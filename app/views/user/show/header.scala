@@ -40,7 +40,7 @@ object header {
         ),
         u.disabled option span(cls := "closed")("CLOSED")
       ),
-      div(cls := "user-show__header")(
+      (info.countTrophiesAndPerfCups > 0) option div(cls := "user-show__header")(
         div(cls := "trophies toomany")(
           views.html.user.bits.perfTrophies(u, info.ranks),
           otherTrophies(info)
