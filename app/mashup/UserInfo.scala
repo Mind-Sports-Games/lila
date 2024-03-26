@@ -37,8 +37,10 @@ case class UserInfo(
       math.round(cr * 100)
     }
 
-  def countTrophiesAndPerfCups =
-    trophies.filterNot(_.kind.klass.has("icon3d")).size + ranks.count(_._2 <= 100)
+  def countDisplayedTrophies =
+    trophies.filterNot(_.kind.klass.has("icon3d")).size + shields.size + revolutions.size + ranks.count(
+      _._2 <= 100
+    )
 }
 
 object UserInfo {
