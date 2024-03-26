@@ -234,15 +234,7 @@ export const spinner = () =>
     ]
   );
 
-const noAnalysisBoardVariants: VariantKey[] = [
-  'monster',
-  'amazons',
-  'go9x9',
-  'go13x13',
-  'go19x19',
-  'backgammon',
-  'nackgammon',
-];
+const noAnalysisBoardVariants: VariantKey[] = ['monster', 'amazons', 'backgammon', 'nackgammon'];
 
 export function allowAnalysisForVariant(variant: VariantKey) {
   return noAnalysisBoardVariants.indexOf(variant) == -1;
