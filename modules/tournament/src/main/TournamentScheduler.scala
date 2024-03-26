@@ -70,6 +70,20 @@ final private class TournamentScheduler(
     val nextSaturday                    = nextDayOfWeek(6)
     val nextSunday                      = nextDayOfWeek(7)
 
+    def monthOfWithWeekAndDayOfWeek(month: OfMonth, weekOfMonth: Int, dayOfWeek: Int) =
+      month.firstDay
+        .plusDays(
+          if (month.firstDay.getDayOfWeek <= dayOfWeek) dayOfWeek - month.firstDay.getDayOfWeek
+          else 7 - month.firstDay.getDayOfWeek + dayOfWeek
+        )
+        .plusDays(7 * (weekOfMonth - 1))
+
+    def thisMonthWeekAndDayOfWeek(weekOfMonth: Int, dayOfWeek: Int) =
+      monthOfWithWeekAndDayOfWeek(thisMonth, weekOfMonth, dayOfWeek)
+
+    def nextMonthWeekAndDayOfWeek(weekOfMonth: Int, dayOfWeek: Int) =
+      monthOfWithWeekAndDayOfWeek(nextMonth, weekOfMonth, dayOfWeek)
+
     def secondWeekOf(month: Int) = {
       val start = orNextYear(startOfYear.withMonthOfYear(month))
       start.plusDays(15 - start.getDayOfWeek)
@@ -116,14 +130,14 @@ final private class TournamentScheduler(
         Schedule(Unique, speed, variant, none, date, Some(duration)).plan
       }
 
-    def scheduleMedleyShield(speed: Schedule.Speed, medleyShield: TournamentShield.MedleyShield)(
+    def scheduleMedleyShield(medleyShield: TournamentShield.MedleyShield)(
         day: DateTime
     ) =
       at(day, medleyShield.hour) map { date =>
         Schedule(
           MedleyShield,
-          speed,
-          medleyShield.eligibleVariants.head,
+          medleyShield.speed,
+          medleyShield.variants.head,
           none,
           date,
           Some(medleyShield.arenaMinutes),
@@ -189,28 +203,48 @@ final private class TournamentScheduler(
       }
 
     //schedule this week
-    val thisWeekMedleyShields = TournamentShield.MedleyShield.all
+    val thisWeekMedleyShields = TournamentShield.MedleyShield.allWeekly
       .map(ms =>
-        scheduleMedleyShield(Blitz53, ms)(
+        scheduleMedleyShield(ms)(
           nextDayOfWeek(ms.dayOfWeek)
         )
       )
       .flatten filter { _.schedule.at isAfter rightNow }
 
     //and schedule two weeks in advance
-    val nextWeekMedleyShields = TournamentShield.MedleyShield.all
+    val nextWeekMedleyShields = TournamentShield.MedleyShield.allWeekly
       .map(ms =>
-        scheduleMedleyShield(Blitz53, ms)(
+        scheduleMedleyShield(ms)(
           nextDayOfFortnight(ms.dayOfWeek + 7)
         )
       )
       .flatten filter { _.schedule.at isAfter rightNow }
 
+    //schedule this month
+    val thisMonthMedleyShields = TournamentShield.MedleyShield.allMonthly
+      .map(ms =>
+        scheduleMedleyShield(ms)(
+          thisMonthWeekAndDayOfWeek(ms.weekOfMonth.getOrElse(1), ms.dayOfWeek)
+        )
+      )
+      .flatten filter { _.schedule.at isAfter rightNow }
+
+    //and schedule two months in advance
+    val nextMonthMedleyShields = TournamentShield.MedleyShield.allMonthly
+      .map(ms =>
+        scheduleMedleyShield(ms)(
+          nextMonthWeekAndDayOfWeek(ms.weekOfMonth.getOrElse(1), ms.dayOfWeek)
+        )
+      )
+      .flatten filter { _.schedule.at isAfter rightNow }
+
+    val shieldDuration = Some(90)
+
     //schedule this months shields
     val thisMonthShields = TournamentShield.Category.all
       .map(shield =>
         at(thisMonthWithDay(shield.dayOfMonth), shield.scheduleHour(thisMonth.index)) map { date =>
-          Schedule(Shield, shield.speed, shield.variant, none, date) plan {
+          Schedule(Shield, shield.speed, shield.variant, none, date, shieldDuration) plan {
             _.copy(
               name = s"${VariantKeys.variantName(shield.variant)} Shield",
               spotlight = Some(
@@ -229,7 +263,7 @@ final private class TournamentScheduler(
     val nextMonthShields = TournamentShield.Category.all
       .map(shield =>
         at(nextMonthWithDay(shield.dayOfMonth), shield.scheduleHour(nextMonth.index)) map { date =>
-          Schedule(Shield, shield.speed, shield.variant, none, date) plan {
+          Schedule(Shield, shield.speed, shield.variant, none, date, shieldDuration) plan {
             _.copy(
               name = s"${VariantKeys.variantName(shield.variant)} Shield",
               spotlight = Some(
@@ -254,18 +288,20 @@ final private class TournamentScheduler(
       (nextTuesday, 5),
       (nextTuesday, 8),
       (nextTuesday, 14),
+      (nextTuesday, 16),
       (nextTuesday, 20),
       (nextWednesday, 1),
       (nextWednesday, 4),
       (nextWednesday, 7),
       (nextWednesday, 10),
       (nextWednesday, 15),
-      (nextWednesday, 19),
+      (nextWednesday, 21),
       (nextThursday, 0),
       (nextThursday, 3),
       (nextThursday, 6),
       (nextThursday, 9),
       (nextThursday, 14),
+      (nextThursday, 16),
       (nextThursday, 20),
       (nextFriday, 1),
       (nextFriday, 5),
@@ -276,13 +312,13 @@ final private class TournamentScheduler(
       (nextSaturday, 4),
       (nextSaturday, 7),
       (nextSaturday, 10),
-      (nextSaturday, 16),
+      //(nextSaturday, 16),
       (nextSaturday, 22),
       (nextSunday, 4),
       (nextSunday, 7),
       (nextSunday, 10),
-      (nextSunday, 16),
-      (nextSunday, 22)
+      //(nextSunday, 16),
+      (nextSunday, 23)
     )
 
     val nextWeeklySchedule = weeklySchedule.map { case (day, hour) => (day.plusDays(7), hour) }
@@ -323,7 +359,7 @@ final private class TournamentScheduler(
       (Variant.Chess(strategygames.chess.variant.RacingKings), Blitz32),
       (Variant.Draughts(strategygames.draughts.variant.Russian), Blitz32),
       (Variant.FairySF(strategygames.fairysf.variant.Flipello10), Blitz32),
-      (Variant.Backgammon(strategygames.backgammon.variant.Backgammon), Delay212),
+      (Variant.Backgammon(strategygames.backgammon.variant.Backgammon), Delay310),
       (Variant.Chess(strategygames.chess.variant.NoCastling), Blitz32),
       (Variant.Draughts(strategygames.draughts.variant.Frisian), Blitz32),
       (Variant.Togyzkumalak(strategygames.togyzkumalak.variant.Togyzkumalak), Blitz53),
@@ -333,7 +369,7 @@ final private class TournamentScheduler(
       (Variant.Chess(strategygames.chess.variant.ThreeCheck), Blitz32),
       (Variant.FairySF(strategygames.fairysf.variant.MiniXiangqi), Blitz32),
       (Variant.Go(strategygames.go.variant.Go13x13), Blitz53),
-      (Variant.Backgammon(strategygames.backgammon.variant.Nackgammon), Delay212),
+      (Variant.Backgammon(strategygames.backgammon.variant.Nackgammon), Delay310),
       (Variant.Chess(strategygames.chess.variant.Standard), Blitz32)
     )
 
@@ -467,18 +503,25 @@ final private class TournamentScheduler(
       scheduleYearly24hr(Variant.Go(strategygames.go.variant.Go9x9), Blitz32)(
         new DateTime(2024, 9, 13, 0, 0)
       ),
-      scheduleYearly24hr(Variant.Backgammon(strategygames.backgammon.variant.Backgammon), Delay212)(
+      scheduleYearly24hr(Variant.Backgammon(strategygames.backgammon.variant.Backgammon), Delay310)(
         new DateTime(2024, 9, 20, 0, 0)
       )
       //TODO seperate out both backgammon variants
-      // scheduleYearly24hr(Variant.Backgammon(strategygames.backgammon.variant.Nackgammon), Delay212)(
+      // scheduleYearly24hr(Variant.Backgammon(strategygames.backgammon.variant.Nackgammon), Delay310)(
       //   new DateTime(2024, 9, 27, 0, 0)
       // )
       //Fri 27th is the end of year medley
     ).flatten filter { _.schedule.at isAfter rightNow }
 
     //order matters for pruning weekly/yearly tournaments
-    yearly2024Tournaments ::: thisWeekMedleyShields ::: nextWeekMedleyShields ::: thisMonthShields ::: nextMonthShields ::: weeklyTourmaments
+    yearly2024Tournaments :::
+      thisWeekMedleyShields :::
+      nextWeekMedleyShields :::
+      thisMonthMedleyShields :::
+      nextMonthMedleyShields :::
+      thisMonthShields :::
+      nextMonthShields :::
+      weeklyTourmaments
 
 //          List( // shield tournaments!
 //            month.firstWeek.withDayOfWeek(MONDAY)    -> Bullet,

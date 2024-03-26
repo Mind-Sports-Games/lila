@@ -9,6 +9,9 @@ import controllers.routes
 
 object atom {
 
+  def urlencode(str: String): String =
+    java.net.URLEncoder.encode(str, "US-ASCII")
+
   def apply(
       pager: Paginator[io.prismic.Document],
       baseUrl: BaseUrl
@@ -25,13 +28,17 @@ object atom {
       tag("updated")(pager.currentPageResults.headOption.flatMap(atomDate("blog.date"))),
       pager.currentPageResults.map { doc =>
         tag("entry")(
-          tag("id")(s"$baseUrl${routes.Blog.show(doc.id, doc.slug)}"),
+          tag("id")(
+            s"$baseUrl${routes.Blog
+              .show(doc.id, urlencode(doc.getText("blog.title").getOrElse("-").toLowerCase().replace(" ", "-")))}"
+          ),
           tag("published")(atomDate("blog.date")(doc)),
           tag("updated")(atomDate("blog.date")(doc)),
           link(
             rel := "alternate",
             tpe := "text/html",
-            href := s"$baseUrl${routes.Blog.show(doc.id, doc.slug)}"
+            href := s"$baseUrl${routes.Blog
+              .show(doc.id, urlencode(doc.getText("blog.title").getOrElse("-").toLowerCase().replace(" ", "-")))}"
           ),
           tag("title")(doc.getText("blog.title")),
           tag("category")(

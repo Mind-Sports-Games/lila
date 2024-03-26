@@ -94,13 +94,14 @@ final class PostApi(
 
   private val quickHideCategs = Set("playstrategy-feedback", "off-topic-discussion")
 
-  private def shouldHideOnPost(topic: Topic) =
-    topic.visibleOnHome && {
-      (quickHideCategs(topic.categId) && topic.nbPosts == 1) || {
-        topic.nbPosts == maxPerPage.value ||
-        (!topic.looksLikeTeamForum && topic.createdAt.isBefore(DateTime.now minusDays 5))
-      }
-    }
+  //while we are small dont hide posts, let them display on home page
+  private def shouldHideOnPost(topic: Topic) = false
+  // topic.visibleOnHome && {
+  //   (quickHideCategs(topic.categId) && topic.nbPosts == 1) || {
+  //     topic.nbPosts == maxPerPage.value ||
+  //     (!topic.looksLikeTeamForum && topic.createdAt.isBefore(DateTime.now minusDays 5))
+  //   }
+  // }
 
   def urlData(postId: String, forUser: Option[User]): Fu[Option[PostUrlData]] =
     get(postId) flatMap {

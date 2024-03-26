@@ -8,6 +8,9 @@ import controllers.routes
 
 object show {
 
+  def urlencode(str: String): String =
+    java.net.URLEncoder.encode(str, "US-ASCII")
+
   def apply(doc: io.prismic.Document)(implicit ctx: Context, prismic: lila.blog.BlogApi.Context) =
     views.html.base.layout(
       title = s"${~doc.getText("blog.title")} | Blog",
@@ -17,7 +20,9 @@ object show {
           `type` = "article",
           image = doc.getImage("blog.image", "main").map(_.url),
           title = ~doc.getText("blog.title"),
-          url = s"$netBaseUrl${routes.Blog.show(doc.id, doc.slug).url}",
+          url = s"$netBaseUrl${routes.Blog
+            .show(doc.id, urlencode(doc.getText("blog.title").getOrElse("-").toLowerCase().replace(" ", "-")))
+            .url}",
           description = ~doc.getText("blog.shortlede")
         )
         .some,
@@ -57,5 +62,5 @@ object show {
         )
       )
     )
-    
+
 }

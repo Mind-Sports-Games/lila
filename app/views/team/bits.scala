@@ -56,7 +56,8 @@ object bits {
           href := routes.Team.show(t.id)
         )(
           t.name,
-          ctx.userId.exists(t.leaders.contains) option em("leader")
+          ctx.userId.exists(t.leaders.contains) option em(cls := "leader")("leader"),
+          t.isOfficial option em(cls := "official")("official")
         ),
         shorten(t.description, 200)
       ),
