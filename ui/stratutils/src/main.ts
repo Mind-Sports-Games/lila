@@ -210,6 +210,12 @@ export const variantToRules = (v: VariantKey): Rules => {
       return 'oware';
     case 'togyzkumalak':
       return 'togyzkumalak';
+    case 'go9x9':
+      return 'go9x9';
+    case 'go13x13':
+      return 'go13x13';
+    case 'go19x19':
+      return 'go19x19';
     default:
       return 'chess';
   }
