@@ -18,24 +18,29 @@ object RequestPref {
 
     def paramOrSession(name: String): Option[String] =
       queryParam(req, name) orElse req.session.get(name)
-    
+
     def updateSessionWithParam(name: String): Option[List[PieceSet]] = {
       //Session data is only used for guests it would seem...
-      req.session.get(name)
+      req.session
+        .get(name)
         .map(Json.parse)
         .flatMap(_.validate(pieceSetsRead).asOpt)
-        .map{ps => queryParam(req, name)
-                  .fold(ps)(v => PieceSet.updatePieceSet(ps, v))
-    }}
+        .map { ps =>
+          queryParam(req, name)
+            .fold(ps)(v => PieceSet.updatePieceSet(ps, v))
+        }
+    }
 
     def updateSessionWithThemeParam(name: String): Option[List[Theme]] = {
-      req.session.get(name)
+      req.session
+        .get(name)
         .map(Json.parse)
         .flatMap(_.validate(themesRead).asOpt)
     }
 
     default.copy(
       bg = paramOrSession("bg").flatMap(Pref.Bg.fromString.get) | default.bg,
+      colour = paramOrSession("colour").flatMap(Pref.Colour.fromString.get) | default.colour,
       theme = updateSessionWithThemeParam("theme") | default.theme,
       theme3d = paramOrSession("theme3d") | default.theme3d,
       pieceSet = updateSessionWithParam("pieceSet") | default.pieceSet,

@@ -242,6 +242,12 @@ object PrefForm {
     )
   )
 
+  val colour = Form(
+    single(
+      "colour" -> stringIn(Pref.Colour.fromString.keySet)
+    )
+  )
+
   val is3d = Form(
     single(
       "is3d" -> text.verifying(List("true", "false") contains _)

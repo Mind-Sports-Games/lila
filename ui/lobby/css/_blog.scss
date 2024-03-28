@@ -28,6 +28,30 @@
       background: $c-bg-zebra;
       color: $c-font;
       position: relative;
+      .main-color-white & {
+        border: hsl(30, 100%, 99%);
+        border-style: solid;
+      }
+      .main-color-black & {
+        border: hsl(336, 2%, 47%);
+        border-style: solid;
+      }
+      .main-color-red & {
+        border: hsl(7, 54%, 70%);
+        border-style: solid;
+      }
+      .main-color-blue & {
+        border: hsl(192, 35%, 71%);
+        border-style: solid;
+      }
+      .main-color-green & {
+        border: hsl(75, 31%, 72%);
+        border-style: solid;
+      }
+      .main-color-yellow & {
+        border: hsl(35, 96%, 80%);
+        border-style: solid;
+      }
 
       &--link:hover {
         box-shadow: 0 0 5px $c-link, 0 0 20px $c-link;
@@ -60,6 +84,30 @@
       &__image {
         width: 100%;
         height: auto;
+        .main-color-white & {
+          border-bottom: hsl(30, 100%, 99%);
+          border-bottom-style: solid;
+        }
+        .main-color-black & {
+          border-bottom: hsl(336, 2%, 47%);
+          border-bottom-style: solid;
+        }
+        .main-color-red & {
+          border-bottom: hsl(7, 54%, 70%);
+          border-bottom-style: solid;
+        }
+        .main-color-blue & {
+          border-bottom: hsl(192, 35%, 71%);
+          border-bottom-style: solid;
+        }
+        .main-color-green & {
+          border-bottom: hsl(75, 31%, 72%);
+          border-bottom-style: solid;
+        }
+        .main-color-yellow & {
+          border-bottom: hsl(35, 96%, 80%);
+          border-bottom-style: solid;
+        }
         &.blog-post-image-default {
           background-image: img-url('placeholder-margin.png');
           background-size: cover;

@@ -10,6 +10,7 @@ object JsonView {
       "dark"                -> (p.bg != Pref.Bg.LIGHT),
       "transp"              -> (p.bg == Pref.Bg.TRANSPARENT),
       "bgImg"               -> p.bgImgOrDefault,
+      "colour"              -> p.colour,
       "is3d"                -> p.is3d,
       "theme"               -> p.theme.map(p => Json.obj("name" -> p.name, "gameFamily" -> p.gameFamily)),
       "pieceSet"            -> p.pieceSet.map(p => Json.obj("name" -> p.name, "gameFamily" -> p.gameFamily)),
