@@ -1,6 +1,6 @@
 package lila.tournament
 
-import org.joda.time.{ DateTime, Weeks }
+import org.joda.time.{ DateTime, Months, Weeks }
 import reactivemongo.api.ReadPreference
 import scala.concurrent.duration._
 import scala.util.Random
@@ -504,14 +504,22 @@ object TournamentShield {
 
     def byKey(k: String): Option[MedleyShield] = all.find(_.key == k)
 
-    private val medleyStartDate = new DateTime(2022, 6, 11, 0, 0)
-    val arenaMedleyStartDate    = new DateTime(2022, 8, 7, 22, 0)
+    private val medleyStartDate              = new DateTime(2022, 6, 11, 0, 0)
+    private val arenaMedleyStartDate         = new DateTime(2022, 8, 7, 22, 0)
+    private val monthlyMedleyShieldStartDate = new DateTime(2024, 4, 1, 0, 0)
 
     def weeksSinceStart(startsAt: DateTime) =
       Weeks.weeksBetween(medleyStartDate, startsAt).getWeeks()
 
-    def makeName(baseName: String, startsAt: DateTime) =
-      s"${baseName} ${weeksSinceStart(startsAt) + 1}"
+    def monthsSinceStart(startsAt: DateTime) =
+      Months.monthsBetween(monthlyMedleyShieldStartDate, startsAt).getMonths()
+
+    def countSinceStart(startsAt: DateTime, isWeekly: Boolean) =
+      if (isWeekly) weeksSinceStart(startsAt) + 1
+      else monthsSinceStart(startsAt) + 1
+
+    def makeName(baseName: String, startsAt: DateTime, isWeekly: Boolean) =
+      s"${baseName} ${countSinceStart(startsAt, isWeekly) + 1}"
   }
 
   sealed abstract class Category(
