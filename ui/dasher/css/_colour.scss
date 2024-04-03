@@ -1,0 +1,28 @@
+#dasher_app {
+  .colour-choice {
+    border-radius: 50%;
+    width: 1.5em;
+    height: 1.5em;
+    &.white {
+      background: $c-color-choice-white;
+    }
+    &.black {
+      background: $c-color-choice-black;
+    }
+    &.red {
+      background: $c-color-choice-red;
+    }
+    &.blue {
+      background: $c-color-choice-blue;
+    }
+    &.green {
+      background: $c-color-choice-green;
+    }
+    &.yellow {
+      background: $c-color-choice-yellow;
+    }
+  }
+  .sub.colour .selector a {
+    display: flex;
+  }
+}

@@ -28,29 +28,34 @@
       background: $c-bg-zebra;
       color: $c-font;
       position: relative;
-      .main-color-white & {
-        border: hsl(30, 100%, 99%);
-        border-style: solid;
-      }
-      .main-color-black & {
-        border: hsl(336, 2%, 47%);
-        border-style: solid;
-      }
-      .main-color-red & {
-        border: hsl(7, 54%, 70%);
-        border-style: solid;
-      }
-      .main-color-blue & {
-        border: hsl(192, 35%, 71%);
-        border-style: solid;
-      }
-      .main-color-green & {
-        border: hsl(75, 31%, 72%);
-        border-style: solid;
-      }
-      .main-color-yellow & {
-        border: hsl(35, 96%, 80%);
-        border-style: solid;
+
+      &__container {
+        height: 100%;
+
+        .main-color-white & {
+          border: $c-color-choice-white;
+          border-style: solid;
+        }
+        .main-color-black & {
+          border: $c-color-choice-black;
+          border-style: solid;
+        }
+        .main-color-red & {
+          border: $c-color-choice-red;
+          border-style: solid;
+        }
+        .main-color-blue & {
+          border: $c-color-choice-blue;
+          border-style: solid;
+        }
+        .main-color-green & {
+          border: $c-color-choice-green;
+          border-style: solid;
+        }
+        .main-color-yellow & {
+          border: $c-color-choice-yellow;
+          border-style: solid;
+        }
       }
 
       &--link:hover {
@@ -85,27 +90,27 @@
         width: 100%;
         height: auto;
         .main-color-white & {
-          border-bottom: hsl(30, 100%, 99%);
+          border-bottom: $c-color-choice-white;
           border-bottom-style: solid;
         }
         .main-color-black & {
-          border-bottom: hsl(336, 2%, 47%);
+          border-bottom: $c-color-choice-black;
           border-bottom-style: solid;
         }
         .main-color-red & {
-          border-bottom: hsl(7, 54%, 70%);
+          border-bottom: $c-color-choice-red;
           border-bottom-style: solid;
         }
         .main-color-blue & {
-          border-bottom: hsl(192, 35%, 71%);
+          border-bottom: $c-color-choice-blue;
           border-bottom-style: solid;
         }
         .main-color-green & {
-          border-bottom: hsl(75, 31%, 72%);
+          border-bottom: $c-color-choice-green;
           border-bottom-style: solid;
         }
         .main-color-yellow & {
-          border-bottom: hsl(35, 96%, 80%);
+          border-bottom: $c-color-choice-yellow;
           border-bottom-style: solid;
         }
         &.blog-post-image-default {

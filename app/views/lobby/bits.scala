@@ -92,15 +92,17 @@ object bits {
       div(cls := "lobby__blog blog-post-cards")(
         posts map { post =>
           a(cls := "blog-post-card blog-post-card--link", href := routes.Blog.show(post.id, post.slug))(
-            img(
-              src := post.image,
-              cls := "blog-post-card__image",
-              widthA := 400,
-              heightA := 400 * 10 / 16
-            ),
-            span(cls := "blog-post-card__content")(
-              h2(cls := "blog-post-card__title")(post.title),
-              semanticDate(post.date)(ctx.lang)(cls := "blog-post-card__over-image")
+            div(cls := "blog-post-card__container")(
+              img(
+                src := post.image,
+                cls := "blog-post-card__image",
+                widthA := 400,
+                heightA := 400 * 10 / 16
+              ),
+              span(cls := "blog-post-card__content")(
+                h2(cls := "blog-post-card__title")(post.title),
+                semanticDate(post.date)(ctx.lang)(cls := "blog-post-card__over-image")
+              )
             )
           )
         }
