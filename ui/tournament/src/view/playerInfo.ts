@@ -16,7 +16,7 @@ function result(win, stat): string {
 }
 
 function playerTitle(player) {
-  return h('h2.player-title', [h('span.rank', player.rank + '. '), renderPlayer(player, true, false, true, false)]);
+  return h('h2.player-title', [h('span.rank', player.disqualified ? 'DQ' : player.rank + '. '), renderPlayer(player, true, true, true, false)]);
 }
 
 function setup(vnode: VNode) {
@@ -105,9 +105,11 @@ export default function (ctrl: TournamentController): VNode {
                 h('th', '' + (Math.max(nb.game, pairingsLen) - i)),
                 ctrl.data.medley ? h('td', { attrs: { 'data-icon': p.variantIcon } }, '') : null,
                 h('td', playerName(p.op)),
-                h('td', ctrl.data.medley ? '' : p.op.rating),
+                h('td', ctrl.data.medley ? null : p.op.rating),
+                berserkTd(!!p.op.berserk),
                 h('td.is.playerIndex-icon.' + p.playerColor),
-                h('td', res),
+                h('td.result', res),
+                berserkTd(p.berserk)
               ]
             );
           })
@@ -116,3 +118,7 @@ export default function (ctrl: TournamentController): VNode {
     ]
   );
 }
+
+const berserkTd = (b: boolean) =>
+  b ? h('td.berserk', { attrs: { 'data-icon': "`", title: 'Berserk' } }) : h('td.berserk');
+

@@ -12,8 +12,9 @@ import lila.user.User
 
 final class PlayerRepo(coll: Coll)(implicit ec: scala.concurrent.ExecutionContext) {
 
-  private def selectId(id: Tournament.ID)       = $doc("_id" -> id)
-  private def selectTour(tourId: Tournament.ID) = $doc("tid" -> tourId)
+  private def selectId(id: Tournament.ID)           = $doc("_id" -> id)
+  private def selectTour(tourId: Tournament.ID)     = $doc("tid" -> tourId)
+  private def selectTourNoDQ(tourId: Tournament.ID) = $doc("tid" -> tourId, "dq" $ne true)
   private def selectTourUser(tourId: Tournament.ID, userId: User.ID) =
     $doc(
       "tid" -> tourId,
@@ -26,15 +27,25 @@ final class PlayerRepo(coll: Coll)(implicit ec: scala.concurrent.ExecutionContex
 
   def byId(id: Tournament.ID): Fu[Option[Player]] = coll.one[Player](selectId(id))
 
-  private[tournament] def bestByTour(tourId: Tournament.ID, nb: Int, skip: Int = 0): Fu[List[Player]] =
-    coll.find(selectTour(tourId)).sort(bestSort).skip(skip).cursor[Player]().list(nb)
+  private def selectTour(tourId: Tournament.ID, noDQs: Boolean): Bdoc =
+    if (noDQs) selectTourNoDQ(tourId)
+    else selectTour(tourId)
+
+  private[tournament] def bestByTour(
+      tourId: Tournament.ID,
+      nb: Int,
+      skip: Int = 0,
+      noDQs: Boolean = false
+  ): Fu[List[Player]] =
+    coll.find(selectTour(tourId, noDQs)).sort(bestSort).skip(skip).cursor[Player]().list(nb)
 
   private[tournament] def bestByTourWithRank(
       tourId: Tournament.ID,
       nb: Int,
-      skip: Int = 0
+      skip: Int = 0,
+      noDQs: Boolean = false
   ): Fu[RankedPlayers] =
-    bestByTour(tourId, nb, skip).map { res =>
+    bestByTour(tourId, nb, skip, noDQs).map { res =>
       res
         .foldRight(List.empty[RankedPlayer] -> (res.size + skip)) { case (p, (res, rank)) =>
           (RankedPlayer(rank, p) :: res, rank - 1)
@@ -58,7 +69,7 @@ final class PlayerRepo(coll: Coll)(implicit ec: scala.concurrent.ExecutionContex
     coll
       .aggregateList(maxDocs = TeamBattle.maxTeams) { framework =>
         import framework._
-        Match(selectTour(tourId)) -> List(
+        Match(selectTourNoDQ(tourId)) -> List(
           Sort(Descending("m")),
           GroupField("t")(
             "m" -> Push(
@@ -114,7 +125,7 @@ final class PlayerRepo(coll: Coll)(implicit ec: scala.concurrent.ExecutionContex
       .aggregateWith[Bdoc]() { framework =>
         import framework._
         List(
-          Match(selectTour(tourId) ++ $doc("t" -> teamId)),
+          Match(selectTourNoDQ(tourId) ++ $doc("t" -> teamId)),
           Sort(Descending("m")),
           Facet(
             List(
@@ -228,7 +239,7 @@ final class PlayerRepo(coll: Coll)(implicit ec: scala.concurrent.ExecutionContex
     coll.countSel(selectTour(tourId) ++ selectActive)
 
   def winner(tourId: Tournament.ID): Fu[Option[Player]] =
-    coll.find(selectTour(tourId)).sort(bestSort).one[Player]
+    coll.find(selectTourNoDQ(tourId)).sort(bestSort).one[Player]
 
   // freaking expensive (marathons)
   private[tournament] def computeRanking(tourId: Tournament.ID): Fu[Ranking] =
