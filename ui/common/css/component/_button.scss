@@ -99,6 +99,67 @@
       color: $c-font-dim;
     }
 
+    .main-color-white & {
+      background: $c-color-choice-white;
+      color: $c-color-choice-font-dark;
+      text-shadow: 0 1px 0 $c-color-choice-white;
+      &:hover {
+        background: $c-color-choice-black-dim;
+        color: $c-color-choice-font-default;
+        text-shadow: 0 1px 0 $c-color-choice-black-dim;
+      }
+    }
+    .main-color-black & {
+      background: $c-color-choice-black;
+      color: $c-color-choice-font-default;
+      text-shadow: 0 1px 0 $c-color-choice-black;
+      &:hover {
+        background: $c-color-choice-black-dim;
+        color: $c-color-choice-font-default;
+        text-shadow: 0 1px 0 $c-color-choice-black-dim;
+      }
+    }
+    .main-color-red & {
+      background: $c-color-choice-red;
+      color: $c-color-choice-font-default;
+      text-shadow: 0 1px 0 $c-color-choice-red;
+      &:hover {
+        background: $c-color-choice-red-dim;
+        color: $c-color-choice-font-default;
+        text-shadow: 0 1px 0 $c-color-choice-red-dim;
+      }
+    }
+    .main-color-blue & {
+      background: $c-color-choice-blue;
+      color: $c-color-choice-font-default;
+      text-shadow: 0 1px 0 $c-color-choice-blue;
+      &:hover {
+        background: $c-color-choice-blue-dim;
+        color: $c-color-choice-font-default;
+        text-shadow: 0 1px 0 $c-color-choice-blue-dim;
+      }
+    }
+    .main-color-green & {
+      background: $c-color-choice-green;
+      color: $c-color-choice-font-default;
+      text-shadow: 0 1px 0 $c-color-choice-green;
+      &:hover {
+        background: $c-color-choice-green-dim;
+        color: $c-color-choice-font-default;
+        text-shadow: 0 1px 0 $c-color-choice-green-dim;
+      }
+    }
+    .main-color-yellow & {
+      background: $c-color-choice-yellow;
+      color: $c-color-choice-font-default;
+      text-shadow: 0 1px 0 $c-color-choice-yellow;
+      &:hover {
+        background: $c-color-choice-yellow-dim;
+        color: $c-color-choice-font-default;
+        text-shadow: 0 1px 0 $c-color-choice-yellow-dim;
+      }
+    }
+
     &:not(.disabled):hover {
       @extend %metal-hover;
     }
