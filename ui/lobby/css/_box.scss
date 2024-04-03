@@ -9,8 +9,7 @@
       padding: 0.3em 0.5em;
 
       .more {
-        color: $c-font-dim;
-
+        color: $c-color-choice-font-default;
         @include transition;
 
         &:hover {
@@ -23,8 +22,52 @@
 
         font-size: 1em;
         font-weight: bold;
-        color: $c-font-dim;
+        color: $c-color-choice-font-default;
         padding: 0.3em;
+      }
+
+      .main-color-white & {
+        background: $c-color-choice-white;
+        .title,
+        .more {
+          text-shadow: 0 1px 0 $c-color-choice-white;
+          color: $c-color-choice-font-dark;
+        }
+      }
+      .main-color-black & {
+        background: $c-color-choice-black;
+        .title,
+        .more {
+          text-shadow: 0 1px 0 $c-color-choice-black;
+        }
+      }
+      .main-color-red & {
+        background: $c-color-choice-red;
+        .title,
+        .more {
+          text-shadow: 0 1px 0 $c-color-choice-red;
+        }
+      }
+      .main-color-blue & {
+        background: $c-color-choice-blue;
+        .title,
+        .more {
+          text-shadow: 0 1px 0 $c-color-choice-blue;
+        }
+      }
+      .main-color-green & {
+        background: $c-color-choice-green;
+        .title,
+        .more {
+          text-shadow: 0 1px 0 $c-color-choice-green;
+        }
+      }
+      .main-color-yellow & {
+        background: $c-color-choice-yellow;
+        .title,
+        .more {
+          text-shadow: 0 1px 0 $c-color-choice-yellow;
+        }
       }
     }
 

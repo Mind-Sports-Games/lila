@@ -252,7 +252,24 @@
     }
 
     &:hover {
-      box-shadow: 0 0 5px $c-link, 0 0 20px $c-link;
+      .main-color-white & {
+        box-shadow: 0 0 5px $c-color-choice-white, 0 0 20px $c-color-choice-white;
+      }
+      .main-color-black & {
+        box-shadow: 0 0 5px $c-color-choice-black, 0 0 20px $c-color-choice-black;
+      }
+      .main-color-red & {
+        box-shadow: 0 0 5px $c-color-choice-red, 0 0 20px $c-color-choice-red;
+      }
+      .main-color-blue & {
+        box-shadow: 0 0 5px $c-color-choice-blue, 0 0 20px $c-color-choice-blue;
+      }
+      .main-color-green & {
+        box-shadow: 0 0 5px $c-color-choice-green, 0 0 20px $c-color-choice-green;
+      }
+      .main-color-yellow & {
+        box-shadow: 0 0 5px $c-color-choice-yellow, 0 0 20px $c-color-choice-yellow;
+      }
     }
 
     time {
