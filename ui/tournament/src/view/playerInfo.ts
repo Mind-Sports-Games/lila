@@ -16,7 +16,10 @@ function result(win, stat): string {
 }
 
 function playerTitle(player) {
-  return h('h2.player-title', [h('span.rank', player.disqualified ? 'DQ' : player.rank + '. '), renderPlayer(player, true, true, true, false)]);
+  return h('h2.player-title', [
+    h('span.rank', player.disqualified ? 'DQ' : player.rank + '. '),
+    renderPlayer(player, true, true, true, false),
+  ]);
 }
 
 function setup(vnode: VNode) {
@@ -109,7 +112,7 @@ export default function (ctrl: TournamentController): VNode {
                 berserkTd(!!p.op.berserk),
                 h('td.is.playerIndex-icon.' + p.playerColor),
                 h('td.result', res),
-                berserkTd(p.berserk)
+                berserkTd(p.berserk),
               ]
             );
           })
@@ -120,5 +123,4 @@ export default function (ctrl: TournamentController): VNode {
 }
 
 const berserkTd = (b: boolean) =>
-  b ? h('td.berserk', { attrs: { 'data-icon': "`", title: 'Berserk' } }) : h('td.berserk');
-
+  b ? h('td.berserk', { attrs: { 'data-icon': '`', title: 'Berserk' } }) : h('td.berserk');
