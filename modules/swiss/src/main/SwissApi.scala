@@ -56,6 +56,7 @@ final class SwissApi(
   import BsonHandlers._
 
   def byId(id: Swiss.Id)            = colls.swiss.byId[Swiss](id.value)
+  def finishedById(id: Swiss.Id)    = byId(id).dmap(_.filter(_.isFinished))
   def notFinishedById(id: Swiss.Id) = byId(id).dmap(_.filter(_.isNotFinished))
   def createdById(id: Swiss.Id)     = byId(id).dmap(_.filter(_.isCreated))
   def startedById(id: Swiss.Id)     = byId(id).dmap(_.filter(_.isStarted))
@@ -414,6 +415,15 @@ final class SwissApi(
           }
       }.void
     } >> recomputeAndUpdateAll(id)
+
+  def disqualify(id: String, userId: User.ID) =
+    Sequencing(Swiss.Id(id))(finishedById) { swiss =>
+      SwissPlayer.fields { f =>
+        val selId = $id(SwissPlayer.makeId(swiss.id, userId))
+        colls.player.updateField(selId, f.disqualified, true)
+      }.void >>-
+      socket.reload(swiss.id)
+    }
 
   def recomputeScore(id: String): Funit =
     recomputeAndUpdateAll(Swiss.Id(id))

@@ -496,6 +496,11 @@ final class TournamentApi(
       }.sequenceFu.void
     }
 
+  def disqualify(tourId: Tournament.ID, userId: User.ID): Funit =
+    Sequencing(tourId)(tournamentRepo.finishedById) { tour =>
+      playerRepo.disqualify(tour.id, userId) >>- socket.reload(tour.id) >>- publish()
+    }
+
   private[tournament] def berserk(gameId: Game.ID, userId: User.ID): Funit =
     proxyRepo game gameId flatMap {
       _.filter(_.berserkable) ?? { game =>
