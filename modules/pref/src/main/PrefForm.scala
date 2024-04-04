@@ -242,9 +242,9 @@ object PrefForm {
     )
   )
 
-  val colour = Form(
+  val color = Form(
     single(
-      "colour" -> stringIn(Pref.Colour.fromString.keySet)
+      "color" -> stringIn(Pref.Color.fromString.keySet)
     )
   )
 

@@ -104,18 +104,18 @@
     }
   }
 
-  &.button-colour-choice {
-    .main-color-white & {
-      background: $c-color-choice-white;
-      color: $c-color-choice-font-dark;
-      text-shadow: 0 1px 0 $c-color-choice-white;
+  &.button-color-choice {
+    .selected-color-original & {
+      @extend %metal;
+      &,
       &:hover {
-        background: $c-color-choice-black-dim;
-        color: $c-color-choice-font-default;
-        text-shadow: 0 1px 0 $c-color-choice-black-dim;
+        color: $c-font-dim;
+      }
+      &:not(.disabled):hover {
+        @extend %metal-hover;
       }
     }
-    .main-color-black & {
+    .selected-color-black & {
       background: $c-color-choice-black;
       color: $c-color-choice-font-default;
       text-shadow: 0 1px 0 $c-color-choice-black;
@@ -125,7 +125,7 @@
         text-shadow: 0 1px 0 $c-color-choice-black-dim;
       }
     }
-    .main-color-red & {
+    .selected-color-red & {
       background: $c-color-choice-red;
       color: $c-color-choice-font-default;
       text-shadow: 0 1px 0 $c-color-choice-red;
@@ -135,7 +135,7 @@
         text-shadow: 0 1px 0 $c-color-choice-red-dim;
       }
     }
-    .main-color-blue & {
+    .selected-color-blue & {
       background: $c-color-choice-blue;
       color: $c-color-choice-font-default;
       text-shadow: 0 1px 0 $c-color-choice-blue;
@@ -145,7 +145,7 @@
         text-shadow: 0 1px 0 $c-color-choice-blue-dim;
       }
     }
-    .main-color-green & {
+    .selected-color-green & {
       background: $c-color-choice-green;
       color: $c-color-choice-font-default;
       text-shadow: 0 1px 0 $c-color-choice-green;
@@ -155,7 +155,7 @@
         text-shadow: 0 1px 0 $c-color-choice-green-dim;
       }
     }
-    .main-color-yellow & {
+    .selected-color-yellow & {
       background: $c-color-choice-yellow;
       color: $c-color-choice-font-default;
       text-shadow: 0 1px 0 $c-color-choice-yellow;

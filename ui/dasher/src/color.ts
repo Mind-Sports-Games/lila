@@ -3,27 +3,27 @@ import { Redraw, Close, bind, header } from './util';
 import * as xhr from 'common/xhr';
 import throttle from 'common/throttle';
 
-export interface ColourCtrl {
-  list: Colour[];
+export interface ColorCtrl {
+  list: Color[];
   set(k: string): void;
   get(): string;
   trans: Trans;
   close: Close;
 }
 
-export interface ColourData {
+export interface ColorData {
   current: string;
 }
 
-interface Colour {
+interface Color {
   key: string;
   name: string;
   title?: string;
 }
 
-export function ctrl(data: ColourData, trans: Trans, redraw: Redraw, close: Close): ColourCtrl {
-  const list: Colour[] = [
-    { key: 'white', name: 'white' },
+export function ctrl(data: ColorData, trans: Trans, redraw: Redraw, close: Close): ColorCtrl {
+  const list: Color[] = [
+    { key: 'original', name: 'original' },
     { key: 'black', name: trans.noarg('black') },
     { key: 'red', name: 'red' },
     { key: 'blue', name: 'blue' },
@@ -31,7 +31,7 @@ export function ctrl(data: ColourData, trans: Trans, redraw: Redraw, close: Clos
     { key: 'yellow', name: 'yellow' },
   ];
 
-  const announceFail = () => playstrategy.announce({ msg: 'Failed to save colour preference' });
+  const announceFail = () => playstrategy.announce({ msg: 'Failed to save color preference' });
 
   const reloadAllTheThings = () => {
     if (window.Highcharts) playstrategy.reload();
@@ -44,23 +44,23 @@ export function ctrl(data: ColourData, trans: Trans, redraw: Redraw, close: Clos
     set: throttle(700, (c: string) => {
       data.current = c;
       xhr
-        .text('/pref/colour', {
-          body: xhr.form({ colour: c }),
+        .text('/pref/color', {
+          body: xhr.form({ color: c }),
           method: 'post',
         })
         .then(reloadAllTheThings, announceFail);
-      applyColour(data, list);
+      applyColor(data, list);
       redraw();
     }),
     close,
   };
 }
 
-export function view(ctrl: ColourCtrl): VNode {
+export function view(ctrl: ColorCtrl): VNode {
   const cur = ctrl.get();
 
-  return h('div.sub.colour', [
-    header('Colour', ctrl.close),
+  return h('div.sub.color', [
+    header(ctrl.trans.noarg('colorTheme'), ctrl.close),
     h(
       'div.selector.large',
       ctrl.list.map(c => {
@@ -71,17 +71,17 @@ export function view(ctrl: ColourCtrl): VNode {
             attrs: { 'data-icon': 'E', title: c.title || '' },
             hook: bind('click', () => ctrl.set(c.key)),
           },
-          h(`div.colour-choice.${c.name}`)
+          h(`div.color-choice.${c.name}`)
         );
       })
     ),
   ]);
 }
 
-function applyColour(data: ColourData, list: Colour[]) {
+function applyColor(data: ColorData, list: Color[]) {
   const key = data.current;
   $('body')
-    .removeClass(list.map(b => `main-color-${b.key}`).join(' '))
-    .addClass(`main-color-${key}`);
-  $('body').data('main-color', key);
+    .removeClass(list.map(b => `selected-color-${b.key}`).join(' '))
+    .addClass(`selected-color-${key}`);
+  $('body').data('selected-color', key);
 }

@@ -32,9 +32,8 @@ $c-font-clearer: c-light($c-font, 0%);
 $c-shade: c-dimmer($c-font, 80%);
 $c-font-page: c-light($c-font, 37%);
 
-/* Colour choices in prefs */
-$c-color-choice-white: hsl(30, 100%, 99%);
-$c-color-choice-white-dim: hsl(30, 100%, 99%);
+/* Color choices in prefs */
+$c-color-choice-original: hsl(0, 0%, 73%);
 $c-color-choice-black: hsl(336, 2%, 47%);
 $c-color-choice-black-dim: hsl(345, 2%, 69%);
 $c-color-choice-red: hsl(7, 54%, 70%);
@@ -47,7 +46,6 @@ $c-color-choice-yellow: hsl(37, 82%, 67%);
 $c-color-choice-yellow-dim: hsl(35, 96%, 80%);
 
 $c-color-choice-font-default: white;
-$c-color-choice-font-dark: hsl(0, 0%, 30%);
 
 /* Primary: blue */
 $c-primary: hsl(209, 77%, 46%);

@@ -26,43 +26,41 @@
         padding: 0.3em;
       }
 
-      .main-color-white & {
-        background: $c-color-choice-white;
+      .selected-color-original & {
         .title,
         .more {
-          text-shadow: 0 1px 0 $c-color-choice-white;
-          color: $c-color-choice-font-dark;
+          color: $c-font-dim;
         }
       }
-      .main-color-black & {
+      .selected-color-black & {
         background: $c-color-choice-black;
         .title,
         .more {
           text-shadow: 0 1px 0 $c-color-choice-black;
         }
       }
-      .main-color-red & {
+      .selected-color-red & {
         background: $c-color-choice-red;
         .title,
         .more {
           text-shadow: 0 1px 0 $c-color-choice-red;
         }
       }
-      .main-color-blue & {
+      .selected-color-blue & {
         background: $c-color-choice-blue;
         .title,
         .more {
           text-shadow: 0 1px 0 $c-color-choice-blue;
         }
       }
-      .main-color-green & {
+      .selected-color-green & {
         background: $c-color-choice-green;
         .title,
         .more {
           text-shadow: 0 1px 0 $c-color-choice-green;
         }
       }
-      .main-color-yellow & {
+      .selected-color-yellow & {
         background: $c-color-choice-yellow;
         .title,
         .more {

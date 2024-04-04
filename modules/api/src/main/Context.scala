@@ -69,8 +69,8 @@ sealed trait Context extends lila.user.UserContextWrapper {
     else if (pref.bg == Pref.Bg.LIGHT) "light"
     else "dark"
 
-  def currentMainColourCls = Pref.Colour.asString.get(pref.colour).getOrElse(Pref.Colour.default)
-  def currentMainColour    = s"main-color-${currentMainColourCls}"
+  def currentSelectedColorCls = Pref.Color.asString.get(pref.color).getOrElse(Pref.Color.default)
+  def currentSelectedColor    = s"selected-color-${currentSelectedColorCls}"
 
   lazy val mobileApiVersion = Mobile.Api requestVersion req
 

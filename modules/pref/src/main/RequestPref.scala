@@ -40,7 +40,7 @@ object RequestPref {
 
     default.copy(
       bg = paramOrSession("bg").flatMap(Pref.Bg.fromString.get) | default.bg,
-      colour = paramOrSession("colour").flatMap(Pref.Colour.fromString.get) | default.colour,
+      color = paramOrSession("color").flatMap(Pref.Color.fromString.get) | default.color,
       theme = updateSessionWithThemeParam("theme") | default.theme,
       theme3d = paramOrSession("theme3d") | default.theme3d,
       pieceSet = updateSessionWithParam("pieceSet") | default.pieceSet,

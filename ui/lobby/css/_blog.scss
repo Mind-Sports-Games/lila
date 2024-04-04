@@ -32,49 +32,45 @@
       &__container {
         height: 100%;
 
-        .main-color-white & {
-          border: $c-color-choice-white;
-          border-style: solid;
-        }
-        .main-color-black & {
+        .selected-color-black & {
           border: $c-color-choice-black;
           border-style: solid;
         }
-        .main-color-red & {
+        .selected-color-red & {
           border: $c-color-choice-red;
           border-style: solid;
         }
-        .main-color-blue & {
+        .selected-color-blue & {
           border: $c-color-choice-blue;
           border-style: solid;
         }
-        .main-color-green & {
+        .selected-color-green & {
           border: $c-color-choice-green;
           border-style: solid;
         }
-        .main-color-yellow & {
+        .selected-color-yellow & {
           border: $c-color-choice-yellow;
           border-style: solid;
         }
       }
 
       &--link:hover {
-        .main-color-white & {
-          box-shadow: 0 0 5px $c-color-choice-white, 0 0 20px $c-color-choice-white;
+        .selected-color-original & {
+          box-shadow: 0 0 5px $c-link, 0 0 20px $c-link;
         }
-        .main-color-black & {
+        .selected-color-black & {
           box-shadow: 0 0 5px $c-color-choice-black, 0 0 20px $c-color-choice-black;
         }
-        .main-color-red & {
+        .selected-color-red & {
           box-shadow: 0 0 5px $c-color-choice-red, 0 0 20px $c-color-choice-red;
         }
-        .main-color-blue & {
+        .selected-color-blue & {
           box-shadow: 0 0 5px $c-color-choice-blue, 0 0 20px $c-color-choice-blue;
         }
-        .main-color-green & {
+        .selected-color-green & {
           box-shadow: 0 0 5px $c-color-choice-green, 0 0 20px $c-color-choice-green;
         }
-        .main-color-yellow & {
+        .selected-color-yellow & {
           box-shadow: 0 0 5px $c-color-choice-yellow, 0 0 20px $c-color-choice-yellow;
         }
       }
@@ -106,27 +102,23 @@
       &__image {
         width: 100%;
         height: auto;
-        .main-color-white & {
-          border-bottom: $c-color-choice-white;
-          border-bottom-style: solid;
-        }
-        .main-color-black & {
+        .selected-color-black & {
           border-bottom: $c-color-choice-black;
           border-bottom-style: solid;
         }
-        .main-color-red & {
+        .selected-color-red & {
           border-bottom: $c-color-choice-red;
           border-bottom-style: solid;
         }
-        .main-color-blue & {
+        .selected-color-blue & {
           border-bottom: $c-color-choice-blue;
           border-bottom-style: solid;
         }
-        .main-color-green & {
+        .selected-color-green & {
           border-bottom: $c-color-choice-green;
           border-bottom-style: solid;
         }
-        .main-color-yellow & {
+        .selected-color-yellow & {
           border-bottom: $c-color-choice-yellow;
           border-bottom-style: solid;
         }

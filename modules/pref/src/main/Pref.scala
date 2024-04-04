@@ -6,7 +6,7 @@ case class Pref(
     _id: String, // user id
     bg: Int,
     bgImg: Option[String],
-    colour: Int,
+    color: Int,
     is3d: Boolean,
     theme: List[Theme],
     pieceSet: List[PieceSet],
@@ -75,7 +75,7 @@ case class Pref(
       case "bgImg" => copy(bgImg = value.some).some
       // case "theme" =>
       //    copy(theme = Theme.updateBoardTheme(theme, value)).some
-      case "colour" => Pref.Colour.fromString.get(value).map { c => copy(colour = c) }
+      case "color" => Pref.Color.fromString.get(value).map { c => copy(color = c) }
       case "pieceSet" =>
         copy(pieceSet = PieceSet.updatePieceSet(pieceSet, value)).some
       case "theme3d" =>
@@ -174,32 +174,32 @@ object Pref {
     val asString = fromString.map(_.swap)
   }
 
-  object Colour {
-    val WHITE  = 100
-    val BLACK  = 200
-    val RED    = 300
-    val BLUE   = 400
-    val GREEN  = 500
-    val YELLOW = 600
+  object Color {
+    val ORIGINAL = 100
+    val BLACK    = 200
+    val RED      = 300
+    val BLUE     = 400
+    val GREEN    = 500
+    val YELLOW   = 600
 
-    val default = "yellow"
+    val default = "original"
 
     val choices = Seq(
-      WHITE  -> "White",
-      BLACK  -> "Black",
-      RED    -> "Red",
-      BLUE   -> "Blue",
-      GREEN  -> "Green",
-      YELLOW -> "Yellow"
+      ORIGINAL -> "Original",
+      BLACK    -> "Black",
+      RED      -> "Red",
+      BLUE     -> "Blue",
+      GREEN    -> "Green",
+      YELLOW   -> "Yellow"
     )
 
     val fromString = Map(
-      "white"  -> WHITE,
-      "black"  -> BLACK,
-      "red"    -> RED,
-      "blue"   -> BLUE,
-      "green"  -> GREEN,
-      "yellow" -> YELLOW
+      "original" -> ORIGINAL,
+      "black"    -> BLACK,
+      "red"      -> RED,
+      "blue"     -> BLUE,
+      "green"    -> GREEN,
+      "yellow"   -> YELLOW
     )
 
     val asString = fromString.map(_.swap)
@@ -487,7 +487,7 @@ object Pref {
     _id = "",
     bg = Bg.LIGHT,
     bgImg = none,
-    colour = Colour.YELLOW,
+    color = Color.ORIGINAL,
     is3d = false,
     theme = Theme.defaults,
     pieceSet = PieceSet.defaults,

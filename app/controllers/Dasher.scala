@@ -20,6 +20,7 @@ final class Dasher(env: Env) extends LilaController(env) {
     trans.transparent,
     trans.backgroundImageUrl,
     trans.boardGeometry,
+    trans.colorTheme,
     trans.boardTheme,
     trans.boardSize,
     trans.pieceSet,
@@ -72,8 +73,8 @@ final class Dasher(env: Env) extends LilaController(env) {
                   "current" -> lila.pref.Pref.Bg.asString.get(ctx.pref.bg),
                   "image"   -> ctx.pref.bgImgOrDefault
                 ),
-                "colour" -> Json.obj(
-                  "current" -> lila.pref.Pref.Colour.asString.get(ctx.pref.colour)
+                "color" -> Json.obj(
+                  "current" -> lila.pref.Pref.Color.asString.get(ctx.pref.color)
                 ),
                 "board" -> Json.obj(
                   "is3d" -> ctx.pref.is3d

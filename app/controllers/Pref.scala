@@ -98,7 +98,7 @@ final class Pref(env: Env) extends LilaController(env) {
     "soundSet"   -> (forms.soundSet   -> save("soundSet") _),
     "bg"         -> (forms.bg         -> save("bg") _),
     "bgImg"      -> (forms.bgImg      -> save("bgImg") _),
-    "colour"     -> (forms.colour     -> save("colour") _),
+    "color"      -> (forms.color      -> save("color") _),
     "is3d"       -> (forms.is3d       -> save("is3d") _),
     "zen"        -> (forms.zen        -> save("zen") _)
   )
