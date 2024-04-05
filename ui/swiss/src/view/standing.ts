@@ -13,6 +13,7 @@ function playerTr(ctrl: SwissCtrl, player: Player) {
       class: {
         me: ctrl.data.me?.id == userId,
         active: ctrl.playerInfoId === userId,
+        dq: player.disqualified,
       },
       hook: bind('click', _ => ctrl.showPlayerInfo(player), ctrl.redraw),
     },

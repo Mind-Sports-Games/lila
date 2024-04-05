@@ -30,8 +30,12 @@ export function ratio2percent(r: number) {
   return Math.round(100 * r) + '%';
 }
 
+function playerNameWithDQ(p) {
+  return p.disqualified ? h('span.dq', p.name) : p.name;
+}
+
 export function playerName(p) {
-  return p.title ? [h('span.utitle', p.title), ' ' + p.name] : p.name;
+  return p.title ? [h('span.utitle', p.title), ' ' + playerNameWithDQ(p)] : playerNameWithDQ(p);
 }
 
 export function player(p, asLink: boolean, withRating: boolean, withFlag: boolean, defender = false, leader = false) {

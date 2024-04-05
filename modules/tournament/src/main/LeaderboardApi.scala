@@ -23,6 +23,11 @@ final class LeaderboardApi(
   private val maxPerPage = MaxPerPage(15)
 
   private def userSelector(userId: User.ID) = $doc("u" -> userId)
+  private def tourUserSelector(userId: User.ID, tourId: Tournament.ID) =
+    $doc(
+      "u" -> userId,
+      "t" -> tourId
+    )
 
   def recentByUser(user: User, page: Int) =
     paginator(user, page, userSelector(user.id), $sort desc "d")
@@ -86,15 +91,24 @@ final class LeaderboardApi(
       }
   }
 
-  def getAndDeleteRecent(userId: User.ID, since: DateTime): Fu[List[Tournament.ID]] =
+  private def ejectEntries(entryIds: List[String], disqualify: Boolean) =
+    if (disqualify) repo.coll.update.one($inIds(entryIds), $set("dq" -> true)).void
+    else repo.coll.delete.one($inIds(entryIds)).void
+
+  def getAndEjectRecent(userId: User.ID, since: DateTime, disqualify: Boolean): Fu[List[Tournament.ID]] =
     repo.coll.list[Entry](
       $doc(
         "u" -> userId,
         "d" $gt since
       )
     ) flatMap { entries =>
-      (entries.nonEmpty ?? repo.coll.delete.one($inIds(entries.map(_.id))).void) inject entries.map(_.tourId)
+      (entries.nonEmpty ?? ejectEntries(entries.map(_.id), disqualify)) inject entries.map(_.tourId)
     }
+
+  def ejectEntry(userId: User.ID, tourId: Tournament.ID, disqualify: Boolean) =
+    if (disqualify) repo.coll.update.one(tourUserSelector(userId, tourId), $set("dq" -> true)).void
+    else repo.coll.delete.one(tourUserSelector(userId, tourId)).void
+
 
   private def paginator(user: User, page: Int, selector: Bdoc, sort: Bdoc): Fu[Paginator[TourEntry]] =
     Paginator(

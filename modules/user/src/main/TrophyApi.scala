@@ -35,13 +35,19 @@ final class TrophyApi(
   def findByUser(user: User, max: Int = 50): Fu[List[Trophy]] =
     coll.list[Trophy]($doc("user" -> user.id), max).map(_.filter(_.kind != TrophyKind.Unknown))
 
+  def trophiesByUrl(url: String): Fu[List[Trophy]] =
+    coll.list[Trophy]($doc("url" -> url))
+
+  def removeTrophiesByUrl(url: String) =
+    coll.delete.one($doc("url" -> url)).void
+
   def roleBasedTrophies(user: User, isPublicMod: Boolean, isDev: Boolean, isVerified: Boolean): List[Trophy] =
     List(
       isPublicMod option Trophy(
         _id = "",
         user = user.id,
         kind = kindCache sync TrophyKind.moderator,
-        date = org.joda.time.DateTime.now,
+        date = DateTime.now,
         url = none,
         name = none,
         expiry = none
@@ -50,7 +56,7 @@ final class TrophyApi(
         _id = "",
         user = user.id,
         kind = kindCache sync TrophyKind.developer,
-        date = org.joda.time.DateTime.now,
+        date = DateTime.now,
         url = none,
         name = none,
         expiry = none
@@ -59,7 +65,7 @@ final class TrophyApi(
         _id = "",
         user = user.id,
         kind = kindCache sync TrophyKind.verified,
-        date = org.joda.time.DateTime.now,
+        date = DateTime.now,
         url = none,
         name = none,
         expiry = none
@@ -71,7 +77,8 @@ final class TrophyApi(
       userId: String,
       kindKey: String,
       trophyName: Option[String] = None,
-      trophyExpiryDays: Option[Int] = None
+      trophyExpiryDays: Option[Int] = None,
+      date: DateTime = DateTime.now
   ): Funit =
     coll.insert
       .one(
@@ -81,7 +88,7 @@ final class TrophyApi(
           "kind"   -> kindKey,
           "name"   -> trophyName,
           "url"    -> trophyUrl,
-          "date"   -> DateTime.now,
+          "date"   -> date,
           "expiry" -> trophyExpiryDays.map(DateTime.now.plusDays(_))
         )
       ) void

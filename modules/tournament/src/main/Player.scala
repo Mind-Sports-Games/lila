@@ -13,6 +13,7 @@ private[tournament] case class Player(
     provisional: Boolean,
     isBot: Boolean = false,
     withdraw: Boolean = false,
+    disqualified: Boolean = false,
     score: Int = 0,
     fire: Boolean = false,
     performance: Int = 0,
