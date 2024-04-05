@@ -370,11 +370,7 @@ final class JsonView(
         tournamentRepo finishedById id flatMap {
           _ ?? { tour =>
             playerRepo
-              .bestByTourWithRank(
-                tourId = id,
-                nb = 3,
-                noDQs = true
-              )
+              .bestByTourWithRank(tourId = id, nb = 3, noDQs = true)
               .flatMap { top3 =>
                 // check that the winner is still correctly denormalized
                 top3.headOption.map(_.player.userId).filter(w => tour.winnerId.fold(true)(w !=)) foreach {

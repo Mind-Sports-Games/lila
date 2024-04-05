@@ -109,10 +109,10 @@ export default function (ctrl: TournamentController): VNode {
                 ctrl.data.medley ? h('td', { attrs: { 'data-icon': p.variantIcon } }, '') : null,
                 h('td', playerName(p.op)),
                 h('td', ctrl.data.medley ? null : p.op.rating),
-                berserkTd(!!p.op.berserk),
+                berserkTd(!!p.op.berserk, p.op.name),
                 h('td.is.playerIndex-icon.' + p.playerColor),
                 h('td.result', res),
-                berserkTd(p.berserk),
+                berserkTd(p.berserk, data.player.name),
               ]
             );
           })
@@ -122,5 +122,5 @@ export default function (ctrl: TournamentController): VNode {
   );
 }
 
-const berserkTd = (b: boolean) =>
-  b ? h('td.berserk', { attrs: { 'data-icon': '`', title: 'Berserk' } }) : h('td.berserk');
+const berserkTd = (b: boolean, p: string) =>
+  b ? h('td.berserk', { attrs: { 'data-icon': '`', title: p + ' Berserk' } }) : h('td.berserk');

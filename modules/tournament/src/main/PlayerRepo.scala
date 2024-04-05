@@ -197,6 +197,9 @@ final class PlayerRepo(coll: Coll)(implicit ec: scala.concurrent.ExecutionContex
   def remove(tourId: Tournament.ID, userId: User.ID) =
     coll.delete.one(selectTourUser(tourId, userId)).void
 
+  def disqualify(tourId: Tournament.ID, userId: User.ID) =
+    coll.update.one(selectTourUser(tourId, userId), $set("dq" -> true)).void
+
   def existsActive(tourId: Tournament.ID, userId: User.ID) =
     coll.exists(selectTourUser(tourId, userId) ++ selectActive)
 
@@ -229,9 +232,6 @@ final class PlayerRepo(coll: Coll)(implicit ec: scala.concurrent.ExecutionContex
 
   def withdraw(tourId: Tournament.ID, userId: User.ID) =
     coll.update.one(selectTourUser(tourId, userId), $set("w" -> true)).void
-
-  def disqualify(tourId: Tournament.ID, userId: User.ID) =
-    coll.update.one(selectTourUser(tourId, userId), $set("dq" -> true)).void
 
   private[tournament] def withPoints(tourId: Tournament.ID): Fu[List[Player]] =
     coll.list[Player](
