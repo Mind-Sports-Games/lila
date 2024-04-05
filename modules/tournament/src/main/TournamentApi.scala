@@ -21,7 +21,6 @@ import lila.i18n.{ defaultLang, I18nKeys => trans, VariantKeys }
 import lila.rating.PerfType
 import lila.round.actorApi.round.{ AbortForce, GoBerserk }
 import lila.socket.Socket.SendToFlag
-import lila.tournament.Tournament.tournamentUrl
 import lila.user.TrophyKind._
 import lila.user.{ User, UserRepo }
 
@@ -291,7 +290,7 @@ final class TournamentApi(
       _.map {
         case rp if rp.rank == rank =>
           trophyApi.award(
-            tournamentUrl(tour.id),
+            Tournament.tournamentUrl(tour.id),
             rp.player.userId,
             trophyKind,
             tour.name.some,
@@ -318,12 +317,14 @@ final class TournamentApi(
     tour.schedule.??(_.freq == Schedule.Freq.Marathon) ?? {
       playerRepo.bestByTourWithRank(tour.id, 100).flatMap {
         _.map {
-          case rp if rp.rank == 1 => trophyApi.award(tournamentUrl(tour.id), rp.player.userId, marathonWinner)
+          case rp if rp.rank == 1 =>
+            trophyApi.award(Tournament.tournamentUrl(tour.id), rp.player.userId, marathonWinner)
           case rp if rp.rank <= 10 =>
-            trophyApi.award(tournamentUrl(tour.id), rp.player.userId, marathonTopTen)
+            trophyApi.award(Tournament.tournamentUrl(tour.id), rp.player.userId, marathonTopTen)
           case rp if rp.rank <= 50 =>
-            trophyApi.award(tournamentUrl(tour.id), rp.player.userId, marathonTopFifty)
-          case rp => trophyApi.award(tournamentUrl(tour.id), rp.player.userId, marathonTopHundred)
+            trophyApi.award(Tournament.tournamentUrl(tour.id), rp.player.userId, marathonTopFifty)
+          case rp =>
+            trophyApi.award(Tournament.tournamentUrl(tour.id), rp.player.userId, marathonTopHundred)
         }.sequenceFu.void
       }
     }
@@ -641,13 +642,15 @@ final class TournamentApi(
               } >>- callbacks.clearWinnersCache(tour)
             }
           }
-          trophyApi.trophiesByUrl(tournamentUrl(tour.id)).map(_.filter(_.user == userId)).flatMap {
-            trophyList =>
+          trophyApi
+            .trophiesByUrl(Tournament.tournamentUrl(tour.id))
+            .map(_.filter(_.user == userId))
+            .flatMap { trophyList =>
               trophyList.headOption ?? { trophy =>
-                trophyApi.removeTrophiesByUrl(tournamentUrl(tour.id))
+                trophyApi.removeTrophiesByUrl(Tournament.tournamentUrl(tour.id))
                 awardTrophies(tour, trophy.date)
               } >>- callbacks.clearTrophyCache(tour)
-          }
+            }
         } >>-
         socket.reload(tour.id) >>- publish()
     }
