@@ -5,6 +5,9 @@ import RoundController from './ctrl';
 export function updateBoardFromFen(ctrl: RoundController, newFen: string) {
   ctrl.chessground.set({
     dice: ctrl.data.dice ? ctrl.data.dice : [],
+    canUndo: ctrl.data.canUndo,
+    showUndoButton:
+      ctrl.data.player.playerIndex === ctrl.data.game.player && ctrl.data.dice && ctrl.data.dice.length > 0,
     fen: newFen,
   });
   ctrl.chessground.redrawAll();
