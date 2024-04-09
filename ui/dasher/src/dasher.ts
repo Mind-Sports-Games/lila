@@ -2,6 +2,7 @@ import { PingCtrl, ctrl as pingCtrl } from './ping';
 import { LangsCtrl, LangsData, ctrl as langsCtrl } from './langs';
 import { SoundCtrl, ctrl as soundCtrl } from './sound';
 import { BackgroundCtrl, BackgroundData, ctrl as backgroundCtrl } from './background';
+import { ColorCtrl, ColorData, ctrl as colorCtrl } from './color';
 import { BoardCtrl, BoardData, ctrl as boardCtrl } from './board';
 import { ThemeCtrl, ThemeData, ctrl as themeCtrl } from './theme';
 import { PieceCtrl, PieceData, ctrl as pieceCtrl } from './piece';
@@ -14,6 +15,7 @@ export interface DasherData {
     list: string[];
   };
   background: BackgroundData;
+  color: ColorData;
   board: BoardData;
   theme: ThemeData;
   piece: PieceData;
@@ -22,7 +24,7 @@ export interface DasherData {
   i18n: I18nDict;
 }
 
-export type Mode = 'links' | 'langs' | 'sound' | 'background' | 'board' | 'theme' | 'piece';
+export type Mode = 'links' | 'langs' | 'sound' | 'background' | 'color' | 'board' | 'theme' | 'piece';
 
 const defaultMode = 'links';
 
@@ -36,6 +38,7 @@ export interface DasherCtrl {
     langs: LangsCtrl;
     sound: SoundCtrl;
     background: BackgroundCtrl;
+    color: ColorCtrl;
     board: BoardCtrl;
     theme: ThemeCtrl;
     piece: PieceCtrl;
@@ -66,6 +69,7 @@ export function makeCtrl(opts: DasherOpts, data: DasherData, redraw: Redraw): Da
     langs: langsCtrl(data.lang, trans, close),
     sound: soundCtrl(data.sound.list, trans, redraw, close),
     background: backgroundCtrl(data.background, trans, redraw, close),
+    color: colorCtrl(data.color, trans, redraw, close),
     board: boardCtrl(data.board, trans, redraw, close),
     theme: themeCtrl(data.theme, trans, () => (data.board.is3d ? 'd3' : 'd2'), redraw, setMode),
     piece: pieceCtrl(data.piece, trans, () => (data.board.is3d ? 'd3' : 'd2'), redraw, setMode),

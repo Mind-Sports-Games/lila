@@ -53,6 +53,57 @@ $c-tabs-active: $c-accent !default;
     &.active {
       color: $c-tabs-active;
     }
+
+    .selected-color-black .color-choice & {
+      &::after {
+        background: fade-out($c-color-choice-black, 0.3);
+        height: 3px;
+      }
+      &.active {
+        color: $c-color-choice-font-default;
+        background: $c-color-choice-black;
+      }
+    }
+    .selected-color-red .color-choice & {
+      &::after {
+        background: fade-out($c-color-choice-red, 0.3);
+        height: 3px;
+      }
+      &.active {
+        color: $c-color-choice-font-default;
+        background: $c-color-choice-red;
+      }
+    }
+    .selected-color-blue .color-choice & {
+      &::after {
+        background: fade-out($c-color-choice-blue, 0.3);
+        height: 3px;
+      }
+      &.active {
+        color: $c-color-choice-font-default;
+        background: $c-color-choice-blue;
+      }
+    }
+    .selected-color-green .color-choice & {
+      &::after {
+        background: fade-out($c-color-choice-green, 0.3);
+        height: 3px;
+      }
+      &.active {
+        color: $c-color-choice-font-default;
+        background: $c-color-choice-green;
+      }
+    }
+    .selected-color-yellow .color-choice & {
+      &::after {
+        background: fade-out($c-color-choice-yellow, 0.3);
+        height: 3px;
+      }
+      &.active {
+        color: $c-color-choice-font-default;
+        background: $c-color-choice-yellow;
+      }
+    }
   }
 
   .unread {
