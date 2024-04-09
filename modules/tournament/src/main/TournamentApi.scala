@@ -286,13 +286,13 @@ final class TournamentApi(
   }
 
   private def awardTrophyByRank(tour: Tournament, trophyKind: String, rank: Int, date: DateTime) =
-    playerRepo.bestByTourWithRank(tourId = tour.id, nb = rank.pp("rank"), noDQs = true).flatMap {
-      _.pp("bestByTourWithRank").map {
+    playerRepo.bestByTourWithRank(tourId = tour.id, nb = rank, noDQs = true).flatMap {
+      _.map {
         case rp if rp.rank == rank =>
           trophyApi.award(
             Tournament.tournamentUrl(tour.id),
             rp.player.userId,
-            trophyKind.pp("trophyKind"),
+            trophyKind,
             tour.name.some,
             tour.trophyExpiryDays,
             date
