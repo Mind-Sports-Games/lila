@@ -647,7 +647,7 @@ final class TournamentApi(
             .map(_.filter(_.user == userId))
             .flatMap { trophyList =>
               trophyList.headOption ?? { trophy =>
-                trophyApi.removeTrophiesByUrl(Tournament.tournamentUrl(tour.id))
+                trophyApi.removeTrophiesByUrl(Tournament.tournamentUrl(tour.id)) >>
                 awardTrophies(tour, trophy.date)
               } >>- callbacks.clearTrophyCache(tour)
             }
