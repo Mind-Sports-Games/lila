@@ -440,6 +440,7 @@ final class SwissApi(
             }
           }
           .unit
+        recomputeAndUpdateAll(swiss.id)
         socket.reload(swiss.id)
       }
     }
@@ -665,7 +666,11 @@ final class SwissApi(
   private def getWinner(id: Swiss.Id) =
     SwissPlayer
       .fields { f =>
-        colls.player.primitiveOne[User.ID]($doc(f.swissId -> id), $sort desc f.score, f.userId)
+        colls.player.primitiveOne[User.ID](
+          $doc(f.swissId -> id, f.disqualified $ne true),
+          $sort desc f.score,
+          f.userId
+        )
       }
 
   private def doFinish(swiss: Swiss): Funit =
