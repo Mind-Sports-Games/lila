@@ -8,7 +8,6 @@ import lila.user.User
 
 final private[tournament] class ApiActor(
     api: TournamentApi,
-    leaderboard: LeaderboardApi,
     shieldApi: TournamentShieldApi,
     winnersApi: WinnersApi,
     tournamentRepo: TournamentRepo
@@ -25,6 +24,8 @@ final private[tournament] class ApiActor(
     "teamKick"
   )
 
+  val markCheaterDQs = true
+
   def receive = {
 
     case FinishGame(game, _, _) => api.finishGame(game).unit
@@ -33,13 +34,7 @@ final private[tournament] class ApiActor(
 
     case lila.hub.actorApi.mod.MarkCheater(userId, true) =>
       ejectFromEnterable(userId) >>
-        leaderboard
-          .getAndDeleteRecent(userId, DateTime.now minusDays 30)
-          .flatMap {
-            _.map {
-              api.removePlayerAndRewriteHistory(_, userId)
-            }.sequenceFu
-          } >>
+        api.ejectRecent(userId, markCheaterDQs) >>
         shieldApi.clearAfterMarking(userId) >>
         winnersApi.clearAfterMarking(userId)
       ()

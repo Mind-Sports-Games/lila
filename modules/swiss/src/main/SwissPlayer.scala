@@ -16,7 +16,8 @@ case class SwissPlayer(
     performance: Option[Swiss.Performance],
     score: Swiss.Score,
     absent: Boolean,
-    byes: Set[SwissRound.Number] // byes granted by the pairing system - the player was here
+    byes: Set[SwissRound.Number], // byes granted by the pairing system - the player was here
+    disqualified: Boolean
 ) {
   def is(uid: User.ID): Boolean       = uid == userId
   def is(user: User): Boolean         = is(user.id)
@@ -62,7 +63,8 @@ object SwissPlayer {
       performance = none,
       score = Swiss.Score(0),
       absent = false,
-      byes = Set.empty
+      byes = Set.empty,
+      disqualified = false
     ).recomputeScore
 
   case class WithRank(player: SwissPlayer, rank: Int) {
@@ -104,18 +106,19 @@ object SwissPlayer {
     players.view.map(p => p.userId -> p).toMap
 
   object Fields {
-    val id          = "_id"
-    val swissId     = "s"
-    val userId      = "u"
-    val rating      = "r"
-    val provisional = "pr"
-    val points      = "p"
-    val sbTieBreak  = "t"
-    val bhTieBreak  = "tb"
-    val performance = "e"
-    val score       = "c"
-    val absent      = "a"
-    val byes        = "b"
+    val id           = "_id"
+    val swissId      = "s"
+    val userId       = "u"
+    val rating       = "r"
+    val provisional  = "pr"
+    val points       = "p"
+    val sbTieBreak   = "t"
+    val bhTieBreak   = "tb"
+    val performance  = "e"
+    val score        = "c"
+    val absent       = "a"
+    val byes         = "b"
+    val disqualified = "dq"
   }
   def fields[A](f: Fields.type => A): A = f(Fields)
 }

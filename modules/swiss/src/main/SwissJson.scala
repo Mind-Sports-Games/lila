@@ -127,7 +127,7 @@ final class SwissJson(
     swiss.isFinished ?? {
       SwissPlayer.fields { f =>
         colls.player
-          .find($doc(f.swissId -> swiss.id))
+          .find($doc(f.swissId -> swiss.id, f.disqualified $ne true))
           .sort($sort desc f.score)
           .cursor[SwissPlayer]()
           .list(3) flatMap { top3 =>
@@ -168,6 +168,7 @@ final class SwissJson(
         .add("title" -> user.title)
         .add("performance" -> player.performance)
         .add("absent" -> player.absent)
+        .add("disqualified" -> player.disqualified)
   }
 }
 
@@ -267,6 +268,7 @@ object SwissJson {
       .add("performance" -> (performance ?? p.performance))
       .add("provisional" -> p.provisional)
       .add("absent" -> p.absent)
+      .add("disqualified" -> p.disqualified)
 
   private def outcomeJson(outcome: List[SwissSheet.Outcome]): String =
     outcome.head match {

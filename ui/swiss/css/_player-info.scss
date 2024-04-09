@@ -41,6 +41,10 @@
     margin-right: 0.3em;
   }
 
+  .dq {
+    text-decoration: line-through;
+  }
+
   .stats {
     @extend %flex-column;
 
