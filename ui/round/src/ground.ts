@@ -38,7 +38,7 @@ export function makeConfig(ctrl: RoundController): Config {
     boardScores: ['togyzkumalak', 'backgammon', 'nackgammon'].includes(data.game.variant.key),
     dice: dice,
     canUndo: data.canUndo,
-    showUndoButton: turnPlayerIndex == data.player.playerIndex && dice.length > 0,
+    showUndoButton: playing && turnPlayerIndex == data.player.playerIndex && dice.length > 0,
     addPieceZIndex: ctrl.data.pref.is3d,
     selectOnly: data.selectMode,
     highlight: {
