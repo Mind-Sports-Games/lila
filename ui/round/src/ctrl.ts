@@ -405,7 +405,7 @@ export default class RoundController {
       config.liftable = {
         liftDests: util.parsePossibleLifts(this.data.possibleLifts),
       };
-      config.showUndoButton = this.data.player.playerIndex == turnPlayerIndex && dice.length > 0;
+      config.showUndoButton = this.isPlaying() && this.data.player.playerIndex == turnPlayerIndex && dice.length > 0;
       config.canUndo = this.data.canUndo;
       config.gameButtonsActive = true;
       // need to trigger dice roll as it's only supported automatically until multi-point backgammon
