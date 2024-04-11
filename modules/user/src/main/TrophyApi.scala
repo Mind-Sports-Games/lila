@@ -32,7 +32,7 @@ final class TrophyApi(
 
   implicit private val trophyBSONHandler = Macros.handler[Trophy]
 
-  def findByUser(user: User, max: Int = 50): Fu[List[Trophy]] =
+  def findByUser(user: User, max: Int = 100): Fu[List[Trophy]] =
     coll.list[Trophy]($doc("user" -> user.id), max).map(_.filter(_.kind != TrophyKind.Unknown))
 
   def trophiesByUrl(url: String): Fu[List[Trophy]] =
