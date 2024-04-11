@@ -47,8 +47,8 @@ object bits {
       ),*/
       div(cls := "lobby__winners lobby__box")(
         div(cls := "lobby__box__top")(
-          h2(cls := "title text", dataIcon := "g")(trans.tournamentWinners()),
-          a(cls := "more", href := routes.Tournament.leaderboard)(trans.more(), " »")
+          h2(cls := "title text", dataIcon := "g")(trans.medleyShieldHolders()),
+          a(cls := "more", href := routes.Tournament.shields)(trans.more(), " »")
         ),
         div(cls := "lobby__box__content")(
           table(

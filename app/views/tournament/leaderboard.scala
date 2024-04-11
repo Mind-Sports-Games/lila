@@ -31,24 +31,24 @@ object leaderboard {
         fws.yearly.map { w =>
           freqWinner(w, "Yearly")
         },
-        fws.monthly.map { w =>
-          freqWinner(w, "Monthly")
-        },
+        //fws.monthly.map { w =>
+        //  freqWinner(w, "Monthly")
+        //},
         fws.shield.map { w =>
           freqWinner(w, "Shield")
         },
         fws.weekly.map { w =>
           freqWinner(w, "Weekly")
         },
-        fws.daily.map { w =>
-          freqWinner(w, "Daily")
-        },
-        fws.mso21.map { w =>
-          freqWinner(w, "MSO 2021")
-        },
-        fws.msoGP.map { w =>
-          freqWinner(w, "MSO Grand Prix")
-        },
+        //fws.daily.map { w =>
+        //  freqWinner(w, "Daily")
+        //},
+        //fws.mso21.map { w =>
+        //  freqWinner(w, "MSO 2021")
+        //},
+        //fws.msoGP.map { w =>
+        //  freqWinner(w, "MSO Grand Prix")
+        //},
         fws.introductory.map { w =>
           freqWinner(w, "Introductory")
         }

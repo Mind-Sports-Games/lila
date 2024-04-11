@@ -56,7 +56,7 @@ object home {
             a(href := routes.Tournament.help("arena".some))(trans.tournamentFAQ())
           ),
           h2(
-            a(href := routes.Tournament.leaderboard)(trans.leaderboard())
+            a(href := routes.Tournament.shields)(trans.medleyShieldHolders())
           ),
           ul(cls := "leaderboard")(
             winners.top.map { w =>

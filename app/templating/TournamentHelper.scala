@@ -54,8 +54,6 @@ trait TournamentHelper { self: I18nHelper with DateHelper with UserHelper =>
       "SuperBlitz"      -> s"S${icon(Speed.Blitz.perfIcon)}",
       "Grand Prix"      -> "GP",
       " PREMIER"        -> "",
-      "Lines of Action" -> icon(strategygames.chess.variant.LinesOfAction.perfIcon),
-      "Draughts"        -> icon(strategygames.draughts.variant.Standard.perfIcon),
       "Variants Medley" -> icon('5'),
       "Medley"          -> icon('5'),
       " -"              -> ""
@@ -64,13 +62,21 @@ trait TournamentHelper { self: I18nHelper with DateHelper with UserHelper =>
       .map { pt =>
         pt.trans(lila.i18n.defaultLang) -> icon(pt.iconChar)
       }
-      .sortBy(-_._1.length) ++ List("Chess" -> s"${icon(Speed.Blitz.perfIcon)}")
+      .sortBy(-_._1.length) ++
+      List(
+        "Chess"    -> icon(strategygames.chess.variant.Standard.perfIcon),
+        "Draughts" -> icon(strategygames.draughts.variant.Standard.perfIcon)
+      )
 
     def apply(name: String): Frag =
       raw {
-        replacements.foldLeft(name) { case (n, (from, to)) =>
-          n.replace(from, to)
-        }
+        if (name.contains("Medley Shield"))
+          name.split(" ").dropRight(1).mkString(" ").replace(" Medley Shield", icon('5'))
+        else
+          //old replacements
+          replacements.foldLeft(name) { case (n, (from, to)) =>
+            n.replace(from, to)
+          }
       }
   }
 
