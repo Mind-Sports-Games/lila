@@ -435,14 +435,14 @@ final class SwissApi(
           .map(_.filter(_.user == userId))
           .flatMap { trophyList =>
             trophyList.headOption ?? { trophy =>
-              trophyApi.removeTrophiesByUrl(Swiss.swissUrl(swiss.id))
-              awardTrophies(swiss, trophy.date)
+              trophyApi.removeTrophiesByUrl(Swiss.swissUrl(swiss.id)) >>
+                awardTrophies(swiss, trophy.date)
             }
           }
           .unit
-        recomputeAndUpdateAll(swiss.id)
+      } >>
+        recomputeAndUpdateAll(swiss.id) >>-
         socket.reload(swiss.id)
-      }
     }
 
   def recomputeScore(id: String): Funit =
