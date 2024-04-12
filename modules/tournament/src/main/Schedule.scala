@@ -201,6 +201,7 @@ object Schedule {
       override val display = "Experimental Marathon"
     }
     case object Yearly       extends Freq(70, 70)
+    case object Annual       extends Freq(75, 80)
     case object Introductory extends Freq(80, 65)
     case object Unique       extends Freq(90, 59)
     case object MSOWarmUp extends Freq(120, 41) {
@@ -225,6 +226,7 @@ object Schedule {
       Marathon,
       ExperimentalMarathon,
       Yearly,
+      Annual,
       Introductory,
       Unique,
       MSOWarmUp,

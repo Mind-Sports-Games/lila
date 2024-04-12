@@ -19,30 +19,32 @@ case class Winner(
 )
 
 case class FreqWinners(
-    mso21: Option[Winner],
-    msoGP: Option[Winner],
-    msoWarmUp: Option[Winner],
+    //mso21: Option[Winner],
+    //msoGP: Option[Winner],
+    //msoWarmUp: Option[Winner],
     introductory: Option[Winner],
     yearly: Option[Winner],
-    monthly: Option[Winner],
+    //monthly: Option[Winner],
     shield: Option[Winner],
-    weekly: Option[Winner],
-    daily: Option[Winner]
+    weekly: Option[Winner]
+    //daily: Option[Winner]
 ) {
 
   lazy val top: Option[Winner] =
-    daily.filter(_.date isAfter DateTime.now.minusHours(2)) orElse
-      weekly.filter(_.date isAfter DateTime.now.minusDays(1)) orElse
-      monthly.filter(_.date isAfter DateTime.now.minusDays(3)) orElse
+    //daily.filter(_.date isAfter DateTime.now.minusHours(2)) orElse
+    weekly.filter(_.date isAfter DateTime.now.minusDays(1)) orElse
+      //monthly.filter(_.date isAfter DateTime.now.minusDays(3)) orElse
       shield.filter(_.date isAfter DateTime.now.minusDays(3)) orElse
       yearly.filter(_.date isAfter DateTime.now.minusDays(28)) orElse
-      mso21.filter(_.date isAfter DateTime.now.minusDays(60)) orElse
-      msoGP.filter(_.date isAfter DateTime.now.minusDays(60)) orElse
-      msoWarmUp.filter(_.date isAfter DateTime.now.minusDays(14)) orElse
-      introductory orElse msoGP orElse mso21 orElse msoWarmUp orElse yearly orElse monthly orElse shield orElse weekly orElse daily
+      //mso21.filter(_.date isAfter DateTime.now.minusDays(60)) orElse
+      //msoGP.filter(_.date isAfter DateTime.now.minusDays(60)) orElse
+      //msoWarmUp.filter(_.date isAfter DateTime.now.minusDays(14)) orElse
+      //introductory orElse msoGP orElse mso21 orElse msoWarmUp orElse yearly orElse monthly orElse shield orElse weekly orElse daily
+      introductory orElse yearly orElse shield orElse weekly
 
   def userIds =
-    List(mso21, msoGP, msoWarmUp, introductory, yearly, monthly, shield, weekly, daily).flatten.map(_.userId)
+    List(introductory, yearly, shield, weekly).flatten.map(_.userId)
+  //List(mso21, msoGP, msoWarmUp, introductory, yearly, monthly, shield, weekly, daily).flatten.map(_.userId)
 }
 
 case class AllWinners(
@@ -53,21 +55,36 @@ case class AllWinners(
     //rapid: FreqWinners,
     //elite: List[Winner],
     //marathon: List[Winner],
+    annuals: List[Winner],
+    yearlies: List[Winner],
+    medleyShields: List[Winner],
+    shields: List[Winner],
+    weeklies: List[Winner],
     variants: Map[String, FreqWinners]
 ) {
 
-  lazy val top: List[Winner] = List(
-    //List(hyperbullet, bullet, superblitz, blitz, rapid).flatMap(_.top),
-    //List(elite.headOption, marathon.headOption).flatten,
-    Variant.all.flatMap { v =>
-      variants get v.key flatMap (_.top)
-    }
-  ).flatten
+  lazy val top10: List[Winner] =
+    annuals.take(1) ++ yearlies.take(1) ++ medleyShields.take(5) ++ shields.take(2) ++ weeklies.take(1)
+
+  lazy val top20: List[Winner] =
+    annuals.take(2) ++ yearlies.take(2) ++ medleyShields.take(9) ++ shields.take(5) ++ weeklies.take(2)
+
+  //lazy val top: List[Winner] = medleyShields.take(TournamentShield.MedleyShield.all.size)
+
+  //lichess top
+  //lazy val top: List[Winner] = List(
+  //  List(hyperbullet, bullet, superblitz, blitz, rapid).flatMap(_.top),
+  //  List(elite.headOption, marathon.headOption).flatten,
+  //  Variant.all.flatMap { v =>
+  //    variants get v.key flatMap (_.top)
+  //  }
+  //).flatten
 
   lazy val userIds =
     //List(hyperbullet, bullet, superblitz, blitz, rapid).flatMap(_.userIds) :::
     //  elite.map(_.userId) ::: marathon.map(_.userId) :::
-    variants.values.toList.flatMap(_.userIds)
+    (annuals ++ yearlies ++ medleyShields ++ shields ++ weeklies).map(_.userId) ++
+      variants.values.toList.flatMap(_.userIds)
 }
 
 final class WinnersApi(
@@ -106,14 +123,16 @@ final class WinnersApi(
 
   private def fetchAll: Fu[AllWinners] =
     for {
-      yearlies     <- fetchLastFreq(Freq.Yearly, DateTime.now.minusYears(1))
-      monthlies    <- fetchLastFreq(Freq.Monthly, DateTime.now.minusMonths(2))
-      shields      <- fetchLastFreq(Freq.Shield, DateTime.now.minusMonths(2))
-      weeklies     <- fetchLastFreq(Freq.Weekly, DateTime.now.minusWeeks(2))
-      dailies      <- fetchLastFreq(Freq.Daily, DateTime.now.minusDays(2))
-      mso21        <- fetchLastFreq(Freq.MSO21, DateTime.now.minusMonths(8))
-      msoGP        <- fetchLastFreq(Freq.MSOGP, DateTime.now.minusMonths(10))
-      msoWarmUp    <- fetchLastFreq(Freq.MSOWarmUp, DateTime.now.minusWeeks(3))
+      annuals  <- fetchLastFreq(Freq.Annual, DateTime.now.minusYears(2))
+      yearlies <- fetchLastFreq(Freq.Yearly, DateTime.now.minusYears(1))
+      //monthlies     <- fetchLastFreq(Freq.Monthly, DateTime.now.minusMonths(2))
+      shields       <- fetchLastFreq(Freq.Shield, DateTime.now.minusMonths(2))
+      medleyShields <- fetchLastFreq(Freq.MedleyShield, DateTime.now.minusMonths(2))
+      weeklies      <- fetchLastFreq(Freq.Weekly, DateTime.now.minusWeeks(2))
+      //dailies       <- fetchLastFreq(Freq.Daily, DateTime.now.minusDays(2))
+      //mso21         <- fetchLastFreq(Freq.MSO21, DateTime.now.minusMonths(8))
+      //msoGP         <- fetchLastFreq(Freq.MSOGP, DateTime.now.minusMonths(10))
+      //msoWarmUp     <- fetchLastFreq(Freq.MSOWarmUp, DateTime.now.minusWeeks(3))
       introductory <- fetchLastFreq(Freq.Introductory, DateTime.now.minusYears(1))
       //elites    <- fetchLastFreq(Freq.Weekend, DateTime.now.minusWeeks(3))
       //marathons <- fetchLastFreq(Freq.Marathon, DateTime.now.minusMonths(13))
@@ -133,16 +152,21 @@ final class WinnersApi(
         //rapid = standardFreqWinners(Speed.Rapid),
         //elite = elites flatMap (_.winner) take 4,
         //marathon = marathons flatMap (_.winner) take 4,
+        annuals = annuals.flatMap(_.winner),
+        yearlies = yearlies.flatMap(_.winner),
+        shields = shields.flatMap(_.winner),
+        medleyShields = medleyShields.flatMap(_.winner),
+        weeklies = weeklies.flatMap(_.winner),
         variants = Variant.all.view.map { v =>
           v.key -> FreqWinners(
             yearly = firstVariantWinner(yearlies, v),
-            monthly = firstVariantWinner(monthlies, v),
+            //monthly = firstVariantWinner(monthlies, v),
             shield = firstVariantWinner(shields, v),
             weekly = firstVariantWinner(weeklies, v),
-            daily = firstVariantWinner(dailies, v),
-            mso21 = firstVariantWinner(mso21, v),
-            msoGP = firstVariantWinner(msoGP, v),
-            msoWarmUp = firstVariantWinner(msoWarmUp, v),
+            //daily = firstVariantWinner(dailies, v),
+            //mso21 = firstVariantWinner(mso21, v),
+            //msoGP = firstVariantWinner(msoGP, v),
+            //msoWarmUp = firstVariantWinner(msoWarmUp, v),
             introductory = firstVariantWinner(introductory, v)
           )
         }.toMap

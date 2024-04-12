@@ -73,7 +73,7 @@ object bits {
           span(cls := "more")(trans.more(), " »")
         ),
         div(cls := "enterable_list lobby__box__content")(
-          views.html.tournament.bits.enterable(tours)
+          views.html.tournament.bits.enterable(tours.take(10))
         )
       ),
       simuls.nonEmpty option div(cls := "lobby__simuls lobby__box")(
