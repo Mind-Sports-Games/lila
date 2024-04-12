@@ -51,15 +51,15 @@ object home {
             },
             a(href := routes.Tournament.calendar)(trans.tournamentCalendar()),
             br,
-            a(href := routes.Tournament.history(Freq.Introductory.name))(trans.arena.history()),
+            a(href := routes.Tournament.history(Freq.Annual.name))(trans.arena.history()),
             br,
             a(href := routes.Tournament.help("arena".some))(trans.tournamentFAQ())
           ),
           h2(
-            a(href := routes.Tournament.shields)(trans.medleyShieldHolders())
+            a(href := routes.Tournament.leaderboard)(trans.tournamentWinners())
           ),
           ul(cls := "leaderboard")(
-            winners.top.map { w =>
+            winners.top20.map { w =>
               li(
                 userIdLink(w.userId.some),
                 a(title := w.tourName, href := routes.Tournament.show(w.tourId))(

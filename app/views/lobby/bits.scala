@@ -47,8 +47,8 @@ object bits {
       ),*/
       div(cls := "lobby__winners lobby__box")(
         div(cls := "lobby__box__top")(
-          h2(cls := "title text", dataIcon := "g")(trans.medleyShieldHolders()),
-          a(cls := "more", href := routes.Tournament.shields)(trans.more(), " »")
+          h2(cls := "title text", dataIcon := "g")(trans.tournamentWinners()),
+          a(cls := "more", href := routes.Tournament.leaderboard)(trans.more(), " »")
         ),
         div(cls := "lobby__box__content")(
           table(
@@ -73,7 +73,7 @@ object bits {
           span(cls := "more")(trans.more(), " »")
         ),
         div(cls := "enterable_list lobby__box__content")(
-          views.html.tournament.bits.enterable(tours)
+          views.html.tournament.bits.enterable(tours.take(10))
         )
       ),
       simuls.nonEmpty option div(cls := "lobby__simuls lobby__box")(

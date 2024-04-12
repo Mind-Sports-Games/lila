@@ -41,15 +41,16 @@ object Spotlight {
           _.plusWeeks(weeks).isAfterNow
         }
       sched.freq match {
-        case Hourly                                   => canMaybeJoinLimited(tour, user) && playedSinceWeeks(2)
-        case Daily                                    => playedSinceWeeks(2)
-        case Weekly | Weekend                         => playedSinceWeeks(4)
-        case Unique                                   => playedSinceWeeks(4)
-        case Monthly                                  => playedSinceWeeks(8)
-        case MedleyShield | Shield                    => true
-        case Marathon | Yearly                        => true
-        case Introductory | MSO21 | MSOGP | MSOWarmUp => true
-        case ExperimentalMarathon                     => false
+        case Hourly                    => canMaybeJoinLimited(tour, user) && playedSinceWeeks(2)
+        case Daily                     => playedSinceWeeks(2)
+        case Weekly | Weekend          => playedSinceWeeks(4)
+        case Unique                    => playedSinceWeeks(4)
+        case Monthly                   => playedSinceWeeks(8)
+        case MedleyShield | Shield     => true
+        case Marathon | Yearly         => true
+        case Annual | Introductory     => true
+        case MSO21 | MSOGP | MSOWarmUp => true
+        case ExperimentalMarathon      => false
       }
     }
 

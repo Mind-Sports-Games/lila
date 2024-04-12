@@ -22,11 +22,11 @@ object leaderboard {
 
   private val section = st.section(cls := "tournament-leaderboards__item")
 
-  private def freqWinners(fws: lila.tournament.FreqWinners, perfType: PerfType, name: String)(implicit
+  private def freqWinners(fws: lila.tournament.FreqWinners, perfIcon: Char, name: String)(implicit
       lang: Lang
   ) =
     section(
-      h2(cls := "text", dataIcon := perfType.iconChar)(name),
+      h2(cls := "text", dataIcon := perfIcon)(name),
       ul(
         fws.yearly.map { w =>
           freqWinner(w, "Yearly")
@@ -101,10 +101,20 @@ object leaderboard {
             freqWinners(winners.rapid, PerfType.orDefaultSpeed("rapid"), "Rapid"),
             marathonWinners,*/
             Variant.all.map { v =>
-              PerfType.byVariant(v).map { pt =>
-                winners.variants.get(pt.key).map { w =>
-                  freqWinners(w, pt, VariantKeys.variantName(v))
-                }
+              v.key match {
+                case "standard" =>
+                  winners.variants
+                    .get("standard")
+                    .map { w =>
+                      freqWinners(w, v.perfIcon, VariantKeys.variantName(v))
+                    }
+                    .some
+                case _ =>
+                  PerfType.byVariant(v).map { pt =>
+                    winners.variants.get(pt.key).map { w =>
+                      freqWinners(w, pt.iconChar, VariantKeys.variantName(v))
+                    }
+                  }
               }
             }
           )

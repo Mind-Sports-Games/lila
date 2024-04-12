@@ -55,11 +55,21 @@ case class AllWinners(
     //rapid: FreqWinners,
     //elite: List[Winner],
     //marathon: List[Winner],
+    annuals: List[Winner],
+    yearlies: List[Winner],
     medleyShields: List[Winner],
+    shields: List[Winner],
+    weeklies: List[Winner],
     variants: Map[String, FreqWinners]
 ) {
 
-  lazy val top: List[Winner] = medleyShields.take(TournamentShield.MedleyShield.all.size)
+  lazy val top10: List[Winner] =
+    annuals.take(1) ++ yearlies.take(1) ++ medleyShields.take(5) ++ shields.take(2) ++ weeklies.take(1)
+
+  lazy val top20: List[Winner] =
+    annuals.take(2) ++ yearlies.take(2) ++ medleyShields.take(9) ++ shields.take(5) ++ weeklies.take(2)
+
+  //lazy val top: List[Winner] = medleyShields.take(TournamentShield.MedleyShield.all.size)
 
   //lichess top
   //lazy val top: List[Winner] = List(
@@ -73,7 +83,8 @@ case class AllWinners(
   lazy val userIds =
     //List(hyperbullet, bullet, superblitz, blitz, rapid).flatMap(_.userIds) :::
     //  elite.map(_.userId) ::: marathon.map(_.userId) :::
-    variants.values.toList.flatMap(_.userIds)
+    (annuals ++ yearlies ++ medleyShields ++ shields ++ weeklies).map(_.userId) ++
+      variants.values.toList.flatMap(_.userIds)
 }
 
 final class WinnersApi(
@@ -112,6 +123,7 @@ final class WinnersApi(
 
   private def fetchAll: Fu[AllWinners] =
     for {
+      annuals  <- fetchLastFreq(Freq.Annual, DateTime.now.minusYears(2))
       yearlies <- fetchLastFreq(Freq.Yearly, DateTime.now.minusYears(1))
       //monthlies     <- fetchLastFreq(Freq.Monthly, DateTime.now.minusMonths(2))
       shields       <- fetchLastFreq(Freq.Shield, DateTime.now.minusMonths(2))
@@ -140,7 +152,11 @@ final class WinnersApi(
         //rapid = standardFreqWinners(Speed.Rapid),
         //elite = elites flatMap (_.winner) take 4,
         //marathon = marathons flatMap (_.winner) take 4,
+        annuals = annuals.flatMap(_.winner),
+        yearlies = yearlies.flatMap(_.winner),
+        shields = shields.flatMap(_.winner),
         medleyShields = medleyShields.flatMap(_.winner),
+        weeklies = weeklies.flatMap(_.winner),
         variants = Variant.all.view.map { v =>
           v.key -> FreqWinners(
             yearly = firstVariantWinner(yearlies, v),
