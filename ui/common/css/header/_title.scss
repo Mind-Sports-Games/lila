@@ -37,6 +37,37 @@
       span {
         color: $c-primary-dim;
       }
+
+      .selected-color-black & {
+        color: $c-color-choice-black;
+        span {
+          color: $c-color-choice-black;
+        }
+      }
+      .selected-color-red & {
+        color: $c-color-choice-red;
+        span {
+          color: $c-color-choice-red;
+        }
+      }
+      .selected-color-blue & {
+        color: $c-color-choice-blue;
+        span {
+          color: $c-color-choice-blue;
+        }
+      }
+      .selected-color-green & {
+        color: $c-color-choice-green;
+        span {
+          color: $c-color-choice-green;
+        }
+      }
+      .selected-color-yellow & {
+        color: $c-color-choice-yellow;
+        span {
+          color: $c-color-choice-yellow;
+        }
+      }
     }
   }
 

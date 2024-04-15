@@ -13,7 +13,17 @@
         @include transition;
 
         &:hover {
-          color: $c-link;
+          .selected-color-original & {
+            color: $c-link;
+          }
+          .selected-color-black &,
+          .selected-color-red &,
+          .selected-color-blue &,
+          .selected-color-green &,
+          .selected-color-yellow & {
+            color: $c-color-choice-font-default;
+            font-weight: bold;
+          }
         }
       }
 

@@ -219,7 +219,7 @@ object bits {
         div(cls := "game-icon-list", id := "game-icons-container")(
           variantsOrdered
             .map(v =>
-              a(cls := "game-icon", href := s"/variant/${v.key}")(
+              a(cls := "game-icon color-choice", href := s"/variant/${v.key}")(
                 i(cls := "img", dataIcon := v.perfIcon),
                 p(cls := "text")(VariantKeys.variantName(v))
               )
