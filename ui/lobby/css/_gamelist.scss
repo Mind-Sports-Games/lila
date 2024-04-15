@@ -1,6 +1,7 @@
 .lobby__gamelist {
   .game-icon-area {
     display: flex;
+    background: $c-bg-box;
 
     .arrow {
       font-size: 2em;
