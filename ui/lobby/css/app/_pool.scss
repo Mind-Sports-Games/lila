@@ -40,6 +40,28 @@
     &:hover {
       background: fade-out($c-accent, 0.8);
       opacity: 1;
+
+      .selected-color-black & {
+        background: $c-color-choice-black-dim;
+        color: $c-color-choice-font-default;
+      }
+      .selected-color-red & {
+        background: $c-color-choice-red-dim;
+        color: $c-color-choice-font-default;
+      }
+      .selected-color-blue & {
+        background: $c-color-choice-blue-dim;
+        color: $c-color-choice-font-default;
+      }
+      .selected-color-green & {
+        background: $c-color-choice-green-dim;
+        color: $c-color-choice-font-default;
+      }
+      .selected-color-yellow & {
+       background: $c-color-choice-yellow-dim;
+       color: $c-color-choice-font-default;
+      }
+
     }
   }
 
