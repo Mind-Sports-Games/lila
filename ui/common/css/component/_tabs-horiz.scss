@@ -61,6 +61,7 @@ $c-tabs-active: $c-accent !default;
       }
       &.active {
         color: $c-color-choice-font-default;
+        font-weight: bold;
         background: $c-color-choice-black;
       }
     }
@@ -71,6 +72,7 @@ $c-tabs-active: $c-accent !default;
       }
       &.active {
         color: $c-color-choice-font-default;
+        font-weight: bold;
         background: $c-color-choice-red;
       }
     }
@@ -81,6 +83,7 @@ $c-tabs-active: $c-accent !default;
       }
       &.active {
         color: $c-color-choice-font-default;
+        font-weight: bold;
         background: $c-color-choice-blue;
       }
     }
@@ -91,6 +94,7 @@ $c-tabs-active: $c-accent !default;
       }
       &.active {
         color: $c-color-choice-font-default;
+        font-weight: bold;
         background: $c-color-choice-green;
       }
     }
@@ -101,6 +105,7 @@ $c-tabs-active: $c-accent !default;
       }
       &.active {
         color: $c-color-choice-font-default;
+        font-weight: bold;
         background: $c-color-choice-yellow;
       }
     }
