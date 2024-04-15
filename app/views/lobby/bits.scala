@@ -17,6 +17,8 @@ object bits {
     div(cls := "lobby__app__content")
   )
 
+  private val maxUnderboardRows = 10
+
   def underboards(
       tours: List[lila.tournament.Tournament],
       simuls: List[lila.simul.Simul],
@@ -53,7 +55,7 @@ object bits {
         div(cls := "lobby__box__content")(
           table(
             tbody(
-              tournamentWinners take 10 map { w =>
+              tournamentWinners take maxUnderboardRows map { w =>
                 tr(
                   td(userIdLink(w.userId.some)),
                   td(
@@ -74,7 +76,7 @@ object bits {
         ),
         div(cls := "enterable_list lobby__box__content")(
           views.html.tournament.bits
-            .enterable(truncateTournamentList(tours, 10))
+            .enterable(truncateTournamentList(tours, maxUnderboardRows))
         )
       ),
       simuls.nonEmpty option div(cls := "lobby__simuls lobby__box")(
