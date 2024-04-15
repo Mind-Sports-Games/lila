@@ -182,7 +182,7 @@ object Pref {
     val GREEN    = 500
     val YELLOW   = 600
 
-    val default = "original"
+    val default = "green"
 
     val choices = Seq(
       ORIGINAL -> "Original",
@@ -487,7 +487,7 @@ object Pref {
     _id = "",
     bg = Bg.LIGHT,
     bgImg = none,
-    color = Color.ORIGINAL,
+    color = Color.GREEN,
     is3d = false,
     theme = Theme.defaults,
     pieceSet = PieceSet.defaults,
