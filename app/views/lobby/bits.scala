@@ -73,7 +73,8 @@ object bits {
           span(cls := "more")(trans.more(), " »")
         ),
         div(cls := "enterable_list lobby__box__content")(
-          views.html.tournament.bits.enterable(tours.take(10))
+          views.html.tournament.bits
+            .enterable(truncateTournamentList(tours, 10))
         )
       ),
       simuls.nonEmpty option div(cls := "lobby__simuls lobby__box")(
@@ -86,6 +87,15 @@ object bits {
         )
       )
     )
+
+  private def truncateTournamentList(
+      tours: List[lila.tournament.Tournament],
+      maxTours: Int
+  ): List[lila.tournament.Tournament] = {
+    val numShields  = maxTours - tours.filterNot(_.isShield).size max 0
+    var shieldCount = 0
+    tours.filter { !_.isShield || { shieldCount += 1; shieldCount <= numShields } }.take(maxTours)
+  }
 
   def lastPosts(posts: List[lila.blog.MiniPost])(implicit ctx: Context): Option[Frag] =
     posts.nonEmpty option
