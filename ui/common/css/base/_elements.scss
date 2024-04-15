@@ -44,7 +44,7 @@ a {
     &:hover,
     &:active,
     &:focus {
-      color: $c-color-choice-black-dim;
+      color: $c-color-choice-black-link-hover;
     }
   }
   .selected-color-red &.color-choice {
@@ -52,7 +52,7 @@ a {
     &:hover,
     &:active,
     &:focus {
-      color: $c-color-choice-red-dim;
+      color: $c-color-choice-red-link-hover;
     }
   }
   .selected-color-blue &.color-choice {
@@ -60,7 +60,7 @@ a {
     &:hover,
     &:active,
     &:focus {
-      color: $c-color-choice-blue-dim;
+      color: $c-color-choice-blue-link-hover;
     }
   }
   .selected-color-green &.color-choice {
@@ -68,7 +68,7 @@ a {
     &:hover,
     &:active,
     &:focus {
-      color: $c-color-choice-green-dim;
+      color: $c-color-choice-green-link-hover;
     }
   }
   .selected-color-yellow &.color-choice {
@@ -76,7 +76,7 @@ a {
     &:hover,
     &:active,
     &:focus {
-      color: $c-color-choice-yellow-dim;
+      color: $c-color-choice-yellow-link-hover;
     }
   }
 }

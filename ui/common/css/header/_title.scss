@@ -40,30 +40,35 @@
 
       .selected-color-black & {
         color: $c-color-choice-black;
+        text-shadow: none;
         span {
           color: $c-color-choice-black;
         }
       }
       .selected-color-red & {
         color: $c-color-choice-red;
+        text-shadow: none;
         span {
           color: $c-color-choice-red;
         }
       }
       .selected-color-blue & {
         color: $c-color-choice-blue;
+        text-shadow: none;
         span {
           color: $c-color-choice-blue;
         }
       }
       .selected-color-green & {
         color: $c-color-choice-green;
+        text-shadow: none;
         span {
           color: $c-color-choice-green;
         }
       }
       .selected-color-yellow & {
         color: $c-color-choice-yellow;
+        text-shadow: none;
         span {
           color: $c-color-choice-yellow;
         }

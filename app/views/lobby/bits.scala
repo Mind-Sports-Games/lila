@@ -57,7 +57,7 @@ object bits {
                 tr(
                   td(userIdLink(w.userId.some)),
                   td(
-                    a(title := w.tourName, href := routes.Tournament.show(w.tourId))(
+                    a(cls := "color-choice", title := w.tourName, href := routes.Tournament.show(w.tourId))(
                       scheduledTournamentNameShortHtml(w.tourName)
                     )
                   )
