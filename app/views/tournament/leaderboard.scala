@@ -22,33 +22,33 @@ object leaderboard {
 
   private val section = st.section(cls := "tournament-leaderboards__item")
 
-  private def freqWinners(fws: lila.tournament.FreqWinners, perfType: PerfType, name: String)(implicit
+  private def freqWinners(fws: lila.tournament.FreqWinners, perfIcon: Char, name: String)(implicit
       lang: Lang
   ) =
     section(
-      h2(cls := "text", dataIcon := perfType.iconChar)(name),
+      h2(cls := "text", dataIcon := perfIcon)(name),
       ul(
         fws.yearly.map { w =>
           freqWinner(w, "Yearly")
         },
-        fws.monthly.map { w =>
-          freqWinner(w, "Monthly")
-        },
+        //fws.monthly.map { w =>
+        //  freqWinner(w, "Monthly")
+        //},
         fws.shield.map { w =>
           freqWinner(w, "Shield")
         },
         fws.weekly.map { w =>
           freqWinner(w, "Weekly")
         },
-        fws.daily.map { w =>
-          freqWinner(w, "Daily")
-        },
-        fws.mso21.map { w =>
-          freqWinner(w, "MSO 2021")
-        },
-        fws.msoGP.map { w =>
-          freqWinner(w, "MSO Grand Prix")
-        },
+        //fws.daily.map { w =>
+        //  freqWinner(w, "Daily")
+        //},
+        //fws.mso21.map { w =>
+        //  freqWinner(w, "MSO 2021")
+        //},
+        //fws.msoGP.map { w =>
+        //  freqWinner(w, "MSO Grand Prix")
+        //},
         fws.introductory.map { w =>
           freqWinner(w, "Introductory")
         }
@@ -101,10 +101,20 @@ object leaderboard {
             freqWinners(winners.rapid, PerfType.orDefaultSpeed("rapid"), "Rapid"),
             marathonWinners,*/
             Variant.all.map { v =>
-              PerfType.byVariant(v).map { pt =>
-                winners.variants.get(pt.key).map { w =>
-                  freqWinners(w, pt, VariantKeys.variantName(v))
-                }
+              v.key match {
+                case "standard" =>
+                  winners.variants
+                    .get("standard")
+                    .map { w =>
+                      freqWinners(w, v.perfIcon, VariantKeys.variantName(v))
+                    }
+                    .some
+                case _ =>
+                  PerfType.byVariant(v).map { pt =>
+                    winners.variants.get(pt.key).map { w =>
+                      freqWinners(w, pt.iconChar, VariantKeys.variantName(v))
+                    }
+                  }
               }
             }
           )

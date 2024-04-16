@@ -80,32 +80,32 @@ object home {
             a(
               href := routes.Setup.hookForm,
               cls := List(
-                "button button-metal config_hook" -> true,
-                "disabled"                        -> (playban.isDefined || currentGame.isDefined || ctx.isBot)
+                "button button-color-choice config_hook" -> true,
+                "disabled"                               -> (playban.isDefined || currentGame.isDefined || ctx.isBot)
               ),
               trans.createAGame()
             ),
             a(
               href := routes.Setup.friendForm(none),
               cls := List(
-                "button button-metal config_friend" -> true,
-                "disabled"                          -> currentGame.isDefined
+                "button button-color-choice config_friend" -> true,
+                "disabled"                                 -> currentGame.isDefined
               ),
               trans.playWithAFriend()
             ),
             a(
               href := routes.Setup.aiForm,
               cls := List(
-                "button button-metal config_ai" -> true,
-                "disabled"                      -> currentGame.isDefined
+                "button button-color-choice config_ai" -> true,
+                "disabled"                             -> currentGame.isDefined
               ),
               trans.playWithTheMachine()
             ),
             a(
               href := routes.PlayApi.botOnline,
               cls := List(
-                "button button-metal config_bot just-a-link" -> true,
-                "disabled"                                   -> currentGame.isDefined
+                "button button-color-choice config_bot just-a-link" -> true,
+                "disabled"                                          -> currentGame.isDefined
               ),
               trans.playWithBots()
             )

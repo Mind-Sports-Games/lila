@@ -664,7 +664,27 @@ backgammon_themes.map { |theme|
     }
   }
   }.flatten
-  File.open(dest_dir + 'backgammon-' + name + '.css', 'w') { |f| f.puts (classes_backgammon_game_and_variant).join("\n") }
+  classes_backgammon_buttons = colors.map { |color|
+    if name === 'wooden'
+      bg_colour = color == 'w' ? "#F3C977" : "#692819"
+      border_colour = color == 'b' ? "#F3C977" : "#692819"
+    elsif name === 'contemporary'
+      bg_colour = color == 'w' ? "#D75049" : "#414143"
+      border_colour = "#F3F0E9"
+    else #classic
+      bg_colour = color == 'w' ? "white" : "black"
+      border_colour = color == 'b' ? "white" : "black"
+    end
+    pos_class = ' cg-button'
+      initial_css = '.backgammon.is2d ' + 'cg-buttons.' + (color == 'w' ? 'p1' : 'p2') + pos_class + 
+      ', ' + '.is2d .variant-backgammon ' + 'cg-buttons.' + (color == 'w' ? 'p1' : 'p2') + pos_class + 
+      ', ' + '.is2d .variant-nackgammon ' + 'cg-buttons.' + (color == 'w' ? 'p1' : 'p2') + pos_class
+        initial_css + ' {' + "background: " + bg_colour + ";" + 
+        " color: " + border_colour + ";" +
+        " border: " + border_colour + ";" + 
+        " border-width: medium; border-style: solid; " + "}"
+  }.flatten
+  File.open(dest_dir + 'backgammon-' + name + '.css', 'w') { |f| f.puts (classes_backgammon_game_and_variant + classes_backgammon_buttons).join("\n") }
 }
 # external SVG backgammon
 backgammon_themes.map { |theme|
@@ -694,6 +714,26 @@ backgammon_themes.map { |theme|
     }
   }
   }.flatten
-  File.open(dest_dir + 'backgammon-' + name + '.external.css', 'w') { |f| f.puts (classes_backgammon_game_and_variant).join("\n") }
+  classes_backgammon_buttons = colors.map { |color|
+    if name === 'wooden'
+      bg_colour = color == 'w' ? "#F3C977" : "#692819"
+      border_colour = color == 'b' ? "#F3C977" : "#692819"
+    elsif name === 'contemporary'
+      bg_colour = color == 'w' ? "#D75049" : "#414143"
+      border_colour = "#F3F0E9"
+    else #classic
+      bg_colour = color == 'w' ? "white" : "black"
+      border_colour = color == 'b' ? "white" : "black"
+    end
+    pos_class = ' cg-button'
+      initial_css = '.backgammon.is2d ' + 'cg-buttons.' + (color == 'w' ? 'p1' : 'p2') + pos_class + 
+      ', ' + '.is2d .variant-backgammon ' + 'cg-buttons.' + (color == 'w' ? 'p1' : 'p2') + pos_class + 
+      ', ' + '.is2d .variant-nackgammon ' + 'cg-buttons.' + (color == 'w' ? 'p1' : 'p2') + pos_class
+        initial_css + ' {' + "background: " + bg_colour + ";" + 
+        " color: " + border_colour + ";" +
+        " border: " + border_colour + ";" + 
+        " border-width: medium; border-style: solid; " + "}"
+  }.flatten
+  File.open(dest_dir + 'backgammon-' + name + '.external.css', 'w') { |f| f.puts (classes_backgammon_game_and_variant + classes_backgammon_buttons).join("\n") }
 }
 

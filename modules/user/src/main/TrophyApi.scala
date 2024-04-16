@@ -32,8 +32,14 @@ final class TrophyApi(
 
   implicit private val trophyBSONHandler = Macros.handler[Trophy]
 
-  def findByUser(user: User, max: Int = 50): Fu[List[Trophy]] =
-    coll.list[Trophy]($doc("user" -> user.id), max).map(_.filter(_.kind != TrophyKind.Unknown))
+  private def permanent = $doc("expiry" $exists false)
+
+  private def relevant = $doc("expiry" $gt DateTime.now)
+
+  private def nonExpired = $doc("$or" -> List(permanent, relevant))
+
+  def findByUser(user: User, max: Int = 100): Fu[List[Trophy]] =
+    coll.list[Trophy]($doc("user" -> user.id) ++ nonExpired, max).map(_.filter(_.kind != TrophyKind.Unknown))
 
   def trophiesByUrl(url: String): Fu[List[Trophy]] =
     coll.list[Trophy]($doc("url" -> url))

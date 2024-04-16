@@ -58,6 +58,7 @@ export const init = (node: HTMLElement) => {
           resizable: false,
           fen,
           dice: readDice(fen, variantFromElement($el) as VariantKey),
+          showUndoButton: false,
           orientation,
           lastMove: lm && (lm[1] === '@' ? [lm.slice(2)] : [lm[0] + lm[1], lm[2] + lm[3]]),
           highlight: {

@@ -17,7 +17,7 @@ object post {
         li(
           a(
             dataIcon := p.isTeam.option("f"),
-            cls := "post_link text",
+            cls := "post_link text color-choice",
             href := routes.ForumPost.redirect(p.postId),
             title := p.topicName
           )(

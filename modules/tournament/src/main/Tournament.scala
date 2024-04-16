@@ -85,7 +85,7 @@ case class Tournament(
 
   def isIntro = schedule.map(_.freq) has Schedule.Freq.Introductory
 
-  def isPlayStrategyHeadline = isMSO || isMSOWarmUp || isIntro
+  def isAnnual = schedule.map(_.freq) has Schedule.Freq.Annual
 
   def isScheduled = schedule.isDefined
 
@@ -149,7 +149,7 @@ case class Tournament(
       .map(v => v.take(medleyNumIntervals.getOrElse(medleyVariants.size)))
 
   def isStillWorthEntering =
-    isPlayStrategyHeadline || isMarathonOrUnique || {
+    isScheduled || {
       secondsToFinish > (minutes * 60 / 3).atMost(20 * 60)
     }
 
