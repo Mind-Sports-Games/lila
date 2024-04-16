@@ -71,7 +71,7 @@ trait TournamentHelper { self: I18nHelper with DateHelper with UserHelper =>
         if (name.contains("Medley Shield"))
           name.split(" ").dropRight(1).mkString(" ").replace(" Medley Shield", icon('5'))
         else if (name.contains("End of Year"))
-          (name.split(" ").dropRight(2) ++ name.split(" ").takeRight(1)).toList.mkString(" ")
+          (name.split(" ").drop(1).dropRight(2) ++ name.split(" ").takeRight(1)).toList.mkString(" ")
         else
           //old replacements
           replacements.foldLeft(name) { case (n, (from, to)) =>
