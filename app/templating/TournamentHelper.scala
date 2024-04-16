@@ -48,15 +48,13 @@ trait TournamentHelper { self: I18nHelper with DateHelper with UserHelper =>
   object scheduledTournamentNameShortHtml {
     private def icon(c: Char) = s"""<span data-icon="$c"></span>"""
     private val replacements = List(
-      "PlayStrategy "   -> "",
-      "Marathon"        -> icon('\\'),
-      "HyperBullet"     -> s"H${icon(Speed.Bullet.perfIcon)}",
-      "SuperBlitz"      -> s"S${icon(Speed.Blitz.perfIcon)}",
-      "Grand Prix"      -> "GP",
-      " PREMIER"        -> "",
-      "Variants Medley" -> icon('5'),
-      "Medley"          -> icon('5'),
-      " -"              -> ""
+      "PlayStrategy " -> "",
+      "Marathon"      -> icon('\\'),
+      "HyperBullet"   -> s"H${icon(Speed.Bullet.perfIcon)}",
+      "SuperBlitz"    -> s"S${icon(Speed.Blitz.perfIcon)}",
+      "Grand Prix"    -> "GP",
+      " PREMIER"      -> "",
+      " -"            -> ""
     ) ++ PerfType.leaderboardable
       .filterNot(PerfType.translated.contains)
       .map { pt =>
@@ -72,6 +70,8 @@ trait TournamentHelper { self: I18nHelper with DateHelper with UserHelper =>
       raw {
         if (name.contains("Medley Shield"))
           name.split(" ").dropRight(1).mkString(" ").replace(" Medley Shield", icon('5'))
+        else if (name.contains("End of Year"))
+          (name.split(" ").dropRight(2) ++ name.split(" ").takeRight(1)).toList.mkString(" ")
         else
           //old replacements
           replacements.foldLeft(name) { case (n, (from, to)) =>

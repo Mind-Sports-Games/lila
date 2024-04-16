@@ -63,13 +63,30 @@ case class AllWinners(
     variants: Map[String, FreqWinners]
 ) {
 
+  private def uniqueMedleyShields = {
+    val uniques =
+      medleyShields
+        .map { ms => (ms, ms.tourName.split(" ").dropRight(1).mkString(" ")) }
+        .groupBy { case (_, name) => name }
+        .values
+        .map(_.head._1)
+        .toSet
+    medleyShields.filter(uniques.contains(_))
+  }
+
   lazy val top10: List[Winner] =
-    annuals.take(1) ++ yearlies.take(1) ++ medleyShields.take(5) ++ shields.take(2) ++ weeklies.take(1)
+    annuals.take(1) ++
+      yearlies.take(1) ++
+      uniqueMedleyShields.take(5) ++
+      shields.take(2) ++
+      weeklies.take(1)
 
   lazy val top20: List[Winner] =
-    annuals.take(2) ++ yearlies.take(2) ++ medleyShields.take(9) ++ shields.take(5) ++ weeklies.take(2)
-
-  //lazy val top: List[Winner] = medleyShields.take(TournamentShield.MedleyShield.all.size)
+    annuals.take(2) ++
+      yearlies.take(2) ++
+      uniqueMedleyShields.take(TournamentShield.MedleyShield.all.size) ++
+      shields.take(20 - 6 - TournamentShield.MedleyShield.all.size max 1) ++
+      weeklies.take(2)
 
   //lichess top
   //lazy val top: List[Winner] = List(
