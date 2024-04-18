@@ -1,6 +1,6 @@
 import { lastStep } from './round';
 import RoundController from './ctrl';
-import { ApiMove, RoundData } from './interfaces';
+import { ApiAction, RoundData } from './interfaces';
 import * as xhr from 'common/xhr';
 
 let found = false;
@@ -30,6 +30,6 @@ export function subscribe(ctrl: RoundController): void {
   });
 }
 
-export function publish(d: RoundData, move: ApiMove) {
-  if (d.opponent.ai) playstrategy.storage.fire('ceval.fen', move.fen);
+export function publish(d: RoundData, action: ApiAction) {
+  if (d.opponent.ai) playstrategy.storage.fire('ceval.fen', action.fen);
 }

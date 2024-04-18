@@ -39,7 +39,7 @@ import * as stratUtils from 'stratutils';
 import {
   RoundOpts,
   RoundData,
-  ApiMove,
+  ApiAction,
   ApiEnd,
   Redraw,
   SocketMove,
@@ -577,7 +577,7 @@ export default class RoundController {
 
   playerByPlayerIndex = (c: PlayerIndex) => this.data[c === this.data.player.playerIndex ? 'player' : 'opponent'];
 
-  apiMove = (o: ApiMove): true => {
+  apiAction = (o: ApiAction): true => {
     const d = this.data,
       playing = this.isPlaying(),
       hasJustSwitchedTurns = d.game.turns != o.turnCount;
