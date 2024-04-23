@@ -27,8 +27,7 @@ trait GameHelper { self: I18nHelper with UserHelper with AiHelper with StringHel
 
   def titleGame(g: Game) = {
     val speed   = strategygames.Speed(g.clock.map(_.config)).name
-    val variant = g.variant.exotic ?? s" ${VariantKeys.variantName(g.variant)}"
-    s"$speed$variant ${g.variant.gameLogic.name} • ${playerText(g.p1Player)} vs ${playerText(g.p2Player)}"
+    s"$speed ${VariantKeys.variantName(g.variant)} • ${playerText(g.p1Player)} vs ${playerText(g.p2Player)}"
   }
 
   def describePov(pov: Pov) = {
