@@ -203,7 +203,7 @@ object home {
                 span(trans.patron.becomePatron())
               )
             ),
-            a(href := "https://shop.msoworld.com/wp/shop/")(
+            a(href := "https://mindsportsolympiad.com/product-category/merch/")(
               iconTag(""),
               span(cls := "lobby__support__text")(
                 strong("Swag Store"),
