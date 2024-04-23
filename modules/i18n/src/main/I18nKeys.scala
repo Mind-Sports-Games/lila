@@ -2209,4 +2209,26 @@ val `xRuns` = new I18nKey("storm:xRuns")
 val `playedNbRunsOfPuzzleStorm` = new I18nKey("storm:playedNbRunsOfPuzzleStorm")
 }
 
+object onboarding {
+val `configure` = new I18nKey("onboarding:configure")
+val `explore` = new I18nKey("onboarding:explore")
+val `follow` = new I18nKey("onboarding:follow")
+val `improveIt` = new I18nKey("onboarding:improveIt")
+val `joinCommunities` = new I18nKey("onboarding:joinCommunities")
+val `kidMode` = new I18nKey("onboarding:kidMode")
+val `kidModeEnabled` = new I18nKey("onboarding:kidModeEnabled")
+val `learnFrom` = new I18nKey("onboarding:learnFrom")
+val `learnRules` = new I18nKey("onboarding:learnRules")
+val `playBot` = new I18nKey("onboarding:playBot")
+val `playOthers` = new I18nKey("onboarding:playOthers")
+val `playTournaments` = new I18nKey("onboarding:playTournaments")
+val `profilePage` = new I18nKey("onboarding:profilePage")
+val `studies` = new I18nKey("onboarding:studies")
+val `suggestions` = new I18nKey("onboarding:suggestions")
+val `weeklyChallenge` = new I18nKey("onboarding:weeklyChallenge")
+val `welcome` = new I18nKey("onboarding:welcome")
+val `willAChildUse` = new I18nKey("onboarding:willAChildUse")
+val `wouldYou` = new I18nKey("onboarding:wouldYou")
+}
+
 }
