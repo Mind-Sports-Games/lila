@@ -1,5 +1,6 @@
 package views.html.user.show
 
+import lila.api.Context
 import lila.app.templating.Environment._
 import lila.app.ui.ScalatagsTemplate._
 import lila.user.User
@@ -8,45 +9,45 @@ import controllers.routes
 
 object newPlayer {
 
-  def apply(u: User) =
+  def apply(u: User)(implicit ctx: Context) =
     div(cls := "new-player")(
-      h2("Welcome to playstrategy.org!"),
+      h2(trans.onboarding.welcome.txt()),
       p(
-        "This is your profile page.",
+        trans.onboarding.profilePage.txt(),
         u.profile.isEmpty option frag(
           br,
-          "Would you like to ",
-          a(href := routes.Account.profile)("improve it"),
-          "?"
+          trans.onboarding.wouldYou(
+            a(href := routes.Report.form)(trans.onboarding.improveIt())
+          )
         )
       ),
       p(
-        if (u.kid) "Kid mode is enabled."
+        if (u.kid) trans.onboarding.kidModeEnabled.txt()
         else
           frag(
-            "Will a child use this account? You might want to enable ",
-            a(href := routes.Account.kid)("Kid mode"),
-            "."
+            trans.onboarding.willAChildUse(
+              a(href := routes.Account.kid)(trans.onboarding.kidMode())
+            )
           )
       ),
       p(
-        "What now? Here are a few suggestions:"
+        trans.onboarding.suggestions.txt()
       ),
       ul(
-        li(a(href := routes.Learn.index)("Learn chess rules")),
-        li(a(href := routes.Puzzle.home)("Improve with chess tactics puzzles")),
-        li(a(href := s"${routes.Lobby.home}#ai")("Play the artificial intelligence")),
-        li(a(href := s"${routes.Lobby.home}#hook")("Play opponents from around the world")),
-        li(a(href := routes.User.list)("Follow your friends on PlayStrategy")),
-        li(a(href := routes.Tournament.home)("Play in tournaments")),
+        li(a(href := routes.Learn.index)(trans.onboarding.learnRules.txt())),
+        li(a(href := routes.PlayApi.botOnline)(trans.onboarding.playBot.txt())),
+        li(a(href := s"${routes.Lobby.home}#hook")(trans.onboarding.playOthers.txt())),
+        li(a(href := routes.User.list)(trans.onboarding.follow.txt())),
+        li(a(href := routes.Team.all(1))(trans.onboarding.joinCommunities.txt())),
+        li(a(href := routes.Tournament.home)(trans.onboarding.playTournaments.txt())),
         li(
-          "Learn from ",
-          a(href := routes.Study.allDefault(1))("studies"),
-          /*" and ",
-          a(href := routes.Video.index)("videos")*/
+          trans.onboarding.learnFrom(
+            a(href := routes.Study.allDefault(1))(trans.onboarding.studies())
+          )
         ),
-        li(a(href := routes.Pref.form("game-display"))("Configure PlayStrategy to your liking")),
-        li("Explore the site and have fun :)")
+        li(a(href := routes.ForumCateg.show("weekly-challenges"))(trans.onboarding.weeklyChallenge.txt())),
+        li(a(href := routes.Pref.form("game-display"))(trans.onboarding.configure.txt())),
+        li(trans.onboarding.explore.txt())
       )
     )
 }
