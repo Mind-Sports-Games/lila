@@ -17,7 +17,7 @@ object newPlayer {
         u.profile.isEmpty option frag(
           br,
           trans.onboarding.wouldYou(
-            a(href := routes.Report.form)(trans.onboarding.improveIt())
+            a(href := routes.Account.profile)(trans.onboarding.improveIt())
           )
         )
       ),
