@@ -288,7 +288,6 @@ trait GameHelper { self: I18nHelper with UserHelper with AiHelper with StringHel
     val speed = c.clock.map(_.config).fold(strategygames.Speed.Correspondence.name) { clock =>
       s"${strategygames.Speed(clock).name} (${clock.show})"
     }
-    val variant = c.variant.exotic ?? s" ${VariantKeys.variantName(c.variant)}"
     val challenger = c.challengerUser.fold(trans.anonymous.txt()) { reg =>
       s"${usernameOrId(reg.id)} (${reg.rating.show})"
     }
@@ -298,7 +297,7 @@ trait GameHelper { self: I18nHelper with UserHelper with AiHelper with StringHel
         c.destUser.fold(s"Challenge from $challenger") { dest =>
           s"$challenger challenges ${usernameOrId(dest.id)} (${dest.rating.show})"
         }
-    s"$speed$variant ${c.mode.name} Chess • $players"
+    s"$speed ${VariantKeys.variantName(c.variant)} ${c.mode.name} • $players"
   }
 
   def challengeOpenGraph(c: lila.challenge.Challenge)(implicit lang: Lang) =
