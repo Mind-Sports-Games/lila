@@ -99,7 +99,8 @@ object mini {
         cls := s"mini-game__user playerIndex-icon is ${pov.game.variant.playerColors(pov.player.playerIndex)} text"
       )(
         playerUsername(pov.player, withRating = false),
-        span(cls := "rating")(lila.game.Namer ratingString pov.player)
+        span(cls := "rating")(lila.game.Namer ratingString pov.player),
+        if (pov.player.berserk) iconTag("`")
       ),
       if (pov.game.finished) renderResult(pov)
       else pov.game.clock.map { renderClock(_, pov) }
