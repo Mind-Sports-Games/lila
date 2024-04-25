@@ -258,16 +258,6 @@ trait GameHelper { self: I18nHelper with UserHelper with AiHelper with StringHel
       case _ => ""
     }
 
-  def gameTitle(game: Game, playerIndex: PlayerIndex): String = {
-    val u1 = playerText(game player playerIndex, withRating = true)
-    val u2 = playerText(game opponent playerIndex, withRating = true)
-    val clock = game.clock ?? { c =>
-      " • " + c.config.show
-    }
-    val variant = game.variant.exotic ?? s" • ${VariantKeys.variantName(game.variant)}"
-    s"$u1 vs $u2$clock$variant"
-  }
-
   // p1Username 1-0 p2Username
   def gameSummary(p1UserId: String, p2UserId: String, finished: Boolean, result: Option[Boolean]) = {
     val res = if (finished) PlayerIndex.showResult(result map PlayerIndex.fromP1) else "*"
