@@ -16,6 +16,7 @@ import lila.setup.ApiConfig
 import lila.socket.Socket.SocketVersion
 import lila.user.{ User => UserModel }
 import lila.common.Template
+import lila.i18n.I18nKeys
 
 final class Challenge(
     env: Env
@@ -266,7 +267,11 @@ final class Challenge(
                       env.challenge.granter(ctx.me, dest, c.perfType.some) flatMap {
                         case Some(denied) =>
                           showChallenge(c, lila.challenge.ChallengeDenied.translated(denied).some)
-                        case None => api.setDestUser(c, dest) inject Redirect(routes.Challenge.show(c.id))
+                        case None =>
+                          if(username == ctx.userId.get)
+                            showChallenge(c, Some(I18nKeys.challenge.cannotChallengeYourself.txt()))
+                          else
+                            api.setDestUser(c, dest) inject Redirect(routes.Challenge.show(c.id))
                       }
                   }
                 }(rateLimitedFu)
