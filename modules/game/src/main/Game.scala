@@ -911,7 +911,8 @@ object Game {
 
   val maxPlayingRealtime = 100 // plus 200 correspondence games
 
-  val maxPlies = 1000     // also in SG gl/format/pgn/Binary.scala (unlimited can cause StackOverflowError)
+  val maxPlies =
+    1000 // also in SG gl/format/pgn/Binary.scala + study/node(unlimited can cause StackOverflowError)
   val maxTurns = maxPlies // used for correct terminology where appropriate
 
   val analysableVariants: Set[Variant] = Variant.all.filter(_.hasFishnet).toSet

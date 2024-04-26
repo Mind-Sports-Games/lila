@@ -7,6 +7,7 @@ import { Setup, Material, RemainingChecks } from 'stratops/setup';
 import { Castles, setupPosition, defaultPosition } from 'stratops/variant';
 import { playstrategyVariants } from 'stratops/compat';
 import { makeFen, parseFen, parseCastlingFen, INITIAL_FEN, EMPTY_FEN, INITIAL_EPD } from 'stratops/fen';
+import * as fp from 'stratops/fp';
 import { defined, prop, Prop } from 'common';
 
 export default class EditorCtrl {
@@ -24,8 +25,8 @@ export default class EditorCtrl {
   turn: PlayerIndex;
   unmovedRooks: SquareSet | undefined;
   castlingToggles: CastlingToggles<boolean>;
-  epSquare: Square | undefined;
-  remainingChecks: RemainingChecks | undefined;
+  epSquare: fp.Option<Square>;
+  remainingChecks: fp.Option<RemainingChecks>;
   rules: Rules;
   halfmoves: number;
   fullmoves: number;
@@ -99,7 +100,7 @@ export default class EditorCtrl {
       board,
       pockets: this.pockets,
       turn: this.turn,
-      unmovedRooks: this.unmovedRooks || parseCastlingFen(board, this.castlingToggleFen()).unwrap(),
+      unmovedRooks: this.unmovedRooks || parseCastlingFen(board)(this.castlingToggleFen()).unwrap(),
       epSquare: this.epSquare,
       remainingChecks: this.remainingChecks,
       halfmoves: this.halfmoves,
