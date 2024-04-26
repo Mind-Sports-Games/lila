@@ -48,8 +48,7 @@ case class UserInfo(
       .size +
       trophies.filter(_.kind.klass.has("fire-trophy")).some.filter(_.nonEmpty).size +
       shields.size +
-      revolutions.size +
-      ranks.count(_._2 <= 100)
+      revolutions.size // + ranks.count(_._2 <= 100) // Add back in when we give trophies for top x
 }
 
 object UserInfo {

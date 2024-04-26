@@ -445,7 +445,7 @@ final private class TournamentScheduler(
       scheduleYearly24hr(Variant.Chess(strategygames.chess.variant.Antichess), Blitz32)(
         new DateTime(2024, 4, 26, 0, 0)
       ),
-      scheduleYearly24hr(Variant.Draughts(strategygames.draughts.variant.Standard), Blitz32)(
+      scheduleYearly24hr(Variant.Backgammon(strategygames.backgammon.variant.Nackgammon), Delay310)(
         new DateTime(2024, 5, 3, 0, 0)
       ),
       scheduleYearly24hr(Variant.FairySF(strategygames.fairysf.variant.Xiangqi), Blitz53)(
@@ -505,11 +505,10 @@ final private class TournamentScheduler(
       ),
       scheduleYearly24hr(Variant.Backgammon(strategygames.backgammon.variant.Backgammon), Delay310)(
         new DateTime(2024, 9, 20, 0, 0)
-      )
-      //TODO seperate out both backgammon variants
-      // scheduleYearly24hr(Variant.Backgammon(strategygames.backgammon.variant.Nackgammon), Delay310)(
-      //   new DateTime(2024, 9, 27, 0, 0)
-      // )
+      ),
+      scheduleYearly24hr(Variant.Draughts(strategygames.draughts.variant.Standard), Blitz32)(
+        new DateTime(2024, 9, 27, 0, 0)
+      ),      
       //Fri 27th is the end of year medley
     ).flatten filter { _.schedule.at isAfter rightNow }
 
