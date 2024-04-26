@@ -123,7 +123,10 @@ $pocket-col1-size: 5rem;
 }
 
 .variant-flipello .game-score,
-.variant-flipello10 .game-score {
+.variant-flipello10 .game-score,
+.variant-go9x9 .game-score,
+.variant-go13x13 .game-score,
+.variant-go19x19 .game-score {
   piece::after {
     @extend %active, %box-radius;
 

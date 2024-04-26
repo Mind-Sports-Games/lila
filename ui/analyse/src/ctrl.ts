@@ -507,7 +507,9 @@ export default class AnalyseCtrl {
 
   userNewPiece = (piece: cg.Piece, pos: Key): void => {
     if (crazyValid(this.chessground, this.data, this.node.drops, this.node.dropsByRole, piece, pos)) {
-      this.justPlayed = roleToChar(piece.role).toUpperCase() + '@' + pos;
+      this.justPlayed = ['go9x9', 'go13x13', 'go19x19'].includes(this.data.game.variant.key)
+        ? roleToChar(piece.role) + '@' + pos
+        : roleToChar(piece.role).toUpperCase() + '@' + pos;
       this.justDropped = piece.role;
       this.justCaptured = undefined;
       this.sound.move();

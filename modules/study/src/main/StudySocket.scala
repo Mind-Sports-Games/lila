@@ -243,7 +243,7 @@ final private class StudySocket(
 
   private def gameAction(studyId: Study.Id, m: AnaAny, opts: MoveOpts)(who: Who) =
     m.branch match {
-      case Validated.Valid(branch) if branch.ply < Node.MAX_PLIES =>
+      case Validated.Valid(branch) if branch.ply < Node.maxPlies =>
         m.chapterId.ifTrue(opts.write) foreach { chapterId =>
           api.addNode(
             studyId,
