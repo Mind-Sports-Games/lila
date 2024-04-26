@@ -89,29 +89,41 @@ final class ChatApi(
     ): Funit =
       makeLine(chatId, userId, text) flatMap {
         _ ?? { line =>
-          linkCheck(line, publicSource) flatMap {
-            case false =>
+          linkCheck(line, publicSource) zip userRepo.byId(userId) flatMap {
+            case (false, Some(user)) if isSuperAdmin(user) =>
+              publishLine(line, chatId, userId, text, publicSource, busChan, persist)
+            case (false, _) =>
               logger.info(s"Link check rejected $line in $publicSource")
               funit
-            case true =>
-              (persist ?? persistLine(chatId, line)) >>- {
-                if (persist) {
-                  if (publicSource.isDefined) cached invalidate chatId
-                  shutup ! {
-                    publicSource match {
-                      case Some(source) => RecordPublicChat(userId, text, source)
-                      case _            => RecordPrivateChat(chatId.value, userId, text)
-                    }
-                  }
-                  lila.mon.chat
-                    .message(publicSource.fold("player")(_.parentName), line.troll)
-                    .increment()
-                    .unit
-                }
-                publish(chatId, actorApi.ChatLine(chatId, line), busChan)
-              }
+            case (true, _) => publishLine(line, chatId, userId, text, publicSource, busChan, persist)
           }
         }
+      }
+
+    private def publishLine(
+        line: Line,
+        chatId: Chat.Id,
+        userId: User.ID,
+        text: String,
+        publicSource: Option[PublicSource],
+        busChan: BusChan.Select,
+        persist: Boolean = true
+    ): Funit =
+      (persist ?? persistLine(chatId, line)) >>- {
+        if (persist) {
+          if (publicSource.isDefined) cached invalidate chatId
+          shutup ! {
+            publicSource match {
+              case Some(source) => RecordPublicChat(userId, text, source)
+              case _            => RecordPrivateChat(chatId.value, userId, text)
+            }
+          }
+          lila.mon.chat
+            .message(publicSource.fold("player")(_.parentName), line.troll)
+            .increment()
+            .unit
+        }
+        publish(chatId, actorApi.ChatLine(chatId, line), busChan)
       }
 
     private def linkCheck(line: UserLine, source: Option[PublicSource]) =
@@ -232,6 +244,8 @@ final class ChatApi(
     }
 
     private def isMod(user: User) = lila.security.Granter(_.ChatTimeout)(user)
+
+    private def isSuperAdmin(user: User) = lila.security.Granter(_.SuperAdmin)(user)
 
     def reinstate(list: List[ChatTimeout.Reinstate]) =
       list.foreach { r =>

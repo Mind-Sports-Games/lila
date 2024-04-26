@@ -37,6 +37,8 @@ export function makeConfig(ctrl: RoundController): Config {
     coordinates: data.pref.coords !== Prefs.Coords.Hidden,
     boardScores: ['togyzkumalak', 'backgammon', 'nackgammon'].includes(data.game.variant.key),
     dice: dice,
+    canUndo: data.canUndo,
+    showUndoButton: playing && turnPlayerIndex == data.player.playerIndex && dice.length > 0,
     addPieceZIndex: ctrl.data.pref.is3d,
     selectOnly: data.selectMode,
     highlight: {
@@ -53,6 +55,7 @@ export function makeConfig(ctrl: RoundController): Config {
       },
       select: hooks.onSelect,
       selectDice: hooks.onSelectDice,
+      undoButton: hooks.onUndoButton,
     },
     movable: {
       free: false,

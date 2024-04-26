@@ -27,8 +27,7 @@ trait GameHelper { self: I18nHelper with UserHelper with AiHelper with StringHel
 
   def titleGame(g: Game) = {
     val speed   = strategygames.Speed(g.clock.map(_.config)).name
-    val variant = g.variant.exotic ?? s" ${VariantKeys.variantName(g.variant)}"
-    s"$speed$variant ${g.variant.gameLogic.name} • ${playerText(g.p1Player)} vs ${playerText(g.p2Player)}"
+    s"$speed ${VariantKeys.variantName(g.variant)} • ${playerText(g.p1Player)} vs ${playerText(g.p2Player)}"
   }
 
   def describePov(pov: Pov) = {
@@ -259,16 +258,6 @@ trait GameHelper { self: I18nHelper with UserHelper with AiHelper with StringHel
       case _ => ""
     }
 
-  def gameTitle(game: Game, playerIndex: PlayerIndex): String = {
-    val u1 = playerText(game player playerIndex, withRating = true)
-    val u2 = playerText(game opponent playerIndex, withRating = true)
-    val clock = game.clock ?? { c =>
-      " • " + c.config.show
-    }
-    val variant = game.variant.exotic ?? s" • ${VariantKeys.variantName(game.variant)}"
-    s"$u1 vs $u2$clock$variant"
-  }
-
   // p1Username 1-0 p2Username
   def gameSummary(p1UserId: String, p2UserId: String, finished: Boolean, result: Option[Boolean]) = {
     val res = if (finished) PlayerIndex.showResult(result map PlayerIndex.fromP1) else "*"
@@ -299,7 +288,6 @@ trait GameHelper { self: I18nHelper with UserHelper with AiHelper with StringHel
     val speed = c.clock.map(_.config).fold(strategygames.Speed.Correspondence.name) { clock =>
       s"${strategygames.Speed(clock).name} (${clock.show})"
     }
-    val variant = c.variant.exotic ?? s" ${VariantKeys.variantName(c.variant)}"
     val challenger = c.challengerUser.fold(trans.anonymous.txt()) { reg =>
       s"${usernameOrId(reg.id)} (${reg.rating.show})"
     }
@@ -309,7 +297,7 @@ trait GameHelper { self: I18nHelper with UserHelper with AiHelper with StringHel
         c.destUser.fold(s"Challenge from $challenger") { dest =>
           s"$challenger challenges ${usernameOrId(dest.id)} (${dest.rating.show})"
         }
-    s"$speed$variant ${c.mode.name} Chess • $players"
+    s"$speed ${VariantKeys.variantName(c.variant)} ${c.mode.name} • $players"
   }
 
   def challengeOpenGraph(c: lila.challenge.Challenge)(implicit lang: Lang) =

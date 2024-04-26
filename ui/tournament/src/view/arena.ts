@@ -25,6 +25,7 @@ function playerTr(ctrl: TournamentController, player) {
         long: nbScores > 35,
         xlong: nbScores > 80,
         active: ctrl.playerInfo.id === userId,
+        dq: player.disqualified,
       },
       hook: bind('click', _ => ctrl.showPlayerInfo(player), ctrl.redraw),
     },

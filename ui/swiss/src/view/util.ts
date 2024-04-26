@@ -54,7 +54,7 @@ export function playerInfo(p: BasePlayer, withRating: boolean, withFlag: boolean
           })
         )
       : null,
-    h('span.name', userName(p.user)),
+    h(p.disqualified ? 'span.name.dq' : 'span.name', userName(p.user)),
     withRating ? h('span.rating', ' ' + p.rating + (p.provisional ? '?' : '')) : null,
   ];
 }

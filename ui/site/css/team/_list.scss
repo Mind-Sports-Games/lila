@@ -24,11 +24,18 @@
       @extend %box-radius;
 
       padding: 1px 5px;
-      background: $c-primary;
       color: $c-primary-over;
       text-transform: uppercase;
       font-size: 0.9rem;
       margin-left: 1em;
+    }
+
+    em.leader {
+      background: $c-primary;
+    }
+
+    em.official {
+      background: #e73636;
     }
   }
 

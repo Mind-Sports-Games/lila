@@ -85,7 +85,7 @@ case class Tournament(
 
   def isIntro = schedule.map(_.freq) has Schedule.Freq.Introductory
 
-  def isPlayStrategyHeadline = isMSO || isMSOWarmUp || isIntro
+  def isAnnual = schedule.map(_.freq) has Schedule.Freq.Annual
 
   def isScheduled = schedule.isDefined
 
@@ -149,7 +149,7 @@ case class Tournament(
       .map(v => v.take(medleyNumIntervals.getOrElse(medleyVariants.size)))
 
   def isStillWorthEntering =
-    isPlayStrategyHeadline || isMarathonOrUnique || {
+    isScheduled || {
       secondsToFinish > (minutes * 60 / 3).atMost(20 * 60)
     }
 
@@ -291,7 +291,7 @@ object Tournament {
     Tournament(
       id = makeId,
       name = sched.medleyShield.fold(sched.name(full = false)(defaultLang))(ms =>
-        TournamentShield.MedleyShield.makeName(ms.medleyName, sched.at)
+        TournamentShield.MedleyShield.makeName(ms.medleyName, sched.at, ms.weekOfMonth.isEmpty)
       ),
       status = Status.Created,
       clock = Schedule clockFor sched,
@@ -300,8 +300,8 @@ object Tournament {
       createdAt = DateTime.now,
       nbPlayers = 0,
       variant = sched.variant,
-      medleyVariantsAndIntervals = sched.medleyShield.map(ms => ms.generateVariants(ms.eligibleVariants)),
-      medleyMinutes = sched.medleyShield.map(_.arenaMedleyMinutes),
+      medleyVariantsAndIntervals = sched.medleyShield.map(ms => ms.generateVariants(ms.variants)),
+      medleyMinutes = sched.medleyShield.map(_.medleyMinutes),
       position = sched.position,
       mode = Mode.Rated,
       conditions = sched.conditions,

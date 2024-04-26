@@ -1177,6 +1177,52 @@ cg-container .cg-custom-svgs svg {
 .variant-backgammon {
   &.orientation-p1,
   .orientation-p1 {
+    cg-buttons.p1 {
+      left: calc(100% * 1 / 15);
+    }
+    cg-buttons.p2 {
+      left: calc(100% * 8 / 15);
+    }
+  }
+  &.orientation-p1vflip,
+  .orientation-p1vflip {
+    cg-buttons.p1 {
+      left: calc(100% * 8 / 15);
+    }
+    cg-buttons.p2 {
+      left: calc(100% * 1 / 15);
+    }
+  }
+  cg-buttons {
+    width: calc(100% * 6 / 15);
+    top: 46.5%;
+    height: 7%;
+    display: flex;
+    flex-flow: row;
+    justify-content: center;
+    position: absolute;
+    pointer-events: none;
+    cg-button {
+      width: calc(100% * 15 * 15 / 600);
+      &.unavailable {
+        opacity: 0.35;
+      }
+      border-radius: 7%;
+      text-align: center;
+      margin: auto;
+      padding: 3%;
+      font-weight: bold;
+      @include breakpoint($mq-col1-uniboard) {
+        border-width: thin;
+      }
+    }
+  }
+}
+
+.variant-nackgammon,
+.variant-backgammon {
+  &.orientation-p1,
+  .orientation-p1 {
     cg-dice.p1 {
       left: calc(100% * 8 / 15);
     }

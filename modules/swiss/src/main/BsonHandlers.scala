@@ -40,22 +40,24 @@ object BsonHandlers {
         performance = r.getO[Swiss.Performance](performance),
         score = r.get[Swiss.Score](score),
         absent = r.boolD(absent),
-        byes = ~r.getO[Set[SwissRound.Number]](byes)
+        byes = ~r.getO[Set[SwissRound.Number]](byes),
+        disqualified = r.boolD(disqualified)
       )
     def writes(w: BSON.Writer, o: SwissPlayer) =
       $doc(
-        id          -> o.id,
-        swissId     -> o.swissId,
-        userId      -> o.userId,
-        rating      -> o.rating,
-        provisional -> w.boolO(o.provisional),
-        points      -> o.points,
-        sbTieBreak  -> o.sbTieBreak,
-        bhTieBreak  -> o.bhTieBreak,
-        performance -> o.performance,
-        score       -> o.score,
-        absent      -> w.boolO(o.absent),
-        byes        -> o.byes.some.filter(_.nonEmpty)
+        id           -> o.id,
+        swissId      -> o.swissId,
+        userId       -> o.userId,
+        rating       -> o.rating,
+        provisional  -> w.boolO(o.provisional),
+        points       -> o.points,
+        sbTieBreak   -> o.sbTieBreak,
+        bhTieBreak   -> o.bhTieBreak,
+        performance  -> o.performance,
+        score        -> o.score,
+        absent       -> w.boolO(o.absent),
+        byes         -> o.byes.some.filter(_.nonEmpty),
+        disqualified -> w.boolO(o.disqualified)
       )
   }
 

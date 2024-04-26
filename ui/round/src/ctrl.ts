@@ -293,6 +293,10 @@ export default class RoundController {
     this.chessground.redrawAll(); //redraw dice
   };
 
+  private onUndoButton = () => {
+    this.undoAction();
+  };
+
   private isSimulHost = () => {
     return this.data.simul && this.data.simul.hostId === this.opts.userId;
   };
@@ -350,6 +354,7 @@ export default class RoundController {
     onCancelDropMode: this.onCancelDropMode,
     onSelect: this.onSelect,
     onSelectDice: this.onSelectDice,
+    onUndoButton: this.onUndoButton,
   });
 
   replaying = (): boolean => this.ply !== this.lastPly();
@@ -379,13 +384,15 @@ export default class RoundController {
     this.preDrop = undefined;
     const s = this.stepAt(ply);
     this.turnCount = s.turnCount;
+    const turnPlayerIndex = util.turnPlayerIndexFromLastTurn(this.turnCount);
     const dice = stratUtils.readDice(s.fen, this.data.game.variant.key);
     const config: CgConfig = {
       fen: s.fen,
       lastMove: util.lastMove(this.data.onlyDropsVariant, s.uci),
       check: !!s.check,
-      turnPlayerIndex: util.turnPlayerIndexFromLastTurn(this.turnCount),
+      turnPlayerIndex: turnPlayerIndex,
       dice: dice,
+      showUndoButton: false,
     };
     if (this.replaying()) {
       cancelDropMode(this.chessground.state);
@@ -398,6 +405,9 @@ export default class RoundController {
       config.liftable = {
         liftDests: util.parsePossibleLifts(this.data.possibleLifts),
       };
+      config.showUndoButton = this.isPlaying() && this.data.player.playerIndex == turnPlayerIndex && dice.length > 0;
+      config.canUndo = this.data.canUndo;
+      config.gameButtonsActive = true;
       // need to trigger dice roll as it's only supported automatically until multi-point backgammon
       if (['backgammon', 'nackgammon'].includes(this.data.game.variant.key)) {
         if (this.data.canOnlyRollDice) setTimeout(() => this.forceRollDice(this.data.game.variant.key), 500);
@@ -1156,8 +1166,8 @@ export default class RoundController {
   undoAction = (): void => {
     if (this.data.canUndo) {
       this.sendUndo();
+      this.redraw();
     }
-    this.redraw();
   };
 
   endTurnAction = (): void => {

@@ -809,6 +809,7 @@ computer analysis, game chat and shareable URL.</string>
   <string name="transparent">Transparent</string>
   <string name="backgroundImageUrl">Background image URL:</string>
   <string name="boardGeometry">Board geometry</string>
+  <string name="colorTheme">Colour theme</string>
   <string name="boardTheme">Board theme</string>
   <string name="boardSize">Board size</string>
   <string name="pieceSet">Piece set</string>

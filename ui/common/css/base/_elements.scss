@@ -37,6 +37,48 @@ a {
     color: inherit;
     text-decoration: none;
   }
+
+  //support colour choices
+  .selected-color-black &.color-choice {
+    color: $c-color-choice-black;
+    &:hover,
+    &:active,
+    &:focus {
+      color: $c-color-choice-black-link-hover;
+    }
+  }
+  .selected-color-red &.color-choice {
+    color: $c-color-choice-red;
+    &:hover,
+    &:active,
+    &:focus {
+      color: $c-color-choice-red-link-hover;
+    }
+  }
+  .selected-color-blue &.color-choice {
+    color: $c-color-choice-blue;
+    &:hover,
+    &:active,
+    &:focus {
+      color: $c-color-choice-blue-link-hover;
+    }
+  }
+  .selected-color-green &.color-choice {
+    color: $c-color-choice-green;
+    &:hover,
+    &:active,
+    &:focus {
+      color: $c-color-choice-green-link-hover;
+    }
+  }
+  .selected-color-yellow &.color-choice {
+    color: $c-color-choice-yellow;
+    &:hover,
+    &:active,
+    &:focus {
+      color: $c-color-choice-yellow-link-hover;
+    }
+  }
 }
 
 p {

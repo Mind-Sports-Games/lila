@@ -5,6 +5,7 @@ import links from './links';
 import { view as langsView } from './langs';
 import { view as soundView } from './sound';
 import { view as backgroundView } from './background';
+import { view as colorView } from './color';
 import { view as boardView } from './board';
 import { view as themeView } from './theme';
 import { view as pieceView } from './piece';
@@ -25,6 +26,9 @@ export function loaded(ctrl: DasherCtrl): VNode {
       break;
     case 'background':
       content = backgroundView(ctrl.subs.background);
+      break;
+    case 'color':
+      content = colorView(ctrl.subs.color);
       break;
     case 'board':
       content = boardView(ctrl.subs.board);

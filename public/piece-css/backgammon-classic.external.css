@@ -90,3 +90,5 @@
 .backgammon.is2d cg-dice.p1 dice.six, .is2d .variant-backgammon cg-dice.p1 dice.six, .is2d .variant-nackgammon cg-dice.p1 dice.six {background-image:url('/assets/piece/backgammon/classic/wdicesix.svg')}
 .backgammon.is2d cg-dice.p2 dice.six, .is2d .variant-backgammon cg-dice.p2 dice.six, .is2d .variant-nackgammon cg-dice.p2 dice.six {background-image:url('/assets/piece/backgammon/classic/bdicesix.svg')}
 .backgammon.is2d cg-dice.p2 dice.six, .is2d .variant-backgammon cg-dice.p2 dice.six, .is2d .variant-nackgammon cg-dice.p2 dice.six {background-image:url('/assets/piece/backgammon/classic/bdicesix.svg')}
+.backgammon.is2d cg-buttons.p1 cg-button, .is2d .variant-backgammon cg-buttons.p1 cg-button, .is2d .variant-nackgammon cg-buttons.p1 cg-button {background: white; color: black; border: black; border-width: medium; border-style: solid; }
+.backgammon.is2d cg-buttons.p2 cg-button, .is2d .variant-backgammon cg-buttons.p2 cg-button, .is2d .variant-nackgammon cg-buttons.p2 cg-button {background: black; color: white; border: white; border-width: medium; border-style: solid; }

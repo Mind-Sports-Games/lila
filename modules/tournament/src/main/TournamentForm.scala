@@ -440,7 +440,6 @@ private[tournament] case class TournamentSetup(
           fullMedleyList,
           clock.limitSeconds,
           medleyDuration,
-          medleyIntervalOptions.medleyMinutes.getOrElse(0),
           medleyIntervalOptions.numIntervals.getOrElse(fullMedleyList.length),
           medleyIntervalOptions.balanceIntervals.getOrElse(false)
         )
