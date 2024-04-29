@@ -144,6 +144,7 @@ export interface StudyFeatures {
 export interface StudyChapterMeta {
   id: string;
   name: string;
+  variant: Variant;
   ongoing?: boolean;
   res?: string;
 }

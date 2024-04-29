@@ -1,5 +1,6 @@
 import { h, VNode } from 'snabbdom';
 import { defined, prop, Prop } from 'common';
+import { isChess } from 'common/analysis';
 import { Redraw } from '../interfaces';
 import { bind, bindSubmit, spinner, option, onInsert, emptyRedButton } from '../util';
 import * as modal from '../modal';
@@ -31,6 +32,7 @@ export function ctrl(
     current({
       id: data.id,
       name: data.name,
+      variant: data.variant,
     });
     chapterConfig(data.id).then(d => {
       current(d!);
@@ -179,9 +181,10 @@ function viewLoaded(ctrl: StudyChapterEditFormCtrl, data: StudyChapterConfig): V
         ),
         h(
           'select#chapter-mode.form-control',
-          chapterForm.modeChoices.map(c => {
-            return option(c[0], mode, ctrl.trans.noarg(c[1]));
-          })
+          (isChess(data.variant.key ?? 'standard')
+            ? chapterForm.modeChoices
+            : chapterForm.nonBrowserAnalysisModeChoices
+          ).map(c => option(c[0], mode, ctrl.trans.noarg(c[1])))
         ),
       ]),
     ]),
