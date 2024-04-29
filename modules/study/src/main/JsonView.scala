@@ -67,6 +67,7 @@ final class JsonView(
       .obj(
         "id"          -> c.id,
         "name"        -> c.name,
+        "variant"     -> c.setup.variant,
         "orientation" -> c.setup.orientation
       )
       .add("description", c.description) pipe addChapterMode(c)
