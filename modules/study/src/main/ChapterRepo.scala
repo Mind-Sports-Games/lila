@@ -154,7 +154,7 @@ final class ChapterRepo(val coll: AsyncColl)(implicit
   ): Vector[(String, Bdoc)] = {
     val variantHandlers = VariantHandlers()
     import variantHandlers._
-    (parentPath.depth < Node.MAX_PLIES) ?? {
+    (parentPath.depth < Node.maxPlies) ?? {
       val path = parentPath + subTree
       subTree.children.nodes.flatMap(subTreeToBsonElements(path, _)) appended {
         path.toDbField -> writeNode(subTree)
@@ -180,7 +180,7 @@ final class ChapterRepo(val coll: AsyncColl)(implicit
   ): Vector[(String, Bdoc)] = {
     val variantHandlers = VariantHandlers()
     import variantHandlers._
-    (parentPath.depth < Node.MAX_PLIES) ??
+    (parentPath.depth < Node.maxPlies) ??
       children.nodes.flatMap { node =>
         val path = parentPath + node
         childrenTreeToBsonElements(path, node.children) appended (path.toDbField -> writeNode(node))

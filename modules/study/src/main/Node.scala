@@ -118,7 +118,7 @@ case class Node(
 
 object Node {
 
-  val MAX_PLIES = 400
+  val maxPlies = 1000 // keep in sync with maxPlies (modules/game/src/main/Game.scala)
 
   case class Children(nodes: Vector[Node]) extends AnyVal {
 

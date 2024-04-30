@@ -20,9 +20,6 @@ object userAnalysis {
     Variant.Chess(strategygames.chess.variant.FromPosition),
     Variant.Chess(strategygames.chess.variant.Monster),
     Variant.FairySF(strategygames.fairysf.variant.Amazons),
-    Variant.Go(strategygames.go.variant.Go9x9),
-    Variant.Go(strategygames.go.variant.Go13x13),
-    Variant.Go(strategygames.go.variant.Go19x19),
     Variant.Backgammon(strategygames.backgammon.variant.Backgammon),
     Variant.Backgammon(strategygames.backgammon.variant.Nackgammon)
   )
