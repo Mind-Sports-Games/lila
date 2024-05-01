@@ -186,7 +186,7 @@ final class JsonView(
           .add("canOnlyRollDice" -> pov.game.situation.canOnlyRollDice)
           .add("canEndTurn" -> pov.game.situation.canEndTurn)
           .add("canUndo" -> pov.game.situation.canUndo)
-          .add("forcedAction" -> forcedAction(pov))
+          .add("forcedAction" -> pov.game.situation.forcedAction.map(_.toUci.uci))
           .add("pauseSecs" -> pov.game.timeWhenPaused.millis.some)
           .add("expirationAtStart" -> pov.game.expirableAtStart.option {
             Json.obj(
@@ -473,11 +473,6 @@ final class JsonView(
       case _                 => None
     })
   }
-
-  private def forcedAction(pov: Pov): Option[JsValue] =
-    (pov.game.situation.actions.nonEmpty && pov.game.situation.actions.length == 1) option {
-      JsString(pov.game.situation.actions.head.toUci.uci)
-    }
 
   private def selectMode(pov: Pov): Boolean = {
     pov.game.situation match {

@@ -764,7 +764,7 @@ export default class RoundController {
     return true; // prevents default socket pubsub
   };
 
-  private forceMove(possibleMoves: cg.Dests, variantKey: VariantKey) {
+  private forcePass(possibleMoves: cg.Dests, variantKey: VariantKey) {
     if (possibleMoves.size == 1) {
       const passOrig = possibleMoves.keys().next().value;
       const passDests = possibleMoves.get(passOrig);
@@ -1172,53 +1172,57 @@ export default class RoundController {
     }
   };
 
+  private forcedActionDelayMillis = 400;
+
   playForcedAction = (): void => {
     const d = this.data;
-    const playedNoMoves = round.lastStep(d).uci.includes('/');
-    const dropDests = stratUtils.readDropsByRole(d.possibleDropsByRole).get('s-piece');
-    const delayMillis = 500;
     if (
       ['backgammon', 'nackgammon'].includes(d.game.variant.key) &&
       this.isPlaying() &&
       !this.replaying() &&
       d.player.playerIndex === d.game.player &&
-      this.data.pref.playForcedAction
+      this.data.pref.playForcedAction &&
+      d.forcedAction !== undefined
     ) {
-      if (d.canEndTurn && playedNoMoves) {
+      if (d.forcedAction === 'endturn') {
         this.chessground.set({ viewOnly: true });
         setTimeout(() => {
           this.sendEndTurn(d.game.variant.key);
           this.chessground.set({ viewOnly: false });
-        }, delayMillis);
-      } else if (dropDests && dropDests.length === 1) {
-        this.chessground.set({ viewOnly: true });
-        setTimeout(() => {
-          this.chessground.newPiece(
-            {
-              role: 's-piece',
-              playerIndex: d.game.player,
-            },
-            dropDests[0] as cg.Key
-          );
-          this.chessground.set({ viewOnly: false });
-          this.onUserNewPiece('s-piece', dropDests[0], { premove: false });
-        }, delayMillis);
-      } else if (d.forcedAction !== undefined && d.forcedAction.includes('^')) {
+        }, this.forcedActionDelayMillis);
+      } else if (d.forcedAction.includes('@')) {
+        const dropDests = stratUtils.readDropsByRole(d.possibleDropsByRole).get('s-piece');
+        if (dropDests) {
+          this.chessground.set({ viewOnly: true });
+          setTimeout(() => {
+            this.chessground.newPiece(
+              {
+                role: 's-piece',
+                playerIndex: d.game.player,
+              },
+              dropDests[0] as cg.Key
+            );
+            this.chessground.set({ viewOnly: false });
+            this.onUserNewPiece('s-piece', dropDests[0], { premove: false });
+          }, this.forcedActionDelayMillis);
+        }
+      } else if (d.forcedAction.includes('^')) {
         this.chessground.set({ viewOnly: true });
         setTimeout(() => {
           this.chessground.liftNoAnim(d.forcedAction!.slice(1) as cg.Key);
           this.chessground.set({ viewOnly: false });
           this.onUserLift(d.forcedAction!.slice(1) as cg.Key);
-        }, delayMillis);
-      } else if (d.forcedAction !== undefined && util.parsePossibleMoves(d.possibleMoves).size == 1) {
-        this.chessground.set({ viewOnly: true });
-        setTimeout(() => {
-          this.chessground.moveNoAnim(d.forcedAction!.slice(0, 2) as cg.Key, d.forcedAction!.slice(2, 4) as cg.Key);
-          this.chessground.set({ viewOnly: false });
-          this.onUserMove(d.forcedAction!.slice(0, 2) as cg.Key, d.forcedAction!.slice(2, 4) as cg.Key, {
-            premove: false,
-          });
-        }, delayMillis);
+        }, this.forcedActionDelayMillis);
+      } else {
+        const uciMove = util.uci2move(d.forcedAction);
+        if (uciMove !== undefined) {
+          this.chessground.set({ viewOnly: true });
+          setTimeout(() => {
+            this.chessground.moveNoAnim(uciMove[0], uciMove[1]);
+            this.chessground.set({ viewOnly: false });
+            this.onUserMove(uciMove[0], uciMove[1], {premove: false});
+          }, this.forcedActionDelayMillis);
+        }
       }
     }
   };
@@ -1228,11 +1232,12 @@ export default class RoundController {
     if (this.isPlaying() && !this.replaying()) {
       //flipello pass
       if ((d.game.variant.key === 'flipello' || d.game.variant.key === 'flipello10') && d.possibleMoves) {
-        this.forceMove(util.parsePossibleMoves(d.possibleMoves), d.game.variant.key);
+        this.forcePass(util.parsePossibleMoves(d.possibleMoves), d.game.variant.key);
       }
       //backgammon roll dice at start of turn or end turn when no moves
       if (['backgammon', 'nackgammon'].includes(d.game.variant.key)) {
-        if (d.canOnlyRollDice) setTimeout(() => this.forceRollDice(d.game.variant.key), 500);
+        if (d.canOnlyRollDice)
+          setTimeout(() => this.forceRollDice(d.game.variant.key), this.forcedActionDelayMillis);
         else if (d.pref.playForcedAction) this.playForcedAction();
       }
     }
