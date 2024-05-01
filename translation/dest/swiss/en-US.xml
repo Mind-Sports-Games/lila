@@ -3,14 +3,14 @@
   <string name="swissTournaments">Swiss tournaments</string>
   <string name="medleyGameFamilies">Game families that could appear in this Medley</string>
   <string name="medleyGameGroups">Game groups that could appear in this Medley</string>
-  <string name="onePerGameFamily">Ensure one game per game family is selected, where possible</string>
   <string name="onePerGameGroup">Ensure one game per game group is selected, where possible</string>
-  <string name="exoticChessVariants">Use only exotic chess variants</string>
-  <string name="draughts64Variants">Only use draughts 64 variants</string>
+  <string name="exoticChessVariants">Only exotic chess variants</string>
+  <string name="draughts64Variants">Only draughts 64 variants</string>
   <string name="usingDrawTables">Using Draw Tables</string>
   <string name="firstRound">First Round</string>
   <plurals name="viewAllXRounds">
     <item quantity="one">View the round</item>
     <item quantity="other">View all %s rounds</item>
   </plurals>
+  <string name="numberOfRoundsInSwiss">The number of rounds played in a Swiss tournament may be less than the number shown if there are not enough players to make a valid pairing</string>
 </resources>
