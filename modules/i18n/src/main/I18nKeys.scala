@@ -1946,13 +1946,13 @@ object swiss {
 val `swissTournaments` = new I18nKey("swiss:swissTournaments")
 val `medleyGameFamilies` = new I18nKey("swiss:medleyGameFamilies")
 val `medleyGameGroups` = new I18nKey("swiss:medleyGameGroups")
-val `onePerGameFamily` = new I18nKey("swiss:onePerGameFamily")
 val `onePerGameGroup` = new I18nKey("swiss:onePerGameGroup")
 val `exoticChessVariants` = new I18nKey("swiss:exoticChessVariants")
 val `draughts64Variants` = new I18nKey("swiss:draughts64Variants")
 val `usingDrawTables` = new I18nKey("swiss:usingDrawTables")
 val `firstRound` = new I18nKey("swiss:firstRound")
 val `viewAllXRounds` = new I18nKey("swiss:viewAllXRounds")
+val `numberOfRoundsInSwiss` = new I18nKey("swiss:numberOfRoundsInSwiss")
 }
 
 object puzzle {

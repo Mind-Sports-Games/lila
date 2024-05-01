@@ -258,7 +258,7 @@ final private class SwissFields(form: Form[_], swiss: Option[Swiss])(implicit ct
     frag(
       form3.checkbox(
         form("medleyDefaults.onePerGameFamily"),
-        "Where possible, use one game per game group",
+        trans.swiss.onePerGameGroup.txt(),
         klass = "medleyDefaults",
         displayed = false
       )
@@ -267,7 +267,7 @@ final private class SwissFields(form: Form[_], swiss: Option[Swiss])(implicit ct
     frag(
       form3.checkbox(
         form("medleyDefaults.exoticChessVariants"),
-        "Only exotic chess variants",
+        trans.swiss.exoticChessVariants.txt(),
         klass = "medleyDefaults",
         displayed = false
       )
@@ -276,7 +276,7 @@ final private class SwissFields(form: Form[_], swiss: Option[Swiss])(implicit ct
     frag(
       form3.checkbox(
         form("medleyDefaults.draughts64Variants"),
-        "Only draughts 64 variants",
+        trans.swiss.draughts64Variants.txt(),
         klass = "medleyDefaults",
         displayed = false
       )
