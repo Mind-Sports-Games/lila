@@ -10,6 +10,7 @@ import play.api.i18n.Lang
 import scala.concurrent.duration._
 import scala.concurrent.Promise
 import scala.util.chaining._
+import scala.concurrent.Future
 
 import lila.common.config.{ MaxPerPage, MaxPerSecond }
 import lila.common.paginator.Paginator
@@ -149,6 +150,15 @@ final class TournamentApi(
   private def updatePlayerRatingCache(tour: Tournament, variant: Variant, userIds: Set[User.ID]): Funit =
     userIds.map(updatePlayer(tour, variant, None)).sequenceFu.void
 
+  private def updateBotRatingCache(tour: Tournament, variant: Variant): Future[List[Unit]] =
+    if (tour.botsAllowed)
+      playerRepo
+        .byTourAndUserIds(tour.id, LightUser.tourBotsIDs)
+        .flatMap { p =>
+          Future.traverse(p.map(_.userId))(updatePlayer(tour, variant, None))
+        }
+    else fuccess(List())
+
   private def usersReady(tour: Tournament, users: WaitingUsers): Boolean =
     !hadPairings.get(tour.id) || users.haveWaitedEnough(tour.minWaitingUsersForPairings)
 
@@ -164,6 +174,7 @@ final class TournamentApi(
     (users.size >= forTour.minWaitingUsersForPairings && usersReady(forTour, users)) ??
       Sequencing(forTour.id)(tournamentRepo.startedById) { tour =>
         updatePlayerRatingCache(tour, tour.variant, users.all) >>
+          updateBotRatingCache(tour, tour.variant) >>
           withdrawInactivePlayers(tour.id, users.all) >>
           cached
             .ranking(tour)
@@ -286,13 +297,13 @@ final class TournamentApi(
   }
 
   private def awardTrophyByRank(tour: Tournament, trophyKind: String, rank: Int, date: DateTime) =
-    playerRepo.bestByTourWithRank(tourId = tour.id, nb = rank.pp("rank"), noDQs = true).flatMap {
-      _.pp("bestByTourWithRank").map {
+    playerRepo.bestByTourWithRank(tourId = tour.id, nb = rank, noDQs = true).flatMap {
+      _.map {
         case rp if rp.rank == rank =>
           trophyApi.award(
             Tournament.tournamentUrl(tour.id),
             rp.player.userId,
-            trophyKind.pp("trophyKind"),
+            trophyKind,
             tour.name.some,
             tour.trophyExpiryDays,
             date
