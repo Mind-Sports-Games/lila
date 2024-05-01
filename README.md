@@ -42,8 +42,6 @@ run
 
 The Lichess Wiki describes [how to setup a development environment](https://github.com/lichess-org/lila/wiki/Lichess-Development-Onboarding), which is the same process as PlayStrategy.
 
-Swiss tournaments pairings require to have a running [bbpPairings](https://github.com/cyanfish/bbpPairings) and set the correct path value for the key swiss.bbpairing in conf/base.conf (create yours based on conf/base.conf.default).
-
 ## HTTP API
 
 Feel free to use the [Playstrategy API](https://playstrategy.org/api) in your applications and websites.
