@@ -4,6 +4,7 @@
 .metals/
 project/.bloop/
 conf/application.conf
+conf/base.conf
 conf/version.conf
 
 logs
