@@ -8,7 +8,7 @@ import views._
 import lila.pref.PieceSet
 import lila.pref.Theme
 import lila.pref.JsonView._
-import scala.concurrent.{Future}
+import scala.concurrent.{ Future }
 import strategygames.{ GameFamily }
 
 import play.api.libs.json._
@@ -75,21 +75,21 @@ final class Pref(env: Env) extends LilaController(env) {
   def updatePieceSet(gameFamily: String) =
     OpenBody { implicit ctx =>
       implicit val req = ctx.body
-        FormResult(forms.pieceSet) { v =>
-          updatePieceSetForFamily(gameFamily, v, ctx) map { cookie =>
-            Ok(()).withCookies(cookie)
-          }
+      FormResult(forms.pieceSet) { v =>
+        updatePieceSetForFamily(gameFamily, v, ctx) map { cookie =>
+          Ok(()).withCookies(cookie)
         }
+      }
     }
-  
+
   def updateTheme(gameFamily: String) =
     OpenBody { implicit ctx =>
       implicit val req = ctx.body
-        FormResult(forms.theme) { v =>
-          updateThemeForFamily(gameFamily, v, ctx) map { cookie =>
-            Ok(()).withCookies(cookie)
-          }
+      FormResult(forms.theme) { v =>
+        updateThemeForFamily(gameFamily, v, ctx) map { cookie =>
+          Ok(()).withCookies(cookie)
         }
+      }
     }
 
   private lazy val setters = Map(
@@ -98,32 +98,37 @@ final class Pref(env: Env) extends LilaController(env) {
     "soundSet"   -> (forms.soundSet   -> save("soundSet") _),
     "bg"         -> (forms.bg         -> save("bg") _),
     "bgImg"      -> (forms.bgImg      -> save("bgImg") _),
+    "color"      -> (forms.color      -> save("color") _),
     "is3d"       -> (forms.is3d       -> save("is3d") _),
     "zen"        -> (forms.zen        -> save("zen") _)
   )
-  
+
   private def updatePieceSetForFamily(gameFamily: String, value: String, ctx: Context): Fu[Cookie] =
     ctx.me match {
-      case Some(u) => api.updatePrefPieceSet(u, gameFamily, value).map( j => env.lilaCookie.session("pieceSet", j)(ctx.req))
+      case Some(u) =>
+        api.updatePrefPieceSet(u, gameFamily, value).map(j => env.lilaCookie.session("pieceSet", j)(ctx.req))
       case _ => //get PieceSet pref from session and update the cookie
-          val currentPS = ctx.req.session.get("pieceSet")
-                          .fold(PieceSet.defaults)(p => Json.parse(p).validate(pieceSetsRead).getOrElse(PieceSet.defaults))
-          val newPS = PieceSet.updatePieceSet(currentPS, value)
-          val j = Json.toJson(newPS).toString
-          fuccess(env.lilaCookie.session("pieceSet", j)(ctx.req))
-    } 
-  
+        val currentPS = ctx.req.session
+          .get("pieceSet")
+          .fold(PieceSet.defaults)(p => Json.parse(p).validate(pieceSetsRead).getOrElse(PieceSet.defaults))
+        val newPS = PieceSet.updatePieceSet(currentPS, value)
+        val j     = Json.toJson(newPS).toString
+        fuccess(env.lilaCookie.session("pieceSet", j)(ctx.req))
+    }
+
   private def updateThemeForFamily(gameFamily: String, value: String, ctx: Context): Fu[Cookie] =
     ctx.me match {
-      case Some(u) => api.updatePrefTheme(u, gameFamily, value).map( j => env.lilaCookie.session("theme", j)(ctx.req))
+      case Some(u) =>
+        api.updatePrefTheme(u, gameFamily, value).map(j => env.lilaCookie.session("theme", j)(ctx.req))
       case _ => //get Theme pref from session and update the cookie
-          val currentT = ctx.req.session.get("theme")
-                          .fold(Theme.defaults)(p => Json.parse(p).validate(themesRead).getOrElse(Theme.defaults))
-          val newT = Theme.updateBoardTheme(currentT, value, gameFamily)
-          val j = Json.toJson(newT).toString
-          fuccess(env.lilaCookie.session("theme", j)(ctx.req))
+        val currentT = ctx.req.session
+          .get("theme")
+          .fold(Theme.defaults)(p => Json.parse(p).validate(themesRead).getOrElse(Theme.defaults))
+        val newT = Theme.updateBoardTheme(currentT, value, gameFamily)
+        val j    = Json.toJson(newT).toString
+        fuccess(env.lilaCookie.session("theme", j)(ctx.req))
     }
-  
+
   private def save(name: String)(value: String, ctx: Context): Fu[Cookie] =
     ctx.me ?? {
       api.setPrefString(_, name, value)

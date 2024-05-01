@@ -773,7 +773,10 @@ export default class Setup {
       })
       .trigger('change');
 
-    $modeChoices.on('change', save);
+    $modeChoices.on('change', () => {
+      toggleButtons();
+      save();
+    });
 
     $advancedTimeToggle.on('click', function (this: HTMLElement) {
       if ($advancedTimeToggle.hasClass('active')) {

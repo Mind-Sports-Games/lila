@@ -36,6 +36,9 @@ case class Team(
   def publicMembers: Boolean = !hideMembers.has(true)
 
   def publicForum: Boolean = !hideForum.has(true)
+
+  def isOfficial: Boolean = createdBy == "playstrategy"
+
 }
 
 object Team {

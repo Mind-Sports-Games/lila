@@ -4,9 +4,10 @@ import { Rules, Square } from 'stratops/types';
 import { SquareSet } from 'stratops/squareSet';
 import { Board } from 'stratops/board';
 import { Setup, Material, RemainingChecks } from 'stratops/setup';
-import { Castles, setupPosition } from 'stratops/variant';
+import { Castles, setupPosition, defaultPosition } from 'stratops/variant';
 import { playstrategyVariants } from 'stratops/compat';
 import { makeFen, parseFen, parseCastlingFen, INITIAL_FEN, EMPTY_FEN, INITIAL_EPD } from 'stratops/fen';
+import * as fp from 'stratops/fp';
 import { defined, prop, Prop } from 'common';
 
 export default class EditorCtrl {
@@ -19,12 +20,13 @@ export default class EditorCtrl {
 
   selected: Prop<Selected>;
 
+  initialFen: string;
   pockets: Material | undefined;
   turn: PlayerIndex;
   unmovedRooks: SquareSet | undefined;
   castlingToggles: CastlingToggles<boolean>;
-  epSquare: Square | undefined;
-  remainingChecks: RemainingChecks | undefined;
+  epSquare: fp.Option<Square>;
+  remainingChecks: fp.Option<RemainingChecks>;
   rules: Rules;
   halfmoves: number;
   fullmoves: number;
@@ -59,11 +61,13 @@ export default class EditorCtrl {
     });
 
     this.castlingToggles = { K: false, Q: false, k: false, q: false };
+    const params = new URLSearchParams(location.search);
     this.rules =
       !this.cfg.embed && window.history.state && window.history.state.rules ? window.history.state.rules : 'chess';
+    this.initialFen = (cfg.fen || params.get('fen') || INITIAL_FEN).replace(/_/g, ' ');
 
     this.redraw = () => {};
-    this.setFen(cfg.fen);
+    this.setFen(this.initialFen);
     this.redraw = redraw;
   }
 
@@ -87,16 +91,16 @@ export default class EditorCtrl {
   }
 
   private getSetup(): Setup {
-    const boardFen = this.chessground ? this.chessground.getFen() : this.cfg.fen;
-    const board = parseFen('chess')(boardFen).unwrap(
+    const boardFen = this.chessground ? this.chessground.getFen() : this.initialFen;
+    const board = parseFen(this.rules)(boardFen).unwrap(
       setup => setup.board,
-      _ => Board.empty('chess')
+      _ => Board.empty(this.rules)
     );
     return {
       board,
       pockets: this.pockets,
       turn: this.turn,
-      unmovedRooks: this.unmovedRooks || parseCastlingFen(board, this.castlingToggleFen()).unwrap(),
+      unmovedRooks: this.unmovedRooks || parseCastlingFen(board)(this.castlingToggleFen()).unwrap(),
       epSquare: this.epSquare,
       remainingChecks: this.remainingChecks,
       halfmoves: this.halfmoves,
@@ -160,13 +164,9 @@ export default class EditorCtrl {
     this.onChange();
   }
 
-  startPosition(): void {
-    this.setFen(INITIAL_FEN);
-  }
+  startPosition = () => this.setFen(makeFen('chess')(defaultPosition(this.rules).toSetup()));
 
-  clearBoard(): void {
-    this.setFen(EMPTY_FEN);
-  }
+  clearBoard = () => this.setFen(EMPTY_FEN);
 
   loadNewFen(fen: string | 'prompt'): void {
     if (fen === 'prompt') {
@@ -176,7 +176,7 @@ export default class EditorCtrl {
     this.setFen(fen);
   }
 
-  setFen(fen: string): boolean {
+  setFen = (fen: string): boolean => {
     return parseFen('chess')(fen).unwrap(
       setup => {
         if (this.chessground) this.chessground.set({ fen });
@@ -199,7 +199,7 @@ export default class EditorCtrl {
       },
       _ => false
     );
-  }
+  };
 
   setRules(rules: Rules): void {
     this.rules = rules;

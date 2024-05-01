@@ -56,6 +56,7 @@ final class SwissApi(
   import BsonHandlers._
 
   def byId(id: Swiss.Id)            = colls.swiss.byId[Swiss](id.value)
+  def finishedById(id: Swiss.Id)    = byId(id).dmap(_.filter(_.isFinished))
   def notFinishedById(id: Swiss.Id) = byId(id).dmap(_.filter(_.isNotFinished))
   def createdById(id: Swiss.Id)     = byId(id).dmap(_.filter(_.isCreated))
   def startedById(id: Swiss.Id)     = byId(id).dmap(_.filter(_.isStarted))
@@ -415,6 +416,35 @@ final class SwissApi(
       }.void
     } >> recomputeAndUpdateAll(id)
 
+  def disqualify(id: String, userId: User.ID) =
+    Sequencing(Swiss.Id(id))(finishedById) { swiss =>
+      SwissPlayer.fields { f =>
+        val selId = $id(SwissPlayer.makeId(swiss.id, userId))
+        colls.player.updateField(selId, f.disqualified, true)
+      }.void >>- {
+        getWinner(swiss.id).flatMap { winnerUserId =>
+          colls.swiss.update
+            .one(
+              $id(swiss.id),
+              $set("winnerId" -> winnerUserId)
+            )
+            .void
+        }.unit
+        trophyApi
+          .trophiesByUrl(Swiss.swissUrl(swiss.id))
+          .map(_.filter(_.user == userId))
+          .flatMap { trophyList =>
+            trophyList.headOption ?? { trophy =>
+              trophyApi.removeTrophiesByUrl(Swiss.swissUrl(swiss.id))
+              awardTrophies(swiss, trophy.date)
+            }
+          }
+          .unit
+        recomputeAndUpdateAll(swiss.id)
+        socket.reload(swiss.id)
+      }
+    }
+
   def recomputeScore(id: String): Funit =
     recomputeAndUpdateAll(Swiss.Id(id))
 
@@ -633,11 +663,18 @@ final class SwissApi(
       }
     }
 
-  private def doFinish(swiss: Swiss): Funit =
+  private def getWinner(id: Swiss.Id) =
     SwissPlayer
       .fields { f =>
-        colls.player.primitiveOne[User.ID]($doc(f.swissId -> swiss.id), $sort desc f.score, f.userId)
+        colls.player.primitiveOne[User.ID](
+          $doc(f.swissId -> id, f.disqualified $ne true),
+          $sort desc f.score,
+          f.userId
+        )
       }
+
+  private def doFinish(swiss: Swiss): Funit =
+    getWinner(swiss.id)
       .flatMap { winnerUserId =>
         colls.swiss.update
           .one(
@@ -676,13 +713,11 @@ final class SwissApi(
     else funit
   } >>- cache.featuredInTeam.invalidate(swiss.teamId)
 
-  private def awardTrophies(swiss: Swiss): Funit = {
-    import lila.user.TrophyKind._
-    import lila.swiss.Swiss.swissUrl
+  private def awardTrophies(swiss: Swiss, date: DateTime = DateTime.now): Funit = {
     SwissPlayer
       .fields { f =>
         colls.player.primitive[User.ID](
-          $doc(f.swissId -> swiss.id),
+          $doc(f.swissId -> swiss.id, f.disqualified $ne true),
           $sort desc f.score,
           3,
           f.userId
@@ -695,11 +730,12 @@ final class SwissApi(
           .flatten
           .map { case (trophyKind, userId) =>
             trophyApi.award(
-              swissUrl(swiss.id),
+              Swiss.swissUrl(swiss.id),
               userId.toString,
               trophyKind,
               swiss.name.some,
-              swiss.trophyExpiryDays
+              swiss.trophyExpiryDays,
+              date
             )
           }
           .unit

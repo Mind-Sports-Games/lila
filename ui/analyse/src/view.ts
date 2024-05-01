@@ -1,5 +1,6 @@
 import { h, VNode } from 'snabbdom';
 import { parseFen } from 'stratops/fen';
+import { variantToRules } from 'stratutils';
 import * as chessground from './ground';
 import { read as fenRead } from 'chessground/fen';
 import {
@@ -11,7 +12,7 @@ import {
   getPlayerScore,
   getMancalaScore,
   getGoScore,
-  variantToRules,
+  allowClientEvalForVariant,
 } from './util';
 import { defined } from 'common';
 import changeColorHandle from 'common/coordsColor';
@@ -247,7 +248,7 @@ function controls(ctrl: AnalyseCtrl) {
                   }),
                 ]
               : [
-                  ctrl.ceval.allowed()
+                  ctrl.ceval.allowed() && allowClientEvalForVariant(ctrl.ceval.variant.key)
                     ? h('button.fbt', {
                         attrs: {
                           title: noarg('openingExplorerAndTablebase'),
@@ -260,7 +261,10 @@ function controls(ctrl: AnalyseCtrl) {
                         },
                       })
                     : null,
-                  ctrl.ceval.possible && ctrl.ceval.allowed() && !ctrl.isGamebook()
+                  ctrl.ceval.possible &&
+                  ctrl.ceval.allowed() &&
+                  allowClientEvalForVariant(ctrl.ceval.variant.key) &&
+                  !ctrl.isGamebook()
                     ? h('button.fbt', {
                         attrs: {
                           title: noarg('practiceWithComputer'),
@@ -510,8 +514,10 @@ export default function (ctrl: AnalyseCtrl): VNode {
               ...(menuIsOpen
                 ? [actionMenu(ctrl)]
                 : [
-                    cevalView.renderCeval(ctrl),
-                    showCevalPvs ? cevalView.renderPvs(ctrl) : null,
+                    allowClientEvalForVariant(ctrl.ceval.variant.key) ? cevalView.renderCeval(ctrl) : null,
+                    allowClientEvalForVariant(ctrl.ceval.variant.key) && showCevalPvs
+                      ? cevalView.renderPvs(variantKey)(ctrl)
+                      : null,
                     renderAnalyse(ctrl, concealOf),
                     gamebookEditView || forkView(ctrl, concealOf),
                     retroView(ctrl) || practiceView(ctrl) || explorerView(ctrl),

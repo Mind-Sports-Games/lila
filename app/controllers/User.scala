@@ -265,7 +265,7 @@ final class User(
           html =
             for {
               nbAllTime      <- env.user.cached.top10NbGame.get {}
-              tourneyWinners <- env.tournament.winners.all.map(_.top)
+              tourneyWinners <- env.tournament.winners.all.map(_.top10)
               topOnline      <- env.user.cached.getTop50Online
               anyOnline      <- env.user.cached.get50Online
               _              <- env.user.lightUserApi preloadMany tourneyWinners.map(_.userId)

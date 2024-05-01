@@ -31,6 +31,16 @@ $c-font-clearer: c-light($c-font, 89%);
 $c-shade: c-light($c-font, 30%);
 $c-font-page: $c-font-dim;
 
+/* Color choices in prefs */
+$c-color-choice-original: hsl(0, 0%, 30%);
+$c-color-choice-black-link-hover: $c-color-choice-black-dim;
+$c-color-choice-red-link-hover: $c-color-choice-red-dim;
+$c-color-choice-blue-link-hover: $c-color-choice-blue-dim;
+$c-color-choice-green-link-hover: $c-color-choice-green-dim;
+$c-color-choice-yellow-link-hover: $c-color-choice-yellow-dim;
+
+$c-color-choice-font-default: hsl(0, 0%, 27%);
+
 /* Primary: blue */
 $c-primary: hsl(209, 79%, 56%);
 $c-primary-dim: c-dimmer($c-primary, 15%);

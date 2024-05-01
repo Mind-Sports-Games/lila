@@ -1,3 +1,4 @@
+$medley-list-width: 50ch;
 $user-list-width: 35ch;
 $narrow-user-list-width: 30ch;
 
@@ -112,7 +113,7 @@ $narrow-user-list-width: 30ch;
 @media (min-width: 1700px) {
   .shield-leaderboards,
   .medley-shields {
-    grid-template-columns: repeat(auto-fit, minmax($user-list-width, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax($medley-list-width, 1fr));
   }
 }
 

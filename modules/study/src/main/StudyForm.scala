@@ -1,7 +1,9 @@
 package lila.study
 
 import strategygames.format.FEN
-import strategygames.{ Player => PlayerIndex, P1 }
+import strategygames.format.Forsyth
+import strategygames.variant.Variant
+import strategygames.{ Player => PlayerIndex, P1, GameLogic }
 import play.api.data._
 import play.api.data.Forms._
 
@@ -15,23 +17,35 @@ object StudyForm {
       mapping(
         "gameId"      -> optional(nonEmptyText),
         "orientation" -> optional(nonEmptyText),
-        "fen"         -> optional(lila.common.Form.fen.playable(strict = false)),
+        "fen"         -> optional(nonEmptyText),
         "pgn"         -> optional(nonEmptyText),
         "variant"     -> optional(nonEmptyText),
         "as"          -> optional(nonEmptyText)
       )(Data.apply)(Data.unapply)
+        .verifying(s"Fen does not match variant given", _.validFen)
     )
 
     case class Data(
         gameId: Option[String] = None,
         orientationStr: Option[String] = None,
-        fen: Option[FEN] = None,
+        fen: Option[String] = None,
         pgnStr: Option[String] = None,
         variantStr: Option[String] = None,
         asStr: Option[String] = None
     ) {
 
       def orientation = orientationStr.flatMap(PlayerIndex.fromName) | P1
+
+      lazy val variant: Variant = variantStr.fold(Variant.default(GameLogic.Chess()))(Variant.orDefault(_))
+
+      val actualFen: Option[FEN] = fen.map(FEN(variant.gameLogic, _))
+
+      def validFen: Boolean = actualFen
+        .fold(true) { f =>
+          (Forsyth
+            .<<<@(variant.gameLogic, variant, f))
+            .exists(_.situation.playable(false))
+        }
 
       def as: As =
         asStr match {
@@ -44,7 +58,7 @@ object StudyForm {
           name = Chapter.Name(""),
           game = gameId,
           variant = variantStr,
-          fen = fen,
+          fen = actualFen.map(_.value),
           pgn = pgnStr,
           orientation = orientation.name,
           mode = ChapterMaker.Mode.Normal.key,

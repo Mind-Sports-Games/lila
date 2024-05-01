@@ -18,6 +18,8 @@ final class Blog(
 
   private def blogApi = env.blog.api
 
+  def urlencode(str: String): String = java.net.URLEncoder.encode(str, "US-ASCII")
+
   def index(page: Int) =
     WithPrismic { implicit ctx => implicit prismic =>
       pageHit
@@ -30,11 +32,9 @@ final class Blog(
   def show(id: String, slug: String, ref: Option[String]) =
     WithPrismic { implicit ctx => implicit prismic =>
       pageHit
-      blogApi.one(prismic, id) flatMap { maybeDocument =>
-        checkSlug(maybeDocument, slug) {
-          case Left(newSlug) => MovedPermanently(routes.Blog.show(id, newSlug, ref).url)
-          case Right(doc)    => Ok(views.html.blog.show(doc))
-        }
+      blogApi.one(prismic, id) flatMap {
+        case Some(doc) => fuccess(Ok(views.html.blog.show(doc)))
+        case _         => notFound
       } recoverWith {
         case e: RuntimeException if e.getMessage contains "Not Found" => notFound
       }
@@ -84,7 +84,9 @@ final class Blog(
         blogApi.masterContext flatMap { implicit prismic =>
           blogApi.all() map {
             _.map { doc =>
-              s"${env.net.baseUrl}${routes.Blog.show(doc.id, doc.slug)}"
+              {
+                s"${env.net.baseUrl}${routes.Blog.show(doc.id, urlencode(doc.getText("blog.title").getOrElse("-").toLowerCase().replace(" ", "-")))}"
+              }
             } mkString "\n"
           }
         }
@@ -108,8 +110,7 @@ final class Blog(
   def year(year: Int) =
     WithPrismic { implicit ctx => implicit prismic =>
       if (lila.blog.allYears contains year)
-        blogApi.byYear(prismic, year) map { posts => Ok(views.html.blog.index.byYear(year, posts))
-        }
+        blogApi.byYear(prismic, year) map { posts => Ok(views.html.blog.index.byYear(year, posts)) }
       else notFound
     }
 
@@ -129,7 +130,8 @@ final class Blog(
                     categ = categ,
                     slug = topicSlug,
                     name = doc.getText("blog.title") | "New blog post",
-                    url = s"${env.net.baseUrl}${routes.Blog.show(doc.id, doc.slug)}"
+                    url = s"${env.net.baseUrl}${routes.Blog
+                      .show(doc.id, urlencode(doc.getText("blog.title").getOrElse("-").toLowerCase().replace(" ", "-")))}"
                   )
                 }
               } inject redirect
@@ -145,13 +147,4 @@ final class Blog(
       }
     }
 
-  // -- Helper: Check if the slug is valid and redirect to the most recent version id needed
-  private def checkSlug(document: Option[Document], slug: String)(
-      callback: Either[String, Document] => Result
-  )(implicit ctx: lila.api.Context) =
-    document.collect {
-      case document if document.slug == slug => fuccess(callback(Right(document)))
-      case document if document.slugs.exists(StringUtils.stripEnd(_, ".") == slug) =>
-        fuccess(callback(Left(document.slug)))
-    } getOrElse notFound
 }

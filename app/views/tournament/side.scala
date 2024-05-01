@@ -110,6 +110,14 @@ object side {
             }
           )
         ),
+        (!tour.noBerserk && tour.clock.berserkable) option div(cls := "text", dataIcon := "`")(
+          "Berserk Clock: ",
+          a(
+            title := "Clock info",
+            href := s"${routes.Page.loneBookmark("clocks")}",
+            target := "_blank"
+          )(tour.clock.showBerserk)
+        ),
         tour.noBerserk option div(cls := "text", dataIcon := "`")("No Berserk allowed"),
         tour.noStreak option div(cls := "text", dataIcon := "Q")("No Arena streaks"),
         !tour.isFinished option tour.trophy1st.map { trophy1st =>

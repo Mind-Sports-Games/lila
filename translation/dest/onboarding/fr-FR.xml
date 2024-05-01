@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <string name="configure">Configurez PlayStrategy comme vous le souhaitez</string>
+  <string name="explore">Découvrez le site et amusez-vous :)</string>
+  <string name="follow">Suivez vos amis sur PlayStrategy</string>
+  <string name="improveIt">la compléter</string>
+  <string name="joinCommunities">Rejoignez les communautés de vos jeux favoris</string>
+  <string name="kidModeEnabled">Le mode enfant est actif.</string>
+  <string name="kidMode">le mode enfant</string>
+  <string name="learnFrom">Apprenez via %1$s</string>
+  <string name="learnRules">Découvrez les règles de certains de nos jeux</string>
+  <string name="playBot">Jouez avec l'un de nos bots</string>
+  <string name="playOthers">Jouez avec d'autres joueurs du monde entier</string>
+  <string name="playTournaments">Participez à des tournois</string>
+  <string name="profilePage">Ceci est votre page de profil.</string>
+  <string name="studies">les études de parties</string>
+  <string name="suggestions">Et maintenant ? Voici quelques suggestions :</string>
+  <string name="weeklyChallenge">Essayez notre défi hebdomadaire</string>
+  <string name="welcome">Bienvenue sur playstrategy.org!</string>
+  <string name="willAChildUse">Ce compte est utilisé par un enfant ? Vous pouvez activer %1$s.</string>
+  <string name="wouldYou">Souhaitez-vous %1$s ?</string>
+</resources>

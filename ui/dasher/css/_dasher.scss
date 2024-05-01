@@ -1,6 +1,7 @@
 @import 'link';
 @import 'board';
 @import 'piece';
+@import 'color';
 
 #dasher_app {
   @extend %box-radius-left;

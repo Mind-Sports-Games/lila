@@ -226,9 +226,46 @@
     background: $c-bg-zebra;
     color: $c-font;
     position: relative;
+    .selected-color-black & {
+      border: $c-color-choice-black;
+      border-style: solid;
+    }
+    .selected-color-red & {
+      border: $c-color-choice-red;
+      border-style: solid;
+    }
+    .selected-color-blue & {
+      border: $c-color-choice-blue;
+      border-style: solid;
+    }
+    .selected-color-green & {
+      border: $c-color-choice-green;
+      border-style: solid;
+    }
+    .selected-color-yellow & {
+      border: $c-color-choice-yellow;
+      border-style: solid;
+    }
 
     &:hover {
-      box-shadow: 0 0 5px $c-link, 0 0 20px $c-link;
+      .selected-color-original & {
+        box-shadow: 0 0 5px $c-link, 0 0 20px $c-link;
+      }
+      .selected-color-black & {
+        box-shadow: 0 0 5px $c-color-choice-black, 0 0 20px $c-color-choice-black;
+      }
+      .selected-color-red & {
+        box-shadow: 0 0 5px $c-color-choice-red, 0 0 20px $c-color-choice-red;
+      }
+      .selected-color-blue & {
+        box-shadow: 0 0 5px $c-color-choice-blue, 0 0 20px $c-color-choice-blue;
+      }
+      .selected-color-green & {
+        box-shadow: 0 0 5px $c-color-choice-green, 0 0 20px $c-color-choice-green;
+      }
+      .selected-color-yellow & {
+        box-shadow: 0 0 5px $c-color-choice-yellow, 0 0 20px $c-color-choice-yellow;
+      }
     }
 
     time {
@@ -245,6 +282,26 @@
     img {
       width: 100%;
       background: $c-bg-zebra;
+      .selected-color-black & {
+        border-bottom: $c-color-choice-black;
+        border-bottom-style: solid;
+      }
+      .selected-color-red & {
+        border-bottom: $c-color-choice-red;
+        border-bottom-style: solid;
+      }
+      .selected-color-blue & {
+        border-bottom: $c-color-choice-blue;
+        border-bottom-style: solid;
+      }
+      .selected-color-green & {
+        border-bottom: $c-color-choice-green;
+        border-bottom-style: solid;
+      }
+      .selected-color-yellow & {
+        border-bottom: $c-color-choice-yellow;
+        border-bottom-style: solid;
+      }
     }
 
     .content {

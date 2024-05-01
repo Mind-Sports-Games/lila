@@ -3,10 +3,15 @@
   padding: 2em 1.5em 1em 1.5em;
   flex-flow: row nowrap;
 
+  &:has(div.trophies.toomany) {
+    padding: 0em 1.5em 1em 1.5em;
+  }
+
   h1 {
     flex: 0 0 auto;
     font-size: 2em;
     margin-top: 0;
+    margin-right: 1em;
   }
 
   .connected {

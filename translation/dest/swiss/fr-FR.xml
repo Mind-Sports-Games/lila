@@ -1,8 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-  <string name="swissTournaments">Tournoi au système suisse</string>
+  <string name="swissTournaments">Tournoi en système suisse</string>
+  <string name="medleyGameFamilies">Familles de jeux pouvant apparaître dans ce Medley</string>
+  <string name="medleyGameGroups">Groupes de jeux pouvant apparaître dans ce Medley</string>
+  <string name="onePerGameGroup">Tente d'utiliser un jeu par groupe de jeux</string>
+  <string name="exoticChessVariants">Utiliser uniquement des variantes exotiques du jeu d'échecs</string>
+  <string name="draughts64Variants">Utiliser uniquement des variantes 64 du jeu de dames</string>
+  <string name="usingDrawTables">Using Draw Tables</string>
+  <string name="firstRound">Première ronde</string>
   <plurals name="viewAllXRounds" comment="viewAllXRounds [one] [other]&#10;&#10;%s is the number of rounds in the Swiss tournament.">
     <item quantity="one">Voir la ronde</item>
     <item quantity="other">Voir les %s rondes en détail</item>
   </plurals>
+  <string name="numberOfRoundsInSwiss">Le nombre de rondes jouées en tournoi Suisse peut être inférieur au nombre indiqué s'il n'y a pas assez de joueurs pour un appariement valide</string>
 </resources>

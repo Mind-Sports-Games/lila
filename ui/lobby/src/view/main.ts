@@ -27,7 +27,7 @@ export default function (ctrl: LobbyController) {
         body = renderPlaying(ctrl);
         break;
     }
-  return h('div.lobby__app.lobby__app-' + ctrl.tab, [
+  return h('div.lobby__app.lobby__app-' + ctrl.tab + '.color-choice', [
     h('div.tabs-horiz', renderTabs(ctrl)),
     h('div.lobby__app__content.l' + (ctrl.redirecting ? 'redir' : ctrl.tab), data, body),
   ]);

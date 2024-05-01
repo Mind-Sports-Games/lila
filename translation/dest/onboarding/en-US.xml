@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <string name="configure">Configure PlayStrategy to your liking</string>
+  <string name="explore">Explore the site and have fun :)</string>
+  <string name="follow">Follow your friends on PlayStrategy</string>
+  <string name="improveIt">improve it</string>
+  <string name="joinCommunities">Join communities for your favourite games</string>
+  <string name="kidModeEnabled">Kid mode is enabled.</string>
+  <string name="kidMode">Kid mode</string>
+  <string name="learnFrom">Learn from : %1$s</string>
+  <string name="learnRules">Learn the rules to some of our games</string>
+  <string name="playBot">Play against one of our bots</string>
+  <string name="playOthers">Play opponents from around the world</string>
+  <string name="playTournaments">Play in tournaments</string>
+  <string name="profilePage">This is your profile page.</string>
+  <string name="studies">studies</string>
+  <string name="suggestions">What now? Here are a few suggestions:</string>
+  <string name="weeklyChallenge">Have a go at the weekly challenge</string>
+  <string name="welcome">Welcome to playstrategy.org!</string>
+  <string name="willAChildUse">Will a child use this account? You might want to enable %1$s.</string>
+  <string name="wouldYou">Would you like to %1$s ?</string>
+</resources>
