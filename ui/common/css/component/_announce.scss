@@ -12,6 +12,27 @@
   z-index: z('tour-reminder');
   width: 100%;
 
+  .selected-color-black & {
+    background: $c-color-choice-black;
+    color: $c-color-choice-font-default;
+  }
+  .selected-color-red & {
+    background: $c-color-choice-red;
+    color: $c-color-choice-font-default;
+  }
+  .selected-color-blue & {
+    background: $c-color-choice-blue;
+    color: $c-color-choice-font-default;
+  }
+  .selected-color-green & {
+    background: $c-color-choice-green;
+    color: $c-color-choice-font-default;
+  }
+  .selected-color-yellow & {
+    background: $c-color-choice-yellow;
+    color: $c-color-choice-font-default;
+  }
+
   @include breakpoint($mq-xx-small) {
     width: auto;
     border-top-right-radius: 3px;
@@ -19,6 +40,13 @@
 
   a {
     color: $c-primary-over;
+    .selected-color-black &,
+    .selected-color-red &,
+    .selected-color-blue &,
+    .selected-color-green &,
+    .selected-color-yellow & {
+      color: $c-color-choice-font-default;
+    }
   }
 
   time {

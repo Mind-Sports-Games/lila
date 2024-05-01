@@ -60,8 +60,8 @@ case class ContentSecurityPolicy(
     if (maybe)
       copy(
         scriptSrc = "https://static.cdn.prismic.io" :: scriptSrc,
-        frameSrc = "https://lichess.prismic.io" :: "https://lichess.cdn.prismic.io" :: frameSrc,
-        connectSrc = "https://lichess.prismic.io" :: "https://lichess.cdn.prismic.io" :: connectSrc
+        frameSrc = "https://playstrategy.prismic.io" :: "https://playstrategy.cdn.prismic.io" :: frameSrc,
+        connectSrc = "https://playstrategy.prismic.io" :: "https://playstrategy.cdn.prismic.io" :: connectSrc
       )
     else this
 

@@ -5,15 +5,13 @@ import strategygames.Centis
 import strategygames.format.pgn.{ Dumper, Glyphs, ParsedPgn, San, Tags }
 import strategygames.format.{ FEN, Forsyth, Uci, UciCharPair }
 import strategygames.variant.Variant
-import strategygames.{ Player => PlayerIndex, Game, GameLogic, Status }
+import strategygames.{ Player => PlayerIndex, Game, Status }
 
 import lila.common.LightUser
 import lila.importer.{ ImportData, Preprocessed }
 import lila.tree.Node.{ Comment, Comments, Shapes }
 
 object PgnImport {
-
-  def lib = GameLogic.Chess()
 
   case class Result(
       root: Node.Root,
@@ -29,7 +27,9 @@ object PgnImport {
       statusText: String
   )
 
-  def apply(pgn: String, contributors: List[LightUser]): Validated[String, Result] =
+  def apply(pgn: String, contributors: List[LightUser])(implicit
+      variant: Variant
+  ): Validated[String, Result] =
     ImportData(pgn, analyse = none).preprocess(user = none).map {
       case Preprocessed(game, replay, initialFen, parsedPgn) =>
         val annotator = findAnnotator(parsedPgn, contributors)
@@ -37,6 +37,7 @@ object PgnImport {
           case (shapes, _, comments) =>
             val root = Node.Root(
               ply = replay.setup.plies,
+              variant = game.variant,
               fen = initialFen.getOrElse(game.variant.initialFen),
               check = replay.setup.situation.check,
               shapes = shapes,
@@ -103,7 +104,7 @@ object PgnImport {
   private def parseComments(
       comments: List[String],
       annotator: Option[Comment.Author]
-  ): (Shapes, Option[Centis], Comments) =
+  )(implicit variant: Variant): (Shapes, Option[Centis], Comments) =
     comments.foldLeft((Shapes(Nil), none[Centis], Comments(Nil))) { case ((shapes, clock, comments), txt) =>
       CommentParser(txt) match {
         case CommentParser.ParsedComment(s, c, str) =>
@@ -131,16 +132,18 @@ object PgnImport {
           san(prev.situation).fold(
             _ => none, // illegal move; stop here.
             action => {
-              val game   = prev.apply(action)
-              val uci    = action.toUci
-              val sanStr = Dumper.apply(lib, action)
+              val game             = prev.apply(action)
+              val uci              = action.toUci
+              val sanStr           = Dumper.apply(prev.situation.gameLogic, action)
+              implicit val variant = game.situation.board.variant
               parseComments(san.metas.comments, annotator) match {
                 case (shapes, clock, comments) =>
                   Node(
-                    id = UciCharPair(GameLogic.Chess(), uci),
+                    id = UciCharPair(prev.situation.gameLogic, uci),
                     ply = game.plies,
-                    move = Uci.WithSan(GameLogic.Chess(), uci, sanStr),
-                    fen = Forsyth.>>(GameLogic.Chess(), game),
+                    variant = variant,
+                    move = Uci.WithSan(game.situation.gameLogic, uci, sanStr),
+                    fen = Forsyth.>>(game.situation.gameLogic, game),
                     check = game.situation.check,
                     shapes = shapes,
                     comments = comments,

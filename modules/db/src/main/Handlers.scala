@@ -133,7 +133,7 @@ trait Handlers {
   implicit val StratFENHandler: BSONHandler[StratFEN] = quickHandler[StratFEN](
     {
       case BSONString(f) =>
-        f.split("~") match {
+        f.split("~", 2) match {
           case Array(lib, f) => StratFEN(GameLogic(lib.toInt), f)
           case Array(f)      => StratFEN(GameLogic.Chess(), f)
           case _             => sys.error("error decoding fen in handler")

@@ -228,7 +228,7 @@ final class Study(
   def show(id: String) =
     Open { implicit ctx =>
       orRelay(id) {
-        showQuery(env.study.api byIdWithChapter id)
+        showQuery(env.study.api.byIdWithChapter(id))
       }
     }
 

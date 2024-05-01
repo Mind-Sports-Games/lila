@@ -74,6 +74,14 @@
     );
   }
 
+  tr.dq .rank {
+    text-decoration: line-through;
+  }
+
+  tr.dq .player {
+    text-decoration: line-through;
+  }
+
   td.rank {
     @extend %roboto;
 

@@ -79,11 +79,11 @@ case class AnaMove(
         Branch(
           id = UciCharPair(lib, uci),
           ply = game.plies,
+          variant = variant,
           move = Uci.WithSan(lib, uci, san),
           fen = fen,
           check = game.situation.check,
           dests = variant match {
-            case Variant.Chess(_) => Some(movable ?? game.situation.destinations)
             case Variant.Draughts(variant) => {
               val truncatedDests = truncatedMoves.map {
                 _ mapValues { _ flatMap (uci => variant.boardSize.pos.posAt(uci.takeRight(2))) }
@@ -95,6 +95,7 @@ case class AnaMove(
                   .map { case (p, m) => (Pos.Draughts(p), m.map(Pos.Draughts)) }
               movable option draughtsDests
             }
+            case _ => Some(movable ?? game.situation.destinations)
           },
           destsUci = lib match {
             case GameLogic.Draughts() => movable ?? truncatedMoves.map(_.values.toList.flatten)
@@ -105,6 +106,7 @@ case class AnaMove(
             FullOpeningDB.findByFen(lib, fen)
           },
           drops = if (movable) game.situation.drops else Some(Nil),
+          dropsByRole = game.situation.dropsByRole,
           pocketData = game.situation.board.pocketData
         )
       }
@@ -113,11 +115,13 @@ case class AnaMove(
 
 object AnaMove {
 
+  private def dataGameLogic(d: JsObject): GameLogic =
+    GameLogic(d int "lib" getOrElse 0)
+
   def parse(o: JsObject) =
     for {
-      d   <- o obj "d"
-      lib <- d int "lib"
-      gl = GameLogic(lib)
+      d <- o obj "d"
+      gl = dataGameLogic(d)
       orig <- d str "orig" flatMap { pos => Pos.fromKey(gl, pos) }
       dest <- d str "dest" flatMap { pos => Pos.fromKey(gl, pos) }
       fen  <- d str "fen" map { fen => FEN.apply(gl, fen) }
@@ -130,7 +134,9 @@ object AnaMove {
       fen = fen,
       path = path,
       chapterId = d str "ch",
-      promotion = d str "promotion" flatMap { p => Role.promotable(gl, v.gameFamily, p) },
+      promotion = d.str("promotion").flatMap { p =>
+        Role.allPromotableByGroundName(gl, v.gameFamily).get(p)
+      },
       uci = d str "uci",
       fullCapture = d boolean "fullCapture"
     )

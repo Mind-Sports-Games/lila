@@ -144,6 +144,7 @@ export interface StudyFeatures {
 export interface StudyChapterMeta {
   id: string;
   name: string;
+  variant: Variant;
   ongoing?: boolean;
   res?: string;
 }
@@ -276,6 +277,11 @@ export interface AnaDrop {
   fen: Fen;
   path: string;
   ch?: string;
+  halfMove?: {
+    // Set this to indicate tt this is a half move for amazons
+    orig: string;
+    dest: string;
+  };
 }
 
 export interface AnaPass {

@@ -115,17 +115,17 @@ export function view(ctrl: StudyShareCtrl): VNode {
         },
         ctrl.trans.noarg(ctrl.relay ? 'downloadGame' : 'chapterPgn')
       ),
-      h(
-        'a.button.text',
-        {
-          attrs: {
-            'data-icon': 'x',
-            href: `/study/${studyId}/${chapter.id}.gif`,
-            download: true,
-          },
-        },
-        'GIF'
-      ),
+      // h(
+      //   'a.button.text',
+      //   {
+      //     attrs: {
+      //       'data-icon': 'x',
+      //       href: `/study/${studyId}/${chapter.id}.gif`,
+      //       download: true,
+      //     },
+      //   },
+      //   'GIF'
+      // ),
     ]),
     h('form.form3', [
       ...(ctrl.relay

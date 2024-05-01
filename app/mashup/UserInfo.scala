@@ -1,6 +1,7 @@
 package lila.app
 package mashup
 
+import org.joda.time.DateTime
 import play.api.data.Form
 
 import lila.api.Context
@@ -37,7 +38,17 @@ case class UserInfo(
       math.round(cr * 100)
     }
 
-  def countTrophiesAndPerfCups = trophies.size + ranks.count(_._2 <= 100)
+  def countDisplayedTrophies =
+    trophies
+      .filter(t =>
+        t.kind.withCustomImage && t.expiry
+          .getOrElse(DateTime.now.plusDays(1))
+          .isAfter(DateTime.now)
+      )
+      .size +
+      trophies.filter(_.kind.klass.has("fire-trophy")).some.filter(_.nonEmpty).size +
+      shields.size +
+      revolutions.size // + ranks.count(_._2 <= 100) // Add back in when we give trophies for top x
 }
 
 object UserInfo {

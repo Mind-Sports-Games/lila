@@ -6,8 +6,9 @@ import { AutoplayDelay } from './autoplay';
 import { boolSetting, BoolSetting } from './boolSetting';
 import AnalyseCtrl from './ctrl';
 import { cont as contRoute } from 'game/router';
-import { bind, dataIcon } from './util';
+import { bind, dataIcon, allowClientEvalForVariant } from './util';
 import * as pgnExport from './pgnExport';
+import { isChess } from 'common/analysis';
 
 interface AutoplaySpeed {
   name: string;
@@ -107,6 +108,8 @@ function hiddenInput(name: string, value: string) {
 }
 
 function studyButton(ctrl: AnalyseCtrl) {
+  const canStudyFromHere = isChess(ctrl.data.game.variant.key) || !ctrl.synthetic;
+  if (!canStudyFromHere) return;
   if (ctrl.study && ctrl.embed && !ctrl.ongoing)
     return h(
       'a.button.button-empty',
@@ -178,7 +181,8 @@ export function view(ctrl: AnalyseCtrl): VNode {
       ),
       ctrl.ongoing
         ? null
-        : h(
+        : ceval.variant.lib === 0 //board editor for chess only games atm
+        ? h(
             'a.button.button-empty',
             {
               attrs: {
@@ -195,7 +199,8 @@ export function view(ctrl: AnalyseCtrl): VNode {
               },
             },
             noarg('boardEditor')
-          ),
+          )
+        : null,
       canContinue
         ? h(
             'a.button.button-empty',
@@ -211,7 +216,7 @@ export function view(ctrl: AnalyseCtrl): VNode {
   ];
 
   const cevalConfig: MaybeVNodes =
-    ceval && ceval.possible && ceval.allowed()
+    ceval && ceval.possible && ceval.allowed() && allowClientEvalForVariant(ceval.variant.key)
       ? ([h('h2', noarg('computerAnalysis'))] as MaybeVNodes)
           .concat([
             ctrlBoolSetting(

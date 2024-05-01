@@ -22,6 +22,7 @@ object ChallengeDenied {
     case class RatingIsProvisional(perf: PerfType) extends Reason
     case object FriendsOnly                        extends Reason
     case object BotUltraBullet                     extends Reason
+    case object Yourself                           extends Reason
   }
 
   def translated(d: ChallengeDenied)(implicit lang: Lang): String =
@@ -34,6 +35,7 @@ object ChallengeDenied {
       case Reason.RatingIsProvisional(perf) => trans.cannotChallengeDueToProvisionalXRating.txt(perf.trans)
       case Reason.FriendsOnly               => trans.xOnlyAcceptsChallengesFromFriends.txt(d.dest.titleUsername)
       case Reason.BotUltraBullet            => "Bots cannot play UltraBullet. Choose a slower time control."
+      case Reason.Yourself                  => trans.cannotChallengeYourself.txt()
     }
 }
 
@@ -57,6 +59,7 @@ final class ChallengeGranter(
             case (_, Pref.Challenge.NEVER)                         => TheyDontAcceptChallenges.some
             case (Some(Follow), _)                                 => none // always accept from followed
             case (_, _) if from.marks.engine && !dest.marks.engine => YouAreBlocked.some
+            case (_, _) if from.id == dest.id                      => Yourself.some
             case (_, Pref.Challenge.FRIEND)                        => FriendsOnly.some
             case (_, Pref.Challenge.RATING) =>
               perfType ?? { pt =>

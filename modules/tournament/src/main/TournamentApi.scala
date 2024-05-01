@@ -10,6 +10,7 @@ import play.api.i18n.Lang
 import scala.concurrent.duration._
 import scala.concurrent.Promise
 import scala.util.chaining._
+import scala.concurrent.Future
 
 import lila.common.config.{ MaxPerPage, MaxPerSecond }
 import lila.common.paginator.Paginator
@@ -21,6 +22,7 @@ import lila.i18n.{ defaultLang, I18nKeys => trans, VariantKeys }
 import lila.rating.PerfType
 import lila.round.actorApi.round.{ AbortForce, GoBerserk }
 import lila.socket.Socket.SendToFlag
+import lila.user.TrophyKind._
 import lila.user.{ User, UserRepo }
 
 final class TournamentApi(
@@ -30,6 +32,7 @@ final class TournamentApi(
     playerRepo: PlayerRepo,
     pairingRepo: PairingRepo,
     tournamentRepo: TournamentRepo,
+    leaderboardApi: LeaderboardApi,
     shieldTableApi: ShieldTableApi,
     apiJsonView: ApiJsonView,
     autoPairing: AutoPairing,
@@ -147,6 +150,15 @@ final class TournamentApi(
   private def updatePlayerRatingCache(tour: Tournament, variant: Variant, userIds: Set[User.ID]): Funit =
     userIds.map(updatePlayer(tour, variant, None)).sequenceFu.void
 
+  private def updateBotRatingCache(tour: Tournament, variant: Variant): Future[List[Unit]] =
+    if (tour.botsAllowed)
+      playerRepo
+        .byTourAndUserIds(tour.id, LightUser.tourBotsIDs)
+        .flatMap { p =>
+          Future.traverse(p.map(_.userId))(updatePlayer(tour, variant, None))
+        }
+    else fuccess(List())
+
   private def usersReady(tour: Tournament, users: WaitingUsers): Boolean =
     !hadPairings.get(tour.id) || users.haveWaitedEnough(tour.minWaitingUsersForPairings)
 
@@ -162,6 +174,7 @@ final class TournamentApi(
     (users.size >= forTour.minWaitingUsersForPairings && usersReady(forTour, users)) ??
       Sequencing(forTour.id)(tournamentRepo.startedById) { tour =>
         updatePlayerRatingCache(tour, tour.variant, users.all) >>
+          updateBotRatingCache(tour, tour.variant) >>
           withdrawInactivePlayers(tour.id, users.all) >>
           cached
             .ranking(tour)
@@ -254,7 +267,7 @@ final class TournamentApi(
                 userRepo.incToints(p.userId, p.score)
               }
             }
-            awardTrophies(tour).logFailure(logger, _ => s"${tour.id} awardTrophies")
+            awardPrizes(tour).logFailure(logger, _ => s"${tour.id} awardPrizes")
             callbacks.indexLeaderboard(tour).logFailure(logger, _ => s"${tour.id} indexLeaderboard")
             callbacks.clearWinnersCache(tour)
             callbacks.clearTrophyCache(tour)
@@ -283,18 +296,46 @@ final class TournamentApi(
     else funit
   }
 
-  private def awardTrophies(tour: Tournament): Funit = {
-    import lila.user.TrophyKind._
-    import lila.tournament.Tournament.tournamentUrl
+  private def awardTrophyByRank(tour: Tournament, trophyKind: String, rank: Int, date: DateTime) =
+    playerRepo.bestByTourWithRank(tourId = tour.id, nb = rank, noDQs = true).flatMap {
+      _.map {
+        case rp if rp.rank == rank =>
+          trophyApi.award(
+            Tournament.tournamentUrl(tour.id),
+            rp.player.userId,
+            trophyKind,
+            tour.name.some,
+            tour.trophyExpiryDays,
+            date
+          )
+        case _ => funit
+      }.sequenceFu.void
+    }
+
+  private def awardTrophies(tour: Tournament, date: DateTime = DateTime.now): Funit = {
+    tour.trophy1st ?? { trophyKind =>
+      awardTrophyByRank(tour, trophyKind, 1, date)
+    }
+    tour.trophy2nd ?? { trophyKind =>
+      awardTrophyByRank(tour, trophyKind, 2, date)
+    }
+    tour.trophy3rd ?? { trophyKind =>
+      awardTrophyByRank(tour, trophyKind, 3, date)
+    }
+  }
+
+  private def awardPrizes(tour: Tournament): Funit = {
     tour.schedule.??(_.freq == Schedule.Freq.Marathon) ?? {
       playerRepo.bestByTourWithRank(tour.id, 100).flatMap {
         _.map {
-          case rp if rp.rank == 1 => trophyApi.award(tournamentUrl(tour.id), rp.player.userId, marathonWinner)
+          case rp if rp.rank == 1 =>
+            trophyApi.award(Tournament.tournamentUrl(tour.id), rp.player.userId, marathonWinner)
           case rp if rp.rank <= 10 =>
-            trophyApi.award(tournamentUrl(tour.id), rp.player.userId, marathonTopTen)
+            trophyApi.award(Tournament.tournamentUrl(tour.id), rp.player.userId, marathonTopTen)
           case rp if rp.rank <= 50 =>
-            trophyApi.award(tournamentUrl(tour.id), rp.player.userId, marathonTopFifty)
-          case rp => trophyApi.award(tournamentUrl(tour.id), rp.player.userId, marathonTopHundred)
+            trophyApi.award(Tournament.tournamentUrl(tour.id), rp.player.userId, marathonTopFifty)
+          case rp =>
+            trophyApi.award(Tournament.tournamentUrl(tour.id), rp.player.userId, marathonTopHundred)
         }.sequenceFu.void
       }
     }
@@ -313,49 +354,7 @@ final class TournamentApi(
     tour.schedule.??(_.freq == Schedule.Freq.Shield && tour.variant.gameFamily.id == 1) ?? {
       shieldTableApi.recalculate(ShieldTableApi.Category.Draughts)
     }
-    tour.trophy1st ?? { trophyKind =>
-      playerRepo.bestByTourWithRank(tour.id, 1).flatMap {
-        _.map { case rp =>
-          trophyApi.award(
-            tournamentUrl(tour.id),
-            rp.player.userId,
-            trophyKind,
-            tour.name.some,
-            tour.trophyExpiryDays
-          )
-        }.sequenceFu.void
-      }
-    }
-    tour.trophy2nd ?? { trophyKind =>
-      playerRepo.bestByTourWithRank(tour.id, 2).flatMap {
-        _.map {
-          case rp if rp.rank == 2 =>
-            trophyApi.award(
-              tournamentUrl(tour.id),
-              rp.player.userId,
-              trophyKind,
-              tour.name.some,
-              tour.trophyExpiryDays
-            )
-          case _ => funit
-        }.sequenceFu.void
-      }
-    }
-    tour.trophy3rd ?? { trophyKind =>
-      playerRepo.bestByTourWithRank(tour.id, 3).flatMap {
-        _.map {
-          case rp if rp.rank == 3 =>
-            trophyApi.award(
-              tournamentUrl(tour.id),
-              rp.player.userId,
-              trophyKind,
-              tour.name.some,
-              tour.trophyExpiryDays
-            )
-          case _ => funit
-        }.sequenceFu.void
-      }
-    }
+    awardTrophies(tour)
   }
 
   def getVerdicts(
@@ -622,19 +621,62 @@ final class TournamentApi(
         socket.reload(tour.id) >>- publish()
     }
 
-  // erases player from tournament and reassigns winner
-  private[tournament] def removePlayerAndRewriteHistory(tourId: Tournament.ID, userId: User.ID): Funit =
+  //in one code path the player will have already been ejected from the leaderboard
+  //so in that case no need to re-eject
+  private def ejectFromLeaderboard(
+      tourId: Tournament.ID,
+      userId: User.ID,
+      disqualify: Boolean,
+      updateLeaderboard: Boolean
+  ) =
+    if (updateLeaderboard) leaderboardApi.ejectEntry(userId, tourId, disqualify)
+    else funit
+
+  private def ejectPlayer(tourId: Tournament.ID, userId: User.ID, disqualify: Boolean) =
+    if (disqualify) playerRepo.disqualify(tourId, userId)
+    else playerRepo.remove(tourId, userId)
+
+  // erases player from tournament and reassigns winner and trophies
+  private[tournament] def ejectPlayerAndRewriteHistory(
+      tourId: Tournament.ID,
+      userId: User.ID,
+      disqualify: Boolean,
+      updateLeaderboard: Boolean
+  ): Funit =
     Sequencing(tourId)(tournamentRepo.finishedById) { tour =>
-      playerRepo.remove(tourId, userId) >> {
-        tour.winnerId.contains(userId) ?? {
-          playerRepo winner tour.id flatMap {
-            _ ?? { p =>
-              tournamentRepo.setWinnerId(tour.id, p.userId)
+      ejectFromLeaderboard(tourId, userId, disqualify, updateLeaderboard) >>
+        ejectPlayer(tourId, userId, disqualify) >> {
+          tour.winnerId.contains(userId) ?? {
+            playerRepo winner tour.id flatMap { winner =>
+              winner ?? { p =>
+                tournamentRepo.setWinnerId(tour.id, p.userId)
+              } >>- callbacks.clearWinnersCache(tour)
             }
           }
-        }
-      }
+          trophyApi
+            .trophiesByUrl(Tournament.tournamentUrl(tour.id))
+            .map(_.filter(_.user == userId))
+            .flatMap { trophyList =>
+              trophyList.headOption ?? { trophy =>
+                trophyApi.removeTrophiesByUrl(Tournament.tournamentUrl(tour.id))
+                awardTrophies(tour, trophy.date)
+              } >>- callbacks.clearTrophyCache(tour)
+            }
+        } >>-
+        socket.reload(tour.id) >>- publish()
     }
+
+  def ejectRecent(userId: User.ID, disqualify: Boolean) =
+    leaderboardApi
+      .getAndEjectRecent(userId, DateTime.now minusDays 30, disqualify)
+      .flatMap {
+        _.map {
+          ejectPlayerAndRewriteHistory(_, userId, disqualify, false)
+        }.sequenceFu
+      }
+
+  def disqualify(tourId: Tournament.ID, userId: User.ID): Funit =
+    ejectPlayerAndRewriteHistory(tourId, userId, true, true)
 
   private val tournamentTopNb = 20
   private val tournamentTopCache = cacheApi[Tournament.ID, TournamentTop](16, "tournament.top") {

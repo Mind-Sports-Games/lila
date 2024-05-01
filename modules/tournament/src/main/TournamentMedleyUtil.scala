@@ -9,7 +9,6 @@ object TournamentMedleyUtil {
       orderedMedleyList: List[Variant],
       gameClockSeconds: Int,
       minutes: Int,
-      mMinutes: Int,
       mNumIntervals: Int,
       mBalanced: Boolean
   ): List[(Variant, Int)] = {
@@ -28,15 +27,19 @@ object TournamentMedleyUtil {
         val extra               = minutes * 60 - times.sum
         val firstLastBonus: Int = math.min(gameClockSeconds / 3, 120)
         // take time from first variant and give to last
-
         times.take(1).map(v => v - firstLastBonus) ::: times.drop(1).take(times.size - 2) :::
           times.drop(times.size - 1).map(v => v + extra + firstLastBonus)
-
       } else {
-        List.fill(mNumIntervals)(mMinutes * 60)
+        defaultIntervalTimes(minutes, mNumIntervals)
       }
 
-    orderedMedleyList.zipWithIndex.map { case (v, i) => (v, medleyIntervalSeconds.lift(i).getOrElse(0)) }
+    orderedMedleyList.zipWithIndex
+      .map { case (v, i) => (v, medleyIntervalSeconds.lift(i).getOrElse(0)) }
+  }
+
+  def defaultIntervalTimes(minutes: Int, mNumIntervals: Int) = {
+    val intervals = List.fill(mNumIntervals)((minutes / mNumIntervals) * 60)
+    intervals.updated(intervals.size - 1, intervals.last + minutes * 60 - intervals.sum)
   }
 
   def isMedleyChessShieldStyle(variants: List[Variant]): Boolean =

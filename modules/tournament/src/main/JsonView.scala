@@ -215,6 +215,7 @@ final class JsonView(
             .add("rank" -> ranking.get(user.id).map(1 +))
             .add("provisional" -> player.provisional)
             .add("withdraw" -> player.withdraw)
+            .add("disqualified" -> player.disqualified)
             .add("team" -> player.team),
           "pairings" -> povScores.map { case (pov, score) =>
             Json
@@ -222,7 +223,7 @@ final class JsonView(
                 "id"          -> pov.gameId,
                 "playerIndex" -> pov.playerIndex.name,
                 "playerColor" -> tour.variant.playerColors(pov.playerIndex),
-                "op"          -> gameUserJson(pov.opponent.userId, pov.opponent.rating),
+                "op"          -> gameUserJson(pov.opponent.userId, pov.opponent.rating, pov.opponent.berserk),
                 "win"         -> score.flatMap(_.isWin),
                 "status"      -> pov.game.status.id,
                 "score"       -> score.map(sheetScoreJson),
@@ -352,12 +353,13 @@ final class JsonView(
       )
       .add("pauseDelay", delay.map(_.seconds))
 
-  private def gameUserJson(userId: Option[String], rating: Option[Int]): JsObject = {
+  private def gameUserJson(userId: Option[String], rating: Option[Int], berserk: Boolean): JsObject = {
     val light = userId flatMap lightUserApi.sync
     Json
       .obj("rating" -> rating)
       .add("name" -> light.map(_.name))
       .add("title" -> light.flatMap(_.title))
+      .add("berserk" -> berserk)
   }
 
   private val podiumJsonCache = cacheApi[Tournament.ID, Option[JsArray]](32, "tournament.podiumJson") {
@@ -367,22 +369,24 @@ final class JsonView(
       .buildAsyncFuture { id =>
         tournamentRepo finishedById id flatMap {
           _ ?? { tour =>
-            playerRepo.bestByTourWithRank(id, 3).flatMap { top3 =>
-              // check that the winner is still correctly denormalized
-              top3.headOption.map(_.player.userId).filter(w => tour.winnerId.fold(true)(w !=)) foreach {
-                tournamentRepo.setWinnerId(tour.id, _)
-              }
-              top3.map { case rp @ RankedPlayer(_, player) =>
-                for {
-                  sheet <- cached.sheet(tour, player.userId)
-                  json  <- playerJson(lightUserApi, sheet.some, rp, tour.streakable)
-                } yield json ++ Json
-                  .obj(
-                    "nb" -> sheetNbs(sheet)
-                  )
-                  .add("performance" -> player.performanceOption)
-              }.sequenceFu
-            } map { l =>
+            playerRepo
+              .bestByTourWithRank(tourId = id, nb = 3, noDQs = true)
+              .flatMap { top3 =>
+                // check that the winner is still correctly denormalized
+                top3.headOption.map(_.player.userId).filter(w => tour.winnerId.fold(true)(w !=)) foreach {
+                  tournamentRepo.setWinnerId(tour.id, _)
+                }
+                top3.map { case rp @ RankedPlayer(_, player) =>
+                  for {
+                    sheet <- cached.sheet(tour, player.userId)
+                    json  <- playerJson(lightUserApi, sheet.some, rp, tour.streakable)
+                  } yield json ++ Json
+                    .obj(
+                      "nb" -> sheetNbs(sheet)
+                    )
+                    .add("performance" -> player.performanceOption)
+                }.sequenceFu
+              } map { l =>
               JsArray(l).some
             }
           }
@@ -507,6 +511,7 @@ object JsonView {
           .add("t" -> light.flatMap(_.title))
           .add("f" -> p.fire)
           .add("w" -> p.withdraw)
+          .add("dq" -> p.disqualified)
       }
     }
 
@@ -551,6 +556,7 @@ object JsonView {
         .add("title" -> light.flatMap(_.title))
         .add("provisional" -> p.provisional)
         .add("withdraw" -> p.withdraw)
+        .add("disqualified" -> p.disqualified)
         .add("team" -> p.team)
     }
   }

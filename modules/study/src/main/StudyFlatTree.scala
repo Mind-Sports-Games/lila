@@ -1,5 +1,7 @@
 package lila.study
 
+import strategygames.variant.Variant
+
 import BSONHandlers._
 import Node.Children
 
@@ -11,15 +13,15 @@ private object StudyFlatTree {
   private case class FlatNode(path: Path, data: Bdoc) {
     val depth = path.ids.size
 
-    def toNodeWithChildren(children: Option[Children]): Option[Node] =
-      readNode(data, path.ids.last) map {
+    def toNodeWithChildren(children: Option[Children])(implicit variant: Variant): Option[Node] =
+      VariantHandlers().readNode(data, path.ids.last) map {
         _.copy(children = children | Node.emptyChildren)
       }
   }
 
   object reader {
 
-    def rootChildren(flatTree: Bdoc): Children =
+    def rootChildren(flatTree: Bdoc)(implicit variant: Variant): Children =
       Chronometer
         .syncMon(_.study.tree.read)(
           traverse(
@@ -32,7 +34,7 @@ private object StudyFlatTree {
           )
         )
 
-    private def traverse(children: List[FlatNode]): Children =
+    private def traverse(children: List[FlatNode])(implicit variant: Variant): Children =
       children
         .foldLeft(Map.empty[Path, Children]) { case (allChildren, flat) =>
           update(allChildren, flat)
@@ -40,7 +42,9 @@ private object StudyFlatTree {
         .get(Path.root) | Node.emptyChildren
 
     // assumes that node has a greater depth than roots (sort beforehand)
-    private def update(roots: Map[Path, Children], flat: FlatNode): Map[Path, Children] = {
+    private def update(roots: Map[Path, Children], flat: FlatNode)(implicit
+        variant: Variant
+    ): Map[Path, Children] = {
       flat
         .toNodeWithChildren(roots.get(flat.path))
         .fold(roots) { node =>
@@ -62,11 +66,11 @@ private object StudyFlatTree {
       }
 
     private def traverse(node: Node, parentPath: Path): Vector[(String, Bdoc)] =
-      (parentPath.depth < Node.MAX_PLIES) ?? {
+      (parentPath.depth < Node.maxPlies) ?? {
         val path = parentPath + node.id
         node.children.nodes.flatMap {
           traverse(_, path)
-        } appended (Path.encodeDbKey(path) -> writeNode(node))
+        } appended (Path.encodeDbKey(path) -> VariantHandlers()(node.variant).writeNode(node))
       }
   }
 }
