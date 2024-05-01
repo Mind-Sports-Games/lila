@@ -1220,7 +1220,7 @@ export default class RoundController {
           setTimeout(() => {
             this.chessground.moveNoAnim(uciMove[0], uciMove[1]);
             this.chessground.set({ viewOnly: false });
-            this.onUserMove(uciMove[0], uciMove[1], {premove: false});
+            this.onUserMove(uciMove[0], uciMove[1], { premove: false });
           }, this.forcedActionDelayMillis);
         }
       }
@@ -1236,8 +1236,7 @@ export default class RoundController {
       }
       //backgammon roll dice at start of turn or end turn when no moves
       if (['backgammon', 'nackgammon'].includes(d.game.variant.key)) {
-        if (d.canOnlyRollDice)
-          setTimeout(() => this.forceRollDice(d.game.variant.key), this.forcedActionDelayMillis);
+        if (d.canOnlyRollDice) setTimeout(() => this.forceRollDice(d.game.variant.key), this.forcedActionDelayMillis);
         else if (d.pref.playForcedAction) this.playForcedAction();
       }
     }
