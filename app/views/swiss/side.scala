@@ -56,9 +56,11 @@ object side {
             ),
             p(
               span(cls := "swiss__meta__round")(
+                title := trans.swiss.numberOfRoundsInSwiss.txt(),
                 s"${s.round}/${s.settings.nbRounds}"
               ),
               span(cls := "swiss__meta__rounds")(
+                title := trans.swiss.numberOfRoundsInSwiss.txt(),
                 " rounds",
                 if (s.settings.isBestOfX) {
                   s" (best of ${s.settings.nbGamesPerRound} games"
