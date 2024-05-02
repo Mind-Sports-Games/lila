@@ -72,27 +72,19 @@ export default function (ctrl: LobbyController): MaybeVNodes {
       h(
         'tbody',
         {
-          hook: bind(
-            'click',
-            e => {
-              let el = e.target as HTMLElement;
-              do {
-                el = el.parentNode as HTMLElement;
-                if (el.nodeName === 'TR') {
-                  if (!ctrl.data.me) {
-                    if (confirm(ctrl.trans('youNeedAnAccountToDoThat'))) location.href = '/signup';
-                    return;
-                  }
-                  return ctrl.clickSeek(el.getAttribute('data-id')!);
+          hook: bind('click', e => {
+            let el = e.target as HTMLElement;
+            do {
+              el = el.parentNode as HTMLElement;
+              if (el.nodeName === 'TR') {
+                if (!ctrl.data.me) {
+                  if (confirm(ctrl.trans('youNeedAnAccountToDoThat'))) location.href = '/signup';
+                  return;
                 }
-              } while (el.nodeName !== 'TABLE');
-            },
-            () => {
-              ctrl.setRedirecting();
-              ctrl.reload();
-              ctrl.setTab('now_playing');
-            }
-          ),
+                return ctrl.clickSeek(el.getAttribute('data-id')!);
+              }
+            } while (el.nodeName !== 'TABLE');
+          }),
         },
         ctrl.data.seeks.map(s => renderSeek(ctrl, s))
       ),
