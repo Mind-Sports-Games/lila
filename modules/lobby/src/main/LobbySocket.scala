@@ -18,6 +18,7 @@ import lila.room.RoomSocket.{ Protocol => RP, _ }
 import lila.socket.Socket.{ makeMessage, Sri, Sris }
 import lila.user.User
 import lila.round.ChangeFeatured
+import lila.socket.RemoteSocket
 
 case class LobbyCounters(members: Int, rounds: Int)
 
@@ -96,10 +97,9 @@ final class LobbySocket(
         send(P.Out.tellSri(hook.sri, gameStartRedirect(game pov creatorPlayerIndex)))
         send(P.Out.tellSri(sri, gameStartRedirect(game pov !creatorPlayerIndex)))
 
-      case JoinSeek(userId, seek, game, creatorPlayerIndex) =>
+      case JoinSeek(userId, _, game, creatorPlayerIndex) =>
         lila.mon.lobby.seek.join.increment()
-        send(Out.tellLobbyUsers(List(seek.user.id), gameStartRedirect(game pov creatorPlayerIndex)))
-        send(Out.tellLobbyUsers(List(userId), gameStartRedirect(game pov !creatorPlayerIndex)))
+        send(RemoteSocket.Protocol.Out.tellUser(userId, gameStartRedirect(game pov !creatorPlayerIndex)))
 
       case PoolApi.Pairings(pairings) => send(Out.pairings(pairings))
 
