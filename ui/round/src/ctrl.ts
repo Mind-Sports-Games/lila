@@ -22,10 +22,6 @@ import { CorresClockController, ctrl as makeCorresClock } from './corresClock/co
 import MoveOn from './moveOn';
 import TransientMove from './transientMove';
 import * as atomic from './atomic';
-import * as flipello from './flipello';
-import * as mancala from './mancala';
-import * as go from './go';
-import * as backgammon from './backgammon';
 import * as sound from './sound';
 import * as util from './util';
 import * as xhr from './xhr';
@@ -39,7 +35,7 @@ import * as stratUtils from 'stratutils';
 import {
   RoundOpts,
   RoundData,
-  ApiMove,
+  ApiAction,
   ApiEnd,
   Redraw,
   SocketMove,
@@ -207,13 +203,8 @@ export default class RoundController {
   private onUserNewPiece = (role: cg.Role, key: cg.Key, meta: cg.MoveMetadata) => {
     if (!this.replaying() && crazyValid(this.data, role, key)) {
       this.sendNewPiece(role, key, this.data.game.variant.key, !!meta.predrop);
-      if (this.data.game.variant.key === 'flipello' || this.data.game.variant.key === 'flipello10') {
-        flipello.flip(this, key, this.data.player.playerIndex);
-        this.redraw();
-      }
       if (['backgammon', 'nackgammon'].includes(this.data.game.variant.key)) {
         sound.move();
-        backgammon.updateBoardFromDrop(this, key, this.data.player.playerIndex);
         cancelDropMode(this.chessground.state);
         this.redraw();
       }
@@ -229,28 +220,11 @@ export default class RoundController {
       if (this.data.game.variant.key === 'atomic') {
         sound.explode();
         atomic.capture(this, dest);
-      } else if (this.data.game.variant.key === 'oware') {
-        mancala.updateBoardFromOwareMove(this, orig, dest);
-        sound.capture();
-      } else if (this.data.game.variant.key === 'togyzkumalak') {
-        mancala.updateBoardFromTogyzkumalakMove(this, orig, dest);
-        sound.capture();
-      } else if (['backgammon', 'nackgammon'].includes(this.data.game.variant.key)) {
-        backgammon.updateBoardFromMove(this, orig, dest);
-        sound.capture();
       } else sound.capture();
-    } else if (this.data.game.variant.key === 'flipello' || this.data.game.variant.key === 'flipello10') {
-      flipello.flip(this, dest, this.data.player.playerIndex);
-    } else if (this.data.game.variant.key === 'oware') {
-      mancala.updateBoardFromOwareMove(this, orig, dest);
-      sound.capture();
-    } else if (this.data.game.variant.key === 'togyzkumalak') {
-      mancala.updateBoardFromTogyzkumalakMove(this, orig, dest);
-      sound.capture();
-    } else if (['backgammon', 'nackgammon'].includes(this.data.game.variant.key)) {
-      backgammon.updateBoardFromMove(this, orig, dest);
-      sound.move();
     } else sound.move();
+    if (['togyzkumalak', 'backgammon', 'nackgammon'].includes(this.data.game.variant.key)) {
+      this.chessground.redrawAll(); //redraw board scores or coordinates
+    }
     if (!this.data.onlyDropsVariant) cancelDropMode(this.chessground.state);
   };
 
@@ -385,7 +359,11 @@ export default class RoundController {
     const s = this.stepAt(ply);
     this.turnCount = s.turnCount;
     const turnPlayerIndex = util.turnPlayerIndexFromLastTurn(this.turnCount);
-    const dice = stratUtils.readDice(s.fen, this.data.game.variant.key);
+    const dice = stratUtils.readDice(
+      s.fen,
+      this.data.game.variant.key,
+      this.replaying() ? false : this.data.canEndTurn
+    );
     const config: CgConfig = {
       fen: s.fen,
       lastMove: util.lastMove(this.data.onlyDropsVariant, s.uci),
@@ -408,11 +386,6 @@ export default class RoundController {
       config.showUndoButton = this.isPlaying() && this.data.player.playerIndex == turnPlayerIndex && dice.length > 0;
       config.canUndo = this.data.canUndo;
       config.gameButtonsActive = true;
-      // need to trigger dice roll as it's only supported automatically until multi-point backgammon
-      if (['backgammon', 'nackgammon'].includes(this.data.game.variant.key)) {
-        if (this.data.canOnlyRollDice) setTimeout(() => this.forceRollDice(this.data.game.variant.key), 500);
-        else if (this.data.pref.playForcedAction) this.playForcedAction();
-      }
     }
     config.dropmode = {
       dropDests: this.isPlaying() ? stratUtils.readDropsByRole(this.data.possibleDropsByRole) : new Map(),
@@ -453,6 +426,8 @@ export default class RoundController {
     this.autoScroll();
     if (this.keyboardMove) this.keyboardMove.update(s);
     playstrategy.pubsub.emit('ply', ply);
+
+    this.doForcedActions();
     return true;
   };
 
@@ -577,7 +552,7 @@ export default class RoundController {
 
   playerByPlayerIndex = (c: PlayerIndex) => this.data[c === this.data.player.playerIndex ? 'player' : 'opponent'];
 
-  apiMove = (o: ApiMove): true => {
+  apiAction = (o: ApiAction): true => {
     const d = this.data,
       playing = this.isPlaying(),
       hasJustSwitchedTurns = d.game.turns != o.turnCount;
@@ -633,8 +608,12 @@ export default class RoundController {
     if (!this.replaying()) {
       this.ply++;
       this.turnCount = o.turnCount;
-      //drops and moves are not really supported for backgammon in chessground, we compute changes ourselves
-      if (o.role && !['backgammon', 'nackgammon'].includes(d.game.variant.key)) {
+      const variantCanStillHavePieceAtActionKey = ['togyzkumalak', 'backgammon', 'nackgammon'];
+      const allowChessgroundAction = !(
+        variantCanStillHavePieceAtActionKey.includes(d.game.variant.key) && playedPlayerIndex === d.player.playerIndex
+      );
+      //apiAction triggers for both players and the move/drop/lift has already happened for the active player.
+      if (o.role && allowChessgroundAction) {
         this.chessground.newPiece(
           {
             role: o.role,
@@ -642,8 +621,8 @@ export default class RoundController {
           },
           util.uci2move(o.uci)![1] as cg.Key
         );
-        if (d.game.variant.key == 'flipello' || d.game.variant.key == 'flipello10')
-          flipello.flip(this, util.uci2move(o.uci)![0], playedPlayerIndex);
+      } else if (o.uci.includes('^') && allowChessgroundAction) {
+        this.chessground.liftNoAnim(o.uci.slice(1) as cg.Key);
       } else {
         // This block needs to be idempotent, even for castling moves in
         // Chess960.
@@ -654,9 +633,9 @@ export default class RoundController {
           if (
             (!o.castle ||
               (pieces.get(o.castle.king[0])?.role === 'k-piece' && pieces.get(o.castle.rook[0])?.role === 'r-piece')) &&
-            !['backgammon', 'nackgammon'].includes(d.game.variant.key)
+            allowChessgroundAction
           ) {
-            if (['oware', 'togyzkumalak'].includes(d.game.variant.key)) {
+            if (['oware', 'togyzkumalak', 'backgammon', 'nackgammon'].includes(d.game.variant.key)) {
               this.chessground.moveNoAnim(keys[0], keys[1]);
             } else {
               this.chessground.move(keys[0], keys[1]);
@@ -664,14 +643,19 @@ export default class RoundController {
           }
         }
       }
-      if (d.game.variant.key === 'oware' || d.game.variant.key === 'togyzkumalak') {
-        // a lot of pieces can change from 1 move so update them all
-        mancala.updateBoardFromFen(this, o.fen);
-      }
+
       if (['backgammon', 'nackgammon'].includes(d.game.variant.key)) {
-        backgammon.updateBoardFromFen(this, o.fen);
+        this.chessground.set({
+          dice: this.data.dice ? this.data.dice : [],
+          canUndo: this.data.canUndo,
+          showUndoButton:
+            this.isPlaying() &&
+            this.data.player.playerIndex === this.data.game.player &&
+            this.data.dice &&
+            this.data.dice.length > 0,
+        });
+        this.chessground.redrawAll();
       }
-      if (['go9x9', 'go13x13', 'go19x19'].includes(d.game.variant.key)) go.updateBoardFromFen(this, o.fen);
       if (d.onlyDropsVariant) {
         this.setDropOnlyVariantDropMode(activePlayerIndex, d.player.playerIndex, this.chessground.state);
       }
@@ -775,23 +759,12 @@ export default class RoundController {
       this.jump(o.ply);
     }
 
-    //forced moves
-    if (playing && !this.replaying()) {
-      //flipello pass
-      if ((d.game.variant.key === 'flipello' || d.game.variant.key === 'flipello10') && d.possibleMoves) {
-        this.forceMove(util.parsePossibleMoves(d.possibleMoves), d.game.variant.key);
-      }
-      //backgammon roll dice at start of turn or end turn when no moves
-      if (['backgammon', 'nackgammon'].includes(d.game.variant.key)) {
-        if (d.canOnlyRollDice) setTimeout(() => this.forceRollDice(d.game.variant.key), 500);
-        else if (d.pref.playForcedAction) this.playForcedAction();
-      }
-    }
+    this.doForcedActions();
 
     return true; // prevents default socket pubsub
   };
 
-  private forceMove(possibleMoves: cg.Dests, variantKey: VariantKey) {
+  private forcePass(possibleMoves: cg.Dests, variantKey: VariantKey) {
     if (possibleMoves.size == 1) {
       const passOrig = possibleMoves.keys().next().value;
       const passDests = possibleMoves.get(passOrig);
@@ -1199,68 +1172,80 @@ export default class RoundController {
     }
   };
 
+  private forcedActionDelayMillis = 400;
+
   playForcedAction = (): void => {
     const d = this.data;
-    const playedNoMoves = round.lastStep(d).uci.includes('/');
-    const dropDests = stratUtils.readDropsByRole(d.possibleDropsByRole).get('s-piece');
-    const delayMillis = 500;
     if (
       ['backgammon', 'nackgammon'].includes(d.game.variant.key) &&
       this.isPlaying() &&
       !this.replaying() &&
       d.player.playerIndex === d.game.player &&
-      this.data.pref.playForcedAction
+      this.data.pref.playForcedAction &&
+      d.forcedAction !== undefined
     ) {
-      if (d.canEndTurn && playedNoMoves) {
+      if (d.forcedAction === 'endturn') {
         this.chessground.set({ viewOnly: true });
         setTimeout(() => {
           this.sendEndTurn(d.game.variant.key);
           this.chessground.set({ viewOnly: false });
-        }, delayMillis);
-      } else if (dropDests && dropDests.length === 1) {
-        this.chessground.set({ viewOnly: true });
-        setTimeout(() => {
-          this.onUserNewPiece('s-piece', dropDests[0], { premove: false });
-          this.chessground.set({ viewOnly: false });
-        }, delayMillis);
-      } else if (d.forcedAction !== undefined && d.forcedAction.includes('^')) {
-        // we dont handle lift in api move therefore call CG here todo action
+        }, this.forcedActionDelayMillis);
+      } else if (d.forcedAction.includes('@')) {
+        const dropDests = stratUtils.readDropsByRole(d.possibleDropsByRole).get('s-piece');
+        if (dropDests) {
+          this.chessground.set({ viewOnly: true });
+          setTimeout(() => {
+            this.chessground.newPiece(
+              {
+                role: 's-piece',
+                playerIndex: d.game.player,
+              },
+              dropDests[0] as cg.Key
+            );
+            this.chessground.set({ viewOnly: false });
+            this.onUserNewPiece('s-piece', dropDests[0], { premove: false });
+          }, this.forcedActionDelayMillis);
+        }
+      } else if (d.forcedAction.includes('^')) {
         this.chessground.set({ viewOnly: true });
         setTimeout(() => {
           this.chessground.liftNoAnim(d.forcedAction!.slice(1) as cg.Key);
           this.chessground.set({ viewOnly: false });
-        }, delayMillis);
-      } else if (d.forcedAction !== undefined && util.parsePossibleMoves(d.possibleMoves).size == 1) {
-        this.chessground.set({ viewOnly: true });
-        setTimeout(() => {
-          this.sendMove(
-            d.forcedAction!.slice(0, 2) as cg.Key,
-            d.forcedAction!.slice(2, 4) as cg.Key,
-            undefined,
-            this.data.game.variant.key,
-            { premove: false }
-          );
-          this.chessground.set({ viewOnly: false });
-          sound.move();
-        }, delayMillis);
+          this.onUserLift(d.forcedAction!.slice(1) as cg.Key);
+        }, this.forcedActionDelayMillis);
+      } else {
+        const uciMove = util.uci2move(d.forcedAction);
+        if (uciMove !== undefined) {
+          this.chessground.set({ viewOnly: true });
+          setTimeout(() => {
+            this.chessground.moveNoAnim(uciMove[0], uciMove[1]);
+            this.chessground.set({ viewOnly: false });
+            this.onUserMove(uciMove[0], uciMove[1], { premove: false });
+          }, this.forcedActionDelayMillis);
+        }
+      }
+    }
+  };
+
+  private doForcedActions = (): void => {
+    const d = this.data;
+    if (this.isPlaying() && !this.replaying()) {
+      //flipello pass
+      if ((d.game.variant.key === 'flipello' || d.game.variant.key === 'flipello10') && d.possibleMoves) {
+        this.forcePass(util.parsePossibleMoves(d.possibleMoves), d.game.variant.key);
+      }
+      //backgammon roll dice at start of turn or end turn when no moves
+      if (['backgammon', 'nackgammon'].includes(d.game.variant.key)) {
+        if (d.canOnlyRollDice) setTimeout(() => this.forceRollDice(d.game.variant.key), this.forcedActionDelayMillis);
+        else if (d.pref.playForcedAction) this.playForcedAction();
       }
     }
   };
 
   private delayedInit = () => {
     const d = this.data;
-    //forced moves
-    if (this.isPlaying() && !this.replaying()) {
-      //flipello pass
-      if ((d.game.variant.key === 'flipello' || d.game.variant.key === 'flipello10') && d.possibleMoves) {
-        this.forceMove(util.parsePossibleMoves(d.possibleMoves), d.game.variant.key);
-      }
-      //backgammon roll dice at start of turn or end turn when no moves
-      if (['backgammon', 'nackgammon'].includes(d.game.variant.key)) {
-        if (d.canOnlyRollDice) setTimeout(() => this.forceRollDice(d.game.variant.key), 500);
-        else if (d.pref.playForcedAction) this.playForcedAction();
-      }
-    }
+    this.doForcedActions();
+
     if (this.isPlaying() && game.nbMoves(d, d.player.playerIndex) === 0 && !this.isSimulHost()) {
       playstrategy.sound.play('genericNotify');
     }

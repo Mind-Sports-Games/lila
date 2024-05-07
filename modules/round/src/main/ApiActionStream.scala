@@ -13,7 +13,7 @@ import lila.game.{ Game, GameRepo }
 import strategygames.{ Centis, Replay }
 import lila.game.actorApi.FinishGame
 
-final class ApiMoveStream(gameRepo: GameRepo, gameJsonView: lila.game.JsonView)(implicit
+final class ApiActionStream(gameRepo: GameRepo, gameJsonView: lila.game.JsonView)(implicit
     ec: ExecutionContext
 ) {
 

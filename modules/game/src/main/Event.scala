@@ -241,9 +241,7 @@ object Event {
           case (Situation.Backgammon(_)) => Some(situation.lifts.map(_.pos))
           case _                         => None
         },
-        forcedAction = (situation.actions.nonEmpty && situation.actions.length == 1) option {
-          situation.actions.head.toUci.uci
-        },
+        forcedAction = situation.forcedAction.map(_.toUci.uci),
         pocketData = pocketData,
         // TODO future multiaction games may not end turn on the same action, and this will need to be fixed
         couldNextActionEndTurn = situation.actions.headOption.map(_ match {
@@ -351,9 +349,7 @@ object Event {
           case (Situation.Backgammon(_)) => Some(situation.lifts.map(_.pos))
           case _                         => None
         },
-        forcedAction = (situation.actions.nonEmpty && situation.actions.length == 1) option {
-          situation.actions.head.toUci.uci
-        },
+        forcedAction = situation.forcedAction.map(_.toUci.uci),
         pocketData = pocketData,
         // TODO future multiaction games may not end turn on the same action, and this will need to be fixed
         couldNextActionEndTurn = situation.actions.headOption.map(_ match {
@@ -453,9 +449,7 @@ object Event {
           case (Situation.Backgammon(_)) => Some(situation.lifts.map(_.pos))
           case _                         => None
         },
-        forcedAction = (situation.actions.nonEmpty && situation.actions.length == 1) option {
-          situation.actions.head.toUci.uci
-        },
+        forcedAction = situation.forcedAction.map(_.toUci.uci),
         pocketData = pocketData,
         //TODO future multiaction games may not end turn on the same action, and this will need to be fixed
         couldNextActionEndTurn = situation.actions.headOption.map(_ match {
@@ -552,9 +546,7 @@ object Event {
           case (Situation.Backgammon(_)) => Some(situation.lifts.map(_.pos))
           case _                         => None
         },
-        forcedAction = (situation.actions.nonEmpty && situation.actions.length == 1) option {
-          situation.actions.head.toUci.uci
-        },
+        forcedAction = situation.forcedAction.map(_.toUci.uci),
         pocketData = pocketData
       )
   }
@@ -648,9 +640,7 @@ object Event {
           case (Situation.Backgammon(_)) => Some(situation.lifts.map(_.pos))
           case _                         => None
         },
-        forcedAction = (situation.actions.nonEmpty && situation.actions.length == 1) option {
-          situation.actions.head.toUci.uci
-        },
+        forcedAction = situation.forcedAction.map(_.toUci.uci),
         pocketData = pocketData
       )
   }
@@ -735,9 +725,7 @@ object Event {
           case (Situation.Backgammon(_)) => Some(situation.lifts.map(_.pos))
           case _                         => None
         },
-        forcedAction = (situation.actions.nonEmpty && situation.actions.length == 1) option {
-          situation.actions.head.toUci.uci
-        },
+        forcedAction = situation.forcedAction.map(_.toUci.uci),
         pocketData = pocketData
       )
   }
@@ -828,9 +816,7 @@ object Event {
           case (Situation.Backgammon(_)) => Some(situation.lifts.map(_.pos))
           case _                         => None
         },
-        forcedAction = (situation.actions.nonEmpty && situation.actions.length == 1) option {
-          situation.actions.head.toUci.uci
-        },
+        forcedAction = situation.forcedAction.map(_.toUci.uci),
         pocketData = pocketData
       )
   }
