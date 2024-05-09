@@ -45,6 +45,7 @@ import { ConcealOf, Position } from './interfaces';
 import relayManager from './study/relay/relayManagerView';
 import relayTour from './study/relay/relayTourView';
 import renderPlayerBars from './study/playerBars';
+import { findTag } from './study/studyChapters';
 import serverSideUnderboard from './serverSideUnderboard';
 import * as gridHacks from './gridHacks';
 
@@ -344,13 +345,36 @@ function renderPlayerScore(
     return h('div.game-score.game-score-' + position, { attrs: { 'data-score': score } }, children);
   } else if (variantKey === 'go9x9' || variantKey === 'go13x13' || variantKey === 'go19x19') {
     children.push(h('piece.p-piece.' + playerIndex, { attrs: { 'data-score': score } }));
-    return h('div.game-score.game-score-' + position + '.' + playerIndex, children);
+    return h('div.game-score.game-score-top' + '.' + playerIndex, children);
   } else {
     const pieceClass =
       variantKey === 'oware' ? `piece.${defaultMancalaRole}${score.toString()}-piece.` : 'piece.p-piece.';
     children.push(h(pieceClass + playerIndex, { attrs: { 'data-score': score } }));
-    return h('div.game-score.game-score-' + position, children);
+    return h('div.game-score.game-score-top' + '.' + playerIndex, children);
   }
+}
+
+function renderPlayerScoreNames(ctrl: AnalyseCtrl): VNode | undefined {
+  const children: VNode[] = [];
+  const study = ctrl.study;
+  let playerNames = { p1: 'Player 1', p2: 'player 2' };
+  if (study !== undefined) {
+    const tags = study.data.chapter.tags;
+    playerNames = {
+      p1: findTag(tags, 'p1') ?? ctrl.data.player.playerName,
+      p2: findTag(tags, 'p2') ?? ctrl.data.opponent.playerName,
+    };
+  } else {
+    playerNames = {
+      p1: ctrl.data.player.user ? ctrl.data.player.user.id : ctrl.data.player.playerName,
+      p2: ctrl.data.opponent.user ? ctrl.data.opponent.user.id : ctrl.data.opponent.playerName,
+    };
+  }
+
+  children.push(h('div.game-score-name.p1.text', playerNames.p1));
+  children.push(h('div.game-score-name.vs.text', 'vs'));
+  children.push(h('div.game-score-name.p2.text', playerNames.p2));
+  return h('div.game-score-names', children);
 }
 
 export default function (ctrl: AnalyseCtrl): VNode {
@@ -506,6 +530,7 @@ export default function (ctrl: AnalyseCtrl): VNode {
       menuIsOpen || tour || !ctrl.data.hasGameScore
         ? null
         : renderPlayerScore(topScore, 'top', ctrl.topPlayerIndex(), variantKey),
+      menuIsOpen || tour || !ctrl.data.hasGameScore ? null : renderPlayerScoreNames(ctrl),
       menuIsOpen || tour ? null : crazyView(ctrl, ctrl.topPlayerIndex(), 'top'),
       gamebookPlayView ||
         (tour
