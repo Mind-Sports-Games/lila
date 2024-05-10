@@ -107,6 +107,10 @@ body.togyzkumalak-wood .variant-togyzkumalak .game-score {
   }
 }
 
+.game-score-names {
+  font-size: 1.2em;
+}
+
 @each $variant in $score-variants-square {
   .variant-#{$variant} .game-score {
     @extend %box-radius;
