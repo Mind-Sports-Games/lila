@@ -647,6 +647,7 @@ export default class RoundController {
       if (['backgammon', 'nackgammon'].includes(d.game.variant.key)) {
         this.chessground.set({
           dice: this.data.dice ? this.data.dice : [],
+          fen: o.fen,
           canUndo: this.data.canUndo,
           showUndoButton:
             this.isPlaying() &&
