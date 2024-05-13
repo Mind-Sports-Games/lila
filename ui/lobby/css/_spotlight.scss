@@ -7,6 +7,65 @@
 .tour-spotlight {
   @extend %flex-center-nowrap, %nowrap-hidden, %page-metal;
 
+  &.highlighted {
+    @extend %active;
+
+    .selected-color-original & {
+      background: $c-color-choice-blue;
+      color: $c-color-choice-font-default;
+      text-shadow: 0 1px 0 $c-color-choice-blue;
+      &:hover {
+        background: $c-color-choice-blue-dim;
+        text-shadow: 0 1px 0 $c-color-choice-blue-dim;
+      }
+    }
+    .selected-color-black & {
+      background: $c-color-choice-black;
+      color: $c-color-choice-font-default;
+      text-shadow: 0 1px 0 $c-color-choice-black;
+      &:hover {
+        background: $c-color-choice-black-dim;
+        text-shadow: 0 1px 0 $c-color-choice-black-dim;
+      }
+    }
+    .selected-color-red & {
+      background: $c-color-choice-red;
+      color: $c-color-choice-font-default;
+      text-shadow: 0 1px 0 $c-color-choice-red;
+      &:hover {
+        background: $c-color-choice-red-dim;
+        text-shadow: 0 1px 0 $c-color-choice-red-dim;
+      }
+    }
+    .selected-color-blue & {
+      background: $c-color-choice-blue;
+      color: $c-color-choice-font-default;
+      text-shadow: 0 1px 0 $c-color-choice-blue;
+      &:hover {
+        background: $c-color-choice-blue-dim;
+        text-shadow: 0 1px 0 $c-color-choice-blue-dim;
+      }
+    }
+    .selected-color-green & {
+      background: $c-color-choice-green;
+      color: $c-color-choice-font-default;
+      text-shadow: 0 1px 0 $c-color-choice-green;
+      &:hover {
+        background: $c-color-choice-green-dim;
+        text-shadow: 0 1px 0 $c-color-choice-green-dim;
+      }
+    }
+    .selected-color-yellow & {
+      background: $c-color-choice-yellow;
+      color: $c-color-choice-font-default;
+      text-shadow: 0 1px 0 $c-color-choice-yellow;
+      &:hover {
+        background: $c-color-choice-yellow-dim;
+        text-shadow: 0 1px 0 $c-color-choice-yellow-dim;
+      }
+    }
+  }
+
   flex: 0 0 auto;
   padding: 0.3em;
   opacity: 0.8;
