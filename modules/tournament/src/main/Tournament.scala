@@ -148,11 +148,6 @@ case class Tournament(
     medleyVariants
       .map(v => v.take(medleyNumIntervals.getOrElse(medleyVariants.size)))
 
-  def isStillWorthEntering =
-    isScheduled || {
-      secondsToFinish > (minutes * 60 / 3).atMost(20 * 60)
-    }
-
   def isRecentlyFinished = isFinished && (nowSeconds - finishesAt.getSeconds) < 30 * 60
 
   def isRecentlyStarted = isStarted && (nowSeconds - startsAt.getSeconds) < 15
