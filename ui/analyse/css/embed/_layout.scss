@@ -121,7 +121,18 @@ $pocket-col1-size: 9.5vw;
     }
 
     &-names {
-      display: none;
+      grid-area: pocket-top;
+      width: calc(100% - 2 * #{$pocket-col1-size});
+      margin-left: $pocket-col1-size;
+      display: grid;
+      padding: 0.5em;
+      align-content: space-between;
+      .p2 {
+        justify-self: right;
+      }
+      .vs {
+        justify-self: center;
+      }
     }
   }
 }
