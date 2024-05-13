@@ -12,7 +12,7 @@
   }
 
   display: grid;
-  grid-template-columns: minmax(200px, calc(100vh - 2.5rem)) minmax(200px, 1fr);
+  grid-template-columns: minmax(150px, calc(100vh - 2.5rem)) minmax(150px, 1fr);
   grid-template-rows: auto 3rem;
   grid-template-areas: 'board tools' 'board controls';
 }
@@ -137,13 +137,13 @@ $pocket-col1-size: 9.5vw;
       width: calc(100% - 2 * #{$pocket-col1-size});
       margin-left: $pocket-col1-size;
       display: grid;
-      padding: 0.5em;
+      padding: 0.5vw;
       align-content: space-between;
       .p2 {
         justify-self: right;
       }
       .vs {
-        justify-self: center;
+        display: none; // to support mobile
       }
     }
   }
@@ -182,13 +182,13 @@ $pocket-col1-size: 9.5vw;
     width: calc(100% - 2 * #{$pocket-col1-size});
     margin-left: $pocket-col1-size;
     display: grid;
-    padding: 0.5em;
+    padding: 0.5vw;
     align-content: space-between;
     .p2 {
       justify-self: right;
     }
     .vs {
-      justify-self: center;
+      display: none; // to support mobile
     }
   }
 }
