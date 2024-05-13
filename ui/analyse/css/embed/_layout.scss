@@ -68,6 +68,18 @@ body.togyzkumalak-wood .variant-togyzkumalak .game-score {
   background-size: cover;
 }
 
+body.backgammon-classic .variant-nackgammon .game-score,
+body.backgammon-classic .variant-backgammon .game-score {
+  background: url(../images/board/backgammon/svg/backgammon_classic_house.svg);
+  background-size: cover;
+}
+
+body.backgammon-contemporary .variant-nackgammon .game-score,
+body.backgammon-contemporary .variant-backgammon .game-score {
+  background: url(../images/board/backgammon/svg/backgammon_contemporary_house.svg);
+  background-size: cover;
+}
+
 @each $variant in $go-variants {
   body.go-light-wood .variant-#{$variant} .game-score.p2 {
     background: url(../images/board/go/svg/go_pot_white_light.svg);
@@ -200,7 +212,9 @@ $pocket-col1-size: 9.5vw;
   }
 }
 
-//togyzkumalak layout different
+//togyzkumalak and backgammon (large score) layout different
+.analyse.variant-nackgammon,
+.analyse.variant-backgammon,
 .analyse.variant-togyzkumalak {
   grid-template-rows: $pocket-col1-size auto 3rem $pocket-col1-size;
   grid-template-areas: 'board pocket-top' 'board tools' 'board controls' 'board pocket-bot';
@@ -259,9 +273,49 @@ $pocket-col1-size: 9.5vw;
   font-size: 1.5em;
 }
 
-//TODO support backgammon in analysis
+.variant-nackgammon .game-score::after,
+.variant-backgammon .game-score::after {
+  @extend %active, %box-radius;
+
+  content: attr(data-score);
+  top: 0;
+  right: 0;
+  height: fit-content;
+  margin-left: auto;
+  position: relative;
+  line-height: 0.9em;
+  padding: 3px 0.3em;
+  font-weight: bold;
+  font-size: 1.5em;
+}
+
 .variant-nackgammon .game-score,
 .variant-backgammon .game-score {
+  @extend %box-radius;
+  display: flex;
+  width: calc(#{$pocket-col1-size} * 3);
+  height: $pocket-col1-size;
+  gap: 0.13em;
+  background-color: #aaa;
+
+  piece {
+    width: 1em !important;
+    height: 4.7em !important;
+    position: relative;
+    margin-top: 0.65em !important;
+    &.first {
+      margin-left: 0.65em;
+    }
+  }
+
+  &-top {
+    grid-area: pocket-top;
+  }
+
+  &-bottom {
+    grid-area: pocket-bot;
+  }
+
   &-names {
     display: none;
   }

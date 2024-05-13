@@ -12,6 +12,7 @@ import {
   getPlayerScore,
   getMancalaScore,
   getGoScore,
+  getBackgammonScore,
   allowClientEvalForVariant,
 } from './util';
 import { defined } from 'common';
@@ -346,6 +347,11 @@ function renderPlayerScore(
   } else if (variantKey === 'go9x9' || variantKey === 'go13x13' || variantKey === 'go19x19') {
     children.push(h('piece.p-piece.' + playerIndex, { attrs: { 'data-score': score } }));
     return h('div.game-score.game-score-top' + '.' + playerIndex, children);
+  } else if (variantKey === 'backgammon' || variantKey === 'nackgammon') {
+    for (let i = 0; i < score; i++) {
+      children.push(h('piece.side-piece.' + playerIndex + (i === 0 ? ' first' : '')));
+    }
+    return h('div.game-score.game-score-' + position, { attrs: { 'data-score': score } }, children);
   } else {
     const pieceClass =
       variantKey === 'oware' ? `piece.${defaultMancalaRole}${score.toString()}-piece.` : 'piece.p-piece.';
@@ -422,6 +428,16 @@ export default function (ctrl: AnalyseCtrl): VNode {
         const fen = ctrl.node.fen;
         const p1Score = getGoScore(fen, 'p1');
         const p2Score = getGoScore(fen, 'p2');
+        topScore = ctrl.topPlayerIndex() === 'p1' ? p1Score : p2Score;
+        bottomScore = ctrl.topPlayerIndex() === 'p2' ? p1Score : p2Score;
+        break;
+      }
+      case 'backgammon':
+      case 'nackgammon': {
+        const fen = ctrl.node.fen;
+        const p1Score = getBackgammonScore(fen, 'p1');
+        const p2Score = getBackgammonScore(fen, 'p2');
+        console.log('fen', fen);
         topScore = ctrl.topPlayerIndex() === 'p1' ? p1Score : p2Score;
         bottomScore = ctrl.topPlayerIndex() === 'p2' ? p1Score : p2Score;
         break;
