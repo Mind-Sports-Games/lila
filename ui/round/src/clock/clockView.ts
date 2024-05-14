@@ -31,7 +31,7 @@ export function renderClock(ctrl: RoundController, player: game.Player, position
       ['monster', 'amazons'].includes(ctrl.data.game.variant.key) &&
       isClockRunning;
 
-  //TODO in multication render clock gets called as the move is played while it's sent, and then during apimove update, the
+  //TODO in multication render clock gets called as the move is played while it's sent, and then during apiAction update, the
   // state of ctrl.data is different here and therefore hard to obtain the correct class in all states.
   // This causes the green/orange flicker on the clock. The delayClass is an attempt to fix this which is only paritally working.
   const delayClass =

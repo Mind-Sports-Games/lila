@@ -115,7 +115,7 @@ export interface Step {
   captLen?: number;
 }
 
-export interface ApiMove extends Step {
+export interface ApiAction extends Step {
   dests: EncodedDests;
   clock?: {
     p1: Seconds;

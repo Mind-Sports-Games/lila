@@ -81,13 +81,13 @@ export function make(send: SocketSend, ctrl: RoundController): RoundSocket {
       if (fromOp) notify(ctrl.noarg('yourOpponentProposesATakeback'));
       ctrl.redraw();
     },
-    move: ctrl.apiMove,
-    drop: ctrl.apiMove,
-    lift: ctrl.apiMove,
-    pass: ctrl.apiMove,
-    diceroll: ctrl.apiMove,
-    endturn: ctrl.apiMove,
-    selectSquares: ctrl.apiMove,
+    move: ctrl.apiAction,
+    drop: ctrl.apiAction,
+    lift: ctrl.apiAction,
+    pass: ctrl.apiAction,
+    diceroll: ctrl.apiAction,
+    endturn: ctrl.apiAction,
+    selectSquares: ctrl.apiAction,
     reload,
     redirect: ctrl.setRedirecting,
     clockInc(o) {

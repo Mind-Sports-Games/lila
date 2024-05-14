@@ -36,7 +36,6 @@ final class PromotionApi(domain: NetDomain) {
     s"$domain/tournament/(\\w+)",
     s"$domain/swiss/(\\w+)",
     s"$domain/simul/(\\w+)",
-    s"$domain/study/(\\w+)",
     s"$domain/class/(\\w+)",
     """(?:youtube\.com|youtu\.be)/(?:watch)?(?:\?v=)?([^"&?/ ]{11})""",
     """youtube\.com/channel/([\w-]{24})""",
