@@ -520,7 +520,7 @@ object Pref {
     submitMove = SubmitMove.CORRESPONDENCE_ONLY,
     confirmResign = ConfirmResign.YES,
     confirmPass = ConfirmPass.YES,
-    playForcedAction = PlayForcedAction.NO,
+    playForcedAction = PlayForcedAction.YES,
     insightShare = InsightShare.FRIENDS,
     keyboardMove = KeyboardMove.NO,
     zen = Zen.NO,
