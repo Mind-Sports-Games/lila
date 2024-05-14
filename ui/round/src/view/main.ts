@@ -12,7 +12,6 @@ import * as cg from 'chessground/types';
 import { render as keyboardMove } from '../keyboardMove';
 import { render as renderGround } from '../ground';
 import { renderTable } from './table';
-import { Player } from 'game';
 
 function renderMaterial(
   material: MaterialDiffSide,
@@ -92,18 +91,6 @@ function renderPlayerScore(
     children.push(h(pieceClass + playerIndex, { attrs: { 'data-score': score } }));
     return h('div.game-score.game-score-' + position, children);
   }
-}
-
-function renderPlayerScoreNames(player: Player, opponent: Player): VNode | undefined {
-  const children: VNode[] = [];
-  const playerNames = {
-    p1: player.user ? player.user.id : player.playerName,
-    p2: opponent.user ? opponent.user.id : opponent.playerName,
-  };
-  children.push(h('div.game-score-name.p1.text', playerNames.p1));
-  children.push(h('div.game-score-name.vs.text', 'vs'));
-  children.push(h('div.game-score-name.p2.text', playerNames.p2));
-  return h('div.game-score-names', children);
 }
 
 function wheel(ctrl: RoundController, e: WheelEvent): void {
@@ -288,7 +275,6 @@ export function main(ctrl: RoundController): VNode {
             [renderGround(ctrl), promotion.view(ctrl)]
           ),
           ctrl.data.hasGameScore ? renderPlayerScore(topScore, 'top', topPlayerIndex, variantKey, captures) : null,
-          ctrl.data.hasGameScore ? renderPlayerScoreNames(ctrl.data.player, ctrl.data.opponent) : null,
           crazyView(ctrl, topPlayerIndex, 'top') ||
             renderMaterial(material[topPlayerIndex], -score, 'top', d.hasGameScore, checks[topPlayerIndex]),
           ...renderTable(ctrl),

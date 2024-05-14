@@ -1,13 +1,13 @@
 //Number of shield tournaments
 db.tournament2
-  .find({ 'schedule.freq': 'shield', startsAt: { $gte: ISODate('2024-04-01'), $lt: ISODate('2024-05-01') } })
+  .find({ 'schedule.freq': 'shield', startsAt: { $gte: ISODate('2024-03-01'), $lt: ISODate('2024-04-01') } })
   .count();
 
 //Number of games played
 db.tournament2.aggregate([
   {
     $match: {
-      $and: [{ 'schedule.freq': 'shield' }, { startsAt: { $gte: ISODate('2024-04-01'), $lt: ISODate('2024-05-01') } }],
+      $and: [{ 'schedule.freq': 'shield' }, { startsAt: { $gte: ISODate('2024-03-01'), $lt: ISODate('2024-04-01') } }],
     },
   },
   { $project: { fField: { $concat: ['tournament:stats:', '$_id'] } } },
@@ -24,7 +24,7 @@ db.tournament_leaderboard.aggregate([
     $match: {
       $and: [
         { 'tour.schedule.freq': 'shield' },
-        { 'tour.startsAt': { $gte: ISODate('2024-04-01'), $lt: ISODate('2024-05-01') } },
+        { 'tour.startsAt': { $gte: ISODate('2024-03-01'), $lt: ISODate('2024-04-01') } },
         { u: 'pst-greedy-tom' },
       ],
     },
@@ -40,7 +40,7 @@ db.tournament_leaderboard.aggregate([
     $match: {
       $and: [
         { 'tour.schedule.freq': 'shield' },
-        { 'tour.startsAt': { $gte: ISODate('2024-04-01'), $lt: ISODate('2024-05-01') } },
+        { 'tour.startsAt': { $gte: ISODate('2024-03-01'), $lt: ISODate('2024-04-01') } },
         { u: 'pst-greedy-tom' },
       ],
     },

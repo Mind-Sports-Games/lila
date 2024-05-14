@@ -33,8 +33,8 @@ $go-variants: ('go9x9', 'go13x13', 'go19x19');
   @extend %active, %box-radius;
 
   content: attr(data-score);
-  top: -4.8em;
-  right: -11em;
+  top: -5.5em;
+  right: -10.7em;
   position: relative;
   line-height: 0.9em;
   padding: 3px 0.3em;
@@ -136,12 +136,6 @@ body.backgammon-contemporary .variant-backgammon .game-score {
   }
 }
 
-@include breakpoint($mq-col1) {
-  .game-score-names {
-    font-size: 1.2em;
-  }
-}
-
 @each $variant in $score-variants-square {
   .variant-#{$variant} .game-score {
     @extend %box-radius;
@@ -169,14 +163,10 @@ body.backgammon-contemporary .variant-backgammon .game-score {
       margin-top: -0.5em;
     }
 
-    &-names {
-      display: none;
-    }
-
     @include breakpoint($mq-col1) {
       &-top {
         grid-area: pocket-top;
-        margin-left: 80%;
+        margin-left: 20%;
         width: 20%;
         padding-top: 20%;
         margin-bottom: 0;
@@ -184,24 +174,10 @@ body.backgammon-contemporary .variant-backgammon .game-score {
 
       &-bottom {
         grid-area: pocket-top;
+        margin-left: 65%;
         margin-top: 0;
         width: 20%;
         padding-top: 20%;
-      }
-
-      &-names {
-        grid-area: pocket-top;
-        width: 60%;
-        margin-left: 20%;
-        display: grid;
-        padding: 0.5em;
-        align-content: space-between;
-        .p2 {
-          justify-self: right;
-        }
-        .vs {
-          justify-self: center;
-        }
       }
     }
 
@@ -217,8 +193,6 @@ body.backgammon-contemporary .variant-backgammon .game-score {
   }
 }
 
-$non-sqaure-pocket-height-mobile: 9.5vw;
-$non-square-pocket-margin-top-mobile: 5vw;
 .variant-togyzkumalak .game-score {
   @extend %box-radius;
   display: block;
@@ -232,7 +206,7 @@ $non-square-pocket-margin-top-mobile: 5vw;
     height: 10em !important;
     position: relative;
     margin-top: -2.2em !important;
-    margin-left: 2em !important;
+    margin-left: 2.5em !important;
     transform: rotate(270deg);
   }
 
@@ -242,7 +216,7 @@ $non-square-pocket-margin-top-mobile: 5vw;
     height: 10em !important;
     position: relative;
     margin-top: -10em !important;
-    margin-left: 9.6em !important;
+    margin-left: 10.1em !important;
     transform: rotate(270deg);
   }
 
@@ -255,49 +229,22 @@ $non-square-pocket-margin-top-mobile: 5vw;
     grid-area: mat-bot;
   }
 
-  &-names {
-    display: none;
-  }
-
-  @include breakpoint($mq-col1-uniboard) {
-    width: calc(#{$non-sqaure-pocket-height-mobile} * 4);
-    height: $non-sqaure-pocket-height-mobile;
-    piece.part1 {
-      width: calc(#{$non-sqaure-pocket-height-mobile} * 1.11) !important;
-      height: calc(#{$non-sqaure-pocket-height-mobile} * 2.22) !important;
-      margin-top: -4.8vw !important;
-      margin-left: calc(#{$non-sqaure-pocket-height-mobile} * 1.11 * 0.5) !important;
-    }
-    piece.part2 {
-      width: calc(#{$non-sqaure-pocket-height-mobile} * 1.11) !important;
-      height: calc(#{$non-sqaure-pocket-height-mobile} * 2.22) !important;
-      margin-top: calc(#{$non-sqaure-pocket-height-mobile} * -2.22) !important;
-      margin-left: calc(#{$non-sqaure-pocket-height-mobile} * 2.25) !important;
-    }
+  @include breakpoint($mq-col1) {
     &-top {
       grid-area: pocket-top;
-      margin-top: $non-square-pocket-margin-top-mobile;
-      &::after {
-        top: -13.3vw;
-        right: -38.5vw;
-      }
+      margin-bottom: 0;
+      margin-top: 0;
+      margin-left: 1%;
     }
+
     &-bottom {
       grid-area: pocket-top;
-      margin-left: calc(100% - 4 * #{$non-sqaure-pocket-height-mobile});
-      margin-top: $non-square-pocket-margin-top-mobile;
-      &::after {
-        top: -13.3vw;
-        right: 8vw;
-      }
+      margin-top: 0;
+      margin-left: 43%;
     }
-    &-names {
-      grid-area: pocket-top;
-      width: 100%;
-      display: inline-flex;
-      padding: 0.5vw;
-      justify-content: space-around;
-    }
+
+    //todo how to only affect phone screen?
+    transform: scale(0.65); //to fit large scores on phone screen
   }
 
   @include breakpoint($mq-col2-uniboard) {
@@ -339,38 +286,22 @@ $non-square-pocket-margin-top-mobile: 5vw;
     grid-area: mat-bot;
   }
 
-  &-names {
-    display: none;
-  }
-
   @include breakpoint($mq-col1) {
-    width: calc(#{$non-sqaure-pocket-height-mobile} * 4);
-    height: calc(#{$non-sqaure-pocket-height-mobile} * 4 / 3);
-    piece {
-      width: calc(#{$non-sqaure-pocket-height-mobile} * (4 / 3) * (1 / 6)) !important;
-      height: calc(#{$non-sqaure-pocket-height-mobile} * (4 / 3) * (4.7 / 6)) !important;
-      position: relative;
-      margin-top: 1.4vw !important;
-      &.first {
-        margin-left: 1.4vw;
-      }
-    }
     &-top {
       grid-area: pocket-top;
-      margin-top: $non-square-pocket-margin-top-mobile;
+      margin-bottom: 0;
+      margin-top: 0;
+      margin-left: 1%;
     }
+
     &-bottom {
       grid-area: pocket-top;
-      margin-left: calc(100% - 4 * #{$non-sqaure-pocket-height-mobile});
-      margin-top: $non-square-pocket-margin-top-mobile;
+      margin-top: 0;
+      margin-left: 43%;
     }
-    &-names {
-      grid-area: pocket-top;
-      width: 100%;
-      display: inline-flex;
-      padding: 0.5vw;
-      justify-content: space-around;
-    }
+
+    //todo how to only affect phone screen?
+    transform: scale(0.65); //to fit large scores on phone screen
   }
 
   @include breakpoint($mq-col2-uniboard) {
