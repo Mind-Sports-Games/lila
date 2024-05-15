@@ -132,7 +132,8 @@ object TournamentShield {
       val medleyRounds: Int,
       val swissFormat: String,
       val arenaFormat: String,
-      val arenaDescription: String
+      val arenaDescription: String,
+      val countOffset: Int = 0
   ) {
     def eligibleVariants = variants.distinct
     def hasAllVariants   = eligibleVariants == Variant.all.filterNot(_.fromPositionVariant)
@@ -533,7 +534,8 @@ object TournamentShield {
           s"An Arena which is divided into ${chessgammonRounds} equal length periods of ${chessgammonVariants
             .map(VariantKeys.variantName)
             .mkString(", ")}.",
-          s"Welcome to the Chessgammon Medley Arena!"
+          s"Welcome to the Chessgammon Medley Arena!",
+          2
         )
 
     val all = List(
@@ -567,11 +569,11 @@ object TournamentShield {
       Months.monthsBetween(monthlyMedleyShieldStartDate, startsAt).getMonths()
 
     def countSinceStart(startsAt: DateTime, isWeekly: Boolean) =
-      if (isWeekly) weeksSinceStart(startsAt) + 1
-      else monthsSinceStart(startsAt) + 1
+      if (isWeekly) weeksSinceStart(startsAt)
+      else monthsSinceStart(startsAt)
 
-    def makeName(baseName: String, startsAt: DateTime, isWeekly: Boolean) =
-      s"${baseName} ${countSinceStart(startsAt, isWeekly) + 1}"
+    def makeName(baseName: String, startsAt: DateTime, isWeekly: Boolean, countOffset: Int) =
+      s"${baseName} ${countSinceStart(startsAt, isWeekly) - countOffset + 1}"
   }
 
   sealed abstract class Category(
