@@ -485,6 +485,57 @@ object TournamentShield {
           s"Welcome to the ${VariantKeys.gameFamilyName(GameFamily.Backgammon())} Medley Arena!"
         )
 
+    //all the order permuations which doesnt put two chess or two backgammon next to each other
+    private val chessgammonVariantPermuations = List(
+      List(0, 1, 2, 3),
+      List(2, 1, 0, 3),
+      List(0, 3, 2, 1),
+      List(2, 3, 0, 1),
+      List(3, 2, 1, 0),
+      List(3, 0, 1, 2),
+      List(1, 2, 3, 0),
+      List(1, 0, 3, 2)
+    )
+
+    private def chessgammonMedleyGeneration(variants: List[Variant]) = {
+      TournamentMedleyUtil.medleyVariantsAndIntervals(
+        Random.shuffle(chessgammonVariantPermuations).head.map(i => variants(i)),
+        5 * 60,
+        playStrategyMinutes,
+        playStrategyRounds,
+        false
+      )
+    }
+    private val chessgammonVariants = List(
+      Variant.wrap(strategygames.chess.variant.Standard),
+      Variant.wrap(strategygames.backgammon.variant.Backgammon),
+      Variant.wrap(strategygames.chess.variant.Chess960),
+      Variant.wrap(strategygames.backgammon.variant.Nackgammon)
+    )
+
+    private val chessgammonVariantMinutes = 80
+    private val chessgammonRounds         = chessgammonVariants.size
+
+    case object ChessgammonMedley
+        extends MedleyShield(
+          "shieldChessgammonMedley",
+          "Chessgammon",
+          Condition.TeamMember("playstrategy-medleys", "PlayStrategy Medleys"),
+          chessgammonVariants,
+          chessgammonMedleyGeneration,
+          Delay310,
+          Some(1),
+          7,
+          16,
+          chessgammonVariantMinutes,
+          chessgammonRounds,
+          "",
+          s"An Arena which is divided into ${chessgammonRounds} equal length periods of ${chessgammonVariants
+            .map(VariantKeys.variantName)
+            .mkString(", ")}.",
+          s"Welcome to the Chessgammon Medley Arena!"
+        )
+
     val all = List(
       PlayStrategyMedley,  //Weekly - Sun evenings
       ChessVariantsMedley, //Weekly - Sat evenings
@@ -494,7 +545,8 @@ object TournamentShield {
       XiangqiMedley,       //Monthly - 2nd Sun lunchtime
       OthelloMedley,       //Monthly - 4th Sun lunchtime
       MancalaMedley,       //Monthly - 1st Sun lunchtime
-      BackgammonMedley     //Monthly - 1st Sat afternoon
+      BackgammonMedley,    //Monthly - 1st Sat afternoon
+      ChessgammonMedley    //Monthly - 1st Sun afternoon
     )
 
     val allWeekly  = all.filter(_.weekOfMonth.isEmpty)
