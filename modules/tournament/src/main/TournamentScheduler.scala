@@ -457,9 +457,7 @@ final private class TournamentScheduler(
       scheduleYearly24hr(Variant.Go(strategygames.go.variant.Go19x19), Blitz53)(
         new DateTime(2024, 5, 24, 0, 0)
       ),
-      scheduleYearly24hr(Variant.Draughts(strategygames.draughts.variant.Brazilian), Blitz32)(
-        new DateTime(2024, 5, 31, 0, 0)
-      ),
+      //skip 31st May 2024 for UKGE tournaments...
       scheduleYearly24hr(Variant.FairySF(strategygames.fairysf.variant.Shogi), Byoyomi510)(
         new DateTime(2024, 6, 7, 0, 0)
       ),
@@ -500,7 +498,7 @@ final private class TournamentScheduler(
       scheduleYearly24hr(Variant.Chess(strategygames.chess.variant.Monster), Blitz32)(
         new DateTime(2024, 9, 6, 0, 0)
       ),
-      scheduleYearly24hr(Variant.Go(strategygames.go.variant.Go9x9), Blitz32)(
+      scheduleYearly24hr(Variant.Draughts(strategygames.draughts.variant.Brazilian), Blitz32)(
         new DateTime(2024, 9, 13, 0, 0)
       ),
       scheduleYearly24hr(Variant.Backgammon(strategygames.backgammon.variant.Backgammon), Delay310)(
@@ -508,7 +506,10 @@ final private class TournamentScheduler(
       ),
       scheduleYearly24hr(Variant.Draughts(strategygames.draughts.variant.Standard), Blitz32)(
         new DateTime(2024, 9, 27, 0, 0)
-      ),      
+      ),
+      scheduleYearly24hr(Variant.Go(strategygames.go.variant.Go9x9), Blitz32)(
+        new DateTime(2024, 10, 4, 0, 0)
+      )
       //Fri 27th is the end of year medley
     ).flatten filter { _.schedule.at isAfter rightNow }
 

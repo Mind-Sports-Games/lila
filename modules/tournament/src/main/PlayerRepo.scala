@@ -23,7 +23,8 @@ final class PlayerRepo(coll: Coll)(implicit ec: scala.concurrent.ExecutionContex
   private val selectActive   = $doc("w" $ne true)
   private val selectWithdraw = $doc("w" -> true)
   private val selectNonBot   = $doc("b" $ne true)
-  private val bestSort       = $doc("m" -> -1)
+  //_id is added as a secondary sort to ensure the same order is returned for the paginator
+  private val bestSort = $doc("m" -> -1, "_id" -> 1)
 
   def byId(id: Tournament.ID): Fu[Option[Player]] = coll.one[Player](selectId(id))
 
