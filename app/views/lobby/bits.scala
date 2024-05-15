@@ -184,8 +184,9 @@ object bits {
     a(
       href := (if (e.isNow || !e.countdown) e.url else routes.Event.show(e.id).url),
       cls := List(
-        s"tour-spotlight event-spotlight id_${e.id}" -> true,
-        "invert"                                     -> e.isNowOrSoon
+        s"tour-spotlight event-spotlight id_${e.id} ${ctx.currentSelectedColor}" -> true,
+        "invert"                                                                 -> e.isNowOrSoon,
+        "highlighted"                                                            -> (e.isNow || !e.countdown)
       )
     )(
       views.html.event.iconOf(e),
