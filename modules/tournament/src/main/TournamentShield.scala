@@ -183,7 +183,7 @@ object TournamentShield {
           "shieldPlayStrategyMedley",
           "PlayStrategy",
           Condition.TeamMember("playstrategy-medleys", "PlayStrategy Medleys"),
-          Variant.all.filterNot(_.fromPositionVariant),
+          Variant.all.filterNot(_.fromPositionVariant).filterNot(_.key == "go19x19"),
           playStrategyMedleyGeneration,
           Blitz55,
           None,
