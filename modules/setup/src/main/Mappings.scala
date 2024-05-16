@@ -32,7 +32,7 @@ private object Mappings {
   val byoyomi                  = number.verifying(HookConfig validateByoyomi _)
   val periods                  = number.verifying(HookConfig validatePeriods _)
   val goHandicap               = number.verifying(FriendConfig validateGoHandicap _)
-  val goKomi                   = number.verifying(FriendConfig validateGoKomi _)
+  def goKomi(boardSize: Int)   = number.verifying(FriendConfig.validateGoKomi(boardSize)(_))
   val days                     = number(min = 1, max = 14)
   def timeMode                 = number.verifying(TimeMode.ids contains _)
   def mode(withRated: Boolean) = optional(rawMode(withRated))
