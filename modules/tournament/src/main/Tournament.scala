@@ -148,11 +148,6 @@ case class Tournament(
     medleyVariants
       .map(v => v.take(medleyNumIntervals.getOrElse(medleyVariants.size)))
 
-  def isStillWorthEntering =
-    isScheduled || {
-      secondsToFinish > (minutes * 60 / 3).atMost(20 * 60)
-    }
-
   def isRecentlyFinished = isFinished && (nowSeconds - finishesAt.getSeconds) < 30 * 60
 
   def isRecentlyStarted = isStarted && (nowSeconds - startsAt.getSeconds) < 15
@@ -291,7 +286,8 @@ object Tournament {
     Tournament(
       id = makeId,
       name = sched.medleyShield.fold(sched.name(full = false)(defaultLang))(ms =>
-        TournamentShield.MedleyShield.makeName(ms.medleyName, sched.at, ms.weekOfMonth.isEmpty)
+        TournamentShield.MedleyShield
+          .makeName(ms.medleyName, sched.at, ms.weekOfMonth.isEmpty, ms.countOffset)
       ),
       status = Status.Created,
       clock = Schedule clockFor sched,
