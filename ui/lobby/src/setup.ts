@@ -91,9 +91,11 @@ export default class Setup {
     }
   };
 
-  private sliderKomis = [...Array(41).keys()].map(i => -100 + i * 5);
+  private sliderHandicap = (v: number) => (v < 26 ? v : 0);
 
-  private sliderKomi = (v: number) => (v < this.sliderKomis.length ? this.sliderKomis[v] : 75);
+  private sliderKomis = (bs: number) => [...Array(bs * bs * 4 + 1).keys()].map(i => -(bs * bs * 10) + i * 5);
+
+  private sliderKomi = (bs: number) => (v: number) => (v < this.sliderKomis(bs).length ? this.sliderKomis(bs)[v] : 75);
 
   private sliderDays = (v: number) => {
     if (v <= 3) return v;
@@ -611,25 +613,27 @@ export default class Setup {
           save();
         });
       });
-      $goHandicapInput.each(function (this: HTMLInputElement) {
-        const $input = $(this),
-          $value = $input.siblings('span'),
-          $range = $input.siblings('.range');
-        $value.text($input.val() as string);
-        $range.attr({
-          min: '0',
-          max: '9',
-          value: '' + self.sliderInitVal(parseInt($input.val() as string), self.sliderIncrement, 10),
-        });
-        $range.on('input', () => {
-          const goHandicap = self.sliderIncrement(parseInt($range.val() as string));
-          $value.text('' + goHandicap);
-          $input.val('' + goHandicap);
-          save();
-          clearFenInput();
-          toggleButtons();
-        });
+    }
+    $goHandicapInput.each(function (this: HTMLInputElement) {
+      const $input = $(this),
+        $value = $input.siblings('span'),
+        $range = $input.siblings('.range');
+      $value.text($input.val() as string);
+      $range.attr({
+        min: '0',
+        max: '25',
+        value: '' + self.sliderInitVal(parseInt($input.val() as string), self.sliderHandicap, 26),
       });
+      $range.on('input', () => {
+        const goHandicap = self.sliderHandicap(parseInt($range.val() as string));
+        $value.text('' + goHandicap);
+        $input.val('' + goHandicap);
+        save();
+        clearFenInput();
+        toggleButtons();
+      });
+    });
+    const setupGoKomiInput = () => {
       $goKomiInput.each(function (this: HTMLInputElement) {
         const $input = $(this),
           $value = $input.siblings('span'),
@@ -637,15 +641,25 @@ export default class Setup {
           showKomi = (v: number) => {
             return ('' + v / 10.0).replace('.0', '');
           },
-          show = (komi: number) => $value.text(showKomi(komi));
-        show(parseInt($input.val() as string));
+          show = (komi: number) => $value.text(showKomi(komi)),
+          variantId = ($variantSelect.val() as string).split('_'),
+          boardsize = variantId[1] == '1' ? 9 : variantId[1] == '2' ? 13 : 19,
+          defaultValue = boardsize === 9 ? 55 : 75,
+          initialValue =
+            Math.abs(parseInt($input.val() as string)) > boardsize * boardsize * 10
+              ? defaultValue
+              : parseInt($input.val() as string);
+        if (initialValue === defaultValue) $input.val(defaultValue.toString());
+        show(initialValue);
         $range.attr({
           min: '0',
-          max: '40',
-          value: '' + self.sliderInitVal(parseInt($input.val() as string), self.sliderKomi, 40),
+          max: (boardsize * boardsize * 2 * 2).toString(),
+          value: '' + self.sliderInitVal(initialValue, self.sliderKomi(boardsize), boardsize * boardsize * 2 * 2),
         });
+        $range.val('' + self.sliderInitVal(initialValue, self.sliderKomi(boardsize), boardsize * boardsize * 2 * 2));
+        save();
         $range.on('input', () => {
-          const goKomi = self.sliderKomi(parseInt($range.val() as string));
+          const goKomi = self.sliderKomi(boardsize)(parseInt($range.val() as string));
           show(goKomi);
           $input.val('' + goKomi);
           save();
@@ -653,43 +667,44 @@ export default class Setup {
           toggleButtons();
         });
       });
-      $form.find('.rating-range').each(function (this: HTMLDivElement) {
-        const $this = $(this),
-          $minInput = $this.find('.rating-range__min'),
-          $maxInput = $this.find('.rating-range__max'),
-          minStorage = self.makeStorage('lobby.ratingRange.min'),
-          maxStorage = self.makeStorage('lobby.ratingRange.max'),
-          update = (e?: Event) => {
-            const min = $minInput.val() as string,
-              max = $maxInput.val() as string;
-            minStorage.set(min);
-            maxStorage.set(max);
-            $this.find('.rating-min').text(`-${min.replace('-', '')}`);
-            $this.find('.rating-max').text(`+${max}`);
-            if (e) save();
-          };
+    };
+    setupGoKomiInput();
+    $form.find('.rating-range').each(function (this: HTMLDivElement) {
+      const $this = $(this),
+        $minInput = $this.find('.rating-range__min'),
+        $maxInput = $this.find('.rating-range__max'),
+        minStorage = self.makeStorage('lobby.ratingRange.min'),
+        maxStorage = self.makeStorage('lobby.ratingRange.max'),
+        update = (e?: Event) => {
+          const min = $minInput.val() as string,
+            max = $maxInput.val() as string;
+          minStorage.set(min);
+          maxStorage.set(max);
+          $this.find('.rating-min').text(`-${min.replace('-', '')}`);
+          $this.find('.rating-max').text(`+${max}`);
+          if (e) save();
+        };
 
-        $minInput
-          .attr({
-            min: '-1000',
-            max: '0',
-            step: '100',
-            value: minStorage.get() || '-1000',
-          })
-          .on('input', update);
+      $minInput
+        .attr({
+          min: '-1000',
+          max: '0',
+          step: '100',
+          value: minStorage.get() || '-1000',
+        })
+        .on('input', update);
 
-        $maxInput
-          .attr({
-            min: '0',
-            max: '1000',
-            step: '100',
-            value: maxStorage.get() || '1000',
-          })
-          .on('input', update);
+      $maxInput
+        .attr({
+          min: '0',
+          max: '1000',
+          step: '100',
+          value: maxStorage.get() || '1000',
+        })
+        .on('input', update);
 
-        update();
-      });
-    }
+      update();
+    });
     $timeModeSelect
       .on('change', function (this: HTMLElement) {
         const timeMode = $(this).val();
@@ -769,6 +784,7 @@ export default class Setup {
         }
         showRating();
         showStartingImages();
+        if (variantId[0] == '9') setupGoKomiInput();
         toggleButtons();
       })
       .trigger('change');

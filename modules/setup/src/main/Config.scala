@@ -269,11 +269,11 @@ trait BaseConfig {
   def validatePeriods(i: Int) = i >= periodsMin && i <= periodsMax
 
   private val handicapMin        = 0
-  private val handicapMax        = 9
+  private val handicapMax        = 25
   def validateGoHandicap(i: Int) = i >= handicapMin && i <= handicapMax
 
   //komi is multipled by 10 to allow int.
-  private val komiMin        = -100
-  private val komiMax        = 100
-  def validateGoKomi(i: Int) = i >= komiMin && i <= komiMax
+  private def komiMin(bs: Int)               = -bs * bs * 10
+  private def komiMax(bs: Int)               = bs * bs * 10
+  def validateGoKomi(boardSize: Int)(i: Int) = i >= komiMin(boardSize) && i <= komiMax(boardSize)
 }
