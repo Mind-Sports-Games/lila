@@ -95,6 +95,23 @@ $border: $border-width $border-style $c-border;
 $c-font-shadow: black;
 $text-shadow: none;
 
+/* lobby highlighted events */
+$spotlight-box-shadow: inset -1px -1px 15px -1px $c-link;
+$spotlight-box-shadow-black: inset -1px -1px 15px -1px $c-color-choice-black;
+$spotlight-box-shadow-blue: inset -1px -1px 15px -1px $c-color-choice-blue;
+$spotlight-box-shadow-green: inset -1px -1px 15px -1px $c-color-choice-green;
+$spotlight-box-shadow-red: inset -1px -1px 15px -1px $c-color-choice-red;
+$spotlight-box-shadow-yellow: inset -1px -1px 15px -1px $c-color-choice-yellow;
+
+$spotlight-color: $c-link;
+$spotlight-color-black: $c-color-choice-black-dim;
+$spotlight-color-blue: $c-color-choice-blue;
+$spotlight-color-green: $c-color-choice-green;
+$spotlight-color-red: $c-color-choice-red;
+$spotlight-color-yellow: $c-color-choice-yellow;
+
+$spotlight-ribbon-text-color: black;
+
 @mixin metal-bg {
   background: linear-gradient(to bottom, hsl($c-site-hue, 7%, 22), hsl($c-site-hue, 5%, 19) 100%);
 }
