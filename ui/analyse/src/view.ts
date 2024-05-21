@@ -301,6 +301,20 @@ function controls(ctrl: AnalyseCtrl) {
   );
 }
 
+function forceNoCoords(ctrl: AnalyseCtrl) {
+  if (ctrl.data.pref.coords !== Prefs.Coords.Hidden) {
+    $('body').toggleClass('coords-out', false).toggleClass('coords-in', false).toggleClass('coords-no', true);
+    changeColorHandle();
+  }
+}
+
+function forceOutterCoords(ctrl: AnalyseCtrl, v: boolean) {
+  if (ctrl.data.pref.coords === Prefs.Coords.Inside) {
+    $('body').toggleClass('coords-out', v).toggleClass('coords-in', !v);
+    changeColorHandle();
+  }
+}
+
 function forceInnerCoords(ctrl: AnalyseCtrl, v: boolean) {
   if (ctrl.data.pref.coords === Prefs.Coords.Outside) {
     $('body').toggleClass('coords-in', v).toggleClass('coords-out', !v);
@@ -395,9 +409,28 @@ export default function (ctrl: AnalyseCtrl): VNode {
     playerBars = renderPlayerBars(ctrl),
     clocks = !playerBars && renderClocks(ctrl),
     gaugeOn = ctrl.showEvalGauge(),
-    needsInnerCoords = !!gaugeOn || !!playerBars,
-    tour = relayTour(ctrl),
-    variantKey = ctrl.data.game.variant.key;
+    variantKey = ctrl.data.game.variant.key,
+    needsInnerCoords =
+      ((!!gaugeOn || !!playerBars) &&
+        !['xiangqi', 'shogi', 'minixiangqi', 'minishogi', 'oware'].includes(variantKey)) ||
+      ['togyzkumalak', 'backgammon', 'nackgammon'].includes(variantKey),
+    needsOutterCoords =
+      [
+        'xiangqi',
+        'shogi',
+        'minixiangqi',
+        'minishogi',
+        'oware',
+        'flipello',
+        'flipello10',
+        'go9x9',
+        'go13x13',
+        'go19x19',
+      ].includes(variantKey) &&
+      !((!!gaugeOn || !!playerBars) && ['flipello', 'flipello10', 'go9x9', 'go13x13', 'go19x19'].includes(variantKey)),
+    needsNoCoords =
+      ['xiangqi', 'shogi', 'minixiangqi', 'minishogi'].includes(variantKey) && (!!gaugeOn || !!playerBars),
+    tour = relayTour(ctrl);
 
   let topScore = 0,
     bottomScore = 0;
@@ -447,31 +480,6 @@ export default function (ctrl: AnalyseCtrl): VNode {
       }
     }
   }
-  // fix coordinates for non-chess games to display them outside due to not working well displaying on board
-  if (
-    [
-      'xiangqi',
-      'shogi',
-      'minixiangqi',
-      'minishogi',
-      'flipello',
-      'flipello10',
-      'oware',
-      'go9x9',
-      'go13x13',
-      'go19x19',
-    ].includes(variantKey)
-  ) {
-    if (!$('body').hasClass('coords-no')) {
-      $('body').removeClass('coords-in').addClass('coords-out');
-    }
-  }
-  //Togyzkumalak and backgammon board always has coodinates on the inside
-  if (['togyzkumalak', 'backgammon', 'nackgammon'].includes(variantKey)) {
-    if (!$('body').hasClass('coords-no')) {
-      $('body').removeClass('coords-out').addClass('coords-in');
-    }
-  }
 
   //Add piece-letter class for games which dont want Noto Chess (font-famliy)
   const notationBasic = [
@@ -496,6 +504,8 @@ export default function (ctrl: AnalyseCtrl): VNode {
         insert: vn => {
           playstrategy.miniGame.initAll();
           forceInnerCoords(ctrl, needsInnerCoords);
+          forceOutterCoords(ctrl, needsOutterCoords);
+          if (needsNoCoords) forceNoCoords(ctrl);
           if (!!playerBars != $('body').hasClass('header-margin')) {
             requestAnimationFrame(() => {
               $('body').toggleClass('header-margin', !!playerBars);
@@ -506,6 +516,8 @@ export default function (ctrl: AnalyseCtrl): VNode {
         },
         update(_, _2) {
           forceInnerCoords(ctrl, needsInnerCoords);
+          forceOutterCoords(ctrl, needsOutterCoords);
+          if (needsNoCoords) forceNoCoords(ctrl);
         },
         postpatch(old, vnode) {
           if (old.data!.gaugeOn !== gaugeOn) document.body.dispatchEvent(new Event('chessground.resize'));
