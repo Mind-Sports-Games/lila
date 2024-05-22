@@ -40,6 +40,9 @@ $go-variants: ('go9x9', 'go13x13', 'go19x19');
   padding: 3px 0.3em;
   font-weight: bold;
   font-size: 1.5em;
+  @include breakpoint($mq-col1-uniboard) {
+    font-size: 4vw;
+  }
 }
 
 .variant-nackgammon .game-score::after,
@@ -270,7 +273,7 @@ $non-square-game-score-height-mobile-and-names: 18.5vw;
       grid-area: pocket-top;
       width: 100%;
       display: inline-flex;
-      padding: 0.5em;
+      padding: 0 0.5em;
       justify-content: space-around;
     }
   }
@@ -333,7 +336,7 @@ $backgammon-pocket-height: 6em;
       grid-area: pocket-top;
       width: 100%;
       display: inline-flex;
-      padding: 0.5em;
+      padding: 0 0.5em;
       justify-content: space-around;
     }
   }
