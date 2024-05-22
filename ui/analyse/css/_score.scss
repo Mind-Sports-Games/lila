@@ -276,6 +276,7 @@ $non-square-game-score-height-mobile-and-names: 18.5vw;
   }
 }
 
+$backgammon-pocket-height: 6em;
 .variant-nackgammon .game-score,
 .variant-backgammon .game-score {
   @extend %box-radius;
@@ -297,7 +298,6 @@ $non-square-game-score-height-mobile-and-names: 18.5vw;
 
   &-top {
     grid-area: pocket-top;
-    margin-top: 1em;
   }
 
   &-bottom {
@@ -341,70 +341,70 @@ $non-square-game-score-height-mobile-and-names: 18.5vw;
 
 @each $variant in $score-variants-square {
   .analyse.has-players.variant-#{$variant} {
-    grid-template-rows: $pocket-height-mobile-and-names auto auto 50vh;
+    grid-template-rows: $pocket-height-mobile-and-names auto auto minmax(20em, 30vh);
     grid-template-areas: 'pocket-top' 'board' 'controls' 'tools' 'side' 'acpl' 'under' 'chat' 'uchat';
 
     @include breakpoint($mq-col2) {
       grid-template-rows: $pocket-height auto $pocket-height;
-      grid-template-areas: 'board gauge pocket-top' 'board gauge tools' 'board gauge controls' 'under      .     acpl' 'under      .     side' 'chat       .     side' 'uchat      .     side';
+      grid-template-areas: 'board gauge pocket-top' 'board gauge tools' 'board gauge tools' 'under  .  controls' 'under      .     acpl' 'under      .     side' 'chat       .     side' 'uchat      .     side';
     }
 
     @include breakpoint($mq-col3) {
       grid-template-rows: $pocket-height $meta-height $chat-height $pocket-height;
-      grid-template-areas: 'side    . board gauge pocket-top' 'side    . board gauge tools' 'chat    . board gauge tools' 'chat    . board gauge controls' 'uchat   . under .     acpl';
+      grid-template-areas: 'side    . board gauge pocket-top' 'side    . board gauge tools' 'chat    . board gauge tools' 'chat    . board gauge tools' 'uchat   . under .     contorls' 'uchat   . under .     acpl';
     }
   }
 
   .analyse.variant-#{$variant} {
-    grid-template-rows: $pocket-height-mobile auto auto 50vh;
+    grid-template-rows: $pocket-height-mobile auto auto minmax(20em, 30vh);
     grid-template-areas: 'pocket-top' 'board' 'controls' 'tools' 'side' 'acpl' 'under' 'chat' 'uchat';
 
     @include breakpoint($mq-col2) {
       grid-template-rows: $pocket-height auto $pocket-height;
-      grid-template-areas: 'board gauge pocket-top' 'board gauge tools' 'board gauge controls' 'under      .     acpl' 'under      .     side' 'chat       .     side' 'uchat      .     side';
+      grid-template-areas: 'board gauge pocket-top' 'board gauge tools' 'board gauge tools' 'under  .  controls' 'under      .     acpl' 'under      .     side' 'chat       .     side' 'uchat      .     side';
     }
 
     @include breakpoint($mq-col3) {
       grid-template-rows: $pocket-height $meta-height $chat-height $pocket-height;
-      grid-template-areas: 'side    . board gauge pocket-top' 'side    . board gauge tools' 'chat    . board gauge tools' 'chat    . board gauge controls' 'uchat   . under .     acpl';
+      grid-template-areas: 'side    . board gauge pocket-top' 'side    . board gauge tools' 'chat    . board gauge tools' 'chat    . board gauge tools' 'uchat   . under .     contorls' 'uchat   . under .     acpl';
     }
   }
 }
 
 .analyse.has-players.variant-nackgammon,
 .analyse.has-players.variant-backgammon {
-  grid-template-rows: 23vw auto auto 50vh;
+  grid-template-rows: 23vw auto auto minmax(20em, 30vh);
   grid-template-areas: 'pocket-top' 'board' 'controls' 'tools' 'side' 'acpl' 'under' 'chat' 'uchat';
 
   @include breakpoint($mq-col2) {
-    grid-template-rows: $pocket-height auto $pocket-height;
+    grid-template-rows: $backgammon-pocket-height auto $backgammon-pocket-height;
     grid-template-areas: 'board      gauge pocket-top' 'board      gauge tools' 'board      gauge pocket-bot' 'under      .     controls' 'under      .     acpl' 'under      .     side' 'chat       .     side' 'uchat      .     side';
   }
 
   @include breakpoint($mq-col3) {
-    grid-template-rows: $pocket-height $meta-height $chat-height $pocket-height;
+    grid-template-rows: $backgammon-pocket-height $meta-height $chat-height $backgammon-pocket-height;
     grid-template-areas: 'side    . board gauge pocket-top' 'side    . board gauge tools' 'chat    . board gauge tools' 'chat    . board gauge pocket-bot' 'uchat   . under .     controls' 'uchat   . under .     acpl';
   }
 }
 
 .analyse.variant-nackgammon,
 .analyse.variant-backgammon {
-  grid-template-rows: 18vw auto auto 50vh;
+  grid-template-rows: 18vw auto auto minmax(20em, 30vh);
   grid-template-areas: 'pocket-top' 'board' 'controls' 'tools' 'side' 'acpl' 'under' 'chat' 'uchat';
 
   @include breakpoint($mq-col2) {
-    grid-template-rows: $pocket-height auto $pocket-height;
+    grid-template-rows: $backgammon-pocket-height auto $backgammon-pocket-height;
     grid-template-areas: 'board      gauge pocket-top' 'board      gauge tools' 'board      gauge pocket-bot' 'under      .     controls' 'under      .     acpl' 'under      .     side' 'chat       .     side' 'uchat      .     side';
   }
 
   @include breakpoint($mq-col3) {
-    grid-template-rows: $pocket-height $meta-height $chat-height $pocket-height;
+    grid-template-rows: $backgammon-pocket-height $meta-height $chat-height $backgammon-pocket-height;
     grid-template-areas: 'side    . board gauge pocket-top' 'side    . board gauge tools' 'chat    . board gauge tools' 'chat    . board gauge pocket-bot' 'uchat   . under .     controls' 'uchat   . under .     acpl';
   }
 }
 
 .analyse.has-players.variant-togyzkumalak {
-  grid-template-rows: $non-square-game-score-height-mobile-and-names auto auto 50vh;
+  grid-template-rows: $non-square-game-score-height-mobile-and-names auto auto minmax(20em, 30vh);
   grid-template-areas: 'pocket-top' 'board' 'controls' 'tools' 'side' 'acpl' 'under' 'chat' 'uchat';
 
   @include breakpoint($mq-col2) {
@@ -419,7 +419,7 @@ $non-square-game-score-height-mobile-and-names: 18.5vw;
 }
 
 .analyse.variant-togyzkumalak {
-  grid-template-rows: $non-square-game-score-height-mobile auto auto 50vh;
+  grid-template-rows: $non-square-game-score-height-mobile auto auto minmax(20em, 30vh);
   grid-template-areas: 'pocket-top' 'board' 'controls' 'tools' 'side' 'acpl' 'under' 'chat' 'uchat';
 
   @include breakpoint($mq-col2) {
