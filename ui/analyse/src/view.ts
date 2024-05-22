@@ -378,16 +378,18 @@ function renderPlayerScoreNames(ctrl: AnalyseCtrl): VNode | undefined {
   const children: VNode[] = [];
   const study = ctrl.study;
   let playerNames = { p1: 'Player 1', p2: 'player 2' };
+  const p1player = ctrl.data.player.playerIndex === 'p1' ? ctrl.data.player : ctrl.data.opponent;
+  const p2player = ctrl.data.player.playerIndex === 'p2' ? ctrl.data.player : ctrl.data.opponent;
   if (study !== undefined) {
     const tags = study.data.chapter.tags;
     playerNames = {
-      p1: findTag(tags, 'p1') ?? ctrl.data.player.playerName,
-      p2: findTag(tags, 'p2') ?? ctrl.data.opponent.playerName,
+      p1: findTag(tags, 'p1') ?? p1player.playerName,
+      p2: findTag(tags, 'p2') ?? p2player.playerName,
     };
   } else {
     playerNames = {
-      p1: ctrl.data.player.user ? ctrl.data.player.user.id : ctrl.data.player.playerName,
-      p2: ctrl.data.opponent.user ? ctrl.data.opponent.user.id : ctrl.data.opponent.playerName,
+      p1: p1player.user ? p1player.user.username : p1player.playerName,
+      p2: p2player.user ? p2player.user.username : p2player.playerName,
     };
   }
 
