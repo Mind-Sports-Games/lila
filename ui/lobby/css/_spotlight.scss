@@ -81,7 +81,7 @@
       box-shadow: $spotlight-box-shadow;
       color: $spotlight-color;
       i.img::before {
-        color: $c-link;
+        color: $spotlight-icon-color;
       }
 
       %ribbon {
@@ -102,7 +102,7 @@
       box-shadow: $spotlight-box-shadow-black;
       color: $spotlight-color-black;
       i.img::before {
-        color: $c-color-choice-black;
+        color: $spotlight-icon-color-black;
       }
 
       %ribbon {
@@ -123,7 +123,7 @@
       box-shadow: $spotlight-box-shadow-blue;
       color: $spotlight-color-blue;
       i.img::before {
-        color: $c-color-choice-blue;
+        color: $spotlight-icon-color-blue;
       }
 
       %ribbon {
@@ -144,7 +144,7 @@
       box-shadow: $spotlight-box-shadow-green;
       color: $spotlight-color-green;
       i.img::before {
-        color: $c-color-choice-green;
+        color: $spotlight-icon-color-green;
       }
 
       %ribbon {
@@ -165,7 +165,7 @@
       box-shadow: $spotlight-box-shadow-red;
       color: $spotlight-color-red;
       i.img::before {
-        color: $c-color-choice-red;
+        color: $spotlight-icon-color-red;
       }
 
       %ribbon {
@@ -186,7 +186,7 @@
       box-shadow: $spotlight-box-shadow-yellow;
       color: $spotlight-color-yellow;
       i.img::before {
-        color: $c-color-choice-yellow;
+        color: $spotlight-icon-color-yellow;
       }
 
       %ribbon {
