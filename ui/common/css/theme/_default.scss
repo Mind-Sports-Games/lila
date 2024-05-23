@@ -146,3 +146,41 @@ $border: $border-width $border-style $c-border;
 $box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 3px 1px -2px rgba(0, 0, 0, 0.2), 0 1px 5px 0 rgba(0, 0, 0, 0.12);
 
 // $box-shadow: 0 2px 2px 0 rgba(0,0,0,.157);
+
+/* lobby highlighted events */
+$spotlight-box-shadow: inset -1px -1px 15px -1px $c-link;
+$spotlight-box-shadow-black: inset -1px -1px 15px -1px $c-link;
+$spotlight-box-shadow-blue: inset -1px -1px 15px -1px $c-link;
+$spotlight-box-shadow-green: inset -1px -1px 15px -1px $c-link;
+$spotlight-box-shadow-red: inset -1px -1px 15px -1px $c-link;
+$spotlight-box-shadow-yellow: inset -1px -1px 15px -1px $c-link;
+
+$spotlight-color: $c-font;
+$spotlight-color-black: $c-font;
+$spotlight-color-blue: $c-font;
+$spotlight-color-green: $c-font;
+$spotlight-color-red: $c-font;
+$spotlight-color-yellow: $c-font;
+
+$spotlight-icon-color: white;
+$spotlight-icon-color-black: white;
+$spotlight-icon-color-blue: white;
+$spotlight-icon-color-green: white;
+$spotlight-icon-color-red: white;
+$spotlight-icon-color-yellow: white;
+
+$spotlight-ribbon-color: $c-link;
+$spotlight-ribbon-color-black: $c-color-choice-black;
+$spotlight-ribbon-color-blue: $c-link;
+$spotlight-ribbon-color-green: $c-color-choice-green;
+$spotlight-ribbon-color-red: $c-color-choice-red;
+$spotlight-ribbon-color-yellow: $c-color-choice-yellow;
+
+$spotlight-ribbon-inner-side-color: $c-link-dim;
+$spotlight-ribbon-inner-side-color-black: $c-color-choice-black-dim;
+$spotlight-ribbon-inner-side-color-blue: $c-link-dim;
+$spotlight-ribbon-inner-side-color-green: $c-color-choice-green-dim;
+$spotlight-ribbon-inner-side-color-red: $c-color-choice-red-dim;
+$spotlight-ribbon-inner-side-color-yellow: $c-color-choice-yellow-dim;
+
+$spotlight-ribbon-text-color: white;
