@@ -225,9 +225,18 @@ body.backgammon-contemporary .variant-backgammon .game-score {
 // 2. move scores on the left of user nickname and adjust nicknames position
 @each $variant in append($go-variants, $flipello-variants) {
   .variant-#{$variant} {
-    .game-score {
-      @include breakpoint($mq-col1-phone) {
-        transform: scale(0.6);
+    @include breakpoint($mq-col1-uniboard, $mq-col1-phone) {
+      .game-score {
+        transform: scale(0.4);
+
+        piece::after {
+          font-size: 2em;
+        }
+
+        &-bottom {
+          grid-area: user-bot;
+          margin-top: -8vmin;
+        }
 
         &-names {
           display: none;
@@ -236,24 +245,21 @@ body.backgammon-contemporary .variant-backgammon .game-score {
         &-top {
           grid-area: user-top;
           margin-left: 0;
-          width: 20%;
-          padding-top: 20%;
-          margin-top: -5%;
+          margin-top: -6vmin;
         }
-        &-bottom {
-          grid-area: user-bot;
-          margin-top: -8%;
-          width: 20%;
-          padding-top: 20%;
-        }
+      }
+
+      .ruser {
+        font-size: 1em;
+        margin-left: 16%;
       }
     }
 
-    .ruser {
-      font-size: 1em;
-      margin-left: 16%;
-      &-bottom {
-        margin-bottom: -10px;
+    @include breakpoint($mq-col1-phone) {
+      .game-score {
+        &-top {
+          margin-top: -3vmin;
+        }
       }
     }
   }
