@@ -214,36 +214,47 @@ $pocket-col1-size: 9.5vw;
 
 //togyzkumalak and backgammon (large score) layout different
 .analyse.variant-nackgammon,
-.analyse.variant-backgammon,
-.analyse.variant-togyzkumalak {
+.analyse.variant-backgammon {
   grid-template-rows: $pocket-col1-size auto 3rem $pocket-col1-size;
   grid-template-areas: 'board pocket-top' 'board tools' 'board controls' 'board pocket-bot';
+}
+
+$pocket-height-togy: 14vh;
+.analyse.variant-togyzkumalak {
+  grid-template-rows: $pocket-height-togy auto calc(#{$pocket-height-togy} - 3rem) 3rem;
+  grid-template-areas: 'pocket-top tools' 'board tools' 'pocket-bot tools' 'pocket-bot controls';
+  grid-template-columns: minmax(150px, calc(59vw - 2.5rem)) minmax(150px, 1fr);
+}
+
+.variant-togyzkumalak .analyse__board {
+  margin-top: 0px;
+  margin-bottom: 0px;
 }
 
 .variant-togyzkumalak .game-score {
   @extend %box-radius;
   display: block;
-  width: calc(#{$pocket-col1-size} * 4);
-  height: $pocket-col1-size;
+  width: calc(#{$pocket-height-togy} * 4);
+  height: $pocket-height-togy;
   background-color: #aaa;
 
   piece.part1 {
     display: block;
-    width: calc(#{$pocket-col1-size} * 1.11) !important;
-    height: calc(#{$pocket-col1-size} * 2.22) !important;
+    width: calc(#{$pocket-height-togy} * 1.11) !important;
+    height: calc(#{$pocket-height-togy} * 2.22) !important;
     position: relative;
-    margin-top: -4.8vw !important;
-    margin-left: calc(#{$pocket-col1-size} * 1.11 * 0.5) !important;
+    margin-top: calc(#{$pocket-height-togy} * -0.5) !important;
+    margin-left: calc(#{$pocket-height-togy} * 1.11 * 0.5) !important;
     transform: rotate(270deg);
   }
 
   piece.part2 {
     display: block;
-    width: calc(#{$pocket-col1-size} * 1.11) !important;
-    height: calc(#{$pocket-col1-size} * 2.22) !important;
+    width: calc(#{$pocket-height-togy} * 1.11) !important;
+    height: calc(#{$pocket-height-togy} * 2.22) !important;
     position: relative;
-    margin-top: calc(#{$pocket-col1-size} * -2.22) !important;
-    margin-left: calc(#{$pocket-col1-size} * 2.25) !important;
+    margin-top: calc(#{$pocket-height-togy} * -2.22) !important;
+    margin-left: calc(#{$pocket-height-togy} * 2.25) !important;
     transform: rotate(270deg);
   }
 
@@ -264,8 +275,8 @@ $pocket-col1-size: 9.5vw;
   @extend %active, %box-radius;
 
   content: attr(data-score);
-  top: calc(#{$pocket-col1-size} * -1.6);
-  right: calc(#{$pocket-col1-size} * -3.76);
+  top: calc(#{$pocket-height-togy} * -1.6);
+  right: calc(#{$pocket-height-togy} * -3.76);
   position: relative;
   line-height: 0.9em;
   padding: 3px 0.3em;
