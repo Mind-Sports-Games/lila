@@ -227,7 +227,7 @@ $pocket-height-togy: 14vh;
 }
 
 .variant-togyzkumalak .analyse__board {
-  margin-top: 0px;
+  margin-top: -43%;
   margin-bottom: 0px;
 }
 
@@ -329,6 +329,21 @@ $pocket-height-togy: 14vh;
 
   &-names {
     display: none;
+  }
+}
+
+//just for oware and togy due to different score layout and board size
+.variant-togyzkumalak,
+.variant-oware {
+  .game-score-player-name {
+    padding-left: calc(#{$pocket-height-togy} * 4 * 1.15);
+    padding-top: 4vh;
+    &.top {
+      grid-area: pocket-top;
+    }
+    &.bottom {
+      grid-area: pocket-bot;
+    }
   }
 }
 

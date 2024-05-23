@@ -1162,17 +1162,6 @@ cg-container .cg-custom-svgs svg {
   }
 }
 
-.variant-togyzkumalak .analyse__board {
-  padding-bottom: calc(365.555 * 100% / 640);
-  margin-top: calc(106.666 * 100% / 640);
-  margin-bottom: calc(106.666 * 100% / 640);
-
-  @include breakpoint($mq-col1-uniboard) {
-    margin-top: 5px;
-    margin-bottom: 5px;
-  }
-}
-
 .variant-nackgammon,
 .variant-backgammon {
   &.orientation-p1,

@@ -393,10 +393,41 @@ function renderPlayerScoreNames(ctrl: AnalyseCtrl): VNode | undefined {
     };
   }
 
-  children.push(h('div.game-score-name.p1.text', playerNames.p1));
+  if (p1player.user) {
+    children.push(
+      h(
+        'div.game-score-name.p1.text.player',
+        h('a.user-link.ulpt', { attrs: { href: `/@/${p1player.user.id}` } }, playerNames.p1)
+      )
+    );
+  } else {
+    children.push(h('div.game-score-name.p1.text', playerNames.p1));
+  }
   children.push(h('div.game-score-name.vs.text', 'vs'));
-  children.push(h('div.game-score-name.p2.text', playerNames.p2));
+  if (p2player.user) {
+    children.push(
+      h(
+        'div.game-score-name.p2.text.player',
+        h('a.user-link.ulpt', { attrs: { href: `/@/${p2player.user.id}` } }, playerNames.p2)
+      )
+    );
+  } else {
+    children.push(h('div.game-score-name.p2.text', playerNames.p2));
+  }
   return h('div.game-score-names', children);
+}
+
+function renderPlayerName(ctrl: AnalyseCtrl, position: Position): VNode | undefined {
+  const playerIndex = position === 'top' ? ctrl.topPlayerIndex() : ctrl.bottomPlayerIndex();
+  const player = ctrl.data.player.playerIndex === playerIndex ? ctrl.data.player : ctrl.data.opponent;
+  if (player.user)
+    return h(
+      `div.game-score-player-name.${playerIndex}.text.${position}`,
+      h('a.user-link.ulpt', { attrs: { href: `/@/${player.user.id}` } }, player.user.username)
+    );
+  else {
+    return h(`div.game-score-player-name.${playerIndex}.text.${position}`, player.playerName);
+  }
 }
 
 export default function (ctrl: AnalyseCtrl): VNode {
@@ -412,6 +443,7 @@ export default function (ctrl: AnalyseCtrl): VNode {
     clocks = !playerBars && renderClocks(ctrl),
     gaugeOn = ctrl.showEvalGauge(),
     variantKey = ctrl.data.game.variant.key,
+    needsUserNameWithScore = ['togyzkumalak', 'oware'].includes(variantKey),
     needsInnerCoords =
       ((!!gaugeOn || !!playerBars) &&
         !['xiangqi', 'shogi', 'minixiangqi', 'minishogi', 'oware'].includes(variantKey)) ||
@@ -557,10 +589,9 @@ export default function (ctrl: AnalyseCtrl): VNode {
           ]
         ),
       gaugeOn && !tour ? cevalView.renderGauge(ctrl) : null,
-      menuIsOpen || tour || !ctrl.data.hasGameScore
-        ? null
-        : renderPlayerScore(topScore, 'top', ctrl.topPlayerIndex(), variantKey),
-      menuIsOpen || tour || !ctrl.data.hasGameScore ? null : renderPlayerScoreNames(ctrl),
+      tour || !ctrl.data.hasGameScore ? null : renderPlayerScore(topScore, 'top', ctrl.topPlayerIndex(), variantKey),
+      tour || !needsUserNameWithScore ? null : renderPlayerName(ctrl, 'top'),
+      tour || !ctrl.data.hasGameScore ? null : renderPlayerScoreNames(ctrl),
       menuIsOpen || tour ? null : crazyView(ctrl, ctrl.topPlayerIndex(), 'top'),
       gamebookPlayView ||
         (tour
@@ -578,9 +609,10 @@ export default function (ctrl: AnalyseCtrl): VNode {
                     retroView(ctrl) || practiceView(ctrl) || explorerView(ctrl),
                   ]),
             ])),
-      menuIsOpen || tour || !ctrl.data.hasGameScore
+      tour || !ctrl.data.hasGameScore
         ? null
         : renderPlayerScore(bottomScore, 'bottom', ctrl.bottomPlayerIndex(), variantKey),
+      tour || !needsUserNameWithScore ? null : renderPlayerName(ctrl, 'bottom'),
       menuIsOpen || tour ? null : crazyView(ctrl, ctrl.bottomPlayerIndex(), 'bottom'),
       gamebookPlayView || tour ? null : controls(ctrl),
       ctrl.embed || tour
