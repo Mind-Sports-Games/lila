@@ -117,6 +117,20 @@ $spotlight-icon-color-green: $c-color-choice-green;
 $spotlight-icon-color-red: $c-color-choice-red;
 $spotlight-icon-color-yellow: $c-color-choice-yellow;
 
+$spotlight-ribbon-color: $c-link;
+$spotlight-ribbon-color-black: $c-color-choice-black;
+$spotlight-ribbon-color-blue: $c-color-choice-blue;
+$spotlight-ribbon-color-green: $c-color-choice-green;
+$spotlight-ribbon-color-red: $c-color-choice-red;
+$spotlight-ribbon-color-yellow: $c-color-choice-yellow;
+
+$spotlight-ribbon-inner-side-color: $c-link-dim;
+$spotlight-ribbon-inner-side-color-black: $c-color-choice-black-dim;
+$spotlight-ribbon-inner-side-color-blue: $c-color-choice-blue-dim;
+$spotlight-ribbon-inner-side-color-green: $c-color-choice-green-dim;
+$spotlight-ribbon-inner-side-color-red: $c-color-choice-red-dim;
+$spotlight-ribbon-inner-side-color-yellow: $c-color-choice-yellow-dim;
+
 $spotlight-ribbon-text-color: black;
 
 @mixin metal-bg {
