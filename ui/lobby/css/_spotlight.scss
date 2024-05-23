@@ -86,12 +86,12 @@
 
       %ribbon {
         span {
-          background-color: $c-link;
+          background-color: $spotlight-ribbon-color;
           color: $spotlight-ribbon-text-color;
         }
         &::before,
         &::after {
-          border-color: $c-link-dim;
+          border-color: $spotlight-ribbon-inner-side-color;
           border-right-color: transparent;
           border-top-color: transparent;
         }
@@ -107,12 +107,12 @@
 
       %ribbon {
         span {
-          background-color: $c-color-choice-black;
+          background-color: $spotlight-ribbon-color-black;
           color: $spotlight-ribbon-text-color;
         }
         &::before,
         &::after {
-          border-color: $c-color-choice-black-dim;
+          border-color: $spotlight-ribbon-inner-side-color-black;
           border-right-color: transparent;
           border-top-color: transparent;
         }
@@ -128,12 +128,12 @@
 
       %ribbon {
         span {
-          background-color: $c-link;
+          background-color: $spotlight-ribbon-color-blue;
           color: $spotlight-ribbon-text-color;
         }
         &::before,
         &::after {
-          border-color: $c-link-dim;
+          border-color: $spotlight-ribbon-inner-side-color-blue;
           border-right-color: transparent;
           border-top-color: transparent;
         }
@@ -149,12 +149,12 @@
 
       %ribbon {
         span {
-          background-color: $c-color-choice-green;
+          background-color: $spotlight-ribbon-color-green;
           color: $spotlight-ribbon-text-color;
         }
         &::before,
         &::after {
-          border-color: $c-color-choice-green-dim;
+          border-color: $spotlight-ribbon-inner-side-color-green;
           border-right-color: transparent;
           border-top-color: transparent;
         }
@@ -170,12 +170,12 @@
 
       %ribbon {
         span {
-          background-color: $c-color-choice-red;
+          background-color: $spotlight-ribbon-color-red;
           color: $spotlight-ribbon-text-color;
         }
         &::before,
         &::after {
-          border-color: $c-color-choice-red-dim;
+          border-color: $spotlight-ribbon-inner-side-color-red;
           border-right-color: transparent;
           border-top-color: transparent;
         }
@@ -191,12 +191,12 @@
 
       %ribbon {
         span {
-          background-color: $c-color-choice-yellow;
+          background-color: $spotlight-ribbon-color-yellow;
           color: $spotlight-ribbon-text-color;
         }
         &::before,
         &::after {
-          border-color: $c-color-choice-yellow-dim;
+          border-color: $spotlight-ribbon-inner-side-color-yellow;
           border-right-color: transparent;
           border-top-color: transparent;
         }
