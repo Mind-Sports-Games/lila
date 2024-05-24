@@ -235,7 +235,7 @@ body.backgammon-contemporary .variant-backgammon .game-score {
 
         &-bottom {
           grid-area: user-bot;
-          margin-top: -8vmin;
+          margin-top: -4vh;
         }
 
         &-names {
@@ -245,7 +245,7 @@ body.backgammon-contemporary .variant-backgammon .game-score {
         &-top {
           grid-area: user-top;
           margin-left: 0;
-          margin-top: -6vmin;
+          margin-top: -4vh;
         }
       }
 
@@ -258,7 +258,7 @@ body.backgammon-contemporary .variant-backgammon .game-score {
     @include breakpoint($mq-col1-phone) {
       .game-score {
         &-top {
-          margin-top: -3vmin;
+          margin-top: -2vh;
         }
       }
     }
