@@ -12,7 +12,7 @@
   }
 
   display: grid;
-  grid-template-columns: minmax(200px, calc(100vh - 2.5rem)) minmax(200px, 1fr);
+  grid-template-columns: minmax(150px, calc(100vh - 2.5rem)) minmax(150px, 1fr);
   grid-template-rows: auto 3rem;
   grid-template-areas: 'board tools' 'board controls';
 }
@@ -44,8 +44,8 @@
   grid-template-areas: 'board pocket-top' 'board tools' 'board controls' 'board pocket-bot';
 }
 
-//score for games (togyzkumalak has own layout below)
-$score-variants: ('flipello', 'flipello10', 'oware', 'go9x9', 'go13x13', 'go19x19');
+//score for games (togyzkumalak and Oware has own layout below)
+$score-variants: ('flipello', 'flipello10', 'go9x9', 'go13x13', 'go19x19');
 $go-variants: ('go9x9', 'go13x13', 'go19x19');
 
 body.oware-light-wood .variant-oware .game-score {
@@ -68,29 +68,41 @@ body.togyzkumalak-wood .variant-togyzkumalak .game-score {
   background-size: cover;
 }
 
+body.backgammon-classic .variant-nackgammon .game-score,
+body.backgammon-classic .variant-backgammon .game-score {
+  background: url(../images/board/backgammon/svg/backgammon_classic_house.svg);
+  background-size: cover;
+}
+
+body.backgammon-contemporary .variant-nackgammon .game-score,
+body.backgammon-contemporary .variant-backgammon .game-score {
+  background: url(../images/board/backgammon/svg/backgammon_contemporary_house.svg);
+  background-size: cover;
+}
+
 @each $variant in $go-variants {
-  body.go-light-wood .variant-#{$variant} .game-score.game-score-top {
+  body.go-light-wood .variant-#{$variant} .game-score.p2 {
     background: url(../images/board/go/svg/go_pot_white_light.svg);
     background-size: cover;
   }
 
-  body.go-light-wood .variant-#{$variant} .game-score.game-score-bottom {
+  body.go-light-wood .variant-#{$variant} .game-score.p1 {
     background: url(../images/board/go/svg/go_pot_black_light.svg);
     background-size: cover;
   }
 
-  body.go-dark-wood .variant-#{$variant} .game-score.game-score-top {
+  body.go-dark-wood .variant-#{$variant} .game-score.p2 {
     background: url(../images/board/go/svg/go_pot_white_dark.svg);
     background-size: cover;
   }
 
-  body.go-dark-wood .variant-#{$variant} .game-score.game-score-bottom {
+  body.go-dark-wood .variant-#{$variant} .game-score.p1 {
     background: url(../images/board/go/svg/go_pot_black_dark.svg);
     background-size: cover;
   }
 }
 
-$pocket-col1-size: 5rem;
+$pocket-col1-size: 9.5vw;
 @each $variant in $score-variants {
   .analyse.variant-#{$variant} {
     grid-template-rows: $pocket-col1-size auto 3rem;
@@ -111,13 +123,72 @@ $pocket-col1-size: 5rem;
       position: relative;
     }
 
-    &-top {
+    &-top.p1 {
       grid-area: pocket-top;
     }
 
-    &-bottom {
+    &-top.p2 {
       grid-area: pocket-top;
       margin-left: calc(100% - #{$pocket-col1-size});
+    }
+
+    &-names {
+      grid-area: pocket-top;
+      width: calc(100% - 2 * #{$pocket-col1-size});
+      margin-left: $pocket-col1-size;
+      display: grid;
+      padding: 0.5vw;
+      align-content: space-between;
+      .p2 {
+        justify-self: right;
+      }
+      .vs {
+        display: none; // to support mobile
+      }
+    }
+  }
+}
+
+.analyse.variant-oware {
+  grid-template-rows: $pocket-col1-size auto 3em;
+  grid-template-areas: 'board pocket-top' 'board tools' 'board controls';
+}
+
+.variant-oware .game-score {
+  @extend %box-radius;
+  display: block;
+  width: $pocket-col1-size;
+  height: $pocket-col1-size;
+  background-color: #aaa;
+
+  piece {
+    display: block;
+    width: 100% !important;
+    height: 100% !important;
+    position: relative;
+  }
+
+  &-top.p1 {
+    grid-area: pocket-top;
+  }
+
+  &-top.p2 {
+    grid-area: pocket-top;
+    margin-left: calc(100% - #{$pocket-col1-size});
+  }
+
+  &-names {
+    grid-area: pocket-top;
+    width: calc(100% - 2 * #{$pocket-col1-size});
+    margin-left: $pocket-col1-size;
+    display: grid;
+    padding: 0.5vw;
+    align-content: space-between;
+    .p2 {
+      justify-self: right;
+    }
+    .vs {
+      display: none; // to support mobile
     }
   }
 }
@@ -141,36 +212,38 @@ $pocket-col1-size: 5rem;
   }
 }
 
-//togyzkumalak layout different
+//togyzkumalak and backgammon (large score) layout different
+.analyse.variant-nackgammon,
+.analyse.variant-backgammon,
 .analyse.variant-togyzkumalak {
-  grid-template-rows: 4.5rem auto 3rem 4.5rem;
+  grid-template-rows: $pocket-col1-size auto 3rem $pocket-col1-size;
   grid-template-areas: 'board pocket-top' 'board tools' 'board controls' 'board pocket-bot';
 }
 
 .variant-togyzkumalak .game-score {
   @extend %box-radius;
   display: block;
-  width: 17.8em;
-  height: 4.5em;
+  width: calc(#{$pocket-col1-size} * 4);
+  height: $pocket-col1-size;
   background-color: #aaa;
 
   piece.part1 {
     display: block;
-    width: 5em !important;
-    height: 10em !important;
+    width: calc(#{$pocket-col1-size} * 1.11) !important;
+    height: calc(#{$pocket-col1-size} * 2.22) !important;
     position: relative;
-    margin-top: -2.2em !important;
-    margin-left: 2.5em !important;
+    margin-top: -4.8vw !important;
+    margin-left: calc(#{$pocket-col1-size} * 1.11 * 0.5) !important;
     transform: rotate(270deg);
   }
 
   piece.part2 {
     display: block;
-    width: 5em !important;
-    height: 10em !important;
+    width: calc(#{$pocket-col1-size} * 1.11) !important;
+    height: calc(#{$pocket-col1-size} * 2.22) !important;
     position: relative;
-    margin-top: -10em !important;
-    margin-left: 10.1em !important;
+    margin-top: calc(#{$pocket-col1-size} * -2.22) !important;
+    margin-left: calc(#{$pocket-col1-size} * 2.25) !important;
     transform: rotate(270deg);
   }
 
@@ -181,19 +254,71 @@ $pocket-col1-size: 5rem;
   &-bottom {
     grid-area: pocket-bot;
   }
+
+  &-names {
+    display: none;
+  }
 }
 
 .variant-togyzkumalak .game-score::after {
   @extend %active, %box-radius;
 
   content: attr(data-score);
-  top: -4.8em;
-  right: -10.7em;
+  top: calc(#{$pocket-col1-size} * -1.6);
+  right: calc(#{$pocket-col1-size} * -3.76);
   position: relative;
   line-height: 0.9em;
   padding: 3px 0.3em;
   font-weight: bold;
   font-size: 1.5em;
+}
+
+.variant-nackgammon .game-score::after,
+.variant-backgammon .game-score::after {
+  @extend %active, %box-radius;
+
+  content: attr(data-score);
+  top: 0;
+  right: 0;
+  height: fit-content;
+  margin-left: auto;
+  position: relative;
+  line-height: 0.9em;
+  padding: 3px 0.3em;
+  font-weight: bold;
+  font-size: 1.5em;
+}
+
+.variant-nackgammon .game-score,
+.variant-backgammon .game-score {
+  @extend %box-radius;
+  display: flex;
+  width: calc(#{$pocket-col1-size} * 3);
+  height: $pocket-col1-size;
+  gap: 0.13em;
+  background-color: #aaa;
+
+  piece {
+    width: 1em !important;
+    height: 4.7em !important;
+    position: relative;
+    margin-top: 0.65em !important;
+    &.first {
+      margin-left: 0.65em;
+    }
+  }
+
+  &-top {
+    grid-area: pocket-top;
+  }
+
+  &-bottom {
+    grid-area: pocket-bot;
+  }
+
+  &-names {
+    display: none;
+  }
 }
 
 //taller than wider board (e.g. xiangqi) undo some css
