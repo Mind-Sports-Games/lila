@@ -227,7 +227,10 @@ body.backgammon-contemporary .variant-backgammon .game-score {
   .variant-#{$variant} {
     @include breakpoint($mq-col1-uniboard, $mq-col1-phone) {
       .game-score {
-        transform: scale(0.4);
+        width: 3%;
+        padding-top: 8%;
+        padding-left: 8%;
+        margin-bottom: 8%;
 
         piece::after {
           font-size: 2em;
@@ -235,7 +238,7 @@ body.backgammon-contemporary .variant-backgammon .game-score {
 
         &-bottom {
           grid-area: user-bot;
-          margin-top: -4vh;
+          margin-top: -1vh;
         }
 
         &-names {
@@ -245,7 +248,6 @@ body.backgammon-contemporary .variant-backgammon .game-score {
         &-top {
           grid-area: user-top;
           margin-left: 0;
-          margin-top: -4vh;
         }
       }
 
@@ -257,8 +259,11 @@ body.backgammon-contemporary .variant-backgammon .game-score {
 
     @include breakpoint($mq-col1-phone) {
       .game-score {
+        piece::after {
+          font-size: 1.1em;
+        }
         &-top {
-          margin-top: -2vh;
+          margin-top: 1vh;
         }
       }
     }
