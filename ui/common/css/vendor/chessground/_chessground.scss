@@ -1151,17 +1151,6 @@ cg-container .cg-custom-svgs svg {
   padding-bottom: calc(640 * 100% / 576);
 }
 
-.variant-oware .analyse__board {
-  padding-bottom: calc(213.333 * 100% / 640);
-  margin-top: calc(213.333 * 100% / 640);
-  margin-bottom: calc(213.333 * 100% / 640);
-
-  @include breakpoint($mq-col1-uniboard) {
-    margin-top: 5px;
-    margin-bottom: 5px;
-  }
-}
-
 .variant-nackgammon,
 .variant-backgammon {
   &.orientation-p1,

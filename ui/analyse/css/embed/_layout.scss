@@ -149,16 +149,23 @@ $pocket-col1-size: 9.5vw;
   }
 }
 
+$pocket-height-oware: 14vh;
 .analyse.variant-oware {
-  grid-template-rows: $pocket-col1-size auto 3em;
-  grid-template-areas: 'board pocket-top' 'board tools' 'board controls';
+  grid-template-rows: $pocket-height-oware auto calc(#{$pocket-height-oware} - 3rem) 3rem;
+  grid-template-areas: 'pocket-top tools' 'board tools' 'pocket-bot tools' 'pocket-bot controls';
+  grid-template-columns: minmax(150px, calc(59vw - 2.5rem)) minmax(150px, 1fr);
+}
+
+.variant-oware .analyse__board {
+  margin-top: -60%;
+  margin-bottom: 7%;
 }
 
 .variant-oware .game-score {
   @extend %box-radius;
   display: block;
-  width: $pocket-col1-size;
-  height: $pocket-col1-size;
+  width: $pocket-height-oware;
+  height: $pocket-height-oware;
   background-color: #aaa;
 
   piece {
@@ -168,28 +175,16 @@ $pocket-col1-size: 9.5vw;
     position: relative;
   }
 
-  &-top.p1 {
+  &-top {
     grid-area: pocket-top;
   }
 
-  &-top.p2 {
-    grid-area: pocket-top;
-    margin-left: calc(100% - #{$pocket-col1-size});
+  &-bottom {
+    grid-area: pocket-bot;
   }
 
   &-names {
-    grid-area: pocket-top;
-    width: calc(100% - 2 * #{$pocket-col1-size});
-    margin-left: $pocket-col1-size;
-    display: grid;
-    padding: 0.5vw;
-    align-content: space-between;
-    .p2 {
-      justify-self: right;
-    }
-    .vs {
-      display: none; // to support mobile
-    }
+    display: none;
   }
 }
 
@@ -333,17 +328,25 @@ $pocket-height-togy: 14vh;
 }
 
 //just for oware and togy due to different score layout and board size
-.variant-togyzkumalak,
-.variant-oware {
-  .game-score-player-name {
-    padding-left: calc(#{$pocket-height-togy} * 4 * 1.15);
-    padding-top: 4vh;
-    &.top {
-      grid-area: pocket-top;
-    }
-    &.bottom {
-      grid-area: pocket-bot;
-    }
+.variant-togyzkumalak .game-score-player-name {
+  padding-left: calc(#{$pocket-height-togy} * 4 * 1.15);
+  padding-top: 4vh;
+  &.top {
+    grid-area: pocket-top;
+  }
+  &.bottom {
+    grid-area: pocket-bot;
+  }
+}
+
+.variant-oware .game-score-player-name {
+  padding-left: calc(#{$pocket-height-oware} * 1.15);
+  padding-top: 4vh;
+  &.top {
+    grid-area: pocket-top;
+  }
+  &.bottom {
+    grid-area: pocket-bot;
   }
 }
 

@@ -366,9 +366,13 @@ function renderPlayerScore(
       children.push(h('piece.side-piece.' + playerIndex + (i === 0 ? ' first' : '')));
     }
     return h('div.game-score.game-score-' + position, { attrs: { 'data-score': score } }, children);
+  } else if (variantKey === 'oware') {
+    const pieceClass = `piece.${defaultMancalaRole}${score.toString()}-piece.`;
+    children.push(h(pieceClass + playerIndex, { attrs: { 'data-score': score } }));
+    return h('div.game-score.game-score-' + position + '.' + playerIndex, children);
   } else {
-    const pieceClass =
-      variantKey === 'oware' ? `piece.${defaultMancalaRole}${score.toString()}-piece.` : 'piece.p-piece.';
+    //filpello variants
+    const pieceClass = 'piece.p-piece.';
     children.push(h(pieceClass + playerIndex, { attrs: { 'data-score': score } }));
     return h('div.game-score.game-score-top' + '.' + playerIndex, children);
   }
