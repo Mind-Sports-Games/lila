@@ -332,7 +332,7 @@ $non-square-game-score-height-mobile-and-names: 18.5vw;
       margin-top: calc(#{$non-sqaure-pocket-height-mobile} * -2.22) !important;
       margin-left: calc(#{$non-sqaure-pocket-height-mobile} * 2.25) !important;
     }
-    &-top {
+    &-bottom {
       grid-area: pocket-top;
       margin-top: $non-square-pocket-margin-top-mobile;
       &::after {
@@ -340,7 +340,7 @@ $non-square-game-score-height-mobile-and-names: 18.5vw;
         right: -38.5vw;
       }
     }
-    &-bottom {
+    &-top {
       grid-area: pocket-top;
       margin-left: calc(100% - 4 * #{$non-sqaure-pocket-height-mobile});
       margin-top: $non-square-pocket-margin-top-mobile;
@@ -355,6 +355,21 @@ $non-square-game-score-height-mobile-and-names: 18.5vw;
       display: inline-flex;
       padding: 0 0.5em;
       justify-content: space-around;
+      .p1 {
+        order: 1;
+        &.flipped {
+          order: 3;
+        }
+      }
+      .vs {
+        order: 2;
+      }
+      .p2 {
+        order: 3;
+        &.flipped {
+          order: 1;
+        }
+      }
     }
     &-player-name {
       display: none;
@@ -406,11 +421,11 @@ $backgammon-pocket-height: 6em;
         margin-left: 1.4vw;
       }
     }
-    &-top {
+    &-bottom {
       grid-area: pocket-top;
       margin-top: 5.3vw;
     }
-    &-bottom {
+    &-top {
       grid-area: pocket-top;
       margin-left: calc(100% - 4 * #{$non-sqaure-pocket-height-mobile});
       margin-top: 5.3vw;
@@ -421,6 +436,21 @@ $backgammon-pocket-height: 6em;
       display: inline-flex;
       padding: 0 0.5em;
       justify-content: space-around;
+      .p1 {
+        order: 1;
+        &.flipped {
+          order: 3;
+        }
+      }
+      .vs {
+        order: 2;
+      }
+      .p2 {
+        order: 3;
+        &.flipped {
+          order: 1;
+        }
+      }
     }
   }
 }

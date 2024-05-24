@@ -397,26 +397,29 @@ function renderPlayerScoreNames(ctrl: AnalyseCtrl): VNode | undefined {
     };
   }
 
+  //need to switch player order for togy view as scores also flip
+  const flippedCss = ctrl.flipped ? '.flipped' : '';
+
   if (p1player.user) {
     children.push(
       h(
-        'div.game-score-name.p1.text.player',
+        'div.game-score-name.p1.text.player' + flippedCss,
         h('a.user-link.ulpt', { attrs: { href: `/@/${p1player.user.id}` } }, playerNames.p1)
       )
     );
   } else {
-    children.push(h('div.game-score-name.p1.text', playerNames.p1));
+    children.push(h('div.game-score-name.p1.text' + flippedCss, playerNames.p1));
   }
   children.push(h('div.game-score-name.vs.text', 'vs'));
   if (p2player.user) {
     children.push(
       h(
-        'div.game-score-name.p2.text.player',
+        'div.game-score-name.p2.text.player' + flippedCss,
         h('a.user-link.ulpt', { attrs: { href: `/@/${p2player.user.id}` } }, playerNames.p2)
       )
     );
   } else {
-    children.push(h('div.game-score-name.p2.text', playerNames.p2));
+    children.push(h('div.game-score-name.p2.text' + flippedCss, playerNames.p2));
   }
   return h('div.game-score-names', children);
 }
@@ -596,7 +599,7 @@ export default function (ctrl: AnalyseCtrl): VNode {
       tour || !ctrl.data.hasGameScore ? null : renderPlayerScore(topScore, 'top', ctrl.topPlayerIndex(), variantKey),
       tour || !needsUserNameWithScore ? null : renderPlayerName(ctrl, 'top'),
       tour || !ctrl.data.hasGameScore ? null : renderPlayerScoreNames(ctrl),
-      menuIsOpen || tour ? null : crazyView(ctrl, ctrl.topPlayerIndex(), 'top'),
+      tour ? null : crazyView(ctrl, ctrl.topPlayerIndex(), 'top'),
       gamebookPlayView ||
         (tour
           ? null
@@ -617,7 +620,7 @@ export default function (ctrl: AnalyseCtrl): VNode {
         ? null
         : renderPlayerScore(bottomScore, 'bottom', ctrl.bottomPlayerIndex(), variantKey),
       tour || !needsUserNameWithScore ? null : renderPlayerName(ctrl, 'bottom'),
-      menuIsOpen || tour ? null : crazyView(ctrl, ctrl.bottomPlayerIndex(), 'bottom'),
+      tour ? null : crazyView(ctrl, ctrl.bottomPlayerIndex(), 'bottom'),
       gamebookPlayView || tour ? null : controls(ctrl),
       ctrl.embed || tour
         ? null
