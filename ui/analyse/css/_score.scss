@@ -2,9 +2,12 @@
 
 $pocket-col1-height: auto;
 $pocket-height: 7em;
+$pocket-height-mobile: 5em;
+$pocket-height-mobile-and-names: 7em;
 
-$score-variants: ('flipello', 'flipello10', 'oware', 'togyzkumalak', 'go9x9', 'go13x13', 'go19x19');
-$score-variants-square: ('flipello', 'flipello10', 'oware', 'go9x9', 'go13x13', 'go19x19');
+$score-variants: ('flipello', 'flipello10', 'oware', 'togyzkumalak', 'go9x9', 'go13x13', 'go19x19', 'backgammon');
+$score-variants-square: ('flipello', 'flipello10', 'go9x9', 'go13x13', 'go19x19'); //oware handled differently
+$score-variants-non-square: ('togyzkumalak', 'backgammon');
 $go-variants: ('go9x9', 'go13x13', 'go19x19');
 
 .variant-flipello .game-score,
@@ -30,8 +33,27 @@ $go-variants: ('go9x9', 'go13x13', 'go19x19');
   @extend %active, %box-radius;
 
   content: attr(data-score);
-  top: -5.5em;
-  right: -10.7em;
+  top: -4.8em;
+  right: -11em;
+  position: relative;
+  line-height: 0.9em;
+  padding: 3px 0.3em;
+  font-weight: bold;
+  font-size: 1.5em;
+  @include breakpoint($mq-col1-uniboard) {
+    font-size: 4vw;
+  }
+}
+
+.variant-nackgammon .game-score::after,
+.variant-backgammon .game-score::after {
+  @extend %active, %box-radius;
+
+  content: attr(data-score);
+  top: 0;
+  right: 0;
+  height: fit-content;
+  margin-left: auto;
   position: relative;
   line-height: 0.9em;
   padding: 3px 0.3em;
@@ -58,6 +80,19 @@ body.togyzkumalak-wood .variant-togyzkumalak .game-score {
   background: url(../images/board/togyzkumalak/togyzkumalak_wood_house.png);
   background-size: cover;
 }
+
+body.backgammon-classic .variant-nackgammon .game-score,
+body.backgammon-classic .variant-backgammon .game-score {
+  background: url(../images/board/backgammon/svg/backgammon_classic_house.svg);
+  background-size: cover;
+}
+
+body.backgammon-contemporary .variant-nackgammon .game-score,
+body.backgammon-contemporary .variant-backgammon .game-score {
+  background: url(../images/board/backgammon/svg/backgammon_contemporary_house.svg);
+  background-size: cover;
+}
+
 @each $variant in $go-variants {
   body.go-light-wood .variant-#{$variant} .game-score.game-score-top {
     &.p1 {
@@ -108,8 +143,8 @@ body.togyzkumalak-wood .variant-togyzkumalak .game-score {
   .variant-#{$variant} .game-score {
     @extend %box-radius;
     display: block;
-    width: 7em;
-    height: 7em;
+    width: $pocket-height;
+    height: $pocket-height;
     background-color: #aaa;
 
     piece {
@@ -121,14 +156,127 @@ body.togyzkumalak-wood .variant-togyzkumalak .game-score {
 
     &-top {
       grid-area: pocket-top;
+
+      &.p2 {
+        margin-left: calc(100% - #{$pocket-height});
+      }
     }
 
-    &-bottom {
-      grid-area: pocket-bot;
+    &-names {
+      grid-area: pocket-top;
+      width: calc(100% - 2 * #{$pocket-height});
+      height: $pocket-height;
+      margin-left: $pocket-height;
+      display: grid;
+      padding: 0.5em;
+      align-content: space-between;
+      .p2 {
+        justify-self: right;
+      }
+      .vs {
+        justify-self: center;
+      }
+    }
+
+    @include breakpoint($mq-col1-uniboard) {
+      width: $pocket-height-mobile;
+      height: $pocket-height-mobile;
+      &-top.p2 {
+        margin-left: calc(100% - #{$pocket-height-mobile});
+      }
+      &-names {
+        width: calc(100% - 2 * #{$pocket-height-mobile});
+        height: $pocket-height-mobile;
+        margin-left: $pocket-height-mobile;
+      }
     }
   }
 }
 
+.variant-oware .game-score {
+  @extend %box-radius;
+  display: block;
+  width: $pocket-height;
+  height: $pocket-height;
+  background-color: #aaa;
+
+  piece {
+    display: block;
+    width: 100% !important;
+    height: 100% !important;
+    position: relative;
+  }
+
+  &-top {
+    grid-area: pocket-top;
+  }
+
+  &-bottom {
+    grid-area: pocket-bot;
+  }
+
+  &-names {
+    display: none;
+  }
+
+  @include breakpoint($mq-col1-uniboard) {
+    width: $pocket-height-mobile;
+    height: $pocket-height-mobile;
+    &-bottom {
+      grid-area: pocket-top;
+      margin-left: calc(100% - #{$pocket-height-mobile});
+    }
+    &-names {
+      grid-area: pocket-top;
+      width: calc(100% - 2 * #{$pocket-height-mobile});
+      height: $pocket-height-mobile;
+      margin-left: $pocket-height-mobile;
+      display: grid;
+      padding: 0.5em;
+      align-content: space-between;
+      .p2 {
+        justify-self: right;
+      }
+      .vs {
+        justify-self: center;
+      }
+    }
+    &-player-name {
+      display: none;
+    }
+  }
+}
+
+.variant-oware .game-score-player-name {
+  &.top {
+    grid-area: pocket-top;
+    padding-left: 10em;
+    padding-top: 3em;
+  }
+  &.bottom {
+    grid-area: pocket-bot;
+    padding-left: 10em;
+    padding-top: 3em;
+  }
+}
+
+.variant-togyzkumalak .game-score-player-name {
+  &.top {
+    grid-area: pocket-top;
+    padding-left: 20em;
+    padding-top: 4em;
+  }
+  &.bottom {
+    grid-area: pocket-bot;
+    padding-left: 20em;
+    padding-top: 1.5em;
+  }
+}
+
+$non-sqaure-pocket-height-mobile: 9.5vw;
+$non-square-game-score-height-mobile: 13.5vw;
+$non-square-pocket-margin-top-mobile: 5vw;
+$non-square-game-score-height-mobile-and-names: 18.5vw;
 .variant-togyzkumalak .game-score {
   @extend %box-radius;
   display: block;
@@ -142,7 +290,7 @@ body.togyzkumalak-wood .variant-togyzkumalak .game-score {
     height: 10em !important;
     position: relative;
     margin-top: -2.2em !important;
-    margin-left: 2.5em !important;
+    margin-left: 2em !important;
     transform: rotate(270deg);
   }
 
@@ -152,7 +300,7 @@ body.togyzkumalak-wood .variant-togyzkumalak .game-score {
     height: 10em !important;
     position: relative;
     margin-top: -10em !important;
-    margin-left: 10.1em !important;
+    margin-left: 9.6em !important;
     transform: rotate(270deg);
   }
 
@@ -164,21 +312,307 @@ body.togyzkumalak-wood .variant-togyzkumalak .game-score {
   &-bottom {
     grid-area: pocket-bot;
   }
+
+  &-names {
+    display: none;
+  }
+
+  @include breakpoint($mq-col1-uniboard) {
+    width: calc(#{$non-sqaure-pocket-height-mobile} * 4);
+    height: $non-sqaure-pocket-height-mobile;
+    piece.part1 {
+      width: calc(#{$non-sqaure-pocket-height-mobile} * 1.11) !important;
+      height: calc(#{$non-sqaure-pocket-height-mobile} * 2.22) !important;
+      margin-top: -4.8vw !important;
+      margin-left: calc(#{$non-sqaure-pocket-height-mobile} * 1.11 * 0.5) !important;
+    }
+    piece.part2 {
+      width: calc(#{$non-sqaure-pocket-height-mobile} * 1.11) !important;
+      height: calc(#{$non-sqaure-pocket-height-mobile} * 2.22) !important;
+      margin-top: calc(#{$non-sqaure-pocket-height-mobile} * -2.22) !important;
+      margin-left: calc(#{$non-sqaure-pocket-height-mobile} * 2.25) !important;
+    }
+    &-bottom {
+      grid-area: pocket-top;
+      margin-top: $non-square-pocket-margin-top-mobile;
+      &::after {
+        top: -13.3vw;
+        right: -38.5vw;
+      }
+    }
+    &-top {
+      grid-area: pocket-top;
+      margin-left: calc(100% - 4 * #{$non-sqaure-pocket-height-mobile});
+      margin-top: $non-square-pocket-margin-top-mobile;
+      &::after {
+        top: -13.3vw;
+        right: 8vw;
+      }
+    }
+    &-names {
+      grid-area: pocket-top;
+      width: 100%;
+      display: inline-flex;
+      padding: 0 0.5em;
+      justify-content: space-around;
+      .p1 {
+        order: 1;
+        &.flipped {
+          order: 3;
+        }
+      }
+      .vs {
+        order: 2;
+      }
+      .p2 {
+        order: 3;
+        &.flipped {
+          order: 1;
+        }
+      }
+    }
+    &-player-name {
+      display: none;
+    }
+  }
 }
 
-@each $variant in $score-variants {
-  .analyse.variant-#{$variant} {
-    grid-template-rows: $pocket-col1-height auto $pocket-col1-height auto 50vh;
-    grid-template-areas: 'pocket-top' 'board' 'pocket-bot' 'controls' 'tools' 'side' 'acpl' 'under' 'chat' 'uchat';
+$backgammon-pocket-height: 6em;
+.variant-nackgammon .game-score,
+.variant-backgammon .game-score {
+  @extend %box-radius;
+  display: flex;
+  width: 18em;
+  height: 6em;
+  gap: 0.13em;
+  background-color: #aaa;
+
+  piece {
+    width: 1em !important;
+    height: 4.7em !important;
+    position: relative;
+    margin-top: 0.65em !important;
+    &.first {
+      margin-left: 0.65em;
+    }
+  }
+
+  &-top {
+    grid-area: pocket-top;
+  }
+
+  &-bottom {
+    grid-area: pocket-bot;
+  }
+
+  &-names {
+    display: none;
+  }
+
+  @include breakpoint($mq-col1) {
+    width: calc(#{$non-sqaure-pocket-height-mobile} * 4);
+    height: calc(#{$non-sqaure-pocket-height-mobile} * 4 / 3);
+    piece {
+      width: calc(#{$non-sqaure-pocket-height-mobile} * (4 / 3) * (1 / 6)) !important;
+      height: calc(#{$non-sqaure-pocket-height-mobile} * (4 / 3) * (4.7 / 6)) !important;
+      position: relative;
+      margin-top: 1.4vw !important;
+      &.first {
+        margin-left: 1.4vw;
+      }
+    }
+    &-bottom {
+      grid-area: pocket-top;
+      margin-top: 5.3vw;
+    }
+    &-top {
+      grid-area: pocket-top;
+      margin-left: calc(100% - 4 * #{$non-sqaure-pocket-height-mobile});
+      margin-top: 5.3vw;
+    }
+    &-names {
+      grid-area: pocket-top;
+      width: 100%;
+      display: inline-flex;
+      padding: 0 0.5em;
+      justify-content: space-around;
+      .p1 {
+        order: 1;
+        &.flipped {
+          order: 3;
+        }
+      }
+      .vs {
+        order: 2;
+      }
+      .p2 {
+        order: 3;
+        &.flipped {
+          order: 1;
+        }
+      }
+    }
+  }
+}
+
+@each $variant in $score-variants-square {
+  .analyse.has-players.variant-#{$variant} {
+    grid-template-rows: $pocket-height-mobile-and-names auto auto minmax(20em, 30vh);
+    grid-template-areas: 'pocket-top' 'board' 'controls' 'tools' 'side' 'acpl' 'under' 'chat' 'uchat';
 
     @include breakpoint($mq-col2) {
       grid-template-rows: $pocket-height auto $pocket-height;
-      grid-template-areas: 'board      gauge pocket-top' 'board      gauge tools' 'board      gauge pocket-bot' 'under      .     controls' 'under      .     acpl' 'under      .     side' 'chat       .     side' 'uchat      .     side';
+      grid-template-areas: 'board gauge pocket-top' 'board gauge tools' 'board gauge tools' 'under  .  controls' 'under      .     acpl' 'under      .     side' 'chat       .     side' 'uchat      .     side';
     }
 
     @include breakpoint($mq-col3) {
       grid-template-rows: $pocket-height $meta-height $chat-height $pocket-height;
-      grid-template-areas: 'side    . board gauge pocket-top' 'side    . board gauge tools' 'chat    . board gauge tools' 'chat    . board gauge pocket-bot' 'uchat   . under .     controls' 'uchat   . under .     acpl';
+      grid-template-areas: 'side    . board gauge pocket-top' 'side    . board gauge tools' 'chat    . board gauge tools' 'chat    . board gauge tools' 'uchat   . under .     controls' 'uchat   . under .     acpl';
     }
+  }
+
+  .analyse.variant-#{$variant} {
+    grid-template-rows: $pocket-height-mobile auto auto minmax(20em, 30vh);
+    grid-template-areas: 'pocket-top' 'board' 'controls' 'tools' 'side' 'acpl' 'under' 'chat' 'uchat';
+
+    @include breakpoint($mq-col2) {
+      grid-template-rows: $pocket-height auto $pocket-height;
+      grid-template-areas: 'board gauge pocket-top' 'board gauge tools' 'board gauge tools' 'under  .  controls' 'under      .     acpl' 'under      .     side' 'chat       .     side' 'uchat      .     side';
+    }
+
+    @include breakpoint($mq-col3) {
+      grid-template-rows: $pocket-height $meta-height $chat-height $pocket-height;
+      grid-template-areas: 'side    . board gauge pocket-top' 'side    . board gauge tools' 'chat    . board gauge tools' 'chat    . board gauge tools' 'uchat   . under .     controls' 'uchat   . under .     acpl';
+    }
+  }
+}
+
+.analyse.has-players.variant-oware {
+  grid-template-rows: $pocket-height-mobile-and-names auto auto minmax(20em, 30vh);
+  grid-template-areas: 'pocket-top' 'board' 'controls' 'tools' 'side' 'acpl' 'under' 'chat' 'uchat';
+
+  @include breakpoint($mq-col2) {
+    grid-template-rows: $pocket-height auto $pocket-height;
+    grid-template-areas: 'pocket-top gauge tools' 'board gauge tools' 'pocket-bot gauge tools' 'under  .  controls' 'under      .     acpl' 'under      .     side' 'chat       .     side' 'uchat      .     side';
+  }
+
+  @include breakpoint($mq-col3) {
+    grid-template-rows: $pocket-height $meta-height $chat-height $pocket-height;
+    grid-template-areas: 'side    . pocket-top gauge tools' 'side    . board gauge tools' 'chat    . board gauge tools' 'chat    . pocket-bot gauge tools' 'uchat   . under .     controls' 'uchat   . under .     acpl';
+  }
+}
+
+.analyse.variant-oware {
+  grid-template-rows: $pocket-height-mobile auto auto minmax(20em, 30vh);
+  grid-template-areas: 'pocket-top' 'board' 'controls' 'tools' 'side' 'acpl' 'under' 'chat' 'uchat';
+
+  @include breakpoint($mq-col2) {
+    grid-template-rows: $pocket-height auto $pocket-height;
+    grid-template-areas: 'pocket-top gauge tools' 'board gauge tools' 'pocket-bot gauge tools' 'under  .  controls' 'under      .     acpl' 'under      .     side' 'chat       .     side' 'uchat      .     side';
+  }
+
+  @include breakpoint($mq-col3) {
+    grid-template-rows: $pocket-height $meta-height $chat-height $pocket-height;
+    grid-template-areas: 'side    . pocket-top gauge tools' 'side    . board gauge tools' 'chat    . board gauge tools' 'chat    . pocket-bot gauge tools' 'uchat   . under .     controls' 'uchat   . under .     acpl';
+  }
+}
+
+.analyse.has-players.variant-nackgammon,
+.analyse.has-players.variant-backgammon {
+  grid-template-rows: 23vw auto auto minmax(20em, 30vh);
+  grid-template-areas: 'pocket-top' 'board' 'controls' 'tools' 'side' 'acpl' 'under' 'chat' 'uchat';
+
+  @include breakpoint($mq-col2) {
+    grid-template-rows: $backgammon-pocket-height auto $backgammon-pocket-height;
+    grid-template-areas: 'board      gauge pocket-top' 'board      gauge tools' 'board      gauge pocket-bot' 'under      .     controls' 'under      .     acpl' 'under      .     side' 'chat       .     side' 'uchat      .     side';
+  }
+
+  @include breakpoint($mq-col3) {
+    grid-template-rows: $backgammon-pocket-height $meta-height $chat-height $backgammon-pocket-height;
+    grid-template-areas: 'side    . board gauge pocket-top' 'side    . board gauge tools' 'chat    . board gauge tools' 'chat    . board gauge pocket-bot' 'uchat   . under .     controls' 'uchat   . under .     acpl';
+  }
+}
+
+.analyse.variant-nackgammon,
+.analyse.variant-backgammon {
+  grid-template-rows: 18vw auto auto minmax(20em, 30vh);
+  grid-template-areas: 'pocket-top' 'board' 'controls' 'tools' 'side' 'acpl' 'under' 'chat' 'uchat';
+
+  @include breakpoint($mq-col2) {
+    grid-template-rows: $backgammon-pocket-height auto $backgammon-pocket-height;
+    grid-template-areas: 'board      gauge pocket-top' 'board      gauge tools' 'board      gauge pocket-bot' 'under      .     controls' 'under      .     acpl' 'under      .     side' 'chat       .     side' 'uchat      .     side';
+  }
+
+  @include breakpoint($mq-col3) {
+    grid-template-rows: $backgammon-pocket-height $meta-height $chat-height $backgammon-pocket-height;
+    grid-template-areas: 'side    . board gauge pocket-top' 'side    . board gauge tools' 'chat    . board gauge tools' 'chat    . board gauge pocket-bot' 'uchat   . under .     controls' 'uchat   . under .     acpl';
+  }
+}
+
+.analyse.has-players.variant-togyzkumalak {
+  grid-template-rows: $non-square-game-score-height-mobile-and-names auto auto minmax(20em, 30vh);
+  grid-template-areas: 'pocket-top' 'board' 'controls' 'tools' 'side' 'acpl' 'under' 'chat' 'uchat';
+
+  @include breakpoint($mq-col2) {
+    grid-template-rows: $pocket-height auto $pocket-height;
+    grid-template-areas: 'pocket-top gauge tools' 'board      gauge tools' 'pocket-bot gauge tools' 'under      .     controls' 'under      .     acpl' 'under      .     side' 'chat       .     side' 'uchat      .     side';
+  }
+
+  @include breakpoint($mq-col3) {
+    grid-template-rows: $pocket-height $meta-height $chat-height $pocket-height;
+    grid-template-areas: 'side    . pocket-top gauge tools' 'side    . board gauge tools' 'chat    . board gauge tools' 'chat    . pocket-bot gauge tools' 'uchat   . under .     controls' 'uchat   . under .     acpl';
+  }
+}
+
+.analyse.variant-togyzkumalak {
+  grid-template-rows: $non-square-game-score-height-mobile auto auto minmax(20em, 30vh);
+  grid-template-areas: 'pocket-top' 'board' 'controls' 'tools' 'side' 'acpl' 'under' 'chat' 'uchat';
+
+  @include breakpoint($mq-col2) {
+    grid-template-rows: $pocket-height auto $pocket-height;
+    grid-template-areas: 'pocket-top gauge tools' 'board      gauge tools' 'pocket-bot gauge tools' 'under      .     controls' 'under      .     acpl' 'under      .     side' 'chat       .     side' 'uchat      .     side';
+  }
+
+  @include breakpoint($mq-col3) {
+    grid-template-rows: $pocket-height $meta-height $chat-height $pocket-height;
+    grid-template-areas: 'side    . pocket-top gauge tools' 'side    . board gauge tools' 'chat    . board gauge tools' 'chat    . pocket-bot gauge tools' 'uchat   . under .     controls' 'uchat   . under .     acpl';
+  }
+}
+
+.variant-oware .analyse__board {
+  padding-bottom: calc(213.333 * 100% / 640 - 10em);
+  margin-top: calc(213.333 * 100% / 640);
+  margin-bottom: calc(213.333 * 100% / 640 - 10em);
+
+  @include breakpoint($mq-col1-uniboard) {
+    padding-bottom: calc(213.333 * 100% / 640);
+    margin-top: 5px;
+    margin-bottom: 5px;
+  }
+}
+
+@include breakpoint($mq-col2) {
+  .variant-togyzkumalak .analyse__board {
+    padding-bottom: calc(365.555 * 100% / 640 - 6em);
+    margin-top: calc(106.666 * 100% / 640);
+    margin-bottom: calc(106.666 * 100% / 640 - 6em);
+  }
+
+  .analyse.has-players.variant-togyzkumalak .analyse__board {
+    padding-bottom: calc(365.555 * 100% / 640 - 5em);
+    margin-top: calc(106.666 * 100% / 640);
+    margin-bottom: calc(106.666 * 100% / 640 - 5em);
+  }
+}
+
+.variant-togyzkumalak .analyse__board {
+  padding-bottom: calc(365.555 * 100% / 640 - $pocket-height);
+  margin-top: calc(106.666 * 100% / 640);
+  margin-bottom: calc(106.666 * 100% / 640 - $pocket-height);
+
+  @include breakpoint($mq-col1-uniboard) {
+    padding-bottom: calc(365.555 * 100% / 640);
+    margin-top: 5px;
+    margin-bottom: 5px;
   }
 }
