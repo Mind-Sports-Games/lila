@@ -60,6 +60,22 @@ $player-height: 1.6rem;
     }
   }
 
+  @include breakpoint($mq-col2) {
+    .variant-oware & {
+      &-top {
+        top: calc(2 * #{-$player-height} - 10em);
+      }
+    }
+  }
+
+  @include breakpoint($mq-col2) {
+    .variant-togyzkumalak & {
+      &-top {
+        top: calc(#{-$player-height} - 5em);
+      }
+    }
+  }
+
   .left {
     flex: 1 1 100%;
     display: flex;

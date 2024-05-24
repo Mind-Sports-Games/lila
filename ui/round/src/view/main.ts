@@ -97,8 +97,8 @@ function renderPlayerScore(
 function renderPlayerScoreNames(player: Player, opponent: Player): VNode | undefined {
   const children: VNode[] = [];
   const playerNames = {
-    p1: player.user ? player.user.id : player.playerName,
-    p2: opponent.user ? opponent.user.id : opponent.playerName,
+    p1: player.user ? player.user.username : player.playerName,
+    p2: opponent.user ? opponent.user.username : opponent.playerName,
   };
   children.push(h('div.game-score-name.p1.text', playerNames.p1));
   children.push(h('div.game-score-name.vs.text', 'vs'));
