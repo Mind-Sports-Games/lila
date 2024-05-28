@@ -27,6 +27,17 @@ $player-height: 1.6rem;
       }
     }
   }
+
+  @include breakpoint($mq-col1) {
+    .pocket {
+      &-top {
+        margin-bottom: $player-height;
+      }
+      &-bottom {
+        margin-top: $player-height;
+      }
+    }
+  }
 }
 
 .study__player {
