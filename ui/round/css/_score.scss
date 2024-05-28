@@ -144,6 +144,11 @@ body.backgammon-contemporary .variant-backgammon .game-score {
   .game-score-names {
     font-size: 1.2em;
   }
+  .game-score-name {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
 }
 
 @each $variant in $score-variants-square {
@@ -201,7 +206,7 @@ body.backgammon-contemporary .variant-backgammon .game-score {
         padding: 0.5em;
         align-content: space-between;
         .p2 {
-          justify-self: right;
+          text-align: right;
         }
         .vs {
           justify-self: center;
@@ -374,6 +379,16 @@ $non-square-pocket-margin-top-mobile: 5vw;
       display: inline-flex;
       padding: 0 0.5vw;
       justify-content: space-around;
+      text-align: center;
+      .p1 {
+        width: 40%;
+      }
+      .p2 {
+        width: 40%;
+      }
+      .vs {
+        width: 20%;
+      }
     }
   }
 
@@ -446,6 +461,16 @@ $non-square-pocket-margin-top-mobile: 5vw;
       display: inline-flex;
       padding: 0 0.5vw;
       justify-content: space-around;
+      text-align: center;
+      .p1 {
+        width: 40%;
+      }
+      .p2 {
+        width: 40%;
+      }
+      .vs {
+        width: 20%;
+      }
     }
   }
 
