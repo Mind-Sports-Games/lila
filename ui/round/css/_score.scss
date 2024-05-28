@@ -221,10 +221,10 @@ body.backgammon-contemporary .variant-backgammon .game-score {
   }
 }
 
-// 1. prevent displaying names a second time
-// 2. move scores on the left of user nickname and adjust nicknames position
 @each $variant in append($go-variants, $flipello-variants) {
   .variant-#{$variant} {
+    // 1. prevent displaying names a second time
+    // 2. move scores on the left of user nickname and adjust nicknames position
     @include breakpoint($mq-col1-uniboard, $mq-col1-phone) {
       .game-score {
         width: 40px;
@@ -267,6 +267,27 @@ body.backgammon-contemporary .variant-backgammon .game-score {
 
         .line {
           margin-left: 50px;
+        }
+      }
+    }
+    // replace elements when the controls move in the grid to display a move-confirm message
+    &.move-confirm {
+      @include breakpoint($mq-col1-uniboard, $mq-col1-phone) {
+        .game-score {
+          &-bottom {
+            margin-top: 4px;
+          }
+          &-top {
+            margin-top: -20px;
+          }
+        }
+        .ruser {
+          &-bottom {
+            margin-top: 10px;
+          }
+          &-top {
+            margin-bottom: 10px;
+          }
         }
       }
     }
