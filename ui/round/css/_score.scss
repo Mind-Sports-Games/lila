@@ -221,7 +221,7 @@ body.backgammon-contemporary .variant-backgammon .game-score {
   }
 }
 
-@each $variant in append($go-variants, $flipello-variants) {
+@each $variant in join($go-variants, $flipello-variants) {
   .variant-#{$variant} {
     // 1. prevent displaying names a second time
     // 2. move scores on the left of user nickname and adjust nicknames position
@@ -293,7 +293,6 @@ body.backgammon-contemporary .variant-backgammon .game-score {
     }
   }
 }
-
 
 $non-sqaure-pocket-height-mobile: 9.5vw;
 $non-square-pocket-margin-top-mobile: 5vw;
