@@ -228,8 +228,8 @@ body.backgammon-contemporary .variant-backgammon .game-score {
     @include breakpoint($mq-col1-uniboard, $mq-col1-phone) {
       .game-score {
         width: 40px;
-        padding-top: 40px;
-        padding-left: 40px;
+        padding-top: 48px;
+        padding-left: 48px;
         margin-left: 0;
 
         piece::after {
@@ -238,7 +238,7 @@ body.backgammon-contemporary .variant-backgammon .game-score {
 
         &-bottom {
           grid-area: user-bot;
-          margin-top: -10px;
+          margin-top: -18px;
         }
 
         &-names {
@@ -246,7 +246,7 @@ body.backgammon-contemporary .variant-backgammon .game-score {
         }
 
         &-top {
-          margin-top: 8px;
+          margin-top: 0;
           grid-area: user-top;
         }
       }
