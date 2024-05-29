@@ -278,6 +278,16 @@ body.backgammon-contemporary .variant-backgammon .game-score {
     // replace elements when the controls move in the grid to display a move-confirm message
     &.move-confirm {
       @include breakpoint($mq-col1-uniboard, $mq-col1-phone) {
+        &.turn-indicator-off {
+          .game-score {
+            &-bottom {
+              margin-top: 2px;
+            }
+            &-top {
+              margin-top: -28px;
+            }
+          }
+        }
         .game-score {
           &-bottom {
             margin-top: 4px;

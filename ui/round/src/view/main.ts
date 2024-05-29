@@ -274,7 +274,10 @@ export function main(ctrl: RoundController): VNode {
     : h(
         `div.round__app.variant-${variantKey}${notationBasic}.${d.game.gameFamily}`,
         {
-          class: { 'move-confirm': !!(ctrl.moveToSubmit || ctrl.dropToSubmit) },
+          class: {
+            'move-confirm': !!(ctrl.moveToSubmit || ctrl.dropToSubmit),
+            'turn-indicator-off': !ctrl.data.pref.playerTurnIndicator,
+          },
         },
         [
           h(
