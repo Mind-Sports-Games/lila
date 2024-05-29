@@ -11,8 +11,9 @@ interface PlayerNames {
 }
 
 export default function (ctrl: AnalyseCtrl): VNode[] | undefined {
+  if (ctrl.embed) return;
   const study = ctrl.study;
-  if (!study || ctrl.embed) {
+  if (!study) {
     //Add in playerbars for boards where it's not obvious which side the player is on
     return playerBarsForAnalysisBoards(ctrl, ['oware', 'togyzkumalak']);
   }
