@@ -139,6 +139,15 @@ body.backgammon-contemporary .variant-backgammon .game-score {
   }
 }
 
+.game-score {
+  &-name,
+  &-player-name {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+
 @each $variant in $score-variants-square {
   .variant-#{$variant} .game-score {
     @extend %box-radius;
@@ -171,7 +180,7 @@ body.backgammon-contemporary .variant-backgammon .game-score {
       padding: 0.5em;
       align-content: space-between;
       .p2 {
-        justify-self: right;
+        text-align: right;
       }
       .vs {
         justify-self: center;
@@ -235,7 +244,7 @@ body.backgammon-contemporary .variant-backgammon .game-score {
       padding: 0.5em;
       align-content: space-between;
       .p2 {
-        justify-self: right;
+        text-align: right;
       }
       .vs {
         justify-self: center;
@@ -355,17 +364,21 @@ $non-square-game-score-height-mobile-and-names: 18.5vw;
       display: inline-flex;
       padding: 0 0.5em;
       justify-content: space-around;
+      text-align: center;
       .p1 {
         order: 1;
+        width: 40%;
         &.flipped {
           order: 3;
         }
       }
       .vs {
         order: 2;
+        width: 20%;
       }
       .p2 {
         order: 3;
+        width: 40%;
         &.flipped {
           order: 1;
         }
@@ -436,17 +449,21 @@ $backgammon-pocket-height: 6em;
       display: inline-flex;
       padding: 0 0.5em;
       justify-content: space-around;
+      text-align: center;
       .p1 {
         order: 1;
+        width: 40%;
         &.flipped {
           order: 3;
         }
       }
       .vs {
         order: 2;
+        width: 20%;
       }
       .p2 {
         order: 3;
+        width: 40%;
         &.flipped {
           order: 1;
         }

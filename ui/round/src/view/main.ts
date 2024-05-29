@@ -86,10 +86,15 @@ function renderPlayerScore(
       children.push(h('piece.side-piece.' + playerIndex + (i === 0 ? ' first' : '')));
     }
     return h('div.game-score.game-score-' + position, { attrs: { 'data-score': score } }, children);
+  } else if (variantKey === 'oware') {
+    children.push(
+      h(`piece.${defaultMancalaRole}${score.toString()}-piece.` + playerIndex + `.captures`, {
+        attrs: { 'data-score': score },
+      })
+    );
+    return h('div.game-score.game-score-' + position, children);
   } else {
-    const pieceClass =
-      variantKey === 'oware' ? `piece.${defaultMancalaRole}${score.toString()}-piece.` : 'piece.p-piece.';
-    children.push(h(pieceClass + playerIndex, { attrs: { 'data-score': score } }));
+    children.push(h('piece.p-piece.' + playerIndex, { attrs: { 'data-score': score } }));
     return h('div.game-score.game-score-' + position, children);
   }
 }
@@ -274,7 +279,10 @@ export function main(ctrl: RoundController): VNode {
     : h(
         `div.round__app.variant-${variantKey}${notationBasic}.${d.game.gameFamily}`,
         {
-          class: { 'move-confirm': !!(ctrl.moveToSubmit || ctrl.dropToSubmit) },
+          class: {
+            'move-confirm': !!(ctrl.moveToSubmit || ctrl.dropToSubmit),
+            'turn-indicator-off': !ctrl.data.pref.playerTurnIndicator,
+          },
         },
         [
           h(

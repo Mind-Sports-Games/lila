@@ -79,3 +79,11 @@
     overflow-y: scroll;
   }
 }
+
+@mixin active {
+  box-shadow: 0 3px 4px hsla(0, 0, 0, 0.15) inset;
+
+  background: $c-accent;
+  color: #fff;
+  text-shadow: 0 1px 1px black !important;
+}
