@@ -511,7 +511,6 @@ export default function (ctrl: AnalyseCtrl): VNode {
         const fen = ctrl.node.fen;
         const p1Score = getBackgammonScore(fen, 'p1');
         const p2Score = getBackgammonScore(fen, 'p2');
-        console.log('fen', fen);
         topScore = ctrl.topPlayerIndex() === 'p1' ? p1Score : p2Score;
         bottomScore = ctrl.topPlayerIndex() === 'p2' ? p1Score : p2Score;
         break;

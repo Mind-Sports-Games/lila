@@ -31,6 +31,12 @@
   box-shadow: 0 3px 5px rgba(0, 0, 0, 0.3) inset;
   background: #888;
   border-radius: 0;
+
+  .analyse.variant-backgammon &,
+  .analyse.variant-nackgammon & {
+    box-shadow: none;
+    background: inherit;
+  }
 }
 
 @each $variant in ('crazyhouse', 'minishogi') {
@@ -305,12 +311,12 @@ $pocket-height-togy: 14vh;
   background-color: #aaa;
 
   piece {
-    width: 1em !important;
-    height: 4.7em !important;
+    width: calc(#{$pocket-col1-size} / 6) !important;
+    height: calc(#{$pocket-col1-size} * (4.7 / 6)) !important;
     position: relative;
-    margin-top: 0.65em !important;
+    margin-top: 1.3vw !important;
     &.first {
-      margin-left: 0.65em;
+      margin-left: 1.4vw;
     }
   }
 
