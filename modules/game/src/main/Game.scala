@@ -16,6 +16,7 @@ import strategygames.{
   Player => PlayerIndex,
   Game => StratGame,
   GameLogic,
+  GameFamily,
   Mode,
   Move,
   Drop,
@@ -71,6 +72,12 @@ case class Game(
   def clock        = stratGame.clock
   def actionStrs   = stratGame.actionStrs
   def activePlayer = stratGame.situation.player
+
+  val gameRecordFormat = variant match {
+    case Variant.Chess(variant) if variant.gameFamily == GameFamily.LinesOfAction() => "sgf"
+    case Variant.FairySF(_) | Variant.Go(_) | Variant.Backgammon(_)                 => "sgf"
+    case _                                                                          => "pgn"
+  }
 
   val players = List(p1Player, p2Player)
 

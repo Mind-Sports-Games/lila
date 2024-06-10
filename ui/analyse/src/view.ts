@@ -27,6 +27,7 @@ import { view as actionMenu } from './actionMenu';
 import { view as renderPromotion } from './promotion';
 import renderClocks from './clocks';
 import * as pgnExport from './pgnExport';
+import * as sgfExport from './sgfExport';
 import forecastView from './forecast/forecastView';
 import { view as cevalView } from 'ceval';
 import crazyView from './crazy/crazyView';
@@ -143,42 +144,66 @@ function inputs(ctrl: AnalyseCtrl): VNode | undefined {
         },
       }),
     ]),
-    h('div.pgn', [
-      h('div.pair', [
-        h('label.name', 'PGN'),
-        h('textarea.copyable.autoselect', {
-          attrs: { spellCheck: false },
-          hook: {
-            ...onInsert(el => {
-              (el as HTMLTextAreaElement).value = defined(ctrl.pgnInput)
-                ? ctrl.pgnInput
-                : pgnExport.renderFullTxt(ctrl);
-              el.addEventListener('input', e => (ctrl.pgnInput = (e.target as HTMLTextAreaElement).value));
-            }),
-            postpatch: (_, vnode) => {
-              (vnode.elm as HTMLTextAreaElement).value = defined(ctrl.pgnInput)
-                ? ctrl.pgnInput
-                : pgnExport.renderFullTxt(ctrl);
-            },
-          },
-        }),
-        h(
-          'button.button.button-thin.action.text',
-          {
-            attrs: dataIcon('G'),
-            hook: bind(
-              'click',
-              _ => {
-                const pgn = $('.copyables .pgn textarea').val() as string;
-                if (pgn !== pgnExport.renderFullTxt(ctrl)) ctrl.changePgn(pgn);
+    ctrl.data.gameRecordFormat === 'pgn'
+      ? h('div.pgn', [
+          h('div.pair', [
+            h('label.name', 'PGN'),
+            h('textarea.copyable.autoselect', {
+              attrs: { spellCheck: false },
+              hook: {
+                ...onInsert(el => {
+                  (el as HTMLTextAreaElement).value = defined(ctrl.pgnInput)
+                    ? ctrl.pgnInput
+                    : pgnExport.renderFullTxt(ctrl);
+                  el.addEventListener('input', e => (ctrl.pgnInput = (e.target as HTMLTextAreaElement).value));
+                }),
+                postpatch: (_, vnode) => {
+                  (vnode.elm as HTMLTextAreaElement).value = defined(ctrl.pgnInput)
+                    ? ctrl.pgnInput
+                    : pgnExport.renderFullTxt(ctrl);
+                },
               },
-              ctrl.redraw
-            ),
-          },
-          ctrl.trans.noarg('importPgn')
-        ),
-      ]),
-    ]),
+            }),
+            ctrl.data.game.variant.lib == 0 && !['linesOfAction', 'scrambledEggs'].includes(ctrl.data.game.variant.key)
+              ? h(
+                  'button.button.button-thin.action.text',
+                  {
+                    attrs: dataIcon('G'),
+                    hook: bind(
+                      'click',
+                      _ => {
+                        const pgn = $('.copyables .pgn textarea').val() as string;
+                        if (pgn !== pgnExport.renderFullTxt(ctrl)) ctrl.changePgn(pgn);
+                      },
+                      ctrl.redraw
+                    ),
+                  },
+                  ctrl.trans.noarg('importPgn')
+                )
+              : undefined,
+          ]),
+        ])
+      : h('div.sgf', [
+          h('div.pair', [
+            h('label.name', 'SGF'),
+            h('textarea.copyable.autoselect', {
+              attrs: { spellCheck: false },
+              hook: {
+                ...onInsert(el => {
+                  (el as HTMLTextAreaElement).value = defined(ctrl.sgfInput)
+                    ? ctrl.sgfInput
+                    : sgfExport.renderFullTxt(ctrl);
+                  //el.addEventListener('input', e => (ctrl.sgfInput = (e.target as HTMLTextAreaElement).value));
+                }),
+                postpatch: (_, vnode) => {
+                  (vnode.elm as HTMLTextAreaElement).value = defined(ctrl.sgfInput)
+                    ? ctrl.sgfInput
+                    : sgfExport.renderFullTxt(ctrl);
+                },
+              },
+            }),
+          ]),
+        ]),
   ]);
 }
 

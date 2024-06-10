@@ -23,6 +23,7 @@ import lila.round.GameProxyRepo
 
 final class GameApiV2(
     pgnDump: PgnDump,
+    sgfDump: SgfDump,
     gameRepo: lila.game.GameRepo,
     tournamentRepo: lila.tournament.TournamentRepo,
     pairingRepo: lila.tournament.PairingRepo,
@@ -59,6 +60,13 @@ final class GameApiV2(
                 config.flags,
                 realPlayers = realPlayers
               ) dmap pgnDump.toPgnString
+            case Format.SGF =>
+              sgfDump(
+                game,
+                initialFen,
+                config.flags,
+                realPlayers = realPlayers
+              )
           }
         } yield export
     }
@@ -68,7 +76,8 @@ final class GameApiV2(
   def filename(game: Game, format: Format): Fu[String] =
     gameLightUsers(game) map { case (wu, bu) =>
       fileR.replaceAllIn(
-        "playstrategy_pgn_%s_%s_vs_%s.%s.%s".format(
+        "playstrategy_%s_%s_%s_vs_%s.%s.%s".format(
+          format.toString.toLowerCase,
           Tag.UTCDate.format.print(game.createdAt),
           pgnDump.dumper.player(game.p1Player, wu),
           pgnDump.dumper.player(game.p2Player, bu),
@@ -184,6 +193,7 @@ final class GameApiV2(
           .mapAsync(4) { case ((game, fen, analysis), pairing, teams) =>
             config.format match {
               case Format.PGN => pgnDump.formatter(config.flags)(game, fen, analysis, teams, none)
+              case Format.SGF => sgfDump.formatter(config.flags)(game, fen, analysis, teams, none)
               case Format.JSON =>
                 def addBerserk(playerIndex: PlayerIndex)(json: JsObject) =
                   if (pairing berserkOf playerIndex)
@@ -215,6 +225,7 @@ final class GameApiV2(
       .mapAsync(4) { case (game, fen, analysis) =>
         config.format match {
           case Format.PGN => pgnDump.formatter(config.flags)(game, fen, analysis, none, none)
+          case Format.SGF => sgfDump.formatter(config.flags)(game, fen, analysis, none, none)
           case Format.JSON =>
             toJson(game, fen, analysis, config.flags, None) dmap { json =>
               s"${Json.stringify(json)}\n"
@@ -242,12 +253,14 @@ final class GameApiV2(
   private def formatterFor(config: Config) =
     config.format match {
       case Format.PGN  => pgnDump.formatter(config.flags)
+      case Format.SGF  => sgfDump.formatter(config.flags)
       case Format.JSON => jsonFormatter(config.flags)
     }
 
   private def emptyMsgFor(config: Config) =
     config.format match {
       case Format.PGN  => "\n"
+      case Format.SGF  => "\n"
       case Format.JSON => "{}\n"
     }
 
@@ -333,6 +346,7 @@ object GameApiV2 {
   object Format {
     case object PGN  extends Format
     case object JSON extends Format
+    case object SGF  extends Format
     def byRequest(req: play.api.mvc.RequestHeader) = if (HTTPRequest acceptsNdJson req) JSON else PGN
   }
 
