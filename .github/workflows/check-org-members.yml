@@ -2,9 +2,9 @@ name: Run Workflow for Org Members Only
 
 on:
   workflow_call:
-  secrets:
-    GITHUB_TOKEN:
-      required: true
+    secrets:
+      GITHUB_TOKEN:
+        required: true
 
 jobs:
   check-org-member:
