@@ -11,8 +11,6 @@ on:
 jobs:
   check_org_member:
     uses: ./.github/workflows/check-org-members.yml
-    with:
-      repo-token: ${{ secrets.GITHUB_TOKEN }}
 
   lint:
     needs: check_org_member
