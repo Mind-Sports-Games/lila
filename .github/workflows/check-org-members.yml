@@ -10,7 +10,7 @@ jobs:
       - name: Check if actor is an org member
         id: check_membership
         run: |
-          ORG="Mind-Sports-Games"
+          ORG="Watkins Media LTD"
           ACTOR="${{ github.actor }}"
           RESULT=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
             "https://api.github.com/orgs/$ORG/members/$ACTOR" -o /dev/null -w '%{http_code}')
