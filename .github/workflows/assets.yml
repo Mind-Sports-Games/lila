@@ -25,6 +25,10 @@ on:
       - 'lila'
 
 jobs:
+  check_org_member:
+    uses: ./.github/workflows/check-org-members.yml
+    secrets: inherit
+
   assets:
     runs-on: ubuntu-latest
     steps:

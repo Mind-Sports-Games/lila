@@ -9,6 +9,10 @@ on:
       - 'translation/dest/**'
 
 jobs:
+  check_org_member:
+    uses: ./.github/workflows/check-org-members.yml
+    secrets: inherit
+    
   lint:
     runs-on: ubuntu-latest
     steps:

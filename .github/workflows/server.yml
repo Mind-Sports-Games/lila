@@ -34,6 +34,10 @@ on:
       - 'yarn.lock'
 
 jobs:
+  check_org_member:
+    uses: ./.github/workflows/check-org-members.yml
+    secrets: inherit
+
   openjdk17:
     runs-on: ubuntu-latest
     steps:
