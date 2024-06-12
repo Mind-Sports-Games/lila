@@ -12,8 +12,9 @@ jobs:
   check_org_member:
     uses: ./.github/workflows/check-org-members.yml
     secrets: inherit
-    
+
   lint:
+    needs: check_org_member
     runs-on: ubuntu-latest
     steps:
       - uses: webfactory/ssh-agent@v0.5.2
