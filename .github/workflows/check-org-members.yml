@@ -2,6 +2,9 @@ name: Run Workflow for Org Members Only
 
 on:
   workflow_call:
+  secrets:
+    GITHUB_TOKEN:
+      required: true
 
 jobs:
   check-org-member:
@@ -10,7 +13,7 @@ jobs:
       - name: Check if actor is an org member
         id: check_membership
         run: |
-          ORG="Watkins Media LTD"
+          ORG="Mind-Sports-Games"
           ACTOR="${{ github.actor }}"
           RESULT=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
             "https://api.github.com/orgs/$ORG/members/$ACTOR" -o /dev/null -w '%{http_code}')

@@ -36,7 +36,8 @@ on:
 jobs:
   check_org_member:
     uses: ./.github/workflows/check-org-members.yml
-    secrets: inherit
+    with:
+      repo-token: ${{ secrets.GITHUB_TOKEN }}
 
   openjdk17:
     needs: check_org_member
