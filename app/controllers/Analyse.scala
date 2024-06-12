@@ -8,7 +8,7 @@ import views._
 import lila.api.Context
 import lila.app._
 import lila.common.HTTPRequest
-import lila.game.{ PgnDump, Pov }
+import lila.game.{ PgnDump, Pov, SgfDump }
 import lila.round.JsonView.WithFlags
 
 final class Analyse(
@@ -52,13 +52,21 @@ final class Analyse(
               initialFen,
               analysis = none,
               PgnDump.WithFlags(clocks = false)
+            ) zip
+            env.api.sgfDump(
+              pov.game,
+              initialFen,
+              PgnDump.WithFlags(clocks = false)
             ) flatMap {
               case (
                     (
-                      (((((analysis, analysisInProgress), simul), chat), crosstable), bookmarked),
-                      swissPairingGames
+                      (
+                        (((((analysis, analysisInProgress), simul), chat), crosstable), bookmarked),
+                        swissPairingGames
+                      ),
+                      pgn
                     ),
-                    pgn
+                    sgf
                   ) =>
                 env.api.roundApi.review(
                   pov,
@@ -82,6 +90,7 @@ final class Analyse(
                         data,
                         initialFen,
                         env.analyse.annotator(pgn, pov.game, analysis).toString,
+                        sgf,
                         analysis,
                         analysisInProgress,
                         simul,
@@ -139,11 +148,13 @@ final class Analyse(
       simul      <- pov.game.simulId ?? env.simul.repo.find
       crosstable <- env.game.crosstableApi.withMatchup(pov.game)
       pgn        <- env.api.pgnDump(pov.game, initialFen, analysis, PgnDump.WithFlags(clocks = false))
+      sgf        <- env.api.sgfDump(pov.game, initialFen, PgnDump.WithFlags(clocks = false))
     } yield Ok(
       html.analyse.replayBot(
         pov,
         initialFen,
         env.analyse.annotator(pgn, pov.game, analysis).toString,
+        sgf,
         simul,
         crosstable
       )

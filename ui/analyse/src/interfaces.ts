@@ -44,6 +44,7 @@ export interface AnalyseData {
   practiceGoal?: PracticeGoal;
   clock?: Clock;
   pref: AnalysePref;
+  gameRecordFormat: string; //sgf or png
   url: {
     socket: string;
   };

@@ -13,7 +13,7 @@ import lila.api.Context
 import lila.app._
 import lila.chat.Chat
 import lila.common.HTTPRequest
-import lila.game.{ Pov, Game => GameModel, PgnDump }
+import lila.game.{ Pov, Game => GameModel, PgnDump, SgfDump }
 import lila.swiss.Swiss.{ Id => SwissId }
 import lila.tournament.{ Tournament => Tour }
 import lila.user.{ User => UserModel }
@@ -221,7 +221,8 @@ final class Round(
               for { // web crawlers don't need the full thing
                 initialFen <- env.game.gameRepo.initialFen(pov.gameId)
                 pgn        <- env.api.pgnDump(pov.game, initialFen, none, PgnDump.WithFlags(clocks = false))
-              } yield Ok(html.round.watcher.crawler(pov, initialFen, pgn))
+                sgf        <- env.api.sgfDump(pov.game, initialFen, PgnDump.WithFlags(clocks = false))
+              } yield Ok(html.round.watcher.crawler(pov, initialFen, pgn, sgf))
           },
           api = apiVersion =>
             for {

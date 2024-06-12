@@ -4,12 +4,12 @@ import cats.data.Validated
 import strategygames.format.{ FEN, Forsyth, Uci, UciCharPair }
 import strategygames.variant.Variant
 import strategygames.opening.FullOpeningDB
-import strategygames.{ Game, GameLogic, Move, Pos, PromotableRole, Role, Situation }
+import strategygames.{ Game, GameFamily, GameLogic, Move, Pos, PromotableRole, Role, Situation }
 import play.api.libs.json._
 
 import lila.tree.Branch
 
-//We don't think AnaMove is used - think this has been ported to lila-ws
+//This is getting hit during study moves (but not during basic analysis)
 
 trait AnaAny {
 
@@ -46,7 +46,15 @@ case class AnaMove(
 
   def branch: Validated[String, Branch] =
     newGame flatMap { case (game, move) =>
-      game.actionStrs.flatten.lastOption toValid "Moved but no last move!" map { san =>
+      game.actionStrs.flatten.lastOption toValid "Moved but no last move!" map { lastAction =>
+        val gameRecordNotation =
+          if (
+            lib == GameLogic.FairySF() || lib == GameLogic.Go() || lib == GameLogic
+              .Backgammon() || (variant.gameFamily == GameFamily.LinesOfAction())
+          )
+            strategygames.format.sgf
+              .Dumper(variant, Vector(Vector(lastAction)))
+          else lastAction
         val uci = Uci(
           lib,
           move,
@@ -80,7 +88,7 @@ case class AnaMove(
           id = UciCharPair(lib, uci),
           ply = game.plies,
           variant = variant,
-          move = Uci.WithSan(lib, uci, san),
+          move = Uci.WithSan(lib, uci, gameRecordNotation),
           fen = fen,
           check = game.situation.check,
           dests = variant match {

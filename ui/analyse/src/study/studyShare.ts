@@ -78,6 +78,25 @@ export function view(ctrl: StudyShareCtrl): VNode {
   const studyId = ctrl.studyId,
     chapter = ctrl.chapter();
   const isPrivate = ctrl.isPrivate();
+  const variantKey = chapter.variant ? chapter.variant.key : ctrl.variant.key;
+  const gameFormatNotation = [
+    'go9x9',
+    'go13x13',
+    'go19x19',
+    'backgammon',
+    'nackgammon',
+    'linesOfAction',
+    'scrambledEggs',
+    'amazons',
+    'flipello',
+    'flipello10',
+    'shogi',
+    'minishogi',
+    'xiangqi',
+    'minixiangqi',
+  ].includes(variantKey)
+    ? 'sgf'
+    : 'pgn';
   const addPly = (path: string) => (ctrl.withPly() ? `${path}#${ctrl.currentNode().ply}` : path);
   return h('div.study__share', [
     h('div.downloads', [
@@ -98,22 +117,22 @@ export function view(ctrl: StudyShareCtrl): VNode {
         {
           attrs: {
             'data-icon': 'x',
-            href: `/study/${studyId}.pgn`,
+            href: `/study/${studyId}.${gameFormatNotation}`,
             download: true,
           },
         },
-        ctrl.trans.noarg(ctrl.relay ? 'downloadAllGames' : 'studyPgn')
+        ctrl.trans.noarg(ctrl.relay ? 'downloadAllGames' : gameFormatNotation === 'pgn' ? 'studyPgn' : 'studySgf')
       ),
       h(
         'a.button.text',
         {
           attrs: {
             'data-icon': 'x',
-            href: `/study/${studyId}/${chapter.id}.pgn`,
+            href: `/study/${studyId}/${chapter.id}.${gameFormatNotation}`,
             download: true,
           },
         },
-        ctrl.trans.noarg(ctrl.relay ? 'downloadGame' : 'chapterPgn')
+        ctrl.trans.noarg(ctrl.relay ? 'downloadGame' : gameFormatNotation === 'pgn' ? 'chapterPgn' : 'chapterSgf')
       ),
       // h(
       //   'a.button.text',
