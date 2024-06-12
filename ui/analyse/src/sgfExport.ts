@@ -1,23 +1,27 @@
 import AnalyseCtrl from './ctrl';
-import { initialFen, fixCrazySan } from 'stratutils';
+import { initialFen } from 'stratutils';
 
 interface SgfNode {
   ply: Ply;
   san?: San;
 }
 
-//TODO add logic to produce sgf not pgn actionstrings
+//TODO fix for multi action, requre more info in node
 function renderNodesTxt(nodes: SgfNode[]): string {
-  console.log('nodes', nodes);
   if (!nodes[0]) return '';
   if (!nodes[0].san) nodes = nodes.slice(1);
   if (!nodes[0]) return '';
-  let s = nodes[0].ply % 2 === 1 ? '' : Math.floor((nodes[0].ply + 1) / 2) + '... ';
-  nodes.forEach(function (node, i) {
+  let s = '';
+  const startingColor = nodes[0].san ? nodes[0].san[1] : '';
+  const startingPly = nodes[0].ply ? nodes[0].ply % 2 : 1;
+  const color = startingColor === 'W' ? 'B' : 'W';
+  nodes.forEach(function (node, _) {
     if (node.ply === 0) return;
-    if (node.ply % 2 === 1) s += (node.ply + 1) / 2 + '. ';
-    else s += '';
-    s += fixCrazySan(node.san!) + ((i + 9) % 8 === 0 ? '\n' : ' ');
+    if (node.ply % 2 !== startingPly && node.san) {
+      s += ';' + color + node.san.substring(2) + '\n';
+    } else {
+      s += node.san + '\n';
+    }
   });
   return s.trim();
 }
@@ -57,6 +61,7 @@ export function renderFullTxt(ctrl: AnalyseCtrl): string {
         })
         .join('\n') +
       '\n\n' +
-      txt;
+      txt +
+      ')';
   return txt;
 }
