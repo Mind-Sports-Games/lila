@@ -26,7 +26,7 @@ trait GameHelper { self: I18nHelper with UserHelper with AiHelper with StringHel
     )
 
   def titleGame(g: Game) = {
-    val speed   = strategygames.Speed(g.clock.map(_.config)).name
+    val speed = strategygames.Speed(g.clock.map(_.config)).name
     s"$speed ${VariantKeys.variantName(g.variant)} • ${playerText(g.p1Player)} vs ${playerText(g.p2Player)}"
   }
 
@@ -68,6 +68,7 @@ trait GameHelper { self: I18nHelper with UserHelper with AiHelper with StringHel
       case (Some(w), _, SingleWin, _)                  => s"${playerText(w)} won"
       case (Some(w), _, GammonWin, _)                  => s"${playerText(w)} won by gammon"
       case (Some(w), _, BackgammonWin, _)              => s"${playerText(w)} won by backgammon"
+      case (Some(w), _, RuleOfGin, _)                  => s"${playerText(w)} won by rule of gin"
       case (_, _, VariantEnd, _)                       => VariantKeys.variantTitle(game.variant)
       case _                                           => "Game is still being played"
     }
@@ -198,6 +199,11 @@ trait GameHelper { self: I18nHelper with UserHelper with AiHelper with StringHel
           case (P1, None)    => trans.playerIndexTimeOut(game.playerTrans(P1)).v + " • " + trans.draw.txt()
           case (P2, Some(_)) => trans.playerIndexTimeOut(game.playerTrans(P2)).v
           case (P2, None)    => trans.playerIndexTimeOut(game.playerTrans(P2)).v + " • " + trans.draw.txt()
+        }
+      case S.RuleOfGin =>
+        game.winner match {
+          case Some(p) if p.playerIndex.p1 => trans.playerIndexWinsByRuleOfGin(game.playerTrans(P1)).v
+          case _                           => trans.playerIndexWinsByRuleOfGin(game.playerTrans(P2)).v
         }
       case S.NoStart =>
         val playerIndex = game.loser.fold(PlayerIndex.p1)(_.playerIndex).name.capitalize

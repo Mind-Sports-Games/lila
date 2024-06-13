@@ -98,6 +98,7 @@ object jsI18n {
     trans.playerIndexLeftTheGame,
     trans.draw,
     trans.playerIndexTimeOut,
+    trans.playerIndexWinsByRuleOfGin,
     trans.playerIndexIsVictorious,
     trans.promotion,
     trans.withdraw,

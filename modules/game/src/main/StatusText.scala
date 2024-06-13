@@ -19,6 +19,7 @@ object StatusText {
       case Timeout if win.isDefined              => s"${loser(win)} left the game."
       case Timeout | Draw                        => "The game is a draw."
       case Outoftime                             => s"${winner(win)} wins on time."
+      case RuleOfGin                             => s"${winner(win)} wins by rule of gin."
       case NoStart                               => s"${loser(win)} wins by forfeit."
       case Cheat                                 => "Cheat detected."
       case SingleWin                             => s"${winner(win)} wins."

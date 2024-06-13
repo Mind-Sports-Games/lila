@@ -117,7 +117,7 @@ case class Game(
   //once draughts is converted to multiaction we should be able to use actionStrs.flatten.size
   def playedPlies = plies - stratGame.startedAtPly
 
-  def flagged = (status == Status.Outoftime).option(turnPlayerIndex)
+  def flagged = (Status.flagged.contains(status)).option(turnPlayerIndex)
 
   def fullIdOf(player: Player): Option[String] =
     (players contains player) option s"$id${player.id}"
@@ -1359,7 +1359,7 @@ case class ByoyomiClockHistory(
       // remaining time
       val byoyomiStart = firstEnteredPeriod(playerIndex)
       val byoyomiTimeout =
-        byoyomiStart.isDefined && (status == Status.Outoftime) && (playerIndex == turnPlayerIndex)
+        byoyomiStart.isDefined && (Status.flagged.contains(status)) && (playerIndex == turnPlayerIndex)
 
       (pairs.zipWithIndex.map { case ((first, second), index) =>
         ({

@@ -19,6 +19,7 @@ private object jsI18n {
     trans.playerIndexLeftTheGame,
     trans.draw,
     trans.playerIndexTimeOut,
+    trans.playerIndexWinsByRuleOfGin,
     trans.playingRightNow,
     trans.playerIndexIsVictorious,
     trans.promotion,

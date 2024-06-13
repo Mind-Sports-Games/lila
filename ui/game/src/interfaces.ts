@@ -80,6 +80,7 @@ export type StatusName =
   | 'timeout'
   | 'draw'
   | 'outoftime'
+  | 'ruleOfGin'
   | 'noStart'
   | 'cheat'
   | 'singleWin'
