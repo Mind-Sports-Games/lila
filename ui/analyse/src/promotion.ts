@@ -1,8 +1,8 @@
 import { h } from 'snabbdom';
 import * as ground from './ground';
 import { bind, onInsert } from './util';
-import * as util from 'chessground/util';
-import { Role } from 'chessground/types';
+import * as util from 'chessground/build/util';
+import { Role } from 'chessground/build/types';
 import AnalyseCtrl from './ctrl';
 import { MaybeVNode, JustCaptured } from './interfaces';
 import { promotion } from 'stratutils';

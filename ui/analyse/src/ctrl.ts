@@ -1,11 +1,11 @@
-import * as cg from 'chessground/types';
+import * as cg from 'chessground/build/types';
 import {
   oppositeOrientation,
   oppositeOrientationForLOA,
   orientationForLOA,
   oppositeOrientationForBackgammon,
   orientationForBackgammon,
-} from 'chessground/util';
+} from 'chessground/build/util';
 import * as stratUtils from 'stratutils';
 import * as game from 'game';
 import * as keyboard from './keyboard';
@@ -19,20 +19,20 @@ import GamebookPlayCtrl from './study/gamebook/gamebookPlayCtrl';
 import makeStudy from './study/studyCtrl';
 import throttle from 'common/throttle';
 import { AnalyseOpts, AnalyseData, ServerEvalData, Key, JustCaptured, NvuiPlugin, Redraw } from './interfaces';
-import { Api as ChessgroundApi } from 'chessground/api';
+import { Api as ChessgroundApi } from 'chessground/build/api';
 import { Autoplay, AutoplayDelay } from './autoplay';
 import { build as makeTree, path as treePath, ops as treeOps, TreeWrapper } from 'tree';
 import { compute as computeAutoShapes } from './autoShape';
-import { Config as ChessgroundConfig } from 'chessground/config';
-import { setDropMode, cancelDropMode } from 'chessground/drop';
+import { Config as ChessgroundConfig } from 'chessground/build/config';
+import { setDropMode, cancelDropMode } from 'chessground/build/drop';
 import { ActionMenuCtrl } from './actionMenu';
 import { ctrl as cevalCtrl, isEvalBetter, sanIrreversible, CevalCtrl, Work as CevalWork, CevalOpts } from 'ceval';
 import { ctrl as treeViewCtrl, TreeView } from './treeView/treeView';
 import { defined, prop, Prop } from 'common';
-import { DrawShape } from 'chessground/draw';
+import { DrawShape } from 'chessground/build/draw';
 import { ExplorerCtrl } from './explorer/interfaces';
 import { ForecastCtrl } from './forecast/interfaces';
-import { playstrategyRules, amazonsChessgroundFen } from 'stratops/compat';
+import { playstrategyRules, amazonsChessgroundFen } from 'stratops/build/compat';
 import { make as makeEvalCache, EvalCache } from './evalCache';
 import { make as makeForecast } from './forecast/forecastCtrl';
 import { make as makeFork, ForkCtrl } from './fork';
@@ -40,13 +40,13 @@ import { make as makePractice, PracticeCtrl } from './practice/practiceCtrl';
 import { make as makeRetro, RetroCtrl } from './retrospect/retroCtrl';
 import { make as makeSocket, Socket } from './socket';
 import { nextGlyphSymbol } from './nodeFinder';
-import { opposite, parseUci, makeSquare, roleToChar } from 'stratops/util';
-import { PLAYERINDEXES, Outcome, isNormal } from 'stratops/types';
-import { SquareSet } from 'stratops/squareSet';
-import { parseFen } from 'stratops/fen';
-import { Position, PositionError } from 'stratops/chess';
+import { opposite, parseUci, makeSquare, roleToChar } from 'stratops/build/util';
+import { PLAYERINDEXES, Outcome, isNormal } from 'stratops/build/types';
+import { SquareSet } from 'stratops/build/squareSet';
+import { parseFen } from 'stratops/build/fen';
+import { Position, PositionError } from 'stratops/build/chess';
 import { Result } from '@badrap/result';
-import { setupPosition } from 'stratops/variant';
+import { setupPosition } from 'stratops/build/variant';
 import { storedProp, StoredBooleanProp } from 'common/storage';
 import { AnaMove, AnaDrop, AnaPass, StudyCtrl } from './study/interfaces';
 import { StudyPracticeCtrl } from './study/practice/interfaces';

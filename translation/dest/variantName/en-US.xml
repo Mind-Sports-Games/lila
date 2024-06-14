@@ -14,13 +14,15 @@
   <string name="noCastling">No Castling</string>
   <string name="racingKings">Racing Kings</string>
   <string name="threeCheck">Three-check</string>
+  <string name="breakthroughtroyka">Breakthrough</string>
+  <string name="minibreakthroughtroyka">MiniBreakthrough</string>
   <string name="linesOfAction">Lines Of Action</string>
   <string name="scrambledEggs">Scrambled Eggs</string>
   <string name="draughts">Draughts</string>
   <string name="international">International</string>
   <string name="antidraughts">Antidraughts</string>
   <string name="brazilian">Brazilian</string>
-  <string name="breakthrough">Breakthrough</string>
+  <string name="breakthrough">BRKTHRU</string>
   <string name="frisian">Frisian</string>
   <string name="frysk">Frysk!</string>
   <string name="pool">Pool</string>

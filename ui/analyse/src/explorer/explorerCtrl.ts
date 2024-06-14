@@ -1,7 +1,7 @@
 import { prop } from 'common';
 import { storedProp } from 'common/storage';
 import debounce from 'common/debounce';
-import { opposite } from 'chessground/util';
+import { opposite } from 'chessground/build/util';
 import { controller as configCtrl } from './explorerConfig';
 import * as xhr from './explorerXhr';
 import { winnerOf, playerIndexOf } from './explorerUtil';

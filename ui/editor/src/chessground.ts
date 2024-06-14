@@ -1,8 +1,8 @@
 import { h, VNode } from 'snabbdom';
 import { Chessground } from 'chessground';
-import { Config as CgConfig } from 'chessground/config';
-import { MouchEvent } from 'chessground/types';
-import * as util from 'chessground/util';
+import { Config as CgConfig } from 'chessground/build/config';
+import { MouchEvent } from 'chessground/build/types';
+import * as util from 'chessground/build/util';
 import changeColorHandle from 'common/coordsColor';
 import EditorCtrl from './ctrl';
 

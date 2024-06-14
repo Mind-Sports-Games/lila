@@ -1,11 +1,11 @@
 import { h, VNode } from 'snabbdom';
-import { Pieces, Rank, File, files } from 'chessground/types';
-import { invRanks, allKeys } from 'chessground/util';
+import { Pieces, Rank, File, files } from 'chessground/build/types';
+import { invRanks, allKeys } from 'chessground/build/util';
 import { Setting, makeSetting } from './setting';
-import { parseFen } from 'stratops/fen';
-import { Chess } from 'stratops/chess';
-import { chessgroundDests } from 'stratops/compat';
-import { SquareName } from 'stratops/types';
+import { parseFen } from 'stratops/build/fen';
+import { Chess } from 'stratops/build/chess';
+import { chessgroundDests } from 'stratops/build/compat';
+import { SquareName } from 'stratops/build/types';
 
 export type Style = 'uci' | 'san' | 'literate' | 'nato' | 'anna';
 export type PieceStyle = 'letter' | 'white uppercase letter' | 'name' | 'white uppercase name';

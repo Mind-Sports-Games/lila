@@ -425,6 +425,16 @@ export default class Setup {
               break;
           }
           break;
+        case '11':
+          switch (variantId[1]) {
+            case '1':
+              key = 'breakthroughtroyka';
+              break;
+            case '2':
+              key = 'minibreakthroughtroyka';
+              break;
+          }
+          break;
       }
       const $selected = $ratings
         .hide()
@@ -470,6 +480,9 @@ export default class Setup {
           break;
         case '10':
           key = 'backgammon';
+          break;
+        case '11':
+          key = 'breakthroughtroyka';
           break;
       }
       $form.find('.playerIndex-submits').removeClass(class_list);

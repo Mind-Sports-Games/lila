@@ -1,5 +1,5 @@
 import { altCastles } from 'stratutils';
-import { parseUci } from 'stratops/util';
+import { parseUci } from 'stratops/build/util';
 import { path as pathOps } from 'tree';
 import { Vm, Puzzle, MoveTest } from './interfaces';
 

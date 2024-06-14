@@ -8,8 +8,8 @@ import RoundController from './ctrl';
 import { Untyped } from './interfaces';
 import { defined } from 'common';
 import * as util from './util';
-import * as cg from 'chessground/types';
-import { opposite } from 'chessground/util';
+import * as cg from 'chessground/build/types';
+import { opposite } from 'chessground/build/util';
 
 export interface RoundSocket extends Untyped {
   send: SocketSend;

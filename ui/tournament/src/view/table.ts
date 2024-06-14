@@ -1,5 +1,5 @@
 import { h, VNode } from 'snabbdom';
-import { opposite } from 'chessground/util';
+import { opposite } from 'chessground/build/util';
 import { player as renderPlayer, bind, onInsert } from './util';
 import { Duel, DuelPlayer, DuelTeams, TeamBattle, FeaturedGame } from '../interfaces';
 import { teamName } from './battle';

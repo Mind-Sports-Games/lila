@@ -32,7 +32,7 @@ object bits {
       moreJs = moreJs,
       moreCss = frag(
         cssTag {
-          if (variant.hasDetatchedPocket) "round.zh"
+          if (variant.hasDetachedPocket) "round.zh"
           else "round"
         },
         ctx.blind option cssTag("round.nvui"),

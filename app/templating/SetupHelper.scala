@@ -179,7 +179,10 @@ trait SetupHelper { self: I18nHelper =>
       encode: Variant => String = encodeId
   )(implicit lang: Lang): List[(SelectChoice, List[SelectChoice])] =
     GameFamily.all.map(gf =>
-      (translatedGameFamilyChoice(gf), translatedVariantChoicesWithVariantsByGameFamily(gf, encode))
+      (
+        translatedGameFamilyChoice(gf),
+        translatedVariantChoicesWithVariantsByGameFamily(gf, encode)
+      )
     )
 
   def translatedAllVariantChoicesWithVariants(

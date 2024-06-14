@@ -7,20 +7,20 @@ import moveTest from './moveTest';
 import PuzzleSession from './session';
 import PuzzleStreak from './streak';
 import throttle from 'common/throttle';
-import { Api as CgApi } from 'chessground/api';
+import { Api as CgApi } from 'chessground/build/api';
 import { build as treeBuild, ops as treeOps, path as treePath, TreeWrapper } from 'tree';
-import { Chess } from 'stratops/chess';
-import { chessgroundDests, scalachessCharPair } from 'stratops/compat';
-import { Config as CgConfig } from 'chessground/config';
+import { Chess } from 'stratops/build/chess';
+import { chessgroundDests, scalachessCharPair } from 'stratops/build/compat';
+import { Config as CgConfig } from 'chessground/build/config';
 import { ctrl as cevalCtrl, CevalCtrl } from 'ceval';
 import { defer } from 'common/defer';
 import { defined, prop, Prop } from 'common';
-import { makeSanAndPlay } from 'stratops/san';
-import { parseFen, makeFen } from 'stratops/fen';
-import { parseSquare, parseUci, makeSquare, makeUci } from 'stratops/util';
+import { makeSanAndPlay } from 'stratops/build/san';
+import { parseFen, makeFen } from 'stratops/build/fen';
+import { parseSquare, parseUci, makeSquare, makeUci } from 'stratops/build/util';
 import { pgnToTree, mergeSolution } from './moveTree';
 import { Redraw, Vm, Controller, PuzzleOpts, PuzzleData, PuzzleResult, MoveTest, ThemeKey } from './interfaces';
-import { Role, Move, Outcome } from 'stratops/types';
+import { Role, Move, Outcome } from 'stratops/build/types';
 import { storedProp } from 'common/storage';
 
 export default function (opts: PuzzleOpts, redraw: Redraw): Controller {

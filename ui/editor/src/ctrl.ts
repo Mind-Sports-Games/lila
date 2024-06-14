@@ -1,13 +1,13 @@
 import { EditorState, Selected, Redraw, CastlingToggle, CastlingToggles, CASTLING_TOGGLES } from './interfaces';
-import { Api as CgApi } from 'chessground/api';
-import { Rules, Square } from 'stratops/types';
-import { SquareSet } from 'stratops/squareSet';
-import { Board } from 'stratops/board';
-import { Setup, Material, RemainingChecks } from 'stratops/setup';
-import { Castles, setupPosition, defaultPosition } from 'stratops/variant';
-import { playstrategyVariants } from 'stratops/compat';
-import { makeFen, parseFen, parseCastlingFen, INITIAL_FEN, EMPTY_FEN, INITIAL_EPD } from 'stratops/fen';
-import * as fp from 'stratops/fp';
+import { Api as CgApi } from 'chessground/build/api';
+import { Rules, Square } from 'stratops/build/types';
+import { SquareSet } from 'stratops/build/squareSet';
+import { Board } from 'stratops/build/board';
+import { Setup, Material, RemainingChecks } from 'stratops/build/setup';
+import { Castles, setupPosition, defaultPosition } from 'stratops/build/variant';
+import { playstrategyVariants } from 'stratops/build/compat';
+import { makeFen, parseFen, parseCastlingFen, INITIAL_FEN, EMPTY_FEN, INITIAL_EPD } from 'stratops/build/fen';
+import * as fp from 'stratops/build/fp';
 import { defined, prop, Prop } from 'common';
 
 export default class EditorCtrl {

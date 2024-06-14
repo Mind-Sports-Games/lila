@@ -1,4 +1,4 @@
-import { playstrategyRules } from 'stratops/compat';
+import { playstrategyRules } from 'stratops/build/compat';
 import { ProtocolOpts, Work } from './types';
 import { Deferred, defer } from 'common/defer';
 import { Sync, sync } from 'common/sync';

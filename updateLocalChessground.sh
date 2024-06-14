@@ -1,0 +1,12 @@
+yarn workspace analyse add file:/home/vincent/Desktop/code/chessground
+yarn workspace draughtsround add file:/home/vincent/Desktop/code/chessground
+yarn workspace editor add file:/home/vincent/Desktop/code/chessground
+yarn workspace learn add file:/home/vincent/Desktop/code/chessground
+yarn workspace lobby add file:/home/vincent/Desktop/code/chessground
+yarn workspace puz add file:/home/vincent/Desktop/code/chessground
+yarn workspace puzzle add file:/home/vincent/Desktop/code/chessground
+yarn workspace racer add file:/home/vincent/Desktop/code/chessground
+yarn workspace round add file:/home/vincent/Desktop/code/chessground
+yarn workspace storm add file:/home/vincent/Desktop/code/chessground
+yarn workspace swiss add file:/home/vincent/Desktop/code/chessground
+yarn workspace tournament add file:/home/vincent/Desktop/code/chessground
