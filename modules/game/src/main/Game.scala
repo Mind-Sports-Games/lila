@@ -74,9 +74,8 @@ case class Game(
   def activePlayer = stratGame.situation.player
 
   val gameRecordFormat = variant match {
-    case Variant.Chess(variant) if variant.gameFamily == GameFamily.LinesOfAction() => "sgf"
-    case Variant.FairySF(_) | Variant.Go(_) | Variant.Backgammon(_)                 => "sgf"
-    case _                                                                          => "pgn"
+    case Variant.FairySF(_) | Variant.Go(_) | Variant.Backgammon(_) => "sgf"
+    case _                                                          => "pgn"
   }
 
   val players = List(p1Player, p2Player)

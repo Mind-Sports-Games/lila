@@ -38,8 +38,7 @@ final class SgfDump(
   def validSgf(variant: Variant, actionStrs: ActionStrs): String = {
     if (
       variant.gameLogic == GameLogic.FairySF() || variant.gameLogic == GameLogic
-        .Go() || variant.gameLogic == GameLogic
-        .Backgammon() || (variant.gameFamily == GameFamily.LinesOfAction())
+        .Go() || variant.gameLogic == GameLogic.Backgammon()
     ) {
       Dumper(variant, actionStrs)
     } else {
@@ -87,7 +86,7 @@ final class SgfDump(
         )
       ) ::: (
         chapter.setup.variant.gameFamily match {
-          case GameFamily.LinesOfAction() =>
+          case GameFamily.LinesOfAction() => //not currently used
             List(
               Tag(_.GM, 9),
               Tag(_.SU, if (chapter.setup.variant.key == "linesOfAction") "Standard" else "Scrambled-eggs")
@@ -120,10 +119,10 @@ final class SgfDump(
           case GameFamily.Backgammon() =>
             List(
               Tag(_.GM, 6),
-              Tag(_.RU, "Crawford"),
+              //Tag(_.RU, "Crawford"), // multipoint info
               Tag(_.CV, 1),
               Tag(_.CO, "n"),
-              Tag.matchInfo(1, 1, 0, 0),
+              Tag.matchInfo(1, 1, 0, 0), // multipoint info
               Tag(_.SU, if (chapter.setup.variant.key == "backgammon") "Standard" else "Nackgammon")
             )
           case _ => List()

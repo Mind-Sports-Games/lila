@@ -3,7 +3,7 @@ package lila.socket
 import cats.data.Validated
 import strategygames.format.{ FEN, Forsyth, Uci, UciCharPair }
 import strategygames.opening.FullOpeningDB
-import strategygames.{ Game, GameFamily, GameLogic, Pos, Role, Situation }
+import strategygames.{ Game, GameLogic, Pos, Role, Situation }
 import strategygames.variant.Variant
 import play.api.libs.json.JsObject
 
@@ -26,12 +26,8 @@ case class AnaDrop(
     newGame.flatMap { case (game, drop) =>
       game.actionStrs.flatten.lastOption toValid "Dropped but no last move!" map { lastAction =>
         val gameRecordNotation =
-          if (
-            lib == GameLogic.FairySF() || lib == GameLogic.Go() || lib == GameLogic
-              .Backgammon() || (variant.gameFamily == GameFamily.LinesOfAction())
-          )
-            strategygames.format.sgf
-              .Dumper(variant, Vector(Vector(lastAction)))
+          if (lib == GameLogic.FairySF() || lib == GameLogic.Go() || lib == GameLogic.Backgammon())
+            strategygames.format.sgf.Dumper(variant, Vector(Vector(lastAction)))
           else lastAction
         val uci     = Uci(lib, drop)
         val movable = !game.situation.end
