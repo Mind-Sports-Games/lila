@@ -4,7 +4,7 @@ import cats.data.Validated
 import strategygames.format.{ FEN, Forsyth, Uci, UciCharPair }
 import strategygames.variant.Variant
 import strategygames.opening.FullOpeningDB
-import strategygames.{ Game, GameFamily, GameLogic, Move, Pos, PromotableRole, Role, Situation }
+import strategygames.{ Game, GameLogic, Move, Pos, PromotableRole, Role, Situation }
 import play.api.libs.json._
 
 import lila.tree.Branch
@@ -48,12 +48,8 @@ case class AnaMove(
     newGame flatMap { case (game, move) =>
       game.actionStrs.flatten.lastOption toValid "Moved but no last move!" map { lastAction =>
         val gameRecordNotation =
-          if (
-            lib == GameLogic.FairySF() || lib == GameLogic.Go() || lib == GameLogic
-              .Backgammon() || (variant.gameFamily == GameFamily.LinesOfAction())
-          )
-            strategygames.format.sgf
-              .Dumper(variant, Vector(Vector(lastAction)))
+          if (lib == GameLogic.FairySF() || lib == GameLogic.Go() || lib == GameLogic.Backgammon())
+            strategygames.format.sgf.Dumper(variant, Vector(Vector(lastAction)))
           else lastAction
         val uci = Uci(
           lib,

@@ -85,8 +85,6 @@ export function view(ctrl: StudyShareCtrl): VNode {
     'go19x19',
     'backgammon',
     'nackgammon',
-    'linesOfAction',
-    'scrambledEggs',
     'amazons',
     'flipello',
     'flipello10',

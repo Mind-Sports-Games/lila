@@ -102,10 +102,10 @@ final class SgfDump(
           teams.flatMap { t => !isP1Black option Tag("BT", t.p2) },
           teams.flatMap { t => !isP1Black option Tag("WT", t.p1) },
           teams.flatMap { t => isP1Black option Tag("WT", t.p2) },
-          Tag(_.IP, (initialFen | Forsyth.initial(game.variant.gameLogic)).value).some
+          initialFen.map { fen => Tag(_.IP, fen.value) }
         ).flatten
       } ++ (game.variant.gameFamily match {
-        case GameFamily.LinesOfAction() =>
+        case GameFamily.LinesOfAction() => //not used yet
           Tags {
             List(
               Tag(_.GM, 9),
@@ -147,10 +147,10 @@ final class SgfDump(
           Tags {
             List(
               Tag(_.GM, 6),
-              Tag(_.RU, "Crawford"),
+              //Tag(_.RU, "Crawford"), // multipoint info
               Tag(_.CV, 1),
               Tag(_.CO, "n"),
-              Tag.matchInfo(1, 1, 0, 0),
+              Tag.matchInfo(1, 1, 0, 0), // multipoint info
               Tag(_.SU, if (game.variant.key == "backgammon") "Standard" else "Nackgammon")
             )
           }
@@ -161,25 +161,6 @@ final class SgfDump(
 }
 
 object SgfDump {
-
-//   private val delayTurnsBy         = 3
-//   private val delayKeepsFirstTurns = 5
-
-//   case class WithFlags(
-//       clocks: Boolean = true,
-//       turns: Boolean = true,
-//       tags: Boolean = true,
-//       evals: Boolean = true,
-//       opening: Boolean = true,
-//       literate: Boolean = false,
-//       delayTurns: Boolean = false
-//   ) {
-//     def applyDelay[M](actionStrs: Seq[M]): Seq[M] =
-//       if (!delayTurns) actionStrs
-//       else actionStrs.take((actionStrs.size - delayTurnsBy) atLeast delayKeepsFirstTurns)
-
-//     def keepDelayIf(cond: Boolean) = copy(delayTurns = delayTurns && cond)
-//   }
 
   def result(game: Game) =
     if (game.finished) PlayerIndex.showResult(game.winnerPlayerIndex, false)
