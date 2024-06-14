@@ -94,6 +94,8 @@ object jsI18n {
     trans.checkmate,
     trans.perpetualCheck,
     trans.playerIndexResigned,
+    trans.playerIndexResignedGammon,
+    trans.playerIndexResignedBackgammon,
     trans.stalemate,
     trans.playerIndexLeftTheGame,
     trans.draw,

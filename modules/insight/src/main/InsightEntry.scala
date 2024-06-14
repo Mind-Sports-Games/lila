@@ -94,7 +94,7 @@ object Termination {
     s match {
       case S.Timeout                                                           => Disconnect
       case S.Outoftime | S.RuleOfGin                                           => ClockFlag
-      case S.Resign                                                            => Resignation
+      case S.Resign | S.ResignGammon | S.ResignBackgammon                      => Resignation
       case S.Draw                                                              => Draw
       case S.Stalemate                                                         => Stalemate
       case S.Mate | S.SingleWin | S.GammonWin | S.BackgammonWin | S.VariantEnd => Checkmate

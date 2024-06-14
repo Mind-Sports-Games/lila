@@ -13,6 +13,8 @@ object StatusText {
       case Mate                                  => s"${winner(win)} wins by checkmate."
       case PerpetualCheck                        => s"${winner(win)} wins by opponent causing perpetual check."
       case Resign                                => s"${loser(win)} resigns."
+      case ResignGammon                          => s"${loser(win)} resigns a gammon."
+      case ResignBackgammon                      => s"${loser(win)} resigns a backgammon."
       case UnknownFinish                         => s"${winner(win)} wins."
       case Stalemate if !variant.stalemateIsDraw => s"${winner(win)} wins by stalemate."
       case Stalemate                             => "Draw by stalemate."

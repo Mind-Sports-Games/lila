@@ -131,7 +131,7 @@ final class PlaybanApi(
                 loser.playerIndex
               ) < Centis(1000) &&
               game.turnOf(loser) &&
-              Status.Resign.is(status)
+              (Status.Resign.is(status) || Status.ResignGammon.is(status) || Status.ResignBackgammon.is(status))
             }
             .map { c =>
               (c.estimateTotalSeconds / 10) atLeast 15 atMost (3 * 60)
