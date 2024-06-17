@@ -36,7 +36,7 @@ final class JsonView(rematches: Rematches) {
         "speed"         -> game.speed.key,
         "perf"          -> PerfPicker.key(game),
         "rated"         -> game.rated,
-        "initialFen"    -> (initialFen | Forsyth.initial(game.variant.gameLogic)),
+        "initialFen"    -> (initialFen | game.variant.initialFen),
         "fen"           -> (Forsyth.>>(game.variant.gameLogic, game.stratGame)),
         "player"        -> game.activePlayerIndex,
         "plies"         -> game.plies,
