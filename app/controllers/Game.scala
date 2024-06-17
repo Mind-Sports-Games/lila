@@ -45,7 +45,9 @@ final class Game(
       case Some(game) =>
         lila.mon.export.pgn.game.increment()
         val config = GameApiV2.OneConfig(
-          format = if (HTTPRequest acceptsJson req) GameApiV2.Format.JSON else GameApiV2.Format.PGN,
+          format = if (HTTPRequest acceptsJson req) { GameApiV2.Format.JSON }
+          else if (game.gameRecordFormat == "pgn") { GameApiV2.Format.PGN }
+          else { GameApiV2.Format.SGF },
           imported = getBool("imported", req),
           flags = requestPgnFlags(req, extended = true),
           playerFile = get("players", req)
@@ -160,6 +162,7 @@ final class Game(
   private[controllers] def gameContentType(config: GameApiV2.Config) =
     config.format match {
       case GameApiV2.Format.PGN => pgnContentType
+      case GameApiV2.Format.SGF => sgfContentType
       case GameApiV2.Format.JSON =>
         config match {
           case _: GameApiV2.OneConfig => JSON

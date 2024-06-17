@@ -110,6 +110,7 @@ export default class AnalyseCtrl {
   // underboard inputs
   fenInput?: string;
   pgnInput?: string;
+  sgfInput?: string;
 
   // other paths
   initialPath: Tree.Path;
@@ -218,6 +219,7 @@ export default class AnalyseCtrl {
     this.onMainline = this.tree.pathIsMainline(path);
     this.fenInput = undefined;
     this.pgnInput = undefined;
+    this.sgfInput = undefined;
   };
 
   flip = () => {

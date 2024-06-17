@@ -25,7 +25,11 @@ on:
       - 'lila'
 
 jobs:
+  check_org_member:
+    uses: ./.github/workflows/check-org-members.yml
+
   assets:
+    needs: check_org_member
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
