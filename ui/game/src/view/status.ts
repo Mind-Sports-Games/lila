@@ -39,6 +39,10 @@ export default function status(ctrl: Ctrl): string {
         : `${ctrl.trans('playerIndexTimeOut', '')} • ${noarg('draw')}`;
     case 'ruleOfGin':
       return ctrl.trans('playerIndexWinsByRuleOfGin', d.game.winnerPlayer ? d.game.winnerPlayer : '')
+    case 'ginGammon':
+      return ctrl.trans('playerIndexWinsByGinGammon', d.game.winnerPlayer ? d.game.winnerPlayer : '')
+    case 'ginBackgammon':
+      return ctrl.trans('playerIndexWinsByGinBackgammon', d.game.winnerPlayer ? d.game.winnerPlayer : '')
     case 'noStart':
       return d.game.loserPlayer + " didn't move";
     case 'cheat':

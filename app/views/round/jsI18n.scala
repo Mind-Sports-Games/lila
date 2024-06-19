@@ -101,6 +101,8 @@ object jsI18n {
     trans.draw,
     trans.playerIndexTimeOut,
     trans.playerIndexWinsByRuleOfGin,
+    trans.playerIndexWinsByGinGammon,
+    trans.playerIndexWinsByGinBackgammon,
     trans.playerIndexIsVictorious,
     trans.promotion,
     trans.withdraw,

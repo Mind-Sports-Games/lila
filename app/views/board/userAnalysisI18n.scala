@@ -40,6 +40,8 @@ object userAnalysisI18n {
     trans.draw,
     trans.playerIndexTimeOut,
     trans.playerIndexWinsByRuleOfGin,
+    trans.playerIndexWinsByGinGammon,
+    trans.playerIndexWinsByGinBackgammon,
     trans.playingRightNow,
     trans.playerIndexIsVictorious,
     trans.promotion,

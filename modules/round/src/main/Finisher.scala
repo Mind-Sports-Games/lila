@@ -48,7 +48,7 @@ final private class Finisher(
     } else if (
       game.variant.useRuleOfGinOnInsufficientMaterial && game.situation.opponentHasInsufficientMaterial
     ) {
-      apply(game, _.RuleOfGin, Some(game.player.playerIndex))
+      apply(game, game.situation.insufficientMaterialStatus, Some(game.player.playerIndex))
     } else {
       val winner = Some(!game.player.playerIndex) ifFalse game.situation.opponentHasInsufficientMaterial
       apply(game, _.Outoftime, winner) >>-

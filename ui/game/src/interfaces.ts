@@ -83,6 +83,8 @@ export type StatusName =
   | 'draw'
   | 'outoftime'
   | 'ruleOfGin'
+  | 'ginGammon'
+  | 'ginBackgammon'
   | 'noStart'
   | 'cheat'
   | 'singleWin'

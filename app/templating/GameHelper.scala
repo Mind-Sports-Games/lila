@@ -71,6 +71,8 @@ trait GameHelper { self: I18nHelper with UserHelper with AiHelper with StringHel
       case (_, Some(l), ResignGammon, _)               => s"${playerText(l)} resigned a gammon"
       case (_, Some(l), ResignBackgammon, _)           => s"${playerText(l)} resigned a backgammon"
       case (Some(w), _, RuleOfGin, _)                  => s"${playerText(w)} won by rule of gin"
+      case (Some(w), _, GinGammon, _)                  => s"${playerText(w)} won a gammon by rule of gin"
+      case (Some(w), _, GinBackgammon, _)              => s"${playerText(w)} won a backgammon by rule of gin"
       case (_, _, VariantEnd, _)                       => VariantKeys.variantTitle(game.variant)
       case _                                           => "Game is still being played"
     }
@@ -216,6 +218,16 @@ trait GameHelper { self: I18nHelper with UserHelper with AiHelper with StringHel
         game.winner match {
           case Some(p) if p.playerIndex.p1 => trans.playerIndexWinsByRuleOfGin(game.playerTrans(P1)).v
           case _                           => trans.playerIndexWinsByRuleOfGin(game.playerTrans(P2)).v
+        }
+      case S.GinGammon =>
+        game.winner match {
+          case Some(p) if p.playerIndex.p1 => trans.playerIndexWinsByGinGammon(game.playerTrans(P1)).v
+          case _                           => trans.playerIndexWinsByGinGammon(game.playerTrans(P2)).v
+        }
+      case S.GinBackgammon =>
+        game.winner match {
+          case Some(p) if p.playerIndex.p1 => trans.playerIndexWinsByGinBackgammon(game.playerTrans(P1)).v
+          case _                           => trans.playerIndexWinsByGinBackgammon(game.playerTrans(P2)).v
         }
       case S.NoStart =>
         val playerIndex = game.loser.fold(PlayerIndex.p1)(_.playerIndex).name.capitalize
