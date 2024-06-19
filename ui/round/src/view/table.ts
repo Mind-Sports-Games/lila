@@ -87,7 +87,7 @@ export const renderTablePlay = (ctrl: RoundController) => {
       h(
         'div.ricons',
         {
-          class: { confirm: !!(ctrl.drawConfirm || ctrl.resignConfirm) },
+          class: { confirm: !!(ctrl.drawConfirm || ctrl.resignConfirm || ctrl.passConfirm) },
         },
         icons
       ),
