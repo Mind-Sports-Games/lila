@@ -61,6 +61,7 @@ final class GameMod(env: Env)(implicit mat: akka.stream.Materializer) extends Li
             err => BadRequest(err.toString).fuccess,
             {
               case (gameIds, Some("pgn"))            => downloadPgn(user, gameIds).fuccess
+              case (gameIds, Some("sgf"))            => downloadSgf(user, gameIds).fuccess
               case (gameIds, Some("analyse") | None) => multipleAnalysis(me, gameIds)
               case _                                 => notFound
             }
@@ -96,6 +97,20 @@ final class GameMod(env: Env)(implicit mat: akka.stream.Materializer) extends Li
       )
     }.pipe(asAttachmentStream(s"playstrategy_mod_${user.username}_${gameIds.size}_games.pgn"))
       .as(pgnContentType)
+
+  private def downloadSgf(user: lila.user.User, gameIds: Seq[lila.game.Game.ID]) =
+    Ok.chunked {
+      env.api.gameApiV2.exportByIds(
+        GameApiV2.ByIdsConfig(
+          ids = gameIds,
+          format = GameApiV2.Format.SGF,
+          flags = lila.game.PgnDump.WithFlags(),
+          perSecond = config.MaxPerSecond(100),
+          playerFile = none
+        )
+      )
+    }.pipe(asAttachmentStream(s"playstrategy_mod_${user.username}_${gameIds.size}_games.sgf"))
+      .as(sgfContentType)
 
   private def guessSwisses(user: lila.user.User): Fu[Seq[lila.swiss.Swiss]] = fuccess(Nil)
 }
@@ -150,7 +165,7 @@ object GameMod {
     Form(
       tuple(
         "game"   -> list(nonEmptyText),
-        "action" -> optional(lila.common.Form.stringIn(Set("pgn", "analyse")))
+        "action" -> optional(lila.common.Form.stringIn(Set("pgn", "sgf", "analyse")))
       )
     )
 }

@@ -62,6 +62,8 @@ final class Env(
 
   lazy val pgnDump: PgnDump = wire[PgnDump]
 
+  lazy val sgfDump: SgfDump = wire[SgfDump]
+
   lazy val userApi = wire[UserApi]
 
   lazy val gameApi = wire[GameApi]

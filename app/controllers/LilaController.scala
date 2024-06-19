@@ -687,6 +687,7 @@ abstract private[controllers] class LilaController(val env: Env)
   protected def asAttachmentStream(name: String) = (res: Result) => noProxyBuffer(asAttachment(name)(res))
 
   protected val pgnContentType    = "application/x-chess-pgn"
+  protected val sgfContentType    = "application/x-game-sgf"
   protected val ndJsonContentType = "application/x-ndjson"
   protected val csvContentType    = "text/csv"
 }
