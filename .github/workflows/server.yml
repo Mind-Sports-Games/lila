@@ -41,23 +41,23 @@ jobs:
     needs: check_org_member
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: webfactory/ssh-agent@v0.5.2
         with:
           ssh-private-key: ${{ secrets.MSO_CI_SSH_KEY }}
       - name: Checkout Mind-Sports-Games/lila-maven
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           repository: Mind-Sports-Games/lila-maven
           ssh-key: ${{ secrets.MSO_CI_SSH_KEY }}
           path: deps/lila-maven
-      - uses: actions/cache@v2
+      - uses: actions/cache@v3
         with:
           path: |
             ~/.sbt
             ~/.ivy2/cache
           key: ${{ runner.os }}-sbt-${{ hashFiles('**/project/build.properties') }}-${{ hashFiles('**/build.sbt') }}-${{ hashFiles('**/project/Dependencies.scala') }}
-      - uses: actions/setup-java@v2
+      - uses: actions/setup-java@v3
         with:
           distribution: temurin
           java-version: 17.0.5
