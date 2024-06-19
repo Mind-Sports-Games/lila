@@ -58,6 +58,8 @@
   <string name="talkInChat">Please be nice in the chat!</string>
   <string name="theFirstPersonToComeOnThisUrlWillPlayWithYou">The first person to come to this URL will play with you.</string>
   <string name="playerIndexResigned">%s resigned</string>
+  <string name="playerIndexResignedGammon">%s resigned a gammon</string>
+  <string name="playerIndexResignedBackgammon">%s resigned a backgammon</string>
   <string name="whiteResigned">White resigned</string>
   <string name="blackResigned">Black resigned</string>
   <string name="playerIndexLeftTheGame">%s left the game</string>
@@ -240,6 +242,9 @@
   <string name="playerIndexTimeOut">%s time out</string>
   <string name="whiteTimeOut">White time out</string>
   <string name="blackTimeOut">Black time out</string>
+  <string name="playerIndexWinsByRuleOfGin">%s time out, but win by rule of gin</string>
+  <string name="playerIndexWinsByGinGammon">%s time out, but win a gammon by rule of gin</string>
+  <string name="playerIndexWinsByGinBackgammon">%s time out, but win a backgammon by rule of gin</string>
   <string name="playerIndexOffersSelectSquares">%s offers selected squares</string>
   <string name="selectSquareOfferDeclined">Square selection declined </string>
   <string name="selectSquareOfferAccepted">Square selection accepted</string>
