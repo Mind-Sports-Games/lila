@@ -110,6 +110,7 @@ export default class AnalyseCtrl {
   // underboard inputs
   fenInput?: string;
   pgnInput?: string;
+  sgfInput?: string;
 
   // other paths
   initialPath: Tree.Path;
@@ -218,6 +219,7 @@ export default class AnalyseCtrl {
     this.onMainline = this.tree.pathIsMainline(path);
     this.fenInput = undefined;
     this.pgnInput = undefined;
+    this.sgfInput = undefined;
   };
 
   flip = () => {
@@ -229,6 +231,7 @@ export default class AnalyseCtrl {
       this.retro = makeRetro(this, this.bottomPlayerIndex());
     }
     if (this.practice) this.restartPractice();
+    this.onChange();
     this.redraw();
   };
 
@@ -237,8 +240,7 @@ export default class AnalyseCtrl {
   }
 
   bottomPlayerIndex(): PlayerIndex {
-    const playerIndex = this.getOrientation() === 'p1' ? 'p1' : 'p2';
-    return this.flipped ? opposite(playerIndex) : playerIndex;
+    return this.getOrientation() === 'p1' ? 'p1' : 'p2';
   }
 
   bottomIsP1 = () => this.bottomPlayerIndex() === 'p1';

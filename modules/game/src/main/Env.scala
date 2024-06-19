@@ -52,6 +52,8 @@ final class Env(
 
   lazy val pgnDump = wire[PgnDump]
 
+  lazy val sgfDump = wire[SgfDump]
+
   lazy val crosstableApi = new CrosstableApi(
     coll = db(config.crosstableColl),
     matchupColl = db(config.matchupColl)

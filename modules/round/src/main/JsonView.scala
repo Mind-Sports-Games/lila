@@ -316,7 +316,7 @@ final class JsonView(
             "lib"        -> game.variant.gameLogic.id,
             "variant"    -> game.variant,
             "opening"    -> game.opening,
-            "initialFen" -> (initialFen | Forsyth.initial(game.variant.gameLogic)),
+            "initialFen" -> (initialFen | game.variant.initialFen),
             "fen"        -> fen,
             "plies"      -> game.plies,
             "turns"      -> game.turnCount,
@@ -354,8 +354,9 @@ final class JsonView(
           .add("destination" -> (pref.destination && !pref.isBlindfold))
           .add("playerTurnIndicator" -> false),
         //TODO multiaction we think this correct to use plies (not turnCount) but analysis needs testing
-        "path"         -> pov.game.plies,
-        "userAnalysis" -> true
+        "path"             -> pov.game.plies,
+        "gameRecordFormat" -> pov.game.gameRecordFormat,
+        "userAnalysis"     -> true
       )
       .add("evalPut" -> me.??(evalCache.shouldPut))
       .add("possibleDropsByRole" -> possibleDropsByrole(pov))

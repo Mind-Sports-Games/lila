@@ -249,7 +249,7 @@ final class PgnDump(
             )
           case _ =>
             List(
-              Tag(_.FEN, (initialFen | Forsyth.initial(game.variant.gameLogic)).value),
+              Tag(_.FEN, (initialFen | game.variant.initialFen).value),
               Tag("SetUp", "1")
             )
         })

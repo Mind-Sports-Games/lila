@@ -106,7 +106,8 @@ $col2-panel-height: 240px;
       margin-bottom: 1em;
     }
 
-    .pgn {
+    .pgn,
+    .sgf {
       white-space: pre-wrap;
       font-family: monospace;
     }
@@ -116,7 +117,8 @@ $col2-panel-height: 240px;
       margin-right: 1em;
     }
 
-    .pgn-options {
+    .pgn-options,
+    .sgf-options {
       div {
         @extend %flex-wrap;
       }
