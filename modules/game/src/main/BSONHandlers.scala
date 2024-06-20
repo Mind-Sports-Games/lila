@@ -928,13 +928,13 @@ object BSONHandlers {
           clk.config match {
             case fc: Clock.Config =>
               BinaryFormat.fischerClockHistory
-                .read(fc.limit, bw, bb, (light.status == Status.Outoftime).option(turnPlayerIndex))
+                .read(fc.limit, bw, bb, (Status.flagged.contains(light.status)).option(turnPlayerIndex))
             case bdc: Clock.BronsteinConfig =>
               BinaryFormat.delayClockHistory
-                .read(bdc.limit, bw, bb, (light.status == Status.Outoftime).option(turnPlayerIndex))
+                .read(bdc.limit, bw, bb, (Status.flagged.contains(light.status)).option(turnPlayerIndex))
             case sdc: Clock.SimpleDelayConfig =>
               BinaryFormat.delayClockHistory
-                .read(sdc.limit, bw, bb, (light.status == Status.Outoftime).option(turnPlayerIndex))
+                .read(sdc.limit, bw, bb, (Status.flagged.contains(light.status)).option(turnPlayerIndex))
             case bc: ByoyomiClock.Config =>
               BinaryFormat.byoyomiClockHistory
                 .read(
@@ -943,7 +943,7 @@ object BSONHandlers {
                   bw,
                   bb,
                   periodEntries.getOrElse(PeriodEntries.default),
-                  (light.status == Status.Outoftime).option(turnPlayerIndex)
+                  (Status.flagged.contains(light.status)).option(turnPlayerIndex)
                 )
           }
         _ = lila.mon.game.loadClockHistory.increment()

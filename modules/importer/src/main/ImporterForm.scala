@@ -113,6 +113,7 @@ case class ImportData(pgn: String, analyse: Option[String]) {
           case Some("normal") | None                   => Status.Resign
           case Some("abandoned")                       => Status.Aborted
           case Some("time forfeit")                    => Status.Outoftime
+          case Some("rule of gin")                     => Status.RuleOfGin
           case Some("rules infraction")                => Status.Cheat
           case Some(txt) if txt contains "won on time" => Status.Outoftime
           case Some(_)                                 => Status.UnknownFinish
@@ -145,10 +146,10 @@ case class ImportData(pgn: String, analyse: Option[String]) {
             case None =>
               parsed.tags.resultPlayer
                 .map {
-                  case Some(playerIndex)                  => TagResult(status, playerIndex.some)
-                  case None if status == Status.Outoftime => TagResult(status, none)
-                  case None                               => TagResult(Status.Draw, none)
-                  case _                                  => sys.error("Not implemented for draughts yet")
+                  case Some(playerIndex)                       => TagResult(status, playerIndex.some)
+                  case None if Status.flagged.contains(status) => TagResult(status, none)
+                  case None                                    => TagResult(Status.Draw, none)
+                  case _                                       => sys.error("Not implemented for draughts yet")
                 }
                 .filter(_.status > Status.Started)
                 .fold(dbGame) { res =>

@@ -26,7 +26,7 @@ trait GameHelper { self: I18nHelper with UserHelper with AiHelper with StringHel
     )
 
   def titleGame(g: Game) = {
-    val speed   = strategygames.Speed(g.clock.map(_.config)).name
+    val speed = strategygames.Speed(g.clock.map(_.config)).name
     s"$speed ${VariantKeys.variantName(g.variant)} • ${playerText(g.p1Player)} vs ${playerText(g.p2Player)}"
   }
 
@@ -68,6 +68,11 @@ trait GameHelper { self: I18nHelper with UserHelper with AiHelper with StringHel
       case (Some(w), _, SingleWin, _)                  => s"${playerText(w)} won"
       case (Some(w), _, GammonWin, _)                  => s"${playerText(w)} won by gammon"
       case (Some(w), _, BackgammonWin, _)              => s"${playerText(w)} won by backgammon"
+      case (_, Some(l), ResignGammon, _)               => s"${playerText(l)} resigned a gammon"
+      case (_, Some(l), ResignBackgammon, _)           => s"${playerText(l)} resigned a backgammon"
+      case (Some(w), _, RuleOfGin, _)                  => s"${playerText(w)} won by rule of gin"
+      case (Some(w), _, GinGammon, _)                  => s"${playerText(w)} won a gammon by rule of gin"
+      case (Some(w), _, GinBackgammon, _)              => s"${playerText(w)} won a backgammon by rule of gin"
       case (_, _, VariantEnd, _)                       => VariantKeys.variantTitle(game.variant)
       case _                                           => "Game is still being played"
     }
@@ -183,6 +188,16 @@ trait GameHelper { self: I18nHelper with UserHelper with AiHelper with StringHel
           case Some(p) if p.playerIndex.p1 => trans.playerIndexResigned(game.playerTrans(P1)).v
           case _                           => trans.playerIndexResigned(game.playerTrans(P2)).v
         }
+      case S.ResignGammon =>
+        game.loser match {
+          case Some(p) if p.playerIndex.p1 => trans.playerIndexResignedGammon(game.playerTrans(P1)).v
+          case _                           => trans.playerIndexResignedGammon(game.playerTrans(P2)).v
+        }
+      case S.ResignBackgammon =>
+        game.loser match {
+          case Some(p) if p.playerIndex.p1 => trans.playerIndexResignedBackgammon(game.playerTrans(P1)).v
+          case _                           => trans.playerIndexResignedBackgammon(game.playerTrans(P2)).v
+        }
       case S.UnknownFinish => trans.finished.txt()
       case S.Stalemate     => trans.stalemate.txt()
       case S.Timeout =>
@@ -199,34 +214,28 @@ trait GameHelper { self: I18nHelper with UserHelper with AiHelper with StringHel
           case (P2, Some(_)) => trans.playerIndexTimeOut(game.playerTrans(P2)).v
           case (P2, None)    => trans.playerIndexTimeOut(game.playerTrans(P2)).v + " • " + trans.draw.txt()
         }
+      case S.RuleOfGin =>
+        game.winner match {
+          case Some(p) if p.playerIndex.p1 => trans.playerIndexWinsByRuleOfGin(game.playerTrans(P1)).v
+          case _                           => trans.playerIndexWinsByRuleOfGin(game.playerTrans(P2)).v
+        }
+      case S.GinGammon =>
+        game.winner match {
+          case Some(p) if p.playerIndex.p1 => trans.playerIndexWinsByGinGammon(game.playerTrans(P1)).v
+          case _                           => trans.playerIndexWinsByGinGammon(game.playerTrans(P2)).v
+        }
+      case S.GinBackgammon =>
+        game.winner match {
+          case Some(p) if p.playerIndex.p1 => trans.playerIndexWinsByGinBackgammon(game.playerTrans(P1)).v
+          case _                           => trans.playerIndexWinsByGinBackgammon(game.playerTrans(P2)).v
+        }
       case S.NoStart =>
         val playerIndex = game.loser.fold(PlayerIndex.p1)(_.playerIndex).name.capitalize
         s"$playerIndex didn't move"
-      case S.Cheat => trans.cheatDetected.txt()
-      case S.SingleWin =>
-        game.variant match {
-          case Variant.Backgammon(strategygames.backgammon.variant.Backgammon) =>
-            trans.backgammonSingleWin.txt()
-          case Variant.Backgammon(strategygames.backgammon.variant.Nackgammon) =>
-            trans.backgammonSingleWin.txt()
-          case _ => trans.variantEnding.txt()
-        }
-      case S.GammonWin =>
-        game.variant match {
-          case Variant.Backgammon(strategygames.backgammon.variant.Backgammon) =>
-            trans.backgammonGammonWin.txt()
-          case Variant.Backgammon(strategygames.backgammon.variant.Nackgammon) =>
-            trans.backgammonGammonWin.txt()
-          case _ => trans.variantEnding.txt()
-        }
-      case S.BackgammonWin =>
-        game.variant match {
-          case Variant.Backgammon(strategygames.backgammon.variant.Backgammon) =>
-            trans.backgammonBackgammonWin.txt()
-          case Variant.Backgammon(strategygames.backgammon.variant.Nackgammon) =>
-            trans.backgammonBackgammonWin.txt()
-          case _ => trans.variantEnding.txt()
-        }
+      case S.Cheat         => trans.cheatDetected.txt()
+      case S.SingleWin     => trans.backgammonSingleWin.txt()
+      case S.GammonWin     => trans.backgammonGammonWin.txt()
+      case S.BackgammonWin => trans.backgammonBackgammonWin.txt()
       case S.VariantEnd =>
         game.variant match {
           case Variant.Chess(strategygames.chess.variant.KingOfTheHill)      => trans.kingInTheCenter.txt()

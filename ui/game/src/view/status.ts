@@ -20,6 +20,10 @@ export default function status(ctrl: Ctrl): string {
       return '';
     case 'resign':
       return ctrl.trans('playerIndexResigned', d.game.loserPlayer ? d.game.loserPlayer : '');
+    case 'resignGammon':
+      return ctrl.trans('playerIndexResignedGammon', d.game.loserPlayer ? d.game.loserPlayer : '');
+    case 'resignBackgammon':
+      return ctrl.trans('playerIndexResignedBackgammon', d.game.loserPlayer ? d.game.loserPlayer : '');
     case 'stalemate':
       return noarg('stalemate');
     case 'timeout':
@@ -33,6 +37,12 @@ export default function status(ctrl: Ctrl): string {
       return d.game.loserPlayer
         ? ctrl.trans('playerIndexTimeOut', d.game.loserPlayer)
         : `${ctrl.trans('playerIndexTimeOut', '')} • ${noarg('draw')}`;
+    case 'ruleOfGin':
+      return ctrl.trans('playerIndexWinsByRuleOfGin', d.game.winnerPlayer ? d.game.winnerPlayer : '');
+    case 'ginGammon':
+      return ctrl.trans('playerIndexWinsByGinGammon', d.game.winnerPlayer ? d.game.winnerPlayer : '');
+    case 'ginBackgammon':
+      return ctrl.trans('playerIndexWinsByGinBackgammon', d.game.winnerPlayer ? d.game.winnerPlayer : '');
     case 'noStart':
       return d.game.loserPlayer + " didn't move";
     case 'cheat':

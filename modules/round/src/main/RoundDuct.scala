@@ -262,12 +262,12 @@ final private[round] class RoundDuct(
 
     case Resign(playerId) =>
       handle(PlayerId(playerId)) { pov =>
-        pov.game.resignable ?? finisher.other(pov.game, _.Resign, Some(!pov.playerIndex))
+        pov.game.resignable ?? finisher.other(pov.game, pov.game.situation.resignStatus(pov.playerIndex), Some(!pov.playerIndex))
       }
 
     case ResignAi =>
       handleAi { pov =>
-        pov.game.resignable ?? finisher.other(pov.game, _.Resign, Some(!pov.playerIndex))
+        pov.game.resignable ?? finisher.other(pov.game, pov.game.situation.resignStatus(pov.playerIndex), Some(!pov.playerIndex))
       }
 
     case GoBerserk(playerIndex, promise) =>

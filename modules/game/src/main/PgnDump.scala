@@ -216,11 +216,12 @@ final class PgnDump(
             _.Termination, {
               import Status._
               game.status match {
-                case Created | Started   => "Unterminated"
-                case Aborted | NoStart   => "Abandoned"
-                case Timeout | Outoftime => "Time forfeit"
-                case Resign | Draw | Stalemate |
-                    Mate | PerpetualCheck | SingleWin | GammonWin | BackgammonWin | VariantEnd =>
+                case Created | Started                     => "Unterminated"
+                case Aborted | NoStart                     => "Abandoned"
+                case Timeout | Outoftime                   => "Time forfeit"
+                case RuleOfGin | GinGammon | GinBackgammon => "Rule of Gin"
+                case Resign | ResignGammon | ResignBackgammon | Draw | Stalemate | Mate | PerpetualCheck |
+                    VariantEnd | SingleWin | GammonWin | BackgammonWin =>
                   "Normal"
                 case Cheat         => "Rules infraction"
                 case UnknownFinish => "Unknown"

@@ -17,6 +17,11 @@ export const ids = {
   singleWin: 40,
   gammonWin: 41,
   backgammonWin: 42,
+  resignGammon: 43,
+  resignBackgammon: 44,
+  ruleOfGin: 45,
+  ginGammon: 46,
+  ginBackgammon: 47,
   variantEnd: 60,
 };
 
