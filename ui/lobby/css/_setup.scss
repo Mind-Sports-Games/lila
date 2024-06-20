@@ -29,7 +29,7 @@ $game-family-random-pieces: (
   'mixed.svg',
   'bwS.svg',
   'wbS.svg',
-  'wbK.svg' // @TODO: change
+  'wbP.svg'
 );
 
 $game-family-p1-pieces: (
@@ -44,7 +44,7 @@ $game-family-p1-pieces: (
   'togyzkumalak/south.svg',
   'go/classic_stone/bS.svg',
   'backgammon/wooden/w.svg',
-  'chess/cburnett/wK.svg' // @TODO: change
+  'breakthroughtroyka/staunty/wP.svg'
 );
 
 $game-family-p2-pieces: (
@@ -59,7 +59,7 @@ $game-family-p2-pieces: (
   'togyzkumalak/north.svg',
   'go/classic_stone/wS.svg',
   'backgammon/wooden/b.svg',
-  'chess/cburnett/bK.svg' // @TODO: change
+  'breakthroughtroyka/staunty/bP.svg'
 );
 
 .game-setup {

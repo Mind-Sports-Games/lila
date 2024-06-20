@@ -14,8 +14,6 @@
   <string name="noCastling">No Castling</string>
   <string name="racingKings">Racing Kings</string>
   <string name="threeCheck">Three-check</string>
-  <string name="breakthroughtroyka">Breakthrough</string>
-  <string name="minibreakthroughtroyka">Mini Breakthrough</string>
   <string name="linesOfAction">Lines Of Action</string>
   <string name="scrambledEggs">Scrambled Eggs</string>
   <string name="draughts">Draughts</string>
@@ -46,4 +44,6 @@
   <string name="go19x19">Go 19x19</string>
   <string name="backgammon">Backgammon</string>
   <string name="nackgammon">Nackgammon</string>
+  <string name="breakthroughtroyka">Breakthrough</string>
+  <string name="minibreakthroughtroyka">Mini Breakthrough</string>  
 </resources>

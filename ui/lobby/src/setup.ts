@@ -445,7 +445,8 @@ export default class Setup {
     };
     const showStartingImages = () => {
       const variantId = ($variantSelect.val() as string).split('_');
-      const class_list = 'chess draughts loa shogi xiangqi flipello oware togyzkumalak amazons go backgammon';
+      const class_list =
+        'chess draughts loa shogi xiangqi flipello oware togyzkumalak amazons go backgammon breakthroughtroyka';
       let key = 'chess';
       switch (variantId[0]) {
         case '0':

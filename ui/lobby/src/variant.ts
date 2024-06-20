@@ -42,8 +42,8 @@ const variantConfirms = {
     'This is a Backgammon game!\n\nThe aim of the game is to get all your pieces into your home, and then take them all off the board first.',
   nackgammon:
     'This is a Nackgammon game!\n\nThe aim of the game is to get all your pieces into your home, and then take them all off the board first.',
-  breakthroughtroyka: 'This is a Breakthrough game!\n\nThe first player who reach opposite rank wins',
-  minibreakthroughtroyka: 'This is a Mini Breakthrough game!\n\nThe first player who reach opposite rank wins',
+  breakthroughtroyka: 'This is a Breakthrough game!\n\nThe first player who reaches their last rank (opponent home row) wins.',
+  minibreakthroughtroyka: 'This is a Mini Breakthrough game!\n\nThe first player who reaches their last rank (opponent home row) wins.',
 };
 
 function storageKey(key) {

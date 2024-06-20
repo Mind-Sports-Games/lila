@@ -29,16 +29,6 @@ object PoolList {
     PoolConfig(3 ++ 2, Wave(22 seconds, 30 players), Variant.FairySF(strategygames.fairysf.variant.Xiangqi)),
     PoolConfig(3 ++ 2, Wave(22 seconds, 30 players), Variant.FairySF(strategygames.fairysf.variant.Flipello)),
     PoolConfig(3 ++ 2, Wave(22 seconds, 30 players), Variant.FairySF(strategygames.fairysf.variant.Amazons)),
-    PoolConfig(
-      3 ++ 2,
-      Wave(22 seconds, 30 players),
-      Variant.FairySF(strategygames.fairysf.variant.BreakthroughTroyka)
-    ),
-    PoolConfig(
-      3 ++ 2,
-      Wave(22 seconds, 30 players),
-      Variant.FairySF(strategygames.fairysf.variant.MiniBreakthroughTroyka)
-    ),
     PoolConfig(3 ++ 2, Wave(22 seconds, 30 players), Variant.Samurai(strategygames.samurai.variant.Oware)),
     PoolConfig(
       3 ++ 2,
@@ -50,6 +40,11 @@ object PoolList {
       strategygames.Clock.SimpleDelayConfig(2 * 60, 12),
       Wave(22 seconds, 30 players),
       Variant.Backgammon(strategygames.backgammon.variant.Backgammon)
+    ),
+    PoolConfig(
+      3 ++ 2,
+      Wave(22 seconds, 30 players),
+      Variant.FairySF(strategygames.fairysf.variant.BreakthroughTroyka)
     )
   )
 

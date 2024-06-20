@@ -150,8 +150,6 @@ $togyzkumalak-variants: ('togyzkumalak'); // must use same board
 
 $backgammon-variants: ('backgammon', 'nackgammon'); // must use same board
 
-$breakthrough-variants: ('breakthroughtroyka', 'minibreakthroughtroyka'); // must use same board
-
 @each $gameFamily in ('chess', 'loa') {
   @each $color, $file in $chess-board-files {
     .#{$gameFamily}-#{$color} .#{$gameFamily}.is2d cg-board {
