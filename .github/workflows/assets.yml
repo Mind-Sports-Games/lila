@@ -43,14 +43,14 @@ jobs:
           fi
       - name: Run your main job
         run: echo "The actor is an organization member. Running the workflow."
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           submodules: recursive
-      - uses: webfactory/ssh-agent@v0.5.2
+      - uses: webfactory/ssh-agent@v0.9.0
         with:
           ssh-private-key: ${{ secrets.MSO_CI_SSH_KEY }}
       - run: git submodule absorbgitdirs
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           repository: lichess-org/ab
           ssh-key: ${{ secrets.id_rsa_ab }}

@@ -41,12 +41,12 @@ jobs:
     needs: check_org_member
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: webfactory/ssh-agent@v0.5.2
+      - uses: actions/checkout@v4
+      - uses: webfactory/ssh-agent@v0.9.0
         with:
           ssh-private-key: ${{ secrets.MSO_CI_SSH_KEY }}
       - name: Checkout Mind-Sports-Games/lila-maven
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           repository: Mind-Sports-Games/lila-maven
           ssh-key: ${{ secrets.MSO_CI_SSH_KEY }}
