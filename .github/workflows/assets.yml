@@ -25,13 +25,10 @@ on:
       - 'lila'
 
 jobs:
-  check_org_member:
-    uses: ./.github/workflows/check-org-members.yml
-
   assets:
-    needs: check_org_member
     runs-on: ubuntu-latest
     steps:
+      - uses: ./.github/workflows/check-org-members.yml
       - uses: actions/checkout@v3
         with:
           submodules: recursive
@@ -58,7 +55,7 @@ jobs:
           restore-keys: ${{ runner.os }}-yarn-
       - uses: actions/setup-node@v3
         with:
-          node-version: '20'
+          node-version: '16'
           cache: yarn
       - run: yarn install --network-concurrency 1
       - run: ./ui/build prod
