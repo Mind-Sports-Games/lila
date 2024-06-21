@@ -49,6 +49,16 @@ shogi_themes = [
 ]
 xiangqi_themes = [
   ['2dhanzi', 'svg'],
+  ['ct2', 'svg'],
+  ['ct3', 'svg'],
+  ['ct2w', 'svg'],
+  ['euro', 'svg'],
+  ['hnz', 'svg'],
+  ['hnzw', 'svg'],
+  ['wikim', 'svg'],
+  ['ttxqhanzi', 'svg'],
+  ['playok', 'svg'],
+  ['ttxqintl', 'svg'],
   ['ka', 'svg']
 ]
 flipello_themes = [
@@ -350,7 +360,7 @@ shogi_themes.map { |theme|
   File.open(dest_dir + 'shogi-' + name + '.external.css', 'w') { |f| f.puts (classes_shogi_game_and_variant).join("\n") }
 }
 
-# inline SVG xiangqi
+# inline SVG Xiangqi
 xiangqi_themes.map { |theme|
   name = theme[0]
   ext = theme[1]
@@ -382,7 +392,7 @@ xiangqi_themes.map { |theme|
   }.flatten
   File.open(dest_dir + 'xiangqi-' + name + '.css', 'w') { |f| f.puts (classes_xiangqi_game + classes_xiangqi_variant).join("\n") }
 }
-# external SVG xiangqi
+# external SVG Xiangqi
 xiangqi_themes.map { |theme|
   name = theme[0]
   ext = theme[1]
