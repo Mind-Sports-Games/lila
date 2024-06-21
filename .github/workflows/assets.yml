@@ -60,11 +60,10 @@ jobs:
         id: ab
       - run: yarn link --cwd "$GITHUB_WORKSPACE/ab" && yarn link ab --cwd ui/round
         if: steps.ab.outcome == 'success'
-      - run: echo "dir::$(yarn cache dir)" >> $GITHUB_OUTPUT
-        id: yarn-cache
+      - run: echo "$(dir)::$(yarn cache dir)" >> $GITHUB_OUTPUT
       - uses: actions/cache@v4
         with:
-          path: ${{ steps.yarn-cache.outputs.dir }}
+          path: ${{ vars.GITHUB_OUTPUT.dir }}
           key: ${{ runner.os }}-yarn-${{ hashFiles('yarn.lock') }}
           restore-keys: ${{ runner.os }}-yarn-
       - uses: actions/setup-node@v4
