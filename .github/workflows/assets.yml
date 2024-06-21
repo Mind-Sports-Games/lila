@@ -60,7 +60,7 @@ jobs:
         id: ab
       - run: yarn link --cwd "$GITHUB_WORKSPACE/ab" && yarn link ab --cwd ui/round
         if: steps.ab.outcome == 'success'
-      - run: echo "dir::$(yarn cache dir)" >> $GITHUB_OUTPUT
+      - run: echo "dir=$(yarn cache dir)" >> $GITHUB_OUTPUT
         id: yarn-cache
       - uses: actions/cache@v4
         with:
