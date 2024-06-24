@@ -1012,6 +1012,11 @@
   resolved "https://registry.yarnpkg.com/@badrap/result/-/result-0.2.8.tgz#76b835c17c4c2d12575a4b205a7df3d14e3ad39c"
   integrity sha512-zC6LgWe8QWSTwxfQVoRyieFaTbCJ2WYvpJdZ0fONoUJT1ln/oWNb3zBPlPP5J9ehLAaFIZJ7aB8oISzYFs6grQ==
 
+"@badrap/result@^0.2.8":
+  version "0.2.13"
+  resolved "https://registry.yarnpkg.com/@badrap/result/-/result-0.2.13.tgz#3c23f39f7e861cfa8ac3a65726ac17b1ee364927"
+  integrity sha512-Qvyzz0dmGY0h8pwvBFo1BznAKf5Y5NXIDiqhPALWtfU7oHbAToCtPu4FlYQ3uysskSWLx8GUiyhe0nv0nDd/7Q==
+
 "@bcoe/v8-coverage@^0.2.3":
   version "0.2.3"
   resolved "https://registry.yarnpkg.com/@bcoe/v8-coverage/-/v8-coverage-0.2.3.tgz#75a2e8b51cb758a7553d6804a5932d7aace75c39"
@@ -2489,9 +2494,9 @@ chartjs-color@^2.1.0:
   version "0.10.2"
   resolved "https://codeload.github.com/ornicar/chess.js/tar.gz/ad0709c0b07773d9d0da8e4605a9a2a28f00d249"
 
-"chessground@git+ssh://git@github.com:Mind-Sports-Games/chessground.git#v7.11.1-pstrat2.44":
-  version "7.11.1-pstrat2.44"
-  resolved "git+ssh://git@github.com:Mind-Sports-Games/chessground.git#25c83be5db2aafab70815321a36efb84069c3dff"
+"chessground@git+ssh://git@github.com:Mind-Sports-Games/chessground.git#v7.11.1-pstrat2.45":
+  version "7.11.1-pstrat2.45"
+  resolved "git+ssh://git@github.com:Mind-Sports-Games/chessground.git#f6d223d01f2ac193e61c656b7f8573da07e42087"
 
 chokidar@^2.0.0:
   version "2.1.8"
@@ -7387,8 +7392,15 @@ stockfish.wasm@^0.10.0:
   resolved "https://registry.yarnpkg.com/stockfish.wasm/-/stockfish.wasm-0.10.0.tgz#dc3ef4d98a2a79724c29510d39d89e4a5f0f1888"
   integrity sha512-OTvOlz0ijCSmIb/YvOZ1Dn6vwZVS4Ge3N+RcV0d2b6LXUtCJ9UwmBHypRW3DZ+VXf8WNm7E3P+6jMTVvb3QaBg==
 
-"stratops@file:../stratops":
-  version "0.8.1-pstrat4.1-dev02"
+"stratops@git+ssh://git@github.com:Mind-Sports-Games/stratops.git#v0.8.1-pstrat4.1":
+  version "0.8.1-pstrat4.1"
+  resolved "git+ssh://git@github.com:Mind-Sports-Games/stratops.git#a264a608c62c7b4f76820b1d12a515cc98a1015a"
+  dependencies:
+    "@badrap/result" "^0.2.8"
+
+"stratops@git+ssh://git@github.com:Mind-Sports-Games/stratops.git#v0.8.1-pstrat4.2":
+  version "0.8.1-pstrat4.2"
+  resolved "git+ssh://git@github.com:Mind-Sports-Games/stratops.git#02a3e0aea0b58bdce4e7599a37be9433046d9a85"
   dependencies:
     "@badrap/result" "0.2.8"
 
