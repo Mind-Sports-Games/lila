@@ -1,6 +1,6 @@
 import { piotr } from './piotr';
-import * as cg from 'chessground/build/types';
-import { Rules } from 'stratops/build/types';
+import * as cg from 'chessground/types';
+import { Rules } from 'stratops/types';
 
 // TODO: For some reason we can't import this like:
 // import * from 'stratutils/promotion'

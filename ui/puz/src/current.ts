@@ -1,5 +1,5 @@
-import { Chess, opposite, parseUci } from 'stratops/build';
-import { parseFen } from 'stratops/build/fen';
+import { Chess, opposite, parseUci } from 'stratops';
+import { parseFen } from 'stratops/fen';
 import { Puzzle } from './interfaces';
 import { getNow } from './util';
 

@@ -1,8 +1,8 @@
 import { h, VNode } from 'snabbdom';
-import { parseFen } from 'stratops/build/fen';
+import { parseFen } from 'stratops/fen';
 import { variantToRules } from 'stratutils';
 import * as chessground from './ground';
-import { read as fenRead } from 'chessground/build/fen';
+import { read as fenRead } from 'chessground/fen';
 import {
   bind,
   onInsert,

@@ -1,8 +1,8 @@
 import { h } from 'snabbdom';
 import { bind, onInsert } from './util';
-import { Api as CgApi } from 'chessground/build/api';
-import * as cgUtil from 'chessground/build/util';
-import { Role } from 'chessground/build/types';
+import { Api as CgApi } from 'chessground/api';
+import * as cgUtil from 'chessground/util';
+import { Role } from 'chessground/types';
 import { MaybeVNode, Vm, Redraw, Promotion } from './interfaces';
 import { Prop } from 'common';
 

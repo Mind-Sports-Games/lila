@@ -1696,10 +1696,10 @@
     "@typescript-eslint/types" "4.33.0"
     eslint-visitor-keys "^2.0.0"
 
-"@yaireo/tagify@~4.0.5":
-  version "4.0.5"
-  resolved "https://registry.yarnpkg.com/@yaireo/tagify/-/tagify-4.0.5.tgz#476bbbeaa08d53f6cc469b6309ea1540dbdad2a8"
-  integrity sha512-HCIn2bCQ114SBDHafUR+jDutKFDbxDIjlWygg3eQBVpmJIcavKdYX6MdW5Jeh0QEcuDP4Ihby9QnZVNbv3z43Q==
+"@yaireo/tagify@4.6.0":
+  version "4.6.0"
+  resolved "https://registry.yarnpkg.com/@yaireo/tagify/-/tagify-4.6.0.tgz#6cb40f4dbe900afbbaab8e09cd88a2c27e8f5340"
+  integrity sha512-fipdTlEt08A/NKTg+HH9CP8r8ZdKaVyDTNBc42inZqfKXceMUhCHR1rQ6evoH+18TyPNG+zj37ld+YbOcwNnhA==
 
 "ab@https://github.com/lichess-org/ab-stub":
   version "1.0.0"
@@ -2494,9 +2494,9 @@ chartjs-color@^2.1.0:
   version "0.10.2"
   resolved "https://codeload.github.com/ornicar/chess.js/tar.gz/ad0709c0b07773d9d0da8e4605a9a2a28f00d249"
 
-"chessground@git+ssh://git@github.com:Mind-Sports-Games/chessground.git#v7.11.1-pstrat2.45":
-  version "7.11.1-pstrat2.45"
-  resolved "git+ssh://git@github.com:Mind-Sports-Games/chessground.git#f6d223d01f2ac193e61c656b7f8573da07e42087"
+"chessground@git+ssh://git@github.com:Mind-Sports-Games/chessground.git#v7.11.1-pstrat2.46":
+  version "7.11.1-pstrat2.46"
+  resolved "git+ssh://git@github.com:Mind-Sports-Games/chessground.git#818753641a44dfbc8e260ee4779787f6c5123586"
 
 chokidar@^2.0.0:
   version "2.1.8"
@@ -7398,9 +7398,9 @@ stockfish.wasm@^0.10.0:
   dependencies:
     "@badrap/result" "^0.2.8"
 
-"stratops@git+ssh://git@github.com:Mind-Sports-Games/stratops.git#v0.8.1-pstrat4.2":
-  version "0.8.1-pstrat4.2"
-  resolved "git+ssh://git@github.com:Mind-Sports-Games/stratops.git#02a3e0aea0b58bdce4e7599a37be9433046d9a85"
+"stratops@git+ssh://git@github.com:Mind-Sports-Games/stratops.git#v0.8.1-pstrat4.3":
+  version "0.8.1-pstrat4.3"
+  resolved "git+ssh://git@github.com:Mind-Sports-Games/stratops.git#451f3e314033d97b058667e0ed8ec586962b1c81"
   dependencies:
     "@badrap/result" "0.2.8"
 

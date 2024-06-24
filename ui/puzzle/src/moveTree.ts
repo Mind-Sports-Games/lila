@@ -1,10 +1,10 @@
-import { Chess } from 'stratops/build/chess';
-import { INITIAL_FEN, makeFen, parseFen } from 'stratops/build/fen';
-import { makeSan, parseSan } from 'stratops/build/san';
-import { makeSquare, makeUci, parseUci } from 'stratops/build/util';
-import { scalachessCharPair } from 'stratops/build/compat';
+import { Chess } from 'stratops/chess';
+import { INITIAL_FEN, makeFen, parseFen } from 'stratops/fen';
+import { makeSan, parseSan } from 'stratops/san';
+import { makeSquare, makeUci, parseUci } from 'stratops/util';
+import { scalachessCharPair } from 'stratops/compat';
 import { TreeWrapper } from 'tree';
-import { Move } from 'stratops/build/types';
+import { Move } from 'stratops/types';
 
 export function pgnToTree(pgn: San[]): Tree.Node {
   const pos = Chess.default();

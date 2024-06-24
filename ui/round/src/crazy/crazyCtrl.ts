@@ -1,8 +1,8 @@
 import { isPlayerTurn } from 'game/game';
-import { dragNewPiece } from 'chessground/build/drag';
-import { setDropMode, cancelDropMode } from 'chessground/build/drop';
+import { dragNewPiece } from 'chessground/drag';
+import { setDropMode, cancelDropMode } from 'chessground/drop';
 import RoundController from '../ctrl';
-import * as cg from 'chessground/build/types';
+import * as cg from 'chessground/types';
 import { RoundData } from '../interfaces';
 import * as stratUtils from 'stratutils';
 

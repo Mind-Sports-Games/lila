@@ -1,5 +1,5 @@
 import { TablebaseMoveStats } from './interfaces';
-import { opposite } from 'stratops/build/util';
+import { opposite } from 'stratops/util';
 
 export function playerIndexOf(fen: Fen): PlayerIndex {
   return fen.split(' ')[1] === 'w' ? 'p1' : 'p2';

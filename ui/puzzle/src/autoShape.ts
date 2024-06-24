@@ -1,8 +1,8 @@
 import { winningChances, CevalCtrl } from 'ceval';
-import { DrawModifiers, DrawShape } from 'chessground/build/draw';
+import { DrawModifiers, DrawShape } from 'chessground/draw';
 import { Vm } from './interfaces';
-import { Api as CgApi } from 'chessground/build/api';
-import { opposite } from 'chessground/build/util';
+import { Api as CgApi } from 'chessground/api';
+import { opposite } from 'chessground/util';
 
 interface Opts {
   vm: Vm;

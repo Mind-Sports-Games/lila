@@ -1,7 +1,7 @@
 import { h } from 'snabbdom';
 import * as status from 'game/status';
 import { Pairing } from '../interfaces';
-import { opposite } from 'chessground/build/util';
+import { opposite } from 'chessground/util';
 import SimulCtrl from '../ctrl';
 
 export default function (ctrl: SimulCtrl) {

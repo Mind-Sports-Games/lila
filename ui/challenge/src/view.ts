@@ -1,6 +1,6 @@
 import { Ctrl, Challenge, ChallengeData, ChallengeDirection, ChallengeUser, TimeControl } from './interfaces';
 import { h, VNode } from 'snabbdom';
-import { opposite } from 'chessground/build/util';
+import { opposite } from 'chessground/util';
 
 export function loaded(ctrl: Ctrl): VNode {
   return ctrl.redirecting()

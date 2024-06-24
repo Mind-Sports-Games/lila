@@ -1,5 +1,5 @@
 import { Config, PuzPrefs, Puzzle } from 'puz/interfaces';
-import { Api as CgApi } from 'chessground/build/api';
+import { Api as CgApi } from 'chessground/api';
 
 export type RaceStatus = 'pre' | 'racing' | 'post';
 

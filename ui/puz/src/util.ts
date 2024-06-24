@@ -1,7 +1,7 @@
 import { Hooks } from 'snabbdom';
 import { Puzzle } from './interfaces';
-import { opposite } from 'stratops/build';
-import { parseFen } from 'stratops/build/fen';
+import { opposite } from 'stratops';
+import { parseFen } from 'stratops/fen';
 
 export function bind(eventName: string, f: (e: Event) => any, redraw?: () => void): Hooks {
   return onInsert(el =>

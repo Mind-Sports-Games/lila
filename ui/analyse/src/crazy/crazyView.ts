@@ -1,6 +1,6 @@
 import { drag, selectToDrop } from './crazyCtrl';
 import { h } from 'snabbdom';
-import * as cg from 'chessground/build/types';
+import * as cg from 'chessground/types';
 import { onInsert } from '../util';
 import AnalyseCtrl from '../ctrl';
 

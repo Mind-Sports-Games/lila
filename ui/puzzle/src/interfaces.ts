@@ -1,9 +1,9 @@
 import PuzzleSession from './session';
-import { Api as CgApi } from 'chessground/build/api';
+import { Api as CgApi } from 'chessground/api';
 import { CevalCtrl, NodeEvals } from 'ceval';
-import { Config as CgConfig } from 'chessground/build/config';
+import { Config as CgConfig } from 'chessground/config';
 import { Deferred } from 'common/defer';
-import { Outcome, Role, Move } from 'stratops/build/types';
+import { Outcome, Role, Move } from 'stratops/types';
 import { Prop } from 'common';
 import { StoredBooleanProp } from 'common/storage';
 import { TreeWrapper } from 'tree';

@@ -1,4 +1,4 @@
-import { Outcome } from 'stratops/build/types';
+import { Outcome } from 'stratops/types';
 import { Prop } from 'common';
 import { StoredProp, StoredBooleanProp } from 'common/storage';
 

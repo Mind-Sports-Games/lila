@@ -1,5 +1,5 @@
 import { h, VNode } from 'snabbdom';
-import { opposite } from 'chessground/build/util';
+import { opposite } from 'chessground/util';
 import { player as renderPlayer } from './util';
 import { Board } from '../interfaces';
 

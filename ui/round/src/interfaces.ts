@@ -4,7 +4,7 @@ import { ClockData, Seconds, Centis } from './clock/clockCtrl';
 import { CorresClockData } from './corresClock/corresClockCtrl';
 import RoundController from './ctrl';
 import { ChatCtrl, ChatPlugin } from 'chat';
-import * as cg from 'chessground/build/types';
+import * as cg from 'chessground/types';
 
 export type MaybeVNode = VNode | null | undefined;
 export type MaybeVNodes = MaybeVNode[];

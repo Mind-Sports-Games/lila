@@ -1,14 +1,14 @@
 import { h } from 'snabbdom';
 import { Chessground } from 'chessground';
-import * as cg from 'chessground/build/types';
+import * as cg from 'chessground/types';
 import {
   oppositeOrientationForLOA,
   orientationForLOA,
   oppositeOrientationForBackgammon,
   orientationForBackgammon,
-} from 'chessground/build/util';
-import { Api as CgApi } from 'chessground/build/api';
-import { Config } from 'chessground/build/config';
+} from 'chessground/util';
+import { Api as CgApi } from 'chessground/api';
+import { Config } from 'chessground/config';
 import changeColorHandle from 'common/coordsColor';
 import resizeHandle from 'common/resize';
 import * as util from './util';
