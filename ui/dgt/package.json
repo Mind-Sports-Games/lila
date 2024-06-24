@@ -10,7 +10,7 @@
     "@types/playstrategy": "2.0.0"
   },
   "dependencies": {
-    "stratops": "file:/home/vincent/Desktop/code/stratops"
+    "stratops": "git+ssh://git@github.com:Mind-Sports-Games/stratops.git#v0.8.1-pstrat4.1"
   },
   "scripts": {
     "dev": "rollup --config",

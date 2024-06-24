@@ -9,8 +9,7 @@
   "author": "Thibault Duplessis",
   "license": "AGPL-3.0-or-later",
   "dependencies": {
-    "breakpoint-sass": "^2.7.1",
-    "stratops": "file:/home/vincent/Desktop/code/stratops"
+    "breakpoint-sass": "^2.7.1"
   },
   "devDependencies": {
     "glob": "^7.1.3",
