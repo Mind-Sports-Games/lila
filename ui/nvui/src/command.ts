@@ -1,5 +1,5 @@
 import { renderPieceKeys, renderPiecesOn, Style } from './chess';
-import { Pieces } from 'chessground/build/types';
+import { Pieces } from 'chessground/types';
 
 export const commands = {
   piece: {

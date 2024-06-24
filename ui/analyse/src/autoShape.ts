@@ -1,7 +1,7 @@
 import { winningChances } from 'ceval';
-import * as cg from 'chessground/build/types';
-import { opposite } from 'chessground/build/util';
-import { DrawModifiers, DrawShape } from 'chessground/build/draw';
+import * as cg from 'chessground/types';
+import { opposite } from 'chessground/util';
+import { DrawModifiers, DrawShape } from 'chessground/draw';
 import AnalyseCtrl from './ctrl';
 import { parseLexicalUci } from './util';
 

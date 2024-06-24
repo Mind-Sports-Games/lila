@@ -1,11 +1,11 @@
 import * as miniBoard from 'common/mini-board';
 import StormCtrl from '../ctrl';
-import { Chess } from 'stratops/build/chess';
+import { Chess } from 'stratops/chess';
 import { getNow, onInsert } from 'puz/util';
 import { h, VNode } from 'snabbdom';
 import { numberSpread } from 'common/number';
-import { parseFen, makeFen } from 'stratops/build/fen';
-import { parseUci } from 'stratops/build/util';
+import { parseFen, makeFen } from 'stratops/fen';
+import { parseUci } from 'stratops/util';
 
 const parseUciChess = parseUci('chess');
 

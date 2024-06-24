@@ -1,8 +1,8 @@
 import { Run } from './interfaces';
-import { Config as CgConfig } from 'chessground/build/config';
+import { Config as CgConfig } from 'chessground/config';
 import { uciToLastMove } from './util';
-import { makeFen } from 'stratops/build/fen';
-import { chessgroundDests } from 'stratops/build/compat';
+import { makeFen } from 'stratops/fen';
+import { chessgroundDests } from 'stratops/compat';
 
 export const makeCgOpts = (run: Run, canMove: boolean): CgConfig => {
   const cur = run.current;

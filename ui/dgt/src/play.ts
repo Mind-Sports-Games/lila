@@ -1,9 +1,9 @@
-import { Chess } from 'stratops/build/chess';
-import { INITIAL_FEN, makeFen, parseFen } from 'stratops/build/fen';
-import { makeSan, parseSan } from 'stratops/build/san';
-import { NormalMove } from 'stratops/build/types';
-import { board } from 'stratops/build/debug';
-import { defaultSetup, fen, makeUci, parseUci } from 'stratops/build';
+import { Chess } from 'stratops/chess';
+import { INITIAL_FEN, makeFen, parseFen } from 'stratops/fen';
+import { makeSan, parseSan } from 'stratops/san';
+import { NormalMove } from 'stratops/types';
+import { board } from 'stratops/debug';
+import { defaultSetup, fen, makeUci, parseUci } from 'stratops';
 
 const makeSanChess = makeSan('chess');
 const parseSanChess = parseSan('chess');

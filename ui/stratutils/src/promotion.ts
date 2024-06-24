@@ -1,4 +1,4 @@
-import { Api as ChessgroundApi } from 'chessground/build/api';
+import { Api as ChessgroundApi } from 'chessground/api';
 
 export const forcedShogiPromotion = (chessground: ChessgroundApi, orig: Key, dest: Key): boolean | undefined => {
   const piece = chessground.state.pieces.get(dest),

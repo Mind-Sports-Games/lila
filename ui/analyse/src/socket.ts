@@ -1,4 +1,4 @@
-import { initial as initialBoardFen } from 'chessground/build/fen';
+import { initial as initialBoardFen } from 'chessground/fen';
 import { ops as treeOps } from 'tree';
 import AnalyseCtrl from './ctrl';
 import { CachedEval, EvalGetData, EvalPutData, ServerEvalData } from './interfaces';

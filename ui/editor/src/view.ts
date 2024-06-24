@@ -1,9 +1,9 @@
 import { h, VNode } from 'snabbdom';
-import { MouchEvent, NumberPair } from 'chessground/build/types';
-import { dragNewPiece } from 'chessground/build/drag';
-import { eventPosition, opposite } from 'chessground/build/util';
-import { Rules } from 'stratops/build/types';
-import { parseFen } from 'stratops/build/fen';
+import { MouchEvent, NumberPair } from 'chessground/types';
+import { dragNewPiece } from 'chessground/drag';
+import { eventPosition, opposite } from 'chessground/util';
+import { Rules } from 'stratops/types';
+import { parseFen } from 'stratops/fen';
 import modal from 'common/modal';
 import EditorCtrl from './ctrl';
 import chessground from './chessground';

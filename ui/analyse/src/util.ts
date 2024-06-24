@@ -1,7 +1,7 @@
 import { h, VNode, Hooks, Attrs } from 'snabbdom';
 import { fixCrazySan } from 'stratutils';
-import * as cg from 'chessground/build/types';
-import { Rules } from 'stratops/build';
+import * as cg from 'chessground/types';
+import { Rules } from 'stratops';
 
 export { autolink, innerHTML, enrichText, richHTML, toYouTubeEmbed, toTwitchEmbed } from 'common/richText';
 
