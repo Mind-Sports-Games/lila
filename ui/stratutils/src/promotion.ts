@@ -1,4 +1,4 @@
-import { Api as ChessgroundApi } from 'chessground/api';
+import { Api as ChessgroundApi } from 'chessground/build/api';
 
 export const forcedShogiPromotion = (chessground: ChessgroundApi, orig: Key, dest: Key): boolean | undefined => {
   const piece = chessground.state.pieces.get(dest),
@@ -50,6 +50,8 @@ export const possiblePromotion = (
     case 'go19x19':
     case 'backgammon':
     case 'nackgammon':
+    case 'breakthroughtroyka':
+    case 'minibreakthroughtroyka':
       return false;
     case 'shogi':
       return (

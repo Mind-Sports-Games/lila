@@ -1,4 +1,4 @@
-import { Outcome } from 'stratops/types';
+import { Outcome } from 'stratops/build/types';
 import { bind } from '../util';
 import { h, VNode } from 'snabbdom';
 import { PracticeCtrl, Comment } from './practiceCtrl';

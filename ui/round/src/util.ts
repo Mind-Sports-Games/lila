@@ -1,6 +1,6 @@
-import * as cg from 'chessground/types';
+import * as cg from 'chessground/build/types';
 import { h, Hooks, VNodeData } from 'snabbdom';
-import { opposite, calculatePieceGroup, backgammonPosDiff } from 'chessground/util';
+import { opposite, calculatePieceGroup, backgammonPosDiff } from 'chessground/build/util';
 import { Redraw, EncodedDests, Dests, MaterialDiff, Step, CheckCount } from './interfaces';
 
 function pieceScores(variant: VariantKey, piece: cg.Role, isPromoted: boolean | undefined): number {

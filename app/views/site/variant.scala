@@ -66,7 +66,7 @@ object variant {
               cls := List("text" -> true, "active" -> active.has(v)),
               href := routes.Page.variant(v.key),
               dataIcon := v.perfIcon
-            )(v.name)
+            )(VariantKeys.variantName(v))
           }
         ),
         div(cls := s"page-menu__content box $klass")(body)

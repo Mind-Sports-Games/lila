@@ -1,9 +1,9 @@
 import { h, VNode } from 'snabbdom';
 import { Chessground } from 'chessground';
-import { Api as CgApi } from 'chessground/api';
-import { Config as CgConfig } from 'chessground/config';
-import * as cg from 'chessground/types';
-import { DrawShape } from 'chessground/draw';
+import { Api as CgApi } from 'chessground/build/api';
+import { Config as CgConfig } from 'chessground/build/config';
+import * as cg from 'chessground/build/types';
+import { DrawShape } from 'chessground/build/draw';
 import changeColorHandle from 'common/coordsColor';
 import resizeHandle from 'common/resize';
 import AnalyseCtrl from './ctrl';
@@ -120,6 +120,10 @@ export function makeConfig(ctrl: AnalyseCtrl): CgConfig {
             : cgVariantKey === 'xiangqi' || cgVariantKey === 'minixiangqi'
             ? 'https://playstrategy.org/assets/piece/xiangqi/' +
               d.pref.pieceSet.filter(ps => ps.gameFamily === 'xiangqi')[0].name +
+              '/'
+            : ctrl.data.game.gameFamily === 'breakthroughtroyka'
+            ? 'https://playstrategy.org/assets/piece/chess/' + // @TODO: use https://playstrategy.org/assets/piece/breakthrougtroyka/ instead
+              d.pref.pieceSet.filter(ps => ps.gameFamily === 'breakthroughtroyka')[0].name +
               '/'
             : 'https://playstrategy.org/assets/piece/chess/' +
               d.pref.pieceSet.filter(ps => ps.gameFamily === 'chess')[0].name +

@@ -1,9 +1,9 @@
 import { h } from 'snabbdom';
 import * as ground from './ground';
-import * as cg from 'chessground/types';
-import { DrawShape } from 'chessground/draw';
+import * as cg from 'chessground/build/types';
+import { DrawShape } from 'chessground/build/draw';
 import * as xhr from './xhr';
-import { key2pos } from 'chessground/util';
+import { key2pos } from 'chessground/build/util';
 import { bind, onInsert } from './util';
 import RoundController from './ctrl';
 import { MaybeVNode } from './interfaces';

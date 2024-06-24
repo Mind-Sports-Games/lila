@@ -1,9 +1,9 @@
-import { dragNewPiece } from 'chessground/drag';
+import { dragNewPiece } from 'chessground/build/drag';
 import { readDrops, readDropsByRole } from 'stratutils';
 import AnalyseCtrl from '../ctrl';
-import * as cg from 'chessground/types';
-import { Api as ChessgroundApi } from 'chessground/api';
-import { setDropMode, cancelDropMode } from 'chessground/drop';
+import * as cg from 'chessground/build/types';
+import { Api as ChessgroundApi } from 'chessground/build/api';
+import { setDropMode, cancelDropMode } from 'chessground/build/drop';
 import { AnalyseData } from '../interfaces';
 
 export function drag(ctrl: AnalyseCtrl, playerIndex: PlayerIndex, e: cg.MouchEvent): void {

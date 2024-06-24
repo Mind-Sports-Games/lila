@@ -3,13 +3,13 @@ import RacerCtrl from '../ctrl';
 import { makeCgOpts } from 'puz/run';
 import { makeConfig as makeCgConfig } from 'puz/view/chessground';
 import { h, VNode } from 'snabbdom';
-import { INITIAL_BOARD_FEN } from 'stratops/fen';
+import { INITIAL_BOARD_FEN } from 'stratops/build/fen';
 
 export const renderBoard = (ctrl: RacerCtrl) =>
   h('div.puz-board.main-board', [
     renderGround(ctrl),
     ctrl.promotion.view(),
-    ctrl.countdownSeconds() ? renderCountdown(ctrl.countdownSeconds()) : undefined,
+    ctrl.countdownSeconds() ? renderCountdown(ctrl.countdownSeconds() ?? 0) : undefined,
   ]);
 
 const renderGround = (ctrl: RacerCtrl): VNode =>

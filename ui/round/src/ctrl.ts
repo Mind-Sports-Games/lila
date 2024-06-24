@@ -11,12 +11,12 @@ import * as title from './title';
 import * as promotion from './promotion';
 import * as blur from './blur';
 import * as speech from './speech';
-import * as cg from 'chessground/types';
-import { Config as CgConfig } from 'chessground/config';
-import { Api as CgApi } from 'chessground/api';
-import { setDropMode, cancelDropMode } from 'chessground/drop';
-import { State } from 'chessground/state';
-import { opposite } from 'chessground/util';
+import * as cg from 'chessground/build/types';
+import { Config as CgConfig } from 'chessground/build/config';
+import { Api as CgApi } from 'chessground/build/api';
+import { setDropMode, cancelDropMode } from 'chessground/build/drop';
+import { State } from 'chessground/build/state';
+import { opposite } from 'chessground/build/util';
 import { ClockController, isByoyomi } from './clock/clockCtrl';
 import { CorresClockController, ctrl as makeCorresClock } from './corresClock/corresClockCtrl';
 import MoveOn from './moveOn';
@@ -292,6 +292,8 @@ export default class RoundController {
         'go19x19',
         'backgammon',
         'nackgammon',
+        'breakthroughtroyka',
+        'minibreakthroughtroyka',
       ].includes(this.data.game.variant.key)
     )
       return false;

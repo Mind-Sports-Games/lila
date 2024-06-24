@@ -1,6 +1,6 @@
 import { piotr } from './piotr';
-import * as cg from 'chessground/types';
-import { Rules } from 'stratops/types';
+import * as cg from 'chessground/build/types';
+import { Rules } from 'stratops/build/types';
 
 // TODO: For some reason we can't import this like:
 // import * from 'stratutils/promotion'
@@ -56,7 +56,7 @@ export const altCastles = {
 };
 
 export function variantUsesUCINotation(key: VariantKey | DraughtsVariantKey) {
-  return ['linesOfAction', 'scrambledEggs', 'amazons'].includes(key);
+  return ['linesOfAction', 'scrambledEggs', 'amazons', 'breakthroughtroyka', 'minibreakthroughtroyka'].includes(key);
 }
 
 export function variantUsesUSINotation(key: VariantKey | DraughtsVariantKey) {
@@ -216,6 +216,10 @@ export const variantToRules = (v: VariantKey): Rules => {
       return 'go13x13';
     case 'go19x19':
       return 'go19x19';
+    case 'breakthroughtroyka':
+      return 'breakthrough';
+    case 'minibreakthroughtroyka':
+      return 'minibreakthrough';
     default:
       return 'chess';
   }

@@ -4,7 +4,7 @@ import { bind, spinner } from '../util';
 import { h, VNode } from 'snabbdom';
 import { MaybeVNodes } from '../interfaces';
 import { multiBoard as xhrLoad } from './studyXhr';
-import { opposite } from 'chessground/util';
+import { opposite } from 'chessground/build/util';
 import { StudyCtrl, ChapterPreview, ChapterPreviewPlayer, Position } from './interfaces';
 
 export class MultiBoardCtrl {

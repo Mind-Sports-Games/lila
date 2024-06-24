@@ -304,7 +304,9 @@ declare type VariantKey =
   | 'go13x13'
   | 'go19x19'
   | 'backgammon'
-  | 'nackgammon';
+  | 'nackgammon'
+  | 'breakthroughtroyka'
+  | 'minibreakthroughtroyka';
 
 declare type DraughtsVariantKey =
   | 'international'
@@ -364,7 +366,9 @@ declare type Perf =
   | 'go13x13'
   | 'go19x19'
   | 'backgammon'
-  | 'nackgammon';
+  | 'nackgammon'
+  | 'breakthroughtroyka'
+  | 'minibreakthroughtroyka';
 
 //declare type Color = 'white' | 'black';
 declare type PlayerName = 'White' | 'Black' | 'Sente' | 'Gote' | 'Red' | 'South' | 'North' | 'Bastaushi' | 'Kostaushi';
@@ -384,7 +388,8 @@ declare type GameFamilyKey =
   | 'oware'
   | 'togyzkumalak'
   | 'go'
-  | 'backgammon';
+  | 'backgammon'
+  | 'breakthroughtroyka';
 
 declare type Files =
   | 'a'
