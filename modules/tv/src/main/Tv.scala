@@ -730,6 +730,7 @@ object Tv {
       Nackgammon,
       BreakthroughTroyka,
       MiniBreakthroughTroyka,
+      BreakthroughTroykaFamily,
       Bot,
       Computer
     )

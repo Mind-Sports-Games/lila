@@ -64,17 +64,16 @@ final private class LeaderboardIndexer(
         s"${tour.variant.gameFamily.id}_${tour.variant.id}".some
       case Some(c) if c == Schedule.Freq.MedleyShield =>
         tour.trophy1st match {
-          case Some(t) if t == "shieldDraughtsMedley"           => "sdm".some
-          case Some(t) if t == "shieldChessMedley"              => "scm".some
-          case Some(t) if t == "shieldPlayStrategyMedley"       => "spm".some
-          case Some(t) if t == "shieldLinesOfActionMedley"      => "slm".some
-          case Some(t) if t == "shieldShogiMedley"              => "ssm".some
-          case Some(t) if t == "shieldXiangqiMedley"            => "sxm".some
-          case Some(t) if t == "shieldOthelloMedley"            => "som".some
-          case Some(t) if t == "shieldMancalaMedley"            => "smm".some
-          case Some(t) if t == "shieldBackgammonMedley"         => "sbm".some
-          case Some(t) if t == "shieldBreakthroughTroykaMedley" => "sbm".some
-          case _                                                => None
+          case Some(t) if t == "shieldDraughtsMedley"      => "sdm".some
+          case Some(t) if t == "shieldChessMedley"         => "scm".some
+          case Some(t) if t == "shieldPlayStrategyMedley"  => "spm".some
+          case Some(t) if t == "shieldLinesOfActionMedley" => "slm".some
+          case Some(t) if t == "shieldShogiMedley"         => "ssm".some
+          case Some(t) if t == "shieldXiangqiMedley"       => "sxm".some
+          case Some(t) if t == "shieldOthelloMedley"       => "som".some
+          case Some(t) if t == "shieldMancalaMedley"       => "smm".some
+          case Some(t) if t == "shieldBackgammonMedley"    => "sbm".some
+          case _                                           => None
         }
       case _ => None
     }

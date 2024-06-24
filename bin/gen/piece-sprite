@@ -85,7 +85,8 @@ backgammon_themes = [
 ]
 breakthroughtroyka_themes = [
    ['staunty', 'svg'],
-   ['checkers', 'svg']
+   ['checkers', 'svg'],
+   ['fabirovsky', 'svg']
 ]
 types = {
   'svg' => 'svg+xml;base64,',

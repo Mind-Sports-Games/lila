@@ -35,16 +35,15 @@ object PoolList {
       Wave(22 seconds, 30 players),
       Variant.Togyzkumalak(strategygames.togyzkumalak.variant.Togyzkumalak)
     ),
-    PoolConfig(5 ++ 3, Wave(22 seconds, 30 players), Variant.Go(strategygames.go.variant.Go19x19)),
-    PoolConfig(
-      strategygames.Clock.SimpleDelayConfig(2 * 60, 12),
-      Wave(22 seconds, 30 players),
-      Variant.Backgammon(strategygames.backgammon.variant.Backgammon)
-    ),
     PoolConfig(
       3 ++ 2,
       Wave(22 seconds, 30 players),
       Variant.FairySF(strategygames.fairysf.variant.BreakthroughTroyka)
+    ),
+    PoolConfig(
+      strategygames.Clock.SimpleDelayConfig(2 * 60, 12),
+      Wave(22 seconds, 30 players),
+      Variant.Backgammon(strategygames.backgammon.variant.Backgammon)
     )
   )
 

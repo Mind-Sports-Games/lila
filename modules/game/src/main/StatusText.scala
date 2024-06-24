@@ -29,7 +29,7 @@ object StatusText {
       case SingleWin                             => s"${winner(win)} wins."
       case GammonWin                             => s"${winner(win)} wins by gammon."
       case BackgammonWin                         => s"${winner(win)} wins by backgammon."
-      case VariantEnd =>
+      case VariantEnd => // @TODO : add custom end for BreakthroughTroyka
         variant match {
           case Variant.Chess(strategygames.chess.variant.KingOfTheHill) =>
             s"${winner(win)} brings the king in the center."
