@@ -63,6 +63,8 @@ trait GameHelper { self: I18nHelper with UserHelper with AiHelper with StringHel
       case (_, Some(l), Resign | Timeout | Cheat | NoStart, _) =>
         s"${playerText(l)} resigned"
       case (_, Some(l), Outoftime, _)                  => s"${playerText(l)} forfeits by time"
+      case (_, Some(l), OutoftimeGammon, _)            => s"${playerText(l)} forfeits a gammon by time"
+      case (_, Some(l), OutoftimeBackgammon, _)        => s"${playerText(l)} forfeits a backgammon by time"
       case (Some(w), _, UnknownFinish, _)              => s"${playerText(w)} won"
       case (_, _, Draw | Stalemate | UnknownFinish, _) => "Game is a draw"
       case (_, _, Aborted, _)                          => "Game has been aborted"
@@ -214,6 +216,17 @@ trait GameHelper { self: I18nHelper with UserHelper with AiHelper with StringHel
           case (P1, None)    => trans.playerIndexTimeOut(game.playerTrans(P1)).v + " • " + trans.draw.txt()
           case (P2, Some(_)) => trans.playerIndexTimeOut(game.playerTrans(P2)).v
           case (P2, None)    => trans.playerIndexTimeOut(game.playerTrans(P2)).v + " • " + trans.draw.txt()
+        }
+      case S.OutoftimeGammon =>
+        game.loser match {
+          case Some(p) if p.playerIndex.p1 => trans.playerIndexLosesByGammonTimeOut(game.playerTrans(P1)).v
+          case _                           => trans.playerIndexLosesByGammonTimeOut(game.playerTrans(P2)).v
+        }
+      case S.OutoftimeBackgammon =>
+        game.loser match {
+          case Some(p) if p.playerIndex.p1 =>
+            trans.playerIndexLosesByBackgammonTimeOut(game.playerTrans(P1)).v
+          case _ => trans.playerIndexLosesByBackgammonTimeOut(game.playerTrans(P2)).v
         }
       case S.RuleOfGin =>
         game.winner match {
