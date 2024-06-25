@@ -39,6 +39,8 @@ object userAnalysisI18n {
     trans.playerIndexLeftTheGame,
     trans.draw,
     trans.playerIndexTimeOut,
+    trans.playerIndexLosesByGammonTimeOut,
+    trans.playerIndexLosesByBackgammonTimeOut,
     trans.playerIndexWinsByRuleOfGin,
     trans.playerIndexWinsByGinGammon,
     trans.playerIndexWinsByGinBackgammon,
