@@ -109,6 +109,9 @@ export function convertVariantKeyToGameFamily(variantKey: VariantKey | DraughtsV
     case 'english':
     case 'international':
       return 'draughts';
+    case 'breakthroughtroyka':
+    case 'minibreakthroughtroyka':
+      return 'breakthroughtroyka';
     default:
       return 'chess';
   }

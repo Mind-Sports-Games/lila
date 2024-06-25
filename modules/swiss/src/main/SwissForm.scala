@@ -38,16 +38,17 @@ final class SwissForm(implicit mode: Mode) {
           "draughts64Variants"  -> optional(boolean)
         )(MedleyDefaults.apply)(MedleyDefaults.unapply),
         "medleyGameFamilies" -> mapping(
-          "chess"      -> optional(boolean),
-          "draughts"   -> optional(boolean),
-          "shogi"      -> optional(boolean),
-          "xiangqi"    -> optional(boolean),
-          "loa"        -> optional(boolean),
-          "flipello"   -> optional(boolean),
-          "mancala"    -> optional(boolean),
-          "amazons"    -> optional(boolean),
-          "go"         -> optional(boolean),
-          "backgammon" -> optional(boolean)
+          "chess"              -> optional(boolean),
+          "draughts"           -> optional(boolean),
+          "shogi"              -> optional(boolean),
+          "xiangqi"            -> optional(boolean),
+          "loa"                -> optional(boolean),
+          "flipello"           -> optional(boolean),
+          "mancala"            -> optional(boolean),
+          "amazons"            -> optional(boolean),
+          "go"                 -> optional(boolean),
+          "backgammon"         -> optional(boolean),
+          "breakthroughtroyka" -> optional(boolean)
         )(MedleyGameFamilies.apply)(MedleyGameFamilies.unapply),
         "rated" -> optional(boolean),
         "xGamesChoice" -> mapping(
@@ -112,7 +113,8 @@ final class SwissForm(implicit mode: Mode) {
         mancala = true.some,
         amazons = true.some,
         go = true.some,
-        backgammon = true.some
+        backgammon = true.some,
+        breakthroughtroyka = true.some
       ),
       rated = true.some,
       xGamesChoice = XGamesChoice(
@@ -157,7 +159,8 @@ final class SwissForm(implicit mode: Mode) {
         mancala = gameGroupInMedley(s.settings.medleyVariants, GameGroup.Mancala()).some,
         amazons = gameGroupInMedley(s.settings.medleyVariants, GameGroup.Amazons()).some,
         go = gameGroupInMedley(s.settings.medleyVariants, GameGroup.Go()).some,
-        backgammon = gameGroupInMedley(s.settings.medleyVariants, GameGroup.Backgammon()).some
+        backgammon = gameGroupInMedley(s.settings.medleyVariants, GameGroup.Backgammon()).some,
+        breakthroughtroyka = gameGroupInMedley(s.settings.medleyVariants, GameGroup.BreakthroughTroyka()).some
       ),
       rated = s.settings.rated.some,
       xGamesChoice = XGamesChoice(
@@ -448,7 +451,8 @@ object SwissForm {
       mancala: Option[Boolean],
       amazons: Option[Boolean],
       go: Option[Boolean],
-      backgammon: Option[Boolean]
+      backgammon: Option[Boolean],
+      breakthroughtroyka: Option[Boolean]
   ) {
 
     lazy val ggList: List[GameGroup] = GameGroup.medley
@@ -462,5 +466,8 @@ object SwissForm {
       .filterNot(gg => if (!amazons.getOrElse(false)) gg == GameGroup.Amazons() else false)
       .filterNot(gg => if (!go.getOrElse(false)) gg == GameGroup.Go() else false)
       .filterNot(gg => if (!backgammon.getOrElse(false)) gg == GameGroup.Backgammon() else false)
+      .filterNot(gg =>
+        if (!breakthroughtroyka.getOrElse(false)) gg == GameGroup.BreakthroughTroyka() else false
+      )
   }
 }

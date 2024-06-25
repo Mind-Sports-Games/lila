@@ -50,7 +50,7 @@ export function render(ctrl: LobbyController) {
           h('div.variant', pool.variantDisplayName),
           active && member!.range
             ? renderRange(member!.range!)
-            : h('div.logo', { attrs: { 'data-icon': perfIcons[pool.perf] } }),
+            : h('div.logo', { attrs: { 'data-icon': perfIcons[pool.variantDisplayName] || perfIcons[pool.perf] } }),
           h('div.clock', displayClockTime(pool)),
           active ? spinner() : null,
         ]

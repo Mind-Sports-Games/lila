@@ -50,6 +50,8 @@ export const possiblePromotion = (
     case 'go19x19':
     case 'backgammon':
     case 'nackgammon':
+    case 'breakthroughtroyka':
+    case 'minibreakthroughtroyka':
       return false;
     case 'shogi':
       return (

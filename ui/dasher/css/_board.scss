@@ -37,6 +37,10 @@
       height: 125px;
     }
 
+    &.breakthroughtroyka {
+      height: 44px;
+    }
+
     @extend %flex-center;
 
     justify-content: center;
@@ -94,6 +98,12 @@
     height: 100px;
   }
 
+  .list a.breakthroughtroyka span {
+    display: block;
+    width: 64px;
+    height: 32px;
+  }
+
   &.d3 .list span {
     width: 66px;
     height: 30px;
@@ -141,7 +151,7 @@
     'horsey': 'horsey.thumbnail.jpg',
   );
 
-  @each $gameFamily in ('chess', 'draughts', 'loa', 'amazons') {
+  @each $gameFamily in ('chess', 'draughts', 'loa', 'amazons', 'breakthroughtroyka') {
     @each $color, $file in $chess-board-files {
       &.d2 .#{$gameFamily}-#{$color} {
         background-image: url(../images/board/#{$gameFamily}/#{$file});
@@ -226,6 +236,10 @@
     .backgammon-contemporary {
       background-image: url(../images/board/backgammon/svg/backgammon_contemporary_board.svg);
       background-size: 100px;
+    }
+
+    .breakthrough-wood {
+      background-image: url(../images/board/breakthroughtroyka/wood.thumbnail.jpg);
     }
   }
 

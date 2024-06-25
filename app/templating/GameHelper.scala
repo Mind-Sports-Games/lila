@@ -30,6 +30,7 @@ trait GameHelper { self: I18nHelper with UserHelper with AiHelper with StringHel
     s"$speed ${VariantKeys.variantName(g.variant)} • ${playerText(g.p1Player)} vs ${playerText(g.p2Player)}"
   }
 
+  // @TODO: adapt for breakthrouhtroyka
   def describePov(pov: Pov) = {
     import pov._
     val p1 = playerText(player, withRating = true)
@@ -261,6 +262,9 @@ trait GameHelper { self: I18nHelper with UserHelper with AiHelper with StringHel
           case Variant.Backgammon(strategygames.backgammon.variant.Backgammon) =>
             trans.gameFinished.txt()
           case Variant.Backgammon(strategygames.backgammon.variant.Nackgammon) =>
+            trans.gameFinished.txt()
+          case Variant.FairySF(strategygames.fairysf.variant.BreakthroughTroyka) => trans.gameFinished.txt()
+          case Variant.FairySF(strategygames.fairysf.variant.MiniBreakthroughTroyka) =>
             trans.gameFinished.txt()
           case _ => trans.variantEnding.txt()
         }

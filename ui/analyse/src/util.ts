@@ -396,5 +396,9 @@ export const variantToRules = (v: VariantKey): Rules => {
       return 'backgammon';
     case 'nackgammon':
       return 'nackgammon';
+    case 'breakthroughtroyka':
+      return 'breakthrough';
+    case 'minibreakthroughtroyka':
+      return 'minibreakthrough';
   }
 };

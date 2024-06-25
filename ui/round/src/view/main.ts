@@ -270,6 +270,8 @@ export function main(ctrl: RoundController): VNode {
     'go19x19',
     'backgammon',
     'nackgammon',
+    'breakthroughtroyka',
+    'minibreakthroughtroyka',
   ].includes(variantKey)
     ? '.piece-letter'
     : '';
