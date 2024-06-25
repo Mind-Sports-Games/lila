@@ -206,6 +206,10 @@ export const variantToRules = (v: VariantKey): Rules => {
       return 'flipello10';
     case 'amazons':
       return 'amazons';
+    case 'breakthroughtroyka':
+      return 'breakthrough';
+    case 'minibreakthroughtroyka':
+      return 'minibreakthrough';
     case 'oware':
       return 'oware';
     case 'togyzkumalak':
@@ -216,10 +220,6 @@ export const variantToRules = (v: VariantKey): Rules => {
       return 'go13x13';
     case 'go19x19':
       return 'go19x19';
-    case 'breakthroughtroyka':
-      return 'breakthrough';
-    case 'minibreakthroughtroyka':
-      return 'minibreakthrough';
     default:
       return 'chess';
   }

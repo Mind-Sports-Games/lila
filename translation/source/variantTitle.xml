@@ -33,6 +33,8 @@
   <string name="flipello">Flip pieces between your color to get the most board area</string>
   <string name="flipello10">Flip pieces between your color to get the most board area</string>
   <string name="amazons">Immobilize all the enemy pieces</string>
+  <string name="breakthroughtroyka">Reach opponents home rank to win</string>
+  <string name="minibreakthroughtroyka">Reach opponents home rank to win</string>  
   <string name="oware">Capture the most stones to win</string>
   <string name="togyzkumalak">Capture the most stones to win</string>
   <string name="go9x9">Surround the largest area(s) of the 9 by 9 board with your stones to win</string>
@@ -40,6 +42,4 @@
   <string name="go19x19">Surround the largest area(s) of the 19 by 19 board with your stones to win</string>
   <string name="backgammon">Get all your pieces into your home and then bear them off first to win</string>
   <string name="nackgammon">Get all your pieces into your home and then bear them off first to win</string>
-  <string name="breakthroughtroyka">Reach opponents home rank to win</string>
-  <string name="minibreakthroughtroyka">Reach opponents home rank to win</string>
 </resources>

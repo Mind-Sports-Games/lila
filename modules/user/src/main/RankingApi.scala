@@ -122,6 +122,8 @@ final class RankingApi(
       flipello               <- topPerf(PerfType.orDefault("flipello").id, nb)
       flipello10             <- topPerf(PerfType.orDefault("flipello10").id, nb)
       amazons                <- topPerf(PerfType.orDefault("amazons").id, nb)
+      breakthroughtroyka     <- topPerf(PerfType.orDefault("breakthroughtroyka").id, nb)
+      minibreakthroughtroyka <- topPerf(PerfType.orDefault("minibreakthroughtroyka").id, nb)
       oware                  <- topPerf(PerfType.orDefault("oware").id, nb)
       togyzkumalak           <- topPerf(PerfType.orDefault("togyzkumalak").id, nb)
       go9x9                  <- topPerf(PerfType.orDefault("go9x9").id, nb)
@@ -129,8 +131,6 @@ final class RankingApi(
       go19x19                <- topPerf(PerfType.orDefault("go19x19").id, nb)
       backgammon             <- topPerf(PerfType.orDefault("backgammon").id, nb)
       nackgammon             <- topPerf(PerfType.orDefault("nackgammon").id, nb)
-      breakthroughtroyka     <- topPerf(PerfType.orDefault("breakthroughtroyka").id, nb)
-      minibreakthroughtroyka <- topPerf(PerfType.orDefault("minibreakthroughtroyka").id, nb)
     } yield Perfs.Leaderboards(
       ultraBullet = ultraBullet,
       bullet = bullet,
@@ -167,15 +167,15 @@ final class RankingApi(
       flipello = flipello,
       flipello10 = flipello10,
       amazons = amazons,
+      breakthroughtroyka = breakthroughtroyka,
+      minibreakthroughtroyka = minibreakthroughtroyka,
       oware = oware,
       togyzkumalak = togyzkumalak,
       go9x9 = go9x9,
       go13x13 = go13x13,
       go19x19 = go19x19,
       backgammon = backgammon,
-      nackgammon = nackgammon,
-      breakthroughtroyka = breakthroughtroyka,
-      minibreakthroughtroyka = minibreakthroughtroyka
+      nackgammon = nackgammon
     )
 
   object weeklyStableRanking {

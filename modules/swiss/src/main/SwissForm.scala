@@ -46,9 +46,9 @@ final class SwissForm(implicit mode: Mode) {
           "flipello"           -> optional(boolean),
           "mancala"            -> optional(boolean),
           "amazons"            -> optional(boolean),
+          "breakthroughtroyka" -> optional(boolean),
           "go"                 -> optional(boolean),
-          "backgammon"         -> optional(boolean),
-          "breakthroughtroyka" -> optional(boolean)
+          "backgammon"         -> optional(boolean)
         )(MedleyGameFamilies.apply)(MedleyGameFamilies.unapply),
         "rated" -> optional(boolean),
         "xGamesChoice" -> mapping(
@@ -112,9 +112,9 @@ final class SwissForm(implicit mode: Mode) {
         flipello = true.some,
         mancala = true.some,
         amazons = true.some,
+        breakthroughtroyka = true.some,
         go = true.some,
-        backgammon = true.some,
-        breakthroughtroyka = true.some
+        backgammon = true.some
       ),
       rated = true.some,
       xGamesChoice = XGamesChoice(
@@ -158,9 +158,10 @@ final class SwissForm(implicit mode: Mode) {
         flipello = gameGroupInMedley(s.settings.medleyVariants, GameGroup.Flipello()).some,
         mancala = gameGroupInMedley(s.settings.medleyVariants, GameGroup.Mancala()).some,
         amazons = gameGroupInMedley(s.settings.medleyVariants, GameGroup.Amazons()).some,
+        breakthroughtroyka =
+          gameGroupInMedley(s.settings.medleyVariants, GameGroup.BreakthroughTroyka()).some,
         go = gameGroupInMedley(s.settings.medleyVariants, GameGroup.Go()).some,
-        backgammon = gameGroupInMedley(s.settings.medleyVariants, GameGroup.Backgammon()).some,
-        breakthroughtroyka = gameGroupInMedley(s.settings.medleyVariants, GameGroup.BreakthroughTroyka()).some
+        backgammon = gameGroupInMedley(s.settings.medleyVariants, GameGroup.Backgammon()).some
       ),
       rated = s.settings.rated.some,
       xGamesChoice = XGamesChoice(
@@ -450,9 +451,9 @@ object SwissForm {
       flipello: Option[Boolean],
       mancala: Option[Boolean],
       amazons: Option[Boolean],
+      breakthroughtroyka: Option[Boolean],
       go: Option[Boolean],
-      backgammon: Option[Boolean],
-      breakthroughtroyka: Option[Boolean]
+      backgammon: Option[Boolean]
   ) {
 
     lazy val ggList: List[GameGroup] = GameGroup.medley
@@ -464,10 +465,11 @@ object SwissForm {
       .filterNot(gg => if (!flipello.getOrElse(false)) gg == GameGroup.Flipello() else false)
       .filterNot(gg => if (!mancala.getOrElse(false)) gg == GameGroup.Mancala() else false)
       .filterNot(gg => if (!amazons.getOrElse(false)) gg == GameGroup.Amazons() else false)
-      .filterNot(gg => if (!go.getOrElse(false)) gg == GameGroup.Go() else false)
-      .filterNot(gg => if (!backgammon.getOrElse(false)) gg == GameGroup.Backgammon() else false)
       .filterNot(gg =>
         if (!breakthroughtroyka.getOrElse(false)) gg == GameGroup.BreakthroughTroyka() else false
       )
+      .filterNot(gg => if (!go.getOrElse(false)) gg == GameGroup.Go() else false)
+      .filterNot(gg => if (!backgammon.getOrElse(false)) gg == GameGroup.Backgammon() else false)
+
   }
 }

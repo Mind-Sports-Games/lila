@@ -246,10 +246,15 @@ object Tv {
         )
     case object BreakthroughTroykaFamily
         extends Channel(
-          name = s"All ${GameGroup(11).name}",
+          name = s"All ${VariantKeys.gameFamilyName(GameFamily.BreakthroughTroyka())}",
           icon = FV.BreakthroughTroyka.perfIcon.toString,
           secondsSinceLastMove = freshBlitz,
-          filters = Seq(anyVariant(GameGroup(11).variants), noBot),
+          filters = Seq(
+            anyVariant(
+              Variant.all(GameLogic.FairySF()).filter(v => v.gameFamily == GameFamily.BreakthroughTroyka())
+            ),
+            noBot
+          ),
           familyChannel = true,
           gameFamily = "breakthroughtroyka"
         )
@@ -579,7 +584,7 @@ object Tv {
           icon = FV.BreakthroughTroyka.perfIcon.toString,
           secondsSinceLastMove = freshBlitz,
           filters = Seq(variant(Variant.wrap(FV.BreakthroughTroyka)), noBot),
-          familyChannel = true,
+          familyChannel = false,
           gameFamily = "breakthroughtroyka"
         )
 
@@ -589,7 +594,7 @@ object Tv {
           icon = FV.MiniBreakthroughTroyka.perfIcon.toString,
           secondsSinceLastMove = freshBlitz,
           filters = Seq(variant(Variant.wrap(FV.MiniBreakthroughTroyka)), noBot),
-          familyChannel = true,
+          familyChannel = false,
           gameFamily = "breakthroughtroyka"
         )
 
@@ -718,6 +723,9 @@ object Tv {
       Flipello,
       Flipello10,
       Amazons,
+      BreakthroughTroykaFamily,
+      BreakthroughTroyka,
+      MiniBreakthroughTroyka,
       MancalaFamily,
       Oware,
       Togyzkumalak,
@@ -728,9 +736,6 @@ object Tv {
       BackgammonFamily,
       Backgammon,
       Nackgammon,
-      BreakthroughTroyka,
-      MiniBreakthroughTroyka,
-      BreakthroughTroykaFamily,
       Bot,
       Computer
     )

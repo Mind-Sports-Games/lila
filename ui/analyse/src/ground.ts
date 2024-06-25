@@ -101,6 +101,10 @@ export function makeConfig(ctrl: AnalyseCtrl): CgConfig {
             ? 'https://playstrategy.org/assets/piece/amazons/' +
               d.pref.pieceSet.filter(ps => ps.gameFamily === 'amazons')[0].name +
               '/'
+            : ctrl.data.game.gameFamily === 'breakthroughtroyka'
+            ? 'https://playstrategy.org/assets/piece/breakthrougtroyka/' +
+              d.pref.pieceSet.filter(ps => ps.gameFamily === 'breakthroughtroyka')[0].name +
+              '/'
             : cgVariantKey === 'oware'
             ? 'https://playstrategy.org/assets/piece/oware/' +
               d.pref.pieceSet.filter(ps => ps.gameFamily === 'oware')[0].name +
@@ -120,10 +124,6 @@ export function makeConfig(ctrl: AnalyseCtrl): CgConfig {
             : cgVariantKey === 'xiangqi' || cgVariantKey === 'minixiangqi'
             ? 'https://playstrategy.org/assets/piece/xiangqi/' +
               d.pref.pieceSet.filter(ps => ps.gameFamily === 'xiangqi')[0].name +
-              '/'
-            : ctrl.data.game.gameFamily === 'breakthroughtroyka'
-            ? 'https://playstrategy.org/assets/piece/chess/' + // @TODO: use https://playstrategy.org/assets/piece/breakthrougtroyka/ instead
-              d.pref.pieceSet.filter(ps => ps.gameFamily === 'breakthroughtroyka')[0].name +
               '/'
             : 'https://playstrategy.org/assets/piece/chess/' +
               d.pref.pieceSet.filter(ps => ps.gameFamily === 'chess')[0].name +

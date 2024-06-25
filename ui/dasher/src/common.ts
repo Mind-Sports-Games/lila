@@ -7,9 +7,9 @@ export const gameFamily: GameFamilyKey[] = [
   'xiangqi',
   'flipello',
   'amazons',
+  'breakthroughtroyka',
   'oware',
   'togyzkumalak',
   'go',
   'backgammon',
-  'breakthroughtroyka',
 ];

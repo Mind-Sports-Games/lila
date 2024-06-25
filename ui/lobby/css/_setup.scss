@@ -10,11 +10,11 @@ $game-family: (
   'xiangqi',
   'flipello',
   'amazons',
+  'breakthroughtroyka',
   'oware',
   'togyzkumalak',
   'go',
-  'backgammon',
-  'breakthroughtroyka'
+  'backgammon'
 );
 
 $game-family-random-pieces: (
@@ -25,11 +25,11 @@ $game-family-random-pieces: (
   'rbK.png',
   'bwP.png',
   'wbQ.svg',
+  'wbP.svg',
   'mixed.svg',
   'mixed.svg',
   'bwS.svg',
-  'wbS.svg',
-  'wbP.svg'
+  'wbS.svg'
 );
 
 $game-family-p1-pieces: (
@@ -40,11 +40,11 @@ $game-family-p1-pieces: (
   'xiangqi/ka/RK.svg',
   'flipello/classic_flipello/bP.png',
   'amazons/arrow/wQ.svg',
+  'breakthroughtroyka/staunty/wP.svg',
   'oware/south.svg',
   'togyzkumalak/south.svg',
   'go/classic_stone/bS.svg',
-  'backgammon/wooden/w.svg',
-  'breakthroughtroyka/staunty/wP.svg'
+  'backgammon/wooden/w.svg'
 );
 
 $game-family-p2-pieces: (
@@ -55,11 +55,11 @@ $game-family-p2-pieces: (
   'xiangqi/ka/BK.svg',
   'flipello/classic_flipello/wP.png',
   'amazons/arrow/bQ.svg',
+  'breakthroughtroyka/staunty/bP.svg',
   'oware/north.svg',
   'togyzkumalak/north.svg',
   'go/classic_stone/wS.svg',
-  'backgammon/wooden/b.svg',
-  'breakthroughtroyka/staunty/bP.svg'
+  'backgammon/wooden/b.svg'
 );
 
 .game-setup {

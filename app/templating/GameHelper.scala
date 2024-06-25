@@ -30,7 +30,6 @@ trait GameHelper { self: I18nHelper with UserHelper with AiHelper with StringHel
     s"$speed ${VariantKeys.variantName(g.variant)} • ${playerText(g.p1Player)} vs ${playerText(g.p2Player)}"
   }
 
-  // @TODO: adapt for breakthrouhtroyka
   def describePov(pov: Pov) = {
     import pov._
     val p1 = playerText(player, withRating = true)
@@ -252,16 +251,19 @@ trait GameHelper { self: I18nHelper with UserHelper with AiHelper with StringHel
       case S.BackgammonWin => trans.backgammonBackgammonWin.txt()
       case S.VariantEnd =>
         game.variant match {
-          case Variant.Chess(strategygames.chess.variant.KingOfTheHill)      => trans.kingInTheCenter.txt()
-          case Variant.Chess(strategygames.chess.variant.ThreeCheck)         => trans.threeChecks.txt()
-          case Variant.Chess(strategygames.chess.variant.FiveCheck)          => trans.fiveChecks.txt()
-          case Variant.Chess(strategygames.chess.variant.RacingKings)        => trans.raceFinished.txt()
-          case Variant.Chess(strategygames.chess.variant.LinesOfAction)      => trans.checkersConnected.txt()
-          case Variant.Chess(strategygames.chess.variant.ScrambledEggs)      => trans.checkersConnected.txt()
-          case Variant.Draughts(strategygames.draughts.variant.Breakthrough) => trans.promotion.txt()
-          case Variant.FairySF(strategygames.fairysf.variant.Flipello)       => trans.gameFinished.txt()
-          case Variant.FairySF(strategygames.fairysf.variant.Flipello10)     => trans.gameFinished.txt()
-          case Variant.FairySF(strategygames.fairysf.variant.Amazons)        => trans.gameFinished.txt()
+          case Variant.Chess(strategygames.chess.variant.KingOfTheHill)          => trans.kingInTheCenter.txt()
+          case Variant.Chess(strategygames.chess.variant.ThreeCheck)             => trans.threeChecks.txt()
+          case Variant.Chess(strategygames.chess.variant.FiveCheck)              => trans.fiveChecks.txt()
+          case Variant.Chess(strategygames.chess.variant.RacingKings)            => trans.raceFinished.txt()
+          case Variant.Chess(strategygames.chess.variant.LinesOfAction)          => trans.checkersConnected.txt()
+          case Variant.Chess(strategygames.chess.variant.ScrambledEggs)          => trans.checkersConnected.txt()
+          case Variant.Draughts(strategygames.draughts.variant.Breakthrough)     => trans.promotion.txt()
+          case Variant.FairySF(strategygames.fairysf.variant.Flipello)           => trans.gameFinished.txt()
+          case Variant.FairySF(strategygames.fairysf.variant.Flipello10)         => trans.gameFinished.txt()
+          case Variant.FairySF(strategygames.fairysf.variant.Amazons)            => trans.gameFinished.txt()
+          case Variant.FairySF(strategygames.fairysf.variant.BreakthroughTroyka) => trans.raceFinished.txt()
+          case Variant.FairySF(strategygames.fairysf.variant.MiniBreakthroughTroyka) =>
+            trans.raceFinished.txt()
           case Variant.Samurai(strategygames.samurai.variant.Oware) =>
             if (game.situation.isRepetition) trans.gameFinishedRepetition.txt() else trans.gameFinished.txt()
           case Variant.Togyzkumalak(strategygames.togyzkumalak.variant.Togyzkumalak) =>
@@ -275,9 +277,6 @@ trait GameHelper { self: I18nHelper with UserHelper with AiHelper with StringHel
           case Variant.Backgammon(strategygames.backgammon.variant.Backgammon) =>
             trans.gameFinished.txt()
           case Variant.Backgammon(strategygames.backgammon.variant.Nackgammon) =>
-            trans.gameFinished.txt()
-          case Variant.FairySF(strategygames.fairysf.variant.BreakthroughTroyka) => trans.gameFinished.txt()
-          case Variant.FairySF(strategygames.fairysf.variant.MiniBreakthroughTroyka) =>
             trans.gameFinished.txt()
           case _ => trans.variantEnding.txt()
         }
