@@ -67,7 +67,7 @@ const changeColorHandle = (): void => {
     'amazons-olive': '#b8b19f #6d6655',
     'amazons-purple': '#9f90b0 #7d4a8d',
     'breakthroughtroyka-wood': '#d8a45b #9b4d0f',
-    'breakthroughtroyka-purple-diag': '#E5DAF0 #957AB0',
+    'breakthroughtroyka-maple': '#e8ceab #bc7944',
   };
 
   for (const theme of document.body.className.split(' ')) {

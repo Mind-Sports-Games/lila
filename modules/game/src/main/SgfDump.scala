@@ -131,6 +131,14 @@ final class SgfDump(
         case GameFamily.Flipello() =>
           Tags { List(Tag(_.GM, 2), Tag(_.SZ, game.variant.toFairySF.boardSize.height)) }
         case GameFamily.Amazons() => Tags { List(Tag(_.GM, 18)) }
+        case GameFamily.BreakthroughTroyka() =>
+          Tags {
+            List(
+              Tag(_.GM, 41),
+              Tag(_.SZ, game.variant.toFairySF.boardSize.height),
+              Tag(_.SU, if (game.variant.key == "breakthroughtroyka") "Standard" else "MiniBreakthrough")
+            )
+          }
         case GameFamily.Go() =>
           Tags {
             List(

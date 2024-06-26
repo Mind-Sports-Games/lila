@@ -79,6 +79,16 @@ $amazons-board-files: (
   'maple': 'maple_100.jpg',
 );
 
+$breakthrough-board-files: (
+  'purple-diag': 'purple-diag.png',
+  'maple': 'maple.jpg',
+);
+
+$minibreakthrough-board-files: (
+  'purple-diag': 'purple-diag-mini.png',
+  'maple': 'maple-mini.jpg',
+);
+
 $oware-board-files: (
   'light-wood': 'oware_light_wood_board.png',
   'dark-wood': 'oware_dark_wood_board.png',
@@ -107,16 +117,6 @@ $go19x19-board-files: (
 $backgammon-board-files: (
   'classic': 'svg/backgammon_classic_board.svg',
   'contemporary': 'svg/backgammon_contemporary_board.svg',
-);
-
-$breakthrough-board-files: (
-  'purple-diag': 'purple-diag.png',
-  'wood': 'wood.jpg',
-);
-
-$minibreakthrough-board-files: (
-  'purple-diag': 'purple-diag-mini.png',
-  'wood': 'wood-mini.jpg',
 );
 
 $chess-variants: (
@@ -155,18 +155,6 @@ $backgammon-variants: ('backgammon', 'nackgammon'); // must use same board
     .#{$gameFamily}-#{$color} .#{$gameFamily}.is2d cg-board {
       background-image: url(../images/board/chess/#{$file});
     }
-  }
-}
-
-@each $color, $file in $breakthrough-board-files {
-  .breakthroughtroyka-#{$color} .variant-breakthroughtroyka.is2d cg-board {
-    background-image: url(../images/board/breakthroughtroyka/#{$file});
-  }
-}
-
-@each $color, $file in $minibreakthrough-board-files {
-  .breakthroughtroyka-#{$color} .variant-minibreakthroughtroyka.is2d cg-board {
-    background-image: url(../images/board/breakthroughtroyka/#{$file});
   }
 }
 
@@ -209,6 +197,18 @@ $backgammon-variants: ('backgammon', 'nackgammon'); // must use same board
 @each $color, $file in $amazons-board-files {
   .amazons-#{$color} .variant-amazons.is2d cg-board {
     background-image: url(../images/board/amazons/#{$file});
+  }
+}
+
+@each $color, $file in $breakthrough-board-files {
+  .breakthroughtroyka-#{$color} .variant-breakthroughtroyka.is2d cg-board {
+    background-image: url(../images/board/breakthroughtroyka/#{$file});
+  }
+}
+
+@each $color, $file in $minibreakthrough-board-files {
+  .breakthroughtroyka-#{$color} .variant-minibreakthroughtroyka.is2d cg-board {
+    background-image: url(../images/board/breakthroughtroyka/#{$file});
   }
 }
 
@@ -314,6 +314,18 @@ $backgammon-variants: ('backgammon', 'nackgammon'); // must use same board
   }
 }
 
+@each $color, $file in $breakthrough-board-files {
+  .breakthroughtroyka-#{$color} .is2d .variant-breakthroughtroyka cg-board {
+    background-image: url(../images/board/breakthroughtroyka/#{$file});
+  }
+}
+
+@each $color, $file in $minibreakthrough-board-files {
+  .breakthroughtroyka-#{$color} .is2d .variant-minibreakthroughtroyka cg-board {
+    background-image: url(../images/board/breakthroughtroyka/#{$file});
+  }
+}
+
 @each $color, $file in $oware-board-files {
   .oware-#{$color} .is2d .variant-oware cg-board {
     background-image: url(../images/board/oware/#{$file});
@@ -349,17 +361,5 @@ $backgammon-variants: ('backgammon', 'nackgammon'); // must use same board
     .backgammon-#{$color} .is2d .variant-#{$variant} cg-board {
       background-image: url(../images/board/backgammon/#{$file});
     }
-  }
-}
-
-@each $color, $file in $breakthrough-board-files {
-  .breakthroughtroyka-#{$color} .is2d .variant-breakthroughtroyka cg-board {
-    background-image: url(../images/board/breakthroughtroyka/#{$file});
-  }
-}
-
-@each $color, $file in $minibreakthrough-board-files {
-  .breakthroughtroyka-#{$color} .is2d .variant-minibreakthroughtroyka cg-board {
-    background-image: url(../images/board/breakthroughtroyka/#{$file});
   }
 }

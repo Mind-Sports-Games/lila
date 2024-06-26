@@ -78,7 +78,10 @@ export default function status(ctrl: Ctrl): string {
           return noarg('gameFinished');
         case 'amazons':
           return noarg('gameFinished');
-        // insert breakthroughtroyka variant end here
+        case 'breakthroughtroyka':
+        case 'minibreakthroughtroyka':
+          // if (d.game)
+          return noarg('raceFinished');
         case 'oware':
           if (d.game.isRepetition) {
             return noarg('gameFinishedRepetition');

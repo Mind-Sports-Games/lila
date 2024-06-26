@@ -21,6 +21,10 @@
       height: 125px;
     }
 
+    &.breakthroughtroyka {
+      height: 44px;
+    }
+
     &.oware {
       height: 125px;
     }
@@ -35,10 +39,6 @@
 
     &.backgammon {
       height: 125px;
-    }
-
-    &.breakthroughtroyka {
-      height: 44px;
     }
 
     @extend %flex-center;
@@ -74,6 +74,12 @@
     height: 100px;
   }
 
+  .list a.breakthroughtroyka span {
+    display: block;
+    width: 64px;
+    height: 32px;
+  }
+
   .list a.oware span {
     display: block;
     width: 100px;
@@ -96,12 +102,6 @@
     display: block;
     width: 100px;
     height: 100px;
-  }
-
-  .list a.breakthroughtroyka span {
-    display: block;
-    width: 64px;
-    height: 32px;
   }
 
   &.d3 .list span {
@@ -198,6 +198,10 @@
       background-size: 100px;
     }
 
+    .breakthroughtroyka-maple {
+      background-image: url(../images/board/breakthroughtroyka/maple.thumbnail.jpg);
+    }
+
     .oware-light-wood {
       background-image: url(../images/board/oware/oware_light_wood_board.png);
       background-size: 100px;
@@ -236,10 +240,6 @@
     .backgammon-contemporary {
       background-image: url(../images/board/backgammon/svg/backgammon_contemporary_board.svg);
       background-size: 100px;
-    }
-
-    .breakthrough-wood {
-      background-image: url(../images/board/breakthroughtroyka/wood.thumbnail.jpg);
     }
   }
 

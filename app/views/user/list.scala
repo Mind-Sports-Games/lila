@@ -84,15 +84,15 @@ object list {
               userTopPerf(leaderboards.flipello, PerfType.orDefault("flipello")),
               userTopPerf(leaderboards.flipello10, PerfType.orDefault("flipello10")),
               userTopPerf(leaderboards.amazons, PerfType.orDefault("amazons")),
+              userTopPerf(leaderboards.breakthroughtroyka, PerfType.orDefault("breakthroughtroyka")),
+              userTopPerf(leaderboards.minibreakthroughtroyka, PerfType.orDefault("minibreakthroughtroyka")),
               userTopPerf(leaderboards.oware, PerfType.orDefault("oware")),
               userTopPerf(leaderboards.togyzkumalak, PerfType.orDefault("togyzkumalak")),
               userTopPerf(leaderboards.go9x9, PerfType.orDefault("go9x9")),
               userTopPerf(leaderboards.go13x13, PerfType.orDefault("go13x13")),
               userTopPerf(leaderboards.go19x19, PerfType.orDefault("go19x19")),
               userTopPerf(leaderboards.backgammon, PerfType.orDefault("backgammon")),
-              userTopPerf(leaderboards.nackgammon, PerfType.orDefault("nackgammon")),
-              userTopPerf(leaderboards.breakthroughtroyka, PerfType.orDefault("breakthroughtroyka")),
-              userTopPerf(leaderboards.minibreakthroughtroyka, PerfType.orDefault("minibreakthroughtroyka"))
+              userTopPerf(leaderboards.nackgammon, PerfType.orDefault("nackgammon"))
             )
           )
         )

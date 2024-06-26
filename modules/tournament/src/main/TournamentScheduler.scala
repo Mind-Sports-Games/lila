@@ -303,6 +303,7 @@ final private class TournamentScheduler(
       (nextThursday, 14),
       (nextThursday, 16),
       (nextThursday, 20),
+      (nextThursday, 23),
       (nextFriday, 1),
       (nextFriday, 5),
       (nextFriday, 8),
@@ -314,6 +315,7 @@ final private class TournamentScheduler(
       (nextSaturday, 10),
       //(nextSaturday, 16),
       (nextSaturday, 22),
+      (nextSunday, 1),
       (nextSunday, 4),
       (nextSunday, 7),
       (nextSunday, 10),
@@ -345,6 +347,7 @@ final private class TournamentScheduler(
       (Variant.Chess(strategygames.chess.variant.FiveCheck), Blitz32),
       (Variant.Draughts(strategygames.draughts.variant.Frysk), Blitz32),
       (Variant.FairySF(strategygames.fairysf.variant.Amazons), Blitz32),
+      (Variant.FairySF(strategygames.fairysf.variant.MiniBreakthroughTroyka), Blitz32),
       (Variant.Chess(strategygames.chess.variant.Horde), Blitz32),
       (Variant.Draughts(strategygames.draughts.variant.Portuguese), Blitz32),
       (Variant.Samurai(strategygames.samurai.variant.Oware), Blitz32),
@@ -355,6 +358,7 @@ final private class TournamentScheduler(
       (Variant.Chess(strategygames.chess.variant.Monster), Blitz32),
       (Variant.Chess(strategygames.chess.variant.KingOfTheHill), Blitz32),
       (Variant.Draughts(strategygames.draughts.variant.Brazilian), Blitz32),
+      (Variant.FairySF(strategygames.fairysf.variant.BreakthroughTroyka), Blitz32),
       (Variant.FairySF(strategygames.fairysf.variant.Shogi), Byoyomi510),
       (Variant.Chess(strategygames.chess.variant.RacingKings), Blitz32),
       (Variant.Draughts(strategygames.draughts.variant.Russian), Blitz32),
@@ -498,7 +502,10 @@ final private class TournamentScheduler(
       scheduleYearly24hr(Variant.Chess(strategygames.chess.variant.Monster), Blitz32)(
         new DateTime(2024, 9, 6, 0, 0)
       ),
-      scheduleYearly24hr(Variant.Draughts(strategygames.draughts.variant.Brazilian), Blitz32)(
+      scheduleYearly24hr(
+        Variant.FairySF(strategygames.fairysf.variant.MiniBreakthroughTroyka),
+        Blitz32
+      )(
         new DateTime(2024, 9, 13, 0, 0)
       ),
       scheduleYearly24hr(Variant.Backgammon(strategygames.backgammon.variant.Backgammon), Delay310)(
@@ -509,6 +516,15 @@ final private class TournamentScheduler(
       ),
       scheduleYearly24hr(Variant.Go(strategygames.go.variant.Go9x9), Blitz32)(
         new DateTime(2024, 10, 4, 0, 0)
+      ),
+      scheduleYearly24hr(
+        Variant.FairySF(strategygames.fairysf.variant.BreakthroughTroyka),
+        Blitz32
+      )(
+        new DateTime(2024, 10, 11, 0, 0)
+      ),
+      scheduleYearly24hr(Variant.Draughts(strategygames.draughts.variant.Brazilian), Blitz32)(
+        new DateTime(2024, 10, 18, 0, 0)
       )
       //Fri 27th is the end of year medley
     ).flatten filter { _.schedule.at isAfter rightNow }

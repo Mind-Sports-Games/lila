@@ -298,15 +298,15 @@ declare type VariantKey =
   | 'flipello'
   | 'flipello10'
   | 'amazons'
+  | 'breakthroughtroyka'
+  | 'minibreakthroughtroyka'
   | 'oware'
   | 'togyzkumalak'
   | 'go9x9'
   | 'go13x13'
   | 'go19x19'
   | 'backgammon'
-  | 'nackgammon'
-  | 'breakthroughtroyka'
-  | 'minibreakthroughtroyka';
+  | 'nackgammon';
 
 declare type DraughtsVariantKey =
   | 'international'
@@ -360,15 +360,15 @@ declare type Perf =
   | 'flipello'
   | 'flipello10'
   | 'amazons'
+  | 'breakthroughtroyka'
+  | 'minibreakthroughtroyka'
   | 'oware'
   | 'togyzkumalak'
   | 'go9x9'
   | 'go13x13'
   | 'go19x19'
   | 'backgammon'
-  | 'nackgammon'
-  | 'breakthroughtroyka'
-  | 'minibreakthroughtroyka';
+  | 'nackgammon';
 
 //declare type Color = 'white' | 'black';
 declare type PlayerName = 'White' | 'Black' | 'Sente' | 'Gote' | 'Red' | 'South' | 'North' | 'Bastaushi' | 'Kostaushi';
@@ -385,11 +385,11 @@ declare type GameFamilyKey =
   | 'xiangqi'
   | 'flipello'
   | 'amazons'
+  | 'breakthroughtroyka'
   | 'oware'
   | 'togyzkumalak'
   | 'go'
-  | 'backgammon'
-  | 'breakthroughtroyka';
+  | 'backgammon';
 
 declare type Files =
   | 'a'

@@ -36,6 +36,8 @@ case class History(
     flipello: RatingsMap,
     flipello10: RatingsMap,
     amazons: RatingsMap,
+    breakthroughtroyka: RatingsMap,
+    minibreakthroughtroyka: RatingsMap,
     oware: RatingsMap,
     togyzkumalak: RatingsMap,
     go9x9: RatingsMap,
@@ -43,8 +45,6 @@ case class History(
     go19x19: RatingsMap,
     backgammon: RatingsMap,
     nackgammon: RatingsMap,
-    breakthroughtroyka: RatingsMap,
-    minibreakthroughtroyka: RatingsMap,
     ultraBullet: RatingsMap,
     bullet: RatingsMap,
     blitz: RatingsMap,
@@ -92,6 +92,8 @@ case class History(
       case "flipello"               => flipello
       case "flipello10"             => flipello10
       case "amazons"                => amazons
+      case "breakthroughtroyka"     => breakthroughtroyka
+      case "minibreakthroughtroyka" => minibreakthroughtroyka
       case "oware"                  => oware
       case "togyzkumalak"           => togyzkumalak
       case "go9x9"                  => go9x9
@@ -99,8 +101,6 @@ case class History(
       case "go19x19"                => go19x19
       case "backgammon"             => backgammon
       case "nackgammon"             => nackgammon
-      case "breakthroughtroyka"     => breakthroughtroyka
-      case "minibreakthroughtroyka" => minibreakthroughtroyka
       case "puzzle"                 => puzzle
       case "ultraBullet"            => ultraBullet
       case x                        => sys error s"No history for perf $x"
@@ -160,6 +160,8 @@ object History {
           flipello = ratingsMap("flipello"),
           flipello10 = ratingsMap("flipello10"),
           amazons = ratingsMap("amazons"),
+          breakthroughtroyka = ratingsMap("breakthroughtroyka"),
+          minibreakthroughtroyka = ratingsMap("minibreakthroughtroyka"),
           oware = ratingsMap("oware"),
           togyzkumalak = ratingsMap("togyzkumalak"),
           go9x9 = ratingsMap("go9x9"),
@@ -167,8 +169,6 @@ object History {
           go19x19 = ratingsMap("go19x19"),
           backgammon = ratingsMap("backgammon"),
           nackgammon = ratingsMap("nackgammon"),
-          breakthroughtroyka = ratingsMap("breakthroughtroyka"),
-          minibreakthroughtroyka = ratingsMap("minibreakthroughtroyka"),
           ultraBullet = ratingsMap("ultraBullet"),
           bullet = ratingsMap("bullet"),
           blitz = ratingsMap("blitz"),

@@ -86,15 +86,15 @@ object TournamentMedleyUtil {
       "flipello"               -> medium,
       "flipello10"             -> slow,
       "amazons"                -> medium,
+      "breakthroughtroyka"     -> quick,
+      "minibreakthroughtroyka" -> fastest,
       "oware"                  -> slow,
       "togyzkumalak"           -> slow,
       "go9x9"                  -> medium,
       "go13x13"                -> slow,
       "go19x19"                -> slow,
       "backgammon"             -> medium,
-      "nackgammon"             -> medium,
-      "breakthroughtroyka"     -> quick,
-      "minibreakthroughtroyka" -> fastest
+      "nackgammon"             -> medium
     )
   }
 

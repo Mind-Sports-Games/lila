@@ -40,6 +40,8 @@ case class Perfs(
     flipello: Perf,
     flipello10: Perf,
     amazons: Perf,
+    breakthroughtroyka: Perf,
+    minibreakthroughtroyka: Perf,
     oware: Perf,
     togyzkumalak: Perf,
     go9x9: Perf,
@@ -47,8 +49,6 @@ case class Perfs(
     go19x19: Perf,
     backgammon: Perf,
     nackgammon: Perf,
-    breakthroughtroyka: Perf,
-    minibreakthroughtroyka: Perf,
     ultraBullet: Perf,
     bullet: Perf,
     blitz: Perf,
@@ -94,6 +94,8 @@ case class Perfs(
       "flipello"               -> flipello,
       "flipello10"             -> flipello10,
       "amazons"                -> amazons,
+      "breakthroughtroyka"     -> breakthroughtroyka,
+      "minibreakthroughtroyka" -> minibreakthroughtroyka,
       "oware"                  -> oware,
       "togyzkumalak"           -> togyzkumalak,
       "go9x9"                  -> go9x9,
@@ -101,8 +103,6 @@ case class Perfs(
       "go19x19"                -> go19x19,
       "backgammon"             -> backgammon,
       "nackgammon"             -> nackgammon,
-      "breakthroughtroyka"     -> breakthroughtroyka,
-      "minibreakthroughtroyka" -> minibreakthroughtroyka,
       "ultraBullet"            -> ultraBullet,
       "bullet"                 -> bullet,
       "blitz"                  -> blitz,
@@ -204,6 +204,8 @@ case class Perfs(
     "flipello"               -> flipello,
     "flipello10"             -> flipello10,
     "amazons"                -> amazons,
+    "breakthroughtroyka"     -> breakthroughtroyka,
+    "minibreakthroughtroyka" -> minibreakthroughtroyka,
     "oware"                  -> oware,
     "togyzkumalak"           -> togyzkumalak,
     "go9x9"                  -> go9x9,
@@ -211,8 +213,6 @@ case class Perfs(
     "go19x19"                -> go19x19,
     "backgammon"             -> backgammon,
     "nackgammon"             -> nackgammon,
-    "breakthroughtroyka"     -> breakthroughtroyka,
-    "minibreakthroughtroyka" -> minibreakthroughtroyka,
     "ultraBullet"            -> ultraBullet,
     "bullet"                 -> bullet,
     "blitz"                  -> blitz,
@@ -343,37 +343,40 @@ case object Perfs {
 
   def variantLens(variant: Variant): Option[Perfs => Perf] =
     variant match {
-      case Variant.Chess(strategygames.chess.variant.Standard)                   => Some(_.standard)
-      case Variant.Chess(strategygames.chess.variant.Chess960)                   => Some(_.chess960)
-      case Variant.Chess(strategygames.chess.variant.KingOfTheHill)              => Some(_.kingOfTheHill)
-      case Variant.Chess(strategygames.chess.variant.ThreeCheck)                 => Some(_.threeCheck)
-      case Variant.Chess(strategygames.chess.variant.FiveCheck)                  => Some(_.fiveCheck)
-      case Variant.Chess(strategygames.chess.variant.Antichess)                  => Some(_.antichess)
-      case Variant.Chess(strategygames.chess.variant.Atomic)                     => Some(_.atomic)
-      case Variant.Chess(strategygames.chess.variant.Crazyhouse)                 => Some(_.crazyhouse)
-      case Variant.Chess(strategygames.chess.variant.Horde)                      => Some(_.horde)
-      case Variant.Chess(strategygames.chess.variant.RacingKings)                => Some(_.racingKings)
-      case Variant.Chess(strategygames.chess.variant.NoCastling)                 => Some(_.noCastling)
-      case Variant.Chess(strategygames.chess.variant.Monster)                    => Some(_.monster)
-      case Variant.Chess(strategygames.chess.variant.LinesOfAction)              => Some(_.linesOfAction)
-      case Variant.Chess(strategygames.chess.variant.ScrambledEggs)              => Some(_.scrambledEggs)
-      case Variant.Draughts(strategygames.draughts.variant.Standard)             => Some(_.international)
-      case Variant.Draughts(strategygames.draughts.variant.Frysk)                => Some(_.frysk)
-      case Variant.Draughts(strategygames.draughts.variant.Frisian)              => Some(_.frisian)
-      case Variant.Draughts(strategygames.draughts.variant.Antidraughts)         => Some(_.antidraughts)
-      case Variant.Draughts(strategygames.draughts.variant.Breakthrough)         => Some(_.breakthrough)
-      case Variant.Draughts(strategygames.draughts.variant.Russian)              => Some(_.russian)
-      case Variant.Draughts(strategygames.draughts.variant.Brazilian)            => Some(_.brazilian)
-      case Variant.Draughts(strategygames.draughts.variant.Pool)                 => Some(_.pool)
-      case Variant.Draughts(strategygames.draughts.variant.Portuguese)           => Some(_.portuguese)
-      case Variant.Draughts(strategygames.draughts.variant.English)              => Some(_.english)
-      case Variant.FairySF(strategygames.fairysf.variant.Shogi)                  => Some(_.shogi)
-      case Variant.FairySF(strategygames.fairysf.variant.Xiangqi)                => Some(_.xiangqi)
-      case Variant.FairySF(strategygames.fairysf.variant.MiniShogi)              => Some(_.minishogi)
-      case Variant.FairySF(strategygames.fairysf.variant.MiniXiangqi)            => Some(_.minixiangqi)
-      case Variant.FairySF(strategygames.fairysf.variant.Flipello)               => Some(_.flipello)
-      case Variant.FairySF(strategygames.fairysf.variant.Flipello10)             => Some(_.flipello10)
-      case Variant.FairySF(strategygames.fairysf.variant.Amazons)                => Some(_.amazons)
+      case Variant.Chess(strategygames.chess.variant.Standard)               => Some(_.standard)
+      case Variant.Chess(strategygames.chess.variant.Chess960)               => Some(_.chess960)
+      case Variant.Chess(strategygames.chess.variant.KingOfTheHill)          => Some(_.kingOfTheHill)
+      case Variant.Chess(strategygames.chess.variant.ThreeCheck)             => Some(_.threeCheck)
+      case Variant.Chess(strategygames.chess.variant.FiveCheck)              => Some(_.fiveCheck)
+      case Variant.Chess(strategygames.chess.variant.Antichess)              => Some(_.antichess)
+      case Variant.Chess(strategygames.chess.variant.Atomic)                 => Some(_.atomic)
+      case Variant.Chess(strategygames.chess.variant.Crazyhouse)             => Some(_.crazyhouse)
+      case Variant.Chess(strategygames.chess.variant.Horde)                  => Some(_.horde)
+      case Variant.Chess(strategygames.chess.variant.RacingKings)            => Some(_.racingKings)
+      case Variant.Chess(strategygames.chess.variant.NoCastling)             => Some(_.noCastling)
+      case Variant.Chess(strategygames.chess.variant.Monster)                => Some(_.monster)
+      case Variant.Chess(strategygames.chess.variant.LinesOfAction)          => Some(_.linesOfAction)
+      case Variant.Chess(strategygames.chess.variant.ScrambledEggs)          => Some(_.scrambledEggs)
+      case Variant.Draughts(strategygames.draughts.variant.Standard)         => Some(_.international)
+      case Variant.Draughts(strategygames.draughts.variant.Frysk)            => Some(_.frysk)
+      case Variant.Draughts(strategygames.draughts.variant.Frisian)          => Some(_.frisian)
+      case Variant.Draughts(strategygames.draughts.variant.Antidraughts)     => Some(_.antidraughts)
+      case Variant.Draughts(strategygames.draughts.variant.Breakthrough)     => Some(_.breakthrough)
+      case Variant.Draughts(strategygames.draughts.variant.Russian)          => Some(_.russian)
+      case Variant.Draughts(strategygames.draughts.variant.Brazilian)        => Some(_.brazilian)
+      case Variant.Draughts(strategygames.draughts.variant.Pool)             => Some(_.pool)
+      case Variant.Draughts(strategygames.draughts.variant.Portuguese)       => Some(_.portuguese)
+      case Variant.Draughts(strategygames.draughts.variant.English)          => Some(_.english)
+      case Variant.FairySF(strategygames.fairysf.variant.Shogi)              => Some(_.shogi)
+      case Variant.FairySF(strategygames.fairysf.variant.Xiangqi)            => Some(_.xiangqi)
+      case Variant.FairySF(strategygames.fairysf.variant.MiniShogi)          => Some(_.minishogi)
+      case Variant.FairySF(strategygames.fairysf.variant.MiniXiangqi)        => Some(_.minixiangqi)
+      case Variant.FairySF(strategygames.fairysf.variant.Flipello)           => Some(_.flipello)
+      case Variant.FairySF(strategygames.fairysf.variant.Flipello10)         => Some(_.flipello10)
+      case Variant.FairySF(strategygames.fairysf.variant.Amazons)            => Some(_.amazons)
+      case Variant.FairySF(strategygames.fairysf.variant.BreakthroughTroyka) => Some(_.breakthroughtroyka)
+      case Variant.FairySF(strategygames.fairysf.variant.MiniBreakthroughTroyka) =>
+        Some(_.minibreakthroughtroyka)
       case Variant.Samurai(strategygames.samurai.variant.Oware)                  => Some(_.oware)
       case Variant.Togyzkumalak(strategygames.togyzkumalak.variant.Togyzkumalak) => Some(_.togyzkumalak)
       case Variant.Go(strategygames.go.variant.Go9x9)                            => Some(_.go9x9)
@@ -381,10 +384,7 @@ case object Perfs {
       case Variant.Go(strategygames.go.variant.Go19x19)                          => Some(_.go19x19)
       case Variant.Backgammon(strategygames.backgammon.variant.Backgammon)       => Some(_.backgammon)
       case Variant.Backgammon(strategygames.backgammon.variant.Nackgammon)       => Some(_.nackgammon)
-      case Variant.FairySF(strategygames.fairysf.variant.BreakthroughTroyka)     => Some(_.breakthroughtroyka)
-      case Variant.FairySF(strategygames.fairysf.variant.MiniBreakthroughTroyka) =>
-        Some(_.minibreakthroughtroyka)
-      case _ => none
+      case _                                                                     => none
     }
 
   def speedLens(speed: Speed): Perfs => Perf =
@@ -435,6 +435,8 @@ case object Perfs {
         flipello = perf("flipello"),
         flipello10 = perf("flipello10"),
         amazons = perf("amazons"),
+        breakthroughtroyka = perf("breakthroughtroyka"),
+        minibreakthroughtroyka = perf("minibreakthroughtroyka"),
         oware = perf("oware"),
         togyzkumalak = perf("togyzkumalak"),
         go9x9 = perf("go9x9"),
@@ -442,8 +444,6 @@ case object Perfs {
         go19x19 = perf("go19x19"),
         backgammon = perf("backgammon"),
         nackgammon = perf("nackgammon"),
-        breakthroughtroyka = perf("breakthroughtroyka"),
-        minibreakthroughtroyka = perf("minibreakthroughtroyka"),
         ultraBullet = perf("ultraBullet"),
         bullet = perf("bullet"),
         blitz = perf("blitz"),
@@ -492,6 +492,8 @@ case object Perfs {
         "flipello"               -> notNew(o.flipello),
         "flipello10"             -> notNew(o.flipello10),
         "amazons"                -> notNew(o.amazons),
+        "breakthroughtroyka"     -> notNew(o.breakthroughtroyka),
+        "minibreakthroughtroyka" -> notNew(o.minibreakthroughtroyka),
         "oware"                  -> notNew(o.oware),
         "togyzkumalak"           -> notNew(o.togyzkumalak),
         "go9x9"                  -> notNew(o.go9x9),
@@ -499,8 +501,6 @@ case object Perfs {
         "go19x19"                -> notNew(o.go19x19),
         "backgammon"             -> notNew(o.backgammon),
         "nackgammon"             -> notNew(o.nackgammon),
-        "breakthroughtroyka"     -> notNew(o.breakthroughtroyka),
-        "minibreakthroughtroyka" -> notNew(o.minibreakthroughtroyka),
         "ultraBullet"            -> notNew(o.ultraBullet),
         "bullet"                 -> notNew(o.bullet),
         "blitz"                  -> notNew(o.blitz),
@@ -531,8 +531,6 @@ case object Perfs {
       racingKings: List[User.LightPerf],
       noCastling: List[User.LightPerf],
       monster: List[User.LightPerf],
-      breakthroughtroyka: List[User.LightPerf],
-      minibreakthroughtroyka: List[User.LightPerf],
       linesOfAction: List[User.LightPerf],
       scrambledEggs: List[User.LightPerf],
       international: List[User.LightPerf],
@@ -552,6 +550,8 @@ case object Perfs {
       flipello: List[User.LightPerf],
       flipello10: List[User.LightPerf],
       amazons: List[User.LightPerf],
+      breakthroughtroyka: List[User.LightPerf],
+      minibreakthroughtroyka: List[User.LightPerf],
       oware: List[User.LightPerf],
       togyzkumalak: List[User.LightPerf],
       go9x9: List[User.LightPerf],

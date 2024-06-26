@@ -396,6 +396,16 @@ export default class Setup {
         case '8':
           key = 'amazons';
           break;
+        case '11':
+          switch (variantId[1]) {
+            case '1':
+              key = 'breakthroughtroyka';
+              break;
+            case '2':
+              key = 'minibreakthroughtroyka';
+              break;
+          }
+          break;
         case '6':
           key = 'oware';
           break;
@@ -422,16 +432,6 @@ export default class Setup {
               break;
             case '2':
               key = 'nackgammon';
-              break;
-          }
-          break;
-        case '11':
-          switch (variantId[1]) {
-            case '1':
-              key = 'breakthroughtroyka';
-              break;
-            case '2':
-              key = 'minibreakthroughtroyka';
               break;
           }
           break;

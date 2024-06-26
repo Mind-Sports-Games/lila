@@ -35,6 +35,8 @@
   <string name="flipello">Othello</string>
   <string name="flipello10">Grand Othello</string>
   <string name="amazons">Amazons</string>
+  <string name="breakthroughtroyka">Breakthrough</string>
+  <string name="minibreakthroughtroyka">Mini Breakthrough</string>    
   <string name="oware">Oware</string>
   <string name="mancala">Mancala</string>
   <string name="togyzkumalak">Togyzqumalaq</string>
@@ -44,6 +46,4 @@
   <string name="go19x19">Go 19x19</string>
   <string name="backgammon">Backgammon</string>
   <string name="nackgammon">Nackgammon</string>
-  <string name="breakthroughtroyka">Breakthrough</string>
-  <string name="minibreakthroughtroyka">Mini Breakthrough</string>  
 </resources>

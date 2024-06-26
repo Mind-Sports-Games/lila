@@ -317,15 +317,15 @@ final class User(
                   "flipello"               -> leaderboards.flipello,
                   "flipello10"             -> leaderboards.flipello10,
                   "amazons"                -> leaderboards.amazons,
+                  "breakthroughtroyka"     -> leaderboards.breakthroughtroyka,
+                  "minibreakthroughtroyka" -> leaderboards.minibreakthroughtroyka,
                   "oware"                  -> leaderboards.oware,
                   "togyzkumalak"           -> leaderboards.togyzkumalak,
                   "go9x9"                  -> leaderboards.go9x9,
                   "go13x13"                -> leaderboards.go13x13,
                   "go19x19"                -> leaderboards.go19x19,
                   "backgammon"             -> leaderboards.backgammon,
-                  "nackgammon"             -> leaderboards.nackgammon,
-                  "breakthroughtroyka"     -> leaderboards.breakthroughtroyka,
-                  "minibreakthroughtroyka" -> leaderboards.minibreakthroughtroyka
+                  "nackgammon"             -> leaderboards.nackgammon
                 )
               )
             }
