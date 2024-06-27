@@ -116,6 +116,8 @@ case class Tournament(
 
   def pairingsClosedSeconds = math.max(30, math.min(clock.limitSeconds / 2, 120))
 
+  def waitForPlayerReturnSeconds = pairingsClosedSeconds / 2
+
   def pairingsClosed = secondsToFinish < pairingsClosedSeconds
 
   def isOver = secondsToFinish <= 0
