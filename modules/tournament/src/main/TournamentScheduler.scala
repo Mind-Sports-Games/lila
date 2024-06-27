@@ -335,8 +335,6 @@ final private class TournamentScheduler(
     // Because we create two weeks in advance we will then need to delete one tournament in the second week where the new variant has cycled into. It should just be one, if not its gone wrong
     // Practise locally, can always delete any newly created tournaments and try again
     val weeklyVariants: List[(Variant, Schedule.Speed)] = List(
-      (Variant.Draughts(strategygames.draughts.variant.Antidraughts), Blitz32),
-      (Variant.FairySF(strategygames.fairysf.variant.MiniShogi), Byoyomi35),
       (Variant.Chess(strategygames.chess.variant.Atomic), Blitz32),
       (Variant.Go(strategygames.go.variant.Go19x19), Blitz53),
       (Variant.Draughts(strategygames.draughts.variant.Breakthrough), Blitz32),
@@ -374,7 +372,9 @@ final private class TournamentScheduler(
       (Variant.FairySF(strategygames.fairysf.variant.MiniXiangqi), Blitz32),
       (Variant.Go(strategygames.go.variant.Go13x13), Blitz53),
       (Variant.Backgammon(strategygames.backgammon.variant.Nackgammon), Delay310),
-      (Variant.Chess(strategygames.chess.variant.Standard), Blitz32)
+      (Variant.Chess(strategygames.chess.variant.Standard), Blitz32),
+      (Variant.Draughts(strategygames.draughts.variant.Antidraughts), Blitz32),
+      (Variant.FairySF(strategygames.fairysf.variant.MiniShogi), Byoyomi35)
     )
 
     val weeklyVariantDefault: (Variant, Schedule.Speed) =
