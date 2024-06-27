@@ -406,7 +406,6 @@ function show(ctrl: AnalyseCtrl): MaybeVNode {
     else if (data.checkmate) lastShow = showGameEnd(ctrl, trans('checkmate'));
     else if (data.stalemate) lastShow = showGameEnd(ctrl, trans('stalemate'));
     else if (data.variant_win || data.variant_loss) lastShow = showGameEnd(ctrl, trans('variantEnding'));
-    // @TODO check here
     else lastShow = showEmpty(ctrl);
   }
   return lastShow;

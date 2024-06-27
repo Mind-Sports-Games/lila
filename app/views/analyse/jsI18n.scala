@@ -34,6 +34,7 @@ private object jsI18n {
     trans.threeChecks,
     trans.fiveChecks,
     trans.checkersConnected,
+    trans.raceFinished,
     trans.gameFinished,
     trans.backgammonSingleWin,
     trans.backgammonGammonWin,
