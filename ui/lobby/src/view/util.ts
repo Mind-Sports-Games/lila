@@ -67,6 +67,8 @@ export const perfIcons = {
   Othello: '',
   'Grand Othello': '',
   Amazons: '€',
+  Breakthrough: '',
+  'Mini Breakthrough': '',
   Mancala: '',
   Oware: '',
   Togyzqumalaq: '›',
@@ -75,6 +77,4 @@ export const perfIcons = {
   'Go 19x19': '',
   Backgammon: '',
   Nackgammon: '',
-  Breakthrough: '',
-  'Mini Breakthrough': '',
 };
