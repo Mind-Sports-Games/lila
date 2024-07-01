@@ -79,6 +79,7 @@ final class SgfDump(
       withRatings: Boolean = true
   ): Fu[Tags] = {
     val isP1Black = game.variant.gameFamily.playerColors.get(P1) == Some("black")
+    val isGo      = game.variant.gameFamily == GameFamily.Go()
     gameLightUsers(game) map { case (p1, p2) =>
       Tags {
         List[Option[Tag]](
@@ -92,17 +93,18 @@ final class SgfDump(
           !isP1Black option Tag(_.PB, player(game.p2Player, p2)),
           !isP1Black option Tag(_.PW, player(game.p1Player, p1)),
           isP1Black option Tag(_.PW, player(game.p2Player, p2)),
-          Tag(_.RE, result(game)).some, //TODO different for backgammon multipoint
-          withRatings && isP1Black option Tag(_.BR, rating(game.p1Player)),
-          withRatings && !isP1Black option Tag(_.BR, rating(game.p2Player)),
-          withRatings && !isP1Black option Tag(_.WR, rating(game.p1Player)),
-          withRatings && isP1Black option Tag(_.WR, rating(game.p2Player)),
+          !isGo option Tag(_.RE, result(game)), //TODO different for backgammon multipoint
+          !isGo && withRatings && isP1Black option Tag(_.BR, rating(game.p1Player)),
+          !isGo && withRatings && !isP1Black option Tag(_.BR, rating(game.p2Player)),
+          !isGo && withRatings && !isP1Black option Tag(_.WR, rating(game.p1Player)),
+          !isGo && withRatings && isP1Black option Tag(_.WR, rating(game.p2Player)),
           Tag.timeControl(game.clock.map(_.config)).some,
           teams.flatMap { t => isP1Black option Tag("BT", t.p1) },
           teams.flatMap { t => !isP1Black option Tag("BT", t.p2) },
           teams.flatMap { t => !isP1Black option Tag("WT", t.p1) },
           teams.flatMap { t => isP1Black option Tag("WT", t.p2) },
-          initialFen.map { fen => Tag(_.IP, fen.value) }
+          if (!isGo) { initialFen.map { fen => Tag(_.IP, fen.value) } }
+          else None
         ).flatten
       } ++ (game.variant.gameFamily match {
         case GameFamily.LinesOfAction() => //not used yet
@@ -146,9 +148,7 @@ final class SgfDump(
               Tag(_.SZ, game.variant.toGo.boardSize.height),
               Tag(_.KM, game.board.toGo.apiPosition.initialFen.komi),
               Tag(_.HA, game.board.toGo.apiPosition.initialFen.handicap.getOrElse(0)),
-              Tag(_.RU, "Chinese"),
-              Tag(_.TB, game.board.toGo.apiPosition.fen.player1Score),
-              Tag(_.TW, game.board.toGo.apiPosition.fen.player2Score)
+              Tag(_.RU, "Chinese")
             )
           }
         case GameFamily.Backgammon() =>

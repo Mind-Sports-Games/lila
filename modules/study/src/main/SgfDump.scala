@@ -71,16 +71,16 @@ final class SgfDump(
 
   private val dateFormat = DateTimeFormat forPattern "yyyy.MM.dd"
 
-  private def makeTags(study: Study, chapter: Chapter): Tags =
+  private def makeTags(study: Study, chapter: Chapter): Tags = {
+    val isGo = chapter.setup.variant.gameFamily == GameFamily.Go()
     Tags {
       List(
         Tag(_.FF, 4),
         Tag(_.CA, "UTF-8"),
         Tag(_.EV, s"${study.name}: ${chapter.name}"),
         Tag(_.PC, chapterUrl(study.id, chapter.id)),
-        Tag(_.DT, Tag.DT.format.print(chapter.createdAt)),
-        Tag(_.RE, "*")
-      ) ::: (!chapter.root.fen.initial).??(
+        Tag(_.DT, Tag.DT.format.print(chapter.createdAt))
+      ) ::: (!chapter.root.fen.initial && !isGo).??(
         List(
           Tag(_.IP, chapter.root.fen.value)
         )
@@ -121,9 +121,7 @@ final class SgfDump(
               Tag(_.SZ, chapter.setup.variant.toGo.boardSize.height),
               Tag(_.KM, chapter.root.fen.toGo.komi),
               Tag(_.HA, chapter.root.fen.toGo.handicap.getOrElse(0)),
-              Tag(_.RU, "Chinese"),
-              Tag(_.TB, chapter.root.fen.toGo.player1Score),
-              Tag(_.TW, chapter.root.fen.toGo.player2Score)
+              Tag(_.RU, "Chinese")
             )
           case GameFamily.Backgammon() =>
             List(
@@ -138,6 +136,7 @@ final class SgfDump(
         }
       )
     }
+  }
 }
 
 object SgfDump {

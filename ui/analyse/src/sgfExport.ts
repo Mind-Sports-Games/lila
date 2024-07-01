@@ -32,7 +32,8 @@ export function renderFullTxt(ctrl: AnalyseCtrl): string {
   const tags: Array<[string, string]> = [];
   tags.push(['FF', '4']);
   tags.push(['CA', 'UTF-8']);
-  if (g.initialFen && g.initialFen !== initialFen) tags.push(['IP', g.initialFen]);
+  if (g.initialFen && g.initialFen !== initialFen && !['go9x9', 'go13x13', 'go19x19'].includes(g.variant.key))
+    tags.push(['IP', g.initialFen]);
   if (['linesOfAction', 'scrambledEggs'].includes(g.variant.key)) tags.push(['GM', '9']);
   if (['shogi', 'minishogi'].includes(g.variant.key)) {
     tags.push(['GM', '8']);
