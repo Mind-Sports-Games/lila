@@ -38,15 +38,15 @@ final class SgfDump(
       else fuccess(Tags(Nil))
     tagsFuture map { tags =>
       if (game.gameRecordFormat == "sgf") {
-        format(game, tags)
+        format(game, tags, initialFen)
       } else {
         "SGF NOT SUPPORTED"
       }
     }
   }
 
-  def format(game: Game, tags: Tags): String = {
-    "(;" ++ tags.toString ++ "\n\n" ++ Dumper(game.variant, game.actionStrs) ++ ")"
+  def format(game: Game, tags: Tags, initialFen: Option[FEN]): String = {
+    "(;" ++ tags.toString ++ "\n\n" ++ Dumper(game.variant, game.actionStrs, initialFen) ++ ")"
   }
 
   private def gameLightUsers(game: Game): Fu[(Option[LightUser], Option[LightUser])] =

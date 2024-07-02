@@ -52,6 +52,8 @@ export function renderFullTxt(ctrl: AnalyseCtrl): string {
     tags.push(['SZ', g.variant.boardSize.height.toString()]);
   }
   if (['go9x9', 'go13x13', 'go19x19'].includes(g.variant.key)) {
+    //from position and handicap in plain analysis does not add initial moves at start
+    // as anlaysis needs to correctly support go hanicap starting player
     tags.push(['GM', '1']);
     tags.push(['SZ', g.variant.boardSize.height.toString()]);
     tags.push(['RU', 'Chinese']);

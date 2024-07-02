@@ -2,6 +2,7 @@ package lila.study
 
 import akka.stream.scaladsl._
 import strategygames.format.sgf.{ Dumper, Tag, Tags }
+import strategygames.format.FEN
 import strategygames.{ ActionStrs, GameFamily, GameLogic }
 import strategygames.variant.Variant
 import org.joda.time.format.DateTimeFormat
@@ -28,19 +29,20 @@ final class SgfDump(
   def ofChapter(study: Study)(chapter: Chapter): String = {
     val actionStrs = toActionStrs(chapter.root.mainline)
     val tags       = makeTags(study, chapter)
-    format(chapter.setup.variant, actionStrs, tags)
+    val initialFen = !chapter.root.fen.initial option chapter.root.fen
+    format(chapter.setup.variant, actionStrs, tags, initialFen)
   }
 
-  def format(variant: Variant, actionStrs: ActionStrs, tags: Tags): String = {
-    "(;" ++ tags.toString ++ "\n\n" ++ validSgf(variant, actionStrs) ++ ")"
+  def format(variant: Variant, actionStrs: ActionStrs, tags: Tags, initialFen: Option[FEN]): String = {
+    "(;" ++ tags.toString ++ "\n\n" ++ validSgf(variant, actionStrs, initialFen) ++ ")"
   }
 
-  def validSgf(variant: Variant, actionStrs: ActionStrs): String = {
+  def validSgf(variant: Variant, actionStrs: ActionStrs, initialFen: Option[FEN]): String = {
     if (
       variant.gameLogic == GameLogic.FairySF() || variant.gameLogic == GameLogic
         .Go() || variant.gameLogic == GameLogic.Backgammon()
     ) {
-      Dumper(variant, actionStrs)
+      Dumper(variant, actionStrs, initialFen)
     } else {
       "SGF NOT SUPPORTED"
     }
