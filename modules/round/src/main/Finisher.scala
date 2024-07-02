@@ -51,7 +51,7 @@ final private class Finisher(
       apply(game, game.situation.insufficientMaterialStatus, Some(game.player.playerIndex))
     } else {
       val winner = Some(!game.player.playerIndex) ifFalse game.situation.opponentHasInsufficientMaterial
-      apply(game, _.Outoftime, winner) >>-
+      apply(game, game.situation.outOfTimeStatus, winner) >>-
         winner.foreach { w =>
           playban.flag(game, !w)
         }

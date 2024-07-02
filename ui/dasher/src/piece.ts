@@ -2,6 +2,7 @@ import { h, VNode } from 'snabbdom';
 
 import * as xhr from 'common/xhr';
 import { Redraw, Open, bind, header, displayGameFamily, convertVariantKeyToGameFamily } from './util';
+import { gameFamily } from './common';
 
 type Piece = {
   name: string;
@@ -81,21 +82,6 @@ export function view(ctrl: PieceCtrl): VNode {
     pieceList(d, dgf, ctrl),
   ]);
 }
-
-// keep up to date with StrategyGames
-const gameFamily: GameFamilyKey[] = [
-  'chess',
-  'draughts',
-  'loa',
-  'shogi',
-  'xiangqi',
-  'flipello',
-  'amazons',
-  'oware',
-  'togyzkumalak',
-  'go',
-  'backgammon',
-];
 
 function gameFamilyOption(v: GameFamilyKey, sv: string) {
   if (v === sv) {

@@ -89,6 +89,10 @@ final class PerfsUpdater(
                 updateRatings(ratingsW.flipello10, ratingsB.flipello10, game)
               case Variant.FairySF(strategygames.fairysf.variant.Amazons) =>
                 updateRatings(ratingsW.amazons, ratingsB.amazons, game)
+              case Variant.FairySF(strategygames.fairysf.variant.BreakthroughTroyka) =>
+                updateRatings(ratingsW.breakthroughtroyka, ratingsB.breakthroughtroyka, game)
+              case Variant.FairySF(strategygames.fairysf.variant.MiniBreakthroughTroyka) =>
+                updateRatings(ratingsW.minibreakthroughtroyka, ratingsB.minibreakthroughtroyka, game)
               case Variant.Samurai(strategygames.samurai.variant.Oware) =>
                 updateRatings(ratingsW.oware, ratingsB.oware, game)
               case Variant.Togyzkumalak(strategygames.togyzkumalak.variant.Togyzkumalak) =>
@@ -169,6 +173,8 @@ final class PerfsUpdater(
       flipello: Rating,
       flipello10: Rating,
       amazons: Rating,
+      breakthroughtroyka: Rating,
+      minibreakthroughtroyka: Rating,
       oware: Rating,
       togyzkumalak: Rating,
       go9x9: Rating,
@@ -216,6 +222,8 @@ final class PerfsUpdater(
       flipello = perfs.flipello.toRating,
       flipello10 = perfs.flipello10.toRating,
       amazons = perfs.amazons.toRating,
+      breakthroughtroyka = perfs.breakthroughtroyka.toRating,
+      minibreakthroughtroyka = perfs.minibreakthroughtroyka.toRating,
       oware = perfs.oware.toRating,
       togyzkumalak = perfs.togyzkumalak.toRating,
       go9x9 = perfs.go9x9.toRating,
@@ -417,6 +425,16 @@ final class PerfsUpdater(
             perfs.amazons,
             ratings.amazons
           ),
+          breakthroughtroyka = addRatingVariant(
+            Variant.FairySF(strategygames.fairysf.variant.BreakthroughTroyka),
+            perfs.breakthroughtroyka,
+            ratings.breakthroughtroyka
+          ),
+          minibreakthroughtroyka = addRatingVariant(
+            Variant.FairySF(strategygames.fairysf.variant.MiniBreakthroughTroyka),
+            perfs.minibreakthroughtroyka,
+            ratings.minibreakthroughtroyka
+          ),
           oware = addRatingVariant(
             Variant.Samurai(strategygames.samurai.variant.Oware),
             perfs.oware,
@@ -492,6 +510,13 @@ final class PerfsUpdater(
           flipello = r(PT.orDefault("flipello"), perfs.flipello, perfs1.flipello),
           flipello10 = r(PT.orDefault("flipello10"), perfs.flipello10, perfs1.flipello10),
           amazons = r(PT.orDefault("amazons"), perfs.amazons, perfs1.amazons),
+          breakthroughtroyka =
+            r(PT.orDefault("breakthroughtroyka"), perfs.breakthroughtroyka, perfs1.breakthroughtroyka),
+          minibreakthroughtroyka = r(
+            PT.orDefault("minibreakthroughtroyka"),
+            perfs.minibreakthroughtroyka,
+            perfs1.minibreakthroughtroyka
+          ),
           oware = r(PT.orDefault("oware"), perfs.oware, perfs1.oware),
           togyzkumalak = r(PT.orDefault("togyzkumalak"), perfs.togyzkumalak, perfs1.togyzkumalak),
           go9x9 = r(PT.orDefault("go9x9"), perfs.go9x9, perfs1.go9x9),

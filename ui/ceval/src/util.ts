@@ -20,6 +20,8 @@ const noClientEvalVariants = [
   'flipello',
   'flipello10',
   'amazons',
+  'breakthroughtroyka',
+  'minibreakthroughtroyka',
   'oware',
   'togyzkumalak',
   'go9x9',

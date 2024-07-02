@@ -82,6 +82,8 @@ export type StatusName =
   | 'timeout'
   | 'draw'
   | 'outoftime'
+  | 'outoftimeGammon'
+  | 'outoftimeBackgammon'
   | 'ruleOfGin'
   | 'ginGammon'
   | 'ginBackgammon'

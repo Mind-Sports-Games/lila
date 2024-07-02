@@ -21,6 +21,8 @@ object StatusText {
       case Timeout if win.isDefined              => s"${loser(win)} left the game."
       case Timeout | Draw                        => "The game is a draw."
       case Outoftime                             => s"${winner(win)} wins on time."
+      case OutoftimeGammon                       => s"${winner(win)} wins a gammon on time."
+      case OutoftimeBackgammon                   => s"${winner(win)} wins a backgammon on time."
       case RuleOfGin                             => s"${winner(win)} wins by rule of gin."
       case GinGammon                             => s"${winner(win)} wins a gammon by rule of gin."
       case GinBackgammon                         => s"${winner(win)} wins a backgammon by rule of gin."
@@ -44,6 +46,10 @@ object StatusText {
             s"${winner(win)} connects all of their pieces."
           case Variant.Draughts(strategygames.draughts.variant.Breakthrough) =>
             s"${winner(win)} has a promotion first."
+          case Variant.FairySF(strategygames.fairysf.variant.BreakthroughTroyka) =>
+            s"${winner(win)} wins the race."
+          case Variant.FairySF(strategygames.fairysf.variant.MiniBreakthroughTroyka) =>
+            s"${winner(win)} wins the race."
           case _ => "Game ends by variant rule."
         }
       case _ => ""

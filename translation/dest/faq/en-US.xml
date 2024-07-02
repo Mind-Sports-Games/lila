@@ -38,7 +38,7 @@ For instance, the estimated duration of a 5+3 game is 5 × 60 + 40 × 3 = 420 se
   <string name="inferiorThanXsEqualYtimeControl">&lt; %1$ss = %2$s</string>
   <string name="superiorThanXsEqualYtimeControl">≥ %1$ss = %2$s</string>
   <string name="whatGamesCanIplay">What games can I play on PlayStrategy?</string>
-  <string name="playstrategyGamesList">On PlayStrategy there is Chess, Draughts, Othello, Go, Mancala, Shogi, Xiangqi, Lines of Action, Amazons and Backgammon. More games on the way...</string>
+  <string name="playstrategyGamesList">On PlayStrategy there is Chess, Draughts, Othello, Go, Mancala, Shogi, Xiangqi, Lines of Action, Amazons, Backgammon and Breakthrough. More games on the way...</string>
   <string name="whatVariantsCanIplay">What variants can I play on PlayStrategy?</string>
   <string name="playstrategySupportChessAnd">PlayStrategy supports %1$s.</string>
   <string name="eightVariants">8 chess variants</string>

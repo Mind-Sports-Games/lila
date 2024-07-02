@@ -818,6 +818,22 @@ object TournamentShield {
           1
         )
 
+    case object BreakthroughTroyka
+        extends Category(
+          Variant.FairySF(strategygames.fairysf.variant.BreakthroughTroyka),
+          Blitz32,
+          21,
+          1
+        )
+
+    case object MiniBreakthroughTroyka
+        extends Category(
+          Variant.FairySF(strategygames.fairysf.variant.MiniBreakthroughTroyka),
+          Blitz32,
+          8,
+          1
+        )
+
     case object Oware
         extends Category(
           Variant.Samurai(strategygames.samurai.variant.Oware),
@@ -900,6 +916,8 @@ object TournamentShield {
       Flipello,
       Flipello10,
       Amazons,
+      BreakthroughTroyka,
+      MiniBreakthroughTroyka,
       Oware,
       Togyzkumalak,
       Go9x9,

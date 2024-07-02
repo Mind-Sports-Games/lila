@@ -396,6 +396,16 @@ export default class Setup {
         case '8':
           key = 'amazons';
           break;
+        case '11':
+          switch (variantId[1]) {
+            case '1':
+              key = 'breakthroughtroyka';
+              break;
+            case '2':
+              key = 'minibreakthroughtroyka';
+              break;
+          }
+          break;
         case '6':
           key = 'oware';
           break;
@@ -435,7 +445,8 @@ export default class Setup {
     };
     const showStartingImages = () => {
       const variantId = ($variantSelect.val() as string).split('_');
-      const class_list = 'chess draughts loa shogi xiangqi flipello oware togyzkumalak amazons go backgammon';
+      const class_list =
+        'chess draughts loa shogi xiangqi flipello oware togyzkumalak amazons go backgammon breakthroughtroyka';
       let key = 'chess';
       switch (variantId[0]) {
         case '0':
@@ -470,6 +481,9 @@ export default class Setup {
           break;
         case '10':
           key = 'backgammon';
+          break;
+        case '11':
+          key = 'breakthroughtroyka';
           break;
       }
       $form.find('.playerIndex-submits').removeClass(class_list);

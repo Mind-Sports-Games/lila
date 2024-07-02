@@ -46,6 +46,10 @@ export function renderFullTxt(ctrl: AnalyseCtrl): string {
     tags.push(['GM', '2']);
     tags.push(['SZ', g.variant.boardSize.height.toString()]);
   }
+  if (['breakthroughtroyka', 'minibreakthroughtroyka'].includes(g.variant.key)) {
+    tags.push(['GM', '41']);
+    tags.push(['SZ', g.variant.boardSize.height.toString()]);
+  }
   if (['go9x9', 'go13x13', 'go19x19'].includes(g.variant.key)) {
     tags.push(['GM', '1']);
     tags.push(['SZ', g.variant.boardSize.height.toString()]);

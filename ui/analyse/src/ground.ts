@@ -101,6 +101,10 @@ export function makeConfig(ctrl: AnalyseCtrl): CgConfig {
             ? 'https://playstrategy.org/assets/piece/amazons/' +
               d.pref.pieceSet.filter(ps => ps.gameFamily === 'amazons')[0].name +
               '/'
+            : ctrl.data.game.gameFamily === 'breakthroughtroyka'
+            ? 'https://playstrategy.org/assets/piece/breakthrougtroyka/' +
+              d.pref.pieceSet.filter(ps => ps.gameFamily === 'breakthroughtroyka')[0].name +
+              '/'
             : cgVariantKey === 'oware'
             ? 'https://playstrategy.org/assets/piece/oware/' +
               d.pref.pieceSet.filter(ps => ps.gameFamily === 'oware')[0].name +

@@ -62,6 +62,8 @@ trait GameHelper { self: I18nHelper with UserHelper with AiHelper with StringHel
       case (_, Some(l), Resign | Timeout | Cheat | NoStart, _) =>
         s"${playerText(l)} resigned"
       case (_, Some(l), Outoftime, _)                  => s"${playerText(l)} forfeits by time"
+      case (_, Some(l), OutoftimeGammon, _)            => s"${playerText(l)} forfeits a gammon by time"
+      case (_, Some(l), OutoftimeBackgammon, _)        => s"${playerText(l)} forfeits a backgammon by time"
       case (Some(w), _, UnknownFinish, _)              => s"${playerText(w)} won"
       case (_, _, Draw | Stalemate | UnknownFinish, _) => "Game is a draw"
       case (_, _, Aborted, _)                          => "Game has been aborted"
@@ -214,6 +216,17 @@ trait GameHelper { self: I18nHelper with UserHelper with AiHelper with StringHel
           case (P2, Some(_)) => trans.playerIndexTimeOut(game.playerTrans(P2)).v
           case (P2, None)    => trans.playerIndexTimeOut(game.playerTrans(P2)).v + " • " + trans.draw.txt()
         }
+      case S.OutoftimeGammon =>
+        game.loser match {
+          case Some(p) if p.playerIndex.p1 => trans.playerIndexLosesByGammonTimeOut(game.playerTrans(P1)).v
+          case _                           => trans.playerIndexLosesByGammonTimeOut(game.playerTrans(P2)).v
+        }
+      case S.OutoftimeBackgammon =>
+        game.loser match {
+          case Some(p) if p.playerIndex.p1 =>
+            trans.playerIndexLosesByBackgammonTimeOut(game.playerTrans(P1)).v
+          case _ => trans.playerIndexLosesByBackgammonTimeOut(game.playerTrans(P2)).v
+        }
       case S.RuleOfGin =>
         game.winner match {
           case Some(p) if p.playerIndex.p1 => trans.playerIndexWinsByRuleOfGin(game.playerTrans(P1)).v
@@ -238,16 +251,19 @@ trait GameHelper { self: I18nHelper with UserHelper with AiHelper with StringHel
       case S.BackgammonWin => trans.backgammonBackgammonWin.txt()
       case S.VariantEnd =>
         game.variant match {
-          case Variant.Chess(strategygames.chess.variant.KingOfTheHill)      => trans.kingInTheCenter.txt()
-          case Variant.Chess(strategygames.chess.variant.ThreeCheck)         => trans.threeChecks.txt()
-          case Variant.Chess(strategygames.chess.variant.FiveCheck)          => trans.fiveChecks.txt()
-          case Variant.Chess(strategygames.chess.variant.RacingKings)        => trans.raceFinished.txt()
-          case Variant.Chess(strategygames.chess.variant.LinesOfAction)      => trans.checkersConnected.txt()
-          case Variant.Chess(strategygames.chess.variant.ScrambledEggs)      => trans.checkersConnected.txt()
-          case Variant.Draughts(strategygames.draughts.variant.Breakthrough) => trans.promotion.txt()
-          case Variant.FairySF(strategygames.fairysf.variant.Flipello)       => trans.gameFinished.txt()
-          case Variant.FairySF(strategygames.fairysf.variant.Flipello10)     => trans.gameFinished.txt()
-          case Variant.FairySF(strategygames.fairysf.variant.Amazons)        => trans.gameFinished.txt()
+          case Variant.Chess(strategygames.chess.variant.KingOfTheHill)          => trans.kingInTheCenter.txt()
+          case Variant.Chess(strategygames.chess.variant.ThreeCheck)             => trans.threeChecks.txt()
+          case Variant.Chess(strategygames.chess.variant.FiveCheck)              => trans.fiveChecks.txt()
+          case Variant.Chess(strategygames.chess.variant.RacingKings)            => trans.raceFinished.txt()
+          case Variant.Chess(strategygames.chess.variant.LinesOfAction)          => trans.checkersConnected.txt()
+          case Variant.Chess(strategygames.chess.variant.ScrambledEggs)          => trans.checkersConnected.txt()
+          case Variant.Draughts(strategygames.draughts.variant.Breakthrough)     => trans.promotion.txt()
+          case Variant.FairySF(strategygames.fairysf.variant.Flipello)           => trans.gameFinished.txt()
+          case Variant.FairySF(strategygames.fairysf.variant.Flipello10)         => trans.gameFinished.txt()
+          case Variant.FairySF(strategygames.fairysf.variant.Amazons)            => trans.gameFinished.txt()
+          case Variant.FairySF(strategygames.fairysf.variant.BreakthroughTroyka) => trans.raceFinished.txt()
+          case Variant.FairySF(strategygames.fairysf.variant.MiniBreakthroughTroyka) =>
+            trans.raceFinished.txt()
           case Variant.Samurai(strategygames.samurai.variant.Oware) =>
             if (game.situation.isRepetition) trans.gameFinishedRepetition.txt() else trans.gameFinished.txt()
           case Variant.Togyzkumalak(strategygames.togyzkumalak.variant.Togyzkumalak) =>

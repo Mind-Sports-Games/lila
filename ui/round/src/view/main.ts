@@ -263,6 +263,8 @@ export function main(ctrl: RoundController): VNode {
     'shogi',
     'minixiangqi',
     'minishogi',
+    'breakthroughtroyka',
+    'minibreakthroughtroyka',
     'oware',
     'togyzkumalak',
     'go9x9',

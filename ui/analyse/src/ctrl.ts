@@ -545,7 +545,9 @@ export default class AnalyseCtrl {
     this.justPlayed = orig;
     this.justDropped = undefined;
     const piece = this.chessground.state.pieces.get(dest);
-    const isCapture = capture || (piece && piece.role == 'p-piece' && orig[0] != dest[0]);
+    const isCapture =
+      capture ||
+      (this.data.game.gameFamily !== 'breakthroughtroyka' && piece && piece.role == 'p-piece' && orig[0] != dest[0]);
     this.sound[isCapture ? 'capture' : 'move']();
     if (!promotion.start(this, orig, dest, capture, this.sendMove)) this.sendMove(orig, dest, capture);
     if (!this.data.onlyDropsVariant) cancelDropMode(this.chessground.state);
