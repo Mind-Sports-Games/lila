@@ -1,3 +1,15 @@
 {
-  "extends": "../tsconfig.base.json"
+  "extends": "../tsconfig.base.json",
+  "compilerOptions": {
+    "types": ["playstrategy", "web"],
+    "noEmit": true
+  },
+  "isolatedModules": true,
+  "references": [
+    { "path": "../ceval/tsconfig.json" },
+    { "path": "../common/tsconfig.json" },
+    { "path": "../nvui/tsconfig.json" },
+    { "path": "../stratutils/tsconfig.json" },
+    { "path": "../tree/tsconfig.json" }
+  ]
 }

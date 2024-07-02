@@ -23,7 +23,7 @@ const sound = new (class {
       name,
       new window.Howl({
         src: ['ogg', 'mp3'].map(ext => `${path}.${ext}`),
-      })
+      }),
     );
 
   loadStandard = (name: Name, soundSet?: string) => {

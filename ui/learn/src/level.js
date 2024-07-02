@@ -35,7 +35,7 @@ module.exports = function (blueprint, opts) {
         m.redraw();
         if (!blueprint.nextButton) timeouts.setTimeout(opts.onComplete, 1200);
       },
-      ground.data().stats.dragged ? 1 : 250
+      ground.data().stats.dragged ? 1 : 250,
     );
   };
 

@@ -2,6 +2,12 @@
   "extends": "../tsconfig_module.base.json",
   "include": ["src"],
   "compilerOptions": {
-    "outDir": "./dist"
-  }
+    "outDir": "./dist",
+    "rootDir": "src",
+    "types": ["playstrategy"],
+    "lib": ["es2019", "dom"],
+    "composite": true,
+    "incremental": true
+  },
+  "isolatedModules": true
 }

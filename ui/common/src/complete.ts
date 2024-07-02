@@ -23,7 +23,7 @@ export default function <Result>(opts: Opts<Result>) {
           {
             length: term.length - 3,
           },
-          (_, i) => -i - 1
+          (_, i) => -i - 1,
         )
           .map(i => term.slice(0, i))
           .some(sub => cache.has(sub) && !cache.get(sub)!.length)
@@ -114,7 +114,7 @@ export default function <Result>(opts: Opts<Result>) {
             if (opts.onSelect) opts.onSelect(result);
             return true;
           })
-          .appendTo($container)
+          .appendTo($container),
       );
     else $container.html(empty());
     renderedResults = results;

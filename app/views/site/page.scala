@@ -46,9 +46,9 @@ object page {
       moreCss = frag(cssTag("source")),
       contentCls = "page",
       moreJs = embedJsUnsafeLoadThen(
-        """$('#asset-version-date').text(playstrategy.info.date);
-$('#asset-version-commit').attr('href', 'https://github.com/Mind-Sports-Games/lila/commits/' + playstrategy.info.commit).find('pre').text(playstrategy.info.commit);
-$('#asset-version-message').text(playstrategy.info.message);"""
+        """$('#asset-version-date').text(window.playstrategy.info.date);
+$('#asset-version-commit').attr('href', 'https://github.com/Mind-Sports-Games/lila/commits/' + window.playstrategy.info.commit).find('pre').text(window.playstrategy.info.commit);
+$('#asset-version-message').text(window.playstrategy.info.message);"""
       )
     )(
       frag(

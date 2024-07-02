@@ -72,15 +72,15 @@ export function view(ctrl: ServerEvalCtrl): VNode {
         ctrl.lastPly(false);
         playstrategy.requestIdleCallback(
           () =>
-            playstrategy.loadScript('javascripts/chart/acpl.js').then(() => {
+            playstrategy.loadScriptCJS('javascripts/chart/acpl.js').then(() => {
               playstrategy.advantageChart!(ctrl.root.data, ctrl.root.trans, el);
               ctrl.chartEl(el as HighchartsHTMLElement);
             }),
-          800
+          800,
         );
       }),
     },
-    [h('div.study__message', spinner())]
+    [h('div.study__message', spinner())],
   );
 }
 
@@ -99,24 +99,24 @@ function requestButton(ctrl: ServerEvalCtrl) {
     root.mainline.length < 5
       ? h('p', root.trans.noarg('theChapterIsTooShortToBeAnalysed'))
       : !root.study!.members.canContribute()
-      ? [root.trans.noarg('onlyContributorsCanRequestAnalysis')]
-      : [
-          h('p', [
-            root.trans.noarg('getAFullComputerAnalysis'),
-            h('br'),
-            root.trans.noarg('makeSureTheChapterIsComplete'),
-          ]),
-          h(
-            'a.button.text',
-            {
-              attrs: {
-                'data-icon': '',
-                disabled: root.mainline.length < 5,
+        ? [root.trans.noarg('onlyContributorsCanRequestAnalysis')]
+        : [
+            h('p', [
+              root.trans.noarg('getAFullComputerAnalysis'),
+              h('br'),
+              root.trans.noarg('makeSureTheChapterIsComplete'),
+            ]),
+            h(
+              'a.button.text',
+              {
+                attrs: {
+                  'data-icon': '',
+                  disabled: root.mainline.length < 5,
+                },
+                hook: bind('click', ctrl.request, root.redraw),
               },
-              hook: bind('click', ctrl.request, root.redraw),
-            },
-            root.trans.noarg('requestAComputerAnalysis')
-          ),
-        ]
+              root.trans.noarg('requestAComputerAnalysis'),
+            ),
+          ],
   );
 }

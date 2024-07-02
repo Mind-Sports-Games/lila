@@ -20,3 +20,5 @@ playstrategy.load.then(() => {
 });
 
 export default flatpickr;
+
+(window as any).PlayStrategyFlatpickr = flatpickr; // esbuild

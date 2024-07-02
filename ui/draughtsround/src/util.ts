@@ -2,7 +2,7 @@ import * as cg from 'draughtsground/types';
 import { h, Hooks, VNodeData } from 'snabbdom';
 import { opposite } from 'draughtsground/util';
 import { Redraw, EncodedDests, DecodedDests } from './interfaces';
-import { decomposeUci } from 'draughts';
+import { decomposeUci } from 'draughts/src/draughts';
 
 const pieceScores = {
   man: 1,
@@ -34,7 +34,7 @@ export const bind = (eventName: string, f: (e: Event) => void, redraw?: Redraw, 
         f(e);
         redraw && redraw();
       },
-      { passive }
+      { passive },
     );
   });
 
@@ -85,7 +85,7 @@ export function spinner() {
           attrs: { cx: 20, cy: 20, r: 18, fill: 'none' },
         }),
       ]),
-    ]
+    ],
   );
 }
 

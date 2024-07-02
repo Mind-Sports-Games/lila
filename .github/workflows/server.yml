@@ -31,7 +31,7 @@ on:
       - 'public/**'
       - 'ui/**'
       - 'package.json'
-      - 'yarn.lock'
+      - 'pnpm-lock.yaml'
 
 jobs:
   openjdk17:

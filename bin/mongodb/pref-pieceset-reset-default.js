@@ -13,6 +13,6 @@ db.pref.find().forEach(c => {
           { name: 'black_mancala', gameFamily: 6 },
         ],
       },
-    }
+    },
   );
 });

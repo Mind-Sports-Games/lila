@@ -14,7 +14,7 @@ db.report
         },
       },
     ],
-    { allowDiskUse: true }
+    { allowDiskUse: true },
   )
   .toArray()
   .forEach(group => {

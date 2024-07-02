@@ -1,7 +1,15 @@
 {
   "extends": "../tsconfig.base.json",
   "compilerOptions": {
+    "esModuleInterop": true,
+    "noEmit": true,
     "noImplicitAny": false,
-    "allowSyntheticDefaultImports": true
-  }
+    "types": ["node", "web", "playstrategy"]
+  },
+  "isolatedModules": true,
+  "references": [
+    { "path": "../chat/tsconfig.json" },
+    { "path": "../common/tsconfig.json" },
+    { "path": "../draughtsground/tsconfig.json" }
+  ]
 }

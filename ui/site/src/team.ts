@@ -9,7 +9,7 @@ interface TeamOpts {
   chat?: any;
 }
 
-export default function (opts: TeamOpts) {
+export default function PlayStrategyTeam(opts: TeamOpts) {
   playstrategy.socket = new playstrategy.StrongSocket('/team/' + opts.id, opts.socketVersion);
 
   if (opts.chat) playstrategy.makeChat(opts.chat);
@@ -22,3 +22,5 @@ export default function (opts: TeamOpts) {
       });
   });
 }
+
+(window as any).PlayStrategyTeam = PlayStrategyTeam; // esbuild

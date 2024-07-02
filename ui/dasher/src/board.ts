@@ -26,7 +26,7 @@ export function ctrl(data: BoardData, trans: Trans, redraw: Redraw, close: Close
       xhr
         .text('/pref/zoom?v=' + readZoom(), { method: 'post' })
         .catch(() => playstrategy.announce({ msg: 'Failed to save zoom' })),
-    1000
+    1000,
   );
 
   return {
@@ -66,7 +66,7 @@ export function view(ctrl: BoardCtrl): VNode {
           attrs: { 'data-icon': 'E' },
           hook: bind('click', () => ctrl.setIs3d(false)),
         },
-        '2D'
+        '2D',
       ),
       h(
         'a.text',
@@ -75,7 +75,7 @@ export function view(ctrl: BoardCtrl): VNode {
           attrs: { 'data-icon': 'E' },
           hook: bind('click', () => ctrl.setIs3d(true)),
         },
-        '3D'
+        '3D',
       ),
     ]),
     h(
@@ -99,7 +99,7 @@ export function view(ctrl: BoardCtrl): VNode {
                 },
               },
             }),
-          ]
+          ],
     ),
   ]);
 }

@@ -79,7 +79,11 @@ export default class StrongSocket {
     StrongSocket.resolveFirstConnect = r;
   });
 
-  constructor(readonly url: string, version: number | false, settings: Partial<Settings> = {}) {
+  constructor(
+    readonly url: string,
+    version: number | false,
+    settings: Partial<Settings> = {},
+  ) {
     this.settings = {
       receive: settings.receive,
       events: settings.events || {},
@@ -113,7 +117,7 @@ export default class StrongSocket {
     this.debug('connection attempt to ' + fullUrl);
     try {
       const ws = (this.ws = new WebSocket(fullUrl));
-      ws.onerror = e => this.onError(e);
+      ws.onerror = (e: any) => this.onError(e);
       ws.onclose = () => {
         this.pubsub.emit('socket.close');
         if (this.autoReconnect) {
@@ -138,7 +142,7 @@ export default class StrongSocket {
         if (m.t === 'n') this.pong();
         this.handle(m);
       };
-    } catch (e) {
+    } catch (e: any) {
       this.onError(e);
     }
     this.scheduleConnect(this.options.pingMaxLag);
@@ -163,7 +167,7 @@ export default class StrongSocket {
       try {
         stack = new Error().stack!.split('\n').join(' / ').replace(/\s+/g, ' ');
       } catch (e) {
-        stack = `${e.message} ${navigator.userAgent}`;
+        stack = `${e} ${navigator.userAgent}`;
       }
       if (!stack.includes('round.nvui')) setTimeout(() => this.send('rep', { n: `soc: ${message} ${stack}` }), 10000);
     }
@@ -208,7 +212,7 @@ export default class StrongSocket {
     try {
       this.ws!.send(pingData);
       this.lastPingTime = performance.now();
-    } catch (e) {
+    } catch (e: any) {
       this.debug(e, true);
     }
     this.scheduleConnect(this.options.pingMaxLag);
@@ -300,7 +304,7 @@ export default class StrongSocket {
           this.options.idle = false;
           if (this.ws) clearTimeout(disconnectTimeout);
           else location.reload();
-        }
+        },
       );
     }
   };

@@ -30,7 +30,7 @@ export function spinner() {
 }
 
 // keys can have to match the translations in translation/source/variantName.xml or just a perf name depending on what file refers to that util from lobby
-export const perfIcons = {
+export const perfIcons: any = {
   Blitz: ')',
   'Racing Kings': '',
   UltraBullet: '{',

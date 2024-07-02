@@ -1,6 +1,7 @@
 import * as domData from 'common/data';
 import { variantFromElement } from 'common/mini-board';
 import { readDice } from 'stratutils';
+import clockWidget from './clock-widget';
 
 interface UpdateData {
   lm: string;
@@ -40,13 +41,13 @@ export const init = (node: HTMLElement) => {
       domData.set($cg[0] as HTMLElement, 'draughtsground', window.Draughtsground($cg[0], config));
       ['p1', 'p2'].forEach(playerIndex =>
         $el.find('.mini-game__clock--' + playerIndex).each(function (this: HTMLElement) {
-          $(this).clock({
+          clockWidget(this, {
             time: parseInt(this.getAttribute('data-time')!),
             delay: parseInt(this.getAttribute('data-time-delay')!),
             pending: parseInt(this.getAttribute('data-time-pending')!),
             pause: playerIndex != turnPlayerIndex,
           });
-        })
+        }),
       );
     } else {
       const [fen, orientation, lm] = node.getAttribute('data-state')!.split('|'),
@@ -71,28 +72,28 @@ export const init = (node: HTMLElement) => {
           dimensions: $el.hasClass('variant-shogi')
             ? { width: 9, height: 9 }
             : $el.hasClass('variant-xiangqi')
-            ? { width: 9, height: 10 }
-            : $el.hasClass('variant-minishogi') || $el.hasClass('variant-minibreakthroughtroyka')
-            ? { width: 5, height: 5 }
-            : $el.hasClass('variant-minixiangqi')
-            ? { width: 7, height: 7 }
-            : $el.hasClass('variant-flipello10')
-            ? { width: 10, height: 10 }
-            : $el.hasClass('variant-amazons')
-            ? { width: 10, height: 10 }
-            : $el.hasClass('variant-oware')
-            ? { width: 6, height: 2 }
-            : $el.hasClass('variant-togyzkumalak')
-            ? { width: 9, height: 2 }
-            : $el.hasClass('variant-go9x9')
-            ? { width: 9, height: 9 }
-            : $el.hasClass('variant-go13x13')
-            ? { width: 13, height: 13 }
-            : $el.hasClass('variant-go19x19')
-            ? { width: 19, height: 19 }
-            : $el.hasClass('variant-backgammon') || $el.hasClass('variant-nackgammon')
-            ? { width: 12, height: 2 }
-            : { width: 8, height: 8 },
+              ? { width: 9, height: 10 }
+              : $el.hasClass('variant-minishogi') || $el.hasClass('variant-minibreakthroughtroyka')
+                ? { width: 5, height: 5 }
+                : $el.hasClass('variant-minixiangqi')
+                  ? { width: 7, height: 7 }
+                  : $el.hasClass('variant-flipello10')
+                    ? { width: 10, height: 10 }
+                    : $el.hasClass('variant-amazons')
+                      ? { width: 10, height: 10 }
+                      : $el.hasClass('variant-oware')
+                        ? { width: 6, height: 2 }
+                        : $el.hasClass('variant-togyzkumalak')
+                          ? { width: 9, height: 2 }
+                          : $el.hasClass('variant-go9x9')
+                            ? { width: 9, height: 9 }
+                            : $el.hasClass('variant-go13x13')
+                              ? { width: 13, height: 13 }
+                              : $el.hasClass('variant-go19x19')
+                                ? { width: 19, height: 19 }
+                                : $el.hasClass('variant-backgammon') || $el.hasClass('variant-nackgammon')
+                                  ? { width: 12, height: 2 }
+                                  : { width: 8, height: 8 },
           variant: variantFromElement($el),
         },
         $cg = $el.find('.cg-wrap'),
@@ -100,13 +101,13 @@ export const init = (node: HTMLElement) => {
       domData.set($cg[0] as HTMLElement, 'chessground', window.Chessground($cg[0], config));
       ['p1', 'p2'].forEach(playerIndex =>
         $el.find('.mini-game__clock--' + playerIndex).each(function (this: HTMLElement) {
-          $(this).clock({
+          clockWidget(this, {
             time: parseInt(this.getAttribute('data-time')!),
             delay: parseInt(this.getAttribute('data-time-delay')!),
             pending: parseInt(this.getAttribute('data-time-pending')!),
             pause: playerIndex != turnPlayerIndex,
           });
-        })
+        }),
       );
     }
   }
@@ -132,7 +133,6 @@ export const update = (node: HTMLElement, data: UpdateData) => {
       dice: readDice(data.fen, variantFromElement($el) as VariantKey),
       lastMove,
     });
-  cg.redrawAll();
   if (dg)
     dg.set({
       fen: data.fen,
@@ -143,13 +143,13 @@ export const update = (node: HTMLElement, data: UpdateData) => {
     time: number | undefined,
     delay: number | undefined,
     pending: number | undefined,
-    playerIndex: string
+    playerIndex: string,
   ) => {
     if (!isNaN(time!))
-      $el.find('.mini-game__clock--' + playerIndex).clock('set', {
-        time,
-        delay,
-        pending,
+      clockWidget($el[0]?.querySelector('.mini-game__clock--' + playerIndex) as HTMLElement, {
+        time: time || 0,
+        delay: delay || 0,
+        pending: pending || 0,
         pause: playerIndex != turnPlayerIndex,
       });
   };
@@ -159,11 +159,7 @@ export const update = (node: HTMLElement, data: UpdateData) => {
 
 export const finish = (node: HTMLElement, win?: string) =>
   ['p1', 'p2'].forEach(playerIndex => {
-    const $clock = $(node)
-      .find('.mini-game__clock--' + playerIndex)
-      .each(function (this: HTMLElement) {
-        $(this).clock('destroy');
-      });
+    const $clock = $(node).find('.mini-game__clock--' + playerIndex);
     const colorLetter = playerIndex === 'p1' ? 'w' : 'b';
     if (!$clock.data('managed'))
       // snabbdom

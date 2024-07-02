@@ -1,8 +1,18 @@
 {
   "extends": "../tsconfig.base.json",
   "compilerOptions": {
-    "noImplicitAny": false,
+    "skipLibCheck": true,
     "noImplicitReturns": false,
-    "esModuleInterop": true
-  }
+    "noEmit": true,
+    "noImplicitAny": false,
+    "composite": true,
+    "allowJs": true
+  },
+  "isolatedModules": true,
+  "references": [
+    { "path": "../chat/tsconfig.json" },
+    { "path": "../common/tsconfig.json" },
+    { "path": "../draughtsground/tsconfig.json" },
+    { "path": "../stratutils/tsconfig.json" }
+  ]
 }

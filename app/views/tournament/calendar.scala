@@ -15,7 +15,7 @@ object calendar {
       moreJs = frag(
         jsModule("tournament.calendar"),
         embedJsUnsafeLoadThen(
-          s"""PlayStrategyTournamentCalendar.app(document.getElementById('tournament-calendar'), ${safeJsonValue(
+          s"""PlayStrategyTournamentCalendar(document.getElementById('tournament-calendar'), ${safeJsonValue(
             Json.obj(
               "data" -> json,
               "i18n" -> bits.jsI18n

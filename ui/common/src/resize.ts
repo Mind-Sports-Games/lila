@@ -1,13 +1,14 @@
 import * as cg from 'chessground/types';
 import * as xhr from './xhr';
 import debounce from './debounce';
+import * as Prefs from './prefs';
 
 type MouchEvent = Event & Partial<MouseEvent & TouchEvent>;
 
 type Visible = (ply: Ply) => boolean;
 
 export default function resizeHandle(els: cg.Elements, pref: Prefs.ShowResizeHandle, ply: number, visible?: Visible) {
-  if (pref === Prefs.ShowResizeHandle.Never) return;
+  if (pref === 0) return;
 
   const el = document.createElement('cg-resize');
   els.container.appendChild(el);
@@ -45,14 +46,14 @@ export default function resizeHandle(els: cg.Elements, pref: Prefs.ShowResizeHan
         document.removeEventListener(mousemoveEvent, resize);
         document.body.classList.remove('resizing');
       },
-      { once: true }
+      { once: true },
     );
   };
 
   el.addEventListener('touchstart', startResize, { passive: false });
   el.addEventListener('mousedown', startResize, { passive: false });
 
-  if (pref === Prefs.ShowResizeHandle.OnlyAtStart) {
+  if (pref === 1) {
     const toggle = (ply: number) => el.classList.toggle('none', visible ? !visible(ply) : ply >= 2);
     toggle(ply);
     playstrategy.pubsub.on('ply', toggle);

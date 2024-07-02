@@ -52,7 +52,7 @@ object embed {
       jsModule("analysisBoard.embed"),
       analyseTag,
       embedJsUnsafeLoadThen(
-        s"""analyseEmbed(${safeJsonValue(
+        s"""PlayStrategyAnalyseEmbed(${safeJsonValue(
           Json.obj(
             "study"  -> data.study,
             "data"   -> data.analysis,

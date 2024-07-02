@@ -11,7 +11,10 @@ export default class Setup {
     ai: FormStore;
   };
 
-  constructor(readonly makeStorage: (name: string) => PlayStrategyStorage, readonly root: LobbyController) {
+  constructor(
+    readonly makeStorage: (name: string) => PlayStrategyStorage,
+    readonly root: LobbyController,
+  ) {
     this.stores = {
       hook: makeStore(makeStorage('lobby.setup.hook')),
       friend: makeStore(makeStorage('lobby.setup.friend')),
@@ -578,7 +581,7 @@ export default class Setup {
             self.sliderInitVal(
               parseFloat($input.val() as string),
               isTimeSlider ? self.sliderTime : self.sliderIncrement,
-              100
+              100,
             ),
         });
         $range.on('input', () => {
@@ -757,7 +760,7 @@ export default class Setup {
             $fenPosition.find('.preview').html('');
             $submits.addClass('nope');
             fenOk = false;
-          }
+          },
         );
       }
     }, 200);

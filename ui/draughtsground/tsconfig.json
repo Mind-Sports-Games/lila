@@ -1,18 +1,12 @@
 {
-  "include": ["src/*.ts"],
-  "exclude": [],
+  "extends": "../tsconfig_module.base.json",
+  "include": ["src"],
   "compilerOptions": {
+    "outDir": "./dist",
+    "rootDir": "src",
     "declaration": true,
-    "outDir": ".",
-    "types": [],
-    "noEmitOnError": false,
-    "strict": true,
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
-    "noImplicitThis": true,
-    "noImplicitReturns": true,
-    "module": "esnext",
-    "target": "ES2017",
-    "lib": ["DOM", "ES2017"]
-  }
+    "inlineSourceMap": true,
+    "composite": true
+  },
+  "isolatedModules": true
 }

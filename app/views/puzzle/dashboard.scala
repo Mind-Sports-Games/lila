@@ -36,7 +36,7 @@ object dashboard {
         }
         frag(
           jsModule("puzzle.dashboard"),
-          embedJsUnsafeLoadThen(s"""PlayStrategyPuzzleDashboard.renderRadar(${safeJsonValue(
+          embedJsUnsafeLoadThen(s"""PlayStrategyPuzzleDashboard(${safeJsonValue(
             Json
               .obj(
                 "radar" -> Json.obj(

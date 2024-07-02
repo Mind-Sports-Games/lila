@@ -14,8 +14,8 @@ module.exports = function (ctrl) {
             ctrl.setQuestion(p);
           },
         },
-        p.name
+        p.name,
       );
-    })
+    }),
   );
 };

@@ -37,6 +37,7 @@ export default class StormCtrl {
 
   constructor(opts: RacerOpts, redraw: (data: RacerData) => void) {
     this.data = opts.data;
+    const startsIn = this.data.startsIn || 0;
     this.race = this.data.race;
     this.pref = opts.pref;
     this.redraw = () => redraw(this.data);
@@ -46,7 +47,7 @@ export default class StormCtrl {
       moves: 0,
       errors: 0,
       current: new CurrentPuzzle(0, this.data.puzzles[0]),
-      clock: new Clock(config, Math.max(0, -opts.data.startsIn)),
+      clock: new Clock(config, Math.max(0, -startsIn)),
       history: [],
       combo: new Combo(config),
       modifier: {
@@ -54,7 +55,7 @@ export default class StormCtrl {
       },
     };
     this.vm = {
-      alreadyStarted: opts.data.startsIn && opts.data.startsIn <= 0,
+      alreadyStarted: startsIn <= 0,
     };
     this.countdown = new Countdown(this.run.clock, this.resetGround, () => setTimeout(this.redraw));
     this.promotion = makePromotion(this.withGround, this.cgOpts, this.redraw);

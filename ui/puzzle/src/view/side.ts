@@ -31,9 +31,9 @@ function puzzleInfos(ctrl: Controller, puzzle: Puzzle): VNode {
                       ...(ctrl.streak ? { target: '_blank' } : {}),
                     },
                   },
-                  '#' + puzzle.id
-                )
-              )
+                  '#' + puzzle.id,
+                ),
+              ),
             ),
         h(
           'p',
@@ -41,12 +41,12 @@ function puzzleInfos(ctrl: Controller, puzzle: Puzzle): VNode {
             'ratingX',
             !ctrl.streak && ctrl.vm.mode === 'play'
               ? h('span.hidden', ctrl.trans.noarg('hidden'))
-              : h('strong', puzzle.rating)
-          )
+              : h('strong', puzzle.rating),
+          ),
         ),
         h('p', ctrl.trans.vdom('playedXTimes', h('strong', numberFormat(puzzle.plays)))),
       ]),
-    ]
+    ],
   );
 }
 
@@ -70,9 +70,9 @@ function gameInfos(ctrl: Controller, game: PuzzleGame, puzzle: Puzzle): VNode {
                   {
                     attrs: { href: `/${game.id}/${ctrl.vm.pov}#${puzzle.initialPly}` },
                   },
-                  gameName
-                )
-          )
+                  gameName,
+                ),
+          ),
         ),
         h(
           'div.players',
@@ -86,14 +86,14 @@ function gameInfos(ctrl: Controller, game: PuzzleGame, puzzle: Puzzle): VNode {
                     {
                       attrs: { href: '/@/' + p.userId },
                     },
-                    p.title && p.title != 'BOT' ? [h('span.utitle', p.title), ' ' + p.name] : p.name
+                    p.title && p.title != 'BOT' ? [h('span.utitle', p.title), ' ' + p.name] : p.name,
                   )
-                : p.name
-            )
-          )
+                : p.name,
+            ),
+          ),
         ),
       ]),
-    ]
+    ],
   );
 }
 
@@ -107,7 +107,7 @@ const renderStreak = (streak: PuzzleStreak, noarg: TransNoArg) =>
             {
               attrs: dataIcon('}'),
             },
-            'Puzzle Streak'
+            'Puzzle Streak',
           ),
           h('p', noarg('streakDescription')),
         ])
@@ -116,8 +116,8 @@ const renderStreak = (streak: PuzzleStreak, noarg: TransNoArg) =>
           {
             attrs: dataIcon('}'),
           },
-          streak.data.index
-        )
+          streak.data.index,
+        ),
   );
 
 export const userBox = (ctrl: Controller): VNode => {
@@ -137,8 +137,8 @@ export const userBox = (ctrl: Controller): VNode => {
           data.user.rating - (diff || 0),
           ...(diff && diff > 0 ? [' ', h('good.rp', '+' + diff)] : []),
           ...(diff && diff < 0 ? [' ', h('bad.rp', '−' + -diff)] : []),
-        ])
-      )
+        ]),
+      ),
     ),
   ]);
 };
@@ -166,7 +166,7 @@ export function replay(ctrl: Controller): MaybeVNode {
           href: `/training/dashboard/${replay.days}`,
         },
       },
-      ['« ', `Replaying ${ctrl.trans.noarg(ctrl.getData().theme.key)} puzzles`]
+      ['« ', `Replaying ${ctrl.trans.noarg(ctrl.getData().theme.key)} puzzles`],
     ),
     h('div.puzzle__side__replay__bar', {
       attrs: {
@@ -211,14 +211,14 @@ export function config(ctrl: Controller): MaybeVNode {
               {
                 attrs: { for: 'puzzle-difficulty' },
               },
-              ctrl.trans.noarg('difficultyLevel')
+              ctrl.trans.noarg('difficultyLevel'),
             ),
             h(
               'select#puzzle-difficulty.puzzle__difficulty__selector',
               {
                 attrs: { name: 'difficulty' },
                 hook: onInsert(elm =>
-                  elm.addEventListener('change', () => (elm.parentNode as HTMLFormElement).submit())
+                  elm.addEventListener('change', () => (elm.parentNode as HTMLFormElement).submit()),
                 ),
               },
               difficulties.map(([key, delta]) =>
@@ -232,15 +232,15 @@ export function config(ctrl: Controller): MaybeVNode {
                         !!delta &&
                         ctrl.trans.plural(
                           delta < 0 ? 'nbPointsBelowYourPuzzleRating' : 'nbPointsAboveYourPuzzleRating',
-                          Math.abs(delta)
+                          Math.abs(delta),
                         ),
                     },
                   },
-                  [ctrl.trans.noarg(key), delta ? ` (${delta > 0 ? '+' : ''}${delta})` : '']
-                )
-              )
+                  [ctrl.trans.noarg(key), delta ? ` (${delta > 0 ? '+' : ''}${delta})` : ''],
+                ),
+              ),
             ),
-          ]
+          ],
         )
       : null,
     h(
@@ -251,7 +251,7 @@ export function config(ctrl: Controller): MaybeVNode {
           title: 'Keyboard: z',
         },
       },
-      ctrl.trans.noarg('zenMode')
+      ctrl.trans.noarg('zenMode'),
     ),
   ]);
 }

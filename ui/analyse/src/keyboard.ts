@@ -94,7 +94,7 @@ export const bind = (ctrl: AnalyseCtrl) => {
         const i = chapters.findIndex(ch => ch.id === study.vm.chapterId);
         const chapter = chapters[i + (key === 'n' ? 1 : -1)];
         if (chapter) study.setChapter(chapter.id);
-      })
+      }),
     );
   }
 };

@@ -32,9 +32,9 @@ function select(ctrl) {
             value: value.key,
             selected: selected && selected.includes(value.key),
           },
-          value.name
+          value.name,
         );
-      })
+      }),
     );
   };
 }
@@ -45,7 +45,7 @@ module.exports = function (ctrl) {
       'div.items',
       ctrl.ui.dimensionCategs.map(function (categ) {
         return m('div.categ.box', [m('div.top', categ.name), categ.items.map(select(ctrl))]);
-      })
+      }),
     ),
   ]);
 };

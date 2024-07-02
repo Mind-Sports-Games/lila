@@ -3,21 +3,22 @@
   "version": "2.0.0",
   "private": true,
   "description": "playstrategy.org chat ui",
+  "types": "dist/chat.d.ts",
   "type": "module",
-  "module": "dist/main.js",
-  "types": "dist/main.d.ts",
+  "module": "dist/chat.js",
   "author": "Thibault Duplessis",
   "license": "AGPL-3.0-or-later",
-  "scripts": {
-    "compile": "../../node_modules/typescript/bin/tsc --incremental --outDir ./dist --declaration --inlineSourceMap",
-    "dev": "yarn run compile && rollup --config",
-    "prod": "yarn run compile && rollup --config --config-prod"
-  },
   "dependencies": {
+    "common": "workspace:*",
+    "palantir": "workspace:*",
     "snabbdom": "^3.0.1"
   },
-  "devDependencies": {
-    "@build/rollupProject": "2.0.0",
-    "@types/playstrategy": "2.0.0"
+  "scripts": {
+    "compile": "tsc",
+    "dev": "tsc",
+    "prod": "tsc"
+  },
+  "playstrategy": {
+    "bundles": "src/chat.ts"
   }
 }

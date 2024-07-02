@@ -81,11 +81,11 @@ export default function (opts: CevalOpts): CevalCtrl {
   const initialAllocationMaxThreads = officialStockfish ? 2 : 1;
   const maxThreads = Math.min(
     Math.max((navigator.hardwareConcurrency || 1) - 1, 1),
-    growableSharedMem ? 32 : initialAllocationMaxThreads
+    growableSharedMem ? 32 : initialAllocationMaxThreads,
   );
   const threads = storedProp(
     storageKey('ceval.threads'),
-    Math.min(Math.ceil((navigator.hardwareConcurrency || 1) / 4), maxThreads)
+    Math.min(Math.ceil((navigator.hardwareConcurrency || 1) / 4), maxThreads),
   );
 
   const maxHashSize = Math.min(((navigator.deviceMemory || 0.25) * 1024) / 8, growableSharedMem ? 1024 : 16);
@@ -295,7 +295,7 @@ export default function (opts: CevalOpts): CevalCtrl {
               fen,
               uci,
             }
-          : null
+          : null,
       );
       opts.setAutoShapes();
     },

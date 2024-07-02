@@ -2,28 +2,23 @@
   "name": "draughts",
   "version": "2.0.0",
   "description": "lidraughts.org draughts utils",
-  "main": "main.js",
-  "typings": "main.d.ts",
+  "main": "dist/draughts.js",
+  "typings": "dist/draughts.d.ts",
   "keywords": [
     "draughts",
     "lidraughts"
   ],
   "author": "Stefan Schermann (modified original by Thibault Duplessis)",
   "license": "AGPL-3.0",
+  "dependencies": {
+    "draughtsground": "workspace:*"
+  },
   "scripts": {
-    "dev": "rollup --config",
-    "prod": "rollup --config --config-prod",
-    "plugin-dev": "rollup --config --config-plugin",
-    "plugin-prod": "rollup --config --config-prod --config-plugin"
+    "compile": "tsc",
+    "dev": "tsc",
+    "prod": "tsc"
   },
-  "devDependencies": {
-    "@build/rollupProject": "2.0.0",
-    "@rollup/plugin-commonjs": "^17",
-    "@rollup/plugin-typescript": "^8.1.0",
-    "@types/playstrategy": "2.0.0",
-    "draughtsground": "7.6.0",
-    "rollup-plugin-typescript2": "^0.30.0",
-    "typescript": "^4.1.3"
-  },
-  "dependencies": {}
+  "playstrategy": {
+    "bundles": "src/draughts.ts"
+  }
 }

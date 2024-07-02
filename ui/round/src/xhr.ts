@@ -17,5 +17,5 @@ export const setZen = throttle(1000, zen =>
   xhr.text('/pref/zen', {
     method: 'post',
     body: xhr.form({ zen: zen ? 1 : 0 }),
-  })
+  }),
 );

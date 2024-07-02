@@ -155,7 +155,7 @@ export default function (opts: ChatOpts, redraw: Redraw): Ctrl {
             $('.mchat__say').each(function (this: HTMLElement) {
               this.focus();
             }),
-          500
+          500,
         );
       redraw();
     },
