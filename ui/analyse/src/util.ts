@@ -260,6 +260,8 @@ const noServerEvalVariants = [
   'linesOfAction',
   'scrambledEggs',
   'amazons',
+  'breakthroughtroyka',
+  'minibreakthroughtroyka',
   'oware',
   'togyzkumalak',
   'go9x9',
@@ -280,6 +282,8 @@ const noClientEvalVariants = [
   'flipello',
   'flipello10',
   'amazons',
+  'breakthroughtroyka',
+  'minibreakthroughtroyka',
   'oware',
   'togyzkumalak',
   'go9x9',
@@ -396,5 +400,9 @@ export const variantToRules = (v: VariantKey): Rules => {
       return 'backgammon';
     case 'nackgammon':
       return 'nackgammon';
+    case 'breakthroughtroyka':
+      return 'breakthrough';
+    case 'minibreakthroughtroyka':
+      return 'minibreakthrough';
   }
 };

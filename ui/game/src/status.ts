@@ -14,6 +14,8 @@ export const ids = {
   outoftime: 35,
   cheat: 36,
   noStart: 37,
+  unknownFinish: 38,
+  perpetualCheck: 39,
   singleWin: 40,
   gammonWin: 41,
   backgammonWin: 42,
@@ -22,6 +24,8 @@ export const ids = {
   ruleOfGin: 45,
   ginGammon: 46,
   ginBackgammon: 47,
+  outoftimeGammon: 48,
+  outoftimeBackgammon: 49,
   variantEnd: 60,
 };
 

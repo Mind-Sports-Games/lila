@@ -244,6 +244,20 @@ object Tv {
           familyChannel = true,
           gameFamily = "backgammon"
         )
+    case object BreakthroughTroykaFamily
+        extends Channel(
+          name = s"All ${VariantKeys.gameFamilyName(GameFamily.BreakthroughTroyka())}",
+          icon = FV.BreakthroughTroyka.perfIcon.toString,
+          secondsSinceLastMove = freshBlitz,
+          filters = Seq(
+            anyVariant(
+              Variant.all(GameLogic.FairySF()).filter(v => v.gameFamily == GameFamily.BreakthroughTroyka())
+            ),
+            noBot
+          ),
+          familyChannel = true,
+          gameFamily = "breakthroughtroyka"
+        )
     case object Bullet
         extends Channel(
           name = S.Bullet.name,
@@ -564,6 +578,26 @@ object Tv {
           familyChannel = true,
           gameFamily = "amazons"
         )
+    case object BreakthroughTroyka
+        extends Channel(
+          name = VariantKeys.variantName(Variant.wrap(FV.BreakthroughTroyka)),
+          icon = FV.BreakthroughTroyka.perfIcon.toString,
+          secondsSinceLastMove = freshBlitz,
+          filters = Seq(variant(Variant.wrap(FV.BreakthroughTroyka)), noBot),
+          familyChannel = false,
+          gameFamily = "breakthroughtroyka"
+        )
+
+    case object MiniBreakthroughTroyka
+        extends Channel(
+          name = VariantKeys.variantName(Variant.wrap(FV.MiniBreakthroughTroyka)),
+          icon = FV.MiniBreakthroughTroyka.perfIcon.toString,
+          secondsSinceLastMove = freshBlitz,
+          filters = Seq(variant(Variant.wrap(FV.MiniBreakthroughTroyka)), noBot),
+          familyChannel = false,
+          gameFamily = "breakthroughtroyka"
+        )
+
     case object Oware
         extends Channel(
           name = VariantKeys.variantName(Variant.wrap(MSV.Oware)),
@@ -689,6 +723,9 @@ object Tv {
       Flipello,
       Flipello10,
       Amazons,
+      BreakthroughTroykaFamily,
+      BreakthroughTroyka,
+      MiniBreakthroughTroyka,
       MancalaFamily,
       Oware,
       Togyzkumalak,

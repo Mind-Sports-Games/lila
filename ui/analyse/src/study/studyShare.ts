@@ -86,6 +86,8 @@ export function view(ctrl: StudyShareCtrl): VNode {
     'backgammon',
     'nackgammon',
     'amazons',
+    'breakthroughtroyka',
+    'minibreakthroughtroyka',
     'flipello',
     'flipello10',
     'shogi',

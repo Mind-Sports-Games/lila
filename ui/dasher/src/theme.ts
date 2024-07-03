@@ -3,6 +3,7 @@ import changeColorHandle from 'common/coordsColor';
 import * as xhr from 'common/xhr';
 
 import { Redraw, Open, bind, header, displayGameFamily, convertVariantKeyToGameFamily } from './util';
+import { gameFamily } from './common';
 
 type Theme = {
   name: string;
@@ -82,20 +83,6 @@ export function view(ctrl: ThemeCtrl): VNode {
     h('div.list', allThemes.map(themeView(currentTheme, dgf.list, ctrl.set))),
   ]);
 }
-
-const gameFamily: GameFamilyKey[] = [
-  'chess',
-  'draughts',
-  'loa',
-  'shogi',
-  'xiangqi',
-  'flipello',
-  'amazons',
-  'oware',
-  'togyzkumalak',
-  'go',
-  'backgammon',
-];
 
 function gameFamilyOption(v: GameFamilyKey, sv: string) {
   if (v === sv) {

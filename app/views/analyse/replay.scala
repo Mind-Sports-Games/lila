@@ -87,7 +87,7 @@ object replay {
       title = titleOf(pov),
       moreCss = frag(
         cssTag("analyse.round"),
-        (pov.game.variant.hasDetatchedPocket) option cssTag(
+        (pov.game.variant.hasDetachedPocket) option cssTag(
           "analyse.zh"
         ),
         ctx.blind option cssTag("round.nvui")

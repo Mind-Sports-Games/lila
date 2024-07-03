@@ -37,6 +37,10 @@ export default function status(ctrl: Ctrl): string {
       return d.game.loserPlayer
         ? ctrl.trans('playerIndexTimeOut', d.game.loserPlayer)
         : `${ctrl.trans('playerIndexTimeOut', '')} • ${noarg('draw')}`;
+    case 'outoftimeGammon':
+      return ctrl.trans('playerIndexLosesByGammonTimeOut', d.game.loserPlayer ? d.game.loserPlayer : '');
+    case 'outoftimeBackgammon':
+      return ctrl.trans('playerIndexLosesByBackgammonTimeOut', d.game.loserPlayer ? d.game.loserPlayer : '');
     case 'ruleOfGin':
       return ctrl.trans('playerIndexWinsByRuleOfGin', d.game.winnerPlayer ? d.game.winnerPlayer : '');
     case 'ginGammon':
@@ -74,6 +78,9 @@ export default function status(ctrl: Ctrl): string {
           return noarg('gameFinished');
         case 'amazons':
           return noarg('gameFinished');
+        case 'breakthroughtroyka':
+        case 'minibreakthroughtroyka':
+          return noarg('raceFinished');
         case 'oware':
           if (d.game.isRepetition) {
             return noarg('gameFinishedRepetition');

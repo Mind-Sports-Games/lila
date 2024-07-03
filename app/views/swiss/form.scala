@@ -250,6 +250,7 @@ final private class SwissFields(form: Form[_], swiss: Option[Swiss])(implicit ct
       medleyGameGroup(GameGroup.Flipello()),
       medleyGameGroup(GameGroup.Mancala()),
       medleyGameGroup(GameGroup.Amazons()),
+      medleyGameGroup(GameGroup.BreakthroughTroyka()),
       medleyGameGroup(GameGroup.Go()),
       medleyGameGroup(GameGroup.Backgammon())
     )

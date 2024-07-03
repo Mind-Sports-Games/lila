@@ -101,6 +101,8 @@ object side {
         showNonEmptyPerf(u.perfs.flipello, PerfType.orDefault("flipello")),
         showNonEmptyPerf(u.perfs.flipello10, PerfType.orDefault("flipello10")),
         showNonEmptyPerf(u.perfs.amazons, PerfType.orDefault("amazons")),
+        showNonEmptyPerf(u.perfs.breakthroughtroyka, PerfType.orDefault("breakthroughtroyka")),
+        showNonEmptyPerf(u.perfs.minibreakthroughtroyka, PerfType.orDefault("minibreakthroughtroyka")),
         showNonEmptyPerf(u.perfs.oware, PerfType.orDefault("oware")),
         showNonEmptyPerf(u.perfs.togyzkumalak, PerfType.orDefault("togyzkumalak")),
         showNonEmptyPerf(u.perfs.go9x9, PerfType.orDefault("go9x9")),

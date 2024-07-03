@@ -29,7 +29,8 @@ final private[tournament] class PairingSystem(
       ranking: Ranking
   ): Fu[Pairings] = {
     for {
-      activePlayers <- playerRepo.countActive(tour.id)
+      justFinishedUsers <- pairingRepo.justFinishedUsers(tour.id, tour.waitForPlayerReturnSeconds)
+      activePlayers = users.activePlayers(justFinishedUsers -- LightUser.tourBotsIDs.toSet)
       lastOpponents <- limitLastOpponents(tour, users, activePlayers)
       botsToAdd     <- botsToAdd(tour, activePlayers)
       usersWithBots = users.addBotUsers(botsToAdd)
