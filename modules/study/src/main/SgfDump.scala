@@ -2,6 +2,7 @@ package lila.study
 
 import akka.stream.scaladsl._
 import strategygames.format.sgf.{ Dumper, Tag, Tags }
+import strategygames.format.FEN
 import strategygames.{ ActionStrs, GameFamily, GameLogic }
 import strategygames.variant.Variant
 import org.joda.time.format.DateTimeFormat
@@ -28,19 +29,20 @@ final class SgfDump(
   def ofChapter(study: Study)(chapter: Chapter): String = {
     val actionStrs = toActionStrs(chapter.root.mainline)
     val tags       = makeTags(study, chapter)
-    format(chapter.setup.variant, actionStrs, tags)
+    val initialFen = !chapter.root.fen.initial option chapter.root.fen
+    format(chapter.setup.variant, actionStrs, tags, initialFen)
   }
 
-  def format(variant: Variant, actionStrs: ActionStrs, tags: Tags): String = {
-    "(;" ++ tags.toString ++ "\n\n" ++ validSgf(variant, actionStrs) ++ ")"
+  def format(variant: Variant, actionStrs: ActionStrs, tags: Tags, initialFen: Option[FEN]): String = {
+    "(;" ++ tags.toString ++ "\n\n" ++ validSgf(variant, actionStrs, initialFen) ++ ")"
   }
 
-  def validSgf(variant: Variant, actionStrs: ActionStrs): String = {
+  def validSgf(variant: Variant, actionStrs: ActionStrs, initialFen: Option[FEN]): String = {
     if (
       variant.gameLogic == GameLogic.FairySF() || variant.gameLogic == GameLogic
         .Go() || variant.gameLogic == GameLogic.Backgammon()
     ) {
-      Dumper(variant, actionStrs)
+      Dumper(variant, actionStrs, initialFen)
     } else {
       "SGF NOT SUPPORTED"
     }
@@ -71,16 +73,16 @@ final class SgfDump(
 
   private val dateFormat = DateTimeFormat forPattern "yyyy.MM.dd"
 
-  private def makeTags(study: Study, chapter: Chapter): Tags =
+  private def makeTags(study: Study, chapter: Chapter): Tags = {
+    val isGo = chapter.setup.variant.gameFamily == GameFamily.Go()
     Tags {
       List(
         Tag(_.FF, 4),
         Tag(_.CA, "UTF-8"),
         Tag(_.EV, s"${study.name}: ${chapter.name}"),
         Tag(_.PC, chapterUrl(study.id, chapter.id)),
-        Tag(_.DT, Tag.DT.format.print(chapter.createdAt)),
-        Tag(_.RE, "*")
-      ) ::: (!chapter.root.fen.initial).??(
+        Tag(_.DT, Tag.DT.format.print(chapter.createdAt))
+      ) ::: (!chapter.root.fen.initial && !isGo).??(
         List(
           Tag(_.IP, chapter.root.fen.value)
         )
@@ -121,9 +123,7 @@ final class SgfDump(
               Tag(_.SZ, chapter.setup.variant.toGo.boardSize.height),
               Tag(_.KM, chapter.root.fen.toGo.komi),
               Tag(_.HA, chapter.root.fen.toGo.handicap.getOrElse(0)),
-              Tag(_.RU, "Chinese"),
-              Tag(_.TB, chapter.root.fen.toGo.player1Score),
-              Tag(_.TW, chapter.root.fen.toGo.player2Score)
+              Tag(_.RU, "Chinese")
             )
           case GameFamily.Backgammon() =>
             List(
@@ -138,6 +138,7 @@ final class SgfDump(
         }
       )
     }
+  }
 }
 
 object SgfDump {
