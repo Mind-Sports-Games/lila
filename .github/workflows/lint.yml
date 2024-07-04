@@ -9,13 +9,22 @@ on:
       - 'translation/dest/**'
 
 jobs:
-  check_org_member:
-    uses: ./.github/workflows/check-org-members.yml
-
   lint:
-    needs: check_org_member
     runs-on: ubuntu-latest
     steps:
+      - name: Check if organization member
+        id: check_org_member
+        uses: Mind-Sports-Games/check-org-member@v1.1.0
+        with:
+          username: ${{ github.actor }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Check Failed
+        if: ${{ steps.check_org_member.outputs.result == 'false' }}
+        run: |
+          echo User Does Not Belong to Mind-Sports-Games
+          exit 1
+      - name: Check Passed
+        run: echo The actor is an organization member
       - uses: webfactory/ssh-agent@v0.9.0
         with:
           ssh-private-key: ${{ secrets.MSO_CI_SSH_KEY }}
