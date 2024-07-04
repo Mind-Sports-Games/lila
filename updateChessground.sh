@@ -2,7 +2,7 @@
 printf 'enter path for chessground
 Examples of values :
 - empty space to quit
-- repo : git+ssh://git@github.com:Mind-Sports-Games/chessground.git#v7.11.1-pstrat<version>
+- repo : git+ssh://git@github.com:Mind-Sports-Games/chessground.git#semver:v7.11.1-pstrat2.48
 - local : file:/home/vincent/Desktop/code/chessground
 '
 read path
@@ -15,5 +15,5 @@ workspaces=("analyse" "draughtsround" "editor" "learn" "lobby" "puz" "puzzle" "r
 
 for workspace in "${workspaces[@]}"
 do
-    yarn workspace $workspace add $path
+    pnpm add $path --filter $workspace
 done

@@ -2,7 +2,7 @@
 printf 'enter path to stratops
 Examples of values :
 - empty space to quit
-- repo : git+ssh://git@github.com:Mind-Sports-Games/stratops.git#v0.8.1-pstrat
+- repo : git+ssh://git@github.com:Mind-Sports-Games/stratops.git#semver:v0.8.1-pstrat4.4
 - local : file:/home/vincent/Desktop/code/stratops
 '
 read path
@@ -15,5 +15,5 @@ workspaces=("analyse" "ceval" "dgt" "editor" "puz" "puzzle" "racer" "storm")
 
 for workspace in "${workspaces[@]}"
 do
-    yarn workspace $workspace add $path
+    pnpm add $path --filter $workspace
 done
