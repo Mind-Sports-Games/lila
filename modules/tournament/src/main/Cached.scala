@@ -80,7 +80,8 @@ final private[tournament] class Cached(
         tourId: Tournament.ID,
         userId: User.ID,
         version: Sheet.Version,
-        streakable: Sheet.Streakable
+        streakable: Sheet.Streakable,
+        statusScoring: Boolean
     )
 
     def apply(tour: Tournament, userId: User.ID): Fu[Sheet] =
@@ -97,12 +98,13 @@ final private[tournament] class Cached(
         tour.id,
         userId,
         Sheet versionOf tour.startsAt,
-        if (tour.streakable) Sheet.Streaks else Sheet.NoStreaks
+        if (tour.streakable) Sheet.Streaks else Sheet.NoStreaks,
+        tour.statusScoring
       )
 
     private def compute(key: SheetKey): Fu[Sheet] =
       pairingRepo.finishedByPlayerChronological(key.tourId, key.userId) map {
-        arena.Sheet(key.userId, _, key.version, key.streakable)
+        arena.Sheet(key.userId, _, key.version, key.streakable, key.statusScoring)
       }
 
     private val cache = cacheApi[SheetKey, Sheet](8192, "tournament.sheet") {

@@ -194,6 +194,15 @@ object form {
           half = true
         ),
         form3.hidden(form("streakable"), "false".some) // hack to allow disabling streaks
+      ),
+      form3.split(
+        form3.checkbox(
+          form("statusScoring"),
+          trans.statusScoring(),
+          help = frag("In Backgammon score additional points, 1 for gammon, 2 for backgammon.").some,
+          half = true
+        ),
+        form3.hidden(form("statusScoring"), "false".some) // hack to allow disabling statusScoring
       )
     )
 

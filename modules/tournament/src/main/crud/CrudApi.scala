@@ -35,6 +35,7 @@ final class CrudApi(tournamentRepo: TournamentRepo) {
       conditions = Condition.DataForm.AllSetup(tour.conditions),
       berserkable = !tour.noBerserk,
       streakable = tour.streakable,
+      statusScoring = tour.statusScoring,
       teamBattle = tour.isTeamBattle,
       hasChat = tour.hasChat
     )
@@ -81,6 +82,7 @@ final class CrudApi(tournamentRepo: TournamentRepo) {
       startDate = none,
       berserkable = true,
       streakable = true,
+      statusScoring = false,
       teamBattle = none,
       description = none,
       hasChat = true
@@ -111,6 +113,7 @@ final class CrudApi(tournamentRepo: TournamentRepo) {
       position = data.realPosition,
       noBerserk = !data.berserkable,
       noStreak = !data.streakable,
+      statusScoring = data.statusScoring,
       teamBattle = data.teamBattle option (tour.teamBattle | TeamBattle(Set.empty, 10)),
       hasChat = data.hasChat
     ) pipe { tour =>

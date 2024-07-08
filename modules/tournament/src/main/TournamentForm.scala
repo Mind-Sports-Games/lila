@@ -61,6 +61,7 @@ final class TournamentForm {
       teamBattleByTeam = teamBattleId,
       berserkable = true.some,
       streakable = true.some,
+      statusScoring = false.some,
       description = none,
       hasChat = true.some
     )
@@ -105,6 +106,7 @@ final class TournamentForm {
       teamBattleByTeam = none,
       berserkable = tour.berserkable.some,
       streakable = tour.streakable.some,
+      statusScoring = tour.statusScoring.some,
       description = tour.description,
       hasChat = tour.hasChat.some
     )
@@ -188,6 +190,7 @@ final class TournamentForm {
         "teamBattleByTeam" -> optional(nonEmptyText.verifying(id => leaderTeams.exists(_.id == id))),
         "berserkable"      -> optional(boolean),
         "streakable"       -> optional(boolean),
+        "statusScoring"    -> optional(boolean),
         "description"      -> optional(cleanNonEmptyText),
         "hasChat"          -> optional(boolean)
       )(TournamentSetup.apply)(TournamentSetup.unapply)
@@ -277,6 +280,7 @@ private[tournament] case class TournamentSetup(
     teamBattleByTeam: Option[String],
     berserkable: Option[Boolean],
     streakable: Option[Boolean],
+    statusScoring: Option[Boolean],
     description: Option[String],
     hasChat: Option[Boolean]
 ) {
@@ -345,6 +349,7 @@ private[tournament] case class TournamentSetup(
         },
         noBerserk = !(~berserkable),
         noStreak = !(~streakable),
+        statusScoring = statusScoring | false,
         teamBattle = old.teamBattle,
         description = description,
         hasChat = hasChat | true
@@ -370,6 +375,7 @@ private[tournament] case class TournamentSetup(
         },
         noBerserk = berserkable.fold(old.noBerserk)(!_),
         noStreak = streakable.fold(old.noStreak)(!_),
+        statusScoring = statusScoring | old.statusScoring,
         teamBattle = old.teamBattle,
         description = description.fold(old.description)(_.some.filter(_.nonEmpty)),
         hasChat = hasChat | old.hasChat
