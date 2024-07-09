@@ -24,6 +24,7 @@ data/
 dist/
 node_modules/
 local/
+ui/common/css/theme/gen/*.scss
 ui/common/**/*.js
 ui/common/**/*.d.ts
 ui/game/**/*.js
