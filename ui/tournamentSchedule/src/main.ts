@@ -36,9 +36,9 @@ export default function (env: any) {
   });
 }
 
-function update(prevs, news) {
+function update(prevs: any, news: any) {
   // updates ignore team tournaments (same for all)
   // also lacks finished tournaments
   const now = new Date().getTime();
-  return news.concat(prevs.filter(p => !p.schedule || p.finishesAt < now));
+  return news.concat(prevs.filter((p: any) => !p.schedule || p.finishesAt < now));
 }

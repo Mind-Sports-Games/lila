@@ -1,6 +1,7 @@
 {
     "extends": "../../tsconfig.base.json",
     "compilerOptions": {
-        "isolatedModules": false
+        "isolatedModules": false,
+        "lib": ["DOM"]
     }
 }

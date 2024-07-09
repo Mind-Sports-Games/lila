@@ -871,6 +871,9 @@ importers:
         specifier: ^3.0.1
         version: 3.5.1
     devDependencies:
+      '@types/dragscroll':
+        specifier: ^0.0.3
+        version: 0.0.3
       '@types/playstrategy':
         specifier: workspace:*
         version: link:../@types/playstrategy
@@ -1687,6 +1690,9 @@ packages:
 
   '@types/debounce-promise@3.1.9':
     resolution: {integrity: sha512-awNxydYSU+E2vL7EiOAMtiSOfL5gUM5X4YSE2A92qpxDJQ/rXz6oMPYBFDcDywlUmvIDI6zsqgq17cGm5CITQw==}
+
+  '@types/dragscroll@0.0.3':
+    resolution: {integrity: sha512-Nti+uvpcVv2VAkqF1+XJivEdE1rxdvWmE4mtMydm9kYBaT0/QsvQSjzqA2G0SE62RoTjVmhC48ap8yfApl8YJw==}
 
   '@types/fnando__sparkline@0.3.7':
     resolution: {integrity: sha512-irYrS2clNGbnKBBIBAulPH6hDZ/HlBkNsDbYPfO8B2obcxtC9UzKFS5IBSzrUtfKbwf8U01xHj+5iEJ7TtY04Q==}
@@ -4734,6 +4740,8 @@ snapshots:
       moment: 2.30.1
 
   '@types/debounce-promise@3.1.9': {}
+
+  '@types/dragscroll@0.0.3': {}
 
   '@types/fnando__sparkline@0.3.7': {}
 

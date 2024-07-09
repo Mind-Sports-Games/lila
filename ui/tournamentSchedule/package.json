@@ -13,6 +13,7 @@
   "license": "AGPL-3.0-or-later",
   "devDependencies": {
     "@types/playstrategy": "workspace:*",
+    "@types/dragscroll": "^0.0.3",
     "typescript": "^5.4.3"
   },
   "dependencies": {
