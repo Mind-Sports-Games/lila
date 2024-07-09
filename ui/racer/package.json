@@ -16,11 +16,11 @@
     "typescript": "^5.4.3"
   },
   "dependencies": {
-    "chessground": "git+ssh://git@github.com:Mind-Sports-Games/chessground.git#v7.11.1-pstrat2.48",
     "common": "workspace:*",
-    "puz": "workspace:*",
-    "snabbdom": "^3.0.1",
-    "stratops": "git+ssh://git@github.com:Mind-Sports-Games/stratops.git#semver:v0.8.1-pstrat4.4"
+    "puz": "workspace:*",    
+    "chessground": "git+ssh://git@github.com:Mind-Sports-Games/chessground.git#v7.11.1-pstrat2.48",
+    "stratops": "git+ssh://git@github.com:Mind-Sports-Games/stratops.git#semver:v0.8.1-pstrat4.4",
+    "snabbdom": "^3.0.1"
   },
   "scripts": {
     "compile": "tsc",

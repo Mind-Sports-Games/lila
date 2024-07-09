@@ -12,13 +12,13 @@
     "typescript": "^5.4.3"
   },
   "dependencies": {
-    "@fnando/sparkline": "^0.3.10",
-    "@yaireo/tagify": "4.6.0",
     "chat": "workspace:*",
     "common": "workspace:*",
     "draughtsground": "workspace:*",
     "stratutils": "workspace:*",
     "chessground": "git+ssh://git@github.com:Mind-Sports-Games/chessground.git#v7.11.1-pstrat2.48",
+    "@fnando/sparkline": "^0.3.10",
+    "@yaireo/tagify": "4.6.0",
     "prop-types": "^15.7.2", 
     "debounce-promise": "^3.1.2",
     "flatpickr": "^4.6.9",

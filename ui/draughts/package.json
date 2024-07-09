@@ -15,7 +15,6 @@
     "draughtsground": "workspace:*",
     "typescript": "^5.4.3"
   },
-  "dependencies": {},
   "scripts": {
     "compile": "tsc",
     "dev": "tsc",

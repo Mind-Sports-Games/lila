@@ -5,11 +5,9 @@
   "description": "playstrategy.org type declarations",
   "author": "Thibault Duplessis",
   "license": "AGPL-3.0-or-later",
-  "devDependencies": {
-    "@types/cash": "workspace:*",
-    "@types/node": "20.12.2"
-  },
   "dependencies": {
+    "@types/cash": "workspace:*",
+    "@types/node": "20.12.2",    
     "@types/highcharts": "4.2.57"
   }
 }

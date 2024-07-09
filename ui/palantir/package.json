@@ -15,11 +15,11 @@
   "license": "AGPL-3.0-or-later",
   "devDependencies": {
     "@types/playstrategy": "workspace:*",
-    "typescript": "^4",
-    "types-serviceworker": "^0.0.1"
+    "typescript": "^5.4.3",
+    "types-serviceworker": "^0.0.1",
+    "@types/webrtc": "^0.0.26"
   },
   "dependencies": {
-    "@types/webrtc": "^0.0.26",
     "common": "workspace:*",
     "peerjs": "^1.5.4",
     "snabbdom": "3.5.1"

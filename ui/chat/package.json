@@ -9,10 +9,10 @@
   "author": "Thibault Duplessis",
   "license": "AGPL-3.0-or-later",
   "dependencies": {
-    "snabbdom": "^3.0.1",
     "@types/playstrategy": "workspace:*",
     "common": "workspace:*",
     "palantir": "workspace:*",
+    "snabbdom": "^3.0.1",
     "typescript": "^5.4.3"
   },
   "scripts": {

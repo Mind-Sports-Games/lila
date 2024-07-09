@@ -16,15 +16,15 @@
     "typescript": "^5.4.3"
   },
   "dependencies": {
-    "ab": "https://github.com/lichess-org/ab-stub",
     "chat": "workspace:*",
-    "chessground": "git+ssh://git@github.com:Mind-Sports-Games/chessground.git#v7.11.1-pstrat2.48",
     "common": "workspace:*",
     "draughtsground": "workspace:*",
     "game": "workspace:*",
     "nvui": "workspace:*",
-    "snabbdom": "^3.0.1",
-    "stratutils": "workspace:*"
+    "stratutils": "workspace:*",
+    "chessground": "git+ssh://git@github.com:Mind-Sports-Games/chessground.git#v7.11.1-pstrat2.48",
+    "ab": "https://github.com/lichess-org/ab-stub",
+    "snabbdom": "^3.0.1"
   },
   "scripts": {
     "compile": "tsc",
