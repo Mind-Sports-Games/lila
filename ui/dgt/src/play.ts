@@ -53,7 +53,7 @@ export default function (token: string) {
       console.warn('JSON Object for Speech Keywords seems incomplete. Using English default.');
     }
   } catch (error) {
-    console.error('Invalid JSON Object for Speech Keywords. Using English default. ' + Error(error).message);
+    console.error('Invalid JSON Object for Speech Keywords. Using English default. ' + error);
   }
 
   //PlayStrategy Integration with Board API
@@ -255,7 +255,7 @@ export default function (token: string) {
                 connectToGameStream(data.game.id);
               } catch (error) {
                 //This will trigger if connectToGameStream fails
-                console.error('connectToEventStream - Failed to connect to game stream. ' + Error(error).message);
+                console.error('connectToEventStream - Failed to connect to game stream. ' + error);
               }
             } else if (data.type == 'challenge') {
               //Challenge received
@@ -267,7 +267,7 @@ export default function (token: string) {
               console.warn('connectToEventStream - ' + data.error);
             }
           } catch (error) {
-            console.error('connectToEventStream - Unable to parse JSON or Unexpected error. ' + Error(error).message);
+            console.error('connectToEventStream - Unable to parse JSON or Unexpected error. ' + error);
           }
         } else {
           //Signal that some empty message arrived. This is normal to keep the connection alive.
@@ -379,7 +379,7 @@ export default function (token: string) {
               console.log('connectToGameStream - ' + data.error);
             }
           } catch (error) {
-            console.error('connectToGameStream - No valid game data or Unexpected error. ' + Error(error).message);
+            console.error('connectToGameStream - No valid game data or Unexpected error. ' + error);
           }
         } else {
           //Signal that some empty message arrived
@@ -545,7 +545,7 @@ export default function (token: string) {
       if (verbose) console.log(board(chess.board));
       if (verbose) console.log(chess.turn + "'s turn");
     } catch (error) {
-      console.error(`initializeChessBoard - Error: ${error.message}`);
+      console.error(`initializeChessBoard - Error: ${error}`);
     }
   }
 
@@ -598,7 +598,7 @@ export default function (token: string) {
         if (verbose) console.log(chess.turn + "'s turn");
       }
     } catch (error) {
-      console.error(`updateChessBoard - Error: ${error.message}`);
+      console.error(`updateChessBoard - Error: ${error}`);
     }
   }
 
@@ -1142,7 +1142,7 @@ export default function (token: string) {
       try {
         extendedSanMove = extendedSanMove.replace(keywordsBase[i], ' ' + keywords[keywordsBase[i]].toLowerCase() + ' ');
       } catch (error) {
-        console.error(`raplaceKeywords - Error replacing keyword. ${keywordsBase[i]} . ${Error(error).message}`);
+        console.error(`raplaceKeywords - Error replacing keyword. ${keywordsBase[i]} . ${error}`);
       }
     }
     return extendedSanMove;
@@ -1220,7 +1220,7 @@ export default function (token: string) {
         }
       }
     } catch (err) {
-      console.warn('compareMoves - ' + Error(err).message);
+      console.warn('compareMoves - ' + err);
     }
     return false;
   }
