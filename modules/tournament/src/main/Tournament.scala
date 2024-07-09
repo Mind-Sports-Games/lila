@@ -306,6 +306,7 @@ object Tournament {
       position = sched.position,
       mode = Mode.Rated,
       conditions = sched.conditions,
+      statusScoring = sched.statusScoring,
       schedule = Some(sched),
       startsAt = sched.at plusSeconds ThreadLocalRandom.nextInt(60),
       description = sched.medleyShield.map(_.arenaDescriptionFull),
