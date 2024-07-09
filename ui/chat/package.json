@@ -12,8 +12,8 @@
     "snabbdom": "^3.0.1",
     "@types/playstrategy": "workspace:*",
     "common": "workspace:*",
-    "palantir": "workspace:*",    
-    "typescript": "4.1.3"
+    "palantir": "workspace:*",
+    "typescript": "^5.4.3"
   },
   "scripts": {
     "compile": "tsc",

@@ -13,7 +13,7 @@
   "license": "AGPL-3.0-or-later",
   "devDependencies": {
     "@types/playstrategy": "workspace:*",
-    "typescript": "4.1.3"
+    "typescript": "^5.4.3"
   },
   "dependencies": {
     "chat": "workspace:*",

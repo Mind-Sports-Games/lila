@@ -31,8 +31,8 @@
   },
   "dependencies": {
     "@types/cash": "workspace:*",
+    "@types/playstrategy": "workspace:*",
     "@types/node": "20.12.2",
-    "@types/playstrategy": "workspace:*",    
     "@types/web": "^0.0.142",
     "@typescript-eslint/eslint-plugin": "^7.2.0",
     "@typescript-eslint/parser": "^7.2.0",
@@ -41,7 +41,7 @@
     "lint-staged": "^15.2.2",
     "onchange": "^7.1.0",
     "prettier": "3.0.2",
-    "typescript": "^5.4.2",
+    "typescript": "^5.4.3",
     "xml2js": "0.4.19"
   },
   "scripts": {

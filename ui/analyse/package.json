@@ -18,23 +18,23 @@
     "@types/playstrategy": "workspace:*",
     "@types/node": "20.12.2",
     "@types/yaireo__tagify": "^4.0.1",
-    "typescript": "4.1.3"
+    "typescript": "^5.4.2"
   },
   "dependencies": {
-    "@badrap/result": "0.2.8",
-    "@yaireo/tagify": "4.6.0",
-    "prop-types": "^15.7.2", 
     "ceval": "workspace:*",
-    "chat": "workspace:*",
-    "chessground": "git+ssh://git@github.com:Mind-Sports-Games/chessground.git#semver:v7.11.1-pstrat2.48",
+    "chat": "workspace:*",    
     "common": "workspace:*",
     "draughtsground": "workspace:*",
     "game": "workspace:*",
     "nvui": "workspace:*",
-    "snabbdom": "^3.0.1",
-    "stratops": "git+ssh://git@github.com:Mind-Sports-Games/stratops.git#semver:v0.8.1-pstrat4.4",
     "stratutils": "workspace:*",
-    "tree": "workspace:*"
+    "tree": "workspace:*",
+    "chessground": "git+ssh://git@github.com:Mind-Sports-Games/chessground.git#semver:v7.11.1-pstrat2.48",
+    "stratops": "git+ssh://git@github.com:Mind-Sports-Games/stratops.git#semver:v0.8.1-pstrat4.4",
+    "@badrap/result": "0.2.8",
+    "@yaireo/tagify": "4.6.0",
+    "prop-types": "^15.7.2", 
+    "snabbdom": "^3.0.1"
   },
   "scripts": {
     "compile": "tsc",

@@ -13,7 +13,7 @@
     "eslint": "^7",
     "prettier": "^2",
     "tslib": "^2",
-    "typescript": "4.1.3"
+    "typescript": "^5.4.3"
   },
   "scripts": {
     "prepare": "tsc",

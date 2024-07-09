@@ -8,7 +8,7 @@
   "devDependencies": {
     "@types/playstrategy": "workspace:*",
     "common": "workspace:*",
-    "typescript": "4.1.3"
+    "typescript": "^5.4.3"
   },
   "scripts": {
     "compile": "tsc",
