@@ -90,6 +90,7 @@ final class TournamentApi(
       position = setup.realPosition,
       berserkable = setup.berserkable | true,
       streakable = setup.streakable | true,
+      statusScoring = setup.statusScoring | false,
       teamBattle = setup.teamBattleByTeam map TeamBattle.init,
       description = setup.description,
       hasChat = setup.hasChat | true
@@ -659,7 +660,7 @@ final class TournamentApi(
             .flatMap { trophyList =>
               trophyList.headOption ?? { trophy =>
                 trophyApi.removeTrophiesByUrl(Tournament.tournamentUrl(tour.id)) >>
-                awardTrophies(tour, trophy.date)
+                  awardTrophies(tour, trophy.date)
               } >>- callbacks.clearTrophyCache(tour)
             }
         } >>-

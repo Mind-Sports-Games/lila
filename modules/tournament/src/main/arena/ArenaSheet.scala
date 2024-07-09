@@ -2,6 +2,16 @@ package lila.tournament
 package arena
 
 import org.joda.time.DateTime
+import strategygames.Status.{
+  BackgammonWin,
+  GammonWin,
+  GinBackgammon,
+  GinGammon,
+  OutoftimeBackgammon,
+  OutoftimeGammon,
+  ResignBackgammon,
+  ResignGammon
+}
 
 case class Sheet(scores: List[Sheet.Score]) {
   val total  = scores.foldLeft(0)(_ + _.value)
@@ -17,6 +27,11 @@ object Sheet {
   sealed trait Streakable
   case object Streaks   extends Streakable
   case object NoStreaks extends Streakable
+
+  sealed trait StatusScore
+  case object SSBackgammon extends StatusScore
+  case object SSGammon     extends StatusScore
+  case object SSNormal     extends StatusScore
 
   sealed abstract class Flag(val id: Int)
   case object Double        extends Flag(3)
@@ -38,7 +53,8 @@ object Sheet {
   case class Score(
       res: Result,
       flag: Flag,
-      berserk: Berserk
+      berserk: Berserk,
+      statusScoring: StatusScore
   ) {
 
     def isBerserk = berserk != NoBerserk
@@ -61,12 +77,24 @@ object Sheet {
       case _                 => 0
     }) + {
       if (res == ResWin && berserk == ValidBerserk) 1 else 0
+    } + {
+      statusScoring match {
+        case SSBackgammon => 2
+        case SSGammon     => 1
+        case SSNormal     => 0
+      }
     }
   }
 
   val emptySheet = Sheet(Nil)
 
-  def apply(userId: String, pairings: Pairings, version: Version, streakable: Streakable): Sheet =
+  def apply(
+      userId: String,
+      pairings: Pairings,
+      version: Version,
+      streakable: Streakable,
+      statusScoring: Boolean
+  ): Sheet =
     Sheet {
       val streaks = streakable == Streaks
       val nexts   = (pairings drop 1 map some) :+ None
@@ -74,15 +102,22 @@ object Sheet {
         val berserk = if (p berserkOf userId) {
           if (p.notSoQuickFinish) ValidBerserk else InvalidBerserk
         } else NoBerserk
+        val statusScoreWin = (statusScoring, p.status) match {
+          case (true, BackgammonWin | ResignBackgammon | GinBackgammon | OutoftimeBackgammon) =>
+            SSBackgammon
+          case (true, GammonWin | ResignGammon | GinGammon | OutoftimeGammon) => SSGammon
+          case _                                                              => SSNormal
+        }
         (p.winner match {
-          case None if p.quickDraw => Score(ResDQ, Normal, berserk)
+          case None if p.quickDraw => Score(ResDQ, Normal, berserk, SSNormal)
           case None =>
             Score(
               ResDraw,
               if (streaks && isOnFire(scores)) Double
               else if (version != V1 && !p.longGame && isDrawStreak(scores)) Null
               else Normal,
-              berserk
+              berserk,
+              SSNormal
             )
           case Some(w) if userId == w =>
             Score(
@@ -96,9 +131,10 @@ object Sheet {
                   case Some(s) if s.winner.contains(userId) => StreakStarter
                   case _                                    => Normal
                 },
-              berserk
+              berserk,
+              statusScoreWin
             )
-          case _ => Score(ResLoss, Normal, berserk)
+          case _ => Score(ResLoss, Normal, berserk, SSNormal)
         }) :: scores
       }
     }
