@@ -1,5 +1,4 @@
 packages:
   - 'ui'
   - 'ui/*'
-  - 'ui/@build/*'
   - 'ui/@types/*'
