@@ -30,7 +30,10 @@ object Query {
 
   val mate: Bdoc = status(Status.Mate)
 
-  def draw(u: String): Bdoc = user(u) ++ finished ++ F.winnerId.$exists(false)
+  def draw(u: String): Bdoc =
+    user(u) ++ F.winnerId.$exists(false) ++ $doc(
+      F.status $in Status.finishedWithPossibleDraw.map(_.id)
+    )
 
   val finished: Bdoc = F.status $gte Status.Mate.id
 
