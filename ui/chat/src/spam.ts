@@ -40,7 +40,7 @@ const spamRegex = new RegExp(
     'tiny.cc/',
   ]
     .map(url => url.replace(/\./g, '\\.').replace(/\//g, '\\/'))
-    .join('|')
+    .join('|'),
 );
 
 const suspLink = (txt: string) => !!txt.match(spamRegex);

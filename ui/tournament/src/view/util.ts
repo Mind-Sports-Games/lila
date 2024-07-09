@@ -8,7 +8,7 @@ export function bind(eventName: string, f: (e: Event) => any, redraw?: () => voi
       const res = f(e);
       if (redraw) redraw();
       return res;
-    })
+    }),
   );
 }
 
@@ -47,7 +47,7 @@ export function player(p, asLink: boolean, withRating: boolean, withFlag: boolea
         destroy: vnode => $.powerTip.destroy(vnode.elm as HTMLElement),
       },
     },
-    [h('div.player-info', playerInfo(p, withRating, withFlag, defender, leader))]
+    [h('div.player-info', playerInfo(p, withRating, withFlag, defender, leader))],
   );
 }
 
@@ -60,13 +60,13 @@ export function playerInfo(p, withRating: boolean, withFlag: boolean, defender =
             attrs: {
               src: playstrategy.assetUrl('images/flags/' + p.country + '.png'),
             },
-          })
+          }),
         )
       : null,
     h(
       'span.name' + (defender ? '.defender' : leader ? '.leader' : ''),
       defender ? { attrs: dataIcon('5') } : leader ? { attrs: dataIcon('8') } : {},
-      playerName(p)
+      playerName(p),
     ),
     withRating
       ? h('span.rating' + (p.inputRating ? '.unused' : ''), ' ' + p.rating + (p.provisional ? '?' : ''))
@@ -86,7 +86,7 @@ export function numberRow(name: string, value: any, typ?: string) {
         ? value[1] > 0
           ? ratio2percent(value[0] / value[1])
           : 0
-        : numberFormat(value)
+        : numberFormat(value),
     ),
   ]);
 }
@@ -109,7 +109,7 @@ export function medleyVariantsHoriz(ctrl: TournamentController) {
         attrs: { 'data-icon': 5 },
         hook: bind('click', _ => ctrl.showMedleyVariants(!ctrl.showingMedleyVariants), ctrl.redraw),
       },
-      ''
+      '',
     ),
     h(
       'div.medley-variants-wide',
@@ -120,9 +120,9 @@ export function medleyVariantsHoriz(ctrl: TournamentController) {
           ctrl.data.medleyRound,
           ctrl.data.isFinished,
           ctrl.data.medleyBalanceIntervals,
-          ctrl.data.medleyIntervalSeconds
-        )
-      )
+          ctrl.data.medleyIntervalSeconds,
+        ),
+      ),
     ),
   ]);
 }
@@ -132,7 +132,7 @@ export function medleyVariantListItems(
   medleyRound: number,
   displayCompleted: boolean,
   showIntervalTimes: boolean,
-  IntervalSeconds: number[]
+  IntervalSeconds: number[],
 ) {
   const variantsH = [] as (string | VNode)[];
   variants.forEach((v, index) => {
@@ -152,11 +152,11 @@ export function medleyVariantListItems(
                 },
                 h(
                   'span.medley-variant-name',
-                  v.name + (showIntervalTimes ? ` (${Math.floor(IntervalSeconds[index] / 60)})` : '')
-                )
-              )
-            )
-          )
+                  v.name + (showIntervalTimes ? ` (${Math.floor(IntervalSeconds[index] / 60)})` : ''),
+                ),
+              ),
+            ),
+          ),
         )
       : null;
   });
@@ -175,7 +175,7 @@ export function medleyVariantsList(ctrl: TournamentController, withClose: boolea
       'h1',
       ctrl.data.medleyBalanceIntervals
         ? 'Medley Variants: Balanced Intervals (minutes)'
-        : ctrl.trans('medleyVariantsXMinutesEach', ctrl.data.medleyMinutes)
+        : ctrl.trans('medleyVariantsXMinutesEach', ctrl.data.medleyMinutes),
     ),
     h(
       'div.medley-variants-list',
@@ -184,8 +184,8 @@ export function medleyVariantsList(ctrl: TournamentController, withClose: boolea
         ctrl.data.medleyRound,
         true,
         ctrl.data.medleyBalanceIntervals,
-        ctrl.data.medleyIntervalSeconds
-      )
+        ctrl.data.medleyIntervalSeconds,
+      ),
     ),
   ]);
 }

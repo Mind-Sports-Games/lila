@@ -64,7 +64,7 @@ export function make(root: AnalyseCtrl, playerIndex: PlayerIndex): RetroCtrl {
     const playerIndexModulo = playerIndex == 'p1' ? 1 : 0;
     candidateNodes = evalSwings(
       root.mainline,
-      n => n.ply % 2 === playerIndexModulo && !explorerCancelPlies.includes(n.ply)
+      n => n.ply % 2 === playerIndexModulo && !explorerCancelPlies.includes(n.ply),
     );
     return candidateNodes.find(n => !isPlySolved(n.ply));
   }

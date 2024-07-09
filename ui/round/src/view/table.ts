@@ -89,7 +89,7 @@ export const renderTablePlay = (ctrl: RoundController) => {
         {
           class: { confirm: !!(ctrl.drawConfirm || ctrl.resignConfirm || ctrl.passConfirm) },
         },
-        icons
+        icons,
       ),
     ]),
   ];
@@ -105,9 +105,9 @@ function whosTurn(ctrl: RoundController, playerIndex: PlayerIndex, position: Pos
           d.player.spectator
             ? ctrl.trans(
                 'playerIndexPlays',
-                d.game.player === d.player.playerIndex ? d.player.playerName : d.opponent.playerName
+                d.game.player === d.player.playerIndex ? d.player.playerName : d.opponent.playerName,
               )
-            : ctrl.trans(d.game.player === d.player.playerIndex ? 'yourTurn' : 'waitingForOpponent')
+            : ctrl.trans(d.game.player === d.player.playerIndex ? 'yourTurn' : 'waitingForOpponent'),
         )
       : null,
   ]);

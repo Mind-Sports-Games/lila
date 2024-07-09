@@ -39,7 +39,7 @@ function playerTr(ctrl: TournamentController, player) {
                 title: ctrl.trans.noarg('pause'),
               },
             })
-          : player.rank
+          : player.rank,
       ),
       h('td.player', [
         renderPlayer(player, false, !ctrl.data.medley, true, userId === ctrl.data.defender),
@@ -51,7 +51,7 @@ function playerTr(ctrl: TournamentController, player) {
           ? h('strong.is-gold', { attrs: dataIcon('Q') }, player.sheet.total)
           : h('strong', player.sheet.total),
       ]),
-    ]
+    ],
   );
 }
 
@@ -61,7 +61,7 @@ function podiumUsername(p) {
     {
       attrs: { href: '/@/' + p.name },
     },
-    playerName(p)
+    playerName(p),
   );
 }
 
@@ -88,7 +88,7 @@ function podiumTrophy(img: string): VNode {
       'div',
       h('img.customTrophy', {
         attrs: { src: playstrategy.assetUrl('images/trophy/' + img + '.png') },
-      })
+      }),
     );
   } else return h('div.trophy');
 }
@@ -172,8 +172,8 @@ export function standing(ctrl: TournamentController, pag, klass?: string): VNode
             },
           },
         },
-        tableBody
+        tableBody,
       ),
-    ]
+    ],
   );
 }

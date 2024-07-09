@@ -3,6 +3,9 @@
   "version": "2.0.0",
   "private": true,
   "description": "playstrategy.org webrtc media calls",
+  "type": "module",
+  "module": "dist/main.js",
+  "types": "dist/main.d.ts",
   "keywords": [
     "chess",
     "playstrategy",
@@ -11,14 +14,24 @@
   "author": "Thibault Duplessis",
   "license": "AGPL-3.0-or-later",
   "devDependencies": {
-    "@build/rollupProject": "2.0.0",
-    "@types/playstrategy": "2.0.0"
+    "@types/playstrategy": "workspace:*",
+    "typescript": "^4",
+    "types-serviceworker": "^0.0.1"
   },
   "dependencies": {
-    "@types/webrtc": "^0.0.26"
+    "@types/webrtc": "^0.0.26",
+    "common": "workspace:*",
+    "peerjs": "^1.5.4",
+    "snabbdom": "3.5.1"
   },
   "scripts": {
-    "dev": "rollup --config",
-    "prod": "rollup --config --config-prod"
+    "compile": "tsc",
+    "dev": "tsc",
+    "prod": "tsc"
+  },
+  "playstrategy": {
+    "bundles": {
+      "src/main.ts": "palantir"
+    }
   }
 }

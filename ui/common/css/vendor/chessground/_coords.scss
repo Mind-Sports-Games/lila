@@ -93,7 +93,9 @@ coords {
 
   //Handle togy corrds as they are always inside the board
   .variant-togyzkumalak & {
-    text-shadow: 0.5px -1px 0px rgba(0, 0, 0, 0.25), -0.5px 1px 0px rgba(255, 255, 255, 0.6);
+    text-shadow:
+      0.5px -1px 0px rgba(0, 0, 0, 0.25),
+      -0.5px 1px 0px rgba(255, 255, 255, 0.6);
     .togyzkumalak-wood & coord {
       color: #000000 !important;
     }
@@ -130,7 +132,9 @@ coords {
 
   .variant-nackgammon &,
   .variant-backgammon & {
-    text-shadow: 0.5px -1px 0px rgba(0, 0, 0, 0.25), -0.5px 1px 0px rgba(255, 255, 255, 0.6);
+    text-shadow:
+      0.5px -1px 0px rgba(0, 0, 0, 0.25),
+      -0.5px 1px 0px rgba(255, 255, 255, 0.6);
     .backgammon-classic & coord {
       color: #edc966 !important;
       padding-left: 0px;
@@ -377,7 +381,7 @@ coords {
   }
 
   @each $variant in $go-variants {
-    .coords-out .variant-#{$variant} &.ranks {
+    .coords-out .variant-#{$variant} .ranks {
       &.p1,
       &.p2 {
         top: -4px;

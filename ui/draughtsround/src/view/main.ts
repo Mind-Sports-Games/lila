@@ -66,12 +66,12 @@ export function main(ctrl: RoundController): VNode {
                   ? undefined
                   : util.bind('wheel', (e: WheelEvent) => wheel(ctrl, e), undefined, false),
             },
-            [renderGround(ctrl)]
+            [renderGround(ctrl)],
           ),
           renderMaterial(material[topPlayerIndex], -score, 'top'),
           ...renderTable(ctrl),
           renderMaterial(material[bottomPlayerIndex], score, 'bottom'),
           ctrl.keyboardMove ? keyboardMove(ctrl.keyboardMove) : null,
-        ]
+        ],
       );
 }

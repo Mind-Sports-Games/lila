@@ -27,7 +27,7 @@ export default rollupProject({
           // highcharts
           {
             src: ['highcharts/highcharts.js', 'highcharts/highcharts-more.js', 'highcharts/highstock.js'].map(
-              require.resolve
+              require.resolve,
             ),
             dest: '../../public/vendor/highcharts-4.2.5',
           },
@@ -39,7 +39,7 @@ export default rollupProject({
           // stockfish.js
           {
             src: ['stockfish.js/stockfish.js', 'stockfish.js/stockfish.wasm', 'stockfish.js/stockfish.wasm.js'].map(
-              require.resolve
+              require.resolve,
             ),
             dest: '../../public/vendor/stockfish.js',
           },

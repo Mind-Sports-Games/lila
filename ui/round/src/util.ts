@@ -80,7 +80,7 @@ export const bind = (eventName: string, f: (e: Event) => void, redraw?: Redraw, 
         f(e);
         redraw && redraw();
       },
-      { passive }
+      { passive },
     );
   });
 
@@ -100,7 +100,7 @@ export function parsePossibleMoves(dests?: EncodedDests, activeDiceValue?: numbe
     dec.forEach((value: cg.Key[], key: cg.Key) => {
       const newOrder = value.sort(
         (a, b) =>
-          Math.abs(backgammonPosDiff(key, a) - activeDiceValue) - Math.abs(backgammonPosDiff(key, b) - activeDiceValue)
+          Math.abs(backgammonPosDiff(key, a) - activeDiceValue) - Math.abs(backgammonPosDiff(key, b) - activeDiceValue),
       );
       sorted.set(key, newOrder);
     });
@@ -238,7 +238,7 @@ export const spinner = () =>
           attrs: { cx: 20, cy: 20, r: 18, fill: 'none' },
         }),
       ]),
-    ]
+    ],
   );
 
 const noAnalysisBoardVariants: VariantKey[] = ['monster', 'amazons', 'backgammon', 'nackgammon'];

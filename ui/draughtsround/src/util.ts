@@ -34,7 +34,7 @@ export const bind = (eventName: string, f: (e: Event) => void, redraw?: Redraw, 
         f(e);
         redraw && redraw();
       },
-      { passive }
+      { passive },
     );
   });
 
@@ -85,7 +85,7 @@ export function spinner() {
           attrs: { cx: 20, cy: 20, r: 18, fill: 'none' },
         }),
       ]),
-    ]
+    ],
   );
 }
 

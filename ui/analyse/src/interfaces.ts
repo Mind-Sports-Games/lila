@@ -9,6 +9,7 @@ import { ChatCtrl } from 'chat';
 import { ExplorerOpts } from './explorer/interfaces';
 import { StudyData } from './study/interfaces';
 import { AnalyseSocketSend } from './socket';
+import * as Prefs from 'common/prefs';
 
 export type MaybeVNode = VNode | string | null | undefined;
 export type MaybeVNodes = MaybeVNode[];

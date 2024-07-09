@@ -21,7 +21,7 @@ export const join = throttle(1000, (ctrl: TournamentController, password?: strin
           if (t.startsWith('<!DOCTYPE html>')) playstrategy.reload();
           else alert(t);
         });
-    })
+    }),
 );
 
 export const withdraw = throttle(1000, (ctrl: TournamentController) =>
@@ -29,14 +29,14 @@ export const withdraw = throttle(1000, (ctrl: TournamentController) =>
     .text('/tournament/' + ctrl.data.id + '/withdraw', {
       method: 'POST',
     })
-    .catch(onFail)
+    .catch(onFail),
 );
 
 export const loadPage = throttle(1000, (ctrl: TournamentController, p: number) =>
   xhr.json(`/tournament/${ctrl.data.id}/standing/${p}`).then(data => {
     ctrl.loadPage(data);
     ctrl.redraw();
-  }, onFail)
+  }, onFail),
 );
 
 export const loadPageOf = (ctrl: TournamentController, userId: string) =>
@@ -49,7 +49,7 @@ export const reloadNow = (ctrl: TournamentController) =>
         page: ctrl.focusOnMe ? undefined : ctrl.page,
         playerInfo: ctrl.playerInfo.id,
         partial: true,
-      })
+      }),
     )
     .then(data => {
       ctrl.reload(data);

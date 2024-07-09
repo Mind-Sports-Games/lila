@@ -16,7 +16,7 @@ export default function () {
     $('#topnav > section > a').removeAttr('href');
 
   $('#topnav-toggle').on('change', e =>
-    document.body.classList.toggle('masked', (e.target as HTMLInputElement).checked)
+    document.body.classList.toggle('masked', (e.target as HTMLInputElement).checked),
   );
 
   $('#top').on('click', 'a.toggle', function (this: HTMLElement) {
@@ -57,7 +57,7 @@ export default function () {
             pulse() {
               $toggle.addClass('pulse');
             },
-          }))
+          })),
       );
     };
     pubsub.on('socket.in.challenges', data => {
@@ -96,7 +96,7 @@ export default function () {
             pulse() {
               $toggle.addClass('pulse');
             },
-          }))
+          })),
       );
     };
 
@@ -144,7 +144,7 @@ export default function () {
       booted = true;
       loadModule('cli').then(
         () => window.PlayStrategyCli.app($input[0]),
-        () => (booted = false)
+        () => (booted = false),
       );
     };
     $input.on({

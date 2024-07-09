@@ -29,10 +29,10 @@ export default function (opts: Opts): void {
             tour: opts.tour,
             swiss: opts.swiss,
             object: 1,
-          })
+          }),
         )
         .then(r => ({ term, ...r })),
-    150
+    150,
   );
 
   complete<Result>({

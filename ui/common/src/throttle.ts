@@ -2,7 +2,7 @@
 // Any extra calls are dropped, except the last one.
 export default function throttle<T extends (...args: any) => void>(
   delay: number,
-  callback: T
+  callback: T,
 ): (...args: Parameters<T>) => void {
   let timeout: Timeout | undefined;
   let lastExec = 0;

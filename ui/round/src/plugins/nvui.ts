@@ -67,7 +67,7 @@ playstrategy.RoundNVUI = function (redraw: Redraw) {
             animation: { enabled: false },
             drawable: { enabled: false },
             coordinates: false,
-          })
+          }),
         );
         if (variantNope) setTimeout(() => notify.set(variantNope), 3000);
       }
@@ -80,7 +80,7 @@ playstrategy.RoundNVUI = function (redraw: Redraw) {
           h('h1', gameText(ctrl)),
           h('h2', 'Game info'),
           ...['p1', 'p2'].map((playerIndex: PlayerIndex) =>
-            h('p', [playerIndex + ' player: ', playerHtml(ctrl, ctrl.playerByPlayerIndex(playerIndex))])
+            h('p', [playerIndex + ' player: ', playerHtml(ctrl, ctrl.playerByPlayerIndex(playerIndex))]),
           ),
           h('p', `${d.game.rated ? 'Rated' : 'Casual'} ${d.game.perf}`),
           d.clock ? h('p', `Clock: ${d.clock.initial / 60} + ${d.clock.increment}`) : null,
@@ -93,7 +93,7 @@ playstrategy.RoundNVUI = function (redraw: Redraw) {
                 'aria-live': 'off',
               },
             },
-            renderMoves(d.steps.slice(1), style)
+            renderMoves(d.steps.slice(1), style),
           ),
           h('h2', 'Pieces'),
           h('div.pieces', renderPieces(ctrl.chessground.state.pieces, style)),
@@ -107,7 +107,7 @@ playstrategy.RoundNVUI = function (redraw: Redraw) {
                 'aria-atomic': true,
               },
             },
-            [ctrl.data.game.status.name === 'started' ? 'Playing' : renderResult(ctrl)]
+            [ctrl.data.game.status.name === 'started' ? 'Playing' : renderResult(ctrl)],
           ),
           h('h2', 'Last move'),
           h(
@@ -118,7 +118,7 @@ playstrategy.RoundNVUI = function (redraw: Redraw) {
                 'aria-atomic': true,
               },
             },
-            renderSan(step.san, step.uci, style)
+            renderSan(step.san, step.uci, style),
           ),
           ...(ctrl.isPlaying()
             ? [
@@ -147,7 +147,7 @@ playstrategy.RoundNVUI = function (redraw: Redraw) {
                         },
                       }),
                     ]),
-                  ]
+                  ],
                 ),
               ]
             : []),
@@ -176,8 +176,8 @@ playstrategy.RoundNVUI = function (redraw: Redraw) {
                   lastCapturedCommandHandler(
                     () => ctrl.data.steps.map(step => step.fen),
                     pieceStyle.get(),
-                    prefixStyle.get()
-                  )
+                    prefixStyle.get(),
+                  ),
                 );
                 const $buttons = $board.find('button');
                 $buttons.on('click', selectionHandler(ctrl.data.opponent.playerIndex, selectSound));
@@ -187,8 +187,8 @@ playstrategy.RoundNVUI = function (redraw: Redraw) {
                   possibleMovesHandler(
                     ctrl.data.player.playerIndex,
                     ctrl.chessground.getFen,
-                    () => ctrl.chessground.state.pieces
-                  )
+                    () => ctrl.chessground.state.pieces,
+                  ),
                 );
                 $buttons.on('keypress', positionJumpHandler());
                 $buttons.on('keypress', pieceJumpingHandler(wrapSound, errorSound));
@@ -200,8 +200,8 @@ playstrategy.RoundNVUI = function (redraw: Redraw) {
               pieceStyle.get(),
               prefixStyle.get(),
               positionStyle.get(),
-              boardStyle.get()
-            )
+              boardStyle.get(),
+            ),
           ),
           h(
             'div.boardstatus',
@@ -211,7 +211,7 @@ playstrategy.RoundNVUI = function (redraw: Redraw) {
                 'aria-atomic': true,
               },
             },
-            ''
+            '',
           ),
           // h('p', takes(ctrl.data.steps.map(data => data.fen))),
           h('h2', 'Settings'),
@@ -275,7 +275,7 @@ playstrategy.RoundNVUI = function (redraw: Redraw) {
             h('br'),
             'Omission results in promotion to queen',
           ]),
-        ]
+        ],
       );
     },
   };
@@ -310,7 +310,7 @@ function onSubmit(ctrl: RoundController, notify: (txt: string) => void, style: (
           {
             u: uci + promotion,
           },
-          { ackable: true }
+          { ackable: true },
         );
       else notify(d.player.playerIndex === d.game.player ? `Invalid move: ${input}` : 'Not your turn');
     }
@@ -398,7 +398,7 @@ function playerHtml(ctrl: RoundController, player: game.Player) {
           {
             attrs: { href: '/@/' + user.username },
           },
-          user.title ? `${user.title} ${user.username}` : user.username
+          user.title ? `${user.title} ${user.username}` : user.username,
         ),
         rating ? ` ${rating}` : ``,
         ' ' + ratingDiff,

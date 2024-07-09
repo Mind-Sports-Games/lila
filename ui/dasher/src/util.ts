@@ -43,7 +43,7 @@ export function header(name: string, close: Close) {
       attrs: { 'data-icon': 'I' },
       hook: bind('click', close),
     },
-    name
+    name,
   );
 }
 

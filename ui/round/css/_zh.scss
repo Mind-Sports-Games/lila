@@ -74,7 +74,9 @@
 @each $color, $c in ('p1': w, 'p2': b) {
   @each $role, $r in (p-piece: P, n-piece: N, b-piece: B, r-piece: R, q-piece: Q) {
     body.cursor-#{$color}-#{$role}-chess * {
-      cursor: url(../piece/chess/cburnett/#{$c}#{$r}.svg) 22 22, auto !important;
+      cursor:
+        url(../piece/chess/cburnett/#{$c}#{$r}.svg) 22 22,
+        auto !important;
     }
   }
 }
@@ -93,6 +95,8 @@ $shogi-piece-drops-roles: (
 // shogi - all drops are ally pieces, i.e. white or '0'
 @each $role, $r in $shogi-piece-drops-roles {
   body.cursor-#{$role}-shogi * {
-    cursor: url(../piece/shogi/2kanji/0#{$r}.svg) 22 22, auto !important;
+    cursor:
+      url(../piece/shogi/2kanji/0#{$r}.svg) 22 22,
+      auto !important;
   }
 }

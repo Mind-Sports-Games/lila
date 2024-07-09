@@ -1,7 +1,9 @@
 {
   "extends": "../tsconfig.base.json",
-  "compilerOptions": {
-    "noImplicitAny": false,
-    "noImplicitReturns": false
-  }
+  "compilerOptions": { "noEmit": true },
+  "references": [
+    { "path": "../chat/tsconfig.json" },
+    { "path": "../common/tsconfig.json" },
+    { "path": "../game/tsconfig.json" }
+  ]
 }

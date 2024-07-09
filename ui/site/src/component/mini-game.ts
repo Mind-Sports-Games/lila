@@ -46,7 +46,7 @@ export const init = (node: HTMLElement) => {
             pending: parseInt(this.getAttribute('data-time-pending')!),
             pause: playerIndex != turnPlayerIndex,
           });
-        })
+        }),
       );
     } else {
       const [fen, orientation, lm] = node.getAttribute('data-state')!.split('|'),
@@ -106,7 +106,7 @@ export const init = (node: HTMLElement) => {
             pending: parseInt(this.getAttribute('data-time-pending')!),
             pause: playerIndex != turnPlayerIndex,
           });
-        })
+        }),
       );
     }
   }
@@ -143,7 +143,7 @@ export const update = (node: HTMLElement, data: UpdateData) => {
     time: number | undefined,
     delay: number | undefined,
     pending: number | undefined,
-    playerIndex: string
+    playerIndex: string,
   ) => {
     if (!isNaN(time!))
       $el.find('.mini-game__clock--' + playerIndex).clock('set', {

@@ -65,7 +65,7 @@ playstrategy.AnalyseNVUI = function (redraw: Redraw) {
           h('h1', 'Textual representation'),
           h('h2', 'Game info'),
           ...['p1', 'p2'].map((playerIndex: PlayerIndex) =>
-            h('p', [playerIndex + ' player: ', renderPlayer(ctrl, playerByPlayerIndex(d, playerIndex))])
+            h('p', [playerIndex + ' player: ', renderPlayer(ctrl, playerByPlayerIndex(d, playerIndex))]),
           ),
           h('p', `${d.game.rated ? 'Rated' : 'Casual'} ${d.game.perf}`),
           d.clock ? h('p', `Clock: ${d.clock.initial / 60} + ${d.clock.increment}`) : null,
@@ -78,7 +78,7 @@ playstrategy.AnalyseNVUI = function (redraw: Redraw) {
                 'aria-live': 'off',
               },
             },
-            renderMainline(ctrl.mainline, ctrl.path, style)
+            renderMainline(ctrl.mainline, ctrl.path, style),
           ),
           h('h2', 'Pieces'),
           h('div.pieces', renderPieces(ctrl.chessground.state.pieces, style)),
@@ -91,7 +91,7 @@ playstrategy.AnalyseNVUI = function (redraw: Redraw) {
                 'aria-atomic': true,
               },
             },
-            renderCurrentNode(ctrl.node, style)
+            renderCurrentNode(ctrl.node, style),
           ),
           h('h2', 'Move form'),
           h(
@@ -118,7 +118,7 @@ playstrategy.AnalyseNVUI = function (redraw: Redraw) {
                   },
                 }),
               ]),
-            ]
+            ],
           ),
           notify.render(),
           // h('h2', 'Actions'),
@@ -147,8 +147,8 @@ playstrategy.AnalyseNVUI = function (redraw: Redraw) {
               pieceStyle.get(),
               prefixStyle.get(),
               positionStyle.get(),
-              boardStyle.get()
-            )
+              boardStyle.get(),
+            ),
           ),
           h('div.content', {
             hook: {
@@ -257,11 +257,11 @@ function renderAcpl(ctrl: AnalyseController, style: Style): MaybeVNodes | undefi
                 },
               },
               [moveView.plyToTurn(node.ply), renderSan(node.san!, node.uci, style), renderComments(node, style)].join(
-                ' '
-              )
-            )
-          )
-      )
+                ' ',
+              ),
+            ),
+          ),
+      ),
     );
   });
   return res;
@@ -283,11 +283,11 @@ function requestAnalysisButton(ctrl: AnalyseController, inProgress: Prop<boolean
               inProgress(true);
               notify('Server-side analysis in progress');
             },
-            _ => notify('Cannot run server-side analysis')
-          )
+            _ => notify('Cannot run server-side analysis'),
+          ),
       ),
     },
-    'Request a computer analysis'
+    'Request a computer analysis',
   );
 }
 
@@ -308,8 +308,8 @@ function renderMainline(nodes: Tree.Node[], currentPath: Tree.Path, style: Style
           attrs: { p: path },
           class: { active: path === currentPath },
         },
-        content
-      )
+        content,
+      ),
     );
     res.push(renderComments(node, style));
     res.push(', ');
@@ -352,7 +352,7 @@ function userHtml(ctrl: AnalyseController, player: Player) {
           {
             attrs: { href: '/@/' + user.username },
           },
-          user.title ? `${user.title} ${user.username}` : user.username
+          user.title ? `${user.title} ${user.username}` : user.username,
         ),
         rating ? ` ${rating}` : ``,
         ' ' + ratingDiff,

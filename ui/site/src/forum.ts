@@ -75,7 +75,7 @@ playstrategy.load.then(() => {
           {
             placement: 'top',
             appendTo: '#playstrategy_forum',
-          }
+          },
         );
       });
   });
@@ -93,7 +93,7 @@ playstrategy.load.then(() => {
         },
         _ => {
           playstrategy.announce({ msg: 'Failed to send forum post reaction' });
-        }
+        },
       );
     }
   });

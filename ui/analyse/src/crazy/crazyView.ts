@@ -65,9 +65,9 @@ export default function (ctrl: AnalyseCtrl, playerIndex: PlayerIndex, position: 
               'data-playerindex': playerIndex,
               'data-nb': nb,
             },
-          })
-        )
+          }),
+        ),
       );
-    })
+    }),
   );
 }

@@ -13,7 +13,7 @@ module.exports = function (fen, appleKeys) {
           type: 'p',
           color: color,
         },
-        key
+        key,
       );
     });
   }

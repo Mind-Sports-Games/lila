@@ -1,6 +1,9 @@
 {
   "extends": "../tsconfig.base.json",
   "compilerOptions": {
-    "noImplicitAny": false
-  }
+    "noImplicitAny": false,
+    "noEmit": true,
+    "types": ["playstrategy", "web"]
+  },
+  "isolatedModules": true
 }

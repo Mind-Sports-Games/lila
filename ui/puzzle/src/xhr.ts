@@ -9,7 +9,7 @@ export function complete(
   theme: ThemeKey,
   win: boolean,
   replay?: PuzzleReplay,
-  streak?: PuzzleStreak
+  streak?: PuzzleStreak,
 ): Promise<PuzzleResult | undefined> {
   return xhr.json(`/training/complete/${theme}/${puzzleId}`, {
     method: 'POST',
@@ -39,5 +39,5 @@ export const setZen = throttle(1000, zen =>
   xhr.text('/pref/zen', {
     method: 'post',
     body: xhr.form({ zen: zen ? 1 : 0 }),
-  })
+  }),
 );

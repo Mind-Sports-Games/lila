@@ -49,7 +49,7 @@ function renderPromotion(ctrl, dest, pieces, color, orientation, explain) {
             finish(serverRole);
           },
         },
-        m('piece.' + serverRole + '.' + color)
+        m('piece.' + serverRole + '.' + color),
       );
     }),
     explain ? renderExplanation(ctrl) : null,
@@ -78,7 +78,7 @@ module.exports = {
       pieces,
       opposite(ground.data().turnColor),
       ground.data().orientation,
-      stage.blueprint.explainPromotion
+      stage.blueprint.explainPromotion,
     );
   },
 

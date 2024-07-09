@@ -40,7 +40,7 @@ function renderPgnTags(
   chapter: StudyChapter,
   submit: ((type: string) => (tag: string) => void) | false,
   types: string[],
-  trans: Trans
+  trans: Trans,
 ): VNode {
   let rows: TagRow[] = [];
   if (chapter.setup.variant.key !== 'standard') rows.push(['Variant', fixed(chapter.setup.variant.name)]);
@@ -76,7 +76,7 @@ function renderPgnTags(
             if (!existingTypes.includes(t)) return option(t, '', t);
             return undefined;
           }),
-        ]
+        ],
       ),
       editable('', (value, el) => {
         if (selectedType) {
@@ -97,10 +97,10 @@ function renderPgnTags(
           {
             key: '' + r[0],
           },
-          [h('th', [r[0]]), h('td', [r[1]])]
+          [h('th', [r[0]]), h('td', [r[1]])],
         );
-      })
-    )
+      }),
+    ),
   );
 }
 
@@ -124,7 +124,7 @@ export function ctrl(root: AnalyseCtrl, getChapter: () => StudyChapter, types: s
 function doRender(root: StudyCtrl): VNode {
   return h(
     'div',
-    renderPgnTags(root.tags.getChapter(), root.vm.mode.write && root.tags.submit, root.tags.types, root.trans)
+    renderPgnTags(root.tags.getChapter(), root.vm.mode.write && root.tags.submit, root.tags.types, root.trans),
   );
 }
 

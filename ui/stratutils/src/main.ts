@@ -28,7 +28,7 @@ export function readDests(lines?: string): Dests | null {
         line
           .slice(1)
           .split('')
-          .map(c => piotr[c])
+          .map(c => piotr[c]),
       );
     }
   return dests;

@@ -81,9 +81,9 @@ export function view(ctrl: ExplorerConfigCtrl): VNode[] {
               class: { selected: d.db.selected() === s },
               hook: bind('click', _ => ctrl.toggleDb(s), ctrl.redraw),
             },
-            s
+            s,
           );
-        })
+        }),
       ),
     ]),
     d.db.selected() === 'masters'
@@ -103,9 +103,9 @@ export function view(ctrl: ExplorerConfigCtrl): VNode[] {
                     class: { selected: d.rating.selected().includes(r) },
                     hook: bind('click', _ => ctrl.toggleRating(r), ctrl.redraw),
                   },
-                  r.toString()
+                  r.toString(),
                 );
-              })
+              }),
             ),
           ]),
           h('section.speed', [
@@ -119,9 +119,9 @@ export function view(ctrl: ExplorerConfigCtrl): VNode[] {
                     class: { selected: d.speed.selected().includes(s) },
                     hook: bind('click', _ => ctrl.toggleSpeed(s), ctrl.redraw),
                   },
-                  s
+                  s,
                 );
-              })
+              }),
             ),
           ]),
         ]),
@@ -133,8 +133,8 @@ export function view(ctrl: ExplorerConfigCtrl): VNode[] {
           attrs: dataIcon('E'),
           hook: bind('click', ctrl.toggleOpen),
         },
-        ctrl.trans.noarg('allSet')
-      )
+        ctrl.trans.noarg('allSet'),
+      ),
     ),
   ];
 }

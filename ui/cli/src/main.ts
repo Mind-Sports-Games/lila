@@ -40,7 +40,7 @@ function command(q: string) {
       .then(() =>
         window.PlayStrategyDasher(document.createElement('div'), {
           playing: $('body').hasClass('playing'),
-        })
+        }),
       )
       .then(dasher => dasher.subs.background.set(exec));
   else if (is('stream') && parts[1]) location.href = '/streamer/' + parts[1];
@@ -72,8 +72,8 @@ function help() {
         commandHelp('s', '', 'Search for a user') +
         commandHelp('/', '', 'Type a command') +
         commandHelp('c', '', 'Focus the chat input') +
-        commandHelp('esc', '', 'Close modals like this one')
+        commandHelp('esc', '', 'Close modals like this one'),
     ),
-    'clinput-help'
+    'clinput-help',
   );
 }

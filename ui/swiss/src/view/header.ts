@@ -39,7 +39,7 @@ function clock(ctrl: SwissCtrl): VNode | undefined {
                 rel: 'noopener',
               },
             },
-            ctrl.data.roundVariantName
+            ctrl.data.roundVariantName,
           )
         : undefined,
     ]),
@@ -71,11 +71,11 @@ export default function (ctrl: SwissCtrl): VNode {
                   rel: 'noopener',
                 },
               },
-              greatPlayer.name
+              greatPlayer.name,
             ),
             ' Tournament',
           ]
-        : [ctrl.data.name]
+        : [ctrl.data.name],
     ),
     ctrl.data.status == 'finished' ? undefined : clock(ctrl) || ongoing(ctrl),
   ]);

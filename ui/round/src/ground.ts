@@ -16,6 +16,7 @@ import { plyStep } from './round';
 import RoundController from './ctrl';
 import { RoundData } from './interfaces';
 import * as stratUtils from 'stratutils';
+import * as Prefs from 'common/prefs';
 
 export function makeConfig(ctrl: RoundController): Config {
   const data = ctrl.data,
@@ -190,7 +191,7 @@ export function reSelectSelectedSquares(ctrl: RoundController) {
     const goStonesToSelect = util.goStonesToSelect(
       ctrl.data.selectedSquares,
       ctrl.chessground.state.pieces,
-      ctrl.data.game.variant.boardSize
+      ctrl.data.game.variant.boardSize,
     );
     for (const square of goStonesToSelect) {
       ctrl.chessground.selectSquare(square as cg.Key);
@@ -219,7 +220,7 @@ export function promote(ground: CgApi, key: cg.Key, role: cg.Role) {
             promoted: true,
           },
         ],
-      ])
+      ]),
     );
   }
 }

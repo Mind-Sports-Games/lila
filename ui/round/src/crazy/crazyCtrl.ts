@@ -154,7 +154,7 @@ export function init(ctrl: RoundController) {
           }
         }
       },
-      'keyup'
+      'keyup',
     );
   }
 
@@ -173,7 +173,7 @@ export function init(ctrl: RoundController) {
     e => {
       if (e.target && (e.target as HTMLElement).localName === 'input') resetKeys();
     },
-    { capture: true }
+    { capture: true },
   );
 
   if (playstrategy.storage.get('crazyKeyHist') !== '0') preloadMouseIcons(ctrl.data);

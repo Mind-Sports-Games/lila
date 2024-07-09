@@ -28,7 +28,7 @@ function resultBar(move: OpeningMoveStats): VNode {
           {
             attrs: { style: 'width: ' + Math.round((move[key] * 1000) / sum) / 10 + '%' },
           },
-          percent > 12 ? Math.round(percent) + (percent > 20 ? '%' : '') : ''
+          percent > 12 ? Math.round(percent) + (percent > 20 ? '%' : '') : '',
         );
   }
   return h('div.bar', ['p1', 'draws', 'p2'].map(section));
@@ -45,7 +45,7 @@ function moveTableAttributes(ctrl: AnalyseCtrl, fen: Fen) {
             $(el).attr('data-fen')!,
             $(e.target as HTMLElement)
               .parents('tr')
-              .attr('data-uci')
+              .attr('data-uci'),
           );
         });
         el.addEventListener('mouseout', _ => {
@@ -92,9 +92,9 @@ function showMoveTable(ctrl: AnalyseCtrl, data: OpeningData): VNode | null {
             h('td', move.san[0] === 'P' ? move.san.slice(1) : move.san),
             h('td', numberFormat(move.p1 + move.draws + move.p2)),
             h('td', resultBar(move)),
-          ]
+          ],
         );
-      })
+      }),
     ),
   ]);
 }
@@ -135,17 +135,17 @@ function showGameTable(ctrl: AnalyseCtrl, title: string, games: OpeningGame[]): 
               [
                 h(
                   'td',
-                  [game.p1, game.p2].map(p => h('span', '' + p.rating))
+                  [game.p1, game.p2].map(p => h('span', '' + p.rating)),
                 ),
                 h(
                   'td',
-                  [game.p1, game.p2].map(p => h('span', p.name))
+                  [game.p1, game.p2].map(p => h('span', p.name)),
                 ),
                 h('td', showResult(game.winner)),
                 h('td', [game.year]),
-              ]
+              ],
             );
-      })
+      }),
     ),
   ]);
 }
@@ -184,7 +184,7 @@ function gameActions(ctrl: AnalyseCtrl, game: OpeningGame): VNode {
                 attrs: dataIcon('v'),
                 hook: bind('click', _ => openGame(ctrl, game.id)),
               },
-              'View'
+              'View',
             ),
             ...(ctrl.study
               ? [
@@ -194,7 +194,7 @@ function gameActions(ctrl: AnalyseCtrl, game: OpeningGame): VNode {
                       attrs: dataIcon('c'),
                       hook: bind('click', _ => send(false), ctrl.redraw),
                     },
-                    'Cite'
+                    'Cite',
                   ),
                   h(
                     'a.text',
@@ -202,7 +202,7 @@ function gameActions(ctrl: AnalyseCtrl, game: OpeningGame): VNode {
                       attrs: dataIcon('O'),
                       hook: bind('click', _ => send(true), ctrl.redraw),
                     },
-                    'Insert'
+                    'Insert',
                   ),
                 ]
               : []),
@@ -212,12 +212,12 @@ function gameActions(ctrl: AnalyseCtrl, game: OpeningGame): VNode {
                 attrs: dataIcon('L'),
                 hook: bind('click', _ => ctrl.explorer.gameMenu(null), ctrl.redraw),
               },
-              'Close'
+              'Close',
             ),
           ]),
-        ]
+        ],
       ),
-    ]
+    ],
   );
 }
 
@@ -236,9 +236,9 @@ function showTablebase(ctrl: AnalyseCtrl, fen: Fen, title: string, moves: Tableb
               key: move.uci,
               attrs: { 'data-uci': move.uci },
             },
-            [h('td', move.san), h('td', [showDtz(ctrl, fen, move), showDtm(ctrl, fen, move)])]
+            [h('td', move.san), h('td', [showDtz(ctrl, fen, move), showDtm(ctrl, fen, move)])],
           );
-        })
+        }),
       ),
     ]),
   ];
@@ -253,7 +253,7 @@ function showDtm(ctrl: AnalyseCtrl, fen: Fen, move: TablebaseMoveStats) {
           title: ctrl.trans.plural('mateInXHalfMoves', Math.abs(move.dtm)) + ' (Depth To Mate)',
         },
       },
-      'DTM ' + Math.abs(move.dtm)
+      'DTM ' + Math.abs(move.dtm),
     );
   return undefined;
 }
@@ -278,7 +278,7 @@ function showDtz(ctrl: AnalyseCtrl, fen: Fen, move: TablebaseMoveStats): VNode |
         title: ctrl.trans.plural('nextCaptureOrPawnMoveInXHalfMoves', Math.abs(move.dtz)),
       },
     },
-    'DTZ ' + Math.abs(move.dtz)
+    'DTZ ' + Math.abs(move.dtz),
   );
 }
 
@@ -289,7 +289,7 @@ function closeButton(ctrl: AnalyseCtrl): VNode {
       attrs: dataIcon('L'),
       hook: bind('click', ctrl.toggleExplorer, ctrl.redraw),
     },
-    ctrl.trans.noarg('close')
+    ctrl.trans.noarg('close'),
   );
 }
 
@@ -302,8 +302,8 @@ function showEmpty(ctrl: AnalyseCtrl, opening?: Opening): VNode {
         {
           attrs: opening ? { title: opening && `${opening.eco} ${opening.name}` } : {},
         },
-        opening ? [h('strong', opening.eco), ' ', opening.name] : [showTitle(ctrl, ctrl.data.game.variant)]
-      )
+        opening ? [h('strong', opening.eco), ' ', opening.name] : [showTitle(ctrl, ctrl.data.game.variant)],
+      ),
     ),
     h('div.message', [
       h('strong', ctrl.trans.noarg('noGameFound')),
@@ -342,8 +342,8 @@ function show(ctrl: AnalyseCtrl): MaybeVNode {
               {
                 attrs: data.opening ? { title: data.opening && `${data.opening.eco} ${data.opening.name}` } : {},
               },
-              [h('strong', data.opening.eco), ' ', data.opening.name]
-            )
+              [h('strong', data.opening.eco), ' ', data.opening.name],
+            ),
           ),
         moveTable,
         topTable,
@@ -362,7 +362,7 @@ function show(ctrl: AnalyseCtrl): MaybeVNode {
       lastShow = h('div.data', [
         ...row(
           trans('winning'),
-          moves.filter(m => immediateWin(m) || (m.wdl === -2 && hasDtz(m) && (zeroed || dtz(m) - halfmoves > -100)))
+          moves.filter(m => immediateWin(m) || (m.wdl === -2 && hasDtz(m) && (zeroed || dtz(m) - halfmoves > -100))),
         ),
         ...row(
           trans('unknown'),
@@ -373,34 +373,34 @@ function show(ctrl: AnalyseCtrl): MaybeVNode {
               !m.insufficient_material &&
               !m.stalemate &&
               m.wdl === null &&
-              m.dtz === null
-          )
+              m.dtz === null,
+          ),
         ),
         ...row(
           'Winning or 50 moves by prior mistake',
-          moves.filter(m => m.wdl === -2 && hasDtz(m) && !zeroed && dtz(m) - halfmoves === -100)
+          moves.filter(m => m.wdl === -2 && hasDtz(m) && !zeroed && dtz(m) - halfmoves === -100),
         ),
         ...row(
           trans('winPreventedBy50MoveRule'),
-          moves.filter(m => hasDtz(m) && (m.wdl === -1 || (m.wdl === -2 && !zeroed && dtz(m) - halfmoves < -100)))
+          moves.filter(m => hasDtz(m) && (m.wdl === -1 || (m.wdl === -2 && !zeroed && dtz(m) - halfmoves < -100))),
         ),
         ...row(
           trans('drawn'),
           moves.filter(
-            m => !immediateWin(m) && !m.variant_win && (m.insufficient_material || m.stalemate || m.wdl === 0)
-          )
+            m => !immediateWin(m) && !m.variant_win && (m.insufficient_material || m.stalemate || m.wdl === 0),
+          ),
         ),
         ...row(
           trans('lossSavedBy50MoveRule'),
-          moves.filter(m => hasDtz(m) && (m.wdl === 1 || (m.wdl === 2 && !zeroed && dtz(m) + halfmoves > 100)))
+          moves.filter(m => hasDtz(m) && (m.wdl === 1 || (m.wdl === 2 && !zeroed && dtz(m) + halfmoves > 100))),
         ),
         ...row(
           'Losing or 50 moves by prior mistake',
-          moves.filter(m => m.wdl === 2 && hasDtz(m) && !zeroed && dtz(m) + halfmoves === 100)
+          moves.filter(m => m.wdl === 2 && hasDtz(m) && !zeroed && dtz(m) + halfmoves === 100),
         ),
         ...row(
           trans('losing'),
-          moves.filter(m => m.variant_win || (m.wdl === 2 && hasDtz(m) && (zeroed || dtz(m) + halfmoves < 100)))
+          moves.filter(m => m.variant_win || (m.wdl === 2 && hasDtz(m) && (zeroed || dtz(m) + halfmoves < 100))),
         ),
       ]);
     else if (data.checkmate) lastShow = showGameEnd(ctrl, trans('checkmate'));
@@ -419,7 +419,7 @@ function showTitle(ctrl: AnalyseCtrl, variant: Variant) {
 function showConfig(ctrl: AnalyseCtrl): VNode {
   return h(
     'div.config',
-    [h('div.title', showTitle(ctrl, ctrl.data.game.variant))].concat(renderConfig(ctrl.explorer.config))
+    [h('div.title', showTitle(ctrl, ctrl.data.game.variant))].concat(renderConfig(ctrl.explorer.config)),
   );
 }
 
@@ -470,6 +470,6 @@ export default function (ctrl: AnalyseCtrl): VNode | undefined {
             attrs: dataIcon(configOpened ? 'L' : '%'),
             hook: bind('click', () => ctrl.explorer.config.toggleOpen(), ctrl.redraw),
           }),
-    ]
+    ],
   );
 }

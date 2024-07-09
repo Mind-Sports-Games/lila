@@ -306,11 +306,11 @@ export function renderPieces(pieces: Pieces, style: Style): VNode {
               `${l[0]}: ${l
                 .slice(1)
                 .map((k: string) => renderKey(k, style))
-                .join(', ')}`
+                .join(', ')}`,
           )
           .join(', '),
       ]);
-    })
+    }),
   );
 }
 
@@ -340,7 +340,7 @@ export function renderBoard(
   pieceStyle: PieceStyle,
   prefixStyle: PrefixStyle,
   positionStyle: PositionStyle,
-  boardStyle: BoardStyle
+  boardStyle: BoardStyle,
 ): VNode {
   const doRankHeader = (rank: Rank): VNode => {
     return h('th', { attrs: { scope: 'row' } }, rank);
@@ -365,14 +365,14 @@ export function renderBoard(
     file: File,
     letter: string,
     playerIndex: PlayerIndex | 'none',
-    text: string
+    text: string,
   ): VNode => {
     return h(
       'button',
       {
         attrs: { rank: rank, file: file, piece: letter.toLowerCase(), playerIndex: playerIndex },
       },
-      text
+      text,
     );
   };
   const doPiece = (rank: Rank, file: File): VNode => {
@@ -446,7 +446,7 @@ export function positionJumpHandler() {
       return true;
     }
     const newBtn = document.querySelector(
-      '.board-wrapper button[rank="' + $newRank + '"][file="' + $newFile + '"]'
+      '.board-wrapper button[rank="' + $newRank + '"][file="' + $newFile + '"]',
     ) as HTMLElement;
     if (newBtn) {
       newBtn.focus();
@@ -623,8 +623,8 @@ export function possibleMovesHandler(playerIndex: PlayerIndex, fen: () => string
     // possible ineffecient to reparse fen; but seems to work when it is AND when it is not the users' turn.
     const possibleMoves = chessgroundDests('chess')(
       Chess.fromSetup(
-        parseFen('chess')(fen().replace(' ' + opponentTurnFen + ' ', ' ' + myTurnFen + ' ')).unwrap()
-      ).unwrap()
+        parseFen('chess')(fen().replace(' ' + opponentTurnFen + ' ', ' ' + myTurnFen + ' ')).unwrap(),
+      ).unwrap(),
     )
       .get($pos)
       ?.map(i => {

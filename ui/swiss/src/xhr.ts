@@ -31,7 +31,7 @@ const reload = (ctrl: SwissCtrl) =>
       ctrl.reload(data);
       ctrl.redraw();
     },
-    onFail
+    onFail,
   );
 
 const playerInfo = (ctrl: SwissCtrl, userId: string) =>
@@ -65,7 +65,7 @@ const readSheetMin = (str: string) =>
                   : s.length > 12 && s[11] == 'x' && s[12] == 's'
                   ? s.slice(13, 15)
                   : undefined,
-            }
+            },
       )
     : [];
 

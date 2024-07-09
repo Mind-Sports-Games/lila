@@ -10,6 +10,7 @@ import * as util from './util';
 import { plyStep } from './round';
 import RoundController from './ctrl';
 import { RoundData } from './interfaces';
+import * as Prefs from 'common/prefs';
 
 export function makeConfig(ctrl: RoundController): Config {
   const data = ctrl.data,
@@ -99,7 +100,7 @@ export function promote(ground: CgApi, key: cg.Key, role: cg.Role) {
             promoted: true,
           },
         ],
-      ])
+      ]),
     );
   }
 }

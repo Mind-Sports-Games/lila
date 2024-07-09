@@ -33,7 +33,7 @@ export function palantir(opts: PalantirOpts) {
             },
             function (err) {
               log(`Failed to get local stream: ${err}`);
-            }
+            },
           )
           .catch(err => log(err));
       })
@@ -217,9 +217,9 @@ export function palantir(opts: PalantirOpts) {
                         (vnode.elm as HTMLAudioElement).srcObject = c.remoteStream;
                       },
                     },
-                  })
+                  }),
                 )
-              : []
+              : [],
           )
         : null;
     },

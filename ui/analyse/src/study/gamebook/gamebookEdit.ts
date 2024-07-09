@@ -32,10 +32,10 @@ export function render(ctrl: AnalyseCtrl): VNode {
           $('#comment-text').each(function (this: HTMLTextAreaElement) {
             this.focus();
           }),
-        500
+        500,
       );
     },
-    ctrl.redraw
+    ctrl.redraw,
   );
 
   if (!ctrl.path) {
@@ -47,7 +47,7 @@ export function render(ctrl: AnalyseCtrl): VNode {
             hook: commentHook,
             class: { done: isCommented },
           },
-          [iconTag('c'), h('p', 'Help the player find the initial move, with a comment.')]
+          [iconTag('c'), h('p', 'Help the player find the initial move, with a comment.')],
         ),
         renderHint(ctrl),
       ];
@@ -58,7 +58,7 @@ export function render(ctrl: AnalyseCtrl): VNode {
           {
             hook: commentHook,
           },
-          [iconTag('c'), h('p', 'Introduce the gamebook with a comment')]
+          [iconTag('c'), h('p', 'Introduce the gamebook with a comment')],
         ),
         h('div.legend.todo', { class: { done: !!ctrl.node.children[0] } }, [
           iconTag('G'),
@@ -74,7 +74,7 @@ export function render(ctrl: AnalyseCtrl): VNode {
             hook: commentHook,
             class: { done: isCommented },
           },
-          [iconTag('c'), h('p', 'Explain the opponent move, and help the player find the next move, with a comment.')]
+          [iconTag('c'), h('p', 'Explain the opponent move, and help the player find the next move, with a comment.')],
         ),
         renderHint(ctrl),
       ];
@@ -89,9 +89,9 @@ export function render(ctrl: AnalyseCtrl): VNode {
             iconTag('c'),
             h(
               'p',
-              "You may reflect on the player's correct move, with a comment; or leave empty to jump immediately to the next move."
+              "You may reflect on the player's correct move, with a comment; or leave empty to jump immediately to the next move.",
             ),
-          ]
+          ],
         ),
         hasVariation
           ? null
@@ -100,7 +100,7 @@ export function render(ctrl: AnalyseCtrl): VNode {
               {
                 hook: bind('click', () => control.prev(ctrl), ctrl.redraw),
               },
-              [iconTag('G'), h('p', 'Add variation moves to explain why specific other moves are wrong.')]
+              [iconTag('G'), h('p', 'Add variation moves to explain why specific other moves are wrong.')],
             ),
         renderDeviation(ctrl),
       ];
@@ -112,7 +112,7 @@ export function render(ctrl: AnalyseCtrl): VNode {
           hook: commentHook,
           class: { done: isCommented },
         },
-        [iconTag('c'), h('p', 'Explain why this move is wrong in a comment')]
+        [iconTag('c'), h('p', 'Explain why this move is wrong in a comment')],
       ),
       h('div.legend', [h('p', 'Or promote it as the mainline if it is the right move.')]),
     ];
@@ -122,7 +122,7 @@ export function render(ctrl: AnalyseCtrl): VNode {
     {
       hook: { insert: _ => playstrategy.loadCssPath('analyse.gamebook.edit') },
     },
-    content
+    content,
   );
 }
 

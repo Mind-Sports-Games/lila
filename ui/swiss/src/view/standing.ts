@@ -27,7 +27,7 @@ function playerTr(ctrl: SwissCtrl, player: Player) {
                 title: 'Absent',
               },
             })
-          : [player.rank]
+          : [player.rank],
       ),
       h('td.player', renderPlayer(player, false, !ctrl.data.isMedley, true)),
       h(
@@ -51,15 +51,15 @@ function playerTr(ctrl: SwissCtrl, player: Player) {
                       },
                       hook: onInsert(playstrategy.powertip.manualGame),
                     },
-                    result(p)
-                  )
+                    result(p),
+                  ),
             )
-            .concat([...Array(Math.max(0, ctrl.data.nbRounds - player.sheet.length))].map(_ => h('r')))
-        )
+            .concat([...Array(Math.max(0, ctrl.data.nbRounds - player.sheet.length))].map(_ => h('r'))),
+        ),
       ),
       h('td.points', title('Points'), '' + player.points),
       h('td.tieBreak', title('Tiebreak'), '' + player.tieBreak),
-    ]
+    ],
   );
 }
 
@@ -115,8 +115,8 @@ export default function standing(ctrl: SwissCtrl, pag: Pager, klass?: string): V
             },
           },
         },
-        tableBody
+        tableBody,
       ),
-    ]
+    ],
   );
 }

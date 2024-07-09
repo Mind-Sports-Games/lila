@@ -5,7 +5,7 @@ const chat = data =>
     requestAnimationFrame(() => {
       data.loadCss = loadCssPath;
       resolve(window.PlayStrategyChat(document.querySelector('.mchat'), data));
-    })
+    }),
   );
 
 export default chat;

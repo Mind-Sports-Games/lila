@@ -27,7 +27,7 @@ export default function (ctrl: AnalyseCtrl): VNode | undefined {
                     },
                   },
                 },
-                playstrategy.timeago(round.startsAt)
+                playstrategy.timeago(round.startsAt),
               )
             : null,
         ]),
@@ -62,7 +62,7 @@ export function rounds(ctrl: StudyCtrl): VNode {
               {
                 attrs: { href: relay.roundPath(round) },
               },
-              round.name
+              round.name,
             ),
             round.ongoing
               ? h('ongoing', { attrs: { ...dataIcon('J'), title: 'Ongoing' } })
@@ -77,8 +77,8 @@ export function rounds(ctrl: StudyCtrl): VNode {
                   },
                 })
               : null,
-          ]
-        )
+          ],
+        ),
       )
       .concat(
         canContribute
@@ -93,11 +93,11 @@ export function rounds(ctrl: StudyCtrl): VNode {
                       'data-icon': 'O',
                     },
                   },
-                  ctrl.trans.noarg('addRound')
-                )
+                  ctrl.trans.noarg('addRound'),
+                ),
               ),
             ]
-          : []
-      )
+          : [],
+      ),
   );
 }

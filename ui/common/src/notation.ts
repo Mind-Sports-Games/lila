@@ -284,7 +284,7 @@ function xiangqiNotation(move: ExtendedMoveInfo, variant: Variant): string {
       pawnRole,
       addMovedPiece,
       prevRank,
-      newRank
+      newRank,
     );
 
     if (pawnRanks.length == 2) {
@@ -324,7 +324,7 @@ function numFriendlyPawnsInColumn(
   role: string,
   addMovedPiece: boolean,
   origPieceRank: number,
-  newPieceRank: number
+  newPieceRank: number,
 ): number[] {
   const pawnRanks: number[] = [];
   const ranks = [...Array(numRanks + 1).keys()].slice(1);

@@ -27,12 +27,12 @@ function stats(data: TournamentData, trans: Trans): VNode {
     numberRow(
       trans('playerIndexWins', data.p1Name ? data.p1Name : 'P1'),
       [data.stats.p1Wins, data.stats.games],
-      'percent'
+      'percent',
     ),
     numberRow(
       trans('playerIndexWins', data.p2Name ? data.p2Name : 'P2'),
       [data.stats.p2Wins, data.stats.games],
-      'percent'
+      'percent',
     ),
     numberRow(noarg('draws'), [data.stats.draws, data.stats.games], 'percent'),
   ];
@@ -55,7 +55,7 @@ function stats(data: TournamentData, trans: Trans): VNode {
                   href: `/tournament/${data.id}/teams`,
                 },
               },
-              trans('viewAllXTeams', Object.keys(data.teamBattle.teams).length)
+              trans('viewAllXTeams', Object.keys(data.teamBattle.teams).length),
             ),
             h('br'),
           ]
@@ -69,7 +69,7 @@ function stats(data: TournamentData, trans: Trans): VNode {
             download: true,
           },
         },
-        'Download all games'
+        'Download all games',
       ),
       h(
         'a.text',
@@ -80,7 +80,7 @@ function stats(data: TournamentData, trans: Trans): VNode {
             download: true,
           },
         },
-        'Download results as NDJSON'
+        'Download results as NDJSON',
       ),
       h(
         'a.text',
@@ -91,7 +91,7 @@ function stats(data: TournamentData, trans: Trans): VNode {
             download: true,
           },
         },
-        'Download results as CSV'
+        'Download results as CSV',
       ),
       h('br'),
       h(
@@ -102,7 +102,7 @@ function stats(data: TournamentData, trans: Trans): VNode {
             href: 'https://playstrategy.org/api#tag/Arena-tournaments',
           },
         },
-        'Arena API documentation'
+        'Arena API documentation',
       ),
     ]),
   ]);

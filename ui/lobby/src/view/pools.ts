@@ -17,7 +17,7 @@ export function hooks(ctrl: LobbyController): Hooks {
       if (id === 'custom') $('.config_hook').trigger('mousedown');
       else if (id) ctrl.clickPool(id);
     },
-    ctrl.redraw
+    ctrl.redraw,
   );
 }
 
@@ -53,7 +53,7 @@ export function render(ctrl: LobbyController) {
             : h('div.logo', { attrs: { 'data-icon': perfIcons[pool.variantDisplayName] || perfIcons[pool.perf] } }),
           h('div.clock', displayClockTime(pool)),
           active ? spinner() : null,
-        ]
+        ],
       );
     })
     .concat(
@@ -63,7 +63,7 @@ export function render(ctrl: LobbyController) {
           class: { transp: !!member },
           attrs: { 'data-id': 'custom' },
         },
-        ctrl.trans.noarg('custom')
-      )
+        ctrl.trans.noarg('custom'),
+      ),
     );
 }

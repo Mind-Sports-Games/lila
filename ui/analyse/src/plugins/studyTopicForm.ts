@@ -9,7 +9,7 @@ playstrategy.load.then(() => {
   });
   const doFetch: (term: string) => Promise<string[]> = debounce(
     (term: string) => xhr.json(xhr.url('/study/topic/autocomplete', { term })),
-    300
+    300,
   );
   tagify.on('input', e => {
     const term = e.detail.value.trim();

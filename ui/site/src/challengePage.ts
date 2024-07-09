@@ -52,7 +52,7 @@ export default function (opts: ChallengeOpts) {
             tag: 'span',
             focus: true,
             onSelect: () => setTimeout(() => (input.parentNode as HTMLFormElement).submit(), 100),
-          })
+          }),
         );
       });
   }

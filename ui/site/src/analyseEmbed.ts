@@ -20,7 +20,7 @@ export default function (opts: any) {
   if (opts.study && opts.study.chapter.gamebook)
     $('.main-board').append(
       $(
-        `<a href="/study/${opts.study.id}/${opts.study.chapter.id}" target="_blank" rel="noopener" class="button gamebook-embed">Start</a>`
-      )
+        `<a href="/study/${opts.study.id}/${opts.study.chapter.id}" target="_blank" rel="noopener" class="button gamebook-embed">Start</a>`,
+      ),
     );
 }

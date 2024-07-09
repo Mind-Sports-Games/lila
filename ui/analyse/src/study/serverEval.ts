@@ -76,11 +76,11 @@ export function view(ctrl: ServerEvalCtrl): VNode {
               playstrategy.advantageChart!(ctrl.root.data, ctrl.root.trans, el);
               ctrl.chartEl(el as HighchartsHTMLElement);
             }),
-          800
+          800,
         );
       }),
     },
-    [h('div.study__message', spinner())]
+    [h('div.study__message', spinner())],
   );
 }
 
@@ -115,8 +115,8 @@ function requestButton(ctrl: ServerEvalCtrl) {
               },
               hook: bind('click', ctrl.request, root.redraw),
             },
-            root.trans.noarg('requestAComputerAnalysis')
+            root.trans.noarg('requestAComputerAnalysis'),
           ),
-        ]
+        ],
   );
 }

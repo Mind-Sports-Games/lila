@@ -20,7 +20,7 @@ export function makeCtrl(
   members: Prop<StudyMemberMap>,
   setTab: () => void,
   redraw: () => void,
-  trans: Trans
+  trans: Trans,
 ): StudyInviteFormCtrl {
   const open = prop(false),
     spectators = prop<string[]>([]);
@@ -70,7 +70,7 @@ export function view(ctrl: ReturnType<typeof makeCtrl>): VNode {
                 },
               });
               input.focus();
-            })
+            }),
           ),
         }),
       ]),
@@ -84,9 +84,9 @@ export function view(ctrl: ReturnType<typeof makeCtrl>): VNode {
                   key: username,
                   hook: bind('click', _ => ctrl.invite(username)),
                 },
-                username
+                username,
               );
-            })
+            }),
           )
         : undefined,
     ],

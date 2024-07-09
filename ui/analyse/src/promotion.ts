@@ -23,7 +23,7 @@ export function start(
   orig: Key,
   dest: Key,
   capture: JustCaptured | undefined,
-  callback: Callback
+  callback: Callback,
 ): boolean {
   const s = ctrl.chessground.state;
   const premovePiece = s.pieces.get(orig);
@@ -74,7 +74,7 @@ function renderPromotion(
   dest: Key,
   roles: Role[],
   playerIndex: PlayerIndex,
-  orientation: Orientation
+  orientation: Orientation,
 ): MaybeVNode {
   if (!promoting) return;
 
@@ -119,9 +119,9 @@ function renderPromotion(
             finish(ctrl, serverRole);
           }),
         },
-        [h(`piece.${serverRole}.${playerIndex}.ally`)]
+        [h(`piece.${serverRole}.${playerIndex}.ally`)],
       );
-    })
+    }),
   );
 }
 

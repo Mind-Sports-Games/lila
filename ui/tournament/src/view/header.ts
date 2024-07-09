@@ -84,7 +84,7 @@ function title(ctrl: TournamentController) {
         {
           attrs: { href: '/tournament/shields' },
         },
-        d.perf.icon
+        d.perf.icon,
       ),
       d.fullName,
     ]);
@@ -101,12 +101,12 @@ function title(ctrl: TournamentController) {
                 rel: 'noopener',
               },
             },
-            d.greatPlayer.name
+            d.greatPlayer.name,
           ),
           ' Arena',
         ]
       : [d.fullName]
-    ).concat(d.private ? [' ', h('span', { attrs: dataIcon('a') })] : [])
+    ).concat(d.private ? [' ', h('span', { attrs: dataIcon('a') })] : []),
   );
 }
 

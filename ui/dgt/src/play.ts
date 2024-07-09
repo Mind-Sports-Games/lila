@@ -455,7 +455,7 @@ export default function (token: string) {
     */
     if (playableGames.length == 0) {
       console.log(
-        'No started playable games, challenges or games are disconnected. Please start a new game or fix connection.'
+        'No started playable games, challenges or games are disconnected. Please start a new game or fix connection.',
       );
       //TODO What happens if the games reconnect and this move is not sent?
     } else {
@@ -490,7 +490,7 @@ export default function (token: string) {
           //No match found but there is a valid currentGameId , so keep it
           if (verbose)
             console.log(
-              'chooseCurrentGame - Board will remain attached to current game. currentGameId: ' + currentGameId
+              'chooseCurrentGame - Board will remain attached to current game. currentGameId: ' + currentGameId,
             );
         } else {
           //No match and No valid current game but there are active games
@@ -511,7 +511,7 @@ export default function (token: string) {
           //The board matches currentGameId . No need to do anything.
           if (verbose)
             console.log(
-              'chooseCurrentGame - Board will remain attached to current game. currentGameId: ' + currentGameId
+              'chooseCurrentGame - Board will remain attached to current game. currentGameId: ' + currentGameId,
             );
         }
       }
@@ -717,21 +717,21 @@ export default function (token: string) {
           announceWinner(
             keywords[gameState.winner],
             'flag',
-            keywords[gameState.winner] + ' ' + keywords['wins by'] + ' ' + keywords['timeout']
+            keywords[gameState.winner] + ' ' + keywords['wins by'] + ' ' + keywords['timeout'],
           );
           break;
         case 'resign':
           announceWinner(
             keywords[gameState.winner],
             'resign',
-            keywords[gameState.winner] + ' ' + keywords['wins by'] + ' ' + keywords['resignation']
+            keywords[gameState.winner] + ' ' + keywords['wins by'] + ' ' + keywords['resignation'],
           );
           break;
         case 'mate':
           announceWinner(
             keywords[lastMove.player],
             'mate',
-            keywords[lastMove.player] + ' ' + keywords['wins by'] + ' ' + keywords['#']
+            keywords[lastMove.player] + ' ' + keywords['wins by'] + ' ' + keywords['#'],
           );
           break;
         case 'draw':
@@ -911,7 +911,7 @@ export default function (token: string) {
               if (JSON.stringify(lastLegalParam.san) != JSON.stringify(quarantinedlastLegalParam.san)) {
                 //lastLegalParam was altered, this mean a new move was received from LiveChess during quarantine
                 console.warn(
-                  'onmessage - Invalid moved quarantined and not sent to playstrategy. Newer move interpretration received.'
+                  'onmessage - Invalid moved quarantined and not sent to playstrategy. Newer move interpretration received.',
                 );
                 return;
               }
@@ -923,7 +923,7 @@ export default function (token: string) {
                 //It looks like a duplicate, so just ignore it
                 if (verbose)
                   console.info(
-                    'onmessage - Duplicate position and san move received after quarantine and will be ignored'
+                    'onmessage - Duplicate position and san move received after quarantine and will be ignored',
                   );
                 return;
               }
@@ -983,7 +983,7 @@ export default function (token: string) {
                 if (verbose)
                   console.error(
                     'onmessage - invalidMove - Position Mismatch between DGT Board and internal in-memory Board. SAN: ' +
-                      SANMove
+                      SANMove,
                   );
                 announceInvalidMove();
                 console.info(board(localBoard.board));
@@ -1017,7 +1017,7 @@ export default function (token: string) {
         //Websocket is fine but still no board detected
         console.warn(
           'Connection to DGT Live Chess is Fine but no board is detected. Attempting re-connection. Attempt: ' +
-            attempts
+            attempts,
         );
         liveChessConnection.send('{"id":1,"call":"eboards"}');
       }
@@ -1056,7 +1056,7 @@ export default function (token: string) {
     } else {
       console.error('WebSocket is not open or is not ready to receive setup - cannot send setup command.');
       console.error(
-        `isLiveChessConnected: ${isLiveChessConnected} - DGTgameId: ${DGTgameId} - currentSerialnr: ${currentSerialnr} - currentGameId: ${currentGameId}`
+        `isLiveChessConnected: ${isLiveChessConnected} - DGTgameId: ${DGTgameId} - currentSerialnr: ${currentSerialnr} - currentGameId: ${currentGameId}`,
       );
     }
   }

@@ -1,4 +1,14 @@
 {
   "extends": "../tsconfig.base.json",
-  "include": ["src"]
+  "include": ["src"],
+  "compilerOptions": {
+    "outDir": "./dist",
+    "rootDir": "src",
+    "types": ["playstrategy", "cash", "web"],
+    "declaration": true,
+    "inlineSourceMap": true,
+    "composite": true
+  },
+  "references": [{ "path": "../common/tsconfig.json" }, { "path": "../palantir/tsconfig.json" }],
+  "isolatedModules": true
 }

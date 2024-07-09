@@ -1,8 +1,14 @@
 {
+  "extends": "../tsconfig.base.json",
   "include": ["src/*.ts"],
-  "exclude": [],
+  "exclude": [],  
   "compilerOptions": {
-    "outDir": ".",
-    "declaration": true
-  }
+    "outDir": "./dist",
+    "rootDir": "src",    
+    "types": ["playstrategy", "web"],
+    "declaration": true,
+    "composite": true
+  },
+  "references": [{ "path": "../common/tsconfig.json" }, { "path": "../draughtsground/tsconfig.json" }],
+  "isolatedModules": true
 }

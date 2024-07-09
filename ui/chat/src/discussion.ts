@@ -37,8 +37,10 @@ export default function (ctrl: Ctrl): Array<VNode | undefined> {
               playstrategy.pubsub.emit('jump', (e.target as HTMLElement).getAttribute('data-ply'));
             });
             if (hasMod)
-              $el.on('click', '.mod', (e: Event) =>
-                ctrl.moderation()?.open((e.target as HTMLElement).parentNode as HTMLElement)
+              $el.on(
+                'click',
+                '.mod',
+                (e: Event) => ctrl.moderation()?.open((e.target as HTMLElement).parentNode as HTMLElement),
               );
             else
               $el.on('click', '.flag', (e: Event) => report(ctrl, (e.target as HTMLElement).parentNode as HTMLElement));
@@ -47,7 +49,7 @@ export default function (ctrl: Ctrl): Array<VNode | undefined> {
           postpatch: (_, vnode) => scrollCb(vnode),
         },
       },
-      selectLines(ctrl).map(line => renderLine(ctrl, line))
+      selectLines(ctrl).map(line => renderLine(ctrl, line)),
     ),
     renderInput(ctrl),
   ];
@@ -127,7 +129,7 @@ const setupHooks = (ctrl: Ctrl, chatEl: HTMLInputElement) => {
       el.removeAttribute('placeholder');
       if (!ctrl.opts.public) el.classList.toggle('whisper', !!txt.match(whisperRegex));
       storage.set(txt);
-    })
+    }),
   );
 
   window.Mousetrap.bind('c', () => chatEl.focus());
@@ -146,7 +148,7 @@ const setupHooks = (ctrl: Ctrl, chatEl: HTMLInputElement) => {
 
   chatEl.onfocus = () =>
     mouchEvents.forEach(event =>
-      document.body.addEventListener(event, mouchListener, { passive: true, capture: true })
+      document.body.addEventListener(event, mouchListener, { passive: true, capture: true }),
     );
 
   chatEl.onblur = () =>
@@ -226,6 +228,6 @@ function renderLine(ctrl: Ctrl, line: Line): VNode {
           userNode,
           ' ',
           textNode,
-        ]
+        ],
   );
 }

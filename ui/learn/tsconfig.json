@@ -1,0 +1,13 @@
+{
+  "extends": "../tsconfig.base.json",
+  "compilerOptions": {
+    "paths": { "chessground": ["./@types/chessground"] },
+    "types": ["playstrategy", "cash"],
+    "allowSyntheticDefaultImports": true,
+    "skipLibCheck": true,
+    "noEmit": true,
+    "composite": true
+  },
+  "isolatedModules": true,
+  "references": [{ "path": "../common/tsconfig.json" }],
+}

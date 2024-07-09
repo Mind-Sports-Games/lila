@@ -46,17 +46,17 @@ function renderTournament(tour: Tournament, day: Date) {
                 'data-icon': iconOf(tour, tour.perf.icon),
               },
             }
-          : {}
+          : {},
       ),
       h('span.body', [tour.fullName]),
-    ]
+    ],
   );
 }
 
 function renderLane(tours: Tournament[], day: Date) {
   return h(
     'lane',
-    tours.map(t => renderTournament(t, day))
+    tours.map(t => renderTournament(t, day)),
   );
 }
 
@@ -88,11 +88,11 @@ function renderDay(ctrl: Ctrl) {
             title: format(day, 'EEEE, dd/MM/yyyy'),
           },
         },
-        [format(day, 'dd/MM')]
+        [format(day, 'dd/MM')],
       ),
       h(
         'lanes',
-        makeLanes(tours).map(l => renderLane(l, day))
+        makeLanes(tours).map(l => renderLane(l, day)),
       ),
     ]);
   };
@@ -115,9 +115,9 @@ function renderTimeline() {
         {
           attrs: { style: 'left: ' + (hour / 24) * 100 + '%' },
         },
-        timeString(hour)
-      )
-    )
+        timeString(hour),
+      ),
+    ),
   );
 }
 

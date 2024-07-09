@@ -95,7 +95,7 @@ playstrategy.load.then(() => {
             friend: $(this).data('friend'),
             tag: $(this).data('tag'),
             focus,
-          })
+          }),
         );
       if (focus) start();
       else $(this).one('focus', start);
@@ -163,10 +163,10 @@ playstrategy.load.then(() => {
       playstrategy.redirect(d);
     });
     pubsub.on('socket.in.fen', e =>
-      document.querySelectorAll('.mini-game-' + e.id).forEach((el: HTMLElement) => miniGame.update(el, e))
+      document.querySelectorAll('.mini-game-' + e.id).forEach((el: HTMLElement) => miniGame.update(el, e)),
     );
     pubsub.on('socket.in.finish', e =>
-      document.querySelectorAll('.mini-game-' + e.id).forEach((el: HTMLElement) => miniGame.finish(el, e.win))
+      document.querySelectorAll('.mini-game-' + e.id).forEach((el: HTMLElement) => miniGame.finish(el, e.win)),
     );
     pubsub.on('socket.in.announce', announce);
     pubsub.on('socket.in.tournamentReminder', (data: { id: string; name: string }) => {
@@ -179,7 +179,7 @@ playstrategy.load.then(() => {
             '<div class="actions">' +
             `<a class="withdraw text" href="${url}/withdraw" data-icon="Z">Pause</a>` +
             `<a class="text" href="${url}" data-icon="G">Resume</a>` +
-            '</div></div>'
+            '</div></div>',
         )
         .find('#announce .withdraw')
         .on('click', function (this: HTMLAnchorElement) {

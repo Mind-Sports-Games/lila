@@ -74,7 +74,7 @@ export function calcCaptKey(
   startX: number,
   startY: number,
   destX: number,
-  destY: number
+  destY: number,
 ): cg.Key | undefined {
   const xDiff: number = destX - startX,
     yDiff: number = destY - startY;
@@ -485,7 +485,7 @@ export function getKeyAtDomPos(
   pos: cg.NumberPair,
   boardSize: cg.BoardSize,
   asP1: boolean,
-  bounds: ClientRect
+  bounds: ClientRect,
 ): cg.Key | undefined {
   let row = Math.ceil(boardSize[1] * ((pos[1] - bounds.top) / bounds.height));
   if (!asP1) row = boardSize[1] + 1 - row;
@@ -509,7 +509,7 @@ export function unusedFieldAtDomPos(
   pos: cg.NumberPair,
   boardSize: cg.BoardSize,
   asP1: boolean,
-  bounds: ClientRect
+  bounds: ClientRect,
 ): boolean {
   let row = Math.ceil(boardSize[1] * ((pos[1] - bounds.top) / bounds.height));
   if (!asP1) row = boardSize[1] + 1 - row;

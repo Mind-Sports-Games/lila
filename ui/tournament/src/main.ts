@@ -17,7 +17,7 @@ export default function (opts: TournamentOpts) {
     opts.data.socketVersion,
     {
       receive: (t: string, d: any) => ctrl.socket.receive(t, d),
-    }
+    },
   );
   opts.socketSend = playstrategy.socket.send;
   opts.element = document.querySelector('main.tour') as HTMLElement;

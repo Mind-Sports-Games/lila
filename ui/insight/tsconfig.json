@@ -1,0 +1,11 @@
+{
+  "extends": "../tsconfig.base.json",
+  "compilerOptions": {
+    "paths": { "numeral": ["./@types/numeral"] },
+    "types": ["playstrategy", "cash"],
+    "noEmit": true,
+    "composite": true
+  },
+  "isolatedModules": true,
+  "references": [{ "path": "../common/tsconfig.json" }]
+}

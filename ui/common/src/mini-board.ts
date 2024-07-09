@@ -29,7 +29,7 @@ export const initWith = (node: HTMLElement, fen: string, orientation: Orientatio
             enabled: false,
             visible: false,
           },
-        })
+        }),
       );
     } else {
       const [, myPlayerIndex] = $el.data('state').split('|');
@@ -84,7 +84,7 @@ export const initWith = (node: HTMLElement, fen: string, orientation: Orientatio
             ? { width: 12, height: 2 }
             : { width: 8, height: 8 },
           variant: variantFromElement($el),
-        })
+        }),
       );
     }
   }

@@ -190,14 +190,14 @@ export default function PlayStrategyLobby(opts: LobbyOpts) {
         res.text().then(text => {
           if (res.ok) {
             lobby.setup.prepareForm(
-              modal($(text), 'game-setup', () => $startButtons.find('.active').removeClass('active'))
+              modal($(text), 'game-setup', () => $startButtons.find('.active').removeClass('active')),
             );
             playstrategy.contentLoaded();
           } else {
             alert(text);
             playstrategy.reload();
           }
-        })
+        }),
       );
     })
     .on('click', e => e.preventDefault());
@@ -250,7 +250,7 @@ export default function PlayStrategyLobby(opts: LobbyOpts) {
     direction: 'right' | 'left',
     speed: number,
     distance: number,
-    step: number
+    step: number,
   ) {
     let fullElementWidth = 0;
     element.childNodes.forEach(n => {
@@ -303,8 +303,8 @@ function suggestBgSwitch() {
     .addClass('active')
     .on('click', () =>
       getDasher().then(dasher =>
-        dasher.subs.background.set(document.body.classList.contains('dark') ? 'light' : 'dark')
-      )
+        dasher.subs.background.set(document.body.classList.contains('dark') ? 'light' : 'dark'),
+      ),
     );
 }
 

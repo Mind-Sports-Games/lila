@@ -16,7 +16,7 @@ export function withdraw(ctrl: TournamentController): VNode {
         attrs: dataIcon(pause ? 'Z' : 'b'),
         hook: bind('click', ctrl.withdraw, ctrl.redraw),
       },
-      ctrl.trans.noarg(pause ? 'pause' : 'withdraw')
+      ctrl.trans.noarg(pause ? 'pause' : 'withdraw'),
     );
   });
 }
@@ -34,7 +34,7 @@ export function join(ctrl: TournamentController): VNode {
         },
         hook: bind('click', _ => ctrl.join(), ctrl.redraw),
       },
-      ctrl.trans.noarg('join')
+      ctrl.trans.noarg('join'),
     );
     return delay
       ? h(
@@ -59,9 +59,9 @@ export function join(ctrl: TournamentController): VNode {
                   },
                 },
               },
-              [button]
+              [button],
             ),
-          ]
+          ],
         )
       : button;
   });
@@ -77,7 +77,7 @@ export function joinWithdraw(ctrl: TournamentController): VNode | undefined {
           'data-icon': 'G',
         },
       },
-      ctrl.trans('signIn')
+      ctrl.trans('signIn'),
     );
   if (!ctrl.data.isFinished) return isIn(ctrl) ? withdraw(ctrl) : join(ctrl);
 }

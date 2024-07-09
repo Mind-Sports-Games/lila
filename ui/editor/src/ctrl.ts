@@ -94,7 +94,7 @@ export default class EditorCtrl {
     const boardFen = this.chessground ? this.chessground.getFen() : this.initialFen;
     const board = parseFen(this.rules)(boardFen).unwrap(
       setup => setup.board,
-      _ => Board.empty(this.rules)
+      _ => Board.empty(this.rules),
     );
     return {
       board,
@@ -117,14 +117,14 @@ export default class EditorCtrl {
       pos => {
         return makeFen('chess')(pos.toSetup(), { promoted: pos.rules == 'crazyhouse' });
       },
-      _ => undefined
+      _ => undefined,
     );
   }
 
   private isPlayable(): boolean {
     return setupPosition(this.rules, this.getSetup()).unwrap(
       pos => !pos.isEnd(),
-      _ => false
+      _ => false,
     );
   }
 
@@ -197,7 +197,7 @@ export default class EditorCtrl {
         this.onChange();
         return true;
       },
-      _ => false
+      _ => false,
     );
   };
 

@@ -17,7 +17,11 @@ export default class MsgCtrl {
   typing?: Typing;
   textStore?: PlayStrategyStorage;
 
-  constructor(data: MsgData, readonly trans: Trans, readonly redraw: Redraw) {
+  constructor(
+    data: MsgData,
+    readonly trans: Trans,
+    readonly redraw: Redraw,
+  ) {
     this.data = data;
     this.pane = data.convo ? 'convo' : 'side';
     this.connected = network.websocketHandler(this);
@@ -96,7 +100,7 @@ export default class MsgCtrl {
               this.data.contacts = data.contacts;
               this.redraw();
             }),
-          1000
+          1000,
         );
       scroller.enable(true);
       this.redraw();

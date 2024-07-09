@@ -9,7 +9,7 @@ const evalRegex = new RegExp(
     /score (cp|mate) ([-\d]+) /.source +
     /(?:(upper|lower)bound )?nodes (\d+) nps \S+ /.source +
     /(?:hashfull \d+ )?(?:tbhits \d+ )?time (\S+) /.source +
-    /pv (.+)/.source
+    /pv (.+)/.source,
 );
 
 const minDepth = 6;
@@ -27,7 +27,10 @@ export default class Protocol {
 
   private nextWork: Work | undefined;
 
-  constructor(private send: (cmd: string) => void, private opts: ProtocolOpts) {}
+  constructor(
+    private send: (cmd: string) => void,
+    private opts: ProtocolOpts,
+  ) {}
 
   init(): void {
     // Get engine name/version.

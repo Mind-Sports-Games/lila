@@ -6,6 +6,17 @@
   "type": "module",
   "module": "game.js",
   "typings": "game.d.ts",
+  "exports": {
+    ".": "./dist/game.js",
+    "./*": "./dist/*.js"
+  },
+  "typesVersions": {
+    "*": {
+      "*": [
+        "dist/*"
+      ]
+    }
+  },
   "keywords": [
     "chess",
     "playstrategy",
@@ -14,13 +25,13 @@
   ],
   "author": "Thibault Duplessis",
   "license": "AGPL-3.0-or-later",
-  "scripts": {
-    "compile": "../../node_modules/typescript/bin/tsc --incremental",
-    "dev": "yarn run compile",
-    "prod": "yarn run compile"
-  },
   "devDependencies": {
-    "@types/playstrategy": "2.0.0",
-    "typescript": "^4.1.3"
+    "@types/playstrategy": "workspace:*",
+    "typescript": "4.1.3"
+  },
+  "scripts": {
+    "compile": "tsc",
+    "dev": "tsc",
+    "prod": "tsc"
   }
 }

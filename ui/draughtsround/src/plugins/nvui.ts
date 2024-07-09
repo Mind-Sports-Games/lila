@@ -103,7 +103,7 @@ playstrategy.RoundNVUI = function (redraw: Redraw) {
             animation: { enabled: false },
             drawable: { enabled: false },
             coordinates: undefined,
-          })
+          }),
         );
         if (variantNope) setTimeout(() => notify.set(variantNope), 3000);
       }
@@ -116,7 +116,7 @@ playstrategy.RoundNVUI = function (redraw: Redraw) {
           h('h1', gameText(ctrl)),
           h('h2', 'Game info'),
           ...['p1', 'p2'].map((playerIndex: PlayerIndex) =>
-            h('p', [playerIndex + ' player: ', playerHtml(ctrl, ctrl.playerByPlayerIndex(playerIndex))])
+            h('p', [playerIndex + ' player: ', playerHtml(ctrl, ctrl.playerByPlayerIndex(playerIndex))]),
           ),
           h('p', `${d.game.rated ? 'Rated' : 'Casual'} ${d.game.perf}`),
           d.clock ? h('p', `Clock: ${d.clock.initial / 60} + ${d.clock.increment}`) : null,
@@ -129,7 +129,7 @@ playstrategy.RoundNVUI = function (redraw: Redraw) {
                 'aria-live': 'off',
               },
             },
-            renderMoves(d.steps.slice(1), style)
+            renderMoves(d.steps.slice(1), style),
           ),
           h('h2', 'Pieces'),
           // TODO: removed to get this to compile
@@ -144,7 +144,7 @@ playstrategy.RoundNVUI = function (redraw: Redraw) {
                 'aria-atomic': true,
               },
             },
-            [ctrl.data.game.status.name === 'started' ? 'Playing' : renderResult(ctrl)]
+            [ctrl.data.game.status.name === 'started' ? 'Playing' : renderResult(ctrl)],
           ),
           h('h2', 'Last move'),
           h(
@@ -155,7 +155,7 @@ playstrategy.RoundNVUI = function (redraw: Redraw) {
                 'aria-atomic': true,
               },
             },
-            renderSan(step.san, step.lidraughtsUci, style)
+            renderSan(step.san, step.lidraughtsUci, style),
           ),
           ...(ctrl.isPlaying()
             ? [
@@ -184,7 +184,7 @@ playstrategy.RoundNVUI = function (redraw: Redraw) {
                         },
                       }),
                     ]),
-                  ]
+                  ],
                 ),
               ]
             : []),
@@ -213,8 +213,8 @@ playstrategy.RoundNVUI = function (redraw: Redraw) {
                   lastCapturedCommandHandler(
                     () => ctrl.data.steps.map(step => step.fen),
                     pieceStyle.get(),
-                    prefixStyle.get()
-                  )
+                    prefixStyle.get(),
+                  ),
                 );
                 const $buttons = $board.find('button');
                 $buttons.on('click', selectionHandler(ctrl.data.opponent.playerIndex, selectSound));
@@ -224,8 +224,8 @@ playstrategy.RoundNVUI = function (redraw: Redraw) {
                   possibleMovesHandler(
                     ctrl.data.player.playerIndex,
                     ctrl.draughtsground.getFen,
-                    () => new Map() //ctrl.draughtsground.state.pieces // TODO: this isn't working
-                  )
+                    () => new Map(), //ctrl.draughtsground.state.pieces // TODO: this isn't working
+                  ),
                 );
                 $buttons.on('keypress', positionJumpHandler());
                 $buttons.on('keypress', pieceJumpingHandler(wrapSound, errorSound));
@@ -237,8 +237,8 @@ playstrategy.RoundNVUI = function (redraw: Redraw) {
               pieceStyle.get(),
               prefixStyle.get(),
               positionStyle.get(),
-              boardStyle.get()
-            )
+              boardStyle.get(),
+            ),
           ),
           h(
             'div.boardstatus',
@@ -248,7 +248,7 @@ playstrategy.RoundNVUI = function (redraw: Redraw) {
                 'aria-atomic': true,
               },
             },
-            ''
+            '',
           ),
           // h('p', takes(ctrl.data.steps.map(data => data.fen))),
           h('h2', 'Settings'),
@@ -312,7 +312,7 @@ playstrategy.RoundNVUI = function (redraw: Redraw) {
             h('br'),
             'Omission results in promotion to queen',
           ]),
-        ]
+        ],
       );
     },
   };
@@ -329,7 +329,7 @@ function onSubmit(ctrl: RoundController, notify: (txt: string) => void, style: (
         legalSans: SanToUci = sanWriter(
           plyStep(d, ctrl.ply).fen,
           legalUcis,
-          ctrl.draughtsground.state.movable.captLen
+          ctrl.draughtsground.state.movable.captLen,
         ) as SanToUci;
       const uci = sanToUci(input, legalSans) || input;
       if (legalUcis.includes(uci.toLowerCase()))
@@ -339,7 +339,7 @@ function onSubmit(ctrl: RoundController, notify: (txt: string) => void, style: (
             from: uci.substr(0, 2),
             to: uci.substr(2, 2),
           },
-          { ackable: true }
+          { ackable: true },
         );
       else notify(d.player.playerIndex === d.game.player ? `Invalid move: ${input}` : 'Not your turn');
     }

@@ -5,11 +5,12 @@ import view from './view';
 import { ChatOpts } from './interfaces';
 import { PresetCtrl } from './preset';
 
-export { Ctrl as ChatCtrl, ChatPlugin } from './interfaces';
+export type { ChatPlugin } from './interfaces';
+export { default as ChatCtrl } from './ctrl';
 
 export default function PlayStrategyChat(
   element: Element,
-  opts: ChatOpts
+  opts: ChatOpts,
 ): {
   preset: PresetCtrl;
 } {

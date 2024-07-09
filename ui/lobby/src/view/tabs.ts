@@ -13,7 +13,7 @@ function tab(ctrl: LobbyController, key: Tab, active: Tab, content: MaybeVNodes)
       },
       hook: bind('mousedown', _ => ctrl.setTab(key), ctrl.redraw),
     },
-    content
+    content,
   );
 }
 

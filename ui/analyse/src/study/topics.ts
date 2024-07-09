@@ -19,7 +19,7 @@ export function ctrl(
   save: (data: string[]) => void,
   getTopics: () => Topic[],
   trans: Trans,
-  redraw: Redraw
+  redraw: Redraw,
 ): TopicsCtrl {
   const open = prop(false);
 
@@ -43,8 +43,8 @@ export function view(ctrl: StudyCtrl): VNode {
         {
           attrs: { href: `/study/topic/${encodeURIComponent(topic)}/hot` },
         },
-        topic
-      )
+        topic,
+      ),
     ),
     ctrl.members.canContribute()
       ? h(
@@ -52,7 +52,7 @@ export function view(ctrl: StudyCtrl): VNode {
           {
             hook: bind('click', () => ctrl.topics.open(true), ctrl.redraw),
           },
-          ['Manage topics']
+          ['Manage topics'],
         )
       : null,
   ]);
@@ -83,16 +83,16 @@ export function formView(ctrl: TopicsCtrl, userId?: string): VNode {
             {
               hook: onInsert(elm => setupTagify(elm as HTMLTextAreaElement, userId)),
             },
-            ctrl.getTopics().join(', ').replace(/[<>]/g, '')
+            ctrl.getTopics().join(', ').replace(/[<>]/g, ''),
           ),
           h(
             'button.button',
             {
               type: 'submit',
             },
-            ctrl.trans.noarg('apply')
+            ctrl.trans.noarg('apply'),
           ),
-        ]
+        ],
       ),
     ],
   });

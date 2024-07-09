@@ -97,11 +97,11 @@ export default function (root: AnalyseCtrl, opts: ExplorerOpts, allow: boolean):
           loading(false);
           failing(true);
           root.redraw();
-        }
+        },
       );
     },
     250,
-    true
+    true,
   );
 
   const empty: ExplorerData = {
@@ -160,7 +160,7 @@ export default function (root: AnalyseCtrl, opts: ExplorerOpts, allow: boolean):
               fen,
               uci,
             }
-          : null
+          : null,
       );
       root.setAutoShapes();
     },

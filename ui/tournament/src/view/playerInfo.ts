@@ -74,7 +74,7 @@ export default function (ctrl: TournamentController): VNode {
               {
                 hook: bind('click', () => ctrl.showTeamInfo(data.player.team), ctrl.redraw),
               },
-              [teamName(ctrl.data.teamBattle!, data.player.team)]
+              [teamName(ctrl.data.teamBattle!, data.player.team)],
             )
           : null,
         h('table', [
@@ -120,12 +120,12 @@ export default function (ctrl: TournamentController): VNode {
                 h('td.is.playerIndex-icon.' + p.playerColor),
                 h('td.result', res),
                 berserkTd(p.berserk, data.player.name),
-              ]
+              ],
             );
-          })
+          }),
         ),
       ]),
-    ]
+    ],
   );
 }
 

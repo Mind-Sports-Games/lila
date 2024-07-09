@@ -109,7 +109,7 @@ playstrategy.load.then(() => {
       .getAttribute('data-value')
       ?.split(',')
       .map(code => whitelist?.find(l => l.code == code))
-      .filter(notNull) as Tagify.TagData[]
+      .filter(notNull) as Tagify.TagData[],
   );
 
   todo();

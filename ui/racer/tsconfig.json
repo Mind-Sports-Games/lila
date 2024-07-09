@@ -1,0 +1,11 @@
+{
+  "extends": "../tsconfig.base.json",
+  "compilerOptions": {
+    "types": ["playstrategy", "cash", "web"],
+    "noEmit": true
+  },
+  "references": [
+    { "path": "../common/tsconfig.json" },
+    { "path": "../puz/tsconfig.json" }
+  ]
+}

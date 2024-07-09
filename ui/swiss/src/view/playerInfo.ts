@@ -149,9 +149,9 @@ export default function (ctrl: SwissCtrl): VNode | undefined {
                       ? isMatchScore
                         ? matchScoreDisplay(multiMatchByeScore(ctrl))
                         : '1'
-                      : '½'
+                      : '½',
                   ),
-                ]
+                ],
               );
             }
             const res = result(p);
@@ -176,12 +176,12 @@ export default function (ctrl: SwissCtrl): VNode | undefined {
                   : p.ismm
                   ? ''
                   : h('td.matchscore', res),
-              ]
+              ],
             );
-          })
+          }),
         ),
       ]),
-    ]
+    ],
   );
 }
 

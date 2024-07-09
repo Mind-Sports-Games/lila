@@ -58,7 +58,9 @@
   circle {
     stroke: #42a5f5;
     stroke-width: 4;
-    animation: spinner-dash 1.275s ease-in-out infinite, spinner-color 5.1s linear infinite;
+    animation:
+      spinner-dash 1.275s ease-in-out infinite,
+      spinner-color 5.1s linear infinite;
   }
 
   .white & circle {

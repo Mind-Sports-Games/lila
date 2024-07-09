@@ -99,7 +99,7 @@ playstrategy.load.then(() => {
     });
 
     makeReady('form.fide-title select', el =>
-      $(el).on('change', () => ($(el).parent('form')[0] as HTMLFormElement).submit())
+      $(el).on('change', () => ($(el).parent('form')[0] as HTMLFormElement).submit()),
     );
 
     makeReady('form.pm-preset select', (el: HTMLSelectElement) =>
@@ -107,7 +107,7 @@ playstrategy.load.then(() => {
         const form = $(el).parent('form')[0] as HTMLFormElement;
         xhr.text(form.getAttribute('action') + encodeURIComponent(el.value), { method: 'post' });
         $(form).html('Sent!');
-      })
+      }),
     );
 
     makeReady('.mz_others', el => {
@@ -159,7 +159,7 @@ playstrategy.load.then(() => {
       el => {
         tablesort(el, { descending: true });
       },
-      'ready-sort'
+      'ready-sort',
     );
     makeReady('.mz_others .more-others', el => {
       $(el)
@@ -182,7 +182,7 @@ playstrategy.load.then(() => {
   if (new URL(location.href).searchParams.has('mod')) $toggle.trigger('click');
 
   window.Mousetrap.bind('m', () => $toggle.trigger('click')).bind('i', () =>
-    $zone.find('button.inquiry').trigger('click')
+    $zone.find('button.inquiry').trigger('click'),
   );
 
   const $other = $('#communication,main.appeal');

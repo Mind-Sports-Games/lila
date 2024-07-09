@@ -52,7 +52,7 @@ function action(icon: string, text: string, handler: () => void): VNode {
       attrs: { 'data-icon': icon },
       hook: bind('click', handler),
     },
-    text
+    text,
   );
 }
 
@@ -76,7 +76,7 @@ function view(opts: Opts, coords: Coords): VNode {
       action('q', trans('deleteFromHere'), () => ctrl.deleteNode(opts.path)),
     ]
       .concat(ctrl.study ? studyView.contextMenu(ctrl.study, opts.path, node) : [])
-      .concat([onMainline ? action('F', trans('forceVariation'), () => ctrl.forceVariation(opts.path, true)) : null])
+      .concat([onMainline ? action('F', trans('forceVariation'), () => ctrl.forceVariation(opts.path, true)) : null]),
   );
 }
 

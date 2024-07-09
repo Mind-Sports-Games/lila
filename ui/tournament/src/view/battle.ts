@@ -39,8 +39,8 @@ export function joinWithTeamSelector(ctrl: TournamentController) {
                       {
                         hook: bind('click', () => ctrl.join(id), ctrl.redraw),
                       },
-                      tb.teams[id]
-                    )
+                      tb.teams[id],
+                    ),
                   ),
                 ]
               : [
@@ -55,16 +55,16 @@ export function joinWithTeamSelector(ctrl: TournamentController) {
                           {
                             attrs: { href: '/team/' + t },
                           },
-                          tb.teams[t]
-                        )
-                      )
-                    )
+                          tb.teams[t],
+                        ),
+                      ),
+                    ),
                   ),
                 ]),
           ]),
-        ]
+        ],
       ),
-    ]
+    ],
   );
 }
 
@@ -97,9 +97,9 @@ function extraTeams(ctrl: TournamentController): VNode {
             href: `/tournament/${ctrl.data.id}/teams`,
           },
         },
-        ctrl.trans('viewAllXTeams', Object.keys(ctrl.data.teamBattle!.teams).length)
-      )
-    )
+        ctrl.trans('viewAllXTeams', Object.keys(ctrl.data.teamBattle!.teams).length),
+      ),
+    ),
   );
 }
 
@@ -111,7 +111,7 @@ function myTeam(ctrl: TournamentController, battle: TeamBattle): MaybeVNode {
 export function teamName(battle: TeamBattle, teamId: string): VNode {
   return h(
     battle.hasMoreThanTenTeams ? 'team' : 'team.ttc-' + Object.keys(battle.teams).indexOf(teamId),
-    battle.teams[teamId]
+    battle.teams[teamId],
   );
 }
 
@@ -134,8 +134,8 @@ function teamTr(ctrl: TournamentController, battle: TeamBattle, team: RankedTeam
             ...bind('click', _ => ctrl.jumpToPageOf(p.user.name), ctrl.redraw),
           },
         },
-        [...(i === 0 ? [h('username', playerName(p.user)), ' '] : []), '' + p.score]
-      )
+        [...(i === 0 ? [h('username', playerName(p.user)), ' '] : []), '' + p.score],
+      ),
     );
   });
   return h(
@@ -152,7 +152,7 @@ function teamTr(ctrl: TournamentController, battle: TeamBattle, team: RankedTeam
       h('td.team', [teamName(battle, team.id)]),
       h('td.players', players),
       h('td.total', [h('strong', '' + team.score)]),
-    ]
+    ],
   );
 }
 

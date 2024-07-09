@@ -8,34 +8,33 @@
   "directories": {},
   "dependencies": {},
   "devDependencies": {
-    "@rollup/plugin-commonjs": "^17",
-    "@rollup/plugin-typescript": "^8.1.0",
-    "@typescript-eslint/eslint-plugin": "^4",
-    "@typescript-eslint/parser": "^4",
+    "@typescript-eslint/eslint-plugin": "4.33.0",
+    "@typescript-eslint/parser": "4.33.0",
     "eslint": "^7",
     "prettier": "^2",
-    "rollup": "^2",
-    "rollup-plugin-terser": "^7",
     "tslib": "^2",
-    "typescript": "^4"
+    "typescript": "4.1.3"
   },
   "scripts": {
-    "prepare": "npm run compile",
-    "compile": "tsc --outDir . --sourceMap --declaration",
+    "prepare": "tsc",
+    "compile": "tsc",
     "lint": "eslint src/*.ts",
     "format": "prettier --write .",
     "check-format": "prettier --check .",
-    "dist": "rollup --config",
-    "dev": "yarn run dist && tsc --outDir . --sourceMap --declaration",
-    "prod": "yarn run dist && tsc --outDir . --sourceMap --declaration"
+    "dev": "tsc",
+    "prod": "tsc"
+  },
+  "playstrategy": {
+    "bundles": {
+      "src/index.js": "draughtsground"
+    }
   },
   "files": [
     "/*.js",
     "/*.d.ts",
     "/*.js.map",
     "/assets/*.css",
-    "/src/*.ts",
-    "!/rollup.config.js"
+    "/src/*.ts"
   ],
   "keywords": [
     "draughts",

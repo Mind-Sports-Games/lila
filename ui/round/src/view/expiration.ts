@@ -58,13 +58,13 @@ export default function (ctrl: RoundController, position: Position): MaybeVNode 
           'bar-glider': myTurn,
         },
       },
-      moveIndicatorText
+      moveIndicatorText,
     );
   } else {
     return h(
       'div.expiration.expiration-' + position,
       { attrs: { style: 'visibility: hidden' } },
-      'div not shown... but for layout'
+      'div not shown... but for layout',
     );
   }
 }

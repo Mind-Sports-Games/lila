@@ -1,7 +1,16 @@
 {
   "extends": "../tsconfig_module.base.json",
-  "include": ["src"],
+  "include": [
+    "src"
+  ],
   "compilerOptions": {
-    "outDir": "./dist"
-  }
+    "outDir": "./dist",
+    "rootDir": "src",
+    "types": [
+      "playstrategy"
+    ],
+    "composite": true,
+    "incremental": true
+  },
+  "isolatedModules": true,
 }

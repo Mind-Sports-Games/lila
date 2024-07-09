@@ -38,7 +38,7 @@ const setupActionForm = () => {
         const reload = confirm('Analysis completed. Reload the page?');
         if (reload) playstrategy.reload();
       }),
-    1000
+    1000,
   );
   $(form).on('click', 'button', e => {
     const button = e.target as HTMLButtonElement;
@@ -91,5 +91,5 @@ const checkBoxAll = (table: HTMLTableElement) =>
     .on('change', (e: MouseEvent) =>
       $(table)
         .find('tbody input')
-        .prop('checked', (e.target as HTMLInputElement).checked)
+        .prop('checked', (e.target as HTMLInputElement).checked),
     );

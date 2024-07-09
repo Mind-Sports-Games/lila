@@ -6,6 +6,7 @@ import * as cg from 'chessground/types';
 import { DrawShape } from 'chessground/draw';
 import changeColorHandle from 'common/coordsColor';
 import resizeHandle from 'common/resize';
+import * as Prefs from 'common/prefs';
 import AnalyseCtrl from './ctrl';
 import { isOnlyDropsPly } from './util';
 import * as stratUtils from 'stratutils';
@@ -38,7 +39,7 @@ export function promote(ground: CgApi, key: Key, role: cg.Role) {
             promoted: true,
           },
         ],
-      ])
+      ]),
     );
   }
 }

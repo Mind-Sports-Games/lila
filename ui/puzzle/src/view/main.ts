@@ -9,6 +9,7 @@ import { h, VNode } from 'snabbdom';
 import { onInsert, bind, bindMobileMousedown } from '../util';
 import { render as treeView } from './tree';
 import { view as cevalView } from 'ceval';
+import * as Prefs from 'common/prefs';
 
 function renderAnalyse(ctrl: Controller): VNode {
   return h('div.puzzle__moves.areplay', [treeView(ctrl)]);
@@ -56,7 +57,7 @@ function controls(ctrl: Controller): VNode {
             else if (action === 'first') control.first(ctrl);
             else if (action === 'last') control.last(ctrl);
           },
-          ctrl.redraw
+          ctrl.redraw,
         );
       }),
     },
@@ -67,7 +68,7 @@ function controls(ctrl: Controller): VNode {
         jumpButton('X', 'next', !nextNode, goNext),
         jumpButton('V', 'last', !nextNode, goNext),
       ]),
-    ]
+    ],
   );
 }
 
@@ -110,7 +111,7 @@ export default function (ctrl: Controller): VNode {
         {
           hook: 'ontouchstart' in window ? undefined : bind('wheel', e => wheel(ctrl, e as WheelEvent)),
         },
-        [chessground(ctrl), ctrl.promotion.view()]
+        [chessground(ctrl), ctrl.promotion.view()],
       ),
       cevalView.renderGauge(ctrl),
       h('div.puzzle__tools', [
@@ -121,14 +122,14 @@ export default function (ctrl: Controller): VNode {
           {
             class: { none: !showCeval },
           },
-          showCeval ? [cevalView.renderCeval(ctrl), cevalView.renderPvs('standard')(ctrl)] : []
+          showCeval ? [cevalView.renderCeval(ctrl), cevalView.renderPvs('standard')(ctrl)] : [],
         ),
         renderAnalyse(ctrl),
         feedbackView(ctrl),
       ]),
       controls(ctrl),
       session(ctrl),
-    ]
+    ],
   );
 }
 
@@ -150,7 +151,7 @@ function session(ctrl: Controller) {
             ...(ctrl.streak ? { target: '_blank' } : {}),
           },
         },
-        rd
+        rd,
       );
     }),
     rounds.find(r => r.id == current)
@@ -172,7 +173,7 @@ function session(ctrl: Controller) {
                   href: `/training/${ctrl.session.theme}/${current}`,
                 },
           },
-          ctrl.streak?.data.index
+          ctrl.streak?.data.index,
         ),
   ]);
 }

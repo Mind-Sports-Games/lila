@@ -130,8 +130,8 @@ function renderTournament(ctrl, tour) {
           0,
           Math.min(
             width - 250, // max padding, reserved text space
-            leftPos(now) - left - 380
-          )
+            leftPos(now) - left - 380,
+          ),
         ); // distance from Now
   // cut right overflow to fit viewport and not widen it, for marathons
   width = Math.min(width, leftPos(stopTime) - left);
@@ -155,7 +155,7 @@ function renderTournament(ctrl, tour) {
                 title: tour.perf.name,
               },
             }
-          : {}
+          : {},
       ),
       h('span.body', [
         h('span.name', i18nName(tour)),
@@ -172,12 +172,12 @@ function renderTournament(ctrl, tour) {
                 {
                   attrs: { 'data-icon': 'r' },
                 },
-                tour.nbPlayers
+                tour.nbPlayers,
               )
             : null,
         ]),
       ]),
-    ]
+    ],
   );
 }
 
@@ -197,15 +197,15 @@ function renderTimeline() {
           class: { hour: !time.getMinutes() },
           attrs: { style: 'left: ' + leftPos(time.getTime()) + 'px' },
         },
-        timeString(time)
-      )
+        timeString(time),
+      ),
     );
     time.setUTCMinutes(time.getUTCMinutes() + minutesBetween);
   }
   timeHeaders.push(
     h('div.timeheader.now', {
       attrs: { style: 'left: ' + leftPos(now) + 'px' },
-    })
+    }),
   );
 
   return h('div.timeline', timeHeaders);
@@ -241,7 +241,7 @@ export default function (ctrl) {
 
   // group system tournaments into dedicated lanes for PerfType
   const tourLanes = splitOverlaping(group(systemTours, laneGrouper).concat([userTours])).filter(
-    lane => lane.length > 0
+    lane => lane.length > 0,
   );
 
   return h('div.tour-chart', [
@@ -275,10 +275,10 @@ export default function (ctrl) {
         ...tourLanes.map(lane => {
           return h(
             'div.tournamentline',
-            lane.map(tour => renderTournament(ctrl, tour))
+            lane.map(tour => renderTournament(ctrl, tour)),
           );
         }),
-      ]
+      ],
     ),
   ]);
 }

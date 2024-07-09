@@ -12,19 +12,25 @@
   "author": "Thibault Duplessis",
   "license": "AGPL-3.0-or-later",
   "devDependencies": {
-    "@build/rollupProject": "2.0.0",
-    "@types/playstrategy": "2.0.0"
+    "@types/playstrategy": "workspace:*",
+    "typescript": "4.1.3"
   },
   "dependencies": {
-    "chat": "2.0.0",
+    "chat": "workspace:*",
     "chessground": "git+ssh://git@github.com:Mind-Sports-Games/chessground.git#v7.11.1-pstrat2.48",
-    "common": "2.0.0",
-    "draughtsground": "^7.6",
-    "game": "2.0.0",
+    "common": "workspace:*",
+    "draughtsground": "workspace:*",
+    "game": "workspace:*",
     "snabbdom": "^3.0.1"
   },
   "scripts": {
-    "dev": "rollup --config",
-    "prod": "rollup --config --config-prod"
+    "compile": "tsc",
+    "dev": "tsc",
+    "prod": "tsc"
+  },
+  "playstrategy": {
+    "bundles": {
+      "src/main.ts": "swiss"
+    }
   }
 }
