@@ -11,6 +11,7 @@ project/metals.sbt
 project/project
 project/target
 public/compiled
+public/npm
 public/vendor/highcharts-4.2.5
 public/vendor/hopscotch
 public/vendor/tagify
