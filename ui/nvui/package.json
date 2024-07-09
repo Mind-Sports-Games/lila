@@ -3,6 +3,16 @@
   "version": "2.0.0",
   "private": true,
   "description": "playstrategy.org non-visual user interface",
+  "exports": {
+    "./*": "./dist/*.js"
+  },
+  "typesVersions": {
+    "*": {
+      "*": [
+        "dist/*"
+      ]
+    }
+  },
   "keywords": [
     "chess",
     "playstrategy",
@@ -17,13 +27,14 @@
     "typescript": "^5.4.3"
   },
   "dependencies": {
+    "@types/jquery": "^3.5.30",
     "chessground": "git+ssh://git@github.com:Mind-Sports-Games/chessground.git#semver:v7.11.1-pstrat2.48",
-    "stratops": "git+ssh://git@github.com:Mind-Sports-Games/stratops.git#semver:v0.8.1-pstrat4.4",
-    "snabbdom": "^3.0.1"
+    "snabbdom": "^3.0.1",
+    "stratops": "git+ssh://git@github.com:Mind-Sports-Games/stratops.git#semver:v0.8.1-pstrat4.4"
   },
   "scripts": {
     "compile": "tsc",
     "dev": "tsc",
     "prod": "tsc"
-  }  
+  }
 }

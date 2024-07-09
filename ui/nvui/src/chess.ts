@@ -477,7 +477,7 @@ export function pieceJumpingHandler(wrapSound: () => void, errorSound: () => voi
         cancelable: true,
         bubbles: true,
       });
-      $form.trigger($sendForm);
+      $form.trigger('submit', $sendForm);
       return false;
     }
 
@@ -553,7 +553,7 @@ export function selectionHandler(opponentPlayerIndex: PlayerIndex, selectSound: 
       // if user selects their own piece second
       if ($evBtn.attr('playerIndex') === (opponentPlayerIndex === 'p2' ? 'p1' : 'p2')) return false;
 
-      const $first = $moveBox.val();
+      const $first = $moveBox.val() || '';
       const $firstPiece = $('.board-wrapper [file="' + $first[0] + '"][rank="' + $first[1] + '"]');
       $moveBox.val($moveBox.val() + $pos);
       // this is coupled to pieceJumpingHandler() noticing that the attribute is set and acting differently. TODO: make cleaner
@@ -569,7 +569,7 @@ export function selectionHandler(opponentPlayerIndex: PlayerIndex, selectSound: 
         cancelable: true,
         bubbles: true,
       });
-      $form.trigger($event);
+      $form.trigger('submit', $event);
     }
     return false;
   };
