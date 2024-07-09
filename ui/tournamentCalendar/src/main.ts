@@ -8,7 +8,7 @@ const patch = init([classModule, attributesModule]);
 
 export function app(element: HTMLElement, env: any) {
   // enrich tournaments
-  env.data.tournaments.forEach(t => {
+  env.data.tournaments.forEach((t: any) => {
     if (!t.bounds)
       t.bounds = {
         start: new Date(t.startsAt),
