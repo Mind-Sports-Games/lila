@@ -121,7 +121,7 @@ object side {
         tour.noBerserk option div(cls := "text", dataIcon := "`")("No Berserk allowed"),
         tour.noStreak option div(cls := "text", dataIcon := "Q")("No Arena streaks"),
         tour.statusScoring option div(cls := "text", dataIcon := "g")(
-          "Additional points awarded, 1 for gammon, 2 for backgammon."
+          "Extra points: +1 Gammon, +2 Backgammon."
         ),
         !tour.isFinished option tour.trophy1st.map { trophy1st =>
           table(cls := "trophyPreview")(

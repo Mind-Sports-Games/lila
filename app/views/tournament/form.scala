@@ -199,7 +199,7 @@ object form {
         form3.checkbox(
           form("statusScoring"),
           trans.statusScoring(),
-          help = frag("In Backgammon score additional points, 1 for gammon, 2 for backgammon.").some,
+          help = frag("Score extra points: +1 Gammon, +2 Backgammon.").some,
           half = true
         ),
         form3.hidden(form("statusScoring"), "false".some) // hack to allow disabling statusScoring
