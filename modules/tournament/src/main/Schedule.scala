@@ -18,7 +18,8 @@ case class Schedule(
     at: DateTime,
     duration: Option[Int] = None,
     medleyShield: Option[TournamentShield.MedleyShield] = None,
-    conditions: Condition.All = Condition.All.empty
+    conditions: Condition.All = Condition.All.empty,
+    statusScoring: Boolean = false
 ) {
 
   // Simpler naming for now.
@@ -160,7 +161,8 @@ object Schedule {
       speed = Speed fromClock tour.clock,
       variant = tour.variant,
       position = tour.position,
-      at = tour.startsAt
+      at = tour.startsAt,
+      statusScoring = tour.statusScoring
     )
 
   case class Plan(schedule: Schedule, buildFunc: Option[Tournament => Tournament]) {

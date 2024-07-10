@@ -4,12 +4,19 @@ import { teamName } from './battle';
 import * as status from 'game/status';
 import TournamentController from '../ctrl';
 
-function result(win, stat): string {
+function result(win, stat, useStatusScoring): string {
   switch (win) {
     case true:
-      return '1';
+      if (useStatusScoring) {
+        if (status.isBackgammon(stat)) {
+          return 'B';
+        } else if (status.isGammon(stat)) {
+          return 'G';
+        } else return 'W';
+      } else return '1';
     case false:
-      return '0';
+      if (useStatusScoring) return 'L';
+      else return '0';
     default:
       return stat >= status.ids.mate ? '½' : '*';
   }
@@ -94,9 +101,9 @@ export default function (ctrl: TournamentController): VNode {
             }),
           },
           data.pairings.map(function (p, i) {
-            const res = result(p.win, p.status);
+            const res = result(p.win, p.status, ctrl.data.statusScoring);
             return h(
-              'tr.glpt.' + (res === '1' ? ' win' : res === '0' ? ' loss' : ''),
+              'tr.glpt.' + (p.win ? ' win' : res === '0' || res === 'L' ? ' loss' : ''),
               {
                 key: p.id,
                 attrs: { 'data-href': '/' + p.id + '/' + p.playerIndex },

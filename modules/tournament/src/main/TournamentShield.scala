@@ -148,6 +148,10 @@ object TournamentShield {
     def arenaFormatFull = s"${arenaFormat} ${balancedFormat}"
     def arenaDescriptionFull =
       s"${arenaDescription}\r\n\r\nWin the tournament, win the shield... until next ${intervalStr}!\r\n\r\nMore info here: ${url}"
+    def useStatusScoring = variants.map(_.gameFamily).toSet.size == 1 && variants
+      .map(_.gameFamily)
+      .headOption
+      .getOrElse(GameFamily.Chess()) == GameFamily.Backgammon()
   }
 
   object MedleyShield {

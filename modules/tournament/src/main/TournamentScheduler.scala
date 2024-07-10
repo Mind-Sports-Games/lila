@@ -148,7 +148,8 @@ final private class TournamentScheduler(
             minRating = none,
             titled = none,
             teamMember = medleyShield.teamOwner.some
-          )
+          ),
+          medleyShield.useStatusScoring
         ).plan
       }
 
@@ -162,7 +163,8 @@ final private class TournamentScheduler(
           variant,
           none,
           date,
-          Some(60 * 24)
+          Some(60 * 24),
+          statusScoring = variant.key == "backgammon" || variant.key == "nackgammon"
         ).plan {
           _.copy(
             spotlight = Some(
@@ -187,7 +189,8 @@ final private class TournamentScheduler(
           speed,
           variant,
           none,
-          date
+          date,
+          statusScoring = variant.key == "backgammon" || variant.key == "nackgammon"
         ).plan {
           _.copy(
             spotlight = Some(
@@ -244,7 +247,15 @@ final private class TournamentScheduler(
     val thisMonthShields = TournamentShield.Category.all
       .map(shield =>
         at(thisMonthWithDay(shield.dayOfMonth), shield.scheduleHour(thisMonth.index)) map { date =>
-          Schedule(Shield, shield.speed, shield.variant, none, date, shieldDuration) plan {
+          Schedule(
+            Shield,
+            shield.speed,
+            shield.variant,
+            none,
+            date,
+            shieldDuration,
+            statusScoring = shield.variant.key == "backgammon" || shield.variant.key == "nackgammon"
+          ) plan {
             _.copy(
               name = s"${VariantKeys.variantName(shield.variant)} Shield",
               spotlight = Some(
@@ -263,7 +274,15 @@ final private class TournamentScheduler(
     val nextMonthShields = TournamentShield.Category.all
       .map(shield =>
         at(nextMonthWithDay(shield.dayOfMonth), shield.scheduleHour(nextMonth.index)) map { date =>
-          Schedule(Shield, shield.speed, shield.variant, none, date, shieldDuration) plan {
+          Schedule(
+            Shield,
+            shield.speed,
+            shield.variant,
+            none,
+            date,
+            shieldDuration,
+            statusScoring = shield.variant.key == "backgammon" || shield.variant.key == "nackgammon"
+          ) plan {
             _.copy(
               name = s"${VariantKeys.variantName(shield.variant)} Shield",
               spotlight = Some(

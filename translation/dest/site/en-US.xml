@@ -289,6 +289,7 @@
   <string name="confirmMove">Confirm move</string>
   <string name="play">Play</string>
   <string name="inbox">Inbox</string>
+  <string name="statusScoring">Status Scoring</string>
   <string name="chatRoom">Chat room</string>
   <string name="loginToChat">Sign in to chat</string>
   <string name="youHaveBeenTimedOut">You have been timed out.</string>

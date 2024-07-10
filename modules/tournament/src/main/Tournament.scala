@@ -31,6 +31,7 @@ case class Tournament(
     teamBattle: Option[TeamBattle] = None,
     noBerserk: Boolean = false,
     noStreak: Boolean = false,
+    statusScoring: Boolean = false,
     schedule: Option[Schedule],
     nbPlayers: Int,
     createdAt: DateTime,
@@ -249,6 +250,7 @@ object Tournament {
       startDate: Option[DateTime],
       berserkable: Boolean,
       streakable: Boolean,
+      statusScoring: Boolean,
       teamBattle: Option[TeamBattle],
       description: Option[String],
       hasChat: Boolean
@@ -275,6 +277,7 @@ object Tournament {
       teamBattle = teamBattle,
       noBerserk = !berserkable,
       noStreak = !streakable,
+      statusScoring = statusScoring,
       schedule = None,
       startsAt = startDate match {
         case Some(startDate) => startDate plusSeconds ThreadLocalRandom.nextInt(60)
@@ -303,6 +306,7 @@ object Tournament {
       position = sched.position,
       mode = Mode.Rated,
       conditions = sched.conditions,
+      statusScoring = sched.statusScoring,
       schedule = Some(sched),
       startsAt = sched.at plusSeconds ThreadLocalRandom.nextInt(60),
       description = sched.medleyShield.map(_.arenaDescriptionFull),

@@ -81,6 +81,7 @@ object BSONHandlers {
         teamBattle = r.getO[TeamBattle]("teamBattle"),
         noBerserk = r boolD "noBerserk",
         noStreak = r boolD "noStreak",
+        statusScoring = r boolO "statusScoring" getOrElse false,
         schedule = for {
           doc   <- r.getO[Bdoc]("schedule")
           freq  <- doc.getAsOpt[Schedule.Freq]("freq")
@@ -122,6 +123,7 @@ object BSONHandlers {
         "teamBattle"       -> o.teamBattle,
         "noBerserk"        -> w.boolO(o.noBerserk),
         "noStreak"         -> w.boolO(o.noStreak),
+        "statusScoring"    -> o.statusScoring.option(true),
         "schedule"         -> o.schedule,
         "nbPlayers"        -> o.nbPlayers,
         "createdAt"        -> w.date(o.createdAt),
