@@ -44,3 +44,11 @@ export function aborted(data: BaseGameData): boolean {
 export function playing(data: BaseGameData): boolean {
   return started(data) && !finished(data) && !aborted(data);
 }
+
+export function isGammon(statusId: number): boolean {
+  return [ids.gammonWin, ids.ginGammon, ids.outoftimeGammon, ids.resignGammon].includes(statusId);
+}
+
+export function isBackgammon(statusId: number): boolean {
+  return [ids.backgammonWin, ids.ginBackgammon, ids.outoftimeBackgammon, ids.resignBackgammon].includes(statusId);
+}
