@@ -6,7 +6,7 @@ import { ChatOpts } from './interfaces';
 import { PresetCtrl } from './preset';
 
 export type { ChatPlugin } from './interfaces';
-export { default as ChatCtrl } from './ctrl';
+export type { Ctrl as ChatCtrl } from './interfaces';
 
 export default function PlayStrategyChat(
   element: Element,

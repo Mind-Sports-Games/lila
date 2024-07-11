@@ -1,7 +1,7 @@
 import * as xhr from 'common/xhr';
 import { RoundOpts, RoundData } from './interfaces';
 import { RoundApi, RoundMain } from './main';
-import { ChatCtrl } from 'chat';
+import { type ChatCtrl } from 'chat';
 import { TourPlayer } from 'game';
 import { tourStandingCtrl, TourStandingCtrl } from './tourStanding';
 
