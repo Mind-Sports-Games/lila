@@ -3,7 +3,7 @@
   "compilerOptions": {
     "outDir": "./dist",
     "rootDir": "src",    
-    "types": ["playstrategy", "web"],
+    "types": ["jquery", "playstrategy", "web"],
     "declaration": true,
     "composite": true
   },
