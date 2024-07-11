@@ -16,7 +16,7 @@ export function loadContacts(): Promise<MsgData> {
 
 export function search(q: string): Promise<SearchResult> {
   return json(`/inbox/search?q=${q}`).then(
-    res =>
+    (res: any) =>
       ({
         ...res,
         contacts: res.contacts.map(upgradeContact),

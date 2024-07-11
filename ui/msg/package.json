@@ -11,7 +11,8 @@
     "typescript": "^5.4.3"
   },
   "dependencies": {
-    "snabbdom": "^3.0.1"
+    "snabbdom": "^3.0.1",
+    "common": "workspace:*"
   },
   "scripts": {
     "compile": "tsc",

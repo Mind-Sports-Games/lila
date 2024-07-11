@@ -408,6 +408,9 @@ importers:
 
   ui/msg:
     dependencies:
+      common:
+        specifier: workspace:*
+        version: link:../common
       snabbdom:
         specifier: ^3.0.1
         version: 3.5.1
