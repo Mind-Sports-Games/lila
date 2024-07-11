@@ -19,7 +19,6 @@
   },
   "dependencies": {
     "chat": "workspace:*",
-    "chessground": "file:/home/vincent/Desktop/code/chessground",
     "common": "workspace:*",
     "draughtsground": "workspace:*",
     "snabbdom": "^3.0.1"

@@ -15,7 +15,6 @@
     "@fnando/sparkline": "^0.3.10",
     "@yaireo/tagify": "4.6.0",
     "chat": "workspace:*",
-    "chessground": "file:/home/vincent/Desktop/code/chessground",
     "common": "workspace:*",
     "debounce-promise": "^3.1.2",
     "draughtsground": "workspace:*",

@@ -19,7 +19,6 @@
   },
   "dependencies": {
     "chess.js": "github:ornicar/chess.js#learn",
-    "chessground": "file:/home/vincent/Desktop/code/chessground",
     "common": "workspace:*",
     "mithril": "github:ornicar/mithril.js#lila-1"
   },

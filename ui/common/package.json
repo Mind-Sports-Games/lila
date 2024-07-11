@@ -24,7 +24,6 @@
   "author": "Thibault Duplessis",
   "license": "AGPL-3.0-or-later",
   "dependencies": {
-    "chessground": "file:/home/vincent/Desktop/code/chessground",
     "stratutils": "workspace:*"
   },
   "devDependencies": {

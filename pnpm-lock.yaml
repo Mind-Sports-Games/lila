@@ -29,6 +29,9 @@ importers:
       ab:
         specifier: github:lichess-org/ab-stub
         version: https://codeload.github.com/lichess-org/ab-stub/tar.gz/94236bf34dbc9c05daf50f4c9842d859b9142be0
+      chessground:
+        specifier: file:/home/vincent/Desktop/code/chessground
+        version: file:../chessground
       eslint:
         specifier: ^8.57.0
         version: 8.57.0
@@ -82,9 +85,6 @@ importers:
       chat:
         specifier: workspace:*
         version: link:../chat
-      chessground:
-        specifier: file:/home/vincent/Desktop/code/chessground
-        version: file:../chessground
       common:
         specifier: workspace:*
         version: link:../common
@@ -202,9 +202,6 @@ importers:
 
   ui/common:
     dependencies:
-      chessground:
-        specifier: file:/home/vincent/Desktop/code/chessground
-        version: file:../chessground
       stratutils:
         specifier: workspace:*
         version: link:../stratutils
@@ -298,9 +295,6 @@ importers:
       chat:
         specifier: workspace:*
         version: link:../chat
-      chessground:
-        specifier: file:/home/vincent/Desktop/code/chessground
-        version: file:../chessground
       common:
         specifier: workspace:*
         version: link:../common
@@ -326,9 +320,6 @@ importers:
 
   ui/editor:
     dependencies:
-      chessground:
-        specifier: file:/home/vincent/Desktop/code/chessground
-        version: file:../chessground
       common:
         specifier: workspace:*
         version: link:../common
@@ -376,9 +367,6 @@ importers:
       chess.js:
         specifier: github:ornicar/chess.js#learn
         version: https://codeload.github.com/ornicar/chess.js/tar.gz/ad0709c0b07773d9d0da8e4605a9a2a28f00d249
-      chessground:
-        specifier: file:/home/vincent/Desktop/code/chessground
-        version: file:../chessground
       common:
         specifier: workspace:*
         version: link:../common
@@ -401,9 +389,6 @@ importers:
       chat:
         specifier: workspace:*
         version: link:../chat
-      chessground:
-        specifier: file:/home/vincent/Desktop/code/chessground
-        version: file:../chessground
       common:
         specifier: workspace:*
         version: link:../common
@@ -458,9 +443,6 @@ importers:
       '@types/jquery':
         specifier: ^3.5.30
         version: 3.5.30
-      chessground:
-        specifier: file:/home/vincent/Desktop/code/chessground
-        version: file:../chessground
       snabbdom:
         specifier: ^3.0.1
         version: 3.5.1
@@ -502,9 +484,6 @@ importers:
 
   ui/puz:
     dependencies:
-      chessground:
-        specifier: file:/home/vincent/Desktop/code/chessground
-        version: file:../chessground
       common:
         specifier: workspace:*
         version: link:../common
@@ -533,9 +512,6 @@ importers:
       chart.js:
         specifier: ^2.9
         version: 2.9.4
-      chessground:
-        specifier: file:/home/vincent/Desktop/code/chessground
-        version: file:../chessground
       common:
         specifier: workspace:*
         version: link:../common
@@ -564,9 +540,6 @@ importers:
 
   ui/racer:
     dependencies:
-      chessground:
-        specifier: file:/home/vincent/Desktop/code/chessground
-        version: file:../chessground
       common:
         specifier: workspace:*
         version: link:../common
@@ -595,9 +568,6 @@ importers:
       chat:
         specifier: workspace:*
         version: link:../chat
-      chessground:
-        specifier: file:/home/vincent/Desktop/code/chessground
-        version: file:../chessground
       common:
         specifier: workspace:*
         version: link:../common
@@ -638,9 +608,6 @@ importers:
       chat:
         specifier: workspace:*
         version: link:../chat
-      chessground:
-        specifier: file:/home/vincent/Desktop/code/chessground
-        version: file:../chessground
       common:
         specifier: workspace:*
         version: link:../common
@@ -672,9 +639,6 @@ importers:
       chat:
         specifier: workspace:*
         version: link:../chat
-      chessground:
-        specifier: file:/home/vincent/Desktop/code/chessground
-        version: file:../chessground
       common:
         specifier: workspace:*
         version: link:../common
@@ -739,9 +703,6 @@ importers:
 
   ui/storm:
     dependencies:
-      chessground:
-        specifier: file:/home/vincent/Desktop/code/chessground
-        version: file:../chessground
       common:
         specifier: workspace:*
         version: link:../common
@@ -764,9 +725,6 @@ importers:
 
   ui/stratutils:
     dependencies:
-      chessground:
-        specifier: file:/home/vincent/Desktop/code/chessground
-        version: file:../chessground
       stratops:
         specifier: git+ssh://git@github.com:Mind-Sports-Games/stratops.git#semver:v0.8.1-pstrat4.4
         version: https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/226564904bfb1d6471f8d8f3c138369826ac775f
@@ -783,9 +741,6 @@ importers:
       chat:
         specifier: workspace:*
         version: link:../chat
-      chessground:
-        specifier: file:/home/vincent/Desktop/code/chessground
-        version: file:../chessground
       common:
         specifier: workspace:*
         version: link:../common
@@ -811,9 +766,6 @@ importers:
       chat:
         specifier: workspace:*
         version: link:../chat
-      chessground:
-        specifier: file:/home/vincent/Desktop/code/chessground
-        version: file:../chessground
       common:
         specifier: workspace:*
         version: link:../common

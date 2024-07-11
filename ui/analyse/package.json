@@ -25,7 +25,6 @@
     "@yaireo/tagify": "4.6.0",
     "ceval": "workspace:*",
     "chat": "workspace:*",
-    "chessground": "file:/home/vincent/Desktop/code/chessground",
     "common": "workspace:*",
     "draughtsground": "workspace:*",
     "game": "workspace:*",

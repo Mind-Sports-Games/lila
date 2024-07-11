@@ -16,7 +16,6 @@
     "typescript": "^5.4.3"
   },
   "dependencies": {
-    "chessground": "file:/home/vincent/Desktop/code/chessground",
     "common": "workspace:*",
     "puz": "workspace:*",
     "snabbdom": "^3.0.1",
