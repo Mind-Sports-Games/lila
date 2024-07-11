@@ -1,6 +1,6 @@
 import LobbyController from './ctrl';
 
-function order(a, b) {
+function order(a: any, b: any) {
   return a.rating > b.rating ? -1 : 1;
 }
 

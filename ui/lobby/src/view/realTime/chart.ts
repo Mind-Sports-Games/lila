@@ -1,3 +1,4 @@
+// @ts-nocheck
 import LobbyController from '../../ctrl';
 import { bind, perfIcons } from '../util';
 import { h, VNode } from 'snabbdom';

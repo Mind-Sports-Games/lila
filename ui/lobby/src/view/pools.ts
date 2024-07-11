@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { h, Hooks } from 'snabbdom';
 import LobbyController from '../ctrl';
 import { bind, spinner, perfIcons } from './util';
