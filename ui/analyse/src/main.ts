@@ -7,7 +7,7 @@ import menuHover from 'common/menuHover';
 import view from './view';
 import { AnalyseApi, AnalyseOpts } from './interfaces';
 import { Chessground } from 'chessground';
-import { Draughtsground } from 'draughtsground';
+import Draughtsground from 'draughtsground';
 
 export const patch = init([classModule, attributesModule]);
 

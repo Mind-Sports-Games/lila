@@ -1,6 +1,6 @@
 import { init, classModule, attributesModule } from 'snabbdom';
 import { Chessground } from 'chessground';
-import { Draughtsground } from 'draughtsground';
+import Draughtsground from 'draughtsground';
 import { LobbyOpts, Tab } from './interfaces';
 import PlayStrategyChat from 'chat';
 

@@ -1,21 +1,11 @@
 {
-  "extends": "../tsconfig_module.base.json",
-  "include": ["src/*.ts"],
-  "exclude": [],
+  "extends": "../tsconfig.base.json",
+  "include": ["src"],
   "compilerOptions": {
-    "declaration": true,
     "outDir": "./dist",
     "rootDir": "src",
-    "noEmitOnError": false,
-    "strict": true,
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
-    "noImplicitThis": true,
-    "noImplicitReturns": true,
-    "module": "esnext",
-    "target": "ES2019",
-    "lib": ["DOM", "ES2019"],
-    "types": [],
+    "declaration": true,
+    "inlineSourceMap": true,
     "composite": true
   },
   "isolatedModules": true

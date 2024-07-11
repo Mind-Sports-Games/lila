@@ -1,6 +1,6 @@
 import exportPlayStrategyGlobals from './site.playstrategy.globals';
 import { Chessground } from 'chessground';
-import { Draughtsground } from 'draughtsground';
+import Draughtsground from 'draughtsground';
 
 exportPlayStrategyGlobals();
 window.Chessground = Chessground;

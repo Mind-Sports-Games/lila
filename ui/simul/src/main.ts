@@ -1,6 +1,6 @@
 import { init, VNode, classModule, attributesModule } from 'snabbdom';
 import { SimulOpts } from './interfaces';
-import { Draughtsground } from 'draughtsground';
+import Draughtsground from 'draughtsground';
 import { Chessground } from 'chessground';
 import SimulCtrl from './ctrl';
 import PlayStrategyChat from 'chat';

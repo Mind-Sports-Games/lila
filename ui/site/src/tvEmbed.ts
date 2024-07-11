@@ -1,5 +1,5 @@
 import { Chessground } from 'chessground';
-import { Draughtsground } from 'draughtsground';
+import Draughtsground from 'draughtsground';
 import * as miniGame from './component/mini-game';
 import loadClockWidget from './component/clock-widget';
 

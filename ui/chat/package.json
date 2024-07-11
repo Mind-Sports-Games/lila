@@ -19,7 +19,7 @@
     "compile": "tsc",
     "dev": "tsc",
     "prod": "tsc"
-  },  
+  },
   "playstrategy": {
     "bundles": {
       "src/main.ts": "chat"

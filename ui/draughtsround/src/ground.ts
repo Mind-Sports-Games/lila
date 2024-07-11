@@ -1,5 +1,5 @@
 import { h } from 'snabbdom';
-import { Draughtsground } from 'draughtsground';
+import Draughtsground from 'draughtsground';
 import * as cg from 'draughtsground/types';
 import { Api as CgApi } from 'draughtsground/api';
 import { countGhosts } from 'draughtsground/fen';

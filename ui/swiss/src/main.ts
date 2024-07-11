@@ -1,5 +1,5 @@
 import { init, VNode, classModule, attributesModule } from 'snabbdom';
-import { Draughtsground } from 'draughtsground';
+import Draughtsground from 'draughtsground';
 import { Chessground } from 'chessground';
 import { SwissOpts } from './interfaces';
 import SwissCtrl from './ctrl';
