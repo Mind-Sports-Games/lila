@@ -35,7 +35,7 @@ case class AnaMove(
   private lazy val fullCaptureFields =
     uci.flatMap(m => Uci.Move.apply(lib, variant.gameFamily, m)).flatMap(_.capture)
 
-  private lazy val newGame = Game(lib, variant.some, fen.some)(
+  private lazy val newGame = Game(lib.pp("lib.some"), variant.some.pp("variant.some"), fen.some.pp("fen.some"))(
     orig = orig,
     dest = dest,
     promotion = promotion,
@@ -45,7 +45,7 @@ case class AnaMove(
   )
 
   def branch: Validated[String, Branch] =
-    newGame flatMap { case (game, move) =>
+    newGame. flatMap { case (game, move) =>
       game.actionStrs.flatten.lastOption toValid "Moved but no last move!" map { san =>
         val uci = Uci(
           lib,
@@ -55,6 +55,8 @@ case class AnaMove(
             case _                    => false
           }
         )
+        println(game.player)
+        println(game.turnCount)
         val sit     = game.situation
         val movable = sit playable false
         val fen     = Forsyth.>>(lib, game)
@@ -79,6 +81,7 @@ case class AnaMove(
         Branch(
           id = UciCharPair(lib, uci),
           ply = game.plies,
+          turnCount = game.turnCount,
           variant = variant,
           move = Uci.WithSan(lib, uci, san),
           fen = fen,

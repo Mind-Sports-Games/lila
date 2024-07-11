@@ -226,9 +226,9 @@ final class StudyApi(
       opts: MoveOpts,
       relay: Option[Chapter.Relay] = None
   )(who: Who): Funit =
-    sequenceStudyWithChapter(studyId, position.chapterId) { case Study.WithChapter(study, chapter) =>
+    sequenceStudyWithChapter(studyId.pp("studyId"), position.chapterId.pp("chapterId")) { case Study.WithChapter(study, chapter) =>
       Contribute(who.u, study) {
-        doAddNode(study, Position(chapter, position.path), node, opts, relay)(who)(chapter.root.variant)
+        doAddNode(study, Position(chapter, position.path), node.pp("node"), opts.pp("opts"), relay)(who)(chapter.root.variant)
       }
     } flatMap { _ ?? { _() } } // this one is for you, Lakin <3
 

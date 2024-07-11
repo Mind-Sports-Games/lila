@@ -13,7 +13,7 @@ sealed trait RootOrNode {
   val ply: Int
   //TODO multiaction will want turnCount, but atm Study won't be for multiaction variants.
   //Will need to think what is stored here. Presumably turnCount is of the actual node (ply) and not the turnCount after this ply has been applied?
-  //val turnCount: Int
+  val turnCount: Int
   val variant: Variant
   val fen: FEN
   val check: Boolean
@@ -30,16 +30,14 @@ sealed trait RootOrNode {
   //and as mentioned above we dont have any multiaction variants in Study
   def fullTurnCount = 1 + ply / 2
   def mainline: Vector[Node]
-  //TODO multiaction - again this will need to be upgraded, but is fine for now, same reasons as above
-  //this stores who plays next. like tree/src/main/tree.scala
-  def playerIndex = PlayerIndex.fromTurnCount(ply)
+  def playerIndex = PlayerIndex.fromTurnCount(turnCount).pp("playerIndex fromTurnCount(turnCount) in RootOrNode")
   def moveOption: Option[Uci.WithSan]
 }
 
 case class Node(
     id: UciCharPair,
     ply: Int,
-    //turnCount: Int,
+    turnCount: Int,
     variant: Variant,
     move: Uci.WithSan,
     fen: FEN,
@@ -209,7 +207,7 @@ object Node {
       }
 
     def updateWith(id: UciCharPair, op: Node => Option[Node]): Option[Children] =
-      get(id) flatMap op map update
+      get(id).flatMap(op).map(update)
 
     def updateChildren(id: UciCharPair, f: Children => Option[Children]): Option[Children] =
       updateWith(id, _ withChildren f)
@@ -244,7 +242,7 @@ object Node {
 
   case class Root(
       ply: Int,
-      //turnCount: Int,
+      turnCount: Int,
       variant: Variant,
       fen: FEN,
       check: Boolean,
@@ -339,6 +337,7 @@ object Node {
     def default(variant: Variant) =
       Root(
         ply = 0,
+        turnCount = 0,
         variant = variant,
         fen = variant.initialFen,
         check = false,
@@ -350,6 +349,7 @@ object Node {
     def fromRoot(b: lila.tree.Root): Root =
       Root(
         ply = b.ply,
+        turnCount = b.turnCount,
         variant = b.variant,
         fen = b.fen,
         check = b.check,
@@ -363,6 +363,7 @@ object Node {
     Node(
       id = b.id,
       ply = b.ply,
+      turnCount = b.turnCount,
       variant = b.variant,
       move = b.move,
       fen = b.fen,
@@ -374,7 +375,8 @@ object Node {
     )
 
   object BsonFields {
-    val ply = "p"
+    val ply       = "p"
+    val turnCount = "t"
     //no longer used (was plysPerTurn)
     //val ppt            = "pt"
     val variant        = "v"

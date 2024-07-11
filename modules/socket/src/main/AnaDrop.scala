@@ -31,6 +31,7 @@ case class AnaDrop(
         Branch(
           id = UciCharPair(lib, uci),
           ply = game.plies,
+          turnCount = game.turnCount,
           variant = variant,
           move = Uci.WithSan(lib, uci, san),
           fen = fen,

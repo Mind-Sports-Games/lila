@@ -179,6 +179,7 @@ object ServerEval {
       Node(
         id = UciCharPair(g.situation.board.variant.gameLogic, m.uci),
         ply = g.plies,
+        turnCount = g.turnCount,
         variant = g.situation.board.variant,
         move = m,
         fen = Forsyth.>>(g.situation.board.variant.gameLogic, g),

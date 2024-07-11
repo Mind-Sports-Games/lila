@@ -10,7 +10,6 @@ const noAnalysisBoardVariants: string[] = [
   'frisian',
   'frysk',
   'international',
-  'monster',
   'pool',
   'portuguese',
   'russian',

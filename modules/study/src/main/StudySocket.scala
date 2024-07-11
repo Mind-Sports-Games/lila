@@ -242,14 +242,14 @@ final private class StudySocket(
   )
 
   private def gameAction(studyId: Study.Id, m: AnaAny, opts: MoveOpts)(who: Who) =
-    m.branch match {
+    m.pp("gameAction -> m").branch.pp("gameAction -> m.branch") match {
       case Validated.Valid(branch) if branch.ply < Node.maxPlies =>
         m.chapterId.ifTrue(opts.write) foreach { chapterId =>
           api.addNode(
-            studyId,
-            Position.Ref(Chapter.Id(chapterId), Path(m.path)),
+            studyId.pp("gameAction -> studyId"),
+            Position.Ref(Chapter.Id(chapterId), Path(m.path.pp("gameAction -> path"))),
             Node.fromBranch(branch) withClock opts.clock,
-            opts
+            opts.pp("gameAction -> moveOpts")
           )(who)
         }
       case _ =>
