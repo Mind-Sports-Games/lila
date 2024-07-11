@@ -2,19 +2,19 @@ import { h, VNode } from 'snabbdom';
 import TournamentController from '../ctrl';
 import { dataIcon } from './util';
 
-function startClock(time) {
+function startClock(time: any) {
   return {
-    insert: vnode => $(vnode.elm as HTMLElement).clock({ time }),
+    insert: (vnode: any) => $(vnode.elm as HTMLElement).clock({ time }),
   };
 }
 
 const oneDayInSeconds = 60 * 60 * 24;
 
-function hasFreq(freq, d) {
+function hasFreq(freq: any, d: any) {
   return d.schedule && d.schedule.freq === freq;
 }
 
-function clock(d): VNode | undefined {
+function clock(d: any): VNode | undefined {
   if (d.isFinished) return;
   if (d.secondsToFinish)
     if (d.medley && d.secondsToFinish != d.secondsToFinishInterval) {
@@ -59,9 +59,10 @@ function clock(d): VNode | undefined {
       }),
     ]);
   }
+  return;
 }
 
-function image(d): VNode | undefined {
+function image(d: any): VNode | undefined {
   if (d.isFinished) return;
   if (hasFreq('shield', d) || hasFreq('marathon', d)) return;
   const s = d.spotlight;

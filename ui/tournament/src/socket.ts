@@ -6,7 +6,7 @@ export interface TournamentSocket {
 }
 
 export default function (send: SocketSend, ctrl: TournamentController) {
-  const handlers = {
+  const handlers: any = {
     reload() {
       setTimeout(ctrl.askReload, Math.floor(Math.random() * 4000));
     },

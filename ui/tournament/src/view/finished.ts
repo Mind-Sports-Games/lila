@@ -16,6 +16,7 @@ function confetti(data: TournamentData): VNode | undefined {
         insert: _ => playstrategy.loadScript('javascripts/confetti.js'),
       },
     });
+  return;
 }
 
 function stats(data: TournamentData, trans: Trans): VNode {

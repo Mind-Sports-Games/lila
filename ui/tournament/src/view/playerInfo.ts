@@ -4,7 +4,7 @@ import { teamName } from './battle';
 import * as status from 'game/status';
 import TournamentController from '../ctrl';
 
-function result(win, stat, useStatusScoring): string {
+function result(win: any, stat: any, useStatusScoring: any): string {
   switch (win) {
     case true:
       if (useStatusScoring) {
@@ -22,7 +22,7 @@ function result(win, stat, useStatusScoring): string {
   }
 }
 
-function playerTitle(player) {
+function playerTitle(player: any) {
   return h('h2.player-title', [
     h('span.rank', player.disqualified ? 'DQ' : player.rank + '. '),
     renderPlayer(player, true, true, true, false),
@@ -100,7 +100,7 @@ export default function (ctrl: TournamentController): VNode {
               if (href) window.open(href, '_blank', 'noopener');
             }),
           },
-          data.pairings.map(function (p, i) {
+          data.pairings.map(function (p: any, i: any) {
             const res = result(p.win, p.status, ctrl.data.statusScoring);
             return h(
               'tr.glpt.' + (p.win ? ' win' : res === '0' || res === 'L' ? ' loss' : ''),

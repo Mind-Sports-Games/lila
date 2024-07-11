@@ -8,11 +8,11 @@ import * as pagination from '../pagination';
 
 const scoreTagNames = ['score', 'streak', 'double'];
 
-function scoreTag(s) {
+function scoreTag(s: any) {
   return h(scoreTagNames[(s[1] || 1) - 1], [Array.isArray(s) ? s[0] : s]);
 }
 
-function playerTr(ctrl: TournamentController, player) {
+function playerTr(ctrl: TournamentController, player: any) {
   const userId = player.name.toLowerCase(),
     nbScores = player.sheet.scores.length;
   const battle = ctrl.data.teamBattle;
@@ -55,7 +55,7 @@ function playerTr(ctrl: TournamentController, player) {
   );
 }
 
-function podiumUsername(p) {
+function podiumUsername(p: any) {
   return h(
     'a.text.ulpt.user-link',
     {
@@ -94,10 +94,10 @@ function podiumTrophy(img: string): VNode {
 }
 
 function podiumPosition(
-  p,
+  p: any,
   pos: string,
   trophyImg: string,
-  berserkable,
+  berserkable: any,
   isMedley: boolean,
   isHandicapped: boolean,
   trans: Trans
@@ -149,12 +149,12 @@ function preloadUserTips(el: HTMLElement) {
   playstrategy.powertip.manualUserIn(el);
 }
 
-export function controls(ctrl: TournamentController, pag): VNode {
+export function controls(ctrl: TournamentController, pag: any): VNode {
   return h('div.tour__controls', [h('div.pager', pagination.renderPager(ctrl, pag)), button.joinWithdraw(ctrl)]);
 }
 
-export function standing(ctrl: TournamentController, pag, klass?: string): VNode {
-  const tableBody = pag.currentPageResults ? pag.currentPageResults.map(res => playerTr(ctrl, res)) : lastBody;
+export function standing(ctrl: TournamentController, pag: any, klass?: string): VNode {
+  const tableBody = pag.currentPageResults ? pag.currentPageResults.map((res: any) => playerTr(ctrl, res)) : lastBody;
   if (pag.currentPageResults) lastBody = tableBody;
   return h(
     'table.slist.tour__standing' + (klass ? '.' + klass : ''),

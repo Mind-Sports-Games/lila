@@ -30,15 +30,22 @@ export function ratio2percent(r: number) {
   return Math.round(100 * r) + '%';
 }
 
-function playerNameWithDQ(p) {
+function playerNameWithDQ(p: any) {
   return p.disqualified ? h('span.dq', p.name) : p.name;
 }
 
-export function playerName(p) {
+export function playerName(p: any) {
   return p.title ? [h('span.utitle', p.title), ' ' + playerNameWithDQ(p)] : playerNameWithDQ(p);
 }
 
-export function player(p, asLink: boolean, withRating: boolean, withFlag: boolean, defender = false, leader = false) {
+export function player(
+  p: any,
+  asLink: boolean,
+  withRating: boolean,
+  withFlag: boolean,
+  defender = false,
+  leader = false,
+) {
   return h(
     'a.ulpt.user-link' + (((p.title || '') + p.name).length > 15 ? '.long' : ''),
     {
@@ -51,7 +58,7 @@ export function player(p, asLink: boolean, withRating: boolean, withFlag: boolea
   );
 }
 
-export function playerInfo(p, withRating: boolean, withFlag: boolean, defender = false, leader = false) {
+export function playerInfo(p: any, withRating: boolean, withFlag: boolean, defender = false, leader = false) {
   return [
     withFlag && p.country
       ? h(
