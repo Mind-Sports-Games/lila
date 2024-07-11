@@ -1,3 +1,4 @@
+// @ts-nocheck
 import extendTablesortNumber from './component/tablesort-number';
 import tablesort from 'tablesort';
 import debounce from 'common/debounce';

@@ -15,7 +15,7 @@ playstrategy.load.then(() => {
     (term: string) => xhr.json(xhr.url('/player/autocomplete', { term, names: 1 })),
     300,
   );
-  tagify.on('input', e => {
+  tagify.on('input', (e: any) => {
     const term = e.detail.value.trim();
     if (term.length < 3) return;
     tagify.settings.whitelist!.length = 0; // reset the whitelist

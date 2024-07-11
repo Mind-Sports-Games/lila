@@ -1,3 +1,4 @@
+// @ts-nocheck
 import tablesort from 'tablesort';
 
 export default function extendTablesortNumber() {

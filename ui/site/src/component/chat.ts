@@ -1,6 +1,6 @@
 import { loadCssPath } from './assets';
 
-const chat = data =>
+const chat = (data: any) =>
   new Promise(resolve =>
     requestAnimationFrame(() => {
       data.loadCss = loadCssPath;

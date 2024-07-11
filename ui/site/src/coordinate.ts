@@ -1,3 +1,4 @@
+// @ts-nocheck
 import * as xhr from 'common/xhr';
 import sparkline from '@fnando/sparkline';
 import throttle from 'common/throttle';

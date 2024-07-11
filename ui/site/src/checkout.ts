@@ -87,7 +87,7 @@ export default function (publicKey: string) {
             .redirectToCheckout({
               sessionId: data.session.id,
             })
-            .then(result => showError(result.error.message));
+            .then((result: any) => showError(result.error.message));
         } else {
           location.assign('/patron');
         }
