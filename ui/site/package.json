@@ -12,22 +12,22 @@
     "typescript": "^5.4.3"
   },
   "dependencies": {
-    "chat": "workspace:*",
-    "common": "workspace:*",
-    "draughtsground": "workspace:*",
-    "stratutils": "workspace:*",
-    "chessground": "git+ssh://git@github.com:Mind-Sports-Games/chessground.git#v7.11.1-pstrat2.48",
     "@fnando/sparkline": "^0.3.10",
     "@yaireo/tagify": "4.6.0",
-    "prop-types": "^15.7.2", 
+    "chat": "workspace:*",
+    "chessground": "file:/home/vincent/Desktop/code/chessground",
+    "common": "workspace:*",
     "debounce-promise": "^3.1.2",
+    "draughtsground": "workspace:*",
     "flatpickr": "^4.6.9",
     "highcharts": "=4.2.5",
     "hopscotch": "^0.3.1",
+    "prop-types": "^15.7.2",
     "stockfish-mv.wasm": "^0.6.1",
     "stockfish-nnue.wasm": "0.0.2",
     "stockfish.js": "^10.0.2",
     "stockfish.wasm": "^0.10.0",
+    "stratutils": "workspace:*",
     "tablesort": "^5.1",
     "zxcvbn": "^4.4.2"
   },
@@ -73,7 +73,7 @@
       "src/ublog.ts": "ublog",
       "src/ublogForm.ts": "ublogForm",
       "src/speech.ts": "speech"
-    }, 
+    },
     "copy": [
       {
         "src": "node_modules/hopscotch/dist/js/hopscotch.min.js",

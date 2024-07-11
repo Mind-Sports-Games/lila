@@ -9,6 +9,7 @@
     "types": [
       "playstrategy"
     ],
+    "lib": ["es2019", "dom"],
     "composite": true,
     "incremental": true
   },

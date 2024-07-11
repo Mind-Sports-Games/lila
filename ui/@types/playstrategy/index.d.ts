@@ -1,5 +1,3 @@
-/// <reference types="highcharts" />
-
 interface PlayStrategy {
   load: Promise<void>; // window.onload promise
   info: any;
@@ -235,7 +233,6 @@ interface Window {
   moment: any;
   Mousetrap: any;
   Chessground: any;
-  Highcharts: Highcharts.Static;
   InfiniteScroll(selector: string): void;
   playstrategyReplayMusic: () => {
     jump(node: Tree.Node): void;
@@ -685,10 +682,6 @@ declare namespace PowerTip {
     openEvents?: string[];
     closeEvents?: string[];
   }
-}
-
-interface HighchartsHTMLElement extends HTMLElement {
-  highcharts: Highcharts.ChartObject;
 }
 
 interface Dictionary<T> {

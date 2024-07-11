@@ -24,20 +24,16 @@
   "author": "Thibault Duplessis",
   "license": "AGPL-3.0-or-later",
   "dependencies": {
-    "chessground": "git+ssh://git@github.com:Mind-Sports-Games/chessground.git#semver:v7.11.1-pstrat2.48",
+    "chessground": "file:/home/vincent/Desktop/code/chessground",
     "stratutils": "workspace:*"
   },
   "devDependencies": {
-    "@types/cash": "workspace:*",
-    "@types/playstrategy": "workspace:*",
     "@babel/core": "^7.16.0",
     "@babel/preset-env": "^7.16.0",
     "@babel/preset-typescript": "^7.16.0",
-    "@types/jest": "^27.0.2",
-    "babel-jest": "^27.3.1",
-    "jest": "^27.3.1",
-    "snabbdom": "^3.0.1",    
-    "ts-jest": "^27.0.7",
+    "@types/cash": "workspace:*",
+    "@types/playstrategy": "workspace:*",
+    "snabbdom": "^3.0.1",
     "typescript": "^5.4.3"
   },
   "scripts": {

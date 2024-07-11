@@ -12,7 +12,7 @@ if [ -z "$path" ]; then
 fi
 
 # @TODO: check list is still correct
-workspaces=("analyse" "common" "draughtsround" "editor" "learn" "lobby" "puz" "puzzle" "racer" "round" "simul" "site" "storm" "swiss" "tournament")
+workspaces=("analyse" "common" "draughtsround" "editor" "learn" "lobby" "nvui" "puz" "puzzle" "racer" "round" "simul" "site" "storm" "stratutils" "swiss" "tournament")
 
 for workspace in "${workspaces[@]}"
 do

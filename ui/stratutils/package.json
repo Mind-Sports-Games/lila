@@ -17,7 +17,7 @@
     "typescript": "^5.4.3"
   },
   "dependencies": {
-    "chessground": "git+ssh://git@github.com:Mind-Sports-Games/chessground.git#v7.11.1-pstrat2.48",
+    "chessground": "file:/home/vincent/Desktop/code/chessground",
     "stratops": "git+ssh://git@github.com:Mind-Sports-Games/stratops.git#semver:v0.8.1-pstrat4.4"
   },
   "scripts": {
