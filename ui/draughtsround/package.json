@@ -26,6 +26,7 @@
   "dependencies": {
     "chat": "workspace:*",
     "common": "workspace:*",
+    "draughts": "workspace:*",
     "draughtsground": "workspace:*",
     "game": "workspace:*",
     "nvui": "workspace:*",

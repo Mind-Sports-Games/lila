@@ -301,6 +301,9 @@ importers:
       common:
         specifier: workspace:*
         version: link:../common
+      draughts:
+        specifier: workspace:*
+        version: link:../draughts
       draughtsground:
         specifier: workspace:*
         version: link:../draughtsground
