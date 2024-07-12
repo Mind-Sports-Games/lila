@@ -6,7 +6,7 @@
     "rootDir": "src",
     "declaration": true,
     "inlineSourceMap": true,
-    "composite": true
+    "composite": true  
   },
   "isolatedModules": true
 }
