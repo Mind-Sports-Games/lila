@@ -29,16 +29,17 @@ final private[tournament] class PairingSystem(
       ranking: Ranking
   ): Fu[Pairings] = {
     for {
+      inPlayUsers       <- pairingRepo.inPlayUsers(tour.id)
       justFinishedUsers <- pairingRepo.justFinishedUsers(tour.id, tour.waitForPlayerReturnSeconds)
-      activePlayers = users.activePlayers(justFinishedUsers -- LightUser.tourBotsIDs.toSet)
-      lastOpponents <- limitLastOpponents(tour, users, activePlayers)
-      botsToAdd     <- botsToAdd(tour, activePlayers)
+      activeUsers   = inPlayUsers ++ justFinishedUsers -- LightUser.tourBotsIDs.toSet
+      activePlayers = users.activePlayers(activeUsers)
+      botsToAdd <- botsToAdd(tour, activePlayers)
       usersWithBots = users.addBotUsers(botsToAdd)
-      data          = Data(tour, lastOpponents, ranking, activePlayers == 2)
+      lastOpponents <- limitLastOpponents(tour, users, activePlayers)
+      data = Data(tour, lastOpponents, ranking, activePlayers == 2)
       preps <- readyToRunPreps(lastOpponents, usersWithBots, activePlayers) ?? evenOrAll(
         data,
-        usersWithBots,
-        activePlayers
+        usersWithBots
       )
       pairings <- prepsToPairings(preps)
     } yield pairings
@@ -92,7 +93,7 @@ final private[tournament] class PairingSystem(
         .flatMap { availableBots(tour.id) }
     else fuccess(Set())
 
-  private def evenOrAll(data: Data, users: WaitingUsers, activePlayers: Int) = {
+  private def evenOrAll(data: Data, users: WaitingUsers) = {
     makePreps(data, users.evenNumber) flatMap {
       case Nil if users.isOdd => makePreps(data, users.all)
       case x                  => fuccess(x)

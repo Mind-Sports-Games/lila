@@ -196,6 +196,19 @@ final class PairingRepo(coll: Coll)(implicit ec: scala.concurrent.ExecutionConte
         }.toSet
       }
 
+  def inPlayUsers(tourId: Tournament.ID): Fu[Set[User.ID]] =
+    coll
+      .find(
+        selectTour(tourId) ++ $doc("f" $exists false)
+      )
+      .cursor[Bdoc]()
+      .list()
+      .dmap {
+        _.view.flatMap { doc =>
+          ~doc.getAsOpt[List[User.ID]]("u")
+        }.toSet
+      }
+
   def setBerserk(pairing: Pairing, userId: User.ID) = {
     if (pairing.user1 == userId) "b1".some
     else if (pairing.user2 == userId) "b2".some
