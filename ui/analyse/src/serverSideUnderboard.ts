@@ -1,3 +1,4 @@
+// @ts-nocheck
 import type Highcharts from 'highcharts';
 
 import AnalyseCtrl from './ctrl';

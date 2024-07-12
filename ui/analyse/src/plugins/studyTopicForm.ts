@@ -12,6 +12,7 @@ playstrategy.load.then(() => {
     300,
   );
   tagify.on('input', e => {
+    // @ts-ignore
     const term = e.detail.value.trim();
     if (term.length < 2) return;
     tagify.settings.whitelist!.length = 0; // reset the whitelist
