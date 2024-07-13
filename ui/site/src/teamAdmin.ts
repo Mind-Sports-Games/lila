@@ -12,7 +12,7 @@ playstrategy.load.then(() => {
     whitelist: input.value.trim().split(/\s*,\s*/),
   });
   const doFetch: (term: string) => Promise<string[]> = debounce(
-    (term: string) => xhr.json(xhr.url('/player/autocomplete', { term, names: 1 })),
+    (term: string) => xhr.json(xhr.url('/api/player/autocomplete', { term, names: 1 })),
     300
   );
   tagify.on('input', e => {
