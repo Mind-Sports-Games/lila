@@ -32,8 +32,8 @@ function renderSeek(ctrl: LobbyController, seek: Seek): VNode {
         h('span.varicon', {
           attrs: { 'data-icon': seek.perf.icon },
         }),
-        noarg(seek.perf.name),
-        noarg(seek.mode === 1 ? ' - Rated' : ' - Casual'),
+        noarg(seek.mode === 1 ? 'Rated ' : 'Casual '),
+        '(' + noarg(seek.perf.name) + ')',
       ]),
     ])
   );
