@@ -135,7 +135,6 @@ const noFishnetVariants: VariantKey[] = [
   'go19x19',
   'backgammon',
   'nackgammon',
-  'minibreakthroughtroyka',
 ];
 export function allowFishnetForVariant(variant: VariantKey) {
   return noFishnetVariants.indexOf(variant) == -1;

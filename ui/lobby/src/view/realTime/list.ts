@@ -34,7 +34,7 @@ function renderHook(ctrl: LobbyController, hook: Hook) {
         {
           attrs: { 'data-icon': perfIcons[hook.perf] },
         },
-        [noarg(hook.perf), noarg(hook.ra ? ' - Rated' : ' - Casual')]
+        [noarg(hook.ra ? 'Rated ' : 'Casual '), '(' + noarg(hook.perf) + ')']
       ),
     ])
   );
