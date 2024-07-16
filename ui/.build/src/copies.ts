@@ -1,33 +1,34 @@
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import { globArray } from './parse';
-import { Sync, env, errorMark, colors as c } from './main';
+import { Copy, env, errorMark, colors as c } from './main';
+import { buildModules } from './build';
 
-const syncWatch: fs.FSWatcher[] = [];
+const globRe = /[*?!{}[\]()]|\*\*|\[[^[\]]*\]/;
+const copyWatch: fs.FSWatcher[] = [];
 let watchTimeout: NodeJS.Timeout | undefined;
 
 export function stopCopies() {
-  // @ts-ignore
   clearTimeout(watchTimeout);
   watchTimeout = undefined;
-  for (const watcher of syncWatch) watcher.close();
-  syncWatch.length = 0;
+  for (const watcher of copyWatch) watcher.close();
+  copyWatch.length = 0;
 }
 
 export async function copies() {
   if (!env.copies) return;
-  const watched = new Map<string, Sync[]>();
+  const watched = new Map<string, Copy[]>();
   const updated = new Set<string>();
 
   const fire = () => {
-    updated.forEach(d => watched.get(d)?.forEach(globSync));
+    updated.forEach(d => watched.get(d)?.forEach(globCopy));
     updated.clear();
     watchTimeout = undefined;
   };
-  for (const mod of env.building) {
-    if (!mod?.sync) continue;
-    for (const cp of mod.sync) {
-      for (const src of await globSync(cp)) {
+  for (const mod of buildModules) {
+    if (!mod?.copy) continue;
+    for (const cp of mod.copy) {
+      for (const src of await globCopy(cp)) {
         watched.set(src, [...(watched.get(src) ?? []), cp]);
       }
     }
@@ -36,21 +37,20 @@ export async function copies() {
       const watcher = fs.watch(dir);
       watcher.on('change', () => {
         updated.add(dir);
-        // @ts-ignore
         clearTimeout(watchTimeout);
         watchTimeout = setTimeout(fire, 2000);
       });
       watcher.on('error', (err: Error) => env.error(err));
-      syncWatch.push(watcher);
+      copyWatch.push(watcher);
     }
   }
 }
 
-async function globSync(cp: Sync): Promise<Set<string>> {
+async function globCopy(cp: Copy): Promise<Set<string>> {
   const watchDirs = new Set<string>();
-  const dest = path.join(env.rootDir, cp.dest) + path.sep;
+  const dest = path.join(cp.mod.root, cp.dest) + path.sep;
 
-  const globIndex = cp.src.search(/[*?!{}[\]()]|\*\*|\[[^[\]]*\]/);
+  const globIndex = cp.src.search(globRe);
   const globRoot =
     globIndex > 0 && cp.src[globIndex - 1] === path.sep
       ? cp.src.slice(0, globIndex - 1)
@@ -66,13 +66,13 @@ async function globSync(cp: Sync): Promise<Set<string>> {
     const srcPath = path.join(cp.mod.root, src);
     watchDirs.add(path.dirname(srcPath));
     const destPath = path.join(dest, src.slice(globRoot.length));
-    fileCopies.push(syncOne(srcPath, destPath, cp.mod.name));
+    fileCopies.push(copyOne(srcPath, destPath, cp.mod.name));
   }
   await Promise.allSettled(fileCopies);
   return watchDirs;
 }
 
-async function syncOne(absSrc: string, absDest: string, modName: string) {
+async function copyOne(absSrc: string, absDest: string, modName: string) {
   try {
     const [src, dest] = (
       await Promise.allSettled([
@@ -86,7 +86,7 @@ async function syncOne(absSrc: string, absDest: string, modName: string) {
       fs.utimes(absDest, src.atime, src.mtime, () => {});
     }
   } catch (_) {
-    env.log(`[${c.grey(modName)}] - ${errorMark} - failed sync '${c.cyan(absSrc)}' to '${c.cyan(absDest)}'`);
+    env.log(`[${c.grey(modName)}] - ${errorMark} - failed copy '${c.cyan(absSrc)}' to '${c.cyan(absDest)}'`);
   }
 }
 

@@ -1,15 +1,19 @@
 import * as fs from 'node:fs';
 import * as cps from 'node:child_process';
 import * as ps from 'node:process';
+import * as path from 'node:path';
 import { parseModules } from './parse';
 import { tsc, stopTsc } from './tsc';
 import { sass, stopSass } from './sass';
 import { esbuild, stopEsbuild } from './esbuild';
 import { copies, stopCopies } from './copies';
-import { startMonitor, stopMonitor } from './monitor';
-import { initManifest, writeManifest } from './manifest';
+import { startTickling, stopTickling } from './tickler';
 import { clean } from './clean';
 import { PlaystrategyModule, env, errorMark, colors as c } from './main';
+
+export let moduleDeps: Map<string, string[]>;
+export let modules: Map<string, PlaystrategyModule>;
+export let buildModules: PlaystrategyModule[];
 
 export async function build(mods: string[]) {
   await stop();
@@ -19,28 +23,28 @@ export async function build(mods: string[]) {
   if (!mods.length) env.log(`Parsing modules in '${c.cyan(env.uiDir)}'`);
 
   ps.chdir(env.uiDir);
-  [env.modules, env.deps] = await parseModules();
+  [modules, moduleDeps] = await parseModules();
 
-  mods.filter(x => !env.modules.has(x)).forEach(x => env.exit(`${errorMark} - unknown module '${c.magenta(x)}'`));
+  mods.filter(x => !modules.has(x)).forEach(x => env.exit(`${errorMark} - unknown module '${c.magenta(x)}'`));
 
-  env.building = mods.length === 0 ? [...env.modules.values()] : depsMany(mods);
+  buildModules = mods.length === 0 ? [...modules.values()] : depsMany(mods);
 
-  if (mods.length) env.log(`Building ${c.grey(env.building.map(x => x.name).join(', '))}`);
+  if (mods.length) env.log(`Building ${c.grey(buildModules.map(x => x.name).join(', '))}`);
 
   await Promise.allSettled([
     fs.promises.mkdir(env.jsDir),
     fs.promises.mkdir(env.cssDir),
-    fs.promises.mkdir(env.themeGenDir),
-    fs.promises.mkdir(env.cssTempDir),
+    fs.promises.mkdir(path.join(env.themeDir, 'gen')),
   ]);
-
-  await initManifest();
-  startMonitor(mods);
-  await Promise.all([sass(), copies(), esbuild(tsc())]);
+  sass();
+  await tsc();
+  await copies();
+  await esbuild();
+  startTickling(mods);
 }
 
 export async function stop() {
-  stopMonitor();
+  stopTickling();
   stopSass();
   stopTsc();
   stopCopies();
@@ -48,8 +52,7 @@ export async function stop() {
 }
 
 export function postBuild() {
-  writeManifest();
-  for (const mod of env.building) {
+  for (const mod of buildModules) {
     mod.post.forEach((args: string[]) => {
       env.log(`[${c.grey(mod.name)}] exec - ${c.cyanBold(args.join(' '))}`);
       const stdout = cps.execSync(`${args.join(' ')}`, { cwd: mod.root });
@@ -67,8 +70,8 @@ export function preModule(mod: PlaystrategyModule | undefined) {
 }
 
 function depsOne(modName: string): PlaystrategyModule[] {
-  const collect = (dep: string): string[] => [...(env.deps.get(dep) || []).flatMap(d => collect(d)), dep];
-  return unique(collect(modName).map(name => env.modules.get(name)));
+  const collect = (dep: string): string[] => [...(moduleDeps.get(dep) || []).flatMap(d => collect(d)), dep];
+  return unique(collect(modName).map(name => modules.get(name)));
 }
 
 const depsMany = (modNames: string[]): PlaystrategyModule[] => unique(modNames.flatMap(depsOne));

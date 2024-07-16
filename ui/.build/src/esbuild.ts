@@ -1,68 +1,73 @@
+import * as cps from 'node:child_process';
 import * as path from 'node:path';
 import * as es from 'esbuild';
-import { preModule } from './build';
+import { preModule, buildModules } from './build';
 import { env, errorMark, colors as c } from './main';
-import { js as jsManifest } from './manifest';
 
-const bundles = new Map<string, string>();
+const typeBundles = new Map<string, Map<string, string>>();
 const esbuildCtx: es.BuildContext[] = [];
 
 export async function stopEsbuild() {
   const proof = Promise.allSettled(esbuildCtx.map(x => x.dispose()));
   esbuildCtx.length = 0;
-  bundles.clear();
+  typeBundles.clear();
   return proof;
 }
 
-export async function esbuild(tsc?: Promise<void>): Promise<void> {
+export async function esbuild(): Promise<void> {
   if (!env.esbuild) return;
-  try {
-    await tsc;
-  } catch (_) {
-    return; // killed
-  }
 
-  const entryPoints = [];
-  for (const mod of env.building) {
+  const define: { [_: string]: string } = {
+    __info__: JSON.stringify({
+      date: new Date(new Date().toUTCString()).toISOString().split('.')[0] + '+00:00',
+      commit: cps.execSync('git rev-parse -q HEAD', { encoding: 'utf-8' }).trim(),
+      message: cps.execSync('git log -1 --pretty=%s', { encoding: 'utf-8' }).trim(),
+    }),
+    __debug__: String(env.debug),
+  };
+  for (const mod of buildModules) {
     preModule(mod);
-    for (const bundle of mod.bundles ?? []) {
-      entryPoints.push(path.join(mod.root, bundle));
+    for (const tpe in mod.bundles) {
+      if (!typeBundles.has(tpe)) typeBundles.set(tpe, new Map());
+      for (const r of mod.bundles[tpe]) {
+        typeBundles.get(tpe)?.set(r.output, path.join(mod.root, r.input));
+      }
     }
   }
-  entryPoints.sort();
-  const ctx = await es.context({
-    entryPoints,
-    bundle: true,
-    metafile: true,
-    treeShaking: true,
-    splitting: true,
-    format: 'esm',
-    target: 'es2018',
-    logLevel: 'silent',
-    sourcemap: !env.prod,
-    minify: env.prod,
-    outdir: env.jsDir,
-    entryNames: '[name].[hash]',
-    chunkNames: 'common.[hash]',
-    plugins: [onEndPlugin],
-  });
-  if (env.watch) {
-    ctx.watch();
-    esbuildCtx.push(ctx);
-  } else {
-    await ctx.rebuild();
-    await ctx.dispose();
+  for (const [tpe, bundles] of typeBundles) {
+    const ctx = await es.context({
+      sourcemap: !env.prod,
+      define,
+      format: tpe as es.Format,
+      target: 'es2018',
+      logLevel: 'silent',
+      splitting: env.split && tpe === 'esm',
+      bundle: true,
+      outdir: env.jsDir,
+      minify: env.prod,
+      entryPoints: Object.fromEntries(bundles),
+      treeShaking: true,
+      outExtension: { '.js': env.prod ? '.min.js' : '.js' },
+      plugins: [onEndPlugin],
+    });
+    if (env.watch) {
+      ctx.watch();
+      esbuildCtx.push(ctx);
+    } else {
+      await ctx.rebuild();
+      await ctx.dispose();
+    }
   }
 }
 
 const onEndPlugin = {
-  name: 'onEnd',
+  name: 'lichessOnEnd',
   setup(build: es.PluginBuild) {
-    build.onEnd(async (result: es.BuildResult) => {
+    build.onEnd((result: es.BuildResult) => {
       for (const err of result.errors) esbuildMessage(err, true);
       for (const warn of result.warnings) esbuildMessage(warn);
-      if (result.errors.length === 0) await jsManifest(result.metafile!);
-      env.done(result.errors.length, 'esbuild');
+      typeBundles.delete(typeBundles.keys().next().value);
+      if (result.errors.length || !typeBundles.size) env.done(result.errors.length, 'esbuild');
     });
   },
 };
