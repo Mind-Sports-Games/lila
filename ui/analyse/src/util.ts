@@ -260,8 +260,6 @@ const noServerEvalVariants = [
   'linesOfAction',
   'scrambledEggs',
   'amazons',
-  'breakthroughtroyka',
-  'minibreakthroughtroyka',
   'oware',
   'togyzkumalak',
   'go9x9',
