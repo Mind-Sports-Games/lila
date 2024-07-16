@@ -30,7 +30,7 @@
     "prod": "tsc"
   },
   "playstrategy": {
-    "bundles": {
+    "modules": {
       "src/boot.ts": "lobby"
     }
   }
