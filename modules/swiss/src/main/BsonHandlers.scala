@@ -178,6 +178,7 @@ object BsonHandlers {
       Swiss.Settings(
         nbRounds = r.get[Int]("n"),
         rated = r.boolO("r") | true,
+        handicapped = r.boolO("h") | false,
         isMatchScore = r.boolO("ms") | false,
         isBestOfX = r.boolO("x") | false,
         isPlayX = r.boolO("px") | false,
@@ -199,6 +200,7 @@ object BsonHandlers {
       $doc(
         "n"   -> s.nbRounds,
         "r"   -> (!s.rated).option(false),
+        "h"   -> (s.handicapped).option(true),
         "ms"  -> s.isMatchScore,
         "x"   -> s.isBestOfX,
         "px"  -> s.isPlayX,

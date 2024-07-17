@@ -2,7 +2,9 @@ import flatpickr from 'flatpickr';
 
 playstrategy.load.then(() => {
   const $variant = $('#form3-variant'),
+    $rated = $('#form3-rated'),
     $medley = $('#form3-medley'),
+    $handicapped = $('#form3-handicapped'),
     $drawTables = $('.form3 .drawTables'),
     $perPairingDrawTables = $('.form3 .perPairingDrawTables'),
     $onePerGameFamily = $('#form3-medleyDefaults_onePerGameFamily'),
@@ -94,6 +96,11 @@ playstrategy.load.then(() => {
 
   $variant.on('change', showPosition);
   $variant.on('change', showDrawTables);
+  $handicapped.on('change', () => {
+    toggleOff($medley);
+    toggleOff($rated);
+    showMedleySettings();
+  });
   $drawTables.on('change', () => toggleOff('#form3-perPairingDrawTables'));
   $perPairingDrawTables.on('change', () => toggleOff('#form3-drawTables'));
   $medley.on('change', showMedleySettings);

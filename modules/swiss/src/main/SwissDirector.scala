@@ -1,6 +1,6 @@
 package lila.swiss
 
-import strategygames.{ P2, Player => PlayerIndex, P1, GameLogic }
+import strategygames.{ P2, Player => PlayerIndex, P1, GameLogic, GameFamily }
 import strategygames.variant.Variant
 import strategygames.format.FEN
 import strategygames.draughts.variant.{ Variant => DraughtsVariant }
@@ -9,7 +9,7 @@ import scala.util.chaining._
 import scala.util.Random
 
 import lila.db.dsl._
-import lila.game.Game
+import lila.game.{ Game, Handicaps }
 import lila.user.User
 
 final private class SwissDirector(
@@ -54,23 +54,38 @@ final private class SwissDirector(
               colls.player.list[SwissPlayer]($doc(f.swissId -> swiss.id))
             }
             ids <- idGenerator.games(pendingPairings.size)
-            pairings = pendingPairings.zip(ids).map { case (SwissPairing.Pending(w, b), id) =>
-              SwissPairing(
-                id = id,
-                swissId = swiss.id,
-                round = swiss.round,
-                p1 = w,
-                p2 = b,
-                status = Left(SwissPairing.Ongoing),
-                matchStatus = Left(SwissPairing.Ongoing),
-                None,
-                isMatchScore = swiss.settings.isMatchScore,
-                isBestOfX = swiss.settings.isBestOfX,
-                isPlayX = swiss.settings.isPlayX,
-                nbGamesPerRound = swiss.settings.nbGamesPerRound,
-                if (randomPairingPos) randomPos().orElse(perRoundPos) else perRoundPos,
-                swiss.roundVariant.some
-              )
+            pairings = pendingPairings.zip(ids).map {
+              case (SwissPairing.Pending(w, b), id) => {
+                //weaker player must be p1 in handicap go games
+                val wRating = players.filter(_.userId == w).map(_.rating).headOption.getOrElse(1500)
+                val bRating = players.filter(_.userId == b).map(_.rating).headOption.getOrElse(1500)
+                val p1Id    = if (wRating <= bRating) w else b
+                val p2Id    = if (wRating <= bRating) b else w
+
+                SwissPairing(
+                  id = id,
+                  swissId = swiss.id,
+                  round = swiss.round,
+                  p1 = if (swiss.settings.handicapped) p1Id else w,
+                  p2 = if (swiss.settings.handicapped) p2Id else b,
+                  status = Left(SwissPairing.Ongoing),
+                  matchStatus = Left(SwissPairing.Ongoing),
+                  None,
+                  isMatchScore = swiss.settings.isMatchScore,
+                  isBestOfX = swiss.settings.isBestOfX,
+                  isPlayX = swiss.settings.isPlayX,
+                  nbGamesPerRound = swiss.settings.nbGamesPerRound,
+                  if (swiss.settings.handicapped)
+                    Handicaps.startingFen(
+                      swiss.roundVariant.some,
+                      if (p1Id == w) wRating else bRating,
+                      if (p2Id == w) wRating else bRating
+                    )
+                  else if (randomPairingPos) randomPos().orElse(perRoundPos)
+                  else perRoundPos,
+                  swiss.roundVariant.some
+                )
+              }
             }
             _ <-
               colls.swiss.update
