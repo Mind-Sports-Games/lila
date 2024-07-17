@@ -87,7 +87,7 @@ final private[tournament] class PairingSystem(
       .map(_.flatten.toSet)
 
   private def botsToAdd(tour: Tournament, activePlayers: Int): Fu[Set[User.ID]] =
-    if (tour.botsAllowed && activePlayers < minPlayersForNoBots)
+    if (tour.botsAllowed && activePlayers < minPlayersForNoBots && activePlayers % 2 == 1)
       playerRepo
         .byTourAndUserIds(tour.id, LightUser.tourBotsIDs)
         .flatMap { availableBots(tour.id) }
