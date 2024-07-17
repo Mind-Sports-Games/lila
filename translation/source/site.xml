@@ -299,6 +299,7 @@
   <string name="thisGameIsRated">This game is rated</string>
   <string name="handicapped">Handicapped</string>
   <string name="handicappedTournament">Handicapped</string>
+  <string name="handicapTournaments">Handicap Tournaments</string>
   <string name="handicappedDefinition">A handicap is given based on the players ratings to create an even game. Only supported for Go games.</string>
   <string name="rematch">Rematch</string>
   <string name="rematchOfferSent">Rematch offer sent</string>

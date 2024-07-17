@@ -157,7 +157,7 @@ final private class SwissDirector(
             if (
               rematch && pairing.multiMatchGameIds
                 .fold(false)(ids => ids.size % 2 == 1) && swiss.roundVariant.gameLogic != GameLogic
-                .Backgammon()
+                .Backgammon() && !swiss.settings.handicapped
             ) pairing.p2
             else pairing.p1
           ) err s"Missing pairing p1 $pairing"
@@ -168,7 +168,7 @@ final private class SwissDirector(
             if (
               rematch && pairing.multiMatchGameIds
                 .fold(false)(ids => ids.size % 2 == 1) && swiss.roundVariant.gameLogic != GameLogic
-                .Backgammon()
+                .Backgammon() && !swiss.settings.handicapped
             ) pairing.p1
             else pairing.p2
           ) err s"Missing pairing p2 $pairing"
