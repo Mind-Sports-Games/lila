@@ -163,6 +163,7 @@ object Swiss {
   case class Settings(
       nbRounds: Int,
       rated: Boolean,
+      handicapped: Boolean,
       isMatchScore: Boolean,
       isBestOfX: Boolean,
       isPlayX: Boolean,

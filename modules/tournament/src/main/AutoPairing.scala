@@ -4,7 +4,7 @@ import strategygames.{ P2, Player => PlayerIndex, P1, Game => StratGame, GameLog
 import strategygames.variant.Variant
 import scala.util.chaining._
 
-import lila.game.{ Game, Player => GamePlayer, GameRepo, Source }
+import lila.game.{ Game, Player => GamePlayer, GameRepo, Source, Handicaps }
 import lila.user.User
 
 final class AutoPairing(
@@ -35,7 +35,8 @@ final class AutoPairing(
                 .byName(variant.gameLogic, "From Position")
                 .getOrElse(Variant.orDefault(variant.gameLogic, 3))
           },
-          tour.position
+          if (tour.handicapped) Handicaps.startingFen(variant.some, player1.rating, player2.rating)
+          else tour.position
         ) pipe { g =>
           val turns = g.player.fold(0, 1)
           g.copy(
