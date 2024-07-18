@@ -93,11 +93,17 @@ private[tournament] object Pairing {
       p1: RankedPlayerWithPlayerIndexHistory,
       p2: RankedPlayerWithPlayerIndexHistory
   ) =
-    if (
-      p1.playerIndexHistory.firstGetsP1(p2.playerIndexHistory)(() =>
-        lila.common.ThreadLocalRandom.nextBoolean()
+    if (tour.handicapped) {
+      //in go handicapped tournament weaker player must go first
+      if (p1.player.rating <= p2.player.rating) Prep(tour.id, p1.player.userId, p2.player.userId)
+      else Prep(tour.id, p2.player.userId, p1.player.userId)
+    } else {
+      if (
+        p1.playerIndexHistory.firstGetsP1(p2.playerIndexHistory)(() =>
+          lila.common.ThreadLocalRandom.nextBoolean()
+        )
       )
-    )
-      Prep(tour.id, p1.player.userId, p2.player.userId)
-    else Prep(tour.id, p2.player.userId, p1.player.userId)
+        Prep(tour.id, p1.player.userId, p2.player.userId)
+      else Prep(tour.id, p2.player.userId, p1.player.userId)
+    }
 }

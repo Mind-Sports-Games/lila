@@ -21,13 +21,9 @@ final class AutoPairing(
       playersMap: Map[User.ID, Player],
       ranking: Ranking
   ): Fu[Game] = {
-    //in a go handicapped game p1 must be the weaker player
-    val user1   = playersMap get pairing.user1 err s"Missing pairing player1 $pairing"
-    val user2   = playersMap get pairing.user2 err s"Missing pairing player2 $pairing"
-    val player1 = if (tour.handicapped && user2.rating < user1.rating) user2 else user1
-    val player2 = if (tour.handicapped && user2.rating < user1.rating) user1 else user2
-
-    val clock = tour.clock.toClock
+    val player1 = playersMap get pairing.user1 err s"Missing pairing player1 $pairing"
+    val player2 = playersMap get pairing.user2 err s"Missing pairing player2 $pairing"
+    val clock   = tour.clock.toClock
     val game = Game
       .make(
         stratGame = StratGame(
