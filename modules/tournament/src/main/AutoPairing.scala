@@ -4,7 +4,7 @@ import strategygames.{ P2, Player => PlayerIndex, P1, Game => StratGame, GameLog
 import strategygames.variant.Variant
 import scala.util.chaining._
 
-import lila.game.{ Game, Player => GamePlayer, GameRepo, Source }
+import lila.game.{ Game, Player => GamePlayer, GameRepo, Source, Handicaps }
 import lila.user.User
 
 final class AutoPairing(
@@ -21,9 +21,13 @@ final class AutoPairing(
       playersMap: Map[User.ID, Player],
       ranking: Ranking
   ): Fu[Game] = {
-    val player1 = playersMap get pairing.user1 err s"Missing pairing player1 $pairing"
-    val player2 = playersMap get pairing.user2 err s"Missing pairing player2 $pairing"
-    val clock   = tour.clock.toClock
+    //in a go handicapped game p1 must be the weaker player
+    val user1   = playersMap get pairing.user1 err s"Missing pairing player1 $pairing"
+    val user2   = playersMap get pairing.user2 err s"Missing pairing player2 $pairing"
+    val player1 = if (tour.handicapped && user2.rating < user1.rating) user2 else user1
+    val player2 = if (tour.handicapped && user2.rating < user1.rating) user1 else user2
+
+    val clock = tour.clock.toClock
     val game = Game
       .make(
         stratGame = StratGame(
@@ -35,7 +39,8 @@ final class AutoPairing(
                 .byName(variant.gameLogic, "From Position")
                 .getOrElse(Variant.orDefault(variant.gameLogic, 3))
           },
-          tour.position
+          if (tour.handicapped) Handicaps.startingFen(variant.some, player1.rating, player2.rating)
+          else tour.position
         ) pipe { g =>
           val turns = g.player.fold(0, 1)
           g.copy(
