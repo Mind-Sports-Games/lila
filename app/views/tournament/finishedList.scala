@@ -37,7 +37,8 @@ object finishedList {
           if (t.variant.exotic) VariantKeys.variantName(t.variant) else t.perfType.trans,
           t.position.isDefined option frag(" • ", trans.thematic()),
           " • ",
-          t.mode.fold(trans.casualTournament, trans.ratedTournament)(),
+          if (t.handicapped) trans.handicappedTournament()
+          else t.mode.fold(trans.casualTournament, trans.ratedTournament)(),
           " • ",
           t.durationString
         )
