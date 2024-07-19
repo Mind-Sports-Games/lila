@@ -12,6 +12,7 @@ case class SwissPairing(
     round: SwissRound.Number,
     p1: User.ID,
     p2: User.ID,
+    bbpPairingP1: User.ID,
     status: SwissPairing.Status,
     matchStatus: SwissPairing.MatchStatus,
     multiMatchGameIds: Option[List[Game.ID]],
@@ -22,18 +23,19 @@ case class SwissPairing(
     openingFEN: Option[FEN],
     variant: Option[Variant] = None
 ) {
-  def apply(c: PlayerIndex)          = c.fold(p1, p2)
-  def gameId                         = id
-  def players                        = List(p1, p2)
-  def has(userId: User.ID)           = p1 == userId || p2 == userId
-  def playerIndexOf(userId: User.ID) = PlayerIndex.fromP1(p1 == userId)
-  def opponentOf(userId: User.ID)    = if (p1 == userId) p2 else p1
-  def winner: Option[User.ID]        = (~status.toOption).map(apply)
-  def isOngoing                      = status.isLeft
-  def resultFor(userId: User.ID)     = winner.map(userId.==)
-  def p1Wins                         = status == Right(Some(PlayerIndex.P1))
-  def p2Wins                         = status == Right(Some(PlayerIndex.P2))
-  def isDraw                         = status == Right(None)
+  def apply(c: PlayerIndex)                    = c.fold(p1, p2)
+  def gameId                                   = id
+  def players                                  = List(p1, p2)
+  def has(userId: User.ID)                     = p1 == userId || p2 == userId
+  def playerIndexOf(userId: User.ID)           = PlayerIndex.fromP1(p1 == userId)
+  def bbpPairingPlayerIndexOf(userId: User.ID) = PlayerIndex.fromP1(bbpPairingP1 == userId)
+  def opponentOf(userId: User.ID)              = if (p1 == userId) p2 else p1
+  def winner: Option[User.ID]                  = (~status.toOption).map(apply)
+  def isOngoing                                = status.isLeft
+  def resultFor(userId: User.ID)               = winner.map(userId.==)
+  def p1Wins                                   = status == Right(Some(PlayerIndex.P1))
+  def p2Wins                                   = status == Right(Some(PlayerIndex.P2))
+  def isDraw                                   = status == Right(None)
 
   def numFirstPlayerWins  = matchStatus.fold(_ => 0, l => l.count(Some(PlayerIndex.P1).==))
   def numSecondPlayerWins = matchStatus.fold(_ => 0, l => l.count(Some(PlayerIndex.P2).==))
@@ -224,6 +226,7 @@ object SwissPairing {
     val round             = "r"
     val gameId            = "g"
     val players           = "p"
+    val bbpPairingP1      = "bbp"
     val status            = "t"
     val matchStatus       = "mt"
     val multiMatchGameIds = "mmids"

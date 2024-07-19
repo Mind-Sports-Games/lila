@@ -68,6 +68,7 @@ final private class SwissDirector(
                   round = swiss.round,
                   p1 = if (swiss.settings.handicapped) p1Id else w,
                   p2 = if (swiss.settings.handicapped) p2Id else b,
+                  bbpPairingP1 = w,
                   status = Left(SwissPairing.Ongoing),
                   matchStatus = Left(SwissPairing.Ongoing),
                   None,

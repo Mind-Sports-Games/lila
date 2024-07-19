@@ -114,6 +114,7 @@ object BsonHandlers {
             round = r.get[SwissRound.Number](round),
             p1 = w,
             p2 = b,
+            bbpPairingP1 = r.get[User.ID](bbpPairingP1),
             status = r.getO[SwissPairing.Status](status) | Right(none),
             matchStatus = r.getO[SwissPairing.MatchStatus](matchStatus) | Right(List(none)),
             // TODO: long term we may want to skip storing both of these fields
@@ -130,12 +131,13 @@ object BsonHandlers {
       }
     def writes(w: BSON.Writer, o: SwissPairing) =
       $doc(
-        id          -> o.id,
-        swissId     -> o.swissId,
-        round       -> o.round,
-        players     -> o.players,
-        status      -> o.status,
-        matchStatus -> o.matchStatus,
+        id           -> o.id,
+        swissId      -> o.swissId,
+        round        -> o.round,
+        players      -> o.players,
+        bbpPairingP1 -> o.bbpPairingP1,
+        status       -> o.status,
+        matchStatus  -> o.matchStatus,
         // TODO: long term we may want to skip storing both of these fields
         //       in the case that it's not a multimatch to save on storage
         multiMatchGameIds -> o.multiMatchGameIds,
