@@ -40,7 +40,7 @@ playstrategy.load.then(() => {
             else
               xhr
                 .json(
-                  xhr.url('/player/autocomplete', {
+                  xhr.url('/api/player/autocomplete', {
                     object: 1,
                     teacher: 1,
                     term,
