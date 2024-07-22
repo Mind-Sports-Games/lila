@@ -114,7 +114,7 @@ object BsonHandlers {
             round = r.get[SwissRound.Number](round),
             p1 = w,
             p2 = b,
-            bbpPairingP1 = r.get[User.ID](bbpPairingP1),
+            bbpPairingP1 = r.getO[User.ID](bbpPairingP1) | w,
             status = r.getO[SwissPairing.Status](status) | Right(none),
             matchStatus = r.getO[SwissPairing.MatchStatus](matchStatus) | Right(List(none)),
             // TODO: long term we may want to skip storing both of these fields
