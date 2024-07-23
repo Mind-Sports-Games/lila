@@ -83,6 +83,7 @@ final class SwissApi(
       settings = Swiss.Settings(
         nbRounds = data.nbRounds,
         rated = data.realPosition.isEmpty && data.isRated,
+        handicapped = data.isHandicapped,
         isMatchScore = data.isMatchScore,
         isBestOfX = data.isBestOfX,
         isPlayX = data.isPlayX,
@@ -123,6 +124,7 @@ final class SwissApi(
           settings = old.settings.copy(
             nbRounds = data.nbRounds,
             rated = position.isEmpty && (data.rated | old.settings.rated),
+            handicapped = data.isHandicapped,
             isMatchScore = data.isMatchScore,
             isBestOfX = data.isBestOfX,
             isPlayX = data.isPlayX,

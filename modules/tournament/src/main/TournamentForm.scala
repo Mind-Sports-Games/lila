@@ -56,6 +56,7 @@ final class TournamentForm {
       position = None,
       password = None,
       mode = none,
+      handicapped = false.some,
       rated = true.some,
       conditions = Condition.DataForm.AllSetup.default,
       teamBattleByTeam = teamBattleId,
@@ -100,6 +101,7 @@ final class TournamentForm {
       ),
       position = tour.position,
       mode = none,
+      handicapped = tour.handicapped.some,
       rated = tour.mode.rated.some,
       password = tour.password,
       conditions = Condition.DataForm.AllSetup(tour.conditions),
@@ -185,6 +187,7 @@ final class TournamentForm {
         "position"         -> optional(lila.common.Form.fen.playableStrict),
         "mode"             -> optional(number.verifying(Mode.all.map(_.id) contains _)), // deprecated, use rated
         "rated"            -> optional(boolean),
+        "handicapped"      -> optional(boolean),
         "password"         -> optional(cleanNonEmptyText),
         "conditions"       -> Condition.DataForm.all(leaderTeams),
         "teamBattleByTeam" -> optional(nonEmptyText.verifying(id => leaderTeams.exists(_.id == id))),
@@ -199,6 +202,7 @@ final class TournamentForm {
         .verifying("Increase tournament duration, or decrease game clock", _.sufficientDuration)
         .verifying("Reduce tournament duration, or increase game clock", _.excessiveDuration)
         .verifying("Must have more than 1 game type for medley tournaments", _.validMedleySetup)
+        .verifying("Hanidcapped mode requires a Go variant, non-rated and non-meldey", _.validHandicapSetup)
     )
 }
 
@@ -275,6 +279,7 @@ private[tournament] case class TournamentSetup(
     position: Option[FEN],
     mode: Option[Int], // deprecated, use rated
     rated: Option[Boolean],
+    handicapped: Option[Boolean],
     password: Option[String],
     conditions: Condition.DataForm.AllSetup,
     teamBattleByTeam: Option[String],
@@ -312,6 +317,9 @@ private[tournament] case class TournamentSetup(
     realMode == Mode.Casual ||
       lila.game.Game.allowRated(realVariant, clock.some)
 
+  def validHandicapSetup =
+    !handicapped.has(true) || (gameLogic == GameLogic.Go() && !isMedley && realMode == Mode.Casual)
+
   def sufficientDuration = estimateNumberOfGamesOneCanPlay >= 3
   def excessiveDuration  = estimateNumberOfGamesOneCanPlay <= 150
 
@@ -329,6 +337,7 @@ private[tournament] case class TournamentSetup(
         clock = if (old.isCreated) clock else old.clock,
         minutes = if (isMedley) medleyDuration else minutes,
         mode = realMode,
+        handicapped = handicapped | false,
         variant = newVariant,
         medleyVariantsAndIntervals =
           if (
@@ -366,6 +375,7 @@ private[tournament] case class TournamentSetup(
         clock = if (old.isCreated) clock else old.clock,
         minutes = minutes,
         mode = if (rated.isDefined) realMode else old.mode,
+        handicapped = handicapped | old.handicapped,
         variant = newVariant,
         startsAt = startDate | old.startsAt,
         password = password.fold(old.password)(_.some.filter(_.nonEmpty)),

@@ -81,6 +81,7 @@ final class TournamentApi(
       waitMinutes = setup.waitMinutes | TournamentForm.waitMinuteDefault,
       startDate = setup.startDate,
       mode = setup.realMode,
+      handicapped = setup.handicapped | false,
       password = setup.password,
       variant = setup.medleyVariantsAndIntervals
         .flatMap(_.lift(0).map(_._1))

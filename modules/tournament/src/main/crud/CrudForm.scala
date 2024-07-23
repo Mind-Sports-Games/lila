@@ -31,6 +31,7 @@ object CrudForm {
           Variant(GameFamily(v.split("_")(0).toInt).gameLogic, v.split("_")(1).toInt).isDefined
         )
       ),
+      "handicapped"   -> boolean,
       "position"      -> optional(lila.common.Form.fen.playableStrict),
       "date"          -> isoDateTime,
       "image"         -> stringIn(imageChoices),
@@ -51,6 +52,7 @@ object CrudForm {
     clock = Clock.Config(180, 0),
     minutes = minuteDefault,
     variant = s"${GameFamily.Chess().id}_${Variant.default(GameLogic.Chess()).id}".some,
+    handicapped = false,
     position = none,
     date = DateTime.now plusDays 7,
     image = "",
@@ -70,6 +72,7 @@ object CrudForm {
       clock: ClockConfig,
       minutes: Int,
       variant: Option[String],
+      handicapped: Boolean,
       position: Option[FEN],
       date: DateTime,
       image: String,

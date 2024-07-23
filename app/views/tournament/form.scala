@@ -31,6 +31,7 @@ object form {
           postForm(cls := "form3", action := routes.Tournament.create)(
             fields.name,
             form3.split(fields.rated, fields.variant),
+            fields.handicapped,
             fields.medleyControls,
             fields.medleyIntervalOptions,
             fields.medleyDefaults,
@@ -72,6 +73,7 @@ object form {
           postForm(cls := "form3", action := routes.Tournament.update(tour.id))(
             form3.split(fields.name, tour.isCreated option fields.startDate),
             form3.split(fields.rated, fields.variant),
+            fields.handicapped,
             fields.medleyControls,
             fields.medleyIntervalOptions,
             fields.medleyDefaults,
@@ -263,6 +265,23 @@ final private class TourFields(form: Form[_], tour: Option[Tournament])(implicit
         translatedVariantChoicesWithVariants,
         disabled = disabledAfterStart
       )
+    )
+  def handicapped =
+    frag(
+      form3.checkbox(
+        form("handicapped"),
+        trans.handicapped(),
+        help = frag(
+          trans.handicappedDefinition.txt(),
+          br,
+          a(href := routes.Page.loneBookmark("handicaps"), target := "_blank")("More detail here")
+        ).some
+      ),
+      st.input(
+        tpe := "hidden",
+        st.name := form("handicapped").name,
+        value := "false"
+      ) // hack allow disabling handicapped
     )
   def medley =
     frag(

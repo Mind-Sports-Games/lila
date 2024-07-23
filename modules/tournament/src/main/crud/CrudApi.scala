@@ -27,6 +27,7 @@ final class CrudApi(tournamentRepo: TournamentRepo) {
       clock = tour.clock,
       minutes = tour.minutes,
       variant = s"${tour.variant.gameFamily.id}_${tour.variant.id}".some,
+      handicapped = tour.handicapped,
       position = tour.position,
       date = tour.startsAt,
       image = ~tour.spotlight.flatMap(_.iconImg),
@@ -75,6 +76,7 @@ final class CrudApi(tournamentRepo: TournamentRepo) {
       clock = Clock.Config(0, 0),
       minutes = 0,
       variant = Variant.libStandard(GameLogic.Chess()),
+      handicapped = false,
       position = none,
       mode = Mode.Rated,
       password = None,
@@ -95,6 +97,7 @@ final class CrudApi(tournamentRepo: TournamentRepo) {
       clock = if (tour.isCreated) clock else tour.clock,
       minutes = minutes,
       variant = realVariant,
+      handicapped = data.handicapped,
       startsAt = date,
       schedule = Schedule(
         freq = Schedule.Freq.Unique,

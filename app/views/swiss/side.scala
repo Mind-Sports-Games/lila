@@ -50,7 +50,12 @@ object side {
               separator,
               if (s.settings.usingDrawTables) trans.swiss.usingDrawTables(),
               if (s.settings.usingDrawTables) separator,
-              if (s.settings.rated) trans.ratedTournament() else trans.casualTournament(),
+              if (s.settings.handicapped)
+                a(href := routes.Page.loneBookmark("handicaps"), target := "_blank")(
+                  trans.handicappedTournament()
+                )
+              else if (s.settings.rated) trans.ratedTournament()
+              else trans.casualTournament(),
               separator,
               a(href := routes.Swiss.home)("Swiss")
             ),

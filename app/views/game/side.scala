@@ -75,7 +75,15 @@ object side {
                         target := "_blank"
                       )(widgets showClock game),
                       separator,
-                      (if (game.rated) trans.rated else trans.casual).txt(),
+                      if (game.fromHandicappedTournament) {
+                        a(
+                          cls := "remove_color",
+                          title := "Handicap info",
+                          href := s"${routes.Page.loneBookmark("handicaps")}",
+                          target := "_blank"
+                        )(trans.handicapped.txt())
+                      } else if (game.rated) trans.rated.txt()
+                      else trans.casual.txt(),
                       separator,
                       if (game.variant.exotic)
                         bits.variantLink(
