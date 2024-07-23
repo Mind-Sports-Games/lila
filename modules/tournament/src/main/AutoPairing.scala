@@ -58,6 +58,7 @@ final class AutoPairing(
       )
       .withId(pairing.gameId)
       .withTournamentId(tour.id)
+      .withHandicappedTournament(tour.handicapped)
       .start
     (gameRepo insertDenormalized game) >>- {
       onStart(game.id)
