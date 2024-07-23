@@ -185,6 +185,7 @@ final private class SwissDirector(
       )
       .withId(if (rematch) pairing.multiMatchGameIds.fold(pairing.gameId)(l => l.last) else pairing.id)
       .withSwissId(swiss.id.value)
+      .withHandicappedTournament(swiss.settings.handicapped)
       .start
 
   private def makePlayer(playerIndex: PlayerIndex, player: SwissPlayer) =
