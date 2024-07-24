@@ -116,6 +116,7 @@ export type Outcome = 'absent' | 'late' | 'bye';
 export interface BasePlayer {
   user: LightUser;
   rating: number;
+  inputRating?: number;
   provisional?: boolean;
   withdraw?: boolean;
   points: number;

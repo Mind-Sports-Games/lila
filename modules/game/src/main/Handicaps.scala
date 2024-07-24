@@ -69,6 +69,18 @@ object Handicaps {
     computeRankDiff(rating, diff, 0)
   }
 
+  def convertGoRating(goRating: String): Int =
+    goRating match {
+      case x if x.matches("""\d+k""") =>
+        x.dropRight(1).toInt match {
+          case y if y > 18 => Math.max(1593 - y * 33, 600) //lowest rating is 600 on site
+          case y if y > 4  => 1900 - y * 50
+          case y if y > 0  => 2100 - y * 100
+          case _           => 1500                         // our default but shouldn't get here
+        }
+      case x if x.matches("""\dd""") => Math.min(Math.max(x.dropRight(1).toInt * 100 + 2000, 2100), 2700)
+    }
+
 }
 
 case class GoHandicap(komi: Int, stones: Int) //komi is 10x to be int

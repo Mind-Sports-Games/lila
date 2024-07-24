@@ -50,8 +50,11 @@ final class SwissForm(implicit mode: Mode) {
           "go"                 -> optional(boolean),
           "backgammon"         -> optional(boolean)
         )(MedleyGameFamilies.apply)(MedleyGameFamilies.unapply),
-        "rated"       -> optional(boolean),
-        "handicapped" -> optional(boolean),
+        "rated" -> optional(boolean),
+        "handicaps" -> mapping(
+          "handicapped"        -> optional(boolean),
+          "inputPlayerRatings" -> optional(cleanNonEmptyText)
+        )(Handicaps.apply)(Handicaps.unapply),
         "xGamesChoice" -> mapping(
           "bestOfX"    -> optional(boolean),
           "playX"      -> optional(boolean),
@@ -119,7 +122,10 @@ final class SwissForm(implicit mode: Mode) {
         backgammon = true.some
       ),
       rated = true.some,
-      handicapped = false.some,
+      handicaps = Handicaps(
+        handicapped = false.some,
+        inputPlayerRatings = none
+      ),
       xGamesChoice = XGamesChoice(
         bestOfX = false.some,
         playX = false.some,
@@ -167,7 +173,10 @@ final class SwissForm(implicit mode: Mode) {
         backgammon = gameGroupInMedley(s.settings.medleyVariants, GameGroup.Backgammon()).some
       ),
       rated = s.settings.rated.some,
-      handicapped = s.settings.handicapped.some,
+      handicaps = Handicaps(
+        handicapped = s.settings.handicapped.some,
+        inputPlayerRatings = s.settings.inputPlayerRatings.some.filter(_.nonEmpty)
+      ),
       xGamesChoice = XGamesChoice(
         bestOfX = s.settings.isBestOfX.some,
         playX = s.settings.isPlayX.some,
@@ -327,7 +336,7 @@ object SwissForm {
       medleyDefaults: MedleyDefaults,
       medleyGameFamilies: MedleyGameFamilies,
       rated: Option[Boolean],
-      handicapped: Option[Boolean],
+      handicaps: Handicaps,
       xGamesChoice: XGamesChoice,
       nbRounds: Int,
       description: Option[String],
@@ -377,12 +386,13 @@ object SwissForm {
     def usePerPairingDrawTables = perPairingDrawTables | false
     def realPosition            = position ifTrue realVariant.standardVariant
 
-    def isRated         = rated | true
-    def isHandicapped   = handicapped | false
-    def isMatchScore    = xGamesChoice.matchScore | false
-    def isBestOfX       = xGamesChoice.bestOfX | false
-    def isPlayX         = xGamesChoice.playX | false
-    def nbGamesPerRound = xGamesChoice.nbGamesPerRound
+    def isRated            = rated | true
+    def isHandicapped      = handicaps.handicapped | false
+    def inputPlayerRatings = if (isHandicapped) handicaps.inputPlayerRatings else None
+    def isMatchScore       = xGamesChoice.matchScore | false
+    def isBestOfX          = xGamesChoice.bestOfX | false
+    def isPlayX            = xGamesChoice.playX | false
+    def nbGamesPerRound    = xGamesChoice.nbGamesPerRound
     def validXGamesSetup =
       ((!isBestOfX && !isPlayX) || nbGamesPerRound > 1) && !(isBestOfX && isPlayX)
     def validMatchScoreSetup = !isMatchScore || !(isBestOfX && nbGamesPerRound % 2 == 1)
@@ -435,6 +445,11 @@ object SwissForm {
       } else None
 
   }
+
+  case class Handicaps(
+      handicapped: Option[Boolean],
+      inputPlayerRatings: Option[String]
+  )
 
   case class XGamesChoice(
       bestOfX: Option[Boolean],

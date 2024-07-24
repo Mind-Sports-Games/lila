@@ -13,7 +13,7 @@ import lila.chat.Chat
 import lila.common.config.MaxPerSecond
 import lila.common.{ Bus, GreatPlayer, LightUser }
 import lila.db.dsl._
-import lila.game.{ Game, Pov }
+import lila.game.{ Game, Handicaps, Pov }
 import lila.hub.LightTeam.TeamID
 import lila.round.actorApi.round.QuietFlag
 import lila.user.{ User, UserRepo }
@@ -84,6 +84,7 @@ final class SwissApi(
         nbRounds = data.nbRounds,
         rated = data.realPosition.isEmpty && data.isRated,
         handicapped = data.isHandicapped,
+        inputPlayerRatings = ~data.inputPlayerRatings,
         isMatchScore = data.isMatchScore,
         isBestOfX = data.isBestOfX,
         isPlayX = data.isPlayX,
@@ -125,6 +126,7 @@ final class SwissApi(
             nbRounds = data.nbRounds,
             rated = position.isEmpty && (data.rated | old.settings.rated),
             handicapped = data.isHandicapped,
+            inputPlayerRatings = ~data.inputPlayerRatings,
             isMatchScore = data.isMatchScore,
             isBestOfX = data.isBestOfX,
             isPlayX = data.isPlayX,
@@ -172,6 +174,18 @@ final class SwissApi(
             s.copy(nextRoundAt = none)
           else s
         }
+      if (data.isHandicapped && old.settings.inputPlayerRatings != ~data.inputPlayerRatings) {
+        playerInputRating(~data.inputPlayerRatings).toList.map { case (u, r) =>
+          colls.player
+            .updateField(
+              $id(SwissPlayer.makeId(swiss.id, u)),
+              SwissPlayer.Fields.inputRating,
+              r
+            )
+            .void
+        }
+        recomputeAndUpdateAll(swiss.id)
+      }
       colls.swiss.update.one($id(old.id), addFeaturable(swiss)).void >>- {
         cache.roundInfo.put(swiss.id, fuccess(swiss.roundInfo.some))
         socket.reload(swiss.id)
@@ -206,7 +220,14 @@ final class SwissApi(
           .flatMap { rejoin =>
             fuccess(rejoin.n == 1) >>| { // if the match failed (not the update!), try a join
               (swiss.isEnterable && isInTeam(swiss.teamId)) ?? {
-                colls.player.insert.one(SwissPlayer.make(swiss.id, me, swiss.roundPerfType)) zip
+                colls.player.insert.one(
+                  SwissPlayer.make(
+                    swiss.id,
+                    me,
+                    swiss.roundPerfType,
+                    playerInputRating(swiss.settings.inputPlayerRatings).get(me.username)
+                  )
+                ) zip
                   colls.swiss.update.one($id(swiss.id), $inc("nbPlayers" -> 1)) inject true
               }
             }
@@ -214,6 +235,19 @@ final class SwissApi(
     } flatMap { res =>
       recomputeAndUpdateAll(id) inject res
     }
+
+  private def playerInputRating(inputPlayerRatings: String): Map[String, Int] =
+    inputPlayerRatings.linesIterator.flatMap {
+      _.trim.toLowerCase.split(' ').map(_.trim) match {
+        case Array(u, r) if r.matches("""\d+""") && r.toInt > 600 && r.toInt < 2900 =>
+          Map(u -> r.toInt)
+        case Array(u, r) if r.matches("""\d+k""") && r.dropRight(1).toInt > 0 && r.dropRight(1).toInt < 60 =>
+          Map(u -> Handicaps.convertGoRating(r))
+        case Array(u, r) if r.matches("""\d+d""") && r.dropRight(1).toInt > 0 && r.dropRight(1).toInt < 8 =>
+          Map(u -> Handicaps.convertGoRating(r))
+        case _ => None
+      }
+    }.toMap
 
   def gameIdSource(
       swissId: Swiss.Id,

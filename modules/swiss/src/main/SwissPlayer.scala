@@ -9,6 +9,7 @@ case class SwissPlayer(
     swissId: Swiss.Id,
     userId: User.ID,
     rating: Int,
+    inputRating: Option[Int],
     provisional: Boolean,
     points: Swiss.Points,
     sbTieBreak: Swiss.SonnenbornBerger,
@@ -49,13 +50,15 @@ object SwissPlayer {
   private[swiss] def make(
       swissId: Swiss.Id,
       user: User,
-      perf: PerfType
+      perf: PerfType,
+      inputRating: Option[Int]
   ): SwissPlayer =
     new SwissPlayer(
       id = makeId(swissId, user.id),
       swissId = swissId,
       userId = user.id,
       rating = user.perfs(perf).intRating,
+      inputRating = inputRating,
       provisional = user.perfs(perf).provisional,
       points = Swiss.Points(0),
       sbTieBreak = Swiss.SonnenbornBerger(0),
@@ -110,6 +113,7 @@ object SwissPlayer {
     val swissId      = "s"
     val userId       = "u"
     val rating       = "r"
+    val inputRating  = "ir"
     val provisional  = "pr"
     val points       = "p"
     val sbTieBreak   = "t"

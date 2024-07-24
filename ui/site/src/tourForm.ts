@@ -4,7 +4,7 @@ playstrategy.load.then(() => {
   const $variant = $('#form3-variant'),
     $rated = $('#form3-rated'),
     $medley = $('#form3-medley'),
-    $handicapped = $('#form3-handicapped'),
+    $handicapped = $('#form3-handicaps_handicapped'),
     $drawTables = $('.form3 .drawTables'),
     $perPairingDrawTables = $('.form3 .perPairingDrawTables'),
     $onePerGameFamily = $('#form3-medleyDefaults_onePerGameFamily'),
@@ -31,6 +31,9 @@ playstrategy.load.then(() => {
       $('.form3 .variant').toggle(!$medley.is(':checked'));
       showPosition();
       showDrawTables();
+    },
+    showInputRatings = () => {
+      $('.form3 .inputPlayerRatings').toggle($handicapped.is(':checked'));
     },
     hideByoyomiSettings = () => {
       $('.form3 .byoyomiClock').toggle($useByoyomi.is(':checked'));
@@ -100,6 +103,7 @@ playstrategy.load.then(() => {
     toggleOff($medley);
     toggleOff($rated);
     showMedleySettings();
+    showInputRatings();
   });
   $drawTables.on('change', () => toggleOff('#form3-perPairingDrawTables'));
   $perPairingDrawTables.on('change', () => toggleOff('#form3-drawTables'));
@@ -108,7 +112,7 @@ playstrategy.load.then(() => {
   $exoticChessVariants.on('change', toggleChessVariants);
   $draughts64Variants.on('change', toggleDraughts64Variants);
   showMedleySettings();
-
+  showInputRatings();
   $bestOfX.on('change', () => {
     toggleOff($playX);
     toggleOff($useMatchScore);
