@@ -39,3 +39,6 @@ The structure of a CSS module is as follows:
     - forum.light.scss # generated
     - forum.dark.scss # generated
     - forum.transp.scss # generated
+
+
+// @TODO: add mermaid diagram of modules relations overview

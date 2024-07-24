@@ -1,5 +1,5 @@
 import { AnalyseOpts } from './interfaces';
-import { start } from './main';
+import { PlayStrategyAnalyse } from './analysisBoard';
 
 export default function (cfg: AnalyseOpts) {
   playstrategy.socket = new playstrategy.StrongSocket(cfg.data.url.socket, cfg.data.player.version, {
@@ -13,5 +13,5 @@ export default function (cfg: AnalyseOpts) {
   cfg.$side = $('.analyse__side').clone();
   cfg.$underboard = $('.analyse__underboard').clone();
   cfg.socketSend = playstrategy.socket.send;
-  const analyse = start(cfg);
+  const analyse = PlayStrategyAnalyse(cfg);
 }

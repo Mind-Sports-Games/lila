@@ -1,6 +1,6 @@
 import modal from 'common/modal';
 
-export function app(input: HTMLInputElement) {
+export function PlayStrategyCli(input: HTMLInputElement) {
   playstrategy.userComplete().then(uac => {
     uac({
       input,
@@ -77,3 +77,5 @@ function help() {
     'clinput-help',
   );
 }
+
+(window as any).PlayStrategyCli = PlayStrategyCli; // esbuild

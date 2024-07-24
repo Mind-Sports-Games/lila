@@ -5,11 +5,6 @@
   "description": "playstrategy.org msg",
   "author": "Thibault Duplessis",
   "license": "AGPL-3.0-or-later",
-  "devDependencies": {
-    "@types/cash": "workspace:*",
-    "@types/playstrategy": "workspace:*",
-    "typescript": "^5.4.3"
-  },
   "dependencies": {
     "snabbdom": "^3.0.1",
     "common": "workspace:*"
@@ -20,8 +15,6 @@
     "prod": "tsc"
   },
   "playstrategy": {
-    "bundles": {
-      "src/main.ts": "msg"
-    }
+    "bundles": "src/msg.ts"
   }
 }

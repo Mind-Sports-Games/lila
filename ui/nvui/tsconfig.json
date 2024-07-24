@@ -4,7 +4,7 @@
   "compilerOptions": {
     "outDir": "./dist",
     "rootDir": "src",
-    "types": ["playstrategy", "web", "jquery"],
+    "types": ["playstrategy", "web"],
     "composite": true
   },
   "isolatedModules": true,

@@ -23,3 +23,5 @@ export default function PlayStrategyNotify(element: Element, opts: NotifyOpts) {
     redraw,
   };
 }
+
+(window as any).PlayStrategyNotify = PlayStrategyNotify; // esbuild

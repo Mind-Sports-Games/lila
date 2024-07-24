@@ -4,18 +4,14 @@
   "private": true,
   "description": "playstrategy.org moves tree",
   "type": "module",
-  "module": "dist/main.js",
-  "types": "dist/main.d.ts",
+  "module": "dist/tree.js",
+  "types": "dist/tree.d.ts",
   "keywords": [
     "chess",
     "playstrategy"
   ],
   "author": "Thibault Duplessis",
   "license": "AGPL-3.0-or-later",
-  "devDependencies": {
-    "@types/playstrategy": "workspace:*",
-    "typescript": "^5.4.3"
-  },
   "dependencies": {
     "common": "workspace:*"
   },

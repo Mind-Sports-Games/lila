@@ -38,66 +38,19 @@ async function parseModule(moduleDir: string): Promise<PlaystrategyModule> {
     post: [],
     hasTsconfig: fs.existsSync(path.join(moduleDir, 'tsconfig.json')),
   };
-  parseScripts(mod, 'scripts' in pkg ? pkg.scripts : {});
 
-  if ('playstrategy' in pkg && 'modules' in pkg.playstrategy) {
-    for (const moduleType in pkg.playstrategy.modules) {
-      if (moduleType !== 'esm' && moduleType !== 'iife') {
-        env.log(
-          c.warn('WARNING') +
-            ` - Unsupported module type '${c.cyan(moduleType)}' in '${c.cyan(mod.name + '/package.json')}'`,
-        );
-        continue;
-      }
-      mod.bundles ??= {};
-      mod.bundles[moduleType] = Object.entries(pkg.playstrategy.modules[moduleType]).map(x => ({
-        input: x[0],
-        output: x[1] as string,
-      }));
-    }
+  if ('playstrategy' in pkg && 'bundles' in pkg.playstrategy) {
+    // mod.bundle = Object.entries(pkg.playstrategy.bundles).map(x => ({ input: x[0], output: x[1] as string }));
+    // return mod;
+    if (typeof pkg.playstrategy.bundles === 'string') mod.bundles = [pkg.playstrategy.bundles];
+    else mod.bundles = pkg.playstrategy.bundles as string[];
   }
-  if ('playstrategy' in pkg && 'copy' in pkg.playstrategy) {
-    const copy: any[] = Array.isArray(pkg.playstrategy.copy) ? pkg.playstrategy.copy : [pkg.playstrategy.copy];
-    const flattener = new Map<string, Set<string>>();
-    for (const s of copy) {
-      if (!Array.isArray(s.src)) s.src = [s.src];
-      for (const src of s.src) {
-        const srcDest = flattener.get(src) ?? new Set<string>();
-        srcDest.add(s.dest);
-        flattener.set(src, srcDest);
-      }
-    }
-    mod.copy = [];
-    for (const [src, dests] of flattener.entries()) for (const dest of dests) mod.copy.push({ src, dest, mod });
+  if ('playstrategy' in pkg && 'sync' in pkg.playstrategy) {
+    mod.sync = Object.entries(pkg.playstrategy.sync).map(x => ({
+      src: x[0],
+      dest: x[1] as string,
+      mod,
+    }));
   }
   return mod;
-}
-
-function tokenizeArgs(argstr: string): string[] {
-  const args: string[] = [];
-  const reducer = (a: any[], ch: string) => {
-    if (ch !== ' ') return ch === "'" ? [a[0], !a[1]] : [a[0] + ch, a[1]];
-    if (a[1]) return [a[0] + ' ', true];
-    else if (a[0]) args.push(a[0]);
-    return ['', false];
-  };
-  const lastOne = [...argstr].reduce(reducer, ['', false])[0];
-  return lastOne ? [...args, lastOne] : args;
-}
-
-// go through package json scripts and get what we need from 'compile', 'dev', and 'deps'
-// if some other script is necessary, add it to buildScriptKeys
-function parseScripts(module: PlaystrategyModule, pkgScripts: any) {
-  const buildScriptKeys = ['deps', 'compile', 'dev', 'post'].concat(env.prod ? ['prod'] : []);
-
-  for (const script in pkgScripts) {
-    if (!buildScriptKeys.includes(script)) continue;
-    pkgScripts[script].split(/&&/).forEach((cmd: string) => {
-      // no need to support || in a script property yet, we don't even short circuit && properly
-      const args = tokenizeArgs(cmd.trim());
-      if (!['$npm_execpath', 'tsc'].includes(args[0])) {
-        script == 'prod' || script == 'post' ? module.post.push(args) : module.pre.push(args);
-      }
-    });
-  }
 }

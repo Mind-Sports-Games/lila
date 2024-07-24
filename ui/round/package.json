@@ -11,10 +11,6 @@
   ],
   "author": "Thibault Duplessis",
   "license": "AGPL-3.0-or-later",
-  "devDependencies": {
-    "@types/playstrategy": "workspace:*",
-    "typescript": "^5.4.3"
-  },
   "dependencies": {
     "ab": "https://github.com/lichess-org/ab-stub",
     "chat": "workspace:*",
@@ -31,10 +27,10 @@
     "prod": "tsc"
   },
   "playstrategy": {
-    "bundles": {
-      "src/main.ts": "round",
-      "src/plugins/keyboardMove.ts": "round.keyboardMove",
-      "src/plugins/nvui.ts": "round.nvui"
-    }
-  }
+    "bundles": [
+      "src/round.ts",
+      "src/plugins/round.keyboardMove.ts",
+      "src/plugins/round.nvui.ts"
+    ]
+  }  
 }

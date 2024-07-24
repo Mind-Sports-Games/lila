@@ -1,6 +1,6 @@
 import { RoundData, Step } from './interfaces';
 import { countGhosts } from 'draughtsground/fen';
-import { san2alg, invertSan } from 'draughts';
+import { san2alg, invertSan } from 'draughts/src/draughts';
 
 export const firstPly = (d: RoundData): number => d.steps[0].ply;
 

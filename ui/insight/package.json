@@ -3,7 +3,6 @@
   "version": "2.0.0",
   "private": true,
   "description": "playstrategy.org chess insights",
-  "type": "module",
   "module": "src/main.js",
   "keywords": [
     "chess",
@@ -13,9 +12,6 @@
   ],
   "author": "ornicar",
   "license": "AGPL-3.0-or-later",
-  "devDependencies": {
-    "typescript": "^5.4.3"
-  },
   "dependencies": {
     "common": "workspace:*",
     "mithril": "github:ornicar/mithril.js#lila-1",
@@ -27,8 +23,6 @@
     "prod": "tsc"
   },
   "playstrategy": {
-    "bundles": {
-      "src/main.ts": "insight"
-    }
+    "bundles": "src/insight.js"
   }
 }

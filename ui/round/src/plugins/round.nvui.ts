@@ -7,7 +7,7 @@ import { makeConfig as makeCgConfig } from '../ground';
 import { Chessground } from 'chessground';
 import renderCorresClock from '../corresClock/corresClockView';
 import { renderResult } from '../view/replay';
-import { plyStep } from '../round';
+import { plyStep } from '../round.js';
 import { onInsert } from '../util';
 import { Step, Dests, Position, Redraw } from '../interfaces';
 import * as game from 'game';
@@ -355,7 +355,7 @@ function destsToUcis(dests: Dests) {
   const ucis: string[] = [];
   for (const [orig, d] of dests) {
     if (d)
-      d.forEach(function (dest) {
+      d.forEach(function (dest: any) {
         ucis.push(orig + dest);
       });
   }

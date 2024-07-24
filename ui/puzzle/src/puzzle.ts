@@ -7,7 +7,7 @@ import { PuzzleOpts } from './interfaces';
 
 const patch = init([classModule, attributesModule]);
 
-export default function (opts: PuzzleOpts): void {
+export default function PlayStrategyPuzzle(opts: PuzzleOpts): void {
   const element = document.querySelector('main.puzzle') as HTMLElement;
   const ctrl = makeCtrl(opts, redraw);
 
@@ -25,3 +25,5 @@ export default function (opts: PuzzleOpts): void {
 // that's for the rest of playstrategy to access chessground
 // without having to include it a second time
 window.Chessground = Chessground;
+
+(window as any).PlayStrategyPuzzle = PlayStrategyPuzzle; // esbuild

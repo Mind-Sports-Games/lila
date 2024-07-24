@@ -10,7 +10,7 @@ interface RadarData {
   };
 }
 
-export function renderRadar(data: RadarData) {
+export function PlayStrategyPuzzleDashboard(data: RadarData) {
   const canvas = document.querySelector('.puzzle-dashboard__radar') as HTMLCanvasElement;
   const d = data.radar;
   const dark = $('body').hasClass('dark');
@@ -53,3 +53,5 @@ export function renderRadar(data: RadarData) {
     },
   });
 }
+
+(window as any).PlayStrategyPuzzleDashboard = PlayStrategyPuzzleDashboard; // esbuild

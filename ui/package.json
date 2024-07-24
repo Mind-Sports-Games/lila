@@ -8,9 +8,8 @@
   ],
   "author": "Thibault Duplessis",
   "license": "AGPL-3.0-or-later",
-  "devDependencies": {
-    "@types/cash": "workspace:*",
+  "dependencies": {
     "breakpoint-sass": "2.7.1",
-    "typescript": "^5.4.3"
+    "chessground": "file:/home/vincent/Desktop/code/chessground"
   }
 }

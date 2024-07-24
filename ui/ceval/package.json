@@ -4,8 +4,8 @@
   "private": true,
   "description": "playstrategy.org local computer analysis",
   "type": "module",
-  "module": "dist/main.js",
-  "types": "dist/main.d.ts",
+  "module": "dist/ceval.js",
+  "types": "dist/ceval.d.ts",
   "keywords": [
     "chess",
     "playstrategy",
@@ -14,10 +14,6 @@
   ],
   "author": "Thibault Duplessis",
   "license": "AGPL-3.0-or-later",
-  "devDependencies": {
-    "@types/playstrategy": "workspace:*",
-    "typescript": "^5.4.3"
-  },
   "dependencies": {
     "common": "workspace:*",
     "stratops": "git+ssh://git@github.com:Mind-Sports-Games/stratops.git#semver:v0.8.1-pstrat4.4",

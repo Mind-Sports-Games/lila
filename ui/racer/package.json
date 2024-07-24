@@ -11,10 +11,6 @@
   ],
   "author": "Thibault Duplessis",
   "license": "AGPL-3.0-or-later",
-  "devDependencies": {
-    "@types/playstrategy": "workspace:*",
-    "typescript": "^5.4.3"
-  },
   "dependencies": {
     "common": "workspace:*",
     "puz": "workspace:*",
@@ -27,8 +23,6 @@
     "prod": "tsc"
   },
   "playstrategy": {
-    "bundles": {
-      "src/main.ts": "racer"
-    }
+    "bundles": "src/racer.ts"
   }
 }

@@ -5,10 +5,8 @@
   "description": "playstrategy.org command line interface",
   "author": "Thibault Duplessis",
   "license": "AGPL-3.0-or-later",
-  "devDependencies": {
-    "@types/playstrategy": "workspace:*",
-    "common": "workspace:*",
-    "typescript": "^5.4.3"
+  "dependencies": {
+    "common": "workspace:*"
   },
   "scripts": {
     "compile": "tsc",
@@ -16,8 +14,6 @@
     "prod": "tsc"
   },
   "playstrategy": {
-    "bundles": {
-      "src/main.ts": "cli"
-    }
+    "bundles": "src/cli.ts"
   }
 }

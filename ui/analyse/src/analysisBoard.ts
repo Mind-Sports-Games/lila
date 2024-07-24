@@ -11,7 +11,7 @@ import Draughtsground from 'draughtsground';
 
 export const patch = init([classModule, attributesModule]);
 
-export function start(opts: AnalyseOpts): AnalyseApi {
+export function PlayStrategyAnalyse(opts: AnalyseOpts): AnalyseApi {
   opts.element = document.querySelector('main.analyse') as HTMLElement;
   opts.trans = playstrategy.trans(opts.i18n);
 
@@ -36,6 +36,8 @@ export function start(opts: AnalyseOpts): AnalyseApi {
   };
 }
 
+console.log('boot analysisBoard');
+
 export { boot };
 
 // that's for the rest of playstrategy to access chessground
@@ -43,3 +45,5 @@ export { boot };
 window.Chessground = Chessground;
 window.Draughtsground = Draughtsground;
 window.PlayStrategyChat = PlayStrategyChat;
+
+(window as any).PlayStrategyAnalyse = PlayStrategyAnalyse; // esbuild

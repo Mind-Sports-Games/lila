@@ -47,6 +47,7 @@ export const script = (src: string): Promise<void> =>
     const nonce = document.body.getAttribute('data-nonce'),
       el = document.createElement('script');
     if (nonce) el.setAttribute('nonce', nonce);
+    el.setAttribute('type', 'module');
     el.onload = resolve as () => void;
     el.onerror = reject;
     el.src = src;

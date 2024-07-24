@@ -95,7 +95,7 @@ object replay {
       moreJs = frag(
         analyseTag,
         analyseNvuiTag,
-        embedJsUnsafeLoadThen(s"""PlayStrategyAnalyse.boot(${safeJsonValue(
+        embedJsUnsafeLoadThen(s"""PlayStrategyAnalyse(${safeJsonValue(
           Json
             .obj(
               "data"   -> data,

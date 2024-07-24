@@ -4,7 +4,7 @@
   "compilerOptions": {
     "outDir": "./dist",
     "rootDir": "src",
-    "types": ["playstrategy", "cash", "web"],
+    "types": ["playstrategy", "web"],
     "composite": true,
     "incremental": true
   },

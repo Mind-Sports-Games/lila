@@ -7,7 +7,7 @@ const patch = init([classModule, attributesModule]);
 
 dragscroll; // required to include the dependency :( :( :(
 
-export default function (env: any) {
+export default function PlayStrategyTournamentSchedule(env: any) {
   playstrategy.StrongSocket.defaultParams.flag = 'tournament';
 
   const element = document.querySelector('.tour-chart') as HTMLElement;
@@ -42,3 +42,5 @@ function update(prevs: any, news: any) {
   const now = new Date().getTime();
   return news.concat(prevs.filter((p: any) => !p.schedule || p.finishesAt < now));
 }
+
+(window as any).PlayStrategyTournamentSchedule = PlayStrategyTournamentSchedule; // esbuild

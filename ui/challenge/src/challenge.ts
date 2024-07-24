@@ -29,3 +29,5 @@ export default function PlayStrategyChallenge(element: Element, opts: ChallengeO
     update,
   };
 }
+
+(window as any).PlayStrategyChallenge = PlayStrategyChallenge; // esbuild

@@ -28,3 +28,5 @@ export default function PlayStrategyEditor(element: HTMLElement, config: Editor.
 // that's for the rest of playstrategy to access chessground
 // without having to include it a second time
 window.Chessground = Chessground;
+
+(window as any).PlayStrategyEditor = PlayStrategyEditor; // esbuild

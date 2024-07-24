@@ -1,7 +1,7 @@
 {
   "extends": "../tsconfig.base.json",
   "compilerOptions": {
-    "types": ["playstrategy", "cash", "web"],
+    "types": ["playstrategy", "web"],
     "noEmit": true
   },
   "references": [

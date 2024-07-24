@@ -11,10 +11,6 @@
   ],
   "author": "Thibault Duplessis",
   "license": "AGPL-3.0-or-later",
-  "devDependencies": {
-    "@types/playstrategy": "workspace:*",
-    "typescript": "^5.4.3"
-  },
   "dependencies": {
     "common": "workspace:*",
     "snabbdom": "^3.0.1",
@@ -25,8 +21,6 @@
     "prod": "tsc"
   },
   "playstrategy": {
-    "bundles": {
-      "src/main.ts": "editor"
-    }
+    "bundles": "src/editor.ts"
   }
 }

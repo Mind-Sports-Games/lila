@@ -25,3 +25,5 @@ export default function PlayStrategyMsg(opts: MsgOpts) {
 
   redraw();
 }
+
+(window as any).PlayStrategyMsg = PlayStrategyMsg; // esbuild

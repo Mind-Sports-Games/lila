@@ -11,10 +11,6 @@
   ],
   "author": "Thibault Duplessis",
   "license": "AGPL-3.0-or-later",
-  "devDependencies": {
-    "@types/playstrategy": "workspace:*",
-    "typescript": "^5.4.3"
-  },
   "dependencies": {
     "date-fns": "^2.14.0",
     "snabbdom": "^3.0.1"
@@ -25,8 +21,6 @@
     "prod": "tsc"
   },
   "playstrategy": {
-    "bundles": {
-      "src/main.ts": "tournament.calendar"
-    }
+    "bundles": "src/tournament.calendar.ts"
   }
 }

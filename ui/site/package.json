@@ -5,14 +5,13 @@
   "description": "playstrategy.org website",
   "author": "Thibault Duplessis",
   "license": "AGPL-3.0-or-later",
-  "devDependencies": {
+  "type": "module",
+  "module": "src/site",
+  "dependencies": {
     "@types/debounce-promise": "^3.1.3",
     "@types/fnando__sparkline": "^0.3.2",
     "@types/yaireo__tagify": "^4.0.1",
-    "@types/zxcvbn": "^4.4.0",
-    "typescript": "^5.4.3"
-  },
-  "dependencies": {
+    "@types/zxcvbn": "^4.4.0",    
     "@fnando/sparkline": "^0.3.10",
     "@yaireo/tagify": "4.6.0",
     "chat": "workspace:*",
@@ -38,99 +37,45 @@
     "prod": "cat ../../public/compiled/deps.min.js ../../public/compiled/site.min.js > ../../public/compiled/playstrategy.min.js"
   },
   "playstrategy": {
-    "bundles": {
-      "src/site.ts": "site",
-      "src/tvEmbed.ts": "tvEmbed",
-      "src/puzzleEmbed.ts": "puzzle.embed",
-      "src/analyseEmbed.ts": "analysisBoard.embed",
-      "src/user.ts": "user",
-      "src/clas.ts": "clas",
-      "src/captcha.ts": "captcha",
-      "src/expandText.ts": "expandText",
-      "src/lpv.ts": "lpv",
-      "src/lpv.embed.ts": "lpv.embed",
-      "src/team.ts": "team",
-      "src/forum.ts": "forum",
-      "src/account.ts": "account",
-      "src/passwordComplexity.ts": "passwordComplexity",
-      "src/coachForm.ts": "coach.form",
-      "src/coachShow.ts": "coach.show",
-      "src/challengePage.ts": "challengePage",
-      "src/checkout.ts": "checkout",
-      "src/plan.ts": "plan",
-      "src/login.ts": "login",
-      "src/teamBattleForm.ts": "teamBattleForm",
-      "src/tourForm.ts": "tourForm",
-      "src/gameSearch.ts": "gameSearch",
-      "src/userComplete.ts": "userComplete",
-      "src/infiniteScroll.ts": "infiniteScroll",
-      "src/flatpickr.ts": "flatpickr",
-      "src/appeal.ts": "appeal",
-      "src/publicChats.ts": "publicChats",
-      "src/contact.ts": "contact",
-      "src/userGamesDownload.ts": "userGamesDownload",
-      "src/tvGames.ts": "tvGames",
-      "src/ublog.ts": "ublog",
-      "src/ublogForm.ts": "ublogForm",
-      "src/speech.ts": "speech"
-    },
-    "copy": [
-      {
-        "src": "node_modules/hopscotch/dist/js/hopscotch.min.js",
-        "dest": "../../public/vendor/hopscotch/dist/js"
-      },
-      {
-        "src": "node_modules/hopscotch/dist/css/hopscotch.min.css",
-        "dest": "../../public/vendor/hopscotch/dist/css"
-      },
-      {
-        "src": "node_modules/hopscotch/dist/img",
-        "dest": "../../public/vendor/hopscotch/dist"
-      },
-      {
-        "src": [
-          "node_modules/highcharts/highcharts.js",
-          "node_modules/highcharts/highcharts-more.js",
-          "node_modules/highcharts/highstock.js"
-        ],
-        "dest": "../../public/vendor/highcharts-4.2.5"
-      },
-      {
-        "src": "node_modules/@yaireo/tagify/dist/tagify.min.js",
-        "dest": "../../public/vendor/tagify"
-      },
-      {
-        "src": [
-          "node_modules/stockfish.js/stockfish.js",
-          "node_modules/stockfish.js/stockfish.wasm",
-          "node_modules/stockfish.js/stockfish.wasm.js"
-        ],
-        "dest": "../../public/vendor/stockfish.js"
-      },
-      {
-        "src": [
-          "node_modules/stockfish.wasm/stockfish.js",
-          "node_modules/stockfish.wasm/stockfish.wasm",
-          "node_modules/stockfish.wasm/stockfish.worker.js"
-        ],
-        "dest": "../../public/vendor/stockfish.wasm"
-      },
-      {
-        "src": [
-          "node_modules/stockfish-mv.wasm/stockfish.js",
-          "node_modules/stockfish-mv.wasm/stockfish.wasm",
-          "node_modules/stockfish-mv.wasm/stockfish.worker.js"
-        ],
-        "dest": "../../public/vendor/stockfish-mv.wasm"
-      },
-      {
-        "src": [
-          "node_modules/stockfish-nnue.wasm/stockfish.js",
-          "node_modules/stockfish-nnue.wasm/stockfish.wasm",
-          "node_modules/stockfish-nnue.wasm/stockfish.worker.js"
-        ],
-        "dest": "../../public/vendor/stockfish-nnue.wasm"
-      }
-    ]
+    "bundles": [
+      "src/site.ts",
+      "src/tvEmbed.ts",
+      "src/puzzleEmbed.ts",
+      "src/analysisBoard.embed.ts",
+      "src/user.ts",
+      "src/clas.ts",
+      "src/captcha.ts",
+      "src/expandText.ts",
+      "src/team.ts",
+      "src/forum.ts",
+      "src/account.ts",
+      "src/passwordComplexity.ts",
+      "src/coachForm.ts",
+      "src/coachShow.ts",
+      "src/challengePage.ts",
+      "src/checkout.ts",
+      "src/plan.ts",
+      "src/login.ts",
+      "src/teamBattleForm.ts",
+      "src/tourForm.ts",
+      "src/gameSearch.ts",
+      "src/userComplete.ts",
+      "src/infiniteScroll.ts",
+      "src/flatpickr.ts",
+      "src/appeal.ts",
+      "src/publicChats.ts",
+      "src/contact.ts"
+    ],
+    "sync": {
+        "../../node_modules/chessground/dist/chessground.min.js": "public/npm",
+        "node_modules/hopscotch/dist/js/hopscotch.min.js": "public/vendor/hopscotch/dist/js",
+        "node_modules/hopscotch/dist/css/hopscotch.min.css": "public/vendor/hopscotch/dist/css",
+        "node_modules/hopscotch/dist/img": "public/vendor/hopscotch/dist",
+        "node_modules/highcharts/high*.js": "public/vendor/highcharts-4.2.5",
+        "node_modules/@yaireo/tagify/dist/tagify.min.js": "public/vendor/tagify",
+        "node_modules/stockfish.js/*": "public/vendor/stockfish.js",
+        "node_modules/stockfish.wasm/*": "public/vendor/stockfish-mv.wasm",
+        "node_modules/stockfish-nnue.wasm/*": "public/vendor/stockfish-nnue.wasm"
+    }
   }
 }

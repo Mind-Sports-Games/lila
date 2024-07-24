@@ -8,9 +8,6 @@ importers:
 
   .:
     dependencies:
-      '@types/cash':
-        specifier: workspace:*
-        version: link:ui/@types/cash
       '@types/node':
         specifier: 20.12.2
         version: 20.12.2
@@ -52,30 +49,30 @@ importers:
         version: 0.4.19
 
   ui:
-    devDependencies:
-      '@types/cash':
-        specifier: workspace:*
-        version: link:@types/cash
+    dependencies:
       breakpoint-sass:
         specifier: 2.7.1
         version: 2.7.1
-      typescript:
-        specifier: ^5.4.3
-        version: 5.5.3
+      chessground:
+        specifier: file:/home/vincent/Desktop/code/chessground
+        version: file:../chessground
 
-  ui/@types/cash: {}
-
-  ui/@types/playstrategy:
-    dependencies:
-      '@types/cash':
-        specifier: workspace:*
-        version: link:../cash
+  ui/@types/playstrategy: {}
 
   ui/analyse:
     dependencies:
       '@badrap/result':
         specifier: 0.2.8
         version: 0.2.8
+      '@types/debounce-promise':
+        specifier: ^3.1.3
+        version: 3.1.9
+      '@types/node':
+        specifier: 20.12.2
+        version: 20.12.2
+      '@types/yaireo__tagify':
+        specifier: ^4.0.1
+        version: 4.24.0
       '@yaireo/tagify':
         specifier: 4.6.0
         version: 4.6.0(prop-types@15.8.1)
@@ -88,6 +85,9 @@ importers:
       common:
         specifier: workspace:*
         version: link:../common
+      debounce-promise:
+        specifier: ^3.1.2
+        version: 3.1.2
       draughtsground:
         specifier: workspace:*
         version: link:../draughtsground
@@ -112,22 +112,6 @@ importers:
       tree:
         specifier: workspace:*
         version: link:../tree
-    devDependencies:
-      '@types/debounce-promise':
-        specifier: ^3.1.3
-        version: 3.1.9
-      '@types/node':
-        specifier: 20.12.2
-        version: 20.12.2
-      '@types/playstrategy':
-        specifier: workspace:*
-        version: link:../@types/playstrategy
-      '@types/yaireo__tagify':
-        specifier: ^4.0.1
-        version: 4.24.0
-      typescript:
-        specifier: ^5.4.2
-        version: 5.5.3
 
   ui/ceval:
     dependencies:
@@ -146,13 +130,6 @@ importers:
       stratutils:
         specifier: workspace:*
         version: link:../stratutils
-    devDependencies:
-      '@types/playstrategy':
-        specifier: workspace:*
-        version: link:../@types/playstrategy
-      typescript:
-        specifier: ^5.4.3
-        version: 5.5.3
 
   ui/challenge:
     dependencies:
@@ -162,19 +139,9 @@ importers:
       snabbdom:
         specifier: ^3.0.1
         version: 3.5.1
-    devDependencies:
-      '@types/playstrategy':
-        specifier: workspace:*
-        version: link:../@types/playstrategy
-      typescript:
-        specifier: ^5.4.3
-        version: 5.5.3
 
   ui/chat:
     dependencies:
-      '@types/playstrategy':
-        specifier: workspace:*
-        version: link:../@types/playstrategy
       common:
         specifier: workspace:*
         version: link:../common
@@ -184,28 +151,15 @@ importers:
       snabbdom:
         specifier: ^3.0.1
         version: 3.5.1
-      typescript:
-        specifier: ^5.4.3
-        version: 5.5.3
 
   ui/cli:
-    devDependencies:
-      '@types/playstrategy':
-        specifier: workspace:*
-        version: link:../@types/playstrategy
+    dependencies:
       common:
         specifier: workspace:*
         version: link:../common
-      typescript:
-        specifier: ^5.4.3
-        version: 5.5.3
 
   ui/common:
     dependencies:
-      stratutils:
-        specifier: workspace:*
-        version: link:../stratutils
-    devDependencies:
       '@babel/core':
         specifier: ^7.16.0
         version: 7.24.7
@@ -215,18 +169,12 @@ importers:
       '@babel/preset-typescript':
         specifier: ^7.16.0
         version: 7.24.7(@babel/core@7.24.7)
-      '@types/cash':
-        specifier: workspace:*
-        version: link:../@types/cash
-      '@types/playstrategy':
-        specifier: workspace:*
-        version: link:../@types/playstrategy
       snabbdom:
         specifier: ^3.0.1
         version: 3.5.1
-      typescript:
-        specifier: ^5.4.3
-        version: 5.5.3
+      stratutils:
+        specifier: workspace:*
+        version: link:../stratutils
 
   ui/dasher:
     dependencies:
@@ -236,44 +184,21 @@ importers:
       snabbdom:
         specifier: ^3.0.1
         version: 3.5.1
-    devDependencies:
-      '@types/jquery':
-        specifier: ^3.5.30
-        version: 3.5.30
-      '@types/playstrategy':
-        specifier: workspace:*
-        version: link:../@types/playstrategy
-      typescript:
-        specifier: ^5.4.3
-        version: 5.5.3
 
   ui/dgt:
     dependencies:
       stratops:
         specifier: git+ssh://git@github.com:Mind-Sports-Games/stratops.git#semver:v0.8.1-pstrat4.4
         version: https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/226564904bfb1d6471f8d8f3c138369826ac775f
-    devDependencies:
-      '@types/playstrategy':
-        specifier: workspace:*
-        version: link:../@types/playstrategy
-      typescript:
-        specifier: ^5.4.3
-        version: 5.5.3
 
   ui/draughts:
-    devDependencies:
-      '@types/playstrategy':
-        specifier: workspace:*
-        version: link:../@types/playstrategy
+    dependencies:
       draughtsground:
         specifier: workspace:*
         version: link:../draughtsground
-      typescript:
-        specifier: ^5.4.3
-        version: 5.5.3
 
   ui/draughtsground:
-    devDependencies:
+    dependencies:
       '@typescript-eslint/eslint-plugin':
         specifier: 4.33.0
         version: 4.33.0(@typescript-eslint/parser@4.33.0(eslint@7.32.0)(typescript@5.5.3))(eslint@7.32.0)(typescript@5.5.3)
@@ -289,9 +214,6 @@ importers:
       tslib:
         specifier: ^2
         version: 2.6.3
-      typescript:
-        specifier: ^5.4.3
-        version: 5.5.3
 
   ui/draughtsround:
     dependencies:
@@ -316,13 +238,6 @@ importers:
       snabbdom:
         specifier: ^3.0.1
         version: 3.5.1
-    devDependencies:
-      '@types/playstrategy':
-        specifier: workspace:*
-        version: link:../@types/playstrategy
-      typescript:
-        specifier: ^5.4.3
-        version: 5.5.3
 
   ui/editor:
     dependencies:
@@ -335,22 +250,8 @@ importers:
       stratops:
         specifier: git+ssh://git@github.com:Mind-Sports-Games/stratops.git#semver:v0.8.1-pstrat4.4
         version: https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/226564904bfb1d6471f8d8f3c138369826ac775f
-    devDependencies:
-      '@types/playstrategy':
-        specifier: workspace:*
-        version: link:../@types/playstrategy
-      typescript:
-        specifier: ^5.4.3
-        version: 5.5.3
 
-  ui/game:
-    devDependencies:
-      '@types/playstrategy':
-        specifier: workspace:*
-        version: link:../@types/playstrategy
-      typescript:
-        specifier: ^5.4.3
-        version: 5.5.3
+  ui/game: {}
 
   ui/insight:
     dependencies:
@@ -363,10 +264,6 @@ importers:
       numeral:
         specifier: ^1.5
         version: 1.5.6
-    devDependencies:
-      typescript:
-        specifier: ^5.4.3
-        version: 5.5.3
 
   ui/learn:
     dependencies:
@@ -379,41 +276,30 @@ importers:
       mithril:
         specifier: github:ornicar/mithril.js#lila-1
         version: https://codeload.github.com/ornicar/mithril.js/tar.gz/dd92827aec63f921149ca9a3460ccd981e7025bb
-    devDependencies:
-      '@types/cash':
-        specifier: workspace:*
-        version: link:../@types/cash
-      '@types/playstrategy':
-        specifier: workspace:*
-        version: link:../@types/playstrategy
-      typescript:
-        specifier: ^5.4.3
-        version: 5.5.3
 
   ui/lobby:
     dependencies:
+      '@types/debounce-promise':
+        specifier: ^3.1.3
+        version: 3.1.9
+      '@types/node':
+        specifier: 20.12.2
+        version: 20.12.2
       chat:
         specifier: workspace:*
         version: link:../chat
       common:
         specifier: workspace:*
         version: link:../common
+      debounce-promise:
+        specifier: ^3.1.2
+        version: 3.1.2
       draughtsground:
         specifier: workspace:*
         version: link:../draughtsground
       snabbdom:
         specifier: ^3.0.1
         version: 3.5.1
-    devDependencies:
-      '@types/debounce-promise':
-        specifier: ^3.1.3
-        version: 3.1.9
-      '@types/playstrategy':
-        specifier: workspace:*
-        version: link:../@types/playstrategy
-      typescript:
-        specifier: ^5.4.3
-        version: 5.5.3
 
   ui/msg:
     dependencies:
@@ -423,16 +309,6 @@ importers:
       snabbdom:
         specifier: ^3.0.1
         version: 3.5.1
-    devDependencies:
-      '@types/cash':
-        specifier: workspace:*
-        version: link:../@types/cash
-      '@types/playstrategy':
-        specifier: workspace:*
-        version: link:../@types/playstrategy
-      typescript:
-        specifier: ^5.4.3
-        version: 5.5.3
 
   ui/notify:
     dependencies:
@@ -442,35 +318,21 @@ importers:
       snabbdom:
         specifier: ^3.0.1
         version: 3.5.1
-    devDependencies:
-      '@types/playstrategy':
-        specifier: workspace:*
-        version: link:../@types/playstrategy
-      typescript:
-        specifier: ^5.4.3
-        version: 5.5.3
 
   ui/nvui:
     dependencies:
-      '@types/jquery':
-        specifier: ^3.5.30
-        version: 3.5.30
       snabbdom:
         specifier: ^3.0.1
         version: 3.5.1
       stratops:
         specifier: git+ssh://git@github.com:Mind-Sports-Games/stratops.git#semver:v0.8.1-pstrat4.4
         version: https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/226564904bfb1d6471f8d8f3c138369826ac775f
-    devDependencies:
-      '@types/playstrategy':
-        specifier: workspace:*
-        version: link:../@types/playstrategy
-      typescript:
-        specifier: ^5.4.3
-        version: 5.5.3
 
   ui/palantir:
     dependencies:
+      '@types/webrtc':
+        specifier: ^0.0.26
+        version: 0.0.26
       common:
         specifier: workspace:*
         version: link:../common
@@ -480,19 +342,9 @@ importers:
       snabbdom:
         specifier: 3.5.1
         version: 3.5.1
-    devDependencies:
-      '@types/playstrategy':
-        specifier: workspace:*
-        version: link:../@types/playstrategy
-      '@types/webrtc':
-        specifier: ^0.0.26
-        version: 0.0.26
       types-serviceworker:
         specifier: ^0.0.1
         version: 0.0.1
-      typescript:
-        specifier: ^5.4.3
-        version: 5.5.3
 
   ui/puz:
     dependencies:
@@ -505,19 +357,12 @@ importers:
       stratops:
         specifier: git+ssh://git@github.com:Mind-Sports-Games/stratops.git#semver:v0.8.1-pstrat4.4
         version: https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/226564904bfb1d6471f8d8f3c138369826ac775f
-    devDependencies:
-      '@types/cash':
-        specifier: workspace:*
-        version: link:../@types/cash
-      '@types/playstrategy':
-        specifier: workspace:*
-        version: link:../@types/playstrategy
-      typescript:
-        specifier: ^5.4.3
-        version: 5.5.3
 
   ui/puzzle:
     dependencies:
+      '@types/chart.js':
+        specifier: ^2.9.29
+        version: 2.9.41
       ceval:
         specifier: workspace:*
         version: link:../ceval
@@ -539,16 +384,6 @@ importers:
       tree:
         specifier: workspace:*
         version: link:../tree
-    devDependencies:
-      '@types/chart.js':
-        specifier: ^2.9.29
-        version: 2.9.41
-      '@types/playstrategy':
-        specifier: workspace:*
-        version: link:../@types/playstrategy
-      typescript:
-        specifier: ^5.4.3
-        version: 5.5.3
 
   ui/racer:
     dependencies:
@@ -564,13 +399,6 @@ importers:
       stratops:
         specifier: git+ssh://git@github.com:Mind-Sports-Games/stratops.git#semver:v0.8.1-pstrat4.4
         version: https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/226564904bfb1d6471f8d8f3c138369826ac775f
-    devDependencies:
-      '@types/playstrategy':
-        specifier: workspace:*
-        version: link:../@types/playstrategy
-      typescript:
-        specifier: ^5.4.3
-        version: 5.5.3
 
   ui/round:
     dependencies:
@@ -598,22 +426,12 @@ importers:
       stratutils:
         specifier: workspace:*
         version: link:../stratutils
-    devDependencies:
-      '@types/playstrategy':
-        specifier: workspace:*
-        version: link:../@types/playstrategy
-      typescript:
-        specifier: ^5.4.3
-        version: 5.5.3
 
   ui/serviceWorker:
-    devDependencies:
+    dependencies:
       types-serviceworker:
         specifier: ^0.0.1
         version: 0.0.1
-      typescript:
-        specifier: ^5.4.3
-        version: 5.5.3
 
   ui/simul:
     dependencies:
@@ -632,19 +450,24 @@ importers:
       snabbdom:
         specifier: ^3.0.1
         version: 3.5.1
-    devDependencies:
-      '@types/playstrategy':
-        specifier: workspace:*
-        version: link:../@types/playstrategy
-      typescript:
-        specifier: ^5.4.3
-        version: 5.5.3
 
   ui/site:
     dependencies:
       '@fnando/sparkline':
         specifier: ^0.3.10
         version: 0.3.10
+      '@types/debounce-promise':
+        specifier: ^3.1.3
+        version: 3.1.9
+      '@types/fnando__sparkline':
+        specifier: ^0.3.2
+        version: 0.3.7
+      '@types/yaireo__tagify':
+        specifier: ^4.0.1
+        version: 4.24.0
+      '@types/zxcvbn':
+        specifier: ^4.4.0
+        version: 4.4.4
       '@yaireo/tagify':
         specifier: 4.6.0
         version: 4.6.0(prop-types@15.8.1)
@@ -693,28 +516,8 @@ importers:
       zxcvbn:
         specifier: ^4.4.2
         version: 4.4.2
-    devDependencies:
-      '@types/debounce-promise':
-        specifier: ^3.1.3
-        version: 3.1.9
-      '@types/fnando__sparkline':
-        specifier: ^0.3.2
-        version: 0.3.7
-      '@types/yaireo__tagify':
-        specifier: ^4.0.1
-        version: 4.24.0
-      '@types/zxcvbn':
-        specifier: ^4.4.0
-        version: 4.4.4
-      typescript:
-        specifier: ^5.4.3
-        version: 5.5.3
 
-  ui/speech:
-    devDependencies:
-      typescript:
-        specifier: ^5.4.3
-        version: 5.5.3
+  ui/speech: {}
 
   ui/storm:
     dependencies:
@@ -730,26 +533,12 @@ importers:
       stratops:
         specifier: git+ssh://git@github.com:Mind-Sports-Games/stratops.git#semver:v0.8.1-pstrat4.4
         version: https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/226564904bfb1d6471f8d8f3c138369826ac775f
-    devDependencies:
-      '@types/playstrategy':
-        specifier: workspace:*
-        version: link:../@types/playstrategy
-      typescript:
-        specifier: ^5.4.3
-        version: 5.5.3
 
   ui/stratutils:
     dependencies:
       stratops:
         specifier: git+ssh://git@github.com:Mind-Sports-Games/stratops.git#semver:v0.8.1-pstrat4.4
         version: https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/226564904bfb1d6471f8d8f3c138369826ac775f
-    devDependencies:
-      '@types/playstrategy':
-        specifier: workspace:*
-        version: link:../@types/playstrategy
-      typescript:
-        specifier: ^5.4.3
-        version: 5.5.3
 
   ui/swiss:
     dependencies:
@@ -768,13 +557,6 @@ importers:
       snabbdom:
         specifier: ^3.0.1
         version: 3.5.1
-    devDependencies:
-      '@types/playstrategy':
-        specifier: workspace:*
-        version: link:../@types/playstrategy
-      typescript:
-        specifier: ^5.4.3
-        version: 5.5.3
 
   ui/tournament:
     dependencies:
@@ -793,13 +575,6 @@ importers:
       snabbdom:
         specifier: ^3.0.1
         version: 3.5.1
-    devDependencies:
-      '@types/playstrategy':
-        specifier: workspace:*
-        version: link:../@types/playstrategy
-      typescript:
-        specifier: ^5.4.3
-        version: 5.5.3
 
   ui/tournamentCalendar:
     dependencies:
@@ -809,45 +584,24 @@ importers:
       snabbdom:
         specifier: ^3.0.1
         version: 3.5.1
-    devDependencies:
-      '@types/playstrategy':
-        specifier: workspace:*
-        version: link:../@types/playstrategy
-      typescript:
-        specifier: ^5.4.3
-        version: 5.5.3
 
   ui/tournamentSchedule:
     dependencies:
+      '@types/dragscroll':
+        specifier: ^0.0.3
+        version: 0.0.3
       dragscroll:
         specifier: ^0.0.8
         version: 0.0.8
       snabbdom:
         specifier: ^3.0.1
         version: 3.5.1
-    devDependencies:
-      '@types/dragscroll':
-        specifier: ^0.0.3
-        version: 0.0.3
-      '@types/playstrategy':
-        specifier: workspace:*
-        version: link:../@types/playstrategy
-      typescript:
-        specifier: ^5.4.3
-        version: 5.5.3
 
   ui/tree:
     dependencies:
       common:
         specifier: workspace:*
         version: link:../common
-    devDependencies:
-      '@types/playstrategy':
-        specifier: workspace:*
-        version: link:../@types/playstrategy
-      typescript:
-        specifier: ^5.4.3
-        version: 5.5.3
 
 packages:
 
@@ -1560,9 +1314,6 @@ packages:
   '@types/fnando__sparkline@0.3.7':
     resolution: {integrity: sha512-irYrS2clNGbnKBBIBAulPH6hDZ/HlBkNsDbYPfO8B2obcxtC9UzKFS5IBSzrUtfKbwf8U01xHj+5iEJ7TtY04Q==}
 
-  '@types/jquery@3.5.30':
-    resolution: {integrity: sha512-nbWKkkyb919DOUxjmRVk8vwtDb0/k8FKncmUKFi+NY+QXqWltooxTrswvz4LspQwxvLdvzBN1TImr6cw3aQx2A==}
-
   '@types/json-schema@7.0.15':
     resolution: {integrity: sha512-5+fP8P8MFNC+AyZCDxrB2pkZFPGzqQWUzpSeuuVLvm8VMcorNYavBqoFcxK8bQz4Qsbn4oUEEem4wDLfcysGHA==}
 
@@ -1574,9 +1325,6 @@ packages:
 
   '@types/react@18.3.3':
     resolution: {integrity: sha512-hti/R0pS0q1/xx+TsI73XIqk26eBsISZ2R0wUijXIngRK9R/e7Xw/cXVxQK7R5JjW+SV4zGcn5hXjudkN/pLIw==}
-
-  '@types/sizzle@2.3.8':
-    resolution: {integrity: sha512-0vWLNK2D5MT9dg0iOo8GlKguPAU02QjmZitPEsXRuJXU/OGIOt9vT9Fc26wtYuavLxtO45v9PGleoL9Z0k1LHg==}
 
   '@types/web@0.0.142':
     resolution: {integrity: sha512-QWDvMW+P3sdq8rhiw3dNyBR64O5adSY80gBjRd2xI3BADGsAFpAglblWucsGUjKVKyPm4EbYZkvFs7BRxPsBOg==}
@@ -3683,10 +3431,6 @@ snapshots:
 
   '@types/fnando__sparkline@0.3.7': {}
 
-  '@types/jquery@3.5.30':
-    dependencies:
-      '@types/sizzle': 2.3.8
-
   '@types/json-schema@7.0.15': {}
 
   '@types/node@20.12.2':
@@ -3699,8 +3443,6 @@ snapshots:
     dependencies:
       '@types/prop-types': 15.7.12
       csstype: 3.1.3
-
-  '@types/sizzle@2.3.8': {}
 
   '@types/web@0.0.142': {}
 

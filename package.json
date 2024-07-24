@@ -30,7 +30,6 @@
     "*.{js,ts,md,json,scss}": "prettier --write"
   },
   "dependencies": {
-    "@types/cash": "workspace:*",
     "@types/playstrategy": "workspace:*",
     "@types/node": "20.12.2",
     "@types/web": "^0.0.142",

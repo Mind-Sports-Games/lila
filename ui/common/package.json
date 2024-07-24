@@ -24,16 +24,11 @@
   "author": "Thibault Duplessis",
   "license": "AGPL-3.0-or-later",
   "dependencies": {
-    "stratutils": "workspace:*"
-  },
-  "devDependencies": {
     "@babel/core": "^7.16.0",
     "@babel/preset-env": "^7.16.0",
     "@babel/preset-typescript": "^7.16.0",
-    "@types/cash": "workspace:*",
-    "@types/playstrategy": "workspace:*",
     "snabbdom": "^3.0.1",
-    "typescript": "^5.4.3"
+    "stratutils": "workspace:*"
   },
   "scripts": {
     "compile": "tsc",

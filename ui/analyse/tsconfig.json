@@ -1,6 +1,7 @@
 {
   "extends": "../tsconfig.base.json",
   "compilerOptions": {
+    "paths": { "chessground": ["./@types/chessground"] },
     "esModuleInterop": true,
     "noEmit": true,
   },

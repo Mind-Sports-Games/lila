@@ -2,7 +2,7 @@
   "extends": "../tsconfig.base.json",
   "compilerOptions": {
     "paths": { "numeral": ["./@types/numeral"] },
-    "types": ["playstrategy", "cash"],
+    "types": ["playstrategy"],
     "noEmit": true,
     "composite": true
   },

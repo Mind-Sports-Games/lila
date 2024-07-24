@@ -1,11 +1,12 @@
 import * as xhr from 'common/xhr';
 import { RoundOpts, RoundData } from './interfaces';
-import { RoundApi, RoundMain } from './main';
+import { RoundApi, app } from './round';
 import { type ChatCtrl } from 'chat';
 import { TourPlayer } from 'game';
 import { tourStandingCtrl, TourStandingCtrl } from './tourStanding';
 
-export default function (opts: RoundOpts): void {
+export default function PlayStrategyRound(opts: RoundOpts): void {
+  console.log('VFR2');
   const element = document.querySelector('.round__app') as HTMLElement,
     data: RoundData = opts.data;
   playstrategy.pageVariant = data.game.variant.key;
@@ -60,7 +61,7 @@ export default function (opts: RoundOpts): void {
   opts.element = element;
   opts.socketSend = playstrategy.socket.send;
 
-  const round: RoundApi = (window['PlayStrategyRound'] as RoundMain).app(opts);
+  const round: RoundApi = app(opts);
   const chatOpts = opts.chat;
   if (chatOpts) {
     if (data.tournament?.top) {
@@ -87,3 +88,6 @@ export default function (opts: RoundOpts): void {
   $('#zentog').on('click', () => playstrategy.pubsub.emit('zen'));
   playstrategy.storage.make('reload-round-tabs').listen(playstrategy.reload);
 }
+
+(window as any).PlayStrategyRound = PlayStrategyRound; // esbuild
+console.log('PlayStrategyRound was booted efg and added to window');

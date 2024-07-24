@@ -9,7 +9,7 @@ const patch = init([classModule, attributesModule]);
 
 import view from './view/main';
 
-export function start(opts: SimulOpts) {
+export function PlayStrategySimul(opts: SimulOpts) {
   const element = document.querySelector('main.simul') as HTMLElement;
 
   playstrategy.socket = new playstrategy.StrongSocket(`/simul/${opts.data.id}/socket/v4`, opts.socketVersion, {
@@ -38,3 +38,5 @@ export function start(opts: SimulOpts) {
 window.PlayStrategyChat = PlayStrategyChat;
 window.Chessground = Chessground;
 window.Draughtsground = Draughtsground;
+
+(window as any).PlayStrategySimul = PlayStrategySimul; // esbuild

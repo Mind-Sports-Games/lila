@@ -9,18 +9,12 @@
     "common": "workspace:*",
     "snabbdom": "^3.0.1"
   },
-  "devDependencies": {
-    "@types/playstrategy": "workspace:*",
-    "typescript": "^5.4.3"
-  },
   "scripts": {
     "compile": "tsc",
     "dev": "tsc",
     "prod": "tsc"
   },
   "playstrategy": {
-    "bundles": {
-      "src/main.ts": "challenge"
-    }
+    "bundles": "src/challenge.ts"
   }
 }

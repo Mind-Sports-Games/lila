@@ -157,6 +157,7 @@ export default function PlayStrategyLobby(opts: LobbyOpts) {
   });
   playstrategy.StrongSocket.firstConnect.then(() => {
     const gameId = getParameterByName('hook_like');
+    console.log('vfr');
     if (!gameId) return;
     const ratingRange = lobby.setup.stores.hook.get()?.ratingRange;
     xhr.text(`/setup/hook/${playstrategy.sri}/like/${gameId}?rr=${ratingRange || ''}`, { method: 'post' });
@@ -283,6 +284,9 @@ export default function PlayStrategyLobby(opts: LobbyOpts) {
   }
 }
 
+(window as any).PlayStrategyLobby = PlayStrategyLobby; // esbuild
+console.log('PlayStrategyLobby was booted and added to window');
+
 function suggestBgSwitch() {
   const m = window.matchMedia('(prefers-color-scheme: dark)');
   if (m.media == 'not all') return;
@@ -323,6 +327,7 @@ function spreadNumber(selector: string, nbSteps: number) {
     const interv = Math.abs(playstrategy.socket.pingInterval() / nbSteps);
     const prev = previous || nb;
     previous = nb;
+    // @ts-ignore
     for (let i = 0; i < nbSteps; i++) timeouts.push(setTimeout(() => display(prev, nb, i), Math.round(i * interv)));
   };
 }

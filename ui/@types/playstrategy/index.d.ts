@@ -1,3 +1,9 @@
+// eslint-disable-next-line
+/// <reference path="./chessground.d.ts" />
+// eslint-disable-next-line
+/// <reference path="./cash.d.ts" />
+
+// file://./../../site/src/site.ts
 interface PlayStrategy {
   load: Promise<void>; // window.onload promise
   info: any;
@@ -691,3 +697,4 @@ interface Dictionary<T> {
 type SocketHandlers = Dictionary<(d: any) => void>;
 
 declare const playstrategy: PlayStrategy;
+declare const $as: <T>(cashOrHtml: Cash | string) => T;

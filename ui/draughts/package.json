@@ -10,10 +10,8 @@
   ],
   "author": "Stefan Schermann (modified original by Thibault Duplessis)",
   "license": "AGPL-3.0",
-  "devDependencies": {
-    "@types/playstrategy": "workspace:*",
-    "draughtsground": "workspace:*",
-    "typescript": "^5.4.3"
+  "dependencies": {
+    "draughtsground": "workspace:*"
   },
   "scripts": {
     "compile": "tsc",
@@ -21,8 +19,6 @@
     "prod": "tsc"
   },
   "playstrategy": {
-    "bundles": {
-      "src/main.ts": "draughts"
-    }
+    "bundles":"src/draughts.ts"
   }
 }

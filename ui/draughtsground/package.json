@@ -16,13 +16,12 @@
       ]
     }
   },
-  "devDependencies": {
+  "dependencies": {
     "@typescript-eslint/eslint-plugin": "4.33.0",
     "@typescript-eslint/parser": "4.33.0",
     "eslint": "^7",
     "prettier": "^2",
-    "tslib": "^2",
-    "typescript": "^5.4.3"
+    "tslib": "^2"
   },
   "scripts": {
     "prepare": "tsc",
@@ -32,11 +31,6 @@
     "check-format": "prettier --check .",
     "dev": "tsc",
     "prod": "tsc"
-  },
-  "playstrategy": {
-    "bundles": {
-      "src/draughtsground.ts": "draughtsground"
-    }
   },
   "files": [
     "/dist/*.js",
@@ -53,5 +47,8 @@
     "typescript"
   ],
   "author": "Stefan Schermann (modified original by Thibault Duplessis)",
-  "license": "GPL-3.0"
+  "license": "GPL-3.0",
+  "playstrategy": {
+    "bundles": "src/draughtsground.ts"
+  }  
 }

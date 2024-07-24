@@ -2,7 +2,7 @@ import { h, VNode } from 'snabbdom';
 import * as studyView from '../study/studyView';
 import { nodeFullName, bind } from '../util';
 import AnalyseCtrl from '../ctrl';
-import { patch } from '../main';
+import { patch } from '../analysisBoard';
 
 export interface Opts {
   path: Tree.Path;

@@ -5,6 +5,7 @@
   "author": "Thibault Duplessis",
   "license": "AGPL-3.0-or-later",
   "type": "commonjs",
+  "moduleResolution": "nodenext",
   "dependencies": {
     "@types/node": "20.12.2",
     "@types/tinycolor2": "^1.4.6",

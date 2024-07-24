@@ -13,19 +13,16 @@
   ],
   "author": "Thibault Duplessis",
   "license": "AGPL-3.0-or-later",
-  "devDependencies": {
+  "dependencies": {
     "@types/debounce-promise": "^3.1.3",
     "@types/node": "20.12.2",
-    "@types/playstrategy": "workspace:*",
     "@types/yaireo__tagify": "^4.0.1",
-    "typescript": "^5.4.2"
-  },
-  "dependencies": {
     "@badrap/result": "0.2.8",
     "@yaireo/tagify": "4.6.0",
     "ceval": "workspace:*",
     "chat": "workspace:*",
     "common": "workspace:*",
+    "debounce-promise": "^3.1.2",
     "draughtsground": "workspace:*",
     "game": "workspace:*",
     "nvui": "workspace:*",
@@ -41,12 +38,11 @@
     "prod": "tsc"
   },
   "playstrategy": {
-    "bundles": {
-      "src/main.ts": "analysisBoard",
-      "src/plugins/studyMain.ts": "analysisBoard.study",
-      "src/plugins/nvui.ts": "analysisBoard.nvui",
-      "src/plugins/studyTopicForm.ts": "study.topic.form"
-    },
+    "bundles": [
+      "src/analysisBoard.ts",
+      "src/plugins/analyse.nvui.ts",
+      "src/plugins/analyse.study.topic.form.ts"
+    ],
     "sync": {
       "node_modules/@yaireo/tagify/dist/tagify.min.js": "public/npm/tagify"
     }

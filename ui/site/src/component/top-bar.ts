@@ -143,7 +143,7 @@ export default function () {
       if (booted) return;
       booted = true;
       loadModule('cli').then(
-        () => window.PlayStrategyCli.app($input[0]),
+        () => window.PlayStrategyCli($input[0]),
         () => (booted = false),
       );
     };

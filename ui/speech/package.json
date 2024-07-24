@@ -12,17 +12,12 @@
   ],
   "author": "Thibault Duplessis",
   "license": "AGPL-3.0-or-later",
-  "devDependencies": {
-    "typescript": "^5.4.3"
-  },
   "scripts": {
     "compile": "tsc",
     "dev": "tsc",
     "prod": "tsc"
   },
   "playstrategy": {
-    "bundles": {
-      "src/main.ts": "speech"
-    }
+    "bundles": "src/speech.ts"
   }
 }

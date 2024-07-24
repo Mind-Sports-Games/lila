@@ -5,9 +5,8 @@
   "description": "playstrategy.org service worker",
   "author": "Thibault Duplessis",
   "license": "AGPL-3.0-or-later",
-  "devDependencies": {
-    "types-serviceworker": "^0.0.1",
-    "typescript": "^5.4.3"
+  "dependencies": {
+    "types-serviceworker": "^0.0.1"
   },
   "scripts": {
     "compile": "tsc",
@@ -15,8 +14,6 @@
     "prod": "tsc"
   },
   "playstrategy": {
-    "bundles": {
-      "src/main.ts": "serviceWorker"
-    }
+    "bundles": "src/serviceWorker.ts"
   }
 }

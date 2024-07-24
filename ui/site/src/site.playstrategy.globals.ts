@@ -28,7 +28,13 @@ import * as miniGame from './component/mini-game';
 import { format as timeago } from './component/timeago';
 import watchers from './component/watchers';
 
+// window.site.{load, quantity, i18n} are initialized in layout.scala embedded script tags in lichess
+// @TODO: check what happens for playstrategy
+
+window.$as = <T>(cashOrHtml: Cash | string) => (typeof cashOrHtml === 'string' ? $(cashOrHtml) : cashOrHtml)[0] as T;
+
 export default function () {
+  console.log("i'm here...");
   const l = window.playstrategy;
   l.StrongSocket = StrongSocket;
   l.requestIdleCallback = requestIdleCallback;

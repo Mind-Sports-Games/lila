@@ -11,12 +11,8 @@
   ],
   "author": "Thibault Duplessis",
   "license": "AGPL-3.0-or-later",
-  "devDependencies": {
-    "@types/chart.js": "^2.9.29",
-    "@types/playstrategy": "workspace:*",
-    "typescript": "^5.4.3"
-  },
   "dependencies": {
+    "@types/chart.js": "^2.9.29",
     "ceval": "workspace:*",
     "chart.js": "^2.9",
     "common": "workspace:*",
@@ -31,9 +27,9 @@
     "prod": "tsc"
   },
   "playstrategy": {
-    "bundles": {
-      "src/main.ts": "puzzle",
-      "src/dashboard.ts": "puzzle.dashboard"
-    }
+    "bundles": [
+      "src/puzzle.ts",
+      "src/puzzle.dashboard.ts"
+    ]
   }
 }

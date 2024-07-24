@@ -2,7 +2,7 @@
   "extends": "../tsconfig.base.json",
   "compilerOptions": {
     "paths": { "chessground": ["./@types/chessground"] },
-    "types": ["playstrategy", "cash"],
+    "types": ["playstrategy"],
     "allowSyntheticDefaultImports": true,
     "skipLibCheck": true,
     "noEmit": true,

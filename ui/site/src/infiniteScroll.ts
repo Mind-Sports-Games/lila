@@ -7,6 +7,8 @@ export default function InfiniteScroll(selector: string) {
   });
 }
 
+(window as any).InfiniteScroll = InfiniteScroll; // esbuild
+
 function register(el: HTMLElement, selector: string, backoff = 500) {
   const nav = el.querySelector('.pager') as HTMLAnchorElement | null,
     next = nav?.querySelector('.pager a') as HTMLAnchorElement | null,

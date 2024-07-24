@@ -2,7 +2,7 @@
   "name": "draughtsround",
   "version": "2.0.0",
   "description": "lidraughts.org round",
-  "main": "src/main.js",
+  "main": "src/draughtsround.js",
   "repository": {
     "type": "git",
     "url": "https://github.com/roepstoep/lidraughts"
@@ -19,10 +19,6 @@
     "url": "https://github.com/roepstoep/lidraughts/issues"
   },
   "homepage": "https://github.com/roepstoep/lidraughts",
-  "devDependencies": {
-    "@types/playstrategy": "workspace:*",
-    "typescript": "^5.4.3"
-  },
   "dependencies": {
     "chat": "workspace:*",
     "common": "workspace:*",
@@ -38,10 +34,10 @@
     "prod": "tsc"
   },
   "playstrategy": {
-    "bundle": {
-      "src/main.ts": "draughtsround",
-      "src/plugins/keyboardMove.ts": "draughtsround.keyboardMove",
-      "src/plugins/nvui.ts": "draughtsround.nvui"
-    }
+    "bundles": [
+      "src/draughtsround.ts",
+      "src/plugins/draughtsround.keyboardMove.ts",
+      "src/plugins/draughtsround.nvui.ts"
+    ]
   }
 }

@@ -6,8 +6,10 @@ exportPlayStrategyGlobals();
 window.Chessground = Chessground;
 window.Draughtsground = Draughtsground;
 
-export default function (opts: any) {
+export default function analyseEmbed(opts: any) {
   document.body.classList.toggle('supports-max-content', !!window.chrome);
+
+  console.log('titi');
 
   window.PlayStrategyAnalyse.start({
     ...opts,
