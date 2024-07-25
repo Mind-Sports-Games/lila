@@ -49,7 +49,11 @@ object side {
               separator,
               tour.durationString
             ),
-            tour.mode.fold(trans.casualTournament, trans.ratedTournament)(),
+            if (tour.handicapped)
+              a(href := routes.Page.loneBookmark("handicaps"), target := "_blank")(
+                trans.handicappedTournament()
+              )
+            else tour.mode.fold(trans.casualTournament, trans.ratedTournament)(),
             separator,
             "Arena",
             (isGranted(_.ManageTournament) || (ctx.userId
