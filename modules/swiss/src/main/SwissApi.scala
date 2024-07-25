@@ -175,7 +175,8 @@ final class SwissApi(
           else s
         }
       if (data.isHandicapped && old.settings.inputPlayerRatings != ~data.inputPlayerRatings) {
-        playerInputRating(~data.inputPlayerRatings).toList.map { case (u, r) =>
+        val playerRatingMap = playerInputRating(~data.inputPlayerRatings)
+        playerRatingMap.toList.map { case (u, r) =>
           colls.player
             .updateField(
               $id(SwissPlayer.makeId(swiss.id, u)),
@@ -183,14 +184,41 @@ final class SwissApi(
               r
             )
             .void
-        }
-        recomputeAndUpdateAll(swiss.id)
+        }.sequenceFu >> unsetAllPlayerInputRating( // to reset removed players
+          swiss.id,
+          playerRatingMap.keys.toList.map(u => SwissPlayer.Id(s"${swiss.id}:${u}"))
+        ) >>
+          recomputeAndUpdateAll(swiss.id)
+      } else if (!data.isHandicapped && old.settings.handicapped) {
+        unsetAllPlayerInputRating(swiss.id) >>
+          recomputeAndUpdateAll(swiss.id)
       }
       colls.swiss.update.one($id(old.id), addFeaturable(swiss)).void >>- {
         cache.roundInfo.put(swiss.id, fuccess(swiss.roundInfo.some))
         socket.reload(swiss.id)
       }
     }
+
+  private def unsetAllPlayerInputRating(
+      swissId: Swiss.Id,
+      retainedPlayerIds: List[SwissPlayer.Id] = List()
+  ): Funit = {
+    colls.player.list[SwissPlayer]($doc(SwissPlayer.Fields.swissId -> swissId)) map { players =>
+      players
+        .filter(p => !retainedPlayerIds.contains(p.id))
+        .map { p => unsetPlayerInputRating(p.id) }
+        .sequenceFu
+        .unit
+    }
+  }
+
+  private def unsetPlayerInputRating(playerId: SwissPlayer.Id): Funit =
+    colls.player.update
+      .one(
+        $id(playerId),
+        $unset(SwissPlayer.Fields.inputRating)
+      )
+      .void
 
   def scheduleNextRound(swiss: Swiss, date: DateTime): Funit =
     Sequencing(swiss.id)(notFinishedById) { old =>

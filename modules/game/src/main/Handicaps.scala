@@ -55,7 +55,11 @@ object Handicaps {
           case x if (x - 2) % 5 == 3 => GoHandicap(60, (((x - 5) / 5) + 1) * 2 + 1)
           case x if (x - 2) % 5 == 4 => GoHandicap(20, (((x - 6) / 5) + 1) * 2 + 1)
         }
-      case 19 => GoHandicap(75, rankDiff)
+      case 19 =>
+        rankDiff match {
+          case 0 => GoHandicap(75, 0)
+          case _ => GoHandicap(5, rankDiff)
+        }
     }
   }
 
