@@ -187,6 +187,7 @@ object SwissJson {
         "clock"                 -> swiss.clock,
         "variant"               -> swiss.variant.key,
         "isMedley"              -> swiss.isMedley,
+        "isHandicapped"         -> swiss.settings.handicapped,
         "p1Name"                -> swiss.variant.playerNames(P1),
         "p2Name"                -> swiss.variant.playerNames(P2),
         "round"                 -> swiss.round,
@@ -384,9 +385,10 @@ object SwissJson {
 
   private def boardPlayerJson(player: SwissBoard.Player) =
     Json.obj(
-      "rank"   -> player.rank,
-      "rating" -> player.rating,
-      "user"   -> player.user
+      "rank"        -> player.rank,
+      "rating"      -> player.rating,
+      "inputRating" -> player.inputRating,
+      "user"        -> player.user
     )
 
   implicit private val roundNumberWriter: Writes[SwissRound.Number] = Writes[SwissRound.Number] { n =>

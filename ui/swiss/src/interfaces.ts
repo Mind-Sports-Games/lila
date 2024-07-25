@@ -24,6 +24,7 @@ export interface SwissData {
   clock: Clock;
   variant: string;
   isMedley: boolean;
+  isHandicapped: boolean;
   roundVariant: string;
   roundVariantName: string;
   p1Name: PlayerName;
@@ -104,6 +105,7 @@ export interface Pairing extends PairingBase {
 export interface PairingExt extends Pairing {
   user: LightUser;
   rating: number;
+  inputRating?: number;
 }
 
 export interface Standing {
