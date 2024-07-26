@@ -310,6 +310,7 @@ final class GameApiV2(
             .add("ratingDiff", p.ratingDiff)
             .add("name", p.name)
             .add("provisional" -> p.provisional)
+            .add("isInputRating" -> p.isInputRating)
             .add("aiLevel" -> p.aiLevel)
             .add("analysis" -> analysisOption.flatMap(analysisJson.player(g pov p.playerIndex)))
             .add("team" -> teams.map(_(p.playerIndex)))

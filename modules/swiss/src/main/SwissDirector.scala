@@ -195,6 +195,7 @@ final private class SwissDirector(
       playerIndex,
       player.userId,
       player.actualRating,
-      player.inputRating.fold(player.provisional)(_ => false)
+      player.inputRating.fold(player.provisional)(_ => false),
+      player.inputRating.fold(false)(_ => true)
     )
 }
