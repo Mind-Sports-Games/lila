@@ -55,7 +55,11 @@ object Handicaps {
           case x if (x - 2) % 5 == 3 => GoHandicap(60, (((x - 5) / 5) + 1) * 2 + 1)
           case x if (x - 2) % 5 == 4 => GoHandicap(20, (((x - 6) / 5) + 1) * 2 + 1)
         }
-      case 19 => GoHandicap(75, rankDiff)
+      case 19 =>
+        rankDiff match {
+          case 0 => GoHandicap(75, 0)
+          case _ => GoHandicap(5, rankDiff)
+        }
     }
   }
 
@@ -68,6 +72,18 @@ object Handicaps {
 
     computeRankDiff(rating, diff, 0)
   }
+
+  def convertGoRating(goRating: String): Int =
+    goRating match {
+      case x if x.matches("""\d+k""") =>
+        x.dropRight(1).toInt match {
+          case y if y > 18 => Math.max(1593 - y * 33, 600) //lowest rating is 600 on site
+          case y if y > 4  => 1900 - y * 50
+          case y if y > 0  => 2100 - y * 100
+          case _           => 1500                         // our default but shouldn't get here
+        }
+      case x if x.matches("""\dd""") => Math.min(Math.max(x.dropRight(1).toInt * 100 + 2000, 2100), 2700)
+    }
 
 }
 

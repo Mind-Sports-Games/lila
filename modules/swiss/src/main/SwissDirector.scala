@@ -57,10 +57,12 @@ final private class SwissDirector(
             pairings = pendingPairings.zip(ids).map {
               case (SwissPairing.Pending(w, b), id) => {
                 //weaker player must be p1 in handicap go games
-                val wRating = players.filter(_.userId == w).map(_.rating).headOption.getOrElse(1500)
-                val bRating = players.filter(_.userId == b).map(_.rating).headOption.getOrElse(1500)
-                val p1Id    = if (wRating <= bRating) w else b
-                val p2Id    = if (wRating <= bRating) b else w
+                val wRating =
+                  players.filter(_.userId == w).map(_.handicappedRating).headOption.getOrElse(1500)
+                val bRating =
+                  players.filter(_.userId == b).map(_.handicappedRating).headOption.getOrElse(1500)
+                val p1Id = if (wRating <= bRating) w else b
+                val p2Id = if (wRating <= bRating) b else w
 
                 SwissPairing(
                   id = id,
