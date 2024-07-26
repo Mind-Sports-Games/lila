@@ -52,7 +52,7 @@ final class SwissTrf(
       3                    -> "001",
       8                    -> playerIds.getOrElse(p.userId, 0).toString,
       (15 + p.userId.size) -> p.userId,
-      52                   -> p.handicappedRating.toString,
+      52                   -> p.actualRating.toString,
       84                   -> f"${sheet.pointsTrf.value}%1.1f"
     ) ::: {
       swiss.allRounds.zip(sheet.outcomes).flatMap { case (rn, outcome) =>

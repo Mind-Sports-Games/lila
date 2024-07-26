@@ -58,9 +58,9 @@ final private class SwissDirector(
               case (SwissPairing.Pending(w, b), id) => {
                 //weaker player must be p1 in handicap go games
                 val wRating =
-                  players.filter(_.userId == w).map(_.handicappedRating).headOption.getOrElse(1500)
+                  players.filter(_.userId == w).map(_.actualRating).headOption.getOrElse(1500)
                 val bRating =
-                  players.filter(_.userId == b).map(_.handicappedRating).headOption.getOrElse(1500)
+                  players.filter(_.userId == b).map(_.actualRating).headOption.getOrElse(1500)
                 val p1Id = if (wRating <= bRating) w else b
                 val p2Id = if (wRating <= bRating) b else w
 
@@ -191,5 +191,10 @@ final private class SwissDirector(
       .start
 
   private def makePlayer(playerIndex: PlayerIndex, player: SwissPlayer) =
-    lila.game.Player.make(playerIndex, player.userId, player.rating, player.provisional)
+    lila.game.Player.make(
+      playerIndex,
+      player.userId,
+      player.actualRating,
+      player.inputRating.fold(player.provisional)(_ => false)
+    )
 }

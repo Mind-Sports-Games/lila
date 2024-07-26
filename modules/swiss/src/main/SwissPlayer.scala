@@ -24,7 +24,7 @@ case class SwissPlayer(
   def is(user: User): Boolean         = is(user.id)
   def is(other: SwissPlayer): Boolean = is(other.userId)
   def present                         = !absent
-  val handicappedRating: Int          = inputRating.getOrElse(rating)
+  val actualRating: Int               = inputRating.getOrElse(rating)
 
   // If bhTieBreak is None, then we'll use sb, otherwise, we'll use
   val tieBreak = bhTieBreak.fold(sbTieBreak.value)(_.value)
@@ -74,7 +74,7 @@ object SwissPlayer {
   case class WithRank(player: SwissPlayer, rank: Int) {
     def is(other: WithRank)       = player is other.player
     def withUser(user: LightUser) = WithUserAndRank(player, user, rank)
-    override def toString         = s"$rank. ${player.userId}[${player.rating}]"
+    override def toString         = s"$rank. ${player.userId}[${player.actualRating}]"
   }
 
   case class WithUser(player: SwissPlayer, user: LightUser)
