@@ -24,6 +24,7 @@ import strategygames.{
   Pass,
   DiceRoll,
   EndTurn,
+  Undo,
   SelectSquares,
   Action,
   Pos,
@@ -289,6 +290,7 @@ case class Game(
         case p: Pass     => Event.Pass(p, game.situation, state, clockEvent, updated.board.pocketData)
         case r: DiceRoll => Event.DiceRoll(r, game.situation, state, clockEvent, updated.board.pocketData)
         case et: EndTurn => Event.EndTurn(et, game.situation, state, clockEvent, updated.board.pocketData)
+        case u: Undo     => Event.Undo(u, game.situation, state, clockEvent, updated.board.pocketData)
         case ss: SelectSquares =>
           Event.SelectSquares(ss, game.situation, state, clockEvent, updated.board.pocketData)
       }
@@ -339,6 +341,7 @@ case class Game(
       case m: Uci.Move          => m.keys
       case l: Uci.Lift          => s"${l.pos}${l.pos}"
       case _: Uci.EndTurn       => "endturn"
+      case _: Uci.Undo          => "undo"
       case _: Uci.Pass          => "pass"
       case _: Uci.DiceRoll      => "roll"
       case _: Uci.SelectSquares => "ss:"

@@ -44,6 +44,7 @@ import {
   SocketDoRoll,
   SocketLift,
   SocketEndTurn,
+  SocketUndo,
   SocketOpts,
   MoveMetadata,
   Position,
@@ -811,8 +812,13 @@ export default class RoundController {
     this.actualSendMove('lift', lift);
   };
 
-  sendUndo = (): void => {
-    this.socket.sendLoading('undo');
+  sendUndo = (variant: VariantKey): void => {
+    const undo: SocketUndo = {
+      variant: variant,
+    };
+    if (blur.get()) undo.b = 1;
+    this.resign(false);
+    this.actualSendMove('undo', undo);
   };
 
   sendEndTurn = (variant: VariantKey): void => {
@@ -1149,7 +1155,7 @@ export default class RoundController {
 
   undoAction = (): void => {
     if (this.data.canUndo) {
-      this.sendUndo();
+      this.sendUndo(this.data.game.variant.key);
       this.redraw();
     }
   };

@@ -17,6 +17,7 @@ import strategygames.{
   Player => PlayerIndex,
   Lift => StratLift,
   EndTurn => StratEndTurn,
+  Undo => StratUndo,
   SelectSquares => StratSelectSquares,
   DiceRoll => StratDiceRoll,
   PocketData,
@@ -791,6 +792,96 @@ object Event {
         gf = situation.board.variant.gameFamily,
         dice = dr.dice,
         san = dr.dice.mkString("/"),
+        fen = Forsyth.boardAndPlayer(situation.board.variant.gameLogic, situation),
+        check = situation.check,
+        threefold = situation.threefoldRepetition,
+        perpetualWarning = situation.perpetualPossible,
+        takebackable = situation.takebackable,
+        canOnlyRollDice = situation.canOnlyRollDice,
+        canEndTurn = situation.canEndTurn,
+        canUndo = situation.canUndo,
+        state = state,
+        clock = clock,
+        possibleMoves = situation.destinations,
+        possibleDrops = situation.drops,
+        possibleDropsByRole = situation match {
+          case (Situation.FairySF(_)) =>
+            situation.dropsByRole
+          case (Situation.Go(_)) =>
+            situation.dropsByRole
+          case (Situation.Backgammon(_)) =>
+            situation.dropsByRole
+          case _ => None
+        },
+        possibleLifts = situation match {
+          case (Situation.Backgammon(_)) => Some(situation.lifts.map(_.pos))
+          case _                         => None
+        },
+        forcedAction = situation.forcedAction.map(_.toUci.uci),
+        pocketData = pocketData
+      )
+  }
+
+  case class Undo(
+      gf: GameFamily,
+      san: String,
+      fen: String,
+      check: Boolean,
+      threefold: Boolean,
+      perpetualWarning: Boolean,
+      takebackable: Boolean,
+      canOnlyRollDice: Boolean,
+      canEndTurn: Boolean,
+      canUndo: Boolean,
+      state: State,
+      clock: Option[ClockEvent],
+      possibleMoves: Map[Pos, List[Pos]],
+      pocketData: Option[PocketData],
+      possibleDrops: Option[List[Pos]],
+      possibleDropsByRole: Option[Map[Role, List[Pos]]],
+      possibleLifts: Option[List[Pos]],
+      forcedAction: Option[String]
+  ) extends Event {
+    def typ = "undo"
+    def data =
+      Action.data(
+        gf,
+        fen,
+        check,
+        threefold,
+        perpetualWarning,
+        takebackable,
+        canOnlyRollDice,
+        canEndTurn,
+        canUndo,
+        state,
+        clock,
+        possibleMoves,
+        possibleDrops,
+        possibleDropsByRole,
+        possibleLifts,
+        forcedAction,
+        pocketData
+      ) {
+        Json.obj(
+          "uci" -> "undo",
+          "san" -> san
+        )
+      }
+    override def moveBy = Some(!state.playerIndex)
+  }
+
+  object Undo {
+    def apply(
+        undo: StratUndo,
+        situation: Situation,
+        state: State,
+        clock: Option[ClockEvent],
+        pocketData: Option[PocketData]
+    ): Undo =
+      Undo(
+        gf = situation.board.variant.gameFamily,
+        san = "undo",
         fen = Forsyth.boardAndPlayer(situation.board.variant.gameLogic, situation),
         check = situation.check,
         threefold = situation.threefoldRepetition,
