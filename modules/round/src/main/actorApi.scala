@@ -53,7 +53,6 @@ package round {
   case class SelectSquaresDecline(playerId: PlayerId)
   case class TakebackYes(playerId: PlayerId)
   case class TakebackNo(playerId: PlayerId)
-  case class Undo(playerId: PlayerId)
   object Moretime { val defaultDuration = 15.seconds }
   case class Moretime(playerId: PlayerId, seconds: FiniteDuration = Moretime.defaultDuration)
   case object QuietFlag

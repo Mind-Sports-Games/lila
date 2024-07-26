@@ -50,9 +50,8 @@ export const justIcon = (icon: string): VNodeData => ({
   attrs: { 'data-icon': icon },
 });
 
-// TODO: this is duplicated in ui/analyse/src/util.ts
 export const uci2move = (uci: string): cg.Key[] | undefined => {
-  if (!uci || uci == 'pass' || uci == 'roll' || uci == 'endturn' || uci.includes('/') || uci.substring(0, 3) == 'ss:')
+  if (!uci || uci == 'pass' || uci == 'roll' || uci == 'endturn' || uci == 'undo' || uci.includes('/') || uci.substring(0, 3) == 'ss:')
     return undefined;
   const pos = uci.match(/[a-z][1-9][0-9]?/g) as cg.Key[];
   if (uci[1] === '@') return [pos[0], pos[0]] as cg.Key[];

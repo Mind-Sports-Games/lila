@@ -451,6 +451,7 @@ export function getMancalaScore(fen: string, playerIndex: string): number {
 function backgammonNotation(move: ExtendedMoveInfo, variant: Variant): string {
   let isLift = false; //using this instead of changing the regex
   if (move.uci === 'roll') return '';
+  if (move.uci === 'undo') return 'undo';
   if (move.uci === 'endturn') return '(no-play)';
   if (move.uci.includes('/')) return `${move.uci.replace('/', '')}:`;
   if (move.uci.includes('^')) {
@@ -459,7 +460,7 @@ function backgammonNotation(move: ExtendedMoveInfo, variant: Variant): string {
 
   const reg = isLift
     ? (move.uci.replace('^', 'a1').match(/[a-lsA-LS][1-2@]/g) as string[])
-    : (move.uci.match(/[a-lsA-LS][1-2@]/g) as string[]);
+    : (move.uci.replace('x', '').match(/[a-lsA-LS][1-2@]/g) as string[]);
   const orig = reg[0];
   const dest = reg[1];
   const isDrop = reg[0].includes('@');
@@ -535,11 +536,31 @@ function numberofCapturedPiecesOfPlayer(player: 'p1' | 'p2', fen: string): numbe
   } else return 0;
 }
 
+function removeUndosFromNotation(actionNotations: string[]): string[] {
+  let withoutUndos: string[] = [];
+  let undoCount = 0;
+  let index = actionNotations.length - 1;
+  while (index >= 0){
+    if (actionNotations[index] == 'undo') {
+      undoCount += 1;
+      index -= 1;
+    } else if (undoCount > 0) {
+      undoCount -= 1;
+      index -= 1;
+    } else {
+      withoutUndos.push(actionNotations[index]);
+      index -= 1;
+    }
+  }
+  return withoutUndos.reverse();
+}
+
 export function combinedNotationForBackgammonActions(actionNotations: string[]): string {
   const actions: string[] = [];
   const captures: boolean[] = [];
   const occurances: number[] = [];
-  for (const notation of actionNotations) {
+  const actionNotationsWithoutUndos: string[] = removeUndosFromNotation(actionNotations);
+  for (const notation of actionNotationsWithoutUndos) {
     if (notation.split(' ').length === 2) {
       const movePart = notation.split(' ')[1].replace('*', '');
       const isCapture = notation.split(' ')[1].includes('*');
@@ -556,9 +577,9 @@ export function combinedNotationForBackgammonActions(actionNotations: string[]):
           captures.push(false);
         }
       }
-    } else if (notation === '(no-play)' && actionNotations.length === 2) {
-      return actionNotations[0].split(' ')[0] + ' ' + notation;
-    } else if (notation === '(no-play)' && actionNotations.length === 1) {
+    } else if (notation === '(no-play)' && actionNotationsWithoutUndos.length === 2) {
+      return actionNotationsWithoutUndos[0].split(' ')[0] + ' ' + notation;
+    } else if (notation === '(no-play)' && actionNotationsWithoutUndos.length === 1) {
       return '...';
     }
   }

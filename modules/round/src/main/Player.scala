@@ -14,6 +14,7 @@ import strategygames.{
   Lift => StratLift,
   EndTurn => StratEndTurn,
   DiceRoll => StratRollDice,
+  Undo => StratUndo,
   SelectSquares => StratSelectSquares
 }
 import strategygames.chess
@@ -175,6 +176,7 @@ final private class Player(
         case l: StratLift           => l.toUci.uci
         case et: StratEndTurn       => et.toUci.uci
         case r: StratRollDice       => r.toUci.uci
+        case u: StratUndo           => u.toUci.uci
         case ss: StratSelectSquares => ss.toUci.uci
       }
     )
