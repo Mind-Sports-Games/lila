@@ -540,7 +540,7 @@ function removeUndosFromNotation(actionNotations: string[]): string[] {
   const withoutUndos: string[] = [];
   let undoCount = 0;
   let index = actionNotations.length - 1;
-  while (index >= 0){
+  while (index >= 0) {
     if (actionNotations[index] == 'undo') {
       undoCount += 1;
       index -= 1;
