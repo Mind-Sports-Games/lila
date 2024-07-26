@@ -537,7 +537,7 @@ function numberofCapturedPiecesOfPlayer(player: 'p1' | 'p2', fen: string): numbe
 }
 
 function removeUndosFromNotation(actionNotations: string[]): string[] {
-  let withoutUndos: string[] = [];
+  const withoutUndos: string[] = [];
   let undoCount = 0;
   let index = actionNotations.length - 1;
   while (index >= 0){
