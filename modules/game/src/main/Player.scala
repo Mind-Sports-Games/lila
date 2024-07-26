@@ -21,6 +21,7 @@ case class Player(
     rating: Option[Int] = None,
     ratingDiff: Option[Int] = None,
     provisional: Boolean = false,
+    isInputRating: Boolean = false,
     blurs: Blurs = Blurs.blursZero.zero,
     berserk: Boolean = false,
     name: Option[String] = None
@@ -43,7 +44,7 @@ case class Player(
 
   def userInfos: Option[Player.UserInfo] =
     (userId, rating) mapN { (id, ra) =>
-      Player.UserInfo(id, ra, provisional)
+      Player.UserInfo(id, ra, provisional, isInputRating)
     }
 
   def wins = isWinner getOrElse false
@@ -109,14 +110,16 @@ object Player {
       playerIndex = playerIndex,
       userId = userPerf._1,
       rating = userPerf._2.intRating,
-      provisional = userPerf._2.glicko.provisional
+      provisional = userPerf._2.glicko.provisional,
+      isInputRating = false
     )
 
   def make(
       playerIndex: PlayerIndex,
       userId: User.ID,
       rating: Int,
-      provisional: Boolean
+      provisional: Boolean,
+      isInputRating: Boolean
   ): Player =
     Player(
       id = IdGenerator.player(playerIndex),
@@ -124,7 +127,8 @@ object Player {
       aiLevel = none,
       userId = userId.some,
       rating = rating.some,
-      provisional = provisional
+      provisional = provisional,
+      isInputRating = isInputRating
     )
 
   def make(
@@ -159,7 +163,7 @@ object Player {
     def suspicious(m: Map): Boolean   = m exists { _ exists (_.suspicious) }
   }
 
-  case class UserInfo(id: String, rating: Int, provisional: Boolean)
+  case class UserInfo(id: String, rating: Int, provisional: Boolean, isInputRating: Boolean)
 
   import reactivemongo.api.bson.Macros
   implicit val holdAlertBSONHandler = Macros.handler[HoldAlert]
@@ -173,6 +177,7 @@ object Player {
     val rating                  = "e"
     val ratingDiff              = "d"
     val provisional             = "p"
+    val isInputRating           = "ir"
     val blursBits               = "l"
     val holdAlert               = "h"
     val berserk                 = "be"
@@ -215,6 +220,7 @@ object Player {
                 rating = r intO rating flatMap ratingRange,
                 ratingDiff = r intO ratingDiff flatMap ratingDiffRange,
                 provisional = r boolD provisional,
+                isInputRating = r boolD isInputRating,
                 blurs = r.getD[Blurs](blursBits, blursZero.zero),
                 berserk = r boolD berserk,
                 name = r strO name
@@ -230,6 +236,7 @@ object Player {
           rating                  -> p.rating,
           ratingDiff              -> p.ratingDiff,
           provisional             -> w.boolO(p.provisional),
+          isInputRating           -> w.boolO(p.isInputRating),
           blursBits               -> p.blurs.nonEmpty.??(BlursBSONHandler writeOpt p.blurs),
           name                    -> p.name
         )

@@ -73,7 +73,7 @@ final class AutoPairing(
   }
 
   private def makePlayer(playerIndex: PlayerIndex, player: Player) =
-    GamePlayer.make(playerIndex, player.userId, player.rating, player.provisional)
+    GamePlayer.make(playerIndex, player.userId, player.rating, player.provisional, false)
 
   private def usernameOf(userId: User.ID) =
     lightUserApi.sync(userId).fold(userId)(_.name)

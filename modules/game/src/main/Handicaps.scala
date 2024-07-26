@@ -66,7 +66,7 @@ object Handicaps {
   private def goRankDiff(rating: Int, diff: Int): Int = {
     def computeRankDiff(r: Int, diffLeft: Int, rank: Int): Int = {
       val ratingIncrease = if (r < 1000) 33 else if (r < 1700) 50 else 100
-      if (diffLeft <= ratingIncrease) return rank
+      if (!(diffLeft >= ratingIncrease)) return rank
       else computeRankDiff(r + ratingIncrease, diffLeft - ratingIncrease, rank + 1)
     }
 
