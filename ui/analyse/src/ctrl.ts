@@ -295,7 +295,6 @@ export default class AnalyseCtrl {
 
   private showGround(): void {
     this.onChange();
-    console.log(`this.node.dests: ${this.node.dests}`);
     if (!defined(this.node.dests)) this.getDests();
     this.withCg(cg => {
       cg.set(this.makeCgOpts());
@@ -356,9 +355,6 @@ export default class AnalyseCtrl {
       enabled: false,
     };
     this.cgConfig = config;
-    console.log(`playerIndex: ${playerIndex}`);
-    console.log(`movablePlayerIndex: ${movablePlayerIndex}`);
-    console.log(`movable: ${movablePlayerIndex === playerIndex}`);
     return config;
   }
 
@@ -615,10 +611,6 @@ export default class AnalyseCtrl {
     this.redraw();
     this.chessground.playPremove();
     const parsedDests = stratUtils.readDests(node.dests);
-    if (parsedDests)
-      for (var [key, value] of parsedDests) {
-        console.log(`parsedDests: ${key} = ${value}`);
-      }
     if (parsedDests) this.maybeForceMove(parsedDests);
   }
 
