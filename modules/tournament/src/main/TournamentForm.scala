@@ -49,17 +49,20 @@ final class TournamentForm {
         flipello = true.some,
         mancala = true.some,
         amazons = true.some,
+        breakthroughtroyka = true.some,
         go = true.some,
         backgammon = true.some
       ),
       position = None,
       password = None,
       mode = none,
+      handicapped = false.some,
       rated = true.some,
       conditions = Condition.DataForm.AllSetup.default,
       teamBattleByTeam = teamBattleId,
       berserkable = true.some,
       streakable = true.some,
+      statusScoring = false.some,
       description = none,
       hasChat = true.some
     )
@@ -92,17 +95,20 @@ final class TournamentForm {
         flipello = gameGroupInMedley(tour.medleyVariants, GameGroup.Flipello()).some,
         mancala = gameGroupInMedley(tour.medleyVariants, GameGroup.Mancala()).some,
         amazons = gameGroupInMedley(tour.medleyVariants, GameGroup.Amazons()).some,
+        breakthroughtroyka = gameGroupInMedley(tour.medleyVariants, GameGroup.BreakthroughTroyka()).some,
         go = gameGroupInMedley(tour.medleyVariants, GameGroup.Go()).some,
         backgammon = gameGroupInMedley(tour.medleyVariants, GameGroup.Backgammon()).some
       ),
       position = tour.position,
       mode = none,
+      handicapped = tour.handicapped.some,
       rated = tour.mode.rated.some,
       password = tour.password,
       conditions = Condition.DataForm.AllSetup(tour.conditions),
       teamBattleByTeam = none,
       berserkable = tour.berserkable.some,
       streakable = tour.streakable.some,
+      statusScoring = tour.statusScoring.some,
       description = tour.description,
       hasChat = tour.hasChat.some
     )
@@ -166,25 +172,28 @@ final class TournamentForm {
           "draughts64Variants"  -> optional(boolean)
         )(MedleyDefaults.apply)(MedleyDefaults.unapply),
         "medleyGameFamilies" -> mapping(
-          "chess"      -> optional(boolean),
-          "draughts"   -> optional(boolean),
-          "shogi"      -> optional(boolean),
-          "xiangqi"    -> optional(boolean),
-          "loa"        -> optional(boolean),
-          "flipello"   -> optional(boolean),
-          "mancala"    -> optional(boolean),
-          "amazons"    -> optional(boolean),
-          "go"         -> optional(boolean),
-          "backgammon" -> optional(boolean)
+          "chess"              -> optional(boolean),
+          "draughts"           -> optional(boolean),
+          "shogi"              -> optional(boolean),
+          "xiangqi"            -> optional(boolean),
+          "loa"                -> optional(boolean),
+          "flipello"           -> optional(boolean),
+          "mancala"            -> optional(boolean),
+          "amazons"            -> optional(boolean),
+          "breakthroughtroyka" -> optional(boolean),
+          "go"                 -> optional(boolean),
+          "backgammon"         -> optional(boolean)
         )(MedleyGameFamilies.apply)(MedleyGameFamilies.unapply),
         "position"         -> optional(lila.common.Form.fen.playableStrict),
         "mode"             -> optional(number.verifying(Mode.all.map(_.id) contains _)), // deprecated, use rated
         "rated"            -> optional(boolean),
+        "handicapped"      -> optional(boolean),
         "password"         -> optional(cleanNonEmptyText),
         "conditions"       -> Condition.DataForm.all(leaderTeams),
         "teamBattleByTeam" -> optional(nonEmptyText.verifying(id => leaderTeams.exists(_.id == id))),
         "berserkable"      -> optional(boolean),
         "streakable"       -> optional(boolean),
+        "statusScoring"    -> optional(boolean),
         "description"      -> optional(cleanNonEmptyText),
         "hasChat"          -> optional(boolean)
       )(TournamentSetup.apply)(TournamentSetup.unapply)
@@ -193,6 +202,7 @@ final class TournamentForm {
         .verifying("Increase tournament duration, or decrease game clock", _.sufficientDuration)
         .verifying("Reduce tournament duration, or increase game clock", _.excessiveDuration)
         .verifying("Must have more than 1 game type for medley tournaments", _.validMedleySetup)
+        .verifying("Hanidcapped mode requires a Go variant, non-rated and non-meldey", _.validHandicapSetup)
     )
 }
 
@@ -269,11 +279,13 @@ private[tournament] case class TournamentSetup(
     position: Option[FEN],
     mode: Option[Int], // deprecated, use rated
     rated: Option[Boolean],
+    handicapped: Option[Boolean],
     password: Option[String],
     conditions: Condition.DataForm.AllSetup,
     teamBattleByTeam: Option[String],
     berserkable: Option[Boolean],
     streakable: Option[Boolean],
+    statusScoring: Option[Boolean],
     description: Option[String],
     hasChat: Option[Boolean]
 ) {
@@ -305,6 +317,9 @@ private[tournament] case class TournamentSetup(
     realMode == Mode.Casual ||
       lila.game.Game.allowRated(realVariant, clock.some)
 
+  def validHandicapSetup =
+    !handicapped.has(true) || (gameLogic == GameLogic.Go() && !isMedley && realMode == Mode.Casual)
+
   def sufficientDuration = estimateNumberOfGamesOneCanPlay >= 3
   def excessiveDuration  = estimateNumberOfGamesOneCanPlay <= 150
 
@@ -322,6 +337,7 @@ private[tournament] case class TournamentSetup(
         clock = if (old.isCreated) clock else old.clock,
         minutes = if (isMedley) medleyDuration else minutes,
         mode = realMode,
+        handicapped = handicapped | false,
         variant = newVariant,
         medleyVariantsAndIntervals =
           if (
@@ -342,6 +358,7 @@ private[tournament] case class TournamentSetup(
         },
         noBerserk = !(~berserkable),
         noStreak = !(~streakable),
+        statusScoring = statusScoring | false,
         teamBattle = old.teamBattle,
         description = description,
         hasChat = hasChat | true
@@ -358,6 +375,7 @@ private[tournament] case class TournamentSetup(
         clock = if (old.isCreated) clock else old.clock,
         minutes = minutes,
         mode = if (rated.isDefined) realMode else old.mode,
+        handicapped = handicapped | old.handicapped,
         variant = newVariant,
         startsAt = startDate | old.startsAt,
         password = password.fold(old.password)(_.some.filter(_.nonEmpty)),
@@ -367,6 +385,7 @@ private[tournament] case class TournamentSetup(
         },
         noBerserk = berserkable.fold(old.noBerserk)(!_),
         noStreak = streakable.fold(old.noStreak)(!_),
+        statusScoring = statusScoring | old.statusScoring,
         teamBattle = old.teamBattle,
         description = description.fold(old.description)(_.some.filter(_.nonEmpty)),
         hasChat = hasChat | old.hasChat
@@ -469,6 +488,7 @@ case class MedleyGameFamilies(
     flipello: Option[Boolean],
     mancala: Option[Boolean],
     amazons: Option[Boolean],
+    breakthroughtroyka: Option[Boolean],
     go: Option[Boolean],
     backgammon: Option[Boolean]
 ) {
@@ -482,6 +502,9 @@ case class MedleyGameFamilies(
     .filterNot(gg => if (!flipello.getOrElse(false)) gg == GameGroup.Flipello() else false)
     .filterNot(gg => if (!mancala.getOrElse(false)) gg == GameGroup.Mancala() else false)
     .filterNot(gg => if (!amazons.getOrElse(false)) gg == GameGroup.Amazons() else false)
+    .filterNot(gg =>
+      if (!breakthroughtroyka.getOrElse(false)) gg == GameGroup.BreakthroughTroyka() else false
+    )
     .filterNot(gg => if (!go.getOrElse(false)) gg == GameGroup.Go() else false)
     .filterNot(gg => if (!backgammon.getOrElse(false)) gg == GameGroup.Backgammon() else false)
 

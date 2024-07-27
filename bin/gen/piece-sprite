@@ -83,6 +83,11 @@ backgammon_themes = [
    ['contemporary', 'svg'],
    ['wooden', 'svg']
 ]
+breakthroughtroyka_themes = [
+   ['staunty', 'svg'],
+   ['checkers', 'svg'],
+   ['fabirovsky', 'svg']
+]
 types = {
   'svg' => 'svg+xml;base64,',
   'png' => 'png;base64,'
@@ -136,6 +141,8 @@ backgammon_base_image_names = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10'
 backgammon_dice_names = ['diceone', 'dicetwo', 'dicethree', 'dicefour', 'dicefive', 'dicesix']
 backgammon_extra_names = ['flat', 'side']
 backgammon_directions = ['top', 'bottom']
+breakthroughtroyka_variants = ['breakthroughtroyka', 'minibreakthroughtroyka']
+breakthroughtroyka_roles = ['p-piece']
 
 # inline SVG Chess
 chess_themes.map { |theme|
@@ -737,3 +744,39 @@ backgammon_themes.map { |theme|
   File.open(dest_dir + 'backgammon-' + name + '.external.css', 'w') { |f| f.puts (classes_backgammon_game_and_variant + classes_backgammon_buttons).join("\n") }
 }
 
+
+# inline SVG breakthroughtroyka
+breakthroughtroyka_themes.map { |theme|
+  name = theme[0]
+  ext = theme[1]
+  classes_breakthroughtroyka = colors.map { |color|
+    breakthroughtroyka_roles.map { |role|
+      piece = color[0] + role.upcase[0]
+      file = source_dir + 'breakthroughtroyka/' + name + '/' + piece + '.' + ext
+      File.open(file, 'r') do|image_file|
+        image = image_file.read
+        base64 = Base64.strict_encode64(image)
+        '.breakthroughtroyka.is2d .' + role + '.' + (color == 'w' ? 'p1' : 'p2') +
+         ', ' + '.is2d .variant-breakthroughtroyka' + ' .' + role + '.' + (color == 'w' ? 'p1' : 'p2') + 
+         ', ' + '.is2d .variant-minibreakthroughtroyka' + ' .' + role + '.' + (color == 'w' ? 'p1' : 'p2') + ' {' +
+          "background-image:url('data:image/" + types[ext] + base64 + "')}"
+      end
+    }
+  }.flatten
+  File.open(dest_dir + 'breakthroughtroyka-' + name + '.css', 'w') { |f| f.puts (classes_breakthroughtroyka).join("\n") }
+}
+# external SVG breakthroughtroyka
+breakthroughtroyka_themes.map { |theme|
+  name = theme[0]
+  ext = theme[1]
+  classes_breakthroughtroyka = colors.map { |color|
+    breakthroughtroyka_roles.map { |role|
+      piece = color[0] + role.upcase[0]
+      '.breakthroughtroyka.is2d .' + role + '.' + (color == 'w' ? 'p1' : 'p2') + 
+      ', ' + '.is2d .variant-breakthroughtroyka' + ' .' + role + '.' + (color == 'w' ? 'p1' : 'p2') + 
+      ', ' + '.is2d .variant-minibreakthroughtroyka' + ' .' + role + '.' + (color == 'w' ? 'p1' : 'p2') + ' {' +
+        "background-image:url('/assets/piece/" + 'breakthroughtroyka/' + name + "/" + piece + "." + ext + "')}"
+    }
+  }.flatten
+  File.open(dest_dir + 'breakthroughtroyka-' + name + '.external.css', 'w') { |f| f.puts (classes_breakthroughtroyka).join("\n") }
+}

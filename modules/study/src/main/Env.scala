@@ -80,6 +80,8 @@ final class Env(
 
   lazy val pgnDump = wire[PgnDump]
 
+  lazy val sgfDump = wire[SgfDump]
+
   lazy val gifExport = new GifExport(ws, appConfig.get[String]("game.gifUrl"))
 
   def cli =

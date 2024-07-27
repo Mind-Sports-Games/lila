@@ -12,21 +12,34 @@ jobs:
   lint:
     runs-on: ubuntu-latest
     steps:
-      - uses: webfactory/ssh-agent@v0.5.2
+      - name: Check if organization member
+        id: check_org_member
+        uses: Mind-Sports-Games/check-org-member@v1.1.0
+        with:
+          username: ${{ github.actor }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Check Failed
+        if: ${{ steps.check_org_member.outputs.result == 'false' }}
+        run: |
+          echo User Does Not Belong to Mind-Sports-Games
+          exit 1
+      - name: Check Passed
+        run: echo The actor is an organization member
+      - uses: webfactory/ssh-agent@v0.9.0
         with:
           ssh-private-key: ${{ secrets.MSO_CI_SSH_KEY }}
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
         with:
           submodules: recursive
       - run: git submodule absorbgitdirs
-      - run: echo "::set-output name=dir::$(yarn cache dir)"
+      - run: echo "dir=$(yarn cache dir)" >> $GITHUB_OUTPUT
         id: yarn-cache
-      - uses: actions/cache@v2
+      - uses: actions/cache@v4
         with:
           path: ${{ steps.yarn-cache.outputs.dir }}
           key: ${{ runner.os }}-yarn-${{ hashFiles('yarn.lock') }}
           restore-keys: ${{ runner.os }}-yarn-
-      - uses: actions/setup-node@v2
+      - uses: actions/setup-node@v4
         with:
           node-version: '14'
           cache: yarn

@@ -181,20 +181,24 @@ object bits {
     )
 
   def spotlight(e: lila.event.Event)(implicit ctx: Context) =
-    a(
-      href := (if (e.isNow || !e.countdown) e.url else routes.Event.show(e.id).url),
-      cls := List(
-        s"tour-spotlight event-spotlight id_${e.id}" -> true,
-        "invert"                                     -> e.isNowOrSoon
-      )
-    )(
-      views.html.event.iconOf(e),
-      span(cls := "content")(
-        span(cls := "name")(e.title),
-        span(cls := "headline")(e.headline),
-        span(cls := "more")(
-          if (e.isNow) e.duringMessage.fold(trans.eventInProgress())(m => raw(m))
-          else e.beforeMessage.fold[Frag](momentFromNow(e.startsAt))(m => raw(m))
+    div(
+      a(
+        href := (if (e.isNow || !e.countdown) e.url else routes.Event.show(e.id).url),
+        cls := List(
+          s"tour-spotlight event-spotlight id_${e.id} ${ctx.currentSelectedColor}" -> true,
+          "invert"                                                                 -> e.isNowOrSoon,
+          "highlighted"                                                            -> (e.isNow || !e.countdown)
+        )
+      )(
+        if (e.isNow || !e.countdown) span(cls := "ribbon")(span("live")),
+        views.html.event.iconOf(e),
+        span(cls := "content")(
+          span(cls := "name")(e.title),
+          span(cls := "headline")(e.headline),
+          span(cls := "more")(
+            if (e.isNow) e.duringMessage.fold(trans.eventInProgress())(m => raw(m))
+            else e.beforeMessage.fold[Frag](momentFromNow(e.startsAt))(m => raw(m))
+          )
         )
       )
     )

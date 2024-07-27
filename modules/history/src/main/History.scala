@@ -36,6 +36,8 @@ case class History(
     flipello: RatingsMap,
     flipello10: RatingsMap,
     amazons: RatingsMap,
+    breakthroughtroyka: RatingsMap,
+    minibreakthroughtroyka: RatingsMap,
     oware: RatingsMap,
     togyzkumalak: RatingsMap,
     go9x9: RatingsMap,
@@ -54,52 +56,54 @@ case class History(
 
   def apply(perfType: PerfType): RatingsMap =
     perfType.key match {
-      case "standard"       => standard
-      case "bullet"         => bullet
-      case "blitz"          => blitz
-      case "rapid"          => rapid
-      case "classical"      => classical
-      case "correspondence" => correspondence
-      case "chess960"       => chess960
-      case "kingOfTheHill"  => kingOfTheHill
-      case "antichess"      => antichess
-      case "threeCheck"     => threeCheck
-      case "fiveCheck"      => fiveCheck
-      case "atomic"         => atomic
-      case "horde"          => horde
-      case "racingKings"    => racingKings
-      case "crazyhouse"     => crazyhouse
-      case "noCastling"     => noCastling
-      case "monster"        => monster
-      case "linesOfAction"  => linesOfAction
-      case "scrambledEggs"  => scrambledEggs
-      case "international"  => international
-      case "frisian"        => frisian
-      case "frysk"          => frysk
-      case "antidraughts"   => antidraughts
-      case "breakthrough"   => breakthrough
-      case "russian"        => russian
-      case "brazilian"      => brazilian
-      case "pool"           => pool
-      case "portuguese"     => portuguese
-      case "english"        => english
-      case "shogi"          => shogi
-      case "xiangqi"        => xiangqi
-      case "minishogi"      => minishogi
-      case "minixiangqi"    => minixiangqi
-      case "flipello"       => flipello
-      case "flipello10"     => flipello10
-      case "amazons"        => amazons
-      case "oware"          => oware
-      case "togyzkumalak"   => togyzkumalak
-      case "go9x9"          => go9x9
-      case "go13x13"        => go13x13
-      case "go19x19"        => go19x19
-      case "backgammon"     => backgammon
-      case "nackgammon"     => nackgammon
-      case "puzzle"         => puzzle
-      case "ultraBullet"    => ultraBullet
-      case x                => sys error s"No history for perf $x"
+      case "standard"               => standard
+      case "bullet"                 => bullet
+      case "blitz"                  => blitz
+      case "rapid"                  => rapid
+      case "classical"              => classical
+      case "correspondence"         => correspondence
+      case "chess960"               => chess960
+      case "kingOfTheHill"          => kingOfTheHill
+      case "antichess"              => antichess
+      case "threeCheck"             => threeCheck
+      case "fiveCheck"              => fiveCheck
+      case "atomic"                 => atomic
+      case "horde"                  => horde
+      case "racingKings"            => racingKings
+      case "crazyhouse"             => crazyhouse
+      case "noCastling"             => noCastling
+      case "monster"                => monster
+      case "linesOfAction"          => linesOfAction
+      case "scrambledEggs"          => scrambledEggs
+      case "international"          => international
+      case "frisian"                => frisian
+      case "frysk"                  => frysk
+      case "antidraughts"           => antidraughts
+      case "breakthrough"           => breakthrough
+      case "russian"                => russian
+      case "brazilian"              => brazilian
+      case "pool"                   => pool
+      case "portuguese"             => portuguese
+      case "english"                => english
+      case "shogi"                  => shogi
+      case "xiangqi"                => xiangqi
+      case "minishogi"              => minishogi
+      case "minixiangqi"            => minixiangqi
+      case "flipello"               => flipello
+      case "flipello10"             => flipello10
+      case "amazons"                => amazons
+      case "breakthroughtroyka"     => breakthroughtroyka
+      case "minibreakthroughtroyka" => minibreakthroughtroyka
+      case "oware"                  => oware
+      case "togyzkumalak"           => togyzkumalak
+      case "go9x9"                  => go9x9
+      case "go13x13"                => go13x13
+      case "go19x19"                => go19x19
+      case "backgammon"             => backgammon
+      case "nackgammon"             => nackgammon
+      case "puzzle"                 => puzzle
+      case "ultraBullet"            => ultraBullet
+      case x                        => sys error s"No history for perf $x"
     }
 }
 
@@ -156,6 +160,8 @@ object History {
           flipello = ratingsMap("flipello"),
           flipello10 = ratingsMap("flipello10"),
           amazons = ratingsMap("amazons"),
+          breakthroughtroyka = ratingsMap("breakthroughtroyka"),
+          minibreakthroughtroyka = ratingsMap("minibreakthroughtroyka"),
           oware = ratingsMap("oware"),
           togyzkumalak = ratingsMap("togyzkumalak"),
           go9x9 = ratingsMap("go9x9"),

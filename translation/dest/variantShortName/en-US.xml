@@ -18,7 +18,7 @@
   <string name="international">Int</string>
   <string name="antidraughts">AntiD</string>
   <string name="brazilian">Brazil</string>
-  <string name="breakthrough">BreakT</string>
+  <string name="breakthrough">BRKTHRU</string>
   <string name="frisian">Frisian</string>
   <string name="frysk">Frysk</string>
   <string name="pool">Pool</string>
@@ -39,4 +39,6 @@
   <string name="go19x19">Go19</string>
   <string name="backgammon">Backg</string>
   <string name="nackgammon">Nackg</string>
+  <string name="breakthroughtroyka">BreakT</string>
+  <string name="minibreakthroughtroyka">MBreakT</string>  
 </resources>

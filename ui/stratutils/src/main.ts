@@ -56,7 +56,7 @@ export const altCastles = {
 };
 
 export function variantUsesUCINotation(key: VariantKey | DraughtsVariantKey) {
-  return ['linesOfAction', 'scrambledEggs', 'amazons'].includes(key);
+  return ['linesOfAction', 'scrambledEggs', 'amazons', 'breakthroughtroyka', 'minibreakthroughtroyka'].includes(key);
 }
 
 export function variantUsesUSINotation(key: VariantKey | DraughtsVariantKey) {
@@ -206,6 +206,10 @@ export const variantToRules = (v: VariantKey): Rules => {
       return 'flipello10';
     case 'amazons':
       return 'amazons';
+    case 'breakthroughtroyka':
+      return 'breakthrough';
+    case 'minibreakthroughtroyka':
+      return 'minibreakthrough';
     case 'oware':
       return 'oware';
     case 'togyzkumalak':

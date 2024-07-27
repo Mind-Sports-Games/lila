@@ -70,6 +70,12 @@
     height: 100px;
   }
 
+  .list a.breakthroughtroyka span {
+    display: block;
+    width: 64px;
+    height: 32px;
+  }
+
   .list a.oware span {
     display: block;
     width: 100px;
@@ -141,7 +147,7 @@
     'horsey': 'horsey.thumbnail.jpg',
   );
 
-  @each $gameFamily in ('chess', 'draughts', 'loa', 'amazons') {
+  @each $gameFamily in ('chess', 'draughts', 'loa', 'amazons', 'breakthroughtroyka') {
     @each $color, $file in $chess-board-files {
       &.d2 .#{$gameFamily}-#{$color} {
         background-image: url(../images/board/#{$gameFamily}/#{$file});
@@ -186,6 +192,10 @@
     .flipello-wood {
       background-image: url(../images/board/flipello/flipello_wood_board.svg);
       background-size: 100px;
+    }
+
+    .breakthroughtroyka-maple {
+      background-image: url(../images/board/breakthroughtroyka/maple.thumbnail.jpg);
     }
 
     .oware-light-wood {

@@ -16,6 +16,7 @@ import strategygames.{
   Player => PlayerIndex,
   Game => StratGame,
   GameLogic,
+  GameFamily,
   Mode,
   Move,
   Drop,
@@ -72,6 +73,11 @@ case class Game(
   def actionStrs   = stratGame.actionStrs
   def activePlayer = stratGame.situation.player
 
+  val gameRecordFormat = variant match {
+    case Variant.FairySF(_) | Variant.Go(_) | Variant.Backgammon(_) => "sgf"
+    case _                                                          => "pgn"
+  }
+
   val players = List(p1Player, p2Player)
 
   def player(playerIndex: PlayerIndex): Player = playerIndex.fold(p1Player, p2Player)
@@ -117,7 +123,7 @@ case class Game(
   //once draughts is converted to multiaction we should be able to use actionStrs.flatten.size
   def playedPlies = plies - stratGame.startedAtPly
 
-  def flagged = (status == Status.Outoftime).option(turnPlayerIndex)
+  def flagged = (Status.flagged.contains(status)).option(turnPlayerIndex)
 
   def fullIdOf(player: Player): Option[String] =
     (players contains player) option s"$id${player.id}"
@@ -126,9 +132,10 @@ case class Game(
 
   def swapPlayersOnRematch: Boolean = variant.key != "backgammon" && variant.key != "nackgammon"
 
-  def tournamentId = metadata.tournamentId
-  def simulId      = metadata.simulId
-  def swissId      = metadata.swissId
+  def fromHandicappedTournament = metadata.fromHandicappedTournament
+  def tournamentId              = metadata.tournamentId
+  def simulId                   = metadata.simulId
+  def swissId                   = metadata.swissId
 
   def isTournament = tournamentId.isDefined
   def isSimul      = simulId.isDefined
@@ -836,6 +843,9 @@ case class Game(
       case _             => None
     }
 
+  def withHandicappedTournament(isHandicapped: Boolean) =
+    copy(metadata = metadata.copy(fromHandicappedTournament = isHandicapped))
+
   def withTournamentId(id: String) = copy(metadata = metadata.copy(tournamentId = id.some))
   def withSwissId(id: String)      = copy(metadata = metadata.copy(swissId = id.some))
 
@@ -1040,59 +1050,60 @@ object Game {
 
   object BSONFields {
 
-    val id                 = "_id"
-    val p1Player           = "p0"
-    val p2Player           = "p1"
-    val playerIds          = "is"
-    val playerUids         = "us"
-    val playingUids        = "pl"
-    val binaryPieces       = "ps"
-    val oldPgn             = "pg"
-    val huffmanPgn         = "hp"
-    val status             = "s"
-    val turns              = "t"
-    val plies              = "p"
-    val activePlayer       = "ap"
-    val startedAtPly       = "sp"
-    val startedAtTurn      = "st"
-    val clock              = "c"
-    val clockType          = "ct"
-    val positionHashes     = "ph"
-    val checkCount         = "cc"
-    val score              = "sc"
-    val captures           = "cp"
-    val castleLastMove     = "cl"
-    val kingMoves          = "km"
-    val historyLastTurn    = "hlm" // was called historyLastMove hence hlm
-    val historyCurrentTurn = "hct"
-    val unmovedRooks       = "ur"
-    val daysPerTurn        = "cd"
-    val plyTimes           = "mt"  // was called moveTimes hence mt
-    val p1ClockHistory     = "cw"
-    val p2ClockHistory     = "cb"
-    val periodsP1          = "pp0"
-    val periodsP2          = "pp1"
-    val rated              = "ra"
-    val analysed           = "an"
-    val lib                = "l"
-    val variant            = "v"
-    val pocketData         = "chd"
-    val bookmarks          = "bm"
-    val createdAt          = "ca"
-    val updatedAt          = "ua"
-    val turnAt             = "ta"
-    val source             = "so"
-    val pgnImport          = "pgni"
-    val tournamentId       = "tid"
-    val swissId            = "iid"
-    val simulId            = "sid"
-    val tvAt               = "tv"
-    val winnerPlayerIndex  = "w"
-    val winnerId           = "wid"
-    val initialFen         = "if"
-    val checkAt            = "ck"
-    val perfType           = "pt"  // only set on student games for aggregation
-    val drawOffers         = "do"
+    val id                        = "_id"
+    val p1Player                  = "p0"
+    val p2Player                  = "p1"
+    val playerIds                 = "is"
+    val playerUids                = "us"
+    val playingUids               = "pl"
+    val binaryPieces              = "ps"
+    val oldPgn                    = "pg"
+    val huffmanPgn                = "hp"
+    val status                    = "s"
+    val turns                     = "t"
+    val plies                     = "p"
+    val activePlayer              = "ap"
+    val startedAtPly              = "sp"
+    val startedAtTurn             = "st"
+    val clock                     = "c"
+    val clockType                 = "ct"
+    val positionHashes            = "ph"
+    val checkCount                = "cc"
+    val score                     = "sc"
+    val captures                  = "cp"
+    val castleLastMove            = "cl"
+    val kingMoves                 = "km"
+    val historyLastTurn           = "hlm" // was called historyLastMove hence hlm
+    val historyCurrentTurn        = "hct"
+    val unmovedRooks              = "ur"
+    val daysPerTurn               = "cd"
+    val plyTimes                  = "mt"  // was called moveTimes hence mt
+    val p1ClockHistory            = "cw"
+    val p2ClockHistory            = "cb"
+    val periodsP1                 = "pp0"
+    val periodsP2                 = "pp1"
+    val rated                     = "ra"
+    val analysed                  = "an"
+    val lib                       = "l"
+    val variant                   = "v"
+    val pocketData                = "chd"
+    val bookmarks                 = "bm"
+    val createdAt                 = "ca"
+    val updatedAt                 = "ua"
+    val turnAt                    = "ta"
+    val source                    = "so"
+    val pgnImport                 = "pgni"
+    val tournamentId              = "tid"
+    val swissId                   = "iid"
+    val simulId                   = "sid"
+    val fromHandicappedTournament = "hd"
+    val tvAt                      = "tv"
+    val winnerPlayerIndex         = "w"
+    val winnerId                  = "wid"
+    val initialFen                = "if"
+    val checkAt                   = "ck"
+    val perfType                  = "pt"  // only set on student games for aggregation
+    val drawOffers                = "do"
     //backgammon
     val unusedDice = "ud"
     // go
@@ -1359,7 +1370,7 @@ case class ByoyomiClockHistory(
       // remaining time
       val byoyomiStart = firstEnteredPeriod(playerIndex)
       val byoyomiTimeout =
-        byoyomiStart.isDefined && (status == Status.Outoftime) && (playerIndex == turnPlayerIndex)
+        byoyomiStart.isDefined && (Status.flagged.contains(status)) && (playerIndex == turnPlayerIndex)
 
       (pairs.zipWithIndex.map { case ((first, second), index) =>
         ({

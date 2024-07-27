@@ -14,9 +14,18 @@ export const ids = {
   outoftime: 35,
   cheat: 36,
   noStart: 37,
+  unknownFinish: 38,
+  perpetualCheck: 39,
   singleWin: 40,
   gammonWin: 41,
   backgammonWin: 42,
+  resignGammon: 43,
+  resignBackgammon: 44,
+  ruleOfGin: 45,
+  ginGammon: 46,
+  ginBackgammon: 47,
+  outoftimeGammon: 48,
+  outoftimeBackgammon: 49,
   variantEnd: 60,
 };
 
@@ -34,4 +43,12 @@ export function aborted(data: BaseGameData): boolean {
 
 export function playing(data: BaseGameData): boolean {
   return started(data) && !finished(data) && !aborted(data);
+}
+
+export function isGammon(statusId: number): boolean {
+  return [ids.gammonWin, ids.ginGammon, ids.outoftimeGammon, ids.resignGammon].includes(statusId);
+}
+
+export function isBackgammon(statusId: number): boolean {
+  return [ids.backgammonWin, ids.ginBackgammon, ids.outoftimeBackgammon, ids.resignBackgammon].includes(statusId);
 }

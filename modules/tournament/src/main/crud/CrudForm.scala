@@ -31,16 +31,18 @@ object CrudForm {
           Variant(GameFamily(v.split("_")(0).toInt).gameLogic, v.split("_")(1).toInt).isDefined
         )
       ),
-      "position"    -> optional(lila.common.Form.fen.playableStrict),
-      "date"        -> isoDateTime,
-      "image"       -> stringIn(imageChoices),
-      "headline"    -> text(minLength = 5, maxLength = 30),
-      "description" -> text(minLength = 10, maxLength = 400),
-      "conditions"  -> Condition.DataForm.all(Nil),
-      "berserkable" -> boolean,
-      "streakable"  -> boolean,
-      "teamBattle"  -> boolean,
-      "hasChat"     -> boolean
+      "handicapped"   -> boolean,
+      "position"      -> optional(lila.common.Form.fen.playableStrict),
+      "date"          -> isoDateTime,
+      "image"         -> stringIn(imageChoices),
+      "headline"      -> text(minLength = 5, maxLength = 30),
+      "description"   -> text(minLength = 10, maxLength = 400),
+      "conditions"    -> Condition.DataForm.all(Nil),
+      "berserkable"   -> boolean,
+      "streakable"    -> boolean,
+      "statusScoring" -> boolean,
+      "teamBattle"    -> boolean,
+      "hasChat"       -> boolean
     )(CrudForm.Data.apply)(CrudForm.Data.unapply)
       .verifying("Invalid clock", _.validClock)
       .verifying("Increase tournament duration, or decrease game clock", _.validTiming)
@@ -50,6 +52,7 @@ object CrudForm {
     clock = Clock.Config(180, 0),
     minutes = minuteDefault,
     variant = s"${GameFamily.Chess().id}_${Variant.default(GameLogic.Chess()).id}".some,
+    handicapped = false,
     position = none,
     date = DateTime.now plusDays 7,
     image = "",
@@ -58,6 +61,7 @@ object CrudForm {
     conditions = Condition.DataForm.AllSetup.default,
     berserkable = true,
     streakable = true,
+    statusScoring = false,
     teamBattle = false,
     hasChat = true
   )
@@ -68,6 +72,7 @@ object CrudForm {
       clock: ClockConfig,
       minutes: Int,
       variant: Option[String],
+      handicapped: Boolean,
       position: Option[FEN],
       date: DateTime,
       image: String,
@@ -76,6 +81,7 @@ object CrudForm {
       conditions: Condition.DataForm.AllSetup,
       berserkable: Boolean,
       streakable: Boolean,
+      statusScoring: Boolean,
       teamBattle: Boolean,
       hasChat: Boolean
   ) {

@@ -13,6 +13,7 @@ object replayBot {
       pov: Pov,
       initialFen: Option[FEN],
       pgn: String,
+      sgf: String,
       simul: Option[lila.simul.Simul],
       cross: Option[lila.game.Crosstable.WithMatchup]
   )(implicit ctx: Context) = {
@@ -37,7 +38,10 @@ object replayBot {
                 strong("FEN"),
                 input(readonly, spellcheck := false, cls := "copyable autoselect analyse__underboard__fen")
               ),
-              div(cls := "pgn")(pgn)
+              pov.game.gameRecordFormat match {
+                case "pgn" => div(cls := "pgn")(pgn)
+                case "sgf" => div(cls := "sgf")(sgf)
+              }
             ),
             cross.map { c =>
               div(cls := "ctable active")(

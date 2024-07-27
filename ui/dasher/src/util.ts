@@ -63,6 +63,8 @@ export function displayGameFamily(gameFamilyKey: GameFamilyKey): string {
       return 'LinesOfAction';
     case 'flipello':
       return 'Othello';
+    case 'breakthroughtroyka':
+      return 'Breakthrough';
     case 'togyzkumalak':
       return 'Togyzqumalaq';
     default:
@@ -86,6 +88,9 @@ export function convertVariantKeyToGameFamily(variantKey: VariantKey | DraughtsV
       return 'flipello';
     case 'amazons':
       return 'amazons';
+    case 'breakthroughtroyka':
+    case 'minibreakthroughtroyka':
+      return 'breakthroughtroyka';
     case 'oware':
       return 'oware';
     case 'togyzkumalak':

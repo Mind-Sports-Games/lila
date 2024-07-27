@@ -61,7 +61,7 @@ object SetupForm {
         "byoyomi"     -> byoyomi,
         "periods"     -> periods,
         "goHandicap"  -> goHandicap,
-        "goKomi"      -> goKomi,
+        "goKomi"      -> goKomi(boardSize = 19),
         "days"        -> days,
         "mode"        -> mode(withRated = ctx.isAuth),
         "playerIndex" -> playerIndex,
@@ -71,6 +71,7 @@ object SetupForm {
         .verifying("Invalid clock", _.validClock)
         .verifying("Invalid speed", _.validSpeed(ctx.me.exists(_.isBot)))
         .verifying("invalidFen", _.validFen)
+        .verifying("Invalid Komi", _.validKomi)
     )
 
   def hookFilled(timeModeString: Option[String])(implicit ctx: UserContext): Form[HookConfig] =

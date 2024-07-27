@@ -72,7 +72,7 @@ export const init = (node: HTMLElement) => {
             ? { width: 9, height: 9 }
             : $el.hasClass('variant-xiangqi')
             ? { width: 9, height: 10 }
-            : $el.hasClass('variant-minishogi')
+            : $el.hasClass('variant-minishogi') || $el.hasClass('variant-minibreakthroughtroyka')
             ? { width: 5, height: 5 }
             : $el.hasClass('variant-minixiangqi')
             ? { width: 7, height: 7 }

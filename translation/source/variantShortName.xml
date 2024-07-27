@@ -19,7 +19,7 @@
   <string name="draughtsFromPosition">FEN</string>
   <string name="antidraughts">AntiD</string>
   <string name="brazilian">Brazil</string>
-  <string name="breakthrough">BreakT</string>
+  <string name="breakthrough">BRKTHRU</string>
   <string name="frisian">Frisian</string>
   <string name="frysk">Frysk</string>
   <string name="pool">Pool</string>
@@ -33,6 +33,8 @@
   <string name="flipello">Flip</string>
   <string name="flipello10">XFlip</string>
   <string name="amazons">Amazons</string>
+  <string name="breakthroughtroyka">BreakT</string>
+  <string name="minibreakthroughtroyka">MBreakT</string>  
   <string name="oware">Oware</string>
   <string name="togyzkumalak">Toqyz</string>
   <string name="go9x9">Go9</string>

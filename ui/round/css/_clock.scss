@@ -145,6 +145,10 @@
     font-size: 1.6em;
     letter-spacing: inherit;
 
+    @include breakpoint($mq-col1) {
+      font-size: 1.12em;
+    }
+
     @include breakpoint($mq-col2) {
       line-height: 1.5em;
     }

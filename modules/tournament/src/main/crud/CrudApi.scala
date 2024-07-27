@@ -27,6 +27,7 @@ final class CrudApi(tournamentRepo: TournamentRepo) {
       clock = tour.clock,
       minutes = tour.minutes,
       variant = s"${tour.variant.gameFamily.id}_${tour.variant.id}".some,
+      handicapped = tour.handicapped,
       position = tour.position,
       date = tour.startsAt,
       image = ~tour.spotlight.flatMap(_.iconImg),
@@ -35,6 +36,7 @@ final class CrudApi(tournamentRepo: TournamentRepo) {
       conditions = Condition.DataForm.AllSetup(tour.conditions),
       berserkable = !tour.noBerserk,
       streakable = tour.streakable,
+      statusScoring = tour.statusScoring,
       teamBattle = tour.isTeamBattle,
       hasChat = tour.hasChat
     )
@@ -74,6 +76,7 @@ final class CrudApi(tournamentRepo: TournamentRepo) {
       clock = Clock.Config(0, 0),
       minutes = 0,
       variant = Variant.libStandard(GameLogic.Chess()),
+      handicapped = false,
       position = none,
       mode = Mode.Rated,
       password = None,
@@ -81,6 +84,7 @@ final class CrudApi(tournamentRepo: TournamentRepo) {
       startDate = none,
       berserkable = true,
       streakable = true,
+      statusScoring = false,
       teamBattle = none,
       description = none,
       hasChat = true
@@ -93,6 +97,7 @@ final class CrudApi(tournamentRepo: TournamentRepo) {
       clock = if (tour.isCreated) clock else tour.clock,
       minutes = minutes,
       variant = realVariant,
+      handicapped = data.handicapped,
       startsAt = date,
       schedule = Schedule(
         freq = Schedule.Freq.Unique,
@@ -111,6 +116,7 @@ final class CrudApi(tournamentRepo: TournamentRepo) {
       position = data.realPosition,
       noBerserk = !data.berserkable,
       noStreak = !data.streakable,
+      statusScoring = data.statusScoring,
       teamBattle = data.teamBattle option (tour.teamBattle | TeamBattle(Set.empty, 10)),
       hasChat = data.hasChat
     ) pipe { tour =>

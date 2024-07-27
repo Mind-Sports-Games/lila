@@ -251,6 +251,10 @@ export function getGoScore(fen: string, playerIndex: string): number {
   return +fen.split(' ')[playerIndex === 'p1' ? 3 : 4] / 10.0;
 }
 
+export function getBackgammonScore(fen: string, playerIndex: string): number {
+  return +fen.split(' ')[playerIndex === 'p1' ? 4 : 5];
+}
+
 const noServerEvalVariants = [
   'monster',
   'linesOfAction',
@@ -276,6 +280,8 @@ const noClientEvalVariants = [
   'flipello',
   'flipello10',
   'amazons',
+  'breakthroughtroyka',
+  'minibreakthroughtroyka',
   'oware',
   'togyzkumalak',
   'go9x9',
@@ -392,5 +398,9 @@ export const variantToRules = (v: VariantKey): Rules => {
       return 'backgammon';
     case 'nackgammon':
       return 'nackgammon';
+    case 'breakthroughtroyka':
+      return 'breakthrough';
+    case 'minibreakthroughtroyka':
+      return 'minibreakthrough';
   }
 };

@@ -9,7 +9,7 @@ import play.api.libs.json._
 
 import lila.tree.Branch
 
-//We don't think AnaMove is used - think this has been ported to lila-ws
+//This is getting hit during study moves (but not during basic analysis)
 
 trait AnaAny {
 
@@ -35,18 +35,23 @@ case class AnaMove(
   private lazy val fullCaptureFields =
     uci.flatMap(m => Uci.Move.apply(lib, variant.gameFamily, m)).flatMap(_.capture)
 
-  private lazy val newGame = Game(lib.pp("lib.some"), variant.some.pp("variant.some"), fen.some.pp("fen.some"))(
-    orig = orig,
-    dest = dest,
-    promotion = promotion,
-    finalSquare = fullCaptureFields.isDefined,
-    captures = fullCaptureFields,
-    partialCaptures = ~fullCapture
-  )
+  private lazy val newGame =
+    Game(lib, variant.some, fen.some)(
+      orig = orig,
+      dest = dest,
+      promotion = promotion,
+      finalSquare = fullCaptureFields.isDefined,
+      captures = fullCaptureFields,
+      partialCaptures = ~fullCapture
+    )
 
   def branch: Validated[String, Branch] =
-    newGame. flatMap { case (game, move) =>
-      game.actionStrs.flatten.lastOption toValid "Moved but no last move!" map { san =>
+    newGame flatMap { case (game, move) =>
+      game.actionStrs.flatten.lastOption toValid "Moved but no last move!" map { lastAction =>
+        val gameRecordNotation =
+          if (lib == GameLogic.FairySF() || lib == GameLogic.Go() || lib == GameLogic.Backgammon())
+            strategygames.format.sgf.Dumper(variant, Vector(Vector(lastAction)))
+          else lastAction
         val uci = Uci(
           lib,
           move,
@@ -83,7 +88,7 @@ case class AnaMove(
           ply = game.plies,
           turnCount = game.turnCount,
           variant = variant,
-          move = Uci.WithSan(lib, uci, san),
+          move = Uci.WithSan(lib, uci, gameRecordNotation),
           fen = fen,
           check = game.situation.check,
           dests = variant match {

@@ -43,12 +43,15 @@ final private class Finisher(
     ) {
       logger.info(s"Aborting game last played before JVM boot: ${game.id}")
       other(game, _.Aborted, none)
-
     } else if (game.player(!game.player.playerIndex).isOfferingDraw) {
       apply(game, _.Draw, None, Some(trans.drawOfferAccepted.txt()))
+    } else if (
+      game.variant.useRuleOfGinOnInsufficientMaterial && game.situation.opponentHasInsufficientMaterial
+    ) {
+      apply(game, game.situation.insufficientMaterialStatus, Some(game.player.playerIndex))
     } else {
       val winner = Some(!game.player.playerIndex) ifFalse game.situation.opponentHasInsufficientMaterial
-      apply(game, _.Outoftime, winner) >>-
+      apply(game, game.situation.outOfTimeStatus, winner) >>-
         winner.foreach { w =>
           playban.flag(game, !w)
         }

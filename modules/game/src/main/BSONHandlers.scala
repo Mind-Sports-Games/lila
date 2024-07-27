@@ -215,6 +215,7 @@ object BSONHandlers {
           simulId = r strO F.simulId,
           multiMatch = r strO F.multiMatch,
           analysed = r boolD F.analysed,
+          fromHandicappedTournament = r boolD F.fromHandicappedTournament,
           drawOffers = r.getD(F.drawOffers, GameDrawOffers.empty)
         )
 
@@ -356,6 +357,7 @@ object BSONHandlers {
           multiMatch = r strO F.multiMatch,
           drawLimit = r intO F.drawLimit,
           analysed = r boolD F.analysed,
+          fromHandicappedTournament = r boolD F.fromHandicappedTournament,
           drawOffers = r.getD(F.drawOffers, GameDrawOffers.empty) //should be empty for draughts
         )
 
@@ -562,6 +564,7 @@ object BSONHandlers {
           simulId = r strO F.simulId,
           multiMatch = r strO F.multiMatch,
           analysed = r boolD F.analysed,
+          fromHandicappedTournament = r boolD F.fromHandicappedTournament,
           drawOffers = r.getD(F.drawOffers, GameDrawOffers.empty),
           selectedSquares = (r bytesO F.selectedSquares).map(BinaryFormat.pos.readGo(_)),
           deadStoneOfferState = (r intO F.deadStoneOfferState) flatMap DeadStoneOfferState.apply
@@ -676,25 +679,26 @@ object BSONHandlers {
         F.clock -> (o.stratGame.clock flatMap { c =>
           clockBSONWrite(o.createdAt, c).toOption
         }),
-        F.daysPerTurn    -> o.daysPerTurn,
-        F.plyTimes       -> o.binaryPlyTimes,
-        F.p1ClockHistory -> clockHistory(P1, o.clockHistory, o.stratGame.clock, o.flagged),
-        F.p2ClockHistory -> clockHistory(P2, o.clockHistory, o.stratGame.clock, o.flagged),
-        F.rated          -> w.boolO(o.mode.rated),
-        F.lib            -> o.board.variant.gameLogic.id,
-        F.variant        -> o.board.variant.exotic.option(w int o.board.variant.id),
-        F.bookmarks      -> w.intO(o.bookmarks),
-        F.createdAt      -> w.date(o.createdAt),
-        F.updatedAt      -> w.date(o.updatedAt),
-        F.turnAt         -> w.date(o.turnAt),
-        F.source         -> o.metadata.source.map(_.id),
-        F.pgnImport      -> o.metadata.pgnImport,
-        F.tournamentId   -> o.metadata.tournamentId,
-        F.swissId        -> o.metadata.swissId,
-        F.simulId        -> o.metadata.simulId,
-        F.multiMatch     -> o.metadata.multiMatch,
-        F.drawLimit      -> o.metadata.drawLimit,
-        F.analysed       -> w.boolO(o.metadata.analysed)
+        F.daysPerTurn               -> o.daysPerTurn,
+        F.plyTimes                  -> o.binaryPlyTimes,
+        F.p1ClockHistory            -> clockHistory(P1, o.clockHistory, o.stratGame.clock, o.flagged),
+        F.p2ClockHistory            -> clockHistory(P2, o.clockHistory, o.stratGame.clock, o.flagged),
+        F.rated                     -> w.boolO(o.mode.rated),
+        F.lib                       -> o.board.variant.gameLogic.id,
+        F.variant                   -> o.board.variant.exotic.option(w int o.board.variant.id),
+        F.bookmarks                 -> w.intO(o.bookmarks),
+        F.createdAt                 -> w.date(o.createdAt),
+        F.updatedAt                 -> w.date(o.updatedAt),
+        F.turnAt                    -> w.date(o.turnAt),
+        F.source                    -> o.metadata.source.map(_.id),
+        F.pgnImport                 -> o.metadata.pgnImport,
+        F.tournamentId              -> o.metadata.tournamentId,
+        F.swissId                   -> o.metadata.swissId,
+        F.simulId                   -> o.metadata.simulId,
+        F.multiMatch                -> o.metadata.multiMatch,
+        F.drawLimit                 -> o.metadata.drawLimit,
+        F.analysed                  -> w.boolO(o.metadata.analysed),
+        F.fromHandicappedTournament -> w.boolO(o.metadata.fromHandicappedTournament)
       ) ++ {
         o.board.variant.gameLogic match {
           case GameLogic.Draughts() =>
@@ -928,13 +932,13 @@ object BSONHandlers {
           clk.config match {
             case fc: Clock.Config =>
               BinaryFormat.fischerClockHistory
-                .read(fc.limit, bw, bb, (light.status == Status.Outoftime).option(turnPlayerIndex))
+                .read(fc.limit, bw, bb, (Status.flagged.contains(light.status)).option(turnPlayerIndex))
             case bdc: Clock.BronsteinConfig =>
               BinaryFormat.delayClockHistory
-                .read(bdc.limit, bw, bb, (light.status == Status.Outoftime).option(turnPlayerIndex))
+                .read(bdc.limit, bw, bb, (Status.flagged.contains(light.status)).option(turnPlayerIndex))
             case sdc: Clock.SimpleDelayConfig =>
               BinaryFormat.delayClockHistory
-                .read(sdc.limit, bw, bb, (light.status == Status.Outoftime).option(turnPlayerIndex))
+                .read(sdc.limit, bw, bb, (Status.flagged.contains(light.status)).option(turnPlayerIndex))
             case bc: ByoyomiClock.Config =>
               BinaryFormat.byoyomiClockHistory
                 .read(
@@ -943,7 +947,7 @@ object BSONHandlers {
                   bw,
                   bb,
                   periodEntries.getOrElse(PeriodEntries.default),
-                  (light.status == Status.Outoftime).option(turnPlayerIndex)
+                  (Status.flagged.contains(light.status)).option(turnPlayerIndex)
                 )
           }
         _ = lila.mon.game.loadClockHistory.increment()

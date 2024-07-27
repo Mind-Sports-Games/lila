@@ -24,7 +24,11 @@ case class AnaDrop(
 
   def branch: Validated[String, Branch] =
     newGame.flatMap { case (game, drop) =>
-      game.actionStrs.flatten.lastOption toValid "Dropped but no last move!" map { san =>
+      game.actionStrs.flatten.lastOption toValid "Dropped but no last move!" map { lastAction =>
+        val gameRecordNotation =
+          if (lib == GameLogic.FairySF() || lib == GameLogic.Go() || lib == GameLogic.Backgammon())
+            strategygames.format.sgf.Dumper(variant, Vector(Vector(lastAction)))
+          else lastAction
         val uci     = Uci(lib, drop)
         val movable = !game.situation.end
         val fen     = Forsyth.>>(variant.gameLogic, game)
@@ -33,7 +37,7 @@ case class AnaDrop(
           ply = game.plies,
           turnCount = game.turnCount,
           variant = variant,
-          move = Uci.WithSan(lib, uci, san),
+          move = Uci.WithSan(lib, uci, gameRecordNotation),
           fen = fen,
           check = game.situation.check,
           dests = Some(movable ?? game.situation.destinations),

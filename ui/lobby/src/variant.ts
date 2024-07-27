@@ -33,6 +33,10 @@ const variantConfirms = {
   flipello10:
     'This is a Grand Othello game!\n\nPlayers take it in turns to place counters, flipping all opposition counters between their placed counter and another counter on the edge. The winner is the player who has the most counters face up at the end.',
   amazons: 'This is an Amazons game!\n\nImmobilize all the enemy pieces to win.',
+  breakthroughtroyka:
+    'This is a Breakthrough game!\n\nThe first player who reaches their last rank (opponent home row) wins.',
+  minibreakthroughtroyka:
+    'This is a Mini Breakthrough game!\n\nThe first player who reaches their last rank (opponent home row) wins.',
   oware: 'This is an Oware game!\n\nThe aim of the game is to capture the most stones.',
   togyzkumalak: 'This is a Togyzqumalaq game!\n\nThe aim of the game is to capture the most stones.',
   go9x9: 'This is a 9 by 9 Go game!\n\n The aim of the game is to surround the largest area(s) with your stones',

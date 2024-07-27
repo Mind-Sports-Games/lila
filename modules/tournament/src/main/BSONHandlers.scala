@@ -76,11 +76,13 @@ object BSONHandlers {
         medleyMinutes = r.intO("mMinutes"),
         position = position,
         mode = r.intO("mode") flatMap Mode.apply getOrElse Mode.Rated,
+        handicapped = r.boolO("handicapped") | false,
         password = r.strO("password"),
         conditions = r.getO[Condition.All]("conditions") getOrElse Condition.All.empty,
         teamBattle = r.getO[TeamBattle]("teamBattle"),
         noBerserk = r boolD "noBerserk",
         noStreak = r boolD "noStreak",
+        statusScoring = r boolO "statusScoring" getOrElse false,
         schedule = for {
           doc   <- r.getO[Bdoc]("schedule")
           freq  <- doc.getAsOpt[Schedule.Freq]("freq")
@@ -116,12 +118,14 @@ object BSONHandlers {
         "mIntervals"       -> o.medleyIntervalSeconds,
         "fen"              -> o.position.map(_.value),
         "mode"             -> o.mode.some.filterNot(_.rated).map(_.id),
+        "handicapped"      -> o.handicapped.option(true),
         "password"         -> o.password,
         "conditions"       -> o.conditions.ifNonEmpty,
         "forTeams"         -> o.conditions.teamMember.map(_.teamId),
         "teamBattle"       -> o.teamBattle,
         "noBerserk"        -> w.boolO(o.noBerserk),
         "noStreak"         -> w.boolO(o.noStreak),
+        "statusScoring"    -> o.statusScoring.option(true),
         "schedule"         -> o.schedule,
         "nbPlayers"        -> o.nbPlayers,
         "createdAt"        -> w.date(o.createdAt),

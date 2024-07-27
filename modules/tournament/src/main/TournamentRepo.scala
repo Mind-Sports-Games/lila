@@ -281,9 +281,7 @@ final class TournamentRepo(val coll: Coll, playerCollName: CollName)(implicit
       .cursor[Tournament]()
 
   private def scheduledStillWorthEntering: Fu[List[Tournament]] =
-    coll.list[Tournament](startedSelect ++ scheduledSelect) dmap {
-      _.filter(_.isStillWorthEntering)
-    }
+    coll.list[Tournament](startedSelect ++ scheduledSelect)
 
   private def canShowOnHomepage(tour: Tournament): Boolean =
     tour.schedule exists { schedule =>
@@ -398,8 +396,10 @@ final class TournamentRepo(val coll: Coll, playerCollName: CollName)(implicit
         List(
           // tour.conditions.titled.isEmpty option "conditions.titled",
           tour.isRated option "mode",
+          (!tour.handicapped) option "handicapped",
           tour.berserkable option "noBerserk",
           tour.streakable option "noStreak",
+          (!tour.statusScoring) option "statusScoring",
           tour.hasChat option "chat",
           tour.password.isEmpty option "password",
           tour.conditions.list.isEmpty option "conditions",

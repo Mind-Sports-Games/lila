@@ -31,6 +31,7 @@ object form {
           postForm(cls := "form3", action := routes.Tournament.create)(
             fields.name,
             form3.split(fields.rated, fields.variant),
+            fields.handicapped,
             fields.medleyControls,
             fields.medleyIntervalOptions,
             fields.medleyDefaults,
@@ -72,6 +73,7 @@ object form {
           postForm(cls := "form3", action := routes.Tournament.update(tour.id))(
             form3.split(fields.name, tour.isCreated option fields.startDate),
             form3.split(fields.rated, fields.variant),
+            fields.handicapped,
             fields.medleyControls,
             fields.medleyIntervalOptions,
             fields.medleyDefaults,
@@ -194,6 +196,15 @@ object form {
           half = true
         ),
         form3.hidden(form("streakable"), "false".some) // hack to allow disabling streaks
+      ),
+      form3.split(
+        form3.checkbox(
+          form("statusScoring"),
+          trans.statusScoring(),
+          help = frag("Score extra points: +1 Gammon, +2 Backgammon.").some,
+          half = true
+        ),
+        form3.hidden(form("statusScoring"), "false".some) // hack to allow disabling statusScoring
       )
     )
 
@@ -254,6 +265,23 @@ final private class TourFields(form: Form[_], tour: Option[Tournament])(implicit
         translatedVariantChoicesWithVariants,
         disabled = disabledAfterStart
       )
+    )
+  def handicapped =
+    frag(
+      form3.checkbox(
+        form("handicapped"),
+        trans.handicapped(),
+        help = frag(
+          trans.handicappedDefinition.txt(),
+          br,
+          a(href := routes.Page.loneBookmark("handicaps"), target := "_blank")("More detail here")
+        ).some
+      ),
+      st.input(
+        tpe := "hidden",
+        st.name := form("handicapped").name,
+        value := "false"
+      ) // hack allow disabling handicapped
     )
   def medley =
     frag(
@@ -333,6 +361,7 @@ final private class TourFields(form: Form[_], tour: Option[Tournament])(implicit
       medleyGameGroup(GameGroup.Flipello()),
       medleyGameGroup(GameGroup.Mancala()),
       medleyGameGroup(GameGroup.Amazons()),
+      medleyGameGroup(GameGroup.BreakthroughTroyka()),
       medleyGameGroup(GameGroup.Go()),
       medleyGameGroup(GameGroup.Backgammon())
     )

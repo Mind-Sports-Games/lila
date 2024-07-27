@@ -23,6 +23,7 @@ object replay {
       data: play.api.libs.json.JsObject,
       initialFen: Option[FEN],
       pgn: String,
+      sgf: String,
       analysis: Option[lila.analyse.Analysis],
       analysisStarted: Boolean,
       simul: Option[lila.simul.Simul],
@@ -46,7 +47,7 @@ object replay {
         palantir = ctx.me.exists(_.canPalantir)
       )
     }
-    val pgnLinks = div(
+    val gameRecordLinks = div(
       a(
         dataIcon := "x",
         cls := "text",
@@ -86,7 +87,7 @@ object replay {
       title = titleOf(pov),
       moreCss = frag(
         cssTag("analyse.round"),
-        (pov.game.variant.hasDetatchedPocket) option cssTag(
+        (pov.game.variant.hasDetachedPocket) option cssTag(
           "analyse.zh"
         ),
         ctx.blind option cssTag("round.nvui")
@@ -156,11 +157,14 @@ object replay {
                       cls := "copyable autoselect analyse__underboard__fen"
                     )
                   ),
-                  div(cls := "pgn-options")(
-                    strong("PGN"),
-                    pgnLinks
+                  div(cls := s"${game.gameRecordFormat}-options")(
+                    strong(game.gameRecordFormat.toUpperCase),
+                    gameRecordLinks
                   ),
-                  div(cls := "pgn")(pgn)
+                  game.gameRecordFormat match {
+                    case "pgn" => div(cls := "pgn")(pgn)
+                    case "sgf" => div(cls := "sgf")(sgf)
+                  }
                 ),
                 cross.map { c =>
                   div(cls := "ctable")(
@@ -185,8 +189,8 @@ object replay {
         ),
         if (ctx.blind)
           div(cls := "blind-content none")(
-            h2("PGN downloads"),
-            pgnLinks
+            h2(s"${game.gameRecordFormat.toUpperCase} downloads"),
+            gameRecordLinks
           )
       )
     )

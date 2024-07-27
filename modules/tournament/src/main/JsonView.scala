@@ -138,6 +138,7 @@ final class JsonView(
           )
           .add("spotlight" -> tour.spotlight)
           .add("berserkable" -> tour.berserkable)
+          .add("statusScoring" -> tour.statusScoring)
           .add("position" -> tour.position.ifTrue(full).map(positionJson))
           .add("verdicts" -> verdicts.map(Condition.JSONHandlers.verdictsFor(_, lang)))
           .add("schedule" -> tour.schedule.map(scheduleJson))

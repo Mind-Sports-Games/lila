@@ -93,8 +93,8 @@ object Termination {
   def fromStatus(s: strategygames.Status) =
     s match {
       case S.Timeout                                                           => Disconnect
-      case S.Outoftime                                                         => ClockFlag
-      case S.Resign                                                            => Resignation
+      case S.Outoftime | S.OutoftimeGammon | S.OutoftimeBackgammon | S.RuleOfGin | S.GinGammon | S.GinBackgammon => ClockFlag
+      case S.Resign | S.ResignGammon | S.ResignBackgammon                      => Resignation
       case S.Draw                                                              => Draw
       case S.Stalemate                                                         => Stalemate
       case S.Mate | S.SingleWin | S.GammonWin | S.BackgammonWin | S.VariantEnd => Checkmate

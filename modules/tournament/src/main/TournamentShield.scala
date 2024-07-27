@@ -132,7 +132,8 @@ object TournamentShield {
       val medleyRounds: Int,
       val swissFormat: String,
       val arenaFormat: String,
-      val arenaDescription: String
+      val arenaDescription: String,
+      val countOffset: Int = 0
   ) {
     def eligibleVariants = variants.distinct
     def hasAllVariants   = eligibleVariants == Variant.all.filterNot(_.fromPositionVariant)
@@ -147,6 +148,10 @@ object TournamentShield {
     def arenaFormatFull = s"${arenaFormat} ${balancedFormat}"
     def arenaDescriptionFull =
       s"${arenaDescription}\r\n\r\nWin the tournament, win the shield... until next ${intervalStr}!\r\n\r\nMore info here: ${url}"
+    def useStatusScoring = variants.map(_.gameFamily).toSet.size == 1 && variants
+      .map(_.gameFamily)
+      .headOption
+      .getOrElse(GameFamily.Chess()) == GameFamily.Backgammon()
   }
 
   object MedleyShield {
@@ -183,7 +188,7 @@ object TournamentShield {
           "shieldPlayStrategyMedley",
           "PlayStrategy",
           Condition.TeamMember("playstrategy-medleys", "PlayStrategy Medleys"),
-          Variant.all.filterNot(_.fromPositionVariant),
+          Variant.all.filterNot(_.fromPositionVariant).filterNot(_.key == "go19x19"),
           playStrategyMedleyGeneration,
           Blitz55,
           None,
@@ -485,6 +490,58 @@ object TournamentShield {
           s"Welcome to the ${VariantKeys.gameFamilyName(GameFamily.Backgammon())} Medley Arena!"
         )
 
+    //all the order permuations which doesnt put two chess or two backgammon next to each other
+    private val chessgammonVariantPermuations = List(
+      List(0, 1, 2, 3),
+      List(2, 1, 0, 3),
+      List(0, 3, 2, 1),
+      List(2, 3, 0, 1),
+      List(3, 2, 1, 0),
+      List(3, 0, 1, 2),
+      List(1, 2, 3, 0),
+      List(1, 0, 3, 2)
+    )
+
+    private def chessgammonMedleyGeneration(variants: List[Variant]) = {
+      TournamentMedleyUtil.medleyVariantsAndIntervals(
+        Random.shuffle(chessgammonVariantPermuations).head.map(i => variants(i)),
+        5 * 60,
+        playStrategyMinutes,
+        playStrategyRounds,
+        false
+      )
+    }
+    private val chessgammonVariants = List(
+      Variant.wrap(strategygames.chess.variant.Standard),
+      Variant.wrap(strategygames.backgammon.variant.Backgammon),
+      Variant.wrap(strategygames.chess.variant.Chess960),
+      Variant.wrap(strategygames.backgammon.variant.Nackgammon)
+    )
+
+    private val chessgammonVariantMinutes = 80
+    private val chessgammonRounds         = chessgammonVariants.size
+
+    case object ChessgammonMedley
+        extends MedleyShield(
+          "shieldChessgammonMedley",
+          "Chessgammon",
+          Condition.TeamMember("playstrategy-medleys", "PlayStrategy Medleys"),
+          chessgammonVariants,
+          chessgammonMedleyGeneration,
+          Delay310,
+          Some(1),
+          7,
+          16,
+          chessgammonVariantMinutes,
+          chessgammonRounds,
+          "",
+          s"An Arena which is divided into ${chessgammonRounds} equal length periods of ${chessgammonVariants
+            .map(VariantKeys.variantName)
+            .mkString(", ")}.",
+          s"Welcome to the Chessgammon Medley Arena!",
+          2
+        )
+
     val all = List(
       PlayStrategyMedley,  //Weekly - Sun evenings
       ChessVariantsMedley, //Weekly - Sat evenings
@@ -494,7 +551,8 @@ object TournamentShield {
       XiangqiMedley,       //Monthly - 2nd Sun lunchtime
       OthelloMedley,       //Monthly - 4th Sun lunchtime
       MancalaMedley,       //Monthly - 1st Sun lunchtime
-      BackgammonMedley     //Monthly - 1st Sat afternoon
+      BackgammonMedley,    //Monthly - 1st Sat afternoon
+      ChessgammonMedley    //Monthly - 1st Sun afternoon
     )
 
     val allWeekly  = all.filter(_.weekOfMonth.isEmpty)
@@ -515,11 +573,11 @@ object TournamentShield {
       Months.monthsBetween(monthlyMedleyShieldStartDate, startsAt).getMonths()
 
     def countSinceStart(startsAt: DateTime, isWeekly: Boolean) =
-      if (isWeekly) weeksSinceStart(startsAt) + 1
-      else monthsSinceStart(startsAt) + 1
+      if (isWeekly) weeksSinceStart(startsAt)
+      else monthsSinceStart(startsAt)
 
-    def makeName(baseName: String, startsAt: DateTime, isWeekly: Boolean) =
-      s"${baseName} ${countSinceStart(startsAt, isWeekly) + 1}"
+    def makeName(baseName: String, startsAt: DateTime, isWeekly: Boolean, countOffset: Int) =
+      s"${baseName} ${countSinceStart(startsAt, isWeekly) - countOffset + 1}"
   }
 
   sealed abstract class Category(
@@ -764,6 +822,22 @@ object TournamentShield {
           1
         )
 
+    case object BreakthroughTroyka
+        extends Category(
+          Variant.FairySF(strategygames.fairysf.variant.BreakthroughTroyka),
+          Blitz32,
+          21,
+          1
+        )
+
+    case object MiniBreakthroughTroyka
+        extends Category(
+          Variant.FairySF(strategygames.fairysf.variant.MiniBreakthroughTroyka),
+          Blitz32,
+          8,
+          1
+        )
+
     case object Oware
         extends Category(
           Variant.Samurai(strategygames.samurai.variant.Oware),
@@ -846,6 +920,8 @@ object TournamentShield {
       Flipello,
       Flipello10,
       Amazons,
+      BreakthroughTroyka,
+      MiniBreakthroughTroyka,
       Oware,
       Togyzkumalak,
       Go9x9,

@@ -34,8 +34,8 @@ $c-tabs-active: $c-accent !default;
       background: fade-out($c-tabs-active, 0.3);
       height: 2px;
       position: absolute;
-      width: 96%;
-      left: 2%;
+      width: 100%;
+      left: 0%;
       bottom: -2px;
 
       @include transition(all, 0.25s);

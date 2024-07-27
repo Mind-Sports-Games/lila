@@ -2,10 +2,207 @@
   @extend %box-neat-force;
 
   flex: 0 0 auto;
+
+  padding-top: 0;
+  padding-right: 0;
+  overflow: visible;
+}
+
+%ribbon {
+  width: 118px;
+  height: 54px;
+  overflow: hidden;
+  position: absolute;
+
+  span {
+    position: absolute;
+    transform: rotate(45deg);
+    display: block;
+    width: 130px;
+    padding: 4px 0;
+    background-color: $c-link;
+    opacity: 0.8;
+    color: black;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    text-align: center;
+  }
 }
 
 .tour-spotlight {
   @extend %flex-center-nowrap, %nowrap-hidden, %page-metal;
+
+  &.highlighted {
+    position: relative; // required for ribbons
+    overflow: visible; // required for ribbons
+
+    .ribbon {
+      @extend %ribbon;
+
+      @include breakpoint($mq-col1-phone) {
+        right: -18px;
+        top: -16px;
+        transform: scale(0.7);
+      }
+
+      right: -11px;
+      top: -11px;
+
+      &::before,
+      &::after {
+        border: 6px solid $c-link-dim;
+        border-right-color: transparent;
+        border-top-color: transparent;
+        content: '';
+        display: block;
+        opacity: 0.8;
+        position: absolute;
+        z-index: 0;
+      }
+      &::before {
+        left: 68px;
+        top: -1px;
+      }
+      &::after {
+        @include breakpoint($mq-col1-phone) {
+          content: none;
+        }
+        bottom: 5px;
+        right: -1px;
+      }
+      span {
+        left: 36px;
+        top: 6px;
+      }
+    }
+
+    .selected-color-original & {
+      box-shadow: $spotlight-box-shadow;
+      color: $spotlight-color;
+      i.img::before {
+        color: $spotlight-icon-color;
+      }
+
+      %ribbon {
+        span {
+          background-color: $spotlight-ribbon-color;
+          color: $spotlight-ribbon-text-color;
+        }
+        &::before,
+        &::after {
+          border-color: $spotlight-ribbon-inner-side-color;
+          border-right-color: transparent;
+          border-top-color: transparent;
+        }
+      }
+    }
+
+    .selected-color-black & {
+      box-shadow: $spotlight-box-shadow-black;
+      color: $spotlight-color-black;
+      i.img::before {
+        color: $spotlight-icon-color-black;
+      }
+
+      %ribbon {
+        span {
+          background-color: $spotlight-ribbon-color-black;
+          color: $spotlight-ribbon-text-color;
+        }
+        &::before,
+        &::after {
+          border-color: $spotlight-ribbon-inner-side-color-black;
+          border-right-color: transparent;
+          border-top-color: transparent;
+        }
+      }
+    }
+
+    .selected-color-blue & {
+      box-shadow: $spotlight-box-shadow-blue;
+      color: $spotlight-color-blue;
+      i.img::before {
+        color: $spotlight-icon-color-blue;
+      }
+
+      %ribbon {
+        span {
+          background-color: $spotlight-ribbon-color-blue;
+          color: $spotlight-ribbon-text-color;
+        }
+        &::before,
+        &::after {
+          border-color: $spotlight-ribbon-inner-side-color-blue;
+          border-right-color: transparent;
+          border-top-color: transparent;
+        }
+      }
+    }
+
+    .selected-color-green & {
+      box-shadow: $spotlight-box-shadow-green;
+      color: $spotlight-color-green;
+      i.img::before {
+        color: $spotlight-icon-color-green;
+      }
+
+      %ribbon {
+        span {
+          background-color: $spotlight-ribbon-color-green;
+          color: $spotlight-ribbon-text-color;
+        }
+        &::before,
+        &::after {
+          border-color: $spotlight-ribbon-inner-side-color-green;
+          border-right-color: transparent;
+          border-top-color: transparent;
+        }
+      }
+    }
+
+    .selected-color-red & {
+      box-shadow: $spotlight-box-shadow-red;
+      color: $spotlight-color-red;
+      i.img::before {
+        color: $spotlight-icon-color-red;
+      }
+
+      %ribbon {
+        span {
+          background-color: $spotlight-ribbon-color-red;
+          color: $spotlight-ribbon-text-color;
+        }
+        &::before,
+        &::after {
+          border-color: $spotlight-ribbon-inner-side-color-red;
+          border-right-color: transparent;
+          border-top-color: transparent;
+        }
+      }
+    }
+
+    .selected-color-yellow & {
+      box-shadow: $spotlight-box-shadow-yellow;
+      color: $spotlight-color-yellow;
+      i.img::before {
+        color: $spotlight-icon-color-yellow;
+      }
+
+      %ribbon {
+        span {
+          background-color: $spotlight-ribbon-color-yellow;
+          color: $spotlight-ribbon-text-color;
+        }
+        &::before,
+        &::after {
+          border-color: $spotlight-ribbon-inner-side-color-yellow;
+          border-right-color: transparent;
+          border-top-color: transparent;
+        }
+      }
+    }
+  }
 
   flex: 0 0 auto;
   padding: 0.3em;

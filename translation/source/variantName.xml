@@ -21,7 +21,7 @@
   <string name="draughtsFromPosition">From Position</string>
   <string name="antidraughts">Antidraughts</string>
   <string name="brazilian">Brazilian</string>
-  <string name="breakthrough">Breakthrough</string>
+  <string name="breakthrough">BRKTHRU</string>
   <string name="frisian">Frisian</string>
   <string name="frysk">Frysk!</string>
   <string name="pool">Pool</string>
@@ -35,6 +35,8 @@
   <string name="flipello">Othello</string>
   <string name="flipello10">Grand Othello</string>
   <string name="amazons">Amazons</string>
+  <string name="breakthroughtroyka">Breakthrough</string>
+  <string name="minibreakthroughtroyka">Mini Breakthrough</string>    
   <string name="oware">Oware</string>
   <string name="mancala">Mancala</string>
   <string name="togyzkumalak">Togyzqumalaq</string>

@@ -38,18 +38,20 @@ final class SwissForm(implicit mode: Mode) {
           "draughts64Variants"  -> optional(boolean)
         )(MedleyDefaults.apply)(MedleyDefaults.unapply),
         "medleyGameFamilies" -> mapping(
-          "chess"      -> optional(boolean),
-          "draughts"   -> optional(boolean),
-          "shogi"      -> optional(boolean),
-          "xiangqi"    -> optional(boolean),
-          "loa"        -> optional(boolean),
-          "flipello"   -> optional(boolean),
-          "mancala"    -> optional(boolean),
-          "amazons"    -> optional(boolean),
-          "go"         -> optional(boolean),
-          "backgammon" -> optional(boolean)
+          "chess"              -> optional(boolean),
+          "draughts"           -> optional(boolean),
+          "shogi"              -> optional(boolean),
+          "xiangqi"            -> optional(boolean),
+          "loa"                -> optional(boolean),
+          "flipello"           -> optional(boolean),
+          "mancala"            -> optional(boolean),
+          "amazons"            -> optional(boolean),
+          "breakthroughtroyka" -> optional(boolean),
+          "go"                 -> optional(boolean),
+          "backgammon"         -> optional(boolean)
         )(MedleyGameFamilies.apply)(MedleyGameFamilies.unapply),
-        "rated" -> optional(boolean),
+        "rated"       -> optional(boolean),
+        "handicapped" -> optional(boolean),
         "xGamesChoice" -> mapping(
           "bestOfX"    -> optional(boolean),
           "playX"      -> optional(boolean),
@@ -86,6 +88,7 @@ final class SwissForm(implicit mode: Mode) {
           "Best of x or Play x and Match Score can only be used if number of games per round is greater than 1",
           _.validNumberofGames
         )
+        .verifying("Hanidcapped mode requires a Go variant, non-rated and non-meldey", _.validHandicapped)
     )
 
   def create =
@@ -111,10 +114,12 @@ final class SwissForm(implicit mode: Mode) {
         flipello = true.some,
         mancala = true.some,
         amazons = true.some,
+        breakthroughtroyka = true.some,
         go = true.some,
         backgammon = true.some
       ),
       rated = true.some,
+      handicapped = false.some,
       xGamesChoice = XGamesChoice(
         bestOfX = false.some,
         playX = false.some,
@@ -156,10 +161,13 @@ final class SwissForm(implicit mode: Mode) {
         flipello = gameGroupInMedley(s.settings.medleyVariants, GameGroup.Flipello()).some,
         mancala = gameGroupInMedley(s.settings.medleyVariants, GameGroup.Mancala()).some,
         amazons = gameGroupInMedley(s.settings.medleyVariants, GameGroup.Amazons()).some,
+        breakthroughtroyka =
+          gameGroupInMedley(s.settings.medleyVariants, GameGroup.BreakthroughTroyka()).some,
         go = gameGroupInMedley(s.settings.medleyVariants, GameGroup.Go()).some,
         backgammon = gameGroupInMedley(s.settings.medleyVariants, GameGroup.Backgammon()).some
       ),
       rated = s.settings.rated.some,
+      handicapped = s.settings.handicapped.some,
       xGamesChoice = XGamesChoice(
         bestOfX = s.settings.isBestOfX.some,
         playX = s.settings.isPlayX.some,
@@ -319,6 +327,7 @@ object SwissForm {
       medleyDefaults: MedleyDefaults,
       medleyGameFamilies: MedleyGameFamilies,
       rated: Option[Boolean],
+      handicapped: Option[Boolean],
       xGamesChoice: XGamesChoice,
       nbRounds: Int,
       description: Option[String],
@@ -369,6 +378,7 @@ object SwissForm {
     def realPosition            = position ifTrue realVariant.standardVariant
 
     def isRated         = rated | true
+    def isHandicapped   = handicapped | false
     def isMatchScore    = xGamesChoice.matchScore | false
     def isBestOfX       = xGamesChoice.bestOfX | false
     def isPlayX         = xGamesChoice.playX | false
@@ -381,6 +391,7 @@ object SwissForm {
     def validRatedVariant =
       !isRated ||
         lila.game.Game.allowRated(realVariant, clock.some)
+    def validHandicapped = !isHandicapped || (gameLogic == GameLogic.Go() && !isMedley && !isRated)
 
     def validClock = clock match {
       case fc: Clock.Config             => (fc.limitSeconds + fc.incrementSeconds) > 0
@@ -447,6 +458,7 @@ object SwissForm {
       flipello: Option[Boolean],
       mancala: Option[Boolean],
       amazons: Option[Boolean],
+      breakthroughtroyka: Option[Boolean],
       go: Option[Boolean],
       backgammon: Option[Boolean]
   ) {
@@ -460,7 +472,11 @@ object SwissForm {
       .filterNot(gg => if (!flipello.getOrElse(false)) gg == GameGroup.Flipello() else false)
       .filterNot(gg => if (!mancala.getOrElse(false)) gg == GameGroup.Mancala() else false)
       .filterNot(gg => if (!amazons.getOrElse(false)) gg == GameGroup.Amazons() else false)
+      .filterNot(gg =>
+        if (!breakthroughtroyka.getOrElse(false)) gg == GameGroup.BreakthroughTroyka() else false
+      )
       .filterNot(gg => if (!go.getOrElse(false)) gg == GameGroup.Go() else false)
       .filterNot(gg => if (!backgammon.getOrElse(false)) gg == GameGroup.Backgammon() else false)
+
   }
 }
