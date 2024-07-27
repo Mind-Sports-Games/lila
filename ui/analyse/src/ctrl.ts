@@ -265,7 +265,6 @@ export default class AnalyseCtrl {
   }
 
   turnPlayerIndex(): PlayerIndex {
-    //console.log(this.node.playerIndex);
     return this.node.playerIndex;
   }
 
