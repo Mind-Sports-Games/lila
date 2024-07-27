@@ -60,8 +60,6 @@ case class AnaMove(
             case _                    => false
           }
         )
-        println(game.player)
-        println(game.turnCount)
         val sit     = game.situation
         val movable = sit playable false
         val fen     = Forsyth.>>(lib, game)
