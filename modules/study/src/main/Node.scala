@@ -30,7 +30,7 @@ sealed trait RootOrNode {
   //and as mentioned above we dont have any multiaction variants in Study
   def fullTurnCount = 1 + ply / 2
   def mainline: Vector[Node]
-  def playerIndex = PlayerIndex.fromTurnCount(turnCount).pp("playerIndex fromTurnCount(turnCount) in RootOrNode")
+  def playerIndex = PlayerIndex.fromTurnCount(turnCount)
   def moveOption: Option[Uci.WithSan]
 }
 

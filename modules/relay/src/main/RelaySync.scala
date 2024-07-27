@@ -94,7 +94,7 @@ final private class RelaySync(
           lila.common.Future.fold(node.mainline.toList)(Position(chapter, path).ref) { case (position, n) =>
             studyApi.addNode(
               studyId = study.id,
-              position = position.pp("position"),
+              position = position,
               node = n,
               opts = moveOpts.copy(clock = n.clock),
               relay = Chapter
