@@ -16,7 +16,7 @@ object passwd {
       evenMoreJs = frag(
         embedJsUnsafeLoadThen("""
           playstrategy.loadModule('passwordComplexity').then(() =>
-            new window.PlayStrategyPassword().addPasswordChangeListener('form3-newPasswd1')
+            PlayStrategyPassword.addPasswordChangeListener('form3-newPasswd1')
           )""")
       )
     ) {

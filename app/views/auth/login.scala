@@ -18,7 +18,7 @@ object login {
       title = trans.signIn.txt(),
       moreJs = frag(
         jsModule("login"),
-        embedJsUnsafeLoadThen("""new window.PlayStrategyLogin().loginStart()""")
+        embedJsUnsafeLoadThen("""PlayStrategyLogin.loginStart()""")
       ),
       moreCss = cssTag("auth")
     ) {

@@ -1,7 +1,7 @@
 import zxcvbn from 'zxcvbn';
 
-export class PlayStrategyPassword {
-  addPasswordChangeListener(id: string): void {
+namespace PlayStrategyPassword {
+  export function addPasswordChangeListener(id: string): void {
     const passwordInput = document.getElementById(id) as HTMLInputElement;
     passwordInput.addEventListener('input', () => {
       updatePasswordComplexityMeter(passwordInput.value);
@@ -28,4 +28,4 @@ function updateMeter(score: number): void {
   }
 }
 
-(window as any).PlayStrategyPassword = PlayStrategyPassword;
+(window as any).PlayStrategyPassword = PlayStrategyPassword; // esbuild

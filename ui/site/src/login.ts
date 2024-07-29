@@ -2,8 +2,8 @@ import * as xhr from 'common/xhr';
 import debounce from 'common/debounce';
 import spinnerHtml from './component/spinner';
 
-export class PlayStrategyLogin {
-  loginStart() {
+namespace PlayStrategyLogin {
+  export function loginStart() {
     const selector = '.auth-login form';
 
     (function load() {
@@ -47,7 +47,7 @@ export class PlayStrategyLogin {
     })();
   }
 
-  signupStart() {
+  export function signupStart() {
     const $form = $('#signup-form'),
       $exists = $form.find('.username-exists'),
       $username = $form.find('input[name="username"]').on('change keyup paste', () => {
@@ -79,7 +79,8 @@ export class PlayStrategyLogin {
 
     playstrategy
       .loadModule('passwordComplexity')
-      .then(() => new window.PlayStrategyPassword().addPasswordChangeListener('form3-password'));
+      .then(() => window.PlayStrategyPassword.addPasswordChangeListener('form3-password'));
   }
 }
-(window as any).PlayStrategyLogin = PlayStrategyLogin;
+
+(window as any).PlayStrategyLogin = PlayStrategyLogin; // esbuild
