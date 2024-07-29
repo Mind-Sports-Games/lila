@@ -1,5 +1,6 @@
 import rate from 'common/rate';
 
+// this file does not seem to be loaded from anywhere
 playstrategy.load.then(() => {
   $('.coach-review-form .toggle').on('click', function (this: HTMLElement) {
     $(this).remove();

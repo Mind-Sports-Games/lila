@@ -4,6 +4,7 @@ import { notNull } from 'common';
 import spinnerHtml from './component/spinner';
 import Tagify from '@yaireo/tagify';
 
+// this file does not seem to be loaded from anywhere
 playstrategy.load.then(() => {
   const $editor = $('.coach-edit');
 
