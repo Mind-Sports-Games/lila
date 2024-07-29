@@ -11,7 +11,7 @@
     "@types/debounce-promise": "^3.1.3",
     "@types/fnando__sparkline": "^0.3.2",
     "@types/yaireo__tagify": "^4.0.1",
-    "@types/zxcvbn": "^4.4.0",    
+    "@types/zxcvbn": "^4.4.0",
     "@fnando/sparkline": "^0.3.10",
     "@yaireo/tagify": "4.6.0",
     "chat": "workspace:*",
@@ -44,6 +44,7 @@
       "src/analysisBoard.embed.ts",
       "src/user.ts",
       "src/mod.user.ts",
+      "src/mod.games.ts",
       "src/clas.ts",
       "src/captcha.ts",
       "src/expandText.ts",
@@ -69,16 +70,16 @@
       "src/coordinate.ts"
     ],
     "sync": {
-        "../../node_modules/chessground/dist/chessground.min.js": "public/npm",
-        "node_modules/hopscotch/dist/js/hopscotch.min.js": "public/vendor/hopscotch/dist/js",
-        "node_modules/hopscotch/dist/css/hopscotch.min.css": "public/vendor/hopscotch/dist/css",
-        "node_modules/hopscotch/dist/img": "public/vendor/hopscotch/dist",
-        "node_modules/highcharts/high*.js": "public/vendor/highcharts-4.2.5",
-        "node_modules/@yaireo/tagify/dist/tagify.min.js": "public/vendor/tagify",
-        "node_modules/stockfish.js/*": "public/vendor/stockfish.js",
-        "node_modules/stockfish.wasm/*": "public/vendor/stockfish.wasm",
-        "node_modules/stockfish-mv.wasm/*": "public/vendor/stockfish-mv.wasm",
-        "node_modules/stockfish-nnue.wasm/*": "public/vendor/stockfish-nnue.wasm"
+      "../../node_modules/chessground/dist/chessground.min.js": "public/npm",
+      "node_modules/hopscotch/dist/js/hopscotch.min.js": "public/vendor/hopscotch/dist/js",
+      "node_modules/hopscotch/dist/css/hopscotch.min.css": "public/vendor/hopscotch/dist/css",
+      "node_modules/hopscotch/dist/img": "public/vendor/hopscotch/dist",
+      "node_modules/highcharts/high*.js": "public/vendor/highcharts-4.2.5",
+      "node_modules/@yaireo/tagify/dist/tagify.min.js": "public/vendor/tagify",
+      "node_modules/stockfish.js/*": "public/vendor/stockfish.js",
+      "node_modules/stockfish.wasm/*": "public/vendor/stockfish.wasm",
+      "node_modules/stockfish-mv.wasm/*": "public/vendor/stockfish-mv.wasm",
+      "node_modules/stockfish-nnue.wasm/*": "public/vendor/stockfish-nnue.wasm"
     }
   }
 }
