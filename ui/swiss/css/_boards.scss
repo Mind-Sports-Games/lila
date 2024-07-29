@@ -24,7 +24,7 @@
 
   .player-info .rating {
     &.unused {
-      text-decoration: line-through;
+      display: none;
     }
   }
 }
