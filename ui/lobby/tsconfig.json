@@ -1,8 +1,9 @@
 {
   "extends": "../tsconfig.base.json",
-  "compilerOptions": {
+  "compilerOptions": {    
     "esModuleInterop": true,
     "noEmit": true,
+    "noImplicitAny": false,
     "types": ["node", "web", "playstrategy"]
   },
   "isolatedModules": true,  

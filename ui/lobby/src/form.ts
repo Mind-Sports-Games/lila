@@ -1,4 +1,3 @@
-// @ts-nocheck
 export interface FormLines {
   [key: string]: string;
 }

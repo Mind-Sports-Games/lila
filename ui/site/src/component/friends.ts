@@ -1,4 +1,3 @@
-// @ts-nocheck
 import trans from './trans';
 import pubsub from './pubsub';
 import { notNull } from 'common/common';

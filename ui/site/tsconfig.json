@@ -4,6 +4,7 @@
     "skipLibCheck": true,
     "noImplicitReturns": false,
     "noEmit": true,
+    "noImplicitAny": false,
     "composite": true,
     "allowJs": true
   },

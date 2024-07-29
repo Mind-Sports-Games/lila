@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { FormStore, toFormLines, makeStore } from './form';
 import modal from 'common/modal';
 import debounce from 'common/debounce';

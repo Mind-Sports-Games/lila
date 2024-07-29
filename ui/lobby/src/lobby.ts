@@ -318,7 +318,7 @@ function spreadNumber(selector: string, nbSteps: number) {
   const display = (prev: number, cur: number, it: number) => {
     el.textContent = numberFormat(Math.round((prev * (nbSteps - 1 - it) + cur * (it + 1)) / nbSteps));
   };
-  let timeouts: number[] = [];
+  let timeouts: Array<Timeout | number> = [];
   return (nb: number, overrideNbSteps?: number) => {
     if (!el || (!nb && nb !== 0)) return;
     if (overrideNbSteps) nbSteps = Math.abs(overrideNbSteps);
@@ -327,7 +327,6 @@ function spreadNumber(selector: string, nbSteps: number) {
     const interv = Math.abs(playstrategy.socket.pingInterval() / nbSteps);
     const prev = previous || nb;
     previous = nb;
-    // @ts-ignore
     for (let i = 0; i < nbSteps; i++) timeouts.push(setTimeout(() => display(prev, nb, i), Math.round(i * interv)));
   };
 }

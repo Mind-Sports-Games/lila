@@ -1,4 +1,3 @@
-// @ts-nocheck
 import * as data from 'common/data';
 
 const widget = (name: string, prototype: any) => {

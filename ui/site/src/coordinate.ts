@@ -1,4 +1,3 @@
-// @ts-nocheck
 import * as xhr from 'common/xhr';
 import { sparkline } from '@fnando/sparkline';
 import throttle from 'common/throttle';
@@ -81,7 +80,7 @@ playstrategy.load.then(() => {
 
     function showCharts() {
       $side.find('.user_chart').each(function (this: HTMLElement) {
-        const $svg = $('<svg class="sparkline" height="80px" stroke-width="3">')
+        const $svg: any = $('<svg class="sparkline" height="80px" stroke-width="3">')
           .attr('width', $(this).width() + 'px')
           .prependTo($(this).empty());
         sparkline($svg[0] as SVGSVGElement, $(this).data('points'), {

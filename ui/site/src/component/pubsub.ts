@@ -1,4 +1,3 @@
-// @ts-nocheck
 const subs: Array<() => void> = [];
 
 const pubsub: Pubsub = {

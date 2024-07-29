@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { h } from 'snabbdom';
 import LobbyController from '../../ctrl';
 import { bind, tds, perfIcons } from '../util';
@@ -35,7 +34,7 @@ function renderHook(ctrl: LobbyController, hook: Hook) {
         {
           attrs: { 'data-icon': perfIcons[hook.perf] },
         },
-        [noarg(hook.ra ? 'Rated ' : 'Casual '), '(' + noarg(hook.perf) + ')']
+        [noarg(hook.ra ? 'Rated ' : 'Casual '), '(' + noarg(hook.perf) + ')'],
       ),
     ]),
   );

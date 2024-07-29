@@ -106,8 +106,7 @@ function setupTagify(elm: HTMLInputElement | HTMLTextAreaElement, userId?: strin
       maxTags: 30,
     }) as Tagify;
     let abortCtrl: AbortController | undefined; // for aborting the call
-    tagify.on('input', e => {
-      // @ts-ignore
+    tagify.on('input', (e: any) => {
       const term = e.detail.value.trim();
       if (term.length < 2) return;
       tagify!.settings.whitelist!.length = 0; // reset the whitelist
