@@ -3,6 +3,8 @@
 // eslint-disable-next-line
 /// <reference path="./cash.d.ts" />
 
+/// <reference types="highcharts" />
+
 // file://./../../site/src/site.ts
 interface PlayStrategy {
   load: Promise<void>; // window.onload promise
@@ -240,6 +242,7 @@ interface Window {
   moment: any;
   Mousetrap: any;
   Chessground: any;
+  Highcharts: Highcharts.Static;
   InfiniteScroll(selector: string): void;
   playstrategyReplayMusic: () => {
     jump(node: Tree.Node): void;
@@ -688,6 +691,48 @@ declare namespace PowerTip {
     manual?: boolean;
     openEvents?: string[];
     closeEvents?: string[];
+  }
+}
+
+interface HighchartsHTMLElement extends HTMLElement {
+  highcharts: Highcharts.ChartObject;
+}
+
+declare namespace Prefs {
+  const enum Coords {
+    Hidden = 0,
+    Inside = 1,
+    Outside = 2,
+  }
+
+  const enum AutoQueen {
+    Never = 1,
+    OnPremove = 2,
+    Always = 3,
+  }
+
+  const enum ShowClockTenths {
+    Never = 0,
+    Below10Secs = 1,
+    Always = 2,
+  }
+
+  const enum ShowResizeHandle {
+    Never = 0,
+    OnlyAtStart = 1,
+    Always = 2,
+  }
+
+  const enum MoveEvent {
+    Click = 0,
+    Drag = 1,
+    ClickOrDrag = 2,
+  }
+
+  const enum Replay {
+    Never = 0,
+    OnlySlowGames = 1,
+    Always = 2,
   }
 }
 

@@ -1,4 +1,3 @@
-// @ts-nocheck
 import AnalyseCtrl from '../ctrl';
 import { h, VNode } from 'snabbdom';
 import { Prop, prop, defined } from 'common';
