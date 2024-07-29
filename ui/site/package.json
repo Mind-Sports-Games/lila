@@ -43,6 +43,7 @@
       "src/puzzleEmbed.ts",
       "src/analysisBoard.embed.ts",
       "src/user.ts",
+      "src/mod.user.ts",
       "src/clas.ts",
       "src/captcha.ts",
       "src/expandText.ts",
