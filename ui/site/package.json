@@ -60,6 +60,7 @@
       "src/login.ts",
       "src/teamBattleForm.ts",
       "src/tourForm.ts",
+      "src/simulForm.ts",
       "src/gameSearch.ts",
       "src/userComplete.ts",
       "src/infiniteScroll.ts",
