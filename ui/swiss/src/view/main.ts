@@ -109,7 +109,7 @@ function nextRound(ctrl: SwissCtrl): VNode | undefined {
           value: ctrl.data.nextRound?.at || '',
         },
         hook: onInsert((el: HTMLInputElement) =>
-          window['PlayStrategyFlatpickr'](el, {
+          window.PlayStrategyFlatpickr(el, {
             minDate: 'today',
             maxDate: new Date(Date.now() + 1000 * 3600 * 24 * 31),
             dateFormat: 'Z',
