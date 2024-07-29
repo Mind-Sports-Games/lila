@@ -75,7 +75,7 @@ object bits {
       moreJs = frag(
         embedJsUnsafeLoadThen("""
           playstrategy.loadModule('passwordComplexity').then(() =>
-            passwordComplexity.addPasswordChangeListener('form3-newPasswd1')
+            new window.PlayStrategyPassword().addPasswordChangeListener('form3-newPasswd1')
           )""")
       )
     ) {

@@ -14,7 +14,7 @@ object signup {
       title = trans.signUp.txt(),
       moreJs = frag(
         jsModule("login"),
-        embedJsUnsafeLoadThen("""loginSignup.signupStart()"""),
+        embedJsUnsafeLoadThen("""new window.PlayStrategyLogin().signupStart()"""),
         views.html.base.hcaptcha.script(form),
         fingerprintTag
       ),
