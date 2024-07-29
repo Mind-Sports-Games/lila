@@ -9,7 +9,7 @@ const patch = init([classModule, attributesModule]);
 
 import view from './view/main';
 
-export function start(opts: SwissOpts) {
+function start(opts: SwissOpts) {
   const element = document.querySelector('main.swiss') as HTMLElement;
 
   playstrategy.socket = new playstrategy.StrongSocket('/swiss/' + opts.data.id, opts.data.socketVersion || 0, {
@@ -34,6 +34,7 @@ export function start(opts: SwissOpts) {
 
   redraw();
 }
+(window as any).PlayStrategySwiss = { start };
 
 // that's for the rest of playstrategy to access chessground
 // without having to include it a second time
