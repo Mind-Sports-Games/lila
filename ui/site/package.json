@@ -65,6 +65,7 @@
       "src/userComplete.ts",
       "src/infiniteScroll.ts",
       "src/flatpickr.ts",
+      "src/team.admin.ts",
       "src/appeal.ts",
       "src/publicChats.ts",
       "src/contact.ts",
