@@ -122,6 +122,9 @@ Another point to note is that, as time passes, the confidence interval will incr
   <string name="similarOpponents">opponents of similar strength</string>
   <string name="notPlayedRecently">The player hasn\'t played enough recent games. Depending on the number of games you\'ve played, it might take around a year of inactivity for your rating to become provisional again.</string>
   <string name="ratingDeviationMorethanOneHundredTen">Concretely, it means that the Glicko-2 deviation is greater than 110. The deviation is the level of confidence the system has in the rating. The lower the deviation, the more stable a rating is.</string>
+  <string name="whatIsInputRating">Why is there an asterisk (*) next to a rating?</string>
+  <string name="inputRatingExplanation">The asterisk means the rating has been input. This has been done as part of the setup for a %1$s as the player does not have an accurate rating on PlayStrategy yet.</string>
+  <string name="handicappedTournament">handicapped tournament</string>
   <string name="howDoLeaderoardsWork">How do ranks and leaderboards work?</string>
   <string name="inOrderToAppearsYouMust">In order to get on the %1$s you must:</string>
   <string name="ratingLeaderboards">rating leaderboard</string>
