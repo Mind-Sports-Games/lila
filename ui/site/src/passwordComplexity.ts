@@ -1,15 +1,13 @@
 import zxcvbn from 'zxcvbn';
 
-namespace PlayStrategyPassword {
-  export function addPasswordChangeListener(id: string): void {
-    const passwordInput = document.getElementById(id) as HTMLInputElement;
-    passwordInput.addEventListener('input', () => {
-      updatePasswordComplexityMeter(passwordInput.value);
-    });
-    // Update the meter if script loaded after user has already typed something
-    if (passwordInput.value) {
-      updatePasswordComplexityMeter(passwordInput.value);
-    }
+function addPasswordChangeListener(id: string): void {
+  const passwordInput = document.getElementById(id) as HTMLInputElement;
+  passwordInput.addEventListener('input', () => {
+    updatePasswordComplexityMeter(passwordInput.value);
+  });
+  // Update the meter if script loaded after user has already typed something
+  if (passwordInput.value) {
+    updatePasswordComplexityMeter(passwordInput.value);
   }
 }
 
@@ -28,4 +26,4 @@ function updateMeter(score: number): void {
   }
 }
 
-(window as any).PlayStrategyPassword = PlayStrategyPassword; // esbuild
+(window as any).PlayStrategyPassword = { addPasswordChangeListener }; // esbuild
