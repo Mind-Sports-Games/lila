@@ -12,6 +12,8 @@ import Draughtsground from 'draughtsground';
 export const patch = init([classModule, attributesModule]);
 
 export function PlayStrategyAnalyse(opts: AnalyseOpts): AnalyseApi {
+  console.log('PlayStrategyAnalyse invoked :)');
+
   opts.element = document.querySelector('main.analyse') as HTMLElement;
   opts.trans = playstrategy.trans(opts.i18n);
 

@@ -4,6 +4,7 @@
     "paths": { "chessground": ["./@types/chessground"] },
     "esModuleInterop": true,
     "noEmit": true,
+    "types": ["web", "playstrategy"]
   },
   "references": [
     { "path": "../ceval/tsconfig.json" },

@@ -18,7 +18,7 @@ interface Opts {
   swiss?: string;
 }
 
-export default function (opts: Opts): void {
+export default function UserComplete(opts: Opts): void {
   const debounced = debounce(
     (term: string) =>
       xhr
@@ -67,3 +67,5 @@ export default function (opts: Opts): void {
     regex: /^[a-z0-9][\w-]{2,29}$/i,
   });
 }
+
+(window as any).UserComplete = UserComplete; // esbuild

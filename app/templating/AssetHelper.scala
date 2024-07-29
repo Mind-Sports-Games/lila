@@ -48,6 +48,22 @@ trait AssetHelper { self: I18nHelper with SecurityHelper =>
   // @TODO: rename jsAt & jsAt2 to show one is using type module
   def jsAt2(path: String): Frag = script(deferAttr, src := assetUrl(path))
 
+  /*
+  @TODO:
+    could rework a bit easily how these functions are used ...
+    (take care to check what changes would be made to xhr.ts and assets.ts so they keep exposing the same functions)
+
+    - get rid of jsAt() ?
+    actually, just use script() with the correct set of options (deferAttr + tpe + src) could also work
+
+    - jsModule and jsTag have 2 differences :
+      - jsModule takes care of the fact the asset is minified or not
+      - jsModule looks in public/compiled/, while jsTag looks in public/javascripts/
+
+    - depsTag is just the deps.min.js
+
+   */
+
   def jsTag(name: String): Frag = jsAt(s"javascripts/$name")
 
   def jsModule(name: String): Frag =
@@ -70,9 +86,13 @@ trait AssetHelper { self: I18nHelper with SecurityHelper =>
 
   def captchaTag        = jsModule("captcha")
   def infiniteScrollTag = jsModule("infiniteScroll")
-  def chessgroundTag    = jsAt("javascripts/vendor/chessground.min.js")
+
+  // def chessgroundTag = jsAt("npm/chessground.min.js")
+  // def chessgroundTag    = jsAt2("npm/chessground.min.js")
+  def chessgroundTag = jsAt("javascripts/vendor/chessground.min.js")
   // lazy val chessgroundTag: Frag = script(tpe := "module", src := assetUrl("npm/chessground.min.js"))
-  // @TODO: chessground.min.js should be copied to npm using playstrategy sync in package.json
+  // def chessgroundTag: Frag = script(tpe := "module", src := assetUrl("npm/chessground.min.js"))
+  // @TODO: load public/npm/chessground.min.js instead
 
   def draughtsgroundTag   = jsAt2("javascripts/vendor/draughtsground.min.js")
   def cashTag             = jsAt("javascripts/vendor/cash.min.js")

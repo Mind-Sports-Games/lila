@@ -12,6 +12,7 @@ import {
   loadCssPath,
   jsModule,
   loadScript,
+  loadScriptNotAsModule,
   hopscotch,
   userComplete,
   loadModule,
@@ -50,6 +51,7 @@ export default function () {
   l.loadCssPath = loadCssPath;
   l.jsModule = jsModule;
   l.loadScript = loadScript;
+  l.loadScriptNotAsModule = loadScriptNotAsModule;
   l.loadModule = loadModule;
   l.hopscotch = hopscotch;
   l.userComplete = userComplete;

@@ -6,12 +6,12 @@ exportPlayStrategyGlobals();
 window.Chessground = Chessground;
 window.Draughtsground = Draughtsground;
 
-export default function analyseEmbed(opts: any) {
+export default function PlayStrategyAnalyseEmbed(opts: any) {
   document.body.classList.toggle('supports-max-content', !!window.chrome);
 
-  console.log('titi');
+  console.log('PlayStrategyAnalyseEmbed invoked :)');
 
-  window.PlayStrategyAnalyse.start({
+  window.PlayStrategyAnalyse({
     ...opts,
     socketSend: () => {},
   });
@@ -26,3 +26,5 @@ export default function analyseEmbed(opts: any) {
       ),
     );
 }
+
+(window as any).PlayStrategyAnalyseEmbed = PlayStrategyAnalyseEmbed; // esbuild

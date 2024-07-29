@@ -1,4 +1,3 @@
-// @ts-nocheck
 import type Highcharts from 'highcharts';
 
 import AnalyseCtrl from './ctrl';
@@ -38,12 +37,13 @@ export default function (element: HTMLElement, ctrl: AnalyseCtrl) {
     });
     playstrategy.pubsub.on('analysis.change', (fen: Fen, _, mainlinePly: Ply | false) => {
       const $chart = $('#acpl-chart');
+      console.log(fen, inputFen);
       if (fen && fen !== lastFen) {
         inputFen.value = fen;
         lastFen = fen;
       }
       if ($chart.length) {
-        const chart: PlyChart = ($chart[0] as HighchartsHTMLElement).highcharts;
+        const chart: PlyChart = ($chart[0] as any).highcharts;
         if (chart) {
           if (mainlinePly != chart.lastPly) {
             if (mainlinePly === false) unselect(chart);
@@ -58,7 +58,7 @@ export default function (element: HTMLElement, ctrl: AnalyseCtrl) {
         }
       }
       if ($timeChart.length) {
-        const chart: PlyChart = ($timeChart[0] as HighchartsHTMLElement).highcharts;
+        const chart: PlyChart = ($timeChart[0] as any).highcharts;
         if (chart) {
           if (mainlinePly != chart.lastPly) {
             if (mainlinePly === false) unselect(chart);
@@ -92,7 +92,7 @@ export default function (element: HTMLElement, ctrl: AnalyseCtrl) {
     const $panel = $panels.filter('.computer-analysis');
     if (!$('#acpl-chart').length) $panel.html('<div id="acpl-chart"></div>' + (loading ? chartLoader() : ''));
     else if (loading && !$('#acpl-chart-loader').length) $panel.append(chartLoader());
-    playstrategy.loadScript('javascripts/chart/acpl.js').then(function () {
+    playstrategy.loadScriptNotAsModule('javascripts/chart/acpl.js').then(function () {
       playstrategy.advantageChart!(data, ctrl.trans, $('#acpl-chart')[0] as HTMLElement);
     });
   }

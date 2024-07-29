@@ -54,6 +54,17 @@ export const script = (src: string): Promise<void> =>
     document.head.append(el);
   });
 
+export const scriptNotAsModule = (src: string): Promise<void> =>
+  new Promise((resolve, reject) => {
+    const nonce = document.body.getAttribute('data-nonce'),
+      el = document.createElement('script');
+    if (nonce) el.setAttribute('nonce', nonce);
+    el.onload = resolve as () => void;
+    el.onerror = reject;
+    el.src = src;
+    document.head.append(el);
+  });
+
 /* produce HTTP form data from a JS object */
 export const form = (data: any): FormData => {
   const formData = new FormData();

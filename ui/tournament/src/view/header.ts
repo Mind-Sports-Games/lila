@@ -4,7 +4,7 @@ import { dataIcon } from './util';
 
 function startClock(time: any) {
   return {
-    insert: (vnode: any) => $(vnode.elm as HTMLElement).clock({ time }),
+    insert: vnode => $(vnode.elm as HTMLElement).clock({ time }),
   };
 }
 

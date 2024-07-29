@@ -8,7 +8,7 @@ import StrongSocket from './component/socket';
 import watchers from './component/watchers';
 import { reload } from './component/reload';
 import { requestIdleCallback } from './component/functions';
-import { userComplete } from './component/assets';
+import { loadScriptNotAsModule, userComplete } from './component/assets';
 
 import { escapeHtml } from './component/functions';
 import makeChat from './component/chat';
@@ -46,6 +46,7 @@ l.loadCss = loadCss;
 l.loadCssPath = loadCssPath;
 l.jsModule = jsModule;
 l.loadScript = loadScript;
+l.loadScriptNotAsModule = loadScriptNotAsModule;
 l.loadModule = loadModule;
 l.hopscotch = hopscotch;
 l.userComplete = userComplete;

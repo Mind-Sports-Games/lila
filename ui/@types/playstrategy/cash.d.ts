@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-declaration-merging */
 interface Cash {
   [index: number]: EleLoose | undefined;
   length: number;
@@ -317,3 +318,5 @@ declare const $: CashStatic;
 /* export default cash; */
 /* export { Cash, CashStatic, Ele as Element, Selector, Comparator, Context }; */
 /* end hacks */
+
+/* eslint-enable @typescript-eslint/no-unsafe-declaration-merging */

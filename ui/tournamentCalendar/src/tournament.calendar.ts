@@ -6,7 +6,7 @@ import { Ctrl } from './interfaces';
 
 const patch = init([classModule, attributesModule]);
 
-export function app(element: HTMLElement, env: any) {
+export function PlayStrategyTournamentCalendar(element: HTMLElement, env: any) {
   // enrich tournaments
   env.data.tournaments.forEach((t: any) => {
     if (!t.bounds)
@@ -28,3 +28,5 @@ export function app(element: HTMLElement, env: any) {
 
   redraw();
 }
+
+(window as any).PlayStrategyTournamentCalendar = PlayStrategyTournamentCalendar; // esbuild

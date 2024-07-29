@@ -11,8 +11,8 @@ playstrategy.load.then(() => {
     (term: string) => xhr.json(xhr.url('/study/topic/autocomplete', { term })),
     300,
   );
-  tagify.on('input', e => {
-    // @ts-ignore
+
+  tagify.on('input', (e: any) => {
     const term = e.detail.value.trim();
     if (term.length < 2) return;
     tagify.settings.whitelist!.length = 0; // reset the whitelist

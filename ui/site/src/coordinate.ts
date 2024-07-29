@@ -1,6 +1,6 @@
 // @ts-nocheck
 import * as xhr from 'common/xhr';
-import sparkline from '@fnando/sparkline';
+import { sparkline } from '@fnando/sparkline';
 import throttle from 'common/throttle';
 
 playstrategy.load.then(() => {
@@ -84,7 +84,7 @@ playstrategy.load.then(() => {
         const $svg = $('<svg class="sparkline" height="80px" stroke-width="3">')
           .attr('width', $(this).width() + 'px')
           .prependTo($(this).empty());
-        sparkline($svg[0] as unknown as SVGSVGElement, $(this).data('points'), {
+        sparkline($svg[0] as SVGSVGElement, $(this).data('points'), {
           interactive: true,
           /* onmousemove(event, datapoint) { */
           /*   var svg = findClosest(event.target, "svg"); */

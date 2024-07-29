@@ -2,7 +2,6 @@
   "name": "draughtsground",
   "version": "7.6.0",
   "description": "lidraughts.org Draughts UI",
-  "type": "commonjs",
   "main": "draughtsground.js",
   "typings": "draughtsground.d.ts",
   "exports": {
@@ -17,10 +16,6 @@
     }
   },
   "dependencies": {
-    "@typescript-eslint/eslint-plugin": "4.33.0",
-    "@typescript-eslint/parser": "4.33.0",
-    "eslint": "^7",
-    "prettier": "^2",
     "tslib": "^2"
   },
   "scripts": {
