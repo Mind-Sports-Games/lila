@@ -28,7 +28,7 @@ object index {
       moreJs = frag(
         stripeScript,
         jsModule("checkout"),
-        embedJsUnsafeLoadThen(s"""checkout("$stripePublicKey")""")
+        embedJsUnsafeLoadThen(s"""PlayStrategyCheckout("$stripePublicKey")""")
       ),
       openGraph = lila.app.ui
         .OpenGraph(

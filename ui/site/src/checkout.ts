@@ -1,6 +1,6 @@
 import * as xhr from 'common/xhr';
 
-export default function checkout(publicKey: string) {
+export default function PlayStrategyCheckout(publicKey: string) {
   const $checkout = $('div.plan_checkout');
   const lifetime = {
     cents: parseInt($checkout.data('lifetime-cents')),
@@ -99,4 +99,4 @@ export default function checkout(publicKey: string) {
     window.stripeHandler.close();
   });
 }
-(window as any).checkout = checkout; // esbuild
+(window as any).PlayStrategyCheckout = PlayStrategyCheckout; // esbuild
