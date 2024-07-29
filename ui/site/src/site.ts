@@ -6,20 +6,26 @@ import powertip from './component/powertip';
 import pubsub from './component/pubsub';
 import StrongSocket from './component/socket';
 import watchers from './component/watchers';
-import { reload } from './component/reload';
-import { requestIdleCallback } from './component/functions';
-import { loadScriptNotAsModule, userComplete } from './component/assets';
-
-import { escapeHtml } from './component/functions';
+import { escapeHtml, requestIdleCallback } from './component/functions';
 import makeChat from './component/chat';
 import once from './component/once';
 import spinnerHtml from './component/spinner';
 import sri from './component/sri';
 import { storage, tempStorage } from './component/storage';
-import { assetUrl, loadCss, loadCssPath, jsModule, loadScript, hopscotch, loadModule } from './component/assets';
+import {
+  assetUrl,
+  loadCss,
+  loadCssPath,
+  jsModule,
+  loadScript,
+  loadScriptNotAsModule,
+  hopscotch,
+  loadModule,
+  userComplete,
+} from './component/assets';
 import widget from './component/widget';
 import idleTimer from './component/idle-timer';
-import { unload, redirect } from './component/reload';
+import { unload, reload, redirect } from './component/reload';
 import trans from './component/trans';
 import sound from './component/sound';
 
