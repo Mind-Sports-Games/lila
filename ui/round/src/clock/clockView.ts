@@ -31,7 +31,7 @@ export function renderClock(ctrl: RoundController, player: game.Player, position
       ['monster', 'amazons'].includes(ctrl.data.game.variant.key) &&
       isClockRunning;
 
-  //TODO in multication render clock gets called as the move is played while it's sent, and then during apiAction update, the
+  //TODO in multiaction render clock gets called as the move is played while it's sent, and then during apiAction update, the
   // state of ctrl.data is different here and therefore hard to obtain the correct class in all states.
   // This causes the green/orange flicker on the clock. The delayClass is an attempt to fix this which is only paritally working.
   const delayClass =
@@ -66,7 +66,9 @@ export function renderClock(ctrl: RoundController, player: game.Player, position
       (cl.contains('indelay') || !cl.contains('notindelay')) &&
       isRunning
     ) {
-      clock.emergSound.lowtime();
+      if (millis < clock.emergMs) {
+        clock.emergSound.lowtime();
+      }
       cl.remove('indelay');
       cl.add('notindelay');
     } else if (cl.contains('notindelay') && !isRunning) cl.remove('notindelay');
@@ -226,7 +228,9 @@ export function updateElements(clock: ClockController, els: ClockElements, milli
       cl.remove('notindelay');
       cl.add('indelay');
     } else if (clock.isNotInDelay(playerIndex) && (cl.contains('indelay') || !cl.contains('notindelay')) && isRunning) {
-      clock.emergSound.lowtime();
+      if (millis < clock.emergMs){
+        clock.emergSound.lowtime();
+      }
       cl.remove('indelay');
       cl.add('notindelay');
     } else if (cl.contains('notindelay') && !isRunning) cl.remove('notindelay');
