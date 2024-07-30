@@ -45,7 +45,6 @@ jobs:
       - uses: webfactory/ssh-agent@v0.9.0
         with:
           ssh-private-key: ${{ secrets.MSO_CI_SSH_KEY }}
-      # - run: git submodule absorbgitdirs
       # - run: echo "dir=$(yarn cache dir)" >> $GITHUB_OUTPUT
       # id: yarn-cache
       # - uses: actions/cache@v4
@@ -60,7 +59,7 @@ jobs:
         with:
           run_install: |
             - recursive: true
-            - args: [--frozen-lockfile, --strict-peer-dependencies]
+            - args: [--no-frozen-lockfile, --strict-peer-dependencies]
       - run: ./ui/build --no-install -p
       # - run: yarn install --network-concurrency 1
       # - run: ./ui/build prod

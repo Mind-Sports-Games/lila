@@ -37,7 +37,5 @@ jobs:
           run_install: |
             - recursive: false
             - args: [--no-frozen-lockfile, --strict-peer-dependencies]
-      # - run: git submodule absorbgitdirs
-      # - run: pnpm install --no-frozen-lockfile --network-concurrency 1
       - run: pnpm run lint
       - run: pnpm run check-format
