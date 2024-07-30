@@ -19,7 +19,6 @@
     "tslib": "^2"
   },
   "scripts": {
-    "prepare": "tsc",
     "compile": "tsc",
     "lint": "eslint src/*.ts",
     "format": "prettier --write .",
