@@ -53,9 +53,6 @@ importers:
       breakpoint-sass:
         specifier: 2.7.1
         version: 2.7.1
-      chessground:
-        specifier: file:/home/vincent/Desktop/code/chessground
-        version: file:../chessground
 
   ui/@types/playstrategy:
     dependencies:

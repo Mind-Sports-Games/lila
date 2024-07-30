@@ -9,7 +9,6 @@
   "author": "Thibault Duplessis",
   "license": "AGPL-3.0-or-later",
   "dependencies": {
-    "breakpoint-sass": "2.7.1",
-    "chessground": "file:/home/vincent/Desktop/code/chessground"
+    "breakpoint-sass": "2.7.1"
   }
 }
