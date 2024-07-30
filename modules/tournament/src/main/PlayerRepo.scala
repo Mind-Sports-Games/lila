@@ -224,11 +224,17 @@ final class PlayerRepo(coll: Coll)(implicit ec: scala.concurrent.ExecutionContex
       coll.update.one(selectId(player._id), player).void
     }
 
-  def join(tourId: Tournament.ID, user: User, perfType: PerfType, team: Option[TeamID]) =
+  def join(
+      tourId: Tournament.ID,
+      user: User,
+      perfType: PerfType,
+      team: Option[TeamID],
+      inputRating: Option[Int]
+  ) =
     find(tourId, user.id) flatMap {
       case Some(p) if p.withdraw => coll.update.one(selectId(p._id), $unset("w"))
       case Some(_)               => funit
-      case None                  => coll.insert.one(Player.make(tourId, user, perfType, team))
+      case None                  => coll.insert.one(Player.make(tourId, user, perfType, team, inputRating))
     } void
 
   def withdraw(tourId: Tournament.ID, userId: User.ID) =

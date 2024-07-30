@@ -47,7 +47,7 @@ export default function (ctrl: TournamentController): VNode {
     avgOp = pairingsLen
       ? Math.round(
           data.pairings.reduce(function (a, b) {
-            return a + b.op.rating;
+            return a + (b.op.inputRating ?? b.op.rating);
           }, 0) / pairingsLen
         )
       : undefined;
@@ -78,7 +78,7 @@ export default function (ctrl: TournamentController): VNode {
             )
           : null,
         h('table', [
-          data.player.performance && !ctrl.data.medley
+          data.player.performance && !ctrl.data.medley && !ctrl.data.isHandicapped
             ? numberRow(noarg('performance'), data.player.performance + (nb.game < 3 ? '?' : ''), 'raw')
             : null,
           numberRow(noarg('gamesPlayed'), nb.game),
@@ -115,7 +115,7 @@ export default function (ctrl: TournamentController): VNode {
                 h('th', '' + (Math.max(nb.game, pairingsLen) - i)),
                 ctrl.data.medley ? h('td', { attrs: { 'data-icon': p.variantIcon } }, '') : null,
                 h('td', playerName(p.op)),
-                h('td', ctrl.data.medley ? null : p.op.rating),
+                h('td', ctrl.data.medley ? null : '' + p.op.rating + (p.op.isInputRating ? '*' : '')),
                 berserkTd(!!p.op.berserk, p.op.name),
                 h('td.is.playerIndex-icon.' + p.playerColor),
                 h('td.result', res),

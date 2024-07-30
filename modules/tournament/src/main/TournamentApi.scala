@@ -15,7 +15,7 @@ import scala.concurrent.Future
 import lila.common.config.{ MaxPerPage, MaxPerSecond }
 import lila.common.paginator.Paginator
 import lila.common.{ Bus, Debouncer, LightUser }
-import lila.game.{ Game, GameRepo, LightPov, Pov }
+import lila.game.{ Game, GameRepo, Handicaps, LightPov, Pov }
 import lila.hub.LeaderTeam
 import lila.hub.LightTeam._
 import lila.i18n.{ defaultLang, I18nKeys => trans, VariantKeys }
@@ -81,7 +81,8 @@ final class TournamentApi(
       waitMinutes = setup.waitMinutes | TournamentForm.waitMinuteDefault,
       startDate = setup.startDate,
       mode = setup.realMode,
-      handicapped = setup.handicapped | false,
+      handicapped = setup.handicaps.handicapped | false,
+      inputPlayerRatings = setup.handicaps.inputPlayerRatings,
       password = setup.password,
       variant = setup.medleyVariantsAndIntervals
         .flatMap(_.lift(0).map(_._1))
@@ -375,6 +376,10 @@ final class TournamentApi(
         }
     }
 
+  private def getInputRating(userId: String, inputPlayerRatings: Option[String]): Option[Int] = {
+    inputPlayerRatings.flatMap(Handicaps.playerInputRatings(_).get(userId))
+  }
+
   private[tournament] def join(
       tourId: Tournament.ID,
       me: User,
@@ -400,7 +405,13 @@ final class TournamentApi(
                 //       if someone joins _just_ before the new medley round, but after the
                 //       updatePlayerRatingCache, which rating will they have in their next game?
                 def proceedWithTeam(team: Option[String]): Fu[JoinResult] =
-                  playerRepo.join(tour.id, me, tour.perfType, team) >>
+                  playerRepo.join(
+                    tour.id,
+                    me,
+                    tour.perfType,
+                    team,
+                    getInputRating(me.id, tour.inputPlayerRatings)
+                  ) >>
                     updateNbPlayers(tour.id) >>- {
                       socket.reload(tour.id)
                       publish()

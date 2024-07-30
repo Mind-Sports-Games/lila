@@ -31,7 +31,7 @@ object form {
           postForm(cls := "form3", action := routes.Tournament.create)(
             fields.name,
             form3.split(fields.rated, fields.variant),
-            fields.handicapped,
+            form3.split(fields.handicapped, fields.inputPlayerRatings),
             fields.medleyControls,
             fields.medleyIntervalOptions,
             fields.medleyDefaults,
@@ -73,7 +73,7 @@ object form {
           postForm(cls := "form3", action := routes.Tournament.update(tour.id))(
             form3.split(fields.name, tour.isCreated option fields.startDate),
             form3.split(fields.rated, fields.variant),
-            fields.handicapped,
+            form3.split(fields.handicapped, fields.inputPlayerRatings),
             fields.medleyControls,
             fields.medleyIntervalOptions,
             fields.medleyDefaults,
@@ -269,8 +269,9 @@ final private class TourFields(form: Form[_], tour: Option[Tournament])(implicit
   def handicapped =
     frag(
       form3.checkbox(
-        form("handicapped"),
+        form("handicaps.handicapped"),
         trans.handicapped(),
+        half = true,
         help = frag(
           trans.handicappedDefinition.txt(),
           br,
@@ -283,6 +284,16 @@ final private class TourFields(form: Form[_], tour: Option[Tournament])(implicit
         value := "false"
       ) // hack allow disabling handicapped
     )
+  def inputPlayerRatings =
+    form3.group(
+      form("handicaps.inputPlayerRatings"),
+      frag("Input player ratings"),
+      klass = "inputPlayerRatings",
+      help = frag(
+        "Input player ratings to be used for the handicapped tournament. Username and Rating per line, separated by a space."
+      ).some,
+      half = true
+    )(form3.textarea(_)(rows := 4))
   def medley =
     frag(
       form3.checkbox(

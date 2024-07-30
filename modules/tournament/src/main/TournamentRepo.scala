@@ -397,6 +397,7 @@ final class TournamentRepo(val coll: Coll, playerCollName: CollName)(implicit
           // tour.conditions.titled.isEmpty option "conditions.titled",
           tour.isRated option "mode",
           (!tour.handicapped) option "handicapped",
+          (tour.inputPlayerRatings.isEmpty || !tour.handicapped) option "inputPlayerRatings",
           tour.berserkable option "noBerserk",
           tour.streakable option "noStreak",
           (!tour.statusScoring) option "statusScoring",

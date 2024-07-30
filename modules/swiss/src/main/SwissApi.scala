@@ -175,7 +175,7 @@ final class SwissApi(
           else s
         }
       if (data.isHandicapped && old.settings.inputPlayerRatings != ~data.inputPlayerRatings) {
-        val playerRatingMap = playerInputRating(~data.inputPlayerRatings)
+        val playerRatingMap = Handicaps.playerInputRatings(~data.inputPlayerRatings)
         playerRatingMap.toList.map { case (u, r) =>
           colls.player
             .updateField(
@@ -253,7 +253,7 @@ final class SwissApi(
                     swiss.id,
                     me,
                     swiss.roundPerfType,
-                    playerInputRating(swiss.settings.inputPlayerRatings).get(me.username)
+                    Handicaps.playerInputRatings(swiss.settings.inputPlayerRatings).get(me.username)
                   )
                 ) zip
                   colls.swiss.update.one($id(swiss.id), $inc("nbPlayers" -> 1)) inject true
@@ -263,19 +263,6 @@ final class SwissApi(
     } flatMap { res =>
       recomputeAndUpdateAll(id) inject res
     }
-
-  private def playerInputRating(inputPlayerRatings: String): Map[String, Int] =
-    inputPlayerRatings.linesIterator.flatMap {
-      _.trim.toLowerCase.split(' ').map(_.trim) match {
-        case Array(u, r) if r.matches("""\d+""") && r.toInt > 600 && r.toInt < 2900 =>
-          Map(u -> r.toInt)
-        case Array(u, r) if r.matches("""\d+k""") && r.dropRight(1).toInt > 0 && r.dropRight(1).toInt < 60 =>
-          Map(u -> Handicaps.convertGoRating(r))
-        case Array(u, r) if r.matches("""\d+d""") && r.dropRight(1).toInt > 0 && r.dropRight(1).toInt < 8 =>
-          Map(u -> Handicaps.convertGoRating(r))
-        case _ => None
-      }
-    }.toMap
 
   def gameIdSource(
       swissId: Swiss.Id,

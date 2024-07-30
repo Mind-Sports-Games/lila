@@ -61,6 +61,7 @@ interface FeaturedPlayer {
   rank: number;
   name: string;
   rating: number;
+  inputRating?: number;
   title?: string;
   berserk?: boolean;
 }
@@ -123,6 +124,7 @@ export interface Duel {
 export interface DuelPlayer {
   n: string; // name
   r: number; // rating
+  i: boolean; // isInputRating
   k: number; // rank
   t?: string; // title
 }

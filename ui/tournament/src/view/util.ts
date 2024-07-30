@@ -68,7 +68,10 @@ export function playerInfo(p, withRating: boolean, withFlag: boolean, defender =
       defender ? { attrs: dataIcon('5') } : leader ? { attrs: dataIcon('8') } : {},
       playerName(p)
     ),
-    withRating ? h('span.rating', ' ' + p.rating + (p.provisional ? '?' : '')) : null,
+    withRating
+      ? h('span.rating' + (p.inputRating ? '.unused' : ''), ' ' + p.rating + (p.provisional ? '?' : ''))
+      : null,
+    withRating && p.inputRating ? h('span.rating.input', ' ' + p.inputRating.toString() + '*') : null,
   ];
 }
 
