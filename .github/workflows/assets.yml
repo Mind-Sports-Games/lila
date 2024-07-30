@@ -59,8 +59,8 @@ jobs:
       - uses: pnpm/action-setup@v4
         with:
           run_install: |
-            - recursive: false
-            - args: [--no-frozen-lockfile, --strict-peer-dependencies]
+            - recursive: true
+            - args: [--frozen-lockfile, --strict-peer-dependencies]
       - run: ./ui/build --no-install -p
       # - run: yarn install --network-concurrency 1
       # - run: ./ui/build prod
