@@ -54,13 +54,13 @@ trait AssetHelper { self: I18nHelper with SecurityHelper =>
     (take care to check what changes would be made to xhr.ts and assets.ts so they keep exposing the same functions)
 
     - get rid of jsAt() ?
-    actually, just use script() with the correct set of options (deferAttr + tpe + src) could also work
+    actually, just use script() with the correct set of options (deferAttr, tpe, src) could also work ?
 
-    - jsModule and jsTag have 2 differences :
+    - jsModule and jsTag functions have 2 differences :
       - jsModule takes care of the fact the asset is minified or not
       - jsModule looks in public/compiled/, while jsTag looks in public/javascripts/
 
-    - depsTag is just the deps.min.js
+    - depsTag is just the deps.min.js : find a way to generate it automatically from the build system
 
    */
 
@@ -87,9 +87,9 @@ trait AssetHelper { self: I18nHelper with SecurityHelper =>
   def captchaTag        = jsModule("captcha")
   def infiniteScrollTag = jsModule("infiniteScroll")
 
-  // def chessgroundTag = jsAt("npm/chessground.min.js")
-  // def chessgroundTag    = jsAt2("npm/chessground.min.js")
-  def chessgroundTag = jsAt("javascripts/vendor/chessground.min.js")
+  // def chessgroundTag: Frag = script(src := assetUrl("npm/chessground.min.js"), tpe := "module")
+  def chessgroundTag = jsAt("npm/chessground.min.js")
+  // def chessgroundTag = jsAt("javascripts/vendor/chessground.min.js")
   // lazy val chessgroundTag: Frag = script(tpe := "module", src := assetUrl("npm/chessground.min.js"))
   // def chessgroundTag: Frag = script(tpe := "module", src := assetUrl("npm/chessground.min.js"))
   // @TODO: load public/npm/chessground.min.js instead

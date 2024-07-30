@@ -41,4 +41,8 @@ The structure of a CSS module is as follows:
     - forum.transp.scss # generated
 
 
-// @TODO: add mermaid diagram of modules relations overview
+commonJS 
+ES Modules :
+  - chessground
+  - stratops
+iife : Immediately Invoked Function Expression
