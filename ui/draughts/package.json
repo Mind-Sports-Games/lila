@@ -2,8 +2,8 @@
   "name": "draughts",
   "version": "2.0.0",
   "description": "lidraughts.org draughts utils",
-  "main": "dist/main.js",
-  "typings": "dist/main.d.ts",
+  "main": "dist/draughts.js",
+  "typings": "dist/draughts.d.ts",
   "keywords": [
     "draughts",
     "lidraughts"
