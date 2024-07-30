@@ -609,7 +609,7 @@ export default class RoundController {
     }
     this.setTitle();
     if (!this.replaying()) {
-      if (o.uci === "undo"){
+      if (o.uci === 'undo') {
         this.ply--;
       } else {
         this.ply++;
@@ -726,7 +726,7 @@ export default class RoundController {
       check: o.check,
       crazy: o.crazyhouse,
     };
-    if (step.uci === "undo"){
+    if (step.uci === 'undo') {
       d.steps.pop();
     } else {
       d.steps.push(step);

@@ -228,7 +228,7 @@ export function updateElements(clock: ClockController, els: ClockElements, milli
       cl.remove('notindelay');
       cl.add('indelay');
     } else if (clock.isNotInDelay(playerIndex) && (cl.contains('indelay') || !cl.contains('notindelay')) && isRunning) {
-      if (millis < clock.emergMs){
+      if (millis < clock.emergMs) {
         clock.emergSound.lowtime();
       }
       cl.remove('indelay');
