@@ -161,8 +161,9 @@ export default class TournamentController {
 
     //also update clock for interval times
     d.secondsToFinishInterval = d.medleyIntervalSeconds[d.medleyRound];
-    const mClock = $('.medley-interval-time').clock();
-    mClock.clock('addSeconds', d.secondsToFinishInterval);
+    $('.game__tournament .clock').each(function (this: HTMLElement) {
+      playstrategy.clockWidget(this, { time: d.secondsToFinishInterval });
+    });
 
     const medleyClockElement = $('.medley-extra-clock');
     if (finalVariant) medleyClockElement.addClass('hidden');

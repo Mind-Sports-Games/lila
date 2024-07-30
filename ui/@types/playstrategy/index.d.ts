@@ -15,6 +15,7 @@ interface PlayStrategy {
   tempStorage: PlayStrategyStorageHelper;
   once(key: string, mod?: 'always'): boolean;
   powertip: any;
+  clockWidget(el: HTMLElement, opts: { time: number; pause?: boolean; delay?: number; pending?: number }): void;
   widget: any;
   spinnerHtml: string;
   assetUrl(url: string, opts?: AssetUrlOpts): string;
@@ -670,7 +671,6 @@ interface CashStatic {
 
 interface Cash {
   powerTip(options?: PowerTip.Options | 'show' | 'hide'): Cash;
-  clock: any;
 }
 
 declare namespace PowerTip {

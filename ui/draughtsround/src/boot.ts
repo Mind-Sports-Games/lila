@@ -46,7 +46,7 @@ export default function PlayStrategyDraughtsRound(opts: RoundOpts): void {
   function startTournamentClock() {
     if (data.tournament)
       $('.game__tournament .clock').each(function (this: HTMLElement) {
-        $(this).clock({
+        playstrategy.clockWidget(this, {
           time: parseFloat($(this).data('time')),
         });
       });

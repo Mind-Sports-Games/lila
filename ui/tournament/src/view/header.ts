@@ -1,12 +1,10 @@
-import { h, VNode } from 'snabbdom';
+import { h, VNode, Hooks } from 'snabbdom';
 import TournamentController from '../ctrl';
 import { dataIcon } from './util';
 
-function startClock(time: any) {
-  return {
-    insert: vnode => $(vnode.elm as HTMLElement).clock({ time }),
-  };
-}
+const startClock = (time: number): Hooks => ({
+  insert: vnode => playstrategy.clockWidget(vnode.elm as HTMLElement, { time }),
+});
 
 const oneDayInSeconds = 60 * 60 * 24;
 
@@ -59,7 +57,7 @@ function clock(d: any): VNode | undefined {
       }),
     ]);
   }
-  return;
+  return undefined;
 }
 
 function image(d: any): VNode | undefined {

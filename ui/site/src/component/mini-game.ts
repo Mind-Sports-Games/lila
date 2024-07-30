@@ -1,6 +1,7 @@
 import * as domData from 'common/data';
 import { variantFromElement } from 'common/mini-board';
 import { readDice } from 'stratutils';
+import clockWidget from './clock-widget';
 
 interface UpdateData {
   lm: string;
@@ -40,7 +41,7 @@ export const init = (node: HTMLElement) => {
       domData.set($cg[0] as HTMLElement, 'draughtsground', window.Draughtsground($cg[0], config));
       ['p1', 'p2'].forEach(playerIndex =>
         $el.find('.mini-game__clock--' + playerIndex).each(function (this: HTMLElement) {
-          $(this).clock({
+          clockWidget(this, {
             time: parseInt(this.getAttribute('data-time')!),
             delay: parseInt(this.getAttribute('data-time-delay')!),
             pending: parseInt(this.getAttribute('data-time-pending')!),
@@ -100,7 +101,7 @@ export const init = (node: HTMLElement) => {
       domData.set($cg[0] as HTMLElement, 'chessground', window.Chessground($cg[0], config));
       ['p1', 'p2'].forEach(playerIndex =>
         $el.find('.mini-game__clock--' + playerIndex).each(function (this: HTMLElement) {
-          $(this).clock({
+          clockWidget(this, {
             time: parseInt(this.getAttribute('data-time')!),
             delay: parseInt(this.getAttribute('data-time-delay')!),
             pending: parseInt(this.getAttribute('data-time-pending')!),
@@ -145,10 +146,10 @@ export const update = (node: HTMLElement, data: UpdateData) => {
     playerIndex: string,
   ) => {
     if (!isNaN(time!))
-      $el.find('.mini-game__clock--' + playerIndex).clock('set', {
-        time,
-        delay,
-        pending,
+      clockWidget($el[0]?.querySelector('.mini-game__clock--' + playerIndex) as HTMLElement, {
+        time: time || 0,
+        delay: delay || 0,
+        pending: pending || 0,
         pause: playerIndex != turnPlayerIndex,
       });
   };
@@ -158,11 +159,7 @@ export const update = (node: HTMLElement, data: UpdateData) => {
 
 export const finish = (node: HTMLElement, win?: string) =>
   ['p1', 'p2'].forEach(playerIndex => {
-    const $clock = $(node)
-      .find('.mini-game__clock--' + playerIndex)
-      .each(function (this: HTMLElement) {
-        $(this).clock('destroy');
-      });
+    const $clock = $(node).find('.mini-game__clock--' + playerIndex);
     const colorLetter = playerIndex === 'p1' ? 'w' : 'b';
     if (!$clock.data('managed'))
       // snabbdom

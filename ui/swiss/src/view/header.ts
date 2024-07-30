@@ -1,12 +1,10 @@
-import { h, VNode } from 'snabbdom';
+import { h, Hooks, VNode } from 'snabbdom';
 import SwissCtrl from '../ctrl';
 import { dataIcon } from './util';
 
-function startClock(time: number) {
-  return {
-    insert: (vnode: VNode) => $(vnode.elm as HTMLElement).clock({ time }),
-  };
-}
+const startClock = (time: number): Hooks => ({
+  insert: vnode => playstrategy.clockWidget(vnode.elm as HTMLElement, { time }),
+});
 
 const oneDayInSeconds = 60 * 60 * 24;
 

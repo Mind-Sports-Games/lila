@@ -6,6 +6,7 @@ import spinnerHtml from './component/spinner';
 import sri from './component/sri';
 import { storage, tempStorage } from './component/storage';
 import powertip from './component/powertip';
+import clockWidget from './component/clock-widget';
 import {
   assetUrl,
   loadCss,
@@ -34,7 +35,7 @@ import watchers from './component/watchers';
 
 window.$as = <T>(cashOrHtml: Cash | string) => (typeof cashOrHtml === 'string' ? $(cashOrHtml) : cashOrHtml)[0] as T;
 
-export default function () {
+export default function windowedPlaystrategy() {
   console.log("i'm here...");
   const l = window.playstrategy;
   l.StrongSocket = StrongSocket;
@@ -44,6 +45,7 @@ export default function () {
   l.tempStorage = tempStorage;
   l.once = once;
   l.powertip = powertip;
+  l.clockWidget = clockWidget;
   l.widget = widget;
   l.spinnerHtml = spinnerHtml;
   l.assetUrl = assetUrl;
@@ -71,4 +73,6 @@ export default function () {
   l.timeago = timeago;
   l.contentLoaded = (parent?: HTMLElement) => pubsub.emit('content-loaded', parent);
   l.pageVariant = undefined;
+
+  return l;
 }
