@@ -21,7 +21,7 @@
     "url": "https://github.com/Mind-Sports-Games/lila/issues"
   },
   "homepage": "https://playstrategy.org",
-  "packageManager": "pnpm@9.1.0+sha256.22e36fba7f4880ecf749a5ca128b8435da085ecd49575e7fb9e64d6bf4fad394",
+  "packageManager": "pnpm@9.1.0",
   "engines": {
     "node": ">=20",
     "pnpm": "^9"
@@ -36,12 +36,12 @@
     "@typescript-eslint/eslint-plugin": "^7.2.0",
     "@typescript-eslint/parser": "^7.2.0",
     "ab": "github:lichess-org/ab-stub",
-    "chessground": "file:/home/vincent/Desktop/code/chessground",
+    "chessground": "git+ssh://git@github.com:Mind-Sports-Games/chessground.git#pla-875-improve-build-of-chessground",
     "eslint": "^8.57.0",
     "lint-staged": "^15.2.2",
     "onchange": "^7.1.0",
-    "prettier": "3.0.2",
-    "typescript": "^5.4.3",
+    "prettier": "^3.2.5",
+    "typescript": "^5.4.5",
     "xml2js": "0.4.19"
   },
   "scripts": {

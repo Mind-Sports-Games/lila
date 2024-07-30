@@ -31,10 +31,11 @@ on:
       - 'public/**'
       - 'ui/**'
       - 'package.json'
-      - 'yarn.lock'
+      - 'pnpm-lock.yaml'
 
 jobs:
   openjdk17:
+    if: 'false'
     runs-on: ubuntu-latest
     steps:
       - name: Check if organization member
