@@ -105,8 +105,8 @@ export function init(ctrl: RoundController) {
           ctrl.data.game.variant.key === 'shogi'
             ? pieceShogiRoles
             : ctrl.data.game.variant.key === 'minishogi'
-            ? pieceMiniShogiRoles
-            : pieceRoles,
+              ? pieceMiniShogiRoles
+              : pieceRoles,
         role = dropRoles[crazyKeys[crazyKeys.length - 1] - 1],
         playerIndex = ctrl.data.player.playerIndex,
         crazyData = ctrl.data.crazyhouse;

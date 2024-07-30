@@ -4,8 +4,5 @@
     "types": ["playstrategy", "web"],
     "noEmit": true
   },
-  "references": [
-    { "path": "../common/tsconfig.json" },
-    { "path": "../puz/tsconfig.json" }
-  ]
+  "references": [{ "path": "../common/tsconfig.json" }, { "path": "../puz/tsconfig.json" }]
 }

@@ -133,8 +133,8 @@ export function opponentGone(ctrl: RoundController) {
         ),
       ])
     : gone
-    ? h('div.suggestion', [h('p', ctrl.trans.vdomPlural('opponentLeftCounter', gone, h('strong', '' + gone)))])
-    : null;
+      ? h('div.suggestion', [h('p', ctrl.trans.vdomPlural('opponentLeftCounter', gone, h('strong', '' + gone)))])
+      : null;
 }
 
 const fbtCancel = (ctrl: RoundController, f: (v: boolean) => void) =>
@@ -205,20 +205,20 @@ export const selectSquaresOfferOptions = (ctrl: RoundController): VNode | null =
   return ctrl.data.opponent.offeringSelectSquares
     ? h('div', [offerSelectSquares(ctrl, isNotSameOffer), answerOpponentSelectSquaresOffer(ctrl, isNotSameOffer)])
     : ctrl.data.player.offeringSelectSquares
-    ? h(
-        'div.pending',
-        {},
-        `Offer sent to opponent (${
-          ctrl.data.currentSelectedSquares
-            ? ctrl.data.currentSelectedSquares.length
-            : ctrl.data.selectedSquares
-            ? ctrl.data.selectedSquares.length
-            : 0
-        } DS)`,
-      )
-    : ctrl.canOfferSelectSquares()
-    ? h('div', [offerSelectSquares(ctrl, isNotSameOffer)])
-    : null;
+      ? h(
+          'div.pending',
+          {},
+          `Offer sent to opponent (${
+            ctrl.data.currentSelectedSquares
+              ? ctrl.data.currentSelectedSquares.length
+              : ctrl.data.selectedSquares
+                ? ctrl.data.selectedSquares.length
+                : 0
+          } DS)`,
+        )
+      : ctrl.canOfferSelectSquares()
+        ? h('div', [offerSelectSquares(ctrl, isNotSameOffer)])
+        : null;
 };
 
 export function answerOpponentSelectSquaresOffer(ctrl: RoundController, isNotSameOffer: boolean) {
@@ -470,8 +470,8 @@ export function followUp(ctrl: RoundController): VNode {
           ),
         ]
       : rematchable || d.game.rematch
-      ? rematchButtons(ctrl)
-      : [];
+        ? rematchButtons(ctrl)
+        : [];
   return h('div.follow-up', [
     ...rematchZone,
     d.tournament

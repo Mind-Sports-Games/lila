@@ -269,8 +269,8 @@ function xiangqiNotation(move: ExtendedMoveInfo, variant: Variant): string {
       newRank === prevRank
         ? '='
         : (board.wMoved && newRank < prevRank) || (!board.wMoved && newRank > prevRank)
-        ? '+'
-        : '-',
+          ? '+'
+          : '-',
     movement = direction == '=' || isdiagonalMove ? newFile : Math.abs(newRank - prevRank);
 
   //Ammend notation due to multiple pawns in row, case 1: pair sideways, case 2: 3 or more up and down and sideways
@@ -484,20 +484,20 @@ function backgammonNotation(move: ExtendedMoveInfo, variant: Variant): string {
   const origBoardPosNumber = isDrop
     ? 'bar'
     : movePlayer === 'p1'
-    ? origRank === 1
-      ? variant.boardSize.width + 1 - origFile
-      : variant.boardSize.width + origFile
-    : origRank === 1
-    ? variant.boardSize.width + origFile
-    : variant.boardSize.width + 1 - origFile;
+      ? origRank === 1
+        ? variant.boardSize.width + 1 - origFile
+        : variant.boardSize.width + origFile
+      : origRank === 1
+        ? variant.boardSize.width + origFile
+        : variant.boardSize.width + 1 - origFile;
   const destBoardPosNumber =
     movePlayer === 'p1'
       ? destRank === 1
         ? variant.boardSize.width + 1 - destFile
         : variant.boardSize.width + destFile
       : destRank === 1
-      ? variant.boardSize.width + destFile
-      : variant.boardSize.width + 1 - destFile;
+        ? variant.boardSize.width + destFile
+        : variant.boardSize.width + 1 - destFile;
 
   // examples:
   // 43: 8/4 8/5

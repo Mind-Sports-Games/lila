@@ -7,7 +7,7 @@ db.pref.find({ playForcedAction: { $exists: true, $eq: 0 } }).forEach(c => {
       $set: {
         playForcedAction: 1,
       },
-    }
+    },
   );
   print(c._id + ' had pref set to 0 -> changed to 1');
 });

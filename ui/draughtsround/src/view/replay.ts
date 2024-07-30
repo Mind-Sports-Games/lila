@@ -61,8 +61,8 @@ function renderMove(step: Step, curPly: number, orEmpty: boolean, drawOffers: Se
         [step.alg || step.san, drawOffers.has(step.turnCount) ? renderDrawOffer() : undefined],
       )
     : orEmpty
-    ? h(moveTag, '…')
-    : undefined;
+      ? h(moveTag, '…')
+      : undefined;
 }
 
 export function renderResult(ctrl: RoundController): VNode | undefined {

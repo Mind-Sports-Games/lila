@@ -137,8 +137,8 @@ export function view(ctrl: AnalyseCtrl): MaybeVNode {
       variantKey === 'shogi' || variantKey === 'minishogi'
         ? (['p' + piece.role, piece.role] as Role[])
         : variantKey === 'antichess'
-        ? roles.concat('k-piece')
-        : roles;
+          ? roles.concat('k-piece')
+          : roles;
 
   return renderPromotion(ctrl, promoting.dest, rolesToChoose, piece.playerIndex, ctrl.chessground.state.orientation);
 }

@@ -8,5 +8,5 @@
     "composite": true
   },
   "references": [{ "path": "../common/tsconfig.json" }, { "path": "../stratutils/tsconfig.json" }],
-  "isolatedModules": true  
+  "isolatedModules": true
 }

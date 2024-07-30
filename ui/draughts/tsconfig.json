@@ -1,10 +1,10 @@
 {
   "extends": "../tsconfig.base.json",
   "include": ["src/*.ts"],
-  "exclude": [],  
+  "exclude": [],
   "compilerOptions": {
     "outDir": "./dist",
-    "rootDir": "src",    
+    "rootDir": "src",
     "types": ["playstrategy", "web"],
     "declaration": true,
     "composite": true

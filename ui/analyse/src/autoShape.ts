@@ -125,8 +125,8 @@ export function compute(ctrl: AnalyseCtrl): DrawShape[] {
               ? 'c1'
               : 'g1'
             : san === 'O-O-O'
-            ? 'c8'
-            : 'g8'
+              ? 'c8'
+              : 'g8'
           : move.to;
         shapes = shapes.concat({
           orig: destSquare,

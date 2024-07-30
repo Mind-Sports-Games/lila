@@ -45,5 +45,5 @@
   "license": "GPL-3.0",
   "playstrategy": {
     "bundles": "src/draughtsground.ts"
-  }  
+  }
 }

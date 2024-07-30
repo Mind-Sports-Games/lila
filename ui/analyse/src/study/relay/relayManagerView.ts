@@ -81,8 +81,8 @@ function stateOn(ctrl: RelayCtrl) {
         url
           ? ['Connected to source', h('br'), url.replace(/https?:\/\//, '')]
           : ids
-          ? ['Connected to', h('br'), ids.length, ' game(s)']
-          : [],
+            ? ['Connected to', h('br'), ids.length, ' game(s)']
+            : [],
       ),
     ],
   );

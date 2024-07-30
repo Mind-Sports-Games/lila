@@ -29,8 +29,8 @@ export default function (ctrl: AnalyseCtrl, playerIndex: PlayerIndex, position: 
     ((variantKey === 'shogi' || variantKey === 'minishogi') && capturedPiece['promoted']
       ? (capturedPiece.role.slice(1) as cg.Role)
       : capturedPiece['promoted']
-      ? 'p-piece'
-      : capturedPiece.role);
+        ? 'p-piece'
+        : capturedPiece.role);
   const activePlayerIndex = playerIndex === ctrl.turnPlayerIndex();
   const usable = !ctrl.embed && activePlayerIndex;
   return h(

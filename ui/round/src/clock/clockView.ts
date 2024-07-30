@@ -39,9 +39,9 @@ export function renderClock(ctrl: RoundController, player: game.Player, position
     ctrl.data.game.player === player.playerIndex
       ? '.indelay'
       : clock.isNotInDelay(player.playerIndex, ctrl.data.multiActionMetaData?.couldNextActionEndTurn) &&
-        ctrl.data.game.player === player.playerIndex
-      ? '.notindelay'
-      : '';
+          ctrl.data.game.player === player.playerIndex
+        ? '.notindelay'
+        : '';
   const update = (el: HTMLElement) => {
     const els = clock.elements[player.playerIndex],
       millis = clock.millisOf(player.playerIndex),

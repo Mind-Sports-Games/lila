@@ -95,40 +95,40 @@ export function makeConfig(ctrl: AnalyseCtrl): CgConfig {
               d.pref.pieceSet.filter(ps => ps.gameFamily === 'shogi')[0].name +
               '/'
             : cgVariantKey === 'flipello' || cgVariantKey === 'flipello10'
-            ? 'https://playstrategy.org/assets/piece/flipello/' +
-              d.pref.pieceSet.filter(ps => ps.gameFamily === 'flipello')[0].name +
-              '/'
-            : cgVariantKey === 'amazons'
-            ? 'https://playstrategy.org/assets/piece/amazons/' +
-              d.pref.pieceSet.filter(ps => ps.gameFamily === 'amazons')[0].name +
-              '/'
-            : ctrl.data.game.gameFamily === 'breakthroughtroyka'
-            ? 'https://playstrategy.org/assets/piece/breakthrougtroyka/' +
-              d.pref.pieceSet.filter(ps => ps.gameFamily === 'breakthroughtroyka')[0].name +
-              '/'
-            : cgVariantKey === 'oware'
-            ? 'https://playstrategy.org/assets/piece/oware/' +
-              d.pref.pieceSet.filter(ps => ps.gameFamily === 'oware')[0].name +
-              '/'
-            : cgVariantKey === 'togyzkumalak'
-            ? 'https://playstrategy.org/assets/piece/togyzkumalak/' +
-              d.pref.pieceSet.filter(ps => ps.gameFamily === 'togyzkumalak')[0].name +
-              '/'
-            : cgVariantKey === 'go9x9' || cgVariantKey === 'go13x13' || cgVariantKey === 'go19x19'
-            ? 'https://playstrategy.org/assets/piece/go/' +
-              d.pref.pieceSet.filter(ps => ps.gameFamily === 'go')[0].name +
-              '/'
-            : cgVariantKey === 'backgammon' || cgVariantKey === 'nackgammon'
-            ? 'https://playstrategy.org/assets/piece/backgammon/' +
-              d.pref.pieceSet.filter(ps => ps.gameFamily === 'backgammon')[0].name +
-              '/'
-            : cgVariantKey === 'xiangqi' || cgVariantKey === 'minixiangqi'
-            ? 'https://playstrategy.org/assets/piece/xiangqi/' +
-              d.pref.pieceSet.filter(ps => ps.gameFamily === 'xiangqi')[0].name +
-              '/'
-            : 'https://playstrategy.org/assets/piece/chess/' +
-              d.pref.pieceSet.filter(ps => ps.gameFamily === 'chess')[0].name +
-              '/',
+              ? 'https://playstrategy.org/assets/piece/flipello/' +
+                d.pref.pieceSet.filter(ps => ps.gameFamily === 'flipello')[0].name +
+                '/'
+              : cgVariantKey === 'amazons'
+                ? 'https://playstrategy.org/assets/piece/amazons/' +
+                  d.pref.pieceSet.filter(ps => ps.gameFamily === 'amazons')[0].name +
+                  '/'
+                : ctrl.data.game.gameFamily === 'breakthroughtroyka'
+                  ? 'https://playstrategy.org/assets/piece/breakthrougtroyka/' +
+                    d.pref.pieceSet.filter(ps => ps.gameFamily === 'breakthroughtroyka')[0].name +
+                    '/'
+                  : cgVariantKey === 'oware'
+                    ? 'https://playstrategy.org/assets/piece/oware/' +
+                      d.pref.pieceSet.filter(ps => ps.gameFamily === 'oware')[0].name +
+                      '/'
+                    : cgVariantKey === 'togyzkumalak'
+                      ? 'https://playstrategy.org/assets/piece/togyzkumalak/' +
+                        d.pref.pieceSet.filter(ps => ps.gameFamily === 'togyzkumalak')[0].name +
+                        '/'
+                      : cgVariantKey === 'go9x9' || cgVariantKey === 'go13x13' || cgVariantKey === 'go19x19'
+                        ? 'https://playstrategy.org/assets/piece/go/' +
+                          d.pref.pieceSet.filter(ps => ps.gameFamily === 'go')[0].name +
+                          '/'
+                        : cgVariantKey === 'backgammon' || cgVariantKey === 'nackgammon'
+                          ? 'https://playstrategy.org/assets/piece/backgammon/' +
+                            d.pref.pieceSet.filter(ps => ps.gameFamily === 'backgammon')[0].name +
+                            '/'
+                          : cgVariantKey === 'xiangqi' || cgVariantKey === 'minixiangqi'
+                            ? 'https://playstrategy.org/assets/piece/xiangqi/' +
+                              d.pref.pieceSet.filter(ps => ps.gameFamily === 'xiangqi')[0].name +
+                              '/'
+                            : 'https://playstrategy.org/assets/piece/chess/' +
+                              d.pref.pieceSet.filter(ps => ps.gameFamily === 'chess')[0].name +
+                              '/',
       },
     },
     highlight: {

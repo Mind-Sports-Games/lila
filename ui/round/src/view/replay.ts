@@ -85,8 +85,8 @@ function renderMultiActionMove(
         ],
       )
     : orEmpty
-    ? h(moveTag, '…')
-    : undefined;
+      ? h(moveTag, '…')
+      : undefined;
 }
 
 function combinedNotationOfTurn(actionNotations: string[], notation: NotationStyle): string {

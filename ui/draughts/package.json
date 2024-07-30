@@ -19,6 +19,6 @@
     "prod": "tsc"
   },
   "playstrategy": {
-    "bundles":"src/draughts.ts"
+    "bundles": "src/draughts.ts"
   }
 }

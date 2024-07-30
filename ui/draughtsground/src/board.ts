@@ -85,12 +85,12 @@ export function calcCaptKey(
     yDiff === 0
       ? 0
       : yDiff > 0
-      ? xDiff === 0 && Math.abs(yDiff) >= 2
-        ? 2
-        : 1
-      : xDiff === 0 && Math.abs(yDiff) >= 2
-      ? -2
-      : -1;
+        ? xDiff === 0 && Math.abs(yDiff) >= 2
+          ? 2
+          : 1
+        : xDiff === 0 && Math.abs(yDiff) >= 2
+          ? -2
+          : -1;
   const xStep: number =
     xDiff === 0 ? 0 : yDiff === 0 ? (xDiff > 0 ? 1 : -1) : startY % 2 == 0 ? (xDiff < 0 ? -1 : 0) : xDiff > 0 ? 1 : 0;
 

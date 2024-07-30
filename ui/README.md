@@ -40,9 +40,9 @@ The structure of a CSS module is as follows:
     - forum.dark.scss # generated
     - forum.transp.scss # generated
 
-
-commonJS 
+commonJS
 ES Modules :
-  - chessground
-  - stratops
-iife : Immediately Invoked Function Expression
+
+- chessground
+- stratops
+  iife : Immediately Invoked Function Expression

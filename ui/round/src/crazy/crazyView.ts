@@ -31,8 +31,8 @@ export default function pocket(ctrl: RoundController, playerIndex: PlayerIndex, 
     ((variantKey === 'shogi' || variantKey === 'minishogi') && capturedPiece['promoted']
       ? (capturedPiece.role.slice(1) as cg.Role)
       : capturedPiece['promoted']
-      ? 'p-piece'
-      : capturedPiece.role);
+        ? 'p-piece'
+        : capturedPiece.role);
   return h(
     'div.pocket.is2d.pocket-' + position,
     {

@@ -131,36 +131,36 @@ export function makeConfig(ctrl: RoundController): Config {
               data.pref.pieceSet.filter(ps => ps.gameFamily === 'shogi')[0].name +
               '/'
             : variantKey === 'flipello' || variantKey === 'flipello10'
-            ? 'https://playstrategy.org/assets/piece/flipello/' +
-              data.pref.pieceSet.filter(ps => ps.gameFamily === 'flipello')[0].name +
-              '/'
-            : variantKey === 'amazons'
-            ? 'https://playstrategy.org/assets/piece/amazons/' +
-              data.pref.pieceSet.filter(ps => ps.gameFamily === 'amazons')[0].name +
-              '/'
-            : variantKey === 'oware'
-            ? 'https://playstrategy.org/assets/piece/oware/' +
-              data.pref.pieceSet.filter(ps => ps.gameFamily === 'oware')[0].name +
-              '/'
-            : variantKey === 'togyzkumalak'
-            ? 'https://playstrategy.org/assets/piece/togyzkumalak/' +
-              data.pref.pieceSet.filter(ps => ps.gameFamily === 'togyzkumalak')[0].name +
-              '/'
-            : variantKey === 'go9x9' || variantKey === 'go13x13' || variantKey === 'go19x19'
-            ? 'https://playstrategy.org/assets/piece/go/' +
-              data.pref.pieceSet.filter(ps => ps.gameFamily === 'go')[0].name +
-              '/'
-            : variantKey === 'backgammon' || variantKey === 'nackgammon'
-            ? 'https://playstrategy.org/assets/piece/backgammon/' +
-              data.pref.pieceSet.filter(ps => ps.gameFamily === 'backgammon')[0].name +
-              '/'
-            : variantKey === 'xiangqi' || variantKey === 'minixiangqi'
-            ? 'https://playstrategy.org/assets/piece/xiangqi/' +
-              data.pref.pieceSet.filter(ps => ps.gameFamily === 'xiangqi')[0].name +
-              '/'
-            : 'https://playstrategy.org/assets/piece/chess/' +
-              data.pref.pieceSet.filter(ps => ps.gameFamily === 'chess')[0].name +
-              '/',
+              ? 'https://playstrategy.org/assets/piece/flipello/' +
+                data.pref.pieceSet.filter(ps => ps.gameFamily === 'flipello')[0].name +
+                '/'
+              : variantKey === 'amazons'
+                ? 'https://playstrategy.org/assets/piece/amazons/' +
+                  data.pref.pieceSet.filter(ps => ps.gameFamily === 'amazons')[0].name +
+                  '/'
+                : variantKey === 'oware'
+                  ? 'https://playstrategy.org/assets/piece/oware/' +
+                    data.pref.pieceSet.filter(ps => ps.gameFamily === 'oware')[0].name +
+                    '/'
+                  : variantKey === 'togyzkumalak'
+                    ? 'https://playstrategy.org/assets/piece/togyzkumalak/' +
+                      data.pref.pieceSet.filter(ps => ps.gameFamily === 'togyzkumalak')[0].name +
+                      '/'
+                    : variantKey === 'go9x9' || variantKey === 'go13x13' || variantKey === 'go19x19'
+                      ? 'https://playstrategy.org/assets/piece/go/' +
+                        data.pref.pieceSet.filter(ps => ps.gameFamily === 'go')[0].name +
+                        '/'
+                      : variantKey === 'backgammon' || variantKey === 'nackgammon'
+                        ? 'https://playstrategy.org/assets/piece/backgammon/' +
+                          data.pref.pieceSet.filter(ps => ps.gameFamily === 'backgammon')[0].name +
+                          '/'
+                        : variantKey === 'xiangqi' || variantKey === 'minixiangqi'
+                          ? 'https://playstrategy.org/assets/piece/xiangqi/' +
+                            data.pref.pieceSet.filter(ps => ps.gameFamily === 'xiangqi')[0].name +
+                            '/'
+                          : 'https://playstrategy.org/assets/piece/chess/' +
+                            data.pref.pieceSet.filter(ps => ps.gameFamily === 'chess')[0].name +
+                            '/',
       },
     },
     disableContextMenu: true,

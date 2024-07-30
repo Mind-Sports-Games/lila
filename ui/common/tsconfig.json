@@ -8,5 +8,5 @@
     "composite": true,
     "incremental": true
   },
-  "references": [{ "path": "../stratutils/tsconfig.json" }],
+  "references": [{ "path": "../stratutils/tsconfig.json" }]
 }

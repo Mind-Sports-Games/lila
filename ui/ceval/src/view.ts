@@ -95,14 +95,14 @@ function engineName(ctrl: CevalCtrl): VNode[] {
           'NNUE',
         )
       : ctrl.technology == 'hce'
-      ? h(
-          'span.technology.good',
-          { attrs: { title: 'Multi-threaded WebAssembly (classical hand crafted evaluation)' } },
-          'HCE',
-        )
-      : ctrl.technology == 'wasm'
-      ? h('span.technology', { attrs: { title: 'Single-threaded WebAssembly fallback (slow)' } }, 'WASM')
-      : h('span.technology', { attrs: { title: 'Single-threaded JavaScript fallback (very slow)' } }, 'ASMJS'),
+        ? h(
+            'span.technology.good',
+            { attrs: { title: 'Multi-threaded WebAssembly (classical hand crafted evaluation)' } },
+            'HCE',
+          )
+        : ctrl.technology == 'wasm'
+          ? h('span.technology', { attrs: { title: 'Single-threaded WebAssembly fallback (slow)' } }, 'WASM')
+          : h('span.technology', { attrs: { title: 'Single-threaded JavaScript fallback (very slow)' } }, 'ASMJS'),
   ];
 }
 
@@ -208,8 +208,8 @@ export function renderCeval(ctrl: ParentCtrl): VNode | undefined {
             ctrl.outcome()
               ? [trans.noarg('gameOver')]
               : threatMode
-              ? [threatInfo(ctrl, threat)]
-              : localEvalInfo(ctrl, evs),
+                ? [threatInfo(ctrl, threat)]
+                : localEvalInfo(ctrl, evs),
           ),
         ]),
       ]

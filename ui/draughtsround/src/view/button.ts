@@ -135,8 +135,8 @@ export function opponentGone(ctrl: RoundController) {
         ),
       ])
     : gone
-    ? h('div.suggestion', [h('p', ctrl.trans.vdomPlural('opponentLeftCounter', gone, h('strong', '' + gone)))])
-    : null;
+      ? h('div.suggestion', [h('p', ctrl.trans.vdomPlural('opponentLeftCounter', gone, h('strong', '' + gone)))])
+      : null;
 }
 
 const fbtCancel = (ctrl: RoundController, f: (v: boolean) => void) =>
@@ -367,10 +367,10 @@ export function followUp(ctrl: RoundController): VNode {
           ),
         ]
       : rematchable || d.game.rematch
-      ? rematchButtons(ctrl)
-      : awaitingAutoRematch
-      ? [h('button.fbt.rematch.disabled.multimatch', ctrl.noarg('multiMatchRematchAwaiting'))]
-      : [];
+        ? rematchButtons(ctrl)
+        : awaitingAutoRematch
+          ? [h('button.fbt.rematch.disabled.multimatch', ctrl.noarg('multiMatchRematchAwaiting'))]
+          : [];
   return h('div.follow-up', [
     ...rematchZone,
     d.tournament
@@ -426,8 +426,8 @@ export function watcherFollowUp(ctrl: RoundController): VNode | null {
             ctrl.noarg('viewRematch'),
           )
         : awaitingAutoRematch
-        ? h('button.fbt.rematch.disabled.multimatch', ctrl.noarg('multiMatchRematchAwaiting'))
-        : null,
+          ? h('button.fbt.rematch.disabled.multimatch', ctrl.noarg('multiMatchRematchAwaiting'))
+          : null,
       d.tournament
         ? h(
             'a.fbt',

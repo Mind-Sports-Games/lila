@@ -6,7 +6,7 @@ db.tournament2
     var intervals = Math.ceil(t.minutes / t.mMinutes);
     var remainder = intervals * t.mMinutes * 60 - t.minutes * 60;
     var speeds = Array.from({ length: intervals }, (_, i) =>
-      i !== intervals - 1 ? NumberInt(t.mMinutes * 60) : NumberInt(t.mMinutes * 60 - remainder)
+      i !== intervals - 1 ? NumberInt(t.mMinutes * 60) : NumberInt(t.mMinutes * 60 - remainder),
     );
     db.tournament2.update(
       { _id: t._id },
@@ -14,7 +14,7 @@ db.tournament2
         $set: {
           mIntervals: speeds,
         },
-      }
+      },
     );
   });
 
@@ -23,7 +23,7 @@ db.tournament2.count({ mVariants: { $exists: true }, mMinutes: { $exists: true }
 db.tournament2.find({ mVariants: { $exists: true }, mMinutes: { $exists: true } }, { _id: 1, name: 1, createdBy: 1 });
 db.tournament2.find(
   { mVariants: { $exists: true }, mMinutes: { $exists: true }, createdBy: { $exists: true } },
-  { _id: 1, name: 1, createdBy: 1, mMinutes: 1, minutes: 1 }
+  { _id: 1, name: 1, createdBy: 1, mMinutes: 1, minutes: 1 },
 );
 
 //undo setting of mIntervals
@@ -36,6 +36,6 @@ db.tournament2.find({ mIntervals: { $exists: true } }).forEach(t => {
       $unset: {
         mIntervals: true,
       },
-    }
+    },
   );
 });

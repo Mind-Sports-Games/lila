@@ -160,8 +160,8 @@ playstrategy.RoundNVUI = function (redraw: Redraw) {
           ...(ctrl.data.player.spectator
             ? renderTableWatch(ctrl)
             : game.playable(ctrl.data)
-            ? renderTablePlay(ctrl)
-            : renderTableEnd(ctrl)),
+              ? renderTablePlay(ctrl)
+              : renderTableEnd(ctrl)),
           h('h2', 'Board'),
           h(
             'div.board',

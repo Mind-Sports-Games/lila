@@ -31,7 +31,7 @@ function podiumPosition(
   trophyImg: string,
   trans: Trans,
   isMedley: boolean,
-  isHandicapped: boolean
+  isHandicapped: boolean,
 ): VNode | undefined {
   return p
     ? h(
@@ -51,7 +51,7 @@ function podiumPosition(
             userName(p.user),
           ),
           podiumStats(p, trans, isMedley, isHandicapped),
-        ]
+        ],
       )
     : undefined;
 }

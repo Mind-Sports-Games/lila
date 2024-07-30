@@ -87,18 +87,18 @@ export function notationStyle(key: VariantKey | DraughtsVariantKey): NotationSty
   return variantUsesUCINotation(key)
     ? 'uci'
     : variantUsesUSINotation(key)
-    ? 'usi'
-    : variantUsesWXFNotation(key)
-    ? 'wxf'
-    : variantUsesDestPosOthelloNotation(key)
-    ? 'dpo'
-    : variantUsesDestPosGoNotation(key)
-    ? 'dpg'
-    : variantUsesMancalaNotation(key)
-    ? 'man'
-    : variantUsesBackgammonNotation(key)
-    ? 'bkg'
-    : 'san';
+      ? 'usi'
+      : variantUsesWXFNotation(key)
+        ? 'wxf'
+        : variantUsesDestPosOthelloNotation(key)
+          ? 'dpo'
+          : variantUsesDestPosGoNotation(key)
+            ? 'dpg'
+            : variantUsesMancalaNotation(key)
+              ? 'man'
+              : variantUsesBackgammonNotation(key)
+                ? 'bkg'
+                : 'san';
 }
 
 interface Piece {

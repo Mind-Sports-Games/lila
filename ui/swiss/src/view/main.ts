@@ -199,15 +199,15 @@ function joinButton(ctrl: SwissCtrl): VNode | undefined {
             ctrl.trans.noarg('join'),
           )
       : ctrl.joinSpinner
-      ? spinner()
-      : h(
-          'button.fbt.text',
-          {
-            attrs: dataIcon('b'),
-            hook: bind('click', ctrl.withdraw, ctrl.redraw),
-          },
-          ctrl.trans.noarg('withdraw'),
-        );
+        ? spinner()
+        : h(
+            'button.fbt.text',
+            {
+              attrs: dataIcon('b'),
+              hook: bind('click', ctrl.withdraw, ctrl.redraw),
+            },
+            ctrl.trans.noarg('withdraw'),
+          );
 
   return;
 }

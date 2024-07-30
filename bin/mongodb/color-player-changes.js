@@ -13,7 +13,7 @@ db.challenge.find().forEach(s => {
         playerIndexChoice: '',
         finalPlayerIndex: '',
       },
-    }
+    },
   );
 });
 
@@ -28,7 +28,7 @@ db.pref.find({ coordColor: { $exists: true } }).forEach(s => {
       $unset: {
         coordColor: '',
       },
-    }
+    },
   );
 });
 
@@ -43,7 +43,7 @@ db.user4.find({ colorIt: { $exists: true } }).forEach(s => {
       $unset: {
         colorIt: '',
       },
-    }
+    },
   );
 });
 
@@ -58,7 +58,7 @@ db.cache.find({ 'v.whiteWins': { $exists: true } }).forEach(s => {
       $unset: {
         'v.whiteWins': '',
       },
-    }
+    },
   );
 });
 
@@ -73,7 +73,7 @@ db.cache.find({ 'v.blackWins': { $exists: true } }).forEach(s => {
       $unset: {
         'v.blackWins': '',
       },
-    }
+    },
   );
 });
 
@@ -88,7 +88,7 @@ db.coordinate_score.find({ white: { $exists: true } }).forEach(s => {
       $unset: {
         white: '',
       },
-    }
+    },
   );
 });
 
@@ -103,7 +103,7 @@ db.coordinate_score.find({ black: { $exists: true } }).forEach(s => {
       $unset: {
         black: '',
       },
-    }
+    },
   );
 });
 
@@ -118,7 +118,7 @@ db.player_assessment.find({ white: { $exists: true } }).forEach(s => {
       $unset: {
         white: '',
       },
-    }
+    },
   );
 });
 
@@ -143,7 +143,7 @@ db.seek_archive.find().forEach(s => {
       $unset: {
         color: '',
       },
-    }
+    },
   );
 });
 
@@ -161,7 +161,7 @@ db.seek.find().forEach(s => {
       $unset: {
         color: '',
       },
-    }
+    },
   );
 });
 
@@ -179,7 +179,7 @@ db.simul.find().forEach(s => {
       $unset: {
         color: '',
       },
-    }
+    },
   );
 });
 

@@ -11,6 +11,6 @@ db.pref.find().forEach(c => {
           { name: 'green', gameFamily: 4 },
         ],
       },
-    }
+    },
   );
 });

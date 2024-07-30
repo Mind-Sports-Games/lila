@@ -30,37 +30,37 @@ export default function (showText: (ctrl: SimulCtrl) => VNode) {
             ? isHost
               ? [startOrCancel(ctrl, accepted), randomButton(ctrl)]
               : ctrl.containsMe()
-              ? h(
-                  'a.button',
-                  {
-                    hook: util.bind('click', () => xhr.withdraw(ctrl.data.id)),
-                  },
-                  ctrl.trans('withdraw'),
-                )
-              : h(
-                  'a.button.text' + (ctrl.teamBlock() ? '.disabled' : ''),
-                  {
-                    attrs: {
-                      disabled: ctrl.teamBlock(),
-                      'data-icon': 'G',
+                ? h(
+                    'a.button',
+                    {
+                      hook: util.bind('click', () => xhr.withdraw(ctrl.data.id)),
                     },
-                    hook: ctrl.teamBlock()
-                      ? {}
-                      : util.bind('click', () => {
-                          if (ctrl.data.variants.length === 1) xhr.join(ctrl.data.id, ctrl.data.variants[0].key);
-                          else {
-                            modal($('.simul .continue-with'));
-                            $('#modal-wrap .continue-with a').on('click', function (this: HTMLElement) {
-                              modal.close();
-                              xhr.join(ctrl.data.id, $(this).data('variant'));
-                            });
-                          }
-                        }),
-                  },
-                  ctrl.teamBlock() && ctrl.data.team
-                    ? ctrl.trans('mustBeInTeam', ctrl.data.team.name)
-                    : ctrl.trans('join'),
-                )
+                    ctrl.trans('withdraw'),
+                  )
+                : h(
+                    'a.button.text' + (ctrl.teamBlock() ? '.disabled' : ''),
+                    {
+                      attrs: {
+                        disabled: ctrl.teamBlock(),
+                        'data-icon': 'G',
+                      },
+                      hook: ctrl.teamBlock()
+                        ? {}
+                        : util.bind('click', () => {
+                            if (ctrl.data.variants.length === 1) xhr.join(ctrl.data.id, ctrl.data.variants[0].key);
+                            else {
+                              modal($('.simul .continue-with'));
+                              $('#modal-wrap .continue-with a').on('click', function (this: HTMLElement) {
+                                modal.close();
+                                xhr.join(ctrl.data.id, $(this).data('variant'));
+                              });
+                            }
+                          }),
+                    },
+                    ctrl.teamBlock() && ctrl.data.team
+                      ? ctrl.trans('mustBeInTeam', ctrl.data.team.name)
+                      : ctrl.trans('join'),
+                  )
             : h(
                 'a.button.text',
                 {
@@ -77,11 +77,11 @@ export default function (showText: (ctrl: SimulCtrl) => VNode) {
       ctrl.acceptedContainsMe()
         ? h('p.instructions', 'You have been selected! Hold still, the simul is about to begin.')
         : isHost && ctrl.data.applicants.length < 6
-        ? h(
-            'p.instructions',
-            'Share this page URL to let people enter the simul! ' + ctrl.trans('absentSimulApplicants'),
-          )
-        : h('p.instructions', ctrl.trans('absentSimulApplicants')),
+          ? h(
+              'p.instructions',
+              'Share this page URL to let people enter the simul! ' + ctrl.trans('absentSimulApplicants'),
+            )
+          : h('p.instructions', ctrl.trans('absentSimulApplicants')),
       h(
         'div.halves',
         {

@@ -191,8 +191,8 @@ export function view(ctrl: RoundController): MaybeVNode {
       variantKey === 'shogi' || variantKey === 'minishogi'
         ? (['p' + piece?.role, piece?.role] as cg.Role[])
         : variantKey === 'antichess'
-        ? roles.concat('k-piece')
-        : roles;
+          ? roles.concat('k-piece')
+          : roles;
   return renderPromotion(
     ctrl,
     promoting.move[1],

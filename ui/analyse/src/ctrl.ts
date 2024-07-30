@@ -328,11 +328,11 @@ export default class AnalyseCtrl {
       movablePlayerIndex = this.gamebookPlay()
         ? playerIndex
         : this.practice
-        ? this.bottomPlayerIndex()
-        : !this.embed &&
-          ((dests && dests.size > 0) || drops === null || drops.length || dropsByRole == null || dropsByRole.length)
-        ? playerIndex
-        : undefined,
+          ? this.bottomPlayerIndex()
+          : !this.embed &&
+              ((dests && dests.size > 0) || drops === null || drops.length || dropsByRole == null || dropsByRole.length)
+            ? playerIndex
+            : undefined,
       config: ChessgroundConfig = {
         fen: this.data.game.variant.key == 'amazons' ? amazonsChessgroundFen(node.fen) : node.fen,
         turnPlayerIndex: playerIndex,

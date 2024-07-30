@@ -222,10 +222,10 @@ export function view(ctrl: StudyChapterNewFormCtrl): VNode {
   const mode = currentChapter.practice
     ? 'practice'
     : defined(currentChapter.conceal)
-    ? 'conceal'
-    : currentChapter.gamebook
-    ? 'gamebook'
-    : 'normal';
+      ? 'conceal'
+      : currentChapter.gamebook
+        ? 'gamebook'
+        : 'normal';
   const noarg = trans.noarg;
   const onlyForAnalysisVariants = (node: VNode | null): VNode | null =>
     allowAnalysisForVariant(ctrl.vm.variantKey() ?? 'standard') ? node : null;

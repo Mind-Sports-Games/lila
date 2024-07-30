@@ -182,25 +182,27 @@ export function view(ctrl: AnalyseCtrl): VNode {
       ctrl.ongoing
         ? null
         : ceval.variant.lib === 0 //board editor for chess only games atm
-        ? h(
-            'a.button.button-empty',
-            {
-              attrs: {
-                href: d.userAnalysis ? '/editor?fen=' + ctrl.node.fen : '/' + d.game.id + '/edit?fen=' + ctrl.node.fen,
-                'data-icon': 'm',
-                ...(ctrl.embed
-                  ? {
-                      target: '_blank',
-                      rel: 'noopener nofollow',
-                    }
-                  : {
-                      rel: 'nofollow',
-                    }),
+          ? h(
+              'a.button.button-empty',
+              {
+                attrs: {
+                  href: d.userAnalysis
+                    ? '/editor?fen=' + ctrl.node.fen
+                    : '/' + d.game.id + '/edit?fen=' + ctrl.node.fen,
+                  'data-icon': 'm',
+                  ...(ctrl.embed
+                    ? {
+                        target: '_blank',
+                        rel: 'noopener nofollow',
+                      }
+                    : {
+                        rel: 'nofollow',
+                      }),
+                },
               },
-            },
-            noarg('boardEditor'),
-          )
-        : null,
+              noarg('boardEditor'),
+            )
+          : null,
       canContinue
         ? h(
             'a.button.button-empty',

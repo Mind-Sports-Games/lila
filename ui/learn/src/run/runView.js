@@ -69,8 +69,8 @@ module.exports = function (ctrl) {
           level.vm.failed
             ? renderFailed(ctrl)
             : level.vm.completed
-            ? renderCompleted(ctrl, level)
-            : m('div.goal', util.withLinebreaks(ctrl.trans.noarg(level.blueprint.goal))),
+              ? renderCompleted(ctrl, level)
+              : m('div.goal', util.withLinebreaks(ctrl.trans.noarg(level.blueprint.goal))),
           renderProgress(ctrl.progress),
         ]),
       ]),

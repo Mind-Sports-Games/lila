@@ -14,6 +14,6 @@ db.simul.find().forEach(t => {
       //     'clock.config.limitSeconds': true,
       //     'clock.config.incrementSeconds': true,
       // }
-    }
+    },
   );
 });

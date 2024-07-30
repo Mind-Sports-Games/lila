@@ -1,50 +1,50 @@
 db.trophyKind.update(
   { _id: 'mso21-bronze-medal' },
-  { $set: { url: '//msodb.playstrategy.org/Report/YearMedals?year=21' } }
+  { $set: { url: '//msodb.playstrategy.org/Report/YearMedals?year=21' } },
 );
 db.trophyKind.update(
   { _id: 'mso21-gold-medal' },
-  { $set: { url: '//msodb.playstrategy.org/Report/YearMedals?year=21' } }
+  { $set: { url: '//msodb.playstrategy.org/Report/YearMedals?year=21' } },
 );
 db.trophyKind.update(
   { _id: 'mso21-silver-medal' },
-  { $set: { url: '//msodb.playstrategy.org/Report/YearMedals?year=21' } }
+  { $set: { url: '//msodb.playstrategy.org/Report/YearMedals?year=21' } },
 );
 db.trophyKind.update(
   { _id: 'msogp-2023-bronze-medal' },
-  { $set: { url: '//msodb.playstrategy.org/Report/YearMedals?year=23' } }
+  { $set: { url: '//msodb.playstrategy.org/Report/YearMedals?year=23' } },
 );
 db.trophyKind.update(
   { _id: 'msogp-2023-gold-medal' },
-  { $set: { url: '//msodb.playstrategy.org/Report/YearMedals?year=23' } }
+  { $set: { url: '//msodb.playstrategy.org/Report/YearMedals?year=23' } },
 );
 db.trophyKind.update(
   { _id: 'msogp-2023-silver-medal' },
-  { $set: { url: '//msodb.playstrategy.org/Report/YearMedals?year=23' } }
+  { $set: { url: '//msodb.playstrategy.org/Report/YearMedals?year=23' } },
 );
 db.trophyKind.update(
   { _id: 'msogp-bronze-medal' },
-  { $set: { url: '//msodb.playstrategy.org/Report/YearMedals?year=22' } }
+  { $set: { url: '//msodb.playstrategy.org/Report/YearMedals?year=22' } },
 );
 db.trophyKind.update(
   { _id: 'msogp-bronze-medal-x3' },
-  { $set: { url: '//msodb.playstrategy.org/Report/YearMedals?year=22' } }
+  { $set: { url: '//msodb.playstrategy.org/Report/YearMedals?year=22' } },
 );
 db.trophyKind.update(
   { _id: 'msogp-bronze-medal-x5' },
-  { $set: { url: '//msodb.playstrategy.org/Report/YearMedals?year=22' } }
+  { $set: { url: '//msodb.playstrategy.org/Report/YearMedals?year=22' } },
 );
 db.trophyKind.update(
   { _id: 'msogp-gold-medal' },
-  { $set: { url: '//msodb.playstrategy.org/Report/YearMedals?year=22' } }
+  { $set: { url: '//msodb.playstrategy.org/Report/YearMedals?year=22' } },
 );
 db.trophyKind.update(
   { _id: 'msogp-silver-medal' },
-  { $set: { url: '//msodb.playstrategy.org/Report/YearMedals?year=22' } }
+  { $set: { url: '//msodb.playstrategy.org/Report/YearMedals?year=22' } },
 );
 db.trophyKind.update(
   { _id: 'msogp-silver-medal-x6' },
-  { $set: { url: '//msodb.playstrategy.org/Report/YearMedals?year=22' } }
+  { $set: { url: '//msodb.playstrategy.org/Report/YearMedals?year=22' } },
 );
 
 db.trophyKind.insert({
@@ -313,13 +313,13 @@ db.trophy.remove({ user: 'kspttw', kind: 'msogp-gold-medal' });
 
 db.trophy.update(
   { _id: 'msogp-silver-6-kspttw' },
-  { $set: { url: '//msodb.playstrategy.org/Report/ContestantMedals?contestantId=11913' } }
+  { $set: { url: '//msodb.playstrategy.org/Report/ContestantMedals?contestantId=11913' } },
 );
 db.trophy.update(
   { _id: 'msogp-bronze-5-kspttw' },
-  { $set: { url: '//msodb.playstrategy.org/Report/ContestantMedals?contestantId=11913' } }
+  { $set: { url: '//msodb.playstrategy.org/Report/ContestantMedals?contestantId=11913' } },
 );
 db.trophy.update(
   { _id: 'msogp-bronze-3-jheps' },
-  { $set: { url: '//msodb.playstrategy.org/Report/ContestantMedals?contestantId=1006' } }
+  { $set: { url: '//msodb.playstrategy.org/Report/ContestantMedals?contestantId=1006' } },
 );

@@ -343,7 +343,7 @@ export class ClockController {
 
   delayMillisOf = (playerIndex: PlayerIndex, activePlayerInGame: PlayerIndex): Millis => {
     const isBerserk = this.goneBerserk[playerIndex];
-    const countDown = isBerserk ? 0 : this.countdownDelay ?? 0;
+    const countDown = isBerserk ? 0 : (this.countdownDelay ?? 0);
     const delayMillis = 1000 * countDown;
     return this.isNotOpponentsTurn(playerIndex) && playerIndex === activePlayerInGame
       ? Math.max(0, delayMillis - (this.elapsed() + this.pendingMillisOf(playerIndex)))

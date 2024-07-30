@@ -61,28 +61,28 @@ export const initWith = (node: HTMLElement, fen: string, orientation: Orientatio
           dimensions: $el.hasClass('variant-shogi')
             ? { width: 9, height: 9 }
             : $el.hasClass('variant-xiangqi')
-            ? { width: 9, height: 10 }
-            : $el.hasClass('variant-minishogi') || $el.hasClass('variant-minibreakthroughtroyka')
-            ? { width: 5, height: 5 }
-            : $el.hasClass('variant-minixiangqi')
-            ? { width: 7, height: 7 }
-            : $el.hasClass('variant-flipello10')
-            ? { width: 10, height: 10 }
-            : $el.hasClass('variant-amazons')
-            ? { width: 10, height: 10 }
-            : $el.hasClass('variant-oware')
-            ? { width: 6, height: 2 }
-            : $el.hasClass('variant-togyzkumalak')
-            ? { width: 9, height: 2 }
-            : $el.hasClass('variant-go9x9')
-            ? { width: 9, height: 9 }
-            : $el.hasClass('variant-go13x13')
-            ? { width: 13, height: 13 }
-            : $el.hasClass('variant-go19x19')
-            ? { width: 19, height: 19 }
-            : $el.hasClass('variant-backgammon') || $el.hasClass('variant-nackgammon')
-            ? { width: 12, height: 2 }
-            : { width: 8, height: 8 },
+              ? { width: 9, height: 10 }
+              : $el.hasClass('variant-minishogi') || $el.hasClass('variant-minibreakthroughtroyka')
+                ? { width: 5, height: 5 }
+                : $el.hasClass('variant-minixiangqi')
+                  ? { width: 7, height: 7 }
+                  : $el.hasClass('variant-flipello10')
+                    ? { width: 10, height: 10 }
+                    : $el.hasClass('variant-amazons')
+                      ? { width: 10, height: 10 }
+                      : $el.hasClass('variant-oware')
+                        ? { width: 6, height: 2 }
+                        : $el.hasClass('variant-togyzkumalak')
+                          ? { width: 9, height: 2 }
+                          : $el.hasClass('variant-go9x9')
+                            ? { width: 9, height: 9 }
+                            : $el.hasClass('variant-go13x13')
+                              ? { width: 13, height: 13 }
+                              : $el.hasClass('variant-go19x19')
+                                ? { width: 19, height: 19 }
+                                : $el.hasClass('variant-backgammon') || $el.hasClass('variant-nackgammon')
+                                  ? { width: 12, height: 2 }
+                                  : { width: 8, height: 8 },
           variant: variantFromElement($el),
         }),
       );
@@ -97,28 +97,28 @@ export const variantFromElement = (element: Cash): string => {
   return element.hasClass('variant-shogi')
     ? 'shogi'
     : element.hasClass('variant-xiangqi')
-    ? 'xiangqi'
-    : element.hasClass('variant-minishogi')
-    ? 'minishogi'
-    : element.hasClass('variant-minixiangqi')
-    ? 'minixiangqi'
-    : element.hasClass('variant-flipello10')
-    ? 'flipello10'
-    : element.hasClass('variant-amazons')
-    ? 'amazons'
-    : element.hasClass('variant-oware')
-    ? 'oware'
-    : element.hasClass('variant-togyzkumalak')
-    ? 'togyzkumalak'
-    : element.hasClass('variant-go9x9')
-    ? 'go9x9'
-    : element.hasClass('variant-go13x13')
-    ? 'go13x13'
-    : element.hasClass('variant-go19x19')
-    ? 'go19x19'
-    : element.hasClass('variant-backgammon')
-    ? 'backgammon'
-    : element.hasClass('variant-nackgammon')
-    ? 'nackgammon'
-    : 'standard';
+      ? 'xiangqi'
+      : element.hasClass('variant-minishogi')
+        ? 'minishogi'
+        : element.hasClass('variant-minixiangqi')
+          ? 'minixiangqi'
+          : element.hasClass('variant-flipello10')
+            ? 'flipello10'
+            : element.hasClass('variant-amazons')
+              ? 'amazons'
+              : element.hasClass('variant-oware')
+                ? 'oware'
+                : element.hasClass('variant-togyzkumalak')
+                  ? 'togyzkumalak'
+                  : element.hasClass('variant-go9x9')
+                    ? 'go9x9'
+                    : element.hasClass('variant-go13x13')
+                      ? 'go13x13'
+                      : element.hasClass('variant-go19x19')
+                        ? 'go19x19'
+                        : element.hasClass('variant-backgammon')
+                          ? 'backgammon'
+                          : element.hasClass('variant-nackgammon')
+                            ? 'nackgammon'
+                            : 'standard';
 };

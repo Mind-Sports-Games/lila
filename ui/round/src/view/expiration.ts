@@ -22,12 +22,12 @@ export default function (ctrl: RoundController, position: Position): MaybeVNode 
           ? 'nbSecondsToOfferDeadStones'
           : 'nbSecondsForOpponentToOfferDeadStones'
         : ctrl.data.expirationOnPaused
-        ? myTurn
-          ? 'nbSecondsToRespondToOffer'
-          : 'nbSecondsForOpponentToRespondToOffer'
-        : myTurn
-        ? 'nbSecondsToPlayTheFirstMove'
-        : 'nbSecondsForOpponentToPlayTheFirstMove';
+          ? myTurn
+            ? 'nbSecondsToRespondToOffer'
+            : 'nbSecondsForOpponentToRespondToOffer'
+          : myTurn
+            ? 'nbSecondsToPlayTheFirstMove'
+            : 'nbSecondsForOpponentToPlayTheFirstMove';
 
   let emerg = myTurn && timeLeft < 8000;
   if (!rang && emerg) {
