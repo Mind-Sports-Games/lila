@@ -40,9 +40,6 @@ The structure of a CSS module is as follows:
     - forum.dark.scss # generated
     - forum.transp.scss # generated
 
-commonJS
-ES Modules :
-
-- chessground
-- stratops
-  iife : Immediately Invoked Function Expression
+alternatively, how to try having a fresh new install (for example if you target a branch instead of a tag ?) :
+- rm -rf node_modules pnpm-lock.yaml && pnpm store prune
+- pnpm i

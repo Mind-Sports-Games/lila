@@ -48,6 +48,7 @@
     "format": "prettier --write --log-level warn .",
     "check-format": "prettier --check --log-level warn .",
     "watch-format": "onchange \"**/*\" -- prettier --write --log-level warn {{changed}}",
-    "lint": "eslint . --ext .ts"
+    "lint": "eslint . --ext .ts",
+    "postinstall": "cat ./public/javascripts/vendor/cash.min.js ./ui/site/dep/powertip.min.js ./ui/site/dep/howler.min.js ./ui/site/dep/mousetrap.min.js > ./public/compiled/deps.min.js"
   }
 }

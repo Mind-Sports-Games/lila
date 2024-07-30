@@ -28,7 +28,7 @@ importers:
         version: https://codeload.github.com/lichess-org/ab-stub/tar.gz/94236bf34dbc9c05daf50f4c9842d859b9142be0
       chessground:
         specifier: git+ssh://git@github.com:Mind-Sports-Games/chessground.git#pla-875-improve-build-of-chessground
-        version: https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/dafdecd198acac17a66e95d03c1cdb47c1a7437c
+        version: https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/060baf9c0ff09dded2d7418473d1e882d4a5a0ad
       eslint:
         specifier: ^8.57.0
         version: 8.57.0
@@ -1647,9 +1647,10 @@ packages:
     resolution: {tarball: https://codeload.github.com/ornicar/chess.js/tar.gz/ad0709c0b07773d9d0da8e4605a9a2a28f00d249}
     version: 0.10.2
 
-  chessground@https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/dafdecd198acac17a66e95d03c1cdb47c1a7437c:
-    resolution: {tarball: https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/dafdecd198acac17a66e95d03c1cdb47c1a7437c}
+  chessground@https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/060baf9c0ff09dded2d7418473d1e882d4a5a0ad:
+    resolution: {tarball: https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/060baf9c0ff09dded2d7418473d1e882d4a5a0ad}
     version: 7.11.1-pstrat2.48
+    engines: {node: '>=20', pnpm: ^9}
 
   chokidar@3.6.0:
     resolution: {integrity: sha512-7VT13fmjotKpGipCW9JEQAusEPE+Ei8nl6/g4FBAmIm0GOOLMua9NDDo/DWp0ZAxCr3cPq5ZpBqmPAQgDda2Pw==}
@@ -3651,7 +3652,7 @@ snapshots:
 
   chess.js@https://codeload.github.com/ornicar/chess.js/tar.gz/ad0709c0b07773d9d0da8e4605a9a2a28f00d249: {}
 
-  chessground@https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/dafdecd198acac17a66e95d03c1cdb47c1a7437c:
+  chessground@https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/060baf9c0ff09dded2d7418473d1e882d4a5a0ad:
     dependencies:
       '@types/node': 20.12.2
       '@typescript-eslint/eslint-plugin': 7.18.0(@typescript-eslint/parser@7.18.0(eslint@8.57.0)(typescript@5.5.4))(eslint@8.57.0)(typescript@5.5.4)
