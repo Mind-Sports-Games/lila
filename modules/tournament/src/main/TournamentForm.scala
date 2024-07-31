@@ -347,7 +347,7 @@ private[tournament] case class TournamentSetup(
         minutes = if (isMedley) medleyDuration else minutes,
         mode = realMode,
         handicapped = handicaps.handicapped.has(true),
-        inputPlayerRatings = handicaps.inputPlayerRatings,
+        inputPlayerRatings = if (handicaps.handicapped.has(true)) handicaps.inputPlayerRatings else None,
         variant = newVariant,
         medleyVariantsAndIntervals =
           if (
@@ -386,8 +386,9 @@ private[tournament] case class TournamentSetup(
         minutes = minutes,
         mode = if (rated.isDefined) realMode else old.mode,
         handicapped = handicaps.handicapped | old.handicapped,
-        inputPlayerRatings =
-          handicaps.inputPlayerRatings.fold(old.inputPlayerRatings)(_.some.filter(_.nonEmpty)),
+        inputPlayerRatings = if (handicaps.handicapped.has(true)) {
+          handicaps.inputPlayerRatings.fold(old.inputPlayerRatings)(_.some.filter(_.nonEmpty))
+        } else None,
         variant = newVariant,
         startsAt = startDate | old.startsAt,
         password = password.fold(old.password)(_.some.filter(_.nonEmpty)),

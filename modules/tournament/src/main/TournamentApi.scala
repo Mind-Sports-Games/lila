@@ -114,11 +114,13 @@ final class TournamentApi(
 
   def update(old: Tournament, data: TournamentSetup, leaderTeams: List[LeaderTeam]): Fu[Tournament] = {
     val tour = postUpdate(old, data, data updateAll old, leaderTeams)
+    processHandicappedChanges(tour, old)
     tournamentRepo update tour inject tour
   }
 
   def apiUpdate(old: Tournament, data: TournamentSetup, leaderTeams: List[LeaderTeam]): Fu[Tournament] = {
     val tour = postUpdate(old, data, data updatePresent old, leaderTeams)
+    processHandicappedChanges(tour, old)
     tournamentRepo update tour inject tour
   }
 
@@ -134,6 +136,26 @@ final class TournamentApi(
         .copy(teamMember = old.conditions.teamMember), // can't change that
       mode = if (tour.position.isDefined) strategygames.Mode.Casual else tour.mode
     )
+
+  private def processHandicappedChanges(tour: Tournament, old: Tournament): Funit = {
+    if (
+      (tour.handicapped && tour.inputPlayerRatings != old.inputPlayerRatings) ||
+      (!tour.handicapped && old.handicapped)
+    ) {
+      updateAllPlayersInputRating(tour) >>- socket.reload(tour.id) >>- publish()
+    } else { funit }
+  }
+
+  private def updateAllPlayersInputRating(tour: Tournament): Funit = {
+    playerRepo.unsetInputRating(tour.id) >>
+      playerRepo.allPlayersbyTour(tour.id).flatMap { players =>
+        players
+          .map(_.userId)
+          .map(updatePlayer(tour, tour.variant, None))
+          .sequenceFu
+          .void
+      }
+  }
 
   def teamBattleUpdate(
       tour: Tournament,
@@ -563,6 +585,7 @@ final class TournamentApi(
             score = sheet.total,
             fire = tour.streakable && sheet.onFire,
             rating = perf.fold(player.rating)(_.intRating),
+            inputRating = getInputRating(userId, tour.inputPlayerRatings),
             provisional = perf.fold(player.provisional)(_.provisional),
             performance = {
               for {
