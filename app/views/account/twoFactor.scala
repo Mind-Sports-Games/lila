@@ -20,7 +20,7 @@ object twoFactor {
       title = s"${u.username} - ${twoFactorAuth.txt()}",
       active = "twofactor",
       evenMoreJs = frag(
-        jsAt2("javascripts/vendor/qrcode.min.js"),
+        jsAtCJS("javascripts/vendor/qrcode.min.js"),
         jsTag("twofactor.form.js")
       )
     ) {
