@@ -27,11 +27,11 @@ object Handicaps {
       _.trim.toLowerCase.split(' ').map(_.trim) match {
         case Array(u, r) =>
           r match {
-            case psRating(grade) if grade.toInt > 600 && grade.toInt < 2900 =>
+            case psRating(grade) if grade.toInt >= 600 && grade.toInt <= 2900 =>
               Map(u -> r.toInt)
-            case goKyuRating(grade) if grade.toInt > 0 && grade.toInt < 60 =>
+            case goKyuRating(grade) if grade.toInt > 0 && grade.toInt <= 60 =>
               Map(u -> convertGoRating(grade.toInt, KyuRating))
-            case goDanRating(grade) if grade.toInt > 0 && grade.toInt < 8 =>
+            case goDanRating(grade) if grade.toInt > 0 && grade.toInt <= 7 =>
               Map(u -> convertGoRating(grade.toInt, DanRating))
             case _ => None
           }
