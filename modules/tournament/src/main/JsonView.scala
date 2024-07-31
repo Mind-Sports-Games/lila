@@ -314,9 +314,9 @@ final class JsonView(
       val light = lightUserApi sync rp.player.userId
       Json
         .obj(
-          "rank"   -> rp.rank,
-          "name"   -> light.fold(rp.player.userId)(_.name),
-          "rating" -> rp.player.rating,
+          "rank"        -> rp.rank,
+          "name"        -> light.fold(rp.player.userId)(_.name),
+          "rating"      -> rp.player.rating,
           "inputRating" -> rp.player.inputRating
         )
         .add("title" -> light.flatMap(_.title))
@@ -542,6 +542,7 @@ object JsonView {
         )
         .add("title" -> user.title)
         .add("performance" -> player.performanceOption)
+        .add("inputRating" -> player.inputRating)
         .add("team" -> player.team)
   }
 

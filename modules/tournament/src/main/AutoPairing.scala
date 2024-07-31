@@ -35,7 +35,8 @@ final class AutoPairing(
                 .byName(variant.gameLogic, "From Position")
                 .getOrElse(Variant.orDefault(variant.gameLogic, 3))
           },
-          if (tour.handicapped) Handicaps.startingFen(variant.some, player1.rating, player2.rating)
+          if (tour.handicapped)
+            Handicaps.startingFen(variant.some, player1.actualRating, player2.actualRating)
           else tour.position
         ) pipe { g =>
           val turns = g.player.fold(0, 1)
