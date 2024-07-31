@@ -48,7 +48,7 @@ export default function (ctrl: TournamentController): VNode {
       ? Math.round(
           data.pairings.reduce(function (a, b) {
             return a + (b.op.inputRating ?? b.op.rating);
-          }, 0) / pairingsLen
+          }, 0) / pairingsLen,
         )
       : undefined;
   return h(

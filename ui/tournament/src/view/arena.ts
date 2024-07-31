@@ -100,7 +100,7 @@ function podiumPosition(
   berserkable: any,
   isMedley: boolean,
   isHandicapped: boolean,
-  trans: Trans
+  trans: Trans,
 ): VNode | undefined {
   if (p)
     return h('div.' + pos, [
@@ -122,7 +122,7 @@ export function podium(ctrl: TournamentController) {
       ctrl.data.berserkable,
       ctrl.data.medley,
       ctrl.data.isHandicapped,
-      ctrl.trans
+      ctrl.trans,
     ),
     podiumPosition(
       p[0],
@@ -131,7 +131,7 @@ export function podium(ctrl: TournamentController) {
       ctrl.data.berserkable,
       ctrl.data.medley,
       ctrl.data.isHandicapped,
-      ctrl.trans
+      ctrl.trans,
     ),
     podiumPosition(
       p[2],
@@ -140,7 +140,7 @@ export function podium(ctrl: TournamentController) {
       ctrl.data.berserkable,
       ctrl.data.medley,
       ctrl.data.isHandicapped,
-      ctrl.trans
+      ctrl.trans,
     ),
   ]);
 }
