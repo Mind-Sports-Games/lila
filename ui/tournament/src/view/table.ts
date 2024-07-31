@@ -75,7 +75,7 @@ function featured(game: FeaturedGame, withRating: boolean): VNode {
 }
 
 function duelPlayerMeta(p: DuelPlayer) {
-  return [h('em.rank', '#' + p.k), p.t ? h('em.utitle', p.t) : null, h('em.rating', '' + p.r)];
+  return [h('em.rank', '#' + p.k), p.t ? h('em.utitle', p.t) : null, h('em.rating', '' + p.r + (p.i ? '*' : ''))];
 }
 
 function renderDuel(battle?: TeamBattle, duelTeams?: DuelTeams) {

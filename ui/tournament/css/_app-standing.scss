@@ -31,11 +31,23 @@
   .user-link .rating {
     font-style: italic;
     font-size: 0.8em;
+    &.unused {
+      text-decoration: line-through;
+    }
+    &.input {
+      padding-left: 5px;
+    }
   }
 
   tr.long .user-link .rating {
     display: block;
     padding-left: 0px;
+    &.unused {
+      text-decoration: line-through;
+    }
+    &.input {
+      padding-left: 5px;
+    }
   }
 
   tr {

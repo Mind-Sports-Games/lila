@@ -11,6 +11,7 @@ private[tournament] case class Player(
     userId: User.ID,
     rating: Int,
     provisional: Boolean,
+    inputRating: Option[Int] = None,
     isBot: Boolean = false,
     withdraw: Boolean = false,
     disqualified: Boolean = false,
@@ -29,10 +30,12 @@ private[tournament] case class Player(
   def is(user: User): Boolean    = is(user.id)
   def is(other: Player): Boolean = is(other.userId)
 
+  def actualRating = inputRating.getOrElse(rating)
+
   def doWithdraw = copy(withdraw = true)
   def unWithdraw = copy(withdraw = false)
 
-  def magicScore = score * 100000 + (if (playedGames) 1 else 0) * 10000 + (performanceOption | rating)
+  def magicScore = score * 100000 + (if (playedGames) 1 else 0) * 10000 + (performanceOption | actualRating)
 
   def performanceOption = performance > 0 option performance
 }
@@ -49,7 +52,8 @@ private[tournament] object Player {
       tourId: Tournament.ID,
       user: User,
       perfType: PerfType,
-      team: Option[TeamID]
+      team: Option[TeamID],
+      inputRating: Option[Int]
   ): Player =
     new Player(
       _id = lila.common.ThreadLocalRandom.nextString(8),
@@ -57,6 +61,7 @@ private[tournament] object Player {
       userId = user.id,
       rating = user.perfs(perfType).intRating,
       provisional = user.perfs(perfType).provisional,
+      inputRating = inputRating,
       isBot = user.isBot,
       team = team
     )

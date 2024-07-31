@@ -82,7 +82,7 @@ case class RankedPlayer(rank: Int, player: Player) {
   def withPlayerIndexHistory(getHistory: Player.ID => PlayerIndexHistory) =
     RankedPlayerWithPlayerIndexHistory(rank, player, getHistory(player.id))
 
-  override def toString = s"$rank. ${player.userId}[${player.rating}]"
+  override def toString = s"$rank. ${player.userId}[${player.actualRating}]"
 }
 
 object RankedPlayer {
@@ -93,11 +93,15 @@ object RankedPlayer {
     }
 }
 
-case class RankedPlayerWithPlayerIndexHistory(rank: Int, player: Player, playerIndexHistory: PlayerIndexHistory) {
+case class RankedPlayerWithPlayerIndexHistory(
+    rank: Int,
+    player: Player,
+    playerIndexHistory: PlayerIndexHistory
+) {
 
   def is(other: RankedPlayer) = player is other.player
 
-  override def toString = s"$rank. ${player.userId}[${player.rating}]"
+  override def toString = s"$rank. ${player.userId}[${player.actualRating}]"
 }
 
 case class FeaturedGame(

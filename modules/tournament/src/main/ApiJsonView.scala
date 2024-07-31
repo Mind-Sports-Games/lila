@@ -40,20 +40,21 @@ final class ApiJsonView(lightUserApi: LightUserApi)(implicit ec: scala.concurren
   private def baseJson(tour: Tournament)(implicit lang: Lang): JsObject =
     Json
       .obj(
-        "id"         -> tour.id,
-        "createdBy"  -> tour.createdBy,
-        "system"     -> "arena", // BC
-        "minutes"    -> tour.minutes,
-        "clock"      -> tour.clock,
-        "rated"      -> tour.mode.rated,
-        "fullName"   -> tour.name(),
-        "nbPlayers"  -> tour.nbPlayers,
-        "variant"    -> variantJson(tour.variant),
-        "startsAt"   -> tour.startsAt,
-        "finishesAt" -> tour.finishesAt,
-        "status"     -> tour.status.id,
-        "perf"       -> perfJson(tour.perfType),
-        "isMedley"   -> tour.isMedley
+        "id"          -> tour.id,
+        "createdBy"   -> tour.createdBy,
+        "system"      -> "arena", // BC
+        "minutes"     -> tour.minutes,
+        "clock"       -> tour.clock,
+        "rated"       -> tour.mode.rated,
+        "fullName"    -> tour.name(),
+        "nbPlayers"   -> tour.nbPlayers,
+        "variant"     -> variantJson(tour.variant),
+        "startsAt"    -> tour.startsAt,
+        "finishesAt"  -> tour.finishesAt,
+        "status"      -> tour.status.id,
+        "perf"        -> perfJson(tour.perfType),
+        "isMedley"    -> tour.isMedley,
+        "handicapped" -> tour.handicapped
       )
       .add("secondsToStart", tour.secondsToStart.some.filter(0 <))
       .add("hasMaxRating", tour.conditions.maxRating.isDefined)

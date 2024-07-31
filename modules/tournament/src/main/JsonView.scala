@@ -139,6 +139,7 @@ final class JsonView(
           .add("spotlight" -> tour.spotlight)
           .add("berserkable" -> tour.berserkable)
           .add("statusScoring" -> tour.statusScoring)
+          .add("isHandicapped" -> tour.handicapped)
           .add("position" -> tour.position.ifTrue(full).map(positionJson))
           .add("verdicts" -> verdicts.map(Condition.JSONHandlers.verdictsFor(_, lang)))
           .add("schedule" -> tour.schedule.map(scheduleJson))
@@ -215,6 +216,7 @@ final class JsonView(
             .add("performance" -> player.performanceOption)
             .add("rank" -> ranking.get(user.id).map(1 +))
             .add("provisional" -> player.provisional)
+            .add("inputRating" -> player.inputRating)
             .add("withdraw" -> player.withdraw)
             .add("disqualified" -> player.disqualified)
             .add("team" -> player.team),
@@ -224,7 +226,12 @@ final class JsonView(
                 "id"          -> pov.gameId,
                 "playerIndex" -> pov.playerIndex.name,
                 "playerColor" -> tour.variant.playerColors(pov.playerIndex),
-                "op"          -> gameUserJson(pov.opponent.userId, pov.opponent.rating, pov.opponent.berserk),
+                "op" -> gameUserJson(
+                  pov.opponent.userId,
+                  pov.opponent.rating,
+                  pov.opponent.isInputRating,
+                  pov.opponent.berserk
+                ),
                 "win"         -> score.flatMap(_.isWin),
                 "status"      -> pov.game.status.id,
                 "score"       -> score.map(sheetScoreJson),
@@ -307,9 +314,10 @@ final class JsonView(
       val light = lightUserApi sync rp.player.userId
       Json
         .obj(
-          "rank"   -> rp.rank,
-          "name"   -> light.fold(rp.player.userId)(_.name),
-          "rating" -> rp.player.rating
+          "rank"        -> rp.rank,
+          "name"        -> light.fold(rp.player.userId)(_.name),
+          "rating"      -> rp.player.rating,
+          "inputRating" -> rp.player.inputRating
         )
         .add("title" -> light.flatMap(_.title))
         .add("berserk" -> p.berserk)
@@ -354,10 +362,16 @@ final class JsonView(
       )
       .add("pauseDelay", delay.map(_.seconds))
 
-  private def gameUserJson(userId: Option[String], rating: Option[Int], berserk: Boolean): JsObject = {
+  private def gameUserJson(
+      userId: Option[String],
+      rating: Option[Int],
+      isInputRating: Boolean,
+      berserk: Boolean
+  ): JsObject = {
     val light = userId flatMap lightUserApi.sync
     Json
       .obj("rating" -> rating)
+      .add("isInputRating" -> isInputRating)
       .add("name" -> light.map(_.name))
       .add("title" -> light.flatMap(_.title))
       .add("berserk" -> berserk)
@@ -401,7 +415,8 @@ final class JsonView(
         .obj(
           "n" -> u.fold(p.name.value)(_.name),
           "r" -> p.rating.value,
-          "k" -> p.rank.value
+          "k" -> p.rank.value,
+          "i" -> p.isInputRating
         )
         .add("t" -> u.flatMap(_.title))
     }
@@ -527,6 +542,7 @@ object JsonView {
         )
         .add("title" -> user.title)
         .add("performance" -> player.performanceOption)
+        .add("inputRating" -> player.inputRating)
         .add("team" -> player.team)
   }
 
@@ -556,6 +572,7 @@ object JsonView {
         .add("country" -> light.flatMap(_.country))
         .add("title" -> light.flatMap(_.title))
         .add("provisional" -> p.provisional)
+        .add("inputRating" -> p.inputRating)
         .add("withdraw" -> p.withdraw)
         .add("disqualified" -> p.disqualified)
         .add("team" -> p.team)

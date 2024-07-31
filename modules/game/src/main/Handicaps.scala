@@ -22,6 +22,23 @@ object Handicaps {
     }
   }
 
+  def playerInputRatings(inputPlayerRatingsInput: String): Map[String, Int] =
+    inputPlayerRatingsInput.linesIterator.flatMap {
+      _.trim.toLowerCase.split(' ').map(_.trim) match {
+        case Array(u, r) =>
+          r match {
+            case psRating(grade) if grade.toInt > 600 && grade.toInt < 2900 =>
+              Map(u -> r.toInt)
+            case goKyuRating(grade) if grade.toInt > 0 && grade.toInt < 60 =>
+              Map(u -> convertGoRating(grade.toInt, KyuRating))
+            case goDanRating(grade) if grade.toInt > 0 && grade.toInt < 8 =>
+              Map(u -> convertGoRating(grade.toInt, DanRating))
+            case _ => None
+          }
+        case _ => None
+      }
+    }.toMap
+
   private def calcGoHandicap(size: Int, p1Rating: Int, p2Rating: Int): GoHandicap = {
     val ratingDiff = Math.abs(p1Rating - p2Rating)
     val rankDiff   = goRankDiff(Math.min(p1Rating, p2Rating), ratingDiff)
@@ -73,18 +90,25 @@ object Handicaps {
     computeRankDiff(rating, diff, 0)
   }
 
-  def convertGoRating(goRating: String): Int =
-    goRating match {
-      case x if x.matches("""\d+k""") =>
-        x.dropRight(1).toInt match {
+  private def convertGoRating(goRating: Int, ratingType: GoRatingType): Int =
+    ratingType match {
+      case KyuRating =>
+        goRating match {
           case y if y > 18 => Math.max(1593 - y * 33, 600) //lowest rating is 600 on site
           case y if y > 4  => 1900 - y * 50
           case y if y > 0  => 2100 - y * 100
-          case _           => 1500                         // our default but shouldn't get here
+          case _           => 1500
         }
-      case x if x.matches("""\dd""") => Math.min(Math.max(x.dropRight(1).toInt * 100 + 2000, 2100), 2700)
+      case DanRating => Math.min(Math.max(goRating * 100 + 2000, 2100), 2700)
     }
 
+  val goKyuRating = s"^([0-9]+)k$$".r
+  val goDanRating = s"^([1-7]+)d$$".r
+  val psRating    = s"^([0-9]+)$$".r
 }
 
 case class GoHandicap(komi: Int, stones: Int) //komi is 10x to be int
+
+sealed trait GoRatingType
+case object KyuRating extends GoRatingType
+case object DanRating extends GoRatingType
