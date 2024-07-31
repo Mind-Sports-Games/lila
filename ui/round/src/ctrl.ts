@@ -609,7 +609,11 @@ export default class RoundController {
     }
     this.setTitle();
     if (!this.replaying()) {
-      this.ply++;
+      if (o.uci === 'undo') {
+        this.ply--;
+      } else {
+        this.ply++;
+      }
       this.turnCount = o.turnCount;
       const variantCanStillHavePieceAtActionKey = ['togyzkumalak', 'backgammon', 'nackgammon'];
       const allowChessgroundAction = !(
@@ -722,7 +726,11 @@ export default class RoundController {
       check: o.check,
       crazy: o.crazyhouse,
     };
-    d.steps.push(step);
+    if (step.uci === 'undo') {
+      d.steps.pop();
+    } else {
+      d.steps.push(step);
+    }
     this.justDropped = undefined;
     this.justCaptured = undefined;
     game.setOnGame(d, playedPlayerIndex, true);

@@ -31,7 +31,7 @@ export function renderClock(ctrl: RoundController, player: game.Player, position
       ['monster', 'amazons'].includes(ctrl.data.game.variant.key) &&
       isClockRunning;
 
-  //TODO in multication render clock gets called as the move is played while it's sent, and then during apiAction update, the
+  //TODO in multiaction render clock gets called as the move is played while it's sent, and then during apiAction update, the
   // state of ctrl.data is different here and therefore hard to obtain the correct class in all states.
   // This causes the green/orange flicker on the clock. The delayClass is an attempt to fix this which is only paritally working.
   const delayClass =
@@ -57,19 +57,7 @@ export function renderClock(ctrl: RoundController, player: game.Player, position
       showDelayTime,
       clock.opts.nvui
     );
-    const cl = els.time.classList;
-    if (clock.isInDelay(player.playerIndex) && isRunning) {
-      cl.remove('notindelay');
-      cl.add('indelay');
-    } else if (
-      clock.isNotInDelay(player.playerIndex) &&
-      (cl.contains('indelay') || !cl.contains('notindelay')) &&
-      isRunning
-    ) {
-      clock.emergSound.lowtime();
-      cl.remove('indelay');
-      cl.add('notindelay');
-    } else if (cl.contains('notindelay') && !isRunning) cl.remove('notindelay');
+    updateClassList(els.time.classList, clock, player.playerIndex, isRunning, millis);
   };
   const timeHook: Hooks = {
     insert: vnode => update(vnode.elm as HTMLElement),
@@ -210,8 +198,7 @@ function showBar(ctrl: RoundController, playerIndex: PlayerIndex) {
 
 export function updateElements(clock: ClockController, els: ClockElements, millis: Millis, playerIndex: PlayerIndex) {
   const delayMillis = clock.delayMillisOf(playerIndex, playerIndex),
-    showDelayTime = clock.countdownDelay !== undefined && !clock.goneBerserk[playerIndex],
-    isRunning = playerIndex === clock.times.activePlayerIndex;
+    showDelayTime = clock.countdownDelay !== undefined && !clock.goneBerserk[playerIndex];
   if (els.time) {
     els.time.innerHTML = formatClockTime(
       millis,
@@ -221,15 +208,7 @@ export function updateElements(clock: ClockController, els: ClockElements, milli
       showDelayTime,
       clock.opts.nvui
     );
-    const cl = els.time.classList;
-    if (clock.isInDelay(playerIndex) && isRunning) {
-      cl.remove('notindelay');
-      cl.add('indelay');
-    } else if (clock.isNotInDelay(playerIndex) && (cl.contains('indelay') || !cl.contains('notindelay')) && isRunning) {
-      clock.emergSound.lowtime();
-      cl.remove('indelay');
-      cl.add('notindelay');
-    } else if (cl.contains('notindelay') && !isRunning) cl.remove('notindelay');
+    updateClassList(els.time.classList, clock, playerIndex, playerIndex === clock.times.activePlayerIndex, millis);
   }
   if (els.bar) els.bar.style.transform = 'scale(' + clock.timeRatio(millis, playerIndex) + ',1)';
   if (els.clock) {
@@ -237,6 +216,23 @@ export function updateElements(clock: ClockController, els: ClockElements, milli
     if (isEmerg(millis, clock, playerIndex)) cl.add('emerg');
     else if (cl.contains('emerg')) cl.remove('emerg');
   }
+}
+
+function updateClassList(
+  cl: DOMTokenList,
+  clock: ClockController,
+  playerIndex: PlayerIndex,
+  isRunning: boolean,
+  millis: Millis
+) {
+  if (clock.isInDelay(playerIndex) && isRunning) {
+    cl.remove('notindelay');
+    cl.add('indelay');
+  } else if (clock.isNotInDelay(playerIndex) && (cl.contains('indelay') || !cl.contains('notindelay')) && isRunning) {
+    if (isEmerg(millis, clock, playerIndex)) clock.emergSound.lowtime();
+    cl.remove('indelay');
+    cl.add('notindelay');
+  } else if (cl.contains('notindelay') && !isRunning) cl.remove('notindelay');
 }
 
 function showBerserk(ctrl: RoundController, playerIndex: PlayerIndex): boolean {

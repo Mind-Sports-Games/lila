@@ -7,6 +7,7 @@ import strategygames.opening.{ FullOpening, FullOpeningDB }
 import strategygames.chess.{ Castles, CheckCount }
 import strategygames.chess.format.{ Uci => ChessUci }
 import strategygames.{
+  Action,
   ActionStrs,
   Centis,
   ByoyomiClock,
@@ -26,7 +27,6 @@ import strategygames.{
   EndTurn,
   Undo,
   SelectSquares,
-  Action,
   Pos,
   Speed,
   Status,
@@ -259,7 +259,10 @@ case class Game(
           } :+ Centis(nowCentis - updatedAt.getCentis).nonNeg
         }
       },
-      loadClockHistory = _ => newClockHistory,
+      loadClockHistory = action match {
+        case _: Undo => (_ => clockHistory.map(_.update(turnPlayerIndex, _.dropRight(1))))
+        case _       => (_ => newClockHistory)
+      },
       status = game.situation.status | status,
       updatedAt = DateTime.now,
       turnAt = if (game.hasJustSwitchedTurns) DateTime.now else turnAt,

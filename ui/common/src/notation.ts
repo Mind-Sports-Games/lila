@@ -536,31 +536,11 @@ function numberofCapturedPiecesOfPlayer(player: 'p1' | 'p2', fen: string): numbe
   } else return 0;
 }
 
-function removeUndosFromNotation(actionNotations: string[]): string[] {
-  const withoutUndos: string[] = [];
-  let undoCount = 0;
-  let index = actionNotations.length - 1;
-  while (index >= 0) {
-    if (actionNotations[index] == 'undo') {
-      undoCount += 1;
-      index -= 1;
-    } else if (undoCount > 0) {
-      undoCount -= 1;
-      index -= 1;
-    } else {
-      withoutUndos.push(actionNotations[index]);
-      index -= 1;
-    }
-  }
-  return withoutUndos.reverse();
-}
-
 export function combinedNotationForBackgammonActions(actionNotations: string[]): string {
   const actions: string[] = [];
   const captures: boolean[] = [];
   const occurances: number[] = [];
-  const actionNotationsWithoutUndos: string[] = removeUndosFromNotation(actionNotations);
-  for (const notation of actionNotationsWithoutUndos) {
+  for (const notation of actionNotations) {
     if (notation.split(' ').length === 2) {
       const movePart = notation.split(' ')[1].replace('*', '');
       const isCapture = notation.split(' ')[1].includes('*');
@@ -577,9 +557,9 @@ export function combinedNotationForBackgammonActions(actionNotations: string[]):
           captures.push(false);
         }
       }
-    } else if (notation === '(no-play)' && actionNotationsWithoutUndos.length === 2) {
-      return actionNotationsWithoutUndos[0].split(' ')[0] + ' ' + notation;
-    } else if (notation === '(no-play)' && actionNotationsWithoutUndos.length === 1) {
+    } else if (notation === '(no-play)' && actionNotations.length === 2) {
+      return actionNotations[0].split(' ')[0] + ' ' + notation;
+    } else if (notation === '(no-play)' && actionNotations.length === 1) {
       return '...';
     }
   }
