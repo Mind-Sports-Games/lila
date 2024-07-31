@@ -40,8 +40,6 @@ async function parseModule(moduleDir: string): Promise<PlaystrategyModule> {
   };
 
   if ('playstrategy' in pkg && 'bundles' in pkg.playstrategy) {
-    // mod.bundle = Object.entries(pkg.playstrategy.bundles).map(x => ({ input: x[0], output: x[1] as string }));
-    // return mod;
     if (typeof pkg.playstrategy.bundles === 'string') mod.bundles = [pkg.playstrategy.bundles];
     else mod.bundles = pkg.playstrategy.bundles as string[];
   }

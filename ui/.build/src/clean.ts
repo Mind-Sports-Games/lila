@@ -15,7 +15,7 @@ const allGlobs = [
   'ui/.build/dist/css',
   'ui/*/dist',
   'ui/*/tsconfig.tsbuildinfo',
-  'public/compiled/**/*',
+  'public/compiled',
   'public/npm',
   'public/css',
 ];

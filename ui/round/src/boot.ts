@@ -6,7 +6,6 @@ import { TourPlayer } from 'game';
 import { tourStandingCtrl, TourStandingCtrl } from './tourStanding';
 
 export default function PlayStrategyRound(opts: RoundOpts): void {
-  console.log('VFR2');
   const element = document.querySelector('.round__app') as HTMLElement,
     data: RoundData = opts.data;
   playstrategy.pageVariant = data.game.variant.key;
@@ -90,4 +89,3 @@ export default function PlayStrategyRound(opts: RoundOpts): void {
 }
 
 (window as any).PlayStrategyRound = PlayStrategyRound; // esbuild
-console.log('PlayStrategyRound was booted efg and added to window');

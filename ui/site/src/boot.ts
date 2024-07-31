@@ -7,7 +7,6 @@ import moduleLaunchers from './component/module-launchers';
 import OnlineFriends from './component/friends';
 import powertip from './component/powertip';
 import pubsub from './component/pubsub';
-import serviceWorker from './component/serviceWorker';
 import StrongSocket from './component/socket';
 import topBar from './component/top-bar';
 import watchers from './component/watchers';
@@ -16,8 +15,6 @@ import { requestIdleCallback } from './component/functions';
 import { userComplete } from './component/assets';
 
 export function boot() {
-  console.log('playstrategy loaded from site/boot !!!...');
-
   moduleLaunchers();
 
   requestAnimationFrame(() => {
@@ -149,7 +146,7 @@ export function boot() {
     const pageAnnounce = document.body.getAttribute('data-announce');
     if (pageAnnounce) announce(JSON.parse(pageAnnounce));
 
-    serviceWorker();
+    // serviceWorker();
 
     // socket default receive handlers
     pubsub.on('socket.in.redirect', (d: RedirectTo) => {

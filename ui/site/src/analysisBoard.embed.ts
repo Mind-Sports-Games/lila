@@ -9,8 +9,6 @@ window.Draughtsground = Draughtsground;
 export default function PlayStrategyAnalyseEmbed(opts: any) {
   document.body.classList.toggle('supports-max-content', !!window.chrome);
 
-  console.log('PlayStrategyAnalyseEmbed invoked :)');
-
   window.PlayStrategyAnalyse({
     ...opts,
     socketSend: () => {},

@@ -89,4 +89,3 @@ export default function PlayStrategyDraughtsRound(opts: RoundOpts): void {
 }
 
 (window as any).PlayStrategyDraughtsRound = PlayStrategyDraughtsRound; // esbuild
-console.log('PlayStrategyDraughtsRound was booted and added to window');

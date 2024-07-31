@@ -24,7 +24,6 @@ export async function esbuild(tsc?: Promise<void>): Promise<void> {
   }
 
   const entryPoints = [];
-
   for (const mod of env.building) {
     preModule(mod);
     for (const bundle of mod.bundles ?? []) {
@@ -32,22 +31,26 @@ export async function esbuild(tsc?: Promise<void>): Promise<void> {
     }
   }
   entryPoints.sort();
-
   const ctx = await es.context({
+    define: {
+      __info__: JSON.stringify({
+        date: new Date(new Date().toUTCString()).toISOString().split('.')[0] + '+00:00',
+        commit: cps.execSync('git rev-parse -q HEAD', { encoding: 'utf-8' }).trim(),
+        message: cps.execSync('git log -1 --pretty=%s', { encoding: 'utf-8' }).trim(),
+      }),
+    },
     entryPoints,
     bundle: true,
     metafile: true,
     treeShaking: true,
-    // splitting: false, // Splitting currently only works with the "esm" format - https://esbuild.github.io/api/#splitting
-    // format: 'iife', // was "esm"
-    splitting: true,
-    format: 'esm',
+    splitting: true, // Splitting currently only works with the "esm" format - https://esbuild.github.io/api/#splitting
+    format: 'esm', // 'iife' immediately invoked function expression
     target: 'es2018',
     logLevel: 'silent',
     sourcemap: !env.prod,
     minify: env.prod,
     outdir: env.jsDir,
-    entryNames: '[name]',
+    entryNames: '[name]', // was '[name].[hash]', with manifest
     // chunkNames: 'common.[hash]',
     plugins: [onEndPlugin],
   });
@@ -66,7 +69,7 @@ const onEndPlugin = {
     build.onEnd(async (result: es.BuildResult) => {
       for (const err of result.errors) esbuildMessage(err, true);
       for (const warn of result.warnings) esbuildMessage(warn);
-      // if (result.errors.length === 0) await jsManifest(result.metafile!);
+      if (result.errors.length === 0) await jsManifest(result.metafile!);
       env.done(result.errors.length, 'esbuild');
     });
   },

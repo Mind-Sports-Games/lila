@@ -37,7 +37,6 @@ export default function (element: HTMLElement, ctrl: AnalyseCtrl) {
     });
     playstrategy.pubsub.on('analysis.change', (fen: Fen, _, mainlinePly: Ply | false) => {
       const $chart = $('#acpl-chart');
-      console.log(fen, inputFen);
       if (fen && fen !== lastFen) {
         inputFen.value = fen;
         lastFen = fen;

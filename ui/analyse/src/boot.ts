@@ -2,7 +2,6 @@ import { AnalyseOpts } from './interfaces';
 import { PlayStrategyAnalyse } from './analysisBoard';
 
 export default function PlayStrategyAnalyseBoot(cfg: AnalyseOpts) {
-  console.log('PlayStrategyAnalyseBoot invoked :)');
   playstrategy.socket = new playstrategy.StrongSocket(cfg.data.url.socket, cfg.data.player.version, {
     params: {
       userTv: cfg.data.userTv && cfg.data.userTv.id,

@@ -76,7 +76,6 @@ export interface PlaystrategyModule {
   post: string[][]; // post-bundle build steps from package.json scripts
   hasTsconfig?: boolean; // fileExists('tsconfig.json')
   bundles?: string[];
-  // bundles?: LichessBundle[]; // bundle targets from package json
   sync?: Sync[]; // pre-bundle filesystem copies from package json
 }
 
@@ -86,11 +85,6 @@ export interface Sync {
   dest: string;
   mod: PlaystrategyModule;
 }
-
-// export interface LichessBundle {
-//   input: string; // abs path to source
-//   output: string; // abs path to bundle destination
-// }
 
 export const lines = (s: string): string[] => s.split(/[\n\r\f]+/).filter(x => x.trim());
 
