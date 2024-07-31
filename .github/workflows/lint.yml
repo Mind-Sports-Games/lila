@@ -28,11 +28,14 @@ jobs:
       - uses: webfactory/ssh-agent@v0.9.0
         with:
           ssh-private-key: ${{ secrets.MSO_CI_SSH_KEY }}
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - name: Retrieve last code from Github
+        uses: actions/checkout@v4
+      - name: Install Node
+        uses: actions/setup-node@v4
         with:
           node-version: 20
-      - uses: pnpm/action-setup@v4
+      - name: Install PNPM and run pnpm install
+        uses: pnpm/action-setup@v4
         with:
           run_install: |
             - recursive: false

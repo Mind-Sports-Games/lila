@@ -45,24 +45,18 @@ jobs:
       - uses: webfactory/ssh-agent@v0.9.0
         with:
           ssh-private-key: ${{ secrets.MSO_CI_SSH_KEY }}
-      # - run: echo "dir=$(yarn cache dir)" >> $GITHUB_OUTPUT
-      # id: yarn-cache
-      # - uses: actions/cache@v4
-      #   with:
-      #     path: ${{ steps.yarn-cache.outputs.dir }}
-      #     key: ${{ runner.os }}-yarn-${{ hashFiles('yarn.lock') }}
-      #     restore-keys: ${{ runner.os }}-yarn-
-      - uses: actions/setup-node@v4
+      - name: install Node
+        uses: actions/setup-node@v4
         with:
           node-version: 20
-      - uses: pnpm/action-setup@v4
+      - name: Install PNPM and run pnpm install
+        uses: pnpm/action-setup@v4
         with:
           run_install: |
             - recursive: false
               args: [--no-frozen-lockfile, --strict-peer-dependencies]
-      - run: ./ui/build --no-install -p
-      # - run: yarn install --network-concurrency 1
-      # - run: ./ui/build prod
+      - name: build files
+        run: ./ui/build --no-install -p
       - name: Get Time
         id: time
         uses: nanzm/get-time-action@v2.0
