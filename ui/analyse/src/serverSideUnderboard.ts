@@ -91,7 +91,7 @@ export default function (element: HTMLElement, ctrl: AnalyseCtrl) {
     const $panel = $panels.filter('.computer-analysis');
     if (!$('#acpl-chart').length) $panel.html('<div id="acpl-chart"></div>' + (loading ? chartLoader() : ''));
     else if (loading && !$('#acpl-chart-loader').length) $panel.append(chartLoader());
-    playstrategy.loadScriptNotAsModule('javascripts/chart/acpl.js').then(function () {
+    playstrategy.loadScriptCJS('javascripts/chart/acpl.js').then(function () {
       playstrategy.advantageChart!(data, ctrl.trans, $('#acpl-chart')[0] as HTMLElement);
     });
   }

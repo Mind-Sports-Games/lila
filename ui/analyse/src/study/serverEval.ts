@@ -72,7 +72,7 @@ export function view(ctrl: ServerEvalCtrl): VNode {
         ctrl.lastPly(false);
         playstrategy.requestIdleCallback(
           () =>
-            playstrategy.loadScriptNotAsModule('javascripts/chart/acpl.js').then(() => {
+            playstrategy.loadScriptCJS('javascripts/chart/acpl.js').then(() => {
               playstrategy.advantageChart!(ctrl.root.data, ctrl.root.trans, el);
               ctrl.chartEl(el as HighchartsHTMLElement);
             }),

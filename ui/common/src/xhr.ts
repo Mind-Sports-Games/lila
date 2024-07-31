@@ -54,7 +54,7 @@ export const script = (src: string): Promise<void> =>
     document.head.append(el);
   });
 
-export const scriptNotAsModule = (src: string): Promise<void> =>
+export const scriptCJS = (src: string): Promise<void> =>
   new Promise((resolve, reject) => {
     const nonce = document.body.getAttribute('data-nonce'),
       el = document.createElement('script');

@@ -105,9 +105,7 @@ export class ThreadedWasmWorker extends AbstractWorker<ThreadedWasmWorkerOpts> {
         await cache.set(wasmPath, version!, wasmBinary);
       }
 
-      // Load Emscripten module.
-      // await playstrategy.loadScript(this.opts.baseUrl + 'stockfish.js', { version });
-      await playstrategy.loadScriptNotAsModule(this.opts.baseUrl + 'stockfish.js', { version });
+      await playstrategy.loadScriptCJS(this.opts.baseUrl + 'stockfish.js', { version });
 
       const sf = await window[this.opts.module]({
         wasmBinary,

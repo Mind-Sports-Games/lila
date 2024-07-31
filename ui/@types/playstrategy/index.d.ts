@@ -23,7 +23,7 @@ interface PlayStrategy {
   loadCssPath(path: string): void;
   jsModule(name: string): string;
   loadScript(url: string, opts?: AssetUrlOpts): Promise<void>;
-  loadScriptNotAsModule(url: string, opts?: AssetUrlOpts): Promise<void>;
+  loadScriptCJS(url: string, opts?: AssetUrlOpts): Promise<void>;
   loadModule(name: string): Promise<void>;
   hopscotch: any;
   userComplete: () => Promise<UserComplete>;

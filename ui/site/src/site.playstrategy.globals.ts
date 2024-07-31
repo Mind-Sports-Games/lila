@@ -13,7 +13,7 @@ import {
   loadCssPath,
   jsModule,
   loadScript,
-  loadScriptNotAsModule,
+  loadScriptCJS,
   hopscotch,
   userComplete,
   loadModule,
@@ -49,7 +49,7 @@ export default function windowedPlaystrategy() {
   l.loadCssPath = loadCssPath;
   l.jsModule = jsModule;
   l.loadScript = loadScript;
-  l.loadScriptNotAsModule = loadScriptNotAsModule;
+  l.loadScriptCJS = loadScriptCJS;
   l.loadModule = loadModule;
   l.hopscotch = hopscotch;
   l.userComplete = userComplete;

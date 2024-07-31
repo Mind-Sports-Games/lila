@@ -28,8 +28,8 @@ export const loadScript = (url: string, opts: AssetUrlOpts = {}): Promise<void> 
   if (!loadedScript.has(url)) loadedScript.set(url, xhr.script(assetUrl(url, opts)));
   return loadedScript.get(url)!;
 };
-export const loadScriptNotAsModule = (url: string, opts: AssetUrlOpts = {}): Promise<void> => {
-  if (!loadedScript.has(url)) loadedScript.set(url, xhr.scriptNotAsModule(assetUrl(url, opts)));
+export const loadScriptCJS = (url: string, opts: AssetUrlOpts = {}): Promise<void> => {
+  if (!loadedScript.has(url)) loadedScript.set(url, xhr.scriptCJS(assetUrl(url, opts)));
   return loadedScript.get(url)!;
 };
 
