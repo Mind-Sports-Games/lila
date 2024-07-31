@@ -55,7 +55,7 @@ jobs:
           run_install: |
             - recursive: false
               args: [--no-frozen-lockfile, --strict-peer-dependencies]
-      - name: build files
+      - name: Build files
         run: ./ui/build --no-install -p
       - name: Get Time
         id: time
