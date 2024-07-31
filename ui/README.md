@@ -6,7 +6,7 @@ This enters watch mode (automatically rebuilds any client source files when chan
 NOTE - always use hard refresh (google it) or disable caching in the network tab of your browser inspector to pick up fresh changes.
 
 NOTE - since we now use pnpm, it may be useful to know you can run `rm -rf node_modules pnpm-lock.yaml && pnpm store prune` if you want to ensure pnpm tries to solve completely the deps tree with `pnpm i`\
-You can still pass args using `command -- --argName` 
+You can still pass args using `command -- --argName`
 
 Usage examples:
 
@@ -23,10 +23,12 @@ ui/build --no-time # don't log the time\
 ui/build --no-context # don't log the context ([sass], [esbuild], etc)
 
 ## Testing
+
 Lichess uses uses the Vitest testing framework.
 We do not (yet?)
 
 ## CSS
+
 The structure of a CSS module is as follows:
 
 - css/
