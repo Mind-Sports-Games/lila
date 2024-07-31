@@ -1,31 +1,32 @@
-Client-side modules
-Building
-Client builds are performed by the ui/build script. Stick to ui/build -w and leave it running when you can. This automatically rebuilds any client source files when changed and lets you quickly see the results in your browser. NOTE - always use hard refresh (google it) or disable caching in the network tab of your browser inspector to pick up fresh changes.
+## Client-side modules
+
+Client builds are performed by the ui/build script.\
+Stick to `ui/build -rc` and leave it running when you can.\
+This enters watch mode (automatically rebuilds any client source files when changed and lets you quickly see the results in your browser) after cleaning and doing a fresh new install.\
+NOTE - always use hard refresh (google it) or disable caching in the network tab of your browser inspector to pick up fresh changes.
+
+NOTE - since we now use pnpm, it may be useful to know you can run `rm -rf node_modules pnpm-lock.yaml && pnpm store prune` if you want to ensure pnpm tries to solve completely the deps tree with `pnpm i`\
+You can still pass args using `command -- --argName` 
 
 Usage examples:
 
-ui/build # builds all client assets in dev mode
-ui/build -w # builds all client assets and watches for changes
-ui/build -p # builds minified client assets (prod builds)
-ui/build --no-install # no pnpm install (to preserve local links you have set up)
-ui/build analyse site msg # specify modules (don't build everything)
-ui/build -w dasher chart # watch mode but only for given modules
-ui/build --tsc -w # watch mode but type checking only
-ui/build --sass msg notify # build css only for msg and notify modules
-ui/build --no-color # don't use color in logs
-ui/build --no-time # don't log the time
+ui/build # builds all client assets in dev mode\
+ui/build -w # builds all client assets and watches for changes\
+ui/build -p # builds minified client assets (prod builds)\
+ui/build --no-install # no pnpm install (to preserve local links you have set up)\
+ui/build analyse site msg # specify modules (don't build everything)\
+ui/build -w dasher chart # watch mode but only for given modules\
+ui/build --tsc -w # watch mode but type checking only\
+ui/build --sass msg notify # build css only for msg and notify modules\
+ui/build --no-color # don't use color in logs\
+ui/build --no-time # don't log the time\
 ui/build --no-context # don't log the context ([sass], [esbuild], etc)
-Testing
-The frontend uses the Vitest testing framework.
 
-cd ui
+## Testing
+Lichess uses uses the Vitest testing framework.
+We do not (yet?)
 
-pnpm test
-
-## or
-
-pnpm test:watch
-CSS
+## CSS
 The structure of a CSS module is as follows:
 
 - css/
@@ -39,8 +40,3 @@ The structure of a CSS module is as follows:
     - forum.light.scss # generated
     - forum.dark.scss # generated
     - forum.transp.scss # generated
-
-alternatively, how to try having a fresh new install (for example if you target a branch instead of a tag ?) :
-
-- rm -rf node_modules pnpm-lock.yaml && pnpm store prune
-- pnpm i
