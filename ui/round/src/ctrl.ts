@@ -44,6 +44,7 @@ import {
   SocketDoRoll,
   SocketLift,
   SocketEndTurn,
+  SocketUndo,
   SocketOpts,
   MoveMetadata,
   Position,
@@ -608,7 +609,11 @@ export default class RoundController {
     }
     this.setTitle();
     if (!this.replaying()) {
-      this.ply++;
+      if (o.uci === 'undo') {
+        this.ply--;
+      } else {
+        this.ply++;
+      }
       this.turnCount = o.turnCount;
       const variantCanStillHavePieceAtActionKey = ['togyzkumalak', 'backgammon', 'nackgammon'];
       const allowChessgroundAction = !(
@@ -721,7 +726,11 @@ export default class RoundController {
       check: o.check,
       crazy: o.crazyhouse,
     };
-    d.steps.push(step);
+    if (step.uci === 'undo') {
+      d.steps.pop();
+    } else {
+      d.steps.push(step);
+    }
     this.justDropped = undefined;
     this.justCaptured = undefined;
     game.setOnGame(d, playedPlayerIndex, true);
@@ -811,8 +820,13 @@ export default class RoundController {
     this.actualSendMove('lift', lift);
   };
 
-  sendUndo = (): void => {
-    this.socket.sendLoading('undo');
+  sendUndo = (variant: VariantKey): void => {
+    const undo: SocketUndo = {
+      variant: variant,
+    };
+    if (blur.get()) undo.b = 1;
+    this.resign(false);
+    this.actualSendMove('undo', undo);
   };
 
   sendEndTurn = (variant: VariantKey): void => {
@@ -1149,7 +1163,7 @@ export default class RoundController {
 
   undoAction = (): void => {
     if (this.data.canUndo) {
-      this.sendUndo();
+      this.sendUndo(this.data.game.variant.key);
       this.redraw();
     }
   };

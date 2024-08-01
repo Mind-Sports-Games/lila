@@ -61,6 +61,7 @@ final class GamesByUsersStream(gameRepo: lila.game.GameRepo)(implicit
                 "rating" -> p.rating
               )
               .add("provisional" -> p.provisional)
+              .add("isInputRating" -> p.isInputRating)
           })
         )
         .add("initialFen" -> initialFen)

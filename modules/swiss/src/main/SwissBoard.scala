@@ -17,7 +17,7 @@ private case class SwissBoard(
 )
 
 private object SwissBoard {
-  case class Player(user: LightUser, rank: Int, rating: Int)
+  case class Player(user: LightUser, rank: Int, rating: Int, inputRating: Option[Int])
   case class WithGame(
       board: SwissBoard,
       game: Game,
@@ -81,8 +81,8 @@ final private class SwissBoardApi(
                     r2 <- ranks get p2.userId
                   } yield SwissBoard(
                     pairing.gameId,
-                    p1 = SwissBoard.Player(u1, r1, p1.rating),
-                    p2 = SwissBoard.Player(u2, r2, p2.rating),
+                    p1 = SwissBoard.Player(u1, r1, p1.rating, p1.inputRating),
+                    p2 = SwissBoard.Player(u2, r2, p2.rating, p2.inputRating),
                     isBestOfX = pairing.isBestOfX,
                     isPlayX = pairing.isPlayX,
                     multiMatchGameIds = pairing.multiMatchGameIds

@@ -120,6 +120,7 @@ export interface Player {
   score?: number;
   rating?: number;
   provisional?: string;
+  isInputRating?: boolean;
   engine?: boolean;
   berserk?: boolean;
   version: number;

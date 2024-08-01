@@ -184,8 +184,6 @@ final class Env(
 
   private lazy val takebacker = wire[Takebacker]
 
-  private lazy val undoer = wire[Undoer]
-
   private lazy val moretimer = wire[Moretimer]
 
   val playing = wire[PlayingUsers]

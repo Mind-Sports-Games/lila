@@ -9,6 +9,14 @@
 
   .player-info {
     display: flex;
+    .rating {
+      &.unused {
+        text-decoration: line-through;
+      }
+      &.input {
+        padding-left: 5px;
+      }
+    }
   }
 
   .name {

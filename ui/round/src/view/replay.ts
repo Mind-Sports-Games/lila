@@ -170,7 +170,6 @@ function renderMoves(ctrl: RoundController): MaybeVNodes {
     els.push(renderMultiActionMove(moveTurns[i + 1], notation, variant, prevStepFen, curPly, false, drawTurns));
   }
   els.push(renderResult(ctrl));
-
   return els;
 }
 
@@ -250,8 +249,8 @@ function renderButtons(ctrl: RoundController) {
   );
 }
 
-function initMessage(d: RoundData, trans: Trans) {
-  return game.playable(d) && d.game.turns === 0 && !d.player.spectator
+function initMessage(d: RoundData, ply: number, trans: Trans) {
+  return game.playable(d) && d.game.turns === 0 && ply === 0 && !d.player.spectator
     ? h('div.message', util.justIcon(''), [
         h('div', [
           trans('youPlayThePlayerIndexPieces', d.player.playerName),
@@ -309,7 +308,7 @@ export function render(ctrl: RoundController): VNode | undefined {
     ? undefined
     : h(rmovesTag, [
         renderButtons(ctrl),
-        initMessage(d, ctrl.trans) ||
+        initMessage(d, ctrl.ply, ctrl.trans) ||
           (moves
             ? isCol1()
               ? h('div.col1-moves', [

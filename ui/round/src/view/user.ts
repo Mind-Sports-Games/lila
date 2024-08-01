@@ -51,7 +51,7 @@ export function userHtml(ctrl: RoundController, player: Player, position: Positi
               ]
             : [user.username]
         ),
-        rating ? h('rating', rating + (player.provisional ? '?' : '')) : null,
+        rating ? h('rating', rating + (player.isInputRating ? '*' : player.provisional ? '?' : '')) : null,
         ratingDiff,
         player.engine
           ? h('span', {
