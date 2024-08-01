@@ -33,10 +33,10 @@ trait AssetHelper { self: I18nHelper with SecurityHelper =>
     cssTagWithTheme(name, ctx.currentBg)
 
   def cssTagWithTheme(name: String, theme: String): Frag =
-    cssAt(s"css/$name.$theme.${if (minifiedAssets) "min" else "dev"}.css")
+    cssAt(s"css/$name.$theme.${if (!minifiedAssets) "dev"}.css")
 
   def cssTagNoTheme(name: String): Frag =
-    cssAt(s"css/$name.${if (minifiedAssets) "min" else "dev"}.css")
+    cssAt(s"css/$name.${if (!minifiedAssets) "dev"}.css")
 
   private def cssAt(path: String): Frag =
     link(href := assetUrl(path), rel := "stylesheet")
@@ -49,8 +49,7 @@ trait AssetHelper { self: I18nHelper with SecurityHelper =>
 
   def jsTag(name: String): Frag = jsAtESM(s"javascripts/$name")
 
-  def jsModule(name: String): Frag =
-    jsAtESM(s"compiled/$name${minifiedAssets ?? ".min"}.js")
+  def jsModule(name: String): Frag = jsAtESM(s"compiled/$name.js")
 
   def depsTag = jsAtESM("compiled/deps.min.js")
 

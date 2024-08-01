@@ -1,8 +1,7 @@
 ## Client-side modules
 
 Client builds are performed by the ui/build script.\
-Stick to `ui/build -rc` and leave it running when you can.\
-This enters watch mode (automatically rebuilds any client source files when changed and lets you quickly see the results in your browser) after cleaning and doing a fresh new install.\
+Stick to `ui/build -cr` (clean rebuild with watch mode) and leave it running when you can.\
 NOTE - always use hard refresh (google it) or disable caching in the network tab of your browser inspector to pick up fresh changes.
 
 NOTE - since we now use pnpm, it may be useful to know you can run `rm -rf node_modules pnpm-lock.yaml && pnpm store prune && pnpm i` if you want to ensure pnpm tries to solve completely the deps tree\
