@@ -19,9 +19,9 @@ export const loadCss = (url: string) => {
 };
 
 export const loadCssPath = (key: string) =>
-  loadCss(`css/${key}.${$('body').data('theme')}.${$('body').data('dev') ? 'dev' : 'min'}.css`);
+  loadCss(`css/${key}.${$('body').data('theme')}.${$('body').data('dev') ? 'dev' : ''}.css`);
 
-export const jsModule = (name: string) => `compiled/${name}${$('body').data('dev') ? '' : '.min'}.js`;
+export const jsModule = (name: string) => `compiled/${name}.js`;
 
 const loadedScript = new Map<string, Promise<void>>();
 export const loadScript = (url: string, opts: AssetUrlOpts = {}): Promise<void> => {
