@@ -22,7 +22,7 @@ export default function (ctrl: RelayCtrl): VNode | undefined {
           ]),
           ctrl.data.sync?.url || ctrl.data.sync?.ids ? (ctrl.data.sync.ongoing ? stateOn : stateOff)(ctrl) : null,
           renderLog(ctrl),
-        ]
+        ],
       )
     : undefined;
 }
@@ -51,7 +51,7 @@ function renderLog(ctrl: RelayCtrl) {
                 },
               }
             : {},
-          e.error
+          e.error,
         );
       return h(
         'div' + (err ? '.err' : ''),
@@ -59,7 +59,7 @@ function renderLog(ctrl: RelayCtrl) {
           key: e.at,
           attrs: dataIcon(err ? 'j' : 'E'),
         },
-        [h('div', [...(err ? [err] : logSuccess(e)), h('time', dateFormatter(new Date(e.at)))])]
+        [h('div', [...(err ? [err] : logSuccess(e)), h('time', dateFormatter(new Date(e.at)))])],
       );
     });
   if (ctrl.loading()) logLines.unshift(h('div.load', [h('i.ddloader'), 'Polling source...']));
@@ -81,10 +81,10 @@ function stateOn(ctrl: RelayCtrl) {
         url
           ? ['Connected to source', h('br'), url.replace(/https?:\/\//, '')]
           : ids
-          ? ['Connected to', h('br'), ids.length, ' game(s)']
-          : []
+            ? ['Connected to', h('br'), ids.length, ' game(s)']
+            : [],
       ),
-    ]
+    ],
   );
 }
 
@@ -95,7 +95,7 @@ function stateOff(ctrl: RelayCtrl) {
       hook: bind('click', _ => ctrl.setSync(true)),
       attrs: dataIcon('G'),
     },
-    [h('div.fat', 'Click to connect')]
+    [h('div.fat', 'Click to connect')],
   );
 }
 

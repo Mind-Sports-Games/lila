@@ -75,7 +75,7 @@ export function bindSubmit(f: (e: Event) => unknown, redraw?: () => void): Hooks
       e.preventDefault();
       return f(e);
     },
-    redraw
+    redraw,
   );
 }
 
@@ -142,7 +142,7 @@ export function option(value: string, current: string | undefined, name: string)
         selected: value === current,
       },
     },
-    name
+    name,
   );
 }
 

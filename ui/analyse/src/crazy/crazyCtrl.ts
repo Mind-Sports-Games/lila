@@ -54,7 +54,7 @@ export function valid(
   possibleDrops: string | undefined | null,
   possibleDropsByRole: string | undefined | null,
   piece: cg.Piece,
-  pos: Key
+  pos: Key,
 ): boolean {
   if (piece.playerIndex !== chessground.state.movable.playerIndex) return false;
   if (data.game.variant.key === 'crazyhouse') {

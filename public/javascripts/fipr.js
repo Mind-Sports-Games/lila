@@ -52,8 +52,8 @@ window.fipr = (function () {
       return 32 === (t %= 64)
         ? [e[1], e[0]]
         : t < 32
-        ? [(e[0] << t) | (e[1] >>> (32 - t)), (e[1] << t) | (e[0] >>> (32 - t))]
-        : ((t -= 32), [(e[1] << t) | (e[0] >>> (32 - t)), (e[0] << t) | (e[1] >>> (32 - t))]);
+          ? [(e[0] << t) | (e[1] >>> (32 - t)), (e[1] << t) | (e[0] >>> (32 - t))]
+          : ((t -= 32), [(e[1] << t) | (e[0] >>> (32 - t)), (e[0] << t) | (e[1] >>> (32 - t))]);
     },
     h = function (e, t) {
       return 0 === (t %= 64) ? e : t < 32 ? [(e[0] << t) | (e[1] >>> (32 - t)), e[1] << t] : [e[1] << (t - 32), 0];
@@ -89,11 +89,11 @@ window.fipr = (function () {
       return null == e
         ? a
         : Array.prototype.map && e.map === Array.prototype.map
-        ? e.map(r)
-        : (d(e, function (e, t, n) {
-            a.push(r(e, t, n));
-          }),
-          a);
+          ? e.map(r)
+          : (d(e, function (e, t, n) {
+              a.push(r(e, t, n));
+            }),
+            a);
     },
     n = function (e) {
       var t = [window.screen.width, window.screen.height];
@@ -159,7 +159,7 @@ window.fipr = (function () {
                 } catch (t) {
                   return n.ERROR;
                 }
-              }
+              },
             ))
           : e.push(n.NOT_AVAILABLE),
         navigator.plugins && (e = e.concat(i(n))),
@@ -282,13 +282,13 @@ window.fipr = (function () {
         a = o.createShader(o.VERTEX_SHADER);
       o.shaderSource(
         a,
-        'attribute vec2 attrVertex;varying vec2 varyinTexCoordinate;uniform vec2 uniformOffset;void main(){varyinTexCoordinate=attrVertex+uniformOffset;gl_Position=vec4(attrVertex,0,1);}'
+        'attribute vec2 attrVertex;varying vec2 varyinTexCoordinate;uniform vec2 uniformOffset;void main(){varyinTexCoordinate=attrVertex+uniformOffset;gl_Position=vec4(attrVertex,0,1);}',
       ),
         o.compileShader(a);
       var i = o.createShader(o.FRAGMENT_SHADER);
       o.shaderSource(
         i,
-        'precision mediump float;varying vec2 varyinTexCoordinate;void main() {gl_FragColor=vec4(varyinTexCoordinate,0,1);}'
+        'precision mediump float;varying vec2 varyinTexCoordinate;void main() {gl_FragColor=vec4(varyinTexCoordinate,0,1);}',
       ),
         o.compileShader(i),
         o.attachShader(r, a),
@@ -324,7 +324,7 @@ window.fipr = (function () {
                 return 0 === n && (n = 2), n;
               }
               return null;
-            })(o)
+            })(o),
         ),
         c.push('webgl max combined texture image units:' + o.getParameter(o.MAX_COMBINED_TEXTURE_IMAGE_UNITS)),
         c.push('webgl max cube map texture size:' + o.getParameter(o.MAX_CUBE_MAP_TEXTURE_SIZE)),
@@ -421,27 +421,27 @@ window.fipr = (function () {
           0 <= e.indexOf('windows phone')
             ? 'Windows Phone'
             : 0 <= e.indexOf('windows') ||
-              0 <= e.indexOf('win16') ||
-              0 <= e.indexOf('win32') ||
-              0 <= e.indexOf('win64') ||
-              0 <= e.indexOf('win95') ||
-              0 <= e.indexOf('win98') ||
-              0 <= e.indexOf('winnt') ||
-              0 <= e.indexOf('wow64')
-            ? 'Windows'
-            : 0 <= e.indexOf('android')
-            ? 'Android'
-            : 0 <= e.indexOf('linux') || 0 <= e.indexOf('cros') || 0 <= e.indexOf('x11')
-            ? 'Linux'
-            : 0 <= e.indexOf('iphone') ||
-              0 <= e.indexOf('ipad') ||
-              0 <= e.indexOf('ipod') ||
-              0 <= e.indexOf('crios') ||
-              0 <= e.indexOf('fxios')
-            ? 'iOS'
-            : 0 <= e.indexOf('macintosh') || 0 <= e.indexOf('mac_powerpc)')
-            ? 'Mac'
-            : 'Other';
+                0 <= e.indexOf('win16') ||
+                0 <= e.indexOf('win32') ||
+                0 <= e.indexOf('win64') ||
+                0 <= e.indexOf('win95') ||
+                0 <= e.indexOf('win98') ||
+                0 <= e.indexOf('winnt') ||
+                0 <= e.indexOf('wow64')
+              ? 'Windows'
+              : 0 <= e.indexOf('android')
+                ? 'Android'
+                : 0 <= e.indexOf('linux') || 0 <= e.indexOf('cros') || 0 <= e.indexOf('x11')
+                  ? 'Linux'
+                  : 0 <= e.indexOf('iphone') ||
+                      0 <= e.indexOf('ipad') ||
+                      0 <= e.indexOf('ipod') ||
+                      0 <= e.indexOf('crios') ||
+                      0 <= e.indexOf('fxios')
+                    ? 'iOS'
+                    : 0 <= e.indexOf('macintosh') || 0 <= e.indexOf('mac_powerpc)')
+                      ? 'Mac'
+                      : 'Other';
       if (
         ('ontouchstart' in window || 0 < navigator.maxTouchPoints || 0 < navigator.msMaxTouchPoints) &&
         'Windows' !== r &&
@@ -491,19 +491,19 @@ window.fipr = (function () {
             0 <= t.indexOf('firefox/')
               ? 'Firefox'
               : 0 <= t.indexOf('opera/') || 0 <= t.indexOf(' opr/')
-              ? 'Opera'
-              : 0 <= t.indexOf('chrome/')
-              ? 'Chrome'
-              : 0 <= t.indexOf('safari/')
-              ? 0 <= t.indexOf('android 1.') ||
-                0 <= t.indexOf('android 2.') ||
-                0 <= t.indexOf('android 3.') ||
-                0 <= t.indexOf('android 4.')
-                ? 'AOSP'
-                : 'Safari'
-              : 0 <= t.indexOf('trident/')
-              ? 'Internet Explorer'
-              : 'Other') ||
+                ? 'Opera'
+                : 0 <= t.indexOf('chrome/')
+                  ? 'Chrome'
+                  : 0 <= t.indexOf('safari/')
+                    ? 0 <= t.indexOf('android 1.') ||
+                      0 <= t.indexOf('android 2.') ||
+                      0 <= t.indexOf('android 3.') ||
+                      0 <= t.indexOf('android 4.')
+                      ? 'AOSP'
+                      : 'Safari'
+                    : 0 <= t.indexOf('trident/')
+                      ? 'Internet Explorer'
+                      : 'Other') ||
           'Safari' === e ||
           'Opera' === e) &&
         '20030107' !== n
@@ -574,7 +574,7 @@ window.fipr = (function () {
               navigator.userLanguage ||
               navigator.browserLanguage ||
               navigator.systemLanguage ||
-              t.NOT_AVAILABLE
+              t.NOT_AVAILABLE,
           );
         },
       },
@@ -883,7 +883,7 @@ window.fipr = (function () {
               o[e[0]] !== undefined &&
                 'function' == typeof o[e[0]].setValueAtTime &&
                 o[e[0]].setValueAtTime(e[1], a.currentTime);
-            }
+            },
           ),
             i.connect(o),
             o.connect(a.destination),
@@ -894,7 +894,7 @@ window.fipr = (function () {
               console.warn(
                 'Audio fingerprint timed out. Please report bug at https://github.com/Valve/fingerprintjs2 with your user agent: "' +
                   navigator.userAgent +
-                  '".'
+                  '".',
               ),
               (a.oncomplete = function () {}),
               (a = null),
@@ -1072,5 +1072,5 @@ playstrategy.load.then(() =>
       };
     if (storage.get()) send(storage.get());
     else fipr.get(c => send(fipr.x64hash128(c.map(x => x.value).join(''), 31)));
-  }, 1000)
+  }, 1000),
 );

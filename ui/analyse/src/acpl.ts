@@ -29,14 +29,14 @@ function renderPlayer(ctrl: AnalyseCtrl, playerIndex: PlayerIndex): VNode {
       {
         attrs: { href: '/@/' + p.user.username },
       },
-      [p.user.username, ' ', renderRatingDiff(p.ratingDiff)]
+      [p.user.username, ' ', renderRatingDiff(p.ratingDiff)],
     );
   return h(
     'span',
     p.name ||
       (p.ai && 'Stockfish level ' + p.ai) ||
       (ctrl.study && findTag(ctrl.study.data.chapter.tags, playerIndex)) ||
-      'Anonymous'
+      'Anonymous',
   );
 }
 
@@ -63,7 +63,7 @@ function playerTable(ctrl: AnalyseCtrl, playerIndex: PlayerIndex): VNode {
       return h(
         `div.advice-summary__mistake${nb ? '.symbol' : ''}`,
         { attrs },
-        ctrl.trans.vdomPlural(a.i18n, nb, h('strong', nb))
+        ctrl.trans.vdomPlural(a.i18n, nb, h('strong', nb)),
       );
     }),
     h('div.advice-summary__acpl', [
@@ -96,10 +96,10 @@ function doRender(ctrl: AnalyseCtrl): VNode {
               attrs: dataIcon('G'),
               hook: bind('click', ctrl.toggleRetro, ctrl.redraw),
             },
-            ctrl.trans.noarg('learnFromYourMistakes')
+            ctrl.trans.noarg('learnFromYourMistakes'),
           ),
       playerTable(ctrl, 'p2'),
-    ]
+    ],
   );
 }
 

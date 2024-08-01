@@ -8,7 +8,7 @@ export default function (select: HTMLSelectElement) {
       .map((_, i: number) =>
         $('<star>')
           .data('v', i + 1)
-          .appendTo($rate)
+          .appendTo($rate),
       ),
     setClasses = () =>
       requestAnimationFrame(() => {

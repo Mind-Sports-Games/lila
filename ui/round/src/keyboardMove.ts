@@ -120,7 +120,7 @@ export function render(ctrl: KeyboardMove) {
       hook: onInsert(input =>
         playstrategy
           .loadModule('round.keyboardMove')
-          .then(() => ctrl.registerHandler(playstrategy.keyboardMove({ input, ctrl })))
+          .then(() => ctrl.registerHandler(playstrategy.keyboardMove({ input, ctrl }))),
       ),
     }),
     ctrl.hasFocus()

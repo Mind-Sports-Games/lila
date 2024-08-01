@@ -41,15 +41,18 @@ trait AssetHelper { self: I18nHelper with SecurityHelper =>
   private def cssAt(path: String): Frag =
     link(href := assetUrl(path), rel := "stylesheet")
 
-  // load scripts in <head> and always use defer
-  def jsAt(path: String): Frag = script(deferAttr, src := assetUrl(path))
+  // load script as module
+  def jsAtESM(path: String): Frag = script(deferAttr, src := assetUrl(path), tpe := "module")
 
-  def jsTag(name: String): Frag = jsAt(s"javascripts/$name")
+  // load script as common js
+  def jsAtCJS(path: String): Frag = script(deferAttr, src := assetUrl(path))
+
+  def jsTag(name: String): Frag = jsAtESM(s"javascripts/$name")
 
   def jsModule(name: String): Frag =
-    jsAt(s"compiled/$name${minifiedAssets ?? ".min"}.js")
+    jsAtESM(s"compiled/$name${minifiedAssets ?? ".min"}.js")
 
-  def depsTag = jsAt("compiled/deps.min.js")
+  def depsTag = jsAtESM("compiled/deps.min.js")
 
   def roundTag(lib: GameLogic) = lib match {
     case GameLogic.Draughts() => jsModule("draughtsround")
@@ -64,15 +67,17 @@ trait AssetHelper { self: I18nHelper with SecurityHelper =>
   def analyseTag                            = jsModule("analysisBoard")
   def analyseNvuiTag(implicit ctx: Context) = ctx.blind option jsModule("analysisBoard.nvui")
 
-  def captchaTag          = jsModule("captcha")
-  def infiniteScrollTag   = jsModule("infiniteScroll")
-  def chessgroundTag      = jsAt("javascripts/vendor/chessground.min.js")
-  def draughtsgroundTag   = jsAt("javascripts/vendor/draughtsground.min.js")
-  def cashTag             = jsAt("javascripts/vendor/cash.min.js")
-  def fingerprintTag      = jsAt("javascripts/fipr.js")
-  def tagifyTag           = jsAt("vendor/tagify/tagify.min.js")
-  def highchartsLatestTag = jsAt("vendor/highcharts-4.2.5/highcharts.js")
-  def highchartsMoreTag   = jsAt("vendor/highcharts-4.2.5/highcharts-more.js")
+  def captchaTag        = jsModule("captcha")
+  def infiniteScrollTag = jsModule("infiniteScroll")
+
+  def chessgroundTag = jsAtESM("npm/chessground.min.js")
+
+  def draughtsgroundTag   = jsAtCJS("javascripts/vendor/draughtsground.min.js")
+  def cashTag             = jsAtESM("javascripts/vendor/cash.min.js")
+  def fingerprintTag      = jsAtESM("javascripts/fipr.js")
+  def tagifyTag           = jsAtESM("vendor/tagify/tagify.min.js")
+  def highchartsLatestTag = jsAtESM("vendor/highcharts-4.2.5/highcharts.js")
+  def highchartsMoreTag   = jsAtESM("vendor/highcharts-4.2.5/highcharts-more.js")
 
   def prismicJs(implicit ctx: Context): Frag =
     raw {

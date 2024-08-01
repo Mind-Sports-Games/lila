@@ -1,3 +1,9 @@
 {
-  "extends": "../tsconfig.base.json"
+  "extends": "../tsconfig.base.json",
+  "compilerOptions": {
+    "types": ["playstrategy", "web"],
+    "noEmit": true
+  },
+  "isolateModules": true,
+  "references": [{ "path": "../common/tsconfig.json" }]
 }

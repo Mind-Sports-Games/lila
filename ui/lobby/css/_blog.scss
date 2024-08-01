@@ -56,22 +56,34 @@
 
       &--link:hover {
         .selected-color-original & {
-          box-shadow: 0 0 5px $c-link, 0 0 20px $c-link;
+          box-shadow:
+            0 0 5px $c-link,
+            0 0 20px $c-link;
         }
         .selected-color-black & {
-          box-shadow: 0 0 5px $c-color-choice-black, 0 0 20px $c-color-choice-black;
+          box-shadow:
+            0 0 5px $c-color-choice-black,
+            0 0 20px $c-color-choice-black;
         }
         .selected-color-red & {
-          box-shadow: 0 0 5px $c-color-choice-red, 0 0 20px $c-color-choice-red;
+          box-shadow:
+            0 0 5px $c-color-choice-red,
+            0 0 20px $c-color-choice-red;
         }
         .selected-color-blue & {
-          box-shadow: 0 0 5px $c-color-choice-blue, 0 0 20px $c-color-choice-blue;
+          box-shadow:
+            0 0 5px $c-color-choice-blue,
+            0 0 20px $c-color-choice-blue;
         }
         .selected-color-green & {
-          box-shadow: 0 0 5px $c-color-choice-green, 0 0 20px $c-color-choice-green;
+          box-shadow:
+            0 0 5px $c-color-choice-green,
+            0 0 20px $c-color-choice-green;
         }
         .selected-color-yellow & {
-          box-shadow: 0 0 5px $c-color-choice-yellow, 0 0 20px $c-color-choice-yellow;
+          box-shadow:
+            0 0 5px $c-color-choice-yellow,
+            0 0 20px $c-color-choice-yellow;
         }
       }
 

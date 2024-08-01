@@ -52,9 +52,9 @@ export default function (ctrl: TournamentController): VNode | undefined {
                 {
                   attrs: { href: '/team/' + data.id },
                 },
-                'Team page'
-              )
-            )
+                'Team page',
+              ),
+            ),
           ),
         ]),
       ]),
@@ -76,11 +76,11 @@ export default function (ctrl: TournamentController): VNode | undefined {
                     ? h('strong.is-gold', { attrs: dataIcon('Q') }, '' + p.score)
                     : h('strong', '' + p.score),
                 ]),
-              ]
-            )
-          )
+              ],
+            ),
+          ),
         ),
       ]),
-    ]
+    ],
   );
 }

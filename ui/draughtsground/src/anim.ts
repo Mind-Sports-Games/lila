@@ -183,7 +183,9 @@ function computePlan(prevPieces: cg.Pieces, current: State, fadeOnly = false, no
               (p.piece.role === 'man' &&
                 newP.piece.role === 'king' &&
                 isPromotablePos(newP.piece.playerIndex, newP.pos, bs)) ||
-              (p.piece.role === 'king' && newP.piece.role === 'man' && isPromotablePos(p.piece.playerIndex, p.pos, bs)))
+              (p.piece.role === 'king' &&
+                newP.piece.role === 'man' &&
+                isPromotablePos(p.piece.playerIndex, p.pos, bs))),
         );
       if (!filteredMissings.length && (variant === 'russian' || variant === 'pool' || variant === 'english')) {
         maybePromote = true;
@@ -192,7 +194,7 @@ function computePlan(prevPieces: cg.Pieces, current: State, fadeOnly = false, no
             !samePieces[p.key] &&
             newP.piece.playerIndex === p.piece.playerIndex &&
             ((p.piece.role === 'man' && newP.piece.role === 'king') ||
-              (p.piece.role === 'king' && newP.piece.role === 'man'))
+              (p.piece.role === 'king' && newP.piece.role === 'man')),
         );
       }
       preP = closer(newP, filteredMissings);

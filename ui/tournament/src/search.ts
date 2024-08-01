@@ -30,8 +30,8 @@ export function input(ctrl: TournamentController): VNode {
             },
           });
           el.focus();
-        })
+        }),
       ),
-    })
+    }),
   );
 }

@@ -49,7 +49,7 @@ export function userHtml(ctrl: RoundController, player: Player, position: Positi
                 ' ',
                 user.username,
               ]
-            : [user.username]
+            : [user.username],
         ),
         rating ? h('rating', rating + (player.isInputRating ? '*' : player.provisional ? '?' : '')) : null,
         ratingDiff,
@@ -61,7 +61,7 @@ export function userHtml(ctrl: RoundController, player: Player, position: Positi
               },
             })
           : null,
-      ]
+      ],
     );
   }
   const connecting = !player.onGame && ctrl.firstSeconds;
@@ -81,7 +81,7 @@ export function userHtml(ctrl: RoundController, player: Player, position: Positi
         },
       }),
       h('name', player.name || ctrl.noarg('anonymous')),
-    ]
+    ],
   );
 }
 

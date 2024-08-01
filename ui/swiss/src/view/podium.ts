@@ -20,7 +20,7 @@ function podiumTrophy(img: string): VNode {
       'div',
       h('img.customTrophy', {
         attrs: { src: playstrategy.assetUrl('images/trophy/' + img + '.png') },
-      })
+      }),
     );
   } else return h('div.trophy');
 }
@@ -31,7 +31,7 @@ function podiumPosition(
   trophyImg: string,
   trans: Trans,
   isMedley: boolean,
-  isHandicapped: boolean
+  isHandicapped: boolean,
 ): VNode | undefined {
   return p
     ? h(
@@ -48,10 +48,10 @@ function podiumPosition(
             {
               attrs: { href: '/@/' + p.user.name },
             },
-            userName(p.user)
+            userName(p.user),
           ),
           podiumStats(p, trans, isMedley, isHandicapped),
-        ]
+        ],
       )
     : undefined;
 }

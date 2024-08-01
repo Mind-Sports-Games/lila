@@ -36,7 +36,7 @@ export default function (
   trans: Trans,
   playerIndex: PlayerIndex,
   position: Position,
-  runningPlayerIndex: PlayerIndex
+  runningPlayerIndex: PlayerIndex,
 ) {
   const millis = ctrl.millisOf(playerIndex),
     update = (el: HTMLElement) => {
@@ -66,6 +66,6 @@ export default function (
         },
       }),
       isPlayer ? null : moretime(ctrl.root),
-    ]
+    ],
   );
 }

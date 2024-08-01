@@ -2,7 +2,7 @@ import { h, VNode } from 'snabbdom';
 import * as studyView from '../study/studyView';
 import { nodeFullName, bind } from '../util';
 import AnalyseCtrl from '../ctrl';
-import { patch } from '../main';
+import { patch } from '../analysisBoard';
 
 export interface Opts {
   path: Tree.Path;
@@ -52,7 +52,7 @@ function action(icon: string, text: string, handler: () => void): VNode {
       attrs: { 'data-icon': icon },
       hook: bind('click', handler),
     },
-    text
+    text,
   );
 }
 
@@ -76,7 +76,7 @@ function view(opts: Opts, coords: Coords): VNode {
       action('q', trans('deleteFromHere'), () => ctrl.deleteNode(opts.path)),
     ]
       .concat(ctrl.study ? studyView.contextMenu(ctrl.study, opts.path, node) : [])
-      .concat([onMainline ? action('F', trans('forceVariation'), () => ctrl.forceVariation(opts.path, true)) : null])
+      .concat([onMainline ? action('F', trans('forceVariation'), () => ctrl.forceVariation(opts.path, true)) : null]),
   );
 }
 

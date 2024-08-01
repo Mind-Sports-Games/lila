@@ -52,7 +52,7 @@ object player {
       moreJs = frag(
         roundNvuiTag,
         roundTag(gameLogic),
-        embedJsUnsafeLoadThen(s"""${roundPlayStrategyTag(gameLogic)}.boot(${safeJsonValue(
+        embedJsUnsafeLoadThen(s"""${roundPlayStrategyTag(gameLogic)}(${safeJsonValue(
           Json
             .obj(
               "data"   -> data,

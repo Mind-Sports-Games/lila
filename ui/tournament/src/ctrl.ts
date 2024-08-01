@@ -131,7 +131,7 @@ export default class TournamentController {
   join = (team?: string) => {
     this.joinWithTeamSelector = false;
     if (!this.data.verdicts.accepted)
-      return this.data.verdicts.list.forEach(v => {
+      return this.data.verdicts.list.forEach((v: any) => {
         if (v.verdict !== 'ok') alert(v.verdict);
       });
     if (this.data.teamBattle && !team && !this.data.me) {
@@ -161,8 +161,9 @@ export default class TournamentController {
 
     //also update clock for interval times
     d.secondsToFinishInterval = d.medleyIntervalSeconds[d.medleyRound];
-    const mClock = $('.medley-interval-time').clock();
-    mClock.clock('addSeconds', d.secondsToFinishInterval);
+    $('.game__tournament .clock').each(function (this: HTMLElement) {
+      playstrategy.clockWidget(this, { time: d.secondsToFinishInterval });
+    });
 
     const medleyClockElement = $('.medley-extra-clock');
     if (finalVariant) medleyClockElement.addClass('hidden');
@@ -181,7 +182,7 @@ export default class TournamentController {
     if (this.focusOnMe) this.scrollToMe();
   };
 
-  showPlayerInfo = player => {
+  showPlayerInfo = (player: any) => {
     if (this.data.secondsToStart) return;
     const userId = player.name.toLowerCase();
     this.teamInfo.requested = undefined;
@@ -196,16 +197,16 @@ export default class TournamentController {
     }
   };
 
-  setPlayerInfoData = data => {
+  setPlayerInfoData = (data: any) => {
     if (data.player.id === this.playerInfo.id) this.playerInfo.data = data;
   };
 
-  showMedleyVariants = bool => {
+  showMedleyVariants = (bool: any) => {
     if (this.data.secondsToStart) return;
     this.setShowMedleyVariants(bool);
   };
 
-  setShowMedleyVariants = bool => {
+  setShowMedleyVariants = (bool: any) => {
     this.showingMedleyVariants = bool;
   };
 

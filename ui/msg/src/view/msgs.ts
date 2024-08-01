@@ -27,13 +27,13 @@ export default function renderMsgs(ctrl: MsgCtrl, convo: Convo): VNode {
                   ctrl.getMore();
                 }),
               },
-              'Load more'
+              'Load more',
             )
           : null,
         ...contentMsgs(ctrl, convo.msgs),
         ctrl.typing ? h('div.msg-app__convo__msgs__typing', `${convo.user.name} is typing...`) : null,
       ]),
-    ]
+    ],
   );
 }
 
@@ -50,8 +50,8 @@ function renderDaily(ctrl: MsgCtrl, daily: Daily): VNode[] {
     ...daily.msgs.map(group =>
       h(
         'group',
-        group.map(msg => renderMsg(ctrl, msg))
-      )
+        group.map(msg => renderMsg(ctrl, msg)),
+      ),
     ),
   ];
 }

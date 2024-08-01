@@ -1,11 +1,11 @@
 import * as xhr from 'common/xhr';
 import { RoundOpts, RoundData } from './interfaces';
-import { RoundApi, RoundMain } from './main';
-import { ChatCtrl } from 'chat';
+import { RoundApi, app } from './round';
+import { type ChatCtrl } from 'chat';
 import { TourPlayer } from 'game';
 import { tourStandingCtrl, TourStandingCtrl } from './tourStanding';
 
-export default function (opts: RoundOpts): void {
+export default function PlayStrategyRound(opts: RoundOpts): void {
   const element = document.querySelector('.round__app') as HTMLElement,
     data: RoundData = opts.data;
   playstrategy.pageVariant = data.game.variant.key;
@@ -20,7 +20,7 @@ export default function (opts: RoundOpts): void {
         if (data.tv && data.tv.channel == o.channel) playstrategy.reload();
         else
           $('.tv-channels .' + o.channel + ' .champion').html(
-            o.player ? [o.player.title, o.player.name, o.player.rating].filter(x => x).join('&nbsp') : 'Anonymous'
+            o.player ? [o.player.title, o.player.name, o.player.rating].filter(x => x).join('&nbsp') : 'Anonymous',
           );
       },
       end() {
@@ -46,7 +46,7 @@ export default function (opts: RoundOpts): void {
   function startTournamentClock() {
     if (data.tournament)
       $('.game__tournament .clock').each(function (this: HTMLElement) {
-        $(this).clock({
+        playstrategy.clockWidget(this, {
           time: parseFloat($(this).data('time')),
         });
       });
@@ -60,7 +60,7 @@ export default function (opts: RoundOpts): void {
   opts.element = element;
   opts.socketSend = playstrategy.socket.send;
 
-  const round: RoundApi = (window['PlayStrategyRound'] as RoundMain).app(opts);
+  const round: RoundApi = app(opts);
   const chatOpts = opts.chat;
   if (chatOpts) {
     if (data.tournament?.top) {
@@ -87,3 +87,5 @@ export default function (opts: RoundOpts): void {
   $('#zentog').on('click', () => playstrategy.pubsub.emit('zen'));
   playstrategy.storage.make('reload-round-tabs').listen(playstrategy.reload);
 }
+
+(window as any).PlayStrategyRound = PlayStrategyRound; // esbuild

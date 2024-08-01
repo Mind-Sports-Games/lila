@@ -27,6 +27,6 @@ db.report
       },
       {
         multi: true,
-      }
+      },
     );
   });

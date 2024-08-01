@@ -48,7 +48,7 @@ function renderClock(centis: number | undefined, active: boolean, cls: string, s
     {
       class: { active },
     },
-    clockContent(centis, showTenths)
+    clockContent(centis, showTenths),
   );
 }
 

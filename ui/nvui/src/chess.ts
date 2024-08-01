@@ -306,11 +306,11 @@ export function renderPieces(pieces: Pieces, style: Style): VNode {
               `${l[0]}: ${l
                 .slice(1)
                 .map((k: string) => renderKey(k, style))
-                .join(', ')}`
+                .join(', ')}`,
           )
           .join(', '),
       ]);
-    })
+    }),
   );
 }
 
@@ -340,7 +340,7 @@ export function renderBoard(
   pieceStyle: PieceStyle,
   prefixStyle: PrefixStyle,
   positionStyle: PositionStyle,
-  boardStyle: BoardStyle
+  boardStyle: BoardStyle,
 ): VNode {
   const doRankHeader = (rank: Rank): VNode => {
     return h('th', { attrs: { scope: 'row' } }, rank);
@@ -365,14 +365,14 @@ export function renderBoard(
     file: File,
     letter: string,
     playerIndex: PlayerIndex | 'none',
-    text: string
+    text: string,
   ): VNode => {
     return h(
       'button',
       {
         attrs: { rank: rank, file: file, piece: letter.toLowerCase(), playerIndex: playerIndex },
       },
-      text
+      text,
     );
   };
   const doPiece = (rank: Rank, file: File): VNode => {
@@ -446,7 +446,7 @@ export function positionJumpHandler() {
       return true;
     }
     const newBtn = document.querySelector(
-      '.board-wrapper button[rank="' + $newRank + '"][file="' + $newFile + '"]'
+      '.board-wrapper button[rank="' + $newRank + '"][file="' + $newFile + '"]',
     ) as HTMLElement;
     if (newBtn) {
       newBtn.focus();
@@ -477,7 +477,7 @@ export function pieceJumpingHandler(wrapSound: () => void, errorSound: () => voi
         cancelable: true,
         bubbles: true,
       });
-      $form.trigger($sendForm);
+      $form.trigger('submit', $sendForm);
       return false;
     }
 
@@ -553,7 +553,7 @@ export function selectionHandler(opponentPlayerIndex: PlayerIndex, selectSound: 
       // if user selects their own piece second
       if ($evBtn.attr('playerIndex') === (opponentPlayerIndex === 'p2' ? 'p1' : 'p2')) return false;
 
-      const $first = $moveBox.val();
+      const $first = $moveBox.val() || '';
       const $firstPiece = $('.board-wrapper [file="' + $first[0] + '"][rank="' + $first[1] + '"]');
       $moveBox.val($moveBox.val() + $pos);
       // this is coupled to pieceJumpingHandler() noticing that the attribute is set and acting differently. TODO: make cleaner
@@ -569,7 +569,7 @@ export function selectionHandler(opponentPlayerIndex: PlayerIndex, selectSound: 
         cancelable: true,
         bubbles: true,
       });
-      $form.trigger($event);
+      $form.trigger('submit', $event);
     }
     return false;
   };
@@ -623,8 +623,8 @@ export function possibleMovesHandler(playerIndex: PlayerIndex, fen: () => string
     // possible ineffecient to reparse fen; but seems to work when it is AND when it is not the users' turn.
     const possibleMoves = chessgroundDests('chess')(
       Chess.fromSetup(
-        parseFen('chess')(fen().replace(' ' + opponentTurnFen + ' ', ' ' + myTurnFen + ' ')).unwrap()
-      ).unwrap()
+        parseFen('chess')(fen().replace(' ' + opponentTurnFen + ' ', ' ' + myTurnFen + ' ')).unwrap(),
+      ).unwrap(),
     )
       .get($pos)
       ?.map(i => {

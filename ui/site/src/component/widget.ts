@@ -1,7 +1,7 @@
 import * as data from 'common/data';
 
 const widget = (name: string, prototype: any) => {
-  const constructor = ($[name] = function (options: any, element: HTMLElement) {
+  const constructor: any = ($[name] = function (options: any, element: HTMLElement) {
     const self: any = this;
     self.element = $(element);
     (element as any)[name] = this;

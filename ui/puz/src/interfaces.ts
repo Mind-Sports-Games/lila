@@ -3,6 +3,7 @@ import { VNode } from 'snabbdom';
 import { Clock } from './clock';
 import { Combo } from './combo';
 import CurrentPuzzle from './current';
+import * as Prefs from 'common/prefs';
 
 export type MaybeVNode = VNode | string | null | undefined;
 export type MaybeVNodes = MaybeVNode[];

@@ -8,7 +8,7 @@ module.exports = function (ctrl) {
       ['metric', 'dimension'].map(function (type) {
         var data = ctrl.vm[type];
         return m('section.' + type, [m('h3', data.name), m('p', m.trust(data.description))]);
-      })
+      }),
     ),
   ]);
 };

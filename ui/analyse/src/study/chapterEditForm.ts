@@ -24,7 +24,7 @@ export function ctrl(
   send: StudySocketSend,
   chapterConfig: (id: string) => Promise<StudyChapterConfig>,
   trans: Trans,
-  redraw: Redraw
+  redraw: Redraw,
 ): StudyChapterEditFormCtrl {
   const current = prop<StudyChapterMeta | StudyChapterConfig | null>(null);
 
@@ -104,7 +104,7 @@ export function view(ctrl: StudyChapterEditFormCtrl): VNode | undefined {
                   {
                     attrs: { for: 'chapter-name' },
                   },
-                  ctrl.trans.noarg('name')
+                  ctrl.trans.noarg('name'),
                 ),
                 h('input#chapter-name.form-control', {
                   attrs: {
@@ -121,7 +121,7 @@ export function view(ctrl: StudyChapterEditFormCtrl): VNode | undefined {
                 }),
               ]),
               ...(isLoaded(data) ? viewLoaded(ctrl, data) : [spinner()]),
-            ]
+            ],
           ),
           h('div.destructive', [
             h(
@@ -131,7 +131,7 @@ export function view(ctrl: StudyChapterEditFormCtrl): VNode | undefined {
                   if (confirm(ctrl.trans.noarg('clearAllCommentsInThisChapter'))) ctrl.clearAnnotations(data.id);
                 }),
               },
-              ctrl.trans.noarg('clearAnnotations')
+              ctrl.trans.noarg('clearAnnotations'),
             ),
             h(
               emptyRedButton,
@@ -140,7 +140,7 @@ export function view(ctrl: StudyChapterEditFormCtrl): VNode | undefined {
                   if (confirm(ctrl.trans.noarg('deleteThisChapter'))) ctrl.delete(data.id);
                 }),
               },
-              ctrl.trans.noarg('deleteChapter')
+              ctrl.trans.noarg('deleteChapter'),
             ),
           ]),
         ],
@@ -162,13 +162,13 @@ function viewLoaded(ctrl: StudyChapterEditFormCtrl, data: StudyChapterConfig): V
           {
             attrs: { for: 'chapter-orientation' },
           },
-          ctrl.trans.noarg('orientation')
+          ctrl.trans.noarg('orientation'),
         ),
         h(
           'select#chapter-orientation.form-control',
           ['p1', 'p2'].map(function (playerIndex) {
             return option(playerIndex, data.orientation, ctrl.trans.noarg(playerIndex));
-          })
+          }),
         ),
       ]),
       h('div.form-group.form-half', [
@@ -177,14 +177,14 @@ function viewLoaded(ctrl: StudyChapterEditFormCtrl, data: StudyChapterConfig): V
           {
             attrs: { for: 'chapter-mode' },
           },
-          ctrl.trans.noarg('analysisMode')
+          ctrl.trans.noarg('analysisMode'),
         ),
         h(
           'select#chapter-mode.form-control',
           (isChess(data.variant.key ?? 'standard')
             ? chapterForm.modeChoices
             : chapterForm.nonBrowserAnalysisModeChoices
-          ).map(c => option(c[0], mode, ctrl.trans.noarg(c[1])))
+          ).map(c => option(c[0], mode, ctrl.trans.noarg(c[1]))),
         ),
       ]),
     ]),
@@ -194,14 +194,14 @@ function viewLoaded(ctrl: StudyChapterEditFormCtrl, data: StudyChapterConfig): V
         {
           attrs: { for: 'chapter-description' },
         },
-        ctrl.trans.noarg('pinnedChapterComment')
+        ctrl.trans.noarg('pinnedChapterComment'),
       ),
       h(
         'select#chapter-description.form-control',
         [
           ['', ctrl.trans.noarg('noPinnedComment')],
           ['1', ctrl.trans.noarg('rightUnderTheBoard')],
-        ].map(v => option(v[0], data.description ? '1' : '', v[1]))
+        ].map(v => option(v[0], data.description ? '1' : '', v[1])),
       ),
     ]),
     modal.button(ctrl.trans.noarg('saveChapter')),

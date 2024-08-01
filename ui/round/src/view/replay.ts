@@ -38,7 +38,7 @@ const autoScroll = throttle(100, (movesEl: HTMLElement, ctrl: RoundController) =
       else if (isCol1()) movesEl.scrollLeft = st;
       else movesEl.scrollTop = st;
     }
-  })
+  }),
 );
 
 const renderDrawOffer = () =>
@@ -49,7 +49,7 @@ const renderDrawOffer = () =>
         title: 'Draw offer',
       },
     },
-    '½?'
+    '½?',
   );
 
 function renderMultiActionMove(
@@ -59,7 +59,7 @@ function renderMultiActionMove(
   prevStepFen: (s: Step) => string,
   curPly: number,
   orEmpty: boolean,
-  drawOffers: Set<number>
+  drawOffers: Set<number>,
 ) {
   return step
     ? h(
@@ -75,18 +75,18 @@ function renderMultiActionMove(
               s
                 ? moveFromNotationStyle(notation)(
                     { san: s.san, uci: s.uci, fen: s.fen, prevFen: prevStepFen(s) },
-                    variant
+                    variant,
                   )
-                : ''
+                : '',
             ),
-            notation
+            notation,
           ),
           step.map(s => drawOffers.has(s ? s.turnCount : -1)).includes(true) ? renderDrawOffer() : undefined,
-        ]
+        ],
       )
     : orEmpty
-    ? h(moveTag, '…')
-    : undefined;
+      ? h(moveTag, '…')
+      : undefined;
 }
 
 function combinedNotationOfTurn(actionNotations: string[], notation: NotationStyle): string {
@@ -118,7 +118,7 @@ export function renderResult(ctrl: RoundController): VNode | undefined {
             else setTimeout(() => ctrl.autoScroll(), 200);
           }),
         },
-        [viewStatus(ctrl), winner ? ' • ' + ctrl.trans('playerIndexIsVictorious', winner) : '']
+        [viewStatus(ctrl), winner ? ' • ' + ctrl.trans('playerIndexIsVictorious', winner) : ''],
       ),
     ]);
   }
@@ -188,7 +188,7 @@ export function analysisButton(ctrl: RoundController): VNode | undefined {
             'data-icon': 'A',
           },
         },
-        forecastCount ? ['' + forecastCount] : []
+        forecastCount ? ['' + forecastCount] : [],
       )
     : undefined;
 }
@@ -216,7 +216,7 @@ function renderButtons(ctrl: RoundController) {
             }
           }
         },
-        ctrl.redraw
+        ctrl.redraw,
       ),
     },
     [
@@ -245,7 +245,7 @@ function renderButtons(ctrl: RoundController) {
         });
       }),
       analysisButton(ctrl) || h('div.noop'),
-    ]
+    ],
   );
 }
 
@@ -302,7 +302,7 @@ export function render(ctrl: RoundController): VNode | undefined {
             ctrl.autoScroll();
           }),
         },
-        renderMoves(ctrl)
+        renderMoves(ctrl),
       );
   return ctrl.nvui
     ? undefined

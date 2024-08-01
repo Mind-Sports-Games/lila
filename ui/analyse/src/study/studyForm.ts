@@ -43,7 +43,7 @@ function select(s: Select): MaybeVNodes {
       {
         attrs: { for: 'study-' + s.key },
       },
-      s.name
+      s.name,
     ),
     h(
       `select#study-${s.key}.form-control`,
@@ -56,9 +56,9 @@ function select(s: Select): MaybeVNodes {
               selected: s.selected === o[0],
             },
           },
-          o[1]
+          o[1],
         );
-      })
+      }),
     ),
   ];
 }
@@ -68,7 +68,7 @@ export function ctrl(
   getData: () => StudyData,
   trans: Trans,
   redraw: Redraw,
-  relay?: RelayCtrl
+  relay?: RelayCtrl,
 ): StudyFormCtrl {
   const initAt = Date.now();
 
@@ -142,7 +142,7 @@ export function view(ctrl: StudyFormCtrl): VNode {
                 sticky: getVal('sticky') as 'true' | 'false',
                 description: getVal('description') as 'true' | 'false',
               },
-              isNew
+              isNew,
             );
           }, ctrl.redraw),
         },
@@ -172,7 +172,7 @@ export function view(ctrl: StudyFormCtrl): VNode {
                   ['private', ctrl.trans.noarg('inviteOnly')],
                 ],
                 selected: data.visibility,
-              })
+              }),
             ),
             h(
               'div.form-group.form-half',
@@ -181,7 +181,7 @@ export function view(ctrl: StudyFormCtrl): VNode {
                 name: ctrl.trans.noarg('allowCloning'),
                 choices: userSelectionChoices,
                 selected: data.settings.cloneable,
-              })
+              }),
             ),
           ]),
           h('div.form-split', [
@@ -192,7 +192,7 @@ export function view(ctrl: StudyFormCtrl): VNode {
                 name: ctrl.trans.noarg('computerAnalysis'),
                 choices: userSelectionChoices.map(c => [c[0], ctrl.trans.noarg(c[1])]),
                 selected: data.settings.computer,
-              })
+              }),
             ),
             h(
               'div.form-group.form-half',
@@ -201,7 +201,7 @@ export function view(ctrl: StudyFormCtrl): VNode {
                 name: ctrl.trans.noarg('openingExplorer'),
                 choices: userSelectionChoices,
                 selected: data.settings.explorer,
-              })
+              }),
             ),
           ]),
           h('div.form-split', [
@@ -212,7 +212,7 @@ export function view(ctrl: StudyFormCtrl): VNode {
                 name: ctrl.trans.noarg('chat'),
                 choices: userSelectionChoices,
                 selected: data.settings.chat,
-              })
+              }),
             ),
             h(
               'div.form-group.form-half',
@@ -224,7 +224,7 @@ export function view(ctrl: StudyFormCtrl): VNode {
                   ['false', ctrl.trans.noarg('noLetPeopleBrowseFreely')],
                 ],
                 selected: '' + data.settings.sticky,
-              })
+              }),
             ),
           ]),
           h(
@@ -237,7 +237,7 @@ export function view(ctrl: StudyFormCtrl): VNode {
                 ['true', ctrl.trans.noarg('rightUnderTheBoard')],
               ],
               selected: '' + data.settings.description,
-            })
+            }),
           ),
           h(`div.form-actions${ctrl.relay ? '' : '.single'}`, [
             ...(ctrl.relay
@@ -247,14 +247,14 @@ export function view(ctrl: StudyFormCtrl): VNode {
                     {
                       attrs: { 'data-icon': '', href: `/broadcast/${ctrl.relay.data.tour.id}/edit` },
                     },
-                    'Tournament settings'
+                    'Tournament settings',
                   ),
                   h(
                     'a.text',
                     {
                       attrs: { 'data-icon': '', href: `/broadcast/round/${data.id}/edit` },
                     },
-                    'Round settings'
+                    'Round settings',
                   ),
                 ]
               : []),
@@ -263,10 +263,10 @@ export function view(ctrl: StudyFormCtrl): VNode {
               {
                 attrs: { type: 'submit' },
               },
-              ctrl.trans.noarg(isNew ? 'start' : 'save')
+              ctrl.trans.noarg(isNew ? 'start' : 'save'),
             ),
           ]),
-        ]
+        ],
       ),
       h('div.destructive', [
         isNew
@@ -282,7 +282,7 @@ export function view(ctrl: StudyFormCtrl): VNode {
                   return confirm(ctrl.trans.noarg('deleteTheStudyChatHistory'));
                 }),
               },
-              [h(emptyRedButton, ctrl.trans.noarg('clearChat'))]
+              [h(emptyRedButton, ctrl.trans.noarg('clearChat'))],
             ),
         h(
           'form',
@@ -295,7 +295,7 @@ export function view(ctrl: StudyFormCtrl): VNode {
               return isNew || confirm(ctrl.trans.noarg('deleteTheEntireStudy'));
             }),
           },
-          [h(emptyRedButton, ctrl.trans.noarg(isNew ? 'cancel' : 'deleteStudy'))]
+          [h(emptyRedButton, ctrl.trans.noarg(isNew ? 'cancel' : 'deleteStudy'))],
         ),
       ]),
     ],

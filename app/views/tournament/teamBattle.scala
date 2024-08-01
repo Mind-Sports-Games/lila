@@ -17,7 +17,7 @@ object teamBattle {
       title = tour.name(),
       moreCss = cssTag("tournament.form"),
       moreJs = frag(
-        jsAt("vendor/textcomplete.min.js"),
+        jsAtESM("vendor/textcomplete.min.js"),
         jsModule("teamBattleForm")
       )
     )(

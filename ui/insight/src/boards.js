@@ -28,7 +28,7 @@ function miniGame(game) {
           game.user2.title ? ' ' + game.user2.title : '',
         ]),
       ]),
-    ]
+    ],
   );
 }
 

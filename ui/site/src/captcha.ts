@@ -40,7 +40,7 @@ playstrategy.load.then(() => {
                   turnPlayerIndex: cg.state.orientation,
                   movable: { dests },
                 }),
-              300
+              300,
             );
         });
       };

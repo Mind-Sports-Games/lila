@@ -11,7 +11,7 @@ module.exports = function (ctrl) {
         {
           href: '/@/' + ctrl.user.name,
         },
-        ctrl.user.name
+        ctrl.user.name,
       ),
     ]),
     m('div.content', [
@@ -26,9 +26,9 @@ module.exports = function (ctrl) {
                 target: '_blank',
                 rel: 'noopener',
               },
-              shareText
+              shareText,
             )
-          : shareText
+          : shareText,
       ),
     ]),
     m('div.refresh', {
