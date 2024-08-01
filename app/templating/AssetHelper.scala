@@ -33,10 +33,10 @@ trait AssetHelper { self: I18nHelper with SecurityHelper =>
     cssTagWithTheme(name, ctx.currentBg)
 
   def cssTagWithTheme(name: String, theme: String): Frag =
-    cssAt(s"css/$name.$theme.${if (!minifiedAssets) "dev"}.css")
+    cssAt(s"css/$name.$theme${if (!minifiedAssets) ".dev" else ""}.css")
 
   def cssTagNoTheme(name: String): Frag =
-    cssAt(s"css/$name.${if (!minifiedAssets) "dev"}.css")
+    cssAt(s"css/$name${if (!minifiedAssets) ".dev" else ""}.css")
 
   private def cssAt(path: String): Frag =
     link(href := assetUrl(path), rel := "stylesheet")
