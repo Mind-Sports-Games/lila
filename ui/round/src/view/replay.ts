@@ -250,7 +250,7 @@ function renderButtons(ctrl: RoundController) {
 }
 
 function initMessage(d: RoundData, ply: number, trans: Trans) {
-  return game.playable(d) && ply === 0 && !d.player.spectator
+  return game.playable(d) && d.game.turns === 0 && ply === 0 && !d.player.spectator
     ? h('div.message', util.justIcon(''), [
         h('div', [
           trans('youPlayThePlayerIndexPieces', d.player.playerName),
