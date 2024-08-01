@@ -19,7 +19,7 @@ export const loadCss = (url: string) => {
 };
 
 export const loadCssPath = (key: string) =>
-  loadCss(`css/${key}.${$('body').data('theme')}.${$('body').data('dev') ? 'dev' : ''}.css`);
+  loadCss(`css/${key}.${$('body').data('theme')}${$('body').data('dev') ? '.dev' : ''}.css`);
 
 export const jsModule = (name: string) => `compiled/${name}.js`;
 
