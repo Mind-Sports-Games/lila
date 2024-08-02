@@ -30,6 +30,9 @@ jobs:
           ssh-private-key: ${{ secrets.MSO_CI_SSH_KEY }}
       - name: Retrieve last code from Github
         uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - run: git submodule absorbgitdirs
       - name: Install Node
         uses: actions/setup-node@v4
         with:
