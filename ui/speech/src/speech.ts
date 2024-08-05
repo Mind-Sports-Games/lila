@@ -48,3 +48,5 @@ export function say(text: string, cut: boolean) {
 export function step(s: { san?: San }, cut: boolean) {
   say(s.san ? renderSan(s.san) : 'Game start', cut);
 }
+
+(window as any).PlayStrategySpeech = { say, step }; // esbuild

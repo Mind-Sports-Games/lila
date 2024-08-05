@@ -14,8 +14,7 @@
   "dependencies": {
     "common": "workspace:*",
     "puz": "workspace:*",
-    "snabbdom": "^3.0.1",
-    "stratops": "git+ssh://git@github.com:Mind-Sports-Games/stratops.git#semver:v0.8.1-pstrat4.4"
+    "snabbdom": "^3.0.1"
   },
   "scripts": {
     "compile": "tsc",

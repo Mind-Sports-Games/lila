@@ -31,7 +31,6 @@
     "nvui": "workspace:*",
     "prop-types": "^15.7.2",
     "snabbdom": "^3.0.1",
-    "stratops": "git+ssh://git@github.com:Mind-Sports-Games/stratops.git#semver:v0.8.1-pstrat4.4",
     "stratutils": "workspace:*",
     "tree": "workspace:*"
   },
