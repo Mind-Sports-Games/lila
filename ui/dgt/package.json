@@ -5,14 +5,6 @@
   "description": "playstrategy.org msg",
   "author": "Thibault Duplessis",
   "license": "AGPL-3.0-or-later",
-  "dependencies": {
-    "stratops": "git+ssh://git@github.com:Mind-Sports-Games/stratops.git#semver:v0.8.1-pstrat4.4"
-  },
-  "scripts": {
-    "compile": "tsc",
-    "dev": "tsc",
-    "prod": "tsc"
-  },
   "playstrategy": {
     "bundles": "src/dgt.ts"
   }
