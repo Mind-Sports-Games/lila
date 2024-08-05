@@ -67,4 +67,4 @@ function playstrategyReplayMusic() {
   };
 }
 
-window.playstrategyReplayMusic = playstrategyReplayMusic;
+window.playstrategyReplayMusic = playstrategyReplayMusic; // declared in @types/playstrategy

@@ -14,6 +14,6 @@ export function PlayStrategyInsight(element, opts) {
   });
 
   return controller;
-};
+}
 
-(window).PlayStrategyInsight = PlayStrategyInsight; // esbuild
+window.PlayStrategyInsight = PlayStrategyInsight; // esbuild
