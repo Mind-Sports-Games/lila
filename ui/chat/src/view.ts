@@ -35,7 +35,7 @@ function renderPalantir(ctrl: Ctrl) {
         hook: bind('click', () => {
           if (!p.loaded) {
             p.loaded = true;
-            playstrategy.loadScript('javascripts/vendor/peerjs.min.js').then(() => {
+            playstrategy.loadScriptCJS('javascripts/vendor/peerjs.min.js').then(() => {
               playstrategy.loadModule('palantir').then(() => {
                 p.instance = window.Palantir!.palantir({
                   uid: ctrl.data.userId,
