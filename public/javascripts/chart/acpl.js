@@ -2,8 +2,8 @@ function toBlurArray(player) {
   return player.blurs && player.blurs.bits ? player.blurs.bits.split('') : [];
 }
 playstrategy.advantageChart = function (data, trans, el) {
-  playstrategy.loadScript('javascripts/chart/common.js').then(function () {
-    playstrategy.loadScript('javascripts/chart/division.js').then(function () {
+  playstrategy.loadScriptCJS('javascripts/chart/common.js').then(function () {
+    playstrategy.loadScriptCJS('javascripts/chart/division.js').then(function () {
       playstrategy.chartCommon('highchart').then(function () {
         playstrategy.advantageChart.update = function (d) {
           el.highcharts && el.highcharts.series[0].setData(makeSerieData(d));

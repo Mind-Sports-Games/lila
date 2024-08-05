@@ -1,7 +1,7 @@
 function playstrategyReplayMusic() {
   var orchestra;
 
-  playstrategy.loadScript('javascripts/music/orchestra.js').then(function () {
+  playstrategy.loadScriptCJS('javascripts/music/orchestra.js').then(function () {
     orchestra = playstrategyOrchestra();
   });
 
@@ -66,3 +66,5 @@ function playstrategyReplayMusic() {
     },
   };
 }
+
+window.playstrategyReplayMusic = playstrategyReplayMusic;
