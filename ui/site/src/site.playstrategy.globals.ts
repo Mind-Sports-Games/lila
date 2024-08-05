@@ -32,7 +32,7 @@ import watchers from './component/watchers';
 
 window.$as = <T>(cashOrHtml: Cash | string) => (typeof cashOrHtml === 'string' ? $(cashOrHtml) : cashOrHtml)[0] as T;
 
-export default function windowedPlaystrategy() {
+export default function windowedPlaystrategy(): PlayStrategy {
   const l = window.playstrategy;
   l.StrongSocket = StrongSocket;
   l.requestIdleCallback = requestIdleCallback;

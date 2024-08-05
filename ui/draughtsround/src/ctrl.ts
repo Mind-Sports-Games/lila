@@ -144,7 +144,7 @@ export default class RoundController {
 
     playstrategy.pubsub.on('sound_set', set => {
       if (!this.music && set === 'music')
-        playstrategy.loadScript('javascripts/music/play.js').then(() => {
+        playstrategy.loadScriptCJS('javascripts/music/play.js').then(() => {
           this.music = playstrategy.playMusic();
         });
       if (this.music && set !== 'music') this.music = undefined;

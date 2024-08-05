@@ -3,7 +3,7 @@ var m = require('mithril');
 var ctrl = require('./ctrl');
 var view = require('./view');
 
-module.exports = function (element, opts) {
+export function PlayStrategyInsight(element, opts) {
   var controller = new ctrl(opts, element);
 
   m.module(element, {
@@ -14,4 +14,6 @@ module.exports = function (element, opts) {
   });
 
   return controller;
-};
+}
+
+window.PlayStrategyInsight = PlayStrategyInsight; // esbuild

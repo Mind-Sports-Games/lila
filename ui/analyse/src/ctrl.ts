@@ -178,7 +178,7 @@ export default class AnalyseCtrl {
 
     playstrategy.pubsub.on('sound_set', (set: string) => {
       if (!this.music && set === 'music')
-        playstrategy.loadScript('javascripts/music/replay.js').then(() => {
+        playstrategy.loadScriptCJS('javascripts/music/replay.js').then(() => {
           this.music = window.playstrategyReplayMusic();
         });
       if (this.music && set !== 'music') this.music = null;
