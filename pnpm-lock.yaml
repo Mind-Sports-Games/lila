@@ -28,7 +28,7 @@ importers:
         version: https://codeload.github.com/lichess-org/ab-stub/tar.gz/94236bf34dbc9c05daf50f4c9842d859b9142be0
       chessground:
         specifier: git+ssh://git@github.com:Mind-Sports-Games/chessground.git#pla-875-improve-build-of-chessground
-        version: https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/1615a8796bee8154b775cb3aa1ed9686caae4cfc(@babel/core@7.25.2)(@jest/transform@29.7.0)(@jest/types@29.6.3)(babel-jest@29.7.0(@babel/core@7.25.2))
+        version: https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/03fbcd73f888515f820790462d6db3c8211015bc(@babel/core@7.25.2)(@jest/transform@29.7.0)(@jest/types@29.6.3)(babel-jest@29.7.0(@babel/core@7.25.2))
       eslint:
         specifier: ^8.57.0
         version: 8.57.0
@@ -1803,8 +1803,8 @@ packages:
     resolution: {tarball: https://codeload.github.com/ornicar/chess.js/tar.gz/ad0709c0b07773d9d0da8e4605a9a2a28f00d249}
     version: 0.10.2
 
-  chessground@https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/1615a8796bee8154b775cb3aa1ed9686caae4cfc:
-    resolution: {tarball: https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/1615a8796bee8154b775cb3aa1ed9686caae4cfc}
+  chessground@https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/03fbcd73f888515f820790462d6db3c8211015bc:
+    resolution: {tarball: https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/03fbcd73f888515f820790462d6db3c8211015bc}
     version: 7.11.1-pstrat2.48
     engines: {node: '>=20', pnpm: ^9}
 
@@ -4624,7 +4624,7 @@ snapshots:
 
   chess.js@https://codeload.github.com/ornicar/chess.js/tar.gz/ad0709c0b07773d9d0da8e4605a9a2a28f00d249: {}
 
-  chessground@https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/1615a8796bee8154b775cb3aa1ed9686caae4cfc(@babel/core@7.25.2)(@jest/transform@29.7.0)(@jest/types@29.6.3)(babel-jest@29.7.0(@babel/core@7.25.2)):
+  chessground@https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/03fbcd73f888515f820790462d6db3c8211015bc(@babel/core@7.25.2)(@jest/transform@29.7.0)(@jest/types@29.6.3)(babel-jest@29.7.0(@babel/core@7.25.2)):
     dependencies:
       '@jest/globals': 29.7.0
       '@types/node': 20.12.2
