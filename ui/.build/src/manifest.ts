@@ -111,7 +111,7 @@ async function hashMove(src: string) {
   const basename = path.basename(src, '.css');
   await Promise.allSettled([
     env.prod ? undefined : fs.promises.rename(`${src}.map`, path.join(env.cssDir, `${basename}.css.map`)),
-    fs.promises.rename(src, path.join(env.cssDir, `${basename}.dev.css`)),
+    fs.promises.rename(src, path.join(env.cssDir, `${basename}.css`)),
   ]);
   return { name: path.basename(src, '.css'), hash };
 }
