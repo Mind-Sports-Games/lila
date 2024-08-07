@@ -321,10 +321,11 @@ object BSONHandlers {
     def readNode(doc: Bdoc, id: UciCharPair): Option[Node] = {
       import Node.{ BsonFields => F }
       for {
-        ply <- doc.getAsOpt[Int](F.ply)
-        uci <- doc.getAsOpt[Uci](F.uci)
-        san <- doc.getAsOpt[String](F.san)
-        fen <- doc.getAsOpt[FEN](F.fen)
+        ply       <- doc.getAsOpt[Int](F.ply)
+        turnCount <- doc.getAsOpt[Int](F.turnCount).orElse(ply.some)
+        uci       <- doc.getAsOpt[Uci](F.uci)
+        san       <- doc.getAsOpt[String](F.san)
+        fen       <- doc.getAsOpt[FEN](F.fen)
         check          = ~doc.getAsOpt[Boolean](F.check)
         shapes         = doc.getAsOpt[Shapes](F.shapes).getOrElse(Shapes.empty)
         comments       = doc.getAsOpt[Comments](F.comments).getOrElse(Comments.empty)
@@ -337,6 +338,7 @@ object BSONHandlers {
       } yield Node(
         id,
         ply,
+        turnCount,
         variant,
         WithSan(variant.gameLogic, uci, san),
         fen,
@@ -388,7 +390,8 @@ object BSONHandlers {
       import variantHandlers._
 
       Root(
-        ply = r int F.ply,
+        ply = r.int(F.ply),
+        turnCount = r.intO(F.turnCount).getOrElse(r.int(F.ply)),
         variant = variant,
         fen = r.get[FEN](F.fen),
         check = r boolD F.check,

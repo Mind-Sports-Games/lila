@@ -13,7 +13,7 @@ import lila.common.Json._
 sealed trait Node {
   def ply: Int
   //
-  //def turnCount: Int
+  def turnCount: Int
   //def playerIndex: PlayerIndex
   def variant: Variant
   def fen: FEN
@@ -45,8 +45,7 @@ sealed trait Node {
   // who's playerIndex plays next
   // This was inherited from lichess but is the right?
   // Should the node track who played on this node?
-  // TODO change for multiaction (use turnCount)
-  def playerIndex = PlayerIndex.fromTurnCount(ply)
+  def playerIndex = PlayerIndex.fromTurnCount(turnCount)
 
   def mainlineNodeList: List[Node] =
     dropFirstChild :: children.headOption.fold(List.empty[Node])(_.mainlineNodeList)
@@ -54,6 +53,7 @@ sealed trait Node {
 
 case class Root(
     ply: Int,
+    turnCount: Int,
     variant: Variant,
     fen: FEN,
     check: Boolean,
@@ -87,6 +87,7 @@ case class Root(
 case class Branch(
     id: UciCharPair,
     ply: Int,
+    turnCount: Int,
     variant: Variant,
     move: Uci.WithSan,
     fen: FEN,
@@ -312,6 +313,7 @@ object Node {
         Json
           .obj(
             "ply"         -> ply,
+            "playerIndex" -> playerIndex.name,
             "fen"         -> fen.value,
             "dropsByRole" -> DropsByRole.json(dropsByRole.getOrElse(Map.empty))
           )
