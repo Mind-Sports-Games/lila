@@ -162,13 +162,10 @@ object layout {
       ground option draughtsgroundTag,
       ctx.requiresFingerprint option fingerprintTag,
       ctx.nonce map playstrategyJsObject,
-      if (netConfig.minifiedAssets)
-        jsModule("playstrategy")
-      else
-        frag(
-          depsTag,
-          jsModule("site")
-        ),
+      frag(
+        depsTag,
+        jsModule("site")
+      ),
       moreJs,
       ctx.pageData.inquiry.isDefined option jsTag("inquiry.js")
     )

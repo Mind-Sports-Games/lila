@@ -77,22 +77,7 @@ const depsMany = (modNames: string[]): PlaystrategyModule[] => unique(modNames.f
 const unique = <T>(mods: (T | undefined)[]): T[] => [...new Set(mods.filter(x => x))] as T[];
 
 async function buildPlaystrategy() {
-  const depsFilename = `${env.jsDir}/deps.min.js`;
-  await buildDeps(depsFilename);
-
-  if (env.prod) {
-    const playstrategyFilename = `${env.jsDir}/playstrategy.js`;
-    try {
-      if (fs.existsSync(playstrategyFilename)) return;
-      env.log(`Generating ${c.cyan(playstrategyFilename)} file`);
-      await append(depsFilename, playstrategyFilename);
-      env.log(`Added the content of ${c.cyan(depsFilename)}`);
-      await append(`${env.jsDir}/site.js`, playstrategyFilename);
-      env.log(`Added the content of ${c.cyan(`${env.jsDir}/site.js`)}`);
-    } catch (error) {
-      env.log(`${c.error(error + '')}`);
-    }
-  }
+  await buildDeps(`${env.jsDir}/deps.min.js`);
 }
 
 async function buildDeps(filename: string) {
