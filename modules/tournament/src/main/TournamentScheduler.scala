@@ -558,7 +558,7 @@ final private class TournamentScheduler(
       nextMonthShields :::
       weeklyTourmaments
 
-//          List( // shield tournaments!
+//          List( // lichess shield tournaments!
 //            month.firstWeek.withDayOfWeek(MONDAY)    -> Bullet,
 //            month.firstWeek.withDayOfWeek(TUESDAY)   -> SuperBlitz,
 //            month.firstWeek.withDayOfWeek(WEDNESDAY) -> Blitz,
