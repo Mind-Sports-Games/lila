@@ -1,6 +1,7 @@
 import { updateElements } from './clockView';
 import { Redraw, RoundData } from '../interfaces';
 import * as game from 'game';
+import * as Prefs from 'common/prefs';
 
 export type Seconds = number;
 export type Centis = number;
@@ -139,7 +140,10 @@ export class ClockController {
 
   private tickCallback?: number;
 
-  constructor(d: RoundData, readonly opts: ClockOpts) {
+  constructor(
+    d: RoundData,
+    readonly opts: ClockOpts,
+  ) {
     const cdata = d.clock!;
 
     if (cdata.showTenths === Prefs.ShowClockTenths.Never) this.showTenths = () => false;
@@ -215,7 +219,7 @@ export class ClockController {
     p2Pending: Seconds,
     p1Per = 0,
     p2Per = 0,
-    delay: Centis = 0
+    delay: Centis = 0,
   ) => {
     const isClockRunning = game.playable(d) && (game.playedTurns(d) > 1 || d.clock!.running),
       delayMs = delay * 10;
@@ -272,7 +276,7 @@ export class ClockController {
       this.tick,
       // changing the value of active node confuses the chromevox screen reader
       // so update the clock less often
-      this.opts.nvui ? 1000 : (time % (this.showTenths(time) ? 100 : 500)) + 1 + extraDelay
+      this.opts.nvui ? 1000 : (time % (this.showTenths(time) ? 100 : 500)) + 1 + extraDelay,
     );
   };
 
@@ -339,7 +343,7 @@ export class ClockController {
 
   delayMillisOf = (playerIndex: PlayerIndex, activePlayerInGame: PlayerIndex): Millis => {
     const isBerserk = this.goneBerserk[playerIndex];
-    const countDown = isBerserk ? 0 : this.countdownDelay ?? 0;
+    const countDown = isBerserk ? 0 : (this.countdownDelay ?? 0);
     const delayMillis = 1000 * countDown;
     return this.isNotOpponentsTurn(playerIndex) && playerIndex === activePlayerInGame
       ? Math.max(0, delayMillis - (this.elapsed() + this.pendingMillisOf(playerIndex)))

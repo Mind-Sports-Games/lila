@@ -188,7 +188,7 @@ const posToTranslateBase: (
   asP1: boolean,
   xFactor: number,
   yFactor: number,
-  shift: number
+  shift: number,
 ) => cg.NumberPair = (pos, boardSize, asP1, xFactor, yFactor, shift: number) => {
   const xf = boardSize[0] / 2 - 0.5;
   if (shift !== 0) {

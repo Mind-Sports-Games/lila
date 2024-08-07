@@ -146,12 +146,12 @@ export default function (ctrl: SwissCtrl): VNode | undefined {
                     p.outcome == 'absent'
                       ? '-'
                       : p.outcome == 'bye'
-                      ? isMatchScore
-                        ? matchScoreDisplay(multiMatchByeScore(ctrl))
-                        : '1'
-                      : '½'
+                        ? isMatchScore
+                          ? matchScoreDisplay(multiMatchByeScore(ctrl))
+                          : '1'
+                        : '½',
                   ),
-                ]
+                ],
               );
             }
             const res = result(p);
@@ -174,14 +174,14 @@ export default function (ctrl: SwissCtrl): VNode | undefined {
                 p.ismm && p.isFinalGame
                   ? h('td.matchscore', { attrs: { rowSpan: p.mmGameNb } }, res)
                   : p.ismm
-                  ? ''
-                  : h('td.matchscore', res),
-              ]
+                    ? ''
+                    : h('td.matchscore', res),
+              ],
             );
-          })
+          }),
         ),
       ]),
-    ]
+    ],
   );
 }
 

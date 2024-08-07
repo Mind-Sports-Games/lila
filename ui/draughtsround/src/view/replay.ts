@@ -35,7 +35,7 @@ const autoScroll = throttle(100, (movesEl: HTMLElement, ctrl: RoundController) =
       else if (isCol1()) movesEl.scrollLeft = st;
       else movesEl.scrollTop = st;
     }
-  })
+  }),
 );
 
 const renderDrawOffer = () =>
@@ -46,7 +46,7 @@ const renderDrawOffer = () =>
         title: 'Draw offer',
       },
     },
-    '½?'
+    '½?',
   );
 
 function renderMove(step: Step, curPly: number, orEmpty: boolean, drawOffers: Set<number>) {
@@ -58,11 +58,11 @@ function renderMove(step: Step, curPly: number, orEmpty: boolean, drawOffers: Se
             a1t: step.ply === curPly,
           },
         },
-        [step.alg || step.san, drawOffers.has(step.turnCount) ? renderDrawOffer() : undefined]
+        [step.alg || step.san, drawOffers.has(step.turnCount) ? renderDrawOffer() : undefined],
       )
     : orEmpty
-    ? h(moveTag, '…')
-    : undefined;
+      ? h(moveTag, '…')
+      : undefined;
 }
 
 export function renderResult(ctrl: RoundController): VNode | undefined {
@@ -93,7 +93,7 @@ export function renderResult(ctrl: RoundController): VNode | undefined {
         [
           viewStatus(ctrl),
           winner ? (viewStatus(ctrl) ? ' • ' : '') + ctrl.trans('playerIndexIsVictorious', winner) : '',
-        ]
+        ],
       ),
     ]);
   }
@@ -142,7 +142,7 @@ export function analysisButton(ctrl: RoundController): VNode | undefined {
             'data-icon': 'A',
           },
         },
-        forecastCount ? ['' + forecastCount] : []
+        forecastCount ? ['' + forecastCount] : [],
       )
     : undefined;
 }
@@ -170,7 +170,7 @@ function renderButtons(ctrl: RoundController) {
             }
           }
         },
-        ctrl.redraw
+        ctrl.redraw,
       ),
     },
     [
@@ -199,7 +199,7 @@ function renderButtons(ctrl: RoundController) {
         });
       }),
       analysisButton(ctrl) || h('div.noop'),
-    ]
+    ],
   );
 }
 
@@ -256,7 +256,7 @@ export function render(ctrl: RoundController): VNode | undefined {
             ctrl.autoScroll();
           }),
         },
-        renderMoves(ctrl)
+        renderMoves(ctrl),
       );
   return ctrl.nvui
     ? undefined

@@ -18,18 +18,18 @@ export default function (ctrl: AnalyseCtrl): VNode | undefined {
           round.ongoing
             ? ctrl.trans.noarg('playingRightNow')
             : round.startsAt
-            ? h(
-                'time.timeago',
-                {
-                  hook: {
-                    insert(vnode) {
-                      (vnode.elm as HTMLElement).setAttribute('datetime', '' + round.startsAt);
+              ? h(
+                  'time.timeago',
+                  {
+                    hook: {
+                      insert(vnode) {
+                        (vnode.elm as HTMLElement).setAttribute('datetime', '' + round.startsAt);
+                      },
                     },
                   },
-                },
-                playstrategy.timeago(round.startsAt)
-              )
-            : null,
+                  playstrategy.timeago(round.startsAt),
+                )
+              : null,
         ]),
         relay.data.tour.markup
           ? h('div', {
@@ -62,13 +62,13 @@ export function rounds(ctrl: StudyCtrl): VNode {
               {
                 attrs: { href: relay.roundPath(round) },
               },
-              round.name
+              round.name,
             ),
             round.ongoing
               ? h('ongoing', { attrs: { ...dataIcon('J'), title: 'Ongoing' } })
               : round.finished
-              ? h('finished', { attrs: { ...dataIcon('E'), title: 'Finished' } })
-              : null,
+                ? h('finished', { attrs: { ...dataIcon('E'), title: 'Finished' } })
+                : null,
             canContribute
               ? h('a.act', {
                   attrs: {
@@ -77,8 +77,8 @@ export function rounds(ctrl: StudyCtrl): VNode {
                   },
                 })
               : null,
-          ]
-        )
+          ],
+        ),
       )
       .concat(
         canContribute
@@ -93,11 +93,11 @@ export function rounds(ctrl: StudyCtrl): VNode {
                       'data-icon': 'O',
                     },
                   },
-                  ctrl.trans.noarg('addRound')
-                )
+                  ctrl.trans.noarg('addRound'),
+                ),
               ),
             ]
-          : []
-      )
+          : [],
+      ),
   );
 }

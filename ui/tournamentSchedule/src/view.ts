@@ -3,14 +3,14 @@ import { h, VNode } from 'snabbdom';
 const scale = 8;
 let now: number, startTime: number, stopTime: number;
 
-const i18nNames = {};
+const i18nNames: any = {};
 
-function i18nName(t) {
+function i18nName(t: any) {
   if (!i18nNames[t.id]) i18nNames[t.id] = t.fullName;
   return i18nNames[t.id];
 }
 
-function displayClockLimit(limit) {
+function displayClockLimit(limit: any) {
   switch (limit) {
     case 15:
       return '¼';
@@ -25,16 +25,16 @@ function displayClockLimit(limit) {
   }
 }
 
-function displayClock(clock) {
+function displayClock(clock: any) {
   return displayClockLimit(clock.limit) + '+' + clock.increment;
 }
 
-function leftPos(time) {
+function leftPos(time: any) {
   const rounded = 1000 * 60 * Math.floor(time / 1000 / 60);
   return (scale * (rounded - startTime)) / 1000 / 60;
 }
 
-function laneGrouper(t) {
+function laneGrouper(t: any) {
   if (t.schedule && t.schedule.freq === 'unique') {
     return -1;
   } else if (t.variant.key !== 'standard') {
@@ -52,10 +52,10 @@ function laneGrouper(t) {
   }
 }
 
-function group(arr, grouper) {
-  const groups = {};
+function group(arr: any, grouper: any) {
+  const groups: any = {};
   let g;
-  arr.forEach(e => {
+  arr.forEach((e: any) => {
     g = grouper(e);
     if (!groups[g]) groups[g] = [];
     groups[g].push(e);
@@ -67,20 +67,20 @@ function group(arr, grouper) {
     });
 }
 
-function fitLane(lane, tour2) {
-  return !lane.some(function (tour1) {
+function fitLane(lane: any, tour2: any) {
+  return !lane.some(function (tour1: any) {
     return !(tour1.finishesAt <= tour2.startsAt || tour2.finishesAt <= tour1.startsAt);
   });
 }
 
 // splits lanes that have collisions, but keeps
 // groups separate by not compacting existing lanes
-function splitOverlaping(lanes) {
+function splitOverlaping(lanes: any) {
   let ret: any[] = [],
     i: number;
-  lanes.forEach(lane => {
+  lanes.forEach((lane: any) => {
     const newLanes: any[] = [[]];
-    lane.forEach(tour => {
+    lane.forEach((tour: any) => {
       let collision = true;
       for (i = 0; i < newLanes.length; i++) {
         if (fitLane(newLanes[i], tour)) {
@@ -96,10 +96,10 @@ function splitOverlaping(lanes) {
   return ret;
 }
 
-function tournamentClass(tour) {
+function tournamentClass(tour: any) {
   const finished = tour.status === 30,
     userCreated = tour.createdBy !== 'playstrategy',
-    classes = {
+    classes: any = {
       'tsht-rated': tour.rated,
       'tsht-casual': !tour.rated,
       'tsht-finished': finished,
@@ -113,13 +113,13 @@ function tournamentClass(tour) {
   return classes;
 }
 
-function iconOf(tour, perfIcon) {
+function iconOf(tour: any, perfIcon: any) {
   return tour.isMedley ? '5' : perfIcon;
 }
 
 let mousedownAt: number[] | undefined;
 
-function renderTournament(ctrl, tour) {
+function renderTournament(ctrl: any, tour: any) {
   let width = tour.minutes * scale;
   const left = leftPos(tour.startsAt);
   // moves content into viewport, for long tourneys and marathons
@@ -130,8 +130,8 @@ function renderTournament(ctrl, tour) {
           0,
           Math.min(
             width - 250, // max padding, reserved text space
-            leftPos(now) - left - 380
-          )
+            leftPos(now) - left - 380,
+          ),
         ); // distance from Now
   // cut right overflow to fit viewport and not widen it, for marathons
   width = Math.min(width, leftPos(stopTime) - left);
@@ -155,7 +155,7 @@ function renderTournament(ctrl, tour) {
                 title: tour.perf.name,
               },
             }
-          : {}
+          : {},
       ),
       h('span.body', [
         h('span.name', i18nName(tour)),
@@ -172,12 +172,12 @@ function renderTournament(ctrl, tour) {
                 {
                   attrs: { 'data-icon': 'r' },
                 },
-                tour.nbPlayers
+                tour.nbPlayers,
               )
             : null,
         ]),
       ]),
-    ]
+    ],
   );
 }
 
@@ -197,30 +197,30 @@ function renderTimeline() {
           class: { hour: !time.getMinutes() },
           attrs: { style: 'left: ' + leftPos(time.getTime()) + 'px' },
         },
-        timeString(time)
-      )
+        timeString(time),
+      ),
     );
     time.setUTCMinutes(time.getUTCMinutes() + minutesBetween);
   }
   timeHeaders.push(
     h('div.timeheader.now', {
       attrs: { style: 'left: ' + leftPos(now) + 'px' },
-    })
+    }),
   );
 
   return h('div.timeline', timeHeaders);
 }
 
 // converts Date to "%H:%M" with leading zeros
-function timeString(time) {
+function timeString(time: any) {
   return ('0' + time.getHours()).slice(-2) + ':' + ('0' + time.getMinutes()).slice(-2);
 }
 
-function isSystemTournament(t) {
+function isSystemTournament(t: any) {
   return !!t.schedule;
 }
 
-export default function (ctrl) {
+export default function (ctrl: any) {
   now = Date.now();
   startTime = now - 3 * 60 * 60 * 1000;
   stopTime = startTime + 10 * 60 * 60 * 1000;
@@ -233,15 +233,15 @@ export default function (ctrl) {
   data.finished
     .concat(data.started)
     .concat(data.created)
-    .filter(t => t.finishesAt > startTime)
-    .forEach(t => {
+    .filter((t: any) => t.finishesAt > startTime)
+    .forEach((t: any) => {
       if (isSystemTournament(t)) systemTours.push(t);
       else userTours.push(t);
     });
 
   // group system tournaments into dedicated lanes for PerfType
   const tourLanes = splitOverlaping(group(systemTours, laneGrouper).concat([userTours])).filter(
-    lane => lane.length > 0
+    lane => lane.length > 0,
   );
 
   return h('div.tour-chart', [
@@ -275,10 +275,10 @@ export default function (ctrl) {
         ...tourLanes.map(lane => {
           return h(
             'div.tournamentline',
-            lane.map(tour => renderTournament(ctrl, tour))
+            lane.map((tour: any) => renderTournament(ctrl, tour)),
           );
         }),
-      ]
+      ],
     ),
   ]);
 }

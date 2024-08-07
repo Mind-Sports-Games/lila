@@ -34,7 +34,7 @@ $(function () {
     $(this).html(
       $(this)
         .html()
-        .replaceAll(/(?:https:\/\/)?playstrategy\.org\/([\w\/]+)/g, '<a href="/$1">playstrategy.org/$1</a>')
+        .replaceAll(/(?:https:\/\/)?playstrategy\.org\/([\w\/]+)/g, '<a href="/$1">playstrategy.org/$1</a>'),
     );
   });
 });

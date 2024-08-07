@@ -1,6 +1,6 @@
 import { h, VNode } from 'snabbdom';
 
-import { DasherCtrl, Mode } from './dasher';
+import { DasherCtrl, Mode } from './interfaces';
 import { view as pingView } from './ping';
 import { bind } from './util';
 
@@ -15,7 +15,7 @@ export default function (ctrl: DasherCtrl): VNode {
           h(
             'a.user-link.online.text.is-green',
             linkCfg(`/@/${d.user.name}`, d.user.patron ? '' : ''),
-            noarg('profile')
+            noarg('profile'),
           ),
 
           h('a.text', linkCfg('/inbox', 'e'), noarg('inbox')),
@@ -25,9 +25,9 @@ export default function (ctrl: DasherCtrl): VNode {
             linkCfg(
               '/account/preferences/game-display',
               '%',
-              ctrl.opts.playing ? { target: '_blank', rel: 'noopener' } : undefined
+              ctrl.opts.playing ? { target: '_blank', rel: 'noopener' } : undefined,
             ),
-            noarg('preferences')
+            noarg('preferences'),
           ),
 
           !d.coach ? null : h('a.text', linkCfg('/coach/edit', ':'), 'Coach manager'),
@@ -48,9 +48,9 @@ export default function (ctrl: DasherCtrl): VNode {
                     'data-icon': 'w',
                   },
                 },
-                noarg('logOut')
+                noarg('logOut'),
               ),
-            ]
+            ],
           ),
         ])
       : null;
@@ -81,7 +81,7 @@ export default function (ctrl: DasherCtrl): VNode {
             },
             hook: bind('click', () => playstrategy.pubsub.emit('zen')),
           },
-          noarg('zenMode')
+          noarg('zenMode'),
         ),
       ])
     : null;

@@ -100,7 +100,7 @@ export function view(ctrl: SoundCtrl): VNode {
         }),
         h('div.selector', ctrl.makeList().map(soundView(ctrl, current))),
       ]),
-    ]
+    ],
   );
 }
 
@@ -113,6 +113,6 @@ function soundView(ctrl: SoundCtrl, current: Key) {
         class: { active: current === s[0] },
         attrs: { 'data-icon': 'E' },
       },
-      s[1]
+      s[1],
     );
 }

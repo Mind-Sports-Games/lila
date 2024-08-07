@@ -56,7 +56,7 @@ object freeJs {
         tbody(
           uiModules map { module =>
             val name = renames.getOrElse(module, module)
-            val file = s"$name.min.js"
+            val file = s"$name.js"
             tr(
               td(a(href := assetUrl(s"compiled/$file"))(file)),
               td(agpl),

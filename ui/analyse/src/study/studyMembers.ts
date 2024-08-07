@@ -185,7 +185,7 @@ export function view(ctrl: StudyCtrl): VNode {
       {
         attrs: { 'data-href': '/@/' + u.name },
       },
-      (u.title ? u.title + ' ' : '') + u.name
+      (u.title ? u.title + ' ' : '') + u.name,
     );
   }
 
@@ -201,7 +201,7 @@ export function view(ctrl: StudyCtrl): VNode {
         },
         attrs: { title: ctrl.trans.noarg(contrib ? 'contributor' : 'spectator') },
       },
-      [iconTag(contrib ? 'r' : 'v')]
+      [iconTag(contrib ? 'r' : 'v')],
     );
   }
 
@@ -215,7 +215,7 @@ export function view(ctrl: StudyCtrl): VNode {
             members.confing(members.confing() == member.user.id ? null : member.user.id);
             console.log(members.confing(), member.user.id);
           },
-          ctrl.redraw
+          ctrl.redraw,
         ),
       });
     if (!isOwner && member.user.id === members.myId)
@@ -251,7 +251,7 @@ export function view(ctrl: StudyCtrl): VNode {
                 e => {
                   members.setRole(member.user.id, (e.target as HTMLInputElement).checked ? 'w' : 'r');
                 },
-                ctrl.redraw
+                ctrl.redraw,
               ),
             }),
             h('label', { attrs: { for: roleId } }),
@@ -266,10 +266,10 @@ export function view(ctrl: StudyCtrl): VNode {
               attrs: dataIcon('L'),
               hook: bind('click', _ => members.kick(member.user.id), ctrl.redraw),
             },
-            ctrl.trans.noarg('kick')
-          )
+            ctrl.trans.noarg('kick'),
+          ),
         ),
-      ]
+      ],
     );
   }
 
@@ -291,7 +291,7 @@ export function view(ctrl: StudyCtrl): VNode {
                 key: member.user.id,
                 class: { editing: !!confing },
               },
-              [h('div.left', [statusIcon(member), username(member)]), configButton(ctrl, member)]
+              [h('div.left', [statusIcon(member), username(member)]), configButton(ctrl, member)],
             ),
             confing ? memberConfig(member) : null,
           ];
@@ -304,7 +304,7 @@ export function view(ctrl: StudyCtrl): VNode {
               key: 'add',
               hook: bind('click', members.inviteForm.toggle, ctrl.redraw),
             },
-            [h('div.left', [h('span.status', iconTag('O')), h('div.user-link', ctrl.trans.noarg('addMembers'))])]
+            [h('div.left', [h('span.status', iconTag('O')), h('div.user-link', ctrl.trans.noarg('addMembers'))])],
           )
         : null,
       !members.canContribute() && ctrl.data.admin
@@ -323,11 +323,11 @@ export function view(ctrl: StudyCtrl): VNode {
                 {
                   attrs: { type: 'submit' },
                 },
-                'Enter as admin'
+                'Enter as admin',
               ),
-            ]
+            ],
           )
         : null,
-    ]
+    ],
   );
 }

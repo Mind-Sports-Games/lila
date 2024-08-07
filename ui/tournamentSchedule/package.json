@@ -11,16 +11,17 @@
   ],
   "author": "Thibault Duplessis",
   "license": "AGPL-3.0-or-later",
-  "devDependencies": {
-    "@build/rollupProject": "2.0.0",
-    "@types/playstrategy": "2.0.0"
-  },
   "dependencies": {
+    "@types/dragscroll": "^0.0.3",
     "dragscroll": "^0.0.8",
     "snabbdom": "^3.0.1"
   },
   "scripts": {
-    "dev": "rollup --config",
-    "prod": "rollup --config --config-prod"
+    "compile": "tsc",
+    "dev": "tsc",
+    "prod": "tsc"
+  },
+  "playstrategy": {
+    "bundles": "src/tournament.schedule.ts"
   }
 }

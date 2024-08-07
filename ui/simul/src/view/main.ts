@@ -32,12 +32,12 @@ export default function (ctrl: SimulCtrl) {
             },
           },
         },
-        handler(ctrl)
+        handler(ctrl),
       ),
       h('div.chat__members.none', {
         hook: util.onInsert(playstrategy.watchers),
       }),
-    ]
+    ],
   );
 }
 

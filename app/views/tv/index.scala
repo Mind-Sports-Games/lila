@@ -26,7 +26,7 @@ object index {
       moreJs = frag(
         roundTag(pov.game.variant.gameLogic),
         embedJsUnsafeLoadThen(
-          s"""${roundPlayStrategyTag(pov.game.variant.gameLogic)}.boot(${safeJsonValue(
+          s"""${roundPlayStrategyTag(pov.game.variant.gameLogic)}(${safeJsonValue(
             Json.obj(
               "data" -> data,
               "i18n" -> views.html.round.jsI18n(pov.game)

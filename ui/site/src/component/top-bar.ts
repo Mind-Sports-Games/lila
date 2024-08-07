@@ -16,7 +16,7 @@ export default function () {
     $('#topnav > section > a').removeAttr('href');
 
   $('#topnav-toggle').on('change', e =>
-    document.body.classList.toggle('masked', (e.target as HTMLInputElement).checked)
+    document.body.classList.toggle('masked', (e.target as HTMLInputElement).checked),
   );
 
   $('#top').on('click', 'a.toggle', function (this: HTMLElement) {
@@ -36,7 +36,7 @@ export default function () {
 
   {
     // challengeApp
-    let instance, booted: boolean;
+    let instance: any, booted: boolean;
     const $toggle = $('#challenge-toggle');
     $toggle.one('mouseover click', () => load());
     const load = function (data?: any) {
@@ -57,7 +57,7 @@ export default function () {
             pulse() {
               $toggle.addClass('pulse');
             },
-          }))
+          })),
       );
     };
     pubsub.on('socket.in.challenges', data => {
@@ -69,7 +69,7 @@ export default function () {
 
   {
     // notifyApp
-    let instance, booted: boolean;
+    let instance: any, booted: boolean;
     const $toggle = $('#notify-toggle'),
       selector = '#notify-app';
 
@@ -96,7 +96,7 @@ export default function () {
             pulse() {
               $toggle.addClass('pulse');
             },
-          }))
+          })),
       );
     };
 
@@ -143,8 +143,8 @@ export default function () {
       if (booted) return;
       booted = true;
       loadModule('cli').then(
-        () => window.PlayStrategyCli.app($input[0]),
-        () => (booted = false)
+        () => window.PlayStrategyCli($input[0]),
+        () => (booted = false),
       );
     };
     $input.on({

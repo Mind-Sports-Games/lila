@@ -1,10 +1,12 @@
 {
   "extends": "../tsconfig_module.base.json",
   "include": ["src"],
-  "exclude": [],
   "compilerOptions": {
-    "outDir": ".",
-    "types": ["jest", "cash"],
-    "esModuleInterop": true
-  }
+    "outDir": "./dist",
+    "rootDir": "src",
+    "types": ["playstrategy", "web"],
+    "composite": true,
+    "incremental": true
+  },
+  "references": [{ "path": "../stratutils/tsconfig.json" }]
 }

@@ -21,7 +21,7 @@ export function makeShapesFromUci(
   playerIndex: PlayerIndex,
   uci: Uci,
   brush: string,
-  modifiers?: DrawModifiers
+  modifiers?: DrawModifiers,
 ): DrawShape[] {
   // TODO: add this in stratops
   const move = parseLexicalUci(uci);
@@ -89,7 +89,7 @@ export function compute(ctrl: AnalyseCtrl): DrawShape[] {
             shapes = shapes.concat(
               makeShapesFromUci(playerIndex, pv.moves[0], 'paleGrey', {
                 lineWidth: Math.round(12 - shift * 50), // 12 to 2
-              })
+              }),
             );
           }
         });
@@ -107,7 +107,7 @@ export function compute(ctrl: AnalyseCtrl): DrawShape[] {
         shapes = shapes.concat(
           makeShapesFromUci(rPlayerIndex, pv.moves[0], 'paleRed', {
             lineWidth: Math.round(11 - shift * 45), // 11 to 2
-          })
+          }),
         );
       }
     });
@@ -125,8 +125,8 @@ export function compute(ctrl: AnalyseCtrl): DrawShape[] {
               ? 'c1'
               : 'g1'
             : san === 'O-O-O'
-            ? 'c8'
-            : 'g8'
+              ? 'c8'
+              : 'g8'
           : move.to;
         shapes = shapes.concat({
           orig: destSquare,

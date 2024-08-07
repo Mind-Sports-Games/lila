@@ -192,7 +192,7 @@ export function make(send: SocketSend, ctrl: RoundController): RoundSocket {
           const goStonesToSelect = util.goStonesToSelect(
             ctrl.data.selectedSquares,
             ctrl.chessground.state.pieces,
-            ctrl.data.game.variant.boardSize
+            ctrl.data.game.variant.boardSize,
           );
           for (const square of goStonesToSelect) {
             ctrl.chessground.selectSquare(square as cg.Key);
@@ -251,8 +251,8 @@ export function make(send: SocketSend, ctrl: RoundController): RoundSocket {
       modal(
         $(
           '<p>Simul complete!</p><br /><br />' +
-            `<a class="button" href="/simul/${simul.id}">Back to ${simul.name} simul</a>`
-        )
+            `<a class="button" href="/simul/${simul.id}">Back to ${simul.name} simul</a>`,
+        ),
       );
     },
   };

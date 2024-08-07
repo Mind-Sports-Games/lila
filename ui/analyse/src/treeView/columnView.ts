@@ -36,7 +36,7 @@ function emptyMove(conceal?: Conceal): VNode {
     {
       class: c,
     },
-    '...'
+    '...',
   );
 }
 
@@ -57,7 +57,7 @@ function renderChildrenOf(ctx: Ctx, node: Tree.ParentedNode, opts: Opts): MaybeV
           parentPath: opts.parentPath,
           isMainline: true,
           conceal,
-        }) || []
+        }) || [],
       );
     const mainChildren = main.forceVariation
       ? undefined
@@ -82,12 +82,12 @@ function renderChildrenOf(ctx: Ctx, node: Tree.ParentedNode, opts: Opts): MaybeV
               isMainline: passOpts.isMainline,
               conceal,
               noConceal: !conceal,
-            })
-          )
+            }),
+          ),
         ),
       ] as MaybeVNodes)
       .concat(
-        isP1 && mainChildren ? [moveView.renderIndex(main.ply, variant.key, false), emptyMove(passOpts.conceal)] : []
+        isP1 && mainChildren ? [moveView.renderIndex(main.ply, variant.key, false), emptyMove(passOpts.conceal)] : [],
       )
       .concat(mainChildren || []);
   }
@@ -125,10 +125,10 @@ function renderLines(ctx: Ctx, nodes: Tree.ParentedNode[], opts: Opts): VNode {
             withIndex: true,
             noConceal: opts.noConceal,
             truncate: n.comp && !treePath.contains(ctx.ctrl.path, opts.parentPath + n.id) ? 3 : undefined,
-          })
+          }),
         )
       );
-    })
+    }),
   );
 }
 
@@ -149,8 +149,8 @@ function renderMainlineMoveOf(ctx: Ctx, node: Tree.ParentedNode, opts: Opts): VN
     moveView.renderMove(
       { variant: ctx.ctrl.data.game.variant, ...ctx },
       node,
-      notationStyle(ctx.ctrl.data.game.variant.key)
-    )
+      notationStyle(ctx.ctrl.data.game.variant.key),
+    ),
   );
 }
 
@@ -169,7 +169,7 @@ function renderVariationMoveOf(ctx: Ctx, node: Tree.ParentedNode, opts: Opts): V
           fen: node.fen,
           prevFen: node.parent?.fen || '',
         },
-        variant
+        variant,
       ),
     ],
     classes = nodeClasses(ctx, node, path);
@@ -181,7 +181,7 @@ function renderVariationMoveOf(ctx: Ctx, node: Tree.ParentedNode, opts: Opts): V
       attrs: { p: path },
       class: classes,
     },
-    content
+    content,
   );
 }
 
@@ -194,7 +194,7 @@ function renderMoveAndChildrenOf(ctx: Ctx, node: Tree.ParentedNode, opts: Opts):
         {
           attrs: { p: path },
         },
-        [h('index', '[...]')]
+        [h('index', '[...]')],
       ),
     ];
   return ([renderMoveOf(ctx, node, opts)] as MaybeVNodes)
@@ -206,7 +206,7 @@ function renderMoveAndChildrenOf(ctx: Ctx, node: Tree.ParentedNode, opts: Opts):
         isMainline: opts.isMainline,
         noConceal: opts.noConceal,
         truncate: opts.truncate ? opts.truncate - 1 : undefined,
-      }) || []
+      }) || [],
     );
 }
 
@@ -219,7 +219,7 @@ function renderInline(ctx: Ctx, node: Tree.ParentedNode, opts: Opts): VNode {
       isMainline: false,
       noConceal: opts.noConceal,
       truncate: opts.truncate,
-    })
+    }),
   );
 }
 
@@ -266,15 +266,17 @@ export default function (ctrl: AnalyseCtrl, concealOf?: ConcealOf): VNode {
     {
       hook: mainHook(ctrl),
     },
-    ([
-      isEmpty(commentTags) ? null : h('interrupt', commentTags),
-      root.ply & 1 ? moveView.renderIndex(root.ply, ctrl.data.game.variant.key, false) : null,
-      root.ply & 1 ? emptyMove() : null,
-    ] as MaybeVNodes).concat(
+    (
+      [
+        isEmpty(commentTags) ? null : h('interrupt', commentTags),
+        root.ply & 1 ? moveView.renderIndex(root.ply, ctrl.data.game.variant.key, false) : null,
+        root.ply & 1 ? emptyMove() : null,
+      ] as MaybeVNodes
+    ).concat(
       renderChildrenOf(ctx, root, {
         parentPath: '',
         isMainline: true,
-      }) || []
-    )
+      }) || [],
+    ),
   );
 }

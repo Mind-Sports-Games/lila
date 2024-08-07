@@ -8,6 +8,7 @@ import { bind, onInsert } from './util';
 import RoundController from './ctrl';
 import { MaybeVNode } from './interfaces';
 import { promotion } from 'stratutils';
+import * as Prefs from 'common/prefs';
 
 interface Promoting {
   move: [cg.Key, cg.Key];
@@ -23,7 +24,7 @@ export function sendPromotion(
   orig: cg.Key,
   dest: cg.Key,
   role: cg.Role,
-  meta: cg.MoveMetadata
+  meta: cg.MoveMetadata,
 ): boolean {
   const piece = ctrl.chessground.state.pieces.get(dest);
   if (['shogi', 'minishogi'].includes(ctrl.data.game.variant.key) && piece && piece.role === role) {
@@ -40,7 +41,7 @@ export function start(
   ctrl: RoundController,
   orig: cg.Key,
   dest: cg.Key,
-  meta: cg.MoveMetadata = {} as cg.MoveMetadata
+  meta: cg.MoveMetadata = {} as cg.MoveMetadata,
 ): boolean {
   const d = ctrl.data,
     premovePiece = ctrl.chessground.state.pieces.get(orig),
@@ -128,7 +129,7 @@ function renderPromotion(
   dest: cg.Key,
   roles: cg.Role[],
   playerIndex: PlayerIndex,
-  orientation: cg.Orientation
+  orientation: cg.Orientation,
 ): MaybeVNode {
   const rows = ctrl.chessground.state.dimensions.height;
   const columns = ctrl.chessground.state.dimensions.width;
@@ -174,9 +175,9 @@ function renderPromotion(
             finish(ctrl, serverRole);
           }),
         },
-        [h(`piece.${serverRole}.${playerIndex}.ally`)]
+        [h(`piece.${serverRole}.${playerIndex}.ally`)],
       );
-    })
+    }),
   );
 }
 
@@ -190,13 +191,13 @@ export function view(ctrl: RoundController): MaybeVNode {
       variantKey === 'shogi' || variantKey === 'minishogi'
         ? (['p' + piece?.role, piece?.role] as cg.Role[])
         : variantKey === 'antichess'
-        ? roles.concat('k-piece')
-        : roles;
+          ? roles.concat('k-piece')
+          : roles;
   return renderPromotion(
     ctrl,
     promoting.move[1],
     rolesToChoose,
     ctrl.data.player.playerIndex,
-    ctrl.chessground.state.orientation
+    ctrl.chessground.state.orientation,
   );
 }

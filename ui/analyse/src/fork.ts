@@ -73,7 +73,7 @@ export function view(root: AnalyseCtrl, concealOf?: ConcealOf) {
         el.addEventListener('click', e => {
           const target = e.target as HTMLElement,
             it = parseInt(
-              (target.parentNode as HTMLElement).getAttribute('data-it') || target.getAttribute('data-it') || ''
+              (target.parentNode as HTMLElement).getAttribute('data-it') || target.getAttribute('data-it') || '',
             );
           root.fork.proceed(it);
           root.redraw();
@@ -97,10 +97,10 @@ export function view(root: AnalyseCtrl, concealOf?: ConcealOf) {
               showGlyphs: root.showComputer(),
             },
             parentedNode(node, state.node),
-            notationStyle(root.data.game.variant.key)
-          )!
+            notationStyle(root.data.game.variant.key),
+          )!,
         );
       return undefined;
-    })
+    }),
   );
 }

@@ -5,12 +5,10 @@
   "description": "playstrategy.org service worker",
   "author": "Thibault Duplessis",
   "license": "AGPL-3.0-or-later",
-  "devDependencies": {
-    "@build/rollupProject": "2.0.0",
+  "dependencies": {
     "types-serviceworker": "^0.0.1"
   },
-  "scripts": {
-    "dev": "rollup --config",
-    "prod": "rollup --config --config-prod"
+  "playstrategy": {
+    "bundles": "src/serviceWorker.ts"
   }
 }

@@ -28,9 +28,9 @@ const renderVote = (ctrl: Controller): VNode =>
               h('div.vote.vote-down', {
                 hook: bind('click', () => ctrl.vote(false)),
               }),
-            ]
+            ],
           ),
-        ]
+        ],
   );
 
 const renderContinue = (ctrl: Controller) =>
@@ -39,7 +39,7 @@ const renderContinue = (ctrl: Controller) =>
     {
       hook: bind('click', ctrl.nextPuzzle),
     },
-    [h('i', { attrs: dataIcon('G') }), ctrl.trans.noarg('continueTraining')]
+    [h('i', { attrs: dataIcon('G') }), ctrl.trans.noarg('continueTraining')],
   );
 
 const renderStreak = (ctrl: Controller): MaybeVNodes => [
@@ -52,7 +52,7 @@ const renderStreak = (ctrl: Controller): MaybeVNodes => [
     {
       attrs: { href: '/streak' },
     },
-    [h('i', { attrs: dataIcon('G') }), ctrl.trans('newStreak')]
+    [h('i', { attrs: dataIcon('G') }), ctrl.trans('newStreak')],
   ),
 ];
 
@@ -81,10 +81,10 @@ export default function (ctrl: Controller): VNode {
                   {
                     hook: bind('click', ctrl.nextPuzzle),
                   },
-                  ctrl.trans.noarg(ctrl.streak ? 'continueTheStreak' : 'continueTraining')
+                  ctrl.trans.noarg(ctrl.streak ? 'continueTheStreak' : 'continueTraining'),
                 )
               : undefined,
           ]),
-        ]
+        ],
   );
 }

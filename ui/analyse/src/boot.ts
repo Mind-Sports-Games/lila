@@ -1,7 +1,7 @@
 import { AnalyseOpts } from './interfaces';
-import { start } from './main';
+import { PlayStrategyAnalyse } from './analysisBoard';
 
-export default function (cfg: AnalyseOpts) {
+export default function PlayStrategyAnalyseBoot(cfg: AnalyseOpts) {
   playstrategy.socket = new playstrategy.StrongSocket(cfg.data.url.socket, cfg.data.player.version, {
     params: {
       userTv: cfg.data.userTv && cfg.data.userTv.id,
@@ -13,5 +13,7 @@ export default function (cfg: AnalyseOpts) {
   cfg.$side = $('.analyse__side').clone();
   cfg.$underboard = $('.analyse__underboard').clone();
   cfg.socketSend = playstrategy.socket.send;
-  const analyse = start(cfg);
+  const analyse = PlayStrategyAnalyse(cfg);
 }
+
+(window as any).PlayStrategyAnalyseBoot = PlayStrategyAnalyseBoot; // esbuild

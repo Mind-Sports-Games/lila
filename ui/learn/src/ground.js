@@ -92,7 +92,7 @@ module.exports = {
       cg.setShapes(
         checks.map(function (move) {
           return util.arrow(move.orig + move.dest, 'yellow');
-        })
+        }),
       );
   },
   promote: function (key, role) {

@@ -3,8 +3,8 @@ function toBlurArray(player) {
 }
 playstrategy.movetimeChart = function (data, trans) {
   if (!data.game.plyCentis) return; // imported games
-  playstrategy.loadScript('javascripts/chart/common.js').then(function () {
-    playstrategy.loadScript('javascripts/chart/division.js').then(function () {
+  playstrategy.loadScriptCJS('javascripts/chart/common.js').then(function () {
+    playstrategy.loadScriptCJS('javascripts/chart/division.js').then(function () {
       playstrategy.chartCommon('highchart').then(function () {
         playstrategy.movetimeChart.render = function () {
           $('#movetimes-chart:not(.rendered)').each(function () {

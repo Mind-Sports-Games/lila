@@ -35,8 +35,8 @@ export default function (ctrl: AnalyseCtrl): VNode[] | undefined {
       playerNames,
       playerIndex,
       ticking === playerIndex,
-      ctrl.bottomPlayerIndex() !== playerIndex
-    )
+      ctrl.bottomPlayerIndex() !== playerIndex,
+    ),
   );
 }
 
@@ -57,8 +57,8 @@ function playerBarsForAnalysisBoards(ctrl: AnalyseCtrl, requiredVariants: string
       playerNames,
       playerIndex,
       ticking === playerIndex,
-      ctrl.bottomPlayerIndex() !== playerIndex
-    )
+      ctrl.bottomPlayerIndex() !== playerIndex,
+    ),
   );
 }
 
@@ -68,7 +68,7 @@ function renderPlayer(
   playerNames: PlayerNames,
   playerIndex: PlayerIndex,
   ticking: boolean,
-  top: boolean
+  top: boolean,
 ): VNode {
   const title = findTag(tags, `${playerIndex}title`),
     elo = findTag(tags, `${playerIndex}elo`),
@@ -88,6 +88,6 @@ function renderPlayer(
         ]),
       ]),
       clocks && clocks[playerIndex === 'p1' ? 0 : 1],
-    ]
+    ],
   );
 }

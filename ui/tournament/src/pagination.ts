@@ -26,9 +26,10 @@ function scrollToMeButton(ctrl: TournamentController): VNode | undefined {
       },
       hook: bind('mousedown', ctrl.toggleFocusOnMe, ctrl.redraw),
     });
+  return;
 }
 
-export function renderPager(ctrl: TournamentController, pag): MaybeVNodes {
+export function renderPager(ctrl: TournamentController, pag: any): MaybeVNodes {
   const enabled = !!pag.currentPageResults,
     page = ctrl.page;
   return pag.nbPages > -1
@@ -66,4 +67,5 @@ export function players(ctrl: TournamentController) {
 
 export function myPage(ctrl: TournamentController): number | undefined {
   if (ctrl.data.me) return Math.floor((ctrl.data.me.rank - 1) / 10) + 1;
+  return;
 }

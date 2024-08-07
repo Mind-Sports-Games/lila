@@ -11,7 +11,7 @@ db.pref.find().forEach(c => {
           { name: '2dhanzi', gameFamily: 4 },
         ],
       },
-    }
+    },
   );
 });
 
@@ -60,6 +60,6 @@ db.pref.find().forEach(c => {
           { name: 'black_gloss', gameFamily: 7 },
         ],
       },
-    }
+    },
   );
 });

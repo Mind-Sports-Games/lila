@@ -73,7 +73,7 @@ function renderChildrenOf(ctx: Ctx, node: Tree.Node, opts: RenderOpts): MaybeVNo
         renderLines(ctx, cs.slice(1), {
           parentPath: opts.parentPath,
           isMainline: true,
-        })
+        }),
       ),
       ...(isP1 && mainChildren ? [renderIndex(main.ply, false), emptyMove()] : []),
       ...mainChildren,
@@ -95,9 +95,9 @@ function renderLines(ctx: Ctx, nodes: Tree.Node[], opts: RenderOpts): VNode {
           parentPath: opts.parentPath,
           isMainline: false,
           withIndex: true,
-        })
+        }),
       );
-    })
+    }),
   );
 }
 
@@ -119,7 +119,7 @@ function renderMainlineMoveOf(ctx: Ctx, node: Tree.Node, opts: RenderOpts): VNod
       attrs: { p: path },
       class: classes,
     },
-    renderMove(ctx, node)
+    renderMove(ctx, node),
   );
 }
 
@@ -129,7 +129,7 @@ function renderGlyph(glyph: Glyph): VNode {
     {
       attrs: { title: glyph.name },
     },
-    glyph.symbol
+    glyph.symbol,
   );
 }
 
@@ -181,7 +181,7 @@ function renderVariationMoveOf(ctx: Ctx, node: Tree.Node, opts: RenderOpts): VNo
       attrs: { p: path },
       class: classes,
     },
-    [withIndex ? renderIndex(node.ply, true) : null, node.san, puzzleGlyph(ctx, node)]
+    [withIndex ? renderIndex(node.ply, true) : null, node.san, puzzleGlyph(ctx, node)],
   );
 }
 
@@ -246,6 +246,6 @@ export function render(ctrl: Controller): VNode {
         parentPath: '',
         isMainline: true,
       }),
-    ]
+    ],
   );
 }

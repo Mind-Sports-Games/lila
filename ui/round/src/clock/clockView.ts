@@ -31,7 +31,7 @@ export function renderClock(ctrl: RoundController, player: game.Player, position
       ['monster', 'amazons'].includes(ctrl.data.game.variant.key) &&
       isClockRunning;
 
-  //TODO in multiaction render clock gets called as the move is played while it's sent, and then during apiAction update, the
+  // TODO in multication render clock gets called as the move is played while it's sent, and then during apiAction update, the
   // state of ctrl.data is different here and therefore hard to obtain the correct class in all states.
   // This causes the green/orange flicker on the clock. The delayClass is an attempt to fix this which is only paritally working.
   const delayClass =
@@ -39,9 +39,9 @@ export function renderClock(ctrl: RoundController, player: game.Player, position
     ctrl.data.game.player === player.playerIndex
       ? '.indelay'
       : clock.isNotInDelay(player.playerIndex, ctrl.data.multiActionMetaData?.couldNextActionEndTurn) &&
-        ctrl.data.game.player === player.playerIndex
-      ? '.notindelay'
-      : '';
+          ctrl.data.game.player === player.playerIndex
+        ? '.notindelay'
+        : '';
   const update = (el: HTMLElement) => {
     const els = clock.elements[player.playerIndex],
       millis = clock.millisOf(player.playerIndex),
@@ -55,7 +55,7 @@ export function renderClock(ctrl: RoundController, player: game.Player, position
       clock.showTenths(millis),
       isRunning,
       showDelayTime,
-      clock.opts.nvui
+      clock.opts.nvui,
     );
     updateClassList(els.time.classList, clock, player.playerIndex, isRunning, millis);
   };
@@ -97,7 +97,7 @@ export function renderClock(ctrl: RoundController, player: game.Player, position
           renderBerserk(ctrl, player.playerIndex, position),
           isPlayer ? goBerserk(ctrl) : button.moretime(ctrl),
           tourRank(ctrl, player.playerIndex, position),
-        ]
+        ],
   );
 }
 
@@ -113,7 +113,7 @@ const renderByoyomiTime = (clock: ClockController, playerIndex: PlayerIndex, ber
   return h(
     `div.byoyomi.per${periods}`,
     { berserk: berserk },
-    !berserk && byoyomi && periods ? `|${byoyomi}s${perStr}` : ''
+    !berserk && byoyomi && periods ? `|${byoyomi}s${perStr}` : '',
   );
 };
 
@@ -123,7 +123,7 @@ function formatClockTime(
   showTenths: boolean,
   isRunning: boolean,
   showDelayTime: boolean,
-  nvui: boolean
+  nvui: boolean,
 ) {
   const displayDate = new Date(Math.max(0, time - delay));
   const tickDate = new Date(time);
@@ -206,7 +206,7 @@ export function updateElements(clock: ClockController, els: ClockElements, milli
       clock.showTenths(millis),
       true,
       showDelayTime,
-      clock.opts.nvui
+      clock.opts.nvui,
     );
     updateClassList(els.time.classList, clock, playerIndex, playerIndex === clock.times.activePlayerIndex, millis);
   }
@@ -223,7 +223,7 @@ function updateClassList(
   clock: ClockController,
   playerIndex: PlayerIndex,
   isRunning: boolean,
-  millis: Millis
+  millis: Millis,
 ) {
   if (clock.isInDelay(playerIndex) && isRunning) {
     cl.remove('notindelay');
@@ -266,7 +266,7 @@ function tourRank(ctrl: RoundController, playerIndex: PlayerIndex, position: Pos
         {
           attrs: { title: 'Current tournament rank' },
         },
-        '#' + ranks[playerIndex]
+        '#' + ranks[playerIndex],
       )
     : null;
 }

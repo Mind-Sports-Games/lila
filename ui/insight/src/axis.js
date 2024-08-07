@@ -32,11 +32,11 @@ module.exports = function (ctrl) {
                 // disabled: !ctrl.validCombination(ctrl.vm.dimension, y),
                 selected: ctrl.vm.metric.key === y.key,
               },
-              y.name
+              y.name,
             );
-          })
+          }),
         );
-      })
+      }),
     ),
     m('span.by', 'by'),
     m(
@@ -70,11 +70,11 @@ module.exports = function (ctrl) {
                 // disabled: !ctrl.validCombination(x, ctrl.vm.metric),
                 selected: ctrl.vm.dimension.key === x.key,
               },
-              x.name
+              x.name,
             );
-          })
+          }),
         );
-      })
+      }),
     ),
   ]);
 };

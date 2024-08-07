@@ -24,7 +24,7 @@ function renderHook(ctrl: LobbyController, hook: Hook) {
             {
               attrs: { 'data-href': '/@/' + hook.u },
             },
-            hook.u
+            hook.u,
           )
         : noarg('anonymous'),
       (hook.rating ? hook.rating : '') + (hook.prov ? '?' : ''),
@@ -34,9 +34,9 @@ function renderHook(ctrl: LobbyController, hook: Hook) {
         {
           attrs: { 'data-icon': perfIcons[hook.perf] },
         },
-        [noarg(hook.ra ? 'Rated ' : 'Casual '), '(' + noarg(hook.perf) + ')']
+        [noarg(hook.ra ? 'Rated ' : 'Casual '), '(' + noarg(hook.perf) + ')'],
       ),
-    ])
+    ]),
   );
 }
 
@@ -88,9 +88,9 @@ export function render(ctrl: LobbyController, allHooks: Hook[]) {
               {
                 attrs: { colspan: 5 },
               },
-              '— ' + ctrl.trans('variant') + ' —'
+              '— ' + ctrl.trans('variant') + ' —',
             ),
-          ]
+          ],
         )
       : null,
     ...variants.map(render),
@@ -111,7 +111,7 @@ export function render(ctrl: LobbyController, allHooks: Hook[]) {
             },
             hook: bind('click', _ => ctrl.setSort('rating'), ctrl.redraw),
           },
-          [h('i.is'), ctrl.trans('rating')]
+          [h('i.is'), ctrl.trans('rating')],
         ),
         h(
           'th',
@@ -122,10 +122,10 @@ export function render(ctrl: LobbyController, allHooks: Hook[]) {
             },
             hook: bind('click', _ => ctrl.setSort('time'), ctrl.redraw),
           },
-          [h('i.is'), ctrl.trans('time')]
+          [h('i.is'), ctrl.trans('time')],
         ),
         h('th', ctrl.trans('mode')),
-      ])
+      ]),
     ),
     h(
       'tbody',
@@ -140,10 +140,10 @@ export function render(ctrl: LobbyController, allHooks: Hook[]) {
               if (el.nodeName === 'TR') return ctrl.clickHook(el.getAttribute('data-id')!);
             } while (el.nodeName !== 'TABLE');
           },
-          ctrl.redraw
+          ctrl.redraw,
         ),
       },
-      renderedHooks
+      renderedHooks,
     ),
   ]);
 }

@@ -19,9 +19,10 @@ playstrategy.load.then(() => {
     showPosition = () =>
       $('.form3 .position').toggle(['0_1', '1_1'].includes($variant.val() as string) && !$medley.is(':checked')),
     showDrawTables = () =>
+      // NOTE: as this script is loaded both on /tournament/manager AND tournament/manager/<id>, $variant.val() could be undefined so I added "|| ''" for startsWith() to not create an error.
       $drawTables
         .add($perPairingDrawTables)
-        .toggle(($variant.val() as string).startsWith('1_') && !$medley.is(':checked')),
+        .toggle((($variant.val() as string) || '').startsWith('1_') && !$medley.is(':checked')),
     showMedleySettings = () => {
       $('.form3 .medleyMinutes').toggle($medley.is(':checked'));
       $('.form3 .medleyIntervalOptions').toggle($medley.is(':checked'));

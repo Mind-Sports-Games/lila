@@ -1,5 +1,11 @@
+// eslint-disable-next-line
+/// <reference path="./chessground.d.ts" />
+// eslint-disable-next-line
+/// <reference path="./cash.d.ts" />
+
 /// <reference types="highcharts" />
 
+// file://./../../site/src/site.ts
 interface PlayStrategy {
   load: Promise<void>; // window.onload promise
   info: any;
@@ -9,6 +15,7 @@ interface PlayStrategy {
   tempStorage: PlayStrategyStorageHelper;
   once(key: string, mod?: 'always'): boolean;
   powertip: any;
+  clockWidget(el: HTMLElement, opts: { time: number; pause?: boolean; delay?: number; pending?: number }): void;
   widget: any;
   spinnerHtml: string;
   assetUrl(url: string, opts?: AssetUrlOpts): string;
@@ -16,6 +23,7 @@ interface PlayStrategy {
   loadCssPath(path: string): void;
   jsModule(name: string): string;
   loadScript(url: string, opts?: AssetUrlOpts): Promise<void>;
+  loadScriptCJS(url: string, opts?: AssetUrlOpts): Promise<void>;
   loadModule(name: string): Promise<void>;
   hopscotch: any;
   userComplete: () => Promise<UserComplete>;
@@ -68,14 +76,10 @@ interface PlayStrategy {
     (data: any, trans: Trans, el: HTMLElement): void;
   };
   movetimeChart: any;
-  RoundNVUI?(
-    redraw: () => void
-  ): {
+  RoundNVUI?(redraw: () => void): {
     render(ctrl: any): any;
   };
-  AnalyseNVUI?(
-    redraw: () => void
-  ): {
+  AnalyseNVUI?(redraw: () => void): {
     render(ctrl: any): any;
   };
   playMusic(): any;
@@ -667,7 +671,6 @@ interface CashStatic {
 
 interface Cash {
   powerTip(options?: PowerTip.Options | 'show' | 'hide'): Cash;
-  clock: any;
 }
 
 declare namespace PowerTip {
@@ -740,3 +743,4 @@ interface Dictionary<T> {
 type SocketHandlers = Dictionary<(d: any) => void>;
 
 declare const playstrategy: PlayStrategy;
+declare const $as: <T>(cashOrHtml: Cash | string) => T;

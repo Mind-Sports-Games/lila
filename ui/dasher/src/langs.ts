@@ -44,7 +44,7 @@ export function view(ctrl: LangsCtrl): VNode {
       {
         attrs: { method: 'post', action: '/translation/select' },
       },
-      ctrl.list().map(langView(ctrl.current, ctrl.accepted))
+      ctrl.list().map(langView(ctrl.current, ctrl.accepted)),
     ),
     h(
       'a.help.text',
@@ -54,7 +54,7 @@ export function view(ctrl: LangsCtrl): VNode {
           'data-icon': '',
         },
       },
-      'Help translate PlayStrategy'
+      'Help translate PlayStrategy',
     ),
   ]);
 }
@@ -71,6 +71,6 @@ function langView(current: Code, accepted: Set<Code>) {
           title: l[0],
         },
       },
-      l[1]
+      l[1],
     );
 }

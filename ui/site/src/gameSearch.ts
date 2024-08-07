@@ -14,9 +14,9 @@ playstrategy.load.then(() => {
     return us;
   }
 
-  function userChoices(row) {
+  function userChoices(row: any) {
     const options = ["<option value=''></option>"];
-    const isSelected = function (row, rowClassName, user, dataKey) {
+    const isSelected = function (row: any, rowClassName: any, user: any, dataKey: any) {
       const player = $form.data(dataKey);
       return row.classList.contains(rowClassName) && player.length && user == player ? 'selected' : '';
     };

@@ -21,7 +21,7 @@ db.game5.find({ st: { $exists: true } }).forEach(g => {
       $set: {
         sp: g.st,
       },
-    }
+    },
   );
 });
 
@@ -32,7 +32,7 @@ db.game5.find({ l: 2, v: 8 }).forEach(g => {
       $set: {
         p: g.t,
       },
-    }
+    },
   );
 });
 
@@ -43,7 +43,7 @@ db.game5.find({ l: 2, v: 8 }).forEach(g => {
       $set: {
         t: NumberInt(g.t / 2),
       },
-    }
+    },
   );
 });
 
@@ -54,7 +54,7 @@ db.tournament_pairing.find({ ppt: 2 }).forEach(p => {
       $set: {
         t: NumberInt(p.t / 2),
       },
-    }
+    },
   );
 });
 
@@ -78,6 +78,6 @@ db.game5.find({ l: 2, v: 8, do: { $exists: true } }).forEach(g => {
           return NumberInt(d / 2);
         }),
       },
-    }
+    },
   );
 });

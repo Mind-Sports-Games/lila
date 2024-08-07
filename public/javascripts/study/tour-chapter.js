@@ -1,8 +1,8 @@
 function loadShepherd(f) {
   var theme = 'shepherd-theme-' + ($('body').hasClass('dark') ? 'default' : 'dark');
   playstrategy.loadCss('vendor/shepherd/dist/css/' + theme + '.css');
-  playstrategy.loadScript('vendor/shepherd/dist/js/tether.js', { noVersion: true }).then(function () {
-    playstrategy.loadScript('vendor/shepherd/dist/js/shepherd.min.js', { noVersion: true }).then(function () {
+  playstrategy.loadScriptCJS('vendor/shepherd/dist/js/tether.js', { noVersion: true }).then(function () {
+    playstrategy.loadScriptCJS('vendor/shepherd/dist/js/shepherd.min.js', { noVersion: true }).then(function () {
       f(theme);
     });
   });

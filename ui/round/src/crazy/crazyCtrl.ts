@@ -105,8 +105,8 @@ export function init(ctrl: RoundController) {
           ctrl.data.game.variant.key === 'shogi'
             ? pieceShogiRoles
             : ctrl.data.game.variant.key === 'minishogi'
-            ? pieceMiniShogiRoles
-            : pieceRoles,
+              ? pieceMiniShogiRoles
+              : pieceRoles,
         role = dropRoles[crazyKeys[crazyKeys.length - 1] - 1],
         playerIndex = ctrl.data.player.playerIndex,
         crazyData = ctrl.data.crazyhouse;
@@ -154,7 +154,7 @@ export function init(ctrl: RoundController) {
           }
         }
       },
-      'keyup'
+      'keyup',
     );
   }
 
@@ -173,7 +173,7 @@ export function init(ctrl: RoundController) {
     e => {
       if (e.target && (e.target as HTMLElement).localName === 'input') resetKeys();
     },
-    { capture: true }
+    { capture: true },
   );
 
   if (playstrategy.storage.get('crazyKeyHist') !== '0') preloadMouseIcons(ctrl.data);

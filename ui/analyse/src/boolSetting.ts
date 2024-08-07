@@ -32,6 +32,6 @@ export function boolSetting(o: BoolSetting, trans: Trans, redraw: Redraw) {
         }),
         h('label', { attrs: { for: fullId } }),
       ]),
-    ]
+    ],
   );
 }

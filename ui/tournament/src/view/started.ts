@@ -17,7 +17,7 @@ function joinTheGame(ctrl: TournamentController, gameId: string) {
     {
       attrs: { href: '/' + gameId },
     },
-    [ctrl.trans('youArePlaying'), h('br'), ctrl.trans('joinTheGame')]
+    [ctrl.trans('youArePlaying'), h('br'), ctrl.trans('joinTheGame')],
   );
 }
 
@@ -52,8 +52,8 @@ export function table(ctrl: TournamentController): VNode | undefined {
   return ctrl.showingMedleyVariants
     ? medleyVariantsList(ctrl, true)
     : ctrl.playerInfo.id
-    ? playerInfo(ctrl)
-    : ctrl.teamInfo.requested
-    ? teamInfo(ctrl)
-    : tourTable(ctrl);
+      ? playerInfo(ctrl)
+      : ctrl.teamInfo.requested
+        ? teamInfo(ctrl)
+        : tourTable(ctrl);
 }

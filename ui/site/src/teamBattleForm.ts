@@ -30,9 +30,9 @@ playstrategy.load.then(() => {
                 .split('\n')
                 .map(t => t.split(' ')[0])
                 .slice(0, -1);
-              callback(res.filter(t => !current.includes(t.id)));
+              callback(res.filter((t: any) => !current.includes(t.id)));
             },
-            _ => callback([])
+            _ => callback([]),
           );
         },
         template: (team: Team) => team.name + ', by ' + team.owner + ', with ' + team.members + ' members',

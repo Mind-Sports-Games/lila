@@ -71,9 +71,9 @@ export function view(ctrl: ColorCtrl): VNode {
             attrs: { 'data-icon': 'E', title: c.title || '' },
             hook: bind('click', () => ctrl.set(c.key)),
           },
-          h(`div.color-choice.${c.name}`)
+          h(`div.color-choice.${c.name}`),
         );
-      })
+      }),
     ),
   ]);
 }
