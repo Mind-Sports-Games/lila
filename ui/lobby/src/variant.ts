@@ -54,7 +54,7 @@ const variantConfirms: variantConfirmsType = {
   linesOfAction:
     "This is a Lines Of Action game! The aim of the game is to connect all of one's pieces, with movement variable on the number of pieces in a line.",
   scrambledEggs:
-    "This is Scrambled Eggs, a variant of Lines of Action. The aim of the game is to connect all of one's pieces, with movement variable on the number of pieces in a line.",
+    "This is a Scrambled Eggs game! The aim of the game is to connect all of one's pieces, with movement variable on the number of pieces in a line.",
   frisian: 'This is a Frisian draughts game!\n\nPieces can also capture horizontally and vertically.',
   frysk: 'This is a Frysk! game!\n\nFrisian draughts starting with 5 pieces each.',
   antidraughts:
