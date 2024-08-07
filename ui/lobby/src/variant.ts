@@ -52,7 +52,7 @@ const variantConfirms: variantConfirmsType = {
   monster:
     'This is a Monster chess game!\nWhite gets two moves every turn to compensate for their starting disadvantage.',
   linesOfAction:
-    "This is Lines Of Action, a separate game from chess. The aim of the game is to connect all of one's pieces, with movement variable on the number of pieces in a line.",
+    "This is a Lines Of Action game! The aim of the game is to connect all of one's pieces, with movement variable on the number of pieces in a line.",
   scrambledEggs:
     "This is Scrambled Eggs, a variant of Lines of Action. The aim of the game is to connect all of one's pieces, with movement variable on the number of pieces in a line.",
   frisian: 'This is a Frisian draughts game!\n\nPieces can also capture horizontally and vertically.',
