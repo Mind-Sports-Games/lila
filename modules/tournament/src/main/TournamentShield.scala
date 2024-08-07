@@ -454,7 +454,7 @@ object TournamentShield {
     private def backgammonVariantOrder(variants: List[Variant]) = {
       TournamentMedleyUtil.medleyVariantsAndIntervals(
         variants,
-        5 * 60,
+        3 * 60,
         backgammonVariantMinutes,
         backgammonRounds,
         false
@@ -505,9 +505,9 @@ object TournamentShield {
     private def chessgammonMedleyGeneration(variants: List[Variant]) = {
       TournamentMedleyUtil.medleyVariantsAndIntervals(
         Random.shuffle(chessgammonVariantPermuations).head.map(i => variants(i)),
-        5 * 60,
-        playStrategyMinutes,
-        playStrategyRounds,
+        3 * 60,
+        chessgammonMinutes,
+        chessgammonRounds,
         false
       )
     }
@@ -518,8 +518,8 @@ object TournamentShield {
       Variant.wrap(strategygames.backgammon.variant.Nackgammon)
     )
 
-    private val chessgammonVariantMinutes = 80
-    private val chessgammonRounds         = chessgammonVariants.size
+    private val chessgammonMinutes = 80
+    private val chessgammonRounds  = chessgammonVariants.size
 
     case object ChessgammonMedley
         extends MedleyShield(
@@ -532,7 +532,7 @@ object TournamentShield {
           Some(1),
           7,
           16,
-          chessgammonVariantMinutes,
+          chessgammonMinutes,
           chessgammonRounds,
           "",
           s"An Arena which is divided into ${chessgammonRounds} equal length periods of ${chessgammonVariants
