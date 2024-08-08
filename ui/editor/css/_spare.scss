@@ -15,6 +15,12 @@
     margin-top: 2vh;
   }
 
+  @include breakpoint($mq-landscape-mobile) {
+    .coords-out &-bottom {
+      margin-top: 4vh;
+    }
+  }
+
   .no-square {
     flex: 0 0 12.5%;
 

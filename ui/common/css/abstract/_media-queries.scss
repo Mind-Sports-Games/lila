@@ -22,11 +22,15 @@ $mq-tall: min-height 600px;
 $mq-x-tall: min-height 700px;
 
 $mq-not-x-short: max-height 399px;
+$mq-not-short: max-height 499px;
 
 /* Orientations */
 
 $mq-portrait: orientation portrait;
 $mq-landscape: orientation landscape;
+
+/* Mobile/tablet */
+$mq-landscape-mobile: $mq-landscape $mq-not-short;
 
 /* Capabilities */
 
