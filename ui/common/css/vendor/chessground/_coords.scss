@@ -311,6 +311,61 @@ coords {
   }
 }
 
+@include breakpoint($mq-landscape-mobile) {
+  .coords-out coords {
+    &.ranks {
+      right: -10px !important;
+    }
+  }
+
+  //dont show xiangqi coords
+  .coords-out .variant-xiangqi coords {
+    display: none;
+  }
+
+  .coords-out .variant-minixiangqi coords {
+    display: none;
+  }
+
+  //always show for Togy and make smaller
+  .variant-togyzkumalak .orientation-p1 coords.files {
+    &.p1 {
+      bottom: 1px;
+    }
+    &.p2 {
+      top: 2px;
+    }
+  }
+  .variant-togyzkumalak .orientation-p2 coords.files {
+    &.p1 {
+      top: 2px;
+    }
+    &.p2 {
+      bottom: 1px;
+    }
+  }
+
+  //always show for backgammon single column and make smaller
+  .variant-nackgammon .orientation-p1 coords.files,
+  .variant-backgammon .orientation-p1 coords.files {
+    &.p1 {
+      bottom: 0.4em;
+    }
+    &.p2 {
+      top: 0.4em;
+    }
+  }
+  .variant-nackgammon .orientation-p1vflip coords.files,
+  .variant-backgammon .orientation-p1vflip coords.files {
+    &.p1 {
+      top: 0.4em;
+    }
+    &.p2 {
+      bottom: 0.4em;
+    }
+  }
+}
+
 /* handle outer coords */
 @include breakpoint($mq-col2-uniboard) {
   .coords-out coords {

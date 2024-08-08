@@ -121,3 +121,34 @@ board-scores {
     @include fluid-size('font-size', 9px, 11px);
   }
 }
+
+/* handle outer coords */
+@include breakpoint($mq-landscape-mobile) {
+  board-scores {
+    .variant-togyzkumalak & {
+      font-size: 60%;
+    }
+
+    .variant-togyzkumalak .orientation-p1 & {
+      &.p1 {
+        left: 0;
+        bottom: 41%;
+      }
+      &.p2 {
+        left: 0;
+        top: 41%;
+      }
+    }
+
+    .variant-togyzkumalak .orientation-p2 & {
+      &.p1 {
+        left: 0;
+        top: 41%;
+      }
+      &.p2 {
+        left: 0;
+        bottom: 41%;
+      }
+    }
+  }
+}
