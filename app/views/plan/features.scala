@@ -53,7 +53,7 @@ object features {
             tr(check)(
               "A variety of clock types; ",
               a(href := routes.Page.loneBookmark("clocks"))(
-                "Fischer, Byoyomi, Bronstien, Simple Delay, Correspondence and unlimited"
+                "Fischer, Byoyomi, Bronstein, Simple Delay, Correspondence and unlimited"
               )
             ),
             tr(check)(
