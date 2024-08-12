@@ -1,6 +1,7 @@
 modules
 app
 project
+conf/routes
 
 pnpm-lock.yaml
 

@@ -23,7 +23,7 @@ export default function UserComplete(opts: Opts): void {
     (term: string) =>
       xhr
         .json(
-          xhr.url('/player/autocomplete', {
+          xhr.url('/api/player/autocomplete', {
             term,
             friend: opts.friend ? 1 : 0,
             tour: opts.tour,
