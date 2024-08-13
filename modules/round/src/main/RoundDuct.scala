@@ -63,7 +63,7 @@ final private[round] class RoundDuct(
     def isOnline = offlineSince.isEmpty || botConnected
 
     def setOnline(on: Boolean): Unit = {
-      isLongGone foreach { _ ?? notifyGone(playerIndex, gone = false) }
+      isLongGone.foreach(_ ?? notifyGone(playerIndex, gone = !on))
       offlineSince = if (on) None else offlineSince orElse nowMillis.some
       bye = bye && !on
     }
@@ -262,12 +262,20 @@ final private[round] class RoundDuct(
 
     case Resign(playerId) =>
       handle(PlayerId(playerId)) { pov =>
-        pov.game.resignable ?? finisher.other(pov.game, pov.game.situation.resignStatus(pov.playerIndex), Some(!pov.playerIndex))
+        pov.game.resignable ?? finisher.other(
+          pov.game,
+          pov.game.situation.resignStatus(pov.playerIndex),
+          Some(!pov.playerIndex)
+        )
       }
 
     case ResignAi =>
       handleAi { pov =>
-        pov.game.resignable ?? finisher.other(pov.game, pov.game.situation.resignStatus(pov.playerIndex), Some(!pov.playerIndex))
+        pov.game.resignable ?? finisher.other(
+          pov.game,
+          pov.game.situation.resignStatus(pov.playerIndex),
+          Some(!pov.playerIndex)
+        )
       }
 
     case GoBerserk(playerIndex, promise) =>
@@ -280,7 +288,7 @@ final private[round] class RoundDuct(
 
     case ResignForce(playerId) =>
       handle(playerId) { pov =>
-        (pov.game.resignable && !pov.game.hasAi && pov.game.hasClock && !pov.isMyTurn) ?? {
+        pov.mightClaimWin ?? {
           getPlayer(!pov.playerIndex).isLongGone flatMap {
             case true =>
               finisher.rageQuit(
@@ -476,7 +484,7 @@ final private[round] class RoundDuct(
 
     case Tick =>
       proxy.withGameOptionSync { g =>
-        (g.forceResignable && g.bothPlayersHaveMoved) ?? fuccess {
+        (g.forceResignableNow) ?? fuccess {
           PlayerIndex.all.foreach { c =>
             if (!getPlayer(c).isOnline && getPlayer(!c).isOnline) {
               getPlayer(c).showMillisToGone foreach {

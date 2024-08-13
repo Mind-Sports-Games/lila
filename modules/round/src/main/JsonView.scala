@@ -113,16 +113,18 @@ final class JsonView(
               )
             }.add("onGame" -> (player.isAi || socket.onGame(player.playerIndex))),
             "opponent" -> {
-              commonPlayerJson(pov.game, opponent, opponentUser, withFlags) ++ Json.obj(
-                //"color" -> pov.game.variant.playerNames(opponent.playerIndex),
-                //"color" -> opponent.playerIndex.classicName,
-                "playerName"  -> pov.game.variant.playerNames(opponent.playerIndex),
-                "playerIndex" -> opponent.playerIndex.name,
-                "playerColor" -> pov.game.variant.playerColors(opponent.playerIndex),
-                "ai"          -> opponent.aiLevel
-              )
-            }.add("isGone" -> (!opponent.isAi && socket.isGone(opponent.playerIndex)))
-              .add("onGame" -> (opponent.isAi || socket.onGame(opponent.playerIndex))),
+              commonPlayerJson(pov.game, opponent, opponentUser, withFlags) ++ Json
+                .obj(
+                  //"color" -> pov.game.variant.playerNames(opponent.playerIndex),
+                  //"color" -> opponent.playerIndex.classicName,
+                  "playerName"  -> pov.game.variant.playerNames(opponent.playerIndex),
+                  "playerIndex" -> opponent.playerIndex.name,
+                  "playerColor" -> pov.game.variant.playerColors(opponent.playerIndex),
+                  "ai"          -> opponent.aiLevel
+                )
+                .add("isGone" -> (!opponent.isAi && socket.isGone(opponent.playerIndex)))
+                .add("onGame" -> (opponent.isAi || socket.onGame(opponent.playerIndex)))
+            },
             "url" -> Json.obj(
               "socket" -> s"/play/$fullId/v$apiVersion",
               "round"  -> s"/$fullId"

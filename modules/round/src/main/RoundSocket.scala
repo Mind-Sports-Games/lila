@@ -227,21 +227,23 @@ object RoundSocket {
   val disconnectTimeout = 40.seconds
 
   def povDisconnectTimeout(pov: Pov): FiniteDuration =
-    disconnectTimeout * {
-      pov.game.speed match {
-        case Speed.Classical => 3
-        case Speed.Rapid     => 2
-        case _               => 1
+    if (!pov.game.hasClock) 30.days
+    else
+      disconnectTimeout * {
+        pov.game.speed match {
+          case Speed.Classical => 3
+          case Speed.Rapid     => 2
+          case _               => 1
+        }
+      } / {
+        pov.game.board.materialImbalance match {
+          case _ if pov.game.variant.materialImbalanceVariant                         => 1
+          case i if (pov.playerIndex.p1 && i <= -4) || (pov.playerIndex.p2 && i >= 4) => 3
+          case _                                                                      => 1
+        }
+      } / {
+        if (pov.player.hasUser) 1 else 2
       }
-    } / {
-      pov.game.board.materialImbalance match {
-        case _ if pov.game.variant.materialImbalanceVariant                         => 1
-        case i if (pov.playerIndex.p1 && i <= -4) || (pov.playerIndex.p2 && i >= 4) => 3
-        case _                                                                      => 1
-      }
-    } / {
-      if (pov.player.hasUser) 1 else 2
-    }
 
   object Protocol {
 
