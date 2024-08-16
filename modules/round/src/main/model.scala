@@ -24,6 +24,10 @@ final private class ScheduleExpiration(f: Game => Unit) extends (Game => Unit) {
   def apply(g: Game) = f(g)
 }
 
+final private class ScheduleActionExpiration(f: Game => Unit) extends (Game => Unit) {
+  def apply(g: Game) = f(g)
+}
+
 final class IsOfferingRematch(f: Pov => Boolean) extends (Pov => Boolean) {
   def apply(p: Pov) = f(p)
 }

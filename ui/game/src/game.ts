@@ -35,6 +35,8 @@ export const drawable = (data: BaseGameData): boolean =>
 
 export const resignable = (data: BaseGameData): boolean => playable(data) && !abortable(data);
 
+export const allowForcedResult = (data: BaseGameData): boolean => data.tournament !== undefined && resignable(data); //Can only force a resign in arena, from absent player
+
 // can the current player go berserk?
 export const berserkableBy = (data: BaseGameData): boolean =>
   !!data.tournament && data.tournament.berserkable && isPlayerPlaying(data) && !bothPlayersHavePlayed(data);

@@ -1,7 +1,7 @@
 package lila.round
 
 import actorApi._, round._
-import strategygames.{ P2, Centis, Player => PlayerIndex, Move, P1 }
+import strategygames.{ P2, Centis, Player => PlayerIndex, Move, P1, Pos }
 import org.joda.time.DateTime
 import ornicar.scalalib.Zero
 import play.api.libs.json._
@@ -335,7 +335,10 @@ final private[round] class RoundDuct(
         }
       }
 
-    case p: PlayerSelectSquares         => handle(p.playerId)(selectSquarer.selectSquares(p.squares))
+    case p: PlayerSelectSquares =>
+      handle(p.playerId)(selectSquarer.selectSquares(p.squares)) >> proxy.withGame { g =>
+        fuccess(scheduleActionExpiration(g))
+      }
     case SelectSquaresAccept(playerId)  => handle(playerId)(selectSquarer.accept)
     case SelectSquaresDecline(playerId) => handle(playerId)(selectSquarer.decline)
 
@@ -468,6 +471,22 @@ final private[round] class RoundDuct(
           }
           else finisher.noStart(game)
         }
+      }
+
+    case ForceExpiredAction =>
+      handle { game =>
+        game.timeBeforeExpirationOnPaused.exists(_.centis == 0) ?? {
+          if (game.selectSquaresPossible) {
+            val pov = Pov(game, game.activePlayerIndex)
+            if (game.neitherPlayerHasMadeAnOffer)
+              selectSquarer.selectSquares(List[Pos]())(pov)
+            else
+              selectSquarer.accept(pov)
+          } else fuccess(List[Event]())
+        }
+      } >> proxy.withGame { g =>
+        if (g.selectSquaresPossible) fuccess(scheduleActionExpiration(g))
+        else funit
       }
 
     case StartClock =>
@@ -623,6 +642,7 @@ object RoundDuct {
       val drawer: Drawer,
       val selectSquarer: SelectSquarer,
       val forecastApi: ForecastApi,
-      val isSimulHost: IsSimulHost
+      val isSimulHost: IsSimulHost,
+      val scheduleActionExpiration: ScheduleActionExpiration
   )
 }

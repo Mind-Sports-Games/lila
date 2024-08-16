@@ -437,7 +437,7 @@ case class Game(
       p2Player = f(p2Player)
     )
 
-  private def selectSquaresPossible =
+  def selectSquaresPossible =
     started &&
       playable &&
       turnCount >= 2 &&
@@ -447,7 +447,7 @@ case class Game(
       }) &&
       !deadStoneOfferState.map(_.is(DeadStoneOfferState.RejectedOffer)).has(true)
 
-  private def neitherPlayerHasMadeAnOffer =
+  def neitherPlayerHasMadeAnOffer =
     !player(PlayerIndex.P1).isOfferingSelectSquares &&
       !player(PlayerIndex.P2).isOfferingSelectSquares
 
