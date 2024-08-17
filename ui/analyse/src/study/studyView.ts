@@ -43,10 +43,10 @@ function toolButton(opts: ToolButtonOpts): VNode {
           if (opts.onClick) opts.onClick();
           opts.ctrl.vm.toolTab(opts.tab);
         },
-        opts.ctrl.redraw
+        opts.ctrl.redraw,
       ),
     },
-    [opts.count ? h('count.data-count', { attrs: { 'data-count': opts.count } }) : null, opts.icon]
+    [opts.count ? h('count.data-count', { attrs: { 'data-count': opts.count } }) : null, opts.icon],
   );
 }
 
@@ -66,7 +66,7 @@ function buttons(root: AnalyseCtrl): VNode {
               class: { on: ctrl.vm.mode.sticky },
               hook: bind('click', ctrl.toggleSticky),
             },
-            [ctrl.vm.behind ? h('span.behind', '' + ctrl.vm.behind) : h('i.is'), 'SYNC']
+            [ctrl.vm.behind ? h('span.behind', '' + ctrl.vm.behind) : h('i.is'), 'SYNC'],
           )
         : null,
       ctrl.members.canContribute()
@@ -77,7 +77,7 @@ function buttons(root: AnalyseCtrl): VNode {
               class: { on: ctrl.vm.mode.write },
               hook: bind('click', ctrl.toggleWrite),
             },
-            [h('i.is'), 'REC']
+            [h('i.is'), 'REC'],
           )
         : null,
       toolButton({
@@ -157,7 +157,7 @@ function metadata(ctrl: StudyCtrl): VNode {
           },
           hook: bind('click', ctrl.toggleLike),
         },
-        '' + d.likes
+        '' + d.likes,
       ),
     ]),
     topicsView(ctrl),
@@ -180,10 +180,10 @@ export function side(ctrl: StudyCtrl): VNode {
             tourShow?.disable();
             ctrl.vm.tab(key);
           },
-          ctrl.redraw
+          ctrl.redraw,
         ),
       },
-      name
+      name,
     );
 
   const tourTab =
@@ -197,13 +197,13 @@ export function side(ctrl: StudyCtrl): VNode {
           () => {
             tourShow.active = true;
           },
-          ctrl.redraw
+          ctrl.redraw,
         ),
         attrs: {
           'data-icon': '',
         },
       },
-      'Broadcast'
+      'Broadcast',
     );
 
   const tabs = h('div.tabs-horiz', [
@@ -218,7 +218,7 @@ export function side(ctrl: StudyCtrl): VNode {
           {
             hook: bind('click', () => ctrl.form.open(!ctrl.form.open()), ctrl.redraw),
           },
-          [iconTag('[')]
+          [iconTag('[')],
         )
       : null,
   ]);
@@ -240,7 +240,7 @@ export function contextMenu(ctrl: StudyCtrl, path: Tree.Path, node: Tree.Node): 
               ctrl.commentForm.start(ctrl.currentChapter()!.id, path, node);
             }),
           },
-          ctrl.trans.noarg('commentThisMove')
+          ctrl.trans.noarg('commentThisMove'),
         ),
         h(
           'a.glyph-icon',
@@ -250,7 +250,7 @@ export function contextMenu(ctrl: StudyCtrl, path: Tree.Path, node: Tree.Node): 
               ctrl.userJump(path);
             }),
           },
-          ctrl.trans.noarg('annotateWithGlyphs')
+          ctrl.trans.noarg('annotateWithGlyphs'),
         ),
       ]
     : [];
@@ -282,7 +282,9 @@ export function underboard(ctrl: AnalyseCtrl): MaybeVNodes {
         ? commentForm.view(ctrl)
         : commentForm.viewDisabled(
             ctrl,
-            study.members.canContribute() ? 'Press REC to comment moves' : 'Only the study members can comment on moves'
+            study.members.canContribute()
+              ? 'Press REC to comment moves'
+              : 'Only the study members can comment on moves',
           );
       break;
     case 'glyphs':

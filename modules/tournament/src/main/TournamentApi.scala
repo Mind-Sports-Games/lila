@@ -15,7 +15,7 @@ import scala.concurrent.Future
 import lila.common.config.{ MaxPerPage, MaxPerSecond }
 import lila.common.paginator.Paginator
 import lila.common.{ Bus, Debouncer, LightUser }
-import lila.game.{ Game, GameRepo, LightPov, Pov }
+import lila.game.{ Game, GameRepo, Handicaps, LightPov, Pov }
 import lila.hub.LeaderTeam
 import lila.hub.LightTeam._
 import lila.i18n.{ defaultLang, I18nKeys => trans, VariantKeys }
@@ -81,7 +81,8 @@ final class TournamentApi(
       waitMinutes = setup.waitMinutes | TournamentForm.waitMinuteDefault,
       startDate = setup.startDate,
       mode = setup.realMode,
-      handicapped = setup.handicapped | false,
+      handicapped = setup.handicaps.handicapped | false,
+      inputPlayerRatings = setup.handicaps.inputPlayerRatings,
       password = setup.password,
       variant = setup.medleyVariantsAndIntervals
         .flatMap(_.lift(0).map(_._1))
@@ -113,11 +114,13 @@ final class TournamentApi(
 
   def update(old: Tournament, data: TournamentSetup, leaderTeams: List[LeaderTeam]): Fu[Tournament] = {
     val tour = postUpdate(old, data, data updateAll old, leaderTeams)
+    processHandicappedChanges(tour, old)
     tournamentRepo update tour inject tour
   }
 
   def apiUpdate(old: Tournament, data: TournamentSetup, leaderTeams: List[LeaderTeam]): Fu[Tournament] = {
     val tour = postUpdate(old, data, data updatePresent old, leaderTeams)
+    processHandicappedChanges(tour, old)
     tournamentRepo update tour inject tour
   }
 
@@ -133,6 +136,26 @@ final class TournamentApi(
         .copy(teamMember = old.conditions.teamMember), // can't change that
       mode = if (tour.position.isDefined) strategygames.Mode.Casual else tour.mode
     )
+
+  private def processHandicappedChanges(tour: Tournament, old: Tournament): Funit = {
+    if (
+      (tour.handicapped && tour.inputPlayerRatings != old.inputPlayerRatings) ||
+      (!tour.handicapped && old.handicapped)
+    ) {
+      updateAllPlayersInputRating(tour) >>- socket.reload(tour.id) >>- publish()
+    } else { funit }
+  }
+
+  private def updateAllPlayersInputRating(tour: Tournament): Funit = {
+    playerRepo.unsetInputRating(tour.id) >>
+      playerRepo.allPlayersbyTour(tour.id).flatMap { players =>
+        players
+          .map(_.userId)
+          .map(updatePlayer(tour, tour.variant, None))
+          .sequenceFu
+          .void
+      }
+  }
 
   def teamBattleUpdate(
       tour: Tournament,
@@ -375,6 +398,10 @@ final class TournamentApi(
         }
     }
 
+  private def getInputRating(userId: String, inputPlayerRatings: Option[String]): Option[Int] = {
+    inputPlayerRatings.flatMap(Handicaps.playerInputRatings(_).get(userId))
+  }
+
   private[tournament] def join(
       tourId: Tournament.ID,
       me: User,
@@ -400,7 +427,13 @@ final class TournamentApi(
                 //       if someone joins _just_ before the new medley round, but after the
                 //       updatePlayerRatingCache, which rating will they have in their next game?
                 def proceedWithTeam(team: Option[String]): Fu[JoinResult] =
-                  playerRepo.join(tour.id, me, tour.perfType, team) >>
+                  playerRepo.join(
+                    tour.id,
+                    me,
+                    tour.perfType,
+                    team,
+                    getInputRating(me.id, tour.inputPlayerRatings)
+                  ) >>
                     updateNbPlayers(tour.id) >>- {
                       socket.reload(tour.id)
                       publish()
@@ -552,6 +585,7 @@ final class TournamentApi(
             score = sheet.total,
             fire = tour.streakable && sheet.onFire,
             rating = perf.fold(player.rating)(_.intRating),
+            inputRating = getInputRating(userId, tour.inputPlayerRatings),
             provisional = perf.fold(player.provisional)(_.provisional),
             performance = {
               for {

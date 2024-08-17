@@ -43,6 +43,15 @@
   grid-area: kb-move;
 }
 
+@include breakpoint($mq-landscape-mobile) {
+  html {
+    font-size: 8px;
+  }
+  .round__app {
+    grid-column-gap: calc($block-gap * 1.5) !important;
+  }
+}
+
 .round__app {
   display: grid;
 

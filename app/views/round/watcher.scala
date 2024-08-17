@@ -46,7 +46,7 @@ object watcher {
       moreJs = frag(
         roundNvuiTag,
         roundTag(gameLogic),
-        embedJsUnsafeLoadThen(s"""${roundPlayStrategyTag(gameLogic)}.boot(${safeJsonValue(
+        embedJsUnsafeLoadThen(s"""${roundPlayStrategyTag(gameLogic)}(${safeJsonValue(
           Json.obj(
             "data" -> data,
             "i18n" -> jsI18n(pov.game),

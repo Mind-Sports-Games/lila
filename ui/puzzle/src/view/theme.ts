@@ -21,7 +21,7 @@ export default function theme(ctrl: Controller): MaybeVNode {
                   target: '_blank',
                 },
               },
-              [' ', ctrl.trans.noarg('example')]
+              [' ', ctrl.trans.noarg('example')],
             ),
         ]),
         ctrl.vm.mode != 'view' || ctrl.autoNexting() ? null : editor(ctrl),
@@ -68,7 +68,7 @@ const editor = (ctrl: Controller): VNode => {
                   title: trans(`${key}Description`),
                 },
               },
-              trans(key)
+              trans(key),
             ),
             !allThemes
               ? null
@@ -80,7 +80,7 @@ const editor = (ctrl: Controller): VNode => {
                           'div.puzzle__themes__lock',
                           h('i', {
                             attrs: dataIcon('a'),
-                          })
+                          }),
                         ),
                       ]
                     : [
@@ -92,11 +92,11 @@ const editor = (ctrl: Controller): VNode => {
                           class: { active: votedThemes[key] === false },
                           attrs: { 'data-theme': key },
                         }),
-                      ]
+                      ],
                 ),
-          ]
-        )
-      )
+          ],
+        ),
+      ),
     ),
     ...(availableThemes
       ? [
@@ -119,7 +119,7 @@ const editor = (ctrl: Controller): VNode => {
                 {
                   attrs: { value: '', selected: true },
                 },
-                trans('addAnotherTheme')
+                trans('addAnotherTheme'),
               ),
               ...availableThemes.map(theme =>
                 h(
@@ -130,10 +130,10 @@ const editor = (ctrl: Controller): VNode => {
                       title: trans(`${theme}Description`),
                     },
                   },
-                  trans(theme)
-                )
+                  trans(theme),
+                ),
               ),
-            ]
+            ],
           ),
           h(
             'a.puzzle__themes__study.text',
@@ -144,7 +144,7 @@ const editor = (ctrl: Controller): VNode => {
                 target: '_blank',
               },
             },
-            'About puzzle themes'
+            'About puzzle themes',
           ),
         ]
       : []),

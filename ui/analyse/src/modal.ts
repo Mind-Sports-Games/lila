@@ -31,9 +31,9 @@ export function modal(d: Modal): VNode {
             hook: bind('click', d.onClose),
           }),
           h('div', d.content),
-        ]
+        ],
       ),
-    ]
+    ],
   );
 }
 
@@ -45,7 +45,7 @@ export function button(name: string): VNode {
       {
         attrs: { type: 'submit' },
       },
-      name
-    )
+      name,
+    ),
   );
 }

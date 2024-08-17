@@ -18,7 +18,7 @@ export default function (ctrl: Ctrl): VNode {
         destroy: ctrl.destroy,
       },
     },
-    moderationView(mod) || normalView(ctrl)
+    moderationView(mod) || normalView(ctrl),
   );
 }
 
@@ -35,7 +35,7 @@ function renderPalantir(ctrl: Ctrl) {
         hook: bind('click', () => {
           if (!p.loaded) {
             p.loaded = true;
-            playstrategy.loadScript('javascripts/vendor/peerjs.min.js').then(() => {
+            playstrategy.loadScriptCJS('javascripts/vendor/peerjs.min.js').then(() => {
               playstrategy.loadModule('palantir').then(() => {
                 p.instance = window.Palantir!.palantir({
                   uid: ctrl.data.userId,
@@ -61,8 +61,8 @@ function normalView(ctrl: Ctrl) {
       active === 'note' && ctrl.note
         ? [noteView(ctrl.note)]
         : ctrl.plugin && active === ctrl.plugin.tab.key
-        ? [ctrl.plugin.view()]
-        : discussionView(ctrl)
+          ? [ctrl.plugin.view()]
+          : discussionView(ctrl),
     ),
   ];
 }
@@ -74,7 +74,7 @@ function renderTab(ctrl: Ctrl, tab: Tab, active: Tab) {
       class: { 'mchat__tab-active': tab === active },
       hook: bind('click', () => ctrl.setTab(tab)),
     },
-    tabName(ctrl, tab)
+    tabName(ctrl, tab),
   );
 }
 

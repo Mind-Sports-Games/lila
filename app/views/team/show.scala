@@ -35,7 +35,7 @@ object show {
         .some,
       moreJs = frag(
         jsModule("team"),
-        embedJsUnsafeLoadThen(s"""teamStart(${safeJsonValue(
+        embedJsUnsafeLoadThen(s"""PlayStrategyTeam(${safeJsonValue(
           Json
             .obj("id" -> t.id)
             .add("socketVersion" -> socketVersion.map(_.value))

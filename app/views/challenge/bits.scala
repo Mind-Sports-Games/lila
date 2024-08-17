@@ -23,7 +23,7 @@ object bits {
   ) =
     frag(
       jsModule("challengePage"),
-      embedJsUnsafeLoadThen(s"""challengePageStart(${safeJsonValue(
+      embedJsUnsafeLoadThen(s"""PlayStrategyChallenge(${safeJsonValue(
         Json.obj(
           "socketUrl" -> s"/challenge/${c.id}/socket/v$apiVersion",
           "xhrUrl"    -> routes.Challenge.show(c.id, playerIndex.map(_.name)).url,

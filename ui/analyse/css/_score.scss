@@ -228,7 +228,7 @@ body.backgammon-contemporary .variant-backgammon .game-score {
     display: none;
   }
 
-  @include breakpoint($mq-col1-uniboard) {
+  @include breakpoint(($mq-col1-uniboard, $mq-landscape-mobile)) {
     width: $pocket-height-mobile;
     height: $pocket-height-mobile;
     &-bottom {
@@ -280,6 +280,15 @@ body.backgammon-contemporary .variant-backgammon .game-score {
     padding-left: 20em;
     padding-top: 1.5em;
   }
+
+  @include breakpoint($mq-landscape-mobile) {
+    &.top {
+      padding-top: 1.25em;
+    }
+    &.bottom {
+      padding-top: 4em;
+    }
+  }
 }
 
 $non-sqaure-pocket-height-mobile: 9.5vw;
@@ -324,6 +333,15 @@ $non-square-game-score-height-mobile-and-names: 18.5vw;
 
   &-names {
     display: none;
+  }
+
+  @include breakpoint($mq-landscape-mobile) {
+    &-top {
+      margin-top: 0em;
+    }
+    &-bottom {
+      margin-top: 2.5em;
+    }
   }
 
   @include breakpoint($mq-col1-uniboard) {
@@ -600,6 +618,12 @@ $backgammon-pocket-height: 6em;
   padding-bottom: calc(213.333 * 100% / 640 - 10em);
   margin-top: calc(213.333 * 100% / 640);
   margin-bottom: calc(213.333 * 100% / 640 - 10em);
+
+  @include breakpoint($mq-landscape-mobile) {
+    padding-bottom: calc(213.333 * 100% / 640 - 7em);
+    margin-top: calc(213.333 * 100% / 640);
+    margin-bottom: calc(213.333 * 100% / 640 - 12em);
+  }
 
   @include breakpoint($mq-col1-uniboard) {
     padding-bottom: calc(213.333 * 100% / 640);

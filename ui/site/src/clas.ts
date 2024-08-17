@@ -44,14 +44,14 @@ playstrategy.load.then(() => {
                     object: 1,
                     teacher: 1,
                     term,
-                  })
+                  }),
                 )
                 .then(
                   res => {
                     const current = currentUserIds();
                     callback(res.result.filter(t => !current.includes(t.id)));
                   },
-                  _ => callback([])
+                  _ => callback([]),
                 );
           },
           template: o =>

@@ -1,6 +1,6 @@
 import { h, VNode } from 'snabbdom';
 
-import { DasherCtrl } from './dasher';
+import { DasherCtrl } from './interfaces';
 import links from './links';
 import { view as langsView } from './langs';
 import { view as soundView } from './sound';

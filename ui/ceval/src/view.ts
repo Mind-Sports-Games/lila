@@ -13,7 +13,7 @@ import { variantToRules } from 'stratutils';
 
 let gaugeLast = 0;
 const gaugeTicks: VNode[] = [...Array(8).keys()].map(i =>
-  h(i === 3 ? 'tick.zero' : 'tick', { attrs: { style: `height: ${(i + 1) * 12.5}%` } })
+  h(i === 3 ? 'tick.zero' : 'tick', { attrs: { style: `height: ${(i + 1) * 12.5}%` } }),
 );
 
 function localEvalInfo(ctrl: ParentCtrl, evs: NodeEvals): Array<VNode | string> {
@@ -48,7 +48,7 @@ function localEvalInfo(ctrl: ParentCtrl, evs: NodeEvals): Array<VNode | string> 
               ceval.redraw();
             }),
         },
-      })
+      }),
     );
   else if (!evs.client.cloud && evs.client.knps) t.push(', ' + Math.round(evs.client.knps) + ' knodes/s');
   return t;
@@ -84,7 +84,7 @@ function engineName(ctrl: CevalCtrl): VNode[] {
     h(
       'span',
       { attrs: { title: version || '' } },
-      ctrl.technology == 'nnue' ? 'Stockfish 13+' : ctrl.technology == 'hce' ? 'Stockfish 11+' : 'Stockfish 10+'
+      ctrl.technology == 'nnue' ? 'Stockfish 13+' : ctrl.technology == 'hce' ? 'Stockfish 11+' : 'Stockfish 10+',
     ),
     ctrl.technology == 'nnue'
       ? h(
@@ -92,17 +92,17 @@ function engineName(ctrl: CevalCtrl): VNode[] {
           {
             attrs: { title: 'Multi-threaded WebAssembly with SIMD (efficiently updatable neural network, strongest)' },
           },
-          'NNUE'
+          'NNUE',
         )
       : ctrl.technology == 'hce'
-      ? h(
-          'span.technology.good',
-          { attrs: { title: 'Multi-threaded WebAssembly (classical hand crafted evaluation)' } },
-          'HCE'
-        )
-      : ctrl.technology == 'wasm'
-      ? h('span.technology', { attrs: { title: 'Single-threaded WebAssembly fallback (slow)' } }, 'WASM')
-      : h('span.technology', { attrs: { title: 'Single-threaded JavaScript fallback (very slow)' } }, 'ASMJS'),
+        ? h(
+            'span.technology.good',
+            { attrs: { title: 'Multi-threaded WebAssembly (classical hand crafted evaluation)' } },
+            'HCE',
+          )
+        : ctrl.technology == 'wasm'
+          ? h('span.technology', { attrs: { title: 'Single-threaded WebAssembly fallback (slow)' } }, 'WASM')
+          : h('span.technology', { attrs: { title: 'Single-threaded JavaScript fallback (very slow)' } }, 'ASMJS'),
   ];
 }
 
@@ -142,7 +142,7 @@ export function renderGauge(ctrl: ParentCtrl): VNode | undefined {
         reverse: ctrl.getOrientation() === 'p2',
       },
     },
-    [h('div.p2', { attrs: { style: `height: ${100 - (ev + 1) * 50}%` } }), ...gaugeTicks]
+    [h('div.p2', { attrs: { style: `height: ${100 - (ev + 1) * 50}%` } }), ...gaugeTicks],
   );
 }
 
@@ -194,7 +194,7 @@ export function renderCeval(ctrl: ParentCtrl): VNode | undefined {
               vnode.data!.threatMode = threatMode;
             },
           },
-        })
+        }),
       )
     : null;
 
@@ -208,8 +208,8 @@ export function renderCeval(ctrl: ParentCtrl): VNode | undefined {
             ctrl.outcome()
               ? [trans.noarg('gameOver')]
               : threatMode
-              ? [threatInfo(ctrl, threat)]
-              : localEvalInfo(ctrl, evs)
+                ? [threatInfo(ctrl, threat)]
+                : localEvalInfo(ctrl, evs),
           ),
         ]),
       ]
@@ -237,7 +237,7 @@ export function renderCeval(ctrl: ParentCtrl): VNode | undefined {
               },
             }),
             h('label', { attrs: { for: 'analyse-toggle-ceval' } }),
-          ]
+          ],
         );
 
   return h(
@@ -247,7 +247,7 @@ export function renderCeval(ctrl: ParentCtrl): VNode | undefined {
         computing: percent < 100 && instance.isComputing(),
       },
     },
-    [progressBar, ...body, threatButton(ctrl), switchButton]
+    [progressBar, ...body, threatButton(ctrl), switchButton],
   );
 }
 
@@ -280,86 +280,88 @@ function getElPvMoves(e: MouseEvent): (string | null)[] {
 function checkHover(el: HTMLElement, instance: CevalCtrl): void {
   playstrategy.requestIdleCallback(
     () => instance.setHovering(getElFen(el), $(el).find('div.pv:hover').attr('data-uci') || undefined),
-    500
+    500,
   );
 }
 
-export const renderPvs = (variantKey: VariantKey) => (ctrl: ParentCtrl): VNode | undefined => {
-  const instance = ctrl.getCeval();
-  if (!instance.allowed() || !instance.possible || !instance.enabled()) return;
-  const multiPv = parseInt(instance.multiPv()),
-    node = ctrl.getNode(),
-    setup = parseFen(variantToRules(variantKey))(node.fen).unwrap();
-  let pvs: Tree.PvData[],
-    threat = false,
-    pvMoves: (string | null)[],
-    pvIndex: number | null;
-  if (ctrl.threatMode() && node.threat) {
-    pvs = node.threat.pvs;
-    threat = true;
-  } else if (node.ceval) pvs = node.ceval.pvs;
-  else pvs = [];
-  if (threat) {
-    setup.turn = opposite(setup.turn);
-    if (setup.turn == 'p1') setup.fullmoves += 1;
-  }
-  const pos = setupPosition(playstrategyRules(instance.variant.key), setup);
+export const renderPvs =
+  (variantKey: VariantKey) =>
+  (ctrl: ParentCtrl): VNode | undefined => {
+    const instance = ctrl.getCeval();
+    if (!instance.allowed() || !instance.possible || !instance.enabled()) return;
+    const multiPv = parseInt(instance.multiPv()),
+      node = ctrl.getNode(),
+      setup = parseFen(variantToRules(variantKey))(node.fen).unwrap();
+    let pvs: Tree.PvData[],
+      threat = false,
+      pvMoves: (string | null)[],
+      pvIndex: number | null;
+    if (ctrl.threatMode() && node.threat) {
+      pvs = node.threat.pvs;
+      threat = true;
+    } else if (node.ceval) pvs = node.ceval.pvs;
+    else pvs = [];
+    if (threat) {
+      setup.turn = opposite(setup.turn);
+      if (setup.turn == 'p1') setup.fullmoves += 1;
+    }
+    const pos = setupPosition(playstrategyRules(instance.variant.key), setup);
 
-  return h(
-    'div.pv_box',
-    {
-      attrs: { 'data-fen': node.fen },
-      hook: {
-        insert: vnode => {
-          const el = vnode.elm as HTMLElement;
-          el.addEventListener('mouseover', (e: MouseEvent) => {
-            instance.setHovering(getElFen(el), getElUci(e));
-            const pvBoard = (e.target as HTMLElement).dataset['board'];
-            if (pvBoard) {
-              pvIndex = Number((e.target as HTMLElement).dataset['moveIndex']);
-              pvMoves = getElPvMoves(e);
-              const [fen, uci] = pvBoard.split('|');
-              instance.setPvBoard({ fen, uci });
-            }
-          });
-          el.addEventListener('wheel', (e: WheelEvent) => {
-            e.preventDefault();
-            if (pvIndex != null && pvMoves != null) {
-              if (e.deltaY < 0 && pvIndex > 0) pvIndex -= 1;
-              else if (e.deltaY > 0 && pvIndex < pvMoves.length - 1) pvIndex += 1;
-
-              const pvBoard = pvMoves[pvIndex];
+    return h(
+      'div.pv_box',
+      {
+        attrs: { 'data-fen': node.fen },
+        hook: {
+          insert: vnode => {
+            const el = vnode.elm as HTMLElement;
+            el.addEventListener('mouseover', (e: MouseEvent) => {
+              instance.setHovering(getElFen(el), getElUci(e));
+              const pvBoard = (e.target as HTMLElement).dataset['board'];
               if (pvBoard) {
+                pvIndex = Number((e.target as HTMLElement).dataset['moveIndex']);
+                pvMoves = getElPvMoves(e);
                 const [fen, uci] = pvBoard.split('|');
                 instance.setPvBoard({ fen, uci });
               }
-            }
-          });
-          el.addEventListener('mouseout', () => instance.setHovering(getElFen(el)));
-          for (const event of ['touchstart', 'mousedown']) {
-            el.addEventListener(event, (e: TouchEvent | MouseEvent) => {
-              const uci = getElUci(e);
-              if (uci) {
-                ctrl.playUci(uci);
-                e.preventDefault();
+            });
+            el.addEventListener('wheel', (e: WheelEvent) => {
+              e.preventDefault();
+              if (pvIndex != null && pvMoves != null) {
+                if (e.deltaY < 0 && pvIndex > 0) pvIndex -= 1;
+                else if (e.deltaY > 0 && pvIndex < pvMoves.length - 1) pvIndex += 1;
+
+                const pvBoard = pvMoves[pvIndex];
+                if (pvBoard) {
+                  const [fen, uci] = pvBoard.split('|');
+                  instance.setPvBoard({ fen, uci });
+                }
               }
             });
-          }
-          el.addEventListener('mouseleave', () => {
-            instance.setPvBoard(null);
-            pvIndex = null;
-          });
-          checkHover(el, instance);
+            el.addEventListener('mouseout', () => instance.setHovering(getElFen(el)));
+            for (const event of ['touchstart', 'mousedown']) {
+              el.addEventListener(event, (e: TouchEvent | MouseEvent) => {
+                const uci = getElUci(e);
+                if (uci) {
+                  ctrl.playUci(uci);
+                  e.preventDefault();
+                }
+              });
+            }
+            el.addEventListener('mouseleave', () => {
+              instance.setPvBoard(null);
+              pvIndex = null;
+            });
+            checkHover(el, instance);
+          },
+          postpatch: (_, vnode) => checkHover(vnode.elm as HTMLElement, instance),
         },
-        postpatch: (_, vnode) => checkHover(vnode.elm as HTMLElement, instance),
       },
-    },
-    [
-      ...[...Array(multiPv).keys()].map(i => renderPv(threat, multiPv, pvs[i], pos.isOk ? pos.value : undefined)),
-      renderPvBoard(ctrl),
-    ]
-  );
-};
+      [
+        ...[...Array(multiPv).keys()].map(i => renderPv(threat, multiPv, pvs[i], pos.isOk ? pos.value : undefined)),
+        renderPvBoard(ctrl),
+      ],
+    );
+  };
 
 const MAX_NUM_MOVES = 16;
 
@@ -427,8 +429,8 @@ function renderPvMoves(pos: Position, pv: Uci[]): VNode[] {
             'data-board': `${fen}|${uci}`,
           },
         },
-        san
-      )
+        san,
+      ),
     );
   }
   return vnodes;

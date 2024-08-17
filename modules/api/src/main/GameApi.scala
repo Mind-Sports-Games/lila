@@ -232,6 +232,7 @@ final private[api] class GameApi(
             )
             .add("name", p.name)
             .add("provisional" -> p.provisional)
+            .add("isInputRating" -> p.isInputRating)
             .add("plyCentis" -> withFlags.plyTimes ?? g.plyTimes(p.playerIndex).map(_.map(_.centis)))
             .add("blurs" -> withFlags.blurs.option(p.blurs.nb))
             .add("analysis" -> analysisOption.flatMap(analysisJson.player(g pov p.playerIndex)))

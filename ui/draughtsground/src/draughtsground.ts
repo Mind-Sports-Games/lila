@@ -8,7 +8,7 @@ import { render, updateBounds } from './render';
 import * as svg from './svg';
 import * as util from './util';
 
-export function Draughtsground(element: HTMLElement, config?: Config): Api {
+export default function Draughtsground(element: HTMLElement, config?: Config): Api {
   const state = defaults() as State;
 
   configure(state, config || {});

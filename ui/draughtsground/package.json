@@ -2,40 +2,36 @@
   "name": "draughtsground",
   "version": "7.6.0",
   "description": "lidraughts.org Draughts UI",
-  "type": "commonjs",
   "main": "draughtsground.js",
   "typings": "draughtsground.d.ts",
-  "directories": {},
-  "dependencies": {},
-  "devDependencies": {
-    "@rollup/plugin-commonjs": "^17",
-    "@rollup/plugin-typescript": "^8.1.0",
-    "@typescript-eslint/eslint-plugin": "^4",
-    "@typescript-eslint/parser": "^4",
-    "eslint": "^7",
-    "prettier": "^2",
-    "rollup": "^2",
-    "rollup-plugin-terser": "^7",
-    "tslib": "^2",
-    "typescript": "^4"
+  "exports": {
+    ".": "./dist/draughtsground.js",
+    "./*": "./dist/*.js"
+  },
+  "typesVersions": {
+    "*": {
+      "*": [
+        "dist/*"
+      ]
+    }
+  },
+  "dependencies": {
+    "tslib": "^2"
   },
   "scripts": {
-    "prepare": "npm run compile",
-    "compile": "tsc --outDir . --sourceMap --declaration",
+    "compile": "tsc",
     "lint": "eslint src/*.ts",
     "format": "prettier --write .",
     "check-format": "prettier --check .",
-    "dist": "rollup --config",
-    "dev": "yarn run dist && tsc --outDir . --sourceMap --declaration",
-    "prod": "yarn run dist && tsc --outDir . --sourceMap --declaration"
+    "dev": "tsc",
+    "prod": "tsc"
   },
   "files": [
-    "/*.js",
-    "/*.d.ts",
-    "/*.js.map",
+    "/dist/*.js",
+    "/dist/*.d.ts",
+    "/dist/*.js.map",
     "/assets/*.css",
-    "/src/*.ts",
-    "!/rollup.config.js"
+    "/src/*.ts"
   ],
   "keywords": [
     "draughts",
@@ -45,5 +41,8 @@
     "typescript"
   ],
   "author": "Stefan Schermann (modified original by Thibault Duplessis)",
-  "license": "GPL-3.0"
+  "license": "GPL-3.0",
+  "playstrategy": {
+    "bundles": "src/draughtsground.ts"
+  }
 }

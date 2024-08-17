@@ -184,6 +184,15 @@ object faq {
           )
         ),
         question(
+          "input-rating",
+          whatIsInputRating.txt(),
+          p(
+            inputRatingExplanation(
+              a(href := routes.Page.loneBookmark("handicaps"))(handicappedTournament())
+            )
+          )
+        ),
+        question(
           "leaderboards",
           howDoLeaderoardsWork.txt(),
           p(

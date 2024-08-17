@@ -19,7 +19,10 @@ export default class SwissCtrl {
 
   private lastStorage = playstrategy.storage.make('last-redirect');
 
-  constructor(readonly opts: SwissOpts, readonly redraw: () => void) {
+  constructor(
+    readonly opts: SwissOpts,
+    readonly redraw: () => void,
+  ) {
     this.data = this.readData(opts.data);
     this.trans = playstrategy.trans(opts.i18n);
     this.socket = makeSocket(opts.socketSend, this);
@@ -134,7 +137,7 @@ export default class SwissCtrl {
   private reloadSoon = () => {
     if (!this.reloadSoonThrottle)
       this.reloadSoonThrottle = throttle(Math.max(2000, Math.min(5000, this.data.nbPlayers * 20)), () =>
-        xhr.reloadNow(this)
+        xhr.reloadNow(this),
       );
     this.reloadSoonThrottle();
   };

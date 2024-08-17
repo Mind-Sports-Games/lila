@@ -9,7 +9,7 @@ export function bindMobileMousedown(el: HTMLElement, f: (e: Event) => unknown, r
         e.preventDefault();
         if (redraw) redraw();
       },
-      { passive: false }
+      { passive: false },
     );
   }
 }
@@ -20,7 +20,7 @@ export function bind(eventName: string, f: (e: Event) => unknown, redraw?: () =>
       const res = f(e);
       if (redraw) redraw();
       return res;
-    })
+    }),
   );
 }
 

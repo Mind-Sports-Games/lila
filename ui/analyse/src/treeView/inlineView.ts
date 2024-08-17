@@ -36,7 +36,7 @@ function renderChildrenOf(ctx: Ctx, node: Tree.ParentedNode, opts: Opts): MaybeV
           renderLines(ctx, main.forceVariation ? cs : cs.slice(1), {
             parentPath: opts.parentPath,
             isMainline: true,
-          })
+          }),
         ),
         ...(main.forceVariation
           ? []
@@ -77,10 +77,10 @@ function renderLines(ctx: Ctx, nodes: Tree.Node[], opts: Opts): VNode {
             isMainline: false,
             withIndex: true,
             truncate: n.comp && !treePath.contains(ctx.ctrl.path, opts.parentPath + n.id) ? 3 : undefined,
-          })
+          }),
         )
       );
-    })
+    }),
   );
 }
 
@@ -99,7 +99,7 @@ function renderMoveAndChildrenOf(ctx: Ctx, node: Tree.ParentedNode, opts: Opts):
           isMainline: opts.isMainline,
           truncate: opts.truncate ? opts.truncate - 1 : undefined,
           withIndex: !!comments[0],
-        }) || []
+        }) || [],
       )
   );
 }
@@ -111,7 +111,7 @@ function renderInline(ctx: Ctx, node: Tree.ParentedNode, opts: Opts): VNode {
       withIndex: true,
       parentPath: opts.parentPath,
       isMainline: false,
-    })
+    }),
   );
 }
 
@@ -129,7 +129,7 @@ function renderMoveOf(ctx: Ctx, node: Tree.ParentedNode, opts: Opts): VNode {
           fen: node.fen,
           prevFen: node.parent?.fen || '',
         },
-        variant
+        variant,
       ),
     ];
   if (node.glyphs && ctx.showGlyphs) node.glyphs.forEach(g => content.push(moveView.renderGlyph(g)));
@@ -139,7 +139,7 @@ function renderMoveOf(ctx: Ctx, node: Tree.ParentedNode, opts: Opts): VNode {
       attrs: { p: path },
       class: nodeClasses(ctx, node, path),
     },
-    content
+    content,
   );
 }
 
@@ -163,6 +163,6 @@ export default function (ctrl: AnalyseCtrl): VNode {
         parentPath: '',
         isMainline: true,
       }) || []),
-    ]
+    ],
   );
 }

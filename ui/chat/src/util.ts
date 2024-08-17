@@ -14,7 +14,7 @@ export function userLink(u: string, title?: string): VNode {
         href: '/@/' + u,
       },
     },
-    title && title != 'BOT' ? [h('span.utitle', title), trunc] : [trunc]
+    title && title != 'BOT' ? [h('span.utitle', title), trunc] : [trunc],
   );
 }
 

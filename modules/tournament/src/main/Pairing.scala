@@ -95,7 +95,7 @@ private[tournament] object Pairing {
   ) =
     if (tour.handicapped) {
       //in go handicapped tournament weaker player must go first
-      if (p1.player.rating <= p2.player.rating) Prep(tour.id, p1.player.userId, p2.player.userId)
+      if (p1.player.actualRating <= p2.player.actualRating) Prep(tour.id, p1.player.userId, p2.player.userId)
       else Prep(tour.id, p2.player.userId, p1.player.userId)
     } else {
       if (

@@ -2,7 +2,7 @@ function playstrategyOrchestra() {
   const load = (instrument, index, filename) =>
     playstrategy.sound.loadOggOrMp3(
       `orchestra.${instrument}.${index}`,
-      `${playstrategy.sound.baseUrl}/instrument/${instrument}/${filename}`
+      `${playstrategy.sound.baseUrl}/instrument/${instrument}/${filename}`,
     );
 
   const volumes = {

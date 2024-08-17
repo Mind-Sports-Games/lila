@@ -29,9 +29,9 @@ const renderGround = (ctrl: RacerCtrl): VNode =>
                     movable: { playerIndex: ctrl.run.pov },
                   },
               ctrl.pref,
-              ctrl.userMove
-            )
-          )
+              ctrl.userMove,
+            ),
+          ),
         ),
     },
   });

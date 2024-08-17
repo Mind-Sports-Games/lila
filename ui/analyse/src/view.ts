@@ -50,6 +50,7 @@ import renderPlayerBars from './study/playerBars';
 import { findTag } from './study/studyChapters';
 import serverSideUnderboard from './serverSideUnderboard';
 import * as gridHacks from './gridHacks';
+import * as Prefs from 'common/prefs';
 
 function renderResult(ctrl: AnalyseCtrl): VNode[] {
   let result: string | undefined;
@@ -69,7 +70,7 @@ function renderResult(ctrl: AnalyseCtrl): VNode[] {
     tags.push(h('div.result', result));
     const winner = ctrl.data.game.winnerPlayer;
     tags.push(
-      h('div.status', [statusView(ctrl), winner ? ', ' + ctrl.trans('playerIndexIsVictorious', winner) : null])
+      h('div.status', [statusView(ctrl), winner ? ', ' + ctrl.trans('playerIndexIsVictorious', winner) : null]),
     );
   }
   return tags;
@@ -98,7 +99,7 @@ function renderAnalyse(ctrl: AnalyseCtrl, concealOf?: ConcealOf) {
     [
       ctrl.embed && ctrl.study ? h('div.chapter-name', ctrl.study.currentChapter().name) : null,
       renderTreeView(ctrl, concealOf),
-    ].concat(renderResult(ctrl))
+    ].concat(renderResult(ctrl)),
   );
 }
 
@@ -130,7 +131,7 @@ function inputs(ctrl: AnalyseCtrl): VNode | undefined {
             el.addEventListener('input', _ => {
               ctrl.fenInput = el.value;
               el.setCustomValidity(
-                parseFen(variantToRules(ctrl.data.game.variant.key))(el.value.trim()).isOk ? '' : 'Invalid FEN'
+                parseFen(variantToRules(ctrl.data.game.variant.key))(el.value.trim()).isOk ? '' : 'Invalid FEN',
               );
             });
           },
@@ -175,10 +176,10 @@ function inputs(ctrl: AnalyseCtrl): VNode | undefined {
                         const pgn = $('.copyables .pgn textarea').val() as string;
                         if (pgn !== pgnExport.renderFullTxt(ctrl)) ctrl.changePgn(pgn);
                       },
-                      ctrl.redraw
+                      ctrl.redraw,
                     ),
                   },
-                  ctrl.trans.noarg('importPgn')
+                  ctrl.trans.noarg('importPgn'),
                 )
               : undefined,
           ]),
@@ -253,7 +254,7 @@ function controls(ctrl: AnalyseCtrl) {
             else if (action === 'practice') ctrl.togglePractice();
             else if (action === 'menu') ctrl.actionMenu.toggle();
           },
-          ctrl.redraw
+          ctrl.redraw,
         );
       }),
     },
@@ -304,7 +305,7 @@ function controls(ctrl: AnalyseCtrl) {
                         },
                       })
                     : null,
-                ]
+                ],
           ),
       h('div.jumps', [
         jumpButton('W', 'first', canJumpPrev),
@@ -322,7 +323,7 @@ function controls(ctrl: AnalyseCtrl) {
               'data-icon': '[',
             },
           }),
-    ]
+    ],
   );
 }
 
@@ -355,7 +356,7 @@ function renderPlayerScore(
   score: number,
   position: Position,
   playerIndex: string,
-  variantKey: VariantKey
+  variantKey: VariantKey,
 ): VNode | undefined {
   const defaultMancalaRole = 's';
   const children: VNode[] = [];
@@ -429,8 +430,8 @@ function renderPlayerScoreNames(ctrl: AnalyseCtrl): VNode | undefined {
     children.push(
       h(
         'div.game-score-name.p1.text.player' + flippedCss,
-        h('a.user-link.ulpt', { attrs: { href: `/@/${p1player.user.id}` } }, playerNames.p1)
-      )
+        h('a.user-link.ulpt', { attrs: { href: `/@/${p1player.user.id}` } }, playerNames.p1),
+      ),
     );
   } else {
     children.push(h('div.game-score-name.p1.text' + flippedCss, playerNames.p1));
@@ -440,8 +441,8 @@ function renderPlayerScoreNames(ctrl: AnalyseCtrl): VNode | undefined {
     children.push(
       h(
         'div.game-score-name.p2.text.player' + flippedCss,
-        h('a.user-link.ulpt', { attrs: { href: `/@/${p2player.user.id}` } }, playerNames.p2)
-      )
+        h('a.user-link.ulpt', { attrs: { href: `/@/${p2player.user.id}` } }, playerNames.p2),
+      ),
     );
   } else {
     children.push(h('div.game-score-name.p2.text' + flippedCss, playerNames.p2));
@@ -455,7 +456,7 @@ function renderPlayerName(ctrl: AnalyseCtrl, position: Position): VNode | undefi
   if (player.user)
     return h(
       `div.game-score-player-name.${playerIndex}.text.${position}`,
-      h('a.user-link.ulpt', { attrs: { href: `/@/${player.user.id}` } }, player.user.username)
+      h('a.user-link.ulpt', { attrs: { href: `/@/${player.user.id}` } }, player.user.username),
     );
   else {
     return h(`div.game-score-player-name.${playerIndex}.text.${position}`, player.playerName);
@@ -617,7 +618,7 @@ export default function (ctrl: AnalyseCtrl): VNode {
             chessground.render(ctrl),
             playerBars ? playerBars[ctrl.bottomIsP1() ? 0 : 1] : null,
             renderPromotion(ctrl),
-          ]
+          ],
         ),
       gaugeOn && !tour ? cevalView.renderGauge(ctrl) : null,
       tour || !ctrl.data.hasGameScore ? null : renderPlayerScore(topScore, 'top', ctrl.topPlayerIndex(), variantKey),
@@ -654,44 +655,44 @@ export default function (ctrl: AnalyseCtrl): VNode {
               hook:
                 ctrl.synthetic || playable(ctrl.data) ? undefined : onInsert(elm => serverSideUnderboard(elm, ctrl)),
             },
-            study ? studyView.underboard(ctrl) : [inputs(ctrl)]
+            study ? studyView.underboard(ctrl) : [inputs(ctrl)],
           ),
       tour ? null : acplView(ctrl),
       ctrl.embed
         ? null
         : ctrl.studyPractice
-        ? studyPracticeView.side(study!)
-        : h(
-            'aside.analyse__side',
-            {
-              hook: onInsert(elm => {
-                ctrl.opts.$side && ctrl.opts.$side.length && $(elm).replaceWith(ctrl.opts.$side);
-                $(elm).append($('.context-streamers').clone().removeClass('none'));
-              }),
-            },
-            ctrl.studyPractice
-              ? [studyPracticeView.side(study!)]
-              : study
-              ? [studyView.side(study)]
-              : [
-                  ctrl.forecast ? forecastView(ctrl, ctrl.forecast) : null,
-                  !ctrl.synthetic && playable(ctrl.data)
-                    ? h(
-                        'div.back-to-game',
-                        h(
-                          'a.button.button-empty.text',
-                          {
-                            attrs: {
-                              href: router.game(ctrl.data, ctrl.data.player.playerIndex),
-                              'data-icon': 'i',
-                            },
-                          },
-                          ctrl.trans.noarg('backToGame')
-                        )
-                      )
-                    : null,
-                ]
-          ),
+          ? studyPracticeView.side(study!)
+          : h(
+              'aside.analyse__side',
+              {
+                hook: onInsert(elm => {
+                  ctrl.opts.$side && ctrl.opts.$side.length && $(elm).replaceWith(ctrl.opts.$side);
+                  $(elm).append($('.context-streamers').clone().removeClass('none'));
+                }),
+              },
+              ctrl.studyPractice
+                ? [studyPracticeView.side(study!)]
+                : study
+                  ? [studyView.side(study)]
+                  : [
+                      ctrl.forecast ? forecastView(ctrl, ctrl.forecast) : null,
+                      !ctrl.synthetic && playable(ctrl.data)
+                        ? h(
+                            'div.back-to-game',
+                            h(
+                              'a.button.button-empty.text',
+                              {
+                                attrs: {
+                                  href: router.game(ctrl.data, ctrl.data.player.playerIndex),
+                                  'data-icon': 'i',
+                                },
+                              },
+                              ctrl.trans.noarg('backToGame'),
+                            ),
+                          )
+                        : null,
+                    ],
+            ),
       study && study.relay && relayManager(study.relay),
       ctrl.opts.chat &&
         h('section.mchat', {
@@ -707,6 +708,6 @@ export default function (ctrl: AnalyseCtrl): VNode {
         : h('div.chat__members.none', {
             hook: onInsert(playstrategy.watchers),
           }),
-    ]
+    ],
   );
 }

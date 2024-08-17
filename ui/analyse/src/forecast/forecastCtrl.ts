@@ -107,7 +107,7 @@ export function make(cfg: ForecastData, data: AnalyseData, redraw: () => void): 
         body: JSON.stringify(
           findStartingWithNode(node)
             .filter(notEmpty)
-            .map(fc => fc.slice(1))
+            .map(fc => fc.slice(1)),
         ),
         headers: { 'Content-Type': 'application/json' },
       })

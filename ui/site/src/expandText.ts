@@ -3,7 +3,7 @@ import spinner from './component/spinner';
 function toYouTubeEmbedUrl(url: string) {
   if (!url) return;
   const m = url.match(
-    /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com|youtu\.be)\/(?:watch)?(?:\?v=)?([^"&?/ ]{11})(?:\?|&|)(\S*)/i
+    /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com|youtu\.be)\/(?:watch)?(?:\?v=)?([^"&?/ ]{11})(?:\?|&|)(\S*)/i,
   );
   if (!m) return;
   let start = 1;
@@ -180,7 +180,7 @@ playstrategy.load.then(() => {
         a.element.classList.add('embedding_analyse');
         a.element.innerHTML = spinner;
         return a;
-      })
+      }),
   );
 
   expandGames(as.filter(a => a.type === 'game'));

@@ -31,7 +31,7 @@ export const possiblePromotion = (
   chessground: ChessgroundApi,
   orig: Key,
   dest: Key,
-  variant: VariantKey
+  variant: VariantKey,
 ): boolean | undefined => {
   const piece = chessground.state.pieces.get(dest),
     premovePiece = chessground.state.pieces.get(orig);

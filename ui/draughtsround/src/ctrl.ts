@@ -25,6 +25,7 @@ import { ctrl as makeKeyboardMove, KeyboardMove } from './keyboardMove';
 import * as renderUser from './view/user';
 import * as cevalSub from './cevalSub';
 import * as keyboard from './keyboard';
+import * as Prefs from 'common/prefs';
 
 import {
   RoundOpts,
@@ -86,7 +87,10 @@ export default class RoundController {
   sign: string = Math.random().toString(36);
   private music?: any;
 
-  constructor(readonly opts: RoundOpts, readonly redraw: Redraw) {
+  constructor(
+    readonly opts: RoundOpts,
+    readonly redraw: Redraw,
+  ) {
     opts.data.steps = round.mergeSteps(opts.data.steps, this.coordSystem(opts.data));
     round.massage(opts.data);
 
@@ -140,7 +144,7 @@ export default class RoundController {
 
     playstrategy.pubsub.on('sound_set', set => {
       if (!this.music && set === 'music')
-        playstrategy.loadScript('javascripts/music/play.js').then(() => {
+        playstrategy.loadScriptCJS('javascripts/music/play.js').then(() => {
           this.music = playstrategy.playMusic();
         });
       if (this.music && set !== 'music') this.music = undefined;
@@ -355,7 +359,7 @@ export default class RoundController {
             role: o.role,
             playerIndex: playedPlayerIndex,
           },
-          o.uci.substr(o.uci.length - 2, 2) as cg.Key
+          o.uci.substr(o.uci.length - 2, 2) as cg.Key,
         );
       else {
         const keys = util.uci2move(o.uci);
@@ -384,7 +388,7 @@ export default class RoundController {
         uci: o.uci,
         lidraughtsUci: o.uci,
       },
-      this.coordSystem(d)
+      this.coordSystem(d),
     );
 
     this.justDropped = undefined;
@@ -499,7 +503,7 @@ export default class RoundController {
         o.clock.p1Pending * 0.01,
         o.clock.p2Pending * 0.01,
         o.clock.p1Periods,
-        o.clock.p2Periods
+        o.clock.p2Periods,
       );
     }
     if (this.clock && o.clock)
@@ -540,7 +544,7 @@ export default class RoundController {
       },
       _ => {
         this.challengeRematched = false;
-      }
+      },
     );
   };
 

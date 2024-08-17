@@ -18,7 +18,7 @@ export function playButtons(root: AnalyseCtrl): VNode | undefined {
             attrs: dataIcon('I'),
             hook: bind('click', () => root.userJump(''), ctrl.redraw),
           },
-          'Back'
+          'Back',
         )
       : null,
     myTurn
@@ -28,7 +28,7 @@ export function playButtons(root: AnalyseCtrl): VNode | undefined {
             attrs: dataIcon('G'),
             hook: bind('click', ctrl.solution, ctrl.redraw),
           },
-          'View the solution'
+          'View the solution',
         )
       : undefined,
     overrideButton(study),
@@ -49,10 +49,10 @@ export function overrideButton(study: StudyCtrl): VNode | undefined {
             () => {
               study.setGamebookOverride(o === 'play' ? undefined : 'play');
             },
-            study.redraw
+            study.redraw,
           ),
         },
-        'Preview'
+        'Preview',
       );
     else {
       const isAnalyse = o === 'analyse',
@@ -68,10 +68,10 @@ export function overrideButton(study: StudyCtrl): VNode | undefined {
               () => {
                 study.setGamebookOverride(isAnalyse ? undefined : 'analyse');
               },
-              study.redraw
+              study.redraw,
             ),
           },
-          'Analyse'
+          'Analyse',
         );
     }
   }

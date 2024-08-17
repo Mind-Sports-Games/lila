@@ -8,9 +8,11 @@
     "noImplicitThis": true,
     "noUnusedParameters": true,
     "moduleResolution": "node",
-    "target": "ES2017",
+    "target": "es2019",
     "module": "esnext",
-    "lib": ["DOM", "ES2017", "DOM.iterable"],
-    "types": ["playstrategy", "cash"]
+    "lib": ["es2019"],
+    "esModuleInterop": true,
+    "isolatedModules": true,
+    "types": ["playstrategy", "web"]
   }
 }

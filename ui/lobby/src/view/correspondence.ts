@@ -23,7 +23,7 @@ function renderSeek(ctrl: LobbyController, seek: Seek): VNode {
             {
               attrs: { 'data-href': '/@/' + seek.username },
             },
-            seek.username
+            seek.username,
           )
         : 'Anonymous',
       seek.rating + (seek.provisional ? '?' : ''),
@@ -35,7 +35,7 @@ function renderSeek(ctrl: LobbyController, seek: Seek): VNode {
         noarg(seek.mode === 1 ? 'Rated ' : 'Casual '),
         '(' + noarg(seek.perf.name) + ')',
       ]),
-    ])
+    ]),
   );
 }
 
@@ -54,7 +54,7 @@ function createSeek(ctrl: LobbyController): VNode | undefined {
               .trigger('click');
           }),
         },
-        ctrl.trans('createAGame')
+        ctrl.trans('createAGame'),
       ),
     ]);
   return;
@@ -66,7 +66,7 @@ export default function (ctrl: LobbyController): MaybeVNodes {
       h('thead', [
         h(
           'tr',
-          ['', 'player', 'rating', 'time', 'mode'].map(header => h('th', ctrl.trans(header)))
+          ['', 'player', 'rating', 'time', 'mode'].map(header => h('th', ctrl.trans(header))),
         ),
       ]),
       h(
@@ -86,7 +86,7 @@ export default function (ctrl: LobbyController): MaybeVNodes {
             } while (el.nodeName !== 'TABLE');
           }),
         },
-        ctrl.data.seeks.map(s => renderSeek(ctrl, s))
+        ctrl.data.seeks.map(s => renderSeek(ctrl, s)),
       ),
     ]),
     createSeek(ctrl),

@@ -23,7 +23,7 @@ db.swiss_pairing.find({ mm: true }).forEach(sp => {
       $set: {
         mm: game1mm,
       },
-    }
+    },
   );
   print('updating game 2/2 ' + sp.mmid);
   db.game5.update(
@@ -32,7 +32,7 @@ db.swiss_pairing.find({ mm: true }).forEach(sp => {
       $set: {
         mm: game2mm,
       },
-    }
+    },
   );
   //update mt in swiss paring
   var res1 = 0;
@@ -59,7 +59,7 @@ db.swiss_pairing.find({ mm: true }).forEach(sp => {
       //   mmid: true,
       //   mm: true,
       // },
-    }
+    },
   );
 
   var stat_cache = `swiss:stats:${sp.s}`;
@@ -82,7 +82,7 @@ db.swiss.find({ 'settings.m': true }).forEach(s => {
       // $unset: {
       //   'settings.m': true,
       // },
-    }
+    },
   );
   print(s._id + ' swiss updated');
 });
@@ -99,7 +99,7 @@ db.swiss.find({ 'settings.m': { $exists: true } }).forEach(s => {
       $unset: {
         'settings.m': true,
       },
-    }
+    },
   );
 });
 
@@ -112,6 +112,6 @@ db.swiss_pairing.find({ mm: { $exists: true } }).forEach(sp => {
         mmid: true,
         mm: true,
       },
-    }
+    },
   );
 });

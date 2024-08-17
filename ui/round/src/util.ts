@@ -50,9 +50,16 @@ export const justIcon = (icon: string): VNodeData => ({
   attrs: { 'data-icon': icon },
 });
 
-// TODO: this is duplicated in ui/analyse/src/util.ts
 export const uci2move = (uci: string): cg.Key[] | undefined => {
-  if (!uci || uci == 'pass' || uci == 'roll' || uci == 'endturn' || uci.includes('/') || uci.substring(0, 3) == 'ss:')
+  if (
+    !uci ||
+    uci == 'pass' ||
+    uci == 'roll' ||
+    uci == 'endturn' ||
+    uci == 'undo' ||
+    uci.includes('/') ||
+    uci.substring(0, 3) == 'ss:'
+  )
     return undefined;
   const pos = uci.match(/[a-z][1-9][0-9]?/g) as cg.Key[];
   if (uci[1] === '@') return [pos[0], pos[0]] as cg.Key[];
@@ -73,7 +80,7 @@ export const bind = (eventName: string, f: (e: Event) => void, redraw?: Redraw, 
         f(e);
         redraw && redraw();
       },
-      { passive }
+      { passive },
     );
   });
 
@@ -93,7 +100,7 @@ export function parsePossibleMoves(dests?: EncodedDests, activeDiceValue?: numbe
     dec.forEach((value: cg.Key[], key: cg.Key) => {
       const newOrder = value.sort(
         (a, b) =>
-          Math.abs(backgammonPosDiff(key, a) - activeDiceValue) - Math.abs(backgammonPosDiff(key, b) - activeDiceValue)
+          Math.abs(backgammonPosDiff(key, a) - activeDiceValue) - Math.abs(backgammonPosDiff(key, b) - activeDiceValue),
       );
       sorted.set(key, newOrder);
     });
@@ -231,7 +238,7 @@ export const spinner = () =>
           attrs: { cx: 20, cy: 20, r: 18, fill: 'none' },
         }),
       ]),
-    ]
+    ],
   );
 
 const noAnalysisBoardVariants: VariantKey[] = ['monster', 'amazons', 'backgammon', 'nackgammon'];

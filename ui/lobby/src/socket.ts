@@ -10,7 +10,10 @@ interface Handlers {
 export default class LobbySocket {
   handlers: Handlers;
 
-  constructor(readonly send: SocketSend, ctrl: LobbyController) {
+  constructor(
+    readonly send: SocketSend,
+    ctrl: LobbyController,
+  ) {
     this.send = send;
 
     this.handlers = {
@@ -45,7 +48,7 @@ export default class LobbySocket {
       () => {
         send('idle', false);
         ctrl.awake();
-      }
+      },
     );
   }
 

@@ -8,7 +8,10 @@ type Notification = {
 export class Notify {
   notification: Notification | undefined;
 
-  constructor(readonly redraw: () => void, readonly timeout: number = 3000) {}
+  constructor(
+    readonly redraw: () => void,
+    readonly timeout: number = 3000,
+  ) {}
 
   set = (msg: string) => {
     // make sure it's different from previous, so it gets read again
@@ -29,6 +32,6 @@ export class Notify {
           'aria-atomic': true,
         },
       },
-      this.currentText()
+      this.currentText(),
     );
 }

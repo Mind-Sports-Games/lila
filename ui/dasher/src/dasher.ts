@@ -1,89 +1,25 @@
-import { PingCtrl, ctrl as pingCtrl } from './ping';
-import { LangsCtrl, LangsData, ctrl as langsCtrl } from './langs';
-import { SoundCtrl, ctrl as soundCtrl } from './sound';
-import { BackgroundCtrl, BackgroundData, ctrl as backgroundCtrl } from './background';
-import { ColorCtrl, ColorData, ctrl as colorCtrl } from './color';
-import { BoardCtrl, BoardData, ctrl as boardCtrl } from './board';
-import { ThemeCtrl, ThemeData, ctrl as themeCtrl } from './theme';
-import { PieceCtrl, PieceData, ctrl as pieceCtrl } from './piece';
-import { Redraw, Prop, prop } from './util';
+import { Redraw } from './util';
+import { DasherCtrl, DasherOpts, makeCtrl } from './interfaces';
+import { loading, loaded } from './view';
+import * as xhr from 'common/xhr';
+import { init, VNode, classModule, attributesModule } from 'snabbdom';
 
-export interface DasherData {
-  user?: LightUser;
-  lang: LangsData;
-  sound: {
-    list: string[];
+const patch = init([classModule, attributesModule]);
+
+export default async function PlayStrategyDasher(element: Element, opts: DasherOpts) {
+  let vnode: VNode, ctrl: DasherCtrl;
+
+  const redraw: Redraw = () => {
+    vnode = patch(vnode || element, ctrl ? loaded(ctrl) : loading());
   };
-  background: BackgroundData;
-  color: ColorData;
-  board: BoardData;
-  theme: ThemeData;
-  piece: PieceData;
-  coach: boolean;
-  streamer: boolean;
-  i18n: I18nDict;
-}
 
-export type Mode = 'links' | 'langs' | 'sound' | 'background' | 'color' | 'board' | 'theme' | 'piece';
+  redraw();
 
-const defaultMode = 'links';
-
-export interface DasherCtrl {
-  mode: Prop<Mode>;
-  setMode(m: Mode): void;
-  data: DasherData;
-  trans: Trans;
-  ping: PingCtrl;
-  subs: {
-    langs: LangsCtrl;
-    sound: SoundCtrl;
-    background: BackgroundCtrl;
-    color: ColorCtrl;
-    board: BoardCtrl;
-    theme: ThemeCtrl;
-    piece: PieceCtrl;
-  };
-  opts: DasherOpts;
-}
-
-export interface DasherOpts {
-  playing: boolean;
-}
-
-export function makeCtrl(opts: DasherOpts, data: DasherData, redraw: Redraw): DasherCtrl {
-  const trans = playstrategy.trans(data.i18n);
-
-  const mode: Prop<Mode> = prop(defaultMode as Mode);
-
-  function setMode(m: Mode) {
-    mode(m);
+  return xhr.json('/dasher').then(data => {
+    ctrl = makeCtrl(opts, data, redraw);
     redraw();
-  }
-  function close() {
-    setMode(defaultMode);
-  }
-
-  const ping = pingCtrl(trans, redraw);
-
-  const subs = {
-    langs: langsCtrl(data.lang, trans, close),
-    sound: soundCtrl(data.sound.list, trans, redraw, close),
-    background: backgroundCtrl(data.background, trans, redraw, close),
-    color: colorCtrl(data.color, trans, redraw, close),
-    board: boardCtrl(data.board, trans, redraw, close),
-    theme: themeCtrl(data.theme, trans, () => (data.board.is3d ? 'd3' : 'd2'), redraw, setMode),
-    piece: pieceCtrl(data.piece, trans, () => (data.board.is3d ? 'd3' : 'd2'), redraw, setMode),
-  };
-
-  playstrategy.pubsub.on('top.toggle.user_tag', () => setMode(defaultMode));
-
-  return {
-    mode,
-    setMode,
-    data,
-    trans,
-    ping,
-    subs,
-    opts,
-  };
+    return ctrl;
+  });
 }
+
+(window as any).PlayStrategyDasher = PlayStrategyDasher; // esbuild

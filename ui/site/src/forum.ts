@@ -32,8 +32,8 @@ playstrategy.load.then(() => {
 
     if (topicId)
       playstrategy.loadScript('vendor/textcomplete.min.js').then(function () {
-        const searchCandidates = function (term, candidateUsers) {
-          return candidateUsers.filter(function (user) {
+        const searchCandidates = function (term: any, candidateUsers: any) {
+          return candidateUsers.filter(function (user: any) {
             return user.toLowerCase().startsWith(term.toLowerCase());
           });
         };
@@ -49,7 +49,7 @@ playstrategy.load.then(() => {
           [
             {
               match: /(^|\s)@(|[a-zA-Z_-][\w-]{0,19})$/,
-              search: function (term, callback) {
+              search: function (term: any, callback: any) {
                 // Initially we only autocomplete by participants in the thread. As the user types more,
                 // we can autocomplete against all users on the site.
                 threadParticipants.then(function (participants) {
@@ -69,13 +69,13 @@ playstrategy.load.then(() => {
                   }
                 });
               },
-              replace: mention => '$1@' + mention + ' ',
+              replace: (mention: any) => '$1@' + mention + ' ',
             },
           ],
           {
             placement: 'top',
             appendTo: '#playstrategy_forum',
-          }
+          },
         );
       });
   });
@@ -93,7 +93,7 @@ playstrategy.load.then(() => {
         },
         _ => {
           playstrategy.announce({ msg: 'Failed to send forum post reaction' });
-        }
+        },
       );
     }
   });

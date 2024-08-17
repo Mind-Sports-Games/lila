@@ -77,6 +77,7 @@ final class CrudApi(tournamentRepo: TournamentRepo) {
       minutes = 0,
       variant = Variant.libStandard(GameLogic.Chess()),
       handicapped = false,
+      inputPlayerRatings = None,
       position = none,
       mode = Mode.Rated,
       password = None,

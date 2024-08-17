@@ -9,7 +9,7 @@ export function bind(eventName: string, f: (e: Event) => any, redraw?: () => voi
       const res = f(e);
       if (redraw) redraw();
       return res;
-    })
+    }),
   );
 }
 

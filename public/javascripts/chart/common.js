@@ -3,7 +3,7 @@ playstrategy.chartCommon = function (type) {
   if (playstrategy.highchartsPromise) return playstrategy.highchartsPromise;
   var file = type === 'highstock' ? 'highstock.js' : 'highcharts.js';
   return (playstrategy.highchartsPromise = playstrategy
-    .loadScript('vendor/highcharts-4.2.5/' + file, { noVersion: true })
+    .loadScriptCJS('vendor/highcharts-4.2.5/' + file, { noVersion: true })
     .then(function () {
       // Drop-in fix for Highcharts issue #8477 on older Highcharts versions. The
       // issue is fixed since Highcharts v6.1.1.

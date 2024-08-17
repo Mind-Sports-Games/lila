@@ -6,6 +6,8 @@
   <string name="isRated">This tournament is rated and will affect your rating.</string>
   <string name="isNotRated">This tournament is *not* rated and will *not* affect your rating.</string>
   <string name="someRated">Some tournaments are rated and will affect your rating.</string>
+  <string name="isItHandicapped">Is it handicapped?</string>
+  <string name="isHandicapped">This tournament is handicapped. User ratings may have an asterisk (*) after them denoting that they have been modified just for this tournament. This new rating is being used as part of the handicapped calculation.</string>
   <string name="howAreScoresCalculated">How are scores calculated?</string>
   <string name="howAreScoresCalculatedAnswer">A win has a base score of 2 points, a draw 1 point, and a loss is worth no points.
 If you win two games consecutively you will start a double point streak, represented by a flame icon.

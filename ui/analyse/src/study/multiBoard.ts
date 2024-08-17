@@ -13,7 +13,11 @@ export class MultiBoardCtrl {
   pager?: Paginator<ChapterPreview>;
   playing = false;
 
-  constructor(readonly studyId: string, readonly redraw: () => void, readonly trans: Trans) {}
+  constructor(
+    readonly studyId: string,
+    readonly redraw: () => void,
+    readonly trans: Trans,
+  ) {}
 
   addNode = (pos: Position, node: Tree.Node) => {
     const cp = this.pager && this.pager.currentPageResults.find(cp => cp.id == pos.chapterId);
@@ -80,7 +84,7 @@ export function view(ctrl: MultiBoardCtrl, study: StudyCtrl): VNode | undefined 
         },
       },
     },
-    ctrl.pager ? renderPager(ctrl.pager, study) : [spinner()]
+    ctrl.pager ? renderPager(ctrl.pager, study) : [spinner()],
   );
 }
 
@@ -146,7 +150,7 @@ function makePreview(study: StudyCtrl) {
         },
         hook: bind('mousedown', _ => study.setChapter(preview.id)),
       },
-      contents
+      contents,
     );
   };
 }

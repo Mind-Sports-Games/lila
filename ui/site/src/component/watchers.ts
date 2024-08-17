@@ -15,7 +15,7 @@ export default function watchers(element: HTMLElement) {
   $element.data('watched', 1);
   const $innerElement = $('<div class="chat__members__inner">').appendTo($element);
   const $numberEl = $('<div class="chat__members__number" data-icon="r" title="Spectators"></div>').appendTo(
-    $innerElement
+    $innerElement,
   );
   const $listEl = $('<div>').appendTo($innerElement);
 
@@ -30,7 +30,7 @@ export default function watchers(element: HTMLElement) {
 
     if (data.users) {
       const tags = data.users.map(u =>
-        u ? `<a class="user-link ulpt" href="/@/${u.includes(' ') ? u.split(' ')[1] : u}">${u}</a>` : 'Anonymous'
+        u ? `<a class="user-link ulpt" href="/@/${u.includes(' ') ? u.split(' ')[1] : u}">${u}</a>` : 'Anonymous',
       );
       if (data.anons === 1) tags.push('Anonymous');
       else if (data.anons) tags.push(`Anonymous (${data.anons})`);

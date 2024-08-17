@@ -192,7 +192,7 @@ export default function (opts: PuzzleOpts, redraw: Redraw): Controller {
         check: defined(check) ? makeSquare('chess')(check) : undefined,
         children: [],
       },
-      path
+      path,
     );
   }
 
@@ -257,10 +257,13 @@ export default function (opts: PuzzleOpts, redraw: Redraw): Controller {
       }
     } else if (progress) {
       vm.lastFeedback = 'good';
-      setTimeout(() => {
-        const pos = Chess.fromSetup(parseFen('chess')(progress.fen).unwrap()).unwrap();
-        sendMoveAt(progress.path, pos, progress.move);
-      }, opts.pref.animation.duration * (autoNext() ? 1 : 1.5));
+      setTimeout(
+        () => {
+          const pos = Chess.fromSetup(parseFen('chess')(progress.fen).unwrap()).unwrap();
+          sendMoveAt(progress.path, pos, progress.move);
+        },
+        opts.pref.animation.duration * (autoNext() ? 1 : 1.5),
+      );
     }
   }
 
@@ -339,7 +342,7 @@ export default function (opts: PuzzleOpts, redraw: Redraw): Controller {
           ground: g,
           threatMode: threatMode(),
           nextNodeBest: nextNodeBest(),
-        })
+        }),
       );
     });
   }

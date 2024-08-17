@@ -122,7 +122,10 @@ export default class AnalyseCtrl {
   music?: any;
   nvui?: NvuiPlugin;
 
-  constructor(readonly opts: AnalyseOpts, readonly redraw: Redraw) {
+  constructor(
+    readonly opts: AnalyseOpts,
+    readonly redraw: Redraw,
+  ) {
     this.data = opts.data;
     this.element = opts.element;
     this.embed = opts.embed;
@@ -175,7 +178,7 @@ export default class AnalyseCtrl {
 
     playstrategy.pubsub.on('sound_set', (set: string) => {
       if (!this.music && set === 'music')
-        playstrategy.loadScript('javascripts/music/replay.js').then(() => {
+        playstrategy.loadScriptCJS('javascripts/music/replay.js').then(() => {
           this.music = window.playstrategyReplayMusic();
         });
       if (this.music && set !== 'music') this.music = null;
@@ -286,7 +289,7 @@ export default class AnalyseCtrl {
     cg.set({
       dropmode: {
         showDropDests: !['go9x9', 'go13x13', 'go19x19', 'backgammon', 'nackgammon'].includes(
-          cg.state.variant as VariantKey
+          cg.state.variant as VariantKey,
         ),
         dropDests: stratUtils.readDropsByRole(this.node.dropsByRole),
       },
@@ -324,11 +327,11 @@ export default class AnalyseCtrl {
       movablePlayerIndex = this.gamebookPlay()
         ? playerIndex
         : this.practice
-        ? this.bottomPlayerIndex()
-        : !this.embed &&
-          ((dests && dests.size > 0) || drops === null || drops.length || dropsByRole == null || dropsByRole.length)
-        ? playerIndex
-        : undefined,
+          ? this.bottomPlayerIndex()
+          : !this.embed &&
+              ((dests && dests.size > 0) || drops === null || drops.length || dropsByRole == null || dropsByRole.length)
+            ? playerIndex
+            : undefined,
       config: ChessgroundConfig = {
         fen: this.data.game.variant.key == 'amazons' ? amazonsChessgroundFen(node.fen) : node.fen,
         turnPlayerIndex: playerIndex,
@@ -493,7 +496,7 @@ export default class AnalyseCtrl {
           console.log(error);
           this.redirecting = false;
           this.redraw();
-        }
+        },
       );
   }
 
@@ -647,7 +650,7 @@ export default class AnalyseCtrl {
         'Delete ' +
           util.plural('move', count.nodes) +
           (count.comments ? ' and ' + util.plural('comment', count.comments) : '') +
-          '?'
+          '?',
       )
     )
       return;
@@ -734,7 +737,7 @@ export default class AnalyseCtrl {
                 Math.max(board['b-piece'].intersect(pieces).intersect(SquareSet.darkSquares64()).size() - 1, 0);
               return board['p-piece'].intersect(pieces).size() + promotedPieces <= 8;
             }),
-          _ => false
+          _ => false,
         ),
       possible: !this.embed && (this.synthetic || !game.playable(this.data)),
       emit: (ev: Tree.ClientEval, work: CevalWork) => {
@@ -757,7 +760,7 @@ export default class AnalyseCtrl {
   outcome(node?: Tree.Node): Outcome | undefined {
     return this.position(node || this.node).unwrap(
       pos => pos.outcome(),
-      _ => undefined
+      _ => undefined,
     );
   }
 
@@ -916,14 +919,14 @@ export default class AnalyseCtrl {
     const to = makeSquare(stratUtils.variantToRules(this.data.game.variant.key))(move.to);
     if (isNormal(move)) {
       const piece = this.chessground.state.pieces.get(
-        makeSquare(stratUtils.variantToRules(this.data.game.variant.key))(move.from)
+        makeSquare(stratUtils.variantToRules(this.data.game.variant.key))(move.from),
       );
       const capture = this.chessground.state.pieces.get(to);
       this.sendMove(
         makeSquare(stratUtils.variantToRules(this.data.game.variant.key))(move.from),
         to,
         capture && piece && capture.playerIndex !== piece.playerIndex ? capture : undefined,
-        move.promotion
+        move.promotion,
       );
     } else
       this.chessground.newPiece(
@@ -931,7 +934,7 @@ export default class AnalyseCtrl {
           playerIndex: this.chessground.state.movable.playerIndex as PlayerIndex,
           role: move.role,
         },
-        to
+        to,
       );
   }
 
