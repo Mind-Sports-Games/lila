@@ -416,7 +416,7 @@ final private class StudySocket(
         "w"         -> who
       )
     )
-  def reloadSri(sri: Sri) = notifySri(sri, "reload", JsNull)
+  def reloadSri(sri: Sri) = notifySri(sri, "reload".pp("reloadSri"), JsNull)
   def reloadSriBecauseOf(sri: Sri, chapterId: Chapter.Id) =
     notifySri(sri, "reload", Json.obj("chapterId" -> chapterId))
   def validationError(error: String, sri: Sri) = notifySri(sri, "validationError", Json.obj("error" -> error))

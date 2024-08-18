@@ -45,7 +45,10 @@ sealed trait Node {
   // who's playerIndex plays next
   // This was inherited from lichess but is the right?
   // Should the node track who played on this node?
-  def playerIndex = PlayerIndex.fromTurnCount(turnCount)
+  def playerIndex = {
+    println(s"turnCount: $turnCount")
+    PlayerIndex.fromTurnCount(turnCount).pp("playerIndex from turncount")
+  }
 
   def mainlineNodeList: List[Node] =
     dropFirstChild :: children.headOption.fold(List.empty[Node])(_.mainlineNodeList)

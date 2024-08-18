@@ -204,6 +204,7 @@ export function make(send: AnalyseSocketSend, ctrl: AnalyseCtrl): Socket {
 
   return {
     receive(type, data) {
+      console.log(`Received ${type} from socket`, data);
       const handler = (handlers as SocketHandlers)[type];
       if (handler) {
         handler(data);
