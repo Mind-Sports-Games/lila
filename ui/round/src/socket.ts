@@ -247,7 +247,7 @@ export function make(send: SocketSend, ctrl: RoundController): RoundSocket {
       }
     },
     simulEnd(simul: game.Simul) {
-      playstrategy.loadCssPath('modal');
+      playstrategy.loadHashedCssPath('modal');
       modal(
         $(
           '<p>Simul complete!</p><br /><br />' +

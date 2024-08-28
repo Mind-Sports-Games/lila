@@ -50,6 +50,7 @@ final class Env(
     slackApi: lila.irc.SlackApi,
     mongoCacheApi: lila.memo.MongoCache.Api,
     ws: StandaloneWSClient,
+    webEnv: lila.web.Env,
     val mode: Mode
 )(implicit
     ec: scala.concurrent.ExecutionContext,

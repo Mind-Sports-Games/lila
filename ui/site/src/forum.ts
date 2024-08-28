@@ -31,7 +31,7 @@ playstrategy.load.then(() => {
       topicId = $(this).attr('data-topic');
 
     if (topicId)
-      playstrategy.loadScript('vendor/textcomplete.min.js').then(function () {
+      playstrategy.loadScriptCJS('vendor/textcomplete.min.js').then(function () {
         const searchCandidates = function (term: any, candidateUsers: any) {
           return candidateUsers.filter(function (user: any) {
             return user.toLowerCase().startsWith(term.toLowerCase());

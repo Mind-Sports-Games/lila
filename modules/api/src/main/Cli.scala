@@ -19,7 +19,8 @@ final private[api] class Cli(
     msg: lila.msg.Env,
     slackApi: lila.irc.SlackApi,
     email: lila.security.AutomaticEmail,
-    swiss: lila.swiss.Env
+    swiss: lila.swiss.Env,
+    web: lila.web.Env
 )(implicit ec: scala.concurrent.ExecutionContext)
     extends lila.common.Cli {
 
@@ -36,6 +37,8 @@ final private[api] class Cli(
     case "uptime" :: Nil => fuccess(s"${lila.common.Uptime.seconds} seconds")
     case "change" :: ("asset" | "assets") :: "version" :: Nil =>
       import lila.common.AssetVersion
+      web.manifest.update()
+      web.manifest.lastUpdate.pp("updated manifest")
       AssetVersion.change()
       fuccess(s"Changed to ${AssetVersion.current}")
     case "swiss" :: "update" :: "score" :: id :: Nil =>

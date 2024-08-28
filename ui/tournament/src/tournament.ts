@@ -51,4 +51,4 @@ window.Chessground = Chessground;
 window.Draughtsground = Draughtsground;
 window.PlayStrategyChat = PlayStrategyChat;
 
-(window as any).PlayStrategyTournament = PlayStrategyTournament;
+(window as any).PlayStrategyTournament = PlayStrategyTournament; // esbuild

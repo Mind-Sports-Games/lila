@@ -113,16 +113,16 @@ object side {
           table(cls := "trophyPreview")(
             tr(
               td(
-                img(cls := "customTrophy", src := assetUrl(s"images/trophy/${trophy1st}.png"))
+                img(cls := "customTrophy", src := staticAssetUrl(s"images/trophy/${trophy1st}.png"))
               ),
               s.trophy2nd.map { trophy2nd =>
                 td(
-                  img(cls := "customTrophy", src := assetUrl(s"images/trophy/${trophy2nd}.png"))
+                  img(cls := "customTrophy", src := staticAssetUrl(s"images/trophy/${trophy2nd}.png"))
                 )
               },
               s.trophy3rd.map { trophy3rd =>
                 td(
-                  img(cls := "customTrophy", src := assetUrl(s"images/trophy/${trophy3rd}.png"))
+                  img(cls := "customTrophy", src := staticAssetUrl(s"images/trophy/${trophy3rd}.png"))
                 )
               }
             ),

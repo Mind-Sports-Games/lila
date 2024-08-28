@@ -20,7 +20,8 @@ interface PlayStrategy {
   spinnerHtml: string;
   assetUrl(url: string, opts?: AssetUrlOpts): string;
   loadCss(path: string): void;
-  loadCssPath(path: string): void;
+  loadHashedCss(path: string): void;
+  loadHashedCssPath(path: string): void;
   jsModule(name: string): string;
   loadScript(url: string, opts?: AssetUrlOpts): Promise<void>;
   loadScriptCJS(url: string, opts?: AssetUrlOpts): Promise<void>;
@@ -87,6 +88,8 @@ interface PlayStrategy {
   keyboardMove?: any;
   analysis?: any; // expose the analysis ctrl
   pageVariant: PageVariant;
+
+  manifest: { css: Record<string, string>; js: Record<string, string> };
 }
 
 type I18nDict = { [key: string]: string };

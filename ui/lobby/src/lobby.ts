@@ -176,7 +176,7 @@ export default function PlayStrategyLobby(opts: LobbyOpts) {
     .find('a:not(.disabled, .just-a-link)')
     .on(clickEvent, function (this: HTMLAnchorElement) {
       $(this).addClass('active').siblings().removeClass('active');
-      playstrategy.loadCssPath('lobby.setup');
+      playstrategy.loadHashedCssPath('lobby.setup');
       lobby.leavePool();
       let url = this.href;
       if (this.dataset.hrefAddon) {

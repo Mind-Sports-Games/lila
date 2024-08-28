@@ -55,8 +55,8 @@ object home {
       chessground = false,
       openGraph = lila.app.ui
         .OpenGraph(
-          image = assetUrl("logo/playstrategy-tile-wide.png").some,
-          twitterImage = assetUrl("logo/playstrategy-tile.png").some,
+          image = staticAssetUrl("logo/playstrategy-tile-wide.png").some,
+          twitterImage = staticAssetUrl("logo/playstrategy-tile.png").some,
           title = trans.playstrategySiteTitle.txt(),
           url = netBaseUrl,
           description = trans.playstrategySiteDescription.txt()

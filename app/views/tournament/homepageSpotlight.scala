@@ -22,10 +22,10 @@ object homepageSpotlight {
           if (tour.isStarted && !tour.isFinished) span(cls := "ribbon")(span("live")),
           frag(
             spot.iconImg map { i =>
-              img(cls := "img", src := assetUrl(s"images/$i"))
+              img(cls := "img", src := staticAssetUrl(s"images/$i"))
             } getOrElse {
               spot.iconFont.fold[Frag](iconTag("g")(cls := "img")) {
-                case "\\" => img(cls := "img icon", src := assetUrl(s"images/globe.svg"))
+                case "\\" => img(cls := "img icon", src := staticAssetUrl(s"images/globe.svg"))
                 case i    => iconTag(i)(cls := "img")
               }
             },

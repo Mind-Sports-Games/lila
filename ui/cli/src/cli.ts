@@ -60,7 +60,7 @@ function commandHelp(aliases: string, args: string, desc: string) {
 }
 
 function help() {
-  playstrategy.loadCssPath('clinput.help');
+  playstrategy.loadHashedCssPath('clinput.help');
   modal(
     $(
       '<h3>Commands</h3>' +

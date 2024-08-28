@@ -10,7 +10,8 @@ import clockWidget from './component/clock-widget';
 import {
   assetUrl,
   loadCss,
-  loadCssPath,
+  loadHashedCss,
+  loadHashedCssPath,
   jsModule,
   loadScript,
   loadScriptCJS,
@@ -46,7 +47,8 @@ export default function windowedPlaystrategy(): PlayStrategy {
   l.spinnerHtml = spinnerHtml;
   l.assetUrl = assetUrl;
   l.loadCss = loadCss;
-  l.loadCssPath = loadCssPath;
+  l.loadHashedCss = loadHashedCss;
+  l.loadHashedCssPath = loadHashedCssPath;
   l.jsModule = jsModule;
   l.loadScript = loadScript;
   l.loadScriptCJS = loadScriptCJS;

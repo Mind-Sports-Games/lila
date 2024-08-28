@@ -30,7 +30,7 @@ object notFound {
         ),
         div(cls := "game")(
           iframe(
-            src := assetUrl(s"vendor/ChessPursuit/bin-release/index.html"),
+            src := staticAssetUrl(s"vendor/ChessPursuit/bin-release/index.html"),
             st.frameborder := 0,
             width := 400,
             height := 500

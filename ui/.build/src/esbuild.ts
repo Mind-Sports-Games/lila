@@ -43,15 +43,15 @@ export async function esbuild(tsc?: Promise<void>): Promise<void> {
     bundle: true,
     metafile: true,
     treeShaking: true,
-    splitting: true, // Splitting currently only works with the "esm" format - https://esbuild.github.io/api/#splitting
-    format: 'esm', // 'iife' immediately invoked function expression
+    splitting: true,
+    format: 'esm',
     target: 'es2018',
     logLevel: 'silent',
     sourcemap: !env.prod,
     minify: env.prod,
     outdir: env.jsDir,
-    entryNames: '[name]', // was '[name].[hash]', with manifest
-    // chunkNames: 'common.[hash]',
+    entryNames: '[name].[hash]',
+    chunkNames: 'common.[hash]',
     plugins: [onEndPlugin],
   });
   if (env.watch) {

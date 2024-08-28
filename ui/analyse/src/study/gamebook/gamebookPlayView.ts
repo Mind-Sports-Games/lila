@@ -18,7 +18,7 @@ export function render(ctrl: GamebookPlayCtrl): VNode {
   return h(
     'div.gamebook',
     {
-      hook: { insert: _ => playstrategy.loadCssPath('analyse.gamebook.play') },
+      hook: { insert: _ => playstrategy.loadHashedCssPath('analyse.gamebook.play') },
     },
     [
       comment

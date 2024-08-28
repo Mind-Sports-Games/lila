@@ -45,7 +45,7 @@ object event {
     e.icon match {
       case None                                     => i(cls := "img", dataIcon := "")
       case Some(c) if c == EventForm.icon.broadcast => i(cls := "img", dataIcon := "")
-      case Some(c)                                  => img(cls := "img", src := assetUrl(s"images/$c"))
+      case Some(c)                                  => img(cls := "img", src := staticAssetUrl(s"images/$c"))
     }
 
   def show(e: Event)(implicit ctx: Context) =
