@@ -63,6 +63,7 @@ package round {
   case class HoldAlert(playerId: PlayerId, mean: Int, sd: Int, ip: IpAddress)
   case class GoBerserk(playerIndex: PlayerIndex, promise: Promise[Boolean])
   case object NoStart
+  case object ForceExpiredAction
   case object StartClock
   case object TooManyPlies
 }

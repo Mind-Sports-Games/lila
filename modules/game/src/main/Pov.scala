@@ -23,7 +23,7 @@ case class Pov(game: Game, playerIndex: PlayerIndex) {
 
   def ref = PovRef(game.id, playerIndex)
 
-  def withGame(g: Game)   = copy(game = g)
+  def withGame(g: Game)               = copy(game = g)
   def withPlayerIndex(c: PlayerIndex) = copy(playerIndex = c)
 
   lazy val isMyTurn = game.started && game.playable && game.activePlayerIndex == playerIndex
@@ -43,6 +43,8 @@ case class Pov(game: Game, playerIndex: PlayerIndex) {
 
   def forecastable = game.forecastable && game.turnPlayerIndex != playerIndex
 
+  def mightClaimWin = game.forceResignable && !isMyTurn
+
   override def toString = ref.toString
 }
 
@@ -52,7 +54,7 @@ object Pov {
 
   def naturalOrientation(game: Game) = apply(game, game.naturalOrientation)
 
-  def player(game: Game) = apply(game, game.player)
+  def player(game: Game)   = apply(game, game.player)
   def opponent(game: Game) = apply(game, game.opponent(game.player))
 
   def apply(game: Game, player: Player) = new Pov(game, player.playerIndex)

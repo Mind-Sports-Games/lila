@@ -1,7 +1,7 @@
 package lila.round
 
 import actorApi._, round._
-import strategygames.{ P2, Centis, Player => PlayerIndex, Move, P1 }
+import strategygames.{ P2, Centis, Player => PlayerIndex, Move, P1, Pos }
 import org.joda.time.DateTime
 import ornicar.scalalib.Zero
 import play.api.libs.json._
@@ -63,7 +63,7 @@ final private[round] class RoundDuct(
     def isOnline = offlineSince.isEmpty || botConnected
 
     def setOnline(on: Boolean): Unit = {
-      isLongGone foreach { _ ?? notifyGone(playerIndex, gone = false) }
+      isLongGone.foreach(_ ?? notifyGone(playerIndex, gone = !on))
       offlineSince = if (on) None else offlineSince orElse nowMillis.some
       bye = bye && !on
     }
@@ -262,12 +262,20 @@ final private[round] class RoundDuct(
 
     case Resign(playerId) =>
       handle(PlayerId(playerId)) { pov =>
-        pov.game.resignable ?? finisher.other(pov.game, pov.game.situation.resignStatus(pov.playerIndex), Some(!pov.playerIndex))
+        pov.game.resignable ?? finisher.other(
+          pov.game,
+          pov.game.situation.resignStatus(pov.playerIndex),
+          Some(!pov.playerIndex)
+        )
       }
 
     case ResignAi =>
       handleAi { pov =>
-        pov.game.resignable ?? finisher.other(pov.game, pov.game.situation.resignStatus(pov.playerIndex), Some(!pov.playerIndex))
+        pov.game.resignable ?? finisher.other(
+          pov.game,
+          pov.game.situation.resignStatus(pov.playerIndex),
+          Some(!pov.playerIndex)
+        )
       }
 
     case GoBerserk(playerIndex, promise) =>
@@ -280,7 +288,7 @@ final private[round] class RoundDuct(
 
     case ResignForce(playerId) =>
       handle(playerId) { pov =>
-        (pov.game.resignable && !pov.game.hasAi && pov.game.hasClock && !pov.isMyTurn) ?? {
+        pov.mightClaimWin ?? {
           getPlayer(!pov.playerIndex).isLongGone flatMap {
             case true =>
               finisher.rageQuit(
@@ -327,7 +335,10 @@ final private[round] class RoundDuct(
         }
       }
 
-    case p: PlayerSelectSquares         => handle(p.playerId)(selectSquarer.selectSquares(p.squares))
+    case p: PlayerSelectSquares =>
+      handle(p.playerId)(selectSquarer.selectSquares(p.squares)) >> proxy.withGame { g =>
+        fuccess(scheduleActionExpiration(g))
+      }
     case SelectSquaresAccept(playerId)  => handle(playerId)(selectSquarer.accept)
     case SelectSquaresDecline(playerId) => handle(playerId)(selectSquarer.decline)
 
@@ -462,6 +473,22 @@ final private[round] class RoundDuct(
         }
       }
 
+    case ForceExpiredAction =>
+      handle { game =>
+        game.timeBeforeExpirationOnPaused.exists(_.centis == 0) ?? {
+          if (game.selectSquaresPossible) {
+            val pov = Pov(game, game.activePlayerIndex)
+            if (game.neitherPlayerHasMadeAnOffer)
+              selectSquarer.selectSquares(List[Pos]())(pov)
+            else
+              selectSquarer.accept(pov)
+          } else fuccess(List[Event]())
+        }
+      } >> proxy.withGame { g =>
+        if (g.selectSquaresPossible) fuccess(scheduleActionExpiration(g))
+        else funit
+      }
+
     case StartClock =>
       handle { game =>
         game.startClock ?? { g =>
@@ -476,7 +503,7 @@ final private[round] class RoundDuct(
 
     case Tick =>
       proxy.withGameOptionSync { g =>
-        (g.forceResignable && g.bothPlayersHaveMoved) ?? fuccess {
+        (g.forceResignableNow) ?? fuccess {
           PlayerIndex.all.foreach { c =>
             if (!getPlayer(c).isOnline && getPlayer(!c).isOnline) {
               getPlayer(c).showMillisToGone foreach {
@@ -615,6 +642,7 @@ object RoundDuct {
       val drawer: Drawer,
       val selectSquarer: SelectSquarer,
       val forecastApi: ForecastApi,
-      val isSimulHost: IsSimulHost
+      val isSimulHost: IsSimulHost,
+      val scheduleActionExpiration: ScheduleActionExpiration
   )
 }

@@ -112,7 +112,7 @@ export interface Player {
   offeringSelectSquares?: boolean;
   ai: number | null;
   onGame: boolean;
-  gone: number | boolean;
+  isGone: number | boolean;
   blurs?: Blurs;
   hold?: Hold;
   ratingDiff?: number;

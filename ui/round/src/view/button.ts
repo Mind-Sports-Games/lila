@@ -114,27 +114,29 @@ export function standard(
 
 export function opponentGone(ctrl: RoundController) {
   const gone = ctrl.opponentGone();
-  return gone === true
-    ? h('div.suggestion', [
-        h('p', { hook: onSuggestionHook }, ctrl.noarg('opponentLeftChoices')),
-        h(
-          'button.button',
-          {
-            hook: util.bind('click', () => ctrl.socket.sendLoading('resign-force')),
-          },
-          ctrl.noarg('forceResignation'),
-        ),
-        h(
-          'button.button',
-          {
-            hook: util.bind('click', () => ctrl.socket.sendLoading('draw-force')),
-          },
-          ctrl.noarg('forceDraw'),
-        ),
-      ])
-    : gone
-      ? h('div.suggestion', [h('p', ctrl.trans.vdomPlural('opponentLeftCounter', gone, h('strong', '' + gone)))])
-      : null;
+  return !game.allowForcedResult(ctrl.data)
+    ? null
+    : gone === true
+      ? h('div.suggestion', [
+          h('p', { hook: onSuggestionHook }, ctrl.noarg('opponentLeftChoices')),
+          h(
+            'button.button',
+            {
+              hook: util.bind('click', () => ctrl.socket.sendLoading('resign-force')),
+            },
+            ctrl.noarg('forceResignation'),
+          ),
+          h(
+            'button.button',
+            {
+              hook: util.bind('click', () => ctrl.socket.sendLoading('draw-force')),
+            },
+            ctrl.noarg('forceDraw'),
+          ),
+        ])
+      : gone
+        ? h('div.suggestion', [h('p', ctrl.trans.vdomPlural('opponentLeftCounter', gone, h('strong', '' + gone)))])
+        : null;
 }
 
 const fbtCancel = (ctrl: RoundController, f: (v: boolean) => void) =>
