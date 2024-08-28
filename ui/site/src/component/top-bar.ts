@@ -1,6 +1,6 @@
 import pubsub from './pubsub';
 import spinnerHtml from './spinner';
-import { loadCssPath, loadModule } from './assets';
+import { loadHashedCssPath, loadModule } from './assets';
 
 export default function () {
   const initiatingHtml = `<div class="initiating">${spinnerHtml}</div>`,
@@ -43,7 +43,7 @@ export default function () {
       if (booted) return;
       booted = true;
       const $el = $('#challenge-app').html(initiatingHtml);
-      loadCssPath('challenge');
+      loadHashedCssPath('challenge');
       loadModule('challenge').then(
         () =>
           (instance = window.PlayStrategyChallenge($el[0], {
@@ -77,7 +77,7 @@ export default function () {
       if (booted) return;
       booted = true;
       const $el = $('#notify-app').html(initiatingHtml);
-      loadCssPath('notify');
+      loadHashedCssPath('notify');
       loadModule('notify').then(
         () =>
           (instance = window.PlayStrategyNotify($el.empty()[0], {
@@ -128,7 +128,7 @@ export default function () {
       $(this).removeAttr('href');
       const $el = $('#dasher_app').html(initiatingHtml),
         playing = $('body').hasClass('playing');
-      loadCssPath('dasher');
+      loadHashedCssPath('dasher');
       loadModule('dasher').then(() => window.PlayStrategyDasher($el.empty()[0], { playing }));
     });
   }

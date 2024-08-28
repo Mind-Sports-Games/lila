@@ -30,6 +30,8 @@ export async function writeManifest() {
   writeTimer = setTimeout(write, 500);
 }
 
+const generateHash = (content: string) => crypto.createHash('sha256').update(content).digest('hex').slice(0, 8);
+
 export async function css() {
   const files = await globArray(path.join(env.cssTempDir, '*.css'), { abs: true });
   const css: { name: string; hash: string }[] = await Promise.all(files.map(hashMove));
@@ -87,7 +89,7 @@ async function write() {
   }
 
   const hashable = clientJs.join('\n');
-  const hash = crypto.createHash('sha256').update(hashable).digest('hex').slice(0, 8);
+  const hash = generateHash(hashable);
   // add the date after hashing
   const clientManifest =
     hashable +
@@ -95,9 +97,9 @@ async function write() {
   const serverManifest = { js: { manifest: { hash }, ...current.js }, css: { ...current.css } };
 
   await Promise.all([
-    fs.promises.writeFile(path.join(env.jsDir, `manifest.${hash}.js`), clientManifest),
+    fs.promises.writeFile(path.join(env.jsDir, `manifest.${hash}.js`), clientManifest), // client manifest - manifest.<hash>.js
     fs.promises.writeFile(
-      path.join(env.jsDir, `manifest.${env.prod ? 'prod' : 'dev'}.json`),
+      path.join(env.jsDir, `manifest.${env.prod ? 'prod' : 'dev'}.json`), // server manifest -  manifest.<dev|prod>.json
       JSON.stringify(serverManifest, null, env.prod ? undefined : 2),
     ),
   ]);
@@ -107,11 +109,11 @@ async function write() {
 
 async function hashMove(src: string) {
   const content = await fs.promises.readFile(src, 'utf-8');
-  const hash = crypto.createHash('sha256').update(content).digest('hex').slice(0, 8);
+  const hash = generateHash(content);
   const basename = path.basename(src, '.css');
   await Promise.allSettled([
-    env.prod ? undefined : fs.promises.rename(`${src}.map`, path.join(env.cssDir, `${basename}.css.map`)),
-    fs.promises.rename(src, path.join(env.cssDir, `${basename}.css`)),
+    env.prod ? undefined : fs.promises.rename(`${src}.map`, path.join(env.cssDir, `${basename}.css.map`)), // no map file in prod
+    fs.promises.rename(src, path.join(env.cssDir, `${basename}.${hash}.css`)), // rename css file to include hash
   ]);
   return { name: path.basename(src, '.css'), hash };
 }

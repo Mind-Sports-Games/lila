@@ -102,7 +102,7 @@ export function view(ctrl: StudyCtrl): VNode {
         });
       };
       if (window['Sortable']) makeSortable();
-      else playstrategy.loadScript('javascripts/vendor/Sortable.min.js').then(makeSortable);
+      else playstrategy.loadScriptCJS('javascripts/vendor/Sortable.min.js').then(makeSortable);
     }
   }
 

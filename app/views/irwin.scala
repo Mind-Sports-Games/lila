@@ -77,7 +77,7 @@ object irwin {
     div(id := "mz_irwin", cls := "mz-section")(
       header(
         a(cls := "title", href := routes.Irwin.dashboard)(
-          img(src := assetUrl("images/icons/brain.blue.svg")),
+          img(src := staticAssetUrl("images/icons/brain.blue.svg")),
           " Irwin AI",
           br,
           "Hunter"

@@ -1,6 +1,6 @@
 import tablesort from 'tablesort';
 
-import { loadScript } from './component/assets';
+import { loadScriptCJS } from './component/assets';
 import extendTablesortNumber from './component/tablesort-number';
 import * as xhr from 'common/xhr';
 
@@ -22,7 +22,7 @@ playstrategy.load.then(() => {
       return textarea.value.split('\n').slice(0, -1);
     }
 
-    loadScript('vendor/textcomplete.min.js').then(() => {
+    loadScriptCJS('vendor/textcomplete.min.js').then(() => {
       const textcomplete = new window.Textcomplete(new window.Textcomplete.editors.Textarea(textarea), {
         dropdown: {
           maxCount: 10,

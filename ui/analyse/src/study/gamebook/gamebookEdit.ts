@@ -120,7 +120,7 @@ export function render(ctrl: AnalyseCtrl): VNode {
   return h(
     'div.gamebook-edit',
     {
-      hook: { insert: _ => playstrategy.loadCssPath('analyse.gamebook.edit') },
+      hook: { insert: _ => playstrategy.loadHashedCssPath('analyse.gamebook.edit') },
     },
     content,
   );

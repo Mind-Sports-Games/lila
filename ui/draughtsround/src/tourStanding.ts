@@ -21,7 +21,7 @@ export function tourStandingCtrl(players: TourPlayer[], team: Team | undefined, 
         'div',
         {
           hook: onInsert(_ => {
-            playstrategy.loadCssPath('round.tour-standing');
+            playstrategy.loadHashedCssPath('round.tour-standing');
           }),
         },
         [

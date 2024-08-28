@@ -8,7 +8,7 @@ export default function (ctrl: RelayCtrl): VNode | undefined {
     ? h(
         'div.relay-admin',
         {
-          hook: onInsert(_ => playstrategy.loadCssPath('analyse.relay-admin')),
+          hook: onInsert(_ => playstrategy.loadHashedCssPath('analyse.relay-admin')),
         },
         [
           h('h2', [

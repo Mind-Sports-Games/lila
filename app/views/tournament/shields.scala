@@ -42,7 +42,7 @@ object shields {
                 h2(
                   a(href := routes.Tournament.medleyShield(medley.key))(
                     span(cls := "medley-shield-trophy")(
-                      img(cls := "medley-trophy", src := assetUrl(s"images/trophy/${medley.key}.png"))
+                      img(cls := "medley-trophy", src := staticAssetUrl(s"images/trophy/${medley.key}.png"))
                     ),
                     medley.name
                   )
@@ -163,7 +163,10 @@ object shields {
             " Medley Shield"
           ),
           div(cls := "page-medley-current")(
-            img(cls := "one-medley-shield-trophy", src := assetUrl(s"images/trophy/${medleyShield.key}.png")),
+            img(
+              cls := "one-medley-shield-trophy",
+              src := staticAssetUrl(s"images/trophy/${medleyShield.key}.png")
+            ),
             history.headOption.map { latest =>
               span(
                 a(

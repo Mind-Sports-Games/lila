@@ -36,7 +36,7 @@ object layout {
     def pieceSprite(ps: lila.pref.PieceSet): Frag =
       link(
         id := s"piece-sprite-${ps.gameFamilyName}",
-        href := assetUrl(s"piece-css/${ps.gameFamilyName}-${ps.name}.css"),
+        href := staticAssetUrl(s"piece-css/${ps.gameFamilyName}-${ps.name}.css"),
         rel := "stylesheet"
       )
   }
@@ -62,14 +62,14 @@ object layout {
   private val favicons = raw {
     List(512, 256, 192, 128, 64)
       .map { px =>
-        s"""<link rel="icon" type="image/png" href="${assetUrl(
+        s"""<link rel="icon" type="image/png" href="${staticAssetUrl(
           s"logo/playstrategy-favicon-$px.png"
         )}" sizes="${px}x$px">"""
       }
       .mkString(
         "",
         "",
-        s"""<link id="favicon" rel="icon" type="image/png" href="${assetUrl(
+        s"""<link id="favicon" rel="icon" type="image/png" href="${staticAssetUrl(
           "logo/playstrategy-favicon-32.png"
         )}" sizes="32x32">"""
       )
@@ -143,7 +143,7 @@ object layout {
 
   private def botImage =
     img(
-      src := assetUrl("images/icons/bot.png"),
+      src := staticAssetUrl("images/icons/bot.png"),
       title := "Robot chess",
       style :=
         "display:inline;width:34px;height:34px;vertical-align:top;margin-right:5px;vertical-align:text-top"
@@ -151,7 +151,7 @@ object layout {
 
   def playstrategyJsObject(nonce: Nonce)(implicit lang: Lang) =
     embedJsUnsafe(
-      s"""playstrategy={load:new Promise(r=>{window.onload=r}),quantity:${lila.i18n
+      s"""window.playstrategy={load:new Promise(r=>{window.onload=r}),quantity:${lila.i18n
         .JsQuantity(lang)}};$timeagoLocaleScript""",
       nonce
     )
@@ -163,6 +163,7 @@ object layout {
       ctx.requiresFingerprint option fingerprintTag,
       ctx.nonce map playstrategyJsObject,
       frag(
+        jsModule("manifest"),
         depsTag,
         jsModule("site")
       ),
@@ -173,18 +174,21 @@ object layout {
   private val spaceRegex              = """\s{2,}+""".r
   private def spaceless(html: String) = raw(spaceRegex.replaceAllIn(html.replace("\\n", ""), ""))
 
+  // define data-attr in the header of the page for client-side interactions
   private val dataVapid         = attr("data-vapid")
   private val dataUser          = attr("data-user")
   private val dataSocketDomains = attr("data-socket-domains")
   private val dataI18n          = attr("data-i18n")
   private val dataNonce         = attr("data-nonce")
   private val dataAnnounce      = attr("data-announce")
+  private val dataSelectedColor = attr("data-selected-color")
+  private val dataDev           = attr("data-dev")
   val dataSoundSet              = attr("data-sound-set")
   val dataTheme                 = attr("data-theme")
-  val dataSelectedColor         = attr("data-selected-color")
-  val dataAssetUrl              = attr("data-asset-url")
-  val dataAssetVersion          = attr("data-asset-version")
-  val dataDev                   = attr("data-dev")
+  val dataAssetUrl              = attr("data-asset-url") // netConfig.assetBaseUrl.value
+  val dataAssetVersion = attr(
+    "data-asset-version"
+  )
 
   def apply(
       title: String,
@@ -198,7 +202,9 @@ object layout {
       zoomable: Boolean = false,
       csp: Option[ContentSecurityPolicy] = None,
       wrapClass: String = ""
-  )(body: Frag)(implicit ctx: Context): Frag =
+  )(body: Frag)(implicit ctx: Context): Frag = {
+    updateManifest()
+
     frag(
       doctype,
       htmlTag(ctx.lang)(
@@ -224,7 +230,7 @@ object layout {
             content := openGraph.fold(trans.playstrategySiteDescription.txt())(o => o.description),
             name := "description"
           ),
-          link(rel := "mask-icon", href := assetUrl("logo/playstrategy.svg"), color := "black"),
+          link(rel := "mask-icon", href := staticAssetUrl("logo/playstrategy.svg"), color := "black"),
           favicons,
           !robots option raw("""<meta content="noindex, nofollow" name="robots">"""),
           noTranslate,
@@ -302,6 +308,7 @@ object layout {
         )
       )
     )
+  }
 
   object siteHeader {
 

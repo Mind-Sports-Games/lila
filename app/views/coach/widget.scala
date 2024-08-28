@@ -9,7 +9,7 @@ import lila.i18n.LangList
 import controllers.routes
 
 object widget {
-/*
+  /*
   import trans.coach._
 
   def titleName(c: lila.coach.Coach.WithUser) =
@@ -36,7 +36,7 @@ object widget {
           width := size,
           height := size,
           cls := "default picture",
-          src := assetUrl("images/placeholder.png"),
+          src := staticAssetUrl("images/placeholder.png"),
           alt := "Default PlayStrategy coach picture"
         )
       }
@@ -65,7 +65,7 @@ object widget {
                 profile.countryInfo.map { c =>
                   frag(
                     span(cls := "country")(
-                      img(cls := "flag", src := assetUrl(s"images/flags/${c.code}.png")),
+                      img(cls := "flag", src := staticAssetUrl(s"images/flags/${c.code}.png")),
                       " ",
                       c.name
                     )
