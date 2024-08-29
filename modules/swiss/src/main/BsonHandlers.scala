@@ -182,6 +182,8 @@ object BsonHandlers {
       Swiss.Settings(
         nbRounds = r.get[Int]("n"),
         rated = r.boolO("r") | true,
+        mcmahon = r.boolO("m") | false,
+        mcmahonCutoff = r.getD[String]("mc"),
         handicapped = r.boolO("h") | false,
         inputPlayerRatings = r.getD[String]("ipr"),
         isMatchScore = r.boolO("ms") | false,
@@ -205,6 +207,8 @@ object BsonHandlers {
       $doc(
         "n"   -> s.nbRounds,
         "r"   -> (!s.rated).option(false),
+        "m"   -> (s.mcmahon).option(true),
+        "mc"  -> s.mcmahonCutoff.some.filter(_.nonEmpty),
         "h"   -> (s.handicapped).option(true),
         "ipr" -> s.inputPlayerRatings.some.filter(_.nonEmpty),
         "ms"  -> s.isMatchScore,

@@ -187,6 +187,8 @@ object SwissJson {
         "clock"                 -> swiss.clock,
         "variant"               -> swiss.variant.key,
         "isMedley"              -> swiss.isMedley,
+        "isMcMahon"             -> swiss.settings.mcmahon,
+        "mcmahonCutoff"         -> swiss.settings.mcmahonCutoff,
         "isHandicapped"         -> swiss.settings.handicapped,
         "p1Name"                -> swiss.variant.playerNames(P1),
         "p2Name"                -> swiss.variant.playerNames(P2),

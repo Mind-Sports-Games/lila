@@ -5,6 +5,7 @@ playstrategy.load.then(() => {
     $rated = $('#form3-rated'),
     $medley = $('#form3-medley'),
     $handicapped = $('#form3-handicaps_handicapped'),
+    $mcmahon = $('#form3-mcmahon_mcmahon'),
     $drawTables = $('.form3 .drawTables'),
     $perPairingDrawTables = $('.form3 .perPairingDrawTables'),
     $onePerGameFamily = $('#form3-medleyDefaults_onePerGameFamily'),
@@ -34,7 +35,7 @@ playstrategy.load.then(() => {
       showDrawTables();
     },
     showInputRatings = () => {
-      $('.form3 .inputPlayerRatings').toggle($handicapped.is(':checked'));
+      $('.form3 .inputPlayerRatings').toggle($handicapped.is(':checked') || $mcmahon.is(':checked'));
     },
     hideByoyomiSettings = () => {
       $('.form3 .byoyomiClock').toggle($useByoyomi.is(':checked'));
@@ -103,11 +104,19 @@ playstrategy.load.then(() => {
   $handicapped.on('change', () => {
     toggleOff($medley);
     toggleOff($rated);
+    toggleOff($mcmahon);
     showMedleySettings();
     showInputRatings();
   });
-  $drawTables.on('change', () => toggleOff('#form3-perPairingDrawTables'));
-  $perPairingDrawTables.on('change', () => toggleOff('#form3-drawTables'));
+  $mcmahon.on('change', () => {
+    toggleOff($medley);
+    toggleOff($rated);
+    toggleOff($handicapped);
+    showMedleySettings();
+    showInputRatings();
+  });
+  $drawTables.on('change', () => toggleOff('#form3-drawTables_perPairingDrawTables'));
+  $perPairingDrawTables.on('change', () => toggleOff('#form3-drawTables_drawTables'));
   $medley.on('change', showMedleySettings);
   $onePerGameFamily.on('change', toggleOnePerGameFamily);
   $exoticChessVariants.on('change', toggleChessVariants);

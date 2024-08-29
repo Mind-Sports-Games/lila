@@ -83,6 +83,8 @@ final class SwissApi(
       settings = Swiss.Settings(
         nbRounds = data.nbRounds,
         rated = data.realPosition.isEmpty && data.isRated,
+        mcmahon = data.isMcMahon,
+        mcmahonCutoff = ~data.mcmahonCutoff,
         handicapped = data.isHandicapped,
         inputPlayerRatings = ~data.inputPlayerRatings,
         isMatchScore = data.isMatchScore,
@@ -125,6 +127,8 @@ final class SwissApi(
           settings = old.settings.copy(
             nbRounds = data.nbRounds,
             rated = position.isEmpty && (data.rated | old.settings.rated),
+            mcmahon = data.isMcMahon,
+            mcmahonCutoff = ~data.mcmahonCutoff,
             handicapped = data.isHandicapped,
             inputPlayerRatings = ~data.inputPlayerRatings,
             isMatchScore = data.isMatchScore,
