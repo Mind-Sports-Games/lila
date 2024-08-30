@@ -3,6 +3,7 @@ package lila.swiss
 import lila.common.LightUser
 import lila.rating.PerfType
 import lila.user.User
+import lila.game.Handicaps.mcMahonScoreFromRating
 
 case class SwissPlayer(
     id: SwissPlayer.Id, // swissId:userId
@@ -30,6 +31,11 @@ case class SwissPlayer(
   val tieBreak = bhTieBreak.fold(sbTieBreak.value)(_.value)
   // If bhTieBreak is None, then there is no secondary tb, else its sb
   val tieBreak2 = bhTieBreak.map(_ => sbTieBreak.value)
+
+  def mcMahonStartingScore(mcmahonCutoff: Int): Double = {
+    if (actualRating > mcmahonCutoff) mcMahonScoreFromRating(mcmahonCutoff)
+    else mcMahonScoreFromRating(actualRating)
+  }
 
   def recomputeScore =
     copy(

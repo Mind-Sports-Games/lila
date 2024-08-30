@@ -39,6 +39,18 @@ object Handicaps {
       }
     }.toMap
 
+  def playerRatingFromInput(inputRating: String): Option[Int] = {
+    inputRating match {
+      case psRating(grade) if grade.toInt >= 600 && grade.toInt <= 2900 =>
+        Some(inputRating.toInt)
+      case goKyuRating(grade) if grade.toInt > 0 && grade.toInt <= 60 =>
+        Some(convertGoRating(grade.toInt, KyuRating))
+      case goDanRating(grade) if grade.toInt > 0 && grade.toInt <= 7 =>
+        Some(convertGoRating(grade.toInt, DanRating))
+      case _ => None
+    }
+  }
+
   private def calcGoHandicap(size: Int, p1Rating: Int, p2Rating: Int): GoHandicap = {
     val ratingDiff = Math.abs(p1Rating - p2Rating)
     val rankDiff   = goRankDiff(Math.min(p1Rating, p2Rating), ratingDiff)
@@ -105,6 +117,50 @@ object Handicaps {
   val goKyuRating = s"^([0-9]+)k$$".r
   val goDanRating = s"^([1-7]+)d$$".r
   val psRating    = s"^([0-9]+)$$".r
+
+  def mcMahonScoreFromRating(rating: Int): Double = {
+    rating match {
+      case x if x > 2700 => 7.0
+      case x if x > 2600 => 6.0
+      case x if x > 2500 => 5.0
+      case x if x > 2400 => 4.0
+      case x if x > 2300 => 3.0
+      case x if x > 2200 => 2.0
+      case x if x > 2100 => 1.0
+      case x if x > 2000 => 0.0
+      case x if x > 1900 => -1.0
+      case x if x > 1800 => -2.0
+      case x if x > 1700 => -3.0
+      case x if x > 1650 => -4.0
+      case x if x > 1600 => -5.0
+      case x if x > 1550 => -6.0
+      case x if x > 1500 => -7.0
+      case x if x > 1450 => -8.0
+      case x if x > 1400 => -9.0
+      case x if x > 1350 => -10.0
+      case x if x > 1300 => -11.0
+      case x if x > 1250 => -12.0
+      case x if x > 1200 => -13.0
+      case x if x > 1150 => -14.0
+      case x if x > 1100 => -15.0
+      case x if x > 1050 => -16.0
+      case x if x > 1000 => -17.0
+      case x if x > 967  => -18.0
+      case x if x > 934  => -19.0
+      case x if x > 901  => -20.0
+      case x if x > 867  => -21.0
+      case x if x > 834  => -22.0
+      case x if x > 801  => -23.0
+      case x if x > 767  => -24.0
+      case x if x > 734  => -25.0
+      case x if x > 701  => -26.0
+      case x if x > 667  => -27.0
+      case x if x > 634  => -28.0
+      case x if x > 601  => -29.0
+      case x if x <= 601 => -30.0
+      case _             => 0.0
+    }
+  }
 }
 
 case class GoHandicap(komi: Int, stones: Int) //komi is 10x to be int

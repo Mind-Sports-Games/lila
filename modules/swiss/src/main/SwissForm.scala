@@ -12,7 +12,7 @@ import scala.concurrent.duration._
 
 import lila.common.Form._
 import lila.common.Clock._
-import lila.game.Handicaps.{ goDanRating, goKyuRating, psRating }
+import lila.game.Handicaps.{ playerRatingFromInput }
 
 final class SwissForm(implicit mode: Mode) {
 
@@ -433,12 +433,7 @@ object SwissForm {
     def validHandicapped = !isHandicapped || (gameLogic == GameLogic.Go() && !isMedley && !isRated)
     def validMcMahon =
       !isMcMahon || (gameLogic == GameLogic.Go() && !isMedley && !isRated && !isHandicapped)
-    def validMcMahonCutoff = !isMcMahon || (mcmahonCutoff.fold(false)(_ match {
-      case psRating(grade) if grade.toInt >= 600 && grade.toInt <= 2900 => true
-      case goKyuRating(grade) if grade.toInt > 0 && grade.toInt <= 60   => true
-      case goDanRating(grade) if grade.toInt > 0 && grade.toInt <= 7    => true
-      case _                                                            => false
-    }))
+    def validMcMahonCutoff = !isMcMahon || (mcmahonCutoff.fold(false)(playerRatingFromInput(_) != None))
 
     def validClock = clock match {
       case fc: Clock.Config             => (fc.limitSeconds + fc.incrementSeconds) > 0

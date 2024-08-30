@@ -25,6 +25,8 @@ export interface SwissData {
   variant: string;
   isMedley: boolean;
   isHandicapped: boolean;
+  isMcMahon: boolean;
+  mcmahonCutoff: string;
   roundVariant: string;
   roundVariantName: string;
   p1Name: PlayerName;
@@ -137,6 +139,7 @@ export interface Player extends BasePlayer {
   rank: number;
   sheetMin: string;
   sheet: (PairingBase | Outcome)[];
+  mmStartingScore?: number;
 }
 
 export interface BoardSize {

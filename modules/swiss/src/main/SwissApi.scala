@@ -178,7 +178,9 @@ final class SwissApi(
             s.copy(nextRoundAt = none)
           else s
         }
-      if (data.isHandicapped && old.settings.inputPlayerRatings != ~data.inputPlayerRatings) {
+      if (
+        (data.isHandicapped || data.isMcMahon) && old.settings.inputPlayerRatings != ~data.inputPlayerRatings
+      ) {
         val playerRatingMap = Handicaps.playerInputRatings(~data.inputPlayerRatings)
         playerRatingMap.toList.map { case (u, r) =>
           colls.player
@@ -193,7 +195,9 @@ final class SwissApi(
           playerRatingMap.keys.toList.map(u => SwissPlayer.Id(s"${swiss.id}:${u}"))
         ) >>
           recomputeAndUpdateAll(swiss.id)
-      } else if (!data.isHandicapped && old.settings.handicapped) {
+      } else if (
+        !(data.isHandicapped || data.isMcMahon) && (old.settings.handicapped || old.settings.mcmahon)
+      ) {
         unsetAllPlayerInputRating(swiss.id) >>
           recomputeAndUpdateAll(swiss.id)
       }

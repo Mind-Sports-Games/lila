@@ -108,6 +108,7 @@ export default function (ctrl: SwissCtrl): VNode | undefined {
         ]),
         h('table', [
           numberRow('Points', data.points, 'raw'),
+          ctrl.data.isMcMahon ? numberRow('McMahon Starting Score', data.mmStartingScore, 'raw') : null,
           numberRow('Tiebreak' + (data.tieBreak2 ? ' [BH]' : ' [SB]'), data.tieBreak, 'raw'),
           data.tieBreak2 ? numberRow('Tiebreak [SB]', data.tieBreak2, 'raw') : null,
           ...(games

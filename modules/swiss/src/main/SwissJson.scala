@@ -230,7 +230,11 @@ object SwissJson {
             pairingJsonOrOutcome(view.player)
           }
           .mkString("|")
-      )
+      ) ++ Json.obj(
+      "mmStartingScore" -> (swiss.settings.mcmahon ?? view.player.mcMahonStartingScore(
+        swiss.settings.mcmahonCutoffGrade
+      ))
+    )
 
   def playerJsonExt(swiss: Swiss, view: SwissPlayer.ViewExt): JsObject =
     playerJsonBase(view, performance = true) ++ Json
@@ -248,7 +252,11 @@ object SwissJson {
                 )
             }
           }
-      )
+      ) ++ Json.obj(
+      "mmStartingScore" -> (swiss.settings.mcmahon ?? view.player.mcMahonStartingScore(
+        swiss.settings.mcmahonCutoffGrade
+      ))
+    )
 
   private def playerJsonBase(
       view: SwissPlayer.Viewish,
