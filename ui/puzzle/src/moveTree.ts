@@ -10,6 +10,7 @@ export function pgnToTree(pgn: San[]): Tree.Node {
   const pos = Chess.default();
   const root: Tree.Node = {
     ply: 0,
+    playerIndex: 'p1',
     id: '',
     fen: INITIAL_FEN,
     children: [],
@@ -42,6 +43,7 @@ export function mergeSolution(root: TreeWrapper, initialPath: Tree.Path, solutio
 
 const makeNode = (pos: Chess, move: Move, ply: number, san: San): Tree.Node => ({
   ply,
+  playerIndex: ply % 2 == 1 ? 'p1' : 'p2',
   san,
   fen: makeFen('chess')(pos.toSetup()),
   id: scalachessCharPair('chess')(move),
