@@ -525,14 +525,6 @@ export default class AnalyseCtrl {
         fen: this.node.fen,
         path: this.path,
       };
-      if (this.data.game.variant.key == 'amazons' && this.node.uci !== undefined) {
-        drop.halfMove = {
-          orig: this.node.uci.substring(0, 2),
-          dest: this.node.uci.substring(2, 4),
-        };
-        drop.fen = this.tree.parentNode(this.path).fen;
-        // Add in
-      }
       this.socket.sendAnaDrop(drop);
       this.preparePremoving();
       this.redraw();
