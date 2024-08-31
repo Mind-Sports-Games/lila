@@ -213,6 +213,11 @@ body.backgammon-contemporary .variant-backgammon .game-score {
       }
     }
 
+    @include breakpoint($mq-landscape-mobile) {
+      width: 20%;
+      padding-top: 20%;
+    }
+
     @include breakpoint($mq-col2-uniboard) {
       &-top {
         margin-bottom: $block-gap;

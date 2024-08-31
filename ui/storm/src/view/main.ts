@@ -18,7 +18,7 @@ export default function (ctrl: StormCtrl): VNode {
       {
         class: playModifiers(ctrl.run),
       },
-      renderPlay(ctrl)
+      renderPlay(ctrl),
     );
   return h('main.storm.storm--end', renderEnd(ctrl));
 }
@@ -30,8 +30,8 @@ const chessground = (ctrl: StormCtrl): VNode =>
         ctrl.ground(
           Chessground(
             vnode.elm as HTMLElement,
-            makeCgConfig(makeCgOpts(ctrl.run, !ctrl.run.endAt), ctrl.pref, ctrl.userMove)
-          )
+            makeCgConfig(makeCgOpts(ctrl.run, !ctrl.run.endAt), ctrl.pref, ctrl.userMove),
+          ),
         ),
     },
   });
@@ -95,6 +95,6 @@ const renderReload = (msg: string) =>
       {
         attrs: { href: '/storm' },
       },
-      'Click to reload'
+      'Click to reload',
     ),
   ]);

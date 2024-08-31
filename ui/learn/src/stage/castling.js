@@ -9,11 +9,11 @@ var castledKingSide = assert.lastMoveSan('O-O');
 var castledQueenSide = assert.lastMoveSan('O-O-O');
 var cantCastleKingSide = assert.and(
   assert.not(castledKingSide),
-  assert.or(assert.pieceNotOn('K', 'e1'), assert.pieceNotOn('R', 'h1'))
+  assert.or(assert.pieceNotOn('K', 'e1'), assert.pieceNotOn('R', 'h1')),
 );
 var cantCastleQueenSide = assert.and(
   assert.not(castledQueenSide),
-  assert.or(assert.pieceNotOn('K', 'e1'), assert.pieceNotOn('R', 'a1'))
+  assert.or(assert.pieceNotOn('K', 'e1'), assert.pieceNotOn('R', 'a1')),
 );
 
 module.exports = {

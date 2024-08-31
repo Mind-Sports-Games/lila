@@ -18,9 +18,9 @@ module.exports = function (ctrl) {
           {
             onclick: ctrl.hideStartingPane,
           },
-          ctrl.trans.noarg('letsGo')
-        )
+          ctrl.trans.noarg('letsGo'),
+        ),
       ),
-    ])
+    ]),
   );
 };

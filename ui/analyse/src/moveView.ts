@@ -22,7 +22,7 @@ export const renderGlyph = (glyph: Tree.Glyph): VNode =>
     {
       attrs: { title: glyph.name },
     },
-    glyph.symbol
+    glyph.symbol,
   );
 
 const renderEval = (e: string): VNode => h('eval', e.replace('-', '−'));
@@ -50,8 +50,8 @@ export function renderMove(ctx: Ctx, node: Tree.ParentedNode, style: NotationSty
           fen: node.fen,
           prevFen: node.parent?.fen || '',
         },
-        variant
-      )
+        variant,
+      ),
     ),
   ];
   if (node.glyphs && ctx.showGlyphs) node.glyphs.forEach(g => nodes.push(renderGlyph(g)));

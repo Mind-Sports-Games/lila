@@ -93,7 +93,9 @@ coords {
 
   //Handle togy corrds as they are always inside the board
   .variant-togyzkumalak & {
-    text-shadow: 0.5px -1px 0px rgba(0, 0, 0, 0.25), -0.5px 1px 0px rgba(255, 255, 255, 0.6);
+    text-shadow:
+      0.5px -1px 0px rgba(0, 0, 0, 0.25),
+      -0.5px 1px 0px rgba(255, 255, 255, 0.6);
     .togyzkumalak-wood & coord {
       color: #000000 !important;
     }
@@ -130,7 +132,9 @@ coords {
 
   .variant-nackgammon &,
   .variant-backgammon & {
-    text-shadow: 0.5px -1px 0px rgba(0, 0, 0, 0.25), -0.5px 1px 0px rgba(255, 255, 255, 0.6);
+    text-shadow:
+      0.5px -1px 0px rgba(0, 0, 0, 0.25),
+      -0.5px 1px 0px rgba(255, 255, 255, 0.6);
     .backgammon-classic & coord {
       color: #edc966 !important;
       padding-left: 0px;
@@ -307,6 +311,61 @@ coords {
   }
 }
 
+@include breakpoint($mq-landscape-mobile) {
+  .coords-out coords {
+    &.ranks {
+      right: -10px !important;
+    }
+  }
+
+  //dont show xiangqi coords
+  .coords-out .variant-xiangqi coords {
+    display: none;
+  }
+
+  .coords-out .variant-minixiangqi coords {
+    display: none;
+  }
+
+  //always show for Togy and make smaller
+  .variant-togyzkumalak .orientation-p1 coords.files {
+    &.p1 {
+      bottom: 1px;
+    }
+    &.p2 {
+      top: 2px;
+    }
+  }
+  .variant-togyzkumalak .orientation-p2 coords.files {
+    &.p1 {
+      top: 2px;
+    }
+    &.p2 {
+      bottom: 1px;
+    }
+  }
+
+  //always show for backgammon single column and make smaller
+  .variant-nackgammon .orientation-p1 coords.files,
+  .variant-backgammon .orientation-p1 coords.files {
+    &.p1 {
+      bottom: 0.4em;
+    }
+    &.p2 {
+      top: 0.4em;
+    }
+  }
+  .variant-nackgammon .orientation-p1vflip coords.files,
+  .variant-backgammon .orientation-p1vflip coords.files {
+    &.p1 {
+      top: 0.4em;
+    }
+    &.p2 {
+      bottom: 0.4em;
+    }
+  }
+}
+
 /* handle outer coords */
 @include breakpoint($mq-col2-uniboard) {
   .coords-out coords {
@@ -377,7 +436,7 @@ coords {
   }
 
   @each $variant in $go-variants {
-    .coords-out .variant-#{$variant} &.ranks {
+    .coords-out .variant-#{$variant} .ranks {
       &.p1,
       &.p2 {
         top: -4px;

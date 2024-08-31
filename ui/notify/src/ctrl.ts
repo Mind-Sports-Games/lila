@@ -47,7 +47,7 @@ export default function makeCtrl(opts: NotifyOpts, redraw: Redraw): Ctrl {
   const loadPage = (page: number) =>
     xhr.json(xhr.url('/notify', { page: page || 1 })).then(
       d => update(d, false),
-      _ => playstrategy.announce({ msg: 'Failed to load notifications' })
+      _ => playstrategy.announce({ msg: 'Failed to load notifications' }),
     );
 
   function nextPage() {

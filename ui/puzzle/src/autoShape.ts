@@ -49,7 +49,7 @@ export default function (opts: Opts): DrawShape[] {
           shapes = shapes.concat(
             makeAutoShapesFromUci(pv.moves[0], 'paleGrey', {
               lineWidth: Math.round(12 - shift * 50), // 12 to 2
-            })
+            }),
           );
         });
       }
@@ -64,7 +64,7 @@ export default function (opts: Opts): DrawShape[] {
         shapes = shapes.concat(
           makeAutoShapesFromUci(pv.moves[0], 'paleRed', {
             lineWidth: Math.round(11 - shift * 45), // 11 to 2
-          })
+          }),
         );
       });
     } else shapes = shapes.concat(makeAutoShapesFromUci(n.threat.pvs[0].moves[0], 'red'));

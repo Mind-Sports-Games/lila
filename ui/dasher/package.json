@@ -3,17 +3,20 @@
   "version": "2.0.0",
   "private": true,
   "description": "playstrategy.org multipurpose dropdown",
+  "module": "dist/dasher.js",
+  "types": "dist/dasher.d.ts",
   "author": "Thibault Duplessis",
   "license": "AGPL-3.0-or-later",
   "dependencies": {
+    "common": "workspace:*",
     "snabbdom": "^3.0.1"
   },
-  "devDependencies": {
-    "@build/rollupProject": "2.0.0",
-    "@types/playstrategy": "2.0.0"
-  },
   "scripts": {
-    "dev": "rollup --config",
-    "prod": "rollup --config --config-prod"
+    "compile": "tsc",
+    "dev": "tsc",
+    "prod": "tsc"
+  },
+  "playstrategy": {
+    "bundles": "src/dasher.ts"
   }
 }

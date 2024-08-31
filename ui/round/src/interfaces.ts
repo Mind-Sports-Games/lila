@@ -5,6 +5,7 @@ import { CorresClockData } from './corresClock/corresClockCtrl';
 import RoundController from './ctrl';
 import { ChatCtrl, ChatPlugin } from 'chat';
 import * as cg from 'chessground/types';
+import * as Prefs from 'common/prefs';
 
 export type MaybeVNode = VNode | null | undefined;
 export type MaybeVNodes = MaybeVNode[];
@@ -47,6 +48,10 @@ export interface SocketDoRoll {
 }
 export interface SocketLift {
   pos: cg.Key;
+  variant: string;
+  b?: 1;
+}
+export interface SocketUndo {
   variant: string;
   b?: 1;
 }

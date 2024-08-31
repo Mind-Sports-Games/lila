@@ -387,8 +387,6 @@ final private[round] class RoundDuct(
         }
       }
 
-    case Undo(playerId) => handle(playerId) { pov => undoer.apply(pov) }
-
     case Moretime(playerId, duration) =>
       handle(playerId) { pov =>
         moretimer(pov, duration) flatMap {
@@ -610,7 +608,6 @@ object RoundDuct {
       val gameRepo: GameRepo,
       val messenger: Messenger,
       val takebacker: Takebacker,
-      val undoer: Undoer,
       val moretimer: Moretimer,
       val finisher: Finisher,
       val rematcher: Rematcher,

@@ -7,6 +7,7 @@ import strategygames.opening.{ FullOpening, FullOpeningDB }
 import strategygames.chess.{ Castles, CheckCount }
 import strategygames.chess.format.{ Uci => ChessUci }
 import strategygames.{
+  Action,
   ActionStrs,
   Centis,
   ByoyomiClock,
@@ -24,8 +25,8 @@ import strategygames.{
   Pass,
   DiceRoll,
   EndTurn,
+  Undo,
   SelectSquares,
-  Action,
   Pos,
   Speed,
   Status,
@@ -258,7 +259,10 @@ case class Game(
           } :+ Centis(nowCentis - updatedAt.getCentis).nonNeg
         }
       },
-      loadClockHistory = _ => newClockHistory,
+      loadClockHistory = action match {
+        case _: Undo => (_ => clockHistory.map(_.update(turnPlayerIndex, _.dropRight(1))))
+        case _       => (_ => newClockHistory)
+      },
       status = game.situation.status | status,
       updatedAt = DateTime.now,
       turnAt = if (game.hasJustSwitchedTurns) DateTime.now else turnAt,
@@ -289,6 +293,7 @@ case class Game(
         case p: Pass     => Event.Pass(p, game.situation, state, clockEvent, updated.board.pocketData)
         case r: DiceRoll => Event.DiceRoll(r, game.situation, state, clockEvent, updated.board.pocketData)
         case et: EndTurn => Event.EndTurn(et, game.situation, state, clockEvent, updated.board.pocketData)
+        case u: Undo     => Event.Undo(u, game.situation, state, clockEvent, updated.board.pocketData)
         case ss: SelectSquares =>
           Event.SelectSquares(ss, game.situation, state, clockEvent, updated.board.pocketData)
       }
@@ -339,6 +344,7 @@ case class Game(
       case m: Uci.Move          => m.keys
       case l: Uci.Lift          => s"${l.pos}${l.pos}"
       case _: Uci.EndTurn       => "endturn"
+      case _: Uci.Undo          => "undo"
       case _: Uci.Pass          => "pass"
       case _: Uci.DiceRoll      => "roll"
       case _: Uci.SelectSquares => "ss:"

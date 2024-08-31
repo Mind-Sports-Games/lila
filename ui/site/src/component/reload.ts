@@ -1,6 +1,6 @@
 let redirectInProgress: false | string = false;
 
-export const redirect = obj => {
+export const redirect = (obj: any) => {
   let url;
   if (typeof obj == 'string') url = obj;
   else {

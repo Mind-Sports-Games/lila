@@ -6,7 +6,10 @@ import { Cache } from './cache';
 export abstract class AbstractWorker<T> {
   protected protocol: Sync<Protocol>;
 
-  constructor(protected protocolOpts: ProtocolOpts, protected opts: T) {
+  constructor(
+    protected protocolOpts: ProtocolOpts,
+    protected opts: T,
+  ) {
     this.protocol = sync(this.boot());
   }
 
@@ -42,7 +45,7 @@ export class WebWorker extends AbstractWorker<WebWorkerOpts> {
       e => {
         protocol.received(e.data);
       },
-      true
+      true,
     );
     protocol.init();
     return Promise.resolve(protocol);
@@ -102,8 +105,8 @@ export class ThreadedWasmWorker extends AbstractWorker<ThreadedWasmWorkerOpts> {
         await cache.set(wasmPath, version!, wasmBinary);
       }
 
-      // Load Emscripten module.
-      await playstrategy.loadScript(this.opts.baseUrl + 'stockfish.js', { version });
+      await playstrategy.loadScriptCJS(this.opts.baseUrl + 'stockfish.js', { version });
+
       const sf = await window[this.opts.module]({
         wasmBinary,
         locateFile: (path: string) =>

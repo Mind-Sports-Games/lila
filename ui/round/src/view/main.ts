@@ -19,7 +19,7 @@ function renderMaterial(
   score: number,
   position: Position,
   noMaterial: boolean,
-  checks?: number
+  checks?: number,
 ) {
   if (noMaterial) return;
   const children: VNode[] = [];
@@ -41,7 +41,7 @@ function renderPlayerScore(
   position: Position,
   playerIndex: string,
   variantKey: VariantKey,
-  captures: boolean
+  captures: boolean,
 ): VNode {
   const defaultMancalaRole = 's';
   const children: VNode[] = [];
@@ -79,7 +79,7 @@ function renderPlayerScore(
           title: captures ? 'Captures' : 'Score',
         },
       },
-      children
+      children,
     );
   } else if (variantKey === 'backgammon' || variantKey === 'nackgammon') {
     for (let i = 0; i < score; i++) {
@@ -90,7 +90,7 @@ function renderPlayerScore(
     children.push(
       h(`piece.${defaultMancalaRole}${score.toString()}-piece.` + playerIndex + `.captures`, {
         attrs: { 'data-score': score },
-      })
+      }),
     );
     return h('div.game-score.game-score-' + position, children);
   } else {
@@ -295,7 +295,7 @@ export function main(ctrl: RoundController): VNode {
                   ? undefined
                   : util.bind('wheel', (e: WheelEvent) => wheel(ctrl, e), undefined, false),
             },
-            [renderGround(ctrl), promotion.view(ctrl)]
+            [renderGround(ctrl), promotion.view(ctrl)],
           ),
           ctrl.data.hasGameScore ? renderPlayerScore(topScore, 'top', topPlayerIndex, variantKey, captures) : null,
           ctrl.data.hasGameScore ? renderPlayerScoreNames(ctrl.data.player, ctrl.data.opponent) : null,
@@ -308,6 +308,6 @@ export function main(ctrl: RoundController): VNode {
             ? renderPlayerScore(bottomScore, 'bottom', bottomPlayerIndex, variantKey, captures)
             : null,
           ctrl.keyboardMove ? keyboardMove(ctrl.keyboardMove) : null,
-        ]
+        ],
       );
 }

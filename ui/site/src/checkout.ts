@@ -1,6 +1,6 @@
 import * as xhr from 'common/xhr';
 
-export default function (publicKey: string) {
+export default function PlayStrategyCheckout(publicKey: string) {
   const $checkout = $('div.plan_checkout');
   const lifetime = {
     cents: parseInt($checkout.data('lifetime-cents')),
@@ -87,7 +87,7 @@ export default function (publicKey: string) {
             .redirectToCheckout({
               sessionId: data.session.id,
             })
-            .then(result => showError(result.error.message));
+            .then((result: any) => showError(result.error.message));
         } else {
           location.assign('/patron');
         }
@@ -99,3 +99,4 @@ export default function (publicKey: string) {
     window.stripeHandler.close();
   });
 }
+(window as any).PlayStrategyCheckout = PlayStrategyCheckout; // esbuild

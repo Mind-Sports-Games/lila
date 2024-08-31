@@ -51,7 +51,7 @@ export function ctrl(
   send: StudySocketSend,
   chapters: Prop<StudyChapterMeta[]>,
   setTab: () => void,
-  root: AnalyseCtrl
+  root: AnalyseCtrl,
 ): StudyChapterNewFormCtrl {
   const multiPgnMax = 20;
 
@@ -145,7 +145,7 @@ function edittab(ctrl: StudyChapterNewFormCtrl): VNode {
         },
       },
     },
-    [spinner()]
+    [spinner()],
   );
 }
 function gametab(ctrl: StudyChapterNewFormCtrl): VNode {
@@ -157,7 +157,7 @@ function gametab(ctrl: StudyChapterNewFormCtrl): VNode {
       {
         attrs: { for: 'chapter-game' },
       },
-      trans('loadAGameFromX', 'playstrategy.org')
+      trans('loadAGameFromX', 'playstrategy.org'),
     ),
     h('textarea#chapter-game.form-control', {
       attrs: { placeholder: noarg('urlOfTheGame') },
@@ -214,7 +214,7 @@ export function view(ctrl: StudyChapterNewFormCtrl): VNode {
         attrs: { title },
         hook: bind('click', () => ctrl.vm.tab(key), ctrl.root.redraw),
       },
-      name
+      name,
     );
   };
   const gameOrPgn = activeTab === 'game' || activeTab === 'pgn';
@@ -222,10 +222,10 @@ export function view(ctrl: StudyChapterNewFormCtrl): VNode {
   const mode = currentChapter.practice
     ? 'practice'
     : defined(currentChapter.conceal)
-    ? 'conceal'
-    : currentChapter.gamebook
-    ? 'gamebook'
-    : 'normal';
+      ? 'conceal'
+      : currentChapter.gamebook
+        ? 'gamebook'
+        : 'normal';
   const noarg = trans.noarg;
   const onlyForAnalysisVariants = (node: VNode | null): VNode | null =>
     allowAnalysisForVariant(ctrl.vm.variantKey() ?? 'standard') ? node : null;
@@ -272,7 +272,7 @@ export function view(ctrl: StudyChapterNewFormCtrl): VNode {
               {
                 attrs: { for: 'chapter-name' },
               },
-              noarg('name')
+              noarg('name'),
             ),
             h('input#chapter-name.form-control', {
               attrs: {
@@ -309,7 +309,7 @@ export function view(ctrl: StudyChapterNewFormCtrl): VNode {
                 {
                   attrs: { for: 'chapter-variant' },
                 },
-                noarg('Variant')
+                noarg('Variant'),
               ),
               h(
                 'select#chapter-variant.form-control',
@@ -328,7 +328,7 @@ export function view(ctrl: StudyChapterNewFormCtrl): VNode {
                   ? [h('option', noarg('automatic'))]
                   : ctrl.vm.variants
                       .filter(v => allowAnalysisForVariant(v.key))
-                      .map(v => option(v.key, currentChapter.setup.variant.key, v.name))
+                      .map(v => option(v.key, currentChapter.setup.variant.key, v.name)),
               ),
             ]),
             h('div.form-group.form-half', [
@@ -337,7 +337,7 @@ export function view(ctrl: StudyChapterNewFormCtrl): VNode {
                 {
                   attrs: { for: 'chapter-orientation' },
                 },
-                noarg('orientation')
+                noarg('orientation'),
               ),
               h(
                 'select#chapter-orientation.form-control',
@@ -349,7 +349,7 @@ export function view(ctrl: StudyChapterNewFormCtrl): VNode {
                 },
                 ['p1', 'p2'].map(function (playerIndex) {
                   return option(playerIndex, currentChapter.setup.orientation, noarg(playerIndex));
-                })
+                }),
               ),
             ]),
           ]),
@@ -359,17 +359,17 @@ export function view(ctrl: StudyChapterNewFormCtrl): VNode {
               {
                 attrs: { for: 'chapter-mode' },
               },
-              noarg('analysisMode')
+              noarg('analysisMode'),
             ),
             h(
               'select#chapter-mode.form-control',
               (isChess(ctrl.vm.variantKey() ?? 'standard') ? modeChoices : nonBrowserAnalysisModeChoices).map(c =>
-                option(c[0], mode, noarg(c[1]))
-              )
+                option(c[0], mode, noarg(c[1])),
+              ),
             ),
           ]),
           modal.button(noarg('createChapter')),
-        ]
+        ],
       ),
     ],
   });

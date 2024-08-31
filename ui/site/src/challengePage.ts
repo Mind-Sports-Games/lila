@@ -7,7 +7,7 @@ interface ChallengeOpts {
   data: any;
 }
 
-export default function (opts: ChallengeOpts) {
+export default function PlayStrategyChallenge(opts: ChallengeOpts) {
   const selector = '.challenge-page';
   let accepting: boolean;
 
@@ -52,7 +52,7 @@ export default function (opts: ChallengeOpts) {
             tag: 'span',
             focus: true,
             onSelect: () => setTimeout(() => (input.parentNode as HTMLFormElement).submit(), 100),
-          })
+          }),
         );
       });
   }
@@ -68,3 +68,5 @@ export default function (opts: ChallengeOpts) {
 
   pingNow();
 }
+
+(window as any).PlayStrategyChallenge = PlayStrategyChallenge; // esbuild

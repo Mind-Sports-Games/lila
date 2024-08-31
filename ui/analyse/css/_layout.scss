@@ -66,6 +66,12 @@ body {
   grid-template-rows: auto auto minmax(20em, 30vh);
   grid-template-areas: 'board' 'controls' 'tools' 'side' 'acpl' 'under' 'chat' 'uchat';
 
+  @include breakpoint($mq-landscape-mobile) {
+    .coords-out &__underboard {
+      margin-top: calc($block-gap * 2);
+    }
+  }
+
   @include breakpoint($mq-col2) {
     grid-template-columns: $col2-uniboard-width var(--gauge-gap) $col2-uniboard-table;
     grid-template-rows: fit-content(0);

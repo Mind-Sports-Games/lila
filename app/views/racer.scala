@@ -39,7 +39,7 @@ object racer {
       moreJs = frag(
         jsModule("racer"),
         embedJsUnsafeLoadThen(
-          s"""PlayStrategyRacer.start(${safeJsonValue(
+          s"""PlayStrategyRacer(${safeJsonValue(
             Json.obj(
               "data" -> data,
               "pref" -> pref,

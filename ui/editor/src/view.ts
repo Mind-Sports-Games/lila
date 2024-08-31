@@ -56,9 +56,9 @@ function studyButton(ctrl: EditorCtrl, state: EditorState): VNode {
             disabled: !state.legalFen,
           },
         },
-        ctrl.trans.noarg('toStudy')
+        ctrl.trans.noarg('toStudy'),
       ),
-    ]
+    ],
   );
 }
 
@@ -71,7 +71,7 @@ function variant2option(key: Rules, name: string, ctrl: EditorCtrl): VNode {
         selected: key == ctrl.rules,
       },
     },
-    `${ctrl.trans.noarg('variant')} | ${name}`
+    `${ctrl.trans.noarg('variant')} | ${name}`,
   );
 }
 
@@ -98,20 +98,20 @@ function controls(ctrl: EditorCtrl, state: EditorState): VNode {
           'data-fen': pos.fen,
         },
       },
-      pos.eco ? `${pos.eco} ${pos.name}` : pos.name
+      pos.eco ? `${pos.eco} ${pos.name}` : pos.name,
     );
   };
   const buttonStart = (icon?: string) =>
     h(
       `a.button.button-empty${icon ? '.text' : ''}`,
       { on: { click: ctrl.startPosition }, attrs: icon ? { 'data-icon': icon } : {} },
-      ctrl.trans.noarg('startPosition')
+      ctrl.trans.noarg('startPosition'),
     );
   const buttonClear = (icon?: string) =>
     h(
       `a.button.button-empty${icon ? '.text' : ''}`,
       { on: { click: ctrl.clearBoard }, attrs: icon ? { 'data-icon': icon } : {} },
-      ctrl.trans.noarg('clearBoard')
+      ctrl.trans.noarg('clearBoard'),
     );
   return h('div.board-editor__tools', [
     ...(ctrl.cfg.embed || !ctrl.cfg.positions
@@ -142,12 +142,12 @@ function controls(ctrl: EditorCtrl, state: EditorState): VNode {
                         selected: true,
                       },
                     },
-                    `- ${ctrl.trans.noarg('boardEditor')}  -`
+                    `- ${ctrl.trans.noarg('boardEditor')}  -`,
                   ),
                   ...ctrl.extraPositions.map(position2option),
                 ]),
                 optgroup(ctrl.trans.noarg('popularOpenings'), ctrl.cfg.positions.map(position2option)),
-              ]
+              ],
             ),
           ]),
         ]),
@@ -172,10 +172,10 @@ function controls(ctrl: EditorCtrl, state: EditorState): VNode {
                   selected: ctrl.turn === key,
                 },
               },
-              ctrl.trans('playerIndexPlays', key == 'p1' ? 'White' : 'Black')
+              ctrl.trans('playerIndexPlays', key == 'p1' ? 'White' : 'Black'),
             );
-          })
-        )
+          }),
+        ),
       ),
       h('div.castling', [
         h('strong', ctrl.trans.noarg('castling')),
@@ -203,7 +203,7 @@ function controls(ctrl: EditorCtrl, state: EditorState): VNode {
                   },
                 },
               },
-              allVariants.map(x => variant2option(x[0], x[1], ctrl))
+              allVariants.map(x => variant2option(x[0], x[1], ctrl)),
             ),
           ]),
           h('div.actions', [
@@ -220,7 +220,7 @@ function controls(ctrl: EditorCtrl, state: EditorState): VNode {
                   },
                 },
               },
-              ctrl.trans.noarg('flipBoard')
+              ctrl.trans.noarg('flipBoard'),
             ),
             h(
               'a',
@@ -237,7 +237,7 @@ function controls(ctrl: EditorCtrl, state: EditorState): VNode {
                   disabled: !state.legalFen,
                 },
               },
-              ctrl.trans.noarg('analysis')
+              ctrl.trans.noarg('analysis'),
             ),
             h(
               'a',
@@ -253,7 +253,7 @@ function controls(ctrl: EditorCtrl, state: EditorState): VNode {
                   },
                 },
               },
-              [h('span.text', { attrs: { 'data-icon': 'U' } }, ctrl.trans.noarg('continueFromHere'))]
+              [h('span.text', { attrs: { 'data-icon': 'U' } }, ctrl.trans.noarg('continueFromHere'))],
             ),
             studyButton(ctrl, state),
           ]),
@@ -266,7 +266,7 @@ function controls(ctrl: EditorCtrl, state: EditorState): VNode {
                   rel: 'nofollow',
                 },
               },
-              ctrl.trans.noarg('playWithTheMachine')
+              ctrl.trans.noarg('playWithTheMachine'),
             ),
             h(
               'a.button',
@@ -276,7 +276,7 @@ function controls(ctrl: EditorCtrl, state: EditorState): VNode {
                   rel: 'nofollow',
                 },
               },
-              ctrl.trans.noarg('playWithAFriend')
+              ctrl.trans.noarg('playWithAFriend'),
             ),
           ]),
         ]),
@@ -338,7 +338,7 @@ function sparePieces(
   ctrl: EditorCtrl,
   playerIndex: PlayerIndex,
   _orientation: Orientation,
-  position: 'top' | 'bottom'
+  position: 'top' | 'bottom',
 ): VNode {
   const selectedClass = selectedToClass(ctrl.selected());
 
@@ -386,9 +386,9 @@ function sparePieces(
             },
           },
         },
-        [h('div', [h('piece', { attrs })])]
+        [h('div', [h('piece', { attrs })])],
       );
-    })
+    }),
   );
 }
 
@@ -408,7 +408,7 @@ function onSelectSparePiece(ctrl: EditorCtrl, s: Selected, upEvent: string): (e:
           role: s[1],
         },
         e,
-        true
+        true,
       );
 
       document.addEventListener(
@@ -419,7 +419,7 @@ function onSelectSparePiece(ctrl: EditorCtrl, s: Selected, upEvent: string): (e:
           else ctrl.selected(s);
           ctrl.redraw();
         },
-        { once: true }
+        { once: true },
       );
     }
   };
@@ -451,7 +451,7 @@ export default function (ctrl: EditorCtrl): VNode {
       sparePieces(ctrl, playerIndex, playerIndex, 'bottom'),
       controls(ctrl, state),
       inputs(ctrl, state.fen),
-    ]
+    ],
   );
 }
 

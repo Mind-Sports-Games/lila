@@ -164,6 +164,7 @@ object Swiss {
       nbRounds: Int,
       rated: Boolean,
       handicapped: Boolean,
+      inputPlayerRatings: String,
       isMatchScore: Boolean,
       isBestOfX: Boolean,
       isPlayX: Boolean,

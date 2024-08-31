@@ -195,12 +195,12 @@ var retina = window.devicePixelRatio,
       _g.beginPath();
       _g.moveTo(
         (this.pos.x + this.corners[0].x * this.size) * retina,
-        (this.pos.y + this.corners[0].y * this.size * this.cosA) * retina
+        (this.pos.y + this.corners[0].y * this.size * this.cosA) * retina,
       );
       for (var i = 1; i < 4; i++) {
         _g.lineTo(
           (this.pos.x + this.corners[i].x * this.size) * retina,
-          (this.pos.y + this.corners[i].y * this.size * this.cosA) * retina
+          (this.pos.y + this.corners[i].y * this.size * this.cosA) * retina,
         );
       }
       _g.closePath();
@@ -282,7 +282,7 @@ var retina = window.devicePixelRatio,
         var p0 = new Vector2(this.particles[i].position.x + this.xOff, this.particles[i].position.y + this.yOff);
         var p1 = new Vector2(
           this.particles[i + 1].position.x + this.xOff,
-          this.particles[i + 1].position.y + this.yOff
+          this.particles[i + 1].position.y + this.yOff,
         );
         if (
           this.Side(
@@ -291,7 +291,7 @@ var retina = window.devicePixelRatio,
             this.particles[i + 1].position.x,
             this.particles[i + 1].position.y,
             p1.x,
-            p1.y
+            p1.y,
           ) < 0
         ) {
           _g.fillStyle = this.frontColor;
@@ -306,7 +306,7 @@ var retina = window.devicePixelRatio,
           _g.lineTo(this.particles[i + 1].position.x * retina, this.particles[i + 1].position.y * retina);
           _g.lineTo(
             (this.particles[i + 1].position.x + p1.x) * 0.5 * retina,
-            (this.particles[i + 1].position.y + p1.y) * 0.5 * retina
+            (this.particles[i + 1].position.y + p1.y) * 0.5 * retina,
           );
           _g.closePath();
           _g.stroke();
@@ -316,7 +316,7 @@ var retina = window.devicePixelRatio,
           _g.lineTo(p0.x * retina, p0.y * retina);
           _g.lineTo(
             (this.particles[i + 1].position.x + p1.x) * 0.5 * retina,
-            (this.particles[i + 1].position.y + p1.y) * 0.5 * retina
+            (this.particles[i + 1].position.y + p1.y) * 0.5 * retina,
           );
           _g.closePath();
           _g.stroke();
@@ -327,7 +327,7 @@ var retina = window.devicePixelRatio,
           _g.lineTo(this.particles[i + 1].position.x * retina, this.particles[i + 1].position.y * retina);
           _g.lineTo(
             (this.particles[i].position.x + p0.x) * 0.5 * retina,
-            (this.particles[i].position.y + p0.y) * 0.5 * retina
+            (this.particles[i].position.y + p0.y) * 0.5 * retina,
           );
           _g.closePath();
           _g.stroke();
@@ -337,7 +337,7 @@ var retina = window.devicePixelRatio,
           _g.lineTo(p0.x * retina, p0.y * retina);
           _g.lineTo(
             (this.particles[i].position.x + p0.x) * 0.5 * retina,
-            (this.particles[i].position.y + p0.y) * 0.5 * retina
+            (this.particles[i].position.y + p0.y) * 0.5 * retina,
           );
           _g.closePath();
           _g.stroke();
@@ -380,7 +380,7 @@ var retina = window.devicePixelRatio,
         ribbonPaperDist,
         ribbonPaperThick,
         45,
-        0.05
+        0.05,
       );
     }
     var confettiPapers = new Array();

@@ -29,7 +29,7 @@ export function player(p: Player) {
       h(`i.line${p.patron ? '.patron' : ''}`),
       h('span.name', userName(p)),
       h('em', ` ${p.rating}${p.provisional ? '?' : ''}`),
-    ]
+    ],
   );
 }
 

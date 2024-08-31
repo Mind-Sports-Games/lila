@@ -82,7 +82,7 @@ export function moderationView(ctrl?: ModerationCtrl): VNode[] | undefined {
                   href: '/@/' + data.username + '?mod',
                 },
               },
-              'profile'
+              'profile',
             ),
           ])
           .concat(
@@ -95,11 +95,11 @@ export function moderationView(ctrl?: ModerationCtrl): VNode[] | undefined {
                         href: '/mod/' + data.username + '/communication',
                       },
                     },
-                    'coms'
+                    'coms',
                   ),
                 ]
-              : []
-          )
+              : [],
+          ),
       )
     : undefined;
 
@@ -113,7 +113,7 @@ export function moderationView(ctrl?: ModerationCtrl): VNode[] | undefined {
               attrs: { 'data-icon': 'p' },
               hook: bind('click', () => ctrl.timeout(r, data.text)),
             },
-            r.name
+            r.name,
           );
         }),
       ])
@@ -125,7 +125,7 @@ export function moderationView(ctrl?: ModerationCtrl): VNode[] | undefined {
             attrs: { 'data-icon': 'p' },
             hook: bind('click', () => ctrl.timeout(ctrl.reasons[0], data.text)),
           },
-          'Timeout 15 minutes'
+          'Timeout 15 minutes',
         ),
       ]);
 
@@ -151,11 +151,11 @@ export function moderationView(ctrl?: ModerationCtrl): VNode[] | undefined {
                   'td',
                   h('time.timeago', {
                     attrs: { datetime: e.date },
-                  })
+                  }),
                 ),
               ]);
-            })
-          )
+            }),
+          ),
         ),
       ])
     : undefined;
@@ -167,7 +167,7 @@ export function moderationView(ctrl?: ModerationCtrl): VNode[] | undefined {
         {
           attrs: { 'data-icon': '' },
         },
-        [userLink(data.username)]
+        [userLink(data.username)],
       ),
       h('a', {
         attrs: { 'data-icon': 'L' },

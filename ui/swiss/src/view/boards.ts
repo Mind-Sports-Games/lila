@@ -57,7 +57,7 @@ const renderBoard = (incomingBoard: Board): VNode => {
         },
       }),
       boardPlayer(board, board.orientation),
-    ]
+    ],
   );
 };
 

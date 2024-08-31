@@ -4,7 +4,11 @@ import { Redraw } from 'puz/interfaces';
 export class Countdown {
   played = new Set<number>();
 
-  public constructor(readonly clock: Clock, readonly resetGround: () => void, readonly redraw: Redraw) {
+  public constructor(
+    readonly clock: Clock,
+    readonly resetGround: () => void,
+    readonly redraw: Redraw,
+  ) {
     for (let i = 10; i >= 0; i--) playstrategy.sound.loadStandard(`countDown${i}`);
   }
 

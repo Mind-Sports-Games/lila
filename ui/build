@@ -1,86 +1,21 @@
-#!/bin/bash -ea
+#!/usr/bin/env bash
 
-target=${1-dev}
-mode=${2-build} # build | upgrade | css | js
-echo "building ui modules with target=$target and mode=$mode"
+set -e
 
-nodever="$(node --version)"
-echo "node: $nodever"
-echo "yarn: $(yarn --version)"
+cd "$(dirname "${BASH_SOURCE:-$0}")/.build"
 
-[[ "$nodever" =~ ^v1[0-5]\.[0-9]+\.[0-9]+$ ]] || { echo "Node version >=10 and <16 required. Found: $nodever"; exit 1; }
+update=$(echo "$*" | grep -q -- '--update' && echo true || echo false)
 
-cd "$(git rev-parse --show-toplevel)"
-
-ls -l node_modules node_modules/@* ui/node_modules ui/*/node_modules | grep /yarn/link/ || true
-
-mkdir -p public/compiled
-
-apps1="stratutils"
-apps2="draughtsground common"
-apps3="ceval draughts game tree chat nvui puz"
-apps4="site swiss msg chat cli challenge notify learn insight editor puzzle round draughtsround analyse lobby tournament tournamentSchedule tournamentCalendar simul dasher speech palantir serviceWorker dgt storm racer"
-site_plugins="tvEmbed puzzleEmbed analyseEmbed user modUser clas coordinate captcha expandText team forum account coachShow coachForm challengePage checkout plan login passwordComplexity tourForm simulForm teamBattleForm gameSearch userComplete infiniteScroll flatpickr teamAdmin appeal modGames publicChats contact"
-round_plugins="nvui keyboardMove"
-analyse_plugins="nvui studyTopicForm"
-puzzle_plugins="dashboard"
-
-if [ $mode == "upgrade" ]; then
-  yarn upgrade --non-interactive
-else
-  yarn install --non-interactive
-fi
-
-build() {
-  echo
-  echo "### ui/$@ ###"
-  set -ev
-  if [[ $1 == "css" ]]; then
-    cd ui
-    yarn run gulp "css-$target"
-  else
-    cd ui/$1
-    yarn run $target
+#if $update || [ ! -d "node_modules" ]; then
+  if ! command -v pnpm &> /dev/null; then
+    echo "The 'pnpm' tool is required. See https://pnpm.io/installation."
+    exit 1
   fi
-}
+  pnpm install --silent --ignore-workspace --no-lockfile
+#fi
 
-build_plugin() {
-  echo
-  echo "### ui/$1 plugin $2 ###"
-  set -ev
-  cd ui/$1
-  yarn run plugin-$target $2
-}
+#if $update || [ ! -d "dist" ]; then
+  ./node_modules/.bin/tsc
+#fi
 
-if [ $mode != "upgrade" ] && [ $mode != "js" ]; then
-  apps4="css $apps4"
-fi
-
-if [ $mode == "css" ]; then
-  (build css)
-else
-  if type -p parallel; then # parallel execution!
-    if [ -z "$P_OPTS" -a ! -e ~/.parallel/config ]; then
-      P_OPTS="-j+4 --halt 2"
-      [ -n "$GITHUB_WORKFLOW" ] || P_OPTS+=" --bar"
-    fi
-    set -x
-    parallel --gnu $P_OPTS build ::: $apps1
-    parallel --gnu $P_OPTS build ::: $apps2
-    parallel --gnu $P_OPTS build ::: $apps3
-    parallel --gnu $P_OPTS build ::: $apps4
-    parallel --gnu $P_OPTS build_plugin site ::: $site_plugins
-    parallel --gnu $P_OPTS build_plugin round ::: $round_plugins
-    parallel --gnu $P_OPTS build_plugin draughtsround ::: $round_plugins
-    parallel --gnu $P_OPTS build_plugin analyse ::: $analyse_plugins
-    parallel --gnu $P_OPTS build_plugin puzzle ::: $puzzle_plugins
-  else # sequential execution
-    echo "For faster builds, install GNU parallel."
-    for app in $apps1 $apps2 $apps3 $apps4; do (build $app); done
-    for plugin in $site_plugins; do (build_plugin site $plugin); done
-    for plugin in $round_plugins; do (build_plugin round $plugin); done
-    for plugin in $round_plugins; do (build_plugin draughtsround $plugin); done
-    for plugin in $analyse_plugins; do (build_plugin analyse $plugin); done
-    for plugin in $puzzle_plugins; do (build_plugin puzzle $plugin); done
-  fi
-fi
+node --input-type=module dist/main.js "$@"

@@ -36,7 +36,7 @@ object embed {
       jsModule("analysisBoard.embed"),
       analyseTag,
       embedJsUnsafeLoadThen(
-        s"""analyseEmbed(${safeJsonValue(
+        s"""PlayStrategyAnalyseEmbed(${safeJsonValue(
           Json.obj(
             "data"  -> data,
             "embed" -> true,

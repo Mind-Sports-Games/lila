@@ -9,13 +9,13 @@ module.exports = function (env, domElement) {
     [],
     this.ui.dimensionCategs.map(function (c) {
       return c.items;
-    })
+    }),
   );
   this.metrics = [].concat.apply(
     [],
     this.ui.metricCategs.map(function (c) {
       return c.items;
-    })
+    }),
   );
 
   var findMetric = function (key) {
@@ -85,12 +85,12 @@ module.exports = function (env, domElement) {
               this.vm.loading = false;
               this.vm.broken = true;
               m.redraw();
-            }.bind(this)
+            }.bind(this),
           );
         }.bind(this),
-        1
+        1,
       );
-    }.bind(this)
+    }.bind(this),
   );
 
   this.makeUrl = function (dKey, mKey, filters) {
@@ -125,7 +125,7 @@ module.exports = function (env, domElement) {
       this.vm.dimension = this.dimensions.find(
         function (d) {
           return this.validCombination(d, this.vm.metric);
-        }.bind(this)
+        }.bind(this),
       );
     this.vm.panel = 'filter';
     askQuestion();
@@ -137,7 +137,7 @@ module.exports = function (env, domElement) {
       this.vm.metric = this.metrics.find(
         function (m) {
           return this.validCombination(this.vm.dimension, m);
-        }.bind(this)
+        }.bind(this),
       );
     this.vm.panel = 'filter';
     askQuestion();

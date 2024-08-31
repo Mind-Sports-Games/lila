@@ -31,8 +31,8 @@ export default function pocket(ctrl: RoundController, playerIndex: PlayerIndex, 
     ((variantKey === 'shogi' || variantKey === 'minishogi') && capturedPiece['promoted']
       ? (capturedPiece.role.slice(1) as cg.Role)
       : capturedPiece['promoted']
-      ? 'p-piece'
-      : capturedPiece.role);
+        ? 'p-piece'
+        : capturedPiece.role);
   return h(
     'div.pocket.is2d.pocket-' + position,
     {
@@ -41,12 +41,12 @@ export default function pocket(ctrl: RoundController, playerIndex: PlayerIndex, 
         eventNames1.forEach(name =>
           el.addEventListener(name, (e: cg.MouchEvent) => {
             if (position === (ctrl.flip ? 'top' : 'bottom') && crazyKeys.length == 0) drag(ctrl, e);
-          })
+          }),
         );
         eventNames2.forEach(name =>
           el.addEventListener(name, (e: cg.MouchEvent) => {
             if (position === (ctrl.flip ? 'top' : 'bottom') && crazyKeys.length == 0) selectToDrop(ctrl, e);
-          })
+          }),
         );
       }),
     },
@@ -68,9 +68,9 @@ export default function pocket(ctrl: RoundController, playerIndex: PlayerIndex, 
               'data-playerindex': playerIndex,
               'data-nb': nb,
             },
-          })
-        )
+          }),
+        ),
       );
-    })
+    }),
   );
 }

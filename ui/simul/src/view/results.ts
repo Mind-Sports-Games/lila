@@ -8,19 +8,19 @@ export default function (ctrl: SimulCtrl) {
   return h('div.results', [
     h(
       'div',
-      trans(ctrl, 'nbPlaying', p => p.game.status < status.ids.mate)
+      trans(ctrl, 'nbPlaying', p => p.game.status < status.ids.mate),
     ),
     h(
       'div',
-      trans(ctrl, 'nbWins', p => p.game.winner === p.hostPlayerIndex)
+      trans(ctrl, 'nbWins', p => p.game.winner === p.hostPlayerIndex),
     ),
     h(
       'div',
-      trans(ctrl, 'nbDraws', p => p.game.status >= status.ids.mate && !p.game.winner)
+      trans(ctrl, 'nbDraws', p => p.game.status >= status.ids.mate && !p.game.winner),
     ),
     h(
       'div',
-      trans(ctrl, 'nbLosses', p => p.game.winner === opposite(p.hostPlayerIndex))
+      trans(ctrl, 'nbLosses', p => p.game.winner === opposite(p.hostPlayerIndex)),
     ),
   ]);
 }

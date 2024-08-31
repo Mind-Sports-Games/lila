@@ -2,6 +2,8 @@ modules
 app
 project
 
+pnpm-lock.yaml
+
 public/css
 public/piece-css
 public/compiled

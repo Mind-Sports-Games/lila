@@ -269,8 +269,8 @@ function xiangqiNotation(move: ExtendedMoveInfo, variant: Variant): string {
       newRank === prevRank
         ? '='
         : (board.wMoved && newRank < prevRank) || (!board.wMoved && newRank > prevRank)
-        ? '+'
-        : '-',
+          ? '+'
+          : '-',
     movement = direction == '=' || isdiagonalMove ? newFile : Math.abs(newRank - prevRank);
 
   //Ammend notation due to multiple pawns in row, case 1: pair sideways, case 2: 3 or more up and down and sideways
@@ -284,7 +284,7 @@ function xiangqiNotation(move: ExtendedMoveInfo, variant: Variant): string {
       pawnRole,
       addMovedPiece,
       prevRank,
-      newRank
+      newRank,
     );
 
     if (pawnRanks.length == 2) {
@@ -324,7 +324,7 @@ function numFriendlyPawnsInColumn(
   role: string,
   addMovedPiece: boolean,
   origPieceRank: number,
-  newPieceRank: number
+  newPieceRank: number,
 ): number[] {
   const pawnRanks: number[] = [];
   const ranks = [...Array(numRanks + 1).keys()].slice(1);
@@ -451,6 +451,7 @@ export function getMancalaScore(fen: string, playerIndex: string): number {
 function backgammonNotation(move: ExtendedMoveInfo, variant: Variant): string {
   let isLift = false; //using this instead of changing the regex
   if (move.uci === 'roll') return '';
+  if (move.uci === 'undo') return 'undo';
   if (move.uci === 'endturn') return '(no-play)';
   if (move.uci.includes('/')) return `${move.uci.replace('/', '')}:`;
   if (move.uci.includes('^')) {
@@ -459,7 +460,7 @@ function backgammonNotation(move: ExtendedMoveInfo, variant: Variant): string {
 
   const reg = isLift
     ? (move.uci.replace('^', 'a1').match(/[a-lsA-LS][1-2@]/g) as string[])
-    : (move.uci.match(/[a-lsA-LS][1-2@]/g) as string[]);
+    : (move.uci.replace('x', '').match(/[a-lsA-LS][1-2@]/g) as string[]);
   const orig = reg[0];
   const dest = reg[1];
   const isDrop = reg[0].includes('@');
@@ -483,20 +484,20 @@ function backgammonNotation(move: ExtendedMoveInfo, variant: Variant): string {
   const origBoardPosNumber = isDrop
     ? 'bar'
     : movePlayer === 'p1'
-    ? origRank === 1
-      ? variant.boardSize.width + 1 - origFile
-      : variant.boardSize.width + origFile
-    : origRank === 1
-    ? variant.boardSize.width + origFile
-    : variant.boardSize.width + 1 - origFile;
+      ? origRank === 1
+        ? variant.boardSize.width + 1 - origFile
+        : variant.boardSize.width + origFile
+      : origRank === 1
+        ? variant.boardSize.width + origFile
+        : variant.boardSize.width + 1 - origFile;
   const destBoardPosNumber =
     movePlayer === 'p1'
       ? destRank === 1
         ? variant.boardSize.width + 1 - destFile
         : variant.boardSize.width + destFile
       : destRank === 1
-      ? variant.boardSize.width + destFile
-      : variant.boardSize.width + 1 - destFile;
+        ? variant.boardSize.width + destFile
+        : variant.boardSize.width + 1 - destFile;
 
   // examples:
   // 43: 8/4 8/5

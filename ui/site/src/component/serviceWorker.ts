@@ -7,7 +7,7 @@ export default function () {
       assetUrl(jsModule('serviceWorker'), {
         sameDomain: true,
       }),
-      self.location.href
+      self.location.href,
     );
     workerUrl.searchParams.set('asset-url', document.body.getAttribute('data-asset-url')!);
     if (document.body.getAttribute('data-dev')) workerUrl.searchParams.set('dev', '1');
@@ -45,7 +45,7 @@ export default function () {
                   err => {
                     console.log('push subscribe failed', err.message);
                     if (sub) sub.unsubscribe();
-                  }
+                  },
                 );
             }
           });

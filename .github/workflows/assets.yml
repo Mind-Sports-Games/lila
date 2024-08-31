@@ -7,14 +7,14 @@ on:
       - 'public/**'
       - 'ui/**'
       - 'package.json'
-      - 'yarn.lock'
+      - 'pnpm-lock.yaml'
   pull_request:
     paths:
       - '.github/workflows/assets.yml'
       - 'public/**'
       - 'ui/**'
       - 'package.json'
-      - 'yarn.lock'
+      - 'pnpm-lock.yaml'
       #add back end options to ensure full build gets triggered
       - 'app/**'
       - 'conf/**'
@@ -48,19 +48,18 @@ jobs:
         with:
           ssh-private-key: ${{ secrets.MSO_CI_SSH_KEY }}
       - run: git submodule absorbgitdirs
-      - run: echo "dir=$(yarn cache dir)" >> $GITHUB_OUTPUT
-        id: yarn-cache
-      - uses: actions/cache@v4
+      - name: install Node
+        uses: actions/setup-node@v4
         with:
-          path: ${{ steps.yarn-cache.outputs.dir }}
-          key: ${{ runner.os }}-yarn-${{ hashFiles('yarn.lock') }}
-          restore-keys: ${{ runner.os }}-yarn-
-      - uses: actions/setup-node@v4
+          node-version: 20
+      - name: Install PNPM and run pnpm install
+        uses: pnpm/action-setup@v4
         with:
-          node-version: '14'
-          cache: yarn
-      - run: yarn install --network-concurrency 1
-      - run: ./ui/build prod
+          run_install: |
+            - recursive: false
+              args: [--no-frozen-lockfile, --strict-peer-dependencies]
+      - name: Build files
+        run: ./ui/build --no-install --prod
       - name: Get Time
         id: time
         uses: nanzm/get-time-action@v2.0

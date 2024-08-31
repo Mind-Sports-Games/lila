@@ -34,9 +34,9 @@ module.exports = {
             config: m.route,
             class: status,
           },
-          label
+          label,
         );
-      })
+      }),
     );
   },
   makeStars: makeStars,

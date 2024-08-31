@@ -558,7 +558,7 @@ final private class TournamentScheduler(
       nextMonthShields :::
       weeklyTourmaments
 
-//          List( // shield tournaments!
+//          List( // lichess shield tournaments!
 //            month.firstWeek.withDayOfWeek(MONDAY)    -> Bullet,
 //            month.firstWeek.withDayOfWeek(TUESDAY)   -> SuperBlitz,
 //            month.firstWeek.withDayOfWeek(WEDNESDAY) -> Blitz,
@@ -1115,19 +1115,20 @@ Thank you all, you rock!"""
   private def overlaps(t: Tournament, ts: List[Tournament]): Boolean =
     t.schedule exists { s =>
       ts exists { t2 =>
-        t.variant == t2.variant && t2.schedule.?? {
-          // prevent daily && weekly on the same day - we don't care about this.
-          // case s2 if s.freq.isDailyOrBetter && s2.freq.isDailyOrBetter && s.sameSpeed(s2) => s sameDay s2
-          // dont let yearly's block shields and vice versa
-          case s2 if s.freq == Shield || s.freq == MedleyShield   => s2.freq == s.freq && (s sameDay s2)
-          case s2 if s2.freq == Shield || s2.freq == MedleyShield => false
-          case s2 =>
-            (
-              t.variant.exotic ||  // overlapping exotic variant
-                s.hasMaxRating ||  // overlapping same rating limit
-                s.similarSpeed(s2) // overlapping similar
-            ) && s.similarConditions(s2) && t.overlaps(t2)
-        }
+        ((!t.isMedley && !t2.isMedley && t.variant == t2.variant) || (t.isMedley && t2.isMedley && t.trophy1st == t2.trophy1st)) && t2.schedule
+          .?? {
+            // prevent daily && weekly on the same day - we don't care about this.
+            // case s2 if s.freq.isDailyOrBetter && s2.freq.isDailyOrBetter && s.sameSpeed(s2) => s sameDay s2
+            // dont let yearly's block shields and vice versa
+            case s2 if s.freq == Shield || s.freq == MedleyShield   => s2.freq == s.freq && (s sameDay s2)
+            case s2 if s2.freq == Shield || s2.freq == MedleyShield => false
+            case s2 =>
+              (
+                t.variant.exotic ||  // overlapping exotic variant
+                  s.hasMaxRating ||  // overlapping same rating limit
+                  s.similarSpeed(s2) // overlapping similar
+              ) && s.similarConditions(s2) && t.overlaps(t2)
+          }
       }
     }
 

@@ -91,7 +91,7 @@ function syncShapes(
   brushes: DrawBrushes,
   arrowDests: ArrowDests,
   root: SVGElement,
-  defsEl: SVGElement
+  defsEl: SVGElement,
 ): void {
   const bounds = state.dom.bounds(),
     hashesInDom: { [hash: string]: boolean } = {},
@@ -121,7 +121,7 @@ function shapeHash(
   { orig, dest, brush, piece, modifiers }: DrawShape,
   arrowDests: ArrowDests,
   current: boolean,
-  bounds: ClientRect
+  bounds: ClientRect,
 ): Hash {
   return [
     bounds.width,
@@ -152,7 +152,7 @@ function renderShape(
   brushes: DrawBrushes,
   arrowDests: ArrowDests,
   bounds: ClientRect,
-  boardSize: cg.BoardSize
+  boardSize: cg.BoardSize,
 ): SVGElement {
   let el: SVGElement;
   if (shape.piece)
@@ -161,7 +161,7 @@ function renderShape(
       orient(key2pos(shape.orig, state.boardSize), state.orientation, boardSize),
       shape.piece,
       bounds,
-      boardSize
+      boardSize,
     );
   else {
     const orig = orient(key2pos(shape.orig, state.boardSize), state.orientation, boardSize);
@@ -175,7 +175,7 @@ function renderShape(
         current,
         arrowDests[shape.dest] > 1,
         bounds,
-        boardSize
+        boardSize,
       );
     } else el = renderCircle(brushes[shape.brush], orig, current, bounds, boardSize);
   }
@@ -188,7 +188,7 @@ function renderCircle(
   pos: cg.Pos,
   current: boolean,
   bounds: ClientRect,
-  boardSize: cg.BoardSize
+  boardSize: cg.BoardSize,
 ): SVGElement {
   const o = pos2px(pos, bounds, boardSize),
     widths = circleWidth(bounds, boardSize),
@@ -211,7 +211,7 @@ function renderArrow(
   current: boolean,
   shorten: boolean,
   bounds: ClientRect,
-  boardSize: cg.BoardSize
+  boardSize: cg.BoardSize,
 ): SVGElement {
   const m = arrowMargin(bounds, shorten && !current, boardSize),
     a = pos2px(orig, bounds, boardSize),
@@ -239,7 +239,7 @@ function renderPiece(
   pos: cg.Pos,
   piece: DrawShapePiece,
   bounds: ClientRect,
-  boardSize: cg.BoardSize
+  boardSize: cg.BoardSize,
 ): SVGElement {
   const o = pos2px(pos, bounds, boardSize),
     size = (bounds.width / boardSize[0]) * (piece.scale || 1),
@@ -267,7 +267,7 @@ function renderMarker(brush: DrawBrush): SVGElement {
     setAttributes(createElement('path'), {
       d: 'M0,0 V4 L3,2 Z',
       fill: brush.color,
-    })
+    }),
   );
   marker.setAttribute('cgKey', brush.key);
   return marker;

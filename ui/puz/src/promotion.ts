@@ -9,7 +9,7 @@ import { MaybeVNode, Redraw, Promotion } from './interfaces';
 export default function (
   withGround: <A>(f: (cg: CgApi) => A) => A | false,
   makeCgOpts: () => CgConfig,
-  redraw: Redraw
+  redraw: Redraw,
 ): Promotion {
   let promoting: any = false;
 
@@ -46,7 +46,7 @@ export default function (
               promoted: true,
             },
           ],
-        ])
+        ]),
       );
     }
   }
@@ -94,9 +94,9 @@ export default function (
               finish(serverRole);
             }),
           },
-          [h('piece.' + serverRole + '.' + playerIndex)]
+          [h('piece.' + serverRole + '.' + playerIndex)],
         );
-      })
+      }),
     );
   }
 
@@ -108,7 +108,7 @@ export default function (
       const pieces: Role[] = ['q-piece', 'n-piece', 'r-piece', 'b-piece'];
       return (
         withGround(g =>
-          renderPromotion(promoting.dest, pieces, cgUtil.opposite(g.state.turnPlayerIndex), g.state.orientation)
+          renderPromotion(promoting.dest, pieces, cgUtil.opposite(g.state.turnPlayerIndex), g.state.orientation),
         ) || null
       );
     },

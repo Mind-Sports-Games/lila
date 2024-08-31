@@ -11,7 +11,7 @@ export function nextGlyphSymbol(
   playerIndex: PlayerIndex,
   symbol: string,
   mainline: Tree.Node[],
-  fromPly: number
+  fromPly: number,
 ): Tree.Node | undefined {
   const len = mainline.length;
   if (!len) return;

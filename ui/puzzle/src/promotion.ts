@@ -41,7 +41,7 @@ export default function (vm: Vm, getGround: Prop<CgApi>, redraw: Redraw): Promot
               promoted: true,
             },
           ],
-        ])
+        ]),
       );
     }
   }
@@ -91,9 +91,9 @@ export default function (vm: Vm, getGround: Prop<CgApi>, redraw: Redraw): Promot
               finish(serverRole);
             }),
           },
-          [h('piece.' + serverRole + '.' + playerIndex)]
+          [h('piece.' + serverRole + '.' + playerIndex)],
         );
-      })
+      }),
     );
   }
 
@@ -107,7 +107,7 @@ export default function (vm: Vm, getGround: Prop<CgApi>, redraw: Redraw): Promot
         promoting.dest,
         pieces,
         cgUtil.opposite(getGround().state.turnPlayerIndex),
-        getGround().state.orientation
+        getGround().state.orientation,
       );
     },
   };

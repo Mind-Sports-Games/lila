@@ -10,11 +10,11 @@ class Scroller {
     this.element = e;
     this.element.addEventListener(
       'scroll',
-      throttle(500, _ => {
+      throttle(500, (_: any) => {
         const el = this.element;
         this.enable(!!el && el.offsetHeight + el.scrollTop > el.scrollHeight - 20);
       }),
-      { passive: true }
+      { passive: true },
     );
     window.el = this.element;
   };

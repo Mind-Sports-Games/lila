@@ -8,6 +8,6 @@ db.f_post.find({ 'reactions.horsey': { $exists: true } }).forEach(p => {
       $unset: {
         'reactions.horsey': '',
       },
-    }
+    },
   );
 });

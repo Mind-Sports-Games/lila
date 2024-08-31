@@ -26,7 +26,7 @@ function onMyTurn(ctrl: AnalyseCtrl, fctrl: ForecastCtrl, cNodes: ForecastStep[]
           ? h('span', ctrl.trans.plural('andSaveNbPremoveLines', lines.length))
           : h('span', ctrl.trans.noarg('noConditionalPremoves')),
       ]),
-    ]
+    ],
   );
 }
 
@@ -39,7 +39,7 @@ function makeCnodes(ctrl: AnalyseCtrl, fctrl: ForecastCtrl): ForecastStep[] {
       uci: node.uci!,
       san: node.san!,
       check: node.check,
-    }))
+    })),
   );
 }
 
@@ -73,15 +73,15 @@ export default function (ctrl: AnalyseCtrl, fctrl: ForecastCtrl): VNode {
                         fctrl.removeIndex(i);
                         e.stopPropagation();
                       },
-                      ctrl.redraw
+                      ctrl.redraw,
                     ),
                   },
-                  'x'
+                  'x',
                 ),
                 h('sans', renderNodesHtml(nodes)),
-              ]
+              ],
             );
-          })
+          }),
         ),
         h(
           'button.add.text',
@@ -94,10 +94,10 @@ export default function (ctrl: AnalyseCtrl, fctrl: ForecastCtrl): VNode {
             isCandidate
               ? h('span', [h('span', ctrl.trans.noarg('addCurrentVariation')), h('sans', renderNodesHtml(cNodes))])
               : h('span', ctrl.trans.noarg('playVariationToCreateConditionalPremoves')),
-          ]
+          ],
         ),
       ]),
       fctrl.onMyTurn ? onMyTurn(ctrl, fctrl, cNodes) : null,
-    ]
+    ],
   );
 }

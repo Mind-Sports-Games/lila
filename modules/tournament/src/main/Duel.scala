@@ -20,9 +20,9 @@ case class Duel(
 
 object Duel {
 
-  type UsernameRating = (String, Int)
+  type UsernameRating = (String, Int, Boolean)
 
-  case class DuelPlayer(name: Name, rating: Rating, rank: Rank)
+  case class DuelPlayer(name: Name, rating: Rating, rank: Rank, isInputRating: Boolean)
   case class Name(value: String) extends AnyVal with StringValue {
     def id = User normalize value
   }
@@ -31,7 +31,7 @@ object Duel {
 
   def tbUser(p: UsernameRating, ranking: Ranking) =
     ranking get User.normalize(p._1) map { rank =>
-      DuelPlayer(Name(p._1), Rating(p._2), Rank(rank + 1))
+      DuelPlayer(Name(p._1), Rating(p._2), Rank(rank + 1), p._3)
     }
 
   private[tournament] val ratingOrdering               = Ordering.by[Duel, Int](_.averageRating.value)

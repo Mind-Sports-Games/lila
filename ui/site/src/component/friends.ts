@@ -52,7 +52,7 @@ export default class OnlineFriends {
         this.titleEl.innerHTML = this.trans.plural(
           'nbFriendsOnline',
           ids.length,
-          this.loaded ? `<strong>${ids.length}</strong>` : '-'
+          this.loaded ? `<strong>${ids.length}</strong>` : '-',
         );
         this.el.querySelector('.nobody')?.classList.toggle('none', !!ids[0]);
         this.el.querySelector('.list')!.innerHTML = ids.map(id => this.renderFriend(this.users.get(id)!)).join('');

@@ -70,12 +70,12 @@ function featured(game: FeaturedGame, withRating: boolean): VNode {
         },
       }),
       featuredPlayer(game, game.orientation, withRating),
-    ]
+    ],
   );
 }
 
 function duelPlayerMeta(p: DuelPlayer) {
-  return [h('em.rank', '#' + p.k), p.t ? h('em.utitle', p.t) : null, h('em.rating', '' + p.r)];
+  return [h('em.rank', '#' + p.k), p.t ? h('em.utitle', p.t) : null, h('em.rating', '' + p.r + (p.i ? '*' : ''))];
 }
 
 function renderDuel(battle?: TeamBattle, duelTeams?: DuelTeams) {
@@ -90,12 +90,12 @@ function renderDuel(battle?: TeamBattle, duelTeams?: DuelTeams) {
         battle && duelTeams
           ? h(
               'line.t',
-              [0, 1].map(i => teamName(battle, duelTeams[d.p[i].n.toLowerCase()]))
+              [0, 1].map(i => teamName(battle, duelTeams[d.p[i].n.toLowerCase()])),
             )
           : undefined,
         h('line.a', [h('strong', d.p[0].n), h('span', duelPlayerMeta(d.p[1]).reverse())]),
         h('line.b', [h('span', duelPlayerMeta(d.p[0])), h('strong', d.p[1].n)]),
-      ]
+      ],
     );
 }
 
@@ -118,9 +118,9 @@ export default function (ctrl: TournamentController): VNode {
             {
               hook: bind('click', _ => !ctrl.disableClicks),
             },
-            [h('h2', 'Top games')].concat(ctrl.data.duels.map(renderDuel(ctrl.data.teamBattle, ctrl.data.duelTeams)))
+            [h('h2', 'Top games')].concat(ctrl.data.duels.map(renderDuel(ctrl.data.teamBattle, ctrl.data.duelTeams))),
           )
         : null,
-    ]
+    ],
   );
 }

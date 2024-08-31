@@ -20,9 +20,10 @@ final class PlayerRepo(coll: Coll)(implicit ec: scala.concurrent.ExecutionContex
       "tid" -> tourId,
       "uid" -> userId
     )
-  private val selectActive   = $doc("w" $ne true)
-  private val selectWithdraw = $doc("w" -> true)
-  private val selectNonBot   = $doc("b" $ne true)
+  private val selectActive      = $doc("w" $ne true)
+  private val selectWithdraw    = $doc("w" -> true)
+  private val selectInputRating = $doc("ir" -> true)
+  private val selectNonBot      = $doc("b" $ne true)
   //_id is added as a secondary sort to ensure the same order is returned for the paginator
   private val bestSort = $doc("m" -> -1, "_id" -> 1)
 
@@ -224,11 +225,17 @@ final class PlayerRepo(coll: Coll)(implicit ec: scala.concurrent.ExecutionContex
       coll.update.one(selectId(player._id), player).void
     }
 
-  def join(tourId: Tournament.ID, user: User, perfType: PerfType, team: Option[TeamID]) =
+  def join(
+      tourId: Tournament.ID,
+      user: User,
+      perfType: PerfType,
+      team: Option[TeamID],
+      inputRating: Option[Int]
+  ) =
     find(tourId, user.id) flatMap {
       case Some(p) if p.withdraw => coll.update.one(selectId(p._id), $unset("w"))
       case Some(_)               => funit
-      case None                  => coll.insert.one(Player.make(tourId, user, perfType, team))
+      case None                  => coll.insert.one(Player.make(tourId, user, perfType, team, inputRating))
     } void
 
   def withdraw(tourId: Tournament.ID, userId: User.ID) =
@@ -291,6 +298,26 @@ final class PlayerRepo(coll: Coll)(implicit ec: scala.concurrent.ExecutionContex
         s"PlayerRepo.byTourAndUserIds $tourId ${userIds.size} user IDs, ${players.size} players"
       }
       .result
+
+  // Potentially very expensive but need to update all players as unknown which are affected
+  // Current use - input rating adjustment
+  def allPlayersbyTour(tourId: Tournament.ID): Fu[List[Player]] =
+    coll
+      .list[Player](selectTour(tourId))
+      .chronometer
+      .logIfSlow(200, logger) { players =>
+        s"PlayerRepo.allPlayersbyTour $tourId, ${players.size} players"
+      }
+      .result
+
+  def unsetInputRating(tourId: Tournament.ID) =
+    coll.update
+      .one(
+        selectTour(tourId) ++ selectInputRating,
+        $doc("$unset" -> $doc("ir" -> true)),
+        multi = true
+      )
+      .void
 
   def nonActivePlayers(tourId: Tournament.ID, userIds: Iterable[User.ID]): Fu[List[Player]] =
     coll

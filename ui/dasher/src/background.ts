@@ -85,9 +85,9 @@ export function view(ctrl: BackgroundCtrl): VNode {
             attrs: { 'data-icon': 'E', title: bg.title || '' },
             hook: bind('click', () => ctrl.set(bg.key)),
           },
-          bg.name
+          bg.name,
         );
-      })
+      }),
     ),
     cur === 'transp' ? imageInput(ctrl) : null,
   ]);
@@ -111,7 +111,7 @@ function imageInput(ctrl: BackgroundCtrl) {
               // modules/pref/src/main/PrefForm.scala
               if ((url.startsWith('https://') || url.startsWith('//')) && url.length >= 10 && url.length <= 400)
                 ctrl.setImage(url);
-            }, 300)
+            }, 300),
           );
         },
       },

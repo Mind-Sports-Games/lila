@@ -12,14 +12,14 @@ function skipOrViewSolution(ctrl: RetroCtrl) {
       {
         hook: bind('click', ctrl.viewSolution, ctrl.redraw),
       },
-      ctrl.noarg('viewTheSolution')
+      ctrl.noarg('viewTheSolution'),
     ),
     h(
       'a',
       {
         hook: bind('click', ctrl.skip),
       },
-      ctrl.noarg('skipThisMove')
+      ctrl.noarg('skipThisMove'),
     ),
   ]);
 }
@@ -30,7 +30,7 @@ function jumpToNext(ctrl: RetroCtrl) {
     {
       hook: bind('click', ctrl.jumpToNext),
     },
-    [h('i', { attrs: dataIcon('G') }), ctrl.noarg('next')]
+    [h('i', { attrs: dataIcon('G') }), ctrl.noarg('next')],
   );
 }
 
@@ -46,7 +46,7 @@ function renderEvalProgress(node: Tree.Node): VNode {
           node.ceval ? (100 * Math.max(0, node.ceval.depth - minDepth)) / (maxDepth - minDepth) + '%' : 0
         }`,
       },
-    })
+    }),
   );
 }
 
@@ -70,10 +70,10 @@ const feedback = {
                     showEval: false,
                   },
                   parentedNode(ctrl.current()!.fault.node),
-                  notationStyle(ctrl.variant.key)
-                )!
-              )
-            )
+                  notationStyle(ctrl.variant.key),
+                )!,
+              ),
+            ),
           ),
           h('em', ctrl.trans('findBetterMoveForPlayerIndex', ctrl.playerIndex)),
           skipOrViewSolution(ctrl),
@@ -94,7 +94,7 @@ const feedback = {
               {
                 hook: bind('click', ctrl.jumpToNext),
               },
-              ctrl.noarg('resumeLearning')
+              ctrl.noarg('resumeLearning'),
             ),
           ]),
         ]),
@@ -117,7 +117,7 @@ const feedback = {
     return [
       h(
         'div.half.top',
-        h('div.player', [h('div.icon', '✓'), h('div.instruction', h('strong', ctrl.noarg('goodMove')))])
+        h('div.player', [h('div.icon', '✓'), h('div.instruction', h('strong', ctrl.noarg('goodMove')))]),
       ),
       jumpToNext(ctrl),
     ];
@@ -144,13 +144,13 @@ const feedback = {
                       showGlyphs: true,
                     },
                     parentedNode(ctrl.current()!.solution.node),
-                    notationStyle(ctrl.variant.key)
-                  )!
-                )
-              )
+                    notationStyle(ctrl.variant.key),
+                  )!,
+                ),
+              ),
             ),
           ]),
-        ])
+        ]),
       ),
       jumpToNext(ctrl),
     ];
@@ -161,7 +161,7 @@ const feedback = {
         'div.half.top',
         h('div.player.center', [
           h('div.instruction', [h('strong', ctrl.noarg('evaluatingYourMove')), renderEvalProgress(ctrl.node())]),
-        ])
+        ]),
       ),
     ];
   },
@@ -170,7 +170,7 @@ const feedback = {
       return [
         h(
           'div.half.top',
-          h('div.player', [h('div.icon', spinner()), h('div.instruction', ctrl.noarg('waitingForAnalysis'))])
+          h('div.player', [h('div.icon', spinner()), h('div.instruction', ctrl.noarg('waitingForAnalysis'))]),
         ),
       ];
     const nothing = !ctrl.completion()[1];
@@ -182,7 +182,7 @@ const feedback = {
             'em',
             nothing
               ? ctrl.trans('noMistakesFoundForPlayerIndex', ctrl.playerIndex)
-              : ctrl.trans('doneReviewingPlayerIndexMistakes', ctrl.playerIndex)
+              : ctrl.trans('doneReviewingPlayerIndexMistakes', ctrl.playerIndex),
           ),
           h('div.choices.end', [
             nothing
@@ -192,14 +192,14 @@ const feedback = {
                   {
                     hook: bind('click', ctrl.reset),
                   },
-                  ctrl.noarg('doItAgain')
+                  ctrl.noarg('doItAgain'),
                 ),
             h(
               'a',
               {
                 hook: bind('click', () => ctrl.flip()),
               },
-              ctrl.trans('reviewPlayerIndexMistakes', ctrl.playerIndex === 'p1' ? 'p2' : 'p1')
+              ctrl.trans('reviewPlayerIndexMistakes', ctrl.playerIndex === 'p1' ? 'p2' : 'p1'),
             ),
           ]),
         ]),

@@ -26,7 +26,7 @@ object indexStripe {
       moreJs = frag(
         index.stripeScript,
         jsModule("plan"),
-        embedJsUnsafeLoadThen(s"""planStart("$stripePublicKey")""")
+        embedJsUnsafeLoadThen(s"""PlayStrategyPlan("$stripePublicKey")""")
       ),
       csp = defaultCsp.withStripe.some
     ) {

@@ -20,7 +20,7 @@ function selector(data: StudyPracticeData) {
         {
           attrs: { disabled: true, selected: true },
         },
-        'Practice list'
+        'Practice list',
       ),
       ...data.structure.map(section =>
         h(
@@ -28,10 +28,10 @@ function selector(data: StudyPracticeData) {
           {
             attrs: { label: section.name },
           },
-          section.studies.map(study => option(section.id + '/' + study.slug + '/' + study.id, '', study.name))
-        )
+          section.studies.map(study => option(section.id + '/' + study.slug + '/' + study.id, '', study.name)),
+        ),
       ),
-    ]
+    ],
   );
 }
 
@@ -75,7 +75,7 @@ export function underboard(ctrl: StudyCtrl): MaybeVNodes {
             : {
                 attrs: { href: '/practice' },
               },
-          [h('span', 'Success!'), ctrl.nextChapter() ? 'Go to next exercise' : 'Back to practice menu']
+          [h('span', 'Success!'), ctrl.nextChapter() ? 'Go to next exercise' : 'Back to practice menu'],
         ),
       ];
     case false:
@@ -85,7 +85,7 @@ export function underboard(ctrl: StudyCtrl): MaybeVNodes {
           {
             hook: bind('click', p.reset, ctrl.redraw),
           },
-          [h('span', [renderGoal(p, p.goal().moves!)]), h('strong', 'Click to retry')]
+          [h('span', [renderGoal(p, p.goal().moves!)]), h('strong', 'Click to retry')],
         ),
       ];
     default:
@@ -102,7 +102,7 @@ export function underboard(ctrl: StudyCtrl): MaybeVNodes {
             change: p.autoNext,
           },
           ctrl.trans,
-          ctrl.redraw
+          ctrl.redraw,
         ),
       ];
   }
@@ -152,11 +152,11 @@ export function side(ctrl: StudyCtrl): VNode {
                   },
                 }),
                 h('h3', chapter.name),
-              ]
+              ],
             ),
           ];
         })
-        .reduce((a, b) => a.concat(b), [])
+        .reduce((a, b) => a.concat(b), []),
     ),
     h('div.finally', [
       h('a.back', {
