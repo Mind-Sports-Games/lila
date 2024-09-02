@@ -3,9 +3,13 @@ import * as xhr from 'common/xhr';
 /*
 loads assets on the fly
 
-The build system uses a manifest file to maintain the hash of the content for each css and js file of the project.
-JS and CSS from external libs do not contain the hash of their content in their filename, therefore asset_version is needed.
-Other resources like woff files are not part of the build system, meaning asset_version is also needed.
+The build system uses a manifest file to maintain the hash of the content for our assets (in ui) :
+- scss files
+- ts files (entrypoints are then importing common.<hash>.js files)
+- playstrategy woff(2)
+- a few external js libs (cash, powertip, howler, mousetrap)
+
+Some other assets are not bundled by our build system, therefore an asset_version in the URL is needed to invalidate the cache.
 */
 
 export const assetUrl = (path: string, opts: AssetUrlOpts = {}) => {
@@ -80,6 +84,6 @@ export const userComplete = (): Promise<UserComplete> => {
 export const hopscotch = () => {
   loadCss('vendor/hopscotch/dist/css/hopscotch.min.css');
   return loadScriptCJS('vendor/hopscotch/dist/js/hopscotch.min.js', {
-    noVersion: true, // @TODO: check why we would not keep the asset number for hopscotch
+    noVersion: true,
   });
 };
