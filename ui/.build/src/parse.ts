@@ -3,7 +3,7 @@ import * as path from 'node:path';
 import * as fg from 'fast-glob';
 import { PlaystrategyModule, env, colors as c } from './main';
 
-export const parseModules = async (): Promise<[Map<string, PlaystrategyModule>, Map<string, string[]>]> => {
+export async function parseModules(): Promise<[Map<string, PlaystrategyModule>, Map<string, string[]>]> {
   const modules = new Map<string, PlaystrategyModule>();
   const moduleDeps = new Map<string, string[]>();
 
@@ -20,12 +20,20 @@ export const parseModules = async (): Promise<[Map<string, PlaystrategyModule>, 
     moduleDeps.set(mod.name, deplist);
   }
   return [modules, moduleDeps];
-};
+}
 
-export async function globArray(glob: string, { cwd = env.uiDir, abs = true, dirs = false } = {}): Promise<string[]> {
+export async function globArray(glob: string, opts: fg.Options = {}): Promise<string[]> {
   const files: string[] = [];
-  for await (const f of fg.stream(glob, { cwd, absolute: abs, onlyFiles: !dirs })) files.push(f.toString('utf8'));
+  for await (const f of fg.stream(glob, { cwd: env.uiDir, absolute: true, onlyFiles: true, ...opts })) {
+    files.push(f.toString('utf8'));
+  }
   return files;
+}
+
+export async function globArrays(globs: string[] | undefined, opts: fg.Options = {}): Promise<string[]> {
+  if (!globs) return [];
+  const globResults = await Promise.all(globs.map(g => globArray(g, opts)));
+  return [...new Set<string>(globResults.flat())];
 }
 
 async function parseModule(moduleDir: string): Promise<PlaystrategyModule> {
@@ -38,6 +46,8 @@ async function parseModule(moduleDir: string): Promise<PlaystrategyModule> {
     post: [],
     hasTsconfig: fs.existsSync(path.join(moduleDir, 'tsconfig.json')),
   };
+
+  if ('playstrategy' in pkg && 'hashed' in pkg.playstrategy) mod.hashGlobs = pkg.playstrategy.hashed as string[];
 
   if ('playstrategy' in pkg && 'bundles' in pkg.playstrategy) {
     if (typeof pkg.playstrategy.bundles === 'string') mod.bundles = [pkg.playstrategy.bundles];

@@ -74,6 +74,16 @@
       "node_modules/stockfish.wasm/*": "public/vendor/stockfish.wasm",
       "node_modules/stockfish-mv.wasm/*": "public/vendor/stockfish-mv.wasm",
       "node_modules/stockfish-nnue.wasm/*": "public/vendor/stockfish-nnue.wasm"
-    }
+    },
+    "hashed": [
+      "font/playstrategy.woff",
+      "font/playstrategy.woff2",
+      "font/playstrategy.chess.woff",
+      "font/playstrategy.chess.woff2",
+      "javascripts/vendor/cash.min.js",
+      "javascripts/vendor/howler.min.js",
+      "javascripts/vendor/mousetrap.min.js",
+      "javascripts/vendor/powertip.min.js"
+    ]
   }
 }

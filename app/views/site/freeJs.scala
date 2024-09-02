@@ -17,25 +17,32 @@ object freeJs {
     "chat",
     "cli",
     "dasher",
+    "dgt",
+    "draughts",
+    "draughtsground",
+    "draughtsround",
     "editor",
-    "insight",
-    "learn",
     "lobby",
+    "msg",
     "notify",
     "palantir",
-    "puzzle",
+    "racer",
     "round",
     "serviceWorker",
     "simul",
     "site",
     "speech",
-    "tournament.calendar",
+    "swiss",
     "tournament",
-    "tournament.schedule",
-    "swiss"
-  )
+    "tournamentCalendar",
+    "tournamentSchedule"
+  );
 
-  private val renames = Map("analyse" -> "analysisBoard")
+  private val renames = Map(
+    "analyse"            -> "analysisBoard",
+    "tournamentCalendar" -> "tournament.calendar",
+    "tournamentSchedule" -> "tournament.schedule"
+  )
 
   def apply(): Frag =
     frag(
@@ -56,9 +63,8 @@ object freeJs {
         tbody(
           uiModules map { module =>
             val name = renames.getOrElse(module, module)
-            val file = s"$name.js"
             tr(
-              td(a(href := assetUrl(s"compiled/$file"))(file)),
+              td(a(href := jsUrl(name))(s"$name.js")),
               td(agpl),
               td(github(s"ui/$module/src"))
             )

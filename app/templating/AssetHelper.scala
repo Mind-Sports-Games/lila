@@ -23,27 +23,25 @@ trait AssetHelper { self: I18nHelper with SecurityHelper =>
   lazy val sameAssetDomain = netDomain.value == assetDomain.value
 
   def manifest: AssetManifest
-
   def assetVersion = AssetVersion.current
-
-  def assetUrl(path: String): String       = s"$assetBaseUrl/assets/$path"
-  def staticAssetUrl(path: String): String = s"$assetBaseUrl/assets/_$assetVersion/$path"
-
-  def cdnUrl(path: String) = s"$assetBaseUrl$path"
-
-  def dbImageUrl(path: String) = s"$baseUrl/image/$path"
 
   def updateManifest() = if (!env.net.isProd) env.web.manifest.update()
 
+  def assetUrl(path: String): String =
+    s"$assetBaseUrl/assets/${manifest.hashed(path).getOrElse(s"_$assetVersion/$path")}"
+  def jsUrl(key: String): String           = s"$assetBaseUrl/assets/compiled/${jsNameFromManifest(key)}"
+  def staticAssetUrl(path: String): String = s"$assetBaseUrl/assets/_$assetVersion/$path"
+  def cdnUrl(path: String)                 = s"$assetBaseUrl$path"
+  def dbImageUrl(path: String)             = s"$baseUrl/image/$path"
+
   def cssTag(name: String)(implicit ctx: Context): Frag =
     cssTagWithTheme(name, ctx.currentBg)
-
   def cssTagWithTheme(name: String, theme: String): Frag =
     cssAt(s"css/${cssNameFromManifest(name, theme)}")
   def cssTagNoTheme(name: String): Frag =
     cssAt(s"css/${cssNameFromManifest(name)}.css")
   private def cssAt(path: String): Frag =
-    link(href := assetUrl(path), rel := "stylesheet")
+    link(href := s"$assetBaseUrl/assets/${path}", rel := "stylesheet")
   private def cssNameFromManifest(name: String, theme: String = ""): String =
     if (!theme.isEmpty())
       s"${manifest.css(s"$name.$theme").getOrElse(s"$name.$theme")}"
@@ -53,7 +51,7 @@ trait AssetHelper { self: I18nHelper with SecurityHelper =>
   private def jsAtESM(key: String, path: String = "compiled/"): Frag = {
     script(
       deferAttr,
-      src := assetUrl(s"${path}${jsNameFromManifest(key)}"),
+      src := s"$assetBaseUrl/assets/${path}${jsNameFromManifest(key)}",
       tpe := "module"
     )
   }
@@ -68,12 +66,21 @@ trait AssetHelper { self: I18nHelper with SecurityHelper =>
   // load script as common js
   def jsAtCJS(path: String): Frag = script(deferAttr, src := staticAssetUrl(path))
 
-  def jsTag(name: String): Frag = jsAtESM(name, "javascripts/")
+  def jsTag(path: String): Frag =
+    script(
+      deferAttr,
+      src := s"$assetBaseUrl/assets/_$assetVersion/javascripts/$path",
+      tpe := "module"
+    )
 
   // jsModule is used from app/views/ as base ui module entry point
   def jsModule(name: String, path: String = "compiled/"): Frag = jsAtESM(name, path)
 
-  def depsTag = staticJsAtESM("deps.min.js")
+  def depsTag(name: String): Frag = script(
+    deferAttr,
+    src := assetUrl(name),
+    tpe := "module"
+  )
 
   def roundTag(lib: GameLogic) = lib match {
     case GameLogic.Draughts() => jsModule("draughtsround")
@@ -94,7 +101,6 @@ trait AssetHelper { self: I18nHelper with SecurityHelper =>
   def chessgroundTag = staticJsAtESM("chessground.min.js", "npm/")
 
   def draughtsgroundTag   = jsAtCJS("javascripts/vendor/draughtsground.min.js")
-  def cashTag             = staticJsAtESM("cash.min.js", "javascripts/vendor/")
   def fingerprintTag      = staticJsAtESM("fipr.js", "javascripts/")
   def tagifyTag           = staticJsAtESM("tagify.min.js", "vendor/tagify/")
   def highchartsLatestTag = staticJsAtESM("highcharts.js", "vendor/highcharts-4.2.5/")
