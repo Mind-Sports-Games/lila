@@ -9,6 +9,7 @@ import play.api.Mode
 import java.nio.file.{ Files, Path, Paths }
 import java.time.Instant
 
+import lila.common.AssetVersion
 import lila.common.config.NetConfig
 
 case class SplitAsset(name: String, imports: List[String])
@@ -125,7 +126,7 @@ final class AssetManifest(val environment: Environment, net: NetConfig)(implicit
   }
 
   private def fetchManifestJson(filename: String) = {
-    val resource = s"${net.assetBaseUrl}/assets/compiled/$filename"
+    val resource = s"${net.assetBaseUrl}/assets/_${AssetVersion.current}/compiled/$filename"
     ws.url(resource)
       .get()
       .map {
