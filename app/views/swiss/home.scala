@@ -174,7 +174,7 @@ object home {
         "When a player can't be paired during a round, they receive a bye worth one point."
       )
     ),
-    div(cls := "faq")(
+    div(cls := "faq", id := "bestofx")(
       i("?"),
       p(
         strong("What do the Swiss options 'best of x' and 'play x' do?"),

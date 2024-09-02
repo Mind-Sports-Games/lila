@@ -30,6 +30,7 @@ final private class Player(
     fishnetPlayer: lila.fishnet.FishnetPlayer,
     finisher: Finisher,
     scheduleExpiration: ScheduleExpiration,
+    scheduleActionExpiration: ScheduleActionExpiration,
     uciMemo: UciMemo
 )(implicit ec: scala.concurrent.ExecutionContext) {
 
@@ -111,6 +112,7 @@ final private class Player(
         }
       }
       scheduleExpiration(progress.game)
+      if (progress.game.selectSquaresPossible) scheduleActionExpiration(progress.game)
       fuccess(progress.events)
     }
   }

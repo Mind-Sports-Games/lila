@@ -1,9 +1,9 @@
-import { loadCssPath } from './assets';
+import { loadHashedCssPath } from './assets';
 
 const chat = (data: any) =>
   new Promise(resolve =>
     requestAnimationFrame(() => {
-      data.loadCss = loadCssPath;
+      data.loadCss = loadHashedCssPath;
       resolve(window.PlayStrategyChat(document.querySelector('.mchat'), data));
     }),
   );

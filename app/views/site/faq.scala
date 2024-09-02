@@ -264,7 +264,7 @@ object faq {
         question(
           "browser-notifications",
           enableDisableNotificationPopUps.txt(),
-          p(img(src := assetUrl("images/connection-info.png"), alt := viewSiteInformationPopUp.txt())),
+          p(img(src := staticAssetUrl("images/connection-info.png"), alt := viewSiteInformationPopUp.txt())),
           p(
             playstrategyCanOptionnalySendPopUps()
           )

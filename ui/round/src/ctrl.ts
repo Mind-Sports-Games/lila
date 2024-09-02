@@ -51,6 +51,7 @@ import {
   Position,
   NvuiPlugin,
 } from './interfaces';
+import { defined } from 'common';
 
 interface GoneBerserk {
   p1?: boolean;
@@ -1084,7 +1085,13 @@ export default class RoundController {
 
   opponentGone = (): number | boolean => {
     const d = this.data;
-    return d.opponent.gone !== false && !game.isPlayerTurn(d) && game.resignable(d) && d.opponent.gone;
+    return (
+      defined(d.opponent.isGone) &&
+      d.opponent.isGone !== false &&
+      !game.isPlayerTurn(d) &&
+      game.resignable(d) &&
+      d.opponent.isGone
+    );
   };
 
   canOfferDraw = (): boolean => game.drawable(this.data) && (this.lastDrawOfferAtPly || -99) < this.ply - 20;

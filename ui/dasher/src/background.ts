@@ -132,8 +132,13 @@ function applyBackground(data: BackgroundData, list: Background[]) {
   $('body').data('theme', sheet);
   $('link[href*=".' + prev + '."]').each(function (this: HTMLLinkElement) {
     const link = document.createElement('link') as HTMLLinkElement;
+    const currentThemeFileName = this.href.substring(this.href.lastIndexOf('/') + 1, this.href.lastIndexOf('.'));
+    const currentTheme = currentThemeFileName.substring(0, currentThemeFileName.lastIndexOf('.'));
+    const newTheme = currentTheme.substring(0, currentTheme.lastIndexOf('.')) + '.' + sheet;
+    const hash = playstrategy.manifest.css[newTheme];
+    const newThemeFilename = newTheme + '.' + hash;
     link.rel = 'stylesheet';
-    link.href = this.href.replace('.' + prev + '.', '.' + sheet + '.');
+    link.href = this.href.replace(currentThemeFileName, newThemeFilename);
     link.onload = () => setTimeout(() => this.remove(), 100);
     document.head.appendChild(link);
   });

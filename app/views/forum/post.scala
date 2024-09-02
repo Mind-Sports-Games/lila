@@ -135,7 +135,7 @@ object post {
             } else r
           }
         )(
-          img(src := assetUrl(s"images/emoji/$r.png"), alt := r),
+          img(src := staticAssetUrl(s"images/emoji/$r.png"), alt := r),
           size > 0 option size
         )
       }

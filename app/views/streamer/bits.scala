@@ -46,7 +46,7 @@ object bits extends Context.ToLang {
           width := size,
           height := size,
           cls := "default picture",
-          src := assetUrl("images/placeholder.png"),
+          src := staticAssetUrl("images/placeholder.png"),
           alt := "Default PlayStrategy streamer picture"
         )
     }

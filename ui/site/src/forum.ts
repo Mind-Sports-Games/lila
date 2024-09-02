@@ -31,7 +31,7 @@ playstrategy.load.then(() => {
       topicId = $(this).attr('data-topic');
 
     if (topicId)
-      playstrategy.loadScript('vendor/textcomplete.min.js').then(function () {
+      playstrategy.loadScriptCJS('vendor/textcomplete.min.js').then(function () {
         const searchCandidates = function (term: any, candidateUsers: any) {
           return candidateUsers.filter(function (user: any) {
             return user.toLowerCase().startsWith(term.toLowerCase());
@@ -62,7 +62,7 @@ playstrategy.load.then(() => {
                     // We fall back to every site user after 3 letters of the username have been entered
                     // and there are no matches in the forum thread participants
                     xhr
-                      .json(xhr.url('/player/autocomplete', { term }), { cache: 'default' })
+                      .json(xhr.url('/api/player/autocomplete', { term }), { cache: 'default' })
                       .then(candidateUsers => callback(searchCandidates(term, candidateUsers)));
                   } else {
                     callback([]);

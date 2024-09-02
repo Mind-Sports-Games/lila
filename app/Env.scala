@@ -84,7 +84,8 @@ final class Env(
     val racer: lila.racer.Env,
     val lilaCookie: lila.common.LilaCookie,
     val net: NetConfig,
-    val controllerComponents: ControllerComponents
+    val controllerComponents: ControllerComponents,
+    val web: lila.web.Env
 )(implicit
     val system: ActorSystem,
     val executionContext: ExecutionContext,
@@ -279,6 +280,7 @@ final class EnvBoot(
   lazy val racer: lila.racer.Env             = wire[lila.racer.Env]
   lazy val api: lila.api.Env                 = wire[lila.api.Env]
   lazy val lilaCookie                        = wire[lila.common.LilaCookie]
+  lazy val web: lila.web.Env                 = wire[lila.web.Env]
 
   val env: lila.app.Env = {
     val c = lila.common.Chronometer.sync(wire[lila.app.Env])

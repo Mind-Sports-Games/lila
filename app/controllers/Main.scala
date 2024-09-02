@@ -153,17 +153,7 @@ Allow: /
               "sizes" -> s"${size}x$size",
               "type"  -> "image/png"
             )
-          },
-          "related_applications" -> Json.arr(
-            Json.obj(
-              "platform" -> "play",
-              "url"      -> "https://play.google.com/store/apps/details?id=org.lichess.mobileapp"
-            ),
-            Json.obj(
-              "platform" -> "itunes",
-              "url"      -> "https://itunes.apple.com/us/app/playstrategy-free-online-chess/id968371784"
-            )
-          )
+          }
         )
       } withHeaders (CACHE_CONTROL -> "max-age=1209600")
     }

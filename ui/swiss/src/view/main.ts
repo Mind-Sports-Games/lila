@@ -229,7 +229,7 @@ function confetti(data: SwissData): VNode | undefined {
   return data.me && data.isRecentlyFinished && playstrategy.once('tournament.end.canvas.' + data.id)
     ? h('canvas#confetti', {
         hook: {
-          insert: _ => playstrategy.loadScript('javascripts/confetti.js'),
+          insert: _ => playstrategy.loadScriptCJS('javascripts/confetti.js'),
         },
       })
     : undefined;

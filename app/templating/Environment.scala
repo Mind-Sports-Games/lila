@@ -36,6 +36,7 @@ object Environment
   def netConfig           = env.net
   def netBaseUrl          = env.net.baseUrl.value
   def contactEmailInClear = env.net.email.value
+  def manifest            = env.web.manifest
 
   def apiVersion = lila.api.Mobile.Api.currentVersion
 

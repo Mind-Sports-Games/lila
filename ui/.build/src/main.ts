@@ -76,6 +76,7 @@ export interface PlaystrategyModule {
   post: string[][]; // post-bundle build steps from package.json scripts
   hasTsconfig?: boolean; // fileExists('tsconfig.json')
   bundles?: string[];
+  hashGlobs?: string[];
   sync?: Sync[]; // pre-bundle filesystem copies from package json
 }
 
@@ -155,6 +156,9 @@ class Env {
   get outDir(): string {
     return path.join(this.rootDir, 'public');
   }
+  get hashDir(): string {
+    return path.join(this.outDir, 'hashed');
+  }
   get themeDir(): string {
     return path.join(this.uiDir, 'common', 'css', 'theme');
   }
@@ -225,8 +229,8 @@ class Env {
     });
 
     if (allDone) {
-      if (this.startTime && !err) this.log(`Done in ${colors.green((Date.now() - this.startTime) / 1000 + '')}s`);
       if (!err) postBuild();
+      if (this.startTime && !err) this.log(`Done in ${colors.green((Date.now() - this.startTime) / 1000 + '')}s`);
       this.startTime = undefined; // it's pointless to time subsequent builds, they are too fast
       if (!env.watch) {
         process.exitCode = err || 0;

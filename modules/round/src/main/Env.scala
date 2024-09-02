@@ -82,6 +82,14 @@ final class Env(
     }
   })
 
+  private val scheduleActionExpiration = new ScheduleActionExpiration(game => {
+    game.timeBeforeExpirationOnPaused foreach { centis =>
+      scheduler.scheduleOnce((centis.millis + 1000).millis) {
+        tellRound(game.id, actorApi.round.ForceExpiredAction)
+      }
+    }
+  })
+
   private lazy val proxyDependencies =
     new GameProxy.Dependencies(gameRepo, scheduler)
   private lazy val roundDependencies = wire[RoundDuct.Dependencies]
