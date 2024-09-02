@@ -89,7 +89,7 @@ interface PlayStrategy {
   analysis?: any; // expose the analysis ctrl
   pageVariant: PageVariant;
 
-  manifest: { css: Record<string, string>; js: Record<string, string> };
+  manifest: { css: Record<string, string>; js: Record<string, string>; hashed: Record<string, string> };
 }
 
 type I18nDict = { [key: string]: string };

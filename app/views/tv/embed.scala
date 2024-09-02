@@ -17,7 +17,7 @@ object embed {
       div(id := "featured-game", cls := "embedded", title := "playstrategy.org TV")(
         views.html.game.mini.noCtx(pov, tv = true)(targetBlank)
       ),
-      cashTag,
+      depsTag("javascripts/vendor/cash.min.js"),
       jsModule("tvEmbed")
     )
 }

@@ -164,7 +164,10 @@ object layout {
       ctx.nonce map playstrategyJsObject,
       frag(
         jsModule("manifest"),
-        depsTag,
+        depsTag("javascripts/vendor/cash.min.js"),
+        depsTag("javascripts/vendor/powertip.min.js"),
+        depsTag("javascripts/vendor/howler.min.js"),
+        depsTag("javascripts/vendor/mousetrap.min.js"),
         jsModule("site")
       ),
       moreJs,
@@ -188,6 +191,18 @@ object layout {
   val dataAssetUrl              = attr("data-asset-url") // netConfig.assetBaseUrl.value
   val dataAssetVersion = attr(
     "data-asset-version"
+  )
+
+  val playstrategyFontFaceCss = spaceless(
+    s"""<style>@font-face {
+        font-family: 'playstrategy';
+        font-display: block;
+        src:
+          url('${assetUrl("font/playstrategy.woff2")}') format('woff2'),
+          url('${assetUrl("font/playstrategy.woff")}') format('woff'),
+          url('${assetUrl("font/playstrategy.chess.woff")}') format('woff'),
+          url('${assetUrl("font/playstrategy.chess.woff2")}') format('woff2');
+      }</style>"""
   )
 
   def apply(
@@ -249,7 +264,8 @@ object layout {
           },
           fontPreload,
           manifests,
-          jsLicense
+          jsLicense,
+          playstrategyFontFaceCss
         ),
         st.body(
           cls := List(

@@ -7,7 +7,7 @@ import { sass, stopSass } from './sass';
 import { esbuild, stopEsbuild } from './esbuild';
 import { copies, stopCopies } from './copies';
 import { startMonitor, stopMonitor } from './monitor';
-import { initManifest, writeManifest } from './manifest';
+import { writeManifest } from './manifest';
 import { clean } from './clean';
 import { PlaystrategyModule, env, errorMark, colors as c } from './main';
 
@@ -30,11 +30,11 @@ export async function build(mods: string[]) {
   await Promise.allSettled([
     fs.promises.mkdir(env.jsDir),
     fs.promises.mkdir(env.cssDir),
+    fs.promises.mkdir(env.hashDir),
     fs.promises.mkdir(env.themeGenDir),
     fs.promises.mkdir(env.cssTempDir),
   ]);
 
-  await initManifest();
   startMonitor(mods);
   await Promise.all([sass(), copies(), esbuild(tsc())]);
 }
@@ -56,7 +56,6 @@ export function postBuild() {
       if (stdout) env.log(stdout, { ctx: mod.name });
     });
   }
-  buildPlaystrategy();
 }
 
 export function preModule(mod: PlaystrategyModule | undefined) {
@@ -75,35 +74,3 @@ function depsOne(modName: string): PlaystrategyModule[] {
 const depsMany = (modNames: string[]): PlaystrategyModule[] => unique(modNames.flatMap(depsOne));
 
 const unique = <T>(mods: (T | undefined)[]): T[] => [...new Set(mods.filter(x => x))] as T[];
-
-async function buildPlaystrategy() {
-  await buildDeps(`${env.jsDir}/deps.min.js`);
-}
-
-async function buildDeps(filename: string) {
-  try {
-    if (fs.existsSync(filename)) return;
-    env.log(`Generating ${c.cyan(filename)} file...`);
-    await append(`${env.outDir}/javascripts/vendor/cash.min.js`, filename);
-    env.log(`Added the content of ${c.cyan(`${env.outDir}/javascripts/vendor/cash.min.js`)}`);
-    await append(`${env.uiDir}/site/dep/powertip.min.js`, filename);
-    env.log(`Added the content of ${c.cyan(`${env.uiDir}/site/dep/powertip.min.js`)}`);
-    await append(`${env.uiDir}/site/dep/howler.min.js`, filename);
-    env.log(`Added the content of ${c.cyan(`${env.uiDir}/site/dep/howler.min.js`)}`);
-    await append(`${env.uiDir}/site/dep/mousetrap.min.js`, filename);
-    env.log(`Added the content of ${c.cyan(`${env.uiDir}/site/dep/mousetrap.min.js`)}`);
-  } catch (error) {
-    env.log(`${c.error(error + '')}`);
-  }
-}
-
-async function append(src: string, dest: string): Promise<void> {
-  const readSrc = async () => {
-    return fs.promises.readFile(src, { encoding: 'utf8' });
-  };
-  const appendFile = async (content: string) => {
-    return fs.promises.appendFile(dest, content);
-  };
-  const content = await readSrc();
-  await appendFile(content);
-}
