@@ -35,12 +35,13 @@ final private[api] class Cli(
 
   def process = {
     case "uptime" :: Nil => fuccess(s"${lila.common.Uptime.seconds} seconds")
-    case "change" :: ("asset" | "assets") :: "version" :: Nil =>
+    case "change" :: ("asset" | "assets") :: "version" :: Nil => {
       import lila.common.AssetVersion
+      AssetVersion.change()
       web.manifest.update()
       web.manifest.lastUpdate.pp("updated manifest")
-      AssetVersion.change()
       fuccess(s"Changed to ${AssetVersion.current}")
+    }
     case "swiss" :: "update" :: "score" :: id :: Nil =>
       swiss.api.recomputeScore(id).map(_ => s"Updated score for Swiss $id")
     case "swiss" :: "dq" :: username :: id :: Nil =>
