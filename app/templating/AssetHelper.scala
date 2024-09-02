@@ -39,7 +39,7 @@ trait AssetHelper { self: I18nHelper with SecurityHelper =>
   def cssTagWithTheme(name: String, theme: String): Frag =
     cssAt(s"css/${cssNameFromManifest(name, theme)}")
   def cssTagNoTheme(name: String): Frag =
-    cssAt(s"css/${cssNameFromManifest(name)}.css")
+    cssAt(s"css/${cssNameFromManifest(name)}")
   private def cssAt(path: String): Frag =
     link(href := s"$assetBaseUrl/assets/${path}", rel := "stylesheet")
   private def cssNameFromManifest(name: String, theme: String = ""): String =
@@ -109,7 +109,7 @@ trait AssetHelper { self: I18nHelper with SecurityHelper =>
   def prismicJs(implicit ctx: Context): Frag =
     raw {
       isGranted(_.Prismic) ?? { // @TODO: check why lichess prismic is used here
-        embedJsUnsafe("""window.prismic={endpoint:'https://lichess.prismic.io/api/v2'}""").render ++
+        embedJsUnsafe("""window.prismic={endpoint:'https://playstrategy.prismic.io/api/v2'}""").render ++
           """<script src="//static.cdn.prismic.io/prismic.min.js"></script>"""
       }
     }
