@@ -4,8 +4,8 @@ import * as xhr from 'common/xhr';
 loads assets on the fly
 
 The build system uses a manifest file to maintain the hash of the content for each css and js file of the project.
-JS and CSS from external libs do not contain the hash of their content in their filename, therefore asset_version is needed
-Other resources like woff files are not part of the build system, meaning asset_version is also needed
+JS and CSS from external libs do not contain the hash of their content in their filename, therefore asset_version is needed.
+Other resources like woff files are not part of the build system, meaning asset_version is also needed.
 */
 
 export const assetUrl = (path: string, opts: AssetUrlOpts = {}) => {
