@@ -34,18 +34,26 @@ final class AssetManifest(val environment: Environment, net: NetConfig)(implicit
   def deps(keys: List[String]): List[String] = keys.flatMap { key => js(key).??(_.imports) }.distinct
   def lastUpdate: Instant                    = lastModified
 
-  def update(): Unit = {
-    val pathname = environment.getFile(s"public/compiled/$filename").toPath
-    try {
-      val current = Files.getLastModifiedTime(pathname).toInstant
-      if (current.isAfter(lastModified)) {
-        maps = readMaps(Json.parse(Files.newInputStream(pathname)))
-        lastModified = current
+  def update(): Unit =
+    if (environment.mode == Mode.Prod || net.externalManifest)
+      fetchManifestJson(filename).foreach {
+        _.foreach { manifestJson =>
+          maps = readMaps(manifestJson)
+          lastModified = Instant.now()
+        }
       }
-    } catch {
-      case e: Throwable => logger.error(s"Error reading $pathname", e)
+    else {
+      val pathname = environment.getFile(s"public/compiled/$filename").toPath
+      try {
+        val current = Files.getLastModifiedTime(pathname).toInstant
+        if (current.isAfter(lastModified)) {
+          maps = readMaps(Json.parse(Files.newInputStream(pathname)))
+          lastModified = current
+        }
+      } catch {
+        case e: Throwable => logger.error(s"Error reading $pathname", e)
+      }
     }
-  }
 
   private val keyRe = """^(?!common\.)(\S+)\.([A-Z0-9]{8})\.(?:js|css)""".r
   private def keyOf(fullName: String): String =
@@ -114,6 +122,24 @@ final class AssetManifest(val environment: Environment, net: NetConfig)(implicit
       }
       .toMap
     AssetMaps(js, css, hashed)
+  }
+
+  private def fetchManifestJson(filename: String) = {
+    val resource = s"${net.assetBaseUrl}/assets/compiled/$filename"
+    ws.url(resource)
+      .get()
+      .map {
+        case res if res.status == 200 =>
+          res.body[JsValue].some
+        case res => {
+          logger.error(s"${res.status} fetching $resource")
+          none
+        }
+      }
+      .recoverWith { case e: Exception =>
+        logger.error(s"fetching $resource", e)
+        fuccess(none)
+      }
   }
 
   update()
