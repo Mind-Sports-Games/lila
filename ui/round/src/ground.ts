@@ -155,17 +155,17 @@ export function makeConfig(ctrl: RoundController): Config {
                           data.pref.pieceSet.filter(ps => ps.gameFamily === 'backgammon')[0].name +
                           '/'
                         : variantKey === 'abalone'
-                        ? 'https://playstrategy.org/assets/piece/abalone/' +
-                          data.pref.pieceSet.filter(ps => ps.gameFamily === 'abalone')[0].name +
-                          '/'
-                            : variantKey === 'xiangqi' || variantKey === 'minixiangqi'
-                              ? 'https://playstrategy.org/assets/piece/xiangqi/' +
-                                data.pref.pieceSet.filter(ps => ps.gameFamily === 'xiangqi')[0].name +
-                                '/'
-                              : 'https://playstrategy.org/assets/piece/chess/' +
-                                data.pref.pieceSet.filter(ps => ps.gameFamily === 'chess')[0].name +
-                                '/',
-          },
+                          ? 'https://playstrategy.org/assets/piece/abalone/' +
+                            data.pref.pieceSet.filter(ps => ps.gameFamily === 'abalone')[0].name +
+                            '/'
+                          : variantKey === 'xiangqi' || variantKey === 'minixiangqi'
+                            ? 'https://playstrategy.org/assets/piece/xiangqi/' +
+                              data.pref.pieceSet.filter(ps => ps.gameFamily === 'xiangqi')[0].name +
+                              '/'
+                            : 'https://playstrategy.org/assets/piece/chess/' +
+                              data.pref.pieceSet.filter(ps => ps.gameFamily === 'chess')[0].name +
+                              '/',
+      },
     },
     disableContextMenu: true,
     dimensions: data.game.variant.boardSize,

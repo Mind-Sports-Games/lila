@@ -94,7 +94,7 @@ export const init = (node: HTMLElement) => {
                                 : $el.hasClass('variant-backgammon') || $el.hasClass('variant-nackgammon')
                                   ? { width: 12, height: 2 }
                                   : { width: 8, height: 8 },
-                                  //TODO Add Abalone here
+          //TODO Add Abalone here
           variant: variantFromElement($el),
         },
         $cg = $el.find('.cg-wrap'),
