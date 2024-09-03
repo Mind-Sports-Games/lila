@@ -24,6 +24,7 @@ export interface SwissData {
   clock: Clock;
   variant: string;
   isMedley: boolean;
+  isHandicapped: boolean;
   roundVariant: string;
   roundVariantName: string;
   p1Name: PlayerName;
@@ -32,6 +33,7 @@ export interface SwissData {
   p2Color: PlayerColor;
   me?: MyInfo;
   canJoin: boolean;
+  timeBeforeStartToJoin?: string;
   joinTeam?: string;
   round: number;
   nbRounds: number;
@@ -103,6 +105,7 @@ export interface Pairing extends PairingBase {
 export interface PairingExt extends Pairing {
   user: LightUser;
   rating: number;
+  inputRating?: number;
 }
 
 export interface Standing {
@@ -115,6 +118,7 @@ export type Outcome = 'absent' | 'late' | 'bye';
 export interface BasePlayer {
   user: LightUser;
   rating: number;
+  inputRating?: number;
   provisional?: boolean;
   withdraw?: boolean;
   points: number;
@@ -122,6 +126,7 @@ export interface BasePlayer {
   tieBreak2: number;
   performance?: number;
   absent: boolean;
+  disqualified: boolean;
 }
 
 export interface PodiumPlayer extends BasePlayer {

@@ -84,7 +84,7 @@ export default function (ctrl: SwissCtrl): VNode | undefined {
     : data.sheet.filter((p: any) => p.w).length;
   const pairings = data.sheet.filter((p: any) => p.g).length;
   const avgOp: number | undefined = pairings
-    ? Math.round(data.sheet.reduce((r, p) => r + ((p as any).rating || 1), 0) / pairings)
+    ? Math.round(data.sheet.reduce((r, p) => r + (((p as any).inputRating ?? (p as any).rating) || 1), 0) / pairings)
     : undefined;
   return h(
     tag,
@@ -102,14 +102,17 @@ export default function (ctrl: SwissCtrl): VNode | undefined {
         hook: bind('click', () => ctrl.showPlayerInfo(data), ctrl.redraw),
       }),
       h('div.stats', [
-        h('h2.player-title', [h('span.rank', data.rank + '. '), renderPlayer(data, true, !ctrl.data.isMedley, true)]),
+        h('h2.player-title', [
+          h('span.rank', data.disqualified ? 'DQ' : data.rank + '. '),
+          renderPlayer(data, true, !ctrl.data.isMedley, true),
+        ]),
         h('table', [
           numberRow('Points', data.points, 'raw'),
           numberRow('Tiebreak' + (data.tieBreak2 ? ' [BH]' : ' [SB]'), data.tieBreak, 'raw'),
           data.tieBreak2 ? numberRow('Tiebreak [SB]', data.tieBreak2, 'raw') : null,
           ...(games
             ? [
-                data.performance && !ctrl.data.isMedley
+                data.performance && !ctrl.data.isMedley && !ctrl.data.isHandicapped
                   ? numberRow(noarg('performance'), data.performance + (games < 3 ? '?' : ''), 'raw')
                   : null,
                 numberRow(noarg('winRate'), [wins, games], 'percent'),
@@ -143,12 +146,12 @@ export default function (ctrl: SwissCtrl): VNode | undefined {
                     p.outcome == 'absent'
                       ? '-'
                       : p.outcome == 'bye'
-                      ? isMatchScore
-                        ? matchScoreDisplay(multiMatchByeScore(ctrl))
-                        : '1'
-                      : '½'
+                        ? isMatchScore
+                          ? matchScoreDisplay(multiMatchByeScore(ctrl))
+                          : '1'
+                        : '½',
                   ),
-                ]
+                ],
               );
             }
             const res = result(p);
@@ -165,20 +168,20 @@ export default function (ctrl: SwissCtrl): VNode | undefined {
                 h('th', p.ismm ? '' + round + '.' + p.mmGameNb : '' + round),
                 ctrl.data.isMedley && p.vi ? h('td', { attrs: { 'data-icon': p.vi } }, '') : null,
                 h('td', userName(p.user)),
-                h('td', ctrl.data.isMedley ? '' : '' + p.rating),
+                h('td', ctrl.data.isMedley ? '' : p.inputRating ? '' + p.inputRating + '*' : '' + p.rating),
                 h('td.is.playerIndex-icon.' + (p.c ? ctrl.data.p1Color : ctrl.data.p2Color)),
                 h('td.gamescore' + (p.mmGameRes ? '.' + p.mmGameRes : ''), p.ismm ? gameResult(p) : ''),
                 p.ismm && p.isFinalGame
                   ? h('td.matchscore', { attrs: { rowSpan: p.mmGameNb } }, res)
                   : p.ismm
-                  ? ''
-                  : h('td.matchscore', res),
-              ]
+                    ? ''
+                    : h('td.matchscore', res),
+              ],
             );
-          })
+          }),
         ),
       ]),
-    ]
+    ],
   );
 }
 

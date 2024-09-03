@@ -4,6 +4,7 @@ import strategygames.Centis
 import strategygames.format.pgn.{ Glyph, Glyphs }
 import strategygames.format.{ FEN, Uci, UciCharPair }
 import strategygames.opening.FullOpening
+import strategygames.variant.Variant
 import strategygames.{ GameLogic, Player => PlayerIndex, Pocket, PocketData, Pos, Role }
 import play.api.libs.json._
 
@@ -14,6 +15,7 @@ sealed trait Node {
   //
   //def turnCount: Int
   //def playerIndex: PlayerIndex
+  def variant: Variant
   def fen: FEN
   def check: Boolean
   // None when not computed yet
@@ -52,6 +54,7 @@ sealed trait Node {
 
 case class Root(
     ply: Int,
+    variant: Variant,
     fen: FEN,
     check: Boolean,
     // None when not computed yet
@@ -84,6 +87,7 @@ case class Root(
 case class Branch(
     id: UciCharPair,
     ply: Int,
+    variant: Variant,
     move: Uci.WithSan,
     fen: FEN,
     check: Boolean,
@@ -231,16 +235,7 @@ object Node {
   implicit private val pocketWriter: OWrites[Pocket] = OWrites { v =>
     JsObject(
       Role
-        .storable(v.roles.headOption match {
-          case Some(r) =>
-            r match {
-              case Role.ChessRole(_)   => GameLogic.Chess()
-              case Role.FairySFRole(_) => GameLogic.FairySF()
-              case Role.GoRole(_)      => GameLogic.Go()
-              case _                   => sys.error("Pocket not implemented for GameLogic")
-            }
-          case None => GameLogic.Chess()
-        })
+        .storable(v.roles.headOption.map(_.gameLogic).getOrElse(GameLogic.Chess()))
         .flatMap { role =>
           Some(v.roles.count(role ==)).filter(0 <).map { count =>
             role.groundName -> JsNumber(count)

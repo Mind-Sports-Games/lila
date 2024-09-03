@@ -21,7 +21,7 @@ export function tourStandingCtrl(players: TourPlayer[], team: Team | undefined, 
         'div',
         {
           hook: onInsert(_ => {
-            playstrategy.loadCssPath('round.tour-standing');
+            playstrategy.loadHashedCssPath('round.tour-standing');
           }),
         },
         [
@@ -31,7 +31,7 @@ export function tourStandingCtrl(players: TourPlayer[], team: Team | undefined, 
                 {
                   attrs: { 'data-icon': 'f' },
                 },
-                team.name
+                team.name,
               )
             : null,
           h('table.slist', [
@@ -46,7 +46,7 @@ export function tourStandingCtrl(players: TourPlayer[], team: Team | undefined, 
                       {
                         attrs: { href: `/@/${p.n}` },
                       },
-                      (p.t ? p.t + ' ' : '') + p.n
+                      (p.t ? p.t + ' ' : '') + p.n,
                     ),
                   ]),
                   h(
@@ -57,13 +57,13 @@ export function tourStandingCtrl(players: TourPlayer[], team: Team | undefined, 
                           attrs: { 'data-icon': 'Q' },
                         }
                       : {},
-                    '' + p.s
+                    '' + p.s,
                   ),
                 ]);
-              })
+              }),
             ),
           ]),
-        ]
+        ],
       );
     },
   };

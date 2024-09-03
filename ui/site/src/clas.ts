@@ -1,6 +1,6 @@
 import tablesort from 'tablesort';
 
-import { loadScript } from './component/assets';
+import { loadScriptCJS } from './component/assets';
 import extendTablesortNumber from './component/tablesort-number';
 import * as xhr from 'common/xhr';
 
@@ -22,7 +22,7 @@ playstrategy.load.then(() => {
       return textarea.value.split('\n').slice(0, -1);
     }
 
-    loadScript('vendor/textcomplete.min.js').then(() => {
+    loadScriptCJS('vendor/textcomplete.min.js').then(() => {
       const textcomplete = new window.Textcomplete(new window.Textcomplete.editors.Textarea(textarea), {
         dropdown: {
           maxCount: 10,
@@ -40,18 +40,18 @@ playstrategy.load.then(() => {
             else
               xhr
                 .json(
-                  xhr.url('/player/autocomplete', {
+                  xhr.url('/api/player/autocomplete', {
                     object: 1,
                     teacher: 1,
                     term,
-                  })
+                  }),
                 )
                 .then(
                   res => {
                     const current = currentUserIds();
                     callback(res.result.filter(t => !current.includes(t.id)));
                   },
-                  _ => callback([])
+                  _ => callback([]),
                 );
           },
           template: o =>

@@ -8,7 +8,7 @@ import format from 'date-fns/format';
 import { Tournament, Lanes, Ctrl } from './interfaces';
 
 function tournamentClass(tour: Tournament, day: Date) {
-  const classes = {
+  const classes: any = {
     rated: tour.rated,
     casual: !tour.rated,
     'max-rating': tour.hasMaxRating,
@@ -18,7 +18,7 @@ function tournamentClass(tour: Tournament, day: Date) {
   return classes;
 }
 
-function iconOf(tour, perfIcon) {
+function iconOf(tour: any, perfIcon: any) {
   return tour.schedule && tour.schedule.freq === 'medleyshield' ? '5' : perfIcon;
 }
 
@@ -46,17 +46,17 @@ function renderTournament(tour: Tournament, day: Date) {
                 'data-icon': iconOf(tour, tour.perf.icon),
               },
             }
-          : {}
+          : {},
       ),
       h('span.body', [tour.fullName]),
-    ]
+    ],
   );
 }
 
 function renderLane(tours: Tournament[], day: Date) {
   return h(
     'lane',
-    tours.map(t => renderTournament(t, day))
+    tours.map(t => renderTournament(t, day)),
   );
 }
 
@@ -88,11 +88,11 @@ function renderDay(ctrl: Ctrl) {
             title: format(day, 'EEEE, dd/MM/yyyy'),
           },
         },
-        [format(day, 'dd/MM')]
+        [format(day, 'dd/MM')],
       ),
       h(
         'lanes',
-        makeLanes(tours).map(l => renderLane(l, day))
+        makeLanes(tours).map(l => renderLane(l, day)),
       ),
     ]);
   };
@@ -115,14 +115,14 @@ function renderTimeline() {
         {
           attrs: { style: 'left: ' + (hour / 24) * 100 + '%' },
         },
-        timeString(hour)
-      )
-    )
+        timeString(hour),
+      ),
+    ),
   );
 }
 
 // converts Date to "%H:%M" with leading zeros
-function timeString(hour) {
+function timeString(hour: any) {
   return ('0' + hour).slice(-2);
 }
 
@@ -133,7 +133,7 @@ function makeGroups(days: Date[]): Date[][] {
   return groups;
 }
 
-export default function (ctrl) {
+export default function (ctrl: any) {
   const days = eachDayOfInterval({
     start: new Date(ctrl.data.since),
     end: new Date(ctrl.data.to),

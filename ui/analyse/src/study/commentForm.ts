@@ -117,7 +117,7 @@ export function view(root: AnalyseCtrl): VNode {
               {
                 hook: bind('mousedown', () => ctrl.root.userJump(current.path), ctrl.redraw),
               },
-              nodeFullName(current.node)
+              nodeFullName(current.node),
             ),
           ])
         : null,

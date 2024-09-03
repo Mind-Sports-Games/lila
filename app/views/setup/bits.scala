@@ -51,7 +51,17 @@ private object bits {
       variants: List[(SelectChoice, List[SelectChoice])]
   )(implicit ctx: Context) =
     div(cls := "variant label_select")(
-      renderLabel(form("Variant"), trans.variant()),
+      renderLabel(
+        form("Variant"),
+        a(
+          cls := "remove_color",
+          title := "More info",
+          href := s"${routes.Page.variantHome}",
+          target := "_blank"
+        )(
+          trans.variant()
+        )
+      ),
       renderSelectWithOptGroups(
         form("variant"),
         variants.map { case (gf, v) =>
@@ -169,7 +179,15 @@ private object bits {
           "none"         -> (ctx.isAnon && !allowAnon)
         )
       )(
-        renderLabel(form("timeMode"), trans.timeControl()),
+        renderLabel(
+          form("timeMode"),
+          a(
+            cls := "remove_color",
+            title := "More info",
+            href := s"${routes.Page.loneBookmark("clocks")}",
+            target := "_blank"
+          )(trans.timeControl())
+        ),
         renderSelect(form("timeMode"), translatedTimeModeChoices)
       ),
       if (ctx.blind)
@@ -199,7 +217,7 @@ private object bits {
               //strategygames.ByoyomiClock
               //  .Config(~form("time").value.map(x => (x.toDouble * 60).toInt), 0, 0, 1)
               //  .limitString
-              strategygames.FischerClock
+              strategygames.Clock
                 .Config(~form("time").value.map(x => (x.toDouble * 60).toInt), 0)
                 .limitString
             ),

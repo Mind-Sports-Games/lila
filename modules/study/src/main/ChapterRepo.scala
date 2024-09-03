@@ -3,6 +3,7 @@ package lila.study
 import akka.stream.scaladsl._
 import strategygames.format.pgn.Tags
 import strategygames.Centis
+import strategygames.variant.Variant
 import reactivemongo.akkastream.cursorProducer
 import reactivemongo.api.bson._
 
@@ -114,8 +115,11 @@ final class ChapterRepo(val coll: AsyncColl)(implicit
   def setTagsFor(chapter: Chapter) =
     coll(_.updateField($id(chapter.id), "tags", chapter.tags)).void
 
-  def setShapes(shapes: lila.tree.Node.Shapes) =
+  def setShapes(shapes: lila.tree.Node.Shapes)(implicit variant: Variant) = {
+    val variantHandlers = VariantHandlers()
+    import variantHandlers._
     setNodeValue(Node.BsonFields.shapes, shapes.value.nonEmpty option shapes) _
+  }
 
   def setComments(comments: lila.tree.Node.Comments) =
     setNodeValue(Node.BsonFields.comments, comments.value.nonEmpty option comments) _
@@ -123,7 +127,8 @@ final class ChapterRepo(val coll: AsyncColl)(implicit
   def setGamebook(gamebook: lila.tree.Node.Gamebook) =
     setNodeValue(Node.BsonFields.gamebook, gamebook.nonEmpty option gamebook) _
 
-  def setGlyphs(glyphs: strategygames.format.pgn.Glyphs) = setNodeValue(Node.BsonFields.glyphs, glyphs.nonEmpty) _
+  def setGlyphs(glyphs: strategygames.format.pgn.Glyphs) =
+    setNodeValue(Node.BsonFields.glyphs, glyphs.nonEmpty) _
 
   def setClock(clock: Option[Centis]) = setNodeValue(Node.BsonFields.clock, clock) _
 
@@ -131,7 +136,11 @@ final class ChapterRepo(val coll: AsyncColl)(implicit
 
   // insert node and its children
   // and sets the parent order field
-  def addSubTree(subTree: Node, newParent: RootOrNode, parentPath: Path)(chapter: Chapter): Funit = {
+  def addSubTree(subTree: Node, newParent: RootOrNode, parentPath: Path)(
+      chapter: Chapter
+  )(implicit variant: Variant): Funit = {
+    val variantHandlers = VariantHandlers()
+    import variantHandlers._
     val set = $doc(subTreeToBsonElements(parentPath, subTree)) ++ {
       (newParent.children.nodes.sizeIs > 1) ?? $doc(
         pathToField(parentPath, Node.BsonFields.order) -> newParent.children.nodes.map(_.id)
@@ -140,17 +149,23 @@ final class ChapterRepo(val coll: AsyncColl)(implicit
     coll(_.update.one($id(chapter.id), $set(set))).void
   }
 
-  private def subTreeToBsonElements(parentPath: Path, subTree: Node): Vector[(String, Bdoc)] =
-    (parentPath.depth < Node.MAX_PLIES) ?? {
+  private def subTreeToBsonElements(parentPath: Path, subTree: Node)(implicit
+      variant: Variant
+  ): Vector[(String, Bdoc)] = {
+    val variantHandlers = VariantHandlers()
+    import variantHandlers._
+    (parentPath.depth < Node.maxPlies) ?? {
       val path = parentPath + subTree
       subTree.children.nodes.flatMap(subTreeToBsonElements(path, _)) appended {
         path.toDbField -> writeNode(subTree)
       }
     }
+  }
 
   // overrides all children sub-nodes in DB! Make the tree merge beforehand.
-  def setChildren(children: Node.Children)(chapter: Chapter, path: Path): Funit = {
-
+  def setChildren(children: Node.Children)(chapter: Chapter, path: Path)(implicit variant: Variant): Funit = {
+    val variantHandlers = VariantHandlers()
+    import variantHandlers._
     val set: Bdoc = {
       (children.nodes.sizeIs > 1) ?? $doc(
         pathToField(path, Node.BsonFields.order) -> children.nodes.map(_.id)
@@ -160,12 +175,17 @@ final class ChapterRepo(val coll: AsyncColl)(implicit
     coll(_.update.one($id(chapter.id), $set(set))).void
   }
 
-  private def childrenTreeToBsonElements(parentPath: Path, children: Node.Children): Vector[(String, Bdoc)] =
-    (parentPath.depth < Node.MAX_PLIES) ??
+  private def childrenTreeToBsonElements(parentPath: Path, children: Node.Children)(implicit
+      variant: Variant
+  ): Vector[(String, Bdoc)] = {
+    val variantHandlers = VariantHandlers()
+    import variantHandlers._
+    (parentPath.depth < Node.maxPlies) ??
       children.nodes.flatMap { node =>
         val path = parentPath + node
         childrenTreeToBsonElements(path, node.children) appended (path.toDbField -> writeNode(node))
       }
+  }
 
   private def setNodeValue[A: BSONWriter](
       field: String,

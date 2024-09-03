@@ -19,7 +19,8 @@ final private[api] class Cli(
     msg: lila.msg.Env,
     slackApi: lila.irc.SlackApi,
     email: lila.security.AutomaticEmail,
-    swiss: lila.swiss.Env
+    swiss: lila.swiss.Env,
+    web: lila.web.Env
 )(implicit ec: scala.concurrent.ExecutionContext)
     extends lila.common.Cli {
 
@@ -34,12 +35,17 @@ final private[api] class Cli(
 
   def process = {
     case "uptime" :: Nil => fuccess(s"${lila.common.Uptime.seconds} seconds")
-    case "change" :: ("asset" | "assets") :: "version" :: Nil =>
+    case "change" :: ("asset" | "assets") :: "version" :: Nil => {
       import lila.common.AssetVersion
       AssetVersion.change()
+      web.manifest.update()
+      web.manifest.lastUpdate.pp("updated manifest")
       fuccess(s"Changed to ${AssetVersion.current}")
+    }
     case "swiss" :: "update" :: "score" :: id :: Nil =>
-      swiss.api.recomputeScore(id).map(_=>s"Updated score for Swiss $id")
+      swiss.api.recomputeScore(id).map(_ => s"Updated score for Swiss $id")
+    case "swiss" :: "dq" :: username :: id :: Nil =>
+      swiss.api.disqualify(id, username).map(_ => s"Byebye $username from $id")
     case "gdpr" :: "erase" :: username :: "forever" :: Nil =>
       userRepo named username map {
         case None                       => "No such user."

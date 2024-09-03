@@ -16,6 +16,8 @@ import { RacerOpts, RacerData, RacerVm, RacerPrefs, Race, UpdatableData, RaceSta
 import { Role } from 'chessground/types';
 import { storedProp } from 'common/storage';
 
+const parseUciChess = parseUci('chess');
+
 export default class StormCtrl {
   private data: RacerData;
   private redraw: () => void;
@@ -35,6 +37,7 @@ export default class StormCtrl {
 
   constructor(opts: RacerOpts, redraw: (data: RacerData) => void) {
     this.data = opts.data;
+    const startsIn = this.data.startsIn || 0;
     this.race = this.data.race;
     this.pref = opts.pref;
     this.redraw = () => redraw(this.data);
@@ -44,7 +47,7 @@ export default class StormCtrl {
       moves: 0,
       errors: 0,
       current: new CurrentPuzzle(0, this.data.puzzles[0]),
-      clock: new Clock(config, Math.max(0, -opts.data.startsIn)),
+      clock: new Clock(config, Math.max(0, -startsIn)),
       history: [],
       combo: new Combo(config),
       modifier: {
@@ -52,7 +55,7 @@ export default class StormCtrl {
       },
     };
     this.vm = {
-      alreadyStarted: opts.data.startsIn && opts.data.startsIn <= 0,
+      alreadyStarted: startsIn <= 0,
     };
     this.countdown = new Countdown(this.run.clock, this.resetGround, () => setTimeout(this.redraw));
     this.promotion = makePromotion(this.withGround, this.cgOpts, this.redraw);
@@ -141,7 +144,7 @@ export default class StormCtrl {
       this.run.moves++;
       this.promotion.cancel();
       const pos = puzzle.position();
-      const move = parseUci(uci)!;
+      const move = parseUciChess(uci)!;
       let captureSound = pos.board.occupied.has(move.to);
       pos.play(move);
       if (pos.isCheckmate() || uci == puzzle.expectedMove()) {
@@ -159,7 +162,7 @@ export default class StormCtrl {
           if (!this.incPuzzle()) this.end();
         } else {
           puzzle.moveIndex++;
-          captureSound = captureSound || pos.board.occupied.has(parseUci(puzzle.line[puzzle.moveIndex]!)!.to);
+          captureSound = captureSound || pos.board.occupied.has(parseUciChess(puzzle.line[puzzle.moveIndex]!)!.to);
         }
         sound.move(captureSound);
       } else {

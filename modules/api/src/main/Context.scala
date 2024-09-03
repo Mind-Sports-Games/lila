@@ -54,7 +54,7 @@ sealed trait Context extends lila.user.UserContextWrapper {
   def nonce           = pageData.nonce
   def hasClas         = pageData.hasClas
 
-  def currentTheme = lila.pref.Theme.addMissingDefaultsIfAny(pref.theme) 
+  def currentTheme = lila.pref.Theme.addMissingDefaultsIfAny(pref.theme)
 
   def currentTheme3d = lila.pref.Theme3d(pref.theme3d)
 
@@ -68,6 +68,9 @@ sealed trait Context extends lila.user.UserContextWrapper {
     if (pref.bg == Pref.Bg.TRANSPARENT) "transp"
     else if (pref.bg == Pref.Bg.LIGHT) "light"
     else "dark"
+
+  def currentSelectedColorCls = Pref.Color.asString.get(pref.color).getOrElse(Pref.Color.default)
+  def currentSelectedColor    = s"selected-color-${currentSelectedColorCls}"
 
   lazy val mobileApiVersion = Mobile.Api requestVersion req
 

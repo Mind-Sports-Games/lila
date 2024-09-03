@@ -17,6 +17,8 @@ object bits {
     div(cls := "lobby__app__content")
   )
 
+  private val maxUnderboardRows = 10
+
   def underboards(
       tours: List[lila.tournament.Tournament],
       simuls: List[lila.simul.Simul],
@@ -53,11 +55,11 @@ object bits {
         div(cls := "lobby__box__content")(
           table(
             tbody(
-              tournamentWinners take 10 map { w =>
+              tournamentWinners take maxUnderboardRows map { w =>
                 tr(
                   td(userIdLink(w.userId.some)),
                   td(
-                    a(title := w.tourName, href := routes.Tournament.show(w.tourId))(
+                    a(cls := "color-choice", title := w.tourName, href := routes.Tournament.show(w.tourId))(
                       scheduledTournamentNameShortHtml(w.tourName)
                     )
                   )
@@ -73,7 +75,8 @@ object bits {
           span(cls := "more")(trans.more(), " »")
         ),
         div(cls := "enterable_list lobby__box__content")(
-          views.html.tournament.bits.enterable(tours)
+          views.html.tournament.bits
+            .enterable(truncateTournamentList(tours, maxUnderboardRows))
         )
       ),
       simuls.nonEmpty option div(cls := "lobby__simuls lobby__box")(
@@ -87,20 +90,31 @@ object bits {
       )
     )
 
+  private def truncateTournamentList(
+      tours: List[lila.tournament.Tournament],
+      maxTours: Int
+  ): List[lila.tournament.Tournament] = {
+    val numShields  = maxTours - tours.filterNot(_.isShield).size max 0
+    var shieldCount = 0
+    tours.filter { !_.isShield || { shieldCount += 1; shieldCount <= numShields } }.take(maxTours)
+  }
+
   def lastPosts(posts: List[lila.blog.MiniPost])(implicit ctx: Context): Option[Frag] =
     posts.nonEmpty option
       div(cls := "lobby__blog blog-post-cards")(
         posts map { post =>
           a(cls := "blog-post-card blog-post-card--link", href := routes.Blog.show(post.id, post.slug))(
-            img(
-              src := post.image,
-              cls := "blog-post-card__image",
-              widthA := 400,
-              heightA := 400 * 10 / 16
-            ),
-            span(cls := "blog-post-card__content")(
-              h2(cls := "blog-post-card__title")(post.title),
-              semanticDate(post.date)(ctx.lang)(cls := "blog-post-card__over-image")
+            div(cls := "blog-post-card__container")(
+              img(
+                src := post.image,
+                cls := "blog-post-card__image",
+                widthA := 400,
+                heightA := 400 * 10 / 16
+              ),
+              span(cls := "blog-post-card__content")(
+                h2(cls := "blog-post-card__title")(post.title),
+                semanticDate(post.date)(ctx.lang)(cls := "blog-post-card__over-image")
+              )
             )
           )
         }
@@ -167,20 +181,24 @@ object bits {
     )
 
   def spotlight(e: lila.event.Event)(implicit ctx: Context) =
-    a(
-      href := (if (e.isNow || !e.countdown) e.url else routes.Event.show(e.id).url),
-      cls := List(
-        s"tour-spotlight event-spotlight id_${e.id}" -> true,
-        "invert"                                     -> e.isNowOrSoon
-      )
-    )(
-      views.html.event.iconOf(e),
-      span(cls := "content")(
-        span(cls := "name")(e.title),
-        span(cls := "headline")(e.headline),
-        span(cls := "more")(
-          if (e.isNow) e.duringMessage.fold(trans.eventInProgress())(m => raw(m))
-          else e.beforeMessage.fold[Frag](momentFromNow(e.startsAt))(m => raw(m))
+    div(
+      a(
+        href := (if (e.isNow || !e.countdown) e.url else routes.Event.show(e.id).url),
+        cls := List(
+          s"tour-spotlight event-spotlight id_${e.id} ${ctx.currentSelectedColor}" -> true,
+          "invert"                                                                 -> e.isNowOrSoon,
+          "highlighted"                                                            -> (e.isNow || !e.countdown)
+        )
+      )(
+        if (e.isNow || !e.countdown) span(cls := "ribbon")(span("live")),
+        views.html.event.iconOf(e),
+        span(cls := "content")(
+          span(cls := "name")(e.title),
+          span(cls := "headline")(e.headline),
+          span(cls := "more")(
+            if (e.isNow) e.duringMessage.fold(trans.eventInProgress())(m => raw(m))
+            else e.beforeMessage.fold[Frag](momentFromNow(e.startsAt))(m => raw(m))
+          )
         )
       )
     )
@@ -217,7 +235,7 @@ object bits {
         div(cls := "game-icon-list", id := "game-icons-container")(
           variantsOrdered
             .map(v =>
-              a(cls := "game-icon", href := s"/variant/${v.key}")(
+              a(cls := "game-icon color-choice", href := s"/variant/${v.key}")(
                 i(cls := "img", dataIcon := v.perfIcon),
                 p(cls := "text")(VariantKeys.variantName(v))
               )

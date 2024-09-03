@@ -35,7 +35,7 @@ module.exports = function (ctrl) {
                 }, 300);
             },
           },
-          0
+          0,
         ),
       ]),
       m('p', util.withLinebreaks(ctrl.trans.noarg(stage.complete))),
@@ -47,7 +47,7 @@ module.exports = function (ctrl) {
                 href: '/' + next.id,
                 config: m.route,
               },
-              [ctrl.trans.noarg('next') + ': ', ctrl.trans.noarg(next.title) + ' ', m('i[data-icon=H]')]
+              [ctrl.trans.noarg('next') + ': ', ctrl.trans.noarg(next.title) + ' ', m('i[data-icon=H]')],
             )
           : null,
         m(
@@ -56,9 +56,9 @@ module.exports = function (ctrl) {
             href: '/',
             config: m.route,
           },
-          ctrl.trans.noarg('backToMenu')
+          ctrl.trans.noarg('backToMenu'),
         ),
       ]),
-    ])
+    ]),
   );
 };

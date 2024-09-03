@@ -70,7 +70,9 @@
     @include transition(background);
 
     &::before {
-      transition: margin $transition-duration, color $transition-duration;
+      transition:
+        margin $transition-duration,
+        color $transition-duration;
     }
 
     &::after {

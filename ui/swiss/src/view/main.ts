@@ -40,7 +40,7 @@ export default function (ctrl: SwissCtrl) {
             hook: onInsert(playstrategy.watchers),
           })
         : null,
-    ]
+    ],
   );
 }
 
@@ -109,7 +109,7 @@ function nextRound(ctrl: SwissCtrl): VNode | undefined {
           value: ctrl.data.nextRound?.at || '',
         },
         hook: onInsert((el: HTMLInputElement) =>
-          window['PlayStrategyFlatpickr'](el, {
+          window.PlayStrategyFlatpickr(el, {
             minDate: 'today',
             maxDate: new Date(Date.now() + 1000 * 3600 * 24 * 31),
             dateFormat: 'Z',
@@ -120,10 +120,10 @@ function nextRound(ctrl: SwissCtrl): VNode | undefined {
             onClose() {
               (el.parentNode as HTMLFormElement).submit();
             },
-          })
+          }),
         ),
       }),
-    ]
+    ],
   );
 }
 
@@ -138,7 +138,7 @@ function joinButton(ctrl: SwissCtrl): VNode | undefined {
           'data-icon': 'G',
         },
       },
-      ctrl.trans('signIn')
+      ctrl.trans('signIn'),
     );
 
   if (d.joinTeam)
@@ -150,7 +150,19 @@ function joinButton(ctrl: SwissCtrl): VNode | undefined {
           'data-icon': 'f',
         },
       },
-      'Join the team'
+      'Join the team',
+    );
+
+  if (!d.canJoin && d.status === 'created' && d.timeBeforeStartToJoin && !d.me)
+    return h(
+      'a.fbt.text',
+      {
+        attrs: {
+          title: `Join ${d.timeBeforeStartToJoin} before start (please refresh)`,
+          'data-icon': 'p',
+        },
+      },
+      'Wait',
     );
 
   if (d.canJoin)
@@ -168,10 +180,10 @@ function joinButton(ctrl: SwissCtrl): VNode | undefined {
                   if (p !== null) ctrl.join(p);
                 } else ctrl.join();
               },
-              ctrl.redraw
+              ctrl.redraw,
             ),
           },
-          ctrl.trans.noarg('join')
+          ctrl.trans.noarg('join'),
         );
 
   if (d.me && d.status != 'finished')
@@ -184,18 +196,18 @@ function joinButton(ctrl: SwissCtrl): VNode | undefined {
               attrs: dataIcon('G'),
               hook: bind('click', _ => ctrl.join(), ctrl.redraw),
             },
-            ctrl.trans.noarg('join')
+            ctrl.trans.noarg('join'),
           )
       : ctrl.joinSpinner
-      ? spinner()
-      : h(
-          'button.fbt.text',
-          {
-            attrs: dataIcon('b'),
-            hook: bind('click', ctrl.withdraw, ctrl.redraw),
-          },
-          ctrl.trans.noarg('withdraw')
-        );
+        ? spinner()
+        : h(
+            'button.fbt.text',
+            {
+              attrs: dataIcon('b'),
+              hook: bind('click', ctrl.withdraw, ctrl.redraw),
+            },
+            ctrl.trans.noarg('withdraw'),
+          );
 
   return;
 }
@@ -208,7 +220,7 @@ function joinTheGame(ctrl: SwissCtrl) {
         {
           attrs: { href: '/' + gameId },
         },
-        [ctrl.trans('youArePlaying'), h('br'), ctrl.trans('joinTheGame')]
+        [ctrl.trans('youArePlaying'), h('br'), ctrl.trans('joinTheGame')],
       )
     : undefined;
 }
@@ -217,7 +229,7 @@ function confetti(data: SwissData): VNode | undefined {
   return data.me && data.isRecentlyFinished && playstrategy.once('tournament.end.canvas.' + data.id)
     ? h('canvas#confetti', {
         hook: {
-          insert: _ => playstrategy.loadScript('javascripts/confetti.js'),
+          insert: _ => playstrategy.loadScriptCJS('javascripts/confetti.js'),
         },
       })
     : undefined;
@@ -247,7 +259,7 @@ function stats(ctrl: SwissCtrl): VNode | undefined {
                 href: `/swiss/${ctrl.data.id}/round/1`,
               },
             },
-            ctrl.trans('viewAllXRounds', ctrl.data.round)
+            ctrl.trans('viewAllXRounds', ctrl.data.round),
           ),
           h('br'),
           h(
@@ -259,7 +271,7 @@ function stats(ctrl: SwissCtrl): VNode | undefined {
                 download: true,
               },
             },
-            'Download TRF file'
+            'Download TRF file',
           ),
           h(
             'a.text',
@@ -270,7 +282,7 @@ function stats(ctrl: SwissCtrl): VNode | undefined {
                 download: true,
               },
             },
-            'Download all games'
+            'Download all games',
           ),
           h(
             'a.text',
@@ -281,7 +293,7 @@ function stats(ctrl: SwissCtrl): VNode | undefined {
                 download: true,
               },
             },
-            'Download results as NDJSON'
+            'Download results as NDJSON',
           ),
           h(
             'a.text',
@@ -292,7 +304,7 @@ function stats(ctrl: SwissCtrl): VNode | undefined {
                 download: true,
               },
             },
-            'Download results as CSV'
+            'Download results as CSV',
           ),
           h('br'),
           h(
@@ -303,7 +315,7 @@ function stats(ctrl: SwissCtrl): VNode | undefined {
                 href: 'https://playstrategy.org/api#tag/Swiss-tournaments',
               },
             },
-            'Swiss API documentation'
+            'Swiss API documentation',
           ),
         ]),
       ])

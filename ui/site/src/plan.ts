@@ -1,6 +1,6 @@
 import * as xhr from 'common/xhr';
 
-export default function (publicKey: string) {
+export default function PlayStrategyPlan(publicKey: string) {
   const stripe = window.Stripe(publicKey);
   $('.update-payment-method').on('click', () => {
     xhr.json('/patron/stripe/update-payment', { method: 'post' }).then(data => {
@@ -25,3 +25,5 @@ export default function (publicKey: string) {
 }
 
 const showError = (error: string) => alert(error);
+
+(window as any).PlayStrategyPlan = PlayStrategyPlan; // esbuild

@@ -3,6 +3,7 @@ import changeColorHandle from 'common/coordsColor';
 import * as xhr from 'common/xhr';
 
 import { Redraw, Open, bind, header, displayGameFamily, convertVariantKeyToGameFamily } from './util';
+import { gameFamily } from './common';
 
 type Theme = {
   name: string;
@@ -32,7 +33,7 @@ export function ctrl(
   trans: Trans,
   dimension: () => keyof ThemeData,
   redraw: Redraw,
-  open: Open
+  open: Open,
 ): ThemeCtrl {
   function dimensionData() {
     return data[dimension()];
@@ -77,33 +78,18 @@ export function view(ctrl: ThemeCtrl): VNode {
     h(
       'select',
       { attrs: { id: 'gameFamilyForTheme' } },
-      gameFamily.map(v => gameFamilyOption(v, sv))
+      gameFamily.map(v => gameFamilyOption(v, sv)),
     ),
     h('div.list', allThemes.map(themeView(currentTheme, dgf.list, ctrl.set))),
   ]);
 }
-
-const gameFamily: GameFamilyKey[] = [
-  'chess',
-  'draughts',
-  'loa',
-  'shogi',
-  'xiangqi',
-  'flipello',
-  'amazons',
-  'oware',
-  'togyzkumalak',
-  'go',
-  'backgammon',
-  'abalone',
-];
 
 function gameFamilyOption(v: GameFamilyKey, sv: string) {
   if (v === sv) {
     return h(
       'option',
       { attrs: { title: displayGameFamily(v), value: v, selected: 'selected' } },
-      displayGameFamily(v)
+      displayGameFamily(v),
     );
   } else {
     return h('option', { attrs: { title: displayGameFamily(v), value: v } }, displayGameFamily(v));
@@ -130,7 +116,7 @@ function themeView(current: Theme[], displayedThemes: Theme[], set: (t: Theme) =
         attrs: { title: t.name },
         class: { active: isActiveTheme(t, current), hidden: !displayedThemes.includes(t) },
       },
-      [h(`span.${t.gameFamily}-${t.name}`)]
+      [h(`span.${t.gameFamily}-${t.name}`)],
     );
 }
 

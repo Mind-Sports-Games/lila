@@ -20,6 +20,12 @@
     width: 100%;
     box-shadow: 0 3px 5px rgba(0, 0, 0, 0.3) inset;
     background: #888;
+
+    .analyse.variant-backgammon &,
+    .analyse.variant-nackgammon & {
+      box-shadow: none;
+      background: inherit;
+    }
   }
 
   &-c2 {

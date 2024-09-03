@@ -2,7 +2,9 @@ import flatpickr from 'flatpickr';
 
 playstrategy.load.then(() => {
   const $variant = $('#form3-variant'),
+    $rated = $('#form3-rated'),
     $medley = $('#form3-medley'),
+    $handicapped = $('#form3-handicaps_handicapped'),
     $drawTables = $('.form3 .drawTables'),
     $perPairingDrawTables = $('.form3 .perPairingDrawTables'),
     $onePerGameFamily = $('#form3-medleyDefaults_onePerGameFamily'),
@@ -12,12 +14,15 @@ playstrategy.load.then(() => {
     $playX = $('#form3-xGamesChoice_playX'),
     $useMatchScore = $('#form3-xGamesChoice_matchScore'),
     $useByoyomi = $('#form3-clock_useByoyomi'),
+    $useBronsteinDelay = $('#form3-clock_useBronsteinDelay'),
+    $useSimpleDelay = $('#form3-clock_useSimpleDelay'),
     showPosition = () =>
       $('.form3 .position').toggle(['0_1', '1_1'].includes($variant.val() as string) && !$medley.is(':checked')),
     showDrawTables = () =>
+      // NOTE: as this script is loaded both on /tournament/manager AND tournament/manager/<id>, $variant.val() could be undefined so I added "|| ''" for startsWith() to not create an error.
       $drawTables
         .add($perPairingDrawTables)
-        .toggle(($variant.val() as string).startsWith('1_') && !$medley.is(':checked')),
+        .toggle((($variant.val() as string) || '').startsWith('1_') && !$medley.is(':checked')),
     showMedleySettings = () => {
       $('.form3 .medleyMinutes').toggle($medley.is(':checked'));
       $('.form3 .medleyIntervalOptions').toggle($medley.is(':checked'));
@@ -28,9 +33,35 @@ playstrategy.load.then(() => {
       showPosition();
       showDrawTables();
     },
-    showByoyomiSettings = () => {
+    showInputRatings = () => {
+      $('.form3 .inputPlayerRatings').toggle($handicapped.is(':checked'));
+    },
+    hideByoyomiSettings = () => {
       $('.form3 .byoyomiClock').toggle($useByoyomi.is(':checked'));
       $('.form3 .byoyomiPeriods').toggle($useByoyomi.is(':checked'));
+    },
+    toggleDelayIncrement = () => {
+      const useDelay = $useBronsteinDelay.is(':checked') || $useSimpleDelay.is(':checked');
+      $('.form3 .clockDelay').toggle(useDelay);
+      $('.form3 .clockIncrement').toggle(!useDelay);
+    },
+    toggleByoyomiSettings = () => {
+      toggleDelayIncrement();
+      $useBronsteinDelay.prop('checked', false);
+      $useSimpleDelay.prop('checked', false);
+      hideByoyomiSettings();
+    },
+    toggleBronstein = () => {
+      toggleDelayIncrement();
+      $useByoyomi.prop('checked', false);
+      hideByoyomiSettings();
+      $useSimpleDelay.prop('checked', false);
+    },
+    toggleSimpleDelay = () => {
+      toggleDelayIncrement();
+      $useByoyomi.prop('checked', false);
+      hideByoyomiSettings();
+      $useBronsteinDelay.prop('checked', false);
     },
     matchSelectors = (selector1: Selector, selector2: Selector) => {
       const $sel1 = $(selector1);
@@ -69,6 +100,12 @@ playstrategy.load.then(() => {
 
   $variant.on('change', showPosition);
   $variant.on('change', showDrawTables);
+  $handicapped.on('change', () => {
+    toggleOff($medley);
+    toggleOff($rated);
+    showMedleySettings();
+    showInputRatings();
+  });
   $drawTables.on('change', () => toggleOff('#form3-perPairingDrawTables'));
   $perPairingDrawTables.on('change', () => toggleOff('#form3-drawTables'));
   $medley.on('change', showMedleySettings);
@@ -76,7 +113,7 @@ playstrategy.load.then(() => {
   $exoticChessVariants.on('change', toggleChessVariants);
   $draughts64Variants.on('change', toggleDraughts64Variants);
   showMedleySettings();
-
+  showInputRatings();
   $bestOfX.on('change', () => {
     toggleOff($playX);
     toggleOff($useMatchScore);
@@ -84,8 +121,11 @@ playstrategy.load.then(() => {
   $playX.on('change', () => toggleOff($bestOfX));
   $playX.on('change', () => matchSelectors($playX, $useMatchScore));
 
-  $useByoyomi.on('change', showByoyomiSettings);
-  showByoyomiSettings();
+  $useByoyomi.on('change', toggleByoyomiSettings);
+  $useBronsteinDelay.on('change', toggleBronstein);
+  $useSimpleDelay.on('change', toggleSimpleDelay);
+  hideByoyomiSettings();
+  toggleDelayIncrement();
 
   $('form .conditions a.show').on('click', function (this: HTMLAnchorElement) {
     $(this).remove();

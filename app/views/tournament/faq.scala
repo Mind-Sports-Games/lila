@@ -25,7 +25,9 @@ object faq {
       )
     }
 
-  def apply(rated: Option[Boolean] = None, privateId: Option[String] = None)(implicit ctx: Context) =
+  def apply(rated: Option[Boolean] = None, handicapped: Boolean = false, privateId: Option[String] = None)(
+      implicit ctx: Context
+  ) =
     frag(
       privateId.map { id =>
         frag(
@@ -40,6 +42,8 @@ object faq {
         case Some(false) => p(trans.arena.isNotRated())
         case None        => p(trans.arena.someRated())
       },
+      if (handicapped) h2(trans.arena.isItHandicapped()),
+      if (handicapped) p(trans.arena.isHandicapped()),
       h2(howAreScoresCalculated()),
       p(howAreScoresCalculatedAnswer()),
       h2(berserk()),

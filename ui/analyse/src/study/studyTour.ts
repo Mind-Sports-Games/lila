@@ -3,7 +3,7 @@ import { Tab } from './interfaces';
 
 export function study(ctrl: AnalyseCtrl) {
   if (!ctrl.study?.data.chapter.gamebook)
-    playstrategy.loadScript('javascripts/study/tour.js').then(() => {
+    playstrategy.loadScriptCJS('javascripts/study/tour.js').then(() => {
       window.playstrategy['studyTour']({
         userId: ctrl.opts.userId,
         isContrib: ctrl.study!.members.canContribute(),
@@ -17,7 +17,7 @@ export function study(ctrl: AnalyseCtrl) {
 }
 
 export function chapter(setTab: (tab: string) => void) {
-  playstrategy.loadScript('javascripts/study/tour-chapter.js').then(() => {
+  playstrategy.loadScriptCJS('javascripts/study/tour-chapter.js').then(() => {
     window.playstrategy['studyTourChapter']({
       setTab,
     });

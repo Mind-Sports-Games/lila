@@ -2,7 +2,7 @@ import * as xhr from 'common/xhr';
 import debounce from 'common/debounce';
 import spinnerHtml from './component/spinner';
 
-export function loginStart() {
+function loginStart() {
   const selector = '.auth-login form';
 
   (function load() {
@@ -46,7 +46,7 @@ export function loginStart() {
   })();
 }
 
-export function signupStart() {
+function signupStart() {
   const $form = $('#signup-form'),
     $exists = $form.find('.username-exists'),
     $username = $form.find('input[name="username"]').on('change keyup paste', () => {
@@ -57,7 +57,7 @@ export function signupStart() {
   const usernameCheck = debounce(() => {
     const name = $username.val() as string;
     if (name.length >= 3)
-      xhr.json(xhr.url('/player/autocomplete', { term: name, exists: 1 })).then(res => $exists.toggle(res));
+      xhr.json(xhr.url('/api/player/autocomplete', { term: name, exists: 1 })).then(res => $exists.toggle(res));
   }, 300);
 
   $form.on('submit', () => {
@@ -78,5 +78,10 @@ export function signupStart() {
 
   playstrategy
     .loadModule('passwordComplexity')
-    .then(() => window['passwordComplexity'].addPasswordChangeListener('form3-password'));
+    .then(() => window.PlayStrategyPassword.addPasswordChangeListener('form3-password'));
 }
+
+(window as any).PlayStrategyLogin = {
+  loginStart,
+  signupStart,
+}; // esbuild

@@ -1,6 +1,6 @@
 package lila.swiss
 
-import strategygames.{ P2, Player => PlayerIndex, P1, GameLogic }
+import strategygames.{ P2, Player => PlayerIndex, P1, GameLogic, GameFamily }
 import strategygames.variant.Variant
 import strategygames.format.FEN
 import strategygames.draughts.variant.{ Variant => DraughtsVariant }
@@ -9,7 +9,7 @@ import scala.util.chaining._
 import scala.util.Random
 
 import lila.db.dsl._
-import lila.game.Game
+import lila.game.{ Game, Handicaps }
 import lila.user.User
 
 final private class SwissDirector(
@@ -54,23 +54,41 @@ final private class SwissDirector(
               colls.player.list[SwissPlayer]($doc(f.swissId -> swiss.id))
             }
             ids <- idGenerator.games(pendingPairings.size)
-            pairings = pendingPairings.zip(ids).map { case (SwissPairing.Pending(w, b), id) =>
-              SwissPairing(
-                id = id,
-                swissId = swiss.id,
-                round = swiss.round,
-                p1 = w,
-                p2 = b,
-                status = Left(SwissPairing.Ongoing),
-                matchStatus = Left(SwissPairing.Ongoing),
-                None,
-                isMatchScore = swiss.settings.isMatchScore,
-                isBestOfX = swiss.settings.isBestOfX,
-                isPlayX = swiss.settings.isPlayX,
-                nbGamesPerRound = swiss.settings.nbGamesPerRound,
-                if (randomPairingPos) randomPos().orElse(perRoundPos) else perRoundPos,
-                swiss.roundVariant.some
-              )
+            pairings = pendingPairings.zip(ids).map {
+              case (SwissPairing.Pending(w, b), id) => {
+                //weaker player must be p1 in handicap go games
+                val wRating =
+                  players.filter(_.userId == w).map(_.actualRating).headOption.getOrElse(1500)
+                val bRating =
+                  players.filter(_.userId == b).map(_.actualRating).headOption.getOrElse(1500)
+                val p1Id = if (wRating <= bRating) w else b
+                val p2Id = if (wRating <= bRating) b else w
+
+                SwissPairing(
+                  id = id,
+                  swissId = swiss.id,
+                  round = swiss.round,
+                  p1 = if (swiss.settings.handicapped) p1Id else w,
+                  p2 = if (swiss.settings.handicapped) p2Id else b,
+                  bbpPairingP1 = w,
+                  status = Left(SwissPairing.Ongoing),
+                  matchStatus = Left(SwissPairing.Ongoing),
+                  None,
+                  isMatchScore = swiss.settings.isMatchScore,
+                  isBestOfX = swiss.settings.isBestOfX,
+                  isPlayX = swiss.settings.isPlayX,
+                  nbGamesPerRound = swiss.settings.nbGamesPerRound,
+                  if (swiss.settings.handicapped)
+                    Handicaps.startingFen(
+                      swiss.roundVariant.some,
+                      if (p1Id == w) wRating else bRating,
+                      if (p2Id == w) wRating else bRating
+                    )
+                  else if (randomPairingPos) randomPos().orElse(perRoundPos)
+                  else perRoundPos,
+                  swiss.roundVariant.some
+                )
+              }
             }
             _ <-
               colls.swiss.update
@@ -139,14 +157,22 @@ final private class SwissDirector(
         p1Player = makePlayer(
           P1,
           players.get(
-            if (rematch && pairing.multiMatchGameIds.fold(false)(ids => ids.size % 2 == 1)) pairing.p2
+            if (
+              rematch && pairing.multiMatchGameIds
+                .fold(false)(ids => ids.size % 2 == 1) && swiss.roundVariant.gameLogic != GameLogic
+                .Backgammon() && !swiss.settings.handicapped
+            ) pairing.p2
             else pairing.p1
           ) err s"Missing pairing p1 $pairing"
         ),
         p2Player = makePlayer(
           P2,
           players.get(
-            if (rematch && pairing.multiMatchGameIds.fold(false)(ids => ids.size % 2 == 1)) pairing.p1
+            if (
+              rematch && pairing.multiMatchGameIds
+                .fold(false)(ids => ids.size % 2 == 1) && swiss.roundVariant.gameLogic != GameLogic
+                .Backgammon() && !swiss.settings.handicapped
+            ) pairing.p1
             else pairing.p2
           ) err s"Missing pairing p2 $pairing"
         ),
@@ -161,8 +187,15 @@ final private class SwissDirector(
       )
       .withId(if (rematch) pairing.multiMatchGameIds.fold(pairing.gameId)(l => l.last) else pairing.id)
       .withSwissId(swiss.id.value)
+      .withHandicappedTournament(swiss.settings.handicapped)
       .start
 
   private def makePlayer(playerIndex: PlayerIndex, player: SwissPlayer) =
-    lila.game.Player.make(playerIndex, player.userId, player.rating, player.provisional)
+    lila.game.Player.make(
+      playerIndex,
+      player.userId,
+      player.actualRating,
+      player.inputRating.fold(player.provisional)(_ => false),
+      player.inputRating.fold(false)(_ => true)
+    )
 }

@@ -99,6 +99,10 @@
     padding: 0 $block-gap;
     white-space: nowrap;
 
+    &:has(delay) {
+      padding: 0 $block-gap-half;
+    }
+
     /* ensure updates don't redraw other parts of the document */
     will-change: transform;
     z-index: -1;
@@ -141,6 +145,10 @@
     font-size: 1.6em;
     letter-spacing: inherit;
 
+    @include breakpoint($mq-col1) {
+      font-size: 1.12em;
+    }
+
     @include breakpoint($mq-col2) {
       line-height: 1.5em;
     }
@@ -174,9 +182,24 @@
     }
   }
 
+  delay {
+    font-size: 70%;
+    margin-bottom: -0.18em;
+    padding-left: $block-gap-half;
+
+    @include breakpoint($mq-col1) {
+      margin-bottom: 0em;
+      padding-top: 0.18em;
+    }
+  }
+
   &.running .time {
     background: mix($c-secondary, $c-bg-box, 30%);
     color: $c-font-clearer;
+  }
+
+  &.running .time.notindelay {
+    background: mix($c-accent, $c-bg-box, 30%);
   }
 
   &.emerg .time,

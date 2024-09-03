@@ -2,12 +2,11 @@ package lila.round
 
 import strategygames.format.Forsyth
 import strategygames.format.FEN
+import strategygames.format.Uci
 import strategygames.chess.variant._
 import strategygames.variant.Variant
 import strategygames.{
   P2,
-  Clock,
-  FischerClock,
   GameFamily,
   GameLogic,
   Player => PlayerIndex,
@@ -164,7 +163,8 @@ final private class Rematcher(
           Board(game.variant.gameLogic, pieces, variant = game.variant).withHistory(
             History(
               game.variant.gameLogic,
-              lastMove = situation.flatMap(_.situation.board.history.lastMove),
+              lastTurn = situation.fold[List[Uci]](List.empty)(_.situation.board.history.lastTurn),
+              currentTurn = situation.fold[List[Uci]](List.empty)(_.situation.board.history.currentTurn),
               castles = situation.fold(Castles.init)(_.situation.board.history.castles)
             )
           )
@@ -197,12 +197,38 @@ final private class Rematcher(
   }
 
   private def returnPlayer(game: Game, playerIndex: PlayerIndex, users: List[User]): lila.game.Player =
-    game.opponent(playerIndex).aiLevel match {
-      case Some(ai) => lila.game.Player.make(playerIndex, ai.some)
-      case None =>
+    (game.opponent(playerIndex).aiLevel, game.player(playerIndex).aiLevel, game.swapPlayersOnRematch) match {
+      case (Some(ai), Some(_), _) => lila.game.Player.make(playerIndex, ai.some)
+      case (Some(ai), None, true) => lila.game.Player.make(playerIndex, ai.some)
+      case (Some(_), None, false) =>
+        lila.game.Player.make(
+          playerIndex,
+          game.player(playerIndex).userId.flatMap { id =>
+            users.find(_.id == id)
+          },
+          PerfPicker.mainOrDefault(game)
+        )
+      case (None, Some(_), true) =>
         lila.game.Player.make(
           playerIndex,
           game.opponent(playerIndex).userId.flatMap { id =>
+            users.find(_.id == id)
+          },
+          PerfPicker.mainOrDefault(game)
+        )
+      case (None, Some(ai), false) => lila.game.Player.make(playerIndex, ai.some)
+      case (None, None, true) =>
+        lila.game.Player.make(
+          playerIndex,
+          game.opponent(playerIndex).userId.flatMap { id =>
+            users.find(_.id == id)
+          },
+          PerfPicker.mainOrDefault(game)
+        )
+      case (None, None, false) =>
+        lila.game.Player.make(
+          playerIndex,
+          game.player(playerIndex).userId.flatMap { id =>
             users.find(_.id == id)
           },
           PerfPicker.mainOrDefault(game)
@@ -212,9 +238,10 @@ final private class Rematcher(
   private def redirectEvents(game: Game): Events = {
     val p1Id = game fullIdOf P1
     val p2Id = game fullIdOf P2
+
     List(
-      Event.RedirectOwner(P1, p2Id, AnonCookie.json(game pov P2)),
-      Event.RedirectOwner(P2, p1Id, AnonCookie.json(game pov P1)),
+      Event.RedirectOwner(if (game.swapPlayersOnRematch) P1 else P2, p2Id, AnonCookie.json(game pov P2)),
+      Event.RedirectOwner(if (game.swapPlayersOnRematch) P2 else P1, p1Id, AnonCookie.json(game pov P1)),
       // tell spectators about the rematch
       Event.RematchTaken(game.id)
     )

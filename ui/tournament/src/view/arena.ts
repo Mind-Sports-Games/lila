@@ -8,11 +8,11 @@ import * as pagination from '../pagination';
 
 const scoreTagNames = ['score', 'streak', 'double'];
 
-function scoreTag(s) {
+function scoreTag(s: any) {
   return h(scoreTagNames[(s[1] || 1) - 1], [Array.isArray(s) ? s[0] : s]);
 }
 
-function playerTr(ctrl: TournamentController, player) {
+function playerTr(ctrl: TournamentController, player: any) {
   const userId = player.name.toLowerCase(),
     nbScores = player.sheet.scores.length;
   const battle = ctrl.data.teamBattle;
@@ -25,6 +25,7 @@ function playerTr(ctrl: TournamentController, player) {
         long: nbScores > 35,
         xlong: nbScores > 80,
         active: ctrl.playerInfo.id === userId,
+        dq: player.disqualified,
       },
       hook: bind('click', _ => ctrl.showPlayerInfo(player), ctrl.redraw),
     },
@@ -38,7 +39,7 @@ function playerTr(ctrl: TournamentController, player) {
                 title: ctrl.trans.noarg('pause'),
               },
             })
-          : player.rank
+          : player.rank,
       ),
       h('td.player', [
         renderPlayer(player, false, !ctrl.data.medley, true, userId === ctrl.data.defender),
@@ -50,25 +51,27 @@ function playerTr(ctrl: TournamentController, player) {
           ? h('strong.is-gold', { attrs: dataIcon('Q') }, player.sheet.total)
           : h('strong', player.sheet.total),
       ]),
-    ]
+    ],
   );
 }
 
-function podiumUsername(p) {
+function podiumUsername(p: any) {
   return h(
     'a.text.ulpt.user-link',
     {
       attrs: { href: '/@/' + p.name },
     },
-    playerName(p)
+    playerName(p),
   );
 }
 
-function podiumStats(p, berserkable, isMedley, trans: Trans): VNode {
+function podiumStats(p, berserkable, isMedley, isHandicapped, trans: Trans): VNode {
   const noarg = trans.noarg,
     nb = p.nb;
   return h('table.stats', [
-    p.performance && !isMedley ? h('tr', [h('th', noarg('performance')), h('td', p.performance)]) : null,
+    p.performance && !isMedley && !isHandicapped
+      ? h('tr', [h('th', noarg('performance')), h('td', p.performance)])
+      : null,
     h('tr', [h('th', noarg('gamesPlayed')), h('td', nb.game)]),
     ...(nb.game
       ? [
@@ -85,21 +88,27 @@ function podiumTrophy(img: string): VNode {
       'div',
       h('img.customTrophy', {
         attrs: { src: playstrategy.assetUrl('images/trophy/' + img + '.png') },
-      })
+      }),
     );
   } else return h('div.trophy');
 }
 
 function podiumPosition(
-  p,
+  p: any,
   pos: string,
   trophyImg: string,
-  berserkable,
+  berserkable: any,
   isMedley: boolean,
-  trans: Trans
+  isHandicapped: boolean,
+  trans: Trans,
 ): VNode | undefined {
   if (p)
-    return h('div.' + pos, [podiumTrophy(trophyImg), podiumUsername(p), podiumStats(p, berserkable, isMedley, trans)]);
+    return h('div.' + pos, [
+      podiumTrophy(trophyImg),
+      podiumUsername(p),
+      podiumStats(p, berserkable, isMedley, isHandicapped, trans),
+    ]);
+  return undefined;
 }
 
 let lastBody: MaybeVNodes | undefined;
@@ -107,9 +116,33 @@ let lastBody: MaybeVNodes | undefined;
 export function podium(ctrl: TournamentController) {
   const p = ctrl.data.podium || [];
   return h('div.podium', [
-    podiumPosition(p[1], 'second', ctrl.data.trophy2nd, ctrl.data.berserkable, ctrl.data.medley, ctrl.trans),
-    podiumPosition(p[0], 'first', ctrl.data.trophy1st, ctrl.data.berserkable, ctrl.data.medley, ctrl.trans),
-    podiumPosition(p[2], 'third', ctrl.data.trophy3rd, ctrl.data.berserkable, ctrl.data.medley, ctrl.trans),
+    podiumPosition(
+      p[1],
+      'second',
+      ctrl.data.trophy2nd,
+      ctrl.data.berserkable,
+      ctrl.data.medley,
+      ctrl.data.isHandicapped,
+      ctrl.trans,
+    ),
+    podiumPosition(
+      p[0],
+      'first',
+      ctrl.data.trophy1st,
+      ctrl.data.berserkable,
+      ctrl.data.medley,
+      ctrl.data.isHandicapped,
+      ctrl.trans,
+    ),
+    podiumPosition(
+      p[2],
+      'third',
+      ctrl.data.trophy3rd,
+      ctrl.data.berserkable,
+      ctrl.data.medley,
+      ctrl.data.isHandicapped,
+      ctrl.trans,
+    ),
   ]);
 }
 
@@ -117,12 +150,12 @@ function preloadUserTips(el: HTMLElement) {
   playstrategy.powertip.manualUserIn(el);
 }
 
-export function controls(ctrl: TournamentController, pag): VNode {
+export function controls(ctrl: TournamentController, pag: any): VNode {
   return h('div.tour__controls', [h('div.pager', pagination.renderPager(ctrl, pag)), button.joinWithdraw(ctrl)]);
 }
 
-export function standing(ctrl: TournamentController, pag, klass?: string): VNode {
-  const tableBody = pag.currentPageResults ? pag.currentPageResults.map(res => playerTr(ctrl, res)) : lastBody;
+export function standing(ctrl: TournamentController, pag: any, klass?: string): VNode {
+  const tableBody = pag.currentPageResults ? pag.currentPageResults.map((res: any) => playerTr(ctrl, res)) : lastBody;
   if (pag.currentPageResults) lastBody = tableBody;
   return h(
     'table.slist.tour__standing' + (klass ? '.' + klass : ''),
@@ -140,8 +173,8 @@ export function standing(ctrl: TournamentController, pag, klass?: string): VNode
             },
           },
         },
-        tableBody
+        tableBody,
       ),
-    ]
+    ],
   );
 }

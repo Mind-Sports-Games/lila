@@ -2,6 +2,7 @@
   "name": "analyse",
   "version": "2.0.0",
   "private": true,
+  "type": "module",
   "description": "playstrategy.org analysis board",
   "keywords": [
     "chess",
@@ -13,31 +14,39 @@
   ],
   "author": "Thibault Duplessis",
   "license": "AGPL-3.0-or-later",
-  "devDependencies": {
-    "@build/rollupProject": "2.0.0",
-    "@types/debounce-promise": "^3.1.3",
-    "@types/playstrategy": "2.0.0",
-    "@types/yaireo__tagify": "^4.0.1"
-  },
   "dependencies": {
-    "@badrap/result": "^0.2.8",
-    "@yaireo/tagify": "^4.0.5",
-    "ceval": "2.0.0",
-    "chat": "2.0.0",
-    "chessground": "git+ssh://git@github.com:Mind-Sports-Games/chessground.git#222-monsterchess",
-    "common": "2.0.0",
-    "draughtsground": "^7.6",
-    "game": "2.0.0",
-    "nvui": "2.0.0",
+    "@badrap/result": "0.2.8",
+    "@types/debounce-promise": "^3.1.3",
+    "@types/highcharts": "=4.2.57",
+    "@types/node": "20.12.2",
+    "@types/yaireo__tagify": "^4.0.1",
+    "@yaireo/tagify": "4.6.0",
+    "ceval": "workspace:*",
+    "chat": "workspace:*",
+    "common": "workspace:*",
+    "debounce-promise": "^3.1.2",
+    "draughtsground": "workspace:*",
+    "game": "workspace:*",
+    "highcharts": "=4.2.5",
+    "nvui": "workspace:*",
+    "prop-types": "^15.7.2",
     "snabbdom": "^3.0.1",
-    "stratops": "git+ssh://git@github.com:Mind-Sports-Games/stratops.git#222-monsterchess",
-    "stratutils": "2.0.0",
-    "tree": "2.0.0"
+    "stratutils": "workspace:*",
+    "tree": "workspace:*"
   },
   "scripts": {
-    "dev": "rollup --config",
-    "prod": "rollup --config --config-prod",
-    "plugin-dev": "rollup --config --config-plugin",
-    "plugin-prod": "rollup --config --config-prod --config-plugin"
+    "compile": "tsc",
+    "dev": "tsc",
+    "prod": "tsc"
+  },
+  "playstrategy": {
+    "bundles": [
+      "src/analysisBoard.ts",
+      "src/plugins/analyse.nvui.ts",
+      "src/plugins/analyse.study.topic.form.ts"
+    ],
+    "sync": {
+      "node_modules/@yaireo/tagify/dist/tagify.min.js": "public/npm/tagify"
+    }
   }
 }

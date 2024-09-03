@@ -31,7 +31,7 @@ export const possiblePromotion = (
   chessground: ChessgroundApi,
   orig: Key,
   dest: Key,
-  variant: VariantKey
+  variant: VariantKey,
 ): boolean | undefined => {
   const piece = chessground.state.pieces.get(dest),
     premovePiece = chessground.state.pieces.get(orig);
@@ -45,10 +45,13 @@ export const possiblePromotion = (
     case 'flipello10':
     case 'flipello':
     case 'amazons':
+    case 'breakthroughtroyka':
+    case 'minibreakthroughtroyka':
     case 'go9x9':
     case 'go13x13':
     case 'go19x19':
     case 'backgammon':
+    case 'nackgammon':
     case 'abalone':
       return false;
     case 'shogi':

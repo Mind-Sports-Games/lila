@@ -1,6 +1,6 @@
 package lila.swiss
 
-import strategygames.{ ByoyomiClock, ClockConfig, FischerClock }
+import strategygames.{ ByoyomiClock, Clock, ClockConfig }
 import strategygames.format.FEN
 import strategygames.variant.Variant
 import strategygames.{ GameFamily, GameGroup, GameLogic }
@@ -11,49 +11,20 @@ import play.api.Mode
 import scala.concurrent.duration._
 
 import lila.common.Form._
+import lila.common.Clock._
 
 final class SwissForm(implicit mode: Mode) {
 
   import SwissForm._
 
-  // Yes, I know this is kinda gross. :'(
-  private def valuesFromClockConfig(c: ClockConfig): Option[(Boolean, Int, Int, Option[Int], Option[Int])] =
-    c match {
-      case fc: FischerClock.Config => {
-        FischerClock.Config.unapply(fc).map(t => (false, t._1, t._2, None, None))
-      }
-      case bc: ByoyomiClock.Config => {
-        ByoyomiClock.Config.unapply(bc).map(t => (true, t._1, t._2, Some(t._3), Some(t._4)))
-      }
-    }
-
-  // Yes, I know this is kinda gross. :'(
-  private def clockConfigFromValues(
-      useByoyomi: Boolean,
-      limit: Int,
-      increment: Int,
-      byoyomi: Option[Int],
-      periods: Option[Int]
-  ): ClockConfig =
-    (useByoyomi, byoyomi, periods) match {
-      case (true, Some(byoyomi), Some(periods)) =>
-        ByoyomiClock.Config(limit, increment, byoyomi, periods)
-      case _ =>
-        FischerClock.Config(limit, increment)
-    }
-
   def form(minRounds: Int = 3) =
     Form(
       mapping(
         "name" -> optional(eventName(2, 36)),
-        "clock" -> mapping[ClockConfig, Boolean, Int, Int, Option[Int], Option[Int]](
-          "useByoyomi" -> boolean,
-          "limit"      -> number.verifying(clockLimits.contains _),
-          "increment"  -> number(min = 0, max = 120),
-          "byoyomi"    -> optional(number.verifying(byoyomiLimits.contains _)),
-          "periods"    -> optional(number(min = 0, max = 5))
-        )(clockConfigFromValues)(valuesFromClockConfig)
-          .verifying("Invalid clock", _.estimateTotalSeconds > 0),
+        "clock" -> clockConfigMappingsSeconds(clockLimits, byoyomiLimits).verifying(
+          "Invalid clock",
+          _.estimateTotalSeconds > 0
+        ),
         "startsAt" -> optional(inTheFuture(ISODateTimeOrTimestamp.isoDateTimeOrTimestamp)),
         "variant" -> optional(
           nonEmptyText.verifying(v =>
@@ -67,17 +38,23 @@ final class SwissForm(implicit mode: Mode) {
           "draughts64Variants"  -> optional(boolean)
         )(MedleyDefaults.apply)(MedleyDefaults.unapply),
         "medleyGameFamilies" -> mapping(
-          "chess"    -> optional(boolean),
-          "draughts" -> optional(boolean),
-          "shogi"    -> optional(boolean),
-          "xiangqi"  -> optional(boolean),
-          "loa"      -> optional(boolean),
-          "flipello" -> optional(boolean),
-          "mancala"  -> optional(boolean),
-          "amazons"  -> optional(boolean),
-          "go"       -> optional(boolean)
+          "chess"              -> optional(boolean),
+          "draughts"           -> optional(boolean),
+          "shogi"              -> optional(boolean),
+          "xiangqi"            -> optional(boolean),
+          "loa"                -> optional(boolean),
+          "flipello"           -> optional(boolean),
+          "mancala"            -> optional(boolean),
+          "amazons"            -> optional(boolean),
+          "breakthroughtroyka" -> optional(boolean),
+          "go"                 -> optional(boolean),
+          "backgammon"         -> optional(boolean)
         )(MedleyGameFamilies.apply)(MedleyGameFamilies.unapply),
         "rated" -> optional(boolean),
+        "handicaps" -> mapping(
+          "handicapped"        -> optional(boolean),
+          "inputPlayerRatings" -> optional(cleanNonEmptyText)
+        )(Handicaps.apply)(Handicaps.unapply),
         "xGamesChoice" -> mapping(
           "bestOfX"    -> optional(boolean),
           "playX"      -> optional(boolean),
@@ -87,17 +64,20 @@ final class SwissForm(implicit mode: Mode) {
             max = SwissBounds.maxGamesPerRound
           )
         )(XGamesChoice.apply)(XGamesChoice.unapply),
-        "nbRounds"             -> number(min = minRounds, max = SwissBounds.maxRounds),
-        "description"          -> optional(cleanNonEmptyText),
-        "drawTables"           -> optional(boolean),
-        "perPairingDrawTables" -> optional(boolean),
-        "position"             -> optional(lila.common.Form.fen.playableStrict),
-        "chatFor"              -> optional(numberIn(chatForChoices.map(_._1))),
-        "roundInterval"        -> optional(numberIn(roundIntervals)),
-        "password"             -> optional(cleanNonEmptyText),
-        "conditions"           -> SwissCondition.DataForm.all,
-        "forbiddenPairings"    -> optional(cleanNonEmptyText)
+        "nbRounds"                 -> number(min = minRounds, max = SwissBounds.maxRounds),
+        "description"              -> optional(cleanNonEmptyText),
+        "drawTables"               -> optional(boolean),
+        "perPairingDrawTables"     -> optional(boolean),
+        "position"                 -> optional(lila.common.Form.fen.playableStrict),
+        "chatFor"                  -> optional(numberIn(chatForChoices.map(_._1))),
+        "roundInterval"            -> optional(numberIn(roundIntervals)),
+        "halfwayBreak"             -> optional(numberIn(halfwayBreakOptions)),
+        "password"                 -> optional(cleanNonEmptyText),
+        "conditions"               -> SwissCondition.DataForm.all,
+        "forbiddenPairings"        -> optional(cleanNonEmptyText),
+        "minutesBeforeStartToJoin" -> optional(numberIn(timeBeforeStartToJoinOptions))
       )(SwissData.apply)(SwissData.unapply)
+        .verifying("Invalid clock", _.validClock)
         .verifying("15s and 0+1 variant games cannot be rated", _.validRatedVariant)
         .verifying(
           "must have > 1 game per round if using 'Best of X' or 'Play X' options",
@@ -111,12 +91,13 @@ final class SwissForm(implicit mode: Mode) {
           "Best of x or Play x and Match Score can only be used if number of games per round is greater than 1",
           _.validNumberofGames
         )
+        .verifying("Hanidcapped mode requires a Go variant, non-rated and non-meldey", _.validHandicapped)
     )
 
   def create =
     form() fill SwissData(
       name = none,
-      clock = FischerClock.Config(180, 0),
+      clock = Clock.Config(180, 0),
       startsAt = Some(DateTime.now plusSeconds {
         if (mode == Mode.Prod) 60 * 10 else 20
       }),
@@ -136,9 +117,15 @@ final class SwissForm(implicit mode: Mode) {
         flipello = true.some,
         mancala = true.some,
         amazons = true.some,
-        go = true.some
+        breakthroughtroyka = true.some,
+        go = true.some,
+        backgammon = true.some
       ),
       rated = true.some,
+      handicaps = Handicaps(
+        handicapped = false.some,
+        inputPlayerRatings = none
+      ),
       xGamesChoice = XGamesChoice(
         bestOfX = false.some,
         playX = false.some,
@@ -152,9 +139,11 @@ final class SwissForm(implicit mode: Mode) {
       position = none,
       chatFor = Swiss.ChatFor.default.some,
       roundInterval = Swiss.RoundInterval.auto.some,
+      halfwayBreak = None,
       password = None,
       conditions = SwissCondition.DataForm.AllSetup.default,
-      forbiddenPairings = none
+      forbiddenPairings = none,
+      minutesBeforeStartToJoin = none
     )
 
   def edit(s: Swiss) =
@@ -178,9 +167,16 @@ final class SwissForm(implicit mode: Mode) {
         flipello = gameGroupInMedley(s.settings.medleyVariants, GameGroup.Flipello()).some,
         mancala = gameGroupInMedley(s.settings.medleyVariants, GameGroup.Mancala()).some,
         amazons = gameGroupInMedley(s.settings.medleyVariants, GameGroup.Amazons()).some,
-        go = gameGroupInMedley(s.settings.medleyVariants, GameGroup.Go()).some
+        breakthroughtroyka =
+          gameGroupInMedley(s.settings.medleyVariants, GameGroup.BreakthroughTroyka()).some,
+        go = gameGroupInMedley(s.settings.medleyVariants, GameGroup.Go()).some,
+        backgammon = gameGroupInMedley(s.settings.medleyVariants, GameGroup.Backgammon()).some
       ),
       rated = s.settings.rated.some,
+      handicaps = Handicaps(
+        handicapped = s.settings.handicapped.some,
+        inputPlayerRatings = s.settings.inputPlayerRatings.some.filter(_.nonEmpty)
+      ),
       xGamesChoice = XGamesChoice(
         bestOfX = s.settings.isBestOfX.some,
         playX = s.settings.isPlayX.some,
@@ -194,9 +190,11 @@ final class SwissForm(implicit mode: Mode) {
       position = s.settings.position,
       chatFor = s.settings.chatFor.some,
       roundInterval = s.settings.roundInterval.toSeconds.toInt.some,
+      halfwayBreak = s.settings.halfwayBreak.toSeconds.toInt.some,
       password = s.settings.password,
       conditions = SwissCondition.DataForm.AllSetup(s.settings.conditions),
-      forbiddenPairings = s.settings.forbiddenPairings.some.filter(_.nonEmpty)
+      forbiddenPairings = s.settings.forbiddenPairings.some.filter(_.nonEmpty),
+      minutesBeforeStartToJoin = s.settings.minutesBeforeStartToJoin
     )
 
   def nextRound =
@@ -233,15 +231,11 @@ object SwissForm {
   val clockLimits: Seq[Int] = Seq(0, 15, 30, 45, 60, 90) ++ {
     (120 to 420 by 60) ++ (600 to 1800 by 300) ++ (2400 to 10800 by 600)
   }
+  val clockLimitChoices = clockTimeChoicesFromSeconds(clockLimits)
 
   val byoyomiLimits: Seq[Int] = (1 to 9 by 1) ++ (10 to 30 by 5) ++ (30 to 60 by 10)
 
   val clockByoyomiChoices = options(byoyomiLimits, "%d second{s}")
-
-  val clockLimitChoices = options(
-    clockLimits,
-    l => s"${strategygames.FischerClock.Config(l, 0).limitString}${if (l <= 1) " minute" else " minutes"}"
-  )
 
   val roundIntervals: Seq[Int] =
     Seq(
@@ -278,6 +272,54 @@ object SwissForm {
       else s"${s / 24 / 3600} days(s)"
   )
 
+  val halfwayBreakOptions: Seq[Int] =
+    Seq(
+      0,
+      30,
+      60,
+      2 * 60,
+      5 * 60,
+      10 * 60,
+      20 * 60,
+      30 * 60,
+      45 * 60,
+      60 * 60,
+      2 * 60 * 60
+    )
+
+  val halfwayBreakChoices = options(
+    halfwayBreakOptions,
+    s =>
+      if (s == 0) "No additional interval"
+      else if (s < 60) s"$s seconds"
+      else if (s < 3600) s"${s / 60} minute${if (s == 60) "" else "s"}"
+      else if (s < 24 * 3600) s"${s / 3600} hour${if (s == 60 * 60) "" else "s"}"
+      else s"${s / 24 / 3600} day${if (s == 24 * 60 * 60) "" else "s"}"
+  )
+
+  val timeBeforeStartToJoinOptions: Seq[Int] =
+    Seq(
+      Swiss.TimeBeforeStartToJoin.nolimit,
+      15,
+      30,
+      60,
+      2 * 60,
+      6 * 60,
+      12 * 60,
+      24 * 60,
+      2 * 24 * 60,
+      7 * 24 * 60
+    )
+
+  val timeBeforeStartToJoinIntervalChoices = options(
+    timeBeforeStartToJoinOptions,
+    m =>
+      if (m == Swiss.TimeBeforeStartToJoin.nolimit) "No Limit"
+      else if (m < 60) s"$m minutes"
+      else if (m < 24 * 60) s"${m / 60} hour${if (m == 60) "" else "s"}"
+      else s"${m / 24 / 60} day${if (m == 24 * 60) "" else "s"}"
+  )
+
   val chatForChoices = List(
     Swiss.ChatFor.NONE    -> "No chat",
     Swiss.ChatFor.LEADERS -> "Team leaders only",
@@ -294,6 +336,7 @@ object SwissForm {
       medleyDefaults: MedleyDefaults,
       medleyGameFamilies: MedleyGameFamilies,
       rated: Option[Boolean],
+      handicaps: Handicaps,
       xGamesChoice: XGamesChoice,
       nbRounds: Int,
       description: Option[String],
@@ -302,9 +345,11 @@ object SwissForm {
       position: Option[FEN],
       chatFor: Option[Int],
       roundInterval: Option[Int],
+      halfwayBreak: Option[Int],
       password: Option[String],
       conditions: SwissCondition.DataForm.AllSetup,
-      forbiddenPairings: Option[String]
+      forbiddenPairings: Option[String],
+      minutesBeforeStartToJoin: Option[Int]
   ) {
     def gameLogic = variant match {
       case Some(v) => GameFamily(v.split("_")(0).toInt).gameLogic
@@ -330,15 +375,24 @@ object SwissForm {
         case i => i
       }
     }.seconds
+    def realHalfwayBreak = halfwayBreak.fold(0)(i => i).seconds
+    def realMinutesBeforeStartToJoin: Option[Int] =
+      minutesBeforeStartToJoin match {
+        case Some(Swiss.TimeBeforeStartToJoin.nolimit) => None
+        case Some(mbs)                                 => Some(mbs)
+        case _                                         => None
+      }
     def useDrawTables           = drawTables | false
     def usePerPairingDrawTables = perPairingDrawTables | false
     def realPosition            = position ifTrue realVariant.standardVariant
 
-    def isRated         = rated | true
-    def isMatchScore    = xGamesChoice.matchScore | false
-    def isBestOfX       = xGamesChoice.bestOfX | false
-    def isPlayX         = xGamesChoice.playX | false
-    def nbGamesPerRound = xGamesChoice.nbGamesPerRound
+    def isRated            = rated | true
+    def isHandicapped      = handicaps.handicapped | false
+    def inputPlayerRatings = if (isHandicapped) handicaps.inputPlayerRatings else None
+    def isMatchScore       = xGamesChoice.matchScore | false
+    def isBestOfX          = xGamesChoice.bestOfX | false
+    def isPlayX            = xGamesChoice.playX | false
+    def nbGamesPerRound    = xGamesChoice.nbGamesPerRound
     def validXGamesSetup =
       ((!isBestOfX && !isPlayX) || nbGamesPerRound > 1) && !(isBestOfX && isPlayX)
     def validMatchScoreSetup = !isMatchScore || !(isBestOfX && nbGamesPerRound % 2 == 1)
@@ -347,6 +401,15 @@ object SwissForm {
     def validRatedVariant =
       !isRated ||
         lila.game.Game.allowRated(realVariant, clock.some)
+    def validHandicapped = !isHandicapped || (gameLogic == GameLogic.Go() && !isMedley && !isRated)
+
+    def validClock = clock match {
+      case fc: Clock.Config             => (fc.limitSeconds + fc.incrementSeconds) > 0
+      case bc: Clock.BronsteinConfig    => (bc.limitSeconds + bc.delaySeconds) > 0 && bc.delaySeconds > 0
+      case udc: Clock.SimpleDelayConfig => (udc.limitSeconds + udc.delaySeconds) > 0 && udc.delaySeconds > 0
+      case bc: ByoyomiClock.Config =>
+        (bc.limitSeconds + bc.incrementSeconds) > 0 || (bc.limitSeconds + bc.byoyomiSeconds) > 0
+    }
 
     def isMedley = (medley | false) && medleyGameFamilies.ggList.nonEmpty
 
@@ -383,6 +446,11 @@ object SwissForm {
 
   }
 
+  case class Handicaps(
+      handicapped: Option[Boolean],
+      inputPlayerRatings: Option[String]
+  )
+
   case class XGamesChoice(
       bestOfX: Option[Boolean],
       playX: Option[Boolean],
@@ -405,7 +473,9 @@ object SwissForm {
       flipello: Option[Boolean],
       mancala: Option[Boolean],
       amazons: Option[Boolean],
-      go: Option[Boolean]
+      breakthroughtroyka: Option[Boolean],
+      go: Option[Boolean],
+      backgammon: Option[Boolean]
   ) {
 
     lazy val ggList: List[GameGroup] = GameGroup.medley
@@ -417,6 +487,11 @@ object SwissForm {
       .filterNot(gg => if (!flipello.getOrElse(false)) gg == GameGroup.Flipello() else false)
       .filterNot(gg => if (!mancala.getOrElse(false)) gg == GameGroup.Mancala() else false)
       .filterNot(gg => if (!amazons.getOrElse(false)) gg == GameGroup.Amazons() else false)
+      .filterNot(gg =>
+        if (!breakthroughtroyka.getOrElse(false)) gg == GameGroup.BreakthroughTroyka() else false
+      )
       .filterNot(gg => if (!go.getOrElse(false)) gg == GameGroup.Go() else false)
+      .filterNot(gg => if (!backgammon.getOrElse(false)) gg == GameGroup.Backgammon() else false)
+
   }
 }

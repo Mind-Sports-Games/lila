@@ -3,8 +3,6 @@
   "version": "2.0.0",
   "private": true,
   "description": "playstrategy.org lobby",
-  "type": "module",
-  "module": "src/main.js",
   "keywords": [
     "chess",
     "playstrategy",
@@ -13,19 +11,21 @@
   ],
   "author": "Thibault Duplessis",
   "license": "AGPL-3.0-or-later",
-  "devDependencies": {
-    "@build/rollupProject": "2.0.0",
-    "@types/playstrategy": "2.0.0"
-  },
   "dependencies": {
-    "chat": "2.0.0",
-    "chessground": "git+ssh://git@github.com:Mind-Sports-Games/chessground.git#222-monsterchess",
-    "common": "2.0.0",
-    "draughtsground": "^7.6",
+    "@types/debounce-promise": "^3.1.3",
+    "@types/node": "20.12.2",
+    "chat": "workspace:*",
+    "common": "workspace:*",
+    "debounce-promise": "^3.1.2",
+    "draughtsground": "workspace:*",
     "snabbdom": "^3.0.1"
   },
   "scripts": {
-    "dev": "rollup --config",
-    "prod": "rollup --config --config-prod"
+    "compile": "tsc",
+    "dev": "tsc",
+    "prod": "tsc"
+  },
+  "playstrategy": {
+    "bundles": "src/lobby.ts"
   }
 }

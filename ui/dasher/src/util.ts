@@ -43,7 +43,7 @@ export function header(name: string, close: Close) {
       attrs: { 'data-icon': 'I' },
       hook: bind('click', close),
     },
-    name
+    name,
   );
 }
 
@@ -63,6 +63,8 @@ export function displayGameFamily(gameFamilyKey: GameFamilyKey): string {
       return 'LinesOfAction';
     case 'flipello':
       return 'Othello';
+    case 'breakthroughtroyka':
+      return 'Breakthrough';
     case 'togyzkumalak':
       return 'Togyzqumalaq';
     default:
@@ -86,6 +88,9 @@ export function convertVariantKeyToGameFamily(variantKey: VariantKey | DraughtsV
       return 'flipello';
     case 'amazons':
       return 'amazons';
+    case 'breakthroughtroyka':
+    case 'minibreakthroughtroyka':
+      return 'breakthroughtroyka';
     case 'oware':
       return 'oware';
     case 'togyzkumalak':
@@ -94,6 +99,9 @@ export function convertVariantKeyToGameFamily(variantKey: VariantKey | DraughtsV
     case 'go13x13':
     case 'go19x19':
       return 'go';
+    case 'nackgammon':
+    case 'backgammon':
+      return 'backgammon';
     case 'russian':
     case 'brazilian':
     case 'breakthrough':

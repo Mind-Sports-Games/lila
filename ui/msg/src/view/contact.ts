@@ -27,7 +27,7 @@ export default function renderContact(ctrl: MsgCtrl, contact: Contact, active?: 
             {
               class: { 'msg-app__side__contact__msg--new': isNew },
             },
-            msg.text
+            msg.text,
           ),
           isNew
             ? h('i.msg-app__side__contact__new', {
@@ -36,7 +36,7 @@ export default function renderContact(ctrl: MsgCtrl, contact: Contact, active?: 
             : null,
         ]),
       ]),
-    ]
+    ],
   );
 }
 
@@ -50,6 +50,6 @@ function renderDate(msg: LastMsg): VNode {
         datetime: msg.date.getTime(),
       },
     },
-    playstrategy.timeago(msg.date)
+    playstrategy.timeago(msg.date),
   );
 }

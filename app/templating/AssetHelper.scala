@@ -6,6 +6,7 @@ import play.api.mvc.RequestHeader
 import lila.api.Context
 import lila.app.ui.ScalatagsTemplate._
 import lila.common.{ AssetVersion, ContentSecurityPolicy, Nonce }
+import lila.web.AssetManifest
 
 import strategygames.GameLogic
 
@@ -21,35 +22,65 @@ trait AssetHelper { self: I18nHelper with SecurityHelper =>
 
   lazy val sameAssetDomain = netDomain.value == assetDomain.value
 
+  def manifest: AssetManifest
   def assetVersion = AssetVersion.current
 
-  def assetUrl(path: String): String = s"$assetBaseUrl/assets/_$assetVersion/$path"
+  def updateManifest() = if (!env.net.isProd) env.web.manifest.update()
 
-  def cdnUrl(path: String) = s"$assetBaseUrl$path"
-
-  def dbImageUrl(path: String) = s"$baseUrl/image/$path"
+  def assetUrl(path: String): String =
+    s"$assetBaseUrl/assets/${manifest.hashed(path).getOrElse(s"_$assetVersion/$path")}"
+  def jsUrl(key: String): String           = s"$assetBaseUrl/assets/compiled/${jsNameFromManifest(key)}"
+  def staticAssetUrl(path: String): String = s"$assetBaseUrl/assets/_$assetVersion/$path"
+  def cdnUrl(path: String)                 = s"$assetBaseUrl$path"
+  def dbImageUrl(path: String)             = s"$baseUrl/image/$path"
 
   def cssTag(name: String)(implicit ctx: Context): Frag =
     cssTagWithTheme(name, ctx.currentBg)
-
   def cssTagWithTheme(name: String, theme: String): Frag =
-    cssAt(s"css/$name.$theme.${if (minifiedAssets) "min" else "dev"}.css")
-
+    cssAt(s"css/${cssNameFromManifest(name, theme)}")
   def cssTagNoTheme(name: String): Frag =
-    cssAt(s"css/$name.${if (minifiedAssets) "min" else "dev"}.css")
-
+    cssAt(s"css/${cssNameFromManifest(name)}")
   private def cssAt(path: String): Frag =
-    link(href := assetUrl(path), rel := "stylesheet")
+    link(href := s"$assetBaseUrl/assets/${path}", rel := "stylesheet")
+  private def cssNameFromManifest(name: String, theme: String = ""): String =
+    if (!theme.isEmpty())
+      s"${manifest.css(s"$name.$theme").getOrElse(s"$name.$theme")}"
+    else s"${manifest.css(s"$name").getOrElse(s"$name")}"
 
-  // load scripts in <head> and always use defer
-  def jsAt(path: String): Frag = script(deferAttr, src := assetUrl(path))
+  private def jsNameFromManifest(key: String): String = manifest.js(key).fold(key)(_.name)
+  private def jsAtESM(key: String, path: String = "compiled/"): Frag = {
+    script(
+      deferAttr,
+      src := s"$assetBaseUrl/assets/${path}${jsNameFromManifest(key)}",
+      tpe := "module"
+    )
+  }
+  private def staticJsAtESM(key: String, path: String = "compiled/"): Frag = {
+    script(
+      deferAttr,
+      src := staticAssetUrl(s"${path}${jsNameFromManifest(key)}"),
+      tpe := "module"
+    )
+  }
 
-  def jsTag(name: String): Frag = jsAt(s"javascripts/$name")
+  // load script as common js
+  def jsAtCJS(path: String): Frag = script(deferAttr, src := staticAssetUrl(path))
 
-  def jsModule(name: String): Frag =
-    jsAt(s"compiled/$name${minifiedAssets ?? ".min"}.js")
+  def jsTag(path: String): Frag =
+    script(
+      deferAttr,
+      src := s"$assetBaseUrl/assets/_$assetVersion/javascripts/$path",
+      tpe := "module"
+    )
 
-  def depsTag = jsAt("compiled/deps.min.js")
+  // jsModule is used from app/views/ as base ui module entry point
+  def jsModule(name: String, path: String = "compiled/"): Frag = jsAtESM(name, path)
+
+  def depsTag(name: String): Frag = script(
+    deferAttr,
+    src := assetUrl(name),
+    tpe := "module"
+  )
 
   def roundTag(lib: GameLogic) = lib match {
     case GameLogic.Draughts() => jsModule("draughtsround")
@@ -64,20 +95,21 @@ trait AssetHelper { self: I18nHelper with SecurityHelper =>
   def analyseTag                            = jsModule("analysisBoard")
   def analyseNvuiTag(implicit ctx: Context) = ctx.blind option jsModule("analysisBoard.nvui")
 
-  def captchaTag          = jsModule("captcha")
-  def infiniteScrollTag   = jsModule("infiniteScroll")
-  def chessgroundTag      = jsAt("javascripts/vendor/chessground.min.js")
-  def draughtsgroundTag   = jsAt("javascripts/vendor/draughtsground.min.js")
-  def cashTag             = jsAt("javascripts/vendor/cash.min.js")
-  def fingerprintTag      = jsAt("javascripts/fipr.js")
-  def tagifyTag           = jsAt("vendor/tagify/tagify.min.js")
-  def highchartsLatestTag = jsAt("vendor/highcharts-4.2.5/highcharts.js")
-  def highchartsMoreTag   = jsAt("vendor/highcharts-4.2.5/highcharts-more.js")
+  def captchaTag        = jsModule("captcha")
+  def infiniteScrollTag = jsModule("infiniteScroll")
+
+  def chessgroundTag = staticJsAtESM("chessground.min.js", "npm/")
+
+  def draughtsgroundTag   = jsAtCJS("javascripts/vendor/draughtsground.min.js")
+  def fingerprintTag      = staticJsAtESM("fipr.js", "javascripts/")
+  def tagifyTag           = staticJsAtESM("tagify.min.js", "vendor/tagify/")
+  def highchartsLatestTag = staticJsAtESM("highcharts.js", "vendor/highcharts-4.2.5/")
+  def highchartsMoreTag   = staticJsAtESM("highcharts-more.js", "vendor/highcharts-4.2.5/")
 
   def prismicJs(implicit ctx: Context): Frag =
     raw {
-      isGranted(_.Prismic) ?? {
-        embedJsUnsafe("""window.prismic={endpoint:'https://lichess.prismic.io/api/v2'}""").render ++
+      isGranted(_.Prismic) ?? { // @TODO: check why lichess prismic is used here
+        embedJsUnsafe("""window.prismic={endpoint:'https://playstrategy.prismic.io/api/v2'}""").render ++
           """<script src="//static.cdn.prismic.io/prismic.min.js"></script>"""
       }
     }

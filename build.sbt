@@ -28,7 +28,7 @@ libraryDependencies ++= akka.bundle ++ playWs.bundle ++ Seq(
 }
 
 lazy val fairystockfish = Artifact("fairystockfish", "linux-x86_64")
-libraryDependencies += "org.playstrategy"        % "fairystockfish"           % "0.0.18" artifacts(fairystockfish)
+libraryDependencies += "org.playstrategy"        % "fairystockfish"           % "0.0.20" artifacts(fairystockfish)
 classpathTypes ++= Set("linux-x86_64")
 
 lazy val modules = Seq(
@@ -42,7 +42,7 @@ lazy val modules = Seq(
   playban, insight, perfStat, irc, quote, challenge,
   study, studySearch, fishnet, explorer, learn, plan,
   event, coach, practice, evalCache, irwin,
-  activity, relay, streamer, bot, clas, swiss, storm, racer
+  activity, relay, streamer, bot, clas, swiss, storm, racer, web
 )
 
 lazy val moduleRefs = modules map projectToRef
@@ -64,7 +64,7 @@ lazy val i18n = smallModule("i18n",
     MessageCompiler(
       sourceDir = new File("translation/source"),
       destDir = new File("translation/dest"),
-      dbs = "site arena emails learn activity coordinates study class contact patron coach broadcast streamer tfa settings preferences team perfStat search tourname faq lag swiss puzzle puzzleTheme challenge storm variantName variantShortName variantTitle".split(' ').toList,
+      dbs = "site arena emails learn activity coordinates study class contact patron coach broadcast streamer tfa settings preferences team perfStat search tourname faq lag swiss puzzle puzzleTheme challenge storm variantName variantShortName variantTitle onboarding".split(' ').toList,
       compileTo = (Compile / sourceManaged).value
     )
   }.taskValue
@@ -120,7 +120,7 @@ lazy val evaluation = module("evaluation",
   Seq(specs2) ++ reactivemongo.bundle
 )
 
-lazy val common = smallModule("common",
+lazy val common = smallModule("common", // became "ui" in lichess
   Seq(),
   Seq(
     scalalib, scalaUri, strategyGames, autoconfig,
@@ -421,4 +421,9 @@ lazy val socket = smallModule("socket",
 lazy val hub = smallModule("hub",
   Seq(common),
   Seq(scaffeine, macwire.util)
+)
+
+lazy val web = module("web",
+  Seq(common),
+  playWs.bundle ++ Seq(play.api, macwire.util)
 )

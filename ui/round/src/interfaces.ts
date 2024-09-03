@@ -5,6 +5,7 @@ import { CorresClockData } from './corresClock/corresClockCtrl';
 import RoundController from './ctrl';
 import { ChatCtrl, ChatPlugin } from 'chat';
 import * as cg from 'chessground/types';
+import * as Prefs from 'common/prefs';
 
 export type MaybeVNode = VNode | null | undefined;
 export type MaybeVNodes = MaybeVNode[];
@@ -37,8 +38,24 @@ export interface SocketDrop {
   variant: string;
   b?: 1;
 }
-
 export interface SocketPass {
+  variant: string;
+  b?: 1;
+}
+export interface SocketDoRoll {
+  variant: string;
+  b?: 1;
+}
+export interface SocketLift {
+  pos: cg.Key;
+  variant: string;
+  b?: 1;
+}
+export interface SocketUndo {
+  variant: string;
+  b?: 1;
+}
+export interface SocketEndTurn {
   variant: string;
   b?: 1;
 }
@@ -50,6 +67,10 @@ export type EncodedDests =
     };
 export type Dests = cg.Dests;
 
+export interface MultiActionMetaData {
+  couldNextActionEndTurn: boolean;
+}
+
 export interface RoundData extends GameData {
   clock?: ClockData;
   pref: Pref;
@@ -57,11 +78,19 @@ export interface RoundData extends GameData {
   possibleMoves?: EncodedDests;
   possibleDrops?: string;
   possibleDropsByRole?: string;
+  possibleLifts?: string;
+  multiActionMetaData?: MultiActionMetaData;
   selectMode: boolean;
   selectedSquares?: cg.Key[];
   currentSelectedSquares?: cg.Key[];
   calculatedCGGoScores?: cg.SimpleGoScores;
   deadStoneOfferState?: string;
+  dice?: cg.Dice[];
+  activeDiceValue?: number;
+  canOnlyRollDice: boolean;
+  canUndo: boolean;
+  canEndTurn: boolean;
+  forcedAction?: string;
   pauseSecs?: number;
   forecastCount?: number;
   crazyhouse?: CrazyData;
@@ -131,11 +160,13 @@ export interface Step {
   crazy?: StepCrazy;
 }
 
-export interface ApiMove extends Step {
+export interface ApiAction extends Step {
   dests: EncodedDests;
   clock?: {
     p1: Seconds;
     p2: Seconds;
+    p1Pending: Seconds;
+    p2Pending: Seconds;
     p1Periods: number;
     p2Periods: number;
     lag?: Centis;
@@ -152,6 +183,13 @@ export interface ApiMove extends Step {
   role?: cg.Role;
   drops?: string;
   dropsByRole?: string;
+  lifts?: string;
+  canOnlyRollDice: boolean;
+  canUndo: boolean;
+  canEndTurn: boolean;
+  forcedAction?: string;
+  dice?: string;
+  multiActionMetaData?: MultiActionMetaData;
   canSelectSquares?: boolean;
   deadStoneOfferState?: string;
   squares?: string;
@@ -181,6 +219,8 @@ export interface ApiEnd {
   clock?: {
     p1: Centis;
     p2: Centis;
+    p1Pending: Centis;
+    p2Pending: Centis;
     p1Periods: number;
     p2Periods: number;
   };
@@ -197,6 +237,7 @@ export interface Pref {
   clockTenths: Prefs.ShowClockTenths;
   confirmResign: boolean;
   confirmPass: boolean;
+  playForcedAction: boolean;
   coords: Prefs.Coords;
   destination: boolean;
   playerTurnIndicator: boolean;

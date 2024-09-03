@@ -3,7 +3,7 @@ package lila.challenge
 //import strategygames.chess.variant.Variant
 import strategygames.variant.Variant
 import strategygames.format.FEN
-import strategygames.{ FischerClock, GameLogic, Mode }
+import strategygames.{ Clock, GameLogic, Mode }
 import org.specs2.mutable._
 
 import lila.game.Game
@@ -53,7 +53,7 @@ final class JoinerTest extends Specification {
         variant = Variant.Go(strategygames.go.variant.Go9x9),
         fenVariant = Some(Variant.Go(strategygames.go.variant.Go9x9)),
         initialFen = Some(FEN(GameLogic.Go(), position)),
-        timeControl = Challenge.TimeControl.Clock(FischerClock.Config(300, 0)),
+        timeControl = Challenge.TimeControl.Clock(Clock.Config(300, 0)),
         mode = Mode.Casual,
         playerIndex = "p2",
         challenger = Challenge.Challenger.Anonymous("secret"),

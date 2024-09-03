@@ -31,7 +31,11 @@ object side {
         st.section(dataIcon := (if (s.isMedley) "5" else s.perfType.iconChar.toString))(
           div(
             p(
-              s.clock.show,
+              a(
+                title := "Clock info",
+                href := s"${routes.Page.loneBookmark("clocks")}",
+                target := "_blank"
+              )(s.clock.show),
               separator,
               if (s.isMedley) {
                 views.html.game.bits.medleyLink
@@ -46,15 +50,22 @@ object side {
               separator,
               if (s.settings.usingDrawTables) trans.swiss.usingDrawTables(),
               if (s.settings.usingDrawTables) separator,
-              if (s.settings.rated) trans.ratedTournament() else trans.casualTournament(),
+              if (s.settings.handicapped)
+                a(href := routes.Page.loneBookmark("handicaps"), target := "_blank")(
+                  trans.handicappedTournament()
+                )
+              else if (s.settings.rated) trans.ratedTournament()
+              else trans.casualTournament(),
               separator,
               a(href := routes.Swiss.home)("Swiss")
             ),
             p(
               span(cls := "swiss__meta__round")(
+                title := trans.swiss.numberOfRoundsInSwiss.txt(),
                 s"${s.round}/${s.settings.nbRounds}"
               ),
               span(cls := "swiss__meta__rounds")(
+                title := trans.swiss.numberOfRoundsInSwiss.txt(),
                 " rounds",
                 if (s.settings.isBestOfX) {
                   s" (best of ${s.settings.nbGamesPerRound} games"
@@ -71,7 +82,8 @@ object side {
                 a(href := routes.Swiss.edit(s.id.value), title := "Edit tournament")(iconTag("%"))
               )
             ),
-            bits.showInterval(s)
+            bits.showInterval(s),
+            p(bits.showHalfwayBreak(s))
           )
         ),
         s.isMedley option views.html.swiss.bits.medleyGames(
@@ -101,16 +113,16 @@ object side {
           table(cls := "trophyPreview")(
             tr(
               td(
-                img(cls := "customTrophy", src := assetUrl(s"images/trophy/${trophy1st}.png"))
+                img(cls := "customTrophy", src := staticAssetUrl(s"images/trophy/${trophy1st}.png"))
               ),
               s.trophy2nd.map { trophy2nd =>
                 td(
-                  img(cls := "customTrophy", src := assetUrl(s"images/trophy/${trophy2nd}.png"))
+                  img(cls := "customTrophy", src := staticAssetUrl(s"images/trophy/${trophy2nd}.png"))
                 )
               },
               s.trophy3rd.map { trophy3rd =>
                 td(
-                  img(cls := "customTrophy", src := assetUrl(s"images/trophy/${trophy3rd}.png"))
+                  img(cls := "customTrophy", src := staticAssetUrl(s"images/trophy/${trophy3rd}.png"))
                 )
               }
             ),

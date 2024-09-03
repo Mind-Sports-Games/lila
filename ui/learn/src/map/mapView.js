@@ -9,7 +9,7 @@ function makeStars(nb) {
     stars.push(
       m('i', {
         'data-icon': 't',
-      })
+      }),
     );
   return stars;
 }
@@ -29,8 +29,8 @@ function ribbon(ctrl, s, status, res) {
         {
           class: status,
         },
-        content
-      )
+        content,
+      ),
     );
 }
 
@@ -49,7 +49,7 @@ function whatNext(ctrl) {
           src: util.assetUrl + 'images/learn/' + img + '.svg',
         }),
         m('div.text', [m('h3', transTitle), m('p.subtitle', ctrl.trans.noarg(subtitle))]),
-      ]
+      ],
     );
   };
   var userId = ctrl.data._id;
@@ -103,9 +103,9 @@ module.exports = function (ctrl) {
                     src: s.image,
                   }),
                   m('div.text', [m('h3', title), m('p.subtitle', ctrl.trans.noarg(s.subtitle))]),
-                ]
+                ],
               );
-            })
+            }),
           ),
         ]);
       }),

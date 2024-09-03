@@ -37,15 +37,15 @@ final class Fishnet(env: Env) extends LilaController(env) {
             case NotAcquired     => onComplete
             case WeakAnalysis(_) => onComplete
             // case WeakAnalysis => fuccess(Left(UnprocessableEntity("Not enough nodes per move")))
-            case e =>
-              fuccess(Left(InternalServerError(e.pp("analysis-error").getMessage.pp("analysis-error-msg"))))
+            case e               =>
+              fuccess(Left(InternalServerError(e.getMessage)))
           },
           {
             case PostAnalysisResult.Complete(analysis) =>
               env.round.proxyRepo.updateIfPresent(analysis.id)(_.setAnalysed)
               onComplete
-            case _: PostAnalysisResult.Partial    => fuccess(Left(NoContent))
-            case PostAnalysisResult.UnusedPartial => fuccess(Left(NoContent))
+            case _: PostAnalysisResult.Partial         => fuccess(Left(NoContent))
+            case PostAnalysisResult.UnusedPartial      => fuccess(Left(NoContent))
           }
         )
     }
@@ -81,7 +81,7 @@ final class Fishnet(env: Env) extends LilaController(env) {
           },
           data =>
             api.authenticateClient(data, HTTPRequest ipAddress req) flatMap {
-              case Failure(msg) => Unauthorized(jsonError(msg.getMessage)).fuccess
+              case Failure(msg)    => Unauthorized(jsonError(msg.getMessage)).fuccess
               case Success(client) =>
                 f(data)(client).map {
                   case Right(Some(work)) => Accepted(Json toJson work)

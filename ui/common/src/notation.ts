@@ -4,7 +4,7 @@ interface ExtendedMoveInfo {
   san: string;
   uci: string;
   fen: string;
-  prevFen?: string; //needed for shogi and oware not xiangqi
+  prevFen: string;
 }
 
 interface ParsedMove {
@@ -30,6 +30,8 @@ export function moveFromNotationStyle(notation: NotationStyle): (move: ExtendedM
       return destPosGo;
     case 'man':
       return mancalaNotation;
+    case 'bkg':
+      return backgammonNotation;
   }
 }
 
@@ -90,13 +92,13 @@ export function parseUCISquareToUSI(str: string, files: number, ranks: number): 
 function shogiNotation(move: ExtendedMoveInfo, variant: Variant): string {
   const parsed = parseUciToUsi(move.uci, variant.boardSize.width, variant.boardSize.height),
     board = readFen(move.fen, variant.boardSize.height, variant.boardSize.width),
-    prevBoard = readFen(move.prevFen!, variant.boardSize.height, variant.boardSize.width),
+    prevBoard = readFen(move.prevFen, variant.boardSize.height, variant.boardSize.width),
     prevrole = prevBoard.pieces[parsed.orig],
     dest = parsed.dest,
     connector = isCapture(prevBoard, board) ? 'x' : isDrop(prevBoard, board) ? '*' : '-',
     role = board.pieces[dest],
     piece = role[0] === '+' ? role[0] + role[1].toUpperCase() : role[0].toUpperCase(),
-    origin = !isDrop(prevBoard, board) && isMoveAmbiguous(board, parsed.dest, prevrole) ? parsed.orig : '', //ToDo ideally calculate this from SAN or in stratops as currently doesn't include illegal moves like piece being pinned or obstruction
+    origin = !isDrop(prevBoard, board) && isMoveAmbiguous(board, parsed.dest, prevrole) ? parsed.orig : '',
     promotion = promotionSymbol(prevBoard, board, parsed);
 
   if (promotion == '+') return `${piece.slice(1)}${origin}${connector}${dest}${promotion}`;
@@ -267,8 +269,8 @@ function xiangqiNotation(move: ExtendedMoveInfo, variant: Variant): string {
       newRank === prevRank
         ? '='
         : (board.wMoved && newRank < prevRank) || (!board.wMoved && newRank > prevRank)
-        ? '+'
-        : '-',
+          ? '+'
+          : '-',
     movement = direction == '=' || isdiagonalMove ? newFile : Math.abs(newRank - prevRank);
 
   //Ammend notation due to multiple pawns in row, case 1: pair sideways, case 2: 3 or more up and down and sideways
@@ -282,7 +284,7 @@ function xiangqiNotation(move: ExtendedMoveInfo, variant: Variant): string {
       pawnRole,
       addMovedPiece,
       prevRank,
-      newRank
+      newRank,
     );
 
     if (pawnRanks.length == 2) {
@@ -322,7 +324,7 @@ function numFriendlyPawnsInColumn(
   role: string,
   addMovedPiece: boolean,
   origPieceRank: number,
-  newPieceRank: number
+  newPieceRank: number,
 ): number[] {
   const pawnRanks: number[] = [];
   const ranks = [...Array(numRanks + 1).keys()].slice(1);
@@ -383,8 +385,8 @@ function togyzkumalakNotation(move: ExtendedMoveInfo, variant: Variant): string 
   const destNumber = dest[1] === '1' ? dest.charCodeAt(0) - 96 : 97 - dest.charCodeAt(0) + variant.boardSize.width;
   const gainedStones =
     orig[1] === '1'
-      ? getMancalaScore(move.fen, 'p1') > getMancalaScore(move.prevFen!, 'p1')
-      : getMancalaScore(move.fen, 'p2') > getMancalaScore(move.prevFen!, 'p2');
+      ? getMancalaScore(move.fen, 'p1') > getMancalaScore(move.prevFen, 'p1')
+      : getMancalaScore(move.fen, 'p2') > getMancalaScore(move.prevFen, 'p2');
   const destEmpty = isDestEmptyInTogyFen(dest, destNumber, move.fen, variant.boardSize.width);
   const isCapture = gainedStones && orig[1] !== dest[1] && destEmpty;
 
@@ -393,8 +395,8 @@ function togyzkumalakNotation(move: ExtendedMoveInfo, variant: Variant): string 
 
   const createdTuzdik =
     orig[1] === '1'
-      ? hasTuzdik(move.fen, 'p1') && !hasTuzdik(move.prevFen!, 'p1')
-      : hasTuzdik(move.fen, 'p2') && !hasTuzdik(move.prevFen!, 'p2');
+      ? hasTuzdik(move.fen, 'p1') && !hasTuzdik(move.prevFen, 'p1')
+      : hasTuzdik(move.fen, 'p2') && !hasTuzdik(move.prevFen, 'p2');
 
   return `${origNumber}${destNumber}${createdTuzdik ? 'X' : ''}${scoreText}`;
 }
@@ -432,8 +434,8 @@ function owareNotation(move: ExtendedMoveInfo, variant: Variant): string {
   const scoreDiff =
     getMancalaScore(move.fen, 'p1') +
     getMancalaScore(move.fen, 'p2') -
-    getMancalaScore(move.prevFen!, 'p1') -
-    getMancalaScore(move.prevFen!, 'p2');
+    getMancalaScore(move.prevFen, 'p1') -
+    getMancalaScore(move.prevFen, 'p2');
   const scoreText = scoreDiff <= 0 ? '' : ` + ${scoreDiff}`;
   return `${origLetter}${scoreText}`;
 }
@@ -444,4 +446,136 @@ function nextAsciiLetter(letter: string, n: number): string {
 
 export function getMancalaScore(fen: string, playerIndex: string): number {
   return +fen.split(' ')[playerIndex === 'p1' ? 1 : 2];
+}
+
+function backgammonNotation(move: ExtendedMoveInfo, variant: Variant): string {
+  let isLift = false; //using this instead of changing the regex
+  if (move.uci === 'roll') return '';
+  if (move.uci === 'undo') return 'undo';
+  if (move.uci === 'endturn') return '(no-play)';
+  if (move.uci.includes('/')) return `${move.uci.replace('/', '')}:`;
+  if (move.uci.includes('^')) {
+    isLift = true;
+  }
+
+  const reg = isLift
+    ? (move.uci.replace('^', 'a1').match(/[a-lsA-LS][1-2@]/g) as string[])
+    : (move.uci.replace('x', '').match(/[a-lsA-LS][1-2@]/g) as string[]);
+  const orig = reg[0];
+  const dest = reg[1];
+  const isDrop = reg[0].includes('@');
+  const movePlayer = move.prevFen.split(' ')[3] === 'w' ? 'p1' : 'p2';
+  const moveOpponent = move.prevFen.split(' ')[3] === 'w' ? 'p2' : 'p1';
+
+  const diceRoll = getDice(move.prevFen); //this is not really used but for completeness
+
+  //captures
+  const capturedPiecesBefore = numberofCapturedPiecesOfPlayer(moveOpponent, move.prevFen);
+  const capturedPiecesAfter = numberofCapturedPiecesOfPlayer(moveOpponent, move.fen);
+  const isCapture = capturedPiecesBefore !== capturedPiecesAfter;
+  const isCaptureNotation = isCapture ? '*' : '';
+
+  //board pos
+  const origFile = 1 + Math.abs(orig.charCodeAt(0) - 'a'.charCodeAt(0));
+  const origRank = parseInt(orig.slice(1), 10);
+  const destFile = 1 + Math.abs(dest.charCodeAt(0) - 'a'.charCodeAt(0));
+  const destRank = parseInt(dest.slice(1), 10);
+
+  const origBoardPosNumber = isDrop
+    ? 'bar'
+    : movePlayer === 'p1'
+      ? origRank === 1
+        ? variant.boardSize.width + 1 - origFile
+        : variant.boardSize.width + origFile
+      : origRank === 1
+        ? variant.boardSize.width + origFile
+        : variant.boardSize.width + 1 - origFile;
+  const destBoardPosNumber =
+    movePlayer === 'p1'
+      ? destRank === 1
+        ? variant.boardSize.width + 1 - destFile
+        : variant.boardSize.width + destFile
+      : destRank === 1
+        ? variant.boardSize.width + destFile
+        : variant.boardSize.width + 1 - destFile;
+
+  // examples:
+  // 43: 8/4 8/5
+  // 55: 21/16(3) bar/5
+  // 21: 8/7* 13/11
+  if (isLift) return `${diceRoll}: ${destBoardPosNumber}/off`;
+  return `${diceRoll}: ${origBoardPosNumber}/${destBoardPosNumber}${isCaptureNotation}`;
+}
+
+export function getDice(fen: string): string {
+  if (fen.split(' ').length < 2) return '';
+  const unusedDice = fen.split(' ')[1].replace('-', '').split('/');
+  const usedDice = fen.split(' ')[2].replace('-', '').split('/');
+  const dice = unusedDice.concat(usedDice).join('');
+  if (dice.length === 4) return dice.slice(2); // handles doubles
+  return dice;
+}
+
+function numberofCapturedPiecesOfPlayer(player: 'p1' | 'p2', fen: string): number {
+  const pieceString = player === 'p1' ? 'S' : 's';
+
+  if (fen.indexOf('[') !== -1 && fen.indexOf(']') !== -1) {
+    const start = fen.indexOf('[', 0);
+    const end = fen.indexOf(']', start);
+    const pocket = fen.substring(start + 1, end);
+    if (pocket === '') return 0;
+    for (const p of pocket.split(',')) {
+      const count = p.slice(0, -1);
+      const letter = p.substring(p.length - 1);
+      if (letter === pieceString) {
+        return +count;
+      }
+    }
+
+    return 0;
+  } else return 0;
+}
+
+export function combinedNotationForBackgammonActions(actionNotations: string[]): string {
+  const actions: string[] = [];
+  const captures: boolean[] = [];
+  const occurances: number[] = [];
+  for (const notation of actionNotations) {
+    if (notation.split(' ').length === 2) {
+      const movePart = notation.split(' ')[1].replace('*', '');
+      const isCapture = notation.split(' ')[1].includes('*');
+      if (actions.includes(movePart)) {
+        const duplicateIndex = actions.indexOf(movePart);
+        occurances[duplicateIndex] += 1;
+        captures[duplicateIndex] = captures[duplicateIndex] || isCapture;
+      } else {
+        actions.push(movePart);
+        occurances.push(1);
+        if (isCapture) {
+          captures.push(true);
+        } else {
+          captures.push(false);
+        }
+      }
+    } else if (notation === '(no-play)' && actionNotations.length === 2) {
+      return actionNotations[0].split(' ')[0] + ' ' + notation;
+    } else if (notation === '(no-play)' && actionNotations.length === 1) {
+      return '...';
+    }
+  }
+
+  //dice roll is always first action - check this assumption in multipoint games
+  const dice = actionNotations[0].split(' ')[0];
+  let output = dice;
+
+  actions.forEach((action, index) => {
+    const occurancesString = occurances[index] > 1 ? `(${occurances[index]})` : '';
+    const captureString = captures[index] ? '*' : '';
+    const part = ` ${action}${occurancesString}${captureString}`;
+    output += part;
+  });
+
+  //examples (also see tests):
+  // ["43: 8/4", "43: 8/4"] -> "43: 8/4(2)"
+  return output;
 }

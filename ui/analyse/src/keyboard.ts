@@ -94,7 +94,7 @@ export const bind = (ctrl: AnalyseCtrl) => {
         const i = chapters.findIndex(ch => ch.id === study.vm.chapterId);
         const chapter = chapters[i + (key === 'n' ? 1 : -1)];
         if (chapter) study.setChapter(chapter.id);
-      })
+      }),
     );
   }
 };
@@ -103,7 +103,7 @@ export function view(ctrl: AnalyseCtrl): VNode {
   return modal({
     class: 'keyboard-help',
     onInsert(el: HTMLElement) {
-      playstrategy.loadCssPath('analyse.keyboard');
+      playstrategy.loadHashedCssPath('analyse.keyboard');
       xhr.text(xhr.url('/analysis/help', { study: !!ctrl.study })).then(html => {
         el.querySelector('.scrollable')!.innerHTML = html;
       });

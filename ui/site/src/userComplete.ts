@@ -18,21 +18,21 @@ interface Opts {
   swiss?: string;
 }
 
-export default function (opts: Opts): void {
+export default function UserComplete(opts: Opts): void {
   const debounced = debounce(
     (term: string) =>
       xhr
         .json(
-          xhr.url('/player/autocomplete', {
+          xhr.url('/api/player/autocomplete', {
             term,
             friend: opts.friend ? 1 : 0,
             tour: opts.tour,
             swiss: opts.swiss,
             object: 1,
-          })
+          }),
         )
         .then(r => ({ term, ...r })),
-    150
+    150,
   );
 
   complete<Result>({
@@ -67,3 +67,5 @@ export default function (opts: Opts): void {
     regex: /^[a-z0-9][\w-]{2,29}$/i,
   });
 }
+
+(window as any).UserComplete = UserComplete; // esbuild

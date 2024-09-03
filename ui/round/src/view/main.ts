@@ -7,18 +7,19 @@ import { h, VNode } from 'snabbdom';
 import { plyStep } from '../round';
 import { finished } from 'game/status';
 import { Position, MaterialDiff, MaterialDiffSide, CheckCount } from '../interfaces';
-import { read as fenRead } from 'chessground/fen';
+import { read as fenRead, readPocket as pocketRead } from 'chessground/fen';
 import * as cg from 'chessground/types';
 import { render as keyboardMove } from '../keyboardMove';
 import { render as renderGround } from '../ground';
 import { renderTable } from './table';
+import { Player } from 'game';
 
 function renderMaterial(
   material: MaterialDiffSide,
   score: number,
   position: Position,
   noMaterial: boolean,
-  checks?: number
+  checks?: number,
 ) {
   if (noMaterial) return;
   const children: VNode[] = [];
@@ -40,7 +41,7 @@ function renderPlayerScore(
   position: Position,
   playerIndex: string,
   variantKey: VariantKey,
-  captures: boolean
+  captures: boolean,
 ): VNode {
   const defaultMancalaRole = 's';
   const children: VNode[] = [];
@@ -78,14 +79,36 @@ function renderPlayerScore(
           title: captures ? 'Captures' : 'Score',
         },
       },
-      children
+      children,
     );
+  } else if (variantKey === 'backgammon' || variantKey === 'nackgammon') {
+    for (let i = 0; i < score; i++) {
+      children.push(h('piece.side-piece.' + playerIndex + (i === 0 ? ' first' : '')));
+    }
+    return h('div.game-score.game-score-' + position, { attrs: { 'data-score': score } }, children);
+  } else if (variantKey === 'oware') {
+    children.push(
+      h(`piece.${defaultMancalaRole}${score.toString()}-piece.` + playerIndex + `.captures`, {
+        attrs: { 'data-score': score },
+      }),
+    );
+    return h('div.game-score.game-score-' + position, children);
   } else {
-    const pieceClass =
-      variantKey === 'oware' ? `piece.${defaultMancalaRole}${score.toString()}-piece.` : 'piece.p-piece.';
-    children.push(h(pieceClass + playerIndex, { attrs: { 'data-score': score } }));
+    children.push(h('piece.p-piece.' + playerIndex, { attrs: { 'data-score': score } }));
     return h('div.game-score.game-score-' + position, children);
   }
+}
+
+function renderPlayerScoreNames(player: Player, opponent: Player): VNode | undefined {
+  const children: VNode[] = [];
+  const playerNames = {
+    p1: player.user ? player.user.username : player.playerName,
+    p2: opponent.user ? opponent.user.username : opponent.playerName,
+  };
+  children.push(h('div.game-score-name.p1.text', playerNames.p1));
+  children.push(h('div.game-score-name.vs.text', 'vs'));
+  children.push(h('div.game-score-name.p2.text', playerNames.p2));
+  return h('div.game-score-names', children);
 }
 
 function wheel(ctrl: RoundController, e: WheelEvent): void {
@@ -168,16 +191,28 @@ export function main(ctrl: RoundController): VNode {
         }
         break;
       }
-      // case 'togyzkumalak': {
-      // //togy uses game history to store the score while playing (its also in the full fen)
-      // const playerScore = d.player.score ? d.player.score : 0;
-      // const opponentScore = d.opponent.score ? d.opponent.score : 0;
-      // const p1Score = d.player.playerIndex === 'p1' ? playerScore : opponentScore;
-      // const p2Score = d.player.playerIndex === 'p2' ? playerScore : opponentScore;
-      // topScore = topPlayerIndex === 'p1' ? p1Score : p2Score;
-      // bottomScore = topPlayerIndex === 'p2' ? p1Score : p2Score;
-      // break;
-      // }
+      case 'nackgammon':
+      case 'backgammon': {
+        const startingNumberOfPieces = 15;
+        const fen = plyStep(ctrl.data, ctrl.ply).fen;
+        const pieces = cgState ? cgState.pieces : fenRead(fen, boardSize, variantKey);
+        const pocketPieces = pocketRead(fen, variantKey);
+
+        const p1PiecesOffBoard: number =
+          fen.split(' ').length > 5
+            ? util.getBackgammonScoreFromFen(fen, 'p1')
+            : startingNumberOfPieces - util.getBackgammonScoreFromPieces(pieces, pocketPieces, 'p1');
+        const p2PiecesOffBoard: number =
+          fen.split(' ').length > 5
+            ? util.getBackgammonScoreFromFen(fen, 'p2')
+            : startingNumberOfPieces - util.getBackgammonScoreFromPieces(pieces, pocketPieces, 'p2');
+
+        const p1Score = p1PiecesOffBoard;
+        const p2Score = p2PiecesOffBoard;
+        topScore = topPlayerIndex === 'p1' ? p1Score : p2Score;
+        bottomScore = topPlayerIndex === 'p2' ? p1Score : p2Score;
+        break;
+      }
       default: {
         break;
       }
@@ -215,8 +250,8 @@ export function main(ctrl: RoundController): VNode {
       $('body').removeClass('coords-in').addClass('coords-out');
     }
   }
-  //Togyzkumalak board always has coodinates on the inside
-  if (['togyzkumalak'].includes(variantKey)) {
+  //Togyzkumalak and backgammon board always has coodinates on the inside
+  if (['togyzkumalak', 'backgammon', 'nackgammon'].includes(variantKey)) {
     if (!$('body').hasClass('coords-no')) {
       $('body').removeClass('coords-out').addClass('coords-in');
     }
@@ -228,11 +263,15 @@ export function main(ctrl: RoundController): VNode {
     'shogi',
     'minixiangqi',
     'minishogi',
+    'breakthroughtroyka',
+    'minibreakthroughtroyka',
     'oware',
     'togyzkumalak',
     'go9x9',
     'go13x13',
     'go19x19',
+    'backgammon',
+    'nackgammon',
   ].includes(variantKey)
     ? '.piece-letter'
     : '';
@@ -242,7 +281,10 @@ export function main(ctrl: RoundController): VNode {
     : h(
         `div.round__app.variant-${variantKey}${notationBasic}.${d.game.gameFamily}`,
         {
-          class: { 'move-confirm': !!(ctrl.moveToSubmit || ctrl.dropToSubmit) },
+          class: {
+            'move-confirm': !!(ctrl.moveToSubmit || ctrl.dropToSubmit),
+            'turn-indicator-off': !ctrl.data.pref.playerTurnIndicator,
+          },
         },
         [
           h(
@@ -253,9 +295,10 @@ export function main(ctrl: RoundController): VNode {
                   ? undefined
                   : util.bind('wheel', (e: WheelEvent) => wheel(ctrl, e), undefined, false),
             },
-            [renderGround(ctrl), promotion.view(ctrl)]
+            [renderGround(ctrl), promotion.view(ctrl)],
           ),
           ctrl.data.hasGameScore ? renderPlayerScore(topScore, 'top', topPlayerIndex, variantKey, captures) : null,
+          ctrl.data.hasGameScore ? renderPlayerScoreNames(ctrl.data.player, ctrl.data.opponent) : null,
           crazyView(ctrl, topPlayerIndex, 'top') ||
             renderMaterial(material[topPlayerIndex], -score, 'top', d.hasGameScore, checks[topPlayerIndex]),
           ...renderTable(ctrl),
@@ -265,6 +308,6 @@ export function main(ctrl: RoundController): VNode {
             ? renderPlayerScore(bottomScore, 'bottom', bottomPlayerIndex, variantKey, captures)
             : null,
           ctrl.keyboardMove ? keyboardMove(ctrl.keyboardMove) : null,
-        ]
+        ],
       );
 }

@@ -33,6 +33,7 @@ object BsonHandlers {
         swissId = r.get[Swiss.Id](swissId),
         userId = r str userId,
         rating = r int rating,
+        inputRating = r intO inputRating,
         provisional = r boolD provisional,
         points = r.get[Swiss.Points](points),
         sbTieBreak = r.get[Swiss.SonnenbornBerger](sbTieBreak),
@@ -40,22 +41,25 @@ object BsonHandlers {
         performance = r.getO[Swiss.Performance](performance),
         score = r.get[Swiss.Score](score),
         absent = r.boolD(absent),
-        byes = ~r.getO[Set[SwissRound.Number]](byes)
+        byes = ~r.getO[Set[SwissRound.Number]](byes),
+        disqualified = r.boolD(disqualified)
       )
     def writes(w: BSON.Writer, o: SwissPlayer) =
       $doc(
-        id          -> o.id,
-        swissId     -> o.swissId,
-        userId      -> o.userId,
-        rating      -> o.rating,
-        provisional -> w.boolO(o.provisional),
-        points      -> o.points,
-        sbTieBreak  -> o.sbTieBreak,
-        bhTieBreak  -> o.bhTieBreak,
-        performance -> o.performance,
-        score       -> o.score,
-        absent      -> w.boolO(o.absent),
-        byes        -> o.byes.some.filter(_.nonEmpty)
+        id           -> o.id,
+        swissId      -> o.swissId,
+        userId       -> o.userId,
+        rating       -> o.rating,
+        inputRating  -> o.inputRating,
+        provisional  -> w.boolO(o.provisional),
+        points       -> o.points,
+        sbTieBreak   -> o.sbTieBreak,
+        bhTieBreak   -> o.bhTieBreak,
+        performance  -> o.performance,
+        score        -> o.score,
+        absent       -> w.boolO(o.absent),
+        byes         -> o.byes.some.filter(_.nonEmpty),
+        disqualified -> w.boolO(o.disqualified)
       )
   }
 
@@ -112,6 +116,7 @@ object BsonHandlers {
             round = r.get[SwissRound.Number](round),
             p1 = w,
             p2 = b,
+            bbpPairingP1 = r.getO[User.ID](bbpPairingP1) | w,
             status = r.getO[SwissPairing.Status](status) | Right(none),
             matchStatus = r.getO[SwissPairing.MatchStatus](matchStatus) | Right(List(none)),
             // TODO: long term we may want to skip storing both of these fields
@@ -128,12 +133,13 @@ object BsonHandlers {
       }
     def writes(w: BSON.Writer, o: SwissPairing) =
       $doc(
-        id          -> o.id,
-        swissId     -> o.swissId,
-        round       -> o.round,
-        players     -> o.players,
-        status      -> o.status,
-        matchStatus -> o.matchStatus,
+        id           -> o.id,
+        swissId      -> o.swissId,
+        round        -> o.round,
+        players      -> o.players,
+        bbpPairingP1 -> o.bbpPairingP1,
+        status       -> o.status,
+        matchStatus  -> o.matchStatus,
         // TODO: long term we may want to skip storing both of these fields
         //       in the case that it's not a multimatch to save on storage
         multiMatchGameIds -> o.multiMatchGameIds,
@@ -176,6 +182,8 @@ object BsonHandlers {
       Swiss.Settings(
         nbRounds = r.get[Int]("n"),
         rated = r.boolO("r") | true,
+        handicapped = r.boolO("h") | false,
+        inputPlayerRatings = r.getD[String]("ipr"),
         isMatchScore = r.boolO("ms") | false,
         isBestOfX = r.boolO("x") | false,
         isPlayX = r.boolO("px") | false,
@@ -186,15 +194,19 @@ object BsonHandlers {
         position = r.getO[FEN]("f"),
         chatFor = r.intO("c") | Swiss.ChatFor.default,
         roundInterval = (r.intO("i") | 60).seconds,
+        halfwayBreak = (r.intO("hb") | 0).seconds,
         password = r.strO("p"),
         conditions = r.getO[SwissCondition.All]("o") getOrElse SwissCondition.All.empty,
         forbiddenPairings = r.getD[String]("fp"),
-        medleyVariants = r.getO[List[Variant]]("mv")
+        medleyVariants = r.getO[List[Variant]]("mv"),
+        minutesBeforeStartToJoin = r.intO("mbs")
       )
     def writes(w: BSON.Writer, s: Swiss.Settings) =
       $doc(
         "n"   -> s.nbRounds,
         "r"   -> (!s.rated).option(false),
+        "h"   -> (s.handicapped).option(true),
+        "ipr" -> s.inputPlayerRatings.some.filter(_.nonEmpty),
         "ms"  -> s.isMatchScore,
         "x"   -> s.isBestOfX,
         "px"  -> s.isPlayX,
@@ -205,10 +217,12 @@ object BsonHandlers {
         "f"   -> s.position,
         "c"   -> (s.chatFor != Swiss.ChatFor.default).option(s.chatFor),
         "i"   -> s.roundInterval.toSeconds.toInt,
+        "hb"  -> s.halfwayBreak.toSeconds.toInt,
         "p"   -> s.password,
         "o"   -> s.conditions.ifNonEmpty,
         "fp"  -> s.forbiddenPairings.some.filter(_.nonEmpty),
-        "mv"  -> s.medleyVariants
+        "mv"  -> s.medleyVariants,
+        "mbs" -> s.minutesBeforeStartToJoin
       )
   }
 

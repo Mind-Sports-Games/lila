@@ -3,7 +3,7 @@ board-scores {
   display: flex;
   pointer-events: none;
 
-  @include fluid-size('font-size', 8px, 12px);
+  @include fluid-size('font-size', 6px, 14px);
 
   user-select: none;
   color: #fff;
@@ -41,6 +41,14 @@ board-scores {
     }
   }
 
+  board-score {
+    width: 100%;
+    font-size: 130%;
+    .backgammon-contemporary & {
+      color: #a9ad7d;
+    }
+  }
+
   .variant-togyzkumalak .orientation-p1 & {
     &.p1 {
       left: 0;
@@ -70,6 +78,25 @@ board-scores {
   position-score {
     flex: 1 1 auto;
   }
+
+  .variant-nackgammon .orientation-p1 &,
+  .variant-backgammon .orientation-p1 & {
+    &.p1 {
+      bottom: 6%;
+    }
+    &.p2 {
+      top: 6%;
+    }
+  }
+  .variant-nackgammon .orientation-p1vflip &,
+  .variant-backgammon .orientation-p1vflip & {
+    &.p1 {
+      top: 6%;
+    }
+    &.p2 {
+      bottom: 6%;
+    }
+  }
 }
 
 //for single colmun/mobiles
@@ -84,6 +111,44 @@ board-scores {
       height: 1.6em;
       width: 1.6em;
       padding: 0;
+    }
+    @include fluid-size('font-size', 10px, 18px);
+  }
+}
+
+@include breakpoint($mq-col1-phone) {
+  board-scores {
+    @include fluid-size('font-size', 9px, 11px);
+  }
+}
+
+/* handle outer coords */
+@include breakpoint($mq-landscape-mobile) {
+  board-scores {
+    .variant-togyzkumalak & {
+      font-size: 60%;
+    }
+
+    .variant-togyzkumalak .orientation-p1 & {
+      &.p1 {
+        left: 0;
+        bottom: 41%;
+      }
+      &.p2 {
+        left: 0;
+        top: 41%;
+      }
+    }
+
+    .variant-togyzkumalak .orientation-p2 & {
+      &.p1 {
+        left: 0;
+        top: 41%;
+      }
+      &.p2 {
+        left: 0;
+        bottom: 41%;
+      }
     }
   }
 }

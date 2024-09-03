@@ -9,7 +9,6 @@
   <string name="fiveCheck">Check your opponent 5 times to win</string>
   <string name="horde">Destroy the horde to win</string>
   <string name="kingOfTheHill">Bring your King to the center to win</string>
-  <string name="horde">White gets two moves every turn to compensate for their starting disadvantage</string>
   <string name="monster">White gets two moves every turn to compensate for their starting disadvantage</string>
   <string name="noCastling">Standard chess but no castling</string>
   <string name="racingKings">Race your King to the eighth rank to win</string>
@@ -34,12 +33,14 @@
   <string name="flipello">Flip pieces between your color to get the most board area</string>
   <string name="flipello10">Flip pieces between your color to get the most board area</string>
   <string name="amazons">Immobilize all the enemy pieces</string>
+  <string name="breakthroughtroyka">Reach opponents home rank to win</string>
+  <string name="minibreakthroughtroyka">Reach opponents home rank to win</string>  
   <string name="oware">Capture the most stones to win</string>
   <string name="togyzkumalak">Capture the most stones to win</string>
   <string name="go9x9">Surround the largest area(s) of the 9 by 9 board with your stones to win</string>
   <string name="go13x13">Surround the largest area(s) of the 13 by 13 board with your stones to win</string>
   <string name="go19x19">Surround the largest area(s) of the 19 by 19 board with your stones to win</string>
-  <string name="backgammon">Get all your pieces into the end zone first to win</string>
-  <string name="abalone">Push three of your opponents stones off the board to win</string>
-</resources>
+  <string name="backgammon">Get all your pieces into your home and then bear them off first to win</string>
+  <string name="nackgammon">Get all your pieces into your home and then bear them off first to win</string>
+  <string name="abalone">Push six of your opponent's marbles off the board to win</string>
 </resources>

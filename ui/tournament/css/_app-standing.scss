@@ -31,11 +31,23 @@
   .user-link .rating {
     font-style: italic;
     font-size: 0.8em;
+    &.unused {
+      text-decoration: line-through;
+    }
+    &.input {
+      padding-left: 5px;
+    }
   }
 
   tr.long .user-link .rating {
     display: block;
     padding-left: 0px;
+    &.unused {
+      text-decoration: line-through;
+    }
+    &.input {
+      padding-left: 5px;
+    }
   }
 
   tr {
@@ -115,6 +127,14 @@
   tr.xlong .sheet {
     font-size: 0.85rem;
     letter-spacing: 0.04em;
+  }
+
+  tr.dq .rank {
+    text-decoration: line-through;
+  }
+
+  tr.dq .player {
+    text-decoration: line-through;
   }
 
   double {

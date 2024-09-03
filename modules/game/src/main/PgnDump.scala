@@ -216,12 +216,15 @@ final class PgnDump(
             _.Termination, {
               import Status._
               game.status match {
-                case Created | Started                                              => "Unterminated"
-                case Aborted | NoStart                                              => "Abandoned"
-                case Timeout | Outoftime                                            => "Time forfeit"
-                case Resign | Draw | Stalemate | Mate | PerpetualCheck | VariantEnd => "Normal"
-                case Cheat                                                          => "Rules infraction"
-                case UnknownFinish                                                  => "Unknown"
+                case Created | Started                                           => "Unterminated"
+                case Aborted | NoStart                                           => "Abandoned"
+                case Timeout | Outoftime | OutoftimeGammon | OutoftimeBackgammon => "Time forfeit"
+                case RuleOfGin | GinGammon | GinBackgammon                       => "Rule of Gin"
+                case Resign | ResignGammon | ResignBackgammon | Draw | Stalemate | Mate | PerpetualCheck |
+                    VariantEnd | SingleWin | GammonWin | BackgammonWin =>
+                  "Normal"
+                case Cheat         => "Rules infraction"
+                case UnknownFinish => "Unknown"
               }
             }
           ).some
@@ -246,7 +249,7 @@ final class PgnDump(
             )
           case _ =>
             List(
-              Tag(_.FEN, (initialFen | Forsyth.initial(game.variant.gameLogic)).value),
+              Tag(_.FEN, (initialFen | game.variant.initialFen).value),
               Tag("SetUp", "1")
             )
         })

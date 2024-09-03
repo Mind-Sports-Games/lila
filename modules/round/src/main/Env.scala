@@ -82,6 +82,14 @@ final class Env(
     }
   })
 
+  private val scheduleActionExpiration = new ScheduleActionExpiration(game => {
+    game.timeBeforeExpirationOnPaused foreach { centis =>
+      scheduler.scheduleOnce((centis.millis + 1000).millis) {
+        tellRound(game.id, actorApi.round.ForceExpiredAction)
+      }
+    }
+  })
+
   private lazy val proxyDependencies =
     new GameProxy.Dependencies(gameRepo, scheduler)
   private lazy val roundDependencies = wire[RoundDuct.Dependencies]
@@ -190,7 +198,7 @@ final class Env(
 
   val tvBroadcast = system.actorOf(Props(wire[TvBroadcast]))
 
-  val apiMoveStream = wire[ApiMoveStream]
+  val apiActionStream = wire[ApiActionStream]
 
   def resign(pov: Pov): Unit =
     if (pov.game.abortable) tellRound(pov.gameId, Abort(pov.playerId))

@@ -203,14 +203,14 @@ final private[api] class GameApi(
   ) =
     Json
       .obj(
-        "id"         -> g.id,
-        "initialFen" -> initialFen,
-        "rated"      -> g.rated,
-        "variant"    -> g.variant.key,
-        "speed"      -> g.speed.key,
-        "perf"       -> PerfPicker.key(g),
-        "createdAt"  -> g.createdAt,
-        "lastMoveAt" -> g.updatedAt,
+        "id"          -> g.id,
+        "initialFen"  -> initialFen,
+        "rated"       -> g.rated,
+        "variant"     -> g.variant.key,
+        "speed"       -> g.speed.key,
+        "perf"        -> PerfPicker.key(g),
+        "createdAt"   -> g.createdAt,
+        "lastMoveAt"  -> g.updatedAt,
         "turns"       -> g.turnCount,
         "plies"       -> g.plies,
         "playerIndex" -> g.turnPlayerIndex.name,
@@ -218,7 +218,7 @@ final private[api] class GameApi(
         "clock" -> g.clock.map { clock =>
           Json.obj(
             "initial"   -> clock.limitSeconds,
-            "increment" -> clock.incrementSeconds,
+            "increment" -> clock.graceSeconds,
             "totalTime" -> clock.estimateTotalSeconds
           )
         },
@@ -232,6 +232,7 @@ final private[api] class GameApi(
             )
             .add("name", p.name)
             .add("provisional" -> p.provisional)
+            .add("isInputRating" -> p.isInputRating)
             .add("plyCentis" -> withFlags.plyTimes ?? g.plyTimes(p.playerIndex).map(_.map(_.centis)))
             .add("blurs" -> withFlags.blurs.option(p.blurs.nb))
             .add("analysis" -> analysisOption.flatMap(analysisJson.player(g pov p.playerIndex)))

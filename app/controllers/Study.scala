@@ -228,7 +228,7 @@ final class Study(
   def show(id: String) =
     Open { implicit ctx =>
       orRelay(id) {
-        showQuery(env.study.api byIdWithChapter id)
+        showQuery(env.study.api.byIdWithChapter(id))
       }
     }
 
@@ -439,6 +439,21 @@ final class Study(
       }(rateLimitedFu)
     }
 
+  def sgf(id: String) =
+    Open { implicit ctx =>
+      PgnRateLimitPerIp(HTTPRequest ipAddress ctx.req) {
+        OptionFuResult(env.study.api byId id) { study =>
+          CanViewResult(study) {
+            lila.mon.export.pgn.study.increment()
+            Ok.chunked(env.study.sgfDump(study))
+              .pipe(asAttachmentStream(s"${env.study.sgfDump filename study}.sgf"))
+              .as(sgfContentType)
+              .fuccess
+          }
+        }
+      }(rateLimitedFu)
+    }
+
   def chapterPgn(id: String, chapterId: String) =
     Open { implicit ctx =>
       env.study.api.byIdWithChapter(id, chapterId) flatMap {
@@ -448,6 +463,21 @@ final class Study(
             Ok(env.study.pgnDump.ofChapter(study, requestPgnFlags(ctx.req))(chapter).toString)
               .pipe(asAttachment(s"${env.study.pgnDump.filename(study, chapter)}.pgn"))
               .as(pgnContentType)
+              .fuccess
+          }
+        }
+      }
+    }
+
+  def chapterSgf(id: String, chapterId: String) =
+    Open { implicit ctx =>
+      env.study.api.byIdWithChapter(id, chapterId) flatMap {
+        _.fold(notFound) { case WithChapter(study, chapter) =>
+          CanViewResult(study) {
+            lila.mon.export.pgn.studyChapter.increment()
+            Ok(env.study.sgfDump.ofChapter(study)(chapter).toString)
+              .pipe(asAttachment(s"${env.study.sgfDump.filename(study, chapter)}.sgf"))
+              .as(sgfContentType)
               .fuccess
           }
         }

@@ -65,7 +65,8 @@ object tournaments {
                     if (t.variant.exotic) VariantKeys.variantName(t.variant) else t.perfType.trans,
                     t.position.isDefined option frag(" • ", trans.thematic()),
                     " • ",
-                    t.mode.fold(trans.casualTournament, trans.ratedTournament)(),
+                    if (t.handicapped) trans.handicappedTournament()
+                    else t.mode.fold(trans.casualTournament, trans.ratedTournament)(),
                     " • ",
                     t.durationString
                   )
@@ -80,7 +81,9 @@ object tournaments {
                     else if (s.variant.exotic) VariantKeys.variantName(s.variant)
                     else s.perfType.trans,
                     " • ",
-                    (if (s.settings.rated) trans.ratedTournament else trans.casualTournament)()
+                    if (s.settings.handicapped) trans.handicappedTournament()
+                    else if (s.settings.rated) trans.ratedTournament()
+                    else trans.casualTournament()
                   )
                 )
             )

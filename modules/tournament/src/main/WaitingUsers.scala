@@ -65,6 +65,8 @@ private[tournament] case class WaitingUsers(
     )
   }
 
+  def activePlayers(justFinished: Set[User.ID]): Int = (all ++ justFinished).size
+
   def hasUser(userId: User.ID) = hash contains userId
 }
 

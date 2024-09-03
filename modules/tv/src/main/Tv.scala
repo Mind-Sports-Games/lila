@@ -236,6 +236,29 @@ object Tv {
           familyChannel = true,
           gameFamily = "go"
         )
+    case object BackgammonFamily
+        extends Channel(
+          name = s"All ${GameGroup(10).name}",
+          icon = BV.Backgammon.perfIcon.toString,
+          secondsSinceLastMove = freshBlitz,
+          filters = Seq(anyVariant(GameGroup(10).variants), noBot),
+          familyChannel = true,
+          gameFamily = "backgammon"
+        )
+    case object BreakthroughTroykaFamily
+        extends Channel(
+          name = s"All ${VariantKeys.gameFamilyName(GameFamily.BreakthroughTroyka())}",
+          icon = FV.BreakthroughTroyka.perfIcon.toString,
+          secondsSinceLastMove = freshBlitz,
+          filters = Seq(
+            anyVariant(
+              Variant.all(GameLogic.FairySF()).filter(v => v.gameFamily == GameFamily.BreakthroughTroyka())
+            ),
+            noBot
+          ),
+          familyChannel = true,
+          gameFamily = "breakthroughtroyka"
+        )
     case object Bullet
         extends Channel(
           name = S.Bullet.name,
@@ -556,6 +579,26 @@ object Tv {
           familyChannel = true,
           gameFamily = "amazons"
         )
+    case object BreakthroughTroyka
+        extends Channel(
+          name = VariantKeys.variantName(Variant.wrap(FV.BreakthroughTroyka)),
+          icon = FV.BreakthroughTroyka.perfIcon.toString,
+          secondsSinceLastMove = freshBlitz,
+          filters = Seq(variant(Variant.wrap(FV.BreakthroughTroyka)), noBot),
+          familyChannel = false,
+          gameFamily = "breakthroughtroyka"
+        )
+
+    case object MiniBreakthroughTroyka
+        extends Channel(
+          name = VariantKeys.variantName(Variant.wrap(FV.MiniBreakthroughTroyka)),
+          icon = FV.MiniBreakthroughTroyka.perfIcon.toString,
+          secondsSinceLastMove = freshBlitz,
+          filters = Seq(variant(Variant.wrap(FV.MiniBreakthroughTroyka)), noBot),
+          familyChannel = false,
+          gameFamily = "breakthroughtroyka"
+        )
+
     case object Oware
         extends Channel(
           name = VariantKeys.variantName(Variant.wrap(MSV.Oware)),
@@ -607,6 +650,15 @@ object Tv {
           icon = BV.Backgammon.perfIcon.toString,
           secondsSinceLastMove = freshBlitz,
           filters = Seq(variant(Variant.wrap(BV.Backgammon)), noBot),
+          familyChannel = false,
+          gameFamily = "backgammon"
+        )
+    case object Nackgammon
+        extends Channel(
+          name = VariantKeys.variantName(Variant.wrap(BV.Nackgammon)),
+          icon = BV.Nackgammon.perfIcon.toString,
+          secondsSinceLastMove = freshBlitz,
+          filters = Seq(variant(Variant.wrap(BV.Nackgammon)), noBot),
           familyChannel = false,
           gameFamily = "backgammon"
         )
@@ -681,6 +733,9 @@ object Tv {
       Flipello,
       Flipello10,
       Amazons,
+      BreakthroughTroykaFamily,
+      BreakthroughTroyka,
+      MiniBreakthroughTroyka,
       MancalaFamily,
       Oware,
       Togyzkumalak,
@@ -688,7 +743,9 @@ object Tv {
       Go19x19,
       Go13x13,
       Go9x9,
+      BackgammonFamily,
       Backgammon,
+      Nackgammon,
       Abalone,
       Bot,
       Computer

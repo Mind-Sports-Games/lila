@@ -210,7 +210,7 @@ playstrategy.load.then(() => {
     }),
     function (c) {
       charts.server = c;
-    }
+    },
   );
   Highcharts.chart(
     document.querySelector('.network .meter'),
@@ -219,7 +219,7 @@ playstrategy.load.then(() => {
     }),
     function (c) {
       charts.network = c;
-    }
+    },
   );
   var values = {
     server: -1,

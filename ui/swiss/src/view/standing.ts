@@ -13,6 +13,7 @@ function playerTr(ctrl: SwissCtrl, player: Player) {
       class: {
         me: ctrl.data.me?.id == userId,
         active: ctrl.playerInfoId === userId,
+        dq: player.disqualified,
       },
       hook: bind('click', _ => ctrl.showPlayerInfo(player), ctrl.redraw),
     },
@@ -26,7 +27,7 @@ function playerTr(ctrl: SwissCtrl, player: Player) {
                 title: 'Absent',
               },
             })
-          : [player.rank]
+          : [player.rank],
       ),
       h('td.player', renderPlayer(player, false, !ctrl.data.isMedley, true)),
       h(
@@ -38,27 +39,27 @@ function playerTr(ctrl: SwissCtrl, player: Player) {
               p == 'absent'
                 ? h(p, title('Absent'), '-')
                 : p == 'bye'
-                ? h(p, title('Bye'), isMatchScore ? matchScoreDisplay(multiMatchByeScore(ctrl)) : '1')
-                : p == 'late'
-                ? h(p, title('Late'), '½')
-                : h(
-                    'a.glpt.' + (p.o ? 'ongoing' : p.w === true ? 'win' : p.w === false ? 'loss' : 'draw'),
-                    {
-                      attrs: {
-                        key: p.g,
-                        href: `/${p.g}`,
-                      },
-                      hook: onInsert(playstrategy.powertip.manualGame),
-                    },
-                    result(p)
-                  )
+                  ? h(p, title('Bye'), isMatchScore ? matchScoreDisplay(multiMatchByeScore(ctrl)) : '1')
+                  : p == 'late'
+                    ? h(p, title('Late'), '½')
+                    : h(
+                        'a.glpt.' + (p.o ? 'ongoing' : p.w === true ? 'win' : p.w === false ? 'loss' : 'draw'),
+                        {
+                          attrs: {
+                            key: p.g,
+                            href: `/${p.g}`,
+                          },
+                          hook: onInsert(playstrategy.powertip.manualGame),
+                        },
+                        result(p),
+                      ),
             )
-            .concat([...Array(Math.max(0, ctrl.data.nbRounds - player.sheet.length))].map(_ => h('r')))
-        )
+            .concat([...Array(Math.max(0, ctrl.data.nbRounds - player.sheet.length))].map(_ => h('r'))),
+        ),
       ),
       h('td.points', title('Points'), '' + player.points),
       h('td.tieBreak', title('Tiebreak'), '' + player.tieBreak),
-    ]
+    ],
   );
 }
 
@@ -114,8 +115,8 @@ export default function standing(ctrl: SwissCtrl, pag: Pager, klass?: string): V
             },
           },
         },
-        tableBody
+        tableBody,
       ),
-    ]
+    ],
   );
 }

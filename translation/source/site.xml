@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources>
   <string name="playWithAFriend">Play with a friend</string>
-  <string name="playWithTheMachine">Play with the computer</string>
+  <string name="playWithTheMachine">Play with Stockfish</string>
+  <string name="playWithBots">Play with a bot</string>
   <string name="toInviteSomeoneToPlayGiveThisUrl">To invite someone to play, give this URL</string>
   <string name="gameOver">Game Over</string>
   <string name="waitingForOpponent">Waiting for opponent</string>
@@ -50,6 +51,9 @@
   <string name="raceFinished">Race finished</string>
   <string name="checkersConnected">All checkers connected</string>
   <string name="gameFinished">Game finished</string>
+  <string name="backgammonSingleWin">Standard win</string>
+  <string name="backgammonGammonWin">Gammon win</string>
+  <string name="backgammonBackgammonWin">Backgammon win</string>
   <string name="variantEnding">Variant ending</string>
   <string name="gameFinishedRepetition">Game finished via repetition</string>
   <string name="newOpponent">New opponent</string>
@@ -69,6 +73,8 @@
   <string name="talkInChat">Please be nice in the chat!</string>
   <string name="theFirstPersonToComeOnThisUrlWillPlayWithYou">The first person to come to this URL will play with you.</string>
   <string name="playerIndexResigned">%s resigned</string>
+  <string name="playerIndexResignedGammon">%s resigned a gammon</string>
+  <string name="playerIndexResignedBackgammon">%s resigned a backgammon</string>
   <string name="whiteResigned">White resigned</string>
   <string name="blackResigned">Black resigned</string>
   <string name="playerIndexLeftTheGame">%s left the game</string>
@@ -196,6 +202,7 @@
   <string name="variant">Variant</string>
   <string name="variants">Variants</string>
   <string name="rulesVariants">Rules &amp; Variants</string>
+  <string name="clockTypes">Clock Types</string>
   <string name="medley">Medley</string>
   <string name="medleyTournaments">Medley Tournaments</string>
   <string name="medleyDefinition">A different game/variant in every round of the Swiss</string>
@@ -209,6 +216,8 @@
   <string name="timeControl">Time control</string>
   <string name="realTime">Fischer Clock</string>
   <string name="byoyomiTime">Byoyomi Clock</string>
+  <string name="bronsteinDelay">Bronstein Delay</string>
+  <string name="simpleDelay">Simple Delay</string>
   <string name="correspondence">Correspondence</string>
   <string name="daysPerTurn">Days per turn</string>
   <string name="oneDay">One day</string>
@@ -253,6 +262,11 @@
   <string name="playerIndexTimeOut">%s time out</string>
   <string name="whiteTimeOut">White time out</string>
   <string name="blackTimeOut">Black time out</string>
+  <string name="playerIndexLosesByGammonTimeOut">%s time out, and loses a gammon</string>
+  <string name="playerIndexLosesByBackgammonTimeOut">%s time out, and loses a backgammon</string>
+  <string name="playerIndexWinsByRuleOfGin">%s time out, but win by rule of gin</string>
+  <string name="playerIndexWinsByGinGammon">%s time out, but a gammon win by rule of gin</string>
+  <string name="playerIndexWinsByGinBackgammon">%s time out, but a backgammon win by rule of gin</string>
   <string name="playerIndexOffersSelectSquares">%s offers selected squares</string>
   <string name="selectSquareOfferDeclined">Square selection declined </string>
   <string name="selectSquareOfferAccepted">Square selection accepted</string>
@@ -283,6 +297,10 @@
   <string name="casualTournament">Casual</string>
   <string name="ratedTournament">Rated</string>
   <string name="thisGameIsRated">This game is rated</string>
+  <string name="handicapped">Handicapped</string>
+  <string name="handicappedTournament">Handicapped</string>
+  <string name="handicapTournaments">Handicap Tournaments</string>
+  <string name="handicappedDefinition">A handicap is given based on the players ratings to create an even game. Only supported for Go games.</string>
   <string name="rematch">Rematch</string>
   <string name="rematchOfferSent">Rematch offer sent</string>
   <string name="rematchOfferSentWhite">White offers rematch</string>
@@ -295,6 +313,7 @@
   <string name="confirmMove">Confirm move</string>
   <string name="play">Play</string>
   <string name="inbox">Inbox</string>
+  <string name="statusScoring">Status Scoring</string>
   <string name="chatRoom">Chat room</string>
   <string name="loginToChat">Sign in to chat</string>
   <string name="youHaveBeenTimedOut">You have been timed out.</string>
@@ -385,8 +404,8 @@
   <string name="youAreNotInTeam">You are not in the team %s</string>
   <string name="backToGame">Back to game</string>
   <string name="siteDescription">Free online chess server. Play chess in a clean interface. No registration, no ads, no plugin required. Play chess with the computer, friends or random opponents.</string>
-  <string name="playstrategySiteDescription">2 player strategy games platform. Chess, Draughts, Shogi, Xiangqi and more abstract games. Play in a clean interface against the computer, friends or random opponents.</string>
-  <string name="playstrategySiteTitle">The two player strategy games platform. Chess, Draughts, Shogi, Xiangqi and more!</string>
+  <string name="playstrategySiteDescription">2 player strategy games platform. Chess, Draughts, Backgammon, Go, Shogi, Xiangqi and more abstract games. Play in a clean interface against the computer, friends or random opponents.</string>
+  <string name="playstrategySiteTitle">The two player strategy games platform. Chess, Draughts, Backgammon, Go, Shogi, Xiangqi and more!</string>
   <string name="playstrategySiteTitleShort">2 player strategy games</string>
   <string name="xJoinedTeamY">%1$s joined team %2$s</string>
   <string name="xCreatedTeamY">%1$s created team %2$s</string>
@@ -585,9 +604,12 @@ computer analysis, game chat and shareable URL.</string>
   <string name="newPasswordStrength">Password strength</string>
   <string name="clockInitialTime">Clock initial time</string>
   <string name="clockIncrement">Clock increment</string>
+  <string name="clockDelay">Clock delay</string>
   <string name="clockByoyomi">Clock Byoyomi</string>
   <string name="numberOfPeriods">Number of periods</string>
   <string name="useByoyomi">Use Byoyomi Clock</string>
+  <string name="useBronsteinDelay">Use Bronstein Delay</string>
+  <string name="useSimpleDelay">Use Simple Delay</string>
   <string name="privacy">Privacy</string>
   <string name="privacyPolicy">Privacy policy</string>
   <string name="letOtherPlayersFollowYou">Let other players follow you</string>
@@ -799,6 +821,7 @@ computer analysis, game chat and shareable URL.</string>
   <string name="transparent">Transparent</string>
   <string name="backgroundImageUrl">Background image URL:</string>
   <string name="boardGeometry">Board geometry</string>
+  <string name="colorTheme">Colour theme</string>
   <string name="boardTheme">Board theme</string>
   <string name="boardSize">Board size</string>
   <string name="pieceSet">Piece set</string>

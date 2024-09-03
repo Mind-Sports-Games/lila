@@ -31,13 +31,14 @@ object form {
           postForm(cls := "form3", action := routes.Tournament.create)(
             fields.name,
             form3.split(fields.rated, fields.variant),
+            form3.split(fields.handicapped, fields.inputPlayerRatings),
             fields.medleyControls,
             fields.medleyIntervalOptions,
             fields.medleyDefaults,
             fields.medleyGameFamilies,
             fields.clockRow1,
-            fields.useByoyomi,
             fields.clockRow2,
+            fields.clockRow3,
             form3.split(fields.minutes, fields.waitMinutes),
             form3.split(fields.description(true), fields.startPosition),
             form3.globalError(form),
@@ -72,13 +73,14 @@ object form {
           postForm(cls := "form3", action := routes.Tournament.update(tour.id))(
             form3.split(fields.name, tour.isCreated option fields.startDate),
             form3.split(fields.rated, fields.variant),
+            form3.split(fields.handicapped, fields.inputPlayerRatings),
             fields.medleyControls,
             fields.medleyIntervalOptions,
             fields.medleyDefaults,
             fields.medleyGameFamilies,
             fields.clockRow1,
-            fields.useByoyomi,
             fields.clockRow2,
+            fields.clockRow3,
             form3.split(
               if ((TournamentForm.minutes contains tour.minutes) || tour.isMedley) form3.split(fields.minutes)
               else
@@ -194,6 +196,15 @@ object form {
           half = true
         ),
         form3.hidden(form("streakable"), "false".some) // hack to allow disabling streaks
+      ),
+      form3.split(
+        form3.checkbox(
+          form("statusScoring"),
+          trans.statusScoring(),
+          help = frag("Score extra points: +1 Gammon, +2 Backgammon.").some,
+          half = true
+        ),
+        form3.hidden(form("statusScoring"), "false".some) // hack to allow disabling statusScoring
       )
     )
 
@@ -255,6 +266,34 @@ final private class TourFields(form: Form[_], tour: Option[Tournament])(implicit
         disabled = disabledAfterStart
       )
     )
+  def handicapped =
+    frag(
+      form3.checkbox(
+        form("handicaps.handicapped"),
+        trans.handicapped(),
+        half = true,
+        help = frag(
+          trans.handicappedDefinition.txt(),
+          br,
+          a(href := routes.Page.loneBookmark("handicaps"), target := "_blank")("More detail here")
+        ).some
+      ),
+      st.input(
+        tpe := "hidden",
+        st.name := form("handicapped").name,
+        value := "false"
+      ) // hack allow disabling handicapped
+    )
+  def inputPlayerRatings =
+    form3.group(
+      form("handicaps.inputPlayerRatings"),
+      frag("Input player ratings"),
+      klass = "inputPlayerRatings",
+      help = frag(
+        "Input player ratings to be used for the handicapped tournament. Username and Rating per line, separated by a space."
+      ).some,
+      half = true
+    )(form3.textarea(_)(rows := 4))
   def medley =
     frag(
       form3.checkbox(
@@ -333,7 +372,9 @@ final private class TourFields(form: Form[_], tour: Option[Tournament])(implicit
       medleyGameGroup(GameGroup.Flipello()),
       medleyGameGroup(GameGroup.Mancala()),
       medleyGameGroup(GameGroup.Amazons()),
-      medleyGameGroup(GameGroup.Go())
+      medleyGameGroup(GameGroup.BreakthroughTroyka()),
+      medleyGameGroup(GameGroup.Go()),
+      medleyGameGroup(GameGroup.Backgammon())
     )
   private def onePerGameFamily =
     frag(
@@ -385,19 +426,52 @@ final private class TourFields(form: Form[_], tour: Option[Tournament])(implicit
     )(
       views.html.tournament.form.startingPosition(_, tour)
     )
+
   def useByoyomi =
-    frag(form3.checkbox(form("clock.useByoyomi"), trans.useByoyomi()))
+    frag(form3.checkbox(form("clock.useByoyomi"), trans.useByoyomi(), disabled = disabledAfterStart))
+
+  def useBronsteinDelay =
+    frag(
+      form3.checkbox(
+        form("clock.useBronsteinDelay"),
+        trans.useBronsteinDelay(),
+        disabled = disabledAfterStart
+      )
+    )
+
+  def useSimpleDelay =
+    frag(form3.checkbox(form("clock.useSimpleDelay"), trans.useSimpleDelay(), disabled = disabledAfterStart))
 
   def clockRow1 =
     form3.split(
-      form3.group(form("clock.limit"), trans.clockInitialTime(), half = true)(
-        form3.select(_, TournamentForm.clockTimeChoices, disabled = disabledAfterStart)
+      form3.group(
+        form("clock.limit"),
+        trans.clockInitialTime(),
+        half = true,
+        help = frag(
+          a(href := s"${routes.Page.loneBookmark("clocks")}", target := "_blank")("Clock details here")
+        ).some
+      )(
+        form3.select(
+          _,
+          TournamentForm.clockTimeChoices,
+          disabled = disabledAfterStart
+        )
       ),
-      form3.group(form("clock.increment"), trans.clockIncrement(), half = true)(
-        form3.select(_, TournamentForm.clockIncrementChoices, disabled = disabledAfterStart)
+      form3.group(form("clock.increment"), trans.clockIncrement(), klass = "clockIncrement", half = true)(
+        form3.select(
+          _,
+          TournamentForm.clockIncrementChoices,
+          disabled = disabledAfterStart
+        )
+      ),
+      form3.group(form("clock.delay"), trans.clockDelay(), klass = "clockDelay", half = true)(
+        form3.select(_, TournamentForm.clockDelayChoices, disabled = disabledAfterStart)
       )
     )
   def clockRow2 =
+    form3.split(useByoyomi, useBronsteinDelay, useSimpleDelay)
+  def clockRow3 =
     form3.split(
       form3.group(form("clock.byoyomi"), trans.clockByoyomi(), klass = "byoyomiClock", half = true)(
         form3.select(_, TournamentForm.clockByoyomiChoices, disabled = disabledAfterStart)

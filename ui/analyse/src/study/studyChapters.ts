@@ -24,7 +24,7 @@ export function ctrl(
   send: StudySocketSend,
   setTab: () => void,
   chapterConfig: (id: string) => Promise<StudyChapterConfig>,
-  root: AnalyseCtrl
+  root: AnalyseCtrl,
 ): StudyChaptersCtrl {
   const list: Prop<StudyChapterMeta[]> = prop(initChapters);
 
@@ -102,7 +102,7 @@ export function view(ctrl: StudyCtrl): VNode {
         });
       };
       if (window['Sortable']) makeSortable();
-      else playstrategy.loadScript('javascripts/vendor/Sortable.min.js').then(makeSortable);
+      else playstrategy.loadScriptCJS('javascripts/vendor/Sortable.min.js').then(makeSortable);
     }
   }
 
@@ -153,7 +153,7 @@ export function view(ctrl: StudyCtrl): VNode {
             chapter.ongoing ? h('ongoing', { attrs: { ...dataIcon('J'), title: 'Ongoing' } }) : null,
             !chapter.ongoing && chapter.res ? h('res', chapter.res) : null,
             canContribute ? h('i.act', { attrs: dataIcon('%') }) : null,
-          ]
+          ],
         );
       })
       .concat(
@@ -164,10 +164,10 @@ export function view(ctrl: StudyCtrl): VNode {
                 {
                   hook: bind('click', ctrl.chapters.toggleNewForm, ctrl.redraw),
                 },
-                [h('span', iconTag('O')), h('h3', ctrl.trans.noarg('addNewChapter'))]
+                [h('span', iconTag('O')), h('h3', ctrl.trans.noarg('addNewChapter'))],
               ),
             ]
-          : []
-      )
+          : [],
+      ),
   );
 }

@@ -1,6 +1,9 @@
 modules
 app
 project
+conf/routes
+
+pnpm-lock.yaml
 
 public/css
 public/piece-css

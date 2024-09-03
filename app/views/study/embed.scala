@@ -48,11 +48,14 @@ object embed {
         )
       },
       views.html.base.layout.playstrategyJsObject(config.nonce)(config.lang),
-      depsTag,
+      depsTag("javascripts/vendor/cash.min.js"),
+      depsTag("javascripts/vendor/powertip.min.js"),
+      depsTag("javascripts/vendor/howler.min.js"),
+      depsTag("javascripts/vendor/mousetrap.min.js"),
       jsModule("analysisBoard.embed"),
       analyseTag,
       embedJsUnsafeLoadThen(
-        s"""analyseEmbed(${safeJsonValue(
+        s"""PlayStrategyAnalyseEmbed(${safeJsonValue(
           Json.obj(
             "study"  -> data.study,
             "data"   -> data.analysis,

@@ -46,7 +46,7 @@ object watcher {
       moreJs = frag(
         roundNvuiTag,
         roundTag(gameLogic),
-        embedJsUnsafeLoadThen(s"""${roundPlayStrategyTag(gameLogic)}.boot(${safeJsonValue(
+        embedJsUnsafeLoadThen(s"""${roundPlayStrategyTag(gameLogic)}(${safeJsonValue(
           Json.obj(
             "data" -> data,
             "i18n" -> jsI18n(pov.game),
@@ -69,7 +69,7 @@ object watcher {
     )
   }
 
-  def crawler(pov: Pov, initialFen: Option[FEN], pgn: Pgn)(implicit
+  def crawler(pov: Pov, initialFen: Option[FEN], pgn: Pgn, sgf: String)(implicit
       ctx: Context
   ) =
     bits.layout(
@@ -93,7 +93,8 @@ object watcher {
             div(cls := "for-crawler")(
               h1(titleGame(pov.game)),
               p(describePov(pov)),
-              div(cls := "pgn")(pgn.render)
+              div(cls := "pgn")(pgn.render),
+              div(cls := "sgf")(sgf)
             )
           ),
           div(cls := "round__board main-board")(chessground(pov))

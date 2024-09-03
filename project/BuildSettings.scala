@@ -20,7 +20,7 @@ object BuildSettings {
       scalaVersion := globalScalaVersion,
       scalacOptions ++= compilerOptions,
       // No bloop project for tests
-      Test / bloopGenerate := None,
+      // Test / bloopGenerate := None,
       // disable publishing doc and sources
       Compile / doc / sources := Seq.empty,
       Compile / packageDoc / publishArtifact := false,

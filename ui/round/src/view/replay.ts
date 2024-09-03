@@ -2,6 +2,7 @@ import * as game from 'game';
 import * as round from '../round';
 import * as status from 'game/status';
 import * as util from '../util';
+import { allowAnalysisForVariant } from 'common/analysis';
 import isCol1 from 'common/isCol1';
 import RoundController from '../ctrl';
 import throttle from 'common/throttle';
@@ -10,7 +11,7 @@ import { game as gameRoute } from 'game/router';
 import { h, VNode } from 'snabbdom';
 import { Step, MaybeVNodes, RoundData } from '../interfaces';
 import { NotationStyle, notationStyle } from 'stratutils';
-import { moveFromNotationStyle } from 'common/notation';
+import { moveFromNotationStyle, combinedNotationForBackgammonActions } from 'common/notation';
 
 const scrollMax = 99999,
   moveTag = 'u8t',
@@ -37,7 +38,7 @@ const autoScroll = throttle(100, (movesEl: HTMLElement, ctrl: RoundController) =
       else if (isCol1()) movesEl.scrollLeft = st;
       else movesEl.scrollTop = st;
     }
-  })
+  }),
 );
 
 const renderDrawOffer = () =>
@@ -48,17 +49,17 @@ const renderDrawOffer = () =>
         title: 'Draw offer',
       },
     },
-    '½?'
+    '½?',
   );
 
 function renderMultiActionMove(
   step: (Step | null)[],
   notation: NotationStyle,
   variant: Variant,
-  prevFen: string,
+  prevStepFen: (s: Step) => string,
   curPly: number,
   orEmpty: boolean,
-  drawOffers: Set<number>
+  drawOffers: Set<number>,
 ) {
   return step
     ? h(
@@ -69,19 +70,27 @@ function renderMultiActionMove(
           },
         },
         [
-          step
-            .map(s =>
+          combinedNotationOfTurn(
+            step.map(s =>
               s
-                ? moveFromNotationStyle(notation)({ san: s.san, uci: s.uci, fen: s.fen, prevFen: prevFen }, variant)
-                : ''
-            )
-            .join(' '),
+                ? moveFromNotationStyle(notation)(
+                    { san: s.san, uci: s.uci, fen: s.fen, prevFen: prevStepFen(s) },
+                    variant,
+                  )
+                : '',
+            ),
+            notation,
+          ),
           step.map(s => drawOffers.has(s ? s.turnCount : -1)).includes(true) ? renderDrawOffer() : undefined,
-        ]
+        ],
       )
     : orEmpty
-    ? h(moveTag, '…')
-    : undefined;
+      ? h(moveTag, '…')
+      : undefined;
+}
+
+function combinedNotationOfTurn(actionNotations: string[], notation: NotationStyle): string {
+  return notation === 'bkg' ? combinedNotationForBackgammonActions(actionNotations) : actionNotations.join(' ');
 }
 
 export function renderResult(ctrl: RoundController): VNode | undefined {
@@ -109,7 +118,7 @@ export function renderResult(ctrl: RoundController): VNode | undefined {
             else setTimeout(() => ctrl.autoScroll(), 200);
           }),
         },
-        [viewStatus(ctrl), winner ? ' • ' + ctrl.trans('playerIndexIsVictorious', winner) : '']
+        [viewStatus(ctrl), winner ? ' • ' + ctrl.trans('playerIndexIsVictorious', winner) : ''],
       ),
     ]);
   }
@@ -130,7 +139,7 @@ function renderMoves(ctrl: RoundController): MaybeVNodes {
   if (firstTurn % 2 === 1) {
     moveTurns.push([null]);
   }
-  var currentTurn: Array<Step | null> = [];
+  let currentTurn: Array<Step | null> = [];
   let turn = firstTurn + 1;
   for (let i = 1; i < steps.length; i++) {
     if (steps[i].turnCount === turn) {
@@ -146,27 +155,27 @@ function renderMoves(ctrl: RoundController): MaybeVNodes {
     }
   }
 
-  const prevFen = (i: number) => {
-    if (i === 0) return initialFen;
-    const step = moveTurns[i];
-    return step && step[0] ? step[0].fen : initialFen;
+  const prevStepFen = (s: Step) => {
+    if (s.ply <= 1) return initialFen;
+    const stepIndex = steps.indexOf(s);
+    const prevStep = steps[stepIndex - 1];
+    return stepIndex && prevStep ? prevStep.fen : initialFen;
   };
 
   const els: MaybeVNodes = [],
     curPly = ctrl.ply;
   for (let i = 0; i < moveTurns.length; i = i + 2) {
     els.push(h(indexTag, Math.floor(i / 2) + 1 + ''));
-    els.push(renderMultiActionMove(moveTurns[i], notation, variant, prevFen(i), curPly, true, drawTurns));
-    els.push(renderMultiActionMove(moveTurns[i + 1], notation, variant, prevFen(i + 1), curPly, false, drawTurns));
+    els.push(renderMultiActionMove(moveTurns[i], notation, variant, prevStepFen, curPly, true, drawTurns));
+    els.push(renderMultiActionMove(moveTurns[i + 1], notation, variant, prevStepFen, curPly, false, drawTurns));
   }
   els.push(renderResult(ctrl));
-
   return els;
 }
 
 export function analysisButton(ctrl: RoundController): VNode | undefined {
   const forecastCount = ctrl.data.forecastCount;
-  return game.userAnalysable(ctrl.data) && util.allowAnalysisForVariant(ctrl.data.game.variant.key)
+  return game.userAnalysable(ctrl.data) && allowAnalysisForVariant(ctrl.data.game.variant.key)
     ? h(
         'a.fbt.analysis',
         {
@@ -179,7 +188,7 @@ export function analysisButton(ctrl: RoundController): VNode | undefined {
             'data-icon': 'A',
           },
         },
-        forecastCount ? ['' + forecastCount] : []
+        forecastCount ? ['' + forecastCount] : [],
       )
     : undefined;
 }
@@ -207,7 +216,7 @@ function renderButtons(ctrl: RoundController) {
             }
           }
         },
-        ctrl.redraw
+        ctrl.redraw,
       ),
     },
     [
@@ -236,12 +245,12 @@ function renderButtons(ctrl: RoundController) {
         });
       }),
       analysisButton(ctrl) || h('div.noop'),
-    ]
+    ],
   );
 }
 
-function initMessage(d: RoundData, trans: Trans) {
-  return game.playable(d) && d.game.turns === 0 && !d.player.spectator
+function initMessage(d: RoundData, ply: number, trans: Trans) {
+  return game.playable(d) && d.game.turns === 0 && ply === 0 && !d.player.spectator
     ? h('div.message', util.justIcon(''), [
         h('div', [
           trans('youPlayThePlayerIndexPieces', d.player.playerName),
@@ -293,13 +302,13 @@ export function render(ctrl: RoundController): VNode | undefined {
             ctrl.autoScroll();
           }),
         },
-        renderMoves(ctrl)
+        renderMoves(ctrl),
       );
   return ctrl.nvui
     ? undefined
     : h(rmovesTag, [
         renderButtons(ctrl),
-        initMessage(d, ctrl.trans) ||
+        initMessage(d, ctrl.ply, ctrl.trans) ||
           (moves
             ? isCol1()
               ? h('div.col1-moves', [

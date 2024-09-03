@@ -3,7 +3,7 @@ package lila.tournament
 import cats.implicits._
 import strategygames.format.FEN
 import strategygames.chess.{ StartingPosition }
-import strategygames.{ ByoyomiClock, ClockConfig, FischerClock, GameFamily, GameGroup, GameLogic, Mode }
+import strategygames.{ ByoyomiClock, Clock, ClockConfig, GameFamily, GameGroup, GameLogic, Mode }
 import strategygames.variant.Variant
 import org.joda.time.DateTime
 import play.api.data._
@@ -12,6 +12,7 @@ import play.api.data.validation
 import play.api.data.validation.Constraint
 
 import lila.common.Form._
+import lila.common.Clock._
 import lila.hub.LeaderTeam
 import lila.hub.LightTeam._
 import lila.user.User
@@ -23,7 +24,7 @@ final class TournamentForm {
   def create(user: User, leaderTeams: List[LeaderTeam], teamBattleId: Option[TeamID] = None) =
     form(user, leaderTeams) fill TournamentSetup(
       name = teamBattleId.isEmpty option user.titleUsername,
-      clock = FischerClock.Config(180, 0),
+      clock = Clock.Config(180, 0),
       minutes = minuteDefault,
       waitMinutes = waitMinuteDefault.some,
       startDate = none,
@@ -48,7 +49,13 @@ final class TournamentForm {
         flipello = true.some,
         mancala = true.some,
         amazons = true.some,
-        go = true.some
+        breakthroughtroyka = true.some,
+        go = true.some,
+        backgammon = true.some
+      ),
+      handicaps = Handicaps(
+        handicapped = false.some,
+        inputPlayerRatings = None
       ),
       position = None,
       password = None,
@@ -58,6 +65,7 @@ final class TournamentForm {
       teamBattleByTeam = teamBattleId,
       berserkable = true.some,
       streakable = true.some,
+      statusScoring = false.some,
       description = none,
       hasChat = true.some
     )
@@ -90,7 +98,13 @@ final class TournamentForm {
         flipello = gameGroupInMedley(tour.medleyVariants, GameGroup.Flipello()).some,
         mancala = gameGroupInMedley(tour.medleyVariants, GameGroup.Mancala()).some,
         amazons = gameGroupInMedley(tour.medleyVariants, GameGroup.Amazons()).some,
-        go = gameGroupInMedley(tour.medleyVariants, GameGroup.Go()).some
+        breakthroughtroyka = gameGroupInMedley(tour.medleyVariants, GameGroup.BreakthroughTroyka()).some,
+        go = gameGroupInMedley(tour.medleyVariants, GameGroup.Go()).some,
+        backgammon = gameGroupInMedley(tour.medleyVariants, GameGroup.Backgammon()).some
+      ),
+      handicaps = Handicaps(
+        handicapped = tour.handicapped.some,
+        inputPlayerRatings = tour.inputPlayerRatings
       ),
       position = tour.position,
       mode = none,
@@ -100,6 +114,7 @@ final class TournamentForm {
       teamBattleByTeam = none,
       berserkable = tour.berserkable.some,
       streakable = tour.streakable.some,
+      statusScoring = tour.statusScoring.some,
       description = tour.description,
       hasChat = tour.hasChat.some
     )
@@ -134,45 +149,11 @@ final class TournamentForm {
   private def draughts64Variants(medleyVariants: Option[List[Variant]]) =
     medleyVariantsList(medleyVariants).filterNot(_.draughts64Variant).isEmpty
 
-  // Yes, I know this is kinda gross. :'(
-  private def valuesFromClockConfig(
-      c: ClockConfig
-  ): Option[(Boolean, Double, Int, Option[Int], Option[Int])] =
-    c match {
-      case fc: FischerClock.Config => {
-        FischerClock.Config.unapply(fc).map(t => (false, t._1 / 60d, t._2, None, None))
-      }
-      case bc: ByoyomiClock.Config => {
-        ByoyomiClock.Config.unapply(bc).map(t => (true, t._1 / 60d, t._2, Some(t._3), Some(t._4)))
-      }
-    }
-
-  // Yes, I know this is kinda gross. :'(
-  private def clockConfigFromValues(
-      useByoyomi: Boolean,
-      limit: Double,
-      increment: Int,
-      byoyomi: Option[Int],
-      periods: Option[Int]
-  ): ClockConfig =
-    (useByoyomi, byoyomi, periods) match {
-      case (true, Some(byoyomi), Some(periods)) =>
-        ByoyomiClock.Config((limit * 60).toInt, increment, byoyomi, periods)
-      case _ =>
-        FischerClock.Config((limit * 60).toInt, increment)
-    }
-
   private def form(user: User, leaderTeams: List[LeaderTeam]) =
     Form(
       mapping(
         "name" -> optional(nameType(user)),
-        "clock" -> mapping[ClockConfig, Boolean, Double, Int, Option[Int], Option[Int]](
-          "useByoyomi" -> boolean,
-          "limit"      -> numberInDouble(clockTimeChoices),
-          "increment"  -> numberIn(clockIncrementChoices),
-          "byoyomi"    -> optional(numberIn(clockByoyomiChoices)),
-          "periods"    -> optional(numberIn(periodsChoices))
-        )(clockConfigFromValues)(valuesFromClockConfig)
+        "clock" -> clockConfigMappingsMinutes(clockTimes, clockByoyomi)
           .verifying("Invalid clock", _.estimateTotalSeconds > 0),
         "minutes" -> {
           if (lila.security.Granter(_.ManageTournament)(user)) number
@@ -197,16 +178,22 @@ final class TournamentForm {
           "draughts64Variants"  -> optional(boolean)
         )(MedleyDefaults.apply)(MedleyDefaults.unapply),
         "medleyGameFamilies" -> mapping(
-          "chess"    -> optional(boolean),
-          "draughts" -> optional(boolean),
-          "shogi"    -> optional(boolean),
-          "xiangqi"  -> optional(boolean),
-          "loa"      -> optional(boolean),
-          "flipello" -> optional(boolean),
-          "mancala"  -> optional(boolean),
-          "amazons"  -> optional(boolean),
-          "go"       -> optional(boolean)
+          "chess"              -> optional(boolean),
+          "draughts"           -> optional(boolean),
+          "shogi"              -> optional(boolean),
+          "xiangqi"            -> optional(boolean),
+          "loa"                -> optional(boolean),
+          "flipello"           -> optional(boolean),
+          "mancala"            -> optional(boolean),
+          "amazons"            -> optional(boolean),
+          "breakthroughtroyka" -> optional(boolean),
+          "go"                 -> optional(boolean),
+          "backgammon"         -> optional(boolean)
         )(MedleyGameFamilies.apply)(MedleyGameFamilies.unapply),
+        "handicaps" -> mapping(
+          "handicapped"        -> optional(boolean),
+          "inputPlayerRatings" -> optional(cleanNonEmptyText)
+        )(Handicaps.apply)(Handicaps.unapply),
         "position"         -> optional(lila.common.Form.fen.playableStrict),
         "mode"             -> optional(number.verifying(Mode.all.map(_.id) contains _)), // deprecated, use rated
         "rated"            -> optional(boolean),
@@ -215,6 +202,7 @@ final class TournamentForm {
         "teamBattleByTeam" -> optional(nonEmptyText.verifying(id => leaderTeams.exists(_.id == id))),
         "berserkable"      -> optional(boolean),
         "streakable"       -> optional(boolean),
+        "statusScoring"    -> optional(boolean),
         "description"      -> optional(cleanNonEmptyText),
         "hasChat"          -> optional(boolean)
       )(TournamentSetup.apply)(TournamentSetup.unapply)
@@ -223,6 +211,7 @@ final class TournamentForm {
         .verifying("Increase tournament duration, or decrease game clock", _.sufficientDuration)
         .verifying("Reduce tournament duration, or increase game clock", _.excessiveDuration)
         .verifying("Must have more than 1 game type for medley tournaments", _.validMedleySetup)
+        .verifying("Hanidcapped mode requires a Go variant, non-rated and non-meldey", _.validHandicapSetup)
     )
 }
 
@@ -232,15 +221,12 @@ object TournamentForm {
     (2 to 7 by 1) ++ (10 to 30 by 5) ++ (40 to 60 by 10)
   }.map(_.toDouble)
   val clockTimeDefault = 2d
-  private def formatLimit(l: Double) =
-    FischerClock.Config(l * 60 toInt, 0).limitString + {
-      if (l <= 1) " minute" else " minutes"
-    }
-  val clockTimeChoices = optionsDouble(clockTimes, formatLimit)
+  val clockTimeChoices = clockTimeChoicesFromMinutes(clockTimes)
 
-  val clockIncrements       = (0 to 2 by 1) ++ (3 to 7) ++ (10 to 30 by 5) ++ (40 to 60 by 10)
+  val clockIncrements       = (0 to 5) ++ (8 to 12 by 2) ++ (15 to 30 by 5) ++ (40 to 60 by 10)
   val clockIncrementDefault = 0
   val clockIncrementChoices = options(clockIncrements, "%d second{s}")
+  val clockDelayChoices     = clockIncrementChoices
 
   val clockByoyomi        = (1 to 9 by 1) ++ (10 to 30 by 5) ++ (40 to 60 by 10)
   val clockByoyomiDefault = 10
@@ -299,6 +285,7 @@ private[tournament] case class TournamentSetup(
     medleyIntervalOptions: MedleyIntervalOptions,
     medleyDefaults: MedleyDefaults,
     medleyGameFamilies: MedleyGameFamilies,
+    handicaps: Handicaps,
     position: Option[FEN],
     mode: Option[Int], // deprecated, use rated
     rated: Option[Boolean],
@@ -307,12 +294,15 @@ private[tournament] case class TournamentSetup(
     teamBattleByTeam: Option[String],
     berserkable: Option[Boolean],
     streakable: Option[Boolean],
+    statusScoring: Option[Boolean],
     description: Option[String],
     hasChat: Option[Boolean]
 ) {
 
   def validClock = clock match {
-    case fc: FischerClock.Config => (fc.limitSeconds + fc.incrementSeconds) > 0
+    case fc: Clock.Config             => (fc.limitSeconds + fc.incrementSeconds) > 0
+    case bc: Clock.BronsteinConfig    => (bc.limitSeconds + bc.delaySeconds) > 0 && bc.delaySeconds > 0
+    case udc: Clock.SimpleDelayConfig => (udc.limitSeconds + udc.delaySeconds) > 0 && udc.delaySeconds > 0
     case bc: ByoyomiClock.Config =>
       (bc.limitSeconds + bc.incrementSeconds) > 0 || (bc.limitSeconds + bc.byoyomiSeconds) > 0
   }
@@ -336,6 +326,9 @@ private[tournament] case class TournamentSetup(
     realMode == Mode.Casual ||
       lila.game.Game.allowRated(realVariant, clock.some)
 
+  def validHandicapSetup =
+    !handicaps.handicapped.has(true) || (gameLogic == GameLogic.Go() && !isMedley && realMode == Mode.Casual)
+
   def sufficientDuration = estimateNumberOfGamesOneCanPlay >= 3
   def excessiveDuration  = estimateNumberOfGamesOneCanPlay <= 150
 
@@ -353,6 +346,8 @@ private[tournament] case class TournamentSetup(
         clock = if (old.isCreated) clock else old.clock,
         minutes = if (isMedley) medleyDuration else minutes,
         mode = realMode,
+        handicapped = handicaps.handicapped.has(true),
+        inputPlayerRatings = if (handicaps.handicapped.has(true)) handicaps.inputPlayerRatings else None,
         variant = newVariant,
         medleyVariantsAndIntervals =
           if (
@@ -373,6 +368,7 @@ private[tournament] case class TournamentSetup(
         },
         noBerserk = !(~berserkable),
         noStreak = !(~streakable),
+        statusScoring = statusScoring | false,
         teamBattle = old.teamBattle,
         description = description,
         hasChat = hasChat | true
@@ -389,6 +385,10 @@ private[tournament] case class TournamentSetup(
         clock = if (old.isCreated) clock else old.clock,
         minutes = minutes,
         mode = if (rated.isDefined) realMode else old.mode,
+        handicapped = handicaps.handicapped | old.handicapped,
+        inputPlayerRatings = if (handicaps.handicapped.has(true)) {
+          handicaps.inputPlayerRatings.fold(old.inputPlayerRatings)(_.some.filter(_.nonEmpty))
+        } else None,
         variant = newVariant,
         startsAt = startDate | old.startsAt,
         password = password.fold(old.password)(_.some.filter(_.nonEmpty)),
@@ -398,6 +398,7 @@ private[tournament] case class TournamentSetup(
         },
         noBerserk = berserkable.fold(old.noBerserk)(!_),
         noStreak = streakable.fold(old.noStreak)(!_),
+        statusScoring = statusScoring | old.statusScoring,
         teamBattle = old.teamBattle,
         description = description.fold(old.description)(_.some.filter(_.nonEmpty)),
         hasChat = hasChat | old.hasChat
@@ -414,9 +415,17 @@ private[tournament] case class TournamentSetup(
       {
         (bc.limitSeconds + 30 * bc.incrementSeconds + bc.byoyomiSeconds * 20 * bc.periodsTotal) * 2 * 0.8
       } + 15
-    case fc: FischerClock.Config =>
+    case fc: Clock.Config =>
       {
         (fc.limitSeconds + 30 * fc.incrementSeconds) * 2 * 0.8
+      } + 15
+    case bc: Clock.BronsteinConfig =>
+      {
+        (bc.limitSeconds + 30 * bc.delaySeconds) * 2 * 0.8
+      } + 15
+    case udc: Clock.SimpleDelayConfig =>
+      {
+        (udc.limitSeconds + 30 * udc.delaySeconds) * 2 * 0.8
       } + 15
   }
 
@@ -463,7 +472,6 @@ private[tournament] case class TournamentSetup(
           fullMedleyList,
           clock.limitSeconds,
           medleyDuration,
-          medleyIntervalOptions.medleyMinutes.getOrElse(0),
           medleyIntervalOptions.numIntervals.getOrElse(fullMedleyList.length),
           medleyIntervalOptions.balanceIntervals.getOrElse(false)
         )
@@ -471,6 +479,11 @@ private[tournament] case class TournamentSetup(
     } else None
 
 }
+
+case class Handicaps(
+    handicapped: Option[Boolean],
+    inputPlayerRatings: Option[String]
+)
 
 case class MedleyIntervalOptions(
     medleyMinutes: Option[Int],
@@ -493,7 +506,9 @@ case class MedleyGameFamilies(
     flipello: Option[Boolean],
     mancala: Option[Boolean],
     amazons: Option[Boolean],
-    go: Option[Boolean]
+    breakthroughtroyka: Option[Boolean],
+    go: Option[Boolean],
+    backgammon: Option[Boolean]
 ) {
 
   lazy val ggList: List[GameGroup] = GameGroup.medley
@@ -505,6 +520,10 @@ case class MedleyGameFamilies(
     .filterNot(gg => if (!flipello.getOrElse(false)) gg == GameGroup.Flipello() else false)
     .filterNot(gg => if (!mancala.getOrElse(false)) gg == GameGroup.Mancala() else false)
     .filterNot(gg => if (!amazons.getOrElse(false)) gg == GameGroup.Amazons() else false)
+    .filterNot(gg =>
+      if (!breakthroughtroyka.getOrElse(false)) gg == GameGroup.BreakthroughTroyka() else false
+    )
     .filterNot(gg => if (!go.getOrElse(false)) gg == GameGroup.Go() else false)
+    .filterNot(gg => if (!backgammon.getOrElse(false)) gg == GameGroup.Backgammon() else false)
 
 }

@@ -78,7 +78,9 @@ object home {
                 else if (s.variant.exotic) VariantKeys.variantName(s.variant)
                 else s.perfType.trans,
                 " • ",
-                (if (s.settings.rated) trans.ratedTournament else trans.casualTournament)()
+                if (s.settings.handicapped) trans.handicappedTournament()
+                else if (s.settings.rated) trans.ratedTournament()
+                else trans.casualTournament()
               )
             ),
             td(
@@ -172,7 +174,7 @@ object home {
         "When a player can't be paired during a round, they receive a bye worth one point."
       )
     ),
-    div(cls := "faq")(
+    div(cls := "faq", id := "bestofx")(
       i("?"),
       p(
         strong("What do the Swiss options 'best of x' and 'play x' do?"),

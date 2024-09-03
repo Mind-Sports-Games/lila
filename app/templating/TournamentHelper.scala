@@ -48,29 +48,35 @@ trait TournamentHelper { self: I18nHelper with DateHelper with UserHelper =>
   object scheduledTournamentNameShortHtml {
     private def icon(c: Char) = s"""<span data-icon="$c"></span>"""
     private val replacements = List(
-      "PlayStrategy "   -> "",
-      "Marathon"        -> icon('\\'),
-      "HyperBullet"     -> s"H${icon(Speed.Bullet.perfIcon)}",
-      "SuperBlitz"      -> s"S${icon(Speed.Blitz.perfIcon)}",
-      "Grand Prix"      -> "GP",
-      " PREMIER"        -> "",
-      "Lines of Action" -> icon(strategygames.chess.variant.LinesOfAction.perfIcon),
-      "Draughts"        -> icon(strategygames.draughts.variant.Standard.perfIcon),
-      "Variants Medley" -> icon('5'),
-      "Medley"          -> icon('5'),
-      " -"              -> ""
+      "PlayStrategy " -> "",
+      "Marathon"      -> icon('\\'),
+      "HyperBullet"   -> s"H${icon(Speed.Bullet.perfIcon)}",
+      "SuperBlitz"    -> s"S${icon(Speed.Blitz.perfIcon)}",
+      "Grand Prix"    -> "GP",
+      " PREMIER"      -> "",
+      " -"            -> ""
     ) ++ PerfType.leaderboardable
       .filterNot(PerfType.translated.contains)
       .map { pt =>
         pt.trans(lila.i18n.defaultLang) -> icon(pt.iconChar)
       }
-      .sortBy(-_._1.length) ++ List("Chess" -> s"${icon(Speed.Blitz.perfIcon)}")
+      .sortBy(-_._1.length) ++
+      List(
+        "Chess"    -> icon(strategygames.chess.variant.Standard.perfIcon),
+        "Draughts" -> icon(strategygames.draughts.variant.Standard.perfIcon)
+      )
 
     def apply(name: String): Frag =
       raw {
-        replacements.foldLeft(name) { case (n, (from, to)) =>
-          n.replace(from, to)
-        }
+        if (name.contains("Medley Shield"))
+          name.split(" ").dropRight(1).mkString(" ").replace(" Medley Shield", icon('5'))
+        else if (name.contains("End of Year"))
+          (name.split(" ").drop(1).dropRight(2) ++ name.split(" ").takeRight(1)).toList.mkString(" ")
+        else
+          //old replacements
+          replacements.foldLeft(name) { case (n, (from, to)) =>
+            n.replace(from, to)
+          }
       }
   }
 

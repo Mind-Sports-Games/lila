@@ -6,7 +6,7 @@ import { isPlayerTurn, playable } from 'game';
 let rang = false;
 
 export default function (ctrl: RoundController): MaybeVNode {
-  const d = playable(ctrl.data) && ctrl.data.expiration;
+  const d = playable(ctrl.data) && ctrl.data.expirationAtStart;
   if (!d) return;
   const timeLeft = Math.max(0, d.updatedAt - Date.now() + d.millisToMove),
     secondsLeft = Math.floor(timeLeft / 1000),
@@ -25,6 +25,6 @@ export default function (ctrl: RoundController): MaybeVNode {
         'bar-glider': myTurn,
       },
     },
-    ctrl.trans.vdomPlural('nbSecondsToPlayTheFirstMove', secondsLeft, h('strong', '' + secondsLeft))
+    ctrl.trans.vdomPlural('nbSecondsToPlayTheFirstMove', secondsLeft, h('strong', '' + secondsLeft)),
   );
 }

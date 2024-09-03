@@ -13,7 +13,7 @@ function timer(pov: NowPlaying) {
         },
       },
     },
-    playstrategy.timeago(date)
+    playstrategy.timeago(date),
   );
 }
 
@@ -26,6 +26,20 @@ const boardClasses = (variant: Variant): string =>
         variant.key
       }.variant-${variant.key}`
     : `${variant.gameFamily}.${variant.key}.variant-${variant.key}`;
+
+const activePlayerLetter = (pov: NowPlaying): string =>
+  (pov.isMyTurn && pov.playerIndex === 'p1') || (!pov.isMyTurn && pov.playerIndex === 'p2') ? 'w' : 'b';
+
+const orientation = (pov: NowPlaying): string => {
+  switch (pov.variant.key) {
+    case 'backgammon':
+      return pov.playerIndex === 'p2' ? 'p1vflip' : 'p1';
+    case 'nackgammon':
+      return pov.playerIndex === 'p2' ? 'p1vflip' : 'p1';
+    default:
+      return pov.playerIndex;
+  }
+};
 
 export default function (ctrl: LobbyController) {
   return h(
@@ -46,7 +60,7 @@ export default function (ctrl: LobbyController) {
                     'data-state': `${pov.fen}|${boardSize(pov.variant.boardSize)}|${pov.playerIndex}|${pov.lastMove}`,
                   }
                 : {
-                    'data-state': `${pov.fen}|${pov.playerIndex}|${pov.lastMove}`,
+                    'data-state': `${pov.fen} ${activePlayerLetter(pov)}|${orientation(pov)}|${pov.lastMove}`,
                   },
             hook: {
               insert(vnode) {
@@ -62,11 +76,11 @@ export default function (ctrl: LobbyController) {
                 ? pov.secondsLeft && pov.hasMoved
                   ? timer(pov)
                   : [ctrl.trans.noarg('yourTurn')]
-                : h('span', '\xa0')
+                : h('span', '\xa0'),
             ), // &nbsp;
           ]),
-        ]
-      )
-    )
+        ],
+      ),
+    ),
   );
 }

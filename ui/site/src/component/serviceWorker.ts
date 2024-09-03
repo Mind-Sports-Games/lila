@@ -1,13 +1,13 @@
-import { assetUrl, jsModule } from './assets';
+import { hashedAssetUrl, jsModule } from './assets';
 import { storage } from './storage';
 
 export default function () {
   if ('serviceWorker' in navigator && 'Notification' in window && 'PushManager' in window) {
     const workerUrl = new URL(
-      assetUrl(jsModule('serviceWorker'), {
+      hashedAssetUrl(jsModule('serviceWorker'), {
         sameDomain: true,
       }),
-      self.location.href
+      self.location.href,
     );
     workerUrl.searchParams.set('asset-url', document.body.getAttribute('data-asset-url')!);
     if (document.body.getAttribute('data-dev')) workerUrl.searchParams.set('dev', '1');
@@ -45,7 +45,7 @@ export default function () {
                   err => {
                     console.log('push subscribe failed', err.message);
                     if (sub) sub.unsubscribe();
-                  }
+                  },
                 );
             }
           });

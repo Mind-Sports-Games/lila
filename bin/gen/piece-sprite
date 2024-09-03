@@ -4,7 +4,6 @@ require 'fileutils'
 require 'base64'
 include FileUtils
 
-#TODO Add Backgammon
 #TODO Add Abalone. James can help here
 
 lila_dir = pwd()
@@ -81,6 +80,16 @@ go_themes = [
   ['classic_stone', 'svg'],
   ['cross', 'svg']
 ]
+backgammon_themes = [
+   ['classic', 'svg'],
+   ['contemporary', 'svg'],
+   ['wooden', 'svg']
+]
+breakthroughtroyka_themes = [
+   ['staunty', 'svg'],
+   ['checkers', 'svg'],
+   ['fabirovsky', 'svg']
+]
 types = {
   'svg' => 'svg+xml;base64,',
   'png' => 'png;base64,'
@@ -130,6 +139,12 @@ togyzkumalak_extra_names = ['t', 's10o']
 togyzkumalak_variants = ['togyzkumalak']
 go_roles=['s-piece']
 go_variants=['go9x9', 'go13x13', 'go19x19']
+backgammon_base_image_names = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', 'flat','side', 'diceone', 'dicetwo', 'dicethree', 'dicefour', 'dicefive', 'dicesix']
+backgammon_dice_names = ['diceone', 'dicetwo', 'dicethree', 'dicefour', 'dicefive', 'dicesix']
+backgammon_extra_names = ['flat', 'side']
+backgammon_directions = ['top', 'bottom']
+breakthroughtroyka_variants = ['breakthroughtroyka', 'minibreakthroughtroyka']
+breakthroughtroyka_roles = ['p-piece']
 
 # inline SVG Chess
 chess_themes.map { |theme|
@@ -603,7 +618,7 @@ go_themes.map { |theme|
     }.flatten
     File.open(dest_dir + 'go-' + name + '.css', 'w') { |f| f.puts (classes_go_game + classes_go_variant).join("\n") }
   }
-# external SVG loa
+# external SVG go
 go_themes.map { |theme|
   name = theme[0]
   ext = theme[1]
@@ -626,3 +641,144 @@ go_themes.map { |theme|
     File.open(dest_dir + 'go-' + name + '.external.css', 'w') { |f| f.puts (classes_go_game + classes_go_variant).join("\n") }
 }
 
+# inline SVG backgammon
+backgammon_themes.map { |theme|
+  name = theme[0]
+  ext = theme[1]
+  classes_backgammon_game_and_variant = backgammon_base_image_names.map { |image_name|
+   colors.map { |color|
+    backgammon_directions.map { |direction|
+      if backgammon_extra_names.include?(image_name)
+        role = '.' + image_name + '-piece'
+        image_pos = ''
+        pos_class = ''
+      elsif backgammon_dice_names.include?(image_name)
+        role = 'cg-dice'
+        image_pos = ''
+        pos_class = ' dice.' + image_name[4..-1]
+      else
+        role = '.s' + image_name + '-piece'
+        image_pos = direction[0]
+        pos_class = '.' + direction
+      end
+      initial_css = '.backgammon.is2d ' + role + '.' + (color == 'w' ? 'p1' : 'p2') + pos_class + 
+       ', ' + '.is2d .variant-backgammon ' + role + '.' + (color == 'w' ? 'p1' : 'p2') + pos_class + 
+       ', ' + '.is2d .variant-nackgammon ' + role + '.' + (color == 'w' ? 'p1' : 'p2') + pos_class
+      file = source_dir + 'backgammon/' + name + '/' + color + image_name + image_pos + '.' + ext
+        File.open(file, 'r') do|image_file|
+          image = image_file.read
+          base64 = Base64.strict_encode64(image)
+          initial_css + ' {' + "background-image:url('data:image/" + types[ext] + base64 + "')}"
+        end
+    }
+  }
+  }.flatten
+  classes_backgammon_buttons = colors.map { |color|
+    if name === 'wooden'
+      bg_colour = color == 'w' ? "#F3C977" : "#692819"
+      border_colour = color == 'b' ? "#F3C977" : "#692819"
+    elsif name === 'contemporary'
+      bg_colour = color == 'w' ? "#D75049" : "#414143"
+      border_colour = "#F3F0E9"
+    else #classic
+      bg_colour = color == 'w' ? "white" : "black"
+      border_colour = color == 'b' ? "white" : "black"
+    end
+    pos_class = ' cg-button'
+      initial_css = '.backgammon.is2d ' + 'cg-buttons.' + (color == 'w' ? 'p1' : 'p2') + pos_class + 
+      ', ' + '.is2d .variant-backgammon ' + 'cg-buttons.' + (color == 'w' ? 'p1' : 'p2') + pos_class + 
+      ', ' + '.is2d .variant-nackgammon ' + 'cg-buttons.' + (color == 'w' ? 'p1' : 'p2') + pos_class
+        initial_css + ' {' + "background: " + bg_colour + ";" + 
+        " color: " + border_colour + ";" +
+        " border: " + border_colour + ";" + 
+        " border-width: medium; border-style: solid; " + "}"
+  }.flatten
+  File.open(dest_dir + 'backgammon-' + name + '.css', 'w') { |f| f.puts (classes_backgammon_game_and_variant + classes_backgammon_buttons).join("\n") }
+}
+# external SVG backgammon
+backgammon_themes.map { |theme|
+  name = theme[0]
+  ext = theme[1]
+  classes_backgammon_game_and_variant = backgammon_base_image_names.map { |image_name|
+   colors.map { |color|
+    backgammon_directions.map { |direction|
+        if backgammon_extra_names.include?(image_name)
+          role = '.' + image_name + '-piece'
+          image_pos = ''
+          pos_class = ''
+        elsif backgammon_dice_names.include?(image_name)
+          role = 'cg-dice'
+          image_pos = ''
+          pos_class = ' dice.' + image_name[4..-1]
+        else
+          role = '.s' + image_name + '-piece'
+          image_pos = direction[0]
+          pos_class = '.' + direction
+        end
+        initial_css = '.backgammon.is2d ' + role + '.' + (color == 'w' ? 'p1' : 'p2') + pos_class +
+         ', ' + '.is2d .variant-backgammon ' + role + '.' + (color == 'w' ? 'p1' : 'p2') + pos_class +
+         ', ' + '.is2d .variant-nackgammon ' + role + '.' + (color == 'w' ? 'p1' : 'p2') + pos_class
+        initial_css + ' {' +
+          "background-image:url('/assets/piece/" + 'backgammon/' + name + "/" + color + image_name + image_pos + "." + ext + "')}"
+    }
+  }
+  }.flatten
+  classes_backgammon_buttons = colors.map { |color|
+    if name === 'wooden'
+      bg_colour = color == 'w' ? "#F3C977" : "#692819"
+      border_colour = color == 'b' ? "#F3C977" : "#692819"
+    elsif name === 'contemporary'
+      bg_colour = color == 'w' ? "#D75049" : "#414143"
+      border_colour = "#F3F0E9"
+    else #classic
+      bg_colour = color == 'w' ? "white" : "black"
+      border_colour = color == 'b' ? "white" : "black"
+    end
+    pos_class = ' cg-button'
+      initial_css = '.backgammon.is2d ' + 'cg-buttons.' + (color == 'w' ? 'p1' : 'p2') + pos_class + 
+      ', ' + '.is2d .variant-backgammon ' + 'cg-buttons.' + (color == 'w' ? 'p1' : 'p2') + pos_class + 
+      ', ' + '.is2d .variant-nackgammon ' + 'cg-buttons.' + (color == 'w' ? 'p1' : 'p2') + pos_class
+        initial_css + ' {' + "background: " + bg_colour + ";" + 
+        " color: " + border_colour + ";" +
+        " border: " + border_colour + ";" + 
+        " border-width: medium; border-style: solid; " + "}"
+  }.flatten
+  File.open(dest_dir + 'backgammon-' + name + '.external.css', 'w') { |f| f.puts (classes_backgammon_game_and_variant + classes_backgammon_buttons).join("\n") }
+}
+
+
+# inline SVG breakthroughtroyka
+breakthroughtroyka_themes.map { |theme|
+  name = theme[0]
+  ext = theme[1]
+  classes_breakthroughtroyka = colors.map { |color|
+    breakthroughtroyka_roles.map { |role|
+      piece = color[0] + role.upcase[0]
+      file = source_dir + 'breakthroughtroyka/' + name + '/' + piece + '.' + ext
+      File.open(file, 'r') do|image_file|
+        image = image_file.read
+        base64 = Base64.strict_encode64(image)
+        '.breakthroughtroyka.is2d .' + role + '.' + (color == 'w' ? 'p1' : 'p2') +
+         ', ' + '.is2d .variant-breakthroughtroyka' + ' .' + role + '.' + (color == 'w' ? 'p1' : 'p2') + 
+         ', ' + '.is2d .variant-minibreakthroughtroyka' + ' .' + role + '.' + (color == 'w' ? 'p1' : 'p2') + ' {' +
+          "background-image:url('data:image/" + types[ext] + base64 + "')}"
+      end
+    }
+  }.flatten
+  File.open(dest_dir + 'breakthroughtroyka-' + name + '.css', 'w') { |f| f.puts (classes_breakthroughtroyka).join("\n") }
+}
+# external SVG breakthroughtroyka
+breakthroughtroyka_themes.map { |theme|
+  name = theme[0]
+  ext = theme[1]
+  classes_breakthroughtroyka = colors.map { |color|
+    breakthroughtroyka_roles.map { |role|
+      piece = color[0] + role.upcase[0]
+      '.breakthroughtroyka.is2d .' + role + '.' + (color == 'w' ? 'p1' : 'p2') + 
+      ', ' + '.is2d .variant-breakthroughtroyka' + ' .' + role + '.' + (color == 'w' ? 'p1' : 'p2') + 
+      ', ' + '.is2d .variant-minibreakthroughtroyka' + ' .' + role + '.' + (color == 'w' ? 'p1' : 'p2') + ' {' +
+        "background-image:url('/assets/piece/" + 'breakthroughtroyka/' + name + "/" + piece + "." + ext + "')}"
+    }
+  }.flatten
+  File.open(dest_dir + 'breakthroughtroyka-' + name + '.external.css', 'w') { |f| f.puts (classes_breakthroughtroyka).join("\n") }
+}

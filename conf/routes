@@ -67,7 +67,7 @@ GET   /player                          controllers.User.list
 GET   /player/top/:nb/:perfKey         controllers.User.topNb(nb: Int, perfKey: String)
 GET   /player/top/week                 controllers.User.topWeek
 GET   /player/online                   controllers.User.online
-GET   /player/autocomplete             controllers.User.autocomplete
+GET   /api/player/autocomplete         controllers.User.autocomplete
 
 GET   /dasher                          controllers.Dasher.get
 
@@ -148,7 +148,9 @@ GET   /study/$id<\w{8}>                controllers.Study.show(id: String)
 POST  /study                           controllers.Study.create
 POST  /study/as                        controllers.Study.createAs
 GET   /study/$id<\w{8}>.pgn            controllers.Study.pgn(id: String)
+GET   /study/$id<\w{8}>.sgf            controllers.Study.sgf(id: String)
 GET   /study/$id<\w{8}>/$chapterId<\w{8}>.pgn controllers.Study.chapterPgn(id: String, chapterId: String)
+GET   /study/$id<\w{8}>/$chapterId<\w{8}>.sgf controllers.Study.chapterSgf(id: String, chapterId: String)
 GET   /study/$id<\w{8}>/$chapterId<\w{8}>.gif controllers.Study.chapterGif(id: String, chapterId: String)
 POST  /study/$id<\w{8}>/delete         controllers.Study.delete(id: String)
 GET   /study/$id<\w{8}>/clone          controllers.Study.cloneStudy(id: String)
@@ -641,7 +643,7 @@ GET   /api/users/status                controllers.Api.usersStatus
 GET   /api/crosstable/:u1/:u2          controllers.Api.crosstable(u1: String, u2: String)
 POST  /api/stream/games-by-users       controllers.Api.gamesByUsersStream
 GET   /api/stream/event                controllers.Api.eventStream
-GET   /api/stream/game/:id             controllers.Api.moveStream(id: String)
+GET   /api/stream/game/:id             controllers.Api.actionStream(id: String)
 GET   /api/account                     controllers.Account.apiMe
 GET   /api/account/playing             controllers.Account.apiNowPlaying
 GET   /api/account/email               controllers.Account.apiEmail
@@ -791,8 +793,8 @@ GET   /prismic-preview                 controllers.Blog.preview(token: String)
 POST  /jslog/$id<\w{12}>               controllers.Main.jslog(id: String)
 POST  /jsmon/:event                    controllers.Main.jsmon(event: String)
 
-GET   /swag                            controllers.Main.movedPermanently(to: String = "https://shop.spreadshirt.com/playstrategy-org")
-GET   /yt                              controllers.Main.movedPermanently(to: String = "https://www.youtube.com/channel/UCr6RfQga70yMM9-nuzAYTsA")
+GET   /swag                            controllers.Main.movedPermanently(to: String = "https://mindsportsolympiad.com/product-category/merch/")
+# GET   /yt                              controllers.Main.movedPermanently(to: String = "https://www.youtube.com/channel/UCr6RfQga70yMM9-nuzAYTsA")
 
 GET   /assets/_$v<\w{6}>/*file         controllers.Main.devAsset(v, path="public", file)
 GET   /assets/*file                    controllers.ExternalAssets.at(path="public", file)

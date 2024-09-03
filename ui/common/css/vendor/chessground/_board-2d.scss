@@ -79,6 +79,16 @@ $amazons-board-files: (
   'maple': 'maple_100.jpg',
 );
 
+$breakthrough-board-files: (
+  'purple-diag': 'purple-diag.png',
+  'maple': 'maple.jpg',
+);
+
+$minibreakthrough-board-files: (
+  'purple-diag': 'purple-diag-mini.png',
+  'maple': 'maple-mini.jpg',
+);
+
 $oware-board-files: (
   'light-wood': 'oware_light_wood_board.png',
   'dark-wood': 'oware_dark_wood_board.png',
@@ -102,6 +112,11 @@ $go13x13-board-files: (
 $go19x19-board-files: (
   'light-wood': 'svg/go_board_light_19x19.svg',
   'dark-wood': 'svg/go_board_dark_19x19.svg',
+);
+
+$backgammon-board-files: (
+  'classic': 'svg/backgammon_classic_board.svg',
+  'contemporary': 'svg/backgammon_contemporary_board.svg',
 );
 
 $chess-variants: (
@@ -132,6 +147,8 @@ $flipello-variants: ('flipello'); // must use same board
 $oware-variants: ('oware'); // must use same board
 
 $togyzkumalak-variants: ('togyzkumalak'); // must use same board
+
+$backgammon-variants: ('backgammon', 'nackgammon'); // must use same board
 
 @each $gameFamily in ('chess', 'loa') {
   @each $color, $file in $chess-board-files {
@@ -183,6 +200,18 @@ $togyzkumalak-variants: ('togyzkumalak'); // must use same board
   }
 }
 
+@each $color, $file in $breakthrough-board-files {
+  .breakthroughtroyka-#{$color} .variant-breakthroughtroyka.is2d cg-board {
+    background-image: url(../images/board/breakthroughtroyka/#{$file});
+  }
+}
+
+@each $color, $file in $minibreakthrough-board-files {
+  .breakthroughtroyka-#{$color} .variant-minibreakthroughtroyka.is2d cg-board {
+    background-image: url(../images/board/breakthroughtroyka/#{$file});
+  }
+}
+
 @each $color, $file in $oware-board-files {
   .oware-#{$color} .variant-oware.is2d cg-board {
     background-image: url(../images/board/oware/#{$file});
@@ -210,6 +239,14 @@ $togyzkumalak-variants: ('togyzkumalak'); // must use same board
 @each $color, $file in $go19x19-board-files {
   .go-#{$color} .variant-go19x19.is2d cg-board {
     background-image: url(../images/board/go/#{$file});
+  }
+}
+
+@each $variant in $backgammon-variants {
+  @each $color, $file in $backgammon-board-files {
+    .backgammon-#{$color} .variant-#{$variant}.is2d cg-board {
+      background-image: url(../images/board/backgammon/#{$file});
+    }
   }
 }
 
@@ -277,6 +314,18 @@ $togyzkumalak-variants: ('togyzkumalak'); // must use same board
   }
 }
 
+@each $color, $file in $breakthrough-board-files {
+  .breakthroughtroyka-#{$color} .is2d .variant-breakthroughtroyka cg-board {
+    background-image: url(../images/board/breakthroughtroyka/#{$file});
+  }
+}
+
+@each $color, $file in $minibreakthrough-board-files {
+  .breakthroughtroyka-#{$color} .is2d .variant-minibreakthroughtroyka cg-board {
+    background-image: url(../images/board/breakthroughtroyka/#{$file});
+  }
+}
+
 @each $color, $file in $oware-board-files {
   .oware-#{$color} .is2d .variant-oware cg-board {
     background-image: url(../images/board/oware/#{$file});
@@ -304,5 +353,13 @@ $togyzkumalak-variants: ('togyzkumalak'); // must use same board
 @each $color, $file in $go19x19-board-files {
   .go-#{$color} .is2d .variant-go19x19 cg-board {
     background-image: url(../images/board/go/#{$file});
+  }
+}
+
+@each $variant in $backgammon-variants {
+  @each $color, $file in $backgammon-board-files {
+    .backgammon-#{$color} .is2d .variant-#{$variant} cg-board {
+      background-image: url(../images/board/backgammon/#{$file});
+    }
   }
 }

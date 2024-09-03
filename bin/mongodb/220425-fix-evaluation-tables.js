@@ -5,6 +5,6 @@ db.player_assessment.find({ 'date.$date': { $exists: true } }).forEach(s => {
       $set: {
         date: ISODate(s.date['$date']),
       },
-    }
+    },
   );
 });

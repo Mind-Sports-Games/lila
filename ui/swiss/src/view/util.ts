@@ -9,7 +9,7 @@ export function bind(eventName: string, f: (e: Event) => any, redraw?: () => voi
       const res = f(e);
       if (redraw) redraw();
       return res;
-    })
+    }),
   );
 }
 
@@ -38,7 +38,7 @@ export function player(p: BasePlayer, asLink: boolean, withRating: boolean, with
         destroy: vnode => $.powerTip.destroy(vnode.elm as HTMLElement),
       },
     },
-    [h('div.player-info', playerInfo(p, withRating, withFlag))]
+    [h('div.player-info', playerInfo(p, withRating, withFlag))],
   );
 }
 
@@ -51,11 +51,14 @@ export function playerInfo(p: BasePlayer, withRating: boolean, withFlag: boolean
             attrs: {
               src: playstrategy.assetUrl('images/flags/' + p.user.country + '.png'),
             },
-          })
+          }),
         )
       : null,
-    h('span.name', userName(p.user)),
-    withRating ? h('span.rating', ' ' + p.rating + (p.provisional ? '?' : '')) : null,
+    h(p.disqualified ? 'span.name.dq' : 'span.name', userName(p.user)),
+    withRating
+      ? h('span.rating' + (p.inputRating ? '.unused' : ''), ' ' + p.rating + (p.provisional ? '?' : ''))
+      : null,
+    withRating && p.inputRating ? h('span.rating.input', ' ' + p.inputRating.toString() + '*') : null,
   ];
 }
 
@@ -69,10 +72,10 @@ export function numberRow(name: string, value: any, typ?: string) {
       typ === 'raw'
         ? value
         : typ === 'percent'
-        ? value[1] > 0
-          ? ratio2percent(value[0] / value[1])
-          : 0
-        : numberFormat(value)
+          ? value[1] > 0
+            ? ratio2percent(value[0] / value[1])
+            : 0
+          : numberFormat(value),
     ),
   ]);
 }

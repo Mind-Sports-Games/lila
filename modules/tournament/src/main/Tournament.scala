@@ -26,11 +26,14 @@ case class Tournament(
     medleyMinutes: Option[Int] = None,
     position: Option[FEN],
     mode: Mode,
+    handicapped: Boolean = false,
+    inputPlayerRatings: Option[String] = None,
     password: Option[String] = None,
     conditions: Condition.All,
     teamBattle: Option[TeamBattle] = None,
     noBerserk: Boolean = false,
     noStreak: Boolean = false,
+    statusScoring: Boolean = false,
     schedule: Option[Schedule],
     nbPlayers: Int,
     createdAt: DateTime,
@@ -85,7 +88,7 @@ case class Tournament(
 
   def isIntro = schedule.map(_.freq) has Schedule.Freq.Introductory
 
-  def isPlayStrategyHeadline = isMSO || isMSOWarmUp || isIntro
+  def isAnnual = schedule.map(_.freq) has Schedule.Freq.Annual
 
   def isScheduled = schedule.isDefined
 
@@ -115,6 +118,8 @@ case class Tournament(
   def secondsToFinish = (finishesAt.getSeconds - nowSeconds).toInt atLeast 0
 
   def pairingsClosedSeconds = math.max(30, math.min(clock.limitSeconds / 2, 120))
+
+  def waitForPlayerReturnSeconds = pairingsClosedSeconds / 2
 
   def pairingsClosed = secondsToFinish < pairingsClosedSeconds
 
@@ -147,11 +152,6 @@ case class Tournament(
   def medleyVariantsInTournament: Option[List[Variant]] =
     medleyVariants
       .map(v => v.take(medleyNumIntervals.getOrElse(medleyVariants.size)))
-
-  def isStillWorthEntering =
-    isPlayStrategyHeadline || isMarathonOrUnique || {
-      secondsToFinish > (minutes * 60 / 3).atMost(20 * 60)
-    }
 
   def isRecentlyFinished = isFinished && (nowSeconds - finishesAt.getSeconds) < 30 * 60
 
@@ -247,11 +247,14 @@ object Tournament {
       medleyMinutes: Option[Int] = None,
       position: Option[FEN],
       mode: Mode,
+      handicapped: Boolean,
+      inputPlayerRatings: Option[String],
       password: Option[String],
       waitMinutes: Int,
       startDate: Option[DateTime],
       berserkable: Boolean,
       streakable: Boolean,
+      statusScoring: Boolean,
       teamBattle: Option[TeamBattle],
       description: Option[String],
       hasChat: Boolean
@@ -273,11 +276,14 @@ object Tournament {
       medleyMinutes = medleyMinutes,
       position = position,
       mode = mode,
+      handicapped = handicapped,
+      inputPlayerRatings = inputPlayerRatings,
       password = password,
       conditions = Condition.All.empty,
       teamBattle = teamBattle,
       noBerserk = !berserkable,
       noStreak = !streakable,
+      statusScoring = statusScoring,
       schedule = None,
       startsAt = startDate match {
         case Some(startDate) => startDate plusSeconds ThreadLocalRandom.nextInt(60)
@@ -291,7 +297,8 @@ object Tournament {
     Tournament(
       id = makeId,
       name = sched.medleyShield.fold(sched.name(full = false)(defaultLang))(ms =>
-        TournamentShield.MedleyShield.makeName(ms.medleyName, sched.at)
+        TournamentShield.MedleyShield
+          .makeName(ms.medleyName, sched.at, ms.weekOfMonth.isEmpty, ms.countOffset)
       ),
       status = Status.Created,
       clock = Schedule clockFor sched,
@@ -300,11 +307,12 @@ object Tournament {
       createdAt = DateTime.now,
       nbPlayers = 0,
       variant = sched.variant,
-      medleyVariantsAndIntervals = sched.medleyShield.map(ms => ms.generateVariants(ms.eligibleVariants)),
-      medleyMinutes = sched.medleyShield.map(_.arenaMedleyMinutes),
+      medleyVariantsAndIntervals = sched.medleyShield.map(ms => ms.generateVariants(ms.variants)),
+      medleyMinutes = sched.medleyShield.map(_.medleyMinutes),
       position = sched.position,
       mode = Mode.Rated,
       conditions = sched.conditions,
+      statusScoring = sched.statusScoring,
       schedule = Some(sched),
       startsAt = sched.at plusSeconds ThreadLocalRandom.nextInt(60),
       description = sched.medleyShield.map(_.arenaDescriptionFull),

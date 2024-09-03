@@ -18,11 +18,10 @@ object userAnalysis {
 
   def noAnalysisVariants = List(
     Variant.Chess(strategygames.chess.variant.FromPosition),
+    Variant.Chess(strategygames.chess.variant.Monster),
     Variant.FairySF(strategygames.fairysf.variant.Amazons),
-    Variant.Go(strategygames.go.variant.Go9x9),
-    Variant.Go(strategygames.go.variant.Go13x13),
-    Variant.Go(strategygames.go.variant.Go19x19),
     Variant.Backgammon(strategygames.backgammon.variant.Backgammon),
+    Variant.Backgammon(strategygames.backgammon.variant.Nackgammon),
     Variant.Abalone(strategygames.abalone.variant.Abalone)
   )
 
@@ -41,7 +40,9 @@ object userAnalysis {
       title = trans.analysis.txt(),
       moreCss = frag(
         cssTag("analyse.free"),
-        (pov.game.variant.dropsVariant && !pov.game.variant.onlyDropsVariant) option cssTag("analyse.zh"),
+        (pov.game.variant.hasDetachedPocket) option cssTag(
+          "analyse.zh"
+        ),
         withForecast option cssTag("analyse.forecast"),
         ctx.blind option cssTag("round.nvui")
       ),

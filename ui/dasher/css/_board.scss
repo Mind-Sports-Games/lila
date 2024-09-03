@@ -33,6 +33,10 @@
       height: 125px;
     }
 
+    &.backgammon {
+      height: 125px;
+    }
+
     @extend %flex-center;
 
     justify-content: center;
@@ -66,6 +70,12 @@
     height: 100px;
   }
 
+  .list a.breakthroughtroyka span {
+    display: block;
+    width: 64px;
+    height: 32px;
+  }
+
   .list a.oware span {
     display: block;
     width: 100px;
@@ -79,6 +89,12 @@
   }
 
   .list a.go span {
+    display: block;
+    width: 100px;
+    height: 100px;
+  }
+
+  .list a.backgammon span {
     display: block;
     width: 100px;
     height: 100px;
@@ -131,7 +147,7 @@
     'horsey': 'horsey.thumbnail.jpg',
   );
 
-  @each $gameFamily in ('chess', 'draughts', 'loa', 'amazons') {
+  @each $gameFamily in ('chess', 'draughts', 'loa', 'amazons', 'breakthroughtroyka') {
     @each $color, $file in $chess-board-files {
       &.d2 .#{$gameFamily}-#{$color} {
         background-image: url(../images/board/#{$gameFamily}/#{$file});
@@ -178,6 +194,10 @@
       background-size: 100px;
     }
 
+    .breakthroughtroyka-maple {
+      background-image: url(../images/board/breakthroughtroyka/maple.thumbnail.jpg);
+    }
+
     .oware-light-wood {
       background-image: url(../images/board/oware/oware_light_wood_board.png);
       background-size: 100px;
@@ -205,6 +225,16 @@
 
     .go-dark-wood {
       background-image: url(../images/board/go/svg/go_board_dark_9x9.svg);
+      background-size: 100px;
+    }
+
+    .backgammon-classic {
+      background-image: url(../images/board/backgammon/svg/backgammon_classic_board.svg);
+      background-size: 100px;
+    }
+
+    .backgammon-contemporary {
+      background-image: url(../images/board/backgammon/svg/backgammon_contemporary_board.svg);
       background-size: 100px;
     }
   }

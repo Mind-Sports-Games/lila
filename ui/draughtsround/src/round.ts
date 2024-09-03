@@ -1,6 +1,6 @@
 import { RoundData, Step } from './interfaces';
 import { countGhosts } from 'draughtsground/fen';
-import { san2alg, invertSan } from 'draughts';
+import { san2alg, invertSan } from 'draughts/src/draughts';
 
 export const firstPly = (d: RoundData): number => d.steps[0].ply;
 
@@ -24,7 +24,7 @@ export const massage = (d: RoundData): void => {
 
   if (d.correspondence) d.correspondence.showBar = d.pref.clockBar;
 
-  if (d.expiration) d.expiration.updatedAt = Date.now() - d.expiration.idleMillis;
+  if (d.expirationAtStart) d.expirationAtStart.updatedAt = Date.now() - d.expirationAtStart.idleMillis;
 };
 
 export function mergeSteps(steps: Step[], coordSystem: number): Step[] {

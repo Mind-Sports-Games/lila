@@ -29,7 +29,7 @@ object mini {
                 cls := "upt__info__top__country",
                 title := (!hasRoomForNameText).option(c.name)
               )(
-                img(cls := "flag", src := assetUrl(s"images/flags/${c.code}.png")),
+                img(cls := "flag", src := staticAssetUrl(s"images/flags/${c.code}.png")),
                 hasRoomForNameText option c.shortName
               )
             }
@@ -61,7 +61,7 @@ object mini {
                 dataIcon := "U",
                 cls := "btn-rack__btn",
                 title := trans.challenge.challengeToPlay.txt(),
-                href := s"${routes.Lobby.home}?user=${u.username}#friend"
+                href := s"${routes.Lobby.home}?user=${u.username}${if (u.isBot) "#bot" else "#friend"}"
               )
             ),
             views.html.relation.mini(u.id, blocked, followable, rel)

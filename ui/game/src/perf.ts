@@ -35,13 +35,15 @@ export const perf = {
     flipello: '',
     flipello10: '',
     amazons: '€',
+    breakthroughtroyka: '',
+    minibreakthroughtroyka: '',
     oware: '',
     togyzkumalak: '›',
     go9x9: '',
     go13x13: '',
     go19x19: '',
-    backgammon: '›',
-    //TODO Abalone set icon inline with SG
-    abalone: '›',
+    backgammon: '',
+    nackgammon: '',
+    abalone: '',
   },
 };

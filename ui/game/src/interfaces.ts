@@ -76,12 +76,22 @@ export type StatusName =
   | 'aborted'
   | 'mate'
   | 'resign'
+  | 'resignGammon'
+  | 'resignBackgammon'
   | 'stalemate'
   | 'timeout'
   | 'draw'
   | 'outoftime'
+  | 'outoftimeGammon'
+  | 'outoftimeBackgammon'
+  | 'ruleOfGin'
+  | 'ginGammon'
+  | 'ginBackgammon'
   | 'noStart'
   | 'cheat'
+  | 'singleWin'
+  | 'gammonWin'
+  | 'backgammonWin'
   | 'variantEnd'
   | 'perpetualCheck'
   | 'unknownFinish';
@@ -102,7 +112,7 @@ export interface Player {
   offeringSelectSquares?: boolean;
   ai: number | null;
   onGame: boolean;
-  gone: number | boolean;
+  isGone: number | boolean;
   blurs?: Blurs;
   hold?: Hold;
   ratingDiff?: number;
@@ -110,6 +120,7 @@ export interface Player {
   score?: number;
   rating?: number;
   provisional?: string;
+  isInputRating?: boolean;
   engine?: boolean;
   berserk?: boolean;
   version: number;

@@ -38,6 +38,7 @@ object config {
       @ConfigName("asset.domain") assetDomain: AssetDomain,
       @ConfigName("asset.base_url") assetBaseUrl: String,
       @ConfigName("asset.minified") minifiedAssets: Boolean,
+      externalManifest: Boolean,
       @ConfigName("stage.banner") stageBanner: Boolean,
       @ConfigName("socket.domains") socketDomains: List[String],
       crawlable: Boolean,

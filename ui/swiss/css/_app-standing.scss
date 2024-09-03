@@ -31,6 +31,12 @@
   .user-link .rating {
     font-style: italic;
     font-size: 0.8em;
+    &.unused {
+      text-decoration: line-through;
+    }
+    &.input {
+      padding-left: 5px;
+    }
   }
 
   tr {
@@ -72,6 +78,14 @@
       rgba(0, 0, 0, 0) 5px,
       rgba(0, 0, 0, 0) 100%
     );
+  }
+
+  tr.dq .rank {
+    text-decoration: line-through;
+  }
+
+  tr.dq .player {
+    text-decoration: line-through;
   }
 
   td.rank {
@@ -172,6 +186,12 @@
     .user-link .rating {
       display: block;
       padding-left: 0px;
+      &.unused {
+        text-decoration: line-through;
+      }
+      &.input {
+        padding-left: 5px;
+      }
     }
 
     .pairings div > * {

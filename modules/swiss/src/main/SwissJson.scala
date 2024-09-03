@@ -1,7 +1,7 @@
 package lila.swiss
 
 import strategygames.format.{ Forsyth }
-import strategygames.{ ByoyomiClock, FischerClock, P1, P2 }
+import strategygames.{ ByoyomiClock, Clock, P1, P2 }
 import strategygames.variant.Variant
 import strategygames.draughts.Board.BoardSize
 
@@ -127,7 +127,7 @@ final class SwissJson(
     swiss.isFinished ?? {
       SwissPlayer.fields { f =>
         colls.player
-          .find($doc(f.swissId -> swiss.id))
+          .find($doc(f.swissId -> swiss.id, f.disqualified $ne true))
           .sort($sort desc f.score)
           .cursor[SwissPlayer]()
           .list(3) flatMap { top3 =>
@@ -158,16 +158,18 @@ final class SwissJson(
     case SwissPlayer.WithUserAndRank(player, user, rank) =>
       Json
         .obj(
-          "rank"      -> rank,
-          "points"    -> player.points.value,
-          "tieBreak"  -> player.tieBreak,
-          "tieBreak2" -> player.tieBreak2,
-          "rating"    -> player.rating,
-          "username"  -> user.name
+          "rank"        -> rank,
+          "points"      -> player.points.value,
+          "tieBreak"    -> player.tieBreak,
+          "tieBreak2"   -> player.tieBreak2,
+          "rating"      -> player.rating,
+          "inputRating" -> player.inputRating,
+          "username"    -> user.name
         )
         .add("title" -> user.title)
         .add("performance" -> player.performance)
         .add("absent" -> player.absent)
+        .add("disqualified" -> player.disqualified)
   }
 }
 
@@ -178,28 +180,30 @@ object SwissJson {
   private def swissJsonBase(swiss: Swiss) =
     Json
       .obj(
-        "id"               -> swiss.id.value,
-        "createdBy"        -> swiss.createdBy,
-        "startsAt"         -> formatDate(swiss.startsAt),
-        "name"             -> swiss.name,
-        "clock"            -> swiss.clock,
-        "variant"          -> swiss.variant.key,
-        "isMedley"         -> swiss.isMedley,
-        "p1Name"           -> swiss.variant.playerNames(P1),
-        "p2Name"           -> swiss.variant.playerNames(P2),
-        "round"            -> swiss.round,
-        "roundVariant"     -> swiss.roundVariant.key,
-        "roundVariantName" -> VariantKeys.variantName(swiss.roundVariant),
-        "nbRounds"         -> swiss.actualNbRounds,
-        "nbPlayers"        -> swiss.nbPlayers,
-        "nbOngoing"        -> swiss.nbOngoing,
-        "trophy1st"        -> swiss.trophy1st,
-        "trophy2nd"        -> swiss.trophy2nd,
-        "trophy3rd"        -> swiss.trophy3rd,
-        "isMatchScore"     -> swiss.settings.isMatchScore,
-        "isBestOfX"        -> swiss.settings.isBestOfX,
-        "isPlayX"          -> swiss.settings.isPlayX,
-        "nbGamesPerRound"  -> swiss.settings.nbGamesPerRound,
+        "id"                    -> swiss.id.value,
+        "createdBy"             -> swiss.createdBy,
+        "startsAt"              -> formatDate(swiss.startsAt),
+        "name"                  -> swiss.name,
+        "clock"                 -> swiss.clock,
+        "variant"               -> swiss.variant.key,
+        "isMedley"              -> swiss.isMedley,
+        "isHandicapped"         -> swiss.settings.handicapped,
+        "p1Name"                -> swiss.variant.playerNames(P1),
+        "p2Name"                -> swiss.variant.playerNames(P2),
+        "round"                 -> swiss.round,
+        "roundVariant"          -> swiss.roundVariant.key,
+        "roundVariantName"      -> VariantKeys.variantName(swiss.roundVariant),
+        "nbRounds"              -> swiss.actualNbRounds,
+        "nbPlayers"             -> swiss.nbPlayers,
+        "nbOngoing"             -> swiss.nbOngoing,
+        "trophy1st"             -> swiss.trophy1st,
+        "trophy2nd"             -> swiss.trophy2nd,
+        "trophy3rd"             -> swiss.trophy3rd,
+        "isMatchScore"          -> swiss.settings.isMatchScore,
+        "isBestOfX"             -> swiss.settings.isBestOfX,
+        "isPlayX"               -> swiss.settings.isPlayX,
+        "nbGamesPerRound"       -> swiss.settings.nbGamesPerRound,
+        "timeBeforeStartToJoin" -> swiss.settings.timeBeforeStartToJoin,
         "status" -> {
           if (swiss.isStarted) "started"
           else if (swiss.isFinished) "finished"
@@ -236,8 +240,9 @@ object SwissJson {
             view.pairings.get(round).fold[JsValue](JsString(outcomeJson(outcome))) { p =>
               pairingJson(view.player, p.pairing) ++
                 Json.obj(
-                  "user"   -> p.player.user,
-                  "rating" -> p.player.player.rating
+                  "user"        -> p.player.user,
+                  "rating"      -> p.player.player.rating,
+                  "inputRating" -> p.player.player.inputRating
                 )
             }
           }
@@ -257,15 +262,17 @@ object SwissJson {
   ): JsObject =
     Json
       .obj(
-        "user"      -> user,
-        "rating"    -> p.rating,
-        "points"    -> p.points,
-        "tieBreak"  -> p.tieBreak,
-        "tieBreak2" -> p.tieBreak2
+        "user"        -> user,
+        "rating"      -> p.rating,
+        "inputRating" -> p.inputRating,
+        "points"      -> p.points,
+        "tieBreak"    -> p.tieBreak,
+        "tieBreak2"   -> p.tieBreak2
       )
       .add("performance" -> (performance ?? p.performance))
       .add("provisional" -> p.provisional)
       .add("absent" -> p.absent)
+      .add("disqualified" -> p.disqualified)
 
   private def outcomeJson(outcome: List[SwissSheet.Outcome]): String =
     outcome.head match {
@@ -347,7 +354,7 @@ object SwissJson {
         "gameFamily"  -> g.variant.gameFamily.key,
         "variantKey"  -> g.variant.key,
         "fen"         -> Forsyth.boardAndPlayer(g.variant.gameLogic, g.situation),
-        "lastMove"    -> ~g.lastMoveKeys,
+        "lastMove"    -> ~g.lastActionKeys,
         "orientation" -> g.naturalOrientation.name,
         "p1"          -> boardPlayerJson(p1),
         "p2"          -> boardPlayerJson(p2),
@@ -378,9 +385,10 @@ object SwissJson {
 
   private def boardPlayerJson(player: SwissBoard.Player) =
     Json.obj(
-      "rank"   -> player.rank,
-      "rating" -> player.rating,
-      "user"   -> player.user
+      "rank"        -> player.rank,
+      "rating"      -> player.rating,
+      "inputRating" -> player.inputRating,
+      "user"        -> player.user
     )
 
   implicit private val roundNumberWriter: Writes[SwissRound.Number] = Writes[SwissRound.Number] { n =>
@@ -395,20 +403,31 @@ object SwissJson {
 
   implicit private val clockWrites: OWrites[strategygames.ClockConfig] = OWrites { clock =>
     clock match {
-      case fc: FischerClock.Config => {
+      // TODO: this clock json should be universal
+      case fc: Clock.Config =>
         Json.obj(
           "limit"     -> fc.limitSeconds,
           "increment" -> fc.incrementSeconds
         )
-      }
-      case bc: ByoyomiClock.Config => {
+      case bc: Clock.BronsteinConfig =>
+        Json.obj(
+          "limit"     -> bc.limitSeconds,
+          "delay"     -> bc.delaySeconds,
+          "delayType" -> "bronstein"
+        )
+      case udc: Clock.SimpleDelayConfig =>
+        Json.obj(
+          "limit"     -> udc.limitSeconds,
+          "delay"     -> udc.delaySeconds,
+          "delayType" -> "usdelay"
+        )
+      case bc: ByoyomiClock.Config =>
         Json.obj(
           "limit"     -> bc.limitSeconds,
           "increment" -> bc.incrementSeconds,
           "byoyomi"   -> bc.byoyomiSeconds,
           "periods"   -> bc.periodsTotal
         )
-      }
     }
   }
 

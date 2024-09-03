@@ -48,52 +48,29 @@ object bots {
     )
   }
 
-  private def botTable(users: List[User])(implicit ctx: Context) = table(cls := "slist slist-pad")(
-    tbody(
-      users.sortBy { u =>
-        (if (u.isVerified) -1 else 1, -u.playTime.??(_.total))
-      } map { u =>
-        tr(
-          td(userLink(u)),
+  private def botTable(users: List[User])(implicit ctx: Context) = div(cls := "bots__list")(
+    users map { u =>
+      div(cls := "bots__list__entry")(
+        div(cls := "bots__list__entry__desc")(
+          div(cls := "bots__list__entry__head")(
+            userLink(u),
+            div(cls := "bots__list__entry__rating")(
+              u.best3Perfs.map { showPerfRating(u, _) }
+            )
+          ),
           u.profile
             .ifTrue(ctx.noKid)
             .ifTrue(!u.marks.troll || ctx.is(u))
             .flatMap(_.nonEmptyBio)
-            .map { bio =>
-              td(shorten(bio, 400))
-            } | td,
-          td(cls := "rating")(u.best3Perfs.map {
-            showPerfRating(u, _)
-          }),
-          u.playTime.fold(td) { playTime =>
-            td(
-              p(
-                cls := "text",
-                dataIcon := "C",
-                st.title := trans.tpTimeSpentPlaying.txt(showPeriod(playTime.totalPeriod))
-              )(showPeriod(playTime.totalPeriod)),
-              playTime.nonEmptyTvPeriod.map { tvPeriod =>
-                p(
-                  cls := "text",
-                  dataIcon := "1",
-                  st.title := trans.tpTimeSpentOnTV.txt(showPeriod(tvPeriod))
-                )(showPeriod(tvPeriod))
-              }
-            )
-          },
-          if (ctx is u) td
-          else {
-            td(
-              a(
-                dataIcon := "U",
-                cls := List("button button-empty text" -> true),
-                st.title := trans.challenge.challengeToPlay.txt(),
-                href := s"${routes.Lobby.home}?user=${u.username}#friend"
-              )(trans.play())
-            )
-          }
-        )
-      }
-    )
+            .map { bio => td(shorten(bio, 400)) }
+        ),
+        a(
+          dataIcon := "U",
+          cls := List("button button-empty text" -> true),
+          st.title := trans.challenge.challengeToPlay.txt(),
+          href := s"${routes.Lobby.home}?user=${u.username}#friend"
+        )(trans.play())
+      )
+    }
   )
 }

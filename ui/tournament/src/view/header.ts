@@ -1,20 +1,18 @@
-import { h, VNode } from 'snabbdom';
+import { h, VNode, Hooks } from 'snabbdom';
 import TournamentController from '../ctrl';
 import { dataIcon } from './util';
 
-function startClock(time) {
-  return {
-    insert: vnode => $(vnode.elm as HTMLElement).clock({ time }),
-  };
-}
+const startClock = (time: number): Hooks => ({
+  insert: vnode => playstrategy.clockWidget(vnode.elm as HTMLElement, { time }),
+});
 
 const oneDayInSeconds = 60 * 60 * 24;
 
-function hasFreq(freq, d) {
+function hasFreq(freq: any, d: any) {
   return d.schedule && d.schedule.freq === freq;
 }
 
-function clock(d): VNode | undefined {
+function clock(d: any): VNode | undefined {
   if (d.isFinished) return;
   if (d.secondsToFinish)
     if (d.medley && d.secondsToFinish != d.secondsToFinishInterval) {
@@ -59,9 +57,10 @@ function clock(d): VNode | undefined {
       }),
     ]);
   }
+  return undefined;
 }
 
-function image(d): VNode | undefined {
+function image(d: any): VNode | undefined {
   if (d.isFinished) return;
   if (hasFreq('shield', d) || hasFreq('marathon', d)) return;
   const s = d.spotlight;
@@ -84,7 +83,7 @@ function title(ctrl: TournamentController) {
         {
           attrs: { href: '/tournament/shields' },
         },
-        d.perf.icon
+        d.perf.icon,
       ),
       d.fullName,
     ]);
@@ -101,12 +100,12 @@ function title(ctrl: TournamentController) {
                 rel: 'noopener',
               },
             },
-            d.greatPlayer.name
+            d.greatPlayer.name,
           ),
           ' Arena',
         ]
       : [d.fullName]
-    ).concat(d.private ? [' ', h('span', { attrs: dataIcon('a') })] : [])
+    ).concat(d.private ? [' ', h('span', { attrs: dataIcon('a') })] : []),
   );
 }
 

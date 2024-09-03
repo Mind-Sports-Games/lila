@@ -4,19 +4,29 @@ import { teamName } from './battle';
 import * as status from 'game/status';
 import TournamentController from '../ctrl';
 
-function result(win, stat): string {
+function result(win: any, stat: any, useStatusScoring: any): string {
   switch (win) {
     case true:
-      return '1';
+      if (useStatusScoring) {
+        if (status.isBackgammon(stat)) {
+          return 'B';
+        } else if (status.isGammon(stat)) {
+          return 'G';
+        } else return 'W';
+      } else return '1';
     case false:
-      return '0';
+      if (useStatusScoring) return 'L';
+      else return '0';
     default:
       return stat >= status.ids.mate ? '½' : '*';
   }
 }
 
-function playerTitle(player) {
-  return h('h2.player-title', [h('span.rank', player.rank + '. '), renderPlayer(player, true, false, true, false)]);
+function playerTitle(player: any) {
+  return h('h2.player-title', [
+    h('span.rank', player.disqualified ? 'DQ' : player.rank + '. '),
+    renderPlayer(player, true, true, true, false),
+  ]);
 }
 
 function setup(vnode: VNode) {
@@ -37,8 +47,8 @@ export default function (ctrl: TournamentController): VNode {
     avgOp = pairingsLen
       ? Math.round(
           data.pairings.reduce(function (a, b) {
-            return a + b.op.rating;
-          }, 0) / pairingsLen
+            return a + (b.op.inputRating ?? b.op.rating);
+          }, 0) / pairingsLen,
         )
       : undefined;
   return h(
@@ -64,11 +74,11 @@ export default function (ctrl: TournamentController): VNode {
               {
                 hook: bind('click', () => ctrl.showTeamInfo(data.player.team), ctrl.redraw),
               },
-              [teamName(ctrl.data.teamBattle!, data.player.team)]
+              [teamName(ctrl.data.teamBattle!, data.player.team)],
             )
           : null,
         h('table', [
-          data.player.performance && !ctrl.data.medley
+          data.player.performance && !ctrl.data.medley && !ctrl.data.isHandicapped
             ? numberRow(noarg('performance'), data.player.performance + (nb.game < 3 ? '?' : ''), 'raw')
             : null,
           numberRow(noarg('gamesPlayed'), nb.game),
@@ -90,10 +100,10 @@ export default function (ctrl: TournamentController): VNode {
               if (href) window.open(href, '_blank', 'noopener');
             }),
           },
-          data.pairings.map(function (p, i) {
-            const res = result(p.win, p.status);
+          data.pairings.map(function (p: any, i: any) {
+            const res = result(p.win, p.status, ctrl.data.statusScoring);
             return h(
-              'tr.glpt.' + (res === '1' ? ' win' : res === '0' ? ' loss' : ''),
+              'tr.glpt.' + (p.win ? ' win' : res === '0' || res === 'L' ? ' loss' : ''),
               {
                 key: p.id,
                 attrs: { 'data-href': '/' + p.id + '/' + p.playerIndex },
@@ -105,14 +115,19 @@ export default function (ctrl: TournamentController): VNode {
                 h('th', '' + (Math.max(nb.game, pairingsLen) - i)),
                 ctrl.data.medley ? h('td', { attrs: { 'data-icon': p.variantIcon } }, '') : null,
                 h('td', playerName(p.op)),
-                h('td', ctrl.data.medley ? '' : p.op.rating),
+                h('td', ctrl.data.medley ? null : '' + p.op.rating + (p.op.isInputRating ? '*' : '')),
+                berserkTd(!!p.op.berserk, p.op.name),
                 h('td.is.playerIndex-icon.' + p.playerColor),
-                h('td', res),
-              ]
+                h('td.result', res),
+                berserkTd(p.berserk, data.player.name),
+              ],
             );
-          })
+          }),
         ),
       ]),
-    ]
+    ],
   );
 }
+
+const berserkTd = (b: boolean, p: string) =>
+  b ? h('td.berserk', { attrs: { 'data-icon': '`', title: p + ' Berserk' } }) : h('td.berserk');

@@ -2,6 +2,7 @@ package views.html.game
 
 import strategygames.format.Forsyth
 import strategygames.variant.Variant
+import strategygames.{ ByoyomiClock, Clock }
 import controllers.routes
 import play.api.i18n.Lang
 
@@ -13,10 +14,12 @@ import lila.i18n.defaultLang
 
 object mini {
 
-  private val dataLive  = attr("data-live")
-  private val dataState = attr("data-state")
-  private val dataTime  = attr("data-time")
-  val cgWrap            = span(cls := "cg-wrap")(cgWrapContent)
+  private val dataLive        = attr("data-live")
+  private val dataState       = attr("data-state")
+  private val dataTime        = attr("data-time")
+  private val dataTimePending = attr("data-time-pending")
+  private val dataTimeDelay   = attr("data-time-delay")
+  val cgWrap                  = span(cls := "cg-wrap")(cgWrapContent)
 
   def extraClasses(variant: Variant) = {
     val gameLogic  = variant.gameLogic.name.toLowerCase()
@@ -69,16 +72,25 @@ object mini {
     )
   }
 
+  def orientation(pov: Pov): String = {
+    (pov.game.variant.key, pov.playerIndex.name) match {
+      case ("backgammon", "p2") => "p1vflip"
+      case ("nackgammon", "p2") => "p1vflip"
+      case ("racingKings", _)   => "p1"
+      case (_, playerIndex)     => playerIndex
+    }
+  }
+
   def renderState(pov: Pov) =
     pov.game.variant match {
       case Variant.Chess(_) | Variant.FairySF(_) | Variant.Samurai(_) | Variant.Togyzkumalak(_) |
           Variant.Go(_) | Variant.Backgammon(_) | Variant.Abalone(_) =>
-        dataState := s"${Forsyth.boardAndPlayer(pov.game.variant.gameLogic, pov.game.situation)}|${pov.playerIndex.name}|${~pov.game.lastMoveKeys}"
+        dataState := s"${Forsyth.boardAndPlayer(pov.game.variant.gameLogic, pov.game.situation)}|${orientation(pov)}|${~pov.game.lastActionKeys}"
       case Variant.Draughts(v) =>
         dataState := s"${Forsyth.boardAndPlayer(
           pov.game.variant.gameLogic,
           pov.game.situation
-        )}|${v.boardSize.width}x${v.boardSize.height}|${pov.playerIndex.name}|${~pov.game.lastMoveKeys}"
+        )}|${v.boardSize.width}x${v.boardSize.height}|${pov.playerIndex.name}|${~pov.game.lastActionKeys}"
     }
 
   private def renderPlayer(pov: Pov)(implicit lang: Lang) =
@@ -87,7 +99,8 @@ object mini {
         cls := s"mini-game__user playerIndex-icon is ${pov.game.variant.playerColors(pov.player.playerIndex)} text"
       )(
         playerUsername(pov.player, withRating = false),
-        span(cls := "rating")(lila.game.Namer ratingString pov.player)
+        span(cls := "rating")(lila.game.Namer ratingString pov.player),
+        if (pov.player.berserk) iconTag("`")
       ),
       if (pov.game.finished) renderResult(pov)
       else pov.game.clock.map { renderClock(_, pov) }
@@ -115,7 +128,7 @@ object mini {
         val fen   = Forsyth.>>(pov.game.variant.gameLogic, pov.game.situation)
         val score = (if (pov.playerIndex.name == "p1") fen.player1Score else fen.player2Score) / 10.0
         "(" + score.toString().replace(".0", "") + ")"
-      case "backgammon" =>
+      case "backgammon" | "nackgammon" =>
         "(" + pov.game.history.score(pov.playerIndex).toString() + ")"
       case "abalone" =>
         "(" + pov.game.history.score(pov.playerIndex).toString() + ")"
@@ -131,11 +144,20 @@ object mini {
           calculateScore(pov)
     )
 
-  private def renderClock(clock: strategygames.Clock, pov: Pov) = {
+  private def renderClock(clock: strategygames.ClockBase, pov: Pov) = {
     val s = clock.remainingTime(pov.playerIndex).roundSeconds
+    val p = clock.pending(pov.playerIndex).roundSeconds
+    val d = clock.config match {
+      case _: Clock.Config             => 0
+      case bc: Clock.BronsteinConfig   => bc.graceSeconds
+      case dc: Clock.SimpleDelayConfig => dc.graceSeconds
+      case _: ByoyomiClock.Config      => 0
+    }
     span(
       cls := s"mini-game__clock mini-game__clock--${pov.playerIndex.name}",
-      dataTime := s
+      dataTime := s,
+      dataTimePending := p,
+      dataTimeDelay := d
     )(
       f"${s / 60}:${s % 60}%02d"
         +

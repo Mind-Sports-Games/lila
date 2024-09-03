@@ -46,7 +46,7 @@ module.exports = {
       'div.round-svg',
       m('img', {
         src: url,
-      })
+      }),
     );
   },
   withLinebreaks: function (text) {

@@ -18,7 +18,7 @@ export function render(ctrl: GamebookPlayCtrl): VNode {
   return h(
     'div.gamebook',
     {
-      hook: { insert: _ => playstrategy.loadCssPath('analyse.gamebook.play') },
+      hook: { insert: _ => playstrategy.loadHashedCssPath('analyse.gamebook.play') },
     },
     [
       comment
@@ -27,7 +27,7 @@ export function render(ctrl: GamebookPlayCtrl): VNode {
             {
               class: { hinted: state.showHint },
             },
-            [h('div.content', { hook: richHTML(comment) }), hintZone(ctrl)]
+            [h('div.content', { hook: richHTML(comment) }), hintZone(ctrl)],
           )
         : undefined,
       h('div.floor', [
@@ -40,7 +40,7 @@ export function render(ctrl: GamebookPlayCtrl): VNode {
           },
         }),
       ]),
-    ]
+    ],
   );
 }
 
@@ -63,7 +63,7 @@ function renderFeedback(ctrl: GamebookPlayCtrl, state: State) {
       {
         hook: bind('click', ctrl.retry),
       },
-      [iconTag('P'), h('span', 'Retry')]
+      [iconTag('P'), h('span', 'Retry')],
     );
   if (fb === 'good' && state.comment)
     return h(
@@ -71,7 +71,7 @@ function renderFeedback(ctrl: GamebookPlayCtrl, state: State) {
       {
         hook: bind('click', ctrl.next),
       },
-      [h('span.text', { attrs: dataIcon('G') }, 'Next'), h('kbd', '<space>')]
+      [h('span.text', { attrs: dataIcon('G') }, 'Next'), h('kbd', '<space>')],
     );
   if (fb === 'end') return renderEnd(ctrl);
   return h(
@@ -86,8 +86,8 @@ function renderFeedback(ctrl: GamebookPlayCtrl, state: State) {
               h('em', ctrl.trans('findTheBestMoveForPlayerIndex', playerIndex)),
             ]),
           ]
-        : ['Good move!']
-    )
+        : ['Good move!'],
+    ),
   );
 }
 
@@ -102,7 +102,7 @@ function renderEnd(ctrl: GamebookPlayCtrl) {
             attrs: dataIcon('G'),
             hook: bind('click', () => study.setChapter(nextChapter.id)),
           },
-          'Next chapter'
+          'Next chapter',
         )
       : undefined,
     h(
@@ -111,7 +111,7 @@ function renderEnd(ctrl: GamebookPlayCtrl) {
         attrs: dataIcon('P'),
         hook: bind('click', () => ctrl.root.userJump(''), ctrl.redraw),
       },
-      'Play again'
+      'Play again',
     ),
     h(
       'a.analyse',
@@ -119,7 +119,7 @@ function renderEnd(ctrl: GamebookPlayCtrl) {
         attrs: dataIcon('A'),
         hook: bind('click', () => study.setGamebookOverride('analyse'), ctrl.redraw),
       },
-      'Analyse'
+      'Analyse',
     ),
   ]);
 }

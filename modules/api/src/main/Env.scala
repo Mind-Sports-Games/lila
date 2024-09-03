@@ -50,6 +50,7 @@ final class Env(
     slackApi: lila.irc.SlackApi,
     mongoCacheApi: lila.memo.MongoCache.Api,
     ws: StandaloneWSClient,
+    webEnv: lila.web.Env,
     val mode: Mode
 )(implicit
     ec: scala.concurrent.ExecutionContext,
@@ -61,6 +62,8 @@ final class Env(
   import net.{ baseUrl, domain }
 
   lazy val pgnDump: PgnDump = wire[PgnDump]
+
+  lazy val sgfDump: SgfDump = wire[SgfDump]
 
   lazy val userApi = wire[UserApi]
 

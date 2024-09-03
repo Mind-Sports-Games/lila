@@ -17,7 +17,7 @@ export function hooks(ctrl: LobbyController): Hooks {
       if (id === 'custom') $('.config_hook').trigger('mousedown');
       else if (id) ctrl.clickPool(id);
     },
-    ctrl.redraw
+    ctrl.redraw,
   );
 }
 
@@ -25,6 +25,10 @@ function byoyomiDisplay(pool: Pool) {
   const base = pool.inc === 0 ? pool.lim : pool.lim + '+' + pool.inc;
   const periodsString = pool.periods && pool.periods > 1 ? '(' + pool.periods + 'x)' : '';
   return pool.byoyomi && pool.byoyomi > 0 ? base + '|' + pool.byoyomi + periodsString : base;
+}
+
+function displayClockTime(pool: Pool) {
+  return pool.byoyomi ? byoyomiDisplay(pool) : pool.delay ? `${pool.lim} d/${pool.delay}` : pool.lim + '+' + pool.inc;
 }
 
 export function render(ctrl: LobbyController) {
@@ -46,10 +50,10 @@ export function render(ctrl: LobbyController) {
           h('div.variant', pool.variantDisplayName),
           active && member!.range
             ? renderRange(member!.range!)
-            : h('div.logo', { attrs: { 'data-icon': perfIcons[pool.perf] } }),
-          h('div.clock', pool.byoyomi ? byoyomiDisplay(pool) : pool.lim + '+' + pool.inc),
+            : h('div.logo', { attrs: { 'data-icon': perfIcons[pool.variantDisplayName] || perfIcons[pool.perf] } }),
+          h('div.clock', displayClockTime(pool)),
           active ? spinner() : null,
-        ]
+        ],
       );
     })
     .concat(
@@ -59,7 +63,7 @@ export function render(ctrl: LobbyController) {
           class: { transp: !!member },
           attrs: { 'data-id': 'custom' },
         },
-        ctrl.trans.noarg('custom')
-      )
+        ctrl.trans.noarg('custom'),
+      ),
     );
 }

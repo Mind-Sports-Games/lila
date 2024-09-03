@@ -8,7 +8,8 @@ object freeJs {
 
   private lazy val agpl = a(href := "https://www.gnu.org/licenses/agpl-3.0.en.html")("AGPL-3.0+")
 
-  private def github(path: String) = a(href := s"https://github.com/ornicar/lila/tree/master/$path")(path)
+  private def github(path: String) =
+    a(href := s"https://github.com/Mind-Sports-Games/lila/tree/master/$path")(path)
 
   private val uiModules = List(
     "analyse",
@@ -16,25 +17,32 @@ object freeJs {
     "chat",
     "cli",
     "dasher",
+    "dgt",
+    "draughts",
+    "draughtsground",
+    "draughtsround",
     "editor",
-    "insight",
-    "learn",
     "lobby",
+    "msg",
     "notify",
     "palantir",
-    "puzzle",
+    "racer",
     "round",
     "serviceWorker",
     "simul",
     "site",
     "speech",
-    "tournament.calendar",
+    "swiss",
     "tournament",
-    "tournament.schedule",
-    "swiss"
-  )
+    "tournamentCalendar",
+    "tournamentSchedule"
+  );
 
-  private val renames = Map("analyse" -> "analysisBoard")
+  private val renames = Map(
+    "analyse"            -> "analysisBoard",
+    "tournamentCalendar" -> "tournament.calendar",
+    "tournamentSchedule" -> "tournament.schedule"
+  )
 
   def apply(): Frag =
     frag(
@@ -43,7 +51,7 @@ object freeJs {
       ),
       p(cls := "box__pad")(
         "Here are all frontend modules from ",
-        a(href := "https://github.com/ornicar/lila/tree/master/ui")("ornicar/lila ui"),
+        a(href := "https://github.com/Mind-Sports-Games/lila/tree/master/ui")("Mind-Sports-Games/lila ui"),
         " in ",
         a(href := "https://www.gnu.org/licenses/javascript-labels.en.html")("Web Labels"),
         " compatible format:"
@@ -55,9 +63,8 @@ object freeJs {
         tbody(
           uiModules map { module =>
             val name = renames.getOrElse(module, module)
-            val file = s"$name.min.js"
             tr(
-              td(a(href := assetUrl(s"compiled/$file"))(file)),
+              td(a(href := jsUrl(name))(s"$name.js")),
               td(agpl),
               td(github(s"ui/$module/src"))
             )

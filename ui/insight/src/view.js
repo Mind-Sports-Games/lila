@@ -31,7 +31,7 @@ var renderMain = cache(
   function (ctrl) {
     var q = ctrl.vm.answer ? ctrl.vm.answer.question : null;
     return q ? ctrl.makeUrl(q.dimension, q.metric, q.filters) : ctrl.vm.broken;
-  }
+  },
 );
 
 module.exports = function (ctrl) {
@@ -52,7 +52,7 @@ module.exports = function (ctrl) {
                 ctrl.setPanel('preset');
               },
             },
-            'Presets'
+            'Presets',
           ),
           m(
             'a[data-panel="filter"]',
@@ -62,7 +62,7 @@ module.exports = function (ctrl) {
                 ctrl.setPanel('filter');
               },
             },
-            'Filters'
+            'Filters',
           ),
           Object.keys(ctrl.vm.filters).length
             ? m(
@@ -72,7 +72,7 @@ module.exports = function (ctrl) {
                   'data-icon': 'L',
                   onclick: ctrl.clearFilters,
                 },
-                'CLEAR'
+                'CLEAR',
               )
             : null,
         ]),
@@ -88,10 +88,10 @@ module.exports = function (ctrl) {
             class: 'text',
             'data-icon': '7',
           },
-          'Chess Insights'
+          'Chess Insights',
         ),
       ]),
       m('div.insight__main.box', renderMain(ctrl)),
-    ]
+    ],
   );
 };

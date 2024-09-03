@@ -45,7 +45,9 @@ object widgets {
                     separator,
                     g.perfType.fold(strategygames.chess.variant.FromPosition.name)(_.trans),
                     separator,
-                    if (g.rated) trans.rated.txt() else trans.casual.txt()
+                    if (g.fromHandicappedTournament) trans.handicapped.txt()
+                    else if (g.rated) trans.rated.txt()
+                    else trans.casual.txt()
                   )
               ),
               g.pgnImport.flatMap(_.date).fold[Frag](momentFromNowWithPreload(g.createdAt))(frag(_)),
@@ -134,6 +136,7 @@ object widgets {
           br,
           player.berserk option berserkIconSpan,
           playerUser.rating,
+          player.isInputRating option "*",
           player.provisional option "?",
           playerUser.ratingDiff map { d =>
             frag(" ", showRatingDiff(d))

@@ -1,7 +1,7 @@
 package lila.tournament
 
 import strategygames.format.{ FEN, Forsyth }
-import strategygames.{ ByoyomiClock, ClockConfig, FischerClock, P1, P2 }
+import strategygames.{ ByoyomiClock, Clock, ClockConfig, P1, P2 }
 import strategygames.variant.Variant
 import org.joda.time.DateTime
 import org.joda.time.format.ISODateTimeFormat
@@ -138,6 +138,8 @@ final class JsonView(
           )
           .add("spotlight" -> tour.spotlight)
           .add("berserkable" -> tour.berserkable)
+          .add("statusScoring" -> tour.statusScoring)
+          .add("isHandicapped" -> tour.handicapped)
           .add("position" -> tour.position.ifTrue(full).map(positionJson))
           .add("verdicts" -> verdicts.map(Condition.JSONHandlers.verdictsFor(_, lang)))
           .add("schedule" -> tour.schedule.map(scheduleJson))
@@ -214,7 +216,9 @@ final class JsonView(
             .add("performance" -> player.performanceOption)
             .add("rank" -> ranking.get(user.id).map(1 +))
             .add("provisional" -> player.provisional)
+            .add("inputRating" -> player.inputRating)
             .add("withdraw" -> player.withdraw)
+            .add("disqualified" -> player.disqualified)
             .add("team" -> player.team),
           "pairings" -> povScores.map { case (pov, score) =>
             Json
@@ -222,7 +226,12 @@ final class JsonView(
                 "id"          -> pov.gameId,
                 "playerIndex" -> pov.playerIndex.name,
                 "playerColor" -> tour.variant.playerColors(pov.playerIndex),
-                "op"          -> gameUserJson(pov.opponent.userId, pov.opponent.rating),
+                "op" -> gameUserJson(
+                  pov.opponent.userId,
+                  pov.opponent.rating,
+                  pov.opponent.isInputRating,
+                  pov.opponent.berserk
+                ),
                 "win"         -> score.flatMap(_.isWin),
                 "status"      -> pov.game.status.id,
                 "score"       -> score.map(sheetScoreJson),
@@ -305,9 +314,10 @@ final class JsonView(
       val light = lightUserApi sync rp.player.userId
       Json
         .obj(
-          "rank"   -> rp.rank,
-          "name"   -> light.fold(rp.player.userId)(_.name),
-          "rating" -> rp.player.rating
+          "rank"        -> rp.rank,
+          "name"        -> light.fold(rp.player.userId)(_.name),
+          "rating"      -> rp.player.rating,
+          "inputRating" -> rp.player.inputRating
         )
         .add("title" -> light.flatMap(_.title))
         .add("berserk" -> p.berserk)
@@ -325,7 +335,7 @@ final class JsonView(
         ), // app BC https://github.com/ornicar/lila/issues/7195
         "p1Color"  -> game.variant.playerColors(P1),
         "p2Color"  -> game.variant.playerColors(P2),
-        "lastMove" -> ~game.lastMoveKeys,
+        "lastMove" -> ~game.lastActionKeys,
         "p1"       -> ofPlayer(featured.p1, game player P1),
         "p2"       -> ofPlayer(featured.p2, game player P2)
       )
@@ -352,12 +362,19 @@ final class JsonView(
       )
       .add("pauseDelay", delay.map(_.seconds))
 
-  private def gameUserJson(userId: Option[String], rating: Option[Int]): JsObject = {
+  private def gameUserJson(
+      userId: Option[String],
+      rating: Option[Int],
+      isInputRating: Boolean,
+      berserk: Boolean
+  ): JsObject = {
     val light = userId flatMap lightUserApi.sync
     Json
       .obj("rating" -> rating)
+      .add("isInputRating" -> isInputRating)
       .add("name" -> light.map(_.name))
       .add("title" -> light.flatMap(_.title))
+      .add("berserk" -> berserk)
   }
 
   private val podiumJsonCache = cacheApi[Tournament.ID, Option[JsArray]](32, "tournament.podiumJson") {
@@ -367,22 +384,24 @@ final class JsonView(
       .buildAsyncFuture { id =>
         tournamentRepo finishedById id flatMap {
           _ ?? { tour =>
-            playerRepo.bestByTourWithRank(id, 3).flatMap { top3 =>
-              // check that the winner is still correctly denormalized
-              top3.headOption.map(_.player.userId).filter(w => tour.winnerId.fold(true)(w !=)) foreach {
-                tournamentRepo.setWinnerId(tour.id, _)
-              }
-              top3.map { case rp @ RankedPlayer(_, player) =>
-                for {
-                  sheet <- cached.sheet(tour, player.userId)
-                  json  <- playerJson(lightUserApi, sheet.some, rp, tour.streakable)
-                } yield json ++ Json
-                  .obj(
-                    "nb" -> sheetNbs(sheet)
-                  )
-                  .add("performance" -> player.performanceOption)
-              }.sequenceFu
-            } map { l =>
+            playerRepo
+              .bestByTourWithRank(tourId = id, nb = 3, noDQs = true)
+              .flatMap { top3 =>
+                // check that the winner is still correctly denormalized
+                top3.headOption.map(_.player.userId).filter(w => tour.winnerId.fold(true)(w !=)) foreach {
+                  tournamentRepo.setWinnerId(tour.id, _)
+                }
+                top3.map { case rp @ RankedPlayer(_, player) =>
+                  for {
+                    sheet <- cached.sheet(tour, player.userId)
+                    json  <- playerJson(lightUserApi, sheet.some, rp, tour.streakable)
+                  } yield json ++ Json
+                    .obj(
+                      "nb" -> sheetNbs(sheet)
+                    )
+                    .add("performance" -> player.performanceOption)
+                }.sequenceFu
+              } map { l =>
               JsArray(l).some
             }
           }
@@ -396,7 +415,8 @@ final class JsonView(
         .obj(
           "n" -> u.fold(p.name.value)(_.name),
           "r" -> p.rating.value,
-          "k" -> p.rank.value
+          "k" -> p.rank.value,
+          "i" -> p.isInputRating
         )
         .add("t" -> u.flatMap(_.title))
     }
@@ -507,6 +527,7 @@ object JsonView {
           .add("t" -> light.flatMap(_.title))
           .add("f" -> p.fire)
           .add("w" -> p.withdraw)
+          .add("dq" -> p.disqualified)
       }
     }
 
@@ -521,6 +542,7 @@ object JsonView {
         )
         .add("title" -> user.title)
         .add("performance" -> player.performanceOption)
+        .add("inputRating" -> player.inputRating)
         .add("team" -> player.team)
   }
 
@@ -550,7 +572,9 @@ object JsonView {
         .add("country" -> light.flatMap(_.country))
         .add("title" -> light.flatMap(_.title))
         .add("provisional" -> p.provisional)
+        .add("inputRating" -> p.inputRating)
         .add("withdraw" -> p.withdraw)
+        .add("disqualified" -> p.disqualified)
         .add("team" -> p.team)
     }
   }
@@ -585,10 +609,24 @@ object JsonView {
 
   implicit private[tournament] val clockWrites: OWrites[strategygames.ClockConfig] = OWrites { clock =>
     clock match {
-      case fc: FischerClock.Config => {
+      case fc: Clock.Config => {
         Json.obj(
           "limit"     -> fc.limitSeconds,
           "increment" -> fc.incrementSeconds
+        )
+      }
+      case fc: Clock.BronsteinConfig => {
+        Json.obj(
+          "limit"     -> fc.limitSeconds,
+          "delay"     -> fc.delaySeconds,
+          "delayType" -> "bronstein"
+        )
+      }
+      case udc: Clock.SimpleDelayConfig => {
+        Json.obj(
+          "limit"     -> udc.limitSeconds,
+          "delay"     -> udc.delaySeconds,
+          "delayType" -> "usdelay"
         )
       }
       case bc: ByoyomiClock.Config => {

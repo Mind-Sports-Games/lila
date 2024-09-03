@@ -2,6 +2,7 @@ import { h, VNode } from 'snabbdom';
 
 import * as xhr from 'common/xhr';
 import { Redraw, Open, bind, header, displayGameFamily, convertVariantKeyToGameFamily } from './util';
+import { gameFamily } from './common';
 
 type Piece = {
   name: string;
@@ -33,7 +34,7 @@ export function ctrl(
   trans: Trans,
   dimension: () => keyof PieceData,
   redraw: Redraw,
-  open: Open
+  open: Open,
 ): PieceCtrl {
   function dimensionData() {
     return data[dimension()];
@@ -76,34 +77,18 @@ export function view(ctrl: PieceCtrl): VNode {
     h(
       'select',
       { attrs: { id: 'gameFamilyForPiece' } },
-      gameFamily.map(v => gameFamilyOption(v, sv))
+      gameFamily.map(v => gameFamilyOption(v, sv)),
     ),
     pieceList(d, dgf, ctrl),
   ]);
 }
-
-// keep up to date with StrategyGames
-const gameFamily: GameFamilyKey[] = [
-  'chess',
-  'draughts',
-  'loa',
-  'shogi',
-  'xiangqi',
-  'flipello',
-  'amazons',
-  'oware',
-  'togyzkumalak',
-  'go',
-  'backgammon',
-  'abalone',
-];
 
 function gameFamilyOption(v: GameFamilyKey, sv: string) {
   if (v === sv) {
     return h(
       'option',
       { attrs: { title: displayGameFamily(v), value: v, selected: 'selected' } },
-      displayGameFamily(v)
+      displayGameFamily(v),
     );
   } else {
     return h('option', { attrs: { title: displayGameFamily(v), value: v } }, displayGameFamily(v));
@@ -116,7 +101,7 @@ function pieceList(d: PieceDimData[], dgf: PieceDimData, ctrl: PieceCtrl): VNode
   return h(
     'div.list',
     { attrs: { id: 'pieceListDiv' } },
-    allPieceSets.map(pieceView(currentPieceSets, dgf.list, ctrl.set, ctrl.dimension() == 'd3'))
+    allPieceSets.map(pieceView(currentPieceSets, dgf.list, ctrl.set, ctrl.dimension() == 'd3')),
   );
 }
 
@@ -155,7 +140,7 @@ function pieceView(current: Piece[], displayedPieces: Piece[], set: (t: Piece) =
         h('piece', {
           attrs: { style: `background-image:url(${playstrategy.assetUrl(pieceImage(t, is3d))})` },
         }),
-      ]
+      ],
     );
 }
 

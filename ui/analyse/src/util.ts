@@ -1,7 +1,7 @@
 import { h, VNode, Hooks, Attrs } from 'snabbdom';
 import { fixCrazySan } from 'stratutils';
 import * as cg from 'chessground/types';
-import { Rules } from 'stratops/types';
+import { Rules } from 'stratops';
 
 export { autolink, innerHTML, enrichText, richHTML, toYouTubeEmbed, toTwitchEmbed } from 'common/richText';
 
@@ -75,7 +75,7 @@ export function bindSubmit(f: (e: Event) => unknown, redraw?: () => void): Hooks
       e.preventDefault();
       return f(e);
     },
-    redraw
+    redraw,
   );
 }
 
@@ -142,7 +142,7 @@ export function option(value: string, current: string | undefined, name: string)
         selected: value === current,
       },
     },
-    name
+    name,
   );
 }
 
@@ -251,7 +251,26 @@ export function getGoScore(fen: string, playerIndex: string): number {
   return +fen.split(' ')[playerIndex === 'p1' ? 3 : 4] / 10.0;
 }
 
-const noCevalVariants = [
+export function getBackgammonScore(fen: string, playerIndex: string): number {
+  return +fen.split(' ')[playerIndex === 'p1' ? 4 : 5];
+}
+
+const noServerEvalVariants = [
+  'monster',
+  'linesOfAction',
+  'scrambledEggs',
+  'amazons',
+  'oware',
+  'togyzkumalak',
+  'go9x9',
+  'go13x13',
+  'go19x19',
+  'backgammon',
+  'nackgammon',
+];
+
+const noClientEvalVariants = [
+  'monster',
   'linesOfAction',
   'scrambledEggs',
   'shogi',
@@ -261,17 +280,24 @@ const noCevalVariants = [
   'flipello',
   'flipello10',
   'amazons',
+  'breakthroughtroyka',
+  'minibreakthroughtroyka',
   'oware',
   'togyzkumalak',
   'go9x9',
   'go13x13',
   'go19x19',
   'backgammon',
+  'nackgammon',
   'abalone',
 ];
 
-export function allowCevalForVariant(variant: VariantKey) {
-  return noCevalVariants.indexOf(variant) == -1;
+export function allowClientEvalForVariant(variant: VariantKey) {
+  return noClientEvalVariants.indexOf(variant) == -1;
+}
+
+export function allowServerEvalForVariant(variant: VariantKey) {
+  return noServerEvalVariants.indexOf(variant) == -1;
 }
 
 export type LexicalUci = {
@@ -306,6 +332,11 @@ export const parseLexicalUci = (uci: string): LexicalUci | undefined => {
     to: pos[1],
     promotion,
   };
+};
+
+export const isOnlyDropsPly = (node: Tree.Node, variantKey: VariantKey, defaultValue: boolean) => {
+  if (variantKey === 'amazons') return node.drops !== undefined && node.drops !== null && node.drops.length > 0;
+  else return defaultValue;
 };
 
 export const variantToRules = (v: VariantKey): Rules => {
@@ -366,6 +397,12 @@ export const variantToRules = (v: VariantKey): Rules => {
       return 'go19x19';
     case 'backgammon':
       return 'backgammon';
+    case 'nackgammon':
+      return 'nackgammon';
+    case 'breakthroughtroyka':
+      return 'breakthrough';
+    case 'minibreakthroughtroyka':
+      return 'minibreakthrough';
     case 'abalone':
       return 'abalone';
   }

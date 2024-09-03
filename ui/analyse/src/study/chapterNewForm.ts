@@ -2,6 +2,7 @@ import { h, VNode } from 'snabbdom';
 import { defined, prop, Prop } from 'common';
 import { storedProp, StoredProp } from 'common/storage';
 import * as xhr from 'common/xhr';
+import { allowAnalysisForVariant, isChess } from 'common/analysis';
 import { bind, bindSubmit, spinner, option, onInsert } from '../util';
 import { variants as xhrVariants, importPgn } from './studyXhr';
 import * as modal from '../modal';
@@ -18,6 +19,8 @@ export const modeChoices = [
   ['gamebook', 'interactiveLesson'],
 ];
 
+export const nonBrowserAnalysisModeChoices = [['normal', 'normalAnalysis']];
+
 export const fieldValue = (e: Event, id: string) =>
   ((e.target as HTMLElement).querySelector('#chapter-' + id) as HTMLInputElement)?.value;
 
@@ -30,6 +33,7 @@ export interface StudyChapterNewFormCtrl {
     tab: StoredProp<string>;
     editor: PlayStrategyEditor | null;
     editorFen: Prop<Fen | null>;
+    variantKey: Prop<VariantKey | null>;
     isDefaultName: boolean;
   };
   open(): void;
@@ -47,7 +51,7 @@ export function ctrl(
   send: StudySocketSend,
   chapters: Prop<StudyChapterMeta[]>,
   setTab: () => void,
-  root: AnalyseCtrl
+  root: AnalyseCtrl,
 ): StudyChapterNewFormCtrl {
   const multiPgnMax = 20;
 
@@ -58,6 +62,7 @@ export function ctrl(
     tab: storedProp('study.form.tab', 'init'),
     editor: null,
     editorFen: prop(null),
+    variantKey: prop(null),
     isDefaultName: true,
   };
 
@@ -114,6 +119,90 @@ export function ctrl(
   };
 }
 
+function edittab(ctrl: StudyChapterNewFormCtrl): VNode {
+  const currentChapter = ctrl.root.study!.data.chapter;
+  return h(
+    'div.board-editor-wrap',
+    {
+      hook: {
+        insert(vnode) {
+          Promise.all([
+            playstrategy.loadModule('editor'),
+            xhr.json(xhr.url('/editor.json', { fen: ctrl.root.node.fen })),
+          ]).then(([_, data]) => {
+            data.embed = true;
+            data.options = {
+              inlineCastling: true,
+              orientation: currentChapter.setup.orientation,
+              onChange: ctrl.vm.editorFen,
+            };
+            ctrl.vm.editor = window.PlayStrategyEditor!(vnode.elm as HTMLElement, data);
+            ctrl.vm.editorFen(ctrl.vm.editor.getFen());
+          });
+        },
+        destroy: _ => {
+          ctrl.vm.editor = null;
+        },
+      },
+    },
+    [spinner()],
+  );
+}
+function gametab(ctrl: StudyChapterNewFormCtrl): VNode {
+  const trans = ctrl.root.trans;
+  const noarg = trans.noarg;
+  return h('div.form-group', [
+    h(
+      'label.form-label',
+      {
+        attrs: { for: 'chapter-game' },
+      },
+      trans('loadAGameFromX', 'playstrategy.org'),
+    ),
+    h('textarea#chapter-game.form-control', {
+      attrs: { placeholder: noarg('urlOfTheGame') },
+    }),
+  ]);
+}
+function fentab(ctrl: StudyChapterNewFormCtrl): VNode {
+  const trans = ctrl.root.trans;
+  const noarg = trans.noarg;
+  return h('div.form-group', [
+    h('input#chapter-fen.form-control', {
+      attrs: {
+        value: '',
+        placeholder: noarg('loadAPositionFromFen'),
+      },
+    }),
+  ]);
+}
+
+function pgntab(ctrl: StudyChapterNewFormCtrl): VNode {
+  const trans = ctrl.root.trans;
+  return h('div.form-groupabel', [
+    h('textarea#chapter-pgn.form-control', {
+      attrs: { placeholder: trans.plural('pasteYourPgnTextHereUpToNbGames', ctrl.multiPgnMax) },
+    }),
+    window.FileReader
+      ? h('input#chapter-pgn-file.form-control', {
+          attrs: {
+            type: 'file',
+            accept: '.pgn',
+          },
+          hook: bind('change', e => {
+            const file = (e.target as HTMLInputElement).files![0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function () {
+              (document.getElementById('chapter-pgn') as HTMLTextAreaElement).value = reader.result as string;
+            };
+            reader.readAsText(file);
+          }),
+        })
+      : null,
+  ]);
+}
+
 export function view(ctrl: StudyChapterNewFormCtrl): VNode {
   const trans = ctrl.root.trans;
   const activeTab = ctrl.vm.tab();
@@ -125,7 +214,7 @@ export function view(ctrl: StudyChapterNewFormCtrl): VNode {
         attrs: { title },
         hook: bind('click', () => ctrl.vm.tab(key), ctrl.root.redraw),
       },
-      name
+      name,
     );
   };
   const gameOrPgn = activeTab === 'game' || activeTab === 'pgn';
@@ -133,11 +222,15 @@ export function view(ctrl: StudyChapterNewFormCtrl): VNode {
   const mode = currentChapter.practice
     ? 'practice'
     : defined(currentChapter.conceal)
-    ? 'conceal'
-    : currentChapter.gamebook
-    ? 'gamebook'
-    : 'normal';
+      ? 'conceal'
+      : currentChapter.gamebook
+        ? 'gamebook'
+        : 'normal';
   const noarg = trans.noarg;
+  const onlyForAnalysisVariants = (node: VNode | null): VNode | null =>
+    allowAnalysisForVariant(ctrl.vm.variantKey() ?? 'standard') ? node : null;
+  const onlyForChessVariants = (node: VNode | null): VNode | null =>
+    isChess(ctrl.vm.variantKey() ?? 'standard') ? node : null;
 
   return modal.modal({
     class: 'chapter-new',
@@ -179,7 +272,7 @@ export function view(ctrl: StudyChapterNewFormCtrl): VNode {
               {
                 attrs: { for: 'chapter-name' },
               },
-              noarg('name')
+              noarg('name'),
             ),
             h('input#chapter-name.form-control', {
               attrs: {
@@ -200,89 +293,15 @@ export function view(ctrl: StudyChapterNewFormCtrl): VNode {
           ]),
           h('div.tabs-horiz', [
             makeTab('init', noarg('empty'), noarg('startFromInitialPosition')),
-            makeTab('edit', noarg('editor'), noarg('startFromCustomPosition')),
-            makeTab('game', 'URL', noarg('loadAGameByUrl')),
-            makeTab('fen', 'FEN', noarg('loadAPositionFromFen')),
-            makeTab('pgn', 'PGN', noarg('loadAGameFromPgn')),
+            onlyForChessVariants(makeTab('edit', noarg('editor'), noarg('startFromCustomPosition'))),
+            onlyForAnalysisVariants(makeTab('game', 'URL', noarg('loadAGameByUrl'))),
+            onlyForAnalysisVariants(makeTab('fen', 'FEN', noarg('loadAPositionFromFen'))),
+            onlyForChessVariants(makeTab('pgn', 'PGN', noarg('loadAGameFromPgn'))),
           ]),
-          activeTab === 'edit'
-            ? h(
-                'div.board-editor-wrap',
-                {
-                  hook: {
-                    insert(vnode) {
-                      Promise.all([
-                        playstrategy.loadModule('editor'),
-                        xhr.json(xhr.url('/editor.json', { fen: ctrl.root.node.fen })),
-                      ]).then(([_, data]) => {
-                        data.embed = true;
-                        data.options = {
-                          inlineCastling: true,
-                          orientation: currentChapter.setup.orientation,
-                          onChange: ctrl.vm.editorFen,
-                        };
-                        ctrl.vm.editor = window.PlayStrategyEditor!(vnode.elm as HTMLElement, data);
-                        ctrl.vm.editorFen(ctrl.vm.editor.getFen());
-                      });
-                    },
-                    destroy: _ => {
-                      ctrl.vm.editor = null;
-                    },
-                  },
-                },
-                [spinner()]
-              )
-            : null,
-          activeTab === 'game'
-            ? h('div.form-group', [
-                h(
-                  'label.form-label',
-                  {
-                    attrs: { for: 'chapter-game' },
-                  },
-                  trans('loadAGameFromXOrY', 'playstrategy.org', 'chessgames.com')
-                ),
-                h('textarea#chapter-game.form-control', {
-                  attrs: { placeholder: noarg('urlOfTheGame') },
-                }),
-              ])
-            : null,
-          activeTab === 'fen'
-            ? h('div.form-group', [
-                h('input#chapter-fen.form-control', {
-                  attrs: {
-                    value: ctrl.root.node.fen,
-                    placeholder: noarg('loadAPositionFromFen'),
-                  },
-                }),
-              ])
-            : null,
-          activeTab === 'pgn'
-            ? h('div.form-groupabel', [
-                h('textarea#chapter-pgn.form-control', {
-                  attrs: { placeholder: trans.plural('pasteYourPgnTextHereUpToNbGames', ctrl.multiPgnMax) },
-                }),
-                window.FileReader
-                  ? h('input#chapter-pgn-file.form-control', {
-                      attrs: {
-                        type: 'file',
-                        accept: '.pgn',
-                      },
-                      hook: bind('change', e => {
-                        const file = (e.target as HTMLInputElement).files![0];
-                        if (!file) return;
-                        const reader = new FileReader();
-                        reader.onload = function () {
-                          (document.getElementById(
-                            'chapter-pgn'
-                          ) as HTMLTextAreaElement).value = reader.result as string;
-                        };
-                        reader.readAsText(file);
-                      }),
-                    })
-                  : null,
-              ])
-            : null,
+          onlyForChessVariants(activeTab === 'edit' ? edittab(ctrl) : null),
+          onlyForAnalysisVariants(activeTab === 'game' ? gametab(ctrl) : null),
+          onlyForAnalysisVariants(activeTab === 'fen' ? fentab(ctrl) : null),
+          onlyForChessVariants(activeTab === 'pgn' ? pgntab(ctrl) : null),
           h('div.form-split', [
             h('div.form-group.form-half', [
               h(
@@ -290,16 +309,26 @@ export function view(ctrl: StudyChapterNewFormCtrl): VNode {
                 {
                   attrs: { for: 'chapter-variant' },
                 },
-                noarg('Variant')
+                noarg('Variant'),
               ),
               h(
                 'select#chapter-variant.form-control',
                 {
                   attrs: { disabled: gameOrPgn },
+                  hook: {
+                    init: () => ctrl.vm.variantKey(currentChapter.setup.variant.key),
+                    ...bind('change', e => {
+                      const select = e.target as HTMLInputElement;
+                      ctrl.vm.variantKey(select.value as VariantKey);
+                      ctrl.redraw();
+                    }),
+                  },
                 },
                 gameOrPgn
                   ? [h('option', noarg('automatic'))]
-                  : ctrl.vm.variants.map(v => option(v.key, currentChapter.setup.variant.key, v.name))
+                  : ctrl.vm.variants
+                      .filter(v => allowAnalysisForVariant(v.key))
+                      .map(v => option(v.key, currentChapter.setup.variant.key, v.name)),
               ),
             ]),
             h('div.form-group.form-half', [
@@ -308,7 +337,7 @@ export function view(ctrl: StudyChapterNewFormCtrl): VNode {
                 {
                   attrs: { for: 'chapter-orientation' },
                 },
-                noarg('orientation')
+                noarg('orientation'),
               ),
               h(
                 'select#chapter-orientation.form-control',
@@ -320,7 +349,7 @@ export function view(ctrl: StudyChapterNewFormCtrl): VNode {
                 },
                 ['p1', 'p2'].map(function (playerIndex) {
                   return option(playerIndex, currentChapter.setup.orientation, noarg(playerIndex));
-                })
+                }),
               ),
             ]),
           ]),
@@ -330,15 +359,17 @@ export function view(ctrl: StudyChapterNewFormCtrl): VNode {
               {
                 attrs: { for: 'chapter-mode' },
               },
-              noarg('analysisMode')
+              noarg('analysisMode'),
             ),
             h(
               'select#chapter-mode.form-control',
-              modeChoices.map(c => option(c[0], mode, noarg(c[1])))
+              (isChess(ctrl.vm.variantKey() ?? 'standard') ? modeChoices : nonBrowserAnalysisModeChoices).map(c =>
+                option(c[0], mode, noarg(c[1])),
+              ),
             ),
           ]),
           modal.button(noarg('createChapter')),
-        ]
+        ],
       ),
     ],
   });

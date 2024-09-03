@@ -5,6 +5,11 @@ import { NormalMove } from 'stratops/types';
 import { board } from 'stratops/debug';
 import { defaultSetup, fen, makeUci, parseUci } from 'stratops';
 
+const makeSanChess = makeSan('chess');
+const parseSanChess = parseSan('chess');
+const makeUciChess = makeUci('chess');
+const parseUciChess = parseUci('chess');
+
 export default function (token: string) {
   const root = document.getElementById('dgt-play-zone') as HTMLDivElement;
   const consoleOutput = document.getElementById('dgt-play-zone-log') as HTMLPreElement;
@@ -48,7 +53,7 @@ export default function (token: string) {
       console.warn('JSON Object for Speech Keywords seems incomplete. Using English default.');
     }
   } catch (error) {
-    console.error('Invalid JSON Object for Speech Keywords. Using English default. ' + Error(error).message);
+    console.error('Invalid JSON Object for Speech Keywords. Using English default. ' + error);
   }
 
   //PlayStrategy Integration with Board API
@@ -250,7 +255,7 @@ export default function (token: string) {
                 connectToGameStream(data.game.id);
               } catch (error) {
                 //This will trigger if connectToGameStream fails
-                console.error('connectToEventStream - Failed to connect to game stream. ' + Error(error).message);
+                console.error('connectToEventStream - Failed to connect to game stream. ' + error);
               }
             } else if (data.type == 'challenge') {
               //Challenge received
@@ -262,7 +267,7 @@ export default function (token: string) {
               console.warn('connectToEventStream - ' + data.error);
             }
           } catch (error) {
-            console.error('connectToEventStream - Unable to parse JSON or Unexpected error. ' + Error(error).message);
+            console.error('connectToEventStream - Unable to parse JSON or Unexpected error. ' + error);
           }
         } else {
           //Signal that some empty message arrived. This is normal to keep the connection alive.
@@ -374,7 +379,7 @@ export default function (token: string) {
               console.log('connectToGameStream - ' + data.error);
             }
           } catch (error) {
-            console.error('connectToGameStream - No valid game data or Unexpected error. ' + Error(error).message);
+            console.error('connectToGameStream - No valid game data or Unexpected error. ' + error);
           }
         } else {
           //Signal that some empty message arrived
@@ -450,7 +455,7 @@ export default function (token: string) {
     */
     if (playableGames.length == 0) {
       console.log(
-        'No started playable games, challenges or games are disconnected. Please start a new game or fix connection.'
+        'No started playable games, challenges or games are disconnected. Please start a new game or fix connection.',
       );
       //TODO What happens if the games reconnect and this move is not sent?
     } else {
@@ -485,7 +490,7 @@ export default function (token: string) {
           //No match found but there is a valid currentGameId , so keep it
           if (verbose)
             console.log(
-              'chooseCurrentGame - Board will remain attached to current game. currentGameId: ' + currentGameId
+              'chooseCurrentGame - Board will remain attached to current game. currentGameId: ' + currentGameId,
             );
         } else {
           //No match and No valid current game but there are active games
@@ -506,7 +511,7 @@ export default function (token: string) {
           //The board matches currentGameId . No need to do anything.
           if (verbose)
             console.log(
-              'chooseCurrentGame - Board will remain attached to current game. currentGameId: ' + currentGameId
+              'chooseCurrentGame - Board will remain attached to current game. currentGameId: ' + currentGameId,
             );
         }
       }
@@ -529,7 +534,7 @@ export default function (token: string) {
       for (let i = 0; i < moves.length; i++) {
         if (moves[i] != '') {
           //Make any move that may have been already played on the ChessBoard. Useful when reconnecting
-          const uciMove = <NormalMove>parseUci(moves[i]);
+          const uciMove = <NormalMove>parseUciChess(moves[i]);
           const normalizedMove = chess.normalizeMove(uciMove); //This is because stratops uses UCI_960
           if (normalizedMove && chess.isLegal(normalizedMove)) chess.play(normalizedMove);
         }
@@ -540,7 +545,7 @@ export default function (token: string) {
       if (verbose) console.log(board(chess.board));
       if (verbose) console.log(chess.turn + "'s turn");
     } catch (error) {
-      console.error(`initializeChessBoard - Error: ${error.message}`);
+      console.error(`initializeChessBoard - Error: ${error}`);
     }
   }
 
@@ -567,20 +572,20 @@ export default function (token: string) {
         for (let i = 0; i < moves.length; i++) {
           if (moves[i] != '') {
             //Make the new move
-            const uciMove = <NormalMove>parseUci(moves[i]);
+            const uciMove = <NormalMove>parseUciChess(moves[i]);
             const normalizedMove = chess.normalizeMove(uciMove); //This is because stratops uses UCI_960
             if (normalizedMove && chess.isLegal(normalizedMove)) {
               //This is a good chance to get the move in SAN format
               if (chess.turn == 'p2')
                 lastSanMove = {
                   player: 'p2',
-                  move: makeSan(chess, normalizedMove),
+                  move: makeSanChess(chess, normalizedMove),
                   by: gameInfoMap.get(currentGameId).p2.id,
                 };
               else
                 lastSanMove = {
                   player: 'p1',
-                  move: makeSan(chess, normalizedMove),
+                  move: makeSanChess(chess, normalizedMove),
                   by: gameInfoMap.get(currentGameId).p1.id,
                 };
               chess.play(normalizedMove);
@@ -593,7 +598,7 @@ export default function (token: string) {
         if (verbose) console.log(chess.turn + "'s turn");
       }
     } catch (error) {
-      console.error(`updateChessBoard - Error: ${error.message}`);
+      console.error(`updateChessBoard - Error: ${error}`);
     }
   }
 
@@ -712,21 +717,21 @@ export default function (token: string) {
           announceWinner(
             keywords[gameState.winner],
             'flag',
-            keywords[gameState.winner] + ' ' + keywords['wins by'] + ' ' + keywords['timeout']
+            keywords[gameState.winner] + ' ' + keywords['wins by'] + ' ' + keywords['timeout'],
           );
           break;
         case 'resign':
           announceWinner(
             keywords[gameState.winner],
             'resign',
-            keywords[gameState.winner] + ' ' + keywords['wins by'] + ' ' + keywords['resignation']
+            keywords[gameState.winner] + ' ' + keywords['wins by'] + ' ' + keywords['resignation'],
           );
           break;
         case 'mate':
           announceWinner(
             keywords[lastMove.player],
             'mate',
-            keywords[lastMove.player] + ' ' + keywords['wins by'] + ' ' + keywords['#']
+            keywords[lastMove.player] + ' ' + keywords['wins by'] + ' ' + keywords['#'],
           );
           break;
         case 'draw':
@@ -906,7 +911,7 @@ export default function (token: string) {
               if (JSON.stringify(lastLegalParam.san) != JSON.stringify(quarantinedlastLegalParam.san)) {
                 //lastLegalParam was altered, this mean a new move was received from LiveChess during quarantine
                 console.warn(
-                  'onmessage - Invalid moved quarantined and not sent to playstrategy. Newer move interpretration received.'
+                  'onmessage - Invalid moved quarantined and not sent to playstrategy. Newer move interpretration received.',
                 );
                 return;
               }
@@ -918,7 +923,7 @@ export default function (token: string) {
                 //It looks like a duplicate, so just ignore it
                 if (verbose)
                   console.info(
-                    'onmessage - Duplicate position and san move received after quarantine and will be ignored'
+                    'onmessage - Duplicate position and san move received after quarantine and will be ignored',
                   );
                 return;
               }
@@ -930,7 +935,7 @@ export default function (token: string) {
             //Get first move to process, usually the last since movesToProcess is usually 1
             SANMove = String(message.param.san[message.param.san.length - i]).trim();
             if (verbose) console.info('onmessage - SANMove = ' + SANMove);
-            const moveObject = <NormalMove | undefined>parseSan(localBoard, SANMove); //get move from DGT LiveChess
+            const moveObject = <NormalMove | undefined>parseSanChess(localBoard, SANMove); //get move from DGT LiveChess
             //if valid move on local stratops
             if (moveObject && localBoard.isLegal(moveObject)) {
               if (verbose) console.info('onmessage - Move is legal');
@@ -957,7 +962,7 @@ export default function (token: string) {
                   console.error('onmessage - Played move has not been received by PlayStrategy.');
                 } else {
                   console.error('onmessage - Expected:' + lastMove.move + ' by ' + lastMove.player);
-                  console.error('onmessage - Detected:' + makeUci(moveObject) + ' by ' + localBoard.turn);
+                  console.error('onmessage - Detected:' + makeUciChess(moveObject) + ' by ' + localBoard.turn);
                 }
                 announceInvalidMove();
                 await sleep(1000);
@@ -978,7 +983,7 @@ export default function (token: string) {
                 if (verbose)
                   console.error(
                     'onmessage - invalidMove - Position Mismatch between DGT Board and internal in-memory Board. SAN: ' +
-                      SANMove
+                      SANMove,
                   );
                 announceInvalidMove();
                 console.info(board(localBoard.board));
@@ -1012,7 +1017,7 @@ export default function (token: string) {
         //Websocket is fine but still no board detected
         console.warn(
           'Connection to DGT Live Chess is Fine but no board is detected. Attempting re-connection. Attempt: ' +
-            attempts
+            attempts,
         );
         liveChessConnection.send('{"id":1,"call":"eboards"}');
       }
@@ -1051,7 +1056,7 @@ export default function (token: string) {
     } else {
       console.error('WebSocket is not open or is not ready to receive setup - cannot send setup command.');
       console.error(
-        `isLiveChessConnected: ${isLiveChessConnected} - DGTgameId: ${DGTgameId} - currentSerialnr: ${currentSerialnr} - currentGameId: ${currentGameId}`
+        `isLiveChessConnected: ${isLiveChessConnected} - DGTgameId: ${DGTgameId} - currentSerialnr: ${currentSerialnr} - currentGameId: ${currentGameId}`,
       );
     }
   }
@@ -1079,7 +1084,7 @@ export default function (token: string) {
       await chooseCurrentGame();
     }
     //Now send the move
-    const command = makeUci(boardMove);
+    const command = makeUciChess(boardMove);
     sendMove(currentGameId, command);
   }
 
@@ -1137,7 +1142,7 @@ export default function (token: string) {
       try {
         extendedSanMove = extendedSanMove.replace(keywordsBase[i], ' ' + keywords[keywordsBase[i]].toLowerCase() + ' ');
       } catch (error) {
-        console.error(`raplaceKeywords - Error replacing keyword. ${keywordsBase[i]} . ${Error(error).message}`);
+        console.error(`raplaceKeywords - Error replacing keyword. ${keywordsBase[i]} . ${error}`);
       }
     }
     return extendedSanMove;
@@ -1191,7 +1196,7 @@ export default function (token: string) {
    */
   function compareMoves(lastMove: string, moveObject: NormalMove): boolean {
     try {
-      const uciMove = makeUci(moveObject);
+      const uciMove = makeUciChess(moveObject);
       if (verbose) console.log(`Comparing ${lastMove} with ${uciMove}`);
       if (lastMove == uciMove) {
         //it's the same move
@@ -1215,7 +1220,7 @@ export default function (token: string) {
         }
       }
     } catch (err) {
-      console.warn('compareMoves - ' + Error(err).message);
+      console.warn('compareMoves - ' + err);
     }
     return false;
   }

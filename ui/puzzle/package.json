@@ -11,24 +11,24 @@
   ],
   "author": "Thibault Duplessis",
   "license": "AGPL-3.0-or-later",
-  "devDependencies": {
-    "@build/rollupProject": "2.0.0",
-    "@types/chart.js": "^2.9.29",
-    "@types/playstrategy": "2.0.0"
-  },
   "dependencies": {
-    "ceval": "2.0.0",
+    "@types/chart.js": "^2.9.29",
+    "ceval": "workspace:*",
     "chart.js": "^2.9",
-    "chessground": "git+ssh://git@github.com:Mind-Sports-Games/chessground.git#222-monsterchess",
-    "common": "2.0.0",
+    "common": "workspace:*",
     "snabbdom": "^3.0.1",
-    "stratops": "git+ssh://git@github.com:Mind-Sports-Games/stratops.git#222-monsterchess",
-    "tree": "2.0.0"
+    "stratutils": "workspace:*",
+    "tree": "workspace:*"
   },
   "scripts": {
-    "dev": "rollup --config",
-    "prod": "rollup --config --config-prod",
-    "plugin-dev": "rollup --config --config-plugin",
-    "plugin-prod": "rollup --config --config-prod --config-plugin"
+    "compile": "tsc",
+    "dev": "tsc",
+    "prod": "tsc"
+  },
+  "playstrategy": {
+    "bundles": [
+      "src/puzzle.ts",
+      "src/puzzle.dashboard.ts"
+    ]
   }
 }

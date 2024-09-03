@@ -11,6 +11,8 @@ project/metals.sbt
 project/project
 project/target
 public/compiled
+public/hashed
+public/npm
 public/vendor/highcharts-4.2.5
 public/vendor/hopscotch
 public/vendor/tagify
@@ -24,6 +26,7 @@ data/
 dist/
 node_modules/
 local/
+ui/common/css/theme/gen/*.scss
 ui/common/**/*.js
 ui/common/**/*.d.ts
 ui/game/**/*.js

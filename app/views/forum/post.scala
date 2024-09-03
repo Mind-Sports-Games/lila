@@ -17,7 +17,7 @@ object post {
         li(
           a(
             dataIcon := p.isTeam.option("f"),
-            cls := "post_link text",
+            cls := "post_link text color-choice",
             href := routes.ForumPost.redirect(p.postId),
             title := p.topicName
           )(
@@ -135,7 +135,7 @@ object post {
             } else r
           }
         )(
-          img(src := assetUrl(s"images/emoji/$r.png"), alt := r),
+          img(src := staticAssetUrl(s"images/emoji/$r.png"), alt := r),
           size > 0 option size
         )
       }

@@ -116,7 +116,7 @@ export default function (opts: PuzzleOpts, redraw: Redraw): Controller {
   function makeCgOpts(): CgConfig {
     const node = vm.node;
     const playerIndex: PlayerIndex = node.ply % 2 === 0 ? 'p1' : 'p2';
-    const dests = chessgroundDests(position());
+    const dests = chessgroundDests('chess')(position());
     const nextNode = vm.node.children[0];
     const canMove = vm.mode === 'view' || (playerIndex === vm.pov && (!nextNode || nextNode.puzzle == 'fail'));
     const movable = canMove
@@ -163,13 +163,13 @@ export default function (opts: PuzzleOpts, redraw: Redraw): Controller {
   }
 
   function playUci(uci: Uci): void {
-    sendMove(parseUci(uci)!);
+    sendMove(parseUci('chess')(uci)!);
   }
 
   function playUserMove(orig: Key, dest: Key, promotion?: Role): void {
     sendMove({
-      from: parseSquare(orig)!,
-      to: parseSquare(dest)!,
+      from: parseSquare('chess')(orig)!,
+      to: parseSquare('chess')(dest)!,
       promotion,
     });
   }
@@ -180,19 +180,19 @@ export default function (opts: PuzzleOpts, redraw: Redraw): Controller {
 
   function sendMoveAt(path: Tree.Path, pos: Chess, move: Move): void {
     move = pos.normalizeMove(move);
-    const san = makeSanAndPlay(pos, move);
+    const san = makeSanAndPlay('chess')(pos, move);
     const check = pos.isCheck() ? pos.board.kingOf(pos.turn) : undefined;
     addNode(
       {
         ply: 2 * (pos.fullmoves - 1) + (pos.turn == 'p1' ? 0 : 1),
         fen: makeFen('chess')(pos.toSetup()),
-        id: scalachessCharPair(move),
-        uci: makeUci(move),
+        id: scalachessCharPair('chess')(move),
+        uci: makeUci('chess')(move),
         san,
-        check: defined(check) ? makeSquare(check) : undefined,
+        check: defined(check) ? makeSquare('chess')(check) : undefined,
         children: [],
       },
-      path
+      path,
     );
   }
 
@@ -257,10 +257,13 @@ export default function (opts: PuzzleOpts, redraw: Redraw): Controller {
       }
     } else if (progress) {
       vm.lastFeedback = 'good';
-      setTimeout(() => {
-        const pos = Chess.fromSetup(parseFen('chess')(progress.fen).unwrap()).unwrap();
-        sendMoveAt(progress.path, pos, progress.move);
-      }, opts.pref.animation.duration * (autoNext() ? 1 : 1.5));
+      setTimeout(
+        () => {
+          const pos = Chess.fromSetup(parseFen('chess')(progress.fen).unwrap()).unwrap();
+          sendMoveAt(progress.path, pos, progress.move);
+        },
+        opts.pref.animation.duration * (autoNext() ? 1 : 1.5),
+      );
     }
   }
 
@@ -339,7 +342,7 @@ export default function (opts: PuzzleOpts, redraw: Redraw): Controller {
           ground: g,
           threatMode: threatMode(),
           nextNodeBest: nextNodeBest(),
-        })
+        }),
       );
     });
   }

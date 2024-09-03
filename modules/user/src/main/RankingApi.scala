@@ -87,48 +87,51 @@ final class RankingApi(
 
   private[user] def fetchLeaderboard(nb: Int): Fu[Perfs.Leaderboards] =
     for {
-      ultraBullet   <- topPerf(PerfType.orDefault("ultraBullet").id, nb)
-      bullet        <- topPerf(PerfType.orDefault("bullet").id, nb)
-      blitz         <- topPerf(PerfType.orDefault("blitz").id, nb)
-      rapid         <- topPerf(PerfType.orDefault("rapid").id, nb)
-      classical     <- topPerf(PerfType.orDefault("classical").id, nb)
-      chess960      <- topPerf(PerfType.orDefault("chess960").id, nb)
-      kingOfTheHill <- topPerf(PerfType.orDefault("kingOfTheHill").id, nb)
-      threeCheck    <- topPerf(PerfType.orDefault("threeCheck").id, nb)
-      fiveCheck     <- topPerf(PerfType.orDefault("fiveCheck").id, nb)
-      antichess     <- topPerf(PerfType.orDefault("antichess").id, nb)
-      atomic        <- topPerf(PerfType.orDefault("atomic").id, nb)
-      horde         <- topPerf(PerfType.orDefault("horde").id, nb)
-      racingKings   <- topPerf(PerfType.orDefault("racingKings").id, nb)
-      crazyhouse    <- topPerf(PerfType.orDefault("crazyhouse").id, nb)
-      noCastling    <- topPerf(PerfType.orDefault("noCastling").id, nb)
-      monster       <- topPerf(PerfType.orDefault("monster").id, nb)
-      linesOfAction <- topPerf(PerfType.orDefault("linesOfAction").id, nb)
-      scrambledEggs <- topPerf(PerfType.orDefault("scrambledEggs").id, nb)
-      international <- topPerf(PerfType.orDefault("international").id, nb)
-      frisian       <- topPerf(PerfType.orDefault("frisian").id, nb)
-      frysk         <- topPerf(PerfType.orDefault("frysk").id, nb)
-      antidraughts  <- topPerf(PerfType.orDefault("antidraughts").id, nb)
-      breakthrough  <- topPerf(PerfType.orDefault("breakthrough").id, nb)
-      russian       <- topPerf(PerfType.orDefault("russian").id, nb)
-      brazilian     <- topPerf(PerfType.orDefault("brazilian").id, nb)
-      pool          <- topPerf(PerfType.orDefault("pool").id, nb)
-      portuguese    <- topPerf(PerfType.orDefault("portuguese").id, nb)
-      english       <- topPerf(PerfType.orDefault("english").id, nb)
-      shogi         <- topPerf(PerfType.orDefault("shogi").id, nb)
-      xiangqi       <- topPerf(PerfType.orDefault("xiangqi").id, nb)
-      minishogi     <- topPerf(PerfType.orDefault("minishogi").id, nb)
-      minixiangqi   <- topPerf(PerfType.orDefault("minixiangqi").id, nb)
-      flipello      <- topPerf(PerfType.orDefault("flipello").id, nb)
-      flipello10    <- topPerf(PerfType.orDefault("flipello10").id, nb)
-      amazons       <- topPerf(PerfType.orDefault("amazons").id, nb)
-      oware         <- topPerf(PerfType.orDefault("oware").id, nb)
-      togyzkumalak  <- topPerf(PerfType.orDefault("togyzkumalak").id, nb)
-      go9x9         <- topPerf(PerfType.orDefault("go9x9").id, nb)
-      go13x13       <- topPerf(PerfType.orDefault("go13x13").id, nb)
-      go19x19       <- topPerf(PerfType.orDefault("go19x19").id, nb)
-      backgammon    <- topPerf(PerfType.orDefault("backgammon").id, nb)
-      abalone       <- topPerf(PerfType.orDefault("abalone").id, nb)
+      ultraBullet            <- topPerf(PerfType.orDefault("ultraBullet").id, nb)
+      bullet                 <- topPerf(PerfType.orDefault("bullet").id, nb)
+      blitz                  <- topPerf(PerfType.orDefault("blitz").id, nb)
+      rapid                  <- topPerf(PerfType.orDefault("rapid").id, nb)
+      classical              <- topPerf(PerfType.orDefault("classical").id, nb)
+      chess960               <- topPerf(PerfType.orDefault("chess960").id, nb)
+      kingOfTheHill          <- topPerf(PerfType.orDefault("kingOfTheHill").id, nb)
+      threeCheck             <- topPerf(PerfType.orDefault("threeCheck").id, nb)
+      fiveCheck              <- topPerf(PerfType.orDefault("fiveCheck").id, nb)
+      antichess              <- topPerf(PerfType.orDefault("antichess").id, nb)
+      atomic                 <- topPerf(PerfType.orDefault("atomic").id, nb)
+      horde                  <- topPerf(PerfType.orDefault("horde").id, nb)
+      racingKings            <- topPerf(PerfType.orDefault("racingKings").id, nb)
+      crazyhouse             <- topPerf(PerfType.orDefault("crazyhouse").id, nb)
+      noCastling             <- topPerf(PerfType.orDefault("noCastling").id, nb)
+      monster                <- topPerf(PerfType.orDefault("monster").id, nb)
+      linesOfAction          <- topPerf(PerfType.orDefault("linesOfAction").id, nb)
+      scrambledEggs          <- topPerf(PerfType.orDefault("scrambledEggs").id, nb)
+      international          <- topPerf(PerfType.orDefault("international").id, nb)
+      frisian                <- topPerf(PerfType.orDefault("frisian").id, nb)
+      frysk                  <- topPerf(PerfType.orDefault("frysk").id, nb)
+      antidraughts           <- topPerf(PerfType.orDefault("antidraughts").id, nb)
+      breakthrough           <- topPerf(PerfType.orDefault("breakthrough").id, nb)
+      russian                <- topPerf(PerfType.orDefault("russian").id, nb)
+      brazilian              <- topPerf(PerfType.orDefault("brazilian").id, nb)
+      pool                   <- topPerf(PerfType.orDefault("pool").id, nb)
+      portuguese             <- topPerf(PerfType.orDefault("portuguese").id, nb)
+      english                <- topPerf(PerfType.orDefault("english").id, nb)
+      shogi                  <- topPerf(PerfType.orDefault("shogi").id, nb)
+      xiangqi                <- topPerf(PerfType.orDefault("xiangqi").id, nb)
+      minishogi              <- topPerf(PerfType.orDefault("minishogi").id, nb)
+      minixiangqi            <- topPerf(PerfType.orDefault("minixiangqi").id, nb)
+      flipello               <- topPerf(PerfType.orDefault("flipello").id, nb)
+      flipello10             <- topPerf(PerfType.orDefault("flipello10").id, nb)
+      amazons                <- topPerf(PerfType.orDefault("amazons").id, nb)
+      breakthroughtroyka     <- topPerf(PerfType.orDefault("breakthroughtroyka").id, nb)
+      minibreakthroughtroyka <- topPerf(PerfType.orDefault("minibreakthroughtroyka").id, nb)
+      oware                  <- topPerf(PerfType.orDefault("oware").id, nb)
+      togyzkumalak           <- topPerf(PerfType.orDefault("togyzkumalak").id, nb)
+      go9x9                  <- topPerf(PerfType.orDefault("go9x9").id, nb)
+      go13x13                <- topPerf(PerfType.orDefault("go13x13").id, nb)
+      go19x19                <- topPerf(PerfType.orDefault("go19x19").id, nb)
+      backgammon             <- topPerf(PerfType.orDefault("backgammon").id, nb)
+      nackgammon             <- topPerf(PerfType.orDefault("nackgammon").id, nb)
+      abalone                <- topPerf(PerfType.orDefault("abalone").id, nb)
     } yield Perfs.Leaderboards(
       ultraBullet = ultraBullet,
       bullet = bullet,
@@ -165,12 +168,15 @@ final class RankingApi(
       flipello = flipello,
       flipello10 = flipello10,
       amazons = amazons,
+      breakthroughtroyka = breakthroughtroyka,
+      minibreakthroughtroyka = minibreakthroughtroyka,
       oware = oware,
       togyzkumalak = togyzkumalak,
       go9x9 = go9x9,
       go13x13 = go13x13,
       go19x19 = go19x19,
       backgammon = backgammon,
+      nackgammon = nackgammon,
       abalone = abalone
     )
 

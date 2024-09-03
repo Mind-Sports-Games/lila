@@ -32,6 +32,26 @@ $c-font-clearer: c-light($c-font, 0%);
 $c-shade: c-dimmer($c-font, 80%);
 $c-font-page: c-light($c-font, 37%);
 
+/* Color choices in prefs */
+$c-color-choice-original: hsl(0, 0%, 73%);
+$c-color-choice-black: hsl(336, 2%, 47%);
+$c-color-choice-black-dim: hsl(345, 2%, 69%);
+$c-color-choice-black-link-hover: mix(#000, $c-color-choice-black, 20%);
+$c-color-choice-red: hsl(7, 54%, 70%);
+$c-color-choice-red-dim: hsl(13, 89%, 86%);
+$c-color-choice-red-link-hover: mix(#000, $c-color-choice-red, 20%);
+$c-color-choice-blue: hsl(192, 35%, 71%);
+$c-color-choice-blue-dim: hsl(194, 32%, 85%);
+$c-color-choice-blue-link-hover: mix(#000, $c-color-choice-blue, 20%);
+$c-color-choice-green: hsl(75, 30%, 57%);
+$c-color-choice-green-dim: hsl(75, 31%, 72%);
+$c-color-choice-green-link-hover: mix(#000, $c-color-choice-green, 20%);
+$c-color-choice-yellow: hsl(37, 82%, 67%);
+$c-color-choice-yellow-dim: hsl(35, 96%, 80%);
+$c-color-choice-yellow-link-hover: mix(#000, $c-color-choice-yellow, 20%);
+
+$c-color-choice-font-default: white;
+
 /* Primary: blue */
 $c-primary: hsl(209, 77%, 46%);
 $c-primary-dim: c-dimmer($c-primary);
@@ -123,6 +143,47 @@ $border: $border-width $border-style $c-border;
 
 /* Shadows */
 
-$box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 3px 1px -2px rgba(0, 0, 0, 0.2), 0 1px 5px 0 rgba(0, 0, 0, 0.12);
+$box-shadow:
+  0 2px 2px 0 rgba(0, 0, 0, 0.14),
+  0 3px 1px -2px rgba(0, 0, 0, 0.2),
+  0 1px 5px 0 rgba(0, 0, 0, 0.12);
 
 // $box-shadow: 0 2px 2px 0 rgba(0,0,0,.157);
+
+/* lobby highlighted events */
+$spotlight-box-shadow: inset -1px -1px 15px -1px $c-link;
+$spotlight-box-shadow-black: inset -1px -1px 15px -1px $c-link;
+$spotlight-box-shadow-blue: inset -1px -1px 15px -1px $c-link;
+$spotlight-box-shadow-green: inset -1px -1px 15px -1px $c-link;
+$spotlight-box-shadow-red: inset -1px -1px 15px -1px $c-link;
+$spotlight-box-shadow-yellow: inset -1px -1px 15px -1px $c-link;
+
+$spotlight-color: $c-font;
+$spotlight-color-black: $c-font;
+$spotlight-color-blue: $c-font;
+$spotlight-color-green: $c-font;
+$spotlight-color-red: $c-font;
+$spotlight-color-yellow: $c-font;
+
+$spotlight-icon-color: white;
+$spotlight-icon-color-black: white;
+$spotlight-icon-color-blue: white;
+$spotlight-icon-color-green: white;
+$spotlight-icon-color-red: white;
+$spotlight-icon-color-yellow: white;
+
+$spotlight-ribbon-color: $c-link;
+$spotlight-ribbon-color-black: $c-color-choice-black;
+$spotlight-ribbon-color-blue: $c-link;
+$spotlight-ribbon-color-green: $c-color-choice-green;
+$spotlight-ribbon-color-red: $c-color-choice-red;
+$spotlight-ribbon-color-yellow: $c-color-choice-yellow;
+
+$spotlight-ribbon-inner-side-color: $c-link-dim;
+$spotlight-ribbon-inner-side-color-black: $c-color-choice-black-dim;
+$spotlight-ribbon-inner-side-color-blue: $c-link-dim;
+$spotlight-ribbon-inner-side-color-green: $c-color-choice-green-dim;
+$spotlight-ribbon-inner-side-color-red: $c-color-choice-red-dim;
+$spotlight-ribbon-inner-side-color-yellow: $c-color-choice-yellow-dim;
+
+$spotlight-ribbon-text-color: white;

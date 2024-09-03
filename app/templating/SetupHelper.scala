@@ -86,6 +86,8 @@ trait SetupHelper { self: I18nHelper =>
     List(
       (TimeMode.FischerClock.id.toString, trans.realTime.txt(), none),
       (TimeMode.ByoyomiClock.id.toString, trans.byoyomiTime.txt(), none),
+      (TimeMode.BronsteinDelayClock.id.toString, trans.bronsteinDelay.txt(), none),
+      (TimeMode.SimpleDelayClock.id.toString, trans.simpleDelay.txt(), none),
       (TimeMode.Correspondence.id.toString, trans.correspondence.txt(), none),
       (TimeMode.Unlimited.id.toString, trans.unlimited.txt(), none)
     )
@@ -177,7 +179,10 @@ trait SetupHelper { self: I18nHelper =>
       encode: Variant => String = encodeId
   )(implicit lang: Lang): List[(SelectChoice, List[SelectChoice])] =
     GameFamily.all.map(gf =>
-      (translatedGameFamilyChoice(gf), translatedVariantChoicesWithVariantsByGameFamily(gf, encode))
+      (
+        translatedGameFamilyChoice(gf),
+        translatedVariantChoicesWithVariantsByGameFamily(gf, encode)
+      )
     )
 
   def translatedAllVariantChoicesWithVariants(
@@ -370,6 +375,12 @@ trait SetupHelper { self: I18nHelper =>
     List(
       (Pref.ConfirmPass.NO, trans.no.txt()),
       (Pref.ConfirmPass.YES, trans.yes.txt())
+    )
+
+  def playForcedActionChoices(implicit lang: Lang) =
+    List(
+      (Pref.PlayForcedAction.NO, trans.no.txt()),
+      (Pref.PlayForcedAction.YES, trans.yes.txt())
     )
 
   def translatedRookCastleChoices(implicit lang: Lang) =

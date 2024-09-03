@@ -18,17 +18,22 @@ object bits {
 
   sealed abstract class Orientation extends Product
 
+  //Orientation P1,P2,Left,Right is the view of the boar as though you are sat down at that position
+  //Orientation P1VFlip is for backgammon where for P2 they essentially view as P1 but flip the board vertically
   object Orientation {
-    final case object P1    extends Orientation
-    final case object P2    extends Orientation
-    final case object Left  extends Orientation
-    final case object Right extends Orientation
+    final case object P1      extends Orientation
+    final case object P2      extends Orientation
+    final case object Left    extends Orientation
+    final case object Right   extends Orientation
+    final case object P1VFlip extends Orientation
   }
 
-  def playerIndexToOrientation(c: PlayerIndex): Orientation =
-    c match {
-      case P1 => Orientation.P1
-      case P2 => Orientation.P2
+  def playerIndexToOrientation(c: PlayerIndex, v: String): Orientation =
+    (c, v) match {
+      case (P1, _)            => Orientation.P1
+      case (P2, "backgammon") => Orientation.P1VFlip
+      case (P2, "nackgammon") => Orientation.P1VFlip
+      case (P2, _)            => Orientation.P2
     }
 
   private val dataState = attr("data-state")
@@ -42,7 +47,13 @@ object bits {
           case P1 => Orientation.P1
           case P2 => Orientation.Right
         }
-      case _ => playerIndexToOrientation(c)
+      case Variant.Backgammon(strategygames.backgammon.variant.Backgammon) |
+          Variant.Backgammon(strategygames.backgammon.variant.Nackgammon) =>
+        c match {
+          case P1 => Orientation.P1
+          case P2 => Orientation.P1VFlip
+        }
+      case _ => playerIndexToOrientation(c, variant.key)
     }
 
   private def boardOrientation(pov: Pov): Orientation = boardOrientation(pov.game.variant, pov.playerIndex)
@@ -58,7 +69,7 @@ object bits {
         Forsyth.boardAndPlayer(pov.game.variant.gameLogic, pov.game.situation)
       ),
       boardOrientation(pov),
-      ~pov.game.lastMoveKeys,
+      ~pov.game.lastActionKeys,
       boardSize(pov),
       pov.game.variant.key
     ) _
@@ -100,7 +111,9 @@ object bits {
   def mini(fen: FEN, playerIndex: PlayerIndex = P1, variantKey: String, lastMove: String = "")(
       tag: Tag
   ): Tag =
-    miniWithOrientation(fen, playerIndexToOrientation(playerIndex), lastMove, None, variantKey)(tag)
+    miniWithOrientation(fen, playerIndexToOrientation(playerIndex, variantKey), lastMove, None, variantKey)(
+      tag
+    )
 
   def miniForVariant(fen: FEN, variant: Variant, playerIndex: PlayerIndex = P1, lastMove: String = "")(
       tag: Tag

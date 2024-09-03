@@ -2,7 +2,7 @@
   "name": "draughtsround",
   "version": "2.0.0",
   "description": "lidraughts.org round",
-  "main": "src/main.js",
+  "main": "src/draughtsround.js",
   "repository": {
     "type": "git",
     "url": "https://github.com/roepstoep/lidraughts"
@@ -19,26 +19,25 @@
     "url": "https://github.com/roepstoep/lidraughts/issues"
   },
   "homepage": "https://github.com/roepstoep/lidraughts",
-  "devDependencies": {
-    "@build/rollupProject": "2.0.0",
-    "@rollup/plugin-commonjs": "^17",
-    "@rollup/plugin-node-resolve": "^8",
-    "@rollup/plugin-typescript": "^8.1.0",
-    "@types/playstrategy": "2.0.0"
-  },
   "dependencies": {
-    "chat": "2.0.0",
-    "chessground": "git+ssh://git@github.com:Mind-Sports-Games/chessground.git#222-monsterchess",
-    "common": "2.0.0",
-    "draughtsground": "^7.6",
-    "game": "2.0.0",
-    "nvui": "2.0.0",
+    "chat": "workspace:*",
+    "common": "workspace:*",
+    "draughts": "workspace:*",
+    "draughtsground": "workspace:*",
+    "game": "workspace:*",
+    "nvui": "workspace:*",
     "snabbdom": "^3.0.1"
   },
   "scripts": {
-    "dev": "rollup --config",
-    "prod": "rollup --config --config-prod",
-    "plugin-dev": "rollup --config --config-plugin",
-    "plugin-prod": "rollup --config --config-prod --config-plugin"
+    "compile": "tsc",
+    "dev": "tsc",
+    "prod": "tsc"
+  },
+  "playstrategy": {
+    "bundles": [
+      "src/draughtsround.ts",
+      "src/plugins/draughtsround.keyboardMove.ts",
+      "src/plugins/draughtsround.nvui.ts"
+    ]
   }
 }

@@ -25,11 +25,12 @@ import { ctrl as makeKeyboardMove, KeyboardMove } from './keyboardMove';
 import * as renderUser from './view/user';
 import * as cevalSub from './cevalSub';
 import * as keyboard from './keyboard';
+import * as Prefs from 'common/prefs';
 
 import {
   RoundOpts,
   RoundData,
-  ApiMove,
+  ApiAction,
   ApiEnd,
   Redraw,
   SocketMove,
@@ -86,7 +87,10 @@ export default class RoundController {
   sign: string = Math.random().toString(36);
   private music?: any;
 
-  constructor(readonly opts: RoundOpts, readonly redraw: Redraw) {
+  constructor(
+    readonly opts: RoundOpts,
+    readonly redraw: Redraw,
+  ) {
     opts.data.steps = round.mergeSteps(opts.data.steps, this.coordSystem(opts.data));
     round.massage(opts.data);
 
@@ -140,7 +144,7 @@ export default class RoundController {
 
     playstrategy.pubsub.on('sound_set', set => {
       if (!this.music && set === 'music')
-        playstrategy.loadScript('javascripts/music/play.js').then(() => {
+        playstrategy.loadScriptCJS('javascripts/music/play.js').then(() => {
           this.music = playstrategy.playMusic();
         });
       if (this.music && set !== 'music') this.music = undefined;
@@ -159,7 +163,7 @@ export default class RoundController {
   }
 
   private showExpiration = () => {
-    if (!this.data.expiration) return;
+    if (!this.data.expirationAtStart) return;
     this.redraw();
     setTimeout(this.showExpiration, 250);
   };
@@ -329,7 +333,7 @@ export default class RoundController {
 
   playerByPlayerIndex = (c: PlayerIndex) => this.data[c === this.data.player.playerIndex ? 'player' : 'opponent'];
 
-  apiMove = (o: ApiMove): true => {
+  apiAction = (o: ApiAction): true => {
     const d = this.data,
       playing = this.isPlaying(),
       ghosts = countGhosts(o.fen);
@@ -355,7 +359,7 @@ export default class RoundController {
             role: o.role,
             playerIndex: playedPlayerIndex,
           },
-          o.uci.substr(o.uci.length - 2, 2) as cg.Key
+          o.uci.substr(o.uci.length - 2, 2) as cg.Key,
         );
       else {
         const keys = util.uci2move(o.uci);
@@ -384,7 +388,7 @@ export default class RoundController {
         uci: o.uci,
         lidraughtsUci: o.uci,
       },
-      this.coordSystem(d)
+      this.coordSystem(d),
     );
 
     this.justDropped = undefined;
@@ -396,14 +400,14 @@ export default class RoundController {
       const oc = o.clock,
         delay = playing && activePlayerIndex ? 0 : oc.lag || 1;
       if (this.clock && this.clock.byoyomiData) {
-        console.log('apiMove setClock');
-        this.clock.setClock(d, oc.p1, oc.p2, oc.p1Periods, oc.p2Periods, delay);
-      } else if (this.clock) this.clock.setClock(d, oc.p1, oc.p2, delay);
+        this.clock.setClock(d, oc.p1, oc.p2, oc.p1Pending, oc.p2Pending, oc.p1Periods, oc.p2Periods, delay);
+      } else if (this.clock)
+        this.clock.setClock(d, oc.p1, oc.p2, oc.p1Pending, oc.p2Pending, undefined, undefined, delay);
       else if (this.corresClock) this.corresClock.update(oc.p1, oc.p2);
     }
-    if (this.data.expiration) {
-      if (round.turnsTaken(this.data) > 1) this.data.expiration = undefined;
-      else this.data.expiration.updatedAt = Date.now();
+    if (this.data.expirationAtStart) {
+      if (round.turnsTaken(this.data) > 1) this.data.expirationAtStart = undefined;
+      else this.data.expirationAtStart.updatedAt = Date.now();
     }
     this.redraw();
     if (playing && playedPlayerIndex == d.player.playerIndex) {
@@ -447,9 +451,8 @@ export default class RoundController {
     this.shouldSendMoveTime = false;
     const clock = d.clock;
     if (this.clock && clock && isByoyomi(clock)) {
-      console.log('reload setClock');
-      this.clock.setClock(d, clock.p1, clock.p2, clock.p1Periods, clock.p2Periods);
-    } else if (this.clock) this.clock.setClock(d, d.clock!.p1, d.clock!.p2);
+      this.clock.setClock(d, clock.p1, clock.p2, clock.p1Pending, clock.p2Pending, clock.p1Periods, clock.p2Periods);
+    } else if (this.clock) this.clock.setClock(d, d.clock!.p1, d.clock!.p2, d.clock!.p1Pending, d.clock!.p2Pending);
     if (this.corresClock) this.corresClock.update(d.correspondence.p1, d.correspondence.p2);
     if (!this.replaying()) ground.reload(this);
     this.setTitle();
@@ -493,10 +496,18 @@ export default class RoundController {
     this.setQuietMode();
     this.setLoading(false);
     if (this.clock && o.clock && this.clock.byoyomiData) {
-      console.log('endWithData setClock');
-      this.clock.setClock(d, o.clock.p1 * 0.01, o.clock.p2 * 0.01, o.clock.p1Periods, o.clock.p2Periods);
+      this.clock.setClock(
+        d,
+        o.clock.p1 * 0.01,
+        o.clock.p2 * 0.01,
+        o.clock.p1Pending * 0.01,
+        o.clock.p2Pending * 0.01,
+        o.clock.p1Periods,
+        o.clock.p2Periods,
+      );
     }
-    if (this.clock && o.clock) this.clock.setClock(d, o.clock.p1 * 0.01, o.clock.p2 * 0.01);
+    if (this.clock && o.clock)
+      this.clock.setClock(d, o.clock.p1 * 0.01, o.clock.p2 * 0.01, o.clock.p1Pending * 0.01, o.clock.p2Pending * 0.01);
     this.redraw();
     this.autoScroll();
     this.onChange();
@@ -533,7 +544,7 @@ export default class RoundController {
       },
       _ => {
         this.challengeRematched = false;
-      }
+      },
     );
   };
 
@@ -652,7 +663,7 @@ export default class RoundController {
 
   opponentGone = (): number | boolean => {
     const d = this.data;
-    return d.opponent.gone !== false && !game.isPlayerTurn(d) && game.resignable(d) && d.opponent.gone;
+    return d.opponent.isGone !== false && !game.isPlayerTurn(d) && game.resignable(d) && d.opponent.isGone;
   };
 
   canOfferDraw = (): boolean => game.drawable(this.data) && (this.lastDrawOfferAtPly || -99) < this.ply - 20;

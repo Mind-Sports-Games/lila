@@ -1,6 +1,7 @@
 @import 'link';
 @import 'board';
 @import 'piece';
+@import 'color';
 
 #dasher_app {
   @extend %box-radius-left;
@@ -146,6 +147,7 @@
   }
 
   .piece select {
+    width: 122px;
     padding: 0.6em 0em;
     margin: 0.2em 0em;
   }
@@ -155,6 +157,7 @@
   }
 
   .theme select {
+    width: 122px;
     padding: 0.6em 0em;
     margin: 0.2em 0em;
   }

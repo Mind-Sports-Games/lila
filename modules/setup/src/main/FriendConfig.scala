@@ -58,6 +58,9 @@ case class FriendConfig(
       )
     else None
   }(Some(_))
+
+  def validKomi = variant.gameFamily != GameFamily.Go() || (variant.gameFamily == GameFamily.Go() &&
+    goKomi.abs <= (variant.toGo.boardSize.width * variant.toGo.boardSize.width * 10))
 }
 
 object FriendConfig extends BaseHumanConfig {

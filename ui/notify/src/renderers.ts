@@ -155,7 +155,7 @@ function generic(n: Notification, url: string | undefined, icon: string, content
         attrs: { 'data-icon': icon },
       }),
       h('span.content', content),
-    ]
+    ],
   );
 }
 
@@ -169,7 +169,7 @@ function drawTime(n: Notification) {
         datetime: n.date,
       },
     },
-    playstrategy.timeago(date)
+    playstrategy.timeago(date),
   );
 }
 

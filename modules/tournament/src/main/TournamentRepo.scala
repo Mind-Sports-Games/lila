@@ -281,9 +281,7 @@ final class TournamentRepo(val coll: Coll, playerCollName: CollName)(implicit
       .cursor[Tournament]()
 
   private def scheduledStillWorthEntering: Fu[List[Tournament]] =
-    coll.list[Tournament](startedSelect ++ scheduledSelect) dmap {
-      _.filter(_.isStillWorthEntering)
-    }
+    coll.list[Tournament](startedSelect ++ scheduledSelect)
 
   private def canShowOnHomepage(tour: Tournament): Boolean =
     tour.schedule exists { schedule =>
@@ -295,15 +293,14 @@ final class TournamentRepo(val coll: Coll, playerCollName: CollName)(implicit
           case Yearly            => 1 * 60 * 24 * 7
           case Monthly           => 6 * 60
           case Weekend           => 3 * 60
-          case Weekly            => 1 * 60 * 12
+          case Weekly            => 1 * 60 * 8
           case Daily             => 1 * 60
-          case Shield            => 1 * 60 * 24 * 4
+          case Shield            => 1 * 60 * 24 * 7
           case MedleyShield      => 1 * 60 * 24 * 7 // 7 days
-          case Introductory | MSO21 | MSOGP | MSOWarmUp =>
+          case Introductory | Annual | MSO21 | MSOGP | MSOWarmUp =>
             tour.spotlight.flatMap(_.homepageHours).fold(crud.CrudForm.maxHomepageHours * 60)(60 *)
           case _ => 30
         }
-        //if (tour.variant.exotic) base / 3 else
         base
       }
     }
@@ -399,8 +396,11 @@ final class TournamentRepo(val coll: Coll, playerCollName: CollName)(implicit
         List(
           // tour.conditions.titled.isEmpty option "conditions.titled",
           tour.isRated option "mode",
+          (!tour.handicapped) option "handicapped",
+          (tour.inputPlayerRatings.isEmpty || !tour.handicapped) option "inputPlayerRatings",
           tour.berserkable option "noBerserk",
           tour.streakable option "noStreak",
+          (!tour.statusScoring) option "statusScoring",
           tour.hasChat option "chat",
           tour.password.isEmpty option "password",
           tour.conditions.list.isEmpty option "conditions",

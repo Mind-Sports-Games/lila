@@ -52,14 +52,14 @@ final class SwissTrf(
       3                    -> "001",
       8                    -> playerIds.getOrElse(p.userId, 0).toString,
       (15 + p.userId.size) -> p.userId,
-      52                   -> p.rating.toString,
+      52                   -> p.actualRating.toString,
       84                   -> f"${sheet.pointsTrf.value}%1.1f"
     ) ::: {
       swiss.allRounds.zip(sheet.outcomes).flatMap { case (rn, outcome) =>
         val pairing = pairings get rn
         List(
           95 -> pairing.map(_ opponentOf p.userId).flatMap(playerIds.get).??(_.toString),
-          97 -> pairing.map(_ playerIndexOf p.userId).??(_.fold("w", "b")),
+          97 -> pairing.map(_ bbpPairingPlayerIndexOf p.userId).??(_.fold("w", "b")),
           99 -> {
             import SwissSheet._
             outcome match {

@@ -1,5 +1,11 @@
+// eslint-disable-next-line
+/// <reference path="./chessground.d.ts" />
+// eslint-disable-next-line
+/// <reference path="./cash.d.ts" />
+
 /// <reference types="highcharts" />
 
+// file://./../../site/src/site.ts
 interface PlayStrategy {
   load: Promise<void>; // window.onload promise
   info: any;
@@ -9,13 +15,16 @@ interface PlayStrategy {
   tempStorage: PlayStrategyStorageHelper;
   once(key: string, mod?: 'always'): boolean;
   powertip: any;
+  clockWidget(el: HTMLElement, opts: { time: number; pause?: boolean; delay?: number; pending?: number }): void;
   widget: any;
   spinnerHtml: string;
   assetUrl(url: string, opts?: AssetUrlOpts): string;
   loadCss(path: string): void;
-  loadCssPath(path: string): void;
+  loadHashedCss(path: string): void;
+  loadHashedCssPath(path: string): void;
   jsModule(name: string): string;
   loadScript(url: string, opts?: AssetUrlOpts): Promise<void>;
+  loadScriptCJS(url: string, opts?: AssetUrlOpts): Promise<void>;
   loadModule(name: string): Promise<void>;
   hopscotch: any;
   userComplete: () => Promise<UserComplete>;
@@ -68,14 +77,10 @@ interface PlayStrategy {
     (data: any, trans: Trans, el: HTMLElement): void;
   };
   movetimeChart: any;
-  RoundNVUI?(
-    redraw: () => void
-  ): {
+  RoundNVUI?(redraw: () => void): {
     render(ctrl: any): any;
   };
-  AnalyseNVUI?(
-    redraw: () => void
-  ): {
+  AnalyseNVUI?(redraw: () => void): {
     render(ctrl: any): any;
   };
   playMusic(): any;
@@ -83,6 +88,8 @@ interface PlayStrategy {
   keyboardMove?: any;
   analysis?: any; // expose the analysis ctrl
   pageVariant: PageVariant;
+
+  manifest: { css: Record<string, string>; js: Record<string, string>; hashed: Record<string, string> };
 }
 
 type I18nDict = { [key: string]: string };
@@ -298,12 +305,15 @@ declare type VariantKey =
   | 'flipello'
   | 'flipello10'
   | 'amazons'
+  | 'breakthroughtroyka'
+  | 'minibreakthroughtroyka'
   | 'oware'
   | 'togyzkumalak'
   | 'go9x9'
   | 'go13x13'
   | 'go19x19'
   | 'backgammon'
+  | 'nackgammon'
   | 'abalone';
 
 declare type DraughtsVariantKey =
@@ -358,19 +368,22 @@ declare type Perf =
   | 'flipello'
   | 'flipello10'
   | 'amazons'
+  | 'breakthroughtroyka'
+  | 'minibreakthroughtroyka'
   | 'oware'
   | 'togyzkumalak'
   | 'go9x9'
   | 'go13x13'
   | 'go19x19'
   | 'backgammon'
+  | 'nackgammon'
   | 'abalone';
 
 //declare type Color = 'white' | 'black';
 declare type PlayerName = 'White' | 'Black' | 'Sente' | 'Gote' | 'Red' | 'South' | 'North' | 'Bastaushi' | 'Kostaushi';
 declare type PlayerIndex = 'p1' | 'p2';
 declare type PlayerColor = 'white' | 'black';
-declare type Orientation = 'p1' | 'p2' | 'left' | 'right';
+declare type Orientation = 'p1' | 'p2' | 'left' | 'right' | 'p1vflip';
 
 declare type PageVariant = VariantKey | DraughtsVariantKey | undefined;
 declare type GameFamilyKey =
@@ -381,6 +394,7 @@ declare type GameFamilyKey =
   | 'xiangqi'
   | 'flipello'
   | 'amazons'
+  | 'breakthroughtroyka'
   | 'oware'
   | 'togyzkumalak'
   | 'go'
@@ -663,7 +677,6 @@ interface CashStatic {
 
 interface Cash {
   powerTip(options?: PowerTip.Options | 'show' | 'hide'): Cash;
-  clock: any;
 }
 
 declare namespace PowerTip {
@@ -736,3 +749,4 @@ interface Dictionary<T> {
 type SocketHandlers = Dictionary<(d: any) => void>;
 
 declare const playstrategy: PlayStrategy;
+declare const $as: <T>(cashOrHtml: Cash | string) => T;

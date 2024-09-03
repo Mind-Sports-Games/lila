@@ -6,8 +6,9 @@ import { AutoplayDelay } from './autoplay';
 import { boolSetting, BoolSetting } from './boolSetting';
 import AnalyseCtrl from './ctrl';
 import { cont as contRoute } from 'game/router';
-import { bind, dataIcon } from './util';
+import { bind, dataIcon, allowClientEvalForVariant } from './util';
 import * as pgnExport from './pgnExport';
+import { isChess } from 'common/analysis';
 
 interface AutoplaySpeed {
   name: string;
@@ -56,9 +57,9 @@ function deleteButton(ctrl: AnalyseCtrl, userId?: string): VNode | undefined {
               'data-icon': 'q',
             },
           },
-          ctrl.trans.noarg('delete')
+          ctrl.trans.noarg('delete'),
         ),
-      ]
+      ],
     );
   return;
 }
@@ -78,9 +79,9 @@ function autoplayButtons(ctrl: AnalyseCtrl): VNode {
         {
           hook: bind('click', () => ctrl.togglePlay(speed.delay), ctrl.redraw),
         },
-        ctrl.trans.noarg(speed.name)
+        ctrl.trans.noarg(speed.name),
       );
-    })
+    }),
   );
 }
 
@@ -107,6 +108,8 @@ function hiddenInput(name: string, value: string) {
 }
 
 function studyButton(ctrl: AnalyseCtrl) {
+  const canStudyFromHere = isChess(ctrl.data.game.variant.key) || !ctrl.synthetic;
+  if (!canStudyFromHere) return;
   if (ctrl.study && ctrl.embed && !ctrl.ongoing)
     return h(
       'a.button.button-empty',
@@ -118,7 +121,7 @@ function studyButton(ctrl: AnalyseCtrl) {
           'data-icon': '4',
         },
       },
-      ctrl.trans.noarg('openStudy')
+      ctrl.trans.noarg('openStudy'),
     );
   if (ctrl.study || ctrl.ongoing || ctrl.embed) return;
   return h(
@@ -146,9 +149,9 @@ function studyButton(ctrl: AnalyseCtrl) {
             'data-icon': '4',
           },
         },
-        ctrl.trans.noarg('toStudy')
+        ctrl.trans.noarg('toStudy'),
       ),
-    ]
+    ],
   );
 }
 
@@ -174,28 +177,32 @@ export function view(ctrl: AnalyseCtrl): VNode {
           hook: bind('click', ctrl.flip),
           attrs: dataIcon('B'),
         },
-        noarg('flipBoard')
+        noarg('flipBoard'),
       ),
       ctrl.ongoing
         ? null
-        : h(
-            'a.button.button-empty',
-            {
-              attrs: {
-                href: d.userAnalysis ? '/editor?fen=' + ctrl.node.fen : '/' + d.game.id + '/edit?fen=' + ctrl.node.fen,
-                'data-icon': 'm',
-                ...(ctrl.embed
-                  ? {
-                      target: '_blank',
-                      rel: 'noopener nofollow',
-                    }
-                  : {
-                      rel: 'nofollow',
-                    }),
+        : ceval.variant.lib === 0 //board editor for chess only games atm
+          ? h(
+              'a.button.button-empty',
+              {
+                attrs: {
+                  href: d.userAnalysis
+                    ? '/editor?fen=' + ctrl.node.fen
+                    : '/' + d.game.id + '/edit?fen=' + ctrl.node.fen,
+                  'data-icon': 'm',
+                  ...(ctrl.embed
+                    ? {
+                        target: '_blank',
+                        rel: 'noopener nofollow',
+                      }
+                    : {
+                        rel: 'nofollow',
+                      }),
+                },
               },
-            },
-            noarg('boardEditor')
-          ),
+              noarg('boardEditor'),
+            )
+          : null,
       canContinue
         ? h(
             'a.button.button-empty',
@@ -203,7 +210,7 @@ export function view(ctrl: AnalyseCtrl): VNode {
               hook: bind('click', _ => modal($('.continue-with.g_' + d.game.id))),
               attrs: dataIcon('U'),
             },
-            noarg('continueFromHere')
+            noarg('continueFromHere'),
           )
         : null,
       studyButton(ctrl),
@@ -211,7 +218,7 @@ export function view(ctrl: AnalyseCtrl): VNode {
   ];
 
   const cevalConfig: MaybeVNodes =
-    ceval && ceval.possible && ceval.allowed()
+    ceval && ceval.possible && ceval.allowed() && allowClientEvalForVariant(ceval.variant.key)
       ? ([h('h2', noarg('computerAnalysis'))] as MaybeVNodes)
           .concat([
             ctrlBoolSetting(
@@ -223,7 +230,7 @@ export function view(ctrl: AnalyseCtrl): VNode {
                 disabled: mandatoryCeval,
                 change: ctrl.toggleComputer,
               },
-              ctrl
+              ctrl,
             ),
           ])
           .concat(
@@ -237,7 +244,7 @@ export function view(ctrl: AnalyseCtrl): VNode {
                       checked: ctrl.showAutoShapes(),
                       change: ctrl.toggleAutoShapes,
                     },
-                    ctrl
+                    ctrl,
                   ),
                   ctrlBoolSetting(
                     {
@@ -246,7 +253,7 @@ export function view(ctrl: AnalyseCtrl): VNode {
                       checked: ctrl.showGauge(),
                       change: ctrl.toggleGauge,
                     },
-                    ctrl
+                    ctrl,
                   ),
                   ctrlBoolSetting(
                     {
@@ -256,7 +263,7 @@ export function view(ctrl: AnalyseCtrl): VNode {
                       checked: ctrl.showMoveAnnotation(),
                       change: ctrl.toggleMoveAnnotation,
                     },
-                    ctrl
+                    ctrl,
                   ),
                   ctrlBoolSetting(
                     {
@@ -266,7 +273,7 @@ export function view(ctrl: AnalyseCtrl): VNode {
                       checked: ceval.infinite(),
                       change: ctrl.cevalSetInfinite,
                     },
-                    ctrl
+                    ctrl,
                   ),
                   ceval.supportsNnue
                     ? ctrlBoolSetting(
@@ -277,7 +284,7 @@ export function view(ctrl: AnalyseCtrl): VNode {
                           checked: ceval.enableNnue(),
                           change: ceval.enableNnue,
                         },
-                        ctrl
+                        ctrl,
                       )
                     : undefined,
                   (id => {
@@ -326,14 +333,14 @@ export function view(ctrl: AnalyseCtrl): VNode {
                             },
                             hook: rangeConfig(
                               () => Math.floor(Math.log2(parseInt(ceval.hashSize!()))),
-                              v => ctrl.cevalSetHashSize(Math.pow(2, v))
+                              v => ctrl.cevalSetHashSize(Math.pow(2, v)),
                             ),
                           }),
                           h('div.range_value', formatHashSize(parseInt(ceval.hashSize()))),
                         ]))('analyse-memory')
                     : undefined,
                 ]
-              : []
+              : [],
           )
       : [];
 
@@ -349,7 +356,7 @@ export function view(ctrl: AnalyseCtrl): VNode {
           ctrl.actionMenu.toggle();
         },
       },
-      ctrl
+      ctrl,
     ),
   ];
 
@@ -373,7 +380,7 @@ export function view(ctrl: AnalyseCtrl): VNode {
                     rel: 'nofollow',
                   },
                 },
-                noarg('playWithTheMachine')
+                noarg('playWithTheMachine'),
               ),
               h(
                 'a.button',
@@ -385,11 +392,11 @@ export function view(ctrl: AnalyseCtrl): VNode {
                     rel: 'nofollow',
                   },
                 },
-                noarg('playWithAFriend')
+                noarg('playWithAFriend'),
               ),
             ])
           : null,
-      ])
+      ]),
   );
 }
 

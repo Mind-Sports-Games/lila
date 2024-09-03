@@ -78,13 +78,19 @@ export function make(send: SocketSend, ctrl: RoundController): RoundSocket {
       if (fromOp) notify(ctrl.noarg('yourOpponentProposesATakeback'));
       ctrl.redraw();
     },
-    move: ctrl.apiMove,
-    drop: ctrl.apiMove,
+    move: ctrl.apiAction,
+    drop: ctrl.apiAction,
     reload,
     redirect: ctrl.setRedirecting,
     clockInc(o) {
       if (ctrl.clock) {
         ctrl.clock.addTime(o.playerIndex, o.time);
+        ctrl.redraw();
+      }
+    },
+    clock(o) {
+      if (ctrl.clock) {
+        ctrl.clock.setClock(ctrl.data, o.p1, o.p2, o.p1Pending, o.p2Pending, o.p1Periods, o.p2Periods);
         ctrl.redraw();
       }
     },
@@ -156,12 +162,12 @@ export function make(send: SocketSend, ctrl: RoundController): RoundSocket {
       }
     },
     simulEnd(simul: game.Simul) {
-      playstrategy.loadCssPath('modal');
+      playstrategy.loadHashedCssPath('modal');
       modal(
         $(
           '<p>Simul complete!</p><br /><br />' +
-            `<a class="button" href="/simul/${simul.id}">Back to ${simul.name} simul</a>`
-        )
+            `<a class="button" href="/simul/${simul.id}">Back to ${simul.name} simul</a>`,
+        ),
       );
     },
   };

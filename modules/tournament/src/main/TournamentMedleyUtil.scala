@@ -9,7 +9,6 @@ object TournamentMedleyUtil {
       orderedMedleyList: List[Variant],
       gameClockSeconds: Int,
       minutes: Int,
-      mMinutes: Int,
       mNumIntervals: Int,
       mBalanced: Boolean
   ): List[(Variant, Int)] = {
@@ -28,15 +27,19 @@ object TournamentMedleyUtil {
         val extra               = minutes * 60 - times.sum
         val firstLastBonus: Int = math.min(gameClockSeconds / 3, 120)
         // take time from first variant and give to last
-
         times.take(1).map(v => v - firstLastBonus) ::: times.drop(1).take(times.size - 2) :::
           times.drop(times.size - 1).map(v => v + extra + firstLastBonus)
-
       } else {
-        List.fill(mNumIntervals)(mMinutes * 60)
+        defaultIntervalTimes(minutes, mNumIntervals)
       }
 
-    orderedMedleyList.zipWithIndex.map { case (v, i) => (v, medleyIntervalSeconds.lift(i).getOrElse(0)) }
+    orderedMedleyList.zipWithIndex
+      .map { case (v, i) => (v, medleyIntervalSeconds.lift(i).getOrElse(0)) }
+  }
+
+  def defaultIntervalTimes(minutes: Int, mNumIntervals: Int) = {
+    val intervals = List.fill(mNumIntervals)((minutes / mNumIntervals) * 60)
+    intervals.updated(intervals.size - 1, intervals.last + minutes * 60 - intervals.sum)
   }
 
   def isMedleyChessShieldStyle(variants: List[Variant]): Boolean =
@@ -52,44 +55,47 @@ object TournamentMedleyUtil {
     val quick   = 0.9
     val fastest = 0.75
     Map(
-      "standard"      -> medium,
-      "chess960"      -> medium,
-      "kingOfTheHill" -> quick,
-      "threeCheck"    -> fastest,
-      "fiveCheck"     -> quick,
-      "antichess"     -> quick,
-      "atomic"        -> fastest,
-      "horde"         -> slow,
-      "racingKings"   -> fastest,
-      "crazyhouse"    -> quick,
-      "noCastling"    -> medium,
-      "monster"       -> medium,
-      "linesOfAction" -> fastest,
-      "scrambledEggs" -> fastest,
-      "frisian"       -> medium,
-      "frysk"         -> quick,
-      "international" -> slow,
-      "antidraughts"  -> slow,
-      "breakthrough"  -> slow,
-      "russian"       -> medium,
-      "brazilian"     -> medium,
-      "pool"          -> medium,
-      "portuguese"    -> medium,
-      "english"       -> medium,
-      "shogi"         -> slow,
-      "xiangqi"       -> medium,
-      "minishogi"     -> fastest,
-      "minixiangqi"   -> quick,
-      "flipello"      -> medium,
-      "flipello10"    -> slow,
-      "amazons"       -> medium,
-      "oware"         -> slow,
-      "togyzkumalak"  -> slow,
-      "go9x9"         -> medium,
-      "go13x13"       -> slow,
-      "go19x19"       -> slow,
-      "backgammon"    -> medium,
-      "abalone"       -> medium
+      "standard"               -> medium,
+      "chess960"               -> medium,
+      "kingOfTheHill"          -> quick,
+      "threeCheck"             -> fastest,
+      "fiveCheck"              -> quick,
+      "antichess"              -> quick,
+      "atomic"                 -> fastest,
+      "horde"                  -> slow,
+      "racingKings"            -> fastest,
+      "crazyhouse"             -> quick,
+      "noCastling"             -> medium,
+      "monster"                -> quick,
+      "linesOfAction"          -> fastest,
+      "scrambledEggs"          -> fastest,
+      "frisian"                -> medium,
+      "frysk"                  -> quick,
+      "international"          -> slow,
+      "antidraughts"           -> slow,
+      "breakthrough"           -> slow,
+      "russian"                -> medium,
+      "brazilian"              -> medium,
+      "pool"                   -> medium,
+      "portuguese"             -> medium,
+      "english"                -> medium,
+      "shogi"                  -> slow,
+      "xiangqi"                -> medium,
+      "minishogi"              -> fastest,
+      "minixiangqi"            -> quick,
+      "flipello"               -> medium,
+      "flipello10"             -> slow,
+      "amazons"                -> medium,
+      "breakthroughtroyka"     -> quick,
+      "minibreakthroughtroyka" -> fastest,
+      "oware"                  -> slow,
+      "togyzkumalak"           -> slow,
+      "go9x9"                  -> medium,
+      "go13x13"                -> slow,
+      "go19x19"                -> slow,
+      "backgammon"             -> medium,
+      "nackgammon"             -> medium,
+      "abalone"                -> medium
     )
   }
 
@@ -105,7 +111,7 @@ object TournamentMedleyUtil {
       "horde"         -> slow,
       "racingKings"   -> quick,
       "crazyhouse"    -> medium,
-      "monster"       -> medium
+      "monster"       -> quick
     )
   }
 

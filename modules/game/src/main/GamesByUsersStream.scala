@@ -5,6 +5,7 @@ import play.api.libs.json._
 import scala.concurrent.duration._
 
 import actorApi.{ FinishGame, StartGame }
+import strategygames.{ ByoyomiClock, Clock }
 import strategygames.format.FEN
 import lila.common.Bus
 import lila.common.Json.jodaWrites
@@ -60,14 +61,39 @@ final class GamesByUsersStream(gameRepo: lila.game.GameRepo)(implicit
                 "rating" -> p.rating
               )
               .add("provisional" -> p.provisional)
+              .add("isInputRating" -> p.isInputRating)
           })
         )
         .add("initialFen" -> initialFen)
         .add("clock" -> g.clock.map { clock =>
-          Json.obj(
-            "initial"   -> clock.limitSeconds,
-            "increment" -> clock.incrementSeconds
-          )
+          clock.config match {
+            // TODO: this clock json should be universal
+            case fc: Clock.Config =>
+              Json.obj(
+                "initial"   -> fc.limitSeconds,
+                "increment" -> fc.incrementSeconds
+              )
+            case bc: Clock.BronsteinConfig =>
+              Json.obj(
+                "initial"   -> bc.limitSeconds,
+                "delay"     -> bc.delaySeconds,
+                "delayType" -> "bronstein"
+              )
+            case udc: Clock.SimpleDelayConfig =>
+              Json.obj(
+                "initial"   -> udc.limitSeconds,
+                "delay"     -> udc.delaySeconds,
+                "delayType" -> "usdelay"
+              )
+            case bc: ByoyomiClock.Config =>
+              Json.obj(
+                "limit"     -> bc.limitSeconds,
+                "increment" -> bc.incrementSeconds,
+                "byoyomi"   -> bc.byoyomiSeconds,
+                "periods"   -> bc.periodsTotal
+              )
+
+          }
         })
         .add("daysPerTurn" -> g.daysPerTurn)
   }

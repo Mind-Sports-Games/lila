@@ -19,6 +19,28 @@
     &.join:hover td {
       background: fade-out($c-accent, 0.5);
       color: #fff;
+
+      .selected-color-black & {
+        background: $c-color-choice-black-dim;
+        color: $c-color-choice-font-default;
+      }
+      .selected-color-red & {
+        background: $c-color-choice-red-dim;
+        color: $c-color-choice-font-default;
+      }
+      .selected-color-blue & {
+        background: $c-color-choice-blue-dim;
+        color: $c-color-choice-font-default;
+      }
+      .selected-color-green & {
+        background: $c-color-choice-green-dim;
+        color: $c-color-choice-font-default;
+      }
+      .selected-color-yellow & {
+        background:$c-color-choice-yellow-dim;
+        color: $c-color-choice-font-default;
+      }
+
     }
 
     &:not(.disabled):hover ::before {
@@ -38,7 +60,7 @@
   th {
     @extend %roboto;
 
-    padding: 1em;
+    padding: 1em 0.7em;
 
     &.sortable {
       cursor: pointer;
@@ -58,12 +80,22 @@
     &.player {
       width: 110px;
     }
+
+    @include breakpoint($mq-not-xx-small) {
+      padding: 1em 0.4em;
+
+      &:nth-child(3) {
+        max-width: 13vw;
+        direction: rtl;
+        text-align: left;
+      }
+    }
   }
 
   td {
     @extend %nowrap-hidden;
 
-    padding: .5em .7em;
+    padding: 0.5em 0.7em;
     border-bottom: $border;
     cursor: pointer;
     background: fade-out($c-bg-box, 0.5);
@@ -85,6 +117,25 @@
 
     ::before {
       opacity: 0.6;
+    }
+
+    @include breakpoint($mq-not-xx-small) {
+      padding: 0.5em 0.4em;
+
+      &:first-child {
+        padding-inline-start: 0.7em;
+      }
+
+      // player name
+      &:nth-child(2) {
+        @include ellipsis;
+        max-width: 25vw;
+      }
+      //mode
+      &:last-child {
+        @include ellipsis;
+        max-width: 25vw;
+      }
     }
   }
 

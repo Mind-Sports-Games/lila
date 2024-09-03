@@ -336,18 +336,20 @@ final class Api(
   }
 
   def cloudEval =
-    Action.async { req => {
-      val lib = gameLogic(get("lib", req))
-      get("fen", req).fold(notFoundJson("Missing FEN")) { fen =>
-        JsonOptionOk(
-          env.evalCache.api.getEvalJson(
-            Variant.orDefault(lib, ~get("variant", req)),
-            FEN(lib, fen),
-            getInt("multiPv", req) | 1
+    Action.async { req =>
+      {
+        val lib = gameLogic(get("lib", req))
+        get("fen", req).fold(notFoundJson("Missing FEN")) { fen =>
+          JsonOptionOk(
+            env.evalCache.api.getEvalJson(
+              Variant.orDefault(lib, ~get("variant", req)),
+              FEN(lib, fen),
+              getInt("multiPv", req) | 1
+            )
           )
-        )
+        }
       }
-    }}
+    }
 
   private def gamesByUsers(max: Int)(req: Request[String]) =
     GlobalConcurrencyLimitPerIP(HTTPRequest ipAddress req)(
@@ -386,21 +388,21 @@ final class Api(
       }(fuccess(Limited))
     }
 
-  private val ApiMoveStreamGlobalConcurrencyLimitPerIP =
+  private val ApiActionStreamGlobalConcurrencyLimitPerIP =
     new lila.memo.ConcurrencyLimit[IpAddress](
       name = "API concurrency per IP",
-      key = "round.apiMoveStream.ip",
+      key = "round.apiActionStream.ip",
       ttl = 20.minutes,
       maxConcurrency = 8
     )
 
-  def moveStream(gameId: String) =
+  def actionStream(gameId: String) =
     Action.async { req =>
       env.round.proxyRepo.gameIfPresent(gameId) map {
         case None => NotFound
         case Some(game) =>
-          ApiMoveStreamGlobalConcurrencyLimitPerIP(HTTPRequest ipAddress req)(
-            addKeepAlive(env.round.apiMoveStream(game))
+          ApiActionStreamGlobalConcurrencyLimitPerIP(HTTPRequest ipAddress req)(
+            addKeepAlive(env.round.apiActionStream(game))
           )(sourceToNdJsonOption)
       }
     }

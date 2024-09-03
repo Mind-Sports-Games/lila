@@ -1,5 +1,11 @@
 import * as cg from 'chessground/types';
-import { oppositeOrientation, oppositeOrientationForLOA, orientationForLOA } from 'chessground/util';
+import {
+  oppositeOrientation,
+  oppositeOrientationForLOA,
+  orientationForLOA,
+  oppositeOrientationForBackgammon,
+  orientationForBackgammon,
+} from 'chessground/util';
 import * as stratUtils from 'stratutils';
 import * as game from 'game';
 import * as keyboard from './keyboard';
@@ -26,7 +32,7 @@ import { defined, prop, Prop } from 'common';
 import { DrawShape } from 'chessground/draw';
 import { ExplorerCtrl } from './explorer/interfaces';
 import { ForecastCtrl } from './forecast/interfaces';
-import { playstrategyRules } from 'stratops/compat';
+import { playstrategyRules, amazonsChessgroundFen } from 'stratops/compat';
 import { make as makeEvalCache, EvalCache } from './evalCache';
 import { make as makeForecast } from './forecast/forecastCtrl';
 import { make as makeFork, ForkCtrl } from './fork';
@@ -42,9 +48,10 @@ import { Position, PositionError } from 'stratops/chess';
 import { Result } from '@badrap/result';
 import { setupPosition } from 'stratops/variant';
 import { storedProp, StoredBooleanProp } from 'common/storage';
-import { AnaMove, AnaPass, StudyCtrl } from './study/interfaces';
+import { AnaMove, AnaDrop, AnaPass, StudyCtrl } from './study/interfaces';
 import { StudyPracticeCtrl } from './study/practice/interfaces';
 import { valid as crazyValid } from './crazy/crazyCtrl';
+import { isOnlyDropsPly } from './util';
 
 export default class AnalyseCtrl {
   data: AnalyseData;
@@ -103,6 +110,7 @@ export default class AnalyseCtrl {
   // underboard inputs
   fenInput?: string;
   pgnInput?: string;
+  sgfInput?: string;
 
   // other paths
   initialPath: Tree.Path;
@@ -114,7 +122,10 @@ export default class AnalyseCtrl {
   music?: any;
   nvui?: NvuiPlugin;
 
-  constructor(readonly opts: AnalyseOpts, readonly redraw: Redraw) {
+  constructor(
+    readonly opts: AnalyseOpts,
+    readonly redraw: Redraw,
+  ) {
     this.data = opts.data;
     this.element = opts.element;
     this.embed = opts.embed;
@@ -167,7 +178,7 @@ export default class AnalyseCtrl {
 
     playstrategy.pubsub.on('sound_set', (set: string) => {
       if (!this.music && set === 'music')
-        playstrategy.loadScript('javascripts/music/replay.js').then(() => {
+        playstrategy.loadScriptCJS('javascripts/music/replay.js').then(() => {
           this.music = window.playstrategyReplayMusic();
         });
       if (this.music && set !== 'music') this.music = null;
@@ -211,6 +222,7 @@ export default class AnalyseCtrl {
     this.onMainline = this.tree.pathIsMainline(path);
     this.fenInput = undefined;
     this.pgnInput = undefined;
+    this.sgfInput = undefined;
   };
 
   flip = () => {
@@ -222,6 +234,7 @@ export default class AnalyseCtrl {
       this.retro = makeRetro(this, this.bottomPlayerIndex());
     }
     if (this.practice) this.restartPractice();
+    this.onChange();
     this.redraw();
   };
 
@@ -230,7 +243,7 @@ export default class AnalyseCtrl {
   }
 
   bottomPlayerIndex(): PlayerIndex {
-    return this.flipped ? opposite(this.data.player.playerIndex) : this.data.player.playerIndex;
+    return this.getOrientation() === 'p1' ? 'p1' : 'p2';
   }
 
   bottomIsP1 = () => this.bottomPlayerIndex() === 'p1';
@@ -239,6 +252,9 @@ export default class AnalyseCtrl {
     if (this.data.game.variant.key === 'linesOfAction' || this.data.game.variant.key === 'scrambledEggs') {
       const c = this.data.player.playerIndex;
       return this.flipped ? oppositeOrientationForLOA(c) : orientationForLOA(c);
+    } else if (this.data.game.variant.key === 'backgammon' || this.data.game.variant.key === 'nackgammon') {
+      const c = this.data.player.playerIndex;
+      return this.flipped ? oppositeOrientationForBackgammon(c) : orientationForBackgammon(c);
     } else if (this.data.game.variant.key === 'racingKings') {
       return 'p1';
     } else {
@@ -268,20 +284,26 @@ export default class AnalyseCtrl {
     return [pos[0], pos[1]] as Key[];
   }
 
+  setDropMode(cg: ChessgroundApi) {
+    const playerIndex = cg.state.movable.playerIndex as cg.PlayerIndex;
+    setDropMode(cg.state, stratUtils.onlyDropsVariantPiece(cg.state.variant as VariantKey, playerIndex));
+    cg.set({
+      dropmode: {
+        showDropDests: !['go9x9', 'go13x13', 'go19x19', 'backgammon', 'nackgammon'].includes(
+          cg.state.variant as VariantKey,
+        ),
+        dropDests: stratUtils.readDropsByRole(this.node.dropsByRole),
+      },
+    });
+  }
+
   private showGround(): void {
     this.onChange();
     if (!defined(this.node.dests)) this.getDests();
     this.withCg(cg => {
       cg.set(this.makeCgOpts());
       this.setAutoShapes();
-      const playerIndex = cg.state.movable.playerIndex as cg.PlayerIndex;
-      setDropMode(cg.state, stratUtils.onlyDropsVariantPiece(cg.state.variant as VariantKey, playerIndex));
-      cg.set({
-        dropmode: {
-          showDropDests: true,
-          dropDests: stratUtils.readDropsByRole(this.node.dropsByRole),
-        },
-      });
+      this.setDropMode(cg);
       if (this.node.shapes) cg.setShapes(this.node.shapes as DrawShape[]);
     });
   }
@@ -302,16 +324,17 @@ export default class AnalyseCtrl {
       dests = stratUtils.readDests(this.node.dests),
       drops = stratUtils.readDrops(this.node.drops),
       dropsByRole = stratUtils.readDrops(this.node.dropsByRole),
+      variantKey = this.data.game.variant.key,
       movablePlayerIndex = this.gamebookPlay()
         ? playerIndex
         : this.practice
-        ? this.bottomPlayerIndex()
-        : !this.embed &&
-          ((dests && dests.size > 0) || drops === null || drops.length || dropsByRole == null || dropsByRole.length)
-        ? playerIndex
-        : undefined,
+          ? this.bottomPlayerIndex()
+          : !this.embed &&
+              ((dests && dests.size > 0) || drops === null || drops.length || dropsByRole == null || dropsByRole.length)
+            ? playerIndex
+            : undefined,
       config: ChessgroundConfig = {
-        fen: node.fen,
+        fen: this.data.game.variant.key == 'amazons' ? amazonsChessgroundFen(node.fen) : node.fen,
         turnPlayerIndex: playerIndex,
         movable: this.embed
           ? {
@@ -324,7 +347,7 @@ export default class AnalyseCtrl {
             },
         check: !!node.check,
         lastMove: this.uciToLastMove(node.uci),
-        onlyDropsVariant: this.data.onlyDropsVariant,
+        onlyDropsVariant: isOnlyDropsPly(node, variantKey, this.data.onlyDropsVariant),
       };
     if (!dests && !node.check) {
       // premove while dests are loading from server
@@ -377,7 +400,7 @@ export default class AnalyseCtrl {
       isForwardStep = pathChanged && path.length == this.path.length + 2;
     this.setPath(path);
     this.showGround();
-    if (this.data.game.variant.key === 'togyzkumalak') {
+    if (this.data.game.variant.key === 'togyzkumalak' && this.chessground) {
       this.chessground.redrawAll(); //redraw board scores
     }
     if (pathChanged) {
@@ -474,7 +497,7 @@ export default class AnalyseCtrl {
           console.log(error);
           this.redirecting = false;
           this.redraw();
-        }
+        },
       );
   }
 
@@ -489,11 +512,13 @@ export default class AnalyseCtrl {
 
   userNewPiece = (piece: cg.Piece, pos: Key): void => {
     if (crazyValid(this.chessground, this.data, this.node.drops, this.node.dropsByRole, piece, pos)) {
-      this.justPlayed = roleToChar(piece.role).toUpperCase() + '@' + pos;
+      this.justPlayed = ['go9x9', 'go13x13', 'go19x19'].includes(this.data.game.variant.key)
+        ? roleToChar(piece.role) + '@' + pos
+        : roleToChar(piece.role).toUpperCase() + '@' + pos;
       this.justDropped = piece.role;
       this.justCaptured = undefined;
       this.sound.move();
-      const drop = {
+      const drop: AnaDrop = {
         role: piece.role,
         pos,
         variant: this.data.game.variant.key,
@@ -501,11 +526,19 @@ export default class AnalyseCtrl {
         fen: this.node.fen,
         path: this.path,
       };
+      if (this.data.game.variant.key == 'amazons' && this.node.uci !== undefined) {
+        drop.halfMove = {
+          orig: this.node.uci.substring(0, 2),
+          dest: this.node.uci.substring(2, 4),
+        };
+        drop.fen = this.tree.parentNode(this.path).fen;
+        // Add in
+      }
       this.socket.sendAnaDrop(drop);
       this.preparePremoving();
       this.redraw();
     } else this.jump(this.path);
-    if (!this.data.onlyDropsVariant) {
+    if (!this.data.onlyDropsVariant || this.data.game.variant.key === 'amazons') {
       cancelDropMode(this.chessground.state);
       this.redraw();
     }
@@ -515,7 +548,9 @@ export default class AnalyseCtrl {
     this.justPlayed = orig;
     this.justDropped = undefined;
     const piece = this.chessground.state.pieces.get(dest);
-    const isCapture = capture || (piece && piece.role == 'p-piece' && orig[0] != dest[0]);
+    const isCapture =
+      capture ||
+      (this.data.game.gameFamily !== 'breakthroughtroyka' && piece && piece.role == 'p-piece' && orig[0] != dest[0]);
     this.sound[isCapture ? 'capture' : 'move']();
     if (!promotion.start(this, orig, dest, capture, this.sendMove)) this.sendMove(orig, dest, capture);
     if (!this.data.onlyDropsVariant) cancelDropMode(this.chessground.state);
@@ -574,7 +609,6 @@ export default class AnalyseCtrl {
   addNode(node: Tree.Node, path: Tree.Path) {
     const newPath = this.tree.addNode(node, path);
     if (!newPath) {
-      console.log("Can't addNode", node, path);
       return this.redraw();
     }
     this.jump(newPath);
@@ -617,7 +651,7 @@ export default class AnalyseCtrl {
         'Delete ' +
           util.plural('move', count.nodes) +
           (count.comments ? ' and ' + util.plural('comment', count.comments) : '') +
-          '?'
+          '?',
       )
     )
       return;
@@ -691,7 +725,7 @@ export default class AnalyseCtrl {
       variant: this.data.game.variant,
       standardMaterial:
         !this.data.game.initialFen ||
-        parseFen(util.variantToRules(this.data.game.variant.key))(this.data.game.initialFen).unwrap(
+        parseFen(stratUtils.variantToRules(this.data.game.variant.key))(this.data.game.initialFen).unwrap(
           setup =>
             PLAYERINDEXES.every(playerIndex => {
               const board = setup.board;
@@ -704,7 +738,7 @@ export default class AnalyseCtrl {
                 Math.max(board['b-piece'].intersect(pieces).intersect(SquareSet.darkSquares64()).size() - 1, 0);
               return board['p-piece'].intersect(pieces).size() + promotedPieces <= 8;
             }),
-          _ => false
+          _ => false,
         ),
       possible: !this.embed && (this.synthetic || !game.playable(this.data)),
       emit: (ev: Tree.ClientEval, work: CevalWork) => {
@@ -727,12 +761,12 @@ export default class AnalyseCtrl {
   outcome(node?: Tree.Node): Outcome | undefined {
     return this.position(node || this.node).unwrap(
       pos => pos.outcome(),
-      _ => undefined
+      _ => undefined,
     );
   }
 
   position(node: Tree.Node): Result<Position, PositionError> {
-    const setup = parseFen(util.variantToRules(this.data.game.variant.key))(node.fen).unwrap();
+    const setup = parseFen(stratUtils.variantToRules(this.data.game.variant.key))(node.fen).unwrap();
     return setupPosition(playstrategyRules(this.data.game.variant.key), setup);
   }
 
@@ -812,12 +846,16 @@ export default class AnalyseCtrl {
 
   showEvalGauge(): boolean {
     return (
-      this.cevalVariant() && this.hasAnyComputerAnalysis() && this.showGauge() && !this.outcome() && this.showComputer()
+      this.serverEvalVariant() &&
+      this.hasAnyComputerAnalysis() &&
+      this.showGauge() &&
+      !this.outcome() &&
+      this.showComputer()
     );
   }
 
-  cevalVariant(): boolean {
-    return util.allowCevalForVariant(this.data.game.variant.key);
+  serverEvalVariant(): boolean {
+    return util.allowServerEvalForVariant(this.data.game.variant.key);
   }
 
   hasAnyComputerAnalysis(): boolean {
@@ -878,16 +916,18 @@ export default class AnalyseCtrl {
   }
 
   playUci(uci: Uci): void {
-    const move = parseUci(uci)!;
-    const to = makeSquare(move.to);
+    const move = parseUci(stratUtils.variantToRules(this.data.game.variant.key))(uci)!;
+    const to = makeSquare(stratUtils.variantToRules(this.data.game.variant.key))(move.to);
     if (isNormal(move)) {
-      const piece = this.chessground.state.pieces.get(makeSquare(move.from));
+      const piece = this.chessground.state.pieces.get(
+        makeSquare(stratUtils.variantToRules(this.data.game.variant.key))(move.from),
+      );
       const capture = this.chessground.state.pieces.get(to);
       this.sendMove(
-        makeSquare(move.from),
+        makeSquare(stratUtils.variantToRules(this.data.game.variant.key))(move.from),
         to,
         capture && piece && capture.playerIndex !== piece.playerIndex ? capture : undefined,
-        move.promotion
+        move.promotion,
       );
     } else
       this.chessground.newPiece(
@@ -895,7 +935,7 @@ export default class AnalyseCtrl {
           playerIndex: this.chessground.state.movable.playerIndex as PlayerIndex,
           role: move.role,
         },
-        to
+        to,
       );
   }
 

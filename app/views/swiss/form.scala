@@ -28,6 +28,7 @@ object form {
           postForm(cls := "form3", action := routes.Swiss.create(teamId))(
             form3.split(fields.name, fields.nbRounds),
             form3.split(fields.rated, fields.variant),
+            form3.split(fields.handicapped, fields.inputPlayerRatings),
             fields.xGamesChoiceRow1,
             fields.xGamesChoiceRow2,
             form3.split(fields.drawTables, fields.perPairingDrawTables),
@@ -35,12 +36,16 @@ object form {
             fields.medleyDefaults,
             fields.medleyGameFamilies,
             fields.clockRow1,
-            fields.useByoyomi,
             fields.clockRow2,
+            fields.clockRow3,
             form3.split(fields.description, fields.position),
             form3.split(
               fields.roundInterval,
               fields.startsAt
+            ),
+            form3.split(
+              fields.halfwayBreak,
+              fields.minutesBeforeStartToJoin
             ),
             form3.split(
               fields.chatFor,
@@ -71,6 +76,7 @@ object form {
           postForm(cls := "form3", action := routes.Swiss.update(swiss.id.value))(
             form3.split(fields.name, fields.nbRounds),
             form3.split(fields.rated, fields.variant),
+            form3.split(fields.handicapped, fields.inputPlayerRatings),
             fields.xGamesChoiceRow1,
             fields.xGamesChoiceRow2,
             form3.split(fields.drawTables, fields.perPairingDrawTables),
@@ -78,12 +84,16 @@ object form {
             fields.medleyDefaults,
             fields.medleyGameFamilies,
             fields.clockRow1,
-            fields.useByoyomi,
             fields.clockRow2,
+            fields.clockRow3,
             form3.split(fields.description, fields.position),
             form3.split(
               fields.roundInterval,
               swiss.isCreated option fields.startsAt
+            ),
+            form3.split(
+              fields.halfwayBreak,
+              fields.minutesBeforeStartToJoin
             ),
             form3.split(
               fields.chatFor,
@@ -168,6 +178,34 @@ final private class SwissFields(form: Form[_], swiss: Option[Swiss])(implicit ct
       ),
       st.input(tpe := "hidden", st.name := form("rated").name, value := "false") // hack allow disabling rated
     )
+  def handicapped =
+    frag(
+      form3.checkbox(
+        form("handicaps.handicapped"),
+        trans.handicapped(),
+        half = true,
+        help = frag(
+          trans.handicappedDefinition.txt(),
+          br,
+          a(href := routes.Page.loneBookmark("handicaps"), target := "_blank")("More detail here")
+        ).some
+      ),
+      st.input(
+        tpe := "hidden",
+        st.name := form("handicapped").name,
+        value := "false"
+      ) // hack allow disabling handicapped
+    )
+  def inputPlayerRatings =
+    form3.group(
+      form("handicaps.inputPlayerRatings"),
+      frag("Input player ratings"),
+      klass = "inputPlayerRatings",
+      help = frag(
+        "Input player ratings to be used for the handicapped tournament. Username and Rating per line, separated by a space."
+      ).some,
+      half = true
+    )(form3.textarea(_)(rows := 4))
   def matchScore =
     frag(
       form3.checkbox(
@@ -242,14 +280,16 @@ final private class SwissFields(form: Form[_], swiss: Option[Swiss])(implicit ct
       medleyGameGroup(GameGroup.Flipello()),
       medleyGameGroup(GameGroup.Mancala()),
       medleyGameGroup(GameGroup.Amazons()),
-      medleyGameGroup(GameGroup.Go())
+      medleyGameGroup(GameGroup.BreakthroughTroyka()),
+      medleyGameGroup(GameGroup.Go()),
+      medleyGameGroup(GameGroup.Backgammon())
     )
 
   private def onePerGameFamily =
     frag(
       form3.checkbox(
         form("medleyDefaults.onePerGameFamily"),
-        "Where possible, use one game per game group",
+        trans.swiss.onePerGameGroup.txt(),
         klass = "medleyDefaults",
         displayed = false
       )
@@ -258,7 +298,7 @@ final private class SwissFields(form: Form[_], swiss: Option[Swiss])(implicit ct
     frag(
       form3.checkbox(
         form("medleyDefaults.exoticChessVariants"),
-        "Only exotic chess variants",
+        trans.swiss.exoticChessVariants.txt(),
         klass = "medleyDefaults",
         displayed = false
       )
@@ -267,7 +307,7 @@ final private class SwissFields(form: Form[_], swiss: Option[Swiss])(implicit ct
     frag(
       form3.checkbox(
         form("medleyDefaults.draughts64Variants"),
-        "Only draughts 64 variants",
+        trans.swiss.draughts64Variants.txt(),
         klass = "medleyDefaults",
         displayed = false
       )
@@ -291,18 +331,52 @@ final private class SwissFields(form: Form[_], swiss: Option[Swiss])(implicit ct
     )
 
   def useByoyomi =
-    frag(form3.checkbox(form("clock.useByoyomi"), trans.useByoyomi()))
+    frag(
+      form3.checkbox(
+        form("clock.useByoyomi"),
+        trans.useByoyomi(),
+        disabled = disabledAfterStart
+      )
+    )
+
+  def useBronsteinDelay =
+    frag(
+      form3.checkbox(
+        form("clock.useBronsteinDelay"),
+        trans.useBronsteinDelay(),
+        disabled = disabledAfterStart
+      )
+    )
+
+  def useSimpleDelay =
+    frag(form3.checkbox(form("clock.useSimpleDelay"), trans.useSimpleDelay(), disabled = disabledAfterStart))
 
   def clockRow1 =
     form3.split(
-      form3.group(form("clock.limit"), trans.clockInitialTime(), half = true)(
+      form3.group(
+        form("clock.limit"),
+        trans.clockInitialTime(),
+        half = true,
+        help = frag(
+          a(href := s"${routes.Page.loneBookmark("clocks")}", target := "_blank")("Clock details here")
+        ).some
+      )(
         form3.select(_, SwissForm.clockLimitChoices, disabled = disabledAfterStart)
       ),
-      form3.group(form("clock.increment"), trans.clockIncrement(), half = true)(
+      form3.group(form("clock.increment"), trans.clockIncrement(), klass = "clockIncrement", half = true)(
         form3.select(_, TournamentForm.clockIncrementChoices, disabled = disabledAfterStart)
+      ),
+      form3.group(form("clock.delay"), trans.clockDelay(), klass = "clockDelay", half = true)(
+        form3.select(_, TournamentForm.clockDelayChoices, disabled = disabledAfterStart)
       )
     )
   def clockRow2 =
+    form3.split(
+      useByoyomi,
+      useBronsteinDelay,
+      useSimpleDelay
+    )
+  def clockRow3 =
     form3.split(
       form3.group(form("clock.byoyomi"), trans.clockByoyomi(), klass = "byoyomiClock", half = true)(
         form3.select(_, SwissForm.clockByoyomiChoices, disabled = disabledAfterStart)
@@ -316,6 +390,15 @@ final private class SwissFields(form: Form[_], swiss: Option[Swiss])(implicit ct
     form3.group(form("roundInterval"), frag("Interval between rounds"), half = true)(
       form3.select(_, SwissForm.roundIntervalChoices)
     )
+  def halfwayBreak =
+    form3.group(form("halfwayBreak"), frag("Additional interval between rounds at halfway"), half = true)(
+      form3.select(_, SwissForm.halfwayBreakChoices)
+    )
+  def minutesBeforeStartToJoin =
+    form3.group(form("minutesBeforeStartToJoin"), frag("Time before start to join"), half = true)(
+      form3.select(_, SwissForm.timeBeforeStartToJoinIntervalChoices)
+    )
+
   def description =
     form3.group(
       form("description"),

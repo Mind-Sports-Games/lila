@@ -1,6 +1,6 @@
 import pubsub from './pubsub';
 import spinnerHtml from './spinner';
-import { loadCssPath, loadModule } from './assets';
+import { loadHashedCssPath, loadModule } from './assets';
 
 export default function () {
   const initiatingHtml = `<div class="initiating">${spinnerHtml}</div>`,
@@ -16,7 +16,7 @@ export default function () {
     $('#topnav > section > a').removeAttr('href');
 
   $('#topnav-toggle').on('change', e =>
-    document.body.classList.toggle('masked', (e.target as HTMLInputElement).checked)
+    document.body.classList.toggle('masked', (e.target as HTMLInputElement).checked),
   );
 
   $('#top').on('click', 'a.toggle', function (this: HTMLElement) {
@@ -36,14 +36,14 @@ export default function () {
 
   {
     // challengeApp
-    let instance, booted: boolean;
+    let instance: any, booted: boolean;
     const $toggle = $('#challenge-toggle');
     $toggle.one('mouseover click', () => load());
     const load = function (data?: any) {
       if (booted) return;
       booted = true;
       const $el = $('#challenge-app').html(initiatingHtml);
-      loadCssPath('challenge');
+      loadHashedCssPath('challenge');
       loadModule('challenge').then(
         () =>
           (instance = window.PlayStrategyChallenge($el[0], {
@@ -57,7 +57,7 @@ export default function () {
             pulse() {
               $toggle.addClass('pulse');
             },
-          }))
+          })),
       );
     };
     pubsub.on('socket.in.challenges', data => {
@@ -69,7 +69,7 @@ export default function () {
 
   {
     // notifyApp
-    let instance, booted: boolean;
+    let instance: any, booted: boolean;
     const $toggle = $('#notify-toggle'),
       selector = '#notify-app';
 
@@ -77,7 +77,7 @@ export default function () {
       if (booted) return;
       booted = true;
       const $el = $('#notify-app').html(initiatingHtml);
-      loadCssPath('notify');
+      loadHashedCssPath('notify');
       loadModule('notify').then(
         () =>
           (instance = window.PlayStrategyNotify($el.empty()[0], {
@@ -96,7 +96,7 @@ export default function () {
             pulse() {
               $toggle.addClass('pulse');
             },
-          }))
+          })),
       );
     };
 
@@ -128,7 +128,7 @@ export default function () {
       $(this).removeAttr('href');
       const $el = $('#dasher_app').html(initiatingHtml),
         playing = $('body').hasClass('playing');
-      loadCssPath('dasher');
+      loadHashedCssPath('dasher');
       loadModule('dasher').then(() => window.PlayStrategyDasher($el.empty()[0], { playing }));
     });
   }
@@ -143,8 +143,8 @@ export default function () {
       if (booted) return;
       booted = true;
       loadModule('cli').then(
-        () => window.PlayStrategyCli.app($input[0]),
-        () => (booted = false)
+        () => window.PlayStrategyCli($input[0]),
+        () => (booted = false),
       );
     };
     $input.on({

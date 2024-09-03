@@ -37,7 +37,7 @@ body {
 .lobby__side {
   @extend %flex-column;
 
-  overflow: hidden;
+  overflow: visible; // required to display spotlight ribbon
 }
 
 .lobby__chat {
@@ -46,6 +46,11 @@ body {
     margin-top: 0px;
     height: 370px;
     margin-bottom: 0px;
+
+    @include breakpoint($mq-landscape-mobile) {
+      margin-top: 12px !important;
+      height: 180px;
+    }
 
     @include breakpoint($mq-col3) {
       margin-top: 30px;
@@ -146,7 +151,7 @@ body {
     opacity: 1;
   }
 
-  margin-top: 2em;
+  margin-top: 0.5em;
 
   // $c-switch: hsl(264, 70%, 50%);
   $c-switch: $c-primary;

@@ -8,7 +8,7 @@ import scala.util.{ Failure, Success, Try }
 
 import lila.common.Iso._
 import lila.common.{ EmailAddress, IpAddress, Iso, NormalizedEmailAddress }
-import strategygames.{ Player => PlayerIndex, GameLogic, ByoyomiClock, FischerClock }
+import strategygames.{ Player => PlayerIndex, GameLogic, ByoyomiClock, Clock }
 import strategygames.format.{ FEN => StratFEN }
 import strategygames.variant.{ Variant => StratVariant }
 import strategygames.chess.format.FEN
@@ -133,24 +133,14 @@ trait Handlers {
   implicit val StratFENHandler: BSONHandler[StratFEN] = quickHandler[StratFEN](
     {
       case BSONString(f) =>
-        f.split("~") match {
+        f.split("~", 2) match {
           case Array(lib, f) => StratFEN(GameLogic(lib.toInt), f)
           case Array(f)      => StratFEN(GameLogic.Chess(), f)
           case _             => sys.error("error decoding fen in handler")
         }
       case _ => sys.error("fen not encoded in handler")
     },
-    f =>
-      f match {
-        case StratFEN.Chess(f)        => BSONString(s"0~${f.value}")
-        case StratFEN.Draughts(f)     => BSONString(s"1~${f.value}")
-        case StratFEN.FairySF(f)      => BSONString(s"2~${f.value}")
-        case StratFEN.Samurai(f)      => BSONString(s"3~${f.value}")
-        case StratFEN.Togyzkumalak(f) => BSONString(s"4~${f.value}")
-        case StratFEN.Go(f)           => BSONString(s"5~${f.value}")
-        case StratFEN.Backgammon(f)   => BSONString(s"6~${f.value}")
-        case StratFEN.Abalone(f)      => BSONString(s"7~${f.value}")
-      }
+    f => BSONString(s"${f.gameLogic.id}~${f.value}")
   )
 
   implicit val modeHandler = BSONBooleanHandler.as[strategygames.Mode](strategygames.Mode.apply, _.rated)
@@ -185,7 +175,17 @@ trait Handlers {
             for {
               limit <- doc.getAsTry[Int]("limit")
               inc   <- doc.getAsTry[Int]("increment")
-            } yield strategygames.FischerClock.Config(limit, inc)
+            } yield strategygames.Clock.Config(limit, inc)
+          case "bronstein" =>
+            for {
+              limit <- doc.getAsTry[Int]("limit")
+              delay <- doc.getAsTry[Int]("delay")
+            } yield strategygames.Clock.BronsteinConfig(limit, delay)
+          case "usdelay" =>
+            for {
+              limit <- doc.getAsTry[Int]("limit")
+              delay <- doc.getAsTry[Int]("delay")
+            } yield strategygames.Clock.SimpleDelayConfig(limit, delay)
           case "byoyomi" =>
             for {
               limit   <- doc.getAsTry[Int]("limit")
@@ -198,11 +198,23 @@ trait Handlers {
     },
     c =>
       c match {
-        case fc: FischerClock.Config =>
+        case fc: Clock.Config =>
           BSONDocument(
             "t"         -> "fischer",
             "limit"     -> fc.limitSeconds,
             "increment" -> fc.incrementSeconds
+          )
+        case fc: Clock.BronsteinConfig =>
+          BSONDocument(
+            "t"     -> "bronstein",
+            "limit" -> fc.limitSeconds,
+            "delay" -> fc.delaySeconds
+          )
+        case udc: Clock.SimpleDelayConfig =>
+          BSONDocument(
+            "t"     -> "usdelay",
+            "limit" -> udc.limitSeconds,
+            "delay" -> udc.delaySeconds
           )
         case bc: ByoyomiClock.Config =>
           BSONDocument(

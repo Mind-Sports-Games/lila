@@ -10,10 +10,19 @@ const renderGameClasses = (game: FeaturedGame): string =>
     ? `.tour__featured.mini-game.mini-game-${game.id}.mini-game--init.is2d.${game.gameLogic}.is${game.boardSize.key}.${game.variantKey}.variant-${game.variantKey}`
     : `.tour__featured.mini-game.mini-game-${game.id}.mini-game--init.is2d.${game.gameFamily}.${game.variantKey}.variant-${game.variantKey}`;
 
+const orientation = (p: PlayerIndex, gl: string): string => {
+  switch (gl) {
+    case 'backgammon':
+      return p === 'p2' ? 'p1vflip' : 'p1';
+    default:
+      return p;
+  }
+};
+
 const renderGameState = (game: FeaturedGame): string =>
   game.gameLogic === 'draughts' && !!game.boardSize
     ? `${game.fen}|${game.boardSize.size[0]}x${game.boardSize.size[1]}|${game.orientation}|${game.lastMove}`
-    : `${game.fen}|${game.orientation}|${game.lastMove}`;
+    : `${game.fen}|${orientation(game.orientation, game.gameLogic)}|${game.lastMove}`;
 
 function featuredPlayer(game: FeaturedGame, playerIndex: PlayerIndex, withRating: boolean) {
   const player = game[playerIndex];
@@ -61,12 +70,12 @@ function featured(game: FeaturedGame, withRating: boolean): VNode {
         },
       }),
       featuredPlayer(game, game.orientation, withRating),
-    ]
+    ],
   );
 }
 
 function duelPlayerMeta(p: DuelPlayer) {
-  return [h('em.rank', '#' + p.k), p.t ? h('em.utitle', p.t) : null, h('em.rating', '' + p.r)];
+  return [h('em.rank', '#' + p.k), p.t ? h('em.utitle', p.t) : null, h('em.rating', '' + p.r + (p.i ? '*' : ''))];
 }
 
 function renderDuel(battle?: TeamBattle, duelTeams?: DuelTeams) {
@@ -81,12 +90,12 @@ function renderDuel(battle?: TeamBattle, duelTeams?: DuelTeams) {
         battle && duelTeams
           ? h(
               'line.t',
-              [0, 1].map(i => teamName(battle, duelTeams[d.p[i].n.toLowerCase()]))
+              [0, 1].map(i => teamName(battle, duelTeams[d.p[i].n.toLowerCase()])),
             )
           : undefined,
         h('line.a', [h('strong', d.p[0].n), h('span', duelPlayerMeta(d.p[1]).reverse())]),
         h('line.b', [h('span', duelPlayerMeta(d.p[0])), h('strong', d.p[1].n)]),
-      ]
+      ],
     );
 }
 
@@ -109,9 +118,9 @@ export default function (ctrl: TournamentController): VNode {
             {
               hook: bind('click', _ => !ctrl.disableClicks),
             },
-            [h('h2', 'Top games')].concat(ctrl.data.duels.map(renderDuel(ctrl.data.teamBattle, ctrl.data.duelTeams)))
+            [h('h2', 'Top games')].concat(ctrl.data.duels.map(renderDuel(ctrl.data.teamBattle, ctrl.data.duelTeams))),
           )
         : null,
-    ]
+    ],
   );
 }

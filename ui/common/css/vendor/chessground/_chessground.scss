@@ -134,6 +134,31 @@ span.mini-game.variant-togyzkumalak.is2d {
   height: calc(100% / 19);
 }
 
+.variant-nackgammon square,
+.variant-backgammon square {
+  width: calc(100% / 15);
+  height: calc(100% * 6.5 / 15);
+  &.top {
+    margin-top: 6.66%;
+  }
+  &.left {
+    margin-left: 6.66%;
+  }
+  &.right {
+    margin-left: 13.33%;
+  }
+}
+
+.variant-breakthroughtroyka square {
+  width: calc(100% / 8);
+  height: calc(100% / 8);
+}
+
+.variant-minibreakthroughtroyka square {
+  width: calc(100% / 5);
+  height: calc(100% / 5);
+}
+
 $alternate-board-highlights: (
   'flipello-green': 'flipello',
   'flipello-green-marble': 'flipello',
@@ -843,6 +868,63 @@ square {
   height: calc(100% / 19);
 }
 
+.variant-nackgammon piece,
+.variant-backgammon piece {
+  width: calc(100% / 15);
+  height: calc(100% * 6.5 / 15);
+  &.top {
+    margin-top: 6.66%;
+  }
+  &.left {
+    margin-left: 6.66%;
+  }
+  &.right {
+    margin-left: 13.33%;
+  }
+}
+
+.variant-breakthroughtroyka piece {
+  width: calc(100% / 8);
+  height: calc(100% / 8);
+  background-position: center center;
+  transform: scale(0.9);
+}
+
+.variant-minibreakthroughtroyka {
+  piece {
+    width: calc(100% / 5);
+    height: calc(100% / 5);
+    background-position: center center;
+    transform: scale(0.9);
+  }
+}
+
+.variant-nackgammon,
+.variant-backgammon {
+  &.orientation-p1 piece.pocket,
+  .orientation-p1 piece.pocket {
+    &.p1 {
+      margin-top: 6%;
+      margin-left: calc(100% * 7 / 15);
+    }
+    &.p2 {
+      margin-top: 50.66%;
+      margin-left: calc(100% * 7 / 15);
+    }
+  }
+  &.orientation-p1vflip piece.pocket,
+  .orientation-p1vflip piece.pocket {
+    &.p1 {
+      margin-top: 50.66%;
+      margin-left: calc(100% * 7 / 15);
+    }
+    &.p2 {
+      margin-top: 6%;
+      margin-left: calc(100% * 7 / 15);
+    }
+  }
+}
+
 piece {
   position: absolute;
   top: 0;
@@ -928,6 +1010,22 @@ piece {
   padding-bottom: calc(100% / 19);
 }
 
+.variant-nackgammon cg-helper,
+.variant-backgammon cg-helper {
+  width: calc(100% / 15);
+  padding-bottom: calc(100% * 6.5 / 15);
+}
+
+.variant-breakthroughtroyka cg-helper {
+  width: calc(100% / 8);
+  padding-bottom: calc(100% / 8);
+}
+
+.variant-minibreakthroughtroyka cg-helper {
+  width: calc(100% / 5);
+  padding-bottom: calc(100% / 5);
+}
+
 cg-helper {
   position: absolute;
   width: 12.5%;
@@ -991,6 +1089,22 @@ cg-helper {
   height: calc(100% * 19);
 }
 
+.variant-nackgammon cg-container,
+.variant-backgammon cg-container {
+  width: calc(100% * 15);
+  height: calc(100% * 15 / 6.5);
+}
+
+.variant-breakthroughtroyka cg-container {
+  width: calc(100% * 8);
+  height: calc(100% * 8);
+}
+
+.variant-minibreakthroughtroyka cg-container {
+  width: calc(100% * 5);
+  height: calc(100% * 5);
+}
+
 cg-container {
   position: absolute;
   width: 800%;
@@ -1050,7 +1164,7 @@ cg-container .cg-custom-svgs svg {
 .variant-oware .round__app__board {
   padding-bottom: calc(213.333 * 100% / 640);
   margin-top: calc(213.333 * 100% / 640);
-  margin-bottom: calc(213.333 * 100% / 640);
+  margin-bottom: calc(178 * 100% / 640);
 
   @include breakpoint($mq-col1-uniboard) {
     margin-top: 5px;
@@ -1058,7 +1172,6 @@ cg-container .cg-custom-svgs svg {
   }
 }
 
-//TODO check fix?
 .swiss__board,
 .tour__featured {
   &.variant-togyzkumalak .cg-wrap {
@@ -1084,24 +1197,94 @@ cg-container .cg-custom-svgs svg {
   padding-bottom: calc(640 * 100% / 576);
 }
 
-.variant-oware .analyse__board {
-  padding-bottom: calc(213.333 * 100% / 640);
-  margin-top: calc(213.333 * 100% / 640);
-  margin-bottom: calc(213.333 * 100% / 640);
-
-  @include breakpoint($mq-col1-uniboard) {
-    margin-top: 5px;
-    margin-bottom: 5px;
+.variant-nackgammon,
+.variant-backgammon {
+  &.orientation-p1,
+  .orientation-p1 {
+    cg-buttons.p1 {
+      left: calc(100% * 1 / 15);
+    }
+    cg-buttons.p2 {
+      left: calc(100% * 8 / 15);
+    }
+  }
+  &.orientation-p1vflip,
+  .orientation-p1vflip {
+    cg-buttons.p1 {
+      left: calc(100% * 8 / 15);
+    }
+    cg-buttons.p2 {
+      left: calc(100% * 1 / 15);
+    }
+  }
+  cg-buttons {
+    width: calc(100% * 6 / 15);
+    top: 46.5%;
+    height: 7%;
+    display: flex;
+    flex-flow: row;
+    justify-content: center;
+    position: absolute;
+    pointer-events: none;
+    cg-button {
+      width: calc(100% * 15 * 15 / 600);
+      &.unavailable {
+        opacity: 0.35;
+      }
+      border-radius: 7%;
+      text-align: center;
+      margin: auto;
+      padding: 3%;
+      font-weight: bold;
+      @include breakpoint($mq-col1-uniboard) {
+        border-width: thin;
+      }
+    }
   }
 }
 
-.variant-togyzkumalak .analyse__board {
-  padding-bottom: calc(365.555 * 100% / 640);
-  margin-top: calc(106.666 * 100% / 640);
-  margin-bottom: calc(106.666 * 100% / 640);
-
-  @include breakpoint($mq-col1-uniboard) {
-    margin-top: 5px;
-    margin-bottom: 5px;
+.variant-nackgammon,
+.variant-backgammon {
+  &.orientation-p1,
+  .orientation-p1 {
+    cg-dice.p1 {
+      left: calc(100% * 8 / 15);
+    }
+    cg-dice.p2 {
+      left: calc(100% * 1 / 15);
+    }
+  }
+  &.orientation-p1vflip,
+  .orientation-p1vflip {
+    cg-dice.p1 {
+      left: calc(100% * 1 / 15);
+    }
+    cg-dice.p2 {
+      left: calc(100% * 8 / 15);
+    }
+  }
+  cg-dice {
+    width: calc(100% * 6 / 15);
+    top: 46.5%;
+    height: 7%;
+    display: flex;
+    flex-flow: row;
+    justify-content: center;
+    position: absolute;
+    pointer-events: none;
+    dice {
+      @include breakpoint($mq-col1-uniboard) {
+        margin: 0vw 0.75vw;
+      }
+      width: calc(100% * 15 * 7 / 600);
+      margin: 0vw 0.25vw;
+      &.unavailable {
+        opacity: 0.35;
+      }
+    }
+    &.p2 dice,
+    &.p1 dice {
+      background-size: cover;
+    }
   }
 }

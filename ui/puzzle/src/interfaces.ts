@@ -9,6 +9,7 @@ import { StoredBooleanProp } from 'common/storage';
 import { TreeWrapper } from 'tree';
 import { VNode } from 'snabbdom';
 import PuzzleStreak from './streak';
+import * as Prefs from 'common/prefs';
 
 export type MaybeVNode = VNode | string | null | undefined;
 export type MaybeVNodes = MaybeVNode[];

@@ -11,14 +11,21 @@ interface PlayerNames {
 }
 
 export default function (ctrl: AnalyseCtrl): VNode[] | undefined {
+  if (ctrl.embed) return;
   const study = ctrl.study;
-  if (!study || ctrl.embed) return;
+  if (!study) {
+    //Add in playerbars for boards where it's not obvious which side the player is on
+    return playerBarsForAnalysisBoards(ctrl, ['oware', 'togyzkumalak']);
+  }
   const tags = study.data.chapter.tags,
     playerNames = {
       p1: findTag(tags, 'p1')!,
       p2: findTag(tags, 'p2')!,
     };
-  if (!playerNames.p1 && !playerNames.p2 && !treeOps.findInMainline(ctrl.tree.root, n => !!n.clock)) return;
+  if (!playerNames.p1 && !playerNames.p2 && !treeOps.findInMainline(ctrl.tree.root, n => !!n.clock)) {
+    //Add in playerbars for boards where it's not obvious which side the player is on
+    return playerBarsForAnalysisBoards(ctrl, ['oware', 'togyzkumalak']);
+  }
   const clocks = renderClocks(ctrl),
     ticking = !isFinished(study.data.chapter) && ctrl.turnPlayerIndex();
   return (['p1', 'p2'] as PlayerIndex[]).map(playerIndex =>
@@ -28,8 +35,30 @@ export default function (ctrl: AnalyseCtrl): VNode[] | undefined {
       playerNames,
       playerIndex,
       ticking === playerIndex,
-      ctrl.bottomPlayerIndex() !== playerIndex
-    )
+      ctrl.bottomPlayerIndex() !== playerIndex,
+    ),
+  );
+}
+
+function playerBarsForAnalysisBoards(ctrl: AnalyseCtrl, requiredVariants: string[]): VNode[] | undefined {
+  if (!requiredVariants.includes(ctrl.data.game.variant.key)) return;
+  const p1player = ctrl.data.player.playerIndex === 'p1' ? ctrl.data.player : ctrl.data.opponent;
+  const p2player = ctrl.data.player.playerIndex === 'p2' ? ctrl.data.player : ctrl.data.opponent;
+  const playerNames = {
+    p1: p1player.user ? p1player.user.username : p1player.playerName,
+    p2: p2player.user ? p2player.user.username : p2player.playerName,
+  };
+  const clocks = renderClocks(ctrl),
+    ticking = ctrl.turnPlayerIndex();
+  return (['p1', 'p2'] as PlayerIndex[]).map(playerIndex =>
+    renderPlayer(
+      [],
+      clocks,
+      playerNames,
+      playerIndex,
+      ticking === playerIndex,
+      ctrl.bottomPlayerIndex() !== playerIndex,
+    ),
   );
 }
 
@@ -39,7 +68,7 @@ function renderPlayer(
   playerNames: PlayerNames,
   playerIndex: PlayerIndex,
   ticking: boolean,
-  top: boolean
+  top: boolean,
 ): VNode {
   const title = findTag(tags, `${playerIndex}title`),
     elo = findTag(tags, `${playerIndex}elo`),
@@ -59,6 +88,6 @@ function renderPlayer(
         ]),
       ]),
       clocks && clocks[playerIndex === 'p1' ? 0 : 1],
-    ]
+    ],
   );
 }

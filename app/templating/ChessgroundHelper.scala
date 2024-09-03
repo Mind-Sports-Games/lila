@@ -95,7 +95,7 @@ trait ChessgroundHelper {
         chessground(
           board = board,
           orient = pov.playerIndex,
-          lastMove = history.lastMove.map(_.origDest) ?? { case (orig, dest) =>
+          lastMove = history.lastAction.flatMap(_.origDest) ?? { case (orig, dest) =>
             List(orig, dest)
           }
         )
@@ -104,7 +104,7 @@ trait ChessgroundHelper {
         chessground(
           board = board,
           orient = pov.playerIndex,
-          lastMove = history.lastMove.map(_.origDest) ?? { case (orig, dest) =>
+          lastMove = history.lastAction.flatMap(_.origDest) ?? { case (orig, dest) =>
             List(orig, dest)
           }
         )
@@ -112,7 +112,7 @@ trait ChessgroundHelper {
         chessground(
           board = board,
           orient = pov.playerIndex,
-          lastMove = history.lastMove.map(_.origDest) ?? { case (orig, dest) =>
+          lastMove = history.lastAction.flatMap(_.origDest) ?? { case (orig, dest) =>
             List(orig, dest)
           }
         )
@@ -120,7 +120,7 @@ trait ChessgroundHelper {
         chessground(
           board = board,
           orient = pov.playerIndex,
-          lastMove = history.lastMove.map(_.origDest) ?? { case (orig, dest) =>
+          lastMove = history.lastAction.flatMap(_.origDest) ?? { case (orig, dest) =>
             List(orig, dest)
           }
         )
@@ -128,7 +128,7 @@ trait ChessgroundHelper {
         chessground(
           board = board,
           orient = pov.playerIndex,
-          lastMove = history.lastMove.map(_.origDest) ?? { case (orig, dest) =>
+          lastMove = history.lastAction.flatMap(_.origDest) ?? { case (orig, dest) =>
             List(orig, dest)
           }
         )
@@ -136,7 +136,7 @@ trait ChessgroundHelper {
         chessground(
           board = board,
           orient = pov.playerIndex,
-          lastMove = history.lastMove.map(_.origDest) ?? { case (orig, dest) =>
+          lastMove = history.lastAction.flatMap(_.origDest) ?? { case (orig, dest) =>
             List(orig, dest)
           }
         )
@@ -144,7 +144,7 @@ trait ChessgroundHelper {
         chessground(
           board = board,
           orient = pov.playerIndex,
-          lastMove = history.lastMove.map(_.origDest) ?? { case (orig, dest) =>
+          lastMove = history.lastAction.flatMap(_.origDest) ?? { case (orig, dest) =>
             List(orig, dest)
           }
         )
@@ -152,7 +152,7 @@ trait ChessgroundHelper {
         draughtsground(
           board = board,
           orient = pov.playerIndex,
-          lastMove = history.lastMove.map(_.origDest) ?? { case (orig, dest) =>
+          lastMove = history.lastMove.flatMap(_.origDest) ?? { case (orig, dest) =>
             List(orig, dest)
           }
         )

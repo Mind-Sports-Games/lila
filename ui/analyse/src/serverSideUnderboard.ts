@@ -42,7 +42,7 @@ export default function (element: HTMLElement, ctrl: AnalyseCtrl) {
         lastFen = fen;
       }
       if ($chart.length) {
-        const chart: PlyChart = ($chart[0] as HighchartsHTMLElement).highcharts;
+        const chart: PlyChart = ($chart[0] as any).highcharts;
         if (chart) {
           if (mainlinePly != chart.lastPly) {
             if (mainlinePly === false) unselect(chart);
@@ -57,7 +57,7 @@ export default function (element: HTMLElement, ctrl: AnalyseCtrl) {
         }
       }
       if ($timeChart.length) {
-        const chart: PlyChart = ($timeChart[0] as HighchartsHTMLElement).highcharts;
+        const chart: PlyChart = ($timeChart[0] as any).highcharts;
         if (chart) {
           if (mainlinePly != chart.lastPly) {
             if (mainlinePly === false) unselect(chart);
@@ -91,7 +91,7 @@ export default function (element: HTMLElement, ctrl: AnalyseCtrl) {
     const $panel = $panels.filter('.computer-analysis');
     if (!$('#acpl-chart').length) $panel.html('<div id="acpl-chart"></div>' + (loading ? chartLoader() : ''));
     else if (loading && !$('#acpl-chart-loader').length) $panel.append(chartLoader());
-    playstrategy.loadScript('javascripts/chart/acpl.js').then(function () {
+    playstrategy.loadScriptCJS('javascripts/chart/acpl.js').then(function () {
       playstrategy.advantageChart!(data, ctrl.trans, $('#acpl-chart')[0] as HTMLElement);
     });
   }
@@ -157,8 +157,8 @@ export default function (element: HTMLElement, ctrl: AnalyseCtrl) {
           '</pre><br />' +
           iframe +
           '<br /><br />' +
-          '<a class="text" data-icon="" href="/developers#embed-game">Read more about embedding games</a>'
-      )
+          '<a class="text" data-icon="" href="/developers#embed-game">Read more about embedding games</a>',
+      ),
     );
   });
 }

@@ -29,7 +29,7 @@ module.exports = {
             return m('th', serie.name);
           }),
           m('th', answer.sizeYaxis.name),
-        ])
+        ]),
       ),
       m(
         'tbody',
@@ -41,7 +41,7 @@ module.exports = {
             }),
             m('td.size', formatNumber(answer.sizeSerie.dataType, answer.sizeSerie.data[i])),
           ]);
-        })
+        }),
       ),
     ]);
   },

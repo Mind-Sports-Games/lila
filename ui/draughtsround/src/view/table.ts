@@ -15,8 +15,8 @@ function renderPlayer(ctrl: RoundController, position: Position) {
   return ctrl.nvui
     ? undefined
     : player.ai
-    ? h('div.user-link.online.ruser.ruser-' + position, [h('i.line'), h('name', renderUser.aiName(ctrl, player.ai))])
-    : renderUser.userHtml(ctrl, player, position);
+      ? h('div.user-link.online.ruser.ruser-' + position, [h('i.line'), h('name', renderUser.aiName(ctrl, player.ai))])
+      : renderUser.userHtml(ctrl, player, position);
 }
 
 const isLoading = (ctrl: RoundController): boolean => ctrl.loading || ctrl.redirecting;
@@ -52,8 +52,8 @@ export const renderTablePlay = (ctrl: RoundController) => {
             ctrl.drawConfirm
               ? button.drawConfirm(ctrl)
               : d.game.canOfferDraw
-              ? button.standard(ctrl, ctrl.canOfferDraw, '2', 'offerDraw', 'draw-yes', () => ctrl.offerDraw(true))
-              : null,
+                ? button.standard(ctrl, ctrl.canOfferDraw, '2', 'offerDraw', 'draw-yes', () => ctrl.offerDraw(true))
+                : null,
             ctrl.resignConfirm
               ? button.resignConfirm(ctrl)
               : button.standard(ctrl, game.resignable, 'b', 'resign', 'resign', () => ctrl.resign(true)),
@@ -62,15 +62,15 @@ export const renderTablePlay = (ctrl: RoundController) => {
     buttons: MaybeVNodes = loading
       ? [loader()]
       : submit
-      ? [submit]
-      : [
-          button.opponentGone(ctrl),
-          button.threefoldClaimDraw(ctrl),
-          button.cancelDrawOffer(ctrl),
-          button.answerOpponentDrawOffer(ctrl),
-          button.cancelTakebackProposition(ctrl),
-          button.answerOpponentTakebackProposition(ctrl),
-        ];
+        ? [submit]
+        : [
+            button.opponentGone(ctrl),
+            button.threefoldClaimDraw(ctrl),
+            button.cancelDrawOffer(ctrl),
+            button.answerOpponentDrawOffer(ctrl),
+            button.cancelTakebackProposition(ctrl),
+            button.answerOpponentTakebackProposition(ctrl),
+          ];
   return [
     replay.render(ctrl),
     h('div.rcontrols', [
@@ -80,7 +80,7 @@ export const renderTablePlay = (ctrl: RoundController) => {
         {
           class: { confirm: !!(ctrl.drawConfirm || ctrl.resignConfirm) },
         },
-        icons
+        icons,
       ),
     ]),
   ];
@@ -96,9 +96,9 @@ function whosTurn(ctrl: RoundController, playerIndex: PlayerIndex, position: Pos
           d.player.spectator
             ? ctrl.trans(
                 'playerIndexPlays',
-                d.game.player === d.player.playerIndex ? d.player.playerName : d.opponent.playerName
+                d.game.player === d.player.playerIndex ? d.player.playerName : d.opponent.playerName,
               )
-            : ctrl.trans(d.game.player === d.player.playerIndex ? 'yourTurn' : 'waitingForOpponent')
+            : ctrl.trans(d.game.player === d.player.playerIndex ? 'yourTurn' : 'waitingForOpponent'),
         )
       : null,
   ]);
@@ -119,8 +119,8 @@ export const renderTable = (ctrl: RoundController): MaybeVNodes => [
   ...(ctrl.data.player.spectator
     ? renderTableWatch(ctrl)
     : game.playable(ctrl.data)
-    ? renderTablePlay(ctrl)
-    : renderTableEnd(ctrl)),
+      ? renderTablePlay(ctrl)
+      : renderTableEnd(ctrl)),
   renderPlayer(ctrl, 'bottom'),
   /* render clocks after players so they display on top of them in col1,
    * since they occupy the same grid cell. This is required to avoid

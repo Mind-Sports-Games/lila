@@ -2,6 +2,11 @@
   "extends": "../tsconfig_module.base.json",
   "include": ["src"],
   "compilerOptions": {
-    "outDir": "./dist"
-  }
+    "outDir": "./dist",
+    "rootDir": "src",
+    "types": ["playstrategy", "web"],
+    "composite": true
+  },
+  "references": [{ "path": "../common/tsconfig.json" }, { "path": "../stratutils/tsconfig.json" }],
+  "isolatedModules": true
 }

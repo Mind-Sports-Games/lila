@@ -28,7 +28,7 @@ playstrategy.ratingHistoryChart = function (data, singlePerfName) {
   var indexFilter = function (_, i) {
     return !singlePerfName || i === singlePerfIndex;
   };
-  playstrategy.loadScript('javascripts/chart/common.js').then(function () {
+  playstrategy.loadScriptCJS('javascripts/chart/common.js').then(function () {
     playstrategy.chartCommon('highstock').then(function () {
       // support: Fx when user bio overflows
       var disabled = {

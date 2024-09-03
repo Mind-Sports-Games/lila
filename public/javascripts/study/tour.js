@@ -2,8 +2,8 @@ function loadShepherd(f) {
   if (typeof Shepherd === 'undefined' || Shepherd.activeTour === null) {
     var theme = 'shepherd-theme-' + ($('body').hasClass('dark') ? 'default' : 'dark');
     playstrategy.loadCss('vendor/shepherd/dist/css/' + theme + '.css');
-    playstrategy.loadScript('vendor/shepherd/dist/js/tether.js', { noVersion: true }).then(function () {
-      playstrategy.loadScript('vendor/shepherd/dist/js/shepherd.min.js', { noVersion: true }).then(function () {
+    playstrategy.loadScriptCJS('vendor/shepherd/dist/js/tether.js', { noVersion: true }).then(function () {
+      playstrategy.loadScriptCJS('vendor/shepherd/dist/js/shepherd.min.js', { noVersion: true }).then(function () {
         f(theme);
       });
     });
@@ -94,7 +94,7 @@ playstrategy.studyTour = function (study) {
         title: 'Thanks for your time',
         text:
           "You can find your <a href='/study/mine/hot'>previous studies</a> from your profile page.<br>" +
-          "There is also a <a href='//lichess.org/blog/V0KrLSkAAMo3hsi4/study-chess-the-lichess-way'>blog post about studies</a>.<br>" +
+          "There is also a <a href='//lichess.org/blog/V0KrLSkAAMo3hsi4/study-chess-the-lichess-way' target='_blank'>Lichess blog post about studies</a>.<br>" +
           'Power users might want to press "?" to see keyboard shortcuts.<br>' +
           'Have fun!',
         buttons: [

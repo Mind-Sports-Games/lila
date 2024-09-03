@@ -2,7 +2,19 @@ package lila.round
 
 import actorApi.SocketStatus
 import strategygames.format.{ FEN, Forsyth }
-import strategygames.{ Clock, Player => PlayerIndex, P1, P2, Pos, Situation }
+import strategygames.{
+  ClockBase,
+  Player => PlayerIndex,
+  P1,
+  P2,
+  Pos,
+  Situation,
+  Move => StratMove,
+  Drop => StratDrop,
+  Lift => StratLift,
+  DiceRoll => StratDiceRoll,
+  EndTurn => StratEndTurn
+}
 import strategygames.variant.Variant
 import play.api.libs.json._
 import scala.math
@@ -37,8 +49,10 @@ final class JsonView(
   private def kingMoves(game: Game, playerIndex: PlayerIndex) =
     (game.variant.frisianVariant) option game.history.kingMoves(playerIndex)
 
+  // TODO: in analysis mode, this will be evaluated against the last move, but we don't want to set onlyDropsVariant
+  // in this case. Instead just have a return of pov.game.variant.onlyDropsVariant
   private def onlyDropsVariantForCurrentAction(pov: Pov): Boolean = {
-    pov.game.variant.onlyDropsVariant || (pov.game.variant.dropsVariant && pov.game.situation.destinations.size == 0)
+    pov.game.variant.onlyDropsVariant || pov.game.situation.canOnlyDrop
   }
 
   private def coordSystemForVariant(prefCoordSystem: Int, gameVariant: Variant): Int =
@@ -64,6 +78,7 @@ final class JsonView(
       .add("rating" -> p.rating)
       .add("ratingDiff" -> p.ratingDiff)
       .add("provisional" -> p.provisional)
+      .add("isInputRating" -> p.isInputRating)
       .add("offeringRematch" -> isOfferingRematch(Pov(g, p)))
       .add("offeringDraw" -> p.isOfferingDraw)
       .add("offeringSelectSquares" -> p.isOfferingSelectSquares)
@@ -98,16 +113,18 @@ final class JsonView(
               )
             }.add("onGame" -> (player.isAi || socket.onGame(player.playerIndex))),
             "opponent" -> {
-              commonPlayerJson(pov.game, opponent, opponentUser, withFlags) ++ Json.obj(
-                //"color" -> pov.game.variant.playerNames(opponent.playerIndex),
-                //"color" -> opponent.playerIndex.classicName,
-                "playerName"  -> pov.game.variant.playerNames(opponent.playerIndex),
-                "playerIndex" -> opponent.playerIndex.name,
-                "playerColor" -> pov.game.variant.playerColors(opponent.playerIndex),
-                "ai"          -> opponent.aiLevel
-              )
-            }.add("isGone" -> (!opponent.isAi && socket.isGone(opponent.playerIndex)))
-              .add("onGame" -> (opponent.isAi || socket.onGame(opponent.playerIndex))),
+              commonPlayerJson(pov.game, opponent, opponentUser, withFlags) ++ Json
+                .obj(
+                  //"color" -> pov.game.variant.playerNames(opponent.playerIndex),
+                  //"color" -> opponent.playerIndex.classicName,
+                  "playerName"  -> pov.game.variant.playerNames(opponent.playerIndex),
+                  "playerIndex" -> opponent.playerIndex.name,
+                  "playerColor" -> pov.game.variant.playerColors(opponent.playerIndex),
+                  "ai"          -> opponent.aiLevel
+                )
+                .add("isGone" -> (!opponent.isAi && socket.isGone(opponent.playerIndex)))
+                .add("onGame" -> (opponent.isAi || socket.onGame(opponent.playerIndex)))
+            },
             "url" -> Json.obj(
               "socket" -> s"/play/$fullId/v$apiVersion",
               "round"  -> s"/$fullId"
@@ -135,6 +152,7 @@ final class JsonView(
               .add("clockSound" -> pref.clockSound)
               .add("confirmResign" -> (!nvui && pref.confirmResign == Pref.ConfirmResign.YES))
               .add("confirmPass" -> (!nvui && pref.confirmPass == Pref.ConfirmPass.YES))
+              .add("playForcedAction" -> (!nvui && pref.playForcedAction == Pref.PlayForcedAction.YES))
               .add("keyboardMove" -> (!nvui && pref.keyboardMove == Pref.KeyboardMove.YES))
               .add("rookCastle" -> (pref.rookCastle == Pref.RookCastle.YES))
               .add("blindfold" -> pref.isBlindfold)
@@ -145,13 +163,13 @@ final class JsonView(
               .add("showCaptured" -> pref.captured)
               .add("submitMove" -> {
                 import Pref.SubmitMove._
-                pref.submitMove match {
+                (pref.submitMove match {
                   case _ if pov.game.hasAi || nvui                            => false
                   case ALWAYS                                                 => true
                   case CORRESPONDENCE_UNLIMITED if pov.game.isCorrespondence  => true
                   case CORRESPONDENCE_ONLY if pov.game.hasCorrespondenceClock => true
                   case _                                                      => false
-                }
+                }) && !pov.game.variant.ignoreSubmitAction
               })
           )
           .add("clock" -> pov.game.clock.map(clockJson))
@@ -165,14 +183,20 @@ final class JsonView(
           .add("possibleMoves" -> possibleMoves(pov, apiVersion))
           .add("possibleDrops" -> possibleDrops(pov))
           .add("possibleDropsByRole" -> possibleDropsByrole(pov))
+          .add("possibleLifts" -> possibleLifts(pov))
+          .add("multiActionMetaData" -> multiActionMetaData(pov))
           .add("selectMode" -> selectMode(pov))
           .add("selectedSquares" -> pov.game.metadata.selectedSquares.map(_.map(_.toString)))
           .add("deadStoneOfferState" -> pov.game.metadata.deadStoneOfferState.map(_.name))
+          .add("canOnlyRollDice" -> pov.game.situation.canOnlyRollDice)
+          .add("canEndTurn" -> pov.game.situation.canEndTurn)
+          .add("canUndo" -> pov.game.situation.canUndo)
+          .add("forcedAction" -> pov.game.situation.forcedAction.map(_.toUci.uci))
           .add("pauseSecs" -> pov.game.timeWhenPaused.millis.some)
           .add("expirationAtStart" -> pov.game.expirableAtStart.option {
             Json.obj(
-              "idleMillis"   -> (nowMillis - pov.game.updatedAt.getMillis),
-              "millisToMove" -> pov.game.timeForFirstMove.millis
+              "idleMillis"   -> (nowMillis - pov.game.turnAt.getMillis),
+              "millisToMove" -> pov.game.timeForFirstTurn.millis
             )
           })
           .add("expirationOnPaused" -> pov.game.expirableOnPaused.option {
@@ -198,6 +222,7 @@ final class JsonView(
       .add("rating" -> p.rating)
       .add("ratingDiff" -> p.ratingDiff)
       .add("provisional" -> p.provisional)
+      .add("isInputRating" -> p.isInputRating)
       .add("checks" -> checkCount(g, p.playerIndex))
       .add("score" -> score(g, p.playerIndex))
       .add("kingMoves" -> kingMoves(g, p.playerIndex))
@@ -295,7 +320,7 @@ final class JsonView(
             "lib"        -> game.variant.gameLogic.id,
             "variant"    -> game.variant,
             "opening"    -> game.opening,
-            "initialFen" -> (initialFen | Forsyth.initial(game.variant.gameLogic)),
+            "initialFen" -> (initialFen | game.variant.initialFen),
             "fen"        -> fen,
             "plies"      -> game.plies,
             "turns"      -> game.turnCount,
@@ -333,8 +358,9 @@ final class JsonView(
           .add("destination" -> (pref.destination && !pref.isBlindfold))
           .add("playerTurnIndicator" -> false),
         //TODO multiaction we think this correct to use plies (not turnCount) but analysis needs testing
-        "path"         -> pov.game.plies,
-        "userAnalysis" -> true
+        "path"             -> pov.game.plies,
+        "gameRecordFormat" -> pov.game.gameRecordFormat,
+        "userAnalysis"     -> true
       )
       .add("evalPut" -> me.??(evalCache.shouldPut))
       .add("possibleDropsByRole" -> possibleDropsByrole(pov))
@@ -348,8 +374,10 @@ final class JsonView(
         ("percent" -> JsNumber(game.playerBlurPercent(player.playerIndex)))
     }
 
-  private def clockJson(clock: Clock): JsObject =
-    clockWriter.writes(clock) + ("moretime" -> JsNumber(actorApi.round.Moretime.defaultDuration.toSeconds))
+  private def clockJson(clock: ClockBase): JsObject =
+    clockWriter.writes(clock) + ("moretime" -> JsNumber(
+      actorApi.round.Moretime.defaultDuration.toSeconds
+    ))
 
   private def possibleMoves(pov: Pov, apiVersion: ApiVersion): Option[JsValue] =
     (pov.game.situation, pov.game.variant) match {
@@ -417,10 +445,12 @@ final class JsonView(
       case (Situation.Go(_), Variant.Go(_)) =>
         (pov.game playableBy pov.player) option
           Event.PossibleDropsByRole.json(pov.game.situation.dropsByRole.getOrElse(Map.empty))
-      case (Situation.Backgammon(_), Variant.Backgammon(_)) => None
-      case (Situation.Abalone(_), Variant.Abalone(_))       => None
-      case (Situation.Draughts(_), Variant.Draughts(_))     => None
-      case _                                                => sys.error("Mismatch of types for possibleDropsByrole")
+      case (Situation.Backgammon(_), Variant.Backgammon(_)) =>
+        (pov.game playableBy pov.player) option
+          Event.PossibleDropsByRole.json(pov.game.situation.dropsByRole.getOrElse(Map.empty))
+      case (Situation.Draughts(_), Variant.Draughts(_)) => None
+      case (Situation.Abalone(_), Variant.Abalone(_))   => None
+      case _                                            => sys.error("Mismatch of types for possibleDropsByrole")
     }
 
   private def possibleDrops(pov: Pov): Option[JsValue] =
@@ -429,6 +459,31 @@ final class JsonView(
         JsString(drops.map(_.key).mkString)
       }
     }
+
+  private def possibleLifts(pov: Pov): Option[JsValue] =
+    (pov.game playableBy pov.player) option { JsString(pov.game.situation.lifts.map(_.pos.key).mkString) }
+
+  private def multiActionMetaData(pov: Pov): Option[JsObject] = {
+    pov.game.variant.key match {
+      case "monster"    => multiActionMetaJson(pov)
+      case "amazons"    => multiActionMetaJson(pov)
+      case "backgammon" => multiActionMetaJson(pov)
+      case "nackgammon" => multiActionMetaJson(pov)
+      case _            => None
+    }
+  }
+
+  private def multiActionMetaJson(pov: Pov): Option[JsObject] = {
+    //TODO future multiaction games may not end turn on the same action, and this will need to be fixed
+    pov.game.situation.actions.headOption.flatMap(_ match {
+      case m: StratMove      => Some(Json.obj("couldNextActionEndTurn" -> m.autoEndTurn))
+      case d: StratDrop      => Some(Json.obj("couldNextActionEndTurn" -> d.autoEndTurn))
+      case l: StratLift      => Some(Json.obj("couldNextActionEndTurn" -> l.autoEndTurn))
+      case dr: StratDiceRoll => Some(Json.obj("couldNextActionEndTurn" -> dr.autoEndTurn))
+      case _: StratEndTurn   => Some(Json.obj("couldNextActionEndTurn" -> true))
+      case _                 => None
+    })
+  }
 
   private def selectMode(pov: Pov): Boolean = {
     pov.game.situation match {

@@ -7,6 +7,8 @@ import { numberSpread } from 'common/number';
 import { parseFen, makeFen } from 'stratops/fen';
 import { parseUci } from 'stratops/util';
 
+const parseUciChess = parseUci('chess');
+
 const renderEnd = (ctrl: StormCtrl): VNode[] => [...renderSummary(ctrl), renderHistory(ctrl)];
 
 const newHighI18n = {
@@ -32,7 +34,7 @@ const renderSummary = (ctrl: StormCtrl): VNode[] => {
                 h('strong', noarg(newHighI18n[high.key])),
                 high.prev ? h('span', ctrl.trans('previousHighscoreWasX', high.prev)) : null,
               ]),
-            ])
+            ]),
           ),
         ]
       : []),
@@ -42,7 +44,7 @@ const renderSummary = (ctrl: StormCtrl): VNode[] => {
         {
           hook: onInsert(el => numberSpread(el, scoreSteps, Math.round(scoreSteps * 50), 0)(run.score)),
         },
-        '0'
+        '0',
       ),
       h('p', noarg('puzzlesSolved')),
     ]),
@@ -66,7 +68,7 @@ const renderSummary = (ctrl: StormCtrl): VNode[] => {
       {
         attrs: ctrl.run.endAt! < getNow() - 900 ? { href: '/storm' } : {},
       },
-      noarg('playAgain')
+      noarg('playAgain'),
     ),
   ];
 };
@@ -86,7 +88,7 @@ const renderHistory = (ctrl: StormCtrl): VNode => {
             },
             hook: onInsert(e => e.addEventListener('click', ctrl.toggleFilterFailed)),
           },
-          'Failed puzzles'
+          'Failed puzzles',
         ),
         h(
           'button.storm--end__history__filter.button',
@@ -97,7 +99,7 @@ const renderHistory = (ctrl: StormCtrl): VNode => {
             },
             hook: onInsert(e => e.addEventListener('click', ctrl.toggleFilterSlow)),
           },
-          'Slow puzzles'
+          'Slow puzzles',
         ),
       ]),
     ]),
@@ -120,7 +122,7 @@ const renderHistory = (ctrl: StormCtrl): VNode => {
                 hook: onInsert(e => {
                   const pos = Chess.fromSetup(parseFen('chess')(round.puzzle.fen).unwrap()).unwrap();
                   const uci = round.puzzle.line.split(' ')[0];
-                  pos.play(parseUci(uci)!);
+                  pos.play(parseUciChess(uci)!);
                   miniBoard.initWith(e, makeFen('chess')(pos.toSetup()), pos.turn, uci);
                 }),
               }),
@@ -131,9 +133,9 @@ const renderHistory = (ctrl: StormCtrl): VNode => {
                 ]),
                 h('span.storm--end__history__round__id', '#' + round.puzzle.id),
               ]),
-            ]
-          )
-        )
+            ],
+          ),
+        ),
     ),
   ]);
 };

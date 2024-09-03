@@ -12,7 +12,7 @@ const F = ['/assets/logo/playstrategy-favicon-32.png', '/assets/logo/playstrateg
       (document.getElementById('favicon') as HTMLAnchorElement).href = path;
       curFaviconIdx = i;
     }
-  }
+  },
 );
 
 let tickerTimer: Timeout | undefined;

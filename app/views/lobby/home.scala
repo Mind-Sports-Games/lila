@@ -55,8 +55,8 @@ object home {
       chessground = false,
       openGraph = lila.app.ui
         .OpenGraph(
-          image = assetUrl("logo/playstrategy-tile-wide.png").some,
-          twitterImage = assetUrl("logo/playstrategy-tile.png").some,
+          image = staticAssetUrl("logo/playstrategy-tile-wide.png").some,
+          twitterImage = staticAssetUrl("logo/playstrategy-tile.png").some,
           title = trans.playstrategySiteTitle.txt(),
           url = netBaseUrl,
           description = trans.playstrategySiteDescription.txt()
@@ -80,26 +80,34 @@ object home {
             a(
               href := routes.Setup.hookForm,
               cls := List(
-                "button button-metal config_hook" -> true,
-                "disabled"                        -> (playban.isDefined || currentGame.isDefined || ctx.isBot)
+                "button button-color-choice config_hook" -> true,
+                "disabled"                               -> (playban.isDefined || currentGame.isDefined || ctx.isBot)
               ),
               trans.createAGame()
             ),
             a(
               href := routes.Setup.friendForm(none),
               cls := List(
-                "button button-metal config_friend" -> true,
-                "disabled"                          -> currentGame.isDefined
+                "button button-color-choice config_friend" -> true,
+                "disabled"                                 -> currentGame.isDefined
               ),
               trans.playWithAFriend()
             ),
             a(
               href := routes.Setup.aiForm,
               cls := List(
-                "button button-metal config_ai" -> true,
-                "disabled"                      -> currentGame.isDefined
+                "button button-color-choice config_ai" -> true,
+                "disabled"                             -> currentGame.isDefined
               ),
               trans.playWithTheMachine()
+            ),
+            a(
+              href := routes.PlayApi.botOnline,
+              cls := List(
+                "button button-color-choice config_bot just-a-link" -> true,
+                "disabled"                                          -> currentGame.isDefined
+              ),
+              trans.playWithBots()
             )
           ),
           div(cls := "lobby__counters")(
@@ -195,7 +203,7 @@ object home {
                 span(trans.patron.becomePatron())
               )
             ),
-            a(href := "https://shop.msoworld.com/wp/shop/")(
+            a(href := "https://mindsportsolympiad.com/product-category/merch/")(
               iconTag(""),
               span(cls := "lobby__support__text")(
                 strong("Swag Store"),

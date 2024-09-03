@@ -1,4 +1,4 @@
-import { Ctrl, NotifyData, Notification } from './interfaces';
+import { Ctrl, NotifyData, Notification as LNotification } from './interfaces';
 import { h, VNode } from 'snabbdom';
 import makeRenderers from './renderers';
 
@@ -6,7 +6,7 @@ export default function view(ctrl: Ctrl): VNode {
   const d = ctrl.data();
   return h(
     'div#notify-app.links.dropdown',
-    d && !ctrl.initiating() ? renderContent(ctrl, d) : [h('div.initiating', spinner())]
+    d && !ctrl.initiating() ? renderContent(ctrl, d) : [h('div.initiating', spinner())],
   );
 }
 
@@ -21,13 +21,13 @@ function renderContent(ctrl: Ctrl, d: NotifyData): VNode[] {
       h('div.pager.prev', {
         attrs: { 'data-icon': 'S' },
         hook: clickHook(ctrl.previousPage),
-      })
+      }),
     );
   else if (pager.nextPage)
     nodes.push(
       h('div.pager.prev.disabled', {
         attrs: { 'data-icon': 'S' },
-      })
+      }),
     );
 
   nodes.push(nb ? recentNotifications(d, ctrl.scrolling()) : empty());
@@ -37,7 +37,7 @@ function renderContent(ctrl: Ctrl, d: NotifyData): VNode[] {
       h('div.pager.next', {
         attrs: { 'data-icon': 'R' },
         hook: clickHook(ctrl.nextPage),
-      })
+      }),
     );
 
   if (!('Notification' in window))
@@ -47,7 +47,7 @@ function renderContent(ctrl: Ctrl, d: NotifyData): VNode[] {
   return nodes;
 }
 
-export function asText(n: Notification, trans: Trans): string | undefined {
+export function asText(n: LNotification, trans: Trans): string | undefined {
   const renderers = makeRenderers(trans);
   return renderers[n.type] ? renderers[n.type].text(n) : undefined;
 }
@@ -61,11 +61,11 @@ function notificationDenied(): VNode {
         target: '_blank',
       },
     },
-    'Notification popups disabled by browser setting'
+    'Notification popups disabled by browser setting',
   );
 }
 
-function asHtml(n: Notification, trans: Trans): VNode | undefined {
+function asHtml(n: LNotification, trans: Trans): VNode | undefined {
   const renderers = makeRenderers(trans);
   return renderers[n.type] ? renderers[n.type].html(n) : undefined;
 }
@@ -94,7 +94,7 @@ function recentNotifications(d: NotifyData, scrolling: boolean): VNode {
         postpatch: contentLoaded,
       },
     },
-    d.pager.currentPageResults.map(n => asHtml(n, trans)) as VNode[]
+    d.pager.currentPageResults.map(n => asHtml(n, trans)) as VNode[],
   );
 }
 

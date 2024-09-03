@@ -3,7 +3,7 @@ package lila.swiss
 import ornicar.scalalib.Zero
 
 import strategygames.format.FEN
-import strategygames.{ ByoyomiClock, ClockConfig, FischerClock, GameFamily, GameGroup, Speed }
+import strategygames.{ ByoyomiClock, Clock, ClockConfig, GameFamily, GameGroup, Speed }
 import strategygames.variant.Variant
 import org.joda.time.DateTime
 import scala.concurrent.duration._
@@ -43,16 +43,20 @@ case class Swiss(
   def isNowOrSoon        = startsAt.isBefore(DateTime.now plusMinutes 15) && !isFinished
   def isRecentlyFinished = finishedAt.exists(f => (nowSeconds - f.getSeconds) < 30 * 60)
   def isEnterable =
-    isNotFinished && round.value <= settings.nbRounds / 2 && nbPlayers < Swiss.maxPlayers
-  def isMedley = settings.medleyVariants.nonEmpty
+    isNotFinished && round.value <= settings.nbRounds / 2 && nbPlayers < Swiss.maxPlayers && settings.minutesBeforeStartToJoin
+      .fold(true)(mbs =>
+        DateTime.now
+          .isAfter(startsAt minusMinutes mbs)
+      )
+  def isHalfway = round.value == (settings.nbRounds + 1) / 2
+  def isMedley  = settings.medleyVariants.nonEmpty
 
   def allRounds: List[SwissRound.Number]      = (1 to round.value).toList.map(SwissRound.Number.apply)
   def finishedRounds: List[SwissRound.Number] = (1 until round.value).toList.map(SwissRound.Number.apply)
   def tieBreakRounds: List[SwissRound.Number] = if (isFinished) allRounds
-  else (1 until ((round.value + 1) atMost guessNbRounds)).toList.map(SwissRound.Number.apply)
+  else (1 until ((round.value + 1) atMost settings.nbRounds)).toList.map(SwissRound.Number.apply)
 
-  def guessNbRounds  = settings.nbRounds atMost nbPlayers atLeast 2
-  def actualNbRounds = if (isFinished) round.value else guessNbRounds
+  def actualNbRounds = if (isFinished) round.value else settings.nbRounds
 
   def startRound =
     copy(
@@ -68,7 +72,13 @@ case class Swiss(
     case bc: ByoyomiClock.Config => {
       ((bc.limitSeconds + bc.incrementSeconds * 80 + bc.byoyomiSeconds * 20 * bc.periodsTotal + 10) * settings.nbRounds).toInt.seconds
     }
-    case fc: FischerClock.Config => {
+    case bc: Clock.BronsteinConfig => {
+      ((bc.limitSeconds + bc.delaySeconds * 80 + 10) * settings.nbRounds).toInt.seconds
+    }
+    case udc: Clock.SimpleDelayConfig => {
+      ((udc.limitSeconds + udc.delaySeconds * 80 + 10) * settings.nbRounds).toInt.seconds
+    }
+    case fc: Clock.Config => {
       ((fc.limitSeconds + fc.incrementSeconds * 80 + 10) * settings.nbRounds).toInt.seconds
     }
   }
@@ -153,6 +163,8 @@ object Swiss {
   case class Settings(
       nbRounds: Int,
       rated: Boolean,
+      handicapped: Boolean,
+      inputPlayerRatings: String,
       isMatchScore: Boolean,
       isBestOfX: Boolean,
       isPlayX: Boolean,
@@ -165,13 +177,28 @@ object Swiss {
       password: Option[String] = None,
       conditions: SwissCondition.All,
       roundInterval: FiniteDuration,
+      halfwayBreak: FiniteDuration,
       forbiddenPairings: String,
-      medleyVariants: Option[List[Variant]] = None
+      medleyVariants: Option[List[Variant]] = None,
+      minutesBeforeStartToJoin: Option[Int] = None
   ) {
     lazy val intervalSeconds = roundInterval.toSeconds.toInt
-    def manualRounds         = intervalSeconds == Swiss.RoundInterval.manual
-    def dailyInterval        = (!manualRounds && intervalSeconds >= 24 * 3600) option intervalSeconds / 3600 / 24
-    def usingDrawTables      = useDrawTables || usePerPairingDrawTables
+    lazy val timeBeforeStartToJoin: Option[String] = minutesBeforeStartToJoin.map(m =>
+      if (m < 60) s"$m minutes"
+      else if (m < 24 * 60) s"${m / 60} hour${if (m == 60) "" else "s"}"
+      else s"${m / 24 / 60} day${if (m == 24 * 60) "" else "s"}"
+    )
+    lazy val halfwayBreakText: Option[String] = (halfwayBreak.toSeconds.toInt match {
+      case 0                  => None
+      case s if s < 60        => Some(s"$s seconds")
+      case s if s < 3600      => Some(s"${s / 60} minute${if (s == 60) "" else "s"}")
+      case s if s < 24 * 3600 => Some(s"${s / 3600} hour${if (s == 60 * 60) "" else "s"}")
+      case s                  => Some(s"${s / 24 / 3600} day${if (s == 24 * 60 * 60) "" else "s"}")
+    }).map(s => s"${s} break after round ${halfwayBreakRound}")
+    lazy val halfwayBreakRound = (nbRounds + 1) / 2
+    def manualRounds           = intervalSeconds == Swiss.RoundInterval.manual
+    def dailyInterval          = (!manualRounds && intervalSeconds >= 24 * 3600) option intervalSeconds / 3600 / 24
+    def usingDrawTables        = useDrawTables || usePerPairingDrawTables
   }
 
   type ChatFor = Int
@@ -186,6 +213,10 @@ object Swiss {
   object RoundInterval {
     val auto   = -1
     val manual = 99999999
+  }
+
+  object TimeBeforeStartToJoin {
+    val nolimit = -1
   }
 
   def makeScore(

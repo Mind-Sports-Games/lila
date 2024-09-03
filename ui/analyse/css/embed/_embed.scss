@@ -42,3 +42,18 @@ cg-board {
     padding: 2em 4em;
   }
 }
+
+.analyse .game-score {
+  &-name,
+  &-player-name {
+    a {
+      pointer-events: none;
+      cursor: default;
+      text-decoration: none;
+      color: $c-font;
+    }
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}

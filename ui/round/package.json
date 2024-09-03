@@ -11,25 +11,26 @@
   ],
   "author": "Thibault Duplessis",
   "license": "AGPL-3.0-or-later",
-  "devDependencies": {
-    "@build/rollupProject": "2.0.0",
-    "@types/playstrategy": "2.0.0"
-  },
   "dependencies": {
     "ab": "https://github.com/lichess-org/ab-stub",
-    "chat": "2.0.0",
-    "chessground": "git+ssh://git@github.com:Mind-Sports-Games/chessground.git#222-monsterchess",
-    "common": "2.0.0",
-    "draughtsground": "^7.6",
-    "game": "2.0.0",
-    "nvui": "2.0.0",
+    "chat": "workspace:*",
+    "common": "workspace:*",
+    "draughtsground": "workspace:*",
+    "game": "workspace:*",
+    "nvui": "workspace:*",
     "snabbdom": "^3.0.1",
-    "stratutils": "2.0.0"
+    "stratutils": "workspace:*"
   },
   "scripts": {
-    "dev": "rollup --config",
-    "prod": "rollup --config --config-prod",
-    "plugin-dev": "rollup --config --config-plugin",
-    "plugin-prod": "rollup --config --config-prod --config-plugin"
+    "compile": "tsc",
+    "dev": "tsc",
+    "prod": "tsc"
+  },
+  "playstrategy": {
+    "bundles": [
+      "src/round.ts",
+      "src/plugins/round.keyboardMove.ts",
+      "src/plugins/round.nvui.ts"
+    ]
   }
 }

@@ -6,7 +6,9 @@ import * as cg from 'chessground/types';
 import { DrawShape } from 'chessground/draw';
 import changeColorHandle from 'common/coordsColor';
 import resizeHandle from 'common/resize';
+import * as Prefs from 'common/prefs';
 import AnalyseCtrl from './ctrl';
+import { isOnlyDropsPly } from './util';
 import * as stratUtils from 'stratutils';
 
 export function render(ctrl: AnalyseCtrl): VNode {
@@ -17,6 +19,7 @@ export function render(ctrl: AnalyseCtrl): VNode {
         ctrl.setAutoShapes();
         if (ctrl.node.shapes) ctrl.chessground.setShapes(ctrl.node.shapes as DrawShape[]);
         ctrl.cgVersion.dom = ctrl.cgVersion.js;
+        ctrl.setDropMode(ctrl.chessground);
       },
       destroy: _ => ctrl.chessground.destroy(),
     },
@@ -36,7 +39,7 @@ export function promote(ground: CgApi, key: Key, role: cg.Role) {
             promoted: true,
           },
         ],
-      ])
+      ]),
     );
   }
 }
@@ -46,7 +49,8 @@ export function makeConfig(ctrl: AnalyseCtrl): CgConfig {
     hooks = ctrl.makeCgHooks(),
     pref = d.pref,
     opts = ctrl.makeCgOpts(),
-    variantKey = d.game.variant.key as cg.Variant;
+    variantKey = d.game.variant.key,
+    cgVariantKey = variantKey as cg.Variant;
   const config = {
     turnPlayerIndex: opts.turnPlayerIndex,
     fen: opts.fen,
@@ -86,37 +90,45 @@ export function makeConfig(ctrl: AnalyseCtrl): CgConfig {
       defaultSnapToValidMove: (playstrategy.storage.get('arrow.snap') || 1) != '0',
       pieces: {
         baseUrl:
-          variantKey === 'shogi' || variantKey === 'minishogi'
+          cgVariantKey === 'shogi' || cgVariantKey === 'minishogi'
             ? 'https://playstrategy.org/assets/piece/shogi/' +
               d.pref.pieceSet.filter(ps => ps.gameFamily === 'shogi')[0].name +
               '/'
-            : variantKey === 'flipello' || variantKey === 'flipello10'
-            ? 'https://playstrategy.org/assets/piece/flipello/' +
-              d.pref.pieceSet.filter(ps => ps.gameFamily === 'flipello')[0].name +
-              '/'
-            : variantKey === 'amazons'
-            ? 'https://playstrategy.org/assets/piece/amazons/' +
-              d.pref.pieceSet.filter(ps => ps.gameFamily === 'amazons')[0].name +
-              '/'
-            : variantKey === 'oware'
-            ? 'https://playstrategy.org/assets/piece/oware/' +
-              d.pref.pieceSet.filter(ps => ps.gameFamily === 'oware')[0].name +
-              '/'
-            : variantKey === 'togyzkumalak'
-            ? 'https://playstrategy.org/assets/piece/togyzkumalak/' +
-              d.pref.pieceSet.filter(ps => ps.gameFamily === 'togyzkumalak')[0].name +
-              '/'
-            : variantKey === 'go9x9' || variantKey === 'go13x13' || variantKey === 'go19x19'
-            ? 'https://playstrategy.org/assets/piece/go/' +
-              d.pref.pieceSet.filter(ps => ps.gameFamily === 'go')[0].name +
-              '/'
-            : variantKey === 'xiangqi' || variantKey === 'minixiangqi'
-            ? 'https://playstrategy.org/assets/piece/xiangqi/' +
-              d.pref.pieceSet.filter(ps => ps.gameFamily === 'xiangqi')[0].name +
-              '/'
-            : 'https://playstrategy.org/assets/piece/chess/' +
-              d.pref.pieceSet.filter(ps => ps.gameFamily === 'chess')[0].name +
-              '/',
+            : cgVariantKey === 'flipello' || cgVariantKey === 'flipello10'
+              ? 'https://playstrategy.org/assets/piece/flipello/' +
+                d.pref.pieceSet.filter(ps => ps.gameFamily === 'flipello')[0].name +
+                '/'
+              : cgVariantKey === 'amazons'
+                ? 'https://playstrategy.org/assets/piece/amazons/' +
+                  d.pref.pieceSet.filter(ps => ps.gameFamily === 'amazons')[0].name +
+                  '/'
+                : ctrl.data.game.gameFamily === 'breakthroughtroyka'
+                  ? 'https://playstrategy.org/assets/piece/breakthrougtroyka/' +
+                    d.pref.pieceSet.filter(ps => ps.gameFamily === 'breakthroughtroyka')[0].name +
+                    '/'
+                  : cgVariantKey === 'oware'
+                    ? 'https://playstrategy.org/assets/piece/oware/' +
+                      d.pref.pieceSet.filter(ps => ps.gameFamily === 'oware')[0].name +
+                      '/'
+                    : cgVariantKey === 'togyzkumalak'
+                      ? 'https://playstrategy.org/assets/piece/togyzkumalak/' +
+                        d.pref.pieceSet.filter(ps => ps.gameFamily === 'togyzkumalak')[0].name +
+                        '/'
+                      : cgVariantKey === 'go9x9' || cgVariantKey === 'go13x13' || cgVariantKey === 'go19x19'
+                        ? 'https://playstrategy.org/assets/piece/go/' +
+                          d.pref.pieceSet.filter(ps => ps.gameFamily === 'go')[0].name +
+                          '/'
+                        : cgVariantKey === 'backgammon' || cgVariantKey === 'nackgammon'
+                          ? 'https://playstrategy.org/assets/piece/backgammon/' +
+                            d.pref.pieceSet.filter(ps => ps.gameFamily === 'backgammon')[0].name +
+                            '/'
+                          : cgVariantKey === 'xiangqi' || cgVariantKey === 'minixiangqi'
+                            ? 'https://playstrategy.org/assets/piece/xiangqi/' +
+                              d.pref.pieceSet.filter(ps => ps.gameFamily === 'xiangqi')[0].name +
+                              '/'
+                            : 'https://playstrategy.org/assets/piece/chess/' +
+                              d.pref.pieceSet.filter(ps => ps.gameFamily === 'chess')[0].name +
+                              '/',
       },
     },
     highlight: {
@@ -127,19 +139,24 @@ export function makeConfig(ctrl: AnalyseCtrl): CgConfig {
       duration: pref.animationDuration,
     },
     dropmode: {
-      showDropDests: true,
+      showDropDests: !['go9x9', 'go13x13', 'go19x19', 'backgammon', 'nackgammon'].includes(variantKey),
       dropDests: stratUtils.readDropsByRole(ctrl.node.dropsByRole),
       events: {
         cancel: hooks.onCancelDropMode,
       },
     },
+    draggable: {
+      enabled:
+        pref.moveEvent !== Prefs.MoveEvent.Click && !['oware', 'backgammon', 'nackgammon'].includes(d.game.variant.key),
+      showGhost: pref.highlight,
+    },
     disableContextMenu: true,
     dimensions: d.game.variant.boardSize,
-    variant: variantKey,
-    chess960: variantKey == 'chess960',
-    onlyDropsVariant: d.onlyDropsVariant,
+    variant: cgVariantKey,
+    chess960: cgVariantKey == 'chess960',
+    onlyDropsVariant: isOnlyDropsPly(ctrl.node, variantKey, d.onlyDropsVariant),
     singleClickMoveVariant:
-      variantKey === 'togyzkumalak' ||
+      cgVariantKey === 'togyzkumalak' ||
       (stratUtils.variantUsesMancalaNotation(d.game.variant.key) && d.pref.mancalaMove),
   };
   ctrl.study && ctrl.study.mutateCgConfig(config);

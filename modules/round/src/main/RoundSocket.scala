@@ -50,7 +50,7 @@ final class RoundSocket(
   }
 
   def getGame(gameId: Game.ID): Fu[Option[Game]] =
-    rounds.getOrMake(gameId).getGame addEffect { g =>
+    rounds.getOrMake(gameId).getGame.addEffect { g =>
       if (g.isEmpty) finishRound(Game.Id(gameId))
     }
   def getGames(gameIds: List[Game.ID]): Fu[List[(Game.ID, Option[Game])]] =
@@ -227,21 +227,23 @@ object RoundSocket {
   val disconnectTimeout = 40.seconds
 
   def povDisconnectTimeout(pov: Pov): FiniteDuration =
-    disconnectTimeout * {
-      pov.game.speed match {
-        case Speed.Classical => 3
-        case Speed.Rapid     => 2
-        case _               => 1
+    if (!pov.game.hasClock) 30.days
+    else
+      disconnectTimeout * {
+        pov.game.speed match {
+          case Speed.Classical => 3
+          case Speed.Rapid     => 2
+          case _               => 1
+        }
+      } / {
+        pov.game.board.materialImbalance match {
+          case _ if pov.game.variant.materialImbalanceVariant                         => 1
+          case i if (pov.playerIndex.p1 && i <= -4) || (pov.playerIndex.p2 && i >= 4) => 3
+          case _                                                                      => 1
+        }
+      } / {
+        if (pov.player.hasUser) 1 else 2
       }
-    } / {
-      pov.game.board.materialImbalance match {
-        case _ if pov.game.variant.materialImbalanceVariant                         => 1
-        case i if (pov.playerIndex.p1 && i <= -4) || (pov.playerIndex.p2 && i >= 4) => 3
-        case _                                                                      => 1
-      }
-    } / {
-      if (pov.player.hasUser) 1 else 2
-    }
 
   object Protocol {
 
@@ -296,7 +298,7 @@ object RoundSocket {
             raw.get(6) {
               case Array(fullId, gfS, uciS, blurS, lagS, mtS) => {
                 val gf = GameFamily(gfS.toInt)
-                Uci(gf.gameLogic, gf, uciS) map { uci =>
+                Uci(gf.gameLogic, gf, uciS).map { uci =>
                   PlayerMove(
                     FullId(fullId),
                     uci,

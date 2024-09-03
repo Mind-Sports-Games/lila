@@ -29,7 +29,10 @@ export default function renderConvo(ctrl: MsgCtrl, convo: Convo): VNode {
                 offline: !user.online,
               },
             },
-            [h('i.line' + (user.id == 'playstrategy' ? '.moderator' : user.patron ? '.patron' : '')), ...userName(user)]
+            [
+              h('i.line' + (user.id == 'playstrategy' ? '.moderator' : user.patron ? '.patron' : '')),
+              ...userName(user),
+            ],
           ),
         ]),
         h('div.msg-app__convo__head__actions', renderActions(ctrl, convo)),
@@ -42,18 +45,18 @@ export default function renderConvo(ctrl: MsgCtrl, convo: Convo): VNode {
               {
                 attrs: { 'data-icon': 'k' },
               },
-              'This conversation is blocked.'
+              'This conversation is blocked.',
             )
           : convo.postable
-          ? renderInteract(ctrl, user)
-          : h(
-              'div.msg-app__convo__reply__block.text',
-              {
-                attrs: { 'data-icon': 'k' },
-              },
-              `${user.name} doesn't accept new messages.`
-            ),
+            ? renderInteract(ctrl, user)
+            : h(
+                'div.msg-app__convo__reply__block.text',
+                {
+                  attrs: { 'data-icon': 'k' },
+                },
+                `${user.name} doesn't accept new messages.`,
+              ),
       ]),
-    ]
+    ],
   );
 }

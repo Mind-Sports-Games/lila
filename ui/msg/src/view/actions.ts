@@ -15,7 +15,7 @@ export default function renderActions(ctrl: MsgCtrl, convo: Convo): VNode[] {
         href: `/?user=${convo.user.name}#friend`,
         title: ctrl.trans.noarg('challengeToPlay'),
       },
-    })
+    }),
   );
   nodes.push(h('div.msg-app__convo__action__sep', '|'));
   if (convo.relations.out === false)
@@ -28,7 +28,7 @@ export default function renderActions(ctrl: MsgCtrl, convo: Convo): VNode[] {
           'data-hover-text': ctrl.trans.noarg('unblock'),
         },
         hook: bind('click', ctrl.unblock),
-      })
+      }),
     );
   else
     nodes.push(
@@ -39,7 +39,7 @@ export default function renderActions(ctrl: MsgCtrl, convo: Convo): VNode[] {
           title: ctrl.trans.noarg('block'),
         },
         hook: bind('click', withConfirm(ctrl.block)),
-      })
+      }),
     );
   nodes.push(
     h(`button.${cls}.bad`, {
@@ -49,7 +49,7 @@ export default function renderActions(ctrl: MsgCtrl, convo: Convo): VNode[] {
         title: ctrl.trans.noarg('delete'),
       },
       hook: bind('click', withConfirm(ctrl.delete)),
-    })
+    }),
   );
   if (convo.msgs[0])
     nodes.push(
@@ -60,7 +60,7 @@ export default function renderActions(ctrl: MsgCtrl, convo: Convo): VNode[] {
           title: ctrl.trans('reportXToModerators', convo.user.name),
         },
         hook: bind('click', withConfirm(ctrl.report)),
-      })
+      }),
     );
   return nodes;
 }

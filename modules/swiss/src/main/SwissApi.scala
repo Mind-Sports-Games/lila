@@ -13,7 +13,7 @@ import lila.chat.Chat
 import lila.common.config.MaxPerSecond
 import lila.common.{ Bus, GreatPlayer, LightUser }
 import lila.db.dsl._
-import lila.game.{ Game, Pov }
+import lila.game.{ Game, Handicaps, Pov }
 import lila.hub.LightTeam.TeamID
 import lila.round.actorApi.round.QuietFlag
 import lila.user.{ User, UserRepo }
@@ -56,6 +56,7 @@ final class SwissApi(
   import BsonHandlers._
 
   def byId(id: Swiss.Id)            = colls.swiss.byId[Swiss](id.value)
+  def finishedById(id: Swiss.Id)    = byId(id).dmap(_.filter(_.isFinished))
   def notFinishedById(id: Swiss.Id) = byId(id).dmap(_.filter(_.isNotFinished))
   def createdById(id: Swiss.Id)     = byId(id).dmap(_.filter(_.isCreated))
   def startedById(id: Swiss.Id)     = byId(id).dmap(_.filter(_.isStarted))
@@ -82,6 +83,8 @@ final class SwissApi(
       settings = Swiss.Settings(
         nbRounds = data.nbRounds,
         rated = data.realPosition.isEmpty && data.isRated,
+        handicapped = data.isHandicapped,
+        inputPlayerRatings = ~data.inputPlayerRatings,
         isMatchScore = data.isMatchScore,
         isBestOfX = data.isBestOfX,
         isPlayX = data.isPlayX,
@@ -92,10 +95,12 @@ final class SwissApi(
         position = data.realPosition,
         chatFor = data.realChatFor,
         roundInterval = data.realRoundInterval,
+        halfwayBreak = data.realHalfwayBreak,
         password = data.password,
         conditions = data.conditions.all,
         forbiddenPairings = ~data.forbiddenPairings,
-        medleyVariants = data.medleyVariants
+        medleyVariants = data.medleyVariants,
+        minutesBeforeStartToJoin = data.realMinutesBeforeStartToJoin
       )
     )
     colls.swiss.insert.one(addFeaturable(swiss)) >>-
@@ -120,6 +125,8 @@ final class SwissApi(
           settings = old.settings.copy(
             nbRounds = data.nbRounds,
             rated = position.isEmpty && (data.rated | old.settings.rated),
+            handicapped = data.isHandicapped,
+            inputPlayerRatings = ~data.inputPlayerRatings,
             isMatchScore = data.isMatchScore,
             isBestOfX = data.isBestOfX,
             isPlayX = data.isPlayX,
@@ -132,9 +139,13 @@ final class SwissApi(
             roundInterval =
               if (data.roundInterval.isDefined) data.realRoundInterval
               else old.settings.roundInterval,
+            halfwayBreak =
+              if (data.halfwayBreak.isDefined) data.realHalfwayBreak
+              else old.settings.halfwayBreak,
             password = data.password,
             conditions = data.conditions.all,
             forbiddenPairings = ~data.forbiddenPairings,
+            minutesBeforeStartToJoin = data.realMinutesBeforeStartToJoin,
             medleyVariants =
               if (
                 old.medleyGameGroups != Some(
@@ -148,16 +159,66 @@ final class SwissApi(
           if (
             s.isStarted && s.nbOngoing == 0 && (s.nextRoundAt.isEmpty || old.settings.manualRounds) && !s.settings.manualRounds
           )
-            s.copy(nextRoundAt = DateTime.now.plusSeconds(s.settings.roundInterval.toSeconds.toInt).some)
+            if (s.isHalfway) {
+              s.copy(nextRoundAt =
+                DateTime.now
+                  .plusSeconds(
+                    s.settings.roundInterval.toSeconds.toInt + s.settings.halfwayBreak.toSeconds.toInt
+                  )
+                  .some
+              )
+            } else {
+              s.copy(nextRoundAt = DateTime.now.plusSeconds(s.settings.roundInterval.toSeconds.toInt).some)
+            }
           else if (s.settings.manualRounds && !old.settings.manualRounds)
             s.copy(nextRoundAt = none)
           else s
         }
+      if (data.isHandicapped && old.settings.inputPlayerRatings != ~data.inputPlayerRatings) {
+        val playerRatingMap = Handicaps.playerInputRatings(~data.inputPlayerRatings)
+        playerRatingMap.toList.map { case (u, r) =>
+          colls.player
+            .updateField(
+              $id(SwissPlayer.makeId(swiss.id, u)),
+              SwissPlayer.Fields.inputRating,
+              r
+            )
+            .void
+        }.sequenceFu >> unsetAllPlayerInputRating( // to reset removed players
+          swiss.id,
+          playerRatingMap.keys.toList.map(u => SwissPlayer.Id(s"${swiss.id}:${u}"))
+        ) >>
+          recomputeAndUpdateAll(swiss.id)
+      } else if (!data.isHandicapped && old.settings.handicapped) {
+        unsetAllPlayerInputRating(swiss.id) >>
+          recomputeAndUpdateAll(swiss.id)
+      }
       colls.swiss.update.one($id(old.id), addFeaturable(swiss)).void >>- {
         cache.roundInfo.put(swiss.id, fuccess(swiss.roundInfo.some))
         socket.reload(swiss.id)
       }
     }
+
+  private def unsetAllPlayerInputRating(
+      swissId: Swiss.Id,
+      retainedPlayerIds: List[SwissPlayer.Id] = List()
+  ): Funit = {
+    colls.player.list[SwissPlayer]($doc(SwissPlayer.Fields.swissId -> swissId)) map { players =>
+      players
+        .filter(p => !retainedPlayerIds.contains(p.id))
+        .map { p => unsetPlayerInputRating(p.id) }
+        .sequenceFu
+        .unit
+    }
+  }
+
+  private def unsetPlayerInputRating(playerId: SwissPlayer.Id): Funit =
+    colls.player.update
+      .one(
+        $id(playerId),
+        $unset(SwissPlayer.Fields.inputRating)
+      )
+      .void
 
   def scheduleNextRound(swiss: Swiss, date: DateTime): Funit =
     Sequencing(swiss.id)(notFinishedById) { old =>
@@ -187,7 +248,14 @@ final class SwissApi(
           .flatMap { rejoin =>
             fuccess(rejoin.n == 1) >>| { // if the match failed (not the update!), try a join
               (swiss.isEnterable && isInTeam(swiss.teamId)) ?? {
-                colls.player.insert.one(SwissPlayer.make(swiss.id, me, swiss.roundPerfType)) zip
+                colls.player.insert.one(
+                  SwissPlayer.make(
+                    swiss.id,
+                    me,
+                    swiss.roundPerfType,
+                    Handicaps.playerInputRatings(swiss.settings.inputPlayerRatings).get(me.username)
+                  )
+                ) zip
                   colls.swiss.update.one($id(swiss.id), $inc("nbPlayers" -> 1)) inject true
               }
             }
@@ -399,6 +467,35 @@ final class SwissApi(
       }.void
     } >> recomputeAndUpdateAll(id)
 
+  def disqualify(id: String, userId: User.ID) =
+    Sequencing(Swiss.Id(id))(finishedById) { swiss =>
+      SwissPlayer.fields { f =>
+        val selId = $id(SwissPlayer.makeId(swiss.id, userId))
+        colls.player.updateField(selId, f.disqualified, true)
+      }.void >>- {
+        getWinner(swiss.id).flatMap { winnerUserId =>
+          colls.swiss.update
+            .one(
+              $id(swiss.id),
+              $set("winnerId" -> winnerUserId)
+            )
+            .void
+        }.unit
+        trophyApi
+          .trophiesByUrl(Swiss.swissUrl(swiss.id))
+          .map(_.filter(_.user == userId))
+          .flatMap { trophyList =>
+            trophyList.headOption ?? { trophy =>
+              trophyApi.removeTrophiesByUrl(Swiss.swissUrl(swiss.id)) >>
+                awardTrophies(swiss, trophy.date)
+            }
+          }
+          .unit
+      } >>
+        recomputeAndUpdateAll(swiss.id) >>-
+        socket.reload(swiss.id)
+    }
+
   def recomputeScore(id: String): Funit =
     recomputeAndUpdateAll(Swiss.Id(id))
 
@@ -577,7 +674,11 @@ final class SwissApi(
                         swiss.settings.dailyInterval match {
                           case Some(days) => game.createdAt plusDays days
                           case None =>
-                            DateTime.now.plusSeconds(swiss.settings.roundInterval.toSeconds.toInt)
+                            DateTime.now.plusSeconds(
+                              swiss.settings.roundInterval.toSeconds.toInt + (if (swiss.isHalfway)
+                                                                                swiss.settings.halfwayBreak.toSeconds.toInt
+                                                                              else 0)
+                            )
                         }
                       )
                       .void >>-
@@ -613,11 +714,18 @@ final class SwissApi(
       }
     }
 
-  private def doFinish(swiss: Swiss): Funit =
+  private def getWinner(id: Swiss.Id) =
     SwissPlayer
       .fields { f =>
-        colls.player.primitiveOne[User.ID]($doc(f.swissId -> swiss.id), $sort desc f.score, f.userId)
+        colls.player.primitiveOne[User.ID](
+          $doc(f.swissId -> id, f.disqualified $ne true),
+          $sort desc f.score,
+          f.userId
+        )
       }
+
+  private def doFinish(swiss: Swiss): Funit =
+    getWinner(swiss.id)
       .flatMap { winnerUserId =>
         colls.swiss.update
           .one(
@@ -656,13 +764,11 @@ final class SwissApi(
     else funit
   } >>- cache.featuredInTeam.invalidate(swiss.teamId)
 
-  private def awardTrophies(swiss: Swiss): Funit = {
-    import lila.user.TrophyKind._
-    import lila.swiss.Swiss.swissUrl
+  private def awardTrophies(swiss: Swiss, date: DateTime = DateTime.now): Funit = {
     SwissPlayer
       .fields { f =>
         colls.player.primitive[User.ID](
-          $doc(f.swissId -> swiss.id),
+          $doc(f.swissId -> swiss.id, f.disqualified $ne true),
           $sort desc f.score,
           3,
           f.userId
@@ -675,11 +781,12 @@ final class SwissApi(
           .flatten
           .map { case (trophyKind, userId) =>
             trophyApi.award(
-              swissUrl(swiss.id),
+              Swiss.swissUrl(swiss.id),
               userId.toString,
               trophyKind,
               swiss.name.some,
-              swiss.trophyExpiryDays
+              swiss.trophyExpiryDays,
+              date
             )
           }
           .unit

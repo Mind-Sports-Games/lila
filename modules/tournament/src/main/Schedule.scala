@@ -3,7 +3,7 @@ package lila.tournament
 import strategygames.format.FEN
 import strategygames.variant.Variant
 import strategygames.GameLogic
-import strategygames.{ ByoyomiClock, ClockConfig, FischerClock }
+import strategygames.{ ByoyomiClock, Clock, ClockConfig }
 import org.joda.time.DateTime
 import play.api.i18n.Lang
 
@@ -18,7 +18,8 @@ case class Schedule(
     at: DateTime,
     duration: Option[Int] = None,
     medleyShield: Option[TournamentShield.MedleyShield] = None,
-    conditions: Condition.All = Condition.All.empty
+    conditions: Condition.All = Condition.All.empty,
+    statusScoring: Boolean = false
 ) {
 
   // Simpler naming for now.
@@ -160,7 +161,8 @@ object Schedule {
       speed = Speed fromClock tour.clock,
       variant = tour.variant,
       position = tour.position,
-      at = tour.startsAt
+      at = tour.startsAt,
+      statusScoring = tour.statusScoring
     )
 
   case class Plan(schedule: Schedule, buildFunc: Option[Tournament => Tournament]) {
@@ -201,6 +203,7 @@ object Schedule {
       override val display = "Experimental Marathon"
     }
     case object Yearly       extends Freq(70, 70)
+    case object Annual       extends Freq(75, 80)
     case object Introductory extends Freq(80, 65)
     case object Unique       extends Freq(90, 59)
     case object MSOWarmUp extends Freq(120, 41) {
@@ -225,6 +228,7 @@ object Schedule {
       Marathon,
       ExperimentalMarathon,
       Yearly,
+      Annual,
       Introductory,
       Unique,
       MSOWarmUp,
@@ -254,7 +258,10 @@ object Schedule {
     case object Blitz35     extends Speed(75)
     case object Blitz51     extends Speed(80)
     case object Blitz53     extends Speed(85)
+    case object Blitz55     extends Speed(90)
+    case object Delay212    extends Speed(212)
     case object Byoyomi35   extends Speed(305)
+    case object Delay310    extends Speed(310)
     case object Byoyomi510  extends Speed(510)
     val all: List[Speed] =
       List(
@@ -268,6 +275,9 @@ object Schedule {
         Blitz35,
         Blitz51,
         Blitz53,
+        Blitz55,
+        Delay212,
+        Delay310,
         Byoyomi35,
         Byoyomi510,
         Rapid,
@@ -285,7 +295,17 @@ object Schedule {
       }
     def fromClock(clock: ClockConfig) =
       clock match {
-        case _: FischerClock.Config => {
+        case _: ByoyomiClock.Config => {
+          val time = clock.estimateTotalSeconds
+          if (time <= (180 + 5 * 25)) Byoyomi35
+          else Byoyomi510
+        }
+        case Clock.SimpleDelayConfig(_, _) => {
+          val time = clock.estimateTotalSeconds
+          if (time <= (180 + 10 * 25)) Delay310
+          else Delay212
+        }
+        case Clock.Config(_, _) | Clock.BronsteinConfig(_, _) => {
           val time = clock.estimateTotalSeconds
           if (time < 30) UltraBullet
           else if (time < 60) HyperBullet
@@ -295,17 +315,13 @@ object Schedule {
           else if (time < 1500) Rapid
           else Classical
         }
-        case _: ByoyomiClock.Config => {
-          val time = clock.estimateTotalSeconds
-          if (time <= (180 + 5 * 25)) Byoyomi35
-          else Byoyomi510
-        }
+        // NOTE: not using case _ => here, because we want an error when a new clock is added.
       }
     def toPerfType(speed: Speed) =
       speed match {
         case UltraBullet                        => PerfType.orDefaultSpeed("ultraBullet")
         case HyperBullet | Bullet | HippoBullet => PerfType.orDefaultSpeed("bullet")
-        case SuperBlitz | Blitz | Blitz32 | Blitz35 | Blitz51 | Blitz53 =>
+        case SuperBlitz | Blitz | Blitz32 | Blitz35 | Blitz51 | Blitz53 | Blitz55 =>
           PerfType.orDefaultSpeed("blitz")
         case Rapid     => PerfType.orDefaultSpeed("rapid")
         case Classical => PerfType.orDefaultSpeed("classical")
@@ -334,45 +350,45 @@ object Schedule {
     (s.freq, s.variant, s.speed) match {
 
       case (Hourly, _, UltraBullet | HyperBullet | Bullet)                   => 27
-      case (Hourly, _, HippoBullet | SuperBlitz | Blitz | Blitz32 | Blitz51 | Blitz53) => 57
+      case (Hourly, _, HippoBullet | SuperBlitz | Blitz | Blitz32 | Blitz51 | Blitz53 | Blitz55) => 57
       case (Hourly, _, Rapid) if s.hasMaxRating                              => 57
       case (Hourly, _, Rapid | Classical)                                    => 117
 
       case (Daily | Eastern, Standard, SuperBlitz)                => 90
-      case (Daily | Eastern, Standard, Blitz | Blitz32 | Blitz51 | Blitz53) => 120
+      case (Daily | Eastern, Standard, Blitz | Blitz32 | Blitz51 | Blitz53 | Blitz55) => 120
       case (Daily | Eastern, _, Blitz | Blitz32 | Blitz51)        => 90
       case (Daily | Eastern, _, Rapid | Classical)                => 150
       case (Daily | Eastern, _, _)                                => 60
 
       case (Weekly, _, UltraBullet | HyperBullet | Bullet)                   => 60 * 2
-      case (Weekly, _, HippoBullet | SuperBlitz | Blitz | Blitz32 | Blitz51 | Blitz53) => 60 * 3
+      case (Weekly, _, HippoBullet | SuperBlitz | Blitz | Blitz32 | Blitz51 | Blitz53 | Blitz55) => 60 * 3
       case (Weekly, _, Rapid)                                                => 60 * 4
       case (Weekly, _, Classical)                                            => 60 * 5
 
       case (Weekend, Crazyhouse, _)                         => 60 * 2
       case (Weekend, _, UltraBullet | HyperBullet | Bullet) => 90
       case (Weekend, _, HippoBullet | SuperBlitz)           => 60 * 2
-      case (Weekend, _, Blitz | Blitz32 | Blitz51 | Blitz53)          => 60 * 3
+      case (Weekend, _, Blitz | Blitz32 | Blitz51 | Blitz53 | Blitz55)          => 60 * 3
       case (Weekend, _, Rapid)                              => 60 * 4
       case (Weekend, _, Classical)                          => 60 * 5
 
       case (Monthly, _, UltraBullet)               => 60 * 2
       case (Monthly, _, HyperBullet | Bullet)      => 60 * 3
       case (Monthly, _, HippoBullet | SuperBlitz)  => 60 * 3 + 30
-      case (Monthly, _, Blitz | Blitz32 | Blitz51 | Blitz53) => 60 * 4
+      case (Monthly, _, Blitz | Blitz32 | Blitz51 | Blitz53 | Blitz55) => 60 * 4
       case (Monthly, _, Rapid)                     => 60 * 5
       case (Monthly, _, Classical)                 => 60 * 6
 
       case (Shield, _, UltraBullet)               => 60 * 3
       case (Shield, _, HyperBullet | Bullet)      => 60 * 4
       case (Shield, _, HippoBullet | SuperBlitz)  => 60 * 5
-      case (Shield, _, Blitz | Blitz32 | Blitz51 | Blitz53) => 60 * 6
+      case (Shield, _, Blitz | Blitz32 | Blitz51 | Blitz53 | Blitz55) => 60 * 6
       case (Shield, _, Rapid)                     => 60 * 8
       case (Shield, _, Classical)                 => 60 * 10
 
       case (Yearly, _, UltraBullet | HyperBullet | Bullet) => 60 * 4
       case (Yearly, _, HippoBullet | SuperBlitz)           => 60 * 5
-      case (Yearly, _, Blitz | Blitz32 | Blitz51 | Blitz53)          => 60 * 6
+      case (Yearly, _, Blitz | Blitz32 | Blitz51 | Blitz53 | Blitz55)          => 60 * 6
       case (Yearly, _, Rapid)                              => 60 * 8
       case (Yearly, _, Classical)                          => 60 * 10
 
@@ -388,7 +404,7 @@ object Schedule {
   private def zhInc(s: Schedule)       = s.at.getHourOfDay % 2 == 0
 
   private def zhEliteTc(s: Schedule) = {
-    val TC = FischerClock.Config
+    val TC = Clock.Config
     s.at.getDayOfMonth / 7 match {
       case 0 => TC(3 * 60, 0)
       case 1 => TC(1 * 60, 1)
@@ -402,8 +418,9 @@ object Schedule {
     import Freq._, Speed._
     import strategygames.chess.variant._
 
-    val TC = FischerClock.Config
-    val BC = ByoyomiClock.Config
+    val TC  = Clock.Config
+    val BC  = ByoyomiClock.Config
+    val SDC = Clock.SimpleDelayConfig
 
     (s.freq, s.variant, s.speed) match {
       // Special cases.
@@ -424,6 +441,9 @@ object Schedule {
       case (_, _, Blitz35)     => TC(3 * 60, 5)
       case (_, _, Blitz51)     => TC(5 * 60, 1)
       case (_, _, Blitz53)     => TC(5 * 60, 3)
+      case (_, _, Blitz55)     => TC(5 * 60, 5)
+      case (_, _, Delay212)    => SDC(2 * 60, 12)
+      case (_, _, Delay310)    => SDC(3 * 60, 10)
       case (_, _, Byoyomi510)  => BC(5 * 60, 0, 10, 1)
       case (_, _, Byoyomi35)   => BC(3 * 60, 0, 5, 1)
       case (_, _, Rapid)       => TC(10 * 60, 0)

@@ -1,6 +1,6 @@
 playstrategy.ratingDistributionChart = function (data) {
   const trans = playstrategy.trans(data.i18n);
-  playstrategy.loadScript('javascripts/chart/common.js').then(function () {
+  playstrategy.loadScriptCJS('javascripts/chart/common.js').then(function () {
     playstrategy.chartCommon('highchart').then(function () {
       var disabled = {
         enabled: false,

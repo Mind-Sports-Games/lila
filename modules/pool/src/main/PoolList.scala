@@ -9,9 +9,8 @@ object PoolList {
   import PoolConfig._
 
   val all: List[PoolConfig] = List(
-    //TODO Add Backgammon?
     //TODO Add Abalone? Need to decide what we want in the lobby boxes as we are running out of space
-    PoolConfig(1 ++ 0, Wave(22 seconds, 30 players), Variant.Chess(strategygames.chess.variant.Standard)),
+    //PoolConfig(1 ++ 0, Wave(22 seconds, 30 players), Variant.Chess(strategygames.chess.variant.Standard)),
     PoolConfig(3 ++ 2, Wave(22 seconds, 30 players), Variant.Chess(strategygames.chess.variant.Standard)),
     PoolConfig(
       3 ++ 2,
@@ -37,7 +36,16 @@ object PoolList {
       Wave(22 seconds, 30 players),
       Variant.Togyzkumalak(strategygames.togyzkumalak.variant.Togyzkumalak)
     ),
-    PoolConfig(5 ++ 3, Wave(22 seconds, 30 players), Variant.Go(strategygames.go.variant.Go19x19))
+    PoolConfig(
+      3 ++ 2,
+      Wave(22 seconds, 30 players),
+      Variant.FairySF(strategygames.fairysf.variant.BreakthroughTroyka)
+    ),
+    PoolConfig(
+      strategygames.Clock.SimpleDelayConfig(2 * 60, 12),
+      Wave(22 seconds, 30 players),
+      Variant.Backgammon(strategygames.backgammon.variant.Backgammon)
+    )
   )
 
   val clockStringSet: Set[String] = all.view.map(_.clock.show) to Set
@@ -47,7 +55,7 @@ object PoolList {
   val json = Json toJson all
 
   implicit private class PimpedInt(self: Int) {
-    def ++(increment: Int) = strategygames.FischerClock.Config(self * 60, increment)
+    def ++(increment: Int) = strategygames.Clock.Config(self * 60, increment)
     def players            = NbPlayers(self)
   }
 }

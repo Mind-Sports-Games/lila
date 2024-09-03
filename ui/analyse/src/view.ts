@@ -1,5 +1,6 @@
 import { h, VNode } from 'snabbdom';
 import { parseFen } from 'stratops/fen';
+import { variantToRules } from 'stratutils';
 import * as chessground from './ground';
 import { read as fenRead } from 'chessground/fen';
 import {
@@ -11,7 +12,8 @@ import {
   getPlayerScore,
   getMancalaScore,
   getGoScore,
-  variantToRules,
+  getBackgammonScore,
+  allowClientEvalForVariant,
 } from './util';
 import { defined } from 'common';
 import changeColorHandle from 'common/coordsColor';
@@ -25,6 +27,7 @@ import { view as actionMenu } from './actionMenu';
 import { view as renderPromotion } from './promotion';
 import renderClocks from './clocks';
 import * as pgnExport from './pgnExport';
+import * as sgfExport from './sgfExport';
 import forecastView from './forecast/forecastView';
 import { view as cevalView } from 'ceval';
 import crazyView from './crazy/crazyView';
@@ -44,8 +47,10 @@ import { ConcealOf, Position } from './interfaces';
 import relayManager from './study/relay/relayManagerView';
 import relayTour from './study/relay/relayTourView';
 import renderPlayerBars from './study/playerBars';
+import { findTag } from './study/studyChapters';
 import serverSideUnderboard from './serverSideUnderboard';
 import * as gridHacks from './gridHacks';
+import * as Prefs from 'common/prefs';
 
 function renderResult(ctrl: AnalyseCtrl): VNode[] {
   let result: string | undefined;
@@ -65,7 +70,7 @@ function renderResult(ctrl: AnalyseCtrl): VNode[] {
     tags.push(h('div.result', result));
     const winner = ctrl.data.game.winnerPlayer;
     tags.push(
-      h('div.status', [statusView(ctrl), winner ? ', ' + ctrl.trans('playerIndexIsVictorious', winner) : null])
+      h('div.status', [statusView(ctrl), winner ? ', ' + ctrl.trans('playerIndexIsVictorious', winner) : null]),
     );
   }
   return tags;
@@ -94,7 +99,7 @@ function renderAnalyse(ctrl: AnalyseCtrl, concealOf?: ConcealOf) {
     [
       ctrl.embed && ctrl.study ? h('div.chapter-name', ctrl.study.currentChapter().name) : null,
       renderTreeView(ctrl, concealOf),
-    ].concat(renderResult(ctrl))
+    ].concat(renderResult(ctrl)),
   );
 }
 
@@ -126,7 +131,7 @@ function inputs(ctrl: AnalyseCtrl): VNode | undefined {
             el.addEventListener('input', _ => {
               ctrl.fenInput = el.value;
               el.setCustomValidity(
-                parseFen(variantToRules(ctrl.data.game.variant.key))(el.value.trim()).isOk ? '' : 'Invalid FEN'
+                parseFen(variantToRules(ctrl.data.game.variant.key))(el.value.trim()).isOk ? '' : 'Invalid FEN',
               );
             });
           },
@@ -140,42 +145,66 @@ function inputs(ctrl: AnalyseCtrl): VNode | undefined {
         },
       }),
     ]),
-    h('div.pgn', [
-      h('div.pair', [
-        h('label.name', 'PGN'),
-        h('textarea.copyable.autoselect', {
-          attrs: { spellCheck: false },
-          hook: {
-            ...onInsert(el => {
-              (el as HTMLTextAreaElement).value = defined(ctrl.pgnInput)
-                ? ctrl.pgnInput
-                : pgnExport.renderFullTxt(ctrl);
-              el.addEventListener('input', e => (ctrl.pgnInput = (e.target as HTMLTextAreaElement).value));
-            }),
-            postpatch: (_, vnode) => {
-              (vnode.elm as HTMLTextAreaElement).value = defined(ctrl.pgnInput)
-                ? ctrl.pgnInput
-                : pgnExport.renderFullTxt(ctrl);
-            },
-          },
-        }),
-        h(
-          'button.button.button-thin.action.text',
-          {
-            attrs: dataIcon('G'),
-            hook: bind(
-              'click',
-              _ => {
-                const pgn = $('.copyables .pgn textarea').val() as string;
-                if (pgn !== pgnExport.renderFullTxt(ctrl)) ctrl.changePgn(pgn);
+    ctrl.data.gameRecordFormat === 'pgn'
+      ? h('div.pgn', [
+          h('div.pair', [
+            h('label.name', 'PGN'),
+            h('textarea.copyable.autoselect', {
+              attrs: { spellCheck: false },
+              hook: {
+                ...onInsert(el => {
+                  (el as HTMLTextAreaElement).value = defined(ctrl.pgnInput)
+                    ? ctrl.pgnInput
+                    : pgnExport.renderFullTxt(ctrl);
+                  el.addEventListener('input', e => (ctrl.pgnInput = (e.target as HTMLTextAreaElement).value));
+                }),
+                postpatch: (_, vnode) => {
+                  (vnode.elm as HTMLTextAreaElement).value = defined(ctrl.pgnInput)
+                    ? ctrl.pgnInput
+                    : pgnExport.renderFullTxt(ctrl);
+                },
               },
-              ctrl.redraw
-            ),
-          },
-          ctrl.trans.noarg('importPgn')
-        ),
-      ]),
-    ]),
+            }),
+            ctrl.data.game.variant.lib == 0 && !['linesOfAction', 'scrambledEggs'].includes(ctrl.data.game.variant.key)
+              ? h(
+                  'button.button.button-thin.action.text',
+                  {
+                    attrs: dataIcon('G'),
+                    hook: bind(
+                      'click',
+                      _ => {
+                        const pgn = $('.copyables .pgn textarea').val() as string;
+                        if (pgn !== pgnExport.renderFullTxt(ctrl)) ctrl.changePgn(pgn);
+                      },
+                      ctrl.redraw,
+                    ),
+                  },
+                  ctrl.trans.noarg('importPgn'),
+                )
+              : undefined,
+          ]),
+        ])
+      : h('div.sgf', [
+          h('div.pair', [
+            h('label.name', 'SGF'),
+            h('textarea.copyable.autoselect', {
+              attrs: { spellCheck: false },
+              hook: {
+                ...onInsert(el => {
+                  (el as HTMLTextAreaElement).value = defined(ctrl.sgfInput)
+                    ? ctrl.sgfInput
+                    : sgfExport.renderFullTxt(ctrl);
+                  //el.addEventListener('input', e => (ctrl.sgfInput = (e.target as HTMLTextAreaElement).value));
+                }),
+                postpatch: (_, vnode) => {
+                  (vnode.elm as HTMLTextAreaElement).value = defined(ctrl.sgfInput)
+                    ? ctrl.sgfInput
+                    : sgfExport.renderFullTxt(ctrl);
+                },
+              },
+            }),
+          ]),
+        ]),
   ]);
 }
 
@@ -225,7 +254,7 @@ function controls(ctrl: AnalyseCtrl) {
             else if (action === 'practice') ctrl.togglePractice();
             else if (action === 'menu') ctrl.actionMenu.toggle();
           },
-          ctrl.redraw
+          ctrl.redraw,
         );
       }),
     },
@@ -247,7 +276,7 @@ function controls(ctrl: AnalyseCtrl) {
                   }),
                 ]
               : [
-                  ctrl.ceval.allowed()
+                  ctrl.ceval.allowed() && allowClientEvalForVariant(ctrl.ceval.variant.key)
                     ? h('button.fbt', {
                         attrs: {
                           title: noarg('openingExplorerAndTablebase'),
@@ -260,7 +289,10 @@ function controls(ctrl: AnalyseCtrl) {
                         },
                       })
                     : null,
-                  ctrl.ceval.possible && ctrl.ceval.allowed() && !ctrl.isGamebook()
+                  ctrl.ceval.possible &&
+                  ctrl.ceval.allowed() &&
+                  allowClientEvalForVariant(ctrl.ceval.variant.key) &&
+                  !ctrl.isGamebook()
                     ? h('button.fbt', {
                         attrs: {
                           title: noarg('practiceWithComputer'),
@@ -273,7 +305,7 @@ function controls(ctrl: AnalyseCtrl) {
                         },
                       })
                     : null,
-                ]
+                ],
           ),
       h('div.jumps', [
         jumpButton('W', 'first', canJumpPrev),
@@ -291,8 +323,22 @@ function controls(ctrl: AnalyseCtrl) {
               'data-icon': '[',
             },
           }),
-    ]
+    ],
   );
+}
+
+function forceNoCoords(ctrl: AnalyseCtrl) {
+  if (ctrl.data.pref.coords !== Prefs.Coords.Hidden) {
+    $('body').toggleClass('coords-out', false).toggleClass('coords-in', false).toggleClass('coords-no', true);
+    changeColorHandle();
+  }
+}
+
+function forceOutterCoords(ctrl: AnalyseCtrl, v: boolean) {
+  if (ctrl.data.pref.coords === Prefs.Coords.Inside) {
+    $('body').toggleClass('coords-out', v).toggleClass('coords-in', !v);
+    changeColorHandle();
+  }
 }
 
 function forceInnerCoords(ctrl: AnalyseCtrl, v: boolean) {
@@ -310,7 +356,7 @@ function renderPlayerScore(
   score: number,
   position: Position,
   playerIndex: string,
-  variantKey: VariantKey
+  variantKey: VariantKey,
 ): VNode | undefined {
   const defaultMancalaRole = 's';
   const children: VNode[] = [];
@@ -340,12 +386,80 @@ function renderPlayerScore(
     return h('div.game-score.game-score-' + position, { attrs: { 'data-score': score } }, children);
   } else if (variantKey === 'go9x9' || variantKey === 'go13x13' || variantKey === 'go19x19') {
     children.push(h('piece.p-piece.' + playerIndex, { attrs: { 'data-score': score } }));
+    return h('div.game-score.game-score-top' + '.' + playerIndex, children);
+  } else if (variantKey === 'backgammon' || variantKey === 'nackgammon') {
+    for (let i = 0; i < score; i++) {
+      children.push(h('piece.side-piece.' + playerIndex + (i === 0 ? ' first' : '')));
+    }
+    return h('div.game-score.game-score-' + position, { attrs: { 'data-score': score } }, children);
+  } else if (variantKey === 'oware') {
+    const pieceClass = `piece.${defaultMancalaRole}${score.toString()}-piece.`;
+    children.push(h(pieceClass + playerIndex, { attrs: { 'data-score': score } }));
     return h('div.game-score.game-score-' + position + '.' + playerIndex, children);
   } else {
-    const pieceClass =
-      variantKey === 'oware' ? `piece.${defaultMancalaRole}${score.toString()}-piece.` : 'piece.p-piece.';
+    //filpello variants
+    const pieceClass = 'piece.p-piece.';
     children.push(h(pieceClass + playerIndex, { attrs: { 'data-score': score } }));
-    return h('div.game-score.game-score-' + position, children);
+    return h('div.game-score.game-score-top' + '.' + playerIndex, children);
+  }
+}
+
+function renderPlayerScoreNames(ctrl: AnalyseCtrl): VNode | undefined {
+  const children: VNode[] = [];
+  const study = ctrl.study;
+  let playerNames = { p1: 'Player 1', p2: 'player 2' };
+  const p1player = ctrl.data.player.playerIndex === 'p1' ? ctrl.data.player : ctrl.data.opponent;
+  const p2player = ctrl.data.player.playerIndex === 'p2' ? ctrl.data.player : ctrl.data.opponent;
+  if (study !== undefined) {
+    const tags = study.data.chapter.tags;
+    playerNames = {
+      p1: findTag(tags, 'p1') ?? p1player.playerName,
+      p2: findTag(tags, 'p2') ?? p2player.playerName,
+    };
+  } else {
+    playerNames = {
+      p1: p1player.user ? p1player.user.username : p1player.playerName,
+      p2: p2player.user ? p2player.user.username : p2player.playerName,
+    };
+  }
+
+  //need to switch player order for togy view as scores also flip
+  const flippedCss = ctrl.flipped ? '.flipped' : '';
+
+  if (p1player.user) {
+    children.push(
+      h(
+        'div.game-score-name.p1.text.player' + flippedCss,
+        h('a.user-link.ulpt', { attrs: { href: `/@/${p1player.user.id}` } }, playerNames.p1),
+      ),
+    );
+  } else {
+    children.push(h('div.game-score-name.p1.text' + flippedCss, playerNames.p1));
+  }
+  children.push(h('div.game-score-name.vs.text', 'vs'));
+  if (p2player.user) {
+    children.push(
+      h(
+        'div.game-score-name.p2.text.player' + flippedCss,
+        h('a.user-link.ulpt', { attrs: { href: `/@/${p2player.user.id}` } }, playerNames.p2),
+      ),
+    );
+  } else {
+    children.push(h('div.game-score-name.p2.text' + flippedCss, playerNames.p2));
+  }
+  return h('div.game-score-names', children);
+}
+
+function renderPlayerName(ctrl: AnalyseCtrl, position: Position): VNode | undefined {
+  const playerIndex = position === 'top' ? ctrl.topPlayerIndex() : ctrl.bottomPlayerIndex();
+  const player = ctrl.data.player.playerIndex === playerIndex ? ctrl.data.player : ctrl.data.opponent;
+  if (player.user)
+    return h(
+      `div.game-score-player-name.${playerIndex}.text.${position}`,
+      h('a.user-link.ulpt', { attrs: { href: `/@/${player.user.id}` } }, player.user.username),
+    );
+  else {
+    return h(`div.game-score-player-name.${playerIndex}.text.${position}`, player.playerName);
   }
 }
 
@@ -361,9 +475,29 @@ export default function (ctrl: AnalyseCtrl): VNode {
     playerBars = renderPlayerBars(ctrl),
     clocks = !playerBars && renderClocks(ctrl),
     gaugeOn = ctrl.showEvalGauge(),
-    needsInnerCoords = !!gaugeOn || !!playerBars,
-    tour = relayTour(ctrl),
-    variantKey = ctrl.data.game.variant.key;
+    variantKey = ctrl.data.game.variant.key,
+    needsUserNameWithScore = ['togyzkumalak', 'oware'].includes(variantKey),
+    needsInnerCoords =
+      ((!!gaugeOn || !!playerBars) &&
+        !['xiangqi', 'shogi', 'minixiangqi', 'minishogi', 'oware'].includes(variantKey)) ||
+      ['togyzkumalak', 'backgammon', 'nackgammon'].includes(variantKey),
+    needsOutterCoords =
+      [
+        'xiangqi',
+        'shogi',
+        'minixiangqi',
+        'minishogi',
+        'oware',
+        'flipello',
+        'flipello10',
+        'go9x9',
+        'go13x13',
+        'go19x19',
+      ].includes(variantKey) &&
+      !((!!gaugeOn || !!playerBars) && ['flipello', 'flipello10', 'go9x9', 'go13x13', 'go19x19'].includes(variantKey)),
+    needsNoCoords =
+      ['xiangqi', 'shogi', 'minixiangqi', 'minishogi'].includes(variantKey) && (!!gaugeOn || !!playerBars),
+    tour = relayTour(ctrl);
 
   let topScore = 0,
     bottomScore = 0;
@@ -398,34 +532,18 @@ export default function (ctrl: AnalyseCtrl): VNode {
         bottomScore = ctrl.topPlayerIndex() === 'p2' ? p1Score : p2Score;
         break;
       }
+      case 'backgammon':
+      case 'nackgammon': {
+        const fen = ctrl.node.fen;
+        const p1Score = getBackgammonScore(fen, 'p1');
+        const p2Score = getBackgammonScore(fen, 'p2');
+        topScore = ctrl.topPlayerIndex() === 'p1' ? p1Score : p2Score;
+        bottomScore = ctrl.topPlayerIndex() === 'p2' ? p1Score : p2Score;
+        break;
+      }
       default: {
         break;
       }
-    }
-  }
-  // fix coordinates for non-chess games to display them outside due to not working well displaying on board
-  if (
-    [
-      'xiangqi',
-      'shogi',
-      'minixiangqi',
-      'minishogi',
-      'flipello',
-      'flipello10',
-      'oware',
-      'go9x9',
-      'go13x13',
-      'go19x19',
-    ].includes(variantKey)
-  ) {
-    if (!$('body').hasClass('coords-no')) {
-      $('body').removeClass('coords-in').addClass('coords-out');
-    }
-  }
-  //Togyzkumalak board always has coodinates on the inside
-  if (['togyzkumalak'].includes(variantKey)) {
-    if (!$('body').hasClass('coords-no')) {
-      $('body').removeClass('coords-out').addClass('coords-in');
     }
   }
 
@@ -440,6 +558,8 @@ export default function (ctrl: AnalyseCtrl): VNode {
     'go9x9',
     'go13x13',
     'go19x19',
+    'backgammon',
+    'nackgammon',
   ].includes(variantKey)
     ? '.piece-letter'
     : '';
@@ -450,6 +570,8 @@ export default function (ctrl: AnalyseCtrl): VNode {
         insert: vn => {
           playstrategy.miniGame.initAll();
           forceInnerCoords(ctrl, needsInnerCoords);
+          forceOutterCoords(ctrl, needsOutterCoords);
+          if (needsNoCoords) forceNoCoords(ctrl);
           if (!!playerBars != $('body').hasClass('header-margin')) {
             requestAnimationFrame(() => {
               $('body').toggleClass('header-margin', !!playerBars);
@@ -460,6 +582,8 @@ export default function (ctrl: AnalyseCtrl): VNode {
         },
         update(_, _2) {
           forceInnerCoords(ctrl, needsInnerCoords);
+          forceOutterCoords(ctrl, needsOutterCoords);
+          if (needsNoCoords) forceNoCoords(ctrl);
         },
         postpatch(old, vnode) {
           if (old.data!.gaugeOn !== gaugeOn) document.body.dispatchEvent(new Event('chessground.resize'));
@@ -494,13 +618,13 @@ export default function (ctrl: AnalyseCtrl): VNode {
             chessground.render(ctrl),
             playerBars ? playerBars[ctrl.bottomIsP1() ? 0 : 1] : null,
             renderPromotion(ctrl),
-          ]
+          ],
         ),
       gaugeOn && !tour ? cevalView.renderGauge(ctrl) : null,
-      menuIsOpen || tour || !ctrl.data.hasGameScore
-        ? null
-        : renderPlayerScore(topScore, 'top', ctrl.topPlayerIndex(), variantKey),
-      menuIsOpen || tour ? null : crazyView(ctrl, ctrl.topPlayerIndex(), 'top'),
+      tour || !ctrl.data.hasGameScore ? null : renderPlayerScore(topScore, 'top', ctrl.topPlayerIndex(), variantKey),
+      tour || !needsUserNameWithScore ? null : renderPlayerName(ctrl, 'top'),
+      tour || !ctrl.data.hasGameScore ? null : renderPlayerScoreNames(ctrl),
+      tour ? null : crazyView(ctrl, ctrl.topPlayerIndex(), 'top'),
       gamebookPlayView ||
         (tour
           ? null
@@ -508,17 +632,20 @@ export default function (ctrl: AnalyseCtrl): VNode {
               ...(menuIsOpen
                 ? [actionMenu(ctrl)]
                 : [
-                    cevalView.renderCeval(ctrl),
-                    showCevalPvs ? cevalView.renderPvs(ctrl) : null,
+                    allowClientEvalForVariant(ctrl.ceval.variant.key) ? cevalView.renderCeval(ctrl) : null,
+                    allowClientEvalForVariant(ctrl.ceval.variant.key) && showCevalPvs
+                      ? cevalView.renderPvs(variantKey)(ctrl)
+                      : null,
                     renderAnalyse(ctrl, concealOf),
                     gamebookEditView || forkView(ctrl, concealOf),
                     retroView(ctrl) || practiceView(ctrl) || explorerView(ctrl),
                   ]),
             ])),
-      menuIsOpen || tour || !ctrl.data.hasGameScore
+      tour || !ctrl.data.hasGameScore
         ? null
         : renderPlayerScore(bottomScore, 'bottom', ctrl.bottomPlayerIndex(), variantKey),
-      menuIsOpen || tour ? null : crazyView(ctrl, ctrl.bottomPlayerIndex(), 'bottom'),
+      tour || !needsUserNameWithScore ? null : renderPlayerName(ctrl, 'bottom'),
+      tour ? null : crazyView(ctrl, ctrl.bottomPlayerIndex(), 'bottom'),
       gamebookPlayView || tour ? null : controls(ctrl),
       ctrl.embed || tour
         ? null
@@ -528,44 +655,44 @@ export default function (ctrl: AnalyseCtrl): VNode {
               hook:
                 ctrl.synthetic || playable(ctrl.data) ? undefined : onInsert(elm => serverSideUnderboard(elm, ctrl)),
             },
-            study ? studyView.underboard(ctrl) : [inputs(ctrl)]
+            study ? studyView.underboard(ctrl) : [inputs(ctrl)],
           ),
       tour ? null : acplView(ctrl),
       ctrl.embed
         ? null
         : ctrl.studyPractice
-        ? studyPracticeView.side(study!)
-        : h(
-            'aside.analyse__side',
-            {
-              hook: onInsert(elm => {
-                ctrl.opts.$side && ctrl.opts.$side.length && $(elm).replaceWith(ctrl.opts.$side);
-                $(elm).append($('.context-streamers').clone().removeClass('none'));
-              }),
-            },
-            ctrl.studyPractice
-              ? [studyPracticeView.side(study!)]
-              : study
-              ? [studyView.side(study)]
-              : [
-                  ctrl.forecast ? forecastView(ctrl, ctrl.forecast) : null,
-                  !ctrl.synthetic && playable(ctrl.data)
-                    ? h(
-                        'div.back-to-game',
-                        h(
-                          'a.button.button-empty.text',
-                          {
-                            attrs: {
-                              href: router.game(ctrl.data, ctrl.data.player.playerIndex),
-                              'data-icon': 'i',
-                            },
-                          },
-                          ctrl.trans.noarg('backToGame')
-                        )
-                      )
-                    : null,
-                ]
-          ),
+          ? studyPracticeView.side(study!)
+          : h(
+              'aside.analyse__side',
+              {
+                hook: onInsert(elm => {
+                  ctrl.opts.$side && ctrl.opts.$side.length && $(elm).replaceWith(ctrl.opts.$side);
+                  $(elm).append($('.context-streamers').clone().removeClass('none'));
+                }),
+              },
+              ctrl.studyPractice
+                ? [studyPracticeView.side(study!)]
+                : study
+                  ? [studyView.side(study)]
+                  : [
+                      ctrl.forecast ? forecastView(ctrl, ctrl.forecast) : null,
+                      !ctrl.synthetic && playable(ctrl.data)
+                        ? h(
+                            'div.back-to-game',
+                            h(
+                              'a.button.button-empty.text',
+                              {
+                                attrs: {
+                                  href: router.game(ctrl.data, ctrl.data.player.playerIndex),
+                                  'data-icon': 'i',
+                                },
+                              },
+                              ctrl.trans.noarg('backToGame'),
+                            ),
+                          )
+                        : null,
+                    ],
+            ),
       study && study.relay && relayManager(study.relay),
       ctrl.opts.chat &&
         h('section.mchat', {
@@ -581,6 +708,6 @@ export default function (ctrl: AnalyseCtrl): VNode {
         : h('div.chat__members.none', {
             hook: onInsert(playstrategy.watchers),
           }),
-    ]
+    ],
   );
 }

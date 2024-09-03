@@ -98,15 +98,25 @@ object form {
       form3.split(
         form3.group(
           form("clock.limit"),
-          raw("Clock initial time"),
-          help = trans.simulClockHint().some,
+          trans.clockIncrement(),
+          help = frag(
+            trans.simulClockHint().some,
+            a(href := s"${routes.Page.loneBookmark("clocks")}", target := "_blank")("Clock details here")
+          ).some,
           half = true
         )(form3.select(_, clockTimeChoices)),
-        form3.group(form("clock.increment"), raw("Clock increment"), half = true)(
+        form3.group(form("clock.increment"), trans.clockIncrement(), klass = "clockIncrement", half = true)(
           form3.select(_, clockIncrementChoices)
+        ),
+        form3.group(form("clock.delay"), trans.clockDelay(), klass = "clockDelay", half = true)(
+          form3.select(_, clockDelayChoices)
         )
       ),
-      form3.checkbox(form("clock.useByoyomi"), trans.useByoyomi()),
+      form3.split(
+        form3.checkbox(form("clock.useByoyomi"), trans.useByoyomi()),
+        form3.checkbox(form("clock.useBronsteinDelay"), trans.useBronsteinDelay()),
+        form3.checkbox(form("clock.useSimpleDelay"), trans.useSimpleDelay())
+      ),
       form3.split(
         form3.group(form("clock.byoyomi"), trans.clockByoyomi(), klass = "byoyomiClock", half = true)(
           form3.select(_, SimulForm.clockByoyomiChoices)

@@ -123,10 +123,11 @@ final class User(
                     info   <- env.userInfo(u, nbs, ctx)
                     _      <- env.team.cached.nameCache preloadMany info.teamIds
                     social <- env.socialInfo(u, ctx)
-                    searchForm =
-                      (filters.current == GameFilter.Search) option
-                        GameFilterMenu.searchForm(userGameSearch, filters.current)(ctx.body, formBinding)
-                  } yield html.user.show.page.games(u, info, pag, filters, searchForm, social)
+                    //searchForm =
+                    //  (filters.current == GameFilter.Search) option
+                    //    GameFilterMenu.searchForm(userGameSearch, filters.current)(ctx.body, formBinding)
+                  } yield html.user.show.page.games(u, info, pag, filters, None, social)
+                  //} yield html.user.show.page.games(u, info, pag, filters, searchForm, social)
                   else fuccess(html.user.show.gamesContent(u, nbs, pag, filters, filter))
               } yield res,
               api = _ => apiGames(u, filter, page)
@@ -264,7 +265,7 @@ final class User(
           html =
             for {
               nbAllTime      <- env.user.cached.top10NbGame.get {}
-              tourneyWinners <- env.tournament.winners.all.map(_.top)
+              tourneyWinners <- env.tournament.winners.all.map(_.top10)
               topOnline      <- env.user.cached.getTop50Online
               anyOnline      <- env.user.cached.get50Online
               _              <- env.user.lightUserApi preloadMany tourneyWinners.map(_.userId)
@@ -281,48 +282,51 @@ final class User(
               implicit val lpWrites = OWrites[UserModel.LightPerf](env.user.jsonView.lightPerfIsOnline)
               Ok(
                 Json.obj(
-                  "bullet"        -> leaderboards.bullet,
-                  "blitz"         -> leaderboards.blitz,
-                  "rapid"         -> leaderboards.rapid,
-                  "classical"     -> leaderboards.classical,
-                  "ultraBullet"   -> leaderboards.ultraBullet,
-                  "crazyhouse"    -> leaderboards.crazyhouse,
-                  "chess960"      -> leaderboards.chess960,
-                  "kingOfTheHill" -> leaderboards.kingOfTheHill,
-                  "threeCheck"    -> leaderboards.threeCheck,
-                  "fiveCheck"     -> leaderboards.fiveCheck,
-                  "antichess"     -> leaderboards.antichess,
-                  "atomic"        -> leaderboards.atomic,
-                  "horde"         -> leaderboards.horde,
-                  "racingKings"   -> leaderboards.racingKings,
-                  "noCastling"    -> leaderboards.noCastling,
-                  "monster"       -> leaderboards.monster,
-                  "linesOfAction" -> leaderboards.linesOfAction,
-                  "scrambledEggs" -> leaderboards.scrambledEggs,
-                  "international" -> leaderboards.international,
-                  "frisian"       -> leaderboards.frisian,
-                  "frysk"         -> leaderboards.frysk,
-                  "antidraughts"  -> leaderboards.antidraughts,
-                  "breakthrough"  -> leaderboards.breakthrough,
-                  "russian"       -> leaderboards.russian,
-                  "brazilian"     -> leaderboards.brazilian,
-                  "pool"          -> leaderboards.pool,
-                  "portuguese"    -> leaderboards.portuguese,
-                  "english"       -> leaderboards.english,
-                  "shogi"         -> leaderboards.shogi,
-                  "xiangqi"       -> leaderboards.xiangqi,
-                  "minishogi"     -> leaderboards.minishogi,
-                  "minixiangqi"   -> leaderboards.minixiangqi,
-                  "flipello"      -> leaderboards.flipello,
-                  "flipello10"    -> leaderboards.flipello10,
-                  "amazons"       -> leaderboards.amazons,
-                  "oware"         -> leaderboards.oware,
-                  "togyzkumalak"  -> leaderboards.togyzkumalak,
-                  "go9x9"         -> leaderboards.go9x9,
-                  "go13x13"       -> leaderboards.go13x13,
-                  "go19x19"       -> leaderboards.go19x19,
-                  "backgammon"    -> leaderboards.backgammon,
-                  "abalone"       -> leaderboards.abalone
+                  "bullet"                 -> leaderboards.bullet,
+                  "blitz"                  -> leaderboards.blitz,
+                  "rapid"                  -> leaderboards.rapid,
+                  "classical"              -> leaderboards.classical,
+                  "ultraBullet"            -> leaderboards.ultraBullet,
+                  "crazyhouse"             -> leaderboards.crazyhouse,
+                  "chess960"               -> leaderboards.chess960,
+                  "kingOfTheHill"          -> leaderboards.kingOfTheHill,
+                  "threeCheck"             -> leaderboards.threeCheck,
+                  "fiveCheck"              -> leaderboards.fiveCheck,
+                  "antichess"              -> leaderboards.antichess,
+                  "atomic"                 -> leaderboards.atomic,
+                  "horde"                  -> leaderboards.horde,
+                  "racingKings"            -> leaderboards.racingKings,
+                  "noCastling"             -> leaderboards.noCastling,
+                  "monster"                -> leaderboards.monster,
+                  "linesOfAction"          -> leaderboards.linesOfAction,
+                  "scrambledEggs"          -> leaderboards.scrambledEggs,
+                  "international"          -> leaderboards.international,
+                  "frisian"                -> leaderboards.frisian,
+                  "frysk"                  -> leaderboards.frysk,
+                  "antidraughts"           -> leaderboards.antidraughts,
+                  "breakthrough"           -> leaderboards.breakthrough,
+                  "russian"                -> leaderboards.russian,
+                  "brazilian"              -> leaderboards.brazilian,
+                  "pool"                   -> leaderboards.pool,
+                  "portuguese"             -> leaderboards.portuguese,
+                  "english"                -> leaderboards.english,
+                  "shogi"                  -> leaderboards.shogi,
+                  "xiangqi"                -> leaderboards.xiangqi,
+                  "minishogi"              -> leaderboards.minishogi,
+                  "minixiangqi"            -> leaderboards.minixiangqi,
+                  "flipello"               -> leaderboards.flipello,
+                  "flipello10"             -> leaderboards.flipello10,
+                  "amazons"                -> leaderboards.amazons,
+                  "breakthroughtroyka"     -> leaderboards.breakthroughtroyka,
+                  "minibreakthroughtroyka" -> leaderboards.minibreakthroughtroyka,
+                  "oware"                  -> leaderboards.oware,
+                  "togyzkumalak"           -> leaderboards.togyzkumalak,
+                  "go9x9"                  -> leaderboards.go9x9,
+                  "go13x13"                -> leaderboards.go13x13,
+                  "go19x19"                -> leaderboards.go19x19,
+                  "backgammon"             -> leaderboards.backgammon,
+                  "nackgammon"             -> leaderboards.nackgammon,
+                  "abalone"                -> leaderboards.abalone
                 )
               )
             }

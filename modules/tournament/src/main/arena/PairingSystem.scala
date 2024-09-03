@@ -29,15 +29,17 @@ final private[tournament] class PairingSystem(
       ranking: Ranking
   ): Fu[Pairings] = {
     for {
-      activePlayers <- playerRepo.countActive(tour.id)
-      lastOpponents <- limitLastOpponents(tour, users, activePlayers)
-      botsToAdd     <- botsToAdd(tour, activePlayers)
+      inPlayUsers       <- pairingRepo.inPlayUsers(tour.id)
+      justFinishedUsers <- pairingRepo.justFinishedUsers(tour.id, tour.waitForPlayerReturnSeconds)
+      activeUsers   = inPlayUsers ++ justFinishedUsers -- LightUser.tourBotsIDs.toSet
+      activePlayers = users.activePlayers(activeUsers)
+      botsToAdd <- botsToAdd(tour, activePlayers)
       usersWithBots = users.addBotUsers(botsToAdd)
-      data          = Data(tour, lastOpponents, ranking, activePlayers == 2)
+      lastOpponents <- limitLastOpponents(tour, users, activePlayers)
+      data = Data(tour, lastOpponents, ranking, activePlayers == 2)
       preps <- readyToRunPreps(lastOpponents, usersWithBots, activePlayers) ?? evenOrAll(
         data,
-        usersWithBots,
-        activePlayers
+        usersWithBots
       )
       pairings <- prepsToPairings(preps)
     } yield pairings
@@ -85,13 +87,13 @@ final private[tournament] class PairingSystem(
       .map(_.flatten.toSet)
 
   private def botsToAdd(tour: Tournament, activePlayers: Int): Fu[Set[User.ID]] =
-    if (tour.botsAllowed && activePlayers < minPlayersForNoBots)
+    if (tour.botsAllowed && activePlayers < minPlayersForNoBots && activePlayers % 2 == 1)
       playerRepo
         .byTourAndUserIds(tour.id, LightUser.tourBotsIDs)
         .flatMap { availableBots(tour.id) }
     else fuccess(Set())
 
-  private def evenOrAll(data: Data, users: WaitingUsers, activePlayers: Int) = {
+  private def evenOrAll(data: Data, users: WaitingUsers) = {
     makePreps(data, users.evenNumber) flatMap {
       case Nil if users.isOdd => makePreps(data, users.all)
       case x                  => fuccess(x)

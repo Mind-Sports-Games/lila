@@ -11,7 +11,10 @@ export default class Setup {
     ai: FormStore;
   };
 
-  constructor(readonly makeStorage: (name: string) => PlayStrategyStorage, readonly root: LobbyController) {
+  constructor(
+    readonly makeStorage: (name: string) => PlayStrategyStorage,
+    readonly root: LobbyController,
+  ) {
     this.stores = {
       hook: makeStore(makeStorage('lobby.setup.hook')),
       friend: makeStore(makeStorage('lobby.setup.friend')),
@@ -91,9 +94,11 @@ export default class Setup {
     }
   };
 
-  private sliderKomis = [...Array(41).keys()].map(i => -100 + i * 5);
+  private sliderHandicap = (v: number) => (v < 26 ? v : 0);
 
-  private sliderKomi = (v: number) => (v < this.sliderKomis.length ? this.sliderKomis[v] : 75);
+  private sliderKomis = (bs: number) => [...Array(bs * bs * 4 + 1).keys()].map(i => -(bs * bs * 10) + i * 5);
+
+  private sliderKomi = (bs: number) => (v: number) => (v < this.sliderKomis(bs).length ? this.sliderKomis(bs)[v] : 75);
 
   private sliderDays = (v: number) => {
     if (v <= 3) return v;
@@ -130,6 +135,9 @@ export default class Setup {
       : undefined;
   };
 
+  private psBots = ['ps-greedy-two-move', 'ps-greedy-one-move', 'ps-greedy-four-move', 'ps-random-mover'];
+  private ratedTimeModes = ['1', '3', '4', '5'];
+
   prepareForm = ($modal: Cash) => {
     let fenOk = false;
     const self = this,
@@ -155,6 +163,9 @@ export default class Setup {
       $advancedTimeSetup = $form.find('.advanced_setup'),
       $advancedTimeToggle = $form.find('.advanced_toggle'),
       $daysInput = $form.find('.days_choice [name=days]'),
+      userDetails = $form.attr('action')?.split('user='),
+      user = userDetails && userDetails[1] ? userDetails[1].toLowerCase() : '',
+      vsPSBot = this.psBots.includes(user),
       typ = $form.data('type'),
       $ratings = $modal.find('.ratings > div'),
       randomPlayerIndexVariants = $form.data('random-playerindex-variants').split(','),
@@ -162,7 +173,7 @@ export default class Setup {
       toggleButtons = () => {
         randomPlayerIndexVariants;
         const variantId = ($variantSelect.val() as string).split('_'),
-          timeMode = $timeModeSelect.val(),
+          timeMode = <string>$timeModeSelect.val(),
           rated = $rated.prop('checked'),
           limit = parseFloat($timeInput.val() as string),
           inc = parseFloat($incrementInput.val() as string),
@@ -171,23 +182,28 @@ export default class Setup {
           // no rated variants with less than 30s on the clock and no rated unlimited in the lobby
           cantBeRated =
             (typ === 'hook' && timeMode === '0') ||
-            (timeMode != '1' && timeMode != '3') ||
+            this.ratedTimeModes.indexOf(timeMode) === -1 ||
             (limit < 0.5 && inc == 0) ||
             (limit == 0 && inc < 2) ||
+            (vsPSBot && user == 'ps-random-mover') ||
             (variantId[0] == '9' &&
               $goConfig.val() !== undefined &&
-              (($goHandicapInput.val() as string) != '0' || ($goKomiInput.val() as string) != '75'));
+              (($goHandicapInput.val() as string) != '0' ||
+                (variantId[1] !== '1' && ($goKomiInput.val() as string) != '75') ||
+                (variantId[1] == '1' && ($goKomiInput.val() as string) != '55')));
         if (cantBeRated && rated) {
           $casual.trigger('click');
           return toggleButtons();
         }
         $rated.prop('disabled', !!cantBeRated).siblings('label').toggleClass('disabled', cantBeRated);
         const byoOk = timeMode !== '3' || ((limit > 0 || inc > 0 || byo > 0) && (byo || per === 1));
+        const delayOk = (timeMode !== '4' && timeMode !== '5') || inc > 0;
         const timeOk = timeMode !== '1' || limit > 0 || inc > 0,
           ratedOk = typ !== 'hook' || !rated || timeMode !== '0',
           aiOk = typ !== 'ai' || variantId[1] !== '3' || limit >= 1,
-          posOk = variantId[0] !== '0' || variantId[1] !== '3' || fenOk;
-        if (byoOk && timeOk && ratedOk && aiOk && posOk) {
+          posOk = variantId[0] !== '0' || variantId[1] !== '3' || fenOk,
+          botOK = !vsPSBot || psBotCanPlay(user, limit, inc, variantId);
+        if (byoOk && delayOk && timeOk && ratedOk && aiOk && posOk && botOK) {
           $submits.toggleClass('nope', false);
           $submits.filter(':not(.random)').toggle(!rated || !randomPlayerIndexVariants.includes(variantId[1]));
         } else $submits.toggleClass('nope', true);
@@ -196,6 +212,39 @@ export default class Setup {
         self.save($form[0] as HTMLFormElement);
       };
 
+    const psBotCanPlay = (user: string, limit: number, inc: number, variantId: string[]) => {
+      //TODO remove hard coded options and improve bot api flow
+      let variantCompatible = true;
+      switch (user) {
+        case 'ps-greedy-four-move': {
+          //in (draughts, oware, togy)
+          variantCompatible = ['1', '6', '7'].includes(variantId[0]);
+          break;
+        }
+        default:
+          variantCompatible = true;
+      }
+
+      let clockCompatible = true;
+      if (isRealTime()) {
+        switch (user) {
+          case 'ps-random-mover': {
+            clockCompatible = limit >= 0.5;
+            break;
+          }
+          case 'ps-greedy-one-move': {
+            clockCompatible = limit >= 1 && inc >= 1;
+            break;
+          }
+          default: {
+            clockCompatible = limit >= 3 && inc >= 2;
+          }
+        }
+      } else {
+        clockCompatible = true;
+      }
+      return variantCompatible && clockCompatible;
+    };
     const clearFenInput = () => $fenInput.val('');
     const c = this.stores[typ].get();
     if (c) {
@@ -207,6 +256,13 @@ export default class Setup {
           else if (k != 'fen' || !this.value) this.value = c[k];
         });
       });
+    }
+    //default options for playing against ps-bots
+    if (vsPSBot) {
+      $timeModeSelect.val('1');
+      $timeInput.val('3');
+      $incrementInput.val('2');
+      $casual.trigger('click');
     }
 
     const showRating = () => {
@@ -343,6 +399,16 @@ export default class Setup {
         case '8':
           key = 'amazons';
           break;
+        case '11':
+          switch (variantId[1]) {
+            case '1':
+              key = 'breakthroughtroyka';
+              break;
+            case '2':
+              key = 'minibreakthroughtroyka';
+              break;
+          }
+          break;
         case '6':
           key = 'oware';
           break;
@@ -363,9 +429,16 @@ export default class Setup {
           }
           break;
         case '10':
-          key = 'backgammon';
+          switch (variantId[1]) {
+            case '1':
+              key = 'backgammon';
+              break;
+            case '2':
+              key = 'nackgammon';
+              break;
+          }
           break;
-        case '11':
+        case '12':
           key = 'abalone';
           break;
       }
@@ -378,7 +451,8 @@ export default class Setup {
     };
     const showStartingImages = () => {
       const variantId = ($variantSelect.val() as string).split('_');
-      const class_list = 'chess draughts loa shogi xiangqi flipello oware togyzkumalak amazons go backgammon abalone';
+      const class_list =
+        'chess draughts loa shogi xiangqi flipello oware togyzkumalak amazons go backgammon breakthroughtroyka abalone';
       let key = 'chess';
       switch (variantId[0]) {
         case '0':
@@ -415,7 +489,10 @@ export default class Setup {
           key = 'backgammon';
           break;
         case '11':
-          key = 'backgammon';
+          key = 'breakthroughtroyka';
+          break;
+        case '12':
+          key = 'abalone';
           break;
       }
       $form.find('.playerIndex-submits').removeClass(class_list);
@@ -433,7 +510,7 @@ export default class Setup {
       $periodsInput.eq(0).trigger('click');
     };
 
-    const isRealTime = () => $timeModeSelect.val() === '1' || $timeModeSelect.val() == '3';
+    const isRealTime = () => this.ratedTimeModes.indexOf(<string>$timeModeSelect.val()) !== -1;
 
     if (typ === 'hook') {
       if ($form.data('anon')) {
@@ -510,7 +587,7 @@ export default class Setup {
             self.sliderInitVal(
               parseFloat($input.val() as string),
               isTimeSlider ? self.sliderTime : self.sliderIncrement,
-              100
+              100,
             ),
         });
         $range.on('input', () => {
@@ -559,25 +636,27 @@ export default class Setup {
           save();
         });
       });
-      $goHandicapInput.each(function (this: HTMLInputElement) {
-        const $input = $(this),
-          $value = $input.siblings('span'),
-          $range = $input.siblings('.range');
-        $value.text($input.val() as string);
-        $range.attr({
-          min: '0',
-          max: '9',
-          value: '' + self.sliderInitVal(parseInt($input.val() as string), self.sliderIncrement, 10),
-        });
-        $range.on('input', () => {
-          const goHandicap = self.sliderIncrement(parseInt($range.val() as string));
-          $value.text('' + goHandicap);
-          $input.val('' + goHandicap);
-          save();
-          clearFenInput();
-          toggleButtons();
-        });
+    }
+    $goHandicapInput.each(function (this: HTMLInputElement) {
+      const $input = $(this),
+        $value = $input.siblings('span'),
+        $range = $input.siblings('.range');
+      $value.text($input.val() as string);
+      $range.attr({
+        min: '0',
+        max: '25',
+        value: '' + self.sliderInitVal(parseInt($input.val() as string), self.sliderHandicap, 26),
       });
+      $range.on('input', () => {
+        const goHandicap = self.sliderHandicap(parseInt($range.val() as string));
+        $value.text('' + goHandicap);
+        $input.val('' + goHandicap);
+        save();
+        clearFenInput();
+        toggleButtons();
+      });
+    });
+    const setupGoKomiInput = () => {
       $goKomiInput.each(function (this: HTMLInputElement) {
         const $input = $(this),
           $value = $input.siblings('span'),
@@ -585,15 +664,25 @@ export default class Setup {
           showKomi = (v: number) => {
             return ('' + v / 10.0).replace('.0', '');
           },
-          show = (komi: number) => $value.text(showKomi(komi));
-        show(parseInt($input.val() as string));
+          show = (komi: number) => $value.text(showKomi(komi)),
+          variantId = ($variantSelect.val() as string).split('_'),
+          boardsize = variantId[1] == '1' ? 9 : variantId[1] == '2' ? 13 : 19,
+          defaultValue = boardsize === 9 ? 55 : 75,
+          initialValue =
+            Math.abs(parseInt($input.val() as string)) > boardsize * boardsize * 10
+              ? defaultValue
+              : parseInt($input.val() as string);
+        if (initialValue === defaultValue) $input.val(defaultValue.toString());
+        show(initialValue);
         $range.attr({
           min: '0',
-          max: '40',
-          value: '' + self.sliderInitVal(parseInt($input.val() as string), self.sliderKomi, 40),
+          max: (boardsize * boardsize * 2 * 2).toString(),
+          value: '' + self.sliderInitVal(initialValue, self.sliderKomi(boardsize), boardsize * boardsize * 2 * 2),
         });
+        $range.val('' + self.sliderInitVal(initialValue, self.sliderKomi(boardsize), boardsize * boardsize * 2 * 2));
+        save();
         $range.on('input', () => {
-          const goKomi = self.sliderKomi(parseInt($range.val() as string));
+          const goKomi = self.sliderKomi(boardsize)(parseInt($range.val() as string));
           show(goKomi);
           $input.val('' + goKomi);
           save();
@@ -601,49 +690,52 @@ export default class Setup {
           toggleButtons();
         });
       });
-      $form.find('.rating-range').each(function (this: HTMLDivElement) {
-        const $this = $(this),
-          $minInput = $this.find('.rating-range__min'),
-          $maxInput = $this.find('.rating-range__max'),
-          minStorage = self.makeStorage('lobby.ratingRange.min'),
-          maxStorage = self.makeStorage('lobby.ratingRange.max'),
-          update = (e?: Event) => {
-            const min = $minInput.val() as string,
-              max = $maxInput.val() as string;
-            minStorage.set(min);
-            maxStorage.set(max);
-            $this.find('.rating-min').text(`-${min.replace('-', '')}`);
-            $this.find('.rating-max').text(`+${max}`);
-            if (e) save();
-          };
+    };
+    setupGoKomiInput();
+    $form.find('.rating-range').each(function (this: HTMLDivElement) {
+      const $this = $(this),
+        $minInput = $this.find('.rating-range__min'),
+        $maxInput = $this.find('.rating-range__max'),
+        minStorage = self.makeStorage('lobby.ratingRange.min'),
+        maxStorage = self.makeStorage('lobby.ratingRange.max'),
+        update = (e?: Event) => {
+          const min = $minInput.val() as string,
+            max = $maxInput.val() as string;
+          minStorage.set(min);
+          maxStorage.set(max);
+          $this.find('.rating-min').text(`-${min.replace('-', '')}`);
+          $this.find('.rating-max').text(`+${max}`);
+          if (e) save();
+        };
 
-        $minInput
-          .attr({
-            min: '-1000',
-            max: '0',
-            step: '100',
-            value: minStorage.get() || '-1000',
-          })
-          .on('input', update);
+      $minInput
+        .attr({
+          min: '-1000',
+          max: '0',
+          step: '100',
+          value: minStorage.get() || '-1000',
+        })
+        .on('input', update);
 
-        $maxInput
-          .attr({
-            min: '0',
-            max: '1000',
-            step: '100',
-            value: maxStorage.get() || '1000',
-          })
-          .on('input', update);
+      $maxInput
+        .attr({
+          min: '0',
+          max: '1000',
+          step: '100',
+          value: maxStorage.get() || '1000',
+        })
+        .on('input', update);
 
-        update();
-      });
-    }
+      update();
+    });
     $timeModeSelect
       .on('change', function (this: HTMLElement) {
         const timeMode = $(this).val();
         const isFischer = timeMode === '1';
         const isByoyomi = timeMode === '3';
-        $form.find('.time_choice, .increment_choice').toggle(isFischer || isByoyomi);
+        const isBronstein = timeMode === '4';
+        const isSimple = timeMode === '5';
+        $form.find('.time_choice, .increment_choice').toggle(isFischer || isByoyomi || isBronstein || isSimple);
         $form.find('.days_choice').toggle(timeMode === '2');
         $form.find('.byoyomi_choice, .byoyomi_periods').toggle(isByoyomi);
         toggleButtons();
@@ -674,7 +766,7 @@ export default class Setup {
             $fenPosition.find('.preview').html('');
             $submits.addClass('nope');
             fenOk = false;
-          }
+          },
         );
       }
     }, 200);
@@ -715,11 +807,15 @@ export default class Setup {
         }
         showRating();
         showStartingImages();
+        if (variantId[0] == '9') setupGoKomiInput();
         toggleButtons();
       })
       .trigger('change');
 
-    $modeChoices.on('change', save);
+    $modeChoices.on('change', () => {
+      toggleButtons();
+      save();
+    });
 
     $advancedTimeToggle.on('click', function (this: HTMLElement) {
       if ($advancedTimeToggle.hasClass('active')) {

@@ -53,11 +53,13 @@ object show {
       openGraph = lila.app.ui
         .OpenGraph(
           title = s"${tour.name()}: ${VariantKeys
-            .variantName(tour.variant)} ${tour.clock.show} ${tour.mode.name} #${tour.id}",
+            .variantName(tour.variant)} ${tour.clock.show} ${if (tour.handicapped) trans.handicapped.txt()
+          else tour.mode.name} #${tour.id}",
           url = s"$netBaseUrl${routes.Tournament.show(tour.id).url}",
           description =
             s"${tour.nbPlayers} players compete in the ${showEnglishDate(tour.startsAt)} ${tour.name()}. " +
-              s"${tour.clock.show} ${tour.mode.name} games are played during ${tour.minutes} minutes. " +
+              s"${tour.clock.show} ${if (tour.handicapped) trans.handicapped.txt()
+              else tour.mode.name} games are played during ${tour.minutes} minutes. " +
               tour.winnerId.fold("Winner is not yet decided.") { winnerId =>
                 s"${usernameOrId(winnerId)} takes the prize home!"
               }
@@ -73,7 +75,7 @@ object show {
         ),
         div(cls := "tour__main")(div(cls := "box")),
         tour.isCreated option div(cls := "tour__faq")(
-          faq(tour.mode.rated.some, tour.isPrivate.option(tour.id))
+          faq(tour.mode.rated.some, tour.handicapped, tour.isPrivate.option(tour.id))
         )
       )
     )

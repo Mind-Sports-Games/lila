@@ -14,6 +14,7 @@ sealed trait RootOrNode {
   //TODO multiaction will want turnCount, but atm Study won't be for multiaction variants.
   //Will need to think what is stored here. Presumably turnCount is of the actual node (ply) and not the turnCount after this ply has been applied?
   //val turnCount: Int
+  val variant: Variant
   val fen: FEN
   val check: Boolean
   val shapes: Shapes
@@ -39,6 +40,7 @@ case class Node(
     id: UciCharPair,
     ply: Int,
     //turnCount: Int,
+    variant: Variant,
     move: Uci.WithSan,
     fen: FEN,
     check: Boolean,
@@ -116,7 +118,7 @@ case class Node(
 
 object Node {
 
-  val MAX_PLIES = 400
+  val maxPlies = 1000 // keep in sync with maxPlies (modules/game/src/main/Game.scala)
 
   case class Children(nodes: Vector[Node]) extends AnyVal {
 
@@ -243,6 +245,7 @@ object Node {
   case class Root(
       ply: Int,
       //turnCount: Int,
+      variant: Variant,
       fen: FEN,
       check: Boolean,
       shapes: Shapes = Shapes(Nil),
@@ -336,6 +339,7 @@ object Node {
     def default(variant: Variant) =
       Root(
         ply = 0,
+        variant = variant,
         fen = variant.initialFen,
         check = false,
         clock = none,
@@ -346,6 +350,7 @@ object Node {
     def fromRoot(b: lila.tree.Root): Root =
       Root(
         ply = b.ply,
+        variant = b.variant,
         fen = b.fen,
         check = b.check,
         clock = b.clock,
@@ -358,6 +363,7 @@ object Node {
     Node(
       id = b.id,
       ply = b.ply,
+      variant = b.variant,
       move = b.move,
       fen = b.fen,
       check = b.check,
@@ -371,6 +377,7 @@ object Node {
     val ply = "p"
     //no longer used (was plysPerTurn)
     //val ppt            = "pt"
+    val variant        = "v"
     val uci            = "u"
     val san            = "s"
     val fen            = "f"
@@ -385,4 +392,4 @@ object Node {
     val forceVariation = "fv"
     val order          = "o"
   }
- }
+}

@@ -51,6 +51,8 @@ object topnav {
         div(role := "group")(
           a(href := routes.Page.variantHome)(trans.rulesVariants()),
           a(href := routes.Page.loneBookmark("medley"))(trans.medleyTournaments()),
+          a(href := routes.Page.loneBookmark("handicaps"))(trans.handicapTournaments()),
+          a(href := routes.Page.loneBookmark("clocks"))(trans.clockTypes()),
           ctx.noBot option frag(
             //a(href := routes.Learn.index)(trans.chessBasics()),
             //a(href := routes.Practice.index)(trans.practice()),
@@ -86,9 +88,9 @@ object topnav {
         div(role := "group")(
           a(href := routes.UserAnalysis.index)(s"${trans.analysis.txt()}"),
           //a(href := s"${routes.UserAnalysis.index}#explorer")(trans.openingExplorer()),
-          a(href := routes.Editor.index)(s"Chess ${trans.boardEditor.txt()}"),
+          a(href := routes.Editor.index)(s"Chess ${trans.boardEditor.txt()}")
           //a(href := routes.Importer.importGame)(trans.importGame()),
-          a(href := routes.Search.index())(trans.search.advancedSearch())
+          //a(href := routes.Search.index())(trans.search.advancedSearch())
         )
       )
     )

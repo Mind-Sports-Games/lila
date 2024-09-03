@@ -29,7 +29,11 @@ object side {
         st.section(dataIcon := (tour.iconChar.toString))(
           div(
             p(
-              tour.clock.show,
+              a(
+                title := "Clock info",
+                href := s"${routes.Page.loneBookmark("clocks")}",
+                target := "_blank"
+              )(tour.clock.show),
               separator,
               if (tour.isMedley) {
                 views.html.game.bits.medleyLink
@@ -45,7 +49,11 @@ object side {
               separator,
               tour.durationString
             ),
-            tour.mode.fold(trans.casualTournament, trans.ratedTournament)(),
+            if (tour.handicapped)
+              a(href := routes.Page.loneBookmark("handicaps"), target := "_blank")(
+                trans.handicappedTournament()
+              )
+            else tour.mode.fold(trans.casualTournament, trans.ratedTournament)(),
             separator,
             "Arena",
             (isGranted(_.ManageTournament) || (ctx.userId
@@ -106,22 +114,33 @@ object side {
             }
           )
         ),
+        (!tour.noBerserk && tour.clock.berserkable) option div(cls := "text", dataIcon := "`")(
+          "Berserk Clock: ",
+          a(
+            title := "Clock info",
+            href := s"${routes.Page.loneBookmark("clocks")}",
+            target := "_blank"
+          )(tour.clock.showBerserk)
+        ),
         tour.noBerserk option div(cls := "text", dataIcon := "`")("No Berserk allowed"),
         tour.noStreak option div(cls := "text", dataIcon := "Q")("No Arena streaks"),
+        tour.statusScoring option div(cls := "text", dataIcon := "g")(
+          "Extra points: +1 Gammon, +2 Backgammon."
+        ),
         !tour.isFinished option tour.trophy1st.map { trophy1st =>
           table(cls := "trophyPreview")(
             tr(
               td(
-                img(cls := "customTrophy", src := assetUrl(s"images/trophy/${trophy1st}.png"))
+                img(cls := "customTrophy", src := staticAssetUrl(s"images/trophy/${trophy1st}.png"))
               ),
               tour.trophy2nd.map { trophy2nd =>
                 td(
-                  img(cls := "customTrophy", src := assetUrl(s"images/trophy/${trophy2nd}.png"))
+                  img(cls := "customTrophy", src := staticAssetUrl(s"images/trophy/${trophy2nd}.png"))
                 )
               },
               tour.trophy3rd.map { trophy3rd =>
                 td(
-                  img(cls := "customTrophy", src := assetUrl(s"images/trophy/${trophy3rd}.png"))
+                  img(cls := "customTrophy", src := staticAssetUrl(s"images/trophy/${trophy3rd}.png"))
                 )
               }
             ),

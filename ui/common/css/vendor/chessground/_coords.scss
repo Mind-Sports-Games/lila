@@ -93,7 +93,9 @@ coords {
 
   //Handle togy corrds as they are always inside the board
   .variant-togyzkumalak & {
-    text-shadow: 0.5px -1px 0px rgba(0, 0, 0, 0.25), -0.5px 1px 0px rgba(255, 255, 255, 0.6);
+    text-shadow:
+      0.5px -1px 0px rgba(0, 0, 0, 0.25),
+      -0.5px 1px 0px rgba(255, 255, 255, 0.6);
     .togyzkumalak-wood & coord {
       color: #000000 !important;
     }
@@ -127,6 +129,65 @@ coords {
       text-align: center;
     }
   }
+
+  .variant-nackgammon &,
+  .variant-backgammon & {
+    text-shadow:
+      0.5px -1px 0px rgba(0, 0, 0, 0.25),
+      -0.5px 1px 0px rgba(255, 255, 255, 0.6);
+    .backgammon-classic & coord {
+      color: #edc966 !important;
+      padding-left: 0px;
+    }
+    .backgammon-contemporary & coord {
+      color: #0a8299 !important;
+      padding-left: 0px;
+    }
+    coord {
+      flex: 1 1;
+    }
+  }
+
+  .variant-nackgammon .orientation-p1 &.files,
+  .variant-backgammon .orientation-p1 &.files {
+    &.p1 {
+      left: 0;
+      padding-left: 6.66%;
+      padding-right: 6.66%;
+      bottom: 1.4em;
+      text-align: center;
+      flex-flow: row;
+    }
+    &.p2 {
+      left: 0;
+      padding-left: 6.66%;
+      padding-right: 6.66%;
+      top: 1.4em;
+      text-align: center;
+      flex-flow: row;
+    }
+  }
+
+  .variant-nackgammon .orientation-p1vflip &.files,
+  .variant-backgammon .orientation-p1vflip &.files {
+    &.p1 {
+      left: 0;
+      padding-left: 6.66%;
+      padding-right: 6.66%;
+      top: 1.4em;
+      text-align: center;
+      flex-flow: row;
+    }
+    &.p2 {
+      left: 0;
+      padding-left: 6.66%;
+      padding-right: 6.66%;
+      bottom: 1.4em;
+      text-align: center;
+      flex-flow: row;
+    }
+  }
+
   @each $variant in $go-variants {
     .variant-#{$variant} &.files {
       &.p1,
@@ -193,6 +254,14 @@ coords {
     display: none;
   }
 
+  .coords-out .variant-backgammon coords {
+    display: none;
+  }
+
+  .coords-out .variant-nackgammon coords {
+    display: none;
+  }
+
   .coords-out .variant-togyzkumalak coords {
     display: none;
   }
@@ -218,6 +287,81 @@ coords {
     }
     &.p2 {
       bottom: 3px;
+    }
+  }
+
+  //always show for backgammon single column and make smaller
+  .variant-nackgammon .orientation-p1 coords.files,
+  .variant-backgammon .orientation-p1 coords.files {
+    &.p1 {
+      bottom: 0.7em;
+    }
+    &.p2 {
+      top: 0.7em;
+    }
+  }
+  .variant-nackgammon .orientation-p1vflip coords.files,
+  .variant-backgammon .orientation-p1vflip coords.files {
+    &.p1 {
+      top: 0.7em;
+    }
+    &.p2 {
+      bottom: 0.7em;
+    }
+  }
+}
+
+@include breakpoint($mq-landscape-mobile) {
+  .coords-out coords {
+    &.ranks {
+      right: -10px !important;
+    }
+  }
+
+  //dont show xiangqi coords
+  .coords-out .variant-xiangqi coords {
+    display: none;
+  }
+
+  .coords-out .variant-minixiangqi coords {
+    display: none;
+  }
+
+  //always show for Togy and make smaller
+  .variant-togyzkumalak .orientation-p1 coords.files {
+    &.p1 {
+      bottom: 1px;
+    }
+    &.p2 {
+      top: 2px;
+    }
+  }
+  .variant-togyzkumalak .orientation-p2 coords.files {
+    &.p1 {
+      top: 2px;
+    }
+    &.p2 {
+      bottom: 1px;
+    }
+  }
+
+  //always show for backgammon single column and make smaller
+  .variant-nackgammon .orientation-p1 coords.files,
+  .variant-backgammon .orientation-p1 coords.files {
+    &.p1 {
+      bottom: 0.4em;
+    }
+    &.p2 {
+      top: 0.4em;
+    }
+  }
+  .variant-nackgammon .orientation-p1vflip coords.files,
+  .variant-backgammon .orientation-p1vflip coords.files {
+    &.p1 {
+      top: 0.4em;
+    }
+    &.p2 {
+      bottom: 0.4em;
     }
   }
 }
@@ -292,7 +436,7 @@ coords {
   }
 
   @each $variant in $go-variants {
-    .coords-out .variant-#{$variant} &.ranks {
+    .coords-out .variant-#{$variant} .ranks {
       &.p1,
       &.p2 {
         top: -4px;

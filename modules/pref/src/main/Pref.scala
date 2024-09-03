@@ -6,6 +6,7 @@ case class Pref(
     _id: String, // user id
     bg: Int,
     bgImg: Option[String],
+    color: Int,
     is3d: Boolean,
     theme: List[Theme],
     pieceSet: List[PieceSet],
@@ -38,6 +39,7 @@ case class Pref(
     submitMove: Int,
     confirmResign: Int,
     confirmPass: Int,
+    playForcedAction: Int,
     insightShare: Int,
     keyboardMove: Int,
     zen: Int,
@@ -73,6 +75,7 @@ case class Pref(
       case "bgImg" => copy(bgImg = value.some).some
       // case "theme" =>
       //    copy(theme = Theme.updateBoardTheme(theme, value)).some
+      case "color" => Pref.Color.fromString.get(value).map { c => copy(color = c) }
       case "pieceSet" =>
         copy(pieceSet = PieceSet.updatePieceSet(pieceSet, value)).some
       case "theme3d" =>
@@ -171,6 +174,37 @@ object Pref {
     val asString = fromString.map(_.swap)
   }
 
+  object Color {
+    val ORIGINAL = 100
+    val BLACK    = 200
+    val RED      = 300
+    val BLUE     = 400
+    val GREEN    = 500
+    val YELLOW   = 600
+
+    val default = "blue"
+
+    val choices = Seq(
+      ORIGINAL -> "Original",
+      BLACK    -> "Black",
+      RED      -> "Red",
+      BLUE     -> "Blue",
+      GREEN    -> "Green",
+      YELLOW   -> "Yellow"
+    )
+
+    val fromString = Map(
+      "original" -> ORIGINAL,
+      "black"    -> BLACK,
+      "red"      -> RED,
+      "blue"     -> BLUE,
+      "green"    -> GREEN,
+      "yellow"   -> YELLOW
+    )
+
+    val asString = fromString.map(_.swap)
+  }
+
   object Tag {
     val dgt = "dgt"
   }
@@ -213,8 +247,9 @@ object Pref {
     )
   }
 
-  object ConfirmResign extends BooleanPref
-  object ConfirmPass   extends BooleanPref
+  object ConfirmResign    extends BooleanPref
+  object ConfirmPass      extends BooleanPref
+  object PlayForcedAction extends BooleanPref
 
   object InsightShare {
     val NOBODY    = 0
@@ -452,6 +487,7 @@ object Pref {
     _id = "",
     bg = Bg.LIGHT,
     bgImg = none,
+    color = Color.BLUE,
     is3d = false,
     theme = Theme.defaults,
     pieceSet = PieceSet.defaults,
@@ -484,6 +520,7 @@ object Pref {
     submitMove = SubmitMove.CORRESPONDENCE_ONLY,
     confirmResign = ConfirmResign.YES,
     confirmPass = ConfirmPass.YES,
+    playForcedAction = PlayForcedAction.YES,
     insightShare = InsightShare.FRIENDS,
     keyboardMove = KeyboardMove.NO,
     zen = Zen.NO,

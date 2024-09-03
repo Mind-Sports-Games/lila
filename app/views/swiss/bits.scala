@@ -56,7 +56,9 @@ object bits {
                   " • ",
                   if (s.variant.exotic) VariantKeys.variantName(s.variant) else s.perfType.trans,
                   " • ",
-                  if (s.settings.rated) trans.ratedTournament() else trans.casualTournament(),
+                  if (s.settings.handicapped) trans.handicappedTournament()
+                  else if (s.settings.rated) trans.ratedTournament()
+                  else trans.casualTournament(),
                   " • ",
                   s.estimatedDurationString
                 )
@@ -82,6 +84,13 @@ object bits {
           else pluralize("minute", s.settings.intervalSeconds / 60),
           " between rounds"
         )
+    }
+
+  def showHalfwayBreak(s: Swiss): Frag =
+    s.settings.dailyInterval match {
+      case Some(_)                         => frag("")
+      case None if s.settings.manualRounds => frag("")
+      case None                            => s.settings.halfwayBreakText.fold(frag(""))(t => frag(t))
     }
 
   def medleyGames(
