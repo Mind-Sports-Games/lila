@@ -207,7 +207,7 @@ final class Team(
     Auth { implicit ctx => me =>
       LimitPerWeek(me) {
         forms.anyCaptcha map { captcha =>
-          Ok(html.team.form.create(forms.create, captcha))
+          Ok(html.team.form.create(forms.create(), captcha))
         }
       }
     }
@@ -219,7 +219,7 @@ final class Team(
         else
           LimitPerWeek(me) {
             implicit val req = ctx.body
-            forms.create
+            forms.create()
               .bindFromRequest()
               .fold(
                 err =>
