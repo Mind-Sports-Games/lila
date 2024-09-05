@@ -64,4 +64,35 @@ class LameNameTest extends Specification {
       test("TheGMBRianMatthews") must beFalse
     }
   }
+
+  def teamTest = LameName.team _
+  "disallow" should {
+    "impersonating us" in {
+      teamTest("PlayStrategy") must beTrue
+      teamTest("playstrategy oware") must beTrue
+      teamTest("plouf playstrategy oware") must beTrue
+      teamTest("plouf_playstrategy_oware") must beTrue
+      teamTest("test_mindsportsolympiad_chess") must beTrue
+      teamTest("hipbackgammonhubhup") must beTrue
+      teamTest("miniadminia warum nicht") must beTrue
+
+      // these below are FALSE
+      // teamTest("P1ayStrategy") must beTrue // with a 1 instead of a l
+      // teamTest("Play-Strategy") must beTrue
+      // teamTest("P_L_A_Y_S_T_R_A_T_E_G_Y") must beTrue
+      // teamTest("P1ay-Strategy") must beTrue
+    }
+    "gross" in {
+      teamTest("Play fuck") must beTrue
+      teamTest("abifuuuuuckster") must beTrue
+    }
+  }
+  "allow" should {
+    "good stuff" in {
+      teamTest("champion") must beFalse
+      teamTest("oware") must beFalse
+      teamTest("chess") must beFalse
+      teamTest("paystrategy") must beFalse
+    }
+  }
 }
