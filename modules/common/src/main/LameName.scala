@@ -10,6 +10,9 @@ object LameName {
 
   def tournament(name: String): Boolean = tournamentRegex find name
 
+  def team(name: String): Boolean =
+    teamRegex.find(name.replaceIf('_', "")) || containsUsAnywhereRegex.matches(name)
+
   private val titlePattern = "W*(?:[NCFI1L]|I?G)"
   private val containsTitleRegex = (
     "^"
@@ -98,7 +101,15 @@ object LameName {
 
   private val tournamentRegex = lameWords(baseWords)
 
+  private val teamRegex = lameWords(baseWords)
+
   private val containsUsRegex = lameWords(organisations, ".*")
+
+  private val containsUsAnywhereRegex = (
+    "^"
+      + organisations.map("(?i:.*" + _.toString + ".*)?").mkString("|")
+      + "$"
+  ).r
 
   private def lameWords(list: List[String], interspersed: String = "+"): Regex = {
     val extras = Map(
