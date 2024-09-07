@@ -43,9 +43,7 @@ sealed trait Node {
   def moveOption: Option[Uci.WithSan]
 
   // who's playerIndex plays next
-  // This was inherited from lichess but is the right?
-  // Should the node track who played on this node?
-  def playerIndex = PlayerIndex.fromTurnCount(turnCount)
+  def playerIndex = fen.player.getOrElse(PlayerIndex.P1)
 
   def mainlineNodeList: List[Node] =
     dropFirstChild :: children.headOption.fold(List.empty[Node])(_.mainlineNodeList)
