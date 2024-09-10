@@ -74,6 +74,8 @@ export const initWith = (node: HTMLElement, fen: string, orientation: Orientatio
                         ? { width: 6, height: 2 }
                         : $el.hasClass('variant-togyzkumalak')
                           ? { width: 9, height: 2 }
+                        : $el.hasClass('variant-bestemshe')
+                          ? { width: 5, height: 2 }
                           : $el.hasClass('variant-go9x9')
                             ? { width: 9, height: 9 }
                             : $el.hasClass('variant-go13x13')
@@ -110,6 +112,8 @@ export const variantFromElement = (element: Cash): string => {
                 ? 'oware'
                 : element.hasClass('variant-togyzkumalak')
                   ? 'togyzkumalak'
+                : element.hasClass('variant-bestemshe')
+                  ? 'bestemshe'
                   : element.hasClass('variant-go9x9')
                     ? 'go9x9'
                     : element.hasClass('variant-go13x13')

@@ -59,7 +59,7 @@ export function makeConfig(ctrl: AnalyseCtrl): CgConfig {
     orientation: ctrl.getOrientation(),
     myPlayerIndex: ctrl.data.player.playerIndex,
     coordinates: pref.coords !== Prefs.Coords.Hidden && !ctrl.embed,
-    boardScores: d.game.variant.key == 'togyzkumalak',
+    boardScores: d.game.variant.key == 'togyzkumalak' || d.game.variant.key == 'bestemshe',
     addPieceZIndex: pref.is3d,
     viewOnly: !!ctrl.embed,
     movable: {
@@ -110,7 +110,7 @@ export function makeConfig(ctrl: AnalyseCtrl): CgConfig {
                     ? 'https://playstrategy.org/assets/piece/oware/' +
                       d.pref.pieceSet.filter(ps => ps.gameFamily === 'oware')[0].name +
                       '/'
-                    : cgVariantKey === 'togyzkumalak'
+                    : ctrl.data.game.gameFamily === 'togyzkumalak'
                       ? 'https://playstrategy.org/assets/piece/togyzkumalak/' +
                         d.pref.pieceSet.filter(ps => ps.gameFamily === 'togyzkumalak')[0].name +
                         '/'
@@ -156,7 +156,7 @@ export function makeConfig(ctrl: AnalyseCtrl): CgConfig {
     chess960: cgVariantKey == 'chess960',
     onlyDropsVariant: isOnlyDropsPly(ctrl.node, variantKey, d.onlyDropsVariant),
     singleClickMoveVariant:
-      cgVariantKey === 'togyzkumalak' ||
+      ctrl.data.game.gameFamily === 'togyzkumalak' ||
       (stratUtils.variantUsesMancalaNotation(d.game.variant.key) && d.pref.mancalaMove),
   };
   ctrl.study && ctrl.study.mutateCgConfig(config);

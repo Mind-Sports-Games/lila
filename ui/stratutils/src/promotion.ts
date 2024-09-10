@@ -40,6 +40,7 @@ export const possiblePromotion = (
   switch (variant) {
     case 'oware':
     case 'togyzkumalak':
+    case 'bestemshe':
     case 'minixiangqi':
     case 'xiangqi':
     case 'flipello10':

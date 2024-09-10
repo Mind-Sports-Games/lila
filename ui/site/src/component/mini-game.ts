@@ -85,6 +85,8 @@ export const init = (node: HTMLElement) => {
                         ? { width: 6, height: 2 }
                         : $el.hasClass('variant-togyzkumalak')
                           ? { width: 9, height: 2 }
+                        : $el.hasClass('variant-bestemshe')
+                          ? { width: 5, height: 2 }
                           : $el.hasClass('variant-go9x9')
                             ? { width: 9, height: 9 }
                             : $el.hasClass('variant-go13x13')

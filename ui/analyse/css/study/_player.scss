@@ -95,8 +95,17 @@ $player-height: 1.6rem;
     }
   }
 
+  @include breakpoint($mq-col2) {
+    .variant-bestemshe & {
+      &-top {
+        top: calc(#{-$player-height} - 5em);
+      }
+    }
+  }
+
   .variant-oware & .analyse__clock,
-  .variant-togyzkumalak & .analyse__clock {
+  .variant-togyzkumalak & .analyse__clock,
+  .variant-bestemshe & .analyse__clock {
     &.top {
       top: 0px;
     }

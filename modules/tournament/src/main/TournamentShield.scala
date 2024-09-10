@@ -852,6 +852,13 @@ object TournamentShield {
           26,
           1
         )
+    case object Bestemshe
+        extends Category(
+          Variant.Togyzkumalak(strategygames.togyzkumalak.variant.Bestemshe),
+          Blitz32,
+          10,
+          1
+        )
     case object Go9x9
         extends Category(
           Variant.Go(strategygames.go.variant.Go9x9),
@@ -924,6 +931,7 @@ object TournamentShield {
       MiniBreakthroughTroyka,
       Oware,
       Togyzkumalak,
+      Bestemshe,
       Go9x9,
       Go13x13,
       Go19x19,

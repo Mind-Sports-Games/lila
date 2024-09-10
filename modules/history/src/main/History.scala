@@ -40,6 +40,7 @@ case class History(
     minibreakthroughtroyka: RatingsMap,
     oware: RatingsMap,
     togyzkumalak: RatingsMap,
+    bestemshe: RatingsMap,
     go9x9: RatingsMap,
     go13x13: RatingsMap,
     go19x19: RatingsMap,
@@ -96,6 +97,7 @@ case class History(
       case "minibreakthroughtroyka" => minibreakthroughtroyka
       case "oware"                  => oware
       case "togyzkumalak"           => togyzkumalak
+      case "bestemshe"              => bestemshe
       case "go9x9"                  => go9x9
       case "go13x13"                => go13x13
       case "go19x19"                => go19x19
@@ -164,6 +166,7 @@ object History {
           minibreakthroughtroyka = ratingsMap("minibreakthroughtroyka"),
           oware = ratingsMap("oware"),
           togyzkumalak = ratingsMap("togyzkumalak"),
+          bestemshe = ratingsMap("bestemshe"),
           go9x9 = ratingsMap("go9x9"),
           go13x13 = ratingsMap("go13x13"),
           go19x19 = ratingsMap("go19x19"),

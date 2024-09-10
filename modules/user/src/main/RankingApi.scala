@@ -126,6 +126,7 @@ final class RankingApi(
       minibreakthroughtroyka <- topPerf(PerfType.orDefault("minibreakthroughtroyka").id, nb)
       oware                  <- topPerf(PerfType.orDefault("oware").id, nb)
       togyzkumalak           <- topPerf(PerfType.orDefault("togyzkumalak").id, nb)
+      bestemshe              <- topPerf(PerfType.orDefault("bestemshe").id, nb)
       go9x9                  <- topPerf(PerfType.orDefault("go9x9").id, nb)
       go13x13                <- topPerf(PerfType.orDefault("go13x13").id, nb)
       go19x19                <- topPerf(PerfType.orDefault("go19x19").id, nb)
@@ -171,6 +172,7 @@ final class RankingApi(
       minibreakthroughtroyka = minibreakthroughtroyka,
       oware = oware,
       togyzkumalak = togyzkumalak,
+      bestemshe = bestemshe,
       go9x9 = go9x9,
       go13x13 = go13x13,
       go19x19 = go19x19,

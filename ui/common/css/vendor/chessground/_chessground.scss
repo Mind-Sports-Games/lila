@@ -23,7 +23,8 @@ $togyzkumalak-margin-mini-game: 3.7%;
 
 //no background shadow for board as its has rounded corners.
 .variant-oware cg-board,
-.variant-togyzkumalak cg-board {
+.variant-togyzkumalak cg-board,
+.variant-bestemshe cg-board {
   box-shadow: none;
 }
 
@@ -41,6 +42,10 @@ $togyzkumalak-margin-mini-game: 3.7%;
   padding-bottom: calc(256 * 100% / 640);
   padding-top: calc(256 * 100% / 640);
   margin-bottom: calc(128 * 100% / 640);
+}
+.variant-bestemshe.is2d {
+  width: calc(100% * 48 / 49);
+  margin-left: calc(50% / 49);
 }
 
 //only add for fixed mini-games (active game below board), not the popup which create an <a>
@@ -77,6 +82,11 @@ span.mini-game.variant-togyzkumalak.is2d {
   width: calc(100% * 10 / 11);
   margin-right: calc(100% / 11);
 }
+.is2d .variant-bestemshe {
+  width: calc(100% * 48 / 49);
+  margin-right: calc(100% / 49);
+}
+
 
 //Squares
 .variant-shogi square {
@@ -116,6 +126,11 @@ span.mini-game.variant-togyzkumalak.is2d {
 
 .variant-togyzkumalak square {
   width: calc(100% / 9);
+  height: calc(100% / 2);
+}
+
+.variant-bestemshe square {
+  width: calc(100% / 5);
   height: calc(100% / 2);
 }
 
@@ -853,6 +868,33 @@ square {
   }
 }
 
+.variant-bestemshe {
+  piece {
+    width: calc(100% / 5);
+    height: calc(100% / 3);
+  }
+
+  .orientation-p2 piece,
+  &.orientation-p2 piece {
+    &.p2 {
+      margin-top: 5.15%;
+    }
+    &.p1 {
+      margin-top: 4.15%;
+    }
+  }
+
+  .orientation-p1 piece,
+  &.orientation-p1 piece {
+    &.p2 {
+      margin-top: 4.15%;
+    }
+    &.p1 {
+      margin-top: 5.15%;
+    }
+  }
+}
+
 .variant-go9x9 piece {
   width: calc(100% / 9);
   height: calc(100% / 9);
@@ -995,6 +1037,11 @@ piece {
   padding-bottom: calc(100% / 3.527);
 }
 
+.variant-bestemshe cg-helper {
+  width: calc(100% / 5);
+  padding-bottom: calc(100% / 6);
+}
+
 .variant-go9x9 cg-helper {
   width: calc(100% / 9);
   padding-bottom: calc(100% / 9);
@@ -1071,6 +1118,11 @@ cg-helper {
 
 .variant-togyzkumalak cg-container {
   width: calc(100% * 9);
+  height: calc(100% * 2);
+}
+
+.variant-bestemshe cg-container {
+  width: calc(100% * 5);
   height: calc(100% * 2);
 }
 
@@ -1195,6 +1247,10 @@ cg-container .cg-custom-svgs svg {
 
 .variant-xiangqi .analyse__board {
   padding-bottom: calc(640 * 100% / 576);
+}
+
+.variant-bestemshe .analyse__board {
+  padding-bottom: calc(49 * 100% / 48);
 }
 
 .variant-nackgammon,

@@ -64,12 +64,14 @@ body.oware-dark-wood .variant-oware .game-score {
   background-size: cover;
 }
 
-body.togyzkumalak-blue .variant-togyzkumalak .game-score {
+body.togyzkumalak-blue .variant-togyzkumalak .game-score,
+body.togyzkumalak-blue .variant-bestemshe .game-score {
   background: url(../images/board/togyzkumalak/togyzkumalak_blue_house.png);
   background-size: cover;
 }
 
-body.togyzkumalak-wood .variant-togyzkumalak .game-score {
+body.togyzkumalak-wood .variant-togyzkumalak .game-score,
+body.togyzkumalak-wood .variant-bestemshe .game-score {
   background: url(../images/board/togyzkumalak/togyzkumalak_wood_house.png);
   background-size: cover;
 }
@@ -221,18 +223,21 @@ $pocket-height-oware: 14vh;
 }
 
 $pocket-height-togy: 14vh;
-.analyse.variant-togyzkumalak {
+.analyse.variant-togyzkumalak,
+.analyse.variant-bestemshe {
   grid-template-rows: $pocket-height-togy auto calc(#{$pocket-height-togy} - 3rem) 3rem;
   grid-template-areas: 'pocket-top tools' 'board tools' 'pocket-bot tools' 'pocket-bot controls';
   grid-template-columns: minmax(150px, calc(59vw - 2.5rem)) minmax(150px, 1fr);
 }
 
-.variant-togyzkumalak .analyse__board {
+.variant-togyzkumalak .analyse__board,
+.variant-bestemshe .analyse__board {
   margin-top: -43%;
   margin-bottom: 0px;
 }
 
-.variant-togyzkumalak .game-score {
+.variant-togyzkumalak .game-score,
+.variant-bestemshe .game-score {
   @extend %box-radius;
   display: block;
   width: calc(#{$pocket-height-togy} * 4);
@@ -272,7 +277,8 @@ $pocket-height-togy: 14vh;
   }
 }
 
-.variant-togyzkumalak .game-score::after {
+.variant-togyzkumalak .game-score::after,
+.variant-bestemshe .game-score::after {
   @extend %active, %box-radius;
 
   content: attr(data-score);
@@ -334,7 +340,8 @@ $pocket-height-togy: 14vh;
 }
 
 //just for oware and togy due to different score layout and board size
-.variant-togyzkumalak .game-score-player-name {
+.variant-togyzkumalak .game-score-player-name,
+.variant-bestemshe .game-score-player-name {
   padding-left: calc(#{$pocket-height-togy} * 4 * 1.15);
   padding-top: 4vh;
   &.top {
@@ -358,7 +365,8 @@ $pocket-height-togy: 14vh;
 
 //taller than wider board (e.g. xiangqi) undo some css
 
-.analyse.variant-xiangqi {
+.analyse.variant-xiangqi,
+.analyse.variant-bestemshe {
   margin-right: unset;
   width: unset;
 

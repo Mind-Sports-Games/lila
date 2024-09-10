@@ -413,8 +413,14 @@ export default class Setup {
           key = 'oware';
           break;
         case '7':
-          key = 'togyzkumalak';
-          break;
+          switch (variantId[1]) {
+            case '1':
+              key = 'togyzkumalak';
+              break;
+            case '2':
+              key = 'bestemshe';
+              break;
+          }
         case '9':
           switch (variantId[1]) {
             case '1':

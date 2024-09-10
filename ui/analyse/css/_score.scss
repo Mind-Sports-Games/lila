@@ -5,9 +5,9 @@ $pocket-height: 7em;
 $pocket-height-mobile: 5em;
 $pocket-height-mobile-and-names: 7em;
 
-$score-variants: ('flipello', 'flipello10', 'oware', 'togyzkumalak', 'go9x9', 'go13x13', 'go19x19', 'backgammon');
+$score-variants: ('flipello', 'flipello10', 'oware', 'togyzkumalak', 'bestemshe', 'go9x9', 'go13x13', 'go19x19', 'backgammon', 'nackgammon');
 $score-variants-square: ('flipello', 'flipello10', 'go9x9', 'go13x13', 'go19x19'); //oware handled differently
-$score-variants-non-square: ('togyzkumalak', 'backgammon');
+$score-variants-non-square: ('togyzkumalak', 'bestemshe', 'backgammon', 'nackgammon');
 $go-variants: ('go9x9', 'go13x13', 'go19x19');
 
 .variant-flipello .game-score,
@@ -29,7 +29,8 @@ $go-variants: ('go9x9', 'go13x13', 'go19x19');
   }
 }
 
-.variant-togyzkumalak .game-score::after {
+.variant-togyzkumalak .game-score::after,
+.variant-bestemshe .game-score::after {
   @extend %active, %box-radius;
 
   content: attr(data-score);
@@ -71,12 +72,14 @@ body.oware-dark-wood .variant-oware .game-score {
   background-size: cover;
 }
 
-body.togyzkumalak-blue .variant-togyzkumalak .game-score {
+body.togyzkumalak-blue .variant-togyzkumalak .game-score,
+body.togyzkumalak-blue .variant-bestemshe .game-score {
   background: url(../images/board/togyzkumalak/togyzkumalak_blue_house.png);
   background-size: cover;
 }
 
-body.togyzkumalak-wood .variant-togyzkumalak .game-score {
+body.togyzkumalak-wood .variant-togyzkumalak .game-score,
+body.togyzkumalak-wood .variant-bestemshe .game-score {
   background: url(../images/board/togyzkumalak/togyzkumalak_wood_house.png);
   background-size: cover;
 }
@@ -269,7 +272,8 @@ body.backgammon-contemporary .variant-backgammon .game-score {
   }
 }
 
-.variant-togyzkumalak .game-score-player-name {
+.variant-togyzkumalak .game-score-player-name,
+.variant-bestemshe .game-score-player-name {
   &.top {
     grid-area: pocket-top;
     padding-left: 20em;
@@ -295,7 +299,8 @@ $non-sqaure-pocket-height-mobile: 9.5vw;
 $non-square-game-score-height-mobile: 13.5vw;
 $non-square-pocket-margin-top-mobile: 5vw;
 $non-square-game-score-height-mobile-and-names: 18.5vw;
-.variant-togyzkumalak .game-score {
+.variant-togyzkumalak .game-score,
+.variant-bestemshe .game-score {
   @extend %box-radius;
   display: block;
   width: 17.8em;
@@ -584,7 +589,8 @@ $backgammon-pocket-height: 6em;
   }
 }
 
-.analyse.has-players.variant-togyzkumalak {
+.analyse.has-players.variant-togyzkumalak,
+.analyse.has-players.variant-bestemshe {
   grid-template-rows: $non-square-game-score-height-mobile-and-names auto auto minmax(20em, 30vh);
   grid-template-areas: 'pocket-top' 'board' 'controls' 'tools' 'side' 'acpl' 'under' 'chat' 'uchat';
 
@@ -599,7 +605,8 @@ $backgammon-pocket-height: 6em;
   }
 }
 
-.analyse.variant-togyzkumalak {
+.analyse.variant-togyzkumalak,
+.analyse.variant-bestemshe {
   grid-template-rows: $non-square-game-score-height-mobile auto auto minmax(20em, 30vh);
   grid-template-areas: 'pocket-top' 'board' 'controls' 'tools' 'side' 'acpl' 'under' 'chat' 'uchat';
 
@@ -633,20 +640,23 @@ $backgammon-pocket-height: 6em;
 }
 
 @include breakpoint($mq-col2) {
-  .variant-togyzkumalak .analyse__board {
+  .variant-togyzkumalak .analyse__board,
+  .variant-bestemshe .analyse__board {
     padding-bottom: calc(365.555 * 100% / 640 - 6em);
     margin-top: calc(106.666 * 100% / 640);
     margin-bottom: calc(106.666 * 100% / 640 - 6em);
   }
 
-  .analyse.has-players.variant-togyzkumalak .analyse__board {
+  .analyse.has-players.variant-togyzkumalak .analyse__board,
+  .analyse.has-players.variant-bestemshe .analyse__board {
     padding-bottom: calc(365.555 * 100% / 640 - 5em);
     margin-top: calc(106.666 * 100% / 640);
     margin-bottom: calc(106.666 * 100% / 640 - 5em);
   }
 }
 
-.variant-togyzkumalak .analyse__board {
+.variant-togyzkumalak .analyse__board,
+.variant-bestemshe .analyse__board {
   padding-bottom: calc(365.555 * 100% / 640 - $pocket-height);
   margin-top: calc(106.666 * 100% / 640);
   margin-bottom: calc(106.666 * 100% / 640 - $pocket-height);

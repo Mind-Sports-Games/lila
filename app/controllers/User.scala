@@ -321,6 +321,7 @@ final class User(
                   "minibreakthroughtroyka" -> leaderboards.minibreakthroughtroyka,
                   "oware"                  -> leaderboards.oware,
                   "togyzkumalak"           -> leaderboards.togyzkumalak,
+                  "bestemshe"              -> leaderboards.bestemshe,
                   "go9x9"                  -> leaderboards.go9x9,
                   "go13x13"                -> leaderboards.go13x13,
                   "go19x19"                -> leaderboards.go19x19,

@@ -544,6 +544,9 @@ final private class TournamentScheduler(
       ),
       scheduleYearly24hr(Variant.Draughts(strategygames.draughts.variant.Brazilian), Blitz32)(
         new DateTime(2024, 10, 18, 0, 0)
+      ),
+      scheduleYearly24hr(Variant.Togyzkumalak(strategygames.togyzkumalak.variant.Bestemshe), Blitz32)(
+        new DateTime(2024, 10, 25, 0, 0)
       )
       //Fri 27th is the end of year medley
     ).flatten filter { _.schedule.at isAfter rightNow }

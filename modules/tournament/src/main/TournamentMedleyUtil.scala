@@ -90,6 +90,7 @@ object TournamentMedleyUtil {
       "minibreakthroughtroyka" -> fastest,
       "oware"                  -> slow,
       "togyzkumalak"           -> slow,
+      "bestemshe"              -> medium,
       "go9x9"                  -> medium,
       "go13x13"                -> slow,
       "go19x19"                -> slow,

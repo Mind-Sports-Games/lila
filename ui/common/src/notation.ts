@@ -371,6 +371,7 @@ function destPosGo(move: ExtendedMoveInfo): string {
 function mancalaNotation(move: ExtendedMoveInfo, variant: Variant): string {
   switch (variant.key) {
     case 'togyzkumalak':
+    case 'bestemshe':
       return togyzkumalakNotation(move, variant);
     default:
       return owareNotation(move, variant);
