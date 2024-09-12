@@ -223,15 +223,18 @@ $pocket-height-oware: 14vh;
 }
 
 $pocket-height-togy: 14vh;
-.analyse.variant-togyzkumalak,
-.analyse.variant-bestemshe {
+.analyse.variant-togyzkumalak {
   grid-template-rows: $pocket-height-togy auto calc(#{$pocket-height-togy} - 3rem) 3rem;
   grid-template-areas: 'pocket-top tools' 'board tools' 'pocket-bot tools' 'pocket-bot controls';
   grid-template-columns: minmax(150px, calc(59vw - 2.5rem)) minmax(150px, 1fr);
 }
 
-.variant-togyzkumalak .analyse__board,
-.variant-bestemshe .analyse__board {
+.analyse.variant-bestemshe {
+  grid-template-rows: $pocket-height-togy auto 3rem $pocket-height-togy;
+  grid-template-areas: 'board pocket-top' 'board tools' 'board controls' 'board pocket-bot';
+}
+
+.variant-togyzkumalak .analyse__board {
   margin-top: -43%;
   margin-bottom: 0px;
 }
@@ -275,6 +278,10 @@ $pocket-height-togy: 14vh;
   &-names {
     display: none;
   }
+}
+
+.variant-bestemshe .game-score {
+  margin-left: 20%;
 }
 
 .variant-togyzkumalak .game-score::after,
@@ -340,8 +347,7 @@ $pocket-height-togy: 14vh;
 }
 
 //just for oware and togy due to different score layout and board size
-.variant-togyzkumalak .game-score-player-name,
-.variant-bestemshe .game-score-player-name {
+.variant-togyzkumalak .game-score-player-name {
   padding-left: calc(#{$pocket-height-togy} * 4 * 1.15);
   padding-top: 4vh;
   &.top {

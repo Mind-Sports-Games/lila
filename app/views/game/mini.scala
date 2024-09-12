@@ -122,7 +122,7 @@ object mini {
         val fen   = Forsyth.>>(pov.game.variant.gameLogic, pov.game.situation)
         val score = if (pov.playerIndex.name == "p1") fen.player1Score else fen.player2Score
         "(" + score.toString() + ")"
-      case "togyzkumalak" =>
+      case "togyzkumalak" | "bestemshe" =>
         "(" + pov.game.history.score(pov.playerIndex).toString() + ")"
       case "go9x9" | "go13x13" | "go19x19" =>
         val fen   = Forsyth.>>(pov.game.variant.gameLogic, pov.game.situation)

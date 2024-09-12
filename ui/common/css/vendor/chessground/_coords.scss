@@ -91,6 +91,10 @@ coords {
     }
   }
 
+  .variant-bestemshe &.files {
+    font-size: 130%;
+  }
+
   //Handle togy corrds as they are always inside the board
   .variant-togyzkumalak &,
   .variant-bestemshe & {

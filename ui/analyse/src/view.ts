@@ -476,7 +476,7 @@ export default function (ctrl: AnalyseCtrl): VNode {
     clocks = !playerBars && renderClocks(ctrl),
     gaugeOn = ctrl.showEvalGauge(),
     variantKey = ctrl.data.game.variant.key,
-    needsUserNameWithScore = ['togyzkumalak', 'bestemshe', 'oware'].includes(variantKey),
+    needsUserNameWithScore = ['togyzkumalak', 'oware'].includes(variantKey),
     needsInnerCoords =
       ((!!gaugeOn || !!playerBars) &&
         !['xiangqi', 'shogi', 'minixiangqi', 'minishogi', 'oware'].includes(variantKey)) ||
