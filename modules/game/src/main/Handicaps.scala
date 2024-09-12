@@ -22,6 +22,23 @@ object Handicaps {
     }
   }
 
+  def startingFenMcMahon(variant: Option[Variant], scoreDiff: Int): Option[FEN] = {
+    variant.flatMap { v =>
+      v.gameFamily match {
+        case GameFamily.Go() => {
+          val goHandicap = calcGoMcMahonHandicap(v.toGo.boardSize.height, scoreDiff)
+          Some(
+            FEN(
+              v.gameLogic,
+              v.toGo.fenFromSetupConfig(goHandicap.stones, goHandicap.komi).value
+            )
+          )
+        }
+        case _ => None
+      }
+    }
+  }
+
   def playerInputRatings(inputPlayerRatingsInput: String): Map[String, Int] =
     inputPlayerRatingsInput.linesIterator.flatMap {
       _.trim.toLowerCase.split(' ').map(_.trim) match {
@@ -159,6 +176,37 @@ object Handicaps {
       case x if x > 601  => -29.0
       case x if x <= 601 => -30.0
       case _             => 0.0
+    }
+  }
+
+  private def calcGoMcMahonHandicap(size: Int, scoreDiff: Int): GoHandicap = {
+    size match {
+      case 9 =>
+        scoreDiff match {
+          case 0 => GoHandicap(55, 0)
+          case 1 => GoHandicap(55, 0)
+          case 2 => GoHandicap(0, 0)
+          case 3 => GoHandicap(55, 2)
+          case x if x % 3 == 1 => GoHandicap(35, ((x + 2) / 3))
+          case x if x % 3 == 2 => GoHandicap(15, ((x + 1) / 3))
+          case x if x % 3 == 0 => GoHandicap(55, ((x + 3) / 3))
+        }
+      case 13 =>
+        scoreDiff match {
+          case 0 => GoHandicap(75, 0)
+          case 1 => GoHandicap(75, 0)
+          case 2 => GoHandicap(0, 0)
+          case 3 => GoHandicap(75, 2)
+          case x if x % 2 == 0 => GoHandicap(35, (x / 2))
+          case x if x % 2 == 1 => GoHandicap(75, ((x + 1) / 2))
+        }
+      case 19 =>
+        scoreDiff match {
+          case 0 => GoHandicap(75, 0)
+          case 1 => GoHandicap(75, 0)
+          case 2 => GoHandicap(0, 0)
+          case _ => GoHandicap(75, scoreDiff - 1)
+        }
     }
   }
 }

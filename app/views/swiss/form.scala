@@ -190,7 +190,8 @@ final private class SwissFields(form: Form[_], swiss: Option[Swiss])(implicit ct
           trans.mcmahonDefinition.txt(),
           br,
           a(href := s"${routes.Swiss.home}#mcmahon", target := "_blank")("More detail here")
-        ).some
+        ).some,
+        disabled = disabledAfterStart
       ),
       st.input(
         tpe := "hidden",
@@ -205,7 +206,7 @@ final private class SwissFields(form: Form[_], swiss: Option[Swiss])(implicit ct
       klass = "mcmahonCutoff",
       half = true,
       help = trans.mcmahonCutoffDefinition().some
-    )(form3.input(_))
+    )(form3.input(_)(disabled := disabledAfterStart))
   def handicapped =
     frag(
       form3.checkbox(
@@ -216,7 +217,8 @@ final private class SwissFields(form: Form[_], swiss: Option[Swiss])(implicit ct
           trans.handicappedDefinition.txt(),
           br,
           a(href := routes.Page.loneBookmark("handicaps"), target := "_blank")("More detail here")
-        ).some
+        ).some,
+        disabled = disabledAfterStart
       ),
       st.input(
         tpe := "hidden",

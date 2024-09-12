@@ -155,7 +155,7 @@ export default function (ctrl: SwissCtrl): VNode | undefined {
                 ],
               );
             }
-            const res = result(p);
+            const res = result(p) + (p.of && ctrl.data.isMcMahon ? '(H)' : '');
             return h(
               'tr.glpt.' + (p.o ? 'ongoing' : p.w === true ? 'win' : p.w === false ? 'loss' : 'draw'),
               {

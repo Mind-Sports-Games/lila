@@ -99,6 +99,7 @@ export interface PairingBase {
   gpr: string; //nbGamesPerRound
   mp?: string; //match points for player if using matchScore
   vi?: string; //variant icon
+  of?: string; //opening fen
 }
 
 export interface Pairing extends PairingBase {
