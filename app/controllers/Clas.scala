@@ -334,6 +334,67 @@ final class Clas(
       }
     }
 
+  // @TODO pla-989-batch-creation-of-students
+  // def studentManyForm(id: String) =
+  //   Secure(_.Teacher) { implicit ctx => me =>
+  //     WithClassAndStudents(me, id) { (clas, students) =>
+  //       ctx.req.flash.get("created").?? {
+  //         _.split('/').toList
+  //           .flatMap {
+  //             _.split(' ') match {
+  //               case Array(u, p) => (u, p).some
+  //               case _           => none
+  //             }
+  //           }
+  //           .map { case (u, p) =>
+  //             env.clas.api.student
+  //               .get(clas, u)
+  //               .map2(lila.clas.Student.WithPassword(_, lila.user.User.ClearPassword(p)))
+  //           }
+  //           .sequenceFu
+  //           .map(_.flatten)
+  //       } flatMap { created =>
+  //         env.clas.api.student.count(clas.id) map { nbStudents =>
+  //           val form = env.clas.forms.student.manyCreate(lila.clas.Clas.maxStudents - nbStudents)
+  //           Ok(html.clas.student.manyForm(clas, students, form, nbStudents, created))
+  //         }
+  //       }
+  //     }
+  //   }
+
+  // @TODO pla-989-batch-creation-of-students
+  // def studentManyCreate(id: String) =
+  //   SecureBody(_.Teacher) { implicit ctx => me =>
+  //     NoTor {
+  //       Firewall {
+  //         SafeTeacher {
+  //           WithClassAndStudents(me, id) { (clas, students) =>
+  //             env.clas.api.student.count(clas.id) flatMap { nbStudents =>
+  //               env.clas.forms.student
+  //                 .manyCreate(lila.clas.Clas.maxStudents - nbStudents)
+  //                 .bindFromRequest()(ctx.body, formBinding)
+  //                 .fold(
+  //                   err => BadRequest(html.clas.student.manyForm(clas, students, err, nbStudents)).fuccess,
+  //                   data =>
+  //                     env.clas.api.student.manyCreate(clas, data, me.user) flatMap { many =>
+  //                       env.user.lightUserApi.preloadMany(many.map(_.student.userId)) inject
+  //                         Redirect(routes.Clas.studentManyForm(clas.id.value))
+  //                           .flashing(
+  //                             "created" -> many
+  //                               .map { s =>
+  //                                 s"${s.student.userId} ${s.password.value}"
+  //                               }
+  //                               .mkString("/")
+  //                           )
+  //                     }
+  //                 )
+  //             }
+  //           }
+  //         }
+  //       }
+  //     }
+  //   }
+
   def studentInvite(id: String) =
     SecureBody(_.Teacher) { implicit ctx => me =>
       WithClassAndStudents(me, id) { (clas, students) =>
