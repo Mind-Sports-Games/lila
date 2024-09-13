@@ -16,16 +16,6 @@ cg-board {
   }
 }
 
-$togyzkumalak-highlight-height: calc(104% / 3);
-$togyzkumalak-margin-top-same: 4.7%;
-$togyzkumalak-margin-top-opposite: 3.7%;
-$togyzkumalak-margin-mini-game: 3.7%;
-
-$bestemshe-highlight-height: calc(104% / 3);
-$bestemshe-margin-top-same: 8.5%;
-$bestemshe-margin-top-opposite: 6.7%;
-$bestemshe-margin-mini-game: 6.7%;
-
 //no background shadow for board as its has rounded corners.
 .variant-oware cg-board,
 .variant-togyzkumalak cg-board,
@@ -185,24 +175,32 @@ $alternate-board-highlights: (
 );
 $alternate-color: rgba(20, 30, 85, 0.5);
 
-$oware-light-board-highlights: (
-  'oware-light-wood': 'oware',
-);
-$oware-dark-board-highlights: (
-  'oware-dark-wood': 'oware',
+$oware-board-highlights: (
+  //board, variant, lastMove, selectedMove, solid, dashed
+  ('oware-light-wood', 'oware', 'dashed', 'solid', 'solid_darker', 'dashed_darker'),
+  ('oware-dark-wood', 'oware', 'dashed_lighter', 'solid_lighter', 'solid_lighter', 'dashed_lighter'),
 );
 
-$togyzkumalak-blue-board-highlights: (
-  'togyzkumalak-blue': 'togyzkumalak',
+$togyzkumalak-family-highlight-height: calc(104% / 3);
+$togyzkumalak-margin-top-same: 4.7%;
+$togyzkumalak-margin-top-opposite: 3.7%;
+$togyzkumalak-margin-mini-game: 3.7%;
+$bestemshe-margin-top-same: 8.5%;
+$bestemshe-margin-top-opposite: 6.7%;
+$bestemshe-margin-mini-game: 6.7%;
+
+$togyzkumalak-board-highlights: (
+  //board, variant, marker-suffix, margin-top-same, margin-top-opposite, margin-mini-game
+  ('togyzkumalak-blue', 'togyzkumalak', '', $togyzkumalak-margin-top-same, $togyzkumalak-margin-top-opposite, $togyzkumalak-margin-mini-game),
+  ('togyzkumalak-wood', 'togyzkumalak', '-wood', $togyzkumalak-margin-top-same, $togyzkumalak-margin-top-opposite, $togyzkumalak-margin-mini-game),
+  ('togyzkumalak-blue', 'bestemshe', '', $bestemshe-margin-top-same, $bestemshe-margin-top-opposite, $bestemshe-margin-mini-game),
+  ('togyzkumalak-wood', 'bestemshe', '-wood', $bestemshe-margin-top-same, $bestemshe-margin-top-opposite, $bestemshe-margin-mini-game),
 );
-$togyzkumalak-wood-board-highlights: (
-  'togyzkumalak-wood': 'togyzkumalak',
-);
-$bestemshe-blue-board-highlights: (
-  'togyzkumalak-blue': 'bestemshe',
-);
-$bestemshe-wood-board-highlights: (
-  'togyzkumalak-wood': 'bestemshe',
+
+$togyzkumalak-gf-board-highlights: (
+  //board, gf, marker-suffix
+  ('togyzkumalak-blue', 'togyzkumalak', ''),
+  ('togyzkumalak-wood', 'togyzkumalak', '-wood'),
 );
 
 square {
@@ -221,371 +219,96 @@ square {
       }
     }
 
-    @each $color, $gameFamily in $oware-light-board-highlights {
-      body.#{$color} .#{$gameFamily} & {
-        background: url(../images/board/oware/highlights/dashed.svg);
+    @each $board, $variant, $lastMove in $oware-board-highlights {
+      body.#{$board} .#{$variant} & {
+        background: url(../images/board/oware/highlights/#{$lastMove}.svg);
+        background-size: cover;
+      }
+      body.#{$board} .#{$variant} &.last-move.from {
+        background: url(../images/board/oware/highlights/#{$lastMove}.svg);
+        background-size: cover;
+      }
+      body.#{$board} .#{$variant} &.last-move.to {
+        background: url(../images/board/oware/highlights/#{$lastMove}.svg);
         background-size: cover;
       }
     }
 
-    @each $color, $gameFamily in $oware-dark-board-highlights {
-      body.#{$color} .#{$gameFamily} & {
-        background: url(../images/board/oware/highlights/dashed_lighter.svg);
-        background-size: cover;
-      }
-    }
-
-    @each $color, $gameFamily in $oware-light-board-highlights {
-      body.#{$color} .#{$gameFamily} &.last-move.from {
-        background: url(../images/board/oware/highlights/dashed.svg);
-        background-size: cover;
-      }
-    }
-
-    @each $color, $gameFamily in $oware-dark-board-highlights {
-      body.#{$color} .#{$gameFamily} &.last-move.from {
-        background: url(../images/board/oware/highlights/dashed_lighter.svg);
-        background-size: cover;
-      }
-    }
-
-    @each $color, $gameFamily in $oware-light-board-highlights {
-      body.#{$color} .#{$gameFamily} &.last-move.to {
-        background: url(../images/board/oware/highlights/dashed.svg);
-        background-size: cover;
-      }
-    }
-
-    @each $color, $gameFamily in $oware-dark-board-highlights {
-      body.#{$color} .#{$gameFamily} &.last-move.to {
-        background: url(../images/board/oware/highlights/dashed_lighter.svg);
-        background-size: cover;
-      }
-    }
-
-    @each $color, $variant in $togyzkumalak-blue-board-highlights {
+    @each $color, $variant, $marker-suffix, $margin-top-same, $margin-top-opposite in $togyzkumalak-board-highlights {
       body.#{$color} .variant-#{$variant} .orientation-p1 &,
       body.#{$color} .variant-#{$variant}.orientation-p1 & {
-        background: url(../images/board/togyzkumalak/highlights/marker-end.svg);
+        background: url(../images/board/togyzkumalak/highlights/marker-end#{$marker-suffix}.svg);
         background-size: cover;
-        height: $togyzkumalak-highlight-height;
+        height: $togyzkumalak-family-highlight-height;
         &.p2 {
-          margin-top: $togyzkumalak-margin-top-opposite;
+          margin-top: $margin-top-opposite;
         }
         &.p1 {
-          margin-top: $togyzkumalak-margin-top-same;
+          margin-top: $margin-top-same;
         }
       }
       body.#{$color} .variant-#{$variant} .orientation-p2 &,
       body.#{$color} .variant-#{$variant}.orientation-p2 & {
-        background: url(../images/board/togyzkumalak/highlights/marker-end.svg);
+        background: url(../images/board/togyzkumalak/highlights/marker-end#{$marker-suffix}.svg);
         background-size: cover;
-        height: $togyzkumalak-highlight-height;
+        height: $togyzkumalak-family-highlight-height;
         &.p2 {
-          margin-top: $togyzkumalak-margin-top-same;
+          margin-top: $margin-top-same;
         }
         &.p1 {
-          margin-top: $togyzkumalak-margin-top-opposite;
+          margin-top: $margin-top-opposite;
         }
       }
-    }
-
-    @each $color, $variant in $togyzkumalak-wood-board-highlights {
-      body.#{$color} .variant-#{$variant} .orientation-p1 &,
-      body.#{$color} .variant-#{$variant}.orientation-p1 & {
-        background: url(../images/board/togyzkumalak/highlights/marker-end-wood.svg);
-        background-size: cover;
-        height: $togyzkumalak-highlight-height;
-        &.p2 {
-          margin-top: $togyzkumalak-margin-top-opposite;
-        }
-        &.p1 {
-          margin-top: $togyzkumalak-margin-top-same;
-        }
-      }
-      body.#{$color} .variant-#{$variant} .orientation-p2 &,
-      body.#{$color} .variant-#{$variant}.orientation-p2 & {
-        background: url(../images/board/togyzkumalak/highlights/marker-end-wood.svg);
-        background-size: cover;
-        height: $togyzkumalak-highlight-height;
-        &.p2 {
-          margin-top: $togyzkumalak-margin-top-same;
-        }
-        &.p1 {
-          margin-top: $togyzkumalak-margin-top-opposite;
-        }
-      }
-    }
-
-    @each $color, $variant in $togyzkumalak-blue-board-highlights {
       body.#{$color} .variant-#{$variant} .orientation-p1 &.last-move.from,
       body.#{$color} .variant-#{$variant}.orientation-p1 &.last-move.from {
-        background: url(../images/board/togyzkumalak/highlights/marker-end.svg);
+        background: url(../images/board/togyzkumalak/highlights/marker-end#{$marker-suffix}.svg);
         background-size: cover;
-        height: $togyzkumalak-highlight-height;
+        height: $togyzkumalak-family-highlight-height;
         &.p2 {
-          margin-top: $togyzkumalak-margin-top-opposite;
+          margin-top: $margin-top-opposite;
         }
         &.p1 {
-          margin-top: $togyzkumalak-margin-top-same;
+          margin-top: $margin-top-same;
         }
       }
       body.#{$color} .variant-#{$variant} .orientation-p2 &.last-move.from,
       body.#{$color} .variant-#{$variant}.orientation-p2 &.last-move.from {
-        background: url(../images/board/togyzkumalak/highlights/marker-end.svg);
+        background: url(../images/board/togyzkumalak/highlights/marker-end#{$marker-suffix}.svg);
         background-size: cover;
-        height: $togyzkumalak-highlight-height;
+        height: $togyzkumalak-family-highlight-height;
         &.p2 {
-          margin-top: $togyzkumalak-margin-top-same;
+          margin-top: $margin-top-same;
         }
         &.p1 {
-          margin-top: $togyzkumalak-margin-top-opposite;
+          margin-top: $margin-top-opposite;
         }
       }
-    }
-
-    @each $color, $variant in $togyzkumalak-wood-board-highlights {
-      body.#{$color} .variant-#{$variant} .orientation-p1 &.last-move.from,
-      body.#{$color} .variant-#{$variant}.orientation-p1 &.last-move.from {
-        background: url(../images/board/togyzkumalak/highlights/marker-end-wood.svg);
-        background-size: cover;
-        height: $togyzkumalak-highlight-height;
-        &.p2 {
-          margin-top: $togyzkumalak-margin-top-opposite;
-        }
-        &.p1 {
-          margin-top: $togyzkumalak-margin-top-same;
-        }
-      }
-      body.#{$color} .variant-#{$variant} .orientation-p2 &.last-move.from,
-      body.#{$color} .variant-#{$variant}.orientation-p2 &.last-move.from {
-        background: url(../images/board/togyzkumalak/highlights/marker-end-wood.svg);
-        background-size: cover;
-        height: $togyzkumalak-highlight-height;
-        &.p2 {
-          margin-top: $togyzkumalak-margin-top-same;
-        }
-        &.p1 {
-          margin-top: $togyzkumalak-margin-top-opposite;
-        }
-      }
-    }
-
-    @each $color, $variant in $togyzkumalak-blue-board-highlights {
       body.#{$color} .variant-#{$variant} .orientation-p1 &.last-move.to,
       body.#{$color} .variant-#{$variant}.orientation-p1 &.last-move.to {
-        background: url(../images/board/togyzkumalak/highlights/marker-end.svg);
+        background: url(../images/board/togyzkumalak/highlights/marker-end#{$marker-suffix}.svg);
         background-size: cover;
-        height: $togyzkumalak-highlight-height;
+        height: $togyzkumalak-family-highlight-height;
         &.p2 {
-          margin-top: $togyzkumalak-margin-top-opposite;
+          margin-top: $margin-top-opposite;
         }
         &.p1 {
-          margin-top: $togyzkumalak-margin-top-same;
+          margin-top: $margin-top-same;
         }
       }
       body.#{$color} .variant-#{$variant} .orientation-p2 &.last-move.to,
       body.#{$color} .variant-#{$variant}.orientation-p2 &.last-move.to {
-        background: url(../images/board/togyzkumalak/highlights/marker-end.svg);
+        background: url(../images/board/togyzkumalak/highlights/marker-end#{$marker-suffix}.svg);
         background-size: cover;
-        height: $togyzkumalak-highlight-height;
+        height: $togyzkumalak-family-highlight-height;
         &.p2 {
-          margin-top: $togyzkumalak-margin-top-same;
+          margin-top: $margin-top-same;
         }
         &.p1 {
-          margin-top: $togyzkumalak-margin-top-opposite;
+          margin-top: $margin-top-opposite;
         }
       }
     }
 
-    @each $color, $variant in $togyzkumalak-wood-board-highlights {
-      body.#{$color} .variant-#{$variant} .orientation-p1 &.last-move.to,
-      body.#{$color} .variant-#{$variant}.orientation-p1 &.last-move.to {
-        background: url(../images/board/togyzkumalak/highlights/marker-end-wood.svg);
-        background-size: cover;
-        height: $togyzkumalak-highlight-height;
-        &.p2 {
-          margin-top: $togyzkumalak-margin-top-opposite;
-        }
-        &.p1 {
-          margin-top: $togyzkumalak-margin-top-same;
-        }
-      }
-      body.#{$color} .variant-#{$variant} .orientation-p2 &.last-move.to,
-      body.#{$color} .variant-#{$variant}.orientation-p2 &.last-move.to {
-        background: url(../images/board/togyzkumalak/highlights/marker-end-wood.svg);
-        background-size: cover;
-        height: $togyzkumalak-highlight-height;
-        &.p2 {
-          margin-top: $togyzkumalak-margin-top-same;
-        }
-        &.p1 {
-          margin-top: $togyzkumalak-margin-top-opposite;
-        }
-      }
-    }
-
-    @each $color, $variant in $bestemshe-blue-board-highlights {
-      body.#{$color} .variant-#{$variant} .orientation-p1 &,
-      body.#{$color} .variant-#{$variant}.orientation-p1 & {
-        background: url(../images/board/togyzkumalak/highlights/marker-end.svg);
-        background-size: cover;
-        height: $bestemshe-highlight-height;
-        &.p2 {
-          margin-top: $bestemshe-margin-top-opposite;
-        }
-        &.p1 {
-          margin-top: $bestemshe-margin-top-same;
-        }
-      }
-      body.#{$color} .variant-#{$variant} .orientation-p2 &,
-      body.#{$color} .variant-#{$variant}.orientation-p2 & {
-        background: url(../images/board/togyzkumalak/highlights/marker-end.svg);
-        background-size: cover;
-        height: $bestemshe-highlight-height;
-        &.p2 {
-          margin-top: $bestemshe-margin-top-same;
-        }
-        &.p1 {
-          margin-top: $bestemshe-margin-top-opposite;
-        }
-      }
-    }
-
-    @each $color, $variant in $bestemshe-wood-board-highlights {
-      body.#{$color} .variant-#{$variant} .orientation-p1 &,
-      body.#{$color} .variant-#{$variant}.orientation-p1 & {
-        background: url(../images/board/togyzkumalak/highlights/marker-end-wood.svg);
-        background-size: cover;
-        height: $bestemshe-highlight-height;
-        &.p2 {
-          margin-top: $bestemshe-margin-top-opposite;
-        }
-        &.p1 {
-          margin-top: $bestemshe-margin-top-same;
-        }
-      }
-      body.#{$color} .variant-#{$variant} .orientation-p2 &,
-      body.#{$color} .variant-#{$variant}.orientation-p2 & {
-        background: url(../images/board/togyzkumalak/highlights/marker-end-wood.svg);
-        background-size: cover;
-        height: $bestemshe-highlight-height;
-        &.p2 {
-          margin-top: $bestemshe-margin-top-same;
-        }
-        &.p1 {
-          margin-top: $bestemshe-margin-top-opposite;
-        }
-      }
-    }
-
-    @each $color, $variant in $bestemshe-blue-board-highlights {
-      body.#{$color} .variant-#{$variant} .orientation-p1 &.last-move.from,
-      body.#{$color} .variant-#{$variant}.orientation-p1 &.last-move.from {
-        background: url(../images/board/togyzkumalak/highlights/marker-end.svg);
-        background-size: cover;
-        height: $bestemshe-highlight-height;
-        &.p2 {
-          margin-top: $bestemshe-margin-top-opposite;
-        }
-        &.p1 {
-          margin-top: $bestemshe-margin-top-same;
-        }
-      }
-      body.#{$color} .variant-#{$variant} .orientation-p2 &.last-move.from,
-      body.#{$color} .variant-#{$variant}.orientation-p2 &.last-move.from {
-        background: url(../images/board/togyzkumalak/highlights/marker-end.svg);
-        background-size: cover;
-        height: $bestemshe-highlight-height;
-        &.p2 {
-          margin-top: $bestemshe-margin-top-same;
-        }
-        &.p1 {
-          margin-top: $bestemshe-margin-top-opposite;
-        }
-      }
-    }
-
-    @each $color, $variant in $bestemshe-wood-board-highlights {
-      body.#{$color} .variant-#{$variant} .orientation-p1 &.last-move.from,
-      body.#{$color} .variant-#{$variant}.orientation-p1 &.last-move.from {
-        background: url(../images/board/togyzkumalak/highlights/marker-end-wood.svg);
-        background-size: cover;
-        height: $bestemshe-highlight-height;
-        &.p2 {
-          margin-top: $bestemshe-margin-top-opposite;
-        }
-        &.p1 {
-          margin-top: $bestemshe-margin-top-same;
-        }
-      }
-      body.#{$color} .variant-#{$variant} .orientation-p2 &.last-move.from,
-      body.#{$color} .variant-#{$variant}.orientation-p2 &.last-move.from {
-        background: url(../images/board/togyzkumalak/highlights/marker-end-wood.svg);
-        background-size: cover;
-        height: $bestemshe-highlight-height;
-        &.p2 {
-          margin-top: $bestemshe-margin-top-same;
-        }
-        &.p1 {
-          margin-top: $bestemshe-margin-top-opposite;
-        }
-      }
-    }
-
-    @each $color, $variant in $bestemshe-blue-board-highlights {
-      body.#{$color} .variant-#{$variant} .orientation-p1 &.last-move.to,
-      body.#{$color} .variant-#{$variant}.orientation-p1 &.last-move.to {
-        background: url(../images/board/togyzkumalak/highlights/marker-end.svg);
-        background-size: cover;
-        height: $bestemshe-highlight-height;
-        &.p2 {
-          margin-top: $bestemshe-margin-top-opposite;
-        }
-        &.p1 {
-          margin-top: $bestemshe-margin-top-same;
-        }
-      }
-      body.#{$color} .variant-#{$variant} .orientation-p2 &.last-move.to,
-      body.#{$color} .variant-#{$variant}.orientation-p2 &.last-move.to {
-        background: url(../images/board/togyzkumalak/highlights/marker-end.svg);
-        background-size: cover;
-        height: $bestemshe-highlight-height;
-        &.p2 {
-          margin-top: $bestemshe-margin-top-same;
-        }
-        &.p1 {
-          margin-top: $bestemshe-margin-top-opposite;
-        }
-      }
-    }
-
-    @each $color, $variant in $bestemshe-wood-board-highlights {
-      body.#{$color} .variant-#{$variant} .orientation-p1 &.last-move.to,
-      body.#{$color} .variant-#{$variant}.orientation-p1 &.last-move.to {
-        background: url(../images/board/togyzkumalak/highlights/marker-end-wood.svg);
-        background-size: cover;
-        height: $bestemshe-highlight-height;
-        &.p2 {
-          margin-top: $bestemshe-margin-top-opposite;
-        }
-        &.p1 {
-          margin-top: $bestemshe-margin-top-same;
-        }
-      }
-      body.#{$color} .variant-#{$variant} .orientation-p2 &.last-move.to,
-      body.#{$color} .variant-#{$variant}.orientation-p2 &.last-move.to {
-        background: url(../images/board/togyzkumalak/highlights/marker-end-wood.svg);
-        background-size: cover;
-        height: $bestemshe-highlight-height;
-        &.p2 {
-          margin-top: $bestemshe-margin-top-same;
-        }
-        &.p1 {
-          margin-top: $bestemshe-margin-top-opposite;
-        }
-      }
-    }
   }
 
   &.area.p1 {
@@ -624,234 +347,66 @@ square {
     }
   }
 
-  @each $color, $gameFamily in $oware-light-board-highlights {
+  @each $color, $gameFamily, $_lastMove, $_selectedMove, $solid, $dashed in $oware-board-highlights {
     body.#{$color} .#{$gameFamily} &.last-move.from {
-      background: url(../images/board/oware/highlights/solid_darker.svg);
+      background: url(../images/board/oware/highlights/#{$solid}.svg);
       background-size: cover;
     }
 
     body.#{$color} .#{$gameFamily} &.last-move.to {
-      background: url(../images/board/oware/highlights/dashed_darker.svg);
+      background: url(../images/board/oware/highlights/#{$dashed}.svg);
       background-size: cover;
     }
   }
 
-  @each $color, $gameFamily in $oware-dark-board-highlights {
-    body.#{$color} .#{$gameFamily} &.last-move.from {
-      background: url(../images/board/oware/highlights/solid_lighter.svg);
-      background-size: cover;
-    }
-
-    body.#{$color} .#{$gameFamily} &.last-move.to {
-      background: url(../images/board/oware/highlights/dashed_lighter.svg);
-      background-size: cover;
-    }
-  }
-
-  @each $color, $variant in $togyzkumalak-blue-board-highlights {
+  @each $color, $variant, $marker-suffix, $margin-top-same, $margin-top-opposite in $togyzkumalak-board-highlights {
     body.#{$color} .variant-#{$variant} .orientation-p1 &.last-move.from,
     body.#{$color} .variant-#{$variant}.orientation-p1 &.last-move.from {
-      background: url(../images/board/togyzkumalak/highlights/marker-start.svg);
+      background: url(../images/board/togyzkumalak/highlights/marker-start#{$marker-suffix}.svg);
       background-size: cover;
-      height: $togyzkumalak-highlight-height;
+      height: $togyzkumalak-family-highlight-height;
       &.p2 {
-        margin-top: $togyzkumalak-margin-top-opposite;
+        margin-top: $margin-top-opposite;
       }
       &.p1 {
-        margin-top: $togyzkumalak-margin-top-same;
+        margin-top: $margin-top-same;
       }
     }
     body.#{$color} .variant-#{$variant} .orientation-p2 &.last-move.from,
     body.#{$color} .variant-#{$variant}.orientation-p2 &.last-move.from {
-      background: url(../images/board/togyzkumalak/highlights/marker-start.svg);
+      background: url(../images/board/togyzkumalak/highlights/marker-start#{$marker-suffix}.svg);
       background-size: cover;
-      height: $togyzkumalak-highlight-height;
+      height: $togyzkumalak-family-highlight-height;
       &.p2 {
-        margin-top: $togyzkumalak-margin-top-same;
+        margin-top: $margin-top-same;
       }
       &.p1 {
-        margin-top: $togyzkumalak-margin-top-opposite;
+        margin-top: $margin-top-opposite;
       }
     }
 
     body.#{$color} .variant-#{$variant} .orientation-p1 &.last-move.to,
     body.#{$color} .variant-#{$variant}.orientation-p1 &.last-move.to {
-      background: url(../images/board/togyzkumalak/highlights/marker-end.svg);
+      background: url(../images/board/togyzkumalak/highlights/marker-end#{$marker-suffix}.svg);
       background-size: cover;
-      height: $togyzkumalak-highlight-height;
+      height: $togyzkumalak-family-highlight-height;
       &.p2 {
-        margin-top: $togyzkumalak-margin-top-opposite;
+        margin-top: $margin-top-opposite;
       }
       &.p1 {
-        margin-top: $togyzkumalak-margin-top-same;
+        margin-top: $margin-top-same;
       }
     }
     body.#{$color} .variant-#{$variant} .orientation-p2 &.last-move.to,
     body.#{$color} .variant-#{$variant}.orientation-p2 &.last-move.to {
-      background: url(../images/board/togyzkumalak/highlights/marker-end.svg);
+      background: url(../images/board/togyzkumalak/highlights/marker-end#{$marker-suffix}.svg);
       background-size: cover;
-      height: $togyzkumalak-highlight-height;
+      height: $togyzkumalak-family-highlight-height;
       &.p2 {
-        margin-top: $togyzkumalak-margin-top-same;
+        margin-top: $margin-top-same;
       }
       &.p1 {
-        margin-top: $togyzkumalak-margin-top-opposite;
-      }
-    }
-  }
-
-  @each $color, $variant in $togyzkumalak-wood-board-highlights {
-    body.#{$color} .variant-#{$variant} .orientation-p1 &.last-move.from,
-    body.#{$color} .variant-#{$variant}.orientation-p1 &.last-move.from {
-      background: url(../images/board/togyzkumalak/highlights/marker-start-wood.svg);
-      background-size: cover;
-      height: $togyzkumalak-highlight-height;
-      &.p2 {
-        margin-top: $togyzkumalak-margin-top-opposite;
-      }
-      &.p1 {
-        margin-top: $togyzkumalak-margin-top-same;
-      }
-    }
-    body.#{$color} .variant-#{$variant} .orientation-p2 &.last-move.from,
-    body.#{$color} .variant-#{$variant}.orientation-p2 &.last-move.from {
-      background: url(../images/board/togyzkumalak/highlights/marker-start-wood.svg);
-      background-size: cover;
-      height: $togyzkumalak-highlight-height;
-      &.p2 {
-        margin-top: $togyzkumalak-margin-top-same;
-      }
-      &.p1 {
-        margin-top: $togyzkumalak-margin-top-opposite;
-      }
-    }
-
-    body.#{$color} .variant-#{$variant} .orientation-p1 &.last-move.to,
-    body.#{$color} .variant-#{$variant}.orientation-p1 &.last-move.to {
-      background: url(../images/board/togyzkumalak/highlights/marker-end-wood.svg);
-      background-size: cover;
-      height: $togyzkumalak-highlight-height;
-      &.p2 {
-        margin-top: $togyzkumalak-margin-top-opposite;
-      }
-      &.p1 {
-        margin-top: $togyzkumalak-margin-top-same;
-      }
-    }
-    body.#{$color} .variant-#{$variant} .orientation-p2 &.last-move.to,
-    body.#{$color} .variant-#{$variant}.orientation-p2 &.last-move.to {
-      background: url(../images/board/togyzkumalak/highlights/marker-end-wood.svg);
-      background-size: cover;
-      height: $togyzkumalak-highlight-height;
-      &.p2 {
-        margin-top: $togyzkumalak-margin-top-same;
-      }
-      &.p1 {
-        margin-top: $togyzkumalak-margin-top-opposite;
-      }
-    }
-  }
-
-  @each $color, $variant in $bestemshe-blue-board-highlights {
-    body.#{$color} .variant-#{$variant} .orientation-p1 &.last-move.from,
-    body.#{$color} .variant-#{$variant}.orientation-p1 &.last-move.from {
-      background: url(../images/board/togyzkumalak/highlights/marker-start.svg);
-      background-size: cover;
-      height: $bestemshe-highlight-height;
-      &.p2 {
-        margin-top: $bestemshe-margin-top-opposite;
-      }
-      &.p1 {
-        margin-top: $bestemshe-margin-top-same;
-      }
-    }
-    body.#{$color} .variant-#{$variant} .orientation-p2 &.last-move.from,
-    body.#{$color} .variant-#{$variant}.orientation-p2 &.last-move.from {
-      background: url(../images/board/togyzkumalak/highlights/marker-start.svg);
-      background-size: cover;
-      height: $bestemshe-highlight-height;
-      &.p2 {
-        margin-top: $bestemshe-margin-top-same;
-      }
-      &.p1 {
-        margin-top: $bestemshe-margin-top-opposite;
-      }
-    }
-
-    body.#{$color} .variant-#{$variant} .orientation-p1 &.last-move.to,
-    body.#{$color} .variant-#{$variant}.orientation-p1 &.last-move.to {
-      background: url(../images/board/togyzkumalak/highlights/marker-end.svg);
-      background-size: cover;
-      height: $bestemshe-highlight-height;
-      &.p2 {
-        margin-top: $bestemshe-margin-top-opposite;
-      }
-      &.p1 {
-        margin-top: $bestemshe-margin-top-same;
-      }
-    }
-    body.#{$color} .variant-#{$variant} .orientation-p2 &.last-move.to,
-    body.#{$color} .variant-#{$variant}.orientation-p2 &.last-move.to {
-      background: url(../images/board/togyzkumalak/highlights/marker-end.svg);
-      background-size: cover;
-      height: $bestemshe-highlight-height;
-      &.p2 {
-        margin-top: $bestemshe-margin-top-same;
-      }
-      &.p1 {
-        margin-top: $bestemshe-margin-top-opposite;
-      }
-    }
-  }
-
-  @each $color, $variant in $bestemshe-wood-board-highlights {
-    body.#{$color} .variant-#{$variant} .orientation-p1 &.last-move.from,
-    body.#{$color} .variant-#{$variant}.orientation-p1 &.last-move.from {
-      background: url(../images/board/togyzkumalak/highlights/marker-start-wood.svg);
-      background-size: cover;
-      height: $bestemshe-highlight-height;
-      &.p2 {
-        margin-top: $bestemshe-margin-top-opposite;
-      }
-      &.p1 {
-        margin-top: $bestemshe-margin-top-same;
-      }
-    }
-    body.#{$color} .variant-#{$variant} .orientation-p2 &.last-move.from,
-    body.#{$color} .variant-#{$variant}.orientation-p2 &.last-move.from {
-      background: url(../images/board/togyzkumalak/highlights/marker-start-wood.svg);
-      background-size: cover;
-      height: $bestemshe-highlight-height;
-      &.p2 {
-        margin-top: $bestemshe-margin-top-same;
-      }
-      &.p1 {
-        margin-top: $bestemshe-margin-top-opposite;
-      }
-    }
-
-    body.#{$color} .variant-#{$variant} .orientation-p1 &.last-move.to,
-    body.#{$color} .variant-#{$variant}.orientation-p1 &.last-move.to {
-      background: url(../images/board/togyzkumalak/highlights/marker-end-wood.svg);
-      background-size: cover;
-      height: $bestemshe-highlight-height;
-      &.p2 {
-        margin-top: $bestemshe-margin-top-opposite;
-      }
-      &.p1 {
-        margin-top: $bestemshe-margin-top-same;
-      }
-    }
-    body.#{$color} .variant-#{$variant} .orientation-p2 &.last-move.to,
-    body.#{$color} .variant-#{$variant}.orientation-p2 &.last-move.to {
-      background: url(../images/board/togyzkumalak/highlights/marker-end-wood.svg);
-      background-size: cover;
-      height: $bestemshe-highlight-height;
-      &.p2 {
-        margin-top: $bestemshe-margin-top-same;
-      }
-      &.p1 {
-        margin-top: $bestemshe-margin-top-opposite;
+        margin-top: $margin-top-opposite;
       }
     }
   }
@@ -920,7 +475,7 @@ square {
     body.#{$color} .mini-game.variant-#{$variant} &.last-move.#{$from-or-to} {
       background: #{$url-svg};
       background-size: cover;
-      height: $togyzkumalak-highlight-height;
+      height: $togyzkumalak-family-highlight-height;
       &.p2,
       &.p1 {
         margin-top: $margin;
@@ -958,40 +513,23 @@ square {
       background-size: cover;
     }
 
-    @each $color, $gameFamily in $oware-light-board-highlights {
-      body.#{$color} .#{$gameFamily} & {
-        background: url(../images/board/oware/highlights/solid.svg);
+    @each $board, $variant, $_lastMove, $selectedMove in $oware-board-highlights {
+      body.#{$board} .#{$variant} & {
+        background: url(../images/board/oware/highlights/#{$selectedMove}.svg);
+        background-size: cover;
+      }
+      body.#{$board} .#{$variant} &.last-move.to {
+        background: url(../images/board/oware/highlights/#{$selectedMove}.svg);
         background-size: cover;
       }
     }
 
-    @each $color, $gameFamily in $oware-dark-board-highlights {
-      body.#{$color} .#{$gameFamily} & {
-        background: url(../images/board/oware/highlights/solid_lighter.svg);
-        background-size: cover;
-      }
-    }
-
-    @each $color, $gameFamily in $oware-light-board-highlights {
-      body.#{$color} .#{$gameFamily} &.last-move.to {
-        background: url(../images/board/oware/highlights/solid.svg);
-        background-size: cover;
-      }
-    }
-
-    @each $color, $gameFamily in $oware-dark-board-highlights {
-      body.#{$color} .#{$gameFamily} &.last-move.to {
-        background: url(../images/board/oware/highlights/solid_lighter.svg);
-        background-size: cover;
-      }
-    }
-
-    @each $color, $gameFamily in $togyzkumalak-blue-board-highlights {
+    @each $color, $gameFamily, $marker-suffix in $togyzkumalak-gf-board-highlights {
       body.#{$color} .#{$gameFamily} .orientation-p1 &,
       body.#{$color} .#{$gameFamily}.orientation-p1 & {
-        background: url(../images/board/togyzkumalak/highlights/marker-start.svg);
+        background: url(../images/board/togyzkumalak/highlights/marker-start#{$marker-suffix}.svg);
         background-size: cover;
-        height: $togyzkumalak-highlight-height;
+        height: $togyzkumalak-family-highlight-height;
         &.p2 {
           margin-top: $togyzkumalak-margin-top-opposite;
         }
@@ -1001,9 +539,9 @@ square {
       }
       body.#{$color} .#{$gameFamily} .orientation-p2 &,
       body.#{$color} .#{$gameFamily}.orientation-p2 & {
-        background: url(../images/board/togyzkumalak/highlights/marker-start.svg);
+        background: url(../images/board/togyzkumalak/highlights/marker-start#{$marker-suffix}.svg);
         background-size: cover;
-        height: $togyzkumalak-highlight-height;
+        height: $togyzkumalak-family-highlight-height;
         &.p2 {
           margin-top: $togyzkumalak-margin-top-same;
         }
@@ -1011,41 +549,11 @@ square {
           margin-top: $togyzkumalak-margin-top-opposite;
         }
       }
-    }
-
-    @each $color, $gameFamily in $togyzkumalak-wood-board-highlights {
-      body.#{$color} .#{$gameFamily} .orientation-p1 &,
-      body.#{$color} .#{$gameFamily}.orientation-p1 & {
-        background: url(../images/board/togyzkumalak/highlights/marker-start-wood.svg);
-        background-size: cover;
-        height: $togyzkumalak-highlight-height;
-        &.p2 {
-          margin-top: $togyzkumalak-margin-top-opposite;
-        }
-        &.p1 {
-          margin-top: $togyzkumalak-margin-top-same;
-        }
-      }
-      body.#{$color} .#{$gameFamily} .orientation-p2 &,
-      body.#{$color} .#{$gameFamily}.orientation-p2 & {
-        background: url(../images/board/togyzkumalak/highlights/marker-start-wood.svg);
-        background-size: cover;
-        height: $togyzkumalak-highlight-height;
-        &.p2 {
-          margin-top: $togyzkumalak-margin-top-same;
-        }
-        &.p1 {
-          margin-top: $togyzkumalak-margin-top-opposite;
-        }
-      }
-    }
-
-    @each $color, $gameFamily in $togyzkumalak-blue-board-highlights {
       body.#{$color} .#{$gameFamily} .orientation-p1 &.last-move.to,
       body.#{$color} .#{$gameFamily}.orientation-p1 &.last-move.to {
-        background: url(../images/board/togyzkumalak/highlights/marker-start.svg);
+        background: url(../images/board/togyzkumalak/highlights/marker-start#{$marker-suffix}.svg);
         background-size: cover;
-        height: $togyzkumalak-highlight-height;
+        height: $togyzkumalak-family-highlight-height;
         &.p2 {
           margin-top: $togyzkumalak-margin-top-opposite;
         }
@@ -1055,9 +563,9 @@ square {
       }
       body.#{$color} .#{$gameFamily} .orientation-p2 &.last-move.to,
       body.#{$color} .#{$gameFamily}.orientation-p2 &.last-move.to {
-        background: url(../images/board/togyzkumalak/highlights/marker-start.svg);
+        background: url(../images/board/togyzkumalak/highlights/marker-start#{marker-suffix}.svg);
         background-size: cover;
-        height: $togyzkumalak-highlight-height;
+        height: $togyzkumalak-family-highlight-height;
         &.p2 {
           margin-top: $togyzkumalak-margin-top-same;
         }
@@ -1067,32 +575,6 @@ square {
       }
     }
 
-    @each $color, $gameFamily in $togyzkumalak-wood-board-highlights {
-      body.#{$color} .#{$gameFamily} .orientation-p1 &.last-move.to,
-      body.#{$color} .#{$gameFamily}.orientation-p1 &.last-move.to {
-        background: url(../images/board/togyzkumalak/highlights/marker-start-wood.svg);
-        background-size: cover;
-        height: $togyzkumalak-highlight-height;
-        &.p2 {
-          margin-top: $togyzkumalak-margin-top-opposite;
-        }
-        &.p1 {
-          margin-top: $togyzkumalak-margin-top-same;
-        }
-      }
-      body.#{$color} .#{$gameFamily} .orientation-p2 &.last-move.to,
-      body.#{$color} .#{$gameFamily}.orientation-p2 &.last-move.to {
-        background: url(../images/board/togyzkumalak/highlights/marker-start-wood.svg);
-        background-size: cover;
-        height: $togyzkumalak-highlight-height;
-        &.p2 {
-          margin-top: $togyzkumalak-margin-top-same;
-        }
-        &.p1 {
-          margin-top: $togyzkumalak-margin-top-opposite;
-        }
-      }
-    }
   }
 
   &.current-premove {
