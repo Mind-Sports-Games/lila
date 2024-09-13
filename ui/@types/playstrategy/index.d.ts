@@ -63,7 +63,7 @@ interface PlayStrategy {
 
   // socket.js
   StrongSocket: {
-    new (url: string, version: number | false, cfg?: any): any;
+    new(url: string, version: number | false, cfg?: any): any;
     firstConnect: Promise<(tpe: string, data: any) => void>;
     defaultParams: Record<string, any>;
   };
@@ -590,6 +590,7 @@ declare namespace Tree {
   export interface Node {
     id: string;
     ply: Ply;
+    playerIndex: PlayerIndex;
     uci?: Uci;
     fen: Fen;
     children: Node[];
@@ -633,11 +634,11 @@ declare namespace Tree {
   export interface Comment {
     id: string;
     by:
-      | string
-      | {
-          id: string;
-          name: string;
-        };
+    | string
+    | {
+      id: string;
+      name: string;
+    };
     text: string;
   }
 
@@ -657,7 +658,7 @@ declare namespace Tree {
 
   export type Clock = number;
 
-  export interface Shape {}
+  export interface Shape { }
 }
 
 interface GameUpdate {

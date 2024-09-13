@@ -185,6 +185,7 @@ export default function (opts: PuzzleOpts, redraw: Redraw): Controller {
     addNode(
       {
         ply: 2 * (pos.fullmoves - 1) + (pos.turn == 'p1' ? 0 : 1),
+        playerIndex: pos.turn,
         fen: makeFen('chess')(pos.toSetup()),
         id: scalachessCharPair('chess')(move),
         uci: makeUci('chess')(move),

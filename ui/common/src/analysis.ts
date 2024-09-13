@@ -1,6 +1,5 @@
 // need to support multi action games in analysis
 const noAnalysisBoardVariants: string[] = [
-  'amazons',
   'antidraughts',
   'brazilian',
   'breakthrough',
@@ -10,7 +9,6 @@ const noAnalysisBoardVariants: string[] = [
   'frisian',
   'frysk',
   'international',
-  'monster',
   'pool',
   'portuguese',
   'russian',
