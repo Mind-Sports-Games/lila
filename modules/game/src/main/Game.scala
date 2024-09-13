@@ -926,7 +926,9 @@ object Game {
 
   val syntheticId = "synthetic"
 
-  val maxPlayingRealtime = 100 // plus 200 correspondence games
+  val maxPlayingRealtime = 100
+
+  val maxPlaying = 200 //including correspondence
 
   val maxPlies =
     1000 // also in SG gl/format/pgn/Binary.scala + study/node(unlimited can cause StackOverflowError)

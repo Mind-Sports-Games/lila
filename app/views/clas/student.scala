@@ -177,72 +177,10 @@ object student {
             realNameField(create, "create-realName"),
             form3.submit(trans.signUp(), icon = none)
           )
-        ),
-        div(cls := "student-add__or")("~ or ~"),
-        div(cls := "student-add__choice")(
-          div(cls := "info")(
-            h2("Create multiple PlayStrategy accounts at once"),
-            "You can also ",
-            a(href := routes.Clas.studentManyForm(clas.id.value))(
-              "use this form"
-            ),
-            " to create multiple PlayStrategy accounts from a list of student names."
-          )
         )
       )
     )
 
-  def manyForm(
-      clas: Clas,
-      students: List[Student],
-      form: Form[_],
-      nbStudents: Int,
-      created: Seq[lila.clas.Student.WithPassword] = Nil
-  )(implicit ctx: Context) =
-    bits.layout(trans.clas.addStudent.txt(), Left(clas withStudents students))(
-      cls := "box-pad student-add-many",
-      h1("Create multiple PlayStrategy accounts at once"),
-      maxStudentsWarning(clas),
-      created.nonEmpty option frag(
-        flashMessage(cls := "student-add-many__created")(
-          s"${created.size} students accounts have been created."
-        ),
-        div(cls := "student-add-many__list")(
-          p(strong(trans.clas.makeSureToCopy())),
-          table(cls := "slist")(
-            thead(
-              tr(
-                th("Real name"),
-                th("PlayStrategy username"),
-                th("PlayStrategy password")
-              )
-            ),
-            tbody(
-              created map { case Student.WithPassword(student, password) =>
-                tr(
-                  td(student.realName),
-                  td(usernameOrId(student.userId)),
-                  td(password.value)
-                )
-              }
-            )
-          )
-        )
-      ),
-      (nbStudents <= lila.clas.Clas.maxStudents) option frag(
-        postForm(cls := "form3", action := routes.Clas.studentManyCreate(clas.id.value))(
-          form3.globalError(form),
-          form3.group(
-            form("realNames"),
-            "Students real names, one per line",
-            help = trans.clas.privateWillNeverBeShown().some
-          )(
-            form3.textarea(_)(autofocus, rows := 20)
-          ),
-          form3.submit(trans.apply(), icon = none)
-        )
-      )
-    )
 
   private def maxStudentsWarning(clas: Clas)(implicit lang: Lang) =
     p(dataIcon := "", cls := "text")(
