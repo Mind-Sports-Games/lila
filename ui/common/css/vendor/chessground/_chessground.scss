@@ -178,7 +178,7 @@ $alternate-color: rgba(20, 30, 85, 0.5);
 $oware-board-highlights: (
   //board, variant, lastMove, selectedMove, solid, dashed
   ('oware-light-wood', 'oware', 'dashed', 'solid', 'solid_darker', 'dashed_darker'),
-  ('oware-dark-wood', 'oware', 'dashed_lighter', 'solid_lighter', 'solid_lighter', 'dashed_lighter'),
+  ('oware-dark-wood', 'oware', 'dashed_lighter', 'solid_lighter', 'solid_lighter', 'dashed_lighter')
 );
 
 $togyzkumalak-family-highlight-height: calc(104% / 3);
@@ -190,17 +190,17 @@ $bestemshe-margin-top-opposite: 6.7%;
 $bestemshe-margin-mini-game: 6.7%;
 
 $togyzkumalak-board-highlights: (
-  //board, variant, marker-suffix, margin-top-same, margin-top-opposite, margin-mini-game
-  ('togyzkumalak-blue', 'togyzkumalak', '', $togyzkumalak-margin-top-same, $togyzkumalak-margin-top-opposite, $togyzkumalak-margin-mini-game),
-  ('togyzkumalak-wood', 'togyzkumalak', '-wood', $togyzkumalak-margin-top-same, $togyzkumalak-margin-top-opposite, $togyzkumalak-margin-mini-game),
-  ('togyzkumalak-blue', 'bestemshe', '', $bestemshe-margin-top-same, $bestemshe-margin-top-opposite, $bestemshe-margin-mini-game),
-  ('togyzkumalak-wood', 'bestemshe', '-wood', $bestemshe-margin-top-same, $bestemshe-margin-top-opposite, $bestemshe-margin-mini-game),
+  //board, variant, marker-suffix, margin-top-same, margin-top-opposite
+  ('togyzkumalak-blue', 'togyzkumalak', '', $togyzkumalak-margin-top-same, $togyzkumalak-margin-top-opposite),
+  ('togyzkumalak-wood', 'togyzkumalak', '-wood', $togyzkumalak-margin-top-same, $togyzkumalak-margin-top-opposite),
+  ('togyzkumalak-blue', 'bestemshe', '', $bestemshe-margin-top-same, $bestemshe-margin-top-opposite),
+  ('togyzkumalak-wood', 'bestemshe', '-wood', $bestemshe-margin-top-same, $bestemshe-margin-top-opposite)
 );
 
 $togyzkumalak-gf-board-highlights: (
   //board, gf, marker-suffix
   ('togyzkumalak-blue', 'togyzkumalak', ''),
-  ('togyzkumalak-wood', 'togyzkumalak', '-wood'),
+  ('togyzkumalak-wood', 'togyzkumalak', '-wood')
 );
 
 square {
@@ -308,7 +308,6 @@ square {
         }
       }
     }
-
   }
 
   &.area.p1 {
@@ -574,7 +573,6 @@ square {
         }
       }
     }
-
   }
 
   &.current-premove {
