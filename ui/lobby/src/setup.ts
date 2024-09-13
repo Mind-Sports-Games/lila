@@ -421,6 +421,7 @@ export default class Setup {
               key = 'bestemshe';
               break;
           }
+          break;
         case '9':
           switch (variantId[1]) {
             case '1':

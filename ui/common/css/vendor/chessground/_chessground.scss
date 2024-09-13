@@ -92,7 +92,6 @@ span.mini-game.variant-togyzkumalak.is2d {
   margin-right: calc(100% / 49);
 }
 
-
 //Squares
 .variant-shogi square {
   width: calc(100% / 9);
@@ -858,14 +857,62 @@ square {
   }
 
   $togyzkumalak-highlights: (
-    ('togyzkumalak-blue', 'togyzkumalak', 'from', url(../images/board/togyzkumalak/highlights/marker-start.svg), $togyzkumalak-margin-mini-game),
-    ('togyzkumalak-blue', 'togyzkumalak', 'to', url(../images/board/togyzkumalak/highlights/marker-end.svg), $togyzkumalak-margin-mini-game),
-    ('togyzkumalak-wood', 'togyzkumalak', 'from', url(../images/board/togyzkumalak/highlights/marker-start-wood.svg), $togyzkumalak-margin-mini-game),
-    ('togyzkumalak-wood', 'togyzkumalak', 'to', url(../images/board/togyzkumalak/highlights/marker-end-wood.svg), $togyzkumalak-margin-mini-game),
-    ('togyzkumalak-blue', 'bestemshe', 'from', url(../images/board/togyzkumalak/highlights/marker-start.svg), $bestemshe-margin-mini-game),
-    ('togyzkumalak-blue', 'bestemshe', 'to', url(../images/board/togyzkumalak/highlights/marker-end.svg), $bestemshe-margin-mini-game),
-    ('togyzkumalak-wood', 'bestemshe', 'from', url(../images/board/togyzkumalak/highlights/marker-start-wood.svg), $bestemshe-margin-mini-game),
-    ('togyzkumalak-wood', 'bestemshe', 'to', url(../images/board/togyzkumalak/highlights/marker-end-wood.svg), $bestemshe-margin-mini-game)
+    (
+      'togyzkumalak-blue',
+      'togyzkumalak',
+      'from',
+      url(../images/board/togyzkumalak/highlights/marker-start.svg),
+      $togyzkumalak-margin-mini-game
+    ),
+    (
+      'togyzkumalak-blue',
+      'togyzkumalak',
+      'to',
+      url(../images/board/togyzkumalak/highlights/marker-end.svg),
+      $togyzkumalak-margin-mini-game
+    ),
+    (
+      'togyzkumalak-wood',
+      'togyzkumalak',
+      'from',
+      url(../images/board/togyzkumalak/highlights/marker-start-wood.svg),
+      $togyzkumalak-margin-mini-game
+    ),
+    (
+      'togyzkumalak-wood',
+      'togyzkumalak',
+      'to',
+      url(../images/board/togyzkumalak/highlights/marker-end-wood.svg),
+      $togyzkumalak-margin-mini-game
+    ),
+    (
+      'togyzkumalak-blue',
+      'bestemshe',
+      'from',
+      url(../images/board/togyzkumalak/highlights/marker-start.svg),
+      $bestemshe-margin-mini-game
+    ),
+    (
+      'togyzkumalak-blue',
+      'bestemshe',
+      'to',
+      url(../images/board/togyzkumalak/highlights/marker-end.svg),
+      $bestemshe-margin-mini-game
+    ),
+    (
+      'togyzkumalak-wood',
+      'bestemshe',
+      'from',
+      url(../images/board/togyzkumalak/highlights/marker-start-wood.svg),
+      $bestemshe-margin-mini-game
+    ),
+    (
+      'togyzkumalak-wood',
+      'bestemshe',
+      'to',
+      url(../images/board/togyzkumalak/highlights/marker-end-wood.svg),
+      $bestemshe-margin-mini-game
+    )
   );
 
   //also ammend mini-game as the margins need to be different/look nice.....

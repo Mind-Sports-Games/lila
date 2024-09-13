@@ -882,7 +882,8 @@ export default class RoundController {
     if (this.keyboardMove) this.keyboardMove.update(d.steps[d.steps.length - 1]);
     this.bindSpaceToEndTurn();
     //redraw board scores/dice, items in CG wrap layer
-    if (['togyzkumalak', 'bestemshe', 'backgammon', 'nackgammon'].includes(this.data.game.variant.key)) this.chessground.redrawAll();
+    if (['togyzkumalak', 'bestemshe', 'backgammon', 'nackgammon'].includes(this.data.game.variant.key))
+      this.chessground.redrawAll();
   };
 
   endWithData = (o: ApiEnd): void => {
