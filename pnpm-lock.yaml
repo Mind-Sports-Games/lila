@@ -27,8 +27,8 @@ importers:
         specifier: github:lichess-org/ab-stub
         version: https://codeload.github.com/lichess-org/ab-stub/tar.gz/94236bf34dbc9c05daf50f4c9842d859b9142be0
       chessground:
-        specifier: git+ssh://git@github.com:Mind-Sports-Games/chessground.git#pla-982-add-bestemshe-in-lilafront-end
-        version: https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/efaa201212ee558baab85c01768372586db574e0(@babel/core@7.25.2)(@jest/transform@29.7.0)(@jest/types@29.6.3)(babel-jest@29.7.0(@babel/core@7.25.2))
+        specifier: git+ssh://git@github.com:Mind-Sports-Games/chessground.git#v7.11.1-pstrat3.1
+        version: https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/eb0f6bdb1dfd91bab2ae9ace72e4e8b39f9e30d6(@babel/core@7.25.2)(@jest/transform@29.7.0)(@jest/types@29.6.3)(babel-jest@29.7.0(@babel/core@7.25.2))
       eslint:
         specifier: ^8.57.0
         version: 8.57.0
@@ -42,8 +42,8 @@ importers:
         specifier: ^3.2.5
         version: 3.3.3
       stratops:
-        specifier: git+ssh://git@github.com:Mind-Sports-Games/stratops.git#pla-982-add-bestemshe-in-lilafront-end
-        version: https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/8cf32495f6e3865afd87fd165819875873e5487f
+        specifier: git+ssh://git@github.com:Mind-Sports-Games/stratops.git#v0.8.1-pstrat5.1
+        version: https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/4965d40529ebf83d102d12dd0c5258af13e3c355
       typescript:
         specifier: ^5.4.5
         version: 5.6.2
@@ -1803,9 +1803,9 @@ packages:
     resolution: {tarball: https://codeload.github.com/ornicar/chess.js/tar.gz/ad0709c0b07773d9d0da8e4605a9a2a28f00d249}
     version: 0.10.2
 
-  chessground@https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/efaa201212ee558baab85c01768372586db574e0:
-    resolution: {tarball: https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/efaa201212ee558baab85c01768372586db574e0}
-    version: 7.11.1-pstrat3.0
+  chessground@https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/eb0f6bdb1dfd91bab2ae9ace72e4e8b39f9e30d6:
+    resolution: {tarball: https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/eb0f6bdb1dfd91bab2ae9ace72e4e8b39f9e30d6}
+    version: 7.11.1-pstrat3.1
     engines: {node: '>=20', pnpm: ^9}
 
   chokidar@3.6.0:
@@ -2878,9 +2878,9 @@ packages:
   stockfish.wasm@0.10.0:
     resolution: {integrity: sha512-OTvOlz0ijCSmIb/YvOZ1Dn6vwZVS4Ge3N+RcV0d2b6LXUtCJ9UwmBHypRW3DZ+VXf8WNm7E3P+6jMTVvb3QaBg==}
 
-  stratops@https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/8cf32495f6e3865afd87fd165819875873e5487f:
-    resolution: {tarball: https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/8cf32495f6e3865afd87fd165819875873e5487f}
-    version: 0.8.1-pstrat5.0
+  stratops@https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/4965d40529ebf83d102d12dd0c5258af13e3c355:
+    resolution: {tarball: https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/4965d40529ebf83d102d12dd0c5258af13e3c355}
+    version: 0.8.1-pstrat5.1
     engines: {node: '>=20', pnpm: ^9}
 
   string-argv@0.3.2:
@@ -4627,7 +4627,7 @@ snapshots:
 
   chess.js@https://codeload.github.com/ornicar/chess.js/tar.gz/ad0709c0b07773d9d0da8e4605a9a2a28f00d249: {}
 
-  chessground@https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/efaa201212ee558baab85c01768372586db574e0(@babel/core@7.25.2)(@jest/transform@29.7.0)(@jest/types@29.6.3)(babel-jest@29.7.0(@babel/core@7.25.2)):
+  chessground@https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/eb0f6bdb1dfd91bab2ae9ace72e4e8b39f9e30d6(@babel/core@7.25.2)(@jest/transform@29.7.0)(@jest/types@29.6.3)(babel-jest@29.7.0(@babel/core@7.25.2)):
     dependencies:
       '@jest/globals': 29.7.0
       '@types/node': 20.12.2
@@ -5873,7 +5873,7 @@ snapshots:
 
   stockfish.wasm@0.10.0: {}
 
-  stratops@https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/8cf32495f6e3865afd87fd165819875873e5487f:
+  stratops@https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/4965d40529ebf83d102d12dd0c5258af13e3c355:
     dependencies:
       '@badrap/result': 0.2.8
 
