@@ -268,6 +268,8 @@ trait GameHelper { self: I18nHelper with UserHelper with AiHelper with StringHel
             if (game.situation.isRepetition) trans.gameFinishedRepetition.txt() else trans.gameFinished.txt()
           case Variant.Togyzkumalak(strategygames.togyzkumalak.variant.Togyzkumalak) =>
             trans.gameFinished.txt()
+          case Variant.Togyzkumalak(strategygames.togyzkumalak.variant.Bestemshe) =>
+            trans.gameFinished.txt()
           case Variant.Go(strategygames.go.variant.Go9x9) =>
             if (game.situation.isRepetition) trans.gameFinishedRepetition.txt() else trans.gameFinished.txt()
           case Variant.Go(strategygames.go.variant.Go13x13) =>

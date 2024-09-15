@@ -15,7 +15,7 @@ export default function (ctrl: AnalyseCtrl): VNode[] | undefined {
   const study = ctrl.study;
   if (!study) {
     //Add in playerbars for boards where it's not obvious which side the player is on
-    return playerBarsForAnalysisBoards(ctrl, ['oware', 'togyzkumalak']);
+    return playerBarsForAnalysisBoards(ctrl, ['oware', 'togyzkumalak', 'bestemshe']);
   }
   const tags = study.data.chapter.tags,
     playerNames = {
@@ -24,7 +24,7 @@ export default function (ctrl: AnalyseCtrl): VNode[] | undefined {
     };
   if (!playerNames.p1 && !playerNames.p2 && !treeOps.findInMainline(ctrl.tree.root, n => !!n.clock)) {
     //Add in playerbars for boards where it's not obvious which side the player is on
-    return playerBarsForAnalysisBoards(ctrl, ['oware', 'togyzkumalak']);
+    return playerBarsForAnalysisBoards(ctrl, ['oware', 'togyzkumalak', 'bestemshe']);
   }
   const clocks = renderClocks(ctrl),
     ticking = !isFinished(study.data.chapter) && ctrl.turnPlayerIndex();

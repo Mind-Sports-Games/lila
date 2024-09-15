@@ -134,7 +134,7 @@ oware_roles=['s1-piece','s2-piece','s3-piece','s4-piece','s5-piece','s6-piece','
 togyzkumalak_base_image_names = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16', '17',
 '18', '19', '20', 't', 's10o']
 togyzkumalak_extra_names = ['t', 's10o']
-togyzkumalak_variants = ['togyzkumalak']
+togyzkumalak_variants = ['togyzkumalak', 'bestemshe']
 go_roles=['s-piece']
 go_variants=['go9x9', 'go13x13', 'go19x19']
 backgammon_base_image_names = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', 'flat','side', 'diceone', 'dicetwo', 'dicethree', 'dicefour', 'dicefive', 'dicesix']
@@ -541,11 +541,13 @@ togyzkumalak_themes.map { |theme|
     else
       role = 's' + image_name + '-piece'
     end
-    initial_css = '.togyzkumalak.is2d .' + role + ', ' + '.is2d .variant-togyzkumalak' + ' .' + role
+    initial_css = '.togyzkumalak.is2d .' + role + ', ' + '.is2d .variant-togyzkumalak' + ' .' + role + ', ' + '.is2d .variant-bestemshe' + ' .' + role
     if !togyzkumalak_extra_names.include?(image_name) && image_name.to_i > 9 && image_name.to_i < 20
       for a in 1..15 do
         extra_role = 's' + (image_name.to_i + a*10).to_s + '-piece'
-        if (image_name.to_i + a*10 <= 162 && !(a==1 && image_name=='10'))
+        if (image_name.to_i + a*10 <= 50 && !(a==1 && image_name=='10'))
+          initial_css = initial_css + ', .togyzkumalak.is2d .' + extra_role + ', ' + '.is2d .variant-togyzkumalak' + ' .' + extra_role + ', ' + '.is2d .variant-bestemshe' + ' .' + extra_role
+        elsif (image_name.to_i + a*10 <= 162 && !(a==1 && image_name=='10'))
           initial_css = initial_css + ', .togyzkumalak.is2d .' + extra_role + ', ' + '.is2d .variant-togyzkumalak' + ' .' + extra_role
         end
       end
@@ -569,11 +571,13 @@ togyzkumalak_themes.map { |theme|
     else
       role = 's' + image_name + '-piece'
     end
-    initial_css = '.togyzkumalak.is2d .' + role + ', ' + '.is2d .variant-togyzkumalak' + ' .' + role
+    initial_css = '.togyzkumalak.is2d .' + role + ', ' + '.is2d .variant-togyzkumalak' + ' .' + role + ', ' + '.is2d .variant-bestemshe' + ' .' + role
     if !togyzkumalak_extra_names.include?(image_name) && image_name.to_i > 9 && image_name.to_i < 20
       for a in 1..15 do
         extra_role = 's' + (image_name.to_i + a*10).to_s + '-piece'
-        if (image_name.to_i + a*10 <= 162 && !(a==1 && image_name=='10'))
+        if (image_name.to_i + a*10 <= 50 && !(a==1 && image_name=='10'))
+          initial_css = initial_css + ', .togyzkumalak.is2d .' + extra_role + ', ' + '.is2d .variant-togyzkumalak' + ' .' + extra_role + ', ' + '.is2d .variant-bestemshe' + ' .' + extra_role
+        elsif (image_name.to_i + a*10 <= 162 && !(a==1 && image_name=='10'))
           initial_css = initial_css + ', .togyzkumalak.is2d .' + extra_role + ', ' + '.is2d .variant-togyzkumalak' + ' .' + extra_role
         end
       end

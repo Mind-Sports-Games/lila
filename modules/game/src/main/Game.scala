@@ -310,12 +310,12 @@ case class Game(
         )
       else if (updated.board.variant.gameLogic == GameLogic.Togyzkumalak())
         //Is this even necessary as score is in the fen?
-        (updated.board.variant.key == "togyzkumalak") ?? List(
+        (updated.board.variant.gameFamily == GameFamily.Togyzkumalak()) ?? List(
           Event.Score(p1 = updated.history.score.p1, p2 = updated.history.score.p2)
         )
       else if (updated.board.variant.gameLogic == GameLogic.Backgammon())
         //Is this even necessary as score is in the fen?
-        (updated.board.variant.key == "backgammon" || updated.board.variant.key == "nackgammon") ?? List(
+        (updated.board.variant.gameFamily == GameFamily.Backgammon()) ?? List(
           Event.Score(p1 = updated.history.score.p1, p2 = updated.history.score.p2)
         )
       else //chess. Is this even necessary as checkCount is in the fen?

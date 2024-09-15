@@ -309,6 +309,7 @@ final private class TournamentScheduler(
       (nextTuesday, 14),
       (nextTuesday, 16),
       (nextTuesday, 20),
+      (nextTuesday, 22),
       (nextWednesday, 1),
       (nextWednesday, 4),
       (nextWednesday, 7),
@@ -354,7 +355,6 @@ final private class TournamentScheduler(
     // Because we create two weeks in advance we will then need to delete one tournament in the second week where the new variant has cycled into. It should just be one, if not its gone wrong
     // Practise locally, can always delete any newly created tournaments and try again
     val weeklyVariants: List[(Variant, Schedule.Speed)] = List(
-      (Variant.Chess(strategygames.chess.variant.Atomic), Blitz32),
       (Variant.Go(strategygames.go.variant.Go19x19), Blitz53),
       (Variant.Draughts(strategygames.draughts.variant.Breakthrough), Blitz32),
       (Variant.FairySF(strategygames.fairysf.variant.Flipello), Blitz32),
@@ -363,6 +363,7 @@ final private class TournamentScheduler(
       (Variant.Chess(strategygames.chess.variant.LinesOfAction), Blitz32),
       (Variant.Chess(strategygames.chess.variant.FiveCheck), Blitz32),
       (Variant.Draughts(strategygames.draughts.variant.Frysk), Blitz32),
+      (Variant.Togyzkumalak(strategygames.togyzkumalak.variant.Bestemshe), Blitz32),
       (Variant.FairySF(strategygames.fairysf.variant.Amazons), Blitz32),
       (Variant.Chess(strategygames.chess.variant.Horde), Blitz32),
       (Variant.FairySF(strategygames.fairysf.variant.MiniBreakthroughTroyka), Blitz32),
@@ -393,7 +394,8 @@ final private class TournamentScheduler(
       (Variant.Backgammon(strategygames.backgammon.variant.Nackgammon), Delay310),
       (Variant.Chess(strategygames.chess.variant.Standard), Blitz32),
       (Variant.Draughts(strategygames.draughts.variant.Antidraughts), Blitz32),
-      (Variant.FairySF(strategygames.fairysf.variant.MiniShogi), Byoyomi35)
+      (Variant.FairySF(strategygames.fairysf.variant.MiniShogi), Byoyomi35),
+      (Variant.Chess(strategygames.chess.variant.Atomic), Blitz32)
     )
 
     val weeklyVariantDefault: (Variant, Schedule.Speed) =
@@ -544,6 +546,9 @@ final private class TournamentScheduler(
       ),
       scheduleYearly24hr(Variant.Draughts(strategygames.draughts.variant.Brazilian), Blitz32)(
         new DateTime(2024, 10, 18, 0, 0)
+      ),
+      scheduleYearly24hr(Variant.Togyzkumalak(strategygames.togyzkumalak.variant.Bestemshe), Blitz32)(
+        new DateTime(2024, 10, 25, 0, 0)
       )
       //Fri 27th is the end of year medley
     ).flatten filter { _.schedule.at isAfter rightNow }

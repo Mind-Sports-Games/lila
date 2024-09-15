@@ -97,6 +97,8 @@ final class PerfsUpdater(
                 updateRatings(ratingsW.oware, ratingsB.oware, game)
               case Variant.Togyzkumalak(strategygames.togyzkumalak.variant.Togyzkumalak) =>
                 updateRatings(ratingsW.togyzkumalak, ratingsB.togyzkumalak, game)
+              case Variant.Togyzkumalak(strategygames.togyzkumalak.variant.Bestemshe) =>
+                updateRatings(ratingsW.bestemshe, ratingsB.bestemshe, game)
               case Variant.Go(strategygames.go.variant.Go9x9) =>
                 updateRatings(ratingsW.go9x9, ratingsB.go9x9, game)
               case Variant.Go(strategygames.go.variant.Go13x13) =>
@@ -177,6 +179,7 @@ final class PerfsUpdater(
       minibreakthroughtroyka: Rating,
       oware: Rating,
       togyzkumalak: Rating,
+      bestemshe: Rating,
       go9x9: Rating,
       go13x13: Rating,
       go19x19: Rating,
@@ -226,6 +229,7 @@ final class PerfsUpdater(
       minibreakthroughtroyka = perfs.minibreakthroughtroyka.toRating,
       oware = perfs.oware.toRating,
       togyzkumalak = perfs.togyzkumalak.toRating,
+      bestemshe = perfs.bestemshe.toRating,
       go9x9 = perfs.go9x9.toRating,
       go13x13 = perfs.go13x13.toRating,
       go19x19 = perfs.go19x19.toRating,
@@ -445,6 +449,11 @@ final class PerfsUpdater(
             perfs.togyzkumalak,
             ratings.togyzkumalak
           ),
+          bestemshe = addRatingVariant(
+            Variant.Togyzkumalak(strategygames.togyzkumalak.variant.Bestemshe),
+            perfs.bestemshe,
+            ratings.bestemshe
+          ),
           go9x9 = addRatingVariant(
             Variant.Go(strategygames.go.variant.Go9x9),
             perfs.go9x9,
@@ -519,6 +528,7 @@ final class PerfsUpdater(
           ),
           oware = r(PT.orDefault("oware"), perfs.oware, perfs1.oware),
           togyzkumalak = r(PT.orDefault("togyzkumalak"), perfs.togyzkumalak, perfs1.togyzkumalak),
+          bestemshe = r(PT.orDefault("bestemshe"), perfs.bestemshe, perfs1.bestemshe),
           go9x9 = r(PT.orDefault("go9x9"), perfs.go9x9, perfs1.go9x9),
           go13x13 = r(PT.orDefault("go13x13"), perfs.go13x13, perfs1.go13x13),
           go19x19 = r(PT.orDefault("go19x19"), perfs.go19x19, perfs1.go19x19),

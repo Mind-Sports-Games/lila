@@ -44,6 +44,7 @@ case class Perfs(
     minibreakthroughtroyka: Perf,
     oware: Perf,
     togyzkumalak: Perf,
+    bestemshe: Perf,
     go9x9: Perf,
     go13x13: Perf,
     go19x19: Perf,
@@ -98,6 +99,7 @@ case class Perfs(
       "minibreakthroughtroyka" -> minibreakthroughtroyka,
       "oware"                  -> oware,
       "togyzkumalak"           -> togyzkumalak,
+      "bestemshe"              -> bestemshe,
       "go9x9"                  -> go9x9,
       "go13x13"                -> go13x13,
       "go19x19"                -> go19x19,
@@ -208,6 +210,7 @@ case class Perfs(
     "minibreakthroughtroyka" -> minibreakthroughtroyka,
     "oware"                  -> oware,
     "togyzkumalak"           -> togyzkumalak,
+    "bestemshe"              -> bestemshe,
     "go9x9"                  -> go9x9,
     "go13x13"                -> go13x13,
     "go19x19"                -> go19x19,
@@ -321,6 +324,7 @@ case object Perfs {
       p,
       p,
       p,
+      p,
       Perf.Storm.default,
       Perf.Racer.default,
       Perf.Streak.default
@@ -379,6 +383,7 @@ case object Perfs {
         Some(_.minibreakthroughtroyka)
       case Variant.Samurai(strategygames.samurai.variant.Oware)                  => Some(_.oware)
       case Variant.Togyzkumalak(strategygames.togyzkumalak.variant.Togyzkumalak) => Some(_.togyzkumalak)
+      case Variant.Togyzkumalak(strategygames.togyzkumalak.variant.Bestemshe)    => Some(_.bestemshe)
       case Variant.Go(strategygames.go.variant.Go9x9)                            => Some(_.go9x9)
       case Variant.Go(strategygames.go.variant.Go13x13)                          => Some(_.go13x13)
       case Variant.Go(strategygames.go.variant.Go19x19)                          => Some(_.go19x19)
@@ -439,6 +444,7 @@ case object Perfs {
         minibreakthroughtroyka = perf("minibreakthroughtroyka"),
         oware = perf("oware"),
         togyzkumalak = perf("togyzkumalak"),
+        bestemshe = perf("bestemshe"),
         go9x9 = perf("go9x9"),
         go13x13 = perf("go13x13"),
         go19x19 = perf("go19x19"),
@@ -496,6 +502,7 @@ case object Perfs {
         "minibreakthroughtroyka" -> notNew(o.minibreakthroughtroyka),
         "oware"                  -> notNew(o.oware),
         "togyzkumalak"           -> notNew(o.togyzkumalak),
+        "bestemshe"              -> notNew(o.bestemshe),
         "go9x9"                  -> notNew(o.go9x9),
         "go13x13"                -> notNew(o.go13x13),
         "go19x19"                -> notNew(o.go19x19),
@@ -554,6 +561,7 @@ case object Perfs {
       minibreakthroughtroyka: List[User.LightPerf],
       oware: List[User.LightPerf],
       togyzkumalak: List[User.LightPerf],
+      bestemshe: List[User.LightPerf],
       go9x9: List[User.LightPerf],
       go13x13: List[User.LightPerf],
       go19x19: List[User.LightPerf],
@@ -562,6 +570,7 @@ case object Perfs {
   )
 
   val emptyLeaderboards = Leaderboards(
+    Nil,
     Nil,
     Nil,
     Nil,
