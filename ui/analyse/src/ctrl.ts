@@ -633,7 +633,7 @@ export default class AnalyseCtrl {
   private maybeForceMove(possibleMoves: cg.Dests) {
     if (
       (this.data.game.variant.key === 'flipello' || this.data.game.variant.key === 'flipello10') &&
-      possibleMoves.size == 1
+      possibleMoves.size == 1 && possibleMoves.keys().next().value
     ) {
       const passOrig = possibleMoves.keys().next().value;
       const passDests = possibleMoves.get(passOrig);

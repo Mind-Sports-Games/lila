@@ -791,7 +791,7 @@ export default class RoundController {
   };
 
   private forcePass(possibleMoves: cg.Dests, variantKey: VariantKey) {
-    if (possibleMoves.size == 1) {
+    if (possibleMoves.size == 1 && possibleMoves.keys().next().value) {
       const passOrig = possibleMoves.keys().next().value;
       const passDests = possibleMoves.get(passOrig);
       if (passDests && passDests.length == 1) {
