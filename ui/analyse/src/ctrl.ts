@@ -635,11 +635,13 @@ export default class AnalyseCtrl {
       (this.data.game.variant.key === 'flipello' || this.data.game.variant.key === 'flipello10') &&
       possibleMoves.size == 1
     ) {
-      const passOrig: cg.Key = possibleMoves.keys().next().value;
-      const passDests = possibleMoves.get(passOrig);
-      if (passDests && passDests.length == 1) {
-        const passDest = passDests[0];
-        this.sendMove(passOrig, passDest, undefined, undefined);
+      const passOrig = possibleMoves.keys().next().value;
+      if (passOrig != undefined) {
+        const passDests = possibleMoves.get(passOrig);
+        if (passDests && passDests.length == 1) {
+          const passDest = passDests[0];
+          this.sendMove(passOrig, passDest, undefined, undefined);
+        }
       }
     }
   }
