@@ -13,6 +13,11 @@ on:
       - 'lila'
       - 'conf/application.conf.default'
       - '.sbtopts.default'
+      #add front end options to ensure full build gets triggered
+      - 'public/**'
+      - 'ui/**'
+      - 'package.json'
+      - 'pnpm-lock.yaml'
     branches-ignore:
       - 'l10n_master'
   pull_request:
