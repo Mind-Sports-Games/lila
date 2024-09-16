@@ -793,10 +793,12 @@ export default class RoundController {
   private forcePass(possibleMoves: cg.Dests, variantKey: VariantKey) {
     if (possibleMoves.size == 1 && possibleMoves.keys().next().value) {
       const passOrig = possibleMoves.keys().next().value;
-      const passDests = possibleMoves.get(passOrig);
-      if (passDests && passDests.length == 1) {
-        const passDest = passDests[0];
-        this.sendMove(passOrig, passDest, undefined, variantKey, { premove: false });
+      if (passOrig != undefined) {
+        const passDests = possibleMoves.get(passOrig);
+        if (passDests && passDests.length == 1) {
+          const passDest = passDests[0];
+          this.sendMove(passOrig, passDest, undefined, variantKey, { premove: false });
+        }
       }
     }
   }
