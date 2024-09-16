@@ -55,7 +55,6 @@ jobs:
       - name: Install PNPM and run pnpm install
         uses: pnpm/action-setup@v4
         with:
-          version: 9.6.0
           run_install: |
             - recursive: false
               args: [--no-frozen-lockfile, --strict-peer-dependencies]
