@@ -82,6 +82,7 @@ object tournaments {
                     else s.perfType.trans,
                     " • ",
                     if (s.settings.handicapped) trans.handicappedTournament()
+                    else if (s.settings.mcmahon) trans.mcmahon()
                     else if (s.settings.rated) trans.ratedTournament()
                     else trans.casualTournament()
                   )

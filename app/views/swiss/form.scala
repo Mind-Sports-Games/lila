@@ -28,6 +28,7 @@ object form {
           postForm(cls := "form3", action := routes.Swiss.create(teamId))(
             form3.split(fields.name, fields.nbRounds),
             form3.split(fields.rated, fields.variant),
+            form3.split(fields.mcmahon, fields.mcmahonCutoff),
             form3.split(fields.handicapped, fields.inputPlayerRatings),
             fields.xGamesChoiceRow1,
             fields.xGamesChoiceRow2,
@@ -76,6 +77,7 @@ object form {
           postForm(cls := "form3", action := routes.Swiss.update(swiss.id.value))(
             form3.split(fields.name, fields.nbRounds),
             form3.split(fields.rated, fields.variant),
+            form3.split(fields.mcmahon, fields.mcmahonCutoff),
             form3.split(fields.handicapped, fields.inputPlayerRatings),
             fields.xGamesChoiceRow1,
             fields.xGamesChoiceRow2,
@@ -178,6 +180,33 @@ final private class SwissFields(form: Form[_], swiss: Option[Swiss])(implicit ct
       ),
       st.input(tpe := "hidden", st.name := form("rated").name, value := "false") // hack allow disabling rated
     )
+  def mcmahon =
+    frag(
+      form3.checkbox(
+        form("mcmahon.mcmahon"),
+        trans.mcmahon(),
+        half = true,
+        help = frag(
+          trans.mcmahonDefinition.txt(),
+          br,
+          a(href := s"${routes.Swiss.home}#mcmahon", target := "_blank")("More detail here")
+        ).some,
+        disabled = disabledAfterStart
+      ),
+      st.input(
+        tpe := "hidden",
+        st.name := form("mcmahon").name,
+        value := "false"
+      ) // hack allow disabling mcmahon
+    )
+  def mcmahonCutoff =
+    form3.group(
+      form("mcmahon.mcmahonCutoff"),
+      trans.mcmahonCutoff(),
+      klass = "mcmahonCutoff",
+      half = true,
+      help = trans.mcmahonCutoffDefinition().some
+    )(form3.input(_))
   def handicapped =
     frag(
       form3.checkbox(
@@ -188,7 +217,8 @@ final private class SwissFields(form: Form[_], swiss: Option[Swiss])(implicit ct
           trans.handicappedDefinition.txt(),
           br,
           a(href := routes.Page.loneBookmark("handicaps"), target := "_blank")("More detail here")
-        ).some
+        ).some,
+        disabled = disabledAfterStart
       ),
       st.input(
         tpe := "hidden",
@@ -419,7 +449,7 @@ final private class SwissFields(form: Form[_], swiss: Option[Swiss])(implicit ct
   def drawTables =
     frag(
       form3.checkbox(
-        form("drawTables"),
+        form("drawTables.drawTables"),
         "Use Draw Tables (per round)",
         klass = "drawTables",
         half = true,
@@ -432,7 +462,7 @@ final private class SwissFields(form: Form[_], swiss: Option[Swiss])(implicit ct
   def perPairingDrawTables =
     frag(
       form3.checkbox(
-        form("perPairingDrawTables"),
+        form("drawTables.perPairingDrawTables"),
         "Use Draw Tables (per pairing)",
         klass = "perPairingDrawTables",
         half = true,

@@ -108,6 +108,7 @@ export default function (ctrl: SwissCtrl): VNode | undefined {
         ]),
         h('table', [
           numberRow('Points', data.points, 'raw'),
+          ctrl.data.isMcMahon ? numberRow('McMahon Starting Score', data.mmStartingScore, 'raw') : null,
           numberRow('Tiebreak' + (data.tieBreak2 ? ' [BH]' : ' [SB]'), data.tieBreak, 'raw'),
           data.tieBreak2 ? numberRow('Tiebreak [SB]', data.tieBreak2, 'raw') : null,
           ...(games
@@ -154,7 +155,7 @@ export default function (ctrl: SwissCtrl): VNode | undefined {
                 ],
               );
             }
-            const res = result(p);
+            const res = result(p) + (p.of && ctrl.data.isMcMahon ? '(H)' : '');
             return h(
               'tr.glpt.' + (p.o ? 'ongoing' : p.w === true ? 'win' : p.w === false ? 'loss' : 'draw'),
               {
@@ -168,7 +169,16 @@ export default function (ctrl: SwissCtrl): VNode | undefined {
                 h('th', p.ismm ? '' + round + '.' + p.mmGameNb : '' + round),
                 ctrl.data.isMedley && p.vi ? h('td', { attrs: { 'data-icon': p.vi } }, '') : null,
                 h('td', userName(p.user)),
-                h('td', ctrl.data.isMedley ? '' : p.inputRating ? '' + p.inputRating + '*' : '' + p.rating),
+                h(
+                  'td',
+                  ctrl.data.isMedley
+                    ? ''
+                    : p.ratingDisplay
+                      ? '' + p.ratingDisplay + '*'
+                      : p.inputRating
+                        ? '' + p.inputRating + '*'
+                        : '' + p.rating,
+                ),
                 h('td.is.playerIndex-icon.' + (p.c ? ctrl.data.p1Color : ctrl.data.p2Color)),
                 h('td.gamescore' + (p.mmGameRes ? '.' + p.mmGameRes : ''), p.ismm ? gameResult(p) : ''),
                 p.ismm && p.isFinalGame
