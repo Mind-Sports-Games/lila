@@ -169,7 +169,16 @@ export default function (ctrl: SwissCtrl): VNode | undefined {
                 h('th', p.ismm ? '' + round + '.' + p.mmGameNb : '' + round),
                 ctrl.data.isMedley && p.vi ? h('td', { attrs: { 'data-icon': p.vi } }, '') : null,
                 h('td', userName(p.user)),
-                h('td', ctrl.data.isMedley ? '' : p.inputRating ? '' + p.inputRating + '*' : '' + p.rating),
+                h(
+                  'td',
+                  ctrl.data.isMedley
+                    ? ''
+                    : p.ratingDisplay
+                      ? '' + p.ratingDisplay + '*'
+                      : p.inputRating
+                        ? '' + p.inputRating + '*'
+                        : '' + p.rating,
+                ),
                 h('td.is.playerIndex-icon.' + (p.c ? ctrl.data.p1Color : ctrl.data.p2Color)),
                 h('td.gamescore' + (p.mmGameRes ? '.' + p.mmGameRes : ''), p.ismm ? gameResult(p) : ''),
                 p.ismm && p.isFinalGame

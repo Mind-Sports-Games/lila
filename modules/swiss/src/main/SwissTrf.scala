@@ -19,16 +19,18 @@ final class SwissTrf(
     fetchPlayerIds(swiss) map { apply(swiss, _, sorted) }
   }
 
-  //TODO mcmahon order players by input rating not actual rating...
   def apply(swiss: Swiss, playerIds: PlayerIds, sorted: Boolean): Source[String, _] =
     SwissPlayer.fields { f =>
       tournamentLines(swiss) concat
         forbiddenPairings(swiss, playerIds) concat sheetApi
-          .source(swiss, sort = sorted.??($doc(f.rating -> -1)))
+          .source(swiss, sort = sorted.??($doc(f.inputRating -> -1, f.rating -> -1)))
           .map((playerLine(swiss, playerIds) _).tupled)
           .map(formatLine) concat (if (swiss.settings.mcmahon)
                                      sheetApi
-                                       .source(swiss, sort = sorted.??($doc(f.rating -> -1)))
+                                       .source(
+                                         swiss,
+                                         sort = sorted.??($doc(f.inputRating -> -1, f.rating -> -1))
+                                       )
                                        .map((acceleratedPairingLine(swiss, playerIds) _).tupled)
                                        .map(formatLine)
                                    else Source.empty[String])
@@ -57,7 +59,7 @@ final class SwissTrf(
     List(
       3 -> "XXA",
       8 -> playerIds.getOrElse(p.userId, 0).toString
-    ) ::: swiss.allRounds.flatMap { rn =>
+    ) ::: swiss.allAcceleratedRounds.flatMap { rn =>
       List(
         13 -> f"${additionalPoints(swiss.settings.mcmahonCutoffGrade, p)}%1.1f"
       ).map { case (l, s) => (l + (rn.value - 1) * 5, s) }
@@ -132,7 +134,7 @@ final class SwissTrf(
           .aggregateOne() { framework =>
             import framework._
             Match($doc(p.swissId -> swiss.id)) -> List(
-              Sort(Descending(p.rating)),
+              Sort(Descending(p.inputRating), Descending(p.rating)),
               Group(BSONNull)("us" -> PushField(p.userId))
             )
           }

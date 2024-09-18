@@ -206,7 +206,7 @@ final private class SwissFields(form: Form[_], swiss: Option[Swiss])(implicit ct
       klass = "mcmahonCutoff",
       half = true,
       help = trans.mcmahonCutoffDefinition().some
-    )(form3.input(_)(disabled := disabledAfterStart))
+    )(form3.input(_))
   def handicapped =
     frag(
       form3.checkbox(

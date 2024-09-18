@@ -135,47 +135,55 @@ object Handicaps {
   val goDanRating = s"^([1-7]+)d$$".r
   val psRating    = s"^([0-9]+)$$".r
 
+  def goRatingDisplay(rating: Int): String = {
+    if (rating >= 2100) {
+      (mcMahonScoreFromRating(rating).toInt + 1).toString() + "d"
+    } else {
+      (mcMahonScoreFromRating(rating).toInt * -1).toString() + "k"
+    }
+  }
+
   def mcMahonScoreFromRating(rating: Int): Double = {
     rating match {
-      case x if x > 2700 => 7.0
-      case x if x > 2600 => 6.0
-      case x if x > 2500 => 5.0
-      case x if x > 2400 => 4.0
-      case x if x > 2300 => 3.0
-      case x if x > 2200 => 2.0
-      case x if x > 2100 => 1.0
-      case x if x > 2000 => 0.0
-      case x if x > 1900 => -1.0
-      case x if x > 1800 => -2.0
-      case x if x > 1700 => -3.0
-      case x if x > 1650 => -4.0
-      case x if x > 1600 => -5.0
-      case x if x > 1550 => -6.0
-      case x if x > 1500 => -7.0
-      case x if x > 1450 => -8.0
-      case x if x > 1400 => -9.0
-      case x if x > 1350 => -10.0
-      case x if x > 1300 => -11.0
-      case x if x > 1250 => -12.0
-      case x if x > 1200 => -13.0
-      case x if x > 1150 => -14.0
-      case x if x > 1100 => -15.0
-      case x if x > 1050 => -16.0
-      case x if x > 1000 => -17.0
-      case x if x > 967  => -18.0
-      case x if x > 934  => -19.0
-      case x if x > 901  => -20.0
-      case x if x > 867  => -21.0
-      case x if x > 834  => -22.0
-      case x if x > 801  => -23.0
-      case x if x > 767  => -24.0
-      case x if x > 734  => -25.0
-      case x if x > 701  => -26.0
-      case x if x > 667  => -27.0
-      case x if x > 634  => -28.0
-      case x if x > 601  => -29.0
-      case x if x <= 601 => -30.0
-      case _             => 0.0
+      case x if x >= 2800 => 7.0
+      case x if x >= 2700 => 6.0
+      case x if x >= 2600 => 5.0
+      case x if x >= 2500 => 4.0
+      case x if x >= 2400 => 3.0
+      case x if x >= 2300 => 2.0
+      case x if x >= 2200 => 1.0
+      case x if x >= 2100 => 0.0
+      case x if x >= 2000 => -1.0
+      case x if x >= 1900 => -2.0
+      case x if x >= 1800 => -3.0
+      case x if x >= 1700 => -4.0
+      case x if x >= 1650 => -5.0
+      case x if x >= 1600 => -6.0
+      case x if x >= 1550 => -7.0
+      case x if x >= 1500 => -8.0
+      case x if x >= 1450 => -9.0
+      case x if x >= 1400 => -10.0
+      case x if x >= 1350 => -11.0
+      case x if x >= 1300 => -12.0
+      case x if x >= 1250 => -13.0
+      case x if x >= 1200 => -14.0
+      case x if x >= 1150 => -15.0
+      case x if x >= 1100 => -16.0
+      case x if x >= 1050 => -17.0
+      case x if x >= 1000 => -18.0
+      case x if x >= 966  => -19.0
+      case x if x >= 933  => -20.0
+      case x if x >= 900  => -21.0
+      case x if x >= 867  => -22.0
+      case x if x >= 834  => -23.0
+      case x if x >= 801  => -24.0
+      case x if x >= 768  => -25.0
+      case x if x >= 735  => -26.0
+      case x if x >= 702  => -27.0
+      case x if x >= 669  => -28.0
+      case x if x >= 636  => -29.0
+      case x if x < 636   => -30.0
+      case _              => 0.0
     }
   }
 

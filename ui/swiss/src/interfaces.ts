@@ -109,6 +109,7 @@ export interface PairingExt extends Pairing {
   user: LightUser;
   rating: number;
   inputRating?: number;
+  ratingDisplay?: string;
 }
 
 export interface Standing {
@@ -122,6 +123,7 @@ export interface BasePlayer {
   user: LightUser;
   rating: number;
   inputRating?: number;
+  ratingDisplay?: string;
   provisional?: boolean;
   withdraw?: boolean;
   points: number;

@@ -56,6 +56,8 @@ case class Swiss(
   def finishedRounds: List[SwissRound.Number] = (1 until round.value).toList.map(SwissRound.Number.apply)
   def tieBreakRounds: List[SwissRound.Number] = if (isFinished) allRounds
   else (1 until ((round.value + 1) atMost settings.nbRounds)).toList.map(SwissRound.Number.apply)
+  def allAcceleratedRounds: List[SwissRound.Number] = if (isFinished) allRounds
+  else (1 to ((round.value + 1) atMost settings.nbRounds)).toList.map(SwissRound.Number.apply)
 
   def actualNbRounds = if (isFinished) round.value else settings.nbRounds
 

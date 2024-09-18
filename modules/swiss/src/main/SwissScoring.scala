@@ -90,7 +90,7 @@ final private class SwissScoring(
               val perfSum = playerPairings.foldLeft(0f) { case (perfSum, pairing) =>
                 val opponent = playerMap.get(pairing opponentOf p.userId)
                 val result   = pairing.resultFor(p.userId)
-                val newPerf = perfSum + opponent.??(_.rating) + result.?? { win =>
+                val newPerf = perfSum + opponent.??(_.actualRating) + result.?? { win =>
                   if (win) 500 else -500
                 }
                 newPerf

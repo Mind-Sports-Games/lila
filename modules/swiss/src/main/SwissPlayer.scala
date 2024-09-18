@@ -43,7 +43,7 @@ case class SwissPlayer(
         points,
         ~bhTieBreak,
         sbTieBreak,
-        performance | Swiss.Performance(rating.toFloat)
+        performance | Swiss.Performance(actualRating.toFloat)
       )
     )
 }

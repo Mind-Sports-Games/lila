@@ -72,7 +72,7 @@ final class SwissStatsApi(
                       draws = stats.draws + draws,
                       byes = stats.byes + byes,
                       absences = stats.absences + absences,
-                      averageRating = stats.averageRating + player.rating
+                      averageRating = stats.averageRating + player.actualRating
                     )
                 }
             }
