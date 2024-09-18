@@ -316,7 +316,7 @@ object home {
         "a very weak player in the initial rounds.",
         br,
         "To create better pairings, an initial score (MMS) is given to players based on their grade and if they are above a cutoff value. ",
-        "For example, a cutoff value of 3k (~1800), gives all players above this grade 0 points, players at this grade -3 points, and each Kyu grade below an additional -1 point.",
+        "For example, a cutoff value of 3k (~1800), gives all players at and above this grade -3 points, and each Kyu grade below an additional -1 point.",
         "This means that it is impossible for weaker players to win a tournament even if they win all their games."
       )
     ),
