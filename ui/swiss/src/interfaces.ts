@@ -128,7 +128,7 @@ export interface BasePlayer {
   withdraw?: boolean;
   points: number;
   tieBreak: number;
-  tieBreak2: number;
+  tieBreak2?: number;
   performance?: number;
   absent: boolean;
   disqualified: boolean;
