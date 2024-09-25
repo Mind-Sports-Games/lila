@@ -1,7 +1,7 @@
 package lila.swiss
 
 import strategygames.format.{ Forsyth }
-import strategygames.{ ByoyomiClock, Clock, P1, P2 }
+import strategygames.{ ByoyomiClock, Clock, GameFamily, P1, P2 }
 import strategygames.variant.Variant
 import strategygames.draughts.Board.BoardSize
 
@@ -14,6 +14,7 @@ import scala.concurrent.ExecutionContext
 import lila.common.{ GreatPlayer, LightUser }
 import lila.db.dsl._
 import lila.game.Game
+import lila.game.Handicaps.goRatingDisplay
 import lila.quote.Quote
 import lila.quote.Quote.quoteWriter
 import lila.socket.Socket.SocketVersion
@@ -158,13 +159,14 @@ final class SwissJson(
     case SwissPlayer.WithUserAndRank(player, user, rank) =>
       Json
         .obj(
-          "rank"        -> rank,
-          "points"      -> player.points.value,
-          "tieBreak"    -> player.tieBreak,
-          "tieBreak2"   -> player.tieBreak2,
-          "rating"      -> player.rating,
-          "inputRating" -> player.inputRating,
-          "username"    -> user.name
+          "rank"          -> rank,
+          "points"        -> player.points.value,
+          "tieBreak"      -> player.tieBreak,
+          "tieBreak2"     -> player.tieBreak2,
+          "rating"        -> player.rating,
+          "inputRating"   -> player.inputRating,
+          "ratingDisplay" -> player.inputRating.map(goRatingDisplay(_)),
+          "username"      -> user.name
         )
         .add("title" -> user.title)
         .add("performance" -> player.performance)
@@ -187,6 +189,8 @@ object SwissJson {
         "clock"                 -> swiss.clock,
         "variant"               -> swiss.variant.key,
         "isMedley"              -> swiss.isMedley,
+        "isMcMahon"             -> swiss.settings.mcmahon,
+        "mcmahonCutoff"         -> swiss.settings.mcmahonCutoff,
         "isHandicapped"         -> swiss.settings.handicapped,
         "p1Name"                -> swiss.variant.playerNames(P1),
         "p2Name"                -> swiss.variant.playerNames(P2),
@@ -228,7 +232,11 @@ object SwissJson {
             pairingJsonOrOutcome(view.player)
           }
           .mkString("|")
-      )
+      ) ++ Json.obj(
+      "mmStartingScore" -> (swiss.settings.mcmahon ?? view.player.mcMahonStartingScore(
+        swiss.settings.mcmahonCutoffGrade
+      ))
+    )
 
   def playerJsonExt(swiss: Swiss, view: SwissPlayer.ViewExt): JsObject =
     playerJsonBase(view, performance = true) ++ Json
@@ -242,11 +250,18 @@ object SwissJson {
                 Json.obj(
                   "user"        -> p.player.user,
                   "rating"      -> p.player.player.rating,
-                  "inputRating" -> p.player.player.inputRating
+                  "inputRating" -> p.player.player.inputRating,
+                  "ratingDisplay" -> (swiss.variant.gameFamily == GameFamily
+                    .Go() && (swiss.settings.handicapped || swiss.settings.mcmahon)) ?? p.player.player.inputRating
+                    .map(goRatingDisplay(_))
                 )
             }
           }
-      )
+      ) ++ Json.obj(
+      "mmStartingScore" -> (swiss.settings.mcmahon ?? view.player.mcMahonStartingScore(
+        swiss.settings.mcmahonCutoffGrade
+      ))
+    )
 
   private def playerJsonBase(
       view: SwissPlayer.Viewish,
@@ -262,12 +277,13 @@ object SwissJson {
   ): JsObject =
     Json
       .obj(
-        "user"        -> user,
-        "rating"      -> p.rating,
-        "inputRating" -> p.inputRating,
-        "points"      -> p.points,
-        "tieBreak"    -> p.tieBreak,
-        "tieBreak2"   -> p.tieBreak2
+        "user"          -> user,
+        "rating"        -> p.rating,
+        "inputRating"   -> p.inputRating,
+        "ratingDisplay" -> p.inputRating.map(goRatingDisplay(_)),
+        "points"        -> p.points,
+        "tieBreak"      -> p.tieBreak,
+        "tieBreak2"     -> p.tieBreak2
       )
       .add("performance" -> (performance ?? p.performance))
       .add("provisional" -> p.provisional)
@@ -385,10 +401,11 @@ object SwissJson {
 
   private def boardPlayerJson(player: SwissBoard.Player) =
     Json.obj(
-      "rank"        -> player.rank,
-      "rating"      -> player.rating,
-      "inputRating" -> player.inputRating,
-      "user"        -> player.user
+      "rank"          -> player.rank,
+      "rating"        -> player.rating,
+      "inputRating"   -> player.inputRating,
+      "ratingDisplay" -> player.inputRating.map(goRatingDisplay(_)),
+      "user"          -> player.user
     )
 
   implicit private val roundNumberWriter: Writes[SwissRound.Number] = Writes[SwissRound.Number] { n =>

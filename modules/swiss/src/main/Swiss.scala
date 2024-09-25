@@ -11,6 +11,7 @@ import scala.concurrent.duration._
 import lila.hub.LightTeam.TeamID
 import lila.rating.PerfType
 import lila.user.User
+import lila.game.Handicaps
 import lila.i18n.VariantKeys
 
 case class Swiss(
@@ -55,6 +56,8 @@ case class Swiss(
   def finishedRounds: List[SwissRound.Number] = (1 until round.value).toList.map(SwissRound.Number.apply)
   def tieBreakRounds: List[SwissRound.Number] = if (isFinished) allRounds
   else (1 until ((round.value + 1) atMost settings.nbRounds)).toList.map(SwissRound.Number.apply)
+  def allAcceleratedRounds: List[SwissRound.Number] = if (isFinished) allRounds
+  else (1 to ((round.value + 1) atMost settings.nbRounds)).toList.map(SwissRound.Number.apply)
 
   def actualNbRounds = if (isFinished) round.value else settings.nbRounds
 
@@ -163,6 +166,8 @@ object Swiss {
   case class Settings(
       nbRounds: Int,
       rated: Boolean,
+      mcmahon: Boolean,
+      mcmahonCutoff: String,
       handicapped: Boolean,
       inputPlayerRatings: String,
       isMatchScore: Boolean,
@@ -195,10 +200,11 @@ object Swiss {
       case s if s < 24 * 3600 => Some(s"${s / 3600} hour${if (s == 60 * 60) "" else "s"}")
       case s                  => Some(s"${s / 24 / 3600} day${if (s == 24 * 60 * 60) "" else "s"}")
     }).map(s => s"${s} break after round ${halfwayBreakRound}")
-    lazy val halfwayBreakRound = (nbRounds + 1) / 2
-    def manualRounds           = intervalSeconds == Swiss.RoundInterval.manual
-    def dailyInterval          = (!manualRounds && intervalSeconds >= 24 * 3600) option intervalSeconds / 3600 / 24
-    def usingDrawTables        = useDrawTables || usePerPairingDrawTables
+    lazy val halfwayBreakRound  = (nbRounds + 1) / 2
+    def manualRounds            = intervalSeconds == Swiss.RoundInterval.manual
+    def dailyInterval           = (!manualRounds && intervalSeconds >= 24 * 3600) option intervalSeconds / 3600 / 24
+    def usingDrawTables         = useDrawTables || usePerPairingDrawTables
+    def mcmahonCutoffGrade: Int = Handicaps.playerRatingFromInput(mcmahonCutoff).getOrElse(1500)
   }
 
   type ChatFor = Int

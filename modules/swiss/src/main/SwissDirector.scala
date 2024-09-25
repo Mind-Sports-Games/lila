@@ -36,6 +36,43 @@ final private class SwissDirector(
     else tables.lift(Random.nextInt(tables.size))
   }
 
+  private def playersAndStartingFen(
+      swiss: Swiss,
+      players: List[SwissPlayer],
+      w: User.ID,
+      b: User.ID
+  ): (User.ID, User.ID, Option[FEN]) = {
+    //weaker player must be p1 in handicap go games
+    val wRating = players.filter(_.userId == w).map(_.actualRating).headOption.getOrElse(1500)
+    val bRating = players.filter(_.userId == b).map(_.actualRating).headOption.getOrElse(1500)
+    val p1Id    = if (wRating <= bRating) w else b
+    val p2Id    = if (wRating <= bRating) b else w
+
+    //handle mcmahon handicaped games
+    val wPoints: Float     = players.filter(_.userId == w).map(_.points.value).headOption.getOrElse(0)
+    val bPoints: Float     = players.filter(_.userId == b).map(_.points.value).headOption.getOrElse(0)
+    val scoreDiff          = Math.abs(wPoints - bPoints).toInt
+    val mcMahonHandicapped = swiss.settings.mcmahon && scoreDiff >= 2
+    val mmp1Id             = if (wPoints <= bPoints) w else b
+    val mmp2Id             = if (wPoints <= bPoints) b else w
+
+    if (swiss.settings.handicapped) {
+      (
+        p1Id,
+        p2Id,
+        Handicaps.startingFen(
+          swiss.roundVariant.some,
+          if (p1Id == w) wRating else bRating,
+          if (p2Id == w) wRating else bRating
+        )
+      )
+    } else if (mcMahonHandicapped) {
+      (mmp1Id, mmp2Id, Handicaps.startingFenMcMahon(swiss.roundVariant.some, scoreDiff))
+    } else {
+      (w, b, None)
+    }
+  }
+
   // sequenced by SwissApi
   private[swiss] def startRound(from: Swiss): Fu[Option[Swiss]] =
     pairingSystem(from)
@@ -56,20 +93,14 @@ final private class SwissDirector(
             ids <- idGenerator.games(pendingPairings.size)
             pairings = pendingPairings.zip(ids).map {
               case (SwissPairing.Pending(w, b), id) => {
-                //weaker player must be p1 in handicap go games
-                val wRating =
-                  players.filter(_.userId == w).map(_.actualRating).headOption.getOrElse(1500)
-                val bRating =
-                  players.filter(_.userId == b).map(_.actualRating).headOption.getOrElse(1500)
-                val p1Id = if (wRating <= bRating) w else b
-                val p2Id = if (wRating <= bRating) b else w
+                val p1p2sf = playersAndStartingFen(swiss, players, w, b)
 
                 SwissPairing(
                   id = id,
                   swissId = swiss.id,
                   round = swiss.round,
-                  p1 = if (swiss.settings.handicapped) p1Id else w,
-                  p2 = if (swiss.settings.handicapped) p2Id else b,
+                  p1 = p1p2sf._1,
+                  p2 = p1p2sf._2,
                   bbpPairingP1 = w,
                   status = Left(SwissPairing.Ongoing),
                   matchStatus = Left(SwissPairing.Ongoing),
@@ -78,12 +109,7 @@ final private class SwissDirector(
                   isBestOfX = swiss.settings.isBestOfX,
                   isPlayX = swiss.settings.isPlayX,
                   nbGamesPerRound = swiss.settings.nbGamesPerRound,
-                  if (swiss.settings.handicapped)
-                    Handicaps.startingFen(
-                      swiss.roundVariant.some,
-                      if (p1Id == w) wRating else bRating,
-                      if (p2Id == w) wRating else bRating
-                    )
+                  if (p1p2sf._3 != None) p1p2sf._3
                   else if (randomPairingPos) randomPos().orElse(perRoundPos)
                   else perRoundPos,
                   swiss.roundVariant.some
@@ -187,7 +213,9 @@ final private class SwissDirector(
       )
       .withId(if (rematch) pairing.multiMatchGameIds.fold(pairing.gameId)(l => l.last) else pairing.id)
       .withSwissId(swiss.id.value)
-      .withHandicappedTournament(swiss.settings.handicapped)
+      .withHandicappedTournament(
+        swiss.settings.handicapped || (swiss.settings.mcmahon && pairing.openingFEN.nonEmpty)
+      )
       .start
 
   private def makePlayer(playerIndex: PlayerIndex, player: SwissPlayer) =

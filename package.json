@@ -21,7 +21,7 @@
     "url": "https://github.com/Mind-Sports-Games/lila/issues"
   },
   "homepage": "https://playstrategy.org",
-  "packageManager": "pnpm@9.1.0",
+  "packageManager": "pnpm@9.6.0",
   "engines": {
     "node": ">=20",
     "pnpm": "^9"
@@ -36,8 +36,8 @@
     "@typescript-eslint/eslint-plugin": "^7.2.0",
     "@typescript-eslint/parser": "^7.2.0",
     "ab": "github:lichess-org/ab-stub",
-    "chessground": "git+ssh://git@github.com:Mind-Sports-Games/chessground.git#v7.11.1-pstrat3.0",
-    "stratops": "git+ssh://git@github.com:Mind-Sports-Games/stratops.git#v0.8.1-pstrat5.0",
+    "chessground": "git+ssh://git@github.com:Mind-Sports-Games/chessground.git#v7.11.1-pstrat3.1",
+    "stratops": "git+ssh://git@github.com:Mind-Sports-Games/stratops.git#v0.8.1-pstrat5.1",
     "eslint": "^8.57.0",
     "lint-staged": "^15.2.2",
     "onchange": "^7.1.0",

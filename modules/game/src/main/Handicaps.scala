@@ -22,6 +22,23 @@ object Handicaps {
     }
   }
 
+  def startingFenMcMahon(variant: Option[Variant], scoreDiff: Int): Option[FEN] = {
+    variant.flatMap { v =>
+      v.gameFamily match {
+        case GameFamily.Go() => {
+          val goHandicap = calcGoMcMahonHandicap(v.toGo.boardSize.height, scoreDiff)
+          Some(
+            FEN(
+              v.gameLogic,
+              v.toGo.fenFromSetupConfig(goHandicap.stones, goHandicap.komi).value
+            )
+          )
+        }
+        case _ => None
+      }
+    }
+  }
+
   def playerInputRatings(inputPlayerRatingsInput: String): Map[String, Int] =
     inputPlayerRatingsInput.linesIterator.flatMap {
       _.trim.toLowerCase.split(' ').map(_.trim) match {
@@ -38,6 +55,18 @@ object Handicaps {
         case _ => None
       }
     }.toMap
+
+  def playerRatingFromInput(inputRating: String): Option[Int] = {
+    inputRating match {
+      case psRating(grade) if grade.toInt >= 600 && grade.toInt <= 2900 =>
+        Some(inputRating.toInt)
+      case goKyuRating(grade) if grade.toInt > 0 && grade.toInt <= 60 =>
+        Some(convertGoRating(grade.toInt, KyuRating))
+      case goDanRating(grade) if grade.toInt > 0 && grade.toInt <= 7 =>
+        Some(convertGoRating(grade.toInt, DanRating))
+      case _ => None
+    }
+  }
 
   private def calcGoHandicap(size: Int, p1Rating: Int, p2Rating: Int): GoHandicap = {
     val ratingDiff = Math.abs(p1Rating - p2Rating)
@@ -105,6 +134,89 @@ object Handicaps {
   val goKyuRating = s"^([0-9]+)k$$".r
   val goDanRating = s"^([1-7]+)d$$".r
   val psRating    = s"^([0-9]+)$$".r
+
+  def goRatingDisplay(rating: Int): String = {
+    if (rating >= 2100) {
+      (mcMahonScoreFromRating(rating).toInt + 1).toString() + "d"
+    } else {
+      (mcMahonScoreFromRating(rating).toInt * -1).toString() + "k"
+    }
+  }
+
+  def mcMahonScoreFromRating(rating: Int): Double = {
+    rating match {
+      case x if x >= 2800 => 7.0
+      case x if x >= 2700 => 6.0
+      case x if x >= 2600 => 5.0
+      case x if x >= 2500 => 4.0
+      case x if x >= 2400 => 3.0
+      case x if x >= 2300 => 2.0
+      case x if x >= 2200 => 1.0
+      case x if x >= 2100 => 0.0
+      case x if x >= 2000 => -1.0
+      case x if x >= 1900 => -2.0
+      case x if x >= 1800 => -3.0
+      case x if x >= 1700 => -4.0
+      case x if x >= 1650 => -5.0
+      case x if x >= 1600 => -6.0
+      case x if x >= 1550 => -7.0
+      case x if x >= 1500 => -8.0
+      case x if x >= 1450 => -9.0
+      case x if x >= 1400 => -10.0
+      case x if x >= 1350 => -11.0
+      case x if x >= 1300 => -12.0
+      case x if x >= 1250 => -13.0
+      case x if x >= 1200 => -14.0
+      case x if x >= 1150 => -15.0
+      case x if x >= 1100 => -16.0
+      case x if x >= 1050 => -17.0
+      case x if x >= 1000 => -18.0
+      case x if x >= 966  => -19.0
+      case x if x >= 933  => -20.0
+      case x if x >= 900  => -21.0
+      case x if x >= 867  => -22.0
+      case x if x >= 834  => -23.0
+      case x if x >= 801  => -24.0
+      case x if x >= 768  => -25.0
+      case x if x >= 735  => -26.0
+      case x if x >= 702  => -27.0
+      case x if x >= 669  => -28.0
+      case x if x >= 636  => -29.0
+      case x if x < 636   => -30.0
+      case _              => 0.0
+    }
+  }
+
+  private def calcGoMcMahonHandicap(size: Int, scoreDiff: Int): GoHandicap = {
+    size match {
+      case 9 =>
+        scoreDiff match {
+          case 0 => GoHandicap(55, 0)
+          case 1 => GoHandicap(55, 0)
+          case 2 => GoHandicap(0, 0)
+          case 3 => GoHandicap(55, 2)
+          case x if x % 3 == 1 => GoHandicap(35, ((x + 2) / 3))
+          case x if x % 3 == 2 => GoHandicap(15, ((x + 1) / 3))
+          case x if x % 3 == 0 => GoHandicap(55, ((x + 3) / 3))
+        }
+      case 13 =>
+        scoreDiff match {
+          case 0 => GoHandicap(75, 0)
+          case 1 => GoHandicap(75, 0)
+          case 2 => GoHandicap(0, 0)
+          case 3 => GoHandicap(75, 2)
+          case x if x % 2 == 0 => GoHandicap(35, (x / 2))
+          case x if x % 2 == 1 => GoHandicap(75, ((x + 1) / 2))
+        }
+      case 19 =>
+        scoreDiff match {
+          case 0 => GoHandicap(75, 0)
+          case 1 => GoHandicap(75, 0)
+          case 2 => GoHandicap(0, 0)
+          case _ => GoHandicap(75, scoreDiff - 1)
+        }
+    }
+  }
 }
 
 case class GoHandicap(komi: Int, stones: Int) //komi is 10x to be int

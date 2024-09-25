@@ -12,7 +12,7 @@ final private class SwissTiebreak(
     playerMap: SwissPlayer.PlayerMap,
     pairingMap: SwissPairing.PairingMap
 ) extends Tournament {
-  val rounds = swiss.tieBreakRounds
+  val rounds   = swiss.tieBreakRounds
   val nbRounds = rounds.length
   def resultsForPlayer(hero: TiebreakPlayer): List[TiebreakResult] = {
     playerMap
@@ -21,9 +21,9 @@ final private class SwissTiebreak(
         val playerPairingMap = ~pairingMap.get(hero.id)
         rounds.flatMap { round =>
           {
-            // We use 1-based indexing here, 
+            // We use 1-based indexing here,
             // but the tiebreakers use 0 based indexing
-            val r = Tiebreak.Round(round.value-1)
+            val r = Tiebreak.Round(round.value - 1)
             playerPairingMap get round match {
               case Some(pairing) => {
                 val foe = TiebreakPlayer(pairing opponentOf hero.id)
@@ -71,24 +71,29 @@ final private class SwissScoring(
           pairingMap = SwissPairing.toMap(pairings)
           sheets     = SwissSheet.many(swiss, prevPlayers, pairingMap)
           withPoints = (prevPlayers zip sheets).map { case (player, sheet) =>
-            player.copy(points = sheet.points)
+            player.copy(points =
+              if (!swiss.settings.mcmahon) sheet.points
+              else
+                sheet.points + Swiss.Points(
+                  (player.mcMahonStartingScore(swiss.settings.mcmahonCutoffGrade) * 2).toInt
+                )
+            )
           }
           playerMap = SwissPlayer.toMap(withPoints)
           tiebreaks = new Tiebreak(new SwissTiebreak(swiss, playerMap, pairingMap))
           players = withPoints.map { p =>
             {
               val playerPairings = (~pairingMap.get(p.userId)).values
-              val sbTieBreak = 0.5*tiebreaks.lilaSonnenbornBerger(TiebreakPlayer(p.userId))
-              val bhTieBreak = 0.5*tiebreaks.fideBuchholz(TiebreakPlayer(p.userId))
+              val sbTieBreak     = 0.5 * tiebreaks.lilaSonnenbornBerger(TiebreakPlayer(p.userId))
+              val bhTieBreak     = 0.5 * tiebreaks.fideBuchholz(TiebreakPlayer(p.userId))
               // TODO: should the perf rating be in stratgames too?
-              val perfSum = playerPairings.foldLeft(0f) {
-                case (perfSum, pairing) =>
-                  val opponent       = playerMap.get(pairing opponentOf p.userId)
-                  val result         = pairing.resultFor(p.userId)
-                  val newPerf = perfSum + opponent.??(_.rating) + result.?? { win =>
-                    if (win) 500 else -500
-                  }
-                  newPerf
+              val perfSum = playerPairings.foldLeft(0f) { case (perfSum, pairing) =>
+                val opponent = playerMap.get(pairing opponentOf p.userId)
+                val result   = pairing.resultFor(p.userId)
+                val newPerf = perfSum + opponent.??(_.actualRating) + result.?? { win =>
+                  if (win) 500 else -500
+                }
+                newPerf
               }
               p.copy(
                 sbTieBreak = Swiss.SonnenbornBerger(sbTieBreak),

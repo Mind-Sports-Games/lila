@@ -147,6 +147,19 @@ case class Schedule(
 
   def perfType = PerfType.byVariant(variant) | Schedule.Speed.toPerfType(speed)
 
+  def trophyExpiryDays = medleyShield.map(ms =>
+    ms.weekOfMonth match {
+      case Some(_) => {
+        val lastDayOfMonth = at.dayOfMonth.withMaximumValue
+        (((lastDayOfMonth
+          .minusDays((lastDayOfMonth.getDayOfWeek + 7 - ms.dayOfWeek) % 7)
+          .dayOfMonth
+          .get() - 1) / 7) + 1) * 7
+      }
+      case None => 7 //weekly
+    }
+  )
+
   def plan                                  = Schedule.Plan(this, None)
   def plan(build: Tournament => Tournament) = Schedule.Plan(this, build.some)
 

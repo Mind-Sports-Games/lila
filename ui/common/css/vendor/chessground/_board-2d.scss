@@ -99,6 +99,11 @@ $togyzkumalak-board-files: (
   'wood': 'togyzkumalak_wood_board.png',
 );
 
+$bestemshe-board-files: (
+  'blue': 'togyzkumalak_blue_board_mini.png',
+  'wood': 'togyzkumalak_wood_board_mini.png',
+);
+
 $go9x9-board-files: (
   'light-wood': 'svg/go_board_light_9x9.svg',
   'dark-wood': 'svg/go_board_dark_9x9.svg',
@@ -224,6 +229,12 @@ $backgammon-variants: ('backgammon', 'nackgammon'); // must use same board
   }
 }
 
+@each $color, $file in $bestemshe-board-files {
+  .togyzkumalak-#{$color} .variant-bestemshe.is2d cg-board {
+    background-image: url(../images/board/togyzkumalak/#{$file});
+  }
+}
+
 @each $color, $file in $go9x9-board-files {
   .go-#{$color} .variant-go9x9.is2d cg-board {
     background-image: url(../images/board/go/#{$file});
@@ -334,6 +345,12 @@ $backgammon-variants: ('backgammon', 'nackgammon'); // must use same board
 
 @each $color, $file in $togyzkumalak-board-files {
   .togyzkumalak-#{$color} .is2d .variant-togyzkumalak cg-board {
+    background-image: url(../images/board/togyzkumalak/#{$file});
+  }
+}
+
+@each $color, $file in $bestemshe-board-files {
+  .togyzkumalak-#{$color} .is2d .variant-bestemshe cg-board {
     background-image: url(../images/board/togyzkumalak/#{$file});
   }
 }

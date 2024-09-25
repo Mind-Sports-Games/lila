@@ -94,6 +94,7 @@ export function convertVariantKeyToGameFamily(variantKey: VariantKey | DraughtsV
     case 'oware':
       return 'oware';
     case 'togyzkumalak':
+    case 'bestemshe':
       return 'togyzkumalak';
     case 'go9x9':
     case 'go13x13':

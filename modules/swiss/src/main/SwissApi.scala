@@ -83,6 +83,8 @@ final class SwissApi(
       settings = Swiss.Settings(
         nbRounds = data.nbRounds,
         rated = data.realPosition.isEmpty && data.isRated,
+        mcmahon = data.isMcMahon,
+        mcmahonCutoff = ~data.mcmahonCutoff,
         handicapped = data.isHandicapped,
         inputPlayerRatings = ~data.inputPlayerRatings,
         isMatchScore = data.isMatchScore,
@@ -125,8 +127,13 @@ final class SwissApi(
           settings = old.settings.copy(
             nbRounds = data.nbRounds,
             rated = position.isEmpty && (data.rated | old.settings.rated),
-            handicapped = data.isHandicapped,
-            inputPlayerRatings = ~data.inputPlayerRatings,
+            mcmahon = data.isMcMahon | old.settings.mcmahon,
+            mcmahonCutoff =
+              if (data.mcmahonCutoff.isDefined) ~data.mcmahonCutoff else old.settings.mcmahonCutoff,
+            handicapped = data.isHandicapped | old.settings.handicapped,
+            inputPlayerRatings =
+              if (data.inputPlayerRatings.isDefined) ~data.inputPlayerRatings
+              else old.settings.inputPlayerRatings,
             isMatchScore = data.isMatchScore,
             isBestOfX = data.isBestOfX,
             isPlayX = data.isPlayX,
@@ -174,8 +181,10 @@ final class SwissApi(
             s.copy(nextRoundAt = none)
           else s
         }
-      if (data.isHandicapped && old.settings.inputPlayerRatings != ~data.inputPlayerRatings) {
-        val playerRatingMap = Handicaps.playerInputRatings(~data.inputPlayerRatings)
+      if (
+        (swiss.settings.handicapped || swiss.settings.mcmahon) && old.settings.inputPlayerRatings != ~data.inputPlayerRatings
+      ) {
+        val playerRatingMap = Handicaps.playerInputRatings(swiss.settings.inputPlayerRatings)
         playerRatingMap.toList.map { case (u, r) =>
           colls.player
             .updateField(
@@ -189,7 +198,9 @@ final class SwissApi(
           playerRatingMap.keys.toList.map(u => SwissPlayer.Id(s"${swiss.id}:${u}"))
         ) >>
           recomputeAndUpdateAll(swiss.id)
-      } else if (!data.isHandicapped && old.settings.handicapped) {
+      } else if (
+        !(swiss.settings.handicapped || swiss.settings.mcmahon) && (old.settings.handicapped || old.settings.mcmahon)
+      ) {
         unsetAllPlayerInputRating(swiss.id) >>
           recomputeAndUpdateAll(swiss.id)
       }
@@ -197,6 +208,10 @@ final class SwissApi(
         cache.roundInfo.put(swiss.id, fuccess(swiss.roundInfo.some))
         socket.reload(swiss.id)
       }
+    } >> {
+      if (swiss.settings.mcmahon)
+        recomputeAndUpdateAll(swiss.id) //need to update player points preStart
+      else funit
     }
 
   private def unsetAllPlayerInputRating(

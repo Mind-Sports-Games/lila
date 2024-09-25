@@ -317,7 +317,7 @@ object Tournament {
       startsAt = sched.at plusSeconds ThreadLocalRandom.nextInt(60),
       description = sched.medleyShield.map(_.arenaDescriptionFull),
       trophy1st = sched.medleyShield.map(_.key),
-      trophyExpiryDays = if (sched.medleyShield.isDefined) 7.some else none,
+      trophyExpiryDays = sched.trophyExpiryDays,
       //we've scheduled this tour so make bots allowed for any of our tours
       botsAllowed = true
     )

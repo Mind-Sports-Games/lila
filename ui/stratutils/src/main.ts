@@ -76,7 +76,7 @@ export function variantUsesDestPosGoNotation(key: VariantKey | DraughtsVariantKe
 }
 
 export function variantUsesMancalaNotation(key: VariantKey | DraughtsVariantKey) {
-  return ['oware', 'togyzkumalak'].includes(key);
+  return ['oware', 'togyzkumalak', 'bestemshe'].includes(key);
 }
 
 export function variantUsesBackgammonNotation(key: VariantKey | DraughtsVariantKey) {
@@ -130,6 +130,7 @@ const noFishnetVariants: VariantKey[] = [
   'scrambledEggs',
   'oware',
   'togyzkumalak',
+  'bestemshe',
   'go9x9',
   'go13x13',
   'go19x19',
@@ -151,7 +152,8 @@ export function readDice(fen: string, variant: VariantKey, canEndTurn?: boolean,
   const usedDice = fen.split(' ')[2].replace('-', '').split('/');
   const dice = [];
   for (const d of unusedDice) {
-    if (+d) dice.push({ value: +d, isAvailable: !canEndTurn ?? true });
+    //if (+d) dice.push({ value: +d, isAvailable: !canEndTurn ?? true });
+    if (+d) dice.push({ value: +d, isAvailable: !(canEndTurn ?? false) });
   }
   for (const d of usedDice) {
     if (+d) dice.push({ value: +d, isAvailable: false });
@@ -214,6 +216,8 @@ export const variantToRules = (v: VariantKey): Rules => {
       return 'oware';
     case 'togyzkumalak':
       return 'togyzkumalak';
+    case 'bestemshe':
+      return 'bestemshe';
     case 'go9x9':
       return 'go9x9';
     case 'go13x13':

@@ -36,7 +36,7 @@ export function makeConfig(ctrl: RoundController): Config {
     lastMove: util.lastMove(data.onlyDropsVariant, step.uci),
     check: !!step.check,
     coordinates: data.pref.coords !== Prefs.Coords.Hidden,
-    boardScores: ['togyzkumalak', 'backgammon', 'nackgammon'].includes(data.game.variant.key),
+    boardScores: ['togyzkumalak', 'bestemshe', 'backgammon', 'nackgammon'].includes(data.game.variant.key),
     dice: dice,
     canUndo: data.canUndo,
     showUndoButton: playing && turnPlayerIndex == data.player.playerIndex && dice.length > 0,
@@ -83,7 +83,7 @@ export function makeConfig(ctrl: RoundController): Config {
       enabled:
         data.pref.enablePremove &&
         !data.onlyDropsVariant &&
-        !['oware', 'togyzkumalak', 'backgammon', 'nackgammon'].includes(data.game.variant.key),
+        !['oware', 'togyzkumalak', 'bestemshe', 'backgammon', 'nackgammon'].includes(data.game.variant.key),
       showDests: data.pref.destination,
       castle: data.game.variant.key !== 'antichess' && data.game.variant.key !== 'noCastling',
       events: {
@@ -142,7 +142,7 @@ export function makeConfig(ctrl: RoundController): Config {
                   ? 'https://playstrategy.org/assets/piece/oware/' +
                     data.pref.pieceSet.filter(ps => ps.gameFamily === 'oware')[0].name +
                     '/'
-                  : variantKey === 'togyzkumalak'
+                  : variantKey === 'togyzkumalak' || variantKey === 'bestemshe'
                     ? 'https://playstrategy.org/assets/piece/togyzkumalak/' +
                       data.pref.pieceSet.filter(ps => ps.gameFamily === 'togyzkumalak')[0].name +
                       '/'
@@ -169,7 +169,7 @@ export function makeConfig(ctrl: RoundController): Config {
     chess960: data.game.variant.key === 'chess960',
     onlyDropsVariant: data.onlyDropsVariant,
     singleClickMoveVariant:
-      ['togyzkumalak', 'backgammon', 'nackgammon'].includes(data.game.variant.key) ||
+      ['togyzkumalak', 'bestemshe', 'backgammon', 'nackgammon'].includes(data.game.variant.key) ||
       (data.game.variant.key === 'oware' && data.pref.mancalaMove),
   };
 }

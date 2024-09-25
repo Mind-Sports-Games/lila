@@ -88,6 +88,7 @@ export default function status(ctrl: Ctrl): string {
             return noarg('gameFinished');
           }
         case 'togyzkumalak':
+        case 'bestemshe':
           return noarg('gameFinished');
         case 'go9x9':
         case 'go13x13':

@@ -400,7 +400,10 @@ export default class AnalyseCtrl {
       isForwardStep = pathChanged && path.length == this.path.length + 2;
     this.setPath(path);
     this.showGround();
-    if (this.data.game.variant.key === 'togyzkumalak' && this.chessground) {
+    if (
+      (this.data.game.variant.key === 'togyzkumalak' || this.data.game.variant.key === 'bestemshe') &&
+      this.chessground
+    ) {
       this.chessground.redrawAll(); //redraw board scores
     }
     if (pathChanged) {
@@ -633,10 +636,12 @@ export default class AnalyseCtrl {
       possibleMoves.size == 1
     ) {
       const passOrig = possibleMoves.keys().next().value;
-      const passDests = possibleMoves.get(passOrig);
-      if (passDests && passDests.length == 1) {
-        const passDest = passDests[0];
-        this.sendMove(passOrig, passDest, undefined, undefined);
+      if (passOrig != undefined) {
+        const passDests = possibleMoves.get(passOrig);
+        if (passDests && passDests.length == 1) {
+          const passDest = passDests[0];
+          this.sendMove(passOrig, passDest, undefined, undefined);
+        }
       }
     }
   }

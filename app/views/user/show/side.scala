@@ -105,6 +105,7 @@ object side {
         showNonEmptyPerf(u.perfs.minibreakthroughtroyka, PerfType.orDefault("minibreakthroughtroyka")),
         showNonEmptyPerf(u.perfs.oware, PerfType.orDefault("oware")),
         showNonEmptyPerf(u.perfs.togyzkumalak, PerfType.orDefault("togyzkumalak")),
+        showNonEmptyPerf(u.perfs.bestemshe, PerfType.orDefault("bestemshe")),
         showNonEmptyPerf(u.perfs.go9x9, PerfType.orDefault("go9x9")),
         showNonEmptyPerf(u.perfs.go13x13, PerfType.orDefault("go13x13")),
         showNonEmptyPerf(u.perfs.go19x19, PerfType.orDefault("go19x19")),
