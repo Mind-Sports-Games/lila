@@ -456,8 +456,9 @@ object SwissForm {
       if (medleyDefaults.onePerGameFamily.getOrElse(false)) {
         //take a shuffled list of all variants and pull the first for each game group to the front
         val onePerGameGroupVariantList = scala.util.Random.shuffle(
-          medleyGameFamilies.ggList
-            .map(gg => scala.util.Random.shuffle(gg.variants).head)
+          medleyGameFamilies.ggList.map(gg =>
+            scala.util.Random.shuffle(gg.variants.filter(v => !v.fromPositionVariant)).head
+          )
         )
         onePerGameGroupVariantList ::: generateNoDefaultsMedleyVariants.filterNot(
           onePerGameGroupVariantList.contains(_)
