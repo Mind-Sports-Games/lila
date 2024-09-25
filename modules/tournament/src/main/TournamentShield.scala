@@ -451,6 +451,46 @@ object TournamentShield {
           s"Welcome to the ${VariantKeys.gameGroupName(GameGroup.Mancala())} Medley Arena!"
         )
 
+    private def togyzkumalakVariantOrder(variants: List[Variant]) = {
+      TournamentMedleyUtil.medleyVariantsAndIntervals(
+        variants,
+        5 * 60,
+        togyzkumalakVariantMinutes,
+        togyzkumalakRounds,
+        false
+      )
+    }
+
+    private val togyzkumalakVariants = List(
+      Variant.wrap(strategygames.togyzkumalak.variant.Togyzkumalak),
+      Variant.wrap(strategygames.togyzkumalak.variant.Bestemshe),
+      Variant.wrap(strategygames.togyzkumalak.variant.Togyzkumalak)
+    )
+
+    private val togyzkumalakVariantMinutes = 90
+    private val togyzkumalakRounds         = togyzkumalakVariants.size
+
+    case object TogyzkumalakMedley
+        extends MedleyShield(
+          "shieldTogyzkumalakMedley",
+          VariantKeys.gameFamilyName(GameFamily.Togyzkumalak()),
+          Condition.TeamMember("playstrategy-mancala", "PlayStrategy Mancala"),
+          togyzkumalakVariants,
+          togyzkumalakVariantOrder,
+          Blitz53,
+          Some(3),
+          6,
+          14,
+          togyzkumalakVariantMinutes,
+          togyzkumalakRounds,
+          "",
+          s"An Arena which is divided into ${togyzkumalakRounds} equal length periods of ${togyzkumalakVariants.init
+            .map(VariantKeys.variantName)
+            .mkString(", ")} and ${VariantKeys.variantName(togyzkumalakVariants.last)} again.",
+          s"Welcome to the ${VariantKeys.gameFamilyName(GameFamily.Togyzkumalak())} Medley Arena!",
+          6
+        )
+
     private def backgammonVariantOrder(variants: List[Variant]) = {
       TournamentMedleyUtil.medleyVariantsAndIntervals(
         variants,
@@ -488,6 +528,46 @@ object TournamentShield {
             .map(VariantKeys.variantName)
             .mkString(", ")} and ${VariantKeys.variantName(backgammonVariants.last)} again.",
           s"Welcome to the ${VariantKeys.gameFamilyName(GameFamily.Backgammon())} Medley Arena!"
+        )
+
+    private def breakthroughVariantOrder(variants: List[Variant]) = {
+      TournamentMedleyUtil.medleyVariantsAndIntervals(
+        variants,
+        5 * 60,
+        breakthroughVariantMinutes,
+        breakthroughRounds,
+        false
+      )
+    }
+
+    private val breakthroughVariants = List(
+      Variant.wrap(strategygames.fairysf.variant.BreakthroughTroyka),
+      Variant.wrap(strategygames.fairysf.variant.MiniBreakthroughTroyka),
+      Variant.wrap(strategygames.fairysf.variant.BreakthroughTroyka)
+    )
+
+    private val breakthroughVariantMinutes = 90
+    private val breakthroughRounds         = breakthroughVariants.size
+
+    case object BreakthroughMedley
+        extends MedleyShield(
+          "shieldBreakthroughMedley",
+          VariantKeys.gameFamilyName(GameFamily.BreakthroughTroyka()),
+          Condition.TeamMember("playstrategy-breakthrough", "PlayStrategy Breakthrough"),
+          breakthroughVariants,
+          breakthroughVariantOrder,
+          Blitz53,
+          Some(4),
+          6,
+          16,
+          breakthroughVariantMinutes,
+          breakthroughRounds,
+          "",
+          s"An Arena which is divided into ${breakthroughRounds} equal length periods of ${breakthroughVariants.init
+            .map(VariantKeys.variantName)
+            .mkString(", ")} and ${VariantKeys.variantName(breakthroughVariants.last)} again.",
+          s"Welcome to the ${VariantKeys.gameFamilyName(GameFamily.BreakthroughTroyka())} Medley Arena!",
+          5
         )
 
     //all the order permuations which doesnt put two chess or two backgammon next to each other
@@ -551,7 +631,9 @@ object TournamentShield {
       XiangqiMedley,       //Monthly - 2nd Sun lunchtime
       OthelloMedley,       //Monthly - 4th Sun lunchtime
       MancalaMedley,       //Monthly - 1st Sun lunchtime
+      TogyzkumalakMedley,  //Monthly - 3rd Sat lunchtime
       BackgammonMedley,    //Monthly - 1st Sat afternoon
+      BreakthroughMedley,  //Monthly - 4rd Sat afternoon
       ChessgammonMedley    //Monthly - 1st Sun afternoon
     )
 
