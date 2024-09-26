@@ -127,7 +127,8 @@ object BsonHandlers {
             isPlayX = r.getD[Boolean](isPlayX),
             nbGamesPerRound = r.intO("gpr") getOrElse SwissBounds.defaultGamesPerRound,
             //TODO allow this to work for chess too?
-            openingFEN = r.getO[String](openingFEN).map(fen => FEN(GameLogic.Draughts(), fen))
+            openingFEN = r.getO[String](openingFEN).map(fen => FEN(GameLogic.Draughts(), fen)),
+            variant = r.getO[Variant]("v")
           )
         case _ => sys error "Invalid swiss pairing users"
       }
@@ -147,7 +148,8 @@ object BsonHandlers {
         isBestOfX         -> o.isBestOfX,
         isPlayX           -> o.isPlayX,
         nbGamesPerRound   -> (o.nbGamesPerRound != SwissBounds.defaultGamesPerRound).option(o.nbGamesPerRound),
-        openingFEN        -> o.openingFEN.map(_.value)
+        openingFEN        -> o.openingFEN.map(_.value),
+        variant           -> o.variant
       )
   }
   implicit val pairingGamesHandler = new BSON[SwissPairingGameIds] {

@@ -1,6 +1,6 @@
 package lila.swiss
 
-import strategygames.{ Player => PlayerIndex }
+import strategygames.{ Player => PlayerIndex, GameFamily }
 import strategygames.format.FEN
 import strategygames.variant.Variant
 import lila.game.Game
@@ -46,7 +46,7 @@ case class SwissPairing(
     if (nbGamesPerRound > 1)
       matchStatus.fold(
         _ => None,
-        SwissPairing.matchResultsMap("draw", "win", "loss")(playerIndexOf(userId))(_).some
+        SwissPairing.matchResultsMap(variant)("draw", "win", "loss")(playerIndexOf(userId))(_).some
       )
     else None
   }
@@ -57,7 +57,7 @@ case class SwissPairing(
       matchStatus.fold(
         _ => "00",
         SwissPairing
-          .matchResultsMap(1, 2, 0)(playerIndexOf(userId))(_)
+          .matchResultsMap(variant)(1, 2, 0)(playerIndexOf(userId))(_)
           .foldLeft(0)(_ + _)
           .toString()
           .reverse
@@ -74,7 +74,7 @@ case class SwissPairing(
         .fold(
           _ => "*",
           SwissPairing
-            .matchResultsMap(1, 2, 0)(playerIndex)(_)
+            .matchResultsMap(variant)(1, 2, 0)(playerIndex)(_)
             .foldLeft(0)(_ + _)
             .toString()
         )
@@ -112,10 +112,15 @@ case class SwissPairingGames(
       .zipWithIndex
       .map { case (outcome, index) =>
         outcome.fold(0)(playerIndex =>
-          if (index % 2 == 0) {
-            if (playerIndex == PlayerIndex.P1) 1 else -1
-          } else {
-            if (playerIndex == PlayerIndex.P2) 1 else -1
+          game.variant match {
+            case v if v.gameFamily == GameFamily.Backgammon() => if (playerIndex == PlayerIndex.P1) 1 else -1
+            case _ => {
+              if (index % 2 == 0) {
+                if (playerIndex == PlayerIndex.P1) 1 else -1
+              } else {
+                if (playerIndex == PlayerIndex.P2) 1 else -1
+              }
+            }
           }
         )
       }
@@ -160,7 +165,7 @@ case class SwissPairingGames(
 
   def strResultOf(playerIndex: PlayerIndex) =
     SwissPairing
-      .matchResultsMap(1, 2, 0)(playerIndex)(
+      .matchResultsMap(game.variant.some)(1, 2, 0)(playerIndex)(
         multiMatchGames
           .foldLeft(List(game))(_ ++ _)
           .filter(g => g.finished)
@@ -187,15 +192,20 @@ object SwissPairing {
       swissPairing.openingFEN
     )
 
-  def matchResultsMap[A](draw: A, win: A, loss: A)(
+  def matchResultsMap[A](variant: Option[Variant])(draw: A, win: A, loss: A)(
       playerIndex: PlayerIndex
   )(l: List[Option[PlayerIndex]]): List[A] = {
     l.zipWithIndex.map { case (outcome, index) =>
       outcome.fold(draw)(c =>
-        if ( //players swap playerindex each game of multi match
-          (c == playerIndex && (index % 2 == 0)) || (c != playerIndex && (index % 2 == 1))
-        ) win
-        else loss
+        variant match {
+          case Some(v) if v.gameFamily == GameFamily.Backgammon() => if (c == playerIndex) win else loss
+          case _ => {
+            if ( //players swap playerindex each game of multi match
+              (c == playerIndex && (index % 2 == 0)) || (c != playerIndex && (index % 2 == 1))
+            ) win
+            else loss
+          }
+        }
       )
     }
   }
