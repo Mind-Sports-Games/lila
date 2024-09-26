@@ -1,4 +1,6 @@
 package lila.swiss
+import strategygames.{ GameFamily }
+import strategygames.variant.Variant
 
 private case class SwissSheet(outcomes: List[List[SwissSheet.Outcome]]) {
   import SwissSheet._
@@ -93,14 +95,21 @@ private object SwissSheet {
       case Right(l) =>
         l.zipWithIndex
           .map { case (outcome, index) =>
-            outcome.fold[Outcome](Draw)(c =>
-              if (
-                (pairing(c) == player.userId && index % 2 == 0) || (pairing(
-                  c
-                ) != player.userId && index % 2 == 1)
-              ) Win
-              else Loss
-            )
+            outcome.fold[Outcome](Draw)(c => {
+              pairing.variant match {
+                case Some(v) if v.gameFamily == GameFamily.Backgammon() => {
+                  if (pairing(c) == player.userId) Win else Loss
+                } //multimatch Backgammon games require players to keep colour/player for display same pieces
+                case _ => {
+                  if (
+                    (pairing(c) == player.userId && index % 2 == 0) || (pairing(
+                      c
+                    ) != player.userId && index % 2 == 1)
+                  ) Win
+                  else Loss
+                }
+              }
+            })
           }
     }
 
