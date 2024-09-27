@@ -59,11 +59,17 @@ jobs:
             - recursive: false
               args: [--no-frozen-lockfile, --strict-peer-dependencies]
       - name: Build files
-        id: buildFiles
         run: ./ui/build --no-install --prod
-      - name: Exit in case "Build files" failed
-        if: steps.buildFiles.outcome != 'success'
-        run: exit 1
+      # - name: Exit in case "Build files" failed
+      #   if: steps.buildFiles.outcome != 'success'
+      #   run: |
+      #     echo ${{ steps.buildFiles.outcome }}
+      #     exit 1
+      # - name: just a test
+      #   run: |
+      #     echo ${{ steps.build_files.outcome }}
+      #     echo ${{ steps.build_files.outputs.value }}
+      #     exit 1
       - name: Get Time
         id: time
         uses: nanzm/get-time-action@v2.0
