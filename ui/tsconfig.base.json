@@ -13,6 +13,7 @@
     "lib": ["es2019"],
     "esModuleInterop": true,
     "isolatedModules": true,
+    "noEmitOnError": true,
     "types": ["playstrategy", "web"]
   }
 }

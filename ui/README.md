@@ -7,7 +7,7 @@ Stick to `ui/build -cr` (clean rebuild with watch mode) and leave it running whe
 NOTE - always use hard refresh (google it) or disable caching in the network tab of your browser inspector to pick up fresh changes.
 
 NOTE - since we now use pnpm, it may be useful to know you can run `rm -rf node_modules pnpm-lock.yaml && pnpm store prune && pnpm i` if you want to ensure pnpm tries to solve completely the deps tree\
-You can run `pnpm lint` and `pnpm format`, but there is also a new `pnpm lint-staged`.
+Our CI uses the command `./ui/build --no-install --prod` (as the install part is handled upstream) and takes care of pruning after each run.
 
 Usage examples:
 
