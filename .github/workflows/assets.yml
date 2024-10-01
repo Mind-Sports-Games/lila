@@ -57,7 +57,7 @@ jobs:
         with:
           run_install: |
             - recursive: false
-              args: [--no-frozen-lockfile, --strict-peer-dependencies]
+#              args: [--no-frozen-lockfile, --strict-peer-dependencies]
       - run: node -v && pnpm -v && pnpm tsc -v
       - name: Build files
         run: ./ui/build --no-install --prod
