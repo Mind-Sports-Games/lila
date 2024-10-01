@@ -6,7 +6,7 @@
   "license": "AGPL-3.0-or-later",
   "type": "commonjs",
   "moduleResolution": "nodenext",
-  "dependencies": {
+  "devDependencies": {
     "@types/node": "20.12.2",
     "@types/tinycolor2": "^1.4.6",
     "esbuild": "^0.20.2",

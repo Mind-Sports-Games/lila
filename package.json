@@ -30,11 +30,6 @@
     "*.{js,ts,md,json,scss}": "prettier --write"
   },
   "dependencies": {
-    "@types/playstrategy": "workspace:*",
-    "@types/node": "20.12.2",
-    "@types/web": "^0.0.142",
-    "@typescript-eslint/eslint-plugin": "^7.2.0",
-    "@typescript-eslint/parser": "^7.2.0",
     "ab": "github:lichess-org/ab-stub",
     "chessground": "git+ssh://git@github.com:Mind-Sports-Games/chessground.git#v7.11.1-pstrat3.1",
     "stratops": "git+ssh://git@github.com:Mind-Sports-Games/stratops.git#v0.8.1-pstrat5.1",
@@ -42,8 +37,15 @@
     "lint-staged": "^15.2.2",
     "onchange": "^7.1.0",
     "prettier": "^3.2.5",
-    "typescript": "^5.4.5",
     "xml2js": "0.4.19"
+  },
+  "devDependencies": {
+    "@types/playstrategy": "workspace:*",
+    "@types/node": "20.12.2",
+    "@types/web": "^0.0.142",
+    "@typescript-eslint/eslint-plugin": "^7.2.0",
+    "@typescript-eslint/parser": "^7.2.0",
+    "typescript": "^5.4.5"
   },
   "scripts": {
     "format": "prettier --write --log-level warn .",
