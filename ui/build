@@ -16,5 +16,8 @@ cd "$(dirname "${BASH_SOURCE:-$0}")/.build"
   pnpm install --silent --ignore-workspace --no-lockfile
 # fi
 
+# compiles ts into js so the next line can be used...
+./node_modules/.bin/tsc
+
 # invoke the (compiled into js) entry point of the build system, passing args given
 node --input-type=module dist/main.js "$@"
