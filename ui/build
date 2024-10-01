@@ -7,14 +7,14 @@ set -e
 cd "$(dirname "${BASH_SOURCE:-$0}")/.build"
 
 # in case "update" is given as an arg when invoking the build system...
-update=$(echo "$*" | grep -q -- '--update' && echo true || echo false)
-if $update || [ ! -d "node_modules" ]; then
+# update=$(echo "$*" | grep -q -- '--update' && echo true || echo false)
+# if $update || [ ! -d "node_modules" ]; then
   if ! command -v pnpm &> /dev/null; then
     echo "The 'pnpm' tool is required. See https://pnpm.io/installation."
     exit 1
   fi
   pnpm install --silent --ignore-workspace --no-lockfile
-fi
+# fi
 
 # invoke the (compiled into js) entry point of the build system, passing args given
 node --input-type=module dist/main.js "$@"
