@@ -60,6 +60,8 @@ jobs:
               args: [--no-frozen-lockfile, --strict-peer-dependencies]
       - name: Build files
         run: ./ui/build --no-install --prod
+        env:
+          CI: ""
       - name: Get Time
         id: time
         uses: nanzm/get-time-action@v2.0
