@@ -55,9 +55,11 @@ jobs:
       - name: Install PNPM and run pnpm install
         uses: pnpm/action-setup@v4
         with:
-          run_install: |
-            - recursive: true
-              args: [--no-frozen-lockfile, --strict-peer-dependencies]
+          run_install: false
+          # run_install: |
+          #   - recursive: true
+          #     args: [--no-frozen-lockfile, --strict-peer-dependencies]
+      - run: pnpm install -rP
       - name: Build files
         run: ./ui/build --no-install --prod
         env:
