@@ -11,6 +11,7 @@ update=$(echo "$*" | grep -q -- '--update' && echo true || echo false)
     echo "The 'pnpm' tool is required. See https://pnpm.io/installation."
     exit 1
   fi
+  pnpm prune
   pnpm install --silent --ignore-workspace --no-lockfile
 #fi
 
