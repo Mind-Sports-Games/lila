@@ -52,11 +52,12 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
-      - name: Install PNPM and do not run pnpm install
+      - name: Install PNPM and run pnpm install
         uses: pnpm/action-setup@v4
         with:
-          run_install: false
-      - run: ./ui/build --clean-build
+          run_install: |
+            - recursive: false
+              args: [--no-frozen-lockfile, --strict-peer-dependencies]
       - run: node -v && pnpm -v && pnpm tsc -v && pnpm list
       - name: Build files
         run: ./ui/build --no-install --prod
