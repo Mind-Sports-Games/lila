@@ -59,6 +59,7 @@ jobs:
             - recursive: false
               args: [--no-frozen-lockfile, --strict-peer-dependencies]
       - name: Build files
+        continue-on-error: false
         run: ./ui/build --no-install --prod
       # - name: Exit in case "Build files" failed
       #   if: steps.buildFiles.outcome != 'success'
