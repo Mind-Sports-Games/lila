@@ -12,7 +12,7 @@ update=$(echo "$*" | grep -q -- '--update' && echo true || echo false)
     exit 1
   fi
   pnpm prune
-  pnpm install --ignore-workspace --no-lockfile # --silent
+  pnpm install --ignore-workspace --no-lockfile --no-frozen-lockfile # --silent
 #fi
 
 #if $update || [ ! -d "dist" ]; then
