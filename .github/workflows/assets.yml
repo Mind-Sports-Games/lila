@@ -61,7 +61,7 @@ jobs:
       - name: Build files
         run: ./ui/build --no-install --prod
         env:
-          CI: ""
+          CI: false
       - name: Get Time
         id: time
         uses: nanzm/get-time-action@v2.0
