@@ -59,7 +59,7 @@ jobs:
           # run_install: |
           #   - recursive: true
           #     args: [--no-frozen-lockfile, --strict-peer-dependencies]
-      - run: pnpm install --recursive=true -rP
+      - run: pnpm install --recursive=true --no-frozen-lockfile -rP
       - name: Build files
         run: ./ui/build --no-install --prod
         env:

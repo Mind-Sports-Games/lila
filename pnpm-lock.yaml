@@ -42,8 +42,8 @@ importers:
         specifier: ^3.2.5
         version: 3.3.3
       stratops:
-        specifier: git+ssh://git@github.com:Mind-Sports-Games/stratops.git#pla-993-uibuild-unexpected-errors
-        version: https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/9ef607185ca62356a74c0d56db2797fe27efef55
+        specifier: github:Mind-Sports-Games/stratops#pla-993-uibuild-unexpected-errors
+        version: https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/ccc9adc59e9ba55d1105b0bb9d6ae33dd683d728
       typescript:
         specifier: ^5.4.5
         version: 5.6.2
@@ -3758,8 +3758,8 @@ packages:
   stockfish.wasm@0.10.0:
     resolution: {integrity: sha512-OTvOlz0ijCSmIb/YvOZ1Dn6vwZVS4Ge3N+RcV0d2b6LXUtCJ9UwmBHypRW3DZ+VXf8WNm7E3P+6jMTVvb3QaBg==}
 
-  stratops@https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/9ef607185ca62356a74c0d56db2797fe27efef55:
-    resolution: {tarball: https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/9ef607185ca62356a74c0d56db2797fe27efef55}
+  stratops@https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/ccc9adc59e9ba55d1105b0bb9d6ae33dd683d728:
+    resolution: {tarball: https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/ccc9adc59e9ba55d1105b0bb9d6ae33dd683d728}
     version: 0.8.1-pstrat5.1
     engines: {node: '>=20', pnpm: ^9}
 
@@ -5387,11 +5387,7 @@ snapshots:
       jest-runner: 26.6.3
       jest-runtime: 26.6.3
     transitivePeerDependencies:
-      - bufferutil
-      - canvas
       - supports-color
-      - ts-node
-      - utf-8-validate
 
   '@jest/test-sequencer@29.7.0':
     dependencies:
@@ -8320,7 +8316,7 @@ snapshots:
 
   stockfish.wasm@0.10.0: {}
 
-  stratops@https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/9ef607185ca62356a74c0d56db2797fe27efef55:
+  stratops@https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/ccc9adc59e9ba55d1105b0bb9d6ae33dd683d728:
     dependencies:
       '@badrap/result': 0.2.13
       '@jest/globals': 29.7.0
