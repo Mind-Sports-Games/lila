@@ -8,6 +8,21 @@ importers:
 
   .:
     dependencies:
+      '@types/node':
+        specifier: 20.12.2
+        version: 20.12.2
+      '@types/playstrategy':
+        specifier: workspace:*
+        version: link:ui/@types/playstrategy
+      '@types/web':
+        specifier: ^0.0.142
+        version: 0.0.142
+      '@typescript-eslint/eslint-plugin':
+        specifier: ^7.2.0
+        version: 7.18.0(@typescript-eslint/parser@7.18.0(eslint@8.57.1)(typescript@5.6.2))(eslint@8.57.1)(typescript@5.6.2)
+      '@typescript-eslint/parser':
+        specifier: ^7.2.0
+        version: 7.18.0(eslint@8.57.1)(typescript@5.6.2)
       ab:
         specifier: github:lichess-org/ab-stub
         version: https://codeload.github.com/lichess-org/ab-stub/tar.gz/94236bf34dbc9c05daf50f4c9842d859b9142be0
@@ -29,28 +44,12 @@ importers:
       stratops:
         specifier: git+ssh://git@github.com:Mind-Sports-Games/stratops.git#v0.8.1-pstrat5.1
         version: https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/4965d40529ebf83d102d12dd0c5258af13e3c355
-      xml2js:
-        specifier: 0.4.19
-        version: 0.4.19
-    devDependencies:
-      '@types/node':
-        specifier: 20.12.2
-        version: 20.12.2
-      '@types/playstrategy':
-        specifier: workspace:*
-        version: link:ui/@types/playstrategy
-      '@types/web':
-        specifier: ^0.0.142
-        version: 0.0.142
-      '@typescript-eslint/eslint-plugin':
-        specifier: ^7.2.0
-        version: 7.18.0(@typescript-eslint/parser@7.18.0(eslint@8.57.1)(typescript@5.6.2))(eslint@8.57.1)(typescript@5.6.2)
-      '@typescript-eslint/parser':
-        specifier: ^7.2.0
-        version: 7.18.0(eslint@8.57.1)(typescript@5.6.2)
       typescript:
         specifier: ^5.4.5
         version: 5.6.2
+      xml2js:
+        specifier: 0.4.19
+        version: 0.4.19
 
   ui:
     dependencies:
