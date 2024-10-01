@@ -9,9 +9,9 @@
     "noEmitOnError": true,
     "noUnusedParameters": true,
     "moduleResolution": "node",
-    "target": "es2019",
+    "target": "es2017",
     "module": "esnext",
-    "lib": ["es2019"],
+    "lib": ["es2017"],
     "esModuleInterop": true,
     "isolatedModules": true,
     "types": ["playstrategy", "web"]
