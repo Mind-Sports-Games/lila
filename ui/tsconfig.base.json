@@ -12,6 +12,7 @@
     "module": "esnext",
     "lib": ["es2019"],
     "esModuleInterop": true,
+    "noEmitOnError": true,
     "isolatedModules": true,
     "types": ["playstrategy", "web"]
   }

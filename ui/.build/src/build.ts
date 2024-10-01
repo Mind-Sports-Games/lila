@@ -54,7 +54,6 @@ export function postBuild() {
       env.log(`[${c.grey(mod.name)}] exec - ${c.cyanBold(args.join(' '))}`);
       const stdout = cps.execSync(`${args.join(' ')}`, { cwd: mod.root });
       if (stdout) env.log(stdout, { ctx: mod.name });
-      // @TODO: consider return an int in case env.prod is true
     });
   }
 }

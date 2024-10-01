@@ -152,8 +152,7 @@ export function readDice(fen: string, variant: VariantKey, canEndTurn?: boolean,
   const usedDice = fen.split(' ')[2].replace('-', '').split('/');
   const dice = [];
   for (const d of unusedDice) {
-    //if (+d) dice.push({ value: +d, isAvailable: !canEndTurn ?? true });
-    if (+d) dice.push({ value: +d, isAvailable: !(canEndTurn ?? false) });
+    if (+d) dice.push({ value: +d, isAvailable: !canEndTurn ?? true });
   }
   for (const d of usedDice) {
     if (+d) dice.push({ value: +d, isAvailable: false });
@@ -224,6 +223,8 @@ export const variantToRules = (v: VariantKey): Rules => {
       return 'go13x13';
     case 'go19x19':
       return 'go19x19';
+    case 'titi':
+      return 'toto';
     default:
       return 'chess';
   }

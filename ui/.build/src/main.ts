@@ -53,8 +53,6 @@ export function main() {
   env.install = !args.includes('--no-install') && !oneDashArgs.includes('n');
   env.rgb = args.includes('--rgb');
 
-  if (env.prod) return 1;
-
   if (env.rebuild && !env.install) {
     env.warn(`--rebuild incompatible with --no-install`);
     env.rebuild = false;
@@ -68,8 +66,6 @@ export function main() {
   } else {
     build(args.filter(x => !x.startsWith('-')));
   }
-
-  return 0;
 }
 
 export interface PlaystrategyModule {
