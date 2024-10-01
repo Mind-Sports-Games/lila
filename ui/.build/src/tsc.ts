@@ -71,7 +71,10 @@ export async function tsc(): Promise<void> {
 function tscLog(text: string): void {
   if (text.includes('File change detected') || text.includes('Starting compilation')) return; // redundant
   text = text.replace(/\d?\d:\d\d:\d\d (PM|AM) - /, '');
-  if (text.match(/: error TS\d\d\d\d/)) text = fixTscError(text);
+  if (text.match(/: error TS\d\d\d\d/)) {
+    text = fixTscError(text);
+    if (env.prod) throw new Error("tsc failed.");
+  }
   if (text.match(/Found (\d+) errors?/)) {
     if (env.watch) env.done(1, 'tsc');
   } else env.log(text, { ctx: 'tsc' });
