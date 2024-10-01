@@ -606,7 +606,7 @@ export default class AnalyseCtrl {
   }
 
   onPremoveSet = () => {
-    if (this.study) this.study.onPremoveSet() e
+    if (this.study) this.study.onPremoveSet()
   };
 
   addNode(node: Tree.Node, path: Tree.Path) {
