@@ -56,7 +56,7 @@ jobs:
         uses: pnpm/action-setup@v4
         with:
           run_install: false
-      - run: rm -rf node_modules pnpm-lock.yaml && pnpm store prune && pnpm update
+      - run: rm -rf node_modules pnpm-lock.yaml && pnpm update
       - run: node -v && pnpm -v && pnpm tsc -v && pnpm list
       - name: Build files
         run: ./ui/build --no-install --prod
