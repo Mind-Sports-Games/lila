@@ -9,6 +9,7 @@
   "author": "Thibault Duplessis",
   "license": "AGPL-3.0-or-later",
   "dependencies": {
-    "breakpoint-sass": "2.7.1"
+    "breakpoint-sass": "2.7.1",
+    "typescript": "~5.6.2"
   }
 }
