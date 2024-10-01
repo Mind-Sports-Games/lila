@@ -13,6 +13,7 @@ cd "$(dirname "${BASH_SOURCE:-$0}")/.build"
     echo "The 'pnpm' tool is required. See https://pnpm.io/installation."
     exit 1
   fi
+  # solve deps listed in ui/.build/package.json (including typescript version)
   pnpm install --silent --ignore-workspace --no-lockfile
 # fi
 
