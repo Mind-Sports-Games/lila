@@ -232,6 +232,7 @@ function sassError(error: string) {
     if (err.startsWith('Error:')) {
       env.log(c.grey('-'.repeat(75)), { ctx: 'sass' });
       env.log(`${errorMark} - ${err.slice(7)}`, { ctx: 'sass' });
+      if (env.prod) throw new Error("Sass failed.");
     } else env.log(err, { ctx: 'sass' });
   }
 }

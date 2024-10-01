@@ -53,12 +53,6 @@ export function main() {
   env.install = !args.includes('--no-install') && !oneDashArgs.includes('n');
   env.rgb = args.includes('--rgb');
 
-  if (env.prod)  {
-    throw new Error("test");
-    return 1;
-  }
-  return 0;
-
   if (env.rebuild && !env.install) {
     env.warn(`--rebuild incompatible with --no-install`);
     env.rebuild = false;
