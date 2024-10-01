@@ -1,24 +1,20 @@
 #!/usr/bin/env bash
 
+# -e  Exit immediately if a command exits with a non-zero status.
 set -e
 
+# move to the build folder
 cd "$(dirname "${BASH_SOURCE:-$0}")/.build"
 
+# in case "update" is given as an arg when invoking the build system...
 update=$(echo "$*" | grep -q -- '--update' && echo true || echo false)
-
-#if $update || [ ! -d "node_modules" ]; then
+if $update || [ ! -d "node_modules" ]; then
   if ! command -v pnpm &> /dev/null; then
     echo "The 'pnpm' tool is required. See https://pnpm.io/installation."
     exit 1
   fi
-  pnpm prune
-  pnpm install --ignore-workspace --no-lockfile --no-frozen-lockfile # --silent
-#fi
+  pnpm install --silent --ignore-workspace --no-lockfile
+fi
 
-#if $update || [ ! -d "dist" ]; then
-  ./node_modules/.bin/tsc
-#fi
-
-echo "$(./node_modules/.bin/tsc -v)"
-
+# invoke the (compiled into js) entry point of the build system, passing args given
 node --input-type=module dist/main.js "$@"
