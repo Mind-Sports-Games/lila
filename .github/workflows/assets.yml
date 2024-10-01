@@ -52,13 +52,12 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
-      - name: Install PNPM and run pnpm install
+      - name: Install PNPM and do not run pnpm install
         uses: pnpm/action-setup@v4
         with:
-          run_install: true
+          run_install: false
+      - run: rm -rf node_modules pnpm-lock.yaml && pnpm store prune && pnpm update
       - run: node -v && pnpm -v && pnpm tsc -v && pnpm list
-      - run: rm -rf node_modules pnpm-lock.yaml && pnpm store prune && pnpm install
-      - run: ./ui/build -cr
       - name: Build files
         run: ./ui/build --no-install --prod
       - name: Get Time
