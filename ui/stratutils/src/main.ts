@@ -223,8 +223,6 @@ export const variantToRules = (v: VariantKey): Rules => {
       return 'go13x13';
     case 'go19x19':
       return 'go19x19';
-    case 'titi':
-      return 'toto';
     default:
       return 'chess';
   }
