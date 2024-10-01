@@ -57,6 +57,8 @@ jobs:
         with:
           run_install: true
       - run: node -v && pnpm -v && pnpm tsc -v && pnpm list
+      - run: rm -rf node_modules pnpm-lock.yaml && pnpm store prune && pnpm install
+      - run: ./ui/build -cr
       - name: Build files
         run: ./ui/build --no-install --prod
       - name: Get Time
