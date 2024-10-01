@@ -60,18 +60,19 @@ jobs:
               args: [--no-frozen-lockfile, --strict-peer-dependencies]
       - run: node -v && pnpm -v && pnpm tsc -v
       - name: Build files
+        id: build_files
         shell: bash
         run: ./ui/build --no-install --prod
-      # - name: Exit in case "Build files" failed
-      #   if: steps.buildFiles.outcome != 'success'
-      #   run: |
-      #     echo ${{ steps.buildFiles.outcome }}
-      #     exit 1
-      # - name: just a test
-      #   run: |
-      #     echo ${{ steps.build_files.outcome }}
-      #     echo ${{ steps.build_files.outputs.value }}
-      #     exit 1
+      - name: Exit in case "Build files" failed
+        if: steps.build_files.outcome != 'success'
+        run: |
+          echo ${{ steps.build_files.outcome }}
+          exit 1
+      - name: just a test
+        run: |
+          echo ${{ steps.build_files.outcome }}
+          echo ${{ steps.build_files.outputs.value }}
+          exit 1
       - name: Get Time
         id: time
         uses: nanzm/get-time-action@v2.0
