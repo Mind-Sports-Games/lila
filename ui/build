@@ -15,10 +15,11 @@ cd "$(dirname "${BASH_SOURCE:-$0}")/.build"
   fi
   # solve deps listed in ui/.build/package.json (including typescript version)
   pnpm install --silent --ignore-workspace --no-lockfile
+  pnpm dev "$@"
 # fi
 
-# compiles ts into js so the next line can be used...
-./node_modules/.bin/tsc
+# compiles ui/.build ts files into js so the next line can be used...
+#./node_modules/.bin/tsc
 
-# invoke the (compiled into js) entry point of the build system, passing args given
-node --input-type=module dist/main.js "$@"
+# invoke the (compiled into js) entry point of the build system, forwarding args given
+#node --input-type=module dist/main.js "$@"
