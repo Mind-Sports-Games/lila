@@ -73,7 +73,8 @@ function tscLog(text: string): void {
   text = text.replace(/\d?\d:\d\d:\d\d (PM|AM) - /, '');
   if (text.match(/: error TS\d\d\d\d/)) {
     text = fixTscError(text);
-    if (env.prod) throw new Error("tsc failed - showing first error (run it in local to see the complete list) - " + text);
+    if (env.prod)
+      throw new Error('tsc failed - showing first error (run it in local to see the complete list) - ' + text);
   }
   if (text.match(/Found (\d+) errors?/)) {
     if (env.watch) env.done(1, 'tsc');
