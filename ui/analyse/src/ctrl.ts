@@ -606,7 +606,7 @@ export default class AnalyseCtrl {
   }
 
   onPremoveSet = () => {
-    if (this.study) this.study.onPremoveSet()
+    if (this.study) this.study.onPremoveSet();
   };
 
   addNode(node: Tree.Node, path: Tree.Path) {
@@ -636,12 +636,12 @@ export default class AnalyseCtrl {
       possibleMoves.size == 1
     ) {
       const passOrig = possibleMoves.keys().next().value;
-      if (passOrig != undefined) {
-        const passDests = possibleMoves.get(passOrig);
-        if (passDests && passDests.length == 1) {
-          const passDest = passDests[0];
-          this.sendMove(passOrig, passDest, undefined, undefined);
-        }
+      // if (passOrig != undefined) {
+      const passDests = possibleMoves.get(passOrig);
+      if (passDests && passDests.length == 1) {
+        const passDest = passDests[0];
+        this.sendMove(passOrig, passDest, undefined, undefined);
+        // }
       }
     }
   }
