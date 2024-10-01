@@ -57,10 +57,8 @@ jobs:
         with:
           run_install: true
       - run: node -v && pnpm -v && pnpm tsc -v && pnpm list
-      - name: Clean files
-        run: ./ui/build --clean
       - name: Build files
-        run: ./ui/build --prod
+        run: ./ui/build --no-install --prod
       - name: Get Time
         id: time
         uses: nanzm/get-time-action@v2.0
