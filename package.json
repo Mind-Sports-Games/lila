@@ -36,7 +36,7 @@
     "@typescript-eslint/eslint-plugin": "^7.18.0",
     "@typescript-eslint/parser": "^7.18.0",
     "ab": "github:lichess-org/ab-stub",
-    "chessground": "github:Mind-Sports-Games/chessground#v7.11.1-pstrat3.1",
+    "chessground": "github:Mind-Sports-Games/chessground#503-abalone",
     "eslint": "^8.57.1",
     "lint-staged": "^15.2.10",
     "onchange": "^7.1.0",

@@ -27,8 +27,8 @@ importers:
         specifier: github:lichess-org/ab-stub
         version: https://codeload.github.com/lichess-org/ab-stub/tar.gz/94236bf34dbc9c05daf50f4c9842d859b9142be0
       chessground:
-        specifier: github:Mind-Sports-Games/chessground#v7.11.1-pstrat3.1
-        version: https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/eb0f6bdb1dfd91bab2ae9ace72e4e8b39f9e30d6(@babel/core@7.25.2)(@jest/transform@29.7.0)(@jest/types@29.6.3)(babel-jest@29.7.0(@babel/core@7.25.2))
+        specifier: github:Mind-Sports-Games/chessground#503-abalone
+        version: https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/170330ef34a8f40de6eaf1af61678ef4218d2b4a(@babel/core@7.25.2)(@jest/transform@29.7.0)(@jest/types@29.6.3)(babel-jest@29.7.0(@babel/core@7.25.2))
       eslint:
         specifier: ^8.57.1
         version: 8.57.1
@@ -1806,9 +1806,9 @@ packages:
     resolution: {tarball: https://codeload.github.com/ornicar/chess.js/tar.gz/ad0709c0b07773d9d0da8e4605a9a2a28f00d249}
     version: 0.10.2
 
-  chessground@https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/eb0f6bdb1dfd91bab2ae9ace72e4e8b39f9e30d6:
-    resolution: {tarball: https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/eb0f6bdb1dfd91bab2ae9ace72e4e8b39f9e30d6}
-    version: 7.11.1-pstrat3.1
+  chessground@https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/170330ef34a8f40de6eaf1af61678ef4218d2b4a:
+    resolution: {tarball: https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/170330ef34a8f40de6eaf1af61678ef4218d2b4a}
+    version: 7.11.1-pstrat3.0
     engines: {node: '>=20', pnpm: ^9}
 
   chokidar@3.6.0:
@@ -4634,7 +4634,7 @@ snapshots:
 
   chess.js@https://codeload.github.com/ornicar/chess.js/tar.gz/ad0709c0b07773d9d0da8e4605a9a2a28f00d249: {}
 
-  chessground@https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/eb0f6bdb1dfd91bab2ae9ace72e4e8b39f9e30d6(@babel/core@7.25.2)(@jest/transform@29.7.0)(@jest/types@29.6.3)(babel-jest@29.7.0(@babel/core@7.25.2)):
+  chessground@https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/170330ef34a8f40de6eaf1af61678ef4218d2b4a(@babel/core@7.25.2)(@jest/transform@29.7.0)(@jest/types@29.6.3)(babel-jest@29.7.0(@babel/core@7.25.2)):
     dependencies:
       '@jest/globals': 29.7.0
       '@types/node': 20.12.2
