@@ -99,7 +99,7 @@ final class SwissForm(implicit mode: Mode) {
           _.validNumberofGames
         )
         .verifying(
-          "Hanidcapped mode requires a Go variant, non-rated, non-multimatch and non-meldey",
+          "Handicapped mode requires a Go variant, non-rated, non-multimatch and non-medley",
           _.validHandicapped
         )
         .verifying(
