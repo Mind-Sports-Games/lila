@@ -43,7 +43,7 @@ importers:
         version: 3.3.3
       stratops:
         specifier: github:Mind-Sports-Games/stratops#pla-993-uibuild-unexpected-errors
-        version: https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/2fbae77c8207bacf4bb164b39a6c352f6bd1189b
+        version: https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/4096848a4b7fddf0579b0b7bbc8e47be49fd2981
       typescript:
         specifier: ^5.4.5
         version: 5.6.2
@@ -1175,9 +1175,6 @@ packages:
   '@babel/types@7.25.6':
     resolution: {integrity: sha512-/l42B1qxpG6RdfYf343Uw1vmDjeNhneUXtzhojE7pDgfpEypmRhI6j1kr17XCVv4Cgl9HdAiQY2x0GwKm7rWCw==}
     engines: {node: '>=6.9.0'}
-
-  '@badrap/result@0.2.13':
-    resolution: {integrity: sha512-Qvyzz0dmGY0h8pwvBFo1BznAKf5Y5NXIDiqhPALWtfU7oHbAToCtPu4FlYQ3uysskSWLx8GUiyhe0nv0nDd/7Q==}
 
   '@badrap/result@0.2.8':
     resolution: {integrity: sha512-zC6LgWe8QWSTwxfQVoRyieFaTbCJ2WYvpJdZ0fONoUJT1ln/oWNb3zBPlPP5J9ehLAaFIZJ7aB8oISzYFs6grQ==}
@@ -3758,8 +3755,8 @@ packages:
   stockfish.wasm@0.10.0:
     resolution: {integrity: sha512-OTvOlz0ijCSmIb/YvOZ1Dn6vwZVS4Ge3N+RcV0d2b6LXUtCJ9UwmBHypRW3DZ+VXf8WNm7E3P+6jMTVvb3QaBg==}
 
-  stratops@https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/2fbae77c8207bacf4bb164b39a6c352f6bd1189b:
-    resolution: {tarball: https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/2fbae77c8207bacf4bb164b39a6c352f6bd1189b}
+  stratops@https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/4096848a4b7fddf0579b0b7bbc8e47be49fd2981:
+    resolution: {tarball: https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/4096848a4b7fddf0579b0b7bbc8e47be49fd2981}
     version: 0.8.1-pstrat5.11
     engines: {node: '>=20', pnpm: ^9}
 
@@ -4984,8 +4981,6 @@ snapshots:
       '@babel/helper-string-parser': 7.24.8
       '@babel/helper-validator-identifier': 7.24.7
       to-fast-properties: 2.0.0
-
-  '@badrap/result@0.2.13': {}
 
   '@badrap/result@0.2.8': {}
 
@@ -8320,9 +8315,9 @@ snapshots:
 
   stockfish.wasm@0.10.0: {}
 
-  stratops@https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/2fbae77c8207bacf4bb164b39a6c352f6bd1189b:
+  stratops@https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/4096848a4b7fddf0579b0b7bbc8e47be49fd2981:
     dependencies:
-      '@badrap/result': 0.2.13
+      '@badrap/result': 0.2.8
       '@jest/globals': 29.7.0
       '@typescript-eslint/eslint-plugin': 7.18.0(@typescript-eslint/parser@7.18.0(eslint@8.57.1)(typescript@5.6.2))(eslint@8.57.1)(typescript@4.9.5)
       '@typescript-eslint/parser': 7.18.0(eslint@8.57.1)(typescript@4.9.5)
