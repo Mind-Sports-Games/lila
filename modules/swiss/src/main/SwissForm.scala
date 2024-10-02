@@ -103,7 +103,7 @@ final class SwissForm(implicit mode: Mode) {
           _.validHandicapped
         )
         .verifying(
-          "McMahon mode requires a Go varaint, non-rated, non-multimatch, non-medley and non-handicapped",
+          "McMahon mode requires a Go variant, non-rated, non-multimatch, non-medley and non-handicapped",
           _.validMcMahon
         )
         .verifying(
