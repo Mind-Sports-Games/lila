@@ -81,6 +81,9 @@ function esbuildMessage(msg: es.Message, error = false) {
     ? `:${msg.location.line}`
     : '' + (msg.location?.column ? `:${msg.location.column}` : '');
   const srcText = msg.location?.lineText;
+  if (env.prod && error) {
+    throw new Error('Build failed - showing first error (run it in local to see the complete list) - ' + error);
+  }  
   env.log(`${error ? errorMark : c.warn('WARNING')} - '${c.cyan(file + line)}' - ${msg.text}`, {
     ctx: 'esbuild',
   });

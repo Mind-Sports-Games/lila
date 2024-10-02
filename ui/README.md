@@ -8,6 +8,7 @@ NOTE - always use hard refresh (google it) or disable caching in the network tab
 
 NOTE - since we now use pnpm, it may be useful to know you can run `rm -rf node_modules pnpm-lock.yaml && pnpm store prune && pnpm i` if you want to ensure pnpm tries to solve completely the deps tree\
 Our CI uses the command `./ui/build --no-install --prod` (as the install part is handled upstream) and takes care of pruning after each run.
+When env is "prod", sass, tsc, and build will throw an error in case of failure (in order to make the pipeline fail in an efficient way).
 
 Usage examples:
 
