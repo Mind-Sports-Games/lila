@@ -15,5 +15,5 @@
     { "path": "../nvui/tsconfig.json" },
     { "path": "../stratutils/tsconfig.json" },
     { "path": "../tree/tsconfig.json" }
-  ],
+  ]
 }
