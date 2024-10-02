@@ -16,5 +16,4 @@
     { "path": "../stratutils/tsconfig.json" },
     { "path": "../tree/tsconfig.json" }
   ],
-  "isolatedModules": true
 }
