@@ -667,11 +667,14 @@ backgammon_themes.map { |theme|
        ', ' + '.is2d .variant-backgammon ' + role + '.' + (color == 'w' ? 'p1' : 'p2') + pos_class + 
        ', ' + '.is2d .variant-nackgammon ' + role + '.' + (color == 'w' ? 'p1' : 'p2') + pos_class
       file = source_dir + 'backgammon/' + name + '/' + color + image_name + image_pos + '.' + ext
+      # avoid unwanted duplication
+      unless direction == 'bottom' && (backgammon_extra_names.include?(image_name) || backgammon_dice_names.include?(image_name))
         File.open(file, 'r') do|image_file|
           image = image_file.read
           base64 = Base64.strict_encode64(image)
           initial_css + ' {' + "background-image:url('data:image/" + types[ext] + base64 + "')}"
         end
+      end
     }
   }
   }.flatten
@@ -720,8 +723,11 @@ backgammon_themes.map { |theme|
         initial_css = '.backgammon.is2d ' + role + '.' + (color == 'w' ? 'p1' : 'p2') + pos_class +
          ', ' + '.is2d .variant-backgammon ' + role + '.' + (color == 'w' ? 'p1' : 'p2') + pos_class +
          ', ' + '.is2d .variant-nackgammon ' + role + '.' + (color == 'w' ? 'p1' : 'p2') + pos_class
-        initial_css + ' {' +
-          "background-image:url('/assets/piece/" + 'backgammon/' + name + "/" + color + image_name + image_pos + "." + ext + "')}"
+        # avoid unwanted duplication
+          unless direction == 'bottom' && (backgammon_extra_names.include?(image_name) || backgammon_dice_names.include?(image_name))
+            initial_css + ' {' +
+            "background-image:url('/assets/piece/" + 'backgammon/' + name + "/" + color + image_name + image_pos + "." + ext + "')}"
+          end
     }
   }
   }.flatten

@@ -98,9 +98,12 @@ final class SwissForm(implicit mode: Mode) {
           "Best of x or Play x and Match Score can only be used if number of games per round is greater than 1",
           _.validNumberofGames
         )
-        .verifying("Hanidcapped mode requires a Go variant, non-rated and non-meldey", _.validHandicapped)
         .verifying(
-          "McMahon mode requires a Go varaint, non-rated, non-medley and non-handicapped",
+          "Handicapped mode requires a Go variant, non-rated, non-multimatch and non-medley",
+          _.validHandicapped
+        )
+        .verifying(
+          "McMahon mode requires a Go variant, non-rated, non-multimatch, non-medley and non-handicapped",
           _.validMcMahon
         )
         .verifying(
@@ -430,9 +433,11 @@ object SwissForm {
     def validRatedVariant =
       !isRated ||
         lila.game.Game.allowRated(realVariant, clock.some)
-    def validHandicapped = !isHandicapped || (gameLogic == GameLogic.Go() && !isMedley && !isRated)
+    def validHandicapped =
+      !isHandicapped || (gameLogic == GameLogic.Go() && !isMedley && !isRated && !isBestOfX && !isPlayX)
     def validMcMahon =
-      !isMcMahon || (gameLogic == GameLogic.Go() && !isMedley && !isRated && !isHandicapped)
+      !isMcMahon || (gameLogic == GameLogic
+        .Go() && !isMedley && !isRated && !isHandicapped && !isBestOfX && !isPlayX)
     def validMcMahonCutoff = !isMcMahon || (mcmahonCutoff.fold(false)(playerRatingFromInput(_) != None))
 
     def validClock = clock match {
