@@ -52,7 +52,9 @@ final class JsonView(
   // TODO: in analysis mode, this will be evaluated against the last move, but we don't want to set onlyDropsVariant
   // in this case. Instead just have a return of pov.game.variant.onlyDropsVariant
   private def onlyDropsVariantForCurrentAction(pov: Pov): Boolean = {
-    pov.game.variant.onlyDropsVariant || pov.game.situation.canOnlyDrop
+    pov.game.variant.onlyDropsVariant ||
+    (pov.game.situation.canOnlyDrop &&
+      !(List("crazyhouse", "minishogi", "shogi").contains(pov.game.variant.key)))
   }
 
   private def coordSystemForVariant(prefCoordSystem: Int, gameVariant: Variant): Int =
