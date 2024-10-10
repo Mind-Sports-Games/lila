@@ -13,15 +13,6 @@ export function clearSelection() {
   window.getSelection()?.removeAllRanges();
 }
 
-//TODO multiaction remove this function
-export function plyPlayerIndex(ply: number, variantKey: VariantKey): PlayerIndex {
-  if (variantKey === 'amazons') {
-    return Math.floor(ply / 2) % 2 === 0 ? 'p1' : 'p2';
-  } else {
-    return ply % 2 === 0 ? 'p1' : 'p2';
-  }
-}
-
 export function bindMobileMousedown(el: HTMLElement, f: (e: Event) => unknown, redraw?: () => void) {
   for (const mousedownEvent of ['touchstart', 'mousedown']) {
     el.addEventListener(mousedownEvent, e => {
@@ -106,7 +97,8 @@ export function plyToTurn(ply: number): number {
 }
 
 export function nodeFullName(node: Tree.Node) {
-  if (node.san) return plyToTurn(node.ply) + (node.ply % 2 === 1 ? '.' : '...') + ' ' + fixCrazySan(node.san);
+  if (node.san)
+    return plyToTurn(node.ply) + (node.playedPlayerIndex === 'p1' ? '.' : '...') + ' ' + fixCrazySan(node.san);
   return 'Initial position';
 }
 
@@ -190,6 +182,19 @@ export function parentedNode(node: Tree.Node, parent?: Tree.Node): Tree.Parented
 
 export function parentedNodes(nodes: Tree.Node[], parent?: Tree.Node): Tree.ParentedNode[] {
   return nodes.map(n => parentedNode(n, parent));
+}
+
+export function fullTurnNodesFromNode(node: Tree.ParentedNode): Tree.ParentedNode[] {
+  function childNodeOfSameTurn(currentNode: Tree.ParentedNode, nodes: Tree.ParentedNode[]): Tree.ParentedNode[] {
+    if (!currentNode.children) return nodes;
+    const cs = parentedNodes(currentNode.children, currentNode),
+      main = cs[0];
+    if (!main) return nodes;
+    if (!currentNode.parent) return nodes;
+    if (currentNode.playedPlayerIndex === currentNode.playerIndex) return childNodeOfSameTurn(main, nodes.concat(main));
+    return nodes;
+  }
+  return childNodeOfSameTurn(node, [node]);
 }
 
 function pieceScores(variant: VariantKey, piece: cg.Role, isPromoted: boolean | undefined): number {

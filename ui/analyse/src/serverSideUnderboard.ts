@@ -62,9 +62,9 @@ export default function (element: HTMLElement, ctrl: AnalyseCtrl) {
           if (mainlinePly != chart.lastPly) {
             if (mainlinePly === false) unselect(chart);
             else {
-              const p1 = mainlinePly % 2 !== 0;
+              const p1 = mainlinePly % 2 !== 0; //not correct for multiaction
               const serie = p1 ? 0 : 1;
-              //TODO check this for multiaction
+              //TODO check this for multiaction - not working!
               const turn = Math.floor((mainlinePly - 1 - data.game.startedAtTurn) / 2);
               const point = chart.series[serie].data[turn];
               if (defined(point)) point.select();

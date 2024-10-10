@@ -6,7 +6,7 @@ import AnalyseCtrl from '../ctrl';
 import { MaybeVNodes } from '../interfaces';
 import { mainHook, nodeClasses, findCurrentPath, renderInlineCommentsOf, retroLine, Ctx, Opts } from './treeView';
 import { moveFromNotationStyle } from 'common/notation';
-import { parentedNode, parentedNodes, parentedNodesFromOrdering } from '../util';
+import { parentedNode, parentedNodes, parentedNodesFromOrdering, fullTurnNodesFromNode } from '../util';
 
 function renderChildrenOf(ctx: Ctx, node: Tree.ParentedNode, opts: Opts): MaybeVNodes | undefined {
   const cs = parentedNodes(node.children, node),
@@ -85,16 +85,24 @@ function renderLines(ctx: Ctx, nodes: Tree.Node[], opts: Opts): VNode {
 }
 
 function renderMoveAndChildrenOf(ctx: Ctx, node: Tree.ParentedNode, opts: Opts): MaybeVNodes {
-  const path = opts.parentPath + node.id,
+  const nodesOfFullTurn = fullTurnNodesFromNode(node);
+  const lastNodeOfFullMove = nodesOfFullTurn[nodesOfFullTurn.length - 1];
+  const path =
+      opts.parentPath +
+      nodesOfFullTurn
+        .map(n => {
+          return n.id;
+        })
+        .join(''),
     comments = renderInlineCommentsOf(ctx, node);
   if (opts.truncate === 0) return [h('move', { attrs: { p: path } }, '[...]')];
   return (
-    ([renderMoveOf(ctx, node, opts)] as MaybeVNodes)
+    ([renderFullMoveOf(ctx, node, opts)] as MaybeVNodes)
       .concat(comments)
       // TODO: I'm not 100% sure about this parentedNodeCall
       .concat(opts.inline ? renderInline(ctx, parentedNode(opts.inline, node), opts) : null)
       .concat(
-        renderChildrenOf(ctx, node, {
+        renderChildrenOf(ctx, lastNodeOfFullMove, {
           parentPath: path,
           isMainline: opts.isMainline,
           truncate: opts.truncate ? opts.truncate - 1 : undefined,
@@ -115,12 +123,46 @@ function renderInline(ctx: Ctx, node: Tree.ParentedNode, opts: Opts): VNode {
   );
 }
 
+function renderFullMoveOf(ctx: Ctx, node: Tree.ParentedNode, opts: Opts): VNode {
+  const variant = ctx.ctrl.data.game.variant;
+  const notation = notationStyle(variant.key);
+  const fullTurnNodes: Tree.ParentedNode[] = fullTurnNodesFromNode(node);
+  const path = opts.parentPath + node.id,
+    content: MaybeVNodes = [
+      opts.withIndex || node.playedPlayerIndex === 'p1' ? moveView.renderIndex(node, true) : null,
+      // TODO: the || '' are probably not correct
+      moveView.combinedNotationOfTurn(
+        fullTurnNodes.map(n => {
+          return moveFromNotationStyle(notation)(
+            {
+              san: fixCrazySan(n.san || ''),
+              uci: n.uci || '',
+              fen: n.fen,
+              prevFen: n.parent?.fen || '',
+            },
+            variant,
+          );
+        }),
+        notation,
+      ),
+    ];
+  if (node.glyphs && ctx.showGlyphs) node.glyphs.forEach(g => content.push(moveView.renderGlyph(g)));
+  return h(
+    'move',
+    {
+      attrs: { p: path },
+      class: nodeClasses(ctx, node, path),
+    },
+    content,
+  );
+}
+
 function renderMoveOf(ctx: Ctx, node: Tree.ParentedNode, opts: Opts): VNode {
   const variant = ctx.ctrl.data.game.variant;
   const notation = notationStyle(variant.key);
   const path = opts.parentPath + node.id,
     content: MaybeVNodes = [
-      opts.withIndex || node.ply & 1 ? moveView.renderIndex(node.ply, variant.key, true) : null,
+      opts.withIndex || node.ply & 1 ? moveView.renderIndex(node, true) : null,
       // TODO: the || '' are probably not correct
       moveFromNotationStyle(notation)(
         {

@@ -85,6 +85,7 @@ case class AnaMove(
           id = UciCharPair(lib, uci),
           ply = game.plies,
           turnCount = game.turnCount,
+          playedPlayerIndex = if (game.board.history.currentTurn.nonEmpty) game.player else !game.player,
           variant = variant,
           move = Uci.WithSan(lib, uci, gameRecordNotation),
           fen = fen,

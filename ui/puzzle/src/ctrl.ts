@@ -84,7 +84,7 @@ export default function (opts: PuzzleOpts, redraw: Redraw): Controller {
     vm.lastFeedback = 'init';
     vm.initialPath = initialPath;
     vm.initialNode = tree.nodeAtPath(initialPath);
-    vm.pov = vm.initialNode.ply % 2 == 1 ? 'p2' : 'p1';
+    vm.pov = vm.initialNode.playerIndex;
 
     setPath(treePath.init(initialPath));
     setTimeout(() => {
@@ -115,7 +115,7 @@ export default function (opts: PuzzleOpts, redraw: Redraw): Controller {
 
   function makeCgOpts(): CgConfig {
     const node = vm.node;
-    const playerIndex: PlayerIndex = node.ply % 2 === 0 ? 'p1' : 'p2';
+    const playerIndex: PlayerIndex = node.playerIndex;
     const dests = chessgroundDests('chess')(position());
     const nextNode = vm.node.children[0];
     const canMove = vm.mode === 'view' || (playerIndex === vm.pov && (!nextNode || nextNode.puzzle == 'fail'));
@@ -185,6 +185,8 @@ export default function (opts: PuzzleOpts, redraw: Redraw): Controller {
     addNode(
       {
         ply: 2 * (pos.fullmoves - 1) + (pos.turn == 'p1' ? 0 : 1),
+        turnCount: 2 * (pos.fullmoves - 1) + (pos.turn == 'p1' ? 0 : 1), //TODO fix for multiaction
+        playedPlayerIndex: pos.turn === 'p1' ? 'p2' : 'p1', //TODO fix for multiaction
         playerIndex: pos.turn,
         fen: makeFen('chess')(pos.toSetup()),
         id: scalachessCharPair('chess')(move),

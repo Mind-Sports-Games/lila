@@ -11,7 +11,7 @@ export default function renderClocks(ctrl: AnalyseCtrl): [VNode, VNode] | undefi
 
   const p1Pov = ctrl.bottomIsP1(),
     parentClock = ctrl.tree.getParentClock(node, ctrl.path),
-    isP1Turn = node.ply % 2 === 0,
+    isP1Turn = node.playerIndex === 'p1',
     centis: Array<number | undefined> = [parentClock, clock];
 
   if (!isP1Turn) centis.reverse();

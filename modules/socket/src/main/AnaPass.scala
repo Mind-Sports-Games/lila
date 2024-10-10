@@ -31,6 +31,7 @@ case class AnaPass(
               id = UciCharPair(uci),
               ply = game.plies,
               turnCount = game.turnCount,
+              playedPlayerIndex = if (game.board.history.currentTurn.nonEmpty) game.player else !game.player,
               variant: Variant,
               move = strategygames.format.Uci.GoWithSan(Uci.WithSan(uci, san)),
               fen = fen,

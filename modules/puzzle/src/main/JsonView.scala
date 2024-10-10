@@ -200,6 +200,7 @@ final class JsonView(
             id = UciCharPair(game.situation.board.variant.gameLogic, move.toUci),
             ply = game.plies,
             turnCount = game.turnCount,
+            playedPlayerIndex = if (game.board.history.currentTurn.nonEmpty) game.player else !game.player,
             variant = game.situation.board.variant,
             //TODO multiaction. For now we can flatten actionStrs as we are dealing with just Chess
             move =

@@ -14,7 +14,6 @@ sealed trait Node {
   def ply: Int
   //
   def turnCount: Int
-  //def playerIndex: PlayerIndex
   def variant: Variant
   def fen: FEN
   def check: Boolean
@@ -44,6 +43,8 @@ sealed trait Node {
 
   // who's playerIndex plays next
   def playerIndex = fen.player.getOrElse(PlayerIndex.P1)
+  // who's PlayerIndex just made an action
+  def playedPlayerIndex: PlayerIndex
 
   def mainlineNodeList: List[Node] =
     dropFirstChild :: children.headOption.fold(List.empty[Node])(_.mainlineNodeList)
@@ -52,6 +53,7 @@ sealed trait Node {
 case class Root(
     ply: Int,
     turnCount: Int,
+    playedPlayerIndex: PlayerIndex,
     variant: Variant,
     fen: FEN,
     check: Boolean,
@@ -86,6 +88,7 @@ case class Branch(
     id: UciCharPair,
     ply: Int,
     turnCount: Int,
+    playedPlayerIndex: PlayerIndex,
     variant: Variant,
     move: Uci.WithSan,
     fen: FEN,
@@ -310,10 +313,12 @@ object Node {
         val comments = node.comments.list.flatMap(_.removeMeta)
         Json
           .obj(
-            "ply"         -> ply,
-            "playerIndex" -> playerIndex.name,
-            "fen"         -> fen.value,
-            "dropsByRole" -> DropsByRole.json(dropsByRole.getOrElse(Map.empty))
+            "ply"               -> ply,
+            "turnCount"         -> turnCount,
+            "playedPlayerIndex" -> playedPlayerIndex.name,
+            "playerIndex"       -> playerIndex.name,
+            "fen"               -> fen.value,
+            "dropsByRole"       -> DropsByRole.json(dropsByRole.getOrElse(Map.empty))
           )
           .add("id", idOption.map(_.toString))
           .add("uci", moveOption.map(_.uci.uci))

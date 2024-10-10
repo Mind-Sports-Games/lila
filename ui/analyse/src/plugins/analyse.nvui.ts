@@ -246,7 +246,7 @@ function renderAcpl(ctrl: AnalyseController, style: Style): MaybeVNodes | undefi
           }),
         },
         analysisNodes
-          .filter(n => (n.ply % 2 === 1) === (playerIndex === 'p1'))
+          .filter(n => (n.playedPlayerIndex === 'p1') === (playerIndex === 'p1'))
           .map(node =>
             h(
               'option',
@@ -313,7 +313,7 @@ function renderMainline(nodes: Tree.Node[], currentPath: Tree.Path, style: Style
     );
     res.push(renderComments(node, style));
     res.push(', ');
-    if (node.ply % 2 === 0) res.push(h('br'));
+    if (node.playedPlayerIndex === 'p2' && node.playerIndex === 'p1') res.push(h('br'));
   });
   return res;
 }

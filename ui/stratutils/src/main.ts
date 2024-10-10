@@ -151,7 +151,7 @@ export function readDice(fen: string, variant: VariantKey, canEndTurn?: boolean,
   const usedDice = fen.split(' ')[2].replace('-', '').split('/');
   const dice = [];
   for (const d of unusedDice) {
-    if (+d) dice.push({ value: +d, isAvailable: !canEndTurn ?? true });
+    if (+d) dice.push({ value: +d, isAvailable: !(canEndTurn ?? false) });
   }
   for (const d of usedDice) {
     if (+d) dice.push({ value: +d, isAvailable: false });

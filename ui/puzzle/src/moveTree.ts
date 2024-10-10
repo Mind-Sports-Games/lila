@@ -10,6 +10,8 @@ export function pgnToTree(pgn: San[]): Tree.Node {
   const pos = Chess.default();
   const root: Tree.Node = {
     ply: 0,
+    turnCount: 0,
+    playedPlayerIndex: 'p2',
     playerIndex: 'p1',
     id: '',
     fen: INITIAL_FEN,
@@ -35,7 +37,7 @@ export function mergeSolution(root: TreeWrapper, initialPath: Tree.Path, solutio
     const san = makeSan('chess')(pos, move);
     pos.play(move);
     const node = makeNode(pos, move, fromPly + i + 1, san);
-    if ((pov == 'p1') == (node.ply % 2 == 1)) node.puzzle = 'good';
+    if ((pov == 'p1') == (node.playedPlayerIndex === 'p1')) node.puzzle = 'good';
     return node;
   });
   root.addNodes(nodes, initialPath);
@@ -43,7 +45,9 @@ export function mergeSolution(root: TreeWrapper, initialPath: Tree.Path, solutio
 
 const makeNode = (pos: Chess, move: Move, ply: number, san: San): Tree.Node => ({
   ply,
-  playerIndex: ply % 2 == 1 ? 'p1' : 'p2',
+  turnCount: ply, //TODO currently same for single action games, fix for multiaction
+  playedPlayerIndex: pos.turn === 'p1' ? 'p2' : 'p1', //todo fix for multiaction
+  playerIndex: ply % 2 == 1 ? 'p1' : 'p2', // fix for multiaciton (expand stratops to include playedplayer on pos?)
   san,
   fen: makeFen('chess')(pos.toSetup()),
   id: scalachessCharPair('chess')(move),
