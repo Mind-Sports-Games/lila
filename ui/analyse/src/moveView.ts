@@ -12,7 +12,7 @@ export interface Ctx {
   variant: Variant;
 }
 
-//TODO: multiaction this will need changing
+//only used for single action games
 export const plyToTurn = (ply: Ply, variantKey: VariantKey = 'standard'): number =>
   variantKey === 'amazons' ? Math.floor((ply - 1) / 4) + 1 : Math.floor((ply - 1) / 2) + 1;
 

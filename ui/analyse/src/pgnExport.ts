@@ -27,7 +27,9 @@ function renderNodesTxt(nodes: PgnNode[]): string {
     if (nodes[i - 1] && node.playedPlayerIndex === 'p1' && nodes[i - 1].playedPlayerIndex === 'p2')
       s += nodeToTurn(nodes[i - 1]) + '. ';
     else s += '';
-    s += fixCrazySan(node.san!) + ((i + 9) % 8 === 0 ? '\n' : ' ');
+    s += fixCrazySan(node.san!);
+    if (nodes[i + 1] && node.playedPlayerIndex === nodes[i + 1].playedPlayerIndex) s += ',';
+    else s += ' ';
   });
   return s.trim();
 }

@@ -9,6 +9,7 @@ export type MaybeNode = Tree.Node | undefined;
 export interface TreeWrapper {
   root: Tree.Node;
   lastPly(): number;
+  lastTurnCount(): number;
   nodeAtPath(path: Tree.Path): Tree.Node;
   getNodeList(path: Tree.Path): Tree.Node[];
   longestValidPath(path: string): Tree.Path;
@@ -211,9 +212,11 @@ export function build(root: Tree.Node): TreeWrapper {
 
   return {
     root,
-    //TODO multiaction: probably want to add lastTurn here when upgrading
     lastPly(): number {
       return lastNode()?.ply || root.ply;
+    },
+    lastTurnCount(): number {
+      return lastNode()?.turnCount || root.turnCount;
     },
     nodeAtPath,
     getNodeList,

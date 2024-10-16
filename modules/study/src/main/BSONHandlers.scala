@@ -366,6 +366,7 @@ object BSONHandlers {
       val w = new Writer
       $doc(
         ply               -> n.ply,
+        turnCount         -> n.turnCount,
         playedPlayerIndex -> n.playedPlayerIndex,
         uci               -> n.move.uci,
         san               -> n.move.san,
@@ -420,6 +421,7 @@ object BSONHandlers {
         import variantHandlers._
         Path.rootDbKey -> $doc(
           F.ply               -> r.ply,
+          F.turnCount         -> r.turnCount,
           F.playedPlayerIndex -> r.playedPlayerIndex,
           F.variant           -> r.variant,
           F.fen               -> r.fen,

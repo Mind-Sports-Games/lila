@@ -47,7 +47,6 @@ function renderChildrenOf(ctx: Ctx, node: Tree.ParentedNode, opts: Opts): MaybeV
   const conceal = opts.noConceal ? null : opts.conceal || ctx.concealOf(true)(opts.parentPath + main.id, main);
   if (conceal === 'hide') return;
   if (opts.isMainline) {
-    //TODO multiaction. There is a lot of 'ply % 2' in the code which is not safe for multiaction games. These need to be changed as part of upgrading Step and analysis to multiaction
     const isP1 = main.playedPlayerIndex === 'p1';
     const commentTags = renderMainlineCommentsOf(ctx, main, conceal, true).filter(nonEmpty);
     if (!cs[1] && isEmpty(commentTags) && !main.forceVariation)
