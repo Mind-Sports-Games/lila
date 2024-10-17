@@ -1,6 +1,7 @@
 import { h, VNode } from 'snabbdom';
 import AnalyseCtrl from './ctrl';
 import { isFinished } from './study/studyChapters';
+import { path as treePath } from 'tree';
 
 export default function renderClocks(ctrl: AnalyseCtrl): [VNode, VNode] | undefined {
   if (ctrl.embed) return;
@@ -9,12 +10,24 @@ export default function renderClocks(ctrl: AnalyseCtrl): [VNode, VNode] | undefi
     clock = node.clock;
   if (!clock && clock !== 0) return;
 
-  const p1Pov = ctrl.bottomIsP1(),
-    parentClock = ctrl.tree.getParentClock(node, ctrl.path),
-    isP1Turn = node.playerIndex === 'p1',
-    centis: Array<number | undefined> = [parentClock, clock];
+  function clockOfOpponentAtPath(currentPath: Tree.Path): number | undefined {
+    const playedPlayerIndex = ctrl.tree.nodeAtPath(currentPath).playedPlayerIndex;
 
-  if (!isP1Turn) centis.reverse();
+    function findClockOfOpponent(path: Tree.Path): number | undefined {
+      const parentNode = ctrl.tree.nodeAtPath(treePath.init(path));
+      if (parentNode.playedPlayerIndex !== playedPlayerIndex) return parentNode.clock;
+      if (treePath.size(path) <= 0) return undefined;
+      return findClockOfOpponent(treePath.init(path));
+    }
+
+    return findClockOfOpponent(currentPath);
+  }
+
+  const p1Pov = ctrl.bottomIsP1();
+  const isP1Turn = node.playedPlayerIndex === 'p1';
+  const centis: Array<number | undefined> = [clockOfOpponentAtPath(ctrl.path), clock];
+
+  if (isP1Turn) centis.reverse();
 
   const study = ctrl.study,
     relay = study && study.data.chapter.relay;
