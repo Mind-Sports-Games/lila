@@ -240,7 +240,7 @@ export default class StrongSocket {
         return;
       }
       // it's impossible but according to previous logging, it happens nonetheless
-      if (m.v > this.version + 1) return reload();
+      if (m.v > this.version + 1 && !document.body.classList.contains('kid')) return reload();
       this.version = m.v;
     }
     switch (m.t || false) {
