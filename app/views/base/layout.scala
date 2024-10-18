@@ -186,7 +186,6 @@ object layout {
   private val dataAnnounce      = attr("data-announce")
   private val dataSelectedColor = attr("data-selected-color")
   private val dataDev           = attr("data-dev")
-  private val dataKid           = attr("data-kid")
   val dataSoundSet              = attr("data-sound-set")
   val dataTheme                 = attr("data-theme")
   val dataAssetUrl              = attr("data-asset-url") // netConfig.assetBaseUrl.value
@@ -280,7 +279,6 @@ object layout {
             "coords-out"                                                                                                                                                      -> (ctx.pref.coords == lila.pref.Pref.Coords.OUTSIDE),
             "playing fixed-scroll"                                                                                                                                            -> playing
           ),
-          dataKid := ctx.kid,
           dataDev := (!netConfig.minifiedAssets).option("true"),
           dataVapid := vapidPublicKey,
           dataUser := ctx.userId,
