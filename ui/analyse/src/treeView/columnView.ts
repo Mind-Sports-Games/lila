@@ -85,7 +85,7 @@ function renderChildrenOf(ctx: Ctx, node: Tree.ParentedNode, opts: Opts): MaybeV
         ),
       ] as MaybeVNodes)
       .concat(
-        isP1 && mainChildren && main.playerIndex === 'p2'
+        mainChildren && main.playerIndex === 'p2'
           ? [moveView.renderIndex(main, false), emptyMove(passOpts.conceal)]
           : [],
       )
@@ -270,6 +270,42 @@ function renderMoveAndChildrenOf(ctx: Ctx, node: Tree.ParentedNode, opts: Opts):
         [h('index', '[...]')],
       ),
     ];
+  const conceal = opts.noConceal ? null : opts.conceal || ctx.concealOf(true)(opts.parentPath + node.id, node);
+  const cs = parentedNodes(node.children, node);
+  const commentTags = renderMainlineCommentsOf(ctx, node, conceal, true).filter(nonEmpty);
+  const isP1 = node.playedPlayerIndex === 'p1';
+  //check if childen within a full move turn of many actions and render the variation
+  if (node.children.length > 1 && node.playedPlayerIndex === node.playerIndex) {
+    return ([renderFullMoveOf(ctx, node, opts)] as MaybeVNodes)
+      .concat(renderInlineCommentsOf(ctx, node))
+      .concat(opts.inline ? renderInline(ctx, parentedNode(opts.inline, node), opts) : null)
+      .concat([
+        h(
+          'interrupt',
+          commentTags.concat(
+            renderLines(ctx, cs.slice(1), {
+              parentPath: opts.parentPath + node.id,
+              isMainline: false,
+              conceal,
+              noConceal: !conceal,
+            }),
+          ),
+        ),
+      ] as MaybeVNodes)
+      .concat(
+        isP1 && lastNodeOfFullMove.children.length > 0
+          ? [moveView.renderIndex(node, false), emptyMove(opts.conceal)]
+          : [],
+      )
+      .concat(
+        renderChildrenOf(ctx, lastNodeOfFullMove, {
+          parentPath: path,
+          isMainline: opts.isMainline,
+          noConceal: opts.noConceal,
+          truncate: opts.truncate ? opts.truncate - 1 : undefined,
+        }) || [],
+      );
+  }
   return ([renderFullMoveOf(ctx, node, opts)] as MaybeVNodes)
     .concat(renderInlineCommentsOf(ctx, node))
     .concat(opts.inline ? renderInline(ctx, parentedNode(opts.inline, node), opts) : null)

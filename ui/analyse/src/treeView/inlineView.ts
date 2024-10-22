@@ -96,11 +96,21 @@ function renderMoveAndChildrenOf(ctx: Ctx, node: Tree.ParentedNode, opts: Opts):
         .join(''),
     comments = renderInlineCommentsOf(ctx, node);
   if (opts.truncate === 0) return [h('move', { attrs: { p: path } }, '[...]')];
-  return (
-    ([renderFullMoveOf(ctx, node, opts)] as MaybeVNodes)
+  //check if childen within a full move turn of many actions and render the variation
+  const cs = parentedNodes(node.children, node);
+  if (node.children.length > 1 && node.playedPlayerIndex === node.playerIndex) {
+    return ([renderFullMoveOf(ctx, node, opts)] as MaybeVNodes)
       .concat(comments)
-      // TODO: I'm not 100% sure about this parentedNodeCall
       .concat(opts.inline ? renderInline(ctx, parentedNode(opts.inline, node), opts) : null)
+      .concat([
+        h(
+          'interrupt',
+          renderLines(ctx, cs.slice(1), {
+            parentPath: opts.parentPath + node.id,
+            isMainline: false,
+          }),
+        ),
+      ] as MaybeVNodes)
       .concat(
         renderChildrenOf(ctx, lastNodeOfFullMove, {
           parentPath: path,
@@ -108,8 +118,19 @@ function renderMoveAndChildrenOf(ctx: Ctx, node: Tree.ParentedNode, opts: Opts):
           truncate: opts.truncate ? opts.truncate - 1 : undefined,
           withIndex: !!comments[0],
         }) || [],
-      )
-  );
+      );
+  }
+  return ([renderFullMoveOf(ctx, node, opts)] as MaybeVNodes)
+    .concat(comments)
+    .concat(opts.inline ? renderInline(ctx, parentedNode(opts.inline, node), opts) : null)
+    .concat(
+      renderChildrenOf(ctx, lastNodeOfFullMove, {
+        parentPath: path,
+        isMainline: opts.isMainline,
+        truncate: opts.truncate ? opts.truncate - 1 : undefined,
+        withIndex: !!comments[0],
+      }) || [],
+    );
 }
 
 function renderInline(ctx: Ctx, node: Tree.ParentedNode, opts: Opts): VNode {
