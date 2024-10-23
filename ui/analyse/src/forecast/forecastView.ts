@@ -35,6 +35,9 @@ function makeCnodes(ctrl: AnalyseCtrl, fctrl: ForecastCtrl): ForecastStep[] {
   return fctrl.truncate(
     afterPly.map(node => ({
       ply: node.ply,
+      turnCount: node.turnCount,
+      playerIndex: node.playerIndex,
+      playedPlayerIndex: node.playedPlayerIndex,
       fen: node.fen,
       uci: node.uci!,
       san: node.san!,

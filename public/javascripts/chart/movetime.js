@@ -42,8 +42,9 @@ playstrategy.movetimeChart = function (data, trans) {
               var san = node ? node.san : '-';
               if (san === 'NOSAN') san = node.uci;
 
-              var turn = (ply + 1) >> 1;
-              var color = ply & 1;
+              var parentNode = tree[i];
+              var turn = parentNode ? Math.floor((parentNode.turnCount ?? 0) / 2) + 1 : (ply + 1) >> 1;
+              var color = node ? (node.playedPlayerIndex === 'p1' ? 1 : 0) : ply & 1;
 
               var y = Math.pow(Math.log(0.005 * Math.min(time, 12e4) + 3), 2) - logC;
               max = Math.max(y, max);

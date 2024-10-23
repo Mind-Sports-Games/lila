@@ -143,8 +143,17 @@ final class SgfDump(
 
 object SgfDump {
 
-  //TODO this doesn't work for multiaction games....
   def toActionStrs(line: Vector[Node]): ActionStrs = {
-    line.map(n => Vector(n.move.uci.uci))
+    line
+      .drop(1)
+      .foldLeft(Vector(line.take(1))) { case (turn, node) =>
+        if (turn.head.head.playedPlayerIndex != node.playedPlayerIndex) {
+          Vector(node) +: turn
+        } else {
+          (turn.head :+ node) +: turn.tail
+        }
+      }
+      .reverse
+      .map(t => t.map(_.move.uci.uci))
   }
 }

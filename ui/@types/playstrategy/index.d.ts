@@ -592,6 +592,9 @@ declare namespace Tree {
   export interface Node {
     id: string;
     ply: Ply;
+    turnCount: number;
+    playedPlayerIndex: PlayerIndex;
+    playerIndex: PlayerIndex;
     uci?: Uci;
     fen: Fen;
     children: Node[];

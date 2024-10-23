@@ -156,29 +156,30 @@ trait Positional { self: Config =>
           _
         )
       }
-    val (stratGame, state) = baseState.fold(makeGame -> none[SituationPlus]) {
-      case sit @ SituationPlus(s, _) =>
+    val (stratGame, state) = baseState.fold(makeGame -> none[SituationPlus]) { sit =>
+      {
         val game = StratGame(
-          s.gameLogic,
-          situation = s,
+          sit.situation.gameLogic,
+          situation = sit.situation,
           plies = sit.plies,
           turnCount = sit.turnCount,
           startedAtPly = sit.plies,
           startedAtTurn = sit.turnCount,
           clock = makeClock.map(_.toClock)
         )
-        if (Forsyth.>>(s.gameLogic, game).initial)
-          makeGame(Variant.libStandard(s.gameLogic)) -> none
-        else game                                    -> baseState
+        if (Forsyth.>>(sit.situation.gameLogic, game).initial)
+          makeGame(Variant.libStandard(sit.situation.gameLogic)) -> none
+        else game                                                -> baseState
+      }
     }
     val game = builder(stratGame)
-    state.fold(game) { case sit @ SituationPlus(s, _) =>
+    state.fold(game) { sit =>
       game.copy(
         stratGame = game.stratGame.copy(
           situation = game.situation.copy(
             board = game.board.copy(
-              history = s.board.history,
-              variant = s.board.variant
+              history = sit.situation.board.history,
+              variant = sit.situation.board.variant
             )
           ),
           plies = sit.plies,

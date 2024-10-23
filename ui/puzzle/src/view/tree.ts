@@ -38,8 +38,9 @@ function plyToTurn(ply: number): number {
   return Math.floor((ply - 1) / 2) + 1;
 }
 
-export function renderIndex(ply: number, withDots: boolean): VNode {
-  return h('index', plyToTurn(ply) + (withDots ? (ply % 2 === 1 ? '.' : '...') : ''));
+//TODO fix turn count for multiaction games
+export function renderIndex(node: Tree.Node, withDots: boolean): VNode {
+  return h('index', plyToTurn(node.ply) + (withDots ? (node.playedPlayerIndex === 'p1' ? '.' : '...') : ''));
 }
 
 function renderChildrenOf(ctx: Ctx, node: Tree.Node, opts: RenderOpts): MaybeVNodes {
@@ -47,10 +48,10 @@ function renderChildrenOf(ctx: Ctx, node: Tree.Node, opts: RenderOpts): MaybeVNo
     main = cs[0];
   if (!main) return [];
   if (opts.isMainline) {
-    const isP1 = main.ply % 2 === 1;
+    const isP1 = main.playedPlayerIndex === 'p1';
     if (!cs[1])
       return [
-        isP1 ? renderIndex(main.ply, false) : null,
+        isP1 ? renderIndex(main, false) : null,
         ...renderMoveAndChildrenOf(ctx, main, {
           parentPath: opts.parentPath,
           isMainline: true,
@@ -65,7 +66,7 @@ function renderChildrenOf(ctx: Ctx, node: Tree.Node, opts: RenderOpts): MaybeVNo
         isMainline: true,
       };
     return [
-      isP1 ? renderIndex(main.ply, false) : null,
+      isP1 ? renderIndex(main, false) : null,
       renderMoveOf(ctx, main, passOpts),
       isP1 ? emptyMove() : null,
       h(
@@ -75,7 +76,7 @@ function renderChildrenOf(ctx: Ctx, node: Tree.Node, opts: RenderOpts): MaybeVNo
           isMainline: true,
         }),
       ),
-      ...(isP1 && mainChildren ? [renderIndex(main.ply, false), emptyMove()] : []),
+      ...(isP1 && mainChildren ? [renderIndex(main, false), emptyMove()] : []),
       ...mainChildren,
     ];
   }
@@ -167,7 +168,7 @@ export function renderMove(ctx: Ctx, node: Tree.Node): MaybeVNodes {
 }
 
 function renderVariationMoveOf(ctx: Ctx, node: Tree.Node, opts: RenderOpts): VNode {
-  const withIndex = opts.withIndex || node.ply % 2 === 1;
+  const withIndex = opts.withIndex || node.playedPlayerIndex === 'p1';
   const path = opts.parentPath + node.id;
   const active = path === ctx.ctrl.vm.path;
   const classes: Classes = {
@@ -181,7 +182,7 @@ function renderVariationMoveOf(ctx: Ctx, node: Tree.Node, opts: RenderOpts): VNo
       attrs: { p: path },
       class: classes,
     },
-    [withIndex ? renderIndex(node.ply, true) : null, node.san, puzzleGlyph(ctx, node)],
+    [withIndex ? renderIndex(node, true) : null, node.san, puzzleGlyph(ctx, node)],
   );
 }
 
@@ -241,7 +242,7 @@ export function render(ctrl: Controller): VNode {
       },
     },
     [
-      ...(root.ply % 2 === 1 ? [renderIndex(root.ply, false), emptyMove()] : []),
+      ...(root.playedPlayerIndex === 'p1' ? [renderIndex(root, false), emptyMove()] : []),
       ...renderChildrenOf(ctx, root, {
         parentPath: '',
         isMainline: true,
