@@ -341,8 +341,7 @@ export const parseLexicalUci = (uci: string): LexicalUci | undefined => {
 };
 
 export const isOnlyDropsPly = (node: Tree.Node, variantKey: VariantKey, defaultValue: boolean) => {
-  if (variantKey === 'amazons')
-    return Array.isArray(node.dropsByRole) && node.dropsByRole.length;
+  if (variantKey === 'amazons') return Array.isArray(node.dropsByRole) && node.dropsByRole.length;
   else return defaultValue;
 };
 
