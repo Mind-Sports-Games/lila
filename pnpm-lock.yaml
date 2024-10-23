@@ -28,7 +28,7 @@ importers:
         version: https://codeload.github.com/lichess-org/ab-stub/tar.gz/94236bf34dbc9c05daf50f4c9842d859b9142be0
       chessground:
         specifier: git+ssh://git@github.com:Mind-Sports-Games/chessground.git#v7.11.1-pstrat3.1
-        version: https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/eb0f6bdb1dfd91bab2ae9ace72e4e8b39f9e30d6(@babel/core@7.25.2)(@jest/transform@29.7.0)(@jest/types@29.6.3)(babel-jest@29.7.0(@babel/core@7.25.2))
+        version: https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/eb0f6bdb1dfd91bab2ae9ace72e4e8b39f9e30d6(@babel/core@7.25.9)(@jest/transform@29.7.0)(@jest/types@29.6.3)(babel-jest@29.7.0(@babel/core@7.25.9))
       eslint:
         specifier: ^8.57.0
         version: 8.57.1
@@ -45,7 +45,7 @@ importers:
         specifier: git+ssh://git@github.com:Mind-Sports-Games/stratops.git#v0.8.1-pstrat5.2
         version: https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/985bc1c03db7c7a1ceb44f2a0d7bbfa3d014b819
       typescript:
-        specifier: ^5.4.5
+        specifier: ^5.6
         version: 5.6.3
       xml2js:
         specifier: 0.4.19
@@ -4570,18 +4570,18 @@ snapshots:
 
   chess.js@https://codeload.github.com/ornicar/chess.js/tar.gz/ad0709c0b07773d9d0da8e4605a9a2a28f00d249: {}
 
-  chessground@https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/eb0f6bdb1dfd91bab2ae9ace72e4e8b39f9e30d6(@babel/core@7.25.2)(@jest/transform@29.7.0)(@jest/types@29.6.3)(babel-jest@29.7.0(@babel/core@7.25.2)):
+  chessground@https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/eb0f6bdb1dfd91bab2ae9ace72e4e8b39f9e30d6(@babel/core@7.25.9)(@jest/transform@29.7.0)(@jest/types@29.6.3)(babel-jest@29.7.0(@babel/core@7.25.9)):
     dependencies:
       '@jest/globals': 29.7.0
       '@types/node': 20.12.2
-      '@typescript-eslint/eslint-plugin': 7.18.0(@typescript-eslint/parser@7.18.0(eslint@8.57.1)(typescript@5.6.2))(eslint@8.57.1)(typescript@5.6.2)
-      '@typescript-eslint/parser': 7.18.0(eslint@8.57.1)(typescript@5.6.2)
+      '@typescript-eslint/eslint-plugin': 7.18.0(@typescript-eslint/parser@7.18.0(eslint@8.57.1)(typescript@5.6.3))(eslint@8.57.1)(typescript@5.6.3)
+      '@typescript-eslint/parser': 7.18.0(eslint@8.57.1)(typescript@5.6.3)
       esbuild: 0.20.2
       eslint: 8.57.1
       jest: 29.7.0(@types/node@20.12.2)
       prettier: 3.3.3
-      ts-jest: 29.2.5(@babel/core@7.25.2)(@jest/transform@29.7.0)(@jest/types@29.6.3)(babel-jest@29.7.0(@babel/core@7.25.2))(esbuild@0.20.2)(jest@29.7.0(@types/node@20.12.2))(typescript@5.6.2)
-      typescript: 5.6.2
+      ts-jest: 29.2.5(@babel/core@7.25.9)(@jest/transform@29.7.0)(@jest/types@29.6.3)(babel-jest@29.7.0(@babel/core@7.25.9))(esbuild@0.20.2)(jest@29.7.0(@types/node@20.12.2))(typescript@5.6.3)
+      typescript: 5.6.3
     transitivePeerDependencies:
       - '@babel/core'
       - '@jest/transform'
