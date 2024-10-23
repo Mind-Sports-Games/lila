@@ -25,6 +25,8 @@ export interface SwissData {
   variant: string;
   isMedley: boolean;
   isHandicapped: boolean;
+  isMcMahon: boolean;
+  mcmahonCutoff: string;
   roundVariant: string;
   roundVariantName: string;
   p1Name: PlayerName;
@@ -97,6 +99,7 @@ export interface PairingBase {
   gpr: string; //nbGamesPerRound
   mp?: string; //match points for player if using matchScore
   vi?: string; //variant icon
+  of?: string; //opening fen
 }
 
 export interface Pairing extends PairingBase {
@@ -106,6 +109,7 @@ export interface PairingExt extends Pairing {
   user: LightUser;
   rating: number;
   inputRating?: number;
+  ratingDisplay?: string;
 }
 
 export interface Standing {
@@ -119,11 +123,12 @@ export interface BasePlayer {
   user: LightUser;
   rating: number;
   inputRating?: number;
+  ratingDisplay?: string;
   provisional?: boolean;
   withdraw?: boolean;
   points: number;
   tieBreak: number;
-  tieBreak2: number;
+  tieBreak2?: number;
   performance?: number;
   absent: boolean;
   disqualified: boolean;
@@ -137,6 +142,7 @@ export interface Player extends BasePlayer {
   rank: number;
   sheetMin: string;
   sheet: (PairingBase | Outcome)[];
+  mmStartingScore?: number;
 }
 
 export interface BoardSize {

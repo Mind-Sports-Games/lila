@@ -2,24 +2,6 @@
   @return url(#{$font-path}/#{$path});
 }
 
-/* Icon fonts */
-
-@font-face {
-  font-family: 'playstrategy';
-  font-display: block;
-  src:
-    local-font('playstrategy.woff2') format('woff2'),
-    local-font('playstrategy.woff') format('woff');
-}
-
-@font-face {
-  font-family: 'Noto Chess';
-  font-display: block;
-  src:
-    local-font('playstrategy.chess.woff2') format('woff2'),
-    local-font('playstrategy.chess.woff') format('woff');
-}
-
 /* Noto Sans (v7) */
 
 /* cyrillic-ext */

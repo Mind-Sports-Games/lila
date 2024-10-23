@@ -177,7 +177,7 @@ object student {
             realNameField(create, "create-realName"),
             form3.submit(trans.signUp(), icon = none)
           )
-        ),
+        )/*,
         div(cls := "student-add__or")("~ or ~"),
         div(cls := "student-add__choice")(
           div(cls := "info")(
@@ -188,10 +188,11 @@ object student {
             ),
             " to create multiple PlayStrategy accounts from a list of student names."
           )
-        )
+        )*/
       )
     )
 
+/*
   def manyForm(
       clas: Clas,
       students: List[Student],
@@ -243,6 +244,7 @@ object student {
         )
       )
     )
+*/
 
   private def maxStudentsWarning(clas: Clas)(implicit lang: Lang) =
     p(dataIcon := "", cls := "text")(

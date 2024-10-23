@@ -1,10 +1,10 @@
-import { assetUrl, jsModule } from './assets';
+import { hashedAssetUrl, jsModule } from './assets';
 import { storage } from './storage';
 
 export default function () {
   if ('serviceWorker' in navigator && 'Notification' in window && 'PushManager' in window) {
     const workerUrl = new URL(
-      assetUrl(jsModule('serviceWorker'), {
+      hashedAssetUrl(jsModule('serviceWorker'), {
         sameDomain: true,
       }),
       self.location.href,

@@ -301,6 +301,10 @@
   <string name="handicappedTournament">Handicapped</string>
   <string name="handicapTournaments">Handicap Tournaments</string>
   <string name="handicappedDefinition">A handicap is given based on the players ratings to create an even game. Only supported for Go games.</string>
+  <string name="mcmahon">McMahon</string>
+  <string name="mcmahonDefinition">McMahon style tournament, awarding initial points to players to create fairer pairings</string>
+  <string name="mcmahonCutoff">McMahon Cutoff</string>
+  <string name="mcmahonCutoffDefinition">The Cutoff grade separating the top and bottom players. Only supported for Go games. Input example, 2000 or 3k. </string>
   <string name="rematch">Rematch</string>
   <string name="rematchOfferSent">Rematch offer sent</string>
   <string name="rematchOfferSentWhite">White offers rematch</string>

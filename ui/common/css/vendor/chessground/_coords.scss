@@ -91,8 +91,13 @@ coords {
     }
   }
 
+  .variant-bestemshe &.files {
+    font-size: 130%;
+  }
+
   //Handle togy corrds as they are always inside the board
-  .variant-togyzkumalak & {
+  .variant-togyzkumalak &,
+  .variant-bestemshe & {
     text-shadow:
       0.5px -1px 0px rgba(0, 0, 0, 0.25),
       -0.5px 1px 0px rgba(255, 255, 255, 0.6);
@@ -104,7 +109,8 @@ coords {
     }
   }
 
-  .variant-togyzkumalak .orientation-p1 &.files {
+  .variant-togyzkumalak .orientation-p1 &.files,
+  .variant-bestemshe .orientation-p1 &.files {
     &.p1 {
       left: 0;
       bottom: 5px;
@@ -117,7 +123,8 @@ coords {
     }
   }
 
-  .variant-togyzkumalak .orientation-p2 &.files {
+  .variant-togyzkumalak .orientation-p2 &.files,
+  .variant-bestemshe .orientation-p2 &.files {
     &.p1 {
       left: 0;
       top: 5px;
@@ -266,6 +273,10 @@ coords {
     display: none;
   }
 
+  .coords-out .variant-bestemshe coords {
+    display: none;
+  }
+
   @each $variant in $go-variants {
     .coords-out .variant-#{$variant} coords {
       display: none;
@@ -273,7 +284,8 @@ coords {
   }
 
   //always show for Togy and make smaller
-  .variant-togyzkumalak .orientation-p1 coords.files {
+  .variant-togyzkumalak .orientation-p1 coords.files,
+  .variant-bestemshe .orientation-p1 coords.files {
     &.p1 {
       bottom: 3px;
     }
@@ -281,7 +293,8 @@ coords {
       top: 3px;
     }
   }
-  .variant-togyzkumalak .orientation-p2 coords.files {
+  .variant-togyzkumalak .orientation-p2 coords.files,
+  .variant-bestemshe .orientation-p2 coords.files {
     &.p1 {
       top: 3px;
     }
@@ -328,7 +341,8 @@ coords {
   }
 
   //always show for Togy and make smaller
-  .variant-togyzkumalak .orientation-p1 coords.files {
+  .variant-togyzkumalak .orientation-p1 coords.files,
+  .variant-bestemshe .orientation-p1 coords.files {
     &.p1 {
       bottom: 1px;
     }
@@ -336,7 +350,8 @@ coords {
       top: 2px;
     }
   }
-  .variant-togyzkumalak .orientation-p2 coords.files {
+  .variant-togyzkumalak .orientation-p2 coords.files,
+  .variant-bestemshe .orientation-p2 coords.files {
     &.p1 {
       top: 2px;
     }

@@ -616,6 +616,15 @@ object Tv {
           familyChannel = false,
           gameFamily = "mancala"
         )
+    case object Bestemshe
+        extends Channel(
+          name = VariantKeys.variantName(Variant.wrap(MTV.Bestemshe)),
+          icon = MTV.Bestemshe.perfIcon.toString,
+          secondsSinceLastMove = freshBlitz,
+          filters = Seq(variant(Variant.wrap(MTV.Bestemshe)), noBot),
+          familyChannel = false,
+          gameFamily = "mancala"
+        )
     case object Go9x9
         extends Channel(
           name = VariantKeys.variantName(Variant.wrap(GV.Go9x9)),
@@ -729,6 +738,7 @@ object Tv {
       MancalaFamily,
       Oware,
       Togyzkumalak,
+      Bestemshe,
       GoFamily,
       Go19x19,
       Go13x13,

@@ -54,6 +54,7 @@ object side {
                 a(href := routes.Page.loneBookmark("handicaps"), target := "_blank")(
                   trans.handicappedTournament()
                 )
+              else if (s.settings.mcmahon) trans.mcmahon()
               else if (s.settings.rated) trans.ratedTournament()
               else trans.casualTournament(),
               separator,
@@ -93,6 +94,7 @@ object side {
           s.isFinished,
           s.settings.nbRounds
         ),
+        s.settings.mcmahon option div("The bar is at ", strong(s.settings.mcmahonCutoff)),
         s.settings.description map { d =>
           st.section(cls := "description")(markdownLinksOrRichText(d))
         },
@@ -113,16 +115,16 @@ object side {
           table(cls := "trophyPreview")(
             tr(
               td(
-                img(cls := "customTrophy", src := assetUrl(s"images/trophy/${trophy1st}.png"))
+                img(cls := "customTrophy", src := staticAssetUrl(s"images/trophy/${trophy1st}.png"))
               ),
               s.trophy2nd.map { trophy2nd =>
                 td(
-                  img(cls := "customTrophy", src := assetUrl(s"images/trophy/${trophy2nd}.png"))
+                  img(cls := "customTrophy", src := staticAssetUrl(s"images/trophy/${trophy2nd}.png"))
                 )
               },
               s.trophy3rd.map { trophy3rd =>
                 td(
-                  img(cls := "customTrophy", src := assetUrl(s"images/trophy/${trophy3rd}.png"))
+                  img(cls := "customTrophy", src := staticAssetUrl(s"images/trophy/${trophy3rd}.png"))
                 )
               }
             ),

@@ -23,9 +23,17 @@ final class SwissTrf(
     SwissPlayer.fields { f =>
       tournamentLines(swiss) concat
         forbiddenPairings(swiss, playerIds) concat sheetApi
-          .source(swiss, sort = sorted.??($doc(f.rating -> -1)))
+          .source(swiss, sort = sorted.??($doc(f.inputRating -> -1, f.rating -> -1)))
           .map((playerLine(swiss, playerIds) _).tupled)
-          .map(formatLine)
+          .map(formatLine) concat (if (swiss.settings.mcmahon)
+                                     sheetApi
+                                       .source(
+                                         swiss,
+                                         sort = sorted.??($doc(f.inputRating -> -1, f.rating -> -1))
+                                       )
+                                       .map((acceleratedPairingLine(swiss, playerIds) _).tupled)
+                                       .map(formatLine)
+                                   else Source.empty[String])
     }
 
   private def tournamentLines(swiss: Swiss) =
@@ -43,6 +51,24 @@ final class SwissTrf(
         s"XXC ${strategygames.Player.fromP1(swiss.id.value(0).toInt % 2 == 0).classicName}1"
       )
     )
+
+  private def acceleratedPairingLine(
+      swiss: Swiss,
+      playerIds: PlayerIds
+  )(p: SwissPlayer, pairings: Map[SwissRound.Number, SwissPairing], sheet: SwissSheet): Bits =
+    List(
+      3 -> "XXA",
+      8 -> playerIds.getOrElse(p.userId, 0).toString
+    ) ::: swiss.allAcceleratedRounds.flatMap { rn =>
+      List(
+        13 -> f"${additionalPoints(swiss.settings.mcmahonCutoffGrade, p)}%1.1f"
+      ).map { case (l, s) => (l + (rn.value - 1) * 5, s) }
+    }
+
+  private def additionalPoints(mcmahonCutoff: Int, player: SwissPlayer): Double = {
+    val maxScore = 30.0 // so that all scores are positive
+    maxScore + player.mcMahonStartingScore(mcmahonCutoff)
+  }
 
   private def playerLine(
       swiss: Swiss,
@@ -108,7 +134,7 @@ final class SwissTrf(
           .aggregateOne() { framework =>
             import framework._
             Match($doc(p.swissId -> swiss.id)) -> List(
-              Sort(Descending(p.rating)),
+              Sort(Descending(p.inputRating), Descending(p.rating)),
               Group(BSONNull)("us" -> PushField(p.userId))
             )
           }

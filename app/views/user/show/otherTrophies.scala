@@ -62,7 +62,7 @@ object otherTrophies {
   animation: psyche 0.3s ease-in-out infinite alternate;
 }"""),
           a(awardCls(t), href := t.kind.url, ariaTitle(t.kind.name))(
-            img(src := assetUrl("images/trophy/zug-trophy.png"))
+            img(src := staticAssetUrl("images/trophy/zug-trophy.png"))
           )
         )
       },*/
@@ -84,7 +84,7 @@ object otherTrophies {
               case None       => t.kind.name
             })
           )(
-            img(src := assetUrl(s"images/trophy/${t.kind._id}.png"))
+            img(src := staticAssetUrl(s"images/trophy/${t.kind._id}.png"))
           )
         }
     )

@@ -1,4 +1,4 @@
-$score-variants: ('flipello', 'flipello10', 'oware', 'togyzkumalak');
+$score-variants: ('flipello', 'flipello10', 'oware', 'togyzkumalak', 'bestemshe');
 $score-variants-square: ('flipello', 'flipello10', 'oware', 'go9x9', 'go13x13', 'go19x19');
 $go-variants: ('go9x9', 'go13x13', 'go19x19');
 
@@ -29,7 +29,8 @@ $go-variants: ('go9x9', 'go13x13', 'go19x19');
   }
 }
 
-.variant-togyzkumalak .game-score::after {
+.variant-togyzkumalak .game-score::after,
+.variant-bestemshe .game-score::after {
   @extend %active, %box-radius;
 
   content: attr(data-score);
@@ -71,12 +72,14 @@ body.oware-dark-wood .variant-oware .game-score {
   background-size: cover;
 }
 
-body.togyzkumalak-blue .variant-togyzkumalak .game-score {
+body.togyzkumalak-blue .variant-togyzkumalak .game-score,
+body.togyzkumalak-blue .variant-bestemshe .game-score {
   background: url(../images/board/togyzkumalak/togyzkumalak_blue_house.png);
   background-size: cover;
 }
 
-body.togyzkumalak-wood .variant-togyzkumalak .game-score {
+body.togyzkumalak-wood .variant-togyzkumalak .game-score,
+body.togyzkumalak-wood .variant-bestemshe .game-score {
   background: url(../images/board/togyzkumalak/togyzkumalak_wood_house.png);
   background-size: cover;
 }
@@ -334,7 +337,8 @@ body.backgammon-contemporary .variant-backgammon .game-score {
 
 $non-sqaure-pocket-height-mobile: 9.5vw;
 $non-square-pocket-margin-top-mobile: 5vw;
-.variant-togyzkumalak .game-score {
+.variant-togyzkumalak .game-score,
+.variant-bestemshe .game-score {
   @extend %box-radius;
   display: block;
   width: 17.8em;

@@ -85,15 +85,17 @@ export const init = (node: HTMLElement) => {
                         ? { width: 6, height: 2 }
                         : $el.hasClass('variant-togyzkumalak')
                           ? { width: 9, height: 2 }
-                          : $el.hasClass('variant-go9x9')
-                            ? { width: 9, height: 9 }
-                            : $el.hasClass('variant-go13x13')
-                              ? { width: 13, height: 13 }
-                              : $el.hasClass('variant-go19x19')
-                                ? { width: 19, height: 19 }
-                                : $el.hasClass('variant-backgammon') || $el.hasClass('variant-nackgammon')
-                                  ? { width: 12, height: 2 }
-                                  : { width: 8, height: 8 },
+                          : $el.hasClass('variant-bestemshe')
+                            ? { width: 5, height: 2 }
+                            : $el.hasClass('variant-go9x9')
+                              ? { width: 9, height: 9 }
+                              : $el.hasClass('variant-go13x13')
+                                ? { width: 13, height: 13 }
+                                : $el.hasClass('variant-go19x19')
+                                  ? { width: 19, height: 19 }
+                                  : $el.hasClass('variant-backgammon') || $el.hasClass('variant-nackgammon')
+                                    ? { width: 12, height: 2 }
+                                    : { width: 8, height: 8 },
           variant: variantFromElement($el),
         },
         $cg = $el.find('.cg-wrap'),

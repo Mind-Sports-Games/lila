@@ -319,12 +319,12 @@ case class Game(
         )
       else if (updated.board.variant.gameLogic == GameLogic.Togyzkumalak())
         //Is this even necessary as score is in the fen?
-        (updated.board.variant.key == "togyzkumalak") ?? List(
+        (updated.board.variant.gameFamily == GameFamily.Togyzkumalak()) ?? List(
           Event.Score(p1 = updated.history.score.p1, p2 = updated.history.score.p2)
         )
       else if (updated.board.variant.gameLogic == GameLogic.Backgammon())
         //Is this even necessary as score is in the fen?
-        (updated.board.variant.key == "backgammon" || updated.board.variant.key == "nackgammon") ?? List(
+        (updated.board.variant.gameFamily == GameFamily.Backgammon()) ?? List(
           Event.Score(p1 = updated.history.score.p1, p2 = updated.history.score.p2)
         )
       else //chess. Is this even necessary as checkCount is in the fen?
@@ -446,7 +446,7 @@ case class Game(
       p2Player = f(p2Player)
     )
 
-  private def selectSquaresPossible =
+  def selectSquaresPossible =
     started &&
       playable &&
       turnCount >= 2 &&
@@ -456,7 +456,7 @@ case class Game(
       }) &&
       !deadStoneOfferState.map(_.is(DeadStoneOfferState.RejectedOffer)).has(true)
 
-  private def neitherPlayerHasMadeAnOffer =
+  def neitherPlayerHasMadeAnOffer =
     !player(PlayerIndex.P1).isOfferingSelectSquares &&
       !player(PlayerIndex.P2).isOfferingSelectSquares
 
@@ -603,9 +603,10 @@ case class Game(
         )
     }
 
-  def resignable      = playable && !abortable
-  def drawable        = playable && !abortable
-  def forceResignable = resignable && nonAi && !fromFriend && hasClock && !isSwiss
+  def resignable         = playable && !abortable
+  def drawable           = playable && !abortable
+  def forceResignable    = resignable && nonAi && !fromFriend && hasClock && !isSwiss
+  def forceResignableNow = forceResignable && bothPlayersHaveMoved
 
   def finish(status: Status, winner: Option[PlayerIndex]) = {
     val newClock = clock map { _.stop }
@@ -934,7 +935,9 @@ object Game {
 
   val syntheticId = "synthetic"
 
-  val maxPlayingRealtime = 100 // plus 200 correspondence games
+  val maxPlayingRealtime = 100
+
+  val maxPlaying = 200 //including correspondence
 
   val maxPlies =
     1000 // also in SG gl/format/pgn/Binary.scala + study/node(unlimited can cause StackOverflowError)

@@ -64,12 +64,14 @@ body.oware-dark-wood .variant-oware .game-score {
   background-size: cover;
 }
 
-body.togyzkumalak-blue .variant-togyzkumalak .game-score {
+body.togyzkumalak-blue .variant-togyzkumalak .game-score,
+body.togyzkumalak-blue .variant-bestemshe .game-score {
   background: url(../images/board/togyzkumalak/togyzkumalak_blue_house.png);
   background-size: cover;
 }
 
-body.togyzkumalak-wood .variant-togyzkumalak .game-score {
+body.togyzkumalak-wood .variant-togyzkumalak .game-score,
+body.togyzkumalak-wood .variant-bestemshe .game-score {
   background: url(../images/board/togyzkumalak/togyzkumalak_wood_house.png);
   background-size: cover;
 }
@@ -227,12 +229,18 @@ $pocket-height-togy: 14vh;
   grid-template-columns: minmax(150px, calc(59vw - 2.5rem)) minmax(150px, 1fr);
 }
 
+.analyse.variant-bestemshe {
+  grid-template-rows: $pocket-height-togy auto 3rem $pocket-height-togy;
+  grid-template-areas: 'board pocket-top' 'board tools' 'board controls' 'board pocket-bot';
+}
+
 .variant-togyzkumalak .analyse__board {
   margin-top: -43%;
   margin-bottom: 0px;
 }
 
-.variant-togyzkumalak .game-score {
+.variant-togyzkumalak .game-score,
+.variant-bestemshe .game-score {
   @extend %box-radius;
   display: block;
   width: calc(#{$pocket-height-togy} * 4);
@@ -272,7 +280,12 @@ $pocket-height-togy: 14vh;
   }
 }
 
-.variant-togyzkumalak .game-score::after {
+.variant-bestemshe .game-score {
+  margin-left: 20%;
+}
+
+.variant-togyzkumalak .game-score::after,
+.variant-bestemshe .game-score::after {
   @extend %active, %box-radius;
 
   content: attr(data-score);
@@ -358,7 +371,8 @@ $pocket-height-togy: 14vh;
 
 //taller than wider board (e.g. xiangqi) undo some css
 
-.analyse.variant-xiangqi {
+.analyse.variant-xiangqi,
+.analyse.variant-bestemshe {
   margin-right: unset;
   width: unset;
 

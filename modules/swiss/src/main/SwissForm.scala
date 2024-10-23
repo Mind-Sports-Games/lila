@@ -12,6 +12,7 @@ import scala.concurrent.duration._
 
 import lila.common.Form._
 import lila.common.Clock._
+import lila.game.Handicaps.{ playerRatingFromInput }
 
 final class SwissForm(implicit mode: Mode) {
 
@@ -51,6 +52,10 @@ final class SwissForm(implicit mode: Mode) {
           "backgammon"         -> optional(boolean)
         )(MedleyGameFamilies.apply)(MedleyGameFamilies.unapply),
         "rated" -> optional(boolean),
+        "mcmahon" -> mapping(
+          "mcmahon"       -> optional(boolean),
+          "mcmahonCutoff" -> optional(cleanNonEmptyText)
+        )(McMahon.apply)(McMahon.unapply),
         "handicaps" -> mapping(
           "handicapped"        -> optional(boolean),
           "inputPlayerRatings" -> optional(cleanNonEmptyText)
@@ -64,10 +69,12 @@ final class SwissForm(implicit mode: Mode) {
             max = SwissBounds.maxGamesPerRound
           )
         )(XGamesChoice.apply)(XGamesChoice.unapply),
+        "drawTables" -> mapping(
+          "drawTables"           -> optional(boolean),
+          "perPairingDrawTables" -> optional(boolean)
+        )(DrawTables.apply)(DrawTables.unapply),
         "nbRounds"                 -> number(min = minRounds, max = SwissBounds.maxRounds),
         "description"              -> optional(cleanNonEmptyText),
-        "drawTables"               -> optional(boolean),
-        "perPairingDrawTables"     -> optional(boolean),
         "position"                 -> optional(lila.common.Form.fen.playableStrict),
         "chatFor"                  -> optional(numberIn(chatForChoices.map(_._1))),
         "roundInterval"            -> optional(numberIn(roundIntervals)),
@@ -91,7 +98,18 @@ final class SwissForm(implicit mode: Mode) {
           "Best of x or Play x and Match Score can only be used if number of games per round is greater than 1",
           _.validNumberofGames
         )
-        .verifying("Hanidcapped mode requires a Go variant, non-rated and non-meldey", _.validHandicapped)
+        .verifying(
+          "Handicapped mode requires a Go variant, non-rated, non-multimatch and non-medley",
+          _.validHandicapped
+        )
+        .verifying(
+          "McMahon mode requires a Go variant, non-rated, non-multimatch, non-medley and non-handicapped",
+          _.validMcMahon
+        )
+        .verifying(
+          "McMahon cutoff requires a grade between 600 and 2700, or a valid go grade between 30k to 7d",
+          _.validMcMahonCutoff
+        )
     )
 
   def create =
@@ -122,6 +140,10 @@ final class SwissForm(implicit mode: Mode) {
         backgammon = true.some
       ),
       rated = true.some,
+      mcmahon = McMahon(
+        mcmahon = false.some,
+        mcmahonCutoff = none
+      ),
       handicaps = Handicaps(
         handicapped = false.some,
         inputPlayerRatings = none
@@ -132,10 +154,12 @@ final class SwissForm(implicit mode: Mode) {
         matchScore = false.some,
         nbGamesPerRound = 1
       ),
+      drawTables = DrawTables(
+        drawTables = false.some,
+        perPairingDrawTables = false.some
+      ),
       nbRounds = 7,
       description = none,
-      drawTables = false.some,
-      perPairingDrawTables = false.some,
       position = none,
       chatFor = Swiss.ChatFor.default.some,
       roundInterval = Swiss.RoundInterval.auto.some,
@@ -173,6 +197,10 @@ final class SwissForm(implicit mode: Mode) {
         backgammon = gameGroupInMedley(s.settings.medleyVariants, GameGroup.Backgammon()).some
       ),
       rated = s.settings.rated.some,
+      mcmahon = McMahon(
+        mcmahon = s.settings.mcmahon.some,
+        mcmahonCutoff = s.settings.mcmahonCutoff.some.filter(_.nonEmpty)
+      ),
       handicaps = Handicaps(
         handicapped = s.settings.handicapped.some,
         inputPlayerRatings = s.settings.inputPlayerRatings.some.filter(_.nonEmpty)
@@ -183,10 +211,12 @@ final class SwissForm(implicit mode: Mode) {
         matchScore = s.settings.isMatchScore.some,
         nbGamesPerRound = s.settings.nbGamesPerRound
       ),
+      drawTables = DrawTables(
+        drawTables = s.settings.useDrawTables.some,
+        perPairingDrawTables = s.settings.usePerPairingDrawTables.some
+      ),
       nbRounds = s.settings.nbRounds,
       description = s.settings.description,
-      drawTables = s.settings.useDrawTables.some,
-      perPairingDrawTables = s.settings.usePerPairingDrawTables.some,
       position = s.settings.position,
       chatFor = s.settings.chatFor.some,
       roundInterval = s.settings.roundInterval.toSeconds.toInt.some,
@@ -336,12 +366,12 @@ object SwissForm {
       medleyDefaults: MedleyDefaults,
       medleyGameFamilies: MedleyGameFamilies,
       rated: Option[Boolean],
+      mcmahon: McMahon,
       handicaps: Handicaps,
       xGamesChoice: XGamesChoice,
+      drawTables: DrawTables,
       nbRounds: Int,
       description: Option[String],
-      drawTables: Option[Boolean],
-      perPairingDrawTables: Option[Boolean],
       position: Option[FEN],
       chatFor: Option[Int],
       roundInterval: Option[Int],
@@ -382,13 +412,15 @@ object SwissForm {
         case Some(mbs)                                 => Some(mbs)
         case _                                         => None
       }
-    def useDrawTables           = drawTables | false
-    def usePerPairingDrawTables = perPairingDrawTables | false
+    def useDrawTables           = drawTables.drawTables | false
+    def usePerPairingDrawTables = drawTables.perPairingDrawTables | false
     def realPosition            = position ifTrue realVariant.standardVariant
 
     def isRated            = rated | true
+    def isMcMahon          = mcmahon.mcmahon | false
+    def mcmahonCutoff      = if (isMcMahon) mcmahon.mcmahonCutoff else None
     def isHandicapped      = handicaps.handicapped | false
-    def inputPlayerRatings = if (isHandicapped) handicaps.inputPlayerRatings else None
+    def inputPlayerRatings = if (isHandicapped || isMcMahon) handicaps.inputPlayerRatings else None
     def isMatchScore       = xGamesChoice.matchScore | false
     def isBestOfX          = xGamesChoice.bestOfX | false
     def isPlayX            = xGamesChoice.playX | false
@@ -401,7 +433,12 @@ object SwissForm {
     def validRatedVariant =
       !isRated ||
         lila.game.Game.allowRated(realVariant, clock.some)
-    def validHandicapped = !isHandicapped || (gameLogic == GameLogic.Go() && !isMedley && !isRated)
+    def validHandicapped =
+      !isHandicapped || (gameLogic == GameLogic.Go() && !isMedley && !isRated && !isBestOfX && !isPlayX)
+    def validMcMahon =
+      !isMcMahon || (gameLogic == GameLogic
+        .Go() && !isMedley && !isRated && !isHandicapped && !isBestOfX && !isPlayX)
+    def validMcMahonCutoff = !isMcMahon || (mcmahonCutoff.fold(false)(playerRatingFromInput(_) != None))
 
     def validClock = clock match {
       case fc: Clock.Config             => (fc.limitSeconds + fc.incrementSeconds) > 0
@@ -424,8 +461,9 @@ object SwissForm {
       if (medleyDefaults.onePerGameFamily.getOrElse(false)) {
         //take a shuffled list of all variants and pull the first for each game group to the front
         val onePerGameGroupVariantList = scala.util.Random.shuffle(
-          medleyGameFamilies.ggList
-            .map(gg => scala.util.Random.shuffle(gg.variants).head)
+          medleyGameFamilies.ggList.map(gg =>
+            scala.util.Random.shuffle(gg.variants.filter(v => !v.fromPositionVariant)).head
+          )
         )
         onePerGameGroupVariantList ::: generateNoDefaultsMedleyVariants.filterNot(
           onePerGameGroupVariantList.contains(_)
@@ -445,6 +483,16 @@ object SwissForm {
       } else None
 
   }
+
+  case class DrawTables(
+      drawTables: Option[Boolean],
+      perPairingDrawTables: Option[Boolean]
+  )
+
+  case class McMahon(
+      mcmahon: Option[Boolean],
+      mcmahonCutoff: Option[String]
+  )
 
   case class Handicaps(
       handicapped: Option[Boolean],

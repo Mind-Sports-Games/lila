@@ -59,36 +59,36 @@
 .backgammon.is2d .s15-piece.p2.top, .is2d .variant-backgammon .s15-piece.p2.top, .is2d .variant-nackgammon .s15-piece.p2.top {background-image:url('/assets/piece/backgammon/contemporary/b15t.svg')}
 .backgammon.is2d .s15-piece.p2.bottom, .is2d .variant-backgammon .s15-piece.p2.bottom, .is2d .variant-nackgammon .s15-piece.p2.bottom {background-image:url('/assets/piece/backgammon/contemporary/b15b.svg')}
 .backgammon.is2d .flat-piece.p1, .is2d .variant-backgammon .flat-piece.p1, .is2d .variant-nackgammon .flat-piece.p1 {background-image:url('/assets/piece/backgammon/contemporary/wflat.svg')}
-.backgammon.is2d .flat-piece.p1, .is2d .variant-backgammon .flat-piece.p1, .is2d .variant-nackgammon .flat-piece.p1 {background-image:url('/assets/piece/backgammon/contemporary/wflat.svg')}
+
 .backgammon.is2d .flat-piece.p2, .is2d .variant-backgammon .flat-piece.p2, .is2d .variant-nackgammon .flat-piece.p2 {background-image:url('/assets/piece/backgammon/contemporary/bflat.svg')}
-.backgammon.is2d .flat-piece.p2, .is2d .variant-backgammon .flat-piece.p2, .is2d .variant-nackgammon .flat-piece.p2 {background-image:url('/assets/piece/backgammon/contemporary/bflat.svg')}
+
 .backgammon.is2d .side-piece.p1, .is2d .variant-backgammon .side-piece.p1, .is2d .variant-nackgammon .side-piece.p1 {background-image:url('/assets/piece/backgammon/contemporary/wside.svg')}
-.backgammon.is2d .side-piece.p1, .is2d .variant-backgammon .side-piece.p1, .is2d .variant-nackgammon .side-piece.p1 {background-image:url('/assets/piece/backgammon/contemporary/wside.svg')}
+
 .backgammon.is2d .side-piece.p2, .is2d .variant-backgammon .side-piece.p2, .is2d .variant-nackgammon .side-piece.p2 {background-image:url('/assets/piece/backgammon/contemporary/bside.svg')}
-.backgammon.is2d .side-piece.p2, .is2d .variant-backgammon .side-piece.p2, .is2d .variant-nackgammon .side-piece.p2 {background-image:url('/assets/piece/backgammon/contemporary/bside.svg')}
+
 .backgammon.is2d cg-dice.p1 dice.one, .is2d .variant-backgammon cg-dice.p1 dice.one, .is2d .variant-nackgammon cg-dice.p1 dice.one {background-image:url('/assets/piece/backgammon/contemporary/wdiceone.svg')}
-.backgammon.is2d cg-dice.p1 dice.one, .is2d .variant-backgammon cg-dice.p1 dice.one, .is2d .variant-nackgammon cg-dice.p1 dice.one {background-image:url('/assets/piece/backgammon/contemporary/wdiceone.svg')}
+
 .backgammon.is2d cg-dice.p2 dice.one, .is2d .variant-backgammon cg-dice.p2 dice.one, .is2d .variant-nackgammon cg-dice.p2 dice.one {background-image:url('/assets/piece/backgammon/contemporary/bdiceone.svg')}
-.backgammon.is2d cg-dice.p2 dice.one, .is2d .variant-backgammon cg-dice.p2 dice.one, .is2d .variant-nackgammon cg-dice.p2 dice.one {background-image:url('/assets/piece/backgammon/contemporary/bdiceone.svg')}
+
 .backgammon.is2d cg-dice.p1 dice.two, .is2d .variant-backgammon cg-dice.p1 dice.two, .is2d .variant-nackgammon cg-dice.p1 dice.two {background-image:url('/assets/piece/backgammon/contemporary/wdicetwo.svg')}
-.backgammon.is2d cg-dice.p1 dice.two, .is2d .variant-backgammon cg-dice.p1 dice.two, .is2d .variant-nackgammon cg-dice.p1 dice.two {background-image:url('/assets/piece/backgammon/contemporary/wdicetwo.svg')}
+
 .backgammon.is2d cg-dice.p2 dice.two, .is2d .variant-backgammon cg-dice.p2 dice.two, .is2d .variant-nackgammon cg-dice.p2 dice.two {background-image:url('/assets/piece/backgammon/contemporary/bdicetwo.svg')}
-.backgammon.is2d cg-dice.p2 dice.two, .is2d .variant-backgammon cg-dice.p2 dice.two, .is2d .variant-nackgammon cg-dice.p2 dice.two {background-image:url('/assets/piece/backgammon/contemporary/bdicetwo.svg')}
+
 .backgammon.is2d cg-dice.p1 dice.three, .is2d .variant-backgammon cg-dice.p1 dice.three, .is2d .variant-nackgammon cg-dice.p1 dice.three {background-image:url('/assets/piece/backgammon/contemporary/wdicethree.svg')}
-.backgammon.is2d cg-dice.p1 dice.three, .is2d .variant-backgammon cg-dice.p1 dice.three, .is2d .variant-nackgammon cg-dice.p1 dice.three {background-image:url('/assets/piece/backgammon/contemporary/wdicethree.svg')}
+
 .backgammon.is2d cg-dice.p2 dice.three, .is2d .variant-backgammon cg-dice.p2 dice.three, .is2d .variant-nackgammon cg-dice.p2 dice.three {background-image:url('/assets/piece/backgammon/contemporary/bdicethree.svg')}
-.backgammon.is2d cg-dice.p2 dice.three, .is2d .variant-backgammon cg-dice.p2 dice.three, .is2d .variant-nackgammon cg-dice.p2 dice.three {background-image:url('/assets/piece/backgammon/contemporary/bdicethree.svg')}
+
 .backgammon.is2d cg-dice.p1 dice.four, .is2d .variant-backgammon cg-dice.p1 dice.four, .is2d .variant-nackgammon cg-dice.p1 dice.four {background-image:url('/assets/piece/backgammon/contemporary/wdicefour.svg')}
-.backgammon.is2d cg-dice.p1 dice.four, .is2d .variant-backgammon cg-dice.p1 dice.four, .is2d .variant-nackgammon cg-dice.p1 dice.four {background-image:url('/assets/piece/backgammon/contemporary/wdicefour.svg')}
+
 .backgammon.is2d cg-dice.p2 dice.four, .is2d .variant-backgammon cg-dice.p2 dice.four, .is2d .variant-nackgammon cg-dice.p2 dice.four {background-image:url('/assets/piece/backgammon/contemporary/bdicefour.svg')}
-.backgammon.is2d cg-dice.p2 dice.four, .is2d .variant-backgammon cg-dice.p2 dice.four, .is2d .variant-nackgammon cg-dice.p2 dice.four {background-image:url('/assets/piece/backgammon/contemporary/bdicefour.svg')}
+
 .backgammon.is2d cg-dice.p1 dice.five, .is2d .variant-backgammon cg-dice.p1 dice.five, .is2d .variant-nackgammon cg-dice.p1 dice.five {background-image:url('/assets/piece/backgammon/contemporary/wdicefive.svg')}
-.backgammon.is2d cg-dice.p1 dice.five, .is2d .variant-backgammon cg-dice.p1 dice.five, .is2d .variant-nackgammon cg-dice.p1 dice.five {background-image:url('/assets/piece/backgammon/contemporary/wdicefive.svg')}
+
 .backgammon.is2d cg-dice.p2 dice.five, .is2d .variant-backgammon cg-dice.p2 dice.five, .is2d .variant-nackgammon cg-dice.p2 dice.five {background-image:url('/assets/piece/backgammon/contemporary/bdicefive.svg')}
-.backgammon.is2d cg-dice.p2 dice.five, .is2d .variant-backgammon cg-dice.p2 dice.five, .is2d .variant-nackgammon cg-dice.p2 dice.five {background-image:url('/assets/piece/backgammon/contemporary/bdicefive.svg')}
+
 .backgammon.is2d cg-dice.p1 dice.six, .is2d .variant-backgammon cg-dice.p1 dice.six, .is2d .variant-nackgammon cg-dice.p1 dice.six {background-image:url('/assets/piece/backgammon/contemporary/wdicesix.svg')}
-.backgammon.is2d cg-dice.p1 dice.six, .is2d .variant-backgammon cg-dice.p1 dice.six, .is2d .variant-nackgammon cg-dice.p1 dice.six {background-image:url('/assets/piece/backgammon/contemporary/wdicesix.svg')}
+
 .backgammon.is2d cg-dice.p2 dice.six, .is2d .variant-backgammon cg-dice.p2 dice.six, .is2d .variant-nackgammon cg-dice.p2 dice.six {background-image:url('/assets/piece/backgammon/contemporary/bdicesix.svg')}
-.backgammon.is2d cg-dice.p2 dice.six, .is2d .variant-backgammon cg-dice.p2 dice.six, .is2d .variant-nackgammon cg-dice.p2 dice.six {background-image:url('/assets/piece/backgammon/contemporary/bdicesix.svg')}
+
 .backgammon.is2d cg-buttons.p1 cg-button, .is2d .variant-backgammon cg-buttons.p1 cg-button, .is2d .variant-nackgammon cg-buttons.p1 cg-button {background: #D75049; color: #F3F0E9; border: #F3F0E9; border-width: medium; border-style: solid; }
 .backgammon.is2d cg-buttons.p2 cg-button, .is2d .variant-backgammon cg-buttons.p2 cg-button, .is2d .variant-nackgammon cg-buttons.p2 cg-button {background: #414143; color: #F3F0E9; border: #F3F0E9; border-width: medium; border-style: solid; }

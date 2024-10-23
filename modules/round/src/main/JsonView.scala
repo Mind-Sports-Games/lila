@@ -52,7 +52,9 @@ final class JsonView(
   // TODO: in analysis mode, this will be evaluated against the last move, but we don't want to set onlyDropsVariant
   // in this case. Instead just have a return of pov.game.variant.onlyDropsVariant
   private def onlyDropsVariantForCurrentAction(pov: Pov): Boolean = {
-    pov.game.variant.onlyDropsVariant || pov.game.situation.canOnlyDrop
+    pov.game.variant.onlyDropsVariant ||
+    (pov.game.situation.canOnlyDrop &&
+      !(List("crazyhouse", "minishogi", "shogi").contains(pov.game.variant.key)))
   }
 
   private def coordSystemForVariant(prefCoordSystem: Int, gameVariant: Variant): Int =
@@ -113,16 +115,18 @@ final class JsonView(
               )
             }.add("onGame" -> (player.isAi || socket.onGame(player.playerIndex))),
             "opponent" -> {
-              commonPlayerJson(pov.game, opponent, opponentUser, withFlags) ++ Json.obj(
-                //"color" -> pov.game.variant.playerNames(opponent.playerIndex),
-                //"color" -> opponent.playerIndex.classicName,
-                "playerName"  -> pov.game.variant.playerNames(opponent.playerIndex),
-                "playerIndex" -> opponent.playerIndex.name,
-                "playerColor" -> pov.game.variant.playerColors(opponent.playerIndex),
-                "ai"          -> opponent.aiLevel
-              )
-            }.add("isGone" -> (!opponent.isAi && socket.isGone(opponent.playerIndex)))
-              .add("onGame" -> (opponent.isAi || socket.onGame(opponent.playerIndex))),
+              commonPlayerJson(pov.game, opponent, opponentUser, withFlags) ++ Json
+                .obj(
+                  //"color" -> pov.game.variant.playerNames(opponent.playerIndex),
+                  //"color" -> opponent.playerIndex.classicName,
+                  "playerName"  -> pov.game.variant.playerNames(opponent.playerIndex),
+                  "playerIndex" -> opponent.playerIndex.name,
+                  "playerColor" -> pov.game.variant.playerColors(opponent.playerIndex),
+                  "ai"          -> opponent.aiLevel
+                )
+                .add("isGone" -> (!opponent.isAi && socket.isGone(opponent.playerIndex)))
+                .add("onGame" -> (opponent.isAi || socket.onGame(opponent.playerIndex)))
+            },
             "url" -> Json.obj(
               "socket" -> s"/play/$fullId/v$apiVersion",
               "round"  -> s"/$fullId"

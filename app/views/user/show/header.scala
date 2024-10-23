@@ -212,7 +212,7 @@ object header {
                   },
                   profile.countryInfo.map { c =>
                     span(cls := "country")(
-                      img(cls := "flag", src := assetUrl(s"images/flags/${c.code}.png")),
+                      img(cls := "flag", src := staticAssetUrl(s"images/flags/${c.code}.png")),
                       " ",
                       c.name
                     )

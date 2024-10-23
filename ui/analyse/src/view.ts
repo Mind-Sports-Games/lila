@@ -360,7 +360,7 @@ function renderPlayerScore(
 ): VNode | undefined {
   const defaultMancalaRole = 's';
   const children: VNode[] = [];
-  if (variantKey === 'togyzkumalak') {
+  if (variantKey === 'togyzkumalak' || variantKey === 'bestemshe') {
     let part1Score = 0;
     let part2Score = 0;
     let part2Offset = false;
@@ -480,7 +480,7 @@ export default function (ctrl: AnalyseCtrl): VNode {
     needsInnerCoords =
       ((!!gaugeOn || !!playerBars) &&
         !['xiangqi', 'shogi', 'minixiangqi', 'minishogi', 'oware'].includes(variantKey)) ||
-      ['togyzkumalak', 'backgammon', 'nackgammon'].includes(variantKey),
+      ['togyzkumalak', 'bestemshe', 'backgammon', 'nackgammon'].includes(variantKey),
     needsOutterCoords =
       [
         'xiangqi',
@@ -514,7 +514,8 @@ export default function (ctrl: AnalyseCtrl): VNode {
         break;
       }
       case 'oware':
-      case 'togyzkumalak': {
+      case 'togyzkumalak':
+      case 'bestemshe': {
         const fen = ctrl.node.fen;
         const p1Score = getMancalaScore(fen, 'p1');
         const p2Score = getMancalaScore(fen, 'p2');
@@ -555,6 +556,7 @@ export default function (ctrl: AnalyseCtrl): VNode {
     'minishogi',
     'oware',
     'togyzkumalak',
+    'bestemshe',
     'go9x9',
     'go13x13',
     'go19x19',

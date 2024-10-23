@@ -19,7 +19,8 @@ object embed {
           layout.bits.metaCsp(basicCsp withNonce config.nonce),
           st.headTitle(title),
           config.pieceSets.map(ps => layout.bits.pieceSprite(ps)),
-          cssTagWithTheme(cssModule, config.bg)
+          cssTagWithTheme(cssModule, config.bg),
+          views.html.base.layout.playstrategyFontFaceCss
         ),
         st.body(cls := s"base highlight ${config.board}")(
           layout.dataSoundSet := SoundSet.silent.key,

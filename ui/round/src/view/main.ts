@@ -45,7 +45,7 @@ function renderPlayerScore(
 ): VNode {
   const defaultMancalaRole = 's';
   const children: VNode[] = [];
-  if (variantKey === 'togyzkumalak') {
+  if (variantKey === 'togyzkumalak' || variantKey === 'bestemshe') {
     let part1Score = 0;
     let part2Score = 0;
     let part2Offset = false;
@@ -147,7 +147,8 @@ export function main(ctrl: RoundController): VNode {
         break;
       }
       case 'oware':
-      case 'togyzkumalak': {
+      case 'togyzkumalak':
+      case 'bestemshe': {
         //oware stores the score in the board fen so we can do this instead
         const fen = plyStep(ctrl.data, ctrl.ply).fen;
         const p1Score = util.getMancalaScore(fen, 'p1');
@@ -251,7 +252,7 @@ export function main(ctrl: RoundController): VNode {
     }
   }
   //Togyzkumalak and backgammon board always has coodinates on the inside
-  if (['togyzkumalak', 'backgammon', 'nackgammon'].includes(variantKey)) {
+  if (['togyzkumalak', 'bestemshe', 'backgammon', 'nackgammon'].includes(variantKey)) {
     if (!$('body').hasClass('coords-no')) {
       $('body').removeClass('coords-out').addClass('coords-in');
     }
@@ -267,6 +268,7 @@ export function main(ctrl: RoundController): VNode {
     'minibreakthroughtroyka',
     'oware',
     'togyzkumalak',
+    'bestemshe',
     'go9x9',
     'go13x13',
     'go19x19',

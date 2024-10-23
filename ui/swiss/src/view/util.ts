@@ -58,7 +58,11 @@ export function playerInfo(p: BasePlayer, withRating: boolean, withFlag: boolean
     withRating
       ? h('span.rating' + (p.inputRating ? '.unused' : ''), ' ' + p.rating + (p.provisional ? '?' : ''))
       : null,
-    withRating && p.inputRating ? h('span.rating.input', ' ' + p.inputRating.toString() + '*') : null,
+    withRating && p.ratingDisplay
+      ? h('span.rating.input', ' ' + p.ratingDisplay + '*')
+      : withRating && p.inputRating
+        ? h('span.rating.input', ' ' + p.inputRating.toString() + '*')
+        : null,
   ];
 }
 

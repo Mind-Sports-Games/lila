@@ -5,14 +5,18 @@ import play.api.data.Forms._
 import scala.concurrent.duration._
 
 import lila.common.Form.{ cleanNonEmptyText, cleanText, numberIn }
+import lila.common.LameName
 import lila.db.dsl._
+import lila.security.SecurityHelper
+import org.apache.http.protocol.ExecutionContext
 
 final private[team] class TeamForm(
     teamRepo: TeamRepo,
     lightUserApi: lila.user.LightUserApi,
     val captcher: lila.hub.actors.Captcher
 )(implicit ec: scala.concurrent.ExecutionContext)
-    extends lila.hub.CaptchedForm {
+    extends lila.hub.CaptchedForm
+    with SecurityHelper {
 
   private object Fields {
     val name     = "name"     -> cleanText(minLength = 3, maxLength = 60)
@@ -35,22 +39,25 @@ final private[team] class TeamForm(
     val hideForum   = "hideForum"   -> boolean
   }
 
-  val create = Form(
-    mapping(
-      Fields.name,
-      Fields.location,
-      Fields.password,
-      Fields.description,
-      Fields.descPrivate,
-      Fields.request,
-      Fields.gameId,
-      Fields.move,
-      Fields.hideMembers,
-      Fields.hideForum
-    )(TeamSetup.apply)(TeamSetup.unapply)
-      .verifying("team:teamAlreadyExists", d => !teamExists(d).await(2 seconds, "teamExists"))
-      .verifying(captchaFailMessage, validateCaptcha _)
-  )
+  def create()(implicit ctx: lila.user.UserContext) = {
+    Form(
+      mapping(
+        Fields.name,
+        Fields.location,
+        Fields.password,
+        Fields.description,
+        Fields.descPrivate,
+        Fields.request,
+        Fields.gameId,
+        Fields.move,
+        Fields.hideMembers,
+        Fields.hideForum
+      )(TeamSetup.apply)(TeamSetup.unapply)
+        .verifying("team:teamAlreadyExists", d => !teamExists(d).await(2 seconds, "teamExists"))
+        .verifying("team:teamLameName", d => !lameName(d))
+        .verifying(captchaFailMessage, validateCaptcha _)
+    )
+  }
 
   def edit(team: Team) =
     Form(
@@ -105,7 +112,7 @@ final private[team] class TeamForm(
     )
   )
 
-  def createWithCaptcha = withCaptcha(create)
+  def createWithCaptcha(implicit ctx: lila.user.UserContext) = withCaptcha(create())
 
   val pmAll = Form(
     single("message" -> cleanText(minLength = 3, maxLength = 9000))
@@ -119,6 +126,9 @@ final private[team] class TeamForm(
 
   private def teamExists(setup: TeamSetup) =
     teamRepo.coll.exists($id(Team nameToId setup.trim.name))
+
+  private def lameName(d: TeamSetup)(implicit ctx: lila.user.UserContext) =
+    if (isGranted(_.Admin)(ctx)) false else LameName.team(d.name)
 }
 
 private[team] case class TeamSetup(

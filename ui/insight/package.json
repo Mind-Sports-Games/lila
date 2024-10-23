@@ -16,8 +16,5 @@
     "common": "workspace:*",
     "mithril": "github:ornicar/mithril.js#lila-1",
     "numeral": "^1.5"
-  },
-  "playstrategy": {
-    "bundles": "src/insight.js"
   }
 }

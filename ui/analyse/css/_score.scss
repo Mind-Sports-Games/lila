@@ -3,11 +3,23 @@
 $pocket-col1-height: auto;
 $pocket-height: 7em;
 $pocket-height-mobile: 5em;
+$bestemshe-pocket-height: 4.5em;
 $pocket-height-mobile-and-names: 7em;
 
-$score-variants: ('flipello', 'flipello10', 'oware', 'togyzkumalak', 'go9x9', 'go13x13', 'go19x19', 'backgammon');
+$score-variants: (
+  'flipello',
+  'flipello10',
+  'oware',
+  'togyzkumalak',
+  'bestemshe',
+  'go9x9',
+  'go13x13',
+  'go19x19',
+  'backgammon',
+  'nackgammon'
+);
 $score-variants-square: ('flipello', 'flipello10', 'go9x9', 'go13x13', 'go19x19'); //oware handled differently
-$score-variants-non-square: ('togyzkumalak', 'backgammon');
+$score-variants-non-square: ('togyzkumalak', 'bestemshe', 'backgammon', 'nackgammon');
 $go-variants: ('go9x9', 'go13x13', 'go19x19');
 
 .variant-flipello .game-score,
@@ -29,7 +41,8 @@ $go-variants: ('go9x9', 'go13x13', 'go19x19');
   }
 }
 
-.variant-togyzkumalak .game-score::after {
+.variant-togyzkumalak .game-score::after,
+.variant-bestemshe .game-score::after {
   @extend %active, %box-radius;
 
   content: attr(data-score);
@@ -71,12 +84,14 @@ body.oware-dark-wood .variant-oware .game-score {
   background-size: cover;
 }
 
-body.togyzkumalak-blue .variant-togyzkumalak .game-score {
+body.togyzkumalak-blue .variant-togyzkumalak .game-score,
+body.togyzkumalak-blue .variant-bestemshe .game-score {
   background: url(../images/board/togyzkumalak/togyzkumalak_blue_house.png);
   background-size: cover;
 }
 
-body.togyzkumalak-wood .variant-togyzkumalak .game-score {
+body.togyzkumalak-wood .variant-togyzkumalak .game-score,
+body.togyzkumalak-wood .variant-bestemshe .game-score {
   background: url(../images/board/togyzkumalak/togyzkumalak_wood_house.png);
   background-size: cover;
 }
@@ -295,7 +310,16 @@ $non-sqaure-pocket-height-mobile: 9.5vw;
 $non-square-game-score-height-mobile: 13.5vw;
 $non-square-pocket-margin-top-mobile: 5vw;
 $non-square-game-score-height-mobile-and-names: 18.5vw;
+
+//only thing that we want to do for togy but not bestemshe
 .variant-togyzkumalak .game-score {
+  &-top {
+    margin-top: 2.5em;
+  }
+}
+
+.variant-togyzkumalak .game-score,
+.variant-bestemshe .game-score {
   @extend %box-radius;
   display: block;
   width: 17.8em;
@@ -324,7 +348,6 @@ $non-square-game-score-height-mobile-and-names: 18.5vw;
 
   &-top {
     grid-area: pocket-top;
-    margin-top: 2.5em;
   }
 
   &-bottom {
@@ -580,6 +603,36 @@ $backgammon-pocket-height: 6em;
 
   @include breakpoint($mq-col3) {
     grid-template-rows: $backgammon-pocket-height $meta-height $chat-height $backgammon-pocket-height;
+    grid-template-areas: 'side    . board gauge pocket-top' 'side    . board gauge tools' 'chat    . board gauge tools' 'chat    . board gauge pocket-bot' 'uchat   . under .     controls' 'uchat   . under .     acpl';
+  }
+}
+
+.analyse.has-players.variant-bestemshe {
+  grid-template-rows: $non-square-game-score-height-mobile-and-names auto auto minmax(20em, 30vh);
+  grid-template-areas: 'pocket-top' 'board' 'controls' 'tools' 'side' 'acpl' 'under' 'chat' 'uchat';
+
+  @include breakpoint($mq-col2) {
+    grid-template-rows: $bestemshe-pocket-height auto $bestemshe-pocket-height;
+    grid-template-areas: 'board      gauge pocket-top' 'board      gauge tools' 'board      gauge pocket-bot' 'under      .     controls' 'under      .     acpl' 'under      .     side' 'chat       .     side' 'uchat      .     side';
+  }
+
+  @include breakpoint($mq-col3) {
+    grid-template-rows: $bestemshe-pocket-height $meta-height $chat-height $bestemshe-pocket-height;
+    grid-template-areas: 'side    . board gauge pocket-top' 'side    . board gauge tools' 'chat    . board gauge tools' 'chat    . board gauge pocket-bot' 'uchat   . under .     controls' 'uchat   . under .     acpl';
+  }
+}
+
+.analyse.variant-bestemshe {
+  grid-template-rows: $non-square-game-score-height-mobile auto auto minmax(20em, 30vh);
+  grid-template-areas: 'pocket-top' 'board' 'controls' 'tools' 'side' 'acpl' 'under' 'chat' 'uchat';
+
+  @include breakpoint($mq-col2) {
+    grid-template-rows: $bestemshe-pocket-height auto $bestemshe-pocket-height;
+    grid-template-areas: 'board      gauge pocket-top' 'board      gauge tools' 'board      gauge pocket-bot' 'under      .     controls' 'under      .     acpl' 'under      .     side' 'chat       .     side' 'uchat      .     side';
+  }
+
+  @include breakpoint($mq-col3) {
+    grid-template-rows: $bestemshe-pocket-height $meta-height $chat-height $bestemshe-pocket-height;
     grid-template-areas: 'side    . board gauge pocket-top' 'side    . board gauge tools' 'chat    . board gauge tools' 'chat    . board gauge pocket-bot' 'uchat   . under .     controls' 'uchat   . under .     acpl';
   }
 }

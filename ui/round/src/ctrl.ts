@@ -51,6 +51,7 @@ import {
   Position,
   NvuiPlugin,
 } from './interfaces';
+import { defined } from 'common';
 
 interface GoneBerserk {
   p1?: boolean;
@@ -227,7 +228,7 @@ export default class RoundController {
         atomic.capture(this, dest);
       } else sound.capture();
     } else sound.move();
-    if (['togyzkumalak', 'backgammon', 'nackgammon'].includes(this.data.game.variant.key)) {
+    if (['togyzkumalak', 'bestemshe', 'backgammon', 'nackgammon'].includes(this.data.game.variant.key)) {
       this.chessground.redrawAll(); //redraw board scores or coordinates
     }
     if (!this.data.onlyDropsVariant) cancelDropMode(this.chessground.state);
@@ -291,6 +292,7 @@ export default class RoundController {
         'flipello10',
         'oware',
         'togyzkumalak',
+        'bestemshe',
         'amazons',
         'breakthroughtroyka',
         'minibreakthroughtroyka',
@@ -399,7 +401,7 @@ export default class RoundController {
     };
     this.chessground.set(config);
 
-    if (['togyzkumalak', 'backgammon', 'nackgammon'].includes(this.data.game.variant.key)) {
+    if (['togyzkumalak', 'bestemshe', 'backgammon', 'nackgammon'].includes(this.data.game.variant.key)) {
       this.chessground.redrawAll(); //redraw board scores or coordinates
     }
     const variantActionToEnforceDrop =
@@ -619,7 +621,7 @@ export default class RoundController {
         this.ply++;
       }
       this.turnCount = o.turnCount;
-      const variantCanStillHavePieceAtActionKey = ['togyzkumalak', 'backgammon', 'nackgammon'];
+      const variantCanStillHavePieceAtActionKey = ['togyzkumalak', 'bestemshe', 'backgammon', 'nackgammon'];
       const allowChessgroundAction = !(
         variantCanStillHavePieceAtActionKey.includes(d.game.variant.key) && playedPlayerIndex === d.player.playerIndex
       );
@@ -646,7 +648,7 @@ export default class RoundController {
               (pieces.get(o.castle.king[0])?.role === 'k-piece' && pieces.get(o.castle.rook[0])?.role === 'r-piece')) &&
             allowChessgroundAction
           ) {
-            if (['oware', 'togyzkumalak', 'backgammon', 'nackgammon'].includes(d.game.variant.key)) {
+            if (['oware', 'togyzkumalak', 'bestemshe', 'backgammon', 'nackgammon'].includes(d.game.variant.key)) {
               this.chessground.moveNoAnim(keys[0], keys[1]);
             } else {
               this.chessground.move(keys[0], keys[1]);
@@ -882,7 +884,8 @@ export default class RoundController {
     if (this.keyboardMove) this.keyboardMove.update(d.steps[d.steps.length - 1]);
     this.bindSpaceToEndTurn();
     //redraw board scores/dice, items in CG wrap layer
-    if (['togyzkumalak', 'backgammon', 'nackgammon'].includes(this.data.game.variant.key)) this.chessground.redrawAll();
+    if (['togyzkumalak', 'bestemshe', 'backgammon', 'nackgammon'].includes(this.data.game.variant.key))
+      this.chessground.redrawAll();
   };
 
   endWithData = (o: ApiEnd): void => {
@@ -1086,7 +1089,13 @@ export default class RoundController {
 
   opponentGone = (): number | boolean => {
     const d = this.data;
-    return d.opponent.gone !== false && !game.isPlayerTurn(d) && game.resignable(d) && d.opponent.gone;
+    return (
+      defined(d.opponent.isGone) &&
+      d.opponent.isGone !== false &&
+      !game.isPlayerTurn(d) &&
+      game.resignable(d) &&
+      d.opponent.isGone
+    );
   };
 
   canOfferDraw = (): boolean => game.drawable(this.data) && (this.lastDrawOfferAtPly || -99) < this.ply - 20;

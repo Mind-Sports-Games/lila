@@ -42,7 +42,7 @@ lazy val modules = Seq(
   playban, insight, perfStat, irc, quote, challenge,
   study, studySearch, fishnet, explorer, learn, plan,
   event, coach, practice, evalCache, irwin,
-  activity, relay, streamer, bot, clas, swiss, storm, racer
+  activity, relay, streamer, bot, clas, swiss, storm, racer, web
 )
 
 lazy val moduleRefs = modules map projectToRef
@@ -120,7 +120,7 @@ lazy val evaluation = module("evaluation",
   Seq(specs2) ++ reactivemongo.bundle
 )
 
-lazy val common = smallModule("common",
+lazy val common = smallModule("common", // became "ui" in lichess
   Seq(),
   Seq(
     scalalib, scalaUri, strategyGames, autoconfig,
@@ -421,4 +421,9 @@ lazy val socket = smallModule("socket",
 lazy val hub = smallModule("hub",
   Seq(common),
   Seq(scaffeine, macwire.util)
+)
+
+lazy val web = module("web",
+  Seq(common),
+  playWs.bundle ++ Seq(play.api, macwire.util)
 )

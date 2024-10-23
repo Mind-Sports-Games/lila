@@ -4,12 +4,19 @@ import * as fs from 'node:fs';
 import * as crypto from 'node:crypto';
 import * as es from 'esbuild';
 import { env, colors as c, warnMark } from './main';
-import { globArray } from './parse';
+import { globArray, globArrays } from './parse';
+import { isUnmanagedAsset } from './copies';
 import { allSources } from './sass';
 
-type Manifest = { [key: string]: { hash?: string; imports?: string[] } };
+type Manifest = { [key: string]: { hash?: string; imports?: string[]; mtime?: number } };
 
-const current: { js: Manifest; css: Manifest; dirty: boolean } = { js: {}, css: {}, dirty: false };
+const current: { js: Manifest; css: Manifest; hashed: Manifest; dirty: boolean } = {
+  js: {},
+  css: {},
+  hashed: {},
+  dirty: false,
+};
+
 let writeTimer: NodeJS.Timeout;
 
 export async function initManifest() {
@@ -24,24 +31,15 @@ export async function initManifest() {
   current.css = manifest.css;
 }
 
-export async function writeManifest() {
+export function writeManifest() {
   if (!current.dirty) return;
   clearTimeout(writeTimer);
   writeTimer = setTimeout(write, 500);
 }
 
-export async function css() {
-  const files = await globArray(path.join(env.cssTempDir, '*.css'), { abs: true });
-  const css: { name: string; hash: string }[] = await Promise.all(files.map(hashMove));
-  const newCssManifest: Manifest = {};
-  for (const { name, hash } of css) newCssManifest[name] = { hash };
-  if (isEquivalent(newCssManifest, current.css)) return;
-  current.css = shallowSort({ ...current.css, ...newCssManifest });
-  current.dirty = true;
-  writeManifest();
-}
+const generateHash = (content: string) => crypto.createHash('sha256').update(content).digest('hex').slice(0, 8);
 
-export async function js(meta: es.Metafile) {
+export async function jsManifest(meta: es.Metafile) {
   const newJsManifest: Manifest = {};
   for (const [filename, info] of Object.entries(meta.outputs)) {
     const out = parsePath(filename);
@@ -64,6 +62,54 @@ export async function js(meta: es.Metafile) {
   current.dirty = true;
 }
 
+export async function cssManifest() {
+  const files = await globArray(path.join(env.cssTempDir, '*.css'));
+  const css: { name: string; hash: string }[] = await Promise.all(files.map(hashMoveCss));
+  const newCssManifest: Manifest = {};
+  for (const { name, hash } of css) newCssManifest[name] = { hash };
+  if (isEquivalent(newCssManifest, current.css)) return;
+  current.css = shallowSort({ ...current.css, ...newCssManifest });
+  current.dirty = true;
+  writeManifest();
+}
+
+export async function hashedManifest() {
+  const newHashLinks = new Map<string, number>();
+  const alreadyHashed = new Map<string, string>();
+  const sources: string[] = (
+    await globArrays(
+      env.building.flatMap(x => x.hashGlobs ?? []),
+      { cwd: env.outDir },
+    )
+  ).filter(isUnmanagedAsset);
+  const sourceStats = await Promise.all(sources.map(file => fs.promises.stat(file)));
+
+  for (const [i, stat] of sourceStats.entries()) {
+    const name = sources[i].slice(env.outDir.length + 1);
+
+    if (stat.mtimeMs === current.hashed[name]?.mtime) alreadyHashed.set(name, current.hashed[name].hash!);
+    else newHashLinks.set(name, stat.mtimeMs);
+  }
+
+  await Promise.allSettled(
+    [...alreadyHashed].map(([name, hash]) =>
+      fs.promises.symlink(path.join(env.outDir, name), path.join(env.hashDir, hash)),
+    ),
+  );
+
+  for (const { name, hash } of await Promise.all([...newHashLinks.keys()].map(hashLink))) {
+    current.hashed[name] = Object.defineProperty({ hash }, 'mtime', { value: newHashLinks.get(name) });
+  }
+
+  if (newHashLinks.size === 0 && alreadyHashed.size === Object.keys(current.hashed).length) return;
+
+  for (const name of Object.keys(current.hashed)) {
+    if (!sources.some(x => x.endsWith(name))) delete current.hashed[name];
+  }
+  current.dirty = true;
+  writeManifest();
+}
+
 async function write() {
   if (!env.manifestOk || !(await isComplete())) return;
   const commitMessage = cps
@@ -77,7 +123,7 @@ async function write() {
     `window.playstrategy.info.commit='${cps.execSync('git rev-parse -q HEAD', { encoding: 'utf-8' }).trim()}';`,
     `window.playstrategy.info.message='${commitMessage}';`,
     `window.playstrategy.debug=${env.debug};`,
-    'const m=window.playstrategy.manifest={css:{},js:{}};',
+    'const m=window.playstrategy.manifest={css:{},js:{},hashed:{}};',
   ];
   for (const [name, info] of Object.entries(current.js)) {
     if (!/common\.[A-Z0-9]{8}/.test(name)) clientJs.push(`m.js['${name}']='${info.hash}';`);
@@ -85,19 +131,25 @@ async function write() {
   for (const [name, info] of Object.entries(current.css)) {
     clientJs.push(`m.css['${name}']='${info.hash}';`);
   }
-
+  for (const [path, info] of Object.entries(current.hashed)) {
+    clientJs.push(`m.hashed[${JSON.stringify(path)}]='${info.hash}';`);
+  }
   const hashable = clientJs.join('\n');
-  const hash = crypto.createHash('sha256').update(hashable).digest('hex').slice(0, 8);
+  const hash = generateHash(hashable);
   // add the date after hashing
   const clientManifest =
     hashable +
     `\nwindow.playstrategy.info.date='${new Date(new Date().toUTCString()).toISOString().split('.')[0] + '+00:00'}';\n`;
-  const serverManifest = { js: { manifest: { hash }, ...current.js }, css: { ...current.css } };
+  const serverManifest = {
+    js: { manifest: { hash }, ...current.js },
+    css: { ...current.css },
+    hashed: { ...current.hashed },
+  };
 
   await Promise.all([
-    fs.promises.writeFile(path.join(env.jsDir, `manifest.${hash}.js`), clientManifest),
+    fs.promises.writeFile(path.join(env.jsDir, `manifest.${hash}.js`), clientManifest), // client manifest - manifest.<hash>.js
     fs.promises.writeFile(
-      path.join(env.jsDir, `manifest.${env.prod ? 'prod' : 'dev'}.json`),
+      path.join(env.jsDir, `manifest.${env.prod ? 'prod' : 'dev'}.json`), // server manifest -  manifest.<dev|prod>.json
       JSON.stringify(serverManifest, null, env.prod ? undefined : 2),
     ),
   ]);
@@ -105,15 +157,26 @@ async function write() {
   env.log(`Manifest hash ${c.green(hash)}`);
 }
 
-async function hashMove(src: string) {
+async function hashMoveCss(src: string) {
   const content = await fs.promises.readFile(src, 'utf-8');
-  const hash = crypto.createHash('sha256').update(content).digest('hex').slice(0, 8);
+  const hash = generateHash(content);
   const basename = path.basename(src, '.css');
   await Promise.allSettled([
-    env.prod ? undefined : fs.promises.rename(`${src}.map`, path.join(env.cssDir, `${basename}.css.map`)),
-    fs.promises.rename(src, path.join(env.cssDir, `${basename}.css`)),
+    env.prod ? undefined : fs.promises.rename(`${src}.map`, path.join(env.cssDir, `${basename}.css.map`)), // no map file in prod
+    fs.promises.rename(src, path.join(env.cssDir, `${basename}.${hash}.css`)), // rename css file to include hash
   ]);
   return { name: path.basename(src, '.css'), hash };
+}
+
+async function hashLink(name: string) {
+  const src = path.join(env.outDir, name);
+  const hash = crypto
+    .createHash('sha256')
+    .update(await fs.promises.readFile(src))
+    .digest('base64url')
+    .slice(0, 8);
+  link(name, hash);
+  return { name, hash };
 }
 
 async function isComplete() {
@@ -158,4 +221,15 @@ function isEquivalent(a: any, b: any): boolean {
     if (!bKeys.includes(key) || !isEquivalent(a[key], b[key])) return false;
   }
   return true;
+}
+
+function asHashed(path: string, hash: string) {
+  const name = path.slice(path.lastIndexOf('/') + 1);
+  const extPos = name.indexOf('.');
+  return extPos < 0 ? `${name}.${hash}` : `${name.slice(0, extPos)}.${hash}${name.slice(extPos)}`;
+}
+
+function link(name: string, hash: string) {
+  const link = path.join(env.hashDir, asHashed(name, hash));
+  fs.promises.symlink(path.join('..', name), link).catch(() => {});
 }

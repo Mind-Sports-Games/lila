@@ -79,6 +79,7 @@ object home {
                 else s.perfType.trans,
                 " • ",
                 if (s.settings.handicapped) trans.handicappedTournament()
+                else if (s.settings.mcmahon) trans.mcmahon()
                 else if (s.settings.rated) trans.ratedTournament()
                 else trans.casualTournament()
               )
@@ -174,7 +175,7 @@ object home {
         "When a player can't be paired during a round, they receive a bye worth one point."
       )
     ),
-    div(cls := "faq")(
+    div(cls := "faq", id := "bestofx")(
       i("?"),
       p(
         strong("What do the Swiss options 'best of x' and 'play x' do?"),
@@ -294,6 +295,29 @@ object home {
         br,
         "The closest you can get to Round Robin online is to play a Swiss tournament with a very high ",
         "number of rounds. Then all possible pairings will be played before the tournament ends."
+      )
+    ),
+    div(cls := "faq", id := "handicaps")(
+      i("?"),
+      p(
+        strong("What is a Handicapped Style Tournament?"),
+        "A Handicapped style tournament provides an environment to play games against stronger or weaker opponents on a level footing. ",
+        "To do this the initial starting fen is changed to reflect the strength difference between the two players.",
+        br,
+        "For more information see our ",
+        a(href := routes.Page.loneBookmark("handicaps"))("handicaps page.")
+      )
+    ),
+    div(cls := "faq", id := "mcmahon")(
+      i("?"),
+      p(
+        strong("What is a McMahon Style Tournament?"),
+        "A McMahon style tournament is typical in European Go tournaments, and helps reduce the probability of a very strong player playing against ",
+        "a very weak player in the initial rounds.",
+        br,
+        "To create better pairings, an initial score (MMS) is given to players based on their grade and if they are above a cutoff value. ",
+        "For example, a cutoff value of 3k (~1800), gives all players at and above this grade -3 points, and each Kyu grade below an additional -1 point.",
+        "This means that it is impossible for weaker players to win a tournament even if they win all their games."
       )
     ),
     div(cls := "faq")(

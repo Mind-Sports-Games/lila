@@ -28,9 +28,20 @@ object features {
           //header(h1(dataIcon := "")("Website")),
           header(h1("Website")),
           tbody(
+            tr(check)(
+              strong("Zero ads, no tracking")
+            ),
             tr(unlimited)(
               "Play and create ",
               a(href := routes.Tournament.home)("tournaments")
+            ),
+            tr(check)(
+              "Tournament features including: ",
+              a(href := routes.Page.loneBookmark("medley"))("medley"),
+              ", ",
+              a(href := routes.Page.loneBookmark("handicaps"))("handicapped"),
+              ", ",
+              a(href := s"${routes.Swiss.home}#bestofx")("best of X/play X")
             ),
             tr(unlimited)(
               "Play and create ",
@@ -40,11 +51,21 @@ object features {
               "Bullet, Blitz, Rapid, Classical and Correspondence games"
             ),
             tr(check)(
+              "A variety of clock types; ",
+              a(href := routes.Page.loneBookmark("clocks"))(
+                "Fischer, Byoyomi, Bronstein, Simple Delay, Correspondence and unlimited"
+              )
+            ),
+            tr(check)(
               "Standard chess and ",
               a(href := routes.Page.variantHome)("10 chess variants (Chess960, Crazyhouse, ...)")
             ),
             tr(unlimited)(
-              "Lines Of Action"
+              "Over 30 different games/variants including draughts, othello, backgammon, go..."
+            ),
+            tr(unlimited)(
+              "Play against ",
+              a(href := routes.PlayApi.botOnline)("PlayStrategy Bots")
             ),
             tr(custom("35 per day"))(
               "Deep Stockfish 13+ server analysis on chess games"
@@ -52,42 +73,36 @@ object features {
             tr(unlimited)(
               "Instant local Stockfish 13+ analysis on chess games"
             ),
-            /*tr(unlimited)(
-              a(href := "https://lichess.org/blog/WN-gLzAAAKlI89Xn/thousands-of-stockfish-analysers"
-(
-                "Cloud engine analysis"
-              )
-            ),
             tr(unlimited)(
-              a(href := "https://lichess.org/blog/WFvLpiQAACMA8e9D/learn-from-your-mistakes")(
-                "Learn from your mistakes"
-              )
+              "FairyStockfish server analysis on shogi, xiangqi, othello, amazons and breakthrough games"
             ),
+            tr(unlimited)("Cloud engine analysis (chess)"),
+            tr(unlimited)("Learn from your mistakes"),
             tr(unlimited)(
-              a(href := "https://lichess.org/blog/V0KrLSkAAMo3hsi4/study-chess-the-lichess-way")(
+              a(href := routes.Study.allDefault())(
                 "Studies (shared and persistent analysis)"
               )
             ),
-            tr(unlimited)(
-              a(href := "https://lichess.org/blog/VmZbaigAABACtXQC/chess-insights")(
-                "Chess insights (detailed analysis of your play)"
-              )
-            ),*/
-            tr(check)(
-              a(href := routes.Learn.index)("All chess basics lessons")
-            ),
-            tr(unlimited)(
-              a(href := routes.Puzzle.home)("Chess Tactics Puzzles")
-            ),
-            tr(unlimited)(
-              a(href := routes.Puzzle.streak)("Chess Puzzle Streak")
-            ),
-            tr(unlimited)(
-              a(href := routes.Storm.home)("Chess Puzzle Storm")
-            ),
-            tr(unlimited)(
-              a(href := routes.Racer.home)("Chess Puzzle Racer")
-            ),
+            // tr(unlimited)(
+            //   a(href := "https://lichess.org/blog/VmZbaigAABACtXQC/chess-insights")(
+            //     "Chess insights (detailed analysis of your play)"
+            //   )
+            // ),
+            // tr(check)(
+            //   a(href := routes.Learn.index)("All chess basics lessons")
+            // ),
+            // tr(unlimited)(
+            //   a(href := routes.Puzzle.home)("Chess Tactics Puzzles")
+            // ),
+            // tr(unlimited)(
+            //   a(href := routes.Puzzle.streak)("Chess Puzzle Streak")
+            // ),
+            // tr(unlimited)(
+            //   a(href := routes.Storm.home)("Chess Puzzle Storm")
+            // ),
+            // tr(unlimited)(
+            //   a(href := routes.Racer.home)("Chess Puzzle Racer")
+            // ),
             tr(unlimited)(
               a(href := s"${routes.UserAnalysis.index}#explorer")("Chess Opening Explorer")
             ),
@@ -97,17 +112,20 @@ object features {
               )
             ),
             tr(check)(
-              "Download/Upload any game as PGN"
+              "Download/Upload chess game as PGN"
             ),
-            tr(unlimited)(
-              a(href := routes.Search.index(1))("Advanced search"),
-              " through PlayStrategy games library"
+            tr(check)(
+              "Download supported games as SGF"
             ),
+            // tr(unlimited)(
+            //   a(href := routes.Search.index(1))("Advanced search"),
+            //   " through PlayStrategy games library"
+            // ),
             /*tr(unlimited)(
               a(href := routes.Video.index)("Chess video library")
             ),*/
             tr(check)(
-              "Forum, teams, messaging, friends, challenges"
+              "Forum, teams, TV, messaging, friends, challenges"
             ),
             tr(check)(
               /*"Available in ",
@@ -116,12 +134,6 @@ object features {
             ),
             tr(check)(
               "Light/dark theme, custom boards, pieces and background"
-            ),
-            tr(check)(
-              strong("Zero ads")
-            ),
-            tr(check)(
-              strong("No tracking")
             ),
             tr(check)(
               strong("New features to come!")
