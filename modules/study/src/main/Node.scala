@@ -26,7 +26,7 @@ sealed trait RootOrNode {
   val glyphs: Glyphs
   val score: Option[Score]
   def addChild(node: Node): RootOrNode
-  def fullTurnCount = 1 + (turnCount - 1) / 2
+  def fullTurnCount = 1 + (turnCount - (if (playedPlayerIndex == playerIndex) 0 else 1)) / 2
   def mainline: Vector[Node]
   def playerIndex = fen.player.getOrElse(PlayerIndex.P1)
   def moveOption: Option[Uci.WithSan]
