@@ -37,7 +37,7 @@
     "@typescript-eslint/parser": "^7.2.0",
     "ab": "github:lichess-org/ab-stub",
     "chessground": "git+ssh://git@github.com:Mind-Sports-Games/chessground.git#v7.11.1-pstrat3.0",
-    "stratops": "git+ssh://git@github.com:Mind-Sports-Games/stratops.git#pla-560-support-analysis-for-multi-action-games",
+    "stratops": "git+ssh://git@github.com:Mind-Sports-Games/stratops.git#v0.8.1-pstrat5.2",
     "eslint": "^8.57.0",
     "lint-staged": "^15.2.2",
     "onchange": "^7.1.0",
