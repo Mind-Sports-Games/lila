@@ -159,13 +159,7 @@ function renderVariationFullMoveOf(ctx: Ctx, node: Tree.ParentedNode, opts: Opts
   const variant = ctx.ctrl.data.game.variant;
   const notation = notationStyle(variant.key);
   const withIndex = opts.withIndex || node.playedPlayerIndex === 'p1',
-    path =
-      opts.parentPath +
-      fullTurnNodes
-        .map(n => {
-          return n.id;
-        })
-        .join(''),
+    path = opts.parentPath + node.id,
     content: MaybeVNodes = [
       withIndex ? moveView.renderIndex(node, true) : null,
       // TODO: the || '' are probably not correct
