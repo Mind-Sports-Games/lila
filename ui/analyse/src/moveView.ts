@@ -93,7 +93,7 @@ export function renderFullMove(ctx: Ctx, node: Tree.ParentedNode, style: Notatio
     ),
   ];
   if (node.glyphs && ctx.showGlyphs) node.glyphs.forEach(g => nodes.push(renderGlyph(g)));
-  if (node.shapes) nodes.push(h('shapes'));
+  if (fullTurnNodes.filter(n => n.shapes !== undefined).length > 0) nodes.push(h('shapes'));
   if (ev && ctx.showEval) {
     if (defined(ev.cp)) nodes.push(renderEval(normalizeEval(ev.cp)));
     else if (defined(ev.mate)) nodes.push(renderEval('#' + ev.mate));
