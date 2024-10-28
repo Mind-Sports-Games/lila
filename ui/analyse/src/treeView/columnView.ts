@@ -18,7 +18,7 @@ import {
   Ctx as BaseCtx,
   Opts as BaseOpts,
 } from './treeView';
-import { enrichText, innerHTML, parentedNodes, parentedNode } from '../util';
+import { enrichText, innerHTML, parentedNodes, parentedNode, fullTurnNodesFromNode } from '../util';
 
 interface Ctx extends BaseCtx {
   concealOf: ConcealOf;
@@ -42,17 +42,15 @@ function emptyMove(conceal?: Conceal): VNode {
 
 function renderChildrenOf(ctx: Ctx, node: Tree.ParentedNode, opts: Opts): MaybeVNodes | undefined {
   const cs = parentedNodes(node.children, node),
-    variant = ctx.ctrl.data.game.variant,
     main = cs[0];
   if (!main) return;
   const conceal = opts.noConceal ? null : opts.conceal || ctx.concealOf(true)(opts.parentPath + main.id, main);
   if (conceal === 'hide') return;
   if (opts.isMainline) {
-    //TODO multiaction. There is a lot of 'ply % 2' in the code which is not safe for multiaction games. These need to be changed as part of upgrading Step and analysis to multiaction
-    const isP1 = main.ply % 2 === 1,
-      commentTags = renderMainlineCommentsOf(ctx, main, conceal, true).filter(nonEmpty);
+    const isP1 = main.playedPlayerIndex === 'p1';
+    const commentTags = renderMainlineCommentsOf(ctx, main, conceal, true).filter(nonEmpty);
     if (!cs[1] && isEmpty(commentTags) && !main.forceVariation)
-      return ((isP1 ? [moveView.renderIndex(main.ply, variant.key, false)] : []) as MaybeVNodes).concat(
+      return ((isP1 ? [moveView.renderIndex(main, false)] : []) as MaybeVNodes).concat(
         renderMoveAndChildrenOf(ctx, main, {
           parentPath: opts.parentPath,
           isMainline: true,
@@ -71,7 +69,7 @@ function renderChildrenOf(ctx: Ctx, node: Tree.ParentedNode, opts: Opts): MaybeV
       isMainline: !main.forceVariation,
       conceal,
     };
-    return (isP1 ? [moveView.renderIndex(main.ply, variant.key, false)] : ([] as MaybeVNodes))
+    return (isP1 ? [moveView.renderIndex(main, false)] : ([] as MaybeVNodes))
       .concat(main.forceVariation ? [] : [renderMoveOf(ctx, main, passOpts), isP1 ? emptyMove(passOpts.conceal) : null])
       .concat([
         h(
@@ -87,7 +85,9 @@ function renderChildrenOf(ctx: Ctx, node: Tree.ParentedNode, opts: Opts): MaybeV
         ),
       ] as MaybeVNodes)
       .concat(
-        isP1 && mainChildren ? [moveView.renderIndex(main.ply, variant.key, false), emptyMove(passOpts.conceal)] : [],
+        mainChildren && main.playerIndex === 'p2'
+          ? [moveView.renderIndex(main, false), emptyMove(passOpts.conceal)]
+          : [],
       )
       .concat(mainChildren || []);
   }
@@ -132,6 +132,65 @@ function renderLines(ctx: Ctx, nodes: Tree.ParentedNode[], opts: Opts): VNode {
   );
 }
 
+function renderFullMoveOf(ctx: Ctx, node: Tree.ParentedNode, opts: Opts): VNode {
+  return opts.isMainline ? renderMainlineFullMoveOf(ctx, node, opts) : renderVariationFullMoveOf(ctx, node, opts);
+}
+
+function renderMainlineFullMoveOf(ctx: Ctx, node: Tree.ParentedNode, opts: Opts): VNode {
+  const path = opts.parentPath + node.id,
+    classes = nodeClasses(ctx, node, path);
+  if (opts.conceal) classes[opts.conceal as string] = true;
+  return h(
+    'move',
+    {
+      attrs: { p: path },
+      class: classes,
+    },
+    moveView.renderFullMove(
+      { variant: ctx.ctrl.data.game.variant, ...ctx },
+      node,
+      notationStyle(ctx.ctrl.data.game.variant.key),
+    ),
+  );
+}
+
+function renderVariationFullMoveOf(ctx: Ctx, node: Tree.ParentedNode, opts: Opts): VNode {
+  const fullTurnNodes: Tree.ParentedNode[] = fullTurnNodesFromNode(node);
+  const variant = ctx.ctrl.data.game.variant;
+  const notation = notationStyle(variant.key);
+  const withIndex = opts.withIndex || node.playedPlayerIndex === 'p1',
+    path = opts.parentPath + node.id,
+    content: MaybeVNodes = [
+      withIndex ? moveView.renderIndex(node, true) : null,
+      // TODO: the || '' are probably not correct
+      moveView.combinedNotationOfTurn(
+        fullTurnNodes.map(n => {
+          return moveFromNotationStyle(notation)(
+            {
+              san: fixCrazySan(n.san || ''),
+              uci: n.uci || '',
+              fen: n.fen,
+              prevFen: n.parent?.fen || '',
+            },
+            variant,
+          );
+        }),
+        notation,
+      ),
+    ],
+    classes = nodeClasses(ctx, node, path);
+  if (opts.conceal) classes[opts.conceal as string] = true;
+  if (node.glyphs) node.glyphs.forEach(g => content.push(moveView.renderGlyph(g)));
+  return h(
+    'move',
+    {
+      attrs: { p: path },
+      class: classes,
+    },
+    content,
+  );
+}
+
 function renderMoveOf(ctx: Ctx, node: Tree.ParentedNode, opts: Opts): VNode {
   return opts.isMainline ? renderMainlineMoveOf(ctx, node, opts) : renderVariationMoveOf(ctx, node, opts);
 }
@@ -157,10 +216,10 @@ function renderMainlineMoveOf(ctx: Ctx, node: Tree.ParentedNode, opts: Opts): VN
 function renderVariationMoveOf(ctx: Ctx, node: Tree.ParentedNode, opts: Opts): VNode {
   const variant = ctx.ctrl.data.game.variant;
   const notation = notationStyle(variant.key);
-  const withIndex = opts.withIndex || node.ply % 2 === 1,
+  const withIndex = opts.withIndex || node.playedPlayerIndex === 'p1',
     path = opts.parentPath + node.id,
     content: MaybeVNodes = [
-      withIndex ? moveView.renderIndex(node.ply, variant.key, true) : null,
+      withIndex ? moveView.renderIndex(node, true) : null,
       // TODO: the || '' are probably not correct
       moveFromNotationStyle(notation)(
         {
@@ -186,7 +245,15 @@ function renderVariationMoveOf(ctx: Ctx, node: Tree.ParentedNode, opts: Opts): V
 }
 
 function renderMoveAndChildrenOf(ctx: Ctx, node: Tree.ParentedNode, opts: Opts): MaybeVNodes {
-  const path = opts.parentPath + node.id;
+  const nodesOfFullTurn = fullTurnNodesFromNode(node);
+  const lastNodeOfFullMove = nodesOfFullTurn[nodesOfFullTurn.length - 1];
+  const path =
+    opts.parentPath +
+    nodesOfFullTurn
+      .map(n => {
+        return n.id;
+      })
+      .join('');
   if (opts.truncate === 0)
     return [
       h(
@@ -197,11 +264,47 @@ function renderMoveAndChildrenOf(ctx: Ctx, node: Tree.ParentedNode, opts: Opts):
         [h('index', '[...]')],
       ),
     ];
-  return ([renderMoveOf(ctx, node, opts)] as MaybeVNodes)
+  const conceal = opts.noConceal ? null : opts.conceal || ctx.concealOf(true)(opts.parentPath + node.id, node);
+  const cs = parentedNodes(node.children, node);
+  const commentTags = renderMainlineCommentsOf(ctx, node, conceal, true).filter(nonEmpty);
+  const isP1 = node.playedPlayerIndex === 'p1';
+  //check if childen within a full move turn of many actions and render the variation
+  if (node.children.length > 1 && node.playedPlayerIndex === node.playerIndex) {
+    return ([renderFullMoveOf(ctx, node, opts)] as MaybeVNodes)
+      .concat(renderInlineCommentsOf(ctx, node))
+      .concat(opts.inline ? renderInline(ctx, parentedNode(opts.inline, node), opts) : null)
+      .concat([
+        h(
+          'interrupt',
+          commentTags.concat(
+            renderLines(ctx, cs.slice(1), {
+              parentPath: opts.parentPath + node.id,
+              isMainline: false,
+              conceal,
+              noConceal: !conceal,
+            }),
+          ),
+        ),
+      ] as MaybeVNodes)
+      .concat(
+        isP1 && lastNodeOfFullMove.children.length > 0
+          ? [moveView.renderIndex(node, false), emptyMove(opts.conceal)]
+          : [],
+      )
+      .concat(
+        renderChildrenOf(ctx, lastNodeOfFullMove, {
+          parentPath: path,
+          isMainline: opts.isMainline,
+          noConceal: opts.noConceal,
+          truncate: opts.truncate ? opts.truncate - 1 : undefined,
+        }) || [],
+      );
+  }
+  return ([renderFullMoveOf(ctx, node, opts)] as MaybeVNodes)
     .concat(renderInlineCommentsOf(ctx, node))
     .concat(opts.inline ? renderInline(ctx, parentedNode(opts.inline, node), opts) : null)
     .concat(
-      renderChildrenOf(ctx, node, {
+      renderChildrenOf(ctx, lastNodeOfFullMove, {
         parentPath: path,
         isMainline: opts.isMainline,
         noConceal: opts.noConceal,
@@ -226,7 +329,7 @@ function renderInline(ctx: Ctx, node: Tree.ParentedNode, opts: Opts): VNode {
 function renderMainlineCommentsOf(ctx: Ctx, node: Tree.Node, conceal: Conceal, withPlayerIndex: boolean): MaybeVNodes {
   if (!ctx.ctrl.showComments || isEmpty(node.comments)) return [];
 
-  const playerIndexClass = withPlayerIndex ? (node.ply % 2 === 0 ? '.p2 ' : '.p1 ') : '';
+  const playerIndexClass = withPlayerIndex ? `.${node.playedPlayerIndex} ` : '';
 
   return node.comments!.map(comment => {
     if (comment.by === 'playstrategy' && !ctx.showComputer) return;
@@ -269,7 +372,7 @@ export default function (ctrl: AnalyseCtrl, concealOf?: ConcealOf): VNode {
     (
       [
         isEmpty(commentTags) ? null : h('interrupt', commentTags),
-        root.ply & 1 ? moveView.renderIndex(root.ply, ctrl.data.game.variant.key, false) : null,
+        root.ply & 1 ? moveView.renderIndex(root, false) : null,
         root.ply & 1 ? emptyMove() : null,
       ] as MaybeVNodes
     ).concat(

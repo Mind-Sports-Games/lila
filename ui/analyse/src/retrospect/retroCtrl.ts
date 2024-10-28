@@ -61,10 +61,9 @@ export function make(root: AnalyseCtrl, playerIndex: PlayerIndex): RetroCtrl {
   }
 
   function findNextNode(): Tree.Node | undefined {
-    const playerIndexModulo = playerIndex == 'p1' ? 1 : 0;
     candidateNodes = evalSwings(
       root.mainline,
-      n => n.ply % 2 === playerIndexModulo && !explorerCancelPlies.includes(n.ply),
+      n => n.playedPlayerIndex === playerIndex && !explorerCancelPlies.includes(n.ply),
     );
     return candidateNodes.find(n => !isPlySolved(n.ply));
   }
@@ -194,7 +193,7 @@ export function make(root: AnalyseCtrl, playerIndex: PlayerIndex): RetroCtrl {
   }
 
   function hideComputerLine(node: Tree.Node): boolean {
-    return (node.ply % 2 === 0) !== (playerIndex === 'p1') && !isPlySolved(node.ply);
+    return (node.playedPlayerIndex === 'p2') !== (playerIndex === 'p1') && !isPlySolved(node.ply);
   }
 
   function showBadNode(): Tree.Node | undefined {

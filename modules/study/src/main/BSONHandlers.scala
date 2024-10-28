@@ -321,7 +321,13 @@ object BSONHandlers {
     def readNode(doc: Bdoc, id: UciCharPair): Option[Node] = {
       import Node.{ BsonFields => F }
       for {
-        ply <- doc.getAsOpt[Int](F.ply)
+        ply       <- doc.getAsOpt[Int](F.ply)
+        turnCount <- doc.getAsOpt[Int](F.turnCount).orElse(ply.some)
+        playedPlayerIndex <- doc
+          .getAsOpt[PlayerIndex](F.playedPlayerIndex)
+          .orElse(
+            PlayerIndex.apply(if (ply % 2 == 1) "p1" else "p2")
+          ) //assume existing studies were single action
         uci <- doc.getAsOpt[Uci](F.uci)
         san <- doc.getAsOpt[String](F.san)
         fen <- doc.getAsOpt[FEN](F.fen)
@@ -337,6 +343,8 @@ object BSONHandlers {
       } yield Node(
         id,
         ply,
+        turnCount,
+        playedPlayerIndex,
         variant,
         WithSan(variant.gameLogic, uci, san),
         fen,
@@ -357,19 +365,21 @@ object BSONHandlers {
       import Node.BsonFields._
       val w = new Writer
       $doc(
-        ply            -> n.ply,
-        uci            -> n.move.uci,
-        san            -> n.move.san,
-        fen            -> n.fen,
-        check          -> w.boolO(n.check),
-        shapes         -> n.shapes.value.nonEmpty.option(n.shapes),
-        comments       -> n.comments.value.nonEmpty.option(n.comments),
-        gamebook       -> n.gamebook,
-        glyphs         -> n.glyphs.nonEmpty,
-        score          -> n.score,
-        clock          -> n.clock,
-        crazy          -> n.pocketData,
-        forceVariation -> w.boolO(n.forceVariation),
+        ply               -> n.ply,
+        turnCount         -> n.turnCount,
+        playedPlayerIndex -> n.playedPlayerIndex,
+        uci               -> n.move.uci,
+        san               -> n.move.san,
+        fen               -> n.fen,
+        check             -> w.boolO(n.check),
+        shapes            -> n.shapes.value.nonEmpty.option(n.shapes),
+        comments          -> n.comments.value.nonEmpty.option(n.comments),
+        gamebook          -> n.gamebook,
+        glyphs            -> n.glyphs.nonEmpty,
+        score             -> n.score,
+        clock             -> n.clock,
+        crazy             -> n.pocketData,
+        forceVariation    -> w.boolO(n.forceVariation),
         order -> {
           (n.children.nodes.sizeIs > 1) option n.children.nodes.map(_.id)
         }
@@ -388,7 +398,10 @@ object BSONHandlers {
       import variantHandlers._
 
       Root(
-        ply = r int F.ply,
+        ply = r.int(F.ply),
+        turnCount = r.intO(F.turnCount).getOrElse(r.int(F.ply)),
+        playedPlayerIndex =
+          r.getO[PlayerIndex](F.playedPlayerIndex).getOrElse(PlayerIndex.apply(r.int(F.ply) % 2 == 1)),
         variant = variant,
         fen = r.get[FEN](F.fen),
         check = r boolD F.check,
@@ -407,17 +420,19 @@ object BSONHandlers {
         val variantHandlers = VariantHandlers()(r.variant)
         import variantHandlers._
         Path.rootDbKey -> $doc(
-          F.ply      -> r.ply,
-          F.variant  -> r.variant,
-          F.fen      -> r.fen,
-          F.check    -> r.check.some.filter(identity),
-          F.shapes   -> r.shapes.value.nonEmpty.option(r.shapes),
-          F.comments -> r.comments.value.nonEmpty.option(r.comments),
-          F.gamebook -> r.gamebook,
-          F.glyphs   -> r.glyphs.nonEmpty,
-          F.score    -> r.score,
-          F.clock    -> r.clock,
-          F.crazy    -> r.pocketData
+          F.ply               -> r.ply,
+          F.turnCount         -> r.turnCount,
+          F.playedPlayerIndex -> r.playedPlayerIndex,
+          F.variant           -> r.variant,
+          F.fen               -> r.fen,
+          F.check             -> r.check.some.filter(identity),
+          F.shapes            -> r.shapes.value.nonEmpty.option(r.shapes),
+          F.comments          -> r.comments.value.nonEmpty.option(r.comments),
+          F.gamebook          -> r.gamebook,
+          F.glyphs            -> r.glyphs.nonEmpty,
+          F.score             -> r.score,
+          F.clock             -> r.clock,
+          F.crazy             -> r.pocketData
         )
       }
     )

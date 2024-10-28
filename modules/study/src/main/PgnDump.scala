@@ -2,6 +2,7 @@ package lila.study
 
 import akka.stream.scaladsl._
 import strategygames.format.pgn.{ FullTurn, Glyphs, Initial, Pgn, Tag, Tags, Turn }
+import strategygames.Player
 import org.joda.time.format.DateTimeFormat
 
 import lila.common.String.slugify
@@ -94,23 +95,26 @@ object PgnDump {
   private type Variations = Vector[Node]
   private val noVariations: Variations = Vector.empty
 
-  private def node2action(node: Node, variations: Variations)(implicit flags: WithFlags) =
-    Turn(
-      //TODO: Work out how to do nodes for multiaction.
-      san = node.move.san,
-      glyphs = if (flags.comments) node.glyphs else Glyphs.empty,
-      comments = flags.comments ?? {
-        node.comments.list.map(_.text.value) ::: shapeComment(node.shapes).toList
-      },
-      opening = none,
-      result = none,
-      variations = flags.variations ?? {
-        variations.view.map { child =>
-          toFullTurns(child.mainline, noVariations).toList
-        }.toList
-      },
-      secondsLeft = flags.clocks ?? node.clock.map(_.roundSeconds)
-    )
+  //assume comments and info is stored on first node of turn
+  private def nodes2Multiaction(nodes: Vector[Node], variations: Variations)(implicit flags: WithFlags) = {
+    nodes.headOption.map { firstNode =>
+      Turn(
+        san = nodes.map(_.move.san).mkString(","),
+        glyphs = if (flags.comments) firstNode.glyphs else Glyphs.empty,
+        comments = flags.comments ?? {
+          firstNode.comments.list.map(_.text.value) ::: shapeComment(firstNode.shapes).toList
+        },
+        opening = none,
+        result = none,
+        variations = flags.variations ?? {
+          variations.view.map { child =>
+            toFullTurns(child.mainline, noVariations).toList
+          }.toList
+        },
+        secondsLeft = flags.clocks ?? firstNode.clock.map(_.roundSeconds)
+      )
+    }
+  }
 
   // [%csl Gb4,Yd5,Rf6][%cal Ge2e4,Ye2d4,Re2g4]
   private def shapeComment(shapes: Shapes): Option[String] = {
@@ -132,12 +136,13 @@ object PgnDump {
     s"$circles$arrows".some.filter(_.nonEmpty)
   }
 
-  //TODO this wont work for multiaction if each node is a singular ply
-  def toFullTurn(first: Node, second: Option[Node], variations: Variations)(implicit flags: WithFlags) =
+  def toFullTurn(first: Vector[Node], second: Option[Vector[Node]], variations: Variations)(implicit
+      flags: WithFlags
+  ) =
     FullTurn(
-      fullTurnNumber = first.fullTurnCount,
-      p1 = node2action(first, variations).some,
-      p2 = second map { node2action(_, first.children.variations) }
+      fullTurnNumber = first.head.fullTurnCount,
+      p1 = nodes2Multiaction(first, variations),
+      p2 = second flatMap { nodes2Multiaction(_, first.head.children.variations) }
     )
 
   def toFullTurns(root: Node.Root)(implicit flags: WithFlags): Vector[FullTurn] =
@@ -147,20 +152,23 @@ object PgnDump {
       line: Vector[Node],
       variations: Variations
   )(implicit flags: WithFlags): Vector[FullTurn] = {
-    line match {
-      case Vector() => Vector()
-      case first +: rest if first.ply % 2 == 0 =>
+    val nodeTurns: Vector[Vector[Node]] = toNodeTurns(line)
+    nodeTurns match {
+      case Vector(Vector()) => Vector()
+      case first +: rest if first.head.playedPlayerIndex == Player.P2 =>
         FullTurn(
-          //TODO change to turnCount when multiaction supported in study
-          fullTurnNumber = 1 + (first.ply - 1) / 2,
+          first.head.fullTurnCount,
           p1 = none,
-          p2 = node2action(first, variations).some
-        ) +: toFullTurnsFromP1(rest, first.children.variations)
+          p2 = nodes2Multiaction(first, variations)
+        ) +: toFullTurnsFromP1(
+          rest,
+          first.head.children.variations
+        )
       case l => toFullTurnsFromP1(l, variations)
     }
   }.filterNot(_.isEmpty)
 
-  def toFullTurnsFromP1(line: Vector[Node], variations: Variations)(implicit
+  def toFullTurnsFromP1(line: Vector[Vector[Node]], variations: Variations)(implicit
       flags: WithFlags
   ): Vector[FullTurn] =
     line
@@ -170,10 +178,24 @@ object PgnDump {
           pair
             .lift(1)
             .getOrElse(first)
+            .head
             .children
             .variations -> (toFullTurn(first, pair lift 1, variations) +: turns)
         }
       }
       ._2
       .reverse
+
+  def toNodeTurns(line: Vector[Node]): Vector[Vector[Node]] = {
+    line
+      .drop(1)
+      .foldLeft(Vector(line.take(1))) { case (turn, node) =>
+        if (turn.head.head.playedPlayerIndex != node.playedPlayerIndex) {
+          Vector(node) +: turn
+        } else {
+          (turn.head :+ node) +: turn.tail
+        }
+      }
+      .reverse
+  }
 }

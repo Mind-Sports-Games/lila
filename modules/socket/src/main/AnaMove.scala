@@ -35,14 +35,15 @@ case class AnaMove(
   private lazy val fullCaptureFields =
     uci.flatMap(m => Uci.Move.apply(lib, variant.gameFamily, m)).flatMap(_.capture)
 
-  private lazy val newGame = Game(lib, variant.some, fen.some)(
-    orig = orig,
-    dest = dest,
-    promotion = promotion,
-    finalSquare = fullCaptureFields.isDefined,
-    captures = fullCaptureFields,
-    partialCaptures = ~fullCapture
-  )
+  private lazy val newGame =
+    Game(lib, variant.some, fen.some)(
+      orig = orig,
+      dest = dest,
+      promotion = promotion,
+      finalSquare = fullCaptureFields.isDefined,
+      captures = fullCaptureFields,
+      partialCaptures = ~fullCapture
+    )
 
   def branch: Validated[String, Branch] =
     newGame flatMap { case (game, move) =>
@@ -83,6 +84,8 @@ case class AnaMove(
         Branch(
           id = UciCharPair(lib, uci),
           ply = game.plies,
+          turnCount = game.turnCount,
+          playedPlayerIndex = if (game.board.history.currentTurn.nonEmpty) game.player else !game.player,
           variant = variant,
           move = Uci.WithSan(lib, uci, gameRecordNotation),
           fen = fen,
