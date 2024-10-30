@@ -697,6 +697,7 @@ export default class RoundController {
         },
       });
       if (o.check) sound.check();
+      if (o.uci === 'pass') sound.move();
       blur.onMove();
       playstrategy.pubsub.emit('ply', this.ply);
 
