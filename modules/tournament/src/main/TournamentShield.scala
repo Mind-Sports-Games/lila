@@ -120,6 +120,7 @@ object TournamentShield {
 
   sealed abstract class MedleyShield(
       val key: String,
+      val leaderboardKey: String,
       val name: String,
       val teamOwner: Condition.TeamMember,
       val variants: List[Variant],
@@ -186,6 +187,7 @@ object TournamentShield {
     case object PlayStrategyMedley
         extends MedleyShield(
           "shieldPlayStrategyMedley",
+          "spm",
           "PlayStrategy",
           Condition.TeamMember("playstrategy-medleys", "PlayStrategy Medleys"),
           Variant.all.filterNot(_.fromPositionVariant).filterNot(_.key == "go19x19"),
@@ -216,6 +218,7 @@ object TournamentShield {
     case object ChessVariantsMedley
         extends MedleyShield(
           "shieldChessMedley",
+          "scm",
           "Chess Variants",
           Condition.TeamMember("playstrategy-chess-variants", "PlayStrategy Chess Variants"),
           chessVariantOptions,
@@ -247,6 +250,7 @@ object TournamentShield {
     case object DraughtsMedley
         extends MedleyShield(
           "shieldDraughtsMedley",
+          "sdm",
           VariantKeys.gameFamilyName(GameFamily.Draughts()),
           Condition.TeamMember("playstrategy-draughts", "PlayStrategy Draughts"),
           draughtsVariantOptions,
@@ -282,6 +286,7 @@ object TournamentShield {
     case object LinesOfActionMedley
         extends MedleyShield(
           "shieldLinesOfActionMedley",
+          "slm",
           VariantKeys.gameFamilyName(GameFamily.LinesOfAction()),
           Condition.TeamMember("playstrategy-lines-of-action", "PlayStrategy Lines Of Action"),
           loaVariants,
@@ -319,6 +324,7 @@ object TournamentShield {
     case object ShogiMedley
         extends MedleyShield(
           "shieldShogiMedley",
+          "ssm",
           VariantKeys.gameFamilyName(GameFamily.Shogi()),
           Condition.TeamMember("playstrategy-shogi", "PlayStrategy Shogi"),
           shogiVariants,
@@ -357,6 +363,7 @@ object TournamentShield {
     case object XiangqiMedley
         extends MedleyShield(
           "shieldXiangqiMedley",
+          "sxm",
           VariantKeys.gameFamilyName(GameFamily.Xiangqi()),
           Condition.TeamMember("playstrategy-xiangqi", "PlayStrategy Xiangqi"),
           xiangqiVariants,
@@ -396,6 +403,7 @@ object TournamentShield {
     case object OthelloMedley
         extends MedleyShield(
           "shieldOthelloMedley",
+          "som",
           VariantKeys.gameFamilyName(GameFamily.Flipello()),
           Condition.TeamMember("playstrategy-flipello", "PlayStrategy Othello"),
           othelloVariants,
@@ -434,6 +442,7 @@ object TournamentShield {
     case object MancalaMedley
         extends MedleyShield(
           "shieldMancalaMedley",
+          "smm",
           VariantKeys.gameGroupName(GameGroup.Mancala()),
           Condition.TeamMember("playstrategy-mancala", "PlayStrategy Mancala"),
           mancalaVariants,
@@ -473,6 +482,7 @@ object TournamentShield {
     case object TogyzkumalakMedley
         extends MedleyShield(
           "shieldTogyzkumalakMedley",
+          "stm",
           VariantKeys.gameFamilyName(GameFamily.Togyzkumalak()),
           Condition.TeamMember("playstrategy-mancala", "PlayStrategy Mancala"),
           togyzkumalakVariants,
@@ -480,7 +490,7 @@ object TournamentShield {
           Blitz53,
           Some(3),
           6,
-          14,
+          16,
           togyzkumalakVariantMinutes,
           togyzkumalakRounds,
           "",
@@ -513,6 +523,7 @@ object TournamentShield {
     case object BackgammonMedley
         extends MedleyShield(
           "shieldBackgammonMedley",
+          "sbm",
           VariantKeys.gameFamilyName(GameFamily.Backgammon()),
           Condition.TeamMember("playstrategy-backgammon", "PlayStrategy Backgammon"),
           backgammonVariants,
@@ -552,6 +563,7 @@ object TournamentShield {
     case object BreakthroughMedley
         extends MedleyShield(
           "shieldBreakthroughMedley",
+          "sbtm",
           VariantKeys.gameFamilyName(GameFamily.BreakthroughTroyka()),
           Condition.TeamMember("playstrategy-breakthrough", "PlayStrategy Breakthrough"),
           breakthroughVariants,
@@ -604,6 +616,7 @@ object TournamentShield {
     case object ChessgammonMedley
         extends MedleyShield(
           "shieldChessgammonMedley",
+          "scgm",
           "Chessgammon",
           Condition.TeamMember("playstrategy-medleys", "PlayStrategy Medleys"),
           chessgammonVariants,

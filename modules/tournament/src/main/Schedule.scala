@@ -215,6 +215,9 @@ object Schedule {
     case object ExperimentalMarathon extends Freq(61, 55) { // for DB BC
       override val display = "Experimental Marathon"
     }
+    case object MedleyMarathon extends Freq(65, 70) {
+      override val display = "Medley Marathon"
+    }
     case object Yearly       extends Freq(70, 70)
     case object Annual       extends Freq(75, 80)
     case object Introductory extends Freq(80, 65)
@@ -240,6 +243,7 @@ object Schedule {
       MedleyShield,
       Marathon,
       ExperimentalMarathon,
+      MedleyMarathon,
       Yearly,
       Annual,
       Introductory,
