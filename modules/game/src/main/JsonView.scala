@@ -86,7 +86,7 @@ final class JsonView(rematches: Rematches) {
         "fullId"      -> pov.fullId,
         "gameId"      -> pov.gameId,
         "fen"         -> Forsyth.exportBoard(pov.game.variant.gameLogic, pov.game.board),
-        "playerIndex" -> (if (pov.game.variant.key == "racingKings") P1 else pov.playerIndex).name,
+        "playerIndex" -> pov.playerIndex.name,
         "lastMove"    -> ~pov.game.lastActionKeys,
         "source"      -> pov.game.source,
         "status"      -> pov.game.status,
@@ -118,8 +118,6 @@ final class JsonView(rematches: Rematches) {
       .add("tournamentId" -> pov.game.tournamentId)
       .add("swissId" -> pov.game.tournamentId)
       .add("winner" -> pov.game.winnerPlayerIndex)
-      .add("winnerPlayer" -> pov.game.winnerPlayerIndex.map(pov.game.variant.playerNames))
-      .add("loserPlayer" -> pov.game.winnerPlayerIndex.map(w => pov.game.variant.playerNames(!w)))
 }
 
 object JsonView {
