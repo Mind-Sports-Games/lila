@@ -164,6 +164,7 @@ export function make(send: SocketSend, ctrl: RoundController): RoundSocket {
           ctrl.data.selectedSquares = o.squares === '' ? [] : (o.squares.split(',') as Key[]);
           ctrl.redraw();
         } else {
+          sound.move();
           ctrl.data.deadStoneOfferState = 'RejectedOffer';
           ctrl.chessground.resetSelectedPieces();
           ctrl.chessground.set({ highlight: { lastMove: ctrl.data.pref.highlight } });
@@ -177,6 +178,7 @@ export function make(send: SocketSend, ctrl: RoundController): RoundSocket {
           ctrl.redraw();
         }
       } else {
+        sound.move();
         ctrl.data.player.offeringSelectSquares = o.playerIndex === ctrl.data.player.playerIndex;
         ctrl.data.opponent.offeringSelectSquares = o.playerIndex === ctrl.data.opponent.playerIndex;
         ctrl.data.game.player = opposite(o.playerIndex);

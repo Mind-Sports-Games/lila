@@ -20,6 +20,8 @@ import strategygames.{
 }
 import strategygames.variant.Variant
 import lila.common.Json.jodaWrites
+import lila.common.Json._
+import lila.common.LightUser
 import lila.i18n.VariantKeys
 
 final class JsonView(rematches: Rematches) {
@@ -66,6 +68,56 @@ final class JsonView(rematches: Rematches) {
           .obj("index" -> index)
           .add("gameId" -> game.metadata.multiMatchGameId.filter("*" !=))
       })
+
+  def boardSize(variant: Variant) = variant match {
+    case Variant.Draughts(v) =>
+      Some(
+        Json.obj(
+          "size" -> Json.arr(v.boardSize.width, v.boardSize.height),
+          "key"  -> v.boardSize.key
+        )
+      )
+    case _ => None
+  }
+
+  def ownerPreview(pov: Pov)(lightUserSync: LightUser.GetterSync) =
+    Json
+      .obj(
+        "fullId"      -> pov.fullId,
+        "gameId"      -> pov.gameId,
+        "fen"         -> Forsyth.exportBoard(pov.game.variant.gameLogic, pov.game.board),
+        "playerIndex" -> pov.playerIndex.name,
+        "lastMove"    -> ~pov.game.lastActionKeys,
+        "source"      -> pov.game.source,
+        "status"      -> pov.game.status,
+        "variant" -> Json.obj(
+          "gameLogic" -> Json.obj(
+            "id"   -> pov.game.variant.gameLogic.id,
+            "name" -> pov.game.variant.gameLogic.name
+          ),
+          "gameFamily" -> pov.game.variant.gameFamily.key,
+          "key"        -> pov.game.variant.key,
+          "name"       -> VariantKeys.variantName(pov.game.variant),
+          "boardSize"  -> boardSize(pov.game.variant)
+        ),
+        "speed"    -> pov.game.speed.key,
+        "perf"     -> lila.game.PerfPicker.key(pov.game),
+        "rated"    -> pov.game.rated,
+        "hasMoved" -> pov.hasMoved,
+        "opponent" -> Json
+          .obj(
+            "id" -> pov.opponent.userId,
+            "username" -> lila.game.Namer
+              .playerTextBlocking(pov.opponent, withRating = false)(lightUserSync)
+          )
+          .add("rating" -> pov.opponent.rating)
+          .add("ai" -> pov.opponent.aiLevel),
+        "isMyTurn" -> pov.isMyTurn
+      )
+      .add("secondsLeft" -> pov.remainingSeconds)
+      .add("tournamentId" -> pov.game.tournamentId)
+      .add("swissId" -> pov.game.tournamentId)
+      .add("winner" -> pov.game.winnerPlayerIndex)
 }
 
 object JsonView {
