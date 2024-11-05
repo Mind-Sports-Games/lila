@@ -632,10 +632,6 @@ object BSONHandlers {
 
         val actionStrs = NewLibStorage.OldBin.decode(GameLogic.Abalone(), r bytesD F.oldPgn, playedPlies)
 
-        // def turnUcis(turnStr: Option[String]) = turnStr
-        //     .map(_.split(",").toList.flatMap(uci => abalone.format.Uci.apply(uci)))
-        //     .getOrElse(List.empty)
-
         def turnUcis(turnStr: Option[String]) =
           turnStr.map(_.split(",").toList.flatMap(abalone.format.Uci.apply)).getOrElse(List.empty)
 
