@@ -69,7 +69,7 @@ export function renderFullTxt(ctrl: AnalyseCtrl): string {
     tags.push(['SZ', g.variant.boardSize.height.toString()]);
     tags.push(['RU', 'Chinese']);
   }
-  if (['backgammon', 'nackgammon'].includes(g.variant.key)) tags.push(['GM', '6']);
+  if (['backgammon', 'hyper', 'nackgammon'].includes(g.variant.key)) tags.push(['GM', '6']);
   if (['amazons'].includes(g.variant.key)) {
     tags.push(['GM', '18']);
     tags.push(['SZ', g.variant.boardSize.height.toString()]);

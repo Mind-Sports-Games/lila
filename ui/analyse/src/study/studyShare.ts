@@ -84,6 +84,7 @@ export function view(ctrl: StudyShareCtrl): VNode {
     'go13x13',
     'go19x19',
     'backgammon',
+    'hyper',
     'nackgammon',
     'amazons',
     'breakthroughtroyka',

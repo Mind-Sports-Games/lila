@@ -4,6 +4,7 @@ const noAnalysisBoardVariants: string[] = [
   'brazilian',
   'breakthrough',
   'backgammon',
+  'hyper',
   'nackgammon',
   'english',
   'frisian',

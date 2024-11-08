@@ -252,7 +252,11 @@ export default class AnalyseCtrl {
     if (this.data.game.variant.key === 'linesOfAction' || this.data.game.variant.key === 'scrambledEggs') {
       const c = this.data.player.playerIndex;
       return this.flipped ? oppositeOrientationForLOA(c) : orientationForLOA(c);
-    } else if (this.data.game.variant.key === 'backgammon' || this.data.game.variant.key === 'nackgammon') {
+    } else if (
+      this.data.game.variant.key === 'backgammon' ||
+      this.data.game.variant.key === 'hyper' ||
+      this.data.game.variant.key === 'nackgammon'
+    ) {
       const c = this.data.player.playerIndex;
       return this.flipped ? oppositeOrientationForBackgammon(c) : orientationForBackgammon(c);
     } else if (this.data.game.variant.key === 'racingKings') {
@@ -288,7 +292,7 @@ export default class AnalyseCtrl {
     setDropMode(cg.state, stratUtils.onlyDropsVariantPiece(cg.state.variant as VariantKey, playerIndex));
     cg.set({
       dropmode: {
-        showDropDests: !['go9x9', 'go13x13', 'go19x19', 'backgammon', 'nackgammon'].includes(
+        showDropDests: !['go9x9', 'go13x13', 'go19x19', 'backgammon', 'hyper', 'nackgammon'].includes(
           cg.state.variant as VariantKey,
         ),
         dropDests: stratUtils.readDropsByRole(this.node.dropsByRole),

@@ -33,6 +33,7 @@
   border-radius: 0;
 
   .analyse.variant-backgammon &,
+  .analyse.variant-hyper &,
   .analyse.variant-nackgammon & {
     box-shadow: none;
     background: inherit;
@@ -77,12 +78,14 @@ body.togyzkumalak-wood .variant-bestemshe .game-score {
 }
 
 body.backgammon-classic .variant-nackgammon .game-score,
+body.backgammon-classic .variant-hyper .game-score,
 body.backgammon-classic .variant-backgammon .game-score {
   background: url(../images/board/backgammon/svg/backgammon_classic_house.svg);
   background-size: cover;
 }
 
 body.backgammon-contemporary .variant-nackgammon .game-score,
+body.backgammon-contemporary .variant-hyper .game-score,
 body.backgammon-contemporary .variant-backgammon .game-score {
   background: url(../images/board/backgammon/svg/backgammon_contemporary_house.svg);
   background-size: cover;
@@ -217,6 +220,7 @@ $pocket-height-oware: 14vh;
 
 //togyzkumalak and backgammon (large score) layout different
 .analyse.variant-nackgammon,
+.analyse.variant-hyper,
 .analyse.variant-backgammon {
   grid-template-rows: $pocket-col1-size auto 3rem $pocket-col1-size;
   grid-template-areas: 'board pocket-top' 'board tools' 'board controls' 'board pocket-bot';
@@ -299,6 +303,7 @@ $pocket-height-togy: 14vh;
 }
 
 .variant-nackgammon .game-score::after,
+.variant-hyper .game-score::after,
 .variant-backgammon .game-score::after {
   @extend %active, %box-radius;
 
@@ -315,6 +320,7 @@ $pocket-height-togy: 14vh;
 }
 
 .variant-nackgammon .game-score,
+.variant-hyper .game-score,
 .variant-backgammon .game-score {
   @extend %box-radius;
   display: flex;

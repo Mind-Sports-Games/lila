@@ -107,6 +107,8 @@ final class PerfsUpdater(
                 updateRatings(ratingsW.go19x19, ratingsB.go19x19, game)
               case Variant.Backgammon(strategygames.backgammon.variant.Backgammon) =>
                 updateRatings(ratingsW.backgammon, ratingsB.backgammon, game)
+              case Variant.Backgammon(strategygames.backgammon.variant.Hyper) =>
+                updateRatings(ratingsW.hyper, ratingsB.hyper, game)
               case Variant.Backgammon(strategygames.backgammon.variant.Nackgammon) =>
                 updateRatings(ratingsW.nackgammon, ratingsB.nackgammon, game)
               case Variant.Chess(Standard) =>
@@ -184,6 +186,7 @@ final class PerfsUpdater(
       go13x13: Rating,
       go19x19: Rating,
       backgammon: Rating,
+      hyper: Rating,
       nackgammon: Rating,
       ultraBullet: Rating,
       bullet: Rating,
@@ -234,6 +237,7 @@ final class PerfsUpdater(
       go13x13 = perfs.go13x13.toRating,
       go19x19 = perfs.go19x19.toRating,
       backgammon = perfs.backgammon.toRating,
+      hyper = perfs.hyper.toRating,
       nackgammon = perfs.nackgammon.toRating,
       ultraBullet = perfs.ultraBullet.toRating,
       bullet = perfs.bullet.toRating,
@@ -474,6 +478,11 @@ final class PerfsUpdater(
             perfs.backgammon,
             ratings.backgammon
           ),
+          hyper = addRatingVariant(
+            Variant.Backgammon(strategygames.backgammon.variant.Hyper),
+            perfs.hyper,
+            ratings.hyper
+          ),
           nackgammon = addRatingVariant(
             Variant.Backgammon(strategygames.backgammon.variant.Nackgammon),
             perfs.nackgammon,
@@ -533,6 +542,7 @@ final class PerfsUpdater(
           go13x13 = r(PT.orDefault("go13x13"), perfs.go13x13, perfs1.go13x13),
           go19x19 = r(PT.orDefault("go19x19"), perfs.go19x19, perfs1.go19x19),
           backgammon = r(PT.orDefault("backgammon"), perfs.backgammon, perfs1.backgammon),
+          hyper = r(PT.orDefault("hyper"), perfs.hyper, perfs1.hyper),
           nackgammon = r(PT.orDefault("nackgammon"), perfs.nackgammon, perfs1.nackgammon),
           bullet = r(PT.orDefault("bullet"), perfs.bullet, perfs1.bullet),
           blitz = r(PT.orDefault("blitz"), perfs.blitz, perfs1.blitz),

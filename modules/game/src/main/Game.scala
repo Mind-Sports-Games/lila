@@ -131,7 +131,8 @@ case class Game(
 
   def fullIdOf(playerIndex: PlayerIndex): String = s"$id${player(playerIndex).id}"
 
-  def swapPlayersOnRematch: Boolean = variant.key != "backgammon" && variant.key != "nackgammon"
+  def swapPlayersOnRematch: Boolean =
+    variant.key != "backgammon" && variant.key != "hyper" && variant.key != "nackgammon"
 
   def fromHandicappedTournament = metadata.fromHandicappedTournament
   def tournamentId              = metadata.tournamentId
@@ -759,7 +760,9 @@ case class Game(
           case Rapid       => 30
           case _           => 35
         }
-      if (variant.key == "chess960" || variant.key == "backgammon" || variant.key == "nackgammon") base * 2
+      if (
+        variant.key == "chess960" || variant.key == "backgammon" || variant.key == "hyper" || variant.key == "nackgammon"
+      ) base * 2
       else if (isTournament && (variant.draughts64Variant) && metadata.simulPairing.isDefined) base + 10
       else base
     }

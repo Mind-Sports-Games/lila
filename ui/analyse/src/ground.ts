@@ -118,7 +118,7 @@ export function makeConfig(ctrl: AnalyseCtrl): CgConfig {
                         ? 'https://playstrategy.org/assets/piece/go/' +
                           d.pref.pieceSet.filter(ps => ps.gameFamily === 'go')[0].name +
                           '/'
-                        : cgVariantKey === 'backgammon' || cgVariantKey === 'nackgammon'
+                        : cgVariantKey === 'backgammon' || cgVariantKey === 'hyper' || cgVariantKey === 'nackgammon'
                           ? 'https://playstrategy.org/assets/piece/backgammon/' +
                             d.pref.pieceSet.filter(ps => ps.gameFamily === 'backgammon')[0].name +
                             '/'
@@ -139,7 +139,7 @@ export function makeConfig(ctrl: AnalyseCtrl): CgConfig {
       duration: pref.animationDuration,
     },
     dropmode: {
-      showDropDests: !['go9x9', 'go13x13', 'go19x19', 'backgammon', 'nackgammon'].includes(variantKey),
+      showDropDests: !['go9x9', 'go13x13', 'go19x19', 'backgammon', 'hyper', 'nackgammon'].includes(variantKey),
       dropDests: stratUtils.readDropsByRole(ctrl.node.dropsByRole),
       events: {
         cancel: hooks.onCancelDropMode,
@@ -147,7 +147,8 @@ export function makeConfig(ctrl: AnalyseCtrl): CgConfig {
     },
     draggable: {
       enabled:
-        pref.moveEvent !== Prefs.MoveEvent.Click && !['oware', 'backgammon', 'nackgammon'].includes(d.game.variant.key),
+        pref.moveEvent !== Prefs.MoveEvent.Click &&
+        !['oware', 'backgammon', 'hyper', 'nackgammon'].includes(d.game.variant.key),
       showGhost: pref.highlight,
     },
     disableContextMenu: true,

@@ -132,7 +132,10 @@ final class SgfDump(
               Tag(_.CV, 1),
               Tag(_.CO, "n"),
               Tag.matchInfo(1, 1, 0, 0), // multipoint info
-              Tag(_.SU, if (chapter.setup.variant.key == "backgammon") "Standard" else "Nackgammon")
+              Tag(
+                _.SU,
+                if (chapter.setup.variant.key == "backgammon") "Standard" else chapter.setup.variant.name
+              )
             )
           case _ => List()
         }

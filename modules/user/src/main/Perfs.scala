@@ -49,6 +49,7 @@ case class Perfs(
     go13x13: Perf,
     go19x19: Perf,
     backgammon: Perf,
+    hyper: Perf,
     nackgammon: Perf,
     ultraBullet: Perf,
     bullet: Perf,
@@ -104,6 +105,7 @@ case class Perfs(
       "go13x13"                -> go13x13,
       "go19x19"                -> go19x19,
       "backgammon"             -> backgammon,
+      "hyper"                  -> hyper,
       "nackgammon"             -> nackgammon,
       "ultraBullet"            -> ultraBullet,
       "bullet"                 -> bullet,
@@ -215,6 +217,7 @@ case class Perfs(
     "go13x13"                -> go13x13,
     "go19x19"                -> go19x19,
     "backgammon"             -> backgammon,
+    "hyper"                  -> hyper,
     "nackgammon"             -> nackgammon,
     "ultraBullet"            -> ultraBullet,
     "bullet"                 -> bullet,
@@ -277,6 +280,7 @@ case object Perfs {
   val default = {
     val p = Perf.default
     Perfs(
+      p,
       p,
       p,
       p,
@@ -388,6 +392,7 @@ case object Perfs {
       case Variant.Go(strategygames.go.variant.Go13x13)                          => Some(_.go13x13)
       case Variant.Go(strategygames.go.variant.Go19x19)                          => Some(_.go19x19)
       case Variant.Backgammon(strategygames.backgammon.variant.Backgammon)       => Some(_.backgammon)
+      case Variant.Backgammon(strategygames.backgammon.variant.Hyper)            => Some(_.hyper)
       case Variant.Backgammon(strategygames.backgammon.variant.Nackgammon)       => Some(_.nackgammon)
       case _                                                                     => none
     }
@@ -449,6 +454,7 @@ case object Perfs {
         go13x13 = perf("go13x13"),
         go19x19 = perf("go19x19"),
         backgammon = perf("backgammon"),
+        hyper = perf("hyper"),
         nackgammon = perf("nackgammon"),
         ultraBullet = perf("ultraBullet"),
         bullet = perf("bullet"),
@@ -507,6 +513,7 @@ case object Perfs {
         "go13x13"                -> notNew(o.go13x13),
         "go19x19"                -> notNew(o.go19x19),
         "backgammon"             -> notNew(o.backgammon),
+        "hyper"                  -> notNew(o.hyper),
         "nackgammon"             -> notNew(o.nackgammon),
         "ultraBullet"            -> notNew(o.ultraBullet),
         "bullet"                 -> notNew(o.bullet),
@@ -566,10 +573,12 @@ case object Perfs {
       go13x13: List[User.LightPerf],
       go19x19: List[User.LightPerf],
       backgammon: List[User.LightPerf],
+      hyper: List[User.LightPerf],
       nackgammon: List[User.LightPerf]
   )
 
   val emptyLeaderboards = Leaderboards(
+    Nil,
     Nil,
     Nil,
     Nil,

@@ -95,6 +95,7 @@ object TournamentMedleyUtil {
       "go13x13"                -> slow,
       "go19x19"                -> slow,
       "backgammon"             -> medium,
+      "hyper"                  -> quick,
       "nackgammon"             -> medium
     )
   }

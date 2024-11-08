@@ -40,7 +40,9 @@ final class ChallengeMaker(
         case _                => TimeControl.Unlimited
       }
       val playerIndexName =
-        if (pov.game.variant.key == "backgammon" || pov.game.variant.key == "nackgammon") {
+        if (
+          pov.game.variant.key == "backgammon" || pov.game.variant.key == "hyper" || pov.game.variant.key == "nackgammon"
+        ) {
           pov.playerIndex.name
         } else (!pov.playerIndex).name
       Challenge.make(

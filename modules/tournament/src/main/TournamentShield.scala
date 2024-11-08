@@ -514,7 +514,7 @@ object TournamentShield {
     private val backgammonVariants = List(
       Variant.wrap(strategygames.backgammon.variant.Backgammon),
       Variant.wrap(strategygames.backgammon.variant.Nackgammon),
-      Variant.wrap(strategygames.backgammon.variant.Backgammon)
+      Variant.wrap(strategygames.backgammon.variant.Hyper)
     )
 
     private val backgammonVariantMinutes = 90
@@ -537,7 +537,7 @@ object TournamentShield {
           "",
           s"An Arena which is divided into ${backgammonRounds} equal length periods of ${backgammonVariants.init
             .map(VariantKeys.variantName)
-            .mkString(", ")} and ${VariantKeys.variantName(backgammonVariants.last)} again.",
+            .mkString(", ")} and ${VariantKeys.variantName(backgammonVariants.last)}.",
           s"Welcome to the ${VariantKeys.gameFamilyName(GameFamily.Backgammon())} Medley Arena!"
         )
 
@@ -982,6 +982,13 @@ object TournamentShield {
           22,
           1
         )
+    case object Hyper
+        extends Category(
+          Variant.Backgammon(strategygames.backgammon.variant.Hyper),
+          Delay310,
+          17,
+          1
+        )
     case object Nackgammon
         extends Category(
           Variant.Backgammon(strategygames.backgammon.variant.Nackgammon),
@@ -1031,6 +1038,7 @@ object TournamentShield {
       Go13x13,
       Go19x19,
       Backgammon,
+      Hyper,
       Nackgammon
     )
 
