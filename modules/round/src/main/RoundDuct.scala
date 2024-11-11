@@ -243,8 +243,14 @@ final private[round] class RoundDuct(
     case p: BotPlay =>
       val res = proxy.withPov(PlayerId(p.playerId)) {
         _ ?? { pov =>
-          if (pov.game.outoftime(withGrace = true)) finisher.outOfTime(pov.game)
-          else player.bot(p.uci, this)(pov)
+          if (pov.game.outoftime(withGrace = true))
+            // NOTE: Step 1: This does not take into account the lag for the current move,
+            // so it _JUST_ checks if there is enough lag quota to cover the time
+            // and move etc. So it only fails for really long moves
+            finisher.outOfTime(pov.game)
+          else
+            // NOTE: Step 2: Play the move
+            player.bot(p.uci, this)(pov)
         }
       } dmap publish
       p.promise.foreach(_ completeWith res)
