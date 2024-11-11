@@ -77,11 +77,9 @@ final private class Player(
       case Pov(game, _) if game.selectedSquaresOfferDoesNotMatchUci(uci) =>
         fufail(ClientError(s"$pov game selected squares (${game.selectedSquares}) doesn't match uci ($uci)"))
       case Pov(game, playerIndex) if game playableBy playerIndex =>
-        //NOTE: Step 3: Apply UCI
         applyUci(game, uci, blur = false, botLag)
           .fold(errs => fufail(ClientError(errs)), fuccess)
           .flatMap {
-            // NOTE: Step 4: If we were unable to apply the move due to being out of time, report it here.
             case Flagged => finisher.outOfTime(game)
             case ActionApplied(progress, action) =>
               proxy.save(progress) >> postHumanOrBotPlay(round, pov, progress, action)
@@ -158,21 +156,10 @@ final private class Player(
       metrics: MoveMetrics,
       finalSquare: Boolean = false
   ): Validated[String, ActionResult] =
-    // NOTE: Step 5: Apply the UCI in strategy games (which includes updating the clock)
     game.stratGame.applyUci(uci, metrics, finalSquare).map {
-      // NOTE:: Step 6: at this point the clock has had the move time applied to it
-      // taking into account lag, etc. Double check again. Are we out of time?
       case (nsg, _) if nsg.clock.exists(_.outOfTime(game.turnPlayerIndex, withGrace = false)) =>
-        // NOTE: Step 7: After fixing the bug, this is correctly reached, and the game ends.
         Flagged
       case (newStratGame, action) =>
-        // NOTE: Step 8: Before fixing the bug, this was incorrectly reached and the game continued
-        // TODO: Step 8: There was definitely a bug in the strategy games code that was causing
-        //               this branch to be reached. However, I would have expected the game to just
-        //               continue with the bot seemingly able to continue without being flagged. I
-        //               would not expect the player to be flagged as out of time. So it seems
-        //               there is a second bug, and I want to know if you think it's worthwhile for
-        //               me to look into it.
         ActionApplied(
           game.update(newStratGame, action, blur),
           action
