@@ -157,7 +157,8 @@ final private class Player(
       finalSquare: Boolean = false
   ): Validated[String, ActionResult] =
     game.stratGame.applyUci(uci, metrics, finalSquare).map {
-      case (nsg, _) if nsg.clock.exists(_.outOfTime(game.turnPlayerIndex, withGrace = false)) => Flagged
+      case (_, _) if game.outoftime(withGrace = false) =>
+        Flagged
       case (newStratGame, action) =>
         ActionApplied(
           game.update(newStratGame, action, blur),
