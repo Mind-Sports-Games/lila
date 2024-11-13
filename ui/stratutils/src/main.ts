@@ -8,7 +8,7 @@ import { Rules } from 'stratops/types';
 // import { promotion } from 'stratutils'
 export * as promotion from './promotion';
 
-export const initialFen: Fen = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1';
+export const initialFen: Fen = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1'; // @TODO VFR fix THIS ???
 
 export function fixCrazySan(san: San): San {
   return san[0] === 'P' ? san.slice(1) : san;
@@ -56,7 +56,7 @@ export const altCastles = {
 };
 
 export function variantUsesUCINotation(key: VariantKey | DraughtsVariantKey) {
-  return ['linesOfAction', 'scrambledEggs', 'amazons', 'breakthroughtroyka', 'minibreakthroughtroyka'].includes(key);
+  return ['linesOfAction', 'scrambledEggs', 'amazons', 'breakthroughtroyka', 'minibreakthroughtroyka', 'abalone'].includes(key);
 }
 
 export function variantUsesUSINotation(key: VariantKey | DraughtsVariantKey) {
@@ -138,6 +138,7 @@ const noFishnetVariants: VariantKey[] = [
   'backgammon',
   'hyper',
   'nackgammon',
+  'abalone'
 ];
 export function allowFishnetForVariant(variant: VariantKey) {
   return noFishnetVariants.indexOf(variant) == -1;
@@ -231,6 +232,8 @@ export const variantToRules = (v: VariantKey): Rules => {
       return 'hyper';
     case 'nackgammon':
       return 'nackgammon';
+    case 'abalone':
+      return 'abalone';
     default:
       return 'chess';
   }

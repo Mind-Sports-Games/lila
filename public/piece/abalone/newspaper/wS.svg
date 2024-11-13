@@ -1,0 +1,27 @@
+<svg
+    viewBox="0 0 100 100"
+    image-rendering="optimizeQuality"
+    shape-rendering="geometricPrecision"
+    text-rendering="geometricPrecision"
+    version="1.1"
+    xmlns="http://www.w3.org/2000/svg"
+>
+    <defs>
+        <radialGradient
+            id="whiteMarble"
+            gradientUnits="objectBoundingBox"
+            fx="30%"
+            fy="30%"
+        >
+            <stop offset="0%" stop-color="#FFFFFF" />
+            <stop offset="60%" stop-color="#E9E9E9" />
+            <stop offset="100%" stop-color="#666" />
+        </radialGradient>
+    </defs>
+    <circle
+        cx="50"
+        cy="50"
+        r="45px"
+        fill="url(#whiteMarble)"
+    />
+</svg>

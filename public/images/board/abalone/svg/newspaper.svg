@@ -1,0 +1,66 @@
+<svg viewBox="0 0 100 100" width="0px" height="0px">
+    <defs>
+      <!-- <filter id="f3" height="130%">
+        <feOffset
+          xmlns="http://www.w3.org/2000/svg"
+          dx="2"
+          dy="2"
+          result="offsetblur"
+        />
+        <feGaussianBlur
+          xmlns="http://www.w3.org/2000/svg"
+          in="SourceAlpha"
+          stdDeviation="2"
+        />
+        <feComponentTransfer xmlns="http://www.w3.org/2000/svg">
+          <feFuncA type="linear" slope="2" />
+        </feComponentTransfer>
+        <feMerge xmlns="http://www.w3.org/2000/svg">
+          <feMergeNode />
+          <feMergeNode in="SourceGraphic" />
+        </feMerge>
+      </filter>
+      <filter id="triangleShadow" x="-50%" y="-50%" width="180%" height="180%">
+        <feOffset
+          xmlns="http://www.w3.org/2000/svg"
+          dx="2"
+          dy="2"
+          result="offsetblur"
+        />
+        <feGaussianBlur
+          xmlns="http://www.w3.org/2000/svg"
+          in="SourceAlpha"
+          stdDeviation="0.9"
+        />
+        <feComponentTransfer xmlns="http://www.w3.org/2000/svg">
+          <feFuncA type="linear" slope="2.3" />
+        </feComponentTransfer>
+        <feMerge xmlns="http://www.w3.org/2000/svg">
+          <feMergeNode />
+          <feMergeNode in="SourceGraphic" />
+        </feMerge>
+      </filter>
+      <polygon
+        id="pointyBottomTriangle"
+        class="shadowedTriangle pointyBottomTriangle"
+        points="0,25.84618943,10.4,25.84618943,5.2,34.846189433"
+        stroke-opacity={0.9}
+        stroke-linecap="round"
+        stroke-linejoin="bevel"
+        stroke-width={2.2}
+      />
+      <polygon
+        id="pointyTopTriangle"
+        class="shadowedTriangle pointyTopTriangle"
+        points={`0,14.54618943 5.2,5.5461894 10.4,14.546189433`}
+        stroke-opacity={0.9}
+        stroke-linecap="round"
+        stroke-linejoin="bevel"
+        stroke-width={2.2}
+      />
+      <linearGradient id="shadowedTriangleGradient">
+        <stop offset="0%" stop-color="#a1FeF7" />
+        <stop offset="50%" stop-color="#AAA" />
+      </linearGradient> -->
+    </defs>
+</svg>

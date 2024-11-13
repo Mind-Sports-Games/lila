@@ -4,8 +4,6 @@ require 'fileutils'
 require 'base64'
 include FileUtils
 
-#TODO Add Abalone.
-
 lila_dir = pwd()
 source_dir = lila_dir + '/public/piece/'
 dest_dir = lila_dir + '/public/piece-css/'
@@ -90,6 +88,9 @@ breakthroughtroyka_themes = [
    ['checkers', 'svg'],
    ['fabirovsky', 'svg']
 ]
+abalone_themes = [
+  ['newspaper', 'svg']
+]
 types = {
   'svg' => 'svg+xml;base64,',
   'png' => 'png;base64,'
@@ -145,6 +146,7 @@ backgammon_extra_names = ['flat', 'side']
 backgammon_directions = ['top', 'bottom']
 breakthroughtroyka_variants = ['breakthroughtroyka', 'minibreakthroughtroyka']
 breakthroughtroyka_roles = ['p-piece']
+abalone_roles = ['s-piece']
 
 # inline SVG Chess
 chess_themes.map { |theme|
@@ -795,4 +797,40 @@ breakthroughtroyka_themes.map { |theme|
     }
   }.flatten
   File.open(dest_dir + 'breakthroughtroyka-' + name + '.external.css', 'w') { |f| f.puts (classes_breakthroughtroyka).join("\n") }
+}
+
+# inline SVG abalone
+abalone_themes.map { |theme|
+  name = theme[0]
+  ext = theme[1]
+  classes_abalone = colors.map { |color|
+    abalone_roles.map { |role|
+      piece = color[0] + role.upcase[0]
+      file = source_dir + 'abalone/' + name + '/' + piece + '.' + ext
+      File.open(file, 'r') do|image_file|
+        image = image_file.read
+        base64 = Base64.strict_encode64(image)
+        '.abalone.is2d .' + role + '.' + (color == 'b' ? 'p1' : 'p2') +
+         ', ' + '.is2d .variant-abalone' + ' .' + role + '.' + (color == 'b' ? 'p1' : 'p2') +
+         ' {' +
+          "background-image:url('data:image/" + types[ext] + base64 + "')}"
+      end
+    }
+  }.flatten
+  File.open(dest_dir + 'abalone-' + name + '.css', 'w') { |f| f.puts (classes_abalone).join("\n") }
+}
+# external SVG abalone
+abalone_themes.map { |theme|
+  name = theme[0]
+  ext = theme[1]
+  classes_abalone = colors.map { |color|
+    abalone_roles.map { |role|
+      piece = color[0] + role.upcase[0]
+      '.abalone.is2d .' + role + '.' + (color == 'b' ? 'p1' : 'p2') +
+      ', ' + '.is2d .variant-abalone' + ' .' + role + '.' + (color == 'b' ? 'p1' : 'p2') +
+      ' {' +
+        "background-image:url('/assets/piece/" + 'abalone/' + name + "/" + piece + "." + ext + "')}"
+    }
+  }.flatten
+  File.open(dest_dir + 'abalone-' + name + '.external.css', 'w') { |f| f.puts (classes_abalone).join("\n") }
 }

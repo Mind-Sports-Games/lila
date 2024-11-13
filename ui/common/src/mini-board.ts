@@ -87,7 +87,9 @@ export const initWith = (node: HTMLElement, fen: string, orientation: Orientatio
                                       $el.hasClass('variant-hyper') ||
                                       $el.hasClass('variant-nackgammon')
                                     ? { width: 12, height: 2 }
-                                    : { width: 8, height: 8 },
+                                    : $el.hasClass('variant-abalone')
+                                    ? { width: 9, height: 9 }
+                                     : { width: 8, height: 8 },
           variant: variantFromElement($el),
         }),
       );
@@ -129,5 +131,7 @@ export const variantFromElement = (element: Cash): string => {
                               ? 'hyper'
                               : element.hasClass('variant-nackgammon')
                                 ? 'nackgammon'
-                                : 'standard';
+                                : element.hasClass('variant-abalone')
+                                  ? 'abalone'
+                                  : 'standard';
 };

@@ -41,6 +41,10 @@
       height: 125px;
     }
 
+    &.abalone {
+      height: 125px;
+    }
+
     @extend %flex-center;
 
     justify-content: center;
@@ -99,6 +103,12 @@
   }
 
   .list a.backgammon span {
+    display: block;
+    width: 100px;
+    height: 100px;
+  }
+
+  .list a.abalone span {
     display: block;
     width: 100px;
     height: 100px;
@@ -239,6 +249,11 @@
 
     .backgammon-contemporary {
       background-image: url(../images/board/backgammon/svg/backgammon_contemporary_board.svg);
+      background-size: 100px;
+    }
+
+    .abalone-newspaper {
+      background-image: url(../images/board/abalone/svg/newspaper.svg);
       background-size: 100px;
     }
   }

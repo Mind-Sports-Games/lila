@@ -122,13 +122,17 @@ export function makeConfig(ctrl: AnalyseCtrl): CgConfig {
                           ? 'https://playstrategy.org/assets/piece/backgammon/' +
                             d.pref.pieceSet.filter(ps => ps.gameFamily === 'backgammon')[0].name +
                             '/'
-                          : cgVariantKey === 'xiangqi' || cgVariantKey === 'minixiangqi'
-                            ? 'https://playstrategy.org/assets/piece/xiangqi/' +
-                              d.pref.pieceSet.filter(ps => ps.gameFamily === 'xiangqi')[0].name +
+                          : cgVariantKey === 'abalone'
+                            ? 'https://playstrategy.org/assets/piece/abalone/' +
+                              d.pref.pieceSet.filter(ps => ps.gameFamily === 'abalone')[0].name +
                               '/'
-                            : 'https://playstrategy.org/assets/piece/chess/' +
-                              d.pref.pieceSet.filter(ps => ps.gameFamily === 'chess')[0].name +
-                              '/',
+                            : cgVariantKey === 'xiangqi' || cgVariantKey === 'minixiangqi'
+                              ? 'https://playstrategy.org/assets/piece/xiangqi/' +
+                                d.pref.pieceSet.filter(ps => ps.gameFamily === 'xiangqi')[0].name +
+                                '/'
+                              : 'https://playstrategy.org/assets/piece/chess/' +
+                                d.pref.pieceSet.filter(ps => ps.gameFamily === 'chess')[0].name +
+                                '/',
       },
     },
     highlight: {

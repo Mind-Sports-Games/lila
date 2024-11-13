@@ -159,7 +159,7 @@ export function makeConfig(ctrl: RoundController): Config {
                           data.pref.pieceSet.filter(ps => ps.gameFamily === 'backgammon')[0].name +
                           '/'
                         : variantKey === 'abalone'
-                          ? 'https://playstrategy.org/assets/piece/abalone/' +
+                          ? 'https://playstrategy.org/assets/piece/abalone/' + // @TODO VFR: check it actually works
                             data.pref.pieceSet.filter(ps => ps.gameFamily === 'abalone')[0].name +
                             '/'
                           : variantKey === 'xiangqi' || variantKey === 'minixiangqi'
