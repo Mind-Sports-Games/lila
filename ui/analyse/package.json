@@ -20,7 +20,7 @@
     "@types/highcharts": "=4.2.57",
     "@types/node": "20.12.2",
     "@types/yaireo__tagify": "^4.0.1",
-    "@yaireo/tagify": "4.6.0",
+    "@yaireo/tagify": "^4.32.0",
     "ceval": "workspace:*",
     "chat": "workspace:*",
     "common": "workspace:*",
