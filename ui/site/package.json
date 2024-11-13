@@ -11,7 +11,7 @@
     "@types/yaireo__tagify": "^4.0.1",
     "@types/zxcvbn": "^4.4.0",
     "@fnando/sparkline": "^0.3.10",
-    "@yaireo/tagify": "4.6.0",
+    "@yaireo/tagify": "^4.32.0",
     "chat": "workspace:*",
     "common": "workspace:*",
     "debounce-promise": "^3.1.2",
