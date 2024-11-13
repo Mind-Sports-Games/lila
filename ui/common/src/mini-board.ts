@@ -88,8 +88,8 @@ export const initWith = (node: HTMLElement, fen: string, orientation: Orientatio
                                       $el.hasClass('variant-nackgammon')
                                     ? { width: 12, height: 2 }
                                     : $el.hasClass('variant-abalone')
-                                    ? { width: 9, height: 9 }
-                                     : { width: 8, height: 8 },
+                                      ? { width: 9, height: 9 }
+                                      : { width: 8, height: 8 },
           variant: variantFromElement($el),
         }),
       );
