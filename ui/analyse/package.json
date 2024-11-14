@@ -20,7 +20,7 @@
     "@types/highcharts": "=4.2.57",
     "@types/node": "20.12.2",
     "@types/yaireo__tagify": "^4.0.1",
-    "@yaireo/tagify": "4.6.0",
+    "@yaireo/tagify": "^4.32.0",
     "ceval": "workspace:*",
     "chat": "workspace:*",
     "common": "workspace:*",
@@ -44,9 +44,6 @@
       "src/analysisBoard.ts",
       "src/plugins/analyse.nvui.ts",
       "src/plugins/analyse.study.topic.form.ts"
-    ],
-    "sync": {
-      "node_modules/@yaireo/tagify/dist/tagify.min.js": "public/npm/tagify"
-    }
+    ]
   }
 }

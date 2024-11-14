@@ -25,8 +25,14 @@ object faq {
       )
     }
 
-  def apply(rated: Option[Boolean] = None, handicapped: Boolean = false, privateId: Option[String] = None)(
-      implicit ctx: Context
+  def apply(
+      rated: Option[Boolean] = None,
+      handicapped: Option[Boolean] = None,
+      statusScoring: Option[Boolean] = None,
+      isMedley: Option[Boolean] = None,
+      privateId: Option[String] = None
+  )(implicit
+      ctx: Context
   ) =
     frag(
       privateId.map { id =>
@@ -42,10 +48,29 @@ object faq {
         case Some(false) => p(trans.arena.isNotRated())
         case None        => p(trans.arena.someRated())
       },
-      if (handicapped) h2(trans.arena.isItHandicapped()),
-      if (handicapped) p(trans.arena.isHandicapped()),
+      h2(trans.arena.isItHandicapped()),
+      handicapped match {
+        case Some(true) =>
+          p(
+            trans.arena.isHandicapped(),
+            " For more info see the ",
+            a(href := routes.Page.loneBookmark("handicaps"))("handicapped page.")
+          )
+        case Some(false) => p(trans.arena.isNotHandicapped())
+        case None =>
+          p(
+            trans.arena.someHandicapped(),
+            " For more info see the ",
+            a(href := routes.Page.loneBookmark("handicaps"))("handicapped page.")
+          )
+      },
       h2(howAreScoresCalculated()),
       p(howAreScoresCalculatedAnswer()),
+      statusScoring match {
+        case Some(true)  => p(trans.arena.tournamentStatusScoring())
+        case Some(false) => frag()
+        case None        => p(trans.arena.someStatusScoring())
+      },
       h2(berserk()),
       p(berserkAnswer()),
       h2(howIsTheWinnerDecided()),
@@ -54,6 +79,27 @@ object faq {
       p(howDoesPairingWorkAnswer()),
       h2(howDoesItEnd()),
       p(howDoesItEndAnswer()),
+      isMedley match {
+        case Some(true) =>
+          frag(
+            h2(trans.arena.howDoArenaMedleysWork()),
+            p(
+              trans.arena.isTournamentMedley(),
+              " For more info see the ",
+              a(href := routes.Page.loneBookmark("medley"))("medley page.")
+            )
+          )
+        case Some(false) => frag()
+        case None =>
+          frag(
+            h2(trans.arena.howDoArenaMedleysWork()),
+            p(
+              trans.arena.someMedley(),
+              " For more info see the ",
+              a(href := routes.Page.loneBookmark("medley"))("medley page.")
+            )
+          )
+      },
       h2(otherRules()),
       p(thereIsACountdown()),
       p(drawingWithinNbMoves.pluralSame(10)),
