@@ -69,7 +69,7 @@
       "node_modules/hopscotch/dist/css/hopscotch.min.css": "public/vendor/hopscotch/dist/css",
       "node_modules/hopscotch/dist/img": "public/vendor/hopscotch/dist",
       "node_modules/highcharts/high*.js": "public/vendor/highcharts-4.2.5",
-      "node_modules/@yaireo/tagify/dist/tagify.min.js": "public/vendor/tagify",
+      "node_modules/@yaireo/tagify/dist/tagify.js": "public/vendor/tagify",
       "node_modules/stockfish.js/*": "public/vendor/stockfish.js",
       "node_modules/stockfish.wasm/*": "public/vendor/stockfish.wasm",
       "node_modules/stockfish-mv.wasm/*": "public/vendor/stockfish-mv.wasm",
