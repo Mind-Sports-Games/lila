@@ -44,9 +44,6 @@
       "src/analysisBoard.ts",
       "src/plugins/analyse.nvui.ts",
       "src/plugins/analyse.study.topic.form.ts"
-    ],
-    "sync": {
-      "node_modules/@yaireo/tagify/dist/tagify.min.js": "public/npm/tagify"
-    }
+    ]
   }
 }
