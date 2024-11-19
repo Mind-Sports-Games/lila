@@ -285,6 +285,10 @@ export function getBackgammonScore(fen: string, playerIndex: string): number {
   return +fen.split(' ')[playerIndex === 'p1' ? 4 : 5];
 }
 
+export function getAbaloneScore(fen: string, playerIndex: string): number {
+  return +fen.split(' ')[playerIndex === 'p1' ? 1 : 2];
+}
+
 const noServerEvalVariants = [
   'monster',
   'linesOfAction',

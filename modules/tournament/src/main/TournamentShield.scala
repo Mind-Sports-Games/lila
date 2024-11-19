@@ -1000,7 +1000,7 @@ object TournamentShield {
         extends Category(
           Variant.Abalone(strategygames.abalone.variant.Abalone),
           Blitz53,
-          21, // @TODO: same as BreakthroughTroyka
+          9,
           1
         )
 

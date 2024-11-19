@@ -62,7 +62,7 @@ export function variantUsesUCINotation(key: VariantKey | DraughtsVariantKey) {
     'amazons',
     'breakthroughtroyka',
     'minibreakthroughtroyka',
-    'abalone',
+    'abalone', //TODO work out what notation we want for abalone
   ].includes(key);
 }
 

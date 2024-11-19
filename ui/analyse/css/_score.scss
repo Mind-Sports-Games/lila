@@ -17,17 +17,27 @@ $score-variants: (
   'go19x19',
   'backgammon',
   'hyper',
-  'nackgammon'
+  'nackgammon',
+  'abalone'
 );
-$score-variants-square: ('flipello', 'flipello10', 'go9x9', 'go13x13', 'go19x19'); //oware handled differently
-$score-variants-non-square: ('togyzkumalak', 'bestemshe', 'backgammon', 'hyper', 'nackgammon');
+
+$score-variants-square: (
+  'flipello',
+  'flipello10',
+  'go9x9',
+  'go13x13',
+  'go19x19',
+  'abalone'
+); //oware handled differently
+$score-variants-non-square: ('togyzkumalak', 'bestemshe', 'backgammon', 'hyper' 'nackgammon');
 $go-variants: ('go9x9', 'go13x13', 'go19x19');
 
 .variant-flipello .game-score,
 .variant-flipello10 .game-score,
 .variant-go9x9 .game-score,
 .variant-go13x13 .game-score,
-.variant-go19x19 .game-score {
+.variant-go19x19 .game-score,
+.variant-abalone .game-score {
   piece::after {
     @extend %active, %box-radius;
 

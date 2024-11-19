@@ -97,7 +97,7 @@ object TournamentMedleyUtil {
       "backgammon"             -> medium,
       "hyper"                  -> quick,
       "nackgammon"             -> medium,
-      "abalone"                -> medium
+      "abalone"                -> slow
     )
   }
 

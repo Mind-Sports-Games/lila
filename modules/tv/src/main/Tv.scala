@@ -686,7 +686,7 @@ object Tv {
           icon = AV.Abalone.perfIcon.toString,
           secondsSinceLastMove = freshBlitz,
           filters = Seq(variant(Variant.wrap(AV.Abalone)), noBot),
-          familyChannel = false,
+          familyChannel = true,
           gameFamily = "abalone"
         )
     case object Bot
