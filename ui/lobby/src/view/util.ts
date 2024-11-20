@@ -76,6 +76,6 @@ export const perfIcons: any = {
   'Go 13x13': '',
   'Go 19x19': '',
   Backgammon: '',
-  Hyper: '', //TODO hyper icon
+  Hyper: '',
   Nackgammon: '',
 };
