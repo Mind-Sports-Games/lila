@@ -1,6 +1,6 @@
 import { h, VNode } from 'snabbdom';
 import { defined, prop, Prop } from 'common';
-import { isChess } from 'common/analysis';
+import { isChess, allowGameBookStudyForVariant } from 'common/analysis';
 import { Redraw } from '../interfaces';
 import { bind, bindSubmit, spinner, option, onInsert, emptyRedButton } from '../util';
 import * as modal from '../modal';
@@ -183,7 +183,9 @@ function viewLoaded(ctrl: StudyChapterEditFormCtrl, data: StudyChapterConfig): V
           'select#chapter-mode.form-control',
           (isChess(data.variant.key ?? 'standard')
             ? chapterForm.modeChoices
-            : chapterForm.nonBrowserAnalysisModeChoices
+            : allowGameBookStudyForVariant(data.variant.key ?? 'standard')
+              ? chapterForm.nonBrowserAnalysisModeChoices
+              : chapterForm.nonBrowserAnalysisModeChoices
           ).map(c => option(c[0], mode, ctrl.trans.noarg(c[1]))),
         ),
       ]),

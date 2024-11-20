@@ -48,8 +48,8 @@ importers:
         specifier: ^5.6
         version: 5.6.3
       xml2js:
-        specifier: 0.4.19
-        version: 0.4.19
+        specifier: ^0.6.2
+        version: 0.6.2
 
   ui:
     dependencies:
@@ -81,8 +81,8 @@ importers:
         specifier: ^4.0.1
         version: 4.27.0
       '@yaireo/tagify':
-        specifier: 4.6.0
-        version: 4.6.0(prop-types@15.8.1)
+        specifier: ^4.32.0
+        version: 4.32.0(prop-types@15.8.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       ceval:
         specifier: workspace:*
         version: link:../ceval
@@ -442,8 +442,8 @@ importers:
         specifier: ^4.4.0
         version: 4.4.5
       '@yaireo/tagify':
-        specifier: 4.6.0
-        version: 4.6.0(prop-types@15.8.1)
+        specifier: ^4.32.0
+        version: 4.32.0(prop-types@15.8.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       chat:
         specifier: workspace:*
         version: link:../chat
@@ -1599,10 +1599,13 @@ packages:
   '@ungap/structured-clone@1.2.0':
     resolution: {integrity: sha512-zuVdFrMJiuCDQUMCzQaD6KL28MjnqqN8XnAqiEq9PNm/hCPTSGfrXCOfwj1ow4LFb/tNymJPwsNbVePc1xFqrQ==}
 
-  '@yaireo/tagify@4.6.0':
-    resolution: {integrity: sha512-fipdTlEt08A/NKTg+HH9CP8r8ZdKaVyDTNBc42inZqfKXceMUhCHR1rQ6evoH+18TyPNG+zj37ld+YbOcwNnhA==}
+  '@yaireo/tagify@4.32.0':
+    resolution: {integrity: sha512-CxHpwgloFYh3EwGs4LUkEz8oKswLNyX4CtSSqZCcSA0pUV5xTe8L+YaJnbpU79iV3bqxCwkxTx6E0Wi0ebujBQ==}
+    engines: {node: '>=16.15.0', npm: '>=9.0.0'}
     peerDependencies:
-      prop-types: ^15.7.2
+      prop-types: '>15.5.7'
+      react: '*'
+      react-dom: '*'
 
   ab@https://codeload.github.com/lichess-org/ab-stub/tar.gz/94236bf34dbc9c05daf50f4c9842d859b9142be0:
     resolution: {tarball: https://codeload.github.com/lichess-org/ab-stub/tar.gz/94236bf34dbc9c05daf50f4c9842d859b9142be0}
@@ -2696,11 +2699,20 @@ packages:
   queue-microtask@1.2.3:
     resolution: {integrity: sha512-NuaNSa6flKT5JaSYQzJok04JzTL1CA6aGhv5rfLW3PgqA+M2ChpZQnAC8h8i4ZFkBS8X5RqkDBHA7r4hej3K9A==}
 
+  react-dom@18.3.1:
+    resolution: {integrity: sha512-5m4nQKp+rZRb09LNH59GM4BxTh9251/ylbKIbpe7TpGxfJ+9kv6BLkLBXIjjspbgbnIBNqlI23tRnTWT0snUIw==}
+    peerDependencies:
+      react: ^18.3.1
+
   react-is@16.13.1:
     resolution: {integrity: sha512-24e6ynE2H+OKt4kqsOvNd8kBpV65zoxbA4BVsEOB3ARVWQki/DHzaUoC5KuON/BiccDaCCTZBuOcfZs70kR8bQ==}
 
   react-is@18.3.1:
     resolution: {integrity: sha512-/LLMVyas0ljjAtoYiPqYiL8VWXzUUdThrmU5+n20DZv+a+ClRoevUzw5JxU+Ieh5/c87ytoTBV9G1FiKfNJdmg==}
+
+  react@18.3.1:
+    resolution: {integrity: sha512-wS+hAgJShR0KhEvPJArfuPVN1+Hz1t0Y6n5jLrGQbkb4urgPE/0Rve+1kMB1v/oWgHgm4WIcV+i7F2pTVj+2iQ==}
+    engines: {node: '>=0.10.0'}
 
   readdirp@3.6.0:
     resolution: {integrity: sha512-hOS089on8RduqdbhvQ5Z37A0ESjsqz6qnRcffsMU3495FuTdqSm+7bhJ29JvIOsBDEEnan5DPu9t3To9VRlMzA==}
@@ -2778,6 +2790,9 @@ packages:
 
   sax@1.4.1:
     resolution: {integrity: sha512-+aWOz7yVScEGoKNd4PA10LZ8sk0A/z5+nXQG5giUO5rprX9jgYsTdov9qCchZiPIZezbZH+jRut8nPodFAX4Jg==}
+
+  scheduler@0.23.2:
+    resolution: {integrity: sha512-UOShsPwz7NrMUqhR6t0hWjFduvOzbtv7toDH1/hIrfRNIDBnnBWd0CwJTGvTpngVlmwGCdP9/Zl/tVrDqcuYzQ==}
 
   sdp@3.2.0:
     resolution: {integrity: sha512-d7wDPgDV3DDiqulJjKiV2865wKsJ34YI+NDREbm+FySq6WuKOikwyNQcm+doLAZ1O6ltdO0SeKle2xMpN3Brgw==}
@@ -3049,11 +3064,12 @@ packages:
     resolution: {integrity: sha512-7KxauUdBmSdWnmpaGFg+ppNjKF8uNLry8LyzjauQDOVONfFLNKrKvQOxZ/VuTIcS/gge/YNahf5RIIQWTSarlg==}
     engines: {node: ^12.13.0 || ^14.15.0 || >=16.0.0}
 
-  xml2js@0.4.19:
-    resolution: {integrity: sha512-esZnJZJOiJR9wWKMyuvSE1y6Dq5LCuJanqhxslH2bxM6duahNZ+HMpCLhBQGZkbX6xRf8x1Y2eJlgt2q3qo49Q==}
+  xml2js@0.6.2:
+    resolution: {integrity: sha512-T4rieHaC1EXcES0Kxxj4JWgaUQHDk+qwHcYOCFHfiwKz7tOVPLq7Hjq9dM1WCMhylqMEfP7hMcOIChvotiZegA==}
+    engines: {node: '>=4.0.0'}
 
-  xmlbuilder@9.0.7:
-    resolution: {integrity: sha512-7YXTQc3P2l9+0rjaUbLwMKRhtmwg1M1eDf6nag7urC7pIPYLD9W/jmzQ4ptRSUbodw5S0jfoGTflLemQibSpeQ==}
+  xmlbuilder@11.0.1:
+    resolution: {integrity: sha512-fDlsI/kFEx7gLvbecc0/ohLG50fugQp8ryHzMTuW9vSa1GJ0XYWKnhsUx7oie3G98+r56aTQIUB4kht42R3JvA==}
     engines: {node: '>=4.0'}
 
   y18n@5.0.8:
@@ -4339,9 +4355,11 @@ snapshots:
 
   '@ungap/structured-clone@1.2.0': {}
 
-  '@yaireo/tagify@4.6.0(prop-types@15.8.1)':
+  '@yaireo/tagify@4.32.0(prop-types@15.8.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
     dependencies:
       prop-types: 15.8.1
+      react: 18.3.1
+      react-dom: 18.3.1(react@18.3.1)
 
   ab@https://codeload.github.com/lichess-org/ab-stub/tar.gz/94236bf34dbc9c05daf50f4c9842d859b9142be0: {}
 
@@ -5658,9 +5676,19 @@ snapshots:
 
   queue-microtask@1.2.3: {}
 
+  react-dom@18.3.1(react@18.3.1):
+    dependencies:
+      loose-envify: 1.4.0
+      react: 18.3.1
+      scheduler: 0.23.2
+
   react-is@16.13.1: {}
 
   react-is@18.3.1: {}
+
+  react@18.3.1:
+    dependencies:
+      loose-envify: 1.4.0
 
   readdirp@3.6.0:
     dependencies:
@@ -5731,6 +5759,10 @@ snapshots:
   safari-14-idb-fix@1.0.6: {}
 
   sax@1.4.1: {}
+
+  scheduler@0.23.2:
+    dependencies:
+      loose-envify: 1.4.0
 
   sdp@3.2.0: {}
 
@@ -5954,12 +5986,12 @@ snapshots:
       imurmurhash: 0.1.4
       signal-exit: 3.0.7
 
-  xml2js@0.4.19:
+  xml2js@0.6.2:
     dependencies:
       sax: 1.4.1
-      xmlbuilder: 9.0.7
+      xmlbuilder: 11.0.1
 
-  xmlbuilder@9.0.7: {}
+  xmlbuilder@11.0.1: {}
 
   y18n@5.0.8: {}
 
