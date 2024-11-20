@@ -297,6 +297,7 @@ const noServerEvalVariants = [
   'go13x13',
   'go19x19',
   'backgammon',
+  'hyper',
   'nackgammon',
 ];
 
@@ -320,6 +321,7 @@ const noClientEvalVariants = [
   'go13x13',
   'go19x19',
   'backgammon',
+  'hyper',
   'nackgammon',
 ];
 
@@ -430,6 +432,8 @@ export const variantToRules = (v: VariantKey): Rules => {
       return 'go19x19';
     case 'backgammon':
       return 'backgammon';
+    case 'hyper':
+      return 'hyper';
     case 'nackgammon':
       return 'nackgammon';
     case 'breakthroughtroyka':

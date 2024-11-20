@@ -327,19 +327,18 @@ final private class TournamentScheduler(
       (nextFriday, 1),
       (nextFriday, 5),
       (nextFriday, 8),
+      (nextFriday, 11),
       (nextFriday, 15),
       (nextFriday, 21),
       (nextSaturday, 1),
       (nextSaturday, 4),
       (nextSaturday, 7),
       (nextSaturday, 10),
-      //(nextSaturday, 16),
       (nextSaturday, 22),
       (nextSunday, 1),
       (nextSunday, 4),
       (nextSunday, 7),
       (nextSunday, 10),
-      //(nextSunday, 16),
       (nextSunday, 23)
     )
 
@@ -355,7 +354,6 @@ final private class TournamentScheduler(
     // Because we create two weeks in advance we will then need to delete one tournament in the second week where the new variant has cycled into. It should just be one, if not its gone wrong
     // Practise locally, can always delete any newly created tournaments and try again
     val weeklyVariants: List[(Variant, Schedule.Speed)] = List(
-      (Variant.Go(strategygames.go.variant.Go19x19), Blitz53),
       (Variant.Draughts(strategygames.draughts.variant.Breakthrough), Blitz32),
       (Variant.FairySF(strategygames.fairysf.variant.Flipello), Blitz32),
       (Variant.Chess(strategygames.chess.variant.Crazyhouse), Blitz32),
@@ -390,12 +388,14 @@ final private class TournamentScheduler(
       (Variant.Chess(strategygames.chess.variant.ScrambledEggs), Blitz32),
       (Variant.Chess(strategygames.chess.variant.ThreeCheck), Blitz32),
       (Variant.FairySF(strategygames.fairysf.variant.MiniXiangqi), Blitz32),
+      (Variant.Backgammon(strategygames.backgammon.variant.Hyper), Delay310),
       (Variant.Go(strategygames.go.variant.Go13x13), Blitz53),
       (Variant.Backgammon(strategygames.backgammon.variant.Nackgammon), Delay310),
       (Variant.Chess(strategygames.chess.variant.Standard), Blitz32),
       (Variant.Draughts(strategygames.draughts.variant.Antidraughts), Blitz32),
       (Variant.FairySF(strategygames.fairysf.variant.MiniShogi), Byoyomi35),
-      (Variant.Chess(strategygames.chess.variant.Atomic), Blitz32)
+      (Variant.Chess(strategygames.chess.variant.Atomic), Blitz32),
+      (Variant.Go(strategygames.go.variant.Go19x19), Blitz53)
     )
 
     val weeklyVariantDefault: (Variant, Schedule.Speed) =

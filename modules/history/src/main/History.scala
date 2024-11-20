@@ -45,6 +45,7 @@ case class History(
     go13x13: RatingsMap,
     go19x19: RatingsMap,
     backgammon: RatingsMap,
+    hyper: RatingsMap,
     nackgammon: RatingsMap,
     ultraBullet: RatingsMap,
     bullet: RatingsMap,
@@ -102,6 +103,7 @@ case class History(
       case "go13x13"                => go13x13
       case "go19x19"                => go19x19
       case "backgammon"             => backgammon
+      case "hyper"                  => hyper
       case "nackgammon"             => nackgammon
       case "puzzle"                 => puzzle
       case "ultraBullet"            => ultraBullet
@@ -171,6 +173,7 @@ object History {
           go13x13 = ratingsMap("go13x13"),
           go19x19 = ratingsMap("go19x19"),
           backgammon = ratingsMap("backgammon"),
+          hyper = ratingsMap("hyper"),
           nackgammon = ratingsMap("nackgammon"),
           ultraBullet = ratingsMap("ultraBullet"),
           bullet = ratingsMap("bullet"),

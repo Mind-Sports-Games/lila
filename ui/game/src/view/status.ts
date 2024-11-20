@@ -99,6 +99,7 @@ export default function status(ctrl: Ctrl): string {
             return noarg('gameFinished');
           }
         case 'backgammon':
+        case 'hyper':
         case 'nackgammon':
           return noarg('gameFinished');
       }

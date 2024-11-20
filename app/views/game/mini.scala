@@ -75,6 +75,7 @@ object mini {
   def orientation(pov: Pov): String = {
     (pov.game.variant.key, pov.playerIndex.name) match {
       case ("backgammon", "p2") => "p1vflip"
+      case ("hyper", "p2")      => "p1vflip"
       case ("nackgammon", "p2") => "p1vflip"
       case ("racingKings", _)   => "p1"
       case (_, playerIndex)     => playerIndex
@@ -128,7 +129,7 @@ object mini {
         val fen   = Forsyth.>>(pov.game.variant.gameLogic, pov.game.situation)
         val score = (if (pov.playerIndex.name == "p1") fen.player1Score else fen.player2Score) / 10.0
         "(" + score.toString().replace(".0", "") + ")"
-      case "backgammon" | "nackgammon" =>
+      case "backgammon" | "hyper" | "nackgammon" =>
         "(" + pov.game.history.score(pov.playerIndex).toString() + ")"
       case _ => ""
     }

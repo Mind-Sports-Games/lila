@@ -15,7 +15,7 @@ export default function pocket(ctrl: RoundController, playerIndex: PlayerIndex, 
   const dropRoles =
     variantKey == 'crazyhouse' ? pieceRoles : variantKey == 'minishogi' ? pieceMiniShogiRoles : pieceShogiRoles;
   if (!step.crazy || ctrl.data.onlyDropsVariant) return;
-  if (['backgammon', 'nackgammon', 'amazons'].includes(ctrl.data.game.variant.key)) return;
+  if (['backgammon', 'hyper', 'nackgammon', 'amazons'].includes(ctrl.data.game.variant.key)) return;
   const droppedRole = ctrl.justDropped,
     dropMode = ctrl.chessground?.state.dropmode,
     dropPiece = ctrl.chessground?.state.dropmode.piece,

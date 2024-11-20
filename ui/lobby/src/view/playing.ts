@@ -34,6 +34,8 @@ const orientation = (pov: NowPlaying): string => {
   switch (pov.variant.key) {
     case 'backgammon':
       return pov.playerIndex === 'p2' ? 'p1vflip' : 'p1';
+    case 'hyper':
+      return pov.playerIndex === 'p2' ? 'p1vflip' : 'p1';
     case 'nackgammon':
       return pov.playerIndex === 'p2' ? 'p1vflip' : 'p1';
     default:
