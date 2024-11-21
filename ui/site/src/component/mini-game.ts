@@ -63,7 +63,10 @@ export const init = (node: HTMLElement) => {
           orientation,
           lastMove: lm && (lm[1] === '@' ? [lm.slice(2)] : [lm[0] + lm[1], lm[2] + lm[3]]),
           highlight: {
-            lastMove: variantFromElement($el) != 'backgammon' && variantFromElement($el) != 'nackgammon',
+            lastMove:
+              variantFromElement($el) != 'backgammon' &&
+              variantFromElement($el) != 'hyper' &&
+              variantFromElement($el) != 'nackgammon',
           },
           drawable: {
             enabled: false,
@@ -93,7 +96,9 @@ export const init = (node: HTMLElement) => {
                                 ? { width: 13, height: 13 }
                                 : $el.hasClass('variant-go19x19')
                                   ? { width: 19, height: 19 }
-                                  : $el.hasClass('variant-backgammon') || $el.hasClass('variant-nackgammon')
+                                  : $el.hasClass('variant-backgammon') ||
+                                      $el.hasClass('variant-hyper') ||
+                                      $el.hasClass('variant-nackgammon')
                                     ? { width: 12, height: 2 }
                                     : { width: 8, height: 8 },
           variant: variantFromElement($el),

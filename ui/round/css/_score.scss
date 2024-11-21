@@ -47,6 +47,7 @@ $go-variants: ('go9x9', 'go13x13', 'go19x19');
 }
 
 .variant-nackgammon .game-score::after,
+.variant-hyper .game-score::after,
 .variant-backgammon .game-score::after {
   @extend %active, %box-radius;
 
@@ -85,12 +86,14 @@ body.togyzkumalak-wood .variant-bestemshe .game-score {
 }
 
 body.backgammon-classic .variant-nackgammon .game-score,
+body.backgammon-classic .variant-hyper .game-score,
 body.backgammon-classic .variant-backgammon .game-score {
   background: url(../images/board/backgammon/svg/backgammon_classic_house.svg);
   background-size: cover;
 }
 
 body.backgammon-contemporary .variant-nackgammon .game-score,
+body.backgammon-contemporary .variant-hyper .game-score,
 body.backgammon-contemporary .variant-backgammon .game-score {
   background: url(../images/board/backgammon/svg/backgammon_contemporary_house.svg);
   background-size: cover;
@@ -441,6 +444,7 @@ $non-square-pocket-margin-top-mobile: 5vw;
 }
 
 .variant-nackgammon .game-score,
+.variant-hyper .game-score,
 .variant-backgammon .game-score {
   @extend %box-radius;
   display: flex;

@@ -32,6 +32,7 @@ object bits {
     (c, v) match {
       case (P1, _)            => Orientation.P1
       case (P2, "backgammon") => Orientation.P1VFlip
+      case (P2, "hyper")      => Orientation.P1VFlip
       case (P2, "nackgammon") => Orientation.P1VFlip
       case (P2, _)            => Orientation.P2
     }
@@ -48,6 +49,7 @@ object bits {
           case P2 => Orientation.Right
         }
       case Variant.Backgammon(strategygames.backgammon.variant.Backgammon) |
+          Variant.Backgammon(strategygames.backgammon.variant.Hyper) |
           Variant.Backgammon(strategygames.backgammon.variant.Nackgammon) =>
         c match {
           case P1 => Orientation.P1

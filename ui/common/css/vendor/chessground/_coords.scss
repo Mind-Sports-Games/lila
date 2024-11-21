@@ -138,6 +138,7 @@ coords {
   }
 
   .variant-nackgammon &,
+  .variant-hyper &,
   .variant-backgammon & {
     text-shadow:
       0.5px -1px 0px rgba(0, 0, 0, 0.25),
@@ -156,6 +157,7 @@ coords {
   }
 
   .variant-nackgammon .orientation-p1 &.files,
+  .variant-hyper .orientation-p1 &.files,
   .variant-backgammon .orientation-p1 &.files {
     &.p1 {
       left: 0;
@@ -176,6 +178,7 @@ coords {
   }
 
   .variant-nackgammon .orientation-p1vflip &.files,
+  .variant-hyper .orientation-p1vflip &.files,
   .variant-backgammon .orientation-p1vflip &.files {
     &.p1 {
       left: 0;
@@ -269,6 +272,10 @@ coords {
     display: none;
   }
 
+  .coords-out .variant-hyper coords {
+    display: none;
+  }
+
   .coords-out .variant-togyzkumalak coords {
     display: none;
   }
@@ -305,6 +312,7 @@ coords {
 
   //always show for backgammon single column and make smaller
   .variant-nackgammon .orientation-p1 coords.files,
+  .variant-hyper .orientation-p1 coords.files,
   .variant-backgammon .orientation-p1 coords.files {
     &.p1 {
       bottom: 0.7em;
@@ -314,6 +322,7 @@ coords {
     }
   }
   .variant-nackgammon .orientation-p1vflip coords.files,
+  .variant-hyper .orientation-p1vflip coords.files,
   .variant-backgammon .orientation-p1vflip coords.files {
     &.p1 {
       top: 0.7em;
@@ -362,6 +371,7 @@ coords {
 
   //always show for backgammon single column and make smaller
   .variant-nackgammon .orientation-p1 coords.files,
+  .variant-hyper .orientation-p1 coords.files,
   .variant-backgammon .orientation-p1 coords.files {
     &.p1 {
       bottom: 0.4em;
@@ -371,6 +381,7 @@ coords {
     }
   }
   .variant-nackgammon .orientation-p1vflip coords.files,
+  .variant-hyper .orientation-p1vflip coords.files,
   .variant-backgammon .orientation-p1vflip coords.files {
     &.p1 {
       top: 0.4em;

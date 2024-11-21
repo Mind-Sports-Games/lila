@@ -19,6 +19,7 @@ object userAnalysis {
   def noAnalysisVariants = List(
     Variant.Chess(strategygames.chess.variant.FromPosition),
     Variant.Backgammon(strategygames.backgammon.variant.Backgammon),
+    Variant.Backgammon(strategygames.backgammon.variant.Hyper),
     Variant.Backgammon(strategygames.backgammon.variant.Nackgammon)
   )
 

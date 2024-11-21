@@ -465,6 +465,7 @@ final class JsonView(
       case "monster"    => multiActionMetaJson(pov)
       case "amazons"    => multiActionMetaJson(pov)
       case "backgammon" => multiActionMetaJson(pov)
+      case "hyper"      => multiActionMetaJson(pov)
       case "nackgammon" => multiActionMetaJson(pov)
       case _            => None
     }
