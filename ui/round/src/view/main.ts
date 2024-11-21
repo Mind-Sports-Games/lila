@@ -94,8 +94,16 @@ function renderPlayerScore(
     );
     return h('div.game-score.game-score-' + position, children);
   } else if (variantKey === 'abalone') {
-    children.push(h('piece.s-piece.' + playerIndex, { attrs: { 'data-score': score } }));
-    return h('div.game-score.game-score-' + position, children);
+    const opp = playerIndex === 'p1' ? 'p2' : 'p1';
+
+    children.push(h(`piece.${score > 0 ? 's-piece' : 'hole-piece'}.slot-top.${opp}`));
+    children.push(h(`piece.${score > 1 ? 's-piece' : 'hole-piece'}.slot-mid-left.${opp}`));
+    children.push(h(`piece.${score > 2 ? 's-piece' : 'hole-piece'}.slot-mid-right.${opp}`));
+    children.push(h(`piece.${score > 3 ? 's-piece' : 'hole-piece'}.slot-bot-left.${opp}`));
+    children.push(h(`piece.${score > 4 ? 's-piece' : 'hole-piece'}.slot-bot-mid.${opp}`));
+    children.push(h(`piece.${score > 5 ? 's-piece' : 'hole-piece'}.slot-bot-right.${opp}`));
+
+    return h('div.game-score.game-score-' + position, { attrs: { 'data-score': score } }, children);
   } else {
     children.push(h('piece.p-piece.' + playerIndex, { attrs: { 'data-score': score } }));
     return h('div.game-score.game-score-' + position, children);

@@ -6,8 +6,7 @@ $go-variants: ('go9x9', 'go13x13', 'go19x19');
 .variant-flipello10 .game-score,
 .variant-go9x9 .game-score,
 .variant-go13x13 .game-score,
-.variant-go19x19 .game-score,
-.variant-abalone .game-score {
+.variant-go19x19 .game-score {
   piece::after {
     @extend %active, %box-radius;
 
@@ -20,6 +19,19 @@ $go-variants: ('go9x9', 'go13x13', 'go19x19');
     font-weight: bold;
     font-size: 1.5em;
   }
+}
+
+.variant-abalone .game-score::after {
+  @extend %active, %box-radius;
+
+  content: attr(data-score);
+  top: 0;
+  right: 0;
+  position: absolute;
+  line-height: 0.9em;
+  padding: 3px 0.3em;
+  font-weight: bold;
+  font-size: 1.5em;
 }
 
 .variant-go9x9 .game-score.captures,
@@ -146,6 +158,11 @@ body.backgammon-contemporary .variant-backgammon .game-score {
   }
 }
 
+body.abalone-newspaper .variant-abalone .game-score piece.hole-piece {
+  background: url(../images/board/abalone/newspaper_hole.png);
+  background-size: cover;
+}
+
 @include breakpoint($mq-col1) {
   .game-score-names {
     font-size: 1.2em;
@@ -154,6 +171,97 @@ body.backgammon-contemporary .variant-backgammon .game-score {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+  }
+}
+
+//additional piece spaces for abalone (triangle)
+.variant-abalone .game-score {
+  piece {
+    position: absolute;
+    &.slot-top {
+      &.s-piece{
+        width: 33% !important;
+        height: 33% !important;
+        left:33%;
+        top:0;
+      }
+      &.hole-piece{
+        width: 20% !important;
+        height: 20% !important;
+        left: 40%;
+        top:6.5%;
+      }
+    }
+    &.slot-mid-left {
+      &.s-piece{
+        width: 33% !important;
+        height: 33% !important;
+        top:33%;
+        left:17%;
+      }
+      &.hole-piece{
+        width: 20% !important;
+        height: 20% !important;
+        top:39.5%;
+        left:23.5%;
+      }
+    }
+    &.slot-mid-right {
+      &.s-piece{
+        width: 33% !important;
+        height: 33% !important;
+        top:33%;
+        left:50%;
+      }
+      &.hole-piece{
+        width: 20% !important;
+        height: 20% !important;
+        top:39.5%;
+        left:56.5%;
+      }
+    }
+    &.slot-bot-left {
+      &.s-piece{
+        width: 33% !important;
+        height: 33% !important;
+        top:67%;
+        left:0;
+      }
+      &.hole-piece{
+        width: 20% !important;
+        height: 20% !important;
+        top:73.5%;
+        left:6.5%;
+      }
+    }
+    &.slot-bot-right {
+      &.s-piece{
+        width: 33% !important;
+        height: 33% !important;
+        top:67%;
+        left:67%;
+      }
+      &.hole-piece{
+        width: 20% !important;
+        height: 20% !important;
+        top:73.5%;
+        left:73.5%;
+      }
+    }
+    &.slot-bot-mid {
+      &.s-piece{
+        width: 33% !important;
+        height: 33% !important;
+        top:67%;
+        left:33%;
+      }
+      &.hole-piece{
+        width: 20% !important;
+        height: 20% !important;
+        top:73.5%;
+        left: 40%;
+      }
+    }    
   }
 }
 
