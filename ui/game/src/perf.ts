@@ -46,6 +46,6 @@ export const perf = {
     backgammon: '',
     hyper: '',
     nackgammon: '',
-    abalone: '', //TODO abalone replace when known
+    abalone: '\ue927',
   },
 };
