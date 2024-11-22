@@ -16,7 +16,7 @@ export function fixCrazySan(san: San): San {
 
 export type Dests = Map<Key, Key[]>;
 
-export type NotationStyle = 'uci' | 'san' | 'usi' | 'wxf' | 'dpo' | 'dpg' | 'man' | 'bkg';
+export type NotationStyle = 'uci' | 'san' | 'usi' | 'wxf' | 'dpo' | 'dpg' | 'man' | 'bkg' | 'abl';
 
 export function readDests(lines?: string): Dests | null {
   if (typeof lines === 'undefined') return null;
@@ -62,7 +62,6 @@ export function variantUsesUCINotation(key: VariantKey | DraughtsVariantKey) {
     'amazons',
     'breakthroughtroyka',
     'minibreakthroughtroyka',
-    'abalone', //TODO work out what notation we want for abalone
   ].includes(key);
 }
 
@@ -90,6 +89,10 @@ export function variantUsesBackgammonNotation(key: VariantKey | DraughtsVariantK
   return ['backgammon', 'hyper', 'nackgammon'].includes(key);
 }
 
+export function variantUsesAbaloneNotation(key: VariantKey | DraughtsVariantKey) {
+  return ['abalone'].includes(key);
+}
+
 export function notationStyle(key: VariantKey | DraughtsVariantKey): NotationStyle {
   return variantUsesUCINotation(key)
     ? 'uci'
@@ -105,7 +108,9 @@ export function notationStyle(key: VariantKey | DraughtsVariantKey): NotationSty
               ? 'man'
               : variantUsesBackgammonNotation(key)
                 ? 'bkg'
-                : 'san';
+                : variantUsesAbaloneNotation(key)
+                  ? 'abl'
+                  : 'san';
 }
 
 interface Piece {
