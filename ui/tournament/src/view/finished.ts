@@ -24,7 +24,7 @@ function stats(data: TournamentData, trans: Trans): VNode {
   const tableData = [
     !data.medley ? numberRow(noarg('averageElo'), data.stats.averageRating, 'raw') : null,
     numberRow(noarg('gamesPlayed'), data.stats.games),
-    numberRow(noarg('movesPlayed'), data.stats.moves),
+    numberRow(noarg('turnsPlayed'), data.stats.moves),
     numberRow(
       trans('playerIndexWins', data.p1Name ? data.p1Name : 'P1'),
       [data.stats.p1Wins, data.stats.games],

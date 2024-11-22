@@ -139,7 +139,6 @@ export default class Setup {
   private ratedTimeModes = ['1', '3', '4', '5'];
 
   prepareForm = ($modal: Cash) => {
-    let fenOk = false;
     const self = this,
       $form = $modal.find('form'),
       $timeModeSelect = $form.find('#sf_timeMode'),
@@ -201,9 +200,9 @@ export default class Setup {
         const timeOk = timeMode !== '1' || limit > 0 || inc > 0,
           ratedOk = typ !== 'hook' || !rated || timeMode !== '0',
           aiOk = typ !== 'ai' || variantId[1] !== '3' || limit >= 1,
-          posOk = variantId[0] !== '0' || variantId[1] !== '3' || fenOk,
+          fenOk = variantId[0] !== '0' || variantId[1] !== '3' || $fenInput.hasClass('success'),
           botOK = !vsPSBot || psBotCanPlay(user, limit, inc, variantId);
-        if (byoOk && delayOk && timeOk && ratedOk && aiOk && posOk && botOK) {
+        if (byoOk && delayOk && timeOk && ratedOk && aiOk && fenOk && botOK) {
           $submits.toggleClass('nope', false);
           $submits.filter(':not(.random)').toggle(!rated || !randomPlayerIndexVariants.includes(variantId[1]));
         } else $submits.toggleClass('nope', true);
@@ -761,21 +760,18 @@ export default class Setup {
             $fenPosition.find('a.board_editor').each(function (this: HTMLAnchorElement) {
               this.href = this.href.replace(/editor\/.+$/, 'editor/' + fen);
             });
-            $submits.removeClass('nope');
-            fenOk = true;
+            toggleButtons();
             playstrategy.contentLoaded();
           },
           _ => {
             $fenInput.addClass('failure');
             $fenPosition.find('.preview').html('');
-            $submits.addClass('nope');
-            fenOk = false;
+            toggleButtons();
           },
         );
       }
     }, 200);
     $fenInput.on('keyup', validateFen);
-    validateFen();
 
     if (forceFromPosition) {
       switch (($variantSelect.val() as string).split('_')[0]) {
@@ -807,6 +803,7 @@ export default class Setup {
         $goConfig.toggle(variantId[0] == '9');
         if (isFen) {
           $casual.trigger('click');
+          validateFen();
           requestAnimationFrame(() => document.body.dispatchEvent(new Event(ground)));
         }
         showRating();

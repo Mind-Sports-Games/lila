@@ -128,11 +128,11 @@ final class JsonView(
             "lib"                    -> full.option(tour.variant.gameLogic.id),
             "variant"                -> full.option(variantJson(tour.variant)),
             "p1Name" -> full.option(
-              if (tour.isMedley) trans.p1.txt()
+              if (tour.isMedley || tour.variant.recalcStartPlayerForStats) trans.p1.txt()
               else tour.variant.playerNames(P1)
             ),
             "p2Name" -> full.option(
-              if (tour.isMedley) trans.p2.txt()
+              if (tour.isMedley || tour.variant.recalcStartPlayerForStats) trans.p2.txt()
               else tour.variant.playerNames(P2)
             )
           )

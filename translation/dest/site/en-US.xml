@@ -488,6 +488,7 @@ computer analysis, game chat and shareable URL.</string>
   <string name="performance">Performance</string>
   <string name="tournamentComplete">Tournament complete</string>
   <string name="movesPlayed">Moves played</string>
+  <string name="turnsPlayed">Turns played</string>
   <string name="playerIndexWins">%s wins</string>
   <string name="whiteWins">White wins</string>
   <string name="blackWins">Black wins</string>

@@ -51,7 +51,8 @@
   .message {
     display: flex;
     align-items: center;
-    margin: 1em;
+    margin-left: 1em;
+    margin-right: 1em;
 
     &::before {
       color: $c-font-dim;

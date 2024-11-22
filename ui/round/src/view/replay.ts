@@ -250,11 +250,11 @@ function renderButtons(ctrl: RoundController) {
 }
 
 function initMessage(d: RoundData, ply: number, trans: Trans) {
-  return game.playable(d) && d.game.turns === 0 && ply === 0 && !d.player.spectator
+  return game.isPlayerPlaying(d) && !game.playerHasPlayedTurn(d) && ply == ply
     ? h('div.message', util.justIcon(''), [
         h('div', [
           trans('youPlayThePlayerIndexPieces', d.player.playerName),
-          ...(d.player.playerIndex === 'p1' ? [h('br'), h('strong', trans.noarg('itsYourTurn'))] : []),
+          ...(game.isPlayerTurn(d) ? [h('br'), h('strong', trans.noarg('itsYourTurn'))] : []),
         ]),
       ])
     : null;
@@ -308,15 +308,15 @@ export function render(ctrl: RoundController): VNode | undefined {
     ? undefined
     : h(rmovesTag, [
         renderButtons(ctrl),
-        initMessage(d, ctrl.ply, ctrl.trans) ||
-          (moves
-            ? isCol1()
-              ? h('div.col1-moves', [
-                  col1Button(ctrl, -1, 'Y', ctrl.ply == round.firstPly(d)),
-                  moves,
-                  col1Button(ctrl, 1, 'X', ctrl.ply == round.lastPly(d)),
-                ])
-              : moves
-            : renderResult(ctrl)),
+        moves
+          ? isCol1()
+            ? h('div.col1-moves', [
+                col1Button(ctrl, -1, 'Y', ctrl.ply == round.firstPly(d)),
+                moves,
+                col1Button(ctrl, 1, 'X', ctrl.ply == round.lastPly(d)),
+              ])
+            : moves
+          : renderResult(ctrl),
+        initMessage(d, ctrl.ply, ctrl.trans),
       ]);
 }

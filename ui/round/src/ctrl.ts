@@ -713,24 +713,15 @@ export default class RoundController {
     d.game.threefold = !!o.threefold;
     d.game.perpetualWarning = !!o.perpetualWarning;
 
-    //backgammon initial Endturn isn't in the starting json data so add to step before p2 roll is applied
+    //backgammon need to update initial turnCount if we switch starting player on initial dice roll
     if (
       ['backgammon', 'hyper', 'nackgammon'].includes(d.game.variant.key) &&
       this.lastPly() === 0 &&
       o.fen.includes('b')
     ) {
-      const initialStep = round.lastStep(d);
-      const step = {
-        ply: this.lastPly() + 1,
-        turnCount: initialStep.turnCount + 1,
-        fen: initialStep.fen.replace('w', 'b'),
-        san: initialStep.san,
-        uci: 'endturn',
-        check: initialStep.check,
-        crazy: initialStep.crazy,
-      };
-      d.steps.push(step);
-      this.ply++;
+      d.steps[0].turnCount = 1;
+      d.steps[0].ply = 1;
+      d.game.startedAtTurn = 1;
     }
 
     const step = {
