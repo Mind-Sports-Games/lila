@@ -49,11 +49,11 @@ private object ChallengeJoiner {
       .ifTrue(c.variant.fromPositionVariant || c.variant.variableInitialFen) flatMap {
       Forsyth.<<<@(c.variant.gameLogic, c.variant, _)
     }
-    val (stratGame, state) = baseState.fold(makeStratGame(c.variant) -> none[SituationPlus]) {
-      case sp @ SituationPlus(sit, _) =>
+    val (stratGame, state) = baseState.fold(makeStratGame(c.variant) -> none[SituationPlus]) { sp =>
+      {
         val game = strategygames.Game(
           lib = c.variant.gameLogic,
-          situation = sit,
+          situation = sp.situation,
           plies = sp.plies,
           turnCount = sp.turnCount,
           startedAtPly = sp.plies,
@@ -63,6 +63,7 @@ private object ChallengeJoiner {
         if (c.variant.fromPositionVariant && Forsyth.>>(c.variant.gameLogic, game).initial)
           makeStratGame(Variant.libStandard(c.variant.gameLogic)) -> none
         else game                                                 -> baseState
+      }
     }
     val pieces     = stratGame.situation.board.pieces
     val multiMatch = c.isMultiMatch && c.customStartingPosition option "multiMatch"
@@ -80,11 +81,11 @@ private object ChallengeJoiner {
       )
       .withId(c.id)
       .pipe { g =>
-        state.fold(g) { case sp @ SituationPlus(sit, _) =>
+        state.fold(g) { sp =>
           g.copy(
             stratGame = g.stratGame.copy(
               situation = g.situation.copy(
-                board = g.board.copy(history = sit.board.history)
+                board = g.board.copy(history = sp.situation.board.history)
               ),
               plies = sp.plies,
               turnCount = sp.turnCount

@@ -73,7 +73,8 @@ export function render(ctrl: AnalyseCtrl, concealOf?: ConcealOf): VNode {
 export function nodeClasses(ctx: Ctx, node: Tree.Node, path: Tree.Path): NodeClasses {
   const glyphIds = ctx.showGlyphs && node.glyphs ? node.glyphs.map(g => g.id) : [];
   return {
-    active: path === ctx.ctrl.path,
+    active:
+      path === ctx.ctrl.path || (treePath.init(ctx.ctrl.path) === path && node.playedPlayerIndex === node.playerIndex),
     'context-menu': path === ctx.ctrl.contextMenuPath,
     current: path === ctx.currentPath,
     nongame:

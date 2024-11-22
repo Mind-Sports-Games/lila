@@ -314,6 +314,7 @@ declare type VariantKey =
   | 'go13x13'
   | 'go19x19'
   | 'backgammon'
+  | 'hyper'
   | 'nackgammon';
 
 declare type DraughtsVariantKey =
@@ -377,6 +378,7 @@ declare type Perf =
   | 'go13x13'
   | 'go19x19'
   | 'backgammon'
+  | 'hyper'
   | 'nackgammon';
 
 //declare type Color = 'white' | 'black';
@@ -592,6 +594,9 @@ declare namespace Tree {
   export interface Node {
     id: string;
     ply: Ply;
+    turnCount: number;
+    playedPlayerIndex: PlayerIndex;
+    playerIndex: PlayerIndex;
     uci?: Uci;
     fen: Fen;
     children: Node[];

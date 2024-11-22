@@ -665,7 +665,8 @@ backgammon_themes.map { |theme|
       end
       initial_css = '.backgammon.is2d ' + role + '.' + (color == 'w' ? 'p1' : 'p2') + pos_class + 
        ', ' + '.is2d .variant-backgammon ' + role + '.' + (color == 'w' ? 'p1' : 'p2') + pos_class + 
-       ', ' + '.is2d .variant-nackgammon ' + role + '.' + (color == 'w' ? 'p1' : 'p2') + pos_class
+       ', ' + '.is2d .variant-nackgammon ' + role + '.' + (color == 'w' ? 'p1' : 'p2') + pos_class +
+       ', ' + '.is2d .variant-hyper ' + role + '.' + (color == 'w' ? 'p1' : 'p2') + pos_class
       file = source_dir + 'backgammon/' + name + '/' + color + image_name + image_pos + '.' + ext
       # avoid unwanted duplication
       unless direction == 'bottom' && (backgammon_extra_names.include?(image_name) || backgammon_dice_names.include?(image_name))
@@ -692,7 +693,8 @@ backgammon_themes.map { |theme|
     pos_class = ' cg-button'
       initial_css = '.backgammon.is2d ' + 'cg-buttons.' + (color == 'w' ? 'p1' : 'p2') + pos_class + 
       ', ' + '.is2d .variant-backgammon ' + 'cg-buttons.' + (color == 'w' ? 'p1' : 'p2') + pos_class + 
-      ', ' + '.is2d .variant-nackgammon ' + 'cg-buttons.' + (color == 'w' ? 'p1' : 'p2') + pos_class
+      ', ' + '.is2d .variant-nackgammon ' + 'cg-buttons.' + (color == 'w' ? 'p1' : 'p2') + pos_class +
+      ', ' + '.is2d .variant-hyper ' + 'cg-buttons.' + (color == 'w' ? 'p1' : 'p2') + pos_class
         initial_css + ' {' + "background: " + bg_colour + ";" + 
         " color: " + border_colour + ";" +
         " border: " + border_colour + ";" + 
@@ -722,7 +724,8 @@ backgammon_themes.map { |theme|
         end
         initial_css = '.backgammon.is2d ' + role + '.' + (color == 'w' ? 'p1' : 'p2') + pos_class +
          ', ' + '.is2d .variant-backgammon ' + role + '.' + (color == 'w' ? 'p1' : 'p2') + pos_class +
-         ', ' + '.is2d .variant-nackgammon ' + role + '.' + (color == 'w' ? 'p1' : 'p2') + pos_class
+         ', ' + '.is2d .variant-nackgammon ' + role + '.' + (color == 'w' ? 'p1' : 'p2') + pos_class + 
+         ', ' + '.is2d .variant-hyper ' + role + '.' + (color == 'w' ? 'p1' : 'p2') + pos_class
         # avoid unwanted duplication
           unless direction == 'bottom' && (backgammon_extra_names.include?(image_name) || backgammon_dice_names.include?(image_name))
             initial_css + ' {' +
@@ -745,7 +748,8 @@ backgammon_themes.map { |theme|
     pos_class = ' cg-button'
       initial_css = '.backgammon.is2d ' + 'cg-buttons.' + (color == 'w' ? 'p1' : 'p2') + pos_class + 
       ', ' + '.is2d .variant-backgammon ' + 'cg-buttons.' + (color == 'w' ? 'p1' : 'p2') + pos_class + 
-      ', ' + '.is2d .variant-nackgammon ' + 'cg-buttons.' + (color == 'w' ? 'p1' : 'p2') + pos_class
+      ', ' + '.is2d .variant-nackgammon ' + 'cg-buttons.' + (color == 'w' ? 'p1' : 'p2') + pos_class +
+      ', ' + '.is2d .variant-hyper ' + 'cg-buttons.' + (color == 'w' ? 'p1' : 'p2') + pos_class
         initial_css + ' {' + "background: " + bg_colour + ";" + 
         " color: " + border_colour + ";" +
         " border: " + border_colour + ";" + 

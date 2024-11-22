@@ -61,6 +61,8 @@ object TreeBuilder {
         }.toMap)
         val root = Root(
           ply = init.plies,
+          turnCount = init.turnCount,
+          playedPlayerIndex = if (init.board.history.currentTurn.nonEmpty) init.player else !init.player,
           variant = game.variant,
           fen = fen,
           check = init.situation.check,
@@ -82,6 +84,8 @@ object TreeBuilder {
           val branch = Branch(
             id = UciCharPair(g.situation.board.variant.gameLogic, m.uci),
             ply = g.plies,
+            turnCount = g.turnCount,
+            playedPlayerIndex = if (g.board.history.currentTurn.nonEmpty) g.player else !g.player,
             variant = g.situation.board.variant,
             move = m,
             fen = fen,
@@ -153,6 +157,8 @@ object TreeBuilder {
       Branch(
         id = UciCharPair(variant.gameLogic, m.uci),
         ply = g.plies,
+        turnCount = g.turnCount,
+        playedPlayerIndex = if (g.board.history.currentTurn.nonEmpty) g.player else !g.player,
         variant = variant,
         move = m,
         fen = fen,

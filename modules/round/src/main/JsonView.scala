@@ -359,7 +359,6 @@ final class JsonView(
           .add("highlight" -> pref.highlight)
           .add("destination" -> (pref.destination && !pref.isBlindfold))
           .add("playerTurnIndicator" -> false),
-        //TODO multiaction we think this correct to use plies (not turnCount) but analysis needs testing
         "path"             -> pov.game.plies,
         "gameRecordFormat" -> pov.game.gameRecordFormat,
         "userAnalysis"     -> true
@@ -466,6 +465,7 @@ final class JsonView(
       case "monster"    => multiActionMetaJson(pov)
       case "amazons"    => multiActionMetaJson(pov)
       case "backgammon" => multiActionMetaJson(pov)
+      case "hyper"      => multiActionMetaJson(pov)
       case "nackgammon" => multiActionMetaJson(pov)
       case _            => None
     }

@@ -153,7 +153,7 @@ $oware-variants: ('oware'); // must use same board
 
 $togyzkumalak-variants: ('togyzkumalak'); // must use same board
 
-$backgammon-variants: ('backgammon', 'nackgammon'); // must use same board
+$backgammon-variants: ('backgammon', 'hyper', 'nackgammon'); // must use same board
 
 @each $gameFamily in ('chess', 'loa') {
   @each $color, $file in $chess-board-files {

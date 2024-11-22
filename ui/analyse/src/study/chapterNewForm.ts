@@ -2,7 +2,7 @@ import { h, VNode } from 'snabbdom';
 import { defined, prop, Prop } from 'common';
 import { storedProp, StoredProp } from 'common/storage';
 import * as xhr from 'common/xhr';
-import { allowAnalysisForVariant, isChess } from 'common/analysis';
+import { allowAnalysisForVariant, isChess, allowGameBookStudyForVariant } from 'common/analysis';
 import { bind, bindSubmit, spinner, option, onInsert } from '../util';
 import { variants as xhrVariants, importPgn } from './studyXhr';
 import * as modal from '../modal';
@@ -19,7 +19,12 @@ export const modeChoices = [
   ['gamebook', 'interactiveLesson'],
 ];
 
-export const nonBrowserAnalysisModeChoices = [['normal', 'normalAnalysis']];
+export const nonBrowserAnalysisModeChoices = [
+  ['normal', 'normalAnalysis'],
+  ['gamebook', 'interactiveLesson'],
+];
+
+export const onlyNormalAnalysisModeChoices = [['normal', 'normalAnalysis']];
 
 export const fieldValue = (e: Event, id: string) =>
   ((e.target as HTMLElement).querySelector('#chapter-' + id) as HTMLInputElement)?.value;
@@ -363,9 +368,12 @@ export function view(ctrl: StudyChapterNewFormCtrl): VNode {
             ),
             h(
               'select#chapter-mode.form-control',
-              (isChess(ctrl.vm.variantKey() ?? 'standard') ? modeChoices : nonBrowserAnalysisModeChoices).map(c =>
-                option(c[0], mode, noarg(c[1])),
-              ),
+              (isChess(ctrl.vm.variantKey() ?? 'standard')
+                ? modeChoices
+                : allowGameBookStudyForVariant(ctrl.vm.variantKey() ?? 'standard')
+                  ? nonBrowserAnalysisModeChoices
+                  : onlyNormalAnalysisModeChoices
+              ).map(c => option(c[0], mode, noarg(c[1]))),
             ),
           ]),
           modal.button(noarg('createChapter')),

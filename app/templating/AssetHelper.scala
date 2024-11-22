@@ -102,7 +102,7 @@ trait AssetHelper { self: I18nHelper with SecurityHelper =>
 
   def draughtsgroundTag   = jsAtCJS("javascripts/vendor/draughtsground.min.js")
   def fingerprintTag      = staticJsAtESM("fipr.js", "javascripts/")
-  def tagifyTag           = staticJsAtESM("tagify.min.js", "vendor/tagify/")
+  def tagifyTag           = staticJsAtESM("tagify.js", "vendor/tagify/")
   def highchartsLatestTag = staticJsAtESM("highcharts.js", "vendor/highcharts-4.2.5/")
   def highchartsMoreTag   = staticJsAtESM("highcharts-more.js", "vendor/highcharts-4.2.5/")
 

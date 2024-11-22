@@ -100,7 +100,7 @@ export function formView(ctrl: TopicsCtrl, userId?: string): VNode {
 
 function setupTagify(elm: HTMLInputElement | HTMLTextAreaElement, userId?: string) {
   playstrategy.loadHashedCssPath('tagify');
-  playstrategy.loadScriptCJS('vendor/tagify/tagify.min.js').then(() => {
+  playstrategy.loadScriptCJS('vendor/tagify/tagify.js').then(() => {
     tagify = new window.Tagify(elm, {
       pattern: /.{2,}/,
       maxTags: 30,

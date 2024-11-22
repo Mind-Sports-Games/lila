@@ -131,7 +131,8 @@ case class Game(
 
   def fullIdOf(playerIndex: PlayerIndex): String = s"$id${player(playerIndex).id}"
 
-  def swapPlayersOnRematch: Boolean = variant.key != "backgammon" && variant.key != "nackgammon"
+  def swapPlayersOnRematch: Boolean =
+    variant.key != "backgammon" && variant.key != "hyper" && variant.key != "nackgammon"
 
   def fromHandicappedTournament = metadata.fromHandicappedTournament
   def tournamentId              = metadata.tournamentId
@@ -164,7 +165,6 @@ case class Game(
       case _              => l
     }
 
-  //TODO multiaction this does not produce correct times for amazons
   def plyTimes(playerIndex: PlayerIndex): Option[List[Centis]] = {
     for {
       clk <- clock
@@ -188,6 +188,7 @@ case class Game(
     } yield plyTimes
   } orElse binaryPlyTimes.map { binary =>
     // Thibault TODO: make plyTime.read return List after writes are disabled.
+    //TODO fix for multiaction, when does this get called?
     val base = BinaryFormat.plyTime.read(binary, playedPlies)
     val mts  = if (playerIndex == startPlayerIndex) base else base.drop(1)
     everyOther(mts.toList)
@@ -197,12 +198,21 @@ case class Game(
     for {
       a <- plyTimes(startPlayerIndex)
       b <- plyTimes(!startPlayerIndex)
-    } yield Sequence.interleave(a, b)
+    } yield {
+      val who =
+        actionStrs.zipWithIndex.flatMap { case (t, i) =>
+          t.map(_ => { if (i % 2 == 0) "a" else "b" })
+        }
+      Game.combinePlyTimes(a, b, who, Vector.empty)
+    }
 
-  // TODO: I admit I haven't tested this change as much as I would have liked
-  //       We should probably test it.
-  def bothClockStates: Option[Vector[Centis]] =
-    clockHistory.map(_.bothClockStates(startPlayerIndex))
+  def bothClockStates: Option[Vector[Centis]] = {
+    val who: Vector[String] =
+      actionStrs.zipWithIndex.flatMap { case (t, i) =>
+        t.map(_ => { if (i % 2 == 0) "a" else "b" })
+      }
+    clockHistory.map(_.bothClockStates(startPlayerIndex, who))
+  }
 
   def draughtsActionStrsConcat(fullCaptures: Boolean = false, dropGhosts: Boolean = false): ActionStrs =
     stratGame match {
@@ -750,7 +760,9 @@ case class Game(
           case Rapid       => 30
           case _           => 35
         }
-      if (variant.key == "chess960" || variant.key == "backgammon" || variant.key == "nackgammon") base * 2
+      if (
+        variant.key == "chess960" || variant.key == "backgammon" || variant.key == "hyper" || variant.key == "nackgammon"
+      ) base * 2
       else if (isTournament && (variant.draughts64Variant) && metadata.simulPairing.isDefined) base + 10
       else base
     }
@@ -959,6 +971,18 @@ object Game {
         c.limitSeconds > 0 || c.graceSeconds > 1
       }
     }
+
+  def combinePlyTimes(
+      a: List[Centis],
+      b: List[Centis],
+      who: Vector[String],
+      output: Vector[Centis]
+  ): Vector[Centis] = {
+    if (who.size == 0 || (who(0) == "a" & a.size == 0) || (who(0) == "b" & b.size == 0)) output
+    else if (who(0) == "a") combinePlyTimes(a.drop(1), b, who.drop(1), output ++ a.take(1))
+    else if (who(0) == "b") combinePlyTimes(a, b.drop(1), who.drop(1), output ++ b.take(1))
+    else output
+  }
 
   val gameIdSize   = 8
   val playerIdSize = 4
@@ -1207,7 +1231,7 @@ sealed trait ClockHistory {
   ): List[Centis]
   def lastX(playerIndex: PlayerIndex, plies: Int): Option[Centis]
   def size: Int
-  def bothClockStates(firstMoveBy: PlayerIndex): Vector[Centis]
+  def bothClockStates(firstMoveBy: PlayerIndex, who: Vector[String]): Vector[Centis]
 }
 
 case class FischerClockHistory(
@@ -1267,11 +1291,11 @@ case class FischerClockHistory(
   }
 
   // first state is of the playerIndex that moved first.
-  override def bothClockStates(firstMoveBy: PlayerIndex): Vector[Centis] =
-    Sequence.interleave(
-      firstMoveBy.fold(p1, p2),
-      firstMoveBy.fold(p2, p1)
-    )
+  override def bothClockStates(firstMoveBy: PlayerIndex, who: Vector[String]): Vector[Centis] = {
+    val a = firstMoveBy.fold(p1, p2)
+    val b = firstMoveBy.fold(p2, p1)
+    Game.combinePlyTimes(a.toList, b.toList, who, Vector.empty)
+  }
 }
 
 case class DelayClockHistory(
@@ -1329,11 +1353,11 @@ case class DelayClockHistory(
   def size = p1.size + p2.size
 
   // first state is of the playerIndex that moved first.
-  override def bothClockStates(firstMoveBy: PlayerIndex): Vector[Centis] =
-    Sequence.interleave(
-      firstMoveBy.fold(p1, p2),
-      firstMoveBy.fold(p2, p1)
-    )
+  override def bothClockStates(firstMoveBy: PlayerIndex, who: Vector[String]): Vector[Centis] = {
+    val a = firstMoveBy.fold(p1, p2)
+    val b = firstMoveBy.fold(p2, p1)
+    Game.combinePlyTimes(a.toList, b.toList, who, Vector.empty)
+  }
 }
 
 case class ByoyomiClockHistory(
@@ -1447,12 +1471,11 @@ case class ByoyomiClockHistory(
   }
 
   // first state is of the playerIndex that moved first.
-  override def bothClockStates(firstMoveBy: PlayerIndex): Vector[Centis] = {
+  override def bothClockStates(firstMoveBy: PlayerIndex, who: Vector[String]): Vector[Centis] = {
     val p1Times = padWithByo(PlayerIndex.P1, byoyomi)
     val p2Times = padWithByo(PlayerIndex.P2, byoyomi)
-    Sequence.interleave(
-      firstMoveBy.fold(p1Times, p2Times),
-      firstMoveBy.fold(p2Times, p1Times)
-    )
+    val a       = firstMoveBy.fold(p1Times, p2Times)
+    val b       = firstMoveBy.fold(p2Times, p1Times)
+    Game.combinePlyTimes(a.toList, b.toList, who, Vector.empty)
   }
 }

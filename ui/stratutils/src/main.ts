@@ -80,7 +80,7 @@ export function variantUsesMancalaNotation(key: VariantKey | DraughtsVariantKey)
 }
 
 export function variantUsesBackgammonNotation(key: VariantKey | DraughtsVariantKey) {
-  return ['backgammon', 'nackgammon'].includes(key);
+  return ['backgammon', 'hyper', 'nackgammon'].includes(key);
 }
 
 export function notationStyle(key: VariantKey | DraughtsVariantKey): NotationStyle {
@@ -118,6 +118,7 @@ export function onlyDropsVariantPiece(variant: VariantKey, turnPlayerIndex: 'p1'
     case 'go19x19':
       return { playerIndex: turnPlayerIndex, role: 's-piece' };
     case 'nackgammon':
+    case 'hyper':
     case 'backgammon':
       return { playerIndex: turnPlayerIndex, role: 's-piece' }; //needs to match role from readdropsbyrole and SG role
     default:
@@ -135,6 +136,7 @@ const noFishnetVariants: VariantKey[] = [
   'go13x13',
   'go19x19',
   'backgammon',
+  'hyper',
   'nackgammon',
 ];
 export function allowFishnetForVariant(variant: VariantKey) {
@@ -142,7 +144,7 @@ export function allowFishnetForVariant(variant: VariantKey) {
 }
 
 export function readDice(fen: string, variant: VariantKey, canEndTurn?: boolean, isDescending?: boolean): cg.Dice[] {
-  if (!['backgammon', 'nackgammon'].includes(variant)) return [];
+  if (!['backgammon', 'hyper', 'nackgammon'].includes(variant)) return [];
   if (fen.split(' ').length < 2) return [];
   const unusedDice = fen
     .split(' ')[1]
@@ -152,7 +154,6 @@ export function readDice(fen: string, variant: VariantKey, canEndTurn?: boolean,
   const usedDice = fen.split(' ')[2].replace('-', '').split('/');
   const dice = [];
   for (const d of unusedDice) {
-    //if (+d) dice.push({ value: +d, isAvailable: !canEndTurn ?? true });
     if (+d) dice.push({ value: +d, isAvailable: !(canEndTurn ?? false) });
   }
   for (const d of usedDice) {
@@ -224,6 +225,12 @@ export const variantToRules = (v: VariantKey): Rules => {
       return 'go13x13';
     case 'go19x19':
       return 'go19x19';
+    case 'backgammon':
+      return 'backgammon';
+    case 'hyper':
+      return 'hyper';
+    case 'nackgammon':
+      return 'nackgammon';
     default:
       return 'chess';
   }

@@ -13,7 +13,8 @@ import lila.i18n.VariantKeys
 final class LobbyApi(
     lightUserApi: lila.user.LightUserApi,
     seekApi: SeekApi,
-    gameProxyRepo: lila.round.GameProxyRepo
+    gameProxyRepo: lila.round.GameProxyRepo,
+    gameJson: lila.game.JsonView
 )(implicit ec: scala.concurrent.ExecutionContext) {
 
   def apply(implicit ctx: Context): Fu[(JsObject, List[Pov])] =
@@ -33,50 +34,5 @@ final class LobbyApi(
         }
       }
 
-  def boardSize(variant: Variant) = variant match {
-    case Variant.Draughts(v) =>
-      Some(
-        Json.obj(
-          "size" -> Json.arr(v.boardSize.width, v.boardSize.height),
-          "key"  -> v.boardSize.key
-        )
-      )
-    case _ => None
-  }
-
-  def nowPlaying(pov: Pov) =
-    Json
-      .obj(
-        "fullId"      -> pov.fullId,
-        "gameId"      -> pov.gameId,
-        "fen"         -> Forsyth.exportBoard(pov.game.variant.gameLogic, pov.game.board),
-        "playerIndex" -> (if (pov.game.variant.key == "racingKings") P1 else pov.playerIndex).name,
-        "lastMove"    -> ~pov.game.lastActionKeys,
-        "variant" -> Json.obj(
-          "gameLogic" -> Json.obj(
-            "id"   -> pov.game.variant.gameLogic.id,
-            "name" -> pov.game.variant.gameLogic.name
-          ),
-          "gameFamily" -> pov.game.variant.gameFamily.key,
-          "key"        -> pov.game.variant.key,
-          "name"       -> VariantKeys.variantName(pov.game.variant),
-          "boardSize"  -> boardSize(pov.game.variant)
-        ),
-        "speed"    -> pov.game.speed.key,
-        "perf"     -> lila.game.PerfPicker.key(pov.game),
-        "rated"    -> pov.game.rated,
-        "hasMoved" -> pov.hasMoved,
-        "opponent" -> Json
-          .obj(
-            "id" -> pov.opponent.userId,
-            "username" -> lila.game.Namer
-              .playerTextBlocking(pov.opponent, withRating = false)(lightUserApi.sync)
-          )
-          .add("rating" -> pov.opponent.rating)
-          .add("ai" -> pov.opponent.aiLevel),
-        "isMyTurn" -> pov.isMyTurn
-      )
-      .add("secondsLeft" -> pov.remainingSeconds)
-      .add("tournamentId" -> pov.game.tournamentId)
-      .add("swissId" -> pov.game.tournamentId)
+  def nowPlaying(pov: Pov) = gameJson.ownerPreview(pov)(lightUserApi.sync)
 }

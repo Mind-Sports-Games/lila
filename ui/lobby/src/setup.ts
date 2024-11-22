@@ -442,6 +442,9 @@ export default class Setup {
             case '2':
               key = 'nackgammon';
               break;
+            case '4':
+              key = 'hyper';
+              break;
           }
           break;
       }

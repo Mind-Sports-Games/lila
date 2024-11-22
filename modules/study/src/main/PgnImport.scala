@@ -37,6 +37,10 @@ object PgnImport {
           case (shapes, _, comments) =>
             val root = Node.Root(
               ply = replay.setup.plies,
+              turnCount = replay.setup.turnCount,
+              playedPlayerIndex =
+                if (replay.setup.board.history.currentTurn.nonEmpty) replay.setup.player
+                else !replay.setup.player,
               variant = game.variant,
               fen = initialFen.getOrElse(game.variant.initialFen),
               check = replay.setup.situation.check,
@@ -141,6 +145,9 @@ object PgnImport {
                   Node(
                     id = UciCharPair(prev.situation.gameLogic, uci),
                     ply = game.plies,
+                    turnCount = game.turnCount,
+                    playedPlayerIndex =
+                      if (game.board.history.currentTurn.nonEmpty) game.player else !game.player,
                     variant = variant,
                     move = Uci.WithSan(game.situation.gameLogic, uci, sanStr),
                     fen = Forsyth.>>(game.situation.gameLogic, game),

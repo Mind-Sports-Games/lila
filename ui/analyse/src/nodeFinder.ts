@@ -19,7 +19,7 @@ export function nextGlyphSymbol(
   for (let i = 1; i < len; i++) {
     const node = mainline[(fromIndex + i) % len];
     const found =
-      node.ply % 2 === (playerIndex === 'p1' ? 1 : 0) &&
+      node.playedPlayerIndex === playerIndex &&
       node.glyphs &&
       node.glyphs.find(function (g) {
         return g.symbol === symbol;

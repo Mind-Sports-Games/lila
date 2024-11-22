@@ -131,6 +131,7 @@ final class RankingApi(
       go13x13                <- topPerf(PerfType.orDefault("go13x13").id, nb)
       go19x19                <- topPerf(PerfType.orDefault("go19x19").id, nb)
       backgammon             <- topPerf(PerfType.orDefault("backgammon").id, nb)
+      hyper                  <- topPerf(PerfType.orDefault("hyper").id, nb)
       nackgammon             <- topPerf(PerfType.orDefault("nackgammon").id, nb)
     } yield Perfs.Leaderboards(
       ultraBullet = ultraBullet,
@@ -177,6 +178,7 @@ final class RankingApi(
       go13x13 = go13x13,
       go19x19 = go19x19,
       backgammon = backgammon,
+      hyper = hyper,
       nackgammon = nackgammon
     )
 

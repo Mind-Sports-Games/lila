@@ -47,7 +47,8 @@ object Spotlight {
         case Unique                    => playedSinceWeeks(4)
         case Monthly                   => playedSinceWeeks(8)
         case MedleyShield | Shield     => true
-        case Marathon | Yearly         => true
+        case Marathon                  => true
+        case MedleyMarathon | Yearly   => true
         case Annual | Introductory     => true
         case MSO21 | MSOGP | MSOWarmUp => true
         case ExperimentalMarathon      => false

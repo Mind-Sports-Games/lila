@@ -36,7 +36,7 @@ export function makeConfig(ctrl: RoundController): Config {
     lastMove: util.lastMove(data.onlyDropsVariant, step.uci),
     check: !!step.check,
     coordinates: data.pref.coords !== Prefs.Coords.Hidden,
-    boardScores: ['togyzkumalak', 'bestemshe', 'backgammon', 'nackgammon'].includes(data.game.variant.key),
+    boardScores: ['togyzkumalak', 'bestemshe', 'backgammon', 'hyper', 'nackgammon'].includes(data.game.variant.key),
     dice: dice,
     canUndo: data.canUndo,
     showUndoButton: playing && turnPlayerIndex == data.player.playerIndex && dice.length > 0,
@@ -44,8 +44,10 @@ export function makeConfig(ctrl: RoundController): Config {
     selectOnly: data.selectMode,
     highlight: {
       lastMove:
-        data.pref.highlight && !data.selectMode && !['backgammon', 'nackgammon'].includes(data.game.variant.key),
-      check: data.pref.highlight && !['backgammon', 'nackgammon'].includes(data.game.variant.key),
+        data.pref.highlight &&
+        !data.selectMode &&
+        !['backgammon', 'hyper', 'nackgammon'].includes(data.game.variant.key),
+      check: data.pref.highlight && !['backgammon', 'hyper', 'nackgammon'].includes(data.game.variant.key),
     },
     events: {
       move: hooks.onMove,
@@ -76,14 +78,14 @@ export function makeConfig(ctrl: RoundController): Config {
       },
     },
     animation: {
-      enabled: !['backgammon', 'nackgammon'].includes(data.game.variant.key),
+      enabled: !['backgammon', 'hyper', 'nackgammon'].includes(data.game.variant.key),
       duration: data.pref.animationDuration,
     },
     premovable: {
       enabled:
         data.pref.enablePremove &&
         !data.onlyDropsVariant &&
-        !['oware', 'togyzkumalak', 'bestemshe', 'backgammon', 'nackgammon'].includes(data.game.variant.key),
+        !['oware', 'togyzkumalak', 'bestemshe', 'backgammon', 'hyper', 'nackgammon'].includes(data.game.variant.key),
       showDests: data.pref.destination,
       castle: data.game.variant.key !== 'antichess' && data.game.variant.key !== 'noCastling',
       events: {
@@ -101,7 +103,9 @@ export function makeConfig(ctrl: RoundController): Config {
       },
     },
     dropmode: {
-      showDropDests: !['go9x9', 'go13x13', 'go19x19', 'backgammon', 'nackgammon'].includes(data.game.variant.key),
+      showDropDests: !['go9x9', 'go13x13', 'go19x19', 'backgammon', 'hyper', 'nackgammon'].includes(
+        data.game.variant.key,
+      ),
       dropDests: playing ? stratUtils.readDropsByRole(data.possibleDropsByRole) : new Map(),
       active: data.onlyDropsVariant && playing ? true : false,
       piece:
@@ -115,7 +119,7 @@ export function makeConfig(ctrl: RoundController): Config {
     draggable: {
       enabled:
         data.pref.moveEvent !== Prefs.MoveEvent.Click &&
-        !['oware', 'backgammon', 'nackgammon'].includes(data.game.variant.key),
+        !['oware', 'backgammon', 'hyper', 'nackgammon'].includes(data.game.variant.key),
       showGhost: data.pref.highlight,
     },
     selectable: {
@@ -150,7 +154,7 @@ export function makeConfig(ctrl: RoundController): Config {
                       ? 'https://playstrategy.org/assets/piece/go/' +
                         data.pref.pieceSet.filter(ps => ps.gameFamily === 'go')[0].name +
                         '/'
-                      : variantKey === 'backgammon' || variantKey === 'nackgammon'
+                      : variantKey === 'backgammon' || variantKey === 'hyper' || variantKey === 'nackgammon'
                         ? 'https://playstrategy.org/assets/piece/backgammon/' +
                           data.pref.pieceSet.filter(ps => ps.gameFamily === 'backgammon')[0].name +
                           '/'
@@ -169,7 +173,7 @@ export function makeConfig(ctrl: RoundController): Config {
     chess960: data.game.variant.key === 'chess960',
     onlyDropsVariant: data.onlyDropsVariant,
     singleClickMoveVariant:
-      ['togyzkumalak', 'bestemshe', 'backgammon', 'nackgammon'].includes(data.game.variant.key) ||
+      ['togyzkumalak', 'bestemshe', 'backgammon', 'hyper', 'nackgammon'].includes(data.game.variant.key) ||
       (data.game.variant.key === 'oware' && data.pref.mancalaMove),
   };
 }
@@ -230,7 +234,11 @@ export function boardOrientation(data: RoundData, flip: boolean): cg.Orientation
   if (data.game.variant.key === 'linesOfAction' || data.game.variant.key === 'scrambledEggs') {
     return flip ? oppositeOrientationForLOA(data.player.playerIndex) : orientationForLOA(data.player.playerIndex);
   }
-  if (data.game.variant.key === 'backgammon' || data.game.variant.key === 'nackgammon') {
+  if (
+    data.game.variant.key === 'backgammon' ||
+    data.game.variant.key === 'hyper' ||
+    data.game.variant.key === 'nackgammon'
+  ) {
     return flip
       ? oppositeOrientationForBackgammon(data.player.playerIndex)
       : orientationForBackgammon(data.player.playerIndex);

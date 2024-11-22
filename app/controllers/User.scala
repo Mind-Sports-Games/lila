@@ -326,6 +326,7 @@ final class User(
                   "go13x13"                -> leaderboards.go13x13,
                   "go19x19"                -> leaderboards.go19x19,
                   "backgammon"             -> leaderboards.backgammon,
+                  "hyper"                  -> leaderboards.hyper,
                   "nackgammon"             -> leaderboards.nackgammon
                 )
               )

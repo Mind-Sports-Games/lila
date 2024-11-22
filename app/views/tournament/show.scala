@@ -75,7 +75,13 @@ object show {
         ),
         div(cls := "tour__main")(div(cls := "box")),
         tour.isCreated option div(cls := "tour__faq")(
-          faq(tour.mode.rated.some, tour.handicapped, tour.isPrivate.option(tour.id))
+          faq(
+            tour.mode.rated.some,
+            Some(tour.handicapped),
+            Some(tour.statusScoring),
+            Some(tour.isMedley),
+            tour.isPrivate.option(tour.id)
+          )
         )
       )
     )

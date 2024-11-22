@@ -144,6 +144,7 @@ span.mini-game.variant-togyzkumalak.is2d {
 }
 
 .variant-nackgammon square,
+.variant-hyper square,
 .variant-backgammon square {
   width: calc(100% / 15);
   height: calc(100% * 6.5 / 15);
@@ -719,6 +720,7 @@ square {
 }
 
 .variant-nackgammon piece,
+.variant-hyper piece,
 .variant-backgammon piece {
   width: calc(100% / 15);
   height: calc(100% * 6.5 / 15);
@@ -750,6 +752,7 @@ square {
 }
 
 .variant-nackgammon,
+.variant-hyper,
 .variant-backgammon {
   &.orientation-p1 piece.pocket,
   .orientation-p1 piece.pocket {
@@ -866,6 +869,7 @@ piece {
 }
 
 .variant-nackgammon cg-helper,
+.variant-hyper cg-helper,
 .variant-backgammon cg-helper {
   width: calc(100% / 15);
   padding-bottom: calc(100% * 6.5 / 15);
@@ -950,6 +954,7 @@ cg-helper {
 }
 
 .variant-nackgammon cg-container,
+.variant-hyper cg-container,
 .variant-backgammon cg-container {
   width: calc(100% * 15);
   height: calc(100% * 15 / 6.5);
@@ -1070,6 +1075,7 @@ cg-container .cg-custom-svgs svg {
 }
 
 .variant-nackgammon,
+.variant-hyper,
 .variant-backgammon {
   &.orientation-p1,
   .orientation-p1 {
@@ -1116,6 +1122,7 @@ cg-container .cg-custom-svgs svg {
 }
 
 .variant-nackgammon,
+.variant-hyper,
 .variant-backgammon {
   &.orientation-p1,
   .orientation-p1 {

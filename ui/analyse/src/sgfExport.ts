@@ -3,24 +3,35 @@ import { initialFen } from 'stratutils';
 
 interface SgfNode {
   ply: Ply;
+  playedPlayerIndex: PlayerIndex;
   san?: San;
 }
 
-//TODO fix for multi action, requre more info in node
 function renderNodesTxt(nodes: SgfNode[]): string {
   if (!nodes[0]) return '';
   if (!nodes[0].san) nodes = nodes.slice(1);
   if (!nodes[0]) return '';
   let s = '';
   const startingColor = nodes[0].san ? nodes[0].san[1] : '';
-  const startingPly = nodes[0].ply ? nodes[0].ply % 2 : 1;
+  const startingPlayer = nodes[0].playedPlayerIndex;
   const color = startingColor === 'W' ? 'B' : 'W';
-  nodes.forEach(function (node, _) {
+  nodes.forEach(function (node, i) {
     if (node.ply === 0) return;
-    if (node.ply % 2 !== startingPly && node.san) {
-      s += ';' + color + node.san.substring(2) + '\n';
+    //check if adding an extra action of turn to the notation (amazons)
+    if (nodes[i - 1] && node.playedPlayerIndex === nodes[i - 1].playedPlayerIndex && node.san) {
+      s += node.san.substring(3);
     } else {
-      s += node.san + '\n';
+      if (node.playedPlayerIndex !== startingPlayer && node.san) {
+        s += ';' + color + node.san.substring(2);
+      } else {
+        s += node.san;
+      }
+    }
+    //multiaction support
+    if (nodes[i + 1] && node.playedPlayerIndex === nodes[i + 1].playedPlayerIndex && node.san) {
+      s = s.slice(0, -1);
+    } else {
+      s += '\n';
     }
   });
   return s.trim();
@@ -58,7 +69,11 @@ export function renderFullTxt(ctrl: AnalyseCtrl): string {
     tags.push(['SZ', g.variant.boardSize.height.toString()]);
     tags.push(['RU', 'Chinese']);
   }
-  if (['backgammon', 'nackgammon'].includes(g.variant.key)) tags.push(['GM', '6']);
+  if (['backgammon', 'hyper', 'nackgammon'].includes(g.variant.key)) tags.push(['GM', '6']);
+  if (['amazons'].includes(g.variant.key)) {
+    tags.push(['GM', '18']);
+    tags.push(['SZ', g.variant.boardSize.height.toString()]);
+  }
   if (tags.length)
     txt =
       '(;' +

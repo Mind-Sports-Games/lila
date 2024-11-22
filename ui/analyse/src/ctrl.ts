@@ -252,7 +252,11 @@ export default class AnalyseCtrl {
     if (this.data.game.variant.key === 'linesOfAction' || this.data.game.variant.key === 'scrambledEggs') {
       const c = this.data.player.playerIndex;
       return this.flipped ? oppositeOrientationForLOA(c) : orientationForLOA(c);
-    } else if (this.data.game.variant.key === 'backgammon' || this.data.game.variant.key === 'nackgammon') {
+    } else if (
+      this.data.game.variant.key === 'backgammon' ||
+      this.data.game.variant.key === 'hyper' ||
+      this.data.game.variant.key === 'nackgammon'
+    ) {
       const c = this.data.player.playerIndex;
       return this.flipped ? oppositeOrientationForBackgammon(c) : orientationForBackgammon(c);
     } else if (this.data.game.variant.key === 'racingKings') {
@@ -267,9 +271,8 @@ export default class AnalyseCtrl {
     return this.node;
   }
 
-  //TODO multiaction this is probably wrong (mixing ply and turn) want to deprecate plyPlayerIndex by having playerIndex available on the node
   turnPlayerIndex(): PlayerIndex {
-    return util.plyPlayerIndex(this.node.ply, this.data.game.variant.key);
+    return this.node.playerIndex;
   }
 
   togglePlay(delay: AutoplayDelay): void {
@@ -289,7 +292,7 @@ export default class AnalyseCtrl {
     setDropMode(cg.state, stratUtils.onlyDropsVariantPiece(cg.state.variant as VariantKey, playerIndex));
     cg.set({
       dropmode: {
-        showDropDests: !['go9x9', 'go13x13', 'go19x19', 'backgammon', 'nackgammon'].includes(
+        showDropDests: !['go9x9', 'go13x13', 'go19x19', 'backgammon', 'hyper', 'nackgammon'].includes(
           cg.state.variant as VariantKey,
         ),
         dropDests: stratUtils.readDropsByRole(this.node.dropsByRole),
@@ -529,14 +532,6 @@ export default class AnalyseCtrl {
         fen: this.node.fen,
         path: this.path,
       };
-      if (this.data.game.variant.key == 'amazons' && this.node.uci !== undefined) {
-        drop.halfMove = {
-          orig: this.node.uci.substring(0, 2),
-          dest: this.node.uci.substring(2, 4),
-        };
-        drop.fen = this.tree.parentNode(this.path).fen;
-        // Add in
-      }
       this.socket.sendAnaDrop(drop);
       this.preparePremoving();
       this.redraw();

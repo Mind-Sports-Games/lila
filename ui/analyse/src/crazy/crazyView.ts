@@ -14,7 +14,7 @@ type Position = 'top' | 'bottom';
 
 export default function (ctrl: AnalyseCtrl, playerIndex: PlayerIndex, position: Position) {
   if (!ctrl.node.crazy || ctrl.data.onlyDropsVariant) return;
-  if (['backgammon', 'nackgammon'].includes(ctrl.data.game.variant.key)) return;
+  if (['backgammon', 'hyper', 'nackgammon', 'amazons'].includes(ctrl.data.game.variant.key)) return;
   const pocket = ctrl.node.crazy.pockets[playerIndex === 'p1' ? 0 : 1];
   const dropped = ctrl.justDropped;
   const dropMode = ctrl.chessground?.state.dropmode;

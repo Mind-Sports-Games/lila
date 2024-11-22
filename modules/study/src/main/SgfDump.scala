@@ -132,7 +132,10 @@ final class SgfDump(
               Tag(_.CV, 1),
               Tag(_.CO, "n"),
               Tag.matchInfo(1, 1, 0, 0), // multipoint info
-              Tag(_.SU, if (chapter.setup.variant.key == "backgammon") "Standard" else "Nackgammon")
+              Tag(
+                _.SU,
+                if (chapter.setup.variant.key == "backgammon") "Standard" else chapter.setup.variant.name
+              )
             )
           case _ => List()
         }
@@ -143,8 +146,17 @@ final class SgfDump(
 
 object SgfDump {
 
-  //TODO this doesn't work for multiaction games....
   def toActionStrs(line: Vector[Node]): ActionStrs = {
-    line.map(n => Vector(n.move.uci.uci))
+    line
+      .drop(1)
+      .foldLeft(Vector(line.take(1))) { case (turn, node) =>
+        if (turn.head.head.playedPlayerIndex != node.playedPlayerIndex) {
+          Vector(node) +: turn
+        } else {
+          (turn.head :+ node) +: turn.tail
+        }
+      }
+      .reverse
+      .map(t => t.map(_.move.uci.uci))
   }
 }

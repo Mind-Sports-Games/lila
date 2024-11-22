@@ -32,6 +32,7 @@ type variantConfirmsType = {
   go13x13: string;
   go19x19: string;
   backgammon: string;
+  hyper: string;
   nackgammon: string;
 };
 
@@ -82,6 +83,8 @@ const variantConfirms: variantConfirmsType = {
   go19x19: 'This is a 19 by 19 Go game!\n\n The aim of the game is to surround the largest area(s) with your stones',
   backgammon:
     'This is a Backgammon game!\n\nThe aim of the game is to get all your pieces into your home, and then take them all off the board first.',
+  hyper:
+    'This is a Hyper Backgammon game!\n\nThe aim of the game is to get all your pieces into your home, and then take them all off the board first.',
   nackgammon:
     'This is a Nackgammon game!\n\nThe aim of the game is to get all your pieces into your home, and then take them all off the board first.',
 };

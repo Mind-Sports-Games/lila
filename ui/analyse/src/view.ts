@@ -387,7 +387,7 @@ function renderPlayerScore(
   } else if (variantKey === 'go9x9' || variantKey === 'go13x13' || variantKey === 'go19x19') {
     children.push(h('piece.p-piece.' + playerIndex, { attrs: { 'data-score': score } }));
     return h('div.game-score.game-score-top' + '.' + playerIndex, children);
-  } else if (variantKey === 'backgammon' || variantKey === 'nackgammon') {
+  } else if (variantKey === 'backgammon' || variantKey === 'hyper' || variantKey === 'nackgammon') {
     for (let i = 0; i < score; i++) {
       children.push(h('piece.side-piece.' + playerIndex + (i === 0 ? ' first' : '')));
     }
@@ -480,7 +480,7 @@ export default function (ctrl: AnalyseCtrl): VNode {
     needsInnerCoords =
       ((!!gaugeOn || !!playerBars) &&
         !['xiangqi', 'shogi', 'minixiangqi', 'minishogi', 'oware'].includes(variantKey)) ||
-      ['togyzkumalak', 'bestemshe', 'backgammon', 'nackgammon'].includes(variantKey),
+      ['togyzkumalak', 'bestemshe', 'backgammon', 'hyper', 'nackgammon'].includes(variantKey),
     needsOutterCoords =
       [
         'xiangqi',
@@ -534,6 +534,7 @@ export default function (ctrl: AnalyseCtrl): VNode {
         break;
       }
       case 'backgammon':
+      case 'hyper':
       case 'nackgammon': {
         const fen = ctrl.node.fen;
         const p1Score = getBackgammonScore(fen, 'p1');
@@ -561,6 +562,7 @@ export default function (ctrl: AnalyseCtrl): VNode {
     'go13x13',
     'go19x19',
     'backgammon',
+    'hyper',
     'nackgammon',
   ].includes(variantKey)
     ? '.piece-letter'

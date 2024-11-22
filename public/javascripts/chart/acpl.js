@@ -39,8 +39,8 @@ playstrategy.advantageChart = function (data, trans, el) {
           };
 
           var partial = !d.analysis || d.analysis.partial;
-          return d.treeParts.slice(1).map(function (node) {
-            var color = colorForPly(node.ply),
+          return d.treeParts.slice(1).map(function (node, i) {
+            var color = node.playedPlayerIndex === 'p1' ? 1 : 0,
               cp;
 
             var san = node.san;
@@ -58,7 +58,11 @@ playstrategy.advantageChart = function (data, trans, el) {
                 y: null,
               };
 
-            var turn = Math.floor((node.ply - 1) / 2) + 1;
+            var parentNode = d.treeParts[i];
+            var turn = parentNode
+              ? Math.floor((parentNode.turnCount ?? 0) / 2) + 1
+              : Math.floor((node.ply - 1) / 2) + 1;
+
             var dots = color === 1 ? '.' : '...';
             var point = {
               name: turn + dots + ' ' + san,

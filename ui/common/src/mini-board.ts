@@ -52,6 +52,7 @@ export const initWith = (node: HTMLElement, fen: string, orientation: Orientatio
               lm != undefined &&
               lm! == 'pass' &&
               variantFromElement($el) != 'backgammon' &&
+              variantFromElement($el) != 'hyper' &&
               variantFromElement($el) != 'nackgammon',
           },
           drawable: {
@@ -82,7 +83,9 @@ export const initWith = (node: HTMLElement, fen: string, orientation: Orientatio
                                 ? { width: 13, height: 13 }
                                 : $el.hasClass('variant-go19x19')
                                   ? { width: 19, height: 19 }
-                                  : $el.hasClass('variant-backgammon') || $el.hasClass('variant-nackgammon')
+                                  : $el.hasClass('variant-backgammon') ||
+                                      $el.hasClass('variant-hyper') ||
+                                      $el.hasClass('variant-nackgammon')
                                     ? { width: 12, height: 2 }
                                     : { width: 8, height: 8 },
           variant: variantFromElement($el),
@@ -122,7 +125,9 @@ export const variantFromElement = (element: Cash): string => {
                           ? 'go19x19'
                           : element.hasClass('variant-backgammon')
                             ? 'backgammon'
-                            : element.hasClass('variant-nackgammon')
-                              ? 'nackgammon'
-                              : 'standard';
+                            : element.hasClass('variant-hyper')
+                              ? 'hyper'
+                              : element.hasClass('variant-nackgammon')
+                                ? 'nackgammon'
+                                : 'standard';
 };

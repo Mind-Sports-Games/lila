@@ -8,6 +8,8 @@
   <string name="someRated">Some tournaments are rated and will affect your rating.</string>
   <string name="isItHandicapped">Is it handicapped?</string>
   <string name="isHandicapped">This tournament is handicapped. User ratings may have an asterisk (*) after them denoting that they have been modified just for this tournament. This new rating is being used as part of the handicapped calculation.</string>
+  <string name="isNotHandicapped">This tournament is *not* handicapped</string>
+  <string name="someHandicapped">Some tournaments are handicapped. User ratings may have an asterisk (*) after them denoting that they have been modified just for this tournament. This new rating is being used as part of the handicapped calculation.</string>
   <string name="howAreScoresCalculated">How are scores calculated?</string>
   <string name="howAreScoresCalculatedAnswer">A win has a base score of 2 points, a draw 1 point, and a loss is worth no points.
 If you win two games consecutively you will start a double point streak, represented by a flame icon.
@@ -15,6 +17,8 @@ The following games will continue to be worth double points until you fail to wi
 That is, a win will be worth 4 points, a draw 2 points, and a loss will still not award any points.
 
 For example, two wins followed by a draw will be worth 6 points: 2 + 2 + (2 x 1)</string>
+  <string name="tournamentStatusScoring">Extra points are awarded for a gammon (+1) or a backgammon (+2).</string>
+  <string name="someStatusScoring">If using status scoring additional points are awarded in backgammon games for a gammon (+1) or a backgammon (+2).</string>
   <string name="berserk">Arena Berserk</string>
   <string name="berserkAnswer">When a player clicks the Berserk button at the beginning of the game, they lose half of their clock time, but the win is worth one extra tournament point.
 
@@ -37,6 +41,9 @@ As soon as you finish a game, return to the tournament lobby: you will then be p
 Play fast and return to the lobby to play more games and win more points.</string>
   <string name="howDoesItEnd">How does it end?</string>
   <string name="howDoesItEndAnswer">The tournament has a countdown clock. When it reaches zero, the tournament rankings are frozen, and the winner is announced. Games in progress must be finished, however they don't count for the tournament.</string>
+  <string name="howDoArenaMedleysWork">How do Medley tournaments work?</string>
+  <string name="isTournamentMedley">This is a medley tournament, there will be a different variant after each period of time.</string>
+  <string name="someMedley">Some tournaments will be of the medley style. This means that there will be a different variant afer a period of time.</string>
   <string name="otherRules">Other important rules</string>
   <string name="thereIsACountdown">There is a countdown for your first move. Failing to make a move within this time will forfeit the game to your opponent.</string>
   <plurals name="drawingWithinNbMoves">

@@ -38,7 +38,7 @@ object contact {
         ),
         li(
           a(href := "https://github.com/Mind-Sports-Games/lila/issues")(reportWebsiteIssue())
-        ),
+        )
         // li(
         //   a(href := "https://github.com/veloce/lichobile/issues")(reportMobileIssue())
         // ),
@@ -217,25 +217,9 @@ object contact {
               "security",
               "Security vulnerability",
               frag(
-                p("Please report security issues to ", contactEmailLink),
                 p(
-                  "Like all contributions to PlayStrategy, security reviews and pentesting are appreciated. ",
-                  "Note that PlayStrategy is built by volunteers and we currently do not have a bug bounty program."
-                ),
-                p(
-                  "Vulnerabilities are relevant even when they are not directly exploitable, ",
-                  "for example XSS mitigated by CSP."
-                ),
-                p(
-                  "When doing your research, please minimize negative impact for other users. ",
-                  "As long as you keep this in mind, testing should not require prior coordination. ",
-                  "Avoid spamming, DDoS and volumetric attacks."
-                ),
-                p(
-                  "We believe transport encryption should be sufficient for all reports. ",
-                  "If you insist on using PGP, please clarify the nature of the message ",
-                  "in the plain-text subject and encrypt for ",
-                  a(href := "/.well-known/gpg.asc")("multiple recipients"),
+                  "Please refer to our ",
+                  a(href := "https://github.com/Mind-Sports-Games/lila/security/policy")("Security policy"),
                   "."
                 )
               )
@@ -321,7 +305,9 @@ object contact {
               "gdpr",
               "GDPR",
               frag(
-                p("If you are a European citizen, you may request the deletion of your PlayStrategy account."),
+                p(
+                  "If you are a European citizen, you may request the deletion of your PlayStrategy account."
+                ),
                 p(
                   "First, ",
                   a(href := routes.Account.close)("close your account"),

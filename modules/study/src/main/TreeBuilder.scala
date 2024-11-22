@@ -30,6 +30,8 @@ object TreeBuilder {
     tree.Branch(
       id = node.id,
       ply = node.ply,
+      turnCount = node.turnCount,
+      playedPlayerIndex = node.playedPlayerIndex,
       variant = variant,
       move = node.move,
       fen = node.fen,
@@ -53,6 +55,8 @@ object TreeBuilder {
   def makeRoot(root: Node.Root, variant: Variant): tree.Root = {
     tree.Root(
       ply = root.ply,
+      turnCount = root.turnCount,
+      playedPlayerIndex = root.playedPlayerIndex,
       variant = variant,
       fen = root.fen,
       check = root.check,
