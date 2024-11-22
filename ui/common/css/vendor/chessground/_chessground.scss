@@ -159,6 +159,11 @@ span.mini-game.variant-togyzkumalak.is2d {
   }
 }
 
+.variant-abalone square {
+  width: calc(100% / 9);
+  height: calc(100% / 9);
+}
+
 .variant-breakthroughtroyka square {
   width: calc(100% / 8);
   height: calc(100% / 8);
@@ -735,6 +740,15 @@ square {
   }
 }
 
+.variant-abalone {
+  piece {
+    width: calc(100% / 9);
+    height: calc(100% / 9);
+    background-position: center center;
+    transform: scale(0.9);
+  }
+}
+
 .variant-breakthroughtroyka piece {
   width: calc(100% / 8);
   height: calc(100% / 8);
@@ -875,6 +889,11 @@ piece {
   padding-bottom: calc(100% * 6.5 / 15);
 }
 
+.variant-abalone cg-helper {
+  width: calc(100% / 9);
+  padding-bottom: calc(100% / 9);
+}
+
 .variant-breakthroughtroyka cg-helper {
   width: calc(100% / 8);
   padding-bottom: calc(100% / 8);
@@ -958,6 +977,11 @@ cg-helper {
 .variant-backgammon cg-container {
   width: calc(100% * 15);
   height: calc(100% * 15 / 6.5);
+}
+
+.variant-abalone cg-container {
+  width: calc(100% * 9);
+  height: calc(100% * 9);
 }
 
 .variant-breakthroughtroyka cg-container {

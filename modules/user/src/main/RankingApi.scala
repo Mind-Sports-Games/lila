@@ -133,6 +133,7 @@ final class RankingApi(
       backgammon             <- topPerf(PerfType.orDefault("backgammon").id, nb)
       hyper                  <- topPerf(PerfType.orDefault("hyper").id, nb)
       nackgammon             <- topPerf(PerfType.orDefault("nackgammon").id, nb)
+      abalone                <- topPerf(PerfType.orDefault("abalone").id, nb)
     } yield Perfs.Leaderboards(
       ultraBullet = ultraBullet,
       bullet = bullet,
@@ -179,7 +180,8 @@ final class RankingApi(
       go19x19 = go19x19,
       backgammon = backgammon,
       hyper = hyper,
-      nackgammon = nackgammon
+      nackgammon = nackgammon,
+      abalone = abalone
     )
 
   object weeklyStableRanking {

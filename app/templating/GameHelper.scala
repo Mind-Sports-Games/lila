@@ -52,7 +52,7 @@ trait GameHelper { self: I18nHelper with UserHelper with AiHelper with StringHel
             _,
             Mate,
             GameLogic.Chess() | GameLogic.FairySF() | GameLogic.Samurai() | GameLogic.Togyzkumalak() |
-            GameLogic.Go() | GameLogic.Backgammon()
+            GameLogic.Go() | GameLogic.Backgammon() | GameLogic.Abalone()
           ) =>
         s"${playerText(w)} won by checkmate"
       case (Some(w), _, Mate | PerpetualCheck, _) =>
@@ -180,7 +180,7 @@ trait GameHelper { self: I18nHelper with UserHelper with AiHelper with StringHel
       case S.Mate =>
         game.variant.gameLogic match {
           case GameLogic.Chess() | GameLogic.FairySF() | GameLogic.Samurai() | GameLogic.Togyzkumalak() |
-              GameLogic.Go() | GameLogic.Backgammon() =>
+              GameLogic.Go() | GameLogic.Backgammon() | GameLogic.Abalone() =>
             trans.checkmate.txt()
           case _ => ""
         }
@@ -280,6 +280,8 @@ trait GameHelper { self: I18nHelper with UserHelper with AiHelper with StringHel
             trans.gameFinished.txt()
           case Variant.Backgammon(strategygames.backgammon.variant.Hyper) => trans.gameFinished.txt()
           case Variant.Backgammon(strategygames.backgammon.variant.Nackgammon) =>
+            trans.gameFinished.txt()
+          case Variant.Abalone(strategygames.abalone.variant.Abalone) =>
             trans.gameFinished.txt()
           case _ => trans.variantEnding.txt()
         }

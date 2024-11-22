@@ -27,6 +27,7 @@ import strategygames.samurai
 import strategygames.togyzkumalak
 import strategygames.go
 import strategygames.backgammon
+import strategygames.abalone
 import strategygames.format
 import strategygames.variant.Variant
 import org.joda.time.DateTime
@@ -635,6 +636,26 @@ object BinaryFormat {
         .to(Map)
     }
 
+    def writeAbalone(pieces: abalone.PieceMap): ByteArray = {
+      def posInt(pos: abalone.Pos): Int =
+        (pieces get pos).fold(0) { piece =>
+          piece.player.fold(0, 128) + piece.role.binaryInt
+        }
+      ByteArray(abalone.Pos.all.map(posInt(_).toByte).toArray)
+    }
+
+    def readAbalone(ba: ByteArray, variant: abalone.variant.Variant): abalone.PieceMap = {
+      def intPiece(int: Int): Option[abalone.Piece] =
+        abalone.Role.allByBinaryInt.get(int & 127) map { role =>
+          abalone.Piece(PlayerIndex.fromP1((int & 128) == 0), role)
+        }
+      (abalone.Pos.all zip ba.value).view
+        .flatMap { case (pos, int) =>
+          intPiece(int) map (pos -> _)
+        }
+        .to(Map)
+    }
+
     // cache standard start position
     def standard(lib: GameLogic) = lib match {
       case GameLogic.Chess() => writeChess(chess.Board.init(chess.variant.Standard).pieces)
@@ -649,6 +670,7 @@ object BinaryFormat {
       case GameLogic.Go() => writeGo(go.Board.init(go.variant.Go19x19).pieces)
       case GameLogic.Backgammon() =>
         writeBackgammon(backgammon.Board.init(backgammon.variant.Backgammon).pieces)
+      case GameLogic.Abalone() => writeAbalone(abalone.Board.init(abalone.variant.Abalone).pieces)
       case _ =>
         sys.error("Cant write to binary for lib")
     }

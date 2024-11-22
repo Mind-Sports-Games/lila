@@ -448,6 +448,9 @@ export default class Setup {
               break;
           }
           break;
+        case '12':
+          key = 'abalone';
+          break;
       }
       const $selected = $ratings
         .hide()
@@ -459,7 +462,7 @@ export default class Setup {
     const showStartingImages = () => {
       const variantId = ($variantSelect.val() as string).split('_');
       const class_list =
-        'chess draughts loa shogi xiangqi flipello oware togyzkumalak amazons go backgammon breakthroughtroyka';
+        'chess draughts loa shogi xiangqi flipello oware togyzkumalak amazons go backgammon breakthroughtroyka abalone';
       let key = 'chess';
       switch (variantId[0]) {
         case '0':
@@ -497,6 +500,9 @@ export default class Setup {
           break;
         case '11':
           key = 'breakthroughtroyka';
+          break;
+        case '12':
+          key = 'abalone';
           break;
       }
       $form.find('.playerIndex-submits').removeClass(class_list);

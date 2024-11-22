@@ -42,5 +42,6 @@
   <string name="hyper">Get all your pieces into your home and then bear them off first to win</string>
   <string name="nackgammon">Get all your pieces into your home and then bear them off first to win</string>
   <string name="breakthroughtroyka">Reach opponents home rank to win</string>
-  <string name="minibreakthroughtroyka">Reach opponents home rank to win</string>  
+  <string name="minibreakthroughtroyka">Reach opponents home rank to win</string>
+  <string name="abalone">Push six of your opponents stones off the board to win</string>
 </resources>

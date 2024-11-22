@@ -324,6 +324,25 @@ object GameDiff {
           (o: Score) => o.nonEmpty ?? { BSONHandlers.scoreWriter writeOpt o }
         )
       }
+      case GameLogic.Abalone() => {
+        dTry(oldPgn, _.actionStrs, writeBytes compose newLibStorageWriter)
+        dTry(
+          binaryPieces,
+          _.board match {
+            case Board.Abalone(b) => b.pieces
+            case _                => sys.error("Wrong board type")
+          },
+          writeBytes compose BinaryFormat.piece.writeAbalone
+        )
+        d(positionHashes, _.history.positionHashes, w.bytes)
+        d(historyLastTurn, _.history.lastTurn.map(_.uci).mkString(","), w.str)
+        d(historyCurrentTurn, _.history.currentTurn.map(_.uci).mkString(","), w.str)
+        dOpt(
+          score,
+          _.history.score,
+          (o: Score) => o.nonEmpty ?? { BSONHandlers.scoreWriter writeOpt o }
+        )
+      }
     }
 
     d(turns, _.turnCount, w.int)

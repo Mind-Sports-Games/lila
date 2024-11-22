@@ -93,6 +93,17 @@ function renderPlayerScore(
       }),
     );
     return h('div.game-score.game-score-' + position, children);
+  } else if (variantKey === 'abalone') {
+    const opp = playerIndex === 'p1' ? 'p2' : 'p1';
+
+    children.push(h(`piece.${score > 0 ? 's-piece' : 'hole-piece'}.slot-top.${opp}`));
+    children.push(h(`piece.${score > 1 ? 's-piece' : 'hole-piece'}.slot-mid-left.${opp}`));
+    children.push(h(`piece.${score > 2 ? 's-piece' : 'hole-piece'}.slot-mid-right.${opp}`));
+    children.push(h(`piece.${score > 3 ? 's-piece' : 'hole-piece'}.slot-bot-left.${opp}`));
+    children.push(h(`piece.${score > 4 ? 's-piece' : 'hole-piece'}.slot-bot-mid.${opp}`));
+    children.push(h(`piece.${score > 5 ? 's-piece' : 'hole-piece'}.slot-bot-right.${opp}`));
+
+    return h('div.game-score.game-score-' + position, { attrs: { 'data-score': score } }, children);
   } else {
     children.push(h('piece.p-piece.' + playerIndex, { attrs: { 'data-score': score } }));
     return h('div.game-score.game-score-' + position, children);
@@ -142,6 +153,14 @@ export function main(ctrl: RoundController): VNode {
         const pieces = cgState ? cgState.pieces : fenRead(plyStep(ctrl.data, ctrl.ply).fen, boardSize, variantKey);
         const p1Score = util.getPlayerScore(variantKey, pieces, 'p1');
         const p2Score = util.getPlayerScore(variantKey, pieces, 'p2');
+        topScore = topPlayerIndex === 'p1' ? p1Score : p2Score;
+        bottomScore = topPlayerIndex === 'p2' ? p1Score : p2Score;
+        break;
+      }
+      case 'abalone': {
+        const fen = plyStep(ctrl.data, ctrl.ply).fen;
+        const p1Score = util.getAbaloneScore(fen, 'p1');
+        const p2Score = util.getAbaloneScore(fen, 'p2');
         topScore = topPlayerIndex === 'p1' ? p1Score : p2Score;
         bottomScore = topPlayerIndex === 'p2' ? p1Score : p2Score;
         break;
@@ -246,6 +265,7 @@ export function main(ctrl: RoundController): VNode {
       'go9x9',
       'go13x13',
       'go19x19',
+      'abalone',
     ].includes(variantKey)
   ) {
     if (!$('body').hasClass('coords-no')) {
@@ -276,6 +296,7 @@ export function main(ctrl: RoundController): VNode {
     'backgammon',
     'hyper',
     'nackgammon',
+    'abalone',
   ].includes(variantKey)
     ? '.piece-letter'
     : '';

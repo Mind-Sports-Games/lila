@@ -49,7 +49,8 @@ final class SwissForm(implicit mode: Mode) {
           "amazons"            -> optional(boolean),
           "breakthroughtroyka" -> optional(boolean),
           "go"                 -> optional(boolean),
-          "backgammon"         -> optional(boolean)
+          "backgammon"         -> optional(boolean),
+          "abalone"            -> optional(boolean)
         )(MedleyGameFamilies.apply)(MedleyGameFamilies.unapply),
         "rated" -> optional(boolean),
         "mcmahon" -> mapping(
@@ -137,7 +138,8 @@ final class SwissForm(implicit mode: Mode) {
         amazons = true.some,
         breakthroughtroyka = true.some,
         go = true.some,
-        backgammon = true.some
+        backgammon = true.some,
+        abalone = true.some
       ),
       rated = true.some,
       mcmahon = McMahon(
@@ -194,7 +196,8 @@ final class SwissForm(implicit mode: Mode) {
         breakthroughtroyka =
           gameGroupInMedley(s.settings.medleyVariants, GameGroup.BreakthroughTroyka()).some,
         go = gameGroupInMedley(s.settings.medleyVariants, GameGroup.Go()).some,
-        backgammon = gameGroupInMedley(s.settings.medleyVariants, GameGroup.Backgammon()).some
+        backgammon = gameGroupInMedley(s.settings.medleyVariants, GameGroup.Backgammon()).some,
+        abalone = gameGroupInMedley(s.settings.medleyVariants, GameGroup.Abalone()).some
       ),
       rated = s.settings.rated.some,
       mcmahon = McMahon(
@@ -523,7 +526,8 @@ object SwissForm {
       amazons: Option[Boolean],
       breakthroughtroyka: Option[Boolean],
       go: Option[Boolean],
-      backgammon: Option[Boolean]
+      backgammon: Option[Boolean],
+      abalone: Option[Boolean]
   ) {
 
     lazy val ggList: List[GameGroup] = GameGroup.medley
@@ -540,6 +544,7 @@ object SwissForm {
       )
       .filterNot(gg => if (!go.getOrElse(false)) gg == GameGroup.Go() else false)
       .filterNot(gg => if (!backgammon.getOrElse(false)) gg == GameGroup.Backgammon() else false)
+      .filterNot(gg => if (!abalone.getOrElse(false)) gg == GameGroup.Abalone() else false)
 
   }
 }

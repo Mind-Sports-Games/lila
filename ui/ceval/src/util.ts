@@ -31,6 +31,7 @@ const noClientEvalVariants = [
   'backgammon',
   'hyper',
   'nackgammon',
+  'abalone',
 ];
 
 export function isEvalBetter(a: Tree.ClientEval, b?: Tree.ClientEval): boolean {

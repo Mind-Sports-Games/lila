@@ -94,7 +94,8 @@ object list {
               userTopPerf(leaderboards.go19x19, PerfType.orDefault("go19x19")),
               userTopPerf(leaderboards.backgammon, PerfType.orDefault("backgammon")),
               userTopPerf(leaderboards.hyper, PerfType.orDefault("hyper")),
-              userTopPerf(leaderboards.nackgammon, PerfType.orDefault("nackgammon"))
+              userTopPerf(leaderboards.nackgammon, PerfType.orDefault("nackgammon")),
+              userTopPerf(leaderboards.abalone, PerfType.orDefault("abalone"))
             )
           )
         )

@@ -285,6 +285,10 @@ export function getBackgammonScore(fen: string, playerIndex: string): number {
   return +fen.split(' ')[playerIndex === 'p1' ? 4 : 5];
 }
 
+export function getAbaloneScore(fen: string, playerIndex: string): number {
+  return +fen.split(' ')[playerIndex === 'p1' ? 1 : 2];
+}
+
 const noServerEvalVariants = [
   'monster',
   'linesOfAction',
@@ -299,6 +303,7 @@ const noServerEvalVariants = [
   'backgammon',
   'hyper',
   'nackgammon',
+  'abalone',
 ];
 
 const noClientEvalVariants = [
@@ -323,6 +328,7 @@ const noClientEvalVariants = [
   'backgammon',
   'hyper',
   'nackgammon',
+  'abalone',
 ];
 
 export function allowClientEvalForVariant(variant: VariantKey) {
@@ -440,5 +446,7 @@ export const variantToRules = (v: VariantKey): Rules => {
       return 'breakthrough';
     case 'minibreakthroughtroyka':
       return 'minibreakthrough';
+    case 'abalone':
+      return 'abalone';
   }
 };

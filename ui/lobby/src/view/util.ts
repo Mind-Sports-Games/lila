@@ -78,4 +78,5 @@ export const perfIcons: any = {
   Backgammon: '',
   Hyper: '',
   Nackgammon: '',
+  Abalone: '\ue927',
 };

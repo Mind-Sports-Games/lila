@@ -13,6 +13,7 @@ import {
   getMancalaScore,
   getGoScore,
   getBackgammonScore,
+  getAbaloneScore,
   allowClientEvalForVariant,
 } from './util';
 import { defined } from 'common';
@@ -396,6 +397,17 @@ function renderPlayerScore(
     const pieceClass = `piece.${defaultMancalaRole}${score.toString()}-piece.`;
     children.push(h(pieceClass + playerIndex, { attrs: { 'data-score': score } }));
     return h('div.game-score.game-score-' + position + '.' + playerIndex, children);
+  } else if (variantKey === 'abalone') {
+    const opp = playerIndex === 'p1' ? 'p2' : 'p1';
+
+    children.push(h(`piece.${score > 0 ? 's-piece' : 'hole-piece'}.slot-top.${opp}`));
+    children.push(h(`piece.${score > 1 ? 's-piece' : 'hole-piece'}.slot-mid-left.${opp}`));
+    children.push(h(`piece.${score > 2 ? 's-piece' : 'hole-piece'}.slot-mid-right.${opp}`));
+    children.push(h(`piece.${score > 3 ? 's-piece' : 'hole-piece'}.slot-bot-left.${opp}`));
+    children.push(h(`piece.${score > 4 ? 's-piece' : 'hole-piece'}.slot-bot-mid.${opp}`));
+    children.push(h(`piece.${score > 5 ? 's-piece' : 'hole-piece'}.slot-bot-right.${opp}`));
+
+    return h('div.game-score.game-score-top' + '.' + playerIndex, { attrs: { 'data-score': score } }, children);
   } else {
     //filpello variants
     const pieceClass = 'piece.p-piece.';
@@ -493,8 +505,12 @@ export default function (ctrl: AnalyseCtrl): VNode {
         'go9x9',
         'go13x13',
         'go19x19',
+        'abalone',
       ].includes(variantKey) &&
-      !((!!gaugeOn || !!playerBars) && ['flipello', 'flipello10', 'go9x9', 'go13x13', 'go19x19'].includes(variantKey)),
+      !(
+        (!!gaugeOn || !!playerBars) &&
+        ['flipello', 'flipello10', 'go9x9', 'go13x13', 'go19x19', 'abalone'].includes(variantKey)
+      ),
     needsNoCoords =
       ['xiangqi', 'shogi', 'minixiangqi', 'minishogi'].includes(variantKey) && (!!gaugeOn || !!playerBars),
     tour = relayTour(ctrl);
@@ -519,6 +535,14 @@ export default function (ctrl: AnalyseCtrl): VNode {
         const fen = ctrl.node.fen;
         const p1Score = getMancalaScore(fen, 'p1');
         const p2Score = getMancalaScore(fen, 'p2');
+        topScore = ctrl.topPlayerIndex() === 'p1' ? p1Score : p2Score;
+        bottomScore = ctrl.topPlayerIndex() === 'p2' ? p1Score : p2Score;
+        break;
+      }
+      case 'abalone': {
+        const fen = ctrl.node.fen;
+        const p1Score = getAbaloneScore(fen, 'p1');
+        const p2Score = getAbaloneScore(fen, 'p2');
         topScore = ctrl.topPlayerIndex() === 'p1' ? p1Score : p2Score;
         bottomScore = ctrl.topPlayerIndex() === 'p2' ? p1Score : p2Score;
         break;
@@ -564,6 +588,7 @@ export default function (ctrl: AnalyseCtrl): VNode {
     'backgammon',
     'hyper',
     'nackgammon',
+    'abalone',
   ].includes(variantKey)
     ? '.piece-letter'
     : '';

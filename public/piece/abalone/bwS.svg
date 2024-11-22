@@ -1,0 +1,85 @@
+<svg
+    viewBox="0 0 50 50"
+    width="50mm"
+    height="50mm"
+    image-rendering="optimizeQuality"
+    shape-rendering="geometricPrecision"
+    text-rendering="geometricPrecision"
+    version="1.1"
+    xmlns="http://www.w3.org/2000/svg"
+>
+    <defs>
+        <linearGradient
+            id="grad1"
+            gradientTransform="rotate(45)"
+        >
+            <stop
+                offset="0"
+                stop-color="bisque"
+                stop-opacity="0.1"
+            />
+            <stop
+                offset="100%"
+                stop-color="#DDD"
+                stop-opacity="0.9"
+            />
+            <!-- <stop
+                offset="10%"
+                stop-color="#ccc"
+                stop-opacity="0.5"
+            />
+            <stop
+                offset="100%"
+                stop-color="#aaa"
+                stop-opacity="1"
+            /> -->
+        </linearGradient>
+        <radialGradient
+            id="whiteMarble"
+            gradientUnits="objectBoundingBox"
+            fx="30%"
+            fy="30%"
+            gradientTransform="rotate(-25)"
+        >
+            <stop offset="0%" stop-color="#FFFFFF" />
+            <!-- <stop offset="60%" stop-color="#ddd" />
+            <stop offset="100%" stop-color="#000" /> -->
+            <stop offset="15%" stop-color="#6e6257" />
+            <stop xmlns="http://www.w3.org/2000/svg" offset="80%" stop-color="#ddd"/>
+            <stop xmlns="http://www.w3.org/2000/svg" offset="100%" stop-color="#0e0207"/>
+        </radialGradient>
+        <mask id="m1">
+            <rect
+                x="0"
+                y="0"
+                width="100%"
+                height="100%"
+                fill="url(#grad1)"
+            />
+        </mask>
+                <radialGradient
+            id="blackMarble"
+            gradientUnits="objectBoundingBox"
+            fx="30%"
+            fy="30%"
+        >
+            <stop offset="15%" stop-color="#6e6257" />
+            <stop offset="80%" stop-color="#1e1217" />
+            <stop offset="100%" stop-color="#0e0207" />
+        </radialGradient>
+    </defs>
+    <circle
+        cx="24"
+        cy="24"
+        r="24px"
+        fill="url(#whiteMarble)"
+        mask="url(#m1)"
+    />
+    <circle
+        cx="24"
+        cy="24"
+        r="24px"
+        fill="url(#blackMarble)"
+        fill-opacity="0.5"
+    />
+</svg>

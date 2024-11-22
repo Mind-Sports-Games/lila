@@ -8,7 +8,7 @@ import { Rules } from 'stratops/types';
 // import { promotion } from 'stratutils'
 export * as promotion from './promotion';
 
-export const initialFen: Fen = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1';
+export const initialFen: Fen = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1'; // @TODO VFR fix THIS ???
 
 export function fixCrazySan(san: San): San {
   return san[0] === 'P' ? san.slice(1) : san;
@@ -16,7 +16,7 @@ export function fixCrazySan(san: San): San {
 
 export type Dests = Map<Key, Key[]>;
 
-export type NotationStyle = 'uci' | 'san' | 'usi' | 'wxf' | 'dpo' | 'dpg' | 'man' | 'bkg';
+export type NotationStyle = 'uci' | 'san' | 'usi' | 'wxf' | 'dpo' | 'dpg' | 'man' | 'bkg' | 'abl';
 
 export function readDests(lines?: string): Dests | null {
   if (typeof lines === 'undefined') return null;
@@ -56,7 +56,13 @@ export const altCastles = {
 };
 
 export function variantUsesUCINotation(key: VariantKey | DraughtsVariantKey) {
-  return ['linesOfAction', 'scrambledEggs', 'amazons', 'breakthroughtroyka', 'minibreakthroughtroyka'].includes(key);
+  return [
+    'linesOfAction',
+    'scrambledEggs',
+    'amazons',
+    'breakthroughtroyka',
+    'minibreakthroughtroyka',
+  ].includes(key);
 }
 
 export function variantUsesUSINotation(key: VariantKey | DraughtsVariantKey) {
@@ -83,6 +89,10 @@ export function variantUsesBackgammonNotation(key: VariantKey | DraughtsVariantK
   return ['backgammon', 'hyper', 'nackgammon'].includes(key);
 }
 
+export function variantUsesAbaloneNotation(key: VariantKey | DraughtsVariantKey) {
+  return ['abalone'].includes(key);
+}
+
 export function notationStyle(key: VariantKey | DraughtsVariantKey): NotationStyle {
   return variantUsesUCINotation(key)
     ? 'uci'
@@ -98,7 +108,9 @@ export function notationStyle(key: VariantKey | DraughtsVariantKey): NotationSty
               ? 'man'
               : variantUsesBackgammonNotation(key)
                 ? 'bkg'
-                : 'san';
+                : variantUsesAbaloneNotation(key)
+                  ? 'abl'
+                  : 'san';
 }
 
 interface Piece {
@@ -138,6 +150,7 @@ const noFishnetVariants: VariantKey[] = [
   'backgammon',
   'hyper',
   'nackgammon',
+  'abalone',
 ];
 export function allowFishnetForVariant(variant: VariantKey) {
   return noFishnetVariants.indexOf(variant) == -1;
@@ -231,6 +244,8 @@ export const variantToRules = (v: VariantKey): Rules => {
       return 'hyper';
     case 'nackgammon':
       return 'nackgammon';
+    case 'abalone':
+      return 'abalone';
     default:
       return 'chess';
   }

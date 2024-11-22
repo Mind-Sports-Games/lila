@@ -51,6 +51,7 @@ case class Perfs(
     backgammon: Perf,
     hyper: Perf,
     nackgammon: Perf,
+    abalone: Perf,
     ultraBullet: Perf,
     bullet: Perf,
     blitz: Perf,
@@ -107,6 +108,7 @@ case class Perfs(
       "backgammon"             -> backgammon,
       "hyper"                  -> hyper,
       "nackgammon"             -> nackgammon,
+      "abalone"                -> abalone,
       "ultraBullet"            -> ultraBullet,
       "bullet"                 -> bullet,
       "blitz"                  -> blitz,
@@ -219,6 +221,7 @@ case class Perfs(
     "backgammon"             -> backgammon,
     "hyper"                  -> hyper,
     "nackgammon"             -> nackgammon,
+    "abalone"                -> abalone,
     "ultraBullet"            -> ultraBullet,
     "bullet"                 -> bullet,
     "blitz"                  -> blitz,
@@ -280,6 +283,7 @@ case object Perfs {
   val default = {
     val p = Perf.default
     Perfs(
+      p,
       p,
       p,
       p,
@@ -394,6 +398,7 @@ case object Perfs {
       case Variant.Backgammon(strategygames.backgammon.variant.Backgammon)       => Some(_.backgammon)
       case Variant.Backgammon(strategygames.backgammon.variant.Hyper)            => Some(_.hyper)
       case Variant.Backgammon(strategygames.backgammon.variant.Nackgammon)       => Some(_.nackgammon)
+      case Variant.Abalone(strategygames.abalone.variant.Abalone)                => Some(_.abalone)
       case _                                                                     => none
     }
 
@@ -456,6 +461,7 @@ case object Perfs {
         backgammon = perf("backgammon"),
         hyper = perf("hyper"),
         nackgammon = perf("nackgammon"),
+        abalone = perf("abalone"),
         ultraBullet = perf("ultraBullet"),
         bullet = perf("bullet"),
         blitz = perf("blitz"),
@@ -471,7 +477,7 @@ case object Perfs {
 
     private def notNew(p: Perf): Option[Perf] = p.nonEmpty option p
 
-    def writes(w: BSON.Writer, o: Perfs) =
+def writes(w: BSON.Writer, o: Perfs) =
       reactivemongo.api.bson.BSONDocument(
         "standard"               -> notNew(o.standard),
         "chess960"               -> notNew(o.chess960),
@@ -515,6 +521,7 @@ case object Perfs {
         "backgammon"             -> notNew(o.backgammon),
         "hyper"                  -> notNew(o.hyper),
         "nackgammon"             -> notNew(o.nackgammon),
+        "abalone"                -> notNew(o.abalone),
         "ultraBullet"            -> notNew(o.ultraBullet),
         "bullet"                 -> notNew(o.bullet),
         "blitz"                  -> notNew(o.blitz),
@@ -574,7 +581,8 @@ case object Perfs {
       go19x19: List[User.LightPerf],
       backgammon: List[User.LightPerf],
       hyper: List[User.LightPerf],
-      nackgammon: List[User.LightPerf]
+      nackgammon: List[User.LightPerf],
+      abalone: List[User.LightPerf]
   )
 
   val emptyLeaderboards = Leaderboards(
@@ -623,7 +631,7 @@ case object Perfs {
     Nil,
     Nil,
     Nil,
+    Nil,
     Nil
   )
-
 }

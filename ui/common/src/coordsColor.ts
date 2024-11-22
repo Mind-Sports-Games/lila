@@ -68,7 +68,7 @@ const changeColorHandle = (): void => {
     'amazons-purple': '#9f90b0 #7d4a8d',
     'breakthroughtroyka-purple-diag': '#E5DAF0 #957AB0',
     'breakthroughtroyka-maple': '#e8ceab #bc7944',
-  };
+  }; // @TODO: add Abalone
 
   for (const theme of document.body.className.split(' ')) {
     if (theme in dict) {
