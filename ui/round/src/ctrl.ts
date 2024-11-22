@@ -714,7 +714,11 @@ export default class RoundController {
     d.game.perpetualWarning = !!o.perpetualWarning;
 
     //backgammon need to update initial turnCount if we switch starting player on initial dice roll
-    if (['backgammon', 'hyper', 'nackgammon'].includes(d.game.variant.key) && this.lastPly() === 0 && o.fen.includes('b')) {
+    if (
+      ['backgammon', 'hyper', 'nackgammon'].includes(d.game.variant.key) &&
+      this.lastPly() === 0 &&
+      o.fen.includes('b')
+    ) {
       d.steps[0].turnCount = 1;
       d.steps[0].ply = 1;
       d.game.startedAtTurn = 1;

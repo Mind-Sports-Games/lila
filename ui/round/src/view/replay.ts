@@ -308,7 +308,7 @@ export function render(ctrl: RoundController): VNode | undefined {
     ? undefined
     : h(rmovesTag, [
         renderButtons(ctrl),
-        (moves
+        moves
           ? isCol1()
             ? h('div.col1-moves', [
                 col1Button(ctrl, -1, 'Y', ctrl.ply == round.firstPly(d)),
@@ -316,7 +316,7 @@ export function render(ctrl: RoundController): VNode | undefined {
                 col1Button(ctrl, 1, 'X', ctrl.ply == round.lastPly(d)),
               ])
             : moves
-          : renderResult(ctrl)),
-        initMessage(d, ctrl.ply, ctrl.trans)
+          : renderResult(ctrl),
+        initMessage(d, ctrl.ply, ctrl.trans),
       ]);
 }
