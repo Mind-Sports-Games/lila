@@ -4,6 +4,10 @@ import Challenge.TimeControl
 import lila.game.{ Game, Pov }
 import lila.user.User
 
+import strategygames.GameLogic
+import strategygames.variant.Variant
+import strategygames.format.FEN
+
 final class ChallengeMaker(
     userRepo: lila.user.UserRepo,
     gameRepo: lila.game.GameRepo
@@ -31,6 +35,13 @@ final class ChallengeMaker(
       }
     }
 
+  //when rematching we want the same fen unless we are backgammon and the players
+  //aren't flipping colour, but we want the start player to be randomized again
+  private def generateRematchFen(variant: Variant, initialFen: Option[FEN]) =
+    if (variant.initialFens.size > 1)
+      scala.util.Random.shuffle(variant.initialFens).headOption
+    else initialFen
+
   // pov of the challenger
   private def makeRematch(pov: Pov, challenger: User, dest: User): Fu[Challenge] =
     gameRepo initialFen pov.game map { initialFen =>
@@ -40,13 +51,13 @@ final class ChallengeMaker(
         case _                => TimeControl.Unlimited
       }
       val playerIndexName =
-        if (pov.game.variant.key == "backgammon" || pov.game.variant.key == "nackgammon") {
+        if (pov.game.variant.gameLogic == GameLogic.Backgammon()) {
           pov.playerIndex.name
         } else (!pov.playerIndex).name
       Challenge.make(
         variant = pov.game.variant,
         fenVariant = pov.game.variant.some,
-        initialFen = initialFen,
+        initialFen = generateRematchFen(pov.game.variant, initialFen),
         timeControl = timeControl,
         mode = pov.game.mode,
         playerIndex = playerIndexName,

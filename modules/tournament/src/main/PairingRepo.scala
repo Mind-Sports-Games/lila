@@ -12,6 +12,8 @@ import lila.db.dsl._
 import lila.game.Game
 import lila.user.User
 
+import strategygames.Player
+
 final class PairingRepo(coll: Coll)(implicit ec: scala.concurrent.ExecutionContext, mat: Materializer) {
 
   def selectTour(tourId: Tournament.ID) = $doc("tid" -> tourId)
@@ -177,7 +179,9 @@ final class PairingRepo(coll: Coll)(implicit ec: scala.concurrent.ExecutionConte
           $set(
             "s" -> g.status.id,
             "w" -> g.winnerPlayerIndex.map(_.p1),
-            "t" -> g.turnCount,
+            "t" -> g.playedTurns,
+            "st" -> (if (g.startPlayerIndex == Player.P2 && g.variant.recalcStartPlayerForStats) Some(true)
+                     else None),
             "f" -> DateTime.now
           )
         )
@@ -240,10 +244,39 @@ final class PairingRepo(coll: Coll)(implicit ec: scala.concurrent.ExecutionConte
         Project(
           $doc(
             "_id" -> false,
-            "w"   -> true,
-            "t"   -> true,
-            "b1"  -> $doc("$cond" -> $arr("$b1", 1, 0)),
-            "b2"  -> $doc("$cond" -> $arr("$b2", 1, 0))
+            //copilot #3
+            "w" -> $doc(
+              "$cond" -> $arr(
+                $doc("$eq" -> $arr("$st", true)), // Check if st is true
+                $doc(
+                  "$cond" -> $arr(
+                    $doc("$eq" -> $arr("$w", true)), // Check if w is true
+                    false, // Invert true to false
+                    $doc(
+                      "$cond" -> $arr(
+                        $doc("$eq" -> $arr("$w", false)), // Check if w is false
+                        true, // Invert false to true
+                        "$w"  // Keep w as it is if w doesn't exist
+                      )
+                    )
+                  )
+                ),
+                "$w" // Keep w as it is if st is false
+              )
+            ),
+            //my attempt
+            //"w" -> $doc(
+            //  "$cond" -> $arr(
+            //    "$st",
+            //    $doc(
+            //      "$cond" -> $arr($doc("w" $exists true), $doc("$cond" -> $arr("$w", "p2", "p1")), "draw")
+            //    ),
+            //    $doc("$cond" -> $arr($doc("w" $exists true), $doc("$cond" -> $arr("$w", "p1", "p2")), "draw"))
+            //  )
+            //),
+            "t"  -> true,
+            "b1" -> $doc("$cond" -> $arr("$b1", 1, 0)),
+            "b2" -> $doc("$cond" -> $arr("$b2", 1, 0))
           )
         ),
         GroupField("w")(
