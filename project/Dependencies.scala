@@ -28,7 +28,7 @@ object Dependencies {
   val scalatest       = "org.scalatest"              %% "scalatest"                       % "3.1.0"  % Test
   val uaparser        = "org.uaparser"               %% "uap-scala"                       % "0.13.0"
   val specs2          = "org.specs2"                 %% "specs2-core"                     % "4.11.0" % Test
-  val apacheText      = "org.apache.commons"          % "commons-text"                    % "1.9"
+  val apacheText      = "org.apache.commons"          % "commons-text"                    % "1.12.0"
   val bloomFilter     = "com.github.alexandrnikitin" %% "bloom-filter"                    % "0.13.1"
   val jacksonDatabind = "com.fasterxml.jackson.core"  % "jackson-databind"                % "2.10.0"
 
