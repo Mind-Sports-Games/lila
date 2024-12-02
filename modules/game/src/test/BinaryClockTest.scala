@@ -7,9 +7,9 @@ import scala.util.chaining._
 import lila.db.ByteArray
 class BinaryClockTest extends Specification {
 
-  val _0_                                                                 = "00000000"
-  val since                                                               = org.joda.time.DateTime.now.minusHours(1)
-  def writeBytes(c: ClockBase)                                            = c match {
+  val _0_   = "00000000"
+  val since = org.joda.time.DateTime.now.minusHours(1)
+  def writeBytes(c: ClockBase) = c match {
     case fc: Clock        => BinaryFormat.fischerClock(since).write(fc)
     case bc: ByoyomiClock => BinaryFormat.byoyomiClock(since).write(bc)
   }
@@ -21,7 +21,7 @@ class BinaryClockTest extends Specification {
       periodEntries: PeriodEntries = PeriodEntries.default
   ): ByoyomiClock =
     (BinaryFormat.byoyomiClock(since).read(bytes, periodEntries, berserk, false))(P1)
-  def isomorphism(c: ClockBase): ClockBase                                = c match {
+  def isomorphism(c: ClockBase): ClockBase = c match {
     case _: Clock        => readBytesFischer(writeBytes(c))
     case _: ByoyomiClock => readBytesByoyomi(writeBytes(c))
   }
@@ -83,7 +83,7 @@ class BinaryClockTest extends Specification {
         isomorphism(c3) must_== c3
 
         val c4 = clock.start
-        isomorphism(c4).timestamp.get.value must beCloseTo(c4.timestamp.get.value, 10)
+        isomorphism(c4).timestamp.get.value must beCloseTo(c4.timestamp.get.value, 10L)
 
         Clock(120, 60) pipe { c =>
           isomorphism(c) must_== c
@@ -188,7 +188,7 @@ class BinaryClockTest extends Specification {
         isomorphism(c3) must_== c3
 
         val c4 = clock.start
-        isomorphism(c4).timestamp.get.value must beCloseTo(c4.timestamp.get.value, 10)
+        isomorphism(c4).timestamp.get.value must beCloseTo(c4.timestamp.get.value, 10L)
 
         ByoyomiClock(120, 60, 5, 2) pipe { c =>
           isomorphism(c) must_== c
