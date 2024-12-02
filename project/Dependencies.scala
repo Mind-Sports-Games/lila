@@ -17,7 +17,7 @@ object Dependencies {
   val strategyGames   = "org.playstrategy"           %% "strategygames"                   % "10.2.1-pstrat165"
   val maxmind         = "com.sanoma.cda"             %% "maxmind-geoip2-scala"            % "1.3.1-THIB"
   val prismic         = "io.prismic"                 %% "scala-kit"                       % "1.2.19-THIB213"
-  val scrimage        = "com.sksamuel.scrimage"       % "scrimage-core"                   % "4.0.18"
+  val scrimage        = "com.sksamuel.scrimage"       % "scrimage-core"                   % "4.0.33"
   val scaffeine       = "com.github.blemale"         %% "scaffeine"                       % "4.0.2"  % "compile"
   val googleOAuth     = "com.google.auth"             % "google-auth-library-oauth2-http" % "0.25.5"
   val scalaUri        = "io.lemonlabs"               %% "scala-uri"                       % "3.2.0"
