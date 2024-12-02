@@ -39,7 +39,7 @@ final class WorkQueue(buffer: Int, timeout: FiniteDuration, name: String, parall
     }
   }
 
-  private val queue = Source
+  private val queue: SourceQueueWithComplete[TaskWithPromise[_]] = Source
     .queue[TaskWithPromise[_]](buffer, OverflowStrategy.dropNew) // #TODO use akka 2.6.11 BoundedQueueSource
     .mapAsyncUnordered(parallelism) { case (task, promise) =>
       task()
@@ -49,8 +49,12 @@ final class WorkQueue(buffer: Int, timeout: FiniteDuration, name: String, parall
           case e: TimeoutException =>
             lila.mon.workQueue.timeout(name).increment()
             lila.log(s"WorkQueue:$name").warn(s"task timed out after $timeout", e)
+            promise.failure(e)
+            (task, promise): TaskWithPromise[_]
           case e: Exception =>
             lila.log(s"WorkQueue:$name").info("task failed", e)
+            promise.failure(e)
+            (task, promise): TaskWithPromise[_]
         }
     }
     .toMat(Sink.ignore)(Keep.left)
