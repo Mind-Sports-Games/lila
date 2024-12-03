@@ -106,7 +106,7 @@ case class Tournament(
 
   def medleyDurationMinutes = medleyMinutes.getOrElse(0) * medleyNumIntervals.getOrElse(0)
 
-  def meldeySecondsToFinishInterval =
+  def medleySecondsToFinishInterval =
     medleyIntervalSeconds.fold(0)(
       (secondsToFinish - _.drop(medleyRound + 1).sum)
     )
@@ -192,7 +192,7 @@ case class Tournament(
     }
 
   def medleyClockStatus =
-    meldeySecondsToFinishInterval pipe { s =>
+    medleySecondsToFinishInterval pipe { s =>
       "%02d:%02d".format(s / 60, s % 60)
     }
 
@@ -294,7 +294,7 @@ object Tournament {
     )
 
   def scheduleAs(sched: Schedule, minutes: Int) = {
-    val meldeyVariantsAndIntervals = sched.medleyShield.map(ms => ms.generateVariants(ms.variants))
+    val medleyVariantsAndIntervals = sched.medleyShield.map(ms => ms.generateVariants(ms.variants))
     Tournament(
       id = makeId,
       name = sched.medleyShield.fold(sched.name(full = false)(defaultLang))(ms =>
@@ -307,8 +307,8 @@ object Tournament {
       createdBy = User.playstrategyId,
       createdAt = DateTime.now,
       nbPlayers = 0,
-      variant = meldeyVariantsAndIntervals.fold(sched.variant)(v => v.head._1),
-      medleyVariantsAndIntervals = meldeyVariantsAndIntervals,
+      variant = medleyVariantsAndIntervals.fold(sched.variant)(v => v.head._1),
+      medleyVariantsAndIntervals = medleyVariantsAndIntervals,
       medleyMinutes = sched.medleyShield.map(_.medleyMinutes),
       position = sched.position,
       mode = Mode.Rated,
