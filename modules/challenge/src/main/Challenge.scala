@@ -226,24 +226,7 @@ object Challenge {
     }
 
   private def perfTypeOf(variant: Variant, timeControl: TimeControl): PerfType =
-    PerfPicker
-      .perfType(
-        speedOf(timeControl),
-        variant,
-        timeControl match {
-          case TimeControl.Correspondence(d) => d.some
-          case _                             => none
-        }
-      )
-      .orElse {
-        (variant.fromPositionVariant) option perfTypeOf(
-          Variant
-            .byName(variant.gameLogic, "From Position")
-            .getOrElse(Variant.orDefault(variant.gameLogic, 3)),
-          timeControl
-        )
-      }
-      .|(PerfType.orDefaultSpeed("correspondence"))
+    lila.rating.PerfType(variant, speedOf(timeControl))
 
   private val idSize = 8
 
