@@ -293,7 +293,8 @@ object Tournament {
       hasChat = hasChat
     )
 
-  def scheduleAs(sched: Schedule, minutes: Int) =
+  def scheduleAs(sched: Schedule, minutes: Int) = {
+    val meldeyVariantsAndIntervals = sched.medleyShield.map(ms => ms.generateVariants(ms.variants))
     Tournament(
       id = makeId,
       name = sched.medleyShield.fold(sched.name(full = false)(defaultLang))(ms =>
@@ -306,8 +307,8 @@ object Tournament {
       createdBy = User.playstrategyId,
       createdAt = DateTime.now,
       nbPlayers = 0,
-      variant = sched.variant,
-      medleyVariantsAndIntervals = sched.medleyShield.map(ms => ms.generateVariants(ms.variants)),
+      variant = meldeyVariantsAndIntervals.fold(sched.variant)(v => v.head._1),
+      medleyVariantsAndIntervals = meldeyVariantsAndIntervals,
       medleyMinutes = sched.medleyShield.map(_.medleyMinutes),
       position = sched.position,
       mode = Mode.Rated,
@@ -321,6 +322,7 @@ object Tournament {
       //we've scheduled this tour so make bots allowed for any of our tours
       botsAllowed = true
     )
+  }
 
   def tournamentUrl(tourId: String): String = s"https://playstrategy.org/tournament/$tourId"
 
