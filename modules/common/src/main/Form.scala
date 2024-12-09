@@ -162,11 +162,15 @@ object Form {
   }
 
   object fen {
-    implicit private val fenFormat = formatter.stringFormatter[FEN](_.value, fen => FEN.apply(GameLogic.Chess(), fen))
-    val playableStrict             = playable(strict = true)
+    implicit private val fenFormat =
+      formatter.stringFormatter[FEN](_.value, fen => FEN.apply(GameLogic.Chess(), fen))
+    val playableStrict = playable(strict = true)
     def playable(strict: Boolean) = of[FEN](fenFormat)
       .transform[FEN](f => FEN(GameLogic.Chess(), f.value.trim), identity)
-      .verifying("Invalid position", fen => (Forsyth.<<<(GameLogic.Chess(), fen)).exists(_.situation playable strict))
+      .verifying(
+        "Invalid position",
+        fen => (Forsyth.<<<(GameLogic.Chess(), fen)).exists(_.situation playable strict)
+      )
   }
 
   def inTheFuture(m: Mapping[DateTime]) =
@@ -195,16 +199,17 @@ object Form {
   object Timestamp {
     val formatter = new Formatter[org.joda.time.DateTime] {
       def bind(key: String, data: Map[String, String]) =
-        stringFormat
-          .bind(key, data)
-          .flatMap { str =>
-            Try(java.lang.Long.parseLong(str)).toEither.flatMap { long =>
-              Try(new DateTime(long)).toEither
-            }
-          }
-          .left
-          .map(_ => Seq(FormError(key, "Invalid timestamp", Nil)))
-      def unbind(key: String, value: org.joda.time.DateTime) = Map(key -> value.getMillis.toString)
+        for {
+          str <- stringFormat.bind(key, data)
+          long <- Try(java.lang.Long.parseLong(str)).toEither.left.map(_ =>
+            Seq(FormError(key, "Invalid number format", Nil))
+          )
+          date <- Try(new DateTime(long)).toEither.left.map(_ =>
+            Seq(FormError(key, "Invalid date format", Nil))
+          )
+        } yield date
+      def unbind(key: String, value: org.joda.time.DateTime): Map[String, String] =
+        stringFormat.unbind(key, value.getMillis.toString)
     }
     val timestamp = of[org.joda.time.DateTime](formatter)
   }
