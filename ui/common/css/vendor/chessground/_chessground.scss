@@ -980,7 +980,7 @@ cg-container {
 
 cg-container .cg-shapes,
 cg-container .cg-custom-svgs {
-  overflow: hidden;
+  overflow: visible;
   position: absolute;
   top: 0px;
   left: 0px;
@@ -990,7 +990,10 @@ cg-container .cg-custom-svgs {
 }
 
 cg-container .cg-shapes {
-  opacity: 0.6;
+  line,
+  circle {
+    opacity: 0.6;
+  }
   z-index: z('cg__svg.cg-shapes');
 
   image {
