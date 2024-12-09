@@ -135,8 +135,14 @@ cg-container {
   height: 100%;
   pointer-events: none;
   z-index: z('cg__svg');
-  opacity: 0.6;
+  line,
+  circle {
+    opacity: 0.6;
+  }
   image {
     opacity: 0.5;
+  }
+  &.cg-custom-svgs {
+    overflow: visible;
   }
 }
