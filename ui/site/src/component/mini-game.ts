@@ -1,6 +1,6 @@
 import * as domData from 'common/data';
 import { variantFromElement } from 'common/mini-board';
-import { readDice } from 'stratutils';
+import { readDice, displayScore } from 'stratutils';
 import clockWidget from './clock-widget';
 
 interface UpdateData {
@@ -14,6 +14,7 @@ interface UpdateData {
   p2Delay?: number;
 }
 
+//TODO This is wrong - fix, affect clocks counting down incorrectly
 const fenPlayerIndex = (fen: string) => (fen.indexOf(' b') > 0 ? 'p2' : 'p1');
 
 export const init = (node: HTMLElement) => {
@@ -162,13 +163,22 @@ export const update = (node: HTMLElement, data: UpdateData) => {
   };
   renderClock(data.p1, data.p1Delay, data.p1Pending, 'p1');
   renderClock(data.p2, data.p2Delay, data.p2Pending, 'p2');
+
+  ['p1', 'p2'].forEach(playerIndex => {
+    const $score = $(node).find('.mini-game__score--' + playerIndex);
+    $score.html(displayScore(variantFromElement($el) as VariantKey, data.fen, playerIndex));
+  });
 };
 
+//TODO add score to the mini-game__result
 export const finish = (node: HTMLElement, win?: string) =>
   ['p1', 'p2'].forEach(playerIndex => {
     const $clock = $(node).find('.mini-game__clock--' + playerIndex);
+    const $score = $(node).find('.mini-game__score--' + playerIndex);
     const colorLetter = playerIndex === 'p1' ? 'w' : 'b';
-    if (!$clock.data('managed'))
+    if (!$clock.data('managed')) {
       // snabbdom
+      $score.remove();
       $clock.replaceWith(`<span class="mini-game__result">${win ? (win == colorLetter ? 1 : 0) : '½'}</span>`);
+    }
   });

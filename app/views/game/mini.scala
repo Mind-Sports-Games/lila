@@ -103,6 +103,9 @@ object mini {
         span(cls := "rating")(lila.game.Namer ratingString pov.player),
         if (pov.player.berserk) iconTag("`")
       ),
+      if (!pov.game.finished) {
+        span(cls := s"mini-game__score--${pov.playerIndex.name}")(calculateScore(pov))
+      },
       if (pov.game.finished) renderResult(pov)
       else pov.game.clock.map { renderClock(_, pov) }
     )

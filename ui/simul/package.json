@@ -15,6 +15,7 @@
     "common": "workspace:*",
     "draughtsground": "workspace:*",
     "game": "workspace:*",
+    "stratutils": "workspace:*",
     "snabbdom": "^3.0.1"
   },
   "scripts": {
