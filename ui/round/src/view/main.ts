@@ -131,7 +131,8 @@ export function main(ctrl: RoundController): VNode {
     topPlayerIndex = d[ctrl.flip ? 'player' : 'opponent'].playerIndex,
     bottomPlayerIndex = d[ctrl.flip ? 'opponent' : 'player'].playerIndex,
     boardSize = d.game.variant.boardSize,
-    variantKey = d.game.variant.key;
+    variantKey = d.game.variant.key,
+    fen = plyStep(ctrl.data, ctrl.ply).fen;
   let topScore = 0,
     bottomScore = 0,
     captures = false;
@@ -139,9 +140,8 @@ export function main(ctrl: RoundController): VNode {
     switch (variantKey) {
       case 'flipello10':
       case 'flipello': {
-        const pieces = cgState ? cgState.pieces : fenRead(plyStep(ctrl.data, ctrl.ply).fen, boardSize, variantKey);
-        const p1Score = util.getPlayerScore(variantKey, pieces, 'p1');
-        const p2Score = util.getPlayerScore(variantKey, pieces, 'p2');
+        const p1Score = util.getScoreFromFen(variantKey, fen, 'p1');
+        const p2Score = util.getScoreFromFen(variantKey, fen, 'p2');
         topScore = topPlayerIndex === 'p1' ? p1Score : p2Score;
         bottomScore = topPlayerIndex === 'p2' ? p1Score : p2Score;
         break;
@@ -150,9 +150,8 @@ export function main(ctrl: RoundController): VNode {
       case 'togyzkumalak':
       case 'bestemshe': {
         //oware stores the score in the board fen so we can do this instead
-        const fen = plyStep(ctrl.data, ctrl.ply).fen;
-        const p1Score = util.getMancalaScore(fen, 'p1');
-        const p2Score = util.getMancalaScore(fen, 'p2');
+        const p1Score = util.getScoreFromFen(variantKey, fen, 'p1');
+        const p2Score = util.getScoreFromFen(variantKey, fen, 'p2');
         topScore = topPlayerIndex === 'p1' ? p1Score : p2Score;
         bottomScore = topPlayerIndex === 'p2' ? p1Score : p2Score;
         break;
@@ -160,7 +159,6 @@ export function main(ctrl: RoundController): VNode {
       case 'go9x9':
       case 'go13x13':
       case 'go19x19': {
-        const fen = plyStep(ctrl.data, ctrl.ply).fen;
         if (
           ctrl.data.deadStoneOfferState &&
           ctrl.data.deadStoneOfferState !== 'RejectedOffer' &&
@@ -169,18 +167,18 @@ export function main(ctrl: RoundController): VNode {
         ) {
           const p1Score = ctrl.data.calculatedCGGoScores
             ? ctrl.data.calculatedCGGoScores.p1
-            : util.getGoScore(fen, 'p1');
+            : util.getScoreFromFen(variantKey, fen, 'p1');
           const p2Score = ctrl.data.calculatedCGGoScores
             ? ctrl.data.calculatedCGGoScores.p2 + util.getGoKomi(fen)
-            : util.getGoScore(fen, 'p2');
+            : util.getScoreFromFen(variantKey, fen, 'p2');
           topScore = topPlayerIndex === 'p1' ? p1Score : p2Score;
           bottomScore = topPlayerIndex === 'p2' ? p1Score : p2Score;
         } else if (
           (finished(ctrl.data) && !ctrl.replaying()) ||
           (ctrl.data.deadStoneOfferState && ctrl.data.deadStoneOfferState !== 'RejectedOffer')
         ) {
-          const p1Score = util.getGoScore(fen, 'p1');
-          const p2Score = util.getGoScore(fen, 'p2');
+          const p1Score = util.getScoreFromFen(variantKey, fen, 'p1');
+          const p2Score = util.getScoreFromFen(variantKey, fen, 'p2');
           topScore = topPlayerIndex === 'p1' ? p1Score : p2Score;
           bottomScore = topPlayerIndex === 'p2' ? p1Score : p2Score;
         } else {
@@ -196,17 +194,16 @@ export function main(ctrl: RoundController): VNode {
       case 'hyper':
       case 'backgammon': {
         const startingNumberOfPieces = variantKey === 'hyper' ? 3 : 15;
-        const fen = plyStep(ctrl.data, ctrl.ply).fen;
         const pieces = cgState ? cgState.pieces : fenRead(fen, boardSize, variantKey);
         const pocketPieces = pocketRead(fen, variantKey);
 
         const p1PiecesOffBoard: number =
           fen.split(' ').length > 5
-            ? util.getBackgammonScoreFromFen(fen, 'p1')
+            ? util.getScoreFromFen(variantKey, fen, 'p1')
             : startingNumberOfPieces - util.getBackgammonScoreFromPieces(pieces, pocketPieces, 'p1');
         const p2PiecesOffBoard: number =
           fen.split(' ').length > 5
-            ? util.getBackgammonScoreFromFen(fen, 'p2')
+            ? util.getScoreFromFen(variantKey, fen, 'p2')
             : startingNumberOfPieces - util.getBackgammonScoreFromPieces(pieces, pocketPieces, 'p2');
 
         const p1Score = p1PiecesOffBoard;
@@ -223,9 +220,7 @@ export function main(ctrl: RoundController): VNode {
   let material: MaterialDiff,
     score = 0;
   if (d.pref.showCaptured) {
-    const pieces = cgState
-      ? cgState.pieces
-      : fenRead(plyStep(ctrl.data, ctrl.ply).fen, boardSize, variantKey as cg.Variant);
+    const pieces = cgState ? cgState.pieces : fenRead(fen, boardSize, variantKey as cg.Variant);
     material = util.getMaterialDiff(pieces);
     score = util.getScore(variantKey, pieces) * (bottomPlayerIndex === 'p1' ? 1 : -1);
   } else material = emptyMaterialDiff;

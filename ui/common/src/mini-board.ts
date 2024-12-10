@@ -1,12 +1,10 @@
 import * as domData from './data';
-import { readDice } from 'stratutils';
+import { readDice, fenPlayerIndex } from 'stratutils';
 
 export const init = (node: HTMLElement): void => {
   const [fen, orientation, lm] = node.getAttribute('data-state')!.split('|');
   initWith(node, fen, orientation as Orientation, lm);
 };
-
-const fenPlayerIndex = (fen: string) => (fen.indexOf(' b') > 0 ? 'p2' : 'p1');
 
 export const initWith = (node: HTMLElement, fen: string, orientation: Orientation, lm?: string): void => {
   if (!window.Chessground || !window.Draughtsground) setTimeout(() => init(node), 500);
@@ -40,7 +38,7 @@ export const initWith = (node: HTMLElement, fen: string, orientation: Orientatio
           orientation,
           coordinates: false,
           myPlayerIndex: myPlayerIndex,
-          turnPlayerIndex: fenPlayerIndex(fen),
+          turnPlayerIndex: fenPlayerIndex(variantFromElement($el) as VariantKey, fen),
           viewOnly: !node.getAttribute('data-playable'),
           resizable: false,
           fen,
@@ -107,27 +105,29 @@ export const variantFromElement = (element: Cash): string => {
         ? 'minishogi'
         : element.hasClass('variant-minixiangqi')
           ? 'minixiangqi'
-          : element.hasClass('variant-flipello10')
-            ? 'flipello10'
-            : element.hasClass('variant-amazons')
-              ? 'amazons'
-              : element.hasClass('variant-oware')
-                ? 'oware'
-                : element.hasClass('variant-togyzkumalak')
-                  ? 'togyzkumalak'
-                  : element.hasClass('variant-bestemshe')
-                    ? 'bestemshe'
-                    : element.hasClass('variant-go9x9')
-                      ? 'go9x9'
-                      : element.hasClass('variant-go13x13')
-                        ? 'go13x13'
-                        : element.hasClass('variant-go19x19')
-                          ? 'go19x19'
-                          : element.hasClass('variant-backgammon')
-                            ? 'backgammon'
-                            : element.hasClass('variant-hyper')
-                              ? 'hyper'
-                              : element.hasClass('variant-nackgammon')
-                                ? 'nackgammon'
-                                : 'standard';
+          : element.hasClass('variant-flipello')
+            ? 'flipello'
+            : element.hasClass('variant-flipello10')
+              ? 'flipello10'
+              : element.hasClass('variant-amazons')
+                ? 'amazons'
+                : element.hasClass('variant-oware')
+                  ? 'oware'
+                  : element.hasClass('variant-togyzkumalak')
+                    ? 'togyzkumalak'
+                    : element.hasClass('variant-bestemshe')
+                      ? 'bestemshe'
+                      : element.hasClass('variant-go9x9')
+                        ? 'go9x9'
+                        : element.hasClass('variant-go13x13')
+                          ? 'go13x13'
+                          : element.hasClass('variant-go19x19')
+                            ? 'go19x19'
+                            : element.hasClass('variant-backgammon')
+                              ? 'backgammon'
+                              : element.hasClass('variant-hyper')
+                                ? 'hyper'
+                                : element.hasClass('variant-nackgammon')
+                                  ? 'nackgammon'
+                                  : 'standard';
 };

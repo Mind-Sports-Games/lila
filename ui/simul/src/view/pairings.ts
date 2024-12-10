@@ -2,6 +2,7 @@ import { h } from 'snabbdom';
 import SimulCtrl from '../ctrl';
 import { Pairing, Game } from '../interfaces';
 import { onInsert } from './util';
+import { displayScore } from 'stratutils';
 import { opposite } from 'chessground/util';
 
 export default function (ctrl: SimulCtrl) {
@@ -56,8 +57,15 @@ const miniPairing = (ctrl: SimulCtrl) => (pairing: Pairing) => {
           ],
         ),
         game.clock
+          ? h(`span.mini-game__score--${opposite(game.orient)}`, displayScore(variant, game.fen, opposite(game.orient)))
+          : null,
+        game.clock
           ? renderClock(opposite(game.orient), game.clock[opposite(game.orient)])
-          : h('span.mini-game__result', game.winner ? (game.winner == game.orient ? 0 : 1) : '½'),
+          : h(
+              'span.mini-game__result',
+              (game.winner ? (game.winner == game.orient ? 0 : 1) : '½') +
+                displayScore(variant, game.fen, opposite(game.orient)),
+            ),
       ]),
       h('a.cg-wrap', {
         attrs: {
@@ -66,9 +74,13 @@ const miniPairing = (ctrl: SimulCtrl) => (pairing: Pairing) => {
       }),
       h('span.mini-game__player', [
         h('span'),
+        game.clock ? h(`span.mini-game__score--${game.orient}`, displayScore(variant, game.fen, game.orient)) : null,
         game.clock
           ? renderClock(game.orient, game.clock[game.orient])
-          : h('span.mini-game__result', game.winner ? (game.winner == game.orient ? 1 : 0) : '½'),
+          : h(
+              'span.mini-game__result',
+              (game.winner ? (game.winner == game.orient ? 1 : 0) : '½') + displayScore(variant, game.fen, game.orient),
+            ),
       ]),
     ],
   );

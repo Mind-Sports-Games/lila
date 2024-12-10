@@ -1,5 +1,6 @@
 import { h, VNode } from 'snabbdom';
 import { opposite } from 'chessground/util';
+import { displayScore } from 'stratutils';
 import { player as renderPlayer, bind, onInsert } from './util';
 import { Duel, DuelPlayer, DuelTeams, TeamBattle, FeaturedGame } from '../interfaces';
 import { teamName } from './battle';
@@ -27,6 +28,7 @@ const renderGameState = (game: FeaturedGame): string =>
 function featuredPlayer(game: FeaturedGame, playerIndex: PlayerIndex, withRating: boolean) {
   const player = game[playerIndex];
   const clock = game.c || game.clock; // temporary BC, remove me
+  const score: string = displayScore(game.variantKey as VariantKey, game.fen, playerIndex);
 
   return h('span.mini-game__player', [
     h('span.mini-game__user.is.playerIndex-icon.text.' + (playerIndex == 'p1' ? game.p1Color : game.p2Color), [
@@ -41,6 +43,7 @@ function featuredPlayer(game: FeaturedGame, playerIndex: PlayerIndex, withRating
           })
         : null,
     ]),
+    clock ? h(`span.mini-game__score--${playerIndex}`, score) : null,
     clock
       ? h(`span.mini-game__clock.mini-game__clock--${playerIndex}`, {
           attrs: {
@@ -48,7 +51,7 @@ function featuredPlayer(game: FeaturedGame, playerIndex: PlayerIndex, withRating
             'data-managed': 1,
           },
         })
-      : h('span.mini-game__result', game.winner ? (game.winner == playerIndex ? 1 : 0) : '½'),
+      : h('span.mini-game__result', (game.winner ? (game.winner == playerIndex ? 1 : 0) : '½') + score),
   ]);
 }
 
