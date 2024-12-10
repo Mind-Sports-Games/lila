@@ -86,6 +86,15 @@ export function displayScore(variant: VariantKey, fen: string, playerIndex: stri
   else return '';
 }
 
+export function fenPlayerIndex(variant: VariantKey, fen: string) {
+  //the fen input is coming from boardAndFen from SG, we cant use the same tactic for go
+  if (['go9x9', 'go13x13', 'go19x19'].includes(variant)) {
+    return fen.split(' ')[1] === 'b' ? 'p1' : 'p2';
+  }
+  const p2String = variant === 'oware' ? ' N' : ' b';
+  return fen.indexOf(p2String) > 0 ? 'p2' : 'p1';
+}
+
 export function variantUsesUCINotation(key: VariantKey | DraughtsVariantKey) {
   return ['linesOfAction', 'scrambledEggs', 'amazons', 'breakthroughtroyka', 'minibreakthroughtroyka'].includes(key);
 }

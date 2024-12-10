@@ -1,6 +1,6 @@
 import * as domData from 'common/data';
 import { variantFromElement } from 'common/mini-board';
-import { readDice, displayScore } from 'stratutils';
+import { readDice, displayScore, fenPlayerIndex } from 'stratutils';
 import clockWidget from './clock-widget';
 
 interface UpdateData {
@@ -13,9 +13,6 @@ interface UpdateData {
   p2Pending?: number;
   p2Delay?: number;
 }
-
-//TODO This is wrong - fix, affect clocks counting down incorrectly
-const fenPlayerIndex = (fen: string) => (fen.indexOf(' b') > 0 ? 'p2' : 'p1');
 
 export const init = (node: HTMLElement) => {
   if (!window.Chessground || !window.Draughtsground) setTimeout(() => init(node), 200);
@@ -38,7 +35,7 @@ export const init = (node: HTMLElement) => {
           },
         },
         $cg = $el.find('.cg-wrap'),
-        turnPlayerIndex = fenPlayerIndex(fen);
+        turnPlayerIndex = fen[0].toLowerCase() === 'w' ? 'p1' : 'p2';
       domData.set($cg[0] as HTMLElement, 'draughtsground', window.Draughtsground($cg[0], config));
       ['p1', 'p2'].forEach(playerIndex =>
         $el.find('.mini-game__clock--' + playerIndex).each(function (this: HTMLElement) {
@@ -56,7 +53,7 @@ export const init = (node: HTMLElement) => {
           coordinates: false,
           viewOnly: true,
           myPlayerIndex: orientation === 'p1vflip' ? 'p2' : orientation,
-          turnPlayerIndex: fenPlayerIndex(fen),
+          turnPlayerIndex: fenPlayerIndex(variantFromElement($el) as VariantKey, fen),
           resizable: false,
           fen,
           dice: readDice(fen, variantFromElement($el) as VariantKey),
@@ -105,7 +102,7 @@ export const init = (node: HTMLElement) => {
           variant: variantFromElement($el),
         },
         $cg = $el.find('.cg-wrap'),
-        turnPlayerIndex = fenPlayerIndex(fen);
+        turnPlayerIndex = fenPlayerIndex(variantFromElement($el) as VariantKey, fen);
       domData.set($cg[0] as HTMLElement, 'chessground', window.Chessground($cg[0], config));
       ['p1', 'p2'].forEach(playerIndex =>
         $el.find('.mini-game__clock--' + playerIndex).each(function (this: HTMLElement) {
@@ -137,7 +134,7 @@ export const update = (node: HTMLElement, data: UpdateData) => {
   if (cg)
     cg.set({
       fen: data.fen,
-      turnPlayerIndex: fenPlayerIndex(data.fen),
+      turnPlayerIndex: fenPlayerIndex(variantFromElement($el) as VariantKey, data.fen),
       dice: readDice(data.fen, variantFromElement($el) as VariantKey),
       lastMove,
     });
@@ -146,7 +143,7 @@ export const update = (node: HTMLElement, data: UpdateData) => {
       fen: data.fen,
       lastMove,
     });
-  const turnPlayerIndex = fenPlayerIndex(data.fen);
+  const turnPlayerIndex = fenPlayerIndex(variantFromElement($el) as VariantKey, data.fen);
   const renderClock = (
     time: number | undefined,
     delay: number | undefined,
