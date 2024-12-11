@@ -192,7 +192,9 @@ final class RoundSocket(
       }
     case lila.game.actorApi.FinishGame(game, _, _) if game.hasClock =>
       game.userIds.some.filter(_.nonEmpty) foreach { usersPlaying =>
-        sendForGameId(game.id)(Protocol.Out.finishGame(game.id, game.winnerPlayerIndex, usersPlaying))
+        sendForGameId(game.id)(
+          Protocol.Out.finishGame(game.id, game.winnerPlayerIndex, game.playerScores, usersPlaying)
+        )
       }
   }
 
@@ -386,8 +388,13 @@ object RoundSocket {
         s"r/tour/standing $tourId ${Json stringify data}"
 
       def startGame(users: List[User.ID]) = s"r/start ${P.Out.commas(users)}"
-      def finishGame(gameId: Game.ID, winner: Option[PlayerIndex], users: List[User.ID]) =
-        s"r/finish $gameId ${P.Out.playerIndex(winner)} ${P.Out.commas(users)}"
+      def finishGame(
+          gameId: Game.ID,
+          winner: Option[PlayerIndex],
+          playerScores: List[String],
+          users: List[User.ID]
+      ) =
+        s"r/finish $gameId ${P.Out.playerIndex(winner)} ${P.Out.commas(playerScores)} ${P.Out.commas(users)}"
 
       def versioningReady = "r/versioning-ready"
     }

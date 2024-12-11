@@ -167,15 +167,18 @@ export const update = (node: HTMLElement, data: UpdateData) => {
   });
 };
 
-//TODO add score to the mini-game__result
-export const finish = (node: HTMLElement, win?: string) =>
+export const finish = (node: HTMLElement, win?: string, p1Score?: string, p2Score?: string) =>
   ['p1', 'p2'].forEach(playerIndex => {
     const $clock = $(node).find('.mini-game__clock--' + playerIndex);
     const $score = $(node).find('.mini-game__score--' + playerIndex);
     const colorLetter = playerIndex === 'p1' ? 'w' : 'b';
+    const score = playerIndex === 'p1' ? p1Score : p2Score;
+    const scoreDisplay = score ? `(${score})` : '';
     if (!$clock.data('managed')) {
       // snabbdom
       $score.remove();
-      $clock.replaceWith(`<span class="mini-game__result">${win ? (win == colorLetter ? 1 : 0) : '½'}</span>`);
+      $clock.replaceWith(
+        `<span class="mini-game__result">${(win ? (win == colorLetter ? 1 : 0) : '½') + scoreDisplay}</span>`,
+      );
     }
   });
