@@ -105,6 +105,7 @@ final private class SwissDirector(
                   status = Left(SwissPairing.Ongoing),
                   matchStatus = Left(SwissPairing.Ongoing),
                   None,
+                  None,
                   isMatchScore = swiss.settings.isMatchScore,
                   isBestOfX = swiss.settings.isBestOfX,
                   isPlayX = swiss.settings.isPlayX,

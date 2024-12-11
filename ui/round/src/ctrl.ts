@@ -146,7 +146,7 @@ export default class RoundController {
 
     setTimeout(this.showExpiration, 350);
 
-    if (!document.referrer?.includes('/serviceWorker.')) setTimeout(this.showYourMoveNotification, 500);
+    if (!document.referrer?.includes('/serviceWorker.')) setTimeout(this.showYourTurnNotification, 500);
 
     // at the end:
     playstrategy.pubsub.on('jump', ply => {
@@ -542,7 +542,22 @@ export default class RoundController {
     this.actualSendMove('pass', pass);
   };
 
-  showYourMoveNotification = () => {
+  lastTurnStr = () => {
+    const d = this.data;
+    if (d.steps.length > 0) {
+      const lastTurnCount = d.steps[d.steps.length - 1].turnCount;
+      return d.steps
+        .filter(step => step.turnCount >= lastTurnCount - 1)
+        .slice(1)
+        .filter(step => step.san !== 'endturn')
+        .map(step => step.san)
+        .join(',');
+    } else {
+      return '';
+    }
+  };
+
+  showYourTurnNotification = () => {
     const d = this.data;
     if (game.isPlayerTurn(d))
       notify(() => {
@@ -550,10 +565,11 @@ export default class RoundController {
         const opponent = renderUser.userTxt(this, d.opponent);
         if (this.turnCount < 1) txt = `${opponent}\njoined the game.\n${txt}`;
         else {
-          let move = d.steps[d.steps.length - 1].san;
           const turn = Math.floor((this.turnCount - 1) / 2) + 1;
-          move = `${turn}${this.turnCount % 2 === 1 ? '.' : '...'} ${move}`;
-          txt = `${opponent}\nplayed ${move}.\n${txt}`;
+          const actions = `${turn}${this.turnCount % 2 === 1 ? '.' : '...'} ${this.lastTurnStr()}`;
+          let notificationPrefix = `${opponent}\nplayed`;
+          if (d.steps[d.steps.length - 1].san.includes('/')) notificationPrefix = 'You rolled';
+          txt = `${notificationPrefix} ${actions}.\n${txt}`;
         }
         return txt;
       });
@@ -771,7 +787,7 @@ export default class RoundController {
       setTimeout(() => {
         if (!this.chessground.playPremove() && !this.playPredrop()) {
           promotion.cancel(this);
-          this.showYourMoveNotification();
+          this.showYourTurnNotification();
         }
       }, premoveDelay);
     }
