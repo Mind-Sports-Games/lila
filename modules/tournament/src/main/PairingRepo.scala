@@ -244,7 +244,6 @@ final class PairingRepo(coll: Coll)(implicit ec: scala.concurrent.ExecutionConte
         Project(
           $doc(
             "_id" -> false,
-            //copilot #3
             "w" -> $doc(
               "$cond" -> $arr(
                 $doc("$eq" -> $arr("$st", true)), // Check if st is true
@@ -264,16 +263,6 @@ final class PairingRepo(coll: Coll)(implicit ec: scala.concurrent.ExecutionConte
                 "$w" // Keep w as it is if st is false
               )
             ),
-            //my attempt
-            //"w" -> $doc(
-            //  "$cond" -> $arr(
-            //    "$st",
-            //    $doc(
-            //      "$cond" -> $arr($doc("w" $exists true), $doc("$cond" -> $arr("$w", "p2", "p1")), "draw")
-            //    ),
-            //    $doc("$cond" -> $arr($doc("w" $exists true), $doc("$cond" -> $arr("$w", "p1", "p2")), "draw"))
-            //  )
-            //),
             "t"  -> true,
             "b1" -> $doc("$cond" -> $arr("$b1", 1, 0)),
             "b2" -> $doc("$cond" -> $arr("$b2", 1, 0))
