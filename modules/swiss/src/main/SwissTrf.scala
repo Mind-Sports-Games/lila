@@ -25,7 +25,7 @@ final class SwissTrf(
         forbiddenPairings(swiss, playerIds) concat sheetApi
           .source(swiss, sort = sorted.??($doc(f.inputRating -> -1, f.rating -> -1)))
           .map((playerLine(swiss, playerIds) _).tupled)
-          .map(formatLine) concat (if (swiss.settings.mcmahon)
+          .map(formatLine) concat (if (swiss.settings.mcmahon || swiss.settings.isMatchScore)
                                      sheetApi
                                        .source(
                                          swiss,
@@ -61,13 +61,26 @@ final class SwissTrf(
       8 -> playerIds.getOrElse(p.userId, 0).toString
     ) ::: swiss.allAcceleratedRounds.flatMap { rn =>
       List(
-        13 -> f"${additionalPoints(swiss.settings.mcmahonCutoffGrade, p)}%1.1f"
+        13 -> f"${additionalPoints(swiss, p, sheet, rn.value)}%1.1f"
       ).map { case (l, s) => (l + (rn.value - 1) * 5, s) }
     }
 
-  private def additionalPoints(mcmahonCutoff: Int, player: SwissPlayer): Double = {
-    val maxScore = 30.0 // so that all scores are positive
-    maxScore + player.mcMahonStartingScore(mcmahonCutoff)
+  private def additionalPoints(swiss: Swiss, player: SwissPlayer, sheet: SwissSheet, round: Int): Double = {
+    if (swiss.settings.isMatchScore) {
+      val outcomesSoFar = sheet.outcomes.slice(0, round - 1)
+      Swiss
+        .Points {
+          outcomesSoFar.foldLeft(0) { case (acc, out) => acc + SwissSheet.pointsFor(out) }
+        }
+        .-(Swiss.Points {
+          outcomesSoFar.foldLeft(0) { case (acc, out) => acc + SwissSheet.pointsForTrf(out) }
+        })
+        .value
+        .toDouble
+    } else if (swiss.settings.mcmahon) {
+      val maxScore = 30.0 // so that all scores are positive
+      maxScore + player.mcMahonStartingScore(swiss.settings.mcmahonCutoffGrade)
+    } else 0
   }
 
   private def playerLine(

@@ -147,6 +147,7 @@ object Swiss {
   case class Points(double: Int) extends AnyVal {
     def value: Float = double / 2f
     def +(p: Points) = Points(double + p.double)
+    def -(p: Points) = Points(double - p.double)
   }
   trait TieBreak extends Any {
     def value: Double
