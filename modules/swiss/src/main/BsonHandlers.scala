@@ -119,6 +119,8 @@ object BsonHandlers {
             bbpPairingP1 = r.getO[User.ID](bbpPairingP1) | w,
             status = r.getO[SwissPairing.Status](status) | Right(none),
             matchStatus = r.getO[SwissPairing.MatchStatus](matchStatus) | Right(List(none)),
+            //TODO: we could summarise this data or omit it when its identical to matchStatus
+            startPlayerWinners = r.getO[SwissPairing.MatchStatus](startPlayerWinners),
             // TODO: long term we may want to skip storing both of these fields
             //       in the case that it's not a multimatch to save on storage
             multiMatchGameIds = r.getsO[String](multiMatchGameIds),
@@ -141,6 +143,8 @@ object BsonHandlers {
         bbpPairingP1 -> o.bbpPairingP1,
         status       -> o.status,
         matchStatus  -> o.matchStatus,
+        //TODO: we could summarise this data or omit it when its identical to matchStatus
+        startPlayerWinners -> o.startPlayerWinners,
         // TODO: long term we may want to skip storing both of these fields
         //       in the case that it's not a multimatch to save on storage
         multiMatchGameIds -> o.multiMatchGameIds,
