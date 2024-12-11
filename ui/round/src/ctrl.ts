@@ -551,11 +551,11 @@ export default class RoundController {
         .slice(1)
         .filter(step => step.san !== 'endturn')
         .map(step => step.san)
-        .join(',')
+        .join(',');
     } else {
       return '';
     }
-  }
+  };
 
   showYourTurnNotification = () => {
     const d = this.data;
