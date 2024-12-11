@@ -157,7 +157,9 @@ export function boot() {
       document.querySelectorAll('.mini-game-' + e.id).forEach((el: HTMLElement) => miniGame.update(el, e)),
     );
     pubsub.on('socket.in.finish', e =>
-      document.querySelectorAll('.mini-game-' + e.id).forEach((el: HTMLElement) => miniGame.finish(el, e.win)),
+      document
+        .querySelectorAll('.mini-game-' + e.id)
+        .forEach((el: HTMLElement) => miniGame.finish(el, e.win, e.p1Score, e.p2Score)),
     );
     pubsub.on('socket.in.announce', announce);
     pubsub.on('socket.in.tournamentReminder', (data: { id: string; name: string }) => {
