@@ -432,7 +432,7 @@ final private class TournamentScheduler(
         new DateTime(2025, 1, 24, 0, 0)
       ),
       scheduleYearly24hr(Variant.Backgammon(strategygames.backgammon.variant.Hyper), Delay310)(
-        new DateTime(2024, 1, 31, 0, 0)
+        new DateTime(2025, 1, 31, 0, 0)
       ),
       scheduleYearly24hr(Variant.Draughts(strategygames.draughts.variant.Breakthrough), Blitz32)(
         new DateTime(2025, 2, 7, 0, 0)
