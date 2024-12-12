@@ -307,7 +307,8 @@ object Tournament {
       createdBy = User.playstrategyId,
       createdAt = DateTime.now,
       nbPlayers = 0,
-      variant = medleyVariantsAndIntervals.fold(sched.variant)(v => v.head._1),
+      variant =
+        medleyVariantsAndIntervals.fold(sched.variant)(v => v.headOption.map(_._1).getOrElse(sched.variant)),
       medleyVariantsAndIntervals = medleyVariantsAndIntervals,
       medleyMinutes = sched.medleyShield.map(_.medleyMinutes),
       position = sched.position,
