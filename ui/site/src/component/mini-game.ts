@@ -176,7 +176,7 @@ export const finish = (node: HTMLElement, win?: string, p1Score?: string, p2Scor
     const scoreDisplay = score ? `(${score})` : '';
     if (!$clock.data('managed')) {
       // snabbdom
-      $score.remove();
+      $score.html(''); // keep around as css aligns the result/clock to the right
       $clock.replaceWith(
         `<span class="mini-game__result">${(win ? (win == colorLetter ? 1 : 0) : '½') + scoreDisplay}</span>`,
       );

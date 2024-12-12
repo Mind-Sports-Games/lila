@@ -43,7 +43,7 @@ function featuredPlayer(game: FeaturedGame, playerIndex: PlayerIndex, withRating
           })
         : null,
     ]),
-    clock ? h(`span.mini-game__score--${playerIndex}`, score) : null,
+    h(`span.mini-game__score--${playerIndex}`, clock ? score : ''),
     clock
       ? h(`span.mini-game__clock.mini-game__clock--${playerIndex}`, {
           attrs: {
