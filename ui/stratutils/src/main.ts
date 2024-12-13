@@ -75,6 +75,9 @@ export function getScore(variant: VariantKey, fen: string, playerIndex: string):
       const boardPart = fen.split(' ')[0].split('[')[0];
       return boardPart.split(playerIndex === 'p1' ? 'P' : 'p').length - 1;
     }
+    case 'threeCheck':
+    case 'fiveCheck':
+      return +fen.split(' ')[6][playerIndex === 'p1' ? 1 : 3];
     default:
       return undefined;
   }
@@ -87,7 +90,7 @@ export function displayScore(variant: VariantKey, fen: string, playerIndex: stri
 }
 
 export function fenPlayerIndex(variant: VariantKey, fen: string) {
-  //the fen input is coming from boardAndFen from SG, we cant use the same tactic for go
+  //different trick for Go due to fen structure
   if (['go9x9', 'go13x13', 'go19x19'].includes(variant)) {
     return fen.split(' ')[1] === 'b' ? 'p1' : 'p2';
   }

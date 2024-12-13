@@ -352,7 +352,7 @@ case class Game(
           .filter(p => p == playerIndex.name)
           .size
           .toString()
-      case "threeCheck" | "fivecheck" =>
+      case "threeCheck" | "fiveCheck" =>
         history.checkCount(opponent(playerIndex).playerIndex).toString()
       case "oware" =>
         val fen   = Forsyth.>>(variant.gameLogic, situation)

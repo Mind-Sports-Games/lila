@@ -138,6 +138,7 @@ export const update = (node: HTMLElement, data: UpdateData) => {
       dice: readDice(data.fen, variantFromElement($el) as VariantKey),
       lastMove,
     });
+  if (['backgammon', 'nackgammon', 'hyper'].includes(variantFromElement($el))) cg.redrawAll(); //update dice as they are in wrap of cg
   if (dg)
     dg.set({
       fen: data.fen,
