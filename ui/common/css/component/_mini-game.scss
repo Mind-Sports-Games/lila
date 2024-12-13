@@ -50,5 +50,9 @@
   &__score--p2 {
     @extend %roboto;
     margin-left: auto;
+    padding-left: 1ch;
+    &:empty {
+      padding-left: 0;
+    }
   }
 }
