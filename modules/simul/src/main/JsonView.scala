@@ -146,10 +146,9 @@ final class JsonView(
       .obj(
         "id"     -> g.id,
         "status" -> g.status.id,
-        "fen" -> (strategygames.format.Forsyth.boardAndPlayer(
-          g.situation.board.variant.gameLogic,
-          g.situation
-        )),
+        "fen" -> (strategygames.format.Forsyth
+          .>>(g.situation.board.variant.gameLogic, g.stratGame))
+          .value,
         "gameLogic" -> g.situation.board.variant.gameLogic.name.toLowerCase(),
         "boardSize" -> boardSizeJson(g.situation.board.variant),
         "lastMove"  -> ~g.lastActionKeys,

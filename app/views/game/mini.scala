@@ -86,7 +86,7 @@ object mini {
     pov.game.variant match {
       case Variant.Chess(_) | Variant.FairySF(_) | Variant.Samurai(_) | Variant.Togyzkumalak(_) |
           Variant.Go(_) | Variant.Backgammon(_) =>
-        dataState := s"${Forsyth.boardAndPlayer(pov.game.variant.gameLogic, pov.game.situation)}|${orientation(pov)}|${~pov.game.lastActionKeys}"
+        dataState := s"${Forsyth.>>(pov.game.variant.gameLogic, pov.game.stratGame)}|${orientation(pov)}|${~pov.game.lastActionKeys}"
       case Variant.Draughts(v) =>
         dataState := s"${Forsyth.boardAndPlayer(
           pov.game.variant.gameLogic,
@@ -103,9 +103,9 @@ object mini {
         span(cls := "rating")(lila.game.Namer ratingString pov.player),
         if (pov.player.berserk) iconTag("`")
       ),
-      if (!pov.game.finished) {
-        span(cls := s"mini-game__score--${pov.playerIndex.name}")(calculateScore(pov))
-      },
+      span(cls := s"mini-game__score--${pov.playerIndex.name}")(
+        if (!pov.game.finished) calculateScore(pov) else ""
+      ),
       if (pov.game.finished) renderResult(pov)
       else pov.game.clock.map { renderClock(_, pov) }
     )

@@ -129,5 +129,9 @@ export const variantFromElement = (element: Cash): string => {
                                 ? 'hyper'
                                 : element.hasClass('variant-nackgammon')
                                   ? 'nackgammon'
-                                  : 'standard';
+                                  : element.hasClass('variant-threeCheck')
+                                    ? 'threeCheck'
+                                    : element.hasClass('variant-fiveCheck')
+                                      ? 'fiveCheck'
+                                      : 'standard';
 };

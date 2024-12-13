@@ -114,6 +114,7 @@ object EvalCacheEntry {
 
   final class SmallFen private (val value: String) extends AnyVal with StringValue
 
+  //TODO is this correct for all fens in SG? What is this used for?
   object SmallFen {
     private[evalCache] def raw(str: String) = new SmallFen(str)
     def make(variant: Variant, fen: FEN): SmallFen = {

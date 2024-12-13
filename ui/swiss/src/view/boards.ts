@@ -70,7 +70,7 @@ function boardPlayer(board: Board, playerIndex: PlayerIndex) {
       h('strong', '#' + player.rank),
       renderPlayer(player, true, true, false),
     ]),
-    board.clock ? h(`span.mini-game__score--${playerIndex}`, score) : null,
+    h(`span.mini-game__score--${playerIndex}`, board.clock ? score : ''),
     board.clock
       ? h(`span.mini-game__clock.mini-game__clock--${playerIndex}`, {
           attrs: {
