@@ -198,6 +198,7 @@ object BSONHandlers {
           case _    => user2
         },
         turns = r intO "t",
+        invertStartPlayer = r boolD "sp",
         berserk1 = r.intO("b1").fold(r.boolD("b1"))(1 ==), // it used to be int = 0/1
         berserk2 = r.intO("b2").fold(r.boolD("b2"))(1 ==)
       )
@@ -210,6 +211,7 @@ object BSONHandlers {
         "u"   -> BSONArray(o.user1, o.user2),
         "w"   -> o.winner.map(o.user1 ==),
         "t"   -> o.turns,
+        "sp"  -> w.boolO(o.invertStartPlayer),
         "b1"  -> w.boolO(o.berserk1),
         "b2"  -> w.boolO(o.berserk2)
       )

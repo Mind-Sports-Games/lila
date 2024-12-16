@@ -46,10 +46,7 @@ private object ChallengeJoiner {
       )
 
     val baseState = c.initialFen
-      .ifTrue(
-        c.variant.fromPositionVariant || c.variant.key == "chess960" || c.variant.gameFamily == GameFamily
-          .Go()
-      ) flatMap {
+      .ifTrue(c.variant.fromPositionVariant || c.variant.variableInitialFen) flatMap {
       Forsyth.<<<@(c.variant.gameLogic, c.variant, _)
     }
     val (stratGame, state) = baseState.fold(makeStratGame(c.variant) -> none[SituationPlus]) { sp =>

@@ -100,6 +100,8 @@ final private class Rematcher(
           initialFen =
             if (game.variant.gameFamily == GameFamily.Go())
               Some(FEN.Go(nextGame.board.toGo.apiPosition.initialFen))
+            else if (game.variant.gameFamily == GameFamily.Backgammon())
+              Some(Forsyth.>>(game.variant.gameLogic, nextGame.stratGame))
             else None
           _ <- gameRepo.insertDenormalized(nextGame, initialFen)
         } yield {
@@ -133,10 +135,19 @@ final private class Rematcher(
       }
     } else g.metadata.multiMatch.isDefined option "multiMatch"
 
+  //when rematching we want the same fen unless we are backgammon and the players
+  //aren't flipping colour, but we want the start player to be randomized again
+  private def generateRematchFen(variant: Variant, initialFen: Option[FEN]) =
+    if (variant.initialFens.size > 1)
+      scala.util.Random.shuffle(variant.initialFens).headOption
+    else initialFen
+
   private def returnGame(game: Game): Fu[Game] = {
     for {
       initialFen <- gameRepo.initialFen(game)
-      situation = initialFen.flatMap { fen => Forsyth.<<<(game.variant.gameLogic, fen) }
+      situation = generateRematchFen(game.variant, initialFen).flatMap { fen =>
+        Forsyth.<<<(game.variant.gameLogic, fen)
+      }
       pieces: PieceMap = game.variant match {
         case Variant.Chess(Chess960) =>
           if (chess960 get game.id) Piece.pieceMapForChess(Chess960.pieces)

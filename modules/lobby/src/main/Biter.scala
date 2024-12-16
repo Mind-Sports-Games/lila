@@ -67,12 +67,18 @@ final private class Biter(
   private def makeGame(hook: Hook, p1User: Option[User], p2User: Option[User]) = {
     val clock      = hook.clock.toClock
     val perfPicker = PerfPicker.mainOrDefault(strategygames.Speed(clock.config), hook.realVariant, none)
+    val stratSit   = Situation(hook.realVariant.gameLogic, hook.realVariant)
     Game
       .make(
         stratGame = StratGame(
           lib = hook.realVariant.gameLogic,
-          situation = Situation(hook.realVariant.gameLogic, hook.realVariant),
-          clock = clock.some
+          situation = stratSit,
+          clock = clock.some,
+          //we have to do this to handle Backgammon variable start player
+          plies = stratSit.player.fold(0, 1),
+          turnCount = stratSit.player.fold(0, 1),
+          startedAtPly = stratSit.player.fold(0, 1),
+          startedAtTurn = stratSit.player.fold(0, 1)
         ),
         p1Player = Player.make(strategygames.P1, p1User, perfPicker),
         p2Player = Player.make(strategygames.P2, p2User, perfPicker),
@@ -85,12 +91,18 @@ final private class Biter(
 
   private def makeGame(seek: Seek, p1User: Option[User], p2User: Option[User]) = {
     val perfPicker = PerfPicker.mainOrDefault(strategygames.Speed(none), seek.realVariant, seek.daysPerTurn)
+    val stratSit   = Situation(seek.realVariant.gameLogic, seek.realVariant)
     Game
       .make(
         stratGame = StratGame(
           lib = seek.realVariant.gameLogic,
-          situation = Situation(seek.realVariant.gameLogic, seek.realVariant),
-          clock = none
+          situation = stratSit,
+          clock = none,
+          //we have to do this to handle Backgammon variable start player
+          plies = stratSit.player.fold(0, 1),
+          turnCount = stratSit.player.fold(0, 1),
+          startedAtPly = stratSit.player.fold(0, 1),
+          startedAtTurn = stratSit.player.fold(0, 1)
         ),
         p1Player = Player.make(strategygames.P1, p1User, perfPicker),
         p2Player = Player.make(strategygames.P2, p2User, perfPicker),

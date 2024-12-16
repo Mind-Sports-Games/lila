@@ -2,7 +2,7 @@ package lila.game
 
 import scala.annotation.nowarn
 
-import strategygames.format.{ FEN, Uci }
+import strategygames.format.{ FEN, Forsyth, Uci }
 import strategygames.opening.{ FullOpening, FullOpeningDB }
 import strategygames.chess.{ Castles, CheckCount }
 import strategygames.chess.format.{ Uci => ChessUci }
@@ -339,6 +339,33 @@ case class Game(
 
     Progress(this, updated, events)
   }
+
+  def playerScores: List[String] =
+    if (calculateScore(P1) == "" || calculateScore(P2) == "") List()
+    else List(calculateScore(P1), calculateScore(P2))
+
+  def calculateScore(playerIndex: PlayerIndex): String =
+    variant.key match {
+      case "flipello" | "flipello10" =>
+        board.pieces
+          .map { case (_, (piece, _)) => piece.player.name }
+          .filter(p => p == playerIndex.name)
+          .size
+          .toString()
+      case "threeCheck" | "fiveCheck" =>
+        history.checkCount(opponent(playerIndex).playerIndex).toString()
+      case "oware" =>
+        val fen   = Forsyth.>>(variant.gameLogic, situation)
+        val score = if (playerIndex.name == "p1") fen.player1Score else fen.player2Score
+        score.toString()
+      case "togyzkumalak" | "bestemshe" => history.score(playerIndex).toString()
+      case "go9x9" | "go13x13" | "go19x19" =>
+        val fen   = Forsyth.>>(variant.gameLogic, situation)
+        val score = (if (playerIndex.name == "p1") fen.player1Score else fen.player2Score) / 10.0
+        score.toString().replace(".0", "")
+      case "backgammon" | "hyper" | "nackgammon" => history.score(playerIndex).toString()
+      case _                                     => ""
+    }
 
   def displayScore: Option[Score] =
     if (variant.gameLogic == GameLogic.Togyzkumalak() || variant.gameLogic == GameLogic.Backgammon())

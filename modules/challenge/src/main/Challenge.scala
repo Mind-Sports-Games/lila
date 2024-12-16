@@ -4,7 +4,9 @@ import strategygames.format.FEN
 import strategygames.variant.Variant
 import strategygames.chess.variant.Chess960
 import strategygames.{ P2, Player => PlayerIndex, GameFamily, GameLogic, Mode, Speed, P1 }
+
 import org.joda.time.DateTime
+import scala.util.Random
 
 import lila.game.{ Game, PerfPicker }
 import lila.i18n.{ I18nKey, I18nKeys }
@@ -224,24 +226,7 @@ object Challenge {
     }
 
   private def perfTypeOf(variant: Variant, timeControl: TimeControl): PerfType =
-    PerfPicker
-      .perfType(
-        speedOf(timeControl),
-        variant,
-        timeControl match {
-          case TimeControl.Correspondence(d) => d.some
-          case _                             => none
-        }
-      )
-      .orElse {
-        (variant.fromPositionVariant) option perfTypeOf(
-          Variant
-            .byName(variant.gameLogic, "From Position")
-            .getOrElse(Variant.orDefault(variant.gameLogic, 3)),
-          timeControl
-        )
-      }
-      .|(PerfType.orDefaultSpeed("correspondence"))
+    lila.rating.PerfType(variant, speedOf(timeControl))
 
   private val idSize = 8
 
@@ -303,11 +288,12 @@ object Challenge {
       status = Status.Created,
       variant = variant,
       initialFen =
-        if (variant.fromPositionVariant) initialFen
+        if (variant.fromPositionVariant || variant.gameFamily == GameFamily.Go()) initialFen
         else if (variant == Variant.Chess(Chess960)) initialFen filter { fen =>
           fen.chessFen.map(fen => Chess960.positionNumber(fen).isDefined).getOrElse(false)
         }
-        else if (variant.gameFamily == GameFamily.Go()) initialFen
+        else if (variant.initialFens.size > 1)
+          Random.shuffle(variant.initialFens).headOption
         else !variant.standardInitialPosition option variant.initialFen,
       timeControl = timeControl,
       mode = finalMode,

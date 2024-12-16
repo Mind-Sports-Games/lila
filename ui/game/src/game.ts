@@ -16,6 +16,16 @@ export const playedTurns = (data: BaseGameData): number => data.game.turns - (da
 
 export const bothPlayersHavePlayed = (data: BaseGameData): boolean => playedTurns(data) > 1;
 
+export const playerHasPlayedTurn = (data: BaseGameData): boolean =>
+  playedTurns(data) >
+  (data.game.startedAtTurn !== undefined && data.game.startedAtTurn % 2 == 1
+    ? data.player.playerIndex == 'p1'
+      ? 1
+      : 0
+    : data.player.playerIndex == 'p1'
+      ? 0
+      : 1);
+
 export const abortable = (data: BaseGameData): boolean =>
   playable(data) &&
   !bothPlayersHavePlayed(data) &&

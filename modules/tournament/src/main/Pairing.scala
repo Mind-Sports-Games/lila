@@ -12,6 +12,7 @@ case class Pairing(
     user2: User.ID,
     winner: Option[User.ID],
     turns: Option[Int],
+    invertStartPlayer: Boolean,
     berserk1: Boolean,
     berserk2: Boolean
 ) {
@@ -32,6 +33,8 @@ case class Pairing(
   def finished = status >= strategygames.Status.Mate
   def playing  = !finished
 
+  //these don't work so well for multiaction as they trigger on turns started, not finished.
+  //If a player has started a turn but doesn't complete it and resigns mid turn these will trigger a turn early for p2
   def quickFinish      = finished && turns.exists(20 >)
   def quickDraw        = draw && turns.exists(20 >)
   def notSoQuickFinish = finished && turns.exists(14 <=)
@@ -79,6 +82,7 @@ private[tournament] object Pairing {
       user2 = u2,
       winner = none,
       turns = none,
+      invertStartPlayer = false,
       berserk1 = false,
       berserk2 = false
     )
