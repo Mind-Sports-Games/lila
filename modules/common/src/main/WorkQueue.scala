@@ -39,19 +39,32 @@ final class WorkQueue(buffer: Int, timeout: FiniteDuration, name: String, parall
     }
   }
 
-  private val queue = Source
+  private val queue: SourceQueueWithComplete[TaskWithPromise[_]] = Source
     .queue[TaskWithPromise[_]](buffer, OverflowStrategy.dropNew) // #TODO use akka 2.6.11 BoundedQueueSource
     .mapAsyncUnordered(parallelism) { case (task, promise) =>
       task()
         .withTimeout(timeout, new TimeoutException)(ec, mat.system)
-        .tap(promise.completeWith)
-        .recover {
-          case e: TimeoutException =>
-            lila.mon.workQueue.timeout(name).increment()
-            lila.log(s"WorkQueue:$name").warn(s"task timed out after $timeout", e)
-          case e: Exception =>
-            lila.log(s"WorkQueue:$name").info("task failed", e)
-        }
+        .tap(promise.completeWith) // Do the side effect of completing the promise
+        .transform(
+          // Transform both values, in this case, what we want is a tapError to log the error,
+          // But that doesn't exist, as far as I can tell. .transform sorta does it, but it's also
+          // awkward, because we have to provide an identity to avoid transforming the success case
+          // and then error case still needs to return a value
+          identity,
+          e => {
+            e match {
+              case e: TimeoutException =>
+                lila.mon.workQueue.timeout(name).increment()
+                lila.log(s"WorkQueue:$name").warn(s"task timed out after $timeout", e)
+              case e: Exception =>
+                lila.log(s"WorkQueue:$name").info("task failed", e)
+            }
+            // The lack of this line was probably an bug in the previous version, but isn't necessary to fix the compilation error.
+            promise.failure(e)
+            // Still need to return a throwable.
+            e
+          }
+        )
     }
     .toMat(Sink.ignore)(Keep.left)
     .run()

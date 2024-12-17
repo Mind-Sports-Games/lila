@@ -6,6 +6,7 @@ import strategygames.{ Game, GameLogic }
 import org.joda.time.DateTime
 import play.api.libs.json.JsObject
 import scala.concurrent.duration._
+import scala.util.control.NonFatal
 
 import lila.db.dsl._
 import lila.memo.CacheApi._
@@ -81,7 +82,7 @@ final class EvalCacheApi(
               usedAt = DateTime.now,
               updatedAt = DateTime.now
             )
-            coll.insert.one(entry).recover(lila.db.ignoreDuplicateKey).void >>-
+            coll.insert.one(entry).void.recover(lila.db.ignoreDuplicateKey) >>-
               cache.put(input.id, fuccess(entry.some)) >>-
               upgrade.onEval(input, sri)
           case Some(oldEntry) =>
