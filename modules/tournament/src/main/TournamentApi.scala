@@ -816,7 +816,7 @@ final class TournamentApi(
       _ ?? { user =>
         playerRepo.find(tour.id, user.id) flatMap {
           _ ?? { player =>
-            playerPovs(tour, user.id, 50) map { povs =>
+            playerPovs(tour, user.id, 250) map { povs =>
               PlayerInfoExt(user, player, povs).some
             }
           }
@@ -976,7 +976,11 @@ final class TournamentApi(
 
   private[tournament] def subscribeBotsToArenas: Funit =
     subscribeBots(
-      List(Schedule.Freq.Weekly, Schedule.Freq.Yearly, Schedule.Freq.MedleyMarathon) ::: Schedule.Freq.shields,
+      List(
+        Schedule.Freq.Weekly,
+        Schedule.Freq.Yearly,
+        Schedule.Freq.MedleyMarathon
+      ) ::: Schedule.Freq.shields,
       TournamentShield.MedleyShield.medleyTeamIDs
     )
 
