@@ -15,6 +15,7 @@ case class SwissPairing(
     bbpPairingP1: User.ID,
     status: SwissPairing.Status,
     matchStatus: SwissPairing.MatchStatus,
+    startPlayerWinners: Option[SwissPairing.MatchStatus],
     multiMatchGameIds: Option[List[Game.ID]],
     isMatchScore: Boolean,
     isBestOfX: Boolean,
@@ -37,10 +38,16 @@ case class SwissPairing(
   def p2Wins                                   = status == Right(Some(PlayerIndex.P2))
   def isDraw                                   = status == Right(None)
 
-  def numFirstPlayerWins  = matchStatus.fold(_ => 0, l => l.count(Some(PlayerIndex.P1).==))
-  def numSecondPlayerWins = matchStatus.fold(_ => 0, l => l.count(Some(PlayerIndex.P2).==))
-  def numDraws            = matchStatus.fold(_ => 0, l => l.count(None.==))
-  def numGames            = matchStatus.fold(_ => 0, l => l.length)
+  def numFirstPlayerWins =
+    startPlayerWinners.fold(matchStatus.fold(_ => 0, l => l.count(Some(PlayerIndex.P1).==)))(spw =>
+      spw.fold(_ => 0, s => s.count(Some(PlayerIndex.P1).==))
+    )
+  def numSecondPlayerWins =
+    startPlayerWinners.fold(matchStatus.fold(_ => 0, l => l.count(Some(PlayerIndex.P2).==)))(spw =>
+      spw.fold(_ => 0, s => s.count(Some(PlayerIndex.P2).==))
+    )
+  def numDraws = matchStatus.fold(_ => 0, l => l.count(None.==))
+  def numGames = matchStatus.fold(_ => 0, l => l.length)
 
   def multiMatchResultsFor(userId: User.ID): Option[List[String]] = {
     if (nbGamesPerRound > 1)
@@ -162,6 +169,15 @@ case class SwissPairingGames(
     if (nbGamesPerRound > 1) {
       multiMatchGames.foldLeft(List(game))(_ ++ _).map(_.winnerPlayerIndex)
     } else List(game.winnerPlayerIndex)
+  private def startPlayerNormalisation(g: Game): Option[PlayerIndex] =
+    if (g.startPlayerIndex == PlayerIndex.P2 && g.variant.recalcStartPlayerForStats)
+      g.winnerPlayerIndex.map(!_)
+    else
+      g.winnerPlayerIndex
+  def startPlayerWinners: List[Option[PlayerIndex]] =
+    if (nbGamesPerRound > 1) {
+      multiMatchGames.foldLeft(List(game))(_ ++ _).map(g => startPlayerNormalisation(g))
+    } else List(startPlayerNormalisation(game))
 
   def strResultOf(playerIndex: PlayerIndex) =
     SwissPairing
@@ -231,21 +247,22 @@ object SwissPairing {
   case class View(pairing: SwissPairing, player: SwissPlayer.WithUser)
 
   object Fields {
-    val id                = "_id"
-    val swissId           = "s"
-    val round             = "r"
-    val gameId            = "g"
-    val players           = "p"
-    val bbpPairingP1      = "bbp"
-    val status            = "t"
-    val matchStatus       = "mt"
-    val multiMatchGameIds = "mmids"
-    val isMatchScore      = "ms"
-    val isBestOfX         = "x"
-    val isPlayX           = "px"
-    val nbGamesPerRound   = "gpr"
-    val openingFEN        = "of"
-    val variant           = "v"
+    val id                 = "_id"
+    val swissId            = "s"
+    val round              = "r"
+    val gameId             = "g"
+    val players            = "p"
+    val bbpPairingP1       = "bbp"
+    val status             = "t"
+    val matchStatus        = "mt"
+    val startPlayerWinners = "spw"
+    val multiMatchGameIds  = "mmids"
+    val isMatchScore       = "ms"
+    val isBestOfX          = "x"
+    val isPlayX            = "px"
+    val nbGamesPerRound    = "gpr"
+    val openingFEN         = "of"
+    val variant            = "v"
   }
   def fields[A](f: Fields.type => A): A = f(Fields)
 

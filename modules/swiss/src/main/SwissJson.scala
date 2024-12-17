@@ -1,7 +1,7 @@
 package lila.swiss
 
 import strategygames.format.{ Forsyth }
-import strategygames.{ ByoyomiClock, Clock, GameFamily, P1, P2 }
+import strategygames.{ ByoyomiClock, Clock, GameFamily, Player => PlayerIndex, P1, P2 }
 import strategygames.variant.Variant
 import strategygames.draughts.Board.BoardSize
 
@@ -19,7 +19,7 @@ import lila.quote.Quote
 import lila.quote.Quote.quoteWriter
 import lila.socket.Socket.SocketVersion
 import lila.user.{ User, UserRepo }
-import lila.i18n.VariantKeys
+import lila.i18n.{ I18nKeys => trans, VariantKeys }
 
 final class SwissJson(
     colls: SwissColls,
@@ -179,21 +179,23 @@ object SwissJson {
 
   private def formatDate(date: DateTime) = ISODateTimeFormat.dateTime print date
 
-  private def swissJsonBase(swiss: Swiss) =
+  private def swissJsonBase(swiss: Swiss)(implicit lang: Lang = lila.i18n.defaultLang) =
     Json
       .obj(
-        "id"                    -> swiss.id.value,
-        "createdBy"             -> swiss.createdBy,
-        "startsAt"              -> formatDate(swiss.startsAt),
-        "name"                  -> swiss.name,
-        "clock"                 -> swiss.clock,
-        "variant"               -> swiss.variant.key,
-        "isMedley"              -> swiss.isMedley,
-        "isMcMahon"             -> swiss.settings.mcmahon,
-        "mcmahonCutoff"         -> swiss.settings.mcmahonCutoff,
-        "isHandicapped"         -> swiss.settings.handicapped,
-        "p1Name"                -> swiss.variant.playerNames(P1),
-        "p2Name"                -> swiss.variant.playerNames(P2),
+        "id"            -> swiss.id.value,
+        "createdBy"     -> swiss.createdBy,
+        "startsAt"      -> formatDate(swiss.startsAt),
+        "name"          -> swiss.name,
+        "clock"         -> swiss.clock,
+        "variant"       -> swiss.variant.key,
+        "isMedley"      -> swiss.isMedley,
+        "isMcMahon"     -> swiss.settings.mcmahon,
+        "mcmahonCutoff" -> swiss.settings.mcmahonCutoff,
+        "isHandicapped" -> swiss.settings.handicapped,
+        "p1Name" -> (if (swiss.isMedley || swiss.variant.recalcStartPlayerForStats) trans.p1.txt()
+                     else swiss.variant.playerNames(P1)),
+        "p2Name" -> (if (swiss.isMedley || swiss.variant.recalcStartPlayerForStats) trans.p2.txt()
+                     else swiss.variant.playerNames(P2)),
         "round"                 -> swiss.round,
         "roundVariant"          -> swiss.roundVariant.key,
         "roundVariantName"      -> VariantKeys.variantName(swiss.roundVariant),
@@ -369,7 +371,7 @@ object SwissJson {
         "gameLogic"   -> g.variant.gameLogic.name.toLowerCase(),
         "gameFamily"  -> g.variant.gameFamily.key,
         "variantKey"  -> g.variant.key,
-        "fen"         -> Forsyth.boardAndPlayer(g.variant.gameLogic, g.situation),
+        "fen"         -> Forsyth.>>(g.variant.gameLogic, g.stratGame).value,
         "lastMove"    -> ~g.lastActionKeys,
         "orientation" -> g.naturalOrientation.name,
         "p1"          -> boardPlayerJson(p1),
@@ -386,6 +388,13 @@ object SwissJson {
         }
       )
 
+  private[swiss] def boardPlayerFromGame(g: Game, b: SwissBoard, playerIndex: PlayerIndex) =
+    if (playerIndex == P1)
+      if (g.p1Player.userId.contains(b.p1.user.id)) b.p1
+      else b.p2
+    else if (g.p2Player.userId.contains(b.p2.user.id)) b.p2
+    else b.p1
+
   private[swiss] def boardJson(b: SwissBoard.WithGame) =
     boardGameJson(b.game, b.board.p1, b.board.p2)
       .add("winner" -> b.game.winnerPlayerIndex.map(_.name))
@@ -395,7 +404,10 @@ object SwissJson {
       .add("multiMatchGameIds" -> b.board.multiMatchGameIds)
       .add(
         "multiMatchGames" -> b.multiMatchGames.map(l =>
-          l.map(g => boardGameJson(g, b.board.p2, b.board.p1).add("boardSize" -> boardSizeJson(g.variant)))
+          l.map(g =>
+            boardGameJson(g, boardPlayerFromGame(g, b.board, P1), boardPlayerFromGame(g, b.board, P2))
+              .add("boardSize" -> boardSizeJson(g.variant))
+          )
         )
       )
 
