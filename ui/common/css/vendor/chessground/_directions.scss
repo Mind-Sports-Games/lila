@@ -1,0 +1,20 @@
+@function swapDirection($direction) {
+    @if $direction == 'W' {
+      @return 'E';
+    }
+    @if $direction == 'NW' {
+      @return 'SE';
+    }
+    @if $direction == 'NE' {
+      @return 'SW';
+    }
+    @if $direction == 'E' {
+      @return 'W';
+    }
+    @if $direction == 'SE' {
+      @return 'NW';
+    }
+    @if $direction == 'SW' {
+      @return 'NE';
+    }
+  }

@@ -1,5 +1,6 @@
 @import 'board-2d';
 @import 'dark-board';
+@import 'directions';
 
 cg-board {
   @extend %abs-100;
@@ -531,8 +532,19 @@ square {
     }
     @each $color in $abalonePlayerColors {
       @each $direction in $abaloneDirections {
-        .variant-abalone &.#{$color}#{$direction} {
+        .variant-abalone .orientation-p1 &.#{$color}#{$direction} {
           background: url(../images/board/abalone/highlights/#{$color}#{$direction}.svg) !important;
+          background-color: transparent;
+          background-size: cover;
+          z-index: 3;
+        }
+      }
+    }
+
+    @each $color in $abalonePlayerColors {
+      @each $direction in $abaloneDirections {
+        .variant-abalone .orientation-p2 &.#{$color}#{$direction} {
+          background: url(../images/board/abalone/highlights/#{$color}#{#{swapDirection($direction)}}.svg) !important;
           background-color: transparent;
           background-size: cover;
           z-index: 3;
