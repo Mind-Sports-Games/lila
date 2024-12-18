@@ -532,6 +532,18 @@ square {
     }
     @each $color in $abalonePlayerColors {
       @each $direction in $abaloneDirections {
+        .mini-board.variant-abalone &.#{$color}#{$direction} {
+          // mini-board display with p1 orientation
+          background: url(../images/board/abalone/highlights/#{$color}#{$direction}.svg) !important;
+          background-color: transparent;
+          background-size: cover;
+          z-index: 3;
+        }
+      }
+    }
+
+    @each $color in $abalonePlayerColors {
+      @each $direction in $abaloneDirections {
         .variant-abalone .orientation-p1 &.#{$color}#{$direction} {
           background: url(../images/board/abalone/highlights/#{$color}#{$direction}.svg) !important;
           background-color: transparent;
