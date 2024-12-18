@@ -13,7 +13,7 @@
             fx="30%"
             fy="30%"
         >
-            <stop offset="10%" stop-color="#DCAFAF" />
+            <stop offset="10%" stop-color="#AFAFDC" />
             <stop offset="70%" stop-color="#000" />
             <stop offset="100%" stop-color="#000" />
         </radialGradient>

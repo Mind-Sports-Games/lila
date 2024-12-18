@@ -13,9 +13,9 @@
             fx="30%"
             fy="30%"
         >
-            <stop offset="10%" stop-color="#DCAFAF" />
-            <stop offset="70%" stop-color="#AC7F7F" />
-            <stop offset="100%" stop-color="#6C3F3F" />
+            <stop offset="10%" stop-color="#AFAFDC" />
+            <stop offset="70%" stop-color="#7F7FAC" />
+            <stop offset="100%" stop-color="#3F3F6C" />
         </radialGradient>
     </defs>
     <circle
