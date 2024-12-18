@@ -92,7 +92,8 @@ abalone_themes = [
   ['classic', 'svg'],
   ['newspaper', 'svg'],
   ['spatial', 'svg'],
-  ['fantasy', 'svg']
+  ['fantasy_blue', 'svg'],
+  ['fantasy_green', 'svg']
 ]
 types = {
   'svg' => 'svg+xml;base64,',

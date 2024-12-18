@@ -13,9 +13,6 @@
             fx="30%"
             fy="30%"
         >
-<!-- <stop offset="15%" stop-color="#FFF"/>
-<stop offset="80%" stop-color="#EEE"/>
-<stop offset="100%" stop-color="#BBB"/> -->
             <stop offset="0%" stop-color="#FFFFFF" />
             <stop offset="75%" stop-color="#E9E9E9" />
             <stop offset="95%" stop-color="#AAA" />
