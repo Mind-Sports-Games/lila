@@ -56,13 +56,7 @@ export const altCastles = {
 };
 
 export function variantUsesUCINotation(key: VariantKey | DraughtsVariantKey) {
-  return [
-    'linesOfAction',
-    'scrambledEggs',
-    'amazons',
-    'breakthroughtroyka',
-    'minibreakthroughtroyka',
-  ].includes(key);
+  return ['linesOfAction', 'scrambledEggs', 'amazons', 'breakthroughtroyka', 'minibreakthroughtroyka'].includes(key);
 }
 
 export function variantUsesUSINotation(key: VariantKey | DraughtsVariantKey) {

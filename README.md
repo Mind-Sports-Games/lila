@@ -47,13 +47,13 @@ _ mongo 4.4
 _ jenv (java 17) and sbt  
 _ redis  
 _ nvm (Node 20) and pnpm  
-_ ruby for generating pieces css
+\_ ruby for generating pieces css
 
 To start the project you then likely want:  
 1/ make sure redis and mongoDB are available  
 2/ start lila-ws (from it's own repo's folder): `sbt run -Dcsrf.origin=http://localhost:9663`  
 3/ start the front: `ui/build -cr` (clean rebuild)  
-4/ start the back: `./nice lila run`  
+4/ start the back: `./nice lila run`
 
 Swiss tournaments pairings require to have a running https://github.com/cyanfish/bbpPairings and set the correct path value for the key swiss.bbpairing in conf/application.conf.
 
@@ -87,11 +87,12 @@ This code is forked from, and exists because of [ornicar](https://github.com/orn
 [playstrategy.org](https://playstrategy.org/) currently supports the [Mind Sports Olympiad](https://mindsportsolympiad.com/).
 
 ## Troubleshooting
+
 - [error] reactivemongo.api.Cursor
 
 In case you see logs similar to `reactivemongo.api.Cursor - Fails to send request`, try running `mongosh lichess < bin/mongodb/indexes.js`, that should fix it.
 
-- [error] assetManifest - Error reading [...]manifest.dev.json  
+- [error] assetManifest - Error reading [...]manifest.dev.json
 
 This means the manifest file was not ready to be read before you tried accessing it.  
 Try invoking the command to build front before starting the back.

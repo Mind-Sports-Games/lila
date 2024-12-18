@@ -570,12 +570,14 @@ square {
     // WIP VFR
     @each $color in $abalonePlayerColors {
       @each $direction in $abaloneDirections {
-        /*body.abalone-classic*/ &.#{$color}#{$direction} {
+        /*body.abalone-classic*/
+        &.#{$color}#{$direction} {
           background: url(../images/board/abalone/highlights/#{$color}#{$direction}.svg) !important;
           background-size: cover;
           z-index: 3;
         }
-        body.abalone-classic { //.#{$player}-#{$direction} & {
+        body.abalone-classic {
+          //.#{$player}-#{$direction} & {
           background-color: rgba(10, 10, 194, 0.926) !important;
           background: url(../images/board/abalone/highlights/#{$color}#{$direction}.svg) !important;
           background-size: cover !important;

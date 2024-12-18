@@ -179,89 +179,89 @@ body .variant-abalone .game-score piece.hole-piece {
   piece {
     position: absolute;
     &.slot-top {
-      &.s-piece{
+      &.s-piece {
         width: 33% !important;
         height: 33% !important;
-        left:33%;
-        top:0;
+        left: 33%;
+        top: 0;
       }
-      &.hole-piece{
+      &.hole-piece {
         width: 20% !important;
         height: 20% !important;
         left: 40%;
-        top:6.5%;
+        top: 6.5%;
       }
     }
     &.slot-mid-left {
-      &.s-piece{
+      &.s-piece {
         width: 33% !important;
         height: 33% !important;
-        top:33%;
-        left:17%;
+        top: 33%;
+        left: 17%;
       }
-      &.hole-piece{
+      &.hole-piece {
         width: 20% !important;
         height: 20% !important;
-        top:39.5%;
-        left:23.5%;
+        top: 39.5%;
+        left: 23.5%;
       }
     }
     &.slot-mid-right {
-      &.s-piece{
+      &.s-piece {
         width: 33% !important;
         height: 33% !important;
-        top:33%;
-        left:50%;
+        top: 33%;
+        left: 50%;
       }
-      &.hole-piece{
+      &.hole-piece {
         width: 20% !important;
         height: 20% !important;
-        top:39.5%;
-        left:56.5%;
+        top: 39.5%;
+        left: 56.5%;
       }
     }
     &.slot-bot-left {
-      &.s-piece{
+      &.s-piece {
         width: 33% !important;
         height: 33% !important;
-        top:67%;
-        left:0;
+        top: 67%;
+        left: 0;
       }
-      &.hole-piece{
+      &.hole-piece {
         width: 20% !important;
         height: 20% !important;
-        top:73.5%;
-        left:6.5%;
+        top: 73.5%;
+        left: 6.5%;
       }
     }
     &.slot-bot-right {
-      &.s-piece{
+      &.s-piece {
         width: 33% !important;
         height: 33% !important;
-        top:67%;
-        left:67%;
+        top: 67%;
+        left: 67%;
       }
-      &.hole-piece{
+      &.hole-piece {
         width: 20% !important;
         height: 20% !important;
-        top:73.5%;
-        left:73.5%;
+        top: 73.5%;
+        left: 73.5%;
       }
     }
     &.slot-bot-mid {
-      &.s-piece{
+      &.s-piece {
         width: 33% !important;
         height: 33% !important;
-        top:67%;
-        left:33%;
+        top: 67%;
+        left: 33%;
       }
-      &.hole-piece{
+      &.hole-piece {
         width: 20% !important;
         height: 20% !important;
-        top:73.5%;
+        top: 73.5%;
         left: 40%;
       }
-    }    
+    }
   }
 }
 
