@@ -265,15 +265,14 @@ export function main(ctrl: RoundController): VNode {
       'go9x9',
       'go13x13',
       'go19x19',
-      'abalone',
     ].includes(variantKey)
   ) {
     if (!$('body').hasClass('coords-no')) {
       $('body').removeClass('coords-in').addClass('coords-out');
     }
   }
-  //Togyzkumalak and backgammon board always has coodinates on the inside
-  if (['togyzkumalak', 'bestemshe', 'backgammon', 'hyper', 'nackgammon'].includes(variantKey)) {
+  //Togyzkumalak, Abalone and Backgammon board always has coodinates on the inside
+  if (['togyzkumalak', 'bestemshe', 'backgammon', 'hyper', 'nackgammon', 'abalone'].includes(variantKey)) {
     if (!$('body').hasClass('coords-no')) {
       $('body').removeClass('coords-out').addClass('coords-in');
     }

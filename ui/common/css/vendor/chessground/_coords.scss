@@ -95,6 +95,125 @@ coords {
     font-size: 130%;
   }
 
+  //Abalone specific coords
+  .variant-abalone & {
+    .abalone-dark & coord,
+    .abalone-classic & coord {
+      color: #fff !important;
+    }
+    .abalone-yellow & coord {
+      color: #eeddc0 !important;
+    }
+  }
+
+  .variant-abalone .orientation-p1 & {
+    &.files {
+      text-align: center;
+      &.rank-1 {
+        bottom: 11%;
+        padding-left: 30%;
+        padding-right: 24%;
+      }
+      &.rank-2 {
+        bottom: 19%;
+        padding-left: 52%;
+      }
+      &.rank-3 {
+        bottom: 27%;
+        padding-left: 62%;
+      }
+      &.rank-4 {
+        bottom: 35%;
+        padding-left: 71%;
+      }
+      &.rank-5 {
+        bottom: 43%;
+        padding-left: 80%;
+      }
+    }
+    &.ranks {
+      text-align: center;
+      &.file-1 {
+        left: 5%;
+        padding-top: 48.5%;
+      }
+      &.file-2 {
+        left: 9.5%;
+        padding-top: 40.5%;
+        padding-bottom: 27.5%;
+      }
+      &.file-3 {
+        left: 14%;
+        padding-top: 32.5%;
+        padding-bottom: 4%;
+      }
+      &.file-4 {
+        left: 19%;
+        padding-top: 24.5%;
+        padding-bottom: 2%;
+      }
+      &.file-5 {
+        left: 23.5%;
+        padding-top: 16.5%;
+        padding-bottom: 1.5%;
+      }
+    }
+  }
+
+  .variant-abalone .orientation-p2 & {
+    &.files {
+      text-align: center;
+      &.rank-1 {
+        top: 11%;
+        padding-right: 30.5%;
+        padding-left: 23.5%;
+      }
+      &.rank-2 {
+        top: 19%;
+        padding-right: 53%;
+      }
+      &.rank-3 {
+        top: 27%;
+        padding-right: 63%;
+      }
+      &.rank-4 {
+        top: 35%;
+        padding-right: 72%;
+      }
+      &.rank-5 {
+        top: 43%;
+        padding-right: 81.5%;
+      }
+    }
+    &.ranks {
+      text-align: center;
+      &.file-1 {
+        right: 5%;
+        padding-top: 48.5%;
+      }
+      &.file-2 {
+        right: 9.5%;
+        padding-top: 40.5%;
+        padding-bottom: 27.5%;
+      }
+      &.file-3 {
+        right: 14%;
+        padding-top: 32.5%;
+        padding-bottom: 4%;
+      }
+      &.file-4 {
+        right: 19%;
+        padding-top: 24.5%;
+        padding-bottom: 2%;
+      }
+      &.file-5 {
+        right: 23.5%;
+        padding-top: 16.5%;
+        padding-bottom: 1.5%;
+      }
+    }
+  }
+
   //Handle togy corrds as they are always inside the board
   .variant-togyzkumalak &,
   .variant-bestemshe & {
@@ -281,6 +400,10 @@ coords {
   }
 
   .coords-out .variant-bestemshe coords {
+    display: none;
+  }
+
+  .coords-out .variant-abalone coords {
     display: none;
   }
 

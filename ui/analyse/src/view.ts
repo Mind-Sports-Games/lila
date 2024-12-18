@@ -492,7 +492,7 @@ export default function (ctrl: AnalyseCtrl): VNode {
     needsInnerCoords =
       ((!!gaugeOn || !!playerBars) &&
         !['xiangqi', 'shogi', 'minixiangqi', 'minishogi', 'oware'].includes(variantKey)) ||
-      ['togyzkumalak', 'bestemshe', 'backgammon', 'hyper', 'nackgammon'].includes(variantKey),
+      ['togyzkumalak', 'bestemshe', 'backgammon', 'hyper', 'nackgammon', 'abalone'].includes(variantKey),
     needsOutterCoords =
       [
         'xiangqi',
@@ -505,12 +505,8 @@ export default function (ctrl: AnalyseCtrl): VNode {
         'go9x9',
         'go13x13',
         'go19x19',
-        'abalone',
       ].includes(variantKey) &&
-      !(
-        (!!gaugeOn || !!playerBars) &&
-        ['flipello', 'flipello10', 'go9x9', 'go13x13', 'go19x19', 'abalone'].includes(variantKey)
-      ),
+      !((!!gaugeOn || !!playerBars) && ['flipello', 'flipello10', 'go9x9', 'go13x13', 'go19x19'].includes(variantKey)),
     needsNoCoords =
       ['xiangqi', 'shogi', 'minixiangqi', 'minishogi'].includes(variantKey) && (!!gaugeOn || !!playerBars),
     tour = relayTour(ctrl);
