@@ -1,104 +1,102 @@
 @function swapDirection($direction) {
-    @if $direction == 'W' {
-      @return 'E';
-    }
-    @if $direction == 'NW' {
-      @return 'SE';
-    }
-    @if $direction == 'NE' {
-      @return 'SW';
-    }
-    @if $direction == 'E' {
-      @return 'W';
-    }
-    @if $direction == 'SE' {
-      @return 'NW';
-    }
-    @if $direction == 'SW' {
-      @return 'NE';
-    }
+  @if $direction == 'W' {
+    @return 'E';
+  }
+  @if $direction == 'NW' {
+    @return 'SE';
+  }
+  @if $direction == 'NE' {
+    @return 'SW';
+  }
+  @if $direction == 'E' {
+    @return 'W';
+  }
+  @if $direction == 'SE' {
+    @return 'NW';
+  }
+  @if $direction == 'SW' {
+    @return 'NE';
+  }
 }
 
 $players: ('p1', 'p2');
 $directions: ('W', 'NW', 'NE', 'E', 'SE', 'SW');
 
 .variant-abalone {
-    cg-container {
-        width: calc(100% * 9);
-        height: calc(100% * 9);
-    }
+  cg-container {
+    width: calc(100% * 9);
+    height: calc(100% * 9);
+  }
 
-    cg-helper {
-        width: calc(100% / 9);
-        padding-bottom: calc(100% / 9);
-    }
+  cg-helper {
+    width: calc(100% / 9);
+    padding-bottom: calc(100% / 9);
+  }
 
-    piece {
-        width: calc(100% / 11);
-        height: calc(100% / 11);
-        background-position: center center;
-    }
+  piece {
+    width: calc(100% / 11);
+    height: calc(100% / 11);
+    background-position: center center;
+  }
 
-    square {
-        width: calc(100% / 11);
-        height: calc(100% / 11);        
-        background-color: transparent !important;
-    
-        &.last-move.to {
-          @each $player in $players {
-            @each $direction in $directions {
-              .mini-board.variant-abalone &.#{$player}#{$direction} {
-                // mini-board are displayed with p1 orientation only
-                background-image: url("../images/board/abalone/highlights/#{$player}#{$direction}.svg");
-                background-color: transparent;
-                background-size: cover;
-                z-index: 3;
-              }
-            }
-          }
-      
-          @each $player in $players {
-            @each $direction in $directions {
-             &.#{$player}#{$direction} {
-                background-image: url("../images/board/abalone/highlights/#{$player}#{$direction}.svg");
-                background-color: transparent !important;
-                background-size: cover !important;
-                z-index: 3 !important;
-              }
-            }
+  square {
+    width: calc(100% / 11);
+    height: calc(100% / 11);
+    background-color: transparent !important;
+
+    &.last-move.to {
+      @each $player in $players {
+        @each $direction in $directions {
+          .mini-board.variant-abalone &.#{$player}#{$direction} {
+            // mini-board are displayed with p1 orientation only
+            background-image: url('../images/board/abalone/highlights/#{$player}#{$direction}.svg');
+            background-color: transparent;
+            background-size: cover;
+            z-index: 3;
           }
         }
-       
+      }
+
+      @each $player in $players {
+        @each $direction in $directions {
+          &.#{$player}#{$direction} {
+            background-image: url('../images/board/abalone/highlights/#{$player}#{$direction}.svg');
+            background-color: transparent !important;
+            background-size: cover !important;
+            z-index: 3 !important;
+          }
+        }
+      }
+    }
+
     &.move-dest {
-        background: radial-gradient(rgba(255, 87, 87, 0.9) 28%, rgba(255, 0, 0, 0) 29%) !important;
-        z-index: z('cg__svg.direction');
+      background: radial-gradient(rgba(255, 87, 87, 0.9) 28%, rgba(255, 0, 0, 0) 29%) !important;
+      z-index: z('cg__svg.direction');
     }
     &.move-dest.oc {
-        background: radial-gradient(rgba(255, 87, 87, 0.9) 28%, rgba(255, 0, 0, 0) 29%) !important;
-        z-index: z('cg__svg.direction');
+      background: radial-gradient(rgba(255, 87, 87, 0.9) 28%, rgba(255, 0, 0, 0) 29%) !important;
+      z-index: z('cg__svg.direction');
     }
-    
-    &.selected {
-        background: radial-gradient(rgba(255, 87, 87, 0.9) 28%, rgba(255, 0, 0, 0) 29%) !important;
-        z-index: z('cg__svg.direction');
-    }
-    
 
+    &.selected {
+      background: radial-gradient(rgba(255, 87, 87, 0.9) 28%, rgba(255, 0, 0, 0) 29%) !important;
+      z-index: z('cg__svg.direction');
     }
-    .orientation-p2 {
-        square {
-            &.last-move.to {
-                @each $player in $players {
-                    @each $direction in $directions {
-                        &.#{$player}#{$direction} {
-                            background-image:url("../images/board/abalone/highlights/#{$player}#{#{swapDirection($direction)}}.svg");
-                            background-color: transparent;
-                            background-size: cover;
-                            z-index: 3;
-                        }
-                    }
-                }
+  }
+  .orientation-p2 {
+    square {
+      &.last-move.to {
+        @each $player in $players {
+          @each $direction in $directions {
+            &.#{$player}#{$direction} {
+              background-image: url('../images/board/abalone/highlights/#{$player}#{#{swapDirection($direction)}}.svg');
+              background-color: transparent;
+              background-size: cover;
+              z-index: 3;
             }
+          }
         }
+      }
     }
+  }
 }
