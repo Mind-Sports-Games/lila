@@ -1,6 +1,5 @@
 <svg
     viewBox="0 0 100 100"
-
     image-rendering="optimizeQuality"
     shape-rendering="geometricPrecision"
     text-rendering="geometricPrecision"
@@ -14,16 +13,16 @@
             fx="30%"
             fy="30%"
         >
-            <stop offset="15%" stop-color="#6e6257" />
-            <stop offset="80%" stop-color="#1e1217" />
-            <stop offset="100%" stop-color="#0e0207" />
+         <stop offset="0%" stop-color="#444"/>
+         <stop offset="75%" stop-color="#333"/>
+         <stop offset="95%" stop-color="#111"/>
         </radialGradient>
     </defs>
 
     <circle
         cx="50"
         cy="50"
-        r="45px"
+        r="46px"
         fill="url(#blackMarble)"
     />
 </svg>

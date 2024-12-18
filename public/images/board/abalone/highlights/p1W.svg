@@ -1,0 +1,27 @@
+<svg
+    viewBox="0 0 100 100"
+    image-rendering="optimizeQuality"
+    shape-rendering="geometricPrecision"
+    text-rendering="geometricPrecision"
+    version="1.1"
+    xmlns="http://www.w3.org/2000/svg"
+>
+<!--
+radius = 13
+arrowRadius = 7.15
+sin = 3.575
+cos = 6.175
+y = 50
+
+M (x - sin), (y + cos) L (x - arrowRadius), y L (x - sin), (y - cos)
+-->
+    <path
+      d="M 23, 66 L 16 50 L 23 34"
+      fill="none"
+      stroke="black"
+      stroke-width="7"
+      stroke-opacity="0.9"
+      stroke-linecap="round"
+      stroke-linejoin="bevel"
+    />
+</svg>

@@ -1,0 +1,19 @@
+<svg
+    viewBox="0 0 100 100"
+    image-rendering="optimizeQuality"
+    shape-rendering="geometricPrecision"
+    text-rendering="geometricPrecision"
+    version="1.1"
+    xmlns="http://www.w3.org/2000/svg"
+    style="transform: rotate(60deg)"
+>
+  <path
+    d="M 77, 66 L 83 50 L 77 34"
+    fill="none"
+    stroke="black"
+    stroke-width="7"
+    stroke-opacity="0.9"
+    stroke-linecap="round"
+    stroke-linejoin="bevel"
+  />
+</svg>

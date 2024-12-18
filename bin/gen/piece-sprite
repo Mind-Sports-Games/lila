@@ -89,7 +89,10 @@ breakthroughtroyka_themes = [
    ['fabirovsky', 'svg']
 ]
 abalone_themes = [
-  ['newspaper', 'svg']
+  ['classic', 'svg'],
+  ['newspaper', 'svg'],
+  ['spatial', 'svg'],
+  ['fantasy', 'svg']
 ]
 types = {
   'svg' => 'svg+xml;base64,',
@@ -807,13 +810,14 @@ abalone_themes.map { |theme|
     abalone_roles.map { |role|
       piece = color[0] + role.upcase[0]
       file = source_dir + 'abalone/' + name + '/' + piece + '.' + ext
-      File.open(file, 'r') do|image_file|
+      File.open(file, 'r') do |image_file|
         image = image_file.read
         base64 = Base64.strict_encode64(image)
         '.abalone.is2d .' + role + '.' + (color == 'b' ? 'p1' : 'p2') +
-         ', ' + '.is2d .variant-abalone' + ' .' + role + '.' + (color == 'b' ? 'p1' : 'p2') +
-         ' {' +
-          "background-image:url('data:image/" + types[ext] + base64 + "')}"
+        ', ' + '.is2d .variant-abalone' + ' .' + role + '.' + (color == 'b' ? 'p1' : 'p2') + " {\n" +
+        "  background-image:\n" +
+        "    url('data:image/" + types[ext] + base64 + "')\n" +
+        + "}\n"
       end
     }
   }.flatten
@@ -828,8 +832,10 @@ abalone_themes.map { |theme|
       piece = color[0] + role.upcase[0]
       '.abalone.is2d .' + role + '.' + (color == 'b' ? 'p1' : 'p2') +
       ', ' + '.is2d .variant-abalone' + ' .' + role + '.' + (color == 'b' ? 'p1' : 'p2') +
-      ' {' +
-        "background-image:url('/assets/piece/" + 'abalone/' + name + "/" + piece + "." + ext + "')}"
+      " {\n" +
+        "  background-image:\n" + 
+        "    url('/assets/piece/" + 'abalone/' + name + "/" + piece + "." + ext + "')\n" +
+      "}\n"
     }
   }.flatten
   File.open(dest_dir + 'abalone-' + name + '.external.css', 'w') { |f| f.puts (classes_abalone).join("\n") }

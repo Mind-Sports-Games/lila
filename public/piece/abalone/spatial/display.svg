@@ -8,23 +8,23 @@
 >
     <defs>
         <radialGradient
-            id="whiteMarble"
+            id="blackMarble"
             gradientUnits="objectBoundingBox"
             fx="30%"
             fy="30%"
         >
-<!-- <stop offset="15%" stop-color="#FFF"/>
-<stop offset="80%" stop-color="#EEE"/>
-<stop offset="100%" stop-color="#BBB"/> -->
-            <stop offset="0%" stop-color="#FFFFFF" />
-            <stop offset="75%" stop-color="#E9E9E9" />
-            <stop offset="95%" stop-color="#AAA" />
+            <stop offset="0%" stop-color="#AAAAAF"></stop>
+            <stop offset="30%" stop-color="#606066"></stop>
+            <stop offset="55%" stop-color="#2A2A22"></stop>
+            <stop offset="70%" stop-clor="#1A1A11"></stop>
+            <stop offset="98%" stop-color="#020202"></stop>
         </radialGradient>
     </defs>
+
     <circle
         cx="50"
         cy="50"
         r="46px"
-        fill="url(#whiteMarble)"
+        fill="url(#blackMarble)"
     />
 </svg>

@@ -160,8 +160,8 @@ span.mini-game.variant-togyzkumalak.is2d {
 }
 
 .variant-abalone square {
-  width: calc(100% / 9);
-  height: calc(100% / 9);
+  width: calc(100% / 11);
+  height: calc(100% / 11);
 }
 
 .variant-breakthroughtroyka square {
@@ -209,6 +209,9 @@ $togyzkumalak-gf-board-highlights: (
   ('togyzkumalak-wood', 'togyzkumalak', '-wood')
 );
 
+$abalonePlayerColors: ('p1', 'p2');
+$abaloneDirections: ('W', 'NW', 'NE', 'E', 'SE', 'SW');
+
 square {
   position: absolute;
   width: 12.5%;
@@ -216,7 +219,7 @@ square {
   pointer-events: none;
 
   &.move-dest {
-    background: radial-gradient(rgba(20, 85, 30, 0.5) 19%, rgba(0, 0, 0, 0) 20%);
+    // background: radial-gradient(rgba(20, 85, 30, 0.5) 19%, rgba(0, 0, 0, 0) 20%);
     pointer-events: auto;
 
     @each $color, $gameFamily in $alternate-board-highlights {
@@ -224,6 +227,36 @@ square {
         background: radial-gradient($alternate-color 19%, rgba(0, 0, 0, 0) 20%);
       }
     }
+
+    // WIP VFR
+    @each $color in $abalonePlayerColors {
+      @each $direction in $abaloneDirections {
+        & body.abalone-classic &.#{$color}#{$direction} & {
+          background: url(../images/board/abalone/highlights/#{$color}#{$direction}.svg) !important;
+          background-size: cover;
+          z-index: 3;
+        }
+      }
+    }
+    // @each $board, $player, $direction in $abalone-board-highlights {
+    //   body.abalone-#{$board} & { // .#{$player}-#{$direction} {
+    //     // background: radial-gradient(rgba(20, 85, 30, 0.5) 27%, rgba(20, 85, 30, 0) 28%) !important;
+    //     background: url(../images/board/abalone/highlights/bsw.svg) !important;
+    //     background-size: cover;
+    //     z-index: 3;
+    //   }
+    //   body.abalone-#{$board} &.last-move.from & {
+    //     background: url(../images/board/oware/highlights/dashed.svg) !important;
+    //     background-color: rgba(209, 34, 225, 0.926) !important;
+    //     background-size: cover;
+    //     z-index: 3;
+    //   }
+    //   body.abalone-#{$board} &.last-move.to & {
+    //     background: url(../images/board/oware/highlights/dashed.svg) !important;
+    //     background-color: rgba(202, 38, 211, 0.926) !important;
+    //     background-size: cover;
+    //   }
+    // }
 
     @each $board, $variant, $lastMove in $oware-board-highlights {
       body.#{$board} .#{$variant} & {
@@ -492,6 +525,21 @@ square {
     will-change: transform;
     background-color: rgba(155, 199, 0, 0.41);
 
+    // WIP VFR
+    .variant-abalone {
+      background-color: transparent !important;
+    }
+    @each $color in $abalonePlayerColors {
+      @each $direction in $abaloneDirections {
+        .variant-abalone &.#{$color}#{$direction} {
+          background: url(../images/board/abalone/highlights/#{$color}#{$direction}.svg) !important;
+          background-color: transparent;
+          background-size: cover;
+          z-index: 3;
+        }
+      }
+    }
+
     body.chess-horsey &:not(.move-dest),
     body.loa-horsey &:not(.move-dest) {
       background: url(../images/board/horsey.last-move.png);
@@ -510,13 +558,60 @@ square {
   }
 
   &.selected {
-    background-color: rgba(20, 85, 30, 0.5);
+    // background-color: blue;
+    background-color: red !important;
 
     body.chess-horsey &,
     body.loa-horsey & {
       background: url(../images/board/horsey.selected.png);
       background-size: cover;
     }
+
+    // WIP VFR
+    @each $color in $abalonePlayerColors {
+      @each $direction in $abaloneDirections {
+        /*body.abalone-classic*/ &.#{$color}#{$direction} {
+          background: url(../images/board/abalone/highlights/#{$color}#{$direction}.svg) !important;
+          background-size: cover;
+          z-index: 3;
+        }
+        body.abalone-classic { //.#{$player}-#{$direction} & {
+          background-color: rgba(10, 10, 194, 0.926) !important;
+          background: url(../images/board/abalone/highlights/#{$color}#{$direction}.svg) !important;
+          background-size: cover !important;
+          z-index: 3;
+        }
+        body.abalone-classic &.last-move.from.#{$color}#{$direction} {
+          background: url(../images/board/abalone/highlights/#{$color}#{$direction}.svg) !important;
+          background-color: aqua !important;
+          background-size: cover;
+          z-index: 3;
+        }
+        body.abalone-classic &.last-move.to.#{$color}#{$direction} {
+          background: url(../images/board/abalone/highlights/#{$color}#{$direction}.svg);
+          background-color: aqua !important;
+          background-size: cover;
+          z-index: z('cg__svg.direction');
+        }
+      }
+    }
+
+    // @each $board, $player, $direction in $abalone-board-highlights {
+    //   body.abalone-#{$board} & { //.#{$player}-#{$direction} & {
+    //     background-color: rgba(10, 10, 194, 0.926) !important;
+    //     background-size: cover !important;
+    //   }
+    //   body.abalone-#{$board} &.last-move.from & {
+    //     background: url(../images/board/oware/highlights/dashed.svg) !important;
+    //     background-color: aqua !important;
+    //     background-size: cover;
+    //   }
+    //   body.abalone-#{$board} &.last-move.to & {
+    //     background: url(../images/board/oware/highlights/dashed.svg);
+    //     background-color: aqua !important;
+    //     background-size: cover;
+    //   }
+    // }
 
     @each $board, $variant, $_lastMove, $selectedMove in $oware-board-highlights {
       body.#{$board} .#{$variant} & {
@@ -742,10 +837,9 @@ square {
 
 .variant-abalone {
   piece {
-    width: calc(100% / 9);
-    height: calc(100% / 9);
+    width: calc(100% / 11);
+    height: calc(100% / 11);
     background-position: center center;
-    transform: scale(0.9);
   }
 }
 

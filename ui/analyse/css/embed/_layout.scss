@@ -113,8 +113,8 @@ body.backgammon-contemporary .variant-backgammon .game-score {
   }
 }
 
-body.abalone-newspaper .variant-abalone .game-score piece.hole-piece {
-  background: url(../images/board/abalone/newspaper_hole.png);
+body .variant-abalone .game-score piece.hole-piece {
+  background: url(../images/board/abalone/score/hole.svg);
   background-size: cover;
 }
 

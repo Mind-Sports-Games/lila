@@ -109,6 +109,7 @@
   }
 
   .list a.abalone span {
+    background-repeat: no-repeat;
     display: block;
     width: 100px;
     height: 100px;
@@ -252,8 +253,18 @@
       background-size: 100px;
     }
 
-    .abalone-newspaper {
-      background-image: url(../images/board/abalone/svg/newspaper.svg);
+    .abalone-classic {
+      background-image: url(../images/board/abalone/svg/classic.svg);
+      background-size: 100px;
+    }
+
+    .abalone-dark {
+      background-image: url(../images/board/abalone/svg/dark.svg);
+      background-size: 100px;
+    }
+
+    .abalone-yellow {
+      background-image: url(../images/board/abalone/svg/yellow.svg);
       background-size: 100px;
     }
   }

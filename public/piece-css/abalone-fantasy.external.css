@@ -1,9 +1,9 @@
 .abalone.is2d .s-piece.p2, .is2d .variant-abalone .s-piece.p2 {
   background-image:
-    url('/assets/piece/abalone/newspaper/wS.svg')
+    url('/assets/piece/abalone/fantasy/wS.svg')
 }
 
 .abalone.is2d .s-piece.p1, .is2d .variant-abalone .s-piece.p1 {
   background-image:
-    url('/assets/piece/abalone/newspaper/bS.svg')
+    url('/assets/piece/abalone/fantasy/bS.svg')
 }
