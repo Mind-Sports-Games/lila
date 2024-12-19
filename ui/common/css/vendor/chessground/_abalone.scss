@@ -54,7 +54,6 @@ $directions: ('W', 'NW', 'NE', 'E', 'SE', 'SW');
       @each $player in $players {
         @each $direction in $directions {
           .mini-board.variant-abalone &.#{$player}#{$direction} {
-            // mini-board are displayed with p1 orientation only
             background-image: url('../images/board/abalone/highlights/#{$player}#{$direction}.svg');
             background-color: transparent;
             background-size: cover;
@@ -88,6 +87,7 @@ $directions: ('W', 'NW', 'NE', 'E', 'SE', 'SW');
       z-index: z('cg__svg.direction');
     }
   }
+
   .orientation-p2 {
     square {
       &.last-move.to {
@@ -95,6 +95,23 @@ $directions: ('W', 'NW', 'NE', 'E', 'SE', 'SW');
           @each $direction in $directions {
             &.#{$player}#{$direction} {
               background-image: url('../images/board/abalone/highlights/#{$player}#{#{swapDirection($direction)}}.svg');
+              background-color: transparent;
+              background-size: cover;
+              z-index: z('cg__svg.direction');
+            }
+          }
+        }
+      }
+    }
+  }
+
+  &.mini-game {
+    .orientation-p2 {
+      square.last-move.to {
+        @each $player in $players {
+          @each $direction in $directions {
+            &.#{$player}#{$direction} {
+              background-image: url('../images/board/abalone/highlights/#{$player}#{$direction}.svg');
               background-color: transparent;
               background-size: cover;
               z-index: z('cg__svg.direction');
