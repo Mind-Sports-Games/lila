@@ -61,6 +61,7 @@ export function getScore(variant: VariantKey, fen: string, playerIndex: string):
     case 'oware':
     case 'togyzkumalak':
     case 'bestemshe':
+    case 'abalone':
       return +fen.split(' ')[playerIndex === 'p1' ? 1 : 2];
     case 'go9x9':
     case 'go13x13':
