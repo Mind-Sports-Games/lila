@@ -23,6 +23,12 @@ $players: ('p1', 'p2');
 $directions: ('W', 'NW', 'NE', 'E', 'SE', 'SW');
 
 .variant-abalone {
+/*
+  &.mini-board, // lobby, profile page
+  .cg-wrap { // other views
+      background-color: #575757;
+  }
+*/
   cg-container {
     width: calc(100% * 9);
     height: calc(100% * 9);
@@ -42,7 +48,7 @@ $directions: ('W', 'NW', 'NE', 'E', 'SE', 'SW');
   square {
     width: calc(100% / 11);
     height: calc(100% / 11);
-    background-color: transparent !important;
+    background-color: transparent;
 
     &.last-move.to {
       @each $player in $players {
@@ -52,7 +58,7 @@ $directions: ('W', 'NW', 'NE', 'E', 'SE', 'SW');
             background-image: url('../images/board/abalone/highlights/#{$player}#{$direction}.svg');
             background-color: transparent;
             background-size: cover;
-            z-index: 3;
+            z-index: z('cg__svg.direction');
           }
         }
       }
@@ -61,9 +67,9 @@ $directions: ('W', 'NW', 'NE', 'E', 'SE', 'SW');
         @each $direction in $directions {
           &.#{$player}#{$direction} {
             background-image: url('../images/board/abalone/highlights/#{$player}#{$direction}.svg');
-            background-color: transparent !important;
-            background-size: cover !important;
-            z-index: 3 !important;
+            background-color: transparent;
+            background-size: cover;
+            z-index: z('cg__svg.direction');
           }
         }
       }
@@ -77,7 +83,6 @@ $directions: ('W', 'NW', 'NE', 'E', 'SE', 'SW');
       background: radial-gradient(rgba(255, 87, 87, 0.9) 28%, rgba(255, 0, 0, 0) 29%) !important;
       z-index: z('cg__svg.direction');
     }
-
     &.selected {
       background: radial-gradient(rgba(255, 87, 87, 0.9) 28%, rgba(255, 0, 0, 0) 29%) !important;
       z-index: z('cg__svg.direction');
@@ -92,7 +97,7 @@ $directions: ('W', 'NW', 'NE', 'E', 'SE', 'SW');
               background-image: url('../images/board/abalone/highlights/#{$player}#{#{swapDirection($direction)}}.svg');
               background-color: transparent;
               background-size: cover;
-              z-index: 3;
+              z-index: z('cg__svg.direction');
             }
           }
         }
