@@ -32,6 +32,8 @@ export function moveFromNotationStyle(notation: NotationStyle): (move: ExtendedM
       return mancalaNotation;
     case 'bkg':
       return backgammonNotation;
+    case 'abl':
+      return abaloneNotation;
   }
 }
 
@@ -579,4 +581,108 @@ export function combinedNotationForBackgammonActions(actionNotations: string[]):
   //examples (also see tests):
   // ["43: 8/4", "43: 8/4"] -> "43: 8/4(2)"
   return output;
+}
+
+function abaloneNotation(move: ExtendedMoveInfo, variant: Variant): string {
+  const reg = move.uci.match(/[a-i][1-9]/g) as string[],
+    parsed = parseUciToAbl(move.uci),
+    orig = reg[0],
+    dest = reg[1],
+    board = readAbaloneFen(move.fen, variant.boardSize.height, variant.boardSize.width),
+    prevBoard = readAbaloneFen(move.prevFen, variant.boardSize.height, variant.boardSize.width),
+    keyDiffs = diffAbaloneBoard(board, prevBoard),
+    isPush = new Set(keyDiffs[0].concat(keyDiffs[1])).size != keyDiffs[0].concat(keyDiffs[1]).length,
+    oppPushedTo = keyDiffs[1].filter(k => k !== dest),
+    isCapture =
+      move.fen.split(' ')[1] + move.fen.split(' ')[2] != move.prevFen.split(' ')[1] + move.prevFen.split(' ')[2],
+    is3v2Capture = isCapture && !isOnEdgeAbaloneBoard(dest);
+
+  const destNotation = isPush
+    ? isCapture
+      ? is3v2Capture
+        ? parseUCISquareToAbl(findEdgeFromAbaloneMove(orig, dest))
+        : parsed.dest
+      : parseUCISquareToAbl(oppPushedTo[0])
+    : parsed.dest;
+
+  return `${parsed.orig}${isCapture ? 'x' : ''}${destNotation}`;
+}
+
+function isOnEdgeAbaloneBoard(dest: string): boolean {
+  return (
+    dest[0] == 'a' ||
+    dest[0] == 'i' ||
+    dest[1] == '1' ||
+    dest[1] == '9' ||
+    ['b6', 'c7', 'd8', 'f2', 'g3', 'h4'].includes(dest)
+  );
+}
+
+function findEdgeFromAbaloneMove(orig: string, dest: string): string {
+  //same letter (\)
+  if (orig[0] == dest[0]) {
+    if (parseInt(orig[1]) > parseInt(dest[1])) return orig[0] + Math.max(orig[0].charCodeAt(0) - 96 - 4, 1).toString();
+    else return orig[0] + Math.min(orig[0].charCodeAt(0) - 96 + 4, 9).toString();
+  }
+  //same number (-)
+  if (orig[1] == dest[1]) {
+    if (orig[0].charCodeAt(0) > dest[0].charCodeAt(0))
+      return String.fromCharCode(Math.max(parseInt(orig[1]) + 96 - 4, 97)) + orig[1];
+    else return String.fromCharCode(Math.min(parseInt(orig[1]) + 96 + 4, 105)) + orig[1];
+  }
+  // other direction (/)
+  if (Math.abs(parseInt(dest[1]) + dest[0].charCodeAt(0) - (parseInt(orig[1]) + orig[0].charCodeAt(0))) % 2 == 0) {
+    if (parseInt(orig[1]) + orig[0].charCodeAt(0) > parseInt(dest[1]) + dest[0].charCodeAt(0)) {
+      return String.fromCharCode(dest[0].charCodeAt(0) - 1) + (parseInt(dest[1]) - 1).toString();
+    } else return String.fromCharCode(dest[0].charCodeAt(0) + 1) + (parseInt(dest[1]) + 1).toString();
+  }
+  return 'a1';
+}
+
+function diffAbaloneBoard(board: Board, prevBoard: Board): [string[], string[]] {
+  const turnPlayerChanges = Object.keys(prevBoard.pieces).filter(k => prevBoard.pieces[k] !== board.pieces[k]);
+  const oppChanges = Object.keys(board.pieces).filter(k => prevBoard.pieces[k] !== board.pieces[k]);
+  return [turnPlayerChanges, oppChanges];
+}
+
+function parseUciToAbl(uci: string): ParsedMove {
+  const reg = uci.match(/[a-i][1-9]/g) as string[];
+  return {
+    orig: parseUCISquareToAbl(reg[0])!,
+    dest: parseUCISquareToAbl(reg[1])!,
+  };
+}
+
+export function parseUCISquareToAbl(str: string): string | undefined {
+  if (str.length > 2) return;
+  const numberPart = 1 + Math.abs(str.charCodeAt(0) - 'a'.charCodeAt(0));
+  const letterPart = String.fromCharCode(parseInt(str.slice(1)) + 96);
+  return letterPart.toString() + numberPart.toString();
+}
+
+export function readAbaloneFen(fen: string, ranks: number, files: number) {
+  const parts = fen.split(' '),
+    board: Board = {
+      pieces: {},
+      wMoved: parts[3] === 'b',
+    };
+
+  parts[0]
+    .split('[')[0]
+    .split('/')
+    .slice(0, ranks)
+    .forEach((row, y) => {
+      let x = Math.max(files - y - 4, 1);
+      row.split('').forEach(v => {
+        if (v == '~') return;
+        const nb = parseInt(v, 10);
+        if (nb) x += nb;
+        else {
+          board.pieces[`${String.fromCharCode(x + 96)}${files - y}`] = v;
+          x++;
+        }
+      });
+    });
+
+  return board;
 }

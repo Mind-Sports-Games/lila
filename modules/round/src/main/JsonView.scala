@@ -429,6 +429,9 @@ final class JsonView(
       case (Situation.Backgammon(_), Variant.Backgammon(_)) =>
         (pov.game playableBy pov.player) option
           Event.PossibleMoves.json(pov.game.situation.destinations, apiVersion)
+      case (Situation.Abalone(_), Variant.Abalone(_)) =>
+        (pov.game playableBy pov.player) option
+          Event.PossibleMoves.json(pov.game.situation.destinations, apiVersion)
       case _ => sys.error("Mismatch of types for possibleMoves")
     }
 
@@ -446,6 +449,7 @@ final class JsonView(
       case (Situation.Backgammon(_), Variant.Backgammon(_)) =>
         (pov.game playableBy pov.player) option
           Event.PossibleDropsByRole.json(pov.game.situation.dropsByRole.getOrElse(Map.empty))
+      case (Situation.Abalone(_), Variant.Abalone(_))       => None
       case (Situation.Draughts(_), Variant.Draughts(_)) => None
       case _                                            => sys.error("Mismatch of types for possibleDropsByrole")
     }

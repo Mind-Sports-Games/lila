@@ -30,6 +30,7 @@ object TreeBuilder {
       case FEN.Togyzkumalak(fen) => FullOpeningDB.findByFen(GameLogic.Togyzkumalak(), FEN.Togyzkumalak(fen))
       case FEN.Go(fen)           => FullOpeningDB.findByFen(GameLogic.Go(), FEN.Go(fen))
       case FEN.Backgammon(fen)   => FullOpeningDB.findByFen(GameLogic.Backgammon(), FEN.Backgammon(fen))
+      case FEN.Abalone(fen)      => FullOpeningDB.findByFen(GameLogic.Abalone(), FEN.Abalone(fen))
     }
 
   def apply(

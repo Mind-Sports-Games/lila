@@ -98,7 +98,9 @@ export const init = (node: HTMLElement) => {
                                       $el.hasClass('variant-hyper') ||
                                       $el.hasClass('variant-nackgammon')
                                     ? { width: 12, height: 2 }
-                                    : { width: 8, height: 8 },
+                                    : $el.hasClass('variant-abalone')
+                                      ? { width: 9, height: 9 }
+                                      : { width: 8, height: 8 },
           variant: variantFromElement($el),
         },
         $cg = $el.find('.cg-wrap'),

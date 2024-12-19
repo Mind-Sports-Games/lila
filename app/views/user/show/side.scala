@@ -111,7 +111,8 @@ object side {
         showNonEmptyPerf(u.perfs.go19x19, PerfType.orDefault("go19x19")),
         showNonEmptyPerf(u.perfs.backgammon, PerfType.orDefault("backgammon")),
         showNonEmptyPerf(u.perfs.hyper, PerfType.orDefault("hyper")),
-        showNonEmptyPerf(u.perfs.nackgammon, PerfType.orDefault("nackgammon"))
+        showNonEmptyPerf(u.perfs.nackgammon, PerfType.orDefault("nackgammon")),
+        showNonEmptyPerf(u.perfs.abalone, PerfType.orDefault("abalone"))
 //         u.noBot option frag(
 //           hr,
 //           showPerf(u.perfs.puzzle, PerfType.orDefault("puzzle")),

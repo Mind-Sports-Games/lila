@@ -104,6 +104,8 @@ export function convertVariantKeyToGameFamily(variantKey: VariantKey | DraughtsV
     case 'hyper':
     case 'backgammon':
       return 'backgammon';
+    case 'abalone':
+      return 'abalone';
     case 'russian':
     case 'brazilian':
     case 'breakthrough':

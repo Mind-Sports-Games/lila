@@ -95,6 +95,7 @@ object Tv {
   import strategygames.togyzkumalak.{ variant => MTV }
   import strategygames.go.{ variant => GV }
   import strategygames.backgammon.{ variant => BV }
+  import strategygames.abalone.{ variant => AV }
   import strategygames.{ Speed => S, GameFamily }
 
   case class Champion(user: LightUser, rating: Int, gameId: Game.ID)
@@ -679,6 +680,15 @@ object Tv {
           familyChannel = false,
           gameFamily = "backgammon"
         )
+    case object Abalone
+        extends Channel(
+          name = VariantKeys.variantName(Variant.wrap(AV.Abalone)),
+          icon = AV.Abalone.perfIcon.toString,
+          secondsSinceLastMove = freshBlitz,
+          filters = Seq(variant(Variant.wrap(AV.Abalone)), noBot),
+          familyChannel = true,
+          gameFamily = "abalone"
+        )
     case object Bot
         extends Channel(
           name = "Bot",
@@ -756,6 +766,7 @@ object Tv {
       Backgammon,
       Hyper,
       Nackgammon,
+      Abalone,
       Bot,
       Computer
     )

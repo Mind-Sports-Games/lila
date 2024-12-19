@@ -54,6 +54,7 @@ export const possiblePromotion = (
     case 'backgammon':
     case 'hyper':
     case 'nackgammon':
+    case 'abalone':
       return false;
     case 'shogi':
       return (

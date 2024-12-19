@@ -41,6 +41,10 @@
       height: 125px;
     }
 
+    &.abalone {
+      height: 125px;
+    }
+
     @extend %flex-center;
 
     justify-content: center;
@@ -99,6 +103,13 @@
   }
 
   .list a.backgammon span {
+    display: block;
+    width: 100px;
+    height: 100px;
+  }
+
+  .list a.abalone span {
+    background-repeat: no-repeat;
     display: block;
     width: 100px;
     height: 100px;
@@ -239,6 +250,21 @@
 
     .backgammon-contemporary {
       background-image: url(../images/board/backgammon/svg/backgammon_contemporary_board.svg);
+      background-size: 100px;
+    }
+
+    .abalone-classic {
+      background-image: url(../images/board/abalone/svg/classic.svg);
+      background-size: 100px;
+    }
+
+    .abalone-dark {
+      background-image: url(../images/board/abalone/svg/dark.svg);
+      background-size: 100px;
+    }
+
+    .abalone-yellow {
+      background-image: url(../images/board/abalone/svg/yellow.svg);
       background-size: 100px;
     }
   }

@@ -23,7 +23,7 @@ export async function esbuild(tsc?: Promise<void>): Promise<void> {
     return; // killed
   }
 
-  const entryPoints = [];
+  const entryPoints: string[] = [];
   for (const mod of env.building) {
     preModule(mod);
     for (const bundle of mod.bundles ?? []) {

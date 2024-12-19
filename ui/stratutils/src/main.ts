@@ -16,7 +16,7 @@ export function fixCrazySan(san: San): San {
 
 export type Dests = Map<Key, Key[]>;
 
-export type NotationStyle = 'uci' | 'san' | 'usi' | 'wxf' | 'dpo' | 'dpg' | 'man' | 'bkg';
+export type NotationStyle = 'uci' | 'san' | 'usi' | 'wxf' | 'dpo' | 'dpg' | 'man' | 'bkg' | 'abl';
 
 export function readDests(lines?: string): Dests | null {
   if (typeof lines === 'undefined') return null;
@@ -61,6 +61,7 @@ export function getScore(variant: VariantKey, fen: string, playerIndex: string):
     case 'oware':
     case 'togyzkumalak':
     case 'bestemshe':
+    case 'abalone':
       return +fen.split(' ')[playerIndex === 'p1' ? 1 : 2];
     case 'go9x9':
     case 'go13x13':
@@ -126,6 +127,10 @@ export function variantUsesBackgammonNotation(key: VariantKey | DraughtsVariantK
   return ['backgammon', 'hyper', 'nackgammon'].includes(key);
 }
 
+export function variantUsesAbaloneNotation(key: VariantKey | DraughtsVariantKey) {
+  return ['abalone'].includes(key);
+}
+
 export function notationStyle(key: VariantKey | DraughtsVariantKey): NotationStyle {
   return variantUsesUCINotation(key)
     ? 'uci'
@@ -141,7 +146,9 @@ export function notationStyle(key: VariantKey | DraughtsVariantKey): NotationSty
               ? 'man'
               : variantUsesBackgammonNotation(key)
                 ? 'bkg'
-                : 'san';
+                : variantUsesAbaloneNotation(key)
+                  ? 'abl'
+                  : 'san';
 }
 
 interface Piece {
@@ -181,6 +188,7 @@ const noFishnetVariants: VariantKey[] = [
   'backgammon',
   'hyper',
   'nackgammon',
+  'abalone',
 ];
 export function allowFishnetForVariant(variant: VariantKey) {
   return noFishnetVariants.indexOf(variant) == -1;
@@ -274,6 +282,8 @@ export const variantToRules = (v: VariantKey): Rules => {
       return 'hyper';
     case 'nackgammon':
       return 'nackgammon';
+    case 'abalone':
+      return 'abalone';
     default:
       return 'chess';
   }

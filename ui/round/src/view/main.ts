@@ -93,6 +93,17 @@ function renderPlayerScore(
       }),
     );
     return h('div.game-score.game-score-' + position, children);
+  } else if (variantKey === 'abalone') {
+    const opp = playerIndex === 'p1' ? 'p2' : 'p1';
+
+    children.push(h(`piece.${score > 0 ? 's-piece' : 'hole-piece'}.slot-top.${opp}`));
+    children.push(h(`piece.${score > 1 ? 's-piece' : 'hole-piece'}.slot-mid-left.${opp}`));
+    children.push(h(`piece.${score > 2 ? 's-piece' : 'hole-piece'}.slot-mid-right.${opp}`));
+    children.push(h(`piece.${score > 3 ? 's-piece' : 'hole-piece'}.slot-bot-left.${opp}`));
+    children.push(h(`piece.${score > 4 ? 's-piece' : 'hole-piece'}.slot-bot-mid.${opp}`));
+    children.push(h(`piece.${score > 5 ? 's-piece' : 'hole-piece'}.slot-bot-right.${opp}`));
+
+    return h('div.game-score.game-score-' + position, { attrs: { 'data-score': score } }, children);
   } else {
     children.push(h('piece.p-piece.' + playerIndex, { attrs: { 'data-score': score } }));
     return h('div.game-score.game-score-' + position, children);
@@ -140,6 +151,14 @@ export function main(ctrl: RoundController): VNode {
     switch (variantKey) {
       case 'flipello10':
       case 'flipello': {
+        const p1Score = util.getScoreFromFen(variantKey, fen, 'p1');
+        const p2Score = util.getScoreFromFen(variantKey, fen, 'p2');
+        topScore = topPlayerIndex === 'p1' ? p1Score : p2Score;
+        bottomScore = topPlayerIndex === 'p2' ? p1Score : p2Score;
+        break;
+      }
+      case 'abalone': {
+        const fen = plyStep(ctrl.data, ctrl.ply).fen;
         const p1Score = util.getScoreFromFen(variantKey, fen, 'p1');
         const p2Score = util.getScoreFromFen(variantKey, fen, 'p2');
         topScore = topPlayerIndex === 'p1' ? p1Score : p2Score;
@@ -247,8 +266,8 @@ export function main(ctrl: RoundController): VNode {
       $('body').removeClass('coords-in').addClass('coords-out');
     }
   }
-  //Togyzkumalak and backgammon board always has coodinates on the inside
-  if (['togyzkumalak', 'bestemshe', 'backgammon', 'hyper', 'nackgammon'].includes(variantKey)) {
+  //Togyzkumalak, Abalone and Backgammon board always has coodinates on the inside
+  if (['togyzkumalak', 'bestemshe', 'backgammon', 'hyper', 'nackgammon', 'abalone'].includes(variantKey)) {
     if (!$('body').hasClass('coords-no')) {
       $('body').removeClass('coords-out').addClass('coords-in');
     }
@@ -271,6 +290,7 @@ export function main(ctrl: RoundController): VNode {
     'backgammon',
     'hyper',
     'nackgammon',
+    'abalone',
   ].includes(variantKey)
     ? '.piece-letter'
     : '';

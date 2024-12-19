@@ -254,6 +254,7 @@ export default class StrongSocket {
         break;
       default:
         // return true in a receive handler to prevent pubsub and events
+        // @ts-expect-error TS1345: An expression of type 'void' cannot be tested for truthiness.
         if (!(this.settings.receive && this.settings.receive(m.t, m.d))) {
           this.pubsub.emit('socket.in.' + m.t, m.d, m);
           if (this.settings.events[m.t]) this.settings.events[m.t](m.d || null, m);

@@ -30,18 +30,18 @@
     "*.{js,ts,md,json,scss}": "prettier --write"
   },
   "dependencies": {
-    "@types/playstrategy": "workspace:*",
     "@types/node": "20.12.2",
+    "@types/playstrategy": "workspace:*",
     "@types/web": "^0.0.142",
     "@typescript-eslint/eslint-plugin": "^7.2.0",
     "@typescript-eslint/parser": "^7.2.0",
     "ab": "github:lichess-org/ab-stub",
-    "stratops": "git+ssh://git@github.com:Mind-Sports-Games/stratops.git#v0.8.1-pstrat5.3",
-    "chessground": "git+ssh://git@github.com:Mind-Sports-Games/chessground.git#v7.11.1-pstrat3.3",
+    "chessground": "git+ssh://git@github.com:Mind-Sports-Games/chessground.git#v7.11.1-pstrat3.4",
     "eslint": "^8.57.0",
     "lint-staged": "^15.2.2",
     "onchange": "^7.1.0",
     "prettier": "^3.2.5",
+    "stratops": "git+ssh://git@github.com:Mind-Sports-Games/stratops.git#0.8.1-pstrat5.4",
     "typescript": "^5.6",
     "xml2js": "^0.6.2"
   },

@@ -85,7 +85,7 @@ object mini {
   def renderState(pov: Pov) =
     pov.game.variant match {
       case Variant.Chess(_) | Variant.FairySF(_) | Variant.Samurai(_) | Variant.Togyzkumalak(_) |
-          Variant.Go(_) | Variant.Backgammon(_) =>
+          Variant.Go(_) | Variant.Backgammon(_) | Variant.Abalone(_) =>
         dataState := s"${Forsyth.>>(pov.game.variant.gameLogic, pov.game.stratGame)}|${orientation(pov)}|${~pov.game.lastActionKeys}"
       case Variant.Draughts(v) =>
         dataState := s"${Forsyth.boardAndPlayer(
