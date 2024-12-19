@@ -86,7 +86,7 @@ object mini {
     pov.game.variant match {
       case Variant.Chess(_) | Variant.FairySF(_) | Variant.Samurai(_) | Variant.Togyzkumalak(_) |
           Variant.Go(_) | Variant.Backgammon(_) | Variant.Abalone(_) =>
-        dataState := s"${Forsyth.boardAndPlayer(pov.game.variant.gameLogic, pov.game.situation)}|${orientation(pov)}|${~pov.game.lastActionKeys}"
+        dataState := s"${Forsyth.>>(pov.game.variant.gameLogic, pov.game.stratGame)}|${orientation(pov)}|${~pov.game.lastActionKeys}"
       case Variant.Draughts(v) =>
         dataState := s"${Forsyth.boardAndPlayer(
           pov.game.variant.gameLogic,

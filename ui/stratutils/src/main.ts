@@ -8,7 +8,7 @@ import { Rules } from 'stratops/types';
 // import { promotion } from 'stratutils'
 export * as promotion from './promotion';
 
-export const initialFen: Fen = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1'; // @TODO VFR fix THIS ???
+export const initialFen: Fen = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1';
 
 export function fixCrazySan(san: San): San {
   return san[0] === 'P' ? san.slice(1) : san;
