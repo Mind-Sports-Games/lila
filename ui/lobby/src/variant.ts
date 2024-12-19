@@ -89,7 +89,7 @@ const variantConfirms: variantConfirmsType = {
   nackgammon:
     'This is a Nackgammon game!\n\nThe aim of the game is to get all your pieces into your home, and then take them all off the board first.',
   abalone:
-    'This is a Abalone game!\n\nThe aim of the game is to be the first to push six of your opponents stones off the board.',
+    'This is a Abalone game!\n\nThe aim of the game is to be the first to push six of your opponents marbles off the board.',
 };
 
 function storageKey(key: string) {
