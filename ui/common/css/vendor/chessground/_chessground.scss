@@ -211,7 +211,7 @@ square {
   pointer-events: none;
 
   &.move-dest {
-    // background: radial-gradient(rgba(20, 85, 30, 0.5) 19%, rgba(0, 0, 0, 0) 20%);
+    background: radial-gradient(rgba(20, 85, 30, 0.5) 19%, rgba(0, 0, 0, 0) 20%);
     pointer-events: auto;
 
     @each $color, $gameFamily in $alternate-board-highlights {
@@ -505,7 +505,7 @@ square {
   }
 
   &.selected {
-    background-color: rgba(20, 85, 30, 0.5) !important;
+    background-color: rgba(20, 85, 30, 0.5);
 
     body.chess-horsey &,
     body.loa-horsey & {
