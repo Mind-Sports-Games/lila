@@ -19,6 +19,15 @@
   }
 }
 
+@function swapPlayer($player) {
+  @if $player == 'p1' {
+    @return 'p2';
+  }
+  @if $player == 'p2' {
+    @return 'p1';
+  }
+}
+
 $players: ('p1', 'p2');
 $directions: ('W', 'NW', 'NE', 'E', 'SE', 'SW');
 
@@ -53,17 +62,6 @@ $directions: ('W', 'NW', 'NE', 'E', 'SE', 'SW');
     &.last-move.to {
       @each $player in $players {
         @each $direction in $directions {
-          .mini-board.variant-abalone &.#{$player}#{$direction} {
-            background-image: url('../images/board/abalone/highlights/#{$player}#{$direction}.svg');
-            background-color: transparent;
-            background-size: cover;
-            z-index: z('cg__svg.direction');
-          }
-        }
-      }
-
-      @each $player in $players {
-        @each $direction in $directions {
           &.#{$player}#{$direction} {
             background-image: url('../images/board/abalone/highlights/#{$player}#{$direction}.svg');
             background-color: transparent;
@@ -94,7 +92,7 @@ $directions: ('W', 'NW', 'NE', 'E', 'SE', 'SW');
         @each $player in $players {
           @each $direction in $directions {
             &.#{$player}#{$direction} {
-              background-image: url('../images/board/abalone/highlights/#{$player}#{#{swapDirection($direction)}}.svg');
+              background-image: url('../images/board/abalone/highlights/#{$player}#{swapDirection($direction)}.svg');
               background-color: transparent;
               background-size: cover;
               z-index: z('cg__svg.direction');
@@ -106,16 +104,29 @@ $directions: ('W', 'NW', 'NE', 'E', 'SE', 'SW');
   }
 
   &.mini-game {
-    .orientation-p2 {
-      square.last-move.to {
-        @each $player in $players {
-          @each $direction in $directions {
-            &.#{$player}#{$direction} {
-              background-image: url('../images/board/abalone/highlights/#{$player}#{$direction}.svg');
-              background-color: transparent;
-              background-size: cover;
-              z-index: z('cg__svg.direction');
-            }
+    square.last-move.to {
+      @each $player in $players {
+        @each $direction in $directions {
+          &.#{$player}#{$direction} {
+            background-image: url('../images/board/abalone/highlights/#{swapPlayer($player)}#{$direction}.svg');
+            background-color: transparent;
+            background-size: cover;
+            z-index: z('cg__svg.direction');
+          }
+        }
+      }
+    }
+  }
+
+  &.mini-board {
+    square.last-move.to {
+      @each $player in $players {
+        @each $direction in $directions {
+          &.#{$player}#{$direction} {
+            background-image: url('../images/board/abalone/highlights/#{swapPlayer($player)}#{$direction}.svg');
+            background-color: transparent;
+            background-size: cover;
+            z-index: z('cg__svg.direction');
           }
         }
       }
