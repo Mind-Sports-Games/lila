@@ -281,6 +281,7 @@ export default class RoundController {
       } else {
         const moveMillis = this.clock.stopClock();
         if (moveMillis !== undefined && this.shouldSendMoveTime) {
+          // @ts-ignore
           socketOpts.millis = moveMillis;
         }
       }

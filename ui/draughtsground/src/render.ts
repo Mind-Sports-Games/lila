@@ -160,6 +160,7 @@ export function render(s: State): void {
   for (const [k, p] of pieces) {
     anim = anims.get(k);
     tempPiece = temporaryPieces.get(k);
+    // @ts-ignore
     tempRole = temporaryRoles && temporaryRoles.get(k);
     if (!samePieces[k] && !tempPiece) {
       pMvdset = movedPieces.get(pieceNameOf(p));
