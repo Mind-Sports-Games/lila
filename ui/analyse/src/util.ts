@@ -1,5 +1,5 @@
 import { h, VNode, Hooks, Attrs } from 'snabbdom';
-import { fixCrazySan } from 'stratutils';
+import { fixCrazySan, getScore } from 'stratutils';
 import * as cg from 'chessground/types';
 import { Rules } from 'stratops';
 
@@ -273,16 +273,8 @@ export function getPlayerScore(variant: VariantKey, pieces: cg.Pieces, playerInd
   return score;
 }
 
-export function getMancalaScore(fen: string, playerIndex: string): number {
-  return +fen.split(' ')[playerIndex === 'p1' ? 1 : 2];
-}
-
-export function getGoScore(fen: string, playerIndex: string): number {
-  return +fen.split(' ')[playerIndex === 'p1' ? 3 : 4] / 10.0;
-}
-
-export function getBackgammonScore(fen: string, playerIndex: string): number {
-  return +fen.split(' ')[playerIndex === 'p1' ? 4 : 5];
+export function getScoreFromFen(variant: VariantKey, fen: string, playerIndex: string): number {
+  return getScore(variant, fen, playerIndex) ?? 0;
 }
 
 export function getAbaloneScore(fen: string, playerIndex: string): number {

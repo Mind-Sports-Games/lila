@@ -1,5 +1,6 @@
 import { h, VNode } from 'snabbdom';
 import { opposite } from 'chessground/util';
+import { displayScore } from 'stratutils';
 import { player as renderPlayer } from './util';
 import { Board } from '../interfaces';
 
@@ -63,11 +64,13 @@ const renderBoard = (incomingBoard: Board): VNode => {
 
 function boardPlayer(board: Board, playerIndex: PlayerIndex) {
   const player = board[playerIndex];
+  const score = displayScore(board.variantKey as VariantKey, board.fen, playerIndex);
   return h('span.mini-game__player', [
     h('span.mini-game__user.is.playerIndex-icon.text.' + (playerIndex == 'p1' ? board.p1Color : board.p2Color), [
       h('strong', '#' + player.rank),
       renderPlayer(player, true, true, false),
     ]),
+    h(`span.mini-game__score--${playerIndex}`, board.clock ? score : ''),
     board.clock
       ? h(`span.mini-game__clock.mini-game__clock--${playerIndex}`, {
           attrs: {
@@ -75,6 +78,6 @@ function boardPlayer(board: Board, playerIndex: PlayerIndex) {
             'data-managed': 1,
           },
         })
-      : h('span.mini-game__result', board.winner ? (board.winner == playerIndex ? 1 : 0) : '½'),
+      : h('span.mini-game__result', (board.winner ? (board.winner == playerIndex ? 1 : 0) : '½') + score),
   ]);
 }

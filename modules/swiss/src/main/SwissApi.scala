@@ -651,6 +651,9 @@ final class SwissApi(
               SwissPairing.Fields.matchStatus -> pairingMatchStatusHandler
                 .writeTry(Right(game.matchOutcome))
                 .get,
+              SwissPairing.Fields.startPlayerWinners -> pairingMatchStatusHandler
+                .writeTry(Right(game.startPlayerWinners))
+                .get,
               SwissPairing.Fields.status -> pairingStatusHandler
                 .writeTry(Right(game.winnerPlayerIndex))
                 .get

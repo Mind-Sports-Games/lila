@@ -87,6 +87,8 @@ object mini {
       case Variant.Chess(_) | Variant.FairySF(_) | Variant.Samurai(_) | Variant.Togyzkumalak(_) |
           Variant.Go(_) | Variant.Backgammon(_) | Variant.Abalone(_) =>
         dataState := s"${Forsyth.boardAndPlayer(pov.game.variant.gameLogic, pov.game.situation)}|${orientation(pov)}|${~pov.game.lastActionKeys}"
+          Variant.Go(_) | Variant.Backgammon(_) =>
+        dataState := s"${Forsyth.>>(pov.game.variant.gameLogic, pov.game.stratGame)}|${orientation(pov)}|${~pov.game.lastActionKeys}"
       case Variant.Draughts(v) =>
         dataState := s"${Forsyth.boardAndPlayer(
           pov.game.variant.gameLogic,
@@ -103,38 +105,18 @@ object mini {
         span(cls := "rating")(lila.game.Namer ratingString pov.player),
         if (pov.player.berserk) iconTag("`")
       ),
+      span(cls := s"mini-game__score--${pov.playerIndex.name}")(
+        if (!pov.game.finished) calculateScore(pov) else ""
+      ),
       if (pov.game.finished) renderResult(pov)
       else pov.game.clock.map { renderClock(_, pov) }
     )
 
-  private def calculateScore(pov: Pov): String =
-    pov.game.variant.key match {
-      case "flipello" | "flipello10" =>
-        "(" + pov.game.board.pieces
-          .map { case (_, (piece, _)) => piece.player.name }
-          .filter(p => p == pov.playerIndex.name)
-          .size
-          .toString() + ")"
-      case "threeCheck" | "fivecheck" =>
-        "(" + pov.game.history
-          .checkCount(pov.game.opponent(pov.playerIndex).playerIndex)
-          .toString() + ")"
-      case "oware" =>
-        val fen   = Forsyth.>>(pov.game.variant.gameLogic, pov.game.situation)
-        val score = if (pov.playerIndex.name == "p1") fen.player1Score else fen.player2Score
-        "(" + score.toString() + ")"
-      case "togyzkumalak" | "bestemshe" =>
-        "(" + pov.game.history.score(pov.playerIndex).toString() + ")"
-      case "go9x9" | "go13x13" | "go19x19" =>
-        val fen   = Forsyth.>>(pov.game.variant.gameLogic, pov.game.situation)
-        val score = (if (pov.playerIndex.name == "p1") fen.player1Score else fen.player2Score) / 10.0
-        "(" + score.toString().replace(".0", "") + ")"
-      case "backgammon" | "hyper" | "nackgammon" =>
-        "(" + pov.game.history.score(pov.playerIndex).toString() + ")"
-      case "abalone" =>
-        "(" + pov.game.history.score(pov.playerIndex).toString() + ")"
-      case _ => ""
-    }
+  private def calculateScore(pov: Pov): String = {
+    val score = pov.game.calculateScore(pov.playerIndex)
+    if (score == "") ""
+    else " (" + score + ")"
+  }
 
   private def renderResult(pov: Pov) =
     span(cls := "mini-game__result")(

@@ -108,7 +108,7 @@ final class JsonView(
       .add("teamStanding" -> teamStanding)
       .add("myTeam" -> myTeam)
       .add("duelTeams" -> data.duelTeams)
-      .add("secondsToFinishInterval" -> tour.isStarted.option(tour.meldeySecondsToFinishInterval))
+      .add("secondsToFinishInterval" -> tour.isStarted.option(tour.medleySecondsToFinishInterval))
       .add("medleyRound" -> full.option(tour.medleyRound)) ++
       full.?? {
         Json
@@ -128,11 +128,11 @@ final class JsonView(
             "lib"                    -> full.option(tour.variant.gameLogic.id),
             "variant"                -> full.option(variantJson(tour.variant)),
             "p1Name" -> full.option(
-              if (tour.isMedley) trans.p1.txt()
+              if (tour.isMedley || tour.variant.recalcStartPlayerForStats) trans.p1.txt()
               else tour.variant.playerNames(P1)
             ),
             "p2Name" -> full.option(
-              if (tour.isMedley) trans.p2.txt()
+              if (tour.isMedley || tour.variant.recalcStartPlayerForStats) trans.p2.txt()
               else tour.variant.playerNames(P2)
             )
           )
@@ -328,7 +328,7 @@ final class JsonView(
         "gameLogic"   -> game.variant.gameLogic.name.toLowerCase(),
         "gameFamily"  -> game.variant.gameFamily.key,
         "variantKey"  -> game.variant.key,
-        "fen"         -> Forsyth.boardAndPlayer(game.variant.gameLogic, game.situation),
+        "fen"         -> Forsyth.>>(game.variant.gameLogic, game.stratGame).value,
         "orientation" -> game.naturalOrientation.name,
         "color" -> game.variant.playerNames(
           game.naturalOrientation

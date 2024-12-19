@@ -2,18 +2,13 @@ import { h, VNode } from 'snabbdom';
 import { parseFen } from 'stratops/fen';
 import { variantToRules } from 'stratutils';
 import * as chessground from './ground';
-import { read as fenRead } from 'chessground/fen';
 import {
   bind,
   onInsert,
   dataIcon,
   spinner,
   bindMobileMousedown,
-  getPlayerScore,
-  getMancalaScore,
-  getGoScore,
-  getBackgammonScore,
-  getAbaloneScore,
+  getScoreFromFen,
   allowClientEvalForVariant,
 } from './util';
 import { defined } from 'common';
@@ -509,18 +504,17 @@ export default function (ctrl: AnalyseCtrl): VNode {
       !((!!gaugeOn || !!playerBars) && ['flipello', 'flipello10', 'go9x9', 'go13x13', 'go19x19'].includes(variantKey)),
     needsNoCoords =
       ['xiangqi', 'shogi', 'minixiangqi', 'minishogi'].includes(variantKey) && (!!gaugeOn || !!playerBars),
-    tour = relayTour(ctrl);
+    tour = relayTour(ctrl),
+    fen = ctrl.node.fen;
 
   let topScore = 0,
     bottomScore = 0;
-  const cgState = ctrl.chessground && ctrl.chessground.state;
   if (ctrl.data.hasGameScore) {
     switch (variantKey) {
       case 'flipello10':
       case 'flipello': {
-        const pieces = cgState ? cgState.pieces : fenRead(ctrl.node.fen, ctrl.data.game.variant.boardSize, variantKey);
-        const p1Score = getPlayerScore(variantKey, pieces, 'p1');
-        const p2Score = getPlayerScore(variantKey, pieces, 'p2');
+        const p1Score = getScoreFromFen(variantKey, fen, 'p1');
+        const p2Score = getScoreFromFen(variantKey, fen, 'p2');
         topScore = ctrl.topPlayerIndex() === 'p1' ? p1Score : p2Score;
         bottomScore = ctrl.topPlayerIndex() === 'p2' ? p1Score : p2Score;
         break;
@@ -528,9 +522,8 @@ export default function (ctrl: AnalyseCtrl): VNode {
       case 'oware':
       case 'togyzkumalak':
       case 'bestemshe': {
-        const fen = ctrl.node.fen;
-        const p1Score = getMancalaScore(fen, 'p1');
-        const p2Score = getMancalaScore(fen, 'p2');
+        const p1Score = getScoreFromFen(variantKey, fen, 'p1');
+        const p2Score = getScoreFromFen(variantKey, fen, 'p2');
         topScore = ctrl.topPlayerIndex() === 'p1' ? p1Score : p2Score;
         bottomScore = ctrl.topPlayerIndex() === 'p2' ? p1Score : p2Score;
         break;
@@ -546,9 +539,8 @@ export default function (ctrl: AnalyseCtrl): VNode {
       case 'go9x9':
       case 'go13x13':
       case 'go19x19': {
-        const fen = ctrl.node.fen;
-        const p1Score = getGoScore(fen, 'p1');
-        const p2Score = getGoScore(fen, 'p2');
+        const p1Score = getScoreFromFen(variantKey, fen, 'p1');
+        const p2Score = getScoreFromFen(variantKey, fen, 'p2');
         topScore = ctrl.topPlayerIndex() === 'p1' ? p1Score : p2Score;
         bottomScore = ctrl.topPlayerIndex() === 'p2' ? p1Score : p2Score;
         break;
@@ -556,9 +548,8 @@ export default function (ctrl: AnalyseCtrl): VNode {
       case 'backgammon':
       case 'hyper':
       case 'nackgammon': {
-        const fen = ctrl.node.fen;
-        const p1Score = getBackgammonScore(fen, 'p1');
-        const p2Score = getBackgammonScore(fen, 'p2');
+        const p1Score = getScoreFromFen(variantKey, fen, 'p1');
+        const p2Score = getScoreFromFen(variantKey, fen, 'p2');
         topScore = ctrl.topPlayerIndex() === 'p1' ? p1Score : p2Score;
         bottomScore = ctrl.topPlayerIndex() === 'p2' ? p1Score : p2Score;
         break;

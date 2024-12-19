@@ -9,6 +9,7 @@
     { "path": "../chat/tsconfig.json" },
     { "path": "../common/tsconfig.json" },
     { "path": "../draughtsground/tsconfig.json" },
-    { "path": "../game/tsconfig.json" }
+    { "path": "../game/tsconfig.json" },
+    { "path": "../stratutils/tsconfig.json" }
   ]
 }

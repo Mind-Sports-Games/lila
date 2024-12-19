@@ -2,6 +2,7 @@ import * as cg from 'chessground/types';
 import { h, Hooks, VNodeData } from 'snabbdom';
 import { opposite, calculatePieceGroup, backgammonPosDiff } from 'chessground/util';
 import { Redraw, EncodedDests, Dests, MaterialDiff, Step, CheckCount } from './interfaces';
+import * as stratutils from 'stratutils';
 
 function pieceScores(variant: VariantKey, piece: cg.Role, isPromoted: boolean | undefined): number {
   switch (variant) {
@@ -166,16 +167,8 @@ export function getPlayerScore(variant: VariantKey, pieces: cg.Pieces, playerInd
   return score;
 }
 
-export function getMancalaScore(fen: string, playerIndex: string): number {
-  return +fen.split(' ')[playerIndex === 'p1' ? 1 : 2];
-}
-
-export function getAbaloneScore(fen: string, playerIndex: string): number {
-  return +fen.split(' ')[playerIndex === 'p1' ? 1 : 2];
-}
-
-export function getGoScore(fen: string, playerIndex: string): number {
-  return +fen.split(' ')[playerIndex === 'p1' ? 3 : 4] / 10.0;
+export function getScoreFromFen(variant: VariantKey, fen: string, playerIndex: string): number {
+  return stratutils.getScore(variant, fen, playerIndex) ?? 0;
 }
 
 export function getGoCaptures(fen: string, playerIndex: string): number {
@@ -184,10 +177,6 @@ export function getGoCaptures(fen: string, playerIndex: string): number {
 
 export function getGoKomi(fen: string): number {
   return +fen.split(' ')[7] / 10.0;
-}
-
-export function getBackgammonScoreFromFen(fen: string, playerIndex: string): number {
-  return +fen.split(' ')[playerIndex === 'p1' ? 4 : 5];
 }
 
 export function getBackgammonScoreFromPieces(pieces: cg.Pieces, pocketPieces: cg.Piece[], playerIndex: string): number {

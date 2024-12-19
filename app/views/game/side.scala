@@ -178,7 +178,7 @@ object side {
               div(cls := "medley-interval")(
                 span(cls := "clock", dataTime := t.tour.secondsToFinish)(t.tour.clockStatus),
                 span(cls := "text medley-text")(" ("),
-                span(cls := "clock", dataTime := t.tour.meldeySecondsToFinishInterval)(
+                span(cls := "clock", dataTime := t.tour.medleySecondsToFinishInterval)(
                   t.tour.medleyClockStatus
                 ),
                 span(cls := "text medley-text")(")")

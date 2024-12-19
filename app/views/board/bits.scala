@@ -66,10 +66,7 @@ object bits {
   }
   def mini(pov: Pov): Tag => Tag =
     miniWithOrientation(
-      FEN(
-        pov.game.variant.gameLogic,
-        Forsyth.boardAndPlayer(pov.game.variant.gameLogic, pov.game.situation)
-      ),
+      Forsyth.>>(pov.game.variant.gameLogic, pov.game.stratGame),
       boardOrientation(pov),
       ~pov.game.lastActionKeys,
       boardSize(pov),
@@ -140,7 +137,7 @@ object bits {
       fen: FEN
   )(implicit ctx: Context) =
     Json.obj(
-      "fen"         -> fen.value.split(" ").take(4).mkString(" "),
+      "fen"         -> fen.value, // require full fen for score updates
       "baseUrl"     -> s"$netBaseUrl${routes.Editor.load("")}",
       "playerIndex" -> sit.player.letter.toString,
       "castles" -> Json.obj(

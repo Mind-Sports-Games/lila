@@ -55,6 +55,49 @@ export const altCastles = {
   e8h8: 'e8g8',
 };
 
+// 3 check and 5 check dont have constitent fen formats, its calculated from running through game plys.
+export function getScore(variant: VariantKey, fen: string, playerIndex: string): number | undefined {
+  switch (variant) {
+    case 'oware':
+    case 'togyzkumalak':
+    case 'bestemshe':
+      return +fen.split(' ')[playerIndex === 'p1' ? 1 : 2];
+    case 'go9x9':
+    case 'go13x13':
+    case 'go19x19':
+      return +fen.split(' ')[playerIndex === 'p1' ? 3 : 4] / 10.0;
+    case 'backgammon':
+    case 'hyper':
+    case 'nackgammon':
+      return +fen.split(' ')[playerIndex === 'p1' ? 4 : 5];
+    case 'flipello10':
+    case 'flipello': {
+      const boardPart = fen.split(' ')[0].split('[')[0];
+      return boardPart.split(playerIndex === 'p1' ? 'P' : 'p').length - 1;
+    }
+    case 'threeCheck':
+    case 'fiveCheck':
+      return +fen.split(' ')[6][playerIndex === 'p1' ? 1 : 3];
+    default:
+      return undefined;
+  }
+}
+
+export function displayScore(variant: VariantKey, fen: string, playerIndex: string): string {
+  const score: undefined | number = getScore(variant, fen, playerIndex);
+  if (score !== undefined) return `(${score})`;
+  else return '';
+}
+
+export function fenPlayerIndex(variant: VariantKey, fen: string) {
+  //different trick for Go due to fen structure
+  if (['go9x9', 'go13x13', 'go19x19'].includes(variant)) {
+    return fen.split(' ')[1] === 'b' ? 'p1' : 'p2';
+  }
+  const p2String = variant === 'oware' ? ' N' : ' b';
+  return fen.indexOf(p2String) > 0 ? 'p2' : 'p1';
+}
+
 export function variantUsesUCINotation(key: VariantKey | DraughtsVariantKey) {
   return ['linesOfAction', 'scrambledEggs', 'amazons', 'breakthroughtroyka', 'minibreakthroughtroyka'].includes(key);
 }

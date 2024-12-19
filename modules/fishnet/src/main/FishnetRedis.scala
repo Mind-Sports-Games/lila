@@ -56,17 +56,17 @@ final class FishnetRedis(
   private def writeWork(work: Work.Move): String =
     List(
       work.game.id,
-      work.level,
+      work.level.toString(),
       work.clock ?? writeClock,
       work.game.variant.some.filter(_.exotic).??(_.key),
       work.game.initialFen.??(_.value),
       UciDump.fishnetUci(work.game.variant, work.game.moves)
-    ) mkString ";"
+    ).mkString(";")
 
   private def writeClock(clock: Work.Clock): String =
     List(
       clock.wtime,
       clock.btime,
       clock.inc
-    ) mkString " "
+    ).mkString(" ")
 }

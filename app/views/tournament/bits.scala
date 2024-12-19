@@ -102,6 +102,7 @@ object bits {
     trans.performance,
     trans.tournamentComplete,
     trans.movesPlayed,
+    trans.turnsPlayed,
     trans.playerIndexWins,
     trans.draws,
     trans.nextXTournament,

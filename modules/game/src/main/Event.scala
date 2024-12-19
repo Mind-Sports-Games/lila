@@ -204,7 +204,8 @@ object Event {
             }
           else
             Forsyth
-              .boardAndPlayer(situation.board.variant.gameLogic, situation),
+              .>>(situation.board.variant.gameLogic, situation)
+              .value,
         check = situation.check,
         threefold = situation.threefoldRepetition,
         perpetualWarning = situation.perpetualPossible,
@@ -334,7 +335,7 @@ object Event {
           case StratDrop.Go(drop)         => strategygames.go.format.pgn.Dumper(drop)
           case StratDrop.Backgammon(drop) => strategygames.backgammon.format.pgn.Dumper(drop)
         },
-        fen = Forsyth.boardAndPlayer(situation.board.variant.gameLogic, situation),
+        fen = Forsyth.>>(situation.board.variant.gameLogic, situation).value,
         check = situation.check,
         threefold = situation.threefoldRepetition,
         perpetualWarning = situation.perpetualPossible,
@@ -426,7 +427,7 @@ object Event {
         gf = situation.board.variant.gameFamily,
         pos = lift.pos,
         san = s"^${lift.pos.key}",
-        fen = Forsyth.boardAndPlayer(situation.board.variant.gameLogic, situation),
+        fen = Forsyth.>>(situation.board.variant.gameLogic, situation).value,
         check = situation.check,
         threefold = situation.threefoldRepetition,
         perpetualWarning = situation.perpetualPossible,
@@ -523,7 +524,7 @@ object Event {
       EndTurn(
         gf = situation.board.variant.gameFamily,
         san = "endturn",
-        fen = Forsyth.boardAndPlayer(situation.board.variant.gameLogic, situation),
+        fen = Forsyth.>>(situation.board.variant.gameLogic, situation).value,
         check = situation.check,
         threefold = situation.threefoldRepetition,
         perpetualWarning = situation.perpetualPossible,
@@ -625,7 +626,7 @@ object Event {
           case _                 => false
         },
         san = "pass",
-        fen = Forsyth.boardAndPlayer(situation.board.variant.gameLogic, situation),
+        fen = Forsyth.>>(situation.board.variant.gameLogic, situation).value,
         check = situation.check,
         threefold = situation.threefoldRepetition,
         perpetualWarning = situation.perpetualPossible,
@@ -710,7 +711,7 @@ object Event {
         gf = situation.board.variant.gameFamily,
         squares = ss.squares,
         san = s"ss:${ss.squares.mkString(",")}",
-        fen = Forsyth.boardAndPlayer(situation.board.variant.gameLogic, situation),
+        fen = Forsyth.>>(situation.board.variant.gameLogic, situation).value,
         check = situation.check,
         threefold = situation.threefoldRepetition,
         perpetualWarning = situation.perpetualPossible,
@@ -793,7 +794,7 @@ object Event {
         gf = situation.board.variant.gameFamily,
         dice = dr.dice,
         san = dr.dice.mkString("/"),
-        fen = Forsyth.boardAndPlayer(situation.board.variant.gameLogic, situation),
+        fen = Forsyth.>>(situation.board.variant.gameLogic, situation).value,
         check = situation.check,
         threefold = situation.threefoldRepetition,
         perpetualWarning = situation.perpetualPossible,
@@ -883,7 +884,7 @@ object Event {
       Undo(
         gf = situation.board.variant.gameFamily,
         san = "undo",
-        fen = Forsyth.boardAndPlayer(situation.board.variant.gameLogic, situation),
+        fen = Forsyth.>>(situation.board.variant.gameLogic, situation).value,
         check = situation.check,
         threefold = situation.threefoldRepetition,
         perpetualWarning = situation.perpetualPossible,

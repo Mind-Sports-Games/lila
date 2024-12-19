@@ -1,4 +1,4 @@
-import { NotationStyle } from 'stratutils';
+import { NotationStyle, getScore } from 'stratutils';
 
 interface ExtendedMoveInfo {
   san: string;
@@ -448,7 +448,7 @@ function nextAsciiLetter(letter: string, n: number): string {
 }
 
 export function getMancalaScore(fen: string, playerIndex: string): number {
-  return +fen.split(' ')[playerIndex === 'p1' ? 1 : 2];
+  return getScore('oware', fen, playerIndex) ?? 0;
 }
 
 function backgammonNotation(move: ExtendedMoveInfo, variant: Variant): string {

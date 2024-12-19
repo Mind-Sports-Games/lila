@@ -124,13 +124,15 @@ object LameName {
       'z' -> "2"
     )
 
-    val subs = ('a' to 'z' map { c =>
-      c -> s"[$c${c.toUpper}${~extras.get(c)}]"
-    }) ++ Seq('0' -> "[0O]", '1' -> "[1Il]", '8' -> "[8B]") toMap
+    val subs: Map[Char, String] = {
+      (('a' to 'z' map { c =>
+        c -> s"[$c${c.toUpper}${~extras.get(c)}]"
+      }) ++ Seq('0' -> "[0O]", '1' -> "[1Il]", '8' -> "[8B]"))
+    }.toMap
 
     list
       .map {
-        _.map(l => subs.getOrElse(l, l)).iterator.map(l => s"$l$interspersed").mkString
+        _.map(l => subs.getOrElse(l, l.toString)).iterator.map(l => s"$l$interspersed").mkString
       }
       .mkString("|")
       .r

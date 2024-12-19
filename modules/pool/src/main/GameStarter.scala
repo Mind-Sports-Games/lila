@@ -72,13 +72,19 @@ final private class GameStarter(
       pool: PoolConfig,
       p1User: (User.ID, Perf),
       p2User: (User.ID, Perf)
-  ) =
+  ) = {
+    val stratSit = Situation(pool.variant.gameLogic, pool.variant)
     Game
       .make(
         stratGame = strategygames.Game(
           pool.variant.gameLogic,
-          situation = Situation(pool.variant.gameLogic, pool.variant),
-          clock = pool.clock.toClock.some
+          situation = stratSit,
+          clock = pool.clock.toClock.some,
+          //we have to do this to handle Backgammon variable start player
+          plies = stratSit.player.fold(0, 1),
+          turnCount = stratSit.player.fold(0, 1),
+          startedAtPly = stratSit.player.fold(0, 1),
+          startedAtTurn = stratSit.player.fold(0, 1)
         ),
         p1Player = Player.make(P1, p1User),
         p2Player = Player.make(P2, p2User),
@@ -88,6 +94,8 @@ final private class GameStarter(
         pgnImport = None
       )
       .withId(id)
+  }
+
 }
 
 final private class BotGameStarter(
@@ -162,13 +170,19 @@ final private class BotGameStarter(
       pool: PoolConfig,
       p1User: (User.ID, Perf),
       p2User: (User.ID, Perf)
-  ) =
+  ) = {
+    val stratSit = Situation(pool.variant.gameLogic, pool.variant)
     Game
       .make(
         stratGame = strategygames.Game(
           pool.variant.gameLogic,
-          situation = Situation(pool.variant.gameLogic, pool.variant),
-          clock = pool.clock.toClock.some
+          situation = stratSit,
+          clock = pool.clock.toClock.some,
+          //we have to do this to handle Backgammon variable start player
+          plies = stratSit.player.fold(0, 1),
+          turnCount = stratSit.player.fold(0, 1),
+          startedAtPly = stratSit.player.fold(0, 1),
+          startedAtTurn = stratSit.player.fold(0, 1)
         ),
         p1Player = Player.make(P1, p1User),
         p2Player = Player.make(P2, p2User),
@@ -178,6 +192,7 @@ final private class BotGameStarter(
         pgnImport = None
       )
       .withId(id)
+  }
 
   def botPoolMember(userPoolMember: PoolMember, botId: User.ID) =
     PoolMember(

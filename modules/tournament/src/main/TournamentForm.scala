@@ -214,7 +214,7 @@ final class TournamentForm {
         .verifying("Increase tournament duration, or decrease game clock", _.sufficientDuration)
         .verifying("Reduce tournament duration, or increase game clock", _.excessiveDuration)
         .verifying("Must have more than 1 game type for medley tournaments", _.validMedleySetup)
-        .verifying("Hanidcapped mode requires a Go variant, non-rated and non-meldey", _.validHandicapSetup)
+        .verifying("Hanidcapped mode requires a Go variant, non-rated and non-medley", _.validHandicapSetup)
     )
 }
 
