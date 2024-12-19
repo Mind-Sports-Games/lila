@@ -95,6 +95,9 @@ export function fenPlayerIndex(variant: VariantKey, fen: string) {
   if (['go9x9', 'go13x13', 'go19x19'].includes(variant)) {
     return fen.split(' ')[1] === 'b' ? 'p1' : 'p2';
   }
+  if (['abalone'].includes(variant)) {
+    return fen.split(' ')[3] === 'b' ? 'p1' : 'p2';
+  }
   const p2String = variant === 'oware' ? ' N' : ' b';
   return fen.indexOf(p2String) > 0 ? 'p2' : 'p1';
 }
