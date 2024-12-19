@@ -277,10 +277,6 @@ export function getScoreFromFen(variant: VariantKey, fen: string, playerIndex: s
   return getScore(variant, fen, playerIndex) ?? 0;
 }
 
-export function getAbaloneScore(fen: string, playerIndex: string): number {
-  return +fen.split(' ')[playerIndex === 'p1' ? 1 : 2];
-}
-
 const noServerEvalVariants = [
   'monster',
   'linesOfAction',

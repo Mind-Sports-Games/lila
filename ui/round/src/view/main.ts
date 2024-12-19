@@ -159,8 +159,8 @@ export function main(ctrl: RoundController): VNode {
       }
       case 'abalone': {
         const fen = plyStep(ctrl.data, ctrl.ply).fen;
-        const p1Score = util.getAbaloneScore(fen, 'p1');
-        const p2Score = util.getAbaloneScore(fen, 'p2');
+        const p1Score = util.getScoreFromFen(variantKey, fen, 'p1');
+        const p2Score = util.getScoreFromFen(variantKey, fen, 'p2');
         topScore = topPlayerIndex === 'p1' ? p1Score : p2Score;
         bottomScore = topPlayerIndex === 'p2' ? p1Score : p2Score;
         break;
