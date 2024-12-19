@@ -281,7 +281,7 @@ export default class RoundController {
       } else {
         const moveMillis = this.clock.stopClock();
         if (moveMillis !== undefined && this.shouldSendMoveTime) {
-          // @ts-ignore
+          // @ts-expect-error TS2322: Type 'number | void' is not assignable to type 'number'.
           socketOpts.millis = moveMillis;
         }
       }
