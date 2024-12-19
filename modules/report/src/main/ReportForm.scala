@@ -45,7 +45,7 @@ final private[report] class ReportForm(
         gameId = gameId,
         move = move
       )
-    })(_.export.some).verifying(captchaFailMessage, validateCaptcha _).verifying(cheatLinkConstraint)
+    })(_.values.some).verifying(captchaFailMessage, validateCaptcha _).verifying(cheatLinkConstraint)
   )
 
   def createWithCaptcha = withCaptcha(create)
@@ -78,5 +78,5 @@ case class ReportSetup(
 
   def suspect = SuspectId(user.id)
 
-  def export = (user.name, reason, text, gameId, move)
+  def values = (user.name, reason, text, gameId, move)
 }

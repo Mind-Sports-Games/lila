@@ -44,6 +44,8 @@ export default function (ctrl: TournamentController): VNode {
     return h(tag, [h('div.stats', [playerTitle(ctrl.playerInfo.player), spinner()])]);
   const nb = data.player.nb,
     pairingsLen = data.pairings.length,
+    gameInProgress =
+      data.pairings[0] && result(data.pairings[0].win, data.pairings[0].status, ctrl.data.statusScoring) === '*',
     avgOp = pairingsLen
       ? Math.round(
           data.pairings.reduce(function (a, b) {
@@ -112,7 +114,7 @@ export default function (ctrl: TournamentController): VNode {
                 },
               },
               [
-                h('th', '' + (Math.max(nb.game, pairingsLen) - i)),
+                h('th', '' + (Math.max(nb.game + (gameInProgress ? 1 : 0), pairingsLen) - i)),
                 ctrl.data.medley ? h('td', { attrs: { 'data-icon': p.variantIcon } }, '') : null,
                 h('td', playerName(p.op)),
                 h('td', ctrl.data.medley ? null : '' + p.op.rating + (p.op.isInputRating ? '*' : '')),

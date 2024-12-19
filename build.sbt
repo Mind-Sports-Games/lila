@@ -21,7 +21,7 @@ libraryDependencies ++= akka.bundle ++ playWs.bundle ++ Seq(
   strategyGames, compression, scalalib, hasher,
   reactivemongo.driver, reactivemongo.kamon, maxmind, prismic, scalatags,
   kamon.core, kamon.influxdb, kamon.metrics, kamon.prometheus,
-  scrimage, scaffeine, lettuce, uaparser
+  scrimage, scaffeine, lettuce, uaparser, jacksonDatabind
 ) ++ {
   if (useEpoll) Seq(epoll, reactivemongo.epoll)
   else Seq.empty
