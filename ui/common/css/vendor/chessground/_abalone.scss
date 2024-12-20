@@ -32,12 +32,6 @@ $players: ('p1', 'p2');
 $directions: ('W', 'NW', 'NE', 'E', 'SE', 'SW');
 
 .variant-abalone {
-  /*
-  &.mini-board, // lobby, profile page
-  .cg-wrap { // other views
-      background-color: #575757;
-  }
-*/
   cg-container {
     width: calc(100% * 9);
     height: calc(100% * 9);
@@ -97,36 +91,6 @@ $directions: ('W', 'NW', 'NE', 'E', 'SE', 'SW');
               background-size: cover;
               z-index: z('cg__svg.direction');
             }
-          }
-        }
-      }
-    }
-  }
-
-  &.mini-game {
-    square.last-move.to {
-      @each $player in $players {
-        @each $direction in $directions {
-          &.#{$player}#{$direction} {
-            background-image: url('../images/board/abalone/highlights/#{swapPlayer($player)}#{$direction}.svg');
-            background-color: transparent;
-            background-size: cover;
-            z-index: z('cg__svg.direction');
-          }
-        }
-      }
-    }
-  }
-
-  &.mini-board {
-    square.last-move.to {
-      @each $player in $players {
-        @each $direction in $directions {
-          &.#{$player}#{$direction} {
-            background-image: url('../images/board/abalone/highlights/#{swapPlayer($player)}#{$direction}.svg');
-            background-color: transparent;
-            background-size: cover;
-            z-index: z('cg__svg.direction');
           }
         }
       }
