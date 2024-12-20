@@ -365,6 +365,7 @@ case class Game(
         val score = if (playerIndex.name == "p1") fen.player1Score else fen.player2Score
         score.toString()
       case "togyzkumalak" | "bestemshe" => history.score(playerIndex).toString()
+      case "abalone"                    => history.score(playerIndex).toString()
       case "go9x9" | "go13x13" | "go19x19" =>
         val fen   = Forsyth.>>(variant.gameLogic, situation)
         val score = (if (playerIndex.name == "p1") fen.player1Score else fen.player2Score) / 10.0

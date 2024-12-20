@@ -183,6 +183,15 @@ $pocket-col1-size: 9.5vw;
     width: $pocket-col1-size;
     height: $pocket-col1-size;
     background-color: #aaa;
+    .abalone-yellow & {
+      background-color: #f0bc67;
+    }
+    .abalone-classic & {
+      background-color: #6c6c6c;
+    }
+    .abalone-dark & {
+      background-color: #5a5a5a;
+    }
 
     piece {
       display: block;

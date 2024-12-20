@@ -273,6 +273,15 @@ body .variant-abalone .game-score piece.hole-piece {
     padding-top: 35%;
     position: relative;
     background-color: #aaa;
+    .abalone-yellow & {
+      background-color: #f0bc67;
+    }
+    .abalone-classic & {
+      background-color: #6c6c6c;
+    }
+    .abalone-dark & {
+      background-color: #5a5a5a;
+    }
 
     piece {
       width: 100% !important;
