@@ -3,7 +3,6 @@ import { MaybeVNode, Position } from '../interfaces';
 import RoundController from '../ctrl';
 import * as round from '../round';
 import { isPlayerTurn, playable } from 'game';
-import isCol1 from 'common/isCol1';
 
 let rang = false;
 
@@ -48,18 +47,6 @@ export default function (ctrl: RoundController, position: Position): MaybeVNode 
       ctrl.clock.times.activePlayerIndex !== undefined &&
       ctrl.clock?.millisOf(ctrl.clock.times.activePlayerIndex) < 10000;
     moveIndicatorText = myTurn ? [ctrl.trans('yourTurn')] : [ctrl.trans('waitingForOpponent')];
-  }
-
-  if (moveIndicator && round.turnsTaken(ctrl.data) < 2 && isCol1()) {
-    moveIndicatorText = myTurn
-      ? [
-          `${ctrl.trans('youPlayThePlayerIndexPieces', ctrl.data.player.playerName)}.`,
-          ` ${ctrl.trans.noarg('itsYourTurn')}`,
-        ]
-      : [
-          `${ctrl.trans('youPlayThePlayerIndexPieces', ctrl.data.player.playerName)}.`,
-          ` ${ctrl.trans('waitingForOpponent')}`,
-        ];
   }
 
   if (position == side) {
