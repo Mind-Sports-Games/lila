@@ -96,4 +96,41 @@ $directions: ('W', 'NW', 'NE', 'E', 'SE', 'SW');
       }
     }
   }
+
+  &.mini-game .orientation-p2 {
+    square {
+      &.last-move.to {
+        @each $player in $players {
+          @each $direction in $directions {
+            &.#{$player}#{$direction} {
+              background-image: url('../images/board/abalone/highlights/#{$player}#{$direction}.svg');
+              background-color: transparent;
+              background-size: cover;
+              z-index: z('cg__svg.direction');
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+// profile page
+.search__result {
+  .mini-board {
+    square {
+      &.last-move.to {
+        @each $player in $players {
+          @each $direction in $directions {
+            &.#{$player}#{$direction} {
+              background-image: url('../images/board/abalone/highlights/#{$player}#{$direction}.svg');
+              background-color: transparent;
+              background-size: cover;
+              z-index: z('cg__svg.direction');
+            }
+          }
+        }
+      }
+    }
+  }
 }

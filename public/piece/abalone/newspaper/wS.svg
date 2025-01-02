@@ -14,7 +14,8 @@
             fy="30%"
         >
             <stop offset="0%" stop-color="#FFFFFF" />
-            <stop offset="75%" stop-color="#E9E9E9" />
+            <stop offset="25%" stop-color="#DDD" />
+            <stop offset="75%" stop-color="#BBB" />
             <stop offset="95%" stop-color="#AAA" />
         </radialGradient>
     </defs>
