@@ -66,11 +66,11 @@ $directions: ('W', 'NW', 'NE', 'E', 'SE', 'SW');
       }
     }
 
-    $defaultBlue: rgb(0, 48, 143);
-    $inline: $defaultBlue;
-    $selected: $inline;
+    $defaultRed: rgb(255, 87, 87);
+    $inline: $defaultRed;
+    $selected: $defaultRed;
+    $aside: rgb(255, 110, 125);
     $premove: rgb(157, 116, 189);
-    $aside: rgb(116, 131, 189);
 
     &.move-dest.inline {
       background: radial-gradient($inline 28%, rgba(0, 0, 0, 0) 29%) !important;
@@ -82,7 +82,7 @@ $directions: ('W', 'NW', 'NE', 'E', 'SE', 'SW');
     }
     &.move-dest.oc {
       // oc = opposite color. That means there is no need to consider aside + oc
-      background: radial-gradient($inline 28%, /*#208530 29%,*/ rgba(0, 0, 0, 0) 29%) !important;
+      background: radial-gradient($inline 28%, rgba(0, 0, 0, 0) 29%) !important;
       z-index: z('cg__svg.direction');
     }
     &.selected {
@@ -91,6 +91,7 @@ $directions: ('W', 'NW', 'NE', 'E', 'SE', 'SW');
     }
     &.premove-dest {
       background: radial-gradient($premove 28%, rgba(255, 0, 0, 0) 29%) !important;
+      z-index: z('cg__svg.direction');
     }
     &.current-premove {
       background: radial-gradient($premove 28%, rgba(255, 0, 0, 0) 29%) !important;
