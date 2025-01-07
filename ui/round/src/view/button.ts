@@ -13,9 +13,7 @@ function analysisBoardOrientation(data: RoundData) {
 }
 
 function poolUrl(clock: ClockData, variantKey: VariantKey, blocking?: game.PlayerUser) {
-  return (
-    '/#pool/' + clock.initial / 60 + '+' + clock.increment + '-' + variantKey + (blocking ? '/' + blocking.id : '')
-  );
+  return '/#pool/' + util.displayClockPoolUrl(clock) + '-' + variantKey + (blocking ? '/' + blocking.id : '');
 }
 
 function analysisButton(ctrl: RoundController): VNode | null {

@@ -25,8 +25,19 @@ function displayClockLimit(limit: any) {
   }
 }
 
+function byoyomiDisplay(clock: any) {
+  const base =
+    clock.increment === 0 ? displayClockLimit(clock.limit) : displayClockLimit(clock.limit) + '+' + clock.increment;
+  const periodsString = clock.periods && clock.periods > 1 ? '(' + clock.periods + 'x)' : '';
+  return clock.byoyomi && clock.byoyomi > 0 ? base + '|' + clock.byoyomi + periodsString : base;
+}
+
 function displayClock(clock: any) {
-  return displayClockLimit(clock.limit) + '+' + clock.increment;
+  return clock.byoyomi
+    ? byoyomiDisplay(clock)
+    : clock.delay
+      ? `${displayClockLimit(clock.limit)} d/${clock.delay}`
+      : displayClockLimit(clock.limit) + '+' + clock.increment;
 }
 
 function leftPos(time: any) {

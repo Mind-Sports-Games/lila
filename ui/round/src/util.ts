@@ -2,6 +2,7 @@ import * as cg from 'chessground/types';
 import { h, Hooks, VNodeData } from 'snabbdom';
 import { opposite, calculatePieceGroup, backgammonPosDiff } from 'chessground/util';
 import { Redraw, EncodedDests, Dests, MaterialDiff, Step, CheckCount } from './interfaces';
+import { ByoyomiClockData, ClockData } from './clock/clockCtrl';
 import * as stratutils from 'stratutils';
 
 function pieceScores(variant: VariantKey, piece: cg.Role, isPromoted: boolean | undefined): number {
@@ -254,4 +255,34 @@ export function lastMove(onlyDropsVariant: boolean, uci: string): cg.Key[] | und
 
 export function turnPlayerIndexFromLastTurn(turn: number): PlayerIndex {
   return turn % 2 === 0 ? 'p1' : 'p2';
+}
+
+function displayClockLimit(initial: number) {
+  switch (initial) {
+    case 15:
+      return '¼';
+    case 30:
+      return '½';
+    case 45:
+      return '¾';
+    case 90:
+      return '1.5';
+    default:
+      return initial / 60;
+  }
+}
+
+function byoyomiDisplay(clock: ByoyomiClockData) {
+  const base =
+    clock.increment === 0 ? displayClockLimit(clock.initial) : displayClockLimit(clock.initial) + '+' + clock.increment;
+  const periodsString = clock.periods && clock.periods > 1 ? '(' + clock.periods + 'x)' : '';
+  return clock.byoyomi && clock.byoyomi > 0 ? base + '-' + clock.byoyomi + periodsString : base;
+}
+
+export function displayClockPoolUrl(clock: ClockData) {
+  return clock.byoyomi
+    ? byoyomiDisplay(clock as ByoyomiClockData)
+    : clock.delay
+      ? `${displayClockLimit(clock.initial)}d${clock.delay}`
+      : displayClockLimit(clock.initial) + '+' + clock.increment;
 }
