@@ -10,6 +10,8 @@ import lila.lobby.PlayerIndex
 import lila.rating.PerfType
 import lila.common.Template
 
+import scala.util.Random
+
 final case class ApiConfig(
     variant: Variant,
     clock: Option[ClockConfig],
@@ -26,6 +28,12 @@ final case class ApiConfig(
 
   def validFen = ApiConfig.validFen(variant, position)
 
+  def initialFen: Option[FEN] = position.flatMap(p =>
+    if (variant.initialFens.contains(p) && variant.initialFens.size > 1)
+      Random.shuffle(variant.initialFens).headOption
+    else Some(p)
+  )
+
   def validSpeed(isBot: Boolean) =
     !isBot || clock.fold(true) { c =>
       Speed(c) >= Speed.Bullet
@@ -39,6 +47,7 @@ final case class ApiConfig(
     if (variant == Variant.Chess(Standard) && position.exists(!_.initial))
       copy(variant = Variant.wrap(FromPosition))
     else this
+
 }
 
 object ApiConfig extends BaseHumanConfig {

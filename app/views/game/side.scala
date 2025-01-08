@@ -140,8 +140,9 @@ object side {
         },
         initialFen
           .ifTrue(
-            game.variant.key == "chess960" || game.variant.gameFamily == GameFamily
-              .Draughts() || game.variant.gameFamily == GameFamily.Go()
+            game.variant.key == "chess960" ||
+              game.variant.gameFamily == GameFamily.Draughts() ||
+              game.variant.gameFamily == GameFamily.Go()
           )
           .flatMap { fen =>
             (fen, game.variant) match {

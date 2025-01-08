@@ -114,6 +114,7 @@ object forms {
         renderVariant(form, translatedVariantChoicesWithVariantsAndFen),
         fenInput(form("fen"), strict = false, validFen),
         renderGoOptions(form),
+        renderBackgammonOptions(form),
         renderTimeMode(form, allowAnon = true),
         renderMultiMatch(form),
         ctx.isAuth option div(cls := "mode_choice buttons")(

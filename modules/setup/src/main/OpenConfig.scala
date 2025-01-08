@@ -8,6 +8,8 @@ import strategygames.chess.variant.{ FromPosition, Standard }
 import lila.game.PerfPicker
 import lila.rating.PerfType
 
+import scala.util.Random
+
 final case class OpenConfig(
     name: Option[String],
     variant: Variant,
@@ -19,6 +21,12 @@ final case class OpenConfig(
   def perfType: Option[PerfType] = PerfPicker.perfType(Speed(clock), variant, none)
 
   def validFen = ApiConfig.validFen(variant, position)
+
+  def initialFen: Option[FEN] = position.flatMap(p =>
+    if (variant.initialFens.contains(p) && variant.initialFens.size > 1)
+      Random.shuffle(variant.initialFens).headOption
+    else Some(p)
+  )
 
   def autoVariant =
     if (variant == Variant.Chess(Standard) && position.exists(!_.initial))

@@ -331,6 +331,7 @@
   <string name="byoyomiInSeconds">Byoyomi in seconds</string>
   <string name="goHandicap">Handicap</string>
   <string name="goKomi">Komi</string>
+  <string name="backgammonPoints">Points</string>
   <string name="freeOnlineChess">Free Online Chess</string>
   <plurals name="nbRated">
     <item quantity="one">%s rated</item>

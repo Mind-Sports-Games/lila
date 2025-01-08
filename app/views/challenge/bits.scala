@@ -8,6 +8,7 @@ import lila.app.ui.ScalatagsTemplate._
 import lila.challenge.Challenge
 import lila.common.String.html.safeJsonValue
 import strategygames.GameFamily
+import strategygames.format.FEN
 
 import controllers.routes
 
@@ -43,7 +44,9 @@ object bits {
             c.perfType.trans,
           (c.initialFen, c.variant.gameFamily) match {
             case (Some(f), GameFamily.Go()) => " " + c.variant.toGo.setupInfo(f.toGo).getOrElse("")
-            case _                          => ""
+            case (Some(FEN.Backgammon(f)), GameFamily.Backgammon()) if f.pp("bfen").cubeData.nonEmpty =>
+              " Multipoint" //TODO put point information in here, but this won't be in the fen
+            case _ => ""
           },
           br,
           span(cls := "clock")(

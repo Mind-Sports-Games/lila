@@ -347,7 +347,7 @@ final class Challenge(
         variant = config.variant,
         //TODO: draughts: need to have two variants stored in the config?
         fenVariant = config.variant.some,
-        initialFen = config.position,
+        initialFen = config.initialFen,
         timeControl = timeControl,
         mode = config.mode,
         playerIndex = config.playerIndex.name,
@@ -408,7 +408,7 @@ final class Challenge(
                   variant = config.variant,
                   //TODO: draughts: need to have two variants stored in the config?
                   fenVariant = config.variant.some,
-                  initialFen = config.position,
+                  initialFen = config.initialFen,
                   timeControl =
                     config.clock.fold[TimeControl](TimeControl.Unlimited)(TimeControl.Clock.apply),
                   mode = strategygames.Mode(config.rated),
