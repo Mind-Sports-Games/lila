@@ -343,6 +343,10 @@ body .variant-abalone .game-score piece.hole-piece {
     }
 
     @include breakpoint($mq-col2-uniboard) {
+      @media (max-height: 816px) {
+        width: 25%;
+        padding-top: 25%;
+      }
       &-top {
         margin-bottom: $block-gap;
       }
