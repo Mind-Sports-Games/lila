@@ -101,8 +101,11 @@ export default class Setup {
   private sliderKomi = (bs: number) => (v: number) => (v < this.sliderKomis(bs).length ? this.sliderKomis(bs)[v] : 75);
 
   private sliderPoints = (v: number) => {
-    if (v < 0 || v > 16) { return 1 }
-    else { return v * 2 + 1 }
+    if (v < 0 || v > 16) {
+      return 1;
+    } else {
+      return v * 2 + 1;
+    }
   };
 
   private sliderDays = (v: number) => {
