@@ -1,0 +1,155 @@
+@function swapDirection($direction) {
+  @if $direction == 'W' {
+    @return 'E';
+  }
+  @if $direction == 'NW' {
+    @return 'SE';
+  }
+  @if $direction == 'NE' {
+    @return 'SW';
+  }
+  @if $direction == 'E' {
+    @return 'W';
+  }
+  @if $direction == 'SE' {
+    @return 'NW';
+  }
+  @if $direction == 'SW' {
+    @return 'NE';
+  }
+}
+
+@function swapPlayer($player) {
+  @if $player == 'p1' {
+    @return 'p2';
+  }
+  @if $player == 'p2' {
+    @return 'p1';
+  }
+}
+
+$players: ('p1', 'p2');
+$directions: ('W', 'NW', 'NE', 'E', 'SE', 'SW');
+
+.variant-abalone {
+  cg-container {
+    width: calc(100% * 9);
+    height: calc(100% * 9);
+  }
+
+  cg-helper {
+    width: calc(100% / 9);
+    padding-bottom: calc(100% / 9);
+  }
+
+  piece {
+    width: calc(100% / 11);
+    height: calc(100% / 11);
+    background-position: center center;
+  }
+
+  square {
+    width: calc(100% / 11);
+    height: calc(100% / 11);
+    background-color: transparent;
+
+    &.last-move.to {
+      @each $player in $players {
+        @each $direction in $directions {
+          &.#{$player}#{$direction} {
+            background-image: url('../images/board/abalone/highlights/#{$player}#{$direction}.svg');
+            background-color: transparent;
+            background-size: cover;
+            z-index: z('cg__svg.direction');
+          }
+        }
+      }
+    }
+
+    $defaultRed: rgb(255, 87, 87);
+    $inline: $defaultRed;
+    $selected: $defaultRed;
+    $aside: rgb(255, 110, 125);
+    $premove: rgb(157, 116, 189);
+
+    &.move-dest.inline {
+      background: radial-gradient($inline 28%, rgba(0, 0, 0, 0) 29%) !important;
+      z-index: z('cg__svg.direction');
+    }
+    &.move-dest.aside {
+      background: radial-gradient($aside 28%, rgba(255, 0, 0, 0) 29%) !important;
+      z-index: z('cg__svg.direction');
+    }
+    &.move-dest.oc {
+      // oc = opposite color. That means there is no need to consider aside + oc
+      background: radial-gradient($inline 28%, rgba(0, 0, 0, 0) 29%) !important;
+      z-index: z('cg__svg.direction');
+    }
+    &.selected {
+      background: radial-gradient($selected 28%, rgba(255, 0, 0, 0) 29%) !important;
+      z-index: z('cg__svg.direction');
+    }
+    &.premove-dest {
+      background: radial-gradient($premove 28%, rgba(255, 0, 0, 0) 29%) !important;
+      z-index: z('cg__svg.direction');
+    }
+    &.current-premove {
+      background: radial-gradient($premove 28%, rgba(255, 0, 0, 0) 29%) !important;
+      z-index: z('cg__svg.direction');
+    }
+  }
+
+  .orientation-p2 {
+    square {
+      &.last-move.to {
+        @each $player in $players {
+          @each $direction in $directions {
+            &.#{$player}#{$direction} {
+              background-image: url('../images/board/abalone/highlights/#{$player}#{swapDirection($direction)}.svg');
+              background-color: transparent;
+              background-size: cover;
+              z-index: z('cg__svg.direction');
+            }
+          }
+        }
+      }
+    }
+  }
+
+  &.mini-game .orientation-p2 {
+    square {
+      &.last-move.to {
+        @each $player in $players {
+          @each $direction in $directions {
+            &.#{$player}#{$direction} {
+              background-image: url('../images/board/abalone/highlights/#{$player}#{$direction}.svg');
+              background-color: transparent;
+              background-size: cover;
+              z-index: z('cg__svg.direction');
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+// profile page
+.search__result {
+  .mini-board {
+    square {
+      &.last-move.to {
+        @each $player in $players {
+          @each $direction in $directions {
+            &.#{$player}#{$direction} {
+              background-image: url('../images/board/abalone/highlights/#{$player}#{$direction}.svg');
+              background-color: transparent;
+              background-size: cover;
+              z-index: z('cg__svg.direction');
+            }
+          }
+        }
+      }
+    }
+  }
+}

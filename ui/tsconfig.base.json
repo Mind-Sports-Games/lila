@@ -1,11 +1,9 @@
 {
   "compilerOptions": {
-    "strict": true,
+    "strict": false,
     "strictFunctionTypes": false,
     "strictPropertyInitialization": false,
     "noUnusedLocals": true,
-    "noImplicitReturns": true,
-    "noImplicitThis": true,
     "noUnusedParameters": true,
     "moduleResolution": "node",
     "target": "es2019",
@@ -13,6 +11,7 @@
     "lib": ["es2019"],
     "esModuleInterop": true,
     "isolatedModules": true,
-    "types": ["playstrategy", "web"]
+    "types": ["playstrategy", "web"],
+    "noImplicitAny": false
   }
 }

@@ -51,7 +51,8 @@ final class TournamentForm {
         amazons = true.some,
         breakthroughtroyka = true.some,
         go = true.some,
-        backgammon = true.some
+        backgammon = true.some,
+        abalone = true.some
       ),
       handicaps = Handicaps(
         handicapped = false.some,
@@ -100,7 +101,8 @@ final class TournamentForm {
         amazons = gameGroupInMedley(tour.medleyVariants, GameGroup.Amazons()).some,
         breakthroughtroyka = gameGroupInMedley(tour.medleyVariants, GameGroup.BreakthroughTroyka()).some,
         go = gameGroupInMedley(tour.medleyVariants, GameGroup.Go()).some,
-        backgammon = gameGroupInMedley(tour.medleyVariants, GameGroup.Backgammon()).some
+        backgammon = gameGroupInMedley(tour.medleyVariants, GameGroup.Backgammon()).some,
+        abalone = gameGroupInMedley(tour.medleyVariants, GameGroup.Abalone()).some
       ),
       handicaps = Handicaps(
         handicapped = tour.handicapped.some,
@@ -188,7 +190,8 @@ final class TournamentForm {
           "amazons"            -> optional(boolean),
           "breakthroughtroyka" -> optional(boolean),
           "go"                 -> optional(boolean),
-          "backgammon"         -> optional(boolean)
+          "backgammon"         -> optional(boolean),
+          "abalone"            -> optional(boolean)
         )(MedleyGameFamilies.apply)(MedleyGameFamilies.unapply),
         "handicaps" -> mapping(
           "handicapped"        -> optional(boolean),
@@ -510,7 +513,8 @@ case class MedleyGameFamilies(
     amazons: Option[Boolean],
     breakthroughtroyka: Option[Boolean],
     go: Option[Boolean],
-    backgammon: Option[Boolean]
+    backgammon: Option[Boolean],
+    abalone: Option[Boolean]
 ) {
 
   lazy val ggList: List[GameGroup] = GameGroup.medley
@@ -527,5 +531,6 @@ case class MedleyGameFamilies(
     )
     .filterNot(gg => if (!go.getOrElse(false)) gg == GameGroup.Go() else false)
     .filterNot(gg => if (!backgammon.getOrElse(false)) gg == GameGroup.Backgammon() else false)
+    .filterNot(gg => if (!abalone.getOrElse(false)) gg == GameGroup.Abalone() else false)
 
 }

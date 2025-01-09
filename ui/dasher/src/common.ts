@@ -12,4 +12,5 @@ export const gameFamily: GameFamilyKey[] = [
   'togyzkumalak',
   'go',
   'backgammon',
+  'abalone',
 ];

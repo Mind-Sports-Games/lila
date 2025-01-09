@@ -291,6 +291,7 @@ const noServerEvalVariants = [
   'backgammon',
   'hyper',
   'nackgammon',
+  'abalone',
 ];
 
 const noClientEvalVariants = [
@@ -315,6 +316,7 @@ const noClientEvalVariants = [
   'backgammon',
   'hyper',
   'nackgammon',
+  'abalone',
 ];
 
 export function allowClientEvalForVariant(variant: VariantKey) {
@@ -432,5 +434,7 @@ export const variantToRules = (v: VariantKey): Rules => {
       return 'breakthrough';
     case 'minibreakthroughtroyka':
       return 'minibreakthrough';
+    case 'abalone':
+      return 'abalone';
   }
 };

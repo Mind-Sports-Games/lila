@@ -124,6 +124,14 @@ $backgammon-board-files: (
   'contemporary': 'svg/backgammon_contemporary_board.svg',
 );
 
+$abalone-board-files: (
+  'classic': 'svg/classic.svg',
+  // base64 encoded
+  'dark': 'svg/dark.svg',
+  // base64 encoded
+  'yellow': 'svg/yellow.svg', // base64 encoded
+);
+
 $chess-variants: (
   'standard',
   'chess960',
@@ -154,6 +162,8 @@ $oware-variants: ('oware'); // must use same board
 $togyzkumalak-variants: ('togyzkumalak'); // must use same board
 
 $backgammon-variants: ('backgammon', 'hyper', 'nackgammon'); // must use same board
+
+$abalone-variants: ('abalone');
 
 @each $gameFamily in ('chess', 'loa') {
   @each $color, $file in $chess-board-files {
@@ -257,6 +267,15 @@ $backgammon-variants: ('backgammon', 'hyper', 'nackgammon'); // must use same bo
   @each $color, $file in $backgammon-board-files {
     .backgammon-#{$color} .variant-#{$variant}.is2d cg-board {
       background-image: url(../images/board/backgammon/#{$file});
+    }
+  }
+}
+
+// mini boards
+@each $variant in $abalone-variants {
+  @each $theme, $path in $abalone-board-files {
+    .abalone-#{$theme} .variant-#{$variant}.is2d cg-board {
+      background-image: url(../images/board/abalone/#{$path});
     }
   }
 }
@@ -377,6 +396,15 @@ $backgammon-variants: ('backgammon', 'hyper', 'nackgammon'); // must use same bo
   @each $color, $file in $backgammon-board-files {
     .backgammon-#{$color} .is2d .variant-#{$variant} cg-board {
       background-image: url(../images/board/backgammon/#{$file});
+    }
+  }
+}
+
+// normal size boards
+@each $variant in $abalone-variants {
+  @each $theme, $path in $abalone-board-files {
+    .abalone-#{$theme} .is2d .variant-#{$variant} cg-board {
+      background-image: url(../images/board/abalone/#{$path});
     }
   }
 }

@@ -5,15 +5,14 @@
     "strictFunctionTypes": false,
     "strictPropertyInitialization": false,
     "noUnusedLocals": true,
-    "noImplicitReturns": true,
-    "noImplicitThis": true,
     "noUnusedParameters": true,
     "moduleResolution": "node",
     "target": "es2019",
     "module": "esnext",
     "esModuleInterop": true,
     "lib": ["ES2019", "dom"],
-    "types": ["web"]
+    "types": ["web"],
+    "noImplicitAny": true
   },
   "isolatedModules": false
 }

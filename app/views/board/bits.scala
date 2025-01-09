@@ -89,6 +89,7 @@ object bits {
       case FEN.Togyzkumalak(_) => GameLogic.Togyzkumalak().name
       case FEN.Go(_)           => GameLogic.Go().name
       case FEN.Backgammon(_)   => GameLogic.Backgammon().name
+      case FEN.Abalone(_)      => GameLogic.Abalone().name
     }
     val orient    = orientation.toString().toLowerCase()
     val boardSize = boardSizeOpt.getOrElse(Board.D100)
