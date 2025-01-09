@@ -1000,8 +1000,7 @@ object TournamentShield {
         extends Category(
           Variant.Abalone(strategygames.abalone.variant.Abalone),
           Blitz53,
-          19,
-          1
+          2
         )
 
     val all: List[Category] = List(
