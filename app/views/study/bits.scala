@@ -13,7 +13,7 @@ import controllers.routes
 
 object bits {
 
-  def orderSelect(order: Order, active: String, url: String => Call)(implicit ctx: Context) = {
+  def orderSelect(order: lila.study.Order, active: String, url: String => Call)(implicit ctx: Context) = {
     val orders =
       if (active == "all") Order.withoutSelector
       else if (active startsWith "topic") Order.allWithMine

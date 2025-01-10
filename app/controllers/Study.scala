@@ -43,7 +43,7 @@ final class Study(
       }
     }
 
-  def allDefault(page: Int) = all(Order.Hot.key, page)
+  def allDefault(page: Int) = all(Order.Popular.key, page)
 
   def all(o: String, page: Int) =
     Open { implicit ctx =>

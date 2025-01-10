@@ -169,7 +169,7 @@ object Order {
   case object Alphabetical extends Order("alphabetical", trans.study.alphabetical)
   case object Mine         extends Order("mine", trans.study.myStudies)
 
-  val default         = Hot
+  val default         = Popular
   val all             = List(Hot, Newest, Oldest, Updated, Popular, Alphabetical)
   val withoutSelector = all.filter(o => o != Oldest && o != Alphabetical)
   val allWithMine     = Mine :: all
