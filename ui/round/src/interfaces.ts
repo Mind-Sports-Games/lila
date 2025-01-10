@@ -86,6 +86,7 @@ export interface RoundData extends GameData {
   calculatedCGGoScores?: cg.SimpleGoScores;
   deadStoneOfferState?: string;
   dice?: cg.Dice[];
+  doublingCube?: cg.DoublingCube;
   activeDiceValue?: number;
   canOnlyRollDice: boolean;
   canUndo: boolean;

@@ -375,12 +375,14 @@ export default class RoundController {
       this.data.game.variant.key,
       this.replaying() ? false : this.data.canEndTurn,
     );
+    const doublingCube = stratUtils.readDoublingCube(s.fen, this.data.game.variant.key);
     const config: CgConfig = {
       fen: s.fen,
       lastMove: util.lastMove(this.data.onlyDropsVariant, s.uci),
       check: !!s.check,
       turnPlayerIndex: turnPlayerIndex,
       dice: dice,
+      doublingCube: doublingCube,
       showUndoButton: false,
     };
     if (this.replaying()) {
@@ -611,6 +613,7 @@ export default class RoundController {
     this.areDiceDescending = activePlayerIndex ? this.areDiceDescending : true;
     d.canOnlyRollDice = activePlayerIndex ? o.canOnlyRollDice : false;
     d.dice = stratUtils.readDice(o.fen, this.data.game.variant.key, o.canEndTurn, this.areDiceDescending);
+    d.doublingCube = stratUtils.readDoublingCube(o.fen, this.data.game.variant.key);
     d.activeDiceValue = this.activeDiceValue(d.dice);
     d.forcedAction = o.forcedAction;
 
@@ -682,6 +685,7 @@ export default class RoundController {
       if (['backgammon', 'hyper', 'nackgammon'].includes(d.game.variant.key)) {
         this.chessground.set({
           dice: this.data.dice ? this.data.dice : [],
+          doublingCube: this.data.doublingCube,
           fen: o.fen,
           canUndo: this.data.canUndo,
           showUndoButton:

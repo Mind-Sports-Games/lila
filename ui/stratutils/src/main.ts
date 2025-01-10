@@ -197,6 +197,19 @@ export function allowFishnetForVariant(variant: VariantKey) {
   return noFishnetVariants.indexOf(variant) == -1;
 }
 
+export function readDoublingCube(fen: string, variant: VariantKey): cg.DoublingCube | undefined {
+  if (!['backgammon', 'hyper', 'nackgammon'].includes(variant)) return undefined;
+  if (fen.split(' ').length < 8) return undefined;
+  const doublingCube = fen.split(' ')[6];
+  if (doublingCube === '-') return undefined;
+  if (doublingCube === '0') return { value: 0, owner: 'both' };
+  if (doublingCube.length == 2) {
+    if (doublingCube[1] === 'w' || doublingCube[1] === 'b') return { value: +doublingCube[0] + 1, owner: 'both' };
+    else return { value: +doublingCube[0], owner: doublingCube[1] === 'W' ? 'p1' : 'p2' };
+  }
+  return undefined; //shouldn't get here...
+}
+
 export function readDice(fen: string, variant: VariantKey, canEndTurn?: boolean, isDescending?: boolean): cg.Dice[] {
   if (!['backgammon', 'hyper', 'nackgammon'].includes(variant)) return [];
   if (fen.split(' ').length < 2) return [];

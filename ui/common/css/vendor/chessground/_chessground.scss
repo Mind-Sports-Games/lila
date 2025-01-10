@@ -757,22 +757,22 @@ square {
   &.orientation-p1 piece.pocket,
   .orientation-p1 piece.pocket {
     &.p1 {
-      margin-top: 6%;
+      margin-top: 0%;
       margin-left: calc(100% * 7 / 15);
     }
     &.p2 {
-      margin-top: 50.66%;
+      margin-top: 56.66%;
       margin-left: calc(100% * 7 / 15);
     }
   }
   &.orientation-p1vflip piece.pocket,
   .orientation-p1vflip piece.pocket {
     &.p1 {
-      margin-top: 50.66%;
+      margin-top: 56.66%;
       margin-left: calc(100% * 7 / 15);
     }
     &.p2 {
-      margin-top: 6%;
+      margin-top: 0%;
       margin-left: calc(100% * 7 / 15);
     }
   }
@@ -1167,6 +1167,73 @@ cg-container .cg-custom-svgs svg {
     &.p2 dice,
     &.p1 dice {
       background-size: cover;
+    }
+  }
+}
+
+.variant-nackgammon,
+.variant-hyper,
+.variant-backgammon {
+  &.orientation-p1,
+  .orientation-p1 {
+    cg-doubling-cube.p1 {
+      left: calc(100% * 14 / 15);
+      bottom: 0%;
+      height: 7%;
+    }
+    cg-doubling-cube.p2 {
+      left: calc(100% * 14 / 15);
+      top: 0%;
+      height: 7%;
+    }
+  }
+  &.orientation-p1vflip,
+  .orientation-p1vflip {
+    cg-doubling-cube.p1 {
+      left: calc(100% * 14 / 15);
+      top: 0%;
+      height: 7%;
+    }
+    cg-doubling-cube.p2 {
+      left: calc(100% * 14 / 15);
+      bottom: 0%;
+      height: 7%;
+    }
+  }
+
+  cg-doubling-cube.both {
+    left: calc(100% * 7 / 15);
+    top: 46.5%;
+    height: 7%;
+  }
+
+  cg-doubling-cube {
+    width: calc(100% * 1 / 15);
+    position: absolute;
+    pointer-events: none;
+    display: flex;
+    cube {
+      background-size: cover;
+      width: 100%;
+      &.one {
+        background-image: url(../images/board/backgammon/svg/d_cube_one.svg);
+      }
+      &.two {
+        background-image: url(../images/board/backgammon/svg/d_cube_two.svg);
+      }
+      &.three {
+        background-image: url(../images/board/backgammon/svg/d_cube_three.svg);
+      }
+      &.four {
+        background-image: url(../images/board/backgammon/svg/d_cube_four.svg);
+      }
+      &.five {
+        background-image: url(../images/board/backgammon/svg/d_cube_five.svg);
+      }
+      &.zero,
+      &.six {
+        background-image: url(../images/board/backgammon/svg/d_cube_six.svg);
+      }
     }
   }
 }

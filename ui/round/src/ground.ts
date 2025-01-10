@@ -27,7 +27,8 @@ export function makeConfig(ctrl: RoundController): Config {
     turnPlayerIndex = util.turnPlayerIndexFromLastTurn(step.turnCount),
     dice = data.dice
       ? data.dice
-      : stratUtils.readDice(step.fen, data.game.variant.key, data.canEndTurn, ctrl.areDiceDescending);
+      : stratUtils.readDice(step.fen, data.game.variant.key, data.canEndTurn, ctrl.areDiceDescending),
+    doublingCube = data.doublingCube ? data.doublingCube : stratUtils.readDoublingCube(step.fen, data.game.variant.key);
   return {
     fen: step.fen,
     orientation: boardOrientation(data, ctrl.flip),
@@ -38,6 +39,7 @@ export function makeConfig(ctrl: RoundController): Config {
     coordinates: data.pref.coords !== Prefs.Coords.Hidden,
     boardScores: ['togyzkumalak', 'bestemshe', 'backgammon', 'hyper', 'nackgammon'].includes(data.game.variant.key),
     dice: dice,
+    doublingCube: doublingCube,
     canUndo: data.canUndo,
     showUndoButton: playing && turnPlayerIndex == data.player.playerIndex && dice.length > 0,
     addPieceZIndex: ctrl.data.pref.is3d,
