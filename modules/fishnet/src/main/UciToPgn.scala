@@ -7,6 +7,7 @@ import strategygames.format.pgn.Dumper
 import strategygames.format.Uci
 import strategygames.{
   Action,
+  CubeAction,
   DiceRoll,
   Drop,
   EndTurn,
@@ -59,6 +60,7 @@ private object UciToPgn {
                   case p: Pass           => p.situationBefore
                   case ss: SelectSquares => ss.situationBefore
                   case dr: DiceRoll      => dr.situationBefore
+                  case ca: CubeAction    => ca.situationBefore
                   case et: EndTurn       => et.situationBefore
                 }
               }) toValid "No move found"
@@ -92,6 +94,10 @@ private object UciToPgn {
             case (Validated.Valid((sit, moves)), uci: Uci.DiceRoll) =>
               sit.diceRoll(uci.dice).leftMap(e => s"ply $ply $e") map { dr =>
                 dr.situationAfter -> (dr :: moves)
+              }
+            case (Validated.Valid((sit, moves)), uci: Uci.CubeAction) =>
+              sit.cubeAction(uci.interaction).leftMap(e => s"ply $ply $e") map { ca =>
+                ca.situationAfter -> (ca :: moves)
               }
             case (failure, _) => failure
           }

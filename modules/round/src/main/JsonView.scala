@@ -13,6 +13,7 @@ import strategygames.{
   Drop => StratDrop,
   Lift => StratLift,
   DiceRoll => StratDiceRoll,
+  CubeAction => StratCubeAction,
   EndTurn => StratEndTurn
 }
 import strategygames.variant.Variant
@@ -478,12 +479,13 @@ final class JsonView(
   private def multiActionMetaJson(pov: Pov): Option[JsObject] = {
     //TODO future multiaction games may not end turn on the same action, and this will need to be fixed
     pov.game.situation.actions.headOption.flatMap(_ match {
-      case m: StratMove      => Some(Json.obj("couldNextActionEndTurn" -> m.autoEndTurn))
-      case d: StratDrop      => Some(Json.obj("couldNextActionEndTurn" -> d.autoEndTurn))
-      case l: StratLift      => Some(Json.obj("couldNextActionEndTurn" -> l.autoEndTurn))
-      case dr: StratDiceRoll => Some(Json.obj("couldNextActionEndTurn" -> dr.autoEndTurn))
-      case _: StratEndTurn   => Some(Json.obj("couldNextActionEndTurn" -> true))
-      case _                 => None
+      case m: StratMove        => Some(Json.obj("couldNextActionEndTurn" -> m.autoEndTurn))
+      case d: StratDrop        => Some(Json.obj("couldNextActionEndTurn" -> d.autoEndTurn))
+      case l: StratLift        => Some(Json.obj("couldNextActionEndTurn" -> l.autoEndTurn))
+      case dr: StratDiceRoll   => Some(Json.obj("couldNextActionEndTurn" -> dr.autoEndTurn))
+      case ca: StratCubeAction => Some(Json.obj("couldNextActionEndTurn" -> ca.autoEndTurn))
+      case _: StratEndTurn     => Some(Json.obj("couldNextActionEndTurn" -> true))
+      case _                   => None
     })
   }
 

@@ -24,6 +24,7 @@ import strategygames.{
   Lift,
   Pass,
   DiceRoll,
+  CubeAction,
   EndTurn,
   Undo,
   SelectSquares,
@@ -297,13 +298,22 @@ case class Game(
 
     val events = {
       action match {
-        case m: Move     => Event.Move(m, game.situation, state, clockEvent, updated.board.pocketData)
-        case d: Drop     => Event.Drop(d, game.situation, state, clockEvent, updated.board.pocketData)
-        case l: Lift     => Event.Lift(l, game.situation, state, clockEvent, updated.board.pocketData)
-        case p: Pass     => Event.Pass(p, game.situation, state, clockEvent, updated.board.pocketData)
-        case r: DiceRoll => Event.DiceRoll(r, game.situation, state, clockEvent, updated.board.pocketData)
-        case et: EndTurn => Event.EndTurn(et, game.situation, state, clockEvent, updated.board.pocketData)
-        case u: Undo     => Event.Undo(u, game.situation, state, clockEvent, updated.board.pocketData)
+        case m: Move        =>
+          Event.Move(m, game.situation, state, clockEvent, updated.board.pocketData)
+        case d: Drop        =>
+          Event.Drop(d, game.situation, state, clockEvent, updated.board.pocketData)
+        case l: Lift        =>
+          Event.Lift(l, game.situation, state, clockEvent, updated.board.pocketData)
+        case p: Pass        =>
+          Event.Pass(p, game.situation, state, clockEvent, updated.board.pocketData)
+        case r: DiceRoll    =>
+          Event.DiceRoll(r, game.situation, state, clockEvent, updated.board.pocketData)
+        case ca: CubeAction =>
+          Event.CubeAction(ca, game.situation, state, clockEvent, updated.board.pocketData)
+        case et: EndTurn    =>
+          Event.EndTurn(et, game.situation, state, clockEvent, updated.board.pocketData)
+        case u: Undo        =>
+          Event.Undo(u, game.situation, state, clockEvent, updated.board.pocketData)
         case ss: SelectSquares =>
           Event.SelectSquares(ss, game.situation, state, clockEvent, updated.board.pocketData)
       }
@@ -394,6 +404,7 @@ case class Game(
       case _: Uci.Undo          => "undo"
       case _: Uci.Pass          => "pass"
       case _: Uci.DiceRoll      => "roll"
+      case _: Uci.CubeAction    => "cube"
       case _: Uci.SelectSquares => "ss:"
       case _                    => sys.error("Type Error")
     }
@@ -1176,6 +1187,7 @@ object Game {
     val drawOffers                = "do"
     //backgammon
     val unusedDice = "ud"
+    val cubeData   = "bcd"
     // go
     val selectedSquares     = "ss" // the dead stones selected in go
     val deadStoneOfferState = "os" //state of the dead stone offer

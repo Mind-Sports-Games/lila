@@ -5,6 +5,7 @@ import strategygames.{
   ClockConfig,
   Clock,
   ClockBase,
+  CubeData,
   ByoyomiClock,
   P1,
   P2,
@@ -159,6 +160,32 @@ object BSONHandlers {
             o.pockets.p2.roles.map(_.forsyth).mkString
         },
         "t" -> o.promoted.map(_.piotr).mkString
+      )
+  }
+
+  implicit private[game] val cubeDataBSONHandler = new BSON[CubeData] {
+
+    def reads(r: BSON.Reader) =
+      GameLogic(r.intD("l")) match {
+        case GameLogic.Backgammon() =>
+          CubeData.Backgammon(
+            backgammon.CubeData(
+              value = r.intD("v"),
+              owner = r.intO("o").map(p => PlayerIndex(p == 1)),
+              underOffer = r.boolD("u"),
+              rejected = r.boolD("r")
+            )
+          )
+        case _ => sys.error(s"Cube Data BSON reader not implemented for GameLogic: ${r.intD("l")}")
+      }
+
+    def writes(w: BSON.Writer, o: CubeData) =
+      BSONDocument(
+        "l" -> o.gameLogic.id,
+        "v" -> o.value,
+        "o" -> o.owner.map(_.hashCode),
+        "u" -> o.underOffer,
+        "r" -> o.rejected
       )
   }
 
@@ -610,7 +637,12 @@ object BSONHandlers {
                   case None                            => None
                   case _                               => sys.error("non backgammon pocket data")
                 },
-                unusedDice = r.getO[List[Int]](F.unusedDice).getOrElse(List.empty)
+                unusedDice = r.getO[List[Int]](F.unusedDice).getOrElse(List.empty),
+                cubeData = r.getO[CubeData](F.cubeData) match {
+                  case Some(CubeData.Backgammon(cd)) => Some(cd)
+                  case None                          => None
+                  case _                             => sys.error("non backgammon cube data")
+                }
               ),
               player = turnPlayerIndex
             ),
@@ -828,6 +860,7 @@ object BSONHandlers {
               F.historyCurrentTurn -> o.history.currentTurnUciString,
               F.pocketData         -> o.board.pocketData,
               F.unusedDice         -> o.board.unusedDice.nonEmpty.option(o.board.unusedDice),
+              F.cubeData           -> o.board.cubeData,
               F.score              -> o.history.score.nonEmpty.option(o.history.score)
             )
           case GameLogic.Abalone() =>
