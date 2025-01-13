@@ -127,10 +127,11 @@ final class SwissApi(
           settings = old.settings.copy(
             nbRounds = data.nbRounds,
             rated = position.isEmpty && (data.rated | old.settings.rated),
-            mcmahon = data.isMcMahon,
+            mcmahon = if (data.mcmahon.mcmahon.isDefined) data.isMcMahon else old.settings.mcmahon,
             mcmahonCutoff =
               if (data.mcmahonCutoff.isDefined) ~data.mcmahonCutoff else old.settings.mcmahonCutoff,
-            handicapped = data.isHandicapped,
+            handicapped =
+              if (data.handicaps.handicapped.isDefined) data.isHandicapped else old.settings.handicapped,
             inputPlayerRatings =
               if (data.inputPlayerRatings.isDefined) ~data.inputPlayerRatings
               else old.settings.inputPlayerRatings,
