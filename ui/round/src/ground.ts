@@ -28,7 +28,8 @@ export function makeConfig(ctrl: RoundController): Config {
     dice = data.dice
       ? data.dice
       : stratUtils.readDice(step.fen, data.game.variant.key, data.canEndTurn, ctrl.areDiceDescending),
-    doublingCube = data.doublingCube ? data.doublingCube : stratUtils.readDoublingCube(step.fen, data.game.variant.key);
+    doublingCube = data.doublingCube ? data.doublingCube : stratUtils.readDoublingCube(step.fen, data.game.variant.key),
+    cubeActions = data.cubeActions ? data.cubeActions.split(',').map(a => a as cg.CubeAction) : [];
   return {
     fen: step.fen,
     orientation: boardOrientation(data, ctrl.flip),
@@ -40,6 +41,7 @@ export function makeConfig(ctrl: RoundController): Config {
     boardScores: ['togyzkumalak', 'bestemshe', 'backgammon', 'hyper', 'nackgammon'].includes(data.game.variant.key),
     dice: dice,
     doublingCube: doublingCube,
+    cubeActions: cubeActions,
     canUndo: data.canUndo,
     showUndoButton: playing && turnPlayerIndex == data.player.playerIndex && dice.length > 0,
     addPieceZIndex: ctrl.data.pref.is3d,
@@ -60,7 +62,7 @@ export function makeConfig(ctrl: RoundController): Config {
       },
       select: hooks.onSelect,
       selectDice: hooks.onSelectDice,
-      undoButton: hooks.onUndoButton,
+      buttonClick: hooks.onButtonClick,
     },
     movable: {
       free: false,

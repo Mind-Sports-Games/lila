@@ -1083,19 +1083,39 @@ cg-container .cg-custom-svgs svg {
   &.orientation-p1,
   .orientation-p1 {
     cg-buttons.p1 {
-      left: calc(100% * 1 / 15);
+      &.left {
+        left: calc(100% * 1 / 15);
+      }
+      &.right {
+        left: calc(100% * 8 / 15);
+      }
     }
     cg-buttons.p2 {
-      left: calc(100% * 8 / 15);
+      &.left {
+        left: calc(100% * 8 / 15);
+      }
+      &.right {
+        left: calc(100% * 1 / 15);
+      }
     }
   }
   &.orientation-p1vflip,
   .orientation-p1vflip {
     cg-buttons.p1 {
-      left: calc(100% * 8 / 15);
+      &.left {
+        left: calc(100% * 8 / 15);
+      }
+      &.right {
+        left: calc(100% * 1 / 15);
+      }
     }
     cg-buttons.p2 {
-      left: calc(100% * 1 / 15);
+      &.left {
+        left: calc(100% * 1 / 15);
+      }
+      &.right {
+        left: calc(100% * 8 / 15);
+      }
     }
   }
   cg-buttons {

@@ -454,6 +454,7 @@ export function getMancalaScore(fen: string, playerIndex: string): number {
 function backgammonNotation(move: ExtendedMoveInfo, variant: Variant): string {
   let isLift = false; //using this instead of changing the regex
   if (move.uci === 'roll') return '';
+  if (move.uci.substring(0, 4) === 'cube') return ''; // TODO add notation for cube interactions
   if (move.uci === 'undo') return 'undo';
   if (move.uci === 'endturn') return '(no-play)';
   if (move.uci.includes('/')) return `${move.uci.replace('/', '')}:`;

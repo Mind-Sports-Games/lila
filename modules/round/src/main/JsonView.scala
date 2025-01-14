@@ -187,6 +187,7 @@ final class JsonView(
           .add("possibleDrops" -> possibleDrops(pov))
           .add("possibleDropsByRole" -> possibleDropsByrole(pov))
           .add("possibleLifts" -> possibleLifts(pov))
+          .add("cubeActions" -> possibleCubeActions(pov))
           .add("multiActionMetaData" -> multiActionMetaData(pov))
           .add("selectMode" -> selectMode(pov))
           .add("selectedSquares" -> pov.game.metadata.selectedSquares.map(_.map(_.toString)))
@@ -450,7 +451,7 @@ final class JsonView(
       case (Situation.Backgammon(_), Variant.Backgammon(_)) =>
         (pov.game playableBy pov.player) option
           Event.PossibleDropsByRole.json(pov.game.situation.dropsByRole.getOrElse(Map.empty))
-      case (Situation.Abalone(_), Variant.Abalone(_))       => None
+      case (Situation.Abalone(_), Variant.Abalone(_))   => None
       case (Situation.Draughts(_), Variant.Draughts(_)) => None
       case _                                            => sys.error("Mismatch of types for possibleDropsByrole")
     }
@@ -464,6 +465,16 @@ final class JsonView(
 
   private def possibleLifts(pov: Pov): Option[JsValue] =
     (pov.game playableBy pov.player) option { JsString(pov.game.situation.lifts.map(_.pos.key).mkString) }
+
+  private def possibleCubeActions(pov: Pov): Option[JsValue] =
+    (pov.game.situation, pov.game.variant) match {
+      case (Situation.Backgammon(_), Variant.Backgammon(_)) => {
+        (pov.game playableBy pov.player) option {
+          JsString(pov.game.situation.cubeActions.map(_.interaction).map(_.name).mkString(","))
+        }
+      }
+      case _ => None
+    }
 
   private def multiActionMetaData(pov: Pov): Option[JsObject] = {
     pov.game.variant.key match {
