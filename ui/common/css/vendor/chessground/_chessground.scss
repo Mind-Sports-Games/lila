@@ -1199,12 +1199,12 @@ cg-container .cg-custom-svgs svg {
     cg-doubling-cube.p1 {
       left: calc(100% * 14 / 15);
       bottom: 0%;
-      height: 7%;
+      height: calc(100% * 1 / 15);
     }
     cg-doubling-cube.p2 {
       left: calc(100% * 14 / 15);
       top: 0%;
-      height: 7%;
+      height: calc(100% * 1 / 15);
     }
   }
   &.orientation-p1vflip,
@@ -1212,19 +1212,19 @@ cg-container .cg-custom-svgs svg {
     cg-doubling-cube.p1 {
       left: calc(100% * 14 / 15);
       top: 0%;
-      height: 7%;
+      height: calc(100% * 1 / 15);
     }
     cg-doubling-cube.p2 {
       left: calc(100% * 14 / 15);
       bottom: 0%;
-      height: 7%;
+      height: calc(100% * 1 / 15);
     }
   }
 
   cg-doubling-cube.both {
     left: calc(100% * 7 / 15);
     top: 46.5%;
-    height: 7%;
+    height: calc(100% * 1 / 15);
   }
 
   cg-doubling-cube {
@@ -1235,24 +1235,47 @@ cg-container .cg-custom-svgs svg {
     cube {
       background-size: cover;
       width: 100%;
-      &.one {
-        background-image: url(../images/board/backgammon/svg/d_cube_one.svg);
+      .backgammon-classic & {
+        &.one {
+          background-image: url(../images/board/backgammon/svg/blue_d_cube_one.svg);
+        }
+        &.two {
+          background-image: url(../images/board/backgammon/svg/blue_d_cube_two.svg);
+        }
+        &.three {
+          background-image: url(../images/board/backgammon/svg/blue_d_cube_three.svg);
+        }
+        &.four {
+          background-image: url(../images/board/backgammon/svg/blue_d_cube_four.svg);
+        }
+        &.five {
+          background-image: url(../images/board/backgammon/svg/blue_d_cube_five.svg);
+        }
+        &.zero,
+        &.six {
+          background-image: url(../images/board/backgammon/svg/blue_d_cube_six.svg);
+        }
       }
-      &.two {
-        background-image: url(../images/board/backgammon/svg/d_cube_two.svg);
-      }
-      &.three {
-        background-image: url(../images/board/backgammon/svg/d_cube_three.svg);
-      }
-      &.four {
-        background-image: url(../images/board/backgammon/svg/d_cube_four.svg);
-      }
-      &.five {
-        background-image: url(../images/board/backgammon/svg/d_cube_five.svg);
-      }
-      &.zero,
-      &.six {
-        background-image: url(../images/board/backgammon/svg/d_cube_six.svg);
+      .backgammon-contemporary & {
+        &.one {
+          background-image: url(../images/board/backgammon/svg/green_d_cube_one.svg);
+        }
+        &.two {
+          background-image: url(../images/board/backgammon/svg/green_d_cube_two.svg);
+        }
+        &.three {
+          background-image: url(../images/board/backgammon/svg/green_d_cube_three.svg);
+        }
+        &.four {
+          background-image: url(../images/board/backgammon/svg/green_d_cube_four.svg);
+        }
+        &.five {
+          background-image: url(../images/board/backgammon/svg/green_d_cube_five.svg);
+        }
+        &.zero,
+        &.six {
+          background-image: url(../images/board/backgammon/svg/green_d_cube_six.svg);
+        }
       }
     }
   }
