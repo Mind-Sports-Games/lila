@@ -8,13 +8,18 @@ db.simul.createIndex({ hostSeenAt: -1 }, { partialFilterExpression: { status: 10
 
 db.cache.createIndex({ e: 1 }, { expireAfterSeconds: 0 });
 
-// slow queries
+// copied from lichess because mongodb was logging some slow queries
 db.game5.createIndex({ ca: -1 });
 db.game5.createIndex({ us: 1, ca: -1 });
 db.game5.createIndex({ 'pgni.user': 1, 'pgni.ca': -1 }, { sparse: 1 });
 db.game5.createIndex({ ck: 1 }, { sparse: 1, background: 1 });
 db.game5.createIndex({ pl: 1 }, { sparse: true, background: true });
 db.game5.createIndex({ 'pgni.h': 1 }, { sparse: true, background: true });
+db.game5.createIndex(
+  // not inherited from lichess. triggered from https://playstrategy.org/games
+  { s: 1 },
+  { partialFilterExpression: { s: { $lte: 20 } } },
+);
 
 db.notify.createIndex({ notifies: 1, read: 1, createdAt: -1 });
 db.notify.createIndex({ createdAt: 1 }, { expireAfterSeconds: 2592000 });
