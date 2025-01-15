@@ -72,6 +72,7 @@ trait GameHelper { self: I18nHelper with UserHelper with AiHelper with StringHel
       case (Some(w), _, BackgammonWin, _)              => s"${playerText(w)} won by backgammon"
       case (_, Some(l), ResignGammon, _)               => s"${playerText(l)} resigned a gammon"
       case (_, Some(l), ResignBackgammon, _)           => s"${playerText(l)} resigned a backgammon"
+      case (_, Some(l), CubeDropped, _)                => s"${playerText(l)} dropped the cube"
       case (Some(w), _, RuleOfGin, _)                  => s"${playerText(w)} won by rule of gin"
       case (Some(w), _, GinGammon, _)                  => s"${playerText(w)} won a gammon by rule of gin"
       case (Some(w), _, GinBackgammon, _)              => s"${playerText(w)} won a backgammon by rule of gin"
@@ -199,6 +200,11 @@ trait GameHelper { self: I18nHelper with UserHelper with AiHelper with StringHel
         game.loser match {
           case Some(p) if p.playerIndex.p1 => trans.playerIndexResignedBackgammon(game.playerTrans(P1)).v
           case _                           => trans.playerIndexResignedBackgammon(game.playerTrans(P2)).v
+        }
+      case S.CubeDropped =>
+        game.loser match {
+          case Some(p) if p.playerIndex.p1 => trans.playerIndexDroppedTheCube(game.playerTrans(P1)).v
+          case _                           => trans.playerIndexDroppedTheCube(game.playerTrans(P2)).v
         }
       case S.UnknownFinish => trans.finished.txt()
       case S.Stalemate     => trans.stalemate.txt()
