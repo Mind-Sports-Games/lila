@@ -49,6 +49,7 @@ export interface BaseGame {
   boosted?: boolean;
   rematch?: string;
   multiMatch?: MultiMatch;
+  multiPointState?: MultiPointState;
   rated?: boolean;
   perf: string;
 }
@@ -64,6 +65,12 @@ export interface DraughtsGame extends BaseGame {
 export interface MultiMatch {
   index: number;
   gameId?: string;
+}
+
+export interface MultiPointState {
+  target: number;
+  p1: number;
+  p2: number;
 }
 
 export interface Status {

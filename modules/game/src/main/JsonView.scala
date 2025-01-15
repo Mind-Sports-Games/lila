@@ -68,6 +68,7 @@ final class JsonView(rematches: Rematches) {
           .obj("index" -> index)
           .add("gameId" -> game.metadata.multiMatchGameId.filter("*" !=))
       })
+      .add("multiPointState" -> game.metadata.multiPointState)
 
   def boardSize(variant: Variant) = variant match {
     case Variant.Draughts(v) =>
@@ -399,5 +400,13 @@ object JsonView {
 
   implicit val fenWrites: Writes[FEN] = Writes { f =>
     JsString(f.value)
+  }
+
+  implicit val multiPointState: Writes[MultiPointState] = Writes { m =>
+    Json.obj(
+      "target" -> m.target,
+      "p1"     -> m.p1Points,
+      "p2"     -> m.p2Points
+    )
   }
 }

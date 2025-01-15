@@ -44,6 +44,7 @@ export function makeConfig(ctrl: RoundController): Config {
     cubeActions: cubeActions,
     canUndo: data.canUndo,
     showUndoButton: playing && turnPlayerIndex == data.player.playerIndex && dice.length > 0,
+    multiPointState: data.game.multiPointState,
     addPieceZIndex: ctrl.data.pref.is3d,
     selectOnly: data.selectMode,
     highlight: {
