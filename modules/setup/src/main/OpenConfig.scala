@@ -15,7 +15,8 @@ final case class OpenConfig(
     variant: Variant,
     clock: Option[ClockConfig],
     rated: Boolean,
-    position: Option[FEN] = None
+    position: Option[FEN] = None,
+    backgammonPoints: Option[Int] = None
 ) {
 
   def perfType: Option[PerfType] = PerfPicker.perfType(Speed(clock), variant, none)
@@ -44,7 +45,8 @@ object OpenConfig {
       bdc: Option[Clock.BronsteinConfig],
       bcl: Option[ByoyomiClock.Config],
       rated: Boolean,
-      pos: Option[String]
+      pos: Option[String],
+      bp: Option[Int]
   ) = {
     val variant = Variant.orDefault(~v)
     new OpenConfig(
@@ -52,7 +54,8 @@ object OpenConfig {
       variant = variant,
       clock = bcl.orElse(sdc).orElse(bdc).orElse(fcl),
       rated = rated,
-      position = pos.map(f => FEN.apply(variant.gameLogic, f))
+      position = pos.map(f => FEN.apply(variant.gameLogic, f)),
+      backgammonPoints = bp
     ).autoVariant
   }
 }

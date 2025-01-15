@@ -1093,7 +1093,8 @@ object Game {
       pgnImport: Option[PgnImport],
       daysPerTurn: Option[Int] = None,
       drawLimit: Option[Int] = None,
-      multiMatch: Option[String] = None
+      multiMatch: Option[String] = None,
+      backgammonPoints: Option[Int] = None
   ): NewGame = {
     val createdAt = DateTime.now
     NewGame(
@@ -1109,7 +1110,8 @@ object Game {
           .copy(
             pgnImport = pgnImport,
             drawLimit = drawLimit,
-            multiMatch = multiMatch
+            multiMatch = multiMatch,
+            multiPointState = backgammonPoints.map(bp => MultiPointState(bp))
           ),
         createdAt = createdAt,
         updatedAt = createdAt,
@@ -1186,8 +1188,9 @@ object Game {
     val perfType                  = "pt"  // only set on student games for aggregation
     val drawOffers                = "do"
     //backgammon
-    val unusedDice = "ud"
-    val cubeData   = "bcd"
+    val unusedDice      = "ud"
+    val cubeData        = "bcd"
+    val multiPointState = "mps"
     // go
     val selectedSquares     = "ss" // the dead stones selected in go
     val deadStoneOfferState = "os" //state of the dead stone offer
@@ -1204,6 +1207,7 @@ sealed abstract class DeadStoneOfferState(val id: Int) {
   def is(s: DeadStoneOfferState): Boolean                             = this == s
   def is(f: DeadStoneOfferState.type => DeadStoneOfferState): Boolean = is(f(DeadStoneOfferState))
 }
+
 object DeadStoneOfferState {
   case object ChooseFirstOffer extends DeadStoneOfferState(0)
   case object P1Offering       extends DeadStoneOfferState(1)
@@ -1218,6 +1222,8 @@ object DeadStoneOfferState {
 
   def apply(id: Int): Option[DeadStoneOfferState] = byId get id
 }
+
+case class MultiPointState(target: Int, p1Points: Int = 0, p2Points: Int = 0)
 
 case class CastleLastMove(castles: Castles, lastMove: Option[ChessUci])
 

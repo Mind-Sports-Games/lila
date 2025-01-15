@@ -201,6 +201,24 @@ object BSONHandlers {
     offers => BSONArray((offers.p1 ++ offers.p2.map(-_)).view.map(BSONInteger.apply).toIndexedSeq)
   )
 
+  implicit private[game] val multiPointStateHandler = new BSON[MultiPointState] {
+
+    def reads(r: BSON.Reader) =
+      MultiPointState(
+        target = r.intD("t"),
+        p1Points = r.intD("w"),
+        p2Points = r.intD("b")
+      )
+
+    def writes(w: BSON.Writer, o: MultiPointState) =
+      BSONDocument(
+        "t" -> o.target,
+        "w" -> o.p1Points,
+        "b" -> o.p2Points
+      )
+
+  }
+
   import Player.playerBSONHandler
   private val emptyPlayerBuilder = playerBSONHandler.read($empty)
 
@@ -375,22 +393,13 @@ object BSONHandlers {
           )
         )
 
-        val metadata = Metadata(
-          source = r intO F.source flatMap Source.apply,
-          pgnImport = r.getO[PgnImport](F.pgnImport)(PgnImport.pgnImportBSONHandler),
-          tournamentId = r strO F.tournamentId,
-          swissId = r strO F.swissId,
-          simulId = r strO F.simulId,
+        val draughtsMetaData = defaultMetaData.copy(
           simulPairing = r intO F.simulPairing,
           timeOutUntil = r dateO F.timeOutUntil,
-          multiMatch = r strO F.multiMatch,
           drawLimit = r intO F.drawLimit,
-          analysed = r boolD F.analysed,
-          fromHandicappedTournament = r boolD F.fromHandicappedTournament,
-          drawOffers = r.getD(F.drawOffers, GameDrawOffers.empty) //should be empty for draughts
         )
 
-        (draughtsGame, metadata)
+        (draughtsGame, draughtsMetaData)
       }
 
       def readFairySFGame(r: BSON.Reader): (StratGame, Metadata) = {
@@ -585,20 +594,11 @@ object BSONHandlers {
             startedAtTurn = startedAtTurn
           )
         )
-        val metadata = Metadata(
-          source = r intO F.source flatMap Source.apply,
-          pgnImport = r.getO[PgnImport](F.pgnImport)(PgnImport.pgnImportBSONHandler),
-          tournamentId = r strO F.tournamentId,
-          swissId = r strO F.swissId,
-          simulId = r strO F.simulId,
-          multiMatch = r strO F.multiMatch,
-          analysed = r boolD F.analysed,
-          fromHandicappedTournament = r boolD F.fromHandicappedTournament,
-          drawOffers = r.getD(F.drawOffers, GameDrawOffers.empty),
+        val goMetaData = defaultMetaData.copy(
           selectedSquares = (r bytesO F.selectedSquares).map(BinaryFormat.pos.readGo(_)),
           deadStoneOfferState = (r intO F.deadStoneOfferState) flatMap DeadStoneOfferState.apply
         )
-        (goGame, metadata)
+        (goGame, goMetaData)
 
       }
 
@@ -655,7 +655,11 @@ object BSONHandlers {
           )
         )
 
-        (backgammonGame, defaultMetaData)
+        val backgammonMetaData = defaultMetaData.copy(
+          multiPointState = r.getO[MultiPointState](F.multiPointState)
+        )
+
+        (backgammonGame, backgammonMetaData)
       }
 
       def readAbaloneGame(r: BSON.Reader): (StratGame, Metadata) = {
@@ -861,7 +865,8 @@ object BSONHandlers {
               F.pocketData         -> o.board.pocketData,
               F.unusedDice         -> o.board.unusedDice.nonEmpty.option(o.board.unusedDice),
               F.cubeData           -> o.board.cubeData,
-              F.score              -> o.history.score.nonEmpty.option(o.history.score)
+              F.score              -> o.history.score.nonEmpty.option(o.history.score),
+              F.multiPointState    -> o.metadata.multiPointState
             )
           case GameLogic.Abalone() =>
             $doc(

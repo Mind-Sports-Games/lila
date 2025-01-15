@@ -354,7 +354,8 @@ final class Challenge(
         challenger = ChallengeModel.toRegistered(config.variant, timeControl)(orig),
         destUser = dest,
         rematchOf = none,
-        multiMatch = config.multiMatch
+        multiMatch = config.multiMatch,
+        backgammonPoints = config.backgammonPoints
       )
   }
 
@@ -416,7 +417,8 @@ final class Challenge(
                   challenger = Challenger.Open,
                   destUser = none,
                   rematchOf = none,
-                  name = config.name
+                  name = config.name,
+                  backgammonPoints = config.backgammonPoints
                 )
               (env.challenge.api create challenge) map {
                 case true =>

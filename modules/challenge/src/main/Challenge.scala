@@ -32,7 +32,8 @@ case class Challenge(
     open: Option[Boolean] = None,
     name: Option[String] = None,
     declineReason: Option[Challenge.DeclineReason] = None,
-    multiMatch: Option[Boolean] = None
+    multiMatch: Option[Boolean] = None,
+    backgammonPoints: Option[Int] = None
 ) {
 
   import Challenge._
@@ -250,7 +251,9 @@ object Challenge {
       destUser: Option[User],
       rematchOf: Option[Game.ID],
       name: Option[String] = None,
-      multiMatch: Boolean = false
+      multiMatch: Boolean = false,
+      //this could be extended into 'gameSettings' if more game specific fields are required
+      backgammonPoints: Option[Int] = None
   ): Challenge = {
     val (playerIndexChoice, finalPlayerIndex) = playerIndex match {
       case "p1" => PlayerIndexChoice.P1     -> P1
@@ -305,7 +308,8 @@ object Challenge {
       expiresAt = if (isOpen) DateTime.now.plusDays(1) else inTwoWeeks,
       open = isOpen option true,
       name = name,
-      multiMatch = multiMatch option true
+      multiMatch = multiMatch option true,
+      backgammonPoints = backgammonPoints
     )
     if (multiMatch && !challenge.customStartingPosition)
       challenge = challenge.copy(multiMatch = none)

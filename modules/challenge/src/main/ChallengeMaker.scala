@@ -79,7 +79,8 @@ final class ChallengeMaker(
         challenger = Challenge.toRegistered(pov.game.variant, timeControl)(challenger),
         destUser = dest.some,
         rematchOf = pov.gameId.some,
-        multiMatch = pov.game.metadata.multiMatchGameNr.fold(false)(x => x >= 2)
+        multiMatch = pov.game.metadata.multiMatchGameNr.fold(false)(x => x >= 2),
+        backgammonPoints = pov.game.metadata.multiPointState.map(_.target)
       )
     }
 }

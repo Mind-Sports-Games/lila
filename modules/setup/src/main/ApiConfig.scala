@@ -21,7 +21,8 @@ final case class ApiConfig(
     position: Option[FEN] = None,
     acceptByToken: Option[String] = None,
     message: Option[Template],
-    multiMatch: Boolean
+    multiMatch: Boolean,
+    backgammonPoints: Option[Int] = None
 ) {
 
   def perfType: Option[PerfType] = PerfPicker.perfType(Speed(clock), variant, days)
@@ -66,7 +67,8 @@ object ApiConfig extends BaseHumanConfig {
       pos: Option[String],
       tok: Option[String],
       msg: Option[String],
-      mm: Option[Boolean]
+      mm: Option[Boolean],
+      bp: Option[Int]
   ) = {
     val variant = Variant.orDefault(~v)
     new ApiConfig(
@@ -78,7 +80,8 @@ object ApiConfig extends BaseHumanConfig {
       position = pos.map(f => FEN.apply(variant.gameLogic, f)),
       acceptByToken = tok,
       message = msg map Template,
-      multiMatch = ~mm
+      multiMatch = ~mm,
+      backgammonPoints = bp
     ).autoVariant
   }
 

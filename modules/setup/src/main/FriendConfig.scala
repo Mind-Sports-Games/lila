@@ -17,7 +17,7 @@ case class FriendConfig(
     periods: Int,
     goHandicap: Int,
     goKomi: Int,
-    backgammonPoints: Int,
+    backgammonPoints: Option[Int],
     days: Int,
     mode: Mode,
     playerIndex: PlayerIndex,
@@ -62,9 +62,9 @@ case class FriendConfig(
       Some(
         FEN(
           variant.gameLogic,
-          variant.toBackgammon.fenFromSetupConfig(backgammonPoints.pp("bp") != 1).value
+          variant.toBackgammon.fenFromSetupConfig(backgammonPoints.getOrElse(1) != 1).value
         )
-      ).pp("bfensetup")
+      )
     else None
   }(Some(_))
 
@@ -75,7 +75,7 @@ case class FriendConfig(
   def validPoints =
     variant.gameFamily != GameFamily.Backgammon() || (
       variant.gameFamily == GameFamily.Backgammon() &&
-        backgammonPoints % 2 == 1
+        backgammonPoints.getOrElse(1) % 2 == 1
     )
 }
 
@@ -91,7 +91,7 @@ object FriendConfig extends BaseHumanConfig {
       p: Int,
       gh: Int,
       gk: Int,
-      bp: Int,
+      bp: Option[Int],
       d: Int,
       m: Option[Int],
       c: String,
@@ -134,7 +134,7 @@ object FriendConfig extends BaseHumanConfig {
     periods = 1,
     goHandicap = 0,
     goKomi = 75, // value is *10 to provide int
-    backgammonPoints = 1,
+    backgammonPoints = none,
     days = 2,
     mode = Mode.default,
     playerIndex = PlayerIndex.default
@@ -162,7 +162,7 @@ object FriendConfig extends BaseHumanConfig {
         periods = r intD "p",
         goHandicap = r intD "gh",
         goKomi = r intD "gk",
-        backgammonPoints = r intD "bp",
+        backgammonPoints = r intO "bp",
         days = r int "d",
         mode = Mode orDefault (r int "m"),
         playerIndex = PlayerIndex.P1,

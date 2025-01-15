@@ -44,8 +44,11 @@ object bits {
             c.perfType.trans,
           (c.initialFen, c.variant.gameFamily) match {
             case (Some(f), GameFamily.Go()) => " " + c.variant.toGo.setupInfo(f.toGo).getOrElse("")
-            case (Some(FEN.Backgammon(f)), GameFamily.Backgammon()) if f.pp("bfen").cubeData.nonEmpty =>
-              " Multipoint" //TODO put point information in here, but this won't be in the fen
+            case (_, GameFamily.Backgammon()) =>
+              c.backgammonPoints match {
+                case Some(bp) if bp > 1 => s" ${bp}pt"
+                case _                  => ""
+              }
             case _ => ""
           },
           br,

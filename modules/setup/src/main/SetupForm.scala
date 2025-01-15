@@ -62,7 +62,7 @@ object SetupForm {
         "periods"          -> periods,
         "goHandicap"       -> goHandicap,
         "goKomi"           -> goKomi(boardSize = 19),
-        "backgammonPoints" -> backgammonPoints,
+        "backgammonPoints" -> optional(backgammonPoints),
         "days"             -> days,
         "mode"             -> mode(withRated = ctx.isAuth),
         "playerIndex"      -> playerIndex,
@@ -194,13 +194,14 @@ object SetupForm {
         simpleDelayClock,
         bronsteinDelayClock,
         byoyomiClock,
-        "days"          -> optional(days),
-        "rated"         -> boolean,
-        "playerIndex"   -> optional(playerIndex),
-        "fen"           -> fenField,
-        "acceptByToken" -> optional(nonEmptyText),
-        "message"       -> message,
-        "multiMatch"    -> optional(boolean)
+        "days"             -> optional(days),
+        "rated"            -> boolean,
+        "playerIndex"      -> optional(playerIndex),
+        "fen"              -> fenField,
+        "acceptByToken"    -> optional(nonEmptyText),
+        "message"          -> message,
+        "multiMatch"       -> optional(boolean),
+        "backgammonPoints" -> optional(backgammonPoints)
       )(ApiConfig.from)(_ => none)
         .verifying("invalidFen", _.validFen)
         .verifying("can't be rated", _.validRated)
@@ -227,8 +228,9 @@ object SetupForm {
         simpleDelayClock,
         bronsteinDelayClock,
         byoyomiClock,
-        "rated" -> boolean,
-        "fen"   -> fenField
+        "rated"            -> boolean,
+        "fen"              -> fenField,
+        "backgammonPoints" -> optional(backgammonPoints)
       )(OpenConfig.from)(_ => none)
         .verifying("invalidFen", _.validFen)
         .verifying("rated without a clock", c => c.clock.isDefined || !c.rated)

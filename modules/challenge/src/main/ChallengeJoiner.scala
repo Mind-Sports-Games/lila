@@ -76,7 +76,8 @@ private object ChallengeJoiner {
         source = Source.Friend,
         daysPerTurn = c.daysPerTurn,
         pgnImport = None,
-        multiMatch = multiMatch
+        multiMatch = multiMatch,
+        backgammonPoints = c.backgammonPoints
       )
       .withId(c.id)
       .pipe { g =>
