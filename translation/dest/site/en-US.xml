@@ -60,6 +60,7 @@
   <string name="playerIndexResigned">%s resigned</string>
   <string name="playerIndexResignedGammon">%s resigned a gammon</string>
   <string name="playerIndexResignedBackgammon">%s resigned a backgammon</string>
+  <string name="playerIndexDroppedTheCube">%s dropped the cube</string>
   <string name="whiteResigned">White resigned</string>
   <string name="blackResigned">Black resigned</string>
   <string name="playerIndexLeftTheGame">%s left the game</string>
