@@ -203,7 +203,7 @@ export function readDoublingCube(fen: string, variant: VariantKey): cg.DoublingC
   const doublingCube = fen.split(' ')[6];
   if (doublingCube === '-') return undefined;
   if (doublingCube === '0') return { value: 0, owner: 'both' };
-  if (doublingCube.length == 2) {
+  if (doublingCube.length == 2 || doublingCube.length == 3) {
     if (doublingCube[1] === 'w' || doublingCube[1] === 'b') return { value: +doublingCube[0] + 1, owner: 'both' };
     else return { value: +doublingCube[0], owner: doublingCube[1] === 'W' ? 'p1' : 'p2' };
   }
