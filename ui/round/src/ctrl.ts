@@ -401,6 +401,7 @@ export default class RoundController {
       dice: dice,
       doublingCube: doublingCube,
       showUndoButton: false,
+      cubeActions: [], //we dont know what these are so dont want to display them
     };
     if (this.replaying()) {
       cancelDropMode(this.chessground.state);
@@ -415,8 +416,8 @@ export default class RoundController {
       };
       config.showUndoButton = this.isPlaying() && this.data.player.playerIndex == turnPlayerIndex && dice.length > 0;
       config.canUndo = this.data.canUndo;
-      (config.cubeActions = this.data.cubeActions ? this.data.cubeActions.split(',').map(a => a as cg.CubeAction) : []),
-        (config.gameButtonsActive = true);
+      config.cubeActions = this.data.cubeActions ? this.data.cubeActions.split(',').map(a => a as cg.CubeAction) : [];
+      config.gameButtonsActive = true;
     }
     config.dropmode = {
       dropDests: this.isPlaying() ? stratUtils.readDropsByRole(this.data.possibleDropsByRole) : new Map(),

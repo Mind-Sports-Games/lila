@@ -469,9 +469,7 @@ final class JsonView(
   private def possibleCubeActions(pov: Pov): Option[JsValue] =
     (pov.game.situation, pov.game.variant) match {
       case (Situation.Backgammon(_), Variant.Backgammon(_)) => {
-        (pov.game playableBy pov.player) option {
-          JsString(pov.game.situation.cubeActions.map(_.interaction).map(_.name).mkString(","))
-        }
+        Some(JsString(pov.game.situation.cubeActions.map(_.interaction).map(_.name).mkString(",")))
       }
       case _ => None
     }
