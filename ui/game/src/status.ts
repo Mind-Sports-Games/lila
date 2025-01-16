@@ -51,5 +51,11 @@ export function isGammon(statusId: number): boolean {
 }
 
 export function isBackgammon(statusId: number): boolean {
-  return [ids.backgammonWin, ids.ginBackgammon, ids.outoftimeBackgammon, ids.resignBackgammon, ids.cubeDropped].includes(statusId);
+  return [
+    ids.backgammonWin,
+    ids.ginBackgammon,
+    ids.outoftimeBackgammon,
+    ids.resignBackgammon,
+    ids.cubeDropped,
+  ].includes(statusId);
 }

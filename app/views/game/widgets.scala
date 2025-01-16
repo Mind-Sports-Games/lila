@@ -36,14 +36,20 @@ object widgets {
                     },
                     separator,
                     if (g.variant.exotic)
-                      bits.variantLink(g.variant, VariantKeys.variantName(g.variant).toUpperCase)
+                      bits.variantLink(
+                        g.variant,
+                        VariantKeys.variantName(g.variant).toUpperCase,
+                        matchPoints = g.metadata.multiPointState.map(_.target)
+                      )
                     else VariantKeys.variantName(g.variant).toUpperCase
                   )
                 else
                   frag(
                     showClock(g),
                     separator,
-                    g.perfType.fold(strategygames.chess.variant.FromPosition.name)(_.trans),
+                    g.metadata.multiPointState.fold("")(p => s"${p.target}pt ") + g.perfType.fold(
+                      strategygames.chess.variant.FromPosition.name
+                    )(_.trans),
                     separator,
                     if (g.fromHandicappedTournament) trans.handicapped.txt()
                     else if (g.rated) trans.rated.txt()

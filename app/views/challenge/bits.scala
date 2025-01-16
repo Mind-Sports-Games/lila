@@ -39,17 +39,13 @@ object bits {
       div(cls := "variant", dataIcon := (if (c.initialFen.isDefined) '*' else c.perfType.iconChar))(
         div(
           if (c.variant.exotic)
-            views.html.game.bits.variantLink(c.variant, variantName(c.variant))
+            views.html.game.bits
+              .variantLink(c.variant, variantName(c.variant), matchPoints = c.backgammonPoints)
           else
             c.perfType.trans,
           (c.initialFen, c.variant.gameFamily) match {
             case (Some(f), GameFamily.Go()) => " " + c.variant.toGo.setupInfo(f.toGo).getOrElse("")
-            case (_, GameFamily.Backgammon()) =>
-              c.backgammonPoints match {
-                case Some(bp) if bp > 1 => s" ${bp}pt"
-                case _                  => ""
-              }
-            case _ => ""
+            case _                          => ""
           },
           br,
           span(cls := "clock")(

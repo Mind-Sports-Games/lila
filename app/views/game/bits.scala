@@ -43,7 +43,8 @@ object bits {
   def variantLink(
       variant: Variant,
       name: String,
-      initialFen: Option[FEN] = None
+      initialFen: Option[FEN] = None,
+      matchPoints: Option[Int] = None
   ) =
     a(
       cls := "variant-link",
@@ -55,7 +56,7 @@ object bits {
       }),
       targetBlank,
       title := VariantKeys.variantTitle(variant)
-    )(name)
+    )(matchPoints.fold("")(p => s"${p}pt ") + name)
 
   def medleyLink =
     a(
