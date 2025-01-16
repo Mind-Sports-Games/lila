@@ -86,7 +86,7 @@ final class JsonView(rematches: Rematches) {
       .obj(
         "fullId"      -> pov.fullId,
         "gameId"      -> pov.gameId,
-        "fen"         -> Forsyth.exportBoard(pov.game.variant.gameLogic, pov.game.board),
+        "fen"         -> Forsyth.>>(pov.game.variant.gameLogic, pov.game.stratGame),
         "playerIndex" -> pov.playerIndex.name,
         "lastMove"    -> ~pov.game.lastActionKeys,
         "source"      -> pov.game.source,

@@ -289,7 +289,10 @@ object Challenge {
       status = Status.Created,
       variant = variant,
       initialFen =
-        if (variant.fromPositionVariant || variant.gameFamily == GameFamily.Go() || variant.gameFamily == GameFamily.Backgammon()) initialFen
+        if (
+          variant.fromPositionVariant || variant.gameFamily == GameFamily
+            .Go() || variant.gameFamily == GameFamily.Backgammon()
+        ) initialFen
         else if (variant == Variant.Chess(Chess960)) initialFen filter { fen =>
           fen.chessFen.map(fen => Chess960.positionNumber(fen).isDefined).getOrElse(false)
         }
