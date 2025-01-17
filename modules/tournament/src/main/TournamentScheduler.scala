@@ -562,7 +562,7 @@ final private class TournamentScheduler(
     ).flatten filter { _.schedule.at isAfter rightNow }
 
     //order matters for pruning weekly/yearly tournaments
-    yearly2025Tournaments :::
+    // yearly2025Tournaments ::: // after a tournament was created in db, no need to keep it here.
       thisWeekMedleyShields :::
       nextWeekMedleyShields :::
       thisMonthMedleyShields :::
