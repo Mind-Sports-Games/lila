@@ -27,6 +27,7 @@ export interface SwissData {
   isHandicapped: boolean;
   isMcMahon: boolean;
   mcmahonCutoff: string;
+  backgammonPoints: number;
   roundVariant: string;
   roundVariantName: string;
   p1Name: PlayerName;

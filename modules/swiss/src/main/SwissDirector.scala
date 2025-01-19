@@ -68,6 +68,10 @@ final private class SwissDirector(
       )
     } else if (mcMahonHandicapped) {
       (mmp1Id, mmp2Id, Handicaps.startingFenMcMahon(swiss.roundVariant.some, scoreDiff))
+    } else if (
+      swiss.settings.backgammonPoints.getOrElse(1) > 1 && swiss.variant.gameFamily == GameFamily.Backgammon()
+    ) {
+      (w, b, Some(FEN(swiss.variant.gameLogic, swiss.variant.toBackgammon.fenFromSetupConfig(true).value)))
     } else {
       (w, b, None)
     }

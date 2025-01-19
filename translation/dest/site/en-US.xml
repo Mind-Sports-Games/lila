@@ -286,6 +286,7 @@
   <string name="mcmahonDefinition">McMahon style tournament, awarding initial points to players to create fairer pairings</string>
   <string name="mcmahonCutoff">McMahon Cutoff</string>
   <string name="mcmahonCutoffDefinition">The Cutoff grade separating the top and bottom players. Only supported for Go games. Input example, 2000 or 3k. </string>
+  <string name="backgammonPointsDefinition">The number of points to play to in Backgammon games. Selecting anything other than 1 point will introduce the doubling cube.</string>
   <string name="rematch">Rematch</string>
   <string name="rematchOfferSent">Rematch offer sent</string>
   <string name="rematchOfferSentWhite">White offers rematch</string>

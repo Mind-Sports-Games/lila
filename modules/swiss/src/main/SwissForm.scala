@@ -57,10 +57,13 @@ final class SwissForm(implicit mode: Mode) {
           "mcmahon"       -> optional(boolean),
           "mcmahonCutoff" -> optional(cleanNonEmptyText)
         )(McMahon.apply)(McMahon.unapply),
-        "handicaps" -> mapping(
-          "handicapped"        -> optional(boolean),
-          "inputPlayerRatings" -> optional(cleanNonEmptyText)
-        )(Handicaps.apply)(Handicaps.unapply),
+        "variantSettings" -> mapping(
+          "handicaps" -> mapping(
+            "handicapped"        -> optional(boolean),
+            "inputPlayerRatings" -> optional(cleanNonEmptyText)
+          )(Handicaps.apply)(Handicaps.unapply),
+          "backgammonPoints" -> optional(numberIn(backgammonPoints))
+        )(VariantSettings.apply)(VariantSettings.unapply),
         "xGamesChoice" -> mapping(
           "bestOfX"    -> optional(boolean),
           "playX"      -> optional(boolean),
@@ -146,9 +149,12 @@ final class SwissForm(implicit mode: Mode) {
         mcmahon = false.some,
         mcmahonCutoff = none
       ),
-      handicaps = Handicaps(
-        handicapped = false.some,
-        inputPlayerRatings = none
+      variantSettings = VariantSettings(
+        handicaps = Handicaps(
+          handicapped = false.some,
+          inputPlayerRatings = none
+        ),
+        backgammonPoints = none
       ),
       xGamesChoice = XGamesChoice(
         bestOfX = false.some,
@@ -204,9 +210,12 @@ final class SwissForm(implicit mode: Mode) {
         mcmahon = s.settings.mcmahon.some,
         mcmahonCutoff = s.settings.mcmahonCutoff.some.filter(_.nonEmpty)
       ),
-      handicaps = Handicaps(
-        handicapped = s.settings.handicapped.some,
-        inputPlayerRatings = s.settings.inputPlayerRatings.some.filter(_.nonEmpty)
+      variantSettings = VariantSettings(
+        handicaps = Handicaps(
+          handicapped = s.settings.handicapped.some,
+          inputPlayerRatings = s.settings.inputPlayerRatings.some.filter(_.nonEmpty)
+        ),
+        backgammonPoints = s.settings.backgammonPoints
       ),
       xGamesChoice = XGamesChoice(
         bestOfX = s.settings.isBestOfX.some,
@@ -353,6 +362,10 @@ object SwissForm {
       else s"${m / 24 / 60} day${if (m == 24 * 60) "" else "s"}"
   )
 
+  val backgammonPoints: Seq[Int] = (1 to 31 by 2).toList
+
+  val backgammonPointsChoices = options(backgammonPoints, "%d point{s}")
+
   val chatForChoices = List(
     Swiss.ChatFor.NONE    -> "No chat",
     Swiss.ChatFor.LEADERS -> "Team leaders only",
@@ -370,7 +383,7 @@ object SwissForm {
       medleyGameFamilies: MedleyGameFamilies,
       rated: Option[Boolean],
       mcmahon: McMahon,
-      handicaps: Handicaps,
+      variantSettings: VariantSettings,
       xGamesChoice: XGamesChoice,
       drawTables: DrawTables,
       nbRounds: Int,
@@ -422,7 +435,9 @@ object SwissForm {
     def isRated            = rated | true
     def isMcMahon          = mcmahon.mcmahon | false
     def mcmahonCutoff      = if (isMcMahon) mcmahon.mcmahonCutoff else None
+    def handicaps          = variantSettings.handicaps
     def isHandicapped      = handicaps.handicapped | false
+    def backgammonPoints   = variantSettings.backgammonPoints
     def inputPlayerRatings = if (isHandicapped || isMcMahon) handicaps.inputPlayerRatings else None
     def isMatchScore       = xGamesChoice.matchScore | false
     def isBestOfX          = xGamesChoice.bestOfX | false
@@ -495,6 +510,11 @@ object SwissForm {
   case class McMahon(
       mcmahon: Option[Boolean],
       mcmahonCutoff: Option[String]
+  )
+
+  case class VariantSettings(
+      handicaps: Handicaps,
+      backgammonPoints: Option[Int]
   )
 
   case class Handicaps(

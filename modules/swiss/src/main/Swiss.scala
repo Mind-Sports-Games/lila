@@ -170,6 +170,7 @@ object Swiss {
       mcmahon: Boolean,
       mcmahonCutoff: String,
       handicapped: Boolean,
+      backgammonPoints: Option[Int] = None,
       inputPlayerRatings: String,
       isMatchScore: Boolean,
       isBestOfX: Boolean,

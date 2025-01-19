@@ -87,6 +87,7 @@ final class SwissApi(
         mcmahonCutoff = ~data.mcmahonCutoff,
         handicapped = data.isHandicapped,
         inputPlayerRatings = ~data.inputPlayerRatings,
+        backgammonPoints = data.backgammonPoints,
         isMatchScore = data.isMatchScore,
         isBestOfX = data.isBestOfX,
         isPlayX = data.isPlayX,
@@ -134,6 +135,7 @@ final class SwissApi(
             inputPlayerRatings =
               if (data.inputPlayerRatings.isDefined) ~data.inputPlayerRatings
               else old.settings.inputPlayerRatings,
+            backgammonPoints = data.backgammonPoints,
             isMatchScore = data.isMatchScore,
             isBestOfX = data.isBestOfX,
             isPlayX = data.isPlayX,
