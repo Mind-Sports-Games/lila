@@ -437,7 +437,7 @@ object SwissForm {
     def mcmahonCutoff      = if (isMcMahon) mcmahon.mcmahonCutoff else None
     def handicaps          = variantSettings.handicaps
     def isHandicapped      = handicaps.handicapped | false
-    def backgammonPoints   = variantSettings.backgammonPoints
+    def backgammonPoints   = if (gameLogic == GameLogic.Backgammon()) variantSettings.backgammonPoints else None
     def inputPlayerRatings = if (isHandicapped || isMcMahon) handicaps.inputPlayerRatings else None
     def isMatchScore       = xGamesChoice.matchScore | false
     def isBestOfX          = xGamesChoice.bestOfX | false

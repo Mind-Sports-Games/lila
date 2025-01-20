@@ -44,7 +44,8 @@ object side {
                   s.variant,
                   if (s.variant == Variant.Chess(strategygames.chess.variant.KingOfTheHill))
                     VariantKeys.variantShortName(s.variant)
-                  else VariantKeys.variantName(s.variant)
+                  else VariantKeys.variantName(s.variant),
+                  matchPoints = s.settings.backgammonPoints
                 )
               } else s.perfType.trans,
               separator,
