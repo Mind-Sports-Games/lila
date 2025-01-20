@@ -40,7 +40,14 @@ object bits {
         div(
           if (c.variant.exotic)
             views.html.game.bits
-              .variantLink(c.variant, variantName(c.variant), matchPoints = c.backgammonPoints)
+              .variantLink(
+                c.variant,
+                variantName(c.variant),
+                matchPoints = (c.variant.gameFamily match {
+                  case GameFamily.Backgammon() => c.backgammonPoints
+                  case _                       => None
+                })
+              )
           else
             c.perfType.trans,
           (c.initialFen, c.variant.gameFamily) match {
