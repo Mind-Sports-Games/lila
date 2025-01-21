@@ -187,6 +187,7 @@ final private class SwissFields(form: Form[_], swiss: Option[Swiss])(implicit ct
       form3.checkbox(
         form("mcmahon.mcmahon"),
         trans.mcmahon(),
+        klass = "mcmahon",
         half = true,
         help = frag(
           trans.mcmahonDefinition.txt(),
@@ -214,6 +215,7 @@ final private class SwissFields(form: Form[_], swiss: Option[Swiss])(implicit ct
       form3.checkbox(
         form("variantSettings.handicaps.handicapped"),
         trans.handicapped(),
+        klass = "handicapped",
         half = true,
         help = frag(
           trans.handicappedDefinition.txt(),

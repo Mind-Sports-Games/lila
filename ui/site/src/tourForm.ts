@@ -4,7 +4,7 @@ playstrategy.load.then(() => {
   const $variant = $('#form3-variant'),
     $rated = $('#form3-rated'),
     $medley = $('#form3-medley'),
-    $handicapped = $('#form3-handicaps_handicapped'),
+    $handicapped = $('#form3-variantSettings_handicaps_handicapped'),
     $mcmahon = $('#form3-mcmahon_mcmahon'),
     $drawTables = $('.form3 .drawTables'),
     $perPairingDrawTables = $('.form3 .perPairingDrawTables'),
@@ -36,6 +36,19 @@ playstrategy.load.then(() => {
     },
     showInputRatings = () => {
       $('.form3 .inputPlayerRatings').toggle($handicapped.is(':checked') || $mcmahon.is(':checked'));
+    },
+    showVariantOptions = () => {
+      const isBackgammon = (($variant.val() as string) || '').startsWith('10_');
+      const isGo = (($variant.val() as string) || '').startsWith('9_');
+      $('.form3 .backgammonPoints').toggle(isBackgammon);
+      $('.form3 .mcmahon').toggle(isGo);
+      $('.form3 .handicapped').toggle(isGo);
+      $('.form3 .mcmahonCutoff').toggle(isGo);
+      if (!isGo) {
+        $mcmahon.prop('checked', false);
+        $handicapped.prop('checked', false);
+      }
+      showInputRatings();
     },
     hideByoyomiSettings = () => {
       $('.form3 .byoyomiClock').toggle($useByoyomi.is(':checked'));
@@ -101,6 +114,7 @@ playstrategy.load.then(() => {
 
   $variant.on('change', showPosition);
   $variant.on('change', showDrawTables);
+  $variant.on('change', showVariantOptions);
   $handicapped.on('change', () => {
     toggleOff($medley);
     toggleOff($rated);
@@ -121,6 +135,7 @@ playstrategy.load.then(() => {
   $onePerGameFamily.on('change', toggleOnePerGameFamily);
   $exoticChessVariants.on('change', toggleChessVariants);
   $draughts64Variants.on('change', toggleDraughts64Variants);
+  showVariantOptions();
   showMedleySettings();
   showInputRatings();
   $bestOfX.on('change', () => {
