@@ -109,10 +109,19 @@ case class SwissPairingGames(
     nbGamesPerRound: Int,
     openingFEN: Option[FEN]
 ) {
-  def finishedOrAborted =
-    game.finishedOrAborted && (!isBestOfX || !requireMoreGamesInBestOfX) && (!isPlayX || !requireMoreGamesInPlayX)
 
-  def multiMatchGamesScoreDiff: Int =
+  def lastGame: Game =
+    multiMatchGames.fold(game)(_.reverse.headOption.getOrElse(game))
+
+  def isMultiPoint: Boolean = game.metadata.multiPointState.nonEmpty
+
+  def finishedOrAborted =
+    game.finishedOrAborted &&
+      (!isBestOfX || !requireMoreGamesInBestOfX) &&
+      (!isPlayX || !requireMoreGamesInPlayX) &&
+      !requireMoreGamesInMultipoint
+
+  private def multiMatchGamesScoreDiff: Int =
     multiMatchGames
       .foldLeft(List(game))(_ ++ _)
       .map(g => g.winnerPlayerIndex)
@@ -133,51 +142,63 @@ case class SwissPairingGames(
       }
       .foldLeft(0)(_ + _)
 
-  def requireMoreGamesInBestOfX: Boolean = {
-    val nbGamesLeft = nbGamesPerRound - (multiMatchGames.fold(0)(_.length) + 1);
+  private def nbGamesLeft = nbGamesPerRound - (multiMatchGames.fold(0)(_.length) + 1)
+
+  def requireMoreGamesInBestOfX: Boolean =
     nbGamesLeft != 0 && (multiMatchGamesScoreDiff match {
       case x if x > 0 => x <= nbGamesLeft
       case x if x < 0 => -x <= nbGamesLeft
       case _          => true
     })
-  }
-  def requireMoreGamesInPlayX: Boolean = {
-    val nbGamesLeft = nbGamesPerRound - (multiMatchGames.fold(0)(_.length) + 1);
-    nbGamesLeft != 0
-  }
+
+  def requireMoreGamesInPlayX: Boolean = nbGamesLeft != 0
+
+  def requireMoreGamesInMultipoint: Boolean =
+    lastGame.metadata.multiPointState.fold(false)(mps =>
+      lastGame.situation.winner
+        .map { p =>
+          p.fold(mps.p1Points, mps.p2Points) + lastGame.situation.pointValue.getOrElse(0) < mps.target
+        }
+        .getOrElse(false)
+    )
+
   def outoftime = if (game.outoftime(true)) List(game)
   else
     List() ++ multiMatchGames.fold[List[Game]](List())(
       _.filter(_.outoftime(true))
     )
+
   def winnerPlayerIndex: Option[PlayerIndex] =
-    // Single games are easy.
-    if (nbGamesPerRound == 1) game.winnerPlayerIndex
-    else { //multimatch
+    if (nbGamesPerRound > 1) { //multimatch
       multiMatchGamesScoreDiff match {
         case x if x > 0 => Some(PlayerIndex.P1)
         case x if x < 0 => Some(PlayerIndex.P2)
         case _          => None
       }
-    }
+    } else lastGame.winnerPlayerIndex
+
   def playersWhoDidNotMove =
     List() ++ game.playerWhoDidNotMove ++ multiMatchGames.flatMap(_.last.playerWhoDidNotMove)
+
   def createdAt = if (isBestOfX || isPlayX) {
     multiMatchGames.fold(game.createdAt)(_.last.createdAt)
   } else game.createdAt
+
   def matchOutcome: List[Option[PlayerIndex]] =
     if (nbGamesPerRound > 1) {
       multiMatchGames.foldLeft(List(game))(_ ++ _).map(_.winnerPlayerIndex)
-    } else List(game.winnerPlayerIndex)
+    } else List(lastGame.winnerPlayerIndex)
+
   private def startPlayerNormalisation(g: Game): Option[PlayerIndex] =
     if (g.startPlayerIndex == PlayerIndex.P2 && g.variant.recalcStartPlayerForStats)
       g.winnerPlayerIndex.map(!_)
     else
       g.winnerPlayerIndex
+
   def startPlayerWinners: List[Option[PlayerIndex]] =
     if (nbGamesPerRound > 1) {
       multiMatchGames.foldLeft(List(game))(_ ++ _).map(g => startPlayerNormalisation(g))
-    } else List(startPlayerNormalisation(game))
+    } else List(startPlayerNormalisation(lastGame))
 
   def strResultOf(playerIndex: PlayerIndex) =
     SwissPairing

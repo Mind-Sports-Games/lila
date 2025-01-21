@@ -298,21 +298,21 @@ case class Game(
 
     val events = {
       action match {
-        case m: Move        =>
+        case m: Move =>
           Event.Move(m, game.situation, state, clockEvent, updated.board.pocketData)
-        case d: Drop        =>
+        case d: Drop =>
           Event.Drop(d, game.situation, state, clockEvent, updated.board.pocketData)
-        case l: Lift        =>
+        case l: Lift =>
           Event.Lift(l, game.situation, state, clockEvent, updated.board.pocketData)
-        case p: Pass        =>
+        case p: Pass =>
           Event.Pass(p, game.situation, state, clockEvent, updated.board.pocketData)
-        case r: DiceRoll    =>
+        case r: DiceRoll =>
           Event.DiceRoll(r, game.situation, state, clockEvent, updated.board.pocketData)
         case ca: CubeAction =>
           Event.CubeAction(ca, game.situation, state, clockEvent, updated.board.pocketData)
-        case et: EndTurn    =>
+        case et: EndTurn =>
           Event.EndTurn(et, game.situation, state, clockEvent, updated.board.pocketData)
-        case u: Undo        =>
+        case u: Undo =>
           Event.Undo(u, game.situation, state, clockEvent, updated.board.pocketData)
         case ss: SelectSquares =>
           Event.SelectSquares(ss, game.situation, state, clockEvent, updated.board.pocketData)
@@ -913,6 +913,9 @@ case class Game(
   def withHandicappedTournament(isHandicapped: Boolean) =
     copy(metadata = metadata.copy(fromHandicappedTournament = isHandicapped))
 
+  def withMultiPointState(multiPointState: Option[MultiPointState]) =
+    copy(metadata = metadata.copy(multiPointState = multiPointState))
+
   def withTournamentId(id: String) = copy(metadata = metadata.copy(tournamentId = id.some))
   def withSwissId(id: String)      = copy(metadata = metadata.copy(swissId = id.some))
 
@@ -1223,7 +1226,20 @@ object DeadStoneOfferState {
   def apply(id: Int): Option[DeadStoneOfferState] = byId get id
 }
 
-case class MultiPointState(target: Int, p1Points: Int = 0, p2Points: Int = 0)
+case class MultiPointState(target: Int, p1Points: Int = 0, p2Points: Int = 0) {
+
+  private def updatePoints(origPoints: Int, wonPoints: Int) =
+    (origPoints + wonPoints).atMost(target)
+
+  def updateMultiPointState(pointValue: Option[Int], winner: Option[PlayerIndex]) =
+    winner.map(p =>
+      p.fold(
+        copy(p1Points = updatePoints(this.p1Points, pointValue.getOrElse(0))),
+        copy(p2Points = updatePoints(this.p2Points, pointValue.getOrElse(0)))
+      )
+    )
+
+}
 
 case class CastleLastMove(castles: Castles, lastMove: Option[ChessUci])
 

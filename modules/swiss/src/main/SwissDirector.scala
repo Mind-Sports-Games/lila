@@ -3,13 +3,12 @@ package lila.swiss
 import strategygames.{ P2, Player => PlayerIndex, P1, GameLogic, GameFamily }
 import strategygames.variant.Variant
 import strategygames.format.FEN
-import strategygames.draughts.variant.{ Variant => DraughtsVariant }
 import org.joda.time.DateTime
 import scala.util.chaining._
 import scala.util.Random
 
 import lila.db.dsl._
-import lila.game.{ Game, Handicaps }
+import lila.game.{ Game, Handicaps, MultiPointState }
 import lila.user.User
 
 final private class SwissDirector(
@@ -157,7 +156,11 @@ final private class SwissDirector(
       }
       .monSuccess(_.swiss.startRound)
 
-  private[swiss] def makeGame(swiss: Swiss, players: Map[User.ID, SwissPlayer], rematch: Boolean = false)(
+  private[swiss] def makeGame(
+      swiss: Swiss,
+      players: Map[User.ID, SwissPlayer],
+      prevGame: Option[Game] = None
+  )(
       pairing: SwissPairing
   ): Game =
     Game
@@ -189,7 +192,7 @@ final private class SwissDirector(
           P1,
           players.get(
             if (
-              rematch && pairing.multiMatchGameIds
+              prevGame.nonEmpty && pairing.multiMatchGameIds
                 .fold(false)(ids => ids.size % 2 == 1) && swiss.roundVariant.gameLogic != GameLogic
                 .Backgammon() && !swiss.settings.handicapped
             ) pairing.p2
@@ -200,7 +203,7 @@ final private class SwissDirector(
           P2,
           players.get(
             if (
-              rematch && pairing.multiMatchGameIds
+              prevGame.nonEmpty && pairing.multiMatchGameIds
                 .fold(false)(ids => ids.size % 2 == 1) && swiss.roundVariant.gameLogic != GameLogic
                 .Backgammon() && !swiss.settings.handicapped
             ) pairing.p1
@@ -211,15 +214,27 @@ final private class SwissDirector(
         source = lila.game.Source.Swiss,
         pgnImport = None,
         multiMatch =
-          if (rematch)
+          if (prevGame.nonEmpty)
             s"${pairing.multiMatchGameIds.fold(1)(ids => ids.size + 1)}:${pairing.id}".some // link to first mm game
-          else if (swiss.settings.nbGamesPerRound > 1) s"1:${pairing.id}".some
+          else if (swiss.settings.nbGamesPerRound > 1 || swiss.settings.backgammonPoints.getOrElse(1) > 1)
+            s"1:${pairing.id}".some
           else none
       )
-      .withId(if (rematch) pairing.multiMatchGameIds.fold(pairing.gameId)(l => l.last) else pairing.id)
+      .withId(
+        if (prevGame.nonEmpty) pairing.multiMatchGameIds.fold(pairing.gameId)(l => l.last) else pairing.id
+      )
       .withSwissId(swiss.id.value)
       .withHandicappedTournament(
         swiss.settings.handicapped || (swiss.settings.mcmahon && pairing.openingFEN.nonEmpty)
+      )
+      .withMultiPointState(
+        if (prevGame.isEmpty) swiss.settings.backgammonPoints.map(t => MultiPointState(t))
+        else
+          prevGame.flatMap { g =>
+            g.metadata.multiPointState.flatMap(
+              _.updateMultiPointState(g.situation.pointValue, g.situation.winner)
+            )
+          }
       )
       .start
 
