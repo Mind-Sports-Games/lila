@@ -173,6 +173,7 @@ export interface Swiss {
   running?: boolean;
   isBestOfX?: boolean;
   isPlayX?: boolean;
+  isMultiPoint?: boolean;
   ranks?: TournamentRanks;
 }
 
