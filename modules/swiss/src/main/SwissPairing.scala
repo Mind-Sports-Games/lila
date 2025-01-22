@@ -1,9 +1,9 @@
 package lila.swiss
 
-import strategygames.{ Player => PlayerIndex, GameFamily }
+import strategygames.{ Player => PlayerIndex, GameFamily, GameLogic }
 import strategygames.format.FEN
 import strategygames.variant.Variant
-import lila.game.Game
+import lila.game.{ Game, MultiPointState }
 import lila.user.User
 
 case class SwissPairing(
@@ -86,6 +86,22 @@ case class SwissPairing(
             .toString()
         )
     }
+
+  //works because we can't change variant midway through a multipoint match
+  //TODO convert fenFromSetupConfig into a wrapped function
+  def fenForNextGame(prevGame: Game): Option[FEN] =
+    if (prevGame.metadata.multiPointState.isEmpty) openingFEN
+    else
+      prevGame.variant match {
+        case Variant.Backgammon(v) =>
+          Some(
+            FEN(
+              GameLogic.Backgammon(),
+              v.fenFromSetupConfig(!MultiPointState.nextGameIsCrawford(prevGame)).value
+            )
+          )
+        case _ => openingFEN
+      }
 
 }
 

@@ -174,11 +174,13 @@ final private class SwissDirector(
                 .byName(swiss.roundVariant.gameLogic, "From Position")
                 .getOrElse(Variant.orDefault(swiss.roundVariant.gameLogic, 3))
           },
-          fen = pairing.openingFEN
+          fen = prevGame.fold(pairing.openingFEN)(pairing.fenForNextGame)
         ) pipe { g =>
           val turns = g.player.fold(0, 1)
           g.copy(
-            clock = prevGame.fold(swiss.clock.toClock.some)(pg => if (pg.metadata.multiPointState.nonEmpty) pg.clock else swiss.clock.toClock.some),
+            clock = prevGame.fold(swiss.clock.toClock.some)(pg =>
+              if (pg.metadata.multiPointState.nonEmpty) pg.clock else swiss.clock.toClock.some
+            ),
             //Its ok to set all of these to turns - we're just saying we're starting at a non standard
             //place (if 1) and its all normal if 0. We don't necessarily know about how many turns/plies
             //made up the history of a position but it doesnt really matter

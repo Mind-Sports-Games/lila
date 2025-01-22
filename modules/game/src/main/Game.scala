@@ -1228,15 +1228,31 @@ object DeadStoneOfferState {
 
 case class MultiPointState(target: Int, p1Points: Int = 0, p2Points: Int = 0) {
 
+  def maxPoints = Math.max(p1Points, p2Points)
+
+  def isCrawfordState = maxPoints + 1 == target && p1Points != p2Points
+
   private def updatePoints(origPoints: Int, wonPoints: Int) =
     (origPoints + wonPoints).atMost(target)
 
-  def updateMultiPointState(pointValue: Option[Int], winner: Option[PlayerIndex]) =
+  def updateMultiPointState(pointValue: Option[Int], winner: Option[PlayerIndex]): Option[MultiPointState] =
     winner.map(p =>
       p.fold(
         copy(p1Points = updatePoints(this.p1Points, pointValue.getOrElse(0))),
         copy(p2Points = updatePoints(this.p2Points, pointValue.getOrElse(0)))
       )
+    )
+
+}
+
+object MultiPointState {
+
+  def nextGameIsCrawford(game: Game): Boolean =
+    game.metadata.multiPointState.fold(false)(mps =>
+      !mps.isCrawfordState && mps
+        .updateMultiPointState(game.situation.pointValue, game.situation.winner)
+        .map(_.isCrawfordState)
+        .getOrElse(false)
     )
 
 }
