@@ -642,9 +642,10 @@ export default class RoundController {
       }
       this.turnCount = o.turnCount;
       const variantCanStillHavePieceAtActionKey = ['togyzkumalak', 'bestemshe', 'backgammon', 'hyper', 'nackgammon'];
-      const allowChessgroundAction = !(
-        variantCanStillHavePieceAtActionKey.includes(d.game.variant.key) && playedPlayerIndex === d.player.playerIndex
-      );
+      const allowChessgroundAction =
+        !(
+          variantCanStillHavePieceAtActionKey.includes(d.game.variant.key) && playedPlayerIndex === d.player.playerIndex
+        ) || !this.isPlaying();
       //apiAction triggers for both players and the move/drop/lift has already happened for the active player.
       if (o.role && allowChessgroundAction) {
         this.chessground.newPiece(
