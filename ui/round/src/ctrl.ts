@@ -174,11 +174,6 @@ export default class RoundController {
     if (this.isPlaying()) ab.init(this);
   }
 
-  static irrelevantPiecesNamesPerGameFamily = [
-    'togyzkumalak', // "Bastaushi", "Kostaushi"
-    'oware', // "South", "North"
-  ];
-
   private showExpiration = () => {
     if (!this.data.expirationAtStart && !this.data.expirationOnPaused) return;
     if (this.data.expirationOnPaused) {
