@@ -292,7 +292,8 @@ final private[api] class RoundApi(
           "running"         -> s.swiss.isStarted,
           "isBestOfX"       -> s.swiss.settings.isBestOfX,
           "isPlayX"         -> s.swiss.settings.isPlayX,
-          "nbGamesPerRound" -> s.swiss.settings.nbGamesPerRound
+          "nbGamesPerRound" -> s.swiss.settings.nbGamesPerRound,
+          "isMultiPoint"    -> s.swiss.settings.isMultiPoint
         )
         .add("ranks" -> s.ranks.map { r =>
           Json.obj(

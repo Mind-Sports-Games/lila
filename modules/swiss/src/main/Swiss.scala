@@ -207,6 +207,7 @@ object Swiss {
     def dailyInterval           = (!manualRounds && intervalSeconds >= 24 * 3600) option intervalSeconds / 3600 / 24
     def usingDrawTables         = useDrawTables || usePerPairingDrawTables
     def mcmahonCutoffGrade: Int = Handicaps.playerRatingFromInput(mcmahonCutoff).getOrElse(1500)
+    def isMultiPoint            = backgammonPoints.exists(_ > 1)
   }
 
   type ChatFor = Int

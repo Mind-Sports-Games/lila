@@ -50,7 +50,7 @@ case class SwissPairing(
   def numGames = matchStatus.fold(_ => 0, l => l.length)
 
   def multiMatchResultsFor(userId: User.ID): Option[List[String]] = {
-    if (nbGamesPerRound > 1)
+    if (nbGamesPerRound > 1 || multiMatchGameIds.nonEmpty)
       matchStatus.fold(
         _ => None,
         SwissPairing.matchResultsMap(variant)("draw", "win", "loss")(playerIndexOf(userId))(_).some
@@ -185,7 +185,7 @@ case class SwissPairingGames(
   } else game.createdAt
 
   def matchOutcome: List[Option[PlayerIndex]] =
-    if (nbGamesPerRound > 1) {
+    if (nbGamesPerRound > 1 || multiMatchGames.exists(_.length > 0)) {
       multiMatchGames.foldLeft(List(game))(_ ++ _).map(_.winnerPlayerIndex)
     } else List(lastGame.winnerPlayerIndex)
 
@@ -196,7 +196,7 @@ case class SwissPairingGames(
       g.winnerPlayerIndex
 
   def startPlayerWinners: List[Option[PlayerIndex]] =
-    if (nbGamesPerRound > 1) {
+    if (nbGamesPerRound > 1 || multiMatchGames.exists(_.length > 0)) {
       multiMatchGames.foldLeft(List(game))(_ ++ _).map(g => startPlayerNormalisation(g))
     } else List(startPlayerNormalisation(lastGame))
 

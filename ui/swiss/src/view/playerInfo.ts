@@ -37,7 +37,7 @@ const multiMatchGames = (sheet: (PairingExt | Outcome)[]): (MultiMatchPairing | 
     let gameNb = 1;
     if (isOutcome(v)) {
       newSheet.push({ t: 'o', round: round, outcome: v });
-    } else if ((v.x || v.px) && v.mmids) {
+    } else if (v.mmids && (v.x || v.px || v.mmids.length > 0)) {
       newSheet.push({
         t: 'p',
         round: round,
@@ -71,7 +71,7 @@ const multiMatchGames = (sheet: (PairingExt | Outcome)[]): (MultiMatchPairing | 
 export default function (ctrl: SwissCtrl): VNode | undefined {
   if (!ctrl.playerInfoId) return;
   const isMatchScore = ctrl.data.isMatchScore;
-  const isMultiMatch = ctrl.data.nbGamesPerRound > 1;
+  const isMultiMatch = ctrl.data.nbGamesPerRound > 1 || ctrl.data.backgammonPoints > 1;
   const data = ctrl.data.playerInfo;
   const noarg = ctrl.trans.noarg;
   const tag = 'div.swiss__player-info.swiss__table';
