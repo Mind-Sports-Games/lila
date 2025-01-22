@@ -840,7 +840,9 @@ export default class Setup {
         $fenPosition.toggle(isFen);
         $modeChoicesWrap.toggle(!isFen);
         $goConfig.toggle(variantId[0] == '9');
-        $backgammonConfig.toggle(variantId[0] == '10');
+        //TODO change back when playing with friend is allowed for Backgammon multipoint
+        $backgammonConfig.toggle(false);
+        //$backgammonConfig.toggle(variantId[0] == '10');
         if (isFen) {
           $casual.trigger('click');
           validateFen();
