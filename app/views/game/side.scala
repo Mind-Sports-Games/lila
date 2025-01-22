@@ -200,11 +200,12 @@ object side {
           )
         },
         swissPairingGames.flatMap { spg =>
-          if (spg.nbGamesPerRound > 1) {
+          if (spg.nbGamesPerRound > 1 || spg.isMultiPoint) {
             Some(
               st.section(cls := "game__multi-match")(
                 frag(
-                  trans.multiMatch(),
+                  if (spg.nbGamesPerRound > 1) trans.multiMatch()
+                  else s"${spg.game.metadata.multiPointState.map(_.target).getOrElse(0)}pt Match",
                   if (spg.isBestOfX) s" (best of ${spg.nbGamesPerRound})"
                   else if (spg.isPlayX) s" (play ${spg.nbGamesPerRound} games)"
                   else "",

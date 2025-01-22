@@ -201,18 +201,30 @@ case class SwissPairingGames(
     } else List(startPlayerNormalisation(lastGame))
 
   def strResultOf(playerIndex: PlayerIndex) =
-    SwissPairing
-      .matchResultsMap(game.variant.some)(1, 2, 0)(playerIndex)(
-        multiMatchGames
-          .foldLeft(List(game))(_ ++ _)
-          .filter(g => g.finished)
-          .map(g => g.winnerPlayerIndex)
-      )
-      .foldLeft(0)(_ + _) match {
-      case x if x % 2 == 0 => s"${(x / 2)}"
-      case x if x % 2 == 1 => s"${(x / 2)}.5"
-      case _ => "*"
-    }
+    if (isMultiPoint) {
+      lastGame.metadata.multiPointState
+        .fold(0) { mps =>
+          if (lastGame.situation.winner == Some(playerIndex)) {
+            Math.min(
+              playerIndex.fold(mps.p1Points, mps.p2Points) + lastGame.situation.pointValue.getOrElse(0),
+              mps.target
+            )
+          } else playerIndex.fold(mps.p1Points, mps.p2Points)
+        }
+        .toString()
+    } else
+      SwissPairing
+        .matchResultsMap(game.variant.some)(1, 2, 0)(playerIndex)(
+          multiMatchGames
+            .foldLeft(List(game))(_ ++ _)
+            .filter(g => g.finished)
+            .map(g => g.winnerPlayerIndex)
+        )
+        .foldLeft(0)(_ + _) match {
+        case x if x % 2 == 0 => s"${(x / 2)}"
+        case x if x % 2 == 1 => s"${(x / 2)}.5"
+        case _ => "*"
+      }
 
 }
 
