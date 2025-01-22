@@ -170,13 +170,7 @@ case class SwissPairingGames(
   def requireMoreGamesInPlayX: Boolean = nbGamesLeft != 0
 
   def requireMoreGamesInMultipoint: Boolean =
-    lastGame.metadata.multiPointState.fold(false)(mps =>
-      lastGame.situation.winner
-        .map { p =>
-          p.fold(mps.p1Points, mps.p2Points) + lastGame.situation.pointValue.getOrElse(0) < mps.target
-        }
-        .getOrElse(false)
-    )
+    MultiPointState.requireMoreGamesInMultipoint(lastGame)
 
   def outoftime = if (game.outoftime(true)) List(game)
   else

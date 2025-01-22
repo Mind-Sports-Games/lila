@@ -690,7 +690,10 @@ case class Game(
 
   def finishedOrAborted = finished || aborted
 
-  def accountable = playedTurns >= 2 || isTournament
+  private def accountable = playedTurns >= 2 || isTournament
+
+  def updateRatingsOnFinish =
+    rated && accountable && !MultiPointState.requireMoreGamesInMultipoint(this)
 
   def replayable = isPgnImport || finished || (aborted && bothPlayersHaveMoved)
 
@@ -1252,6 +1255,15 @@ object MultiPointState {
       !mps.isCrawfordState && mps
         .updateMultiPointState(game.situation.pointValue, game.situation.winner)
         .map(_.isCrawfordState)
+        .getOrElse(false)
+    )
+
+  def requireMoreGamesInMultipoint(game: Game): Boolean =
+    game.metadata.multiPointState.fold(false)(mps =>
+      game.situation.winner
+        .map { p =>
+          p.fold(mps.p1Points, mps.p2Points) + game.situation.pointValue.getOrElse(0) < mps.target
+        }
         .getOrElse(false)
     )
 
