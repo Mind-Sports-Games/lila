@@ -286,8 +286,3 @@ export function displayClockPoolUrl(clock: ClockData) {
       ? `${displayClockLimit(clock.initial)}d${clock.delay}`
       : displayClockLimit(clock.initial) + '+' + clock.increment;
 }
-
-export const irrelevantPiecesNamesPerGameFamily = [
-  'togyzkumalak', // "Bastaushi", "Kostaushi"
-  'oware', // "South", "North"
-];
