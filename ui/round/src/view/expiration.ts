@@ -1,21 +1,23 @@
 import { h } from 'snabbdom';
+import isCol1 from 'common/isCol1';
 import { MaybeVNode, Position } from '../interfaces';
 import RoundController from '../ctrl';
 import * as round from '../round';
-import { isPlayerTurn, playable } from 'game';
+import * as game from 'game';
+import { irrelevantPiecesNamesPerGameFamily } from '../util';
 
 let rang = false;
 
 export default function (ctrl: RoundController, position: Position): MaybeVNode {
   const moveIndicator = ctrl.data.pref.playerTurnIndicator;
-  const d = playable(ctrl.data) && (ctrl.data.expirationAtStart || ctrl.data.expirationOnPaused);
+  const d = game.playable(ctrl.data) && (ctrl.data.expirationAtStart || ctrl.data.expirationOnPaused);
   let timeLeft = 8000;
-  if ((!d && !moveIndicator) || !playable(ctrl.data)) return;
+  if ((!d && !moveIndicator) || !game.playable(ctrl.data)) return;
   if (d) {
     timeLeft = Math.max(0, d.updatedAt - Date.now() + d.millisToMove);
   }
   const secondsLeft = Math.floor(timeLeft / 1000),
-    myTurn = isPlayerTurn(ctrl.data),
+    myTurn = game.isPlayerTurn(ctrl.data),
     transStr =
       ctrl.data.expirationOnPaused && ctrl.data.deadStoneOfferState == 'ChooseFirstOffer'
         ? myTurn
@@ -36,6 +38,8 @@ export default function (ctrl: RoundController, position: Position): MaybeVNode 
   }
   const side = myTurn != ctrl.flip ? 'bottom' : 'top';
   let moveIndicatorText = ctrl.trans.vdomPlural(transStr, secondsLeft, h('strong', '' + secondsLeft));
+  if (isCol1() && !irrelevantPiecesNamesPerGameFamily.includes(ctrl.data.game.gameFamily))
+    moveIndicatorText.push(`. ${ctrl.trans('youPlayPieces', ctrl.data.player.playerName)}`);
 
   if (
     moveIndicator &&
@@ -47,6 +51,22 @@ export default function (ctrl: RoundController, position: Position): MaybeVNode 
       ctrl.clock.times.activePlayerIndex !== undefined &&
       ctrl.clock?.millisOf(ctrl.clock.times.activePlayerIndex) < 10000;
     moveIndicatorText = myTurn ? [ctrl.trans('yourTurn')] : [ctrl.trans('waitingForOpponent')];
+  }
+
+  const gameData = ctrl.data;
+  if (
+    !d &&
+    isCol1() &&
+    moveIndicator &&
+    game.isPlayerPlaying(gameData) &&
+    !game.playerHasPlayedTurn(gameData) &&
+    !gameData.player.spectator
+  ) {
+    moveIndicatorText = [];
+    if (myTurn) moveIndicatorText.push(`${ctrl.trans.noarg('itsYourTurn')}`);
+    else moveIndicatorText.push(`${ctrl.trans('waitingForOpponent')}.`);
+    if (!irrelevantPiecesNamesPerGameFamily.includes(ctrl.data.game.gameFamily))
+      moveIndicatorText.push(` ${ctrl.trans('youPlayPieces', gameData.player.playerName)}`);
   }
 
   if (position == side) {
