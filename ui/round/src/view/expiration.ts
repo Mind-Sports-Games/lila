@@ -51,13 +51,7 @@ export default function (ctrl: RoundController, position: Position): MaybeVNode 
   }
 
   const gameData = ctrl.data;
-  if (
-    isCol1() &&
-    moveIndicator &&
-    game.isPlayerPlaying(gameData) &&
-    !game.playerHasPlayedTurn(gameData) &&
-    !gameData.player.spectator
-  ) {
+  if (isCol1() && moveIndicator && game.isPlayerPlaying(gameData) && !game.playerHasPlayedTurn(gameData) && !gameData.player.spectator) {
     moveIndicatorText = myTurn
       ? [
           `${ctrl.trans('youPlayThePlayerIndexPieces', gameData.player.playerName)}.`,
