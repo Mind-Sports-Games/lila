@@ -2,21 +2,20 @@ import { h } from 'snabbdom';
 import { MaybeVNode, Position } from '../interfaces';
 import RoundController from '../ctrl';
 import * as round from '../round';
-import * as game from 'game';
-import isCol1 from 'common/isCol1';
+import { isPlayerTurn, playable } from 'game';
 
 let rang = false;
 
 export default function (ctrl: RoundController, position: Position): MaybeVNode {
   const moveIndicator = ctrl.data.pref.playerTurnIndicator;
-  const d = game.playable(ctrl.data) && (ctrl.data.expirationAtStart || ctrl.data.expirationOnPaused);
+  const d = playable(ctrl.data) && (ctrl.data.expirationAtStart || ctrl.data.expirationOnPaused);
   let timeLeft = 8000;
-  if ((!d && !moveIndicator) || !game.playable(ctrl.data)) return;
+  if ((!d && !moveIndicator) || !playable(ctrl.data)) return;
   if (d) {
     timeLeft = Math.max(0, d.updatedAt - Date.now() + d.millisToMove);
   }
   const secondsLeft = Math.floor(timeLeft / 1000),
-    myTurn = game.isPlayerTurn(ctrl.data),
+    myTurn = isPlayerTurn(ctrl.data),
     transStr =
       ctrl.data.expirationOnPaused && ctrl.data.deadStoneOfferState == 'ChooseFirstOffer'
         ? myTurn
@@ -48,19 +47,6 @@ export default function (ctrl: RoundController, position: Position): MaybeVNode 
       ctrl.clock.times.activePlayerIndex !== undefined &&
       ctrl.clock?.millisOf(ctrl.clock.times.activePlayerIndex) < 10000;
     moveIndicatorText = myTurn ? [ctrl.trans('yourTurn')] : [ctrl.trans('waitingForOpponent')];
-  }
-
-  const gameData = ctrl.data;
-  if (isCol1() && moveIndicator && game.isPlayerPlaying(gameData) && !game.playerHasPlayedTurn(gameData) && !gameData.player.spectator) {
-    moveIndicatorText = myTurn
-      ? [
-          `${ctrl.trans('youPlayThePlayerIndexPieces', gameData.player.playerName)}.`,
-          ` ${ctrl.trans.noarg('itsYourTurn')}`,
-        ]
-      : [
-          `${ctrl.trans('youPlayThePlayerIndexPieces', gameData.player.playerName)}.`,
-          ` ${ctrl.trans('waitingForOpponent')}`,
-        ];
   }
 
   if (position == side) {
