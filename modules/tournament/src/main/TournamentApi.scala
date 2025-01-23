@@ -57,12 +57,12 @@ final class TournamentApi(
     mode: play.api.Mode
 ) {
 
-  private val workQueue =
+  private def createWorkQueue(callerName: String) =
     new lila.hub.DuctSequencers(
       maxSize = 256,
       expiration = 1 minute,
       timeout = 10 seconds,
-      name = "tournament"
+      name = s"tournament-$callerName"
     )
 
   def get(id: Tournament.ID) = tournamentRepo byId id
@@ -197,7 +197,7 @@ final class TournamentApi(
   private[tournament] def makePairings(forTour: Tournament, users: WaitingUsers): Funit = {
     // TODO: Consider a cutoff? Don't pair people 10s before the medley is finished?
     (users.size >= forTour.minWaitingUsersForPairings && usersReady(forTour, users)) ??
-      Sequencing(forTour.id)(tournamentRepo.startedById) { tour =>
+      Sequencing(forTour.id, "makePairings")(tournamentRepo.startedById) { tour =>
         updatePlayerRatingCache(tour, tour.variant, users.all) >>
           updateBotRatingCache(tour, tour.variant) >>
           withdrawInactivePlayers(tour.id, users.all) >>
@@ -261,7 +261,7 @@ final class TournamentApi(
   }
 
   private[tournament] def start(oldTour: Tournament): Funit =
-    Sequencing(oldTour.id)(tournamentRepo.createdById) { tour =>
+    Sequencing(oldTour.id, "start")(tournamentRepo.createdById) { tour =>
       tournamentRepo.setStatus(tour.id, Status.Started) >>-
         socket.reload(tour.id) >>-
         publish()
@@ -273,7 +273,7 @@ final class TournamentApi(
       playerRepo.removeByTour(tour.id) >>- publish() >>- socket.reload(tour.id)
 
   private[tournament] def finish(oldTour: Tournament): Funit =
-    Sequencing(oldTour.id)(tournamentRepo.startedById) { tour =>
+    Sequencing(oldTour.id, "finish")(tournamentRepo.startedById) { tour =>
       pairingRepo count tour.id flatMap {
         case 0 => destroy(tour)
         case _ =>
@@ -411,7 +411,7 @@ final class TournamentApi(
       asLeader: Boolean,
       promise: Option[Promise[Tournament.JoinResult]]
   ): Funit =
-    Sequencing(tourId)(tournamentRepo.enterableById) { tour =>
+    Sequencing(tourId, "join")(tournamentRepo.enterableById) { tour =>
       playerRepo.exists(tour.id, me.id) flatMap { playerExists =>
         import Tournament.JoinResult
         val fuResult: Fu[JoinResult] =
@@ -503,7 +503,7 @@ final class TournamentApi(
     withdraw(tourId, userId, isPause = false, isStalling = true)
 
   private def withdraw(tourId: Tournament.ID, userId: User.ID, isPause: Boolean, isStalling: Boolean): Funit =
-    Sequencing(tourId)(tournamentRepo.enterableById) {
+    Sequencing(tourId, "withdraw")(tournamentRepo.enterableById) {
       case tour if tour.isCreated =>
         playerRepo.remove(tour.id, userId) >> updateNbPlayers(tour.id) >>- socket.reload(
           tour.id
@@ -534,7 +534,7 @@ final class TournamentApi(
     proxyRepo game gameId flatMap {
       _.filter(_.berserkable) ?? { game =>
         game.tournamentId ?? { tourId =>
-          Sequencing(tourId)(tournamentRepo.startedById) { tour =>
+          Sequencing(tourId, "berserk")(tournamentRepo.startedById) { tour =>
             pairingRepo.findPlaying(tour.id, userId) flatMap {
               case Some(pairing) if !pairing.berserkOf(userId) =>
                 (pairing playerIndexOf userId) ?? { playerIndex =>
@@ -551,7 +551,7 @@ final class TournamentApi(
 
   private[tournament] def finishGame(game: Game): Funit =
     game.tournamentId ?? { tourId =>
-      Sequencing(tourId)(tournamentRepo.startedById) { tour =>
+      Sequencing(tourId, "finishGame")(tournamentRepo.startedById) { tour =>
         pairingRepo.finish(game) >>
           game.userIds.map(updatePlayer(tour, game.variant, game.some)).sequenceFu.void >>- {
             duelStore.remove(game)
@@ -629,7 +629,7 @@ final class TournamentApi(
   private[tournament] def kickFromTeam(teamId: TeamID, userId: User.ID): Funit =
     tournamentRepo.withdrawableIds(userId, teamId = teamId.some) flatMap {
       _.map { tourId =>
-        Sequencing(tourId)(tournamentRepo.byId) { tour =>
+        Sequencing(tourId, "kickFromTeam")(tournamentRepo.byId) { tour =>
           val fu =
             if (tour.isCreated) playerRepo.remove(tour.id, userId)
             else playerRepo.withdraw(tour.id, userId)
@@ -640,7 +640,7 @@ final class TournamentApi(
 
   // withdraws the player and forfeits all pairings in ongoing tournaments
   private[tournament] def ejectLameFromEnterable(tourId: Tournament.ID, userId: User.ID): Funit =
-    Sequencing(tourId)(tournamentRepo.enterableById) { tour =>
+    Sequencing(tourId, "ejectLameFromEnterable")(tournamentRepo.enterableById) { tour =>
       playerRepo.withdraw(tourId, userId) >> {
         tour.isStarted ?? {
           pairingRepo.findPlaying(tour.id, userId).map {
@@ -679,7 +679,7 @@ final class TournamentApi(
       disqualify: Boolean,
       updateLeaderboard: Boolean
   ): Funit =
-    Sequencing(tourId)(tournamentRepo.finishedById) { tour =>
+    Sequencing(tourId, "ejectPlayerAndRewriteHistory")(tournamentRepo.finishedById) { tour =>
       ejectFromLeaderboard(tourId, userId, disqualify, updateLeaderboard) >>
         ejectPlayer(tourId, userId, disqualify) >> {
           tour.winnerId.contains(userId) ?? {
@@ -913,9 +913,10 @@ final class TournamentApi(
       }
 
   private def Sequencing(
-      tourId: Tournament.ID
+      tourId: Tournament.ID,
+      callerName: String = "noname"
   )(fetch: Tournament.ID => Fu[Option[Tournament]])(run: Tournament => Funit): Funit =
-    workQueue(tourId) {
+    createWorkQueue(callerName)(tourId) {
       fetch(tourId) flatMap {
         _ ?? run
       }

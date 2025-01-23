@@ -26,7 +26,7 @@ on:
 
 jobs:
   assets:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     steps:
       - name: Check if organization member
         id: check_org_member
