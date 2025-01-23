@@ -1,9 +1,9 @@
 import { h } from 'snabbdom';
+import isCol1 from 'common/isCol1';
 import { MaybeVNode, Position } from '../interfaces';
 import RoundController from '../ctrl';
 import * as round from '../round';
 import * as game from 'game';
-import isCol1 from 'common/isCol1';
 
 let rang = false;
 
@@ -37,6 +37,7 @@ export default function (ctrl: RoundController, position: Position): MaybeVNode 
   }
   const side = myTurn != ctrl.flip ? 'bottom' : 'top';
   let moveIndicatorText = ctrl.trans.vdomPlural(transStr, secondsLeft, h('strong', '' + secondsLeft));
+  if (isCol1() && !RoundController.irrelevantPiecesNamesPerGameFamily.includes(ctrl.data.game.gameFamily)) moveIndicatorText.push(`. ${ctrl.trans('youPlayPieces', ctrl.data.player.playerName)}`);
 
   if (
     moveIndicator &&
@@ -52,21 +53,17 @@ export default function (ctrl: RoundController, position: Position): MaybeVNode 
 
   const gameData = ctrl.data;
   if (
+    !d &&
     isCol1() &&
     moveIndicator &&
     game.isPlayerPlaying(gameData) &&
     !game.playerHasPlayedTurn(gameData) &&
     !gameData.player.spectator
   ) {
-    moveIndicatorText = myTurn
-      ? [
-          `${ctrl.trans('youPlayThePlayerIndexPieces', gameData.player.playerName)}.`,
-          ` ${ctrl.trans.noarg('itsYourTurn')}`,
-        ]
-      : [
-          `${ctrl.trans('youPlayThePlayerIndexPieces', gameData.player.playerName)}.`,
-          ` ${ctrl.trans('waitingForOpponent')}`,
-        ];
+    moveIndicatorText = [];
+    if(myTurn) moveIndicatorText.push(` ${ctrl.trans.noarg('itsYourTurn')} `)
+    else moveIndicatorText.push(` ${ctrl.trans('waitingForOpponent')}. `)
+    if (!RoundController.irrelevantPiecesNamesPerGameFamily.includes(ctrl.data.game.gameFamily)) moveIndicatorText.push( `${ctrl.trans('youPlayPieces', gameData.player.playerName)}` )
   }
 
   if (position == side) {
