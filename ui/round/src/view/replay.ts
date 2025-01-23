@@ -9,7 +9,7 @@ import throttle from 'common/throttle';
 import viewStatus from 'game/view/status';
 import { game as gameRoute } from 'game/router';
 import { h, VNode } from 'snabbdom';
-import { Step, MaybeVNodes, RoundData } from '../interfaces';
+import { Step, MaybeVNodes } from '../interfaces';
 import { NotationStyle, notationStyle } from 'stratutils';
 import { moveFromNotationStyle, combinedNotationForBackgammonActions } from 'common/notation';
 
@@ -249,12 +249,13 @@ function renderButtons(ctrl: RoundController) {
   );
 }
 
-function initMessage(d: RoundData, ply: number, trans: Trans) {
-  return game.isPlayerPlaying(d) && !game.playerHasPlayedTurn(d) && ply == ply
+function initMessage(ctrl: RoundController) {
+  const d = ctrl.data;
+  return !isCol1() && game.isPlayerPlaying(d) && !game.playerHasPlayedTurn(d) && !d.player.spectator
     ? h('div.message', util.justIcon(''), [
         h('div', [
-          trans('youPlayThePlayerIndexPieces', d.player.playerName),
-          ...(game.isPlayerTurn(d) ? [h('br'), h('strong', trans.noarg('itsYourTurn'))] : []),
+          ctrl.trans('youPlayThePlayerIndexPieces', d.player.playerName),
+          ...(game.isPlayerTurn(d) ? [h('br'), h('strong', ctrl.trans.noarg('itsYourTurn'))] : []),
         ]),
       ])
     : null;
@@ -317,6 +318,6 @@ export function render(ctrl: RoundController): VNode | undefined {
               ])
             : moves
           : renderResult(ctrl),
-        initMessage(d, ctrl.ply, ctrl.trans),
+        initMessage(ctrl),
       ]);
 }
