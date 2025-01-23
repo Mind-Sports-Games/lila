@@ -40,7 +40,6 @@
   <string name="whiteIsVictorious">White is victorious</string>
   <string name="blackIsVictorious">Black is victorious</string>
   <string name="promotion">Promotion</string>
-  <string name="youPlayPieces">You play %s</string>
   <string name="youPlayThePlayerIndexPieces">You play the %s pieces</string>
   <string name="youPlayTheWhitePieces">You play the white pieces</string>
   <string name="youPlayTheBlackPieces">You play the black pieces</string>

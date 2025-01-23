@@ -23,7 +23,6 @@
   <string name="playerIndexIsVictorious">Victoire des %s</string>
   <string name="whiteIsVictorious">Victoire des Blancs</string>
   <string name="blackIsVictorious">Victoire des Noirs</string>
-  <string name="youPlayPieces">Vous jouez %s</string>
   <string name="youPlayThePlayerIndexPieces">Vous jouez les %s</string>
   <string name="youPlayTheWhitePieces">Vous jouez les Blancs</string>
   <string name="youPlayTheBlackPieces">Vous jouez les Noirs</string>
