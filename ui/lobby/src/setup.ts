@@ -842,6 +842,7 @@ export default class Setup {
         $goConfig.toggle(variantId[0] == '9');
         //TODO change back when playing with friend is allowed for Backgammon multipoint
         $backgammonConfig.toggle(false);
+        $backgammonPointsInput.val('1'); //remove along with above
         //$backgammonConfig.toggle(variantId[0] == '10');
         if (isFen) {
           $casual.trigger('click');
