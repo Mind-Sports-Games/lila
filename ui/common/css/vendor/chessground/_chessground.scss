@@ -1235,6 +1235,9 @@ cg-container .cg-custom-svgs svg {
     cube {
       background-size: cover;
       width: 100%;
+      &.unavailable {
+        opacity: 0.35;
+      }
       .backgammon-classic & {
         &.one {
           background-image: url(../images/board/backgammon/svg/blue_d_cube_one.svg);
