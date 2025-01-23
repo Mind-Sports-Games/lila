@@ -62,10 +62,10 @@ export default function (ctrl: RoundController, position: Position): MaybeVNode 
     !gameData.player.spectator
   ) {
     moveIndicatorText = [];
-    if (myTurn) moveIndicatorText.push(` ${ctrl.trans.noarg('itsYourTurn')} `);
-    else moveIndicatorText.push(` ${ctrl.trans('waitingForOpponent')}. `);
+    if (myTurn) moveIndicatorText.push(`${ctrl.trans.noarg('itsYourTurn')}`);
+    else moveIndicatorText.push(`${ctrl.trans('waitingForOpponent')}`);
     if (!RoundController.irrelevantPiecesNamesPerGameFamily.includes(ctrl.data.game.gameFamily))
-      moveIndicatorText.push(`${ctrl.trans('youPlayPieces', gameData.player.playerName)}`);
+      moveIndicatorText.push(`. ${ctrl.trans('youPlayPieces', gameData.player.playerName)}`);
   }
 
   if (position == side) {
