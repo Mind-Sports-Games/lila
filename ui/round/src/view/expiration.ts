@@ -37,8 +37,7 @@ export default function (ctrl: RoundController, position: Position): MaybeVNode 
   }
   const side = myTurn != ctrl.flip ? 'bottom' : 'top';
   let moveIndicatorText = ctrl.trans.vdomPlural(transStr, secondsLeft, h('strong', '' + secondsLeft));
-  if (isCol1() && !RoundController.irrelevantPiecesNamesPerGameFamily.includes(ctrl.data.game.gameFamily))
-    moveIndicatorText.push(`. ${ctrl.trans('youPlayPieces', ctrl.data.player.playerName)}`);
+  if (isCol1() && !RoundController.irrelevantPiecesNamesPerGameFamily.includes(ctrl.data.game.gameFamily)) moveIndicatorText.push(`. ${ctrl.trans('youPlayPieces', ctrl.data.player.playerName)}`);
 
   if (
     moveIndicator &&
@@ -62,10 +61,9 @@ export default function (ctrl: RoundController, position: Position): MaybeVNode 
     !gameData.player.spectator
   ) {
     moveIndicatorText = [];
-    if (myTurn) moveIndicatorText.push(` ${ctrl.trans.noarg('itsYourTurn')} `);
-    else moveIndicatorText.push(` ${ctrl.trans('waitingForOpponent')}. `);
-    if (!RoundController.irrelevantPiecesNamesPerGameFamily.includes(ctrl.data.game.gameFamily))
-      moveIndicatorText.push(`${ctrl.trans('youPlayPieces', gameData.player.playerName)}`);
+    if(myTurn) moveIndicatorText.push(` ${ctrl.trans.noarg('itsYourTurn')} `)
+    else moveIndicatorText.push(` ${ctrl.trans('waitingForOpponent')}. `)
+    if (!RoundController.irrelevantPiecesNamesPerGameFamily.includes(ctrl.data.game.gameFamily)) moveIndicatorText.push( `${ctrl.trans('youPlayPieces', gameData.player.playerName)}` )
   }
 
   if (position == side) {

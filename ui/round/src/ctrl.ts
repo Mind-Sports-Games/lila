@@ -175,8 +175,8 @@ export default class RoundController {
   }
 
   static irrelevantPiecesNamesPerGameFamily = [
-    'togyzkumalak', // "Bastaushi", "Kostaushi"
-    'oware', // "South", "North"
+    "togyzkumalak", // "Bastaushi", "Kostaushi"
+    "oware" // "South", "North"
   ];
 
   private showExpiration = () => {
