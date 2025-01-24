@@ -65,11 +65,11 @@ private object SwissSheet {
             pairing.status match {
               case Left(_) => List(Ongoing)
               case Right(None) =>
-                if (swiss.settings.isMatchScore || swiss.settings.isMultiPoint)
+                if (swiss.settings.isMatchScore)
                   outcomeListFromMultiMatch(player, pairing)
                 else List(Draw)
               case Right(Some(playerIndex)) =>
-                if (swiss.settings.isMatchScore || swiss.settings.isMultiPoint) {
+                if (swiss.settings.isMatchScore) {
                   outcomeListFromMultiMatch(player, pairing)
                 } else if (pairing(playerIndex) == player.userId) List(Win)
                 else List(Loss)
