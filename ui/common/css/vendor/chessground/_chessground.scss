@@ -73,10 +73,6 @@ span.mini-game.variant-togyzkumalak.is2d {
 }
 
 //main board - alter non-square boards
-.is2d .variant-xiangqi {
-  width: calc(100% * 10 / 11);
-  margin-right: calc(100% / 11);
-}
 .is2d .variant-bestemshe {
   width: calc(100% * 48 / 49);
   margin-right: calc(100% / 49);

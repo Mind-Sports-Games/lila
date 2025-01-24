@@ -227,7 +227,7 @@ export default class LobbyController {
   // also handles onboardink link for anon users
   private joinPoolFromLocationHash() {
     if (location.hash.startsWith('#pool/')) {
-      const regex = /^#pool\/(\d+\+\d+-[A-Za-z]+)(?:\/(.+))?$/,
+      const regex = /^#pool\/(\d+[\+d\-]\d+-[A-Za-z]+)(?:\/(.+))?$/,
         match = regex.exec(location.hash),
         member: any = { id: match![1], blocking: match![2] },
         range = poolRangeStorage.get(member.id);

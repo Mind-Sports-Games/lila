@@ -124,6 +124,7 @@ object jsI18n {
     trans.gameOver,
     trans.analysis,
     trans.yourOpponentWantsToPlayANewGameWithYou,
+    trans.youPlayPieces,
     trans.youPlayThePlayerIndexPieces,
     trans.itsYourTurn
   ).map(_.key)

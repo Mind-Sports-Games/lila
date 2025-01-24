@@ -193,14 +193,8 @@ final private class SwissFields(form: Form[_], swiss: Option[Swiss])(implicit ct
           trans.mcmahonDefinition.txt(),
           br,
           a(href := s"${routes.Swiss.home}#mcmahon", target := "_blank")("More detail here")
-        ).some,
-        disabled = disabledAfterStart
-      ),
-      st.input(
-        tpe := "hidden",
-        st.name := form("mcmahon").name,
-        value := "false"
-      ) // hack allow disabling mcmahon
+        ).some
+      )
     )
   def mcmahonCutoff =
     form3.group(
@@ -221,14 +215,8 @@ final private class SwissFields(form: Form[_], swiss: Option[Swiss])(implicit ct
           trans.handicappedDefinition.txt(),
           br,
           a(href := routes.Page.loneBookmark("handicaps"), target := "_blank")("More detail here")
-        ).some,
-        disabled = disabledAfterStart
-      ),
-      st.input(
-        tpe := "hidden",
-        st.name := form("handicapped").name,
-        value := "false"
-      ) // hack allow disabling handicapped
+        ).some
+      )
     )
   def inputPlayerRatings =
     form3.group(

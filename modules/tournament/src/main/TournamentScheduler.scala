@@ -306,6 +306,7 @@ final private class TournamentScheduler(
       (nextTuesday, 2),
       (nextTuesday, 5),
       (nextTuesday, 8),
+      (nextTuesday, 11),
       (nextTuesday, 14),
       (nextTuesday, 16),
       (nextTuesday, 20),
@@ -365,6 +366,7 @@ final private class TournamentScheduler(
       (Variant.Chess(strategygames.chess.variant.Horde), Blitz32),
       (Variant.Togyzkumalak(strategygames.togyzkumalak.variant.Bestemshe), Blitz32),
       (Variant.FairySF(strategygames.fairysf.variant.MiniBreakthroughTroyka), Blitz32),
+      (Variant.Abalone(strategygames.abalone.variant.Abalone), Blitz53),
       (Variant.Draughts(strategygames.draughts.variant.Portuguese), Blitz32),
       (Variant.Samurai(strategygames.samurai.variant.Oware), Blitz32),
       (Variant.Chess(strategygames.chess.variant.Antichess), Blitz32),
@@ -552,12 +554,15 @@ final private class TournamentScheduler(
       ),
       scheduleYearly24hr(Variant.Togyzkumalak(strategygames.togyzkumalak.variant.Bestemshe), Blitz32)(
         new DateTime(2025, 10, 31, 0, 0)
+      ),
+      scheduleYearly24hr(Variant.Abalone(strategygames.abalone.variant.Abalone), Blitz53)(
+        new DateTime(2025, 11, 7, 0, 0)
       )
       //Fri 26th is the end of year medley
     ).flatten filter { _.schedule.at isAfter rightNow }
 
     //order matters for pruning weekly/yearly tournaments
-    yearly2025Tournaments :::
+    // yearly2025Tournaments ::: // after a tournament was created in db, no need to keep it here.
       thisWeekMedleyShields :::
       nextWeekMedleyShields :::
       thisMonthMedleyShields :::
