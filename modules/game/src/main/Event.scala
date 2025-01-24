@@ -7,6 +7,8 @@ import strategygames.{
   ByoyomiClock,
   Centis,
   Clock => StratClock,
+  CubeAction => StratCubeAction,
+  CubeInteraction,
   Drop => StratDrop,
   GameFamily,
   GameLogic,
@@ -72,6 +74,7 @@ object Event {
         possibleDrops: Option[List[Pos]],
         possibleDropsByRole: Option[Map[Role, List[Pos]]],
         possibleLifts: Option[List[Pos]],
+        possibleCubeActions: Option[List[CubeInteraction]],
         forcedAction: Option[String],
         pocketData: Option[PocketData],
         couldNextActionEndTurn: Option[Boolean] = None,
@@ -79,14 +82,17 @@ object Event {
     )(extra: JsObject) = {
       extra ++ Json
         .obj(
-          "fen"                 -> fen,
-          "ply"                 -> state.plies,
-          "turnCount"           -> state.turnCount,
-          "dests"               -> PossibleMoves.oldJson(possibleMoves),
-          "captLen"             -> ~captLen,
-          "gf"                  -> gf.id,
-          "dropsByRole"         -> PossibleDropsByRole.json(possibleDropsByRole.getOrElse(Map.empty)),
-          "lifts"               -> possibleLifts.map { squares => JsString(squares.map(_.key).mkString) },
+          "fen"         -> fen,
+          "ply"         -> state.plies,
+          "turnCount"   -> state.turnCount,
+          "dests"       -> PossibleMoves.oldJson(possibleMoves),
+          "captLen"     -> ~captLen,
+          "gf"          -> gf.id,
+          "dropsByRole" -> PossibleDropsByRole.json(possibleDropsByRole.getOrElse(Map.empty)),
+          "lifts"       -> possibleLifts.map { squares => JsString(squares.map(_.key).mkString) },
+          "cubeActions" -> possibleCubeActions.map { interactions =>
+            JsString(interactions.map(_.name).mkString(","))
+          },
           "multiActionMetaData" -> couldNextActionEndTurn.map(b => Json.obj("couldNextActionEndTurn" -> b))
         )
         .add("clock" -> clock.map(_.data))
@@ -131,6 +137,7 @@ object Event {
       possibleDrops: Option[List[Pos]],
       possibleDropsByRole: Option[Map[Role, List[Pos]]],
       possibleLifts: Option[List[Pos]],
+      possibleCubeActions: Option[List[CubeInteraction]],
       forcedAction: Option[String],
       pocketData: Option[PocketData],
       couldNextActionEndTurn: Option[Boolean],
@@ -154,6 +161,7 @@ object Event {
         possibleDrops,
         possibleDropsByRole,
         possibleLifts,
+        possibleCubeActions,
         forcedAction,
         pocketData,
         couldNextActionEndTurn,
@@ -244,6 +252,10 @@ object Event {
           case (Situation.Backgammon(_)) => Some(situation.lifts.map(_.pos))
           case _                         => None
         },
+        possibleCubeActions = situation match {
+          case (Situation.Backgammon(_)) => Some(situation.cubeActions.map(_.interaction))
+          case _                         => None
+        },
         forcedAction = situation.forcedAction.map(_.toUci.uci),
         pocketData = pocketData,
         // TODO future multiaction games may not end turn on the same action, and this will need to be fixed
@@ -284,6 +296,7 @@ object Event {
       possibleDrops: Option[List[Pos]],
       possibleDropsByRole: Option[Map[Role, List[Pos]]],
       possibleLifts: Option[List[Pos]],
+      possibleCubeActions: Option[List[CubeInteraction]],
       forcedAction: Option[String],
       couldNextActionEndTurn: Option[Boolean]
   ) extends Event {
@@ -305,6 +318,7 @@ object Event {
         possibleDrops,
         possibleDropsByRole,
         possibleLifts,
+        possibleCubeActions,
         forcedAction,
         pocketData,
         couldNextActionEndTurn
@@ -352,6 +366,10 @@ object Event {
           case (Situation.Backgammon(_)) => Some(situation.lifts.map(_.pos))
           case _                         => None
         },
+        possibleCubeActions = situation match {
+          case (Situation.Backgammon(_)) => Some(situation.cubeActions.map(_.interaction))
+          case _                         => None
+        },
         forcedAction = situation.forcedAction.map(_.toUci.uci),
         pocketData = pocketData,
         // TODO future multiaction games may not end turn on the same action, and this will need to be fixed
@@ -383,6 +401,7 @@ object Event {
       possibleDrops: Option[List[Pos]],
       possibleDropsByRole: Option[Map[Role, List[Pos]]],
       possibleLifts: Option[List[Pos]],
+      possibleCubeActions: Option[List[CubeInteraction]],
       forcedAction: Option[String],
       couldNextActionEndTurn: Option[Boolean]
   ) extends Event {
@@ -404,6 +423,7 @@ object Event {
         possibleDrops,
         possibleDropsByRole,
         possibleLifts,
+        possibleCubeActions,
         forcedAction,
         pocketData,
         couldNextActionEndTurn
@@ -452,6 +472,10 @@ object Event {
           case (Situation.Backgammon(_)) => Some(situation.lifts.map(_.pos))
           case _                         => None
         },
+        possibleCubeActions = situation match {
+          case (Situation.Backgammon(_)) => Some(situation.cubeActions.map(_.interaction))
+          case _                         => None
+        },
         forcedAction = situation.forcedAction.map(_.toUci.uci),
         pocketData = pocketData,
         //TODO future multiaction games may not end turn on the same action, and this will need to be fixed
@@ -482,6 +506,7 @@ object Event {
       possibleDrops: Option[List[Pos]],
       possibleDropsByRole: Option[Map[Role, List[Pos]]],
       possibleLifts: Option[List[Pos]],
+      possibleCubeActions: Option[List[CubeInteraction]],
       forcedAction: Option[String]
   ) extends Event {
     def typ = "endturn"
@@ -502,6 +527,7 @@ object Event {
         possibleDrops,
         possibleDropsByRole,
         possibleLifts,
+        possibleCubeActions,
         forcedAction,
         pocketData
       ) {
@@ -549,6 +575,10 @@ object Event {
           case (Situation.Backgammon(_)) => Some(situation.lifts.map(_.pos))
           case _                         => None
         },
+        possibleCubeActions = situation match {
+          case (Situation.Backgammon(_)) => Some(situation.cubeActions.map(_.interaction))
+          case _                         => None
+        },
         forcedAction = situation.forcedAction.map(_.toUci.uci),
         pocketData = pocketData
       )
@@ -575,6 +605,7 @@ object Event {
       possibleDrops: Option[List[Pos]],
       possibleDropsByRole: Option[Map[Role, List[Pos]]],
       possibleLifts: Option[List[Pos]],
+      possibleCubeActions: Option[List[CubeInteraction]],
       forcedAction: Option[String]
   ) extends Event {
     def typ = "pass"
@@ -595,6 +626,7 @@ object Event {
         possibleDrops,
         possibleDropsByRole,
         possibleLifts,
+        possibleCubeActions,
         forcedAction,
         pocketData
       ) {
@@ -643,6 +675,10 @@ object Event {
           case (Situation.Backgammon(_)) => Some(situation.lifts.map(_.pos))
           case _                         => None
         },
+        possibleCubeActions = situation match {
+          case (Situation.Backgammon(_)) => Some(situation.cubeActions.map(_.interaction))
+          case _                         => None
+        },
         forcedAction = situation.forcedAction.map(_.toUci.uci),
         pocketData = pocketData
       )
@@ -667,6 +703,7 @@ object Event {
       possibleDrops: Option[List[Pos]],
       possibleDropsByRole: Option[Map[Role, List[Pos]]],
       possibleLifts: Option[List[Pos]],
+      possibleCubeActions: Option[List[CubeInteraction]],
       forcedAction: Option[String]
   ) extends Event {
     def typ = "selectSquares"
@@ -687,6 +724,7 @@ object Event {
         possibleDrops,
         possibleDropsByRole,
         possibleLifts,
+        possibleCubeActions,
         forcedAction,
         pocketData
       ) {
@@ -728,6 +766,10 @@ object Event {
           case (Situation.Backgammon(_)) => Some(situation.lifts.map(_.pos))
           case _                         => None
         },
+        possibleCubeActions = situation match {
+          case (Situation.Backgammon(_)) => Some(situation.cubeActions.map(_.interaction))
+          case _                         => None
+        },
         forcedAction = situation.forcedAction.map(_.toUci.uci),
         pocketData = pocketData
       )
@@ -752,6 +794,7 @@ object Event {
       possibleDrops: Option[List[Pos]],
       possibleDropsByRole: Option[Map[Role, List[Pos]]],
       possibleLifts: Option[List[Pos]],
+      possibleCubeActions: Option[List[CubeInteraction]],
       forcedAction: Option[String]
   ) extends Event {
     def typ = "diceroll"
@@ -772,6 +815,7 @@ object Event {
         possibleDrops,
         possibleDropsByRole,
         possibleLifts,
+        possibleCubeActions,
         forcedAction,
         pocketData
       ) {
@@ -819,6 +863,107 @@ object Event {
           case (Situation.Backgammon(_)) => Some(situation.lifts.map(_.pos))
           case _                         => None
         },
+        possibleCubeActions = situation match {
+          case (Situation.Backgammon(_)) => Some(situation.cubeActions.map(_.interaction))
+          case _                         => None
+        },
+        forcedAction = situation.forcedAction.map(_.toUci.uci),
+        pocketData = pocketData
+      )
+  }
+
+  case class CubeAction(
+      gf: GameFamily,
+      interaction: CubeInteraction,
+      san: String,
+      fen: String,
+      check: Boolean,
+      threefold: Boolean,
+      perpetualWarning: Boolean,
+      takebackable: Boolean,
+      canOnlyRollDice: Boolean,
+      canEndTurn: Boolean,
+      canUndo: Boolean,
+      state: State,
+      clock: Option[ClockEvent],
+      possibleMoves: Map[Pos, List[Pos]],
+      pocketData: Option[PocketData],
+      possibleDrops: Option[List[Pos]],
+      possibleDropsByRole: Option[Map[Role, List[Pos]]],
+      possibleLifts: Option[List[Pos]],
+      possibleCubeActions: Option[List[CubeInteraction]],
+      forcedAction: Option[String]
+  ) extends Event {
+    def typ = "cubeaction"
+    def data =
+      Action.data(
+        gf,
+        fen,
+        check,
+        threefold,
+        perpetualWarning,
+        takebackable,
+        canOnlyRollDice,
+        canEndTurn,
+        canUndo,
+        state,
+        clock,
+        possibleMoves,
+        possibleDrops,
+        possibleDropsByRole,
+        possibleLifts,
+        possibleCubeActions,
+        forcedAction,
+        pocketData
+      ) {
+        Json.obj(
+          "uci" -> s"cube${interaction.char}",
+          "san" -> san
+        )
+      }
+    override def moveBy = Some(!state.playerIndex)
+  }
+  object CubeAction {
+    def apply(
+        ca: StratCubeAction,
+        situation: Situation,
+        state: State,
+        clock: Option[ClockEvent],
+        pocketData: Option[PocketData]
+    ): CubeAction =
+      CubeAction(
+        gf = situation.board.variant.gameFamily,
+        interaction = ca.interaction,
+        san = s"cube${ca.interaction.char}",
+        fen = Forsyth.>>(situation.board.variant.gameLogic, situation).value,
+        check = situation.check,
+        threefold = situation.threefoldRepetition,
+        perpetualWarning = situation.perpetualPossible,
+        takebackable = situation.takebackable,
+        canOnlyRollDice = situation.canOnlyRollDice,
+        canEndTurn = situation.canEndTurn,
+        canUndo = situation.canUndo,
+        state = state,
+        clock = clock,
+        possibleMoves = situation.destinations,
+        possibleDrops = situation.drops,
+        possibleDropsByRole = situation match {
+          case (Situation.FairySF(_)) =>
+            situation.dropsByRole
+          case (Situation.Go(_)) =>
+            situation.dropsByRole
+          case (Situation.Backgammon(_)) =>
+            situation.dropsByRole
+          case _ => None
+        },
+        possibleLifts = situation match {
+          case (Situation.Backgammon(_)) => Some(situation.lifts.map(_.pos))
+          case _                         => None
+        },
+        possibleCubeActions = situation match {
+          case (Situation.Backgammon(_)) => Some(situation.cubeActions.map(_.interaction))
+          case _                         => None
+        },
         forcedAction = situation.forcedAction.map(_.toUci.uci),
         pocketData = pocketData
       )
@@ -842,6 +987,7 @@ object Event {
       possibleDrops: Option[List[Pos]],
       possibleDropsByRole: Option[Map[Role, List[Pos]]],
       possibleLifts: Option[List[Pos]],
+      possibleCubeActions: Option[List[CubeInteraction]],
       forcedAction: Option[String]
   ) extends Event {
     def typ = "undo"
@@ -862,6 +1008,7 @@ object Event {
         possibleDrops,
         possibleDropsByRole,
         possibleLifts,
+        possibleCubeActions,
         forcedAction,
         pocketData
       ) {
@@ -907,6 +1054,10 @@ object Event {
         },
         possibleLifts = situation match {
           case (Situation.Backgammon(_)) => Some(situation.lifts.map(_.pos))
+          case _                         => None
+        },
+        possibleCubeActions = situation match {
+          case (Situation.Backgammon(_)) => Some(situation.cubeActions.map(_.interaction))
           case _                         => None
         },
         forcedAction = situation.forcedAction.map(_.toUci.uci),

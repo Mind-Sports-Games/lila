@@ -182,16 +182,17 @@ object SwissJson {
   private def swissJsonBase(swiss: Swiss)(implicit lang: Lang = lila.i18n.defaultLang) =
     Json
       .obj(
-        "id"            -> swiss.id.value,
-        "createdBy"     -> swiss.createdBy,
-        "startsAt"      -> formatDate(swiss.startsAt),
-        "name"          -> swiss.name,
-        "clock"         -> swiss.clock,
-        "variant"       -> swiss.variant.key,
-        "isMedley"      -> swiss.isMedley,
-        "isMcMahon"     -> swiss.settings.mcmahon,
-        "mcmahonCutoff" -> swiss.settings.mcmahonCutoff,
-        "isHandicapped" -> swiss.settings.handicapped,
+        "id"               -> swiss.id.value,
+        "createdBy"        -> swiss.createdBy,
+        "startsAt"         -> formatDate(swiss.startsAt),
+        "name"             -> swiss.name,
+        "clock"            -> swiss.clock,
+        "variant"          -> swiss.variant.key,
+        "isMedley"         -> swiss.isMedley,
+        "isMcMahon"        -> swiss.settings.mcmahon,
+        "mcmahonCutoff"    -> swiss.settings.mcmahonCutoff,
+        "isHandicapped"    -> swiss.settings.handicapped,
+        "backgammonPoints" -> swiss.settings.backgammonPoints,
         "p1Name" -> (if (swiss.isMedley || swiss.variant.recalcStartPlayerForStats) trans.p1.txt()
                      else swiss.variant.playerNames(P1)),
         "p2Name" -> (if (swiss.isMedley || swiss.variant.recalcStartPlayerForStats) trans.p2.txt()

@@ -60,7 +60,8 @@ export const uci2move = (uci: string): cg.Key[] | undefined => {
     uci == 'endturn' ||
     uci == 'undo' ||
     uci.includes('/') ||
-    uci.substring(0, 3) == 'ss:'
+    uci.substring(0, 3) == 'ss:' ||
+    uci.substring(0, 4) == 'cube'
   )
     return undefined;
   const pos = uci.match(/[a-z][1-9][0-9]?/g) as cg.Key[];

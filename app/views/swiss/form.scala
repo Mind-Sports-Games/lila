@@ -30,6 +30,7 @@ object form {
             form3.split(fields.rated, fields.variant),
             form3.split(fields.mcmahon, fields.mcmahonCutoff),
             form3.split(fields.handicapped, fields.inputPlayerRatings),
+            fields.backgammonPoints,
             fields.xGamesChoiceRow1,
             fields.xGamesChoiceRow2,
             form3.split(fields.drawTables, fields.perPairingDrawTables),
@@ -79,6 +80,7 @@ object form {
             form3.split(fields.rated, fields.variant),
             form3.split(fields.mcmahon, fields.mcmahonCutoff),
             form3.split(fields.handicapped, fields.inputPlayerRatings),
+            fields.backgammonPoints,
             fields.xGamesChoiceRow1,
             fields.xGamesChoiceRow2,
             form3.split(fields.drawTables, fields.perPairingDrawTables),
@@ -185,6 +187,7 @@ final private class SwissFields(form: Form[_], swiss: Option[Swiss])(implicit ct
       form3.checkbox(
         form("mcmahon.mcmahon"),
         trans.mcmahon(),
+        klass = "mcmahon",
         half = true,
         help = frag(
           trans.mcmahonDefinition.txt(),
@@ -204,8 +207,9 @@ final private class SwissFields(form: Form[_], swiss: Option[Swiss])(implicit ct
   def handicapped =
     frag(
       form3.checkbox(
-        form("handicaps.handicapped"),
+        form("variantSettings.handicaps.handicapped"),
         trans.handicapped(),
+        klass = "handicapped",
         half = true,
         help = frag(
           trans.handicappedDefinition.txt(),
@@ -216,7 +220,7 @@ final private class SwissFields(form: Form[_], swiss: Option[Swiss])(implicit ct
     )
   def inputPlayerRatings =
     form3.group(
-      form("handicaps.inputPlayerRatings"),
+      form("variantSettings.handicaps.inputPlayerRatings"),
       frag("Input player ratings"),
       klass = "inputPlayerRatings",
       help = frag(
@@ -224,6 +228,16 @@ final private class SwissFields(form: Form[_], swiss: Option[Swiss])(implicit ct
       ).some,
       half = true
     )(form3.textarea(_)(rows := 4))
+  def backgammonPoints =
+    form3.group(
+      form("variantSettings.backgammonPoints"),
+      frag("Points"),
+      klass = "backgammonPoints",
+      half = true,
+      help = trans.backgammonPointsDefinition().some
+    )(
+      form3.select(_, SwissForm.backgammonPointsChoices)
+    )
   def matchScore =
     frag(
       form3.checkbox(

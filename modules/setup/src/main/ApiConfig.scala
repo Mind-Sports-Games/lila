@@ -10,6 +10,8 @@ import lila.lobby.PlayerIndex
 import lila.rating.PerfType
 import lila.common.Template
 
+import scala.util.Random
+
 final case class ApiConfig(
     variant: Variant,
     clock: Option[ClockConfig],
@@ -19,12 +21,19 @@ final case class ApiConfig(
     position: Option[FEN] = None,
     acceptByToken: Option[String] = None,
     message: Option[Template],
-    multiMatch: Boolean
+    multiMatch: Boolean,
+    backgammonPoints: Option[Int] = None
 ) {
 
   def perfType: Option[PerfType] = PerfPicker.perfType(Speed(clock), variant, days)
 
   def validFen = ApiConfig.validFen(variant, position)
+
+  def initialFen: Option[FEN] = position.flatMap(p =>
+    if (variant.initialFens.contains(p) && variant.initialFens.size > 1)
+      Random.shuffle(variant.initialFens).headOption
+    else Some(p)
+  )
 
   def validSpeed(isBot: Boolean) =
     !isBot || clock.fold(true) { c =>
@@ -39,6 +48,7 @@ final case class ApiConfig(
     if (variant == Variant.Chess(Standard) && position.exists(!_.initial))
       copy(variant = Variant.wrap(FromPosition))
     else this
+
 }
 
 object ApiConfig extends BaseHumanConfig {
@@ -57,7 +67,8 @@ object ApiConfig extends BaseHumanConfig {
       pos: Option[String],
       tok: Option[String],
       msg: Option[String],
-      mm: Option[Boolean]
+      mm: Option[Boolean],
+      bp: Option[Int]
   ) = {
     val variant = Variant.orDefault(~v)
     new ApiConfig(
@@ -69,7 +80,8 @@ object ApiConfig extends BaseHumanConfig {
       position = pos.map(f => FEN.apply(variant.gameLogic, f)),
       acceptByToken = tok,
       message = msg map Template,
-      multiMatch = ~mm
+      multiMatch = ~mm,
+      backgammonPoints = bp
     ).autoVariant
   }
 

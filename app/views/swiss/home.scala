@@ -75,7 +75,8 @@ object home {
                 s.clock.show,
                 " • ",
                 if (s.isMedley) trans.medley.txt()
-                else if (s.variant.exotic) VariantKeys.variantName(s.variant)
+                else if (s.variant.exotic)
+                  s.settings.backgammonPoints.fold("")(p => s"${p}pt ") + VariantKeys.variantName(s.variant)
                 else s.perfType.trans,
                 " • ",
                 if (s.settings.handicapped) trans.handicappedTournament()

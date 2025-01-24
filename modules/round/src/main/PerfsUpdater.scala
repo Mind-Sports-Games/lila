@@ -25,7 +25,7 @@ final class PerfsUpdater(
       case true => fuccess(none)
       case _ =>
         PerfPicker.main(game) ?? { mainPerf =>
-          (game.rated && game.finished && game.accountable && !p1.lame && !p2.lame) ?? {
+          (game.finished && game.updateRatingsOnFinish && !p1.lame && !p2.lame) ?? {
             val ratingsW = mkRatings(p1.perfs)
             val ratingsB = mkRatings(p2.perfs)
             game.ratingVariant match {

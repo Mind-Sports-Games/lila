@@ -20,7 +20,9 @@ private[game] case class Metadata(
     simulPairing: Option[Int] = None,
     timeOutUntil: Option[DateTime] = None,
     drawLimit: Option[Int] = None,
+    //extra match data
     multiMatch: Option[String] = None,
+    multiPointState: Option[MultiPointState] = None,
     fromHandicappedTournament: Boolean = false
 ) {
 

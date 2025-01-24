@@ -33,6 +33,7 @@ private object Mappings {
   val periods                  = number.verifying(HookConfig validatePeriods _)
   val goHandicap               = number.verifying(FriendConfig validateGoHandicap _)
   def goKomi(boardSize: Int)   = number.verifying(FriendConfig.validateGoKomi(boardSize)(_))
+  val backgammonPoints         = number.verifying(FriendConfig.validateBackgammonPoints _)
   val days                     = number(min = 1, max = 14)
   def timeMode                 = number.verifying(TimeMode.ids contains _)
   def mode(withRated: Boolean) = optional(rawMode(withRated))

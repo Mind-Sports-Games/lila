@@ -121,7 +121,8 @@ final class Setup(
                       },
                       destUser = destUser,
                       rematchOf = none,
-                      multiMatch = config.multiMatch
+                      multiMatch = config.multiMatch,
+                      backgammonPoints = config.backgammonPoints
                     )
                     env.challenge.api.create(challenge).flatMap {
                       case true =>

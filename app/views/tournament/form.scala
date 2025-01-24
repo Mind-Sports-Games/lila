@@ -269,8 +269,9 @@ final private class TourFields(form: Form[_], tour: Option[Tournament])(implicit
   def handicapped =
     frag(
       form3.checkbox(
-        form("handicaps.handicapped"),
+        form("variantSettings.handicaps.handicapped"),
         trans.handicapped(),
+        klass = "handicapped",
         half = true,
         help = frag(
           trans.handicappedDefinition.txt(),
@@ -286,7 +287,7 @@ final private class TourFields(form: Form[_], tour: Option[Tournament])(implicit
     )
   def inputPlayerRatings =
     form3.group(
-      form("handicaps.inputPlayerRatings"),
+      form("variantSettings.handicaps.inputPlayerRatings"),
       frag("Input player ratings"),
       klass = "inputPlayerRatings",
       help = frag(

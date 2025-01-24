@@ -125,8 +125,8 @@ trait Positional { self: Config =>
     case GameLogic.FairySF()      => true //no fromPosition yet
     case GameLogic.Samurai()      => true //no fromPosition yet
     case GameLogic.Togyzkumalak() => true //no fromPosition yet
-    case GameLogic.Go()           => true //using handicap and komi to set fen instead
-    case GameLogic.Backgammon()   => true //no fromPosition yet
+    case GameLogic.Go()           => true //using handicap and komi to set fen instead - but no from position
+    case GameLogic.Backgammon()   => true //randomly chooses start player and also sets multipoint in fen - but no from position
     case GameLogic.Abalone()      => true //no fromPosition yet
     case _ =>
       fen exists { f =>
@@ -278,4 +278,9 @@ trait BaseConfig {
   private def komiMin(bs: Int)               = -bs * bs * 10
   private def komiMax(bs: Int)               = bs * bs * 10
   def validateGoKomi(boardSize: Int)(i: Int) = i >= komiMin(boardSize) && i <= komiMax(boardSize)
+
+  private val pointsMin      = 1
+  private val pointsMax      = 31
+  def validateBackgammonPoints(i: Int) = i >= pointsMin && i <= pointsMax && i % 2 == 1
+
 }

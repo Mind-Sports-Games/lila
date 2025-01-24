@@ -171,6 +171,16 @@ private object bits {
       )
     )
 
+  def renderBackgammonOptions(form: Form[_])(implicit ctx: Context) =
+    div(cls := "backgammon_config optional_config")(
+      div(cls := "backgammon_points_choice range")(
+        trans.backgammonPoints(),
+        ": ",
+        span(form("backgammonPoints").value),
+        renderDissociatedRange(form("backgammonPoints"))
+      )
+    )
+
   def renderTimeMode(form: Form[_], allowAnon: Boolean)(implicit ctx: Context) =
     div(cls := "time_mode_config optional_config")(
       div(

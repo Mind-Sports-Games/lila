@@ -53,25 +53,27 @@ object SetupForm {
   def friend(ctx: UserContext) =
     Form(
       mapping(
-        "variant"     -> variant(Config.variantsWithFenAndVariants),
-        "fenVariant"  -> optional(draughtsFenVariants),
-        "timeMode"    -> timeMode,
-        "time"        -> time,
-        "increment"   -> increment,
-        "byoyomi"     -> byoyomi,
-        "periods"     -> periods,
-        "goHandicap"  -> goHandicap,
-        "goKomi"      -> goKomi(boardSize = 19),
-        "days"        -> days,
-        "mode"        -> mode(withRated = ctx.isAuth),
-        "playerIndex" -> playerIndex,
-        "fen"         -> fenField,
-        "multiMatch"  -> boolean
+        "variant"          -> variant(Config.variantsWithFenAndVariants),
+        "fenVariant"       -> optional(draughtsFenVariants),
+        "timeMode"         -> timeMode,
+        "time"             -> time,
+        "increment"        -> increment,
+        "byoyomi"          -> byoyomi,
+        "periods"          -> periods,
+        "goHandicap"       -> goHandicap,
+        "goKomi"           -> goKomi(boardSize = 19),
+        "backgammonPoints" -> optional(backgammonPoints),
+        "days"             -> days,
+        "mode"             -> mode(withRated = ctx.isAuth),
+        "playerIndex"      -> playerIndex,
+        "fen"              -> fenField,
+        "multiMatch"       -> boolean
       )(FriendConfig.from)(_.>>)
         .verifying("Invalid clock", _.validClock)
         .verifying("Invalid speed", _.validSpeed(ctx.me.exists(_.isBot)))
         .verifying("invalidFen", _.validFen)
         .verifying("Invalid Komi", _.validKomi)
+        .verifying("Invalid Points", _.validPoints)
     )
 
   def hookFilled(timeModeString: Option[String])(implicit ctx: UserContext): Form[HookConfig] =
@@ -192,13 +194,14 @@ object SetupForm {
         simpleDelayClock,
         bronsteinDelayClock,
         byoyomiClock,
-        "days"          -> optional(days),
-        "rated"         -> boolean,
-        "playerIndex"   -> optional(playerIndex),
-        "fen"           -> fenField,
-        "acceptByToken" -> optional(nonEmptyText),
-        "message"       -> message,
-        "multiMatch"    -> optional(boolean)
+        "days"             -> optional(days),
+        "rated"            -> boolean,
+        "playerIndex"      -> optional(playerIndex),
+        "fen"              -> fenField,
+        "acceptByToken"    -> optional(nonEmptyText),
+        "message"          -> message,
+        "multiMatch"       -> optional(boolean),
+        "backgammonPoints" -> optional(backgammonPoints)
       )(ApiConfig.from)(_ => none)
         .verifying("invalidFen", _.validFen)
         .verifying("can't be rated", _.validRated)
@@ -225,8 +228,9 @@ object SetupForm {
         simpleDelayClock,
         bronsteinDelayClock,
         byoyomiClock,
-        "rated" -> boolean,
-        "fen"   -> fenField
+        "rated"            -> boolean,
+        "fen"              -> fenField,
+        "backgammonPoints" -> optional(backgammonPoints)
       )(OpenConfig.from)(_ => none)
         .verifying("invalidFen", _.validFen)
         .verifying("rated without a clock", c => c.clock.isDefined || !c.rated)

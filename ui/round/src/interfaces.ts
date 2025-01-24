@@ -55,6 +55,11 @@ export interface SocketUndo {
   variant: string;
   b?: 1;
 }
+export interface SocketCubeAction {
+  interaction: string;
+  variant: string;
+  b?: 1;
+}
 export interface SocketEndTurn {
   variant: string;
   b?: 1;
@@ -79,6 +84,7 @@ export interface RoundData extends GameData {
   possibleDrops?: string;
   possibleDropsByRole?: string;
   possibleLifts?: string;
+  cubeActions?: string;
   multiActionMetaData?: MultiActionMetaData;
   selectMode: boolean;
   selectedSquares?: cg.Key[];
@@ -86,6 +92,7 @@ export interface RoundData extends GameData {
   calculatedCGGoScores?: cg.SimpleGoScores;
   deadStoneOfferState?: string;
   dice?: cg.Dice[];
+  doublingCube?: cg.DoublingCube;
   activeDiceValue?: number;
   canOnlyRollDice: boolean;
   canUndo: boolean;
@@ -189,6 +196,7 @@ export interface ApiAction extends Step {
   canEndTurn: boolean;
   forcedAction?: string;
   dice?: string;
+  cubeActions?: string;
   multiActionMetaData?: MultiActionMetaData;
   canSelectSquares?: boolean;
   deadStoneOfferState?: string;
