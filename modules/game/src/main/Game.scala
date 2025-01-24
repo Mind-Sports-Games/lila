@@ -731,11 +731,17 @@ case class Game(
   def outoftime(withGrace: Boolean): Boolean =
     if (isCorrespondence) outoftimeCorrespondence else outoftimeClock(withGrace)
 
+  private def canBeOutOfTime(c: ClockBase): Boolean =
+    if (metadata.multiPointState.map(_.maxPoints).getOrElse(0) > 0)
+      bothPlayersHaveMoved && !c.isRunning && !c.isPaused
+    else
+      !c.isRunning && !c.isPaused
+
   private def outoftimeClock(withGrace: Boolean): Boolean =
     clock ?? { c =>
       started && playable && (bothPlayersHaveMoved || isSimul || isSwiss || fromFriend || fromApi) && {
         c.outOfTime(turnPlayerIndex, withGrace) || {
-          !c.isRunning && !c.isPaused && c.clockPlayerExists(_.elapsed.centis > 0)
+          canBeOutOfTime(c) && c.clockPlayerExists(_.elapsed.centis > 0)
         }
       }
     }

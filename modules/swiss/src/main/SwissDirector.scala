@@ -156,6 +156,18 @@ final private class SwissDirector(
       }
       .monSuccess(_.swiss.startRound)
 
+  private def makeClock(swiss: Swiss, prevGame: Option[Game]) =
+    prevGame.fold(swiss.clock.toClock.some)(pg =>
+      if (pg.metadata.multiPointState.nonEmpty)
+        pg.clock.fold(swiss.clock.toClock.some)(pgc => {
+          swiss.clock.toClock
+            .giveTime(P1, -pgc.clockPlayer(P1).elapsed)
+            .giveTime(P2, -pgc.clockPlayer(P2).elapsed)
+            .some
+        })
+      else swiss.clock.toClock.some
+    )
+
   private[swiss] def makeGame(
       swiss: Swiss,
       players: Map[User.ID, SwissPlayer],
@@ -178,9 +190,7 @@ final private class SwissDirector(
         ) pipe { g =>
           val turns = g.player.fold(0, 1)
           g.copy(
-            clock = prevGame.fold(swiss.clock.toClock.some)(pg =>
-              if (pg.metadata.multiPointState.nonEmpty) pg.clock else swiss.clock.toClock.some
-            ),
+            clock = makeClock(swiss, prevGame),
             //Its ok to set all of these to turns - we're just saying we're starting at a non standard
             //place (if 1) and its all normal if 0. We don't necessarily know about how many turns/plies
             //made up the history of a position but it doesnt really matter
