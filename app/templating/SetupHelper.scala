@@ -104,6 +104,12 @@ trait SetupHelper { self: I18nHelper =>
     }
   }
 
+  val backgammonPointChoices: List[SelectChoice] = {
+    (1 to 31 by 2).toList map { s =>
+      (s.toString, s.toString, none)
+    }
+  }
+
   def translatedReasonChoices(implicit lang: Lang) =
     List(
       (Reason.Cheat.key, trans.cheat.txt()),

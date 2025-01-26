@@ -61,7 +61,8 @@ object side {
                           (if (game.variant == Variant.Chess(strategygames.chess.variant.KingOfTheHill))
                              VariantKeys.variantShortName(game.variant)
                            else VariantKeys.variantName(game.variant)).toUpperCase,
-                          initialFen = initialFen
+                          initialFen = initialFen,
+                          game.metadata.multiPointState.map(_.target)
                         )
                       else
                         VariantKeys.variantName(game.variant).toUpperCase
@@ -91,7 +92,8 @@ object side {
                           (if (game.variant == Variant.Chess(strategygames.chess.variant.KingOfTheHill))
                              VariantKeys.variantShortName(game.variant)
                            else VariantKeys.variantName(game.variant)).toUpperCase,
-                          initialFen = initialFen
+                          initialFen = initialFen,
+                          game.metadata.multiPointState.map(_.target)
                         )
                       else
                         game.perfType.map { pt =>
@@ -140,8 +142,9 @@ object side {
         },
         initialFen
           .ifTrue(
-            game.variant.key == "chess960" || game.variant.gameFamily == GameFamily
-              .Draughts() || game.variant.gameFamily == GameFamily.Go()
+            game.variant.key == "chess960" ||
+              game.variant.gameFamily == GameFamily.Draughts() ||
+              game.variant.gameFamily == GameFamily.Go()
           )
           .flatMap { fen =>
             (fen, game.variant) match {
@@ -197,11 +200,12 @@ object side {
           )
         },
         swissPairingGames.flatMap { spg =>
-          if (spg.nbGamesPerRound > 1) {
+          if (spg.nbGamesPerRound > 1 || spg.isMultiPoint) {
             Some(
               st.section(cls := "game__multi-match")(
                 frag(
-                  trans.multiMatch(),
+                  if (spg.nbGamesPerRound > 1) trans.multiMatch()
+                  else s"${spg.game.metadata.multiPointState.map(_.target).getOrElse(0)}pt Match",
                   if (spg.isBestOfX) s" (best of ${spg.nbGamesPerRound})"
                   else if (spg.isPlayX) s" (play ${spg.nbGamesPerRound} games)"
                   else "",

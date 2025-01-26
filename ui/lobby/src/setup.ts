@@ -100,6 +100,14 @@ export default class Setup {
 
   private sliderKomi = (bs: number) => (v: number) => (v < this.sliderKomis(bs).length ? this.sliderKomis(bs)[v] : 75);
 
+  private sliderPoints = (v: number) => {
+    if (v < 0 || v > 16) {
+      return 1;
+    } else {
+      return v * 2 + 1;
+    }
+  };
+
   private sliderDays = (v: number) => {
     if (v <= 3) return v;
     switch (v) {
@@ -159,6 +167,8 @@ export default class Setup {
       $goConfig = $form.find('.go_config'),
       $goHandicapInput = $form.find('.go_handicap_choice [name=goHandicap]'),
       $goKomiInput = $form.find('.go_komi_choice [name=goKomi]'),
+      $backgammonConfig = $form.find('.backgammon_config'),
+      $backgammonPointsInput = $form.find('.backgammon_points_choice [name=backgammonPoints]'),
       $advancedTimeSetup = $form.find('.advanced_setup'),
       $advancedTimeToggle = $form.find('.advanced_toggle'),
       $daysInput = $form.find('.days_choice [name=days]'),
@@ -189,7 +199,11 @@ export default class Setup {
               $goConfig.val() !== undefined &&
               (($goHandicapInput.val() as string) != '0' ||
                 (variantId[1] !== '1' && ($goKomiInput.val() as string) != '75') ||
-                (variantId[1] == '1' && ($goKomiInput.val() as string) != '55')));
+                (variantId[1] == '1' && ($goKomiInput.val() as string) != '55'))) ||
+            //remove this if we ever want Backgammon cube games to be rated
+            (variantId[0] == '10' &&
+              $backgammonConfig.val() !== undefined &&
+              ($backgammonPointsInput.val() as string) != '1');
         if (cantBeRated && rated) {
           $casual.trigger('click');
           return toggleButtons();
@@ -701,6 +715,25 @@ export default class Setup {
       });
     };
     setupGoKomiInput();
+    $backgammonPointsInput.each(function (this: HTMLInputElement) {
+      const $input = $(this),
+        $value = $input.siblings('span'),
+        $range = $input.siblings('.range');
+      $value.text($input.val() as string);
+      $range.attr({
+        min: '0',
+        max: '15',
+        value: '' + self.sliderInitVal(parseInt($input.val() as string), self.sliderPoints, 16),
+      });
+      $range.on('input', () => {
+        const backgammonPoints = self.sliderPoints(parseInt($range.val() as string));
+        $value.text('' + backgammonPoints);
+        $input.val('' + backgammonPoints);
+        save();
+        clearFenInput();
+        toggleButtons();
+      });
+    });
     $form.find('.rating-range').each(function (this: HTMLDivElement) {
       const $this = $(this),
         $minInput = $this.find('.rating-range__min'),
@@ -802,11 +835,15 @@ export default class Setup {
         let ground = 'chessground';
         if (variantId[0] == '1') ground = 'draughtsground';
         ground += '.resize';
-        if (variantId[0] == '9') clearFenInput();
+        if (variantId[0] == '9' || variantId[0] == '10') clearFenInput();
         $multiMatch.toggle(isFen && variantId[0] == '1');
         $fenPosition.toggle(isFen);
         $modeChoicesWrap.toggle(!isFen);
         $goConfig.toggle(variantId[0] == '9');
+        //TODO change back when playing with friend is allowed for Backgammon multipoint
+        $backgammonConfig.toggle(false);
+        $backgammonPointsInput.val('1'); //remove along with above
+        //$backgammonConfig.toggle(variantId[0] == '10');
         if (isFen) {
           $casual.trigger('click');
           validateFen();

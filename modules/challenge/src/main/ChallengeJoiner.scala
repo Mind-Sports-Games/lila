@@ -1,6 +1,6 @@
 package lila.challenge
 
-import strategygames.{ P2, Player => PlayerIndex, GameLogic, GameFamily, Mode, Situation, P1 }
+import strategygames.{ P2, Player => PlayerIndex, GameLogic, Mode, Situation, P1 }
 import strategygames.format.Forsyth
 import strategygames.format.Forsyth.SituationPlus
 import strategygames.variant.Variant
@@ -65,7 +65,6 @@ private object ChallengeJoiner {
         else game                                                 -> baseState
       }
     }
-    val pieces     = stratGame.situation.board.pieces
     val multiMatch = c.isMultiMatch && c.customStartingPosition option "multiMatch"
     val perfPicker = (perfs: lila.user.Perfs) => perfs(c.perfType)
     Game
@@ -77,7 +76,8 @@ private object ChallengeJoiner {
         source = Source.Friend,
         daysPerTurn = c.daysPerTurn,
         pgnImport = None,
-        multiMatch = multiMatch
+        multiMatch = multiMatch,
+        backgammonPoints = c.backgammonPoints
       )
       .withId(c.id)
       .pipe { g =>

@@ -686,7 +686,7 @@ backgammon_themes.map { |theme|
     }
   }
   }.flatten
-  classes_backgammon_buttons = colors.map { |color|
+  classes_backgammon_buttons_and_score = colors.map { |color|
     if name === 'wooden'
       bg_colour = color == 'w' ? "#F3C977" : "#692819"
       border_colour = color == 'b' ? "#F3C977" : "#692819"
@@ -701,13 +701,17 @@ backgammon_themes.map { |theme|
       initial_css = '.backgammon.is2d ' + 'cg-buttons.' + (color == 'w' ? 'p1' : 'p2') + pos_class + 
       ', ' + '.is2d .variant-backgammon ' + 'cg-buttons.' + (color == 'w' ? 'p1' : 'p2') + pos_class + 
       ', ' + '.is2d .variant-nackgammon ' + 'cg-buttons.' + (color == 'w' ? 'p1' : 'p2') + pos_class +
-      ', ' + '.is2d .variant-hyper ' + 'cg-buttons.' + (color == 'w' ? 'p1' : 'p2') + pos_class
+      ', ' + '.is2d .variant-hyper ' + 'cg-buttons.' + (color == 'w' ? 'p1' : 'p2') + pos_class +
+      ', ' + '.backgammon.is2d ' + 'cg-multi-point-score.' + (color == 'w' ? 'p1' : 'p2') +
+      ', ' + '.is2d .variant-backgammon ' + 'cg-multi-point-score.' + (color == 'w' ? 'p1' : 'p2') +
+      ', ' + '.is2d .variant-nackgammon ' + 'cg-multi-point-score.' + (color == 'w' ? 'p1' : 'p2') +
+      ', ' + '.is2d .variant-hyper ' + 'cg-multi-point-score.' + (color == 'w' ? 'p1' : 'p2')
         initial_css + ' {' + "background: " + bg_colour + ";" + 
         " color: " + border_colour + ";" +
         " border: " + border_colour + ";" + 
         " border-width: medium; border-style: solid; " + "}"
   }.flatten
-  File.open(dest_dir + 'backgammon-' + name + '.css', 'w') { |f| f.puts (classes_backgammon_game_and_variant + classes_backgammon_buttons).join("\n") }
+  File.open(dest_dir + 'backgammon-' + name + '.css', 'w') { |f| f.puts (classes_backgammon_game_and_variant + classes_backgammon_buttons_and_score).join("\n") }
 }
 # external SVG backgammon
 backgammon_themes.map { |theme|
@@ -741,7 +745,7 @@ backgammon_themes.map { |theme|
     }
   }
   }.flatten
-  classes_backgammon_buttons = colors.map { |color|
+  classes_backgammon_buttons_and_score = colors.map { |color|
     if name === 'wooden'
       bg_colour = color == 'w' ? "#F3C977" : "#692819"
       border_colour = color == 'b' ? "#F3C977" : "#692819"
@@ -756,13 +760,17 @@ backgammon_themes.map { |theme|
       initial_css = '.backgammon.is2d ' + 'cg-buttons.' + (color == 'w' ? 'p1' : 'p2') + pos_class + 
       ', ' + '.is2d .variant-backgammon ' + 'cg-buttons.' + (color == 'w' ? 'p1' : 'p2') + pos_class + 
       ', ' + '.is2d .variant-nackgammon ' + 'cg-buttons.' + (color == 'w' ? 'p1' : 'p2') + pos_class +
-      ', ' + '.is2d .variant-hyper ' + 'cg-buttons.' + (color == 'w' ? 'p1' : 'p2') + pos_class
+      ', ' + '.is2d .variant-hyper ' + 'cg-buttons.' + (color == 'w' ? 'p1' : 'p2') + pos_class +
+      ', ' + '.backgammon.is2d ' + 'cg-multi-point-score.' + (color == 'w' ? 'p1' : 'p2') +
+      ', ' + '.is2d .variant-backgammon ' + 'cg-multi-point-score.' + (color == 'w' ? 'p1' : 'p2') +
+      ', ' + '.is2d .variant-nackgammon ' + 'cg-multi-point-score.' + (color == 'w' ? 'p1' : 'p2') +
+      ', ' + '.is2d .variant-hyper ' + 'cg-multi-point-score.' + (color == 'w' ? 'p1' : 'p2')
         initial_css + ' {' + "background: " + bg_colour + ";" + 
         " color: " + border_colour + ";" +
         " border: " + border_colour + ";" + 
         " border-width: medium; border-style: solid; " + "}"
   }.flatten
-  File.open(dest_dir + 'backgammon-' + name + '.external.css', 'w') { |f| f.puts (classes_backgammon_game_and_variant + classes_backgammon_buttons).join("\n") }
+  File.open(dest_dir + 'backgammon-' + name + '.external.css', 'w') { |f| f.puts (classes_backgammon_game_and_variant + classes_backgammon_buttons_and_score).join("\n") }
 }
 
 

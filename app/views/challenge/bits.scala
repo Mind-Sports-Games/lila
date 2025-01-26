@@ -8,6 +8,7 @@ import lila.app.ui.ScalatagsTemplate._
 import lila.challenge.Challenge
 import lila.common.String.html.safeJsonValue
 import strategygames.GameFamily
+import strategygames.format.FEN
 
 import controllers.routes
 
@@ -38,7 +39,15 @@ object bits {
       div(cls := "variant", dataIcon := (if (c.initialFen.isDefined) '*' else c.perfType.iconChar))(
         div(
           if (c.variant.exotic)
-            views.html.game.bits.variantLink(c.variant, variantName(c.variant))
+            views.html.game.bits
+              .variantLink(
+                c.variant,
+                variantName(c.variant),
+                matchPoints = (c.variant.gameFamily match {
+                  case GameFamily.Backgammon() => c.backgammonPoints
+                  case _                       => None
+                })
+              )
           else
             c.perfType.trans,
           (c.initialFen, c.variant.gameFamily) match {

@@ -17,6 +17,7 @@ case class FriendConfig(
     periods: Int,
     goHandicap: Int,
     goKomi: Int,
+    backgammonPoints: Option[Int],
     days: Int,
     mode: Mode,
     playerIndex: PlayerIndex,
@@ -37,6 +38,7 @@ case class FriendConfig(
     periods,
     goHandicap,
     goKomi,
+    backgammonPoints,
     days,
     mode.id.some,
     playerIndex.name,
@@ -56,11 +58,25 @@ case class FriendConfig(
           variant.toGo.fenFromSetupConfig(goHandicap, goKomi).value
         )
       )
+    else if (variant.gameFamily == GameFamily.Backgammon())
+      Some(
+        FEN(
+          variant.gameLogic,
+          variant.toBackgammon.fenFromSetupConfig(backgammonPoints.getOrElse(1) != 1).value
+        )
+      )
     else None
   }(Some(_))
 
-  def validKomi = variant.gameFamily != GameFamily.Go() || (variant.gameFamily == GameFamily.Go() &&
-    goKomi.abs <= (variant.toGo.boardSize.width * variant.toGo.boardSize.width * 10))
+  def validKomi =
+    variant.gameFamily != GameFamily.Go() || (variant.gameFamily == GameFamily.Go() &&
+      goKomi.abs <= (variant.toGo.boardSize.width * variant.toGo.boardSize.width * 10))
+
+  def validPoints =
+    variant.gameFamily != GameFamily.Backgammon() || (
+      variant.gameFamily == GameFamily.Backgammon() &&
+        backgammonPoints.getOrElse(1) % 2 == 1
+    )
 }
 
 object FriendConfig extends BaseHumanConfig {
@@ -75,6 +91,7 @@ object FriendConfig extends BaseHumanConfig {
       p: Int,
       gh: Int,
       gk: Int,
+      bp: Option[Int],
       d: Int,
       m: Option[Int],
       c: String,
@@ -98,6 +115,7 @@ object FriendConfig extends BaseHumanConfig {
       periods = p,
       goHandicap = gh,
       goKomi = gk,
+      backgammonPoints = bp,
       days = d,
       mode = m.fold(Mode.default)(Mode.orDefault),
       playerIndex = PlayerIndex(c) err "Invalid playerIndex " + c,
@@ -116,6 +134,7 @@ object FriendConfig extends BaseHumanConfig {
     periods = 1,
     goHandicap = 0,
     goKomi = 75, // value is *10 to provide int
+    backgammonPoints = none,
     days = 2,
     mode = Mode.default,
     playerIndex = PlayerIndex.default
@@ -133,6 +152,8 @@ object FriendConfig extends BaseHumanConfig {
           case 0 => none
           case 1 => (r intO "v2").flatMap(strategygames.draughts.variant.Variant.apply).map(Variant.Draughts)
           case 5 => (r intO "v2").flatMap(strategygames.go.variant.Variant.apply).map(Variant.Go)
+          case 6 =>
+            (r intO "v2").flatMap(strategygames.backgammon.variant.Variant.apply).map(Variant.Backgammon)
         },
         timeMode = TimeMode orDefault (r int "tm"),
         time = r double "t",
@@ -141,6 +162,7 @@ object FriendConfig extends BaseHumanConfig {
         periods = r intD "p",
         goHandicap = r intD "gh",
         goKomi = r intD "gk",
+        backgammonPoints = r intO "bp",
         days = r int "d",
         mode = Mode orDefault (r int "m"),
         playerIndex = PlayerIndex.P1,
@@ -160,6 +182,7 @@ object FriendConfig extends BaseHumanConfig {
         "p"  -> o.periods,
         "gh" -> o.goHandicap,
         "gk" -> o.goKomi,
+        "bp" -> o.backgammonPoints,
         "d"  -> o.days,
         "m"  -> o.mode.id,
         "f"  -> o.fen,

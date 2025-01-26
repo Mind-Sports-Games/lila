@@ -37,10 +37,25 @@ final class ChallengeMaker(
 
   //when rematching we want the same fen unless we are backgammon and the players
   //aren't flipping colour, but we want the start player to be randomized again
-  private def generateRematchFen(variant: Variant, initialFen: Option[FEN]) =
-    if (variant.initialFens.size > 1)
-      scala.util.Random.shuffle(variant.initialFens).headOption
-    else initialFen
+  //and the cube data to be retained. Will want to reconsider this approach when
+  //enabling fromPosition for Backgammon
+  private def generateRematchFen(variant: Variant, initialFen: Option[FEN]): Option[FEN] =
+    variant match {
+      case Variant.Backgammon(v) =>
+        Some(
+          FEN.Backgammon(
+            v.fenFromSetupConfig(
+              initialFen.exists(f =>
+                f match {
+                  case FEN.Backgammon(f) => f.cubeData.nonEmpty
+                  case _                 => false
+                }
+              )
+            )
+          )
+        )
+      case _ => initialFen
+    }
 
   // pov of the challenger
   private def makeRematch(pov: Pov, challenger: User, dest: User): Fu[Challenge] =
@@ -64,7 +79,8 @@ final class ChallengeMaker(
         challenger = Challenge.toRegistered(pov.game.variant, timeControl)(challenger),
         destUser = dest.some,
         rematchOf = pov.gameId.some,
-        multiMatch = pov.game.metadata.multiMatchGameNr.fold(false)(x => x >= 2)
+        multiMatch = pov.game.metadata.multiMatchGameNr.fold(false)(x => x >= 2),
+        backgammonPoints = pov.game.metadata.multiPointState.map(_.target)
       )
     }
 }

@@ -1,9 +1,9 @@
 package lila.swiss
 
-import strategygames.{ Player => PlayerIndex, GameFamily }
+import strategygames.{ Player => PlayerIndex, GameFamily, GameLogic }
 import strategygames.format.FEN
 import strategygames.variant.Variant
-import lila.game.Game
+import lila.game.{ Game, MultiPointState }
 import lila.user.User
 
 case class SwissPairing(
@@ -50,7 +50,7 @@ case class SwissPairing(
   def numGames = matchStatus.fold(_ => 0, l => l.length)
 
   def multiMatchResultsFor(userId: User.ID): Option[List[String]] = {
-    if (nbGamesPerRound > 1)
+    if (nbGamesPerRound > 1 || multiMatchGameIds.nonEmpty)
       matchStatus.fold(
         _ => None,
         SwissPairing.matchResultsMap(variant)("draw", "win", "loss")(playerIndexOf(userId))(_).some
@@ -87,6 +87,22 @@ case class SwissPairing(
         )
     }
 
+  //works because we can't change variant midway through a multipoint match
+  //TODO convert fenFromSetupConfig into a wrapped function
+  def fenForNextGame(prevGame: Game): Option[FEN] =
+    if (prevGame.metadata.multiPointState.isEmpty) openingFEN
+    else
+      prevGame.variant match {
+        case Variant.Backgammon(v) =>
+          Some(
+            FEN(
+              GameLogic.Backgammon(),
+              v.fenFromSetupConfig(!MultiPointState.nextGameIsCrawford(prevGame)).value
+            )
+          )
+        case _ => openingFEN
+      }
+
 }
 
 case class SwissPairingGameIds(
@@ -109,10 +125,19 @@ case class SwissPairingGames(
     nbGamesPerRound: Int,
     openingFEN: Option[FEN]
 ) {
-  def finishedOrAborted =
-    game.finishedOrAborted && (!isBestOfX || !requireMoreGamesInBestOfX) && (!isPlayX || !requireMoreGamesInPlayX)
 
-  def multiMatchGamesScoreDiff: Int =
+  def lastGame: Game =
+    multiMatchGames.fold(game)(_.reverse.headOption.getOrElse(game))
+
+  def isMultiPoint: Boolean = game.metadata.multiPointState.nonEmpty
+
+  def finishedOrAborted =
+    game.finishedOrAborted &&
+      (!isBestOfX || !requireMoreGamesInBestOfX) &&
+      (!isPlayX || !requireMoreGamesInPlayX) &&
+      !requireMoreGamesInMultipoint
+
+  private def multiMatchGamesScoreDiff: Int =
     multiMatchGames
       .foldLeft(List(game))(_ ++ _)
       .map(g => g.winnerPlayerIndex)
@@ -133,65 +158,83 @@ case class SwissPairingGames(
       }
       .foldLeft(0)(_ + _)
 
-  def requireMoreGamesInBestOfX: Boolean = {
-    val nbGamesLeft = nbGamesPerRound - (multiMatchGames.fold(0)(_.length) + 1);
+  private def nbGamesLeft = nbGamesPerRound - (multiMatchGames.fold(0)(_.length) + 1)
+
+  def requireMoreGamesInBestOfX: Boolean =
     nbGamesLeft != 0 && (multiMatchGamesScoreDiff match {
       case x if x > 0 => x <= nbGamesLeft
       case x if x < 0 => -x <= nbGamesLeft
       case _          => true
     })
-  }
-  def requireMoreGamesInPlayX: Boolean = {
-    val nbGamesLeft = nbGamesPerRound - (multiMatchGames.fold(0)(_.length) + 1);
-    nbGamesLeft != 0
-  }
+
+  def requireMoreGamesInPlayX: Boolean = nbGamesLeft != 0
+
+  def requireMoreGamesInMultipoint: Boolean =
+    MultiPointState.requireMoreGamesInMultipoint(lastGame)
+
   def outoftime = if (game.outoftime(true)) List(game)
   else
     List() ++ multiMatchGames.fold[List[Game]](List())(
       _.filter(_.outoftime(true))
     )
+
   def winnerPlayerIndex: Option[PlayerIndex] =
-    // Single games are easy.
-    if (nbGamesPerRound == 1) game.winnerPlayerIndex
-    else { //multimatch
+    if (nbGamesPerRound > 1) { //multimatch
       multiMatchGamesScoreDiff match {
         case x if x > 0 => Some(PlayerIndex.P1)
         case x if x < 0 => Some(PlayerIndex.P2)
         case _          => None
       }
-    }
+    } else lastGame.winnerPlayerIndex
+
   def playersWhoDidNotMove =
     List() ++ game.playerWhoDidNotMove ++ multiMatchGames.flatMap(_.last.playerWhoDidNotMove)
+
   def createdAt = if (isBestOfX || isPlayX) {
     multiMatchGames.fold(game.createdAt)(_.last.createdAt)
   } else game.createdAt
+
   def matchOutcome: List[Option[PlayerIndex]] =
-    if (nbGamesPerRound > 1) {
+    if (nbGamesPerRound > 1 || multiMatchGames.exists(_.length > 0)) {
       multiMatchGames.foldLeft(List(game))(_ ++ _).map(_.winnerPlayerIndex)
-    } else List(game.winnerPlayerIndex)
+    } else List(lastGame.winnerPlayerIndex)
+
   private def startPlayerNormalisation(g: Game): Option[PlayerIndex] =
     if (g.startPlayerIndex == PlayerIndex.P2 && g.variant.recalcStartPlayerForStats)
       g.winnerPlayerIndex.map(!_)
     else
       g.winnerPlayerIndex
+
   def startPlayerWinners: List[Option[PlayerIndex]] =
-    if (nbGamesPerRound > 1) {
+    if (nbGamesPerRound > 1 || multiMatchGames.exists(_.length > 0)) {
       multiMatchGames.foldLeft(List(game))(_ ++ _).map(g => startPlayerNormalisation(g))
-    } else List(startPlayerNormalisation(game))
+    } else List(startPlayerNormalisation(lastGame))
 
   def strResultOf(playerIndex: PlayerIndex) =
-    SwissPairing
-      .matchResultsMap(game.variant.some)(1, 2, 0)(playerIndex)(
-        multiMatchGames
-          .foldLeft(List(game))(_ ++ _)
-          .filter(g => g.finished)
-          .map(g => g.winnerPlayerIndex)
-      )
-      .foldLeft(0)(_ + _) match {
-      case x if x % 2 == 0 => s"${(x / 2)}"
-      case x if x % 2 == 1 => s"${(x / 2)}.5"
-      case _ => "*"
-    }
+    if (isMultiPoint) {
+      lastGame.metadata.multiPointState
+        .fold(0) { mps =>
+          if (lastGame.situation.winner == Some(playerIndex)) {
+            Math.min(
+              playerIndex.fold(mps.p1Points, mps.p2Points) + lastGame.situation.pointValue.getOrElse(0),
+              mps.target
+            )
+          } else playerIndex.fold(mps.p1Points, mps.p2Points)
+        }
+        .toString()
+    } else
+      SwissPairing
+        .matchResultsMap(game.variant.some)(1, 2, 0)(playerIndex)(
+          multiMatchGames
+            .foldLeft(List(game))(_ ++ _)
+            .filter(g => g.finished)
+            .map(g => g.winnerPlayerIndex)
+        )
+        .foldLeft(0)(_ + _) match {
+        case x if x % 2 == 0 => s"${(x / 2)}"
+        case x if x % 2 == 1 => s"${(x / 2)}.5"
+        case _ => "*"
+      }
 
 }
 

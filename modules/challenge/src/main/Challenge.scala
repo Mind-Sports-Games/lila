@@ -32,7 +32,8 @@ case class Challenge(
     open: Option[Boolean] = None,
     name: Option[String] = None,
     declineReason: Option[Challenge.DeclineReason] = None,
-    multiMatch: Option[Boolean] = None
+    multiMatch: Option[Boolean] = None,
+    backgammonPoints: Option[Int] = None
 ) {
 
   import Challenge._
@@ -94,20 +95,18 @@ case class Challenge(
 
   def notableInitialFen: Option[FEN] =
     variant match {
-      case Variant.Chess(variant) => if (variant.standardInitialPosition) none else initialFen
-      case Variant.Draughts(_)    => customStartingPosition ?? initialFen
-      case Variant.Go(_)          => customStartingGoPosition ?? initialFen
-      case _                      => none
+      case Variant.Chess(variant)                => if (variant.standardInitialPosition) none else initialFen
+      case Variant.Draughts(_)                   => draughtsCustomStartingPosition ?? initialFen
+      case Variant.Go(_) | Variant.Backgammon(_) => customStartingPosition ?? initialFen
+      case _                                     => none
     }
 
-  def customStartingGoPosition: Boolean =
-    initialFen.isDefined && !initialFen.exists(_.value == variant.initialFen.value)
-
   def customStartingPosition: Boolean =
+    initialFen.isDefined && !initialFen.exists(f => variant.initialFens.map(_.value).contains(f.value))
+
+  private def draughtsCustomStartingPosition: Boolean =
     variant == Variant.Draughts(strategygames.draughts.variant.FromPosition) ||
-      (draughtsFenVariants(variant) &&
-        initialFen.isDefined &&
-        !initialFen.exists(_.value == variant.initialFen.value))
+      (draughtsFenVariants(variant) && customStartingPosition)
 
   //When updating, also edit modules/game and ui/@types/playstrategy/index.d.ts:declare type PlayerName
   def playerTrans(p: PlayerIndex)(implicit lang: Lang): String =
@@ -252,7 +251,9 @@ object Challenge {
       destUser: Option[User],
       rematchOf: Option[Game.ID],
       name: Option[String] = None,
-      multiMatch: Boolean = false
+      multiMatch: Boolean = false,
+      //this could be extended into 'gameSettings' if more game specific fields are required
+      backgammonPoints: Option[Int] = None
   ): Challenge = {
     val (playerIndexChoice, finalPlayerIndex) = playerIndex match {
       case "p1" => PlayerIndexChoice.P1     -> P1
@@ -288,7 +289,10 @@ object Challenge {
       status = Status.Created,
       variant = variant,
       initialFen =
-        if (variant.fromPositionVariant || variant.gameFamily == GameFamily.Go()) initialFen
+        if (
+          variant.fromPositionVariant || variant.gameFamily == GameFamily
+            .Go() || variant.gameFamily == GameFamily.Backgammon()
+        ) initialFen
         else if (variant == Variant.Chess(Chess960)) initialFen filter { fen =>
           fen.chessFen.map(fen => Chess960.positionNumber(fen).isDefined).getOrElse(false)
         }
@@ -307,7 +311,8 @@ object Challenge {
       expiresAt = if (isOpen) DateTime.now.plusDays(1) else inTwoWeeks,
       open = isOpen option true,
       name = name,
-      multiMatch = multiMatch option true
+      multiMatch = multiMatch option true,
+      backgammonPoints = backgammonPoints
     )
     if (multiMatch && !challenge.customStartingPosition)
       challenge = challenge.copy(multiMatch = none)

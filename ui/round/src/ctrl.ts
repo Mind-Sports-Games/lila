@@ -46,6 +46,7 @@ import {
   SocketLift,
   SocketEndTurn,
   SocketUndo,
+  SocketCubeAction,
   SocketOpts,
   MoveMetadata,
   Position,
@@ -273,8 +274,24 @@ export default class RoundController {
     this.chessground.redrawAll(); //redraw dice
   };
 
-  private onUndoButton = () => {
-    this.undoAction();
+  private onCGButtonClick = (button: cg.Button) => {
+    switch (button) {
+      case 'undo':
+        this.undoAction();
+        break;
+      case 'roll':
+        this.forceRollDice(this.data.game.variant.key);
+        break;
+      case 'double':
+        this.cubeAction('cubeo');
+        break;
+      case 'take':
+        this.cubeAction('cubey');
+        break;
+      case 'drop':
+        this.cubeAction('cuben');
+        break;
+    }
   };
 
   private isSimulHost = () => {
@@ -339,7 +356,7 @@ export default class RoundController {
     onCancelDropMode: this.onCancelDropMode,
     onSelect: this.onSelect,
     onSelectDice: this.onSelectDice,
-    onUndoButton: this.onUndoButton,
+    onButtonClick: this.onCGButtonClick,
   });
 
   replaying = (): boolean => this.ply !== this.lastPly();
@@ -375,13 +392,16 @@ export default class RoundController {
       this.data.game.variant.key,
       this.replaying() ? false : this.data.canEndTurn,
     );
+    const doublingCube = stratUtils.readDoublingCube(s.fen, this.data.game.variant.key);
     const config: CgConfig = {
       fen: s.fen,
       lastMove: util.lastMove(this.data.onlyDropsVariant, s.uci),
       check: !!s.check,
       turnPlayerIndex: turnPlayerIndex,
       dice: dice,
+      doublingCube: doublingCube,
       showUndoButton: false,
+      cubeActions: [], //we dont know what these are so dont want to display them
     };
     if (this.replaying()) {
       cancelDropMode(this.chessground.state);
@@ -396,6 +416,7 @@ export default class RoundController {
       };
       config.showUndoButton = this.isPlaying() && this.data.player.playerIndex == turnPlayerIndex && dice.length > 0;
       config.canUndo = this.data.canUndo;
+      config.cubeActions = this.data.cubeActions ? this.data.cubeActions.split(',').map(a => a as cg.CubeAction) : [];
       config.gameButtonsActive = true;
     }
     config.dropmode = {
@@ -611,8 +632,9 @@ export default class RoundController {
     this.areDiceDescending = activePlayerIndex ? this.areDiceDescending : true;
     d.canOnlyRollDice = activePlayerIndex ? o.canOnlyRollDice : false;
     d.dice = stratUtils.readDice(o.fen, this.data.game.variant.key, o.canEndTurn, this.areDiceDescending);
+    d.doublingCube = stratUtils.readDoublingCube(o.fen, this.data.game.variant.key);
     d.activeDiceValue = this.activeDiceValue(d.dice);
-    d.forcedAction = o.forcedAction;
+    (d.cubeActions = o.cubeActions), (d.forcedAction = o.forcedAction);
 
     d.crazyhouse = o.crazyhouse;
     d.takebackable = d.canTakeBack ? o.takebackable : false;
@@ -683,6 +705,8 @@ export default class RoundController {
       if (['backgammon', 'hyper', 'nackgammon'].includes(d.game.variant.key)) {
         this.chessground.set({
           dice: this.data.dice ? this.data.dice : [],
+          doublingCube: this.data.doublingCube,
+          cubeActions: this.data.cubeActions ? this.data.cubeActions.split(',').map(a => a as cg.CubeAction) : [],
           fen: o.fen,
           canUndo: this.data.canUndo,
           showUndoButton:
@@ -855,6 +879,16 @@ export default class RoundController {
     if (blur.get()) undo.b = 1;
     this.resign(false);
     this.actualSendMove('undo', undo);
+  };
+
+  sendCubeAction = (variant: VariantKey, interaction: string): void => {
+    const cubeAction: SocketCubeAction = {
+      interaction: interaction,
+      variant: variant,
+    };
+    if (blur.get()) cubeAction.b = 1;
+    this.resign(false);
+    this.actualSendMove('cubeaction', cubeAction);
   };
 
   sendEndTurn = (variant: VariantKey): void => {
@@ -1201,6 +1235,11 @@ export default class RoundController {
       this.sendUndo(this.data.game.variant.key);
       this.redraw();
     }
+  };
+
+  cubeAction = (interaction: string): void => {
+    this.sendCubeAction(this.data.game.variant.key, interaction);
+    this.redraw();
   };
 
   endTurnAction = (): void => {

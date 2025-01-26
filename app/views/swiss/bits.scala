@@ -54,7 +54,9 @@ object bits {
                 span(cls := "setup")(
                   s.clock.show,
                   " • ",
-                  if (s.variant.exotic) VariantKeys.variantName(s.variant) else s.perfType.trans,
+                  if (s.variant.exotic)
+                    s.settings.backgammonPoints.fold("")(p => s"${p}pt ") + VariantKeys.variantName(s.variant)
+                  else s.perfType.trans,
                   " • ",
                   if (s.settings.handicapped) trans.handicappedTournament()
                   else if (s.settings.mcmahon) trans.mcmahon()

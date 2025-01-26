@@ -24,6 +24,7 @@ import strategygames.{
   Lift,
   Pass,
   DiceRoll,
+  CubeAction,
   EndTurn,
   Undo,
   SelectSquares,
@@ -297,13 +298,22 @@ case class Game(
 
     val events = {
       action match {
-        case m: Move     => Event.Move(m, game.situation, state, clockEvent, updated.board.pocketData)
-        case d: Drop     => Event.Drop(d, game.situation, state, clockEvent, updated.board.pocketData)
-        case l: Lift     => Event.Lift(l, game.situation, state, clockEvent, updated.board.pocketData)
-        case p: Pass     => Event.Pass(p, game.situation, state, clockEvent, updated.board.pocketData)
-        case r: DiceRoll => Event.DiceRoll(r, game.situation, state, clockEvent, updated.board.pocketData)
-        case et: EndTurn => Event.EndTurn(et, game.situation, state, clockEvent, updated.board.pocketData)
-        case u: Undo     => Event.Undo(u, game.situation, state, clockEvent, updated.board.pocketData)
+        case m: Move =>
+          Event.Move(m, game.situation, state, clockEvent, updated.board.pocketData)
+        case d: Drop =>
+          Event.Drop(d, game.situation, state, clockEvent, updated.board.pocketData)
+        case l: Lift =>
+          Event.Lift(l, game.situation, state, clockEvent, updated.board.pocketData)
+        case p: Pass =>
+          Event.Pass(p, game.situation, state, clockEvent, updated.board.pocketData)
+        case r: DiceRoll =>
+          Event.DiceRoll(r, game.situation, state, clockEvent, updated.board.pocketData)
+        case ca: CubeAction =>
+          Event.CubeAction(ca, game.situation, state, clockEvent, updated.board.pocketData)
+        case et: EndTurn =>
+          Event.EndTurn(et, game.situation, state, clockEvent, updated.board.pocketData)
+        case u: Undo =>
+          Event.Undo(u, game.situation, state, clockEvent, updated.board.pocketData)
         case ss: SelectSquares =>
           Event.SelectSquares(ss, game.situation, state, clockEvent, updated.board.pocketData)
       }
@@ -394,6 +404,7 @@ case class Game(
       case _: Uci.Undo          => "undo"
       case _: Uci.Pass          => "pass"
       case _: Uci.DiceRoll      => "roll"
+      case _: Uci.CubeAction    => "cube"
       case _: Uci.SelectSquares => "ss:"
       case _                    => sys.error("Type Error")
     }
@@ -679,7 +690,10 @@ case class Game(
 
   def finishedOrAborted = finished || aborted
 
-  def accountable = playedTurns >= 2 || isTournament
+  private def accountable = playedTurns >= 2 || isTournament
+
+  def updateRatingsOnFinish =
+    rated && accountable && !MultiPointState.requireMoreGamesInMultipoint(this)
 
   def replayable = isPgnImport || finished || (aborted && bothPlayersHaveMoved)
 
@@ -717,11 +731,17 @@ case class Game(
   def outoftime(withGrace: Boolean): Boolean =
     if (isCorrespondence) outoftimeCorrespondence else outoftimeClock(withGrace)
 
+  private def canBeOutOfTime(c: ClockBase): Boolean =
+    if (metadata.multiPointState.map(_.maxPoints).getOrElse(0) > 0)
+      bothPlayersHaveMoved && !c.isRunning && !c.isPaused
+    else
+      !c.isRunning && !c.isPaused
+
   private def outoftimeClock(withGrace: Boolean): Boolean =
     clock ?? { c =>
       started && playable && (bothPlayersHaveMoved || isSimul || isSwiss || fromFriend || fromApi) && {
         c.outOfTime(turnPlayerIndex, withGrace) || {
-          !c.isRunning && !c.isPaused && c.clockPlayerExists(_.elapsed.centis > 0)
+          canBeOutOfTime(c) && c.clockPlayerExists(_.elapsed.centis > 0)
         }
       }
     }
@@ -901,6 +921,9 @@ case class Game(
 
   def withHandicappedTournament(isHandicapped: Boolean) =
     copy(metadata = metadata.copy(fromHandicappedTournament = isHandicapped))
+
+  def withMultiPointState(multiPointState: Option[MultiPointState]) =
+    copy(metadata = metadata.copy(multiPointState = multiPointState))
 
   def withTournamentId(id: String) = copy(metadata = metadata.copy(tournamentId = id.some))
   def withSwissId(id: String)      = copy(metadata = metadata.copy(swissId = id.some))
@@ -1082,7 +1105,8 @@ object Game {
       pgnImport: Option[PgnImport],
       daysPerTurn: Option[Int] = None,
       drawLimit: Option[Int] = None,
-      multiMatch: Option[String] = None
+      multiMatch: Option[String] = None,
+      backgammonPoints: Option[Int] = None
   ): NewGame = {
     val createdAt = DateTime.now
     NewGame(
@@ -1098,7 +1122,8 @@ object Game {
           .copy(
             pgnImport = pgnImport,
             drawLimit = drawLimit,
-            multiMatch = multiMatch
+            multiMatch = multiMatch,
+            multiPointState = backgammonPoints.map(bp => MultiPointState(bp))
           ),
         createdAt = createdAt,
         updatedAt = createdAt,
@@ -1175,7 +1200,9 @@ object Game {
     val perfType                  = "pt"  // only set on student games for aggregation
     val drawOffers                = "do"
     //backgammon
-    val unusedDice = "ud"
+    val unusedDice      = "ud"
+    val cubeData        = "bcd"
+    val multiPointState = "mps"
     // go
     val selectedSquares     = "ss" // the dead stones selected in go
     val deadStoneOfferState = "os" //state of the dead stone offer
@@ -1192,6 +1219,7 @@ sealed abstract class DeadStoneOfferState(val id: Int) {
   def is(s: DeadStoneOfferState): Boolean                             = this == s
   def is(f: DeadStoneOfferState.type => DeadStoneOfferState): Boolean = is(f(DeadStoneOfferState))
 }
+
 object DeadStoneOfferState {
   case object ChooseFirstOffer extends DeadStoneOfferState(0)
   case object P1Offering       extends DeadStoneOfferState(1)
@@ -1205,6 +1233,47 @@ object DeadStoneOfferState {
   val byId = all map { v => (v.id, v) } toMap
 
   def apply(id: Int): Option[DeadStoneOfferState] = byId get id
+}
+
+case class MultiPointState(target: Int, p1Points: Int = 0, p2Points: Int = 0) {
+
+  def maxPoints = Math.max(p1Points, p2Points)
+
+  def isCrawfordState = maxPoints + 1 == target && p1Points != p2Points
+
+  private def updatePoints(origPoints: Int, wonPoints: Int) =
+    (origPoints + wonPoints).atMost(target)
+
+  def updateMultiPointState(pointValue: Option[Int], winner: Option[PlayerIndex]): Option[MultiPointState] =
+    winner.map(p =>
+      p.fold(
+        copy(p1Points = updatePoints(this.p1Points, pointValue.getOrElse(0))),
+        copy(p2Points = updatePoints(this.p2Points, pointValue.getOrElse(0)))
+      )
+    )
+
+}
+
+object MultiPointState {
+
+  def nextGameIsCrawford(game: Game): Boolean =
+    game.metadata.multiPointState.fold(false)(mps =>
+      !mps.isCrawfordState && mps
+        .updateMultiPointState(game.situation.pointValue, game.situation.winner)
+        .map(_.isCrawfordState)
+        .getOrElse(false)
+    )
+
+  def requireMoreGamesInMultipoint(game: Game): Boolean =
+    !((Status.flagged ++ Status.resigned).contains(game.status)) &&
+      game.metadata.multiPointState.fold(false)(mps =>
+        game.winnerPlayerIndex
+          .map { p =>
+            p.fold(mps.p1Points, mps.p2Points) + game.situation.pointValue.getOrElse(0) < mps.target
+          }
+          .getOrElse(false)
+      )
+
 }
 
 case class CastleLastMove(castles: Castles, lastMove: Option[ChessUci])

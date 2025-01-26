@@ -61,6 +61,7 @@
   <string name="playerIndexResigned">%s resigned</string>
   <string name="playerIndexResignedGammon">%s resigned a gammon</string>
   <string name="playerIndexResignedBackgammon">%s resigned a backgammon</string>
+  <string name="playerIndexDroppedTheCube">%s dropped the cube</string>
   <string name="whiteResigned">White resigned</string>
   <string name="blackResigned">Black resigned</string>
   <string name="playerIndexLeftTheGame">%s left the game</string>
@@ -286,6 +287,7 @@
   <string name="mcmahonDefinition">McMahon style tournament, awarding initial points to players to create fairer pairings</string>
   <string name="mcmahonCutoff">McMahon Cutoff</string>
   <string name="mcmahonCutoffDefinition">The Cutoff grade separating the top and bottom players. Only supported for Go games. Input example, 2000 or 3k. </string>
+  <string name="backgammonPointsDefinition">The number of points to play to in Backgammon games. Selecting anything other than 1 point will introduce the doubling cube.</string>
   <string name="rematch">Rematch</string>
   <string name="rematchOfferSent">Rematch offer sent</string>
   <string name="rematchOfferSentWhite">White offers rematch</string>
@@ -312,6 +314,7 @@
   <string name="freeOnlineChess">Free Online Chess</string>
   <string name="goHandicap">Handicap</string>
   <string name="goKomi">Komi</string>
+  <string name="backgammonPoints">Points</string>
   <plurals name="nbRated">
     <item quantity="one">%s rated</item>
     <item quantity="other">%s rated</item>

@@ -7,6 +7,7 @@ import strategygames.{
   Centis,
   ClockBase,
   Clock,
+  CubeData,
   GameFamily,
   Player => PlayerIndex,
   GameLogic,
@@ -318,6 +319,11 @@ object GameDiff {
             (o: Option[PocketData]) => o map BSONHandlers.pocketDataBSONHandler.write
           )
         dOpt(unusedDice, _.board.unusedDice, (o: List[Int]) => w.listO[Int](o))
+        dOpt(
+          cubeData,
+          _.board.cubeData,
+          (o: Option[CubeData]) => o map BSONHandlers.cubeDataBSONHandler.write
+        )
         dOpt(
           score,
           _.history.score,

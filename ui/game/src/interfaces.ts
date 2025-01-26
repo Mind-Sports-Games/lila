@@ -49,6 +49,7 @@ export interface BaseGame {
   boosted?: boolean;
   rematch?: string;
   multiMatch?: MultiMatch;
+  multiPointState?: MultiPointState;
   rated?: boolean;
   perf: string;
 }
@@ -66,6 +67,12 @@ export interface MultiMatch {
   gameId?: string;
 }
 
+export interface MultiPointState {
+  target: number;
+  p1: number;
+  p2: number;
+}
+
 export interface Status {
   id: StatusId;
   name: StatusName;
@@ -78,6 +85,7 @@ export type StatusName =
   | 'resign'
   | 'resignGammon'
   | 'resignBackgammon'
+  | 'cubeDropped'
   | 'stalemate'
   | 'timeout'
   | 'draw'
@@ -165,6 +173,7 @@ export interface Swiss {
   running?: boolean;
   isBestOfX?: boolean;
   isPlayX?: boolean;
+  isMultiPoint?: boolean;
   ranks?: TournamentRanks;
 }
 

@@ -54,9 +54,11 @@ final class TournamentForm {
         backgammon = true.some,
         abalone = true.some
       ),
-      handicaps = Handicaps(
-        handicapped = false.some,
-        inputPlayerRatings = None
+      variantSettings = VariantSettings(
+        handicaps = Handicaps(
+          handicapped = false.some,
+          inputPlayerRatings = None
+        )
       ),
       position = None,
       password = None,
@@ -104,9 +106,11 @@ final class TournamentForm {
         backgammon = gameGroupInMedley(tour.medleyVariants, GameGroup.Backgammon()).some,
         abalone = gameGroupInMedley(tour.medleyVariants, GameGroup.Abalone()).some
       ),
-      handicaps = Handicaps(
-        handicapped = tour.handicapped.some,
-        inputPlayerRatings = tour.inputPlayerRatings
+      variantSettings = VariantSettings(handicaps =
+        Handicaps(
+          handicapped = tour.handicapped.some,
+          inputPlayerRatings = tour.inputPlayerRatings
+        )
       ),
       position = tour.position,
       mode = none,
@@ -193,10 +197,12 @@ final class TournamentForm {
           "backgammon"         -> optional(boolean),
           "abalone"            -> optional(boolean)
         )(MedleyGameFamilies.apply)(MedleyGameFamilies.unapply),
-        "handicaps" -> mapping(
-          "handicapped"        -> optional(boolean),
-          "inputPlayerRatings" -> optional(cleanNonEmptyText)
-        )(Handicaps.apply)(Handicaps.unapply),
+        "variantSettings" -> mapping(
+          "handicaps" -> mapping(
+            "handicapped"        -> optional(boolean),
+            "inputPlayerRatings" -> optional(cleanNonEmptyText)
+          )(Handicaps.apply)(Handicaps.unapply)
+        )(VariantSettings.apply)(VariantSettings.unapply),
         "position"         -> optional(lila.common.Form.fen.playableStrict),
         "mode"             -> optional(number.verifying(Mode.all.map(_.id) contains _)), // deprecated, use rated
         "rated"            -> optional(boolean),
@@ -288,7 +294,7 @@ private[tournament] case class TournamentSetup(
     medleyIntervalOptions: MedleyIntervalOptions,
     medleyDefaults: MedleyDefaults,
     medleyGameFamilies: MedleyGameFamilies,
-    handicaps: Handicaps,
+    variantSettings: VariantSettings,
     position: Option[FEN],
     mode: Option[Int], // deprecated, use rated
     rated: Option[Boolean],
@@ -328,6 +334,8 @@ private[tournament] case class TournamentSetup(
   def validRatedVariant =
     realMode == Mode.Casual ||
       lila.game.Game.allowRated(realVariant, clock.some)
+
+  def handicaps = variantSettings.handicaps
 
   def validHandicapSetup =
     !handicaps.handicapped.has(true) || (gameLogic == GameLogic.Go() && !isMedley && realMode == Mode.Casual)
@@ -484,6 +492,10 @@ private[tournament] case class TournamentSetup(
     } else None
 
 }
+
+case class VariantSettings(
+    handicaps: Handicaps
+)
 
 case class Handicaps(
     handicapped: Option[Boolean],

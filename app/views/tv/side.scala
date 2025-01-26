@@ -65,7 +65,8 @@ object side {
                   game.variant,
                   (if (game.variant == Variant.Chess(strategygames.chess.variant.KingOfTheHill))
                      VariantKeys.variantShortName(game.variant)
-                   else VariantKeys.variantName(game.variant)).toUpperCase
+                   else VariantKeys.variantName(game.variant)).toUpperCase,
+                  matchPoints = game.metadata.multiPointState.map(_.target)
                 )
               else
                 game.perfType.map { pt =>

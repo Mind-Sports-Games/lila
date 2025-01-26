@@ -109,7 +109,8 @@ object BsonHandlers {
     import SwissPairing.Fields._
     def reads(r: BSON.Reader) =
       r.get[List[User.ID]](players) match {
-        case List(w, b) =>
+        case List(w, b) => {
+          val variant = r.getO[Variant]("v")
           SwissPairing(
             id = r str id,
             swissId = r.get[Swiss.Id](swissId),
@@ -128,10 +129,13 @@ object BsonHandlers {
             isBestOfX = r.getD[Boolean](isBestOfX),
             isPlayX = r.getD[Boolean](isPlayX),
             nbGamesPerRound = r.intO("gpr") getOrElse SwissBounds.defaultGamesPerRound,
-            //TODO allow this to work for chess too?
-            openingFEN = r.getO[String](openingFEN).map(fen => FEN(GameLogic.Draughts(), fen)),
-            variant = r.getO[Variant]("v")
+            //TODO change default for this?
+            openingFEN = r
+              .getO[String](openingFEN)
+              .map(fen => FEN(variant.map(_.gameLogic).getOrElse(GameLogic.Draughts()), fen)),
+            variant = variant
           )
+        }
         case _ => sys error "Invalid swiss pairing users"
       }
     def writes(w: BSON.Writer, o: SwissPairing) =
@@ -191,6 +195,7 @@ object BsonHandlers {
         mcmahon = r.boolO("m") | false,
         mcmahonCutoff = r.getD[String]("mc"),
         handicapped = r.boolO("h") | false,
+        backgammonPoints = r.intO("bp"),
         inputPlayerRatings = r.getD[String]("ipr"),
         isMatchScore = r.boolO("ms") | false,
         isBestOfX = r.boolO("x") | false,
@@ -215,6 +220,7 @@ object BsonHandlers {
         "r"   -> (!s.rated).option(false),
         "m"   -> (s.mcmahon).option(true),
         "mc"  -> s.mcmahonCutoff.some.filter(_.nonEmpty),
+        "bp"  -> s.backgammonPoints,
         "h"   -> (s.handicapped).option(true),
         "ipr" -> s.inputPlayerRatings.some.filter(_.nonEmpty),
         "ms"  -> s.isMatchScore,

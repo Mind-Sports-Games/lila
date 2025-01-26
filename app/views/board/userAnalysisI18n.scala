@@ -35,6 +35,7 @@ object userAnalysisI18n {
     trans.playerIndexResigned,
     trans.playerIndexResignedGammon,
     trans.playerIndexResignedBackgammon,
+    trans.playerIndexDroppedTheCube,
     trans.stalemate,
     trans.playerIndexLeftTheGame,
     trans.draw,

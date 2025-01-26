@@ -19,7 +19,7 @@ import lila.round.actorApi.round.QuietFlag
 import lila.user.{ User, UserRepo }
 import lila.i18n.VariantKeys
 
-import strategygames.GameLogic
+import strategygames.{ GameLogic, Player }
 
 final class SwissApi(
     colls: SwissColls,
@@ -87,6 +87,7 @@ final class SwissApi(
         mcmahonCutoff = ~data.mcmahonCutoff,
         handicapped = data.isHandicapped,
         inputPlayerRatings = ~data.inputPlayerRatings,
+        backgammonPoints = data.backgammonPoints,
         isMatchScore = data.isMatchScore,
         isBestOfX = data.isBestOfX,
         isPlayX = data.isPlayX,
@@ -135,6 +136,7 @@ final class SwissApi(
             inputPlayerRatings =
               if (data.inputPlayerRatings.isDefined) ~data.inputPlayerRatings
               else old.settings.inputPlayerRatings,
+            backgammonPoints = data.backgammonPoints,
             isMatchScore = data.isMatchScore,
             isBestOfX = data.isBestOfX,
             isPlayX = data.isPlayX,
@@ -586,14 +588,14 @@ final class SwissApi(
     funit
   }
 
-  private[swiss] def rematchForMultiGame(game: SwissPairingGames): Funit =
-    getSwissPairingForGame(game.game) map { pairing =>
+  private[swiss] def rematchForMultiGame(spgame: SwissPairingGames): Funit =
+    getSwissPairingForGame(spgame.game) map { pairing =>
       {
         pairing.map { pairing =>
           SwissPlayer.fields { f =>
             colls.player.list[SwissPlayer]($doc(f.swissId -> pairing.swissId)) map { players =>
               val playerMap = SwissPlayer.toMap(players)
-              byId(game.swissId).map(
+              byId(spgame.swissId).map(
                 _.map(swiss =>
                   idGenerator.game.map(rematchId =>
                     SwissPairing.fields { f2 =>
@@ -602,12 +604,11 @@ final class SwissApi(
                           $doc(f2.id                 -> pairing.id),
                           $push(f2.multiMatchGameIds -> rematchId)
                         ) >> {
-                        val gameIds: List[Game.ID] = pairing.multiMatchGameIds.fold(List(rematchId))(
-                          _ ++ List(rematchId)
-                        )
+                        val gameIds: List[Game.ID] =
+                          pairing.multiMatchGameIds.fold(List(rematchId))(_ ++ List(rematchId))
                         val pairingUpdated = pairing.copy(multiMatchGameIds = Some(gameIds))
                         val nextGame =
-                          director.makeGame(swiss, playerMap, true)(pairingUpdated)
+                          director.makeGame(swiss, playerMap, Some(spgame.lastGame))(pairingUpdated)
                         gameRepo.insertDenormalized(nextGame) >> recomputeAndUpdateAll(
                           pairing.swissId
                         ) >>- onStart(nextGame.id)
@@ -622,17 +623,19 @@ final class SwissApi(
       }
     }
 
-  private[swiss] def updateMultiMatchProgress(game: SwissPairingGames): Funit =
+  private[swiss] def updateMultiMatchProgress(spgame: SwissPairingGames): Funit =
     (
-      game.finishedOrAborted,
-      game.isBestOfX || game.isPlayX,
-      game.multiMatchGames
+      spgame.finishedOrAborted,
+      spgame.isBestOfX || spgame.isPlayX || spgame.isMultiPoint,
+      spgame.multiMatchGames
     ) match {
-      case (true, _, _)        => finishGame(game)
-      case (false, true, None) => rematchForMultiGame(game)
+      case (true, _, _)        => finishGame(spgame)
+      case (false, true, None) => rematchForMultiGame(spgame)
       case (false, true, Some(g)) => {
-        if (g.length + 1 < game.nbGamesPerRound) // actual logic in SwissPairing (game.finishedOrAborted)
-          rematchForMultiGame(game)
+        if (
+          g.length + 1 < spgame.nbGamesPerRound || spgame.isMultiPoint
+        ) // actual logic in SwissPairing (game.finishedOrAborted)
+          rematchForMultiGame(spgame)
         else funit // This will be called by checkOngoingGames
       }
       case (false, false, _) =>
