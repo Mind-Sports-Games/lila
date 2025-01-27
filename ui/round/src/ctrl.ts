@@ -365,7 +365,16 @@ export default class RoundController {
     this.cancelMove();
     this.chessground.selectSquare(null);
     if (ply != this.ply && this.jump(ply)) speech.userJump(this, this.ply);
-    else this.redraw();
+    else {
+      if (
+        ['backgammon', 'hyper', 'nackgammon'].includes(this.data.game.variant.key) &&
+        this.data.game.multiPointState
+      ) {
+        this.chessground.set({ multiPointState: this.finalMultiPointState() });
+        this.chessground.redrawAll();
+      }
+      this.redraw();
+    }
   };
 
   userJumpToTurn = (turn: number): void => {
@@ -377,6 +386,25 @@ export default class RoundController {
   };
 
   isPlaying = () => game.isPlayerPlaying(this.data);
+
+  finalMultiPointState = () => {
+    const d = this.data;
+    const game = d.game;
+    const pointsToAdd =
+      game.pointValue && game.winner && this.ply == round.lastPly(d)
+        ? game.winner === 'p1'
+          ? [game.pointValue, 0]
+          : [0, game.pointValue]
+        : [0, 0];
+
+    return game.multiPointState
+      ? {
+          target: game.multiPointState.target,
+          p1: Math.min(game.multiPointState.target, game.multiPointState.p1 + pointsToAdd[0]),
+          p2: Math.min(game.multiPointState.target, game.multiPointState.p2 + pointsToAdd[1]),
+        }
+      : undefined;
+  };
 
   jump = (ply: Ply): boolean => {
     ply = Math.max(round.firstPly(this.data), Math.min(this.lastPly(), ply));
@@ -402,6 +430,7 @@ export default class RoundController {
       doublingCube: doublingCube,
       showUndoButton: false,
       cubeActions: [], //we dont know what these are so dont want to display them
+      multiPointState: this.finalMultiPointState(),
     };
     if (this.replaying()) {
       cancelDropMode(this.chessground.state);
@@ -949,6 +978,7 @@ export default class RoundController {
     d.game.loserPlayer = o.loserPlayer;
     d.game.status = o.status;
     d.game.boosted = o.boosted;
+    d.game.pointValue = o.pointValue;
     this.userJump(this.lastPly());
     this.chessground.stop();
     if (o.ratingDiff) {
