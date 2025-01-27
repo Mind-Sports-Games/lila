@@ -50,6 +50,7 @@ export interface BaseGame {
   rematch?: string;
   multiMatch?: MultiMatch;
   multiPointState?: MultiPointState;
+  pointValue?: number;
   rated?: boolean;
   perf: string;
 }

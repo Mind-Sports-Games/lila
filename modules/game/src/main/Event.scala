@@ -1195,7 +1195,8 @@ object Event {
           "winner"       -> game.winnerPlayerIndex,
           "winnerPlayer" -> game.winnerPlayerIndex.map(game.variant.playerNames),
           "loserPlayer"  -> game.winnerPlayerIndex.map(w => game.variant.playerNames(!w)),
-          "status"       -> game.status
+          "status"       -> game.status,
+          "pointValue"   -> game.situation.pointValue
         )
         .add("clock" -> game.clock.map { c =>
           c match {

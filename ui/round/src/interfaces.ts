@@ -219,6 +219,7 @@ export interface ApiEnd {
   winnerPlayer?: PlayerName;
   loserPlayer?: PlayerName;
   status: Status;
+  pointValue?: number;
   ratingDiff?: {
     p1: number;
     p2: number;
