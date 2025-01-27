@@ -817,9 +817,7 @@ case class Game(
           case Rapid       => 30
           case _           => 35
         }
-      if (
-        variant.key == "chess960" || variant.key == "backgammon" || variant.key == "nackgammon"
-      ) base * 2
+      if (variant.key == "chess960" || variant.key == "backgammon" || variant.key == "nackgammon") base * 2
       else if (isTournament && (variant.draughts64Variant) && metadata.simulPairing.isDefined) base + 10
       else base
     }
