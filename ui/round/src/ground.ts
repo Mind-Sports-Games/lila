@@ -29,7 +29,12 @@ export function makeConfig(ctrl: RoundController): Config {
       ? data.dice
       : stratUtils.readDice(step.fen, data.game.variant.key, data.canEndTurn, ctrl.areDiceDescending),
     doublingCube = data.doublingCube ? data.doublingCube : stratUtils.readDoublingCube(step.fen, data.game.variant.key),
-    cubeActions = data.cubeActions ? data.cubeActions.split(',').map(a => a as cg.CubeAction) : [];
+    cubeActions = data.cubeActions ? data.cubeActions.split(',').map(a => a as cg.CubeAction) : [],
+    multiPointState =
+      data.game.multiPointState && data.game.multiPointState.target && data.game.multiPointState.target > 1
+        ? data.game.multiPointState
+        : null;
+
   return {
     fen: step.fen,
     orientation: boardOrientation(data, ctrl.flip),
@@ -44,7 +49,7 @@ export function makeConfig(ctrl: RoundController): Config {
     cubeActions: cubeActions,
     canUndo: data.canUndo,
     showUndoButton: playing && turnPlayerIndex == data.player.playerIndex && dice.length > 0,
-    multiPointState: data.game.multiPointState,
+    multiPointState,
     addPieceZIndex: ctrl.data.pref.is3d,
     selectOnly: data.selectMode,
     highlight: {
