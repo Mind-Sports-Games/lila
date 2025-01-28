@@ -69,7 +69,7 @@ final class JsonView(rematches: Rematches) {
           .add("gameId" -> game.metadata.multiMatchGameId.filter("*" !=))
       })
       .add("multiPointState" -> game.metadata.multiPointState)
-      .add("pointValue" -> game.situation.pointValue)
+      .add("pointValue" -> game.pointValue)
 
   def boardSize(variant: Variant) = variant match {
     case Variant.Draughts(v) =>

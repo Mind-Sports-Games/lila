@@ -214,9 +214,9 @@ case class SwissPairingGames(
     if (isMultiPoint) {
       lastGame.metadata.multiPointState
         .fold(0) { mps =>
-          if (lastGame.situation.winner == Some(playerIndex)) {
+          if (lastGame.winnerPlayerIndex == Some(playerIndex)) {
             Math.min(
-              playerIndex.fold(mps.p1Points, mps.p2Points) + lastGame.situation.pointValue.getOrElse(0),
+              playerIndex.fold(mps.p1Points, mps.p2Points) + lastGame.pointValue.getOrElse(0),
               mps.target
             )
           } else playerIndex.fold(mps.p1Points, mps.p2Points)
