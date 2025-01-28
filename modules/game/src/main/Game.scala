@@ -1121,7 +1121,7 @@ object Game {
             pgnImport = pgnImport,
             drawLimit = drawLimit,
             multiMatch = multiMatch,
-            multiPointState = MultiPointState.init(backgammonPoints)
+            multiPointState = MultiPointState(backgammonPoints)
           ),
         createdAt = createdAt,
         updatedAt = createdAt,
@@ -1254,7 +1254,7 @@ case class MultiPointState(target: Int, p1Points: Int = 0, p2Points: Int = 0) {
 
 object MultiPointState {
 
-  def init(points: Option[Int]): Option[MultiPointState] = points.filter(_ != 1).map(p => MultiPointState(p))
+  def apply(points: Option[Int]): Option[MultiPointState] = points.filter(_ != 1).map(p => MultiPointState(p))
 
   def nextGameIsCrawford(game: Game): Boolean =
     game.metadata.multiPointState.fold(false)(mps =>
