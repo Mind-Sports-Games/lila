@@ -24,6 +24,8 @@ export default function status(ctrl: Ctrl): string {
       return ctrl.trans('playerIndexResignedGammon', d.game.loserPlayer ? d.game.loserPlayer : '');
     case 'resignBackgammon':
       return ctrl.trans('playerIndexResignedBackgammon', d.game.loserPlayer ? d.game.loserPlayer : '');
+    case 'resignMatch':
+      return ctrl.trans('playerIndexResignedMatch', d.game.loserPlayer ? d.game.loserPlayer : '');
     case 'cubeDropped':
       return ctrl.trans('playerIndexDroppedTheCube', d.game.loserPlayer ? d.game.loserPlayer : '');
     case 'stalemate':

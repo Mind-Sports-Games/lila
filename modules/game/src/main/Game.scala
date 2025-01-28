@@ -1265,7 +1265,7 @@ object MultiPointState {
     )
 
   def requireMoreGamesInMultipoint(game: Game): Boolean =
-    !((Status.flagged ++ Status.resigned).contains(game.status)) &&
+    !((Status.flagged ++ List(Status.ResignMatch)).contains(game.status)) &&
       game.metadata.multiPointState.fold(false)(mps =>
         game.winnerPlayerIndex
           .map { p =>

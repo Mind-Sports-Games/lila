@@ -92,14 +92,16 @@ object Termination {
 
   def fromStatus(s: strategygames.Status) =
     s match {
-      case S.Timeout                                                           => Disconnect
-      case S.Outoftime | S.OutoftimeGammon | S.OutoftimeBackgammon | S.RuleOfGin | S.GinGammon | S.GinBackgammon => ClockFlag
-      case S.Resign | S.ResignGammon | S.ResignBackgammon | S.CubeDropped      => Resignation
-      case S.Draw                                                              => Draw
-      case S.Stalemate                                                         => Stalemate
-      case S.Mate | S.SingleWin | S.GammonWin | S.BackgammonWin | S.VariantEnd => Checkmate
-      case S.PerpetualCheck                                                    => Perpetual
-      case S.Cheat                                                             => Resignation
+      case S.Timeout => Disconnect
+      case S.Outoftime | S.OutoftimeGammon | S.OutoftimeBackgammon | S.RuleOfGin | S.GinGammon |
+          S.GinBackgammon =>
+        ClockFlag
+      case S.Resign | S.ResignMatch | S.ResignGammon | S.ResignBackgammon | S.CubeDropped => Resignation
+      case S.Draw                                                                         => Draw
+      case S.Stalemate                                                                    => Stalemate
+      case S.Mate | S.SingleWin | S.GammonWin | S.BackgammonWin | S.VariantEnd            => Checkmate
+      case S.PerpetualCheck                                                               => Perpetual
+      case S.Cheat                                                                        => Resignation
       case S.Created | S.Started | S.Aborted | S.NoStart | S.UnknownFinish =>
         logger.error(s"Unfinished game in the insight indexer: $s")
         Resignation
