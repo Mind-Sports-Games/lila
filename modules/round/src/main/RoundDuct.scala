@@ -21,7 +21,8 @@ import lila.hub.actorApi.round.{
   MultiMatchRematch,
   RematchNo,
   RematchYes,
-  Resign
+  Resign,
+  ResignMatch
 }
 import lila.hub.Duct
 import lila.room.RoomSocket.{ Protocol => RP, _ }
@@ -265,6 +266,15 @@ final private[round] class RoundDuct(
         pov.game.resignable ?? finisher.other(
           pov.game,
           pov.game.situation.resignStatus(pov.playerIndex),
+          Some(!pov.playerIndex)
+        )
+      }
+
+    case ResignMatch(playerId) =>
+      handle(PlayerId(playerId)) { pov =>
+        pov.game.resignable ?? finisher.other(
+          pov.game,
+          pov.game.situation.resignMatchStatus,
           Some(!pov.playerIndex)
         )
       }

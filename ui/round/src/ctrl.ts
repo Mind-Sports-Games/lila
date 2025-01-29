@@ -804,6 +804,8 @@ export default class RoundController {
       uci: o.uci,
       check: o.check,
       crazy: o.crazyhouse,
+      currentPointValueP1: o.currentPointValueP1,
+      currentPointValueP2: o.currentPointValueP2,
     };
     if (step.uci === 'undo') {
       d.steps.pop();
@@ -1088,7 +1090,7 @@ export default class RoundController {
         this.socket.sendLoading('resign');
         clearTimeout(this.resignConfirm);
       } else {
-        this.resignConfirm = setTimeout(() => this.resign(false), 3000);
+        this.resignConfirm = setTimeout(() => this.resign(false), 4000);
       }
       this.redraw();
     } else if (this.resignConfirm) {
@@ -1097,6 +1099,25 @@ export default class RoundController {
       this.redraw();
     }
   };
+
+  resignMatch = (v: boolean, immediately?: boolean): void => {
+    if (v) {
+      if (this.resignConfirm || !this.data.pref.confirmResign || immediately) {
+        this.socket.sendLoading('resign-match');
+        clearTimeout(this.resignConfirm);
+      } else {
+        this.resignConfirm = setTimeout(() => this.resign(false), 4000);
+      }
+      this.redraw();
+    } else if (this.resignConfirm) {
+      clearTimeout(this.resignConfirm);
+      this.resignConfirm = undefined;
+      this.redraw();
+    }
+  };
+
+  isBackgammonMultiPoint = (): boolean =>
+    this.data.game.multiPointState && ['backgammon', 'hyper', 'nackgammon'].includes(this.data.game.variant.key);
 
   goBerserk = () => {
     this.socket.berserk();

@@ -86,6 +86,7 @@ export type StatusName =
   | 'resign'
   | 'resignGammon'
   | 'resignBackgammon'
+  | 'resignMatch'
   | 'cubeDropped'
   | 'stalemate'
   | 'timeout'

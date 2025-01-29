@@ -97,6 +97,7 @@ object jsI18n {
     trans.playerIndexResigned,
     trans.playerIndexResignedGammon,
     trans.playerIndexResignedBackgammon,
+    trans.playerIndexResignedMatch,
     trans.playerIndexDroppedTheCube,
     trans.stalemate,
     trans.playerIndexLeftTheGame,

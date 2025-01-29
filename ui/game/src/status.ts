@@ -27,6 +27,7 @@ export const ids = {
   outoftimeGammon: 48,
   outoftimeBackgammon: 49,
   cubeDropped: 50,
+  resignMatch: 51,
   variantEnd: 60,
 };
 
@@ -56,6 +57,7 @@ export function isBackgammon(statusId: number): boolean {
     ids.ginBackgammon,
     ids.outoftimeBackgammon,
     ids.resignBackgammon,
-    ids.cubeDropped,
+    ids.cubeDropped, //TODO check this
+    ids.resignMatch, //TODO check this
   ].includes(statusId);
 }

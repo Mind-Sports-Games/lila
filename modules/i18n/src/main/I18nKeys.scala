@@ -76,6 +76,7 @@ val `theFirstPersonToComeOnThisUrlWillPlayWithYou` = new I18nKey("theFirstPerson
 val `playerIndexResigned` = new I18nKey("playerIndexResigned")
 val `playerIndexResignedGammon` = new I18nKey("playerIndexResignedGammon")
 val `playerIndexResignedBackgammon` = new I18nKey("playerIndexResignedBackgammon")
+val `playerIndexResignedMatch` = new I18nKey("playerIndexResignedMatch")
 val `playerIndexDroppedTheCube` = new I18nKey("playerIndexDroppedTheCube")
 val `whiteResigned` = new I18nKey("whiteResigned")
 val `blackResigned` = new I18nKey("blackResigned")

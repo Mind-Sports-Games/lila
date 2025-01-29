@@ -495,6 +495,11 @@ case class Game(
       p2Player = f(p2Player)
     )
 
+  def pointValue: Option[Int] = {
+    if (status == Status.ResignMatch) Some(64)
+    else situation.pointValue(winnerPlayerIndex.map(!_))
+  }
+
   def selectSquaresPossible =
     started &&
       playable &&
@@ -1259,17 +1264,20 @@ object MultiPointState {
   def nextGameIsCrawford(game: Game): Boolean =
     game.metadata.multiPointState.fold(false)(mps =>
       !mps.isCrawfordState && mps
-        .updateMultiPointState(game.situation.pointValue, game.situation.winner)
+        .updateMultiPointState(
+          game.pointValue,
+          game.winnerPlayerIndex
+        )
         .map(_.isCrawfordState)
         .getOrElse(false)
     )
 
   def requireMoreGamesInMultipoint(game: Game): Boolean =
-    !((Status.flagged ++ Status.resigned).contains(game.status)) &&
+    !((Status.flagged ++ List(Status.ResignMatch)).contains(game.status)) &&
       game.metadata.multiPointState.fold(false)(mps =>
         game.winnerPlayerIndex
           .map { p =>
-            p.fold(mps.p1Points, mps.p2Points) + game.situation.pointValue.getOrElse(0) < mps.target
+            p.fold(mps.p1Points, mps.p2Points) + game.pointValue.getOrElse(0) < mps.target
           }
           .getOrElse(false)
       )
