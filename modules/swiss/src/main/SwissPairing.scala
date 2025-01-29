@@ -1,6 +1,6 @@
 package lila.swiss
 
-import strategygames.{ Player => PlayerIndex, GameFamily, GameLogic }
+import strategygames.{ Player => PlayerIndex, GameFamily, GameLogic, Status => SGStatus }
 import strategygames.format.FEN
 import strategygames.variant.Variant
 import lila.game.{ Game, MultiPointState }
@@ -184,6 +184,22 @@ case class SwissPairingGames(
         case x if x > 0 => Some(PlayerIndex.P1)
         case x if x < 0 => Some(PlayerIndex.P2)
         case _          => None
+      }
+    } else if (
+      isMultiPoint && List(SGStatus.RuleOfGin, SGStatus.GinGammon, SGStatus.GinBackgammon).contains(
+        lastGame.status
+      )
+    ) {
+      lastGame.metadata.multiPointState.flatMap { mps =>
+        lastGame.winnerPlayerIndex.map { p =>
+          if (
+            (if (p == PlayerIndex.P1) mps.p1Points else mps.p2Points) + lastGame.pointValue.getOrElse(
+              0
+            ) >= mps.target
+          )
+            p
+          else !p
+        }
       }
     } else lastGame.winnerPlayerIndex
 

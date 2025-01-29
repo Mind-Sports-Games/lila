@@ -61,3 +61,19 @@ export function isBackgammon(statusId: number): boolean {
     ids.resignMatch, //TODO check this
   ].includes(statusId);
 }
+
+export function isOutOfTime(statusId: number): boolean {
+  return [
+    ids.timeout,
+    ids.outoftime,
+    ids.outoftimeGammon,
+    ids.outoftimeBackgammon,
+    ids.ruleOfGin,
+    ids.ginGammon,
+    ids.ginBackgammon,
+  ].includes(statusId);
+}
+
+export function isGin(statusId: number): boolean {
+  return [ids.ruleOfGin, ids.ginGammon, ids.ginBackgammon].includes(statusId);
+}
