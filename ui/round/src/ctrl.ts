@@ -397,6 +397,27 @@ export default class RoundController {
           : [0, game.pointValue]
         : [0, 0];
 
+    if (status.isOutOfTime(game.status.id) && game.winner && this.ply == round.lastPly(d)) {
+      if (status.isGin(game.status.id)) {
+        if (game.winner === 'p1') {
+          if (game.multiPointState.p1 + pointsToAdd[0] < game.multiPointState.target) {
+            pointsToAdd[1] += 64;
+          }
+        } else {
+          if (game.multiPointState.p2 + pointsToAdd[1] < game.multiPointState.target) {
+            pointsToAdd[0] += 64;
+          }
+        }
+      } else {
+        //normal timeout
+        if (game.winner === 'p1') {
+          pointsToAdd[0] += 64;
+        } else {
+          pointsToAdd[1] += 64;
+        }
+      }
+    }
+
     return game.multiPointState
       ? {
           target: game.multiPointState.target,
