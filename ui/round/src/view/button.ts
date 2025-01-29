@@ -1,6 +1,7 @@
 import { h, VNode, Hooks } from 'snabbdom';
 import { allowAnalysisForVariant } from 'common/analysis';
 import * as util from '../util';
+import * as round from '../round';
 import * as game from 'game';
 import * as status from 'game/status';
 import { game as gameRoute } from 'game/router';
@@ -144,11 +145,13 @@ const fbtCancel = (ctrl: RoundController, f: (v: boolean) => void) =>
   });
 
 export function resignOptions(ctrl: RoundController): VNode | null {
+  const lastStep = round.lastStep(ctrl.data);
+  const pointValue = ctrl.data.player.playerIndex == 'p1' ? lastStep.currentPointValueP1 : lastStep.currentPointValueP2;
   return ctrl.resignConfirm && ctrl.isBackgammonMultiPoint()
     ? h('div', [
         h('div.negotiation.resign-game', [
           declineButton(ctrl, () => ctrl.resign(false)),
-          h('p', 'Resign the current game?'),
+          h('p', `Resign game (${pointValue}pt${pointValue > 1 ? 's' : ''})?`),
           acceptButton(ctrl, 'resign-game', () => ctrl.resign(true)),
         ]),
         h('div.negotiation.resign-match', [

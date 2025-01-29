@@ -804,6 +804,8 @@ export default class RoundController {
       uci: o.uci,
       check: o.check,
       crazy: o.crazyhouse,
+      currentPointValueP1: o.currentPointValueP1,
+      currentPointValueP2: o.currentPointValueP2,
     };
     if (step.uci === 'undo') {
       d.steps.pop();

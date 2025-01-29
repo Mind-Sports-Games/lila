@@ -85,7 +85,7 @@ export const renderTablePlay = (ctrl: RoundController) => {
     replay.render(ctrl),
     h('div.rcontrols', [
       ...buttons,
-      ctrl.resignConfirm && ctrl.isBackgammonMultiPoint
+      ctrl.resignConfirm && ctrl.isBackgammonMultiPoint()
         ? null
         : h(
             'div.ricons',
