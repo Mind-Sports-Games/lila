@@ -230,12 +230,35 @@ case class SwissPairingGames(
     if (isMultiPoint) {
       lastGame.metadata.multiPointState
         .fold(0) { mps =>
-          if (lastGame.winnerPlayerIndex == Some(playerIndex)) {
-            Math.min(
-              playerIndex.fold(mps.p1Points, mps.p2Points) + lastGame.pointValue.getOrElse(0),
-              mps.target
-            )
-          } else playerIndex.fold(mps.p1Points, mps.p2Points)
+          (lastGame.status, lastGame.winnerPlayerIndex == Some(playerIndex)) match {
+            case (s, true)
+                if List(SGStatus.RuleOfGin, SGStatus.GinGammon, SGStatus.GinBackgammon).contains(s) =>
+              if (
+                playerIndex.fold(mps.p1Points, mps.p2Points) + lastGame.pointValue.getOrElse(0) < mps.target
+              ) {
+                playerIndex.fold(mps.p1Points, mps.p2Points) + lastGame.pointValue.getOrElse(0)
+              } else {
+                mps.target
+              }
+            case (s, false)
+                if List(SGStatus.RuleOfGin, SGStatus.GinGammon, SGStatus.GinBackgammon).contains(s) =>
+              if (
+                (!playerIndex)
+                  .fold(mps.p1Points, mps.p2Points) + lastGame.pointValue.getOrElse(0) < mps.target
+              ) {
+                mps.target
+              } else {
+                playerIndex.fold(mps.p1Points, mps.p2Points)
+              }
+            case (s, true) if SGStatus.flagged.contains(s)  => mps.target
+            case (s, false) if SGStatus.flagged.contains(s) => playerIndex.fold(mps.p1Points, mps.p2Points)
+            case (_, true) =>
+              Math.min(
+                playerIndex.fold(mps.p1Points, mps.p2Points) + lastGame.pointValue.getOrElse(0),
+                mps.target
+              )
+            case (_, false) => playerIndex.fold(mps.p1Points, mps.p2Points)
+          }
         }
         .toString()
     } else
