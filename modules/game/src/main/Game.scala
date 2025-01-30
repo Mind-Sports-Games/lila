@@ -19,6 +19,7 @@ import strategygames.{
   GameLogic,
   GameFamily,
   Mode,
+  MultiPointState => StratMultiPointState,
   Move,
   Drop,
   Lift,
@@ -925,8 +926,27 @@ case class Game(
   def withHandicappedTournament(isHandicapped: Boolean) =
     copy(metadata = metadata.copy(fromHandicappedTournament = isHandicapped))
 
+  //TODO Refactor MultiPointState!
   def withMultiPointState(multiPointState: Option[MultiPointState]) =
-    copy(metadata = metadata.copy(multiPointState = multiPointState))
+    copy(
+      stratGame = stratGame match {
+        case StratGame.Backgammon(g) =>
+          StratGame.wrap(
+            g.copy(
+              situation = g.situation.copy(
+                board = g.situation.board.copy(
+                  history = g.situation.board.history.copy(
+                    multiPointState =
+                      multiPointState.map(mps => StratMultiPointState(mps.target, mps.p1Points, mps.p2Points))
+                  )
+                )
+              )
+            )
+          )
+        case _ => stratGame
+      },
+      metadata = metadata.copy(multiPointState = multiPointState)
+    )
 
   def withTournamentId(id: String) = copy(metadata = metadata.copy(tournamentId = id.some))
   def withSwissId(id: String)      = copy(metadata = metadata.copy(swissId = id.some))
@@ -1125,13 +1145,12 @@ object Game {
           .copy(
             pgnImport = pgnImport,
             drawLimit = drawLimit,
-            multiMatch = multiMatch,
-            multiPointState = MultiPointState(backgammonPoints)
+            multiMatch = multiMatch
           ),
         createdAt = createdAt,
         updatedAt = createdAt,
         turnAt = createdAt
-      )
+      ).withMultiPointState(MultiPointState(backgammonPoints))
     )
   }
 
