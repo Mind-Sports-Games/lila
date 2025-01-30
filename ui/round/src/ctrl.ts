@@ -80,6 +80,7 @@ export default class RoundController {
   loadingTimeout: number;
   redirecting = false;
   areDiceDescending = true;
+  autoRoll = false;
   transientMove: TransientMove;
   moveToSubmit?: SocketMove;
   dropToSubmit?: SocketDrop;
@@ -291,6 +292,11 @@ export default class RoundController {
       case 'drop':
         this.cubeAction('cuben');
         break;
+      case 'autoroll':
+        this.autoRoll = !this.autoRoll;
+        this.chessground.redrawAll();
+        if (this.data.player.playerIndex === this.data.game.player) this.doForcedActions();
+        break;
     }
   };
 
@@ -365,7 +371,16 @@ export default class RoundController {
     this.cancelMove();
     this.chessground.selectSquare(null);
     if (ply != this.ply && this.jump(ply)) speech.userJump(this, this.ply);
-    else this.redraw();
+    else {
+      if (
+        ['backgammon', 'hyper', 'nackgammon'].includes(this.data.game.variant.key) &&
+        this.data.game.multiPointState
+      ) {
+        this.chessground.set({ multiPointState: this.finalMultiPointState() });
+        this.chessground.redrawAll();
+      }
+      this.redraw();
+    }
   };
 
   userJumpToTurn = (turn: number): void => {
@@ -377,6 +392,46 @@ export default class RoundController {
   };
 
   isPlaying = () => game.isPlayerPlaying(this.data);
+
+  finalMultiPointState = () => {
+    const d = this.data;
+    const game = d.game;
+    const pointsToAdd =
+      game.pointValue && game.winner && this.ply == round.lastPly(d)
+        ? game.winner === 'p1'
+          ? [game.pointValue, 0]
+          : [0, game.pointValue]
+        : [0, 0];
+
+    if (status.isOutOfTime(game.status.id) && game.winner && this.ply == round.lastPly(d)) {
+      if (status.isGin(game.status.id)) {
+        if (game.winner === 'p1') {
+          if (game.multiPointState.p1 + pointsToAdd[0] < game.multiPointState.target) {
+            pointsToAdd[1] += 64;
+          }
+        } else {
+          if (game.multiPointState.p2 + pointsToAdd[1] < game.multiPointState.target) {
+            pointsToAdd[0] += 64;
+          }
+        }
+      } else {
+        //normal timeout
+        if (game.winner === 'p1') {
+          pointsToAdd[0] += 64;
+        } else {
+          pointsToAdd[1] += 64;
+        }
+      }
+    }
+
+    return game.multiPointState
+      ? {
+          target: game.multiPointState.target,
+          p1: Math.min(game.multiPointState.target, game.multiPointState.p1 + pointsToAdd[0]),
+          p2: Math.min(game.multiPointState.target, game.multiPointState.p2 + pointsToAdd[1]),
+        }
+      : undefined;
+  };
 
   jump = (ply: Ply): boolean => {
     ply = Math.max(round.firstPly(this.data), Math.min(this.lastPly(), ply));
@@ -402,6 +457,7 @@ export default class RoundController {
       doublingCube: doublingCube,
       showUndoButton: false,
       cubeActions: [], //we dont know what these are so dont want to display them
+      multiPointState: this.finalMultiPointState(),
     };
     if (this.replaying()) {
       cancelDropMode(this.chessground.state);
@@ -775,6 +831,8 @@ export default class RoundController {
       uci: o.uci,
       check: o.check,
       crazy: o.crazyhouse,
+      currentPointValueP1: o.currentPointValueP1,
+      currentPointValueP2: o.currentPointValueP2,
     };
     if (step.uci === 'undo') {
       d.steps.pop();
@@ -949,6 +1007,7 @@ export default class RoundController {
     d.game.loserPlayer = o.loserPlayer;
     d.game.status = o.status;
     d.game.boosted = o.boosted;
+    d.game.pointValue = o.pointValue;
     this.userJump(this.lastPly());
     this.chessground.stop();
     if (o.ratingDiff) {
@@ -1058,7 +1117,7 @@ export default class RoundController {
         this.socket.sendLoading('resign');
         clearTimeout(this.resignConfirm);
       } else {
-        this.resignConfirm = setTimeout(() => this.resign(false), 3000);
+        this.resignConfirm = setTimeout(() => this.resign(false), 4000);
       }
       this.redraw();
     } else if (this.resignConfirm) {
@@ -1067,6 +1126,25 @@ export default class RoundController {
       this.redraw();
     }
   };
+
+  resignMatch = (v: boolean, immediately?: boolean): void => {
+    if (v) {
+      if (this.resignConfirm || !this.data.pref.confirmResign || immediately) {
+        this.socket.sendLoading('resign-match');
+        clearTimeout(this.resignConfirm);
+      } else {
+        this.resignConfirm = setTimeout(() => this.resign(false), 4000);
+      }
+      this.redraw();
+    } else if (this.resignConfirm) {
+      clearTimeout(this.resignConfirm);
+      this.resignConfirm = undefined;
+      this.redraw();
+    }
+  };
+
+  isBackgammonMultiPoint = (): boolean =>
+    this.data.game.multiPointState && ['backgammon', 'hyper', 'nackgammon'].includes(this.data.game.variant.key);
 
   goBerserk = () => {
     this.socket.berserk();
@@ -1336,7 +1414,9 @@ export default class RoundController {
       //backgammon roll dice at start of turn or end turn when no moves
       if (['backgammon', 'hyper', 'nackgammon'].includes(d.game.variant.key)) {
         if (d.canOnlyRollDice) setTimeout(() => this.forceRollDice(d.game.variant.key), this.forcedActionDelayMillis);
-        else if (d.pref.playForcedAction) this.playForcedAction();
+        else if (d.game.multiPointState && this.autoRoll && d.cubeActions && d.cubeActions.includes('offer')) {
+          setTimeout(() => this.forceRollDice(d.game.variant.key), this.forcedActionDelayMillis);
+        } else if (d.pref.playForcedAction) this.playForcedAction();
       }
     }
   };

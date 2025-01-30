@@ -11,6 +11,8 @@ case class Step(
     move: Option[Step.Move],
     fen: FEN,
     check: Boolean,
+    currentPointValueP1: Option[Int],
+    currentPointValueP2: Option[Int],
     // None when not computed yet
     dests: Option[Map[Pos, List[Pos]]],
     drops: Option[List[Pos]],
@@ -58,6 +60,8 @@ object Step {
         "captLen"       -> ~captLen
       )
       .add("check", check)
+      .add("currentPointValueP1", currentPointValueP1)
+      .add("currentPointValueP2", currentPointValueP2)
       .add(
         "dests",
         dests.map {

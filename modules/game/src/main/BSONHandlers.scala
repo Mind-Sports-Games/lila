@@ -21,6 +21,7 @@ import strategygames.{
   Pockets,
   Pos,
   PositionHash,
+  MultiPointState => StratMultiPointState,
   Score,
   Situation,
   Board,
@@ -611,6 +612,8 @@ object BSONHandlers {
         def turnUcis(turnStr: Option[String]) =
           turnStr.map(_.split(",").toList.flatMap(backgammon.format.Uci.apply)).getOrElse(List.empty)
 
+        val multiPointState = r.getO[MultiPointState](F.multiPointState)
+
         val backgammonGame = StratGame.Backgammon(
           backgammon.Game(
             situation = backgammon.Situation(
@@ -629,7 +632,8 @@ object BSONHandlers {
                   score = {
                     val counts = r.intsD(F.score)
                     Score(~counts.headOption, ~counts.lastOption)
-                  }
+                  },
+                  multiPointState = multiPointState.map(mps => StratMultiPointState(mps.target, mps.p1Points, mps.p2Points))
                 ),
                 variant = gameVariant,
                 pocketData = gameVariant.dropsVariant option (r.get[PocketData](F.pocketData)) match {
@@ -656,7 +660,7 @@ object BSONHandlers {
         )
 
         val backgammonMetaData = defaultMetaData.copy(
-          multiPointState = r.getO[MultiPointState](F.multiPointState)
+          multiPointState = multiPointState
         )
 
         (backgammonGame, backgammonMetaData)

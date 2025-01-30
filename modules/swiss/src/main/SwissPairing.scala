@@ -1,6 +1,6 @@
 package lila.swiss
 
-import strategygames.{ Player => PlayerIndex, GameFamily, GameLogic }
+import strategygames.{ Player => PlayerIndex, GameFamily, GameLogic, Status => SGStatus }
 import strategygames.format.FEN
 import strategygames.variant.Variant
 import lila.game.{ Game, MultiPointState }
@@ -185,6 +185,22 @@ case class SwissPairingGames(
         case x if x < 0 => Some(PlayerIndex.P2)
         case _          => None
       }
+    } else if (
+      isMultiPoint && List(SGStatus.RuleOfGin, SGStatus.GinGammon, SGStatus.GinBackgammon).contains(
+        lastGame.status
+      )
+    ) {
+      lastGame.metadata.multiPointState.flatMap { mps =>
+        lastGame.winnerPlayerIndex.map { p =>
+          if (
+            (if (p == PlayerIndex.P1) mps.p1Points else mps.p2Points) + lastGame.pointValue.getOrElse(
+              0
+            ) >= mps.target
+          )
+            p
+          else !p
+        }
+      }
     } else lastGame.winnerPlayerIndex
 
   def playersWhoDidNotMove =
@@ -214,12 +230,35 @@ case class SwissPairingGames(
     if (isMultiPoint) {
       lastGame.metadata.multiPointState
         .fold(0) { mps =>
-          if (lastGame.situation.winner == Some(playerIndex)) {
-            Math.min(
-              playerIndex.fold(mps.p1Points, mps.p2Points) + lastGame.situation.pointValue.getOrElse(0),
-              mps.target
-            )
-          } else playerIndex.fold(mps.p1Points, mps.p2Points)
+          (lastGame.status, lastGame.winnerPlayerIndex == Some(playerIndex)) match {
+            case (s, true)
+                if List(SGStatus.RuleOfGin, SGStatus.GinGammon, SGStatus.GinBackgammon).contains(s) =>
+              if (
+                playerIndex.fold(mps.p1Points, mps.p2Points) + lastGame.pointValue.getOrElse(0) < mps.target
+              ) {
+                playerIndex.fold(mps.p1Points, mps.p2Points) + lastGame.pointValue.getOrElse(0)
+              } else {
+                mps.target
+              }
+            case (s, false)
+                if List(SGStatus.RuleOfGin, SGStatus.GinGammon, SGStatus.GinBackgammon).contains(s) =>
+              if (
+                (!playerIndex)
+                  .fold(mps.p1Points, mps.p2Points) + lastGame.pointValue.getOrElse(0) < mps.target
+              ) {
+                mps.target
+              } else {
+                playerIndex.fold(mps.p1Points, mps.p2Points)
+              }
+            case (s, true) if SGStatus.flagged.contains(s)  => mps.target
+            case (s, false) if SGStatus.flagged.contains(s) => playerIndex.fold(mps.p1Points, mps.p2Points)
+            case (_, true) =>
+              Math.min(
+                playerIndex.fold(mps.p1Points, mps.p2Points) + lastGame.pointValue.getOrElse(0),
+                mps.target
+              )
+            case (_, false) => playerIndex.fold(mps.p1Points, mps.p2Points)
+          }
         }
         .toString()
     } else

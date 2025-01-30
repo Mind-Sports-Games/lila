@@ -240,11 +240,14 @@ final private class SwissDirector(
         swiss.settings.handicapped || (swiss.settings.mcmahon && pairing.openingFEN.nonEmpty)
       )
       .withMultiPointState(
-        if (prevGame.isEmpty) swiss.settings.backgammonPoints.map(t => MultiPointState(t))
+        if (prevGame.isEmpty) MultiPointState(swiss.settings.backgammonPoints)
         else
           prevGame.flatMap { g =>
             g.metadata.multiPointState.flatMap(
-              _.updateMultiPointState(g.situation.pointValue, g.situation.winner)
+              _.updateMultiPointState(
+                g.pointValue,
+                g.winnerPlayerIndex
+              )
             )
           }
       )

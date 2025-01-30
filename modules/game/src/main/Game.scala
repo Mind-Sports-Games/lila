@@ -19,6 +19,7 @@ import strategygames.{
   GameLogic,
   GameFamily,
   Mode,
+  MultiPointState => StratMultiPointState,
   Move,
   Drop,
   Lift,
@@ -495,6 +496,11 @@ case class Game(
       p2Player = f(p2Player)
     )
 
+  def pointValue: Option[Int] = {
+    if (status == Status.ResignMatch) Some(64)
+    else situation.pointValue(winnerPlayerIndex.map(!_))
+  }
+
   def selectSquaresPossible =
     started &&
       playable &&
@@ -817,9 +823,7 @@ case class Game(
           case Rapid       => 30
           case _           => 35
         }
-      if (
-        variant.key == "chess960" || variant.key == "backgammon" || variant.key == "nackgammon"
-      ) base * 2
+      if (variant.key == "chess960" || variant.key == "backgammon" || variant.key == "nackgammon") base * 2
       else if (isTournament && (variant.draughts64Variant) && metadata.simulPairing.isDefined) base + 10
       else base
     }
@@ -922,8 +926,27 @@ case class Game(
   def withHandicappedTournament(isHandicapped: Boolean) =
     copy(metadata = metadata.copy(fromHandicappedTournament = isHandicapped))
 
+  //TODO Refactor MultiPointState!
   def withMultiPointState(multiPointState: Option[MultiPointState]) =
-    copy(metadata = metadata.copy(multiPointState = multiPointState))
+    copy(
+      stratGame = stratGame match {
+        case StratGame.Backgammon(g) =>
+          StratGame.wrap(
+            g.copy(
+              situation = g.situation.copy(
+                board = g.situation.board.copy(
+                  history = g.situation.board.history.copy(
+                    multiPointState =
+                      multiPointState.map(mps => StratMultiPointState(mps.target, mps.p1Points, mps.p2Points))
+                  )
+                )
+              )
+            )
+          )
+        case _ => stratGame
+      },
+      metadata = metadata.copy(multiPointState = multiPointState)
+    )
 
   def withTournamentId(id: String) = copy(metadata = metadata.copy(tournamentId = id.some))
   def withSwissId(id: String)      = copy(metadata = metadata.copy(swissId = id.some))
@@ -1122,13 +1145,12 @@ object Game {
           .copy(
             pgnImport = pgnImport,
             drawLimit = drawLimit,
-            multiMatch = multiMatch,
-            multiPointState = backgammonPoints.map(bp => MultiPointState(bp))
+            multiMatch = multiMatch
           ),
         createdAt = createdAt,
         updatedAt = createdAt,
         turnAt = createdAt
-      )
+      ).withMultiPointState(MultiPointState(backgammonPoints))
     )
   }
 
@@ -1256,20 +1278,25 @@ case class MultiPointState(target: Int, p1Points: Int = 0, p2Points: Int = 0) {
 
 object MultiPointState {
 
+  def apply(points: Option[Int]): Option[MultiPointState] = points.filter(_ != 1).map(p => MultiPointState(p))
+
   def nextGameIsCrawford(game: Game): Boolean =
     game.metadata.multiPointState.fold(false)(mps =>
       !mps.isCrawfordState && mps
-        .updateMultiPointState(game.situation.pointValue, game.situation.winner)
+        .updateMultiPointState(
+          game.pointValue,
+          game.winnerPlayerIndex
+        )
         .map(_.isCrawfordState)
         .getOrElse(false)
     )
 
   def requireMoreGamesInMultipoint(game: Game): Boolean =
-    !((Status.flagged ++ Status.resigned).contains(game.status)) &&
+    !((Status.flagged ++ List(Status.ResignMatch)).contains(game.status)) &&
       game.metadata.multiPointState.fold(false)(mps =>
         game.winnerPlayerIndex
           .map { p =>
-            p.fold(mps.p1Points, mps.p2Points) + game.situation.pointValue.getOrElse(0) < mps.target
+            p.fold(mps.p1Points, mps.p2Points) + game.pointValue.getOrElse(0) < mps.target
           }
           .getOrElse(false)
       )

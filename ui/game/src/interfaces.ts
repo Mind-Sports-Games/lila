@@ -50,6 +50,7 @@ export interface BaseGame {
   rematch?: string;
   multiMatch?: MultiMatch;
   multiPointState?: MultiPointState;
+  pointValue?: number;
   rated?: boolean;
   perf: string;
 }
@@ -85,6 +86,7 @@ export type StatusName =
   | 'resign'
   | 'resignGammon'
   | 'resignBackgammon'
+  | 'resignMatch'
   | 'cubeDropped'
   | 'stalemate'
   | 'timeout'

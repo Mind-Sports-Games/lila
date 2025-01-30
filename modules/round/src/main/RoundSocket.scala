@@ -15,7 +15,7 @@ import lila.common.{ Bus, IpAddress, Lilakka }
 import lila.game.Game.{ FullId, PlayerId }
 import lila.game.{ Event, Game, Pov }
 import lila.hub.actorApi.map.{ Exists, Tell, TellAll, TellIfExists, TellMany }
-import lila.hub.actorApi.round.{ Abort, Berserk, RematchNo, RematchYes, Resign, TourStanding }
+import lila.hub.actorApi.round.{ Abort, Berserk, RematchNo, RematchYes, Resign, ResignMatch, TourStanding }
 import lila.hub.actorApi.socket.remote.TellSriIn
 import lila.hub.actorApi.tv.TvSelect
 import lila.hub.DuctConcMap
@@ -111,6 +111,7 @@ final class RoundSocket(
         case "select-squares-decline" => tellRound(id.gameId, SelectSquaresDecline(id.playerId))
         case "resign"                 => tellRound(id.gameId, Resign(id.playerId.value))
         case "resign-force"           => tellRound(id.gameId, ResignForce(id.playerId))
+        case "resign-match"           => tellRound(id.gameId, ResignMatch(id.playerId.value))
         case "draw-force"             => tellRound(id.gameId, DrawForce(id.playerId))
         case "abort"                  => tellRound(id.gameId, Abort(id.playerId.value))
         case "outoftime"              => tellRound(id.gameId, QuietFlag) // mobile app BC

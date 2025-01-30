@@ -165,6 +165,8 @@ export interface Step {
   uci: Uci;
   check?: boolean;
   crazy?: StepCrazy;
+  currentPointValueP1?: number;
+  currentPointValueP2?: number;
 }
 
 export interface ApiAction extends Step {
@@ -219,6 +221,7 @@ export interface ApiEnd {
   winnerPlayer?: PlayerName;
   loserPlayer?: PlayerName;
   status: Status;
+  pointValue?: number;
   ratingDiff?: {
     p1: number;
     p2: number;

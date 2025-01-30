@@ -79,18 +79,21 @@ export const renderTablePlay = (ctrl: RoundController) => {
             button.cancelTakebackProposition(ctrl),
             button.answerOpponentTakebackProposition(ctrl),
             button.selectSquaresOfferOptions(ctrl),
+            button.resignOptions(ctrl),
           ];
   return [
     replay.render(ctrl),
     h('div.rcontrols', [
       ...buttons,
-      h(
-        'div.ricons',
-        {
-          class: { confirm: !!(ctrl.drawConfirm || ctrl.resignConfirm || ctrl.passConfirm) },
-        },
-        icons,
-      ),
+      ctrl.resignConfirm && ctrl.isBackgammonMultiPoint()
+        ? null
+        : h(
+            'div.ricons',
+            {
+              class: { confirm: !!(ctrl.drawConfirm || ctrl.resignConfirm || ctrl.passConfirm) },
+            },
+            icons,
+          ),
     ]),
   ];
 };
