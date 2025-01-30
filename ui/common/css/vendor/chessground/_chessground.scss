@@ -1134,8 +1134,46 @@ cg-container .cg-custom-svgs svg {
       padding: 3%;
       font-weight: bold;
       @include breakpoint($mq-col1-uniboard) {
-        border-width: thin;
+        border-width: thin !important;
       }
+    }
+  }
+}
+
+.variant-nackgammon,
+.variant-hyper,
+.variant-backgammon {
+  cg-autoroll-button {
+    left: calc(100% * 7 / 15 + 0.1%);
+    top: 51%;
+    height: calc(100% * 0.75 / 15);
+    width: 6.5%;
+    position: absolute;
+    pointer-events: none;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    color: #414143;
+    font-weight: bold;
+    font-size: 75%;
+    border: thin solid;
+    border-color: black;
+    border-radius: 0.3vw;
+    .backgammon-classic & {
+      background-color: #9ab7bb;
+    }
+    .backgammon-contemporary & {
+      background-color: #c5c68a;
+    }
+    @include breakpoint($mq-col1-phone) {
+      font-size: 50%;
+    }
+    &.on {
+      opacity: 1; //TODO other effects?
+    }
+    &.off {
+      opacity: 0.35;
     }
   }
 }
@@ -1219,7 +1257,7 @@ cg-container .cg-custom-svgs svg {
 
   cg-doubling-cube.both {
     left: calc(100% * 7 / 15);
-    top: 46.66666666%;
+    top: 43.66666666%;
     height: calc(100% * 1 / 15);
   }
 
