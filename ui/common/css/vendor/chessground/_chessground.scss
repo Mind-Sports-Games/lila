@@ -1124,7 +1124,7 @@ cg-container .cg-custom-svgs svg {
     position: absolute;
     pointer-events: none;
     cg-button {
-      width: calc(100% * 15 * 15 / 600);
+      width: calc(100% * 18 * 15 / 600);
       &.unavailable {
         opacity: 0.35;
       }
