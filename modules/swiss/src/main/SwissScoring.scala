@@ -30,7 +30,7 @@ final private class SwissTiebreak(
                 pairing.matchStatus match {
                   case Left(_) => List()
                   case Right(results) =>
-                    results.map(_ match {
+                    results.map({
                       case None => r.draw(hero, foe)
                       case Some(playerIndex) =>
                         if (pairing(playerIndex) == hero.id)
@@ -40,6 +40,8 @@ final private class SwissTiebreak(
                     })
                 }
               }
+              // TODO: Identify if the following three cases are short-changing
+              //       players who get byes or are withdrawn/absent
               case None if player.byes(round) => List(r.bye(hero))
               case None if round.value == 1   => List(r.absentLoss(hero))
               case None                       => List(r.withdrawn(hero))
