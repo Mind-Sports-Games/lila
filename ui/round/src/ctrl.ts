@@ -80,6 +80,7 @@ export default class RoundController {
   loadingTimeout: number;
   redirecting = false;
   areDiceDescending = true;
+  autoRoll = false;
   transientMove: TransientMove;
   moveToSubmit?: SocketMove;
   dropToSubmit?: SocketDrop;
@@ -290,6 +291,11 @@ export default class RoundController {
         break;
       case 'drop':
         this.cubeAction('cuben');
+        break;
+      case 'autoroll':
+        this.autoRoll = !this.autoRoll;
+        this.chessground.redrawAll();
+        if (this.data.player.playerIndex === this.data.game.player) this.doForcedActions();
         break;
     }
   };
@@ -1408,7 +1414,9 @@ export default class RoundController {
       //backgammon roll dice at start of turn or end turn when no moves
       if (['backgammon', 'hyper', 'nackgammon'].includes(d.game.variant.key)) {
         if (d.canOnlyRollDice) setTimeout(() => this.forceRollDice(d.game.variant.key), this.forcedActionDelayMillis);
-        else if (d.pref.playForcedAction) this.playForcedAction();
+        else if (d.game.multiPointState && this.autoRoll && d.cubeActions && d.cubeActions.includes('offer')) {
+          setTimeout(() => this.forceRollDice(d.game.variant.key), this.forcedActionDelayMillis);
+        } else if (d.pref.playForcedAction) this.playForcedAction();
       }
     }
   };
