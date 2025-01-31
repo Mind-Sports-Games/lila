@@ -82,10 +82,21 @@ object mini {
     }
   }
 
+  private def renderBackgammonMultiPointState(pov: Pov) =
+    pov.game.metadata.multiPointState match {
+      case Some(mps) =>
+        val p1Points = "%02d".format(mps.p1Points)
+        val p2Points = "%02d".format(mps.p2Points)
+        s"$p1Points$p2Points"
+      case None => "-"
+    }
+
   def renderState(pov: Pov) =
     pov.game.variant match {
+      case Variant.Backgammon(_) =>
+        dataState := s"${Forsyth.>>(pov.game.variant.gameLogic, pov.game.stratGame)}|${orientation(pov)}|${~pov.game.lastActionKeys}|${renderBackgammonMultiPointState(pov)}"
       case Variant.Chess(_) | Variant.FairySF(_) | Variant.Samurai(_) | Variant.Togyzkumalak(_) |
-          Variant.Go(_) | Variant.Backgammon(_) | Variant.Abalone(_) =>
+          Variant.Go(_) | Variant.Abalone(_) =>
         dataState := s"${Forsyth.>>(pov.game.variant.gameLogic, pov.game.stratGame)}|${orientation(pov)}|${~pov.game.lastActionKeys}"
       case Variant.Draughts(v) =>
         dataState := s"${Forsyth.boardAndPlayer(

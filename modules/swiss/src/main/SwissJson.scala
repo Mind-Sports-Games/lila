@@ -396,6 +396,14 @@ object SwissJson {
     else if (g.p2Player.userId.contains(b.p2.user.id)) b.p2
     else b.p1
 
+  private[swiss] def multiPointScoreJson(g: Game) =
+    g.metadata.multiPointState.map { mps =>
+      Json.obj(
+        "p1" -> mps.p1Points,
+        "p2" -> mps.p2Points
+      )
+    }
+
   private[swiss] def boardJson(b: SwissBoard.WithGame) =
     boardGameJson(b.game, b.board.p1, b.board.p2)
       .add("winner" -> b.game.winnerPlayerIndex.map(_.name))
@@ -408,6 +416,7 @@ object SwissJson {
           l.map(g =>
             boardGameJson(g, boardPlayerFromGame(g, b.board, P1), boardPlayerFromGame(g, b.board, P2))
               .add("boardSize" -> boardSizeJson(g.variant))
+              .add("multiPointScore" -> multiPointScoreJson(g))
           )
         )
       )

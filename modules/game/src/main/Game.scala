@@ -140,6 +140,7 @@ case class Game(
   def tournamentId              = metadata.tournamentId
   def simulId                   = metadata.simulId
   def swissId                   = metadata.swissId
+  def multiPointState           = metadata.multiPointState
 
   def isTournament = tournamentId.isDefined
   def isSimul      = simulId.isDefined
@@ -381,7 +382,15 @@ case class Game(
         val fen   = Forsyth.>>(variant.gameLogic, situation)
         val score = (if (playerIndex.name == "p1") fen.player1Score else fen.player2Score) / 10.0
         score.toString().replace(".0", "")
-      case "backgammon" | "hyper" | "nackgammon" => history.score(playerIndex).toString()
+      case "backgammon" | "hyper" | "nackgammon" => {
+        multiPointState match {
+          case Some(mps) => (
+            if (playerIndex == P1) mps.p1Points
+            else mps.p2Points
+          ).toString()
+          case None => history.score(playerIndex).toString()
+        }
+      }
       case _                                     => ""
     }
 
