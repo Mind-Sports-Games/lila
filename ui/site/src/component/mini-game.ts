@@ -4,11 +4,11 @@ import { readDice, readDoublingCube, displayScore, fenPlayerIndex } from 'stratu
 import clockWidget from './clock-widget';
 
 interface UpdateData {
-  lm: string;
+  lm: string; // last move
   fen: string;
-  p1?: number;
-  p1Pending?: number;
-  p1Delay?: number;
+  p1?: number; // clock
+  p1Pending?: number; // clock
+  p1Delay?: number; // clock
   p2?: number;
   p2Pending?: number;
   p2Delay?: number;
@@ -48,7 +48,7 @@ export const init = (node: HTMLElement) => {
         }),
       );
     } else {
-      const [fen, orientation, lm] = node.getAttribute('data-state')!.split('|'),
+      const [fen, orientation, lm] = splitDataState(node),
         config = {
           coordinates: false,
           viewOnly: true,
@@ -166,10 +166,24 @@ export const update = (node: HTMLElement, data: UpdateData) => {
   renderClock(data.p1, data.p1Delay, data.p1Pending, 'p1');
   renderClock(data.p2, data.p2Delay, data.p2Pending, 'p2');
 
-  ['p1', 'p2'].forEach(playerIndex => {
-    const $score = $(node).find('.mini-game__score--' + playerIndex);
-    $score.html(displayScore(variantFromElement($el) as VariantKey, data.fen, playerIndex));
-  });
+  if (['backgammon', 'nackgammon', 'hyper'].includes(variantFromElement($el)) && isMultiPoint(node)) {
+    ['p1', 'p2'].forEach(playerIndex => {
+      const $score = $(node).find('.mini-game__score--' + playerIndex);
+      const multiPointScore = getMultiPointScoreFromDataState(node);
+      $score.html(
+        displayScore(
+          variantFromElement($el) as VariantKey,
+          'f a k e ' + (+multiPointScore.substring(0, 2) + "") + " " + (+multiPointScore.substring(2, 4) + ""),
+          playerIndex
+        )
+      );
+    });
+  } else {
+    ['p1', 'p2'].forEach(playerIndex => {
+      const $score = $(node).find('.mini-game__score--' + playerIndex);
+      $score.html(displayScore(variantFromElement($el) as VariantKey, data.fen, playerIndex));
+    });
+  }
 };
 
 export const finish = (node: HTMLElement, win?: string, p1Score?: string, p2Score?: string) =>
@@ -187,3 +201,7 @@ export const finish = (node: HTMLElement, win?: string, p1Score?: string, p2Scor
       );
     }
   });
+
+const splitDataState = (node: HTMLElement): string[] => node.getAttribute('data-state')!.split('|');
+const getMultiPointScoreFromDataState = (node: HTMLElement): string => splitDataState(node)[3];
+const isMultiPoint = (node: HTMLElement) => getMultiPointScoreFromDataState(node) !== '-';

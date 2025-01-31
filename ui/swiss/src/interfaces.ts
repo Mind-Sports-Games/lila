@@ -166,6 +166,10 @@ export interface Board {
   p2Color: PlayerColor;
   multiMatchGameIds?: string[];
   multiMatchGames?: Board[];
+  multiPointScore?: {
+    p1: number;
+    p2: number;
+  };
   isBestOfX: boolean;
   isPlayX: boolean;
   clock?: {
