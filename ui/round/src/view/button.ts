@@ -147,19 +147,27 @@ const fbtCancel = (ctrl: RoundController, f: (v: boolean) => void) =>
 export function resignOptions(ctrl: RoundController): VNode | null {
   const lastStep = round.lastStep(ctrl.data);
   const pointValue = ctrl.data.player.playerIndex == 'p1' ? lastStep.currentPointValueP1 : lastStep.currentPointValueP2;
+  const mps = ctrl.data.game.multiPointState;
+  const showOnlyResign = mps && pointValue + (ctrl.data.player.playerIndex == 'p1' ? mps.p2 : mps.p1) >= mps.target;
   return ctrl.resignConfirm && ctrl.isBackgammonMultiPoint()
-    ? h('div', [
-        h('div.negotiation.resign-game', [
-          declineButton(ctrl, () => ctrl.resign(false)),
-          h('p', `Resign game (${pointValue}pt${pointValue > 1 ? 's' : ''})?`),
-          acceptButton(ctrl, 'resign-game', () => ctrl.resign(true)),
-        ]),
-        h('div.negotiation.resign-match', [
+    ? showOnlyResign
+      ? h('div.negotiation.resign-match', [
           declineButton(ctrl, () => ctrl.resignMatch(false)),
-          h('p', 'Resign the whole match?'),
+          h('p', 'Resign game and match?'),
           acceptButton(ctrl, 'resign-match', () => ctrl.resignMatch(true)),
-        ]),
-      ])
+        ])
+      : h('div', [
+          h('div.negotiation.resign-game', [
+            declineButton(ctrl, () => ctrl.resign(false)),
+            h('p', `Resign game (${pointValue}pt${pointValue > 1 ? 's' : ''})?`),
+            acceptButton(ctrl, 'resign-game', () => ctrl.resign(true)),
+          ]),
+          h('div.negotiation.resign-match', [
+            declineButton(ctrl, () => ctrl.resignMatch(false)),
+            h('p', 'Resign the whole match?'),
+            acceptButton(ctrl, 'resign-match', () => ctrl.resignMatch(true)),
+          ]),
+        ])
     : null;
 }
 
