@@ -383,10 +383,11 @@ case class Game(
         val score = (if (playerIndex.name == "p1") fen.player1Score else fen.player2Score) / 10.0
         score.toString().replace(".0", "")
       case "backgammon" | "hyper" | "nackgammon" => {
-        metadata.multiPointState match {
-          case Some(mps) =>
-            if (playerIndex == P1) mps.p1Points.toString()
-            else mps.p2Points.toString()
+        multiPointState match {
+          case Some(mps) => (
+            if (playerIndex == P1) mps.p1Points
+            else mps.p2Points
+          ).toString()
           case None => history.score(playerIndex).toString()
         }
       }

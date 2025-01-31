@@ -85,8 +85,8 @@ object mini {
   private def renderBackgammonMultiPointState(pov: Pov) =
     pov.game.metadata.multiPointState match {
       case Some(mps) =>
-      val p1Points = if (mps.p1Points < 10) s"0${mps.p1Points}" else mps.p1Points.toString
-      val p2Points = if (mps.p2Points < 10) s"0${mps.p2Points}" else mps.p2Points.toString
+      val p1Points = "%02d".format(mps.p1Points)
+      val p2Points = "%02d".format(mps.p2Points)
       s"$p1Points$p2Points"
       case None => "-"
     }

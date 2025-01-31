@@ -26,19 +26,15 @@ const orientation = (p: PlayerIndex, gl: string): string => {
   }
 };
 
-const formatMultiMatchScore = (board: Board): string => {
-  if (!board.multiPointScore) {
-    return '-';
-  }
-  return [board.multiPointScore.p1, board.multiPointScore.p2].map(s => (s < 10 ? '0' + s : s)).join(''); // care about s being 0 or undefined
-};
+const formatMultiMatchScore = (board: Board): string =>
+  !board.multiPointScore
+    ? '-'
+    : [board.multiPointScore.p1, board.multiPointScore.p2].map(s => (s < 10 ? '0' + s : s)).join(''); // care about s being 0 or undefined
 
-const renderBoardState = (board: Board): string => {
-  if (board.gameLogic === 'draughts' && !!board.boardSize) {
-    return `${board.fen}|${board.boardSize.size[0]}x${board.boardSize.size[1]}|${board.orientation}|${board.lastMove}`;
-  }
-  return `${board.fen}|${orientation(board.orientation, board.gameLogic)}|${board.lastMove}|${formatMultiMatchScore(board)}`;
-};
+const renderBoardState = (board: Board): string =>
+  board.gameLogic === 'draughts' && !!board.boardSize
+    ? `${board.fen}|${board.boardSize.size[0]}x${board.boardSize.size[1]}|${board.orientation}|${board.lastMove}`
+    : `${board.fen}|${orientation(board.orientation, board.gameLogic)}|${board.lastMove}|${formatMultiMatchScore(board)}`;
 
 const renderBoard = (incomingBoard: Board): VNode => {
   const board = incomingBoard.multiMatchGames ? incomingBoard.multiMatchGames.slice(-1)[0] : incomingBoard;
@@ -70,10 +66,11 @@ const renderBoard = (incomingBoard: Board): VNode => {
 
 function boardPlayer(board: Board, playerIndex: PlayerIndex) {
   const player = board[playerIndex];
-  const fen = !board.multiPointScore
-    ? board.fen
-    : 'f a k e ' + board.multiPointScore.p1 + ' ' + board.multiPointScore.p2;
-  const score = displayScore(board.variantKey as VariantKey, fen, playerIndex);
+  const score = !board.multiPointScore
+    ? displayScore(board.variantKey as VariantKey, board.fen, playerIndex)
+    : playerIndex == 'p1'
+      ? `(${board.multiPointScore.p1})`
+      : `(${board.multiPointScore.p2})`;
   return h('span.mini-game__player', [
     h('span.mini-game__user.is.playerIndex-icon.text.' + (playerIndex == 'p1' ? board.p1Color : board.p2Color), [
       h('strong', '#' + player.rank),
