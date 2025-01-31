@@ -1111,13 +1111,16 @@ export default class RoundController {
     promotion.cancel(this);
   };
 
+  isBackgammonMultiPoint = (): boolean =>
+    this.data.game.multiPointState && ['backgammon', 'hyper', 'nackgammon'].includes(this.data.game.variant.key);
+
   resign = (v: boolean, immediately?: boolean): void => {
     if (v) {
       if (this.resignConfirm || !this.data.pref.confirmResign || immediately) {
         this.socket.sendLoading('resign');
         clearTimeout(this.resignConfirm);
       } else {
-        this.resignConfirm = setTimeout(() => this.resign(false), 4000);
+        this.resignConfirm = setTimeout(() => this.resign(false), this.isBackgammonMultiPoint() ? 10000 : 3000);
       }
       this.redraw();
     } else if (this.resignConfirm) {
@@ -1133,7 +1136,7 @@ export default class RoundController {
         this.socket.sendLoading('resign-match');
         clearTimeout(this.resignConfirm);
       } else {
-        this.resignConfirm = setTimeout(() => this.resign(false), 4000);
+        this.resignConfirm = setTimeout(() => this.resign(false), this.isBackgammonMultiPoint() ? 10000 : 3000);
       }
       this.redraw();
     } else if (this.resignConfirm) {
@@ -1142,9 +1145,6 @@ export default class RoundController {
       this.redraw();
     }
   };
-
-  isBackgammonMultiPoint = (): boolean =>
-    this.data.game.multiPointState && ['backgammon', 'hyper', 'nackgammon'].includes(this.data.game.variant.key);
 
   goBerserk = () => {
     this.socket.berserk();

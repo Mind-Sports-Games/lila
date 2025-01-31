@@ -27,8 +27,8 @@ importers:
         specifier: github:lichess-org/ab-stub
         version: https://codeload.github.com/lichess-org/ab-stub/tar.gz/94236bf34dbc9c05daf50f4c9842d859b9142be0
       chessground:
-        specifier: git+ssh://git@github.com:Mind-Sports-Games/chessground.git#v7.11.1-pstrat3.10
-        version: https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/d27c2a918990cfd82873f93478652da0015c72ee(@babel/core@7.26.7)(@jest/transform@29.7.0)(@jest/types@29.6.3)(babel-jest@29.7.0(@babel/core@7.26.7))
+        specifier: git+ssh://git@github.com:Mind-Sports-Games/chessground.git#v7.11.1-pstrat3.11
+        version: https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/ebb3f779c03604ad77271b3393ca716b1d902d45(@babel/core@7.26.7)(@jest/transform@29.7.0)(@jest/types@29.6.3)(babel-jest@29.7.0(@babel/core@7.26.7))
       eslint:
         specifier: ^8.57.0
         version: 8.57.1
@@ -1785,9 +1785,9 @@ packages:
     resolution: {tarball: https://codeload.github.com/ornicar/chess.js/tar.gz/ad0709c0b07773d9d0da8e4605a9a2a28f00d249}
     version: 0.10.2
 
-  chessground@https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/d27c2a918990cfd82873f93478652da0015c72ee:
-    resolution: {tarball: https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/d27c2a918990cfd82873f93478652da0015c72ee}
-    version: 7.11.1-pstrat3.10
+  chessground@https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/ebb3f779c03604ad77271b3393ca716b1d902d45:
+    resolution: {tarball: https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/ebb3f779c03604ad77271b3393ca716b1d902d45}
+    version: 7.11.1-pstrat3.11
     engines: {node: '>=20', pnpm: ^9}
 
   chokidar@3.6.0:
@@ -1798,8 +1798,8 @@ packages:
     resolution: {integrity: sha512-NIxF55hv4nSqQswkAeiOi1r83xy8JldOFDTWiug55KBu9Jnblncd2U6ViHmYgHf01TPZS77NJBhBMKdWj9HQMQ==}
     engines: {node: '>=8'}
 
-  cjs-module-lexer@1.4.1:
-    resolution: {integrity: sha512-cuSVIHi9/9E/+821Qjdvngor+xpnlwnuwIyZOaLmHBVdXL+gP+I6QQB9VkO7RI77YIcTV+S1W9AreJ5eN63JBA==}
+  cjs-module-lexer@1.4.3:
+    resolution: {integrity: sha512-9z8TZaGM1pfswYeXrUpzPrkx8UnWYdhJclsiYMm6x/w5+nN+8Tf/LnAgfLGQCm59qAOxU8WwHEq2vNwF6i4j+Q==}
 
   cli-cursor@5.0.0:
     resolution: {integrity: sha512-aCj4O5wKyszjMmDT4tZj93kxyydN/K5zPWSCe6/0AV/AA1pqe5ZBIw0a2ZfPQV7lL5/yb5HsUreJ6UFAF1tEQw==}
@@ -4544,7 +4544,7 @@ snapshots:
 
   chess.js@https://codeload.github.com/ornicar/chess.js/tar.gz/ad0709c0b07773d9d0da8e4605a9a2a28f00d249: {}
 
-  chessground@https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/d27c2a918990cfd82873f93478652da0015c72ee(@babel/core@7.26.7)(@jest/transform@29.7.0)(@jest/types@29.6.3)(babel-jest@29.7.0(@babel/core@7.26.7)):
+  chessground@https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/ebb3f779c03604ad77271b3393ca716b1d902d45(@babel/core@7.26.7)(@jest/transform@29.7.0)(@jest/types@29.6.3)(babel-jest@29.7.0(@babel/core@7.26.7)):
     dependencies:
       '@jest/globals': 29.7.0
       '@types/node': 20.12.2
@@ -4580,7 +4580,7 @@ snapshots:
 
   ci-info@3.9.0: {}
 
-  cjs-module-lexer@1.4.1: {}
+  cjs-module-lexer@1.4.3: {}
 
   cli-cursor@5.0.0:
     dependencies:
@@ -5289,7 +5289,7 @@ snapshots:
       '@jest/types': 29.6.3
       '@types/node': 20.12.2
       chalk: 4.1.2
-      cjs-module-lexer: 1.4.1
+      cjs-module-lexer: 1.4.3
       collect-v8-coverage: 1.0.2
       glob: 7.2.3
       graceful-fs: 4.2.11
