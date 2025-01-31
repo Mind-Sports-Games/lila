@@ -165,8 +165,7 @@ final private class SwissDirector(
             .giveTime(P2, -pgc.clockPlayer(P2).elapsed)
             .giveTime(
               pg.situation.player,
-              if (Status.resigned.contains(pg.status))
-                Centis.ofSeconds(swiss.clock.graceSeconds)
+              if (pg.status != Status.CubeDropped) Centis.ofSeconds(swiss.clock.graceSeconds)
               else Centis(0)
             )
             .some
