@@ -1,6 +1,6 @@
 package lila.swiss
 
-import strategygames.{ P2, Player => PlayerIndex, P1, GameLogic, GameFamily }
+import strategygames.{ P2, Player => PlayerIndex, P1, GameLogic, GameFamily, Centis, Status }
 import strategygames.variant.Variant
 import strategygames.format.FEN
 import org.joda.time.DateTime
@@ -163,6 +163,11 @@ final private class SwissDirector(
           swiss.clock.toClock
             .giveTime(P1, -pgc.clockPlayer(P1).elapsed)
             .giveTime(P2, -pgc.clockPlayer(P2).elapsed)
+            .giveTime(
+              pg.situation.player,
+              if (pg.status != Status.CubeDropped) Centis.ofSeconds(swiss.clock.graceSeconds)
+              else Centis(0)
+            )
             .some
         })
       else swiss.clock.toClock.some
