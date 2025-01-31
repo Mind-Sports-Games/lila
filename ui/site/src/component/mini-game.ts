@@ -173,9 +173,9 @@ export const update = (node: HTMLElement, data: UpdateData) => {
       $score.html(
         displayScore(
           variantFromElement($el) as VariantKey,
-          'f a k e ' + (+multiPointScore.substring(0, 2) + "") + " " + (+multiPointScore.substring(2, 4) + ""),
-          playerIndex
-        )
+          'f a k e ' + (+multiPointScore.substring(0, 2) + '') + ' ' + (+multiPointScore.substring(2, 4) + ''),
+          playerIndex,
+        ),
       );
     });
   } else {
