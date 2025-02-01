@@ -99,7 +99,7 @@ case object Glicko {
     system.previewDeviation(p.toRating, new DateTime, reverse)
   } atLeast minDeviation atMost maxDeviation
 
-  implicit val glickoBSONHandler = new BSON[Glicko] {
+  implicit val glickoBSONHandler: BSON[Glicko] = new BSON[Glicko] {
 
     def reads(r: BSON.Reader): Glicko =
       Glicko(

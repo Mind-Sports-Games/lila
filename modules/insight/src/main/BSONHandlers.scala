@@ -11,24 +11,24 @@ import lila.rating.PerfType
 
 private object BSONHandlers {
 
-  implicit val EcopeningBSONHandler = tryHandler[Ecopening](
+  implicit val EcopeningBSONHandler: BSONHandler[Ecopening] = tryHandler[Ecopening](
     { case BSONString(v) => EcopeningDB.allByEco get v toTry s"Invalid ECO $v" },
     e => BSONString(e.eco)
   )
-  implicit val RelativeStrengthBSONHandler = tryHandler[RelativeStrength](
+  implicit val RelativeStrengthBSONHandler: BSONHandler[RelativeStrength] = tryHandler[RelativeStrength](
     { case BSONInteger(v) => RelativeStrength.byId get v toTry s"Invalid relative strength $v" },
     e => BSONInteger(e.id)
   )
-  implicit val ResultBSONHandler = tryHandler[Result](
+  implicit val ResultBSONHandler: BSONHandler[Result] = tryHandler[Result](
     { case BSONInteger(v) => Result.byId get v toTry s"Invalid result $v" },
     e => BSONInteger(e.id)
   )
 
-  implicit val PhaseBSONHandler = tryHandler[Phase](
+  implicit val PhaseBSONHandler: BSONHandler[Phase] = tryHandler[Phase](
     { case BSONInteger(v) => Phase.byId get v toTry s"Invalid phase $v" },
     e => BSONInteger(e.id)
   )
-  implicit val RoleBSONHandler = tryHandler[Role](
+  implicit val RoleBSONHandler: BSONHandler[Role] = tryHandler[Role](
     { case BSONString(r) =>
       r.split(":") match {
         case Array(lib, r) =>
@@ -57,46 +57,49 @@ private object BSONHandlers {
         case Role.AbaloneRole(r)            => BSONString(s"${r.gameFamily.id}:${r.forsyth.toString}")
       }
   )
-  implicit val TerminationBSONHandler = tryHandler[Termination](
+  implicit val TerminationBSONHandler: BSONHandler[Termination] = tryHandler[Termination](
     { case BSONInteger(v) => Termination.byId get v toTry s"Invalid termination $v" },
     e => BSONInteger(e.id)
   )
-  implicit val MovetimeRangeBSONHandler = tryHandler[MovetimeRange](
+  implicit val MovetimeRangeBSONHandler: BSONHandler[MovetimeRange] = tryHandler[MovetimeRange](
     { case BSONInteger(v) => MovetimeRange.byId get v toTry s"Invalid movetime range $v" },
     e => BSONInteger(e.id)
   )
-  implicit val CastlingBSONHandler = tryHandler[Castling](
+  implicit val CastlingBSONHandler: BSONHandler[Castling] = tryHandler[Castling](
     { case BSONInteger(v) => Castling.byId get v toTry s"Invalid Castling $v" },
     e => BSONInteger(e.id)
   )
-  implicit val MaterialRangeBSONHandler = tryHandler[MaterialRange](
+  implicit val MaterialRangeBSONHandler: BSONHandler[MaterialRange] = tryHandler[MaterialRange](
     { case BSONInteger(v) => MaterialRange.byId get v toTry s"Invalid material range $v" },
     e => BSONInteger(e.id)
   )
-  implicit val QueenTradeBSONHandler = BSONBooleanHandler.as[QueenTrade](QueenTrade.apply, _.id)
+  implicit val QueenTradeBSONHandler: BSONHandler[QueenTrade] =
+    BSONBooleanHandler.as[QueenTrade](QueenTrade.apply, _.id)
 
   private val BSONBooleanNullHandler = quickHandler[Boolean](
     { case BSONBoolean(v) => v; case BSONNull => false },
     v => if (v) BSONBoolean(true) else BSONNull
   )
 
-  implicit val BlurBSONHandler = BSONBooleanNullHandler.as[Blur](Blur.apply, _.id)
+  implicit val BlurBSONHandler: BSONHandler[Blur] = BSONBooleanNullHandler.as[Blur](Blur.apply, _.id)
 
-  implicit val TimeVarianceBSONHandler = BSONIntegerHandler.as[TimeVariance](
+  implicit val TimeVarianceBSONHandler: BSONHandler[TimeVariance] = BSONIntegerHandler.as[TimeVariance](
     i => TimeVariance(i.toFloat / TimeVariance.intFactor),
     v => (v.id * TimeVariance.intFactor).toInt
   )
 
-  implicit val CplRangeBSONHandler = tryHandler[CplRange](
+  implicit val CplRangeBSONHandler: BSONHandler[CplRange] = tryHandler[CplRange](
     { case BSONInteger(v) => CplRange.byId get v toTry s"Invalid CPL range $v" },
     e => BSONInteger(e.cpl)
   )
 
-  implicit val DateRangeBSONHandler = Macros.handler[lila.insight.DateRange]
+  implicit val DateRangeBSONHandler: BSONDocumentHandler[DateRange] = Macros.handler[lila.insight.DateRange]
 
-  implicit val PeriodBSONHandler = intIsoHandler(lila.common.Iso.int[Period](Period.apply, _.days))
+  implicit val PeriodBSONHandler: BSONHandler[Period] = intIsoHandler(
+    lila.common.Iso.int[Period](Period.apply, _.days)
+  )
 
-  implicit def MoveBSONHandler =
+  implicit def MoveBSONHandler: BSON[InsightMove] =
     new BSON[InsightMove] {
       def reads(r: BSON.Reader) =
         InsightMove(
@@ -128,7 +131,7 @@ private object BSONHandlers {
         )
     }
 
-  implicit def EntryBSONHandler =
+  implicit def EntryBSONHandler: BSON[InsightEntry] =
     new BSON[InsightEntry] {
       import InsightEntry.BSONFields._
       def reads(r: BSON.Reader) =

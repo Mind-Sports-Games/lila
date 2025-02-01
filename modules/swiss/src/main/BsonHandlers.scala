@@ -9,23 +9,29 @@ import scala.concurrent.duration._
 import lila.db.BSON
 import lila.db.dsl._
 import lila.user.User
+import strategygames.ClockConfig
 
 object BsonHandlers {
 
-  implicit val stratVariantHandler = stratVariantByKeyHandler
-  implicit val clockHandler        = clockConfigHandler
-  implicit val swissPointsHandler  = intAnyValHandler[Swiss.Points](_.double, Swiss.Points.apply)
-  implicit val swissSBTieBreakHandler =
+  implicit val stratVariantHandler: BSONHandler[Variant] = stratVariantByKeyHandler
+  implicit val clockHandler: BSONHandler[ClockConfig]    = clockConfigHandler
+  implicit val swissPointsHandler: BSONHandler[Swiss.Points] =
+    intAnyValHandler[Swiss.Points](_.double, Swiss.Points.apply)
+  implicit val swissSBTieBreakHandler: BSONHandler[Swiss.SonnenbornBerger] =
     doubleAnyValHandler[Swiss.SonnenbornBerger](_.value, Swiss.SonnenbornBerger.apply)
-  implicit val swissBHTieBreakHandler = doubleAnyValHandler[Swiss.Buchholz](_.value, Swiss.Buchholz.apply)
-  implicit val swissPerformanceHandler =
+  implicit val swissBHTieBreakHandler: BSONHandler[Swiss.Buchholz] =
+    doubleAnyValHandler[Swiss.Buchholz](_.value, Swiss.Buchholz.apply)
+  implicit val swissPerformanceHandler: BSONHandler[Swiss.Performance] =
     floatAnyValHandler[Swiss.Performance](_.value, Swiss.Performance.apply)
-  implicit val swissScoreHandler  = longAnyValHandler[Swiss.Score](_.value, Swiss.Score.apply)
-  implicit val roundNumberHandler = intAnyValHandler[SwissRound.Number](_.value, SwissRound.Number.apply)
-  implicit val swissIdHandler     = stringAnyValHandler[Swiss.Id](_.value, Swiss.Id.apply)
-  implicit val playerIdHandler    = stringAnyValHandler[SwissPlayer.Id](_.value, SwissPlayer.Id.apply)
+  implicit val swissScoreHandler: BSONHandler[Swiss.Score] =
+    longAnyValHandler[Swiss.Score](_.value, Swiss.Score.apply)
+  implicit val roundNumberHandler: BSONHandler[SwissRound.Number] =
+    intAnyValHandler[SwissRound.Number](_.value, SwissRound.Number.apply)
+  implicit val swissIdHandler: BSONHandler[Swiss.Id] = stringAnyValHandler[Swiss.Id](_.value, Swiss.Id.apply)
+  implicit val playerIdHandler: BSONHandler[SwissPlayer.Id] =
+    stringAnyValHandler[SwissPlayer.Id](_.value, SwissPlayer.Id.apply)
 
-  implicit val playerHandler = new BSON[SwissPlayer] {
+  implicit val playerHandler: BSON[SwissPlayer] = new BSON[SwissPlayer] {
     import SwissPlayer.Fields._
     def reads(r: BSON.Reader) =
       SwissPlayer(
@@ -63,49 +69,51 @@ object BsonHandlers {
       )
   }
 
-  implicit val pairingStatusHandler = lila.db.dsl.quickHandler[SwissPairing.Status](
-    {
-      case BSONBoolean(true)  => Left(SwissPairing.Ongoing)
-      case BSONInteger(index) => Right(PlayerIndex.fromP1(index == 0).some)
-      case _                  => Right(none)
-    },
-    {
-      case Left(_)        => BSONBoolean(true)
-      case Right(Some(c)) => BSONInteger(c.fold(0, 1))
-      case _              => BSONNull
-    }
-  )
-  implicit val pairingMatchStatusHandler = lila.db.dsl.quickHandler[SwissPairing.MatchStatus](
-    {
-      case BSONBoolean(true) => Left(SwissPairing.Ongoing)
-      case BSONArray(indexs) =>
-        Right(
-          indexs
-            .map(i =>
-              i match {
-                case BSONInteger(0) => None
-                case BSONInteger(1) => PlayerIndex.fromName("p1")
-                case BSONInteger(2) => PlayerIndex.fromName("p2")
-                case _              => None
-              }
-            )
-            .toList
-        )
-      case _ => Right(List(none))
-    },
-    {
-      case Left(_) => BSONBoolean(true)
-      case Right(l) =>
-        BSONArray(l.map { p =>
-          p match {
-            case Some(p) => BSONInteger(if (p.name == "p1") 1 else 2)
-            case _       => BSONInteger(0)
-          }
-        })
-      case _ => BSONNull
-    }
-  )
-  implicit val pairingHandler = new BSON[SwissPairing] {
+  implicit val pairingStatusHandler: BSONHandler[SwissPairing.Status] =
+    lila.db.dsl.quickHandler[SwissPairing.Status](
+      {
+        case BSONBoolean(true)  => Left(SwissPairing.Ongoing)
+        case BSONInteger(index) => Right(PlayerIndex.fromP1(index == 0).some)
+        case _                  => Right(none)
+      },
+      {
+        case Left(_)        => BSONBoolean(true)
+        case Right(Some(c)) => BSONInteger(c.fold(0, 1))
+        case _              => BSONNull
+      }
+    )
+  implicit val pairingMatchStatusHandler: BSONHandler[SwissPairing.MatchStatus] =
+    lila.db.dsl.quickHandler[SwissPairing.MatchStatus](
+      {
+        case BSONBoolean(true) => Left(SwissPairing.Ongoing)
+        case BSONArray(indexs) =>
+          Right(
+            indexs
+              .map(i =>
+                i match {
+                  case BSONInteger(0) => None
+                  case BSONInteger(1) => PlayerIndex.fromName("p1")
+                  case BSONInteger(2) => PlayerIndex.fromName("p2")
+                  case _              => None
+                }
+              )
+              .toList
+          )
+        case _ => Right(List(none))
+      },
+      {
+        case Left(_) => BSONBoolean(true)
+        case Right(l) =>
+          BSONArray(l.map { p =>
+            p match {
+              case Some(p) => BSONInteger(if (p.name == "p1") 1 else 2)
+              case _       => BSONInteger(0)
+            }
+          })
+        case _ => BSONNull
+      }
+    )
+  implicit val pairingHandler: BSON[SwissPairing] = new BSON[SwissPairing] {
     import SwissPairing.Fields._
     def reads(r: BSON.Reader) =
       r.get[List[User.ID]](players) match {
@@ -160,7 +168,7 @@ object BsonHandlers {
         variant           -> o.variant
       )
   }
-  implicit val pairingGamesHandler = new BSON[SwissPairingGameIds] {
+  implicit val pairingGamesHandler: BSON[SwissPairingGameIds] = new BSON[SwissPairingGameIds] {
     import SwissPairing.Fields._
     def reads(r: BSON.Reader) =
       SwissPairingGameIds(
@@ -187,7 +195,7 @@ object BsonHandlers {
 
   import SwissCondition.BSONHandlers.AllBSONHandler
 
-  implicit val settingsHandler = new BSON[Swiss.Settings] {
+  implicit val settingsHandler: BSON[Swiss.Settings] = new BSON[Swiss.Settings] {
     def reads(r: BSON.Reader) =
       Swiss.Settings(
         nbRounds = r.get[Int]("n"),
@@ -242,7 +250,7 @@ object BsonHandlers {
       )
   }
 
-  implicit val swissHandler = Macros.handler[Swiss]
+  implicit val swissHandler: BSONDocumentHandler[Swiss] = Macros.handler[Swiss]
 
   // "featurable" mostly means that the tournament isn't over yet
   def addFeaturable(s: Swiss) =
@@ -254,5 +262,5 @@ object BsonHandlers {
     }
 
   import Swiss.IdName
-  implicit val SwissIdNameBSONHandler = Macros.handler[IdName]
+  implicit val SwissIdNameBSONHandler: BSONDocumentHandler[IdName] = Macros.handler[IdName]
 }

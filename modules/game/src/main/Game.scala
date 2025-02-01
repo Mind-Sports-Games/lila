@@ -383,9 +383,11 @@ case class Game(
         val score = (if (playerIndex.name == "p1") fen.player1Score else fen.player2Score) / 10.0
         score.toString().replace(".0", "")
       case "backgammon" | "hyper" | "nackgammon" => {
-        multiPointState.fold(history.score(playerIndex)){mps => playerIndex.fold(mps.p1Points, mps.p2Points)}.toString()
+        multiPointState
+          .fold(history.score(playerIndex)) { mps => playerIndex.fold(mps.p1Points, mps.p2Points) }
+          .toString()
       }
-      case _                                     => ""
+      case _ => ""
     }
 
   def displayScore: Option[Score] =
@@ -1315,17 +1317,18 @@ object CastleLastMove {
   import reactivemongo.api.bson._
   import lila.db.ByteArray.ByteArrayBSONHandler
 
-  implicit private[game] val castleLastMoveBSONHandler = new BSONHandler[CastleLastMove] {
-    def readTry(bson: BSONValue) =
-      bson match {
-        case bin: BSONBinary => ByteArrayBSONHandler readTry bin map BinaryFormat.castleLastMove.read
-        case b               => lila.db.BSON.handlerBadType(b)
-      }
-    def writeTry(clmt: CastleLastMove) =
-      ByteArrayBSONHandler writeTry {
-        BinaryFormat.castleLastMove write clmt
-      }
-  }
+  implicit private[game] val castleLastMoveBSONHandler: BSONHandler[CastleLastMove] =
+    new BSONHandler[CastleLastMove] {
+      def readTry(bson: BSONValue) =
+        bson match {
+          case bin: BSONBinary => ByteArrayBSONHandler readTry bin map BinaryFormat.castleLastMove.read
+          case b               => lila.db.BSON.handlerBadType(b)
+        }
+      def writeTry(clmt: CastleLastMove) =
+        ByteArrayBSONHandler writeTry {
+          BinaryFormat.castleLastMove write clmt
+        }
+    }
 }
 
 // At what turns we entered a new period

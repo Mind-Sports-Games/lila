@@ -9,8 +9,8 @@ import lila.tree.Node.Shapes
 
 class CommentParserTest extends Specification {
 
-  implicit val variant = Variant.libStandard(GameLogic.Chess())
-  val C                = CommentParser
+  implicit val variant: Variant = Variant.libStandard(GameLogic.Chess())
+  val C                         = CommentParser
 
   "parse comment" should {
     "empty" in {

@@ -40,7 +40,7 @@ object PoolConfig {
   )
 
   import play.api.libs.json._
-  implicit val poolConfigJsonWriter = OWrites[PoolConfig] { p =>
+  implicit val poolConfigJsonWriter: OWrites[PoolConfig] = OWrites[PoolConfig] { p =>
     p.clock match {
       case fc: Clock.Config =>
         Json.obj(

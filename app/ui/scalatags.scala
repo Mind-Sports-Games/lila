@@ -8,23 +8,25 @@ import scalatags.Text.{ Aggregate, Cap }
 
 import lila.api.Context
 import lila.user.Title
+import play.api.mvc.Call
+import scalatags.Text
 
 // collection of lila attrs
 trait ScalatagsAttrs {
-  val dataTag        = attr("data-tag")
-  val dataIcon       = attr("data-icon")
-  val dataHref       = attr("data-href")
-  val dataCount      = attr("data-count")
-  val dataEnableTime = attr("data-enable-time")
-  val datatime24h    = attr("data-time_24h")
+  val dataTag         = attr("data-tag")
+  val dataIcon        = attr("data-icon")
+  val dataHref        = attr("data-href")
+  val dataCount       = attr("data-count")
+  val dataEnableTime  = attr("data-enable-time")
+  val datatime24h     = attr("data-time_24h")
   val dataPlayerIndex = attr("data-playerindex")
-  val dataFen        = attr("data-fen")
-  val dataRel        = attr("data-rel")
-  val novalidate     = attr("novalidate").empty
-  val datetimeAttr   = attr("datetime")
-  val dataBotAttr    = attr("data-bot").empty
-  val deferAttr      = attr("defer").empty
-  val downloadAttr   = attr("download").empty
+  val dataFen         = attr("data-fen")
+  val dataRel         = attr("data-rel")
+  val novalidate      = attr("novalidate").empty
+  val datetimeAttr    = attr("datetime")
+  val dataBotAttr     = attr("data-bot").empty
+  val deferAttr       = attr("defer").empty
+  val downloadAttr    = attr("download").empty
 
   object frame {
     val scrolling       = attr("scrolling")
@@ -106,7 +108,7 @@ trait ScalatagsTemplate
   def main  = scalatags.Text.tags2.main
 
   /* Convert play URLs to scalatags attributes with toString */
-  implicit val playCallAttr = genericAttr[play.api.mvc.Call]
+  implicit val playCallAttr: Text.GenericAttr[Call] = genericAttr[play.api.mvc.Call]
 }
 
 object ScalatagsTemplate extends ScalatagsTemplate
@@ -116,14 +118,14 @@ trait ScalatagsExtensions {
 
   implicit def stringValueFrag(sv: StringValue): Frag = new StringFrag(sv.value)
 
-  implicit val stringValueAttr = new AttrValue[StringValue] {
+  implicit val stringValueAttr: AttrValue[StringValue] = new AttrValue[StringValue] {
     def apply(t: scalatags.text.Builder, a: Attr, v: StringValue): Unit =
       t.setAttr(a.name, scalatags.text.Builder.GenericAttrValueSource(v.value))
   }
 
-  implicit val charAttr = genericAttr[Char]
+  implicit val charAttr: Text.GenericAttr[Char] = genericAttr[Char]
 
-  implicit val optionStringAttr = new AttrValue[Option[String]] {
+  implicit val optionStringAttr: AttrValue[Option[String]] = new AttrValue[Option[String]] {
     def apply(t: scalatags.text.Builder, a: Attr, v: Option[String]): Unit = {
       v foreach { s =>
         t.setAttr(a.name, scalatags.text.Builder.GenericAttrValueSource(s))
@@ -132,7 +134,7 @@ trait ScalatagsExtensions {
   }
 
   /* for class maps such as List("foo" -> true, "active" -> isActive) */
-  implicit val classesAttr = new AttrValue[List[(String, Boolean)]] {
+  implicit val classesAttr: AttrValue[List[(String, Boolean)]] = new AttrValue[List[(String, Boolean)]] {
     def apply(t: scalatags.text.Builder, a: Attr, m: List[(String, Boolean)]): Unit = {
       val cls = m collect { case (s, true) => s } mkString " "
       if (cls.nonEmpty) t.setAttr(a.name, scalatags.text.Builder.GenericAttrValueSource(cls))

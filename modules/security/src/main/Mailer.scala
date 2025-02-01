@@ -12,13 +12,16 @@ import scalatags.Text.tags2.{ title => titleTag }
 import lila.common.String.html.{ nl2br }
 import lila.common.{ Chronometer, EmailAddress, ThreadLocalRandom }
 import lila.i18n.I18nKeys.{ emails => trans }
+import play.api.ConfigLoader
+import akka.dispatch.MessageDispatcher
 
 final class Mailer(
     config: Mailer.Config,
     getSecondaryPermille: () => Int
 )(implicit system: ActorSystem) {
 
-  implicit private val blockingExecutionContext = system.dispatchers.lookup("blocking-smtp-dispatcher")
+  implicit private val blockingExecutionContext: MessageDispatcher =
+    system.dispatchers.lookup("blocking-smtp-dispatcher")
 
   private val primaryClient   = new SMTPMailer(config.primary.toClientConfig)
   private val secondaryClient = new SMTPMailer(config.secondary.toClientConfig)
@@ -75,13 +78,13 @@ object Mailer {
       timeout = Mailer.timeout.toMillis.toInt.some
     )
   }
-  implicit val smtpLoader = AutoConfig.loader[Smtp]
+  implicit val smtpLoader: ConfigLoader[Smtp] = AutoConfig.loader[Smtp]
 
   case class Config(
       primary: Smtp,
       secondary: Smtp
   )
-  implicit val configLoader = AutoConfig.loader[Config]
+  implicit val configLoader: ConfigLoader[Config] = AutoConfig.loader[Config]
 
   case class Message(
       to: EmailAddress,

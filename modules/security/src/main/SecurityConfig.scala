@@ -7,6 +7,7 @@ import scala.concurrent.duration.FiniteDuration
 import lila.common.config._
 
 import SecurityConfig._
+import play.api.ConfigLoader
 
 @Module
 final private class SecurityConfig(
@@ -34,48 +35,48 @@ private object SecurityConfig {
       @ConfigName("print_ban") printBan: CollName,
       firewall: CollName
   )
-  implicit val collectionLoader = AutoConfig.loader[Collection]
+  implicit val collectionLoader: ConfigLoader[Collection] = AutoConfig.loader[Collection]
 
   case class EmailConfirm(
       enabled: Boolean,
       secret: Secret,
       cookie: String
   )
-  implicit val emailConfirmLoader = AutoConfig.loader[EmailConfirm]
+  implicit val emailConfirmLoader: ConfigLoader[EmailConfirm] = AutoConfig.loader[EmailConfirm]
 
   case class Tor(
       @ConfigName("enabled") enabled: Boolean,
       @ConfigName("provider_url") providerUrl: String,
       @ConfigName("refresh_delay") refreshDelay: FiniteDuration
   )
-  implicit val torLoader = AutoConfig.loader[Tor]
+  implicit val torLoader: ConfigLoader[Tor] = AutoConfig.loader[Tor]
 
   case class DisposableEmail(
       @ConfigName("enabled") enabled: Boolean,
       @ConfigName("provider_url") providerUrl: String,
       @ConfigName("refresh_delay") refreshDelay: FiniteDuration
   )
-  implicit val disposableLoader = AutoConfig.loader[DisposableEmail]
+  implicit val disposableLoader: ConfigLoader[DisposableEmail] = AutoConfig.loader[DisposableEmail]
 
   case class DnsApi(
       url: String,
       timeout: FiniteDuration
   )
-  implicit val dnsLoader = AutoConfig.loader[DnsApi]
+  implicit val dnsLoader: ConfigLoader[DnsApi] = AutoConfig.loader[DnsApi]
 
   case class CheckMail(
       url: String,
       key: Secret
   )
-  implicit val checkMailLoader = AutoConfig.loader[CheckMail]
+  implicit val checkMailLoader: ConfigLoader[CheckMail] = AutoConfig.loader[CheckMail]
 
   case class Ip2Proxy(
       enabled: Boolean,
       url: String
   )
-  implicit val ip2ProxyLoader = AutoConfig.loader[Ip2Proxy]
+  implicit val ip2ProxyLoader: ConfigLoader[Ip2Proxy] = AutoConfig.loader[Ip2Proxy]
 
-  implicit val lameNameCheckLoader = boolLoader(LameNameCheck.apply)
+  implicit val lameNameCheckLoader: ConfigLoader[LameNameCheck] = boolLoader(LameNameCheck.apply)
 
-  implicit val loader = AutoConfig.loader[SecurityConfig]
+  implicit val loader: ConfigLoader[SecurityConfig] = AutoConfig.loader[SecurityConfig]
 }

@@ -18,6 +18,9 @@ import lila.notify.Notification.Notifies
 import lila.oauth.{ OAuthScope, OAuthServer }
 import lila.security.{ AppealUser, FingerPrintedUser, Granter, Permission }
 import lila.user.{ UserContext, User => UserModel, Holder }
+import scala.concurrent.ExecutionContext
+import akka.actor.Scheduler
+import lila.app.ui.EmbedConfig
 
 abstract private[controllers] class LilaController(val env: Env)
     extends BaseController
@@ -25,11 +28,11 @@ abstract private[controllers] class LilaController(val env: Env)
     with RequestGetter
     with ResponseWriter {
 
-  def controllerComponents      = env.controllerComponents
-  implicit def executionContext = env.executionContext
-  implicit def scheduler        = env.scheduler
+  def controllerComponents                        = env.controllerComponents
+  implicit def executionContext: ExecutionContext = env.executionContext
+  implicit def scheduler: Scheduler               = env.scheduler
 
-  implicit protected val LilaResultZero = Zero.instance[Result](Results.NotFound)
+  implicit protected val LilaResultZero: Zero[Result] = Zero.instance[Result](Results.NotFound)
 
   implicit final protected class LilaPimpedResult(result: Result) {
     def fuccess                           = scala.concurrent.Future successful result
@@ -41,7 +44,7 @@ abstract private[controllers] class LilaController(val env: Env)
 
   implicit protected def LilaFragToResult(frag: Frag): Result = Ok(frag)
 
-  implicit protected def makeApiVersion(v: Int) = ApiVersion(v)
+  implicit protected def makeApiVersion(v: Int): ApiVersion = ApiVersion(v)
 
   implicit protected lazy val formBinding: FormBinding = parse.formBinding(parse.DefaultMaxTextLength)
 
@@ -58,10 +61,10 @@ abstract private[controllers] class LilaController(val env: Env)
       api = _ => fuccess(jsonOkResult)
     )
 
-  implicit def ctxLang(implicit ctx: Context)         = ctx.lang
-  implicit def ctxReq(implicit ctx: Context)          = ctx.req
-  implicit def reqConfig(implicit req: RequestHeader) = ui.EmbedConfig(req)
-  def reqLang(implicit req: RequestHeader)            = I18nLangPicker(req)
+  implicit def ctxLang(implicit ctx: Context): Lang                = ctx.lang
+  implicit def ctxReq(implicit ctx: Context): RequestHeader        = ctx.req
+  implicit def reqConfig(implicit req: RequestHeader): EmbedConfig = ui.EmbedConfig(req)
+  def reqLang(implicit req: RequestHeader)                         = I18nLangPicker(req)
 
   protected def EnableSharedArrayBuffer(res: Result): Result =
     res.withHeaders(

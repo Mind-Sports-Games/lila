@@ -8,6 +8,7 @@ import scala.concurrent.duration._
 import lila.base.LilaException
 import lila.common.Domain
 import lila.db.dsl._
+import reactivemongo.api.bson.BSONHandler
 
 final private class DnsApi(
     ws: StandaloneWSClient,
@@ -24,7 +25,8 @@ final private class DnsApi(
       mxCache get domain
     }
 
-  implicit private val DomainBSONHandler = stringAnyValHandler[Domain](_.value, Domain.apply)
+  implicit private val DomainBSONHandler: BSONHandler[Domain] =
+    stringAnyValHandler[Domain](_.value, Domain.apply)
 
   private val mxCache = mongoCache.only[Domain.Lower, List[Domain]](
     "security.mx",

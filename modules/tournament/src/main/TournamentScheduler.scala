@@ -7,6 +7,7 @@ import org.joda.time.DateTime
 import org.joda.time.DateTimeConstants._
 import scala.util.chaining._
 import lila.i18n.VariantKeys
+import scala.concurrent.ExecutionContextExecutor
 
 final private class TournamentScheduler(
     api: TournamentApi,
@@ -17,7 +18,7 @@ final private class TournamentScheduler(
   import Schedule.Speed._
   import Schedule.Plan
 
-  implicit def ec = context.dispatcher
+  implicit def ec: ExecutionContextExecutor = context.dispatcher
 
   /* Month plan:
    * First week: Shield standard tournaments
@@ -563,7 +564,7 @@ final private class TournamentScheduler(
 
     //order matters for pruning weekly/yearly tournaments
     // yearly2025Tournaments ::: // after a tournament was created in db, no need to keep it here.
-      thisWeekMedleyShields :::
+    thisWeekMedleyShields :::
       nextWeekMedleyShields :::
       thisMonthMedleyShields :::
       nextMonthMedleyShields :::

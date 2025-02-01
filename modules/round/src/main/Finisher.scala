@@ -8,6 +8,7 @@ import lila.game.{ Game, GameRepo, Pov, RatingDiffs }
 import lila.playban.PlaybanApi
 import lila.user.{ User, UserRepo }
 import lila.i18n.{ I18nKeys => trans, defaultLang }
+import play.api.i18n.Lang
 
 final private class Finisher(
     gameRepo: GameRepo,
@@ -21,7 +22,7 @@ final private class Finisher(
     recentTvGames: RecentTvGames
 )(implicit ec: scala.concurrent.ExecutionContext) {
 
-  implicit private val chatLang = defaultLang
+  implicit private val chatLang: Lang = defaultLang
 
   def abort(pov: Pov)(implicit proxy: GameProxy): Fu[Events] =
     apply(pov.game, _.Aborted, None) >>- {

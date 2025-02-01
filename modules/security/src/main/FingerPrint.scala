@@ -1,6 +1,7 @@
 package lila.security
 
 import lila.common.Iso
+import reactivemongo.api.bson.BSONHandler
 
 case class FingerPrint(value: String) extends AnyVal {
   def hash: Option[FingerHash] = FingerHash(this)
@@ -30,6 +31,7 @@ object FingerHash {
     if (str.length % 2 != 0) s"${str}0" else str
   }
 
-  implicit val fingerHashIso     = Iso.string[FingerHash](FingerHash.apply, _.value)
-  implicit val fingerHashHandler = lila.db.BSON.isoHandler[FingerHash, String](fingerHashIso)
+  implicit val fingerHashIso: Iso.StringIso[FingerHash] = Iso.string[FingerHash](FingerHash.apply, _.value)
+  implicit val fingerHashHandler: BSONHandler[FingerHash] =
+    lila.db.BSON.isoHandler[FingerHash, String](fingerHashIso)
 }

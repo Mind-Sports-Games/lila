@@ -10,7 +10,7 @@ final class RacerJson(stormJson: StormJson, sign: StormSign, lightUserSync: Ligh
 
   import StormJson._
 
-  implicit private val playerWrites = OWrites[RacerPlayer] { p =>
+  implicit private val playerWrites: OWrites[RacerPlayer] = OWrites[RacerPlayer] { p =>
     val user = p.userId flatMap lightUserSync
     Json
       .obj("name" -> p.name, "score" -> p.score)

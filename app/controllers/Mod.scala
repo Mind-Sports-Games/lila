@@ -26,7 +26,7 @@ final class Mod(
   private def modLogApi = env.mod.logApi
   private def assessApi = env.mod.assessApi
 
-  implicit private def asMod(holder: Holder) = AsMod(holder.user)
+  implicit private def asMod(holder: Holder): AsMod = AsMod(holder.user)
 
   def alt(username: String, v: Boolean) =
     OAuthModBody(_.CloseAccount) { me =>

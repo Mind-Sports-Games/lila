@@ -9,6 +9,7 @@ import strategygames.{ GameLogic, Player => PlayerIndex, Pocket, PocketData, Pos
 import play.api.libs.json._
 
 import lila.common.Json._
+import lila.base.PimpedJsObject
 
 sealed trait Node {
   def ply: Int
@@ -259,8 +260,8 @@ object Node {
   implicit private val posWrites: Writes[Pos] = Writes[Pos] { p =>
     JsString(p.key)
   }
-  implicit private val shapeCircleWrites = Json.writes[Shape.Circle]
-  implicit private val shapeArrowWrites  = Json.writes[Shape.Arrow]
+  implicit private val shapeCircleWrites: OWrites[Shape.Circle] = Json.writes[Shape.Circle]
+  implicit private val shapeArrowWrites: OWrites[Shape.Arrow]   = Json.writes[Shape.Arrow]
   implicit val shapeWrites: Writes[Shape] = Writes[Shape] {
     case s: Shape.Circle => shapeCircleWrites writes s
     case s: Shape.Arrow  => shapeArrowWrites writes s
@@ -288,11 +289,12 @@ object Node {
     case Comment.Author.PlayStrategy   => JsString("playstrategy")
     case Comment.Author.Unknown        => JsNull
   }
-  implicit val commentWriter  = Json.writes[Node.Comment]
-  implicit val gamebookWriter = Json.writes[Node.Gamebook]
+  implicit val commentWriter: OWrites[Comment]   = Json.writes[Node.Comment]
+  implicit val gamebookWriter: OWrites[Gamebook] = Json.writes[Node.Gamebook]
   import Eval.JsonHandlers.evalWrites
 
-  @inline implicit private def toPimpedJsObject(jo: JsObject) = new lila.base.PimpedJsObject(jo)
+  @inline implicit private def toPimpedJsObject(jo: JsObject): PimpedJsObject =
+    new lila.base.PimpedJsObject(jo)
 
   implicit val defaultNodeJsonWriter: Writes[Node] =
     makeNodeJsonWriter(alwaysChildren = true)

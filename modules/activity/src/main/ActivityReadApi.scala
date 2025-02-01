@@ -25,7 +25,8 @@ final class ActivityReadApi(
   import BSONHandlers._
   import model._
 
-  implicit private val ordering = scala.math.Ordering.Double.TotalOrdering
+  implicit private val ordering: scala.math.Ordering[Double] =
+    scala.math.Ordering.Double.TotalOrdering
 
   private val recentNb = 7
 

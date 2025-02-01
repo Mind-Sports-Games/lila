@@ -202,14 +202,14 @@ object JsonApi {
 
   object readers {
     import play.api.libs.functional.syntax._
-    implicit val ClientVersionReads = Reads.of[String].map(Client.Version(_))
-    implicit val ClientPythonReads  = Reads.of[String].map(Client.Python(_))
-    implicit val ClientKeyReads     = Reads.of[String].map(Client.Key(_))
-    implicit val StockfishReads     = Json.reads[Request.Stockfish]
-    implicit val FishnetReads       = Json.reads[Request.Fishnet]
-    implicit val AcquireReads       = Json.reads[Request.Acquire]
-    implicit val ScoreReads         = Json.reads[Request.Evaluation.Score]
-    implicit val uciListReadsLexicalUcis = Reads.of[String] map { str =>
+    implicit val ClientVersionReads: Reads[Client.Version]   = Reads.of[String].map(Client.Version(_))
+    implicit val ClientPythonReads: Reads[Client.Python]     = Reads.of[String].map(Client.Python(_))
+    implicit val ClientKeyReads: Reads[Client.Key]           = Reads.of[String].map(Client.Key(_))
+    implicit val StockfishReads: Reads[Request.Stockfish]    = Json.reads[Request.Stockfish]
+    implicit val FishnetReads: Reads[Request.Fishnet]        = Json.reads[Request.Fishnet]
+    implicit val AcquireReads: Reads[Request.Acquire]        = Json.reads[Request.Acquire]
+    implicit val ScoreReads: Reads[Request.Evaluation.Score] = Json.reads[Request.Evaluation.Score]
+    implicit val uciListReadsLexicalUcis: Reads[Array[LexicalUci]] = Reads.of[String] map { str =>
       str.split(" ").flatMap(LexicalUci.apply)
     }
 
@@ -223,18 +223,19 @@ object JsonApi {
     )((moves, score, time, nodes, nps, depth) =>
       Request.Evaluation[LexicalUci](moves, score, time, nodes, nps, depth)
     )
-    implicit val EvaluationOptionReads = Reads[Option[Request.Evaluation.OrSkipped[LexicalUci]]] {
-      case JsNull => JsSuccess(None)
-      case obj =>
-        if (~(obj boolean "skipped")) JsSuccess(Left(Request.Evaluation.Skipped).some)
-        else EvaluationReads reads obj map Right.apply map some
-    }
+    implicit val EvaluationOptionReads: Reads[Option[Request.Evaluation.OrSkipped[LexicalUci]]] =
+      Reads[Option[Request.Evaluation.OrSkipped[LexicalUci]]] {
+        case JsNull => JsSuccess(None)
+        case obj =>
+          if (~(obj boolean "skipped")) JsSuccess(Left(Request.Evaluation.Skipped).some)
+          else EvaluationReads reads obj map Right.apply map some
+      }
     implicit val PostAnalysisReads: Reads[Request.PostAnalysisLexicalUci] =
       Json.reads[Request.PostAnalysisLexicalUci]
   }
 
   object writers {
-    implicit val VariantWrites = Writes[Variant] { v => JsString(v.fishnetKey) }
+    implicit val VariantWrites: Writes[Variant] = Writes[Variant] { v => JsString(v.fishnetKey) }
     implicit val GameWrites: Writes[UciGame] = Writes[UciGame] { g =>
       Json.obj(
         "game_id"  -> g.game_id,
@@ -243,10 +244,10 @@ object JsonApi {
         "moves"    -> UciDump.fishnetUci(g.variant, g.moves)
       )
     }
-    implicit val WorkIdWrites = Writes[Work.Id] { id =>
+    implicit val WorkIdWrites: Writes[Work.Id] = Writes[Work.Id] { id =>
       JsString(id.value)
     }
-    implicit val WorkWrites = OWrites[Work] { work =>
+    implicit val WorkWrites: OWrites[Work] = OWrites[Work] { work =>
       (work match {
         case a: Analysis =>
           Json.obj(

@@ -9,40 +9,43 @@ import lila.db.BSON
 import lila.db.dsl._
 import lila.rating.PerfType
 import lila.user.User.playstrategyId
+import strategygames.ClockConfig
 
 object BSONHandlers {
 
-  implicit val stratVariantHandler = stratVariantByKeyHandler
+  implicit val stratVariantHandler: BSONHandler[Variant] = stratVariantByKeyHandler
 
-  implicit private[tournament] val statusBSONHandler = tryHandler[Status](
+  implicit private[tournament] val statusBSONHandler: BSONHandler[Status] = tryHandler[Status](
     { case BSONInteger(v) => Status(v) toTry s"No such status: $v" },
     x => BSONInteger(x.id)
   )
 
-  implicit private[tournament] val scheduleFreqHandler = tryHandler[Schedule.Freq](
-    { case BSONString(v) => Schedule.Freq(v) toTry s"No such freq: $v" },
-    x => BSONString(x.name)
-  )
+  implicit private[tournament] val scheduleFreqHandler: BSONHandler[Schedule.Freq] =
+    tryHandler[Schedule.Freq](
+      { case BSONString(v) => Schedule.Freq(v) toTry s"No such freq: $v" },
+      x => BSONString(x.name)
+    )
 
-  implicit private[tournament] val scheduleSpeedHandler = tryHandler[Schedule.Speed](
-    { case BSONString(v) => Schedule.Speed(v) toTry s"No such speed: $v" },
-    x => BSONString(x.key)
-  )
+  implicit private[tournament] val scheduleSpeedHandler: BSONHandler[Schedule.Speed] =
+    tryHandler[Schedule.Speed](
+      { case BSONString(v) => Schedule.Speed(v) toTry s"No such speed: $v" },
+      x => BSONString(x.key)
+    )
 
-  implicit val scheduleWriter = BSONWriter[Schedule](s =>
+  implicit val scheduleWriter: BSONWriter[Schedule] = BSONWriter[Schedule](s =>
     $doc(
       "freq"  -> s.freq,
       "speed" -> s.speed
     )
   )
 
-  implicit val tournamentClockBSONHandler = clockConfigHandler
+  implicit val tournamentClockBSONHandler: BSONHandler[ClockConfig] = clockConfigHandler
 
-  implicit private val spotlightBSONHandler = Macros.handler[Spotlight]
+  implicit private val spotlightBSONHandler: BSONDocumentHandler[Spotlight] = Macros.handler[Spotlight]
 
-  implicit val battleBSONHandler = Macros.handler[TeamBattle]
+  implicit val battleBSONHandler: BSONDocumentHandler[TeamBattle] = Macros.handler[TeamBattle]
 
-  implicit private val leaderboardRatio =
+  implicit private val leaderboardRatio: BSONHandler[LeaderboardApi.Ratio] =
     BSONIntegerHandler.as[LeaderboardApi.Ratio](
       i => LeaderboardApi.Ratio(i.toDouble / 100_000),
       r => (r.value * 100_000).toInt
@@ -50,7 +53,7 @@ object BSONHandlers {
 
   import Condition.BSONHandlers.AllBSONHandler
 
-  implicit val tournamentHandler = new BSON[Tournament] {
+  implicit val tournamentHandler: BSON[Tournament] = new BSON[Tournament] {
     def reads(r: BSON.Reader) = {
       val lib     = GameLogic(r.intD("lib"))
       val variant = r.intO("variant").fold[Variant](Variant.default(lib))(v => Variant.orDefault(lib, v))
@@ -146,7 +149,7 @@ object BSONHandlers {
       )
   }
 
-  implicit val playerBSONHandler = new BSON[Player] {
+  implicit val playerBSONHandler: BSON[Player] = new BSON[Player] {
     def reads(r: BSON.Reader) =
       Player(
         _id = r str "_id",
@@ -182,7 +185,7 @@ object BSONHandlers {
       )
   }
 
-  implicit val pairingHandler = new BSON[Pairing] {
+  implicit val pairingHandler: BSON[Pairing] = new BSON[Pairing] {
     def reads(r: BSON.Reader) = {
       val users = r strsD "u"
       val user1 = users.headOption err "tournament pairing first user"
@@ -217,7 +220,7 @@ object BSONHandlers {
       )
   }
 
-  implicit val leaderboardEntryHandler = new BSON[LeaderboardApi.Entry] {
+  implicit val leaderboardEntryHandler: BSON[LeaderboardApi.Entry] = new BSON[LeaderboardApi.Entry] {
     def reads(r: BSON.Reader) =
       LeaderboardApi.Entry(
         id = r str "_id",
@@ -254,24 +257,26 @@ object BSONHandlers {
   }
 
   import LeaderboardApi.ChartData.AggregationResult
-  implicit val leaderboardAggregationResultBSONHandler = Macros.handler[AggregationResult]
+  implicit val leaderboardAggregationResultBSONHandler: BSONDocumentHandler[AggregationResult] =
+    Macros.handler[AggregationResult]
 
-  implicit val shieldTableEntryHandler = new BSON[ShieldTableApi.ShieldTableEntry] {
-    def reads(r: BSON.Reader) =
-      ShieldTableApi.ShieldTableEntry(
-        id = r str "_id",
-        userId = r str "u",
-        category = ShieldTableApi.Category.getFromId(r int "c"),
-        points = r int "p"
-      )
+  implicit val shieldTableEntryHandler: BSON[ShieldTableApi.ShieldTableEntry] =
+    new BSON[ShieldTableApi.ShieldTableEntry] {
+      def reads(r: BSON.Reader) =
+        ShieldTableApi.ShieldTableEntry(
+          id = r str "_id",
+          userId = r str "u",
+          category = ShieldTableApi.Category.getFromId(r int "c"),
+          points = r int "p"
+        )
 
-    def writes(w: BSON.Writer, o: ShieldTableApi.ShieldTableEntry) =
-      $doc(
-        "_id" -> o.id,
-        "u"   -> o.userId,
-        "c"   -> o.category.id,
-        "p"   -> o.points
-      )
-  }
+      def writes(w: BSON.Writer, o: ShieldTableApi.ShieldTableEntry) =
+        $doc(
+          "_id" -> o.id,
+          "u"   -> o.userId,
+          "c"   -> o.category.id,
+          "p"   -> o.points
+        )
+    }
 
 }
