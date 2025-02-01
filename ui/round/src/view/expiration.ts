@@ -12,7 +12,14 @@ export default function (ctrl: RoundController, position: Position): MaybeVNode 
   const moveIndicator = ctrl.data.pref.playerTurnIndicator;
   const d = game.playable(ctrl.data) && (ctrl.data.expirationAtStart || ctrl.data.expirationOnPaused);
   let timeLeft = 8000;
-  if ((!d && !moveIndicator) || !game.playable(ctrl.data)) return;
+  if ((!d && !moveIndicator && position === 'bottom') || !game.playable(ctrl.data)) return;
+  if (!moveIndicator && !d) {
+    return h(
+      'div.expiration.expiration-' + position,
+      { attrs: { style: 'visibility: hidden' } },
+      'div not shown... but for layout',
+    );
+  }
   if (d) {
     timeLeft = Math.max(0, d.updatedAt - Date.now() + d.millisToMove);
   }

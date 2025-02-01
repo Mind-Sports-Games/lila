@@ -55,7 +55,7 @@ export const altCastles = {
   e8h8: 'e8g8',
 };
 
-// 3 check and 5 check dont have constitent fen formats, its calculated from running through game plys.
+// 3 check and 5 check dont have consistent fen formats, its calculated from running through game plys.
 export function getScore(variant: VariantKey, fen: string, playerIndex: string): number | undefined {
   switch (variant) {
     case 'oware':

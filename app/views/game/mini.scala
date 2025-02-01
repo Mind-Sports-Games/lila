@@ -84,8 +84,10 @@ object mini {
 
   def renderState(pov: Pov) =
     pov.game.variant match {
+      case Variant.Backgammon(_) =>
+        dataState := s"${Forsyth.>>(pov.game.variant.gameLogic, pov.game.stratGame)}|${orientation(pov)}|${~pov.game.lastActionKeys}|${renderMultiPointState(pov)}"
       case Variant.Chess(_) | Variant.FairySF(_) | Variant.Samurai(_) | Variant.Togyzkumalak(_) |
-          Variant.Go(_) | Variant.Backgammon(_) | Variant.Abalone(_) =>
+          Variant.Go(_) | Variant.Abalone(_) =>
         dataState := s"${Forsyth.>>(pov.game.variant.gameLogic, pov.game.stratGame)}|${orientation(pov)}|${~pov.game.lastActionKeys}"
       case Variant.Draughts(v) =>
         dataState := s"${Forsyth.boardAndPlayer(
@@ -124,6 +126,9 @@ object mini {
         +
           calculateScore(pov)
     )
+
+  private def renderMultiPointState(pov: Pov) =
+    pov.game.metadata.multiPointState.fold("-")(m => f"${m.p1Points}%02d${m.p2Points}%02d")
 
   private def renderClock(clock: strategygames.ClockBase, pov: Pov) = {
     val s = clock.remainingTime(pov.playerIndex).roundSeconds
