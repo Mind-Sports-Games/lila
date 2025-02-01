@@ -28,7 +28,8 @@ final private class RelayFetch(
     pgnDump: PgnDump,
     gameProxy: GameProxyRepo,
     ws: StandaloneWSClient
-) extends Actor {
+)(implicit scheduler: akka.actor.Scheduler)
+    extends Actor {
 
   implicit def system = context.system
   implicit def ec     = context.dispatcher

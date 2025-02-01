@@ -21,7 +21,8 @@ final class EventStream(
     lightUserApi: LightUserApi
 )(implicit
     ec: scala.concurrent.ExecutionContext,
-    system: ActorSystem
+    system: ActorSystem,
+    scheduler: akka.actor.Scheduler
 ) {
 
   private case object SetOnline

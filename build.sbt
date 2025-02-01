@@ -15,6 +15,8 @@ scriptClasspath := Seq("*")
 maintainer := "matt@watkinsmedia.org"
 Compile / resourceDirectory := baseDirectory.value / "conf"
 
+ThisBuild / evictionErrorLevel := Level.Warn
+
 // format: off
 libraryDependencies ++= akka.bundle ++ playWs.bundle ++ Seq(
   macwire.macros, macwire.util, play.json, jodaForms,

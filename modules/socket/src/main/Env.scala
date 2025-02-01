@@ -1,6 +1,6 @@
 package lila.socket
 
-import akka.actor._
+import akka.actor.{ CoordinatedShutdown, Scheduler }
 import com.softwaremill.macwire._
 import io.lettuce.core._
 import play.api.Configuration
@@ -12,7 +12,7 @@ final class Env(
     notification: lila.hub.actors.Notification
 )(implicit
     ec: scala.concurrent.ExecutionContext,
-    akka: ActorSystem
+    scheduler: Scheduler
 ) {
 
   private val RedisUri = appConfig.get[String]("socket.redis.uri")

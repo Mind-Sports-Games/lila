@@ -10,18 +10,19 @@ final private class CreatedOrganizer(
     playerRepo: PlayerRepo
 )(implicit
     ec: scala.concurrent.ExecutionContext,
+    scheduler: akka.actor.Scheduler,
     mat: akka.stream.Materializer
 ) extends Actor {
 
   override def preStart(): Unit = {
-    context setReceiveTimeout 15.seconds
-    context.system.scheduler.scheduleOnce(10 seconds, self, Tick).unit
+    context.setReceiveTimeout(15.seconds)
+    scheduler.scheduleOnce(10 seconds, self, Tick).unit
   }
 
   case object Tick
 
   def scheduleNext(): Unit =
-    context.system.scheduler.scheduleOnce(2 seconds, self, Tick).unit
+    scheduler.scheduleOnce(2 seconds, self, Tick).unit
 
   def receive = {
 

@@ -88,6 +88,7 @@ final class Env(
     val web: lila.web.Env
 )(implicit
     val system: ActorSystem,
+    val scheduler: akka.actor.Scheduler,
     val executionContext: ExecutionContext,
     val mode: play.api.Mode
 ) {
@@ -138,8 +139,6 @@ final class Env(
       lila.log("preloader").warn("daily puzzle", e)
       none
     }
-
-  def scheduler = system.scheduler
 
   def closeAccount(u: User, by: Holder): Funit =
     for {

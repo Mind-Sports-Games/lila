@@ -16,7 +16,8 @@ final class Env(
     mongo: lila.db.Env
 )(implicit
     ec: scala.concurrent.ExecutionContext,
-    system: akka.actor.ActorSystem
+    scheduler: akka.actor.Scheduler,
+    mat: akka.stream.Materializer
 ) {
 
   private lazy val db = mongo.asyncDb(

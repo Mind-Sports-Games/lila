@@ -53,7 +53,9 @@ final class TournamentApi(
     proxyRepo: lila.round.GameProxyRepo
 )(implicit
     ec: scala.concurrent.ExecutionContext,
-    system: ActorSystem,
+    system: akka.actor.ActorSystem,
+    scheduler: akka.actor.Scheduler,
+    mat: akka.stream.Materializer,
     mode: play.api.Mode
 ) {
 
@@ -923,23 +925,16 @@ final class TournamentApi(
     }
 
   private object publish {
-    private val debouncer = system.actorOf(
-      Props(
-        new Debouncer(
-          15 seconds,
-          { (_: Debouncer.Nothing) =>
-            implicit val lang = lila.i18n.defaultLang
-            fetchUpdateTournaments flatMap apiJsonView.apply foreach { json =>
-              Bus.publish(
-                SendToFlag("tournament", Json.obj("t" -> "reload", "d" -> json)),
-                "sendToFlag"
-              )
-            }
-          }
+    private val debouncer = new Debouncer[Unit](system.scheduler, 15 seconds, 1)(_ => {
+      implicit val lang = lila.i18n.defaultLang
+      fetchUpdateTournaments flatMap apiJsonView.apply foreach { json =>
+        Bus.publish(
+          SendToFlag("tournament", Json.obj("t" -> "reload", "d" -> json)),
+          "sendToFlag"
         )
-      )
-    )
-    def apply(): Unit = { debouncer ! Debouncer.Nothing }
+      }
+    })
+    def apply() = debouncer.push(()).unit
   }
 
   private object updateTournamentStanding {

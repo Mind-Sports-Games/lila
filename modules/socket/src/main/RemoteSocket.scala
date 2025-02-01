@@ -1,6 +1,6 @@
 package lila.socket
 
-import akka.actor.{ ActorSystem, CoordinatedShutdown }
+import akka.actor.{ CoordinatedShutdown, Scheduler }
 import strategygames.{ Centis, Player => PlayerIndex }
 import io.lettuce.core._
 import io.lettuce.core.pubsub.{ StatefulRedisPubSubConnection => PubSub }
@@ -26,7 +26,7 @@ final class RemoteSocket(
     shutdown: CoordinatedShutdown
 )(implicit
     ec: scala.concurrent.ExecutionContext,
-    system: ActorSystem
+    scheduler: Scheduler
 ) {
 
   import RemoteSocket._, Protocol._
@@ -315,11 +315,11 @@ object RemoteSocket {
       def pong(id: String)                     = s"pong $id"
       def stop(reqId: Int)                     = s"lila/stop $reqId"
 
-      def commas(strs: Iterable[Any]): String = if (strs.isEmpty) "-" else strs mkString ","
-      def boolean(v: Boolean): String         = if (v) "+" else "-"
-      def optional(str: Option[String])       = str getOrElse "-"
-      def playerIndex(c: PlayerIndex): String             = c.fold("w", "b")
-      def playerIndex(c: Option[PlayerIndex]): String     = optional(c.map(_.fold("w", "b")))
+      def commas(strs: Iterable[Any]): String         = if (strs.isEmpty) "-" else strs mkString ","
+      def boolean(v: Boolean): String                 = if (v) "+" else "-"
+      def optional(str: Option[String])               = str getOrElse "-"
+      def playerIndex(c: PlayerIndex): String         = c.fold("w", "b")
+      def playerIndex(c: Option[PlayerIndex]): String = optional(c.map(_.fold("w", "b")))
     }
   }
 

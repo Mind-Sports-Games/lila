@@ -30,6 +30,7 @@ final class ChallengeBulkApi(
     ec: scala.concurrent.ExecutionContext,
     mat: akka.stream.Materializer,
     system: ActorSystem,
+    scheduler: akka.actor.Scheduler,
     mode: play.api.Mode
 ) {
 
