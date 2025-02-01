@@ -131,7 +131,6 @@ final private class SwissDirector(
                   )
                 )
                 .void
-            date = DateTime.now
             byes = pendings.collect { case Left(bye) => bye.player }
             _ <- SwissPlayer.fields { f =>
               colls.player.update
