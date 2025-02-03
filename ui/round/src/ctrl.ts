@@ -1346,8 +1346,12 @@ export default class RoundController {
       this.data.game.variant.key === 'nackgammon'
     ) {
       window.Mousetrap.bind('space', () => {
-        if (this.data.canEndTurn && this.isPlaying()) {
-          this.endTurnAction();
+        if (this.isPlaying() && !this.replaying() && this.data.player.playerIndex === this.data.game.player) {
+          if (this.data.canEndTurn) {
+            this.endTurnAction();
+          } else if (this.data.cubeActions && this.data.cubeActions.includes('offer')) {
+            this.forceRollDice(this.data.game.variant.key);
+          }
         }
       });
     }
