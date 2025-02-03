@@ -108,10 +108,7 @@ case class Game(
 
   def opponent(c: PlayerIndex): Player = player(!c)
 
-  lazy val naturalOrientation = variant match {
-    case Variant.Chess(strategygames.chess.variant.RacingKings) => P1
-    case _                                                      => PlayerIndex.fromP1(p1Player before p2Player)
-  }
+  lazy val naturalOrientation = P1
 
   def turnPlayerIndex = stratGame.player
 
@@ -383,9 +380,11 @@ case class Game(
         val score = (if (playerIndex.name == "p1") fen.player1Score else fen.player2Score) / 10.0
         score.toString().replace(".0", "")
       case "backgammon" | "hyper" | "nackgammon" => {
-        multiPointState.fold(history.score(playerIndex)){mps => playerIndex.fold(mps.p1Points, mps.p2Points)}.toString()
+        multiPointState
+          .fold(history.score(playerIndex)) { mps => playerIndex.fold(mps.p1Points, mps.p2Points) }
+          .toString()
       }
-      case _                                     => ""
+      case _ => ""
     }
 
   def displayScore: Option[Score] =
