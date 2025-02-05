@@ -175,6 +175,7 @@ export interface Swiss {
   running?: boolean;
   isBestOfX?: boolean;
   isPlayX?: boolean;
+  nbGamesPerRound?: number;
   isMultiPoint?: boolean;
   ranks?: TournamentRanks;
 }

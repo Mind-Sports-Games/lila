@@ -443,10 +443,15 @@ export function backToTournament(ctrl: RoundController): VNode | undefined {
 
 export function backToSwiss(ctrl: RoundController): VNode | undefined {
   const d = ctrl.data;
-  if (d.swiss?.running && (d.swiss?.isBestOfX || d.swiss?.isPlayX || d.swiss?.isMultiPoint)) {
+  const mps = ctrl.finalMultiPointState();
+  const moreGamesInMultiMatch = d.game.multiMatch.index < ctrl.data.swiss?.nbGamesPerRound;
+  const moreGamesInMultiPoint = mps && mps.p1 < mps.target && mps.p2 < mps.target;
+  if (d.swiss?.running && (moreGamesInMultiMatch || moreGamesInMultiPoint)) {
     ctrl.setRedirecting();
-    location.href = '/swiss/' + d.swiss?.id;
-    return undefined;
+    setTimeout(() => {
+      location.href = '/swiss/' + d.swiss?.id;
+      return undefined;
+    }, 2500);
   }
   return d.swiss?.running
     ? h('div.follow-up', [
