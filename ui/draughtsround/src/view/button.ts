@@ -306,7 +306,8 @@ export function backToTournament(ctrl: RoundController): VNode | undefined {
 
 export function backToSwiss(ctrl: RoundController): VNode | undefined {
   const d = ctrl.data;
-  if (d.swiss?.running && (d.swiss?.isBestOfX || d.swiss?.isPlayX)) {
+  const moreGamesInMultiMatch = d.game.multiMatch.index < ctrl.data.swiss?.nbGamesPerRound;
+  if (d.swiss?.running && moreGamesInMultiMatch) {
     ctrl.setRedirecting();
     setTimeout(() => {
       location.href = '/swiss/' + d.swiss?.id;
