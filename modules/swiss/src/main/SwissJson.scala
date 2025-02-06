@@ -388,6 +388,7 @@ object SwissJson {
           )
         }
       )
+      .add("multiPointScore" -> multiPointScoreJson(g))
 
   private[swiss] def boardPlayerFromGame(g: Game, b: SwissBoard, playerIndex: PlayerIndex) =
     if (playerIndex == P1)
@@ -416,7 +417,6 @@ object SwissJson {
           l.map(g =>
             boardGameJson(g, boardPlayerFromGame(g, b.board, P1), boardPlayerFromGame(g, b.board, P2))
               .add("boardSize" -> boardSizeJson(g.variant))
-              .add("multiPointScore" -> multiPointScoreJson(g))
           )
         )
       )
