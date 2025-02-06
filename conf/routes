@@ -80,6 +80,9 @@ GET   /blog/:id/:slug                  controllers.Blog.show(id: String, slug: S
 GET   /blog.atom                       controllers.Blog.atom
 GET   /blog.txt                        controllers.Blog.sitemapTxt
 
+# Memory
+GET /memory                            controllers.Memory.home
+
 # Training - Coordinate
 GET   /training/coordinate             controllers.Coordinate.home
 POST  /training/coordinate/score       controllers.Coordinate.score
