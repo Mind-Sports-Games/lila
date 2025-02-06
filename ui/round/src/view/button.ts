@@ -444,7 +444,7 @@ export function backToTournament(ctrl: RoundController): VNode | undefined {
 export function backToSwiss(ctrl: RoundController): VNode | undefined {
   const d = ctrl.data;
   const mps = ctrl.finalMultiPointState();
-  const moreGamesInMultiMatch = d.game.multiMatch.index < ctrl.data.swiss?.nbGamesPerRound;
+  const moreGamesInMultiMatch = d.game.multiMatch && d.game.multiMatch.index < ctrl.data.swiss?.nbGamesPerRound;
   const moreGamesInMultiPoint = mps && mps.p1 < mps.target && mps.p2 < mps.target;
   if (d.swiss?.running && (moreGamesInMultiMatch || moreGamesInMultiPoint)) {
     ctrl.setRedirecting();
