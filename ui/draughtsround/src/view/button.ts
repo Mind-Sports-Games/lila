@@ -306,7 +306,7 @@ export function backToTournament(ctrl: RoundController): VNode | undefined {
 
 export function backToSwiss(ctrl: RoundController): VNode | undefined {
   const d = ctrl.data;
-  const moreGamesInMultiMatch = d.game.multiMatch.index < ctrl.data.swiss?.nbGamesPerRound;
+  const moreGamesInMultiMatch = d.game.multiMatch && d.game.multiMatch.index < ctrl.data.swiss?.nbGamesPerRound;
   if (d.swiss?.running && moreGamesInMultiMatch) {
     ctrl.setRedirecting();
     setTimeout(() => {
