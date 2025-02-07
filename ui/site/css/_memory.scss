@@ -2,13 +2,14 @@
   display: flex;
   flex-flow: column;
   width: 100%;
-  max-width: 1000px;
+  max-width: 700px;
   align-items: center;
-  padding: 0 0 50px 0;
+  margin: 0 auto;
+  background-color: $c-bg-box;
 
   .memory-title {
     font-weight: bold;
-    padding: 3vh 0;
+    margin: 3vh 0;
   }
 
   .memory-grid {
@@ -16,8 +17,8 @@
     height: 350px;
     display: flex;
     flex-flow: wrap;
-    background-image: url(../images/board/chess/grey.jpg);
-    background-size: cover;
+    background: $c-bg-page;
+    box-shadow: 0 4px 10px 0px hsla(0, 0, 0, 0.225);
     .memory-card {
       width: 25%;
       height: 25%;
@@ -25,7 +26,7 @@
       display: flex;
       flex-flow: column;
       align-items: center;
-      transform: scale(1);
+      transform: scale(0.9);
       transform-style: preserve-3d;
       transition: transform 0.5s;
       user-select: none;
@@ -43,6 +44,9 @@
       .front-face {
         transform: rotateY(180deg);
       }
+      .back-face {
+        border-radius: 75%;
+      }
       .image {
         font-size: 4em;
         width: unset;
@@ -52,5 +56,8 @@
   .moves {
     padding: 2vh 0;
     font-weight: bold;
+  }
+  .memory-buttons {
+    margin-bottom: 3vh;
   }
 }

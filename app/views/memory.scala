@@ -6,10 +6,9 @@ import lila.api.Context
 import lila.app.templating.Environment._
 import lila.app.ui.ScalatagsTemplate._
 import lila.common.String.html.safeJsonValue
+import play.api.i18n.Lang
 
 import controllers.routes
-
-//TODO add text to trans
 
 object memory {
 
@@ -31,76 +30,76 @@ object memory {
         id := "memory-app",
         cls := "memory-app init"
       )(
-        h1(cls := "memory-title")("Find the matching icons!"),
+        h1(cls := "memory-title")(trans.findIcons()),
         div(cls := "memory-grid")(
           div(cls := "memory-card", attr("data-framework") := "1")(
             i(cls := "image front-face", dataIcon := "{"),
-            img(cls := "back-face", src := "/assets/piece/xiangqi/2dhanzi/Bbackface.svg")
+            i(cls := "back-face color-choice-border")
           ),
           div(cls := "memory-card", attr("data-framework") := "1")(
             i(cls := "image front-face", dataIcon := "{"),
-            img(cls := "back-face", src := "/assets/piece/xiangqi/2dhanzi/Bbackface.svg")
+            i(cls := "back-face color-choice-border")
           ),
           div(cls := "memory-card", attr("data-framework") := "2")(
             i(cls := "image front-face", dataIcon := "T"),
-            img(cls := "back-face", src := "/assets/piece/xiangqi/2dhanzi/Bbackface.svg")
+            i(cls := "back-face color-choice-border")
           ),
           div(cls := "memory-card", attr("data-framework") := "2")(
             i(cls := "image front-face", dataIcon := "T"),
-            img(cls := "back-face", src := "/assets/piece/xiangqi/2dhanzi/Bbackface.svg")
+            i(cls := "back-face color-choice-border")
           ),
           div(cls := "memory-card", attr("data-framework") := "3")(
             i(cls := "image front-face", dataIcon := ")"),
-            img(cls := "back-face", src := "/assets/piece/xiangqi/2dhanzi/Bbackface.svg")
+            i(cls := "back-face color-choice-border")
           ),
           div(cls := "memory-card", attr("data-framework") := "3")(
             i(cls := "image front-face", dataIcon := ")"),
-            img(cls := "back-face", src := "/assets/piece/xiangqi/2dhanzi/Bbackface.svg")
+            i(cls := "back-face color-choice-border")
           ),
           div(cls := "memory-card", attr("data-framework") := "4")(
             i(cls := "image front-face", dataIcon := "C"),
-            img(cls := "back-face", src := "/assets/piece/xiangqi/2dhanzi/Bbackface.svg")
+            i(cls := "back-face color-choice-border")
           ),
           div(cls := "memory-card", attr("data-framework") := "4")(
             i(cls := "image front-face", dataIcon := "C"),
-            img(cls := "back-face", src := "/assets/piece/xiangqi/2dhanzi/Bbackface.svg")
+            i(cls := "back-face color-choice-border")
           ),
           div(cls := "memory-card", attr("data-framework") := "5")(
             i(cls := "image front-face", dataIcon := "+"),
-            img(cls := "back-face", src := "/assets/piece/xiangqi/2dhanzi/Bbackface.svg")
+            i(cls := "back-face color-choice-border")
           ),
           div(cls := "memory-card", attr("data-framework") := "5")(
             i(cls := "image front-face", dataIcon := "+"),
-            img(cls := "back-face", src := "/assets/piece/xiangqi/2dhanzi/Bbackface.svg")
+            i(cls := "back-face color-choice-border")
           ),
           div(cls := "memory-card", attr("data-framework") := "6")(
             i(cls := "image front-face", dataIcon := ";"),
-            img(cls := "back-face", src := "/assets/piece/xiangqi/2dhanzi/Bbackface.svg")
+            i(cls := "back-face color-choice-border")
           ),
           div(cls := "memory-card", attr("data-framework") := "6")(
             i(cls := "image front-face", dataIcon := ";"),
-            img(cls := "back-face", src := "/assets/piece/xiangqi/2dhanzi/Bbackface.svg")
+            i(cls := "back-face color-choice-border")
           ),
           div(cls := "memory-card", attr("data-framework") := "7")(
             i(cls := "image front-face", dataIcon := "("),
-            img(cls := "back-face", src := "/assets/piece/xiangqi/2dhanzi/Bbackface.svg")
+            i(cls := "back-face color-choice-border")
           ),
           div(cls := "memory-card", attr("data-framework") := "7")(
             i(cls := "image front-face", dataIcon := "("),
-            img(cls := "back-face", src := "/assets/piece/xiangqi/2dhanzi/Bbackface.svg")
+            i(cls := "back-face color-choice-border")
           ),
           div(cls := "memory-card", attr("data-framework") := "8")(
             i(cls := "image front-face", dataIcon := "@"),
-            img(cls := "back-face", src := "/assets/piece/xiangqi/2dhanzi/Bbackface.svg")
+            i(cls := "back-face color-choice-border")
           ),
           div(cls := "memory-card", attr("data-framework") := "8")(
             i(cls := "image front-face", dataIcon := "@"),
-            img(cls := "back-face", src := "/assets/piece/xiangqi/2dhanzi/Bbackface.svg")
+            i(cls := "back-face color-choice-border")
           )
         ),
         div(cls := "moves", id := "moves")("Moves: 0"),
         div(cls := "memory-buttons")(
-          button(cls := "start button button-fat")("Play Again?")
+          button(cls := "start button button-fat button-color-choice")(trans.storm.playAgain.txt() + "?")
         )
       )
     )

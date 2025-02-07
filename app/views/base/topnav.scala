@@ -57,7 +57,7 @@ object topnav {
             //a(href := routes.Learn.index)(trans.chessBasics()),
             //a(href := routes.Practice.index)(trans.practice()),
             a(href := routes.Coordinate.home)(s"Chess ${trans.coordinates.coordinates.txt()}"),
-            a(href := routes.Memory.home)(s"Memory Game")
+            a(href := routes.Memory.home)(trans.memoryGame())
           ),
           //ctx.noKid option a(href := routes.Coach.all(1))(trans.coaches()),
           canSeeClasMenu option a(href := routes.Clas.index)(trans.clas.playstrategyClasses())

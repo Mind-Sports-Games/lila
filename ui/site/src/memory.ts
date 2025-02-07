@@ -70,8 +70,61 @@ playstrategy.load.then(() => {
       });
     })();
 
+    const icons = [
+      '{',
+      'T',
+      ')',
+      'C',
+      '+',
+      ';',
+      "'",
+      '(',
+      '',
+      '',
+      '@',
+      '>',
+      '_',
+      '',
+      '',
+      '',
+      '',
+      '',
+      '',
+      '',
+      '',
+      '',
+      '',
+      '',
+      '‹',
+      'K',
+      '',
+      '',
+      '',
+      '',
+      '',
+      '',
+      '',
+      '',
+      '€',
+      '',
+      '',
+      '',
+      '›',
+      '',
+      '',
+      '',
+      '',
+      '',
+      '',
+      '',
+      '\ue927',
+    ];
+    const shuffledIcons = icons.sort(() => Math.random() - 0.5);
+
+    //setup cards
     $memoryCards.each(function (this: HTMLElement) {
       $(this).on('click', () => flipCard(this));
+      $(this).find('.front-face').attr('data-icon', shuffledIcons[this.dataset.framework]);
     });
 
     $playAgain.on('click', () => {
