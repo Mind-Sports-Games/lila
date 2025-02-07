@@ -90,6 +90,28 @@ i {
   font-style: normal;
 }
 
+i {
+  //support colour choices (for memory game)
+  .selected-color-original &.color-choice-border {
+    border: $c-color-choice-original solid;
+  }
+  .selected-color-black &.color-choice-border {
+    border: $c-color-choice-black solid;
+  }
+  .selected-color-red &.color-choice-border {
+    border: $c-color-choice-red solid;
+  }
+  .selected-color-blue &.color-choice-border {
+    border: $c-color-choice-blue solid;
+  }
+  .selected-color-green &.color-choice-border {
+    border: $c-color-choice-green solid;
+  }
+  .selected-color-yellow &.color-choice-border {
+    border: $c-color-choice-yellow solid;
+  }
+}
+
 li {
   list-style: none;
 }

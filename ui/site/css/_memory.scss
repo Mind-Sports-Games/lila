@@ -1,0 +1,63 @@
+.memory-app {
+  display: flex;
+  flex-flow: column;
+  width: 100%;
+  max-width: 700px;
+  align-items: center;
+  margin: 0 auto;
+  background-color: $c-bg-box;
+
+  .memory-title {
+    font-weight: bold;
+    margin: 3vh 0;
+  }
+
+  .memory-grid {
+    width: 350px;
+    height: 350px;
+    display: flex;
+    flex-flow: wrap;
+    background: $c-bg-page;
+    box-shadow: 0 4px 10px 0px hsla(0, 0, 0, 0.225);
+    .memory-card {
+      width: 25%;
+      height: 25%;
+      position: relative;
+      display: flex;
+      flex-flow: column;
+      align-items: center;
+      transform: scale(0.9);
+      transform-style: preserve-3d;
+      transition: transform 0.5s;
+      user-select: none;
+      -webkit-user-select: none;
+      &.flip {
+        transform: rotateY(180deg);
+      }
+      .front-face,
+      .back-face {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        backface-visibility: hidden;
+      }
+      .front-face {
+        transform: rotateY(180deg);
+      }
+      .back-face {
+        border-radius: 75%;
+      }
+      .image {
+        font-size: 4em;
+        width: unset;
+      }
+    }
+  }
+  .moves {
+    padding: 2vh 0;
+    font-weight: bold;
+  }
+  .memory-buttons {
+    margin-bottom: 3vh;
+  }
+}
