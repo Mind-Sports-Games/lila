@@ -763,8 +763,7 @@ POST  /push/subscribe                  controllers.Push.webSubscribe
 
 # Pages
 GET   /terms-of-service                controllers.Page.tos
-#GET   /$bookmark<privacy|thanks|about|ads|changelog> controllers.Page.menuBookmark(bookmark: String)
-GET   /$bookmark<privacy|thanks|about|changelog> controllers.Page.menuBookmark(bookmark: String)
+GET   /$uid<privacy|thanks|about|changelog> controllers.Page.menuPage(uid: String)
 GET   /contact                         controllers.Main.contact
 GET   /faq                             controllers.Main.faq
 GET   /source                          controllers.Page.source
@@ -772,8 +771,8 @@ GET   /qa                              controllers.Main.movedPermanently(to: Str
 GET   /help                            controllers.Main.movedPermanently(to: String = "/contact")
 GET   /support                         controllers.Main.movedPermanently(to: String = "/contact")
 GET   /qa/:id/:slug                    controllers.Main.legacyQaQuestion(id: Int, slug: String)
-GET   /how-to-cheat                    controllers.Page.loneBookmark(bookmark = "how-to-cheat")
-GET   /page/:bookmark                  controllers.Page.loneBookmark(bookmark: String)
+GET   /how-to-cheat                    controllers.Page.lonePage(uid = "how-to-cheat")
+GET   /page/:uid                       controllers.Page.lonePage(uid: String)
 
 # Variants
 GET   /variant                         controllers.Page.variantHome

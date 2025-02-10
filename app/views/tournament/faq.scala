@@ -54,14 +54,14 @@ object faq {
           p(
             trans.arena.isHandicapped(),
             " For more info see the ",
-            a(href := routes.Page.loneBookmark("handicaps"))("handicapped page.")
+            a(href := routes.Page.lonePage("handicaps"))("handicapped page.")
           )
         case Some(false) => p(trans.arena.isNotHandicapped())
         case None =>
           p(
             trans.arena.someHandicapped(),
             " For more info see the ",
-            a(href := routes.Page.loneBookmark("handicaps"))("handicapped page.")
+            a(href := routes.Page.lonePage("handicaps"))("handicapped page.")
           )
       },
       h2(howAreScoresCalculated()),
@@ -86,7 +86,7 @@ object faq {
             p(
               trans.arena.isTournamentMedley(),
               " For more info see the ",
-              a(href := routes.Page.loneBookmark("medley"))("medley page.")
+              a(href := routes.Page.lonePage("medley"))("medley page.")
             )
           )
         case Some(false) => frag()
@@ -96,7 +96,7 @@ object faq {
             p(
               trans.arena.someMedley(),
               " For more info see the ",
-              a(href := routes.Page.loneBookmark("medley"))("medley page.")
+              a(href := routes.Page.lonePage("medley"))("medley page.")
             )
           )
       },

@@ -61,7 +61,7 @@ object bits {
   def medleyLink =
     a(
       cls := "variant-link",
-      href := routes.Page.loneBookmark("medley"),
+      href := routes.Page.lonePage("medley"),
       targetBlank,
       title := "Medley"
     )("MEDLEY")

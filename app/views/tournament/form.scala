@@ -276,7 +276,7 @@ final private class TourFields(form: Form[_], tour: Option[Tournament])(implicit
         help = frag(
           trans.handicappedDefinition.txt(),
           br,
-          a(href := routes.Page.loneBookmark("handicaps"), target := "_blank")("More detail here")
+          a(href := routes.Page.lonePage("handicaps"), target := "_blank")("More detail here")
         ).some
       ),
       st.input(
@@ -303,7 +303,7 @@ final private class TourFields(form: Form[_], tour: Option[Tournament])(implicit
         help = frag(
           trans.medleyArenaDefinition.txt(),
           br,
-          a(href := routes.Page.loneBookmark("medley"), target := "_blank")("More detail here")
+          a(href := routes.Page.lonePage("medley"), target := "_blank")("More detail here")
         ).some,
         half = true,
         disabled = disabledAfterStart
@@ -451,7 +451,7 @@ final private class TourFields(form: Form[_], tour: Option[Tournament])(implicit
         trans.clockInitialTime(),
         half = true,
         help = frag(
-          a(href := s"${routes.Page.loneBookmark("clocks")}", target := "_blank")("Clock details here")
+          a(href := s"${routes.Page.lonePage("clocks")}", target := "_blank")("Clock details here")
         ).some
       )(
         form3.select(

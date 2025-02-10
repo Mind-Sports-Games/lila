@@ -72,7 +72,7 @@ object side {
                       a(
                         cls := "remove_color",
                         title := "Clock info",
-                        href := s"${routes.Page.loneBookmark("clocks")}",
+                        href := s"${routes.Page.lonePage("clocks")}",
                         target := "_blank"
                       )(widgets showClock game),
                       separator,
@@ -80,7 +80,7 @@ object side {
                         a(
                           cls := "remove_color",
                           title := "Handicap info",
-                          href := s"${routes.Page.loneBookmark("handicaps")}",
+                          href := s"${routes.Page.lonePage("handicaps")}",
                           target := "_blank"
                         )(trans.handicapped.txt())
                       } else if (game.rated) trans.rated.txt()

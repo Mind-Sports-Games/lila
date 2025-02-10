@@ -11,28 +11,28 @@ final class Page(
     prismicC: Prismic
 ) extends LilaController(env) {
 
-  val help   = menuBookmark("help")
-  val tos    = menuBookmark("tos")
-  val master = menuBookmark("master")
+  val help   = menuPage("help")
+  val tos    = menuPage("terms-of-service")
+  val master = menuPage("master")
 
-  def bookmark(name: String, active: Option[String]) =
+  def page(uid: String, active: Option[String]) =
     Open { implicit ctx =>
       pageHit
-      OptionOk(prismicC getBookmark name) { case (doc, resolver) =>
+      OptionOk(prismicC getPage uid) { case (doc, resolver) =>
         active match {
-          case None       => views.html.site.page.lone(doc, resolver)
-          case Some(name) => views.html.site.page.withMenu(name, doc, resolver)
+          case None      => views.html.site.page.lone(doc, resolver)
+          case Some(uid) => views.html.site.page.withMenu(uid, doc, resolver)
         }
       }
     }
 
-  def loneBookmark(name: String) = bookmark(name, none)
-  def menuBookmark(name: String) = bookmark(name, name.some)
+  def lonePage(uid: String) = page(uid, none)
+  def menuPage(uid: String) = page(uid, uid.some)
 
   def source =
     Open { implicit ctx =>
       pageHit
-      OptionOk(prismicC getBookmark "source") { case (doc, resolver) =>
+      OptionOk(prismicC getPage "source") { case (doc, resolver) =>
         views.html.site.page.source(doc, resolver)
       }
     }
@@ -41,7 +41,7 @@ final class Page(
     Open { implicit ctx =>
       import play.api.libs.json._
       negotiate(
-        html = OptionOk(prismicC getBookmark "variant") { case (doc, resolver) =>
+        html = OptionOk(prismicC getPage "variant") { case (doc, resolver) =>
           views.html.site.variant.home(doc, resolver)
         },
         api = _ =>
@@ -61,7 +61,7 @@ final class Page(
         variant <- (Variant.all).map { v =>
           (v.key, v)
         }.toMap get key
-      } yield OptionOk(prismicC getBookmark key) { case (doc, resolver) =>
+      } yield OptionOk(prismicC getPage key) { case (doc, resolver) =>
         views.html.site.variant.show(doc, resolver, variant)
       }) | notFound
     }

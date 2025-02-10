@@ -50,9 +50,9 @@ object topnav {
         linkTitle(routes.Page.variantHome.path, trans.learnMenu()),
         div(role := "group")(
           a(href := routes.Page.variantHome)(trans.rulesVariants()),
-          a(href := routes.Page.loneBookmark("medley"))(trans.medleyTournaments()),
-          a(href := routes.Page.loneBookmark("handicaps"))(trans.handicapTournaments()),
-          a(href := routes.Page.loneBookmark("clocks"))(trans.clockTypes()),
+          a(href := routes.Page.lonePage("medley"))(trans.medleyTournaments()),
+          a(href := routes.Page.lonePage("handicaps"))(trans.handicapTournaments()),
+          a(href := routes.Page.lonePage("clocks"))(trans.clockTypes()),
           ctx.noBot option frag(
             //a(href := routes.Learn.index)(trans.chessBasics()),
             //a(href := routes.Practice.index)(trans.practice()),

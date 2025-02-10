@@ -31,7 +31,7 @@ object side {
             p(
               a(
                 title := "Clock info",
-                href := s"${routes.Page.loneBookmark("clocks")}",
+                href := s"${routes.Page.lonePage("clocks")}",
                 target := "_blank"
               )(tour.clock.show),
               separator,
@@ -50,7 +50,7 @@ object side {
               tour.durationString
             ),
             if (tour.handicapped)
-              a(href := routes.Page.loneBookmark("handicaps"), target := "_blank")(
+              a(href := routes.Page.lonePage("handicaps"), target := "_blank")(
                 trans.handicappedTournament()
               )
             else tour.mode.fold(trans.casualTournament, trans.ratedTournament)(),
@@ -118,7 +118,7 @@ object side {
           "Berserk Clock: ",
           a(
             title := "Clock info",
-            href := s"${routes.Page.loneBookmark("clocks")}",
+            href := s"${routes.Page.lonePage("clocks")}",
             target := "_blank"
           )(tour.clock.showBerserk)
         ),
