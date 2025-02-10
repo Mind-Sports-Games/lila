@@ -39,7 +39,7 @@ object signup {
             small(
               trans.byRegisteringYouAgreeToBeBoundByOur(a(href := routes.Page.tos)(trans.termsOfService())),
               br,
-              trans.readAboutOur(a(href := routes.Page.menuBookmark("privacy"))(trans.privacyPolicy())),
+              trans.readAboutOur(a(href := routes.Page.menuPage("privacy"))(trans.privacyPolicy())),
               br
             )
           ),

@@ -52,7 +52,7 @@ object tree {
             " to contact us about other issues.",
             br,
             "You can also ",
-            a(href := routes.Page.loneBookmark("appeal"))("find here more information about appeals.")
+            a(href := routes.Page.lonePage("appeal"))("find here more information about appeals.")
           )
         )
       )
@@ -152,7 +152,7 @@ object tree {
           frag(
             p(
               "I accept that I have not followed the ",
-              a(href := routes.Page.loneBookmark("communication-guidelines"))("communication guidelines"),
+              a(href := routes.Page.lonePage("communication-guidelines"))("communication guidelines"),
               ". I will behave better in future, please give me another chance."
             ),
             sendUsAnAppeal,
@@ -170,7 +170,7 @@ object tree {
       ),
       content = p(
         "Read our ",
-        a(href := routes.Page.loneBookmark("communication-guidelines"))("communication guidelines"),
+        a(href := routes.Page.lonePage("communication-guidelines"))("communication guidelines"),
         ". Failure to follow the communication guidelines can result in accounts being muted."
       ).some
     )
@@ -260,7 +260,7 @@ object tree {
         div(cls := "appeal__rules")(
           p(cls := "text", dataIcon := "")(doNotMessageModerators()),
           p(
-            a(cls := "text", dataIcon := "", href := routes.Page.loneBookmark("appeal"))(
+            a(cls := "text", dataIcon := "", href := routes.Page.lonePage("appeal"))(
               "Read more about the appeal process"
             )
           ),
@@ -292,7 +292,7 @@ object tree {
       ),
       p(
         "You can read more about the appeal process ",
-        a(href := routes.Page.loneBookmark("appeal"))("here.")
+        a(href := routes.Page.lonePage("appeal"))("here.")
       )
     )
 }

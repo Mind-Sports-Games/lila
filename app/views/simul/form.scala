@@ -101,7 +101,7 @@ object form {
           trans.clockIncrement(),
           help = frag(
             trans.simulClockHint().some,
-            a(href := s"${routes.Page.loneBookmark("clocks")}", target := "_blank")("Clock details here")
+            a(href := s"${routes.Page.lonePage("clocks")}", target := "_blank")("Clock details here")
           ).some,
           half = true
         )(form3.select(_, clockTimeChoices)),

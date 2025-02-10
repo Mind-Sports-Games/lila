@@ -214,7 +214,7 @@ final private class SwissFields(form: Form[_], swiss: Option[Swiss])(implicit ct
         help = frag(
           trans.handicappedDefinition.txt(),
           br,
-          a(href := routes.Page.loneBookmark("handicaps"), target := "_blank")("More detail here")
+          a(href := routes.Page.lonePage("handicaps"), target := "_blank")("More detail here")
         ).some
       )
     )
@@ -292,7 +292,7 @@ final private class SwissFields(form: Form[_], swiss: Option[Swiss])(implicit ct
         help = frag(
           trans.medleyDefinition.txt(),
           br,
-          a(href := routes.Page.loneBookmark("medley"), target := "_blank")("More detail here")
+          a(href := routes.Page.lonePage("medley"), target := "_blank")("More detail here")
         ).some
       )
     )
@@ -391,7 +391,7 @@ final private class SwissFields(form: Form[_], swiss: Option[Swiss])(implicit ct
         trans.clockInitialTime(),
         half = true,
         help = frag(
-          a(href := s"${routes.Page.loneBookmark("clocks")}", target := "_blank")("Clock details here")
+          a(href := s"${routes.Page.lonePage("clocks")}", target := "_blank")("Clock details here")
         ).some
       )(
         form3.select(_, SwissForm.clockLimitChoices, disabled = disabledAfterStart)

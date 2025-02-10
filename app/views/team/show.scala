@@ -78,7 +78,7 @@ object show {
               ),
               info.ledByMe option a(
                 dataIcon := "",
-                href := routes.Page.loneBookmark("team-etiquette"),
+                href := routes.Page.lonePage("team-etiquette"),
                 cls := "text team-show__meta__etiquette"
               )("Team Etiquette")
             ),
