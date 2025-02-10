@@ -61,8 +61,16 @@ final class Page(
         variant <- (Variant.all).map { v =>
           (v.key, v)
         }.toMap get key
-      } yield OptionOk(prismicC getPage key) { case (doc, resolver) =>
+      } yield OptionOk(prismicC getPage prismicUid(key)) { case (doc, resolver) =>
         views.html.site.variant.show(doc, resolver, variant)
       }) | notFound
     }
+
+  // The UID field in prismic has to be unique, lowercase, and some are taken by other pages
+  def prismicUid(key: String) =
+    key match {
+      case "breakthroughtroyka" => "breakthrough-troyka"
+      case _                    => key.toLowerCase()
+    }
+
 }
