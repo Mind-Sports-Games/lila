@@ -181,7 +181,14 @@ export default function (ctrl: SwissCtrl): VNode | undefined {
                         : '' + p.rating,
                 ),
                 h('td.is.playerIndex-icon.' + (p.c ? ctrl.data.p1Color : ctrl.data.p2Color)),
-                h('td.gamescore' + (p.mmGameRes ? '.' + p.mmGameRes : ''), p.ismm ? (ctrl.data.backgammonPoints ? multiPointResult(p, ctrl.playerInfoId, data.multiPoint ?? []) : gameResult(p)) : ''),
+                h(
+                  'td.gamescore' + (p.mmGameRes ? '.' + p.mmGameRes : ''),
+                  p.ismm
+                    ? ctrl.data.backgammonPoints
+                      ? multiPointResult(p, ctrl.playerInfoId, data.multiPoint ?? [])
+                      : gameResult(p)
+                    : '',
+                ),
                 p.ismm && p.isFinalGame
                   ? h('td.matchscore', { attrs: { rowSpan: p.mmGameNb } }, res)
                   : p.ismm
@@ -214,25 +221,29 @@ function gameResult(p: MultiMatchPairing): string {
 }
 
 function multiPointResult(p: MultiMatchPairing, selectedUserId: string, multiPoints: MultiPoint[]): string {
-  const edgeCasesDisplay = "(*)";
+  const edgeCasesDisplay = '(*)';
   if (!multiPoints) return edgeCasesDisplay;
   const round = multiPoints.find(round => round.games?.find(game => game.id === p.g));
   if (p.mmGameNb === undefined || !round || round.games.length < 1 || !round.target) return edgeCasesDisplay;
 
-  if(p.isFinalGame && p.w !== undefined) {
-    return (p.w === true) ? 
-      (round.players.p1.userId === selectedUserId ? round.target + " - " + round.games[0].startingScore.p2 : round.target + " - " + round.games[0].startingScore.p1) :
-      (round.players.p1.userId === selectedUserId ? round.games[0].startingScore.p1 + " - " + round.target : round.games[0].startingScore.p2 + " - " + round.target) ;
+  if (p.isFinalGame && p.w !== undefined) {
+    return p.w === true
+      ? round.players.p1.userId === selectedUserId
+        ? round.target + ' - ' + round.games[0].startingScore.p2
+        : round.target + ' - ' + round.games[0].startingScore.p1
+      : round.players.p1.userId === selectedUserId
+        ? round.games[0].startingScore.p1 + ' - ' + round.target
+        : round.games[0].startingScore.p2 + ' - ' + round.target;
   }
 
   const multiPointMatchIndex = round.games.length - p.mmGameNb - 1;
   if (!round.games[multiPointMatchIndex]) return edgeCasesDisplay;
   const [selectedPlayerScore, opponentScore] =
-    round.games[multiPointMatchIndex].p1UserId === selectedUserId ?
-    [round.games[multiPointMatchIndex].startingScore.p1, round.games[multiPointMatchIndex].startingScore.p2] :
-    [round.games[multiPointMatchIndex].startingScore.p2, round.games[multiPointMatchIndex].startingScore.p1];
+    round.games[multiPointMatchIndex].p1UserId === selectedUserId
+      ? [round.games[multiPointMatchIndex].startingScore.p1, round.games[multiPointMatchIndex].startingScore.p2]
+      : [round.games[multiPointMatchIndex].startingScore.p2, round.games[multiPointMatchIndex].startingScore.p1];
 
-  return selectedPlayerScore + " - " + opponentScore;
+  return selectedPlayerScore + ' - ' + opponentScore;
 }
 
 function result(p: MultiMatchPairing): string {

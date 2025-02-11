@@ -231,8 +231,8 @@ export interface MultiPoint {
         p1: number;
         p2: number;
       };
-    }
-  ],
+    },
+  ];
   players: {
     p1: {
       userId: string;
@@ -240,6 +240,6 @@ export interface MultiPoint {
     p2: {
       userId: string;
     };
-  },
+  };
   target: number;
 }
