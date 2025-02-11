@@ -24,7 +24,7 @@ final class Appeal(env: Env, reportC: => Report, prismicC: => Prismic, userC: =>
     Auth { implicit ctx => me =>
       if (ctx.isAppealUser || isGranted(_.Appeals)) {
         pageHit
-        OptionOk(prismicC getBookmark "appeal-landing") { case (doc, resolver) =>
+        OptionOk(prismicC getPage "appeal-landing") { case (doc, resolver) =>
           views.html.site.page.lone(doc, resolver)
         }
       } else notFound

@@ -37,9 +37,9 @@ object features {
             ),
             tr(check)(
               "Tournament features including: ",
-              a(href := routes.Page.loneBookmark("medley"))("medley"),
+              a(href := routes.Page.lonePage("medley"))("medley"),
               ", ",
-              a(href := routes.Page.loneBookmark("handicaps"))("handicapped"),
+              a(href := routes.Page.lonePage("handicaps"))("handicapped"),
               ", ",
               a(href := s"${routes.Swiss.home}#bestofx")("best of X/play X")
             ),
@@ -52,7 +52,7 @@ object features {
             ),
             tr(check)(
               "A variety of clock types; ",
-              a(href := routes.Page.loneBookmark("clocks"))(
+              a(href := routes.Page.lonePage("clocks"))(
                 "Fischer, Byoyomi, Bronstein, Simple Delay, Correspondence and unlimited"
               )
             ),

@@ -45,7 +45,7 @@ object topic {
           ),
           p(
             "Make sure to read ",
-            strong(a(href := routes.Page.loneBookmark("forum-etiquette"))("the forum etiquette"))
+            strong(a(href := routes.Page.lonePage("forum-etiquette"))("the forum etiquette"))
           )
         ),
         postForm(cls := "form3", action := routes.ForumTopic.create(categ.slug))(
@@ -179,7 +179,7 @@ object topic {
             form3.group(
               form("text"),
               trans.message(),
-              help = a(dataIcon := "", cls := "text", href := routes.Page.loneBookmark("forum-etiquette"))(
+              help = a(dataIcon := "", cls := "text", href := routes.Page.lonePage("forum-etiquette"))(
                 "Forum etiquette"
               ).some
             ) { f =>
