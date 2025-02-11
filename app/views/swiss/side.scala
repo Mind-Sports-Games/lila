@@ -33,7 +33,7 @@ object side {
             p(
               a(
                 title := "Clock info",
-                href := s"${routes.Page.loneBookmark("clocks")}",
+                href := s"${routes.Page.lonePage("clocks")}",
                 target := "_blank"
               )(s.clock.show),
               separator,
@@ -52,7 +52,7 @@ object side {
               if (s.settings.usingDrawTables) trans.swiss.usingDrawTables(),
               if (s.settings.usingDrawTables) separator,
               if (s.settings.handicapped)
-                a(href := routes.Page.loneBookmark("handicaps"), target := "_blank")(
+                a(href := routes.Page.lonePage("handicaps"), target := "_blank")(
                   trans.handicappedTournament()
                 )
               else if (s.settings.mcmahon) trans.mcmahon()

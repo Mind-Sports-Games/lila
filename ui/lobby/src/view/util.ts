@@ -62,7 +62,7 @@ export const perfIcons: any = {
   'American/English': '‹',
   Shogi: '',
   Xiangqi: '',
-  'Mini Shogi': '',
+  'Mini Shogi': '',
   'Mini Xiangqi': '',
   Othello: '',
   'Grand Othello': '',

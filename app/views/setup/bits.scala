@@ -194,7 +194,7 @@ private object bits {
           a(
             cls := "remove_color",
             title := "More info",
-            href := s"${routes.Page.loneBookmark("clocks")}",
+            href := s"${routes.Page.lonePage("clocks")}",
             target := "_blank"
           )(trans.timeControl())
         ),

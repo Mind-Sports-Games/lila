@@ -28,13 +28,22 @@ final class Prismic(
       }
     }
 
-  def getBookmark(name: String) =
+  private def getPageDocument(api: PrismicApi, uid: String): Fu[Option[Document]] =
+    api
+      .forms("everything")
+      .query(s"""[[:d = at(my.pages.uid, "$uid")]]""")
+      .ref(api.master.ref)
+      .submit() dmap {
+      _.results.headOption
+    }
+
+  def getPage(uid: String) =
     prismicApi flatMap { api =>
-      api.bookmarks.get(name) ?? getDocument map2 { (doc: io.prismic.Document) =>
+      getPageDocument(api, uid) map2 { (doc: io.prismic.Document) =>
         doc -> makeLinkResolver(api)
       }
     } recover { case e: Exception =>
-      logger.error(s"bookmark:$name", e)
+      logger.error(s"page:$uid", e)
       none
     }
 

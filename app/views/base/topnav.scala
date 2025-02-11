@@ -50,13 +50,14 @@ object topnav {
         linkTitle(routes.Page.variantHome.path, trans.learnMenu()),
         div(role := "group")(
           a(href := routes.Page.variantHome)(trans.rulesVariants()),
-          a(href := routes.Page.loneBookmark("medley"))(trans.medleyTournaments()),
-          a(href := routes.Page.loneBookmark("handicaps"))(trans.handicapTournaments()),
-          a(href := routes.Page.loneBookmark("clocks"))(trans.clockTypes()),
+          a(href := routes.Page.lonePage("medley"))(trans.medleyTournaments()),
+          a(href := routes.Page.lonePage("handicaps"))(trans.handicapTournaments()),
+          a(href := routes.Page.lonePage("clocks"))(trans.clockTypes()),
           ctx.noBot option frag(
             //a(href := routes.Learn.index)(trans.chessBasics()),
             //a(href := routes.Practice.index)(trans.practice()),
-            a(href := routes.Coordinate.home)(s"Chess ${trans.coordinates.coordinates.txt()}")
+            a(href := routes.Coordinate.home)(s"Chess ${trans.coordinates.coordinates.txt()}"),
+            a(href := routes.Memory.home)(trans.memoryGame())
           ),
           //ctx.noKid option a(href := routes.Coach.all(1))(trans.coaches()),
           canSeeClasMenu option a(href := routes.Clas.index)(trans.clas.playstrategyClasses())
@@ -88,7 +89,7 @@ object topnav {
           a(href := routes.UserAnalysis.index)(s"${trans.analysis.txt()}"),
           //a(href := s"${routes.UserAnalysis.index}#explorer")(trans.openingExplorer()),
           a(href := routes.Editor.index)(s"Chess ${trans.boardEditor.txt()}"),
-          a(href := routes.Study.allDefault(1))(trans.studyMenu()),
+          a(href := routes.Study.allDefault(1))(trans.studyMenu())
           //a(href := routes.Importer.importGame)(trans.importGame()),
           //a(href := routes.Search.index())(trans.search.advancedSearch())
         )

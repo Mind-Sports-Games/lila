@@ -27,6 +27,8 @@
   <string name="p2">Player 2</string>
   <string name="randomColor">Random side</string>
   <string name="absentSimulApplicants">Games will not get created for users not present (i.e. not in spectators)</string>
+  <string name="memoryGame">Memory Game</string>
+  <string name="findPairs">Find the pairs!</string>
   <string name="multiMatch">Multi-match</string>
   <string name="multiMatchChallenge">This challenge is a multi-match!</string>
   <string name="multiMatchRematchStarted">Started next game of multi-match</string>
