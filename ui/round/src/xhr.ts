@@ -5,6 +5,8 @@ import { RoundData } from './interfaces';
 
 export const reload = (ctrl: RoundController): Promise<RoundData> => xhr.json(ctrl.data.url.round);
 
+export const nowPlaying = () => xhr.json('/account/now-playing').then(o => o.nowPlaying);
+
 export const whatsNext = (ctrl: RoundController): Promise<{ next?: string }> =>
   xhr.json(`/whats-next/${ctrl.data.game.id}${ctrl.data.player.id}`);
 
