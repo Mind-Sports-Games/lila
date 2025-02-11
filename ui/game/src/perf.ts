@@ -30,7 +30,7 @@ export const perf = {
     frysk: '',
     shogi: '',
     xiangqi: '',
-    minishogi: '',
+    minishogi: '',
     minixiangqi: '',
     flipello: '',
     flipello10: '',

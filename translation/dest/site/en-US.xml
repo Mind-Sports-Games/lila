@@ -690,7 +690,7 @@ computer analysis, game chat and shareable URL.</string>
   <string name="sourceCode">Source Code</string>
   <string name="simultaneousExhibitions">Simultaneous exhibitions</string>
   <string name="memoryGame">Memory Game</string>
-  <string name="findIcons">Find the icons!</string>
+  <string name="findPairs">Find the pairs!</string>
   <string name="host">Host</string>
   <string name="hostColorX">Host color: %s</string>
   <string name="createdSimuls">Newly created simuls</string>

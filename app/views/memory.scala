@@ -19,9 +19,9 @@ object memory {
       moreJs = jsModule("memory"),
       openGraph = lila.app.ui
         .OpenGraph(
-          title = "Memory trainer",
+          title = "Memory game",
           url = s"$netBaseUrl${routes.Memory.home.url}",
-          description = "Improve your memory by trying to match pairs of pieces."
+          description = "Improve your memory by trying to match pairs."
         )
         .some,
       zoomable = true
@@ -30,7 +30,7 @@ object memory {
         id := "memory-app",
         cls := "memory-app init"
       )(
-        h1(cls := "memory-title")(trans.findIcons()),
+        h1(cls := "memory-title")(trans.findPairs()),
         div(cls := "memory-grid")(
           div(cls := "memory-card", attr("data-framework") := "1")(
             i(cls := "image front-face", dataIcon := "{"),
