@@ -257,11 +257,7 @@ final class Swiss(
                 JsonOk(fuccess(lila.swiss.SwissJson.playerJsonExtMultiPoint(swiss, player, pairingsWithGames)))
               }
             else
-              env.swiss.api.playerInfo(swiss, userId).flatMap {
-                _.fold(notFoundJson()) { player =>
-                  JsonOk(fuccess(lila.swiss.SwissJson.playerJsonExt(swiss, player)))
-                }
-              }
+              JsonOk(fuccess(lila.swiss.SwissJson.playerJsonExt(swiss, player)))
           }
         }
       }
