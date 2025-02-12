@@ -185,8 +185,9 @@ export default function (ctrl: SwissCtrl): VNode | undefined {
                   'td.gamescore' + (p.mmGameRes ? '.' + p.mmGameRes : ''),
                   ctrl.data.backgammonPoints
                     ? multiPointResult(p, ctrl.playerInfoId, data.multiPoint ?? [])
-                    : p.ismm ? gameResult(p)
-                  : '',
+                    : p.ismm
+                      ? gameResult(p)
+                      : '',
                 ),
                 p.ismm && p.isFinalGame
                   ? h('td.matchscore', { attrs: { rowSpan: p.mmGameNb } }, res)
