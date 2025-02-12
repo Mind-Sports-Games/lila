@@ -6,6 +6,7 @@ import { game as gameRoute } from 'game/router';
 import { RoundData, MaybeVNodes } from '../interfaces';
 import { ClockData } from '../clock/clockCtrl';
 import RoundController from '../ctrl';
+import * as xhr from '../xhr';
 
 function analysisBoardOrientation(data: RoundData) {
   return data.player.playerIndex;
@@ -308,11 +309,16 @@ export function backToSwiss(ctrl: RoundController): VNode | undefined {
   const d = ctrl.data;
   const moreGamesInMultiMatch = d.game.multiMatch && d.game.multiMatch.index < ctrl.data.swiss?.nbGamesPerRound;
   if (d.swiss?.running && moreGamesInMultiMatch) {
-    ctrl.setRedirecting();
-    setTimeout(() => {
-      location.href = '/swiss/' + d.swiss?.id;
-      return undefined;
-    }, 2500);
+    xhr.nowPlaying().then(povs => {
+      const nextGameId = povs
+        .filter(p => p.source === 'swiss' && p.opponent.id === d.opponent.user.id)
+        .map(p => p.gameId);
+      ctrl.setRedirecting();
+      setTimeout(() => {
+        location.href = nextGameId.length === 1 ? '/' + nextGameId[0] : '/swiss/' + d.swiss?.id;
+        return undefined;
+      }, 2500);
+    });
   }
   return d.swiss?.running
     ? h('div.follow-up', [
