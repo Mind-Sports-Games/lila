@@ -356,7 +356,7 @@ final class SwissApi(
     }
 
   def playerToPairingGames(playerView: SwissPlayer.ViewExt): Fu[List[SwissPairingGames]] =
-    playerView.pairings.values.toSeq.map(_.pairing).map { p =>
+    playerView.pairings.values.toList.map(_.pairing).map { p =>
       SwissPairingGameIds(
         p.id,
         p.multiMatchGameIds,
@@ -366,7 +366,7 @@ final class SwissApi(
         p.nbGamesPerRound,
         p.openingFEN
       )
-    }.toList match {
+    } match {
       case Nil => fuccess(List.empty[SwissPairingGames])
       case ids => toSwissPairingGames(playerView.player.swissId, ids)
     }

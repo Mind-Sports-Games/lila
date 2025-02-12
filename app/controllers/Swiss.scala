@@ -251,13 +251,14 @@ final class Swiss(
     Action.async {
       WithSwiss(id) { swiss =>
         env.swiss.api.playerInfo(swiss, userId).flatMap {
-          _.fold(notFoundJson()) { player =>
-            if (swiss.settings.isMultiPoint)
-              env.swiss.api.playerToPairingGames(player).flatMap { pairingsWithGames =>
-                JsonOk(fuccess(lila.swiss.SwissJson.playerJsonExtMultiPoint(swiss, player, pairingsWithGames)))
-              }
-            else
-              JsonOk(fuccess(lila.swiss.SwissJson.playerJsonExt(swiss, player)))
+          _.fold(notFoundJson()) { playerView =>
+            env.swiss.api.playerToPairingGames(playerView).flatMap { pairingsWithGames =>
+              JsonOk(fuccess(lila.swiss.SwissJson.playerJsonExt(
+                swiss,
+                playerView,
+                swiss.settings.isMultiPoint option pairingsWithGames
+              )))
+            }
           }
         }
       }
