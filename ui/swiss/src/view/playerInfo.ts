@@ -183,11 +183,10 @@ export default function (ctrl: SwissCtrl): VNode | undefined {
                 h('td.is.playerIndex-icon.' + (p.c ? ctrl.data.p1Color : ctrl.data.p2Color)),
                 h(
                   'td.gamescore' + (p.mmGameRes ? '.' + p.mmGameRes : ''),
-                  p.ismm
-                    ? ctrl.data.backgammonPoints
-                      ? multiPointResult(p, ctrl.playerInfoId, data.multiPoint ?? [])
-                      : gameResult(p)
-                    : '',
+                  ctrl.data.backgammonPoints
+                    ? multiPointResult(p, ctrl.playerInfoId, data.multiPoint ?? [])
+                    : p.ismm ? gameResult(p)
+                  : '',
                 ),
                 p.ismm && p.isFinalGame
                   ? h('td.matchscore', { attrs: { rowSpan: p.mmGameNb } }, res)
