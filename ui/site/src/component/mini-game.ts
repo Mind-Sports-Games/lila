@@ -166,7 +166,7 @@ export const update = (node: HTMLElement, data: UpdateData) => {
   renderClock(data.p1, data.p1Delay, data.p1Pending, 'p1');
   renderClock(data.p2, data.p2Delay, data.p2Pending, 'p2');
 
-  if (!['backgammon', 'nackgammon', 'hyper'].includes(variantFromElement($el)) || !isMultiPoint(node)) {
+  if (!isMultiPoint(node)) {
     ['p1', 'p2'].forEach(playerIndex => {
       const $score = $(node).find('.mini-game__score--' + playerIndex);
       $score.html(displayScore(variantFromElement($el) as VariantKey, data.fen, playerIndex));
