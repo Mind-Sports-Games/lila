@@ -135,7 +135,6 @@ final private class Streaming(
             }
         }
       res dmap { r =>
-        logger.info(s"Fetched ${r.list.size} youtube streamers.")
         prevYouTubeStreams = r
         r.list
       }

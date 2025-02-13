@@ -9,9 +9,10 @@ import {
   matchScoreDisplay,
   multiMatchByeScore,
 } from './util';
-import { PairingExt, Outcome } from '../interfaces';
 import { isOutcome } from '../util';
 import SwissCtrl from '../ctrl';
+
+import type { PairingExt, MultiPoint, Outcome } from '../interfaces';
 
 interface MultiMatchOutcome {
   t: 'o';
@@ -75,7 +76,7 @@ export default function (ctrl: SwissCtrl): VNode | undefined {
   const data = ctrl.data.playerInfo;
   const noarg = ctrl.trans.noarg;
   const tag = 'div.swiss__player-info.swiss__table';
-  if (data?.user.id !== ctrl.playerInfoId) return h(tag, [h('div.stats', [h('h2', ctrl.playerInfoId), spinner()])]);
+  if (data?.user?.id !== ctrl.playerInfoId) return h(tag, [h('div.stats', [h('h2', ctrl.playerInfoId), spinner()])]);
   const games = isMultiMatch
     ? data.sheet.reduce((r, p) => r + ((p as any).mr || []).length, 0)
     : data.sheet.filter((p: any) => p.g).length;
@@ -180,7 +181,14 @@ export default function (ctrl: SwissCtrl): VNode | undefined {
                         : '' + p.rating,
                 ),
                 h('td.is.playerIndex-icon.' + (p.c ? ctrl.data.p1Color : ctrl.data.p2Color)),
-                h('td.gamescore' + (p.mmGameRes ? '.' + p.mmGameRes : ''), p.ismm ? gameResult(p) : ''),
+                h(
+                  'td.gamescore' + (p.mmGameRes ? '.' + p.mmGameRes : ''),
+                  ctrl.data.backgammonPoints
+                    ? multiPointResult(p, ctrl.playerInfoId, data.multiPoint ?? [])
+                    : p.ismm
+                      ? gameResult(p)
+                      : '',
+                ),
                 p.ismm && p.isFinalGame
                   ? h('td.matchscore', { attrs: { rowSpan: p.mmGameNb } }, res)
                   : p.ismm
@@ -210,6 +218,32 @@ function gameResult(p: MultiMatchPairing): string {
   } else {
     return result(p);
   }
+}
+
+function multiPointResult(p: MultiMatchPairing, selectedUserId: string, multiPoints: MultiPoint[]): string {
+  const edgeCasesDisplay = '(*)';
+  if (!multiPoints) return edgeCasesDisplay;
+  const round = multiPoints.find(round => round.games?.find(game => game.id === p.g));
+  if (p.mmGameNb === undefined || !round || round.games.length < 1 || !round.target) return edgeCasesDisplay;
+
+  if (p.isFinalGame && p.w !== undefined) {
+    return p.w === true
+      ? round.players.p1.userId === selectedUserId
+        ? round.target + ' - ' + round.games[0].startingScore.p2
+        : round.target + ' - ' + round.games[0].startingScore.p1
+      : round.players.p1.userId === selectedUserId
+        ? round.games[0].startingScore.p1 + ' - ' + round.target
+        : round.games[0].startingScore.p2 + ' - ' + round.target;
+  }
+
+  const multiPointMatchIndex = round.games.length - p.mmGameNb - 1;
+  if (!round.games[multiPointMatchIndex]) return edgeCasesDisplay;
+  const [selectedPlayerScore, opponentScore] =
+    round.games[multiPointMatchIndex].p1UserId === selectedUserId
+      ? [round.games[multiPointMatchIndex].startingScore.p1, round.games[multiPointMatchIndex].startingScore.p2]
+      : [round.games[multiPointMatchIndex].startingScore.p2, round.games[multiPointMatchIndex].startingScore.p1];
+
+  return selectedPlayerScore + ' - ' + opponentScore;
 }
 
 function result(p: MultiMatchPairing): string {
