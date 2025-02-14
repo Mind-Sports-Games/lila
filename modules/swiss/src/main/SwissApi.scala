@@ -690,6 +690,9 @@ final class SwissApi(
                 }
             } >>
               game.playersWhoDidNotMove
+                .filter(p =>
+                  game.winnerPlayerIndex.map((game.game.player(_))) != Some(p)
+                ) //prevent malicious opponent resigning on your turn before you play a move
                 .map(_.userId)
                 .map { absent =>
                   SwissPlayer.fields { f =>
