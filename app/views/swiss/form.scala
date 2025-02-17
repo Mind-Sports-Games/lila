@@ -424,7 +424,7 @@ final private class SwissFields(form: Form[_], swiss: Option[Swiss])(implicit ct
       form3.select(_, SwissForm.roundIntervalChoices)
     )
   def halfwayBreak =
-    form3.group(form("halfwayBreak"), frag("Additional interval between rounds at halfway"), half = true)(
+    form3.group(form("halfwayBreak"), frag("Interval between rounds at halfway"), half = true)(
       form3.select(_, SwissForm.halfwayBreakChoices)
     )
   def minutesBeforeStartToJoin =
