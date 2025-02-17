@@ -860,6 +860,8 @@ case class Game(
 
   def expirable = expirableAtStart || expirableOnPaused
 
+  def playersWhoDidNotMove: List[Player] = players.filterNot { p => playerHasMoved(p.playerIndex) }
+
   def playerWhoDidNotMove: Option[Player] =
     if (!onePlayerHasMoved) player(startPlayerIndex).some
     else if (!bothPlayersHaveMoved) player(!startPlayerIndex).some
