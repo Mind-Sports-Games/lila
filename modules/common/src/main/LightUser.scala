@@ -89,6 +89,6 @@ object LightUser {
 
   val easiestPoolBotId: UserID = "ps-greedy-one-move"
 
-  val psBotsIDs = tourBotsIDs ++ poolBotsIDs
+  val psBotsIDs = tourBotsIDs ++ poolBotsIDs ++ stockfishBotsIDs
 
 }

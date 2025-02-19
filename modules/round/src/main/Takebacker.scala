@@ -31,9 +31,9 @@ final private class Takebacker(
               // go back one ply. if playerindex has not switched, continue going back
               takebackRetainPlayer(game)
           } dmap (_ -> situation.reset)
-        case Pov(game, _) if pov.game.playableByAi       => takebackSwitchPlayer(game) dmap (_ -> situation)
-        case Pov(game, _) if pov.opponent.isAi           => takebackRetainPlayer(game) dmap (_ -> situation)
-        case Pov(game, _) if pov.opponent.isStockfishBot => takebackRetainPlayer(game) dmap (_ -> situation)
+        case Pov(game, _) if pov.game.playableByAi => takebackSwitchPlayer(game) dmap (_ -> situation)
+        case Pov(game, _) if pov.opponent.isAi     => takebackRetainPlayer(game) dmap (_ -> situation)
+        case Pov(game, _) if pov.opponent.isPSBot  => takebackRetainPlayer(game) dmap (_ -> situation)
         case Pov(game, playerIndex) if (game playerCanProposeTakeback playerIndex) && situation.offerable =>
           {
             messenger.system(game, trans.takebackPropositionSent.txt())

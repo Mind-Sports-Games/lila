@@ -34,11 +34,9 @@ case class Player(
 
   def isAi = aiLevel.isDefined
 
-  def isHuman = !isAi
+  def isHuman = !isAi && !isPSBot
 
   def isPSBot = userId ?? LightUser.psBotsIDs.contains
-
-  def isStockfishBot = userId ?? LightUser.stockfishBotsIDs.contains
 
   def hasUser = userId.isDefined
 

@@ -474,7 +474,7 @@ case class Game(
 
   def playableBy(c: PlayerIndex): Boolean = playableBy(player(c))
 
-  def playableByAi: Boolean = playable && (player.isAi || player.isStockfishBot)
+  def playableByAi: Boolean = playable && (player.isAi || player.isPSBot)
 
   def mobilePushable = isCorrespondence && playable && nonAi
 
@@ -489,8 +489,6 @@ case class Game(
   def nonAi          = !hasAi
 
   def hasPSBot: Boolean = players.exists(_.isPSBot)
-
-  def hasStockfishBot: Boolean = players.exists(_.isStockfishBot)
 
   def aiPov: Option[Pov] = players.find(_.isAi).map(_.playerIndex) map pov
 
@@ -1102,7 +1100,7 @@ object Game {
     Speed(clock) >= Speed.Rapid
 
   def isBotCompatible(game: Game): Boolean = {
-    game.hasAi || game.fromFriend || game.fromApi || game.hasPSBot || game.hasStockfishBot
+    game.hasAi || game.fromFriend || game.fromApi || game.hasPSBot
   } && isBotCompatible(game.speed)
 
   def isBotCompatible(speed: Speed): Boolean = speed >= Speed.Bullet
