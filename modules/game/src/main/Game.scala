@@ -474,7 +474,7 @@ case class Game(
 
   def playableBy(c: PlayerIndex): Boolean = playableBy(player(c))
 
-  def playableByAi: Boolean = playable && player.isAi
+  def playableByAi: Boolean = playable && (player.isAi || player.isPSBot)
 
   def mobilePushable = isCorrespondence && playable && nonAi
 
