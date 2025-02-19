@@ -203,8 +203,7 @@ case class SwissPairingGames(
       }
     } else lastGame.winnerPlayerIndex
 
-  def playersWhoDidNotMove =
-    List() ++ game.playerWhoDidNotMove ++ multiMatchGames.flatMap(_.last.playerWhoDidNotMove)
+  def playersWhoDidNotMove = lastGame.playersWhoDidNotMove
 
   def createdAt = if (isBestOfX || isPlayX) {
     multiMatchGames.fold(game.createdAt)(_.last.createdAt)

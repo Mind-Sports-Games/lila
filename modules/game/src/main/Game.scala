@@ -474,7 +474,7 @@ case class Game(
 
   def playableBy(c: PlayerIndex): Boolean = playableBy(player(c))
 
-  def playableByAi: Boolean = playable && player.isAi
+  def playableByAi: Boolean = playable && (player.isAi || player.isPSBot)
 
   def mobilePushable = isCorrespondence && playable && nonAi
 
@@ -859,6 +859,8 @@ case class Game(
     }
 
   def expirable = expirableAtStart || expirableOnPaused
+
+  def playersWhoDidNotMove: List[Player] = players.filterNot { p => playerHasMoved(p.playerIndex) }
 
   def playerWhoDidNotMove: Option[Player] =
     if (!onePlayerHasMoved) player(startPlayerIndex).some
