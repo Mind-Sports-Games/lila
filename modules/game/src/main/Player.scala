@@ -38,6 +38,8 @@ case class Player(
 
   def isPSBot = userId ?? LightUser.psBotsIDs.contains
 
+  def isStockfishBot = userId ?? LightUser.stockfishBotsIDs.contains
+
   def hasUser = userId.isDefined
 
   def isUser(u: User) = userId.fold(false)(_ == u.id)
