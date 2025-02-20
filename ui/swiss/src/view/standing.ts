@@ -1,7 +1,7 @@
 import { h, VNode } from 'snabbdom';
 import SwissCtrl from '../ctrl';
 import { player as renderPlayer, bind, onInsert, matchScoreDisplay, multiMatchByeScore } from './util';
-import { MaybeVNodes, PairingBase, Player, Pager } from '../interfaces';
+import { MaybeVNodes, PairingBase, Player, Pager, Board } from '../interfaces';
 
 function playerTr(ctrl: SwissCtrl, player: Player) {
   const userId = player.user.id;
@@ -46,8 +46,8 @@ function playerTr(ctrl: SwissCtrl, player: Player) {
                         'a.glpt.' + (p.o ? 'ongoing' : p.w === true ? 'win' : p.w === false ? 'loss' : 'draw'),
                         {
                           attrs: {
-                            key: p.g,
-                            href: `/${p.g}`,
+                            key: findLastGameId(ctrl.data.boards, p.g),
+                            href: `/${findLastGameId(ctrl.data.boards, p.g)}`,
                           },
                           hook: onInsert(playstrategy.powertip.manualGame),
                         },
@@ -62,6 +62,13 @@ function playerTr(ctrl: SwissCtrl, player: Player) {
     ],
   );
 }
+
+// get the most recent game id from a multi-match game still in progress (as it can be found in the boards array)
+const findLastGameId = (boards: Board[], gameId: string) => {
+  const board = boards?.find(b => b.id === gameId);
+  if (board && board.multiMatchGames) return board.multiMatchGames.slice(-1)[0].id;
+  return gameId;
+};
 
 const result = (p: PairingBase): string => {
   if (p.ms) {

@@ -53,7 +53,7 @@ export interface SwissData {
   status: Status;
   standing: Standing;
   boards: Board[];
-  playerInfo?: PlayerExt;
+  playerInfo?: PlayerExt; // { playerInfo: {} }
   socketVersion?: number;
   quote?: {
     author: string;
@@ -167,6 +167,7 @@ export interface Board {
   multiMatchGameIds?: string[];
   multiMatchGames?: Board[];
   multiPointScore?: {
+    target: number;
     p1: number;
     p2: number;
   };

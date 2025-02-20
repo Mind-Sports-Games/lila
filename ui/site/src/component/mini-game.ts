@@ -48,8 +48,8 @@ export const init = (node: HTMLElement) => {
         }),
       );
     } else {
-      const [fen, orientation, lm] = splitDataState(node),
-        config = {
+      const [fen, orientation, lm, multiPointState] = node.getAttribute('data-state')!.split('|');
+      const config = {
           coordinates: false,
           viewOnly: true,
           myPlayerIndex: orientation === 'p1vflip' ? 'p2' : orientation,
@@ -103,6 +103,13 @@ export const init = (node: HTMLElement) => {
                                       ? { width: 9, height: 9 }
                                       : { width: 8, height: 8 },
           variant: variantFromElement($el),
+          ...(multiPointState?.length === 6 && {
+            multiPointState: {
+              target: parseInt(multiPointState.substring(0, 2)),
+              p1: parseInt(multiPointState.substring(2, 4)),
+              p2: parseInt(multiPointState.substring(4, 6)),
+            },
+          }),
         },
         $cg = $el.find('.cg-wrap'),
         turnPlayerIndex = fenPlayerIndex(variantFromElement($el) as VariantKey, fen);
@@ -133,15 +140,24 @@ export const update = (node: HTMLElement, data: UpdateData) => {
     lm = data.lm,
     lastMove = lm && (lm[1] === '@' ? [lm.slice(2)] : [lm[0] + lm[1], lm[2] + lm[3]]),
     cg = domData.get(node.querySelector('.cg-wrap')!, 'chessground'),
-    dg = domData.get(node.querySelector('.cg-wrap')!, 'draughtsground');
-  if (cg)
+    dg = domData.get(node.querySelector('.cg-wrap')!, 'draughtsground'),
+    [, , , multiPointState] = node.getAttribute('data-state')!.split('|');
+  if (cg) {
     cg.set({
       fen: data.fen,
       turnPlayerIndex: fenPlayerIndex(variantFromElement($el) as VariantKey, data.fen),
       dice: readDice(data.fen, variantFromElement($el) as VariantKey),
       doublingCube: readDoublingCube(data.fen, variantFromElement($el) as VariantKey),
       lastMove,
+      ...(multiPointState?.length === 6 && {
+        multiPointState: {
+          target: parseInt(multiPointState.substring(0, 2)),
+          p1: parseInt(multiPointState.substring(2, 4)),
+          p2: parseInt(multiPointState.substring(4, 6)),
+        },
+      }),
     });
+  }
   if (['backgammon', 'nackgammon', 'hyper'].includes(variantFromElement($el))) cg.redrawAll(); //update dice as they are in wrap of cg
   if (dg)
     dg.set({
@@ -166,7 +182,7 @@ export const update = (node: HTMLElement, data: UpdateData) => {
   renderClock(data.p1, data.p1Delay, data.p1Pending, 'p1');
   renderClock(data.p2, data.p2Delay, data.p2Pending, 'p2');
 
-  if (!isMultiPoint(node)) {
+  if (!isMultiPoint(multiPointState)) {
     ['p1', 'p2'].forEach(playerIndex => {
       const $score = $(node).find('.mini-game__score--' + playerIndex);
       $score.html(displayScore(variantFromElement($el) as VariantKey, data.fen, playerIndex));
@@ -174,7 +190,7 @@ export const update = (node: HTMLElement, data: UpdateData) => {
   }
 };
 
-export const finish = (node: HTMLElement, win?: string, p1Score?: string, p2Score?: string) =>
+export const finish = (node: HTMLElement, win?: string, p1Score?: string, p2Score?: string) => {
   ['p1', 'p2'].forEach(playerIndex => {
     const $clock = $(node).find('.mini-game__clock--' + playerIndex);
     const $score = $(node).find('.mini-game__score--' + playerIndex);
@@ -189,7 +205,6 @@ export const finish = (node: HTMLElement, win?: string, p1Score?: string, p2Scor
       );
     }
   });
+};
 
-const splitDataState = (node: HTMLElement): string[] => node.getAttribute('data-state')!.split('|');
-const getMultiPointScoreFromDataState = (node: HTMLElement): string => splitDataState(node)[3];
-const isMultiPoint = (node: HTMLElement) => getMultiPointScoreFromDataState(node) !== '-';
+const isMultiPoint = (multiPointState?: string) => multiPointState?.length === 6;

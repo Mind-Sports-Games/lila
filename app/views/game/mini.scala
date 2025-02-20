@@ -2,7 +2,7 @@ package views.html.game
 
 import strategygames.format.Forsyth
 import strategygames.variant.Variant
-import strategygames.{ ByoyomiClock, Clock }
+import strategygames.{ ByoyomiClock, Clock, Status }
 import controllers.routes
 import play.api.i18n.Lang
 
@@ -85,7 +85,7 @@ object mini {
   def renderState(pov: Pov) =
     pov.game.variant match {
       case Variant.Backgammon(_) =>
-        dataState := s"${Forsyth.>>(pov.game.variant.gameLogic, pov.game.stratGame)}|${orientation(pov)}|${~pov.game.lastActionKeys}|${renderMultiPointState(pov)}"
+        dataState := s"${Forsyth.>>(pov.game.variant.gameLogic, pov.game.stratGame)}|${orientation(pov)}|${~pov.game.lastActionKeys}|${pov.game.multiPointResult()}"
       case Variant.Chess(_) | Variant.FairySF(_) | Variant.Samurai(_) | Variant.Togyzkumalak(_) |
           Variant.Go(_) | Variant.Abalone(_) =>
         dataState := s"${Forsyth.>>(pov.game.variant.gameLogic, pov.game.stratGame)}|${orientation(pov)}|${~pov.game.lastActionKeys}"
@@ -112,7 +112,7 @@ object mini {
       else pov.game.clock.map { renderClock(_, pov) }
     )
 
-  private def calculateScore(pov: Pov): String = {
+  private def calculateScore(pov: Pov): String = { // @TODO get final score if pov.game.finished
     val score = pov.game.calculateScore(pov.playerIndex)
     if (score == "") ""
     else " (" + score + ")"
@@ -126,9 +126,6 @@ object mini {
         +
           calculateScore(pov)
     )
-
-  private def renderMultiPointState(pov: Pov) =
-    pov.game.metadata.multiPointState.fold("-")(m => f"${m.p1Points}%02d${m.p2Points}%02d")
 
   private def renderClock(clock: strategygames.ClockBase, pov: Pov) = {
     val s = clock.remainingTime(pov.playerIndex).roundSeconds
