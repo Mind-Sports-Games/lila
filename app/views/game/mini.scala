@@ -2,7 +2,7 @@ package views.html.game
 
 import strategygames.format.Forsyth
 import strategygames.variant.Variant
-import strategygames.{ ByoyomiClock, Clock, Status }
+import strategygames.{ ByoyomiClock, Clock }
 import controllers.routes
 import play.api.i18n.Lang
 
