@@ -453,6 +453,7 @@ object SwissJson {
   private[swiss] def multiPointScoreJson(g: Game) =
     g.metadata.multiPointState.map { mps =>
       Json.obj(
+        "target" -> mps.target,
         "p1" -> mps.p1Points,
         "p2" -> mps.p2Points
       )

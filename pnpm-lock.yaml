@@ -507,7 +507,11 @@ importers:
         specifier: ^3.0.1
         version: 3.5.1
 
-  ui/stratutils: {}
+  ui/stratutils:
+    dependencies:
+      game:
+        specifier: workspace:*
+        version: link:../game
 
   ui/swiss:
     dependencies:

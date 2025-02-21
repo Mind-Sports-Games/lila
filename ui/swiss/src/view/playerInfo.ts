@@ -221,6 +221,7 @@ function gameResult(p: MultiMatchPairing): string {
 }
 
 function multiPointResult(p: MultiMatchPairing, selectedUserId: string, multiPoints: MultiPoint[]): string {
+  // @TODO: need fix pla-1183-fix-multipoint-calculation-in-playerinfo : pass a ui/game/BaseGame and a ply up to here in order to invoke ui/stratutils/finalMultiPointState() and compute pts correctly (e.g : win multipoint match by timeout but opponent still gets pts by Rule of Gin)
   const edgeCasesDisplay = '(*)';
   if (!multiPoints) return edgeCasesDisplay;
   const round = multiPoints.find(round => round.games?.find(game => game.id === p.g));
