@@ -143,7 +143,8 @@ final class BotJsonView(
     pov.game.clock
       .fold(0)(_ match {
         case bc: strategygames.ByoyomiClock =>
-          if (bc.spentPeriodsOf(pov.playerIndex) == 0) bc.config.graceSeconds.seconds.toMillis.toInt else 0
+          if (bc.spentPeriodsOf(pov.playerIndex) == 0) bc.config.graceSeconds.seconds.toMillis.toInt
+          else bc.config.byoyomi.millis.toInt
         case c => c.config.graceSeconds.seconds.toMillis.toInt
       })
 
