@@ -190,7 +190,7 @@ export const update = (node: HTMLElement, data: UpdateData) => {
   }
 };
 
-export const finish = (node: HTMLElement, win?: string, p1Score?: string, p2Score?: string) => {
+export const finish = (node: HTMLElement, win?: string, p1Score?: string, p2Score?: string) =>
   ['p1', 'p2'].forEach(playerIndex => {
     const $clock = $(node).find('.mini-game__clock--' + playerIndex);
     const $score = $(node).find('.mini-game__score--' + playerIndex);
@@ -205,6 +205,5 @@ export const finish = (node: HTMLElement, win?: string, p1Score?: string, p2Scor
       );
     }
   });
-};
 
 const isMultiPoint = (multiPointState?: string) => multiPointState?.length === 6;

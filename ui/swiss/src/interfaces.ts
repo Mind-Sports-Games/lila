@@ -53,7 +53,7 @@ export interface SwissData {
   status: Status;
   standing: Standing;
   boards: Board[];
-  playerInfo?: PlayerExt; // { playerInfo: {} }
+  playerInfo?: PlayerExt;
   socketVersion?: number;
   quote?: {
     author: string;

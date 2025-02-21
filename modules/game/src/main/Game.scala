@@ -499,7 +499,7 @@ case class Game(
     )
 
   // style "copy pasted" from a ts function
-  def multiPointResult(): String =
+  def multiPointResult: String =
     if (metadata.multiPointState.isEmpty) "-"
     else if (finished) finalMultiPointScore()
     else metadata.multiPointState.fold("-")(mps => f"${mps.target}%02d${mps.p1Points}%02d${mps.p2Points}%02d")

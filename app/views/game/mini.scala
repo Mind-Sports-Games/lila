@@ -85,7 +85,7 @@ object mini {
   def renderState(pov: Pov) =
     pov.game.variant match {
       case Variant.Backgammon(_) =>
-        dataState := s"${Forsyth.>>(pov.game.variant.gameLogic, pov.game.stratGame)}|${orientation(pov)}|${~pov.game.lastActionKeys}|${pov.game.multiPointResult()}"
+        dataState := s"${Forsyth.>>(pov.game.variant.gameLogic, pov.game.stratGame)}|${orientation(pov)}|${~pov.game.lastActionKeys}|${pov.game.multiPointResult}"
       case Variant.Chess(_) | Variant.FairySF(_) | Variant.Samurai(_) | Variant.Togyzkumalak(_) |
           Variant.Go(_) | Variant.Abalone(_) =>
         dataState := s"${Forsyth.>>(pov.game.variant.gameLogic, pov.game.stratGame)}|${orientation(pov)}|${~pov.game.lastActionKeys}"
@@ -112,11 +112,19 @@ object mini {
       else pov.game.clock.map { renderClock(_, pov) }
     )
 
-  private def calculateScore(pov: Pov): String = { // @TODO get final score if pov.game.finished
-    val score = pov.game.calculateScore(pov.playerIndex)
-    if (score == "") ""
-    else " (" + score + ")"
-  }
+  private def calculateScore(pov: Pov): String =
+    pov.game.metadata.multiPointState match {
+      case Some(_) => {
+        val score = pov.game.multiPointResult
+        if (score == "-") score
+        else " (" + (if(pov.playerIndex.p1) score.substring(2, 4).toInt else score.substring(4, 6).toInt) + ")"
+      }
+      case None => {
+        val score = pov.game.calculateScore(pov.playerIndex)
+        if (score == "") ""
+        else " (" + score + ")"
+      }
+    }
 
   private def renderResult(pov: Pov) =
     span(cls := "mini-game__result")(
