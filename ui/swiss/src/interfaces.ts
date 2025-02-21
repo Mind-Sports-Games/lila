@@ -167,6 +167,7 @@ export interface Board {
   multiMatchGameIds?: string[];
   multiMatchGames?: Board[];
   multiPointScore?: {
+    target: number;
     p1: number;
     p2: number;
   };

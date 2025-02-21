@@ -498,6 +498,39 @@ case class Game(
       p2Player = f(p2Player)
     )
 
+  // style "copy pasted" from a ts function
+  def multiPointResult: String =
+    if (metadata.multiPointState.isEmpty) "-"
+    else if (finished) finalMultiPointScore()
+    else metadata.multiPointState.fold("-")(mps => f"${mps.target}%02d${mps.p1Points}%02d${mps.p2Points}%02d")
+
+  def finalMultiPointScore(): String = {
+    val points2Add: Array[Int] =
+      if (pointValue.isDefined && winner.isDefined)
+        if (winner.get.playerIndex == P1) Array(pointValue.get, 0)
+        else Array(0, pointValue.get)
+      else Array(0, 0)
+    ;
+
+    if (Status.flagged.contains(status) && winner.isDefined) {
+      if (List(Status.RuleOfGin, Status.GinGammon, Status.GinBackgammon).contains(status)) {
+        if (winner.get.playerIndex == P1) {
+          if (multiPointState.get.p1Points + points2Add(0) < multiPointState.get.target) points2Add(1) += 64
+        } else {
+          if (multiPointState.get.p2Points + points2Add(1) < multiPointState.get.target) points2Add(0) += 64
+        }
+      } else {
+        if (winner.get.playerIndex == P1) points2Add(0) += 64
+        else points2Add(1) += 64
+      }
+    }
+
+    return multiPointState match {
+      case Some(m) => f"${m.target}%02d${Math.min(m.target, m.p1Points + points2Add(0))}%02d${Math.min(m.target, m.p2Points + points2Add(1))}%02d"
+      case _       => "-"
+    }
+  }
+
   def pointValue: Option[Int] = {
     if (status == Status.ResignMatch) Some(64)
     else situation.pointValue(winnerPlayerIndex.map(!_))

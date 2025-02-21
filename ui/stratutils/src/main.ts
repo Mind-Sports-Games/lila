@@ -1,6 +1,8 @@
 import { piotr } from './piotr';
 import * as cg from 'chessground/types';
 import { Rules } from 'stratops/types';
+import * as status from 'game/status';
+import type { BaseGame } from 'game';
 
 // TODO: For some reason we can't import this like:
 // import * from 'stratutils/promotion'
@@ -231,6 +233,44 @@ export function readDice(fen: string, variant: VariantKey, canEndTurn?: boolean,
     else return dice.sort((a, b) => +a.value - +b.value);
   } else return dice.sort((a, b) => +b.value - +a.value);
 }
+
+export const finalMultiPointState = (game: BaseGame, ply: any, lastPly: any) => {
+  const pointsToAdd =
+    game.pointValue && game.winner && ply == lastPly
+      ? game.winner === 'p1'
+        ? [game.pointValue, 0]
+        : [0, game.pointValue]
+      : [0, 0];
+
+  if (status.isOutOfTime(game.status.id) && game.winner && ply == lastPly) {
+    if (status.isGin(game.status.id)) {
+      if (game.winner === 'p1') {
+        if (game.multiPointState.p1 + pointsToAdd[0] < game.multiPointState.target) {
+          pointsToAdd[1] += 64;
+        }
+      } else {
+        if (game.multiPointState.p2 + pointsToAdd[1] < game.multiPointState.target) {
+          pointsToAdd[0] += 64;
+        }
+      }
+    } else {
+      //normal timeout
+      if (game.winner === 'p1') {
+        pointsToAdd[0] += 64;
+      } else {
+        pointsToAdd[1] += 64;
+      }
+    }
+  }
+
+  return game.multiPointState
+    ? {
+        target: game.multiPointState.target,
+        p1: Math.min(game.multiPointState.target, game.multiPointState.p1 + pointsToAdd[0]),
+        p2: Math.min(game.multiPointState.target, game.multiPointState.p2 + pointsToAdd[1]),
+      }
+    : undefined;
+};
 
 export const variantToRules = (v: VariantKey): Rules => {
   switch (v) {

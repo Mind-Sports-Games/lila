@@ -70,7 +70,8 @@ object bits {
       boardOrientation(pov),
       ~pov.game.lastActionKeys,
       boardSize(pov),
-      pov.game.variant.key
+      pov.game.variant.key,
+      pov.game.multiPointResult
     ) _
 
   def miniWithOrientation(
@@ -78,7 +79,8 @@ object bits {
       orientation: Orientation = Orientation.P1,
       lastMove: String = "",
       boardSizeOpt: Option[Board.BoardSize],
-      variantKey: String = "standard"
+      variantKey: String = "standard",
+      multiPointResult: String = "-"
   )(tag: Tag): Tag = {
     // TODO: this is an excellent candidate for refactoring.
     val libName = fen match {
@@ -96,7 +98,7 @@ object bits {
     val data = if (libName == "Draughts") {
       s"${fen.value}|${boardSize.width}x${boardSize.height}|${orient}|$lastMove"
     } else {
-      s"${fen.value}|${orient}|$lastMove"
+      s"${fen.value}|${orient}|$lastMove|$multiPointResult"
     }
     val extra =
       if (libName == "Draughts") s"is${boardSize.key} ${libName.toLowerCase()}"
