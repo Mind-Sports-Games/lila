@@ -1344,10 +1344,17 @@ cg-container .cg-custom-svgs svg {
   }
 
   cg-multi-point-target {
+    top: 47.5%;
+  }
+  cg-crawford-game {
+    bottom: 34%;
+  }
+
+  cg-multi-point-target,
+  cg-crawford-game {
     width: 6.5%;
     height: 5%;
     left: 0;
-    top: 47.5%;
     position: absolute;
     pointer-events: none;
     display: flex;
@@ -1393,7 +1400,8 @@ cg-container .cg-custom-svgs svg {
   &.mini-game,
   &.mini-board {
     @container chessgroundContainer (max-width: 400px) {
-      cg-multi-point-target {
+      cg-multi-point-target,
+      cg-crawford-game {
         border-width: thin;
         font-size: 70%;
       }
@@ -1405,13 +1413,15 @@ cg-container .cg-custom-svgs svg {
     }
 
     @container chessgroundContainer (max-width: 360px) {
-      cg-multi-point-target {
+      cg-multi-point-target,
+      cg-crawford-game {
         font-size: 60%;
       }
     }
 
     @container chessgroundContainer (max-width: 300px) {
-      cg-multi-point-target {
+      cg-multi-point-target,
+      cg-crawford-game {
         font-size: 50%;
         border-radius: 0%;
       }
@@ -1422,7 +1432,8 @@ cg-container .cg-custom-svgs svg {
     }
 
     @container chessgroundContainer (max-width: 280px) {
-      cg-multi-point-target {
+      cg-multi-point-target,
+      cg-crawford-game {
         font-size: 40%;
       }
     }
@@ -1434,7 +1445,8 @@ cg-container .cg-custom-svgs svg {
     }
 
     @container chessgroundContainer (max-width: 230px) {
-      cg-multi-point-target {
+      cg-multi-point-target,
+      cg-crawford-game {
         font-size: 30%;
       }
     }
