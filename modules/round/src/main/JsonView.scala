@@ -302,7 +302,7 @@ final class JsonView(
           })
           .add("onlyDropsVariant" -> onlyDropsVariantForCurrentAction(pov))
           .add("hasGameScore" -> pov.game.variant.hasGameScore)
-
+          .add("cubeActions" -> possibleCubeActions(pov))
       }
 
   def userAnalysisJson(
@@ -369,6 +369,7 @@ final class JsonView(
       .add("possibleDropsByRole" -> possibleDropsByrole(pov))
       .add("onlyDropsVariant" -> onlyDropsVariantForCurrentAction(pov))
       .add("hasGameScore" -> pov.game.variant.hasGameScore)
+      .add("cubeActions" -> possibleCubeActions(pov))
   }
 
   private def blurs(game: Game, player: lila.game.Player) =
