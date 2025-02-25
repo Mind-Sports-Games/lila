@@ -115,9 +115,9 @@ object mini {
   private def calculateScore(pov: Pov): String =
     pov.game.metadata.multiPointState match {
       case Some(_) => {
-        val score = pov.game.multiPointResult
-        if (score == "-") score
-        else " (" + (MultiPointState.extractPlayerScoreFromMultiPointString(score, pov.playerIndex.p1)) + ")"
+        pov.game.multiPointResult.fold(MultiPointState.noDataChar) { mps =>
+          s" (${if (pov.playerIndex.p1) mps.p1Points else mps.p2Points})"
+        }
       }
       case None => {
         val score = pov.game.calculateScore(pov.playerIndex)
