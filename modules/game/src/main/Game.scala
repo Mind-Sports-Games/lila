@@ -498,13 +498,13 @@ case class Game(
       p2Player = f(p2Player)
     )
 
-  // style "copy pasted" from a ts function
-  def multiPointResult: String =
-    if (metadata.multiPointState.isEmpty) "-"
-    else if (finished) finalMultiPointScore()
-    else metadata.multiPointState.fold("-")(mps => f"${mps.target}%02d${mps.p1Points}%02d${mps.p2Points}%02d")
+  def multiPointResult: Option[MultiPointState] =
+    metadata.multiPointState.flatMap { mps =>
+    if (finished) finalScoreMultiPointState else Some(mps)
+  }
 
-  def finalMultiPointScore(): String = {
+  // style "copy pasted" from a ts function
+  def finalScoreMultiPointState: Option[MultiPointState] = {
     val points2Add: Array[Int] =
       if (pointValue.isDefined && winner.isDefined)
         if (winner.get.playerIndex == P1) Array(pointValue.get, 0)
@@ -526,8 +526,8 @@ case class Game(
     }
 
     return multiPointState match {
-      case Some(m) => f"${m.target}%02d${Math.min(m.target, m.p1Points + points2Add(0))}%02d${Math.min(m.target, m.p2Points + points2Add(1))}%02d"
-      case _       => "-"
+      case Some(m) => Some(MultiPointState(m.target, Math.min(m.target, m.p1Points + points2Add(0)), Math.min(m.target, m.p2Points + points2Add(1))))
+      case _       => None
     }
   }
 
@@ -1311,9 +1311,12 @@ case class MultiPointState(target: Int, p1Points: Int = 0, p2Points: Int = 0) {
       )
     )
 
+  override def toString: String = f"${target}%02d${p1Points}%02d${p2Points}%02d"
+  def toString(p1: Boolean): String = f"${(if(p1) p1Points else p2Points)}%02d"
 }
 
 object MultiPointState {
+  var noDataChar = "-"
 
   def apply(points: Option[Int]): Option[MultiPointState] = points.filter(_ != 1).map(p => MultiPointState(p))
 
