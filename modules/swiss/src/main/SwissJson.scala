@@ -299,8 +299,8 @@ object SwissJson {
                       "id"        -> game.id,
                       "p1UserId"  -> game.p1Player.userId,
                       "startingScore" -> Json.obj(
-                        "p1" -> game.multiPointResult.fold("0")(_.p1Points.toString),
-                        "p2" -> game.multiPointResult.fold("0")(_.p2Points.toString),
+                        "p1" -> game.multiPointResult.fold(0)(_.p1Points),
+                        "p2" -> game.multiPointResult.fold(0)(_.p2Points),
                       )
                     )
                 } :+
@@ -308,8 +308,8 @@ object SwissJson {
                   "id"        -> pairingGame.game.id,
                   "p1UserId"  -> pairingGame.game.p1Player.userId,
                   "startingScore" -> Json.obj(
-                    "p1" -> pairingGame.game.multiPointResult.fold("0")(_.p1Points.toString),
-                    "p2" -> pairingGame.game.multiPointResult.fold("0")(_.p2Points.toString),
+                    "p1" -> pairingGame.game.multiPointResult.fold(0)(_.p1Points),
+                    "p2" -> pairingGame.game.multiPointResult.fold(0)(_.p2Points),
                   )
                 )
             )

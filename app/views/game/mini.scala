@@ -85,7 +85,7 @@ object mini {
   def renderState(pov: Pov) =
     pov.game.variant match {
       case Variant.Backgammon(_) =>
-        dataState := s"${Forsyth.>>(pov.game.variant.gameLogic, pov.game.stratGame)}|${orientation(pov)}|${~pov.game.lastActionKeys}|${pov.game.multiPointResult}"
+        dataState := s"${Forsyth.>>(pov.game.variant.gameLogic, pov.game.stratGame)}|${orientation(pov)}|${~pov.game.lastActionKeys}|${pov.game.multiPointResult.fold(MultiPointState.noDataChar)(_.toString)}"
       case Variant.Chess(_) | Variant.FairySF(_) | Variant.Samurai(_) | Variant.Togyzkumalak(_) |
           Variant.Go(_) | Variant.Abalone(_) =>
         dataState := s"${Forsyth.>>(pov.game.variant.gameLogic, pov.game.stratGame)}|${orientation(pov)}|${~pov.game.lastActionKeys}"
@@ -116,7 +116,7 @@ object mini {
     pov.game.metadata.multiPointState match {
       case Some(_) => {
         pov.game.multiPointResult.fold(MultiPointState.noDataChar) { mps =>
-          s" (${if (pov.playerIndex.p1) mps.p1Points else mps.p2Points})"
+          s" (${mps.toString(pov.playerIndex.p1).toInt})"
         }
       }
       case None => {

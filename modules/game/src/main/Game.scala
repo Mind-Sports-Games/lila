@@ -1312,6 +1312,7 @@ case class MultiPointState(target: Int, p1Points: Int = 0, p2Points: Int = 0) {
     )
 
   override def toString: String = f"${target}%02d${p1Points}%02d${p2Points}%02d"
+  def toString(p1: Boolean): String = f"${(if(p1) p1Points else p2Points)}%02d"
 }
 
 object MultiPointState {
