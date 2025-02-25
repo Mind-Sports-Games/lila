@@ -183,7 +183,7 @@ export default function (ctrl: SwissCtrl): VNode | undefined {
                 h('td.is.playerIndex-icon.' + (p.c ? ctrl.data.p1Color : ctrl.data.p2Color)),
                 h(
                   'td.gamescore' + (p.mmGameRes ? '.' + p.mmGameRes : ''),
-                  ctrl.data.backgammonPoints
+                  ctrl.data.backgammonPoints && ctrl.data.backgammonPoints > 1
                     ? multiPointResult(p, ctrl.playerInfoId, data.multiPoint ?? [])
                     : p.ismm
                       ? gameResult(p)
@@ -224,14 +224,7 @@ function multiPointResult(p: MultiMatchPairing, selectedUserId: string, multiPoi
   const edgeCasesDisplay = '(*)';
   if (!multiPoints) return edgeCasesDisplay;
   const round = multiPoints.find(round => round.games?.find(game => game.id === p.g));
-  if (
-    p.mmGameNb === undefined ||
-    !round ||
-    round.games.length < 1 ||
-    !round.target ||
-    (p.w === undefined && p.mmGameNb == round.games.length)
-  )
-    return edgeCasesDisplay;
+  if (p.mmGameNb === undefined || !round || round.games.length < 1 || !round.target || (p.w === undefined && p.mmGameNb == round.games.length)) return edgeCasesDisplay;
 
   if (p.isFinalGame && p.w !== undefined) {
     return p.w === true
