@@ -224,7 +224,14 @@ function multiPointResult(p: MultiMatchPairing, selectedUserId: string, multiPoi
   const edgeCasesDisplay = '(*)';
   if (!multiPoints) return edgeCasesDisplay;
   const round = multiPoints.find(round => round.games?.find(game => game.id === p.g));
-  if (p.mmGameNb === undefined || !round || round.games.length < 1 || !round.target || (p.w === undefined && p.mmGameNb == round.games.length)) return edgeCasesDisplay;
+  if (
+    p.mmGameNb === undefined ||
+    !round ||
+    round.games.length < 1 ||
+    !round.target ||
+    (p.w === undefined && p.mmGameNb == round.games.length)
+  )
+    return edgeCasesDisplay;
 
   if (p.isFinalGame && p.w !== undefined) {
     return p.w === true
