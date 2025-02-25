@@ -282,40 +282,39 @@ object SwissJson {
   private def multiPointResultsJson(swissPairingGames: Seq[SwissPairingGames]) =
     JsArray(
       swissPairingGames.flatMap {
-        pairingGame =>
-          Seq(
-            Json.obj(
-              "target" -> pairingGame.game.metadata.multiPointState.fold(0)(_.target),
-              "players" -> Json.obj(
-                "p1" -> Json.obj(
-                  "userId" -> pairingGame.game.p1Player.userId,
-                ),
-                "p2" -> Json.obj(
-                  "userId" -> pairingGame.game.p2Player.userId,
-                )
+        pairingGame => Seq(
+          Json.obj(
+            "target" -> pairingGame.game.metadata.multiPointState.fold(0)(_.target),
+            "players" -> Json.obj(
+              "p1" -> Json.obj(
+                "userId" -> pairingGame.game.p1Player.userId,
               ),
-              "games" -> JsArray(
-                  pairingGame.multiMatchGames.toList.flatten.reverse.map { game =>
-                    Json.obj(
-                      "id"        -> game.id,
-                      "p1UserId"  -> game.p1Player.userId,
-                      "startingScore" -> Json.obj(
-                        "p1" -> game.metadata.multiPointState.fold(0)(_.p1Points),
-                        "p2" -> game.metadata.multiPointState.fold(0)(_.p2Points),
-                      )
-                    )
-                  } :+
+              "p2" -> Json.obj(
+                "userId" -> pairingGame.game.p2Player.userId,
+              )
+            ),
+            "games" -> JsArray(
+                pairingGame.multiMatchGames.toList.flatten.reverse.map { game =>
                   Json.obj(
-                    "id"        -> pairingGame.game.id,
-                    "p1UserId"  -> pairingGame.game.p1Player.userId,
+                    "id"        -> game.id,
+                    "p1UserId"  -> game.p1Player.userId,
                     "startingScore" -> Json.obj(
-                      "p1" -> pairingGame.game.metadata.multiPointState.fold(0)(_.p1Points),
-                      "p2" -> pairingGame.game.metadata.multiPointState.fold(0)(_.p2Points),
+                      "p1" -> (if (game.finished) game.finalMultiPointScore.substring(2,4).toInt.toString else game.metadata.multiPointState.fold(0)(_.p1Points)),
+                      "p2" -> (if (game.finished) game.finalMultiPointScore.substring(4,6).toInt.toString else game.metadata.multiPointState.fold(0)(_.p2Points)),
                     )
                   )
-              )
+                } :+
+                Json.obj(
+                  "id"        -> pairingGame.game.id,
+                  "p1UserId"  -> pairingGame.game.p1Player.userId,
+                  "startingScore" -> Json.obj(
+                    "p1" -> (if (pairingGame.game.finished) pairingGame.game.finalMultiPointScore.substring(2,4).toInt.toString else pairingGame.game.metadata.multiPointState.fold(0)(_.p1Points)),
+                    "p2" -> (if (pairingGame.game.finished) pairingGame.game.finalMultiPointScore.substring(4,6).toInt.toString else pairingGame.game.metadata.multiPointState.fold(0)(_.p2Points)),
+                  )
+                )
             )
           )
+        )
       }
     )
 
