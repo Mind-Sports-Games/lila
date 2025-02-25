@@ -299,8 +299,8 @@ object SwissJson {
                     "id"        -> game.id,
                     "p1UserId"  -> game.p1Player.userId,
                     "startingScore" -> Json.obj(
-                      "p1" -> (if (game.finished) game.finalMultiPointScore.substring(2,4).toInt.toString else game.metadata.multiPointState.fold(0)(_.p1Points)),
-                      "p2" -> (if (game.finished) game.finalMultiPointScore.substring(4,6).toInt.toString else game.metadata.multiPointState.fold(0)(_.p2Points)),
+                      "p1" -> (if (game.finished) game.finalMultiPointScore.fold("-")(score => score).substring(2,4).toInt.toString else game.metadata.multiPointState.fold(0)(_.p1Points)),
+                      "p2" -> (if (game.finished) game.finalMultiPointScore.fold("-")(score => score).substring(4,6).toInt.toString else game.metadata.multiPointState.fold(0)(_.p2Points)),
                     )
                   )
                 } :+
@@ -308,8 +308,8 @@ object SwissJson {
                   "id"        -> pairingGame.game.id,
                   "p1UserId"  -> pairingGame.game.p1Player.userId,
                   "startingScore" -> Json.obj(
-                    "p1" -> (if (pairingGame.game.finished) pairingGame.game.finalMultiPointScore.substring(2,4).toInt.toString else pairingGame.game.metadata.multiPointState.fold(0)(_.p1Points)),
-                    "p2" -> (if (pairingGame.game.finished) pairingGame.game.finalMultiPointScore.substring(4,6).toInt.toString else pairingGame.game.metadata.multiPointState.fold(0)(_.p2Points)),
+                    "p1" -> (if (pairingGame.game.finished) pairingGame.game.finalMultiPointScore.fold("-")(score => score).substring(2,4).toInt.toString else pairingGame.game.metadata.multiPointState.fold(0)(_.p1Points)),
+                    "p2" -> (if (pairingGame.game.finished) pairingGame.game.finalMultiPointScore.fold("-")(score => score).substring(4,6).toInt.toString else pairingGame.game.metadata.multiPointState.fold(0)(_.p2Points)),
                   )
                 )
             )
