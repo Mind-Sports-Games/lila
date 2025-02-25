@@ -1318,6 +1318,9 @@ case class MultiPointState(target: Int, p1Points: Int = 0, p2Points: Int = 0) {
 object MultiPointState {
   var defaultChar = "-"
 
+  def extractPlayerScoreFromMultiPointString(mps: String, p1: Boolean = true): String =
+    mps.substring(if (p1) 2 else 4, if (p1) 4 else 6).toInt.toString
+
   def apply(points: Option[Int]): Option[MultiPointState] = points.filter(_ != 1).map(p => MultiPointState(p))
 
   def nextGameIsCrawford(game: Game): Boolean =

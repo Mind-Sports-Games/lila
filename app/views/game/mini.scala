@@ -9,7 +9,7 @@ import play.api.i18n.Lang
 import lila.api.Context
 import lila.app.templating.Environment._
 import lila.app.ui.ScalatagsTemplate._
-import lila.game.Pov
+import lila.game.{ Pov, MultiPointState }
 import lila.i18n.defaultLang
 
 object mini {
@@ -117,7 +117,7 @@ object mini {
       case Some(_) => {
         val score = pov.game.multiPointResult
         if (score == "-") score
-        else " (" + (if(pov.playerIndex.p1) score.substring(2, 4).toInt else score.substring(4, 6).toInt) + ")"
+        else " (" + (MultiPointState.extractPlayerScoreFromMultiPointString(score, pov.playerIndex.p1)) + ")"
       }
       case None => {
         val score = pov.game.calculateScore(pov.playerIndex)

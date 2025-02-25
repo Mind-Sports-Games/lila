@@ -13,7 +13,7 @@ import scala.concurrent.ExecutionContext
 
 import lila.common.{ GreatPlayer, LightUser }
 import lila.db.dsl._
-import lila.game.Game
+import lila.game.{ Game, MultiPointState }
 import lila.game.Handicaps.goRatingDisplay
 import lila.quote.Quote
 import lila.quote.Quote.quoteWriter
@@ -299,8 +299,8 @@ object SwissJson {
                       "id"        -> game.id,
                       "p1UserId"  -> game.p1Player.userId,
                       "startingScore" -> Json.obj(
-                        "p1" -> game.multiPointResult.substring(2,4).toInt.toString,
-                        "p2" -> game.multiPointResult.substring(4,6).toInt.toString,
+                        "p1" -> MultiPointState.extractPlayerScoreFromMultiPointString(game.multiPointResult),
+                        "p2" -> MultiPointState.extractPlayerScoreFromMultiPointString(game.multiPointResult, false),
                       )
                     )
                 } :+
@@ -308,8 +308,8 @@ object SwissJson {
                   "id"        -> pairingGame.game.id,
                   "p1UserId"  -> pairingGame.game.p1Player.userId,
                   "startingScore" -> Json.obj(
-                    "p1" -> pairingGame.game.multiPointResult.substring(2,4).toInt.toString,
-                    "p2" -> pairingGame.game.multiPointResult.substring(4,6).toInt.toString
+                    "p1" -> MultiPointState.extractPlayerScoreFromMultiPointString(pairingGame.game.multiPointResult),
+                    "p2" -> MultiPointState.extractPlayerScoreFromMultiPointString(pairingGame.game.multiPointResult, false),
                   )
                 )
             )
