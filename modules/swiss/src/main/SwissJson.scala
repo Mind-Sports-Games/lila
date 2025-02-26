@@ -13,7 +13,7 @@ import scala.concurrent.ExecutionContext
 
 import lila.common.{ GreatPlayer, LightUser }
 import lila.db.dsl._
-import lila.game.Game
+import lila.game.{ Game, MultiPointState }
 import lila.game.Handicaps.goRatingDisplay
 import lila.quote.Quote
 import lila.quote.Quote.quoteWriter
@@ -282,40 +282,39 @@ object SwissJson {
   private def multiPointResultsJson(swissPairingGames: Seq[SwissPairingGames]) =
     JsArray(
       swissPairingGames.flatMap {
-        pairingGame =>
-          Seq(
-            Json.obj(
-              "target" -> pairingGame.game.metadata.multiPointState.fold(0)(_.target),
-              "players" -> Json.obj(
-                "p1" -> Json.obj(
-                  "userId" -> pairingGame.game.p1Player.userId,
-                ),
-                "p2" -> Json.obj(
-                  "userId" -> pairingGame.game.p2Player.userId,
-                )
+        pairingGame => Seq(
+          Json.obj(
+            "target" -> pairingGame.game.metadata.multiPointState.fold(0)(_.target),
+            "players" -> Json.obj(
+              "p1" -> Json.obj(
+                "userId" -> pairingGame.game.p1Player.userId,
               ),
-              "games" -> JsArray(
-                  pairingGame.multiMatchGames.toList.flatten.reverse.map { game =>
+              "p2" -> Json.obj(
+                "userId" -> pairingGame.game.p2Player.userId,
+              )
+            ),
+            "games" -> JsArray(
+                pairingGame.multiMatchGames.toList.flatten.reverse.map { game => 
                     Json.obj(
                       "id"        -> game.id,
                       "p1UserId"  -> game.p1Player.userId,
                       "startingScore" -> Json.obj(
-                        "p1" -> game.metadata.multiPointState.fold(0)(_.p1Points),
-                        "p2" -> game.metadata.multiPointState.fold(0)(_.p2Points),
+                        "p1" -> game.multiPointResult.fold(0)(_.p1Points),
+                        "p2" -> game.multiPointResult.fold(0)(_.p2Points),
                       )
                     )
-                  } :+
-                  Json.obj(
-                    "id"        -> pairingGame.game.id,
-                    "p1UserId"  -> pairingGame.game.p1Player.userId,
-                    "startingScore" -> Json.obj(
-                      "p1" -> pairingGame.game.metadata.multiPointState.fold(0)(_.p1Points),
-                      "p2" -> pairingGame.game.metadata.multiPointState.fold(0)(_.p2Points),
-                    )
+                } :+
+                Json.obj(
+                  "id"        -> pairingGame.game.id,
+                  "p1UserId"  -> pairingGame.game.p1Player.userId,
+                  "startingScore" -> Json.obj(
+                    "p1" -> pairingGame.game.multiPointResult.fold(0)(_.p1Points),
+                    "p2" -> pairingGame.game.multiPointResult.fold(0)(_.p2Points),
                   )
-              )
+                )
             )
           )
+        )
       }
     )
 
