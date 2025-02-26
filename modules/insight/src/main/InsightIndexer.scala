@@ -19,7 +19,8 @@ final private class InsightIndexer(
     storage: Storage
 )(implicit
     ec: scala.concurrent.ExecutionContext,
-    system: akka.actor.ActorSystem
+    scheduler: akka.actor.Scheduler,
+    mat: akka.stream.Materializer
 ) {
 
   private val workQueue =
@@ -56,7 +57,7 @@ final private class InsightIndexer(
       Query.finished ++
       Query.turnsGt(2) ++
       Query.notFromPosition
-      //Query.notHordeOrSincePawnsAreP1
+  //Query.notHordeOrSincePawnsAreP1
 
   private val maxGames = 10 * 1000
 

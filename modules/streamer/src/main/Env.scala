@@ -7,6 +7,7 @@ import play.api.Configuration
 import scala.concurrent.duration._
 
 import lila.common.config._
+import play.api.ConfigLoader
 
 @Module
 private class StreamerConfig(
@@ -32,12 +33,13 @@ final class Env(
     imageRepo: lila.db.ImageRepo
 )(implicit
     ec: scala.concurrent.ExecutionContext,
-    system: ActorSystem
+    system: ActorSystem,
+    scheduler: akka.actor.Scheduler
 ) {
 
-  implicit private val twitchLoader  = AutoConfig.loader[TwitchConfig]
-  implicit private val keywordLoader = strLoader(Stream.Keyword.apply)
-  private val config                 = appConfig.get[StreamerConfig]("streamer")(AutoConfig.loader)
+  implicit private val twitchLoader: ConfigLoader[TwitchConfig]    = AutoConfig.loader[TwitchConfig]
+  implicit private val keywordLoader: ConfigLoader[Stream.Keyword] = strLoader(Stream.Keyword.apply)
+  private val config                                               = appConfig.get[StreamerConfig]("streamer")(AutoConfig.loader)
 
   private lazy val streamerColl = db(config.streamerColl)
 
@@ -88,7 +90,7 @@ final class Env(
     api.demote(userId).unit
   }
 
-  system.scheduler.scheduleWithFixedDelay(1 hour, 1 day) { () =>
+  scheduler.scheduleWithFixedDelay(1 hour, 1 day) { () =>
     api.autoDemoteFakes.unit
   }
 }

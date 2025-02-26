@@ -1,6 +1,7 @@
 package lila.report
 
 import lila.user.Holder
+import lila.common.Iso
 
 sealed trait Room {
 
@@ -28,7 +29,8 @@ object Room {
   val allButXfiles: List[Room]         = all.filter(Xfiles !=)
   val allButXfilesAndPrint: List[Room] = allButXfiles.filter(Print !=)
 
-  implicit val roomIso = lila.common.Iso[String, Room](k => byKey.getOrElse(k, Other), _.key)
+  implicit val roomIso: Iso[String, Room] =
+    lila.common.Iso[String, Room](k => byKey.getOrElse(k, Other), _.key)
 
   def apply(key: String): Option[Room] = byKey get key
 

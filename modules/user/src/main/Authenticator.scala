@@ -83,10 +83,11 @@ object Authenticator {
     F.sha512 -> true
   )
 
-  implicit private[user] val HashedPasswordBsonHandler = quickHandler[HashedPassword](
-    { case v: BSONBinary => HashedPassword(v.byteArray) },
-    v => BSONBinary(v.bytes, Subtype.GenericBinarySubtype)
-  )
+  implicit private[user] val HashedPasswordBsonHandler: BSONHandler[HashedPassword] =
+    quickHandler[HashedPassword](
+      { case v: BSONBinary => HashedPassword(v.byteArray) },
+      v => BSONBinary(v.bytes, Subtype.GenericBinarySubtype)
+    )
 
-  implicit val AuthDataBSONHandler = Macros.handler[AuthData]
+  implicit val AuthDataBSONHandler: BSONDocumentHandler[AuthData] = Macros.handler[AuthData]
 }

@@ -14,10 +14,11 @@ import strategygames.variant.{ Variant => StratVariant }
 import strategygames.chess.format.FEN
 import strategygames.chess.variant.Variant
 import io.lemonlabs.uri.AbsoluteUrl
+import strategygames.Mode
 
 trait Handlers {
 
-  implicit val BSONJodaDateTimeHandler = quickHandler[DateTime](
+  implicit val BSONJodaDateTimeHandler: BSONHandler[DateTime] = quickHandler[DateTime](
     { case v: BSONDateTime => new DateTime(v.value) },
     v => BSONDateTime(v.getMillis)
   )
@@ -102,7 +103,9 @@ trait Handlers {
       _.map { case (k, v) => keyIso.to(k) -> v }
     )
 
-  implicit def bsonArrayToNonEmptyListHandler[T](implicit handler: BSONHandler[T]) = {
+  implicit def bsonArrayToNonEmptyListHandler[T](implicit
+      handler: BSONHandler[T]
+  ): BSONHandler[NonEmptyList[T]] = {
     def listWriter = collectionWriter[T, List[T]]
     def listReader = collectionReader[List, T]
     tryHandler[NonEmptyList[T]](
@@ -119,14 +122,16 @@ trait Handlers {
     def writeTry(n: BSONNull.type) = Success(BSONNull)
   }
 
-  implicit val ipAddressHandler = isoHandler[IpAddress, String](ipAddressIso)
+  implicit val ipAddressHandler: BSONHandler[IpAddress] = isoHandler[IpAddress, String](ipAddressIso)
 
-  implicit val emailAddressHandler = isoHandler[EmailAddress, String](emailAddressIso)
+  implicit val emailAddressHandler: BSONHandler[EmailAddress] =
+    isoHandler[EmailAddress, String](emailAddressIso)
 
-  implicit val normalizedEmailAddressHandler =
+  implicit val normalizedEmailAddressHandler: BSONHandler[NormalizedEmailAddress] =
     isoHandler[NormalizedEmailAddress, String](normalizedEmailAddressIso)
 
-  implicit val playerIndexBoolHandler = BSONBooleanHandler.as[PlayerIndex](PlayerIndex.fromP1, _.p1)
+  implicit val playerIndexBoolHandler: BSONHandler[PlayerIndex] =
+    BSONBooleanHandler.as[PlayerIndex](PlayerIndex.fromP1, _.p1)
 
   implicit val FENHandler: BSONHandler[FEN] = stringAnyValHandler[FEN](_.value, FEN.apply)
 
@@ -143,7 +148,8 @@ trait Handlers {
     f => BSONString(s"${f.gameLogic.id}~${f.value}")
   )
 
-  implicit val modeHandler = BSONBooleanHandler.as[strategygames.Mode](strategygames.Mode.apply, _.rated)
+  implicit val modeHandler: BSONHandler[Mode] =
+    BSONBooleanHandler.as[strategygames.Mode](strategygames.Mode.apply, _.rated)
 
   val variantByKeyHandler: BSONHandler[Variant] = quickHandler[Variant](
     {
@@ -227,7 +233,7 @@ trait Handlers {
       }
   )
 
-  implicit val absoluteUrlHandler = tryHandler[AbsoluteUrl](
+  implicit val absoluteUrlHandler: BSONHandler[AbsoluteUrl] = tryHandler[AbsoluteUrl](
     { case str: BSONString => AbsoluteUrl parseTry str.value },
     url => BSONString(url.toString)
   )

@@ -7,6 +7,7 @@ import lila.report.{ Mod, ModId, Report, Suspect }
 import lila.security.Permission
 import lila.user.{ Holder, User, UserRepo }
 import lila.irc.SlackApi
+import reactivemongo.api.bson.BSONDocumentHandler
 
 final class ModlogApi(repo: ModlogRepo, userRepo: UserRepo, slackApi: SlackApi)(implicit
     ec: scala.concurrent.ExecutionContext
@@ -15,7 +16,8 @@ final class ModlogApi(repo: ModlogRepo, userRepo: UserRepo, slackApi: SlackApi)(
   private def coll = repo.coll
 
   import lila.db.BSON.BSONJodaDateTimeHandler
-  implicit private val ModlogBSONHandler = reactivemongo.api.bson.Macros.handler[Modlog]
+  implicit private val ModlogBSONHandler: BSONDocumentHandler[Modlog] =
+    reactivemongo.api.bson.Macros.handler[Modlog]
 
   def streamerDecline(mod: Mod, streamerId: User.ID) =
     add {

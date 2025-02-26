@@ -24,7 +24,7 @@ final class ReportApi(
     thresholds: Thresholds
 )(implicit
     ec: scala.concurrent.ExecutionContext,
-    system: akka.actor.ActorSystem
+    scheduler: akka.actor.Scheduler
 ) {
 
   import BSONHandlers._
@@ -113,7 +113,8 @@ final class ReportApi(
   def getMod(username: String): Fu[Option[Mod]] =
     userRepo named username dmap2 Mod.apply
 
-  def getPlayStrategyMod: Fu[Mod] = userRepo.playstrategy dmap2 Mod.apply orFail "User playstrategy is missing"
+  def getPlayStrategyMod: Fu[Mod] =
+    userRepo.playstrategy dmap2 Mod.apply orFail "User playstrategy is missing"
   def getPlayStrategyReporter: Fu[Reporter] =
     getPlayStrategyMod map { l =>
       Reporter(l.user)

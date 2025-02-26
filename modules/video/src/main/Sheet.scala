@@ -15,8 +15,8 @@ final private[video] class Sheet(
 
   import Sheet._
 
-  implicit private val readGStr  = Json.reads[GStr]
-  implicit private val readEntry = Json.reads[Entry]
+  implicit private val readGStr: Reads[GStr]   = Json.reads[GStr]
+  implicit private val readEntry: Reads[Entry] = Json.reads[Entry]
   implicit private val readEntries: Reads[Seq[Entry]] =
     (__ \ "feed" \ "entry").read(Reads seq readEntry)
 

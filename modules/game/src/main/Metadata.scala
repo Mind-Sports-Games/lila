@@ -4,6 +4,7 @@ import java.security.MessageDigest
 import lila.db.ByteArray
 import org.joda.time.DateTime
 import strategygames.{ P2, Player => PlayerIndex, P1, Pos }
+import reactivemongo.api.bson.BSONDocumentHandler
 
 private[game] case class Metadata(
     source: Option[Source],
@@ -124,5 +125,5 @@ object PgnImport {
 
   import reactivemongo.api.bson.Macros
   import ByteArray.ByteArrayBSONHandler
-  implicit val pgnImportBSONHandler = Macros.handler[PgnImport]
+  implicit val pgnImportBSONHandler: BSONDocumentHandler[PgnImport] = Macros.handler[PgnImport]
 }

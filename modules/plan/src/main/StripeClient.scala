@@ -9,6 +9,7 @@ import play.api.libs.ws.{ StandaloneWSClient, StandaloneWSResponse }
 import lila.common.config.Secret
 import lila.user.User
 import lila.common.EmailAddress
+import play.api.ConfigLoader
 
 final private class StripeClient(
     ws: StandaloneWSClient,
@@ -217,6 +218,6 @@ object StripeClient {
       @ConfigName("keys.secret") secretKey: Secret,
       products: StripeProducts
   )
-  implicit private[plan] val productsLoader = AutoConfig.loader[StripeProducts]
-  implicit private[plan] val configLoader   = AutoConfig.loader[Config]
+  implicit private[plan] val productsLoader: ConfigLoader[StripeProducts] = AutoConfig.loader[StripeProducts]
+  implicit private[plan] val configLoader: ConfigLoader[Config]           = AutoConfig.loader[Config]
 }

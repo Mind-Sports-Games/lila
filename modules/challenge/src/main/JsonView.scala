@@ -19,19 +19,20 @@ final class JsonView(
   import lila.game.JsonView._
   import Challenge._
 
-  implicit private val RegisteredWrites = OWrites[Challenger.Registered] { r =>
-    val light = getLightUser(r.id)
-    Json
-      .obj(
-        "id"     -> r.id,
-        "name"   -> light.fold(r.id)(_.name),
-        "title"  -> light.map(_.title),
-        "rating" -> r.rating.int
-      )
-      .add("provisional" -> r.rating.provisional)
-      .add("patron" -> light.??(_.isPatron))
-      .add("online" -> isOnline(r.id))
-      .add("lag" -> UserLagCache.getLagRating(r.id))
+  implicit private val RegisteredWrites: OWrites[Challenger.Registered] = OWrites[Challenger.Registered] {
+    r =>
+      val light = getLightUser(r.id)
+      Json
+        .obj(
+          "id"     -> r.id,
+          "name"   -> light.fold(r.id)(_.name),
+          "title"  -> light.map(_.title),
+          "rating" -> r.rating.int
+        )
+        .add("provisional" -> r.rating.provisional)
+        .add("patron" -> light.??(_.isPatron))
+        .add("online" -> isOnline(r.id))
+        .add("lag" -> UserLagCache.getLagRating(r.id))
   }
 
   def apply(a: AllChallenges)(implicit lang: Lang): JsObject =

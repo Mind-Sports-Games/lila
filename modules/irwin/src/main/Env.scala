@@ -20,7 +20,7 @@ final class Env(
     db: lila.db.Db
 )(implicit
     ec: scala.concurrent.ExecutionContext,
-    system: ActorSystem
+    scheduler: akka.actor.Scheduler
 ) {
 
   private lazy val reportColl = db(CollName("irwin_report"))
@@ -31,10 +31,10 @@ final class Env(
 
   lazy val api = wire[IrwinApi]
 
-  system.scheduler.scheduleWithFixedDelay(5 minutes, 5 minutes) { () =>
+  scheduler.scheduleWithFixedDelay(5 minutes, 5 minutes) { () =>
     tournamentApi.allCurrentLeadersInStandard.flatMap(api.requests.fromTournamentLeaders).unit
   }
-  system.scheduler.scheduleWithFixedDelay(15 minutes, 15 minutes) { () =>
+  scheduler.scheduleWithFixedDelay(15 minutes, 15 minutes) { () =>
     userCache.getTop50Online.flatMap(api.requests.fromLeaderboard).unit
   }
 }

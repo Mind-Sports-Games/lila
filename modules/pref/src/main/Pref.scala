@@ -129,7 +129,7 @@ case class Pref(
 
   // atob("aHR0cDovL2NoZXNzLWNoZWF0LmNvbS9ob3dfdG9fY2hlYXRfYXRfbGljaGVzcy5odG1s")
   def botCompatible =
-    theme == "brown" &&
+    theme == List("brown") &&
       pieceSet == PieceSet.defaults &&
       is2d &&
       animation == Animation.NONE &&

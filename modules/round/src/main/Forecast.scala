@@ -39,7 +39,9 @@ case class Forecast(
     nextMoveOpponent(g, lastMove) map { move =>
       copy(
         steps = steps.collect {
-          case (fst :: snd :: rest) if rest.nonEmpty && g.plies == fst.ply && fst.is(lastMove.toShortUci) && snd.is(move) => snd :: rest
+          case (fst :: snd :: rest)
+              if rest.nonEmpty && g.plies == fst.ply && fst.is(lastMove.toShortUci) && snd.is(move) =>
+            snd :: rest
         },
         date = DateTime.now
       ) -> lastMove.toShortUci
@@ -48,7 +50,7 @@ case class Forecast(
   private def nextMoveOpponent(g: Game, last: Move) =
     steps.foldLeft(none[Uci.Move]) {
       case (None, fst :: snd :: _) if g.plies == fst.ply && fst.is(last.toShortUci) => snd.uciMove
-      case (move, _) => move
+      case (move, _)                                                                => move
     }
 
 }
@@ -76,9 +78,9 @@ object Forecast {
     def uciMove = Uci.Move(gameFamily.gameLogic, gameFamily, uci)
   }
 
-  implicit val forecastStepJsonFormat = Json.format[Step]
+  implicit val forecastStepJsonFormat: OFormat[Step] = Json.format[Step]
 
-  implicit val forecastJsonWriter = Json.writes[Forecast]
+  implicit val forecastJsonWriter: OWrites[Forecast] = Json.writes[Forecast]
 
   case object OutOfSync extends lila.base.LilaException {
     val message = "Forecast out of sync"

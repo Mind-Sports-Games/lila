@@ -11,6 +11,7 @@ import lila.pref.{ Pref, PrefApi }
 import actorApi.round.HumanPlay
 import lila.hub.actorApi.round.BotPlay
 import lila.hub.actorApi.map.Tell
+import play.api.i18n.Lang
 
 final private[round] class SelectSquarer(
     messenger: Messenger,
@@ -19,7 +20,7 @@ final private[round] class SelectSquarer(
     isBotSync: lila.common.LightUser.IsBotSync
 )(implicit ec: scala.concurrent.ExecutionContext) {
 
-  implicit private val chatLang = defaultLang
+  implicit private val chatLang: Lang = defaultLang
 
   def accept(pov: Pov)(implicit proxy: GameProxy): Fu[Events] = pov.game.playable ?? {
     val squares: List[Pos] = pov.game.selectedSquares.getOrElse(List[Pos]().empty)

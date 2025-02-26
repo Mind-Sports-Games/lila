@@ -9,7 +9,7 @@ import lila.db.dsl._
 
 object EvaluationBsonHandlers {
 
-  implicit val playerFlagsHandler = new BSON[PlayerFlags] {
+  implicit val playerFlagsHandler: lila.db.BSON[lila.evaluation.PlayerFlags] = new BSON[PlayerFlags] {
 
     def reads(r: BSON.Reader): PlayerFlags =
       PlayerFlags(
@@ -36,10 +36,10 @@ object EvaluationBsonHandlers {
       )
   }
 
-  implicit val GameAssessmentBSONHandler =
+  implicit val GameAssessmentBSONHandler: BSONHandler[GameAssessment] =
     BSONIntegerHandler.as[GameAssessment](GameAssessment.orDefault, _.id)
 
-  implicit val playerAssessmentHandler = new BSON[PlayerAssessment] {
+  implicit val playerAssessmentHandler: BSON[PlayerAssessment] = new BSON[PlayerAssessment] {
 
     def reads(r: BSON.Reader): PlayerAssessment = PlayerAssessment(
       _id = r str "_id",

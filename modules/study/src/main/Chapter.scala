@@ -10,6 +10,7 @@ import strategygames.opening.{ FullOpening, FullOpeningDB }
 import lila.tree.Node.{ Comment, Gamebook, Shapes }
 import lila.user.User
 import lila.common.Form
+import lila.common.Iso
 
 case class Chapter(
     _id: Chapter.Id,
@@ -78,9 +79,9 @@ case class Chapter(
 
   private def tagsResultPlayerIndex = tags.resultPlayer match {
     case Some(Some(playerIndex)) => Some(Some(playerIndex))
-    case Some(None) => Some(None)
-    case None => None
-    case _ => sys.error("Not implemented for draughts yet")
+    case Some(None)              => Some(None)
+    case None                    => None
+    case _                       => sys.error("Not implemented for draughts yet")
   }
 
   def metadata = Chapter.Metadata(
@@ -111,10 +112,10 @@ object Chapter {
   val maxNodes = 3000
 
   case class Id(value: String) extends AnyVal with StringValue
-  implicit val idIso = lila.common.Iso.string[Id](Id.apply, _.value)
+  implicit val idIso: Iso.StringIso[Id] = lila.common.Iso.string[Id](Id.apply, _.value)
 
   case class Name(value: String) extends AnyVal with StringValue
-  implicit val nameIso = lila.common.Iso.string[Name](Name.apply, _.value)
+  implicit val nameIso: Iso.StringIso[Name] = lila.common.Iso.string[Name](Name.apply, _.value)
 
   sealed trait Like {
     val _id: Chapter.Id
@@ -167,7 +168,8 @@ object Chapter {
 
     def looksOngoing = resultPlayerIndex.exists(_.isEmpty) && hasRelayPath
 
-    def resultStr: Option[String] = resultPlayerIndex.map(_.fold("*")(c => PlayerIndex.showResult(c)).replace("1/2", "½"))
+    def resultStr: Option[String] =
+      resultPlayerIndex.map(_.fold("*")(c => PlayerIndex.showResult(c)).replace("1/2", "½"))
   }
 
   case class IdName(id: Id, name: Name)

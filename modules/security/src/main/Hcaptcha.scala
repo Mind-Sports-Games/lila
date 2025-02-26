@@ -12,6 +12,7 @@ import play.api.mvc.RequestHeader
 
 import lila.common.config._
 import lila.common.HTTPRequest
+import play.api.ConfigLoader
 
 trait Hcaptcha {
 
@@ -41,7 +42,7 @@ object Hcaptcha {
   ) {
     def public = HcaptchaPublicConfig(publicKey, enabled)
   }
-  implicit private[security] val configLoader = AutoConfig.loader[Config]
+  implicit private[security] val configLoader: ConfigLoader[Config] = AutoConfig.loader[Config]
 }
 
 object HcaptchaSkip extends Hcaptcha {
@@ -60,7 +61,7 @@ final class HcaptchaReal(
   import Hcaptcha.Result
 
   private case class GoodResponse(success: Boolean, hostname: String)
-  implicit private val goodReader = Json.reads[GoodResponse]
+  implicit private val goodReader: Reads[GoodResponse] = Json.reads[GoodResponse]
 
   private case class BadResponse(
       `error-codes`: List[String]
@@ -68,7 +69,7 @@ final class HcaptchaReal(
     def missingInput      = `error-codes` contains "missing-input-response"
     override def toString = `error-codes` mkString ","
   }
-  implicit private val badReader = Json.reads[BadResponse]
+  implicit private val badReader: Reads[BadResponse] = Json.reads[BadResponse]
 
   def verify(response: String, req: RequestHeader): Fu[Result] = {
     val client = HTTPRequest clientName req

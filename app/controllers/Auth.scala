@@ -520,7 +520,7 @@ final class Auth(
       case Some(user) => f(user)
     }
 
-  implicit private val limitedDefault =
+  implicit private val limitedDefault: Zero[Result] =
     Zero.instance[Result](TooManyRequests("Too many requests, try again later."))
 
   private[controllers] def HasherRateLimit =

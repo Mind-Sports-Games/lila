@@ -85,7 +85,7 @@ final class JSONHandlers(getLightUser: LightUser.GetterSync) {
   }
 
   import lila.common.paginator.PaginatorJson._
-  implicit val unreadWrites = Writes[Notification.UnreadCount] { v =>
+  implicit val unreadWrites: Writes[Notification.UnreadCount] = Writes[Notification.UnreadCount] { v =>
     JsNumber(v.value)
   }
   implicit val andUnreadWrites: OWrites[Notification.AndUnread] = Json.writes[Notification.AndUnread]

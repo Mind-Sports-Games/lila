@@ -14,10 +14,14 @@ private object BSONHandlers {
 
   import EvalCacheEntry._
 
-  implicit private val TrustBSONHandler  = doubleAnyValHandler[Trust](_.value, Trust.apply)
-  implicit private val KnodesBSONHandler = intAnyValHandler[Knodes](_.value, Knodes.apply)
+  implicit private val TrustBSONHandler: BSONHandler[Trust] = doubleAnyValHandler[Trust](_.value, Trust.apply)
+  implicit private val KnodesBSONHandler: BSONHandler[Knodes] =
+    intAnyValHandler[Knodes](_.value, Knodes.apply)
 
-  implicit val PvsHandler = new BSONHandler[NonEmptyList[Pv]] {
+  implicit val PvsHandler: BSONHandler[NonEmptyList[Pv]] {
+    def writeTry(x: cats.data.NonEmptyList[lila.evalCache.EvalCacheEntry.Pv])
+        : scala.util.Success[reactivemongo.api.bson.BSONString]
+  } = new BSONHandler[NonEmptyList[Pv]] {
     private def scoreWrite(s: Score): String = s.value.fold(_.value.toString, m => s"#${m.value}")
     private def scoreRead(str: String): Option[Score] =
       if (str startsWith "#") str.drop(1).toIntOption map { m =>
@@ -61,7 +65,7 @@ private object BSONHandlers {
       })
   }
 
-  implicit val EntryIdHandler = tryHandler[Id](
+  implicit val EntryIdHandler: BSONHandler[Id] = tryHandler[Id](
     { case BSONString(value) =>
       value split ':' match {
         case Array(lib, fen) =>
@@ -91,6 +95,6 @@ private object BSONHandlers {
       }
   )
 
-  implicit val evalHandler  = Macros.handler[Eval]
-  implicit val entryHandler = Macros.handler[EvalCacheEntry]
+  implicit val evalHandler: BSONDocumentHandler[Eval]            = Macros.handler[Eval]
+  implicit val entryHandler: BSONDocumentHandler[EvalCacheEntry] = Macros.handler[EvalCacheEntry]
 }

@@ -9,6 +9,7 @@ import scala.concurrent.duration._
 
 import lila.memo.CacheApi._
 import lila.user.User
+import ornicar.scalalib.Zero
 
 case class LiveStreams(streams: List[Stream]) {
 
@@ -63,7 +64,8 @@ object LiveStreams {
       )
   }
 
-  implicit val zero = ornicar.scalalib.Zero.instance(WithTitles(LiveStreams(Nil), Map.empty))
+  implicit val zero: Zero[WithTitles] =
+    ornicar.scalalib.Zero.instance(WithTitles(LiveStreams(Nil), Map.empty))
 }
 
 final class LiveStreamApi(

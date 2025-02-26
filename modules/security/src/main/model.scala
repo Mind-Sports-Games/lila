@@ -7,6 +7,7 @@ import play.api.data.Form
 import lila.common.{ EmailAddress, IpAddress }
 import lila.user.User
 import lila.common.Iso
+import reactivemongo.api.bson.BSONHandler
 
 case class Dated[V](value: V, date: DateTime) extends Ordered[Dated[V]] {
   def compare(other: Dated[V]) = other.date compareTo date
@@ -69,8 +70,9 @@ case class UserAgent(value: String) {
 
 object UserAgent {
 
-  implicit val userAgentIso     = Iso.string[UserAgent](UserAgent.apply, _.value)
-  implicit val userAgentHandler = lila.db.BSON.isoHandler[UserAgent, String](userAgentIso)
+  implicit val userAgentIso: Iso.StringIso[UserAgent] = Iso.string[UserAgent](UserAgent.apply, _.value)
+  implicit val userAgentHandler: BSONHandler[UserAgent] =
+    lila.db.BSON.isoHandler[UserAgent, String](userAgentIso)
 
   sealed trait Client
   object Client {

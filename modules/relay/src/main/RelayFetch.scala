@@ -18,6 +18,7 @@ import lila.study.MultiPgn
 import lila.tree.Node.Comments
 import lila.game.{ GameRepo, PgnDump }
 import lila.round.GameProxyRepo
+import scala.concurrent.ExecutionContextExecutor
 
 final private class RelayFetch(
     sync: RelaySync,
@@ -28,10 +29,11 @@ final private class RelayFetch(
     pgnDump: PgnDump,
     gameProxy: GameProxyRepo,
     ws: StandaloneWSClient
-) extends Actor {
+)(implicit scheduler: akka.actor.Scheduler)
+    extends Actor {
 
-  implicit def system = context.system
-  implicit def ec     = context.dispatcher
+  implicit def system: ActorSystem          = context.system
+  implicit def ec: ExecutionContextExecutor = context.dispatcher
 
   override def preStart(): Unit = {
     context setReceiveTimeout 20.seconds
@@ -278,9 +280,9 @@ private object RelayFetch {
         )
     }
     case class RoundJson(pairings: List[RoundJsonPairing])
-    implicit val pairingPlayerReads = Json.reads[PairingPlayer]
-    implicit val roundPairingReads  = Json.reads[RoundJsonPairing]
-    implicit val roundReads         = Json.reads[RoundJson]
+    implicit val pairingPlayerReads: Reads[PairingPlayer]   = Json.reads[PairingPlayer]
+    implicit val roundPairingReads: Reads[RoundJsonPairing] = Json.reads[RoundJsonPairing]
+    implicit val roundReads: Reads[RoundJson]               = Json.reads[RoundJson]
 
     //This is compatible with multiaction if turns include comma separated actions
     case class GameJson(turns: List[String], result: Option[String]) {
@@ -294,7 +296,7 @@ private object RelayFetch {
         s"$extraTags\n\n$strTurns"
       }
     }
-    implicit val gameReads = Json.reads[GameJson]
+    implicit val gameReads: Reads[GameJson] = Json.reads[GameJson]
   }
 
   object multiPgnToGames {
