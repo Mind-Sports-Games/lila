@@ -509,8 +509,7 @@ case class Game(
       if (pointValue.isDefined && winner.isDefined)
         if (winner.get.playerIndex == P1) Array(pointValue.get, 0)
         else Array(0, pointValue.get)
-      else Array(0, 0)
-    ;
+      else Array(0, 0);
 
     if (Status.flagged.contains(status) && winner.isDefined) {
       if (List(Status.RuleOfGin, Status.GinGammon, Status.GinBackgammon).contains(status)) {
@@ -526,8 +525,10 @@ case class Game(
     }
 
     return multiPointState match {
-      case Some(m) => f"${m.target}%02d${Math.min(m.target, m.p1Points + points2Add(0))}%02d${Math.min(m.target, m.p2Points + points2Add(1))}%02d"
-      case _       => "-"
+      case Some(m) =>
+        f"${m.target}%02d${Math
+          .min(m.target, m.p1Points + points2Add(0))}%02d${Math.min(m.target, m.p2Points + points2Add(1))}%02d"
+      case _ => "-"
     }
   }
 
