@@ -509,8 +509,7 @@ case class Game(
       if (pointValue.isDefined && winner.isDefined)
         if (winner.get.playerIndex == P1) Array(pointValue.get, 0)
         else Array(0, pointValue.get)
-      else Array(0, 0)
-    ;
+      else Array(0, 0);
 
     if (Status.flagged.contains(status) && winner.isDefined) {
       if (List(Status.RuleOfGin, Status.GinGammon, Status.GinBackgammon).contains(status)) {

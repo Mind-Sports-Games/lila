@@ -78,13 +78,15 @@ final class SgfDump(
       withProfileName: Boolean = false,
       withRatings: Boolean = true
   ): Fu[Tags] = {
-    val isP1Black = game.variant.gameFamily.playerColors.get(P1) == Some("black")
-    val isGo      = game.variant.gameFamily == GameFamily.Go()
+    val isP1Black    = game.variant.gameFamily.playerColors.get(P1) == Some("black")
+    val isGo         = game.variant.gameFamily == GameFamily.Go()
+    val isBackgammon = game.variant.gameFamily == GameFamily.Backgammon()
     gameLightUsers(game) map { case (p1, p2) =>
       Tags {
         List[Option[Tag]](
           Tag(_.FF, 4).some,
           Tag(_.CA, "UTF-8").some,
+          Tag(_.AP, "playstrategy.org").some,
           Tag(_.DT, Tag.DT.format.print(game.createdAt)).some,
           Tag(_.PC, "PlayStrategy: " ++ gameUrl(game.id)).some,
           Tag(_.EV, eventOf(game)).some,
@@ -103,7 +105,7 @@ final class SgfDump(
           teams.flatMap { t => !isP1Black option Tag("BT", t.p2) },
           teams.flatMap { t => !isP1Black option Tag("WT", t.p1) },
           teams.flatMap { t => isP1Black option Tag("WT", t.p2) },
-          if (!isGo) { initialFen.map { fen => Tag(_.IP, fen.value) } }
+          if (!isGo && !isBackgammon) { initialFen.map { fen => Tag(_.IP, fen.value) } }
           else None
         ).flatten
       } ++ (game.variant.gameFamily match {
@@ -152,14 +154,27 @@ final class SgfDump(
             )
           }
         case GameFamily.Backgammon() =>
+          val isCrawfordGame =
+            game.multiPointState.map(_.isCrawfordState).getOrElse(false) && game.board.cubeData.fold(true)(
+              _ => false
+            )
+          val crawfordVariantLine =
+            if (game.variant.key == "hyper") ":Hypergammon3"
+            else if (game.variant.key == "nackgammon") ":Nackgammon"
+            else ""
+          val matchInfo = game.multiPointState.fold((1, 0, 0, 0))(mps =>
+            (mps.target, game.metadata.multiMatchGameNr.fold(0)(x => x - 1), mps.p1Points, mps.p2Points)
+          )
           Tags {
             List(
               Tag(_.GM, 6),
-              //Tag(_.RU, "Crawford"), // multipoint info
-              Tag(_.CV, 1),
-              Tag(_.CO, "n"),
-              Tag.matchInfo(1, 1, 0, 0), // multipoint info
-              Tag(_.SU, if (game.variant.key == "backgammon") "Standard" else game.variant.name)
+              Tag(_.RU, "Crawford" + (if (isCrawfordGame) ":CrawfordGame" else "") + crawfordVariantLine),
+              Tag(_.CV, game.board.cubeData.map(_.value).getOrElse(1)),
+              Tag(
+                _.CO,
+                game.board.cubeData.fold('n')(_.owner.fold('c')(p => if (p == PlayerIndex.P1) 'w' else 'b'))
+              ),
+              Tag.matchInfo(matchInfo._1, matchInfo._2, matchInfo._3, matchInfo._4)
             )
           }
         case _ => Tags.empty
@@ -171,6 +186,25 @@ final class SgfDump(
 object SgfDump {
 
   def result(game: Game) =
-    if (game.finished) PlayerIndex.showResult(game.winnerPlayerIndex, false)
-    else "*"
+    if (game.finished) {
+      game.variant.key match {
+        case "backgammon" | "nackgammon" | "hyper" => backgammonResult(game)
+        case _                                     => PlayerIndex.showResult(game.winnerPlayerIndex, false)
+      }
+    } else "*"
+
+  def backgammonResult(game: Game): String = {
+    val isWinnerP1 = game.winnerPlayerIndex == Some(PlayerIndex.P1)
+    val winner     = if (isWinnerP1) "W" else "B"
+    val maxPoints =
+      game.multiPointState.fold(1)(mps => mps.target - (if (isWinnerP1) mps.p1Points else mps.p2Points))
+    val points = Math.min(game.pointValue.getOrElse(1), game.multiPointState.fold(1)(_ => maxPoints))
+    val resign =
+      if (
+        (Status.resigned ++ List(Status.Outoftime, Status.OutoftimeGammon, Status.OutoftimeBackgammon))
+          .contains(game.status)
+      ) "R"
+      else ""
+    return s"$winner+$points$resign"
+  }
 }
