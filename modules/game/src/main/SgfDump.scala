@@ -169,11 +169,8 @@ final class SgfDump(
             List(
               Tag(_.GM, 6),
               Tag(_.RU, "Crawford" + (if (isCrawfordGame) ":CrawfordGame" else "") + crawfordVariantLine),
-              Tag(_.CV, game.board.cubeData.map(_.value).getOrElse(1)),
-              Tag(
-                _.CO,
-                game.board.cubeData.fold('n')(_.owner.fold('c')(p => if (p == PlayerIndex.P1) 'w' else 'b'))
-              ),
+              Tag(_.CV, 1),
+              Tag(_.CO, game.board.cubeData.fold('n')(_ => 'c')),
               Tag.matchInfo(matchInfo._1, matchInfo._2, matchInfo._3, matchInfo._4)
             )
           }

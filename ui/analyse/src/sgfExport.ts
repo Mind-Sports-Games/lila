@@ -76,7 +76,7 @@ export function renderFullTxt(ctrl: AnalyseCtrl): string {
     //TODO options depend on what functionality we need in analysis page
     tags.push(['GM', '6']);
     tags.push(['RU', 'Crawford']);
-    tags.push(['CV', g.pointValue.toString()]);
+    tags.push(['CV', '1']);
   }
   if (['amazons'].includes(g.variant.key)) {
     tags.push(['GM', '18']);
