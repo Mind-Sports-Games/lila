@@ -9,7 +9,7 @@ import play.api.i18n.Lang
 import lila.api.Context
 import lila.app.templating.Environment._
 import lila.app.ui.ScalatagsTemplate._
-import lila.game.Pov
+import lila.game.{ Pov, MultiPointState }
 import lila.i18n.defaultLang
 
 object mini {
@@ -85,7 +85,7 @@ object mini {
   def renderState(pov: Pov) =
     pov.game.variant match {
       case Variant.Backgammon(_) =>
-        dataState := s"${Forsyth.>>(pov.game.variant.gameLogic, pov.game.stratGame)}|${orientation(pov)}|${~pov.game.lastActionKeys}|${pov.game.multiPointResult}"
+        dataState := s"${Forsyth.>>(pov.game.variant.gameLogic, pov.game.stratGame)}|${orientation(pov)}|${~pov.game.lastActionKeys}|${pov.game.multiPointResult.fold(MultiPointState.noDataChar)(_.toString)}"
       case Variant.Chess(_) | Variant.FairySF(_) | Variant.Samurai(_) | Variant.Togyzkumalak(_) |
           Variant.Go(_) | Variant.Abalone(_) =>
         dataState := s"${Forsyth.>>(pov.game.variant.gameLogic, pov.game.stratGame)}|${orientation(pov)}|${~pov.game.lastActionKeys}"
@@ -115,9 +115,9 @@ object mini {
   private def calculateScore(pov: Pov): String =
     pov.game.metadata.multiPointState match {
       case Some(_) => {
-        val score = pov.game.multiPointResult
-        if (score == "-") score
-        else " (" + (if(pov.playerIndex.p1) score.substring(2, 4).toInt else score.substring(4, 6).toInt) + ")"
+        pov.game.multiPointResult.fold(MultiPointState.noDataChar) { mps =>
+          s" (${mps.toString(pov.playerIndex.p1).toInt})"
+        }
       }
       case None => {
         val score = pov.game.calculateScore(pov.playerIndex)

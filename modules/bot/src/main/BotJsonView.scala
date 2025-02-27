@@ -55,14 +55,13 @@ final class BotJsonView(
       uciMoves =>
         Json
           .obj(
-            "type"         -> "gameState",
-            "moves"        -> uciMoves.map(_.mkString(",")).mkString(" "),
-            "activeplayer" -> game.activePlayer.name,
-            "wtime"        -> millisOf(game.p1Pov),
-            "btime"        -> millisOf(game.p2Pov),
-            // TODO: these two fields need to be tested for Bronstein and SimpleDelay and Fischer now
-            "winc"            -> game.clock.??(_.config.graceSeconds.seconds.toMillis),
-            "binc"            -> game.clock.??(_.config.graceSeconds.seconds.toMillis),
+            "type"            -> "gameState",
+            "moves"           -> uciMoves.map(_.mkString(",")).mkString(" "),
+            "activeplayer"    -> game.activePlayer.name,
+            "wtime"           -> millisOf(game.p1Pov),
+            "btime"           -> millisOf(game.p2Pov),
+            "winc"            -> incOf(game.p1Pov),
+            "binc"            -> incOf(game.p2Pov),
             "wdraw"           -> game.p1Player.isOfferingDraw,
             "bdraw"           -> game.p2Player.isOfferingDraw,
             "status"          -> game.status.name,
@@ -128,35 +127,54 @@ final class BotJsonView(
 
   private def millisOf(pov: Pov): Int =
     pov.game.clock
-      .map(_.remainingTime(pov.playerIndex).millis.toInt)
+      .map(_ match {
+        case bc: strategygames.ByoyomiClock =>
+          bc.remainingTime(pov.playerIndex).millis.toInt + (bc
+            .players(pov.playerIndex)
+            .byoyomi
+            .millis
+            .toInt * bc.players(pov.playerIndex).periodsLeft)
+        case c => c.remainingTime(pov.playerIndex).millis.toInt
+      })
       .orElse(pov.game.correspondenceClock.map(_.remainingTime(pov.playerIndex).toInt * 1000))
       .getOrElse(Int.MaxValue)
+
+  private def incOf(pov: Pov): Int =
+    pov.game.clock
+      .fold(0)(_ match {
+        case bc: strategygames.ByoyomiClock =>
+          if (bc.spentPeriodsOf(pov.playerIndex) == 0) bc.config.graceSeconds.seconds.toMillis.toInt
+          else bc.config.byoyomi.millis.toInt
+        case c => c.config.graceSeconds.seconds.toMillis.toInt
+      })
 
   implicit private val clockConfigWriter: OWrites[strategygames.ClockConfig] = OWrites { c =>
     c match {
       case c: strategygames.Clock.Config =>
         Json.obj(
           "initial"   -> c.limit.millis,
-          "increment" -> c.increment.millis
+          "increment" -> c.increment.millis,
+          "clockType" -> "fischer"
         )
       case c: strategygames.Clock.BronsteinConfig =>
         Json.obj(
           "initial"   -> c.limit.millis,
           "delay"     -> c.delay.millis,
-          "delaytype" -> "bronstein"
+          "clockType" -> "bronstein"
         )
       case c: strategygames.Clock.SimpleDelayConfig =>
         Json.obj(
           "initial"   -> c.limit.millis,
           "delay"     -> c.delay.millis,
-          "delayType" -> "usdelay"
+          "clockType" -> "usdelay"
         )
       case c: strategygames.ByoyomiClock.Config =>
         Json.obj(
           "initial"   -> c.limit.millis,
           "increment" -> c.increment.millis,
           "byoyomi"   -> c.byoyomi.millis,
-          "periods"   -> c.periodsTotal
+          "periods"   -> c.periodsTotal,
+          "clockType" -> "byoyomi"
         )
     }
   }

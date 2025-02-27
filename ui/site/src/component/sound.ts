@@ -18,19 +18,43 @@ const sound = new (class {
     if (this.soundSet == 'music') setTimeout(this.publish, 500);
   }
 
-  loadOggOrMp3 = (name: Name, path: Path) =>
-    this.sounds.set(
-      name,
-      new window.Howl({
-        src: ['ogg', 'mp3'].map(ext => `${path}.${ext}`),
-      }),
-    );
+  getNameAndSet = (name: Name) => (['music', 'standard'].includes(this.soundSet) ? name : `${name}-${this.soundSet}`);
 
-  loadStandard = (name: Name, soundSet?: string) => {
-    if (!this.enabled()) return;
-    const path = name[0].toUpperCase() + name.slice(1);
-    this.loadOggOrMp3(name, `${this.baseUrl}/${soundSet || this.soundSet}/${path}`);
-  };
+  getSound = (name: Name) => this.sounds.get(this.getNameAndSet(name));
+
+  loadOggOrMp3 = (name: Name, path: Path): Promise<void> =>
+    new Promise(resolve => {
+      const sound = new window.Howl({
+        src: ['ogg', 'mp3'].map(ext => `${path}.${ext}`),
+      });
+      if (sound._duration != 0) {
+        // sound already loaded
+        resolve(sound);
+      }
+      sound.on('loaderror', () => {
+        // 1st load error : file not found, use standard sound
+        const sound2 = new window.Howl({
+          src: ['ogg', 'mp3'].map(
+            ext => `${`${this.baseUrl}/standard/${name[0].toUpperCase() + name.slice(1)}`}.${ext}`,
+          ),
+        });
+        resolve(sound2);
+      });
+      sound.on('load', () => {
+        // 1st load success
+        resolve(sound);
+      });
+    });
+
+  loadStandard(name: Name, soundSet?: string): Promise<void> {
+    if (!this.enabled()) return Promise.resolve();
+    return new Promise(resolve => {
+      const path = name[0].toUpperCase() + name.slice(1);
+      this.loadOggOrMp3(name, `${this.baseUrl}/${soundSet || this.soundSet}/${path}`).then(sound => {
+        resolve(sound);
+      });
+    });
+  }
 
   preloadBoardSounds() {
     if (this.soundSet !== 'music') ['move', 'capture', 'check'].forEach(s => this.loadStandard(s));
@@ -43,14 +67,21 @@ const sound = new (class {
       if (['move', 'capture', 'check'].includes(name)) return;
       set = 'standard';
     }
-    let s = this.sounds.get(name);
+    // try to "load" the sound in case it was already fetched
+    let s = this.getSound(name);
+    const doPlay = () => s && s.volume(this.getVolume() * (volume || 1)).play();
     if (!s) {
-      this.loadStandard(name, set);
-      s = this.sounds.get(name);
+      // fetch the sound...
+      this.loadStandard(name, set).then(sound => {
+        this.sounds.set(this.getNameAndSet(name), sound);
+        s = this.getSound(name);
+        if (window.Howler.ctx?.state === 'suspended') window.Howler.ctx.resume().then(doPlay);
+        else doPlay();
+      });
+    } else {
+      if (window.Howler.ctx?.state === 'suspended') window.Howler.ctx.resume().then(doPlay);
+      else doPlay();
     }
-    const doPlay = () => s.volume(this.getVolume() * (volume || 1)).play();
-    if (window.Howler.ctx?.state === 'suspended') window.Howler.ctx.resume().then(doPlay);
-    else doPlay();
   }
 
   setVolume = this.volumeStorage.set;

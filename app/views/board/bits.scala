@@ -13,6 +13,7 @@ import lila.api.Context
 import lila.app.templating.Environment._
 import lila.app.ui.ScalatagsTemplate._
 import lila.game.Pov
+import lila.game.MultiPointState
 
 object bits {
 
@@ -80,7 +81,7 @@ object bits {
       lastMove: String = "",
       boardSizeOpt: Option[Board.BoardSize],
       variantKey: String = "standard",
-      multiPointResult: String = "-"
+      multiPointResult: Option[MultiPointState] = None
   )(tag: Tag): Tag = {
     // TODO: this is an excellent candidate for refactoring.
     val libName = fen match {
@@ -98,7 +99,7 @@ object bits {
     val data = if (libName == "Draughts") {
       s"${fen.value}|${boardSize.width}x${boardSize.height}|${orient}|$lastMove"
     } else {
-      s"${fen.value}|${orient}|$lastMove|$multiPointResult"
+      s"${fen.value}|${orient}|$lastMove|${multiPointResult.fold(MultiPointState.noDataChar)(_.toString)}"
     }
     val extra =
       if (libName == "Draughts") s"is${boardSize.key} ${libName.toLowerCase()}"
