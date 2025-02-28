@@ -33,7 +33,7 @@
   <string name="multiMatchChallenge">This challenge is a multi-match!</string>
   <string name="multiMatchRematchStarted">Started next game of multi-match</string>
   <string name="multiMatchRematchAwaiting">Awaiting next game of multi-match</string>
-  <string name="multiMatchGameX">Multi-match game %s</string>
+  <string name="multiMatchGameX">MM %s</string>
   <string name="multiMatchDefinition">Play multiple games in succession with opponents (swapping first player each game)</string>
   <string name="isMatchScore">Use Match Score</string>
   <string name="isMatchScoreDefinition">Use score of entire match against opponent as tournament points</string>
