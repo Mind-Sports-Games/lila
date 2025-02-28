@@ -20,7 +20,7 @@ final class BlogApi(
       ref: Option[String]
   ): Fu[Option[Paginator[Document]]] =
     api
-      .forms(collection)
+      .forms("everything")
       .ref(ref | api.master.ref)
       .orderings(s"[my.$collection.date desc]")
       .pageSize(maxPerPage.value)
@@ -38,7 +38,7 @@ final class BlogApi(
 
   def one(api: Api, ref: Option[String], id: String): Fu[Option[Document]] =
     api
-      .forms(collection)
+      .forms("everything")
       .query(s"""[[:d = at(document.id, "$id")]]""")
       .ref(ref | api.master.ref)
       .submit() map (_.results.headOption)
@@ -47,7 +47,7 @@ final class BlogApi(
 
   def byYear(prismic: BlogApi.Context, year: Int): Fu[List[MiniPost]] = {
     prismic.api
-      .forms(collection)
+      .forms("everything")
       .ref(prismic.ref)
       .query(s"[[date.year(my.$collection.date, $year)]]")
       .orderings(s"[my.$collection.date desc]")
