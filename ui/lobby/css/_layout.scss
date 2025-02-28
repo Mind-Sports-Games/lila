@@ -77,6 +77,13 @@ $mq-not-col3: $mq-not-small;
     }
   }
 
+  //TODO remove once we fully remove play with stockfish server
+  &__start {
+    .invisible {
+      display: none;
+    }
+  }
+
   &__side {
     grid-area: side;
   }

@@ -8,6 +8,7 @@ import lila.api.Context
 import lila.app.templating.Environment._
 import lila.app.ui.ScalatagsTemplate._
 import lila.user.User
+import lila.common.LightUser
 
 import strategygames.GameFamily
 
@@ -111,7 +112,7 @@ object forms {
         user.map { u =>
           userLink(u, cssClass = "target".some)
         },
-        renderVariant(form, translatedVariantChoicesWithVariantsAndFen),
+        renderVariant(form, translatedVariantChoicesForUser(user)),
         fenInput(form("fen"), strict = false, validFen),
         renderGoOptions(form),
         renderBackgammonOptions(form),
@@ -123,6 +124,14 @@ object forms {
         blindSideChoice(form)
       )
     )
+
+  private def translatedVariantChoicesForUser(user: Option[User])(implicit cts: Context) = {
+    user match {
+      case Some(u) if LightUser.stockfishBotsIDs.contains(u.id) => translatedAiVariantChoices
+      case Some(u) if u.id == "ps-greedy-four-move"             => translatedGreedyFourMoveChoices
+      case _                                                    => translatedVariantChoicesWithVariantsAndFen
+    }
+  }
 
   private def blindSideChoice(form: Form[_])(implicit ctx: Context) =
     ctx.blind option frag(
