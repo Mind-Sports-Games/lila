@@ -250,6 +250,15 @@ trait SetupHelper { self: I18nHelper =>
       )
     )
 
+  def translatedGreedyFourMoveChoices(implicit lang: Lang): List[(SelectChoice, List[SelectChoice])] =
+    GameFamily.all.map(gf =>
+      (
+        translatedGameFamilyChoice(gf),
+        translatedVariantChoicesWithVariantsByGameFamily(gf, encodeId) :::
+          gf.variants.filter(_.fromPositionVariant).map(variantTupleId)
+      )
+    )
+
   //used in lidraughts but not in lila (yet?)
   //private def fromPositionVariantTupleId(v: Variant)(implicit lang: Lang) =
   //  variantTuple(encodeId, v => fromPositionVariantName(VariantKeys.variantName(v)))(v)
