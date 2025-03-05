@@ -181,7 +181,7 @@ private object bits {
       )
     )
 
-  def renderTimeMode(form: Form[_], allowAnon: Boolean)(implicit ctx: Context) =
+  def renderTimeMode(form: Form[_], allowAnon: Boolean, allowCorrespondence: Boolean)(implicit ctx: Context) =
     div(cls := "time_mode_config optional_config")(
       div(
         cls := List(
@@ -198,7 +198,10 @@ private object bits {
             target := "_blank"
           )(trans.timeControl())
         ),
-        renderSelect(form("timeMode"), translatedTimeModeChoices)
+        renderSelect(
+          form("timeMode"),
+          if (allowCorrespondence) translatedTimeModeChoices else translatedTimeModeChoicesLive
+        )
       ),
       if (ctx.blind)
         frag(
