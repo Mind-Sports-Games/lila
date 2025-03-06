@@ -430,8 +430,10 @@ function renderPlayerScoreNames(ctrl: AnalyseCtrl): VNode | undefined {
     };
   }
 
-  //need to switch player order for togy view as scores also flip
-  const flippedCss = ctrl.flipped ? '.flipped' : '';
+  const flippedCss =
+    (ctrl.flipped && ctrl.data.player.playerIndex === 'p1') || (!ctrl.flipped && ctrl.data.player.playerIndex === 'p2')
+      ? '.flipped'
+      : '';
 
   if (p1player.user) {
     children.push(
