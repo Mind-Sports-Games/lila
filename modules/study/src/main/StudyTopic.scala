@@ -8,6 +8,7 @@ import lila.common.Future
 import lila.db.AsyncColl
 import lila.db.dsl._
 import lila.user.User
+import lila.common.Iso
 
 case class StudyTopic(value: String) extends AnyVal with StringValue
 
@@ -22,7 +23,8 @@ object StudyTopic {
       case _                                                       => none
     }
 
-  implicit val topicIso = lila.common.Iso.string[StudyTopic](StudyTopic.apply, _.value)
+  implicit val topicIso: Iso.StringIso[StudyTopic] =
+    lila.common.Iso.string[StudyTopic](StudyTopic.apply, _.value)
 }
 
 case class StudyTopics(value: List[StudyTopic]) extends AnyVal {
@@ -58,7 +60,7 @@ final private class StudyUserTopicRepo(val coll: AsyncColl)
 final class StudyTopicApi(topicRepo: StudyTopicRepo, userTopicRepo: StudyUserTopicRepo, studyRepo: StudyRepo)(
     implicit
     ec: scala.concurrent.ExecutionContext,
-    system: akka.actor.ActorSystem
+    scheduler: akka.actor.Scheduler
 ) {
 
   import BSONHandlers.{ StudyTopicBSONHandler, StudyTopicsBSONHandler }
@@ -94,7 +96,7 @@ final class StudyTopicApi(topicRepo: StudyTopicRepo, userTopicRepo: StudyUserTop
     }
 
   private case class TagifyTopic(value: String)
-  implicit private val TagifyTopicReads = Json.reads[TagifyTopic]
+  implicit private val TagifyTopicReads: Reads[TagifyTopic] = Json.reads[TagifyTopic]
 
   def userTopics(user: User, json: String): Funit = {
     val topics =

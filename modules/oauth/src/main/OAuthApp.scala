@@ -40,10 +40,11 @@ object OAuthApp {
   import lila.db.dsl._
   import BSON.BSONJodaDateTimeHandler
 
-  implicit private[oauth] val AppIdHandler     = stringAnyValHandler[Id](_.value, Id.apply)
-  implicit private[oauth] val AppSecretHandler = stringAnyValHandler[Secret](_.value, Secret.apply)
+  implicit private[oauth] val AppIdHandler: BSONHandler[Id] = stringAnyValHandler[Id](_.value, Id.apply)
+  implicit private[oauth] val AppSecretHandler: BSONHandler[Secret] =
+    stringAnyValHandler[Secret](_.value, Secret.apply)
 
-  implicit val AppBSONHandler = new BSON[OAuthApp] {
+  implicit val AppBSONHandler: BSON[OAuthApp] = new BSON[OAuthApp] {
 
     import BSONFields._
 

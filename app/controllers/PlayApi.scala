@@ -15,7 +15,7 @@ final class PlayApi(
     apiC: => Api
 ) extends LilaController(env) {
 
-  implicit private def autoReqLang(implicit req: RequestHeader) = reqLang(req)
+  implicit private def autoReqLang(implicit req: RequestHeader): Lang = reqLang(req)
 
   // bot endpoints
 

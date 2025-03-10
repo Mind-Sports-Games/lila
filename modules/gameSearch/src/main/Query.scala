@@ -56,9 +56,9 @@ object Query {
   import play.api.libs.json._
 
   import Range.rangeJsonWriter
-  implicit private val sortingJsonWriter  = Json.writes[Sorting]
-  implicit private val clockingJsonWriter = Json.writes[Clocking]
-  implicit val jsonWriter                 = Json.writes[Query]
+  implicit private val sortingJsonWriter: OWrites[Sorting]   = Json.writes[Sorting]
+  implicit private val clockingJsonWriter: OWrites[Clocking] = Json.writes[Clocking]
+  implicit val jsonWriter: OWrites[Query]                    = Json.writes[Query]
 
   val durations: List[(Int, String)] =
     ((30, "30 seconds") ::
@@ -132,16 +132,16 @@ object Query {
     options(1 to 5, "y", "%d year{s} ago")
 
   val statuses = Status.finishedNotCheated.flatMap {
-    case s if s.is(_.Timeout)                                                             => none
-    case s if s.is(_.NoStart)                                                             => none
-    case s if s.is(_.UnknownFinish)                                                       => none
+    case s if s.is(_.Timeout)       => none
+    case s if s.is(_.NoStart)       => none
+    case s if s.is(_.UnknownFinish) => none
     case s if s.is(_.Outoftime) || s.is(_.OutoftimeGammon) || s.is(_.OutoftimeBackgammon) =>
       Some(s.id -> "Clock Flag")
-    case s if s.is(_.RuleOfGin) || s.is(_.GinGammon) || s.is(_.GinBackgammon)             =>
+    case s if s.is(_.RuleOfGin) || s.is(_.GinGammon) || s.is(_.GinBackgammon) =>
       Some(s.id -> "Rule of Gin")
-    case s if s.is(_.VariantEnd)                                                          =>
+    case s if s.is(_.VariantEnd) =>
       Some(s.id -> "Variant End")
-    case s                                                                                =>
+    case s =>
       Some(s.id -> s.toString)
   }
 }

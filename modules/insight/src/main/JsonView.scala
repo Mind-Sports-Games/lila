@@ -9,7 +9,7 @@ final class JsonView {
   import writers._
 
   case class Categ(name: String, items: List[JsValue])
-  implicit private val categWrites = Json.writes[Categ]
+  implicit private val categWrites: OWrites[Categ] = Json.writes[Categ]
 
   def ui(ecos: Set[String], asMod: Boolean)(implicit lang: Lang) = {
 
@@ -154,10 +154,10 @@ final class JsonView {
   }
 
   object chart {
-    implicit private val xAxisWrites = Json.writes[Chart.Xaxis]
-    implicit private val yAxisWrites = Json.writes[Chart.Yaxis]
-    implicit private val SerieWrites = Json.writes[Chart.Serie]
-    implicit private val ChartWrites = Json.writes[Chart]
+    implicit private val xAxisWrites: OWrites[Chart.Xaxis] = Json.writes[Chart.Xaxis]
+    implicit private val yAxisWrites: OWrites[Chart.Yaxis] = Json.writes[Chart.Yaxis]
+    implicit private val SerieWrites: OWrites[Chart.Serie] = Json.writes[Chart.Serie]
+    implicit private val ChartWrites: OWrites[Chart]       = Json.writes[Chart]
 
     def apply(c: Chart) = ChartWrites writes c
   }

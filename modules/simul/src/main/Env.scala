@@ -1,6 +1,5 @@
 package lila.simul
 
-import akka.actor._
 import com.softwaremill.macwire._
 import io.methvin.play.autoconfig._
 import play.api.Configuration
@@ -32,7 +31,7 @@ final class Env(
     proxyRepo: lila.round.GameProxyRepo
 )(implicit
     ec: scala.concurrent.ExecutionContext,
-    system: ActorSystem,
+    scheduler: akka.actor.Scheduler,
     mode: play.api.Mode
 ) {
 

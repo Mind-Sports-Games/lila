@@ -37,13 +37,13 @@ object Json {
       }
     )
 
-  implicit val centisReads = Reads.of[Int] map Centis.apply
+  implicit val centisReads: Reads[Centis] = Reads.of[Int].map(Centis.apply)
 
-  implicit val jodaWrites = Writes[DateTime] { time =>
+  implicit val jodaWrites: Writes[DateTime] = Writes[DateTime] { time =>
     JsNumber(time.getMillis)
   }
 
-  implicit val fenFormat: Format[FEN] = stringIsoFormat[FEN](Iso.fenIso)
+  implicit val fenFormat: Format[FEN]           = stringIsoFormat[FEN](Iso.fenIso)
   implicit val stratFenFormat: Format[StratFEN] = stringIsoFormat[StratFEN](Iso.stratFenIso)
 
 }

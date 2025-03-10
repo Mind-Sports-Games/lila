@@ -55,7 +55,7 @@ object PuzzleForm {
     case class Solution(id: Long, win: Boolean)
     case class SolveData(solutions: List[Solution])
 
-    implicit val SolutionReads  = Json.reads[Solution]
-    implicit val SolveDataReads = Json.reads[SolveData]
+    implicit val SolutionReads: Reads[Solution]   = Json.reads[Solution]
+    implicit val SolveDataReads: Reads[SolveData] = Json.reads[SolveData]
   }
 }

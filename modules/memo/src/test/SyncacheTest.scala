@@ -7,6 +7,7 @@ import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpecLike
 import scala.concurrent.duration._
 import scala.concurrent.Future
+import scala.concurrent.ExecutionContextExecutor
 
 class MySpec()
     extends TestKit(ActorSystem())
@@ -19,12 +20,12 @@ class MySpec()
     TestKit.shutdownActorSystem(system)
   }
 
-  implicit def ec = system.dispatcher
+  implicit def ec: ExecutionContextExecutor = system.dispatcher
 
   "syncache" must {
 
     "be thread safe" in {
-      var computeCount = 0
+      var computeCount: Int = 0
       val cache = new Syncache[Int, String](
         name = "test",
         initialCapacity = 64,
@@ -54,3 +55,5 @@ class MySpec()
 
   }
 }
+
+object MySpec {}

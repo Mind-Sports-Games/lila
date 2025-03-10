@@ -14,6 +14,7 @@ import lila.hub.actorApi.round.{ Abort, MultiMatchRematch, Resign }
 import lila.hub.actorApi.simul.GetHostIds
 import lila.hub.actors
 import lila.user.User
+import play.api.ConfigLoader
 
 @Module
 private class RoundConfig(
@@ -60,8 +61,10 @@ final class Env(
 
   import lightUserApi._
 
-  implicit private val animationLoader = durationLoader(AnimationDuration.apply)
-  private val config                   = appConfig.get[RoundConfig]("round")(AutoConfig.loader)
+  implicit private val animationLoader: ConfigLoader[AnimationDuration] = durationLoader(
+    AnimationDuration.apply
+  )
+  private val config = appConfig.get[RoundConfig]("round")(AutoConfig.loader)
 
   private val defaultGoneWeight                      = fuccess(1f)
   private def goneWeight(userId: User.ID): Fu[Float] = playban.getRageSit(userId).dmap(_.goneWeight)

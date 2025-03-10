@@ -8,6 +8,7 @@ import akka.pattern.pipe
 
 import lila.socket.Socket.Sris
 import lila.user.User
+import scala.concurrent.ExecutionContextExecutor
 
 final private class PoolActor(
     config: PoolConfig,
@@ -22,7 +23,7 @@ final private class PoolActor(
 
   var nextWave: Cancellable = _
 
-  implicit def ec = context.dispatcher
+  implicit def ec: ExecutionContextExecutor = context.dispatcher
 
   def scheduleWave() =
     nextWave = context.system.scheduler.scheduleOnce(

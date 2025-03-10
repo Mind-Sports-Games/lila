@@ -4,6 +4,7 @@ import org.joda.time.DateTime
 import cats.data.NonEmptyList
 
 import lila.user.User
+import lila.common.Iso
 
 case class Report(
     _id: Report.ID, // also the url slug
@@ -19,7 +20,8 @@ case class Report(
 
   import Report.{ Atom, Score }
 
-  implicit private val ordering = scala.math.Ordering.Double.TotalOrdering
+  implicit private val ordering: math.Ordering.Double.TotalOrdering.type =
+    scala.math.Ordering.Double.TotalOrdering
 
   def id   = _id
   def slug = _id
@@ -91,7 +93,7 @@ object Report {
       else "green"
     def atLeast(v: Int) = Score(value atLeast v)
   }
-  implicit val scoreIso = lila.common.Iso.double[Score](Score.apply, _.value)
+  implicit val scoreIso: Iso.DoubleIso[Score] = lila.common.Iso.double[Score](Score.apply, _.value)
 
   case class Atom(
       by: ReporterId,

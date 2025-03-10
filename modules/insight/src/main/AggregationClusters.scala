@@ -24,7 +24,7 @@ object AggregationClusters {
     doc.get("_id") flatMap reader.readOpt
 
   private case class StackEntry(metric: BSONValue, v: BSONNumberLike)
-  implicit private val StackEntryBSONReader = Macros.reader[StackEntry]
+  implicit private val StackEntryBSONReader: BSONDocumentReader[StackEntry] = Macros.reader[StackEntry]
 
   private def stacked[X](question: Question[X], aggDocs: List[Bdoc]): List[Cluster[X]] =
     for {

@@ -54,6 +54,7 @@ final class Env(
     val mode: Mode
 )(implicit
     ec: scala.concurrent.ExecutionContext,
+    scheduler: akka.actor.Scheduler,
     system: ActorSystem
 ) {
 
@@ -92,7 +93,7 @@ final class Env(
     endpoint = config.influxEventEndpoint,
     env = config.influxEventEnv
   )
-  if (mode == Mode.Prod) system.scheduler.scheduleOnce(5 seconds)(influxEvent.start())
+  if (mode == Mode.Prod) scheduler.scheduleOnce(5 seconds)(influxEvent.start())
 
   private lazy val linkCheck = wire[LinkCheck]
 
@@ -100,7 +101,7 @@ final class Env(
     promise completeWith linkCheck(line, source)
   }
 
-  system.scheduler.scheduleWithFixedDelay(1 minute, 1 minute) { () =>
+  scheduler.scheduleWithFixedDelay(1 minute, 1 minute) { () =>
     lila.mon.bus.classifiers.update(lila.common.Bus.size)
     // ensure the PlayStrategy user is online
     socketEnv.remoteSocket.onlineUserIds.getAndUpdate(_ + User.playstrategyId)

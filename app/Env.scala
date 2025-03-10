@@ -13,6 +13,8 @@ import lila.common.{ Bus, Strings, UserIds }
 import lila.memo.SettingStore.Strings._
 import lila.memo.SettingStore.UserIds._
 import lila.user.{ Holder, User }
+import play.api.Mode
+import lila.game.IdGenerator
 
 final class Env(
     val config: Configuration,
@@ -88,6 +90,7 @@ final class Env(
     val web: lila.web.Env
 )(implicit
     val system: ActorSystem,
+    val scheduler: akka.actor.Scheduler,
     val executionContext: ExecutionContext,
     val mode: play.api.Mode
 ) {
@@ -138,8 +141,6 @@ final class Env(
       lila.log("preloader").warn("daily puzzle", e)
       none
     }
-
-  def scheduler = system.scheduler
 
   def closeAccount(u: User, by: Holder): Funit =
     for {
@@ -201,13 +202,13 @@ final class EnvBoot(
     ws: StandaloneWSClient
 ) {
 
-  implicit def scheduler   = system.scheduler
-  implicit def mode        = environment.mode
-  def appPath              = AppPath(environment.rootPath)
-  val netConfig            = config.get[NetConfig]("net")
-  def netDomain            = netConfig.domain
-  def baseUrl              = netConfig.baseUrl
-  implicit def idGenerator = game.idGenerator
+  implicit def scheduler: Scheduler     = system.scheduler
+  implicit def mode: Mode               = environment.mode
+  def appPath                           = AppPath(environment.rootPath)
+  val netConfig                         = config.get[NetConfig]("net")
+  def netDomain                         = netConfig.domain
+  def baseUrl                           = netConfig.baseUrl
+  implicit def idGenerator: IdGenerator = game.idGenerator
 
   lazy val mainDb: lila.db.Db = mongo.blockingDb("main", config.get[String]("mongodb.uri"))
   lazy val imageRepo          = new lila.db.ImageRepo(mainDb(CollName("image")))

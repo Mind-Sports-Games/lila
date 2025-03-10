@@ -11,7 +11,7 @@ object LevenshteinTest {
   def check(a: String, b: String) = check0(a, b) && check0(b, a)
   def rndStr(r: Random, l: Int, sigma: Int): String = {
     val sb = new StringBuilder(l)
-    for (i <- 0 until l) sb.append((48 + r.nextInt(sigma)).toChar)
+    for (_ <- 0 until l) sb.append((48 + r.nextInt(sigma)).toChar)
     sb.result()
   }
   def rt(r: Random, l1: Int, l2: Int, sigma: Int) = {

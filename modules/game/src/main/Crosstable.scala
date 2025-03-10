@@ -136,17 +136,18 @@ object Crosstable {
       )
   }
 
-  implicit private[game] val MatchupBSONReader = new BSONDocumentReader[Matchup] {
-    import BSONFields._
-    def readDocument(doc: Bdoc) = {
-      val r = new BSON.Reader(doc)
-      r str id split '/' match {
-        case Array(u1Id, u2Id) =>
-          Success {
-            Matchup(Users(User(u1Id, r intD score1), User(u2Id, r intD score2)))
-          }
-        case x => lila.db.BSON.handlerBadValue(s"Invalid crosstable id $x")
+  implicit private[game] val MatchupBSONReader: BSONDocumentReader[Matchup] =
+    new BSONDocumentReader[Matchup] {
+      import BSONFields._
+      def readDocument(doc: Bdoc) = {
+        val r = new BSON.Reader(doc)
+        r str id split '/' match {
+          case Array(u1Id, u2Id) =>
+            Success {
+              Matchup(Users(User(u1Id, r intD score1), User(u2Id, r intD score2)))
+            }
+          case x => lila.db.BSON.handlerBadValue(s"Invalid crosstable id $x")
+        }
       }
     }
-  }
 }

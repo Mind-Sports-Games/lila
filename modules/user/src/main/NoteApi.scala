@@ -28,7 +28,7 @@ final class NoteApi(
 
   import reactivemongo.api.bson._
   import lila.db.BSON.BSONJodaDateTimeHandler
-  implicit private val noteBSONHandler = Macros.handler[Note]
+  implicit private val noteBSONHandler: BSONDocumentHandler[Note] = Macros.handler[Note]
 
   def get(user: User, me: User, isMod: Boolean): Fu[List[Note]] =
     coll

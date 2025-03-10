@@ -20,7 +20,7 @@ final class LateMultiThrottler(
   def receive: Receive = {
 
     case Work(id, run, delayOption, timeoutOption) if !executions.contains(id) =>
-      implicit val system = context.system
+      implicit val scheduler = context.system.scheduler
       lila.common.Future.delay(delayOption | 0.seconds) {
         timeoutOption.orElse(executionTimeout).fold(run()) { timeout =>
           run().withTimeout(
@@ -47,7 +47,7 @@ object LateMultiThrottler {
   def apply(
       executionTimeout: Option[FiniteDuration] = None,
       logger: lila.log.Logger
-  )(implicit ec: ExecutionContext, system: ActorSystem) =
+  )(implicit ec: ExecutionContext, system: akka.actor.ActorSystem, bscheduler: akka.actor.Scheduler) =
     system.actorOf(Props(new LateMultiThrottler(executionTimeout, logger)))
 
   case class Work(

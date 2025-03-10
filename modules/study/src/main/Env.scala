@@ -30,7 +30,7 @@ final class Env(
     cacheApi: lila.memo.CacheApi
 )(implicit
     ec: scala.concurrent.ExecutionContext,
-    system: akka.actor.ActorSystem,
+    scheduler: akka.actor.Scheduler,
     mat: akka.stream.Materializer,
     mode: play.api.Mode
 ) {
@@ -42,8 +42,6 @@ final class Env(
 
   def isConnected(studyId: Study.Id, userId: User.ID): Fu[Boolean] =
     socket.isPresent(studyId, userId)
-
-  private def scheduler = system.scheduler
 
   private val socket: StudySocket = wire[StudySocket]
 

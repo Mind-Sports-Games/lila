@@ -11,7 +11,7 @@ import lila.storm.StormPuzzle
 
 private object RacerBsonHandlers {
 
-  implicit val StormPuzzleBSONReader = new BSONDocumentReader[StormPuzzle] {
+  implicit val StormPuzzleBSONReader: BSONDocumentReader[StormPuzzle] = new BSONDocumentReader[StormPuzzle] {
     def readDocument(r: BSONDocument) = for {
       id      <- r.getAsTry[Puzzle.Id]("_id")
       fen     <- r.getAsTry[FEN]("fen")

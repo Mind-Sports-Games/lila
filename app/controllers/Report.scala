@@ -19,7 +19,7 @@ final class Report(
 
   private def api = env.report.api
 
-  implicit private def asMod(holder: Holder) = AsMod(holder.user)
+  implicit private def asMod(holder: Holder): AsMod = AsMod(holder.user)
 
   def list =
     Secure(_.SeeReport) { implicit ctx => me =>

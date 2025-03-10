@@ -5,6 +5,7 @@ import play.api.data.Forms.{ single, text }
 
 import lila.common.Ints
 import lila.memo.SettingStore.{ Formable, StringReader }
+import reactivemongo.api.bson.BSONHandler
 
 case class ScoreThresholds(mid: Int, high: Int)
 
@@ -24,9 +25,11 @@ private object ReportThresholds {
       t => Ints(List(t.mid, t.high))
     )
 
-  implicit val scoreThresholdsBsonHandler  = lila.db.dsl.isoHandler(thresholdsIso)
-  implicit val scoreThresholdsStringReader = StringReader.fromIso(thresholdsIso)
-  implicit val scoreThresholdsFormable =
+  implicit val scoreThresholdsBsonHandler: BSONHandler[ScoreThresholds] =
+    lila.db.dsl.isoHandler(thresholdsIso)
+  implicit val scoreThresholdsStringReader: StringReader[ScoreThresholds] =
+    StringReader.fromIso(thresholdsIso)
+  implicit val scoreThresholdsFormable: Formable[ScoreThresholds] =
     new Formable[ScoreThresholds](t => Form(single("v" -> text)) fill thresholdsIso.to(t))
 
   def makeScoreSetting(store: lila.memo.SettingStore.Builder) =

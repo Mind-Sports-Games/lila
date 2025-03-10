@@ -16,7 +16,7 @@ object JSONHandlers {
       (__ \ "l").read[Int]             // loss
   )(MoveReport.apply _)
 
-  implicit private val gameReportReader = Json.reads[GameReport]
+  implicit private val gameReportReader: Reads[GameReport] = Json.reads[GameReport]
 
   implicit val reportReader: Reads[IrwinReport] = (
     (__ \ "userId").read[String] and

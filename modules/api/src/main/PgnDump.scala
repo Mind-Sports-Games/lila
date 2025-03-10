@@ -6,6 +6,7 @@ import lila.analyse.{ Analysis, Annotator }
 import lila.game.Game
 import lila.game.PgnDump.WithFlags
 import lila.team.GameTeams
+import play.api.i18n.Lang
 
 final class PgnDump(
     val dumper: lila.game.PgnDump,
@@ -15,7 +16,7 @@ final class PgnDump(
     getSwissName: lila.swiss.GetSwissName
 )(implicit ec: scala.concurrent.ExecutionContext) {
 
-  implicit private val lang = lila.i18n.defaultLang
+  implicit private val lang: Lang = lila.i18n.defaultLang
 
   def apply(
       game: Game,

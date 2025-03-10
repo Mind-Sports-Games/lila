@@ -2,6 +2,7 @@ package lila.app
 package templating
 
 import java.util.Locale
+import java.util.concurrent.ConcurrentHashMap
 import org.joda.time.format._
 import org.joda.time.format.ISODateTimeFormat
 import org.joda.time.{ DateTime, DateTimeZone, DurationFieldType, Period, PeriodType }
@@ -15,9 +16,9 @@ trait DateHelper { self: I18nHelper with StringHelper =>
   private val dateTimeStyle = "MS"
   private val dateStyle     = "M-"
 
-  private val dateTimeFormatters = mutable.AnyRefMap.empty[String, DateTimeFormatter]
-  private val dateFormatters     = mutable.AnyRefMap.empty[String, DateTimeFormatter]
-  private val periodFormatters   = mutable.AnyRefMap.empty[String, PeriodFormatter]
+  private val dateTimeFormatters = new ConcurrentHashMap[String, DateTimeFormatter]
+  private val dateFormatters     = new ConcurrentHashMap[String, DateTimeFormatter]
+  private val periodFormatters   = new ConcurrentHashMap[String, PeriodFormatter]
   private val periodType = PeriodType forFields Array(
     DurationFieldType.days,
     DurationFieldType.hours,
@@ -30,22 +31,22 @@ trait DateHelper { self: I18nHelper with StringHelper =>
   private val englishDateTimeFormatter = DateTimeFormat forStyle dateTimeStyle
 
   private def dateTimeFormatter(implicit lang: Lang): DateTimeFormatter =
-    dateTimeFormatters.getOrElseUpdate(
+    dateTimeFormatters.computeIfAbsent(
       lang.code,
-      DateTimeFormat forStyle dateTimeStyle withLocale lang.toLocale
+      _ => DateTimeFormat.forStyle(dateTimeStyle).withLocale(lang.toLocale)
     )
 
   private def dateFormatter(implicit lang: Lang): DateTimeFormatter =
-    dateFormatters.getOrElseUpdate(
+    dateFormatters.computeIfAbsent(
       lang.code,
-      DateTimeFormat forStyle dateStyle withLocale lang.toLocale
+      _ => DateTimeFormat.forStyle(dateStyle).withLocale(lang.toLocale)
     )
 
   private def periodFormatter(implicit lang: Lang): PeriodFormatter =
-    periodFormatters.getOrElseUpdate(
+    periodFormatters.computeIfAbsent(
       lang.code, {
         Locale setDefault Locale.ENGLISH
-        PeriodFormat wordBased lang.toLocale
+        _ => PeriodFormat.wordBased(lang.toLocale)
       }
     )
 

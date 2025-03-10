@@ -17,8 +17,8 @@ object UserMark {
   val indexed: Map[String, UserMark] = all.view.map { m =>
     m.key -> m
   }.toMap
-  val bannable: Set[UserMark]  = Set(Boost, Engine, Troll, Alt)
-  implicit val markBsonHandler = stringAnyValHandler[UserMark](_.key, indexed.apply)
+  val bannable: Set[UserMark]                         = Set(Boost, Engine, Troll, Alt)
+  implicit val markBsonHandler: BSONHandler[UserMark] = stringAnyValHandler[UserMark](_.key, indexed.apply)
 }
 
 case class UserMarks(value: List[UserMark]) extends AnyVal {
@@ -43,6 +43,6 @@ case class UserMarks(value: List[UserMark]) extends AnyVal {
 object UserMarks {
   val empty = UserMarks(Nil)
 
-  implicit val marksBsonHandler =
+  implicit val marksBsonHandler: BSONHandler[UserMarks] =
     implicitly[BSONHandler[List[UserMark]]].as[UserMarks](UserMarks.apply, _.value.distinct)
 }

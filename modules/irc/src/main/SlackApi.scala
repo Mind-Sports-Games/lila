@@ -21,7 +21,7 @@ final class SlackApi(
 
     private var buffer: Vector[ChargeEvent] = Vector.empty
 
-    implicit private val amountOrdering = Ordering.by[ChargeEvent, Int](_.amount)
+    implicit private val amountOrdering: Ordering[ChargeEvent] = Ordering.by[ChargeEvent, Int](_.amount)
 
     def apply(event: ChargeEvent): Funit = {
       buffer = buffer :+ event
@@ -210,14 +210,14 @@ final class SlackApi(
       )
     )
 
-  private def link(url: String, name: String)         = s"<$url|$name>"
+  private def link(url: String, name: String)              = s"<$url|$name>"
   private def playstrategyLink(path: String, name: String) = s"<https://playstrategy.org$path|$name>"
-  private def userLink(name: String): String          = playstrategyLink(s"/@/$name?mod", name)
-  private def userLink(user: User): String            = userLink(user.username)
-  private def gameLink(id: String)                    = playstrategyLink(s"/$id", s"#$id")
-  private def userNotesLink(name: String)             = playstrategyLink(s"/@/$name?notes", "notes")
-  private def broadcastLink(id: String, name: String) = playstrategyLink(s"/broadcast/-/$id", name)
-  private val chatPanicLink                           = playstrategyLink("mod/chat-panic", "Chat Panic")
+  private def userLink(name: String): String               = playstrategyLink(s"/@/$name?mod", name)
+  private def userLink(user: User): String                 = userLink(user.username)
+  private def gameLink(id: String)                         = playstrategyLink(s"/$id", s"#$id")
+  private def userNotesLink(name: String)                  = playstrategyLink(s"/@/$name?notes", "notes")
+  private def broadcastLink(id: String, name: String)      = playstrategyLink(s"/broadcast/-/$id", name)
+  private val chatPanicLink                                = playstrategyLink("mod/chat-panic", "Chat Panic")
 
   private val userRegex   = lila.common.String.atUsernameRegex.pattern
   private val userReplace = link("https://playstrategy.org/@/$1?mod", "$1")

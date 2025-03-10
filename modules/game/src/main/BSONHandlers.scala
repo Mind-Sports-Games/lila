@@ -60,25 +60,30 @@ object BSONHandlers {
 
   import lila.db.ByteArray.ByteArrayBSONHandler
 
-  implicit private[game] val checkCountWriter = new BSONWriter[chess.CheckCount] {
+  implicit private[game] val checkCountWriter: BSONWriter[chess.CheckCount] {
+    def writeTry(cc: strategygames.chess.CheckCount): scala.util.Success[reactivemongo.api.bson.BSONArray]
+  } = new BSONWriter[chess.CheckCount] {
     def writeTry(cc: chess.CheckCount) = Success(BSONArray(cc.p1, cc.p2))
   }
 
-  implicit private[game] val scoreWriter = new BSONWriter[Score] {
+  implicit private[game] val scoreWriter: BSONWriter[Score] {
+    def writeTry(sc: strategygames.Score): scala.util.Success[reactivemongo.api.bson.BSONArray]
+  } = new BSONWriter[Score] {
     def writeTry(sc: Score) = Success(BSONArray(sc.p1, sc.p2))
   }
 
-  implicit val StatusBSONHandler = tryHandler[Status](
+  implicit val StatusBSONHandler: BSONHandler[Status] = tryHandler[Status](
     { case BSONInteger(v) => Status(v) toTry s"No such status: $v" },
     x => BSONInteger(x.id)
   )
 
-  implicit private[game] val unmovedRooksHandler = tryHandler[chess.UnmovedRooks](
-    { case bin: BSONBinary => ByteArrayBSONHandler.readTry(bin) map BinaryFormat.unmovedRooks.read },
-    x => ByteArrayBSONHandler.writeTry(BinaryFormat.unmovedRooks write x).get
-  )
+  implicit private[game] val unmovedRooksHandler: BSONHandler[chess.UnmovedRooks] =
+    tryHandler[chess.UnmovedRooks](
+      { case bin: BSONBinary => ByteArrayBSONHandler.readTry(bin) map BinaryFormat.unmovedRooks.read },
+      x => ByteArrayBSONHandler.writeTry(BinaryFormat.unmovedRooks write x).get
+    )
 
-  implicit private[game] val pocketDataBSONHandler = new BSON[PocketData] {
+  implicit private[game] val pocketDataBSONHandler: BSON[PocketData] = new BSON[PocketData] {
 
     def reads(r: BSON.Reader) =
       GameLogic(r.intD("l")) match {
@@ -164,7 +169,7 @@ object BSONHandlers {
       )
   }
 
-  implicit private[game] val cubeDataBSONHandler = new BSON[CubeData] {
+  implicit private[game] val cubeDataBSONHandler: BSON[CubeData] = new BSON[CubeData] {
 
     def reads(r: BSON.Reader) =
       GameLogic(r.intD("l")) match {
@@ -190,7 +195,7 @@ object BSONHandlers {
       )
   }
 
-  implicit private[game] val gameDrawOffersHandler = tryHandler[GameDrawOffers](
+  implicit private[game] val gameDrawOffersHandler: BSONHandler[GameDrawOffers] = tryHandler[GameDrawOffers](
     { case arr: BSONArray =>
       Success(arr.values.foldLeft(GameDrawOffers.empty) {
         case (offers, BSONInteger(p)) =>
@@ -202,7 +207,7 @@ object BSONHandlers {
     offers => BSONArray((offers.p1 ++ offers.p2.map(-_)).view.map(BSONInteger.apply).toIndexedSeq)
   )
 
-  implicit private[game] val multiPointStateHandler = new BSON[MultiPointState] {
+  implicit private[game] val multiPointStateHandler: BSON[MultiPointState] = new BSON[MultiPointState] {
 
     def reads(r: BSON.Reader) =
       MultiPointState(
@@ -223,7 +228,9 @@ object BSONHandlers {
   import Player.playerBSONHandler
   private val emptyPlayerBuilder = playerBSONHandler.read($empty)
 
-  implicit private[game] val kingMovesWriter = new BSONWriter[draughts.KingMoves] {
+  implicit private[game] val kingMovesWriter: BSONWriter[draughts.KingMoves] {
+    def writeTry(km: strategygames.draughts.KingMoves): scala.util.Try[reactivemongo.api.bson.BSONArray]
+  } = new BSONWriter[draughts.KingMoves] {
     def writeTry(km: draughts.KingMoves) = Try {
       BSONArray(km.p1, km.p2, km.p1King.fold(0)(_.fieldNumber), km.p2King.fold(0)(_.fieldNumber))
     }
@@ -397,7 +404,7 @@ object BSONHandlers {
         val draughtsMetaData = defaultMetaData.copy(
           simulPairing = r intO F.simulPairing,
           timeOutUntil = r dateO F.timeOutUntil,
-          drawLimit = r intO F.drawLimit,
+          drawLimit = r intO F.drawLimit
         )
 
         (draughtsGame, draughtsMetaData)
@@ -633,7 +640,8 @@ object BSONHandlers {
                     val counts = r.intsD(F.score)
                     Score(~counts.headOption, ~counts.lastOption)
                   },
-                  multiPointState = multiPointState.map(mps => StratMultiPointState(mps.target, mps.p1Points, mps.p2Points))
+                  multiPointState =
+                    multiPointState.map(mps => StratMultiPointState(mps.target, mps.p1Points, mps.p2Points))
                 ),
                 variant = gameVariant,
                 pocketData = gameVariant.dropsVariant option (r.get[PocketData](F.pocketData)) match {
