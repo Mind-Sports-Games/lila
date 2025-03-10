@@ -4,7 +4,6 @@ import { dragNewPiece } from 'chessground/drag';
 import { eventPosition, opposite } from 'chessground/util';
 import { Rules } from 'stratops/types';
 import { parseFen } from 'stratops/fen';
-import modal from 'common/modal';
 import EditorCtrl from './ctrl';
 import chessground from './chessground';
 import { Selected, CastlingToggle, EditorState } from './interfaces';
@@ -242,42 +241,19 @@ function controls(ctrl: EditorCtrl, state: EditorState): VNode {
             h(
               'a',
               {
+                attrs: {
+                  href: '/?fen=' + state.legalFen + '#friend',
+                  rel: 'nofollow',
+                },
                 class: {
                   button: true,
                   'button-empty': true,
                   disabled: !state.playable,
                 },
-                on: {
-                  click: () => {
-                    if (state.playable) modal($('.continue-with'));
-                  },
-                },
               },
               [h('span.text', { attrs: { 'data-icon': 'U' } }, ctrl.trans.noarg('continueFromHere'))],
             ),
             studyButton(ctrl, state),
-          ]),
-          h('div.continue-with.none', [
-            h(
-              'a.button',
-              {
-                attrs: {
-                  href: '/?fen=' + state.legalFen + '#ai',
-                  rel: 'nofollow',
-                },
-              },
-              ctrl.trans.noarg('playWithTheMachine'),
-            ),
-            h(
-              'a.button',
-              {
-                attrs: {
-                  href: '/?fen=' + state.legalFen + '#friend',
-                  rel: 'nofollow',
-                },
-              },
-              ctrl.trans.noarg('playWithAFriend'),
-            ),
           ]),
         ]),
   ]);
