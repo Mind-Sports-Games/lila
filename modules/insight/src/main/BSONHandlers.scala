@@ -28,6 +28,12 @@ private object BSONHandlers {
     { case BSONInteger(v) => Phase.byId get v toTry s"Invalid phase $v" },
     e => BSONInteger(e.id)
   )
+
+  //When we originally wrote this we made LOA have the same index as Chess
+  //But we have since split all other Roles by GameFamily (not GameLogic)
+  private def roleIndex(r: Role): Int =
+    if (r.gameLogic == GameLogic.Chess()) r.gameLogic.id else r.gameFamily.id
+
   implicit val RoleBSONHandler = tryHandler[Role](
     { case BSONString(r) =>
       r.split(":") match {
@@ -42,20 +48,7 @@ private object BSONHandlers {
         case _ => sys.error("role not correctly encoded")
       }
     },
-    e =>
-      e match {
-        case Role.ChessRole(r)              => BSONString(s"0:${r.forsyth.toString}")
-        case Role.ChessPromotableRole(r)    => BSONString(s"0:${r.forsyth.toString}")
-        case Role.DraughtsRole(r)           => BSONString(s"1:${r.forsyth.toString}")
-        case Role.DraughtsPromotableRole(r) => BSONString(s"1:${r.forsyth.toString}")
-        case Role.FairySFRole(r)            => BSONString(s"${r.gameFamily.id}:${r.forsyth.toString}")
-        case Role.FairySFPromotableRole(r)  => BSONString(s"${r.gameFamily.id}:${r.forsyth.toString}")
-        case Role.SamuraiRole(r)            => BSONString(s"${r.gameFamily.id}:${r.forsyth.toString}")
-        case Role.TogyzkumalakRole(r)       => BSONString(s"${r.gameFamily.id}:${r.forsyth.toString}")
-        case Role.GoRole(r)                 => BSONString(s"${r.gameFamily.id}:${r.forsyth.toString}")
-        case Role.BackgammonRole(r)         => BSONString(s"${r.gameFamily.id}:${r.forsyth.toString}")
-        case Role.AbaloneRole(r)            => BSONString(s"${r.gameFamily.id}:${r.forsyth.toString}")
-      }
+    e => BSONString(s"${roleIndex(e)}:${e.forsyth.toString}")
   )
   implicit val TerminationBSONHandler = tryHandler[Termination](
     { case BSONInteger(v) => Termination.byId get v toTry s"Invalid termination $v" },
