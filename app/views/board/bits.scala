@@ -83,17 +83,7 @@ object bits {
       variantKey: String = "standard",
       multiPointResult: Option[MultiPointState] = None
   )(tag: Tag): Tag = {
-    // TODO: this is an excellent candidate for refactoring.
-    val libName = fen match {
-      case FEN.Chess(_)        => GameLogic.Chess().name
-      case FEN.Draughts(_)     => GameLogic.Draughts().name
-      case FEN.FairySF(_)      => GameLogic.FairySF().name
-      case FEN.Samurai(_)      => GameLogic.Samurai().name
-      case FEN.Togyzkumalak(_) => GameLogic.Togyzkumalak().name
-      case FEN.Go(_)           => GameLogic.Go().name
-      case FEN.Backgammon(_)   => GameLogic.Backgammon().name
-      case FEN.Abalone(_)      => GameLogic.Abalone().name
-    }
+    val libName   = fen.gameLogic.name
     val orient    = orientation.toString().toLowerCase()
     val boardSize = boardSizeOpt.getOrElse(Board.D100)
     val data = if (libName == "Draughts") {

@@ -349,6 +349,7 @@ object GameDiff {
           (o: Score) => o.nonEmpty ?? { BSONHandlers.scoreWriter writeOpt o }
         )
       }
+      case _ => sys.error("GameDiff not implemented for new game logic")
     }
 
     d(turns, _.turnCount, w.int)
