@@ -108,10 +108,7 @@ case class Game(
 
   def opponent(c: PlayerIndex): Player = player(!c)
 
-  lazy val naturalOrientation = variant match {
-    case Variant.Chess(strategygames.chess.variant.RacingKings) => P1
-    case _                                                      => PlayerIndex.fromP1(p1Player before p2Player)
-  }
+  lazy val naturalOrientation = P1
 
   def turnPlayerIndex = stratGame.player
 
@@ -477,7 +474,7 @@ case class Game(
 
   def playableBy(c: PlayerIndex): Boolean = playableBy(player(c))
 
-  def playableByAi: Boolean = playable && player.isAi
+  def playableByAi: Boolean = playable && (player.isAi || player.isPSBot)
 
   def mobilePushable = isCorrespondence && playable && nonAi
 
@@ -500,6 +497,38 @@ case class Game(
       p1Player = f(p1Player),
       p2Player = f(p2Player)
     )
+
+  def multiPointResult: Option[MultiPointState] =
+    metadata.multiPointState.flatMap { mps =>
+    if (finished) finalScoreMultiPointState else Some(mps)
+  }
+
+  // style "copy pasted" from a ts function
+  def finalScoreMultiPointState: Option[MultiPointState] = {
+    val points2Add: Array[Int] =
+      if (pointValue.isDefined && winner.isDefined)
+        if (winner.get.playerIndex == P1) Array(pointValue.get, 0)
+        else Array(0, pointValue.get)
+      else Array(0, 0);
+
+    if (Status.flagged.contains(status) && winner.isDefined) {
+      if (List(Status.RuleOfGin, Status.GinGammon, Status.GinBackgammon).contains(status)) {
+        if (winner.get.playerIndex == P1) {
+          if (multiPointState.get.p1Points + points2Add(0) < multiPointState.get.target) points2Add(1) += 64
+        } else {
+          if (multiPointState.get.p2Points + points2Add(1) < multiPointState.get.target) points2Add(0) += 64
+        }
+      } else {
+        if (winner.get.playerIndex == P1) points2Add(0) += 64
+        else points2Add(1) += 64
+      }
+    }
+
+    return multiPointState match {
+      case Some(m) => Some(MultiPointState(m.target, Math.min(m.target, m.p1Points + points2Add(0)), Math.min(m.target, m.p2Points + points2Add(1))))
+      case _       => None
+    }
+  }
 
   def pointValue: Option[Int] = {
     if (status == Status.ResignMatch) Some(64)
@@ -862,6 +891,8 @@ case class Game(
     }
 
   def expirable = expirableAtStart || expirableOnPaused
+
+  def playersWhoDidNotMove: List[Player] = players.filterNot { p => playerHasMoved(p.playerIndex) }
 
   def playerWhoDidNotMove: Option[Player] =
     if (!onePlayerHasMoved) player(startPlayerIndex).some
@@ -1279,9 +1310,12 @@ case class MultiPointState(target: Int, p1Points: Int = 0, p2Points: Int = 0) {
       )
     )
 
+  override def toString: String = f"${target}%02d${p1Points}%02d${p2Points}%02d"
+  def toString(p1: Boolean): String = f"${(if(p1) p1Points else p2Points)}%02d"
 }
 
 object MultiPointState {
+  var noDataChar = "-"
 
   def apply(points: Option[Int]): Option[MultiPointState] = points.filter(_ != 1).map(p => MultiPointState(p))
 

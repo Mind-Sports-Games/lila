@@ -9,5 +9,6 @@
     "composite": true,
     "incremental": true
   },
-  "isolatedModules": true
+  "isolatedModules": true,
+  "references": [{ "path": "../game/tsconfig.json" }]
 }

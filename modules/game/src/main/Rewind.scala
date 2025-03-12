@@ -19,7 +19,7 @@ object Rewind {
   //takeback
   def apply(game: Game, initialFen: Option[FEN], rewindPly: Boolean): Validated[String, Progress] =
     (game.variant.gameLogic match {
-      case GameLogic.Chess() | GameLogic.Draughts() =>
+      case GameLogic.Chess() | GameLogic.Draughts() | GameLogic.Dameo() =>
         Reader
           .replayResultFromActionStrsUsingSan(
             game.variant.gameLogic,
@@ -28,8 +28,7 @@ object Rewind {
             op = sans => Sans(sans.value.dropRight(1)),
             tags = createTags(initialFen, game)
           )
-      case GameLogic.FairySF() | GameLogic.Samurai() | GameLogic.Togyzkumalak() | GameLogic.Go() |
-          GameLogic.Backgammon() | GameLogic.Abalone() =>
+      case _ =>
         Reader
           .replayResultFromActionStrs(
             game.variant.gameLogic,

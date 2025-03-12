@@ -23,7 +23,7 @@ playstrategy.movetimeChart = function (data, trans) {
 
             var fillColor = Highcharts.theme.playstrategy.area.white;
             var negativeFillColor = Highcharts.theme.playstrategy.area.black;
-            var oppositeColorVariants = ['flipello', 'flipello10', 'shogi', 'minishogi', 'abalone'];
+            var oppositeColorVariants = ['flipello', 'flipello10', 'shogi', 'minishogi', 'abalone', 'linesOfAction'];
             if (
               oppositeColorVariants.find(function (k) {
                 return k == data.game.variant.key;

@@ -61,7 +61,8 @@
       "src/appeal.ts",
       "src/publicChats.ts",
       "src/contact.ts",
-      "src/coordinate.ts"
+      "src/coordinate.ts",
+      "src/memory.ts"
     ],
     "sync": {
       "../../node_modules/chessground/dist/chessground.min.js": "public/npm",

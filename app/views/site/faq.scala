@@ -188,7 +188,7 @@ object faq {
           whatIsInputRating.txt(),
           p(
             inputRatingExplanation(
-              a(href := routes.Page.loneBookmark("handicaps"))(handicappedTournament())
+              a(href := routes.Page.lonePage("handicaps"))(handicappedTournament())
             )
           )
         ),

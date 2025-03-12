@@ -306,7 +306,7 @@ object home {
         "To do this the initial starting fen is changed to reflect the strength difference between the two players.",
         br,
         "For more information see our ",
-        a(href := routes.Page.loneBookmark("handicaps"))("handicaps page.")
+        a(href := routes.Page.lonePage("handicaps"))("handicaps page.")
       )
     ),
     div(cls := "faq", id := "mcmahon")(

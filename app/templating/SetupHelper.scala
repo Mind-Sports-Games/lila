@@ -92,6 +92,14 @@ trait SetupHelper { self: I18nHelper =>
       (TimeMode.Unlimited.id.toString, trans.unlimited.txt(), none)
     )
 
+  def translatedTimeModeChoicesLive(implicit lang: Lang) =
+    List(
+      (TimeMode.FischerClock.id.toString, trans.realTime.txt(), none),
+      (TimeMode.ByoyomiClock.id.toString, trans.byoyomiTime.txt(), none),
+      (TimeMode.BronsteinDelayClock.id.toString, trans.bronsteinDelay.txt(), none),
+      (TimeMode.SimpleDelayClock.id.toString, trans.simpleDelay.txt(), none)
+    )
+
   val goHandicapChoices: List[SelectChoice] = {
     (0 to 9).toList map { s =>
       (s.toString, s.toString, none)
@@ -242,6 +250,15 @@ trait SetupHelper { self: I18nHelper =>
   def translatedVariantChoicesWithVariantsAndFen(implicit
       lang: Lang
   ): List[(SelectChoice, List[SelectChoice])] =
+    GameFamily.all.map(gf =>
+      (
+        translatedGameFamilyChoice(gf),
+        translatedVariantChoicesWithVariantsByGameFamily(gf, encodeId) :::
+          gf.variants.filter(_.fromPositionVariant).map(variantTupleId)
+      )
+    )
+
+  def translatedGreedyFourMoveChoices(implicit lang: Lang): List[(SelectChoice, List[SelectChoice])] =
     GameFamily.all.map(gf =>
       (
         translatedGameFamilyChoice(gf),

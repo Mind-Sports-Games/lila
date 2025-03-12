@@ -1302,10 +1302,6 @@ object Quote {
       new Quote("Chess is beautiful enough to waste your life for.", "Hans Ree"),
       new Quote("Chess is eminently and emphatically the philosopher's game.", "Paul Morphy"),
       new Quote(
-        "Chess is far too complex to be definitively solved with any technology we can conceive of today. However, our looked-down-upon cousin, checkers, or draughts, suffered this fate quite recently thanks to the work of Jonathan Schaeffer at the University of Alberta and his unbeatable program Chinook.",
-        "Garry Kasparov"
-      ),
-      new Quote(
         "Chess is infinite, and one has to make only one ill-considered move, and one`s opponent`s wildest dreams will become reality.",
         "David Bronstein"
       ),

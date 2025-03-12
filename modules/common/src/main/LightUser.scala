@@ -63,7 +63,6 @@ object LightUser {
     LightUser("pst-greedy-tom", "PST-Greedy-Tom", "_playstrategy".some, "BOT".some, false)
   )
 
-  //TODO add stockfish bots when available
   val poolBots: List[LightUser] = List(
     LightUser("ps-greedy-one-move", "PS-Greedy-One-Move", "_playstrategy".some, "BOT".some, false),
     LightUser("ps-greedy-two-move", "PS-Greedy-Two-Move", "_playstrategy".some, "BOT".some, false),
@@ -71,12 +70,25 @@ object LightUser {
     //LightUser("bot1", "bot1", "_playstrategy".some, "BOT".some, false)
   )
 
+  val stockfishBots: List[LightUser] = List(
+    LightUser("stockfish-level1", "Stockfish-Level1", "_playstrategy".some, "BOT".some, false),
+    LightUser("stockfish-level2", "Stockfish-Level2", "_playstrategy".some, "BOT".some, false),
+    LightUser("stockfish-level3", "Stockfish-Level3", "_playstrategy".some, "BOT".some, false),
+    LightUser("stockfish-level4", "Stockfish-Level4", "_playstrategy".some, "BOT".some, false),
+    LightUser("stockfish-level5", "Stockfish-Level5", "_playstrategy".some, "BOT".some, false),
+    LightUser("stockfish-level6", "Stockfish-Level6", "_playstrategy".some, "BOT".some, false),
+    LightUser("stockfish-level7", "Stockfish-Level7", "_playstrategy".some, "BOT".some, false),
+    LightUser("stockfish-level8", "Stockfish-Level8", "_playstrategy".some, "BOT".some, false)
+  )
+
   val tourBotsIDs: List[UserID] = tourBots.map(_.id)
 
   val poolBotsIDs: List[UserID] = poolBots.map(_.id)
 
+  val stockfishBotsIDs: List[UserID] = stockfishBots.map(_.id)
+
   val easiestPoolBotId: UserID = "ps-greedy-one-move"
 
-  val psBotsIDs = tourBotsIDs ++ poolBotsIDs
+  val psBotsIDs = tourBotsIDs ++ poolBotsIDs ++ stockfishBotsIDs
 
 }

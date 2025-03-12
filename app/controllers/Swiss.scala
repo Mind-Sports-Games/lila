@@ -37,13 +37,14 @@ final class Swiss(
               verdicts <- env.swiss.api.verdicts(swiss, ctx.me)
               version  <- env.swiss.version(swiss.id)
               isInTeam <- isCtxInTheTeam(swiss.teamId)
+              playerInfo <- get("playerInfo").?? { env.swiss.api.playerInfo(swiss, _) }
               json <- env.swiss.json(
                 swiss = swiss,
                 me = ctx.me,
                 verdicts = verdicts,
                 reqPage = page,
                 socketVersion = version.some,
-                playerInfo = none,
+                playerInfo = playerInfo,
                 isInTeam = isInTeam
               )
               canChat <- canHaveChat(swiss)
@@ -249,9 +250,15 @@ final class Swiss(
   def player(id: String, userId: String) =
     Action.async {
       WithSwiss(id) { swiss =>
-        env.swiss.api.playerInfo(swiss, userId) flatMap {
-          _.fold(notFoundJson()) { player =>
-            JsonOk(fuccess(lila.swiss.SwissJson.playerJsonExt(swiss, player)))
+        env.swiss.api.playerInfo(swiss, userId).flatMap {
+          _.fold(notFoundJson()) { playerView =>
+            env.swiss.api.playerToPairingGames(playerView).flatMap { pairingsWithGames =>
+              JsonOk(fuccess(lila.swiss.SwissJson.playerJsonExt(
+                swiss,
+                playerView,
+                swiss.settings.isMultiPoint option pairingsWithGames
+              )))
+            }
           }
         }
       }

@@ -30,7 +30,7 @@ Proxy detection done with [IP2Proxy database](https://www.ip2location.com/databa
 
 See [playstrategy.org/source](https://playstrategy.org/source) for a list of repositories.
 
-Join us on discord for more info (coming soon...).
+Join us on [discord](https://discord.gg/bVRQzgSbPq) for more info.
 Use [GitHub issues](https://github.com/Mind-Sports-Games/lila/issues) for bug reports and feature requests.
 
 ## Installation

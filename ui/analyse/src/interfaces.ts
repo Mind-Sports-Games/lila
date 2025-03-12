@@ -112,6 +112,7 @@ export interface Game {
   opening?: Opening;
   perf: string;
   rated?: boolean;
+  pointValue?: number;
 }
 
 export interface Opening {

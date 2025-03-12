@@ -2,11 +2,17 @@ import * as domData from './data';
 import { readDice, fenPlayerIndex, readDoublingCube } from 'stratutils';
 
 export const init = (node: HTMLElement): void => {
-  const [fen, orientation, lm] = node.getAttribute('data-state')!.split('|');
-  initWith(node, fen, orientation as Orientation, lm);
+  const [fen, orientation, lm, multiPointState] = node.getAttribute('data-state')!.split('|');
+  initWith(node, fen, orientation as Orientation, lm, multiPointState);
 };
 
-export const initWith = (node: HTMLElement, fen: string, orientation: Orientation, lm?: string): void => {
+export const initWith = (
+  node: HTMLElement,
+  fen: string,
+  orientation: Orientation,
+  lm?: string,
+  multiPointState?: string,
+): void => {
   if (!window.Chessground || !window.Draughtsground) setTimeout(() => init(node), 500);
   else {
     const $el = $(node);
@@ -90,6 +96,13 @@ export const initWith = (node: HTMLElement, fen: string, orientation: Orientatio
                                       ? { width: 9, height: 9 }
                                       : { width: 8, height: 8 },
           variant: variantFromElement($el),
+          ...(multiPointState?.length === 6 && {
+            multiPointState: {
+              target: parseInt(multiPointState.substring(0, 2)),
+              p1: parseInt(multiPointState.substring(2, 4)),
+              p2: parseInt(multiPointState.substring(4, 6)),
+            },
+          }),
         }),
       );
     }

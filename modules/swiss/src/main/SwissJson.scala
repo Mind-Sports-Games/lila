@@ -13,7 +13,7 @@ import scala.concurrent.ExecutionContext
 
 import lila.common.{ GreatPlayer, LightUser }
 import lila.db.dsl._
-import lila.game.Game
+import lila.game.{ Game, MultiPointState }
 import lila.game.Handicaps.goRatingDisplay
 import lila.quote.Quote
 import lila.quote.Quote.quoteWriter
@@ -28,7 +28,8 @@ final class SwissJson(
     boardApi: SwissBoardApi,
     statsApi: SwissStatsApi,
     userRepo: UserRepo,
-    lightUserApi: lila.user.LightUserApi
+    lightUserApi: lila.user.LightUserApi,
+    swissApi: SwissApi,
 )(implicit ec: ExecutionContext) {
 
   import SwissJson._
@@ -54,6 +55,7 @@ final class SwissJson(
       standing <- standingApi(swiss, page)
       podium   <- podiumJson(swiss)
       boards   <- boardApi(swiss.id)
+      player   <- playerJson(swiss, playerInfo)
       stats    <- statsApi(swiss)
     } yield swissJsonBase(swiss) ++ Json
       .obj(
@@ -65,18 +67,18 @@ final class SwissJson(
         },
         "standing" -> standing,
         "boards"   -> boards.map(boardJson)
-      )
-      .add("me" -> myInfo.map(myInfoJson))
-      .add("joinTeam" -> (!isInTeam).option(swiss.teamId))
-      .add("socketVersion" -> socketVersion.map(_.value))
-      .add("playerInfo" -> playerInfo.map { playerJsonExt(swiss, _) })
-      .add("podium" -> podium)
-      .add("isRecentlyFinished" -> swiss.isRecentlyFinished)
-      .add("password" -> swiss.settings.password.isDefined)
-      .add("stats" -> stats)
-      .add("greatPlayer" -> GreatPlayer.wikiUrl(swiss.name).map { url =>
-        Json.obj("name" -> swiss.name, "url" -> url)
-      })
+      ) ++ Json.obj(
+    "me" -> myInfo.map(myInfoJson),
+    "joinTeam" -> (!isInTeam).option(swiss.teamId),
+    "socketVersion" -> socketVersion.map(_.value),
+    "playerInfo" -> player,
+    "podium" -> podium,
+    "isRecentlyFinished" -> swiss.isRecentlyFinished,
+    "password" -> swiss.settings.password.isDefined,
+    "stats" -> stats,
+    "greatPlayer" -> GreatPlayer.wikiUrl(swiss.name).map { url =>
+      Json.obj("name" -> swiss.name, "url" -> url)
+    })
   }.monSuccess(_.swiss.json)
 
   def fetchMyInfo(swiss: Swiss, me: User): Fu[Option[MyInfo]] =
@@ -152,6 +154,13 @@ final class SwissJson(
             ).some
           }
         }
+      }
+    }
+
+  private def playerJson(swiss: Swiss, playerInfo: Option[SwissPlayer.ViewExt]): Fu[Option[JsObject]] =
+    playerInfo.fold[Fu[Option[JsObject]]](fuccess(None)) { playerView =>
+      swissApi.playerToPairingGames(playerView).flatMap { pairingsWithGames =>
+        fuccess(Some(playerJsonExt(swiss, playerView, swiss.settings.isMultiPoint option pairingsWithGames)))
       }
     }
 
@@ -241,29 +250,72 @@ object SwissJson {
       ))
     )
 
-  def playerJsonExt(swiss: Swiss, view: SwissPlayer.ViewExt): JsObject =
-    playerJsonBase(view, performance = true) ++ Json
-      .obj(
-        "sheet" -> swiss.allRounds
-          .zip(view.sheet.outcomes)
-          .reverse
-          .map { case (round, outcome) =>
-            view.pairings.get(round).fold[JsValue](JsString(outcomeJson(outcome))) { p =>
-              pairingJson(view.player, p.pairing) ++
-                Json.obj(
-                  "user"        -> p.player.user,
-                  "rating"      -> p.player.player.rating,
-                  "inputRating" -> p.player.player.inputRating,
-                  "ratingDisplay" -> (swiss.variant.gameFamily == GameFamily
-                    .Go() && (swiss.settings.handicapped || swiss.settings.mcmahon)) ?? p.player.player.inputRating
-                    .map(goRatingDisplay(_))
-                )
-            }
+  private def commonPlayerJsonExt(swiss: Swiss, playerView: SwissPlayer.ViewExt): JsObject =
+    playerJsonBase(playerView, performance = true) ++ Json.obj(
+      "sheet" -> swiss.allRounds
+        .zip(playerView.sheet.outcomes)
+        .reverse
+        .map { case (round, outcome) =>
+          playerView.pairings.get(round).fold[JsValue](JsString(outcomeJson(outcome))) { p =>
+            pairingJson(playerView.player, p.pairing) ++
+              Json.obj(
+                "user"        -> p.player.user,
+                "rating"      -> p.player.player.rating,
+                "inputRating" -> p.player.player.inputRating,
+                "ratingDisplay" -> (swiss.variant.gameFamily == GameFamily
+                  .Go() && (swiss.settings.handicapped || swiss.settings.mcmahon)) ?? p.player.player.inputRating
+                  .map(goRatingDisplay(_))
+              )
           }
-      ) ++ Json.obj(
-      "mmStartingScore" -> (swiss.settings.mcmahon ?? view.player.mcMahonStartingScore(
+        }
+    ) ++ Json.obj(
+      "mmStartingScore" -> (swiss.settings.mcmahon ?? playerView.player.mcMahonStartingScore(
         swiss.settings.mcmahonCutoffGrade
       ))
+    )
+
+  def playerJsonExt(swiss: Swiss, playerView: SwissPlayer.ViewExt, pairingsWithGames: Option[Seq[SwissPairingGames]] = None): JsObject =
+    commonPlayerJsonExt(swiss, playerView) ++ Json.obj(
+      "multiPoint" -> pairingsWithGames.map(multiPointResultsJson)
+    )
+
+  private def multiPointResultsJson(swissPairingGames: Seq[SwissPairingGames]) =
+    JsArray(
+      swissPairingGames.flatMap {
+        pairingGame => Seq(
+          Json.obj(
+            "target" -> pairingGame.game.metadata.multiPointState.fold(0)(_.target),
+            "players" -> Json.obj(
+              "p1" -> Json.obj(
+                "userId" -> pairingGame.game.p1Player.userId,
+              ),
+              "p2" -> Json.obj(
+                "userId" -> pairingGame.game.p2Player.userId,
+              )
+            ),
+            "games" -> JsArray(
+                pairingGame.multiMatchGames.toList.flatten.reverse.map { game => 
+                    Json.obj(
+                      "id"        -> game.id,
+                      "p1UserId"  -> game.p1Player.userId,
+                      "startingScore" -> Json.obj(
+                        "p1" -> game.multiPointResult.fold(0)(_.p1Points),
+                        "p2" -> game.multiPointResult.fold(0)(_.p2Points),
+                      )
+                    )
+                } :+
+                Json.obj(
+                  "id"        -> pairingGame.game.id,
+                  "p1UserId"  -> pairingGame.game.p1Player.userId,
+                  "startingScore" -> Json.obj(
+                    "p1" -> pairingGame.game.multiPointResult.fold(0)(_.p1Points),
+                    "p2" -> pairingGame.game.multiPointResult.fold(0)(_.p2Points),
+                  )
+                )
+            )
+          )
+        )
+      }
     )
 
   private def playerJsonBase(
@@ -388,6 +440,7 @@ object SwissJson {
           )
         }
       )
+      .add("multiPointScore" -> multiPointScoreJson(g))
 
   private[swiss] def boardPlayerFromGame(g: Game, b: SwissBoard, playerIndex: PlayerIndex) =
     if (playerIndex == P1)
@@ -399,6 +452,7 @@ object SwissJson {
   private[swiss] def multiPointScoreJson(g: Game) =
     g.metadata.multiPointState.map { mps =>
       Json.obj(
+        "target" -> mps.target,
         "p1" -> mps.p1Points,
         "p2" -> mps.p2Points
       )
@@ -416,7 +470,6 @@ object SwissJson {
           l.map(g =>
             boardGameJson(g, boardPlayerFromGame(g, b.board, P1), boardPlayerFromGame(g, b.board, P2))
               .add("boardSize" -> boardSizeJson(g.variant))
-              .add("multiPointScore" -> multiPointScoreJson(g))
           )
         )
       )

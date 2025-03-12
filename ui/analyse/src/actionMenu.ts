@@ -1,5 +1,4 @@
 import { isEmpty } from 'common';
-import modal from 'common/modal';
 import { h, VNode, Hooks } from 'snabbdom';
 import { MaybeVNodes } from './interfaces';
 import { AutoplayDelay } from './autoplay';
@@ -207,8 +206,13 @@ export function view(ctrl: AnalyseCtrl): VNode {
         ? h(
             'a.button.button-empty',
             {
-              hook: bind('click', _ => modal($('.continue-with.g_' + d.game.id))),
-              attrs: dataIcon('U'),
+              attrs: {
+                href: d.userAnalysis
+                  ? '/?fen=' + ctrl.encodeNodeFen() + '#friend'
+                  : contRoute(d, 'friend') + '?fen=' + ctrl.node.fen,
+                rel: 'nofollow',
+                'data-icon': 'U',
+              },
             },
             noarg('continueFromHere'),
           )
@@ -366,37 +370,7 @@ export function view(ctrl: AnalyseCtrl): VNode {
       .concat(notationConfig)
       .concat(cevalConfig)
       .concat(ctrl.mainline.length > 4 ? [h('h2', noarg('replayMode')), autoplayButtons(ctrl)] : [])
-      .concat([
-        deleteButton(ctrl, ctrl.opts.userId),
-        canContinue
-          ? h('div.continue-with.none.g_' + d.game.id, [
-              h(
-                'a.button',
-                {
-                  attrs: {
-                    href: d.userAnalysis
-                      ? '/?fen=' + ctrl.encodeNodeFen() + '#ai'
-                      : contRoute(d, 'ai') + '?fen=' + ctrl.node.fen,
-                    rel: 'nofollow',
-                  },
-                },
-                noarg('playWithTheMachine'),
-              ),
-              h(
-                'a.button',
-                {
-                  attrs: {
-                    href: d.userAnalysis
-                      ? '/?fen=' + ctrl.encodeNodeFen() + '#friend'
-                      : contRoute(d, 'friend') + '?fen=' + ctrl.node.fen,
-                    rel: 'nofollow',
-                  },
-                },
-                noarg('playWithAFriend'),
-              ),
-            ])
-          : null,
-      ]),
+      .concat(deleteButton(ctrl, ctrl.opts.userId)),
   );
 }
 

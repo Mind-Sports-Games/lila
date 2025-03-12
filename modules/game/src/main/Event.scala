@@ -32,6 +32,7 @@ import strategygames.{
 import strategygames.chess
 import strategygames.variant.Variant
 import strategygames.format.Forsyth
+import strategygames.format.pgn.Dumper
 import JsonView._
 import lila.chat.{ PlayerLine, UserLine }
 import lila.common.ApiVersion
@@ -198,15 +199,7 @@ object Event {
         gf = situation.board.variant.gameFamily,
         orig = move.orig,
         dest = move.dest,
-        san = move match {
-          case StratMove.Chess(move)        => strategygames.chess.format.pgn.Dumper(move)
-          case StratMove.Draughts(move)     => strategygames.draughts.format.pdn.Dumper(move)
-          case StratMove.FairySF(move)      => strategygames.fairysf.format.pgn.Dumper(move)
-          case StratMove.Samurai(move)      => strategygames.samurai.format.pgn.Dumper(move)
-          case StratMove.Togyzkumalak(move) => strategygames.togyzkumalak.format.pgn.Dumper(move)
-          case StratMove.Backgammon(move)   => strategygames.backgammon.format.pgn.Dumper(move)
-          case StratMove.Abalone(move)      => strategygames.abalone.format.pgn.Dumper(move)
-        },
+        san = Dumper(situation.board.variant.gameLogic, move),
         fen =
           if (
             situation.board.variant.gameLogic == GameLogic
@@ -1205,22 +1198,12 @@ object Event {
   }
 
   case class Promotion(role: PromotableRole, pos: Pos) extends Event {
-    private val lib = pos match {
-      case Pos.Chess(_)        => GameLogic.Chess().id
-      case Pos.Draughts(_)     => GameLogic.Draughts().id
-      case Pos.FairySF(_)      => GameLogic.FairySF().id
-      case Pos.Samurai(_)      => GameLogic.Samurai().id
-      case Pos.Togyzkumalak(_) => GameLogic.Togyzkumalak().id
-      case Pos.Go(_)           => GameLogic.Go().id
-      case Pos.Backgammon(_)   => GameLogic.Backgammon().id
-      case Pos.Abalone(_)      => GameLogic.Abalone().id
-    }
     def typ = "promotion"
     def data =
       Json.obj(
         "key"        -> pos.key,
         "pieceClass" -> role.groundName,
-        "lib"        -> lib
+        "lib"        -> pos.gameLogic.id
       )
   }
 
