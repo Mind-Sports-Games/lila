@@ -1,6 +1,7 @@
 package lila.report
 
 import lila.user.Holder
+import lila.common.Iso
 
 sealed trait Reason {
 
@@ -31,7 +32,8 @@ object Reason {
     (v.key, v)
   } toMap
 
-  implicit val reasonIso = lila.common.Iso[String, Reason](k => byKey.getOrElse(k, Other), _.key)
+  implicit val reasonIso: Iso[String, Reason] =
+    lila.common.Iso[String, Reason](k => byKey.getOrElse(k, Other), _.key)
 
   def apply(key: String): Option[Reason] = byKey get key
 

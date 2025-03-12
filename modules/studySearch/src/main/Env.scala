@@ -19,7 +19,8 @@ final class Env(
     makeClient: Index => ESClient
 )(implicit
     ec: scala.concurrent.ExecutionContext,
-    system: ActorSystem,
+    system: akka.actor.ActorSystem,
+    scheduler: akka.actor.Scheduler,
     mat: akka.stream.Materializer
 ) {
 

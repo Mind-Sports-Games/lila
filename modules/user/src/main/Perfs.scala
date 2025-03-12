@@ -134,7 +134,8 @@ case class Perfs(
     }
   }
 
-  implicit private val ratingOrdering = Ordering.by[(PerfType, Perf), Int](_._2.intRating)
+  implicit private val ratingOrdering: Ordering[(PerfType, Perf)] =
+    Ordering.by[(PerfType, Perf), Int](_._2.intRating)
 
   def bestPerfs(nb: Int): List[(PerfType, Perf)] = {
     val ps = PerfType.nonPuzzle map { pt =>
@@ -414,7 +415,7 @@ case object Perfs {
 
   val perfsBSONHandler = new BSON[Perfs] {
 
-    implicit def perfHandler = Perf.perfBSONHandler
+    implicit def perfHandler: BSON[Perf] = Perf.perfBSONHandler
 
     def reads(r: BSON.Reader): Perfs = {
       @inline def perf(key: String) = r.getO[Perf](key) getOrElse Perf.default
@@ -477,7 +478,7 @@ case object Perfs {
 
     private def notNew(p: Perf): Option[Perf] = p.nonEmpty option p
 
-def writes(w: BSON.Writer, o: Perfs) =
+    def writes(w: BSON.Writer, o: Perfs) =
       reactivemongo.api.bson.BSONDocument(
         "standard"               -> notNew(o.standard),
         "chess960"               -> notNew(o.chess960),

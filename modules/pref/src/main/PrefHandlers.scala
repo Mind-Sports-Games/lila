@@ -10,7 +10,7 @@ import scala.util.{ Success }
 
 private object PrefHandlers {
 
-  implicit private[pref] val pieceSetBSONHandler = new BSON[PieceSet] {
+  implicit private[pref] val pieceSetBSONHandler: BSON[PieceSet] = new BSON[PieceSet] {
 
     def reads(r: BSON.Reader) = new PieceSet(r.str("name"), r.int("gameFamily"))
 
@@ -21,7 +21,7 @@ private object PrefHandlers {
       )
   }
 
-  implicit private[pref] val themeBSONHandler = new BSON[Theme] {
+  implicit private[pref] val themeBSONHandler: BSON[Theme] = new BSON[Theme] {
 
     def reads(r: BSON.Reader) = Theme.apply(r.str("name"), r.int("gameFamily"))
 
@@ -32,7 +32,7 @@ private object PrefHandlers {
       )
   }
 
-  implicit val prefBSONHandler = new BSON[Pref] {
+  implicit val prefBSONHandler: BSON[Pref] = new BSON[Pref] {
 
     def reads(r: BSON.Reader): Pref =
       Pref(

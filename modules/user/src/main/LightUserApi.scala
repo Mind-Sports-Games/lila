@@ -53,7 +53,7 @@ final class LightUserApi(
 
 private object LightUserApi {
 
-  implicit val lightUserBSONReader = new BSONDocumentReader[LightUser] {
+  implicit val lightUserBSONReader: BSONDocumentReader[LightUser] = new BSONDocumentReader[LightUser] {
 
     def readDocument(doc: BSONDocument) = for {
       id   <- doc.getAsTry[String](F.id)

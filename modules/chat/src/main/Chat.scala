@@ -2,6 +2,7 @@ package lila.chat
 
 import lila.hub.actorApi.shutup.PublicSource
 import lila.user.User
+import reactivemongo.api.bson.BSONHandler
 
 sealed trait AnyChat {
   def id: Chat.Id
@@ -120,10 +121,10 @@ object Chat {
   import reactivemongo.api.bson.BSONDocument
   import Line.{ lineBSONHandler, userLineBSONHandler }
 
-  implicit val chatIdIso         = lila.common.Iso.string[Id](Id.apply, _.value)
-  implicit val chatIdBSONHandler = lila.db.BSON.stringIsoHandler(chatIdIso)
+  implicit val chatIdIso: lila.common.Iso[String, Id] = lila.common.Iso.string[Id](Id.apply, _.value)
+  implicit val chatIdBSONHandler: BSONHandler[Id]     = lila.db.BSON.stringIsoHandler(chatIdIso)
 
-  implicit val mixedChatBSONHandler = new BSON[MixedChat] {
+  implicit val mixedChatBSONHandler: BSON[MixedChat] = new BSON[MixedChat] {
     def reads(r: BSON.Reader): MixedChat = {
       MixedChat(
         id = r.get[Id](id),
@@ -137,7 +138,7 @@ object Chat {
       )
   }
 
-  implicit val userChatBSONHandler = new BSON[UserChat] {
+  implicit val userChatBSONHandler: BSON[UserChat] = new BSON[UserChat] {
     def reads(r: BSON.Reader): UserChat = {
       UserChat(
         id = r.get[Id](id),

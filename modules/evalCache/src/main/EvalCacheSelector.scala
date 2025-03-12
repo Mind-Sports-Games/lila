@@ -9,7 +9,7 @@ object EvalCacheSelector {
 
   private type Evals = List[Eval]
 
-  implicit private val order = Ordering.Double.TotalOrdering
+  implicit private val order: Ordering[Double] = Ordering.Double.TotalOrdering
 
   def apply(evals: Evals): Evals =
     // first, let us group evals by multiPv

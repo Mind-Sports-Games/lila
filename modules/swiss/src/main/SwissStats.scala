@@ -5,6 +5,7 @@ import reactivemongo.api.bson.Macros
 import scala.concurrent.duration._
 
 import lila.db.dsl._
+import reactivemongo.api.bson.BSONDocumentHandler
 
 case class SwissStats(
     games: Int = 0,
@@ -30,7 +31,7 @@ final class SwissStatsApi(
   def apply(swiss: Swiss): Fu[Option[SwissStats]] =
     swiss.isFinished ?? cache.get(swiss.id).dmap(some).dmap(_.filter(_.games > 0))
 
-  implicit private val statsBSONHandler = Macros.handler[SwissStats]
+  implicit private val statsBSONHandler: BSONDocumentHandler[SwissStats] = Macros.handler[SwissStats]
 
   private val cache = mongoCache[Swiss.Id, SwissStats](
     64,

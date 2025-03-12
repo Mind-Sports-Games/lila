@@ -1,6 +1,5 @@
 package lila.common
 
-import akka.actor._
 import scala.concurrent.duration._
 
 object ResilientScheduler {
@@ -12,16 +11,16 @@ object ResilientScheduler {
       every: Every,
       atMost: AtMost,
       initialDelay: FiniteDuration
-  )(f: => Funit)(implicit ec: scala.concurrent.ExecutionContext, system: ActorSystem): Unit = {
+  )(f: => Funit)(implicit ec: scala.concurrent.ExecutionContext, scheduler: akka.actor.Scheduler): Unit = {
     val run = () => f
     def runAndScheduleNext(): Unit =
       run()
         .withTimeout(atMost.value)
         .addEffectAnyway {
-          system.scheduler.scheduleOnce(every.value) { runAndScheduleNext() }.unit
+          scheduler.scheduleOnce(every.value) { runAndScheduleNext() }.unit
         }
         .unit
-    system.scheduler
+    scheduler
       .scheduleOnce(initialDelay) {
         runAndScheduleNext()
       }

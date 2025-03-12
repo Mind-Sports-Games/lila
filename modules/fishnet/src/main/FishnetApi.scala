@@ -22,7 +22,7 @@ final class FishnetApi(
     config: FishnetApi.Config
 )(implicit
     ec: scala.concurrent.ExecutionContext,
-    system: akka.actor.ActorSystem
+    scheduler: akka.actor.Scheduler
 ) {
 
   import FishnetApi._

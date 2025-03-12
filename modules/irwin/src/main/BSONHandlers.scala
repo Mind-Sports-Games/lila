@@ -9,7 +9,7 @@ object BSONHandlers {
 
   import IrwinReport._
 
-  implicit private val MoveReportBSONHandler = new BSON[MoveReport] {
+  implicit private val MoveReportBSONHandler: BSON[MoveReport] = new BSON[MoveReport] {
 
     private val activation = "a"
     private val rank       = "r"
@@ -36,8 +36,8 @@ object BSONHandlers {
       )
   }
 
-  implicit private val GameReportBSONHandler = Macros.handler[GameReport]
+  implicit private val GameReportBSONHandler: BSONDocumentHandler[GameReport] = Macros.handler[GameReport]
   // private implicit val PvBSONHandler = nullableHandler[Int, BSONInteger]
   // private implicit val ReporterIdBSONHandler = stringIsoHandler[ReporterId](ReporterId.reporterIdIso)
-  implicit val ReportBSONHandler = Macros.handler[IrwinReport]
+  implicit val ReportBSONHandler: BSONDocumentHandler[IrwinReport] = Macros.handler[IrwinReport]
 }

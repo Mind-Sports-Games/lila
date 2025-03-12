@@ -55,19 +55,19 @@ object Iso {
 
   implicit val stringIsoIdentity: Iso[String, String] = isoIdentity[String]
 
-  implicit val ipAddressIso = string[IpAddress](IpAddress.unchecked, _.value)
+  implicit val ipAddressIso: Iso[String, IpAddress] = string[IpAddress](IpAddress.unchecked, _.value)
 
-  implicit val emailAddressIso = string[EmailAddress](EmailAddress.apply, _.value)
+  implicit val emailAddressIso: Iso[String, EmailAddress] = string[EmailAddress](EmailAddress.apply, _.value)
 
-  implicit val normalizedEmailAddressIso =
+  implicit val normalizedEmailAddressIso: Iso[String, NormalizedEmailAddress] =
     string[NormalizedEmailAddress](NormalizedEmailAddress.apply, _.value)
 
-  implicit val centisIso = int[Centis](Centis.apply, _.centis)
+  implicit val centisIso: Iso[Int, Centis] = int[Centis](Centis.apply, _.centis)
 
-  implicit val langIso = string[Lang](Lang.apply, _.toString)
+  implicit val langIso: Iso[String, Lang] = string[Lang](Lang.apply, _.toString)
 
-  implicit val fenIso      = string[FEN](FEN.apply, _.value)
-  implicit val stratFenIso = string[StratFEN](f => StratFEN.wrap(FEN(f)), _.value)
+  implicit val fenIso: Iso[String, FEN]           = string[FEN](FEN.apply, _.value)
+  implicit val stratFenIso: Iso[String, StratFEN] = string[StratFEN](f => StratFEN.wrap(FEN(f)), _.value)
   //implicit val StratFENHandler: BSONHandler[StratFEN] = stringAnyValHandler[StratFEN](_.value, f => StratFEN.wrap(FEN(f)))
 
 }

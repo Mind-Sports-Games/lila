@@ -10,6 +10,7 @@ import strategygames.GameLogic
 import lila.db.dsl._
 import Schedule.{ Freq, Speed }
 import lila.user.User
+import reactivemongo.api.bson.BSONDocumentHandler
 
 case class Winner(
     tourId: String,
@@ -111,9 +112,12 @@ final class WinnersApi(
 )(implicit ec: scala.concurrent.ExecutionContext) {
 
   import BSONHandlers._
-  implicit private val WinnerHandler      = reactivemongo.api.bson.Macros.handler[Winner]
-  implicit private val FreqWinnersHandler = reactivemongo.api.bson.Macros.handler[FreqWinners]
-  implicit private val AllWinnersHandler  = reactivemongo.api.bson.Macros.handler[AllWinners]
+  implicit private val WinnerHandler: BSONDocumentHandler[Winner] =
+    reactivemongo.api.bson.Macros.handler[Winner]
+  implicit private val FreqWinnersHandler: BSONDocumentHandler[FreqWinners] =
+    reactivemongo.api.bson.Macros.handler[FreqWinners]
+  implicit private val AllWinnersHandler: BSONDocumentHandler[AllWinners] =
+    reactivemongo.api.bson.Macros.handler[AllWinners]
 
   private def fetchLastFreq(freq: Freq, since: DateTime): Fu[List[Tournament]] =
     tournamentRepo.coll

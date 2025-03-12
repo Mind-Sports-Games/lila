@@ -4,6 +4,7 @@ import lila.memo.SettingStore.{ Formable, StringReader }
 import play.api.data.Form
 import play.api.data.Forms.{ single, text }
 import lila.common.Ints
+import reactivemongo.api.bson.BSONHandler
 
 case class IrwinThresholds(report: Int, mark: Int)
 
@@ -21,9 +22,9 @@ private object IrwinThresholds {
       t => Ints(List(t.report, t.mark))
     )
 
-  implicit val thresholdsBsonHandler  = lila.db.dsl.isoHandler(thresholdsIso)
-  implicit val thresholdsStringReader = StringReader.fromIso(thresholdsIso)
-  implicit val thresholdsFormable =
+  implicit val thresholdsBsonHandler: BSONHandler[IrwinThresholds]   = lila.db.dsl.isoHandler(thresholdsIso)
+  implicit val thresholdsStringReader: StringReader[IrwinThresholds] = StringReader.fromIso(thresholdsIso)
+  implicit val thresholdsFormable: Formable[IrwinThresholds] =
     new Formable[IrwinThresholds](t => Form(single("v" -> text)) fill thresholdsIso.to(t))
 
   def makeSetting(store: lila.memo.SettingStore.Builder) =

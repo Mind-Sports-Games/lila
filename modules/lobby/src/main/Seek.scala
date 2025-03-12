@@ -115,18 +115,18 @@ object Seek {
 
   import reactivemongo.api.bson._
   import lila.db.BSON.BSONJodaDateTimeHandler
-  implicit val lobbyPerfBSONHandler =
+  implicit val lobbyPerfBSONHandler: BSONHandler[LobbyPerf] =
     BSONIntegerHandler.as[LobbyPerf](
       b => LobbyPerf(b.abs, b < 0),
       x => x.rating * (if (x.provisional) -1 else 1)
     )
 
   // TODO: this should probably go somewhere else.
-  implicit val gameLogicBSONHandler =
+  implicit val gameLogicBSONHandler: BSONHandler[GameLogic] =
     BSONIntegerHandler.as[GameLogic](
       b => GameLogic(b.abs),
       lib => lib.id
     )
-  implicit private[lobby] val lobbyUserBSONHandler = Macros.handler[LobbyUser]
-  implicit private[lobby] val seekBSONHandler      = Macros.handler[Seek]
+  implicit private[lobby] val lobbyUserBSONHandler: BSONDocumentHandler[LobbyUser] = Macros.handler[LobbyUser]
+  implicit private[lobby] val seekBSONHandler: BSONDocumentHandler[Seek]           = Macros.handler[Seek]
 }

@@ -15,22 +15,26 @@ private object BSONHandlers {
 
   import Challenge._
 
-  implicit val PlayerIndexChoiceBSONHandler = BSONIntegerHandler.as[PlayerIndexChoice](
-    {
-      case 1 => PlayerIndexChoice.P1
-      case 2 => PlayerIndexChoice.P2
-      case _ => PlayerIndexChoice.Random
-    },
-    {
-      case PlayerIndexChoice.P1     => 1
-      case PlayerIndexChoice.P2     => 2
-      case PlayerIndexChoice.Random => 0
-    }
-  )
+  implicit val PlayerIndexChoiceBSONHandler: BSONHandler[PlayerIndexChoice] =
+    BSONIntegerHandler.as[PlayerIndexChoice](
+      {
+        case 1 => PlayerIndexChoice.P1
+        case 2 => PlayerIndexChoice.P2
+        case _ => PlayerIndexChoice.Random
+      },
+      {
+        case PlayerIndexChoice.P1     => 1
+        case PlayerIndexChoice.P2     => 2
+        case PlayerIndexChoice.Random => 0
+      }
+    )
   // NOTE: the following works because all of our clock type representations are different enough
   //       from each other that we can distinguish between them by the existence of their attributes
   //       New clock types will need to continue this pattern.
-  implicit val TimeControlBSONHandler = new BSON[TimeControl] {
+  implicit val TimeControlBSONHandler: BSON[TimeControl] {
+    def reads(r: lila.db.BSON.Reader)
+        : Product with lila.challenge.Challenge.TimeControl with java.io.Serializable
+  } = new BSON[TimeControl] {
     def reads(r: Reader) =
       (r.intO("l"), r.intO("i"), r.intO("b"), r.intO("p"))
         .mapN((limit, inc, byoyomi, periods) =>
@@ -72,7 +76,7 @@ private object BSONHandlers {
       }
   }
 
-  implicit val VariantBSONHandler = new BSON[Variant] {
+  implicit val VariantBSONHandler: BSON[Variant] = new BSON[Variant] {
     def reads(r: Reader) = Variant(GameLogic(r.intD("gl")), r.int("v")) match {
       case Some(v) => v
       case None    => sys.error(s"No such variant: ${r.intD("v")} for gamelogic: ${r.intD("gl")}")
@@ -80,11 +84,11 @@ private object BSONHandlers {
     def writes(w: Writer, v: Variant) = $doc("gl" -> v.gameLogic.id, "v" -> v.id)
   }
 
-  implicit val StatusBSONHandler = tryHandler[Status](
+  implicit val StatusBSONHandler: BSONHandler[Status] = tryHandler[Status](
     { case BSONInteger(v) => Status(v) toTry s"No such status: $v" },
     x => BSONInteger(x.id)
   )
-  implicit val RatingBSONHandler = new BSON[Rating] {
+  implicit val RatingBSONHandler: BSON[Rating] = new BSON[Rating] {
     def reads(r: Reader) = Rating(r.int("i"), r.boolD("p"))
     def writes(w: Writer, r: Rating) =
       $doc(
@@ -92,7 +96,7 @@ private object BSONHandlers {
         "p" -> w.boolO(r.provisional)
       )
   }
-  implicit val RegisteredBSONHandler = new BSON[Challenger.Registered] {
+  implicit val RegisteredBSONHandler: BSON[Challenger.Registered] = new BSON[Challenger.Registered] {
     def reads(r: Reader) = Challenger.Registered(r.str("id"), r.get[Rating]("r"))
     def writes(w: Writer, r: Challenger.Registered) =
       $doc(
@@ -100,18 +104,18 @@ private object BSONHandlers {
         "r"  -> r.rating
       )
   }
-  implicit val AnonymousBSONHandler = new BSON[Challenger.Anonymous] {
+  implicit val AnonymousBSONHandler: BSON[Challenger.Anonymous] = new BSON[Challenger.Anonymous] {
     def reads(r: Reader) = Challenger.Anonymous(r.str("s"))
     def writes(w: Writer, a: Challenger.Anonymous) =
       $doc(
         "s" -> a.secret
       )
   }
-  implicit val DeclineReasonBSONHandler = tryHandler[DeclineReason](
+  implicit val DeclineReasonBSONHandler: BSONHandler[DeclineReason] = tryHandler[DeclineReason](
     { case BSONString(k) => Success(Challenge.DeclineReason(k)) },
     r => BSONString(r.key)
   )
-  implicit val ChallengerBSONHandler = new BSON[Challenger] {
+  implicit val ChallengerBSONHandler: BSON[Challenger] = new BSON[Challenger] {
     def reads(r: Reader) =
       if (r contains "id") RegisteredBSONHandler reads r
       else if (r contains "s") AnonymousBSONHandler reads r
@@ -124,5 +128,5 @@ private object BSONHandlers {
       }
   }
 
-  implicit val ChallengeBSONHandler = Macros.handler[Challenge]
+  implicit val ChallengeBSONHandler: BSONDocumentHandler[Challenge] = Macros.handler[Challenge]
 }

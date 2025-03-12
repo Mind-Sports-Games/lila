@@ -20,6 +20,7 @@ final class TournamentStandingApi(
     lightUserApi: lila.user.LightUserApi
 )(implicit
     ec: scala.concurrent.ExecutionContext,
+    scheduler: akka.actor.Scheduler,
     mat: akka.stream.Materializer
 ) {
 

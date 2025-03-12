@@ -1,6 +1,6 @@
 package lila.user
 
-import akka.actor._
+import akka.actor.Scheduler
 import com.softwaremill.macwire._
 import io.methvin.play.autoconfig._
 import play.api.Configuration
@@ -31,7 +31,7 @@ final class Env(
     onlineIds: lila.socket.OnlineIds
 )(implicit
     ec: scala.concurrent.ExecutionContext,
-    system: ActorSystem,
+    scheduler: Scheduler,
     ws: StandaloneWSClient
 ) {
 

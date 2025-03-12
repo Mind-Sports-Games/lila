@@ -10,6 +10,7 @@ import scala.concurrent.{ blocking, Future }
 
 import lila.common.Chronometer
 import lila.user.User
+import play.api.ConfigLoader
 
 final private class FirebasePush(
     credentialsOpt: Option[GoogleCredentials],
@@ -18,7 +19,7 @@ final private class FirebasePush(
     config: FirebasePush.Config
 )(implicit
     ec: scala.concurrent.ExecutionContext,
-    system: akka.actor.ActorSystem
+    scheduler: akka.actor.Scheduler
 ) {
 
   private val workQueue =
@@ -104,5 +105,5 @@ private object FirebasePush {
       val url: String,
       val json: lila.common.config.Secret
   )
-  implicit val configLoader = AutoConfig.loader[Config]
+  implicit val configLoader: ConfigLoader[Config] = AutoConfig.loader[Config]
 }

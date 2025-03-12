@@ -21,7 +21,7 @@ object LightUser {
 
   val ghost = LightUser("ghost", "ghost", none, none, false)
 
-  implicit val lightUserWrites = OWrites[LightUser] { u =>
+  implicit val lightUserWrites: OWrites[LightUser] = OWrites[LightUser] { u =>
     writeNoId(u) + ("id" -> JsString(u.id))
   }
 
