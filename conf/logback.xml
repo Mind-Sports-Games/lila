@@ -40,6 +40,7 @@
       <file>${application.home}/logs/reactivemongo.log</file>
       <encoder><pattern>%date [%level] %message%n%xException</pattern></encoder>
     </appender>
+    <appender-ref ref="FILE" />
   </logger>
 
   <logger name="round" level="DEBUG">
@@ -47,66 +48,77 @@
       <file>${application.home}/logs/round.log</file>
       <encoder><pattern>%date [%level] %message%n%xException</pattern></encoder>
     </appender>
+    <appender-ref ref="FILE" />
   </logger>
   <logger name="swiss" level="INFO">
     <appender name="FILE" class="ch.qos.logback.core.FileAppender">
       <file>${application.home}/logs/swiss.log</file>
       <encoder><pattern>%date [%level] %message%n%xException</pattern></encoder>
     </appender>
+    <appender-ref ref="FILE" />
   </logger>
   <logger name="relay" level="DEBUG">
     <appender name="FILE" class="ch.qos.logback.core.FileAppender">
       <file>${application.home}/logs/relay.log</file>
       <encoder><pattern>%date [%level] %message%n%xException</pattern></encoder>
     </appender>
+    <appender-ref ref="FILE" />
   </logger>
   <logger name="lobby" level="DEBUG">
     <appender name="FILE" class="ch.qos.logback.core.FileAppender">
       <file>${application.home}/logs/lobby.log</file>
       <encoder><pattern>%date [%level] %message%n%xException</pattern></encoder>
     </appender>
+    <appender-ref ref="FILE" />
   </logger>
   <logger name="tournament" level="DEBUG">
     <appender name="FILE" class="ch.qos.logback.core.FileAppender">
       <file>${application.home}/logs/tournament.log</file>
       <encoder><pattern>%date [%level] %message%n%xException</pattern></encoder>
     </appender>
+    <appender-ref ref="FILE" />
   </logger>
   <logger name="fishnet" level="DEBUG">
     <appender name="FILE" class="ch.qos.logback.core.FileAppender">
       <file>${application.home}/logs/fishnet.log</file>
       <encoder><pattern>%date [%level] %message%n%xException</pattern></encoder>
     </appender>
+    <appender-ref ref="FILE" />
   </logger>
   <logger name="crosstable" level="DEBUG">
     <appender name="FILE" class="ch.qos.logback.core.FileAppender">
       <file>${application.home}/logs/crosstable.log</file>
       <encoder><pattern>%date [%level] %message%n%xException</pattern></encoder>
     </appender>
+    <appender-ref ref="FILE" />
   </logger>
   <logger name="plan" level="DEBUG">
     <appender name="FILE" class="ch.qos.logback.core.FileAppender">
       <file>${application.home}/logs/plan.log</file>
       <encoder><pattern>%date [%level] %message%n%xException</pattern></encoder>
     </appender>
+    <appender-ref ref="FILE" />
   </logger>
   <logger name="csrf" level="DEBUG">
     <appender name="FILE" class="ch.qos.logback.core.FileAppender">
       <file>${application.home}/logs/csrf.log</file>
       <encoder><pattern>%date [%level] %message%n%xException</pattern></encoder>
     </appender>
+    <appender-ref ref="FILE" />
   </logger>
   <logger name="http" level="DEBUG">
     <appender name="FILE" class="ch.qos.logback.core.FileAppender">
       <file>${application.home}/logs/http.log</file>
       <encoder><pattern>%date [%level] %message%n%xException</pattern></encoder>
     </appender>
+    <appender-ref ref="FILE" />
   </logger>
   <logger name="auth" level="DEBUG">
     <appender name="FILE" class="ch.qos.logback.core.FileAppender">
       <file>${application.home}/logs/auth.log</file>
       <encoder><pattern>%date [%level] %message%n%xException</pattern></encoder>
     </appender>
+    <appender-ref ref="FILE" />
   </logger>
 
 </configuration>
