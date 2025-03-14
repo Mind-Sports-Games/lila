@@ -25,7 +25,7 @@ object InsightUser {
 
 final private class InsightUserApi(coll: AsyncColl)(implicit ec: scala.concurrent.ExecutionContext) {
 
-  implicit private val userCacheBSONHandler = Macros.handler[InsightUser]
+  implicit private val userCacheBSONHandler: BSONDocumentHandler[InsightUser] = Macros.handler[InsightUser]
 
   def find(id: String) = coll(_.one[InsightUser]($id(id)))
 

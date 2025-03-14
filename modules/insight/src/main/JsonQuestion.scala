@@ -30,7 +30,7 @@ case class JsonQuestion(
                 case Phase.key            => build(Phase)
                 case Result.key           => build(Result)
                 case Termination.key      => build(Termination)
-                case PlayerIndex.key            => build(PlayerIndex)
+                case PlayerIndex.key      => build(PlayerIndex)
                 case Opening.key          => build(Opening)
                 case OpponentStrength.key => build(OpponentStrength)
                 case PieceRole.key        => build(PieceRole)
@@ -55,7 +55,7 @@ case class JsonQuestion(
           case Phase.key            => build(Phase)
           case Result.key           => build(Result)
           case Termination.key      => build(Termination)
-          case PlayerIndex.key            => build(PlayerIndex)
+          case PlayerIndex.key      => build(PlayerIndex)
           case Opening.key          => build(Opening)
           case OpponentStrength.key => build(OpponentStrength)
           case PieceRole.key        => build(PieceRole)
@@ -85,5 +85,5 @@ object JsonQuestion {
       }.toMap
     )
 
-  implicit val QuestionFormats = Json.format[JsonQuestion]
+  implicit val QuestionFormats: OFormat[JsonQuestion] = Json.format[JsonQuestion]
 }

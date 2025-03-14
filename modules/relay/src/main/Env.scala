@@ -22,7 +22,8 @@ final class Env(
     baseUrl: BaseUrl
 )(implicit
     ec: scala.concurrent.ExecutionContext,
-    system: ActorSystem
+    system: ActorSystem,
+    scheduler: akka.actor.Scheduler
 ) {
 
   lazy val roundForm = wire[RelayRoundForm]

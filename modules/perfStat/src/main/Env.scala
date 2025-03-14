@@ -1,6 +1,5 @@
 package lila.perfStat
 
-import akka.actor._
 import com.softwaremill.macwire._
 import play.api.Configuration
 
@@ -13,7 +12,7 @@ final class Env(
     db: lila.db.Db
 )(implicit
     ec: scala.concurrent.ExecutionContext,
-    system: ActorSystem
+    scheduler: akka.actor.Scheduler
 ) {
 
   lazy val storage = new PerfStatStorage(

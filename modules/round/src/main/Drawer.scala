@@ -6,6 +6,7 @@ import lila.common.Bus
 import lila.game.{ Event, Game, Pov, Progress }
 import lila.i18n.{ I18nKeys => trans, defaultLang }
 import lila.pref.{ Pref, PrefApi }
+import play.api.i18n.Lang
 
 final private[round] class Drawer(
     messenger: Messenger,
@@ -14,7 +15,7 @@ final private[round] class Drawer(
     isBotSync: lila.common.LightUser.IsBotSync
 )(implicit ec: scala.concurrent.ExecutionContext) {
 
-  implicit private val chatLang = defaultLang
+  implicit private val chatLang: Lang = defaultLang
 
   def autoThreefold(game: Game): Fu[Option[Pov]] = game.playable ??
     Pov(game)

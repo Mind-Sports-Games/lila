@@ -18,12 +18,12 @@ final private[video] class VideoApi(
 
   import lila.db.BSON.BSONJodaDateTimeHandler
   import reactivemongo.api.bson.Macros
-  implicit private val YoutubeBSONHandler = {
+  implicit private val YoutubeBSONHandler: BSONDocumentHandler[Youtube.Metadata] = {
     import Youtube.Metadata
     Macros.handler[Metadata]
   }
-  implicit private val VideoBSONHandler = Macros.handler[Video]
-  implicit private val TagNbBSONHandler = Macros.handler[TagNb]
+  implicit private val VideoBSONHandler: BSONDocumentHandler[Video] = Macros.handler[Video]
+  implicit private val TagNbBSONHandler: BSONDocumentHandler[TagNb] = Macros.handler[TagNb]
   import View.viewBSONHandler
 
   private def videoViews(userOption: Option[User])(videos: Seq[Video]): Fu[Seq[VideoView]] =

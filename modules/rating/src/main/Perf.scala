@@ -7,6 +7,7 @@ import reactivemongo.api.bson.{ BSONDocument, Macros }
 import lila.db.BSON
 
 import strategygames.variant.Variant
+import reactivemongo.api.bson.BSONDocumentHandler
 
 case class Perf(
     glicko: Glicko,
@@ -78,9 +79,9 @@ case class Perf(
   def nonEmpty = !isEmpty
 
   def rankable(variant: Variant) = glicko.rankable(variant)
-  def clueless                                 = glicko.clueless
-  def provisional                              = glicko.provisional
-  def established                              = glicko.established
+  def clueless                   = glicko.clueless
+  def provisional                = glicko.provisional
+  def established                = glicko.established
 
   def showRatingProvisional = s"$intRating${provisional ?? "?"}"
 }
@@ -121,7 +122,7 @@ case object Perf {
     val default = Streak(0, 0)
   }
 
-  implicit val perfBSONHandler = new BSON[Perf] {
+  implicit val perfBSONHandler: BSON[Perf] = new BSON[Perf] {
 
     import Glicko.glickoBSONHandler
 
@@ -144,7 +145,7 @@ case object Perf {
       )
   }
 
-  implicit val stormBSONHandler  = Macros.handler[Storm]
-  implicit val racerBSONHandler  = Macros.handler[Racer]
-  implicit val streakBSONHandler = Macros.handler[Streak]
+  implicit val stormBSONHandler: BSONDocumentHandler[Storm]   = Macros.handler[Storm]
+  implicit val racerBSONHandler: BSONDocumentHandler[Racer]   = Macros.handler[Racer]
+  implicit val streakBSONHandler: BSONDocumentHandler[Streak] = Macros.handler[Streak]
 }

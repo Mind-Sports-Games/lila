@@ -21,7 +21,7 @@ final private class LobbyTrouper(
     playbanApi: lila.playban.PlaybanApi,
     poolApi: lila.pool.PoolApi,
     onStart: lila.round.OnStart
-)(implicit ec: scala.concurrent.ExecutionContext)
+)(implicit ec: scala.concurrent.ExecutionContext, scheduler: akka.actor.Scheduler)
     extends Trouper {
 
   import LobbyTrouper._
@@ -207,10 +207,10 @@ private object LobbyTrouper {
       resyncIdsPeriod: FiniteDuration
   )(
       makeTrouper: () => LobbyTrouper
-  )(implicit ec: scala.concurrent.ExecutionContext, system: akka.actor.ActorSystem) = {
+  )(implicit ec: scala.concurrent.ExecutionContext, scheduler: akka.actor.Scheduler) = {
     val trouper = makeTrouper()
     Bus.subscribe(trouper, "lobbyTrouper")
-    system.scheduler.scheduleWithFixedDelay(15 seconds, resyncIdsPeriod)(() => trouper ! actorApi.Resync)
+    scheduler.scheduleWithFixedDelay(15 seconds, resyncIdsPeriod)(() => trouper ! actorApi.Resync)
     lila.common.ResilientScheduler(
       every = Every(broomPeriod),
       atMost = AtMost(10 seconds),

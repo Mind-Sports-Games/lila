@@ -15,10 +15,10 @@ final class RankingApi(
     cacheApi: lila.memo.CacheApi,
     mongoCache: lila.memo.MongoCache.Api,
     lightUser: lila.common.LightUser.Getter
-)(implicit ec: scala.concurrent.ExecutionContext) {
+)(implicit ec: scala.concurrent.ExecutionContext, scheduler: akka.actor.Scheduler) {
 
   import RankingApi._
-  implicit private val rankingBSONHandler = Macros.handler[Ranking]
+  implicit private val rankingBSONHandler: BSONDocumentHandler[Ranking] = Macros.handler[Ranking]
 
   def save(user: User, perfType: Option[PerfType], perfs: Perfs): Funit =
     perfType ?? { pt =>

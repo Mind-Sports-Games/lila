@@ -20,6 +20,7 @@ import java.util.concurrent.TimeoutException
  */
 final class WorkQueue(buffer: Int, timeout: FiniteDuration, name: String, parallelism: Int)(implicit
     ec: ExecutionContext,
+    scheduler: akka.actor.Scheduler,
     mat: Materializer
 ) {
 
@@ -30,7 +31,7 @@ final class WorkQueue(buffer: Int, timeout: FiniteDuration, name: String, parall
 
   def run[A](task: Task[A]): Fu[A] = {
     val promise = Promise[A]()
-    queue.offer(task -> promise) flatMap {
+    queue.offer(task -> promise) match {
       case QueueOfferResult.Enqueued =>
         promise.future
       case result =>
@@ -39,11 +40,11 @@ final class WorkQueue(buffer: Int, timeout: FiniteDuration, name: String, parall
     }
   }
 
-  private val queue: SourceQueueWithComplete[TaskWithPromise[_]] = Source
-    .queue[TaskWithPromise[_]](buffer, OverflowStrategy.dropNew) // #TODO use akka 2.6.11 BoundedQueueSource
+  private val queue = Source
+    .queue[TaskWithPromise[_]](buffer) // #TODO use akka 2.6.11 BoundedQueueSource
     .mapAsyncUnordered(parallelism) { case (task, promise) =>
       task()
-        .withTimeout(timeout, new TimeoutException)(ec, mat.system)
+        .withTimeout(timeout, new TimeoutException)(ec, scheduler)
         .tap(promise.completeWith) // Do the side effect of completing the promise
         .transform(
           // Transform both values, in this case, what we want is a tapError to log the error,

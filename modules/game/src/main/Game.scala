@@ -1351,17 +1351,18 @@ object CastleLastMove {
   import reactivemongo.api.bson._
   import lila.db.ByteArray.ByteArrayBSONHandler
 
-  implicit private[game] val castleLastMoveBSONHandler = new BSONHandler[CastleLastMove] {
-    def readTry(bson: BSONValue) =
-      bson match {
-        case bin: BSONBinary => ByteArrayBSONHandler readTry bin map BinaryFormat.castleLastMove.read
-        case b               => lila.db.BSON.handlerBadType(b)
-      }
-    def writeTry(clmt: CastleLastMove) =
-      ByteArrayBSONHandler writeTry {
-        BinaryFormat.castleLastMove write clmt
-      }
-  }
+  implicit private[game] val castleLastMoveBSONHandler: BSONHandler[CastleLastMove] =
+    new BSONHandler[CastleLastMove] {
+      def readTry(bson: BSONValue) =
+        bson match {
+          case bin: BSONBinary => ByteArrayBSONHandler readTry bin map BinaryFormat.castleLastMove.read
+          case b               => lila.db.BSON.handlerBadType(b)
+        }
+      def writeTry(clmt: CastleLastMove) =
+        ByteArrayBSONHandler writeTry {
+          BinaryFormat.castleLastMove write clmt
+        }
+    }
 }
 
 // At what turns we entered a new period

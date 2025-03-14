@@ -30,7 +30,7 @@ final class SecurityApi(
     tor: Tor
 )(implicit
     ec: scala.concurrent.ExecutionContext,
-    system: akka.actor.ActorSystem
+    scheduler: akka.actor.Scheduler
 ) {
 
   val AccessUri = "access_uri"

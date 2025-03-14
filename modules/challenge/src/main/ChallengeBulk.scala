@@ -19,6 +19,10 @@ import lila.hub.DuctSequencers
 import lila.rating.PerfType
 import lila.setup.SetupBulk.{ ScheduledBulk, ScheduledGame }
 import lila.user.User
+import reactivemongo.api.bson.{ BSONDocumentHandler, BSONHandler }
+import strategygames.chess.variant.Variant
+import strategygames.variant
+import strategygames.ClockConfig
 
 final class ChallengeBulkApi(
     colls: ChallengeColls,
@@ -30,15 +34,17 @@ final class ChallengeBulkApi(
     ec: scala.concurrent.ExecutionContext,
     mat: akka.stream.Materializer,
     system: ActorSystem,
+    scheduler: akka.actor.Scheduler,
     mode: play.api.Mode
 ) {
 
-  implicit private val gameHandler         = Macros.handler[ScheduledGame]
-  implicit private val variantHandler      = variantByKeyHandler
-  implicit private val stratVariantHandler = stratVariantByKeyHandler
-  implicit private val clockHandler        = clockConfigHandler
-  implicit private val messageHandler      = stringAnyValHandler[Template](_.value, Template.apply)
-  implicit private val bulkHandler         = Macros.handler[ScheduledBulk]
+  implicit private val gameHandler: BSONDocumentHandler[ScheduledGame]   = Macros.handler[ScheduledGame]
+  implicit private val variantHandler: BSONHandler[Variant]              = variantByKeyHandler
+  implicit private val stratVariantHandler: BSONHandler[variant.Variant] = stratVariantByKeyHandler
+  implicit private val clockHandler: BSONHandler[ClockConfig]            = clockConfigHandler
+  implicit private val messageHandler: BSONHandler[Template] =
+    stringAnyValHandler[Template](_.value, Template.apply)
+  implicit private val bulkHandler: BSONDocumentHandler[ScheduledBulk] = Macros.handler[ScheduledBulk]
 
   private val coll = colls.bulk
 

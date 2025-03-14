@@ -11,20 +11,21 @@ final private class StartedOrganizer(
     tournamentRepo: TournamentRepo,
     playerRepo: PlayerRepo,
     socket: TournamentSocket
-)(implicit mat: akka.stream.Materializer)
-    extends Actor {
+)(implicit
+    ec: scala.concurrent.ExecutionContext,
+    scheduler: akka.actor.Scheduler,
+    mat: akka.stream.Materializer
+) extends Actor {
 
   override def preStart(): Unit = {
-    context setReceiveTimeout 120.seconds
+    context.setReceiveTimeout(120.seconds)
     scheduleNext()
   }
-
-  implicit def ec = context.dispatcher
 
   case object Tick
 
   def scheduleNext(): Unit =
-    context.system.scheduler.scheduleOnce(2 seconds, self, Tick).unit
+    scheduler.scheduleOnce(2.seconds, self, Tick).unit
 
   def receive = {
 

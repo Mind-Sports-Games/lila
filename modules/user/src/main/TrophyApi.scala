@@ -27,10 +27,10 @@ final class TrophyApi(
     expireAfter = Syncache.ExpireAfterWrite(1 hour)
   )
 
-  implicit private val trophyKindStringBSONHandler =
+  implicit private val trophyKindStringBSONHandler: BSONHandler[TrophyKind] =
     BSONStringHandler.as[TrophyKind](kindCache.sync, _._id)
 
-  implicit private val trophyBSONHandler = Macros.handler[Trophy]
+  implicit private val trophyBSONHandler: BSONDocumentHandler[Trophy] = Macros.handler[Trophy]
 
   private def permanent = $doc("expiry" $exists false)
 

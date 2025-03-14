@@ -16,10 +16,10 @@ final class Env(
     appConfig: Configuration,
     userRepo: lila.user.UserRepo,
     db: lila.db.Db,
-    cacheApi: lila.memo.CacheApi,
-    scheduler: akka.actor.Scheduler
+    cacheApi: lila.memo.CacheApi
 )(implicit
     ec: scala.concurrent.ExecutionContext,
+    scheduler: akka.actor.Scheduler,
     mode: play.api.Mode
 ) {
 

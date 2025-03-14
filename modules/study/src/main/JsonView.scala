@@ -89,7 +89,7 @@ final class JsonView(
       .add("gamebook", c.isGamebook)
       .add("conceal", c.conceal)
 
-  implicit private[study] val memberRoleWrites = Writes[StudyMember.Role] { r =>
+  implicit private[study] val memberRoleWrites: Writes[StudyMember.Role] = Writes[StudyMember.Role] { r =>
     JsString(r.id)
   }
   implicit private[study] val memberWrites: Writes[StudyMember] = Writes[StudyMember] { m =>
@@ -100,7 +100,7 @@ final class JsonView(
     Json toJson m.members
   }
 
-  implicit private val studyWrites = OWrites[Study] { s =>
+  implicit private val studyWrites: OWrites[Study] = OWrites[Study] { s =>
     Json
       .obj(
         "id"                 -> s.id,
@@ -125,7 +125,7 @@ object JsonView {
 
   implicit val studyIdWrites: Writes[Study.Id]     = stringIsoWriter(Study.idIso)
   implicit val studyNameWrites: Writes[Study.Name] = stringIsoWriter(Study.nameIso)
-  implicit val studyIdNameWrites = OWrites[Study.IdName] { s =>
+  implicit val studyIdNameWrites: OWrites[Study.IdName] = OWrites[Study.IdName] { s =>
     Json.obj("id" -> s._id, "name" -> s.name)
   }
   implicit val chapterIdWrites: Writes[Chapter.Id]     = stringIsoWriter(Chapter.idIso)
@@ -155,30 +155,32 @@ object JsonView {
     case Study.From.Study(id) => Json.obj("study" -> id)
     case Study.From.Relay(id) => Json.obj("relay" -> id)
   }
-  implicit private[study] val userSelectionWriter = Writes[Settings.UserSelection] { v =>
-    JsString(v.key)
-  }
+  implicit private[study] val userSelectionWriter: Writes[Settings.UserSelection] =
+    Writes[Settings.UserSelection] { v =>
+      JsString(v.key)
+    }
   implicit private[study] val settingsWriter: Writes[Settings] = Json.writes[Settings]
 
-  implicit private val plyWrites = Writes[Chapter.Ply] { p =>
+  implicit private val plyWrites: Writes[Chapter.Ply] = Writes[Chapter.Ply] { p =>
     JsNumber(p.value)
   }
 
-  implicit private val variantWrites = OWrites[Variant] { v =>
+  implicit private val variantWrites: OWrites[Variant] = OWrites[Variant] { v =>
     Json.obj("key" -> v.key, "name" -> VariantKeys.variantName(v))
   }
   implicit val pgnTagWrites: Writes[Tag] = Writes[Tag] { t =>
     Json.arr(t.name.toString, t.value)
   }
-  implicit val pgnTagsWrites = Writes[Tags] { tags =>
+  implicit val pgnTagsWrites: Writes[Tags] = Writes[Tags] { tags =>
     JsArray(tags.value map pgnTagWrites.writes)
   }
-  implicit private val chapterSetupWrites = Json.writes[Chapter.Setup]
-  implicit private[study] val chapterMetadataWrites = OWrites[Chapter.Metadata] { c =>
-    Json
-      .obj("id" -> c._id, "name" -> c.name)
-      .add("ongoing", c.looksOngoing)
-      .add("res" -> c.resultStr)
+  implicit private val chapterSetupWrites: OWrites[Chapter.Setup] = Json.writes[Chapter.Setup]
+  implicit private[study] val chapterMetadataWrites: OWrites[Chapter.Metadata] = OWrites[Chapter.Metadata] {
+    c =>
+      Json
+        .obj("id" -> c._id, "name" -> c.name)
+        .add("ongoing", c.looksOngoing)
+        .add("res" -> c.resultStr)
   }
 
   implicit private[study] val positionRefWrites: Writes[Position.Ref] = Json.writes[Position.Ref]
@@ -187,7 +189,7 @@ object JsonView {
   }
   implicit private[study] val likingRefWrites: Writes[Study.Liking] = Json.writes[Study.Liking]
 
-  implicit val relayWrites = OWrites[Chapter.Relay] { r =>
+  implicit val relayWrites: OWrites[Chapter.Relay] = OWrites[Chapter.Relay] { r =>
     Json.obj(
       "path"                 -> r.path,
       "secondsSinceLastMove" -> r.secondsSinceLastMove

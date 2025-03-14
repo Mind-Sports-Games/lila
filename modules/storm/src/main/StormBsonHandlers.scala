@@ -12,7 +12,7 @@ object StormBsonHandlers {
 
   import lila.puzzle.BsonHandlers.{ PuzzleIdBSONHandler }
 
-  implicit val StormPuzzleBSONReader = new BSONDocumentReader[StormPuzzle] {
+  implicit val StormPuzzleBSONReader: BSONDocumentReader[StormPuzzle] = new BSONDocumentReader[StormPuzzle] {
     def readDocument(r: BSONDocument) = for {
       id      <- r.getAsTry[Puzzle.Id]("_id")
       fen     <- r.getAsTry[FEN]("fen")
@@ -22,7 +22,7 @@ object StormBsonHandlers {
     } yield StormPuzzle(id, fen, line, rating)
   }
 
-  implicit lazy val stormDayIdHandler = {
+  implicit lazy val stormDayIdHandler: BSONHandler[StormDay.Id] = {
     import StormDay.Id
     val sep = ':'
     tryHandler[Id](
@@ -36,5 +36,5 @@ object StormBsonHandlers {
     )
   }
 
-  implicit val stormDayBSONHandler = Macros.handler[StormDay]
+  implicit val stormDayBSONHandler: BSONDocumentHandler[StormDay] = Macros.handler[StormDay]
 }

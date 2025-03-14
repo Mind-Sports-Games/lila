@@ -41,7 +41,8 @@ final class SwissApi(
     idGenerator: lila.game.IdGenerator
 )(implicit
     ec: scala.concurrent.ExecutionContext,
-    system: akka.actor.ActorSystem,
+    scheduler: akka.actor.Scheduler,
+    mat: akka.stream.Materializer,
     mode: play.api.Mode
 ) {
 
@@ -786,7 +787,7 @@ final class SwissApi(
       } >>- {
       systemChat(swiss.id, s"Tournament completed!")
       socket.reload(swiss.id)
-      system.scheduler
+      scheduler
         .scheduleOnce(10 seconds) {
           // we're delaying this to make sure the ranking has been recomputed
           // since doFinish is called by finishGame before that

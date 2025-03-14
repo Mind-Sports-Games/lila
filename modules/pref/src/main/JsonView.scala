@@ -5,7 +5,7 @@ import play.api.libs.functional.syntax._
 
 object JsonView {
 
-  implicit val prefJsonWriter = OWrites[Pref] { p =>
+  implicit val prefJsonWriter: OWrites[Pref] = OWrites[Pref] { p =>
     Json.obj(
       "dark"                -> (p.bg != Pref.Bg.LIGHT),
       "transp"              -> (p.bg == Pref.Bg.TRANSPARENT),
