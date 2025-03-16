@@ -27,9 +27,6 @@
     <appender-ref ref="ERROR_FILE" />
     <appender-ref ref="REACTIVEMONGO_FILE" />
     <appender-ref ref="SWISS_FILE" />
-  </root>
-
-  <root level="DEBUG">
     <appender-ref ref="ROUND_FILE" />
     <appender-ref ref="RELAY_FILE" />
     <appender-ref ref="LOBBY_FILE" />
