@@ -20,7 +20,8 @@ final class Env(
     poolApi: lila.pool.PoolApi,
     cacheApi: lila.memo.CacheApi,
     chatApi: lila.chat.ChatApi,
-    remoteSocketApi: lila.socket.RemoteSocket
+    remoteSocketApi: lila.socket.RemoteSocket,
+    discordApi: lila.irc.DiscordApi
 )(implicit
     ec: scala.concurrent.ExecutionContext,
     system: akka.actor.ActorSystem,
