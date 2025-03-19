@@ -1,15 +1,13 @@
-<configuration>
+<configuration debug="false">
 
   <conversionRule conversionWord="coloredLevel" converterClass="play.api.libs.logback.ColoredLevel"/>
 
   <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
-    <filter class="ch.qos.logback.classic.filter.ThresholdFilter"><level>INFO</level></filter>
     <encoder><pattern>%coloredLevel %logger{25} - %message%n%xException{10}</pattern></encoder>
   </appender>
 
   <appender name="ALL_FILE" class="ch.qos.logback.core.FileAppender">
-    <filter class="ch.qos.logback.classic.filter.ThresholdFilter"><level>INFO</level></filter>
-    <file>${application.home}/logs/all.log</file>
+    <file>${application.home:-.}/logs/all.log</file>
     <encoder><pattern>%date %-5level %logger{30} %message%n%xException{60}</pattern></encoder>
   </appender>
 
@@ -17,7 +15,7 @@
   <!-- requires -XX:MaxJavaStackTraceDepth=100000 -->
   <appender name="ERROR_FILE" class="ch.qos.logback.core.FileAppender">
     <filter class="ch.qos.logback.classic.filter.ThresholdFilter"><level>ERROR</level></filter>
-    <file>${application.home}/logs/error.log</file>
+    <file>${application.home:-.}/logs/error.log</file>
     <encoder><pattern>%date %-5level %logger %message%n%xException</pattern></encoder>
   </appender>
 
@@ -25,100 +23,11 @@
     <appender-ref ref="STDOUT" />
     <appender-ref ref="ALL_FILE" />
     <appender-ref ref="ERROR_FILE" />
-    <appender-ref ref="REACTIVEMONGO_FILE" />
-    <appender-ref ref="SWISS_FILE" />
-    <appender-ref ref="ROUND_FILE" />
-    <appender-ref ref="RELAY_FILE" />
-    <appender-ref ref="LOBBY_FILE" />
-    <appender-ref ref="TOURNAMENT_FILE" />
-    <appender-ref ref="FISHNET_FILE" />
-    <appender-ref ref="CROSSTABLE_FILE" />
-    <appender-ref ref="PLAN_FILE" />
-    <appender-ref ref="CSRF_FILE" />
-    <appender-ref ref="HTTP_FILE" />
-    <appender-ref ref="AUTH_FILE" />
   </root>
 
-  <logger name="akka.event.slf4j.Slf4jLogger" level="WARN">
-    <appender-ref ref="STDOUT" />
-  </logger>
-  <logger name="com.github.benmanes.caffeine.cache.LocalAsyncCache" level="ERROR">
-    <!-- allows failing async computations instead of returning null -->
-    <appender-ref ref="STDOUT" />
-  </logger>
-
-  <logger name="reactivemongo" level="INFO">
-    <appender name="REACTIVEMONGO_FILE" class="ch.qos.logback.core.FileAppender">
-      <file>${application.home}/logs/reactivemongo.log</file>
-      <encoder><pattern>%date [%level] %message%n%xException</pattern></encoder>
-    </appender>
-  </logger>
-
-  <logger name="round" level="DEBUG">
-    <appender name="ROUND_FILE" class="ch.qos.logback.core.FileAppender">
-      <file>${application.home}/logs/round.log</file>
-      <encoder><pattern>%date [%level] %message%n%xException</pattern></encoder>
-    </appender>
-  </logger>
-  <logger name="swiss" level="INFO">
-    <appender name="SWISS_FILE" class="ch.qos.logback.core.FileAppender">
-      <file>${application.home}/logs/swiss.log</file>
-      <encoder><pattern>%date [%level] %message%n%xException</pattern></encoder>
-    </appender>
-  </logger>
-  <logger name="relay" level="DEBUG">
-    <appender name="RELAY_FILE" class="ch.qos.logback.core.FileAppender">
-      <file>${application.home}/logs/relay.log</file>
-      <encoder><pattern>%date [%level] %message%n%xException</pattern></encoder>
-    </appender>
-  </logger>
-  <logger name="lobby" level="DEBUG">
-    <appender name="LOBBY_FILE" class="ch.qos.logback.core.FileAppender">
-      <file>${application.home}/logs/lobby.log</file>
-      <encoder><pattern>%date [%level] %message%n%xException</pattern></encoder>
-    </appender>
-  </logger>
-  <logger name="tournament" level="DEBUG">
-    <appender name="TOURNAMENT_FILE" class="ch.qos.logback.core.FileAppender">
-      <file>${application.home}/logs/tournament.log</file>
-      <encoder><pattern>%date [%level] %message%n%xException</pattern></encoder>
-    </appender>
-  </logger>
-  <logger name="fishnet" level="DEBUG">
-    <appender name="FISHNET_FILE" class="ch.qos.logback.core.FileAppender">
-      <file>${application.home}/logs/fishnet.log</file>
-      <encoder><pattern>%date [%level] %message%n%xException</pattern></encoder>
-    </appender>
-  </logger>
-  <logger name="crosstable" level="DEBUG">
-    <appender name="CROSSTABLE_FILE" class="ch.qos.logback.core.FileAppender">
-      <file>${application.home}/logs/crosstable.log</file>
-      <encoder><pattern>%date [%level] %message%n%xException</pattern></encoder>
-    </appender>
-  </logger>
-  <logger name="plan" level="DEBUG">
-    <appender name="PLAN_FILE" class="ch.qos.logback.core.FileAppender">
-      <file>${application.home}/logs/plan.log</file>
-      <encoder><pattern>%date [%level] %message%n%xException</pattern></encoder>
-    </appender>
-  </logger>
-  <logger name="csrf" level="DEBUG">
-    <appender name="CSRF_FILE" class="ch.qos.logback.core.FileAppender">
-      <file>${application.home}/logs/csrf.log</file>
-      <encoder><pattern>%date [%level] %message%n%xException</pattern></encoder>
-    </appender>
-  </logger>
-  <logger name="http" level="DEBUG">
-    <appender name="HTTP_FILE" class="ch.qos.logback.core.FileAppender">
-      <file>${application.home}/logs/http.log</file>
-      <encoder><pattern>%date [%level] %message%n%xException</pattern></encoder>
-    </appender>
-  </logger>
-  <logger name="auth" level="DEBUG">
-    <appender name="AUTH_FILE" class="ch.qos.logback.core.FileAppender">
-      <file>${application.home}/logs/auth.log</file>
-      <encoder><pattern>%date [%level] %message%n%xException</pattern></encoder>
-    </appender>
-  </logger>
+  <logger name="boot" level="INFO"><appender-ref ref="STDOUT_INFO" /></logger>
+  <logger name="play" level="INFO"><appender-ref ref="STDOUT_INFO" /></logger>
+  <logger name="akka" level="INFO"><appender-ref ref="STDOUT_INFO" /></logger>
+  <logger name="reactivemongo" level="INFO"><appender-ref ref="STDOUT_INFO" /></logger>
 
 </configuration>
