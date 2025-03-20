@@ -8,8 +8,8 @@ import scala.concurrent.duration._
 import lila.common.config.Secret
 import lila.memo.RateLimit
 
-final private class DiscordClient(ws: StandaloneWSClient, url: Secret)(implicit
-    ec: scala.concurrent.ExecutionContext
+final private class DiscordClient(ws: StandaloneWSClient, urlMatchMaking: Secret, urlTournaments: Secret)(
+    implicit ec: scala.concurrent.ExecutionContext
 ) {
 
   private val limiter = new RateLimit[DiscordMessage](
@@ -18,22 +18,22 @@ final private class DiscordClient(ws: StandaloneWSClient, url: Secret)(implicit
     key = "discord.client"
   )
 
+  private def urlForMsg(msg: DiscordMessage) = msg.channel match {
+    case MatchMaking => urlMatchMaking.value
+    case Tournaments => urlTournaments.value
+  }
+
   def apply(msg: DiscordMessage): Funit =
     limiter(msg) {
-      if (url.value.isEmpty) fuccess(lila.log("discord").info(msg.toString))
+      if (urlForMsg(msg).isEmpty) fuccess(lila.log("discord").info(msg.toString))
       else
-        ws.url(url.value)
+        ws.url(urlForMsg(msg))
           .post(
-            Json
-              .obj(
-                "content" -> msg.text,
-                "channel" -> msg.channel
-              )
-              .noNull
+            Json.obj("content" -> msg.text).noNull
           )
           .flatMap {
             case res if res.status == 200 => funit
-            case res                      => fufail(s"[discord] $url $msg ${res.status} ${res.body}")
+            case res                      => fufail(s"[discord] ${urlForMsg(msg)} $msg ${res.status} ${res.body}")
           }
           .nevermind
     }(funit)

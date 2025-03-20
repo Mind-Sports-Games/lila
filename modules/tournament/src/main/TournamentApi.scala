@@ -45,6 +45,7 @@ final class TournamentApi(
     //swissApi: lila.swiss.SwissApi,
     trophyApi: lila.user.TrophyApi,
     playerIndexHistoryApi: PlayerIndexHistoryApi,
+    discordApi: lila.irc.DiscordApi,
     verify: Condition.Verify,
     duelStore: DuelStore,
     pause: Pause,
@@ -262,9 +263,21 @@ final class TournamentApi(
       }
   }
 
+  private[tournament] def sendDiscordMessage(tour: Tournament): Funit =
+    tour.isScheduled ?? discordApi.tournamentAnnouncement(
+      tour.schedule.map(_.freq.name).getOrElse(""),
+      tour.name()(defaultLang),
+      VariantKeys.variantName(tour.variant),
+      tour.variant.gameFamily.key,
+      tour.durationString,
+      tour.id,
+      tour.isMedley
+    )
+
   private[tournament] def start(oldTour: Tournament): Funit =
     Sequencing(oldTour.id, "start")(tournamentRepo.createdById) { tour =>
-      tournamentRepo.setStatus(tour.id, Status.Started) >>-
+      sendDiscordMessage(tour) >>
+        tournamentRepo.setStatus(tour.id, Status.Started) >>-
         socket.reload(tour.id) >>-
         publish()
     }
