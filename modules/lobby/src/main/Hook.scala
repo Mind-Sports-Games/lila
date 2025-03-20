@@ -64,7 +64,7 @@ case class Hook(
   lazy val perf: Option[LobbyPerf] = for { u <- user; pt <- perfType } yield u perfAt pt
   def rating: Option[Int]          = perf.map(_.rating)
 
-  val message = s"Play live **${VariantKeys
+  val message = s"[Play](<https://playstrategy.org>) live **${VariantKeys
     .variantName(realVariant)}** with ${user.fold(User.anonymous)(u => "@" + u.username)} (${clock.show})"
 
   def render(implicit lang: Lang): JsObject =

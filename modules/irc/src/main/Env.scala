@@ -28,6 +28,8 @@ final class Env(
     appConfig.get[Secret]("discord.webhook.url.tournaments")
   )
 
+  lazy val baseUrl = appConfig.get[String]("net.base_url")
+
   lazy val slack: SlackApi = wire[SlackApi]
 
   lazy val discord: DiscordApi = wire[DiscordApi]
