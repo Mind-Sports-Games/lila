@@ -48,14 +48,19 @@ final private class LobbyTrouper(
       !hook.compatibleWithPools(hook.realVariant) ?? findCompatible(hook) match {
         case Some(h) => biteHook(h.id, hook.sri, hook.user)
         case None =>
-          discordApi.matchmakingAnnouncement(
-            hook.message,
-            hook.realVariant.gameFamily.key,
-            VariantKeys.variantName(hook.realVariant),
-            true
-          ) >>-
-            hookRepo.save(msg.hook)
+          hookRepo.save(msg.hook)
           socket ! msg
+          discordApi
+            .matchmakingAnnouncement(
+              hook.message,
+              hook.realVariant.gameFamily.key,
+              VariantKeys.variantName(hook.realVariant),
+              true
+            )
+            .effectFold(
+              err => logger.warn(s"discord hook failed: $err"),
+              _ => ()
+            )
       }
 
     case msg @ AddSeek(seek) =>
@@ -67,13 +72,18 @@ final private class LobbyTrouper(
 
     case SaveSeek(msg) =>
       seekApi.insert(msg.seek)
-      discordApi.matchmakingAnnouncement(
-        msg.seek.message,
-        msg.seek.realVariant.gameFamily.key,
-        VariantKeys.variantName(msg.seek.realVariant),
-        false
-      )
       socket ! msg
+      discordApi
+        .matchmakingAnnouncement(
+          msg.seek.message,
+          msg.seek.realVariant.gameFamily.key,
+          VariantKeys.variantName(msg.seek.realVariant),
+          false
+        )
+        .effectFold(
+          err => logger.warn(s"discord seek failed: $err"),
+          _ => ()
+        )
 
     case CancelHook(sri) =>
       hookRepo bySri sri foreach remove
