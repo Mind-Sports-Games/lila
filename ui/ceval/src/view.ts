@@ -5,7 +5,7 @@ import { h, VNode } from 'snabbdom';
 import { Position } from 'stratops/chess';
 import { playstrategyRules } from 'stratops/compat';
 import { makeSanAndPlay } from 'stratops/san';
-import { dimensionsForRules, opposite, parseUci } from 'stratops/util';
+import { opposite, parseUci } from 'stratops/util';
 import { parseFen, makeBoardFen } from 'stratops/fen';
 import { renderEval } from './util';
 import { setupPosition } from 'stratops/variant';
@@ -81,7 +81,11 @@ function threatButton(ctrl: ParentCtrl): VNode | null {
 function engineName(ctrl: CevalCtrl): VNode[] {
   const version = ctrl.engineName();
   return [
-    h('span', { attrs: { title: version || '' } }, 'Stockfish 14+'),
+    h(
+      'span',
+      { attrs: { title: version || '' } },
+      ctrl.technology == 'nnue' ? 'Stockfish 13+' : ctrl.technology == 'hce' ? 'Stockfish 11+' : 'Stockfish 10+',
+    ),
     ctrl.technology == 'nnue'
       ? h(
           'span.technology.good',
@@ -353,17 +357,15 @@ export const renderPvs =
         },
       },
       [
-        ...[...Array(multiPv).keys()].map(i =>
-          renderPv(threat, multiPv, variantKey, pvs[i], pos.isOk ? pos.value : undefined),
-        ),
-        renderPvBoard(ctrl, variantKey),
+        ...[...Array(multiPv).keys()].map(i => renderPv(threat, multiPv, pvs[i], pos.isOk ? pos.value : undefined)),
+        renderPvBoard(ctrl),
       ],
     );
   };
 
 const MAX_NUM_MOVES = 16;
 
-function renderPv(threat: boolean, multiPv: number, variantKey: VariantKey, pv?: Tree.PvData, pos?: Position): VNode {
+function renderPv(threat: boolean, multiPv: number, pv?: Tree.PvData, pos?: Position): VNode {
   const data: any = {};
   const children: VNode[] = [renderPvWrapToggle()];
   if (pv) {
@@ -374,7 +376,7 @@ function renderPv(threat: boolean, multiPv: number, variantKey: VariantKey, pv?:
       children.push(h('strong', defined(pv.mate) ? '#' + pv.mate : renderEval(pv.cp!)));
     }
     if (pos) {
-      children.push(...renderPvMoves(pos.clone(), pv.moves.slice(0, MAX_NUM_MOVES), variantKey));
+      children.push(...renderPvMoves(pos.clone(), pv.moves.slice(0, MAX_NUM_MOVES)));
     }
   }
   return h('div.pv.pv--nowrap', data, children);
@@ -397,9 +399,9 @@ function renderPvWrapToggle(): VNode {
   });
 }
 
-function renderPvMoves(pos: Position, pv: Uci[], variantKey: VariantKey): VNode[] {
+function renderPvMoves(pos: Position, pv: Uci[]): VNode[] {
   const vnodes: VNode[] = [];
-  let key = makeBoardFen(playstrategyRules(variantKey))(pos.board);
+  let key = makeBoardFen('chess')(pos.board);
   for (let i = 0; i < pv.length; i++) {
     let text;
     if (pos.turn === 'p1') {
@@ -411,8 +413,8 @@ function renderPvMoves(pos: Position, pv: Uci[], variantKey: VariantKey): VNode[
       vnodes.push(h('span', { key: text }, text));
     }
     const uci = pv[i];
-    const san = makeSanAndPlay(playstrategyRules(variantKey))(pos, parseUci(playstrategyRules(variantKey))(uci)!);
-    const fen = makeBoardFen(playstrategyRules(variantKey))(pos.board);
+    const san = makeSanAndPlay('chess')(pos, parseUci('chess')(uci)!);
+    const fen = makeBoardFen('chess')(pos.board); // Chessground uses only board fen
     if (san === '--') {
       break;
     }
@@ -434,7 +436,7 @@ function renderPvMoves(pos: Position, pv: Uci[], variantKey: VariantKey): VNode[
   return vnodes;
 }
 
-function renderPvBoard(ctrl: ParentCtrl, variantKey: VariantKey): VNode | undefined {
+function renderPvBoard(ctrl: ParentCtrl): VNode | undefined {
   const instance = ctrl.getCeval();
   const pvBoard = instance.pvBoard();
   if (!pvBoard) {
@@ -443,9 +445,7 @@ function renderPvBoard(ctrl: ParentCtrl, variantKey: VariantKey): VNode | undefi
   const { fen, uci } = pvBoard;
   const lastMove = uci[1] === '@' ? [uci.slice(2)] : [uci.slice(0, 2), uci.slice(2, 4)];
   const orientation = ctrl.getOrientation();
-  const dimensions = dimensionsForRules(variantToRules(variantKey));
   const cgConfig = {
-    ...{ dimensions: { width: dimensions.ranks, height: dimensions.files } },
     fen,
     lastMove,
     orientation,

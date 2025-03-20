@@ -224,22 +224,26 @@ export default function (opts: CevalOpts): CevalCtrl {
     if (!worker) {
       if (technology == 'nnue')
         worker = new ThreadedWasmWorker(protocolOpts, {
+          baseUrl: 'vendor/stockfish-nnue.wasm/',
+          module: 'Stockfish',
           downloadProgress: throttle(200, mb => {
             downloadProgress(mb);
             opts.redraw();
           }),
-          version: '7e57a8e', // v1.1.9
+          version: '85a969',
           wasmMemory: sharedWasmMemory(2048, growableSharedMem ? 32768 : 2048),
           cache: new Cache('ceval-wasm-cache'),
         });
       else if (technology == 'hce')
         worker = new ThreadedWasmWorker(protocolOpts, {
-          version: '7e57a8e',
-          wasmMemory: sharedWasmMemory(2048, growableSharedMem ? 32768 : 2048),
+          baseUrl: officialStockfish ? 'vendor/stockfish.wasm/' : 'vendor/stockfish-mv.wasm/',
+          module: officialStockfish ? 'Stockfish' : 'StockfishMv',
+          version: 'a022fa',
+          wasmMemory: sharedWasmMemory(1024, growableSharedMem ? 32768 : 1088),
         });
       else
         worker = new WebWorker(protocolOpts, {
-          wasm: technology == 'wasm',
+          url: technology == 'wasm' ? 'vendor/stockfish.js/stockfish.wasm.js' : 'vendor/stockfish.js/stockfish.js',
         });
     }
 
