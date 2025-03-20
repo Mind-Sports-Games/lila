@@ -5,6 +5,7 @@ import { Cache } from './cache';
 
 export abstract class AbstractWorker<T> {
   protected protocol: Sync<Protocol>;
+  readonly enginePath = "vendor/fairy-stockfish-nnue.wasm/";
 
   constructor(
     protected protocolOpts: ProtocolOpts,
@@ -31,14 +32,14 @@ export abstract class AbstractWorker<T> {
 }
 
 export interface WebWorkerOpts {
-  url: string;
+  wasm: boolean;
 }
 
 export class WebWorker extends AbstractWorker<WebWorkerOpts> {
   private worker: Worker;
 
   boot(): Promise<Protocol> {
-    this.worker = new Worker(playstrategy.assetUrl(this.opts.url, { sameDomain: true }));
+    this.worker = new Worker(playstrategy.assetUrl(`${this.enginePath}/stockfish.${this.opts.wasm ? 'wasm' : 'js'}`, { sameDomain: true }));
     const protocol = new Protocol(this.send.bind(this), this.protocolOpts);
     this.worker.addEventListener(
       'message',
@@ -61,8 +62,6 @@ export class WebWorker extends AbstractWorker<WebWorkerOpts> {
 }
 
 export interface ThreadedWasmWorkerOpts {
-  baseUrl: string;
-  module: 'Stockfish' | 'StockfishMv';
   version: string;
   downloadProgress?: (mb: number) => void;
   wasmMemory: WebAssembly.Memory;
@@ -73,7 +72,7 @@ export class ThreadedWasmWorker extends AbstractWorker<ThreadedWasmWorkerOpts> {
   private static protocols: { Stockfish?: Protocol; StockfishMv?: Protocol } = {};
   private static sf: { Stockfish?: any; StockfishMv?: any } = {};
   async boot(): Promise<Protocol> {
-    let protocol = ThreadedWasmWorker.protocols[this.opts.module];
+    let protocol = ThreadedWasmWorker.protocols['Stockfish'];
     if (!protocol) {
       const version = this.opts.version;
       const cache = this.opts.cache;
@@ -81,7 +80,7 @@ export class ThreadedWasmWorker extends AbstractWorker<ThreadedWasmWorkerOpts> {
       // Fetch WASM file ourselves, for caching and progress indication.
       let wasmBinary;
       if (cache) {
-        const wasmPath = this.opts.baseUrl + 'stockfish.wasm';
+        const wasmPath = this.enginePath + 'stockfish.wasm';
         if (cache) {
           const [found, data] = await cache.get(wasmPath, version!);
           if (found) wasmBinary = data;
@@ -90,7 +89,7 @@ export class ThreadedWasmWorker extends AbstractWorker<ThreadedWasmWorkerOpts> {
         if (!wasmBinary) {
           wasmBinary = await new Promise((resolve, reject) => {
             const req = new XMLHttpRequest();
-            req.open('GET', playstrategy.assetUrl(wasmPath, { version }), true);
+            req.open('GET', playstrategy.assetUrl(wasmPath), true);
             req.responseType = 'arraybuffer';
             req.onerror = event => reject(event);
             req.onprogress = event => this.opts.downloadProgress?.(event.loaded);
@@ -105,21 +104,21 @@ export class ThreadedWasmWorker extends AbstractWorker<ThreadedWasmWorkerOpts> {
         await cache.set(wasmPath, version!, wasmBinary);
       }
 
-      await playstrategy.loadScriptCJS(this.opts.baseUrl + 'stockfish.js', { version });
+      await playstrategy.loadScriptCJS(this.enginePath + 'stockfish.js');
 
-      const sf = await window[this.opts.module]({
+      const sf = await window['Stockfish']({
         wasmBinary,
         locateFile: (path: string) =>
-          playstrategy.assetUrl(this.opts.baseUrl + path, { version, sameDomain: path.endsWith('.worker.js') }),
+          playstrategy.assetUrl(this.enginePath + path, { sameDomain: path.endsWith('.worker.js') }),
         wasmMemory: this.opts.wasmMemory,
       });
-      ThreadedWasmWorker.sf[this.opts.module] = sf;
+      ThreadedWasmWorker.sf['Stockfish'] = sf;
 
       // Initialize protocol.
       protocol = new Protocol(this.send.bind(this), this.protocolOpts);
       sf.addMessageListener(protocol.received.bind(protocol));
       protocol.init();
-      ThreadedWasmWorker.protocols[this.opts.module] = protocol;
+      ThreadedWasmWorker.protocols['Stockfish'] = protocol;
     }
     return protocol;
   }
@@ -132,6 +131,6 @@ export class ThreadedWasmWorker extends AbstractWorker<ThreadedWasmWorkerOpts> {
   }
 
   send(cmd: string) {
-    ThreadedWasmWorker.sf[this.opts.module]?.postMessage(cmd);
+    ThreadedWasmWorker.sf['Stockfish']?.postMessage(cmd);
   }
 }
