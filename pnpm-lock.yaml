@@ -42,7 +42,7 @@ importers:
         specifier: ^3.2.5
         version: 3.5.3
       stratops:
-        specifier: https://github.com/Mind-Sports-Games/stratops.git#pla-1238-enable-fairysf-browser-analysis-for-minixiangqi
+        specifier: git+ssh://git@github.com:Mind-Sports-Games/stratops.git#pla-1238-enable-fairysf-browser-analysis-for-minixiangqi
         version: https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/662896a1d973d0a0e8127fe1b4d1e382dd8ad594
       typescript:
         specifier: ^5.6
