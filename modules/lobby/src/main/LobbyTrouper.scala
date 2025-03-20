@@ -53,8 +53,8 @@ final private class LobbyTrouper(
             hook.realVariant.gameFamily.key,
             VariantKeys.variantName(hook.realVariant),
             true
-          )
-          hookRepo save msg.hook
+          ) >>-
+            hookRepo.save(msg.hook)
           socket ! msg
       }
 

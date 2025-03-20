@@ -52,7 +52,7 @@ case class Seek(
   def rating = perf.map(_.rating)
 
   val message =
-    s"Play ${daysPerTurn.fold("unlimited")(_ => "correspondence")} **${VariantKeys
+    s"[Play](<https://playstrategy.org>) ${daysPerTurn.fold("unlimited")(_ => "correspondence")} **${VariantKeys
       .variantName(realVariant)}** with @${user.username}${daysPerTurn.fold("")(d => s" (${d}d)")}"
 
   def render(implicit lang: Lang): JsObject =
