@@ -17,7 +17,7 @@ final class ReportApi(
     securityApi: lila.security.SecurityApi,
     userLoginsApi: lila.security.UserLoginsApi,
     playbanApi: lila.playban.PlaybanApi,
-    discordApi: lila.irc.DiscordApi,
+    //discordApi: lila.irc.DiscordApi,
     isOnline: lila.socket.IsOnline,
     cacheApi: lila.memo.CacheApi,
     snoozer: lila.memo.Snoozer[Report.SnoozeKey],
@@ -64,11 +64,11 @@ final class ReportApi(
           .flatMap { prev =>
             val report = Report.make(scored, prev)
             lila.mon.mod.report.create(report.reason.key).increment()
-            if (
-              report.isRecentComm &&
-              report.score.value >= thresholds.discord() &&
-              prev.exists(_.score.value < thresholds.discord())
-            ) discordApi.commReportBurst(c.suspect.user)
+            // if (
+            //   report.isRecentComm &&
+            //   report.score.value >= thresholds.discord() &&
+            //   prev.exists(_.score.value < thresholds.discord())
+            // ) discordApi.commReportBurst(c.suspect.user)
             coll.update.one($id(report.id), report, upsert = true).void >>
               autoAnalysis(candidate) >>- {
                 if (report.isCheat)
