@@ -81,11 +81,7 @@ function threatButton(ctrl: ParentCtrl): VNode | null {
 function engineName(ctrl: CevalCtrl): VNode[] {
   const version = ctrl.engineName();
   return [
-    h(
-      'span',
-      { attrs: { title: version || '' } },
-      'Stockfish 14+',
-    ),
+    h('span', { attrs: { title: version || '' } }, 'Stockfish 14+'),
     ctrl.technology == 'nnue'
       ? h(
           'span.technology.good',
@@ -357,7 +353,9 @@ export const renderPvs =
         },
       },
       [
-        ...[...Array(multiPv).keys()].map(i => renderPv(threat, multiPv, variantKey, pvs[i], pos.isOk ? pos.value : undefined)),
+        ...[...Array(multiPv).keys()].map(i =>
+          renderPv(threat, multiPv, variantKey, pvs[i], pos.isOk ? pos.value : undefined),
+        ),
         renderPvBoard(ctrl, variantKey),
       ],
     );
@@ -400,7 +398,6 @@ function renderPvWrapToggle(): VNode {
 }
 
 function renderPvMoves(pos: Position, pv: Uci[], variantKey: VariantKey): VNode[] {
-
   const vnodes: VNode[] = [];
   let key = makeBoardFen(playstrategyRules(variantKey))(pos.board);
   for (let i = 0; i < pv.length; i++) {
@@ -448,7 +445,7 @@ function renderPvBoard(ctrl: ParentCtrl, variantKey: VariantKey): VNode | undefi
   const orientation = ctrl.getOrientation();
   const dimensions = dimensionsForRules(variantToRules(variantKey));
   const cgConfig = {
-    ...({dimensions: { width: dimensions.ranks, height: dimensions.files }}),
+    ...{ dimensions: { width: dimensions.ranks, height: dimensions.files } },
     fen,
     lastMove,
     orientation,

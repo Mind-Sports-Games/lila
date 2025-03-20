@@ -5,7 +5,7 @@ import { Cache } from './cache';
 
 export abstract class AbstractWorker<T> {
   protected protocol: Sync<Protocol>;
-  readonly enginePath = "vendor/fairy-stockfish-nnue.wasm/";
+  readonly enginePath = 'vendor/fairy-stockfish-nnue.wasm/';
 
   constructor(
     protected protocolOpts: ProtocolOpts,
@@ -39,7 +39,9 @@ export class WebWorker extends AbstractWorker<WebWorkerOpts> {
   private worker: Worker;
 
   boot(): Promise<Protocol> {
-    this.worker = new Worker(playstrategy.assetUrl(`${this.enginePath}/stockfish.${this.opts.wasm ? 'wasm' : 'js'}`, { sameDomain: true }));
+    this.worker = new Worker(
+      playstrategy.assetUrl(`${this.enginePath}/stockfish.${this.opts.wasm ? 'wasm' : 'js'}`, { sameDomain: true }),
+    );
     const protocol = new Protocol(this.send.bind(this), this.protocolOpts);
     this.worker.addEventListener(
       'message',
