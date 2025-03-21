@@ -23,7 +23,7 @@ libraryDependencies ++= akka.bundle ++ playWs.bundle ++ Seq(
   strategyGames, compression, scalalib, hasher,
   reactivemongo.driver, reactivemongo.kamon, maxmind, prismic, scalatags,
   kamon.core, kamon.influxdb, kamon.metrics, kamon.prometheus,
-  scrimage, scaffeine, lettuce, uaparser, jacksonDatabind
+  scrimage, scaffeine, lettuce, uaparser, jacksonDatabind 
 ) ++ {
   if (useEpoll) Seq(epoll, reactivemongo.epoll)
   else Seq.empty
@@ -32,6 +32,17 @@ libraryDependencies ++= akka.bundle ++ playWs.bundle ++ Seq(
 lazy val fairystockfish = Artifact("fairystockfish", "linux-x86_64")
 libraryDependencies += "org.playstrategy"        % "fairystockfish"           % "0.0.20" artifacts(fairystockfish)
 classpathTypes ++= Set("linux-x86_64")
+
+lazy val dbExport = Project("dbexport", file("dbexport"))
+  .dependsOn(dbExportModule)
+  .aggregate(dbExportModule)
+  .dependsOn(game)
+  .aggregate(game)
+  .settings(
+    buildSettings,
+    srcMain
+  )
+
 
 lazy val modules = Seq(
   common, db, rating, user, security, hub, socket,
@@ -49,6 +60,14 @@ lazy val modules = Seq(
 
 lazy val moduleRefs = modules map projectToRef
 lazy val moduleCPDeps = moduleRefs map { sbt.ClasspathDependency(_, None) }
+
+lazy val dbExportModule = module("dbExportModule",
+  moduleCPDeps,
+  Seq(decline, autoconfig) ++ specs2.bundle ++ reactivemongo.bundle
+).settings(
+  Runtime / aggregate := false,
+  Test / aggregate := true  // Test <: Runtime
+) aggregate (moduleRefs: _*)
 
 lazy val api = module("api",
   moduleCPDeps,

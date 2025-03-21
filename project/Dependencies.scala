@@ -30,6 +30,7 @@ object Dependencies {
   val apacheText      = "org.apache.commons"          % "commons-text"                    % "1.12.0"
   val bloomFilter     = "com.github.alexandrnikitin" %% "bloom-filter"                    % "0.13.1"
   val jacksonDatabind = "com.fasterxml.jackson.core"  % "jackson-databind"                % "2.10.0"
+  val decline         = "com.monovore"               %% "decline"                         % "2.5.0"
 
   object specs2 {
     val version = "4.18.0"
