@@ -55,7 +55,9 @@ flipello_themes = [
   ['classic_flipello', 'png'],
   ['check_yb_flipello', 'png'],
   ['marble_bw_flipello', 'png'],
-  ['fabirovsky_flipello', 'svg']
+  ['fabirovsky_flipello', 'svg'],
+  ['stone_flipello', 'svg'],
+  ['disc_flipello', 'svg']
 ]
 amazons_themes = [
   ['queen', 'svg'],
