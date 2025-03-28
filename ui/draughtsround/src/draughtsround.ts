@@ -7,7 +7,7 @@ import RoundController from './ctrl';
 import Draughtsground from 'draughtsground';
 import { Chessground } from 'chessground';
 import { main as view } from './view/main';
-import { RoundOpts, Redraw } from './interfaces';
+import { RoundData, RoundOpts, Redraw, Step } from './interfaces';
 
 export interface RoundApi {
   socketReceive(typ: string, data: any): boolean;
@@ -20,6 +20,11 @@ export interface RoundApi {
 export interface RoundMain {
   app: (opts: RoundOpts) => RoundApi;
 }
+
+export const firstTurn = (d: RoundData): number => d.steps[0].turnCount;
+export const lastTurn = (d: RoundData): number => lastStep(d).turnCount;
+export const turnsTaken = (d: RoundData): number => lastTurn(d) - firstTurn(d);
+export const lastStep = (d: RoundData): Step => d.steps[d.steps.length - 1];
 
 const patch = init([classModule, attributesModule]);
 

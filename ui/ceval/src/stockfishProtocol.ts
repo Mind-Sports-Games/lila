@@ -50,6 +50,10 @@ export default class Protocol {
     this.send(`setoption name ${name} value ${value}`);
   }
 
+  setVariant(variant: VariantKey): void {
+    this.setOption('UCI_Variant', playstrategyRules(variant));
+  }
+
   received(text: string): void {
     if (text.startsWith('id name ')) this.engineNameDeferred.resolve(text.substring('id name '.length));
     else if (text.startsWith('bestmove ')) {
