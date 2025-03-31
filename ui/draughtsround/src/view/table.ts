@@ -114,7 +114,8 @@ function anyClock(ctrl: RoundController, position: Position) {
 
 export const renderTable = (ctrl: RoundController): MaybeVNodes => [
   h('div.round__app__table'),
-  renderExpiration(ctrl),
+  renderExpiration(ctrl, 'top'),
+  renderExpiration(ctrl, 'bottom'),
   renderPlayer(ctrl, 'top'),
   ...(ctrl.data.player.spectator
     ? renderTableWatch(ctrl)
