@@ -152,7 +152,7 @@ object search {
       tbody(
         users.map { case lila.user.User.WithEmails(u, emails) =>
           tr(
-            if (Granter.canViewAltUsername(mod, u))
+            if (isGranted(_.ViewAltUsernames))
               td(
                 userLink(u, withBestRating = true, params = "?mod"),
                 (isGranted(_.Admin) && isGranted(_.SetEmail)) option
