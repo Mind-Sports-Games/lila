@@ -568,7 +568,7 @@ object mod {
               dataTags := s"${other.ips.map(renderIp).mkString(" ")} ${other.fps.mkString(" ")}",
               cls := (o == u) option "same"
             )(
-              if (o == u || Granter.canViewAltUsername(mod, o))
+              if (o == u || isGranted(_.ViewAltUsernames))
                 td(dataSort := o.id)(userLink(o, withBestRating = true, params = "?mod"))
               else td,
               isGranted(_.Admin) option td(othersWithEmail emailValueOf o),
