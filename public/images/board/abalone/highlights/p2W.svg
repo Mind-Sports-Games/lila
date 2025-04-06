@@ -18,7 +18,7 @@ M (x - sin), (y + cos) L (x - arrowRadius), y L (x - sin), (y - cos)
     <path
       d="M 23, 66 L 16 50 L 23 34"
       fill="none"
-      stroke="white"
+      stroke="black"
       stroke-width="7"
       stroke-opacity="0.9"
       stroke-linecap="round"
