@@ -18,6 +18,10 @@ group.radio {
 
     justify-content: center;
     padding: 10px;
+    &[data-icon] {
+      padding: 2px;
+      font-size: 200%;
+    }
     height: 100%;
     cursor: pointer;
     border-right: $border;

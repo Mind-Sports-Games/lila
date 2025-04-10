@@ -55,6 +55,32 @@ final private[setup] class Processor(
       case _ => fuccess(Refused)
     }
   }
+
+  def gameHook(
+      configBase: GameConfig,
+      sri: lila.socket.Socket.Sri,
+      sid: Option[String],
+      blocking: Set[String]
+  )(implicit ctx: UserContext): Fu[Processor.HookResult] = {
+    import Processor.HookResult._
+    val config = configBase.toHookConfig.fixPlayerIndex
+    config.hook(sri, ctx.me, sid, blocking) match {
+      case Left(hook) =>
+        fuccess {
+          Bus.publish(AddHook(hook), "lobbyTrouper")
+          Created(hook.id)
+        }
+      case Right(Some(seek)) =>
+        ctx.userId.??(gameCache.nbPlaying) dmap { nbPlaying =>
+          if (maxPlaying <= nbPlaying) Refused
+          else {
+            Bus.publish(AddSeek(seek), "lobbyTrouper")
+            Created(seek.id)
+          }
+        }
+      case _ => fuccess(Refused)
+    }
+  }
 }
 
 object Processor {

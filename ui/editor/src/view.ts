@@ -242,7 +242,7 @@ function controls(ctrl: EditorCtrl, state: EditorState): VNode {
               'a',
               {
                 attrs: {
-                  href: '/?fen=' + state.legalFen + '#friend',
+                  href: '/?fen=' + state.legalFen + '#game',
                   rel: 'nofollow',
                 },
                 class: {

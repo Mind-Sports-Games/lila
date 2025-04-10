@@ -37,6 +37,27 @@ private object bits {
     )
   }
 
+  def renderGameFamilyOptions(form: Form[_], libs: List[SelectChoice])(implicit ctx: Context) =
+    div(cls := "gameFamily_choice buttons")(
+      "Game Family",
+      div(id := "gameFamily_icons")(
+        renderIconRadios(form("gameFamily"), libs)
+      )
+    )
+
+  def renderVariantOptions(form: Form[_], libs: List[SelectChoice])(implicit ctx: Context) =
+    div(cls := "variant_choice buttons")(
+      a(
+        cls := "remove_color",
+        title := "More info",
+        href := s"${routes.Page.variantHome}",
+        target := "_blank"
+      )(
+        trans.variant()
+      ),
+      div(id := "variant_icons")(renderIconRadios(form("variant"), libs))
+    )
+
   def renderGameFamily(form: Form[_], libs: List[SelectChoice])(implicit ctx: Context) =
     div(cls := "gameFamily label_select")(
       renderLabel(form("gameFamily"), "Game Family"),
@@ -111,6 +132,27 @@ private object bits {
       )(name)
     }
 
+  def renderIconRadios(field: Field, options: Seq[SelectChoice]) =
+    st.group(cls := "radio")(
+      options.map { case (key, icon, hint) =>
+        div(
+          input(
+            tpe := "radio",
+            id := s"$prefix${field.id}_$key",
+            st.name := field.name,
+            value := key,
+            field.value.has(key) option checked
+          ),
+          label(
+            cls := "required",
+            dataIcon := icon,
+            title := hint,
+            `for` := s"$prefix${field.id}_$key"
+          )()
+        )
+      }
+    )
+
   def renderRadios(field: Field, options: Seq[SelectChoice]) =
     st.group(cls := "radio")(
       options.map { case (key, name, hint) =>
@@ -179,6 +221,25 @@ private object bits {
         span(form("backgammonPoints").value),
         renderDissociatedRange(form("backgammonPoints"))
       )
+    )
+
+  def renderOpponentOptions(form: Form[_])(implicit ctx: Context) =
+    div(cls := "opponent_choices buttons")(
+      renderRadios(form("opponent"), translatedOpponentChoices)
+    )
+
+  def renderTimeModeOptions(form: Form[_])(implicit ctx: Context) =
+    div(cls := "time_mode_config optional_config")(
+      renderLabel(
+        form("timeMode"),
+        a(
+          cls := "remove_color",
+          title := "More info",
+          href := s"${routes.Page.lonePage("clocks")}",
+          target := "_blank"
+        )(trans.timeControl())
+      ),
+      renderIconRadios(form("timeMode"), translatedTimeModeIconChoices)
     )
 
   def renderTimeMode(form: Form[_], allowAnon: Boolean, allowCorrespondence: Boolean)(implicit ctx: Context) =

@@ -202,7 +202,7 @@ export default function PlayStrategyLobby(opts: LobbyOpts) {
     })
     .on('click', e => e.preventDefault());
 
-  if (['#ai', '#friend', '#hook'].includes(location.hash)) {
+  if (['#game'].includes(location.hash)) {
     $startButtons
       .find('.config_' + location.hash.replace('#', ''))
       .each(function (this: HTMLElement) {
@@ -210,21 +210,20 @@ export default function PlayStrategyLobby(opts: LobbyOpts) {
       })
       .trigger(clickEvent);
 
-    if (location.hash === '#hook') {
-      if (/time=realTime/.test(location.search)) lobby.setTab('real_time');
-      else if (/time=correspondence/.test(location.search)) lobby.setTab('seeks');
-    }
+    if (/time=realTime/.test(location.search)) lobby.setTab('real_time');
+    else if (/time=correspondence/.test(location.search)) lobby.setTab('seeks');
 
     history.replaceState(null, '', '/');
-  } else if (location.hash == '#bot') {
-    $startButtons
-      .find('.config_friend')
-      .each(function (this: HTMLElement) {
-        this.dataset.hrefAddon = location.search;
-      })
-      .trigger(clickEvent);
-    $startButtons.find('.config_bot').addClass('active').siblings().removeClass('active');
   }
+  // } else if (location.hash == '#bot') {
+  //   $startButtons
+  //     .find('.config_friend')
+  //     .each(function (this: HTMLElement) {
+  //       this.dataset.hrefAddon = location.search;
+  //     })
+  //     .trigger(clickEvent);
+  //   $startButtons.find('.config_bot').addClass('active').siblings().removeClass('active');
+  // }
 
   const $gamelist_button_right = $('#slideRight'),
     $gamelist_button_left = $('#slideLeft'),

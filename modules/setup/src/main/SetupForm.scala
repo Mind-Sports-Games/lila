@@ -38,6 +38,46 @@ object SetupForm {
       .verifying("Can't play that time control from a position", _.timeControlFromPosition)
   )
 
+  //TODO make general....
+  def filled(lib: GameLogic, fen: Option[FEN])(implicit ctx: UserContext): Form[GameConfig] =
+    game(ctx) fill fen.foldLeft(GameConfig.default(lib.id)) { case (config, f) =>
+      config.copy(
+        fen = f.some,
+        variant = lib match {
+          case GameLogic.Chess()    => Variant.wrap(strategygames.chess.variant.FromPosition)
+          case GameLogic.Draughts() => Variant.wrap(strategygames.draughts.variant.FromPosition)
+          case _                    => sys.error("No from position variant")
+        }
+      )
+    }
+
+  def game(ctx: UserContext) =
+    Form(
+      mapping(
+        "variant"          -> variant(Config.variantsWithFenAndVariants),
+        "fenVariant"       -> optional(draughtsFenVariants),
+        "timeMode"         -> timeMode,
+        "time"             -> time,
+        "increment"        -> increment,
+        "byoyomi"          -> byoyomi,
+        "periods"          -> periods,
+        "goHandicap"       -> goHandicap,
+        "goKomi"           -> goKomi(boardSize = 19),
+        "backgammonPoints" -> optional(backgammonPoints),
+        "days"             -> days,
+        "mode"             -> mode(withRated = ctx.isAuth),
+        "playerIndex"      -> playerIndex,
+        "fen"              -> fenField,
+        "multiMatch"       -> boolean,
+        "opponent"         -> opponentType
+      )(GameConfig.from)(_.>>)
+        .verifying("Invalid clock", _.validClock)
+        .verifying("Invalid speed", _.validSpeed(ctx.me.exists(_.isBot)))
+        .verifying("invalidFen", _.validFen)
+        .verifying("Invalid Komi", _.validKomi)
+        .verifying("Invalid Points", _.validPoints)
+    )
+
   def friendFilled(lib: GameLogic, fen: Option[FEN])(implicit ctx: UserContext): Form[FriendConfig] =
     friend(ctx) fill fen.foldLeft(FriendConfig.default(lib.id)) { case (config, f) =>
       config.copy(

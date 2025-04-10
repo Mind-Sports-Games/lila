@@ -133,6 +133,23 @@ trait SetupHelper { self: I18nHelper =>
       (Mode.Rated.id.toString, trans.rated.txt(), none)
     )
 
+  def translatedModeIconChoices(implicit lang: Lang): List[SelectChoice] =
+    List(
+      (Mode.Casual.id.toString, "\uE92A", trans.casual.txt().some),
+      (Mode.Rated.id.toString, "\uE92B", trans.rated.txt().some)
+    )
+
+  //todo create id for each state and translations
+  def translatedTimeModeIconChoices(implicit lang: Lang): List[SelectChoice] =
+    List(
+      ("0", "\u0054", "Bullet".some),
+      ("1", "\u0029", "Blitz".some),
+      ("2", "\u0023", "Rapid".some),
+      ("3", "\u002B", "Classical".some),
+      ("4", "\u003B", "Correspondence".some),
+      ("5", "\u006E", "Custom".some)
+    )
+
   def translatedIncrementChoices(implicit lang: Lang) =
     List(
       (1, trans.yes.txt(), none),
@@ -155,6 +172,30 @@ trait SetupHelper { self: I18nHelper =>
       variantName: Variant => String = VariantKeys.variantName(_)
   )(variant: Variant) =
     (encode(variant), variantName(variant), VariantKeys.variantTitle(variant).some)
+
+  def translatedGameFamilyIconChoices(implicit lang: Lang): List[SelectChoice] =
+    GameFamily.all.map(translatedGameFamilyIconChoice(_))
+
+  private def translatedGameFamilyIconChoice(
+      gameFamily: GameFamily
+  )(implicit lang: Lang): SelectChoice =
+    (
+      encodeGameFamilyId(gameFamily),
+      gameFamily.defaultVariant.perfIcon.toString(),
+      VariantKeys.gameFamilyName(gameFamily).some
+    )
+
+  def translatedVariantIconChoices(implicit lang: Lang): List[SelectChoice] =
+    Variant.all.map(translatedVariantIconChoice(_))
+
+  private def translatedVariantIconChoice(
+      variant: Variant
+  )(implicit lang: Lang): SelectChoice =
+    (
+      s"${encodeGameFamilyId(variant.gameFamily)}_${encodeId(variant)}",
+      variant.perfIcon.toString(),
+      VariantKeys.variantName(variant).some
+    )
 
   def translatedGameFamilyChoices(implicit lang: Lang): List[SelectChoice] =
     GameFamily.all.map(translatedGameFamilyChoice(_))
@@ -296,6 +337,14 @@ trait SetupHelper { self: I18nHelper =>
       ("p2", trans.p2.txt(), none),
       ("random", trans.randomColor.txt(), none),
       ("p1", trans.p1.txt(), none)
+    )
+
+  //TODO add to trans when complete
+  def translatedOpponentChoices(implicit lang: Lang) =
+    List(
+      ("friend", "friend", none),
+      ("bot", "bot", none),
+      ("lobby", "lobby", none)
     )
 
   def translatedAnimationChoices(implicit lang: Lang) =

@@ -4,11 +4,13 @@ import debounce from 'common/debounce';
 import * as xhr from 'common/xhr';
 import LobbyController from './ctrl';
 
+//TODO remove other form setup options
 export default class Setup {
   stores: {
     hook: FormStore;
     friend: FormStore;
     ai: FormStore;
+    game: FormStore;
   };
 
   constructor(
@@ -19,6 +21,7 @@ export default class Setup {
       hook: makeStore(makeStorage('lobby.setup.hook')),
       friend: makeStore(makeStorage('lobby.setup.friend')),
       ai: makeStore(makeStorage('lobby.setup.ai')),
+      game: makeStore(makeStorage('lobby.setup.game')),
     };
   }
 
@@ -154,7 +157,11 @@ export default class Setup {
       $modeChoices = $modeChoicesWrap.find('input'),
       $casual = $modeChoices.eq(0),
       $rated = $modeChoices.eq(1),
-      $variantSelect = $form.find('#sf_variant'),
+      //$variantSelect = $form.find('#sf_variant'),
+      $gameFamilies = $form.find('.gameFamily_choice'),
+      $gameFamilyInput = $gameFamilies.find('.gameFamily_choice [name=gameFamily]'),
+      $variants = $form.find('.variant_choice'),
+      $variantInput = $variants.find('.variant_choice [name=variant]'), //todo not a select anymore....
       $fenPosition = $form.find('.fen_position'),
       $fenInput = $fenPosition.find('input'),
       forceFromPosition = !!$fenInput.val(),
@@ -181,7 +188,7 @@ export default class Setup {
       $submits = $form.find('.playerIndex-submits__button'),
       toggleButtons = () => {
         randomPlayerIndexVariants;
-        const variantId = ($variantSelect.val() as string).split('_'),
+        const variantId = ($variantInput.filter(':checked').val() as string).split('_'),
           timeMode = <string>$timeModeSelect.val(),
           rated = $rated.prop('checked'),
           limit = parseFloat($timeInput.val() as string),
@@ -279,7 +286,7 @@ export default class Setup {
     }
 
     const showRating = () => {
-      const variantId = ($variantSelect.val() as string).split('_'),
+      const variantId = ($variantInput.filter(':checked').val() as string).split('_'),
         timeMode = $timeModeSelect.val();
       let key = 'correspondence';
       switch (variantId[0]) {
@@ -473,7 +480,7 @@ export default class Setup {
       save();
     };
     const showStartingImages = () => {
-      const variantId = ($variantSelect.val() as string).split('_');
+      const variantId = ($variantInput.filter(':checked').val() as string).split('_');
       const class_list =
         'chess draughts loa shogi xiangqi flipello oware togyzkumalak amazons go backgammon breakthroughtroyka abalone';
       let key = 'chess';
@@ -582,7 +589,7 @@ export default class Setup {
         $form.find('.playerIndex-submits').append(playstrategy.spinnerHtml);
       });
     if (this.root.opts.blindMode) {
-      $variantSelect[0]!.focus();
+      $variantInput.filter(':checked')[0]!.focus();
       $timeInput.add($incrementInput).on('change', () => {
         toggleButtons();
         showRating();
@@ -688,7 +695,7 @@ export default class Setup {
             return ('' + v / 10.0).replace('.0', '');
           },
           show = (komi: number) => $value.text(showKomi(komi)),
-          variantId = ($variantSelect.val() as string).split('_'),
+          variantId = ($variantInput.filter(':checked').val() as string).split('_'),
           boardsize = variantId[1] == '1' ? 9 : variantId[1] == '2' ? 13 : 19,
           defaultValue = boardsize === 9 ? 55 : 75,
           initialValue =
@@ -788,7 +795,7 @@ export default class Setup {
     const validateFen = debounce(() => {
       $fenInput.removeClass('success failure');
       const fen = $fenInput.val() as string;
-      const variantId = ($variantSelect.val() as string).split('_');
+      const variantId = ($variantInput.filter(':checked').val() as string).split('_');
       const lib = variantId[0];
       if (fen) {
         const [path, params] = $fenInput.parent().data('validate-url').split('?'); // Separate "strict=1" for AI match
@@ -813,12 +820,12 @@ export default class Setup {
     $fenInput.on('keyup', validateFen);
 
     if (forceFromPosition) {
-      switch (($variantSelect.val() as string).split('_')[0]) {
+      switch (($variantInput.filter(':checked').val() as string).split('_')[0]) {
         case '0':
-          $variantSelect.val('0_3');
+          $variantInput.val('0_3'); //TODO check this still works...
           break;
         case '1':
-          $variantSelect.val('1_3');
+          $variantInput.val('1_3');
           break;
         //TODO: Add all variants from position?
       }
@@ -828,9 +835,9 @@ export default class Setup {
       optgroup.setAttribute('label', optgroup.getAttribute('name') || '');
     });
 
-    $variantSelect
+    $variantInput
       .on('change', function (this: HTMLElement) {
-        const variantId = ($variantSelect.val() as string).split('_'),
+        const variantId = ($variantInput.filter(':checked').val() as string).split('_'),
           isFen = variantId[1] == '3';
         let ground = 'chessground';
         if (variantId[0] == '1') ground = 'draughtsground';
@@ -856,6 +863,45 @@ export default class Setup {
       })
       .trigger('change');
 
+    $gameFamilyInput
+      .on('change', function (this: HTMLElement) {
+        const variantId = ($variantInput.filter(':checked').val() as string).split('_'),
+          gameFamily = $gameFamilyInput.filter(':checked').val() as string;
+
+        $variantInput.each(function (this: HTMLElement) {
+          const gfOfVariant = ($(this).val() as string).split('_')[0];
+          if (gfOfVariant === gameFamily) {
+            $(this).parent().show();
+          } else {
+            $(this).parent().hide();
+          }
+        });
+
+        if (variantId[0] !== gameFamily) {
+          const variantValue = function () {
+            switch (gameFamily) {
+              case '2':
+                return '2_11';
+              case '4':
+                return '4_2';
+              case '5':
+                return '5_6';
+              case '8':
+                return '8_8';
+              case '9':
+                return '9_4';
+              case '11':
+                return '11_9';
+              default:
+                return `${gameFamily}_1`;
+            }
+          };
+          $variantInput.filter(`[value="${variantValue()}"]`).trigger('click');
+        }
+        toggleButtons();
+      })
+      .trigger('change');
+
     $modeChoices.on('change', () => {
       toggleButtons();
       save();
@@ -874,27 +920,27 @@ export default class Setup {
       }
     });
 
-    $form.find('div.level').each(function (this: HTMLElement) {
-      const $infos = $(this).find('.ai_info > div');
-      $(this)
-        .find('label')
-        .on('mouseenter', function (this: HTMLElement) {
-          $infos
-            .hide()
-            .filter('.' + $(this).attr('for'))
-            .show();
-        });
-      $(this)
-        .find('#config_level')
-        .on('mouseleave', function (this: HTMLElement) {
-          const level = $(this).find('input:checked').val();
-          $infos
-            .hide()
-            .filter('.sf_level_' + level)
-            .show();
-        })
-        .trigger('mouseout');
-      $(this).find('input').on('change', save);
-    });
+    // $form.find('div.level').each(function (this: HTMLElement) {
+    //   const $infos = $(this).find('.ai_info > div');
+    //   $(this)
+    //     .find('label')
+    //     .on('mouseenter', function (this: HTMLElement) {
+    //       $infos
+    //         .hide()
+    //         .filter('.' + $(this).attr('for'))
+    //         .show();
+    //     });
+    //   $(this)
+    //     .find('#config_level')
+    //     .on('mouseleave', function (this: HTMLElement) {
+    //       const level = $(this).find('input:checked').val();
+    //       $infos
+    //         .hide()
+    //         .filter('.sf_level_' + level)
+    //         .show();
+    //     })
+    //     .trigger('mouseout');
+    //   $(this).find('input').on('change', save);
+    // });
   };
 }

@@ -41,9 +41,10 @@ private object Mappings {
     number
       .verifying(HookConfig.modes contains _)
       .verifying(m => m == Mode.Casual.id || withRated)
-  val ratingRange = text.verifying(RatingRange valid _)
-  val playerIndex = text.verifying(PlayerIndex.names contains _)
-  val level       = number.verifying(AiConfig.levels contains _)
-  val speed       = number.verifying(Config.speeds contains _)
-  val fenField    = optional(nonEmptyText)
+  val ratingRange  = text.verifying(RatingRange valid _)
+  val playerIndex  = text.verifying(PlayerIndex.names contains _)
+  val level        = number.verifying(AiConfig.levels contains _)
+  val speed        = number.verifying(Config.speeds contains _)
+  val fenField     = optional(nonEmptyText)
+  val opponentType = text.verifying(GameConfig.opponentTypes contains _)
 }
