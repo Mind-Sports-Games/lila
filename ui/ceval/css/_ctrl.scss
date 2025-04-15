@@ -52,9 +52,26 @@
       font-size: 11px;
     }
 
+    @keyframes fadeIn {
+      0% {
+        opacity: 0;
+      }
+      100% {
+        opacity: 1;
+      }
+    }
+
     .info {
       display: block;
       white-space: nowrap;
+
+      &.display {
+        animation: fadeIn 1s ease-in-out;
+      }
+
+      &.hide {
+        opacity: 0;
+      }
     }
 
     .deeper {
