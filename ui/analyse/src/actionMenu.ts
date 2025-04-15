@@ -5,9 +5,10 @@ import { AutoplayDelay } from './autoplay';
 import { boolSetting, BoolSetting } from './boolSetting';
 import AnalyseCtrl from './ctrl';
 import { cont as contRoute } from 'game/router';
-import { bind, dataIcon, allowClientEvalForVariant } from './util';
+import { bind, dataIcon } from './util';
 import * as pgnExport from './pgnExport';
 import { isChess } from 'common/analysis';
+import { allowedForVariant as allowClientEvalForVariant } from 'ceval/src/util';
 
 interface AutoplaySpeed {
   name: string;

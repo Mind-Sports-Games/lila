@@ -46,12 +46,12 @@ import { SquareSet } from 'stratops/squareSet';
 import { parseFen } from 'stratops/fen';
 import { Position, PositionError } from 'stratops/chess';
 import { Result } from '@badrap/result';
-import { setupPosition } from 'stratops/variant';
 import { storedProp, StoredBooleanProp } from 'common/storage';
 import { AnaMove, AnaDrop, AnaPass, StudyCtrl } from './study/interfaces';
 import { StudyPracticeCtrl } from './study/practice/interfaces';
 import { valid as crazyValid } from './crazy/crazyCtrl';
 import { isOnlyDropsPly } from './util';
+import { getClassFromRules } from 'stratops/variants/utils';
 
 export default class AnalyseCtrl {
   data: AnalyseData;
@@ -767,7 +767,7 @@ export default class AnalyseCtrl {
 
   position(node: Tree.Node): Result<Position, PositionError> {
     const setup = parseFen(stratUtils.variantToRules(this.data.game.variant.key))(node.fen).unwrap();
-    return setupPosition(playstrategyRules(this.data.game.variant.key), setup);
+    return getClassFromRules(playstrategyRules(this.data.game.variant.key)).fromSetup(setup);
   }
 
   canUseCeval(): boolean {
