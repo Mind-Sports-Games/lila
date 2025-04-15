@@ -38,6 +38,19 @@ const noVariantOutcomeVariants: VariantKey[] = [
   'flipello10',
 ];
 
+const blackStartsVariants: VariantKey[] = [
+  'abalone',
+  'flipello',
+  'flipello10',
+  'go9x9',
+  'go13x13',
+  'go19x19',
+  'linesOfAction',
+  'minishogi',
+  'scrambledEggs',
+  'shogi',
+];
+
 export function isEvalBetter(a: Tree.ClientEval, b?: Tree.ClientEval): boolean {
   return !b || a.depth > b.depth || (a.depth === b.depth && a.nodes > b.nodes);
 }
@@ -65,4 +78,8 @@ export function allowPv(variant: VariantKey) {
 
 export function noVariantOutcome(variantKey: VariantKey): boolean {
   return noVariantOutcomeVariants.indexOf(variantKey) != -1;
+}
+
+export function blackStartsVariant(variant: VariantKey) {
+  return blackStartsVariants.indexOf(variant) != -1;
 }

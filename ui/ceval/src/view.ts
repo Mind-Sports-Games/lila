@@ -8,7 +8,7 @@ import { playstrategyRules } from 'stratops/compat';
 import { makeSanAndPlay } from 'stratops/san';
 import { dimensionsForRules, opposite, parseUci } from 'stratops/util';
 import { parseFen, makeBoardFen } from 'stratops/fen';
-import { renderEval } from './util';
+import { blackStartsVariant, renderEval } from './util';
 import { notationStyle, variantToRules } from 'stratutils';
 import { getClassFromRules } from 'stratops/variants/utils';
 
@@ -137,6 +137,7 @@ export function renderGauge(ctrl: ParentCtrl): VNode | undefined {
       class: {
         empty: ev === null,
         reverse: ctrl.getOrientation() === 'p2',
+        'swap-colors': blackStartsVariant(ctrl.getCeval().variant.key),
       },
     },
     [h('div.p2', { attrs: { style: `height: ${100 - (ev + 1) * 50}%` } }), ...gaugeTicks],
