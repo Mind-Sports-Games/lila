@@ -52,6 +52,7 @@
       font-size: 11px;
     }
 
+    // this is a workaround to not display "Loading Engine" even when the game finished
     @keyframes fadeIn {
       0% {
         opacity: 0;
@@ -66,7 +67,7 @@
       white-space: nowrap;
 
       &.display {
-        animation: fadeIn 1s ease-in-out;
+        animation: fadeIn 1200ms ease-in-out;
       }
 
       &.hide {
