@@ -184,7 +184,9 @@ export default class Setup {
       vsPSBot = this.psBots.includes(user),
       typ = $form.data('type'),
       $ratings = $modal.find('.ratings > div'),
+      $collapsibleSections = $modal.find('.collapsible'),
       randomPlayerIndexVariants = $form.data('random-playerindex-variants').split(','),
+      $playerIndex = $form.find('.playerIndex_choices'),
       $submits = $form.find('.playerIndex-submits__button'),
       toggleButtons = () => {
         randomPlayerIndexVariants;
@@ -525,8 +527,8 @@ export default class Setup {
           key = 'abalone';
           break;
       }
-      $form.find('.playerIndex-submits').removeClass(class_list);
-      $form.find('.playerIndex-submits').addClass(key);
+      $playerIndex.removeClass(class_list);
+      $playerIndex.addClass(key);
       save();
     };
 
@@ -739,6 +741,48 @@ export default class Setup {
         save();
         clearFenInput();
         toggleButtons();
+      });
+    });
+    $collapsibleSections.each(function (this: HTMLDivElement) {
+      const $this = $(this);
+      const sName = $this.find('input').attr('name') || '';
+      //initial display of form
+      $this.removeClass('active');
+      $this.find('group').addClass('hide');
+      $this
+        .find('div.choice')
+        .hide()
+        .filter(`.${sName}_` + $this.find('input').filter(':checked').val())
+        .show();
+      //Always start the form with gameFamily active
+      if (sName == 'gameFamily') {
+        $this.addClass('active');
+        $this.find('group').removeClass('hide');
+        $this.find('div.choice').hide();
+      }
+      //todo also collapse other sections?
+      $this.on('click', function (this: HTMLElement) {
+        this.classList.toggle('active');
+        $(this).find('group').toggleClass('hide');
+        const $displayChoices = $this.find('div.choice');
+        if (this.classList.contains('active')) {
+          $displayChoices.hide();
+        } else {
+          $displayChoices
+            .hide()
+            .filter(`.${sName}_` + $this.find('input').filter(':checked').val())
+            .show();
+        }
+      });
+      $this.attr('tabindex', '0'); // Make the element focusable
+      $this.on('blur', function (this: HTMLElement) {
+        this.classList.remove('active');
+        $(this).find('group').addClass('hide');
+        const $displayChoices = $this.find('div.choice');
+        $displayChoices
+          .hide()
+          .filter(`.${sName}_` + $this.find('input').filter(':checked').val())
+          .show();
       });
     });
     $form.find('.rating-range').each(function (this: HTMLDivElement) {

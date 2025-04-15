@@ -384,23 +384,6 @@ final class Setup(
       }
     }
 
-  //TODO do we need this for bots?
-  // def apiAi =
-  //   ScopedBody(_.Challenge.Write, _.Bot.Play, _.Board.Play) { implicit req => me =>
-  //     implicit val lang = reqLang
-  //     PostRateLimit(HTTPRequest ipAddress req) {
-  //       forms.api.ai
-  //         .bindFromRequest()
-  //         .fold(
-  //           jsonFormError,
-  //           config =>
-  //             processor.apiAi(config, me) map { pov =>
-  //               Created(env.game.jsonView(pov.game, config.fen)) as JSON
-  //             }
-  //         )
-  //     }(rateLimitedFu)
-  //   }
-
   private def process[A](form: Context => Form[A])(op: A => BodyContext[_] => Fu[Pov]) =
     OpenBody { implicit ctx =>
       PostRateLimit(HTTPRequest ipAddress ctx.req) {

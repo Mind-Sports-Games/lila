@@ -93,22 +93,6 @@ object home {
             //   ),
             //   trans.playWithAFriend()
             // ),
-            // a(
-            //   href := routes.Setup.aiForm,
-            //   cls := List(
-            //     "button button-color-choice config_ai invisible" -> true,
-            //     "disabled"                                       -> currentGame.isDefined
-            //   ),
-            //   trans.playWithTheMachine()
-            // ),
-            // a(
-            //   href := routes.PlayApi.botOnline,
-            //   cls := List(
-            //     "button button-color-choice config_bot just-a-link" -> true,
-            //     "disabled"                                          -> currentGame.isDefined
-            //   ),
-            //   trans.playWithBots()
-            // ),
             a(
               href := routes.Setup.gameForm(none),
               cls := List(

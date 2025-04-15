@@ -57,45 +57,6 @@ object forms {
   //     )
   //   }
 
-  // def ai(form: Form[_], ratings: Map[Int, Int], validFen: Option[lila.setup.ValidFen])(implicit
-  //     ctx: Context
-  // ) =
-  //   layout("ai", trans.playWithTheMachine(), routes.Setup.ai) {
-  //     frag(
-  //       div(cls := "botInfo")(
-  //         a(href := routes.PlayApi.botOnline)(trans.seeOurListOfBots()),
-  //         br,
-  //         span(s"- ${trans.orUpper.txt()} -"),
-  //         br,
-  //         span(trans.playAgainstX("Stockfish"))
-  //       ),
-  //       renderVariant(form, translatedAiVariantChoices),
-  //       fenInput(form("fen"), strict = true, validFen),
-  //       renderTimeMode(form, allowAnon = true, allowCorrespondence = true),
-  //       if (ctx.blind)
-  //         frag(
-  //           renderLabel(form("level"), trans.strength()),
-  //           renderSelect(form("level"), lila.setup.AiConfig.levelChoices),
-  //           blindSideChoice(form)
-  //         )
-  //       else
-  //         frag(
-  //           br,
-  //           trans.strength(),
-  //           div(cls := "level buttons")(
-  //             div(id := "config_level")(
-  //               renderRadios(form("level"), lila.setup.AiConfig.levelChoices)
-  //             ),
-  //             div(cls := "ai_info")(
-  //               ratings.toList.map { case (level, _) =>
-  //                 div(cls := s"${prefix}level_$level")(trans.aiNameLevelAiLevel("Stockfish 13", level))
-  //               }
-  //             )
-  //           )
-  //         )
-  //     )
-  //   }
-
   // def friend(
   //     form: Form[_],
   //     user: Option[User],
@@ -149,10 +110,12 @@ object forms {
         //renderTimeModeOptions(form), //todo support new form input which overrides timeMode
         renderTimeMode(form, allowAnon = false, allowCorrespondence = true),
         renderMultiMatch(form),
+        renderPlayerIndexOptions(form("playerIndex")),
         ctx.isAuth option frag(
-          div(cls := "mode_choice buttons")(
-            "Mode",
-            renderIconRadios(form("mode"), translatedModeIconChoices)
+          div(cls := "mode_choice buttons collapsible optional_config")(
+            div(cls := "section_title")("Mode"),
+            renderIconRadios(form("mode"), translatedModeIconChoices),
+            renderSelectedChoice(form("mode"), translatedModeIconChoices)
           )
           // ctx.noBlind option div(cls := "optional_config")(
           //   div(cls := "rating-range-config")(
@@ -223,19 +186,7 @@ object forms {
             dataAnon := ctx.isAnon.option("1")
           )(
             fields,
-            if (ctx.blind) submitButton("Create the game")
-            else
-              div(cls := "playerIndex-submits")(
-                translatedSideChoices.map { case (key, name, _) =>
-                  submitButton(
-                    (typ == "hook") option disabled,
-                    title := name,
-                    cls := s"playerIndex-submits__button button button-metal $key",
-                    st.name := "playerIndex",
-                    value := key
-                  )(i)
-                }
-              )
+            submitButton("Create the game")
           )
         },
       ctx.me.ifFalse(ctx.blind).map { me =>

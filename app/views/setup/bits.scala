@@ -38,24 +38,28 @@ private object bits {
   }
 
   def renderGameFamilyOptions(form: Form[_], libs: List[SelectChoice])(implicit ctx: Context) =
-    div(cls := "gameFamily_choice buttons")(
-      "Game Family",
+    div(cls := "gameFamily_choice buttons collapsible optional_config")(
+      div(cls := "section_title")("Game Family"),
       div(id := "gameFamily_icons")(
-        renderIconRadios(form("gameFamily"), libs)
+        renderIconRadios(form("gameFamily"), libs),
+        renderSelectedChoice(form("gameFamily"), libs)
       )
     )
 
   def renderVariantOptions(form: Form[_], libs: List[SelectChoice])(implicit ctx: Context) =
-    div(cls := "variant_choice buttons")(
-      a(
-        cls := "remove_color",
-        title := "More info",
-        href := s"${routes.Page.variantHome}",
-        target := "_blank"
-      )(
-        trans.variant()
+    div(cls := "variant_choice buttons collapsible")(
+      div(cls := "section_title")(
+        a(
+          cls := "remove_color",
+          title := "More info",
+          href := s"${routes.Page.variantHome}",
+          target := "_blank"
+        )(trans.variant())
       ),
-      div(id := "variant_icons")(renderIconRadios(form("variant"), libs))
+      div(id := "variant_icons")(
+        renderIconRadios(form("variant"), libs),
+        renderSelectedChoice(form("variant"), libs)
+      )
     )
 
   def renderGameFamily(form: Form[_], libs: List[SelectChoice])(implicit ctx: Context) =
@@ -132,6 +136,19 @@ private object bits {
       )(name)
     }
 
+  def renderSelectedChoice(field: Field, options: Seq[SelectChoice]) =
+    options.map { case (key, icon, hint) =>
+      div(cls := s"${field.name}_$key choice", dataIcon := icon, title := hint)( //TODO refactor?
+        key == "bot" option img(
+          src := staticAssetUrl("images/icons/bot.png"),
+          title := "Robot chess",
+          style :=
+            "display:inline;width:34px;height:34px;vertical-align:top;margin-right:5px;vertical-align:text-top"
+        ),
+        hint
+      )
+    }
+
   def renderIconRadios(field: Field, options: Seq[SelectChoice]) =
     st.group(cls := "radio")(
       options.map { case (key, icon, hint) =>
@@ -148,7 +165,15 @@ private object bits {
             dataIcon := icon,
             title := hint,
             `for` := s"$prefix${field.id}_$key"
-          )()
+          )( //TODO refactor?
+            key == "bot" option img(
+              src := staticAssetUrl("images/icons/bot.png"),
+              title := "Robot chess",
+              style :=
+                "display:inline;width:34px;height:34px;vertical-align:top;margin-right:5px;vertical-align:text-top"
+            ),
+            hint
+          )
         )
       }
     )
@@ -224,10 +249,44 @@ private object bits {
     )
 
   def renderOpponentOptions(form: Form[_])(implicit ctx: Context) =
-    div(cls := "opponent_choices buttons")(
-      renderRadios(form("opponent"), translatedOpponentChoices)
+    div(cls := "opponent_choices buttons collapsible")(
+      div(cls := "section_title")("Opponent"),
+      renderIconRadios(form("opponent"), translatedOpponentChoices),
+      renderSelectedChoice(form("opponent"), translatedOpponentChoices)
     )
 
+  def renderPlayerIndexOptions(field: Field)(implicit ctx: Context) =
+    div(cls := "playerIndex collapsible")(
+      div(cls := "section_title")("PlayerIndex"),
+      div(cls := "playerIndex_choices buttons")(
+        st.group(cls := "radio")(
+          translatedSideChoices.map { case (key, _, _) =>
+            div(
+              input(
+                tpe := "radio",
+                id := s"$prefix${field.id}_$key",
+                st.name := field.name,
+                value := key,
+                field.value.has(key) option checked
+              ),
+              label(
+                cls := s"playerIndex__button button button-metal $key",
+                title := key,
+                `for` := s"$prefix${field.id}_$key"
+              )(i)
+            )
+          }
+        ),
+        translatedSideChoices.map { case (key, _, _) =>
+          div(
+            cls := s"${field.name}_$key choice playerIndex__button button button-metal $key",
+            title := key
+          )(i)
+        }
+      )
+    )
+
+  //TODO add new form input for this choice, allow specific modes for each gf
   def renderTimeModeOptions(form: Form[_])(implicit ctx: Context) =
     div(cls := "time_mode_config optional_config")(
       renderLabel(
