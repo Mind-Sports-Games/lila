@@ -1,5 +1,6 @@
 import * as winningChances from './winningChances';
 import { defined } from 'common';
+import { moveFromNotationStyle } from 'common/notation';
 import { Eval, CevalCtrl, ParentCtrl, NodeEvals } from './types';
 import { h, VNode } from 'snabbdom';
 import { Position } from 'stratops/chess';
@@ -8,8 +9,8 @@ import { makeSanAndPlay } from 'stratops/san';
 import { dimensionsForRules, opposite, parseUci } from 'stratops/util';
 import { parseFen, makeBoardFen } from 'stratops/fen';
 import { renderEval } from './util';
-import { setupPosition } from 'stratops/variant';
-import { variantToRules } from 'stratutils';
+import { notationStyle, variantToRules } from 'stratutils';
+import { getClassFromRules } from 'stratops/variants/utils';
 
 let gaugeLast = 0;
 const gaugeTicks: VNode[] = [...Array(8).keys()].map(i =>
@@ -301,7 +302,7 @@ export const renderPvs =
       setup.turn = opposite(setup.turn);
       if (setup.turn == 'p1') setup.fullmoves += 1;
     }
-    const pos = setupPosition(playstrategyRules(instance.variant.key), setup);
+    const pos = getClassFromRules(playstrategyRules(instance.variant.key)).fromSetup(setup);
 
     return h(
       'div.pv_box',
@@ -399,7 +400,10 @@ function renderPvWrapToggle(): VNode {
 
 function renderPvMoves(pos: Position, pv: Uci[], variantKey: VariantKey): VNode[] {
   const vnodes: VNode[] = [];
-  let key = makeBoardFen(playstrategyRules(variantKey))(pos.board);
+  const rules = playstrategyRules(variantKey);
+  const prevBoard = pos.board.clone();
+  const prevFen = makeBoardFen(rules)(prevBoard);
+  let key = prevFen;
   for (let i = 0; i < pv.length; i++) {
     let text;
     if (pos.turn === 'p1') {
@@ -411,8 +415,8 @@ function renderPvMoves(pos: Position, pv: Uci[], variantKey: VariantKey): VNode[
       vnodes.push(h('span', { key: text }, text));
     }
     const uci = pv[i];
-    const san = makeSanAndPlay(playstrategyRules(variantKey))(pos, parseUci(playstrategyRules(variantKey))(uci)!);
-    const fen = makeBoardFen(playstrategyRules(variantKey))(pos.board);
+    const san = makeSanAndPlay(rules)(pos, parseUci(rules)(uci)!);
+    const fen = makeBoardFen(rules)(pos.board);
     if (san === '--') {
       break;
     }
@@ -427,7 +431,22 @@ function renderPvMoves(pos: Position, pv: Uci[], variantKey: VariantKey): VNode[
             'data-board': `${fen}|${uci}`,
           },
         },
-        san,
+        moveFromNotationStyle(notationStyle(variantKey))(
+          {
+            san,
+            uci,
+            fen,
+            prevFen,
+          },
+          {
+            // @Note: we do not have access to the variant here, so we use stubs because that code should be refactored and moved to stratutils or stratops
+            key: variantKey,
+            name: 'stub',
+            short: 'stub',
+            lib: 0,
+            boardSize: { width: 8, height: 8 },
+          },
+        ),
       ),
     );
   }
