@@ -17,6 +17,8 @@ import strategygames.{
   Role
 }
 import strategygames.chess.{ Pos => ChessPos }
+import strategygames.chess
+import strategygames.fairysf
 import org.joda.time.DateTime
 import reactivemongo.api.bson._
 import scala.util.Success
@@ -305,20 +307,42 @@ object BSONHandlers {
     implicit def CrazyDataBSONHandler: BSON[PocketData] =
       new BSON[PocketData] {
         private def writePocket(p: Pocket) = p.roles.map(_.forsyth).mkString
-        //will need to be updated for different GameFamilys
-        private def readPocket(p: String) = Pocket(
-          p.view.flatMap(r => Role.forsyth(variant.gameLogic, r)).toList
-        )
         def reads(r: Reader) =
-          PocketData.Chess(
-            strategygames.chess.PocketData(
-              promoted = r.getsD[strategygames.chess.Pos]("o").toSet,
-              pockets = Pockets(
-                p1 = readPocket(r.strD("w")),
-                p2 = readPocket(r.strD("b"))
+          variant.gameLogic match {
+            case GameLogic.Chess() =>
+              PocketData.Chess(
+                chess.PocketData(
+                  promoted = Set(),
+                  pockets = {
+                    val (p1, p2) = (
+                      r.strD("w").view.flatMap(c => chess.Piece.fromChar(c)).to(List),
+                      r.strD("b").view.flatMap(c => chess.Piece.fromChar(c)).to(List)
+                    )
+                    Pockets(
+                      p1 = Pocket(p1.map(_.role).map(Role.ChessRole)),
+                      p2 = Pocket(p2.map(_.role).map(Role.ChessRole))
+                    )
+                  }
+                )
               )
-            )
-          )
+            case GameLogic.FairySF() =>
+              PocketData.FairySF(
+                fairysf.PocketData(
+                  promoted = Set(),
+                  pockets = {
+                    val (p1, p2) = (
+                      r.strD("w").view.flatMap(c => fairysf.Piece.fromChar(GameFamily.Shogi(), c)).to(List),
+                      r.strD("b").view.flatMap(c => fairysf.Piece.fromChar(GameFamily.Shogi(), c)).to(List)
+                    )
+                    Pockets(
+                      p1 = Pocket(p1.map(_.role).map(Role.FairySFRole)),
+                      p2 = Pocket(p2.map(_.role).map(Role.FairySFRole))
+                    )
+                  }
+                )
+              )
+            case _ => sys.error(s"Pocket Data BSON reader not implemented for GameLogic: ${r.intD("l")}")
+          }
         def writes(w: Writer, s: PocketData) =
           $doc(
             "o" -> w.listO(s.promoted.toList),
