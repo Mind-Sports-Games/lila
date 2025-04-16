@@ -17,8 +17,6 @@ import strategygames.{
   Role
 }
 import strategygames.chess.{ Pos => ChessPos }
-import strategygames.chess
-import strategygames.fairysf
 import org.joda.time.DateTime
 import reactivemongo.api.bson._
 import scala.util.Success
@@ -311,12 +309,12 @@ object BSONHandlers {
           variant.gameLogic match {
             case GameLogic.Chess() =>
               PocketData.Chess(
-                chess.PocketData(
-                  promoted = Set(),
+                strategygames.chess.PocketData(
+                  promoted = r.getsD[strategygames.chess.Pos]("o").toSet,
                   pockets = {
                     val (p1, p2) = (
-                      r.strD("w").view.flatMap(c => chess.Piece.fromChar(c)).to(List),
-                      r.strD("b").view.flatMap(c => chess.Piece.fromChar(c)).to(List)
+                      r.strD("w").view.flatMap(c => strategygames.chess.Piece.fromChar(c)).to(List),
+                      r.strD("b").view.flatMap(c => strategygames.chess.Piece.fromChar(c)).to(List)
                     )
                     Pockets(
                       p1 = Pocket(p1.map(_.role).map(Role.ChessRole)),
@@ -327,16 +325,37 @@ object BSONHandlers {
               )
             case GameLogic.FairySF() =>
               PocketData.FairySF(
-                fairysf.PocketData(
+                strategygames.fairysf.PocketData(
                   promoted = Set(),
                   pockets = {
                     val (p1, p2) = (
-                      r.strD("w").view.flatMap(c => fairysf.Piece.fromChar(GameFamily.Shogi(), c)).to(List),
-                      r.strD("b").view.flatMap(c => fairysf.Piece.fromChar(GameFamily.Shogi(), c)).to(List)
+                      r.strD("w")
+                        .view
+                        .flatMap(c => strategygames.fairysf.Piece.fromChar(variant.gameFamily, c))
+                        .to(List),
+                      r.strD("b")
+                        .view
+                        .flatMap(c => strategygames.fairysf.Piece.fromChar(variant.gameFamily, c))
+                        .to(List)
                     )
                     Pockets(
                       p1 = Pocket(p1.map(_.role).map(Role.FairySFRole)),
                       p2 = Pocket(p2.map(_.role).map(Role.FairySFRole))
+                    )
+                  }
+                )
+              )
+            case GameLogic.Backgammon() =>
+              PocketData.Backgammon(
+                strategygames.backgammon.PocketData(
+                  pockets = {
+                    val (p1, p2) = (
+                      r.strD("w").view.flatMap(c => strategygames.backgammon.Piece.fromChar(c)).to(List),
+                      r.strD("b").view.flatMap(c => strategygames.backgammon.Piece.fromChar(c)).to(List)
+                    )
+                    Pockets(
+                      p1 = Pocket(p1.map(_.role).map(Role.BackgammonRole)),
+                      p2 = Pocket(p2.map(_.role).map(Role.BackgammonRole))
                     )
                   }
                 )
