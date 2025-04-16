@@ -1775,6 +1775,7 @@ val `now` = new I18nKey("perfStat:now")
 
 object search {
 val `search` = new I18nKey("search:search")
+val `searchUser` = new I18nKey("search:searchUser")
 val `advancedSearch` = new I18nKey("search:advancedSearch")
 val `opponentName` = new I18nKey("search:opponentName")
 val `loser` = new I18nKey("search:loser")
