@@ -345,6 +345,21 @@ object BSONHandlers {
                   }
                 )
               )
+            case GameLogic.Go() =>
+              PocketData.Go(
+                strategygames.go.PocketData(
+                  pockets = {
+                    val (p1, p2) = (
+                      r.strD("w").view.flatMap(c => strategygames.go.Piece.fromChar(c)).to(List),
+                      r.strD("b").view.flatMap(c => strategygames.go.Piece.fromChar(c)).to(List)
+                    )
+                    Pockets(
+                      p1 = Pocket(p1.map(_.role).map(Role.GoRole)),
+                      p2 = Pocket(p2.map(_.role).map(Role.GoRole))
+                    )
+                  }
+                )
+              )
             case GameLogic.Backgammon() =>
               PocketData.Backgammon(
                 strategygames.backgammon.PocketData(
@@ -360,7 +375,8 @@ object BSONHandlers {
                   }
                 )
               )
-            case _ => sys.error(s"Pocket Data BSON reader not implemented for GameLogic: ${r.intD("l")}")
+            case _ =>
+              sys.error(s"Pocket Data BSON reader not implemented for GameLogic: ${variant.gameLogic}")
           }
         def writes(w: Writer, s: PocketData) =
           $doc(
