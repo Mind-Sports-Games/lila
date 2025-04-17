@@ -66,7 +66,7 @@ object publicChat {
         chat.lines.filter(_.isVisible).map { line =>
           div(
             cls := List(
-              "line"    -> true,
+              "line"         -> true,
               "playstrategy" -> line.isPlayStrategy
             )
           )(

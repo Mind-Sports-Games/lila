@@ -9,7 +9,7 @@ import lila.app.ui.ScalatagsTemplate._
 import controllers.routes
 
 object show {
-/*
+  /*
   def apply(
       video: lila.video.Video,
       similar: Seq[lila.video.VideoView],
@@ -65,5 +65,5 @@ object show {
         )
       )
     }
-  */
+   */
 }

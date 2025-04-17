@@ -12,7 +12,7 @@ import lila.user.{ User => UserModel }
 import lila.common.config.MaxPerSecond
 
 final class RelayTour(env: Env, apiC: => Api) extends LilaController(env) {
-/*
+  /*
   def index(page: Int) =
     Open { implicit ctx =>
       Reasonable(page) {
@@ -101,5 +101,5 @@ final class RelayTour(env: Env, apiC: => Api) extends LilaController(env) {
         _ ?? f(tour)
       }
     }
-*/
+   */
 }
