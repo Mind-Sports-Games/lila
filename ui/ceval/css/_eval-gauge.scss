@@ -50,4 +50,13 @@ main {
     background: if($theme-light, #888, #666);
     transition: height 1s;
   }
+
+  &.swap-colors {
+    background: if($theme-light, #888, #666);
+
+    .back,
+    .p2 {
+      background: if($theme-light, #fff, #a0a0a0);
+    }
+  }
 }

@@ -1,6 +1,6 @@
-import { Outcome } from 'stratops/types';
-import { Prop } from 'common';
-import { StoredProp, StoredBooleanProp } from 'common/storage';
+import type { Outcome } from 'stratops/types';
+import type { Prop } from 'common';
+import type { StoredProp, StoredBooleanProp } from 'common/storage';
 
 // NNUE: Efficiently Updateable Neural Network
 // HCE: Hand-Crafted Evaluation

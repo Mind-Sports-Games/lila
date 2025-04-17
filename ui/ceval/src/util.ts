@@ -4,7 +4,7 @@ const noClientEvalVariants = [
   'scrambledEggs',
   'international',
   'antidraughts',
-  'breakthrough',
+  'breakthrough', // BKRTHRU
   'russian',
   'brazilian',
   'pool',
@@ -13,13 +13,8 @@ const noClientEvalVariants = [
   'fromPositionDraughts',
   'frisian',
   'frysk',
-  'shogi',
-  'xiangqi',
-  'minishogi',
-  'flipello',
-  'flipello10',
   'amazons',
-  'minibreakthroughtroyka',
+  'minibreakthroughtroyka', // Note: it looks like fairySF decided the board starts from a5, thus it's computations seem to be wrong
   'oware',
   'togyzkumalak',
   'bestemshe',
@@ -30,6 +25,30 @@ const noClientEvalVariants = [
   'hyper',
   'nackgammon',
   'abalone',
+];
+
+const disallowPathVizualizationVariants: VariantKey[] = ['shogi', 'minishogi', 'xiangqi', 'flipello10'];
+
+const noVariantOutcomeVariants: VariantKey[] = [
+  'minishogi',
+  'shogi',
+  'minixiangqi',
+  'xiangqi',
+  'flipello',
+  'flipello10',
+];
+
+const blackStartsVariants: VariantKey[] = [
+  'abalone',
+  'flipello',
+  'flipello10',
+  'go9x9',
+  'go13x13',
+  'go19x19',
+  'linesOfAction',
+  'minishogi',
+  'scrambledEggs',
+  'shogi',
 ];
 
 export function isEvalBetter(a: Tree.ClientEval, b?: Tree.ClientEval): boolean {
@@ -49,6 +68,18 @@ export function sanIrreversible(variant: VariantKey, san: string): boolean {
   return (variant === 'threeCheck' || variant === 'fiveCheck') && san.includes('+');
 }
 
-export function allowClientEvalForVariant(variant: VariantKey) {
+export function allowedForVariant(variant: VariantKey) {
   return noClientEvalVariants.indexOf(variant) == -1;
+}
+
+export function allowPv(variant: VariantKey) {
+  return disallowPathVizualizationVariants.indexOf(variant) == -1;
+}
+
+export function noVariantOutcome(variantKey: VariantKey): boolean {
+  return noVariantOutcomeVariants.indexOf(variantKey) != -1;
+}
+
+export function blackStartsVariant(variant: VariantKey) {
+  return blackStartsVariants.indexOf(variant) != -1;
 }

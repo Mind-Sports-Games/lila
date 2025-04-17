@@ -1,7 +1,6 @@
 import { h, VNode, Hooks, Attrs } from 'snabbdom';
 import { fixCrazySan, getScore } from 'stratutils';
 import * as cg from 'chessground/types';
-import { Rules } from 'stratops';
 
 export { autolink, innerHTML, enrichText, richHTML, toYouTubeEmbed, toTwitchEmbed } from 'common/richText';
 
@@ -294,33 +293,6 @@ const noServerEvalVariants = [
   'abalone',
 ];
 
-const noClientEvalVariants = [
-  'monster',
-  'linesOfAction',
-  'scrambledEggs',
-  'shogi',
-  'xiangqi',
-  'minishogi',
-  'flipello',
-  'flipello10',
-  'amazons',
-  'minibreakthroughtroyka',
-  'oware',
-  'togyzkumalak',
-  'bestemshe',
-  'go9x9',
-  'go13x13',
-  'go19x19',
-  'backgammon',
-  'hyper',
-  'nackgammon',
-  'abalone',
-];
-
-export function allowClientEvalForVariant(variant: VariantKey) {
-  return noClientEvalVariants.indexOf(variant) == -1;
-}
-
 export function allowServerEvalForVariant(variant: VariantKey) {
   return noServerEvalVariants.indexOf(variant) == -1;
 }
@@ -362,77 +334,4 @@ export const parseLexicalUci = (uci: string): LexicalUci | undefined => {
 export const isOnlyDropsPly = (node: Tree.Node, variantKey: VariantKey, defaultValue: boolean) => {
   if (variantKey === 'amazons') return typeof node.dropsByRole === 'string' && node.dropsByRole.length > 0;
   else return defaultValue;
-};
-
-export const variantToRules = (v: VariantKey): Rules => {
-  switch (v) {
-    case 'standard':
-      return 'chess';
-    case 'chess960':
-      return 'chess';
-    case 'antichess':
-      return 'antichess';
-    case 'fromPosition':
-      return 'chess';
-    case 'kingOfTheHill':
-      return 'kingofthehill';
-    case 'threeCheck':
-      return '3check';
-    case 'fiveCheck':
-      return '5check';
-    case 'atomic':
-      return 'atomic';
-    case 'horde':
-      return 'horde';
-    case 'racingKings':
-      return 'racingkings';
-    case 'crazyhouse':
-      return 'crazyhouse';
-    case 'noCastling':
-      return 'nocastling';
-    case 'monster':
-      return 'monster';
-    case 'linesOfAction':
-      return 'linesofaction';
-    case 'scrambledEggs':
-      return 'scrambledeggs';
-    case 'shogi':
-      return 'shogi';
-    case 'xiangqi':
-      return 'xiangqi';
-    case 'minishogi':
-      return 'minishogi';
-    case 'minixiangqi':
-      return 'minixiangqi';
-    case 'flipello':
-      return 'flipello';
-    case 'flipello10':
-      return 'flipello10';
-    case 'amazons':
-      return 'amazons';
-    case 'oware':
-      return 'oware';
-    case 'togyzkumalak':
-      return 'togyzkumalak';
-    case 'bestemshe':
-      return 'bestemshe';
-    case 'go9x9':
-      return 'go9x9';
-    case 'go13x13':
-      return 'go13x13';
-    case 'go19x19':
-      return 'go19x19';
-    case 'backgammon':
-      return 'backgammon';
-    case 'hyper':
-      return 'hyper';
-    case 'nackgammon':
-      return 'nackgammon';
-    case 'breakthroughtroyka':
-      return 'breakthrough';
-    case 'minibreakthroughtroyka':
-      return 'minibreakthrough';
-    case 'abalone':
-      return 'abalone';
-  }
 };
