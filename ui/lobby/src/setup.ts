@@ -153,6 +153,7 @@ export default class Setup {
     const self = this,
       $form = $modal.find('form'),
       $timeModeSelect = $form.find('#sf_timeMode'),
+      $timeModeDefaults = $form.find('.time_mode_defaults'),
       $modeChoicesWrap = $form.find('.mode_choice'),
       $modeChoices = $modeChoicesWrap.find('input'),
       $casual = $modeChoices.eq(0),
@@ -182,6 +183,9 @@ export default class Setup {
       userDetails = $form.attr('action')?.split('user='),
       user = userDetails && userDetails[1] ? userDetails[1].toLowerCase() : '',
       vsPSBot = this.psBots.includes(user),
+      $botChoices = $form.find('.bot_choice'),
+      $botInput = $form.find('.bot_choice [name=bot]'),
+      $opponentInput = $form.find('.opponent_choices [name=opponent]'),
       typ = $form.data('type'),
       $ratings = $modal.find('.ratings > div'),
       $collapsibleSections = $modal.find('.collapsible'),
@@ -552,6 +556,7 @@ export default class Setup {
           .prop('disabled', true)
           .attr('title', this.root.trans('youNeedAnAccountToDoThat'));
       }
+      //TODO change this as playerIndex is not with submit button anymore
       const ajaxSubmit = (playerIndex: string) => {
         const form = $form[0] as HTMLFormElement;
         const rating = parseInt($modal.find('.ratings input').val() as string) || 1500;
@@ -760,7 +765,6 @@ export default class Setup {
         $this.find('group').removeClass('hide');
         $this.find('div.choice').hide();
       }
-      //todo also collapse other sections?
       $this.on('click', function (this: HTMLElement) {
         this.classList.toggle('active');
         $(this).find('group').toggleClass('hide');
@@ -785,6 +789,7 @@ export default class Setup {
           .show();
       });
     });
+    //TODO shouldn't be able to pick lobby game if user field is set (i.e. from challenge/bot)
     $form.find('.rating-range').each(function (this: HTMLDivElement) {
       const $this = $(this),
         $minInput = $this.find('.rating-range__min'),
@@ -835,7 +840,51 @@ export default class Setup {
         showRating();
       })
       .trigger('change');
-
+    $timeModeDefaults.on('change', function (this: HTMLElement) {
+      const choice = $(this).find('input').filter(':checked').val() as string;
+      const options = choice.split('_');
+      const initial = options[1] || '3',
+        increment = options[2] || '2',
+        byoyomi = options[3] || '1',
+        periods = options[4] || '1';
+      switch (options[0]) {
+        case '1': //fischer
+          $timeModeSelect.val('1');
+          $timeInput.val(initial);
+          $incrementInput.val(increment);
+          $form.find('.time_mode_config').hide();
+          break;
+        case '2': //correspondence
+          $timeModeSelect.val('2');
+          $daysInput.val(initial);
+          $form.find('.time_mode_config').hide();
+          break;
+        case '3': //byoyomi
+          $timeModeSelect.val('3');
+          $timeInput.val(initial);
+          $incrementInput.val(increment);
+          $byoyomiInput.val(byoyomi);
+          $periodsInput.val(periods);
+          $form.find('.time_mode_config').hide();
+          break;
+        case '4': //bronstein
+          $timeModeSelect.val('4');
+          $timeInput.val(initial);
+          $incrementInput.val(increment);
+          $form.find('.time_mode_config').hide();
+          break;
+        case '5': //simple
+          $timeModeSelect.val('5');
+          $timeInput.val(initial);
+          $incrementInput.val(increment);
+          $form.find('.time_mode_config').hide();
+          break;
+        case '99': //custom - i.e. used old time setup options
+          $form.find('.time_mode_config').show();
+          $timeModeSelect.val('5');
+          break;
+      }
+    });
     const validateFen = debounce(() => {
       $fenInput.removeClass('success failure');
       const fen = $fenInput.val() as string;
@@ -877,6 +926,26 @@ export default class Setup {
 
     $form.find('optgroup').each((_, optgroup: HTMLElement) => {
       optgroup.setAttribute('label', optgroup.getAttribute('name') || '');
+    });
+
+    $botChoices.hide();
+    //TODO preset this depending on user input and/or previous form setup
+    $opponentInput.on('change', function (this: HTMLElement) {
+      const opponent = $opponentInput.filter(':checked').val() as string;
+      if (opponent == 'bot') {
+        $botChoices.show();
+      } else {
+        if (!user) $form.attr('action', $form.attr('action')?.replace(/user=[^&]*/, ''));
+        $botChoices.hide();
+      }
+    });
+    $botInput.on('change', function (this: HTMLElement) {
+      const bot = $botInput.filter(':checked').val() as string;
+      const botText = $form.find('.opponent_bot.choice');
+      //TODO add player link here instead of just user name
+      botText.text(bot);
+      if (user) $form.attr('action', $form.attr('action')?.replace(/user=[^&]*/, 'user=' + bot));
+      else $form.attr('action', $form.attr('action') + `&user=${bot}`);
     });
 
     $variantInput

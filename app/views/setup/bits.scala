@@ -6,6 +6,7 @@ import play.api.data.{ Field, Form }
 import lila.api.Context
 import lila.app.templating.Environment._
 import lila.app.ui.ScalatagsTemplate._
+import lila.user.User
 
 import strategygames.GameFamily
 
@@ -136,7 +137,7 @@ private object bits {
       )(name)
     }
 
-  def renderSelectedChoice(field: Field, options: Seq[SelectChoice]) =
+  def renderSelectedChoice(field: Field, options: Seq[SelectChoice], userPart: Option[Tag] = None) =
     options.map { case (key, icon, hint) =>
       div(cls := s"${field.name}_$key choice", dataIcon := icon, title := hint)( //TODO refactor?
         key == "bot" option img(
@@ -145,7 +146,8 @@ private object bits {
           style :=
             "display:inline;width:34px;height:34px;vertical-align:top;margin-right:5px;vertical-align:text-top"
         ),
-        hint
+        userPart == None option hint,
+        (key == "bot" || key == "friend") option userPart
       )
     }
 
@@ -248,11 +250,17 @@ private object bits {
       )
     )
 
-  def renderOpponentOptions(form: Form[_])(implicit ctx: Context) =
+  def renderOpponentOptions(form: Form[_], userPart: Option[Tag])(implicit ctx: Context) =
     div(cls := "opponent_choices buttons collapsible")(
       div(cls := "section_title")("Opponent"),
       renderIconRadios(form("opponent"), translatedOpponentChoices),
-      renderSelectedChoice(form("opponent"), translatedOpponentChoices)
+      renderSelectedChoice(form("opponent"), translatedOpponentChoices, userPart),
+      renderBotChoice(form)
+    )
+
+  def renderBotChoice(form: Form[_])(implicit ctx: Context) =
+    div(cls := "bot_choice buttons")(
+      renderRadios(form("bot"), translatedBotChoices)
     )
 
   def renderPlayerIndexOptions(field: Field)(implicit ctx: Context) =
@@ -288,9 +296,8 @@ private object bits {
 
   //TODO add new form input for this choice, allow specific modes for each gf
   def renderTimeModeOptions(form: Form[_])(implicit ctx: Context) =
-    div(cls := "time_mode_config optional_config")(
-      renderLabel(
-        form("timeMode"),
+    div(cls := "time_mode_defaults optional_config collapsible")(
+      div(cls := "section_title")(
         a(
           cls := "remove_color",
           title := "More info",
@@ -298,7 +305,8 @@ private object bits {
           target := "_blank"
         )(trans.timeControl())
       ),
-      renderIconRadios(form("timeMode"), translatedTimeModeIconChoices)
+      renderIconRadios(form("timeModeDefaults"), translatedTimeModeIconChoices),
+      renderSelectedChoice(form("timeModeDefaults"), translatedTimeModeIconChoices)
     )
 
   def renderTimeMode(form: Form[_], allowAnon: Boolean, allowCorrespondence: Boolean)(implicit ctx: Context) =

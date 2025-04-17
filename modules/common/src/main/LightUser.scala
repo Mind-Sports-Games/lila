@@ -81,14 +81,24 @@ object LightUser {
     LightUser("stockfish-level8", "Stockfish-Level8", "_playstrategy".some, "BOT".some, false)
   )
 
+  val randomBot = LightUser(
+    id = "ps-random-mover",
+    name = "PS-Random-Mover",
+    country = "_playstrategy".some,
+    title = "BOT".some,
+    isPatron = false
+  )
+
   val tourBotsIDs: List[UserID] = tourBots.map(_.id)
 
   val poolBotsIDs: List[UserID] = poolBots.map(_.id)
 
   val stockfishBotsIDs: List[UserID] = stockfishBots.map(_.id)
 
+  val lobbyBotsIDs: List[UserID] = poolBotsIDs ++ stockfishBotsIDs ++ List(randomBot.id)
+
   val easiestPoolBotId: UserID = "ps-greedy-one-move"
 
-  val psBotsIDs = tourBotsIDs ++ poolBotsIDs ++ stockfishBotsIDs
+  val psBotsIDs = tourBotsIDs ++ poolBotsIDs ++ stockfishBotsIDs ++ List(randomBot.id)
 
 }

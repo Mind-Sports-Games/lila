@@ -9,6 +9,7 @@ import lila.i18n.{ I18nKeys => trans, VariantKeys }
 import lila.pref.Pref
 import lila.report.Reason
 import lila.setup.TimeMode
+import lila.common.LightUser
 
 trait SetupHelper { self: I18nHelper =>
 
@@ -139,15 +140,16 @@ trait SetupHelper { self: I18nHelper =>
       (Mode.Rated.id.toString, "\uE92B", trans.rated.txt().some)
     )
 
-  //todo create id for each state and translations
+  //TODO decide wording on all clocks and how to be game family dependent
+  //key creates the clock (TimeMode, initial, increment, byoyomi time, periods)
   def translatedTimeModeIconChoices(implicit lang: Lang): List[SelectChoice] =
     List(
-      ("0", "\u0054", "Bullet".some),
-      ("1", "\u0029", "Blitz".some),
-      ("2", "\u0023", "Rapid".some),
-      ("3", "\u002B", "Classical".some),
-      ("4", "\u003B", "Correspondence".some),
-      ("5", "\u006E", "Custom".some)
+      ("1_1_0", "\u0054", "Fischer 1+0".some),
+      ("1_3_2", "\u0029", "Fischer 3+2".some),
+      ("1_5_5", "\u0023", "Fischer 5+5".some),
+      ("1_20_10", "\u002B", "Fischer 20+10".some),
+      ("2_2", "\u003B", "Correspondence 2d".some),
+      ("99", "\u006E", "Custom".some)
     )
 
   def translatedIncrementChoices(implicit lang: Lang) =
@@ -346,6 +348,9 @@ trait SetupHelper { self: I18nHelper =>
       ("friend", "\u0072", "friend".some),
       ("bot", "", "bot".some)
     )
+
+  def translatedBotChoices(implicit lang: Lang): List[SelectChoice] =
+    LightUser.lobbyBotsIDs.map { id => (id.toString(), id.toString(), none) }
 
   def translatedAnimationChoices(implicit lang: Lang) =
     List(

@@ -99,15 +99,12 @@ object forms {
       error.map(e => raw(e.replace("{{user}}", userIdLink(user.map(_.id)).toString)))
     ) {
       frag(
-        user.map { u =>
-          userLink(u, cssClass = "target".some)
-        },
         renderGameFamilyOptions(form, translatedGameFamilyIconChoices),
         renderVariantOptions(form, translatedVariantIconChoices),
         fenInput(form("fen"), strict = false, validFen),
         renderGoOptions(form),
         renderBackgammonOptions(form),
-        //renderTimeModeOptions(form), //todo support new form input which overrides timeMode
+        renderTimeModeOptions(form),
         renderTimeMode(form, allowAnon = false, allowCorrespondence = true),
         renderMultiMatch(form),
         renderPlayerIndexOptions(form("playerIndex")),
@@ -142,7 +139,12 @@ object forms {
           //   )
           // )
         ),
-        renderOpponentOptions(form),
+        renderOpponentOptions(
+          form,
+          user.map { u =>
+            userLink(u, cssClass = "target".some)
+          }
+        ),
         blindSideChoice(form)
       )
     }
