@@ -17,22 +17,22 @@ final private[gameSearch] class GameSearchForm {
         "b"      -> optional(nonEmptyText),
         "winner" -> optional(nonEmptyText),
         "loser"  -> optional(nonEmptyText),
-        "p1"  -> optional(nonEmptyText),
-        "p2"  -> optional(nonEmptyText)
+        "p1"     -> optional(nonEmptyText),
+        "p2"     -> optional(nonEmptyText)
       )(SearchPlayer.apply)(SearchPlayer.unapply),
       "winnerPlayerIndex" -> optional(numberIn(Query.winnerPlayerIndexs)),
-      "perf"        -> optional(numberIn(lila.rating.PerfType.nonPuzzle.map(_.id))),
-      "source"      -> optional(numberIn(Query.sources)),
-      "mode"        -> optional(numberIn(Query.modes)),
-      "turnsMin"    -> optional(numberIn(Query.fullTurnsCompleted)),
-      "turnsMax"    -> optional(numberIn(Query.fullTurnsCompleted)),
-      "ratingMin"   -> optional(numberIn(Query.averageRatings)),
-      "ratingMax"   -> optional(numberIn(Query.averageRatings)),
-      "hasAi"       -> optional(numberIn(Query.hasAis)),
-      "aiLevelMin"  -> optional(numberIn(Query.aiLevels)),
-      "aiLevelMax"  -> optional(numberIn(Query.aiLevels)),
-      "durationMin" -> optional(numberIn(Query.durations)),
-      "durationMax" -> optional(numberIn(Query.durations)),
+      "perf"              -> optional(numberIn(lila.rating.PerfType.nonPuzzle.map(_.id))),
+      "source"            -> optional(numberIn(Query.sources)),
+      "mode"              -> optional(numberIn(Query.modes)),
+      "turnsMin"          -> optional(numberIn(Query.fullTurnsCompleted)),
+      "turnsMax"          -> optional(numberIn(Query.fullTurnsCompleted)),
+      "ratingMin"         -> optional(numberIn(Query.averageRatings)),
+      "ratingMax"         -> optional(numberIn(Query.averageRatings)),
+      "hasAi"             -> optional(numberIn(Query.hasAis)),
+      "aiLevelMin"        -> optional(numberIn(Query.aiLevels)),
+      "aiLevelMax"        -> optional(numberIn(Query.aiLevels)),
+      "durationMin"       -> optional(numberIn(Query.durations)),
+      "durationMax"       -> optional(numberIn(Query.durations)),
       "clock" -> mapping(
         "initMin" -> optional(numberIn(Query.clockInits)),
         "initMax" -> optional(numberIn(Query.clockInits)),
@@ -122,8 +122,8 @@ private[gameSearch] case class SearchPlayer(
   lazy val cleanB = clean(b)
   def cleanWinner = oneOf(winner)
   def cleanLoser  = oneOf(loser)
-  def cleanP1  = oneOf(p1)
-  def cleanP2  = oneOf(p2)
+  def cleanP1     = oneOf(p1)
+  def cleanP2     = oneOf(p2)
 
   private def oneOf(s: Option[String]) = clean(s).filter(List(cleanA, cleanB).flatten.contains)
   private def clean(s: Option[String]) = s map (_.trim.toLowerCase) filter (_.nonEmpty)

@@ -175,7 +175,7 @@ trait FormHelper { self: I18nHelper =>
           cls := "form-control"
         )(disabled option (st.disabled := true))(validationModifiers(field))(
           default map { option(value := "")(_) },
-          options.map { case((ogValue, ogName, _), opts) =>
+          options.map { case ((ogValue, ogName, _), opts) =>
             optgroup(name := ogName)(
               opts.map { case (value, name, title) =>
                 option(

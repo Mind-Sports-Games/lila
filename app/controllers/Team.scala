@@ -219,7 +219,8 @@ final class Team(
         else
           LimitPerWeek(me) {
             implicit val req = ctx.body
-            forms.create()
+            forms
+              .create()
               .bindFromRequest()
               .fold(
                 err =>

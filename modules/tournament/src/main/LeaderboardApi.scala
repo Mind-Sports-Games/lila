@@ -109,7 +109,6 @@ final class LeaderboardApi(
     if (disqualify) repo.coll.update.one(tourUserSelector(userId, tourId), $set("dq" -> true)).void
     else repo.coll.delete.one(tourUserSelector(userId, tourId)).void
 
-
   private def paginator(user: User, page: Int, selector: Bdoc, sort: Bdoc): Fu[Paginator[TourEntry]] =
     Paginator(
       adapter = new Adapter[Entry](

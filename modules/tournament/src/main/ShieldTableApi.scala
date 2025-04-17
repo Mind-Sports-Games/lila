@@ -68,13 +68,13 @@ object ShieldTableApi {
 
   object Category {
 
-    case object Overall  extends Category {
-      val id               = 0
-      val name             = "Overall"
+    case object Overall extends Category {
+      val id   = 0
+      val name = "Overall"
       // not used for overall all count
       val medleyShieldCode = "spm"
     }
-    case object Chess    extends Category {
+    case object Chess extends Category {
       val id               = 1
       val name             = "Chess"
       val medleyShieldCode = "scm"
