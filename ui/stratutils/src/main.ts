@@ -20,8 +20,6 @@ export function fixCrazySan(san: San): San {
 
 export type Dests = Map<Key, Key[]>;
 
-export type NotationStyle = 'uci' | 'san' | 'usi' | 'wxf' | 'dpo' | 'dpg' | 'man' | 'bkg' | 'abl';
-
 export function readDests(lines?: string): Dests | null {
   if (typeof lines === 'undefined') return null;
   const dests = new Map();
@@ -80,58 +78,6 @@ export function fenPlayerIndex(variant: VariantKey, fen: string) {
   }
   const p2String = variant === 'oware' ? ' N' : ' b';
   return fen.indexOf(p2String) > 0 ? 'p2' : 'p1';
-}
-
-export function variantUsesUCINotation(key: VariantKey | DraughtsVariantKey) {
-  return ['linesOfAction', 'scrambledEggs', 'amazons', 'breakthroughtroyka', 'minibreakthroughtroyka'].includes(key);
-}
-
-export function variantUsesUSINotation(key: VariantKey | DraughtsVariantKey) {
-  return ['shogi', 'minishogi'].includes(key);
-}
-
-export function variantUsesWXFNotation(key: VariantKey | DraughtsVariantKey) {
-  return ['xiangqi', 'minixiangqi'].includes(key);
-}
-
-export function variantUsesDestPosOthelloNotation(key: VariantKey | DraughtsVariantKey) {
-  return ['flipello', 'flipello10'].includes(key);
-}
-
-export function variantUsesDestPosGoNotation(key: VariantKey | DraughtsVariantKey) {
-  return ['go9x9', 'go13x13', 'go19x19'].includes(key);
-}
-
-export function variantUsesMancalaNotation(key: VariantKey | DraughtsVariantKey) {
-  return ['oware', 'togyzkumalak', 'bestemshe'].includes(key);
-}
-
-export function variantUsesBackgammonNotation(key: VariantKey | DraughtsVariantKey) {
-  return ['backgammon', 'hyper', 'nackgammon'].includes(key);
-}
-
-export function variantUsesAbaloneNotation(key: VariantKey | DraughtsVariantKey) {
-  return ['abalone'].includes(key);
-}
-
-export function notationStyle(key: VariantKey | DraughtsVariantKey): NotationStyle {
-  return variantUsesUCINotation(key)
-    ? 'uci'
-    : variantUsesUSINotation(key)
-      ? 'usi'
-      : variantUsesWXFNotation(key)
-        ? 'wxf'
-        : variantUsesDestPosOthelloNotation(key)
-          ? 'dpo'
-          : variantUsesDestPosGoNotation(key)
-            ? 'dpg'
-            : variantUsesMancalaNotation(key)
-              ? 'man'
-              : variantUsesBackgammonNotation(key)
-                ? 'bkg'
-                : variantUsesAbaloneNotation(key)
-                  ? 'abl'
-                  : 'san';
 }
 
 interface Piece {

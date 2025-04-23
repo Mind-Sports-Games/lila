@@ -105,7 +105,7 @@ export default class GamebookPlayCtrl {
 
   solution = () => {
     this.root.chessground.setShapes(
-      makeShapesFromUci(this.root.turnPlayerIndex(), this.root.node.children[0].uci!, 'green'),
+      makeShapesFromUci(this.root.turnPlayerIndex(), this.root.node.children[0].uci!, 'green', this.root.data.game.variant.key),
     );
   };
 

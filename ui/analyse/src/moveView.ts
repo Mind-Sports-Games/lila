@@ -1,9 +1,12 @@
 import { h, VNode } from 'snabbdom';
-import { fixCrazySan, NotationStyle } from 'stratutils';
-import { moveFromNotationStyle, combinedNotationForBackgammonActions } from 'common/notation';
+import { fixCrazySan } from 'stratutils';
 import { defined } from 'common';
 import { view as cevalView, renderEval as normalizeEval } from 'ceval';
 import { fullTurnNodesFromNode } from './util';
+import { NotationStyle } from 'stratops/variants/types';
+import { getClassFromRules } from 'stratops/variants/utils';
+import { playstrategyRules } from 'stratops/compat';
+import { GameFamily as BackgammonFamily } from 'stratops/variants/backgammon/GameFamily';
 
 export interface Ctx {
   withDots?: boolean;
@@ -37,21 +40,19 @@ export function renderIndex(node: Tree.ParentedNode, withDots?: boolean): VNode 
   return h('index', renderIndexText(node, withDots));
 }
 
-export function renderMove(ctx: Ctx, node: Tree.ParentedNode, style: NotationStyle): VNode[] {
-  const variant = ctx.variant;
+export function renderMove(ctx: Ctx, node: Tree.ParentedNode): VNode[] {
   const ev = cevalView.getBestEval({ client: node.ceval, server: node.eval });
   const nodes = [
     h(
       'move',
       // TODO: the || '' are probably not correct
-      moveFromNotationStyle(style)(
+      getClassFromRules(playstrategyRules(ctx.variant.key)).computeMoveNotation(
         {
           san: fixCrazySan(node.san || ''),
           uci: node.uci || '',
           fen: node.fen,
           prevFen: node.parent?.fen || '',
-        },
-        variant,
+        }
       ),
     ),
   ];
@@ -65,7 +66,7 @@ export function renderMove(ctx: Ctx, node: Tree.ParentedNode, style: NotationSty
 }
 
 export function combinedNotationOfTurn(actionNotations: string[], notation: NotationStyle): string {
-  return notation === 'bkg' ? combinedNotationForBackgammonActions(actionNotations) : actionNotations.join(' ');
+  return notation === NotationStyle.bkg ? BackgammonFamily.combinedNotation(actionNotations) : actionNotations.join(' ');
 }
 
 export function renderFullMove(ctx: Ctx, node: Tree.ParentedNode, style: NotationStyle): VNode[] {
@@ -78,14 +79,13 @@ export function renderFullMove(ctx: Ctx, node: Tree.ParentedNode, style: Notatio
       // TODO: the || '' are probably not correct
       combinedNotationOfTurn(
         fullTurnNodes.map(n => {
-          return moveFromNotationStyle(style)(
+          return getClassFromRules(playstrategyRules(variant.key)).computeMoveNotation(
             {
               san: fixCrazySan(n.san || ''),
               uci: n.uci || '',
               fen: n.fen,
               prevFen: n.parent?.fen || '',
-            },
-            variant,
+            }
           );
         }),
         style,
@@ -101,7 +101,7 @@ export function renderFullMove(ctx: Ctx, node: Tree.ParentedNode, style: Notatio
   return nodes;
 }
 
-export function renderIndexAndMove(ctx: Ctx, node: Tree.ParentedNode, style: NotationStyle): VNode[] | undefined {
+export function renderIndexAndMove(ctx: Ctx, node: Tree.ParentedNode): VNode[] | undefined {
   if (!node.san) return; // initial position
-  return [renderIndex(node, ctx.withDots), ...renderMove(ctx, node, style)];
+  return [renderIndex(node, ctx.withDots), ...renderMove(ctx, node)];
 }

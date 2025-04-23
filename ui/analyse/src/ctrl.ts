@@ -702,8 +702,9 @@ export default class AnalyseCtrl {
       if (node.fen !== ev.fen && !isThreat) return;
       if (isThreat) {
         if (!node.threat || isEvalBetter(ev, node.threat) || node.threat.maxDepth < ev.maxDepth) node.threat = ev;
-      } else if (isEvalBetter(ev, node.ceval)) node.ceval = ev;
-      else if (node.ceval && ev.maxDepth > node.ceval.maxDepth) node.ceval.maxDepth = ev.maxDepth;
+      } else if (isEvalBetter(ev, node.ceval)) {
+        node.ceval = ev;
+      } else if (node.ceval && ev.maxDepth > node.ceval.maxDepth) node.ceval.maxDepth = ev.maxDepth;
 
       if (path === this.path) {
         this.setAutoShapes();

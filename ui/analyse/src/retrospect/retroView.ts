@@ -1,5 +1,4 @@
 import { renderIndexAndMove } from '../moveView';
-import { notationStyle } from 'stratutils';
 import { RetroCtrl } from './retroCtrl';
 import AnalyseCtrl from '../ctrl';
 import { bind, dataIcon, spinner, parentedNode } from '../util';
@@ -69,8 +68,7 @@ const feedback = {
                     showGlyphs: true,
                     showEval: false,
                   },
-                  parentedNode(ctrl.current()!.fault.node),
-                  notationStyle(ctrl.variant.key),
+                  parentedNode(ctrl.current()!.fault.node)
                 )!,
               ),
             ),
@@ -143,8 +141,7 @@ const feedback = {
                       withDots: true,
                       showGlyphs: true,
                     },
-                    parentedNode(ctrl.current()!.solution.node),
-                    notationStyle(ctrl.variant.key),
+                    parentedNode(ctrl.current()!.solution.node)
                   )!,
                 ),
               ),

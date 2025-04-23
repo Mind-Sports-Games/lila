@@ -2,7 +2,6 @@ import { h, VNode } from 'snabbdom';
 import { bind, baseUrl, parentedNode } from '../util';
 import { prop, Prop } from 'common';
 import { renderIndexAndMove } from '../moveView';
-import { notationStyle } from 'stratutils';
 import { StudyData, StudyChapterMeta } from './interfaces';
 import RelayCtrl from './relay/relayCtrl';
 
@@ -26,8 +25,7 @@ function fromPly(ctrl: StudyShareCtrl): VNode {
       withDots: true,
       showEval: false,
     },
-    parentedNode(ctrl.currentNode()),
-    notationStyle(ctrl.variant.key),
+    parentedNode(ctrl.currentNode())
   );
   return h(
     'div.ply-wrap',

@@ -1,6 +1,5 @@
 import * as winningChances from './winningChances';
 import { defined } from 'common';
-import { moveFromNotationStyle } from 'common/notation';
 import { Eval, CevalCtrl, ParentCtrl, NodeEvals } from './types';
 import { h, VNode } from 'snabbdom';
 import { Position } from 'stratops/chess';
@@ -9,7 +8,7 @@ import { makeSanAndPlay } from 'stratops/san';
 import { dimensionsForRules, opposite, parseUci } from 'stratops/util';
 import { parseFen, makeBoardFen } from 'stratops/fen';
 import { blackStartsVariant, noVariantOutcome, renderEval } from './util';
-import { notationStyle, variantToRules } from 'stratutils';
+import { variantToRules } from 'stratutils';
 import { getClassFromRules } from 'stratops/variants/utils';
 
 let gaugeLast = 0;
@@ -439,20 +438,12 @@ function renderPvMoves(pos: Position, pv: Uci[], variantKey: VariantKey): VNode[
             'data-board': `${fen}|${uci}`,
           },
         },
-        moveFromNotationStyle(notationStyle(variantKey))(
+        getClassFromRules(playstrategyRules(variantKey)).computeMoveNotation(
           {
             san,
             uci,
             fen,
             prevFen,
-          },
-          {
-            // @Note: we do not have access to the variant here, so we use stubs because that code should be refactored and moved to stratutils or stratops
-            key: variantKey,
-            name: 'stub',
-            short: 'stub',
-            lib: 0,
-            boardSize: { width: 8, height: 8 },
           },
         ),
       ),

@@ -297,40 +297,6 @@ export function allowServerEvalForVariant(variant: VariantKey) {
   return noServerEvalVariants.indexOf(variant) == -1;
 }
 
-export type LexicalUci = {
-  from: cg.Key;
-  to: cg.Key;
-  dropRole?: cg.Role;
-  promotion?: cg.Role;
-};
-
-export const parseLexicalUci = (uci: string): LexicalUci | undefined => {
-  if (!uci) return undefined;
-  const pos = uci.match(/[a-z][1-9][0-9]?/g) as cg.Key[];
-
-  if (uci[1] === '@') {
-    return {
-      from: pos[0],
-      to: pos[0],
-      dropRole: `${uci[0].toLowerCase()}-piece` as cg.Role,
-    };
-  }
-
-  // e7e8Q
-  let promotion: cg.Role | undefined = undefined;
-
-  const uciToFrom = `${pos[0]}${pos[1]}`;
-  if (uci.startsWith(uciToFrom) && uci.length == uciToFrom.length + 1) {
-    promotion = `${uci[uci.length - 1]}-piece` as cg.Role;
-  }
-
-  return {
-    from: pos[0],
-    to: pos[1],
-    promotion,
-  };
-};
-
 export const isOnlyDropsPly = (node: Tree.Node, variantKey: VariantKey, defaultValue: boolean) => {
   if (variantKey === 'amazons') return typeof node.dropsByRole === 'string' && node.dropsByRole.length > 0;
   else return defaultValue;

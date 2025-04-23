@@ -1,12 +1,13 @@
 import { h, VNode } from 'snabbdom';
-import { fixCrazySan, notationStyle } from 'stratutils';
+import { fixCrazySan } from 'stratutils';
 import { path as treePath, ops as treeOps } from 'tree';
 import * as moveView from '../moveView';
 import AnalyseCtrl from '../ctrl';
 import { MaybeVNodes } from '../interfaces';
 import { mainHook, nodeClasses, findCurrentPath, renderInlineCommentsOf, retroLine, Ctx, Opts } from './treeView';
-import { moveFromNotationStyle } from 'common/notation';
 import { parentedNode, parentedNodes, parentedNodesFromOrdering, fullTurnNodesFromNode } from '../util';
+import { getClassFromRules } from 'stratops/variants/utils';
+import { playstrategyRules } from 'stratops/compat';
 
 function renderChildrenOf(ctx: Ctx, node: Tree.ParentedNode, opts: Opts): MaybeVNodes | undefined {
   const cs = parentedNodes(node.children, node),
@@ -146,7 +147,7 @@ function renderInline(ctx: Ctx, node: Tree.ParentedNode, opts: Opts): VNode {
 
 function renderFullMoveOf(ctx: Ctx, node: Tree.ParentedNode, opts: Opts): VNode {
   const variant = ctx.ctrl.data.game.variant;
-  const notation = notationStyle(variant.key);
+  const notation = getClassFromRules(playstrategyRules(variant.key)).getNotationStyle();
   const fullTurnNodes: Tree.ParentedNode[] = fullTurnNodesFromNode(node);
   const path = opts.parentPath + node.id,
     content: MaybeVNodes = [
@@ -154,14 +155,13 @@ function renderFullMoveOf(ctx: Ctx, node: Tree.ParentedNode, opts: Opts): VNode 
       // TODO: the || '' are probably not correct
       moveView.combinedNotationOfTurn(
         fullTurnNodes.map(n => {
-          return moveFromNotationStyle(notation)(
+          return getClassFromRules(playstrategyRules(variant.key)).computeMoveNotation(
             {
               san: fixCrazySan(n.san || ''),
               uci: n.uci || '',
               fen: n.fen,
               prevFen: n.parent?.fen || '',
-            },
-            variant,
+            }
           );
         }),
         notation,
@@ -180,19 +180,17 @@ function renderFullMoveOf(ctx: Ctx, node: Tree.ParentedNode, opts: Opts): VNode 
 
 function renderMoveOf(ctx: Ctx, node: Tree.ParentedNode, opts: Opts): VNode {
   const variant = ctx.ctrl.data.game.variant;
-  const notation = notationStyle(variant.key);
   const path = opts.parentPath + node.id,
     content: MaybeVNodes = [
       opts.withIndex || node.ply & 1 ? moveView.renderIndex(node, true) : null,
       // TODO: the || '' are probably not correct
-      moveFromNotationStyle(notation)(
+      getClassFromRules(playstrategyRules(variant.key)).computeMoveNotation(
         {
           san: fixCrazySan(node.san || ''),
           uci: node.uci || '',
           fen: node.fen,
           prevFen: node.parent?.fen || '',
         },
-        variant,
       ),
     ];
   if (node.glyphs && ctx.showGlyphs) node.glyphs.forEach(g => content.push(moveView.renderGlyph(g)));

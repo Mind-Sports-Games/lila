@@ -10,8 +10,10 @@ import viewStatus from 'game/view/status';
 import { game as gameRoute } from 'game/router';
 import { h, VNode } from 'snabbdom';
 import { Step, MaybeVNodes } from '../interfaces';
-import { NotationStyle, notationStyle } from 'stratutils';
-import { moveFromNotationStyle, combinedNotationForBackgammonActions } from 'common/notation';
+import { getClassFromRules } from 'stratops/variants/utils';
+import { playstrategyRules } from 'stratops/compat';
+import { GameFamily as BackgammonFamily } from 'stratops/variants/backgammon/GameFamily';
+import { NotationStyle } from 'stratops/variants/types';
 
 const scrollMax = 99999,
   moveTag = 'u8t',
@@ -73,9 +75,8 @@ function renderMultiActionMove(
           combinedNotationOfTurn(
             step.map(s =>
               s
-                ? moveFromNotationStyle(notation)(
+                ? getClassFromRules(playstrategyRules(variant.key)).computeMoveNotation(
                     { san: s.san, uci: s.uci, fen: s.fen, prevFen: prevStepFen(s) },
-                    variant,
                   )
                 : '',
             ),
@@ -90,7 +91,7 @@ function renderMultiActionMove(
 }
 
 function combinedNotationOfTurn(actionNotations: string[], notation: NotationStyle): string {
-  return notation === 'bkg' ? combinedNotationForBackgammonActions(actionNotations) : actionNotations.join(' ');
+  return notation === NotationStyle.bkg ? BackgammonFamily.combinedNotation(actionNotations) : actionNotations.join(' ');
 }
 
 export function renderResult(ctrl: RoundController): VNode | undefined {
@@ -127,7 +128,7 @@ export function renderResult(ctrl: RoundController): VNode | undefined {
 
 function renderMoves(ctrl: RoundController): MaybeVNodes {
   const steps = ctrl.data.steps,
-    notation = notationStyle(ctrl.data.game.variant.key),
+    notation = getClassFromRules(playstrategyRules(ctrl.data.game.variant.key)).getNotationStyle(),
     variant = ctrl.data.game.variant,
     firstTurn = round.firstTurn(ctrl.data),
     lastPly = round.lastPly(ctrl.data),
