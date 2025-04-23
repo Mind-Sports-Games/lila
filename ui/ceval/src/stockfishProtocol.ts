@@ -51,6 +51,7 @@ export default class Protocol {
   }
 
   setVariant(variant: VariantKey): void {
+    // allow to switch variant from study
     this.setOption('UCI_Variant', playstrategyRules(variant));
   }
 

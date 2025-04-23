@@ -7,9 +7,9 @@ import { playstrategyRules } from 'stratops/compat';
 import { makeSanAndPlay } from 'stratops/san';
 import { dimensionsForRules, opposite, parseUci } from 'stratops/util';
 import { parseFen, makeBoardFen } from 'stratops/fen';
-import { renderEval } from './util';
-import { setupPosition } from 'stratops/variant';
+import { blackStartsVariant, noVariantOutcome, renderEval } from './util';
 import { variantToRules } from 'stratutils';
+import { getClassFromRules } from 'stratops/variants/utils';
 
 let gaugeLast = 0;
 const gaugeTicks: VNode[] = [...Array(8).keys()].map(i =>
@@ -24,7 +24,9 @@ function localEvalInfo(ctrl: ParentCtrl, evs: NodeEvals): Array<VNode | string> 
     return [
       evs.server && ctrl.nextNodeBest()
         ? trans.noarg('usingServerAnalysis')
-        : trans.noarg('loadingEngine') + (mb >= 1 ? ` (${mb.toFixed(1)} MiB)` : ''),
+        : noVariantOutcome(ceval.variant.key) && ctrl.getNode().children.length === 0 && ctrl.getNode().ply > 0
+          ? trans.noarg('gameFinished')
+          : trans.noarg('loadingEngine') + (mb >= 1 ? ` (${mb.toFixed(1)} MiB)` : ''),
     ];
   }
 
@@ -136,6 +138,7 @@ export function renderGauge(ctrl: ParentCtrl): VNode | undefined {
       class: {
         empty: ev === null,
         reverse: ctrl.getOrientation() === 'p2',
+        'swap-colors': blackStartsVariant(ctrl.getCeval().variant.key),
       },
     },
     [h('div.p2', { attrs: { style: `height: ${100 - (ev + 1) * 50}%` } }), ...gaugeTicks],
@@ -164,7 +167,7 @@ export function renderCeval(ctrl: ParentCtrl): VNode | undefined {
     pearl = '-';
     percent = 0;
   } else {
-    pearl = enabled ? h('i.ddloader') : h('i');
+    pearl = enabled && !noVariantOutcome(instance.variant.key) && ctrl.getNode().ply === 0 ? h('i.ddloader') : h('i');
     percent = 0;
   }
   if (threatMode) {
@@ -200,7 +203,12 @@ export function renderCeval(ctrl: ParentCtrl): VNode | undefined {
         h('div.engine', [
           ...(threatMode ? [trans.noarg('showThreat')] : engineName(instance)),
           h(
-            'span.info',
+            'span.info' +
+              (!noVariantOutcome(instance.variant.key)
+                ? ''
+                : ctrl.getNode().ply == 0 || percent > 0
+                  ? '.display'
+                  : '.hide'),
             ctrl.outcome()
               ? [trans.noarg('gameOver')]
               : threatMode
@@ -301,7 +309,7 @@ export const renderPvs =
       setup.turn = opposite(setup.turn);
       if (setup.turn == 'p1') setup.fullmoves += 1;
     }
-    const pos = setupPosition(playstrategyRules(instance.variant.key), setup);
+    const pos = getClassFromRules(playstrategyRules(instance.variant.key)).fromSetup(setup);
 
     return h(
       'div.pv_box',
@@ -399,7 +407,10 @@ function renderPvWrapToggle(): VNode {
 
 function renderPvMoves(pos: Position, pv: Uci[], variantKey: VariantKey): VNode[] {
   const vnodes: VNode[] = [];
-  let key = makeBoardFen(playstrategyRules(variantKey))(pos.board);
+  const rules = playstrategyRules(variantKey);
+  const prevBoard = pos.board.clone();
+  const prevFen = makeBoardFen(rules)(prevBoard);
+  let key = prevFen;
   for (let i = 0; i < pv.length; i++) {
     let text;
     if (pos.turn === 'p1') {
@@ -411,8 +422,8 @@ function renderPvMoves(pos: Position, pv: Uci[], variantKey: VariantKey): VNode[
       vnodes.push(h('span', { key: text }, text));
     }
     const uci = pv[i];
-    const san = makeSanAndPlay(playstrategyRules(variantKey))(pos, parseUci(playstrategyRules(variantKey))(uci)!);
-    const fen = makeBoardFen(playstrategyRules(variantKey))(pos.board);
+    const san = makeSanAndPlay(rules)(pos, parseUci(rules)(uci)!);
+    const fen = makeBoardFen(rules)(pos.board);
     if (san === '--') {
       break;
     }
@@ -427,7 +438,12 @@ function renderPvMoves(pos: Position, pv: Uci[], variantKey: VariantKey): VNode[
             'data-board': `${fen}|${uci}`,
           },
         },
-        san,
+        getClassFromRules(playstrategyRules(variantKey)).computeMoveNotation({
+          san,
+          uci,
+          fen,
+          prevFen,
+        }),
       ),
     );
   }

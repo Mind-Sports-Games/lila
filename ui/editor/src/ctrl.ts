@@ -4,11 +4,12 @@ import { Rules, Square } from 'stratops/types';
 import { SquareSet } from 'stratops/squareSet';
 import { Board } from 'stratops/board';
 import { Setup, Material, RemainingChecks } from 'stratops/setup';
-import { Castles, setupPosition, defaultPosition } from 'stratops/variant';
+import { Castles } from 'stratops';
 import { playstrategyVariants } from 'stratops/compat';
 import { makeFen, parseFen, parseCastlingFen, INITIAL_FEN, EMPTY_FEN, INITIAL_EPD } from 'stratops/fen';
 import * as fp from 'stratops/fp';
 import { defined, prop, Prop } from 'common';
+import { getClassFromRules } from 'stratops/variants/utils';
 
 export default class EditorCtrl {
   cfg: Editor.Config;
@@ -113,19 +114,23 @@ export default class EditorCtrl {
   }
 
   private getLegalFen(): string | undefined {
-    return setupPosition(this.rules, this.getSetup()).unwrap(
-      pos => {
-        return makeFen('chess')(pos.toSetup(), { promoted: pos.rules == 'crazyhouse' });
-      },
-      _ => undefined,
-    );
+    return getClassFromRules(this.rules)
+      .fromSetup(this.getSetup())
+      .unwrap(
+        pos => {
+          return makeFen('chess')(pos.toSetup(), { promoted: pos.rules == 'crazyhouse' });
+        },
+        _ => undefined,
+      );
   }
 
   private isPlayable(): boolean {
-    return setupPosition(this.rules, this.getSetup()).unwrap(
-      pos => !pos.isEnd(),
-      _ => false,
-    );
+    return getClassFromRules(this.rules)
+      .fromSetup(this.getSetup())
+      .unwrap(
+        pos => !pos.isEnd(),
+        _ => false,
+      );
   }
 
   getState(): EditorState {
@@ -164,7 +169,7 @@ export default class EditorCtrl {
     this.onChange();
   }
 
-  startPosition = () => this.setFen(makeFen('chess')(defaultPosition(this.rules).toSetup()));
+  startPosition = () => this.setFen(makeFen('chess')(getClassFromRules(this.rules).default().toSetup()));
 
   clearBoard = () => this.setFen(EMPTY_FEN);
 

@@ -5,8 +5,10 @@ import { prop } from 'common';
 import { storedProp } from 'common/storage';
 import throttle from 'common/throttle';
 import { povChances } from './winningChances';
-import { sanIrreversible, allowClientEvalForVariant } from './util';
+import { allowedForVariant, sanIrreversible } from './util';
 import { Cache } from './cache';
+import { getClassFromRules } from 'stratops/variants/utils';
+import { playstrategyRules } from 'stratops/compat';
 
 function sharedWasmMemory(initial: number, maximum: number): WebAssembly.Memory {
   return new WebAssembly.Memory({ shared: true, initial, maximum } as WebAssembly.MemoryDescriptor);
@@ -95,7 +97,7 @@ export default function (opts: CevalOpts): CevalCtrl {
   const multiPv = storedProp(storageKey('ceval.multipv'), opts.multiPvDefault || 1);
   const infinite = storedProp('ceval.infinite', false);
   let curEval: Tree.ClientEval | null = null;
-  const allowed = prop(allowClientEvalForVariant(opts.variant.key));
+  const allowed = prop(allowedForVariant(opts.variant.key));
   const enabled = prop(opts.possible && allowed() && enabledAfterDisable());
   const downloadProgress = prop(0);
   let started: Started | false = false;
@@ -150,6 +152,16 @@ export default function (opts: CevalOpts): CevalCtrl {
   let lastEmitFen: string | null = null;
 
   const onEmit = throttle(200, (ev: Tree.ClientEval, work: Work) => {
+    if (['minishogi', 'shogi'].includes(opts.variant.key)) {
+      ev.pvs.map(pv => {
+        if (pv.moves[0]?.endsWith('+'))
+          pv.moves.splice(
+            0,
+            1,
+            getClassFromRules(playstrategyRules(opts.variant.key)).patchFairyUci(pv.moves[0], ev.fen),
+          );
+      });
+    }
     sortPvsInPlace(ev.pvs, work.ply % 2 === (work.threatMode ? 1 : 0) ? 'p1' : 'p2');
     npsRecorder(ev);
     curEval = ev;
@@ -207,6 +219,10 @@ export default function (opts: CevalOpts): CevalCtrl {
       work.currentFen = fen;
       work.initialFen = fen;
     } else {
+      if ((opts.variant.key === 'shogi' || opts.variant.key === 'minishogi') && step.uci?.length === 5) {
+        step.uci = step.uci.slice(0, 4) + '+'; // fairySF UCI is using + for promotions, while we are using a letter representing the piece.
+      }
+
       // send fen after latest castling move and the following moves
       for (let i = 1; i < steps.length; i++) {
         const s = steps[i];
