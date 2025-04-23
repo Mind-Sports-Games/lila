@@ -46,14 +46,12 @@ export function renderMove(ctx: Ctx, node: Tree.ParentedNode): VNode[] {
     h(
       'move',
       // TODO: the || '' are probably not correct
-      getClassFromRules(playstrategyRules(ctx.variant.key)).computeMoveNotation(
-        {
-          san: fixCrazySan(node.san || ''),
-          uci: node.uci || '',
-          fen: node.fen,
-          prevFen: node.parent?.fen || '',
-        }
-      ),
+      getClassFromRules(playstrategyRules(ctx.variant.key)).computeMoveNotation({
+        san: fixCrazySan(node.san || ''),
+        uci: node.uci || '',
+        fen: node.fen,
+        prevFen: node.parent?.fen || '',
+      }),
     ),
   ];
   if (node.glyphs && ctx.showGlyphs) node.glyphs.forEach(g => nodes.push(renderGlyph(g)));
@@ -66,7 +64,9 @@ export function renderMove(ctx: Ctx, node: Tree.ParentedNode): VNode[] {
 }
 
 export function combinedNotationOfTurn(actionNotations: string[], notation: NotationStyle): string {
-  return notation === NotationStyle.bkg ? BackgammonFamily.combinedNotation(actionNotations) : actionNotations.join(' ');
+  return notation === NotationStyle.bkg
+    ? BackgammonFamily.combinedNotation(actionNotations)
+    : actionNotations.join(' ');
 }
 
 export function renderFullMove(ctx: Ctx, node: Tree.ParentedNode, style: NotationStyle): VNode[] {
@@ -79,14 +79,12 @@ export function renderFullMove(ctx: Ctx, node: Tree.ParentedNode, style: Notatio
       // TODO: the || '' are probably not correct
       combinedNotationOfTurn(
         fullTurnNodes.map(n => {
-          return getClassFromRules(playstrategyRules(variant.key)).computeMoveNotation(
-            {
-              san: fixCrazySan(n.san || ''),
-              uci: n.uci || '',
-              fen: n.fen,
-              prevFen: n.parent?.fen || '',
-            }
-          );
+          return getClassFromRules(playstrategyRules(variant.key)).computeMoveNotation({
+            san: fixCrazySan(n.san || ''),
+            uci: n.uci || '',
+            fen: n.fen,
+            prevFen: n.parent?.fen || '',
+          });
         }),
         style,
       ),

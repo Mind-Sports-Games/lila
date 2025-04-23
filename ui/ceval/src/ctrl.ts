@@ -152,10 +152,14 @@ export default function (opts: CevalOpts): CevalCtrl {
   let lastEmitFen: string | null = null;
 
   const onEmit = throttle(200, (ev: Tree.ClientEval, work: Work) => {
-    if(['minishogi', 'shogi'].includes(opts.variant.key)) {
-      ev.pvs.map((pv) => {
+    if (['minishogi', 'shogi'].includes(opts.variant.key)) {
+      ev.pvs.map(pv => {
         if (pv.moves[0]?.endsWith('+'))
-          pv.moves.splice(0, 1, getClassFromRules(playstrategyRules(opts.variant.key)).patchFairyUci(pv.moves[0], ev.fen));
+          pv.moves.splice(
+            0,
+            1,
+            getClassFromRules(playstrategyRules(opts.variant.key)).patchFairyUci(pv.moves[0], ev.fen),
+          );
       });
     }
     sortPvsInPlace(ev.pvs, work.ply % 2 === (work.threatMode ? 1 : 0) ? 'p1' : 'p2');

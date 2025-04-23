@@ -25,7 +25,7 @@ function fromPly(ctrl: StudyShareCtrl): VNode {
       withDots: true,
       showEval: false,
     },
-    parentedNode(ctrl.currentNode())
+    parentedNode(ctrl.currentNode()),
   );
   return h(
     'div.ply-wrap',

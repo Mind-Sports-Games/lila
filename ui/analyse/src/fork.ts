@@ -95,7 +95,7 @@ export function view(root: AnalyseCtrl, concealOf?: ConcealOf) {
               showEval: root.showComputer(),
               showGlyphs: root.showComputer(),
             },
-            parentedNode(node, state.node)
+            parentedNode(node, state.node),
           )!,
         );
       return undefined;

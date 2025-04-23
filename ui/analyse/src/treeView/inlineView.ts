@@ -155,14 +155,12 @@ function renderFullMoveOf(ctx: Ctx, node: Tree.ParentedNode, opts: Opts): VNode 
       // TODO: the || '' are probably not correct
       moveView.combinedNotationOfTurn(
         fullTurnNodes.map(n => {
-          return getClassFromRules(playstrategyRules(variant.key)).computeMoveNotation(
-            {
-              san: fixCrazySan(n.san || ''),
-              uci: n.uci || '',
-              fen: n.fen,
-              prevFen: n.parent?.fen || '',
-            }
-          );
+          return getClassFromRules(playstrategyRules(variant.key)).computeMoveNotation({
+            san: fixCrazySan(n.san || ''),
+            uci: n.uci || '',
+            fen: n.fen,
+            prevFen: n.parent?.fen || '',
+          });
         }),
         notation,
       ),
@@ -184,14 +182,12 @@ function renderMoveOf(ctx: Ctx, node: Tree.ParentedNode, opts: Opts): VNode {
     content: MaybeVNodes = [
       opts.withIndex || node.ply & 1 ? moveView.renderIndex(node, true) : null,
       // TODO: the || '' are probably not correct
-      getClassFromRules(playstrategyRules(variant.key)).computeMoveNotation(
-        {
-          san: fixCrazySan(node.san || ''),
-          uci: node.uci || '',
-          fen: node.fen,
-          prevFen: node.parent?.fen || '',
-        },
-      ),
+      getClassFromRules(playstrategyRules(variant.key)).computeMoveNotation({
+        san: fixCrazySan(node.san || ''),
+        uci: node.uci || '',
+        fen: node.fen,
+        prevFen: node.parent?.fen || '',
+      }),
     ];
   if (node.glyphs && ctx.showGlyphs) node.glyphs.forEach(g => content.push(moveView.renderGlyph(g)));
   return h(

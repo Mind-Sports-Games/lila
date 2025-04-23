@@ -75,9 +75,12 @@ function renderMultiActionMove(
           combinedNotationOfTurn(
             step.map(s =>
               s
-                ? getClassFromRules(playstrategyRules(variant.key)).computeMoveNotation(
-                    { san: s.san, uci: s.uci, fen: s.fen, prevFen: prevStepFen(s) },
-                  )
+                ? getClassFromRules(playstrategyRules(variant.key)).computeMoveNotation({
+                    san: s.san,
+                    uci: s.uci,
+                    fen: s.fen,
+                    prevFen: prevStepFen(s),
+                  })
                 : '',
             ),
             notation,
@@ -91,7 +94,9 @@ function renderMultiActionMove(
 }
 
 function combinedNotationOfTurn(actionNotations: string[], notation: NotationStyle): string {
-  return notation === NotationStyle.bkg ? BackgammonFamily.combinedNotation(actionNotations) : actionNotations.join(' ');
+  return notation === NotationStyle.bkg
+    ? BackgammonFamily.combinedNotation(actionNotations)
+    : actionNotations.join(' ');
 }
 
 export function renderResult(ctrl: RoundController): VNode | undefined {

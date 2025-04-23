@@ -165,7 +165,8 @@ export function makeConfig(ctrl: AnalyseCtrl): CgConfig {
     onlyDropsVariant: isOnlyDropsPly(ctrl.node, variantKey, d.onlyDropsVariant),
     singleClickMoveVariant:
       ctrl.data.game.gameFamily === 'togyzkumalak' ||
-      (getClassFromRules(playstrategyRules(d.game.variant.key)).getNotationStyle() === NotationStyle.man && d.pref.mancalaMove),
+      (getClassFromRules(playstrategyRules(d.game.variant.key)).getNotationStyle() === NotationStyle.man &&
+        d.pref.mancalaMove),
   };
   ctrl.study && ctrl.study.mutateCgConfig(config);
   return config;

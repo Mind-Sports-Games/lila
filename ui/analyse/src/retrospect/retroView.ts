@@ -68,7 +68,7 @@ const feedback = {
                     showGlyphs: true,
                     showEval: false,
                   },
-                  parentedNode(ctrl.current()!.fault.node)
+                  parentedNode(ctrl.current()!.fault.node),
                 )!,
               ),
             ),
@@ -141,7 +141,7 @@ const feedback = {
                       withDots: true,
                       showGlyphs: true,
                     },
-                    parentedNode(ctrl.current()!.solution.node)
+                    parentedNode(ctrl.current()!.solution.node),
                   )!,
                 ),
               ),

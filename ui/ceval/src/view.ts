@@ -438,14 +438,12 @@ function renderPvMoves(pos: Position, pv: Uci[], variantKey: VariantKey): VNode[
             'data-board': `${fen}|${uci}`,
           },
         },
-        getClassFromRules(playstrategyRules(variantKey)).computeMoveNotation(
-          {
-            san,
-            uci,
-            fen,
-            prevFen,
-          },
-        ),
+        getClassFromRules(playstrategyRules(variantKey)).computeMoveNotation({
+          san,
+          uci,
+          fen,
+          prevFen,
+        }),
       ),
     );
   }

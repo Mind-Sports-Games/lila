@@ -166,14 +166,12 @@ function renderVariationFullMoveOf(ctx: Ctx, node: Tree.ParentedNode, opts: Opts
       // TODO: the || '' are probably not correct
       moveView.combinedNotationOfTurn(
         fullTurnNodes.map(n => {
-          return getClassFromRules(playstrategyRules(variant.key)).computeMoveNotation(
-            {
-              san: fixCrazySan(n.san || ''),
-              uci: n.uci || '',
-              fen: n.fen,
-              prevFen: n.parent?.fen || '',
-            }
-          );
+          return getClassFromRules(playstrategyRules(variant.key)).computeMoveNotation({
+            san: fixCrazySan(n.san || ''),
+            uci: n.uci || '',
+            fen: n.fen,
+            prevFen: n.parent?.fen || '',
+          });
         }),
         notation,
       ),
@@ -205,10 +203,7 @@ function renderMainlineMoveOf(ctx: Ctx, node: Tree.ParentedNode, opts: Opts): VN
       attrs: { p: path },
       class: classes,
     },
-    moveView.renderMove(
-      { variant: ctx.ctrl.data.game.variant, ...ctx },
-      node
-    ),
+    moveView.renderMove({ variant: ctx.ctrl.data.game.variant, ...ctx }, node),
   );
 }
 
@@ -219,14 +214,12 @@ function renderVariationMoveOf(ctx: Ctx, node: Tree.ParentedNode, opts: Opts): V
     content: MaybeVNodes = [
       withIndex ? moveView.renderIndex(node, true) : null,
       // TODO: the || '' are probably not correct
-      getClassFromRules(playstrategyRules(variant.key)).computeMoveNotation(
-        {
-          san: fixCrazySan(node.san || ''),
-          uci: node.uci || '',
-          fen: node.fen,
-          prevFen: node.parent?.fen || '',
-        }
-      )
+      getClassFromRules(playstrategyRules(variant.key)).computeMoveNotation({
+        san: fixCrazySan(node.san || ''),
+        uci: node.uci || '',
+        fen: node.fen,
+        prevFen: node.parent?.fen || '',
+      }),
     ],
     classes = nodeClasses(ctx, node, path);
   if (opts.conceal) classes[opts.conceal as string] = true;
