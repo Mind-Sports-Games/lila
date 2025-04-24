@@ -2,7 +2,7 @@ import { h, VNode } from 'snabbdom';
 import { parseFen } from 'stratops/fen';
 import { variantToRules } from 'stratutils';
 import * as chessground from './ground';
-import { bind, onInsert, dataIcon, spinner, bindMobileMousedown, getScoreFromFen } from './util';
+import { bind, onInsert, dataIcon, spinner, bindMobileMousedown, getScoreFromFen, allowExplorerForVariant } from './util';
 import { defined } from 'common';
 import changeColorHandle from 'common/coordsColor';
 import { playable } from 'game';
@@ -39,7 +39,7 @@ import { findTag } from './study/studyChapters';
 import serverSideUnderboard from './serverSideUnderboard';
 import * as gridHacks from './gridHacks';
 import * as Prefs from 'common/prefs';
-import { allowedForVariant as allowClientEvalForVariant, allowPv } from 'ceval/src/util';
+import { allowedForVariant as allowClientEvalForVariant, allowPracticeWithComputer, allowPv } from 'ceval/src/util';
 
 function renderResult(ctrl: AnalyseCtrl): VNode[] {
   let result: string | undefined;
@@ -265,7 +265,7 @@ function controls(ctrl: AnalyseCtrl) {
                   }),
                 ]
               : [
-                  ctrl.ceval.allowed() && allowClientEvalForVariant(ctrl.ceval.variant.key)
+                  ctrl.ceval.allowed() && allowClientEvalForVariant(ctrl.ceval.variant.key) && allowExplorerForVariant(ctrl.ceval.variant.key)
                     ? h('button.fbt', {
                         attrs: {
                           title: noarg('openingExplorerAndTablebase'),
@@ -281,7 +281,8 @@ function controls(ctrl: AnalyseCtrl) {
                   ctrl.ceval.possible &&
                   ctrl.ceval.allowed() &&
                   allowClientEvalForVariant(ctrl.ceval.variant.key) &&
-                  !ctrl.isGamebook()
+                  !ctrl.isGamebook() &&
+                  allowPracticeWithComputer(ctrl.ceval.variant.key)
                     ? h('button.fbt', {
                         attrs: {
                           title: noarg('practiceWithComputer'),
