@@ -2,7 +2,15 @@ import { h, VNode } from 'snabbdom';
 import { parseFen } from 'stratops/fen';
 import { variantToRules } from 'stratutils';
 import * as chessground from './ground';
-import { bind, onInsert, dataIcon, spinner, bindMobileMousedown, getScoreFromFen, allowExplorerForVariant } from './util';
+import {
+  bind,
+  onInsert,
+  dataIcon,
+  spinner,
+  bindMobileMousedown,
+  getScoreFromFen,
+  allowExplorerForVariant,
+} from './util';
 import { defined } from 'common';
 import changeColorHandle from 'common/coordsColor';
 import { playable } from 'game';
@@ -265,7 +273,9 @@ function controls(ctrl: AnalyseCtrl) {
                   }),
                 ]
               : [
-                  ctrl.ceval.allowed() && allowClientEvalForVariant(ctrl.ceval.variant.key) && allowExplorerForVariant(ctrl.ceval.variant.key)
+                  ctrl.ceval.allowed() &&
+                  allowClientEvalForVariant(ctrl.ceval.variant.key) &&
+                  allowExplorerForVariant(ctrl.ceval.variant.key)
                     ? h('button.fbt', {
                         attrs: {
                           title: noarg('openingExplorerAndTablebase'),

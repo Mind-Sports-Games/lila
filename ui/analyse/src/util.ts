@@ -302,6 +302,7 @@ export const isOnlyDropsPly = (node: Tree.Node, variantKey: VariantKey, defaultV
   else return defaultValue;
 };
 
-export function allowExplorerForVariant(_variant: VariantKey) { // @TODO: enable it at least for chess game family when the link gets fixed (points towards something that exists)
+export function allowExplorerForVariant(_variant: VariantKey) {
+  // @TODO: enable it at least for chess game family when the link gets fixed (points towards something that exists)
   return false;
 }
