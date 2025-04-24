@@ -3,7 +3,8 @@ import * as cg from 'chessground/types';
 import { opposite } from 'chessground/util';
 import { DrawModifiers, DrawShape } from 'chessground/draw';
 import AnalyseCtrl from './ctrl';
-import { parseLexicalUci } from './util';
+import { getClassFromRules } from 'stratops/variants/utils';
+import { playstrategyRules } from 'stratops/compat';
 
 function pieceDrop(key: cg.Key, role: cg.Role, playerIndex: PlayerIndex): DrawShape {
   return {
@@ -21,10 +22,10 @@ export function makeShapesFromUci(
   playerIndex: PlayerIndex,
   uci: Uci,
   brush: string,
+  variant: VariantKey = 'standard',
   modifiers?: DrawModifiers,
 ): DrawShape[] {
-  // TODO: add this in stratops
-  const move = parseLexicalUci(uci);
+  const move = getClassFromRules(playstrategyRules(variant)).parseLexicalUci(uci);
   if (move === undefined) return [];
 
   const to = move.to;
@@ -44,14 +45,15 @@ export function makeShapesFromUci(
 }
 
 export function compute(ctrl: AnalyseCtrl): DrawShape[] {
+  const variant = ctrl.data.game.variant.key;
   const playerIndex = ctrl.node.fen.includes(' w ') ? 'p1' : 'p2';
   const rPlayerIndex = opposite(playerIndex);
   if (ctrl.practice) {
     const hovering = ctrl.practice.hovering();
-    if (hovering) return makeShapesFromUci(playerIndex, hovering.uci, 'green');
+    if (hovering) return makeShapesFromUci(playerIndex, hovering.uci, 'green', variant);
     const hint = ctrl.practice.hinting();
     if (hint) {
-      if (hint.mode === 'move') return makeShapesFromUci(playerIndex, hint.uci, 'paleBlue');
+      if (hint.mode === 'move') return makeShapesFromUci(playerIndex, hint.uci, 'paleBlue', variant);
       else
         return [
           {
@@ -69,25 +71,25 @@ export function compute(ctrl: AnalyseCtrl): DrawShape[] {
   let shapes: DrawShape[] = [],
     badNode;
   if (ctrl.retro && (badNode = ctrl.retro.showBadNode())) {
-    return makeShapesFromUci(playerIndex, badNode.uci!, 'paleRed', {
+    return makeShapesFromUci(playerIndex, badNode.uci!, 'paleRed', variant, {
       lineWidth: 8,
     });
   }
   if (hovering && hovering.fen === nFen)
-    shapes = shapes.concat(makeShapesFromUci(playerIndex, hovering.uci, 'paleBlue'));
+    shapes = shapes.concat(makeShapesFromUci(playerIndex, hovering.uci, 'paleBlue', variant));
   if (ctrl.showAutoShapes() && ctrl.showComputer()) {
-    if (nEval.best) shapes = shapes.concat(makeShapesFromUci(rPlayerIndex, nEval.best, 'paleGreen'));
+    if (nEval.best) shapes = shapes.concat(makeShapesFromUci(rPlayerIndex, nEval.best, 'paleGreen', variant));
     if (!hovering && parseInt(instance.multiPv())) {
       let nextBest = ctrl.nextNodeBest();
       if (!nextBest && instance.enabled() && nCeval) nextBest = nCeval.pvs[0].moves[0];
-      if (nextBest) shapes = shapes.concat(makeShapesFromUci(playerIndex, nextBest, 'paleBlue'));
+      if (nextBest) shapes = shapes.concat(makeShapesFromUci(playerIndex, nextBest, 'paleBlue', variant));
       if (instance.enabled() && nCeval && nCeval.pvs[1] && !(ctrl.threatMode() && nThreat && nThreat.pvs.length > 2)) {
         nCeval.pvs.forEach(function (pv) {
           if (pv.moves[0] === nextBest) return;
           const shift = winningChances.povDiff(playerIndex, nCeval.pvs[0], pv);
           if (shift >= 0 && shift < 0.2) {
             shapes = shapes.concat(
-              makeShapesFromUci(playerIndex, pv.moves[0], 'paleGrey', {
+              makeShapesFromUci(playerIndex, pv.moves[0], 'paleGrey', variant, {
                 lineWidth: Math.round(12 - shift * 50), // 12 to 2
               }),
             );
@@ -105,7 +107,7 @@ export function compute(ctrl: AnalyseCtrl): DrawShape[] {
       const shift = winningChances.povDiff(rPlayerIndex, pv, pv0);
       if (shift >= 0 && shift < 0.2) {
         shapes = shapes.concat(
-          makeShapesFromUci(rPlayerIndex, pv.moves[0], 'paleRed', {
+          makeShapesFromUci(rPlayerIndex, pv.moves[0], 'paleRed', variant, {
             lineWidth: Math.round(11 - shift * 45), // 11 to 2
           }),
         );
@@ -118,7 +120,7 @@ export function compute(ctrl: AnalyseCtrl): DrawShape[] {
       const glyph = glyphs[0];
       const svg = (glyphToSvg as Dictionary<string>)[glyph.symbol];
       if (svg) {
-        const move = parseLexicalUci(uci)!;
+        const move = getClassFromRules(playstrategyRules(variant)).parseLexicalUci(uci)!;
         const destSquare = san.startsWith('O-O') // castle, short or long
           ? move.to[1] === '1' // p1 castle
             ? san === 'O-O-O'

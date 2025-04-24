@@ -335,6 +335,10 @@ square {
     body.go-dark-wood .variant-#{$variant} &.last-move {
       background: radial-gradient(transparent 0%, transparent 79%, rgba(155, 199, 0, 0.5) 80%);
     }
+
+    body.go-yellow-wood .variant-#{$variant} &.last-move {
+      background: radial-gradient(transparent 0%, transparent 79%, rgba(20, 85, 0, 0.5) 80%);
+    }
   }
 
   @each $color, $gameFamily in $alternate-board-highlights {

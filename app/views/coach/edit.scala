@@ -12,7 +12,7 @@ import lila.common.String.html.{ richText, safeJsonValue }
 import controllers.routes
 
 object edit {
-/*
+  /*
   private val dataTab   = attr("data-tab")
   private val dataValue = attr("data-value")
 

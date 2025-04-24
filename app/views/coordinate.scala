@@ -96,10 +96,12 @@ object coordinate {
       ).map { case (transPlayer, s) =>
         div(cls := "chart_container")(
           s.nonEmpty option frag(
-            p(trans.coordinates.averageScoreAsPlayerIndexX(
-              transPlayer,
-              raw(s"""<strong>${"%.2f".format(s.sum.toDouble / s.size)}</strong>""")
-            )),
+            p(
+              trans.coordinates.averageScoreAsPlayerIndexX(
+                transPlayer,
+                raw(s"""<strong>${"%.2f".format(s.sum.toDouble / s.size)}</strong>""")
+              )
+            ),
             div(cls := "user_chart", attr("data-points") := safeJsonValue(Json toJson s))
           )
         )

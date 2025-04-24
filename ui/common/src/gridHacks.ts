@@ -12,7 +12,7 @@ export const runner = (hacks: () => void, throttleMs = 100): void => {
 
   function schedule() {
     timeout && clearTimeout(timeout);
-    timeout = setTimeout(runHacks, 500);
+    timeout = setTimeout(runHacks, 500) as unknown as number;
   }
 
   runHacks();

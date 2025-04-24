@@ -211,7 +211,7 @@ object Dimension {
       case Phase                   => lila.insight.Phase.all
       case Result                  => lila.insight.Result.all
       case Termination             => lila.insight.Termination.all
-      case PlayerIndex                => strategygames.Player.all
+      case PlayerIndex             => strategygames.Player.all
       case Opening                 => EcopeningDB.all
       case OpponentStrength        => RelativeStrength.all
       case PieceRole               => Role.all(GameLogic.Chess()).reverse
@@ -232,7 +232,7 @@ object Dimension {
       case Phase                   => key.toIntOption flatMap lila.insight.Phase.byId.get
       case Result                  => key.toIntOption flatMap lila.insight.Result.byId.get
       case Termination             => key.toIntOption flatMap lila.insight.Termination.byId.get
-      case PlayerIndex                => strategygames.Player.fromName(key)
+      case PlayerIndex             => strategygames.Player.fromName(key)
       case Opening                 => EcopeningDB.allByEco get key
       case OpponentStrength        => key.toIntOption flatMap RelativeStrength.byId.get
       case PieceRole               => Role.all(GameLogic.Chess()).find(_.name == key)
@@ -260,7 +260,7 @@ object Dimension {
       case Phase                   => v.id
       case Result                  => v.id
       case Termination             => v.id
-      case PlayerIndex                   => v.name
+      case PlayerIndex             => v.name
       case Opening                 => v.eco
       case OpponentStrength        => v.id
       case PieceRole               => v.name
@@ -281,7 +281,7 @@ object Dimension {
       case Phase                   => JsString(v.name)
       case Result                  => JsString(v.name)
       case Termination             => JsString(v.name)
-      case PlayerIndex                   => JsString(v.toString)
+      case PlayerIndex             => JsString(v.toString)
       case Opening                 => JsString(v.ecoName)
       case OpponentStrength        => JsString(v.name)
       case PieceRole               => JsString(v.toString)

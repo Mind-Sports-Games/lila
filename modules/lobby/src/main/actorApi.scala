@@ -15,7 +15,12 @@ private[lobby] case class CancelSeek(seekId: String, user: LobbyUser)
 private[lobby] case class BiteHook(hookId: String, sri: Sri, user: Option[LobbyUser])
 private[lobby] case class BiteSeek(seekId: String, user: LobbyUser)
 private[lobby] case class JoinHook(sri: Sri, hook: Hook, game: Game, creatorPlayerIndex: strategygames.Player)
-private[lobby] case class JoinSeek(userId: String, seek: Seek, game: Game, creatorPlayerIndex: strategygames.Player)
+private[lobby] case class JoinSeek(
+    userId: String,
+    seek: Seek,
+    game: Game,
+    creatorPlayerIndex: strategygames.Player
+)
 private[lobby] case class HookSub(member: LobbySocket.Member, value: Boolean)
 private[lobby] case class AllHooksFor(member: LobbySocket.Member, hooks: Seq[Hook])
 private[lobby] case class LeaveBatch(sris: Iterable[Sri])

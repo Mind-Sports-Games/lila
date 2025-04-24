@@ -16,7 +16,7 @@ final class RelayRound(
     studyC: => Study
     // apiC: => Api
 ) extends LilaController(env) {
-/*
+  /*
   import lila.relay.JsonView.roundWrites
 
   def form(tourId: String) =
@@ -213,5 +213,5 @@ final class RelayRound(
 
   implicit private def makeRelayId(id: String): RoundModel.Id           = RoundModel.Id(id)
   implicit private def makeChapterId(id: String): lila.study.Chapter.Id = lila.study.Chapter.Id(id)
-*/
+   */
 }

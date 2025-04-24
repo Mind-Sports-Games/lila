@@ -20,7 +20,9 @@ trait UserHelper { self: I18nHelper with StringHelper with NumberHelper =>
 
   val topBarSortedPerfTypes: List[PerfType] =
     List(PerfType.standard, PerfType.variants)
-      .flatMap(_.zipWithIndex).sortBy(_._2).map(_._1)
+      .flatMap(_.zipWithIndex)
+      .sortBy(_._2)
+      .map(_._1)
 
   def showPerfRating(rating: Int, name: String, nb: Int, provisional: Boolean, clueless: Boolean, icon: Char)(
       implicit lang: Lang
@@ -137,11 +139,11 @@ trait UserHelper { self: I18nHelper with StringHelper with NumberHelper =>
       title: Option[Title],
       params: String,
       modIcon: Boolean,
-      dataIcon: Option[Char],
+      dataIcon: Option[Char]
   )(implicit lang: Lang): Tag =
     a(
       cls := userClass(userId, cssClass, withOnline),
-      href := userUrl(username, params = params),
+      href := userUrl(username, params = params)
     )(
       dataIcon.map(iconTag),
       withOnline ?? (if (modIcon) moderatorIcon else lineIcon(isPatron)),

@@ -5,9 +5,9 @@ case class Sorting(f: String, order: String)
 object Sorting {
 
   val fields = List(
-    Fields.date          -> "Date",
+    Fields.date               -> "Date",
     Fields.fullTurnsCompleted -> "Turns",
-    Fields.averageRating -> "Rating"
+    Fields.averageRating      -> "Rating"
   )
 
   val orders = List(

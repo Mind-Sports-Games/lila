@@ -1,8 +1,10 @@
 import { piotr } from './piotr';
-import * as cg from 'chessground/types';
-import { Rules } from 'stratops/types';
 import * as status from 'game/status';
+import type * as cg from 'chessground/types';
 import type { BaseGame } from 'game';
+import type { Rules } from 'stratops/types';
+import { playstrategyRules } from 'stratops/compat';
+import { getClassFromRules } from 'stratops/variants/utils';
 
 // TODO: For some reason we can't import this like:
 // import * from 'stratutils/promotion'
@@ -17,8 +19,6 @@ export function fixCrazySan(san: San): San {
 }
 
 export type Dests = Map<Key, Key[]>;
-
-export type NotationStyle = 'uci' | 'san' | 'usi' | 'wxf' | 'dpo' | 'dpg' | 'man' | 'bkg' | 'abl';
 
 export function readDests(lines?: string): Dests | null {
   if (typeof lines === 'undefined') return null;
@@ -59,31 +59,7 @@ export const altCastles = {
 
 // 3 check and 5 check dont have consistent fen formats, its calculated from running through game plys.
 export function getScore(variant: VariantKey, fen: string, playerIndex: string): number | undefined {
-  switch (variant) {
-    case 'oware':
-    case 'togyzkumalak':
-    case 'bestemshe':
-    case 'abalone':
-      return +fen.split(' ')[playerIndex === 'p1' ? 1 : 2];
-    case 'go9x9':
-    case 'go13x13':
-    case 'go19x19':
-      return +fen.split(' ')[playerIndex === 'p1' ? 3 : 4] / 10.0;
-    case 'backgammon':
-    case 'hyper':
-    case 'nackgammon':
-      return +fen.split(' ')[playerIndex === 'p1' ? 4 : 5];
-    case 'flipello10':
-    case 'flipello': {
-      const boardPart = fen.split(' ')[0].split('[')[0];
-      return boardPart.split(playerIndex === 'p1' ? 'P' : 'p').length - 1;
-    }
-    case 'threeCheck':
-    case 'fiveCheck':
-      return +fen.split(' ')[6][playerIndex === 'p1' ? 1 : 3];
-    default:
-      return undefined;
-  }
+  return getClassFromRules(playstrategyRules(variant)).getScoreFromFen(fen, playerIndex);
 }
 
 export function displayScore(variant: VariantKey, fen: string, playerIndex: string): string {
@@ -102,58 +78,6 @@ export function fenPlayerIndex(variant: VariantKey, fen: string) {
   }
   const p2String = variant === 'oware' ? ' N' : ' b';
   return fen.indexOf(p2String) > 0 ? 'p2' : 'p1';
-}
-
-export function variantUsesUCINotation(key: VariantKey | DraughtsVariantKey) {
-  return ['linesOfAction', 'scrambledEggs', 'amazons', 'breakthroughtroyka', 'minibreakthroughtroyka'].includes(key);
-}
-
-export function variantUsesUSINotation(key: VariantKey | DraughtsVariantKey) {
-  return ['shogi', 'minishogi'].includes(key);
-}
-
-export function variantUsesWXFNotation(key: VariantKey | DraughtsVariantKey) {
-  return ['xiangqi', 'minixiangqi'].includes(key);
-}
-
-export function variantUsesDestPosOthelloNotation(key: VariantKey | DraughtsVariantKey) {
-  return ['flipello', 'flipello10'].includes(key);
-}
-
-export function variantUsesDestPosGoNotation(key: VariantKey | DraughtsVariantKey) {
-  return ['go9x9', 'go13x13', 'go19x19'].includes(key);
-}
-
-export function variantUsesMancalaNotation(key: VariantKey | DraughtsVariantKey) {
-  return ['oware', 'togyzkumalak', 'bestemshe'].includes(key);
-}
-
-export function variantUsesBackgammonNotation(key: VariantKey | DraughtsVariantKey) {
-  return ['backgammon', 'hyper', 'nackgammon'].includes(key);
-}
-
-export function variantUsesAbaloneNotation(key: VariantKey | DraughtsVariantKey) {
-  return ['abalone'].includes(key);
-}
-
-export function notationStyle(key: VariantKey | DraughtsVariantKey): NotationStyle {
-  return variantUsesUCINotation(key)
-    ? 'uci'
-    : variantUsesUSINotation(key)
-      ? 'usi'
-      : variantUsesWXFNotation(key)
-        ? 'wxf'
-        : variantUsesDestPosOthelloNotation(key)
-          ? 'dpo'
-          : variantUsesDestPosGoNotation(key)
-            ? 'dpg'
-            : variantUsesMancalaNotation(key)
-              ? 'man'
-              : variantUsesBackgammonNotation(key)
-                ? 'bkg'
-                : variantUsesAbaloneNotation(key)
-                  ? 'abl'
-                  : 'san';
 }
 
 interface Piece {

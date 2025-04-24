@@ -500,8 +500,8 @@ case class Game(
 
   def multiPointResult: Option[MultiPointState] =
     metadata.multiPointState.flatMap { mps =>
-    if (finished) finalScoreMultiPointState else Some(mps)
-  }
+      if (finished) finalScoreMultiPointState else Some(mps)
+    }
 
   // style "copy pasted" from a ts function
   def finalScoreMultiPointState: Option[MultiPointState] = {
@@ -525,8 +525,15 @@ case class Game(
     }
 
     return multiPointState match {
-      case Some(m) => Some(MultiPointState(m.target, Math.min(m.target, m.p1Points + points2Add(0)), Math.min(m.target, m.p2Points + points2Add(1))))
-      case _       => None
+      case Some(m) =>
+        Some(
+          MultiPointState(
+            m.target,
+            Math.min(m.target, m.p1Points + points2Add(0)),
+            Math.min(m.target, m.p2Points + points2Add(1))
+          )
+        )
+      case _ => None
     }
   }
 
@@ -1310,8 +1317,8 @@ case class MultiPointState(target: Int, p1Points: Int = 0, p2Points: Int = 0) {
       )
     )
 
-  override def toString: String = f"${target}%02d${p1Points}%02d${p2Points}%02d"
-  def toString(p1: Boolean): String = f"${(if(p1) p1Points else p2Points)}%02d"
+  override def toString: String     = f"${target}%02d${p1Points}%02d${p2Points}%02d"
+  def toString(p1: Boolean): String = f"${(if (p1) p1Points else p2Points)}%02d"
 }
 
 object MultiPointState {

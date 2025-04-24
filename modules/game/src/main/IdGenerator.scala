@@ -32,7 +32,7 @@ final class IdGenerator(gameRepo: GameRepo)(implicit ec: scala.concurrent.Execut
 
 object IdGenerator {
 
-  private[this] val secureRandom     = new SecureRandom()
+  private[this] val secureRandom  = new SecureRandom()
   private[this] val p1SuffixChars = ('0' to '4') ++ ('A' to 'Z') mkString
   private[this] val p2SuffixChars = ('5' to '9') ++ ('a' to 'z') mkString
 

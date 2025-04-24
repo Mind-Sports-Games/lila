@@ -11,7 +11,7 @@ import lila.common.paginator.Paginator
 import lila.i18n.LangList
 
 object index {
-/*
+  /*
   import trans.coach._
 
   def apply(

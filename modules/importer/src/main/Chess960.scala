@@ -14,20 +14,20 @@ private object Chess960 {
 
       rankMatches {
         case Some(Piece(P1, King | Queen | Rook | Knight | Bishop)) => true
-        case _                                                         => false
+        case _                                                      => false
       }(Rank.First) &&
       rankMatches {
         case Some(Piece(P1, Pawn)) => true
-        case _                        => false
+        case _                     => false
       }(Rank.Second) &&
       List(Rank.Third, Rank.Fourth, Rank.Fifth, Rank.Sixth).forall(rankMatches(_.isEmpty)) &&
       rankMatches {
         case Some(Piece(P2, Pawn)) => true
-        case _                        => false
+        case _                     => false
       }(Rank.Seventh) &&
       rankMatches {
         case Some(Piece(P2, King | Queen | Rook | Knight | Bishop)) => true
-        case _                                                         => false
+        case _                                                      => false
       }(Rank.Eighth)
     }
 

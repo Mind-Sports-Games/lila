@@ -11,7 +11,7 @@ import controllers.routes
 import lila.relay.{ RelayRound, RelayTour }
 
 object tour {
-/*
+  /*
   import trans.broadcast._
 
   def index(
@@ -69,5 +69,5 @@ object tour {
         )
       )
     }
-*/
+   */
 }

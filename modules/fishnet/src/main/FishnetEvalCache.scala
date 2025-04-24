@@ -1,6 +1,6 @@
 package lila.fishnet
 
-import strategygames.format.{ FEN, Forsyth, Uci}
+import strategygames.format.{ FEN, Forsyth, Uci }
 import strategygames.{ GameLogic, Replay }
 import JsonApi.Request.Evaluation
 
@@ -46,7 +46,9 @@ final private class FishnetEvalCache(
         _ => fuccess(Nil),
         _.zipWithIndex
           .map { case (sit, index) =>
-            evalCacheApi.getSinglePvEval(game.variant, Forsyth.>>(game.variant.gameLogic, sit)) dmap2 { index -> _ }
+            evalCacheApi.getSinglePvEval(game.variant, Forsyth.>>(game.variant.gameLogic, sit)) dmap2 {
+              index -> _
+            }
           }
           .sequenceFu
           .map(_.flatten)
