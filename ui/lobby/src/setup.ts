@@ -3,6 +3,7 @@ import modal from 'common/modal';
 import debounce from 'common/debounce';
 import * as xhr from 'common/xhr';
 import LobbyController from './ctrl';
+import { ClockConfig } from './interfaces';
 
 //TODO remove other form setup options
 export default class Setup {
@@ -132,6 +133,54 @@ export default class Setup {
     return undefined;
   };
 
+  private clockDefaults = (variant: string) => {
+    const defaultClockConfig = {
+      bullet: { timemode: '1', initial: '1', increment: '0' },
+      blitz: { timemode: '1', initial: '3', increment: '2' },
+      rapid: { timemode: '1', initial: '5', increment: '5' },
+      classical: { timemode: '1', initial: '20', increment: '10' },
+      correspondence: { timemode: '2', days: '2' },
+      custom: { timemode: '6' },
+    };
+    switch (
+      variant //TODO add modes for all games, e.g. backgammon
+    ) {
+      case '3_5': //mini-shogi
+      case '3_1': //shogi
+        return Object.assign({}, defaultClockConfig, {
+          bullet: { timemode: '3', byoyomi: '10', periods: '1', increment: '0', initial: '1' },
+          blitz: { timemode: '3', byoyomi: '10', periods: '1', increment: '0', initial: '3' },
+          rapid: { timemode: '3', byoyomi: '10', periods: '1', increment: '0', initial: '5' },
+          classical: { timemode: '3', byoyomi: '20', periods: '2', increment: '0', initial: '20' },
+        });
+      default:
+        return defaultClockConfig;
+    }
+  };
+
+  private clockDisplayText = (clockConfig: ClockConfig) => {
+    switch (clockConfig.timemode) {
+      case '2': //correspondence
+        return clockConfig.days + ' day' + (clockConfig.days !== '1' ? 's' : '');
+      case '3': //byoyomi
+        return (
+          clockConfig.initial +
+          (clockConfig.increment !== '0' ? ' + ' + clockConfig.increment : '') +
+          `|${clockConfig.byoyomi}${clockConfig.periods !== '1' ? `(${clockConfig.periods}x)` : ''}`
+        );
+      case '4': //bronstein
+        return clockConfig.initial + ' d+' + clockConfig.increment;
+      case '5': //simple delay
+        return clockConfig.initial + ' d/' + clockConfig.increment;
+      case '0': //unlimited
+        return '\u221E';
+      case '6': //custom
+        return 'Custom';
+      default:
+        return clockConfig.initial + (clockConfig.increment !== '0' ? ' + ' + clockConfig.increment : '');
+    }
+  };
+
   private hookToPoolMember = (playerIndex: string, form: HTMLFormElement) => {
     const data = Array.from(new FormData(form).entries());
     const hash: any = {};
@@ -170,8 +219,7 @@ export default class Setup {
       $timeInput = $form.find('.time_choice [name=time]'),
       $incrementInput = $form.find('.increment_choice [name=increment]'),
       $byoyomiInput = $form.find('.byoyomi_choice [name=byoyomi]'),
-      $periods = $form.find('.periods'),
-      $periodsInput = $periods.find('.byoyomi_periods [name=periods]'),
+      $periodsInput = $form.find('.byoyomi_periods [name=periods]'),
       $goConfig = $form.find('.go_config'),
       $goHandicapInput = $form.find('.go_handicap_choice [name=goHandicap]'),
       $goKomiInput = $form.find('.go_komi_choice [name=goKomi]'),
@@ -548,6 +596,38 @@ export default class Setup {
 
     const isRealTime = () => this.ratedTimeModes.indexOf(<string>$timeModeSelect.val()) !== -1;
 
+    const customClockConfig = () => {
+      return {
+        timemode: $timeModeSelect.val(),
+        initial: $timeInput.val(),
+        increment: $incrementInput.val(),
+        byoyomi: $byoyomiInput.val(),
+        periods: $periodsInput.filter(':checked').val() as string,
+        days: $daysInput.val(),
+      } as ClockConfig;
+    };
+
+    const updateClockOptionsText = () => {
+      const variantId = $variantInput.filter(':checked').val() as string;
+      const clockConfig = self.clockDefaults(variantId);
+      $timeModeDefaults.find('label').each(function (this: HTMLElement) {
+        const $this = $(this);
+        const clockType = $this.attr('for').split('_')[2];
+        if (clockType !== 'custom') {
+          $this.text(self.clockDisplayText(clockConfig[clockType]));
+          $this.attr('title', self.clockDisplayText(clockConfig[clockType]));
+        }
+        const $selectedChoice = $timeModeDefaults.find(`div.choice.${$this.attr('for').replace('sf_', '')}`);
+        if (clockType !== 'custom') {
+          $selectedChoice.text(self.clockDisplayText(clockConfig[clockType]));
+          $selectedChoice.attr('title', self.clockDisplayText(clockConfig[clockType]));
+        } else {
+          $selectedChoice.text(self.clockDisplayText(customClockConfig()));
+          $selectedChoice.attr('title', self.clockDisplayText(customClockConfig()));
+        }
+      });
+    };
+
     if (typ === 'hook') {
       if ($form.data('anon')) {
         $timeModeSelect
@@ -759,6 +839,7 @@ export default class Setup {
         .hide()
         .filter(`.${sName}_` + $this.find('input').filter(':checked').val())
         .show();
+      $form.find('.time_mode_config').hide();
       //Always start the form with gameFamily active
       if (sName == 'gameFamily') {
         $this.addClass('active');
@@ -771,23 +852,33 @@ export default class Setup {
         const $displayChoices = $this.find('div.choice');
         if (this.classList.contains('active')) {
           $displayChoices.hide();
+          if (
+            sName === 'timeModeDefaults' &&
+            ($timeModeDefaults.find('input').filter(':checked').val() as string) === 'custom'
+          ) {
+            $form.find('.time_mode_config').show();
+            $form.find('.time_mode_config').trigger('click');
+          }
         } else {
           $displayChoices
             .hide()
             .filter(`.${sName}_` + $this.find('input').filter(':checked').val())
             .show();
+          //also hide custom timecontrol and update text
+          $form.find('.time_mode_config').hide();
+          updateClockOptionsText();
         }
       });
-      $this.attr('tabindex', '0'); // Make the element focusable
-      $this.on('blur', function (this: HTMLElement) {
-        this.classList.remove('active');
-        $(this).find('group').addClass('hide');
-        const $displayChoices = $this.find('div.choice');
-        $displayChoices
-          .hide()
-          .filter(`.${sName}_` + $this.find('input').filter(':checked').val())
-          .show();
-      });
+      // $this.attr('tabindex', '0'); // Make the element focusable
+      // $this.on('blur', function (this: HTMLElement) {
+      //   this.classList.remove('active');
+      //   $(this).find('group').addClass('hide');
+      //   const $displayChoices = $this.find('div.choice');
+      //   $displayChoices
+      //     .hide()
+      //     .filter(`.${sName}_` + $this.find('input').filter(':checked').val())
+      //     .show();
+      // });
     });
     //TODO shouldn't be able to pick lobby game if user field is set (i.e. from challenge/bot)
     $form.find('.rating-range').each(function (this: HTMLDivElement) {
@@ -842,47 +933,23 @@ export default class Setup {
       .trigger('change');
     $timeModeDefaults.on('change', function (this: HTMLElement) {
       const choice = $(this).find('input').filter(':checked').val() as string;
-      const options = choice.split('_');
-      const initial = options[1] || '3',
-        increment = options[2] || '2',
-        byoyomi = options[3] || '1',
-        periods = options[4] || '1';
-      switch (options[0]) {
-        case '1': //fischer
-          $timeModeSelect.val('1');
-          $timeInput.val(initial);
-          $incrementInput.val(increment);
+      const clockConfig = self.clockDefaults($variantInput.filter(':checked').val() as string);
+      switch (choice) {
+        case 'correspondence': //correspondence
+          $timeModeSelect.val(clockConfig['correspondence'].timemode);
+          $daysInput.val(clockConfig['correspondence'].days);
           $form.find('.time_mode_config').hide();
           break;
-        case '2': //correspondence
-          $timeModeSelect.val('2');
-          $daysInput.val(initial);
-          $form.find('.time_mode_config').hide();
-          break;
-        case '3': //byoyomi
-          $timeModeSelect.val('3');
-          $timeInput.val(initial);
-          $incrementInput.val(increment);
-          $byoyomiInput.val(byoyomi);
-          $periodsInput.val(periods);
-          $form.find('.time_mode_config').hide();
-          break;
-        case '4': //bronstein
-          $timeModeSelect.val('4');
-          $timeInput.val(initial);
-          $incrementInput.val(increment);
-          $form.find('.time_mode_config').hide();
-          break;
-        case '5': //simple
-          $timeModeSelect.val('5');
-          $timeInput.val(initial);
-          $incrementInput.val(increment);
-          $form.find('.time_mode_config').hide();
-          break;
-        case '99': //custom - i.e. used old time setup options
+        case 'custom': //custom - i.e. used old time setup options
           $form.find('.time_mode_config').show();
-          $timeModeSelect.val('5');
           break;
+        default:
+          $timeModeSelect.val(clockConfig[choice].timemode);
+          if (clockConfig[choice]['initial']) $timeInput.val(clockConfig[choice]['initial']);
+          if (clockConfig[choice]['increment']) $incrementInput.val(clockConfig[choice]['increment']);
+          if (clockConfig[choice]['byoyomi']) $byoyomiInput.val(clockConfig[choice]['byoyomi']);
+          if (clockConfig[choice]['periods']) $periodsInput.val(clockConfig[choice]['periods']);
+          $form.find('.time_mode_config').hide();
       }
     });
     const validateFen = debounce(() => {
@@ -969,6 +1036,7 @@ export default class Setup {
           validateFen();
           requestAnimationFrame(() => document.body.dispatchEvent(new Event(ground)));
         }
+        updateClockOptionsText();
         showRating();
         showStartingImages();
         if (variantId[0] == '9') setupGoKomiInput();

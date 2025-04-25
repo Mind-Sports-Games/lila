@@ -140,16 +140,14 @@ trait SetupHelper { self: I18nHelper =>
       (Mode.Rated.id.toString, "\uE92B", trans.rated.txt().some)
     )
 
-  //TODO decide wording on all clocks and how to be game family dependent
-  //key creates the clock (TimeMode, initial, increment, byoyomi time, periods)
   def translatedTimeModeIconChoices(implicit lang: Lang): List[SelectChoice] =
     List(
-      ("1_1_0", "\u0054", "Fischer 1+0".some),
-      ("1_3_2", "\u0029", "Fischer 3+2".some),
-      ("1_5_5", "\u0023", "Fischer 5+5".some),
-      ("1_20_10", "\u002B", "Fischer 20+10".some),
-      ("2_2", "\u003B", "Correspondence 2d".some),
-      ("99", "\u006E", "Custom".some)
+      ("bullet", "\u0054", "1+0".some),
+      ("blitz", "\u0029", "3+2".some),
+      ("rapid", "\u0023", "5+5".some),
+      ("classical", "\u002B", "20+10".some),
+      ("correspondence", "\u003B", "2 days".some),
+      ("custom", "\u006E", "Custom".some)
     )
 
   def translatedIncrementChoices(implicit lang: Lang) =
@@ -346,7 +344,7 @@ trait SetupHelper { self: I18nHelper =>
     List(
       ("lobby", "\u0066", "lobby".some),
       ("friend", "\u0072", "friend".some),
-      ("bot", "", "bot".some)
+      ("bot", "\uE933", "bot".some)
     )
 
   def translatedBotChoices(implicit lang: Lang): List[SelectChoice] =

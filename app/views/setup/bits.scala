@@ -139,13 +139,7 @@ private object bits {
 
   def renderSelectedChoice(field: Field, options: Seq[SelectChoice], userPart: Option[Tag] = None) =
     options.map { case (key, icon, hint) =>
-      div(cls := s"${field.name}_$key choice", dataIcon := icon, title := hint)( //TODO refactor?
-        key == "bot" option img(
-          src := staticAssetUrl("images/icons/bot.png"),
-          title := "Robot chess",
-          style :=
-            "display:inline;width:34px;height:34px;vertical-align:top;margin-right:5px;vertical-align:text-top"
-        ),
+      div(cls := s"${field.name}_$key choice", dataIcon := icon, title := hint)(
         userPart == None option hint,
         (key == "bot" || key == "friend") option userPart
       )
@@ -167,15 +161,7 @@ private object bits {
             dataIcon := icon,
             title := hint,
             `for` := s"$prefix${field.id}_$key"
-          )( //TODO refactor?
-            key == "bot" option img(
-              src := staticAssetUrl("images/icons/bot.png"),
-              title := "Robot chess",
-              style :=
-                "display:inline;width:34px;height:34px;vertical-align:top;margin-right:5px;vertical-align:text-top"
-            ),
-            hint
-          )
+          )(hint)
         )
       }
     )
@@ -294,7 +280,6 @@ private object bits {
       )
     )
 
-  //TODO add new form input for this choice, allow specific modes for each gf
   def renderTimeModeOptions(form: Form[_])(implicit ctx: Context) =
     div(cls := "time_mode_defaults optional_config collapsible")(
       div(cls := "section_title")(
