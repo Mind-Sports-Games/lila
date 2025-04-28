@@ -107,6 +107,11 @@ $game-family-p2-pieces: (
     }
   }
 
+  .bot_choice group.radio label {
+    width: 3em;
+    height: 3em;
+  }
+
   .optional_config {
     border-bottom: $border;
   }
@@ -167,14 +172,19 @@ $game-family-p2-pieces: (
     }
 
     &.playerIndex__button {
-      margin-left: -50px;
-      width: 64px;
+      display: flex;
+      flex-flow: row nowrap;
+      justify-content: center;
+      margin-left: -80px;
+      height: 64px !important;
+      div {
+        margin-left: 40px;
+        place-self: center;
+      }
     }
   }
 
-  group.radio.hide {
-    display: none;
-  }
+  group.radio.hide,
   label.hide {
     display: none;
   }
@@ -252,7 +262,7 @@ $game-family-p2-pieces: (
 
       .playerIndex__button {
         //width: 64px;
-        height: 64px;
+        height: 83px;
         padding: $padding_button;
 
         i {
@@ -278,6 +288,10 @@ $game-family-p2-pieces: (
           & i {
             background-image: url(../piece/#{$gf}/#{$file});
           }
+        }
+
+        div {
+          margin-top: 4px;
         }
 
         &.nope {

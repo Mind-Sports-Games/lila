@@ -246,7 +246,10 @@ private object bits {
 
   def renderBotChoice(form: Form[_])(implicit ctx: Context) =
     div(cls := "bot_choice buttons")(
-      renderRadios(form("bot"), translatedBotChoices)
+      div(cls := "bot_title")("PS Greedy Bot"),
+      renderRadios(form("bot"), translatedPSBotChoices),
+      div(cls := "bot_title")("Stockfish"),
+      renderRadios(form("bot"), translatedStockfishChoices)
     )
 
   def renderPlayerIndexOptions(field: Field)(implicit ctx: Context) =
@@ -254,7 +257,7 @@ private object bits {
       div(cls := "section_title")("PlayerIndex"),
       div(cls := "playerIndex_choices buttons")(
         st.group(cls := "radio")(
-          translatedSideChoices.map { case (key, _, _) =>
+          translatedSideChoices.map { case (key, name, _) =>
             div(
               input(
                 tpe := "radio",
@@ -267,15 +270,15 @@ private object bits {
                 cls := s"playerIndex__button button button-metal $key",
                 title := key,
                 `for` := s"$prefix${field.id}_$key"
-              )(i)
+              )(i, div(name))
             )
           }
         ),
-        translatedSideChoices.map { case (key, _, _) =>
+        translatedSideChoices.map { case (key, name, _) =>
           div(
-            cls := s"${field.name}_$key choice playerIndex__button button button-metal $key",
+            cls := s"${field.name}_$key choice playerIndex__button $key",
             title := key
-          )(i)
+          )(i, div(name))
         }
       )
     )

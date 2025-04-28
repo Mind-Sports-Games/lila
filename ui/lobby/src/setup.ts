@@ -859,14 +859,20 @@ export default class Setup {
             $form.find('.time_mode_config').show();
             $form.find('.time_mode_config').trigger('click');
           }
+          if (sName === 'opponent' && ($opponentInput.filter(':checked').val() as string) === 'bot') {
+            $form.find('.bot_title').show();
+          }
         } else {
           $displayChoices
             .hide()
             .filter(`.${sName}_` + $this.find('input').filter(':checked').val())
-            .show();
+            .show()
+            .removeAttr('style'); //remove unwated display: block added by show()
           //also hide custom timecontrol and update text
           $form.find('.time_mode_config').hide();
           updateClockOptionsText();
+          //hide bot option titles;
+          $form.find('.bot_title').hide();
         }
       });
       // $this.attr('tabindex', '0'); // Make the element focusable
@@ -996,14 +1002,17 @@ export default class Setup {
     });
 
     $botChoices.hide();
+    $form.find('.bot_title').hide();
     //TODO preset this depending on user input and/or previous form setup
     $opponentInput.on('change', function (this: HTMLElement) {
       const opponent = $opponentInput.filter(':checked').val() as string;
       if (opponent == 'bot') {
         $botChoices.show();
+        $form.find('.bot_title').show();
       } else {
         if (!user) $form.attr('action', $form.attr('action')?.replace(/user=[^&]*/, ''));
         $botChoices.hide();
+        $form.find('.bot_title').hide();
       }
     });
     $botInput.on('change', function (this: HTMLElement) {

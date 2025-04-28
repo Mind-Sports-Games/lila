@@ -95,7 +95,7 @@ object LightUser {
 
   val stockfishBotsIDs: List[UserID] = stockfishBots.map(_.id)
 
-  val lobbyBotsIDs: List[UserID] = poolBotsIDs ++ stockfishBotsIDs ++ List(randomBot.id)
+  val lobbyBotsIDs: List[UserID] = List(randomBot.id) ++ poolBotsIDs
 
   val easiestPoolBotId: UserID = "ps-greedy-one-move"
 

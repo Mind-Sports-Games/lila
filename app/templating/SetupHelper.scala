@@ -347,8 +347,23 @@ trait SetupHelper { self: I18nHelper =>
       ("bot", "\uE933", "bot".some)
     )
 
-  def translatedBotChoices(implicit lang: Lang): List[SelectChoice] =
-    LightUser.lobbyBotsIDs.map { id => (id.toString(), id.toString(), none) }
+  def translatedPSBotChoices(implicit lang: Lang): List[SelectChoice] =
+    LightUser.lobbyBotsIDs.map { id =>
+      (
+        id.toString(),
+        id match {
+          case "ps-greedy-four-move" => "4"
+          case "ps-greedy-two-move"  => "2"
+          case "ps-greedy-one-move"  => "1"
+          case "ps-random-mover"     => "0"
+          case _                     => id
+        },
+        none
+      )
+    }
+
+  def translatedStockfishChoices(implicit lang: Lang): List[SelectChoice] =
+    LightUser.stockfishBotsIDs.map { id => (id.toString(), id.takeRight(1), none) }
 
   def translatedAnimationChoices(implicit lang: Lang) =
     List(
