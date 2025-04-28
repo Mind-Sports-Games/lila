@@ -38,7 +38,6 @@ export default class Protocol {
 
     // Analyse without contempt.
     this.setOption('UCI_AnalyseMode', 'true');
-    this.setOption('Analysis Contempt', 'Off');
 
     // Handle variants ("giveaway" is antichess in old asmjs fallback).
     this.setOption('UCI_Chess960', 'true');

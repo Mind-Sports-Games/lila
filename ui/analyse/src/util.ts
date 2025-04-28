@@ -301,3 +301,8 @@ export const isOnlyDropsPly = (node: Tree.Node, variantKey: VariantKey, defaultV
   if (variantKey === 'amazons') return typeof node.dropsByRole === 'string' && node.dropsByRole.length > 0;
   else return defaultValue;
 };
+
+export function allowExplorerForVariant(_variant: VariantKey) {
+  // @TODO: enable it at least for chess game family when the link gets fixed (points towards something that exists)
+  return false;
+}
