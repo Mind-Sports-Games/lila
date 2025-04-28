@@ -38,7 +38,6 @@ export default class Protocol {
 
     // Analyse without contempt.
     this.setOption('UCI_AnalyseMode', 'true');
-    this.setOption('Analysis Contempt', 'Off');
 
     // Handle variants ("giveaway" is antichess in old asmjs fallback).
     this.setOption('UCI_Chess960', 'true');
@@ -48,6 +47,11 @@ export default class Protocol {
 
   private setOption(name: string, value: string | number): void {
     this.send(`setoption name ${name} value ${value}`);
+  }
+
+  setVariant(variant: VariantKey): void {
+    // allow to switch variant from study
+    this.setOption('UCI_Variant', playstrategyRules(variant));
   }
 
   received(text: string): void {

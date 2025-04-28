@@ -9,7 +9,7 @@ import {
   spinner,
   bindMobileMousedown,
   getScoreFromFen,
-  allowClientEvalForVariant,
+  allowExplorerForVariant,
 } from './util';
 import { defined } from 'common';
 import changeColorHandle from 'common/coordsColor';
@@ -47,6 +47,7 @@ import { findTag } from './study/studyChapters';
 import serverSideUnderboard from './serverSideUnderboard';
 import * as gridHacks from './gridHacks';
 import * as Prefs from 'common/prefs';
+import { allowedForVariant as allowClientEvalForVariant, allowPracticeWithComputer, allowPv } from 'ceval/src/util';
 
 function renderResult(ctrl: AnalyseCtrl): VNode[] {
   let result: string | undefined;
@@ -272,7 +273,9 @@ function controls(ctrl: AnalyseCtrl) {
                   }),
                 ]
               : [
-                  ctrl.ceval.allowed() && allowClientEvalForVariant(ctrl.ceval.variant.key)
+                  ctrl.ceval.allowed() &&
+                  allowClientEvalForVariant(ctrl.ceval.variant.key) &&
+                  allowExplorerForVariant(ctrl.ceval.variant.key)
                     ? h('button.fbt', {
                         attrs: {
                           title: noarg('openingExplorerAndTablebase'),
@@ -288,7 +291,8 @@ function controls(ctrl: AnalyseCtrl) {
                   ctrl.ceval.possible &&
                   ctrl.ceval.allowed() &&
                   allowClientEvalForVariant(ctrl.ceval.variant.key) &&
-                  !ctrl.isGamebook()
+                  !ctrl.isGamebook() &&
+                  allowPracticeWithComputer(ctrl.ceval.variant.key)
                     ? h('button.fbt', {
                         attrs: {
                           title: noarg('practiceWithComputer'),
@@ -476,7 +480,7 @@ export default function (ctrl: AnalyseCtrl): VNode {
   if (ctrl.nvui) return ctrl.nvui.render(ctrl);
   const concealOf = makeConcealOf(ctrl),
     study = ctrl.study,
-    showCevalPvs = !(ctrl.retro && ctrl.retro.isSolving()) && !ctrl.practice,
+    showCevalPvs = !(ctrl.retro && ctrl.retro.isSolving()) && !ctrl.practice && allowPv(ctrl.data.game.variant.key),
     menuIsOpen = ctrl.actionMenu.open,
     gamebookPlay = ctrl.gamebookPlay(),
     gamebookPlayView = gamebookPlay && gbPlay.render(gamebookPlay),
@@ -650,8 +654,10 @@ export default function (ctrl: AnalyseCtrl): VNode {
               ...(menuIsOpen
                 ? [actionMenu(ctrl)]
                 : [
-                    allowClientEvalForVariant(ctrl.ceval.variant.key) ? cevalView.renderCeval(ctrl) : null,
-                    allowClientEvalForVariant(ctrl.ceval.variant.key) && showCevalPvs
+                    ctrl.ceval.allowed && allowClientEvalForVariant(ctrl.ceval.variant.key)
+                      ? cevalView.renderCeval(ctrl)
+                      : null,
+                    ctrl.ceval.allowed && allowClientEvalForVariant(ctrl.ceval.variant.key) && showCevalPvs
                       ? cevalView.renderPvs(variantKey)(ctrl)
                       : null,
                     renderAnalyse(ctrl, concealOf),

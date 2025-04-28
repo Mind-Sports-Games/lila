@@ -9,7 +9,7 @@ import lila.common.String.html.richText
 import controllers.routes
 
 object show {
-/*
+  /*
   import trans.coach._
 
   private def section(title: Frag, text: Option[lila.coach.CoachProfile.RichText]) =

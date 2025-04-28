@@ -7,7 +7,7 @@ import lila.app.ui.ScalatagsTemplate._
 import controllers.routes
 
 object layout {
-/*
+  /*
   def apply(
       title: String,
       control: lila.video.UserControl,
@@ -48,5 +48,5 @@ object layout {
         div(cls := "page-menu__content box")(body)
       )
     }
-    */
+   */
 }
