@@ -1,6 +1,5 @@
 import { h, VNode } from 'snabbdom';
 import { parseFen } from 'stratops/fen';
-import { variantToRules } from 'stratutils';
 import * as chessground from './ground';
 import {
   bind,
@@ -48,6 +47,7 @@ import serverSideUnderboard from './serverSideUnderboard';
 import * as gridHacks from './gridHacks';
 import * as Prefs from 'common/prefs';
 import { allowedForVariant as allowClientEvalForVariant, allowPracticeWithComputer, allowPv } from 'ceval/src/util';
+import { playstrategyRules } from 'stratops/compat';
 
 function renderResult(ctrl: AnalyseCtrl): VNode[] {
   let result: string | undefined;
@@ -128,7 +128,7 @@ function inputs(ctrl: AnalyseCtrl): VNode | undefined {
             el.addEventListener('input', _ => {
               ctrl.fenInput = el.value;
               el.setCustomValidity(
-                parseFen(variantToRules(ctrl.data.game.variant.key))(el.value.trim()).isOk ? '' : 'Invalid FEN',
+                parseFen(playstrategyRules(ctrl.data.game.variant.key))(el.value.trim()).isOk ? '' : 'Invalid FEN',
               );
             });
           },
