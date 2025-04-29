@@ -5,9 +5,10 @@ import { tablebaseGuaranteed } from '../explorer/explorerCtrl';
 import AnalyseCtrl from '../ctrl';
 import { Redraw } from '../interfaces';
 import { defined, prop, Prop } from 'common';
-import { altCastles, variantToRules } from 'stratutils';
+import { altCastles } from 'stratutils';
 import { parseUci } from 'stratops/util';
 import { makeSan } from 'stratops/san';
+import { playstrategyRules } from 'stratops/compat';
 
 declare type Verdict = 'goodMove' | 'inaccuracy' | 'mistake' | 'blunder';
 
@@ -113,7 +114,7 @@ export function make(root: AnalyseCtrl, playableDepth: () => number): PracticeCt
       else verdict = 'blunder';
     }
 
-    const rules = variantToRules(variant);
+    const rules = playstrategyRules(variant);
     return {
       prev,
       node,
