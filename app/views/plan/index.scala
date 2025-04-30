@@ -88,50 +88,50 @@ object index {
                   attr("data-lifetime-cents") := lila.plan.Cents.lifetime.value
                 )(
                   raw(s"""
-<form class="paypal_checkout onetime none" action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top">
+<form class="paypal_checkout onetime none" action="https://www.sandbox.paypal.com/cgi-bin/webscr" method="post" target="_top">
   <input type="hidden" name="custom" value="${~ctx.userId}">
   <input type="hidden" name="amount" class="amount" value="">
   <input type="hidden" name="cmd" value="_xclick">
-  <input type="hidden" name="business" value="F4YEG6EMBR3MU">
-  <input type="hidden" name="item_name" value="playstrategy.org one-time">
+  <input type="hidden" name="business" value="UEWHVQ2F7SQNC">
+  <input type="hidden" name="item_name" value="playstrategy.dev one-time">
   <input type="hidden" name="button_subtype" value="services">
   <input type="hidden" name="no_note" value="1">
   <input type="hidden" name="no_shipping" value="1">
   <input type="hidden" name="rm" value="1">
-  <input type="hidden" name="return" value="https://playstrategy.org/patron/thanks">
-  <input type="hidden" name="cancel_return" value="https://playstrategy.org/patron">
+  <input type="hidden" name="return" value="https://playstrategy.dev/patron/thanks">
+  <input type="hidden" name="cancel_return" value="https://playstrategy.dev/patron">
   <input type="hidden" name="lc" value="US">
   <input type="hidden" name="currency_code" value="USD">
 </form>
-<form class="paypal_checkout monthly none" action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top">
+<form class="paypal_checkout monthly none" action="https://www.sandbox.paypal.com/cgi-bin/webscr" method="post" target="_top">
   <input type="hidden" name="custom" value="${~ctx.userId}">
   <input type="hidden" name="a3" class="amount" value="">
   <input type="hidden" name="cmd" value="_xclick-subscriptions">
-  <input type="hidden" name="business" value="F4YEG6EMBR3MU">
-  <input type="hidden" name="item_name" value="playstrategy.org monthly">
+  <input type="hidden" name="business" value="UEWHVQ2F7SQNC">
+  <input type="hidden" name="item_name" value="playstrategy.dev monthly">
   <input type="hidden" name="no_note" value="1">
   <input type="hidden" name="no_shipping" value="1">
   <input type="hidden" name="rm" value="1">
-  <input type="hidden" name="return" value="https://playstrategy.org/patron/thanks">
-  <input type="hidden" name="cancel_return" value="https://playstrategy.org/patron">
+  <input type="hidden" name="return" value="https://playstrategy.dev/patron/thanks">
+  <input type="hidden" name="cancel_return" value="https://playstrategy.dev/patron">
   <input type="hidden" name="src" value="1">
   <input type="hidden" name="p3" value="1">
   <input type="hidden" name="t3" value="M">
   <input type="hidden" name="lc" value="US">
   <input type="hidden" name="currency_code" value="USD">
 </form>
-<form class="paypal_checkout lifetime none" action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top">
+<form class="paypal_checkout lifetime none" action="https://www.sandbox.paypal.com/cgi-bin/webscr" method="post" target="_top">
   <input type="hidden" name="custom" value="${~ctx.userId}">
   <input type="hidden" name="amount" class="amount" value="">
   <input type="hidden" name="cmd" value="_xclick">
-  <input type="hidden" name="business" value="F4YEG6EMBR3MU">
-  <input type="hidden" name="item_name" value="playstrategy.org lifetime">
+  <input type="hidden" name="business" value="UEWHVQ2F7SQNC">
+  <input type="hidden" name="item_name" value="playstrategy.dev lifetime">
   <input type="hidden" name="button_subtype" value="services">
   <input type="hidden" name="no_note" value="1">
   <input type="hidden" name="no_shipping" value="1">
   <input type="hidden" name="rm" value="1">
-  <input type="hidden" name="return" value="https://playstrategy.org/patron/thanks">
-  <input type="hidden" name="cancel_return" value="https://playstrategy.org/patron">
+  <input type="hidden" name="return" value="https://playstrategy.dev/patron/thanks">
+  <input type="hidden" name="cancel_return" value="https://playstrategy.dev/patron">
   <input type="hidden" name="lc" value="US">
   <input type="hidden" name="currency_code" value="USD">
 </form>"""),

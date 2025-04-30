@@ -6,7 +6,8 @@ import play.api.data.Forms._
 
 object PlanForm {
 
-  private val txnTypes = Set("express_checkout", "web_accept", "recurring_payment", "subscr_payment")
+  private val paymentStatus = Set("Completed")
+  private val txnTypes      = Set("express_checkout", "web_accept", "recurring_payment", "subscr_payment")
   // ignored types = subscr_cancel, ...
 
   val ipn = Form(
@@ -20,7 +21,8 @@ object PlanForm {
       "payer_email"       -> optional(nonEmptyText),
       "first_name"        -> optional(text),
       "last_name"         -> optional(text),
-      "residence_country" -> optional(text)
+      "residence_country" -> optional(text),
+      "payment_status"    -> text.verifying("Invalid payment status", paymentStatus contains _)
     )(Ipn.apply)(Ipn.unapply)
   )
 
@@ -34,7 +36,8 @@ object PlanForm {
       email: Option[String],
       firstName: Option[String],
       lastName: Option[String],
-      countryCode: Option[String]
+      countryCode: Option[String],
+      paymentStatus: String
   ) {
 
     def name = (firstName, lastName) mapN { _ + " " + _ }

@@ -21,7 +21,6 @@ final class PlanApi(
     lightUserApi: lila.user.LightUserApi,
     cacheApi: lila.memo.CacheApi,
     mongoCache: lila.memo.MongoCache.Api,
-    payPalIpnKey: Secret,
     monthlyGoalApi: MonthlyGoalApi
 )(implicit ec: scala.concurrent.ExecutionContext) {
 
@@ -94,13 +93,9 @@ final class PlanApi(
       name: Option[String],
       txnId: Option[String],
       country: Option[Country],
-      ip: String,
-      key: String
+      ip: String
   ): Funit =
-    if (key != payPalIpnKey.value) {
-      logger.error(s"Invalid PayPal IPN key $key from $ip $userId $cents")
-      funit
-    } else if (cents.value < 100) {
+    if (cents.value < 100) {
       logger.info(s"Ignoring small paypal charge from $ip $userId $cents $txnId")
       funit
     } else {

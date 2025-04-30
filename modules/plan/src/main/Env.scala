@@ -12,8 +12,7 @@ import lila.common.config._
 private class PlanConfig(
     @ConfigName("collection.patron") val patronColl: CollName,
     @ConfigName("collection.charge") val chargeColl: CollName,
-    val stripe: StripeClient.Config,
-    @ConfigName("paypal.ipn_key") val payPalIpnKey: Secret
+    val stripe: StripeClient.Config
 )
 
 final class Env(
@@ -63,7 +62,6 @@ final class Env(
     lightUserApi = lightUserApi,
     cacheApi = cacheApi,
     mongoCache = mongoCache,
-    payPalIpnKey = config.payPalIpnKey,
     monthlyGoalApi = monthlyGoalApi
   )
 

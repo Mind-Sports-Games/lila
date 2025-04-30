@@ -22,7 +22,8 @@ import lila.plan.{
 import lila.user.{ User => UserModel }
 import views._
 
-final class Plan(env: Env)(implicit system: akka.actor.ActorSystem) extends LilaController(env) {
+final class Plan(env: Env)(implicit system: akka.actor.ActorSystem, ws: play.api.libs.ws.StandaloneWSClient)
+    extends LilaController(env) {
 
   private val logger = lila.log("plan")
 
@@ -236,30 +237,58 @@ final class Plan(env: Env)(implicit system: akka.actor.ActorSystem) extends Lila
   def payPalIpn =
     Action.async { implicit req =>
       import lila.plan.Patron.PayPal
-      lila.plan.PlanForm.ipn
-        .bindFromRequest()
-        .fold(
-          err => {
-            if (err.errors("txn_type").nonEmpty) {
-              logger.debug(s"Plan.payPalIpn ignore txn_type = ${err.data get "txn_type"}")
-              fuccess(Ok)
-            } else {
-              logger.error(s"Plan.payPalIpn invalid data ${err.toString}")
-              fuccess(BadRequest)
-            }
-          },
-          ipn =>
-            env.plan.api.onPaypalCharge(
-              userId = ipn.userId,
-              email = ipn.email map PayPal.Email.apply,
-              subId = ipn.subId map PayPal.SubId.apply,
-              cents = lila.plan.Cents(ipn.grossCents),
-              name = ipn.name,
-              txnId = ipn.txnId,
-              country = ipn.country,
-              ip = lila.common.HTTPRequest.ipAddress(req).value,
-              key = get("key", req) | "N/A"
-            ) inject Ok
-        )
+      import play.api.libs.ws._
+      import play.api.libs.ws.DefaultBodyWritables._ // required
+      import java.net.URLEncoder
+
+      val ipnUrl = "https://ipnpb.sandbox.paypal.com/cgi-bin/webscr" // PayPal's IPN verification URL
+      val params = req.body.asFormUrlEncoded.getOrElse(Map.empty)
+      val verificationDataString = "cmd=_notify-validate" + params.map { case (k, v) =>
+        s"&${URLEncoder.encode(k, "UTF-8")}=${URLEncoder.encode(v.head, "UTF-8")}"
+      }.mkString
+
+      ws
+        .url(ipnUrl)
+        .post(verificationDataString)
+        .flatMap { response =>
+          response.body.trim match {
+            case "VERIFIED" =>
+              lila.plan.PlanForm.ipn
+                .bindFromRequest()
+                .fold(
+                  err => {
+                    if (err.errors("txn_type").nonEmpty) {
+                      logger.debug(s"Plan.payPalIpn ignore txn_type = ${err.data get "txn_type"}")
+                      fuccess(Ok)
+                    } else {
+                      logger.error(s"Plan.payPalIpn invalid data ${err.toString}")
+                      fuccess(BadRequest)
+                    }
+                  },
+                  ipn =>
+                    env.plan.api.onPaypalCharge(
+                      userId = ipn.pp("ipn").userId,
+                      email = ipn.email map PayPal.Email.apply,
+                      subId = ipn.subId map PayPal.SubId.apply,
+                      cents = lila.plan.Cents(ipn.grossCents),
+                      name = ipn.name,
+                      txnId = ipn.txnId,
+                      country = ipn.country,
+                      ip = lila.common.HTTPRequest.ipAddress(req).value
+                    ) inject Ok
+                )
+            case "INVALID" =>
+              logger.error(s"Plan.payPalIpn invalid IPN data: ${params.mkString(",")}")
+              fuccess(BadRequest("Invalid IPN message"))
+            case other =>
+              logger.error(s"Plan.payPalIpn unexpected response: $other")
+              fuccess(BadRequest("Invalid other IPN message"))
+          }
+        }
+        .recover { case e: Exception =>
+          logger.error(s"Plan.payPalIpn error: ${e.getMessage}", e)
+          BadRequest("Error processing IPN message")
+        }
     }
+
 }
