@@ -44,7 +44,7 @@ object PlayerAssessment {
 
   def makeBasics(pov: Pov, holdAlerts: Option[Player.HoldAlert]): PlayerAssessment.Basics = {
     import Statistics._
-    import pov.{ playerIndex, game }
+    import pov.{ game, playerIndex }
 
     Basics(
       plyTimes = intAvgSd(~game.plyTimes(playerIndex) map (_.roundTenths)),
@@ -57,7 +57,7 @@ object PlayerAssessment {
 
   def make(pov: Pov, analysis: Analysis, holdAlerts: Option[Player.HoldAlert]): PlayerAssessment = {
     import Statistics._
-    import pov.{ playerIndex, game }
+    import pov.{ game, playerIndex }
 
     val basics = makeBasics(pov, holdAlerts)
 

@@ -6,24 +6,21 @@
   "author": "Thibault Duplessis",
   "license": "AGPL-3.0-or-later",
   "dependencies": {
+    "@fnando/sparkline": "^0.3.10",
     "@types/debounce-promise": "^3.1.3",
     "@types/fnando__sparkline": "^0.3.2",
     "@types/yaireo__tagify": "^4.0.1",
     "@types/zxcvbn": "^4.4.0",
-    "@fnando/sparkline": "^0.3.10",
     "@yaireo/tagify": "^4.32.0",
     "chat": "workspace:*",
     "common": "workspace:*",
     "debounce-promise": "^3.1.2",
     "draughtsground": "workspace:*",
+    "fairy-stockfish-nnue.wasm": "1.1.9",
     "flatpickr": "^4.6.9",
     "highcharts": "=4.2.5",
     "hopscotch": "^0.3.1",
     "prop-types": "^15.7.2",
-    "stockfish-mv.wasm": "^0.6.1",
-    "stockfish-nnue.wasm": "0.0.2",
-    "stockfish.js": "^10.0.2",
-    "stockfish.wasm": "^0.10.0",
     "stratutils": "workspace:*",
     "tablesort": "^5.1",
     "zxcvbn": "^4.4.2"
@@ -61,7 +58,8 @@
       "src/appeal.ts",
       "src/publicChats.ts",
       "src/contact.ts",
-      "src/coordinate.ts"
+      "src/coordinate.ts",
+      "src/memory.ts"
     ],
     "sync": {
       "../../node_modules/chessground/dist/chessground.min.js": "public/npm",
@@ -70,10 +68,7 @@
       "node_modules/hopscotch/dist/img": "public/vendor/hopscotch/dist",
       "node_modules/highcharts/high*.js": "public/vendor/highcharts-4.2.5",
       "node_modules/@yaireo/tagify/dist/tagify.js": "public/vendor/tagify",
-      "node_modules/stockfish.js/*": "public/vendor/stockfish.js",
-      "node_modules/stockfish.wasm/*": "public/vendor/stockfish.wasm",
-      "node_modules/stockfish-mv.wasm/*": "public/vendor/stockfish-mv.wasm",
-      "node_modules/stockfish-nnue.wasm/*": "public/vendor/stockfish-nnue.wasm"
+      "node_modules/fairy-stockfish-nnue.wasm/*": "public/vendor/fairy-stockfish-nnue.wasm"
     },
     "hashed": [
       "font/playstrategy.woff",

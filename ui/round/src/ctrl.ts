@@ -376,7 +376,9 @@ export default class RoundController {
         ['backgammon', 'hyper', 'nackgammon'].includes(this.data.game.variant.key) &&
         this.data.game.multiPointState
       ) {
-        this.chessground.set({ multiPointState: this.finalMultiPointState() });
+        this.chessground.set({
+          multiPointState: stratUtils.finalMultiPointState(this.data.game, this.ply, round.lastPly(this.data)),
+        });
         this.chessground.redrawAll();
       }
       this.redraw();
@@ -392,46 +394,6 @@ export default class RoundController {
   };
 
   isPlaying = () => game.isPlayerPlaying(this.data);
-
-  finalMultiPointState = () => {
-    const d = this.data;
-    const game = d.game;
-    const pointsToAdd =
-      game.pointValue && game.winner && this.ply == round.lastPly(d)
-        ? game.winner === 'p1'
-          ? [game.pointValue, 0]
-          : [0, game.pointValue]
-        : [0, 0];
-
-    if (status.isOutOfTime(game.status.id) && game.winner && this.ply == round.lastPly(d)) {
-      if (status.isGin(game.status.id)) {
-        if (game.winner === 'p1') {
-          if (game.multiPointState.p1 + pointsToAdd[0] < game.multiPointState.target) {
-            pointsToAdd[1] += 64;
-          }
-        } else {
-          if (game.multiPointState.p2 + pointsToAdd[1] < game.multiPointState.target) {
-            pointsToAdd[0] += 64;
-          }
-        }
-      } else {
-        //normal timeout
-        if (game.winner === 'p1') {
-          pointsToAdd[0] += 64;
-        } else {
-          pointsToAdd[1] += 64;
-        }
-      }
-    }
-
-    return game.multiPointState
-      ? {
-          target: game.multiPointState.target,
-          p1: Math.min(game.multiPointState.target, game.multiPointState.p1 + pointsToAdd[0]),
-          p2: Math.min(game.multiPointState.target, game.multiPointState.p2 + pointsToAdd[1]),
-        }
-      : undefined;
-  };
 
   jump = (ply: Ply): boolean => {
     ply = Math.max(round.firstPly(this.data), Math.min(this.lastPly(), ply));
@@ -457,7 +419,7 @@ export default class RoundController {
       doublingCube: doublingCube,
       showUndoButton: false,
       cubeActions: [], //we dont know what these are so dont want to display them
-      multiPointState: this.finalMultiPointState(),
+      multiPointState: stratUtils.finalMultiPointState(this.data.game, this.ply, round.lastPly(this.data)),
     };
     if (this.replaying()) {
       cancelDropMode(this.chessground.state);
@@ -1346,8 +1308,12 @@ export default class RoundController {
       this.data.game.variant.key === 'nackgammon'
     ) {
       window.Mousetrap.bind('space', () => {
-        if (this.data.canEndTurn && this.isPlaying()) {
-          this.endTurnAction();
+        if (this.isPlaying() && !this.replaying() && this.data.player.playerIndex === this.data.game.player) {
+          if (this.data.canEndTurn) {
+            this.endTurnAction();
+          } else if (this.data.cubeActions && this.data.cubeActions.includes('offer')) {
+            this.forceRollDice(this.data.game.variant.key);
+          }
         }
       });
     }

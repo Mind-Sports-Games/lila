@@ -1,6 +1,5 @@
 import { h, VNode } from 'snabbdom';
 import { parseFen } from 'stratops/fen';
-import { variantToRules } from 'stratutils';
 import * as chessground from './ground';
 import {
   bind,
@@ -9,7 +8,7 @@ import {
   spinner,
   bindMobileMousedown,
   getScoreFromFen,
-  allowClientEvalForVariant,
+  allowExplorerForVariant,
 } from './util';
 import { defined } from 'common';
 import changeColorHandle from 'common/coordsColor';
@@ -47,6 +46,8 @@ import { findTag } from './study/studyChapters';
 import serverSideUnderboard from './serverSideUnderboard';
 import * as gridHacks from './gridHacks';
 import * as Prefs from 'common/prefs';
+import { allowedForVariant as allowClientEvalForVariant, allowPracticeWithComputer, allowPv } from 'ceval/src/util';
+import { playstrategyRules } from 'stratops/compat';
 
 function renderResult(ctrl: AnalyseCtrl): VNode[] {
   let result: string | undefined;
@@ -127,7 +128,7 @@ function inputs(ctrl: AnalyseCtrl): VNode | undefined {
             el.addEventListener('input', _ => {
               ctrl.fenInput = el.value;
               el.setCustomValidity(
-                parseFen(variantToRules(ctrl.data.game.variant.key))(el.value.trim()).isOk ? '' : 'Invalid FEN',
+                parseFen(playstrategyRules(ctrl.data.game.variant.key))(el.value.trim()).isOk ? '' : 'Invalid FEN',
               );
             });
           },
@@ -272,7 +273,9 @@ function controls(ctrl: AnalyseCtrl) {
                   }),
                 ]
               : [
-                  ctrl.ceval.allowed() && allowClientEvalForVariant(ctrl.ceval.variant.key)
+                  ctrl.ceval.allowed() &&
+                  allowClientEvalForVariant(ctrl.ceval.variant.key) &&
+                  allowExplorerForVariant(ctrl.ceval.variant.key)
                     ? h('button.fbt', {
                         attrs: {
                           title: noarg('openingExplorerAndTablebase'),
@@ -288,7 +291,8 @@ function controls(ctrl: AnalyseCtrl) {
                   ctrl.ceval.possible &&
                   ctrl.ceval.allowed() &&
                   allowClientEvalForVariant(ctrl.ceval.variant.key) &&
-                  !ctrl.isGamebook()
+                  !ctrl.isGamebook() &&
+                  allowPracticeWithComputer(ctrl.ceval.variant.key)
                     ? h('button.fbt', {
                         attrs: {
                           title: noarg('practiceWithComputer'),
@@ -430,8 +434,10 @@ function renderPlayerScoreNames(ctrl: AnalyseCtrl): VNode | undefined {
     };
   }
 
-  //need to switch player order for togy view as scores also flip
-  const flippedCss = ctrl.flipped ? '.flipped' : '';
+  const flippedCss =
+    (ctrl.flipped && ctrl.data.player.playerIndex === 'p1') || (!ctrl.flipped && ctrl.data.player.playerIndex === 'p2')
+      ? '.flipped'
+      : '';
 
   if (p1player.user) {
     children.push(
@@ -474,7 +480,7 @@ export default function (ctrl: AnalyseCtrl): VNode {
   if (ctrl.nvui) return ctrl.nvui.render(ctrl);
   const concealOf = makeConcealOf(ctrl),
     study = ctrl.study,
-    showCevalPvs = !(ctrl.retro && ctrl.retro.isSolving()) && !ctrl.practice,
+    showCevalPvs = !(ctrl.retro && ctrl.retro.isSolving()) && !ctrl.practice && allowPv(ctrl.data.game.variant.key),
     menuIsOpen = ctrl.actionMenu.open,
     gamebookPlay = ctrl.gamebookPlay(),
     gamebookPlayView = gamebookPlay && gbPlay.render(gamebookPlay),
@@ -648,8 +654,10 @@ export default function (ctrl: AnalyseCtrl): VNode {
               ...(menuIsOpen
                 ? [actionMenu(ctrl)]
                 : [
-                    allowClientEvalForVariant(ctrl.ceval.variant.key) ? cevalView.renderCeval(ctrl) : null,
-                    allowClientEvalForVariant(ctrl.ceval.variant.key) && showCevalPvs
+                    ctrl.ceval.allowed && allowClientEvalForVariant(ctrl.ceval.variant.key)
+                      ? cevalView.renderCeval(ctrl)
+                      : null,
+                    ctrl.ceval.allowed && allowClientEvalForVariant(ctrl.ceval.variant.key) && showCevalPvs
                       ? cevalView.renderPvs(variantKey)(ctrl)
                       : null,
                     renderAnalyse(ctrl, concealOf),

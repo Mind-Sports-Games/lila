@@ -167,6 +167,7 @@ export interface Board {
   multiMatchGameIds?: string[];
   multiMatchGames?: Board[];
   multiPointScore?: {
+    target: number;
     p1: number;
     p2: number;
   };
@@ -209,6 +210,7 @@ export interface Pages {
 
 export interface PlayerExt extends Player {
   sheet: (PairingExt | Outcome)[];
+  multiPoint?: MultiPoint[];
 }
 
 export interface Stats {
@@ -219,4 +221,26 @@ export interface Stats {
   byes: number;
   absences: number;
   averageRating: number;
+}
+
+export interface MultiPoint {
+  games?: [
+    {
+      id: string;
+      p1UserId: string;
+      startingScore: {
+        p1: number;
+        p2: number;
+      };
+    },
+  ];
+  players: {
+    p1: {
+      userId: string;
+    };
+    p2: {
+      userId: string;
+    };
+  };
+  target: number;
 }

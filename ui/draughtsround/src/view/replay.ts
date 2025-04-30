@@ -8,7 +8,7 @@ import throttle from 'common/throttle';
 import viewStatus from 'game/view/status';
 import { game as gameRoute } from 'game/router';
 import { h, VNode } from 'snabbdom';
-import { Step, MaybeVNodes, RoundData } from '../interfaces';
+import { Step, MaybeVNodes } from '../interfaces';
 
 const scrollMax = 99999,
   moveTag = 'u8t',
@@ -203,12 +203,13 @@ function renderButtons(ctrl: RoundController) {
   );
 }
 
-function initMessage(d: RoundData, trans: Trans) {
-  return game.playable(d) && d.game.turns === 0 && !d.player.spectator
+function initMessage(ctrl: RoundController) {
+  const d = ctrl.data;
+  return !isCol1() && game.isPlayerPlaying(d) && !game.playerHasPlayedTurn(d) && !d.player.spectator
     ? h('div.message', util.justIcon(''), [
         h('div', [
-          trans('youPlayThePlayerIndexPieces', d.player.playerName),
-          ...(d.player.playerIndex === 'p1' ? [h('br'), h('strong', trans.noarg('itsYourTurn'))] : []),
+          ctrl.trans('youPlayThePlayerIndexPieces', d.player.playerName),
+          ...(game.isPlayerTurn(d) ? [h('br'), h('strong', ctrl.trans.noarg('itsYourTurn'))] : []),
         ]),
       ])
     : null;
@@ -262,7 +263,7 @@ export function render(ctrl: RoundController): VNode | undefined {
     ? undefined
     : h(rmovesTag, [
         renderButtons(ctrl),
-        initMessage(d, ctrl.trans) ||
+        initMessage(ctrl) ||
           (moves
             ? isCol1()
               ? h('div.col1-moves', [

@@ -42,8 +42,11 @@ export function renderFullTxt(ctrl: AnalyseCtrl): string {
   let txt = renderNodesTxt(ctrl.tree.getNodeList(ctrl.path));
   const tags: Array<[string, string]> = [];
   tags.push(['FF', '4']);
-  tags.push(['CA', 'UTF-8']);
-  if (g.initialFen && g.initialFen !== initialFen && !['go9x9', 'go13x13', 'go19x19'].includes(g.variant.key))
+  if (
+    g.initialFen &&
+    g.initialFen !== initialFen &&
+    !['go9x9', 'go13x13', 'go19x19', 'backgammon', 'nackgammon', 'hyper'].includes(g.variant.key)
+  )
     tags.push(['IP', g.initialFen]);
   if (['linesOfAction', 'scrambledEggs'].includes(g.variant.key)) tags.push(['GM', '9']);
   if (['shogi', 'minishogi'].includes(g.variant.key)) {
@@ -69,11 +72,18 @@ export function renderFullTxt(ctrl: AnalyseCtrl): string {
     tags.push(['SZ', g.variant.boardSize.height.toString()]);
     tags.push(['RU', 'Chinese']);
   }
-  if (['backgammon', 'hyper', 'nackgammon'].includes(g.variant.key)) tags.push(['GM', '6']);
+  if (['backgammon', 'hyper', 'nackgammon'].includes(g.variant.key)) {
+    //TODO options depend on what functionality we need in analysis page
+    tags.push(['GM', '6']);
+    tags.push(['RU', 'Crawford']);
+    tags.push(['CV', '1']);
+  }
   if (['amazons'].includes(g.variant.key)) {
     tags.push(['GM', '18']);
     tags.push(['SZ', g.variant.boardSize.height.toString()]);
   }
+  tags.push(['AP', 'playstrategy.org']);
+  tags.push(['CA', 'UTF-8']);
   if (tags.length)
     txt =
       '(;' +

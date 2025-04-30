@@ -22,7 +22,13 @@ final class Env(
 
   private lazy val slackClient = new SlackClient(ws, appConfig.get[Secret]("slack.incoming.url"))
 
-  private lazy val discordClient = new DiscordClient(ws, appConfig.get[Secret]("discord.webhook.url"))
+  private lazy val discordClient = new DiscordClient(
+    ws,
+    appConfig.get[Secret]("discord.webhook.url.matchmaking"),
+    appConfig.get[Secret]("discord.webhook.url.tournaments")
+  )
+
+  lazy val baseUrl = appConfig.get[String]("net.base_url")
 
   lazy val slack: SlackApi = wire[SlackApi]
 

@@ -243,6 +243,11 @@
       background-size: 100px;
     }
 
+    .go-yellow-wood {
+      background-image: url(../images/board/go/svg/go_board_yellow_9x9.svg);
+      background-size: 100px;
+    }
+
     .backgammon-classic {
       background-image: url(../images/board/backgammon/svg/backgammon_classic_board.svg);
       background-size: 100px;
@@ -270,9 +275,10 @@
   }
 
   &.d3 {
-    $board-files: 'Black-White-Aluminium', 'Brushed-Aluminium', 'China-Blue', 'China-Green', 'China-Grey',
-      'China-Scarlet', 'China-Yellow', 'Classic-Blue', 'Gold-Silver', 'Green-Glass', 'Light-Wood', 'Power-Coated',
-      'Purple-Black', 'Rosewood', 'Wood-Glass', 'Wax', 'Jade', 'Marble', 'Woodi';
+    $board-files:
+      'Black-White-Aluminium', 'Brushed-Aluminium', 'China-Blue', 'China-Green', 'China-Grey', 'China-Scarlet',
+      'China-Yellow', 'Classic-Blue', 'Gold-Silver', 'Green-Glass', 'Light-Wood', 'Power-Coated', 'Purple-Black',
+      'Rosewood', 'Wood-Glass', 'Wax', 'Jade', 'Marble', 'Woodi';
 
     @each $name in $board-files {
       .#{$name} {

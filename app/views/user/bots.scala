@@ -28,7 +28,7 @@ object bots {
             div(cls := "bots page-menu__content")(
               div(cls := "box bots__featured")(
                 div(cls := "box__top")(h1("Featured bots")),
-                botTable(featured)
+                botTable(featured.sortBy(featuredBotOrder))
               ),
               div(cls := "box")(
                 div(cls := "box__top")(
@@ -46,6 +46,22 @@ object bots {
         }
       )
     )
+  }
+
+  private def featuredBotOrder(u: User) = u.id match {
+    case "ps-greedy-one-move"  => 1
+    case "ps-greedy-two-move"  => 2
+    case "ps-greedy-four-move" => 3
+    case "ps-random-mover"     => 4
+    case "stockfish-level1"    => 5
+    case "stockfish-level2"    => 6
+    case "stockfish-level3"    => 7
+    case "stockfish-level4"    => 8
+    case "stockfish-level5"    => 9
+    case "stockfish-level6"    => 10
+    case "stockfish-level7"    => 11
+    case "stockfish-level8"    => 12
+    case _                     => 13
   }
 
   private def botTable(users: List[User])(implicit ctx: Context) = div(cls := "bots__list")(

@@ -96,8 +96,8 @@ object home {
             a(
               href := routes.Setup.aiForm,
               cls := List(
-                "button button-color-choice config_ai" -> true,
-                "disabled"                             -> currentGame.isDefined
+                "button button-color-choice config_ai invisible" -> true,
+                "disabled"                                       -> currentGame.isDefined
               ),
               trans.playWithTheMachine()
             ),

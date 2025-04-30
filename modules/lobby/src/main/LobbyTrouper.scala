@@ -12,6 +12,7 @@ import lila.game.Game
 import lila.hub.Trouper
 import lila.socket.Socket.{ Sri, Sris }
 import lila.user.User
+import lila.i18n.VariantKeys
 
 final private class LobbyTrouper(
     seekApi: SeekApi,
@@ -19,6 +20,7 @@ final private class LobbyTrouper(
     gameCache: lila.game.Cached,
     maxPlaying: Max,
     playbanApi: lila.playban.PlaybanApi,
+    discordApi: lila.irc.DiscordApi,
     poolApi: lila.pool.PoolApi,
     onStart: lila.round.OnStart
 )(implicit ec: scala.concurrent.ExecutionContext, scheduler: akka.actor.Scheduler)
@@ -46,8 +48,19 @@ final private class LobbyTrouper(
       !hook.compatibleWithPools(hook.realVariant) ?? findCompatible(hook) match {
         case Some(h) => biteHook(h.id, hook.sri, hook.user)
         case None =>
-          hookRepo save msg.hook
+          hookRepo.save(msg.hook)
           socket ! msg
+          discordApi
+            .matchmakingAnnouncement(
+              hook.message,
+              hook.realVariant.gameFamily.key,
+              VariantKeys.variantName(hook.realVariant),
+              true
+            )
+            .effectFold(
+              err => logger.warn(s"discord hook failed: $err"),
+              _ => ()
+            )
       }
 
     case msg @ AddSeek(seek) =>
@@ -60,6 +73,17 @@ final private class LobbyTrouper(
     case SaveSeek(msg) =>
       seekApi.insert(msg.seek)
       socket ! msg
+      discordApi
+        .matchmakingAnnouncement(
+          msg.seek.message,
+          msg.seek.realVariant.gameFamily.key,
+          VariantKeys.variantName(msg.seek.realVariant),
+          false
+        )
+        .effectFold(
+          err => logger.warn(s"discord seek failed: $err"),
+          _ => ()
+        )
 
     case CancelHook(sri) =>
       hookRepo bySri sri foreach remove

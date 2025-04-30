@@ -13,6 +13,7 @@ import lila.api.Context
 import lila.app.templating.Environment._
 import lila.app.ui.ScalatagsTemplate._
 import lila.game.Pov
+import lila.game.MultiPointState
 
 object bits {
 
@@ -70,7 +71,8 @@ object bits {
       boardOrientation(pov),
       ~pov.game.lastActionKeys,
       boardSize(pov),
-      pov.game.variant.key
+      pov.game.variant.key,
+      pov.game.multiPointResult
     ) _
 
   def miniWithOrientation(
@@ -78,25 +80,16 @@ object bits {
       orientation: Orientation = Orientation.P1,
       lastMove: String = "",
       boardSizeOpt: Option[Board.BoardSize],
-      variantKey: String = "standard"
+      variantKey: String = "standard",
+      multiPointResult: Option[MultiPointState] = None
   )(tag: Tag): Tag = {
-    // TODO: this is an excellent candidate for refactoring.
-    val libName = fen match {
-      case FEN.Chess(_)        => GameLogic.Chess().name
-      case FEN.Draughts(_)     => GameLogic.Draughts().name
-      case FEN.FairySF(_)      => GameLogic.FairySF().name
-      case FEN.Samurai(_)      => GameLogic.Samurai().name
-      case FEN.Togyzkumalak(_) => GameLogic.Togyzkumalak().name
-      case FEN.Go(_)           => GameLogic.Go().name
-      case FEN.Backgammon(_)   => GameLogic.Backgammon().name
-      case FEN.Abalone(_)      => GameLogic.Abalone().name
-    }
+    val libName   = fen.gameLogic.name
     val orient    = orientation.toString().toLowerCase()
     val boardSize = boardSizeOpt.getOrElse(Board.D100)
     val data = if (libName == "Draughts") {
       s"${fen.value}|${boardSize.width}x${boardSize.height}|${orient}|$lastMove"
     } else {
-      s"${fen.value}|${orient}|$lastMove"
+      s"${fen.value}|${orient}|$lastMove|${multiPointResult.fold(MultiPointState.noDataChar)(_.toString)}"
     }
     val extra =
       if (libName == "Draughts") s"is${boardSize.key} ${libName.toLowerCase()}"

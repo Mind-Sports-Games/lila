@@ -194,8 +194,8 @@ object perfStat {
       )
     )
 
-  private def highlowSide(title: Frag => Frag, opt: Option[lila.perfStat.RatingAt], playerIndex: String)(implicit
-      lang: Lang
+  private def highlowSide(title: Frag => Frag, opt: Option[lila.perfStat.RatingAt], playerIndex: String)(
+      implicit lang: Lang
   ): Frag =
     opt match {
       case Some(r) =>
@@ -226,8 +226,8 @@ object perfStat {
       case None => nbsp
     }
 
-  private def resultStreakSideStreak(s: lila.perfStat.Streak, title: Frag => Frag, playerIndex: String)(implicit
-      lang: Lang
+  private def resultStreakSideStreak(s: lila.perfStat.Streak, title: Frag => Frag, playerIndex: String)(
+      implicit lang: Lang
   ): Frag =
     div(cls := "streak")(
       h3(

@@ -29,7 +29,9 @@ const orientation = (p: PlayerIndex, gl: string): string => {
 const formatMultiMatchScore = (board: Board): string =>
   !board.multiPointScore
     ? '-'
-    : [board.multiPointScore.p1, board.multiPointScore.p2].map(s => (s < 10 ? '0' + s : s)).join(''); // care about s being 0 or undefined
+    : [board.multiPointScore.target, board.multiPointScore.p1, board.multiPointScore.p2]
+        .map(s => (s < 10 ? '0' + s : s))
+        .join(''); // care about s being 0 or undefined
 
 const renderBoardState = (board: Board): string =>
   board.gameLogic === 'draughts' && !!board.boardSize

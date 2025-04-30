@@ -1,9 +1,16 @@
 function playstrategyOrchestra() {
-  const load = (instrument, index, filename) =>
-    playstrategy.sound.loadOggOrMp3(
-      `orchestra.${instrument}.${index}`,
-      `${playstrategy.sound.baseUrl}/instrument/${instrument}/${filename}`,
-    );
+  const load = (instrument, index, filename) => {
+    new Promise(resolve => {
+      const sound = new window.Howl({
+        src: ['ogg', 'mp3'].map(ext => `${playstrategy.sound.baseUrl}/instrument/${instrument}/${filename}.${ext}`),
+      });
+      sound.on('load', () => {
+        resolve(sound);
+      });
+    }).then(sound => {
+      playstrategy.sound.sounds.set(`orchestra.${instrument}.${index}`, sound);
+    });
+  };
 
   const volumes = {
       celesta: 0.3,
@@ -37,8 +44,6 @@ function playstrategyOrchestra() {
       }, noteTimeout);
     }
   };
-
-  play('swells', 0);
 
   return {
     play: play,

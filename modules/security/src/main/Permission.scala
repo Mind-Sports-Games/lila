@@ -16,17 +16,19 @@ object Permission {
   case object ViewBlurs     extends Permission("VIEW_BLURS", "View blurs")
   case object ModerateForum extends Permission("MODERATE_FORUM", "Moderate forum")
 
-  case object ChatTimeout           extends Permission("CHAT_TIMEOUT", "Chat timeout")
-  case object PublicChatView        extends Permission("VIEW_PUBLIC_CHAT", "See public chat page")
-  case object GamifyView            extends Permission("GAMIFY_VIEW", "See mod leaderboard")
-  case object UserModView           extends Permission("USER_SPY", "User profile mod view")
-  case object UserEvaluate          extends Permission("USER_EVALUATE", "Request evaluation")
-  case object NotifySlack           extends Permission("NOTIFY_SLACK", List(UserModView), "Notify #tavern")
-  case object ViewPrivateComms      extends Permission("VIEW_PRIVATE_COMS", "View private comms")
-  case object Shadowban             extends Permission("SHADOWBAN", List(UserModView, ChatTimeout), "Shadowban")
-  case object SetKidMode            extends Permission("SET_KID_MODE", List(UserModView), "Set Kid Mode")
-  case object MarkEngine            extends Permission("ADJUST_CHEATER", List(UserModView), "Mark as cheater")
-  case object MarkBooster           extends Permission("ADJUST_BOOSTER", List(UserModView), "Mark as booster")
+  case object ChatTimeout      extends Permission("CHAT_TIMEOUT", "Chat timeout")
+  case object PublicChatView   extends Permission("VIEW_PUBLIC_CHAT", "See public chat page")
+  case object GamifyView       extends Permission("GAMIFY_VIEW", "See mod leaderboard")
+  case object UserModView      extends Permission("USER_SPY", "User profile mod view")
+  case object UserEvaluate     extends Permission("USER_EVALUATE", "Request evaluation")
+  case object NotifySlack      extends Permission("NOTIFY_SLACK", List(UserModView), "Notify #tavern")
+  case object ViewPrivateComms extends Permission("VIEW_PRIVATE_COMS", "View private comms")
+  case object Shadowban        extends Permission("SHADOWBAN", List(UserModView, ChatTimeout), "Shadowban")
+  case object SetKidMode       extends Permission("SET_KID_MODE", List(UserModView), "Set Kid Mode")
+  case object MarkEngine       extends Permission("ADJUST_CHEATER", List(UserModView), "Mark as cheater")
+  case object MarkBooster      extends Permission("ADJUST_BOOSTER", List(UserModView), "Mark as booster")
+  case object ViewAltUsernames
+      extends Permission("VIEW_ALT_USERNAMES", List(UserModView), "View Alt Usernames")
   case object IpBan                 extends Permission("IP_BAN", List(UserModView, ViewPrintNoIP), "IP ban")
   case object PrintBan              extends Permission("PRINT_BAN", List(UserModView), "Print ban")
   case object ViewPrintNoIP         extends Permission("VIEW_PRINT_NOIP", "View Print & NoIP")
@@ -108,7 +110,8 @@ object Permission {
           RemoveRanking,
           ModMessage,
           ModNote,
-          ViewPrintNoIP
+          ViewPrintNoIP,
+          ViewAltUsernames
         ),
         "Hunter"
       )
@@ -128,7 +131,8 @@ object Permission {
           SeeReport,
           ModLog,
           ModNote,
-          ViewPrintNoIP
+          ViewPrintNoIP,
+          ViewAltUsernames
         ),
         "Shusher"
       )
@@ -199,6 +203,7 @@ object Permission {
     ),
     "Account mod" -> List(
       UserModView,
+      ViewAltUsernames,
       IpBan,
       PrintBan,
       DisableTwoFactor,

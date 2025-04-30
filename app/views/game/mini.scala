@@ -9,7 +9,7 @@ import play.api.i18n.Lang
 import lila.api.Context
 import lila.app.templating.Environment._
 import lila.app.ui.ScalatagsTemplate._
-import lila.game.Pov
+import lila.game.{ MultiPointState, Pov }
 import lila.i18n.defaultLang
 
 object mini {
@@ -85,7 +85,9 @@ object mini {
   def renderState(pov: Pov) =
     pov.game.variant match {
       case Variant.Backgammon(_) =>
-        dataState := s"${Forsyth.>>(pov.game.variant.gameLogic, pov.game.stratGame)}|${orientation(pov)}|${~pov.game.lastActionKeys}|${renderMultiPointState(pov)}"
+        dataState := s"${Forsyth.>>(pov.game.variant.gameLogic, pov.game.stratGame)}|${orientation(
+          pov
+        )}|${~pov.game.lastActionKeys}|${pov.game.multiPointResult.fold(MultiPointState.noDataChar)(_.toString)}"
       case Variant.Chess(_) | Variant.FairySF(_) | Variant.Samurai(_) | Variant.Togyzkumalak(_) |
           Variant.Go(_) | Variant.Abalone(_) =>
         dataState := s"${Forsyth.>>(pov.game.variant.gameLogic, pov.game.stratGame)}|${orientation(pov)}|${~pov.game.lastActionKeys}"
@@ -112,11 +114,19 @@ object mini {
       else pov.game.clock.map { renderClock(_, pov) }
     )
 
-  private def calculateScore(pov: Pov): String = {
-    val score = pov.game.calculateScore(pov.playerIndex)
-    if (score == "") ""
-    else " (" + score + ")"
-  }
+  private def calculateScore(pov: Pov): String =
+    pov.game.metadata.multiPointState match {
+      case Some(_) => {
+        pov.game.multiPointResult.fold(MultiPointState.noDataChar) { mps =>
+          s" (${mps.toString(pov.playerIndex.p1).toInt})"
+        }
+      }
+      case None => {
+        val score = pov.game.calculateScore(pov.playerIndex)
+        if (score == "") ""
+        else " (" + score + ")"
+      }
+    }
 
   private def renderResult(pov: Pov) =
     span(cls := "mini-game__result")(
@@ -126,9 +136,6 @@ object mini {
         +
           calculateScore(pov)
     )
-
-  private def renderMultiPointState(pov: Pov) =
-    pov.game.metadata.multiPointState.fold("-")(m => f"${m.p1Points}%02d${m.p2Points}%02d")
 
   private def renderClock(clock: strategygames.ClockBase, pov: Pov) = {
     val s = clock.remainingTime(pov.playerIndex).roundSeconds

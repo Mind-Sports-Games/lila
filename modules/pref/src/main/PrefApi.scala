@@ -10,7 +10,6 @@ import lila.user.User
 import play.api.libs.json._
 import lila.pref.JsonView._
 
-
 final class PrefApi(
     coll: Coll,
     cacheApi: lila.memo.CacheApi
@@ -85,15 +84,14 @@ final class PrefApi(
   def updatePrefPieceSet(user: User, gameFamily: String, value: String): Fu[String] =
     getPref(user) map { _.set("pieceSet", value) } orFail
       s"Bad pref ${user.id} pieceSet -> $value" flatMap (pref => {
-            setPref(pref) inject (Json.toJson(pref.pieceSet).toString)
-          })
-  
+        setPref(pref) inject (Json.toJson(pref.pieceSet).toString)
+      })
+
   def updatePrefTheme(user: User, gameFamily: String, value: String): Fu[String] =
     getPref(user) map { _.setTheme(value, gameFamily) } orFail
       s"Bad pref ${user.id} theme -> $value" flatMap (pref => {
-            setPref(pref) inject (Json.toJson(pref.theme).toString)
-          })
-      
+        setPref(pref) inject (Json.toJson(pref.theme).toString)
+      })
 
   def setBot(user: User): Funit =
     setPref(

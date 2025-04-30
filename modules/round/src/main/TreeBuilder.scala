@@ -21,17 +21,10 @@ object TreeBuilder {
       best = info.best
     )
 
-  def fullOpeningOf(fen: FEN): Option[FullOpening] =
-    fen match {
-      case FEN.Chess(fen)        => FullOpeningDB.findByFen(GameLogic.Chess(), FEN.Chess(fen))
-      case FEN.Draughts(fen)     => FullOpeningDB.findByFen(GameLogic.Draughts(), FEN.Draughts(fen))
-      case FEN.FairySF(fen)      => FullOpeningDB.findByFen(GameLogic.FairySF(), FEN.FairySF(fen))
-      case FEN.Samurai(fen)      => FullOpeningDB.findByFen(GameLogic.Samurai(), FEN.Samurai(fen))
-      case FEN.Togyzkumalak(fen) => FullOpeningDB.findByFen(GameLogic.Togyzkumalak(), FEN.Togyzkumalak(fen))
-      case FEN.Go(fen)           => FullOpeningDB.findByFen(GameLogic.Go(), FEN.Go(fen))
-      case FEN.Backgammon(fen)   => FullOpeningDB.findByFen(GameLogic.Backgammon(), FEN.Backgammon(fen))
-      case FEN.Abalone(fen)      => FullOpeningDB.findByFen(GameLogic.Abalone(), FEN.Abalone(fen))
-    }
+  def fullOpeningOf(fen: FEN, variant: Variant, withFlags: WithFlags): Option[FullOpening] =
+    if (withFlags.opening && Variant.openingSensibleVariants(variant.gameLogic)(variant))
+      FullOpeningDB.findByFen(variant.gameLogic, fen)
+    else None
 
   def apply(
       game: lila.game.Game,
@@ -51,10 +44,6 @@ object TreeBuilder {
     ) match {
       case (init, games, error) =>
         error foreach logChessError(game.id)
-        val openingOf: OpeningOf =
-          if (withFlags.opening && Variant.openingSensibleVariants(game.variant.gameLogic)(game.variant))
-            fullOpeningOf
-          else _ => None
         val fen                 = Forsyth.>>(game.variant.gameLogic, init)
         val infos: Vector[Info] = analysis.??(_.infos.toVector)
         val advices: Map[Ply, Advice] = analysis.??(_.advices.view.map { a =>
@@ -71,7 +60,7 @@ object TreeBuilder {
             case Situation.Draughts(situation) => situation.allMovesCaptureLength.some
             case _                             => None
           },
-          opening = openingOf(fen),
+          opening = fullOpeningOf(fen, game.variant, withFlags),
           clock = withClocks.flatMap(_.headOption),
           pocketData = init.situation.board.pocketData,
           eval = infos lift 0 map makeEval,
@@ -97,7 +86,7 @@ object TreeBuilder {
               case _ => None
             },
             check = g.situation.check,
-            opening = openingOf(fen),
+            opening = fullOpeningOf(fen, g.situation.board.variant, withFlags),
             clock = withClocks flatMap (_ lift (g.plies - init.plies - 1)),
             pocketData = g.situation.board.pocketData,
             eval = info map makeEval,
@@ -124,7 +113,7 @@ object TreeBuilder {
                 branch,
                 game.variant,
                 Forsyth.>>(game.variant.gameLogic, fromGame),
-                openingOf
+                withFlags
               )(adv.info)
             }
           } getOrElse branch
@@ -151,7 +140,7 @@ object TreeBuilder {
       root: Branch,
       variant: Variant,
       fromFen: FEN,
-      openingOf: OpeningOf
+      withFlags: WithFlags
   )(info: Info): Branch = {
     def makeBranch(g: Game, m: Uci.WithSan) = {
       val fen = Forsyth.>>(variant.gameLogic, g)
@@ -164,7 +153,7 @@ object TreeBuilder {
         move = m,
         fen = fen,
         check = g.situation.check,
-        opening = openingOf(fen),
+        opening = fullOpeningOf(fen, variant, withFlags),
         pocketData = g.situation.board.pocketData,
         dropsByRole = g.situation.dropsByRole,
         eval = none

@@ -1,7 +1,10 @@
-import { Outcome } from 'stratops/types';
-import { Prop } from 'common';
-import { StoredProp, StoredBooleanProp } from 'common/storage';
+import type { Outcome } from 'stratops/types';
+import type { Prop } from 'common';
+import type { StoredProp, StoredBooleanProp } from 'common/storage';
 
+// NNUE: Efficiently Updateable Neural Network
+// HCE: Hand-Crafted Evaluation
+// Benchmarks have shown that wasm can be around 5-30% faster than asm.js, depending on the specific use case and browser. However, asm.js can still be useful as a fallback for wasm, and some browsers may optimize asm.js better than others.
 export type CevalTechnology = 'asmjs' | 'wasm' | 'hce' | 'nnue';
 
 export interface Eval {

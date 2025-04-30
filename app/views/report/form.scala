@@ -26,7 +26,7 @@ object form {
           action := s"${routes.Report.create}${reqUser.??(u => "?username=" + u.username)}"
         )(
           div(cls := "form-group")(
-            a(href := routes.Page.loneBookmark("report-faq"), dataIcon := "", cls := "text")(
+            a(href := routes.Page.lonePage("report-faq"), dataIcon := "", cls := "text")(
               "Read more about PlayStrategy reports"
             )
           ),

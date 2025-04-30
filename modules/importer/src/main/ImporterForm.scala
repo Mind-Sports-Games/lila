@@ -51,25 +51,7 @@ case class ImportData(pgn: String, analyse: Option[String]) {
 
   private val maxPlies = 1000
 
-  private def evenIncomplete(result: Reader.Result): Replay =
-    result match {
-      case Reader.Result.ChessComplete(replay)             => Replay.Chess(replay)
-      case Reader.Result.ChessIncomplete(replay, _)        => Replay.Chess(replay)
-      case Reader.Result.DraughtsComplete(replay)          => Replay.Draughts(replay)
-      case Reader.Result.DraughtsIncomplete(replay, _)     => Replay.Draughts(replay)
-      case Reader.Result.FairySFComplete(replay)           => Replay.FairySF(replay)
-      case Reader.Result.FairySFIncomplete(replay, _)      => Replay.FairySF(replay)
-      case Reader.Result.SamuraiComplete(replay)           => Replay.Samurai(replay)
-      case Reader.Result.SamuraiIncomplete(replay, _)      => Replay.Samurai(replay)
-      case Reader.Result.TogyzkumalakComplete(replay)      => Replay.Togyzkumalak(replay)
-      case Reader.Result.TogyzkumalakIncomplete(replay, _) => Replay.Togyzkumalak(replay)
-      case Reader.Result.GoComplete(replay)                => Replay.Go(replay)
-      case Reader.Result.GoIncomplete(replay, _)           => Replay.Go(replay)
-      case Reader.Result.BackgammonComplete(replay)        => Replay.Backgammon(replay)
-      case Reader.Result.BackgammonIncomplete(replay, _)   => Replay.Backgammon(replay)
-      case Reader.Result.AbaloneComplete(replay)           => Replay.Abalone(replay)
-      case Reader.Result.AbaloneIncomplete(replay, _)      => Replay.Abalone(replay)
-    }
+  private def evenIncomplete(result: Reader.Result): Replay = result.evenIncomplete
 
   def preprocess(user: Option[String]): Validated[String, Preprocessed] = ImporterForm.catchOverflow { () =>
     Parser.full(pgn) flatMap { parsed =>

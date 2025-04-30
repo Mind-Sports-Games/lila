@@ -38,11 +38,11 @@ object contact {
         ),
         li(
           a(href := "https://github.com/Mind-Sports-Games/lila/issues")(reportWebsiteIssue())
-        )
+        ),
         // li(
         //   a(href := "https://github.com/veloce/lichobile/issues")(reportMobileIssue())
         // ),
-        //li(a(href := "https://discord.gg/hy5jqSs")(reportBugInDiscord()))
+        li(a(href := "https://discord.gg/bVRQzgSbPq")(reportBugInDiscord()))
       ),
       p(howToReportBug())
     )

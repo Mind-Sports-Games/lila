@@ -270,8 +270,8 @@ final class SwissForm(implicit mode: Mode) {
 
 object SwissForm {
 
-  val clockLimits: Seq[Int] = Seq(0, 15, 30, 45, 60, 90) ++ {
-    (120 to 420 by 60) ++ (600 to 1800 by 300) ++ (2400 to 10800 by 600)
+  val clockLimits: Seq[Int] = Seq(0, 15, 30, 45, 60, 90, 120, 150) ++ {
+    (180 to 720 by 60) ++ (900 to 1800 by 300) ++ (2400 to 10800 by 600)
   }
   val clockLimitChoices = clockTimeChoicesFromSeconds(clockLimits)
 
@@ -332,7 +332,7 @@ object SwissForm {
   val halfwayBreakChoices = options(
     halfwayBreakOptions,
     s =>
-      if (s == 0) "No additional interval"
+      if (s == 0) "Standard interval"
       else if (s < 60) s"$s seconds"
       else if (s < 3600) s"${s / 60} minute${if (s == 60) "" else "s"}"
       else if (s < 24 * 3600) s"${s / 3600} hour${if (s == 60 * 60) "" else "s"}"

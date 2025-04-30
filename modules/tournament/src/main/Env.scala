@@ -38,7 +38,8 @@ final class Env(
     historyApi: lila.history.HistoryApi,
     //swissApi: lila.swiss.SwissApi,
     trophyApi: lila.user.TrophyApi,
-    remoteSocketApi: lila.socket.RemoteSocket
+    remoteSocketApi: lila.socket.RemoteSocket,
+    discordApi: lila.irc.DiscordApi
 )(implicit
     ec: scala.concurrent.ExecutionContext,
     system: ActorSystem,

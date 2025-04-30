@@ -74,7 +74,7 @@ final class Main(
   def mobile =
     Open { implicit ctx =>
       pageHit
-      OptionOk(prismicC getBookmark "mobile-apk") { case (doc, resolver) =>
+      OptionOk(prismicC getPage "mobile-apk") { case (doc, resolver) =>
         html.mobile(doc, resolver)
       }
     }

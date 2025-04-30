@@ -335,6 +335,10 @@ square {
     body.go-dark-wood .variant-#{$variant} &.last-move {
       background: radial-gradient(transparent 0%, transparent 79%, rgba(155, 199, 0, 0.5) 80%);
     }
+
+    body.go-yellow-wood .variant-#{$variant} &.last-move {
+      background: radial-gradient(transparent 0%, transparent 79%, rgba(20, 85, 0, 0.5) 80%);
+    }
   }
 
   @each $color, $gameFamily in $alternate-board-highlights {
@@ -972,6 +976,9 @@ cg-container {
   height: 800%;
   display: block;
   bottom: 0;
+  // https://developer.mozilla.org/en-US/docs/Web/CSS/container-name: currently used to set font-size based on container size
+  container-name: chessgroundContainer;
+  container-type: inline-size;
 }
 
 cg-container .cg-shapes,
@@ -1341,10 +1348,17 @@ cg-container .cg-custom-svgs svg {
   }
 
   cg-multi-point-target {
+    top: 47.5%;
+  }
+  cg-crawford-game {
+    bottom: 34%;
+  }
+
+  cg-multi-point-target,
+  cg-crawford-game {
     width: 6.5%;
     height: 5%;
     left: 0;
-    top: 47.5%;
     position: absolute;
     pointer-events: none;
     display: flex;
@@ -1382,6 +1396,63 @@ cg-container .cg-custom-svgs svg {
     @include breakpoint($mq-col1-phone) {
       border: thin solid !important;
       font-size: 100%;
+    }
+  }
+
+  // we define cg-multi-point-target and cg-multi-point-score css properties of mini games based on the observable chessgroundContainer
+  // https://developer.mozilla.org/en-US/docs/Web/CSS/container-name
+  &.mini-game,
+  &.mini-board {
+    @container chessgroundContainer (max-width: 400px) {
+      cg-multi-point-target,
+      cg-crawford-game {
+        border-width: thin;
+        font-size: 70%;
+      }
+
+      cg-multi-point-score {
+        font-size: 70%;
+        border-width: thin !important;
+      }
+    }
+
+    @container chessgroundContainer (max-width: 360px) {
+      cg-multi-point-target,
+      cg-crawford-game {
+        font-size: 60%;
+      }
+    }
+
+    @container chessgroundContainer (max-width: 300px) {
+      cg-multi-point-target,
+      cg-crawford-game {
+        font-size: 50%;
+        border-radius: 0%;
+      }
+
+      cg-multi-point-score {
+        border-radius: 0%; // having a border radius would make the content less visible in small sizes
+      }
+    }
+
+    @container chessgroundContainer (max-width: 280px) {
+      cg-multi-point-target,
+      cg-crawford-game {
+        font-size: 40%;
+      }
+    }
+
+    @container chessgroundContainer (max-width: 250px) {
+      cg-multi-point-score {
+        font-size: 50%;
+      }
+    }
+
+    @container chessgroundContainer (max-width: 230px) {
+      cg-multi-point-target,
+      cg-crawford-game {
+        font-size: 30%;
+      }
     }
   }
 }

@@ -170,17 +170,15 @@ final class SwissApi(
           if (
             s.isStarted && s.nbOngoing == 0 && (s.nextRoundAt.isEmpty || old.settings.manualRounds) && !s.settings.manualRounds
           )
-            if (s.isHalfway) {
-              s.copy(nextRoundAt =
-                DateTime.now
-                  .plusSeconds(
-                    s.settings.roundInterval.toSeconds.toInt + s.settings.halfwayBreak.toSeconds.toInt
-                  )
-                  .some
-              )
-            } else {
-              s.copy(nextRoundAt = DateTime.now.plusSeconds(s.settings.roundInterval.toSeconds.toInt).some)
-            }
+            s.copy(nextRoundAt =
+              DateTime.now
+                .plusSeconds(
+                  if (s.isHalfway && s.settings.halfwayBreak.toSeconds.toInt != 0)
+                    s.settings.halfwayBreak.toSeconds.toInt
+                  else s.settings.roundInterval.toSeconds.toInt
+                )
+                .some
+            )
           else if (s.settings.manualRounds && !old.settings.manualRounds)
             s.copy(nextRoundAt = none)
           else s
@@ -354,6 +352,22 @@ final class SwissApi(
           }
         }
       }
+    }
+
+  def playerToPairingGames(playerView: SwissPlayer.ViewExt): Fu[List[SwissPairingGames]] =
+    playerView.pairings.values.toList.map(_.pairing).map { p =>
+      SwissPairingGameIds(
+        p.id,
+        p.multiMatchGameIds,
+        p.isMatchScore,
+        p.isBestOfX,
+        p.isPlayX,
+        p.nbGamesPerRound,
+        p.openingFEN
+      )
+    } match {
+      case Nil => fuccess(List.empty[SwissPairingGames])
+      case ids => toSwissPairingGames(playerView.player.swissId, ids)
     }
 
   def pairingViews(pairings: Seq[SwissPairing], player: SwissPlayer): Fu[Seq[SwissPairing.View]] =
@@ -675,6 +689,11 @@ final class SwissApi(
                 }
             } >>
               game.playersWhoDidNotMove
+                .filter(p =>
+                  game.winnerPlayerIndex
+                    .map((game.game.player(_)))
+                    .flatMap(_.userId) != p.userId
+                ) //prevent malicious opponent resigning on your turn before you play a move
                 .map(_.userId)
                 .map { absent =>
                   SwissPlayer.fields { f =>
@@ -698,9 +717,9 @@ final class SwissApi(
                           case Some(days) => game.createdAt plusDays days
                           case None =>
                             DateTime.now.plusSeconds(
-                              swiss.settings.roundInterval.toSeconds.toInt + (if (swiss.isHalfway)
-                                                                                swiss.settings.halfwayBreak.toSeconds.toInt
-                                                                              else 0)
+                              if (swiss.isHalfway && swiss.settings.halfwayBreak.toSeconds.toInt != 0)
+                                swiss.settings.halfwayBreak.toSeconds.toInt
+                              else swiss.settings.roundInterval.toSeconds.toInt
                             )
                         }
                       )

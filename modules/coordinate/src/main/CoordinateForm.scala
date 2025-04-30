@@ -14,7 +14,7 @@ object CoordinateForm {
   val score = Form(
     mapping(
       "playerIndex" -> text.verifying(Set("p1", "p2") contains _),
-      "score" -> number(min = 0, max = 100)
+      "score"       -> number(min = 0, max = 100)
     )(ScoreData.apply)(ScoreData.unapply)
   )
 

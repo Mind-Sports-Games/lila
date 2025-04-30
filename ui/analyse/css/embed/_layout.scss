@@ -111,6 +111,16 @@ body.backgammon-contemporary .variant-backgammon .game-score {
     background: url(../images/board/go/svg/go_pot_black_dark.svg);
     background-size: cover;
   }
+
+  body.go-yellow-wood .variant-#{$variant} .game-score.p2 {
+    background: url(../images/board/go/svg/go_pot_white_yellow.svg);
+    background-size: cover;
+  }
+
+  body.go-yellow-wood .variant-#{$variant} .game-score.p1 {
+    background: url(../images/board/go/svg/go_pot_black_yellow.svg);
+    background-size: cover;
+  }
 }
 
 body .variant-abalone .game-score piece.hole-piece {

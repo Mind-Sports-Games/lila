@@ -46,7 +46,7 @@ export function makeConfig(ctrl: RoundController): Config {
     showUndoButton: playing && turnPlayerIndex == data.player.playerIndex && dice.length > 0,
     autoRoll:
       ctrl.isPlaying() && data.game.winner === undefined && ctrl.isBackgammonMultiPoint() ? ctrl.autoRoll : undefined,
-    multiPointState: ctrl.finalMultiPointState(),
+    multiPointState: stratUtils.finalMultiPointState(data.game, ctrl.ply, ctrl.lastPly()),
     addPieceZIndex: ctrl.data.pref.is3d,
     selectOnly: data.selectMode,
     highlight: {
