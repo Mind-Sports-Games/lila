@@ -10,7 +10,7 @@ object thanks {
 
   import trans.patron._
 
-  def apply(patron: Option[lila.plan.Patron], customer: Option[lila.plan.StripeCustomer])(implicit
+  def apply(patron: Option[lila.plan.Patron], stripeCustomer: Option[lila.plan.StripeCustomer])(implicit
       ctx: Context
   ) =
     views.html.base.layout(
@@ -23,7 +23,10 @@ object thanks {
           p(tyvm()),
           p(transactionCompleted()),
           patron.map { pat =>
-            if (pat.payPal.exists(_.renew) || customer.exists(_.renew)) ctx.me.fold(emptyFrag) { me =>
+            if (
+              pat.payPal.exists(_.renew) || pat.payPalCheckout.exists(_.renew) || stripeCustomer
+                .exists(_.renew)
+            ) ctx.me.fold(emptyFrag) { me =>
               p(
                 permanentPatron(),
                 br,

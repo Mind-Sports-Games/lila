@@ -3,7 +3,7 @@ package lila.plan
 import play.api.data._
 import play.api.data.Forms._
 
-case class Checkout(
+case class PlanCheckout(
     email: Option[String],
     amount: Cents,
     freq: Freq
@@ -17,25 +17,25 @@ case class Checkout(
     )
 }
 
-object Checkout {
+object PlanCheckout {
 
   def make(
       email: Option[String],
       amount: Int,
       freq: String
   ) =
-    Checkout(
+    PlanCheckout(
       email,
       Cents(amount),
       if (freq == "monthly") Freq.Monthly else Freq.Onetime
     )
 
-  val form = Form[Checkout](
+  val form = Form[PlanCheckout](
     mapping(
       "email"  -> optional(email),
       "amount" -> number(min = 100, max = 100 * 100000),
       "freq"   -> nonEmptyText
-    )(Checkout.make)(_.toFormData)
+    )(PlanCheckout.make)(_.toFormData)
   )
 }
 

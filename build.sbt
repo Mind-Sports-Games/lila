@@ -342,7 +342,7 @@ lazy val irc = smallModule("irc",
 
 lazy val plan = module("plan",
   Seq(common, user),
-  reactivemongo.bundle
+  Seq(play.jsonJoda) ++ reactivemongo.bundle
 )
 
 lazy val relation = module("relation",

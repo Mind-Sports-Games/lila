@@ -258,6 +258,8 @@ interface Window {
     palantir(opts: PalantirOpts): Palantir;
   };
   [key: string]: any; // TODO
+  readonly paypalOrder: unknown;
+  readonly paypalSubscription: unknown;
 }
 
 interface Study {

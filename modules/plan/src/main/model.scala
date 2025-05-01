@@ -1,12 +1,9 @@
 package lila.plan
 
 import org.joda.time.DateTime
+import play.api.libs.json.{ JsArray, JsObject }
 
-case class ChargeId(value: String)       extends AnyVal
-case class ClientId(value: String)       extends AnyVal
-case class CustomerId(value: String)     extends AnyVal
-case class SessionId(value: String)      extends AnyVal
-case class SubscriptionId(value: String) extends AnyVal
+import lila.user.User
 
 case class Source(value: String) extends AnyVal
 
@@ -36,6 +33,11 @@ object Cents {
 
 case class Country(code: String) extends AnyVal
 
+case class StripeChargeId(value: String)       extends AnyVal
+case class StripeCustomerId(value: String)     extends AnyVal
+case class StripeSessionId(value: String)      extends AnyVal
+case class StripeSubscriptionId(value: String) extends AnyVal
+
 case class StripeSubscriptions(data: List[StripeSubscription])
 
 case class StripeProducts(monthly: String, onetime: String)
@@ -52,10 +54,12 @@ object StripePrice {
 
 case class NextUrls(cancel: String, success: String)
 
-case class StripeSession(id: SessionId)
+case class ProductIds(monthly: String, onetime: String)
+
+case class StripeSession(id: StripeSessionId)
 case class CreateStripeSession(
-    customerId: CustomerId,
-    checkout: Checkout,
+    customerId: StripeCustomerId,
+    checkout: PlanCheckout,
     urls: NextUrls,
     isLifetime: Boolean
 )
@@ -63,7 +67,7 @@ case class CreateStripeSession(
 case class StripeSubscription(
     id: String,
     item: StripeItem,
-    customer: CustomerId,
+    customer: StripeCustomerId,
     cancel_at_period_end: Boolean,
     status: String,
     default_payment_method: Option[String]
@@ -73,7 +77,7 @@ case class StripeSubscription(
 }
 
 case class StripeCustomer(
-    id: CustomerId,
+    id: StripeCustomerId,
     email: Option[String],
     subscriptions: StripeSubscriptions
 ) {
@@ -83,9 +87,9 @@ case class StripeCustomer(
 }
 
 case class StripeCharge(
-    id: ChargeId,
+    id: StripeChargeId,
     amount: Cents,
-    customer: CustomerId,
+    customer: StripeCustomerId,
     billing_details: Option[StripeCharge.BillingDetails]
 ) {
   def lifetimeWorthy = amount >= Cents.lifetime
@@ -112,10 +116,79 @@ case class StripePaymentMethod(card: Option[StripeCard])
 
 case class StripeCard(brand: String, last4: String, exp_year: Int, exp_month: Int)
 
-case class StripeCompletedSession(customer: CustomerId, mode: String) {
+case class StripeCompletedSession(customer: StripeCustomerId, mode: String) {
   def freq = if (mode == "subscription") Freq.Monthly else Freq.Onetime
 }
 
 case class StripeSetupIntent(payment_method: String)
 
 case class StripeSessionWithIntent(setup_intent: StripeSetupIntent)
+
+// payPal model
+
+case class PayPalPrice(product: String, unit_amount: Cents) {
+  def cents = unit_amount
+  def usd   = cents.usd
+}
+object PayPalPrice {
+  val defaultAmounts = List(5, 10, 20, 50).map(Usd.apply).map(_.cents)
+}
+
+case class PayPalOrderId(value: String)        extends AnyVal with StringValue
+case class PayPalSubscriptionId(value: String) extends AnyVal with StringValue
+case class PayPalOrder(
+    id: PayPalOrderId,
+    intent: String,
+    status: String,
+    purchase_units: List[PayPalPurchaseUnit],
+    payer: PayPalPayer
+) {
+  val userId = purchase_units.headOption.flatMap(_.custom_id).??(_.trim) match {
+    case s"$userId" => userId.some
+    case _          => none
+  }
+  def isApproved        = status == "APPROVED"
+  def isApprovedCapture = isApproved && intent == "CAPTURE"
+  def capturedMoney     = isApprovedCapture ?? purchase_units.headOption.map(_.amount.money)
+  def country           = payer.address.flatMap(_.country_code)
+}
+case class PayPalPayment(amount: PayPalPrice)
+case class PayPalBillingInfo(last_payment: PayPalPayment, next_billing_time: DateTime)
+case class PayPalSubscription(
+    id: PayPalSubscriptionId,
+    status: String,
+    subscriber: PayPalPayer,
+    billing_info: PayPalBillingInfo
+) {
+  def country       = subscriber.address.flatMap(_.country_code)
+  def capturedMoney = billing_info.last_payment.amount.money
+  def nextChargeAt  = billing_info.next_billing_time
+  def isActive      = status == "ACTIVE"
+}
+case class CreatePayPalOrder(
+    checkout: PlanCheckout,
+    user: User,
+    isLifetime: Boolean
+) {
+  def makeCustomId = user.id
+}
+case class PayPalOrderCreated(id: PayPalOrderId)
+case class PayPalSubscriptionCreated(id: PayPalSubscriptionId)
+case class PayPalPurchaseUnit(amount: PayPalPrice, custom_id: Option[String])
+case class PayPalPayerId(value: String) extends AnyVal with StringValue
+case class PayPalPayer(payer_id: PayPalPayerId, address: Option[PayPalAddress]) {
+  def id = payer_id
+}
+case class PayPalAddress(country_code: Option[Country])
+
+case class PayPalEventId(value: String) extends AnyVal with StringValue
+case class PayPalEvent(id: PayPalEventId, event_type: String, resource_type: String, resource: JsObject) {
+  def tpe         = event_type
+  def resourceTpe = resource_type
+  def resourceId  = resource str "id"
+}
+
+case class PayPalPlanId(value: String) extends AnyVal with StringValue
+case class PayPalPlan(id: PayPalPlanId, name: String, status: String, billing_cycles: JsArray) {
+  def active = status == "ACTIVE"
+}

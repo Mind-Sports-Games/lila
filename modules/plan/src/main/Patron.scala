@@ -5,7 +5,8 @@ import org.joda.time.DateTime
 case class Patron(
     _id: Patron.UserId,
     stripe: Option[Patron.Stripe] = none,
-    payPal: Option[Patron.PayPal] = none,
+    payPal: Option[Patron.PayPalLegacy] = none,
+    payPalCheckout: Option[Patron.PayPalCheckout] = none,
     free: Option[Patron.Free] = none,
     expiresAt: Option[DateTime] = none,
     lifetime: Option[Boolean] = None,
@@ -38,6 +39,12 @@ case class Patron(
       expiresAt = none
     )
 
+  def removePayPalCheckout =
+    copy(
+      payPalCheckout = none,
+      expiresAt = none
+    )
+
   def removePayPal =
     copy(
       payPal = none,
@@ -53,17 +60,25 @@ object Patron {
 
   case class UserId(value: String) extends AnyVal
 
-  case class Stripe(customerId: CustomerId)
+  case class Stripe(customerId: StripeCustomerId)
 
-  case class PayPal(
-      email: Option[PayPal.Email],
-      subId: Option[PayPal.SubId],
+  case class PayPalCheckout(
+      orderId: PayPalOrderId,
+      payerId: PayPalPayerId,
+      subscriptionId: Option[PayPalSubscriptionId]
+  ) {
+    def renew = subscriptionId.isDefined
+  }
+
+  case class PayPalLegacy(
+      email: Option[PayPalLegacy.Email],
+      subId: Option[PayPalLegacy.SubId],
       lastCharge: DateTime
   ) {
 
     def renew = subId.isDefined
   }
-  object PayPal {
+  object PayPalLegacy {
     case class Email(value: String) extends AnyVal
     case class SubId(value: String) extends AnyVal
   }
