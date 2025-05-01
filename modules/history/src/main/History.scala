@@ -107,6 +107,7 @@ case class History(
       case "hyper"                  => hyper
       case "nackgammon"             => nackgammon
       case "abalone"                => abalone
+      case "grandabalone"           => grandabalone
       case "puzzle"                 => puzzle
       case "ultraBullet"            => ultraBullet
       case x                        => sys error s"No history for perf $x"
@@ -182,6 +183,7 @@ object History {
           hyper = ratingsMap("hyper"),
           nackgammon = ratingsMap("nackgammon"),
           abalone = ratingsMap("abalone"),
+          grandabalone = ratingsMap("grandabalone"),
           ultraBullet = ratingsMap("ultraBullet"),
           bullet = ratingsMap("bullet"),
           blitz = ratingsMap("blitz"),

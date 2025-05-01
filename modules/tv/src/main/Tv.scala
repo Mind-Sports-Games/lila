@@ -689,6 +689,15 @@ object Tv {
           familyChannel = true,
           gameFamily = "abalone"
         )
+    case object GrandAbalone
+        extends Channel(
+          name = VariantKeys.variantName(Variant.wrap(AV.GrandAbalone)),
+          icon = AV.GrandAbalone.perfIcon.toString,
+          secondsSinceLastMove = freshBlitz,
+          filters = Seq(variant(Variant.wrap(AV.GrandAbalone)), noBot),
+          familyChannel = true,
+          gameFamily = "abalone"
+        )
     case object Bot
         extends Channel(
           name = "Bot",

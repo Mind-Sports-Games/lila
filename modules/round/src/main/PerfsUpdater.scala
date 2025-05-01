@@ -554,6 +554,7 @@ final class PerfsUpdater(
           hyper = r(PT.orDefault("hyper"), perfs.hyper, perfs1.hyper),
           nackgammon = r(PT.orDefault("nackgammon"), perfs.nackgammon, perfs1.nackgammon),
           abalone = r(PT.orDefault("abalone"), perfs.abalone, perfs1.abalone),
+          grandabalone = r(PT.orDefault("grandabalone"), perfs.grandabalone, perfs1.grandabalone),
           bullet = r(PT.orDefault("bullet"), perfs.bullet, perfs1.bullet),
           blitz = r(PT.orDefault("blitz"), perfs.blitz, perfs1.blitz),
           rapid = r(PT.orDefault("rapid"), perfs.rapid, perfs1.rapid),

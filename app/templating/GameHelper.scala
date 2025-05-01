@@ -295,6 +295,8 @@ trait GameHelper { self: I18nHelper with UserHelper with AiHelper with StringHel
             trans.gameFinished.txt()
           case Variant.Abalone(strategygames.abalone.variant.Abalone) =>
             trans.gameFinished.txt()
+          case Variant.Abalone(strategygames.abalone.variant.GrandAbalone) =>
+            trans.gameFinished.txt()
           case _ => trans.variantEnding.txt()
         }
       case _ => ""
