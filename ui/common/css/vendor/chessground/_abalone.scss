@@ -31,7 +31,8 @@
 $players: ('p1', 'p2');
 $directions: ('W', 'NW', 'NE', 'E', 'SE', 'SW');
 
-.variant-abalone {
+.variant-abalone,
+.variant-grandabalone {
   cg-container {
     width: calc(100% * 9);
     height: calc(100% * 9);

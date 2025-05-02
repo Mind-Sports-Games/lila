@@ -94,6 +94,7 @@ export const initWith = (
                                     ? { width: 12, height: 2 }
                                     : $el.hasClass('variant-abalone')
                                       ? { width: 9, height: 9 }
+                                      //TODO Grand Abalone set correctly
                                       : { width: 8, height: 8 },
           variant: variantFromElement($el),
           ...(multiPointState?.length === 6 && {
@@ -147,9 +148,11 @@ export const variantFromElement = (element: Cash): string => {
                                   ? 'nackgammon'
                                   : element.hasClass('variant-abalone')
                                     ? 'abalone'
-                                    : element.hasClass('variant-threeCheck')
-                                      ? 'threeCheck'
-                                      : element.hasClass('variant-fiveCheck')
-                                        ? 'fiveCheck'
-                                        : 'standard';
+                                    : element.hasClass('variant-grandabalone')
+                                      ? 'grandabalone'
+                                      : element.hasClass('variant-threeCheck')
+                                        ? 'threeCheck'
+                                        : element.hasClass('variant-fiveCheck')
+                                          ? 'fiveCheck'
+                                          : 'standard';
 };

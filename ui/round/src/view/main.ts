@@ -93,6 +93,7 @@ function renderPlayerScore(
       }),
     );
     return h('div.game-score.game-score-' + position, children);
+  //TODO Grand Abalone handle 10 piece scoreboard
   } else if (variantKey === 'abalone') {
     const opp = playerIndex === 'p1' ? 'p2' : 'p1';
 
@@ -157,7 +158,8 @@ export function main(ctrl: RoundController): VNode {
         bottomScore = topPlayerIndex === 'p2' ? p1Score : p2Score;
         break;
       }
-      case 'abalone': {
+      case 'abalone':
+      case 'grandabalone': {
         const fen = plyStep(ctrl.data, ctrl.ply).fen;
         const p1Score = util.getScoreFromFen(variantKey, fen, 'p1');
         const p2Score = util.getScoreFromFen(variantKey, fen, 'p2');
@@ -267,7 +269,7 @@ export function main(ctrl: RoundController): VNode {
     }
   }
   //Togyzkumalak, Abalone and Backgammon board always has coodinates on the inside
-  if (['togyzkumalak', 'bestemshe', 'backgammon', 'hyper', 'nackgammon', 'abalone'].includes(variantKey)) {
+  if (['togyzkumalak', 'bestemshe', 'backgammon', 'hyper', 'nackgammon', 'abalone', 'grandabalone'].includes(variantKey)) {
     if (!$('body').hasClass('coords-no')) {
       $('body').removeClass('coords-out').addClass('coords-in');
     }
@@ -291,6 +293,7 @@ export function main(ctrl: RoundController): VNode {
     'hyper',
     'nackgammon',
     'abalone',
+    'grandabalone'
   ].includes(variantKey)
     ? '.piece-letter'
     : '';

@@ -165,7 +165,7 @@ export function makeConfig(ctrl: RoundController): Config {
                         ? 'https://playstrategy.org/assets/piece/backgammon/' +
                           data.pref.pieceSet.filter(ps => ps.gameFamily === 'backgammon')[0].name +
                           '/'
-                        : variantKey === 'abalone'
+                        : variantKey === 'abalone' || variantKey === 'grandabalone'
                           ? 'https://playstrategy.org/assets/piece/abalone/' +
                             data.pref.pieceSet.filter(ps => ps.gameFamily === 'abalone')[0].name +
                             '/'

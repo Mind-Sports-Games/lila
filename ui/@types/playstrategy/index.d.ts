@@ -316,7 +316,8 @@ declare type VariantKey =
   | 'backgammon'
   | 'hyper'
   | 'nackgammon'
-  | 'abalone';
+  | 'abalone'
+  | 'grandabalone';
 
 declare type DraughtsVariantKey =
   | 'international'
@@ -381,7 +382,8 @@ declare type Perf =
   | 'backgammon'
   | 'hyper'
   | 'nackgammon'
-  | 'abalone';
+  | 'abalone'
+  | 'grandabalone';
 
 //declare type Color = 'white' | 'black';
 declare type PlayerName = 'White' | 'Black' | 'Sente' | 'Gote' | 'Red' | 'South' | 'North' | 'Bastaushi' | 'Kostaushi';

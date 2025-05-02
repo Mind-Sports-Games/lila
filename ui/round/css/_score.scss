@@ -1,5 +1,5 @@
-$score-variants: ('flipello', 'flipello10', 'oware', 'togyzkumalak', 'bestemshe', 'abalone');
-$score-variants-square: ('flipello', 'flipello10', 'oware', 'go9x9', 'go13x13', 'go19x19', 'abalone');
+$score-variants: ('flipello', 'flipello10', 'oware', 'togyzkumalak', 'bestemshe', 'abalone', 'grandabalone');
+$score-variants-square: ('flipello', 'flipello10', 'oware', 'go9x9', 'go13x13', 'go19x19', 'abalone', 'grandabalone');
 $go-variants: ('go9x9', 'go13x13', 'go19x19');
 
 .variant-flipello .game-score,
@@ -21,6 +21,7 @@ $go-variants: ('go9x9', 'go13x13', 'go19x19');
   }
 }
 
+//TODO Grand Abalone add 10 hole scoreboard
 .variant-abalone .game-score::after {
   @extend %active, %box-radius;
 

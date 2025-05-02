@@ -396,6 +396,7 @@ function renderPlayerScore(
     const pieceClass = `piece.${defaultMancalaRole}${score.toString()}-piece.`;
     children.push(h(pieceClass + playerIndex, { attrs: { 'data-score': score } }));
     return h('div.game-score.game-score-' + position + '.' + playerIndex, children);
+  //TODO Grand Abalone handle 10 hole scoreboard
   } else if (variantKey === 'abalone') {
     const opp = playerIndex === 'p1' ? 'p2' : 'p1';
 
@@ -493,7 +494,7 @@ export default function (ctrl: AnalyseCtrl): VNode {
     needsInnerCoords =
       ((!!gaugeOn || !!playerBars) &&
         !['xiangqi', 'shogi', 'minixiangqi', 'minishogi', 'oware'].includes(variantKey)) ||
-      ['togyzkumalak', 'bestemshe', 'backgammon', 'hyper', 'nackgammon', 'abalone'].includes(variantKey),
+      ['togyzkumalak', 'bestemshe', 'backgammon', 'hyper', 'nackgammon', 'abalone', 'grandabalone'].includes(variantKey),
     needsOutterCoords =
       [
         'xiangqi',
@@ -534,7 +535,8 @@ export default function (ctrl: AnalyseCtrl): VNode {
         bottomScore = ctrl.topPlayerIndex() === 'p2' ? p1Score : p2Score;
         break;
       }
-      case 'abalone': {
+      case 'abalone':
+      case 'grandabalone': {
         const fen = ctrl.node.fen;
         const p1Score = getScoreFromFen(variantKey, fen, 'p1');
         const p2Score = getScoreFromFen(variantKey, fen, 'p2');
@@ -582,6 +584,7 @@ export default function (ctrl: AnalyseCtrl): VNode {
     'hyper',
     'nackgammon',
     'abalone',
+    'grandabalone'
   ].includes(variantKey)
     ? '.piece-letter'
     : '';

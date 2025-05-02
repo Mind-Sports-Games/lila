@@ -326,6 +326,7 @@ export default class RoundController {
         'hyper',
         'nackgammon',
         'abalone',
+        'grandabalone'
       ].includes(this.data.game.variant.key)
     )
       return false;

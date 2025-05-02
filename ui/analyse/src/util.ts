@@ -291,6 +291,7 @@ const noServerEvalVariants = [
   'hyper',
   'nackgammon',
   'abalone',
+  'grandabalone'
 ];
 
 export function allowServerEvalForVariant(variant: VariantKey) {
