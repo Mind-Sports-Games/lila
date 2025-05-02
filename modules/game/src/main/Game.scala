@@ -340,7 +340,7 @@ case class Game(
       // TODO Abalone is this how we want to represent score? Maybe look at Backgammon
       else if (updated.board.variant.gameLogic == GameLogic.Abalone())
         //Is this even necessary as score is in the fen?
-        (updated.board.variant.key == "abalone") ?? List(
+        (updated.board.variant.gameFamily == GameFamily.Abalone()) ?? List(
           Event.Score(p1 = updated.history.score.p1, p2 = updated.history.score.p2)
         )
       else //chess. Is this even necessary as checkCount is in the fen?
@@ -374,7 +374,7 @@ case class Game(
         val score = if (playerIndex.name == "p1") fen.player1Score else fen.player2Score
         score.toString()
       case "togyzkumalak" | "bestemshe" => history.score(playerIndex).toString()
-      case "abalone"                    => history.score(playerIndex).toString()
+      case "abalone" | "grandabalone"   => history.score(playerIndex).toString()
       case "go9x9" | "go13x13" | "go19x19" =>
         val fen   = Forsyth.>>(variant.gameLogic, situation)
         val score = (if (playerIndex.name == "p1") fen.player1Score else fen.player2Score) / 10.0

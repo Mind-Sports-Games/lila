@@ -182,6 +182,7 @@ object JsonView {
     )
   }
 
+  //TODO we shoulnt have to unwrap per game logic
   implicit val variantWriter: OWrites[Variant] = OWrites { v =>
     v match {
       case Variant.Draughts(draughtsVariant) =>
@@ -240,7 +241,7 @@ object JsonView {
           "name"      -> VariantKeys.variantName(v),
           "short"     -> VariantKeys.variantShortName(v),
           "lib"       -> v.gameLogic.id,
-          "boardSize" -> abaloneVariant.boardSize
+          "boardSize" -> abaloneVariant.boardType
         )
       case _ =>
         Json.obj(
@@ -296,9 +297,8 @@ object JsonView {
       )
     }
 
-  //TODO: Abalone do we need to do anything different because of Hex boards here?
-  implicit val boardSizeAbaloneWriter: Writes[strategygames.abalone.Board.BoardSize] =
-    Writes[strategygames.abalone.Board.BoardSize] { b =>
+  implicit val boardSizeAbaloneWriter: Writes[strategygames.abalone.BoardType] =
+    Writes[strategygames.abalone.BoardType] { b =>
       Json.obj(
         "width"  -> b.width,
         "height" -> b.height

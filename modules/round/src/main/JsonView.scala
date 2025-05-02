@@ -478,12 +478,13 @@ final class JsonView(
 
   private def multiActionMetaData(pov: Pov): Option[JsObject] = {
     pov.game.variant.key match {
-      case "monster"    => multiActionMetaJson(pov)
-      case "amazons"    => multiActionMetaJson(pov)
-      case "backgammon" => multiActionMetaJson(pov)
-      case "hyper"      => multiActionMetaJson(pov)
-      case "nackgammon" => multiActionMetaJson(pov)
-      case _            => None
+      case "monster"      => multiActionMetaJson(pov)
+      case "amazons"      => multiActionMetaJson(pov)
+      case "backgammon"   => multiActionMetaJson(pov)
+      case "hyper"        => multiActionMetaJson(pov)
+      case "nackgammon"   => multiActionMetaJson(pov)
+      case "grandabalone" => multiActionMetaJson(pov)
+      case _              => None
     }
   }
 

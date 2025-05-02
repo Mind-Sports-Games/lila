@@ -52,6 +52,7 @@ case class Perfs(
     hyper: Perf,
     nackgammon: Perf,
     abalone: Perf,
+    grandabalone: Perf,
     ultraBullet: Perf,
     bullet: Perf,
     blitz: Perf,
@@ -109,6 +110,7 @@ case class Perfs(
       "hyper"                  -> hyper,
       "nackgammon"             -> nackgammon,
       "abalone"                -> abalone,
+      "grandabalone"           -> grandabalone,
       "ultraBullet"            -> ultraBullet,
       "bullet"                 -> bullet,
       "blitz"                  -> blitz,
@@ -223,6 +225,7 @@ case class Perfs(
     "hyper"                  -> hyper,
     "nackgammon"             -> nackgammon,
     "abalone"                -> abalone,
+    "grandabalone"           -> grandabalone,
     "ultraBullet"            -> ultraBullet,
     "bullet"                 -> bullet,
     "blitz"                  -> blitz,
@@ -284,6 +287,7 @@ case object Perfs {
   val default = {
     val p = Perf.default
     Perfs(
+      p,
       p,
       p,
       p,
@@ -400,6 +404,7 @@ case object Perfs {
       case Variant.Backgammon(strategygames.backgammon.variant.Hyper)            => Some(_.hyper)
       case Variant.Backgammon(strategygames.backgammon.variant.Nackgammon)       => Some(_.nackgammon)
       case Variant.Abalone(strategygames.abalone.variant.Abalone)                => Some(_.abalone)
+      case Variant.Abalone(strategygames.abalone.variant.GrandAbalone)           => Some(_.grandabalone)
       case _                                                                     => none
     }
 
@@ -463,6 +468,7 @@ case object Perfs {
         hyper = perf("hyper"),
         nackgammon = perf("nackgammon"),
         abalone = perf("abalone"),
+        grandabalone = perf("grandabalone"),
         ultraBullet = perf("ultraBullet"),
         bullet = perf("bullet"),
         blitz = perf("blitz"),
@@ -523,6 +529,7 @@ case object Perfs {
         "hyper"                  -> notNew(o.hyper),
         "nackgammon"             -> notNew(o.nackgammon),
         "abalone"                -> notNew(o.abalone),
+        "grandabalone"           -> notNew(o.grandabalone),
         "ultraBullet"            -> notNew(o.ultraBullet),
         "bullet"                 -> notNew(o.bullet),
         "blitz"                  -> notNew(o.blitz),
@@ -583,10 +590,12 @@ case object Perfs {
       backgammon: List[User.LightPerf],
       hyper: List[User.LightPerf],
       nackgammon: List[User.LightPerf],
-      abalone: List[User.LightPerf]
+      abalone: List[User.LightPerf],
+      grandabalone: List[User.LightPerf]
   )
 
   val emptyLeaderboards = Leaderboards(
+    Nil,
     Nil,
     Nil,
     Nil,
