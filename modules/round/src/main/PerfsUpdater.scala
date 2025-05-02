@@ -113,6 +113,8 @@ final class PerfsUpdater(
                 updateRatings(ratingsW.nackgammon, ratingsB.nackgammon, game)
               case Variant.Abalone(strategygames.abalone.variant.Abalone) =>
                 updateRatings(ratingsW.abalone, ratingsB.abalone, game)
+              case Variant.Abalone(strategygames.abalone.variant.GrandAbalone) =>
+                updateRatings(ratingsW.grandabalone, ratingsB.grandabalone, game)
               case Variant.Chess(Standard) =>
                 game.speed match {
                   case Speed.Bullet =>
@@ -191,6 +193,7 @@ final class PerfsUpdater(
       hyper: Rating,
       nackgammon: Rating,
       abalone: Rating,
+      grandabalone: Rating,
       ultraBullet: Rating,
       bullet: Rating,
       blitz: Rating,
@@ -243,6 +246,7 @@ final class PerfsUpdater(
       hyper = perfs.hyper.toRating,
       nackgammon = perfs.nackgammon.toRating,
       abalone = perfs.abalone.toRating,
+      grandabalone = perfs.grandabalone.toRating,
       ultraBullet = perfs.ultraBullet.toRating,
       bullet = perfs.bullet.toRating,
       blitz = perfs.blitz.toRating,
@@ -496,6 +500,11 @@ final class PerfsUpdater(
             Variant.Abalone(strategygames.abalone.variant.Abalone),
             perfs.abalone,
             ratings.abalone
+          ),
+          grandabalone = addRatingVariant(
+            Variant.Abalone(strategygames.abalone.variant.GrandAbalone),
+            perfs.grandabalone,
+            ratings.grandabalone
           ),
           ultraBullet =
             addRatingIf(isStd && speed == Speed.UltraBullet, perfs.ultraBullet, ratings.ultraBullet),

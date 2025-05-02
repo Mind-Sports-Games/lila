@@ -127,6 +127,7 @@ $backgammon-board-files: (
   'contemporary': 'svg/backgammon_contemporary_board.svg',
 );
 
+//TODO Grand Abalone add new board files
 $abalone-board-files: (
   'classic': 'svg/classic.svg',
   // base64 encoded
@@ -411,3 +412,5 @@ $abalone-variants: ('abalone');
     }
   }
 }
+
+//TODO Grand Abalone add boards here

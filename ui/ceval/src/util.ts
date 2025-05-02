@@ -25,9 +25,10 @@ const noClientEvalVariants = [
   'hyper',
   'nackgammon',
   'abalone',
+  'grandabalone'
 ];
 
-const disallowPathVizualizationVariants: VariantKey[] = ['shogi', 'minishogi', 'xiangqi', 'flipello10'];
+const noPathVizualizationVariants: VariantKey[] = ['shogi', 'minishogi', 'xiangqi', 'flipello10'];
 
 const noVariantOutcomeVariants: VariantKey[] = [
   'minishogi',
@@ -40,6 +41,7 @@ const noVariantOutcomeVariants: VariantKey[] = [
 
 const blackStartsVariants: VariantKey[] = [
   'abalone',
+  'grandabalone',
   'flipello',
   'flipello10',
   'go9x9',
@@ -49,6 +51,32 @@ const blackStartsVariants: VariantKey[] = [
   'minishogi',
   'scrambledEggs',
   'shogi',
+];
+
+const noPracticeWithComputerVariants: VariantKey[] = [
+  'monster',
+  'linesOfAction',
+  'scrambledEggs',
+  'shogi',
+  'xiangqi',
+  'minishogi',
+  'minixiangqi',
+  'flipello',
+  'flipello10',
+  'amazons',
+  'breakthroughtroyka',
+  'minibreakthroughtroyka',
+  'oware',
+  'togyzkumalak',
+  'bestemshe',
+  'go9x9',
+  'go13x13',
+  'go19x19',
+  'backgammon',
+  'hyper',
+  'nackgammon',
+  'abalone',
+  'grandabalone',
 ];
 
 export function isEvalBetter(a: Tree.ClientEval, b?: Tree.ClientEval): boolean {
@@ -73,7 +101,7 @@ export function allowedForVariant(variant: VariantKey) {
 }
 
 export function allowPv(variant: VariantKey) {
-  return disallowPathVizualizationVariants.indexOf(variant) == -1;
+  return noPathVizualizationVariants.indexOf(variant) == -1;
 }
 
 export function noVariantOutcome(variantKey: VariantKey): boolean {
@@ -82,4 +110,8 @@ export function noVariantOutcome(variantKey: VariantKey): boolean {
 
 export function blackStartsVariant(variant: VariantKey) {
   return blackStartsVariants.indexOf(variant) != -1;
+}
+
+export function allowPracticeWithComputer(variant: VariantKey) {
+  return noPracticeWithComputerVariants.indexOf(variant) == -1;
 }

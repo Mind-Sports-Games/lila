@@ -52,7 +52,8 @@
 }
 
 //score for games (togyzkumalak and Oware has own layout below)
-$score-variants: ('flipello', 'flipello10', 'go9x9', 'go13x13', 'go19x19', 'abalone');
+//TODO Grand Abalone handle 10 hole pocket
+$score-variants: ('flipello', 'flipello10', 'go9x9', 'go13x13', 'go19x19', 'abalone', 'grandablone');
 $go-variants: ('go9x9', 'go13x13', 'go19x19');
 
 body.oware-light-wood .variant-oware .game-score {
@@ -193,6 +194,7 @@ $pocket-col1-size: 9.5vw;
     width: $pocket-col1-size;
     height: $pocket-col1-size;
     background-color: #aaa;
+    //TODO Abalone specific code shouldn't be in a general place
     .abalone-yellow & {
       background-color: #f0bc67;
     }

@@ -726,7 +726,7 @@ export default class AnalyseCtrl {
       variant: this.data.game.variant,
       standardMaterial:
         !this.data.game.initialFen ||
-        parseFen(stratUtils.variantToRules(this.data.game.variant.key))(this.data.game.initialFen).unwrap(
+        parseFen(playstrategyRules(this.data.game.variant.key))(this.data.game.initialFen).unwrap(
           setup =>
             PLAYERINDEXES.every(playerIndex => {
               const board = setup.board;
@@ -767,7 +767,7 @@ export default class AnalyseCtrl {
   }
 
   position(node: Tree.Node): Result<Position, PositionError> {
-    const setup = parseFen(stratUtils.variantToRules(this.data.game.variant.key))(node.fen).unwrap();
+    const setup = parseFen(playstrategyRules(this.data.game.variant.key))(node.fen).unwrap();
     return getClassFromRules(playstrategyRules(this.data.game.variant.key)).fromSetup(setup);
   }
 
@@ -917,15 +917,15 @@ export default class AnalyseCtrl {
   }
 
   playUci(uci: Uci): void {
-    const move = parseUci(stratUtils.variantToRules(this.data.game.variant.key))(uci)!;
-    const to = makeSquare(stratUtils.variantToRules(this.data.game.variant.key))(move.to);
+    const move = parseUci(playstrategyRules(this.data.game.variant.key))(uci)!;
+    const to = makeSquare(playstrategyRules(this.data.game.variant.key))(move.to);
     if (isNormal(move)) {
       const piece = this.chessground.state.pieces.get(
-        makeSquare(stratUtils.variantToRules(this.data.game.variant.key))(move.from),
+        makeSquare(playstrategyRules(this.data.game.variant.key))(move.from),
       );
       const capture = this.chessground.state.pieces.get(to);
       this.sendMove(
-        makeSquare(stratUtils.variantToRules(this.data.game.variant.key))(move.from),
+        makeSquare(playstrategyRules(this.data.game.variant.key))(move.from),
         to,
         capture && piece && capture.playerIndex !== piece.playerIndex ? capture : undefined,
         move.promotion,

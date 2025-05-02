@@ -2,7 +2,6 @@ import { piotr } from './piotr';
 import * as status from 'game/status';
 import type * as cg from 'chessground/types';
 import type { BaseGame } from 'game';
-import type { Rules } from 'stratops/types';
 import { playstrategyRules } from 'stratops/compat';
 import { getClassFromRules } from 'stratops/variants/utils';
 
@@ -194,77 +193,4 @@ export const finalMultiPointState = (game: BaseGame, ply: any, lastPly: any) => 
         p2: Math.min(game.multiPointState.target, game.multiPointState.p2 + pointsToAdd[1]),
       }
     : undefined;
-};
-
-export const variantToRules = (v: VariantKey): Rules => {
-  switch (v) {
-    case 'standard':
-      return 'chess';
-    case 'chess960':
-      return 'chess';
-    case 'antichess':
-      return 'antichess';
-    case 'fromPosition':
-      return 'chess';
-    case 'kingOfTheHill':
-      return 'kingofthehill';
-    case 'threeCheck':
-      return '3check';
-    case 'fiveCheck':
-      return '5check';
-    case 'atomic':
-      return 'atomic';
-    case 'horde':
-      return 'horde';
-    case 'racingKings':
-      return 'racingkings';
-    case 'crazyhouse':
-      return 'crazyhouse';
-    case 'noCastling':
-      return 'nocastling';
-    case 'linesOfAction':
-      return 'linesofaction';
-    case 'scrambledEggs':
-      return 'scrambledeggs';
-    case 'shogi':
-      return 'shogi';
-    case 'xiangqi':
-      return 'xiangqi';
-    case 'minishogi':
-      return 'minishogi';
-    case 'minixiangqi':
-      return 'minixiangqi';
-    case 'flipello':
-      return 'flipello';
-    case 'flipello10':
-      return 'flipello10';
-    case 'amazons':
-      return 'amazons';
-    case 'breakthroughtroyka':
-      return 'breakthrough';
-    case 'minibreakthroughtroyka':
-      return 'minibreakthrough';
-    case 'oware':
-      return 'oware';
-    case 'togyzkumalak':
-      return 'togyzkumalak';
-    case 'bestemshe':
-      return 'bestemshe';
-    case 'go9x9':
-      return 'go9x9';
-    case 'go13x13':
-      return 'go13x13';
-    case 'go19x19':
-      return 'go19x19';
-    case 'backgammon':
-      return 'backgammon';
-    case 'hyper':
-      return 'hyper';
-    case 'nackgammon':
-      return 'nackgammon';
-    case 'abalone':
-      return 'abalone';
-    default:
-      return 'chess';
-  }
 };

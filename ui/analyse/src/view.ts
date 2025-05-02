@@ -1,8 +1,15 @@
 import { h, VNode } from 'snabbdom';
 import { parseFen } from 'stratops/fen';
-import { variantToRules } from 'stratutils';
 import * as chessground from './ground';
-import { bind, onInsert, dataIcon, spinner, bindMobileMousedown, getScoreFromFen } from './util';
+import {
+  bind,
+  onInsert,
+  dataIcon,
+  spinner,
+  bindMobileMousedown,
+  getScoreFromFen,
+  allowExplorerForVariant,
+} from './util';
 import { defined } from 'common';
 import changeColorHandle from 'common/coordsColor';
 import { playable } from 'game';
@@ -39,7 +46,8 @@ import { findTag } from './study/studyChapters';
 import serverSideUnderboard from './serverSideUnderboard';
 import * as gridHacks from './gridHacks';
 import * as Prefs from 'common/prefs';
-import { allowedForVariant as allowClientEvalForVariant, allowPv } from 'ceval/src/util';
+import { allowedForVariant as allowClientEvalForVariant, allowPracticeWithComputer, allowPv } from 'ceval/src/util';
+import { playstrategyRules } from 'stratops/compat';
 
 function renderResult(ctrl: AnalyseCtrl): VNode[] {
   let result: string | undefined;
@@ -120,7 +128,7 @@ function inputs(ctrl: AnalyseCtrl): VNode | undefined {
             el.addEventListener('input', _ => {
               ctrl.fenInput = el.value;
               el.setCustomValidity(
-                parseFen(variantToRules(ctrl.data.game.variant.key))(el.value.trim()).isOk ? '' : 'Invalid FEN',
+                parseFen(playstrategyRules(ctrl.data.game.variant.key))(el.value.trim()).isOk ? '' : 'Invalid FEN',
               );
             });
           },
@@ -265,7 +273,9 @@ function controls(ctrl: AnalyseCtrl) {
                   }),
                 ]
               : [
-                  ctrl.ceval.allowed() && allowClientEvalForVariant(ctrl.ceval.variant.key)
+                  ctrl.ceval.allowed() &&
+                  allowClientEvalForVariant(ctrl.ceval.variant.key) &&
+                  allowExplorerForVariant(ctrl.ceval.variant.key)
                     ? h('button.fbt', {
                         attrs: {
                           title: noarg('openingExplorerAndTablebase'),
@@ -281,7 +291,8 @@ function controls(ctrl: AnalyseCtrl) {
                   ctrl.ceval.possible &&
                   ctrl.ceval.allowed() &&
                   allowClientEvalForVariant(ctrl.ceval.variant.key) &&
-                  !ctrl.isGamebook()
+                  !ctrl.isGamebook() &&
+                  allowPracticeWithComputer(ctrl.ceval.variant.key)
                     ? h('button.fbt', {
                         attrs: {
                           title: noarg('practiceWithComputer'),
@@ -385,6 +396,7 @@ function renderPlayerScore(
     const pieceClass = `piece.${defaultMancalaRole}${score.toString()}-piece.`;
     children.push(h(pieceClass + playerIndex, { attrs: { 'data-score': score } }));
     return h('div.game-score.game-score-' + position + '.' + playerIndex, children);
+  //TODO Grand Abalone handle 10 hole scoreboard
   } else if (variantKey === 'abalone') {
     const opp = playerIndex === 'p1' ? 'p2' : 'p1';
 
@@ -482,7 +494,7 @@ export default function (ctrl: AnalyseCtrl): VNode {
     needsInnerCoords =
       ((!!gaugeOn || !!playerBars) &&
         !['xiangqi', 'shogi', 'minixiangqi', 'minishogi', 'oware'].includes(variantKey)) ||
-      ['togyzkumalak', 'bestemshe', 'backgammon', 'hyper', 'nackgammon', 'abalone'].includes(variantKey),
+      ['togyzkumalak', 'bestemshe', 'backgammon', 'hyper', 'nackgammon', 'abalone', 'grandabalone'].includes(variantKey),
     needsOutterCoords =
       [
         'xiangqi',
@@ -523,7 +535,8 @@ export default function (ctrl: AnalyseCtrl): VNode {
         bottomScore = ctrl.topPlayerIndex() === 'p2' ? p1Score : p2Score;
         break;
       }
-      case 'abalone': {
+      case 'abalone':
+      case 'grandabalone': {
         const fen = ctrl.node.fen;
         const p1Score = getScoreFromFen(variantKey, fen, 'p1');
         const p2Score = getScoreFromFen(variantKey, fen, 'p2');
@@ -571,6 +584,7 @@ export default function (ctrl: AnalyseCtrl): VNode {
     'hyper',
     'nackgammon',
     'abalone',
+    'grandabalone'
   ].includes(variantKey)
     ? '.piece-letter'
     : '';

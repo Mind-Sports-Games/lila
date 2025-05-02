@@ -48,6 +48,7 @@ case class History(
     hyper: RatingsMap,
     nackgammon: RatingsMap,
     abalone: RatingsMap,
+    grandabalone: RatingsMap,
     ultraBullet: RatingsMap,
     bullet: RatingsMap,
     blitz: RatingsMap,

@@ -8,7 +8,6 @@ import { makeSanAndPlay } from 'stratops/san';
 import { dimensionsForRules, opposite, parseUci } from 'stratops/util';
 import { parseFen, makeBoardFen } from 'stratops/fen';
 import { blackStartsVariant, noVariantOutcome, renderEval } from './util';
-import { variantToRules } from 'stratutils';
 import { getClassFromRules } from 'stratops/variants/utils';
 
 let gaugeLast = 0;
@@ -295,7 +294,7 @@ export const renderPvs =
     if (!instance.allowed() || !instance.possible || !instance.enabled()) return;
     const multiPv = parseInt(instance.multiPv()),
       node = ctrl.getNode(),
-      setup = parseFen(variantToRules(variantKey))(node.fen).unwrap();
+      setup = parseFen(playstrategyRules(variantKey))(node.fen).unwrap();
     let pvs: Tree.PvData[],
       threat = false,
       pvMoves: (string | null)[],
@@ -459,7 +458,7 @@ function renderPvBoard(ctrl: ParentCtrl, variantKey: VariantKey): VNode | undefi
   const { fen, uci } = pvBoard;
   const lastMove = uci[1] === '@' ? [uci.slice(2)] : [uci.slice(0, 2), uci.slice(2, 4)];
   const orientation = ctrl.getOrientation();
-  const dimensions = dimensionsForRules(variantToRules(variantKey));
+  const dimensions = dimensionsForRules(playstrategyRules(variantKey));
   const cgConfig = {
     ...{ dimensions: { width: dimensions.ranks, height: dimensions.files } },
     fen,

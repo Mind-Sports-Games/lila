@@ -337,6 +337,7 @@ case object Perfs {
       p,
       p,
       p,
+      p,
       Perf.Storm.default,
       Perf.Racer.default,
       Perf.Streak.default
@@ -403,6 +404,7 @@ case object Perfs {
       case Variant.Backgammon(strategygames.backgammon.variant.Hyper)            => Some(_.hyper)
       case Variant.Backgammon(strategygames.backgammon.variant.Nackgammon)       => Some(_.nackgammon)
       case Variant.Abalone(strategygames.abalone.variant.Abalone)                => Some(_.abalone)
+      case Variant.Abalone(strategygames.abalone.variant.GrandAbalone)           => Some(_.grandabalone)
       case _                                                                     => none
     }
 
@@ -588,10 +590,12 @@ case object Perfs {
       backgammon: List[User.LightPerf],
       hyper: List[User.LightPerf],
       nackgammon: List[User.LightPerf],
-      abalone: List[User.LightPerf]
+      abalone: List[User.LightPerf],
+      grandabalone: List[User.LightPerf]
   )
 
   val emptyLeaderboards = Leaderboards(
+    Nil,
     Nil,
     Nil,
     Nil,
