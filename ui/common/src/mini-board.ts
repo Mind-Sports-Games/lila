@@ -112,6 +112,7 @@ export const initWith = (
 export const initAll = (parent?: HTMLElement) =>
   Array.from((parent || document).getElementsByClassName('mini-board--init')).forEach(init);
 
+// @TODO: rename into variantKeyFromElement
 export const variantFromElement = (element: Cash): string => {
   return element.hasClass('variant-shogi')
     ? 'shogi'

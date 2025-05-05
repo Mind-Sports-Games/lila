@@ -18,8 +18,7 @@ import {
   Opts as BaseOpts,
 } from './treeView';
 import { enrichText, innerHTML, parentedNodes, parentedNode, fullTurnNodesFromNode } from '../util';
-import { getClassFromRules } from 'stratops/variants/utils';
-import { playstrategyRules } from 'stratops/compat';
+import { variantClassFromKey } from 'stratops/variants/util';
 
 interface Ctx extends BaseCtx {
   concealOf: ConcealOf;
@@ -150,7 +149,7 @@ function renderMainlineFullMoveOf(ctx: Ctx, node: Tree.ParentedNode, opts: Opts)
     moveView.renderFullMove(
       { variant: ctx.ctrl.data.game.variant, ...ctx },
       node,
-      getClassFromRules(playstrategyRules(ctx.ctrl.data.game.variant.key)).getNotationStyle(),
+      variantClassFromKey(ctx.ctrl.data.game.variant.key).getNotationStyle(),
     ),
   );
 }
@@ -158,7 +157,7 @@ function renderMainlineFullMoveOf(ctx: Ctx, node: Tree.ParentedNode, opts: Opts)
 function renderVariationFullMoveOf(ctx: Ctx, node: Tree.ParentedNode, opts: Opts): VNode {
   const fullTurnNodes: Tree.ParentedNode[] = fullTurnNodesFromNode(node);
   const variant = ctx.ctrl.data.game.variant;
-  const notation = getClassFromRules(playstrategyRules(variant.key)).getNotationStyle();
+  const notation = variantClassFromKey(variant.key).getNotationStyle();
   const withIndex = opts.withIndex || node.playedPlayerIndex === 'p1',
     path = opts.parentPath + node.id,
     content: MaybeVNodes = [
@@ -166,7 +165,7 @@ function renderVariationFullMoveOf(ctx: Ctx, node: Tree.ParentedNode, opts: Opts
       // TODO: the || '' are probably not correct
       moveView.combinedNotationOfTurn(
         fullTurnNodes.map(n => {
-          return getClassFromRules(playstrategyRules(variant.key)).computeMoveNotation({
+          return variantClassFromKey(variant.key).computeMoveNotation({
             san: fixCrazySan(n.san || ''),
             uci: n.uci || '',
             fen: n.fen,
@@ -214,7 +213,7 @@ function renderVariationMoveOf(ctx: Ctx, node: Tree.ParentedNode, opts: Opts): V
     content: MaybeVNodes = [
       withIndex ? moveView.renderIndex(node, true) : null,
       // TODO: the || '' are probably not correct
-      getClassFromRules(playstrategyRules(variant.key)).computeMoveNotation({
+      variantClassFromKey(variant.key).computeMoveNotation({
         san: fixCrazySan(node.san || ''),
         uci: node.uci || '',
         fen: node.fen,

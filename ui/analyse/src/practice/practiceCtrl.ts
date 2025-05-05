@@ -8,7 +8,7 @@ import { defined, prop, Prop } from 'common';
 import { altCastles } from 'stratutils';
 import { parseUci } from 'stratops/util';
 import { makeSan } from 'stratops/san';
-import { playstrategyRules } from 'stratops/compat';
+import { variantKeyToRules } from 'stratops/variants/util';
 
 declare type Verdict = 'goodMove' | 'inaccuracy' | 'mistake' | 'blunder';
 
@@ -114,7 +114,7 @@ export function make(root: AnalyseCtrl, playableDepth: () => number): PracticeCt
       else verdict = 'blunder';
     }
 
-    const rules = playstrategyRules(variant);
+    const rules = variantKeyToRules(variant);
     return {
       prev,
       node,
