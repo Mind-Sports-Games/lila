@@ -47,7 +47,7 @@ import serverSideUnderboard from './serverSideUnderboard';
 import * as gridHacks from './gridHacks';
 import * as Prefs from 'common/prefs';
 import { allowedForVariant as allowClientEvalForVariant, allowPracticeWithComputer, allowPv } from 'ceval/src/util';
-import { playstrategyRules } from 'stratops/compat';
+import { variantKeyToRules } from 'stratops/variants/util';
 
 function renderResult(ctrl: AnalyseCtrl): VNode[] {
   let result: string | undefined;
@@ -128,7 +128,7 @@ function inputs(ctrl: AnalyseCtrl): VNode | undefined {
             el.addEventListener('input', _ => {
               ctrl.fenInput = el.value;
               el.setCustomValidity(
-                parseFen(playstrategyRules(ctrl.data.game.variant.key))(el.value.trim()).isOk ? '' : 'Invalid FEN',
+                parseFen(variantKeyToRules(ctrl.data.game.variant.key))(el.value.trim()).isOk ? '' : 'Invalid FEN',
               );
             });
           },

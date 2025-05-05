@@ -1,7 +1,7 @@
-import { playstrategyRules } from 'stratops/compat';
 import { ProtocolOpts, Work } from './types';
 import { Deferred, defer } from 'common/defer';
 import { Sync, sync } from 'common/sync';
+import { variantKeyToRules } from 'stratops/variants/util';
 
 const evalRegex = new RegExp(
   '' +
@@ -42,7 +42,7 @@ export default class Protocol {
     // Handle variants ("giveaway" is antichess in old asmjs fallback).
     this.setOption('UCI_Chess960', 'true');
     if (this.opts.variant === 'antichess') this.setOption('UCI_Variant', 'giveaway');
-    else this.setOption('UCI_Variant', playstrategyRules(this.opts.variant));
+    else this.setOption('UCI_Variant', variantKeyToRules(this.opts.variant));
   }
 
   private setOption(name: string, value: string | number): void {
@@ -51,7 +51,7 @@ export default class Protocol {
 
   setVariant(variant: VariantKey): void {
     // allow to switch variant from study
-    this.setOption('UCI_Variant', playstrategyRules(variant));
+    this.setOption('UCI_Variant', variantKeyToRules(variant));
   }
 
   received(text: string): void {
