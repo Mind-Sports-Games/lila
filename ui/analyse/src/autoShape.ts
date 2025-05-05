@@ -3,8 +3,7 @@ import * as cg from 'chessground/types';
 import { opposite } from 'chessground/util';
 import { DrawModifiers, DrawShape } from 'chessground/draw';
 import AnalyseCtrl from './ctrl';
-import { getClassFromRules } from 'stratops/variants/utils';
-import { playstrategyRules } from 'stratops/compat';
+import { variantClassFromKey } from 'stratops/variants/util';
 
 function pieceDrop(key: cg.Key, role: cg.Role, playerIndex: PlayerIndex): DrawShape {
   return {
@@ -25,7 +24,7 @@ export function makeShapesFromUci(
   variant: VariantKey = 'standard',
   modifiers?: DrawModifiers,
 ): DrawShape[] {
-  const move = getClassFromRules(playstrategyRules(variant)).parseLexicalUci(uci);
+  const move = variantClassFromKey(variant).parseLexicalUci(uci);
   if (move === undefined) return [];
 
   const to = move.to;
@@ -120,7 +119,7 @@ export function compute(ctrl: AnalyseCtrl): DrawShape[] {
       const glyph = glyphs[0];
       const svg = (glyphToSvg as Dictionary<string>)[glyph.symbol];
       if (svg) {
-        const move = getClassFromRules(playstrategyRules(variant)).parseLexicalUci(uci)!;
+        const move = variantClassFromKey(variant).parseLexicalUci(uci)!;
         const destSquare = san.startsWith('O-O') // castle, short or long
           ? move.to[1] === '1' // p1 castle
             ? san === 'O-O-O'

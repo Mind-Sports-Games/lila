@@ -10,9 +10,8 @@ import * as Prefs from 'common/prefs';
 import AnalyseCtrl from './ctrl';
 import { isOnlyDropsPly } from './util';
 import * as stratUtils from 'stratutils';
-import { getClassFromRules } from 'stratops/variants/utils';
+import { variantClassFromKey } from 'stratops/variants/util';
 import { NotationStyle } from 'stratops/variants/types';
-import { playstrategyRules } from 'stratops/compat';
 
 export function render(ctrl: AnalyseCtrl): VNode {
   return h('div.cg-wrap.cgv' + ctrl.cgVersion.js, {
@@ -165,8 +164,7 @@ export function makeConfig(ctrl: AnalyseCtrl): CgConfig {
     onlyDropsVariant: isOnlyDropsPly(ctrl.node, variantKey, d.onlyDropsVariant),
     singleClickMoveVariant:
       ctrl.data.game.gameFamily === 'togyzkumalak' ||
-      (getClassFromRules(playstrategyRules(d.game.variant.key)).getNotationStyle() === NotationStyle.man &&
-        d.pref.mancalaMove),
+      (variantClassFromKey(d.game.variant.key).getNotationStyle() === NotationStyle.man && d.pref.mancalaMove),
   };
   ctrl.study && ctrl.study.mutateCgConfig(config);
   return config;

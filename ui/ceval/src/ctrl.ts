@@ -7,8 +7,7 @@ import throttle from 'common/throttle';
 import { povChances } from './winningChances';
 import { allowedForVariant, sanIrreversible } from './util';
 import { Cache } from './cache';
-import { getClassFromRules } from 'stratops/variants/utils';
-import { playstrategyRules } from 'stratops/compat';
+import { variantClassFromKey } from 'stratops/variants/util';
 
 function sharedWasmMemory(initial: number, maximum: number): WebAssembly.Memory {
   return new WebAssembly.Memory({ shared: true, initial, maximum } as WebAssembly.MemoryDescriptor);
@@ -155,11 +154,7 @@ export default function (opts: CevalOpts): CevalCtrl {
     if (['minishogi', 'shogi'].includes(opts.variant.key)) {
       ev.pvs.map(pv => {
         if (pv.moves[0]?.endsWith('+'))
-          pv.moves.splice(
-            0,
-            1,
-            getClassFromRules(playstrategyRules(opts.variant.key)).patchFairyUci(pv.moves[0], ev.fen),
-          );
+          pv.moves.splice(0, 1, variantClassFromKey(opts.variant.key).patchFairyUci(pv.moves[0], ev.fen));
       });
     }
     sortPvsInPlace(ev.pvs, work.ply % 2 === (work.threatMode ? 1 : 0) ? 'p1' : 'p2');

@@ -32,7 +32,7 @@ import { defined, prop, Prop } from 'common';
 import { DrawShape } from 'chessground/draw';
 import { ExplorerCtrl } from './explorer/interfaces';
 import { ForecastCtrl } from './forecast/interfaces';
-import { playstrategyRules, amazonsChessgroundFen } from 'stratops/compat';
+import { amazonsChessgroundFen } from 'stratops/compat';
 import { make as makeEvalCache, EvalCache } from './evalCache';
 import { make as makeForecast } from './forecast/forecastCtrl';
 import { make as makeFork, ForkCtrl } from './fork';
@@ -51,7 +51,7 @@ import { AnaMove, AnaDrop, AnaPass, StudyCtrl } from './study/interfaces';
 import { StudyPracticeCtrl } from './study/practice/interfaces';
 import { valid as crazyValid } from './crazy/crazyCtrl';
 import { isOnlyDropsPly } from './util';
-import { getClassFromRules } from 'stratops/variants/utils';
+import { variantClassFromKey, variantKeyToRules } from 'stratops/variants/util';
 
 export default class AnalyseCtrl {
   data: AnalyseData;
@@ -726,7 +726,7 @@ export default class AnalyseCtrl {
       variant: this.data.game.variant,
       standardMaterial:
         !this.data.game.initialFen ||
-        parseFen(playstrategyRules(this.data.game.variant.key))(this.data.game.initialFen).unwrap(
+        parseFen(variantKeyToRules(this.data.game.variant.key))(this.data.game.initialFen).unwrap(
           setup =>
             PLAYERINDEXES.every(playerIndex => {
               const board = setup.board;
@@ -767,8 +767,8 @@ export default class AnalyseCtrl {
   }
 
   position(node: Tree.Node): Result<Position, PositionError> {
-    const setup = parseFen(playstrategyRules(this.data.game.variant.key))(node.fen).unwrap();
-    return getClassFromRules(playstrategyRules(this.data.game.variant.key)).fromSetup(setup);
+    const setup = parseFen(variantKeyToRules(this.data.game.variant.key))(node.fen).unwrap();
+    return variantClassFromKey(this.data.game.variant.key).fromSetup(setup);
   }
 
   canUseCeval(): boolean {
@@ -917,15 +917,15 @@ export default class AnalyseCtrl {
   }
 
   playUci(uci: Uci): void {
-    const move = parseUci(playstrategyRules(this.data.game.variant.key))(uci)!;
-    const to = makeSquare(playstrategyRules(this.data.game.variant.key))(move.to);
+    const move = parseUci(variantKeyToRules(this.data.game.variant.key))(uci)!;
+    const to = makeSquare(variantKeyToRules(this.data.game.variant.key))(move.to);
     if (isNormal(move)) {
       const piece = this.chessground.state.pieces.get(
-        makeSquare(playstrategyRules(this.data.game.variant.key))(move.from),
+        makeSquare(variantKeyToRules(this.data.game.variant.key))(move.from),
       );
       const capture = this.chessground.state.pieces.get(to);
       this.sendMove(
-        makeSquare(playstrategyRules(this.data.game.variant.key))(move.from),
+        makeSquare(variantKeyToRules(this.data.game.variant.key))(move.from),
         to,
         capture && piece && capture.playerIndex !== piece.playerIndex ? capture : undefined,
         move.promotion,

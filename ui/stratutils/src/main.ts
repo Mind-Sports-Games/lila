@@ -2,8 +2,7 @@ import { piotr } from './piotr';
 import * as status from 'game/status';
 import type * as cg from 'chessground/types';
 import type { BaseGame } from 'game';
-import { playstrategyRules } from 'stratops/compat';
-import { getClassFromRules } from 'stratops/variants/utils';
+import { variantClassFromKey } from 'stratops/variants/util';
 
 // TODO: For some reason we can't import this like:
 // import * from 'stratutils/promotion'
@@ -58,7 +57,7 @@ export const altCastles = {
 
 // 3 check and 5 check dont have consistent fen formats, its calculated from running through game plys.
 export function getScore(variant: VariantKey, fen: string, playerIndex: string): number | undefined {
-  return getClassFromRules(playstrategyRules(variant)).getScoreFromFen(fen, playerIndex);
+  return variantClassFromKey(variant).getScoreFromFen(fen, playerIndex);
 }
 
 export function displayScore(variant: VariantKey, fen: string, playerIndex: string): string {

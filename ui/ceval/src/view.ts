@@ -3,12 +3,11 @@ import { defined } from 'common';
 import { Eval, CevalCtrl, ParentCtrl, NodeEvals } from './types';
 import { h, VNode } from 'snabbdom';
 import { Position } from 'stratops/chess';
-import { playstrategyRules } from 'stratops/compat';
 import { makeSanAndPlay } from 'stratops/san';
-import { dimensionsForRules, opposite, parseUci } from 'stratops/util';
+import { opposite, parseUci } from 'stratops/util';
 import { parseFen, makeBoardFen } from 'stratops/fen';
 import { blackStartsVariant, noVariantOutcome, renderEval } from './util';
-import { getClassFromRules } from 'stratops/variants/utils';
+import { variantClassFromKey, variantKeyToRules } from 'stratops/variants/util';
 
 let gaugeLast = 0;
 const gaugeTicks: VNode[] = [...Array(8).keys()].map(i =>
@@ -294,7 +293,7 @@ export const renderPvs =
     if (!instance.allowed() || !instance.possible || !instance.enabled()) return;
     const multiPv = parseInt(instance.multiPv()),
       node = ctrl.getNode(),
-      setup = parseFen(playstrategyRules(variantKey))(node.fen).unwrap();
+      setup = parseFen(variantKeyToRules(variantKey))(node.fen).unwrap();
     let pvs: Tree.PvData[],
       threat = false,
       pvMoves: (string | null)[],
@@ -308,7 +307,7 @@ export const renderPvs =
       setup.turn = opposite(setup.turn);
       if (setup.turn == 'p1') setup.fullmoves += 1;
     }
-    const pos = getClassFromRules(playstrategyRules(instance.variant.key)).fromSetup(setup);
+    const pos = variantClassFromKey(instance.variant.key).fromSetup(setup);
 
     return h(
       'div.pv_box',
@@ -406,7 +405,7 @@ function renderPvWrapToggle(): VNode {
 
 function renderPvMoves(pos: Position, pv: Uci[], variantKey: VariantKey): VNode[] {
   const vnodes: VNode[] = [];
-  const rules = playstrategyRules(variantKey);
+  const rules = variantKeyToRules(variantKey);
   const prevBoard = pos.board.clone();
   const prevFen = makeBoardFen(rules)(prevBoard);
   let key = prevFen;
@@ -437,7 +436,7 @@ function renderPvMoves(pos: Position, pv: Uci[], variantKey: VariantKey): VNode[
             'data-board': `${fen}|${uci}`,
           },
         },
-        getClassFromRules(playstrategyRules(variantKey)).computeMoveNotation({
+        variantClassFromKey(variantKey).computeMoveNotation({
           san,
           uci,
           fen,
@@ -458,7 +457,7 @@ function renderPvBoard(ctrl: ParentCtrl, variantKey: VariantKey): VNode | undefi
   const { fen, uci } = pvBoard;
   const lastMove = uci[1] === '@' ? [uci.slice(2)] : [uci.slice(0, 2), uci.slice(2, 4)];
   const orientation = ctrl.getOrientation();
-  const dimensions = dimensionsForRules(playstrategyRules(variantKey));
+  const dimensions = variantClassFromKey(variantKey).getBoardDimensions();
   const cgConfig = {
     ...{ dimensions: { width: dimensions.ranks, height: dimensions.files } },
     fen,
