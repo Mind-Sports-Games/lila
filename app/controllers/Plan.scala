@@ -15,6 +15,7 @@ import lila.plan.{
   MonthlyCustomerInfo,
   NextUrls,
   OneTimeCustomerInfo,
+  Patron,
   PayPalOrderId,
   PayPalSubscription,
   PayPalSubscriptionId,
@@ -42,7 +43,7 @@ final class Plan(env: Env)(implicit system: akka.actor.ActorSystem) extends Lila
             }
           case Synced(Some(patron), Some(stripeCus), _) => indexStripePatron(me, patron, stripeCus)
           case Synced(Some(patron), _, Some(payPalSub)) => indexPayPalPatron(me, patron, payPalSub)
-          case Synced(_, _)                             => indexFreeUser(me)
+          case _                                        => indexFreeUser(me)
         }
       }
     }
@@ -76,7 +77,7 @@ final class Plan(env: Env)(implicit system: akka.actor.ActorSystem) extends Lila
     } yield Ok(
       html.plan.index(
         stripePublicKey = env.plan.stripePublicKey,
-        payPalPublicKey = env.plan.payPalCheckoutSetting.get() option env.plan.payPalPublicKey,
+        payPalPublicKey = env.plan.payPalPublicKey,
         email = email,
         patron = patron,
         recentIds = recentIds,
@@ -100,7 +101,7 @@ final class Plan(env: Env)(implicit system: akka.actor.ActorSystem) extends Lila
 
   private def indexPayPalPatron(me: UserModel, patron: lila.plan.Patron, subscription: PayPalSubscription)(
       implicit ctx: Context
-  ) = Ok(html.plan.indexPayPal(me, patron, subscription))
+  ) = Ok(html.plan.indexPayPal(me, patron, subscription)).fuccess
 
   def features =
     Open { implicit ctx =>
@@ -198,7 +199,7 @@ final class Plan(env: Env)(implicit system: akka.actor.ActorSystem) extends Lila
     AuthBody { implicit ctx => me =>
       implicit val req = ctx.body
       CheckoutRateLimit(HTTPRequest ipAddress req) {
-        lila.plan.Checkout.form
+        lila.plan.PlanCheckout.form
           .bindFromRequest()
           .fold(
             err => {
@@ -257,7 +258,7 @@ final class Plan(env: Env)(implicit system: akka.actor.ActorSystem) extends Lila
     AuthBody { implicit ctx => me =>
       implicit val req = ctx.body
       CheckoutRateLimit(ctx.ip) {
-        env.plan.checkoutForm.form
+        lila.plan.PlanCheckout.form
           .bindFromRequest()
           .fold(
             err => {
@@ -291,7 +292,6 @@ final class Plan(env: Env)(implicit system: akka.actor.ActorSystem) extends Lila
   //deprecated todo remove
   def payPalIpn =
     Action.async { implicit req =>
-      import lila.plan.Patron.PayPal
       lila.plan.PlanForm.ipn
         .bindFromRequest()
         .fold(
@@ -307,8 +307,8 @@ final class Plan(env: Env)(implicit system: akka.actor.ActorSystem) extends Lila
           ipn =>
             env.plan.api.payPal.onLegacyCharge(
               userId = ipn.userId,
-              email = ipn.email map PayPal.Email.apply,
-              subId = ipn.subId map PayPal.SubId.apply,
+              email = ipn.email map Patron.PayPalLegacy.Email.apply,
+              subId = ipn.subId map Patron.PayPalLegacy.SubId.apply,
               cents = lila.plan.Cents(ipn.grossCents),
               name = ipn.name,
               txnId = ipn.txnId,

@@ -16,6 +16,7 @@ final class PlanWebhook(api: PlanApi)(implicit ec: scala.concurrent.ExecutionCon
         log.warn(s"Forged webhook $js")
         funit
       case Some(event) =>
+        import JsonHandlers.stripe._
         ~(for {
           id   <- (event \ "id").asOpt[String]
           name <- (event \ "type").asOpt[String]

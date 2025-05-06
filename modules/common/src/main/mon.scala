@@ -407,6 +407,9 @@ object mon {
   }
   object plan {
     // val paypal  = histogram("plan.amount").withTag("service", "paypal")
+    object paypalLegacy {
+      val amount = histogram("plan.amount").withTag("service", "paypal")
+    }
     object paypalCheckout {
       val amount           = histogram("plan.amount").withTag("service", "paypalCheckout")
       val fetchAccessToken = future("plan.paypal.accessToken")

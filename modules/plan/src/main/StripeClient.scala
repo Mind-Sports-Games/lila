@@ -222,5 +222,5 @@ object StripeClient {
       products: StripeProducts
   )
   implicit private[plan] val productsLoader: ConfigLoader[StripeProducts] = AutoConfig.loader[StripeProducts]
-  implicit private[plan] val configLoader: ConfigLoader[Config]           = AutoConfig.loader[Config]
+  implicit private[plan] val stripeConfigLoader: ConfigLoader[Config]     = AutoConfig.loader[Config]
 }

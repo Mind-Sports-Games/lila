@@ -63,7 +63,6 @@ object Patron {
   case class Stripe(customerId: StripeCustomerId)
 
   case class PayPalCheckout(
-      orderId: PayPalOrderId,
       payerId: PayPalPayerId,
       subscriptionId: Option[PayPalSubscriptionId]
   ) {

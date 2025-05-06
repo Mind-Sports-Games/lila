@@ -25,6 +25,7 @@ case class Cents(value: Int) extends AnyVal with Ordered[Cents] {
   def compare(other: Cents) = Integer.compare(value, other.value)
   def usd                   = Usd(BigDecimal(value, 2))
   override def toString     = usd.toString
+  def display               = toString
 }
 
 object Cents {
@@ -149,7 +150,7 @@ case class PayPalOrder(
   }
   def isApproved        = status == "APPROVED"
   def isApprovedCapture = isApproved && intent == "CAPTURE"
-  def capturedMoney     = isApprovedCapture ?? purchase_units.headOption.map(_.amount.money)
+  def capturedMoney     = isApprovedCapture ?? purchase_units.headOption.map(_.amount.cents)
   def country           = payer.address.flatMap(_.country_code)
 }
 case class PayPalPayment(amount: PayPalPrice)
@@ -161,7 +162,7 @@ case class PayPalSubscription(
     billing_info: PayPalBillingInfo
 ) {
   def country       = subscriber.address.flatMap(_.country_code)
-  def capturedMoney = billing_info.last_payment.amount.money
+  def capturedMoney = billing_info.last_payment.amount.cents
   def nextChargeAt  = billing_info.next_billing_time
   def isActive      = status == "ACTIVE"
 }

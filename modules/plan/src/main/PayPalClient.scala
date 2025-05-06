@@ -11,8 +11,8 @@ import scala.concurrent.duration._
 import lila.common.config
 import lila.memo.CacheApi
 import lila.user.User
-import java.util.Currency
 import play.api.libs.ws.StandaloneWSRequest
+import play.api.ConfigLoader
 
 final private class PayPalClient(
     ws: StandaloneWSClient,
@@ -34,13 +34,18 @@ final private class PayPalClient(
 
   private val patronMonthProductId = "PATRON-MONTH"
 
-  private val plans = cacheApi(32, "plan.payPal.plans") {
-    _.buildAsyncFuture[Currency, PayPalPlan] { cur =>
-      getPlans() flatMap {
-        _.find(p => p.currency.has(cur)).fold(createPlan(cur))(fuccess)
-      }
+  // private val plans = cacheApi(32, "plan.payPal.plans") {
+  //   _.buildAsyncFuture { _ =>
+  //     getPlans() flatMap {
+  //       _.filter(_.nonEmpty).fold(createPlan)(fuccess)
+  //     }
+  //   }
+  // }
+
+  private def plans: Fu[PayPalPlan] =
+    getPlans() flatMap {
+      _.headOption.fold(createPlan)(fuccess)
     }
-  }
 
   def createOrder(data: CreatePayPalOrder): Fu[PayPalOrderCreated] = postOne[PayPalOrderCreated](
     path.orders,
@@ -49,22 +54,25 @@ final private class PayPalClient(
       "purchase_units" -> List(
         Json.obj(
           "custom_id" -> data.makeCustomId,
-          "amount"    -> data.checkout.money
-        ),
-        "items" -> List(
-          Json.obj(
-            "name"        -> "One-time Patron",
-            "description" -> "Support PlayStrategy and get the Patron wings for one month. Will not renew automatically.",
-            "unit_amount" -> data.checkout.money,
-            "quantity"    -> 1
+          "amount" -> Json.obj(
+            "product"     -> patronMonthProductId,
+            "unit_amount" -> data.checkout.amount.value
           )
+        )
+      ),
+      "items" -> List(
+        Json.obj(
+          "name"        -> "One-time Patron",
+          "description" -> "Support PlayStrategy and get the Patron wings for one month. Will not renew automatically.",
+          "unit_amount" -> data.checkout.amount.value,
+          "quantity"    -> 1
         )
       )
     )
   )
 
   def createSubscription(checkout: PlanCheckout, user: User): Fu[PayPalSubscriptionCreated] =
-    plans.get(checkout.money.currency) flatMap { plan =>
+    plans flatMap { plan =>
       postOne[PayPalSubscriptionCreated](
         path.subscriptions,
         Json.obj(
@@ -76,7 +84,7 @@ final private class PayPalClient(
                 "sequence"     -> 1,
                 "total_cycles" -> 0,
                 "pricing_scheme" -> Json.obj(
-                  "fixed_price" -> checkout.money
+                  "fixed_price" -> checkout.amount.value
                 )
               )
             )
@@ -114,13 +122,13 @@ final private class PayPalClient(
       else fuccess(plans)
     }.map(_.filter(_.active))
 
-  def createPlan(currency: Currency): Fu[PayPalPlan] =
+  def createPlan: Fu[PayPalPlan] =
     postOne[PayPalPlan](
       path.plans,
       Json.obj(
         "product_id"  -> patronMonthProductId,
-        "name"        -> s"Monthly Patron $currency",
-        "description" -> s"Support PlayStrategy and get Patron wings. The subscription is renewed every month. Currency: $currency",
+        "name"        -> s"Monthly Patron USD",
+        "description" -> s"Support PlayStrategy and get Patron wings. The subscription is renewed every month. Currency: USD",
         "status"      -> "ACTIVE",
         "billing_cycles" -> Json.arr(
           Json.obj(
@@ -134,7 +142,7 @@ final private class PayPalClient(
             "pricing_scheme" -> Json.obj(
               "fixed_price" -> Json.obj(
                 "value"         -> "1",
-                "currency_code" -> currency.getCurrencyCode
+                "currency_code" -> "USD"
               )
             )
           )
@@ -245,5 +253,5 @@ object PayPalClient {
       @ConfigName("keys.secret") secretKey: config.Secret
   )
   //implicit private[plan] val productsLoader     = AutoConfig.loader[ProductIds]
-  implicit private[plan] val payPalConfigLoader = AutoConfig.loader[Config]
+  implicit private[plan] val payPalConfigLoader: ConfigLoader[Config] = AutoConfig.loader[Config]
 }

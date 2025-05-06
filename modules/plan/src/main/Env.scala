@@ -15,7 +15,7 @@ private class PlanConfig(
     @ConfigName("collection.charge") val chargeColl: CollName,
     val stripe: StripeClient.Config,
     val payPal: PayPalClient.Config,
-    @ConfigName("paypal.ipn_key") val payPalIpnKey: Secret
+    @ConfigName("payPal.ipn_key") val payPalIpnKey: Secret
 )
 
 final class Env(
@@ -33,7 +33,6 @@ final class Env(
     system: akka.actor.ActorSystem
 ) {
 
-  import StripeClient.configLoader
   private val config = appConfig.get[PlanConfig]("plan")(AutoConfig.loader)
 
   val stripePublicKey = config.stripe.publicKey

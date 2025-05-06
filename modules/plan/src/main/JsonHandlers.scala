@@ -5,17 +5,16 @@ import play.api.libs.functional.syntax._
 
 private[plan] object JsonHandlers {
 
-  implicit val StripeCents: Reads[Cents] = Reads.of[Int].map(Cents.apply)
-  implicit val CountryReads              = Reads.of[String].map(Country)
+  implicit val StripeCents: Reads[Cents]    = Reads.of[Int].map(Cents.apply)
+  implicit val CountryReads: Reads[Country] = Reads.of[String].map(Country)
 
   object stripe {
-    implicit val SubscriptionIdReads: Reads[StripSubscriptionId] = Reads.of[String].map(StripeSubscriptionId)
-    implicit val SessionIdReads: Reads[StripeSessionId]          = Reads.of[String].map(StripeSessionId)
-    implicit val CustomerIdReads: Reads[StripeCustomerId]        = Reads.of[String].map(StripeCustomerId)
-    implicit val ChargeIdReads: Reads[StripeChargeId]            = Reads.of[String].map(StripeChargeId)
-    implicit val AmountReads: Reads[Cents]                       = Reads.of[Int].map(StripeAmount.apply)
-    implicit val PriceReads: Reads[StripePrice]                  = Json.reads[StripePrice]
-    implicit val ItemReads: Reads[StripeItem]                    = Json.reads[StripeItem]
+    implicit val SubscriptionIdReads: Reads[StripeSubscriptionId] = Reads.of[String].map(StripeSubscriptionId)
+    implicit val SessionIdReads: Reads[StripeSessionId]           = Reads.of[String].map(StripeSessionId)
+    implicit val CustomerIdReads: Reads[StripeCustomerId]         = Reads.of[String].map(StripeCustomerId)
+    implicit val ChargeIdReads: Reads[StripeChargeId]             = Reads.of[String].map(StripeChargeId)
+    implicit val PriceReads: Reads[StripePrice]                   = Json.reads[StripePrice]
+    implicit val ItemReads: Reads[StripeItem]                     = Json.reads[StripeItem]
     // require that the items array is not empty.
     implicit val SubscriptionReads: Reads[StripeSubscription] = (
       (__ \ "id").read[String] and
@@ -42,14 +41,14 @@ private[plan] object JsonHandlers {
   object payPal {
     import play.api.libs.json.JodaReads._
     implicit val PayerIdReads: Reads[PayPalPayerId]               = Reads.of[String].map(PayPalPayerId)
-    implicit val OrderIdReads: Reads[PayPalPayerId]               = Reads.of[String].map(PayPalOrderId)
+    implicit val OrderIdReads: Reads[PayPalOrderId]               = Reads.of[String].map(PayPalOrderId)
     implicit val SubscriptionIdReads: Reads[PayPalSubscriptionId] = Reads.of[String].map(PayPalSubscriptionId)
     implicit val EventIdReads: Reads[PayPalEventId]               = Reads.of[String].map(PayPalEventId)
     implicit val PlanIdReads: Reads[PayPalPlanId]                 = Reads.of[String].map(PayPalPlanId)
     implicit val OrderCreatedReads: Reads[PayPalOrderCreated]     = Json.reads[PayPalOrderCreated]
     implicit val SubscriptionCreatedReads: Reads[PayPalSubscriptionCreated] =
       Json.reads[PayPalSubscriptionCreated]
-    implicit val AmountReads: Reads[PayPalAmount]             = Json.reads[PayPalAmount]
+    implicit val AmountReads: Reads[PayPalPrice]              = Json.reads[PayPalPrice]
     implicit val PurchaseUnitReads: Reads[PayPalPurchaseUnit] = Json.reads[PayPalPurchaseUnit]
     implicit val AddressReads: Reads[PayPalAddress]           = Json.reads[PayPalAddress]
     implicit val PayerReads: Reads[PayPalPayer]               = Json.reads[PayPalPayer]

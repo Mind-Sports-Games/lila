@@ -40,8 +40,8 @@ object index {
               src := s"https://www.paypal.com/sdk/js?client-id=${payPalPublicKey}&vault=true&intent=subscription&currency=USD&locale=${ctx.lang.locale}",
               namespaceAttr := "paypalSubscription"
             )
-          )
-            jsModule "checkout",
+          ),
+          jsModule("checkout"),
           embedJsUnsafeLoadThen(s"""checkout.checkoutStart("$stripePublicKey")""")
         ),
       openGraph = lila.app.ui
@@ -204,7 +204,7 @@ object index {
                         href := s"${routes.Auth.login}?referrer=${routes.Plan.index}"
                       )(withCreditCard()),
                     // button(cls := "paypal button")(withPaypal())
-                    payPalPublicKey.isDefined option frag(
+                    (payPalPublicKey != "") option frag(
                       div(cls := "paypal paypal--order"),
                       div(cls := "paypal paypal--subscription"),
                       button(cls := "paypal button disabled paypal--disabled")("PAYPAL")
