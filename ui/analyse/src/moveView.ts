@@ -4,8 +4,7 @@ import { defined } from 'common';
 import { view as cevalView, renderEval as normalizeEval } from 'ceval';
 import { fullTurnNodesFromNode } from './util';
 import { NotationStyle } from 'stratops/variants/types';
-import { getClassFromRules } from 'stratops/variants/utils';
-import { playstrategyRules } from 'stratops/compat';
+import { variantClassFromKey } from 'stratops/variants/util';
 import { GameFamily as BackgammonFamily } from 'stratops/variants/backgammon/GameFamily';
 
 export interface Ctx {
@@ -46,7 +45,7 @@ export function renderMove(ctx: Ctx, node: Tree.ParentedNode): VNode[] {
     h(
       'move',
       // TODO: the || '' are probably not correct
-      getClassFromRules(playstrategyRules(ctx.variant.key)).computeMoveNotation({
+      variantClassFromKey(ctx.variant.key).computeMoveNotation({
         san: fixCrazySan(node.san || ''),
         uci: node.uci || '',
         fen: node.fen,
@@ -79,7 +78,7 @@ export function renderFullMove(ctx: Ctx, node: Tree.ParentedNode, style: Notatio
       // TODO: the || '' are probably not correct
       combinedNotationOfTurn(
         fullTurnNodes.map(n => {
-          return getClassFromRules(playstrategyRules(variant.key)).computeMoveNotation({
+          return variantClassFromKey(variant.key).computeMoveNotation({
             san: fixCrazySan(n.san || ''),
             uci: n.uci || '',
             fen: n.fen,

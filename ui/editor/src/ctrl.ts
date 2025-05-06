@@ -9,7 +9,7 @@ import { playstrategyVariants } from 'stratops/compat';
 import { makeFen, parseFen, parseCastlingFen, INITIAL_FEN, EMPTY_FEN, INITIAL_EPD } from 'stratops/fen';
 import * as fp from 'stratops/fp';
 import { defined, prop, Prop } from 'common';
-import { getClassFromRules } from 'stratops/variants/utils';
+import { variantClass } from 'stratops/variants/util';
 
 export default class EditorCtrl {
   cfg: Editor.Config;
@@ -114,7 +114,7 @@ export default class EditorCtrl {
   }
 
   private getLegalFen(): string | undefined {
-    return getClassFromRules(this.rules)
+    return variantClass(this.rules)
       .fromSetup(this.getSetup())
       .unwrap(
         pos => {
@@ -125,7 +125,7 @@ export default class EditorCtrl {
   }
 
   private isPlayable(): boolean {
-    return getClassFromRules(this.rules)
+    return variantClass(this.rules)
       .fromSetup(this.getSetup())
       .unwrap(
         pos => !pos.isEnd(),
@@ -169,7 +169,7 @@ export default class EditorCtrl {
     this.onChange();
   }
 
-  startPosition = () => this.setFen(makeFen('chess')(getClassFromRules(this.rules).default().toSetup()));
+  startPosition = () => this.setFen(makeFen('chess')(variantClass(this.rules).default().toSetup()));
 
   clearBoard = () => this.setFen(EMPTY_FEN);
 
