@@ -34,14 +34,6 @@ final private class PayPalClient(
 
   private val patronMonthProductId = "PATRON-MONTH"
 
-  // private val plans = cacheApi(32, "plan.payPal.plans") {
-  //   _.buildAsyncFuture { _ =>
-  //     getPlans() flatMap {
-  //       _.filter(_.nonEmpty).fold(createPlan)(fuccess)
-  //     }
-  //   }
-  // }
-
   private def plans: Fu[PayPalPlan] =
     getPlans() flatMap {
       _.headOption.fold(createPlan)(fuccess)
@@ -55,8 +47,11 @@ final private class PayPalClient(
         Json.obj(
           "custom_id" -> data.makeCustomId,
           "amount" -> Json.obj(
-            "product"     -> patronMonthProductId,
-            "unit_amount" -> data.checkout.amount.value
+            "currency_code" -> "USD",
+            "value"         -> data.checkout.amount.value,
+            "breakdown" -> Json.obj(
+              "item_total" -> Json.obj("currency_code" -> "USD", "value" -> data.checkout.amount.value)
+            )
           )
         )
       ),
@@ -64,7 +59,7 @@ final private class PayPalClient(
         Json.obj(
           "name"        -> "One-time Patron",
           "description" -> "Support PlayStrategy and get the Patron wings for one month. Will not renew automatically.",
-          "unit_amount" -> data.checkout.amount.value,
+          "unit_amount" -> Json.obj("currency_code" -> "USD", "value" -> data.checkout.amount.value),
           "quantity"    -> 1
         )
       )
@@ -84,7 +79,7 @@ final private class PayPalClient(
                 "sequence"     -> 1,
                 "total_cycles" -> 0,
                 "pricing_scheme" -> Json.obj(
-                  "fixed_price" -> checkout.amount.value
+                  "fixed_price" -> Json.obj("currency_code" -> "USD", "value" -> checkout.amount.value)
                 )
               )
             )

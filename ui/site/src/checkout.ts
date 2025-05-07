@@ -7,11 +7,14 @@ const showErrorThenReload = (error: string) => {
   location.assign('/patron');
 };
 
-export function checkoutStart(stripePublicKey: string) {
+export default function CheckoutStart(stripePublicKey: string) {
   const lifetime = {
     cents: parseInt($checkout.data('lifetime-cents')),
     usd: $checkout.data('lifetime-usd'),
   };
+
+  const toggleInput = ($input: Cash, enable: boolean) =>
+    $input.prop('disabled', !enable).toggleClass('disabled', !enable);
 
   const min = 100,
     max = 100 * 100000;
@@ -57,6 +60,17 @@ export function checkoutStart(stripePublicKey: string) {
     $(this).siblings('input').data('amount', cents).data('usd', usd);
   });
 
+  const $userInput = $checkout.find('input.user-autocomplete');
+
+  const toggleCheckout = () => {
+    const enabled = true; //alwsy true as no gifts
+    toggleInput($checkout.find('.service button'), enabled);
+    $checkout.find('.service .paypal--disabled').toggleClass('none', enabled);
+    $checkout.find('.service .paypal:not(.paypal--disabled)').toggleClass('none', !enabled);
+  };
+
+  $userInput.on('change', toggleCheckout).on('input', toggleCheckout);
+
   const getAmountToCharge = () => {
     const freq = getFreq(),
       cents =
@@ -72,8 +86,7 @@ export function checkoutStart(stripePublicKey: string) {
     $form.find('input.amount').val('' + amount);
     ($form[0] as HTMLFormElement).submit();
     $checkout.find('.service').html(playstrategy.spinnerHtml);
-    // $checkout.find('.service .paypal--disabled').toggleClass('none', true);
-    // $checkout.find('.service .paypal:not(.paypal--disabled)').toggleClass('none', false);
+    toggleCheckout();
   });
 
   const queryParams = new URLSearchParams(location.search);
@@ -81,6 +94,8 @@ export function checkoutStart(stripePublicKey: string) {
     if (queryParams.has(name))
       $(`input[name=${name}][value=${queryParams.get(name)?.replace(/[^a-z_-]/gi, '')}]`).trigger('click');
   }
+
+  toggleCheckout();
 
   payPalOrderStart($checkout, getAmountToCharge);
   payPalSubscriptionStart($checkout, getAmountToCharge);
@@ -188,3 +203,5 @@ function stripeStart($checkout: Cash, publicKey: string, getAmount: () => number
     window.stripeHandler.close();
   });
 }
+
+(window as any).CheckoutStart = CheckoutStart;

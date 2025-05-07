@@ -42,7 +42,7 @@ object index {
             )
           ),
           jsModule("checkout"),
-          embedJsUnsafeLoadThen(s"""checkout.checkoutStart("$stripePublicKey")""")
+          embedJsUnsafeLoadThen(s"""CheckoutStart("$stripePublicKey")""")
         ),
       openGraph = lila.app.ui
         .OpenGraph(

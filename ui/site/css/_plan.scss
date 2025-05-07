@@ -178,11 +178,16 @@
     .service .button {
       flex: 1 1 auto;
       font-weight: normal;
+      margin-right: 1em;
+      height: 55px;
     }
 
-    .service .button:first-child {
-      margin-right: 1em;
+    #paypal-button-container {
+      height: 55px;
     }
+    // .service .button:first-child {
+    //   margin-right: 1em;
+    // }
   }
 
   .small_team {
