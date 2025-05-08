@@ -2,9 +2,14 @@ package lila.plan
 
 import play.api.libs.json._
 import play.api.libs.functional.syntax._
+import java.util.Currency
+import scala.util.Try
 
 private[plan] object JsonHandlers {
 
+  implicit val CurrencyReads: Reads[Currency] = Reads.of[String].flatMapResult { code =>
+    Try(Currency getInstance code.toUpperCase).fold(err => JsError(err.getMessage), cur => JsSuccess(cur))
+  }
   implicit val StripeCents: Reads[Cents]    = Reads.of[Int].map(Cents.apply)
   implicit val CountryReads: Reads[Country] = Reads.of[String].map(Country)
 
@@ -48,7 +53,7 @@ private[plan] object JsonHandlers {
     implicit val OrderCreatedReads: Reads[PayPalOrderCreated]     = Json.reads[PayPalOrderCreated]
     implicit val SubscriptionCreatedReads: Reads[PayPalSubscriptionCreated] =
       Json.reads[PayPalSubscriptionCreated]
-    implicit val AmountReads: Reads[PayPalPrice]              = Json.reads[PayPalPrice]
+    implicit val AmountReads: Reads[PayPalAmount]             = Json.reads[PayPalAmount]
     implicit val PurchaseUnitReads: Reads[PayPalPurchaseUnit] = Json.reads[PayPalPurchaseUnit]
     implicit val AddressReads: Reads[PayPalAddress]           = Json.reads[PayPalAddress]
     implicit val PayerReads: Reads[PayPalPayer]               = Json.reads[PayPalPayer]

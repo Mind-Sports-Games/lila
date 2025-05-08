@@ -31,6 +31,7 @@
   <string name="otherAmount">Other</string>
   <string name="pleaseEnterAmount">Please enter an amount in USD</string>
   <string name="withCreditCard">Credit Card</string>
+  <string name="logInToDonate">Log in to donate</string>
   <string name="withPaypal">PayPal</string>
   <string name="weAreSmallTeam">We are a small team, so your support makes a huge difference!</string>
   <string name="celebratedPatrons">The celebrated Patrons who make PlayStrategy possible</string>

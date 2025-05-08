@@ -1,5 +1,6 @@
 package lila.plan
 
+import java.util.Currency
 import org.joda.time.DateTime
 import play.api.libs.json.{ JsArray, JsObject }
 
@@ -127,11 +128,11 @@ case class StripeSessionWithIntent(setup_intent: StripeSetupIntent)
 
 // payPal model
 
-case class PayPalPrice(product: String, unit_amount: Cents) {
-  def cents = unit_amount
-  def usd   = cents.usd
+case class PayPalAmount(value: BigDecimal, currency_code: Currency) {
+  def cents = Usd(value).cents
+  def usd   = Usd(value)
 }
-object PayPalPrice {
+object PayPalAmount {
   val defaultAmounts = List(5, 10, 20, 50).map(Usd.apply).map(_.cents)
 }
 
@@ -153,7 +154,7 @@ case class PayPalOrder(
   def capturedMoney     = isApprovedCapture ?? purchase_units.headOption.map(_.amount.cents)
   def country           = payer.address.flatMap(_.country_code)
 }
-case class PayPalPayment(amount: PayPalPrice)
+case class PayPalPayment(amount: PayPalAmount)
 case class PayPalBillingInfo(last_payment: PayPalPayment, next_billing_time: DateTime)
 case class PayPalSubscription(
     id: PayPalSubscriptionId,
@@ -175,7 +176,7 @@ case class CreatePayPalOrder(
 }
 case class PayPalOrderCreated(id: PayPalOrderId)
 case class PayPalSubscriptionCreated(id: PayPalSubscriptionId)
-case class PayPalPurchaseUnit(amount: PayPalPrice, custom_id: Option[String])
+case class PayPalPurchaseUnit(amount: PayPalAmount, custom_id: Option[String])
 case class PayPalPayerId(value: String) extends AnyVal with StringValue
 case class PayPalPayer(payer_id: PayPalPayerId, address: Option[PayPalAddress]) {
   def id = payer_id

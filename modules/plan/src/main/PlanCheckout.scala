@@ -37,13 +37,12 @@ object PlanCheckout {
   val form = Form[PlanCheckout](
     mapping(
       "email"  -> optional(email),
-      "amount" -> PlanCheckout.amountField, //number(min = 100, max = 100 * 100000),
+      "amount" -> PlanCheckout.amountField,
       "freq"   -> nonEmptyText
     )(PlanCheckout.make)(_.toFormData)
   )
 }
 
-//TODO check this all works and is correct?
 case class Switch(amount: BigDecimal) {
 
   def cents = Usd(amount).cents

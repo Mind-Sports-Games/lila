@@ -196,18 +196,21 @@ object index {
                     )
                   ),
                   div(cls := "service")(
-                    if (ctx.isAuth)
-                      button(cls := "stripe button")(withCreditCard())
-                    else
-                      a(
-                        cls := "stripe button",
-                        href := s"${routes.Auth.login}?referrer=${routes.Plan.index}"
-                      )(withCreditCard()),
-                    // button(cls := "paypal button")(withPaypal())
-                    (payPalPublicKey != "") option frag(
-                      div(cls := "paypal paypal--order"),
-                      div(cls := "paypal paypal--subscription"),
-                      button(cls := "paypal button disabled paypal--disabled")("PAYPAL")
+                    div(cls := "buttons")(
+                      if (ctx.isAuth)
+                        frag(
+                          button(cls := "stripe button")(withCreditCard()),
+                          (payPalPublicKey != "") option frag(
+                            div(cls := "paypal paypal--order"),
+                            div(cls := "paypal paypal--subscription"),
+                            button(cls := "paypal button disabled paypal--disabled")("PAYPAL")
+                          )
+                        )
+                      else
+                        a(
+                          cls := "button",
+                          href := s"${routes.Auth.login}?referrer=${routes.Plan.index}"
+                        )(logInToDonate())
                     )
                   )
                 )

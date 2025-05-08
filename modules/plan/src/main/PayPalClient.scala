@@ -48,9 +48,9 @@ final private class PayPalClient(
           "custom_id" -> data.makeCustomId,
           "amount" -> Json.obj(
             "currency_code" -> "USD",
-            "value"         -> data.checkout.amount.value,
+            "value"         -> data.checkout.amount.usd.value,
             "breakdown" -> Json.obj(
-              "item_total" -> Json.obj("currency_code" -> "USD", "value" -> data.checkout.amount.value)
+              "item_total" -> Json.obj("currency_code" -> "USD", "value" -> data.checkout.amount.usd.value)
             )
           )
         )
@@ -59,7 +59,7 @@ final private class PayPalClient(
         Json.obj(
           "name"        -> "One-time Patron",
           "description" -> "Support PlayStrategy and get the Patron wings for one month. Will not renew automatically.",
-          "unit_amount" -> Json.obj("currency_code" -> "USD", "value" -> data.checkout.amount.value),
+          "unit_amount" -> Json.obj("currency_code" -> "USD", "value" -> data.checkout.amount.usd.value),
           "quantity"    -> 1
         )
       )
@@ -79,7 +79,7 @@ final private class PayPalClient(
                 "sequence"     -> 1,
                 "total_cycles" -> 0,
                 "pricing_scheme" -> Json.obj(
-                  "fixed_price" -> Json.obj("currency_code" -> "USD", "value" -> checkout.amount.value)
+                  "fixed_price" -> Json.obj("currency_code" -> "USD", "value" -> checkout.amount.usd.value)
                 )
               )
             )

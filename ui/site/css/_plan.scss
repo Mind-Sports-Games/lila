@@ -170,24 +170,27 @@
     }
 
     .service {
-      display: flex;
-      justify-content: space-between;
-      font-size: 1.1em;
-    }
+      .buttons {
+        @extend %flex-between;
+        font-size: 1.1em;
 
-    .service .button {
-      flex: 1 1 auto;
-      font-weight: normal;
-      margin-right: 1em;
-      height: 55px;
-    }
+        .button {
+          flex: 1 1 auto;
+          font-weight: normal;
+          margin-right: 1em;
+          height: 55px;
+        }
 
-    #paypal-button-container {
-      height: 55px;
+        .paypal {
+          display: flex;
+          height: 55px;
+
+          iframe {
+            color-scheme: normal;
+          }
+        }
+      }
     }
-    // .service .button:first-child {
-    //   margin-right: 1em;
-    // }
   }
 
   .small_team {
