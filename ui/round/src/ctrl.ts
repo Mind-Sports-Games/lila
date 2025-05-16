@@ -307,6 +307,7 @@ export default class RoundController {
   private enpassant = (orig: cg.Key, dest: cg.Key): boolean => {
     if (
       [
+        'dameo',
         'xiangqi',
         'shogi',
         'minixiangqi',

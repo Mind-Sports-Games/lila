@@ -27,6 +27,7 @@
   <string name="russian">Russian</string>
   <string name="portuguese">Spanish</string>
   <string name="english">American/English</string>
+  <string name="dameo">Dameo</string>
   <string name="shogi">Shogi</string>
   <string name="xiangqi">Xiangqi</string>
   <string name="minishogi">Mini Shogi</string>

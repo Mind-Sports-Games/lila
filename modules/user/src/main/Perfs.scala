@@ -33,6 +33,7 @@ case class Perfs(
     pool: Perf,
     portuguese: Perf,
     english: Perf,
+    dameo: Perf,
     shogi: Perf,
     xiangqi: Perf,
     minishogi: Perf,
@@ -90,6 +91,7 @@ case class Perfs(
       "pool"                   -> pool,
       "portuguese"             -> portuguese,
       "english"                -> english,
+      "dameo"                  -> dameo,
       "shogi"                  -> shogi,
       "xiangqi"                -> xiangqi,
       "minishogi"              -> minishogi,
@@ -204,6 +206,7 @@ case class Perfs(
     "pool"                   -> pool,
     "portuguese"             -> portuguese,
     "english"                -> english,
+    "dameo"                  -> dameo,
     "shogi"                  -> shogi,
     "xiangqi"                -> xiangqi,
     "minishogi"              -> minishogi,
@@ -334,6 +337,7 @@ case object Perfs {
       p,
       p,
       p,
+      p,
       Perf.Storm.default,
       Perf.Racer.default,
       Perf.Streak.default
@@ -380,6 +384,7 @@ case object Perfs {
       case Variant.Draughts(strategygames.draughts.variant.Pool)             => Some(_.pool)
       case Variant.Draughts(strategygames.draughts.variant.Portuguese)       => Some(_.portuguese)
       case Variant.Draughts(strategygames.draughts.variant.English)          => Some(_.english)
+      case Variant.Dameo(strategygames.dameo.variant.Dameo)                  => Some(_.dameo)
       case Variant.FairySF(strategygames.fairysf.variant.Shogi)              => Some(_.shogi)
       case Variant.FairySF(strategygames.fairysf.variant.Xiangqi)            => Some(_.xiangqi)
       case Variant.FairySF(strategygames.fairysf.variant.MiniShogi)          => Some(_.minishogi)
@@ -444,6 +449,7 @@ case object Perfs {
         pool = perf("pool"),
         portuguese = perf("portuguese"),
         english = perf("english"),
+        dameo = perf("dameo"),
         shogi = perf("shogi"),
         xiangqi = perf("xiangqi"),
         minishogi = perf("minishogi"),
@@ -504,6 +510,7 @@ case object Perfs {
         "pool"                   -> notNew(o.pool),
         "portuguese"             -> notNew(o.portuguese),
         "english"                -> notNew(o.english),
+        "dameo"                  -> notNew(o.dameo),
         "shogi"                  -> notNew(o.shogi),
         "xiangqi"                -> notNew(o.xiangqi),
         "minishogi"              -> notNew(o.minishogi),
@@ -565,6 +572,7 @@ case object Perfs {
       pool: List[User.LightPerf],
       portuguese: List[User.LightPerf],
       english: List[User.LightPerf],
+      dameo: List[User.LightPerf],
       shogi: List[User.LightPerf],
       xiangqi: List[User.LightPerf],
       minishogi: List[User.LightPerf],
@@ -587,6 +595,7 @@ case object Perfs {
   )
 
   val emptyLeaderboards = Leaderboards(
+    Nil,
     Nil,
     Nil,
     Nil,

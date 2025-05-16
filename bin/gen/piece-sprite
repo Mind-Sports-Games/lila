@@ -37,6 +37,11 @@ draughts_themes = [
   ['fabirovsky','svg'],
   ['check_yb', 'png']
 ]
+dameo_themes = [
+  ['wide_crown_dameo', 'svg'],
+  ['fabirovsky_dameo','svg'],
+  ['check_yb_dameo', 'png']
+]
 loa_themes = [
   ['wide', 'svg'],
   ['fabirovsky_loa', 'svg'],
@@ -107,6 +112,16 @@ chess_variants = ['standard','chess960', 'fromPosition', 'kingOfTheHill', 'three
 draughts_variants = ['international','frisian','frysk','antidraughts','breakthrough','russian','brazilian','pool', 'portuguese', 'english']
 draughts_roles = ['man','king']
 draughts_invert_colors = ['english']
+dameo_variants = ['dameo']
+dameo_roles = [
+  ['m-piece', 'm'],
+  ['k-piece', 'k'],
+  ['g-piece', 'm'],
+  ['p-piece', 'k'],
+  ['a-piece', 'm'],
+  ['b-piece', 'k']
+]
+dameo_opacity_roles = ['g-piece', 'p-piece']
 lines_of_action_variants= ['linesOfAction', 'scrambledEggs']
 lines_of_action_roles = ['l-piece']
 flipello_roles = ['p-piece']
@@ -268,6 +283,65 @@ draughts_themes.map { |theme|
     }
   }.flatten
   File.open(dest_dir + 'draughts-' + name + '.external.css', 'w') { |f| f.puts (classes_draughts_game + classes_draughts_variant).join("\n") }
+}
+
+# inline SVG Dameo
+dameo_themes.map { |theme|
+  name = theme[0]
+  ext = theme[1]
+  classes_dameo_game = colors.map { |color|
+    dameo_roles.map { |role|
+      piece = color[0] + role[1].upcase[0]
+      opacity = dameo_opacity_roles.include?(role[0]) ? 'opacity:0.3; ' : ''
+      file = source_dir + 'dameo/' + name + '/' + piece + '.' + ext
+      File.open(file, 'r') do|image_file|
+        image = image_file.read
+        base64 = Base64.strict_encode64(image)
+        '.dameo.is2d .' + role[0] + '.' + (color == 'w' ? 'p1' : 'p2') + ' {' + opacity +
+          "background-image:url('data:image/" + types[ext] + base64 + "')}"
+      end
+    }
+  }.flatten
+  classes_dameo_variant = dameo_variants.map{ |variant|
+    colors.map { |color|
+      dameo_roles.map { |role|
+        piece = color[0] + role[1].upcase[0]
+        opacity = dameo_opacity_roles.include?(role[0]) ? 'opacity:0.3; ' : ''
+        file = source_dir + 'dameo/' + name + '/' + piece + '.' + ext
+        File.open(file, 'r') do|image_file|
+          image = image_file.read
+          base64 = Base64.strict_encode64(image)
+          '.is2d .variant-' + variant + ' .' + role[0] + '.' + (color == 'w' ? 'p1' : 'p2') + ' {' + opacity +
+            "background-image:url('data:image/" + types[ext] + base64 + "')}"
+        end
+      }
+    }
+  }.flatten
+  File.open(dest_dir + 'dameo-' + name + '.css', 'w') { |f| f.puts (classes_dameo_game + classes_dameo_variant).join("\n") }
+}
+# external SVG Dameo
+dameo_themes.map { |theme|
+  name = theme[0]
+  ext = theme[1]
+  classes_dameo_game = colors.map { |color|
+    dameo_roles.map { |role|
+      piece = color[0] + role[1].upcase[0]
+      opacity = dameo_opacity_roles.include?(role[0]) ? 'opacity:0.3; ' : ''
+      '.dameo.is2d .' + role[0] + '.' + (color == 'w' ? 'p1' : 'p2') + ' {' + opacity +
+        "background-image:url('/assets/piece/" + 'dameo/' + name + "/" + piece + "." + ext + "')}"
+    }
+  }.flatten
+  classes_dameo_variant =  dameo_variants.map { |variant|
+    colors.map { |color|
+      dameo_roles.map { |role|
+        piece = color[0] + role[1].upcase[0]
+        opacity = dameo_opacity_roles.include?(role[0]) ? 'opacity:0.3; ' : ''
+        '.is2d .variant-' + variant + ' .' + role[0] + '.' + (color == 'w' ? 'p2' : 'p1') + ' {' + opacity +
+          "background-image:url('/assets/piece/" + 'dameo/' + name + "/" + piece + "." + ext + "')}"
+      }
+    }
+  }.flatten
+  File.open(dest_dir + 'dameo-' + name + '.external.css', 'w') { |f| f.puts (classes_dameo_game + classes_dameo_variant).join("\n") }
 }
 
 # inline SVG loa

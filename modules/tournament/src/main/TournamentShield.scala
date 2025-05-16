@@ -867,6 +867,14 @@ object TournamentShield {
           1
         )
 
+    case object Dameo
+        extends Category(
+          Variant.Dameo(strategygames.dameo.variant.Dameo),
+          Blitz32,
+          14,
+          1
+        )
+
     case object Shogi
         extends Category(
           Variant.FairySF(strategygames.fairysf.variant.Shogi),
