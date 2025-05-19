@@ -60,6 +60,8 @@ However, Patrons get bragging rights with a cool new profile icon.</string>
   <string name="watkinsAddress">playstrategy.org is a division within Watkins Media Limited, a UK company:
 Company Registration Number: 9171151
 Company Registration Address: Shepperton House Unit 11, 89 Shepperton Road, London, England, N1 3DF</string>
+  <string name="playstrategyAddress">playstrategy.org is owned by PLAYSTRATEGY LTD, a UK company:
+Company Registration Number: 16026079</string>
   <string name="youSupportWith">You support playstrategy.org with %s per month.</string>
   <string name="tyvm">Thank you very much for your help. You rock!</string>
   <string name="currentStatus">Current status</string>

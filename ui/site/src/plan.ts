@@ -33,3 +33,6 @@ export function stripeStart(publicKey: string) {
 export function payPalStart() {
   changeForm();
 }
+
+(window as any).payPalStart = payPalStart;
+(window as any).stripeStart = stripeStart;

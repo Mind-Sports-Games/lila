@@ -219,7 +219,7 @@ object index {
             p(id := "error")(),
             p(cls := "small_team")(weAreSmallTeam()),
             faq,
-            p(cls := "watkins_address")(watkinsAddress()),
+            p(cls := "playstrategy_address")(playstrategyAddress()),
             div(cls := "best_patrons")(
               h2(celebratedPatrons()),
               div(cls := "list")(

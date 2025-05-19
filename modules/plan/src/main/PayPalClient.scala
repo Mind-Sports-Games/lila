@@ -32,7 +32,7 @@ final private class PayPalClient(
     val events        = "v1/notifications/webhooks-events"
   }
 
-  private val patronMonthProductId = "PATRON-MONTH"
+  private val patronMonthProductId = config.monthly
 
   private def plans: Fu[PayPalPlan] =
     getPlans() flatMap {
@@ -244,6 +244,7 @@ object PayPalClient {
   import io.methvin.play.autoconfig._
   private[plan] case class Config(
       endpoint: String,
+      @ConfigName("products.monthly") monthly: String,
       @ConfigName("keys.public") publicKey: String,
       @ConfigName("keys.secret") secretKey: config.Secret
   )

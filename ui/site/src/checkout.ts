@@ -123,7 +123,7 @@ function payPalOrderStart($checkout: Cash, getAmount: () => number | undefined) 
         const amount = getAmount();
         if (!amount) return;
         return xhr
-          .jsonAnyResponse(`/patron/paypal/checkout?currency=USD`, {
+          .jsonAnyResponse(`/patron/paypal/checkout`, {
             method: 'post',
             body: xhrFormData($checkout, amount),
           })
@@ -151,7 +151,7 @@ function payPalSubscriptionStart($checkout: Cash, getAmount: () => number | unde
         const amount = getAmount();
         if (!amount) return;
         return xhr
-          .jsonAnyResponse(`/patron/paypal/checkout?currency=USD`, {
+          .jsonAnyResponse(`/patron/paypal/checkout`, {
             method: 'post',
             body: xhrFormData($checkout, amount),
           })
