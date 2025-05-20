@@ -114,7 +114,6 @@ final class PlanApi(
         }
       }
 
-    //TODO where is there needed?
     def onCompletedSession(completedSession: StripeCompletedSession): Funit =
       customerIdPatron(completedSession.customer) flatMap {
         case None =>
