@@ -170,18 +170,26 @@
     }
 
     .service {
-      display: flex;
-      justify-content: space-between;
-      font-size: 1.1em;
-    }
+      .buttons {
+        @extend %flex-between;
+        font-size: 1.1em;
 
-    .service .button {
-      flex: 1 1 auto;
-      font-weight: normal;
-    }
+        .button {
+          flex: 1 1 auto;
+          font-weight: normal;
+          margin-right: 1em;
+          height: 55px;
+        }
 
-    .service .button:first-child {
-      margin-right: 1em;
+        .paypal {
+          display: flex;
+          height: 55px;
+
+          iframe {
+            color-scheme: normal;
+          }
+        }
+      }
     }
   }
 
@@ -225,7 +233,7 @@
     }
   }
 
-  .watkins_address {
+  .playstrategy_address {
     margin: 0 0 40px 0;
     padding: 0 0 40px 0;
     border-bottom: $border;

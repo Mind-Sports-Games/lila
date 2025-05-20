@@ -14,9 +14,12 @@ object index {
 
   private[plan] val stripeScript = script(src := "https://js.stripe.com/v3/")
 
+  private val namespaceAttr = attr("data-namespace")
+
   def apply(
       email: Option[lila.common.EmailAddress],
       stripePublicKey: String,
+      payPalPublicKey: String,
       patron: Option[lila.plan.Patron],
       recentIds: List[String],
       bestIds: List[String]
@@ -25,11 +28,22 @@ object index {
     views.html.base.layout(
       title = becomePatron.txt(),
       moreCss = cssTag("plan"),
-      moreJs = frag(
-        stripeScript,
-        jsModule("checkout"),
-        embedJsUnsafeLoadThen(s"""PlayStrategyCheckout("$stripePublicKey")""")
-      ),
+      moreJs = ctx.isAuth option
+        frag(
+          stripeScript,
+          frag(
+            script(
+              src := s"https://www.paypal.com/sdk/js?client-id=${payPalPublicKey}&currency=USD&locale=${ctx.lang.locale}",
+              namespaceAttr := "paypalOrder"
+            ),
+            script(
+              src := s"https://www.paypal.com/sdk/js?client-id=${payPalPublicKey}&vault=true&intent=subscription&currency=USD&locale=${ctx.lang.locale}",
+              namespaceAttr := "paypalSubscription"
+            )
+          ),
+          jsModule("checkout"),
+          embedJsUnsafeLoadThen(s"""CheckoutStart("$stripePublicKey")""")
+        ),
       openGraph = lila.app.ui
         .OpenGraph(
           title = becomePatron.txt(),
@@ -37,7 +51,7 @@ object index {
           description = freeChess.txt()
         )
         .some,
-      csp = defaultCsp.withStripe.some
+      csp = defaultCsp.withStripe.withPayPal.some
     ) {
       main(cls := "page-menu plan")(
         st.aside(cls := "page-menu__menu recent-patrons")(
@@ -87,54 +101,6 @@ object index {
                   attr("data-lifetime-usd") := lila.plan.Cents.lifetime.usd.toString,
                   attr("data-lifetime-cents") := lila.plan.Cents.lifetime.value
                 )(
-                  raw(s"""
-<form class="paypal_checkout onetime none" action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top">
-  <input type="hidden" name="custom" value="${~ctx.userId}">
-  <input type="hidden" name="amount" class="amount" value="">
-  <input type="hidden" name="cmd" value="_xclick">
-  <input type="hidden" name="business" value="F4YEG6EMBR3MU">
-  <input type="hidden" name="item_name" value="playstrategy.org one-time">
-  <input type="hidden" name="button_subtype" value="services">
-  <input type="hidden" name="no_note" value="1">
-  <input type="hidden" name="no_shipping" value="1">
-  <input type="hidden" name="rm" value="1">
-  <input type="hidden" name="return" value="https://playstrategy.org/patron/thanks">
-  <input type="hidden" name="cancel_return" value="https://playstrategy.org/patron">
-  <input type="hidden" name="lc" value="US">
-  <input type="hidden" name="currency_code" value="USD">
-</form>
-<form class="paypal_checkout monthly none" action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top">
-  <input type="hidden" name="custom" value="${~ctx.userId}">
-  <input type="hidden" name="a3" class="amount" value="">
-  <input type="hidden" name="cmd" value="_xclick-subscriptions">
-  <input type="hidden" name="business" value="F4YEG6EMBR3MU">
-  <input type="hidden" name="item_name" value="playstrategy.org monthly">
-  <input type="hidden" name="no_note" value="1">
-  <input type="hidden" name="no_shipping" value="1">
-  <input type="hidden" name="rm" value="1">
-  <input type="hidden" name="return" value="https://playstrategy.org/patron/thanks">
-  <input type="hidden" name="cancel_return" value="https://playstrategy.org/patron">
-  <input type="hidden" name="src" value="1">
-  <input type="hidden" name="p3" value="1">
-  <input type="hidden" name="t3" value="M">
-  <input type="hidden" name="lc" value="US">
-  <input type="hidden" name="currency_code" value="USD">
-</form>
-<form class="paypal_checkout lifetime none" action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top">
-  <input type="hidden" name="custom" value="${~ctx.userId}">
-  <input type="hidden" name="amount" class="amount" value="">
-  <input type="hidden" name="cmd" value="_xclick">
-  <input type="hidden" name="business" value="F4YEG6EMBR3MU">
-  <input type="hidden" name="item_name" value="playstrategy.org lifetime">
-  <input type="hidden" name="button_subtype" value="services">
-  <input type="hidden" name="no_note" value="1">
-  <input type="hidden" name="no_shipping" value="1">
-  <input type="hidden" name="rm" value="1">
-  <input type="hidden" name="return" value="https://playstrategy.org/patron/thanks">
-  <input type="hidden" name="cancel_return" value="https://playstrategy.org/patron">
-  <input type="hidden" name="lc" value="US">
-  <input type="hidden" name="currency_code" value="USD">
-</form>"""),
                   ctx.me map { me =>
                     p(style := "text-align:center;margin-bottom:1em")(
                       if (patron.exists(_.isLifetime))
@@ -220,14 +186,22 @@ object index {
                     )
                   ),
                   div(cls := "service")(
-                    if (ctx.isAuth)
-                      button(cls := "stripe button")(withCreditCard())
-                    else
-                      a(
-                        cls := "stripe button",
-                        href := s"${routes.Auth.login}?referrer=${routes.Plan.index}"
-                      )(withCreditCard()),
-                    button(cls := "paypal button")(withPaypal())
+                    div(cls := "buttons")(
+                      if (ctx.isAuth)
+                        frag(
+                          button(cls := "stripe button")(withCreditCard()),
+                          (payPalPublicKey != "") option frag(
+                            div(cls := "paypal paypal--order"),
+                            div(cls := "paypal paypal--subscription"),
+                            button(cls := "paypal button disabled paypal--disabled")("PAYPAL")
+                          )
+                        )
+                      else
+                        a(
+                          cls := "button",
+                          href := s"${routes.Auth.login}?referrer=${routes.Plan.index}"
+                        )(logInToDonate())
+                    )
                   )
                 )
               )
@@ -235,7 +209,7 @@ object index {
             p(id := "error")(),
             p(cls := "small_team")(weAreSmallTeam()),
             faq,
-            p(cls := "watkins_address")(watkinsAddress()),
+            p(cls := "playstrategy_address")(playstrategyAddress()),
             div(cls := "best_patrons")(
               h2(celebratedPatrons()),
               div(cls := "list")(

@@ -10,14 +10,18 @@ import lila.common.{ EmailAddress, HTTPRequest }
 import lila.plan.StripeClient.StripeException
 import lila.plan.{
   Cents,
-  Checkout,
   CreateStripeSession,
-  CustomerId,
   Freq,
   MonthlyCustomerInfo,
   NextUrls,
   OneTimeCustomerInfo,
-  StripeCustomer
+  Patron,
+  PayPalOrderId,
+  PayPalSubscription,
+  PayPalSubscriptionId,
+  PlanCheckout,
+  StripeCustomer,
+  StripeCustomerId
 }
 import lila.user.{ User => UserModel }
 import views._
@@ -33,12 +37,13 @@ final class Plan(env: Env)(implicit system: akka.actor.ActorSystem) extends Lila
         import lila.plan.PlanApi.SyncResult._
         env.plan.api.sync(me) flatMap {
           case ReloadUser => Redirect(routes.Plan.index).fuccess
-          case Synced(Some(patron), None) =>
+          case Synced(Some(patron), None, None) =>
             env.user.repo email me.id flatMap { email =>
               renderIndex(email, patron.some)
             }
-          case Synced(Some(patron), Some(customer)) => indexPatron(me, patron, customer)
-          case Synced(_, _)                         => indexFreeUser(me)
+          case Synced(Some(patron), Some(stripeCus), _) => indexStripePatron(me, patron, stripeCus)
+          case Synced(Some(patron), _, Some(payPalSub)) => indexPayPalPatron(me, patron, payPalSub)
+          case _                                        => indexFreeUser(me)
         }
       }
     }
@@ -48,9 +53,9 @@ final class Plan(env: Env)(implicit system: akka.actor.ActorSystem) extends Lila
       ctx.me.fold(Redirect(routes.Plan.index).fuccess) { me =>
         import lila.plan.PlanApi.SyncResult._
         env.plan.api.sync(me) flatMap {
-          case ReloadUser         => Redirect(routes.Plan.list).fuccess
-          case Synced(Some(_), _) => indexFreeUser(me)
-          case _                  => Redirect(routes.Plan.index).fuccess
+          case ReloadUser            => Redirect(routes.Plan.list).fuccess
+          case Synced(Some(_), _, _) => indexFreeUser(me)
+          case _                     => Redirect(routes.Plan.index).fuccess
         }
       }
     }
@@ -72,6 +77,7 @@ final class Plan(env: Env)(implicit system: akka.actor.ActorSystem) extends Lila
     } yield Ok(
       html.plan.index(
         stripePublicKey = env.plan.stripePublicKey,
+        payPalPublicKey = env.plan.payPalPublicKey,
         email = email,
         patron = patron,
         recentIds = recentIds,
@@ -79,10 +85,10 @@ final class Plan(env: Env)(implicit system: akka.actor.ActorSystem) extends Lila
       )
     )
 
-  private def indexPatron(me: UserModel, patron: lila.plan.Patron, customer: StripeCustomer)(implicit
+  private def indexStripePatron(me: UserModel, patron: lila.plan.Patron, customer: StripeCustomer)(implicit
       ctx: Context
   ) =
-    env.plan.api.customerInfo(me, customer) flatMap {
+    env.plan.api.stripe.customerInfo(me, customer) flatMap {
       case Some(info: MonthlyCustomerInfo) =>
         Ok(html.plan.indexStripe(me, patron, info, stripePublicKey = env.plan.stripePublicKey)).fuccess
       case Some(info: OneTimeCustomerInfo) =>
@@ -92,6 +98,10 @@ final class Plan(env: Env)(implicit system: akka.actor.ActorSystem) extends Lila
           renderIndex(email, patron.some)
         }
     }
+
+  private def indexPayPalPatron(me: UserModel, patron: lila.plan.Patron, subscription: PayPalSubscription)(
+      implicit ctx: Context
+  ) = Ok(html.plan.indexPayPal(me, patron, subscription)).fuccess
 
   def features =
     Open { implicit ctx =>
@@ -122,7 +132,7 @@ final class Plan(env: Env)(implicit system: akka.actor.ActorSystem) extends Lila
       // wait for the payment data from stripe or paypal
       lila.common.Future.delay(2.seconds) {
         ctx.me ?? env.plan.api.userPatron flatMap { patron =>
-          patron ?? env.plan.api.patronCustomer map { customer =>
+          patron ?? env.plan.api.stripe.patronCustomer map { customer =>
             Ok(html.plan.thanks(patron, customer))
           }
         }
@@ -131,9 +141,10 @@ final class Plan(env: Env)(implicit system: akka.actor.ActorSystem) extends Lila
 
   def webhook =
     Action.async(parse.json) { req =>
-      env.plan.webhookHandler(req.body) map { _ =>
-        Ok("kthxbye")
-      }
+      if (req.headers.hasHeader("PAYPAL-TRANSMISSION-SIG"))
+        env.plan.webhook.payPal(req.body) inject Ok("kthxbye")
+      else
+        env.plan.webhook.stripe(req.body) inject Ok("kthxbye")
     }
 
   def badStripeSession[A: Writes](err: A) = BadRequest(jsonError(err))
@@ -142,9 +153,11 @@ final class Plan(env: Env)(implicit system: akka.actor.ActorSystem) extends Lila
     badStripeSession("Stripe API call failed")
   }
 
-  private def createStripeSession(checkout: Checkout, customerId: CustomerId)(implicit ctx: Context) = {
+  private def createStripeSession(checkout: PlanCheckout, customerId: StripeCustomerId)(implicit
+      ctx: Context
+  ) = {
     for {
-      session <- env.plan.api
+      session <- env.plan.api.stripe
         .createSession(
           CreateStripeSession(
             customerId,
@@ -166,8 +179,16 @@ final class Plan(env: Env)(implicit system: akka.actor.ActorSystem) extends Lila
       .recover(badStripeApiCall)
   }
 
-  private val StripeRateLimit = lila.memo.RateLimit.composite[lila.common.IpAddress](
-    key = "stripe.checkout.ip",
+  private val CheckoutRateLimit = lila.memo.RateLimit.composite[lila.common.IpAddress](
+    key = "plan.checkout.ip",
+    enforce = env.net.rateLimit.value
+  )(
+    ("fast", 8, 10.minute),
+    ("slow", 40, 1.day)
+  )
+
+  private val CaptureRateLimit = lila.memo.RateLimit.composite[lila.common.IpAddress](
+    key = "plan.capture.ip",
     enforce = env.net.rateLimit.value
   )(
     ("fast", 8, 10.minute),
@@ -177,8 +198,8 @@ final class Plan(env: Env)(implicit system: akka.actor.ActorSystem) extends Lila
   def stripeCheckout =
     AuthBody { implicit ctx => me =>
       implicit val req = ctx.body
-      StripeRateLimit(HTTPRequest ipAddress req) {
-        lila.plan.Checkout.form
+      CheckoutRateLimit(HTTPRequest ipAddress req) {
+        lila.plan.PlanCheckout.form
           .bindFromRequest()
           .fold(
             err => {
@@ -186,13 +207,13 @@ final class Plan(env: Env)(implicit system: akka.actor.ActorSystem) extends Lila
               badStripeSession(err.toString).fuccess
             },
             checkout =>
-              env.plan.api.userCustomer(me) flatMap {
+              env.plan.api.stripe.userCustomer(me) flatMap {
                 case Some(customer) if checkout.freq == Freq.Onetime =>
                   createStripeSession(checkout, customer.id)
                 case Some(customer) if customer.firstSubscription.isDefined =>
                   switchStripePlan(me, checkout.amount)
                 case _ =>
-                  env.plan.api
+                  env.plan.api.stripe
                     .makeCustomer(me, checkout)
                     .flatMap(customer => createStripeSession(checkout, customer.id))
               }
@@ -203,10 +224,10 @@ final class Plan(env: Env)(implicit system: akka.actor.ActorSystem) extends Lila
   def updatePayment =
     AuthBody { implicit ctx => me =>
       implicit val req = ctx.body
-      StripeRateLimit(HTTPRequest ipAddress req) {
-        env.plan.api.userCustomer(me) flatMap {
+      CaptureRateLimit(HTTPRequest ipAddress req) {
+        env.plan.api.stripe.userCustomer(me) flatMap {
           _.flatMap(_.firstSubscription) ?? { sub =>
-            env.plan.api
+            env.plan.api.stripe
               .createPaymentUpdateSession(
                 sub,
                 NextUrls(
@@ -225,41 +246,47 @@ final class Plan(env: Env)(implicit system: akka.actor.ActorSystem) extends Lila
   def updatePaymentCallback =
     AuthBody { implicit ctx => me =>
       get("session") ?? { session =>
-        env.plan.api.userCustomer(me) flatMap {
+        env.plan.api.stripe.userCustomer(me) flatMap {
           _.flatMap(_.firstSubscription) ?? { sub =>
-            env.plan.api.updatePayment(sub, session) inject Redirect(routes.Plan.index)
+            env.plan.api.stripe.updatePayment(sub, session) inject Redirect(routes.Plan.index)
           }
         }
       }
     }
 
-  def payPalIpn =
-    Action.async { implicit req =>
-      import lila.plan.Patron.PayPal
-      lila.plan.PlanForm.ipn
-        .bindFromRequest()
-        .fold(
-          err => {
-            if (err.errors("txn_type").nonEmpty) {
-              logger.debug(s"Plan.payPalIpn ignore txn_type = ${err.data get "txn_type"}")
-              fuccess(Ok)
-            } else {
-              logger.error(s"Plan.payPalIpn invalid data ${err.toString}")
-              fuccess(BadRequest)
+  def payPalCheckout =
+    AuthBody { implicit ctx => me =>
+      implicit val req = ctx.body
+      CheckoutRateLimit(ctx.ip) {
+        lila.plan.PlanCheckout.form
+          .bindFromRequest()
+          .fold(
+            err => {
+              logger.info(s"Plan.payPalCheckout 400: $err")
+              BadRequest(jsonError(err.errors.map(_.message) mkString ", ")).fuccess
+            },
+            checkout => {
+              if (checkout.freq.renew) for {
+                sub <- env.plan.api.payPal.createSubscription(checkout, me)
+              } yield JsonOk(Json.obj("subscription" -> Json.obj("id" -> sub.id.value)))
+              else
+                for {
+                  order <- env.plan.api.payPal.createOrder(checkout, me)
+                } yield JsonOk(Json.obj("order" -> Json.obj("id" -> order.id.value)))
             }
-          },
-          ipn =>
-            env.plan.api.onPaypalCharge(
-              userId = ipn.userId,
-              email = ipn.email map PayPal.Email.apply,
-              subId = ipn.subId map PayPal.SubId.apply,
-              cents = lila.plan.Cents(ipn.grossCents),
-              name = ipn.name,
-              txnId = ipn.txnId,
-              country = ipn.country,
-              ip = lila.common.HTTPRequest.ipAddress(req).value,
-              key = get("key", req) | "N/A"
-            ) inject Ok
-        )
+          )
+      }(rateLimitedFu)
     }
+
+  def payPalCapture(orderId: String) =
+    Auth { implicit ctx => me =>
+      CaptureRateLimit(ctx.ip) {
+        (get("sub") map PayPalSubscriptionId match {
+          case None => env.plan.api.payPal.captureOrder(PayPalOrderId(orderId), ctx.ip)
+          case Some(subId) =>
+            env.plan.api.payPal.captureSubscription(PayPalOrderId(orderId), subId, me, ctx.ip)
+        }) inject jsonOkResult
+      }(rateLimitedFu)
+    }
+
 }
