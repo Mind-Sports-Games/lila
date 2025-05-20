@@ -19,7 +19,7 @@ final class PlanApi(
     stripeClient: StripeClient,
     payPalClient: PayPalClient,
     patronColl: Coll @@ PatronColl,
-    chargeColl: Coll @@ PatronColl,
+    chargeColl: Coll @@ ChargeColl,
     notifier: PlanNotifier,
     userRepo: UserRepo,
     lightUserApi: lila.user.LightUserApi,
@@ -299,7 +299,6 @@ final class PlanApi(
     def createSubscription(checkout: PlanCheckout, user: User) =
       payPalClient.createSubscription(checkout, user)
 
-    //TODO fix + subscription money and check lifetime
     def captureOrder(orderId: PayPalOrderId, ip: IpAddress) = for {
       order <- payPalClient.getOrder(orderId) orFail s"Missing paypal order for id $orderId"
       cents <- order.capturedMoney.fold[Fu[Cents]](fufail(s"Invalid paypal capture $order"))(fuccess)
@@ -338,7 +337,7 @@ final class PlanApi(
                     patronColl.update.one($id(patron.id), p2) >>
                       setDbUserPlanOnCharge(user, patron.canLevelUp)
                 } >> {
-                  (Cents.lifetime.compare(cents) <= 0) ?? setLifetime(user)
+                  charge.lifetimeWorthy ?? setLifetime(user)
                 } >>- logger.info(s"Charged ${user.username} with paypal: $cents")
               }
             }
@@ -388,7 +387,7 @@ final class PlanApi(
                 patronColl.update.one($id(patron.id), p2) >>
                   setDbUserPlanOnCharge(user, patron.canLevelUp)
             } >> {
-              (Cents.lifetime.compare(cents) <= 0) ?? setLifetime(user)
+              charge.lifetimeWorthy ?? setLifetime(user)
             } >>- logger.info(s"Charged ${user.username} with paypal checkout: $cents")
           }
         }
