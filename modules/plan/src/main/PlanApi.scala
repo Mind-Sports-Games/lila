@@ -25,7 +25,6 @@ final class PlanApi(
     lightUserApi: lila.user.LightUserApi,
     cacheApi: lila.memo.CacheApi,
     mongoCache: lila.memo.MongoCache.Api,
-    payPalIpnKey: Secret,
     monthlyGoalApi: MonthlyGoalApi
 )(implicit ec: scala.concurrent.ExecutionContext) {
 
@@ -201,84 +200,6 @@ final class PlanApi(
   object payPal {
 
     def getEvent = payPalClient.getEvent _
-
-    //TOOD remove as we dont want legacy route with latest paypal account
-    def onLegacyCharge(
-        userId: Option[User.ID],
-        email: Option[Patron.PayPalLegacy.Email],
-        subId: Option[Patron.PayPalLegacy.SubId],
-        cents: Cents,
-        name: Option[String],
-        txnId: Option[String],
-        country: Option[Country],
-        ip: String,
-        key: String
-    ): Funit = {
-      logger.error(s"Not using legacy charge $ip $userId $cents")
-      funit
-    }
-
-    // def onPaypalLegacyCharge(
-    //     userId: Option[User.ID],
-    //     email: Option[Patron.PayPal.Email],
-    //     subId: Option[Patron.PayPal.SubId],
-    //     cents: Cents,
-    //     name: Option[String],
-    //     txnId: Option[String],
-    //     country: Option[Country],
-    //     ip: String,
-    //     key: String
-    // ): Funit =
-    //   if (key != payPalIpnKey.value) {
-    //     logger.error(s"Invalid PayPal IPN key $key from $ip $userId $cents")
-    //     funit
-    //   } else if (cents.value < 100) {
-    //     logger.info(s"Ignoring small paypal charge from $ip $userId $cents $txnId")
-    //     funit
-    //   } else {
-    //     val charge = Charge.make(
-    //       userId = userId,
-    //       payPal = Charge
-    //         .PayPal(
-    //           name = name,
-    //           email = email.map(_.value),
-    //           txnId = txnId,
-    //           subId = subId.map(_.value),
-    //           ip = ip.some
-    //         )
-    //         .some,
-    //       cents = cents
-    //     )
-    //     addCharge(charge, country) >>
-    //       (userId ?? userRepo.named) flatMap { userOption =>
-    //         userOption ?? { user =>
-    //           val payPal = Patron.PayPal(email, subId, DateTime.now)
-    //           userPatron(user).flatMap {
-    //             case None =>
-    //               patronColl.insert.one(
-    //                 Patron(
-    //                   _id = Patron.UserId(user.id),
-    //                   payPal = payPal.some,
-    //                   lastLevelUp = Some(DateTime.now)
-    //                 ).expireInOneMonth
-    //               ) >>
-    //                 setDbUserPlanOnCharge(user, levelUp = false)
-    //             case Some(patron) =>
-    //               val p2 = patron
-    //                 .copy(
-    //                   payPal = payPal.some,
-    //                   free = none
-    //                 )
-    //                 .levelUpIfPossible
-    //                 .expireInOneMonth
-    //               patronColl.update.one($id(patron.id), p2) >>
-    //                 setDbUserPlanOnCharge(user, patron.canLevelUp)
-    //           } >> {
-    //             charge.lifetimeWorthy ?? setLifetime(user)
-    //           } >>- logger.info(s"Charged ${user.username} with paypal: $cents")
-    //         }
-    //       }
-    //   }
 
     def userSubscriptionId(user: User): Fu[Option[PayPalSubscriptionId]] =
       userPatron(user) map {
@@ -585,8 +506,7 @@ final class PlanApi(
           lila.mon.plan.goal.update(m.goal.value)
           lila.mon.plan.current.update(m.current.value)
           lila.mon.plan.percent.update(m.percent)
-          if (charge.isPayPalLegacy) lila.mon.plan.paypalLegacy.amount.record(charge.cents.value)
-          else if (charge.isPayPalCheckout) lila.mon.plan.paypalCheckout.amount.record(charge.cents.value)
+          if (charge.isPayPalCheckout) lila.mon.plan.paypalCheckout.amount.record(charge.cents.value)
           else if (charge.isStripe) lila.mon.plan.stripe.record(charge.cents.value)
         }
       }

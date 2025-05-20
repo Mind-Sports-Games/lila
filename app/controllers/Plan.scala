@@ -289,33 +289,4 @@ final class Plan(env: Env)(implicit system: akka.actor.ActorSystem) extends Lila
       }(rateLimitedFu)
     }
 
-  //deprecated todo remove
-  def payPalIpn =
-    Action.async { implicit req =>
-      lila.plan.PlanForm.ipn
-        .bindFromRequest()
-        .fold(
-          err => {
-            if (err.errors("txn_type").nonEmpty) {
-              logger.debug(s"Plan.payPalIpn ignore txn_type = ${err.data get "txn_type"}")
-              fuccess(Ok)
-            } else {
-              logger.error(s"Plan.payPalIpn invalid data ${err.toString}")
-              fuccess(BadRequest)
-            }
-          },
-          ipn =>
-            env.plan.api.payPal.onLegacyCharge(
-              userId = ipn.userId,
-              email = ipn.email map Patron.PayPalLegacy.Email.apply,
-              subId = ipn.subId map Patron.PayPalLegacy.SubId.apply,
-              cents = lila.plan.Cents(ipn.grossCents),
-              name = ipn.name,
-              txnId = ipn.txnId,
-              country = ipn.country,
-              ip = lila.common.HTTPRequest.ipAddress(req).value,
-              key = get("key", req) | "N/A"
-            ) inject Ok
-        )
-    }
 }

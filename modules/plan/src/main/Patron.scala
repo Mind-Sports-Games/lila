@@ -51,7 +51,7 @@ case class Patron(
       expiresAt = none
     )
 
-  def isDefined = stripe.isDefined || payPal.isDefined
+  def isDefined = stripe.isDefined || payPal.isDefined || payPalCheckout.isDefined
 
   def isLifetime = ~lifetime
 }

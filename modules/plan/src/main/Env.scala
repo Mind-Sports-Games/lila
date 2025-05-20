@@ -14,8 +14,7 @@ private class PlanConfig(
     @ConfigName("collection.patron") val patronColl: CollName,
     @ConfigName("collection.charge") val chargeColl: CollName,
     val stripe: StripeClient.Config,
-    val payPal: PayPalClient.Config,
-    @ConfigName("payPal.ipn_key") val payPalIpnKey: Secret
+    val payPal: PayPalClient.Config
 )
 
 final class Env(
