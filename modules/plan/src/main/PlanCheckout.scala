@@ -3,7 +3,7 @@ package lila.plan
 import play.api.data._
 import play.api.data.Forms._
 
-case class Checkout(
+case class PlanCheckout(
     email: Option[String],
     amount: Cents,
     freq: Freq
@@ -13,42 +13,46 @@ case class Checkout(
 
   def toFormData =
     Some(
-      (email, amount.value, freq.toString.toLowerCase)
+      (email, amount.usd.value, freq.toString.toLowerCase)
     )
 }
 
-object Checkout {
+object PlanCheckout {
+
+  def amountField = bigDecimal(precision = 10, scale = 2)
+    .verifying(_ >= 1)
+    .verifying(_ <= 10000)
 
   def make(
       email: Option[String],
-      amount: Int,
+      amount: BigDecimal,
       freq: String
   ) =
-    Checkout(
+    PlanCheckout(
       email,
-      Cents(amount),
+      Usd(amount).cents,
       if (freq == "monthly") Freq.Monthly else Freq.Onetime
     )
 
-  val form = Form[Checkout](
+  val form = Form[PlanCheckout](
     mapping(
       "email"  -> optional(email),
-      "amount" -> number(min = 100, max = 100 * 100000),
+      "amount" -> PlanCheckout.amountField,
       "freq"   -> nonEmptyText
-    )(Checkout.make)(_.toFormData)
+    )(PlanCheckout.make)(_.toFormData)
   )
 }
 
-case class Switch(usd: BigDecimal) {
+case class Switch(amount: BigDecimal) {
 
-  def cents = Usd(usd).cents
+  def cents = Usd(amount).cents
 }
 
 object Switch {
 
   val form = Form(
     mapping(
-      "usd" -> bigDecimal(precision = 10, scale = 2)
+      "amount" -> bigDecimal(precision = 10, scale = 2)
         .verifying(_ >= 1)
         .verifying(_ <= 10000)
     )(Switch.apply)(Switch.unapply)
