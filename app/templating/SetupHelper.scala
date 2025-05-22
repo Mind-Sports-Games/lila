@@ -1,7 +1,7 @@
 package lila.app
 package templating
 
-import strategygames.{ GameFamily, Mode, Speed }
+import strategygames.{ GameFamily, GameGroup, Mode, Speed }
 import strategygames.variant.Variant
 import play.api.i18n.Lang
 
@@ -164,6 +164,8 @@ trait SetupHelper { self: I18nHelper =>
 
   private val encodeId           = (v: Variant) => v.id.toString
   private val encodeGameFamilyId = (lib: GameFamily) => lib.id.toString
+  private val encodeGameGroupId = (g: GameGroup) =>
+    encodeGameFamilyId(g.variants.headOption.map(_.gameFamily).getOrElse(GameFamily.Chess()))
 
   private def variantTupleId = variantTuple(encodeId) _
 
@@ -173,16 +175,16 @@ trait SetupHelper { self: I18nHelper =>
   )(variant: Variant) =
     (encode(variant), variantName(variant), VariantKeys.variantTitle(variant).some)
 
-  def translatedGameFamilyIconChoices(implicit lang: Lang): List[SelectChoice] =
-    GameFamily.all.map(translatedGameFamilyIconChoice(_))
+  def translatedGameGroupIconChoices(implicit lang: Lang): List[SelectChoice] =
+    GameGroup.medley.map(translatedGameGroupIconChoice(_))
 
-  private def translatedGameFamilyIconChoice(
-      gameFamily: GameFamily
+  private def translatedGameGroupIconChoice(
+      gameGroup: GameGroup
   )(implicit lang: Lang): SelectChoice =
     (
-      encodeGameFamilyId(gameFamily),
-      gameFamily.defaultVariant.perfIcon.toString(),
-      VariantKeys.gameFamilyName(gameFamily).some
+      encodeGameGroupId(gameGroup),
+      gameGroup.variants.headOption.map(_.perfIcon.toString()).getOrElse(""),
+      VariantKeys.gameGroupName(gameGroup).some
     )
 
   def translatedVariantIconChoices(implicit lang: Lang): List[SelectChoice] =

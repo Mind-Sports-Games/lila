@@ -195,7 +195,17 @@ export default class Setup {
       : undefined;
   };
 
-  private psBots = ['ps-greedy-two-move', 'ps-greedy-one-move', 'ps-greedy-four-move', 'ps-random-mover'];
+  private psBots = ['ps-greedy-two-move', 'ps-greedy-one-move', 'ps-greedy-four-move', 'ps-random-mover', 'bot1'];
+  private stockfishBots = [
+    'stockfish-level1',
+    'stockfish-level2',
+    'stockfish-level3',
+    'stockfish-level4',
+    'stockfish-level5',
+    'stockfish-level6',
+    'stockfish-level7',
+    'stockfish-level8',
+  ];
   private ratedTimeModes = ['1', '3', '4', '5'];
 
   prepareForm = ($modal: Cash) => {
@@ -208,8 +218,8 @@ export default class Setup {
       $casual = $modeChoices.eq(0),
       $rated = $modeChoices.eq(1),
       //$variantSelect = $form.find('#sf_variant'),
-      $gameFamilies = $form.find('.gameFamily_choice'),
-      $gameFamilyInput = $gameFamilies.find('.gameFamily_choice [name=gameFamily]'),
+      $gameGroups = $form.find('.gameGroup_choice'),
+      $gameGroupInput = $gameGroups.find('.gameGroup_choice [name=gameGroup]'),
       $variants = $form.find('.variant_choice'),
       $variantInput = $variants.find('.variant_choice [name=variant]'), //todo not a select anymore....
       $fenPosition = $form.find('.fen_position'),
@@ -231,6 +241,7 @@ export default class Setup {
       userDetails = $form.attr('action')?.split('user='),
       user = userDetails && userDetails[1] ? userDetails[1].toLowerCase() : '',
       vsPSBot = this.psBots.includes(user),
+      vsStockfishBot = this.stockfishBots.includes(user),
       $botChoices = $form.find('.bot_choice'),
       $botInput = $form.find('.bot_choice [name=bot]'),
       $opponentInput = $form.find('.opponent_choices [name=opponent]'),
@@ -828,6 +839,21 @@ export default class Setup {
         toggleButtons();
       });
     });
+    const setupOpponentChoices = () => {
+      $botChoices.hide();
+      $form.find('.bot_title').hide();
+      $form.find('.rating-range-config').hide();
+      if (user) {
+        if (vsPSBot || vsStockfishBot) {
+          $opponentInput.val('bot');
+        } else {
+          $opponentInput.val('friend');
+        }
+      } else {
+        $opponentInput.val('lobby'); //default instead of history?
+      }
+    };
+    setupOpponentChoices();
     $collapsibleSections.each(function (this: HTMLDivElement) {
       const $this = $(this);
       const sName = $this.find('input').attr('name') || '';
@@ -840,53 +866,60 @@ export default class Setup {
         .filter(`.${sName}_` + $this.find('input').filter(':checked').val())
         .show();
       $form.find('.time_mode_config').hide();
-      //Always start the form with gameFamily active
-      if (sName == 'gameFamily') {
+      //Always start the form with gameGroup active
+      if (sName == 'gameGroup') {
         $this.addClass('active');
         $this.find('group').removeClass('hide');
         $this.find('div.choice').hide();
       }
-      $this.on('click', function (this: HTMLElement) {
-        this.classList.toggle('active');
-        $(this).find('group').toggleClass('hide');
-        const $displayChoices = $this.find('div.choice');
-        if (this.classList.contains('active')) {
-          $displayChoices.hide();
-          if (
-            sName === 'timeModeDefaults' &&
-            ($timeModeDefaults.find('input').filter(':checked').val() as string) === 'custom'
-          ) {
-            $form.find('.time_mode_config').show();
-            $form.find('.time_mode_config').trigger('click');
+      const fixedSection = user && sName === 'opponent';
+      if (!fixedSection) {
+        $this.on('click', function (this: HTMLElement) {
+          this.classList.toggle('active');
+          $(this).find('group').toggleClass('hide');
+          const $displayChoices = $this.find('div.choice');
+          if (this.classList.contains('active')) {
+            $displayChoices.hide();
+            if (
+              sName === 'timeModeDefaults' &&
+              ($timeModeDefaults.find('input').filter(':checked').val() as string) === 'custom'
+            ) {
+              $form.find('.time_mode_config').show();
+              $form.find('.time_mode_config').trigger('click');
+            }
+            if (sName === 'opponent') {
+              if (($opponentInput.filter(':checked').val() as string) === 'bot') {
+                $form.find('.bot_title').show();
+              }
+              if (($opponentInput.filter(':checked').val() as string) === 'lobby') {
+                $form.find('.rating-range-config').show();
+              }
+            }
+          } else {
+            $displayChoices
+              .hide()
+              .filter(`.${sName}_` + $this.find('input').filter(':checked').val())
+              .show()
+              .removeAttr('style'); //remove unwated display: block added by show()
+            //hide/update additional sections
+            $form.find('.time_mode_config').hide();
+            updateClockOptionsText();
+            $form.find('.bot_title').hide();
+            $form.find('.rating-range-config').hide();
           }
-          if (sName === 'opponent' && ($opponentInput.filter(':checked').val() as string) === 'bot') {
-            $form.find('.bot_title').show();
-          }
-        } else {
-          $displayChoices
-            .hide()
-            .filter(`.${sName}_` + $this.find('input').filter(':checked').val())
-            .show()
-            .removeAttr('style'); //remove unwated display: block added by show()
-          //also hide custom timecontrol and update text
-          $form.find('.time_mode_config').hide();
-          updateClockOptionsText();
-          //hide bot option titles;
-          $form.find('.bot_title').hide();
-        }
-      });
-      // $this.attr('tabindex', '0'); // Make the element focusable
-      // $this.on('blur', function (this: HTMLElement) {
-      //   this.classList.remove('active');
-      //   $(this).find('group').addClass('hide');
-      //   const $displayChoices = $this.find('div.choice');
-      //   $displayChoices
-      //     .hide()
-      //     .filter(`.${sName}_` + $this.find('input').filter(':checked').val())
-      //     .show();
-      // });
+        });
+        // $this.attr('tabindex', '0'); // Make the element focusable
+        // $this.on('blur', function (this: HTMLElement) {
+        //   this.classList.remove('active');
+        //   $(this).find('group').addClass('hide');
+        //   const $displayChoices = $this.find('div.choice');
+        //   $displayChoices
+        //     .hide()
+        //     .filter(`.${sName}_` + $this.find('input').filter(':checked').val())
+        //     .show();
+        // });
+      }
     });
-    //TODO shouldn't be able to pick lobby game if user field is set (i.e. from challenge/bot)
     $form.find('.rating-range').each(function (this: HTMLDivElement) {
       const $this = $(this),
         $minInput = $this.find('.rating-range__min'),
@@ -1001,27 +1034,34 @@ export default class Setup {
       optgroup.setAttribute('label', optgroup.getAttribute('name') || '');
     });
 
-    $botChoices.hide();
-    $form.find('.bot_title').hide();
-    //TODO preset this depending on user input and/or previous form setup
-    $opponentInput.on('change', function (this: HTMLElement) {
-      const opponent = $opponentInput.filter(':checked').val() as string;
-      if (opponent == 'bot') {
-        $botChoices.show();
-        $form.find('.bot_title').show();
-      } else {
-        if (!user) $form.attr('action', $form.attr('action')?.replace(/user=[^&]*/, ''));
-        $botChoices.hide();
-        $form.find('.bot_title').hide();
-      }
-    });
-    $botInput.on('change', function (this: HTMLElement) {
+    const updateBotDetails = () => {
       const bot = $botInput.filter(':checked').val() as string;
       const botText = $form.find('.opponent_bot.choice');
       //TODO add player link here instead of just user name
       botText.text(bot);
       if (user) $form.attr('action', $form.attr('action')?.replace(/user=[^&]*/, 'user=' + bot));
       else $form.attr('action', $form.attr('action') + `&user=${bot}`);
+    };
+    $opponentInput.on('change', function (this: HTMLElement) {
+      const opponent = $opponentInput.filter(':checked').val() as string;
+      if (opponent === 'bot') {
+        $botChoices.show();
+        $form.find('.bot_title').show();
+        $form.find('.rating-range-config').hide();
+        updateBotDetails();
+      } else if (opponent === 'lobby') {
+        $botChoices.hide();
+        $form.find('.bot_title').hide();
+        $form.find('.rating-range-config').show();
+      } else if (opponent === 'friend') {
+        if (!user) $form.attr('action', $form.attr('action')?.replace(/user=[^&]*/, ''));
+        $botChoices.hide();
+        $form.find('.bot_title').hide();
+        $form.find('.rating-range-config').hide();
+      }
+    });
+    $botInput.on('change', function (this: HTMLElement) {
+      updateBotDetails();
     });
 
     $variantInput
@@ -1053,14 +1093,15 @@ export default class Setup {
       })
       .trigger('change');
 
-    $gameFamilyInput
+    $gameGroupInput
       .on('change', function (this: HTMLElement) {
         const variantId = ($variantInput.filter(':checked').val() as string).split('_'),
-          gameFamily = $gameFamilyInput.filter(':checked').val() as string;
+          gameFamily = $gameGroupInput.filter(':checked').val() as string;
 
         $variantInput.each(function (this: HTMLElement) {
           const gfOfVariant = ($(this).val() as string).split('_')[0];
-          if (gfOfVariant === gameFamily) {
+          const additionMatches = gfOfVariant === '6' && gameFamily === '7'; //add oware to mancala group
+          if (gfOfVariant === gameFamily || additionMatches) {
             $(this).parent().show();
           } else {
             $(this).parent().hide();
@@ -1076,6 +1117,8 @@ export default class Setup {
                 return '4_2';
               case '5':
                 return '5_6';
+              case '7':
+                return '6_1';
               case '8':
                 return '8_8';
               case '9':

@@ -8,8 +8,6 @@ import lila.app.templating.Environment._
 import lila.app.ui.ScalatagsTemplate._
 import lila.user.User
 
-import strategygames.GameFamily
-
 private object bits {
 
   val prefix = "sf_"
@@ -38,12 +36,12 @@ private object bits {
     )
   }
 
-  def renderGameFamilyOptions(form: Form[_], libs: List[SelectChoice])(implicit ctx: Context) =
-    div(cls := "gameFamily_choice buttons collapsible optional_config")(
-      div(cls := "section_title")("Game Family"),
-      div(id := "gameFamily_icons")(
-        renderIconRadios(form("gameFamily"), libs),
-        renderSelectedChoice(form("gameFamily"), libs)
+  def renderGameGroupOptions(form: Form[_], libs: List[SelectChoice])(implicit ctx: Context) =
+    div(cls := "gameGroup_choice buttons collapsible optional_config")(
+      div(cls := "section_title")("Game Group"),
+      div(id := "gameGroup_icons")(
+        renderIconRadios(form("gameGroup"), libs),
+        renderSelectedChoice(form("gameGroup"), libs)
       )
     )
 
@@ -60,17 +58,26 @@ private object bits {
       div(id := "variant_icons")(
         renderIconRadios(form("variant"), libs),
         renderSelectedChoice(form("variant"), libs)
-      )
+      ),
+      renderRatings()
     )
 
-  def renderGameFamily(form: Form[_], libs: List[SelectChoice])(implicit ctx: Context) =
-    div(cls := "gameFamily label_select")(
-      renderLabel(form("gameFamily"), "Game Family"),
-      renderSelect(
-        form("gameFamily"),
-        libs
+  def renderRatings()(implicit ctx: Context) =
+    ctx.me.ifFalse(ctx.blind).map { me =>
+      div(cls := "ratings")(
+        form3.hidden("rating", "?"),
+        lila.rating.PerfType.nonPuzzle.map { perfType =>
+          div(cls := perfType.key)(
+            trans.perfRatingX(
+              raw(s"""<strong>${me
+                .perfs(perfType.key)
+                .map(_.intRating)
+                .getOrElse("?")}</strong>""")
+            )
+          )
+        }
       )
-    )
+    }
 
   def renderVariant(
       form: Form[_],
@@ -241,7 +248,8 @@ private object bits {
       div(cls := "section_title")("Opponent"),
       renderIconRadios(form("opponent"), translatedOpponentChoices),
       renderSelectedChoice(form("opponent"), translatedOpponentChoices, userPart),
-      renderBotChoice(form)
+      renderBotChoice(form),
+      renderRatingRange(form("ratingRange"))
     )
 
   def renderBotChoice(form: Form[_])(implicit ctx: Context) =
@@ -250,6 +258,29 @@ private object bits {
       renderRadios(form("bot"), translatedPSBotChoices),
       div(cls := "bot_title")("Stockfish"),
       renderRadios(form("bot"), translatedStockfishChoices)
+    )
+
+  def renderRatingRange(field: Field)(implicit ctx: Context) =
+    div(cls := "rating-range-config optional_config")(
+      trans.ratingRange(),
+      div(cls := "rating-range") {
+        frag(
+          renderInput(field),
+          input(
+            name := s"${field.name}_range_min",
+            tpe := "range",
+            cls := "range rating-range__min"
+          ),
+          span(cls := "rating-min"),
+          "/",
+          span(cls := "rating-max"),
+          input(
+            name := s"${field.name}_range_max",
+            tpe := "range",
+            cls := "range rating-range__max"
+          )
+        )
+      }
     )
 
   def renderPlayerIndexOptions(field: Field)(implicit ctx: Context) =

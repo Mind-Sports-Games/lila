@@ -114,11 +114,11 @@ $game-family-p2-pieces: (
 
   .optional_config {
     border-bottom: $border;
+    background: $c-bg-zebra;
+    border-top: $border;
   }
 
-  .optional_config,
-  .ratings {
-    background: $c-bg-zebra;
+  .submit {
     border-top: $border;
   }
 
@@ -143,7 +143,7 @@ $game-family-p2-pieces: (
   .mode_choice,
   .opponent_choices,
   .playerIndex,
-  .gameFamily_choice,
+  .gameGroup_choice,
   .variant_choice,
   .time_mode_defaults {
     &.collapsible:not(.active) {
@@ -240,7 +240,7 @@ $game-family-p2-pieces: (
   }
 
   .ratings {
-    padding: 1em;
+    margin-right: 4em;
     width: 100%;
     text-align: center;
   }
