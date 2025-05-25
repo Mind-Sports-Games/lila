@@ -20,6 +20,7 @@ import lila.team.GameTeams
 import lila.tournament.Tournament
 import lila.user.User
 import lila.round.GameProxyRepo
+import strategygames.variant.Variant
 
 final class GameApiV2(
     pgnDump: PgnDump,
@@ -49,7 +50,7 @@ final class GameApiV2(
         for {
           realPlayers                  <- config.playerFile.??(realPlayerApi.apply)
           (game, initialFen, analysis) <- enrich(config.flags)(game)
-          export <- config.format match {
+          _export <- config.format match {
             case Format.JSON =>
               toJson(game, initialFen, analysis, config.flags, realPlayers = realPlayers) dmap Json.stringify
             case Format.PGN =>
@@ -68,7 +69,7 @@ final class GameApiV2(
                 realPlayers = realPlayers
               )
           }
-        } yield export
+        } yield _export
     }
 
   private val fileR = """[\s,]""".r
@@ -233,6 +234,17 @@ final class GameApiV2(
         }
       }
 
+  def exportByVariant(config: ByVariantConfig): Source[String, _] =
+    gameRepo
+      .sortedCursor(
+        Query.createdBetween(config.since, config.until) ++ Query.finished ++ Query.variant(config.variant),
+        Query.sortCreated
+      )
+      .documentSource()
+      .via(upgradeOngoingGame)
+      .via(preparationFlow(config, None))
+      .keepAlive(keepAliveInterval, () => emptyMsgFor(config))
+
   private val upgradeOngoingGame =
     Flow[Game].mapAsync(4)(gameProxy.upgradeIfPresent)
 
@@ -386,6 +398,15 @@ object GameApiV2 {
         g.player(c).userId has user.id
       } && analysed.fold(true)(g.metadata.analysed ==)
   }
+
+  case class ByVariantConfig(
+      format: Format,
+      variant: Variant,
+      since: Option[DateTime] = None,
+      until: Option[DateTime] = None,
+      analysed: Option[Boolean] = None,
+      flags: WithFlags
+  ) extends Config {}
 
   case class ByIdsConfig(
       ids: Seq[Game.ID],
