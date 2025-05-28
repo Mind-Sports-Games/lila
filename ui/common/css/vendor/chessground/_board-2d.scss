@@ -167,7 +167,7 @@ $togyzkumalak-variants: ('togyzkumalak'); // must use same board
 
 $backgammon-variants: ('backgammon', 'hyper', 'nackgammon'); // must use same board
 
-$abalone-variants: ('abalone');
+$abalone-variants: ('abalone', 'grandabalone');
 
 @each $gameFamily in ('chess', 'loa') {
   @each $color, $file in $chess-board-files {
@@ -408,9 +408,8 @@ $abalone-variants: ('abalone');
 @each $variant in $abalone-variants {
   @each $theme, $path in $abalone-board-files {
     .abalone-#{$theme} .is2d .variant-#{$variant} cg-board {
-      background-image: url(../images/board/abalone/#{$path});
+      background-image: url(../images/board/abalone/#{$variant}/#{$path});
     }
   }
 }
 
-//TODO Grand Abalone add boards here

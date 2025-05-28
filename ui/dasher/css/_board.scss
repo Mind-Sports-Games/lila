@@ -259,17 +259,32 @@
     }
 
     .abalone-classic {
-      background-image: url(../images/board/abalone/svg/classic.svg);
+      background-image: url(../images/board/abalone/abalone/svg/classic.svg);
       background-size: 100px;
     }
 
     .abalone-dark {
-      background-image: url(../images/board/abalone/svg/dark.svg);
+      background-image: url(../images/board/abalone/abalone/svg/dark.svg);
       background-size: 100px;
     }
 
     .abalone-yellow {
-      background-image: url(../images/board/abalone/svg/yellow.svg);
+      background-image: url(../images/board/abalone/abalone/svg/yellow.svg);
+      background-size: 100px;
+    }
+
+    .grandabalone-classic {
+      background-image: url(../images/board/abalone/abalone/grandabalone/classic.svg);
+      background-size: 100px;
+    }
+
+    .grandabalone-dark {
+      background-image: url(../images/board/abalone/abalone/grandabalone/dark.svg);
+      background-size: 100px;
+    }
+
+    .grandabalone-yellow {
+      background-image: url(../images/board/abalone/abalone/grandabalone/yellow.svg);
       background-size: 100px;
     }
   }

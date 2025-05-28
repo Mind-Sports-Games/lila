@@ -135,6 +135,16 @@ $directions: ('W', 'NW', 'NE', 'E', 'SE', 'SW');
   }
 }
 
+.variant-grandabalone {
+  piece {
+    width: calc(100% / 11 * 0.865);
+    height: calc(100% / 11 * 0.865);
+    background-position: center center;
+    margin-top: .7%;
+    margin-left: .7%;
+  }
+}
+
 // profile page
 .search__result {
   .mini-board {
