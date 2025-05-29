@@ -77,22 +77,6 @@ object home {
           ),
           div(cls := "lobby__start")(
             ctx.blind option h2("Play"),
-            // a(
-            //   href := routes.Setup.hookForm,
-            //   cls := List(
-            //     "button button-color-choice config_hook" -> true,
-            //     "disabled"                               -> (playban.isDefined || currentGame.isDefined || ctx.isBot)
-            //   ),
-            //   trans.createAGame()
-            // ),
-            // a(
-            //   href := routes.Setup.friendForm(none),
-            //   cls := List(
-            //     "button button-color-choice config_friend" -> true,
-            //     "disabled"                                 -> currentGame.isDefined
-            //   ),
-            //   trans.playWithAFriend()
-            // ),
             a(
               href := routes.Setup.gameForm(none),
               cls := List(

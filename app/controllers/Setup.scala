@@ -38,112 +38,6 @@ final class Setup(
   // Defaults to chess if it's not provided, otherwise will take the version provided from the request.
   private def gameLogic(libId: Option[Int]): GameLogic = GameFamily(libId.getOrElse(0)).gameLogic
 
-  // def aiForm =
-  //   Open { implicit ctx =>
-  //     if (HTTPRequest isXhr ctx.req) {
-  //       fuccess(forms aiFilled (get("fen").map(s => FEN.clean(GameLogic.Chess(), s)))) map { form =>
-  //         html.setup.forms.ai(
-  //           form,
-  //           env.fishnet.aiPerfApi.intRatings,
-  //           form("fen").value map (s => FEN.clean(GameLogic.Chess(), s)) flatMap ValidFen(getBool("strict"))
-  //         )
-  //       }
-  //     } else Redirect(s"${routes.Lobby.home}#ai").fuccess
-  //   }
-
-  // def ai =
-  //   process(_ => forms.ai) { config => implicit ctx =>
-  //     processor ai config
-  //   }
-
-  // def friendForm(userId: Option[String]) =
-  //   Open { implicit ctx =>
-  //     if (HTTPRequest isXhr ctx.req) {
-  //       val lib = gameLogic(getInt("lib"))
-  //       fuccess(forms.friendFilled(lib, get("fen").map(s => FEN.clean(lib, s)))) flatMap { form =>
-  //         val validFen = form("fen").value map (s => FEN.clean(lib, s)) flatMap ValidFen(strict = false)
-  //         userId ?? env.user.repo.named flatMap {
-  //           case None => Ok(html.setup.forms.friend(form, none, none, validFen)).fuccess
-  //           case Some(user) =>
-  //             env.challenge.granter(ctx.me, user, none) map {
-  //               case Some(denied) => BadRequest(lila.challenge.ChallengeDenied.translated(denied))
-  //               case None         => Ok(html.setup.forms.friend(form, user.some, none, validFen))
-  //             }
-  //         }
-  //       }
-  //     } else
-  //       fuccess {
-  //         Redirect(s"${routes.Lobby.home}#friend")
-  //       }
-  //   }
-
-  // def friend(userId: Option[String]) =
-  //   OpenBody { implicit ctx =>
-  //     implicit val req = ctx.body
-  //     PostRateLimit(HTTPRequest ipAddress ctx.req) {
-  //       forms
-  //         .friend(ctx)
-  //         .bindFromRequest()
-  //         .fold(
-  //           err =>
-  //             negotiate(
-  //               html = keyPages.home(Results.BadRequest),
-  //               api = _ => jsonFormError(err)
-  //             ),
-  //           config =>
-  //             userId ?? env.user.repo.enabledById flatMap { destUser =>
-  //               destUser ?? { env.challenge.granter(ctx.me, _, config.perfType) } flatMap {
-  //                 case Some(denied) =>
-  //                   val message = lila.challenge.ChallengeDenied.translated(denied)
-  //                   negotiate(
-  //                     html = BadRequest(html.site.message.challengeDenied(message)).fuccess,
-  //                     api = _ => BadRequest(jsonError(message)).fuccess
-  //                   )
-  //                 case None =>
-  //                   import lila.challenge.Challenge._
-  //                   val timeControl = config.makeClock map {
-  //                     TimeControl.Clock.apply
-  //                   } orElse config.makeDaysPerTurn.map {
-  //                     TimeControl.Correspondence.apply
-  //                   } getOrElse TimeControl.Unlimited
-  //                   val challenge = lila.challenge.Challenge.make(
-  //                     variant = config.variant,
-  //                     //TODO: draughts: need to have two variants stored in the config?
-  //                     fenVariant = config.variant.some,
-  //                     initialFen = config.actualFen,
-  //                     timeControl = timeControl,
-  //                     mode = config.mode,
-  //                     playerIndex = config.playerIndex.name,
-  //                     challenger = (ctx.me, HTTPRequest sid req) match {
-  //                       case (Some(user), _) => toRegistered(config.variant, timeControl)(user)
-  //                       case (_, Some(sid))  => Challenger.Anonymous(sid)
-  //                       case _               => Challenger.Open
-  //                     },
-  //                     destUser = destUser,
-  //                     rematchOf = none,
-  //                     multiMatch = config.multiMatch,
-  //                     backgammonPoints = config.backgammonPoints
-  //                   )
-  //                   env.challenge.api.create(challenge).flatMap {
-  //                     case true =>
-  //                       negotiate(
-  //                         html = fuccess(
-  //                           Redirect(routes.Round.watcher(challenge.id, config.variant.startPlayer.name))
-  //                         ),
-  //                         api = _ => challengeC.showChallenge(challenge, justCreated = true)
-  //                       )
-  //                     case false =>
-  //                       negotiate(
-  //                         html = fuccess(Redirect(routes.Lobby.home)),
-  //                         api = _ => fuccess(BadRequest(jsonError("Challenge not created")))
-  //                       )
-  //                   }
-  //               }
-  //             }
-  //         )
-  //     }(rateLimitedFu)
-  //   }
-
   def gameForm(userId: Option[String]) =
     Open { implicit ctx =>
       if (HTTPRequest isXhr ctx.req) {
@@ -263,19 +157,6 @@ final class Setup(
         }
       }(rateLimitedFu)
     }
-
-  // def hookForm =
-  //   Open { implicit ctx =>
-  //     NoBot {
-  //       if (HTTPRequest isXhr ctx.req) NoPlaybanOrCurrent {
-  //         fuccess(forms.hookFilled(timeModeString = get("time"))).map(html.setup.forms.hook(_))
-  //       }
-  //       else
-  //         fuccess {
-  //           Redirect(s"${routes.Lobby.home}#hook")
-  //         }
-  //     }
-  //   }
 
   private def hookResponse(res: HookResult) =
     res match {

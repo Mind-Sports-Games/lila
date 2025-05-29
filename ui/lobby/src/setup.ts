@@ -1021,7 +1021,7 @@ export default class Setup {
     if (forceFromPosition) {
       switch (($variantInput.filter(':checked').val() as string).split('_')[0]) {
         case '0':
-          $variantInput.val('0_3'); //TODO check this still works...
+          $variantInput.val('0_3');
           break;
         case '1':
           $variantInput.val('1_3');
@@ -1074,7 +1074,6 @@ export default class Setup {
         if (variantId[0] == '9' || variantId[0] == '10') clearFenInput();
         $multiMatch.toggle(isFen && variantId[0] == '1');
         $fenPosition.toggle(isFen);
-        $modeChoicesWrap.toggle(!isFen);
         $goConfig.toggle(variantId[0] == '9');
         //TODO change back when playing with friend is allowed for Backgammon multipoint
         $backgammonConfig.toggle(false);

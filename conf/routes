@@ -394,9 +394,6 @@ POST  /account/preferences                    controllers.Pref.formApply
 # Setup
 GET   /setup/game                      controllers.Setup.gameForm(user: Option[String] ?= None)
 POST  /setup/game                      controllers.Setup.game(sri: String, user: Option[String] ?= None)
-# GET   /setup/friend                    controllers.Setup.friendForm(user: Option[String] ?= None)
-# POST  /setup/friend                    controllers.Setup.friend(user: Option[String] ?= None)
-# GET   /setup/hook                      controllers.Setup.hookForm
 POST  /setup/hook/:sri/like/:gameId    controllers.Setup.like(sri: String, gameId: String)
 POST  /setup/hook/:sri                 controllers.Setup.hook(sri: String)
 GET   /setup/filter                    controllers.Setup.filterForm

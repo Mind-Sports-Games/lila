@@ -14,6 +14,7 @@ final private[setup] class Processor(
     onStart: lila.round.OnStart
 )(implicit ec: scala.concurrent.ExecutionContext) {
 
+  //TODO remove functions not called anymore
   def ai(config: AiConfig)(implicit ctx: UserContext): Fu[Pov] = {
     val pov = config pov ctx.me
     (gameRepo insertDenormalized pov.game) >>-

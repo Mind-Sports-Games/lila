@@ -38,7 +38,7 @@ object SetupForm {
       .verifying("Can't play that time control from a position", _.timeControlFromPosition)
   )
 
-  //TODO make general....
+  //TODO make general.... and remove the unused function (ai/friend are now both supported in game)
   def filled(lib: GameLogic, fen: Option[FEN])(implicit ctx: UserContext): Form[GameConfig] =
     game(ctx) fill fen.foldLeft(GameConfig.default(lib.id)) { case (config, f) =>
       config.copy(

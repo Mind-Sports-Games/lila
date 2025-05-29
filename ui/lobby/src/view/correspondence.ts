@@ -49,7 +49,7 @@ function createSeek(ctrl: LobbyController): VNode | undefined {
             $('.lobby__start .config_game')
               .each(function (this: HTMLElement) {
                 this.dataset.hrefAddon = '?time=correspondence&opponent=lobby';
-              })
+              }) //TODO figure out why this is not working
               .trigger('mousedown')
               .trigger('click');
           }),

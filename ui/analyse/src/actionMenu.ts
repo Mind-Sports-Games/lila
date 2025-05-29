@@ -209,7 +209,7 @@ export function view(ctrl: AnalyseCtrl): VNode {
               attrs: {
                 href: d.userAnalysis
                   ? '/?fen=' + ctrl.encodeNodeFen() + '#game'
-                  : contRoute(d, 'friend') + '?fen=' + ctrl.node.fen,
+                  : contRoute(d, 'game') + '?fen=' + ctrl.node.fen,
                 rel: 'nofollow',
                 'data-icon': 'U',
               },
