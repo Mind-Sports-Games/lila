@@ -11,6 +11,8 @@ import lila.common.config.MaxPerSecond
 import lila.common.HTTPRequest
 import lila.game.{ Game => GameModel }
 
+import strategygames.variant.Variant
+
 final class Game(
     env: Env,
     apiC: => Api
@@ -43,7 +45,7 @@ final class Game(
     env.round.proxyRepo.gameIfPresent(gameId) orElse env.game.gameRepo.game(gameId) flatMap {
       case None => NotFound.fuccess
       case Some(game) =>
-        lila.mon.export.pgn.game.increment()
+        lila.mon.`export`.pgn.game.increment()
         val config = GameApiV2.OneConfig(
           format = if (HTTPRequest acceptsJson req) { GameApiV2.Format.JSON }
           else if (game.gameRecordFormat == "pgn") { GameApiV2.Format.PGN }
@@ -73,6 +75,12 @@ final class Game(
     AnonOrScoped()(
       anon = req => handleExport(username, none, req, oauth = false),
       scoped = req => me => handleExport(username, me.some, req, oauth = true)
+    )
+
+  def apiExportByVariant(variant: String) =
+    AnonOrScoped()(
+      anon = req => handleDbExport(none, req, variant, oauth = false),
+      scoped = req => me => handleDbExport(me.some, req, variant, oauth = true)
     )
 
   private def handleExport(username: String, me: Option[lila.user.User], req: RequestHeader, oauth: Boolean) =
@@ -114,6 +122,38 @@ final class Game(
         }
       }
     }
+
+  private def handleDbExport(
+      me: Option[lila.user.User],
+      req: RequestHeader,
+      variant: String,
+      oauth: Boolean
+  ) = {
+    Variant.byKey
+      .lift(variant)
+      .fold(NotFound.fuccess)(variant => {
+        val format = GameApiV2.Format.byRequest(req).pp("format")
+        val config = GameApiV2.ByVariantConfig(
+          format = format,
+          since = getLong("since", req) map { new DateTime(_) },
+          until = getLong("until", req) map { new DateTime(_) },
+          analysed = getBoolOpt("analysed", req),
+          variant = variant,
+          flags = requestPgnFlags(req, extended = false).copy(literate = false)
+        )
+        val date = DateTimeFormat forPattern "yyyy-MM-dd" print new DateTime
+        apiC
+          .GlobalConcurrencyLimitPerIpAndUserOption(req, me)(env.api.gameApiV2.exportByVariant(config)) {
+            source =>
+              Ok.chunked(source)
+                .pipe(
+                  asAttachmentStream(s"playstrategy_${variant.name}_$date.${format.toString.toLowerCase}")
+                )
+                .as(gameContentType(config))
+          }
+          .fuccess
+      })
+  }
 
   def exportByIds =
     Action.async(parse.tolerantText) { req =>
