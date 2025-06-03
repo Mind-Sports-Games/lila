@@ -220,7 +220,7 @@ final class PlanApi(
       payPalClient.createSubscription(checkout, user)
 
     def captureOrder(orderId: PayPalOrderId, ip: IpAddress) = for {
-      order <- payPalClient.getOrder(orderId) orFail s"Missing paypal order for id $orderId"
+      order <- payPalClient.captureOrder(orderId)
       cents <- order.capturedMoney.fold[Fu[Cents]](fufail(s"Invalid paypal capture $order"))(fuccess)
       _ <-
         if (cents.value < 100) {
