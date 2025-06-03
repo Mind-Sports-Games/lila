@@ -25,11 +25,12 @@ final private class PayPalClient(
   import JsonHandlers.payPal._
 
   private object path {
-    val orders        = "v2/checkout/orders"
-    val plans         = "v1/billing/plans"
-    val subscriptions = "v1/billing/subscriptions"
-    val token         = "v1/oauth2/token"
-    val events        = "v1/notifications/webhooks-events"
+    val orders                     = "v2/checkout/orders"
+    def capture(id: PayPalOrderId) = s"$orders/$id/capture"
+    val plans                      = "v1/billing/plans"
+    val subscriptions              = "v1/billing/subscriptions"
+    val token                      = "v1/oauth2/token"
+    val events                     = "v1/notifications/webhooks-events"
   }
 
   private val patronMonthProductId = config.monthly
@@ -97,6 +98,10 @@ final private class PayPalClient(
   def getOrder(id: PayPalOrderId): Fu[Option[PayPalOrder]] =
     getOne[PayPalOrder](s"${path.orders}/$id")
 
+  // actually triggers the payment for a onetime order
+  def captureOrder(id: PayPalOrderId): Fu[PayPalOrder] =
+    postOne[PayPalOrder](path.capture(id), Json.obj())
+
   def getSubscription(id: PayPalSubscriptionId): Fu[Option[PayPalSubscription]] =
     getOne[PayPalSubscription](s"${path.subscriptions}/$id") recover {
       case CantParseException(json, _)
@@ -149,9 +154,6 @@ final private class PayPalClient(
       )
     )
 
-  private val fullResponse = (ws: StandaloneWSRequest) =>
-    ws.addHttpHeaders("Prefer" -> "return=representation")
-
   private def getOne[A: Reads](url: String): Fu[Option[A]] =
     get[A](url) dmap some recover { case _: NotFoundException =>
       None
@@ -181,7 +183,7 @@ final private class PayPalClient(
       .withHttpHeaders(
         "Authorization" -> s"Bearer $bearer",
         "Content-Type"  -> "application/json",
-        "Prefer"        -> "return=representation" // important for plans
+        "Prefer"        -> "return=representation" // important for plans and orders
       )
   }
 

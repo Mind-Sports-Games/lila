@@ -27,9 +27,9 @@ case class ContentSecurityPolicy(
 
   def withPayPal =
     copy(
-      connectSrc = "https://*.paypal.com" :: connectSrc,
-      scriptSrc = "https://*.paypal.com" :: scriptSrc,
-      frameSrc = "https://*.paypal.com" :: frameSrc
+      connectSrc = List("https://www.paypal.com", "https://*.paypal.com") ::: connectSrc,
+      scriptSrc = List("https://www.paypal.com", "https://*.paypal.com") ::: scriptSrc,
+      frameSrc = List("https://www.paypal.com", "https://*.paypal.com") ::: frameSrc
     )
 
   def finalizeWithTwitch =
