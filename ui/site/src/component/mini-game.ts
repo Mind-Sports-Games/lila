@@ -1,6 +1,6 @@
 import * as domData from 'common/data';
 import { variantFromElement } from 'common/mini-board';
-import { readDice, readDoublingCube, displayScore, fenPlayerIndex } from 'stratutils';
+import { readDice, readDoublingCube, displayScore, fenPlayerIndex, lastMove } from 'stratutils';
 import clockWidget from './clock-widget';
 
 interface UpdateData {
@@ -60,9 +60,14 @@ export const init = (node: HTMLElement) => {
           doublingCube: readDoublingCube(fen, variantFromElement($el) as VariantKey),
           showUndoButton: false,
           orientation,
-          lastMove: lm && (lm[1] === '@' ? [lm.slice(2)] : [lm[0] + lm[1], lm[2] + lm[3]]),
+          lastMove: lastMove(
+            ['flipello', 'flipello10', 'go9x9', 'go13x13', 'go19x19'].includes(variantFromElement($el)),
+            lm,
+          ),
           highlight: {
             lastMove:
+              lm != undefined &&
+              lm !== 'pass' &&
               variantFromElement($el) != 'backgammon' &&
               variantFromElement($el) != 'hyper' &&
               variantFromElement($el) != 'nackgammon',

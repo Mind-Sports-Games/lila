@@ -52,23 +52,6 @@ export const justIcon = (icon: string): VNodeData => ({
   attrs: { 'data-icon': icon },
 });
 
-export const uci2move = (uci: string): cg.Key[] | undefined => {
-  if (
-    !uci ||
-    uci == 'pass' ||
-    uci == 'roll' ||
-    uci == 'endturn' ||
-    uci == 'undo' ||
-    uci.includes('/') ||
-    uci.substring(0, 3) == 'ss:' ||
-    uci.substring(0, 4) == 'cube'
-  )
-    return undefined;
-  const pos = uci.match(/[a-z][1-9][0-9]?/g) as cg.Key[];
-  if (uci[1] === '@') return [pos[0], pos[0]] as cg.Key[];
-  return [pos[0], pos[1]] as cg.Key[];
-};
-
 export const onInsert = (f: (el: HTMLElement) => void): Hooks => ({
   insert(vnode) {
     f(vnode.elm as HTMLElement);
@@ -240,18 +223,6 @@ const noAnalysisBoardVariants: VariantKey[] = ['backgammon', 'hyper', 'nackgammo
 
 export function allowAnalysisForVariant(variant: VariantKey) {
   return noAnalysisBoardVariants.indexOf(variant) == -1;
-}
-
-export function lastMove(onlyDropsVariant: boolean, uci: string): cg.Key[] | undefined {
-  if (onlyDropsVariant) {
-    if (uci && uci[1] === '@') {
-      return uci2move(uci);
-    } else {
-      return undefined;
-    }
-  } else {
-    return uci2move(uci);
-  }
 }
 
 export function turnPlayerIndexFromLastTurn(turn: number): PlayerIndex {
