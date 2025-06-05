@@ -35,7 +35,7 @@ export function makeConfig(ctrl: RoundController): Config {
     orientation: boardOrientation(data, ctrl.flip),
     myPlayerIndex: data.player.playerIndex,
     turnPlayerIndex: turnPlayerIndex,
-    lastMove: util.lastMove(data.onlyDropsVariant, step.uci),
+    lastMove: stratUtils.lastMove(data.onlyDropsVariant, step.uci),
     check: !!step.check,
     coordinates: data.pref.coords !== Prefs.Coords.Hidden,
     boardScores: ['togyzkumalak', 'bestemshe', 'backgammon', 'hyper', 'nackgammon'].includes(data.game.variant.key),
@@ -52,6 +52,7 @@ export function makeConfig(ctrl: RoundController): Config {
     highlight: {
       lastMove:
         data.pref.highlight &&
+        step.uci !== 'pass' &&
         !data.selectMode &&
         !['backgammon', 'hyper', 'nackgammon'].includes(data.game.variant.key),
       check: data.pref.highlight && !['backgammon', 'hyper', 'nackgammon'].includes(data.game.variant.key),
