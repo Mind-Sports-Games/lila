@@ -55,6 +55,35 @@ export const altCastles = {
   e8h8: 'e8g8',
 };
 
+export const uci2move = (uci: string): cg.Key[] | undefined => {
+  if (
+    !uci ||
+    uci == 'pass' ||
+    uci == 'roll' ||
+    uci == 'endturn' ||
+    uci == 'undo' ||
+    uci.includes('/') ||
+    uci.substring(0, 3) == 'ss:' ||
+    uci.substring(0, 4) == 'cube'
+  )
+    return undefined;
+  const pos = uci.match(/[a-z][1-9][0-9]?/g) as cg.Key[];
+  if (uci[1] === '@' || uci[0] === '@') return [pos[0], pos[0]] as cg.Key[];
+  return [pos[0], pos[1]] as cg.Key[];
+};
+
+export function lastMove(onlyDropsVariant: boolean, uci: string): cg.Key[] | undefined {
+  if (onlyDropsVariant) {
+    if (uci && (uci[1] === '@' || uci[0] === '@')) {
+      return uci2move(uci);
+    } else {
+      return undefined;
+    }
+  } else {
+    return uci2move(uci);
+  }
+}
+
 // 3 check and 5 check dont have consistent fen formats, its calculated from running through game plys.
 export function getScore(variant: VariantKey, fen: string, playerIndex: string): number | undefined {
   return variantClassFromKey(variant).getScoreFromFen(fen, playerIndex);
