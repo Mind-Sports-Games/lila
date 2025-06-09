@@ -483,10 +483,9 @@ private[tournament] case class TournamentSetup(
       TournamentMedleyUtil
         .medleyVariantsAndIntervals(
           fullMedleyList,
-          clock.limitSeconds,
+          medleyIntervalOptions.balanceIntervals.flatMap(b => if (b) Some(clock.limitSeconds) else None),
           medleyDuration,
           medleyIntervalOptions.numIntervals.getOrElse(fullMedleyList.length),
-          medleyIntervalOptions.balanceIntervals.getOrElse(false)
         )
         .some
     } else None
