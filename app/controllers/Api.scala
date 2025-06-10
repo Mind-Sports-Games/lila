@@ -330,20 +330,15 @@ final class Api(
       scoped = req => u => gamesByUsers(if (u.id == "playstrategy4545") 900 else 500)(req)
     )
 
-  private def gameLogic(libS: Option[String]): GameLogic = libS match {
-    case Some(libS) => GameLogic(libS.toInt)
-    case None       => sys.error("No lib provided in cloudEval")
-  }
-
   def cloudEval =
     Action.async { req =>
       {
-        val lib = gameLogic(get("lib", req))
+        val variant = Variant.orDefault(~get("variant", req))
         get("fen", req).fold(notFoundJson("Missing FEN")) { fen =>
           JsonOptionOk(
             env.evalCache.api.getEvalJson(
-              Variant.orDefault(lib, ~get("variant", req)),
-              FEN(lib, fen),
+              variant,
+              FEN(variant.gameLogic, fen),
               getInt("multiPv", req) | 1
             )
           )
