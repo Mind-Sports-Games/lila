@@ -217,15 +217,15 @@ square {
     }
 
     @each $board, $variant, $lastMove in $oware-board-highlights {
-      body.#{$board} .#{$variant} & {
+      body.#{$board} .variant-#{$variant} & {
         background: url(../images/board/oware/highlights/#{$lastMove}.svg);
         background-size: cover;
       }
-      body.#{$board} .#{$variant} &.last-move.from {
+      body.#{$board} .variant-#{$variant} &.last-move.from {
         background: url(../images/board/oware/highlights/#{$lastMove}.svg);
         background-size: cover;
       }
-      body.#{$board} .#{$variant} &.last-move.to {
+      body.#{$board} .variant-#{$variant} &.last-move.to {
         background: url(../images/board/oware/highlights/#{$lastMove}.svg);
         background-size: cover;
       }
@@ -333,13 +333,13 @@ square {
     }
   }
 
-  @each $color, $gameFamily, $_lastMove, $_selectedMove, $solid, $dashed in $oware-board-highlights {
-    body.#{$color} .#{$gameFamily} &.last-move.from {
+  @each $color, $variant, $_lastMove, $_selectedMove, $solid, $dashed in $oware-board-highlights {
+    body.#{$color} .variant-#{$variant} &.last-move.from {
       background: url(../images/board/oware/highlights/#{$solid}.svg);
       background-size: cover;
     }
 
-    body.#{$color} .#{$gameFamily} &.last-move.to {
+    body.#{$color} .variant-#{$variant} &.last-move.to {
       background: url(../images/board/oware/highlights/#{$dashed}.svg);
       background-size: cover;
     }
