@@ -40,7 +40,10 @@ on:
 
 jobs:
   openjdk17:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
+    env:
+      JAVA_OPTS: "-Xmx20g"
+      SBT_OPTS: "-Dsbt.ci=true"
     steps:
       - name: Check if organization member
         id: check_org_member
@@ -75,6 +78,9 @@ jobs:
         with:
           distribution: temurin
           java-version: 17.0.5
+          cache: sbt
+      - name: Setup sbt
+        uses: sbt/setup-sbt@v1
       - run: TZ=UTC git log -1 --date=iso-strict-local --pretty='format:app.version.commit = "%h"%napp.version.date = "%ad"%napp.version.message = """%s"""%n' | tee conf/version.conf
       - run: ./lila -Depoll=true "test;stage"
       - run: cp LICENSE COPYING.md README.md target/universal/stage && git log -n 1 --pretty=oneline > target/universal/stage/commit.txt

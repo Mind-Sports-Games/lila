@@ -9,9 +9,14 @@ on:
 jobs:
   update-graph:
     name: Update Dependency Graph
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
+    env:
+      JAVA_OPTS: "-Xmx20g"
+      SBT_OPTS: "-Dsbt.ci=true"
     steps:
       - uses: actions/checkout@v4
+      - name: Setup sbt
+        uses: sbt/setup-sbt@v1
       - uses: scalacenter/sbt-dependency-submission@v3
         with:
           working-directory: './'
