@@ -11,8 +11,8 @@ jobs:
     name: Update Dependency Graph
     runs-on: ubuntu-24.04
     env:
-      JAVA_OPTS: "-Xmx20g"
-      SBT_OPTS: "-Dsbt.ci=true"
+      JAVA_OPTS: '-Xmx20g'
+      SBT_OPTS: '-Dsbt.ci=true'
     steps:
       - uses: actions/checkout@v4
       - name: Setup sbt

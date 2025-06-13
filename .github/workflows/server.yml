@@ -42,8 +42,8 @@ jobs:
   openjdk17:
     runs-on: ubuntu-24.04
     env:
-      JAVA_OPTS: "-Xmx20g"
-      SBT_OPTS: "-Dsbt.ci=true"
+      JAVA_OPTS: '-Xmx20g'
+      SBT_OPTS: '-Dsbt.ci=true'
     steps:
       - name: Check if organization member
         id: check_org_member
