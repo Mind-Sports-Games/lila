@@ -858,6 +858,16 @@ export default class Setup {
         toggleButtons();
       });
     });
+    const updateBotDetails = () => {
+      const bot = $botInput.filter(':checked').val() as string;
+      const botText = $form.find('.opponent_bot.choice');
+      botText.empty();
+      botText.append(
+        `<a class="user-link ulpt" href="/@/${bot}"><span class="utitle" data-bot="data-bot" title="Robot">BOT</span>&nbsp${bot}</a>`,
+      );
+      if (user) $form.attr('action', $form.attr('action')?.replace(/user=[^&]*/, 'user=' + bot));
+      else $form.attr('action', $form.attr('action') + `&user=${bot}`);
+    };
     const setupOpponentChoices = () => {
       $botChoices.hide();
       $form.find('.bot_title').hide();
@@ -869,6 +879,7 @@ export default class Setup {
           $opponentInput.val('friend');
         }
       }
+      updateBotDetails();
     };
     setupOpponentChoices();
     $collapsibleSections.each(function (this: HTMLDivElement) {
@@ -907,6 +918,7 @@ export default class Setup {
             if (sName === 'opponent') {
               if (($opponentInput.filter(':checked').val() as string) === 'bot') {
                 $form.find('.bot_title').show();
+                $botChoices.show();
               }
               if (($opponentInput.filter(':checked').val() as string) === 'lobby') {
                 $form.find('.rating-range-config').show();
@@ -1008,6 +1020,8 @@ export default class Setup {
             if (clockConfig[choice]['periods']) $periodsInput.val(clockConfig[choice]['periods']);
             $form.find('.time_mode_config').hide();
         }
+        toggleButtons();
+        showRating();
       })
       .trigger('change');
     const validateFen = debounce(() => {
@@ -1052,15 +1066,6 @@ export default class Setup {
     $form.find('optgroup').each((_, optgroup: HTMLElement) => {
       optgroup.setAttribute('label', optgroup.getAttribute('name') || '');
     });
-
-    const updateBotDetails = () => {
-      const bot = $botInput.filter(':checked').val() as string;
-      const botText = $form.find('.opponent_bot.choice');
-      //TODO add player link here instead of just user name
-      botText.text(bot);
-      if (user) $form.attr('action', $form.attr('action')?.replace(/user=[^&]*/, 'user=' + bot));
-      else $form.attr('action', $form.attr('action') + `&user=${bot}`);
-    };
     $opponentInput.on('change', function (this: HTMLElement) {
       const opponent = $opponentInput.filter(':checked').val() as string;
       if (opponent === 'bot') {
@@ -1175,29 +1180,6 @@ export default class Setup {
         $advancedTimeSetup.show();
       }
     });
-
-    // $form.find('div.level').each(function (this: HTMLElement) {
-    //   const $infos = $(this).find('.ai_info > div');
-    //   $(this)
-    //     .find('label')
-    //     .on('mouseenter', function (this: HTMLElement) {
-    //       $infos
-    //         .hide()
-    //         .filter('.' + $(this).attr('for'))
-    //         .show();
-    //     });
-    //   $(this)
-    //     .find('#config_level')
-    //     .on('mouseleave', function (this: HTMLElement) {
-    //       const level = $(this).find('input:checked').val();
-    //       $infos
-    //         .hide()
-    //         .filter('.sf_level_' + level)
-    //         .show();
-    //     })
-    //     .trigger('mouseout');
-    //   $(this).find('input').on('change', save);
-    // });
 
     toggleButtons();
   };

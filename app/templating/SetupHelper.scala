@@ -197,7 +197,7 @@ trait SetupHelper { self: I18nHelper =>
     (
       s"${encodeGameFamilyId(variant.gameFamily)}_${encodeId(variant)}",
       variant.perfIcon.toString(),
-      VariantKeys.variantName(variant).some
+      VariantKeys.variantName(variant).replace("/", " / ").some
     )
 
   def translatedGameFamilyChoices(implicit lang: Lang): List[SelectChoice] =

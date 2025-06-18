@@ -84,9 +84,43 @@ $game-family-p2-pieces: (
     padding: 0.5em 1em;
   }
 
+  .mode_choice,
+  .bot_choice,
+  .playerIndex_choices {
+    & group.radio div {
+      max-width: unset;
+    }
+  }
+
+  .playerIndex_choices {
+    & group.radio div {
+      width: unset;
+    }
+  }
+
+  .bot_choice {
+    & group.radio div {
+      width: 25%;
+    }
+  }
+
+  .gameGroup_choice,
+  .variant_choice {
+    & group.radio div {
+      width: 25%;
+      max-width: 25%;
+      font-size: 95%;
+    }
+  }
+
   group.radio {
     margin: 0 auto 1em auto;
-    width: 70%;
+    width: 100%;
+    //gap: 0.2em;
+    div {
+      width: 33.33%;
+      max-width: 33.33%;
+    }
 
     .disabled {
       opacity: 0.4;
@@ -108,7 +142,7 @@ $game-family-p2-pieces: (
   }
 
   .bot_choice group.radio label {
-    width: 3em;
+    // width: 3em;
     height: 3em;
   }
 
@@ -148,6 +182,19 @@ $game-family-p2-pieces: (
   .time_mode_defaults {
     &.collapsible:not(.active) {
       @extend %flex-center;
+    }
+  }
+
+  .opponent_choices.collapsible {
+    flex-flow: row nowrap;
+    .opponent_bot.choice {
+      text-wrap-mode: nowrap;
+      a {
+        margin-left: -2em;
+      }
+      a:has(i) {
+        margin-left: -4em;
+      }
     }
   }
 
