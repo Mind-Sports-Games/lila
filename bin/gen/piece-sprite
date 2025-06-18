@@ -627,7 +627,18 @@ go_themes.map { |theme|
         }
       }
     }.flatten
-    File.open(dest_dir + 'go-' + name + '.css', 'w') { |f| f.puts (classes_go_game + classes_go_variant).join("\n") }
+    classes_go_highlights = go_variants.map { |variant|
+      colors.map { |color|
+        player = color == 'w' ? 'p2' : 'p1'
+        type = name == 'cross' ? 'cross' : ''
+        '.variant-' + variant + ' square.last-move.' + player + ' {' +
+          "background-image:url('../images/board/go/highlights/" + player + type + ".svg" + "');" +
+          "background-color: transparent;" +
+          "background-size: cover;" +
+          "z-index: 3;}"
+      }
+    }.flatten
+    File.open(dest_dir + 'go-' + name + '.css', 'w') { |f| f.puts (classes_go_game + classes_go_variant + classes_go_highlights).join("\n") }
   }
 # external SVG go
 go_themes.map { |theme|
@@ -649,7 +660,18 @@ go_themes.map { |theme|
         }
       }
     }.flatten
-    File.open(dest_dir + 'go-' + name + '.external.css', 'w') { |f| f.puts (classes_go_game + classes_go_variant).join("\n") }
+    classes_go_highlights = go_variants.map { |variant|
+      colors.map { |color|
+        player = color == 'w' ? 'p2' : 'p1'
+        type = name == 'cross' ? 'cross' : ''
+        '.variant-' + variant + ' square.last-move.' + player + ' {' +
+          "background-image:url('../images/board/go/highlights/" + player + type + ".svg" + "');" +
+          "background-color: transparent;" +
+          "background-size: cover;" +
+          "z-index: 3;}"
+      }
+    }.flatten
+    File.open(dest_dir + 'go-' + name + '.external.css', 'w') { |f| f.puts (classes_go_game + classes_go_variant + classes_go_highlights).join("\n") }
 }
 
 # inline SVG backgammon

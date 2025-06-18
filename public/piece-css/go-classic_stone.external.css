@@ -6,3 +6,9 @@
 .is2d .variant-go13x13 .s-piece.p1 {background-image:url('/assets/piece/go/classic_stone/bS.svg')}
 .is2d .variant-go19x19 .s-piece.p2 {background-image:url('/assets/piece/go/classic_stone/wS.svg')}
 .is2d .variant-go19x19 .s-piece.p1 {background-image:url('/assets/piece/go/classic_stone/bS.svg')}
+.variant-go9x9 square.last-move.p2 {background-image:url('../images/board/go/highlights/p2.svg');background-color: transparent;background-size: cover;z-index: 3;}
+.variant-go9x9 square.last-move.p1 {background-image:url('../images/board/go/highlights/p1.svg');background-color: transparent;background-size: cover;z-index: 3;}
+.variant-go13x13 square.last-move.p2 {background-image:url('../images/board/go/highlights/p2.svg');background-color: transparent;background-size: cover;z-index: 3;}
+.variant-go13x13 square.last-move.p1 {background-image:url('../images/board/go/highlights/p1.svg');background-color: transparent;background-size: cover;z-index: 3;}
+.variant-go19x19 square.last-move.p2 {background-image:url('../images/board/go/highlights/p2.svg');background-color: transparent;background-size: cover;z-index: 3;}
+.variant-go19x19 square.last-move.p1 {background-image:url('../images/board/go/highlights/p1.svg');background-color: transparent;background-size: cover;z-index: 3;}

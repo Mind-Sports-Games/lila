@@ -1,34 +1,43 @@
 import * as xhr from 'common/xhr';
 
-export default function PlayStrategyCheckout(publicKey: string) {
-  const $checkout = $('div.plan_checkout');
+const $checkout = $('div.plan_checkout');
+const getFreq = () => $checkout.find('group.freq input:checked').val();
+const showErrorThenReload = (error: string) => {
+  alert(error);
+  location.assign('/patron');
+};
+
+export default function CheckoutStart(stripePublicKey: string) {
   const lifetime = {
     cents: parseInt($checkout.data('lifetime-cents')),
     usd: $checkout.data('lifetime-usd'),
   };
+
+  const toggleInput = ($input: Cash, enable: boolean) =>
+    $input.prop('disabled', !enable).toggleClass('disabled', !enable);
+
   const min = 100,
     max = 100 * 100000;
 
   if (location.hash === '#onetime') $('#freq_onetime').trigger('click');
   if (location.hash === '#lifetime') $('#freq_lifetime').trigger('click');
 
-  const getFreq = function () {
-    return $checkout.find('group.freq input:checked').val();
-  };
-
   // Other is selected but no amount specified
   // happens with backward button
   if (!$checkout.find('.amount_choice group.amount input:checked').data('amount'))
     $checkout.find('#plan_monthly_1000').trigger('click');
 
-  const selectAmountGroup = function () {
+  const onFreqChange = function () {
     const freq = getFreq();
     $checkout.find('.amount_fixed').toggleClass('none', freq != 'lifetime');
     $checkout.find('.amount_choice').toggleClass('none', freq == 'lifetime');
+    const sub = freq == 'monthly';
+    $checkout.find('.paypal--order').toggle(!sub);
+    $checkout.find('.paypal--subscription').toggle(sub);
   };
-  selectAmountGroup();
+  onFreqChange();
 
-  $checkout.find('group.freq input').on('change', selectAmountGroup);
+  $checkout.find('group.freq input').on('change', onFreqChange);
 
   $checkout.find('group.amount .other label').on('click', function (this: HTMLLabelElement) {
     let amount: number;
@@ -51,47 +60,142 @@ export default function PlayStrategyCheckout(publicKey: string) {
     $(this).siblings('input').data('amount', cents).data('usd', usd);
   });
 
-  $checkout.find('button.paypal').on('click', function () {
+  const $userInput = $checkout.find('input.user-autocomplete');
+
+  const toggleCheckout = () => {
+    const enabled = true; //alwsy true as no gifts
+    toggleInput($checkout.find('.service button'), enabled);
+    $checkout.find('.service .paypal--disabled').toggleClass('none', enabled);
+    $checkout.find('.service .paypal:not(.paypal--disabled)').toggleClass('none', !enabled);
+  };
+
+  $userInput.on('change', toggleCheckout).on('input', toggleCheckout);
+
+  const getAmountToCharge = () => {
     const freq = getFreq(),
       cents =
         freq == 'lifetime' ? lifetime.cents : parseInt($checkout.find('group.amount input:checked').data('amount'));
     if (!cents || cents < min || cents > max) return;
     const amount = cents / 100;
-    const $form = $checkout.find('form.paypal_checkout.' + freq);
+    return amount;
+  };
+
+  $checkout.find('button.paypal').on('click', function () {
+    const amount = getAmountToCharge();
+    const $form = $checkout.find('form.paypal_checkout.' + getFreq());
     $form.find('input.amount').val('' + amount);
     ($form[0] as HTMLFormElement).submit();
     $checkout.find('.service').html(playstrategy.spinnerHtml);
+    toggleCheckout();
   });
 
+  const queryParams = new URLSearchParams(location.search);
+  for (const name of ['dest', 'freq']) {
+    if (queryParams.has(name))
+      $(`input[name=${name}][value=${queryParams.get(name)?.replace(/[^a-z_-]/gi, '')}]`).trigger('click');
+  }
+
+  toggleCheckout();
+
+  payPalOrderStart($checkout, getAmountToCharge);
+  payPalSubscriptionStart($checkout, getAmountToCharge);
+  stripeStart($checkout, stripePublicKey, getAmountToCharge);
+}
+
+const xhrFormData = ($checkout: Cash, amount: number) =>
+  xhr.form({
+    email: $checkout.data('email'),
+    amount,
+    freq: getFreq(),
+  });
+
+const payPalStyle = {
+  layout: 'horizontal',
+  color: 'blue',
+  height: 55,
+};
+
+function payPalOrderStart($checkout: Cash, getAmount: () => number | undefined) {
+  (window.paypalOrder as any)
+    .Buttons({
+      style: payPalStyle,
+      createOrder: (_data: any, _actions: any) => {
+        const amount = getAmount();
+        if (!amount) return;
+        return xhr
+          .jsonAnyResponse(`/patron/paypal/checkout`, {
+            method: 'post',
+            body: xhrFormData($checkout, amount),
+          })
+          .then(res => res.json())
+          .then(data => {
+            if (data.error) showErrorThenReload(data.error);
+            else if (data.order?.id) return data.order.id;
+            else location.assign('/patron');
+          });
+      },
+      onApprove: (data: any, _actions: any) => {
+        xhr
+          .json('/patron/paypal/capture/' + data.orderID, { method: 'POST' })
+          .then(() => location.assign('/patron/thanks'));
+      },
+    })
+    .render('.paypal--order');
+}
+
+function payPalSubscriptionStart($checkout: Cash, getAmount: () => number | undefined) {
+  (window.paypalSubscription as any)
+    .Buttons({
+      style: payPalStyle,
+      createSubscription: (_data: any, _actions: any) => {
+        const amount = getAmount();
+        if (!amount) return;
+        return xhr
+          .jsonAnyResponse(`/patron/paypal/checkout`, {
+            method: 'post',
+            body: xhrFormData($checkout, amount),
+          })
+          .then(res => res.json())
+          .then(data => {
+            if (data.error) showErrorThenReload(data.error);
+            else if (data.subscription?.id) return data.subscription.id;
+            else location.assign('/patron');
+          });
+      },
+      onApprove: (data: any, _actions: any) => {
+        xhr
+          .json(`/patron/paypal/capture/${data.orderID}?sub=${data.subscriptionID}`, { method: 'POST' })
+          .then(() => location.assign('/patron/thanks'));
+      },
+    })
+    .render('.paypal--subscription');
+}
+
+function stripeStart($checkout: Cash, publicKey: string, getAmount: () => number | undefined) {
   const stripe = window.Stripe(publicKey);
-  const showError = (error: string) => alert(error);
   $checkout.find('button.stripe').on('click', function () {
-    const freq = getFreq(),
-      amount =
-        freq == 'lifetime' ? lifetime.cents : parseInt($checkout.find('group.amount input:checked').data('amount'));
-    if (amount < min || amount > max) return;
+    const amount = getAmount();
+    if (!amount) return;
     $checkout.find('.service').html(playstrategy.spinnerHtml);
 
     xhr
-      .json('/patron/stripe/checkout', {
+      .jsonAnyResponse(`/patron/stripe/checkout`, {
         method: 'post',
-        body: xhr.form({
-          email: $checkout.data('email'),
-          amount,
-          freq,
-        }),
+        body: xhrFormData($checkout, amount),
       })
+      .then(res => res.json())
       .then(data => {
-        if (data.session?.id) {
+        if (data.error) showErrorThenReload(data.error);
+        else if (data.session?.id) {
           stripe
             .redirectToCheckout({
               sessionId: data.session.id,
             })
-            .then((result: any) => showError(result.error.message));
+            .then((result: any) => showErrorThenReload(result.error.message));
         } else {
           location.assign('/patron');
         }
-      }, showError);
+      }, showErrorThenReload);
   });
 
   // Close Checkout on page navigation:
@@ -99,4 +203,5 @@ export default function PlayStrategyCheckout(publicKey: string) {
     window.stripeHandler.close();
   });
 }
-(window as any).PlayStrategyCheckout = PlayStrategyCheckout; // esbuild
+
+(window as any).CheckoutStart = CheckoutStart;
