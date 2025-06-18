@@ -31,13 +31,13 @@ final class Editor(env: Env) extends LilaController(env) {
         .filter(_.nonEmpty)
         .orElse(get("fen"))
       val variantKey = urlVariant match {
-        case "racingkings" => "racingKings"
-        case "kingofthehill"  => "kingOfTheHill"
-        case "linesofaction" => "linesOfAction"
-        case "scrambledeggs" => "scrambledEggs"
+        case "racingkings"      => "racingKings"
+        case "kingofthehill"    => "kingOfTheHill"
+        case "linesofaction"    => "linesOfAction"
+        case "scrambledeggs"    => "scrambledEggs"
         case "minibreakthrough" => "minibreakthroughtroyka"
-        case "breakthrough" => "breakthroughtroyka"
-        case _ => urlVariant
+        case "breakthrough"     => "breakthroughtroyka"
+        case _                  => urlVariant
       }
       val variant = Variant(variantKey).getOrElse(Variant.libStandard(GameLogic.Chess()))
       fuccess {
@@ -79,7 +79,11 @@ final class Editor(env: Env) extends LilaController(env) {
       OptionResult(env.game.gameRepo game id) { game =>
         Redirect {
           if (game.playable) routes.Round.watcher(game.id, game.variant.startPlayer.name)
-          else routes.Editor.load("chess", get("fen") | (Forsyth.>>(game.variant.gameLogic, game.stratGame)).value)
+          else
+            routes.Editor.load(
+              "chess",
+              get("fen") | (Forsyth.>>(game.variant.gameLogic, game.stratGame)).value
+            )
         }
       }
     }
