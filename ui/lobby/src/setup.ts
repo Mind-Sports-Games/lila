@@ -5,12 +5,8 @@ import * as xhr from 'common/xhr';
 import LobbyController from './ctrl';
 import { ClockConfig } from './interfaces';
 
-//TODO remove other form setup options
 export default class Setup {
   stores: {
-    hook: FormStore;
-    friend: FormStore;
-    ai: FormStore;
     game: FormStore;
   };
 
@@ -19,9 +15,6 @@ export default class Setup {
     readonly root: LobbyController,
   ) {
     this.stores = {
-      hook: makeStore(makeStorage('lobby.setup.hook')),
-      friend: makeStore(makeStorage('lobby.setup.friend')),
-      ai: makeStore(makeStorage('lobby.setup.ai')),
       game: makeStore(makeStorage('lobby.setup.game')),
     };
   }
@@ -142,9 +135,7 @@ export default class Setup {
       correspondence: { timemode: '2', days: '2' },
       custom: { timemode: '6' },
     };
-    switch (
-      variant //TODO add modes for all games, e.g. backgammon
-    ) {
+    switch (variant) {
       case '3_5': //mini-shogi
       case '3_1': //shogi
         return Object.assign({}, defaultClockConfig, {
@@ -152,6 +143,24 @@ export default class Setup {
           blitz: { timemode: '3', byoyomi: '10', periods: '1', increment: '0', initial: '3' },
           rapid: { timemode: '3', byoyomi: '10', periods: '1', increment: '0', initial: '5' },
           classical: { timemode: '3', byoyomi: '20', periods: '2', increment: '0', initial: '20' },
+        });
+      case '9_1': //go9x9
+      case '9_2': //go13x13
+      case '9_4': //go19x19
+        return Object.assign({}, defaultClockConfig, {
+          bullet: { timemode: '3', byoyomi: '5', periods: '1', increment: '0', initial: '5' },
+          blitz: { timemode: '3', byoyomi: '10', periods: '1', increment: '0', initial: '10' },
+          rapid: { timemode: '3', byoyomi: '15', periods: '1', increment: '0', initial: '15' },
+          classical: { timemode: '3', byoyomi: '30', periods: '1', increment: '0', initial: '60' },
+        });
+      case '10_1': //backgammon
+      case '10_2': //nackgammon
+      case '10_4': //hyper
+        return Object.assign({}, defaultClockConfig, {
+          bullet: { timemode: '5', increment: '0', initial: '3' },
+          blitz: { timemode: '5', increment: '6', initial: '3' },
+          rapid: { timemode: '5', increment: '12', initial: '3' },
+          classical: { timemode: '5', increment: '12', initial: '5' },
         });
       default:
         return defaultClockConfig;
@@ -177,7 +186,7 @@ export default class Setup {
       case '6': //custom
         return 'Custom';
       default:
-        return clockConfig.initial + (clockConfig.increment !== '0' ? ' + ' + clockConfig.increment : '');
+        return clockConfig.initial + ' + ' + clockConfig.increment;
     }
   };
 
@@ -217,11 +226,10 @@ export default class Setup {
       $modeChoices = $modeChoicesWrap.find('input'),
       $casual = $modeChoices.eq(0),
       $rated = $modeChoices.eq(1),
-      //$variantSelect = $form.find('#sf_variant'),
       $gameGroups = $form.find('.gameGroup_choice'),
       $gameGroupInput = $gameGroups.find('.gameGroup_choice [name=gameGroup]'),
       $variants = $form.find('.variant_choice'),
-      $variantInput = $variants.find('.variant_choice [name=variant]'), //todo not a select anymore....
+      $variantInput = $variants.find('.variant_choice [name=variant]'),
       $fenPosition = $form.find('.fen_position'),
       $fenInput = $fenPosition.find('input'),
       forceFromPosition = !!$fenInput.val(),
@@ -250,22 +258,27 @@ export default class Setup {
       $collapsibleSections = $modal.find('.collapsible'),
       randomPlayerIndexVariants = $form.data('random-playerindex-variants').split(','),
       $playerIndex = $form.find('.playerIndex_choices'),
-      $submits = $form.find('.playerIndex-submits__button'),
+      $playerIndexInput = $form.find('.playerIndex_choices [name=playerIndex]'),
+      $submits = $form.find('.submit_button'),
       toggleButtons = () => {
         randomPlayerIndexVariants;
-        const variantId = ($variantInput.filter(':checked').val() as string).split('_'),
+        const variantFull = $variantInput.filter(':checked').val() as string,
+          variantId = variantFull.split('_'),
           timeMode = <string>$timeModeSelect.val(),
           rated = $rated.prop('checked'),
           limit = parseFloat($timeInput.val() as string),
           inc = parseFloat($incrementInput.val() as string),
           byo = parseFloat($byoyomiInput.val() as string),
           per = parseFloat($periodsInput.filter(':checked').val() as string),
+          opponentType = $opponentInput.filter(':checked').val() as string,
+          playerIndex = $playerIndexInput.filter(':checked').val() as string,
           // no rated variants with less than 30s on the clock and no rated unlimited in the lobby
           cantBeRated =
-            (typ === 'hook' && timeMode === '0') ||
+            (opponentType === 'lobby' && timeMode === '0') ||
             this.ratedTimeModes.indexOf(timeMode) === -1 ||
             (limit < 0.5 && inc == 0) ||
             (limit == 0 && inc < 2) ||
+            (playerIndex !== 'random' && randomPlayerIndexVariants.includes(variantFull)) ||
             (vsPSBot && user == 'ps-random-mover') ||
             (variantId[0] == '9' &&
               $goConfig.val() !== undefined &&
@@ -284,14 +297,14 @@ export default class Setup {
         const byoOk = timeMode !== '3' || ((limit > 0 || inc > 0 || byo > 0) && (byo || per === 1));
         const delayOk = (timeMode !== '4' && timeMode !== '5') || inc > 0;
         const timeOk = timeMode !== '1' || limit > 0 || inc > 0,
-          ratedOk = typ !== 'hook' || !rated || timeMode !== '0',
-          aiOk = typ !== 'ai' || variantId[1] !== '3' || limit >= 1,
+          ratedOk = opponentType !== 'lobby' || !rated || timeMode !== '0',
+          aiOk = opponentType !== 'bot' || variantId[1] !== '3' || limit >= 1,
           fenOk = variantId[0] !== '0' || variantId[1] !== '3' || $fenInput.hasClass('success'),
           botOK = !vsPSBot || psBotCanPlay(user, limit, inc, variantId);
+
         if (byoOk && delayOk && timeOk && ratedOk && aiOk && fenOk && botOK) {
           $submits.toggleClass('nope', false);
-          $submits.filter(':not(.random)').toggle(!rated || !randomPlayerIndexVariants.includes(variantId[1]));
-        } else $submits.toggleClass('nope', true);
+        } else $submits.toggleClass('nope', true); //TODO warning instead of disabling
       },
       save = function () {
         self.save($form[0] as HTMLFormElement);
@@ -639,53 +652,59 @@ export default class Setup {
       });
     };
 
-    if (typ === 'hook') {
-      if ($form.data('anon')) {
-        $timeModeSelect
-          .val('1')
-          .children('.timeMode_2, .timeMode_0')
-          .prop('disabled', true)
-          .attr('title', this.root.trans('youNeedAnAccountToDoThat'));
-      }
-      //TODO change this as playerIndex is not with submit button anymore
-      const ajaxSubmit = (playerIndex: string) => {
-        const form = $form[0] as HTMLFormElement;
-        const rating = parseInt($modal.find('.ratings input').val() as string) || 1500;
-        if (form.ratingRange)
-          form.ratingRange.value = [
-            rating + parseInt(form.ratingRange_range_min.value),
-            rating + parseInt(form.ratingRange_range_max.value),
-          ].join('-');
-        save();
-        const poolMember = this.hookToPoolMember(playerIndex, form);
-        modal.close();
-        if (poolMember) {
-          this.root.enterPool(poolMember);
-        } else {
-          this.root.setTab(isRealTime() ? 'real_time' : 'seeks');
-          xhr.text($form.attr('action')!.replace(/sri-placeholder/, playstrategy.sri), {
-            method: 'post',
-            body: (() => {
-              const data = new FormData($form[0] as HTMLFormElement);
-              data.append('playerIndex', playerIndex);
-              return data;
-            })(),
-          });
+    const updateLobbySubmit = () => {
+      if (($opponentInput.filter(':checked').val() as string) === 'lobby') {
+        if ($form.data('anon')) {
+          $timeModeSelect
+            .val('1')
+            .children('.timeMode_2, .timeMode_0')
+            .prop('disabled', true)
+            .attr('title', this.root.trans('youNeedAnAccountToDoThat'));
         }
-        this.root.redraw();
-        return false;
-      };
-      $submits
-        .on('click', function (this: HTMLElement) {
-          return ajaxSubmit($(this).val() as string);
-        })
-        .prop('disabled', false);
-      $form.on('submit', () => ajaxSubmit('random'));
-    } else
-      $form.one('submit', () => {
-        $submits.hide();
-        $form.find('.playerIndex-submits').append(playstrategy.spinnerHtml);
-      });
+        const ajaxSubmit = (playerIndex: string) => {
+          const form = $form[0] as HTMLFormElement;
+          const rating = parseInt($modal.find('.ratings input').val() as string) || 1500;
+          if (form.ratingRange)
+            form.ratingRange.value = [
+              rating + parseInt(form.ratingRange_range_min.value),
+              rating + parseInt(form.ratingRange_range_max.value),
+            ].join('-');
+          save();
+          const poolMember = this.hookToPoolMember(playerIndex, form);
+          modal.close();
+          if (poolMember) {
+            this.root.enterPool(poolMember);
+          } else {
+            this.root.setTab(isRealTime() ? 'real_time' : 'seeks');
+            xhr.text($form.attr('action')!.replace(/sri-placeholder/, playstrategy.sri), {
+              method: 'post',
+              body: (() => {
+                const data = new FormData($form[0] as HTMLFormElement);
+                return data;
+              })(),
+            });
+          }
+          this.root.redraw();
+          return false;
+        };
+        $submits
+          .off('click') // Always remove previous handlers first!
+          .on('click', function (this: HTMLElement) {
+            return ajaxSubmit($playerIndexInput.filter(':checked').val() as string);
+          })
+          .prop('disabled', false);
+        $form.off('submit').on('submit', () => ajaxSubmit('random'));
+      } else {
+        $submits.off('click').prop('disabled', false);
+        $form.off('submit'); // Remove any custom submit handler
+        $form.one('submit', () => {
+          $submits.hide();
+          $form.find('.submit').append(playstrategy.spinnerHtml);
+        });
+      }
+    };
+    updateLobbySubmit();
+
     if (this.root.opts.blindMode) {
       $variantInput.filter(':checked')[0]!.focus();
       $timeInput.add($incrementInput).on('change', () => {
@@ -849,8 +868,6 @@ export default class Setup {
         } else {
           $opponentInput.val('friend');
         }
-      } else {
-        $opponentInput.val('lobby'); //default instead of history?
       }
     };
     setupOpponentChoices();
@@ -970,27 +987,29 @@ export default class Setup {
         showRating();
       })
       .trigger('change');
-    $timeModeDefaults.on('change', function (this: HTMLElement) {
-      const choice = $(this).find('input').filter(':checked').val() as string;
-      const clockConfig = self.clockDefaults($variantInput.filter(':checked').val() as string);
-      switch (choice) {
-        case 'correspondence': //correspondence
-          $timeModeSelect.val(clockConfig['correspondence'].timemode);
-          $daysInput.val(clockConfig['correspondence'].days);
-          $form.find('.time_mode_config').hide();
-          break;
-        case 'custom': //custom - i.e. used old time setup options
-          $form.find('.time_mode_config').show();
-          break;
-        default:
-          $timeModeSelect.val(clockConfig[choice].timemode);
-          if (clockConfig[choice]['initial']) $timeInput.val(clockConfig[choice]['initial']);
-          if (clockConfig[choice]['increment']) $incrementInput.val(clockConfig[choice]['increment']);
-          if (clockConfig[choice]['byoyomi']) $byoyomiInput.val(clockConfig[choice]['byoyomi']);
-          if (clockConfig[choice]['periods']) $periodsInput.val(clockConfig[choice]['periods']);
-          $form.find('.time_mode_config').hide();
-      }
-    });
+    $timeModeDefaults
+      .on('change', function (this: HTMLElement) {
+        const choice = $(this).find('input').filter(':checked').val() as string;
+        const clockConfig = self.clockDefaults($variantInput.filter(':checked').val() as string);
+        switch (choice) {
+          case 'correspondence': //correspondence
+            $timeModeSelect.val(clockConfig['correspondence'].timemode);
+            $daysInput.val(clockConfig['correspondence'].days);
+            $form.find('.time_mode_config').hide();
+            break;
+          case 'custom': //custom - i.e. used old time setup options
+            $form.find('.time_mode_config').show();
+            break;
+          default:
+            $timeModeSelect.val(clockConfig[choice].timemode);
+            if (clockConfig[choice]['initial']) $timeInput.val(clockConfig[choice]['initial']);
+            if (clockConfig[choice]['increment']) $incrementInput.val(clockConfig[choice]['increment']);
+            if (clockConfig[choice]['byoyomi']) $byoyomiInput.val(clockConfig[choice]['byoyomi']);
+            if (clockConfig[choice]['periods']) $periodsInput.val(clockConfig[choice]['periods']);
+            $form.find('.time_mode_config').hide();
+        }
+      })
+      .trigger('change');
     const validateFen = debounce(() => {
       $fenInput.removeClass('success failure');
       const fen = $fenInput.val() as string;
@@ -1059,6 +1078,7 @@ export default class Setup {
         $form.find('.bot_title').hide();
         $form.find('.rating-range-config').hide();
       }
+      updateLobbySubmit();
     });
     $botInput.on('change', function (this: HTMLElement) {
       updateBotDetails();
@@ -1091,6 +1111,10 @@ export default class Setup {
         toggleButtons();
       })
       .trigger('change');
+
+    $playerIndexInput.on('change', function (this: HTMLElement) {
+      toggleButtons();
+    });
 
     $gameGroupInput
       .on('change', function (this: HTMLElement) {
@@ -1174,5 +1198,7 @@ export default class Setup {
     //     .trigger('mouseout');
     //   $(this).find('input').on('change', save);
     // });
+
+    toggleButtons();
   };
 }

@@ -175,10 +175,15 @@ $game-family-p2-pieces: (
       display: flex;
       flex-flow: row nowrap;
       justify-content: center;
-      margin-left: -80px;
-      height: 64px !important;
+      margin-left: -5.2em;
+      height: 45px !important;
+      &.random {
+        margin-left: -2.6em;
+      }
+      i {
+        margin-right: 4em;
+      }
       div {
-        margin-left: 40px;
         place-self: center;
       }
     }
@@ -262,15 +267,16 @@ $game-family-p2-pieces: (
 
       .playerIndex__button {
         //width: 64px;
-        height: 83px;
+        height: 65px;
         padding: $padding_button;
 
         i {
           display: block;
           padding: 0;
-          width: calc(64px - 2 * #{$padding_button});
-          height: calc(64px - 2 * #{$padding_button});
-          background-size: calc(64px - 2 * #{$padding_button}) calc(64px - 2 * #{$padding_button});
+          width: calc(45px - 2 * #{$padding_button});
+          height: calc(45px - 2 * #{$padding_button});
+          background-size: calc(45px - 2 * #{$padding_button}) calc(45px - 2 * #{$padding_button});
+          place-self: center;
         }
 
         $p1-piece: nth($game-family-p1-pieces, $iter);
@@ -302,13 +308,24 @@ $game-family-p2-pieces: (
           opacity: 0.3;
         }
       }
+    }
+  }
 
-      //TODO move to actual submit button
-      .spinner {
-        width: 85px;
-        height: 85px;
-        margin: 10px auto 20px auto;
+  .submit {
+    .submit_button {
+      &.nope {
+        visibility: hidden;
       }
+
+      &:disabled {
+        opacity: 0.3;
+      }
+    }
+
+    .spinner {
+      width: 50px;
+      height: 50px;
+      margin: 10px auto 20px auto;
     }
   }
 

@@ -95,7 +95,7 @@ object forms {
           )(
             fields,
             div(cls := "submit")(
-              submitButton("Create the game")
+              submitButton(cls := "submit_button")("Create the game")
             )
           )
         }

@@ -158,7 +158,7 @@ export default function PlayStrategyLobby(opts: LobbyOpts) {
   playstrategy.StrongSocket.firstConnect.then(() => {
     const gameId = getParameterByName('hook_like');
     if (!gameId) return;
-    const ratingRange = lobby.setup.stores.hook.get()?.ratingRange;
+    const ratingRange = lobby.setup.stores.game.get()?.ratingRange;
     xhr.text(`/setup/hook/${playstrategy.sri}/like/${gameId}?rr=${ratingRange || ''}`, { method: 'post' });
     lobby.setTab('real_time');
     history.replaceState(null, '', '/');
