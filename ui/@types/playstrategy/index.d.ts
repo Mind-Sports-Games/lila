@@ -224,6 +224,7 @@ declare namespace Editor {
     embed: boolean;
     positions?: OpeningPosition[];
     i18n: I18nDict;
+    variantKey?: VariantKey;
   }
 
   export interface Options {

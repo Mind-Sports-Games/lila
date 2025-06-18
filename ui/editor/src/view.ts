@@ -7,6 +7,7 @@ import { parseFen } from 'stratops/fen';
 import EditorCtrl from './ctrl';
 import chessground from './chessground';
 import { Selected, CastlingToggle, EditorState } from './interfaces';
+import { VariantKey } from 'stratops/variants/types';
 
 function castleCheckBox(ctrl: EditorCtrl, id: CastlingToggle, label: string, reversed: boolean): VNode {
   const input = h('input', {
@@ -46,13 +47,13 @@ function studyButton(ctrl: EditorCtrl, state: EditorState): VNode {
           attrs: {
             type: 'submit',
             'data-icon': '4',
-            disabled: !state.legalFen,
+            disabled: !canOpenStudy(state.legalFen, ctrl.rules),
           },
           class: {
             button: true,
             'button-empty': true,
             text: true,
-            disabled: !state.legalFen,
+            disabled: !canOpenStudy(state.legalFen, ctrl.rules),
           },
         },
         ctrl.trans.noarg('toStudy'),
@@ -61,30 +62,57 @@ function studyButton(ctrl: EditorCtrl, state: EditorState): VNode {
   );
 }
 
-function variant2option(key: Rules, name: string, ctrl: EditorCtrl): VNode {
+function isChessRules(rules: Rules): boolean {
+  return [
+    'chess',
+    'antichess',
+    'atomic',
+    'crazyhouse',
+    'horde',
+    'kingofthehill',
+    'racingkings',
+    '3check',
+    '5check',
+    'monster',
+  ].includes(rules);
+}
+
+function canOpenStudy(legalFen: string, rules: Rules): boolean {
+  return legalFen && isChessRules(rules);
+}
+
+function variant2option(key: VariantKey, name: string, ctrl: EditorCtrl): VNode {
   return h(
     'option',
     {
       attrs: {
         value: key,
-        selected: key == ctrl.rules,
+        selected: key == ctrl.variantKey,
       },
     },
     `${ctrl.trans.noarg('variant')} | ${name}`,
   );
 }
 
-const allVariants: Array<[Rules, string]> = [
-  ['chess', 'Standard'],
-  ['antichess', 'Antichess'],
-  ['atomic', 'Atomic'],
-  ['crazyhouse', 'Crazyhouse'],
-  ['horde', 'Horde'],
-  ['kingofthehill', 'King of the Hill'],
-  ['racingkings', 'Racing Kings'],
-  ['3check', 'Three-check'],
-  ['5check', 'Five-check'],
-  ['monster', 'Monster'],
+const allVariants: Array<[VariantKey, string]> = [
+  [VariantKey.standard, 'Standard'],
+  [VariantKey.antichess, 'Antichess'],
+  [VariantKey.atomic, 'Atomic'],
+  [VariantKey.crazyhouse, 'Crazyhouse'],
+  [VariantKey.horde, 'Horde'],
+  [VariantKey.kingOfTheHill, 'King of the Hill'],
+  [VariantKey.racingKings, 'Racing Kings'],
+  [VariantKey.threeCheck, 'Three-check'],
+  [VariantKey.fiveCheck, 'Five-check'],
+  [VariantKey.monster, 'Monster'],
+  [VariantKey.minibreakthroughtroyka, 'Mini Breakthrough'],
+  [VariantKey.breakthroughtroyka, 'Breakthrough'],
+  [VariantKey.linesOfAction, 'Lines of Action'],
+  [VariantKey.scrambledEggs, 'Scrambled Eggs'],
+  [VariantKey.flipello, 'Othello'],
+  [VariantKey.flipello10, 'Grand Othello'],
+  [VariantKey.xiangqi, 'Xiangqi'],
+  [VariantKey.minixiangqi, 'Mini Xiangqi'],
 ];
 
 function controls(ctrl: EditorCtrl, state: EditorState): VNode {
@@ -145,7 +173,7 @@ function controls(ctrl: EditorCtrl, state: EditorState): VNode {
                   ),
                   ...ctrl.extraPositions.map(position2option),
                 ]),
-                optgroup(ctrl.trans.noarg('popularOpenings'), ctrl.cfg.positions.map(position2option)),
+                isChessRules(ctrl.rules) ? optgroup(ctrl.trans.noarg('popularOpenings'), ctrl.cfg.positions.map(position2option)) : null,
               ],
             ),
           ]),
@@ -176,6 +204,8 @@ function controls(ctrl: EditorCtrl, state: EditorState): VNode {
           }),
         ),
       ),
+      !isChessRules(ctrl.rules) ?
+      h('div.castlingsWTF') :
       h('div.castling', [
         h('strong', ctrl.trans.noarg('castling')),
         h('div', [
@@ -198,7 +228,8 @@ function controls(ctrl: EditorCtrl, state: EditorState): VNode {
                 attrs: { id: 'variants' },
                 on: {
                   change(e) {
-                    ctrl.setRules((e.target as HTMLSelectElement).value as Rules);
+                    ctrl.setVariantAndRules((e.target as HTMLSelectElement).value as VariantKey);
+                    ctrl.startPosition();
                   },
                 },
               },
@@ -279,12 +310,12 @@ function inputs(ctrl: EditorCtrl, fen: string): VNode | undefined {
           },
           input(e) {
             const el = e.target as HTMLInputElement;
-            const valid = parseFen('chess')(el.value.trim()).isOk;
+            const valid = parseFen(ctrl.rules)(el.value.trim()).isOk;
             el.setCustomValidity(valid ? '' : 'Invalid FEN');
           },
           blur(e) {
             const el = e.target as HTMLInputElement;
-            el.value = ctrl.getFen();
+            el.value = ctrl.getFenFromSetup();
             el.setCustomValidity('');
           },
         },
@@ -296,7 +327,7 @@ function inputs(ctrl: EditorCtrl, fen: string): VNode | undefined {
         attrs: {
           readonly: true,
           spellcheck: false,
-          value: ctrl.makeUrl(ctrl.cfg.baseUrl, fen),
+          value: ctrl.makeUrl(ctrl.cfg.baseUrl + ctrl.formatVariantForUrl() + "/", fen),
         },
       }),
     ]),
@@ -317,16 +348,43 @@ function sparePieces(
   position: 'top' | 'bottom',
 ): VNode {
   const selectedClass = selectedToClass(ctrl.selected());
+  let spareCssClasses = ['spare', 'spare-' + position, 'spare-' + playerIndex].join(' ');
 
-  const pieces = ['k-piece', 'q-piece', 'r-piece', 'b-piece', 'n-piece', 'p-piece'].map(function (role) {
+  let pieces = ['b-piece', 'k-piece', 'n-piece', 'p-piece', 'q-piece', 'r-piece', ].map(function (role) {
     return [playerIndex, role];
   });
+  if([
+    'breakthrough',
+    'minibreakthrough',
+    'flipello',
+    'flipello10'
+  ].includes(ctrl.rules)) {
+    pieces = ['p-piece'].map(function (role) {
+      return [playerIndex, role];
+    });
+  }
+  if(['linesofaction', 'scrambledeggs'].includes(ctrl.rules)) {
+    pieces = ['l-piece'].map(function (role) {
+      return [playerIndex, role];
+    });
+  }
+  if(['xiangqi'].includes(ctrl.rules)) {
+    pieces = ['a-piece', 'b-piece', 'c-piece', 'k-piece', 'n-piece', 'p-piece', 'r-piece'].map(function (role) {
+      return [playerIndex, role];
+    });
+    spareCssClasses += ' spare-xiangqi';
+  }
+  if(['minixiangqi'].includes(ctrl.rules)) {
+    pieces = ['c-piece', 'k-piece', 'n-piece', 'p-piece', 'r-piece'].map(function (role) {
+      return [playerIndex, role];
+    });
+  }
 
   return h(
     'div',
     {
       attrs: {
-        class: ['spare', 'spare-' + position, 'spare-' + playerIndex].join(' '),
+        class: spareCssClasses,
       },
     },
     ['pointer', ...pieces, 'trash'].map((s: Selected) => {
@@ -443,6 +501,14 @@ function convertRulesToCGVariant(rule: Rules): string {
       return 'threeCheck';
     case '5check':
       return 'fiveCheck';
+    case 'linesofaction':
+      return 'linesOfAction';
+    case 'scrambledeggs':
+      return 'scrambledEggs';
+    case 'breakthrough':
+      return 'breakthroughtroyka';
+    case 'minibreakthrough':
+      return 'minibreakthroughtroyka';
     default:
       return rule;
   }
