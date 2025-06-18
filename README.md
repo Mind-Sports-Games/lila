@@ -58,6 +58,7 @@ To start the project you then likely want:
 Swiss tournaments pairings require to have a running https://github.com/cyanfish/bbpPairings and set the correct path value for the key swiss.bbpairing in conf/application.conf.
 
 ## Before pushing
+
 ```
 pnpm run lint
 pnpm run format
