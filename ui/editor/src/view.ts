@@ -173,7 +173,9 @@ function controls(ctrl: EditorCtrl, state: EditorState): VNode {
                   ),
                   ...ctrl.extraPositions.map(position2option),
                 ]),
-                isChessRules(ctrl.rules) ? optgroup(ctrl.trans.noarg('popularOpenings'), ctrl.cfg.positions.map(position2option)) : null,
+                isChessRules(ctrl.rules)
+                  ? optgroup(ctrl.trans.noarg('popularOpenings'), ctrl.cfg.positions.map(position2option))
+                  : null,
               ],
             ),
           ]),
@@ -204,19 +206,19 @@ function controls(ctrl: EditorCtrl, state: EditorState): VNode {
           }),
         ),
       ),
-      !isChessRules(ctrl.rules) ?
-      h('div.castlingsWTF') :
-      h('div.castling', [
-        h('strong', ctrl.trans.noarg('castling')),
-        h('div', [
-          castleCheckBox(ctrl, 'K', ctrl.trans.noarg('whiteCastlingKingside'), !!ctrl.options.inlineCastling),
-          castleCheckBox(ctrl, 'Q', 'O-O-O', true),
-        ]),
-        h('div', [
-          castleCheckBox(ctrl, 'k', ctrl.trans.noarg('blackCastlingKingside'), !!ctrl.options.inlineCastling),
-          castleCheckBox(ctrl, 'q', 'O-O-O', true),
-        ]),
-      ]),
+      !isChessRules(ctrl.rules)
+        ? h('div.castlingsWTF')
+        : h('div.castling', [
+            h('strong', ctrl.trans.noarg('castling')),
+            h('div', [
+              castleCheckBox(ctrl, 'K', ctrl.trans.noarg('whiteCastlingKingside'), !!ctrl.options.inlineCastling),
+              castleCheckBox(ctrl, 'Q', 'O-O-O', true),
+            ]),
+            h('div', [
+              castleCheckBox(ctrl, 'k', ctrl.trans.noarg('blackCastlingKingside'), !!ctrl.options.inlineCastling),
+              castleCheckBox(ctrl, 'q', 'O-O-O', true),
+            ]),
+          ]),
     ]),
     ...(ctrl.cfg.embed
       ? [h('div.actions', [buttonStart(), buttonClear()])]
@@ -327,7 +329,7 @@ function inputs(ctrl: EditorCtrl, fen: string): VNode | undefined {
         attrs: {
           readonly: true,
           spellcheck: false,
-          value: ctrl.makeUrl(ctrl.cfg.baseUrl + ctrl.formatVariantForUrl() + "/", fen),
+          value: ctrl.makeUrl(ctrl.cfg.baseUrl + ctrl.formatVariantForUrl() + '/', fen),
         },
       }),
     ]),
@@ -350,31 +352,26 @@ function sparePieces(
   const selectedClass = selectedToClass(ctrl.selected());
   let spareCssClasses = ['spare', 'spare-' + position, 'spare-' + playerIndex].join(' ');
 
-  let pieces = ['b-piece', 'k-piece', 'n-piece', 'p-piece', 'q-piece', 'r-piece', ].map(function (role) {
+  let pieces = ['b-piece', 'k-piece', 'n-piece', 'p-piece', 'q-piece', 'r-piece'].map(function (role) {
     return [playerIndex, role];
   });
-  if([
-    'breakthrough',
-    'minibreakthrough',
-    'flipello',
-    'flipello10'
-  ].includes(ctrl.rules)) {
+  if (['breakthrough', 'minibreakthrough', 'flipello', 'flipello10'].includes(ctrl.rules)) {
     pieces = ['p-piece'].map(function (role) {
       return [playerIndex, role];
     });
   }
-  if(['linesofaction', 'scrambledeggs'].includes(ctrl.rules)) {
+  if (['linesofaction', 'scrambledeggs'].includes(ctrl.rules)) {
     pieces = ['l-piece'].map(function (role) {
       return [playerIndex, role];
     });
   }
-  if(['xiangqi'].includes(ctrl.rules)) {
+  if (['xiangqi'].includes(ctrl.rules)) {
     pieces = ['a-piece', 'b-piece', 'c-piece', 'k-piece', 'n-piece', 'p-piece', 'r-piece'].map(function (role) {
       return [playerIndex, role];
     });
     spareCssClasses += ' spare-xiangqi';
   }
-  if(['minixiangqi'].includes(ctrl.rules)) {
+  if (['minixiangqi'].includes(ctrl.rules)) {
     pieces = ['c-piece', 'k-piece', 'n-piece', 'p-piece', 'r-piece'].map(function (role) {
       return [playerIndex, role];
     });

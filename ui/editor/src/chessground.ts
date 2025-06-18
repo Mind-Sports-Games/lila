@@ -1,7 +1,7 @@
 import { h, VNode } from 'snabbdom';
 import { Chessground } from 'chessground';
 import { Config as CgConfig } from 'chessground/config';
-import * as cg from 'chessground/types'; 
+import * as cg from 'chessground/types';
 import { MouchEvent } from 'chessground/types';
 import * as util from 'chessground/util';
 import changeColorHandle from 'common/coordsColor';
@@ -123,7 +123,10 @@ function deletePiece(ctrl: EditorCtrl, key: Key): void {
 function makeConfig(ctrl: EditorCtrl): CgConfig {
   return {
     variant: ctrl.variantKey as cg.Variant,
-    dimensions: { height: variantClassFromKey(ctrl.variantKey).height, width: variantClassFromKey(ctrl.variantKey).width },
+    dimensions: {
+      height: variantClassFromKey(ctrl.variantKey).height,
+      width: variantClassFromKey(ctrl.variantKey).width,
+    },
     fen: ctrl.initialFen,
     orientation: ctrl.options.orientation || 'p1',
     coordinates: !ctrl.cfg.embed,

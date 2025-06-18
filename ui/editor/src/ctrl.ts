@@ -46,7 +46,7 @@ export default class EditorCtrl {
     const params = new URLSearchParams(window.location.search);
     this.variantKey = (cfg.variantKey || 'standard') as VariantKey;
     this.rules = variantKeyToRules(this.variantKey);
-    this.initialFen = (cfg.fen || params.get('fen') || variantClassFromKey(this.variantKey).getInitialFen());
+    this.initialFen = cfg.fen || params.get('fen') || variantClassFromKey(this.variantKey).getInitialFen();
 
     this.extraPositions = [
       {
@@ -66,7 +66,7 @@ export default class EditorCtrl {
 
     window.Mousetrap.bind('f', () => {
       if (this.chessground) this.chessground.toggleOrientation();
-      this.chessground.set
+      this.chessground.set;
       redraw();
     });
 
@@ -78,7 +78,7 @@ export default class EditorCtrl {
   }
 
   formatVariantForUrl(): string {
-    return this.variantKey === "standard" ? 'chess' : this.variantKey;
+    return this.variantKey === 'standard' ? 'chess' : this.variantKey;
   }
 
   onChange(): void {
@@ -105,7 +105,6 @@ export default class EditorCtrl {
       : this.initialFen || variantClassFromKey(this.variantKey).getInitialFen();
 
     if (fen.split(' ').length === 1) {
-
       fen += ' w - - 0 1';
     }
     const board = parseFen(this.rules)(fen).unwrap(
@@ -129,7 +128,10 @@ export default class EditorCtrl {
   }
 
   getFenFromSetup(): string {
-    return makeFen(this.rules)(this.getSetup(), { promoted: this.rules == 'crazyhouse' }).replace('[', '/').replace(']', '').replace(/ /g, '_');
+    return makeFen(this.rules)(this.getSetup(), { promoted: this.rules == 'crazyhouse' })
+      .replace('[', '/')
+      .replace(']', '')
+      .replace(/ /g, '_');
   }
 
   private getLegalFen(): string | undefined {
@@ -184,11 +186,11 @@ export default class EditorCtrl {
   startPosition = () => {
     this.setFen(variantClassFromKey(this.variantKey).getInitialFen());
     this.redraw();
-  }
+  };
 
   clearBoard = () => {
     this.setFen(variantClassFromKey(this.variantKey).getEmptyBoardFen());
-  }
+  };
 
   loadNewFen(fen: string | 'prompt'): void {
     if (fen === 'prompt') {
@@ -204,28 +206,31 @@ export default class EditorCtrl {
 
     return parseFen(this.rules)(fen).unwrap(
       setup => {
-        if (this.chessground) this.chessground.set({
-          fen,
-          variant: this.variantKey as CGVariant,
-          dimensions: { width, height },
-        });
+        if (this.chessground)
+          this.chessground.set({
+            fen,
+            variant: this.variantKey as CGVariant,
+            dimensions: { width, height },
+          });
         this.turn = setup.turn;
         this.halfmoves = setup.halfmoves;
         this.fullmoves = setup.fullmoves;
         this.pockets = setup.pockets;
 
-        if ([
-          'chess',
-          'antichess',
-          'atomic',
-          'crazyhouse',
-          'horde',
-          'kingofthehill',
-          'racingkings',
-          'threecheck',
-          'fivecheck',
-          'monster'
-        ].includes(this.rules)) {
+        if (
+          [
+            'chess',
+            'antichess',
+            'atomic',
+            'crazyhouse',
+            'horde',
+            'kingofthehill',
+            'racingkings',
+            'threecheck',
+            'fivecheck',
+            'monster',
+          ].includes(this.rules)
+        ) {
           this.unmovedRooks = setup.unmovedRooks;
           this.epSquare = setup.epSquare;
           this.remainingChecks = setup.remainingChecks;
@@ -239,10 +244,10 @@ export default class EditorCtrl {
         this.onChange();
         return true;
       },
-      _ =>  {
+      _ => {
         console.warn('Invalid FEN:', fen);
         return false;
-      }
+      },
     );
   };
 
