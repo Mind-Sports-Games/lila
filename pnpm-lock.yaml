@@ -27,8 +27,8 @@ importers:
         specifier: github:lichess-org/ab-stub
         version: https://codeload.github.com/lichess-org/ab-stub/tar.gz/94236bf34dbc9c05daf50f4c9842d859b9142be0
       chessground:
-        specifier: github:Mind-Sports-Games/chessground#board-editor
-        version: https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/02aae2bcfe45a8121bba92acb964544191024871(@babel/core@7.27.4)(@jest/transform@29.7.0)(@jest/types@29.6.3)(babel-jest@29.7.0(@babel/core@7.27.4))(jest-util@29.7.0)
+        specifier: github:Mind-Sports-Games/chessground#v7.11.1-pstrat3.16
+        version: https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/608aa2d51a12abf701ae5e62cc972452eabd6f4a(@babel/core@7.27.4)(@jest/transform@29.7.0)(@jest/types@29.6.3)(babel-jest@29.7.0(@babel/core@7.27.4))(jest-util@29.7.0)
       eslint:
         specifier: ^8.57.1
         version: 8.57.1
@@ -42,8 +42,8 @@ importers:
         specifier: ^3.5.3
         version: 3.5.3
       stratops:
-        specifier: github:Mind-Sports-Games/stratops#board-editor2
-        version: https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/993a86b606713097288a44d26088d00591930ad4
+        specifier: github:Mind-Sports-Games/stratops#v0.8.1-pstrat5.8
+        version: https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/f9ca270df7583fa184afde1ed6b0bc3259005307
       typescript:
         specifier: ^5.8.3
         version: 5.8.3
@@ -1336,9 +1336,9 @@ packages:
     resolution: {tarball: https://codeload.github.com/ornicar/chess.js/tar.gz/ad0709c0b07773d9d0da8e4605a9a2a28f00d249}
     version: 0.10.2
 
-  chessground@https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/02aae2bcfe45a8121bba92acb964544191024871:
-    resolution: {tarball: https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/02aae2bcfe45a8121bba92acb964544191024871}
-    version: 7.11.1-pstrat3.14
+  chessground@https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/608aa2d51a12abf701ae5e62cc972452eabd6f4a:
+    resolution: {tarball: https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/608aa2d51a12abf701ae5e62cc972452eabd6f4a}
+    version: 7.11.1-pstrat3.15
     engines: {node: '>=20', pnpm: ^9}
 
   chokidar@3.6.0:
@@ -2377,8 +2377,8 @@ packages:
     resolution: {integrity: sha512-XlkWvfIm6RmsWtNJx+uqtKLS8eqFbxUg0ZzLXqY0caEy9l7hruX8IpiDnjsLavoBgqCCR71TqWO8MaXYheJ3RQ==}
     engines: {node: '>=10'}
 
-  stratops@https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/993a86b606713097288a44d26088d00591930ad4:
-    resolution: {tarball: https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/993a86b606713097288a44d26088d00591930ad4}
+  stratops@https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/f9ca270df7583fa184afde1ed6b0bc3259005307:
+    resolution: {tarball: https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/f9ca270df7583fa184afde1ed6b0bc3259005307}
     version: 0.8.1-pstrat5.7
     engines: {node: '>=20', pnpm: ^9}
 
@@ -3465,7 +3465,7 @@ snapshots:
 
   chess.js@https://codeload.github.com/ornicar/chess.js/tar.gz/ad0709c0b07773d9d0da8e4605a9a2a28f00d249: {}
 
-  chessground@https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/02aae2bcfe45a8121bba92acb964544191024871(@babel/core@7.27.4)(@jest/transform@29.7.0)(@jest/types@29.6.3)(babel-jest@29.7.0(@babel/core@7.27.4))(jest-util@29.7.0):
+  chessground@https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/608aa2d51a12abf701ae5e62cc972452eabd6f4a(@babel/core@7.27.4)(@jest/transform@29.7.0)(@jest/types@29.6.3)(babel-jest@29.7.0(@babel/core@7.27.4))(jest-util@29.7.0):
     dependencies:
       '@jest/globals': 29.7.0
       '@types/node': 20.12.2
@@ -4678,7 +4678,7 @@ snapshots:
     dependencies:
       escape-string-regexp: 2.0.0
 
-  stratops@https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/993a86b606713097288a44d26088d00591930ad4:
+  stratops@https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/f9ca270df7583fa184afde1ed6b0bc3259005307:
     dependencies:
       '@badrap/result': 0.2.13
 
