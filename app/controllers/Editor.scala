@@ -30,16 +30,7 @@ final class Editor(env: Env) extends LilaController(env) {
         .map(_.replace('_', ' ').trim)
         .filter(_.nonEmpty)
         .orElse(get("fen"))
-      val variantKey = urlVariant match {
-        case "racingkings"      => "racingKings"
-        case "kingofthehill"    => "kingOfTheHill"
-        case "linesofaction"    => "linesOfAction"
-        case "scrambledeggs"    => "scrambledEggs"
-        case "minibreakthrough" => "minibreakthroughtroyka"
-        case "breakthrough"     => "breakthroughtroyka"
-        case _                  => urlVariant
-      }
-      val variant = Variant(variantKey).getOrElse(Variant.libStandard(GameLogic.Chess()))
+      val variant = Variant(urlVariant).getOrElse(Variant.libStandard(GameLogic.Chess()))
       fuccess {
         val situation = readFen(fenStr, variant)
         Ok(
