@@ -126,13 +126,13 @@ export default class Setup {
     return undefined;
   };
 
-  private clockDefaults = (variant: string) => {
+  private clockDefaults = (variant: string, isAnon: boolean) => {
     const defaultClockConfig = {
       bullet: { timemode: '1', initial: '1', increment: '0' },
       blitz: { timemode: '1', initial: '3', increment: '2' },
       rapid: { timemode: '1', initial: '5', increment: '5' },
       classical: { timemode: '1', initial: '20', increment: '10' },
-      correspondence: { timemode: '2', days: '2' },
+      correspondence: isAnon ? { timemode: '1', initial: '30', increment: '30' } : { timemode: '2', days: '2' },
       custom: { timemode: '6' },
     };
     switch (variant) {
@@ -633,7 +633,7 @@ export default class Setup {
 
     const updateClockOptionsText = () => {
       const variantId = $variantInput.filter(':checked').val() as string;
-      const clockConfig = self.clockDefaults(variantId);
+      const clockConfig = self.clockDefaults(variantId, $form.data('anon') as boolean);
       $timeModeDefaults.find('label').each(function (this: HTMLElement) {
         const $this = $(this);
         const clockType = $this.attr('for').split('_')[2];
@@ -651,16 +651,27 @@ export default class Setup {
         }
       });
     };
-
-    const updateLobbySubmit = () => {
-      if (($opponentInput.filter(':checked').val() as string) === 'lobby') {
-        if ($form.data('anon')) {
+    const setAnonOptions = () => {
+      const isAnon = $form.data('anon');
+      if (isAnon) {
+        $gameGroupInput.val('0'); //default to chess
+        $variantInput.val('0_1'); //default to standard chess
+        $timeModeSelect.val('1'); //default to real time
+        $timeModeDefaults.find('input').val('blitz'); //default to real time
+        $opponentInput.val('lobby'); //default to lobby
+        const opponent = $opponentInput.filter(':checked').val() as string;
+        if (opponent === 'lobby') {
           $timeModeSelect
             .val('1')
             .children('.timeMode_2, .timeMode_0')
             .prop('disabled', true)
             .attr('title', this.root.trans('youNeedAnAccountToDoThat'));
         }
+      }
+    };
+    setAnonOptions();
+    const updateLobbySubmit = () => {
+      if (($opponentInput.filter(':checked').val() as string) === 'lobby') {
         const ajaxSubmit = (playerIndex: string) => {
           const form = $form[0] as HTMLFormElement;
           const rating = parseInt($modal.find('.ratings input').val() as string) || 1500;
@@ -860,12 +871,16 @@ export default class Setup {
     });
     const updateBotDetails = () => {
       const bot = $botInput.filter(':checked').val() as string;
+      if (!bot) $botInput.val('ps-greedy-two-move'); //default bot
       const botText = $form.find('.opponent_bot.choice');
       botText.empty();
       botText.append(
         `<a class="user-link ulpt" href="/@/${bot}"><span class="utitle" data-bot="data-bot" title="Robot">BOT</span>&nbsp${bot}</a>`,
       );
-      if (user) $form.attr('action', $form.attr('action')?.replace(/user=[^&]*/, 'user=' + bot));
+      const botSelected = $opponentInput.filter(':checked').val() === 'bot';
+      if (!botSelected) return;
+      if (user || $form.attr('action').includes('user'))
+        $form.attr('action', $form.attr('action')?.replace(/user=[^&]*/, 'user=' + bot));
       else $form.attr('action', $form.attr('action') + `&user=${bot}`);
     };
     const setupOpponentChoices = () => {
@@ -900,7 +915,7 @@ export default class Setup {
         $this.find('group').removeClass('hide');
         $this.find('div.choice').hide();
       }
-      const fixedSection = user && sName === 'opponent';
+      const fixedSection = (user && sName === 'opponent') || ($form.data('anon') && sName === 'mode');
       if (!fixedSection) {
         $this.on('click', function (this: HTMLElement) {
           this.classList.toggle('active');
@@ -1002,7 +1017,10 @@ export default class Setup {
     $timeModeDefaults
       .on('change', function (this: HTMLElement) {
         const choice = $(this).find('input').filter(':checked').val() as string;
-        const clockConfig = self.clockDefaults($variantInput.filter(':checked').val() as string);
+        const clockConfig = self.clockDefaults(
+          $variantInput.filter(':checked').val() as string,
+          $form.data('anon') as boolean,
+        );
         switch (choice) {
           case 'correspondence': //correspondence
             $timeModeSelect.val(clockConfig['correspondence'].timemode);
@@ -1074,11 +1092,12 @@ export default class Setup {
         $form.find('.rating-range-config').hide();
         updateBotDetails();
       } else if (opponent === 'lobby') {
+        if (!user) $form.attr('action', $form.attr('action')?.replace(/&user=[^&]*/, ''));
         $botChoices.hide();
         $form.find('.bot_title').hide();
         $form.find('.rating-range-config').show();
       } else if (opponent === 'friend') {
-        if (!user) $form.attr('action', $form.attr('action')?.replace(/user=[^&]*/, ''));
+        if (!user) $form.attr('action', $form.attr('action')?.replace(/&user=[^&]*/, ''));
         $botChoices.hide();
         $form.find('.bot_title').hide();
         $form.find('.rating-range-config').hide();

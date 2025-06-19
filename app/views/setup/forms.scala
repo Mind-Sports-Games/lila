@@ -38,7 +38,7 @@ object forms {
         renderTimeMode(form, allowAnon = false, allowCorrespondence = true),
         renderMultiMatch(form),
         renderPlayerIndexOptions(form("playerIndex")),
-        ctx.isAuth option frag(
+        frag(
           div(cls := "mode_choice buttons collapsible optional_config")(
             div(cls := "section_title")("Mode"),
             renderIconRadios(form("mode"), translatedModeIconChoices),
