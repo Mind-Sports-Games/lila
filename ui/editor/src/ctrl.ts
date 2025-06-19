@@ -130,8 +130,7 @@ export default class EditorCtrl {
   getFenFromSetup(): string {
     return makeFen(this.rules)(this.getSetup(), { promoted: this.rules == 'crazyhouse' })
       .replace('[', '/') // @TODO: this is to fix FEN with pockets (e.g. Othello) but it should be fixed in stratops instead
-      .replace(']', '')
-      .replace(/ /g, '_');
+      .replace(']', '');
   }
 
   private getLegalFen(): string | undefined {
