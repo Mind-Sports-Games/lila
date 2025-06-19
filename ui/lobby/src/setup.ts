@@ -897,6 +897,21 @@ export default class Setup {
       updateBotDetails();
     };
     setupOpponentChoices();
+    const squashSection = (collapsibleSection: HTMLDivElement) => {
+      const sName = $(collapsibleSection).find('input').attr('name') || '';
+      $(collapsibleSection).removeClass('active').find('group').addClass('hide');
+      $(collapsibleSection)
+        .find('div.choice')
+        .hide()
+        .filter(`.${sName}_` + $(collapsibleSection).find('input').filter(':checked').val())
+        .show()
+        .removeAttr('style'); //remove unwated display: block added by show()
+      //hide/update additional sections
+      $form.find('.time_mode_config').hide();
+      updateClockOptionsText();
+      $form.find('.bot_title').hide();
+      $form.find('.rating-range-config').hide();
+    };
     $collapsibleSections.each(function (this: HTMLDivElement) {
       const $this = $(this);
       const sName = $this.find('input').attr('name') || '';
@@ -918,6 +933,14 @@ export default class Setup {
       const fixedSection = (user && sName === 'opponent') || ($form.data('anon') && sName === 'mode');
       if (!fixedSection) {
         $this.on('click', function (this: HTMLElement) {
+          const $this = $(this),
+            sName = $this.find('input').attr('name') || '';
+          $collapsibleSections
+            .not(this)
+            .filter('.active')
+            .each(function (this: HTMLDivElement) {
+              squashSection(this);
+            });
           this.classList.toggle('active');
           $(this).find('group').toggleClass('hide');
           const $displayChoices = $this.find('div.choice');
@@ -940,28 +963,9 @@ export default class Setup {
               }
             }
           } else {
-            $displayChoices
-              .hide()
-              .filter(`.${sName}_` + $this.find('input').filter(':checked').val())
-              .show()
-              .removeAttr('style'); //remove unwated display: block added by show()
-            //hide/update additional sections
-            $form.find('.time_mode_config').hide();
-            updateClockOptionsText();
-            $form.find('.bot_title').hide();
-            $form.find('.rating-range-config').hide();
+            squashSection(this as HTMLDivElement);
           }
         });
-        // $this.attr('tabindex', '0'); // Make the element focusable
-        // $this.on('blur', function (this: HTMLElement) {
-        //   this.classList.remove('active');
-        //   $(this).find('group').addClass('hide');
-        //   const $displayChoices = $this.find('div.choice');
-        //   $displayChoices
-        //     .hide()
-        //     .filter(`.${sName}_` + $this.find('input').filter(':checked').val())
-        //     .show();
-        // });
       }
     });
     $form.find('.rating-range').each(function (this: HTMLDivElement) {

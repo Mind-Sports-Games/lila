@@ -86,7 +86,8 @@ $game-family-p2-pieces: (
 
   .mode_choice,
   .bot_choice,
-  .playerIndex_choices {
+  .playerIndex_choices,
+  .byoyomi_periods {
     & group.radio div {
       max-width: unset;
     }
@@ -101,6 +102,12 @@ $game-family-p2-pieces: (
   .bot_choice {
     & group.radio div {
       width: 25%;
+    }
+  }
+
+  .byoyomi_periods {
+    & group.radio div {
+      width: 20%;
     }
   }
 
@@ -141,9 +148,12 @@ $game-family-p2-pieces: (
     }
   }
 
-  .bot_choice group.radio label {
-    // width: 3em;
-    height: 3em;
+  .bot_choice,
+  .byoyomi_periods {
+    group.radio label {
+      // width: 3em;
+      height: 3em;
+    }
   }
 
   .optional_config {
