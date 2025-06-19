@@ -20,7 +20,7 @@ object create {
     views.html.site.message(
       title = trans.toStudy.txt(),
       icon = Some("4"),
-      back = data.actualFen.map(f => routes.Editor.load(f.value, data.variantStr.getOrElse("chess")).url),
+      back = data.actualFen.map(f => routes.Editor.loadFenWithVariant(f.value, data.variantStr.getOrElse("standard")).url),
       moreCss = cssTag("study.create").some
     ) {
       div(cls := "study-create")(

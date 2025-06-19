@@ -23,14 +23,16 @@ final class Editor(env: Env) extends LilaController(env) {
 
   def index = load("")
 
-  def load(urlFen: String, urlVariant: String = "chess") =
+  def loadFenWithVariant(urlFen: String, urlVariant: String) = load(urlFen, Some(urlVariant))
+
+  def load(urlFen: String, urlVariant: Option[String] = None) =
     Open { implicit ctx =>
       val fenStr = lila.common.String
         .decodeUriPath(urlFen)
         .map(_.replace('_', ' ').trim)
         .filter(_.nonEmpty)
         .orElse(get("fen"))
-      val variant = Variant(urlVariant).getOrElse(Variant.libStandard(GameLogic.Chess()))
+      val variant = Variant.orDefault(urlVariant.getOrElse(""))
       fuccess {
         val situation = readFen(fenStr, variant)
         Ok(
@@ -75,9 +77,9 @@ final class Editor(env: Env) extends LilaController(env) {
         Redirect {
           if (game.playable) routes.Round.watcher(game.id, game.variant.startPlayer.name)
           else
-            routes.Editor.load(
+            routes.Editor.loadFenWithVariant(
               get("fen") | (Forsyth.>>(game.variant.gameLogic, game.stratGame)).value,
-              game.variant.key
+              game.variant.key,
             )
         }
       }

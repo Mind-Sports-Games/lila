@@ -16,9 +16,7 @@ private object bits {
   def fenInput(field: Field, strict: Boolean, validFen: Option[lila.setup.ValidFen])(implicit
       ctx: Context
   ) = {
-    val url = field.value.fold(routes.Editor.index.url) { fen =>
-      routes.Editor.load(fen, "chess").url
-    }
+    val url = field.value.fold(routes.Editor.index)(routes.Editor.load).url
     div(cls := "fen_position optional_config")(
       frag(
         div(
