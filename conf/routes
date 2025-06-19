@@ -582,7 +582,7 @@ GET   /import/master/$id<\w{8}>/:playerIndex controllers.Importer.masterGame(id:
 # Edit
 GET   /editor.json                     controllers.Editor.data
 GET   /editor/:urlVariant/*urlFen      controllers.Editor.loadFenWithVariant(urlFen: String, urlVariant: String)
-GET   /editor/*urlFen                  controllers.Editor.load(urlFen: String)
+GET   /editor/*urlFen                  controllers.Editor.load(urlFen: String, None: Option[String])
 GET   /editor                          controllers.Editor.index
 
 # Report

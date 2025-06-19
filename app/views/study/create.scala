@@ -21,7 +21,7 @@ object create {
       title = trans.toStudy.txt(),
       icon = Some("4"),
       back = data.actualFen.map(f =>
-        routes.Editor.loadFenWithVariant(f.value, data.variantStr.getOrElse("standard")).url
+        routes.Editor.load(f.value, data.variantStr).url
       ),
       moreCss = cssTag("study.create").some
     ) {
