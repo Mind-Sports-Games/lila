@@ -60,9 +60,7 @@ Swiss tournaments pairings require to have a running https://github.com/cyanfish
 ## Before pushing
 
 ```
-pnpm run lint
-pnpm run format
-sbt scalafmt
+pnpm run lint && pnpm run format && sbt scalafmt
 ```
 
 ## HTTP API
