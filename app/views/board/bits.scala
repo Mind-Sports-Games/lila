@@ -143,16 +143,8 @@ object bits {
       "animation"  -> Json.obj("duration" -> ctx.pref.animationMillis),
       "is3d"       -> ctx.pref.is3d,
       "i18n"       -> i18nJsObject(i18nKeyes),
-      "variantKey" -> formatVariantKey(variant.key)
+      "variantKey" -> variant.key
     )
-
-  private def formatVariantKey(key: String): String =
-    return key match {
-      case "racingkings"   => "racingKings"
-      case "linesofaction" => "linesOfAction"
-      case "scrambledeggs" => "scrambledEggs"
-      case _               => key
-    }
 
   private val i18nKeyes = List(
     trans.setTheBoard,
