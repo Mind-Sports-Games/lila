@@ -47,12 +47,15 @@ final class Editor(env: Env) extends LilaController(env) {
   def data =
     Open { implicit ctx =>
       fuccess {
-        val situation = readFen(get("fen"), get("variant").flatMap(Variant.apply).getOrElse(Variant.libStandard(GameLogic.Chess())))
+        val situation = readFen(
+          get("fen"),
+          get("variant").flatMap(Variant.apply).getOrElse(Variant.libStandard(GameLogic.Chess()))
+        )
         JsonOk(
           html.board.bits.jsData(
             sit = situation,
             fen = Forsyth.>>(situation.board.variant.gameLogic, situation),
-            variant = situation.board.variant,
+            variant = situation.board.variant
           )
         )
       }
