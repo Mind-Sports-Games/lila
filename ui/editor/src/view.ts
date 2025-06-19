@@ -195,8 +195,8 @@ function controls(ctrl: EditorCtrl, state: EditorState): VNode {
           }),
         ),
       ),
-      isChessRules(ctrl.variantKey) ?
-        h('div.castling', [
+      isChessRules(ctrl.variantKey)
+        ? h('div.castling', [
             h('strong', ctrl.trans.noarg('castling')),
             h('div', [
               castleCheckBox(ctrl, 'K', ctrl.trans.noarg('whiteCastlingKingside'), !!ctrl.options.inlineCastling),
@@ -206,8 +206,8 @@ function controls(ctrl: EditorCtrl, state: EditorState): VNode {
               castleCheckBox(ctrl, 'k', ctrl.trans.noarg('blackCastlingKingside'), !!ctrl.options.inlineCastling),
               castleCheckBox(ctrl, 'q', 'O-O-O', true),
             ]),
-          ]) :
-        null,
+          ])
+        : null,
     ]),
     ...(ctrl.cfg.embed
       ? [h('div.actions', [buttonStart(), buttonClear()])]

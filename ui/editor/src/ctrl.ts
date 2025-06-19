@@ -104,11 +104,9 @@ export default class EditorCtrl {
     const variant = variantClassFromKey(this.variantKey);
     if (this.chessground)
       fen = this.chessground.getFen(); // @Note: chessground.getFen() returns the board part of the FEN
-    else
-      fen = this.initialFen || variant.getInitialFen();
+    else fen = this.initialFen || variant.getInitialFen();
 
-    if (fen.split(' ').length === 1)
-      fen += ` ${variant.getInitialEpd()} ${variant.getInitialMovesFen()}`;
+    if (fen.split(' ').length === 1) fen += ` ${variant.getInitialEpd()} ${variant.getInitialMovesFen()}`;
 
     const board = variant.parseFen(fen).unwrap(
       setup => setup.board,
@@ -220,7 +218,7 @@ export default class EditorCtrl {
         this.fullmoves = setup.fullmoves;
         this.pockets = setup.pockets;
 
-        if( variant.family === 'chess') {
+        if (variant.family === 'chess') {
           this.unmovedRooks = setup.unmovedRooks;
           this.epSquare = setup.epSquare;
           this.remainingChecks = setup.remainingChecks;
