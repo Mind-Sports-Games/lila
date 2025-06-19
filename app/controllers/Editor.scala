@@ -51,7 +51,7 @@ final class Editor(env: Env) extends LilaController(env) {
       fuccess {
         val situation = readFen(
           get("fen"),
-          get("variant").flatMap(Variant.apply).getOrElse(Variant.libStandard(GameLogic.Chess()))
+          Variant.orDefault(get("variant").getOrElse(""))
         )
         JsonOk(
           html.board.bits.jsData(
