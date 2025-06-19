@@ -1,15 +1,29 @@
-.board-editor .spare {
+.board-editor {
+
+  &.variant-xiangqi {
+    .spare {
+      .no-square {
+        flex: 0 0 11.12%;
+      }
+
+      &-bottom {
+        margin-top: 9vh;
+      }
+
+      @include breakpoint($mq-landscape-mobile) {
+        .coords-out &-bottom {
+          margin-top: 7vh;
+        }
+      }
+    }
+  }
+
+.spare {
   @extend %box-radius;
 
   display: flex;
   background: $c-font-dimmer;
   box-shadow: 0 3px 5px rgba(0, 0, 0, 0.3) inset;
-
-  &.spare-xiangqi {
-    .no-square {
-      flex: 0 0 11.12%;
-    }
-  }
 
   &-top {
     grid-area: spare-top;
@@ -19,19 +33,11 @@
   &-bottom {
     grid-area: spare-bottom;
     margin-top: 2vh;
-
-    &.spare-xiangqi {
-      margin-top: 9vh;
-    }
   }
 
   @include breakpoint($mq-landscape-mobile) {
     .coords-out &-bottom {
       margin-top: 4vh;
-
-      &.spare-xiangqi {
-        margin-top: 7vh;
-      }
     }
   }
 
@@ -115,4 +121,5 @@
       top: 0;
     }
   }
+}
 }

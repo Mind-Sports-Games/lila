@@ -2,10 +2,9 @@ import { EditorState, Selected, Redraw, CastlingToggle, CastlingToggles, CASTLIN
 import { Api as CgApi } from 'chessground/api';
 import { Rules, Square } from 'stratops/types';
 import { SquareSet } from 'stratops/squareSet';
-// import { Board } from 'stratops/board';
 import { Setup, Material, RemainingChecks } from 'stratops/setup';
 import { Board, Castles } from 'stratops';
-import { makeFen, parseFen, parseCastlingFen } from 'stratops/fen';
+import { makeFen, parseCastlingFen } from 'stratops/fen';
 import * as fp from 'stratops/fp';
 import { defined, prop, Prop } from 'common';
 import { variantClass, variantClassFromKey, variantKeyToRules } from 'stratops/variants/util';
@@ -45,13 +44,14 @@ export default class EditorCtrl {
 
     const params = new URLSearchParams(window.location.search);
     this.variantKey = (cfg.variantKey || 'standard') as VariantKey;
+    const variant = variantClassFromKey(this.variantKey);
     this.rules = variantKeyToRules(this.variantKey);
-    this.initialFen = cfg.fen || params.get('fen') || variantClassFromKey(this.variantKey).getInitialFen();
+    this.initialFen = cfg.fen || params.get('fen') || variant.getInitialFen();
 
     this.extraPositions = [
       {
-        fen: variantClassFromKey(this.variantKey).getInitialBoardFen(),
-        epd: variantClassFromKey(this.variantKey).getInitialEpd(),
+        fen: variant.getInitialBoardFen(),
+        epd: `${variant.getInitialBoardFen} ${variant.getInitialEpd()}`,
         name: this.trans('startPosition'),
       },
       {
@@ -100,14 +100,17 @@ export default class EditorCtrl {
   }
 
   private getSetup(): Setup {
-    let fen = this.chessground
-      ? this.chessground.getFen()
-      : this.initialFen || variantClassFromKey(this.variantKey).getInitialFen();
+    let fen;
+    const variant = variantClassFromKey(this.variantKey);
+    if (this.chessground)
+      fen = this.chessground.getFen(); // @Note: chessground.getFen() returns the board part of the FEN
+    else
+      fen = this.initialFen || variant.getInitialFen();
 
-    if (fen.split(' ').length === 1) {
-      fen += ' w - - 0 1';
-    }
-    const board = parseFen(this.rules)(fen).unwrap(
+    if (fen.split(' ').length === 1)
+      fen += ` ${variant.getInitialEpd()} ${variant.getInitialMovesFen()}`;
+
+    const board = variant.parseFen(fen).unwrap(
       setup => setup.board,
       _ => {
         console.warn('Invalid FEN:', fen);
@@ -129,7 +132,7 @@ export default class EditorCtrl {
 
   getFenFromSetup(): string {
     return makeFen(this.rules)(this.getSetup(), { promoted: this.rules == 'crazyhouse' })
-      .replace('[', '/')
+      .replace('[', '/') // @TODO: this is to fix FEN with pockets (e.g. Othello) but it should be fixed in stratops instead
       .replace(']', '')
       .replace(/ /g, '_');
   }
@@ -169,7 +172,7 @@ export default class EditorCtrl {
     //TODO: rework this function
     if (orientation === undefined) return 'p1';
     else if (orientation === 'p1' || orientation === 'p2') return orientation;
-    else return 'p2'; // : this needs to be fixed for games other than LinesOfAction and backgammon
+    else return 'p2'; // TODO: this needs to be fixed for games other than LinesOfAction and backgammon
   }
 
   setCastlingToggle(id: CastlingToggle, value: boolean): void {
@@ -185,11 +188,10 @@ export default class EditorCtrl {
 
   startPosition = () => {
     this.setFen(variantClassFromKey(this.variantKey).getInitialFen());
-    this.redraw();
   };
 
   clearBoard = () => {
-    this.setFen(variantClassFromKey(this.variantKey).getEmptyBoardFen());
+    this.setFen(variantClassFromKey(this.variantKey).getEmptyFen());
   };
 
   loadNewFen(fen: string | 'prompt'): void {
@@ -201,10 +203,11 @@ export default class EditorCtrl {
   }
 
   setFen = (fen: string): boolean => {
-    const width = variantClassFromKey(this.variantKey).width;
-    const height = variantClassFromKey(this.variantKey).height;
+    const variant = variantClassFromKey(this.variantKey);
+    const width = variant.width;
+    const height = variant.height;
 
-    return parseFen(this.rules)(fen).unwrap(
+    return variant.parseFen(fen).unwrap(
       setup => {
         if (this.chessground)
           this.chessground.set({
@@ -217,20 +220,7 @@ export default class EditorCtrl {
         this.fullmoves = setup.fullmoves;
         this.pockets = setup.pockets;
 
-        if (
-          [
-            'chess',
-            'antichess',
-            'atomic',
-            'crazyhouse',
-            'horde',
-            'kingofthehill',
-            'racingkings',
-            'threecheck',
-            'fivecheck',
-            'monster',
-          ].includes(this.rules)
-        ) {
+        if( variant.family === 'chess') {
           this.unmovedRooks = setup.unmovedRooks;
           this.epSquare = setup.epSquare;
           this.remainingChecks = setup.remainingChecks;
@@ -241,6 +231,7 @@ export default class EditorCtrl {
           this.castlingToggles['q'] = defined(castles.rook.p2.a);
         }
 
+        this.initialFen = fen;
         this.onChange();
         return true;
       },
@@ -253,11 +244,12 @@ export default class EditorCtrl {
 
   setVariantAndRules(variantKey: VariantKey): void {
     this.variantKey = variantKey;
-    this.initialFen = variantClassFromKey(variantKey).getInitialFen();
+    const variant = variantClassFromKey(variantKey);
+    this.initialFen = variant.getInitialFen();
     this.extraPositions = [
       {
-        fen: variantClassFromKey(variantKey).getInitialFen(),
-        epd: variantClassFromKey(variantKey).getInitialEpd(),
+        fen: variant.getInitialFen(),
+        epd: `${variant.getInitialBoardFen()} ${variant.getInitialEpd()}`,
         name: this.trans('startPosition'),
       },
       {

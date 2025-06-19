@@ -2,12 +2,12 @@ import { h, VNode } from 'snabbdom';
 import { MouchEvent, NumberPair } from 'chessground/types';
 import { dragNewPiece } from 'chessground/drag';
 import { eventPosition, opposite } from 'chessground/util';
-import { Rules } from 'stratops/types';
 import { parseFen } from 'stratops/fen';
 import EditorCtrl from './ctrl';
 import chessground from './chessground';
 import { Selected, CastlingToggle, EditorState } from './interfaces';
 import { VariantKey } from 'stratops/variants/types';
+import { variantClassFromKey } from 'stratops/variants/util';
 
 function castleCheckBox(ctrl: EditorCtrl, id: CastlingToggle, label: string, reversed: boolean): VNode {
   const input = h('input', {
@@ -47,13 +47,13 @@ function studyButton(ctrl: EditorCtrl, state: EditorState): VNode {
           attrs: {
             type: 'submit',
             'data-icon': '4',
-            disabled: !canOpenStudy(state.legalFen, ctrl.rules),
+            disabled: !canOpenStudy(state.legalFen, ctrl.variantKey),
           },
           class: {
             button: true,
             'button-empty': true,
             text: true,
-            disabled: !canOpenStudy(state.legalFen, ctrl.rules),
+            disabled: !canOpenStudy(state.legalFen, ctrl.variantKey),
           },
         },
         ctrl.trans.noarg('toStudy'),
@@ -62,23 +62,12 @@ function studyButton(ctrl: EditorCtrl, state: EditorState): VNode {
   );
 }
 
-function isChessRules(rules: Rules): boolean {
-  return [
-    'chess',
-    'antichess',
-    'atomic',
-    'crazyhouse',
-    'horde',
-    'kingofthehill',
-    'racingkings',
-    '3check',
-    '5check',
-    'monster',
-  ].includes(rules);
+function isChessRules(variantKey: VariantKey): boolean {
+  return variantClassFromKey(variantKey).family == 'chess';
 }
 
-function canOpenStudy(legalFen: string, rules: Rules): boolean {
-  return legalFen && isChessRules(rules);
+function canOpenStudy(legalFen: string, variantKey: VariantKey): boolean {
+  return legalFen && isChessRules(variantKey);
 }
 
 function variant2option(key: VariantKey, name: string, ctrl: EditorCtrl): VNode {
@@ -173,7 +162,7 @@ function controls(ctrl: EditorCtrl, state: EditorState): VNode {
                   ),
                   ...ctrl.extraPositions.map(position2option),
                 ]),
-                isChessRules(ctrl.rules)
+                isChessRules(ctrl.variantKey)
                   ? optgroup(ctrl.trans.noarg('popularOpenings'), ctrl.cfg.positions.map(position2option))
                   : null,
               ],
@@ -201,14 +190,13 @@ function controls(ctrl: EditorCtrl, state: EditorState): VNode {
                   selected: ctrl.turn === key,
                 },
               },
-              ctrl.trans('playerIndexPlays', key == 'p1' ? 'White' : 'Black'),
+              ctrl.trans('playerIndexPlays', key == 'p1' ? 'White' : 'Black'), // @TODO: use ctrl.variantKey and stratops variantFromClass to determine how to map White and Black accordingly
             );
           }),
         ),
       ),
-      !isChessRules(ctrl.rules)
-        ? h('div.castlingsWTF')
-        : h('div.castling', [
+      isChessRules(ctrl.variantKey) ?
+        h('div.castling', [
             h('strong', ctrl.trans.noarg('castling')),
             h('div', [
               castleCheckBox(ctrl, 'K', ctrl.trans.noarg('whiteCastlingKingside'), !!ctrl.options.inlineCastling),
@@ -218,7 +206,8 @@ function controls(ctrl: EditorCtrl, state: EditorState): VNode {
               castleCheckBox(ctrl, 'k', ctrl.trans.noarg('blackCastlingKingside'), !!ctrl.options.inlineCastling),
               castleCheckBox(ctrl, 'q', 'O-O-O', true),
             ]),
-          ]),
+          ]) :
+        null,
     ]),
     ...(ctrl.cfg.embed
       ? [h('div.actions', [buttonStart(), buttonClear()])]
@@ -350,7 +339,6 @@ function sparePieces(
   position: 'top' | 'bottom',
 ): VNode {
   const selectedClass = selectedToClass(ctrl.selected());
-  let spareCssClasses = ['spare', 'spare-' + position, 'spare-' + playerIndex].join(' ');
 
   let pieces = ['b-piece', 'k-piece', 'n-piece', 'p-piece', 'q-piece', 'r-piece'].map(function (role) {
     return [playerIndex, role];
@@ -369,7 +357,6 @@ function sparePieces(
     pieces = ['a-piece', 'b-piece', 'c-piece', 'k-piece', 'n-piece', 'p-piece', 'r-piece'].map(function (role) {
       return [playerIndex, role];
     });
-    spareCssClasses += ' spare-xiangqi';
   }
   if (['minixiangqi'].includes(ctrl.rules)) {
     pieces = ['c-piece', 'k-piece', 'n-piece', 'p-piece', 'r-piece'].map(function (role) {
@@ -381,7 +368,7 @@ function sparePieces(
     'div',
     {
       attrs: {
-        class: spareCssClasses,
+        class: ['spare', 'spare-' + position, 'spare-' + playerIndex].join(' '),
       },
     },
     ['pointer', ...pieces, 'trash'].map((s: Selected) => {
@@ -470,7 +457,7 @@ export default function (ctrl: EditorCtrl): VNode {
   const playerIndex = ctrl.bottomPlayerIndex();
 
   return h(
-    'div.board-editor' + '.variant-' + convertRulesToCGVariant(ctrl.rules),
+    'div.board-editor' + '.variant-' + ctrl.variantKey,
     {
       attrs: {
         style: `cursor: ${makeCursor(ctrl.selected())}`,
@@ -484,29 +471,4 @@ export default function (ctrl: EditorCtrl): VNode {
       inputs(ctrl, state.fen),
     ],
   );
-}
-
-function convertRulesToCGVariant(rule: Rules): string {
-  switch (rule) {
-    case 'chess':
-      return 'standard';
-    case 'kingofthehill':
-      return 'kingOfTheHill';
-    case 'racingkings':
-      return 'racingKings';
-    case '3check':
-      return 'threeCheck';
-    case '5check':
-      return 'fiveCheck';
-    case 'linesofaction':
-      return 'linesOfAction';
-    case 'scrambledeggs':
-      return 'scrambledEggs';
-    case 'breakthrough':
-      return 'breakthroughtroyka';
-    case 'minibreakthrough':
-      return 'minibreakthroughtroyka';
-    default:
-      return rule;
-  }
 }

@@ -43,7 +43,7 @@ importers:
         version: 3.5.3
       stratops:
         specifier: github:Mind-Sports-Games/stratops#board-editor2
-        version: https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/cdd4d58c82d00b40dc59fd139afb50068f144503
+        version: https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/993a86b606713097288a44d26088d00591930ad4
       typescript:
         specifier: ^5.8.3
         version: 5.8.3
@@ -1464,8 +1464,8 @@ packages:
     engines: {node: '>=0.10.0'}
     hasBin: true
 
-  electron-to-chromium@1.5.169:
-    resolution: {integrity: sha512-q7SQx6mkLy0GTJK9K9OiWeaBMV4XQtBSdf6MJUzDB/H/5tFXfIiX38Lci1Kl6SsgiEhz1SQI1ejEOU5asWEhwQ==}
+  electron-to-chromium@1.5.170:
+    resolution: {integrity: sha512-GP+M7aeluQo9uAyiTCxgIj/j+PrWhMlY7LFVj8prlsPljd0Fdg9AprlfUi+OCSFWy9Y5/2D/Jrj9HS8Z4rpKWA==}
 
   emittery@0.13.1:
     resolution: {integrity: sha512-DeWwawk6r5yR9jFgnDKYt4sLS0LmHJJi3ZOnb5/JdbYwj3nW+FxQnHIjhBKz8YLC7oRNPVM9NQ47I3CVx34eqQ==}
@@ -2377,8 +2377,8 @@ packages:
     resolution: {integrity: sha512-XlkWvfIm6RmsWtNJx+uqtKLS8eqFbxUg0ZzLXqY0caEy9l7hruX8IpiDnjsLavoBgqCCR71TqWO8MaXYheJ3RQ==}
     engines: {node: '>=10'}
 
-  stratops@https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/cdd4d58c82d00b40dc59fd139afb50068f144503:
-    resolution: {tarball: https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/cdd4d58c82d00b40dc59fd139afb50068f144503}
+  stratops@https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/993a86b606713097288a44d26088d00591930ad4:
+    resolution: {tarball: https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/993a86b606713097288a44d26088d00591930ad4}
     version: 0.8.1-pstrat5.7
     engines: {node: '>=20', pnpm: ^9}
 
@@ -3418,7 +3418,7 @@ snapshots:
   browserslist@4.25.0:
     dependencies:
       caniuse-lite: 1.0.30001723
-      electron-to-chromium: 1.5.169
+      electron-to-chromium: 1.5.170
       node-releases: 2.0.19
       update-browserslist-db: 1.1.3(browserslist@4.25.0)
 
@@ -3600,7 +3600,7 @@ snapshots:
     dependencies:
       jake: 10.9.2
 
-  electron-to-chromium@1.5.169: {}
+  electron-to-chromium@1.5.170: {}
 
   emittery@0.13.1: {}
 
@@ -4678,7 +4678,7 @@ snapshots:
     dependencies:
       escape-string-regexp: 2.0.0
 
-  stratops@https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/cdd4d58c82d00b40dc59fd139afb50068f144503:
+  stratops@https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/993a86b606713097288a44d26088d00591930ad4:
     dependencies:
       '@badrap/result': 0.2.13
 
