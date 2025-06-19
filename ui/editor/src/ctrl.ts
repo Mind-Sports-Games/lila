@@ -66,7 +66,6 @@ export default class EditorCtrl {
 
     window.Mousetrap.bind('f', () => {
       if (this.chessground) this.chessground.toggleOrientation();
-      this.chessground.set;
       redraw();
     });
 
