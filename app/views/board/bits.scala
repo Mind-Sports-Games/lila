@@ -132,7 +132,7 @@ object bits {
   )(implicit ctx: Context) =
     Json.obj(
       "fen"         -> fen.value, // require full fen for score updates
-      "baseUrl"     -> s"${netBaseUrl}/editor/",
+      "baseUrl"     -> s"$netBaseUrl${routes.Editor.load(fen.value, variant.key).url}",
       "playerIndex" -> sit.player.letter.toString,
       "castles" -> Json.obj(
         "K" -> sitCanCastle(sit, P1, strategygames.chess.KingSide),

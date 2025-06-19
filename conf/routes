@@ -581,7 +581,8 @@ GET   /import/master/$id<\w{8}>/:playerIndex controllers.Importer.masterGame(id:
 
 # Edit
 GET   /editor.json                     controllers.Editor.data
-GET   /editor/:urlVariant/*urlFen      controllers.Editor.load(urlVariant: String, urlFen: String)
+GET   /editor/:urlVariant/*urlFen      controllers.Editor.load(urlFen: String, urlVariant: String)
+GET   /editor/*urlFen                  controllers.Editor.load(urlFen: String, urlVariant: String ?= "chess")
 GET   /editor                          controllers.Editor.index
 
 # Report

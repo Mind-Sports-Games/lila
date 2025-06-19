@@ -21,9 +21,9 @@ final class Editor(env: Env) extends LilaController(env) {
     })
   }
 
-  def index = load("chess", "")
+  def index = load("")
 
-  def load(urlVariant: String = "chess", urlFen: String) =
+  def load(urlFen: String, urlVariant: String = "chess") =
     Open { implicit ctx =>
       val fenStr = lila.common.String
         .decodeUriPath(urlFen)
