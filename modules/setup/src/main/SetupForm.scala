@@ -16,29 +16,6 @@ object SetupForm {
 
   val filter = Form(single("local" -> text))
 
-  def aiFilled(fen: Option[FEN]): Form[AiConfig] =
-    ai fill fen.foldLeft(AiConfig.default) { case (config, f) =>
-      config.copy(fen = f.some, variant = Variant.wrap(strategygames.chess.variant.FromPosition))
-    }
-
-  lazy val ai = Form(
-    mapping(
-      "variant"     -> variant(Config.fishnetVariants),
-      "timeMode"    -> timeMode,
-      "time"        -> time,
-      "increment"   -> increment,
-      "byoyomi"     -> byoyomi,
-      "periods"     -> periods,
-      "days"        -> days,
-      "level"       -> level,
-      "playerIndex" -> playerIndex,
-      "fen"         -> fenField
-    )(AiConfig.from)(_.>>)
-      .verifying("invalidFen", _.validFen)
-      .verifying("Can't play that time control from a position", _.timeControlFromPosition)
-  )
-
-  //TODO make general.... and remove the unused function (ai/friend are now both supported in game)
   def filled(lib: GameLogic, fen: Option[FEN])(implicit ctx: UserContext): Form[GameConfig] =
     game(ctx) fill fen.foldLeft(GameConfig.default(lib.id)) { case (config, f) =>
       config.copy(
@@ -77,47 +54,6 @@ object SetupForm {
         .verifying("Invalid Komi", _.validKomi)
         .verifying("Invalid Points", _.validPoints)
     )
-
-  def friendFilled(lib: GameLogic, fen: Option[FEN])(implicit ctx: UserContext): Form[FriendConfig] =
-    friend(ctx) fill fen.foldLeft(FriendConfig.default(lib.id)) { case (config, f) =>
-      config.copy(
-        fen = f.some,
-        variant = lib match {
-          case GameLogic.Chess()    => Variant.wrap(strategygames.chess.variant.FromPosition)
-          case GameLogic.Draughts() => Variant.wrap(strategygames.draughts.variant.FromPosition)
-          case _                    => sys.error("No from position variant")
-        }
-      )
-    }
-
-  def friend(ctx: UserContext) =
-    Form(
-      mapping(
-        "variant"          -> variant(Config.variantsWithFenAndVariants),
-        "fenVariant"       -> optional(draughtsFenVariants),
-        "timeMode"         -> timeMode,
-        "time"             -> time,
-        "increment"        -> increment,
-        "byoyomi"          -> byoyomi,
-        "periods"          -> periods,
-        "goHandicap"       -> goHandicap,
-        "goKomi"           -> goKomi(boardSize = 19),
-        "backgammonPoints" -> optional(backgammonPoints),
-        "days"             -> days,
-        "mode"             -> mode(withRated = ctx.isAuth),
-        "playerIndex"      -> playerIndex,
-        "fen"              -> fenField,
-        "multiMatch"       -> boolean
-      )(FriendConfig.from)(_.>>)
-        .verifying("Invalid clock", _.validClock)
-        .verifying("Invalid speed", _.validSpeed(ctx.me.exists(_.isBot)))
-        .verifying("invalidFen", _.validFen)
-        .verifying("Invalid Komi", _.validKomi)
-        .verifying("Invalid Points", _.validPoints)
-    )
-
-  def hookFilled(timeModeString: Option[String])(implicit ctx: UserContext): Form[HookConfig] =
-    hook.fill(HookConfig.default(ctx.isAuth).withTimeModeString(timeModeString))
 
   def hook(implicit ctx: UserContext) =
     Form(
@@ -245,20 +181,6 @@ object SetupForm {
       )(ApiConfig.from)(_ => none)
         .verifying("invalidFen", _.validFen)
         .verifying("can't be rated", _.validRated)
-
-    lazy val ai = Form(
-      mapping(
-        "level" -> level,
-        variant,
-        fischerClock,
-        simpleDelayClock,
-        bronsteinDelayClock,
-        byoyomiClock,
-        "days"        -> optional(days),
-        "playerIndex" -> optional(playerIndex),
-        "fen"         -> fenField
-      )(ApiAiConfig.from)(_ => none).verifying("invalidFen", _.validFen)
-    )
 
     lazy val open = Form(
       mapping(

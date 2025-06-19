@@ -8,7 +8,6 @@ import lila.rating.PerfType
 import lila.rating.RatingRange
 import lila.game.PerfPicker
 
-//TODO make opponent a type
 case class GameConfig(
     variant: Variant,
     fenVariant: Option[Variant],
@@ -50,7 +49,6 @@ case class GameConfig(
     opponent
   ).some
 
-  //TODO combine all and support one config
   def toHookConfig = HookConfig(
     variant = variant,
     timeMode = timeMode,
@@ -141,7 +139,7 @@ object GameConfig extends BaseHumanConfig {
       playerIndex = PlayerIndex(c) err "Invalid playerIndex " + c,
       fen = fen.map(f => FEN.apply(gameLogic, f)),
       multiMatch = mm,
-      opponent = o //TODO make opponent a type
+      opponent = o
     )
   }
 
