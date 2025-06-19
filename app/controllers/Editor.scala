@@ -79,7 +79,7 @@ final class Editor(env: Env) extends LilaController(env) {
           else
             routes.Editor.loadFenWithVariant(
               get("fen") | (Forsyth.>>(game.variant.gameLogic, game.stratGame)).value,
-              game.variant.key,
+              game.variant.key
             )
         }
       }
