@@ -76,8 +76,8 @@ final class Editor(env: Env) extends LilaController(env) {
           if (game.playable) routes.Round.watcher(game.id, game.variant.startPlayer.name)
           else
             routes.Editor.load(
-              "chess",
-              get("fen") | (Forsyth.>>(game.variant.gameLogic, game.stratGame)).value
+              get("fen") | (Forsyth.>>(game.variant.gameLogic, game.stratGame)).value,
+              game.variant.key
             )
         }
       }

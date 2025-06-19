@@ -7,6 +7,7 @@ import { Board, Castles } from 'stratops';
 import { makeFen, parseCastlingFen } from 'stratops/fen';
 import * as fp from 'stratops/fp';
 import { defined, prop, Prop } from 'common';
+import { replacePocketsInFen } from 'common/editor';
 import { variantClass, variantClassFromKey, variantKeyToRules } from 'stratops/variants/util';
 import { Variant as CGVariant } from 'chessground/types';
 import { VariantKey } from 'stratops/variants/types';
@@ -128,9 +129,7 @@ export default class EditorCtrl {
   }
 
   getFenFromSetup(): string {
-    return makeFen(this.rules)(this.getSetup(), { promoted: this.rules == 'crazyhouse' })
-      .replace('[', '/') // @TODO: this is to fix FEN with pockets (e.g. Othello) but it should be fixed in stratops instead
-      .replace(']', '');
+    return replacePocketsInFen(makeFen(this.rules)(this.getSetup(), { promoted: this.rules == 'crazyhouse' }));
   }
 
   private getLegalFen(): string | undefined {
