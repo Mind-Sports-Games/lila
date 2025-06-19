@@ -435,7 +435,12 @@ object TournamentShield {
         )
 
     private def togyzkumalakVariantOrder(variants: List[Variant]) =
-      TournamentMedleyUtil.medleyVariantsAndIntervals(variants, None, togyzkumalakVariantMinutes, togyzkumalakRounds)
+      TournamentMedleyUtil.medleyVariantsAndIntervals(
+        variants,
+        None,
+        togyzkumalakVariantMinutes,
+        togyzkumalakRounds
+      )
     private val togyzkumalakVariants = List(
       Variant.wrap(strategygames.togyzkumalak.variant.Togyzkumalak),
       Variant.wrap(strategygames.togyzkumalak.variant.Bestemshe),
@@ -468,7 +473,12 @@ object TournamentShield {
         )
 
     private def backgammonVariantOrder(variants: List[Variant]) =
-      TournamentMedleyUtil.medleyVariantsAndIntervals(variants, None, backgammonVariantMinutes, backgammonRounds)
+      TournamentMedleyUtil.medleyVariantsAndIntervals(
+        variants,
+        None,
+        backgammonVariantMinutes,
+        backgammonRounds
+      )
     private val backgammonVariants = List(
       Variant.wrap(strategygames.backgammon.variant.Backgammon),
       Variant.wrap(strategygames.backgammon.variant.Nackgammon),
@@ -500,7 +510,12 @@ object TournamentShield {
         )
 
     private def breakthroughVariantOrder(variants: List[Variant]) =
-      TournamentMedleyUtil.medleyVariantsAndIntervals(variants, None, breakthroughVariantMinutes, breakthroughRounds)
+      TournamentMedleyUtil.medleyVariantsAndIntervals(
+        variants,
+        None,
+        breakthroughVariantMinutes,
+        breakthroughRounds
+      )
     private val breakthroughVariants = List(
       Variant.wrap(strategygames.fairysf.variant.BreakthroughTroyka),
       Variant.wrap(strategygames.fairysf.variant.MiniBreakthroughTroyka),
@@ -549,7 +564,7 @@ object TournamentShield {
         Random.shuffle(chessgammonVariantPermuations).head.map(i => variants(i)),
         None,
         chessgammonMinutes,
-        chessgammonRounds,
+        chessgammonRounds
       )
     private val chessgammonVariants = List(
       Variant.wrap(strategygames.chess.variant.Standard),
