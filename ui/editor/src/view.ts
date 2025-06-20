@@ -340,7 +340,7 @@ function sparePieces(
 ): VNode {
   const selectedClass = selectedToClass(ctrl.selected());
 
-  let pieces = ['b-piece', 'k-piece', 'n-piece', 'p-piece', 'q-piece', 'r-piece'].map(function (role) {
+  let pieces = ['k-piece', 'q-piece', 'r-piece', 'b-piece', 'n-piece', 'p-piece'].map(function (role) {
     return [playerIndex, role];
   });
   if (['breakthrough', 'minibreakthrough', 'flipello', 'flipello10'].includes(ctrl.rules)) {
@@ -354,12 +354,12 @@ function sparePieces(
     });
   }
   if (['xiangqi'].includes(ctrl.rules)) {
-    pieces = ['a-piece', 'b-piece', 'c-piece', 'k-piece', 'n-piece', 'p-piece', 'r-piece'].map(function (role) {
+    pieces = ['k-piece', 'a-piece', 'c-piece', 'r-piece', 'b-piece', 'n-piece', 'p-piece'].map(function (role) {
       return [playerIndex, role];
     });
   }
   if (['minixiangqi'].includes(ctrl.rules)) {
-    pieces = ['c-piece', 'k-piece', 'n-piece', 'p-piece', 'r-piece'].map(function (role) {
+    pieces = ['k-piece', 'c-piece', 'r-piece', 'n-piece', 'p-piece'].map(function (role) {
       return [playerIndex, role];
     });
   }
