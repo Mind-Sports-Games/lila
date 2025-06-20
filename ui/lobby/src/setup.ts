@@ -897,77 +897,6 @@ export default class Setup {
       updateBotDetails();
     };
     setupOpponentChoices();
-    const squashSection = (collapsibleSection: HTMLDivElement) => {
-      const sName = $(collapsibleSection).find('input').attr('name') || '';
-      $(collapsibleSection).removeClass('active').find('group').addClass('hide');
-      $(collapsibleSection)
-        .find('div.choice')
-        .hide()
-        .filter(`.${sName}_` + $(collapsibleSection).find('input').filter(':checked').val())
-        .show()
-        .removeAttr('style'); //remove unwated display: block added by show()
-      //hide/update additional sections
-      $form.find('.time_mode_config').hide();
-      updateClockOptionsText();
-      $form.find('.bot_title').hide();
-      $form.find('.rating-range-config').hide();
-    };
-    $collapsibleSections.each(function (this: HTMLDivElement) {
-      const $this = $(this);
-      const sName = $this.find('input').attr('name') || '';
-      //initial display of form
-      $this.removeClass('active');
-      $this.find('group').addClass('hide');
-      $this
-        .find('div.choice')
-        .hide()
-        .filter(`.${sName}_` + $this.find('input').filter(':checked').val())
-        .show();
-      $form.find('.time_mode_config').hide();
-      //Always start the form with gameGroup active
-      if (sName == 'gameGroup') {
-        $this.addClass('active');
-        $this.find('group').removeClass('hide');
-        $this.find('div.choice').hide();
-      }
-      const fixedSection = (user && sName === 'opponent') || ($form.data('anon') && sName === 'mode');
-      if (!fixedSection) {
-        $this.on('click', function (this: HTMLElement) {
-          const $this = $(this),
-            sName = $this.find('input').attr('name') || '';
-          $collapsibleSections
-            .not(this)
-            .filter('.active')
-            .each(function (this: HTMLDivElement) {
-              squashSection(this);
-            });
-          this.classList.toggle('active');
-          $(this).find('group').toggleClass('hide');
-          const $displayChoices = $this.find('div.choice');
-          if (this.classList.contains('active')) {
-            $displayChoices.hide();
-            if (
-              sName === 'timeModeDefaults' &&
-              ($timeModeDefaults.find('input').filter(':checked').val() as string) === 'custom'
-            ) {
-              $form.find('.time_mode_config').show();
-              $form.find('.time_mode_config').trigger('click');
-            }
-            if (sName === 'opponent') {
-              if (($opponentInput.filter(':checked').val() as string) === 'bot') {
-                $form.find('.bot_title').show();
-                $botChoices.show();
-              }
-              if (($opponentInput.filter(':checked').val() as string) === 'lobby') {
-                $form.find('.rating-range-config').show();
-              }
-            }
-          } else {
-            squashSection(this as HTMLDivElement);
-          }
-        });
-      }
-    });
     $form.find('.rating-range').each(function (this: HTMLDivElement) {
       const $this = $(this),
         $minInput = $this.find('.rating-range__min'),
@@ -1033,6 +962,7 @@ export default class Setup {
             break;
           case 'custom': //custom - i.e. used old time setup options
             $form.find('.time_mode_config').show();
+            $timeModeSelect.trigger('change');
             break;
           default:
             $timeModeSelect.val(clockConfig[choice].timemode);
@@ -1072,7 +1002,6 @@ export default class Setup {
       }
     }, 200);
     $fenInput.on('keyup', validateFen);
-
     if (forceFromPosition) {
       switch (($variantInput.filter(':checked').val() as string).split('_')[0]) {
         case '0':
@@ -1081,10 +1010,12 @@ export default class Setup {
         case '1':
           $variantInput.val('1_3');
           break;
-        //TODO: Add all variants from position?
+        default:
+          $variantInput.val('0_3');
+          $gameGroupInput.val('0');
       }
+      $opponentInput.val('friend');
     }
-
     $form.find('optgroup').each((_, optgroup: HTMLElement) => {
       optgroup.setAttribute('label', optgroup.getAttribute('name') || '');
     });
@@ -1132,8 +1063,8 @@ export default class Setup {
           validateFen();
           requestAnimationFrame(() => document.body.dispatchEvent(new Event(ground)));
         }
+        $timeModeDefaults.trigger('change');
         updateClockOptionsText();
-        showRating();
         showStartingImages();
         if (variantId[0] == '9') setupGoKomiInput();
         toggleButtons();
@@ -1201,6 +1132,78 @@ export default class Setup {
       } else {
         $advancedTimeToggle.addClass('active');
         $advancedTimeSetup.show();
+      }
+    });
+    const squashSection = (collapsibleSection: HTMLDivElement) => {
+      const sName = $(collapsibleSection).find('input').attr('name') || '';
+      $(collapsibleSection).removeClass('active').find('group').addClass('hide');
+      $(collapsibleSection)
+        .find('div.choice')
+        .hide()
+        .filter(`.${sName}_` + $(collapsibleSection).find('input').filter(':checked').val())
+        .show()
+        .removeAttr('style'); //remove unwated display: block added by show()
+      //hide/update additional sections
+      $form.find('.time_mode_config').hide();
+      updateClockOptionsText();
+      $form.find('.bot_title').hide();
+      $form.find('.rating-range-config').hide();
+    };
+    //do this last so that the form is ready for the user
+    $collapsibleSections.each(function (this: HTMLDivElement) {
+      const $this = $(this);
+      const sName = $this.find('input').attr('name') || '';
+      //initial display of form
+      $this.removeClass('active');
+      $this.find('group').addClass('hide');
+      $this
+        .find('div.choice')
+        .hide()
+        .filter(`.${sName}_` + $this.find('input').filter(':checked').val())
+        .show();
+      $form.find('.time_mode_config').hide();
+      //Always start the form with gameGroup active
+      if (sName == 'gameGroup') {
+        $this.addClass('active');
+        $this.find('group').removeClass('hide');
+        $this.find('div.choice').hide();
+      }
+      const fixedSection = (user && sName === 'opponent') || ($form.data('anon') && sName === 'mode');
+      if (!fixedSection) {
+        $this.on('click', function (this: HTMLElement) {
+          const $this = $(this),
+            sName = $this.find('input').attr('name') || '';
+          $collapsibleSections
+            .not(this)
+            .filter('.active')
+            .each(function (this: HTMLDivElement) {
+              squashSection(this);
+            });
+          this.classList.toggle('active');
+          $(this).find('group').toggleClass('hide');
+          const $displayChoices = $this.find('div.choice');
+          if (this.classList.contains('active')) {
+            $displayChoices.hide();
+            if (
+              sName === 'timeModeDefaults' &&
+              ($timeModeDefaults.find('input').filter(':checked').val() as string) === 'custom'
+            ) {
+              $form.find('.time_mode_config').show();
+              $form.find('.time_mode_config').trigger('click');
+            }
+            if (sName === 'opponent') {
+              if (($opponentInput.filter(':checked').val() as string) === 'bot') {
+                $form.find('.bot_title').show();
+                $botChoices.show();
+              }
+              if (($opponentInput.filter(':checked').val() as string) === 'lobby') {
+                $form.find('.rating-range-config').show();
+              }
+            }
+          } else {
+            squashSection(this as HTMLDivElement);
+          }
+        });
       }
     });
 
