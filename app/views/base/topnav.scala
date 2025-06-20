@@ -88,7 +88,7 @@ object topnav {
         div(role := "group")(
           a(href := routes.UserAnalysis.index)(s"${trans.analysis.txt()}"),
           //a(href := s"${routes.UserAnalysis.index}#explorer")(trans.openingExplorer()),
-          a(href := routes.Editor.index)(s"Chess ${trans.boardEditor.txt()}"),
+          a(href := routes.Editor.index)(s"${trans.boardEditor.txt()}"),
           a(href := routes.Study.allDefault(1))(trans.studyMenu())
           //a(href := routes.Importer.importGame)(trans.importGame()),
           //a(href := routes.Search.index())(trans.search.advancedSearch())

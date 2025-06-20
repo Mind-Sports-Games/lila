@@ -2,14 +2,15 @@ import { EditorState, Selected, Redraw, CastlingToggle, CastlingToggles, CASTLIN
 import { Api as CgApi } from 'chessground/api';
 import { Rules, Square } from 'stratops/types';
 import { SquareSet } from 'stratops/squareSet';
-import { Board } from 'stratops/board';
 import { Setup, Material, RemainingChecks } from 'stratops/setup';
-import { Castles } from 'stratops';
-import { playstrategyVariants } from 'stratops/compat';
-import { makeFen, parseFen, parseCastlingFen, INITIAL_FEN, EMPTY_FEN, INITIAL_EPD } from 'stratops/fen';
+import { Board, Castles } from 'stratops';
+import { makeFen, parseCastlingFen } from 'stratops/fen';
 import * as fp from 'stratops/fp';
 import { defined, prop, Prop } from 'common';
-import { variantClass } from 'stratops/variants/util';
+import { replacePocketsInFen } from 'common/editor';
+import { variantClass, variantClassFromKey, variantKeyToRules } from 'stratops/variants/util';
+import { Variant as CGVariant } from 'chessground/types';
+import { VariantKey } from 'stratops/variants/types';
 
 export default class EditorCtrl {
   cfg: Editor.Config;
@@ -28,9 +29,11 @@ export default class EditorCtrl {
   castlingToggles: CastlingToggles<boolean>;
   epSquare: fp.Option<Square>;
   remainingChecks: fp.Option<RemainingChecks>;
-  rules: Rules;
   halfmoves: number;
   fullmoves: number;
+
+  rules: Rules;
+  variantKey: VariantKey;
 
   constructor(cfg: Editor.Config, redraw: Redraw) {
     this.cfg = cfg;
@@ -40,10 +43,16 @@ export default class EditorCtrl {
 
     this.selected = prop('pointer');
 
+    const params = new URLSearchParams(window.location.search);
+    this.variantKey = (cfg.variantKey || 'standard') as VariantKey;
+    const variant = variantClassFromKey(this.variantKey);
+    this.rules = variantKeyToRules(this.variantKey);
+    this.initialFen = cfg.fen || params.get('fen') || variant.getInitialFen();
+
     this.extraPositions = [
       {
-        fen: INITIAL_FEN,
-        epd: INITIAL_EPD,
+        fen: variant.getInitialBoardFen(),
+        epd: `${variant.getInitialBoardFen} ${variant.getInitialEpd()}`,
         name: this.trans('startPosition'),
       },
       {
@@ -62,22 +71,21 @@ export default class EditorCtrl {
     });
 
     this.castlingToggles = { K: false, Q: false, k: false, q: false };
-    const params = new URLSearchParams(location.search);
-    this.rules =
-      !this.cfg.embed && window.history.state && window.history.state.rules ? window.history.state.rules : 'chess';
-    this.initialFen = (cfg.fen || params.get('fen') || INITIAL_FEN).replace(/_/g, ' ');
 
     this.redraw = () => {};
     this.setFen(this.initialFen);
     this.redraw = redraw;
   }
 
+  formatVariantForUrl(): string {
+    return this.variantKey === 'standard' ? 'chess' : this.variantKey;
+  }
+
   onChange(): void {
-    const fen = this.getFen();
+    const fen = this.getFenFromSetup();
     if (!this.cfg.embed) {
-      const state = { rules: this.rules };
-      if (fen == INITIAL_FEN) window.history.replaceState(state, '', '/editor');
-      else window.history.replaceState(state, '', this.makeUrl('/editor/', fen));
+      const state = { rules: this.rules, variantKey: this.variantKey, fen };
+      window.history.replaceState(state, '', this.makeUrl('/editor/' + this.formatVariantForUrl() + '/', fen));
     }
     this.options.onChange && this.options.onChange(fen);
     this.redraw();
@@ -92,11 +100,22 @@ export default class EditorCtrl {
   }
 
   private getSetup(): Setup {
-    const boardFen = this.chessground ? this.chessground.getFen() : this.initialFen;
-    const board = parseFen(this.rules)(boardFen).unwrap(
+    let fen;
+    const variant = variantClassFromKey(this.variantKey);
+    if (this.chessground)
+      fen = this.chessground.getFen(); // @Note: chessground.getFen() returns the board part of the FEN
+    else fen = this.initialFen || variant.getInitialFen();
+
+    if (fen.split(' ').length === 1) fen += ` ${variant.getInitialEpd()} ${variant.getInitialMovesFen()}`;
+
+    const board = variant.parseFen(fen).unwrap(
       setup => setup.board,
-      _ => Board.empty(this.rules),
+      _ => {
+        console.warn('Invalid FEN:', fen);
+        return Board.empty(this.rules);
+      },
     );
+
     return {
       board,
       pockets: this.pockets,
@@ -104,24 +123,17 @@ export default class EditorCtrl {
       unmovedRooks: this.unmovedRooks || parseCastlingFen(board)(this.castlingToggleFen()).unwrap(),
       epSquare: this.epSquare,
       remainingChecks: this.remainingChecks,
-      halfmoves: this.halfmoves,
-      fullmoves: this.fullmoves,
+      halfmoves: this.halfmoves ?? 0,
+      fullmoves: this.fullmoves ?? 1,
     };
   }
 
-  getFen(): string {
-    return makeFen('chess')(this.getSetup(), { promoted: this.rules == 'crazyhouse' });
+  getFenFromSetup(): string {
+    return replacePocketsInFen(makeFen(this.rules)(this.getSetup(), { promoted: this.rules == 'crazyhouse' }));
   }
 
   private getLegalFen(): string | undefined {
-    return variantClass(this.rules)
-      .fromSetup(this.getSetup())
-      .unwrap(
-        pos => {
-          return makeFen('chess')(pos.toSetup(), { promoted: pos.rules == 'crazyhouse' });
-        },
-        _ => undefined,
-      );
+    return this.getFenFromSetup();
   }
 
   private isPlayable(): boolean {
@@ -135,14 +147,14 @@ export default class EditorCtrl {
 
   getState(): EditorState {
     return {
-      fen: this.getFen(),
+      fen: this.getFenFromSetup(),
       legalFen: this.getLegalFen(),
       playable: this.rules == 'chess' && this.isPlayable(),
     };
   }
 
   makeAnalysisUrl(legalFen: string): string {
-    const variant = this.rules === 'chess' ? '' : playstrategyVariants(this.rules) + '/';
+    const variant = this.rules === 'chess' ? '' : this.variantKey + '/';
     return this.makeUrl(`/analysis/${variant}`, legalFen);
   }
 
@@ -169,9 +181,13 @@ export default class EditorCtrl {
     this.onChange();
   }
 
-  startPosition = () => this.setFen(makeFen('chess')(variantClass(this.rules).default().toSetup()));
+  startPosition = () => {
+    this.setFen(variantClassFromKey(this.variantKey).getInitialFen());
+  };
 
-  clearBoard = () => this.setFen(EMPTY_FEN);
+  clearBoard = () => {
+    this.setFen(variantClassFromKey(this.variantKey).getEmptyFen());
+  };
 
   loadNewFen(fen: string | 'prompt'): void {
     if (fen === 'prompt') {
@@ -182,31 +198,64 @@ export default class EditorCtrl {
   }
 
   setFen = (fen: string): boolean => {
-    return parseFen('chess')(fen).unwrap(
+    const variant = variantClassFromKey(this.variantKey);
+    const width = variant.width;
+    const height = variant.height;
+
+    return variant.parseFen(fen).unwrap(
       setup => {
-        if (this.chessground) this.chessground.set({ fen });
-        this.pockets = setup.pockets;
+        if (this.chessground)
+          this.chessground.set({
+            fen,
+            variant: this.variantKey as CGVariant,
+            dimensions: { width, height },
+          });
         this.turn = setup.turn;
-        this.unmovedRooks = setup.unmovedRooks;
-        this.epSquare = setup.epSquare;
-        this.remainingChecks = setup.remainingChecks;
         this.halfmoves = setup.halfmoves;
         this.fullmoves = setup.fullmoves;
+        this.pockets = setup.pockets;
 
-        const castles = Castles.fromSetup(setup);
-        this.castlingToggles['K'] = defined(castles.rook.p1.h);
-        this.castlingToggles['Q'] = defined(castles.rook.p1.a);
-        this.castlingToggles['k'] = defined(castles.rook.p2.h);
-        this.castlingToggles['q'] = defined(castles.rook.p2.a);
+        if (variant.family === 'chess') {
+          this.unmovedRooks = setup.unmovedRooks;
+          this.epSquare = setup.epSquare;
+          this.remainingChecks = setup.remainingChecks;
+          const castles = Castles.fromSetup(setup);
+          this.castlingToggles['K'] = defined(castles.rook.p1.h);
+          this.castlingToggles['Q'] = defined(castles.rook.p1.a);
+          this.castlingToggles['k'] = defined(castles.rook.p2.h);
+          this.castlingToggles['q'] = defined(castles.rook.p2.a);
+        }
 
+        this.initialFen = fen;
         this.onChange();
         return true;
       },
-      _ => false,
+      _ => {
+        console.warn('Invalid FEN:', fen);
+        return false;
+      },
     );
   };
 
-  setRules(rules: Rules): void {
+  setVariantAndRules(variantKey: VariantKey): void {
+    this.variantKey = variantKey;
+    const variant = variantClassFromKey(variantKey);
+    this.initialFen = variant.getInitialFen();
+    this.extraPositions = [
+      {
+        fen: variant.getInitialFen(),
+        epd: `${variant.getInitialBoardFen()} ${variant.getInitialEpd()}`,
+        name: this.trans('startPosition'),
+      },
+      {
+        fen: 'prompt',
+        name: this.trans('loadPosition'),
+      },
+    ];
+    this.setRules(variantKeyToRules(variantKey));
+  }
+
+  private setRules(rules: Rules): void {
     this.rules = rules;
     if (rules != 'crazyhouse') this.pockets = undefined;
     else if (!this.pockets) this.pockets = Material.empty();

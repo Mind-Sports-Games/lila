@@ -9,9 +9,9 @@ object TournamentMedleyUtil {
       orderedMedleyList: List[Variant],
       gameClockSeconds: Option[Int],
       minutes: Int,
-      mNumIntervals: Int,
+      mNumIntervals: Int
   ): List[(Variant, Int)] = {
-    val mBalanced = gameClockSeconds.nonEmpty
+    val mBalanced                                 = gameClockSeconds.nonEmpty
     val medleyVariantsInTournament: List[Variant] = orderedMedleyList.take(mNumIntervals)
     val medleySpeedChoice = orderedMedleyList match {
       case x if isMedleyChessShieldStyle(x)    => medleyChessShieldSpeeds
