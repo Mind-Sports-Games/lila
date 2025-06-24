@@ -38,13 +38,7 @@ object forms {
         renderTimeMode(form, allowAnon = false, allowCorrespondence = true),
         renderMultiMatch(form),
         renderPlayerIndexOptions(form("playerIndex")),
-        frag(
-          div(cls := "mode_choice buttons collapsible optional_config")(
-            div(cls := "section_title")("Mode"),
-            renderIconRadios(form("mode"), translatedModeIconChoices),
-            renderSelectedChoice(form("mode"), translatedModeIconChoices)
-          )
-        ),
+        renderModeOptions(form),
         renderOpponentOptions(
           form,
           user.map { u =>

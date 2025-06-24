@@ -314,6 +314,13 @@ private object bits {
       )
     )
 
+  def renderModeOptions(form: Form[_])(implicit ctx: Context) =
+    div(cls := "mode_choice buttons collapsible optional_config")(
+      div(cls := "section_title")("Mode"),
+      renderIconRadios(form("mode"), translatedModeIconChoices),
+      renderSelectedChoice(form("mode"), translatedModeIconChoices)
+    )
+
   def renderTimeModeOptions(form: Form[_])(implicit ctx: Context) =
     div(cls := "time_mode_defaults optional_config collapsible")(
       div(cls := "section_title")(

@@ -140,7 +140,6 @@ trait SetupHelper { self: I18nHelper =>
       (Mode.Rated.id.toString, "\uE92B", trans.rated.txt().some)
     )
 
-  //todo add trans
   def translatedTimeModeIconChoices(implicit lang: Lang): List[SelectChoice] =
     List(
       ("bullet", "\u0054", "1+0".some),
