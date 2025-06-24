@@ -342,12 +342,11 @@ trait SetupHelper { self: I18nHelper =>
       ("p1", trans.p1.txt(), none)
     )
 
-  //TODO add to trans when complete
   def translatedOpponentChoices(implicit lang: Lang): List[SelectChoice] =
     List(
-      ("lobby", "\u0066", "lobby".some),
-      ("friend", "\u0072", "friend".some),
-      ("bot", "\uE933", "bot".some)
+      ("lobby", "\u0066", trans.lobby.txt().some),
+      ("friend", "\u0072", trans.friend.txt().some),
+      ("bot", "\uE933", trans.bot.txt().some)
     )
 
   def translatedPSBotChoices(implicit lang: Lang): List[SelectChoice] =

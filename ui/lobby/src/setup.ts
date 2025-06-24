@@ -168,25 +168,31 @@ export default class Setup {
   };
 
   private clockDisplayText = (clockConfig: ClockConfig) => {
+    const showTime = (v: string) => {
+      if (v == '0.25') return '¼';
+      if (v == '0.5') return '½';
+      if (v == '0.75') return '¾';
+      return '' + v;
+    };
     switch (clockConfig.timemode) {
       case '2': //correspondence
         return clockConfig.days + ' day' + (clockConfig.days !== '1' ? 's' : '');
       case '3': //byoyomi
         return (
-          clockConfig.initial +
+          showTime(clockConfig.initial) +
           (clockConfig.increment !== '0' ? ' + ' + clockConfig.increment : '') +
           `|${clockConfig.byoyomi}${clockConfig.periods !== '1' ? `(${clockConfig.periods}x)` : ''}`
         );
       case '4': //bronstein
-        return clockConfig.initial + ' d+' + clockConfig.increment;
+        return showTime(clockConfig.initial) + ' d+' + clockConfig.increment;
       case '5': //simple delay
-        return clockConfig.initial + ' d/' + clockConfig.increment;
+        return showTime(clockConfig.initial) + ' d/' + clockConfig.increment;
       case '0': //unlimited
         return '\u221E';
       case '6': //custom
         return 'Custom';
       default:
-        return clockConfig.initial + ' + ' + clockConfig.increment;
+        return showTime(clockConfig.initial) + ' + ' + clockConfig.increment;
     }
   };
 
@@ -204,7 +210,7 @@ export default class Setup {
       : undefined;
   };
 
-  private psBots = ['ps-greedy-two-move', 'ps-greedy-one-move', 'ps-greedy-four-move', 'ps-random-mover', 'bot1'];
+  private psBots = ['ps-random-mover', 'ps-greedy-one-move', 'ps-greedy-two-move', 'ps-greedy-four-move'];
   private stockfishBots = [
     'stockfish-level1',
     'stockfish-level2',
@@ -215,6 +221,7 @@ export default class Setup {
     'stockfish-level7',
     'stockfish-level8',
   ];
+  private allBots = this.psBots.concat(this.stockfishBots);
   private ratedTimeModes = ['1', '3', '4', '5'];
 
   prepareForm = ($modal: Cash) => {
@@ -271,6 +278,7 @@ export default class Setup {
           byo = parseFloat($byoyomiInput.val() as string),
           per = parseFloat($periodsInput.filter(':checked').val() as string),
           opponentType = $opponentInput.filter(':checked').val() as string,
+          botUser = user === '' ? ($botInput.filter(':checked').val() as string) : user,
           playerIndex = $playerIndexInput.filter(':checked').val() as string,
           // no rated variants with less than 30s on the clock and no rated unlimited in the lobby
           cantBeRated =
@@ -279,7 +287,7 @@ export default class Setup {
             (limit < 0.5 && inc == 0) ||
             (limit == 0 && inc < 2) ||
             (playerIndex !== 'random' && randomPlayerIndexVariants.includes(variantFull)) ||
-            (vsPSBot && user == 'ps-random-mover') ||
+            (vsPSBot && botUser === 'ps-random-mover') ||
             (variantId[0] == '9' &&
               $goConfig.val() !== undefined &&
               (($goHandicapInput.val() as string) != '0' ||
@@ -288,54 +296,84 @@ export default class Setup {
             //remove this if we ever want Backgammon cube games to be rated
             (variantId[0] == '10' &&
               $backgammonConfig.val() !== undefined &&
-              ($backgammonPointsInput.val() as string) != '1');
+              ($backgammonPointsInput.val() as string) != '1'),
+          cantBeLobby =
+            variantId[0] == '9' &&
+            $goConfig.val() !== undefined &&
+            (($goHandicapInput.val() as string) != '0' ||
+              (variantId[1] !== '1' && ($goKomiInput.val() as string) != '75') ||
+              (variantId[1] == '1' && ($goKomiInput.val() as string) != '55'));
         if (cantBeRated && rated) {
           $casual.trigger('click');
           return toggleButtons();
         }
+        if (cantBeLobby && opponentType === 'lobby') {
+          const $friend = $opponentInput.eq(1);
+          $friend.trigger('click');
+          return toggleButtons();
+        }
         $rated.prop('disabled', !!cantBeRated).siblings('label').toggleClass('disabled', cantBeRated);
+        $opponentInput.eq(0).prop('disabled', !!cantBeLobby).siblings('label').toggleClass('disabled', cantBeLobby);
+        this.allBots.forEach((botKey, i) => {
+          $botInput
+            .eq(i)
+            .prop('disabled', !botCanPlay(botKey, limit, inc, variantId))
+            .siblings('label')
+            .toggleClass('disabled', !botCanPlay(botKey, limit, inc, variantId));
+        });
         const byoOk = timeMode !== '3' || ((limit > 0 || inc > 0 || byo > 0) && (byo || per === 1));
         const delayOk = (timeMode !== '4' && timeMode !== '5') || inc > 0;
         const timeOk = timeMode !== '1' || limit > 0 || inc > 0,
           ratedOk = opponentType !== 'lobby' || !rated || timeMode !== '0',
-          aiOk = opponentType !== 'bot' || variantId[1] !== '3' || limit >= 1,
           fenOk = variantId[0] !== '0' || variantId[1] !== '3' || $fenInput.hasClass('success'),
-          botOK = !vsPSBot || psBotCanPlay(user, limit, inc, variantId);
-
-        if (byoOk && delayOk && timeOk && ratedOk && aiOk && fenOk && botOK) {
+          botOK = opponentType !== 'bot' || botCanPlay(botUser, limit, inc, variantId);
+        if (byoOk && delayOk && timeOk && ratedOk && fenOk && botOK) {
           $submits.toggleClass('nope', false);
-        } else $submits.toggleClass('nope', true); //TODO warning instead of disabling
+        } else {
+          $submits.toggleClass('nope', true);
+          if (!botOK && !vsPSBot && !vsStockfishBot) {
+            $botInput.val('ps-greedy-two-move').trigger('change'); //default to a bot that can play all variants
+          }
+        }
       },
       save = function () {
         self.save($form[0] as HTMLFormElement);
       };
 
-    const psBotCanPlay = (user: string, limit: number, inc: number, variantId: string[]) => {
-      //TODO remove hard coded options and improve bot api flow
+    const botCanPlay = (user: string, limit: number, inc: number, variantId: string[]) => {
       let variantCompatible = true;
-      switch (user) {
-        case 'ps-greedy-four-move': {
-          //in (draughts, oware, togy)
-          variantCompatible = ['1', '6', '7'].includes(variantId[0]);
-          break;
+      if (/^stockfish-level[1-8]$/.test(user)) {
+        variantCompatible =
+          (variantId[0] === '0' && variantId[1] !== '15') || ['3', '4', '5', '11'].includes(variantId[0]);
+      } else {
+        switch (user) {
+          case 'ps-greedy-four-move': {
+            //in (draughts, oware, togy)
+            variantCompatible = ['1', '6', '7'].includes(variantId[0]);
+            break;
+          }
+          default:
+            variantCompatible = true;
         }
-        default:
-          variantCompatible = true;
       }
 
       let clockCompatible = true;
       if (isRealTime()) {
-        switch (user) {
-          case 'ps-random-mover': {
-            clockCompatible = limit >= 0.5;
-            break;
-          }
-          case 'ps-greedy-one-move': {
-            clockCompatible = limit >= 1 && inc >= 1;
-            break;
-          }
-          default: {
-            clockCompatible = limit >= 3 && inc >= 2;
+        if (/^stockfish-level[1-8]$/.test(user)) {
+          clockCompatible = limit >= 0.5;
+        } else {
+          switch (user) {
+            case 'ps-random-mover': {
+              clockCompatible = limit >= 0.5;
+              break;
+            }
+            case 'ps-greedy-one-move': {
+              clockCompatible = limit >= 1 && inc >= 1;
+              break;
+            }
+            default: {
+              clockCompatible = limit >= 3 && inc >= 2;
+            }
           }
         }
       } else {
@@ -355,12 +393,45 @@ export default class Setup {
         });
       });
     }
-    //default options for playing against ps-bots
-    if (vsPSBot) {
+
+    const isRealTime = () => this.ratedTimeModes.indexOf(<string>$timeModeSelect.val()) !== -1;
+
+    //default options for challenge against bots
+    if (vsPSBot || vsStockfishBot) {
       $timeModeSelect.val('1');
       $timeInput.val('3');
       $incrementInput.val('2');
       $casual.trigger('click');
+      if (user !== '') $botInput.val(user);
+
+      const limit = +($timeInput.val() as string),
+        inc = +($incrementInput.val() as string);
+      // Disable variant options the bot cannot play
+      $variantInput.each(function (_, el) {
+        const $el = $(el);
+        const variantId = ($el.val() as string).split('_');
+        const canPlay = botCanPlay(user, limit, inc, variantId);
+        $el.prop('disabled', !canPlay).siblings('label').toggleClass('disabled', !canPlay);
+      });
+
+      // Disable game group options the bot cannot play
+      $gameGroupInput.each(function (_, el) {
+        const $el = $(el);
+        // Find the first variant for this game group
+        const groupValue = $el.val() as string;
+        // Find a variantId for this group (e.g., the first matching variant)
+        const variantForGroup = $variantInput
+          .filter(function () {
+            return ($(this).val() as string).split('_')[0] === groupValue;
+          })
+          .first();
+        let canPlay = true;
+        if (variantForGroup.length) {
+          const variantId = (variantForGroup.val() as string).split('_');
+          canPlay = botCanPlay(user, limit, inc, variantId);
+        }
+        $el.prop('disabled', !canPlay).siblings('label').toggleClass('disabled', !canPlay);
+      });
     }
 
     const showRating = () => {
@@ -618,8 +689,6 @@ export default class Setup {
       $periodsInput.eq(0).trigger('click');
     };
 
-    const isRealTime = () => this.ratedTimeModes.indexOf(<string>$timeModeSelect.val()) !== -1;
-
     const customClockConfig = () => {
       return {
         timemode: $timeModeSelect.val(),
@@ -870,12 +939,24 @@ export default class Setup {
       });
     });
     const updateBotDetails = () => {
-      const bot = $botInput.filter(':checked').val() as string;
-      if (!bot) $botInput.val('ps-greedy-two-move'); //default bot
+      let bot = $botInput.filter(':checked').val() as string;
+      if (!bot) {
+        $botInput.val('ps-greedy-two-move'); //default bot
+        bot = 'ps-greedy-two-move';
+      }
       const botText = $form.find('.opponent_bot.choice');
+      const botName = bot
+        .replace('stockfish-l', 'Stockfish-L')
+        .replace('ps-', 'PS-')
+        .replace('greedy-', 'Greedy-')
+        .replace('-move', '-Move')
+        .replace('random', 'Random')
+        .replace('one', 'One')
+        .replace('four', 'Four')
+        .replace('two', 'Two');
       botText.empty();
       botText.append(
-        `<a class="user-link ulpt" href="/@/${bot}"><span class="utitle" data-bot="data-bot" title="Robot">BOT</span>&nbsp${bot}</a>`,
+        `<a class="user-link ulpt" href="/@/${bot}"><span class="utitle" data-bot="data-bot" title="Robot">BOT</span>&nbsp${botName}</a>`,
       );
       const botSelected = $opponentInput.filter(':checked').val() === 'bot';
       if (!botSelected) return;
@@ -961,7 +1042,11 @@ export default class Setup {
             $form.find('.time_mode_config').hide();
             break;
           case 'custom': //custom - i.e. used old time setup options
-            $form.find('.time_mode_config').show();
+            if ($(this).hasClass('active')) {
+              $form.find('.time_mode_config').show();
+            } else {
+              $form.find('.time_mode_config').hide();
+            }
             $timeModeSelect.trigger('change');
             break;
           default:
@@ -1038,9 +1123,11 @@ export default class Setup {
         $form.find('.rating-range-config').hide();
       }
       updateLobbySubmit();
+      toggleButtons();
     });
     $botInput.on('change', function (this: HTMLElement) {
       updateBotDetails();
+      toggleButtons();
     });
 
     $variantInput
