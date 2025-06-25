@@ -1167,15 +1167,22 @@ export default class Setup {
         const variantId = ($variantInput.filter(':checked').val() as string).split('_'),
           gameFamily = $gameGroupInput.filter(':checked').val() as string;
 
+        let numInGroup = 0;
         $variantInput.each(function (this: HTMLElement) {
           const gfOfVariant = ($(this).val() as string).split('_')[0];
           const additionMatches = gfOfVariant === '6' && gameFamily === '7'; //add oware to mancala group
           if (gfOfVariant === gameFamily || additionMatches) {
             $(this).parent().show();
+            numInGroup++;
           } else {
             $(this).parent().hide();
           }
         });
+
+        $variants
+          .find('group.radio')
+          .removeClass('child-count-1 child-count-2 child-count-3')
+          .addClass('child-count-' + numInGroup);
 
         if (variantId[0] !== gameFamily) {
           const variantValue = function () {

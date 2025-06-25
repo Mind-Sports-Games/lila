@@ -120,6 +120,13 @@ $game-family-p2-pieces: (
     }
   }
 
+  @for $i from 1 through 3 {
+    .variant_choice group.radio.child-count-#{$i} div {
+      width: #{100% / $i};
+      max-width: #{100% / $i};
+    }
+  }
+
   group.radio {
     margin: 0 auto 1em auto;
     width: 100%;
