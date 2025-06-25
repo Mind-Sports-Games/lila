@@ -93,7 +93,14 @@ export default class Setup {
 
   private sliderHandicap = (v: number) => (v < 26 ? v : 0);
 
-  private sliderKomis = (bs: number) => [...Array(bs * bs * 4 + 1).keys()].map(i => -(bs * bs * 10) + i * 5);
+  private sliderKomisCache: { [bs: number]: number[] } = {};
+
+  private sliderKomis = (bs: number) => {
+    if (!this.sliderKomisCache[bs]) {
+      this.sliderKomisCache[bs] = [...Array(bs * bs * 4 + 1).keys()].map(i => -(bs * bs * 10) + i * 5);
+    }
+    return this.sliderKomisCache[bs];
+  };
 
   private sliderKomi = (bs: number) => (v: number) => (v < this.sliderKomis(bs).length ? this.sliderKomis(bs)[v] : 75);
 
@@ -314,12 +321,11 @@ export default class Setup {
         }
         $rated.prop('disabled', !!cantBeRated).siblings('label').toggleClass('disabled', cantBeRated);
         $opponentInput.eq(0).prop('disabled', !!cantBeLobby).siblings('label').toggleClass('disabled', cantBeLobby);
-        this.allBots.forEach((botKey, i) => {
-          $botInput
-            .eq(i)
-            .prop('disabled', !botCanPlay(botKey, limit, inc, variantId))
-            .siblings('label')
-            .toggleClass('disabled', !botCanPlay(botKey, limit, inc, variantId));
+        $botInput.each(function (i, input) {
+          const isDisabled = !botCanPlay(self.allBots[i], limit, inc, variantId);
+          const $input = $(input);
+          $input.prop('disabled', isDisabled);
+          $input.siblings('label').toggleClass('disabled', isDisabled);
         });
         const byoOk = timeMode !== '3' || ((limit > 0 || inc > 0 || byo > 0) && (byo || per === 1));
         const delayOk = (timeMode !== '4' && timeMode !== '5') || inc > 0;
@@ -331,7 +337,7 @@ export default class Setup {
           $submits.toggleClass('nope', false);
         } else {
           $submits.toggleClass('nope', true);
-          if (!botOK && !vsPSBot && !vsStockfishBot) {
+          if (!botOK && !vsPSBot && !vsStockfishBot && $botInput.filter(':checked').val() !== 'ps-greedy-two-move') {
             $botInput.val('ps-greedy-two-move').trigger('change'); //default to a bot that can play all variants
           }
         }
@@ -1168,16 +1174,20 @@ export default class Setup {
           gameFamily = $gameGroupInput.filter(':checked').val() as string;
 
         let numInGroup = 0;
+        const toShow: HTMLElement[] = [];
+        const toHide: HTMLElement[] = [];
         $variantInput.each(function (this: HTMLElement) {
           const gfOfVariant = ($(this).val() as string).split('_')[0];
           const additionMatches = gfOfVariant === '6' && gameFamily === '7'; //add oware to mancala group
           if (gfOfVariant === gameFamily || additionMatches) {
-            $(this).parent().show();
+            toShow.push($(this).parent()[0]);
             numInGroup++;
           } else {
-            $(this).parent().hide();
+            toHide.push($(this).parent()[0]);
           }
         });
+        $(toShow).show();
+        $(toHide).hide();
 
         $variants
           .find('group.radio')
