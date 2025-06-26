@@ -209,7 +209,7 @@ export const passConfirm = (ctrl: RoundController): VNode =>
 export const offerSelectSquaresButton = (ctrl: RoundController, isNotSameOffer = true): VNode =>
   h('button.select-squares-offer.button', {
     class: { disabled: !isNotSameOffer },
-    attrs: { disabled: !isNotSameOffer, title: 'send offer', 'data-icon': '' },
+    attrs: { disabled: !isNotSameOffer, title: 'send offer', 'data-icon': '\ue937' },
     hook: util.bind('click', () => ctrl.offerSelectSquares()),
   });
 

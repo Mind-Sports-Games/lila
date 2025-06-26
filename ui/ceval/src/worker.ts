@@ -122,6 +122,7 @@ export class ThreadedWasmWorker extends AbstractWorker<ThreadedWasmWorkerOpts> {
       protocol.init();
       ThreadedWasmWorker.protocols['Stockfish'] = protocol;
     }
+    protocol.setVariant(this.protocolOpts.variant);
     return protocol;
   }
 

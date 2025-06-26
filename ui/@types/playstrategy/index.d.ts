@@ -224,6 +224,7 @@ declare namespace Editor {
     embed: boolean;
     positions?: OpeningPosition[];
     i18n: I18nDict;
+    variantKey?: VariantKey;
   }
 
   export interface Options {
@@ -258,6 +259,8 @@ interface Window {
     palantir(opts: PalantirOpts): Palantir;
   };
   [key: string]: any; // TODO
+  readonly paypalOrder: unknown;
+  readonly paypalSubscription: unknown;
 }
 
 interface Study {

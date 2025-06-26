@@ -1,0 +1,5 @@
+<svg width="250" height="250" xmlns="http://www.w3.org/2000/svg">
+  <!-- Plus sign centered in a larger background -->
+ <line x1="125" y1="70" x2="125" y2="180" stroke="white" stroke-width="20"/>
+  <line x1="70" y1="125" x2="180" y2="125" stroke="white" stroke-width="20"/>
+</svg>

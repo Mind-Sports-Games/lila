@@ -175,10 +175,9 @@ object TournamentShield {
       val newOrder        = onePerGameGroup ::: thisOrder.filterNot(onePerGameGroup.contains(_))
       TournamentMedleyUtil.medleyVariantsAndIntervals(
         newOrder,
-        5 * 60,
+        Some(5 * 60),
         playStrategyMinutes,
-        playStrategyRounds,
-        true
+        playStrategyRounds
       )
     }
     private val playStrategyMinutes = 120
@@ -206,10 +205,9 @@ object TournamentShield {
     private def randomChessVariantOrder(variants: List[Variant]) =
       TournamentMedleyUtil.medleyVariantsAndIntervals(
         Random.shuffle(variants),
-        5 * 60,
+        Some(5 * 60),
         chessVariantMinutes,
-        chessVariantRounds,
-        true
+        chessVariantRounds
       )
     private val chessVariantOptions = Variant.all.filter(_.exoticChessVariant)
     private val chessVariantMinutes = 90
@@ -237,10 +235,9 @@ object TournamentShield {
     private def randomDraughtsVariantOrder(variants: List[Variant]) =
       TournamentMedleyUtil.medleyVariantsAndIntervals(
         Random.shuffle(variants),
-        5 * 60,
+        Some(5 * 60),
         draughtsVariantMinutes,
-        draughtsRounds,
-        true
+        draughtsRounds
       )
     private val draughtsVariantOptions =
       Variant.all.filter(_.gameFamily == GameFamily.Draughts()).filterNot(_.fromPositionVariant)
@@ -267,13 +264,7 @@ object TournamentShield {
         )
 
     private def loaVariantOrder(variants: List[Variant]) =
-      TournamentMedleyUtil.medleyVariantsAndIntervals(
-        variants,
-        5 * 60,
-        loaVariantMinutes,
-        loaRounds,
-        false
-      )
+      TournamentMedleyUtil.medleyVariantsAndIntervals(variants, None, loaVariantMinutes, loaRounds)
     private val loaVariants = List(
       Variant.wrap(strategygames.chess.variant.LinesOfAction),
       Variant.wrap(strategygames.chess.variant.ScrambledEggs),
@@ -305,13 +296,7 @@ object TournamentShield {
         )
 
     private def shogiVariantOrder(variants: List[Variant]) =
-      TournamentMedleyUtil.medleyVariantsAndIntervals(
-        variants,
-        5 * 60,
-        shogiVariantMinutes,
-        shogiRounds,
-        false
-      )
+      TournamentMedleyUtil.medleyVariantsAndIntervals(variants, None, shogiVariantMinutes, shogiRounds)
     private val shogiVariants = List(
       Variant.wrap(strategygames.fairysf.variant.Shogi),
       Variant.wrap(strategygames.fairysf.variant.MiniShogi),
@@ -343,14 +328,7 @@ object TournamentShield {
         )
 
     private def xiangqiVariantOrder(variants: List[Variant]) =
-      TournamentMedleyUtil.medleyVariantsAndIntervals(
-        variants,
-        5 * 60,
-        xiangqiVariantMinutes,
-        xiangqiRounds,
-        false
-      )
-
+      TournamentMedleyUtil.medleyVariantsAndIntervals(variants, None, xiangqiVariantMinutes, xiangqiRounds)
     private val xiangqiVariants = List(
       Variant.wrap(strategygames.fairysf.variant.Xiangqi),
       Variant.wrap(strategygames.fairysf.variant.MiniXiangqi),
@@ -381,16 +359,8 @@ object TournamentShield {
           s"Welcome to the ${VariantKeys.gameFamilyName(GameFamily.Xiangqi())} Medley Arena!"
         )
 
-    private def othelloVariantOrder(variants: List[Variant]) = {
-      TournamentMedleyUtil.medleyVariantsAndIntervals(
-        variants,
-        5 * 60,
-        othelloVariantMinutes,
-        othelloRounds,
-        false
-      )
-    }
-
+    private def othelloVariantOrder(variants: List[Variant]) =
+      TournamentMedleyUtil.medleyVariantsAndIntervals(variants, None, othelloVariantMinutes, othelloRounds)
     private val othelloVariants = List(
       Variant.wrap(strategygames.fairysf.variant.Flipello),
       Variant.wrap(strategygames.fairysf.variant.Flipello10),
@@ -421,22 +391,26 @@ object TournamentShield {
           s"Welcome to the ${VariantKeys.gameFamilyName(GameFamily.Flipello())} Medley Arena!"
         )
 
-    private def mancalaVariantOrder(variants: List[Variant]) = {
+    private def mancalaVariantOrder(variants: List[Variant]) =
       TournamentMedleyUtil.medleyVariantsAndIntervals(
-        Random.shuffle(variants),
-        5 * 60,
+        Random.shuffle(mancalaVariantPermuations).head.map(i => variants(i)),
+        None,
         mancalaVariantMinutes,
-        mancalaRounds,
-        false
+        mancalaRounds
       )
-    }
-
+    //all the order perms which allows for randomisation of Oware/Bestemshe order but keeps Togy at start and end
+    private val mancalaVariantPermuations = List(
+      List(0, 1, 2, 3),
+      List(0, 2, 1, 3)
+    )
     private val mancalaVariants = List(
+      Variant.wrap(strategygames.togyzkumalak.variant.Togyzkumalak),
       Variant.wrap(strategygames.samurai.variant.Oware),
+      Variant.wrap(strategygames.togyzkumalak.variant.Bestemshe),
       Variant.wrap(strategygames.togyzkumalak.variant.Togyzkumalak)
     )
 
-    private val mancalaVariantMinutes = 90
+    private val mancalaVariantMinutes = 100
     private val mancalaRounds         = mancalaVariants.size
 
     case object MancalaMedley
@@ -456,20 +430,17 @@ object TournamentShield {
           "",
           s"An Arena which is divided into ${mancalaRounds} equal length periods of ${mancalaVariants.init
             .map(VariantKeys.variantName)
-            .mkString(", ")} and ${VariantKeys.variantName(mancalaVariants.last)}.",
+            .mkString(", ")} and ${VariantKeys.variantName(mancalaVariants.last)} again.",
           s"Welcome to the ${VariantKeys.gameGroupName(GameGroup.Mancala())} Medley Arena!"
         )
 
-    private def togyzkumalakVariantOrder(variants: List[Variant]) = {
+    private def togyzkumalakVariantOrder(variants: List[Variant]) =
       TournamentMedleyUtil.medleyVariantsAndIntervals(
         variants,
-        5 * 60,
+        None,
         togyzkumalakVariantMinutes,
-        togyzkumalakRounds,
-        false
+        togyzkumalakRounds
       )
-    }
-
     private val togyzkumalakVariants = List(
       Variant.wrap(strategygames.togyzkumalak.variant.Togyzkumalak),
       Variant.wrap(strategygames.togyzkumalak.variant.Bestemshe),
@@ -501,16 +472,13 @@ object TournamentShield {
           6
         )
 
-    private def backgammonVariantOrder(variants: List[Variant]) = {
+    private def backgammonVariantOrder(variants: List[Variant]) =
       TournamentMedleyUtil.medleyVariantsAndIntervals(
         variants,
-        3 * 60,
+        None,
         backgammonVariantMinutes,
-        backgammonRounds,
-        false
+        backgammonRounds
       )
-    }
-
     private val backgammonVariants = List(
       Variant.wrap(strategygames.backgammon.variant.Backgammon),
       Variant.wrap(strategygames.backgammon.variant.Nackgammon),
@@ -541,16 +509,13 @@ object TournamentShield {
           s"Welcome to the ${VariantKeys.gameFamilyName(GameFamily.Backgammon())} Medley Arena!"
         )
 
-    private def breakthroughVariantOrder(variants: List[Variant]) = {
+    private def breakthroughVariantOrder(variants: List[Variant]) =
       TournamentMedleyUtil.medleyVariantsAndIntervals(
         variants,
-        5 * 60,
+        None,
         breakthroughVariantMinutes,
-        breakthroughRounds,
-        false
+        breakthroughRounds
       )
-    }
-
     private val breakthroughVariants = List(
       Variant.wrap(strategygames.fairysf.variant.BreakthroughTroyka),
       Variant.wrap(strategygames.fairysf.variant.MiniBreakthroughTroyka),
@@ -594,15 +559,13 @@ object TournamentShield {
       List(1, 0, 3, 2)
     )
 
-    private def chessgammonMedleyGeneration(variants: List[Variant]) = {
+    private def chessgammonMedleyGeneration(variants: List[Variant]) =
       TournamentMedleyUtil.medleyVariantsAndIntervals(
         Random.shuffle(chessgammonVariantPermuations).head.map(i => variants(i)),
-        3 * 60,
+        None,
         chessgammonMinutes,
-        chessgammonRounds,
-        false
+        chessgammonRounds
       )
-    }
     private val chessgammonVariants = List(
       Variant.wrap(strategygames.chess.variant.Standard),
       Variant.wrap(strategygames.backgammon.variant.Backgammon),

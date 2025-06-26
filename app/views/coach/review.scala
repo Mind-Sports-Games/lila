@@ -8,7 +8,7 @@ import lila.app.ui.ScalatagsTemplate._
 import lila.common.String.html.richText
 
 object review {
-/*
+  /*
   import trans.coach._
 
   def list(reviews: lila.coach.CoachReview.Reviews)(implicit ctx: Context) =
@@ -71,5 +71,5 @@ object review {
           star(selected.exists(s.<=) option (cls := "rate-selected"))
         }
       )
-    */
+   */
 }

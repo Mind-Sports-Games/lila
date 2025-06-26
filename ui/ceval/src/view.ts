@@ -3,13 +3,11 @@ import { defined } from 'common';
 import { Eval, CevalCtrl, ParentCtrl, NodeEvals } from './types';
 import { h, VNode } from 'snabbdom';
 import { Position } from 'stratops/chess';
-import { playstrategyRules } from 'stratops/compat';
 import { makeSanAndPlay } from 'stratops/san';
-import { dimensionsForRules, opposite, parseUci } from 'stratops/util';
+import { opposite, parseUci } from 'stratops/util';
 import { parseFen, makeBoardFen } from 'stratops/fen';
-import { renderEval } from './util';
-import { setupPosition } from 'stratops/variant';
-import { variantToRules } from 'stratutils';
+import { blackStartsVariant, noVariantOutcome, renderEval } from './util';
+import { variantClassFromKey, variantKeyToRules } from 'stratops/variants/util';
 
 let gaugeLast = 0;
 const gaugeTicks: VNode[] = [...Array(8).keys()].map(i =>
@@ -24,7 +22,9 @@ function localEvalInfo(ctrl: ParentCtrl, evs: NodeEvals): Array<VNode | string> 
     return [
       evs.server && ctrl.nextNodeBest()
         ? trans.noarg('usingServerAnalysis')
-        : trans.noarg('loadingEngine') + (mb >= 1 ? ` (${mb.toFixed(1)} MiB)` : ''),
+        : noVariantOutcome(ceval.variant.key) && ctrl.getNode().children.length === 0 && ctrl.getNode().ply > 0
+          ? trans.noarg('gameFinished')
+          : trans.noarg('loadingEngine') + (mb >= 1 ? ` (${mb.toFixed(1)} MiB)` : ''),
     ];
   }
 
@@ -136,6 +136,7 @@ export function renderGauge(ctrl: ParentCtrl): VNode | undefined {
       class: {
         empty: ev === null,
         reverse: ctrl.getOrientation() === 'p2',
+        'swap-colors': blackStartsVariant(ctrl.getCeval().variant.key),
       },
     },
     [h('div.p2', { attrs: { style: `height: ${100 - (ev + 1) * 50}%` } }), ...gaugeTicks],
@@ -164,7 +165,7 @@ export function renderCeval(ctrl: ParentCtrl): VNode | undefined {
     pearl = '-';
     percent = 0;
   } else {
-    pearl = enabled ? h('i.ddloader') : h('i');
+    pearl = enabled && !noVariantOutcome(instance.variant.key) && ctrl.getNode().ply === 0 ? h('i.ddloader') : h('i');
     percent = 0;
   }
   if (threatMode) {
@@ -200,7 +201,12 @@ export function renderCeval(ctrl: ParentCtrl): VNode | undefined {
         h('div.engine', [
           ...(threatMode ? [trans.noarg('showThreat')] : engineName(instance)),
           h(
-            'span.info',
+            'span.info' +
+              (!noVariantOutcome(instance.variant.key)
+                ? ''
+                : ctrl.getNode().ply == 0 || percent > 0
+                  ? '.display'
+                  : '.hide'),
             ctrl.outcome()
               ? [trans.noarg('gameOver')]
               : threatMode
@@ -287,7 +293,7 @@ export const renderPvs =
     if (!instance.allowed() || !instance.possible || !instance.enabled()) return;
     const multiPv = parseInt(instance.multiPv()),
       node = ctrl.getNode(),
-      setup = parseFen(variantToRules(variantKey))(node.fen).unwrap();
+      setup = parseFen(variantKeyToRules(variantKey))(node.fen).unwrap();
     let pvs: Tree.PvData[],
       threat = false,
       pvMoves: (string | null)[],
@@ -301,7 +307,7 @@ export const renderPvs =
       setup.turn = opposite(setup.turn);
       if (setup.turn == 'p1') setup.fullmoves += 1;
     }
-    const pos = setupPosition(playstrategyRules(instance.variant.key), setup);
+    const pos = variantClassFromKey(instance.variant.key).fromSetup(setup);
 
     return h(
       'div.pv_box',
@@ -399,7 +405,10 @@ function renderPvWrapToggle(): VNode {
 
 function renderPvMoves(pos: Position, pv: Uci[], variantKey: VariantKey): VNode[] {
   const vnodes: VNode[] = [];
-  let key = makeBoardFen(playstrategyRules(variantKey))(pos.board);
+  const rules = variantKeyToRules(variantKey);
+  const prevBoard = pos.board.clone();
+  const prevFen = makeBoardFen(rules)(prevBoard);
+  let key = prevFen;
   for (let i = 0; i < pv.length; i++) {
     let text;
     if (pos.turn === 'p1') {
@@ -411,8 +420,8 @@ function renderPvMoves(pos: Position, pv: Uci[], variantKey: VariantKey): VNode[
       vnodes.push(h('span', { key: text }, text));
     }
     const uci = pv[i];
-    const san = makeSanAndPlay(playstrategyRules(variantKey))(pos, parseUci(playstrategyRules(variantKey))(uci)!);
-    const fen = makeBoardFen(playstrategyRules(variantKey))(pos.board);
+    const san = makeSanAndPlay(rules)(pos, parseUci(rules)(uci)!);
+    const fen = makeBoardFen(rules)(pos.board);
     if (san === '--') {
       break;
     }
@@ -427,7 +436,12 @@ function renderPvMoves(pos: Position, pv: Uci[], variantKey: VariantKey): VNode[
             'data-board': `${fen}|${uci}`,
           },
         },
-        san,
+        variantClassFromKey(variantKey).computeMoveNotation({
+          san,
+          uci,
+          fen,
+          prevFen,
+        }),
       ),
     );
   }
@@ -443,7 +457,7 @@ function renderPvBoard(ctrl: ParentCtrl, variantKey: VariantKey): VNode | undefi
   const { fen, uci } = pvBoard;
   const lastMove = uci[1] === '@' ? [uci.slice(2)] : [uci.slice(0, 2), uci.slice(2, 4)];
   const orientation = ctrl.getOrientation();
-  const dimensions = dimensionsForRules(variantToRules(variantKey));
+  const dimensions = variantClassFromKey(variantKey).getBoardDimensions();
   const cgConfig = {
     ...{ dimensions: { width: dimensions.ranks, height: dimensions.files } },
     fen,

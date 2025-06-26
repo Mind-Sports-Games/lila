@@ -123,7 +123,7 @@ const renderHistory = (ctrl: StormCtrl): VNode => {
                   const pos = Chess.fromSetup(parseFen('chess')(round.puzzle.fen).unwrap()).unwrap();
                   const uci = round.puzzle.line.split(' ')[0];
                   pos.play(parseUciChess(uci)!);
-                  miniBoard.initWith(e, makeFen('chess')(pos.toSetup()), pos.turn, uci);
+                  miniBoard.initWith(e, makeFen('chess')(pos.toSetup()), pos.turn);
                 }),
               }),
               h('span.storm--end__history__round__meta', [

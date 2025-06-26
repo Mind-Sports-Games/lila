@@ -177,6 +177,7 @@ export interface Pref {
   coords: Prefs.Coords;
   coordSystem: 0 | 1 | 2;
   destination: boolean;
+  playerTurnIndicator: boolean;
   enablePremove: boolean;
   highlight: boolean;
   is3d: boolean;

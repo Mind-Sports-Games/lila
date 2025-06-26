@@ -1,104 +1,124 @@
-.board-editor .spare {
-  @extend %box-radius;
+.board-editor {
+  &.variant-xiangqi {
+    .spare {
+      .no-square {
+        flex: 0 0 11.12%;
+      }
 
-  display: flex;
-  background: $c-font-dimmer;
-  box-shadow: 0 3px 5px rgba(0, 0, 0, 0.3) inset;
+      &-bottom {
+        margin-top: 9vh;
+      }
 
-  &-top {
-    grid-area: spare-top;
-    margin-bottom: 2vh;
-  }
-
-  &-bottom {
-    grid-area: spare-bottom;
-    margin-top: 2vh;
-  }
-
-  @include breakpoint($mq-landscape-mobile) {
-    .coords-out &-bottom {
-      margin-top: 4vh;
+      @include breakpoint($mq-landscape-mobile) {
+        .coords-out &-bottom {
+          margin-top: 7vh;
+        }
+      }
     }
   }
 
-  .no-square {
-    flex: 0 0 12.5%;
+  .spare {
+    @extend %box-radius;
 
-    @include transition;
+    display: flex;
+    background: $c-font-dimmer;
+    box-shadow: 0 3px 5px rgba(0, 0, 0, 0.3) inset;
 
-    &:hover {
-      background: fade-out($c-primary, 0.8);
+    &-top {
+      grid-area: spare-top;
+      margin-bottom: 2vh;
     }
 
-    &.selected-square {
-      background: fade-out($c-primary, 0.5);
+    &-bottom {
+      grid-area: spare-bottom;
+      margin-top: 2vh;
     }
 
-    div {
-      @extend %square;
+    @include breakpoint($mq-landscape-mobile) {
+      .coords-out &-bottom {
+        margin-top: 4vh;
+      }
     }
 
-    &.pointer {
-      @extend %box-radius-left;
+    .no-square {
+      flex: 0 0 12.5%;
+
+      @include transition;
 
       &:hover {
-        background: fade-out($c-good, 0.8);
+        background: fade-out($c-primary, 0.8);
       }
 
       &.selected-square {
-        background: fade-out($c-good, 0.4);
+        background: fade-out($c-primary, 0.5);
       }
 
-      piece {
-        background-image: img-url('icons/pointer.svg');
+      div {
+        @extend %square;
+      }
+
+      &.pointer {
+        @extend %box-radius-left;
+
+        &:hover {
+          background: fade-out($c-good, 0.8);
+        }
+
+        &.selected-square {
+          background: fade-out($c-good, 0.4);
+        }
+
+        piece {
+          background-image: img-url('icons/pointer.svg');
+        }
+      }
+
+      &.trash {
+        @extend %box-radius-right;
+
+        &:hover {
+          background: fade-out($c-bad, 0.8);
+        }
+
+        &.selected-square {
+          background: fade-out($c-bad, 0.4);
+        }
+
+        piece {
+          background-image: img-url('icons/trash.svg');
+        }
       }
     }
 
-    &.trash {
-      @extend %box-radius-right;
-
-      &:hover {
-        background: fade-out($c-bad, 0.8);
-      }
-
-      &.selected-square {
-        background: fade-out($c-bad, 0.4);
-      }
-
-      piece {
-        background-image: img-url('icons/trash.svg');
-      }
+    .is3d & .no-square div {
+      padding-bottom: 90.72%;
     }
-  }
 
-  .is3d & .no-square div {
-    padding-bottom: 90.72%;
-  }
-
-  piece {
-    display: block;
-    cursor: pointer;
-    width: 100%;
-    height: 100%;
-
-    .is3d & {
-      /* original size: width: 140.625%; height: 179.6875%; size on 3D board, with height/width = 90.78571% */
+    piece {
+      display: block;
+      cursor: pointer;
       width: 100%;
-      height: 140.7465%;
-      left: 0;
-      top: -34%;
+      height: 100%;
+
+      .is3d & {
+        /* original size: width: 140.625%; height: 179.6875%; size on 3D board, with height/width = 90.78571% */
+        width: 100%;
+        height: 140.7465%;
+        left: 0;
+        top: -34%;
+      }
     }
-  }
 
-  piece.pointer,
-  piece.trash {
-    margin: 14%;
-    width: 72%;
-    height: 72%;
+    piece.pointer,
+    piece.trash {
+      margin: 14%;
+      width: 72%;
+      height: 72%;
 
-    .is3d & {
-      width: 62%;
-      top: 0;
+      .is3d & {
+        width: 62%;
+        top: 0;
+      }
     }
   }
 }

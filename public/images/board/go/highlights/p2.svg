@@ -1,0 +1,4 @@
+<svg width="250" height="250" xmlns="http://www.w3.org/2000/svg">
+  <!-- Circle centered in a larger background -->
+  <circle cx="125" cy="125" r="80" fill="none" stroke="black" stroke-width="20"/>
+</svg>

@@ -200,7 +200,8 @@ POST  /patron/switch                   controllers.Plan.switch
 POST  /patron/cancel                   controllers.Plan.cancel
 POST  /patron/webhook                  controllers.Plan.webhook
 POST  /patron/stripe/checkout          controllers.Plan.stripeCheckout
-POST  /patron/ipn                      controllers.Plan.payPalIpn
+POST  /patron/paypal/checkout          controllers.Plan.payPalCheckout
+POST  /patron/paypal/capture/:id       controllers.Plan.payPalCapture(id: String)
 POST  /patron/stripe/update-payment    controllers.Plan.updatePayment
 GET   /patron/stripe/update-payment    controllers.Plan.updatePaymentCallback
 GET   /features                        controllers.Plan.features
@@ -577,7 +578,8 @@ GET   /import/master/$id<\w{8}>/:playerIndex controllers.Importer.masterGame(id:
 
 # Edit
 GET   /editor.json                     controllers.Editor.data
-GET   /editor/*urlFen                  controllers.Editor.load(urlFen: String)
+GET   /editor/:urlVariant/*urlFen      controllers.Editor.loadFenWithVariant(urlFen: String, urlVariant: String)
+GET   /editor/*urlFen                  controllers.Editor.load(urlFen: String, None: Option[String])
 GET   /editor                          controllers.Editor.index
 
 # Report

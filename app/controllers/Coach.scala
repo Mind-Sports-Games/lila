@@ -8,7 +8,7 @@ import lila.coach.{ Coach => CoachModel, CoachProfileForm, CoachPager }
 import views._
 
 final class Coach(env: Env) extends LilaController(env) {
-/*
+  /*
   private def api = env.coach.api
 
   def all(page: Int) = search("all", CoachPager.Order.Login.key, page)
@@ -143,5 +143,5 @@ final class Coach(env: Env) extends LilaController(env) {
         api.deletePicture(c) inject Redirect(routes.Coach.edit)
       }
     }
-  */
+   */
 }

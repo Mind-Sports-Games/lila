@@ -1,18 +1,12 @@
 import * as domData from './data';
-import { readDice, fenPlayerIndex, readDoublingCube } from 'stratutils';
+import { readDice, fenPlayerIndex, readDoublingCube, lastMove } from 'stratutils';
 
 export const init = (node: HTMLElement): void => {
-  const [fen, orientation, lm, multiPointState] = node.getAttribute('data-state')!.split('|');
-  initWith(node, fen, orientation as Orientation, lm, multiPointState);
+  const [fen, orientation, ,] = node.getAttribute('data-state')!.split('|');
+  initWith(node, fen, orientation as Orientation);
 };
 
-export const initWith = (
-  node: HTMLElement,
-  fen: string,
-  orientation: Orientation,
-  lm?: string,
-  multiPointState?: string,
-): void => {
+export const initWith = (node: HTMLElement, fen: string, orientation: Orientation): void => {
   if (!window.Chessground || !window.Draughtsground) setTimeout(() => init(node), 500);
   else {
     const $el = $(node);
@@ -36,7 +30,7 @@ export const initWith = (
         }),
       );
     } else {
-      const [, myPlayerIndex] = $el.data('state').split('|');
+      const [, myPlayerIndex, lm, multiPointState] = $el.data('state').split('|');
       domData.set(
         node,
         'chessground',
@@ -51,11 +45,14 @@ export const initWith = (
           dice: readDice(fen, variantFromElement($el) as VariantKey),
           doublingCube: readDoublingCube(fen, variantFromElement($el) as VariantKey),
           showUndoButton: false,
-          lastMove: lm && (lm == 'pass' ? undefined : lm[1] === '@' ? [lm.slice(2)] : [lm[0] + lm[1], lm[2] + lm[3]]),
+          lastMove: lastMove(
+            ['flipello', 'flipello10', 'go9x9', 'go13x13', 'go19x19'].includes(variantFromElement($el)),
+            lm,
+          ),
           highlight: {
             lastMove:
               lm != undefined &&
-              lm! == 'pass' &&
+              lm !== 'pass' &&
               variantFromElement($el) != 'backgammon' &&
               variantFromElement($el) != 'hyper' &&
               variantFromElement($el) != 'nackgammon',
@@ -112,6 +109,7 @@ export const initWith = (
 export const initAll = (parent?: HTMLElement) =>
   Array.from((parent || document).getElementsByClassName('mini-board--init')).forEach(init);
 
+// @TODO: rename into variantKeyFromElement
 export const variantFromElement = (element: Cash): string => {
   return element.hasClass('variant-shogi')
     ? 'shogi'

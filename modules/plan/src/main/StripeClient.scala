@@ -18,10 +18,11 @@ final private class StripeClient(
 
   import StripeClient._
   import JsonHandlers._
+  import JsonHandlers.stripe._
 
   private val STRIPE_VERSION = "2020-08-27" //do we need this?
 
-  def sessionArgs(customerId: CustomerId, urls: NextUrls): List[(String, Any)] =
+  def sessionArgs(customerId: StripeCustomerId, urls: NextUrls): List[(String, Any)] =
     List(
       "payment_method_types[]" -> "card",
       "success_url"            -> urls.success,
@@ -61,7 +62,7 @@ final private class StripeClient(
     postOne[StripeSession]("checkout/sessions", args: _*)
   }
 
-  def createCustomer(user: User, data: Checkout): Fu[StripeCustomer] =
+  def createCustomer(user: User, data: PlanCheckout): Fu[StripeCustomer] =
     postOne[StripeCustomer](
       "customers",
       "email"       -> data.email,
@@ -69,7 +70,7 @@ final private class StripeClient(
       "expand[]"    -> "subscriptions"
     )
 
-  def getCustomer(id: CustomerId): Fu[Option[StripeCustomer]] =
+  def getCustomer(id: StripeCustomerId): Fu[Option[StripeCustomer]] =
     getOne[StripeCustomer](s"customers/${id.value}", "expand[]" -> "subscriptions")
 
   def updateSubscription(sub: StripeSubscription, amount: Cents): Fu[StripeSubscription] = {
@@ -92,10 +93,10 @@ final private class StripeClient(
   def getEvent(id: String): Fu[Option[JsObject]] =
     getOne[JsObject](s"events/$id")
 
-  def getNextInvoice(customerId: CustomerId): Fu[Option[StripeInvoice]] =
+  def getNextInvoice(customerId: StripeCustomerId): Fu[Option[StripeInvoice]] =
     getOne[StripeInvoice]("invoices/upcoming", "customer" -> customerId.value)
 
-  def getPastInvoices(customerId: CustomerId): Fu[List[StripeInvoice]] =
+  def getPastInvoices(customerId: StripeCustomerId): Fu[List[StripeInvoice]] =
     getList[StripeInvoice]("invoices", "customer" -> customerId.value)
 
   def getPaymentMethod(sub: StripeSubscription): Fu[Option[StripePaymentMethod]] =
@@ -114,7 +115,7 @@ final private class StripeClient(
   def getSession(id: String): Fu[Option[StripeSessionWithIntent]] =
     getOne[StripeSessionWithIntent](s"checkout/sessions/$id", "expand[]" -> "setup_intent")
 
-  def setCustomerPaymentMethod(customerId: CustomerId, paymentMethod: String): Funit =
+  def setCustomerPaymentMethod(customerId: StripeCustomerId, paymentMethod: String): Funit =
     postOne[JsObject](
       s"customers/${customerId.value}",
       "invoice_settings[default_payment_method]" -> paymentMethod
@@ -126,11 +127,13 @@ final private class StripeClient(
   def setSubscriptionPaymentMethod(subscription: StripeSubscription, paymentMethod: String): Funit =
     postOne[JsObject](s"subscriptions/${subscription.id}", "default_payment_method" -> paymentMethod).void
 
+  private val logger = lila.plan.logger branch "stripe"
+
   private def getOne[A: Reads](url: String, queryString: (String, Any)*): Fu[Option[A]] =
     get[A](url, queryString) dmap some recover {
       case _: NotFoundException => None
       case e: DeletedException =>
-        play.api.Logger("stripe").warn(e.getMessage)
+        logger.warn(e.getMessage)
         None
     }
 
@@ -219,5 +222,5 @@ object StripeClient {
       products: StripeProducts
   )
   implicit private[plan] val productsLoader: ConfigLoader[StripeProducts] = AutoConfig.loader[StripeProducts]
-  implicit private[plan] val configLoader: ConfigLoader[Config]           = AutoConfig.loader[Config]
+  implicit private[plan] val stripeConfigLoader: ConfigLoader[Config]     = AutoConfig.loader[Config]
 }

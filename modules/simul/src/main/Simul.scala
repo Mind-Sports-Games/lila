@@ -175,7 +175,8 @@ object Simul {
       hostGameId = none,
       createdAt = DateTime.now,
       estimatedStartAt = estimatedStartAt,
-      variants = if (position.isDefined) List(Variant.wrap(strategygames.chess.variant.Standard)) else variants,
+      variants =
+        if (position.isDefined) List(Variant.wrap(strategygames.chess.variant.Standard)) else variants,
       position = position,
       applicants = Nil,
       pairings = Nil,

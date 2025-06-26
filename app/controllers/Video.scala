@@ -7,7 +7,7 @@ import lila.video.{ Filter, UserControl, View }
 import views._
 
 final class Video(env: Env) extends LilaController(env) {
-/*
+  /*
   private def api = env.video.api
 
   private def WithUserControl[A](f: UserControl => Fu[A])(implicit ctx: Context): Fu[A] = {
@@ -73,5 +73,5 @@ final class Video(env: Env) extends LilaController(env) {
         }
       }
     }
-  */
+   */
 }
