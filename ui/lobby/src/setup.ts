@@ -309,20 +309,22 @@ export default class Setup {
             $goConfig.val() !== undefined &&
             (($goHandicapInput.val() as string) != '0' ||
               (variantId[1] !== '1' && ($goKomiInput.val() as string) != '75') ||
-              (variantId[1] == '1' && ($goKomiInput.val() as string) != '55'));
+              (variantId[1] == '1' && ($goKomiInput.val() as string) != '55')),
+          cantBeBot = !isRealTime();
         if (cantBeRated && rated) {
           $casual.trigger('click');
           return toggleButtons();
         }
-        if (cantBeLobby && opponentType === 'lobby') {
+        if ((cantBeLobby && opponentType === 'lobby') || (cantBeBot && opponentType === 'bot')) {
           const $friend = $opponentInput.eq(1);
           $friend.trigger('click');
           return toggleButtons();
         }
         $rated.prop('disabled', !!cantBeRated).siblings('label').toggleClass('disabled', cantBeRated);
         $opponentInput.eq(0).prop('disabled', !!cantBeLobby).siblings('label').toggleClass('disabled', cantBeLobby);
+        $opponentInput.eq(2).prop('disabled', !!cantBeBot).siblings('label').toggleClass('disabled', cantBeBot);
         $botInput.each(function (i, input) {
-          const isDisabled = !botCanPlay(self.allBots[i], limit, inc, variantId);
+          const isDisabled = !botCanPlay(self.allBots[i], limit, inc, byo, variantId);
           const $input = $(input);
           $input.prop('disabled', isDisabled);
           $input.siblings('label').toggleClass('disabled', isDisabled);
@@ -332,13 +334,29 @@ export default class Setup {
         const timeOk = timeMode !== '1' || limit > 0 || inc > 0,
           ratedOk = opponentType !== 'lobby' || !rated || timeMode !== '0',
           fenOk = variantId[0] !== '0' || variantId[1] !== '3' || $fenInput.hasClass('success'),
-          botOK = opponentType !== 'bot' || botCanPlay(botUser, limit, inc, variantId);
+          botOK = opponentType !== 'bot' || botCanPlay(botUser, limit, inc, byo, variantId);
         if (byoOk && delayOk && timeOk && ratedOk && fenOk && botOK) {
           $submits.toggleClass('nope', false);
         } else {
           $submits.toggleClass('nope', true);
-          if (!botOK && !vsPSBot && !vsStockfishBot && $botInput.filter(':checked').val() !== 'ps-greedy-two-move') {
-            $botInput.val('ps-greedy-two-move').trigger('change'); //default to a bot that can play all variants
+          if (!botOK && !vsPSBot && !vsStockfishBot) {
+            const defaultBot = 'ps-greedy-two-move';
+            const backupBot = 'ps-random-mover';
+            if (
+              $botInput.filter(':checked').val() !== defaultBot &&
+              botCanPlay(defaultBot, limit, inc, byo, variantId)
+            ) {
+              $botInput.val(defaultBot).trigger('change');
+            } else if (
+              $botInput.filter(':checked').val() !== backupBot &&
+              botCanPlay(backupBot, limit, inc, byo, variantId)
+            ) {
+              $botInput.val(backupBot).trigger('change');
+            }
+            if (opponentType === 'bot') {
+              const $bot = $opponentInput.eq(2);
+              $bot.trigger('click');
+            }
           }
         }
       },
@@ -346,7 +364,7 @@ export default class Setup {
         self.save($form[0] as HTMLFormElement);
       };
 
-    const botCanPlay = (user: string, limit: number, inc: number, variantId: string[]) => {
+    const botCanPlay = (user: string, limit: number, inc: number, byo: number, variantId: string[]) => {
       let variantCompatible = true;
       if (/^stockfish-level[1-8]$/.test(user)) {
         variantCompatible =
@@ -370,7 +388,7 @@ export default class Setup {
         } else {
           switch (user) {
             case 'ps-random-mover': {
-              clockCompatible = limit >= 0.5;
+              clockCompatible = limit >= 0.5 || byo > 2;
               break;
             }
             case 'ps-greedy-one-move': {
@@ -383,7 +401,7 @@ export default class Setup {
           }
         }
       } else {
-        clockCompatible = true;
+        clockCompatible = false;
       }
       return variantCompatible && clockCompatible;
     };
@@ -407,16 +425,25 @@ export default class Setup {
       $timeModeSelect.val('1');
       $timeInput.val('3');
       $incrementInput.val('2');
+      $timeModeDefaults.find('input').val('blitz');
       $casual.trigger('click');
       if (user !== '') $botInput.val(user);
 
-      const limit = +($timeInput.val() as string),
-        inc = +($incrementInput.val() as string);
+      //disable non realtime modes
+      $('#sf_timeModeDefaults_correspondence, #sf_timeModeDefaults_custom')
+        .prop('disabled', true)
+        .siblings('label')
+        .toggleClass('disabled', true);
+
+      const limit = parseFloat($timeInput.val() as string),
+        inc = parseFloat($incrementInput.val() as string),
+        byo = parseFloat($byoyomiInput.val() as string);
+
       // Disable variant options the bot cannot play
       $variantInput.each(function (_, el) {
         const $el = $(el);
         const variantId = ($el.val() as string).split('_');
-        const canPlay = botCanPlay(user, limit, inc, variantId);
+        const canPlay = botCanPlay(user, limit, inc, byo, variantId);
         $el.prop('disabled', !canPlay).siblings('label').toggleClass('disabled', !canPlay);
       });
 
@@ -434,7 +461,7 @@ export default class Setup {
         let canPlay = true;
         if (variantForGroup.length) {
           const variantId = (variantForGroup.val() as string).split('_');
-          canPlay = botCanPlay(user, limit, inc, variantId);
+          canPlay = botCanPlay(user, limit, inc, byo, variantId);
         }
         $el.prop('disabled', !canPlay).siblings('label').toggleClass('disabled', !canPlay);
       });
@@ -714,15 +741,12 @@ export default class Setup {
         const clockType = $this.attr('for').split('_')[2];
         if (clockType !== 'custom') {
           $this.text(self.clockDisplayText(clockConfig[clockType]));
-          $this.attr('title', self.clockDisplayText(clockConfig[clockType]));
         }
         const $selectedChoice = $timeModeDefaults.find(`div.choice.${$this.attr('for').replace('sf_', '')}`);
         if (clockType !== 'custom') {
           $selectedChoice.text(self.clockDisplayText(clockConfig[clockType]));
-          $selectedChoice.attr('title', self.clockDisplayText(clockConfig[clockType]));
         } else {
           $selectedChoice.text(self.clockDisplayText(customClockConfig()));
-          $selectedChoice.attr('title', self.clockDisplayText(customClockConfig()));
         }
       });
     };

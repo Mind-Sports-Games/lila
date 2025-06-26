@@ -136,17 +136,16 @@ private object bits {
       compare: (String, String) => Boolean = (a, b) => a == b,
       optValuePrefix: String = ""
   ) =
-    options.map { case (value, name, title) =>
+    options.map { case (value, name, _) =>
       option(
         st.value := optValuePrefix + value,
-        st.title := title,
         field.value.exists(v => compare(v, value)) option selected
       )(name)
     }
 
   def renderSelectedChoice(field: Field, options: Seq[SelectChoice], userPart: Option[Tag] = None) =
     options.map { case (key, icon, hint) =>
-      div(cls := s"${field.name}_$key choice", dataIcon := icon, title := hint)(
+      div(cls := s"${field.name}_$key choice", dataIcon := icon)(
         userPart == None option hint,
         (key == "bot" || key == "friend") option userPart
       )
@@ -166,7 +165,6 @@ private object bits {
           label(
             cls := "required",
             dataIcon := icon,
-            title := hint,
             `for` := s"$prefix${field.id}_$key"
           )(hint)
         )
@@ -175,7 +173,7 @@ private object bits {
 
   def renderRadios(field: Field, options: Seq[SelectChoice]) =
     st.group(cls := "radio")(
-      options.map { case (key, name, hint) =>
+      options.map { case (key, name, _) =>
         div(
           input(
             tpe := "radio",
@@ -186,7 +184,6 @@ private object bits {
           ),
           label(
             cls := "required",
-            title := hint,
             `for` := s"$prefix${field.id}_$key"
           )(name)
         )
@@ -285,7 +282,7 @@ private object bits {
 
   def renderPlayerIndexOptions(field: Field)(implicit ctx: Context) =
     div(cls := "playerIndex collapsible")(
-      div(cls := "section_title")("PlayerIndex"),
+      div(cls := "section_title")("Side"),
       div(cls := "playerIndex_choices buttons")(
         st.group(cls := "radio")(
           translatedSideChoices.map { case (key, name, _) =>
@@ -299,7 +296,6 @@ private object bits {
               ),
               label(
                 cls := s"playerIndex__button button button-metal $key",
-                title := key,
                 `for` := s"$prefix${field.id}_$key"
               )(i, div(name))
             )
@@ -307,8 +303,7 @@ private object bits {
         ),
         translatedSideChoices.map { case (key, name, _) =>
           div(
-            cls := s"${field.name}_$key choice playerIndex__button $key",
-            title := key
+            cls := s"${field.name}_$key choice playerIndex__button $key"
           )(i, div(name))
         }
       )
