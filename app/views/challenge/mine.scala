@@ -107,7 +107,9 @@ object mine {
                 footer(userIdLink(c.destUserId))
               ),
               bits.details(c, playerIndex),
-              a(cls := "button button-fat", href := routes.Lobby.home)(trans.newOpponent())
+              a(cls := "button button-fat button-color-choice", href := routes.Setup.gameForm())(
+                trans.newOpponent()
+              )
             )
           case Status.Accepted =>
             div(cls := "follow-up")(
@@ -121,7 +123,9 @@ object mine {
             div(cls := "follow-up")(
               h1(trans.challenge.challengeCanceled()),
               bits.details(c, playerIndex),
-              a(cls := "button button-fat", href := routes.Lobby.home)(trans.newOpponent())
+              a(cls := "button button-fat button-color-choice", href := routes.Setup.gameForm())(
+                trans.newOpponent()
+              )
             )
         }
       )

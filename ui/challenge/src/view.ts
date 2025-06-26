@@ -186,7 +186,7 @@ function renderUser(u?: ChallengeUser): VNode {
 function create(): VNode {
   return h('a.create', {
     attrs: {
-      href: '/?any#friend',
+      href: '/?any#game',
       'data-icon': 'O',
       title: 'Challenge someone',
     },

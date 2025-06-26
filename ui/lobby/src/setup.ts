@@ -3,12 +3,11 @@ import modal from 'common/modal';
 import debounce from 'common/debounce';
 import * as xhr from 'common/xhr';
 import LobbyController from './ctrl';
+import { ClockConfig } from './interfaces';
 
 export default class Setup {
   stores: {
-    hook: FormStore;
-    friend: FormStore;
-    ai: FormStore;
+    game: FormStore;
   };
 
   constructor(
@@ -16,9 +15,7 @@ export default class Setup {
     readonly root: LobbyController,
   ) {
     this.stores = {
-      hook: makeStore(makeStorage('lobby.setup.hook')),
-      friend: makeStore(makeStorage('lobby.setup.friend')),
-      ai: makeStore(makeStorage('lobby.setup.ai')),
+      game: makeStore(makeStorage('lobby.setup.game')),
     };
   }
 
@@ -96,7 +93,14 @@ export default class Setup {
 
   private sliderHandicap = (v: number) => (v < 26 ? v : 0);
 
-  private sliderKomis = (bs: number) => [...Array(bs * bs * 4 + 1).keys()].map(i => -(bs * bs * 10) + i * 5);
+  private sliderKomisCache: { [bs: number]: number[] } = {};
+
+  private sliderKomis = (bs: number) => {
+    if (!this.sliderKomisCache[bs]) {
+      this.sliderKomisCache[bs] = [...Array(bs * bs * 4 + 1).keys()].map(i => -(bs * bs * 10) + i * 5);
+    }
+    return this.sliderKomisCache[bs];
+  };
 
   private sliderKomi = (bs: number) => (v: number) => (v < this.sliderKomis(bs).length ? this.sliderKomis(bs)[v] : 75);
 
@@ -129,6 +133,77 @@ export default class Setup {
     return undefined;
   };
 
+  private clockDefaults = (variant: string, isAnon: boolean) => {
+    const defaultClockConfig = {
+      bullet: { timemode: '1', initial: '1', increment: '0' },
+      blitz: { timemode: '1', initial: '3', increment: '2' },
+      rapid: { timemode: '1', initial: '5', increment: '5' },
+      classical: { timemode: '1', initial: '20', increment: '10' },
+      correspondence: isAnon ? { timemode: '1', initial: '30', increment: '30' } : { timemode: '2', days: '2' },
+      custom: { timemode: '6' },
+    };
+    switch (variant) {
+      case '3_5': //mini-shogi
+      case '3_1': //shogi
+        return Object.assign({}, defaultClockConfig, {
+          bullet: { timemode: '3', byoyomi: '10', periods: '1', increment: '0', initial: '1' },
+          blitz: { timemode: '3', byoyomi: '10', periods: '1', increment: '0', initial: '3' },
+          rapid: { timemode: '3', byoyomi: '10', periods: '1', increment: '0', initial: '5' },
+          classical: { timemode: '3', byoyomi: '20', periods: '2', increment: '0', initial: '20' },
+        });
+      case '9_1': //go9x9
+      case '9_2': //go13x13
+      case '9_4': //go19x19
+        return Object.assign({}, defaultClockConfig, {
+          bullet: { timemode: '3', byoyomi: '5', periods: '1', increment: '0', initial: '5' },
+          blitz: { timemode: '3', byoyomi: '10', periods: '1', increment: '0', initial: '10' },
+          rapid: { timemode: '3', byoyomi: '15', periods: '1', increment: '0', initial: '15' },
+          classical: { timemode: '3', byoyomi: '30', periods: '1', increment: '0', initial: '60' },
+        });
+      case '10_1': //backgammon
+      case '10_2': //nackgammon
+      case '10_4': //hyper
+        return Object.assign({}, defaultClockConfig, {
+          bullet: { timemode: '5', increment: '0', initial: '3' },
+          blitz: { timemode: '5', increment: '6', initial: '3' },
+          rapid: { timemode: '5', increment: '12', initial: '3' },
+          classical: { timemode: '5', increment: '12', initial: '5' },
+        });
+      default:
+        return defaultClockConfig;
+    }
+  };
+
+  private clockDisplayText = (clockConfig: ClockConfig) => {
+    const capitalize = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
+    const showTime = (v: string) => {
+      if (v == '0.25') return '¼';
+      if (v == '0.5') return '½';
+      if (v == '0.75') return '¾';
+      return '' + v;
+    };
+    switch (clockConfig.timemode) {
+      case '2': //correspondence
+        return clockConfig.days + ' day' + (clockConfig.days !== '1' ? 's' : '');
+      case '3': //byoyomi
+        return (
+          showTime(clockConfig.initial) +
+          (clockConfig.increment !== '0' ? ' + ' + clockConfig.increment : '') +
+          `|${clockConfig.byoyomi}${clockConfig.periods !== '1' ? `(${clockConfig.periods}x)` : ''}`
+        );
+      case '4': //bronstein
+        return showTime(clockConfig.initial) + ' d+' + clockConfig.increment;
+      case '5': //simple delay
+        return showTime(clockConfig.initial) + ' d/' + clockConfig.increment;
+      case '0': //unlimited
+        return capitalize(this.root.trans('unlimited'));
+      case '6': //custom
+        return capitalize(this.root.trans('custom'));
+      default:
+        return showTime(clockConfig.initial) + ' + ' + clockConfig.increment;
+    }
+  };
+
   private hookToPoolMember = (playerIndex: string, form: HTMLFormElement) => {
     const data = Array.from(new FormData(form).entries());
     const hash: any = {};
@@ -143,18 +218,33 @@ export default class Setup {
       : undefined;
   };
 
-  private psBots = ['ps-greedy-two-move', 'ps-greedy-one-move', 'ps-greedy-four-move', 'ps-random-mover'];
+  private psBots = ['ps-random-mover', 'ps-greedy-one-move', 'ps-greedy-two-move', 'ps-greedy-four-move'];
+  private stockfishBots = [
+    'stockfish-level1',
+    'stockfish-level2',
+    'stockfish-level3',
+    'stockfish-level4',
+    'stockfish-level5',
+    'stockfish-level6',
+    'stockfish-level7',
+    'stockfish-level8',
+  ];
+  private allBots = this.psBots.concat(this.stockfishBots);
   private ratedTimeModes = ['1', '3', '4', '5'];
 
   prepareForm = ($modal: Cash) => {
     const self = this,
       $form = $modal.find('form'),
       $timeModeSelect = $form.find('#sf_timeMode'),
+      $timeModeDefaults = $form.find('.time_mode_defaults'),
       $modeChoicesWrap = $form.find('.mode_choice'),
       $modeChoices = $modeChoicesWrap.find('input'),
       $casual = $modeChoices.eq(0),
       $rated = $modeChoices.eq(1),
-      $variantSelect = $form.find('#sf_variant'),
+      $gameGroups = $form.find('.gameGroup_choice'),
+      $gameGroupInput = $gameGroups.find('.gameGroup_choice [name=gameGroup]'),
+      $variants = $form.find('.variant_choice'),
+      $variantInput = $variants.find('.variant_choice [name=variant]'),
       $fenPosition = $form.find('.fen_position'),
       $fenInput = $fenPosition.find('input'),
       forceFromPosition = !!$fenInput.val(),
@@ -162,8 +252,7 @@ export default class Setup {
       $timeInput = $form.find('.time_choice [name=time]'),
       $incrementInput = $form.find('.increment_choice [name=increment]'),
       $byoyomiInput = $form.find('.byoyomi_choice [name=byoyomi]'),
-      $periods = $form.find('.periods'),
-      $periodsInput = $periods.find('.byoyomi_periods [name=periods]'),
+      $periodsInput = $form.find('.byoyomi_periods [name=periods]'),
       $goConfig = $form.find('.go_config'),
       $goHandicapInput = $form.find('.go_handicap_choice [name=goHandicap]'),
       $goKomiInput = $form.find('.go_komi_choice [name=goKomi]'),
@@ -175,26 +264,38 @@ export default class Setup {
       userDetails = $form.attr('action')?.split('user='),
       user = userDetails && userDetails[1] ? userDetails[1].toLowerCase() : '',
       vsPSBot = this.psBots.includes(user),
+      vsStockfishBot = this.stockfishBots.includes(user),
+      $botChoices = $form.find('.bot_choice'),
+      $botInput = $form.find('.bot_choice [name=bot]'),
+      $opponentInput = $form.find('.opponent_choices [name=opponent]'),
       typ = $form.data('type'),
       $ratings = $modal.find('.ratings > div'),
+      $collapsibleSections = $modal.find('.collapsible'),
       randomPlayerIndexVariants = $form.data('random-playerindex-variants').split(','),
-      $submits = $form.find('.playerIndex-submits__button'),
+      $playerIndex = $form.find('.playerIndex_choices'),
+      $playerIndexInput = $form.find('.playerIndex_choices [name=playerIndex]'),
+      $submits = $form.find('.submit_button'),
       toggleButtons = () => {
         randomPlayerIndexVariants;
-        const variantId = ($variantSelect.val() as string).split('_'),
+        const variantFull = $variantInput.filter(':checked').val() as string,
+          variantId = variantFull.split('_'),
           timeMode = <string>$timeModeSelect.val(),
           rated = $rated.prop('checked'),
           limit = parseFloat($timeInput.val() as string),
           inc = parseFloat($incrementInput.val() as string),
           byo = parseFloat($byoyomiInput.val() as string),
           per = parseFloat($periodsInput.filter(':checked').val() as string),
+          opponentType = $opponentInput.filter(':checked').val() as string,
+          botUser = user === '' ? ($botInput.filter(':checked').val() as string) : user,
+          playerIndex = $playerIndexInput.filter(':checked').val() as string,
           // no rated variants with less than 30s on the clock and no rated unlimited in the lobby
           cantBeRated =
-            (typ === 'hook' && timeMode === '0') ||
+            (opponentType === 'lobby' && timeMode === '0') ||
             this.ratedTimeModes.indexOf(timeMode) === -1 ||
             (limit < 0.5 && inc == 0) ||
             (limit == 0 && inc < 2) ||
-            (vsPSBot && user == 'ps-random-mover') ||
+            (playerIndex !== 'random' && randomPlayerIndexVariants.includes(variantFull)) ||
+            (vsPSBot && botUser === 'ps-random-mover') ||
             (variantId[0] == '9' &&
               $goConfig.val() !== undefined &&
               (($goHandicapInput.val() as string) != '0' ||
@@ -203,58 +304,105 @@ export default class Setup {
             //remove this if we ever want Backgammon cube games to be rated
             (variantId[0] == '10' &&
               $backgammonConfig.val() !== undefined &&
-              ($backgammonPointsInput.val() as string) != '1');
+              ($backgammonPointsInput.val() as string) != '1'),
+          cantBeLobby =
+            variantId[0] == '9' &&
+            $goConfig.val() !== undefined &&
+            (($goHandicapInput.val() as string) != '0' ||
+              (variantId[1] !== '1' && ($goKomiInput.val() as string) != '75') ||
+              (variantId[1] == '1' && ($goKomiInput.val() as string) != '55')),
+          cantBeBot = !isRealTime();
         if (cantBeRated && rated) {
           $casual.trigger('click');
           return toggleButtons();
         }
+        if ((cantBeLobby && opponentType === 'lobby') || (cantBeBot && opponentType === 'bot')) {
+          const $friend = $opponentInput.eq(1);
+          $friend.trigger('click');
+          return toggleButtons();
+        }
         $rated.prop('disabled', !!cantBeRated).siblings('label').toggleClass('disabled', cantBeRated);
+        $opponentInput.eq(0).prop('disabled', !!cantBeLobby).siblings('label').toggleClass('disabled', cantBeLobby);
+        $opponentInput.eq(2).prop('disabled', !!cantBeBot).siblings('label').toggleClass('disabled', cantBeBot);
+        $botInput.each(function (i, input) {
+          const isDisabled = !botCanPlay(self.allBots[i], limit, inc, byo, variantId);
+          const $input = $(input);
+          $input.prop('disabled', isDisabled);
+          $input.siblings('label').toggleClass('disabled', isDisabled);
+        });
         const byoOk = timeMode !== '3' || ((limit > 0 || inc > 0 || byo > 0) && (byo || per === 1));
         const delayOk = (timeMode !== '4' && timeMode !== '5') || inc > 0;
         const timeOk = timeMode !== '1' || limit > 0 || inc > 0,
-          ratedOk = typ !== 'hook' || !rated || timeMode !== '0',
-          aiOk = typ !== 'ai' || variantId[1] !== '3' || limit >= 1,
+          ratedOk = opponentType !== 'lobby' || !rated || timeMode !== '0',
           fenOk = variantId[0] !== '0' || variantId[1] !== '3' || $fenInput.hasClass('success'),
-          botOK = !vsPSBot || psBotCanPlay(user, limit, inc, variantId);
-        if (byoOk && delayOk && timeOk && ratedOk && aiOk && fenOk && botOK) {
+          botOK = opponentType !== 'bot' || botCanPlay(botUser, limit, inc, byo, variantId);
+        if (byoOk && delayOk && timeOk && ratedOk && fenOk && botOK) {
           $submits.toggleClass('nope', false);
-          $submits.filter(':not(.random)').toggle(!rated || !randomPlayerIndexVariants.includes(variantId[1]));
-        } else $submits.toggleClass('nope', true);
+        } else {
+          $submits.toggleClass('nope', true);
+          if (!botOK && !vsPSBot && !vsStockfishBot) {
+            const defaultBot = 'ps-greedy-two-move';
+            const backupBot = 'ps-random-mover';
+            if (
+              $botInput.filter(':checked').val() !== defaultBot &&
+              botCanPlay(defaultBot, limit, inc, byo, variantId)
+            ) {
+              $botInput.val(defaultBot).trigger('change');
+            } else if (
+              $botInput.filter(':checked').val() !== backupBot &&
+              botCanPlay(backupBot, limit, inc, byo, variantId)
+            ) {
+              $botInput.val(backupBot).trigger('change');
+            }
+            if (opponentType === 'bot') {
+              const $bot = $opponentInput.eq(2);
+              $bot.trigger('click');
+            }
+          }
+        }
       },
       save = function () {
         self.save($form[0] as HTMLFormElement);
       };
 
-    const psBotCanPlay = (user: string, limit: number, inc: number, variantId: string[]) => {
-      //TODO remove hard coded options and improve bot api flow
+    const botCanPlay = (user: string, limit: number, inc: number, byo: number, variantId: string[]) => {
       let variantCompatible = true;
-      switch (user) {
-        case 'ps-greedy-four-move': {
-          //in (draughts, oware, togy)
-          variantCompatible = ['1', '6', '7'].includes(variantId[0]);
-          break;
+      if (/^stockfish-level[1-8]$/.test(user)) {
+        variantCompatible =
+          (variantId[0] === '0' && variantId[1] !== '15') || ['3', '4', '5', '11'].includes(variantId[0]);
+      } else {
+        switch (user) {
+          case 'ps-greedy-four-move': {
+            //in (draughts, oware, togy)
+            variantCompatible = ['1', '6', '7'].includes(variantId[0]);
+            break;
+          }
+          default:
+            variantCompatible = true;
         }
-        default:
-          variantCompatible = true;
       }
 
       let clockCompatible = true;
       if (isRealTime()) {
-        switch (user) {
-          case 'ps-random-mover': {
-            clockCompatible = limit >= 0.5;
-            break;
-          }
-          case 'ps-greedy-one-move': {
-            clockCompatible = limit >= 1 && inc >= 1;
-            break;
-          }
-          default: {
-            clockCompatible = limit >= 3 && inc >= 2;
+        if (/^stockfish-level[1-8]$/.test(user)) {
+          clockCompatible = limit >= 0.5;
+        } else {
+          switch (user) {
+            case 'ps-random-mover': {
+              clockCompatible = limit >= 0.5 || byo > 2;
+              break;
+            }
+            case 'ps-greedy-one-move': {
+              clockCompatible = limit >= 1 && inc >= 1;
+              break;
+            }
+            default: {
+              clockCompatible = limit >= 3 && inc >= 2;
+            }
           }
         }
       } else {
-        clockCompatible = true;
+        clockCompatible = false;
       }
       return variantCompatible && clockCompatible;
     };
@@ -270,16 +418,58 @@ export default class Setup {
         });
       });
     }
-    //default options for playing against ps-bots
-    if (vsPSBot) {
+
+    const isRealTime = () => this.ratedTimeModes.indexOf(<string>$timeModeSelect.val()) !== -1;
+
+    //default options for challenge against bots
+    if (vsPSBot || vsStockfishBot) {
       $timeModeSelect.val('1');
       $timeInput.val('3');
       $incrementInput.val('2');
+      $timeModeDefaults.find('input').val('blitz');
       $casual.trigger('click');
+      if (user !== '') $botInput.val(user);
+
+      //disable non realtime modes
+      $('#sf_timeModeDefaults_correspondence, #sf_timeModeDefaults_custom')
+        .prop('disabled', true)
+        .siblings('label')
+        .toggleClass('disabled', true);
+
+      const limit = parseFloat($timeInput.val() as string),
+        inc = parseFloat($incrementInput.val() as string),
+        byo = parseFloat($byoyomiInput.val() as string);
+
+      // Disable variant options the bot cannot play
+      $variantInput.each(function (_, el) {
+        const $el = $(el);
+        const variantId = ($el.val() as string).split('_');
+        const canPlay = botCanPlay(user, limit, inc, byo, variantId);
+        $el.prop('disabled', !canPlay).siblings('label').toggleClass('disabled', !canPlay);
+      });
+
+      // Disable game group options the bot cannot play
+      $gameGroupInput.each(function (_, el) {
+        const $el = $(el);
+        // Find the first variant for this game group
+        const groupValue = $el.val() as string;
+        // Find a variantId for this group (e.g., the first matching variant)
+        const variantForGroup = $variantInput
+          .filter(function () {
+            return ($(this).val() as string).split('_')[0] === groupValue;
+          })
+          .first();
+        let canPlay = true;
+        if (variantForGroup.length) {
+          const variantId = (variantForGroup.val() as string).split('_');
+          canPlay = botCanPlay(user, limit, inc, byo, variantId);
+        }
+        $el.prop('disabled', !canPlay).siblings('label').toggleClass('disabled', !canPlay);
+      });
     }
 
     const showRating = () => {
-      const variantId = ($variantSelect.val() as string).split('_'),
+      const variantId = ($variantInput.filter(':checked').val() as string).split('_'),
         timeMode = $timeModeSelect.val();
       let key = 'correspondence';
       switch (variantId[0]) {
@@ -473,7 +663,7 @@ export default class Setup {
       save();
     };
     const showStartingImages = () => {
-      const variantId = ($variantSelect.val() as string).split('_');
+      const variantId = ($variantInput.filter(':checked').val() as string).split('_');
       const class_list =
         'chess draughts loa shogi xiangqi flipello oware togyzkumalak amazons go backgammon breakthroughtroyka abalone';
       let key = 'chess';
@@ -518,8 +708,8 @@ export default class Setup {
           key = 'abalone';
           break;
       }
-      $form.find('.playerIndex-submits').removeClass(class_list);
-      $form.find('.playerIndex-submits').addClass(key);
+      $playerIndex.removeClass(class_list);
+      $playerIndex.addClass(key);
       save();
     };
 
@@ -533,56 +723,101 @@ export default class Setup {
       $periodsInput.eq(0).trigger('click');
     };
 
-    const isRealTime = () => this.ratedTimeModes.indexOf(<string>$timeModeSelect.val()) !== -1;
+    const customClockConfig = () => {
+      return {
+        timemode: $timeModeSelect.val(),
+        initial: $timeInput.val(),
+        increment: $incrementInput.val(),
+        byoyomi: $byoyomiInput.val(),
+        periods: $periodsInput.filter(':checked').val() as string,
+        days: $daysInput.val(),
+      } as ClockConfig;
+    };
 
-    if (typ === 'hook') {
-      if ($form.data('anon')) {
-        $timeModeSelect
-          .val('1')
-          .children('.timeMode_2, .timeMode_0')
-          .prop('disabled', true)
-          .attr('title', this.root.trans('youNeedAnAccountToDoThat'));
-      }
-      const ajaxSubmit = (playerIndex: string) => {
-        const form = $form[0] as HTMLFormElement;
-        const rating = parseInt($modal.find('.ratings input').val() as string) || 1500;
-        if (form.ratingRange)
-          form.ratingRange.value = [
-            rating + parseInt(form.ratingRange_range_min.value),
-            rating + parseInt(form.ratingRange_range_max.value),
-          ].join('-');
-        save();
-        const poolMember = this.hookToPoolMember(playerIndex, form);
-        modal.close();
-        if (poolMember) {
-          this.root.enterPool(poolMember);
-        } else {
-          this.root.setTab(isRealTime() ? 'real_time' : 'seeks');
-          xhr.text($form.attr('action')!.replace(/sri-placeholder/, playstrategy.sri), {
-            method: 'post',
-            body: (() => {
-              const data = new FormData($form[0] as HTMLFormElement);
-              data.append('playerIndex', playerIndex);
-              return data;
-            })(),
-          });
+    const updateClockOptionsText = () => {
+      const variantId = $variantInput.filter(':checked').val() as string;
+      const clockConfig = self.clockDefaults(variantId, $form.data('anon') as boolean);
+      $timeModeDefaults.find('label').each(function (this: HTMLElement) {
+        const $this = $(this);
+        const clockType = $this.attr('for').split('_')[2];
+        if (clockType !== 'custom') {
+          $this.text(self.clockDisplayText(clockConfig[clockType]));
         }
-        this.root.redraw();
-        return false;
-      };
-      $submits
-        .on('click', function (this: HTMLElement) {
-          return ajaxSubmit($(this).val() as string);
-        })
-        .prop('disabled', false);
-      $form.on('submit', () => ajaxSubmit('random'));
-    } else
-      $form.one('submit', () => {
-        $submits.hide();
-        $form.find('.playerIndex-submits').append(playstrategy.spinnerHtml);
+        const $selectedChoice = $timeModeDefaults.find(`div.choice.${$this.attr('for').replace('sf_', '')}`);
+        if (clockType !== 'custom') {
+          $selectedChoice.text(self.clockDisplayText(clockConfig[clockType]));
+        } else {
+          $selectedChoice.text(self.clockDisplayText(customClockConfig()));
+        }
       });
+    };
+    const setAnonOptions = () => {
+      const isAnon = $form.data('anon');
+      if (isAnon) {
+        $gameGroupInput.val('0'); //default to chess
+        $variantInput.val('0_1'); //default to standard chess
+        $timeModeSelect.val('1'); //default to real time
+        $timeModeDefaults.find('input').val('blitz'); //default to real time
+        $opponentInput.val('lobby'); //default to lobby
+        const opponent = $opponentInput.filter(':checked').val() as string;
+        if (opponent === 'lobby') {
+          $timeModeSelect
+            .val('1')
+            .children('.timeMode_2, .timeMode_0')
+            .prop('disabled', true)
+            .attr('title', this.root.trans('youNeedAnAccountToDoThat'));
+        }
+      }
+    };
+    setAnonOptions();
+    const updateLobbySubmit = () => {
+      if (($opponentInput.filter(':checked').val() as string) === 'lobby') {
+        const ajaxSubmit = (playerIndex: string) => {
+          const form = $form[0] as HTMLFormElement;
+          const rating = parseInt($modal.find('.ratings input').val() as string) || 1500;
+          if (form.ratingRange)
+            form.ratingRange.value = [
+              rating + parseInt(form.ratingRange_range_min.value),
+              rating + parseInt(form.ratingRange_range_max.value),
+            ].join('-');
+          save();
+          const poolMember = this.hookToPoolMember(playerIndex, form);
+          modal.close();
+          if (poolMember) {
+            this.root.enterPool(poolMember);
+          } else {
+            this.root.setTab(isRealTime() ? 'real_time' : 'seeks');
+            xhr.text($form.attr('action')!.replace(/sri-placeholder/, playstrategy.sri), {
+              method: 'post',
+              body: (() => {
+                const data = new FormData($form[0] as HTMLFormElement);
+                return data;
+              })(),
+            });
+          }
+          this.root.redraw();
+          return false;
+        };
+        $submits
+          .off('click') // Always remove previous handlers first!
+          .on('click', function (this: HTMLElement) {
+            return ajaxSubmit($playerIndexInput.filter(':checked').val() as string);
+          })
+          .prop('disabled', false);
+        $form.off('submit').on('submit', () => ajaxSubmit('random'));
+      } else {
+        $submits.off('click').prop('disabled', false);
+        $form.off('submit'); // Remove any custom submit handler
+        $form.one('submit', () => {
+          $submits.hide();
+          $form.find('.submit').append(playstrategy.spinnerHtml);
+        });
+      }
+    };
+    updateLobbySubmit();
+
     if (this.root.opts.blindMode) {
-      $variantSelect[0]!.focus();
+      $variantInput.filter(':checked')[0]!.focus();
       $timeInput.add($incrementInput).on('change', () => {
         toggleButtons();
         showRating();
@@ -688,7 +923,7 @@ export default class Setup {
             return ('' + v / 10.0).replace('.0', '');
           },
           show = (komi: number) => $value.text(showKomi(komi)),
-          variantId = ($variantSelect.val() as string).split('_'),
+          variantId = ($variantInput.filter(':checked').val() as string).split('_'),
           boardsize = variantId[1] == '1' ? 9 : variantId[1] == '2' ? 13 : 19,
           defaultValue = boardsize === 9 ? 55 : 75,
           initialValue =
@@ -734,6 +969,46 @@ export default class Setup {
         toggleButtons();
       });
     });
+    const updateBotDetails = () => {
+      let bot = $botInput.filter(':checked').val() as string;
+      if (!bot) {
+        $botInput.val('ps-greedy-two-move'); //default bot
+        bot = 'ps-greedy-two-move';
+      }
+      const botText = $form.find('.opponent_bot.choice');
+      const botName = bot
+        .replace('stockfish-l', 'Stockfish-L')
+        .replace('ps-', 'PS-')
+        .replace('greedy-', 'Greedy-')
+        .replace('-move', '-Move')
+        .replace('random', 'Random')
+        .replace('one', 'One')
+        .replace('four', 'Four')
+        .replace('two', 'Two');
+      botText.empty();
+      botText.append(
+        `<a class="user-link ulpt" href="/@/${bot}"><span class="utitle" data-bot="data-bot" title="Robot">BOT</span>&nbsp${botName}</a>`,
+      );
+      const botSelected = $opponentInput.filter(':checked').val() === 'bot';
+      if (!botSelected) return;
+      if (user || $form.attr('action').includes('user'))
+        $form.attr('action', $form.attr('action')?.replace(/user=[^&]*/, 'user=' + bot));
+      else $form.attr('action', $form.attr('action') + `&user=${bot}`);
+    };
+    const setupOpponentChoices = () => {
+      $botChoices.hide();
+      $form.find('.bot_title').hide();
+      $form.find('.rating-range-config').hide();
+      if (user) {
+        if (vsPSBot || vsStockfishBot) {
+          $opponentInput.val('bot');
+        } else {
+          $opponentInput.val('friend');
+        }
+      }
+      updateBotDetails();
+    };
+    setupOpponentChoices();
     $form.find('.rating-range').each(function (this: HTMLDivElement) {
       const $this = $(this),
         $minInput = $this.find('.rating-range__min'),
@@ -784,11 +1059,43 @@ export default class Setup {
         showRating();
       })
       .trigger('change');
-
+    $timeModeDefaults
+      .on('change', function (this: HTMLElement) {
+        const choice = $(this).find('input').filter(':checked').val() as string;
+        const clockConfig = self.clockDefaults(
+          $variantInput.filter(':checked').val() as string,
+          $form.data('anon') as boolean,
+        );
+        switch (choice) {
+          case 'correspondence': //correspondence
+            $timeModeSelect.val(clockConfig['correspondence'].timemode);
+            $daysInput.val(clockConfig['correspondence'].days);
+            $form.find('.time_mode_config').hide();
+            break;
+          case 'custom': //custom - i.e. used old time setup options
+            if ($(this).hasClass('active')) {
+              $form.find('.time_mode_config').show();
+            } else {
+              $form.find('.time_mode_config').hide();
+            }
+            $timeModeSelect.trigger('change');
+            break;
+          default:
+            $timeModeSelect.val(clockConfig[choice].timemode);
+            if (clockConfig[choice]['initial']) $timeInput.val(clockConfig[choice]['initial']);
+            if (clockConfig[choice]['increment']) $incrementInput.val(clockConfig[choice]['increment']);
+            if (clockConfig[choice]['byoyomi']) $byoyomiInput.val(clockConfig[choice]['byoyomi']);
+            if (clockConfig[choice]['periods']) $periodsInput.val(clockConfig[choice]['periods']);
+            $form.find('.time_mode_config').hide();
+        }
+        toggleButtons();
+        showRating();
+      })
+      .trigger('change');
     const validateFen = debounce(() => {
       $fenInput.removeClass('success failure');
       const fen = $fenInput.val() as string;
-      const variantId = ($variantSelect.val() as string).split('_');
+      const variantId = ($variantInput.filter(':checked').val() as string).split('_');
       const lib = variantId[0];
       if (fen) {
         const [path, params] = $fenInput.parent().data('validate-url').split('?'); // Separate "strict=1" for AI match
@@ -811,26 +1118,52 @@ export default class Setup {
       }
     }, 200);
     $fenInput.on('keyup', validateFen);
-
     if (forceFromPosition) {
-      switch (($variantSelect.val() as string).split('_')[0]) {
+      switch (($variantInput.filter(':checked').val() as string).split('_')[0]) {
         case '0':
-          $variantSelect.val('0_3');
+          $variantInput.val('0_3');
           break;
         case '1':
-          $variantSelect.val('1_3');
+          $variantInput.val('1_3');
           break;
-        //TODO: Add all variants from position?
+        default:
+          $variantInput.val('0_3');
+          $gameGroupInput.val('0');
       }
+      $opponentInput.val('friend');
     }
-
     $form.find('optgroup').each((_, optgroup: HTMLElement) => {
       optgroup.setAttribute('label', optgroup.getAttribute('name') || '');
     });
+    $opponentInput.on('change', function (this: HTMLElement) {
+      const opponent = $opponentInput.filter(':checked').val() as string;
+      if (opponent === 'bot') {
+        $botChoices.show();
+        $form.find('.bot_title').show();
+        $form.find('.rating-range-config').hide();
+        updateBotDetails();
+      } else if (opponent === 'lobby') {
+        if (!user) $form.attr('action', $form.attr('action')?.replace(/&user=[^&]*/, ''));
+        $botChoices.hide();
+        $form.find('.bot_title').hide();
+        $form.find('.rating-range-config').show();
+      } else if (opponent === 'friend') {
+        if (!user) $form.attr('action', $form.attr('action')?.replace(/&user=[^&]*/, ''));
+        $botChoices.hide();
+        $form.find('.bot_title').hide();
+        $form.find('.rating-range-config').hide();
+      }
+      updateLobbySubmit();
+      toggleButtons();
+    });
+    $botInput.on('change', function (this: HTMLElement) {
+      updateBotDetails();
+      toggleButtons();
+    });
 
-    $variantSelect
+    $variantInput
       .on('change', function (this: HTMLElement) {
-        const variantId = ($variantSelect.val() as string).split('_'),
+        const variantId = ($variantInput.filter(':checked').val() as string).split('_'),
           isFen = variantId[1] == '3';
         let ground = 'chessground';
         if (variantId[0] == '1') ground = 'draughtsground';
@@ -838,7 +1171,6 @@ export default class Setup {
         if (variantId[0] == '9' || variantId[0] == '10') clearFenInput();
         $multiMatch.toggle(isFen && variantId[0] == '1');
         $fenPosition.toggle(isFen);
-        $modeChoicesWrap.toggle(!isFen);
         $goConfig.toggle(variantId[0] == '9');
         //TODO change back when playing with friend is allowed for Backgammon multipoint
         $backgammonConfig.toggle(false);
@@ -849,9 +1181,68 @@ export default class Setup {
           validateFen();
           requestAnimationFrame(() => document.body.dispatchEvent(new Event(ground)));
         }
-        showRating();
+        $timeModeDefaults.trigger('change');
+        updateClockOptionsText();
         showStartingImages();
         if (variantId[0] == '9') setupGoKomiInput();
+        toggleButtons();
+      })
+      .trigger('change');
+
+    $playerIndexInput.on('change', function (this: HTMLElement) {
+      toggleButtons();
+    });
+
+    $gameGroupInput
+      .on('change', function (this: HTMLElement) {
+        const variantId = ($variantInput.filter(':checked').val() as string).split('_'),
+          gameFamily = $gameGroupInput.filter(':checked').val() as string;
+
+        let numInGroup = 0;
+        const toShow: HTMLElement[] = [];
+        const toHide: HTMLElement[] = [];
+        $variantInput.each(function (this: HTMLElement) {
+          const gfOfVariant = ($(this).val() as string).split('_')[0];
+          const additionMatches = gfOfVariant === '6' && gameFamily === '7'; //add oware to mancala group
+          if (gfOfVariant === gameFamily || additionMatches) {
+            toShow.push($(this).parent()[0]);
+            numInGroup++;
+          } else {
+            toHide.push($(this).parent()[0]);
+          }
+        });
+        $(toShow).show();
+        $(toHide).hide();
+
+        $variants
+          .find('group.radio')
+          .removeClass('child-count-1 child-count-2 child-count-3')
+          .addClass('child-count-' + numInGroup);
+
+        //select the default variant for each gameGroup
+        if (variantId[0] !== gameFamily) {
+          const variantValue = function () {
+            switch (gameFamily) {
+              case '2':
+                return '2_11'; // Lines of Action
+              case '4':
+                return '4_2'; // Xiangqi
+              case '5':
+                return '5_6'; // Flipello
+              case '7':
+                return '6_1'; // Oware
+              case '8':
+                return '8_8'; // Amazons
+              case '9':
+                return '9_4'; // Go 19x19
+              case '11':
+                return '11_9'; // Breakthrough Troyka
+              default:
+                return `${gameFamily}_1`;
+            }
+          };
+          $variantInput.filter(`[value="${variantValue()}"]`).trigger('click');
+        }
         toggleButtons();
       })
       .trigger('change');
@@ -873,28 +1264,79 @@ export default class Setup {
         $advancedTimeSetup.show();
       }
     });
-
-    $form.find('div.level').each(function (this: HTMLElement) {
-      const $infos = $(this).find('.ai_info > div');
-      $(this)
-        .find('label')
-        .on('mouseenter', function (this: HTMLElement) {
-          $infos
-            .hide()
-            .filter('.' + $(this).attr('for'))
-            .show();
+    const squashSection = (collapsibleSection: HTMLDivElement) => {
+      const sName = $(collapsibleSection).find('input').attr('name') || '';
+      $(collapsibleSection).removeClass('active').find('group').addClass('hide');
+      $(collapsibleSection)
+        .find('div.choice')
+        .hide()
+        .filter(`.${sName}_` + $(collapsibleSection).find('input').filter(':checked').val())
+        .show()
+        .removeAttr('style'); //remove unwated display: block added by show()
+      //hide/update additional sections
+      $form.find('.time_mode_config').hide();
+      updateClockOptionsText();
+      $form.find('.bot_title').hide();
+      $form.find('.rating-range-config').hide();
+    };
+    //do this last so that the form is ready for the user
+    $collapsibleSections.each(function (this: HTMLDivElement) {
+      const $this = $(this);
+      const sName = $this.find('input').attr('name') || '';
+      //initial display of form
+      $this.removeClass('active');
+      $this.find('group').addClass('hide');
+      $this
+        .find('div.choice')
+        .hide()
+        .filter(`.${sName}_` + $this.find('input').filter(':checked').val())
+        .show();
+      $form.find('.time_mode_config').hide();
+      //Always start the form with gameGroup active
+      if (sName == 'gameGroup') {
+        $this.addClass('active');
+        $this.find('group').removeClass('hide');
+        $this.find('div.choice').hide();
+      }
+      const fixedSection = (user && sName === 'opponent') || ($form.data('anon') && sName === 'mode');
+      if (!fixedSection) {
+        $this.on('click', function (this: HTMLElement) {
+          const $this = $(this),
+            sName = $this.find('input').attr('name') || '';
+          $collapsibleSections
+            .not(this)
+            .filter('.active')
+            .each(function (this: HTMLDivElement) {
+              squashSection(this);
+            });
+          this.classList.toggle('active');
+          $(this).find('group').toggleClass('hide');
+          const $displayChoices = $this.find('div.choice');
+          if (this.classList.contains('active')) {
+            $displayChoices.hide();
+            if (
+              sName === 'timeModeDefaults' &&
+              ($timeModeDefaults.find('input').filter(':checked').val() as string) === 'custom'
+            ) {
+              $form.find('.time_mode_config').show();
+              $form.find('.time_mode_config').trigger('click');
+            }
+            if (sName === 'opponent') {
+              if (($opponentInput.filter(':checked').val() as string) === 'bot') {
+                $form.find('.bot_title').show();
+                $botChoices.show();
+              }
+              if (($opponentInput.filter(':checked').val() as string) === 'lobby') {
+                $form.find('.rating-range-config').show();
+              }
+            }
+          } else {
+            squashSection(this as HTMLDivElement);
+          }
         });
-      $(this)
-        .find('#config_level')
-        .on('mouseleave', function (this: HTMLElement) {
-          const level = $(this).find('input:checked').val();
-          $infos
-            .hide()
-            .filter('.sf_level_' + level)
-            .show();
-        })
-        .trigger('mouseout');
-      $(this).find('input').on('change', save);
+      }
     });
+
+    toggleButtons();
   };
 }
