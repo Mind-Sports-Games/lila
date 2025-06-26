@@ -233,6 +233,7 @@ object home {
     trans.quickPairing,
     trans.lobby,
     trans.custom,
+    trans.unlimited,
     trans.anonymous
   ).map(_.key)
 }

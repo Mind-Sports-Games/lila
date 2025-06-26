@@ -175,6 +175,7 @@ export default class Setup {
   };
 
   private clockDisplayText = (clockConfig: ClockConfig) => {
+    const capitalize = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
     const showTime = (v: string) => {
       if (v == '0.25') return '¼';
       if (v == '0.5') return '½';
@@ -195,9 +196,9 @@ export default class Setup {
       case '5': //simple delay
         return showTime(clockConfig.initial) + ' d/' + clockConfig.increment;
       case '0': //unlimited
-        return '\u221E';
+        return capitalize(this.root.trans('unlimited'));
       case '6': //custom
-        return 'Custom';
+        return capitalize(this.root.trans('custom'));
       default:
         return showTime(clockConfig.initial) + ' + ' + clockConfig.increment;
     }
@@ -1218,23 +1219,24 @@ export default class Setup {
           .removeClass('child-count-1 child-count-2 child-count-3')
           .addClass('child-count-' + numInGroup);
 
+        //select the default variant for each gameGroup
         if (variantId[0] !== gameFamily) {
           const variantValue = function () {
             switch (gameFamily) {
               case '2':
-                return '2_11';
+                return '2_11'; // Lines of Action
               case '4':
-                return '4_2';
+                return '4_2'; // Xiangqi
               case '5':
-                return '5_6';
+                return '5_6'; // Flipello
               case '7':
-                return '6_1';
+                return '6_1'; // Oware
               case '8':
-                return '8_8';
+                return '8_8'; // Amazons
               case '9':
-                return '9_4';
+                return '9_4'; // Go 19x19
               case '11':
-                return '11_9';
+                return '11_9'; // Breakthrough Troyka
               default:
                 return `${gameFamily}_1`;
             }
