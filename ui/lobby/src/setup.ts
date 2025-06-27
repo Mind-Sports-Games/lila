@@ -406,7 +406,16 @@ export default class Setup {
       }
       return variantCompatible && clockCompatible;
     };
+    const setBaseDefaultOptions = () => {
+      $gameGroupInput.val('0'); //default to chess
+      $variantInput.val('0_1'); //default to standard chess
+      $timeModeSelect.val('1'); //default to real time
+      $timeInput.val('3'); //match blitz clock
+      $incrementInput.val('2'); //match blitz clock
+      $timeModeDefaults.find('input').val('blitz'); //default to real time
+    };
     const clearFenInput = () => $fenInput.val('');
+    setBaseDefaultOptions();
     const c = this.stores[typ].get();
     if (c) {
       Object.keys(c).forEach(k => {
@@ -423,10 +432,7 @@ export default class Setup {
 
     //default options for challenge against bots
     if (vsPSBot || vsStockfishBot) {
-      $timeModeSelect.val('1');
-      $timeInput.val('3');
-      $incrementInput.val('2');
-      $timeModeDefaults.find('input').val('blitz');
+      setBaseDefaultOptions();
       $casual.trigger('click');
       if (user !== '') $botInput.val(user);
 
@@ -754,10 +760,7 @@ export default class Setup {
     const setAnonOptions = () => {
       const isAnon = $form.data('anon');
       if (isAnon) {
-        $gameGroupInput.val('0'); //default to chess
-        $variantInput.val('0_1'); //default to standard chess
-        $timeModeSelect.val('1'); //default to real time
-        $timeModeDefaults.find('input').val('blitz'); //default to real time
+        setBaseDefaultOptions(); //defult to chess, real time, blitz clock
         $opponentInput.val('lobby'); //default to lobby
         const opponent = $opponentInput.filter(':checked').val() as string;
         if (opponent === 'lobby') {
