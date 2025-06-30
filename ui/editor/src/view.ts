@@ -443,10 +443,17 @@ function onSelectSparePiece(ctrl: EditorCtrl, s: Selected, upEvent: string): (e:
   };
 }
 
-function makeCursor(selected: Selected): string {
+function makeCursor(selected: Selected, variantKey: VariantKey): string {
   if (selected === 'pointer') return 'pointer';
 
   const name = selected === 'trash' ? 'trash' : selected.join('-');
+
+  if (selected !== 'trash') {
+    if (!isChessRules(variantKey)) {
+      return '';
+    }
+  }
+
   const url = playstrategy.assetUrl('cursors/' + name + '.cur');
 
   return `url('${url}'), default !important`;
@@ -460,7 +467,7 @@ export default function (ctrl: EditorCtrl): VNode {
     'div.board-editor' + '.variant-' + ctrl.variantKey,
     {
       attrs: {
-        style: `cursor: ${makeCursor(ctrl.selected())}`,
+        style: `cursor: ${makeCursor(ctrl.selected(), ctrl.variantKey)}`,
       },
     },
     [
