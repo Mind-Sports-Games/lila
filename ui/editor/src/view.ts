@@ -162,7 +162,7 @@ function controls(ctrl: EditorCtrl, state: EditorState): VNode {
                   ),
                   ...ctrl.extraPositions.map(position2option),
                 ]),
-                isChessRules(ctrl.variantKey)
+                isChessRules(ctrl.variantKey) && ctrl.standardInitialPosition
                   ? optgroup(ctrl.trans.noarg('popularOpenings'), ctrl.cfg.positions.map(position2option))
                   : null,
               ],

@@ -33,6 +33,7 @@ export default class EditorCtrl {
   fullmoves: number;
 
   rules: Rules;
+  standardInitialPosition: boolean;
   variantKey: VariantKey;
 
   constructor(cfg: Editor.Config, redraw: Redraw) {
@@ -48,6 +49,7 @@ export default class EditorCtrl {
     const variant = variantClassFromKey(this.variantKey);
     this.rules = variantKeyToRules(this.variantKey);
     this.initialFen = cfg.fen || params.get('fen') || variant.getInitialFen();
+    this.standardInitialPosition = cfg.standardInitialPosition;
 
     this.extraPositions = [
       {
@@ -83,6 +85,7 @@ export default class EditorCtrl {
 
   onChange(): void {
     const fen = this.getFenFromSetup();
+    this.standardInitialPosition = this.isVariantStandardInitialPosition();
     if (!this.cfg.embed) {
       const state = { rules: this.rules, variantKey: this.variantKey, fen };
       window.history.replaceState(state, '', this.makeUrl('/editor/' + this.formatVariantForUrl() + '/', fen));
@@ -265,6 +268,10 @@ export default class EditorCtrl {
       else this.remainingChecks = RemainingChecks.default();
     }
     this.onChange();
+  }
+
+  isVariantStandardInitialPosition(): boolean {
+    return variantClassFromKey(this.variantKey).standardInitialPosition;
   }
 
   setOrientation(o: PlayerIndex): void {
