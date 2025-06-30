@@ -33,7 +33,7 @@ function command(q: string) {
 
   if (is('tv follow') && parts[1]) location.href = '/@/' + parts[1] + '/tv';
   else if (is('tv')) location.href = '/tv';
-  else if (is('play challenge match') && parts[1]) location.href = '/?user=' + parts[1] + '#friend';
+  else if (is('play challenge match') && parts[1]) location.href = '/?user=' + parts[1] + '#game';
   else if (is('light dark transp'))
     playstrategy
       .loadModule('dasher')

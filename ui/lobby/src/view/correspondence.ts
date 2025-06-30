@@ -46,7 +46,7 @@ function createSeek(ctrl: LobbyController): VNode | undefined {
         'a.button.button-color-choice',
         {
           hook: bind('click', () => {
-            $('.lobby__start .config_hook')
+            $('.lobby__start .config_game')
               .each(function (this: HTMLElement) {
                 this.dataset.hrefAddon = '?time=correspondence';
               })

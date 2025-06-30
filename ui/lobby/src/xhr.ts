@@ -11,9 +11,11 @@ export const anonPoolSeek = (pool: Pool) =>
     method: 'POST',
     body: xhr.form({
       variant: pool.variantId,
-      timeMode: 1,
+      timeMode: pool.byoyomi ? 3 : pool.delay ? 5 : 1,
       time: pool.lim,
-      increment: pool.inc,
+      increment: pool.inc || pool.delay || 0,
+      byoyomi: pool.byoyomi || 0,
+      periods: pool.periods || 1,
       days: 1,
       playerIndex: 'random',
     }),

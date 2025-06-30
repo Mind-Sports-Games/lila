@@ -36,7 +36,7 @@ object newPlayer {
       ul(
         li(a(href := routes.Page.variantHome)(trans.onboarding.learnRules.txt())),
         li(a(href := routes.PlayApi.botOnline)(trans.onboarding.playBot.txt())),
-        li(a(href := s"${routes.Lobby.home}#hook")(trans.onboarding.playOthers.txt())),
+        li(a(href := s"${routes.Lobby.home}#game")(trans.onboarding.playOthers.txt())),
         li(a(href := routes.User.list)(trans.onboarding.follow.txt())),
         li(a(href := routes.Team.all(1))(trans.onboarding.joinCommunities.txt())),
         li(a(href := routes.Tournament.home)(trans.onboarding.playTournaments.txt())),
