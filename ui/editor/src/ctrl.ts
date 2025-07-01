@@ -8,6 +8,7 @@ import { makeFen, parseCastlingFen } from 'stratops/fen';
 import * as fp from 'stratops/fp';
 import { defined, prop, Prop } from 'common';
 import { replacePocketsInFen } from 'common/editor';
+import throttle from 'common/throttle';
 import { variantClass, variantClassFromKey, variantKeyToRules } from 'stratops/variants/util';
 import { Variant as CGVariant } from 'chessground/types';
 import { VariantKey } from 'stratops/variants/types';
@@ -36,6 +37,8 @@ export default class EditorCtrl {
   standardInitialPosition: boolean;
   variantKey: VariantKey;
 
+  throttledReplaceState: (state: any, url: string) => void;
+
   constructor(cfg: Editor.Config, redraw: Redraw) {
     this.cfg = cfg;
     this.options = cfg.options || {};
@@ -63,6 +66,15 @@ export default class EditorCtrl {
       },
     ];
 
+    // this.throttledOnChange = throttle(500, this.onChange.bind(this));
+    this.throttledReplaceState = throttle(500, (state: any, url: string) => {
+      try {
+        window.history.replaceState(state, '', url);
+      } catch (e) {
+        console.error('Failed to update history state:', e);
+      }
+    });
+
     if (cfg.positions) {
       cfg.positions.forEach(p => (p.epd = p.fen.split(' ').splice(0, 4).join(' ')));
     }
@@ -87,8 +99,10 @@ export default class EditorCtrl {
     const fen = this.getFenFromSetup();
     this.standardInitialPosition = this.isVariantStandardInitialPosition();
     if (!this.cfg.embed) {
-      const state = { rules: this.rules, variantKey: this.variantKey, fen };
-      window.history.replaceState(state, '', this.makeUrl('/editor/' + this.formatVariantForUrl() + '/', fen));
+      this.throttledReplaceState(
+        { rules: this.rules, variantKey: this.variantKey, fen },
+        this.makeUrl('/editor/' + this.formatVariantForUrl() + '/', fen)
+      );
     }
     this.options.onChange && this.options.onChange(fen);
     this.redraw();
