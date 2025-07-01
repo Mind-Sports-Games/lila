@@ -173,7 +173,7 @@ export default class EditorCtrl {
     return {
       fen: this.getFenFromSetup(),
       legalFen: this.getLegalFen(),
-      playable: this.rules == 'chess' && this.isPlayable(),
+      playable: this.isPlayable(),
     };
   }
 
