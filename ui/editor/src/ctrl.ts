@@ -136,7 +136,14 @@ export default class EditorCtrl {
   }
 
   private getLegalFen(): string | undefined {
-    return this.getFenFromSetup();
+    return variantClass(this.rules)
+      .fromSetup(this.getSetup())
+      .unwrap(
+        pos => {
+          return makeFen(this.rules)(pos.toSetup(), { promoted: pos.rules == 'crazyhouse' });
+        },
+        _ => undefined,
+      );
   }
 
   private isPlayable(): boolean {
