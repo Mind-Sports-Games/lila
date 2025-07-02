@@ -140,7 +140,9 @@ final class Game(
           until = getLong("until", req) map { new DateTime(_) },
           analysed = getBoolOpt("analysed", req),
           variant = variant,
-          flags = requestPgnFlags(req, extended = false).copy(literate = false)
+          flags = requestPgnFlags(req, extended = false).copy(literate = false),
+          // NOTE: if we open this up to the public, we should probably use a similar pattern as above
+          perSecond = MaxPerSecond(60)
         )
         val date = DateTimeFormat forPattern "yyyy-MM-dd" print new DateTime
         apiC

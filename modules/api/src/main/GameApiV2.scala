@@ -238,9 +238,11 @@ final class GameApiV2(
     gameRepo
       .sortedCursor(
         Query.createdBetween(config.since, config.until) ++ Query.finished ++ Query.variant(config.variant),
-        Query.sortCreated
+        Query.sortCreated,
+        batchSize = config.perSecond.value
       )
       .documentSource()
+      .throttle(config.perSecond.value, 1 second)
       .via(upgradeOngoingGame)
       .via(preparationFlow(config, None))
       .keepAlive(keepAliveInterval, () => emptyMsgFor(config))
@@ -405,7 +407,8 @@ object GameApiV2 {
       since: Option[DateTime] = None,
       until: Option[DateTime] = None,
       analysed: Option[Boolean] = None,
-      flags: WithFlags
+      flags: WithFlags,
+      perSecond: MaxPerSecond
   ) extends Config {}
 
   case class ByIdsConfig(
