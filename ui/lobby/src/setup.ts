@@ -819,6 +819,35 @@ export default class Setup {
     };
     updateLobbySubmit();
 
+    const getIncrementMin = () => {
+      const timeMode = $timeModeSelect.val() as string;
+      // For Bronstein (4) and Simple Delay (5): min 1, others: min 0
+      return timeMode === '4' || timeMode === '5' ? 1 : 0;
+    };
+
+    // Update increment input min value and slider
+    const updateIncrementMin = () => {
+      const min = getIncrementMin();
+      $incrementInput.attr('min', String(min));
+      $incrementInput.parent().find('.range').attr('min', String(min));
+      // If current value is less than min, set to min
+      if (parseFloat($incrementInput.val() as string) < min) {
+        $incrementInput.val(String(min));
+        $incrementInput
+          .parent()
+          .find('span')
+          .text($incrementInput.val() as string);
+        $incrementInput
+          .parent()
+          .find('.range')
+          .val('' + self.sliderInitVal(min, self.sliderIncrement, 100));
+      }
+    };
+
+    $timeModeSelect.on('change', updateIncrementMin);
+    $timeModeDefaults.on('change', updateIncrementMin);
+    updateIncrementMin();
+
     if (this.root.opts.blindMode) {
       $variantInput.filter(':checked')[0]!.focus();
       $timeInput.add($incrementInput).on('change', () => {
@@ -1175,6 +1204,15 @@ export default class Setup {
         $multiMatch.toggle(isFen && variantId[0] == '1');
         $fenPosition.toggle(isFen);
         $goConfig.toggle(variantId[0] == '9');
+        // Set default Go komi and handicap for lobby-legal games
+        if (variantId[0] == '9') {
+          $goHandicapInput.val('0');
+          if (variantId[1] == '1') {
+            $goKomiInput.val('55'); // 5.5 for go9x9
+          } else {
+            $goKomiInput.val('75'); // 7.5 for go13x13 and go19x19
+          }
+        }
         //TODO change back when playing with friend is allowed for Backgammon multipoint
         $backgammonConfig.toggle(false);
         $backgammonPointsInput.val('1'); //remove along with above
