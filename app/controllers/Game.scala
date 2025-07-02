@@ -78,10 +78,11 @@ final class Game(
     )
 
   def apiExportByVariant(variant: String) =
-    AnonOrScoped()(
-      anon = req => handleDbExport(none, req, variant, oauth = false),
-      scoped = req => me => handleDbExport(me.some, req, variant, oauth = true)
-    )
+    Scoped(_.PrivateApi.DbExport) { implicit req => me =>
+      // NOTE: this is explicitly limited to oauth with the DbExport scope
+      //       in the future we may make this public, but for now, we will not.
+      handleDbExport(me.some, req, variant, oauth = true)
+    }
 
   private def handleExport(username: String, me: Option[lila.user.User], req: RequestHeader, oauth: Boolean) =
     env.user.repo named username flatMap {
@@ -132,7 +133,7 @@ final class Game(
     Variant.byKey
       .lift(variant)
       .fold(NotFound.fuccess)(variant => {
-        val format = GameApiV2.Format.byRequest(req).pp("format")
+        val format = GameApiV2.Format.byRequest(req)
         val config = GameApiV2.ByVariantConfig(
           format = format,
           since = getLong("since", req) map { new DateTime(_) },
