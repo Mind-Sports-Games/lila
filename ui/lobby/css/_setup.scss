@@ -113,10 +113,15 @@ $game-family-p2-pieces: (
 
   .gameGroup_choice,
   .variant_choice {
-    & group.radio div {
-      width: 25%;
-      max-width: 25%;
-      font-size: 95%;
+    & group.radio {
+      label {
+        padding : 2px;
+      }
+      div {
+        width: 25%;
+        max-width: 25%;
+        font-size: 95%;
+      }
     }
   }
 
@@ -223,8 +228,14 @@ $game-family-p2-pieces: (
   }
 
   .section_title {
+    display: flex;
+    align-items: center;
+    justify-content: center;
     font-weight: bold;
     padding-bottom: 1em;
+    a[data-icon] {
+      padding-right: 0.3em;
+    }
   }
 
   .choice {
@@ -238,6 +249,7 @@ $game-family-p2-pieces: (
       display: flex;
       flex-flow: row nowrap;
       justify-content: center;
+      align-items: center;
       margin-left: -5.2em;
       height: 45px !important;
       &.random {
@@ -245,9 +257,6 @@ $game-family-p2-pieces: (
       }
       i {
         margin-right: 3.8em;
-      }
-      div {
-        place-self: center;
       }
     }
   }
@@ -336,10 +345,10 @@ $game-family-p2-pieces: (
         i {
           display: block;
           padding: 0;
+          margin-bottom: 2px;
           width: calc(45px - 2 * #{$padding_button});
           height: calc(45px - 2 * #{$padding_button});
           background-size: calc(45px - 2 * #{$padding_button}) calc(45px - 2 * #{$padding_button});
-          place-self: center;
         }
 
         $p1-piece: nth($game-family-p1-pieces, $iter);
@@ -360,7 +369,6 @@ $game-family-p2-pieces: (
         }
 
         div {
-          margin-top: 4px;
           text-transform: capitalize;
         }
 

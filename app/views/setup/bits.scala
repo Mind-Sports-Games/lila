@@ -54,8 +54,10 @@ private object bits {
           cls := "remove_color",
           title := "More info",
           href := s"${routes.Page.variantHome}",
+          dataIcon := "",
           target := "_blank"
-        )(trans.variant())
+        )(),
+        trans.variant()
       ),
       div(id := "variant_icons")(
         renderIconRadios(form("variant"), libs),
@@ -285,7 +287,7 @@ private object bits {
   def renderPlayerIndexOptions(field: Field)(implicit ctx: Context) =
     div(cls := "playerIndex collapsible")(
       div(cls := "section_title")("Side"),
-      div(cls := "playerIndex_choices buttons")(
+      div(cls := "playerIndex_choices")(
         st.group(cls := "radio")(
           translatedSideChoices.map { case (key, name, _) =>
             div(
@@ -297,7 +299,7 @@ private object bits {
                 field.value.has(key) option checked
               ),
               label(
-                cls := s"playerIndex__button button button-metal $key",
+                cls := s"playerIndex__button $key",
                 `for` := s"$prefix${field.id}_$key"
               )(i, div(name))
             )
@@ -325,8 +327,10 @@ private object bits {
           cls := "remove_color",
           title := "More info",
           href := s"${routes.Page.lonePage("clocks")}",
+          dataIcon := "",
           target := "_blank"
-        )(trans.timeControl())
+        )(),
+        trans.timeControl()
       ),
       renderIconRadios(form("timeModeDefaults"), translatedTimeModeIconChoices),
       renderSelectedChoice(form("timeModeDefaults"), translatedTimeModeIconChoices)
