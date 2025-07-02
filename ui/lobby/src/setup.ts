@@ -822,7 +822,7 @@ export default class Setup {
     const getIncrementMin = () => {
       const timeMode = $timeModeSelect.val() as string;
       // For Bronstein (4) and Simple Delay (5): min 1, others: min 0
-      return (timeMode === '4' || timeMode === '5') ? 1 : 0;
+      return timeMode === '4' || timeMode === '5' ? 1 : 0;
     };
 
     // Update increment input min value and slider
@@ -833,8 +833,14 @@ export default class Setup {
       // If current value is less than min, set to min
       if (parseFloat($incrementInput.val() as string) < min) {
         $incrementInput.val(String(min));
-        $incrementInput.parent().find('span').text($incrementInput.val() as string);
-        $incrementInput.parent().find('.range').val('' + self.sliderInitVal(min, self.sliderIncrement, 100));
+        $incrementInput
+          .parent()
+          .find('span')
+          .text($incrementInput.val() as string);
+        $incrementInput
+          .parent()
+          .find('.range')
+          .val('' + self.sliderInitVal(min, self.sliderIncrement, 100));
       }
     };
 
