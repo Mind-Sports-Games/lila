@@ -60,7 +60,7 @@ var retina = window.devicePixelRatio,
     ];
 
   function Vector2(_x, _y) {
-    (this.x = _x), (this.y = _y);
+    ((this.x = _x), (this.y = _y));
     this.Length = function () {
       return sqrt(this.SqrLength());
     };

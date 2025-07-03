@@ -2,8 +2,8 @@
 window.fipr = (function () {
   'use strict';
   var l = function (e, t) {
-      (e = [e[0] >>> 16, 65535 & e[0], e[1] >>> 16, 65535 & e[1]]),
-        (t = [t[0] >>> 16, 65535 & t[0], t[1] >>> 16, 65535 & t[1]]);
+      ((e = [e[0] >>> 16, 65535 & e[0], e[1] >>> 16, 65535 & e[1]]),
+        (t = [t[0] >>> 16, 65535 & t[0], t[1] >>> 16, 65535 & t[1]]));
       var n = [0, 0, 0, 0];
       return (
         (n[3] += e[3] + t[3]),
@@ -21,8 +21,8 @@ window.fipr = (function () {
       );
     },
     f = function (e, t) {
-      (e = [e[0] >>> 16, 65535 & e[0], e[1] >>> 16, 65535 & e[1]]),
-        (t = [t[0] >>> 16, 65535 & t[0], t[1] >>> 16, 65535 & t[1]]);
+      ((e = [e[0] >>> 16, 65535 & e[0], e[1] >>> 16, 65535 & e[1]]),
+        (t = [t[0] >>> 16, 65535 & t[0], t[1] >>> 16, 65535 & t[1]]));
       var n = [0, 0, 0, 0];
       return (
         (n[3] += e[3] * t[3]),
@@ -97,12 +97,12 @@ window.fipr = (function () {
     },
     n = function (e) {
       var t = [window.screen.width, window.screen.height];
-      return e.screen.detectScreenOrientation && t.sort().reverse(), t;
+      return (e.screen.detectScreenOrientation && t.sort().reverse(), t);
     },
     r = function (e) {
       if (window.screen.availWidth && window.screen.availHeight) {
         var t = [window.screen.availHeight, window.screen.availWidth];
-        return e.screen.detectScreenOrientation && t.sort().reverse(), t;
+        return (e.screen.detectScreenOrientation && t.sort().reverse(), t);
       }
       return e.NOT_AVAILABLE;
     },
@@ -155,7 +155,7 @@ window.fipr = (function () {
               ],
               function (e) {
                 try {
-                  return new window.ActiveXObject(e), e;
+                  return (new window.ActiveXObject(e), e);
                 } catch (t) {
                   return n.ERROR;
                 }
@@ -213,7 +213,7 @@ window.fipr = (function () {
         ? (t = navigator.maxTouchPoints)
         : 'undefined' != typeof navigator.msMaxTouchPoints && (t = navigator.msMaxTouchPoints);
       try {
-        document.createEvent('TouchEvent'), (e = !0);
+        (document.createEvent('TouchEvent'), (e = !0));
       } catch (n) {
         e = !1;
       }
@@ -222,7 +222,7 @@ window.fipr = (function () {
     O = function (e) {
       var t = [],
         n = document.createElement('canvas');
-      (n.width = 2e3), (n.height = 200), (n.style.display = 'inline');
+      ((n.width = 2e3), (n.height = 200), (n.style.display = 'inline'));
       var r = n.getContext('2d');
       return (
         r.rect(0, 0, 10, 10),
@@ -277,16 +277,16 @@ window.fipr = (function () {
         t = o.createBuffer();
       o.bindBuffer(o.ARRAY_BUFFER, t);
       var n = new Float32Array([-0.2, -0.9, 0, 0.4, -0.26, 0, 0, 0.732134444, 0]);
-      o.bufferData(o.ARRAY_BUFFER, n, o.STATIC_DRAW), (t.itemSize = 3), (t.numItems = 3);
+      (o.bufferData(o.ARRAY_BUFFER, n, o.STATIC_DRAW), (t.itemSize = 3), (t.numItems = 3));
       var r = o.createProgram(),
         a = o.createShader(o.VERTEX_SHADER);
-      o.shaderSource(
+      (o.shaderSource(
         a,
         'attribute vec2 attrVertex;varying vec2 varyinTexCoordinate;uniform vec2 uniformOffset;void main(){varyinTexCoordinate=attrVertex+uniformOffset;gl_Position=vec4(attrVertex,0,1);}',
       ),
-        o.compileShader(a);
+        o.compileShader(a));
       var i = o.createShader(o.FRAGMENT_SHADER);
-      o.shaderSource(
+      (o.shaderSource(
         i,
         'precision mediump float;varying vec2 varyinTexCoordinate;void main() {gl_FragColor=vec4(varyinTexCoordinate,0,1);}',
       ),
@@ -300,11 +300,11 @@ window.fipr = (function () {
         o.enableVertexAttribArray(r.vertexPosArray),
         o.vertexAttribPointer(r.vertexPosAttrib, t.itemSize, o.FLOAT, !1, 0, 0),
         o.uniform2f(r.offsetUniform, 1, 1),
-        o.drawArrays(o.TRIANGLE_STRIP, 0, t.numItems);
+        o.drawArrays(o.TRIANGLE_STRIP, 0, t.numItems));
       try {
         c.push(o.canvas.toDataURL());
       } catch (s) {}
-      c.push('extensions:' + (o.getSupportedExtensions() || []).join(';')),
+      (c.push('extensions:' + (o.getSupportedExtensions() || []).join(';')),
         c.push('webgl aliased line width range:' + e(o.getParameter(o.ALIASED_LINE_WIDTH_RANGE))),
         c.push('webgl aliased point size range:' + e(o.getParameter(o.ALIASED_POINT_SIZE_RANGE))),
         c.push('webgl alpha bits:' + o.getParameter(o.ALPHA_BITS)),
@@ -321,7 +321,7 @@ window.fipr = (function () {
                 e.getExtension('MOZ_EXT_texture_filter_anisotropic');
               if (t) {
                 var n = e.getParameter(t.MAX_TEXTURE_MAX_ANISOTROPY_EXT);
-                return 0 === n && (n = 2), n;
+                return (0 === n && (n = 2), n);
               }
               return null;
             })(o),
@@ -342,7 +342,7 @@ window.fipr = (function () {
         c.push('webgl shading language version:' + o.getParameter(o.SHADING_LANGUAGE_VERSION)),
         c.push('webgl stencil bits:' + o.getParameter(o.STENCIL_BITS)),
         c.push('webgl vendor:' + o.getParameter(o.VENDOR)),
-        c.push('webgl version:' + o.getParameter(o.VERSION));
+        c.push('webgl version:' + o.getParameter(o.VERSION)));
       try {
         var u = o.getExtension('WEBGL_debug_renderer_info');
         u &&
@@ -383,7 +383,7 @@ window.fipr = (function () {
         var e = I(),
           t = e.getExtension('WEBGL_debug_renderer_info'),
           n = e.getParameter(t.UNMASKED_VENDOR_WEBGL) + '~' + e.getParameter(t.UNMASKED_RENDERER_WEBGL);
-        return M(e), n;
+        return (M(e), n);
       } catch (r) {
         return null;
       }
@@ -393,9 +393,9 @@ window.fipr = (function () {
       e.innerHTML = '&nbsp;';
       var t = !(e.className = 'adsbox');
       try {
-        document.body.appendChild(e),
+        (document.body.appendChild(e),
           (t = 0 === document.getElementsByClassName('adsbox')[0].offsetHeight),
-          document.body.removeChild(e);
+          document.body.removeChild(e));
       } catch (n) {
         t = !1;
       }
@@ -518,7 +518,7 @@ window.fipr = (function () {
         throw 'a';
       } catch (i) {
         try {
-          i.toSource(), (r = !0);
+          (i.toSource(), (r = !0));
         } catch (o) {
           r = !1;
         }
@@ -533,7 +533,7 @@ window.fipr = (function () {
       if (!R()) return !1;
       var e = I(),
         t = !!window.WebGLRenderingContext && !!e;
-      return M(e), t;
+      return (M(e), t);
     },
     L = function () {
       return (
@@ -837,17 +837,17 @@ window.fipr = (function () {
             c = (function () {
               for (var e = [], t = 0, n = d.length; t < n; t++) {
                 var r = g();
-                (r.style.fontFamily = d[t]), a.appendChild(r), e.push(r);
+                ((r.style.fontFamily = d[t]), a.appendChild(r), e.push(r));
               }
               return e;
             })();
           n.appendChild(a);
-          for (var u = 0, s = d.length; u < s; u++) (r[d[u]] = c[u].offsetWidth), (i[d[u]] = c[u].offsetHeight);
+          for (var u = 0, s = d.length; u < s; u++) ((r[d[u]] = c[u].offsetWidth), (i[d[u]] = c[u].offsetHeight));
           var h = (function () {
             for (var e, t, n, r = {}, a = 0, i = l.length; a < i; a++) {
               for (var o = [], c = 0, u = d.length; c < u; c++) {
                 var s = ((e = l[a]), (t = d[c]), (n = void 0), ((n = g()).style.fontFamily = "'" + e + "'," + t), n);
-                f.appendChild(s), o.push(s);
+                (f.appendChild(s), o.push(s));
               }
               r[l[a]] = o;
             }
@@ -855,7 +855,7 @@ window.fipr = (function () {
           })();
           n.appendChild(f);
           for (var m = [], p = 0, A = l.length; p < A; p++) o(h[l[p]]) && m.push(l[p]);
-          n.removeChild(f), n.removeChild(a), e(m);
+          (n.removeChild(f), n.removeChild(a), e(m));
         },
         pauseBefore: !0,
       },
@@ -868,9 +868,9 @@ window.fipr = (function () {
           if (null == n) return r(e.NOT_AVAILABLE);
           var a = new n(1, 44100, 44100),
             i = a.createOscillator();
-          (i.type = 'triangle'), i.frequency.setValueAtTime(1e4, a.currentTime);
+          ((i.type = 'triangle'), i.frequency.setValueAtTime(1e4, a.currentTime));
           var o = a.createDynamicsCompressor();
-          d(
+          (d(
             [
               ['threshold', -50],
               ['knee', 40],
@@ -888,7 +888,7 @@ window.fipr = (function () {
             i.connect(o),
             o.connect(a.destination),
             i.start(0),
-            a.startRendering();
+            a.startRendering());
           var c = setTimeout(function () {
             return (
               console.warn(
@@ -904,7 +904,7 @@ window.fipr = (function () {
           a.oncomplete = function (e) {
             var t;
             try {
-              clearTimeout(c),
+              (clearTimeout(c),
                 (t = e.renderedBuffer
                   .getChannelData(0)
                   .slice(4500, 5e3)
@@ -913,7 +913,7 @@ window.fipr = (function () {
                   }, 0)
                   .toString()),
                 i.disconnect(),
-                o.disconnect();
+                o.disconnect());
             } catch (n) {
               return void r(n);
             }
@@ -946,10 +946,10 @@ window.fipr = (function () {
                   );
                 try {
                   t.getData(function (e) {
-                    a.addPreprocessedComponent(t.key, e), o(!1);
+                    (a.addPreprocessedComponent(t.key, e), o(!1));
                   }, c);
                 } catch (n) {
-                  a.addPreprocessedComponent(t.key, String(n)), o(!1);
+                  (a.addPreprocessedComponent(t.key, String(n)), o(!1));
                 }
               }
             }
@@ -971,7 +971,7 @@ window.fipr = (function () {
           d < r;
           d += 16
         )
-          (o = [
+          ((o = [
             (255 & e.charCodeAt(d + 4)) |
               ((255 & e.charCodeAt(d + 5)) << 8) |
               ((255 & e.charCodeAt(d + 6)) << 16) |
@@ -1004,7 +1004,7 @@ window.fipr = (function () {
             (i = m(i, c)),
             (i = g(i, 31)),
             (i = l(i, a)),
-            (i = l(f(i, [0, 5]), [0, 944331445]));
+            (i = l(f(i, [0, 5]), [0, 944331445])));
         switch (((o = [0, 0]), (c = [0, 0]), n)) {
           case 15:
             c = m(c, h([0, e.charCodeAt(d + 14)], 48));
@@ -1019,7 +1019,7 @@ window.fipr = (function () {
           case 10:
             c = m(c, h([0, e.charCodeAt(d + 9)], 8));
           case 9:
-            (c = m(c, [0, e.charCodeAt(d + 8)])), (c = f(c, s)), (c = g(c, 33)), (c = f(c, u)), (i = m(i, c));
+            ((c = m(c, [0, e.charCodeAt(d + 8)])), (c = f(c, s)), (c = g(c, 33)), (c = f(c, u)), (i = m(i, c)));
           case 8:
             o = m(o, h([0, e.charCodeAt(d + 7)], 56));
           case 7:
@@ -1035,7 +1035,7 @@ window.fipr = (function () {
           case 2:
             o = m(o, h([0, e.charCodeAt(d + 1)], 8));
           case 1:
-            (o = m(o, [0, e.charCodeAt(d)])), (o = f(o, u)), (o = g(o, 31)), (o = f(o, s)), (a = m(a, o));
+            ((o = m(o, [0, e.charCodeAt(d)])), (o = f(o, u)), (o = g(o, 31)), (o = f(o, s)), (a = m(a, o)));
         }
         return (
           (a = m(a, [0, e.length])),
