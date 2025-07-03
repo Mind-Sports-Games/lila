@@ -101,7 +101,7 @@ export default class EditorCtrl {
     if (!this.cfg.embed) {
       this.throttledReplaceState(
         { rules: this.rules, variantKey: this.variantKey, fen },
-        this.makeUrl('/editor/' + this.formatVariantForUrl() + '/', fen)
+        this.makeUrl('/editor/' + this.formatVariantForUrl() + '/', fen),
       );
     }
     this.options.onChange && this.options.onChange(fen);
@@ -173,7 +173,7 @@ export default class EditorCtrl {
     return {
       fen: this.getFenFromSetup(),
       legalFen: this.getLegalFen(),
-      playable: this.isPlayable(),
+      playable: this.rules === 'chess' && this.isPlayable(),
     };
   }
 
