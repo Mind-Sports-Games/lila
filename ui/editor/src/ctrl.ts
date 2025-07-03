@@ -37,7 +37,7 @@ export default class EditorCtrl {
   standardInitialPosition: boolean;
   variantKey: VariantKey;
 
-  throttledReplaceState: (state: any, url: string) => void;
+  replaceState: (state: any, url: string) => void;
 
   constructor(cfg: Editor.Config, redraw: Redraw) {
     this.cfg = cfg;
@@ -66,8 +66,7 @@ export default class EditorCtrl {
       },
     ];
 
-    // this.throttledOnChange = throttle(500, this.onChange.bind(this));
-    this.throttledReplaceState = throttle(500, (state: any, url: string) => {
+    this.replaceState = throttle(500, (state: any, url: string) => {
       try {
         window.history.replaceState(state, '', url);
       } catch (e) {
@@ -99,7 +98,7 @@ export default class EditorCtrl {
     const fen = this.getFenFromSetup();
     this.standardInitialPosition = this.isVariantStandardInitialPosition();
     if (!this.cfg.embed) {
-      this.throttledReplaceState(
+      this.replaceState(
         { rules: this.rules, variantKey: this.variantKey, fen },
         this.makeUrl('/editor/' + this.formatVariantForUrl() + '/', fen),
       );
