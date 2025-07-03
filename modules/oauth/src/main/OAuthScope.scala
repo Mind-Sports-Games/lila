@@ -50,6 +50,14 @@ object OAuthScope {
     case object Play extends OAuthScope("bot:play", "Play games with the bot API")
   }
 
+  object PrivateApi {
+    case object DbExport
+        extends OAuthScope(
+          "privateapi:dbexport",
+          "Allows access to a few private APIs such as the game export API"
+        )
+  }
+
   object Web {
     case object Login
         extends OAuthScope("web:login", "Create authenticated website sessions (grants full access!)")
@@ -61,7 +69,7 @@ object OAuthScope {
 
   type Selector = OAuthScope.type => OAuthScope
 
-  val all = List(
+  val public = List(
     Preference.Read,
     Preference.Write,
     Email.Read,
@@ -78,6 +86,12 @@ object OAuthScope {
     Bot.Play,
     Web.Login,
     Web.Mod
+  )
+
+  private val all = public ::: List[OAuthScope](
+    // NOTE: PrivateApi.DbExport is not intended to be something that someone
+    //       else can set, if you include it here, they can set it when making a key
+    PrivateApi.DbExport
   )
 
   val byKey: Map[String, OAuthScope] = all.map { s =>
