@@ -13,10 +13,10 @@ playstrategy.load.then(() => {
       var distance = target - new Date().getTime();
 
       if (distance > 0) {
-        ($el.find('.days').text(Math.floor(distance / day)),
+        $el.find('.days').text(Math.floor(distance / day)),
           $el.find('.hours').text(Math.floor((distance % day) / hour)),
           $el.find('.minutes').text(Math.floor((distance % hour) / minute)),
-          $el.find('.seconds').text(Math.floor((distance % minute) / second)));
+          $el.find('.seconds').text(Math.floor((distance % minute) / second));
       } else {
         clearInterval(interval);
         playstrategy.reload();
