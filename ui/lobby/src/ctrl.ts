@@ -48,10 +48,10 @@ export default class LobbyController {
     this.socket = new LobbySocket(opts.socketSend, this);
 
     this.stores = makeStores(this.data.me ? this.data.me.username.toLowerCase() : null);
-    (this.tab = this.isBot ? 'now_playing' : this.stores.tab.get()),
+    ((this.tab = this.isBot ? 'now_playing' : this.stores.tab.get()),
       (this.mode = this.stores.mode.get()),
       (this.sort = this.stores.sort.get()),
-      (this.trans = opts.trans);
+      (this.trans = opts.trans));
 
     this.poolInStorage = playstrategy.storage.make('lobby.pool-in');
     this.poolInStorage.listen(_ => {

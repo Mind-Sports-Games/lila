@@ -9,6 +9,10 @@ import { Selected, CastlingToggle, EditorState } from './interfaces';
 import { VariantKey } from 'stratops/variants/types';
 import { variantClassFromKey } from 'stratops/variants/util';
 
+function capitalizeFirstLetter(val: string) {
+  return val.charAt(0).toUpperCase() + val.slice(1);
+}
+
 function castleCheckBox(ctrl: EditorCtrl, id: CastlingToggle, label: string, reversed: boolean): VNode {
   const input = h('input', {
     attrs: {
@@ -162,7 +166,7 @@ function controls(ctrl: EditorCtrl, state: EditorState): VNode {
                   ),
                   ...ctrl.extraPositions.map(position2option),
                 ]),
-                isChessRules(ctrl.variantKey)
+                isChessRules(ctrl.variantKey) && ctrl.standardInitialPosition
                   ? optgroup(ctrl.trans.noarg('popularOpenings'), ctrl.cfg.positions.map(position2option))
                   : null,
               ],
@@ -181,7 +185,7 @@ function controls(ctrl: EditorCtrl, state: EditorState): VNode {
               },
             },
           },
-          ['p1', 'p2'].map(function (key) {
+          Object.keys(variantClassFromKey(ctrl.variantKey).playersColors).map(function (key) {
             return h(
               'option',
               {
@@ -190,7 +194,10 @@ function controls(ctrl: EditorCtrl, state: EditorState): VNode {
                   selected: ctrl.turn === key,
                 },
               },
-              ctrl.trans('playerIndexPlays', key == 'p1' ? 'White' : 'Black'), // @TODO: use ctrl.variantKey and stratops variantFromClass to determine how to map White and Black accordingly
+              ctrl.trans(
+                'playerIndexPlays',
+                capitalizeFirstLetter(variantClassFromKey(ctrl.variantKey).playersColors[key]),
+              ),
             );
           }),
         ),
@@ -219,7 +226,7 @@ function controls(ctrl: EditorCtrl, state: EditorState): VNode {
                 attrs: { id: 'variants' },
                 on: {
                   change(e) {
-                    ctrl.setVariantAndRules((e.target as HTMLSelectElement).value as VariantKey);
+                    ctrl.changeVariant((e.target as HTMLSelectElement).value as VariantKey);
                     ctrl.startPosition();
                   },
                 },
@@ -264,7 +271,7 @@ function controls(ctrl: EditorCtrl, state: EditorState): VNode {
               'a',
               {
                 attrs: {
-                  href: '/?fen=' + state.legalFen + '#game',
+                  href: state.playable ? '/?fen=' + state.legalFen + '#game' : '#',
                   rel: 'nofollow',
                 },
                 class: {
@@ -340,7 +347,7 @@ function sparePieces(
 ): VNode {
   const selectedClass = selectedToClass(ctrl.selected());
 
-  let pieces = ['b-piece', 'k-piece', 'n-piece', 'p-piece', 'q-piece', 'r-piece'].map(function (role) {
+  let pieces = ['k-piece', 'q-piece', 'r-piece', 'b-piece', 'n-piece', 'p-piece'].map(function (role) {
     return [playerIndex, role];
   });
   if (['breakthrough', 'minibreakthrough', 'flipello', 'flipello10'].includes(ctrl.rules)) {
@@ -354,12 +361,12 @@ function sparePieces(
     });
   }
   if (['xiangqi'].includes(ctrl.rules)) {
-    pieces = ['a-piece', 'b-piece', 'c-piece', 'k-piece', 'n-piece', 'p-piece', 'r-piece'].map(function (role) {
+    pieces = ['k-piece', 'a-piece', 'c-piece', 'r-piece', 'b-piece', 'n-piece', 'p-piece'].map(function (role) {
       return [playerIndex, role];
     });
   }
   if (['minixiangqi'].includes(ctrl.rules)) {
-    pieces = ['c-piece', 'k-piece', 'n-piece', 'p-piece', 'r-piece'].map(function (role) {
+    pieces = ['k-piece', 'c-piece', 'r-piece', 'n-piece', 'p-piece'].map(function (role) {
       return [playerIndex, role];
     });
   }
@@ -443,10 +450,17 @@ function onSelectSparePiece(ctrl: EditorCtrl, s: Selected, upEvent: string): (e:
   };
 }
 
-function makeCursor(selected: Selected): string {
+function makeCursor(selected: Selected, variantKey: VariantKey): string {
   if (selected === 'pointer') return 'pointer';
 
   const name = selected === 'trash' ? 'trash' : selected.join('-');
+
+  if (selected !== 'trash') {
+    if (!isChessRules(variantKey)) {
+      return '';
+    }
+  }
+
   const url = playstrategy.assetUrl('cursors/' + name + '.cur');
 
   return `url('${url}'), default !important`;
@@ -460,7 +474,7 @@ export default function (ctrl: EditorCtrl): VNode {
     'div.board-editor' + '.variant-' + ctrl.variantKey,
     {
       attrs: {
-        style: `cursor: ${makeCursor(ctrl.selected())}`,
+        style: `cursor: ${makeCursor(ctrl.selected(), ctrl.variantKey)}`,
       },
     },
     [

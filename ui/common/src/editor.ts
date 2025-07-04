@@ -2,6 +2,7 @@ export function canUseBoardEditor(variantKey: VariantKey): boolean {
   return [
     'standard',
     'chess960',
+    'fromPosition',
     'antichess',
     'kingOfTheHill',
     'threeCheck',

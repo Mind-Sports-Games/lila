@@ -143,6 +143,7 @@ object bits {
       "animation"  -> Json.obj("duration" -> ctx.pref.animationMillis),
       "is3d"       -> ctx.pref.is3d,
       "i18n"       -> i18nJsObject(i18nKeyes),
+      "standardInitialPosition" -> variant.standardInitialPosition,
       "variantKey" -> variant.key
     )
 
