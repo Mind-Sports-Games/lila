@@ -9,6 +9,10 @@ import { Selected, CastlingToggle, EditorState } from './interfaces';
 import { VariantKey } from 'stratops/variants/types';
 import { variantClassFromKey } from 'stratops/variants/util';
 
+function capitalizeFirstLetter(val: string) {
+  return val.charAt(0).toUpperCase() + val.slice(1);
+}
+
 function castleCheckBox(ctrl: EditorCtrl, id: CastlingToggle, label: string, reversed: boolean): VNode {
   const input = h('input', {
     attrs: {
@@ -181,7 +185,7 @@ function controls(ctrl: EditorCtrl, state: EditorState): VNode {
               },
             },
           },
-          ['p1', 'p2'].map(function (key) {
+          Object.keys(variantClassFromKey(ctrl.variantKey).playersColors).map(function (key) {
             return h(
               'option',
               {
@@ -190,7 +194,10 @@ function controls(ctrl: EditorCtrl, state: EditorState): VNode {
                   selected: ctrl.turn === key,
                 },
               },
-              ctrl.trans('playerIndexPlays', key == 'p1' ? 'White' : 'Black'), // @TODO: use ctrl.variantKey and stratops variantFromClass to determine how to map White and Black accordingly
+              ctrl.trans(
+                'playerIndexPlays',
+                capitalizeFirstLetter(variantClassFromKey(ctrl.variantKey).playersColors[key]),
+              ),
             );
           }),
         ),
@@ -219,7 +226,7 @@ function controls(ctrl: EditorCtrl, state: EditorState): VNode {
                 attrs: { id: 'variants' },
                 on: {
                   change(e) {
-                    ctrl.setVariantAndRules((e.target as HTMLSelectElement).value as VariantKey);
+                    ctrl.changeVariant((e.target as HTMLSelectElement).value as VariantKey);
                     ctrl.startPosition();
                   },
                 },

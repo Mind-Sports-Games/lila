@@ -90,23 +90,6 @@ export default class EditorCtrl {
     this.redraw = redraw;
   }
 
-  formatVariantForUrl(): string {
-    return this.variantKey === 'standard' ? 'chess' : this.variantKey;
-  }
-
-  onChange(): void {
-    const fen = this.getFenFromSetup();
-    this.standardInitialPosition = this.isVariantStandardInitialPosition();
-    if (!this.cfg.embed) {
-      this.replaceState(
-        { rules: this.rules, variantKey: this.variantKey, fen },
-        this.makeUrl('/editor/' + this.formatVariantForUrl() + '/', fen),
-      );
-    }
-    this.options.onChange && this.options.onChange(fen);
-    this.redraw();
-  }
-
   private castlingToggleFen(): string {
     let fen = '';
     for (const toggle of CASTLING_TOGGLES) {
@@ -144,10 +127,6 @@ export default class EditorCtrl {
     };
   }
 
-  getFenFromSetup(): string {
-    return replacePocketsInFen(makeFen(this.rules)(this.getSetup(), { promoted: this.rules == 'crazyhouse' }));
-  }
-
   private getLegalFen(): string | undefined {
     return variantClass(this.rules)
       .fromSetup(this.getSetup())
@@ -168,6 +147,23 @@ export default class EditorCtrl {
       );
   }
 
+  onChange(): void {
+    const fen = this.getFenFromSetup();
+    this.standardInitialPosition = this.isVariantStandardInitialPosition();
+    if (!this.cfg.embed) {
+      this.replaceState(
+        { rules: this.rules, variantKey: this.variantKey, fen },
+        this.makeUrl('/editor/' + this.formatVariantForUrl() + '/', fen),
+      );
+    }
+    this.options.onChange && this.options.onChange(fen);
+    this.redraw();
+  }
+
+  formatVariantForUrl(): string {
+    return this.variantKey === 'standard' ? 'chess' : this.variantKey;
+  }
+
   getState(): EditorState {
     return {
       fen: this.getFenFromSetup(),
@@ -176,9 +172,13 @@ export default class EditorCtrl {
     };
   }
 
+  getFenFromSetup(): string {
+    return replacePocketsInFen(makeFen(this.rules)(this.getSetup(), { promoted: this.rules == 'crazyhouse' }));
+  }
+
   makeAnalysisUrl(legalFen: string): string {
     const variant = this.rules === 'chess' ? '' : this.variantKey + '/';
-    return this.makeUrl(`/analysis/${variant}`, legalFen);
+    return replacePocketsInFen(this.makeUrl(`/analysis/${variant}`, legalFen));
   }
 
   makeUrl(baseUrl: string, fen: string): string {
@@ -260,9 +260,10 @@ export default class EditorCtrl {
     );
   };
 
-  setVariantAndRules(variantKey: VariantKey): void {
+  changeVariant(variantKey: VariantKey): void {
     this.variantKey = variantKey;
     const variant = variantClassFromKey(variantKey);
+    this.turn = 'p1';
     this.initialFen = variant.getInitialFen();
     this.extraPositions = [
       {
