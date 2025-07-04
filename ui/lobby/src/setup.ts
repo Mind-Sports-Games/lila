@@ -133,13 +133,13 @@ export default class Setup {
     return undefined;
   };
 
-  private clockDefaults = (variant: string, isAnon: boolean) => {
+  private clockDefaults = (variant: string) => {
     const defaultClockConfig = {
       bullet: { timemode: '1', initial: '1', increment: '0' },
       blitz: { timemode: '1', initial: '3', increment: '2' },
       rapid: { timemode: '1', initial: '5', increment: '5' },
       classical: { timemode: '1', initial: '20', increment: '10' },
-      correspondence: isAnon ? { timemode: '1', initial: '30', increment: '30' } : { timemode: '2', days: '2' },
+      correspondence: { timemode: '2', days: '2' },
       custom: { timemode: '6' },
     };
     switch (variant) {
@@ -168,6 +168,13 @@ export default class Setup {
           blitz: { timemode: '5', increment: '6', initial: '3' },
           rapid: { timemode: '5', increment: '12', initial: '3' },
           classical: { timemode: '5', increment: '12', initial: '5' },
+        });
+      case '12_1': // abalone
+        return Object.assign({}, defaultClockConfig, {
+          bullet: { timemode: '1', initial: '2', increment: '0' },
+          blitz: { timemode: '1', initial: '5', increment: '3' },
+          rapid: { timemode: '1', initial: '10', increment: '5' },
+          classical: { timemode: '1', initial: '20', increment: '10' },
         });
       default:
         return defaultClockConfig;
@@ -409,10 +416,11 @@ export default class Setup {
     const setBaseDefaultOptions = () => {
       $gameGroupInput.val('0'); //default to chess
       $variantInput.val('0_1'); //default to standard chess
-      $timeModeSelect.val('1'); //default to real time
-      $timeInput.val('3'); //match blitz clock
-      $incrementInput.val('2'); //match blitz clock
-      $timeModeDefaults.find('input').val('blitz'); //default to real time
+      const clockConfig = self.clockDefaults('chess'); //default of chess
+      $timeModeSelect.val(clockConfig['blitz'].timemode);
+      $timeInput.val(clockConfig['blitz'].initial);
+      $incrementInput.val(clockConfig['blitz'].increment);
+      $timeModeDefaults.find('input').val('blitz'); //default to real time blitz
     };
     const clearFenInput = () => $fenInput.val('');
     setBaseDefaultOptions();
@@ -742,7 +750,7 @@ export default class Setup {
 
     const updateClockOptionsText = () => {
       const variantId = $variantInput.filter(':checked').val() as string;
-      const clockConfig = self.clockDefaults(variantId, $form.data('anon') as boolean);
+      const clockConfig = self.clockDefaults(variantId);
       $timeModeDefaults.find('label').each(function (this: HTMLElement) {
         const $this = $(this);
         const clockType = $this.attr('for').split('_')[2];
@@ -761,6 +769,7 @@ export default class Setup {
       const isAnon = $form.data('anon');
       if (isAnon) {
         setBaseDefaultOptions(); //defult to chess, real time, blitz clock
+        $casual.trigger('click');
         $opponentInput.val('lobby'); //default to lobby
         const opponent = $opponentInput.filter(':checked').val() as string;
         if (opponent === 'lobby') {
@@ -770,6 +779,11 @@ export default class Setup {
             .prop('disabled', true)
             .attr('title', this.root.trans('youNeedAnAccountToDoThat'));
         }
+        //disable non realtime modes
+        $('#sf_timeModeDefaults_correspondence, #sf_timeModeDefaults_custom')
+          .prop('disabled', true)
+          .siblings('label')
+          .toggleClass('disabled', true);
       }
     };
     setAnonOptions();
@@ -1094,10 +1108,7 @@ export default class Setup {
     $timeModeDefaults
       .on('change', function (this: HTMLElement) {
         const choice = $(this).find('input').filter(':checked').val() as string;
-        const clockConfig = self.clockDefaults(
-          $variantInput.filter(':checked').val() as string,
-          $form.data('anon') as boolean,
-        );
+        const clockConfig = self.clockDefaults($variantInput.filter(':checked').val() as string);
         switch (choice) {
           case 'correspondence': //correspondence
             $timeModeSelect.val(clockConfig['correspondence'].timemode);
