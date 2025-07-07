@@ -1245,68 +1245,71 @@ export default class Setup {
       toggleButtons();
     });
 
-    $gameGroupInput.on('click', function (this: HTMLElement) {
-      const variantId = ($variantInput.filter(':checked').val() as string).split('_'),
-        gameFamily = $gameGroupInput.filter(':checked').val() as string;
+    $gameGroupInput
+      .on('click', function (this: HTMLElement) {
+        const variantId = ($variantInput.filter(':checked').val() as string).split('_'),
+          gameFamily = $gameGroupInput.filter(':checked').val() as string;
 
-      let numInGroup = 0;
-      const toShow: HTMLElement[] = [];
-      const toHide: HTMLElement[] = [];
-      $variantInput.each(function (this: HTMLElement) {
-        const gfOfVariant = ($(this).val() as string).split('_')[0];
-        const additionMatches = gfOfVariant === '6' && gameFamily === '7'; //add oware to mancala group
-        if (gfOfVariant === gameFamily || additionMatches) {
-          toShow.push($(this).parent()[0]);
-          numInGroup++;
-        } else {
-          toHide.push($(this).parent()[0]);
-        }
-      });
-      $(toShow).show();
-      $(toHide).hide();
-
-      $variants
-        .find('group.radio')
-        .removeClass('child-count-1 child-count-2 child-count-3')
-        .addClass('child-count-' + numInGroup);
-
-      //select the default variant for each gameGroup
-      if (variantId[0] !== gameFamily) {
-        const variantValue = function () {
-          switch (gameFamily) {
-            case '2':
-              return '2_11'; // Lines of Action
-            case '4':
-              return '4_2'; // Xiangqi
-            case '5':
-              return '5_6'; // Flipello
-            case '7':
-              return '6_1'; // Oware
-            case '8':
-              return '8_8'; // Amazons
-            case '9':
-              return '9_4'; // Go 19x19
-            case '11':
-              return '11_9'; // Breakthrough Troyka
-            default:
-              return `${gameFamily}_1`;
+        let numInGroup = 0;
+        const toShow: HTMLElement[] = [];
+        const toHide: HTMLElement[] = [];
+        $variantInput.each(function (this: HTMLElement) {
+          const gfOfVariant = ($(this).val() as string).split('_')[0];
+          const additionMatches = gfOfVariant === '6' && gameFamily === '7'; //add oware to mancala group
+          if (gfOfVariant === gameFamily || additionMatches) {
+            toShow.push($(this).parent()[0]);
+            numInGroup++;
+          } else {
+            toHide.push($(this).parent()[0]);
           }
-        };
-        $variantInput.filter(`[value="${variantValue()}"]`).trigger('click');
-      }
-
-      //Always close sections and open variants after game group selection
-      $collapsibleSections
-        .not($variants)
-        .filter('.active')
-        .each(function (this: HTMLDivElement) {
-          squashSection(this);
         });
-      $variants.addClass('active');
-      $variants.find('group').removeClass('hide');
+        $(toShow).show();
+        $(toHide).hide();
 
-      toggleButtons();
-    });
+        $variants
+          .find('group.radio')
+          .removeClass('child-count-1 child-count-2 child-count-3')
+          .addClass('child-count-' + numInGroup);
+
+        //select the default variant for each gameGroup
+        if (variantId[0] !== gameFamily) {
+          const variantValue = function () {
+            switch (gameFamily) {
+              case '2':
+                return '2_11'; // Lines of Action
+              case '4':
+                return '4_2'; // Xiangqi
+              case '5':
+                return '5_6'; // Flipello
+              case '7':
+                return '6_1'; // Oware
+              case '8':
+                return '8_8'; // Amazons
+              case '9':
+                return '9_4'; // Go 19x19
+              case '11':
+                return '11_9'; // Breakthrough Troyka
+              default:
+                return `${gameFamily}_1`;
+            }
+          };
+          $variantInput.filter(`[value="${variantValue()}"]`).trigger('click');
+        }
+
+        //Always close sections and open variants after game group selection
+        $collapsibleSections
+          .not($variants)
+          .filter('.active')
+          .each(function (this: HTMLDivElement) {
+            squashSection(this);
+          });
+        $variants.addClass('active');
+        $variants.find('group').removeClass('hide');
+        $variants.find('div.choice').hide();
+
+        toggleButtons();
+      })
+      .trigger('change');
 
     $modeChoices.on('change', () => {
       toggleButtons();
@@ -1355,6 +1358,7 @@ export default class Setup {
       $form.find('.time_mode_config').hide();
       //Always start the form with gameGroup active
       if (sName == 'gameGroup') {
+        $gameGroupInput.filter(':checked').trigger('click'); // to initalise variant list
         $this.addClass('active');
         $this.find('group').removeClass('hide');
         $this.find('div.choice').hide();
