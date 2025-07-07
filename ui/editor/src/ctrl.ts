@@ -109,10 +109,7 @@ export default class EditorCtrl {
 
     const board = variant.parseFen(fen).unwrap(
       setup => setup.board,
-      _ => {
-        console.warn('Invalid FEN:', fen);
-        return Board.empty(this.rules);
-      },
+      _ => Board.empty(this.rules), // @Note: chessground.getFen() might be slow to update its FEN (slower than this.variantKey is updated).
     );
 
     return {
