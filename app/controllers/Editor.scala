@@ -27,19 +27,13 @@ final class Editor(env: Env) extends LilaController(env) {
 
   def load(urlFen: String, urlVariant: Option[String] = None) =
     Open { implicit ctx =>
-      val fenStr = lila.common.String
-        .decodeUriPath(urlFen)
-        .map(_.replace('_', ' ').trim)
-        .filter(_.nonEmpty)
-        .orElse(get("fen"))
-      val variant = Variant.orDefault(urlVariant.getOrElse(""))
       fuccess {
-        val situation = readFen(fenStr, variant)
+        val situation = readFen(urlFen, urlVariant)
         Ok(
           html.board.editor(
             sit = situation,
             fen = Forsyth.>>(situation.board.variant.gameLogic, situation),
-            variant = variant,
+            variant = situation.board.variant,
             positionsJson
           )
         )
@@ -50,8 +44,8 @@ final class Editor(env: Env) extends LilaController(env) {
     Open { implicit ctx =>
       fuccess {
         val situation = readFen(
-          get("fen"),
-          Variant.orDefault(get("variant").getOrElse(""))
+          get("fen").getOrElse(""),
+          get("variant")
         )
         JsonOk(
           html.board.bits.jsData(
@@ -63,13 +57,59 @@ final class Editor(env: Env) extends LilaController(env) {
       }
     }
 
-  private def readFen(fen: Option[String], variant: strategygames.variant.Variant): Situation =
-    fen
+  private def readFen(urlFen: String, urlVariant: Option[String]): Situation = {
+    // Several cases to handle:
+    // 1. /editor : urlVariant is None, urlFen is empty
+    //  - /editor/chess/rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR_w_KQkq_-_0_1
+    // 2/ /editor/variant : urlVariant is None, urlFen is "variant"
+    //  - /editor/variant/initial/fen/of/the/variant
+    // 3/ /editor/notAnExistingVariant
+    //  - /editor/chess/initial/fen/of/chess
+    // 4. /editor/rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR_w_KQkq_-_0_1
+    //  - rnbqkbnr is not a correct variant name, use /editor/chess/rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR_w_KQkq_-_0_1
+    // 5. /editor/variant/some/fen
+    //  - /editor/variant/some/fen
+    // 6. /editor/variant/somethingThatIsNotAFen
+    //  - /editor/variant/initial/fen/of/the/variant
+
+      if (!urlVariant.isDefined) {
+        if(urlFen.trim.isEmpty) { // 1
+          return Situation(GameLogic.Chess(), Variant.default(GameLogic.Chess()))
+        }
+
+        Variant.apply(urlFen) match { // 2 & 3
+          case Some(variant) =>
+            return Situation(variant.gameLogic, variant)
+          case None =>
+            return Situation(GameLogic.Chess(), Variant.default(GameLogic.Chess()))
+        }
+      }
+
+      // /editor/some/fen & /editor/notAVariantKey/some/fen
+      // use chess/some/fen or chess/notAVariantKey/some/fen for backward compatibility
+      var fenStr = lila.common.String
+        .decodeUriPath(urlFen)
+        .map(_.replace('_', ' ').trim)
+        .filter(_.nonEmpty)
+
+      val variant = urlVariant.map(v => if (v == "chess") "standard" else v).flatMap(Variant.apply) match {
+        case Some(v) => v
+        case None => { // 4
+          fenStr = lila.common.String
+            .decodeUriPath(urlVariant.getOrElse("") + "/" + urlFen)
+            .map(_.replace('_', ' ').trim)
+            .filter(_.nonEmpty)
+          Variant.default(GameLogic.Chess())
+        }
+      }
+
+    fenStr
       .map(_.trim)
       .filter(_.nonEmpty)
       .map(s => FEN.clean(variant.gameLogic, s))
       .flatMap(f => Forsyth.<<<@(variant.gameLogic, variant, f))
-      .map(_.situation) | Situation(variant.gameLogic, variant)
+      .map(_.situation) | Situation(variant.gameLogic, variant) // 5 & 6
+  }
 
   def game(id: String) =
     Open { implicit ctx =>
