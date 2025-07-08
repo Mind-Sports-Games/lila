@@ -71,7 +71,7 @@ function isChessRules(variantKey: VariantKey): boolean {
 }
 
 function canOpenStudy(legalFen: string, variantKey: VariantKey): boolean {
-  return legalFen && isChessRules(variantKey);
+  return legalFen && isChessRules(variantKey) && variantKey !== 'monster';
 }
 
 function variant2option(key: VariantKey, name: string, ctrl: EditorCtrl): VNode {
