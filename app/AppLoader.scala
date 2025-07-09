@@ -155,6 +155,7 @@ final class LilaComponents(ctx: ApplicationLoader.Context) extends BuiltInCompon
   lazy val user: User                     = wire[User]
   lazy val userAnalysis: UserAnalysis     = wire[UserAnalysis]
   lazy val userTournament: UserTournament = wire[UserTournament]
+  lazy val variants: Variants             = wire[Variants]
   lazy val video: Video                   = wire[Video]
   lazy val dgt: DgtCtrl                   = wire[DgtCtrl]
   lazy val storm: Storm                   = wire[Storm]

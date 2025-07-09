@@ -1,0 +1,14 @@
+.variants-all {
+  display: flex;
+  flex-flow: column;
+  width: 100%;
+  max-width: 700px;
+  align-items: center;
+  margin: 0 auto;
+  background-color: $c-bg-box;
+
+  .variants-title {
+    font-weight: bold;
+    margin: 3vh 0;
+  }
+}
