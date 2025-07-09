@@ -313,11 +313,12 @@ export default class Setup {
               $backgammonConfig.val() !== undefined &&
               ($backgammonPointsInput.val() as string) != '1'),
           cantBeLobby =
-            variantId[0] == '9' &&
-            $goConfig.val() !== undefined &&
-            (($goHandicapInput.val() as string) != '0' ||
-              (variantId[1] !== '1' && ($goKomiInput.val() as string) != '75') ||
-              (variantId[1] == '1' && ($goKomiInput.val() as string) != '55')),
+            (variantId[0] == '9' &&
+              $goConfig.val() !== undefined &&
+              (($goHandicapInput.val() as string) != '0' ||
+                (variantId[1] !== '1' && ($goKomiInput.val() as string) != '75') ||
+                (variantId[1] == '1' && ($goKomiInput.val() as string) != '55'))) ||
+            variantFull === '0_3',
           cantBeBot = !isRealTime();
         if (cantBeRated && rated) {
           $casual.trigger('click');
@@ -326,6 +327,9 @@ export default class Setup {
         if ((cantBeLobby && opponentType === 'lobby') || (cantBeBot && opponentType === 'bot')) {
           const $friend = $opponentInput.eq(1);
           $friend.trigger('click');
+          $form.find('.opponent_lobby.choice').hide();
+          $form.find('.opponent_bot.choice').hide();
+          $form.find('.opponent_friend.choice').show();
           return toggleButtons();
         }
         $rated.prop('disabled', !!cantBeRated).siblings('label').toggleClass('disabled', cantBeRated);
@@ -1162,17 +1166,9 @@ export default class Setup {
     }, 200);
     $fenInput.on('keyup', validateFen);
     if (forceFromPosition) {
-      switch (($variantInput.filter(':checked').val() as string).split('_')[0]) {
-        case '0':
-          $variantInput.val('0_3');
-          break;
-        case '1':
-          $variantInput.val('1_3');
-          break;
-        default:
-          $variantInput.val('0_3');
-          $gameGroupInput.val('0');
-      }
+      //force chess until support for other variants
+      $variantInput.val('0_3');
+      $gameGroupInput.val('0');
       $opponentInput.val('friend');
     }
     $form.find('optgroup').each((_, optgroup: HTMLElement) => {
