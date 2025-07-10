@@ -7,8 +7,73 @@
   margin: 0 auto;
   background-color: $c-bg-box;
 
+  ::before {
+    font-size: 2.2em;
+  }
+
   .variants-title {
     font-weight: bold;
-    margin: 3vh 0;
+    width: 100%;
+    text-align: center;
+    padding: 0.5em;
+    margin: 0;
+  }
+
+  .section-title {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    padding: 1em 0;
+  }
+
+  .gamegroup-choice {
+    border-bottom: $border;
+    background: $c-bg-zebra;
+    border-top: $border;
+    padding: 0em 1em;
+    width: 100%;
+  }
+
+  .variants-choice {
+    padding: 0em 1em;
+    width: 100%;
+  }
+
+  .gamegroup-icons,
+  .variants-icons {
+    display: flex;
+    flex-flow: row wrap;
+    margin: 0 auto 1em auto;
+    width: 100%;
+    overflow: hidden;
+    border-radius: 3px;
+    box-shadow:
+      0 2px 2px 0 rgba(0, 0, 0, 0.14),
+      0 3px 1px -2px rgba(0, 0, 0, 0.2),
+      0 1px 5px 0 rgba(0, 0, 0, 0.12);
+
+    .gamegroup,
+    .variant {
+      height: 64px;
+      display: flex;
+      flex-flow: column;
+      padding: 2px;
+      justify-content: center;
+      flex: 0 0 25%;
+      max-width: 25%;
+      border-right: 1px solid $c-border;
+      border-left: none;
+      border-top: none;
+      border-bottom: none;
+
+      &:not(.selected):not(:hover) {
+        @include metal;
+      }
+
+      &.button.button-color-choice {
+        text-transform: initial;
+      }
+    }
   }
 }

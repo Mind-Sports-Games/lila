@@ -59,7 +59,8 @@
       "src/publicChats.ts",
       "src/contact.ts",
       "src/coordinate.ts",
-      "src/memory.ts"
+      "src/memory.ts",
+      "src/variantsHome.ts"
     ],
     "sync": {
       "../../node_modules/chessground/dist/chessground.min.js": "public/npm",
