@@ -137,7 +137,7 @@ export default class Setup {
     const defaultClockConfig = {
       bullet: { timemode: '1', initial: '1', increment: '0' },
       blitz: { timemode: '1', initial: '3', increment: '2' },
-      rapid: { timemode: '1', initial: '5', increment: '5' },
+      rapid: { timemode: '1', initial: '10', increment: '5' },
       classical: { timemode: '1', initial: '20', increment: '10' },
       correspondence: { timemode: '2', days: '2' },
       custom: { timemode: '6' },
@@ -146,32 +146,49 @@ export default class Setup {
       case '3_5': //mini-shogi
       case '3_1': //shogi
         return Object.assign({}, defaultClockConfig, {
-          bullet: { timemode: '3', byoyomi: '10', periods: '1', increment: '0', initial: '1' },
-          blitz: { timemode: '3', byoyomi: '10', periods: '1', increment: '0', initial: '3' },
-          rapid: { timemode: '3', byoyomi: '10', periods: '1', increment: '0', initial: '5' },
-          classical: { timemode: '3', byoyomi: '20', periods: '2', increment: '0', initial: '20' },
+          bullet: { timemode: '3', byoyomi: '10', periods: '1', increment: '0', initial: '0' },
+          blitz: { timemode: '3', byoyomi: '10', periods: '1', increment: '0', initial: '5' },
+          rapid: { timemode: '3', byoyomi: '15', periods: '1', increment: '0', initial: '10' },
+          classical: { timemode: '3', byoyomi: '30', periods: '1', increment: '0', initial: '15' },
+        });
+      case '5_6': // othello
+      case '5_7': // grand othello
+        return Object.assign({}, defaultClockConfig, {
+          bullet: { timemode: '1', initial: '2', increment: '0' },
+          blitz: { timemode: '1', initial: '5', increment: '0' },
+          rapid: { timemode: '1', initial: '15', increment: '0' },
+          classical: { timemode: '1', initial: '20', increment: '10' },
+        });
+      case '6_1': // oware
+      case '7_1': // togyzkumalak
+      case '7_2': // bestemshe
+        return Object.assign({}, defaultClockConfig, {
+          bullet: { timemode: '1', initial: '1', increment: '1' },
+          blitz: { timemode: '1', initial: '3', increment: '2' },
+          rapid: { timemode: '1', initial: '7', increment: '3' },
+          classical: { timemode: '1', initial: '20', increment: '10' },
         });
       case '9_1': //go9x9
       case '9_2': //go13x13
       case '9_4': //go19x19
         return Object.assign({}, defaultClockConfig, {
-          bullet: { timemode: '3', byoyomi: '5', periods: '1', increment: '0', initial: '5' },
-          blitz: { timemode: '3', byoyomi: '10', periods: '1', increment: '0', initial: '10' },
-          rapid: { timemode: '3', byoyomi: '15', periods: '1', increment: '0', initial: '15' },
-          classical: { timemode: '3', byoyomi: '30', periods: '1', increment: '0', initial: '60' },
+          bullet: { timemode: '3', byoyomi: '5', periods: '1', increment: '0', initial: '1' },
+          blitz: { timemode: '3', byoyomi: '10', periods: '5', increment: '0', initial: '2' },
+          rapid: { timemode: '3', byoyomi: '30', periods: '3', increment: '0', initial: '10' },
+          classical: { timemode: '3', byoyomi: '60', periods: '1', increment: '0', initial: '40' },
         });
       case '10_1': //backgammon
       case '10_2': //nackgammon
       case '10_4': //hyper
         return Object.assign({}, defaultClockConfig, {
-          bullet: { timemode: '5', increment: '3', initial: '3' },
-          blitz: { timemode: '5', increment: '6', initial: '3' },
-          rapid: { timemode: '5', increment: '12', initial: '3' },
-          classical: { timemode: '5', increment: '12', initial: '5' },
+          bullet: { timemode: '5', increment: '5', initial: '1' },
+          blitz: { timemode: '5', increment: '10', initial: '1.5' },
+          rapid: { timemode: '5', increment: '12', initial: '2' },
+          classical: { timemode: '5', increment: '15', initial: '3' },
         });
       case '12_1': // abalone
         return Object.assign({}, defaultClockConfig, {
-          bullet: { timemode: '1', initial: '2', increment: '0' },
+          bullet: { timemode: '1', initial: '2', increment: '1' },
           blitz: { timemode: '1', initial: '5', increment: '3' },
           rapid: { timemode: '1', initial: '10', increment: '5' },
           classical: { timemode: '1', initial: '20', increment: '10' },
@@ -302,6 +319,7 @@ export default class Setup {
             (limit < 0.5 && inc == 0) ||
             (limit == 0 && inc < 2) ||
             (playerIndex !== 'random' && randomPlayerIndexVariants.includes(variantFull)) ||
+            variantFull === '0_3' ||
             (vsPSBot && botUser === 'ps-random-mover') ||
             (variantId[0] == '9' &&
               $goConfig.val() !== undefined &&
@@ -322,6 +340,8 @@ export default class Setup {
           cantBeBot = !isRealTime();
         if (cantBeRated && rated) {
           $casual.trigger('click');
+          $form.find('.mode_0.choice').show();
+          $form.find('.mode_1.choice').hide();
           return toggleButtons();
         }
         if ((cantBeLobby && opponentType === 'lobby') || (cantBeBot && opponentType === 'bot')) {
@@ -1122,6 +1142,23 @@ export default class Setup {
           case 'custom': //custom - i.e. used old time setup options
             if ($(this).hasClass('active')) {
               $form.find('.time_mode_config').show();
+              // Update text and range to show current form settings
+              $timeInput.siblings('span').text($timeInput.val() as string);
+              $incrementInput.siblings('span').text($incrementInput.val() as string);
+              $byoyomiInput.siblings('span').text($byoyomiInput.val() as string);
+              $periodsInput.siblings('span').text($periodsInput.filter(':checked').val() as string);
+              $daysInput.siblings('span').text($daysInput.val() as string);
+              // After updating the input and span values:
+              [
+                { input: $timeInput, slider: self.sliderTime, max: 38 },
+                { input: $incrementInput, slider: self.sliderIncrement, max: 100 },
+                { input: $byoyomiInput, slider: self.sliderIncrement, max: 20 },
+                { input: $daysInput, slider: self.sliderDays, max: 20 },
+              ].forEach(({ input, slider, max }) => {
+                const val = parseFloat(input.val() as string);
+                const $range = input.parent().find('.range');
+                $range.val('' + self.sliderInitVal(val, slider, max));
+              });
             } else {
               $form.find('.time_mode_config').hide();
             }
@@ -1214,6 +1251,8 @@ export default class Setup {
         // Set default Go komi and handicap for lobby-legal games
         if (variantId[0] == '9') {
           $goHandicapInput.val('0');
+          $goHandicapInput.siblings('span').text('0');
+          $goHandicapInput.siblings('.range').val('' + self.sliderInitVal(0, self.sliderHandicap, 26));
           if (variantId[1] == '1') {
             $goKomiInput.val('55'); // 5.5 for go9x9
           } else {
@@ -1226,6 +1265,8 @@ export default class Setup {
         //$backgammonConfig.toggle(variantId[0] == '10');
         if (isFen) {
           $casual.trigger('click');
+          $form.find('.mode_0.choice').show();
+          $form.find('.mode_1.choice').hide();
           validateFen();
           requestAnimationFrame(() => document.body.dispatchEvent(new Event(ground)));
         }
