@@ -16,7 +16,7 @@ private object bits {
       ctx: Context
   ) = {
     val url = field.value.fold(routes.Editor.index.url) { fen =>
-      routes.Editor.load(fen, None).url
+      routes.Editor.load(fen).url
     }
     div(cls := "fen_position optional_config")(
       frag(
@@ -25,9 +25,9 @@ private object bits {
           dataValidateUrl := s"""${routes.Setup.validateFen}${strict.??("?strict=1")}"""
         )(
           form3.input(field)(st.placeholder := trans.pasteTheFenStringHere.txt()),
-          a(cls := "button button-empty", dataIcon := "m", title := trans.boardEditor.txt(), href := url)
+          a(cls := "button button-empty board_editor_link", dataIcon := "m", title := trans.boardEditor.txt(), href := url)
         ),
-        a(cls := "board_editor", href := url)(
+        a(cls := "board_editor board_editor_link", href := url)(
           span(cls := "preview")(
             validFen.map { vf =>
               views.html.board.bits.mini(vf.fen, vf.playerIndex, vf.situation.board.variant.key)(div)

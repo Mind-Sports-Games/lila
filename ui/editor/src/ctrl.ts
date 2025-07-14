@@ -150,15 +150,11 @@ export default class EditorCtrl {
     if (!this.cfg.embed) {
       this.replaceState(
         { rules: this.rules, variantKey: this.variantKey, fen },
-        this.makeUrl('/editor/' + this.formatVariantForUrl() + '/', fen),
+        this.makeUrl('/editor/', fen),
       );
     }
     this.options.onChange && this.options.onChange(fen);
     this.redraw();
-  }
-
-  formatVariantForUrl(): string {
-    return this.variantKey === 'standard' ? 'chess' : this.variantKey;
   }
 
   getState(): EditorState {
@@ -174,12 +170,11 @@ export default class EditorCtrl {
   }
 
   makeAnalysisUrl(legalFen: string): string {
-    const variant = this.rules === 'chess' ? '' : this.variantKey + '/';
-    return replacePocketsInFen(this.makeUrl(`/analysis/${variant}`, legalFen));
+    return `/analysis/${this.variantKey}/` + encodeURIComponent(replacePocketsInFen(legalFen)).replace(/%20/g, '_').replace(/%2F/g, '/');
   }
 
   makeUrl(baseUrl: string, fen: string): string {
-    return baseUrl + encodeURIComponent(fen).replace(/%20/g, '_').replace(/%2F/g, '/');
+    return baseUrl + encodeURIComponent(fen).replace(/%20/g, '_').replace(/%2F/g, '/') + `${this.variantKey === 'standard' ? '' : '?variant=' + this.variantKey}`;
   }
 
   bottomPlayerIndex(): PlayerIndex {

@@ -5,6 +5,7 @@ import strategygames.format.{ FEN, Forsyth }
 import strategygames.{ GameLogic, Situation }
 import play.api.libs.json._
 import views._
+import strategygames.chess.format.{ Forsyth => ChessForsyth }
 
 import lila.app._
 import lila.common.Json._
@@ -23,15 +24,13 @@ final class Editor(env: Env) extends LilaController(env) {
 
   def index = load("")
 
-  def loadFenWithVariant(urlFen: String, urlVariant: String) = load(urlFen, Some(urlVariant))
-
-  def load(urlFen: String, urlVariant: Option[String] = None) =
+  def load(urlFen: String) =
     Open { implicit ctx =>
+      val urlVariant: Option[String] = ctx.req.getQueryString("variant")
       val fenStr = lila.common.String
         .decodeUriPath(urlFen)
         .map(_.replace('_', ' ').trim)
         .filter(_.nonEmpty)
-        .orElse(get("fen"))
       val variant = Variant.orDefault(urlVariant.getOrElse(""))
       fuccess {
         val situation = readFen(fenStr, variant)
@@ -46,6 +45,7 @@ final class Editor(env: Env) extends LilaController(env) {
       }
     }
 
+  // Study => Add a new chapter, "Editor" tab
   def data =
     Open { implicit ctx =>
       fuccess {
@@ -71,17 +71,22 @@ final class Editor(env: Env) extends LilaController(env) {
       .flatMap(f => Forsyth.<<<@(variant.gameLogic, variant, f))
       .map(_.situation) | Situation(variant.gameLogic, variant)
 
+  // If the game is not playable and the FEN is not passed, redirect to the editor based on the state after the last move.
   def game(id: String) =
     Open { implicit ctx =>
       OptionResult(env.game.gameRepo game id) { game =>
-        Redirect {
-          if (game.playable) routes.Round.watcher(game.id, game.variant.startPlayer.name)
-          else
-            routes.Editor.loadFenWithVariant(
-              get("fen") | (Forsyth.>>(game.variant.gameLogic, game.stratGame)).value,
-              game.variant.key
-            )
-        }
+        Redirect(
+          if (game.playable)
+            routes.Round.watcher(game.id, game.variant.startPlayer.name).url
+          else editorUrl(
+            get("fen").fold(Forsyth.>>(game.variant.gameLogic, game.stratGame))(fen => FEN(game.variant, fen)),
+            game.variant
+          )
+        )
       }
     }
+
+  private[controllers] def editorUrl(fen: FEN, variant: Variant): String =
+    if (fen.value == ChessForsyth.initial.value && variant.key == "standard") routes.Editor.index.url
+    else routes.Editor.load(fen.value).url + s"?variant=${variant.key}"
 }
