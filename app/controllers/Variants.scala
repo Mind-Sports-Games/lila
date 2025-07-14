@@ -8,7 +8,11 @@ final class Variants(env: Env) extends LilaController(env) {
 
   def home =
     Open { implicit ctx =>
-      Ok(views.html.site.variants.home).fuccess
+      {
+        env.game.cached.monthlyGames.flatMap { data =>
+          Ok(views.html.site.variants.home(data.filter(_._2 == "0_1"))).fuccess
+        }
+      }
     }
 
   def variant(key: String) =

@@ -572,4 +572,64 @@ final class GameRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionCont
     game.perfType ?? { pt =>
       coll.updateFieldUnchecked($id(game.id), F.perfType, pt.id)
     }
+
+  def countByMonthly: Fu[List[(String, String, Long)]] =
+    coll
+      .aggregateList(
+        maxDocs = 1000,
+        ReadPreference.secondaryPreferred
+      ) { framework =>
+        import framework._
+        Match(
+          $doc(
+            F.status -> $gte(30),
+            F.lib    -> $exists(true)
+          )
+        ) -> List(
+          Project(
+            $doc(
+              "ym" -> $doc(
+                "$dateToString" -> $doc(
+                  "format" -> "%Y-%m",
+                  "date"   -> s"$$${F.createdAt}"
+                )
+              ),
+              "lib_var" -> $doc(
+                "$concat" -> $arr(
+                  $doc("$toString" -> s"$$${F.lib}"),
+                  "_",
+                  $doc("$toString" -> $doc("$ifNull" -> $arr(s"$$${F.variant}", "1")))
+                )
+              )
+            )
+          ),
+          Group(
+            $doc(
+              "ym"      -> "$ym",
+              "lib_var" -> "$lib_var"
+            )
+          )("count" -> SumAll),
+          Project(
+            $doc(
+              "ym"      -> "$_id.ym",
+              "lib_var" -> "$_id.lib_var",
+              "count"   -> true
+            )
+          ),
+          Sort(
+            Descending("ym"),
+            Ascending("lib_var")
+          )
+        )
+      }
+      .map { docs =>
+        docs.flatMap { doc =>
+          for {
+            ym      <- doc.getAsOpt[String]("ym")
+            lib_var <- doc.getAsOpt[String]("lib_var")
+            count   <- doc.getAsOpt[Long]("count")
+          } yield (ym, lib_var, count)
+        }
+      }
+
 }

@@ -9,6 +9,7 @@ import lila.i18n.{ I18nKeys => trans, VariantKeys }
 import play.api.i18n.Lang
 
 import strategygames.variant.Variant
+import strategygames.GameLogic
 
 object variants {
 
@@ -38,7 +39,7 @@ object variants {
       )
     )
 
-  def home(implicit ctx: Context) =
+  def home(data: List[(String, String, Long)])(implicit ctx: Context) =
     views.html.base.layout(
       title = "Variants",
       moreCss = cssTag("variants"),
@@ -75,6 +76,30 @@ object variants {
               href := routes.Page.variant(variantKey(id)) //TODO routes.Variants.variant(variantKey(id))
             )(name))
           })
+        ),
+        div(cls := "data")(
+          table(cls := "variant-table")(
+            thead(
+              tr(
+                th("Year"),
+                th("Month"),
+                th("Variant"),
+                th("Count")
+              )
+            ),
+            tbody(
+              data.map { case (ym, lib_var, count) =>
+                val Array(year, month) = ym.split("-")
+                val Array(lib, varId)  = lib_var.split("_")
+                tr(
+                  td(year),
+                  td(month),
+                  td(Variant.orDefault(GameLogic(lib.toInt), varId.toInt).name),
+                  td(count.toString)
+                )
+              }
+            )
+          )
         )
       )
     )
