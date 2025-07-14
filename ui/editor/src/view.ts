@@ -51,13 +51,13 @@ function studyButton(ctrl: EditorCtrl, state: EditorState): VNode {
           attrs: {
             type: 'submit',
             'data-icon': '4',
-            disabled: !canOpenStudy(state.legalFen, ctrl.variantKey),
+            disabled: !state.legalFen,
           },
           class: {
             button: true,
             'button-empty': true,
             text: true,
-            disabled: !canOpenStudy(state.legalFen, ctrl.variantKey),
+            disabled: !state.legalFen,
           },
         },
         ctrl.trans.noarg('toStudy'),
@@ -68,10 +68,6 @@ function studyButton(ctrl: EditorCtrl, state: EditorState): VNode {
 
 function isChessRules(variantKey: VariantKey): boolean {
   return variantClassFromKey(variantKey).family == 'chess';
-}
-
-function canOpenStudy(legalFen: string, _variantKey: VariantKey): boolean {
-  return !!legalFen;
 }
 
 function variant2option(key: VariantKey, name: string, ctrl: EditorCtrl): VNode {
