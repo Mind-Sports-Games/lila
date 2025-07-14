@@ -148,10 +148,7 @@ export default class EditorCtrl {
     const fen = this.getFenFromSetup();
     this.standardInitialPosition = this.isVariantStandardInitialPosition();
     if (!this.cfg.embed) {
-      this.replaceState(
-        { rules: this.rules, variantKey: this.variantKey, fen },
-        this.makeUrl('/editor/', fen),
-      );
+      this.replaceState({ rules: this.rules, variantKey: this.variantKey, fen }, this.makeUrl('/editor/', fen));
     }
     this.options.onChange && this.options.onChange(fen);
     this.redraw();
@@ -170,11 +167,18 @@ export default class EditorCtrl {
   }
 
   makeAnalysisUrl(legalFen: string): string {
-    return `/analysis/${this.variantKey}/` + encodeURIComponent(replacePocketsInFen(legalFen)).replace(/%20/g, '_').replace(/%2F/g, '/');
+    return (
+      `/analysis/${this.variantKey}/` +
+      encodeURIComponent(replacePocketsInFen(legalFen)).replace(/%20/g, '_').replace(/%2F/g, '/')
+    );
   }
 
   makeUrl(baseUrl: string, fen: string): string {
-    return baseUrl + encodeURIComponent(fen).replace(/%20/g, '_').replace(/%2F/g, '/') + `${this.variantKey === 'standard' ? '' : '?variant=' + this.variantKey}`;
+    return (
+      baseUrl +
+      encodeURIComponent(fen).replace(/%20/g, '_').replace(/%2F/g, '/') +
+      `${this.variantKey === 'standard' ? '' : '?variant=' + this.variantKey}`
+    );
   }
 
   bottomPlayerIndex(): PlayerIndex {
