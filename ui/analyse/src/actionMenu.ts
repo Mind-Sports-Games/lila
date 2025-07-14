@@ -187,7 +187,7 @@ export function view(ctrl: AnalyseCtrl): VNode {
               'a.button.button-empty',
               {
                 attrs: {
-                  href: `/editor/${d.game.variant.key}/${replacePocketsInFen(ctrl.node.fen)}`,
+                  href: `/editor/${replacePocketsInFen(ctrl.node.fen)}?variant=${d.game.variant.key}`,
                   'data-icon': 'm',
                   ...(ctrl.embed
                     ? {

@@ -1187,11 +1187,12 @@ export default class Setup {
           data => {
             $fenInput.addClass('success');
             $fenPosition.find('.preview').html(data);
-            $fenPosition.find('a.board_editor').each(function (this: HTMLAnchorElement) {
-              this.href = this.href.replace(/editor\/.+$/, 'editor/' + fen);
+            $fenPosition.find('a.board_editor_link').each(function (this: HTMLAnchorElement) {
+              this.href = this.href.replace(/editor(\/.+)?$/, 'editor/' + fen);
             });
             toggleButtons();
             playstrategy.contentLoaded();
+            save();
           },
           _ => {
             $fenInput.addClass('failure');

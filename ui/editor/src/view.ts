@@ -43,7 +43,7 @@ function studyButton(ctrl: EditorCtrl, state: EditorState): VNode {
     },
     [
       h('input', { attrs: { type: 'hidden', name: 'orientation', value: ctrl.bottomPlayerIndex() } }),
-      h('input', { attrs: { type: 'hidden', name: 'variant', value: ctrl.rules } }),
+      h('input', { attrs: { type: 'hidden', name: 'variant', value: ctrl.variantKey } }),
       h('input', { attrs: { type: 'hidden', name: 'fen', value: state.legalFen || '' } }),
       h(
         'button',
@@ -51,13 +51,13 @@ function studyButton(ctrl: EditorCtrl, state: EditorState): VNode {
           attrs: {
             type: 'submit',
             'data-icon': '4',
-            disabled: !canOpenStudy(state.legalFen, ctrl.variantKey),
+            disabled: !state.legalFen,
           },
           class: {
             button: true,
             'button-empty': true,
             text: true,
-            disabled: !canOpenStudy(state.legalFen, ctrl.variantKey),
+            disabled: !state.legalFen,
           },
         },
         ctrl.trans.noarg('toStudy'),
@@ -68,10 +68,6 @@ function studyButton(ctrl: EditorCtrl, state: EditorState): VNode {
 
 function isChessRules(variantKey: VariantKey): boolean {
   return variantClassFromKey(variantKey).family == 'chess';
-}
-
-function canOpenStudy(legalFen: string, variantKey: VariantKey): boolean {
-  return legalFen && isChessRules(variantKey);
 }
 
 function variant2option(key: VariantKey, name: string, ctrl: EditorCtrl): VNode {
@@ -325,7 +321,7 @@ function inputs(ctrl: EditorCtrl, fen: string): VNode | undefined {
         attrs: {
           readonly: true,
           spellcheck: false,
-          value: ctrl.makeUrl(ctrl.cfg.baseUrl + ctrl.formatVariantForUrl() + '/', fen),
+          value: ctrl.makeUrl(ctrl.cfg.baseUrl, fen),
         },
       }),
     ]),
@@ -350,22 +346,22 @@ function sparePieces(
   let pieces = ['k-piece', 'q-piece', 'r-piece', 'b-piece', 'n-piece', 'p-piece'].map(function (role) {
     return [playerIndex, role];
   });
-  if (['breakthrough', 'minibreakthrough', 'flipello', 'flipello10'].includes(ctrl.rules)) {
+  if (['breakthroughtroyka', 'minibreakthroughtroyka', 'flipello', 'flipello10'].includes(ctrl.variantKey)) {
     pieces = ['p-piece'].map(function (role) {
       return [playerIndex, role];
     });
   }
-  if (['linesofaction', 'scrambledeggs'].includes(ctrl.rules)) {
+  if (['linesOfAction', 'scrambledEggs'].includes(ctrl.variantKey)) {
     pieces = ['l-piece'].map(function (role) {
       return [playerIndex, role];
     });
   }
-  if (['xiangqi'].includes(ctrl.rules)) {
+  if (['xiangqi'].includes(ctrl.variantKey)) {
     pieces = ['k-piece', 'a-piece', 'c-piece', 'r-piece', 'b-piece', 'n-piece', 'p-piece'].map(function (role) {
       return [playerIndex, role];
     });
   }
-  if (['minixiangqi'].includes(ctrl.rules)) {
+  if (['miniXiangqi'].includes(ctrl.variantKey)) {
     pieces = ['k-piece', 'c-piece', 'r-piece', 'n-piece', 'p-piece'].map(function (role) {
       return [playerIndex, role];
     });
