@@ -43,6 +43,7 @@ interface PlayStrategy {
   announce(d: PlayStrategyAnnouncement): void;
   studyTour(study: Study): void;
   studyTourChapter(study: Study): void;
+  libraryChart?: (data: any, allowedVariants?: string[]) => void;
 
   trans(i18n: I18nDict): Trans;
   quantity(n: number): 'zero' | 'one' | 'few' | 'many' | 'other';
@@ -247,6 +248,7 @@ interface Window {
   Mousetrap: any;
   Chessground: any;
   Highcharts: Highcharts.Static;
+  libraryChartData?: any;
   InfiniteScroll(selector: string): void;
   playstrategyReplayMusic: () => {
     jump(node: Tree.Node): void;

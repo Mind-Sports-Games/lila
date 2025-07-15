@@ -3,6 +3,12 @@ playstrategy.load.then(() => {
     const $gamegroups = $('button.gamegroup');
     const $variants = $('button.variant');
 
+    function updateLibraryChart(allowedVariants: string[]) {
+      if (window.playstrategy && window.playstrategy.libraryChart && window.libraryChartData) {
+        playstrategy.libraryChart(window.libraryChartData, allowedVariants);
+      }
+    }
+
     $gamegroups.on('click', function (this: HTMLElement) {
       $gamegroups.removeClass('button button-color-choice selected');
       $(this).addClass('button button-color-choice selected');
@@ -22,6 +28,9 @@ playstrategy.load.then(() => {
       });
       $(toShow).show().removeAttr('style'); //remove unwated display: block added by show()
       $(toHide).hide();
+
+      const allowedVariants = toShow.map(el => $(el).val() as string);
+      updateLibraryChart(allowedVariants);
     });
 
     $variants.on('click', function (this: HTMLElement, e) {

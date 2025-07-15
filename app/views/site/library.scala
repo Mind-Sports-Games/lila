@@ -1,10 +1,13 @@
 package views
 package html.site
 
+import play.api.libs.json.Json
+
 import controllers.routes
 import lila.api.Context
 import lila.app.templating.Environment._
 import lila.app.ui.ScalatagsTemplate._
+import lila.common.String.html.safeJsonValue
 import lila.i18n.{ I18nKeys => trans, VariantKeys }
 import play.api.i18n.Lang
 
@@ -14,12 +17,27 @@ import strategygames.GameLogic
 object library {
 
   def show(
-      variant: Variant
+      variant: Variant,
+      data: List[(String, String, Long)]
   )(implicit ctx: Context) =
     views.html.base.layout(
       title = s"${VariantKeys.variantName(variant)} • ${VariantKeys.variantTitle(variant)}",
       moreCss = cssTag("library"),
-      //moreJs = jsModule("library"),
+      moreJs = frag(
+        //jsModule("library"),
+        jsTag("chart/library.js"),
+        embedJsUnsafeLoadThen(s"""playstrategy.libraryChart(${safeJsonValue(
+          Json.obj(
+            "freq" -> transformData(data).filter(_._2 == s"${variant.gameFamily.id}_${variant.id}"),
+            "i18n" -> i18nJsObject(i18nKeys),
+            "variantNames" -> Json.obj(
+              Variant.all.map(v =>
+                s"${v.gameFamily.id}_${v.id}" -> Json.toJsFieldJsValueWrapper(VariantKeys.variantName(v))
+              ): _*
+            )
+          )
+        )})""")
+      ),
       openGraph = lila.app.ui
         .OpenGraph(
           title = "Library of Games",
@@ -35,7 +53,8 @@ object library {
       )(
         h1(cls := "library-title color-choice", dataIcon := variant.perfIcon)(
           s"${VariantKeys.variantName(variant)}"
-        )
+        ),
+        div(id := "library_chart")(spinner)
       )
     )
 
@@ -43,7 +62,22 @@ object library {
     views.html.base.layout(
       title = "Library of Games",
       moreCss = cssTag("library"),
-      moreJs = jsModule("libraryHome"),
+      moreJs = frag(
+        jsModule("libraryHome"),
+        jsTag("chart/library.js"),
+        embedJsUnsafeLoadThen(s"""window.libraryChartData = ${safeJsonValue(
+          Json.obj(
+            "freq" -> transformData(data),
+            "i18n" -> i18nJsObject(i18nKeys),
+            "variantNames" -> Json.obj(
+              Variant.all.map(v =>
+                s"${v.gameFamily.id}_${v.id}" -> Json.toJsFieldJsValueWrapper(VariantKeys.variantName(v))
+              ): _*
+            )
+          )
+        )};"""),
+        embedJsUnsafeLoadThen(s"""playstrategy.libraryChart(window.libraryChartData)""")
+      ),
       openGraph = lila.app.ui
         .OpenGraph(
           title = "Library of Games",
@@ -77,31 +111,25 @@ object library {
             )(name))
           })
         ),
-        div(cls := "data")(
-          table(cls := "variant-table")(
-            thead(
-              tr(
-                th("Year"),
-                th("Month"),
-                th("Variant"),
-                th("Count")
-              )
-            ),
-            tbody(
-              data.map { case (ym, lib_var, count) =>
-                val Array(year, month) = ym.split("-")
-                val Array(lib, varId)  = lib_var.split("_")
-                tr(
-                  td(year),
-                  td(month),
-                  td(Variant.orDefault(GameLogic(lib.toInt), varId.toInt).name),
-                  td(count.toString)
-                )
-              }
-            )
-          )
-        )
+        div(id := "library_chart")(spinner)
       )
     )
 
+  private def transformData(data: List[(String, String, Long)]): List[(String, String, Long)] =
+    data.map { case (ym, lib_var, count) => (ym, getVaraintKey(lib_var), count) }
+
+  private def getVaraintKey(lib_var: String) =
+    lib_var.split('_') match {
+      case Array(lib, id) => {
+        val variant = Variant.orDefault(GameLogic(lib.toInt), id.toInt)
+        s"${variant.gameFamily.id}_${variant.id}"
+      }
+      case _ => "0_1" //standard chess
+    }
+
+  private val i18nKeys =
+    List(
+      trans.players,
+      trans.cumulative
+    ).map(_.key)
 }

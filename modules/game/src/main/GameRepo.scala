@@ -617,7 +617,7 @@ final class GameRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionCont
             )
           ),
           Sort(
-            Descending("ym"),
+            Ascending("ym"),
             Ascending("lib_var")
           )
         )
