@@ -11,29 +11,29 @@ import play.api.i18n.Lang
 import strategygames.variant.Variant
 import strategygames.GameLogic
 
-object variants {
+object library {
 
   def show(
       variant: Variant
   )(implicit ctx: Context) =
     views.html.base.layout(
       title = s"${VariantKeys.variantName(variant)} • ${VariantKeys.variantTitle(variant)}",
-      moreCss = cssTag("variants"),
-      //moreJs = jsModule("variants"),
+      moreCss = cssTag("library"),
+      //moreJs = jsModule("library"),
       openGraph = lila.app.ui
         .OpenGraph(
-          title = "Variants",
-          url = s"$netBaseUrl${routes.Variants.home.url}",
+          title = "Library of Games",
+          url = s"$netBaseUrl${routes.Library.home.url}",
           description = s"Play ${VariantKeys.variantTitle(variant)} on PlayStrategy."
         )
         .some,
       zoomable = true
     )(
       main(
-        id := "variants-section",
-        cls := "variants-all"
+        id := "library-section",
+        cls := "library-all"
       )(
-        h1(cls := "variants-title color-choice", dataIcon := variant.perfIcon)(
+        h1(cls := "library-title color-choice", dataIcon := variant.perfIcon)(
           s"${VariantKeys.variantName(variant)}"
         )
       )
@@ -41,23 +41,23 @@ object variants {
 
   def home(data: List[(String, String, Long)])(implicit ctx: Context) =
     views.html.base.layout(
-      title = "Variants",
-      moreCss = cssTag("variants"),
-      moreJs = jsModule("variantsHome"),
+      title = "Library of Games",
+      moreCss = cssTag("library"),
+      moreJs = jsModule("libraryHome"),
       openGraph = lila.app.ui
         .OpenGraph(
-          title = "Variants",
-          url = s"$netBaseUrl${routes.Variants.home.url}",
+          title = "Library of Games",
+          url = s"$netBaseUrl${routes.Library.home.url}",
           description = "Games you can play on PlayStrategy."
         )
         .some,
       zoomable = true
     )(
       main(
-        id := "variants-section",
-        cls := "variants-all"
+        id := "library-section",
+        cls := "library-all"
       )(
-        h1(cls := "variants-title color-choice")("Games"),
+        h1(cls := "library-title color-choice")("Library of Games"),
         div(cls := "gamegroup-choice")(
           div(cls := "section-title")("Game Group"),
           div(cls := "gamegroup-icons")(translatedGameGroupIconChoices map { case (id, icon, hint) =>
@@ -73,7 +73,7 @@ object variants {
               cls := "variant",
               dataIcon := icon,
               value := id,
-              href := routes.Page.variant(variantKey(id)) //TODO routes.Variants.variant(variantKey(id))
+              href := routes.Page.variant(variantKey(id)) //TODO routes.Library.variant(variantKey(id))
             )(name))
           })
         ),

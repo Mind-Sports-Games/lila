@@ -60,7 +60,7 @@
       "src/contact.ts",
       "src/coordinate.ts",
       "src/memory.ts",
-      "src/variantsHome.ts"
+      "src/libraryHome.ts"
     ],
     "sync": {
       "../../node_modules/chessground/dist/chessground.min.js": "public/npm",

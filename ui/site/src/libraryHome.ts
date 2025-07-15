@@ -1,5 +1,5 @@
 playstrategy.load.then(() => {
-  $('#variants-section').each(function (this: HTMLElement) {
+  $('#library-section').each(function (this: HTMLElement) {
     const $gamegroups = $('button.gamegroup');
     const $variants = $('button.variant');
 
