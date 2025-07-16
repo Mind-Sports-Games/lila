@@ -67,9 +67,9 @@ object TournamentMedleyUtil {
       "crazyhouse"             -> quick,
       "noCastling"             -> medium,
       "monster"                -> quick,
-      "linesOfAction"          -> fastest,
-      "scrambledEggs"          -> fastest,
-      "frisian"                -> medium,
+      "linesOfAction"          -> quick,
+      "scrambledEggs"          -> quick,
+      "frisian"                -> slow,
       "frysk"                  -> quick,
       "international"          -> slow,
       "antidraughts"           -> slow,
@@ -78,7 +78,7 @@ object TournamentMedleyUtil {
       "brazilian"              -> medium,
       "pool"                   -> medium,
       "portuguese"             -> medium,
-      "english"                -> medium,
+      "english"                -> slow,
       "shogi"                  -> slow,
       "xiangqi"                -> medium,
       "minishogi"              -> fastest,
@@ -95,8 +95,8 @@ object TournamentMedleyUtil {
       "go13x13"                -> slow,
       "go19x19"                -> slow,
       "backgammon"             -> medium,
-      "hyper"                  -> quick,
-      "nackgammon"             -> medium,
+      "hyper"                  -> fastest,
+      "nackgammon"             -> slow,
       "abalone"                -> slow
     )
   }
