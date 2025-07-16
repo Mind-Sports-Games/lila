@@ -69,12 +69,56 @@ playstrategy.libraryChart = function (data, allowedVariants) {
             verticalAlign: 'bottom',
             layout: 'horizontal',
           },
-          xAxis: {
-            categories: allMonths,
-            title: { text: trans.noarg('Year-Month') },
-            labels: { rotation: -45 },
-            gridLineWidth: 1,
-          },
+          xAxis: [
+            {
+              categories: allMonths,
+              title: { text: trans.noarg('Date'), y: 10 },
+              labels: {
+                useHTML: true,
+                rotation: -30,
+                formatter: function () {
+                  // this.value is 'yyyy-mm'
+                  var parts = this.value.split('-');
+                  var monthNum = parseInt(parts[1], 10);
+                  var months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+                  return months[monthNum - 1] || '';
+                },
+              },
+              gridLineWidth: 1,
+            },
+            {
+              categories: allMonths,
+              linkedTo: 0,
+              opposite: false,
+              tickPositions: (function () {
+                // Find the middle index for each year
+                var yearToIndexes = {};
+                allMonths.forEach(function (ym, i) {
+                  var year = ym.split('-')[0];
+                  if (!yearToIndexes[year]) yearToIndexes[year] = [];
+                  yearToIndexes[year].push(i);
+                });
+                return Object.values(yearToIndexes).map(function (arr) {
+                  return arr[Math.floor(arr.length / 2)];
+                });
+              })(),
+              labels: {
+                y: -10,
+                style: { color: '#888', fontSize: 'smaller', fontWeight: 'bold' },
+                formatter: function () {
+                  var year = this.value.split('-')[0];
+                  // Only show the year label at the tick positions
+                  return year;
+                },
+              },
+              tickLength: 0,
+              lineWidth: 0,
+              minorGridLineWidth: 0,
+              gridLineWidth: 0,
+              minorTickLength: 0,
+              title: null,
+            },
+          ],
           yAxis: {
             title: { text: trans.noarg('Total Games') },
             min: 1,
