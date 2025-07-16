@@ -10,7 +10,7 @@
   },
   "plugins": ["@typescript-eslint"],
   "extends": ["eslint:recommended", "plugin:@typescript-eslint/recommended"],
-  "ignorePatterns": ["pnpm-lock.yaml"],
+  "ignorePatterns": ["pnpm-lock.yaml", "**/dist/*"],
   "rules": {
     "linebreak-style": ["error", "unix"],
     "no-duplicate-imports": "error",
@@ -25,7 +25,6 @@
     "@typescript-eslint/no-unused-vars": ["warn", { "argsIgnorePattern": "^_" }],
     "@typescript-eslint/no-empty-interface": "off",
     "@typescript-eslint/explicit-module-boundary-types": "off",
-
     "no-var": "warn",
     "no-async-promise-executor": "warn"
   }

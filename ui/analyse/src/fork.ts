@@ -1,6 +1,5 @@
 import { h } from 'snabbdom';
 import { renderIndexAndMove } from './moveView';
-import { notationStyle } from 'stratutils';
 import { defined } from 'common';
 import { ConcealOf } from './interfaces';
 import { onInsert, parentedNode } from './util';
@@ -97,7 +96,6 @@ export function view(root: AnalyseCtrl, concealOf?: ConcealOf) {
               showGlyphs: root.showComputer(),
             },
             parentedNode(node, state.node),
-            notationStyle(root.data.game.variant.key),
           )!,
         );
       return undefined;

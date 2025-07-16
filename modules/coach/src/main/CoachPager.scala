@@ -61,10 +61,10 @@ object CoachPager {
   )
 
   object Order {
-    case object Login         extends Order("login", "Last login", $sort desc "user.seenAt")
+    case object Login              extends Order("login", "Last login", $sort desc "user.seenAt")
     case object PlayStrategyRating extends Order("rating", "PlayStrategy rating", $sort desc "user.rating")
-    case object NbReview      extends Order("review", "User reviews", $sort desc "nbReviews")
-    case object Alphabetical  extends Order("alphabetical", "Alphabetical", $sort asc "_id")
+    case object NbReview           extends Order("review", "User reviews", $sort desc "nbReviews")
+    case object Alphabetical       extends Order("alphabetical", "Alphabetical", $sort asc "_id")
 
     val default                   = Login
     val all                       = List(Login, PlayStrategyRating, NbReview, Alphabetical)

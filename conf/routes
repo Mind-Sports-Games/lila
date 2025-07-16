@@ -200,7 +200,8 @@ POST  /patron/switch                   controllers.Plan.switch
 POST  /patron/cancel                   controllers.Plan.cancel
 POST  /patron/webhook                  controllers.Plan.webhook
 POST  /patron/stripe/checkout          controllers.Plan.stripeCheckout
-POST  /patron/ipn                      controllers.Plan.payPalIpn
+POST  /patron/paypal/checkout          controllers.Plan.payPalCheckout
+POST  /patron/paypal/capture/:id       controllers.Plan.payPalCapture(id: String)
 POST  /patron/stripe/update-payment    controllers.Plan.updatePayment
 GET   /patron/stripe/update-payment    controllers.Plan.updatePaymentCallback
 GET   /features                        controllers.Plan.features
@@ -392,11 +393,8 @@ GET   /account/preferences/:categ             controllers.Pref.form(categ: Strin
 POST  /account/preferences                    controllers.Pref.formApply
 
 # Setup
-GET   /setup/ai                        controllers.Setup.aiForm
-POST  /setup/ai                        controllers.Setup.ai
-GET   /setup/friend                    controllers.Setup.friendForm(user: Option[String] ?= None)
-POST  /setup/friend                    controllers.Setup.friend(user: Option[String] ?= None)
-GET   /setup/hook                      controllers.Setup.hookForm
+GET   /setup/game                      controllers.Setup.gameForm(user: Option[String] ?= None)
+POST  /setup/game                      controllers.Setup.game(sri: String, user: Option[String] ?= None)
 POST  /setup/hook/:sri/like/:gameId    controllers.Setup.like(sri: String, gameId: String)
 POST  /setup/hook/:sri                 controllers.Setup.hook(sri: String)
 GET   /setup/filter                    controllers.Setup.filterForm
@@ -653,7 +651,6 @@ GET   /api/account/email               controllers.Account.apiEmail
 GET   /api/account/kid                 controllers.Account.apiKid
 POST  /api/account/kid                 controllers.Account.apiKidPost
 GET   /api/account/preferences         controllers.Pref.apiGet
-POST  /api/challenge/ai                controllers.Setup.apiAi
 POST  /api/challenge/open              controllers.Challenge.openCreate
 POST  /api/challenge/admin/:orig/:dest controllers.Challenge.apiCreateAdmin(orig: String, dest: String)
 POST  /api/challenge/:user             controllers.Challenge.apiCreate(user: String)

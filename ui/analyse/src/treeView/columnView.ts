@@ -1,7 +1,6 @@
 import { h, VNode } from 'snabbdom';
 import { isEmpty } from 'common';
-import { fixCrazySan, notationStyle } from 'stratutils';
-import { moveFromNotationStyle } from 'common/notation';
+import { fixCrazySan } from 'stratutils';
 import { path as treePath, ops as treeOps } from 'tree';
 import * as moveView from '../moveView';
 import { authorText as commentAuthorText } from '../study/studyComments';
@@ -19,6 +18,7 @@ import {
   Opts as BaseOpts,
 } from './treeView';
 import { enrichText, innerHTML, parentedNodes, parentedNode, fullTurnNodesFromNode } from '../util';
+import { variantClassFromKey } from 'stratops/variants/util';
 
 interface Ctx extends BaseCtx {
   concealOf: ConcealOf;
@@ -149,7 +149,7 @@ function renderMainlineFullMoveOf(ctx: Ctx, node: Tree.ParentedNode, opts: Opts)
     moveView.renderFullMove(
       { variant: ctx.ctrl.data.game.variant, ...ctx },
       node,
-      notationStyle(ctx.ctrl.data.game.variant.key),
+      variantClassFromKey(ctx.ctrl.data.game.variant.key).getNotationStyle(),
     ),
   );
 }
@@ -157,7 +157,7 @@ function renderMainlineFullMoveOf(ctx: Ctx, node: Tree.ParentedNode, opts: Opts)
 function renderVariationFullMoveOf(ctx: Ctx, node: Tree.ParentedNode, opts: Opts): VNode {
   const fullTurnNodes: Tree.ParentedNode[] = fullTurnNodesFromNode(node);
   const variant = ctx.ctrl.data.game.variant;
-  const notation = notationStyle(variant.key);
+  const notation = variantClassFromKey(variant.key).getNotationStyle();
   const withIndex = opts.withIndex || node.playedPlayerIndex === 'p1',
     path = opts.parentPath + node.id,
     content: MaybeVNodes = [
@@ -165,15 +165,12 @@ function renderVariationFullMoveOf(ctx: Ctx, node: Tree.ParentedNode, opts: Opts
       // TODO: the || '' are probably not correct
       moveView.combinedNotationOfTurn(
         fullTurnNodes.map(n => {
-          return moveFromNotationStyle(notation)(
-            {
-              san: fixCrazySan(n.san || ''),
-              uci: n.uci || '',
-              fen: n.fen,
-              prevFen: n.parent?.fen || '',
-            },
-            variant,
-          );
+          return variantClassFromKey(variant.key).computeMoveNotation({
+            san: fixCrazySan(n.san || ''),
+            uci: n.uci || '',
+            fen: n.fen,
+            prevFen: n.parent?.fen || '',
+          });
         }),
         notation,
       ),
@@ -205,31 +202,23 @@ function renderMainlineMoveOf(ctx: Ctx, node: Tree.ParentedNode, opts: Opts): VN
       attrs: { p: path },
       class: classes,
     },
-    moveView.renderMove(
-      { variant: ctx.ctrl.data.game.variant, ...ctx },
-      node,
-      notationStyle(ctx.ctrl.data.game.variant.key),
-    ),
+    moveView.renderMove({ variant: ctx.ctrl.data.game.variant, ...ctx }, node),
   );
 }
 
 function renderVariationMoveOf(ctx: Ctx, node: Tree.ParentedNode, opts: Opts): VNode {
   const variant = ctx.ctrl.data.game.variant;
-  const notation = notationStyle(variant.key);
   const withIndex = opts.withIndex || node.playedPlayerIndex === 'p1',
     path = opts.parentPath + node.id,
     content: MaybeVNodes = [
       withIndex ? moveView.renderIndex(node, true) : null,
       // TODO: the || '' are probably not correct
-      moveFromNotationStyle(notation)(
-        {
-          san: fixCrazySan(node.san || ''),
-          uci: node.uci || '',
-          fen: node.fen,
-          prevFen: node.parent?.fen || '',
-        },
-        variant,
-      ),
+      variantClassFromKey(variant.key).computeMoveNotation({
+        san: fixCrazySan(node.san || ''),
+        uci: node.uci || '',
+        fen: node.fen,
+        prevFen: node.parent?.fen || '',
+      }),
     ],
     classes = nodeClasses(ctx, node, path);
   if (opts.conceal) classes[opts.conceal as string] = true;

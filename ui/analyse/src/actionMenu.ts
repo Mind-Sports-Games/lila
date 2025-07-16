@@ -1,13 +1,15 @@
 import { isEmpty } from 'common';
+import { canUseBoardEditor, replacePocketsInFen } from 'common/editor';
 import { h, VNode, Hooks } from 'snabbdom';
 import { MaybeVNodes } from './interfaces';
 import { AutoplayDelay } from './autoplay';
 import { boolSetting, BoolSetting } from './boolSetting';
 import AnalyseCtrl from './ctrl';
 import { cont as contRoute } from 'game/router';
-import { bind, dataIcon, allowClientEvalForVariant } from './util';
+import { bind, dataIcon } from './util';
 import * as pgnExport from './pgnExport';
 import { isChess } from 'common/analysis';
+import { allowedForVariant as allowClientEvalForVariant } from 'ceval/src/util';
 
 interface AutoplaySpeed {
   name: string;
@@ -180,14 +182,12 @@ export function view(ctrl: AnalyseCtrl): VNode {
       ),
       ctrl.ongoing
         ? null
-        : ceval.variant.lib === 0 //board editor for chess only games atm
+        : canUseBoardEditor(d.game.variant.key)
           ? h(
               'a.button.button-empty',
               {
                 attrs: {
-                  href: d.userAnalysis
-                    ? '/editor?fen=' + ctrl.node.fen
-                    : '/' + d.game.id + '/edit?fen=' + ctrl.node.fen,
+                  href: `/editor/${replacePocketsInFen(ctrl.node.fen)}?variant=${d.game.variant.key}`,
                   'data-icon': 'm',
                   ...(ctrl.embed
                     ? {
@@ -208,8 +208,8 @@ export function view(ctrl: AnalyseCtrl): VNode {
             {
               attrs: {
                 href: d.userAnalysis
-                  ? '/?fen=' + ctrl.encodeNodeFen() + '#friend'
-                  : contRoute(d, 'friend') + '?fen=' + ctrl.node.fen,
+                  ? '/?fen=' + ctrl.encodeNodeFen() + '#game'
+                  : contRoute(d, 'game') + '?fen=' + ctrl.node.fen,
                 rel: 'nofollow',
                 'data-icon': 'U',
               },

@@ -69,7 +69,7 @@ export function cancel(ctrl: AnalyseCtrl): void {
   }
 }
 
-function renderPromotion(
+function renderPromotionChoice(
   ctrl: AnalyseCtrl,
   dest: Key,
   roles: Role[],
@@ -140,5 +140,11 @@ export function view(ctrl: AnalyseCtrl): MaybeVNode {
           ? roles.concat('k-piece')
           : roles;
 
-  return renderPromotion(ctrl, promoting.dest, rolesToChoose, piece.playerIndex, ctrl.chessground.state.orientation);
+  return renderPromotionChoice(
+    ctrl,
+    promoting.dest,
+    rolesToChoose,
+    piece.playerIndex,
+    ctrl.chessground.state.orientation,
+  );
 }

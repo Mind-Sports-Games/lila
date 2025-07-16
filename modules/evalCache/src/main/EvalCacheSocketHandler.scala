@@ -21,7 +21,7 @@ final private class EvalCacheSocketHandler(
       push: JsObject => Unit
   ): Unit =
     for {
-      fen <- d str "fen" map{fen => FEN.apply(GameLogic(~d.int("lib")), fen)}
+      fen <- d str "fen" map { fen => FEN.apply(GameLogic(~d.int("lib")), fen) }
       variant = Variant.orDefault(GameLogic(~d.int("lib")), ~d.str("variant"))
       multiPv = (d int "mpv") | 1
       path <- d str "path"

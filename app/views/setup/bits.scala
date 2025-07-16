@@ -6,8 +6,7 @@ import play.api.data.{ Field, Form }
 import lila.api.Context
 import lila.app.templating.Environment._
 import lila.app.ui.ScalatagsTemplate._
-
-import strategygames.GameFamily
+import lila.user.User
 
 private object bits {
 
@@ -16,7 +15,9 @@ private object bits {
   def fenInput(field: Field, strict: Boolean, validFen: Option[lila.setup.ValidFen])(implicit
       ctx: Context
   ) = {
-    val url = field.value.fold(routes.Editor.index)(routes.Editor.load).url
+    val url = field.value.fold(routes.Editor.index.url) { fen =>
+      routes.Editor.load(fen).url
+    }
     div(cls := "fen_position optional_config")(
       frag(
         div(
@@ -24,9 +25,9 @@ private object bits {
           dataValidateUrl := s"""${routes.Setup.validateFen}${strict.??("?strict=1")}"""
         )(
           form3.input(field)(st.placeholder := trans.pasteTheFenStringHere.txt()),
-          a(cls := "button button-empty", dataIcon := "m", title := trans.boardEditor.txt(), href := url)
+          a(cls := "button button-empty board_editor_link", dataIcon := "m", title := trans.boardEditor.txt(), href := url)
         ),
-        a(cls := "board_editor", href := url)(
+        a(cls := "board_editor board_editor_link", href := url)(
           span(cls := "preview")(
             validFen.map { vf =>
               views.html.board.bits.mini(vf.fen, vf.playerIndex, vf.situation.board.variant.key)(div)
@@ -37,14 +38,50 @@ private object bits {
     )
   }
 
-  def renderGameFamily(form: Form[_], libs: List[SelectChoice])(implicit ctx: Context) =
-    div(cls := "gameFamily label_select")(
-      renderLabel(form("gameFamily"), "Game Family"),
-      renderSelect(
-        form("gameFamily"),
-        libs
+  def renderGameGroupOptions(form: Form[_], libs: List[SelectChoice])(implicit ctx: Context) =
+    div(cls := "gameGroup_choice buttons collapsible optional_config")(
+      div(cls := "section_title")("Game Group"),
+      div(id := "gameGroup_icons")(
+        renderIconRadios(form("gameGroup"), libs),
+        renderSelectedChoice(form("gameGroup"), libs)
       )
     )
+
+  def renderVariantOptions(form: Form[_], libs: List[SelectChoice])(implicit ctx: Context) =
+    div(cls := "variant_choice buttons collapsible")(
+      div(cls := "section_title")(
+        a(
+          cls := "remove_color",
+          title := "More info",
+          href := s"${routes.Page.variantHome}",
+          dataIcon := "",
+          target := "_blank"
+        )(),
+        trans.variant()
+      ),
+      div(id := "variant_icons")(
+        renderIconRadios(form("variant"), libs),
+        renderSelectedChoice(form("variant"), libs)
+      ),
+      renderRatings()
+    )
+
+  def renderRatings()(implicit ctx: Context) =
+    ctx.me.ifFalse(ctx.blind).map { me =>
+      div(cls := "ratings")(
+        form3.hidden("rating", "?"),
+        lila.rating.PerfType.nonPuzzle.map { perfType =>
+          div(cls := perfType.key)(
+            trans.perfRatingX(
+              raw(s"""<strong>${me
+                .perfs(perfType.key)
+                .map(_.intRating)
+                .getOrElse("?")}</strong>""")
+            )
+          )
+        }
+      )
+    }
 
   def renderVariant(
       form: Form[_],
@@ -103,17 +140,24 @@ private object bits {
       compare: (String, String) => Boolean = (a, b) => a == b,
       optValuePrefix: String = ""
   ) =
-    options.map { case (value, name, title) =>
+    options.map { case (value, name, _) =>
       option(
         st.value := optValuePrefix + value,
-        st.title := title,
         field.value.exists(v => compare(v, value)) option selected
       )(name)
     }
 
-  def renderRadios(field: Field, options: Seq[SelectChoice]) =
+  def renderSelectedChoice(field: Field, options: Seq[SelectChoice], userPart: Option[Tag] = None) =
+    options.map { case (key, icon, hint) =>
+      div(cls := s"${field.name}_$key choice", dataIcon := icon)(
+        userPart == None option hint,
+        (key == "bot" || key == "friend") option userPart
+      )
+    }
+
+  def renderIconRadios(field: Field, options: Seq[SelectChoice]) =
     st.group(cls := "radio")(
-      options.map { case (key, name, hint) =>
+      options.map { case (key, icon, hint) =>
         div(
           input(
             tpe := "radio",
@@ -124,7 +168,26 @@ private object bits {
           ),
           label(
             cls := "required",
-            title := hint,
+            dataIcon := icon,
+            `for` := s"$prefix${field.id}_$key"
+          )(hint)
+        )
+      }
+    )
+
+  def renderRadios(field: Field, options: Seq[SelectChoice]) =
+    st.group(cls := "radio")(
+      options.map { case (key, name, _) =>
+        div(
+          input(
+            tpe := "radio",
+            id := s"$prefix${field.id}_$key",
+            st.name := field.name,
+            value := key,
+            field.value.has(key) option checked
+          ),
+          label(
+            cls := "required",
             `for` := s"$prefix${field.id}_$key"
           )(name)
         )
@@ -179,6 +242,98 @@ private object bits {
         span(form("backgammonPoints").value),
         renderDissociatedRange(form("backgammonPoints"))
       )
+    )
+
+  def renderOpponentOptions(form: Form[_], userPart: Option[Tag])(implicit ctx: Context) =
+    div(cls := "opponent_choices buttons collapsible")(
+      div(cls := "section_title")("Opponent"),
+      renderIconRadios(form("opponent"), translatedOpponentChoices),
+      renderSelectedChoice(form("opponent"), translatedOpponentChoices, userPart),
+      renderBotChoice(form),
+      renderRatingRange(form("ratingRange"))
+    )
+
+  def renderBotChoice(form: Form[_])(implicit ctx: Context) =
+    div(cls := "bot_choice buttons")(
+      div(cls := "bot_title")("PS Greedy Bot"),
+      renderRadios(form("bot"), translatedPSBotChoices),
+      div(cls := "bot_title")("Stockfish"),
+      renderRadios(form("bot"), translatedStockfishChoices)
+    )
+
+  def renderRatingRange(field: Field)(implicit ctx: Context) =
+    div(cls := "rating-range-config optional_config")(
+      trans.ratingRange(),
+      div(cls := "rating-range") {
+        frag(
+          renderInput(field),
+          input(
+            name := s"${field.name}_range_min",
+            tpe := "range",
+            cls := "range rating-range__min"
+          ),
+          span(cls := "rating-min"),
+          "/",
+          span(cls := "rating-max"),
+          input(
+            name := s"${field.name}_range_max",
+            tpe := "range",
+            cls := "range rating-range__max"
+          )
+        )
+      }
+    )
+
+  def renderPlayerIndexOptions(field: Field)(implicit ctx: Context) =
+    div(cls := "playerIndex collapsible")(
+      div(cls := "section_title")("Side"),
+      div(cls := "playerIndex_choices")(
+        st.group(cls := "radio")(
+          translatedSideChoices.map { case (key, name, _) =>
+            div(
+              input(
+                tpe := "radio",
+                id := s"$prefix${field.id}_$key",
+                st.name := field.name,
+                value := key,
+                field.value.has(key) option checked
+              ),
+              label(
+                cls := s"playerIndex__button $key",
+                `for` := s"$prefix${field.id}_$key"
+              )(i, div(name))
+            )
+          }
+        ),
+        translatedSideChoices.map { case (key, name, _) =>
+          div(
+            cls := s"${field.name}_$key choice playerIndex__button $key"
+          )(i, div(name))
+        }
+      )
+    )
+
+  def renderModeOptions(form: Form[_])(implicit ctx: Context) =
+    div(cls := "mode_choice buttons collapsible optional_config")(
+      div(cls := "section_title")("Mode"),
+      renderIconRadios(form("mode"), translatedModeIconChoices),
+      renderSelectedChoice(form("mode"), translatedModeIconChoices)
+    )
+
+  def renderTimeModeOptions(form: Form[_])(implicit ctx: Context) =
+    div(cls := "time_mode_defaults optional_config collapsible")(
+      div(cls := "section_title")(
+        a(
+          cls := "remove_color",
+          title := "More info",
+          href := s"${routes.Page.lonePage("clocks")}",
+          dataIcon := "",
+          target := "_blank"
+        )(),
+        trans.timeControl()
+      ),
+      renderIconRadios(form("timeModeDefaults"), translatedTimeModeIconChoices),
+      renderSelectedChoice(form("timeModeDefaults"), translatedTimeModeIconChoices)
     )
 
   def renderTimeMode(form: Form[_], allowAnon: Boolean, allowCorrespondence: Boolean)(implicit ctx: Context) =
@@ -272,7 +427,9 @@ private object bits {
     )
 
   val dataRandomPlayerIndexVariants =
-    attr("data-random-playerindex-variants") := lila.game.Game.variantsWhereP1IsBetter.map(_.id).mkString(",")
+    attr("data-random-playerindex-variants") := lila.game.Game.variantsWhereP1IsBetter
+      .map(v => s"${v.gameFamily.id}_${v.id}")
+      .mkString(",")
 
   val dataAnon        = attr("data-anon")
   val dataMin         = attr("data-min")

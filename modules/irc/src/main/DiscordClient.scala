@@ -13,8 +13,8 @@ final private class DiscordClient(ws: StandaloneWSClient, urlMatchMaking: Secret
 ) {
 
   private val limiter = new RateLimit[DiscordMessage](
-    credits = 1,
-    duration = 15 minutes,
+    credits = 2,
+    duration = 5 minutes,
     key = "discord.client"
   )
 

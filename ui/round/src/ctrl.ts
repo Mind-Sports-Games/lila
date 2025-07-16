@@ -412,7 +412,7 @@ export default class RoundController {
     const doublingCube = stratUtils.readDoublingCube(s.fen, this.data.game.variant.key);
     const config: CgConfig = {
       fen: s.fen,
-      lastMove: util.lastMove(this.data.onlyDropsVariant, s.uci),
+      lastMove: stratUtils.lastMove(this.data.onlyDropsVariant, s.uci),
       check: !!s.check,
       turnPlayerIndex: turnPlayerIndex,
       dice: dice,
@@ -652,7 +652,7 @@ export default class RoundController {
     d.dice = stratUtils.readDice(o.fen, this.data.game.variant.key, o.canEndTurn, this.areDiceDescending);
     d.doublingCube = stratUtils.readDoublingCube(o.fen, this.data.game.variant.key);
     d.activeDiceValue = this.activeDiceValue(d.dice);
-    (d.cubeActions = o.cubeActions), (d.forcedAction = o.forcedAction);
+    ((d.cubeActions = o.cubeActions), (d.forcedAction = o.forcedAction));
 
     d.crazyhouse = o.crazyhouse;
     d.takebackable = d.canTakeBack ? o.takebackable : false;
@@ -693,14 +693,14 @@ export default class RoundController {
             role: o.role,
             playerIndex: playedPlayerIndex,
           },
-          util.uci2move(o.uci)![1] as cg.Key,
+          stratUtils.uci2move(o.uci)![1] as cg.Key,
         );
       } else if (o.uci.includes('^') && allowChessgroundAction) {
         this.chessground.liftNoAnim(o.uci.slice(1) as cg.Key);
       } else {
         // This block needs to be idempotent, even for castling moves in
         // Chess960.
-        const keys = util.uci2move(o.uci);
+        const keys = stratUtils.uci2move(o.uci);
         if (keys !== undefined) {
           // ignore a pass action
           const pieces = this.chessground.state.pieces;
@@ -759,7 +759,10 @@ export default class RoundController {
         selectOnly: d.selectMode,
         highlight: {
           lastMove:
-            d.pref.highlight && !d.selectMode && !['backgammon', 'hyper', 'nackgammon'].includes(d.game.variant.key),
+            d.pref.highlight &&
+            o.uci !== 'pass' &&
+            !d.selectMode &&
+            !['backgammon', 'hyper', 'nackgammon'].includes(d.game.variant.key),
         },
       });
       if (o.check) sound.check();
@@ -1358,7 +1361,7 @@ export default class RoundController {
           this.onUserLift(d.forcedAction!.slice(1) as cg.Key);
         }, this.forcedActionDelayMillis);
       } else {
-        const uciMove = util.uci2move(d.forcedAction);
+        const uciMove = stratUtils.uci2move(d.forcedAction);
         if (uciMove !== undefined) {
           this.chessground.set({ viewOnly: true });
           setTimeout(() => {

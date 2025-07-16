@@ -49,9 +49,10 @@ object Dependencies {
 
   object macwire {
     val version = "2.3.7"
-    val macros  = "com.softwaremill.macwire" %% "macros" % version % "provided"
-    val util    = "com.softwaremill.macwire" %% "util"   % version % "provided"
-    def bundle  = Seq(macros, util)
+    val macros  = "com.softwaremill.macwire" %% "macros"  % version % "provided"
+    val util    = "com.softwaremill.macwire" %% "util"    % version % "provided"
+    val tagging = "com.softwaremill.common"  %% "tagging" % "2.3.5"
+    def bundle  = Seq(macros, util, tagging)
   }
 
   object reactivemongo {
@@ -65,11 +66,12 @@ object Dependencies {
   }
 
   object play {
-    val version = "2.8.16-lila_1.17"
-    val api     = "com.typesafe.play" %% "play"         % version
-    val json    = "com.typesafe.play" %% "play-json"    % "2.9.3"
-    val logback = "com.typesafe.play" %% "play-logback" % "1.2.13"
-    val mailer  = "com.typesafe.play" %% "play-mailer"  % "8.0.1"
+    val version  = "2.8.16-lila_1.17"
+    val api      = "com.typesafe.play" %% "play"           % version
+    val json     = "com.typesafe.play" %% "play-json"      % "2.9.3"
+    val jsonJoda = "com.typesafe.play" %% "play-json-joda" % "2.9.2"
+    val logback  = "com.typesafe.play" %% "play-logback"   % "1.2.13"
+    val mailer   = "com.typesafe.play" %% "play-mailer"    % "8.0.1"
   }
 
   object playWs {

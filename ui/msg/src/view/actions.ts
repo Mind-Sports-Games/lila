@@ -12,7 +12,7 @@ export default function renderActions(ctrl: MsgCtrl, convo: Convo): VNode[] {
       key: 'play',
       attrs: {
         'data-icon': 'U',
-        href: `/?user=${convo.user.name}#friend`,
+        href: `/?user=${convo.user.name}#game`,
         title: ctrl.trans.noarg('challengeToPlay'),
       },
     }),

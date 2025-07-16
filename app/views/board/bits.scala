@@ -127,11 +127,12 @@ object bits {
 
   def jsData(
       sit: Situation,
-      fen: FEN
+      fen: FEN,
+      variant: Variant = Variant.libStandard(GameLogic.Chess())
   )(implicit ctx: Context) =
     Json.obj(
       "fen"         -> fen.value, // require full fen for score updates
-      "baseUrl"     -> s"$netBaseUrl${routes.Editor.load("")}",
+      "baseUrl"     -> s"$netBaseUrl/editor/", // base for building urls in the editor, should not depend on the variant or the FEN
       "playerIndex" -> sit.player.letter.toString,
       "castles" -> Json.obj(
         "K" -> sitCanCastle(sit, P1, strategygames.chess.KingSide),
@@ -139,9 +140,11 @@ object bits {
         "k" -> sitCanCastle(sit, P2, strategygames.chess.KingSide),
         "q" -> sitCanCastle(sit, P2, strategygames.chess.QueenSide)
       ),
-      "animation" -> Json.obj("duration" -> ctx.pref.animationMillis),
-      "is3d"      -> ctx.pref.is3d,
-      "i18n"      -> i18nJsObject(i18nKeyes)
+      "animation"  -> Json.obj("duration" -> ctx.pref.animationMillis),
+      "is3d"       -> ctx.pref.is3d,
+      "i18n"       -> i18nJsObject(i18nKeyes),
+      "standardInitialPosition" -> variant.standardInitialPosition,
+      "variantKey" -> variant.key
     )
 
   private val i18nKeyes = List(

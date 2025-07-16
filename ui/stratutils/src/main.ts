@@ -1,8 +1,8 @@
 import { piotr } from './piotr';
-import * as cg from 'chessground/types';
-import { Rules } from 'stratops/types';
 import * as status from 'game/status';
+import type * as cg from 'chessground/types';
 import type { BaseGame } from 'game';
+import { variantClassFromKey } from 'stratops/variants/util';
 
 // TODO: For some reason we can't import this like:
 // import * from 'stratutils/promotion'
@@ -17,8 +17,6 @@ export function fixCrazySan(san: San): San {
 }
 
 export type Dests = Map<Key, Key[]>;
-
-export type NotationStyle = 'uci' | 'san' | 'usi' | 'wxf' | 'dpo' | 'dpg' | 'man' | 'bkg' | 'abl';
 
 export function readDests(lines?: string): Dests | null {
   if (typeof lines === 'undefined') return null;
@@ -57,33 +55,38 @@ export const altCastles = {
   e8h8: 'e8g8',
 };
 
+export const uci2move = (uci: string): cg.Key[] | undefined => {
+  if (
+    !uci ||
+    uci == 'pass' ||
+    uci == 'roll' ||
+    uci == 'endturn' ||
+    uci == 'undo' ||
+    uci.includes('/') ||
+    uci.substring(0, 3) == 'ss:' ||
+    uci.substring(0, 4) == 'cube'
+  )
+    return undefined;
+  const pos = uci.match(/[a-z][1-9][0-9]?/g) as cg.Key[];
+  if (uci[1] === '@' || uci[0] === '@') return [pos[0], pos[0]] as cg.Key[];
+  return [pos[0], pos[1]] as cg.Key[];
+};
+
+export function lastMove(onlyDropsVariant: boolean, uci: string): cg.Key[] | undefined {
+  if (onlyDropsVariant) {
+    if (uci && (uci[1] === '@' || uci[0] === '@')) {
+      return uci2move(uci);
+    } else {
+      return undefined;
+    }
+  } else {
+    return uci2move(uci);
+  }
+}
+
 // 3 check and 5 check dont have consistent fen formats, its calculated from running through game plys.
 export function getScore(variant: VariantKey, fen: string, playerIndex: string): number | undefined {
-  switch (variant) {
-    case 'oware':
-    case 'togyzkumalak':
-    case 'bestemshe':
-    case 'abalone':
-      return +fen.split(' ')[playerIndex === 'p1' ? 1 : 2];
-    case 'go9x9':
-    case 'go13x13':
-    case 'go19x19':
-      return +fen.split(' ')[playerIndex === 'p1' ? 3 : 4] / 10.0;
-    case 'backgammon':
-    case 'hyper':
-    case 'nackgammon':
-      return +fen.split(' ')[playerIndex === 'p1' ? 4 : 5];
-    case 'flipello10':
-    case 'flipello': {
-      const boardPart = fen.split(' ')[0].split('[')[0];
-      return boardPart.split(playerIndex === 'p1' ? 'P' : 'p').length - 1;
-    }
-    case 'threeCheck':
-    case 'fiveCheck':
-      return +fen.split(' ')[6][playerIndex === 'p1' ? 1 : 3];
-    default:
-      return undefined;
-  }
+  return variantClassFromKey(variant).getScoreFromFen(fen, playerIndex);
 }
 
 export function displayScore(variant: VariantKey, fen: string, playerIndex: string): string {
@@ -102,58 +105,6 @@ export function fenPlayerIndex(variant: VariantKey, fen: string) {
   }
   const p2String = variant === 'oware' ? ' N' : ' b';
   return fen.indexOf(p2String) > 0 ? 'p2' : 'p1';
-}
-
-export function variantUsesUCINotation(key: VariantKey | DraughtsVariantKey) {
-  return ['linesOfAction', 'scrambledEggs', 'amazons', 'breakthroughtroyka', 'minibreakthroughtroyka'].includes(key);
-}
-
-export function variantUsesUSINotation(key: VariantKey | DraughtsVariantKey) {
-  return ['shogi', 'minishogi'].includes(key);
-}
-
-export function variantUsesWXFNotation(key: VariantKey | DraughtsVariantKey) {
-  return ['xiangqi', 'minixiangqi'].includes(key);
-}
-
-export function variantUsesDestPosOthelloNotation(key: VariantKey | DraughtsVariantKey) {
-  return ['flipello', 'flipello10'].includes(key);
-}
-
-export function variantUsesDestPosGoNotation(key: VariantKey | DraughtsVariantKey) {
-  return ['go9x9', 'go13x13', 'go19x19'].includes(key);
-}
-
-export function variantUsesMancalaNotation(key: VariantKey | DraughtsVariantKey) {
-  return ['oware', 'togyzkumalak', 'bestemshe'].includes(key);
-}
-
-export function variantUsesBackgammonNotation(key: VariantKey | DraughtsVariantKey) {
-  return ['backgammon', 'hyper', 'nackgammon'].includes(key);
-}
-
-export function variantUsesAbaloneNotation(key: VariantKey | DraughtsVariantKey) {
-  return ['abalone'].includes(key);
-}
-
-export function notationStyle(key: VariantKey | DraughtsVariantKey): NotationStyle {
-  return variantUsesUCINotation(key)
-    ? 'uci'
-    : variantUsesUSINotation(key)
-      ? 'usi'
-      : variantUsesWXFNotation(key)
-        ? 'wxf'
-        : variantUsesDestPosOthelloNotation(key)
-          ? 'dpo'
-          : variantUsesDestPosGoNotation(key)
-            ? 'dpg'
-            : variantUsesMancalaNotation(key)
-              ? 'man'
-              : variantUsesBackgammonNotation(key)
-                ? 'bkg'
-                : variantUsesAbaloneNotation(key)
-                  ? 'abl'
-                  : 'san';
 }
 
 interface Piece {
@@ -270,77 +221,4 @@ export const finalMultiPointState = (game: BaseGame, ply: any, lastPly: any) => 
         p2: Math.min(game.multiPointState.target, game.multiPointState.p2 + pointsToAdd[1]),
       }
     : undefined;
-};
-
-export const variantToRules = (v: VariantKey): Rules => {
-  switch (v) {
-    case 'standard':
-      return 'chess';
-    case 'chess960':
-      return 'chess';
-    case 'antichess':
-      return 'antichess';
-    case 'fromPosition':
-      return 'chess';
-    case 'kingOfTheHill':
-      return 'kingofthehill';
-    case 'threeCheck':
-      return '3check';
-    case 'fiveCheck':
-      return '5check';
-    case 'atomic':
-      return 'atomic';
-    case 'horde':
-      return 'horde';
-    case 'racingKings':
-      return 'racingkings';
-    case 'crazyhouse':
-      return 'crazyhouse';
-    case 'noCastling':
-      return 'nocastling';
-    case 'linesOfAction':
-      return 'linesofaction';
-    case 'scrambledEggs':
-      return 'scrambledeggs';
-    case 'shogi':
-      return 'shogi';
-    case 'xiangqi':
-      return 'xiangqi';
-    case 'minishogi':
-      return 'minishogi';
-    case 'minixiangqi':
-      return 'minixiangqi';
-    case 'flipello':
-      return 'flipello';
-    case 'flipello10':
-      return 'flipello10';
-    case 'amazons':
-      return 'amazons';
-    case 'breakthroughtroyka':
-      return 'breakthrough';
-    case 'minibreakthroughtroyka':
-      return 'minibreakthrough';
-    case 'oware':
-      return 'oware';
-    case 'togyzkumalak':
-      return 'togyzkumalak';
-    case 'bestemshe':
-      return 'bestemshe';
-    case 'go9x9':
-      return 'go9x9';
-    case 'go13x13':
-      return 'go13x13';
-    case 'go19x19':
-      return 'go19x19';
-    case 'backgammon':
-      return 'backgammon';
-    case 'hyper':
-      return 'hyper';
-    case 'nackgammon':
-      return 'nackgammon';
-    case 'abalone':
-      return 'abalone';
-    default:
-      return 'chess';
-  }
 };

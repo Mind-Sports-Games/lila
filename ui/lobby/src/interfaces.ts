@@ -102,3 +102,12 @@ export interface PoolMember {
 
 export type PoolId = string;
 export type PoolRange = string;
+
+export interface ClockConfig {
+  timemode: string;
+  initial?: string;
+  increment?: string;
+  byoyomi?: string;
+  periods?: string;
+  days?: string;
+}

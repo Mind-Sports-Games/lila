@@ -45,9 +45,11 @@ object show {
           description =
             if (isStreak) trans.puzzle.streakDescription.txt()
             else
-              s"PlayStrategy tactic trainer: ${trans.puzzle.findTheBestMoveForPlayerIndex(
-                puzzle.playerIndex.fold(trans.white.txt(), trans.black.txt())
-              ).v}. Played by ${puzzle.plays} players."
+              s"PlayStrategy tactic trainer: ${trans.puzzle
+                .findTheBestMoveForPlayerIndex(
+                  puzzle.playerIndex.fold(trans.white.txt(), trans.black.txt())
+                )
+                .v}. Played by ${puzzle.plays} players."
         )
         .some,
       zoomable = true,

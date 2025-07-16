@@ -32,7 +32,7 @@ import { defined, prop, Prop } from 'common';
 import { DrawShape } from 'chessground/draw';
 import { ExplorerCtrl } from './explorer/interfaces';
 import { ForecastCtrl } from './forecast/interfaces';
-import { playstrategyRules, amazonsChessgroundFen } from 'stratops/compat';
+import { amazonsChessgroundFen } from 'stratops/compat';
 import { make as makeEvalCache, EvalCache } from './evalCache';
 import { make as makeForecast } from './forecast/forecastCtrl';
 import { make as makeFork, ForkCtrl } from './fork';
@@ -46,12 +46,12 @@ import { SquareSet } from 'stratops/squareSet';
 import { parseFen } from 'stratops/fen';
 import { Position, PositionError } from 'stratops/chess';
 import { Result } from '@badrap/result';
-import { setupPosition } from 'stratops/variant';
 import { storedProp, StoredBooleanProp } from 'common/storage';
 import { AnaMove, AnaDrop, AnaPass, StudyCtrl } from './study/interfaces';
 import { StudyPracticeCtrl } from './study/practice/interfaces';
 import { valid as crazyValid } from './crazy/crazyCtrl';
 import { isOnlyDropsPly } from './util';
+import { variantClassFromKey, variantKeyToRules } from 'stratops/variants/util';
 
 export default class AnalyseCtrl {
   data: AnalyseData;
@@ -702,8 +702,9 @@ export default class AnalyseCtrl {
       if (node.fen !== ev.fen && !isThreat) return;
       if (isThreat) {
         if (!node.threat || isEvalBetter(ev, node.threat) || node.threat.maxDepth < ev.maxDepth) node.threat = ev;
-      } else if (isEvalBetter(ev, node.ceval)) node.ceval = ev;
-      else if (node.ceval && ev.maxDepth > node.ceval.maxDepth) node.ceval.maxDepth = ev.maxDepth;
+      } else if (isEvalBetter(ev, node.ceval)) {
+        node.ceval = ev;
+      } else if (node.ceval && ev.maxDepth > node.ceval.maxDepth) node.ceval.maxDepth = ev.maxDepth;
 
       if (path === this.path) {
         this.setAutoShapes();
@@ -725,7 +726,7 @@ export default class AnalyseCtrl {
       variant: this.data.game.variant,
       standardMaterial:
         !this.data.game.initialFen ||
-        parseFen(stratUtils.variantToRules(this.data.game.variant.key))(this.data.game.initialFen).unwrap(
+        parseFen(variantKeyToRules(this.data.game.variant.key))(this.data.game.initialFen).unwrap(
           setup =>
             PLAYERINDEXES.every(playerIndex => {
               const board = setup.board;
@@ -766,8 +767,8 @@ export default class AnalyseCtrl {
   }
 
   position(node: Tree.Node): Result<Position, PositionError> {
-    const setup = parseFen(stratUtils.variantToRules(this.data.game.variant.key))(node.fen).unwrap();
-    return setupPosition(playstrategyRules(this.data.game.variant.key), setup);
+    const setup = parseFen(variantKeyToRules(this.data.game.variant.key))(node.fen).unwrap();
+    return variantClassFromKey(this.data.game.variant.key).fromSetup(setup);
   }
 
   canUseCeval(): boolean {
@@ -916,15 +917,15 @@ export default class AnalyseCtrl {
   }
 
   playUci(uci: Uci): void {
-    const move = parseUci(stratUtils.variantToRules(this.data.game.variant.key))(uci)!;
-    const to = makeSquare(stratUtils.variantToRules(this.data.game.variant.key))(move.to);
+    const move = parseUci(variantKeyToRules(this.data.game.variant.key))(uci)!;
+    const to = makeSquare(variantKeyToRules(this.data.game.variant.key))(move.to);
     if (isNormal(move)) {
       const piece = this.chessground.state.pieces.get(
-        makeSquare(stratUtils.variantToRules(this.data.game.variant.key))(move.from),
+        makeSquare(variantKeyToRules(this.data.game.variant.key))(move.from),
       );
       const capture = this.chessground.state.pieces.get(to);
       this.sendMove(
-        makeSquare(stratUtils.variantToRules(this.data.game.variant.key))(move.from),
+        makeSquare(variantKeyToRules(this.data.game.variant.key))(move.from),
         to,
         capture && piece && capture.playerIndex !== piece.playerIndex ? capture : undefined,
         move.promotion,

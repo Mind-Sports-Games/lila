@@ -136,7 +136,11 @@ private object bits {
         tr(
           th(label(nbTurns())),
           td(
-            div(cls := "half")(from(), " ", form3.select(form("turnsMin"), Query.fullTurnsCompleted, "".some)),
+            div(cls := "half")(
+              from(),
+              " ",
+              form3.select(form("turnsMin"), Query.fullTurnsCompleted, "".some)
+            ),
             div(cls := "half")(to(), " ", form3.select(form("turnsMax"), Query.fullTurnsCompleted, "".some))
           )
         )
