@@ -54,7 +54,9 @@ object library {
         h1(cls := "library-title color-choice", dataIcon := variant.perfIcon)(
           s"${VariantKeys.variantName(variant)}"
         ),
-        div(id := "library_chart")(spinner)
+        div(id := "library_chart_area")(
+          div(id := "library_chart")(spinner)
+        )
       )
     )
 
@@ -111,7 +113,9 @@ object library {
             )(name))
           })
         ),
-        div(id := "library_chart")(spinner)
+        div(id := "library_chart_area")(
+          div(id := "library_chart")(spinner)
+        )
       )
     )
 

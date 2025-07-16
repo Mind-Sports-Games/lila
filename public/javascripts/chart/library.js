@@ -48,7 +48,7 @@ playstrategy.libraryChart = function (data, allowedVariants) {
               var found = cumul.find(function (row) {
                 return row[0] === m;
               });
-              return found ? found[1] : null;
+              return found ? (found[1] > 0 ? found[1] : 1) : null; //cant plot log(0)
             }),
             color: colorList[idx % colorList.length],
             lineWidth: 4,
@@ -77,7 +77,8 @@ playstrategy.libraryChart = function (data, allowedVariants) {
           },
           yAxis: {
             title: { text: trans.noarg('Total Games') },
-            min: 0,
+            min: 1,
+            type: 'logarithmic',
           },
           series: series,
           plotOptions: {},
