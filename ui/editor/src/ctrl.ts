@@ -53,6 +53,7 @@ export default class EditorCtrl {
     this.rules = variantKeyToRules(this.variantKey);
     this.initialFen = cfg.fen || params.get('fen') || variant.getInitialFen();
     this.standardInitialPosition = cfg.standardInitialPosition;
+    this.turn = cfg.playerIndex || 'p1';
 
     this.extraPositions = [
       {
@@ -229,7 +230,6 @@ export default class EditorCtrl {
             variant: this.variantKey as CGVariant,
             dimensions: { width, height },
           });
-        this.turn = setup.turn;
         this.halfmoves = setup.halfmoves;
         this.fullmoves = setup.fullmoves;
         this.pockets = setup.pockets;

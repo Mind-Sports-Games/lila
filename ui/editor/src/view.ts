@@ -129,6 +129,7 @@ function controls(ctrl: EditorCtrl, state: EditorState): VNode {
       { on: { click: ctrl.clearBoard }, attrs: icon ? { 'data-icon': icon } : {} },
       ctrl.trans.noarg('clearBoard'),
     );
+  const variant = variantClassFromKey(ctrl.variantKey);
   return h('div.board-editor__tools', [
     ...(ctrl.cfg.embed || !ctrl.cfg.positions
       ? []
@@ -181,7 +182,7 @@ function controls(ctrl: EditorCtrl, state: EditorState): VNode {
               },
             },
           },
-          Object.keys(variantClassFromKey(ctrl.variantKey).playersColors).map(function (key) {
+          Object.keys(variant.playerColors).map(function (key) {
             return h(
               'option',
               {
@@ -190,10 +191,7 @@ function controls(ctrl: EditorCtrl, state: EditorState): VNode {
                   selected: ctrl.turn === key,
                 },
               },
-              ctrl.trans(
-                'playerIndexPlays',
-                capitalizeFirstLetter(variantClassFromKey(ctrl.variantKey).playersColors[key]),
-              ),
+              ctrl.trans('playerIndexPlays', capitalizeFirstLetter(variant.playerColors[key])),
             );
           }),
         ),
