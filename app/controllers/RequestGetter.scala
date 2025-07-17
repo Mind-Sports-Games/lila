@@ -6,6 +6,8 @@ import lila.common.IsMobile
 
 import play.api.mvc.RequestHeader
 
+import strategygames.variant.Variant
+
 trait RequestGetter {
 
   protected def get(name: String)(implicit ctx: UserContext): Option[String] = get(name, ctx.req)
@@ -25,6 +27,9 @@ trait RequestGetter {
   protected def getLong(name: String, req: RequestHeader) =
     get(name, req) flatMap (_.toLongOption)
 
+  protected def getVariant(name: String, req: RequestHeader) =
+    get(name, req) flatMap (Variant.byKey.lift)
+
   protected def getBool(name: String)(implicit ctx: UserContext) =
     (getInt(name) exists trueish) || (get(name) exists trueish)
 
@@ -39,4 +44,5 @@ trait RequestGetter {
 
   protected def getMobile(implicit ctx: UserContext) =
     IsMobile(getBool("mobile"))
+
 }

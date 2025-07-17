@@ -111,7 +111,12 @@ object Query {
   def checkableOld = F.checkAt $lt DateTime.now.minusHours(1)
 
   def variant(v: Variant) =
-    $doc(F.variant -> (if (v == Variant.Chess(Standard)) $exists(false) else $int(v.id)))
+    $and(
+      if (v.gameLogic.id == 0) $or($doc(F.lib -> 0), $doc(F.lib $exists false))
+      else $doc(F.lib -> v.gameLogic.id),
+      if (v.id == 1) $or($doc(F.variant -> 1), $doc(F.variant $exists false))
+      else $doc(F.variant -> v.id)
+    )
 
   lazy val variantStandard = variant(Variant.Chess(Standard))
 
