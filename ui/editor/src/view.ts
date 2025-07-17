@@ -182,16 +182,16 @@ function controls(ctrl: EditorCtrl, state: EditorState): VNode {
               },
             },
           },
-          Object.keys(variant.playersColors).map(function (key) {
+          Object.keys(variant.playerColors).map(function (key) {
             return h(
               'option',
               {
                 attrs: {
-                  value: variant.playersColors.p1 == 'white' ? key : key === 'p1' ? 'p2' : 'p1',
-                  selected: variant.playersColors.p1 == 'white' ? ctrl.turn === key : ctrl.turn !== key,
+                  value: key,
+                  selected: ctrl.turn === key,
                 },
               },
-              ctrl.trans('playerIndexPlays', capitalizeFirstLetter(key === 'p1' ? 'white' : 'black')),
+              ctrl.trans('playerIndexPlays', capitalizeFirstLetter(variant.playerColors[key])),
             );
           }),
         ),
