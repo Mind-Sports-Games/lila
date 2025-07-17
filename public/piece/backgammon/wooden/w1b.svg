@@ -4,7 +4,7 @@
   <g>
     <!-- Checker 1 (bottom) -->
 	<circle cx="160.5" cy="1885.5" r="144.5" fill="#6B4301" opacity="0.98"/>
-    <circle cx="164.5" cy="1889.5" r="140.5" fill="#F3C876" opacity="0.98"/>
+    <circle cx="164.5" cy="1889.5" r="140.5" fill="#EEBA64" opacity="0.98"/>
 	<path
       d="M301 1881.5
          A144.5 144.5 0 0 1 160.5 2026"

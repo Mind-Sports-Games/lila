@@ -4,7 +4,7 @@
   <g>
     <!-- Checker 1 (bottom) -->
 	<circle cx="160.5" cy="1885.5" r="144.5" fill="#6B4301" opacity="0.98"/>
-    <circle cx="164.5" cy="1889.5" r="140.5" fill="#F3C876" opacity="0.98"/>
+    <circle cx="164.5" cy="1889.5" r="140.5" fill="#EEBA64" opacity="0.98"/>
 	<path
       d="M301 1881.5
          A144.5 144.5 0 0 1 160.5 2026"
@@ -17,7 +17,7 @@
   <g>
     <!-- Checker 2 -->
 	<circle cx="160.5" cy="1580.5" r="144.5" fill="#6B4301" opacity="0.98"/>
-    <circle cx="164.5" cy="1584.5" r="140.5" fill="#F3C876" opacity="0.98"/>
+    <circle cx="164.5" cy="1584.5" r="140.5" fill="#EEBA64" opacity="0.98"/>
 	<path
       d="M301 1576.5
          A144.5 144.5 0 0 1 160.5 1721"
@@ -30,7 +30,7 @@
   <g>
     <!-- Checker 3 -->
 	<circle cx="160.5" cy="1275.5" r="144.5" fill="#6B4301" opacity="0.98"/>
-    <circle cx="164.5" cy="1279.5" r="140.5" fill="#F3C876" opacity="0.98"/>
+    <circle cx="164.5" cy="1279.5" r="140.5" fill="#EEBA64" opacity="0.98"/>
 	<path
       d="M301 1271.5
          A144.5 144.5 0 0 1 160.5 1416"
@@ -43,7 +43,7 @@
   <g>
     <!-- Checker 4 -->
 	<circle cx="160.5" cy="970.5" r="144.5" fill="#6B4301" opacity="0.98"/>
-    <circle cx="164.5" cy="974.5" r="140.5" fill="#F3C876" opacity="0.98"/>
+    <circle cx="164.5" cy="974.5" r="140.5" fill="#EEBA64" opacity="0.98"/>
 	<path
       d="M301 966.5
          A144.5 144.5 0 0 1 160.5 1111"
@@ -56,7 +56,7 @@
   <g>
     <!-- Checker 5 (top) -->
 	<circle cx="160.5" cy="665.5" r="144.5" fill="#6B4301" opacity="0.98"/>
-    <circle cx="164.5" cy="669.5" r="140.5" fill="#F3C876" opacity="0.98"/>
+    <circle cx="164.5" cy="669.5" r="140.5" fill="#EEBA64" opacity="0.98"/>
 	<path
       d="M301 661.5
          A144.5 144.5 0 0 1 160.5 806"
