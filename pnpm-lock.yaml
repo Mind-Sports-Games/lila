@@ -42,8 +42,8 @@ importers:
         specifier: ^3.5.3
         version: 3.6.2
       stratops:
-        specifier: github:Mind-Sports-Games/stratops#board-editor
-        version: https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/79220acff30d24f860c6dd138c29d23222fff132
+        specifier: github:Mind-Sports-Games/stratops#v0.8.1-pstrat5.10
+        version: https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/345c05c5bc49d0854085ae1fb971ed6f1ac05835
       typescript:
         specifier: ^5.8.3
         version: 5.8.3
@@ -2372,8 +2372,8 @@ packages:
     resolution: {integrity: sha512-XlkWvfIm6RmsWtNJx+uqtKLS8eqFbxUg0ZzLXqY0caEy9l7hruX8IpiDnjsLavoBgqCCR71TqWO8MaXYheJ3RQ==}
     engines: {node: '>=10'}
 
-  stratops@https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/79220acff30d24f860c6dd138c29d23222fff132:
-    resolution: {tarball: https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/79220acff30d24f860c6dd138c29d23222fff132}
+  stratops@https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/345c05c5bc49d0854085ae1fb971ed6f1ac05835:
+    resolution: {tarball: https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/345c05c5bc49d0854085ae1fb971ed6f1ac05835}
     version: 0.8.1-pstrat5.7
     engines: {node: '>=20', pnpm: ^9}
 
@@ -4670,7 +4670,7 @@ snapshots:
     dependencies:
       escape-string-regexp: 2.0.0
 
-  stratops@https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/79220acff30d24f860c6dd138c29d23222fff132:
+  stratops@https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/345c05c5bc49d0854085ae1fb971ed6f1ac05835:
     dependencies:
       '@badrap/result': 0.2.13
 
