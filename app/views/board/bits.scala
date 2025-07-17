@@ -133,7 +133,7 @@ object bits {
     Json.obj(
       "fen"         -> fen.value, // require full fen for score updates
       "baseUrl"     -> s"$netBaseUrl/editor/", // base for building urls in the editor, should not depend on the variant or the FEN
-      "playerIndex" -> sit.player.letter.toString,
+      "playerIndex" -> sit.player.name,
       "castles" -> Json.obj(
         "K" -> sitCanCastle(sit, P1, strategygames.chess.KingSide),
         "Q" -> sitCanCastle(sit, P1, strategygames.chess.QueenSide),
