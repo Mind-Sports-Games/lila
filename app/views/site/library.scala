@@ -51,8 +51,36 @@ object library {
         id := "library-section",
         cls := "library-all"
       )(
-        h1(cls := "library-title color-choice", dataIcon := variant.perfIcon)(
-          s"${VariantKeys.variantName(variant)}"
+        div(cls := "library-header color-choice")(
+          h1(cls := "library-title", dataIcon := variant.perfIcon)(
+            s"${VariantKeys.variantName(variant)}"
+          ),
+          div(cls := "library-links")(
+            a(cls := "library-rules", href := s"${routes.Page.variant(variant.key)}", target := "_blank")(
+              "Rules"
+            ),
+            studyLink(variant).map { studyId =>
+              a(cls := "library-tutorial", href := s"${routes.Study.show(studyId)}", target := "_blank")(
+                "Tutorial"
+              )
+            },
+            a(cls := "library-editor", href := s"${routes.Editor.index}?variant=${variant.key}")(
+              "Editor"
+            ),
+            a(cls := "library-analysis", href := routes.UserAnalysis.parseArg(variant.key))(
+              "Analysis"
+            ),
+            ctx.userId.map(user =>
+              a(
+                cls := "library-mystats",
+                href := routes.User.perfStat(user, variant.key),
+                target := "_blank"
+              )(
+                "My Stats"
+              )
+            ),
+            a(href := routes.Library.home.url, cls := "library-back")("Library")
+          )
         ),
         div(id := "library_chart_area")(
           div(id := "library_chart")(spinner)
@@ -109,7 +137,7 @@ object library {
               cls := "variant",
               dataIcon := icon,
               value := id,
-              href := routes.Page.variant(variantKey(id)) //TODO routes.Library.variant(variantKey(id))
+              href := routes.Library.variant(variantKey(id))
             )(name))
           })
         ),
@@ -130,6 +158,14 @@ object library {
       }
       case _ => "0_1" //standard chess
     }
+
+  private def studyLink(variant: Variant): Option[String] = {
+    variant.key match {
+      case "abalone"       => Some("AbaloneS")
+      case "linesOfAction" => Some("LinesOfA")
+      case _               => None
+    }
+  }
 
   private val i18nKeys =
     List(

@@ -11,6 +11,49 @@
     font-size: 2.2em;
   }
 
+  $c-color-choice-map: (
+    'black': $c-color-choice-black,
+    'green': $c-color-choice-green,
+    'red': $c-color-choice-red,
+    'blue': $c-color-choice-blue,
+    'yellow': $c-color-choice-yellow,
+  );
+
+  .library-header.color-choice {
+    color: $c-font;
+  }
+
+  @each $c in ('black', 'green', 'red', 'blue', 'yellow') {
+    .selected-color-#{$c} & .library-header.color-choice {
+      background: map-get($c-color-choice-map, $c);
+      color: $c-color-choice-font-default;
+      text-shadow: 0 1px 0 map-get($c-color-choice-map, $c);
+    }
+  }
+
+  //game specific page
+  .library-header {
+    display: flex;
+    flex-flow: column nowrap;
+    width: 100%;
+    .library-links {
+      flex: 1 1 auto;
+      display: flex;
+      margin-bottom: 1em;
+      justify-content: center;
+      gap: 1em;
+      a {
+        display: inline-block;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        color: unset;
+        font-weight: bold;
+      }
+    }
+  }
+
+  //general page
   .library-title {
     font-weight: bold;
     width: 100%;
