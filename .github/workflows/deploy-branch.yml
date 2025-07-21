@@ -1,0 +1,13 @@
+name: Update Dependency Graph
+
+on:
+  workflow_dispatch:
+#  push:
+#    branches:
+#      - dev
+
+jobs:
+  deploy_assets:
+    uses: ./.github/workflows/common_dev.yml@deploy_assets
+  deploy_server:
+    uses: ./.github/workflows/common_dev.yml@deploy_server
