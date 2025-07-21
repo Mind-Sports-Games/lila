@@ -234,7 +234,7 @@ export interface Hold {
   sd: number;
 }
 
-export type ContinueMode = 'friend' | 'ai';
+export type ContinueMode = 'game';
 
 export interface GameView {
   status(ctrl: Ctrl): string;

@@ -14,6 +14,7 @@ object editor {
   def apply(
       sit: Situation,
       fen: FEN,
+      variant: strategygames.variant.Variant,
       positionsJson: String
   )(implicit ctx: Context) =
     views.html.base.layout(
@@ -21,7 +22,7 @@ object editor {
       moreJs = frag(
         jsModule("editor"),
         embedJsUnsafeLoadThen(
-          s"""const data=${safeJsonValue(bits.jsData(sit, fen))};data.positions=$positionsJson;
+          s"""const data=${safeJsonValue(bits.jsData(sit, fen, variant))};data.positions=$positionsJson;
 PlayStrategyEditor(document.getElementById('board-editor'), data);"""
         )
       ),

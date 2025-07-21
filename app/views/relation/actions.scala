@@ -23,7 +23,7 @@ object actions {
           !blocked option frag(
             a(
               titleOrText(trans.challenge.challengeToPlay.txt()),
-              href := s"${routes.Lobby.home}?user=$userId#friend",
+              href := s"${routes.Lobby.home}?user=$userId#game",
               cls := "btn-rack__btn",
               dataIcon := "U"
             ),
