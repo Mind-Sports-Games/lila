@@ -354,12 +354,12 @@ function sparePieces(
       return [playerIndex, role];
     });
   }
-  if (['xiangqi'].includes(ctrl.variantKey)) {
+  if (ctrl.variantKey == 'xiangqi') {
     pieces = ['k-piece', 'a-piece', 'c-piece', 'r-piece', 'b-piece', 'n-piece', 'p-piece'].map(function (role) {
       return [playerIndex, role];
     });
   }
-  if (['miniXiangqi'].includes(ctrl.variantKey)) {
+  if (ctrl.variantKey == 'minixiangqi') {
     pieces = ['k-piece', 'c-piece', 'r-piece', 'n-piece', 'p-piece'].map(function (role) {
       return [playerIndex, role];
     });
