@@ -157,7 +157,7 @@ export default class Setup {
           blitz: { timemode: '1', initial: '5', increment: '3' },
         });
       case '1_8': //frysk
-      case '11_2': //minibreakthrough
+      case '11_10': //minibreakthrough
         return Object.assign({}, defaultClockConfig, {
           bullet: { timemode: '1', initial: '0.5', increment: '0' },
           blitz: { timemode: '1', initial: '2', increment: '1' },
@@ -711,10 +711,10 @@ export default class Setup {
           break;
         case '11':
           switch (variantId[1]) {
-            case '1':
+            case '9':
               key = 'breakthroughtroyka';
               break;
-            case '2':
+            case '10':
               key = 'minibreakthroughtroyka';
               break;
           }
