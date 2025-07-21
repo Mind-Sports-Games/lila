@@ -8,6 +8,10 @@ on:
 
 jobs:
   deploy_assets:
-    uses: ./.github/workflows/common_dev.yml@deploy_assets
+    uses: ./.github/workflows/common_dev.yml
+    with:
+      job: deploy_assets
   deploy_server:
-    uses: ./.github/workflows/common_dev.yml@deploy_server
+    uses: ./.github/workflows/common_dev.yml
+    with:
+      job: deploy_server
