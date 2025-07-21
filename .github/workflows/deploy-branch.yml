@@ -1,4 +1,4 @@
-name: Update Dependency Graph
+name: Deploy Branch to Dev
 
 on:
   workflow_dispatch:
