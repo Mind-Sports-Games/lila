@@ -143,7 +143,33 @@ export default class Setup {
       custom: { timemode: '6' },
     };
     switch (variant) {
+      case '0_8': //horde
+      case '4_2': //xiangqi
+        return Object.assign({}, defaultClockConfig, {
+          blitz: { timemode: '1', initial: '5', increment: '3' },
+        });
+      case '1_1': //international draughts
+      case '1_6': //antidraughts
+      case '1_9': //breakthrough
+      case '1_10': //frisian
+        return Object.assign({}, defaultClockConfig, {
+          bullet: { timemode: '1', initial: '2', increment: '1' },
+          blitz: { timemode: '1', initial: '5', increment: '3' },
+        });
+      case '1_8': //frysk
+      case '11_2': //minibreakthrough
+        return Object.assign({}, defaultClockConfig, {
+          bullet: { timemode: '1', initial: '0.5', increment: '0' },
+          blitz: { timemode: '1', initial: '2', increment: '1' },
+          rapid: { timemode: '1', initial: '5', increment: '3' },
+        });
       case '3_5': //mini-shogi
+        return Object.assign({}, defaultClockConfig, {
+          bullet: { timemode: '3', byoyomi: '5', periods: '1', increment: '0', initial: '0' },
+          blitz: { timemode: '3', byoyomi: '5', periods: '1', increment: '0', initial: '3' },
+          rapid: { timemode: '3', byoyomi: '10', periods: '1', increment: '0', initial: '5' },
+          classical: { timemode: '3', byoyomi: '20', periods: '1', increment: '0', initial: '10' },
+        });
       case '3_1': //shogi
         return Object.assign({}, defaultClockConfig, {
           bullet: { timemode: '3', byoyomi: '10', periods: '1', increment: '0', initial: '0' },
@@ -152,15 +178,20 @@ export default class Setup {
           classical: { timemode: '3', byoyomi: '30', periods: '1', increment: '0', initial: '15' },
         });
       case '5_6': // othello
-      case '5_7': // grand othello
         return Object.assign({}, defaultClockConfig, {
-          bullet: { timemode: '1', initial: '2', increment: '0' },
+          bullet: { timemode: '1', initial: '1', increment: '0' },
           blitz: { timemode: '1', initial: '5', increment: '0' },
           rapid: { timemode: '1', initial: '15', increment: '0' },
           classical: { timemode: '1', initial: '20', increment: '10' },
         });
+      case '5_7': // grand othello
+        return Object.assign({}, defaultClockConfig, {
+          bullet: { timemode: '1', initial: '2', increment: '0' },
+          blitz: { timemode: '1', initial: '8', increment: '0' },
+          rapid: { timemode: '1', initial: '20', increment: '0' },
+          classical: { timemode: '1', initial: '20', increment: '10' },
+        });
       case '6_1': // oware
-      case '7_1': // togyzkumalak
       case '7_2': // bestemshe
         return Object.assign({}, defaultClockConfig, {
           bullet: { timemode: '1', initial: '1', increment: '1' },
@@ -168,22 +199,60 @@ export default class Setup {
           rapid: { timemode: '1', initial: '7', increment: '3' },
           classical: { timemode: '1', initial: '20', increment: '10' },
         });
+      case '7_1': // togyzkumalak
+        return Object.assign({}, defaultClockConfig, {
+          bullet: { timemode: '1', initial: '1', increment: '1' },
+          blitz: { timemode: '1', initial: '5', increment: '2' },
+          rapid: { timemode: '1', initial: '10', increment: '3' },
+          classical: { timemode: '1', initial: '20', increment: '10' },
+        });
+      case '8_8': //amazons
+        return Object.assign({}, defaultClockConfig, {
+          bullet: { timemode: '1', initial: '1', increment: '1' },
+          blitz: { timemode: '1', initial: '3', increment: '5' },
+          rapid: { timemode: '1', initial: '10', increment: '10' },
+          classical: { timemode: '1', initial: '20', increment: '10' },
+        });
       case '9_1': //go9x9
+        return Object.assign({}, defaultClockConfig, {
+          bullet: { timemode: '3', byoyomi: '2', periods: '1', increment: '0', initial: '1' },
+          blitz: { timemode: '3', byoyomi: '10', periods: '5', increment: '0', initial: '2' },
+          rapid: { timemode: '3', byoyomi: '30', periods: '3', increment: '0', initial: '10' },
+          classical: { timemode: '3', byoyomi: '30', periods: '1', increment: '0', initial: '20' },
+        });
       case '9_2': //go13x13
+        return Object.assign({}, defaultClockConfig, {
+          bullet: { timemode: '3', byoyomi: '3', periods: '1', increment: '0', initial: '1' },
+          blitz: { timemode: '3', byoyomi: '10', periods: '5', increment: '0', initial: '3' },
+          rapid: { timemode: '3', byoyomi: '30', periods: '3', increment: '0', initial: '15' },
+          classical: { timemode: '3', byoyomi: '40', periods: '1', increment: '0', initial: '30' },
+        });
       case '9_4': //go19x19
         return Object.assign({}, defaultClockConfig, {
           bullet: { timemode: '3', byoyomi: '5', periods: '1', increment: '0', initial: '1' },
-          blitz: { timemode: '3', byoyomi: '10', periods: '5', increment: '0', initial: '2' },
-          rapid: { timemode: '3', byoyomi: '30', periods: '3', increment: '0', initial: '10' },
+          blitz: { timemode: '3', byoyomi: '10', periods: '5', increment: '0', initial: '5' },
+          rapid: { timemode: '3', byoyomi: '30', periods: '3', increment: '0', initial: '20' },
           classical: { timemode: '3', byoyomi: '60', periods: '1', increment: '0', initial: '40' },
         });
       case '10_1': //backgammon
-      case '10_2': //nackgammon
-      case '10_4': //hyper
         return Object.assign({}, defaultClockConfig, {
           bullet: { timemode: '5', increment: '5', initial: '1' },
           blitz: { timemode: '5', increment: '10', initial: '1.5' },
           rapid: { timemode: '5', increment: '12', initial: '2' },
+          classical: { timemode: '5', increment: '15', initial: '3' },
+        });
+      case '10_2': //nackgammon
+        return Object.assign({}, defaultClockConfig, {
+          bullet: { timemode: '5', increment: '5', initial: '1' },
+          blitz: { timemode: '5', increment: '10', initial: '2' },
+          rapid: { timemode: '5', increment: '12', initial: '2' },
+          classical: { timemode: '5', increment: '15', initial: '3' },
+        });
+      case '10_4': //hyper
+        return Object.assign({}, defaultClockConfig, {
+          bullet: { timemode: '5', increment: '3', initial: '0.5' },
+          blitz: { timemode: '5', increment: '10', initial: '1' },
+          rapid: { timemode: '5', increment: '12', initial: '1.5' },
           classical: { timemode: '5', increment: '15', initial: '3' },
         });
       case '12_1': // abalone
