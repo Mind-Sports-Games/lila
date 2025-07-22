@@ -18,7 +18,8 @@ object library {
 
   def show(
       variant: Variant,
-      data: List[(String, String, Long)]
+      data: List[(String, String, Long)],
+      playban: Boolean
   )(implicit ctx: Context) =
     views.html.base.layout(
       title = s"${VariantKeys.variantName(variant)} • ${VariantKeys.variantTitle(variant)}",
@@ -86,7 +87,8 @@ object library {
           a(
             href := routes.Setup.hookForm,
             cls := List(
-              "button button-color-choice config_hook" -> true
+              "button button-color-choice config_hook" -> true,
+              "disabled"                               -> (playban || ctx.isBot)
               //"disabled"                               -> (playban.isDefined || currentGame.isDefined || ctx.isBot)
             ),
             trans.createAGame()
