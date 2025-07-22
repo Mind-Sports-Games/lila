@@ -19,10 +19,9 @@ final class Library(env: Env) extends LilaController(env) {
     Open { implicit ctx =>
       Variant.all.find(_.key == key) match {
         case Some(variant) => {
-          (ctx.userId ?? env.playban.api.hasCurrentBan) zip
-            env.game.cached.monthlyGames flatMap { case (playban, data) =>
-              Ok(views.html.site.library.show(variant, data, playban)).fuccess
-            }
+          env.game.cached.monthlyGames flatMap { libraryStats =>
+            Ok(views.html.site.library.show(variant, libraryStats)).fuccess
+          }
         }
         case None => NotFound("Variant not found").fuccess
       }
