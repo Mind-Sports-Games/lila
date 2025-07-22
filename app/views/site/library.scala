@@ -82,6 +82,16 @@ object library {
             a(href := routes.Library.home.url, cls := "library-back")("Library")
           )
         ),
+        div(cls := "start")(
+          a(
+            href := routes.Setup.hookForm,
+            cls := List(
+              "button button-color-choice config_hook" -> true
+              //"disabled"                               -> (playban.isDefined || currentGame.isDefined || ctx.isBot)
+            ),
+            trans.createAGame()
+          )
+        ),
         div(id := "library_chart_area")(
           div(id := "library_chart")(spinner)
         )
