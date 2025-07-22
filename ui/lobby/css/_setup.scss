@@ -84,9 +84,61 @@ $game-family-p2-pieces: (
     padding: 0.5em 1em;
   }
 
+  .mode_choice,
+  .bot_choice,
+  .playerIndex_choices,
+  .byoyomi_periods {
+    & group.radio div {
+      max-width: unset;
+    }
+  }
+
+  .playerIndex_choices {
+    & group.radio div {
+      width: unset;
+    }
+  }
+
+  .bot_choice {
+    & group.radio div {
+      width: 25%;
+    }
+  }
+
+  .byoyomi_periods {
+    & group.radio div {
+      width: 20%;
+    }
+  }
+
+  .gameGroup_choice,
+  .variant_choice {
+    & group.radio {
+      label {
+        padding: 2px;
+      }
+      div {
+        width: 25%;
+        max-width: 25%;
+        font-size: 95%;
+      }
+    }
+  }
+
+  @for $i from 1 through 3 {
+    .variant_choice group.radio.child-count-#{$i} div {
+      width: #{100% / $i};
+      max-width: #{100% / $i};
+    }
+  }
+
   group.radio {
     margin: 0 auto 1em auto;
-    width: 70%;
+    width: 100%;
+    div {
+      width: 33.33%;
+      max-width: 33.33%;
+    }
 
     .disabled {
       opacity: 0.4;
@@ -96,19 +148,32 @@ $game-family-p2-pieces: (
     input:checked + label {
       background: $c-setup;
     }
+
+    label {
+      display: flex;
+      flex-flow: column;
+      &::before {
+        font-size: 200%;
+      }
+      height: 64px;
+    }
+  }
+
+  .bot_choice,
+  .byoyomi_periods {
+    group.radio label {
+      // width: 3em;
+      height: 3em;
+    }
   }
 
   .optional_config {
     border-bottom: $border;
-  }
-
-  .mode_choice {
-    margin-top: 1em;
-  }
-
-  .optional_config,
-  .ratings {
     background: $c-bg-zebra;
+    border-top: $border;
+  }
+
+  .submit {
     border-top: $border;
   }
 
@@ -128,6 +193,77 @@ $game-family-p2-pieces: (
       margin-left: 0.8em;
       font-weight: bold;
     }
+  }
+
+  .mode_choice,
+  .opponent_choices,
+  .playerIndex,
+  .gameGroup_choice,
+  .variant_choice,
+  .time_mode_defaults {
+    &.collapsible:not(.active) {
+      @extend %flex-center;
+    }
+  }
+
+  .opponent_choices.collapsible {
+    flex-flow: row nowrap;
+    .opponent_bot.choice {
+      text-wrap-mode: nowrap;
+      a {
+        margin-left: -2em;
+      }
+      a:has(i) {
+        margin-left: -4em;
+      }
+    }
+  }
+
+  .collapsible:not(.active) {
+    .section_title {
+      flex: 0 0 33%;
+      text-align: center;
+      padding-bottom: 0;
+    }
+  }
+
+  .section_title {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    padding-bottom: 1em;
+    a[data-icon] {
+      padding-right: 0.3em;
+    }
+  }
+
+  .choice {
+    margin-left: 2em;
+    &::before {
+      font-size: 200%;
+      margin-right: 2em;
+    }
+
+    &.playerIndex__button {
+      display: flex;
+      flex-flow: row nowrap;
+      justify-content: center;
+      align-items: center;
+      margin-left: -5.2em;
+      height: 45px !important;
+      &.random {
+        margin-left: -2.8em;
+      }
+      i {
+        margin-right: 3.8em;
+      }
+    }
+  }
+
+  group.radio.hide,
+  label.hide {
+    display: none;
   }
 
   .fen_position {
@@ -181,7 +317,7 @@ $game-family-p2-pieces: (
   }
 
   .ratings {
-    padding: 1em;
+    margin-right: 4em;
     width: 100%;
     text-align: center;
   }
@@ -192,28 +328,27 @@ $game-family-p2-pieces: (
 
   @each $gf in $game-family {
     $iter: index($game-family, $gf);
-    .playerIndex-submits.#{$gf} {
+    .playerIndex_choices.#{$gf} {
       display: flex;
       align-items: flex-end;
       justify-content: center;
-      margin: 1em auto;
+      margin: 0 auto;
       text-align: center;
 
-      $padding_button: if($gf == 'oware', 0px, 7px);
-      $padding_random: if($gf == 'oware', 0px, 10px);
+      $padding_button: 7px;
 
-      .playerIndex-submits__button {
-        margin: 0 0.5em;
-        width: 64px;
-        height: 64px;
+      .playerIndex__button {
+        //width: 64px;
+        height: 65px;
         padding: $padding_button;
 
         i {
           display: block;
           padding: 0;
-          width: calc(64px - 2 * #{$padding_button});
-          height: calc(64px - 2 * #{$padding_button});
-          background-size: calc(64px - 2 * #{$padding_button}) calc(64px - 2 * #{$padding_button});
+          margin-bottom: 2px;
+          width: calc(45px - 2 * #{$padding_button});
+          height: calc(45px - 2 * #{$padding_button});
+          background-size: calc(45px - 2 * #{$padding_button}) calc(45px - 2 * #{$padding_button});
         }
 
         $p1-piece: nth($game-family-p1-pieces, $iter);
@@ -227,17 +362,14 @@ $game-family-p2-pieces: (
         }
 
         &.random {
-          width: 85px;
-          height: 85px;
-          padding: $padding_random;
-
           $file: nth($game-family-random-pieces, $iter);
           & i {
             background-image: url(../piece/#{$gf}/#{$file});
-            background-size: calc(85px - 2 * #{$padding_random}) calc(85px - 2 * #{$padding_random});
-            width: calc(85px - 2 * #{$padding_random});
-            height: calc(85px - 2 * #{$padding_random});
           }
+        }
+
+        div {
+          text-transform: capitalize;
         }
 
         &.nope {
@@ -248,12 +380,24 @@ $game-family-p2-pieces: (
           opacity: 0.3;
         }
       }
+    }
+  }
 
-      .spinner {
-        width: 85px;
-        height: 85px;
-        margin: 10px auto 20px auto;
+  .submit {
+    .submit_button {
+      &.nope {
+        visibility: hidden;
       }
+
+      &:disabled {
+        opacity: 0.3;
+      }
+    }
+
+    .spinner {
+      width: 50px;
+      height: 50px;
+      margin: 10px auto 20px auto;
     }
   }
 

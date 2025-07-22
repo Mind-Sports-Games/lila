@@ -5,9 +5,10 @@ import strategygames.variant.Variant
 import strategygames.format.FEN
 import lila.lobby.PlayerIndex
 import lila.rating.PerfType
+import lila.rating.RatingRange
 import lila.game.PerfPicker
 
-case class FriendConfig(
+case class GameConfig(
     variant: Variant,
     fenVariant: Option[Variant],
     timeMode: TimeMode,
@@ -22,7 +23,8 @@ case class FriendConfig(
     mode: Mode,
     playerIndex: PlayerIndex,
     fen: Option[FEN] = None,
-    multiMatch: Boolean = false
+    multiMatch: Boolean = false,
+    opponent: String = "friend"
 ) extends HumanConfig
     with Positional {
 
@@ -43,8 +45,22 @@ case class FriendConfig(
     mode.id.some,
     playerIndex.name,
     fen.map(_.value),
-    multiMatch
+    multiMatch,
+    opponent
   ).some
+
+  def toHookConfig = HookConfig(
+    variant = variant,
+    timeMode = timeMode,
+    time = time,
+    increment = increment,
+    byoyomi = byoyomi,
+    periods = periods,
+    days = days,
+    mode = mode,
+    playerIndex = playerIndex,
+    ratingRange = RatingRange.default
+  )
 
   def isPersistent = timeMode == TimeMode.Unlimited || timeMode == TimeMode.Correspondence
 
@@ -77,9 +93,10 @@ case class FriendConfig(
       variant.gameFamily == GameFamily.Backgammon() &&
         backgammonPoints.getOrElse(1) % 2 == 1
     )
+
 }
 
-object FriendConfig extends BaseHumanConfig {
+object GameConfig extends BaseHumanConfig {
 
   def from(
       v: String,
@@ -96,11 +113,12 @@ object FriendConfig extends BaseHumanConfig {
       m: Option[Int],
       c: String,
       fen: Option[String],
-      mm: Boolean
+      mm: Boolean,
+      o: String
   ) = {
     val gameLogic = GameFamily(v.split("_")(0).toInt).gameLogic
     val variantId = v.split("_")(1).toInt
-    new FriendConfig(
+    new GameConfig(
       variant = Variant(gameLogic, variantId) err s"Invalid game variant $v",
       fenVariant = gameLogic match {
         case GameLogic.Draughts() =>
@@ -120,11 +138,12 @@ object FriendConfig extends BaseHumanConfig {
       mode = m.fold(Mode.default)(Mode.orDefault),
       playerIndex = PlayerIndex(c) err "Invalid playerIndex " + c,
       fen = fen.map(f => FEN.apply(gameLogic, f)),
-      multiMatch = mm
+      multiMatch = mm,
+      opponent = o
     )
   }
 
-  def default(l: Int) = FriendConfig(
+  def default(l: Int) = GameConfig(
     variant = defaultVariants(l),
     fenVariant = none,
     timeMode = TimeMode.Unlimited,
@@ -137,16 +156,19 @@ object FriendConfig extends BaseHumanConfig {
     backgammonPoints = none,
     days = 2,
     mode = Mode.default,
-    playerIndex = PlayerIndex.default
+    playerIndex = PlayerIndex.default,
+    opponent = "friend"
   )
+
+  def opponentTypes: List[String] = List("friend", "bot", "lobby")
 
   import lila.db.BSON
   import lila.db.dsl._
 
-  implicit private[setup] val friendConfigBSONHandler: BSON[FriendConfig] = new BSON[FriendConfig] {
+  implicit private[setup] val gameConfigBSONHandler: BSON[GameConfig] = new BSON[GameConfig] {
 
-    def reads(r: BSON.Reader): FriendConfig =
-      FriendConfig(
+    def reads(r: BSON.Reader): GameConfig =
+      GameConfig(
         variant = Variant.orDefault(GameLogic(r intD "l"), r int "v"),
         fenVariant = r intD "l" match {
           case 0 => none
@@ -167,10 +189,11 @@ object FriendConfig extends BaseHumanConfig {
         mode = Mode orDefault (r int "m"),
         playerIndex = PlayerIndex.P1,
         fen = r.getO[FEN]("f") filter (_.value.nonEmpty),
-        multiMatch = ~r.boolO("mm")
+        multiMatch = ~r.boolO("mm"),
+        opponent = "friend"
       )
 
-    def writes(w: BSON.Writer, o: FriendConfig) =
+    def writes(w: BSON.Writer, o: GameConfig) =
       $doc(
         "l"  -> o.variant.gameLogic.id,
         "v"  -> o.variant.id,

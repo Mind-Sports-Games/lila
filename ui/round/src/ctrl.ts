@@ -652,7 +652,7 @@ export default class RoundController {
     d.dice = stratUtils.readDice(o.fen, this.data.game.variant.key, o.canEndTurn, this.areDiceDescending);
     d.doublingCube = stratUtils.readDoublingCube(o.fen, this.data.game.variant.key);
     d.activeDiceValue = this.activeDiceValue(d.dice);
-    (d.cubeActions = o.cubeActions), (d.forcedAction = o.forcedAction);
+    ((d.cubeActions = o.cubeActions), (d.forcedAction = o.forcedAction));
 
     d.crazyhouse = o.crazyhouse;
     d.takebackable = d.canTakeBack ? o.takebackable : false;

@@ -74,7 +74,9 @@ object theirs {
             div(cls := "follow-up")(
               h1(trans.challenge.challengeDeclined()),
               bits.details(c, playerIndex),
-              a(cls := "button button-fat", href := routes.Lobby.home)(trans.newOpponent())
+              a(cls := "button button-fat button-color-choice", href := routes.Lobby.home)(
+                trans.newOpponent()
+              )
             )
           case Status.Accepted =>
             div(cls := "follow-up")(
@@ -83,7 +85,7 @@ object theirs {
               a(
                 id := "challenge-redirect",
                 href := routes.Round.watcher(c.id, "p1"),
-                cls := "button button-fat"
+                cls := "button button-fat button-color-choice"
               )(
                 trans.joinTheGame()
               )
@@ -92,7 +94,9 @@ object theirs {
             div(cls := "follow-up")(
               h1(trans.challenge.challengeCanceled()),
               bits.details(c, playerIndex),
-              a(cls := "button button-fat", href := routes.Lobby.home)(trans.newOpponent())
+              a(cls := "button button-fat button-color-choice", href := routes.Lobby.home)(
+                trans.newOpponent()
+              )
             )
         }
       )

@@ -10,6 +10,7 @@ public/piece-css
 public/compiled
 public/glyphs.json
 public/javascripts/vendor
+public/javascripts/*.js
 public/vendor
 
 translation/dest
