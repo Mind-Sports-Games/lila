@@ -4,10 +4,11 @@ on:
   workflow_dispatch:
 
 jobs:
-  deploy_to_dev:
-    runs-on: ubuntu-24.04
-    steps:
-      - name: deploy assets
-        uses: ./.github/workflows/deploy_assets_dev.yml
-      - name: deploy server
-        uses: ./.github/workflows/deploy_server_dev.yml
+  deploy_assets:
+    uses: ./.github/workflows/deploy_assets_dev.yml
+    with:
+      job: deploy_assets
+  deploy_server:
+    uses: ./.github/workflows/deploy_server_dev.yml
+    with:
+      job: deploy_server
