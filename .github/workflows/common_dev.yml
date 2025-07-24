@@ -3,13 +3,16 @@ on:
     inputs:
       java-version:
         required: true
-        default: 17.0.5
+        default: '17.0.5'
+        type: string
       node-version:
         required: true
-        default: 20
+        default: '20'
+        type: string
       ubuntu-version:
         required: true
         default: '24.04'
+        type: string
 
 jobs:
   deploy_assets:
