@@ -480,6 +480,10 @@
     <item quantity="one">%s partie en cours</item>
     <item quantity="other">%s parties en cours</item>
   </plurals>
+  <plurals name="nbLiveGamesInPlay">
+    <item quantity="one">%s partie en cours</item>
+    <item quantity="other">%s parties en cours</item>
+  </plurals>
   <string name="automaticallyProceedToNextGameAfterMoving">Aller automatiquement à la prochaine partie après chaque coup</string>
   <string name="autoSwitch">Changement automatique</string>
   <string name="puzzles">Problèmes</string>
