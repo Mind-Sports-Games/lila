@@ -2,18 +2,10 @@ name: Deploy Branch to Dev
 
 on:
   workflow_dispatch:
-    inputs:
-      ubuntu-version:
-        required: true
-        default: '24.04'
-        type: string
-#  push:
-#    branches:
-#      - dev
 
 jobs:
   deploy_to_dev:
-    runs-on: ubuntu-${{ inputs.ubuntu-version }}
+    runs-on: ubuntu-24.04
     steps:
       - name: deploy assets
         uses: ./.github/workflows/common_dev.yml
