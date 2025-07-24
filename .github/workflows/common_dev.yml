@@ -2,20 +2,20 @@ on:
   workflow_call:
     inputs:
       java-version:
+        type: string
         required: true
         default: '17.0.5'
-        type: string
       node-version:
+        type: string
         required: true
         default: '20'
-        type: string
       ubuntu-version:
+        type: string
         required: true
         default: '24.04'
-        type: string
       job:
-        required: true
         type: string
+        required: true
 
 jobs:
   deploy_assets:
