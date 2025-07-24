@@ -19,8 +19,7 @@ export default function PlayStrategyEditor(element: HTMLElement, config: Editor.
 
   menuHover();
 
-  return {
-    getFen: ctrl.getFenFromSetup.bind(ctrl),
+  return {getFen: ctrl.getFenFromSetup.bind(ctrl),
     setOrientation: ctrl.setOrientation.bind(ctrl),
   };
 }
