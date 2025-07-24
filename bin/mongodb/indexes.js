@@ -55,6 +55,6 @@ db.swiss.createIndex({ featurable: 1 }, { partialFilterExpression: { featurable:
 
 db.swiss_pairing.createIndex({ s: 1, p: 1, r: 1 });
 db.swiss_pairing.createIndex({ t: 1 }, { partialFilterExpression: { t: true } });
-db.swiss_pairing.createIndex({ mmids: 1 })
+db.swiss_pairing.createIndex({ mmids: 1 });
 
 db.swiss_player.createIndex({ s: 1, c: -1 });
