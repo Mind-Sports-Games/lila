@@ -1,0 +1,19 @@
+name: Deploy Branch to Dev
+
+on:
+  workflow_dispatch:
+
+jobs:
+  deploy_assets:
+    uses: ./.github/workflows/deploy_assets_dev.yml
+    with:
+      job: deploy_assets
+    secrets: inherit
+
+  deploy_server:
+    uses: ./.github/workflows/deploy_server_dev.yml
+    with:
+      job: deploy_server
+    secrets: inherit
+    needs: deploy_assets
+    if: ${{ needs.deploy_assets.result == 'success' }}

@@ -1,0 +1,74 @@
+on:
+  workflow_call:
+    inputs:
+      job:
+        required: true
+        type: string
+jobs:
+  deploy_server:
+    runs-on: ubuntu-24.04
+    env:
+      JAVA_OPTS: '-Xmx20g'
+      SBT_OPTS: '-Dsbt.ci=true'
+    steps:
+      - name: Check if organization member
+        id: check_org_member
+        uses: Mind-Sports-Games/check-org-member@v1.1.0
+        with:
+          username: ${{ github.actor }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Check Failed
+        if: ${{ steps.check_org_member.outputs.result == 'false' }}
+        run: |
+          echo User Does Not Belong to Mind-Sports-Games
+          exit 1
+      - name: Check Passed
+        run: echo The actor is an organization member
+      - uses: actions/checkout@v4
+      - uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.MSO_CI_SSH_KEY }}
+      - name: Checkout Mind-Sports-Games/lila-maven
+        uses: actions/checkout@v4
+        with:
+          repository: Mind-Sports-Games/lila-maven
+          ssh-key: ${{ secrets.MSO_CI_SSH_KEY }}
+          path: deps/lila-maven
+      - uses: actions/cache@v4
+        with:
+          path: |
+            ~/.sbt
+            ~/.ivy2/cache
+          key: ${{ runner.os }}-sbt-${{ hashFiles('**/project/build.properties') }}-${{ hashFiles('**/build.sbt') }}-${{ hashFiles('**/project/Dependencies.scala') }}
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17.0.5
+          cache: sbt
+      - name: Setup sbt
+        uses: sbt/setup-sbt@v1
+      - run: TZ=UTC git log -1 --date=iso-strict-local --pretty='format:app.version.commit = "%h"%napp.version.date = "%ad"%napp.version.message = """%s"""%n' | tee conf/version.conf
+      - run: ./lila -Depoll=true "test;stage"
+      - run: cp LICENSE COPYING.md README.md target/universal/stage && git log -n 1 --pretty=oneline > target/universal/stage/commit.txt
+      - run: cd target/universal/stage && tar -cvpJf ../../../lila-3.0.tar.xz . && cd -
+        env:
+          XZ_OPT: '-0'
+      - uses: actions/upload-artifact@v4
+        with:
+          name: lila-server
+          path: lila-3.0.tar.xz
+      - name: Dev -- Copy file to server
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.PSD_MAIN_HOST }}
+          username: ${{ secrets.PSD_MAIN_USERNAME }}
+          key: ${{ secrets.MSO_CI_SSH_KEY }}
+          source: 'lila-3.0.tar.xz'
+          target: '/tmp/'
+      - name: Dev -- Upgrade application
+        uses: garygrossgarten/github-action-ssh@release
+        with:
+          command: /opt/lila/upgrade.sh lila /tmp/lila-3.0.tar.xz
+          host: ${{ secrets.PSD_MAIN_HOST }}
+          username: ${{ secrets.PSD_MAIN_USERNAME }}
+          privateKey: ${{ secrets.MSO_CI_SSH_KEY }}
