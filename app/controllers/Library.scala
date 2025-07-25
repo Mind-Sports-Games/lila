@@ -10,7 +10,7 @@ final class Library(env: Env) extends LilaController(env) {
     Open { implicit ctx =>
       {
         env.game.cached.monthlyGames.flatMap { data =>
-          Ok(views.html.site.library.home(data)).fuccess
+          Ok(views.html.library.home(data)).fuccess
         }
       }
     }
@@ -20,7 +20,7 @@ final class Library(env: Env) extends LilaController(env) {
       Variant.all.find(_.key == key) match {
         case Some(variant) => {
           env.game.cached.monthlyGames flatMap { libraryStats =>
-            Ok(views.html.site.library.show(variant, libraryStats)).fuccess
+            Ok(views.html.library.show(variant, libraryStats)).fuccess
           }
         }
         case None => NotFound("Variant not found").fuccess
