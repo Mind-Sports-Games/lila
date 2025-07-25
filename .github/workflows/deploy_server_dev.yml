@@ -1,6 +1,9 @@
 on:
   workflow_call:
-
+    inputs:
+      job:
+        required: true
+        type: string
 jobs:
   deploy_server:
     runs-on: ubuntu-24.04
