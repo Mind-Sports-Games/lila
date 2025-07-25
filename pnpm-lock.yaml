@@ -253,6 +253,15 @@ importers:
         specifier: github:ornicar/mithril.js#lila-1
         version: https://codeload.github.com/ornicar/mithril.js/tar.gz/dd92827aec63f921149ca9a3460ccd981e7025bb
 
+  ui/library:
+    dependencies:
+      common:
+        specifier: workspace:*
+        version: link:../common
+      snabbdom:
+        specifier: ^3.0.1
+        version: 3.5.1
+
   ui/lobby:
     dependencies:
       '@types/debounce-promise':

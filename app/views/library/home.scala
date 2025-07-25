@@ -20,7 +20,7 @@ object home {
       title = "Library of Games",
       moreCss = cssTag("library"),
       moreJs = frag(
-        jsModule("libraryHome"),
+        jsModule("library"),
         jsTag("chart/library.js"),
         embedJsUnsafeLoadThen(s"""window.libraryChartData = ${safeJsonValue(
           Json.obj(

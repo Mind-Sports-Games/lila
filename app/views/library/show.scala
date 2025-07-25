@@ -52,7 +52,7 @@ object show {
       )(
         div(cls := "library-header color-choice")(
           h1(cls := "library-title", dataIcon := variant.perfIcon)(
-            s"${VariantKeys.variantName(variant)}"
+            span(s"${VariantKeys.variantName(variant)}")
           ),
           div(cls := "library-links")(
             a(cls := "library-rules", href := s"${routes.Page.variant(variant.key)}", target := "_blank")(
