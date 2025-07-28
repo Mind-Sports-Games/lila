@@ -23,7 +23,7 @@ object show {
       title = s"${VariantKeys.variantName(variant)} • ${VariantKeys.variantTitle(variant)}",
       moreCss = cssTag("library"),
       moreJs = frag(
-        //jsModule("library"),
+        jsModule("libraryVariant"),
         jsTag("chart/library.js"),
         embedJsUnsafeLoadThen(s"""playstrategy.libraryChart(${safeJsonValue(
           Json.obj(
@@ -51,34 +51,37 @@ object show {
         cls := "library-all"
       )(
         div(cls := "library-header color-choice")(
-          h1(cls := "library-title", dataIcon := variant.perfIcon)(
-            span(s"${VariantKeys.variantName(variant)}")
+          h1(cls := "library-title")(
+            a(href := routes.Library.home.url, cls := "library-back", title := "back", dataIcon := "I")(),
+            span(s"${VariantKeys.variantName(variant)}"),
+            span(dataIcon := variant.perfIcon)()
           ),
           div(cls := "library-links")(
-            a(cls := "library-rules", href := s"${routes.Page.variant(variant.key)}", target := "_blank")(
+            a(cls := "library-rules", href := s"${routes.Page.variant(variant.key)}")(
               "Rules"
             ),
             bits.studyLink(variant).map { studyId =>
-              a(cls := "library-tutorial", href := s"${routes.Study.show(studyId)}", target := "_blank")(
+              a(cls := "library-tutorial", href := s"${routes.Study.show(studyId)}")(
                 "Tutorial"
               )
             },
             a(cls := "library-editor", href := s"${routes.Editor.index}?variant=${variant.key}")(
               "Editor"
             ),
-            a(cls := "library-analysis", href := routes.UserAnalysis.parseArg(variant.key))(
+            variant.hasAnalysisBoard option a(
+              cls := "library-analysis",
+              href := routes.UserAnalysis.parseArg(variant.key)
+            )(
               "Analysis"
             ),
             ctx.userId.map(user =>
               a(
                 cls := "library-mystats",
-                href := routes.User.perfStat(user, variant.key),
-                target := "_blank"
+                href := routes.User.perfStat(user, variant.key)
               )(
                 "My Stats"
               )
-            ),
-            a(href := routes.Library.home.url, cls := "library-back")("Library")
+            )
           )
         ),
         div(cls := "start")(

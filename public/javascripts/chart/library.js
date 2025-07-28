@@ -122,7 +122,7 @@ playstrategy.libraryChart = function (data, allowedVariants) {
           yAxis: {
             title: { text: trans.noarg('Total Games') },
             min: 1,
-            type: 'logarithmic',
+            //type: 'logarithmic',
           },
           series: series,
           plotOptions: {},

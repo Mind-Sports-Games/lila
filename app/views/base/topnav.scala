@@ -31,8 +31,14 @@ object topnav {
             a(href := routes.Swiss.home)(trans.swiss.swissTournaments()),
             a(href := routes.Simul.home)(trans.simultaneousExhibitions()),
             ctx.pref.hasDgt option a(href := routes.DgtCtrl.index)("DGT board")
-            //a(href := routes.Library.home)("Games")
           )
+        )
+      ),
+      ctx.noBot option st.section(
+        linkTitle(routes.Library.home.path, trans.games()),
+        div(role := "group")(
+          a(href := routes.Library.home)(trans.gameLibrary()),
+          a(href := routes.Memory.home)(trans.memoryGame())
         )
       ),
       /*ctx.noBot option st.section(
@@ -56,8 +62,7 @@ object topnav {
           ctx.noBot option frag(
             //a(href := routes.Learn.index)(trans.chessBasics()),
             //a(href := routes.Practice.index)(trans.practice()),
-            a(href := routes.Coordinate.home)(s"Chess ${trans.coordinates.coordinates.txt()}"),
-            a(href := routes.Memory.home)(trans.memoryGame())
+            a(href := routes.Coordinate.home)(s"Chess ${trans.coordinates.coordinates.txt()}")
           ),
           //ctx.noKid option a(href := routes.Coach.all(1))(trans.coaches()),
           canSeeClasMenu option a(href := routes.Clas.index)(trans.clas.playstrategyClasses())

@@ -48,15 +48,15 @@ object home {
         id := "library-section",
         cls := "library-all"
       )(
-        h1(cls := "library-title color-choice")("Library of Games"),
+        h1(cls := "library-title color-choice")(trans.gameLibrary()),
         div(cls := "gamegroup-choice")(
-          div(cls := "section-title")("Game Group"),
+          div(cls := "section-title")(trans.gameGroup()),
           div(cls := "gamegroup-icons")(translatedGameGroupIconChoices map { case (id, icon, hint) =>
             (button(cls := "gamegroup", value := id, dataIcon := icon)(hint))
           })
         ),
         div(cls := "variants-choice")(
-          div(cls := "section-title")("Variant"),
+          div(cls := "section-title")(trans.variant()),
           div(cls := "variants-icons")(translatedVariantIconChoices.filter { case (id, _, _) =>
             id != "0_3" //from position
           } map { case (id, icon, name) =>

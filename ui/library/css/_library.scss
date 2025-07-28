@@ -40,8 +40,7 @@
       flex: 1 1 auto;
       display: flex;
       margin-bottom: 1em;
-      justify-content: center;
-      gap: 1em;
+      justify-content: space-evenly;
       a {
         display: inline-block;
         white-space: nowrap;
@@ -63,13 +62,9 @@
     width: 100%;
     padding: 0.5em;
     margin: 0;
-    &::before {
-      margin-right: -1.1em;
-      text-align: left;
-    }
-    span {
-      flex: 1;
-      text-align: center;
+    // Only justify-content: space-between if there is a span child (variant page)
+    &:has(span) {
+      justify-content: space-between;
     }
   }
 
@@ -127,6 +122,19 @@
 
       &:not(.selected):not(:hover) {
         @include metal;
+      }
+
+      &:hover {
+        color: initial;
+      }
+
+      //dont change color on hover for selected buttons
+      @each $c in ('black', 'green', 'red', 'blue', 'yellow') {
+        .selected-color-#{$c} &.button-color-choice.selected:hover {
+          background: map-get($c-color-choice-map, $c);
+          color: $c-color-choice-font-default;
+          text-shadow: 0 1px 0 map-get($c-color-choice-map, $c);
+        }
       }
 
       &.button.button-color-choice {

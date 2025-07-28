@@ -20,6 +20,9 @@
     "prod": "tsc"
   },
   "playstrategy": {
-    "bundles": "src/library.ts"
+    "bundles": [
+      "src/library.ts",
+      "src/libraryVariant.ts"
+    ]
   }
 }
