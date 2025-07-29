@@ -11,7 +11,6 @@ import lila.i18n.{ I18nKeys => trans, VariantKeys }
 import play.api.i18n.Lang
 
 import strategygames.variant.Variant
-import strategygames.GameLogic
 
 object show {
 
@@ -86,7 +85,7 @@ object show {
         ),
         div(cls := "start")(
           a(
-            href := routes.Setup.gameForm(none),
+            href := s"/?variant=${variant.key}#game",
             cls := List(
               "button button-color-choice config_game" -> true
               //"disabled"                               -> currentGame.isDefined

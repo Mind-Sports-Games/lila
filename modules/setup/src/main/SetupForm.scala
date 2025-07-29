@@ -16,16 +16,22 @@ object SetupForm {
 
   val filter = Form(single("local" -> text))
 
-  def filled(lib: GameLogic, fen: Option[FEN])(implicit ctx: UserContext): Form[GameConfig] =
-    game(ctx) fill fen.foldLeft(GameConfig.default(lib.id)) { case (config, f) =>
-      config.copy(
-        fen = f.some,
-        variant = lib match {
-          case GameLogic.Chess()    => Variant.wrap(strategygames.chess.variant.FromPosition)
-          case GameLogic.Draughts() => Variant.wrap(strategygames.draughts.variant.FromPosition)
-          case _                    => sys.error("No from position variant")
-        }
-      )
+  def filled(lib: GameLogic, fen: Option[FEN], variant: Option[Variant])(implicit
+      ctx: UserContext
+  ): Form[GameConfig] =
+    game(ctx) fill {
+      val baseConfig = GameConfig.default(lib.id)
+      val withFen = fen.fold(baseConfig) { f =>
+        baseConfig.copy(
+          fen = Some(f),
+          variant = lib match {
+            case GameLogic.Chess()    => Variant.wrap(strategygames.chess.variant.FromPosition)
+            case GameLogic.Draughts() => Variant.wrap(strategygames.draughts.variant.FromPosition)
+            case _                    => sys.error("No from position variant")
+          }
+        )
+      }
+      variant.fold(withFen)(v => withFen.copy(variant = v))
     }
 
   def game(ctx: UserContext) =

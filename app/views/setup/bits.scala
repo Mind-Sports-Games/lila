@@ -25,7 +25,12 @@ private object bits {
           dataValidateUrl := s"""${routes.Setup.validateFen}${strict.??("?strict=1")}"""
         )(
           form3.input(field)(st.placeholder := trans.pasteTheFenStringHere.txt()),
-          a(cls := "button button-empty board_editor_link", dataIcon := "m", title := trans.boardEditor.txt(), href := url)
+          a(
+            cls := "button button-empty board_editor_link",
+            dataIcon := "m",
+            title := trans.boardEditor.txt(),
+            href := url
+          )
         ),
         a(cls := "board_editor board_editor_link", href := url)(
           span(cls := "preview")(
@@ -437,4 +442,5 @@ private object bits {
   val dataValidateUrl = attr("data-validate-url")
   val dataResizable   = attr("data-resizable")
   val dataType        = attr("data-type")
+  val dataVariant     = attr("data-variant")
 }

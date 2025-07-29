@@ -11,6 +11,7 @@ import lila.user.User
 import lila.common.LightUser
 
 import strategygames.GameFamily
+import strategygames.variant.Variant
 
 object forms {
 
@@ -20,12 +21,14 @@ object forms {
       form: Form[_],
       user: Option[User],
       error: Option[String],
-      validFen: Option[lila.setup.ValidFen]
+      validFen: Option[lila.setup.ValidFen],
+      inputVariant: Option[Variant]
   )(implicit ctx: Context) =
     layout(
       "game",
       (if (user.isDefined) trans.challenge.challengeToPlay else trans.createAGame)(),
       routes.Setup.game("sri-placeholder", user map (_.id)),
+      inputVariant.map(v => s"${v.gameFamily.id}_${v.id}").getOrElse(""),
       error.map(e => raw(e.replace("{{user}}", userIdLink(user.map(_.id)).toString)))
     ) {
       frag(
@@ -67,6 +70,7 @@ object forms {
       typ: String,
       titleF: Frag,
       route: Call,
+      inputVariant: String,
       error: Option[Frag] = None
   )(fields: Frag)(implicit ctx: Context) =
     div(cls := error.isDefined option "error")(
@@ -84,6 +88,7 @@ object forms {
             action := route,
             novalidate,
             dataRandomPlayerIndexVariants,
+            dataVariant := inputVariant,
             dataType := typ,
             dataAnon := ctx.isAnon.option("1")
           )(

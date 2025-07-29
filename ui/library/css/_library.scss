@@ -11,6 +11,16 @@
     font-size: 2.2em;
   }
 
+  .library-back {
+    color: $c-color-choice-font-default;
+    &:hover {
+      color: $c-link-dim;
+    }
+    &::before {
+      font-size: 1.2em;
+    }
+  }
+
   $c-color-choice-map: (
     'black': $c-color-choice-black,
     'green': $c-color-choice-green,
@@ -48,6 +58,9 @@
         text-overflow: ellipsis;
         color: unset;
         font-weight: bold;
+      }
+      a:hover {
+        color: $c-link-dim;
       }
     }
   }
