@@ -127,17 +127,18 @@ export function ctrl(
 
 function edittab(ctrl: StudyChapterNewFormCtrl): VNode {
   const currentChapter = ctrl.root.study!.data.chapter;
+  const variantKeySelected = ctrl.vm.variantKey() ?? 'standard';
   return h(
     'div.board-editor-wrap',
     {
-      key: ctrl.vm.variantKey() || 'standard',
+      key: variantKeySelected,
       hook: {
         insert(vnode) {
           Promise.all([
             playstrategy.loadModule('editor'),
             xhr.json(
               xhr.url('/editor.json', {
-                variant: ctrl.vm.variantKey() ?? 'standard',
+                variant: variantKeySelected,
                 ...(currentChapter.setup.variant.key === ctrl.vm.variantKey() ? { fen: ctrl.root.node.fen } : {}),
               }),
             ),
@@ -231,6 +232,7 @@ export function view(ctrl: StudyChapterNewFormCtrl): VNode {
   };
   const gameOrPgn = activeTab === 'game' || activeTab === 'pgn';
   const currentChapter = ctrl.root.study!.data.chapter;
+  const variantKeySelected = ctrl.vm.variantKey() ?? 'standard';
   const mode = currentChapter.practice
     ? 'practice'
     : defined(currentChapter.conceal)
@@ -240,9 +242,9 @@ export function view(ctrl: StudyChapterNewFormCtrl): VNode {
         : 'normal';
   const noarg = trans.noarg;
   const onlyForAnalysisVariants = (node: VNode | null): VNode | null =>
-    allowAnalysisForVariant(ctrl.vm.variantKey() ?? 'standard') ? node : null;
+    allowAnalysisForVariant(variantKeySelected) ? node : null;
   const onlyForChessVariants = (node: VNode | null): VNode | null =>
-    isChess(ctrl.vm.variantKey() ?? 'standard') ? node : null;
+    isChess(variantKeySelected) ? node : null;
 
   return modal.modal({
     class: 'chapter-new',
@@ -305,14 +307,14 @@ export function view(ctrl: StudyChapterNewFormCtrl): VNode {
           ]),
           h('div.tabs-horiz', [
             makeTab('init', noarg('empty'), noarg('startFromInitialPosition')),
-            canUseBoardEditor(ctrl.vm.variantKey() || 'standard')
+            canUseBoardEditor(variantKeySelected)
               ? makeTab('edit', noarg('editor'), noarg('startFromCustomPosition'))
               : null,
             onlyForAnalysisVariants(makeTab('game', 'URL', noarg('loadAGameByUrl'))),
             onlyForAnalysisVariants(makeTab('fen', 'FEN', noarg('loadAPositionFromFen'))),
             onlyForChessVariants(makeTab('pgn', 'PGN', noarg('loadAGameFromPgn'))),
           ]),
-          activeTab === 'edit' && canUseBoardEditor(ctrl.vm.variantKey() || 'standard') ? edittab(ctrl) : null,
+          activeTab === 'edit' && canUseBoardEditor(variantKeySelected) ? edittab(ctrl) : null,
           onlyForAnalysisVariants(activeTab === 'game' ? gametab(ctrl) : null),
           onlyForAnalysisVariants(activeTab === 'fen' ? fentab(ctrl) : null),
           onlyForChessVariants(activeTab === 'pgn' ? pgntab(ctrl) : null),
@@ -381,9 +383,9 @@ export function view(ctrl: StudyChapterNewFormCtrl): VNode {
             ),
             h(
               'select#chapter-mode.form-control',
-              (isChess(ctrl.vm.variantKey() ?? 'standard')
+              (isChess(variantKeySelected)
                 ? modeChoices
-                : allowGameBookStudyForVariant(ctrl.vm.variantKey() ?? 'standard')
+                : allowGameBookStudyForVariant(variantKeySelected)
                   ? nonBrowserAnalysisModeChoices
                   : onlyNormalAnalysisModeChoices
               ).map(c => option(c[0], mode, noarg(c[1]))),
