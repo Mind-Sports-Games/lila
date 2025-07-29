@@ -338,7 +338,11 @@ export function view(ctrl: StudyChapterNewFormCtrl): VNode {
                 },
                 gameOrPgn
                   ? [h('option', noarg('automatic'))]
-                  : ctrl.vm.variants
+                  : activeTab === 'edit'
+                    ? ctrl.vm.variants
+                        .filter(v => canUseBoardEditor(v.key))
+                        .map(v => option(v.key, currentChapter.setup.variant.key, v.name))
+                    : ctrl.vm.variants
                       .filter(v => allowAnalysisForVariant(v.key))
                       .map(v => option(v.key, currentChapter.setup.variant.key, v.name)),
               ),
