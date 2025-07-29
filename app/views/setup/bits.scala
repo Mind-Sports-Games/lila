@@ -443,4 +443,5 @@ private object bits {
   val dataResizable   = attr("data-resizable")
   val dataType        = attr("data-type")
   val dataVariant     = attr("data-variant")
+  val dataLobbyBan    = attr("data-lobby-ban")
 }

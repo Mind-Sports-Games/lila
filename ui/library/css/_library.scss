@@ -13,8 +13,8 @@
 
   .library-back {
     color: $c-color-choice-font-default;
-    &:hover {
-      color: $c-link-dim;
+    &:hover::before {
+      font-weight: bold;
     }
     &::before {
       font-size: 1.2em;
@@ -49,18 +49,19 @@
     .library-links {
       flex: 1 1 auto;
       display: flex;
-      margin-bottom: 1em;
+      margin-bottom: 0.5em;
       justify-content: space-evenly;
+      border-top: 1px solid $c-color-choice-font-default;
+      padding-top: 0.5em;
       a {
         display: inline-block;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
         color: unset;
-        font-weight: bold;
       }
       a:hover {
-        color: $c-link-dim;
+        font-weight: bold;
       }
     }
   }

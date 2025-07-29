@@ -34,7 +34,7 @@ object topnav {
           )
         )
       ),
-      ctx.noBot option st.section(
+      st.section(
         linkTitle(routes.Library.home.path, trans.games()),
         div(role := "group")(
           a(href := routes.Library.home)(trans.gameLibrary()),

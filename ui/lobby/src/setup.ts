@@ -364,6 +364,7 @@ export default class Setup {
       $botInput = $form.find('.bot_choice [name=bot]'),
       $opponentInput = $form.find('.opponent_choices [name=opponent]'),
       typ = $form.data('type'),
+      lobbyBan = $form.data('lobby-ban') || this.root.playban || false,
       $ratings = $modal.find('.ratings > div'),
       $collapsibleSections = $modal.find('.collapsible'),
       randomPlayerIndexVariants = $form.data('random-playerindex-variants').split(','),
@@ -402,6 +403,7 @@ export default class Setup {
               $backgammonConfig.val() !== undefined &&
               ($backgammonPointsInput.val() as string) != '1'),
           cantBeLobby =
+            lobbyBan ||
             (variantId[0] == '9' &&
               $goConfig.val() !== undefined &&
               (($goHandicapInput.val() as string) != '0' ||

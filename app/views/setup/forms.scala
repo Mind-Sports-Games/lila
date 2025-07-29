@@ -89,6 +89,7 @@ object forms {
             novalidate,
             dataRandomPlayerIndexVariants,
             dataVariant := inputVariant,
+            dataLobbyBan := ctx.isBot,
             dataType := typ,
             dataAnon := ctx.isAnon.option("1")
           )(
