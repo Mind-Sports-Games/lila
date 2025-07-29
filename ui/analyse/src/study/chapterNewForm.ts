@@ -243,8 +243,7 @@ export function view(ctrl: StudyChapterNewFormCtrl): VNode {
   const noarg = trans.noarg;
   const onlyForAnalysisVariants = (node: VNode | null): VNode | null =>
     allowAnalysisForVariant(variantKeySelected) ? node : null;
-  const onlyForChessVariants = (node: VNode | null): VNode | null =>
-    isChess(variantKeySelected) ? node : null;
+  const onlyForChessVariants = (node: VNode | null): VNode | null => (isChess(variantKeySelected) ? node : null);
 
   return modal.modal({
     class: 'chapter-new',
