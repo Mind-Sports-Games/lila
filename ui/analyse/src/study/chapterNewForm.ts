@@ -135,12 +135,12 @@ function edittab(ctrl: StudyChapterNewFormCtrl): VNode {
         insert(vnode) {
           Promise.all([
             playstrategy.loadModule('editor'),
-            xhr.json(xhr.url('/editor.json', {
-              variant: ctrl.vm.variantKey() ?? 'standard',
-              ...(currentChapter.setup.variant.key === ctrl.vm.variantKey()
-                ? { fen: ctrl.root.node.fen }
-                : {}),
-            }))
+            xhr.json(
+              xhr.url('/editor.json', {
+                variant: ctrl.vm.variantKey() ?? 'standard',
+                ...(currentChapter.setup.variant.key === ctrl.vm.variantKey() ? { fen: ctrl.root.node.fen } : {}),
+              }),
+            ),
           ]).then(([_, data]) => {
             data.embed = true;
             data.options = {
@@ -305,12 +305,14 @@ export function view(ctrl: StudyChapterNewFormCtrl): VNode {
           ]),
           h('div.tabs-horiz', [
             makeTab('init', noarg('empty'), noarg('startFromInitialPosition')),
-            canUseBoardEditor(ctrl.vm.variantKey() || "standard") ? makeTab('edit', noarg('editor'), noarg('startFromCustomPosition')) : null,
+            canUseBoardEditor(ctrl.vm.variantKey() || 'standard')
+              ? makeTab('edit', noarg('editor'), noarg('startFromCustomPosition'))
+              : null,
             onlyForAnalysisVariants(makeTab('game', 'URL', noarg('loadAGameByUrl'))),
             onlyForAnalysisVariants(makeTab('fen', 'FEN', noarg('loadAPositionFromFen'))),
             onlyForChessVariants(makeTab('pgn', 'PGN', noarg('loadAGameFromPgn'))),
           ]),
-          activeTab === 'edit' && canUseBoardEditor(ctrl.vm.variantKey() || "standard") ? edittab(ctrl) : null,
+          activeTab === 'edit' && canUseBoardEditor(ctrl.vm.variantKey() || 'standard') ? edittab(ctrl) : null,
           onlyForAnalysisVariants(activeTab === 'game' ? gametab(ctrl) : null),
           onlyForAnalysisVariants(activeTab === 'fen' ? fentab(ctrl) : null),
           onlyForChessVariants(activeTab === 'pgn' ? pgntab(ctrl) : null),
@@ -343,8 +345,8 @@ export function view(ctrl: StudyChapterNewFormCtrl): VNode {
                         .filter(v => canUseBoardEditor(v.key))
                         .map(v => option(v.key, currentChapter.setup.variant.key, v.name))
                     : ctrl.vm.variants
-                      .filter(v => allowAnalysisForVariant(v.key))
-                      .map(v => option(v.key, currentChapter.setup.variant.key, v.name)),
+                        .filter(v => allowAnalysisForVariant(v.key))
+                        .map(v => option(v.key, currentChapter.setup.variant.key, v.name)),
               ),
             ]),
             h('div.form-group.form-half', [
