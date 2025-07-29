@@ -1,5 +1,6 @@
 import { h, VNode } from 'snabbdom';
 import { defined, prop, Prop } from 'common';
+import { canUseBoardEditor } from 'common/editor';
 import { storedProp, StoredProp } from 'common/storage';
 import * as xhr from 'common/xhr';
 import { allowAnalysisForVariant, isChess, allowGameBookStudyForVariant } from 'common/analysis';
@@ -129,11 +130,17 @@ function edittab(ctrl: StudyChapterNewFormCtrl): VNode {
   return h(
     'div.board-editor-wrap',
     {
+      key: ctrl.vm.variantKey() || 'standard',
       hook: {
         insert(vnode) {
           Promise.all([
             playstrategy.loadModule('editor'),
-            xhr.json(xhr.url('/editor.json', { fen: ctrl.root.node.fen })),
+            xhr.json(xhr.url('/editor.json', {
+              variant: ctrl.vm.variantKey() ?? 'standard',
+              ...(currentChapter.setup.variant.key === ctrl.vm.variantKey()
+                ? { fen: ctrl.root.node.fen }
+                : {}),
+            }))
           ]).then(([_, data]) => {
             data.embed = true;
             data.options = {
@@ -298,12 +305,12 @@ export function view(ctrl: StudyChapterNewFormCtrl): VNode {
           ]),
           h('div.tabs-horiz', [
             makeTab('init', noarg('empty'), noarg('startFromInitialPosition')),
-            onlyForChessVariants(makeTab('edit', noarg('editor'), noarg('startFromCustomPosition'))),
+            canUseBoardEditor(ctrl.vm.variantKey() || "standard") ? makeTab('edit', noarg('editor'), noarg('startFromCustomPosition')) : null,
             onlyForAnalysisVariants(makeTab('game', 'URL', noarg('loadAGameByUrl'))),
             onlyForAnalysisVariants(makeTab('fen', 'FEN', noarg('loadAPositionFromFen'))),
             onlyForChessVariants(makeTab('pgn', 'PGN', noarg('loadAGameFromPgn'))),
           ]),
-          onlyForChessVariants(activeTab === 'edit' ? edittab(ctrl) : null),
+          activeTab === 'edit' && canUseBoardEditor(ctrl.vm.variantKey() || "standard") ? edittab(ctrl) : null,
           onlyForAnalysisVariants(activeTab === 'game' ? gametab(ctrl) : null),
           onlyForAnalysisVariants(activeTab === 'fen' ? fentab(ctrl) : null),
           onlyForChessVariants(activeTab === 'pgn' ? pgntab(ctrl) : null),
