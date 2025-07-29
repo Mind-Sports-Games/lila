@@ -1,44 +1,3 @@
-.board-editor-wrap {
-  // embed board editor in analyse
-  .board-editor {
-    &.variant-xiangqi {
-      .spare {
-        .no-square {
-          flex: 0 0 11.12%;
-        }
-
-        &-bottom {
-          margin-top: 5vh;
-        }
-
-        @media (max-height: 800px) {
-          &-bottom {
-            margin-top: 6vh;
-          }
-        }
-
-        @media (max-height: 600px) {
-          &-bottom {
-            margin-top: 7vh;
-          }
-        }
-
-        @media (min-height: 900px) {
-          &-bottom {
-            margin-top: 4vh;
-          }
-        }
-
-        @media (min-height: 1080px) {
-          &-bottom {
-            margin-top: 3vh;
-          }
-        }
-      }
-    }
-  }
-}
-
 .board-editor {
   &.variant-xiangqi {
     .spare {
@@ -46,20 +5,12 @@
         flex: 0 0 11.12%;
       }
 
+      &-top {
+        margin-bottom: 5%;
+      }
+
       &-bottom {
-        margin-top: 9vh;
-      }
-
-      @media (max-height: 800px) {
-        &-bottom {
-          margin-top: 9vh;
-        }
-      }
-
-      @media (max-height: 600px) {
-        &-bottom {
-          margin-top: 11vh;
-        }
+        margin-top: 16%;
       }
     }
   }
