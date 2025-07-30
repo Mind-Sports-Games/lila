@@ -481,7 +481,12 @@ export default class Setup {
             variantCompatible = true;
         }
       }
-
+      const timeModeDefault = $timeModeDefaults.find('input:checked').val() as string;
+      const nonCustomClock = timeModeDefault !== 'custom';
+      const unsupportedClockVariant =
+        timeModeDefault == 'bullet' && ['8_8', '3_1', '4_2'].includes(variantId.join('_'));
+      const timeMode = <string>$timeModeSelect.val();
+      const isByoyomi = timeMode === '3';
       let clockCompatible = true;
       if (isRealTime()) {
         if (/^stockfish-level[1-8]$/.test(user)) {
@@ -489,15 +494,18 @@ export default class Setup {
         } else {
           switch (user) {
             case 'ps-random-mover': {
-              clockCompatible = limit >= 0.5 || byo > 2;
+              clockCompatible = nonCustomClock || limit >= 0.5 || (isByoyomi && byo >= 2);
               break;
             }
             case 'ps-greedy-one-move': {
-              clockCompatible = limit >= 1 && inc >= 1;
+              clockCompatible =
+                nonCustomClock || (limit >= 1 && inc >= 1) || limit >= 10 || (isByoyomi && byo >= 10) || inc >= 10;
               break;
             }
             default: {
-              clockCompatible = limit >= 3 && inc >= 2;
+              clockCompatible =
+                !unsupportedClockVariant &&
+                (nonCustomClock || (limit >= 3 && inc >= 2) || limit >= 10 || (isByoyomi && byo >= 10) || inc >= 10);
             }
           }
         }
