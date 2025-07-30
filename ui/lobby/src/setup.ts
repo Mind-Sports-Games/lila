@@ -1308,10 +1308,12 @@ export default class Setup {
       }
       updateLobbySubmit();
       toggleButtons();
+      save();
     });
     $botInput.on('change', function (this: HTMLElement) {
       updateBotDetails();
       toggleButtons();
+      save();
     });
 
     $variantInput

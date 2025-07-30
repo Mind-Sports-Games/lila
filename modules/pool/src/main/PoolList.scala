@@ -12,38 +12,38 @@ object PoolList {
     //PoolConfig(1 ++ 0, Wave(22 seconds, 30 players), Variant.Chess(strategygames.chess.variant.Standard)),
     PoolConfig(3 ++ 2, Wave(22 seconds, 30 players), Variant.Chess(strategygames.chess.variant.Standard)),
     PoolConfig(
-      3 ++ 2,
+      5 ++ 3,
       Wave(22 seconds, 30 players),
       Variant.Draughts(strategygames.draughts.variant.Standard)
     ),
     PoolConfig(
-      3 ++ 2,
+      strategygames.Clock.SimpleDelayConfig(90, 10),
       Wave(22 seconds, 30 players),
-      Variant.Chess(strategygames.chess.variant.LinesOfAction)
+      Variant.Backgammon(strategygames.backgammon.variant.Backgammon)
     ),
     PoolConfig(
       strategygames.ByoyomiClock.Config(5 * 60, 0, 10, 1),
       Wave(22 seconds, 30 players),
       Variant.FairySF(strategygames.fairysf.variant.Shogi)
     ),
-    PoolConfig(3 ++ 2, Wave(22 seconds, 30 players), Variant.FairySF(strategygames.fairysf.variant.Xiangqi)),
-    PoolConfig(3 ++ 2, Wave(22 seconds, 30 players), Variant.FairySF(strategygames.fairysf.variant.Flipello)),
-    PoolConfig(3 ++ 2, Wave(22 seconds, 30 players), Variant.FairySF(strategygames.fairysf.variant.Amazons)),
-    PoolConfig(3 ++ 2, Wave(22 seconds, 30 players), Variant.Samurai(strategygames.samurai.variant.Oware)),
-    PoolConfig(
-      5 ++ 3,
-      Wave(22 seconds, 30 players),
-      Variant.Abalone(strategygames.abalone.variant.Abalone)
-    ),
     PoolConfig(
       3 ++ 2,
       Wave(22 seconds, 30 players),
       Variant.FairySF(strategygames.fairysf.variant.BreakthroughTroyka)
     ),
+    PoolConfig(3 ++ 2, Wave(22 seconds, 30 players), Variant.Samurai(strategygames.samurai.variant.Oware)),
+    PoolConfig(5 ++ 3, Wave(22 seconds, 30 players), Variant.FairySF(strategygames.fairysf.variant.Xiangqi)),
     PoolConfig(
-      strategygames.Clock.SimpleDelayConfig(2 * 60, 12),
+      3 ++ 2,
       Wave(22 seconds, 30 players),
-      Variant.Backgammon(strategygames.backgammon.variant.Backgammon)
+      Variant.Chess(strategygames.chess.variant.LinesOfAction)
+    ),
+    PoolConfig(3 ++ 5, Wave(22 seconds, 30 players), Variant.FairySF(strategygames.fairysf.variant.Amazons)),
+    PoolConfig(5 ++ 0, Wave(22 seconds, 30 players), Variant.FairySF(strategygames.fairysf.variant.Flipello)),
+    PoolConfig(
+      5 ++ 3,
+      Wave(22 seconds, 30 players),
+      Variant.Abalone(strategygames.abalone.variant.Abalone)
     )
   )
 
