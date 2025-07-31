@@ -69,4 +69,11 @@
   &.chapter-new .tabs-horiz {
     margin: -1em 0 1.6em 0;
   }
+
+  &.chapter-new {
+    option[disabled] {
+      color: gray;
+      font-style: italic;
+    }
+  }
 }

@@ -5,14 +5,12 @@
         flex: 0 0 11.12%;
       }
 
-      &-bottom {
-        margin-top: 9vh;
+      &-top {
+        margin-bottom: 5%;
       }
 
-      @include breakpoint($mq-landscape-mobile) {
-        .coords-out &-bottom {
-          margin-top: 7vh;
-        }
+      &-bottom {
+        margin-top: 16%;
       }
     }
   }
