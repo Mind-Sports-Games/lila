@@ -313,34 +313,32 @@ export function view(ctrl: StudyChapterNewFormCtrl): VNode {
             onlyForAnalysisVariants(makeTab('fen', 'FEN', noarg('loadAPositionFromFen'))),
             onlyForChessVariants(makeTab('pgn', 'PGN', noarg('loadAGameFromPgn'))),
           ]),
-          activeTab === 'edit' && canUseBoardEditor(variantKeySelected) ? edittab(ctrl) : null,
           onlyForAnalysisVariants(activeTab === 'game' ? gametab(ctrl) : null),
           onlyForAnalysisVariants(activeTab === 'fen' ? fentab(ctrl) : null),
           onlyForChessVariants(activeTab === 'pgn' ? pgntab(ctrl) : null),
-          h('div.form-split', [
-            h('div.form-group.form-half', [
-              h(
-                'label.form-label',
-                {
-                  attrs: { for: 'chapter-variant' },
+          h('div.form-group', [
+            h(
+              'label.form-label',
+              {
+                attrs: { for: 'chapter-variant' },
+              },
+              noarg('Variant'),
+            ),
+            h(
+              'select#chapter-variant.form-control',
+              {
+                attrs: { disabled: gameOrPgn },
+                hook: {
+                  init: () => ctrl.vm.variantKey(currentChapter.setup.variant.key),
+                  ...bind('change', e => {
+                    const select = e.target as HTMLInputElement;
+                    ctrl.vm.variantKey(select.value as VariantKey);
+                    ctrl.redraw();
+                  }),
                 },
-                noarg('Variant'),
-              ),
-              h(
-                'select#chapter-variant.form-control',
-                {
-                  attrs: { disabled: gameOrPgn },
-                  hook: {
-                    init: () => ctrl.vm.variantKey(currentChapter.setup.variant.key),
-                    ...bind('change', e => {
-                      const select = e.target as HTMLInputElement;
-                      ctrl.vm.variantKey(select.value as VariantKey);
-                      ctrl.redraw();
-                    }),
-                  },
-                },
-                gameOrPgn
-                  ? [h('option', noarg('automatic'))]
+              },
+              gameOrPgn
+                ? [h('option', noarg('automatic'))]
                 : ctrl.vm.variants.filter(v => allowAnalysisForVariant(v.key)).map(v =>
                     h(
                       'option',
@@ -354,8 +352,10 @@ export function view(ctrl: StudyChapterNewFormCtrl): VNode {
                       v.name,
                     )
                 )
-              ),
-            ]),
+            ),
+          ]),
+          activeTab === 'edit' && canUseBoardEditor(variantKeySelected) ? edittab(ctrl) : null,
+          h('div.form-split', [
             h('div.form-group.form-half', [
               h(
                 'label.form-label',
@@ -377,24 +377,24 @@ export function view(ctrl: StudyChapterNewFormCtrl): VNode {
                 }),
               ),
             ]),
-          ]),
-          h('div.form-group', [
-            h(
-              'label.form-label',
-              {
-                attrs: { for: 'chapter-mode' },
-              },
-              noarg('analysisMode'),
-            ),
-            h(
-              'select#chapter-mode.form-control',
-              (isChess(variantKeySelected)
-                ? modeChoices
-                : allowGameBookStudyForVariant(variantKeySelected)
-                  ? nonBrowserAnalysisModeChoices
-                  : onlyNormalAnalysisModeChoices
-              ).map(c => option(c[0], mode, noarg(c[1]))),
-            ),
+            h('div.form-group.form-half', [
+              h(
+                'label.form-label',
+                {
+                  attrs: { for: 'chapter-mode' },
+                },
+                noarg('analysisMode'),
+              ),
+              h(
+                'select#chapter-mode.form-control',
+                (isChess(variantKeySelected)
+                  ? modeChoices
+                  : allowGameBookStudyForVariant(variantKeySelected)
+                    ? nonBrowserAnalysisModeChoices
+                    : onlyNormalAnalysisModeChoices
+                ).map(c => option(c[0], mode, noarg(c[1]))),
+              ),
+            ]),
           ]),
           modal.button(noarg('createChapter')),
         ],
