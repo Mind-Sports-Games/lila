@@ -341,13 +341,19 @@ export function view(ctrl: StudyChapterNewFormCtrl): VNode {
                 },
                 gameOrPgn
                   ? [h('option', noarg('automatic'))]
-                  : activeTab === 'edit'
-                    ? ctrl.vm.variants
-                        .filter(v => canUseBoardEditor(v.key))
-                        .map(v => option(v.key, currentChapter.setup.variant.key, v.name))
-                    : ctrl.vm.variants
-                        .filter(v => allowAnalysisForVariant(v.key))
-                        .map(v => option(v.key, currentChapter.setup.variant.key, v.name)),
+                : ctrl.vm.variants.filter(v => allowAnalysisForVariant(v.key)).map(v =>
+                    h(
+                      'option',
+                      {
+                        attrs: {
+                          value: v.key,
+                          selected: v.key === currentChapter.setup.variant.key,
+                          ...(activeTab === 'edit' && !canUseBoardEditor(v.key) ? { 'disabled': 'disabled' } : {}),
+                        },
+                      },
+                      v.name,
+                    )
+                )
               ),
             ]),
             h('div.form-group.form-half', [
