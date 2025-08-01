@@ -17,3 +17,16 @@ jobs:
     secrets: inherit
     needs: deploy_assets
     if: ${{ needs.deploy_assets.result == 'success' }}
+
+  notify:
+    runs-on: ubuntu-24.04
+    env:
+      WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL_DEPLOY_DEV }}
+    needs: deploy_server
+    if: ${{ needs.deploy_server.result == 'success' }}
+    steps:
+      - name: Notify
+        run: |
+          curl --request POST \
+            --data-urlencode "content=:white_check_mark: **lila** branch <https://github.com/Mind-Sports-Games/lila/tree/${GITHUB_REF##*/}> is on <https://playstrategy.dev>" \
+            $WEBHOOK_URL
