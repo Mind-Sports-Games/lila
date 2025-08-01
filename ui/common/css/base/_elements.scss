@@ -81,6 +81,25 @@ a {
   }
 }
 
+$c-color-choice-map: (
+  'black': $c-color-choice-black,
+  'green': $c-color-choice-green,
+  'red': $c-color-choice-red,
+  'blue': $c-color-choice-blue,
+  'yellow': $c-color-choice-yellow,
+);
+
+h1 {
+  //support colour choices
+  @each $c in ('black', 'green', 'red', 'blue', 'yellow') {
+    .selected-color-#{$c} &.color-choice {
+      background: map-get($c-color-choice-map, $c);
+      color: $c-color-choice-font-default;
+      text-shadow: 0 1px 0 map-get($c-color-choice-map, $c);
+    }
+  }
+}
+
 p {
   margin-bottom: 1em;
 }

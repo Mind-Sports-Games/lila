@@ -11,7 +11,7 @@ import { replacePocketsInFen } from 'common/editor';
 import throttle from 'common/throttle';
 import { variantClass, variantClassFromKey, variantKeyToRules } from 'stratops/variants/util';
 import { Variant as CGVariant } from 'chessground/types';
-import { VariantKey } from 'stratops/variants/types';
+import type { VariantKey } from 'stratops/variants/types';
 
 export default class EditorCtrl {
   cfg: Editor.Config;

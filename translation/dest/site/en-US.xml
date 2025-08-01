@@ -689,6 +689,8 @@ computer analysis, game chat and shareable URL.</string>
   <string name="termsOfService">Terms of Service</string>
   <string name="sourceCode">Source Code</string>
   <string name="simultaneousExhibitions">Simultaneous exhibitions</string>
+  <string name="gameGroup">Game Group</string>
+  <string name="gameLibrary">Game Library</string>
   <string name="memoryGame">Memory Game</string>
   <string name="findPairs">Find the pairs!</string>
   <string name="host">Host</string>

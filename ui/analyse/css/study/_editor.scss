@@ -14,7 +14,22 @@
   display: grid;
   grid-template-columns: 280px 2vmin 210px;
   grid-template-rows: min-content auto min-content;
-  grid-template-areas: '.            . e-tools' 'spare-top    . e-tools' 'e-board      . e-tools' 'spare-bottom . e-tools' '.            . e-tools';
+  grid-template-areas:
+    '.            . e-tools'
+    'spare-top    . e-tools'
+    'e-board      . e-tools'
+    'spare-bottom . e-tools'
+    '.            . e-tools';
+
+  @media (max-width: 550px) {
+    grid-template-columns: 100%;
+    grid-template-areas:
+      'spare-top'
+      'e-board'
+      'spare-bottom'
+      'e-tools';
+  }
+
   user-select: none;
 
   .main-board {
