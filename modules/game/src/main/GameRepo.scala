@@ -576,7 +576,7 @@ final class GameRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionCont
   def countByMonthly: Fu[List[(String, String, Long)]] =
     coll
       .aggregateList(
-        maxDocs = 1000,
+        maxDocs = Int.MaxValue,
         ReadPreference.secondaryPreferred
       ) { framework =>
         import framework._
@@ -596,7 +596,7 @@ final class GameRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionCont
               ),
               "lib_var" -> $doc(
                 "$concat" -> $arr(
-                  $doc("$toString" -> s"$$${F.lib}"),
+                  $doc("$toString" -> $doc("$ifNull" -> $arr(s"$$${F.lib}", "0"))),
                   "_",
                   $doc("$toString" -> $doc("$ifNull" -> $arr(s"$$${F.variant}", "1")))
                 )
