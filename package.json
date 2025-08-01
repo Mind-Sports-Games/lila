@@ -23,14 +23,14 @@
   "homepage": "https://playstrategy.org",
   "packageManager": "pnpm@9.6.0",
   "engines": {
-    "node": ">=20",
+    "node": "20.19.4",
     "pnpm": "^9"
   },
   "lint-staged": {
     "*.{js,ts,md,json,scss}": "prettier --write"
   },
   "dependencies": {
-    "@types/node": "20.12.2",
+    "@types/node": "20.19.4",
     "@types/playstrategy": "workspace:*",
     "@types/web": "^0.0.142",
     "@typescript-eslint/eslint-plugin": "^7.18.0",
