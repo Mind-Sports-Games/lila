@@ -573,4 +573,11 @@ trait SetupHelper { self: I18nHelper =>
       Pref.Blindfold.NO  -> trans.no.txt(),
       Pref.Blindfold.YES -> trans.yes.txt()
     )
+
+  def variantKey(id: String): String =
+    Variant.all
+      .find(v => s"${encodeGameFamilyId(v.gameFamily)}_${encodeId(v)}" == id)
+      .map(_.key)
+      .getOrElse("standard")
+
 }

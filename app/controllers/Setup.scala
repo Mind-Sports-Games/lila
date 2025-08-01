@@ -6,6 +6,7 @@ import play.api.mvc.Results
 import scala.concurrent.duration._
 
 import strategygames.format.FEN
+import strategygames.variant.Variant
 import strategygames.{ GameFamily, GameLogic }
 
 import lila.api.{ BodyContext, Context }
@@ -41,16 +42,23 @@ final class Setup(
   def gameForm(userId: Option[String]) =
     Open { implicit ctx =>
       if (HTTPRequest isXhr ctx.req) {
-        val lib = gameLogic(getInt("lib"))
-        fuccess(forms.filled(lib, get("fen").map(s => FEN.clean(lib, s)))) flatMap { form =>
+        val lib                      = gameLogic(getInt("lib"))
+        val variant: Option[Variant] = get("variant").map(Variant.orDefault)
+        fuccess(
+          forms.filled(
+            lib,
+            get("fen").map(s => FEN.clean(lib, s)),
+            variant
+          )
+        ) flatMap { form =>
           val validFen = form("fen").value map (s => FEN.clean(lib, s)) flatMap ValidFen(strict = false)
           userId ?? env.user.repo.named flatMap {
             case None =>
-              Ok(html.setup.forms.game(form, none, none, validFen)).fuccess
+              Ok(html.setup.forms.game(form, none, none, validFen, variant)).fuccess
             case Some(user) =>
               env.challenge.granter(ctx.me, user, none) map {
                 case Some(denied) => BadRequest(lila.challenge.ChallengeDenied.translated(denied))
-                case None         => Ok(html.setup.forms.game(form, user.some, none, validFen))
+                case None         => Ok(html.setup.forms.game(form, user.some, none, validFen, variant))
               }
           }
         }
