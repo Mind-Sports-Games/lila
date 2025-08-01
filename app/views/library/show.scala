@@ -76,7 +76,7 @@ object show {
             ctx.userId.map(user =>
               a(
                 cls := "library-mystats",
-                href := routes.User.perfStat(user, variant.key)
+                href := routes.User.perfStat(user, variant.key.replace("standard", "blitz"))
               )(
                 "My Stats"
               )
