@@ -2,6 +2,8 @@ package lila.round
 
 import actorApi.SocketStatus
 import strategygames.format.{ FEN, Forsyth }
+import strategygames.dameo.format.{Uci => DameoUci}
+import strategygames.dameo.{Pos => DameoPos}
 import strategygames.{
   ClockBase,
   Player => PlayerIndex,
@@ -526,6 +528,21 @@ final class JsonView(
           destPos match {
             case Some(dest) => ~situation.captureLengthFrom(dest)
             case _          => situation.allMovesCaptureLength
+          }
+        } else
+          situation.allMovesCaptureLength
+      case (Situation.Dameo(situation), Variant.Dameo(_)) =>
+        if (situation.ghosts > 0) {
+          val move    = pov.game.actionStrs(pov.game.actionStrs.length - 1)(0)
+          move match {
+            case DameoUci.Move.moveR(_, dest, _) =>
+              val posStr = DameoPos.fromKey(dest)
+              posStr match {
+                case Some(pos) => ~situation.captureLengthFrom(pos)
+                case _         => situation.allMovesCaptureLength
+              }
+            case _ =>
+              situation.allMovesCaptureLength
           }
         } else
           situation.allMovesCaptureLength
