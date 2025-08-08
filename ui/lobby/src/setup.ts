@@ -1475,6 +1475,8 @@ export default class Setup {
       //Always start the form with gameGroup active unless forced setup
       if (forceVariant || forceFromPosition) {
         if (sName == 'timeModeDefaults') {
+          $gameGroupInput.filter(':checked').trigger('click'); // to initalise variant list
+          $gameGroups.trigger('click'); //to close section
           $this.addClass('active');
           $this.find('group').removeClass('hide');
           $this.find('div.choice').hide();
