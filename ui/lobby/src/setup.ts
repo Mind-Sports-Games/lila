@@ -487,7 +487,8 @@ export default class Setup {
       }
       const timeModeDefault = $timeModeDefaults.find('input:checked').val() as string;
       const nonCustomClock = timeModeDefault !== 'custom';
-      const unsupportedClockVariant =
+      //Greedy-two-move cant play amazons(8_8), shogi(3_1) and Xaignqi(4_2) with bullet clock from form
+      const unsupportedBulletVariant =
         timeModeDefault == 'bullet' && ['8_8', '3_1', '4_2'].includes(variantId.join('_'));
       const timeMode = <string>$timeModeSelect.val();
       const isByoyomi = timeMode === '3';
@@ -514,7 +515,7 @@ export default class Setup {
             default: {
               //greedy-two-move
               clockCompatible =
-                !unsupportedClockVariant &&
+                !unsupportedBulletVariant &&
                 (nonCustomClock || (limit >= 3 && inc >= 2) || limit >= 10 || (isByoyomi && byo >= 10) || inc >= 10);
             }
           }
