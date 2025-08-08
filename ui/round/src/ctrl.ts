@@ -433,6 +433,7 @@ export default class RoundController {
       config.liftable = {
         liftDests: util.parsePossibleLifts(this.data.possibleLifts),
       };
+      config.captureLength = this.data.captureLength;
       config.showUndoButton = this.isPlaying() && this.data.player.playerIndex == turnPlayerIndex && dice.length > 0;
       config.canUndo = this.data.canUndo;
       config.cubeActions = this.data.cubeActions ? this.data.cubeActions.split(',').map(a => a as cg.CubeAction) : [];
@@ -643,6 +644,7 @@ export default class RoundController {
     this.playerByPlayerIndex('p1').offeringDraw = o.wDraw;
     this.playerByPlayerIndex('p2').offeringDraw = o.bDraw;
     d.possibleMoves = activePlayerIndex ? o.dests : undefined;
+    d.captureLength = o.captLen;
     d.possibleDrops = activePlayerIndex ? o.drops : undefined;
     d.possibleDropsByRole = activePlayerIndex ? o.dropsByRole : undefined;
     d.possibleLifts = activePlayerIndex ? o.lifts : undefined;
@@ -749,6 +751,7 @@ export default class RoundController {
         movable: {
           dests: playing ? util.parsePossibleMoves(d.possibleMoves, d.activeDiceValue) : new Map(),
         },
+        captureLength: d.captureLength,
         liftable: {
           liftDests: playing ? util.parsePossibleLifts(d.possibleLifts) : [],
         },
