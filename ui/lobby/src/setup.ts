@@ -490,7 +490,7 @@ export default class Setup {
       let clockCompatible = true;
       if (isRealTime()) {
         if (/^stockfish-level[1-8]$/.test(user)) {
-          clockCompatible = limit >= 0.5;
+          clockCompatible = limit >= 0.5 || (isByoyomi && byo >= 5) || inc >= 5;
         } else {
           switch (user) {
             case 'ps-random-mover': {
@@ -499,10 +499,16 @@ export default class Setup {
             }
             case 'ps-greedy-one-move': {
               clockCompatible =
-                nonCustomClock || (limit >= 1 && inc >= 1) || limit >= 10 || (isByoyomi && byo >= 10) || inc >= 10;
+                nonCustomClock || (limit >= 1 && inc >= 1) || limit >= 3 || (isByoyomi && byo >= 5) || inc >= 5;
+              break;
+            }
+            case 'ps-greedy-four-move': {
+              clockCompatible =
+                nonCustomClock || (limit >= 1 && inc >= 0) || limit >= 10 || (isByoyomi && byo >= 10) || inc >= 10;
               break;
             }
             default: {
+              //greedy-two-move
               clockCompatible =
                 !unsupportedClockVariant &&
                 (nonCustomClock || (limit >= 3 && inc >= 2) || limit >= 10 || (isByoyomi && byo >= 10) || inc >= 10);

@@ -79,8 +79,11 @@ final class JsonView(
               "limit" -> clock.limitSeconds,
               // TODO: this should be renamed to better reflect that it also
               //       represents Bronstein/Byoyomi/SimpleDelay
-              "increment" -> clock.graceSeconds,
-              "show"      -> clock.show
+              "increment" -> (clock match {
+                case c: strategygames.ByoyomiClock.Config => c.byoyomiSeconds
+                case c                                    => c.graceSeconds
+              }),
+              "show" -> clock.show
             )
           case TimeControl.Correspondence(d) =>
             Json.obj(
