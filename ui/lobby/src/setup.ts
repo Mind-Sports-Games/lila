@@ -338,6 +338,8 @@ export default class Setup {
       $gameGroupInput = $gameGroups.find('.gameGroup_choice [name=gameGroup]'),
       $variants = $form.find('.variant_choice'),
       $variantInput = $variants.find('.variant_choice [name=variant]'),
+      inputVariant = $form.data('variant') as string,
+      forceVariant = inputVariant !== '',
       $fenPosition = $form.find('.fen_position'),
       $fenInput = $fenPosition.find('input'),
       forceFromPosition = !!$fenInput.val(),
@@ -362,6 +364,7 @@ export default class Setup {
       $botInput = $form.find('.bot_choice [name=bot]'),
       $opponentInput = $form.find('.opponent_choices [name=opponent]'),
       typ = $form.data('type'),
+      lobbyBan = $form.data('lobby-ban') || this.root.playban || false,
       $ratings = $modal.find('.ratings > div'),
       $collapsibleSections = $modal.find('.collapsible'),
       randomPlayerIndexVariants = $form.data('random-playerindex-variants').split(','),
@@ -400,6 +403,7 @@ export default class Setup {
               $backgammonConfig.val() !== undefined &&
               ($backgammonPointsInput.val() as string) != '1'),
           cantBeLobby =
+            lobbyBan ||
             (variantId[0] == '9' &&
               $goConfig.val() !== undefined &&
               (($goHandicapInput.val() as string) != '0' ||
@@ -542,7 +546,6 @@ export default class Setup {
         });
       });
     }
-
     const isRealTime = () => this.ratedTimeModes.indexOf(<string>$timeModeSelect.val()) !== -1;
 
     //default options for challenge against bots
@@ -1292,6 +1295,10 @@ export default class Setup {
       $gameGroupInput.val('0');
       $opponentInput.val('friend');
     }
+    if (forceVariant && inputVariant) {
+      $variantInput.val(inputVariant);
+      $gameGroupInput.val(inputVariant.split('_')[0]);
+    }
     $form.find('optgroup').each((_, optgroup: HTMLElement) => {
       optgroup.setAttribute('label', optgroup.getAttribute('name') || '');
     });
@@ -1315,10 +1322,12 @@ export default class Setup {
       }
       updateLobbySubmit();
       toggleButtons();
+      save();
     });
     $botInput.on('change', function (this: HTMLElement) {
       updateBotDetails();
       toggleButtons();
+      save();
     });
 
     $variantInput
@@ -1477,8 +1486,14 @@ export default class Setup {
         .filter(`.${sName}_` + $this.find('input').filter(':checked').val())
         .show();
       $form.find('.time_mode_config').hide();
-      //Always start the form with gameGroup active
-      if (sName == 'gameGroup') {
+      //Always start the form with gameGroup active unless forced setup
+      if (forceVariant || forceFromPosition) {
+        if (sName == 'timeModeDefaults') {
+          $this.addClass('active');
+          $this.find('group').removeClass('hide');
+          $this.find('div.choice').hide();
+        }
+      } else if (sName == 'gameGroup') {
         $gameGroupInput.filter(':checked').trigger('click'); // to initalise variant list
         $this.addClass('active');
         $this.find('group').removeClass('hide');

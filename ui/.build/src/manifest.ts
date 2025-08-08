@@ -172,7 +172,7 @@ async function hashLink(name: string) {
   const src = path.join(env.outDir, name);
   const hash = crypto
     .createHash('sha256')
-    .update(await fs.promises.readFile(src))
+    .update(new Uint8Array(await fs.promises.readFile(src)))
     .digest('base64url')
     .slice(0, 8);
   link(name, hash);

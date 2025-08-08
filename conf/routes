@@ -776,6 +776,10 @@ GET   /page/:uid                       controllers.Page.lonePage(uid: String)
 GET   /variant                         controllers.Page.variantHome
 GET   /variant/:key                    controllers.Page.variant(key)
 
+# Library
+GET   /library                        controllers.Library.home
+GET   /library/:key                   controllers.Library.variant(key)
+
 # Help
 GET   /help/contribute                 controllers.Page.help
 GET   /help/master                     controllers.Page.master

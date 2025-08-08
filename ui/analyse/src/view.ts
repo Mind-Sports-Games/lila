@@ -585,153 +585,156 @@ export default function (ctrl: AnalyseCtrl): VNode {
   ].includes(variantKey)
     ? '.piece-letter'
     : '';
-  return h(
-    `main.analyse.variant-${variantKey}${notationBasic}.${ctrl.data.game.gameFamily}`,
-    {
-      hook: {
-        insert: vn => {
-          playstrategy.miniGame.initAll();
-          forceInnerCoords(ctrl, needsInnerCoords);
-          forceOutterCoords(ctrl, needsOutterCoords);
-          if (needsNoCoords) forceNoCoords(ctrl);
-          if (!!playerBars != $('body').hasClass('header-margin')) {
-            requestAnimationFrame(() => {
-              $('body').toggleClass('header-margin', !!playerBars);
-              ctrl.redraw();
-            });
-          }
-          gridHacks.start(vn.elm as HTMLElement);
-        },
-        update(_, _2) {
-          forceInnerCoords(ctrl, needsInnerCoords);
-          forceOutterCoords(ctrl, needsOutterCoords);
-          if (needsNoCoords) forceNoCoords(ctrl);
-        },
-        postpatch(old, vnode) {
-          if (old.data!.gaugeOn !== gaugeOn) document.body.dispatchEvent(new Event('chessground.resize'));
-          vnode.data!.gaugeOn = gaugeOn;
-          playstrategy.miniGame.initAll();
-        },
-      },
-      class: {
-        'comp-off': !ctrl.showComputer(),
-        'gauge-on': gaugeOn,
-        'has-players': !!playerBars,
-        'has-clocks': !!clocks,
-        'has-relay-tour': !!tour,
-        'analyse-hunter': ctrl.opts.hunter,
-      },
-    },
-    [
-      ctrl.keyboardHelp ? keyboardView(ctrl) : null,
-      study ? studyView.overboard(study) : null,
-      tour ||
-        h(
-          addChapterId(study, 'div.analyse__board.main-board'),
-          {
-            hook:
-              'ontouchstart' in window || ctrl.gamebookPlay()
-                ? undefined
-                : bind('wheel', (e: WheelEvent) => wheel(ctrl, e)),
+
+  return h('main', [
+    study ? studyView.overboard(study) : null,
+    h(
+      `div.analyse.variant-${variantKey}${notationBasic}.${ctrl.data.game.gameFamily}`,
+      {
+        hook: {
+          insert: vn => {
+            playstrategy.miniGame.initAll();
+            forceInnerCoords(ctrl, needsInnerCoords);
+            forceOutterCoords(ctrl, needsOutterCoords);
+            if (needsNoCoords) forceNoCoords(ctrl);
+            if (!!playerBars != $('body').hasClass('header-margin')) {
+              requestAnimationFrame(() => {
+                $('body').toggleClass('header-margin', !!playerBars);
+                ctrl.redraw();
+              });
+            }
+            gridHacks.start(vn.elm as HTMLElement);
           },
-          [
-            ...(clocks || []),
-            playerBars ? playerBars[ctrl.bottomIsP1() ? 1 : 0] : null,
-            chessground.render(ctrl),
-            playerBars ? playerBars[ctrl.bottomIsP1() ? 0 : 1] : null,
-            renderPromotion(ctrl),
-          ],
-        ),
-      gaugeOn && !tour ? cevalView.renderGauge(ctrl) : null,
-      tour || !ctrl.data.hasGameScore ? null : renderPlayerScore(topScore, 'top', ctrl.topPlayerIndex(), variantKey),
-      tour || !needsUserNameWithScore ? null : renderPlayerName(ctrl, 'top'),
-      tour || !ctrl.data.hasGameScore ? null : renderPlayerScoreNames(ctrl),
-      tour ? null : crazyView(ctrl, ctrl.topPlayerIndex(), 'top'),
-      gamebookPlayView ||
-        (tour
-          ? null
-          : h(addChapterId(study, 'div.analyse__tools'), [
-              ...(menuIsOpen
-                ? [actionMenu(ctrl)]
-                : [
-                    ctrl.ceval.allowed && allowClientEvalForVariant(ctrl.ceval.variant.key)
-                      ? cevalView.renderCeval(ctrl)
-                      : null,
-                    ctrl.ceval.allowed && allowClientEvalForVariant(ctrl.ceval.variant.key) && showCevalPvs
-                      ? cevalView.renderPvs(variantKey)(ctrl)
-                      : null,
-                    renderAnalyse(ctrl, concealOf),
-                    gamebookEditView || forkView(ctrl, concealOf),
-                    retroView(ctrl) || practiceView(ctrl) || explorerView(ctrl),
-                  ]),
-            ])),
-      tour || !ctrl.data.hasGameScore
-        ? null
-        : renderPlayerScore(bottomScore, 'bottom', ctrl.bottomPlayerIndex(), variantKey),
-      tour || !needsUserNameWithScore ? null : renderPlayerName(ctrl, 'bottom'),
-      tour ? null : crazyView(ctrl, ctrl.bottomPlayerIndex(), 'bottom'),
-      gamebookPlayView || tour ? null : controls(ctrl),
-      ctrl.embed || tour
-        ? null
-        : h(
-            'div.analyse__underboard',
+          update(_, _2) {
+            forceInnerCoords(ctrl, needsInnerCoords);
+            forceOutterCoords(ctrl, needsOutterCoords);
+            if (needsNoCoords) forceNoCoords(ctrl);
+          },
+          postpatch(old, vnode) {
+            if (old.data!.gaugeOn !== gaugeOn) document.body.dispatchEvent(new Event('chessground.resize'));
+            vnode.data!.gaugeOn = gaugeOn;
+            playstrategy.miniGame.initAll();
+          },
+        },
+        class: {
+          'comp-off': !ctrl.showComputer(),
+          'gauge-on': gaugeOn,
+          'has-players': !!playerBars,
+          'has-clocks': !!clocks,
+          'has-relay-tour': !!tour,
+          'analyse-hunter': ctrl.opts.hunter,
+        },
+      },
+      [
+        ctrl.keyboardHelp ? keyboardView(ctrl) : null,
+        tour ||
+          h(
+            addChapterId(study, 'div.analyse__board.main-board'),
             {
               hook:
-                ctrl.synthetic || playable(ctrl.data) ? undefined : onInsert(elm => serverSideUnderboard(elm, ctrl)),
+                'ontouchstart' in window || ctrl.gamebookPlay()
+                  ? undefined
+                  : bind('wheel', (e: WheelEvent) => wheel(ctrl, e)),
             },
-            study ? studyView.underboard(ctrl) : [inputs(ctrl)],
+            [
+              ...(clocks || []),
+              playerBars ? playerBars[ctrl.bottomIsP1() ? 1 : 0] : null,
+              chessground.render(ctrl),
+              playerBars ? playerBars[ctrl.bottomIsP1() ? 0 : 1] : null,
+              renderPromotion(ctrl),
+            ],
           ),
-      tour ? null : acplView(ctrl),
-      ctrl.embed
-        ? null
-        : ctrl.studyPractice
-          ? studyPracticeView.side(study!)
-          : h(
-              'aside.analyse__side',
-              {
-                hook: onInsert(elm => {
-                  ctrl.opts.$side && ctrl.opts.$side.length && $(elm).replaceWith(ctrl.opts.$side);
-                  $(elm).append($('.context-streamers').clone().removeClass('none'));
-                }),
-              },
-              ctrl.studyPractice
-                ? [studyPracticeView.side(study!)]
-                : study
-                  ? [studyView.side(study)]
+        gaugeOn && !tour ? cevalView.renderGauge(ctrl) : null,
+        tour || !ctrl.data.hasGameScore ? null : renderPlayerScore(topScore, 'top', ctrl.topPlayerIndex(), variantKey),
+        tour || !needsUserNameWithScore ? null : renderPlayerName(ctrl, 'top'),
+        tour || !ctrl.data.hasGameScore ? null : renderPlayerScoreNames(ctrl),
+        tour ? null : crazyView(ctrl, ctrl.topPlayerIndex(), 'top'),
+        gamebookPlayView ||
+          (tour
+            ? null
+            : h(addChapterId(study, 'div.analyse__tools'), [
+                ...(menuIsOpen
+                  ? [actionMenu(ctrl)]
                   : [
-                      ctrl.forecast ? forecastView(ctrl, ctrl.forecast) : null,
-                      !ctrl.synthetic && playable(ctrl.data)
-                        ? h(
-                            'div.back-to-game',
-                            h(
-                              'a.button.button-empty.text',
-                              {
-                                attrs: {
-                                  href: router.game(ctrl.data, ctrl.data.player.playerIndex),
-                                  'data-icon': 'i',
-                                },
-                              },
-                              ctrl.trans.noarg('backToGame'),
-                            ),
-                          )
+                      ctrl.ceval.allowed && allowClientEvalForVariant(ctrl.ceval.variant.key)
+                        ? cevalView.renderCeval(ctrl)
                         : null,
-                    ],
+                      ctrl.ceval.allowed && allowClientEvalForVariant(ctrl.ceval.variant.key) && showCevalPvs
+                        ? cevalView.renderPvs(variantKey)(ctrl)
+                        : null,
+                      renderAnalyse(ctrl, concealOf),
+                      gamebookEditView || forkView(ctrl, concealOf),
+                      retroView(ctrl) || practiceView(ctrl) || explorerView(ctrl),
+                    ]),
+              ])),
+        tour || !ctrl.data.hasGameScore
+          ? null
+          : renderPlayerScore(bottomScore, 'bottom', ctrl.bottomPlayerIndex(), variantKey),
+        tour || !needsUserNameWithScore ? null : renderPlayerName(ctrl, 'bottom'),
+        tour ? null : crazyView(ctrl, ctrl.bottomPlayerIndex(), 'bottom'),
+        gamebookPlayView || tour ? null : controls(ctrl),
+        ctrl.embed || tour
+          ? null
+          : h(
+              'div.analyse__underboard',
+              {
+                hook:
+                  ctrl.synthetic || playable(ctrl.data) ? undefined : onInsert(elm => serverSideUnderboard(elm, ctrl)),
+              },
+              study ? studyView.underboard(ctrl) : [inputs(ctrl)],
             ),
-      study && study.relay && relayManager(study.relay),
-      ctrl.opts.chat &&
-        h('section.mchat', {
-          hook: onInsert(_ => {
-            const chatOpts = ctrl.opts.chat;
-            chatOpts.instance?.then(c => c.destroy());
-            chatOpts.parseMoves = true;
-            chatOpts.instance = playstrategy.makeChat(chatOpts);
+        tour ? null : acplView(ctrl),
+        ctrl.embed
+          ? null
+          : ctrl.studyPractice
+            ? studyPracticeView.side(study!)
+            : h(
+                'aside.analyse__side',
+                {
+                  hook: onInsert(elm => {
+                    ctrl.opts.$side && ctrl.opts.$side.length && $(elm).replaceWith(ctrl.opts.$side);
+                    $(elm).append($('.context-streamers').clone().removeClass('none'));
+                  }),
+                },
+                ctrl.studyPractice
+                  ? [studyPracticeView.side(study!)]
+                  : study
+                    ? [studyView.side(study)]
+                    : [
+                        ctrl.forecast ? forecastView(ctrl, ctrl.forecast) : null,
+                        !ctrl.synthetic && playable(ctrl.data)
+                          ? h(
+                              'div.back-to-game',
+                              h(
+                                'a.button.button-empty.text',
+                                {
+                                  attrs: {
+                                    href: router.game(ctrl.data, ctrl.data.player.playerIndex),
+                                    'data-icon': 'i',
+                                  },
+                                },
+                                ctrl.trans.noarg('backToGame'),
+                              ),
+                            )
+                          : null,
+                      ],
+              ),
+        study && study.relay && relayManager(study.relay),
+        ctrl.opts.chat &&
+          h('section.mchat', {
+            hook: onInsert(_ => {
+              const chatOpts = ctrl.opts.chat;
+              chatOpts.instance?.then(c => c.destroy());
+              chatOpts.parseMoves = true;
+              chatOpts.instance = playstrategy.makeChat(chatOpts);
+            }),
           }),
-        }),
-      ctrl.embed
-        ? null
-        : h('div.chat__members.none', {
-            hook: onInsert(playstrategy.watchers),
-          }),
-    ],
-  );
+        ctrl.embed
+          ? null
+          : h('div.chat__members.none', {
+              hook: onInsert(playstrategy.watchers),
+            }),
+      ],
+    ),
+  ]);
 }
