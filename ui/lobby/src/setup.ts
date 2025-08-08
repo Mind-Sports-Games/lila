@@ -445,18 +445,21 @@ export default class Setup {
         } else {
           $submits.toggleClass('nope', true);
           if (!botOK && !vsPSBot && !vsStockfishBot) {
-            const defaultBot = 'ps-greedy-two-move';
-            const backupBot = 'ps-random-mover';
-            if (
-              $botInput.filter(':checked').val() !== defaultBot &&
-              botCanPlay(defaultBot, limit, inc, byo, variantId)
-            ) {
-              $botInput.val(defaultBot).trigger('change');
-            } else if (
-              $botInput.filter(':checked').val() !== backupBot &&
-              botCanPlay(backupBot, limit, inc, byo, variantId)
-            ) {
-              $botInput.val(backupBot).trigger('change');
+            const greedy1CanPlay =
+              $botInput.filter(':checked').val() !== 'ps-greedy-one-move' &&
+              botCanPlay('ps-greedy-one-move', limit, inc, byo, variantId);
+            const greedy2CanPlay =
+              $botInput.filter(':checked').val() !== 'ps-greedy-two-move' &&
+              botCanPlay('ps-greedy-two-move', limit, inc, byo, variantId);
+            const randoCanPlay =
+              $botInput.filter(':checked').val() !== 'ps-random-mover' &&
+              botCanPlay('ps-random-mover', limit, inc, byo, variantId);
+            if (greedy2CanPlay) {
+              $botInput.val('ps-greedy-two-move').trigger('change');
+            } else if (greedy1CanPlay) {
+              $botInput.val('ps-greedy-one-move').trigger('change');
+            } else if (randoCanPlay) {
+              $botInput.val('ps-random-mover').trigger('change');
             }
             if (opponentType === 'bot') {
               const $bot = $opponentInput.eq(2);
