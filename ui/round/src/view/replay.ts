@@ -12,6 +12,7 @@ import { h, VNode } from 'snabbdom';
 import { Step, MaybeVNodes } from '../interfaces';
 import { variantClassFromKey } from 'stratops/variants/util';
 import { GameFamily as BackgammonFamily } from 'stratops/variants/backgammon/GameFamily';
+import { GameFamily as DameoFamily } from 'stratops/variants/dameo/GameFamily';
 import { NotationStyle } from 'stratops/variants/types';
 
 const scrollMax = 99999,
@@ -93,9 +94,16 @@ function renderMultiActionMove(
 }
 
 function combinedNotationOfTurn(actionNotations: string[], notation: NotationStyle): string {
-  return notation === NotationStyle.bkg
-    ? BackgammonFamily.combinedNotation(actionNotations)
-    : actionNotations.join(' ');
+  switch (notation) {
+    case NotationStyle.bkg:
+      return BackgammonFamily.combinedNotation(actionNotations)
+      break;
+    case NotationStyle.dmo:
+      return DameoFamily.combinedNotation(actionNotations)
+      break;
+    default:
+      return actionNotations.join(' ');
+  }
 }
 
 export function renderResult(ctrl: RoundController): VNode | undefined {
