@@ -58,6 +58,7 @@ object TreeBuilder {
           check = init.situation.check,
           captureLength = init.situation match {
             case Situation.Draughts(situation) => situation.allMovesCaptureLength.some
+            case Situation.Dameo(situation)    => situation.allMovesCaptureLength.some
             case _                             => None
           },
           opening = fullOpeningOf(fen, game.variant, withFlags),
@@ -81,6 +82,9 @@ object TreeBuilder {
             fen = fen,
             captureLength = (g.situation, m) match {
               case (Situation.Draughts(situation), Uci.DraughtsWithSan(uciMove)) =>
+                if (situation.ghosts > 0) situation.captureLengthFrom(uciMove.uci.dest)
+                else situation.allMovesCaptureLength.some
+              case (Situation.Dameo(situation), Uci.DameoWithSan(uciMove)) =>
                 if (situation.ghosts > 0) situation.captureLengthFrom(uciMove.uci.dest)
                 else situation.allMovesCaptureLength.some
               case _ => None
