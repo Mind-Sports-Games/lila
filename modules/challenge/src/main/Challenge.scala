@@ -205,8 +205,11 @@ object Challenge {
       def limit = config.limit
       // TODO: This should be renamed to properly reflect that it also
       //       represents Bronstein and SimpleDelay and not just increment
-      def increment = config.graceSeconds
-      def show      = config.show
+      def increment = config match {
+        case c: strategygames.ByoyomiClock.Config => c.byoyomiSeconds
+        case c                                    => c.graceSeconds
+      }
+      def show = config.show
     }
   }
 

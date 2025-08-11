@@ -445,18 +445,21 @@ export default class Setup {
         } else {
           $submits.toggleClass('nope', true);
           if (!botOK && !vsPSBot && !vsStockfishBot) {
-            const defaultBot = 'ps-greedy-two-move';
-            const backupBot = 'ps-random-mover';
-            if (
-              $botInput.filter(':checked').val() !== defaultBot &&
-              botCanPlay(defaultBot, limit, inc, byo, variantId)
-            ) {
-              $botInput.val(defaultBot).trigger('change');
-            } else if (
-              $botInput.filter(':checked').val() !== backupBot &&
-              botCanPlay(backupBot, limit, inc, byo, variantId)
-            ) {
-              $botInput.val(backupBot).trigger('change');
+            const greedy1CanPlay =
+              $botInput.filter(':checked').val() !== 'ps-greedy-one-move' &&
+              botCanPlay('ps-greedy-one-move', limit, inc, byo, variantId);
+            const greedy2CanPlay =
+              $botInput.filter(':checked').val() !== 'ps-greedy-two-move' &&
+              botCanPlay('ps-greedy-two-move', limit, inc, byo, variantId);
+            const randoCanPlay =
+              $botInput.filter(':checked').val() !== 'ps-random-mover' &&
+              botCanPlay('ps-random-mover', limit, inc, byo, variantId);
+            if (greedy2CanPlay) {
+              $botInput.val('ps-greedy-two-move').trigger('change');
+            } else if (greedy1CanPlay) {
+              $botInput.val('ps-greedy-one-move').trigger('change');
+            } else if (randoCanPlay) {
+              $botInput.val('ps-random-mover').trigger('change');
             }
             if (opponentType === 'bot') {
               const $bot = $opponentInput.eq(2);
@@ -485,23 +488,38 @@ export default class Setup {
             variantCompatible = true;
         }
       }
-
+      const timeModeDefault = $timeModeDefaults.find('input:checked').val() as string;
+      const nonCustomClock = timeModeDefault !== 'custom';
+      //Greedy-two-move cant play amazons(8_8), shogi(3_1) and Xaignqi(4_2) with bullet clock from form
+      const unsupportedBulletVariant =
+        timeModeDefault == 'bullet' && ['8_8', '3_1', '4_2'].includes(variantId.join('_'));
+      const timeMode = <string>$timeModeSelect.val();
+      const isByoyomi = timeMode === '3';
       let clockCompatible = true;
       if (isRealTime()) {
         if (/^stockfish-level[1-8]$/.test(user)) {
-          clockCompatible = limit >= 0.5;
+          clockCompatible = limit >= 0.5 || (isByoyomi && byo >= 5) || inc >= 5;
         } else {
           switch (user) {
             case 'ps-random-mover': {
-              clockCompatible = limit >= 0.5 || byo > 2;
+              clockCompatible = nonCustomClock || limit >= 0.5 || (isByoyomi && byo >= 2);
               break;
             }
             case 'ps-greedy-one-move': {
-              clockCompatible = limit >= 1 && inc >= 1;
+              clockCompatible =
+                nonCustomClock || (limit >= 1 && inc >= 1) || limit >= 3 || (isByoyomi && byo >= 5) || inc >= 5;
+              break;
+            }
+            case 'ps-greedy-four-move': {
+              clockCompatible =
+                nonCustomClock || (limit >= 1 && inc >= 0) || limit >= 10 || (isByoyomi && byo >= 10) || inc >= 10;
               break;
             }
             default: {
-              clockCompatible = limit >= 3 && inc >= 2;
+              //greedy-two-move
+              clockCompatible =
+                !unsupportedBulletVariant &&
+                (nonCustomClock || (limit >= 3 && inc >= 2) || limit >= 10 || (isByoyomi && byo >= 10) || inc >= 10);
             }
           }
         }
@@ -533,18 +551,18 @@ export default class Setup {
       });
     }
     const isRealTime = () => this.ratedTimeModes.indexOf(<string>$timeModeSelect.val()) !== -1;
-
+    const disableNonRealTimeModes = () => {
+      //disable non realtime modes both in default and within custom (correspondence + unlimited)
+      $('#sf_timeModeDefaults_correspondence').prop('disabled', true).siblings('label').toggleClass('disabled', true);
+      $timeModeSelect.find('option[value="2"], option[value="0"]').prop('disabled', true);
+      $timeModeSelect.siblings('label[for="sf_timeMode_0"], label[for="sf_timeMode_2"]').addClass('disabled');
+    };
     //default options for challenge against bots
     if (vsPSBot || vsStockfishBot) {
       setBaseDefaultOptions();
       $casual.trigger('click');
       if (user !== '') $botInput.val(user);
-
-      //disable non realtime modes
-      $('#sf_timeModeDefaults_correspondence, #sf_timeModeDefaults_custom')
-        .prop('disabled', true)
-        .siblings('label')
-        .toggleClass('disabled', true);
+      disableNonRealTimeModes();
 
       const limit = parseFloat($timeInput.val() as string),
         inc = parseFloat($incrementInput.val() as string),
@@ -867,19 +885,7 @@ export default class Setup {
         setBaseDefaultOptions(); //defult to chess, real time, blitz clock
         $casual.trigger('click');
         $opponentInput.val('lobby'); //default to lobby
-        const opponent = $opponentInput.filter(':checked').val() as string;
-        if (opponent === 'lobby') {
-          $timeModeSelect
-            .val('1')
-            .children('.timeMode_2, .timeMode_0')
-            .prop('disabled', true)
-            .attr('title', this.root.trans('youNeedAnAccountToDoThat'));
-        }
-        //disable non realtime modes
-        $('#sf_timeModeDefaults_correspondence, #sf_timeModeDefaults_custom')
-          .prop('disabled', true)
-          .siblings('label')
-          .toggleClass('disabled', true);
+        disableNonRealTimeModes();
       }
     };
     setAnonOptions();
@@ -1475,6 +1481,8 @@ export default class Setup {
       //Always start the form with gameGroup active unless forced setup
       if (forceVariant || forceFromPosition) {
         if (sName == 'timeModeDefaults') {
+          $gameGroupInput.filter(':checked').trigger('click'); // to initalise variant list
+          $gameGroups.trigger('click'); //to close section
           $this.addClass('active');
           $this.find('group').removeClass('hide');
           $this.find('div.choice').hide();
