@@ -473,6 +473,7 @@ export default class Setup {
       };
 
     const botCanPlay = (user: string, limit: number, inc: number, byo: number, variantId: string[]) => {
+      //assumption - only called with one of our custom bots
       let variantCompatible = true;
       if (/^stockfish-level[1-8]$/.test(user)) {
         variantCompatible =
@@ -490,9 +491,15 @@ export default class Setup {
       }
       const timeModeDefault = $timeModeDefaults.find('input:checked').val() as string;
       const nonCustomClock = timeModeDefault !== 'custom';
-      //Greedy-two-move cant play amazons(8_8), shogi(3_1) and Xaignqi(4_2) with bullet clock from form
-      const unsupportedBulletVariant =
-        timeModeDefault == 'bullet' && ['8_8', '3_1', '4_2'].includes(variantId.join('_'));
+      // Our bots cant play all the bullet clock default options, e.g.
+      // greedy-one-move: all chess, frysk(1_8), hyper(10_4), breakthrough + mini, xiangqi + mini, loa + se,
+      // greedy-two-move: all chess, frysk, hyper, breakthrough + mini, shogi + mini,  xiangqi + mini, loa + se + amazons,
+      const unsupportedBulletVariantForGreedyTwo =
+        timeModeDefault == 'bullet' &&
+        (['1_8', '10_4'].includes(variantId.join('_')) || ['0', '2', '3', '4', '8', '11'].includes(variantId[0]));
+      const unsupportedBulletVariantForGreedyOne =
+        timeModeDefault == 'bullet' &&
+        (['1_8', '10_4'].includes(variantId.join('_')) || ['0', '2', '4', '11'].includes(variantId[0]));
       const timeMode = <string>$timeModeSelect.val();
       const isByoyomi = timeMode === '3';
       let clockCompatible = true;
@@ -507,7 +514,8 @@ export default class Setup {
             }
             case 'ps-greedy-one-move': {
               clockCompatible =
-                nonCustomClock || (limit >= 1 && inc >= 1) || limit >= 3 || (isByoyomi && byo >= 5) || inc >= 5;
+                !unsupportedBulletVariantForGreedyOne &&
+                (nonCustomClock || (limit >= 1 && inc >= 1) || limit >= 3 || (isByoyomi && byo >= 5) || inc >= 5);
               break;
             }
             case 'ps-greedy-four-move': {
@@ -518,7 +526,7 @@ export default class Setup {
             default: {
               //greedy-two-move
               clockCompatible =
-                !unsupportedBulletVariant &&
+                !unsupportedBulletVariantForGreedyTwo &&
                 (nonCustomClock || (limit >= 3 && inc >= 2) || limit >= 10 || (isByoyomi && byo >= 10) || inc >= 10);
             }
           }
