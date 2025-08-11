@@ -445,18 +445,21 @@ export default class Setup {
         } else {
           $submits.toggleClass('nope', true);
           if (!botOK && !vsPSBot && !vsStockfishBot) {
-            const defaultBot = 'ps-greedy-two-move';
-            const backupBot = 'ps-random-mover';
-            if (
-              $botInput.filter(':checked').val() !== defaultBot &&
-              botCanPlay(defaultBot, limit, inc, byo, variantId)
-            ) {
-              $botInput.val(defaultBot).trigger('change');
-            } else if (
-              $botInput.filter(':checked').val() !== backupBot &&
-              botCanPlay(backupBot, limit, inc, byo, variantId)
-            ) {
-              $botInput.val(backupBot).trigger('change');
+            const greedy1CanPlay =
+              $botInput.filter(':checked').val() !== 'ps-greedy-one-move' &&
+              botCanPlay('ps-greedy-one-move', limit, inc, byo, variantId);
+            const greedy2CanPlay =
+              $botInput.filter(':checked').val() !== 'ps-greedy-two-move' &&
+              botCanPlay('ps-greedy-two-move', limit, inc, byo, variantId);
+            const randoCanPlay =
+              $botInput.filter(':checked').val() !== 'ps-random-mover' &&
+              botCanPlay('ps-random-mover', limit, inc, byo, variantId);
+            if (greedy2CanPlay) {
+              $botInput.val('ps-greedy-two-move').trigger('change');
+            } else if (greedy1CanPlay) {
+              $botInput.val('ps-greedy-one-move').trigger('change');
+            } else if (randoCanPlay) {
+              $botInput.val('ps-random-mover').trigger('change');
             }
             if (opponentType === 'bot') {
               const $bot = $opponentInput.eq(2);
@@ -548,18 +551,18 @@ export default class Setup {
       });
     }
     const isRealTime = () => this.ratedTimeModes.indexOf(<string>$timeModeSelect.val()) !== -1;
-
+    const disableNonRealTimeModes = () => {
+      //disable non realtime modes both in default and within custom (correspondence + unlimited)
+      $('#sf_timeModeDefaults_correspondence').prop('disabled', true).siblings('label').toggleClass('disabled', true);
+      $timeModeSelect.find('option[value="2"], option[value="0"]').prop('disabled', true);
+      $timeModeSelect.siblings('label[for="sf_timeMode_0"], label[for="sf_timeMode_2"]').addClass('disabled');
+    };
     //default options for challenge against bots
     if (vsPSBot || vsStockfishBot) {
       setBaseDefaultOptions();
       $casual.trigger('click');
       if (user !== '') $botInput.val(user);
-
-      //disable non realtime modes
-      $('#sf_timeModeDefaults_correspondence, #sf_timeModeDefaults_custom')
-        .prop('disabled', true)
-        .siblings('label')
-        .toggleClass('disabled', true);
+      disableNonRealTimeModes();
 
       const limit = parseFloat($timeInput.val() as string),
         inc = parseFloat($incrementInput.val() as string),
@@ -882,19 +885,7 @@ export default class Setup {
         setBaseDefaultOptions(); //defult to chess, real time, blitz clock
         $casual.trigger('click');
         $opponentInput.val('lobby'); //default to lobby
-        const opponent = $opponentInput.filter(':checked').val() as string;
-        if (opponent === 'lobby') {
-          $timeModeSelect
-            .val('1')
-            .children('.timeMode_2, .timeMode_0')
-            .prop('disabled', true)
-            .attr('title', this.root.trans('youNeedAnAccountToDoThat'));
-        }
-        //disable non realtime modes
-        $('#sf_timeModeDefaults_correspondence, #sf_timeModeDefaults_custom')
-          .prop('disabled', true)
-          .siblings('label')
-          .toggleClass('disabled', true);
+        disableNonRealTimeModes();
       }
     };
     setAnonOptions();
