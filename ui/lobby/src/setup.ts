@@ -536,18 +536,18 @@ export default class Setup {
       });
     }
     const isRealTime = () => this.ratedTimeModes.indexOf(<string>$timeModeSelect.val()) !== -1;
-
+    const disableNonRealTimeModes = () => {
+      //disable non realtime modes both in default and within custom (correspondence + unlimited)
+      $('#sf_timeModeDefaults_correspondence').prop('disabled', true).siblings('label').toggleClass('disabled', true);
+      $timeModeSelect.find('option[value="2"], option[value="0"]').prop('disabled', true);
+      $timeModeSelect.siblings('label[for="sf_timeMode_0"], label[for="sf_timeMode_2"]').addClass('disabled');
+    };
     //default options for challenge against bots
     if (vsPSBot || vsStockfishBot) {
       setBaseDefaultOptions();
       $casual.trigger('click');
       if (user !== '') $botInput.val(user);
-
-      //disable non realtime modes
-      $('#sf_timeModeDefaults_correspondence, #sf_timeModeDefaults_custom')
-        .prop('disabled', true)
-        .siblings('label')
-        .toggleClass('disabled', true);
+      disableNonRealTimeModes();
 
       const limit = parseFloat($timeInput.val() as string),
         inc = parseFloat($incrementInput.val() as string),
@@ -870,19 +870,7 @@ export default class Setup {
         setBaseDefaultOptions(); //defult to chess, real time, blitz clock
         $casual.trigger('click');
         $opponentInput.val('lobby'); //default to lobby
-        const opponent = $opponentInput.filter(':checked').val() as string;
-        if (opponent === 'lobby') {
-          $timeModeSelect
-            .val('1')
-            .children('.timeMode_2, .timeMode_0')
-            .prop('disabled', true)
-            .attr('title', this.root.trans('youNeedAnAccountToDoThat'));
-        }
-        //disable non realtime modes
-        $('#sf_timeModeDefaults_correspondence, #sf_timeModeDefaults_custom')
-          .prop('disabled', true)
-          .siblings('label')
-          .toggleClass('disabled', true);
+        disableNonRealTimeModes();
       }
     };
     setAnonOptions();

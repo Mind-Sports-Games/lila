@@ -38,7 +38,7 @@ object forms {
         renderGoOptions(form),
         renderBackgammonOptions(form),
         renderTimeModeOptions(form),
-        renderTimeMode(form, allowAnon = false, allowCorrespondence = true),
+        renderTimeMode(form, allowAnon = true, allowCorrespondence = true),
         renderMultiMatch(form),
         renderPlayerIndexOptions(form("playerIndex")),
         renderModeOptions(form),

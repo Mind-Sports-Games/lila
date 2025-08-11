@@ -132,6 +132,11 @@ $game-family-p2-pieces: (
     }
   }
 
+  select option[disabled] {
+    color: gray;
+    font-style: italic;
+  }
+
   group.radio {
     margin: 0 auto 1em auto;
     width: 100%;
