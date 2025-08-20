@@ -24,22 +24,27 @@ final private class SwissTiebreak(
             // We use 1-based indexing here,
             // but the tiebreakers use 0 based indexing
             val r = Tiebreak.Round(round.value - 1)
-            playerPairingMap get round match {
+            playerPairingMap.get(round) match {
               case Some(pairing) => {
-                val foe = TiebreakPlayer(pairing opponentOf hero.id)
-                pairing.status match {
-                  case Left(_)     => None
-                  case Right(None) => Some(r.draw(hero, foe))
-                  case Right(Some(playerIndex)) =>
-                    if (pairing(playerIndex) == hero.id)
-                      Some(r.win(hero, foe))
-                    else
-                      Some(r.lose(hero, foe))
+                val foe = TiebreakPlayer(pairing.opponentOf(hero.id))
+                pairing.matchStatus match {
+                  case Left(_) => List()
+                  case Right(results) =>
+                    results.map({
+                      case None => r.draw(hero, foe)
+                      case Some(playerIndex) =>
+                        if (pairing(playerIndex) == hero.id)
+                          r.win(hero, foe)
+                        else
+                          r.lose(hero, foe)
+                    })
                 }
               }
-              case None if player.byes(round) => Some(r.bye(hero))
-              case None if round.value == 1   => Some(r.absentLoss(hero))
-              case None                       => Some(r.withdrawn(hero))
+              // TODO: Identify if the following three cases are short-changing
+              //       players who get byes or are withdrawn/absent
+              case None if player.byes(round) => List(r.bye(hero))
+              case None if round.value == 1   => List(r.absentLoss(hero))
+              case None                       => List(r.withdrawn(hero))
             }
           }
         }
