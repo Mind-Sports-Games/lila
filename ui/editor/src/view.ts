@@ -6,7 +6,7 @@ import { parseFen } from 'stratops/fen';
 import EditorCtrl from './ctrl';
 import chessground from './chessground';
 import { Selected, CastlingToggle, EditorState } from './interfaces';
-import { VariantKey } from 'stratops/variants/types';
+import { VariantKey as stratopsVariantKey } from 'stratops/variants/types';
 import { variantClassFromKey } from 'stratops/variants/util';
 import { makeSquare, parseSquare } from 'stratops';
 
@@ -71,7 +71,7 @@ function isChessRules(variantKey: VariantKey): boolean {
   return variantClassFromKey(variantKey).family == 'chess';
 }
 
-function variant2option(key: VariantKey, name: string, ctrl: EditorCtrl): VNode {
+function variant2option(key: stratopsVariantKey, name: string, ctrl: EditorCtrl): VNode {
   return h(
     'option',
     {
@@ -84,26 +84,26 @@ function variant2option(key: VariantKey, name: string, ctrl: EditorCtrl): VNode 
   );
 }
 
-const allVariants: Array<[VariantKey, string]> = [
-  [VariantKey.standard, 'Standard'],
-  [VariantKey.antichess, 'Antichess'],
-  [VariantKey.atomic, 'Atomic'],
-  [VariantKey.crazyhouse, 'Crazyhouse'],
-  [VariantKey.horde, 'Horde'],
-  [VariantKey.kingOfTheHill, 'King of the Hill'],
-  [VariantKey.racingKings, 'Racing Kings'],
-  [VariantKey.threeCheck, 'Three-check'],
-  [VariantKey.fiveCheck, 'Five-check'],
-  [VariantKey.monster, 'Monster'],
-  [VariantKey.minibreakthroughtroyka, 'Mini Breakthrough'],
-  [VariantKey.breakthroughtroyka, 'Breakthrough'],
-  [VariantKey.linesOfAction, 'Lines of Action'],
-  [VariantKey.scrambledEggs, 'Scrambled Eggs'],
-  [VariantKey.flipello, 'Othello'],
-  [VariantKey.flipello10, 'Grand Othello'],
-  [VariantKey.antiflipello, 'AntiOthello'],
-  [VariantKey.xiangqi, 'Xiangqi'],
-  [VariantKey.minixiangqi, 'Mini Xiangqi'],
+const allVariants: Array<[stratopsVariantKey, string]> = [
+  [stratopsVariantKey.standard, 'Standard'],
+  [stratopsVariantKey.antichess, 'Antichess'],
+  [stratopsVariantKey.atomic, 'Atomic'],
+  [stratopsVariantKey.crazyhouse, 'Crazyhouse'],
+  [stratopsVariantKey.horde, 'Horde'],
+  [stratopsVariantKey.kingOfTheHill, 'King of the Hill'],
+  [stratopsVariantKey.racingKings, 'Racing Kings'],
+  [stratopsVariantKey.threeCheck, 'Three-check'],
+  [stratopsVariantKey.fiveCheck, 'Five-check'],
+  [stratopsVariantKey.monster, 'Monster'],
+  [stratopsVariantKey.minibreakthroughtroyka, 'Mini Breakthrough'],
+  [stratopsVariantKey.breakthroughtroyka, 'Breakthrough'],
+  [stratopsVariantKey.linesOfAction, 'Lines of Action'],
+  [stratopsVariantKey.scrambledEggs, 'Scrambled Eggs'],
+  [stratopsVariantKey.flipello, 'Othello'],
+  [stratopsVariantKey.flipello10, 'Grand Othello'],
+  [stratopsVariantKey.xiangqi, 'Xiangqi'],
+  [stratopsVariantKey.minixiangqi, 'Mini Xiangqi'],
+  [stratopsVariantKey.amazons, 'Amazons'],
 ];
 
 function controls(ctrl: EditorCtrl, state: EditorState): VNode {
@@ -131,7 +131,6 @@ function controls(ctrl: EditorCtrl, state: EditorState): VNode {
       { on: { click: ctrl.clearBoard }, attrs: icon ? { 'data-icon': icon } : {} },
       ctrl.trans.noarg('clearBoard'),
     );
-  const variant = variantClassFromKey(ctrl.variantKey);
   return h('div.board-editor__tools', [
     ...(ctrl.cfg.embed || !ctrl.cfg.positions
       ? []
@@ -172,78 +171,7 @@ function controls(ctrl: EditorCtrl, state: EditorState): VNode {
             ),
           ]),
         ]),
-    h('div.metadata', [
-      h(
-        'div.playerindex',
-        h(
-          'select',
-          {
-            on: {
-              change(e) {
-                ctrl.setTurn((e.target as HTMLSelectElement).value as PlayerIndex);
-              },
-            },
-          },
-          Object.keys(variant.playerColors).map(function (key) {
-            return h(
-              'option',
-              {
-                attrs: {
-                  value: key,
-                  selected: ctrl.turn === key,
-                },
-              },
-              ctrl.trans('playerIndexPlays', capitalizeFirstLetter(variant.playerColors[key])),
-            );
-          }),
-        ),
-      ),
-      variant.allowCastling
-        ? h('div.castling', [
-            h('strong', ctrl.trans.noarg('castling')),
-            h('div', [
-              castleCheckBox(ctrl, 'K', ctrl.trans.noarg('whiteCastlingKingside'), !!ctrl.options.inlineCastling),
-              castleCheckBox(ctrl, 'Q', 'O-O-O', true),
-            ]),
-            h('div', [
-              castleCheckBox(ctrl, 'k', ctrl.trans.noarg('blackCastlingKingside'), !!ctrl.options.inlineCastling),
-              castleCheckBox(ctrl, 'q', 'O-O-O', true),
-            ]),
-          ])
-        : null,
-      // Copied the en passant HTML generation logic from lichess (AGPL-3):
-      // https://github.com/lichess-org/lila/commit/2017682f3871d90ab68db7c3495d4886c9c9fcfe
-      variant.allowEnPassant()
-        ? h('div.enpassant', [
-            h('label', { attrs: { for: 'enpassant-select' } }, 'En passant'),
-            h(
-              'select#enpassant-select',
-              {
-                on: {
-                  change(e) {
-                    ctrl.setEnPassant(parseSquare(ctrl.rules)((e.target as HTMLSelectElement).value));
-                  },
-                },
-                props: { value: ctrl.epSquare ? makeSquare(ctrl.rules)(ctrl.epSquare) : '' },
-              },
-              ['', ...[ctrl.turn === 'p2' ? 3 : 6].flatMap(r => 'abcdefgh'.split('').map(f => f + r))].map(key =>
-                h(
-                  'option',
-                  {
-                    attrs: {
-                      value: key,
-                      selected: (key ? parseSquare(ctrl.rules)(key) : undefined) === ctrl.epSquare,
-                      hidden: Boolean(key && !state.enPassantOptions.includes(key)),
-                      disabled: Boolean(key && !state.enPassantOptions.includes(key)) /*Safari*/,
-                    },
-                  },
-                  key,
-                ),
-              ),
-            ),
-          ])
-        : null,
-    ]),
+    renderMetadata(ctrl, state),
     ...(ctrl.cfg.embed
       ? [h('div.actions', [buttonStart(), buttonClear()])]
       : [
@@ -313,6 +241,119 @@ function controls(ctrl: EditorCtrl, state: EditorState): VNode {
             studyButton(ctrl, state),
           ]),
         ]),
+  ]);
+}
+
+function renderMetadata(ctrl: EditorCtrl, state: EditorState): VNode {
+  const variant = variantClassFromKey(ctrl.variantKey);
+  const coords = variant.getPiecesCoordinates(ctrl.getFenFromSetup(), ctrl.turn).map(c => c.coord);
+  const lastMoveValue =
+    ctrl.variantKey === stratopsVariantKey.amazons &&
+    ctrl.lastAction &&
+    coords.includes(makeSquare(ctrl.rules)(ctrl.lastAction.to))
+      ? makeSquare(ctrl.rules)(ctrl.lastAction.to)
+      : '';
+
+  return h('div.metadata', [
+    h(
+      'div.playerindex',
+      h(
+        'select',
+        {
+          on: {
+            change(e) {
+              ctrl.setTurn((e.target as HTMLSelectElement).value as PlayerIndex);
+            },
+          },
+        },
+        Object.keys(variant.playerColors).map(function (key) {
+          return h(
+            'option',
+            {
+              attrs: {
+                value: key,
+                selected: ctrl.turn === key,
+              },
+            },
+            ctrl.trans('playerIndexPlays', capitalizeFirstLetter(variant.playerColors[key])),
+          );
+        }),
+      ),
+    ),
+    variant.allowCastling
+      ? h('div.castling', [
+          h('strong', ctrl.trans.noarg('castling')),
+          h('div', [
+            castleCheckBox(ctrl, 'K', ctrl.trans.noarg('whiteCastlingKingside'), !!ctrl.options.inlineCastling),
+            castleCheckBox(ctrl, 'Q', 'O-O-O', true),
+          ]),
+          h('div', [
+            castleCheckBox(ctrl, 'k', ctrl.trans.noarg('blackCastlingKingside'), !!ctrl.options.inlineCastling),
+            castleCheckBox(ctrl, 'q', 'O-O-O', true),
+          ]),
+        ])
+      : null,
+    // Copied the en passant HTML generation logic from lichess (AGPL-3):
+    // https://github.com/lichess-org/lila/commit/2017682f3871d90ab68db7c3495d4886c9c9fcfe
+    variant.allowEnPassant()
+      ? h('div.enpassant', [
+          h('label', { attrs: { for: 'enpassant-select' } }, 'En passant'),
+          h(
+            'select#enpassant-select',
+            {
+              on: {
+                change(e) {
+                  ctrl.setEnPassant(parseSquare(ctrl.rules)((e.target as HTMLSelectElement).value));
+                },
+              },
+              props: { value: ctrl.epSquare ? makeSquare(ctrl.rules)(ctrl.epSquare) : '' },
+            },
+            ['', ...[ctrl.turn === 'p2' ? 3 : 6].flatMap(r => 'abcdefgh'.split('').map(f => f + r))].map(key =>
+              h(
+                'option',
+                {
+                  attrs: {
+                    value: key,
+                    selected: (key ? parseSquare(ctrl.rules)(key) : undefined) === ctrl.epSquare,
+                    hidden: Boolean(key && !state.enPassantOptions.includes(key)),
+                    disabled: Boolean(key && !state.enPassantOptions.includes(key)) /*Safari*/,
+                  },
+                },
+                key,
+              ),
+            ),
+          ),
+        ])
+      : null,
+    ctrl.variantKey == 'amazons'
+      ? h('div.lastMove', [
+          h('label', { attrs: { for: 'last-move-select' } }, 'Last Move'),
+          h(
+            'select#last-move-select',
+            {
+              key: coords.join(','), // force a re-render if the list of options change
+              on: {
+                change(e) {
+                  ctrl.setLastAction(parseSquare(ctrl.rules)((e.target as HTMLSelectElement).value));
+                },
+              },
+              props: { value: lastMoveValue },
+            },
+            [undefined, ...variant.getPiecesCoordinates(ctrl.getFenFromSetup(), ctrl.turn)].map(c =>
+              h(
+                'option',
+                {
+                  attrs: {
+                    value: c?.coord ?? '',
+                    selected: c ? ctrl.lastAction?.to === parseSquare(ctrl.rules)(c.coord) : '',
+                  },
+                },
+                c?.coord ?? '',
+              ),
+            ),
+          ),
+        ])
+      : null,
   ]);
 }
 
@@ -404,6 +445,11 @@ function sparePieces(
   }
   if (ctrl.variantKey == 'minixiangqi') {
     pieces = ['k-piece', 'c-piece', 'r-piece', 'n-piece', 'p-piece'].map(function (role) {
+      return [playerIndex, role];
+    });
+  }
+  if (ctrl.variantKey == 'amazons') {
+    pieces = ['q-piece', 'p-piece'].map(function (role) {
       return [playerIndex, role];
     });
   }
