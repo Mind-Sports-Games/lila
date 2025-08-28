@@ -102,6 +102,7 @@ const allVariants: Array<[VariantKey, string]> = [
   [VariantKey.flipello10, 'Grand Othello'],
   [VariantKey.xiangqi, 'Xiangqi'],
   [VariantKey.minixiangqi, 'Mini Xiangqi'],
+  [VariantKey.amazons, 'Amazons'],
 ];
 
 function controls(ctrl: EditorCtrl, state: EditorState): VNode {
@@ -361,6 +362,11 @@ function sparePieces(
   }
   if (ctrl.variantKey == 'minixiangqi') {
     pieces = ['k-piece', 'c-piece', 'r-piece', 'n-piece', 'p-piece'].map(function (role) {
+      return [playerIndex, role];
+    });
+  }
+  if (ctrl.variantKey == 'amazons') {
+    pieces = ['q-piece', 'p-piece'].map(function (role) {
       return [playerIndex, role];
     });
   }
