@@ -41,7 +41,7 @@
     "lint-staged": "^15.5.1",
     "onchange": "^7.1.0",
     "prettier": "^3.5.3",
-    "stratops": "github:Mind-Sports-Games/stratops#pla-1419-fix-incorrect-default-castling-values",
+    "stratops": "github:Mind-Sports-Games/stratops#v0.8.1-pstrat5.11",
     "typescript": "^5.8.3",
     "xml2js": "^0.6.2"
   },
