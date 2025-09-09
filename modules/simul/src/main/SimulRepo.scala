@@ -90,7 +90,9 @@ final private[simul] class SimulRepo(val coll: Coll)(implicit ec: scala.concurre
   def hostId(id: Simul.ID): Fu[Option[User.ID]] =
     coll.primitiveOne[User.ID]($id(id), "hostId")
 
-  private val featurableSelect = $doc("featurable" -> true)
+  private val featurableSelect         = $doc("featurable" -> true)
+  private val manyPairings             = $doc("pairings.3" $exists true)
+  private val featurableOrManyPairings = $doc("$or" -> List(featurableSelect, manyPairings))
 
   def allCreatedFeaturable: Fu[List[Simul]] =
     coll
@@ -132,6 +134,13 @@ final private[simul] class SimulRepo(val coll: Coll)(implicit ec: scala.concurre
   def allFinishedFeaturable(max: Int): Fu[List[Simul]] =
     coll
       .find(finishedSelect ++ featurableSelect)
+      .sort($sort desc "finishedAt")
+      .cursor[Simul]()
+      .list(max)
+
+  def allFinishedFeaturableOrManyPairings(max: Int): Fu[List[Simul]] =
+    coll
+      .find(finishedSelect ++ featurableOrManyPairings)
       .sort($sort desc "finishedAt")
       .cursor[Simul]()
       .list(max)
