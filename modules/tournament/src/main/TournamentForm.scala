@@ -245,7 +245,8 @@ object TournamentForm {
   val periodsDefault = 1
   val periodsChoices = options(periods, "%d period{s}")
 
-  val minutes       = (20 to 60 by 5) ++ (70 to 120 by 10) ++ (150 to 360 by 30) ++ (420 to 600 by 60) :+ 720
+  val minutes =
+    (20 to 60 by 5) ++ (70 to 120 by 10) ++ (150 to 360 by 30) ++ (420 to 600 by 60) :+ 720 :+ 1440
   val minuteDefault = 45
   val minuteChoices = options(minutes, "%d minute{s}")
 
