@@ -51,7 +51,7 @@ final class PublicChat(
   private def fetchVisibleSimuls: Fu[List[Simul]] = {
     simulEnv.allCreatedFeaturable.get {} zip
       simulEnv.repo.allStarted zip
-      simulEnv.repo.allFinishedFeaturable(3) map { case ((created, started), finished) =>
+      simulEnv.repo.allFinishedFeaturableOrManyPairings(3) map { case ((created, started), finished) =>
         created ::: started ::: finished
       }
   }

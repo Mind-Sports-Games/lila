@@ -40,7 +40,7 @@ final class Simul(env: Env) extends LilaController(env) {
     } zip
       env.simul.repo.allCreatedRecently zip
       env.simul.repo.allStarted zip
-      env.simul.repo.allFinishedFeaturable(20)
+      env.simul.repo.allFinishedFeaturableOrManyPairings(20)
 
   def show(id: String) =
     Open { implicit ctx =>
