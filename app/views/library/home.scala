@@ -70,6 +70,21 @@ object home {
         ),
         div(id := "library_chart_area")(
           div(id := "library_chart")(spinner)
+        ),
+        div(cls := "library-stats-table")(
+          h2(cls := "library-stats-title color-choice")("Stats"),
+          div(cls := "library-stats-row")(
+            div(cls := "library-stats-term")("Total Game Variants"),
+            div(cls := "library-stats-value")(bits.totalVariants(data))
+          ),
+          div(cls := "library-stats-row")(
+            div(cls := "library-stats-term")("Total Games Played"),
+            div(cls := "library-stats-value")(bits.totalGames(data))
+          ),
+          div(cls := "library-stats-row")(
+            div(cls := "library-stats-term")(s"Total Games Played (${bits.lastFullMonth})"),
+            div(cls := "library-stats-value")(bits.totalGamesLastFullMonth(data))
+          )
         )
       )
     )

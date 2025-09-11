@@ -95,6 +95,25 @@ object show {
         ),
         div(id := "library_chart_area")(
           div(id := "library_chart")(spinner)
+        ),
+        div(cls := "library-stats-table")(
+          h2(cls := "library-stats-title color-choice")("Stats"),
+          div(cls := "library-stats-row")(
+            div(cls := "library-stats-term")("Date Released"),
+            div(cls := "library-stats-value")(bits.releaseDateDisplay(data, variant))
+          ),
+          div(cls := "library-stats-row")(
+            div(cls := "library-stats-term")("Total Games Played"),
+            div(cls := "library-stats-value")(bits.totalGamesForVariant(data, variant))
+          ),
+          div(cls := "library-stats-row")(
+            div(cls := "library-stats-term")(s"Total Games Played (${bits.lastFullMonth})"),
+            div(cls := "library-stats-value")(bits.totalGamesLastFullMonthForVariant(data, variant))
+          ),
+          div(cls := "library-stats-row")(
+            div(cls := "library-stats-term")("Average Games/Day"),
+            div(cls := "library-stats-value")(bits.gamesPerDay(data, variant))
+          )
         )
       )
     )
