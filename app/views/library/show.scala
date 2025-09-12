@@ -16,7 +16,8 @@ object show {
 
   def apply(
       variant: Variant,
-      data: List[(String, String, Long)]
+      monthlyGameData: List[(String, String, Long)],
+      winRates: List[(String, Int, Int, Int)]
   )(implicit ctx: Context) =
     views.html.base.layout(
       title = s"${VariantKeys.variantName(variant)} • ${VariantKeys.variantTitle(variant)}",
@@ -26,7 +27,9 @@ object show {
         jsTag("chart/library.js"),
         embedJsUnsafeLoadThen(s"""playstrategy.libraryChart(${safeJsonValue(
           Json.obj(
-            "freq" -> bits.transformData(data).filter(_._2 == s"${variant.gameFamily.id}_${variant.id}"),
+            "freq" -> bits
+              .transformData(monthlyGameData)
+              .filter(_._2 == s"${variant.gameFamily.id}_${variant.id}"),
             "i18n" -> i18nJsObject(bits.i18nKeys),
             "variantNames" -> Json.obj(
               Variant.all.map(v =>
@@ -100,21 +103,36 @@ object show {
           h2(cls := "library-stats-title color-choice")("Stats"),
           div(cls := "library-stats-row")(
             div(cls := "library-stats-term")("Date Released"),
-            div(cls := "library-stats-value")(bits.releaseDateDisplay(data, variant))
+            div(cls := "library-stats-value")(bits.releaseDateDisplay(monthlyGameData, variant))
           ),
           div(cls := "library-stats-row")(
             div(cls := "library-stats-term")("Total Games Played"),
-            div(cls := "library-stats-value")(bits.totalGamesForVariant(data, variant))
+            div(cls := "library-stats-value")(bits.totalGamesForVariant(monthlyGameData, variant))
           ),
           div(cls := "library-stats-row")(
             div(cls := "library-stats-term")(s"Total Games Played (${bits.lastFullMonth})"),
-            div(cls := "library-stats-value")(bits.totalGamesLastFullMonthForVariant(data, variant))
+            div(cls := "library-stats-value")(
+              bits.totalGamesLastFullMonthForVariant(monthlyGameData, variant)
+            )
           ),
           div(cls := "library-stats-row")(
             div(cls := "library-stats-term")("Average Games/Day"),
-            div(cls := "library-stats-value")(bits.gamesPerDay(data, variant))
+            div(cls := "library-stats-value")(bits.gamesPerDay(monthlyGameData, variant))
+          ),
+          div(cls := "library-stats-row")(
+            div(cls := "library-stats-term")("Player 1 wins"),
+            div(cls := "library-stats-value")(bits.winRatePlayer1(variant, winRates))
+          ),
+          div(cls := "library-stats-row")(
+            div(cls := "library-stats-term")("Player 2 wins"),
+            div(cls := "library-stats-value")(bits.winRatePlayer2(variant, winRates))
+          ),
+          div(cls := "library-stats-row")(
+            div(cls := "library-stats-term")("Draws"),
+            div(cls := "library-stats-value")(bits.winRateDraws(variant, winRates))
           )
         )
       )
     )
+
 }

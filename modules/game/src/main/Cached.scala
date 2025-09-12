@@ -16,8 +16,9 @@ final class Cached(
   def nbImportedBy(userId: User.ID): Fu[Int] = nbImportedCache.get(userId)
   def clearNbImportedByCache                 = nbImportedCache invalidate _
 
-  def nbTotal: Fu[Long]                              = nbTotalCache.get {}
-  def monthlyGames: Fu[List[(String, String, Long)]] = monthlyGamesCache.get {}
+  def nbTotal: Fu[Long]                               = nbTotalCache.get {}
+  def monthlyGames: Fu[List[(String, String, Long)]]  = monthlyGamesCache.get {}
+  def gameWinRates: Fu[List[(String, Int, Int, Int)]] = gameWinRatesCache.get {}
 
   def nbPlaying = nbPlayingCache.get _
   //def nbCorrespondencePlaying = nbCorrespondencePlayingCache.get {}
@@ -82,6 +83,13 @@ final class Cached(
     _.refreshAfterWrite(1 days)
       .buildAsyncFuture { _ =>
         gameRepo.countByMonthly
+      }
+  }
+
+  private val gameWinRatesCache = cacheApi.unit[List[(String, Int, Int, Int)]] {
+    _.refreshAfterWrite(1 days)
+      .buildAsyncFuture { _ =>
+        gameRepo.calculateWinRatePercentages
       }
   }
 

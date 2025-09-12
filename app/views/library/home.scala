@@ -15,7 +15,7 @@ import strategygames.GameLogic
 
 object home {
 
-  def apply(data: List[(String, String, Long)])(implicit ctx: Context) =
+  def apply(monthlyGameData: List[(String, String, Long)])(implicit ctx: Context) =
     views.html.base.layout(
       title = "Library of Games",
       moreCss = cssTag("library"),
@@ -24,7 +24,7 @@ object home {
         jsTag("chart/library.js"),
         embedJsUnsafeLoadThen(s"""window.libraryChartData = ${safeJsonValue(
           Json.obj(
-            "freq" -> bits.transformData(data),
+            "freq" -> bits.transformData(monthlyGameData),
             "i18n" -> i18nJsObject(bits.i18nKeys),
             "variantNames" -> Json.obj(
               Variant.all.map(v =>
@@ -75,15 +75,15 @@ object home {
           h2(cls := "library-stats-title color-choice")("Stats"),
           div(cls := "library-stats-row")(
             div(cls := "library-stats-term")("Total Game Variants"),
-            div(cls := "library-stats-value")(bits.totalVariants(data))
+            div(cls := "library-stats-value")(bits.totalVariants(monthlyGameData))
           ),
           div(cls := "library-stats-row")(
             div(cls := "library-stats-term")("Total Games Played"),
-            div(cls := "library-stats-value")(bits.totalGames(data))
+            div(cls := "library-stats-value")(bits.totalGames(monthlyGameData))
           ),
           div(cls := "library-stats-row")(
             div(cls := "library-stats-term")(s"Total Games Played (${bits.lastFullMonth})"),
-            div(cls := "library-stats-value")(bits.totalGamesLastFullMonth(data))
+            div(cls := "library-stats-value")(bits.totalGamesLastFullMonth(monthlyGameData))
           )
         )
       )

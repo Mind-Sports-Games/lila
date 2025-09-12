@@ -76,6 +76,30 @@ object bits {
     }
   }
 
+  def winRatePlayer1(variant: Variant, winRates: List[(String, Int, Int, Int)]): String =
+    winRates
+      .filter(_._1 == variantKey(variant))
+      .headOption
+      .map(_._2)
+      .getOrElse(0)
+      .toString() + "%"
+
+  def winRatePlayer2(variant: Variant, winRates: List[(String, Int, Int, Int)]): String =
+    winRates
+      .filter(_._1 == variantKey(variant))
+      .headOption
+      .map(_._3)
+      .getOrElse(0)
+      .toString() + "%"
+
+  def winRateDraws(variant: Variant, winRates: List[(String, Int, Int, Int)]): String =
+    winRates
+      .filter(_._1 == variantKey(variant))
+      .headOption
+      .map(_._4)
+      .getOrElse(0)
+      .toString() + "%"
+
   val i18nKeys =
     List(
       trans.players,
