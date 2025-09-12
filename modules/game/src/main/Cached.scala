@@ -19,6 +19,7 @@ final class Cached(
   def nbTotal: Fu[Long]                               = nbTotalCache.get {}
   def monthlyGames: Fu[List[(String, String, Long)]]  = monthlyGamesCache.get {}
   def gameWinRates: Fu[List[(String, Int, Int, Int)]] = gameWinRatesCache.get {}
+  def gameClockRates: Fu[(Int, Int)]                  = gameClockRatesCache.get {}
 
   def nbPlaying = nbPlayingCache.get _
   //def nbCorrespondencePlaying = nbCorrespondencePlayingCache.get {}
@@ -93,4 +94,10 @@ final class Cached(
       }
   }
 
+  private val gameClockRatesCache = cacheApi.unit[(Int, Int)] {
+    _.refreshAfterWrite(1 day)
+      .buildAsyncFuture { _ =>
+        gameRepo.finishedGameClockPercentages
+      }
+  }
 }

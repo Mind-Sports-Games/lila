@@ -15,7 +15,7 @@ import strategygames.GameLogic
 
 object home {
 
-  def apply(monthlyGameData: List[(String, String, Long)])(implicit ctx: Context) =
+  def apply(monthlyGameData: List[(String, String, Long)], clockRates: (Int, Int))(implicit ctx: Context) =
     views.html.base.layout(
       title = "Library of Games",
       moreCss = cssTag("library"),
@@ -72,7 +72,7 @@ object home {
           div(id := "library_chart")(spinner)
         ),
         div(cls := "library-stats-table")(
-          h2(cls := "library-stats-title color-choice")("Stats"),
+          h2(cls := "library-stats-title color-choice")("Overall Game Stats"),
           div(cls := "library-stats-row")(
             div(cls := "library-stats-term")("Total Game Variants"),
             div(cls := "library-stats-value")(bits.totalVariants(monthlyGameData))
@@ -84,6 +84,14 @@ object home {
           div(cls := "library-stats-row")(
             div(cls := "library-stats-term")(s"Total Games Played (${bits.lastFullMonth})"),
             div(cls := "library-stats-value")(bits.totalGamesLastFullMonth(monthlyGameData))
+          ),
+          div(cls := "library-stats-row")(
+            div(cls := "library-stats-term")(s"Live Games Played"),
+            div(cls := "library-stats-value")(clockRates._1.toString() + "%")
+          ),
+          div(cls := "library-stats-row")(
+            div(cls := "library-stats-term")(s"Correspondence Games Played"),
+            div(cls := "library-stats-value")(clockRates._2.toString() + "%")
           )
         )
       )

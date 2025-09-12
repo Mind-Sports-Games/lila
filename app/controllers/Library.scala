@@ -10,7 +10,9 @@ final class Library(env: Env) extends LilaController(env) {
     Open { implicit ctx =>
       {
         env.game.cached.monthlyGames.flatMap { monthlyGameData =>
-          Ok(views.html.library.home(monthlyGameData)).fuccess
+          env.game.cached.gameClockRates flatMap { clockRates =>
+            Ok(views.html.library.home(monthlyGameData, clockRates)).fuccess
+          }
         }
       }
     }

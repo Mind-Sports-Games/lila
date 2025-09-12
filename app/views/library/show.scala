@@ -100,7 +100,7 @@ object show {
           div(id := "library_chart")(spinner)
         ),
         div(cls := "library-stats-table")(
-          h2(cls := "library-stats-title color-choice")("Stats"),
+          h2(cls := "library-stats-title color-choice")("Game Info"),
           div(cls := "library-stats-row")(
             div(cls := "library-stats-term")("Date Released"),
             div(cls := "library-stats-value")(bits.releaseDateDisplay(monthlyGameData, variant))
