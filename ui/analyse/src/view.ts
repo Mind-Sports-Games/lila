@@ -111,6 +111,8 @@ function wheel(ctrl: AnalyseCtrl, e: WheelEvent) {
 }
 
 function inputs(ctrl: AnalyseCtrl): VNode | undefined {
+  const variantKey = ctrl.data.game.variant.key;
+  const rules = variantKeyToRules(variantKey);
   if (ctrl.ongoing || !ctrl.data.userAnalysis) return;
   if (ctrl.redirecting) return spinner();
   return h('div.copyables', [
@@ -128,7 +130,7 @@ function inputs(ctrl: AnalyseCtrl): VNode | undefined {
             el.addEventListener('input', _ => {
               ctrl.fenInput = el.value;
               el.setCustomValidity(
-                parseFen(variantKeyToRules(ctrl.data.game.variant.key))(el.value.trim()).isOk ? '' : 'Invalid FEN',
+                parseFen(rules)(el.value.trim()).isOk ? '' : 'Invalid FEN',
               );
             });
           },
@@ -162,7 +164,7 @@ function inputs(ctrl: AnalyseCtrl): VNode | undefined {
                 },
               },
             }),
-            ctrl.data.game.variant.lib == 0 && !['linesOfAction', 'scrambledEggs'].includes(ctrl.data.game.variant.key)
+            ctrl.data.game.variant.lib == 0 && !['linesOfAction', 'scrambledEggs'].includes(variantKey)
               ? h(
                   'button.button.button-thin.action.text',
                   {

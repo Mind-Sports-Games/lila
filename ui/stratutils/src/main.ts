@@ -1,4 +1,4 @@
-import { piotr } from './piotr';
+import { abalonePiotrMap, piotr } from './piotr';
 import * as status from 'game/status';
 import type * as cg from 'chessground/types';
 import type { BaseGame } from 'game';
@@ -29,6 +29,22 @@ export function readDests(lines?: string): Dests | null {
           .slice(1)
           .split('')
           .map(c => piotr[c]),
+      );
+    }
+  return dests;
+}
+
+export function readDestsAbalone(lines?: string): Dests | null {
+  if (typeof lines === 'undefined') return null;
+  const dests = new Map();
+  if (lines)
+    for (const line of lines.split(' ')) {
+      dests.set(
+        abalonePiotrMap(piotr[line[0]]),
+        line
+          .slice(1)
+          .split('')
+          .map(c => abalonePiotrMap(piotr[c])),
       );
     }
   return dests;

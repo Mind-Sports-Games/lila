@@ -104,3 +104,13 @@ export const piotr: Piotr = {
   '¥': 'i8',
   '¦': 'j8',
 };
+
+export function abalonePiotrMap(k: Key): Key {
+  if (!k) return undefined;
+  if (k.length < 2) return undefined;
+
+  // in Abalone, coordinates are reversed, compared to chess
+  let pos: [number, number] = [k.charCodeAt(0) - 97, parseInt(k.slice(1)) - 1];
+
+  return String.fromCharCode(pos[1] + 97) + "" + (pos[0] + 1) as Key;
+}
