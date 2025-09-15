@@ -43,7 +43,7 @@ importers:
         version: 3.6.2
       stratops:
         specifier: git+ssh://git@github.com:r-gke/stratops.git#GrandAbalone
-        version: https://codeload.github.com/r-gke/stratops/tar.gz/efd4458d1ce91906bf7c05055cfafade492e5666
+        version: https://codeload.github.com/r-gke/stratops/tar.gz/11ad1f6b5fd4b5ebcf6803ba0c41a87fbef568f7
       typescript:
         specifier: ^5.8.3
         version: 5.9.2
@@ -2366,8 +2366,8 @@ packages:
     resolution: {integrity: sha512-XlkWvfIm6RmsWtNJx+uqtKLS8eqFbxUg0ZzLXqY0caEy9l7hruX8IpiDnjsLavoBgqCCR71TqWO8MaXYheJ3RQ==}
     engines: {node: '>=10'}
 
-  stratops@https://codeload.github.com/r-gke/stratops/tar.gz/efd4458d1ce91906bf7c05055cfafade492e5666:
-    resolution: {tarball: https://codeload.github.com/r-gke/stratops/tar.gz/efd4458d1ce91906bf7c05055cfafade492e5666}
+  stratops@https://codeload.github.com/r-gke/stratops/tar.gz/11ad1f6b5fd4b5ebcf6803ba0c41a87fbef568f7:
+    resolution: {tarball: https://codeload.github.com/r-gke/stratops/tar.gz/11ad1f6b5fd4b5ebcf6803ba0c41a87fbef568f7}
     version: 0.8.1-pstrat5.7
     engines: {node: '>=20', pnpm: ^9}
 
@@ -4667,7 +4667,7 @@ snapshots:
     dependencies:
       escape-string-regexp: 2.0.0
 
-  stratops@https://codeload.github.com/r-gke/stratops/tar.gz/efd4458d1ce91906bf7c05055cfafade492e5666:
+  stratops@https://codeload.github.com/r-gke/stratops/tar.gz/11ad1f6b5fd4b5ebcf6803ba0c41a87fbef568f7:
     dependencies:
       '@badrap/result': 0.2.13
 
