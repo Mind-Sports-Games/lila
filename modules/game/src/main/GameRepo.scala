@@ -722,42 +722,4 @@ final class GameRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionCont
       }
     }
 
-  def finishedGameClockStats: Fu[(Int, Int, Int)] =
-    coll
-      .aggregateList(
-        maxDocs = 1,
-        ReadPreference.secondaryPreferred
-      ) { framework =>
-        import framework._
-        Match(Query.finished) -> List(
-          Project(
-            $doc(
-              "clock"   -> $doc("$cond" -> $arr($doc("$ifNull" -> $arr(s"$$${F.clock}", false)), 1, 0)),
-              "noClock" -> $doc("$cond" -> $arr($doc("$ifNull" -> $arr(s"$$${F.clock}", false)), 0, 1))
-            )
-          ),
-          Group($doc())(
-            "total"   -> SumAll,
-            "clock"   -> SumField("clock"),
-            "noClock" -> SumField("noClock")
-          )
-        )
-      }
-      .map { docs =>
-        docs.headOption.flatMap { doc =>
-          for {
-            total   <- doc.getAsOpt[Int]("total")
-            clock   <- doc.getAsOpt[Int]("clock")
-            noClock <- doc.getAsOpt[Int]("noClock")
-          } yield (total, clock, noClock)
-        } getOrElse (0, 0, 0)
-      }
-
-  def finishedGameClockPercentages: Fu[(Int, Int)] =
-    finishedGameClockStats.map { case (total, clock, noClock) =>
-      val clockPct   = if (total > 0) (clock * 100) / total else 0
-      val noClockPct = if (total > 0) (noClock * 100) / total else 0
-      (clockPct, noClockPct)
-    }
-
 }

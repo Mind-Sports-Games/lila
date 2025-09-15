@@ -1,6 +1,7 @@
 package views.html.library
 
 import lila.i18n.{ I18nKeys => trans }
+import lila.app.ui.ScalatagsTemplate._
 import strategygames.variant.Variant
 import strategygames.GameLogic
 import org.joda.time.DateTime
@@ -99,6 +100,12 @@ object bits {
       .map(_._4)
       .getOrElse(0)
       .toString() + "%"
+
+  def statsRow(term: String, value: String) =
+    div(cls := "library-stats-row")(
+      div(cls := "library-stats-term")(term),
+      div(cls := "library-stats-value")(value)
+    )
 
   val i18nKeys =
     List(

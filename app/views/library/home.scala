@@ -15,7 +15,11 @@ import strategygames.GameLogic
 
 object home {
 
-  def apply(monthlyGameData: List[(String, String, Long)], clockRates: (Int, Int))(implicit ctx: Context) =
+  def apply(
+      monthlyGameData: List[(String, String, Long)],
+      clockRates: (Int, Int),
+      botOrHumanGames: (Int, Int)
+  )(implicit ctx: Context) =
     views.html.base.layout(
       title = "Library of Games",
       moreCss = cssTag("library"),
@@ -73,26 +77,16 @@ object home {
         ),
         div(cls := "library-stats-table")(
           h2(cls := "library-stats-title color-choice")("Overall Game Stats"),
-          div(cls := "library-stats-row")(
-            div(cls := "library-stats-term")("Total Game Variants"),
-            div(cls := "library-stats-value")(bits.totalVariants(monthlyGameData))
+          bits.statsRow("Total Game Variants", bits.totalVariants(monthlyGameData).toString),
+          bits.statsRow("Total Games Played", bits.totalGames(monthlyGameData).toString),
+          bits.statsRow(
+            s"Total Games Played (${bits.lastFullMonth})",
+            bits.totalGamesLastFullMonth(monthlyGameData).toString
           ),
-          div(cls := "library-stats-row")(
-            div(cls := "library-stats-term")("Total Games Played"),
-            div(cls := "library-stats-value")(bits.totalGames(monthlyGameData))
-          ),
-          div(cls := "library-stats-row")(
-            div(cls := "library-stats-term")(s"Total Games Played (${bits.lastFullMonth})"),
-            div(cls := "library-stats-value")(bits.totalGamesLastFullMonth(monthlyGameData))
-          ),
-          div(cls := "library-stats-row")(
-            div(cls := "library-stats-term")(s"Live Games Played"),
-            div(cls := "library-stats-value")(clockRates._1.toString() + "%")
-          ),
-          div(cls := "library-stats-row")(
-            div(cls := "library-stats-term")(s"Correspondence Games Played"),
-            div(cls := "library-stats-value")(clockRates._2.toString() + "%")
-          )
+          bits.statsRow("Live Games Played", clockRates._1.toString + "%"),
+          bits.statsRow("Correspondence Games Played", clockRates._2.toString + "%"),
+          bits.statsRow("Human Games Played", botOrHumanGames._2.toString + "%"),
+          bits.statsRow("Bot Games Played", botOrHumanGames._1.toString + "%")
         )
       )
     )
