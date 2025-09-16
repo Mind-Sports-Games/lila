@@ -714,9 +714,9 @@ final class GameRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionCont
     calculateWinRates.map { list =>
       list.map { wr =>
         if (wr.total > 0) {
-          val p1Pct   = (wr.p1 * 100) / wr.total
           val p2Pct   = (wr.p2 * 100) / wr.total
-          val drawPct = 100 - p1Pct - p2Pct
+          val drawPct = (wr.draws * 100) / wr.total
+          val p1Pct   = 100 - p2Pct - drawPct
           WinRatePercentages(wr.libVar, p1Pct, p2Pct, drawPct)
         } else {
           WinRatePercentages(wr.libVar, 0, 0, 0)

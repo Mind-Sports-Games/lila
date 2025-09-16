@@ -80,7 +80,7 @@ object bits {
 
   def winRatePlayer1(variant: Variant, winRates: List[WinRatePercentages]): String =
     winRates
-      .filter(_.libVar == variantKey(variant))
+      .filter(w => getVariantKey(w.libVar) == variantKey(variant))
       .headOption
       .map(_.p1)
       .getOrElse(0)
@@ -88,7 +88,7 @@ object bits {
 
   def winRatePlayer2(variant: Variant, winRates: List[WinRatePercentages]): String =
     winRates
-      .filter(_.libVar == variantKey(variant))
+      .filter(w => getVariantKey(w.libVar) == variantKey(variant))
       .headOption
       .map(_.p2)
       .getOrElse(0)
@@ -96,7 +96,7 @@ object bits {
 
   def winRateDraws(variant: Variant, winRates: List[WinRatePercentages]): String =
     winRates
-      .filter(_.libVar == variantKey(variant))
+      .filter(w => getVariantKey(w.libVar) == variantKey(variant))
       .headOption
       .map(_.draw)
       .getOrElse(0)
