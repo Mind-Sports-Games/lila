@@ -81,6 +81,7 @@ export interface RoundData extends GameData {
   pref: Pref;
   steps: Step[];
   possibleMoves?: EncodedDests;
+  captureLength?: number;
   possibleDrops?: string;
   possibleDropsByRole?: string;
   possibleLifts?: string;
@@ -167,6 +168,7 @@ export interface Step {
   crazy?: StepCrazy;
   currentPointValueP1?: number;
   currentPointValueP2?: number;
+  captLen?: number;
 }
 
 export interface ApiAction extends Step {
