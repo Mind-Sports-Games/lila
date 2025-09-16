@@ -1659,3 +1659,24 @@ case class ByoyomiClockHistory(
     Game.combinePlyTimes(a.toList, b.toList, who, Vector.empty)
   }
 }
+
+case class MonthlyGameData(
+    yearMonth: String,
+    libVar: String,
+    count: Long
+)
+
+case class WinRate(
+    libVar: String,
+    p1: Int,
+    p2: Int,
+    draws: Int,
+    total: Int
+)
+
+case class WinRatePercentages(
+    libVar: String,
+    p1: Int,
+    p2: Int,
+    draw: Int
+)

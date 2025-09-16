@@ -50,9 +50,9 @@ final class LibraryStats(
       }
 
   def finishedGameClockPercentages: Fu[(Int, Int)] =
-    finishedGameClockStats.map { case (total, clock, noClock) =>
+    finishedGameClockStats.map { case (total, clock, _) =>
       val clockPct   = if (total > 0) (clock * 100) / total else 0
-      val noClockPct = if (total > 0) (noClock * 100) / total else 0
+      val noClockPct = if (total > 0) 100 - clockPct else 0
       (clockPct, noClockPct)
     }
 
@@ -90,7 +90,7 @@ final class LibraryStats(
       }
 
       total = botGames.size + humanGames.size
-    } yield if (total > 0) (botGames.size * 100 / total, humanGames.size * 100 / total) else (0, 0)
+    } yield if (total > 0) (botGames.size * 100 / total, 100 - botGames.size * 100 / total) else (0, 0)
 
   private val botOrHumanGameCache = cacheApi.unit[(Int, Int)] {
     _.refreshAfterWrite(1 day)

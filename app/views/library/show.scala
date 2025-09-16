@@ -8,6 +8,7 @@ import lila.app.templating.Environment._
 import lila.app.ui.ScalatagsTemplate._
 import lila.common.String.html.safeJsonValue
 import lila.i18n.{ I18nKeys => trans, VariantKeys }
+import lila.game.{ MonthlyGameData, WinRatePercentages }
 import play.api.i18n.Lang
 
 import strategygames.variant.Variant
@@ -16,8 +17,8 @@ object show {
 
   def apply(
       variant: Variant,
-      monthlyGameData: List[(String, String, Long)],
-      winRates: List[(String, Int, Int, Int)]
+      monthlyGameData: List[MonthlyGameData],
+      winRates: List[WinRatePercentages]
   )(implicit ctx: Context) =
     views.html.base.layout(
       title = s"${VariantKeys.variantName(variant)} • ${VariantKeys.variantTitle(variant)}",
@@ -104,7 +105,7 @@ object show {
           bits.statsRow("Date Released", bits.releaseDateDisplay(monthlyGameData, variant)),
           bits.statsRow("Total Games Played", bits.totalGamesForVariant(monthlyGameData, variant).toString()),
           bits.statsRow(
-            s"Total Games Played (${bits.lastFullMonth})",
+            "Games Played Last Month",
             bits.totalGamesLastFullMonthForVariant(monthlyGameData, variant).toString()
           ),
           bits.statsRow("Average Games/Day", bits.gamesPerDay(monthlyGameData, variant)),

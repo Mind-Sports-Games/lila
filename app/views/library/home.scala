@@ -8,6 +8,7 @@ import lila.app.templating.Environment._
 import lila.app.ui.ScalatagsTemplate._
 import lila.common.String.html.safeJsonValue
 import lila.i18n.{ I18nKeys => trans, VariantKeys }
+import lila.game.{ MonthlyGameData }
 import play.api.i18n.Lang
 
 import strategygames.variant.Variant
@@ -16,7 +17,7 @@ import strategygames.GameLogic
 object home {
 
   def apply(
-      monthlyGameData: List[(String, String, Long)],
+      monthlyGameData: List[MonthlyGameData],
       clockRates: (Int, Int),
       botOrHumanGames: (Int, Int)
   )(implicit ctx: Context) =
@@ -79,10 +80,7 @@ object home {
           h2(cls := "library-stats-title color-choice")("Overall Game Stats"),
           bits.statsRow("Total Game Variants", bits.totalVariants(monthlyGameData).toString),
           bits.statsRow("Total Games Played", bits.totalGames(monthlyGameData).toString),
-          bits.statsRow(
-            s"Total Games Played (${bits.lastFullMonth})",
-            bits.totalGamesLastFullMonth(monthlyGameData).toString
-          ),
+          bits.statsRow("Games Played Last Month", bits.totalGamesLastFullMonth(monthlyGameData).toString),
           bits.statsRow("Live Games Played", clockRates._1.toString + "%"),
           bits.statsRow("Correspondence Games Played", clockRates._2.toString + "%"),
           bits.statsRow("Human Games Played", botOrHumanGames._2.toString + "%"),

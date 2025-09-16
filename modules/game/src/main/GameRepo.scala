@@ -15,6 +15,7 @@ import lila.db.BSON.BSONJodaDateTimeHandler
 import lila.db.dsl._
 import lila.db.isDuplicateKey
 import lila.user.User
+import lila.game.{ MonthlyGameData, WinRate, WinRatePercentages }
 
 final class GameRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionContext) {
 
@@ -573,7 +574,7 @@ final class GameRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionCont
       coll.updateFieldUnchecked($id(game.id), F.perfType, pt.id)
     }
 
-  def countByMonthly: Fu[List[(String, String, Long)]] =
+  def countByMonthly: Fu[List[MonthlyGameData]] =
     coll
       .aggregateList(
         maxDocs = Int.MaxValue,
@@ -625,14 +626,14 @@ final class GameRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionCont
       .map { docs =>
         docs.flatMap { doc =>
           for {
-            ym      <- doc.getAsOpt[String]("ym")
-            lib_var <- doc.getAsOpt[String]("lib_var")
-            count   <- doc.getAsOpt[Long]("count")
-          } yield (ym, lib_var, count)
+            yearMonth <- doc.getAsOpt[String]("ym")
+            libVar    <- doc.getAsOpt[String]("lib_var")
+            count     <- doc.getAsOpt[Long]("count")
+          } yield MonthlyGameData(yearMonth, libVar, count)
         }
       }
 
-  def calculateWinRates: Fu[List[(String, Int, Int, Int, Int)]] =
+  def calculateWinRates: Fu[List[WinRate]] =
     coll
       .aggregateList(
         maxDocs = Int.MaxValue,
@@ -705,20 +706,21 @@ final class GameRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionCont
             p2      <- doc.getAsOpt[Int]("p2")
             d       <- doc.getAsOpt[Int]("d")
             total   <- doc.getAsOpt[Int]("total")
-          } yield (lib_var, p1, p2, d, total)
+          } yield WinRate(lib_var, p1, p2, d, total)
         }
       }
 
-  def calculateWinRatePercentages: Fu[List[(String, Int, Int, Int)]] =
+  def calculateWinRatePercentages: Fu[List[WinRatePercentages]] =
     calculateWinRates.map { list =>
-      list.map {
-        case (lib_var, p1, p2, d, total) if total > 0 =>
-          val p1Pct = (p1 * 100) / total
-          val p2Pct = (p2 * 100) / total
-          val dPct  = (d * 100) / total
-          (lib_var, p1Pct, p2Pct, dPct)
-        case (lib_var, _, _, _, _) =>
-          (lib_var, 0, 0, 0)
+      list.map { wr =>
+        if (wr.total > 0) {
+          val p1Pct   = (wr.p1 * 100) / wr.total
+          val p2Pct   = (wr.p2 * 100) / wr.total
+          val drawPct = 100 - p1Pct - p2Pct
+          WinRatePercentages(wr.libVar, p1Pct, p2Pct, drawPct)
+        } else {
+          WinRatePercentages(wr.libVar, 0, 0, 0)
+        }
       }
     }
 
