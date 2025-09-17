@@ -61,13 +61,12 @@ object bits {
       .map(_.count.toInt)
       .sum
 
-  private val dateFormat        = DateTimeFormat.forPattern("yyyy-MM")
-  private val releaseDateFormat = DateTimeFormat.forPattern("yyyy-MM-dd")
-  val lastFullMonth: String     = DateTime.now.minusMonths(1).withDayOfMonth(1).toString(dateFormat)
+  private val dateFormat    = DateTimeFormat.forPattern("yyyy-MM")
+  val lastFullMonth: String = DateTime.now.minusMonths(1).withDayOfMonth(1).toString(dateFormat)
 
   def releaseDateDisplay(data: List[MonthlyGameData], variant: Variant) =
     firstGamePlayedForVariant(data, variant)
-      .map(_.toString(releaseDateFormat))
+      .map(_.toString(dateFormat))
       .getOrElse("N/A")
 
   def studyLink(variant: Variant): Option[String] = {

@@ -18,8 +18,8 @@ object home {
 
   def apply(
       monthlyGameData: List[MonthlyGameData],
-      clockRates: (Int, Int),
-      botOrHumanGames: (Int, Int)
+      clockRates: (Int, Int)
+      // botOrHumanGames: (Int, Int)
   )(implicit ctx: Context) =
     views.html.base.layout(
       title = "Library of Games",
@@ -82,9 +82,9 @@ object home {
           bits.statsRow("Total Games Played", bits.totalGames(monthlyGameData).toString),
           bits.statsRow("Games Played Last Month", bits.totalGamesLastFullMonth(monthlyGameData).toString),
           bits.statsRow("Live Games Played", clockRates._1.toString + "%"),
-          bits.statsRow("Correspondence Games Played", clockRates._2.toString + "%"),
-          bits.statsRow("Human Games Played", botOrHumanGames._2.toString + "%"),
-          bits.statsRow("Bot Games Played", botOrHumanGames._1.toString + "%")
+          bits.statsRow("Correspondence Games Played", clockRates._2.toString + "%")
+          // bits.statsRow("Human Games Played", botOrHumanGames._2.toString + "%"),
+          // bits.statsRow("Bot Games Played", botOrHumanGames._1.toString + "%")
         )
       )
     )
