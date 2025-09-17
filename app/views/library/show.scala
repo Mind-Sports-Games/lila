@@ -8,6 +8,7 @@ import lila.app.templating.Environment._
 import lila.app.ui.ScalatagsTemplate._
 import lila.common.String.html.safeJsonValue
 import lila.i18n.{ I18nKeys => trans, VariantKeys }
+import lila.game.{ MonthlyGameData, WinRatePercentages }
 import play.api.i18n.Lang
 
 import strategygames.variant.Variant
@@ -16,7 +17,8 @@ object show {
 
   def apply(
       variant: Variant,
-      data: List[(String, String, Long)]
+      monthlyGameData: List[MonthlyGameData],
+      winRates: List[WinRatePercentages]
   )(implicit ctx: Context) =
     views.html.base.layout(
       title = s"${VariantKeys.variantName(variant)} • ${VariantKeys.variantTitle(variant)}",
@@ -26,7 +28,9 @@ object show {
         jsTag("chart/library.js"),
         embedJsUnsafeLoadThen(s"""playstrategy.libraryChart(${safeJsonValue(
           Json.obj(
-            "freq" -> bits.transformData(data).filter(_._2 == s"${variant.gameFamily.id}_${variant.id}"),
+            "freq" -> bits
+              .transformData(monthlyGameData)
+              .filter(_._2 == s"${variant.gameFamily.id}_${variant.id}"),
             "i18n" -> i18nJsObject(bits.i18nKeys),
             "variantNames" -> Json.obj(
               Variant.all.map(v =>
@@ -95,7 +99,21 @@ object show {
         ),
         div(id := "library_chart_area")(
           div(id := "library_chart")(spinner)
+        ),
+        div(cls := "library-stats-table")(
+          h2(cls := "library-stats-title color-choice")("Game Info"),
+          bits.statsRow("Date Released", bits.releaseDateDisplay(monthlyGameData, variant)),
+          bits.statsRow("Total Games Played", bits.totalGamesForVariant(monthlyGameData, variant).toString()),
+          bits.statsRow(
+            "Games Played Last Month",
+            bits.totalGamesLastFullMonthForVariant(monthlyGameData, variant).toString()
+          ),
+          bits.statsRow("Average Games/Day", bits.gamesPerDay(monthlyGameData, variant)),
+          bits.statsRow("Player 1 wins", bits.winRatePlayer1(variant, winRates)),
+          bits.statsRow("Player 2 wins", bits.winRatePlayer2(variant, winRates)),
+          bits.statsRow("Draws", bits.winRateDraws(variant, winRates))
         )
       )
     )
+
 }

@@ -8,6 +8,7 @@ import lila.app.templating.Environment._
 import lila.app.ui.ScalatagsTemplate._
 import lila.common.String.html.safeJsonValue
 import lila.i18n.{ I18nKeys => trans, VariantKeys }
+import lila.game.{ MonthlyGameData }
 import play.api.i18n.Lang
 
 import strategygames.variant.Variant
@@ -15,7 +16,11 @@ import strategygames.GameLogic
 
 object home {
 
-  def apply(data: List[(String, String, Long)])(implicit ctx: Context) =
+  def apply(
+      monthlyGameData: List[MonthlyGameData],
+      clockRates: (Int, Int),
+      botOrHumanGames: (Int, Int)
+  )(implicit ctx: Context) =
     views.html.base.layout(
       title = "Library of Games",
       moreCss = cssTag("library"),
@@ -24,7 +29,7 @@ object home {
         jsTag("chart/library.js"),
         embedJsUnsafeLoadThen(s"""window.libraryChartData = ${safeJsonValue(
           Json.obj(
-            "freq" -> bits.transformData(data),
+            "freq" -> bits.transformData(monthlyGameData),
             "i18n" -> i18nJsObject(bits.i18nKeys),
             "variantNames" -> Json.obj(
               Variant.all.map(v =>
@@ -70,6 +75,16 @@ object home {
         ),
         div(id := "library_chart_area")(
           div(id := "library_chart")(spinner)
+        ),
+        div(cls := "library-stats-table")(
+          h2(cls := "library-stats-title color-choice")("Overall Game Stats"),
+          bits.statsRow("Total Game Variants", bits.totalVariants(monthlyGameData).toString),
+          bits.statsRow("Total Games Played", bits.totalGames(monthlyGameData).toString),
+          bits.statsRow("Games Played Last Month", bits.totalGamesLastFullMonth(monthlyGameData).toString),
+          bits.statsRow("Live Games Played", clockRates._1.toString + "%"),
+          bits.statsRow("Correspondence Games Played", clockRates._2.toString + "%"),
+          bits.statsRow("Human Games Played", botOrHumanGames._2.toString + "%"),
+          bits.statsRow("Bot Games Played", botOrHumanGames._1.toString + "%")
         )
       )
     )

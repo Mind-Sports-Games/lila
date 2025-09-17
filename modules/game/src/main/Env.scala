@@ -8,6 +8,7 @@ import play.api.libs.ws.StandaloneWSClient
 import scala.concurrent.duration._
 
 import lila.common.config._
+import lila.mon.user
 
 final private class GameConfig(
     @ConfigName("collection.game") val gameColl: CollName,
@@ -62,6 +63,8 @@ final class Env(
   lazy val gamesByUsersStream = wire[GamesByUsersStream]
 
   lazy val favoriteOpponents = wire[FavoriteOpponents]
+
+  lazy val libraryStats = new LibraryStats(db(config.gameColl), userRepo, cacheApi)
 
   lazy val rematches = Rematches(
     lila.memo.CacheApi.scaffeineNoScheduler

@@ -15,6 +15,7 @@ import lila.db.BSON.BSONJodaDateTimeHandler
 import lila.db.dsl._
 import lila.db.isDuplicateKey
 import lila.user.User
+import lila.game.{ MonthlyGameData, WinRate, WinRatePercentages }
 
 final class GameRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionContext) {
 
@@ -573,7 +574,7 @@ final class GameRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionCont
       coll.updateFieldUnchecked($id(game.id), F.perfType, pt.id)
     }
 
-  def countByMonthly: Fu[List[(String, String, Long)]] =
+  def countByMonthly: Fu[List[MonthlyGameData]] =
     coll
       .aggregateList(
         maxDocs = Int.MaxValue,
@@ -625,11 +626,102 @@ final class GameRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionCont
       .map { docs =>
         docs.flatMap { doc =>
           for {
-            ym      <- doc.getAsOpt[String]("ym")
-            lib_var <- doc.getAsOpt[String]("lib_var")
-            count   <- doc.getAsOpt[Long]("count")
-          } yield (ym, lib_var, count)
+            yearMonth <- doc.getAsOpt[String]("ym")
+            libVar    <- doc.getAsOpt[String]("lib_var")
+            count     <- doc.getAsOpt[Long]("count")
+          } yield MonthlyGameData(yearMonth, libVar, count)
         }
       }
+
+  def calculateWinRates: Fu[List[WinRate]] =
+    coll
+      .aggregateList(
+        maxDocs = Int.MaxValue,
+        ReadPreference.secondaryPreferred
+      ) { framework =>
+        import framework._
+        Match(
+          $doc(
+            F.status -> $gte(30),
+            F.lib    -> $exists(true)
+          )
+        ) -> List(
+          Project(
+            $doc(
+              "lib_var" -> $doc(
+                "$concat" -> $arr(
+                  $doc("$toString" -> $doc("$ifNull" -> $arr(s"$$${F.lib}", "0"))),
+                  "_",
+                  $doc("$toString" -> $doc("$ifNull" -> $arr(s"$$${F.variant}", "1")))
+                )
+              ),
+              "p1" -> $doc(
+                "$cond" -> $arr(
+                  $doc("$eq" -> $arr(s"$$${F.winnerPlayerIndex}", true)),
+                  1,
+                  0
+                )
+              ),
+              "p2" -> $doc(
+                "$cond" -> $arr(
+                  $doc("$eq" -> $arr(s"$$${F.winnerPlayerIndex}", false)),
+                  1,
+                  0
+                )
+              ),
+              "d" -> $doc(
+                "$cond" -> $arr(
+                  $doc("$eq" -> $arr($doc("$type" -> s"$$${F.winnerPlayerIndex}"), "missing")),
+                  1,
+                  0
+                )
+              )
+            )
+          ),
+          Group(
+            $doc("lib_var" -> "$lib_var")
+          )(
+            "p1"    -> SumField("p1"),
+            "p2"    -> SumField("p2"),
+            "d"     -> SumField("d"),
+            "total" -> SumAll
+          ),
+          Project(
+            $doc(
+              F.id    -> "$_id.lib_var",
+              "p1"    -> true,
+              "p2"    -> true,
+              "d"     -> true,
+              "total" -> true
+            )
+          ),
+          Sort(Ascending(F.id))
+        )
+      }
+      .map { docs =>
+        docs.flatMap { doc =>
+          for {
+            lib_var <- doc.getAsOpt[String](F.id)
+            p1      <- doc.getAsOpt[Int]("p1")
+            p2      <- doc.getAsOpt[Int]("p2")
+            d       <- doc.getAsOpt[Int]("d")
+            total   <- doc.getAsOpt[Int]("total")
+          } yield WinRate(lib_var, p1, p2, d, total)
+        }
+      }
+
+  def calculateWinRatePercentages: Fu[List[WinRatePercentages]] =
+    calculateWinRates.map { list =>
+      list.map { wr =>
+        if (wr.total > 0) {
+          val p2Pct   = (wr.p2 * 100) / wr.total
+          val drawPct = (wr.draws * 100) / wr.total
+          val p1Pct   = 100 - p2Pct - drawPct
+          WinRatePercentages(wr.libVar, p1Pct, p2Pct, drawPct)
+        } else {
+          WinRatePercentages(wr.libVar, 0, 0, 0)
+        }
+      }
+    }
 
 }
