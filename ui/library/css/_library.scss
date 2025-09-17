@@ -46,6 +46,7 @@
     display: flex;
     flex-flow: column nowrap;
     width: 100%;
+    margin-bottom: 2em;
     .library-links {
       flex: 1 1 auto;
       display: flex;
@@ -83,7 +84,7 @@
   }
 
   .start {
-    padding-top: 2em;
+    margin-bottom: 2em;
   }
 
   .section-title {
@@ -224,6 +225,60 @@
       flex: 2;
       text-align: right;
       font-weight: bold;
+    }
+  }
+
+  .leaderboards {
+    @each $c in ('black', 'green', 'red', 'blue', 'yellow') {
+      .selected-color-#{$c} & .color-choice {
+        background: map-get($c-color-choice-map, $c);
+        color: $c-color-choice-font-default;
+        text-shadow: 0 1px 0 map-get($c-color-choice-map, $c);
+      }
+    }
+
+    width: 100%;
+    max-width: 400px;
+
+    ::before {
+      font-size: unset;
+    }
+
+    .title {
+      flex: 0 0 auto;
+      display: flex;
+      flex-flow: row nowrap;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.5em;
+
+      h2 {
+        font-size: 1.3em;
+        font-weight: bold;
+      }
+
+      a {
+        color: $c-color-choice-font-default;
+        &:hover {
+          font-weight: bold;
+        }
+      }
+    }
+
+    li {
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      white-space: nowrap;
+      padding: 0.7rem 1.2rem 0.7rem 0.5rem;
+    }
+
+    li:nth-child(even) {
+      background: $c-bg-zebra;
+    }
+
+    .user-link {
+      @extend %ellipsis;
     }
   }
 }
