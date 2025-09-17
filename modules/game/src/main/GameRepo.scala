@@ -583,8 +583,7 @@ final class GameRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionCont
         import framework._
         Match(
           $doc(
-            F.status -> $gte(30),
-            F.lib    -> $exists(true)
+            F.status -> $gte(30)
           )
         ) -> List(
           Project(
@@ -642,8 +641,7 @@ final class GameRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionCont
         import framework._
         Match(
           $doc(
-            F.status -> $gte(30),
-            F.lib    -> $exists(true)
+            F.status -> $gte(30)
           )
         ) -> List(
           Project(

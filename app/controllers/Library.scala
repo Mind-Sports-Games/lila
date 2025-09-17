@@ -12,8 +12,8 @@ final class Library(env: Env) extends LilaController(env) {
         for {
           monthlyGameData <- env.game.cached.monthlyGames
           clockRates      <- env.game.libraryStats.gameClockRates
-          botOrHumanGames <- env.game.libraryStats.botOrHumanGames
-        } yield Ok(views.html.library.home(monthlyGameData, clockRates, botOrHumanGames))
+          // botOrHumanGames <- env.game.libraryStats.botOrHumanGames
+        } yield Ok(views.html.library.home(monthlyGameData, clockRates))
       }
     }
 
