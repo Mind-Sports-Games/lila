@@ -2,6 +2,8 @@ package lila.round
 
 import actorApi.SocketStatus
 import strategygames.format.{ FEN, Forsyth }
+import strategygames.dameo.format.{ Uci => DameoUci }
+import strategygames.dameo.{ Pos => DameoPos }
 import strategygames.{
   ClockBase,
   Player => PlayerIndex,
@@ -436,6 +438,9 @@ final class JsonView(
       case (Situation.Abalone(_), Variant.Abalone(_)) =>
         (pov.game playableBy pov.player) option
           Event.PossibleMoves.json(pov.game.situation.destinations, apiVersion)
+      case (Situation.Dameo(_), Variant.Dameo(_)) =>
+        (pov.game playableBy pov.player) option
+          Event.PossibleMoves.json(pov.game.situation.destinations, apiVersion)
       case _ => sys.error("Mismatch of types for possibleMoves")
     }
 
@@ -454,6 +459,7 @@ final class JsonView(
         (pov.game playableBy pov.player) option
           Event.PossibleDropsByRole.json(pov.game.situation.dropsByRole.getOrElse(Map.empty))
       case (Situation.Abalone(_), Variant.Abalone(_))   => None
+      case (Situation.Dameo(_), Variant.Dameo(_))       => None
       case (Situation.Draughts(_), Variant.Draughts(_)) => None
       case _                                            => sys.error("Mismatch of types for possibleDropsByrole")
     }
@@ -522,6 +528,21 @@ final class JsonView(
           destPos match {
             case Some(dest) => ~situation.captureLengthFrom(dest)
             case _          => situation.allMovesCaptureLength
+          }
+        } else
+          situation.allMovesCaptureLength
+      case (Situation.Dameo(situation), Variant.Dameo(_)) =>
+        if (situation.ghosts > 0) {
+          val move = pov.game.actionStrs(pov.game.actionStrs.length - 1)(0)
+          move match {
+            case DameoUci.Move.moveR(_, dest, _) =>
+              val posStr = DameoPos.fromKey(dest)
+              posStr match {
+                case Some(pos) => ~situation.captureLengthFrom(pos)
+                case _         => situation.allMovesCaptureLength
+              }
+            case _ =>
+              situation.allMovesCaptureLength
           }
         } else
           situation.allMovesCaptureLength

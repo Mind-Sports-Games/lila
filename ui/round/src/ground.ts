@@ -36,6 +36,7 @@ export function makeConfig(ctrl: RoundController): Config {
     myPlayerIndex: data.player.playerIndex,
     turnPlayerIndex: turnPlayerIndex,
     lastMove: stratUtils.lastMove(data.onlyDropsVariant, step.uci),
+    captureLength: data.captureLength,
     check: !!step.check,
     coordinates: data.pref.coords !== Prefs.Coords.Hidden,
     boardScores: ['togyzkumalak', 'bestemshe', 'backgammon', 'hyper', 'nackgammon'].includes(data.game.variant.key),

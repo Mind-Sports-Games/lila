@@ -28,6 +28,7 @@ export const perf = {
     fromPositionDraughts: 'K',
     frisian: '',
     frysk: '',
+    dameo: '',
     shogi: '',
     xiangqi: '',
     minishogi: '',

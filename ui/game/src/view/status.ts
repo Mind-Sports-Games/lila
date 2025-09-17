@@ -75,6 +75,8 @@ export default function status(ctrl: Ctrl): string {
           return noarg('checkersConnected');
         case 'scrambledEggs':
           return noarg('checkersConnected');
+        case 'dameo':
+          return noarg('gameFinished');
         case 'breakthrough':
           return noarg('promotion');
         case 'flipello10':

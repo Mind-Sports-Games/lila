@@ -79,6 +79,7 @@ object TournamentMedleyUtil {
       "pool"                   -> medium,
       "portuguese"             -> medium,
       "english"                -> slow,
+      "dameo"                  -> medium,
       "shogi"                  -> slow,
       "xiangqi"                -> medium,
       "minishogi"              -> fastest,

@@ -305,6 +305,7 @@ declare type VariantKey =
   | 'monster'
   | 'linesOfAction'
   | 'scrambledEggs'
+  | 'dameo'
   | 'shogi'
   | 'xiangqi'
   | 'minishogi'
@@ -370,6 +371,7 @@ declare type Perf =
   | 'fromPositionDraughts'
   | 'frisian'
   | 'frysk'
+  | 'dameo'
   | 'shogi'
   | 'xiangqi'
   | 'minishogi'
@@ -410,7 +412,8 @@ declare type GameFamilyKey =
   | 'togyzkumalak'
   | 'go'
   | 'backgammon'
-  | 'abalone';
+  | 'abalone'
+  | 'dameo';
 
 declare type Files =
   | 'a'

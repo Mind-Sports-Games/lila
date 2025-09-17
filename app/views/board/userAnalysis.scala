@@ -26,6 +26,7 @@ object userAnalysis {
   def analysisVariants =
     (
       Variant.all(GameLogic.Chess()) ++
+        Variant.all(GameLogic.Dameo()) ++
         Variant.all(GameLogic.FairySF()) ++
         Variant.all(GameLogic.Samurai()) ++
         Variant.all(GameLogic.Togyzkumalak()) ++

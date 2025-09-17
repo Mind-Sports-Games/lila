@@ -2,6 +2,7 @@
 export const gameFamily: GameFamilyKey[] = [
   'chess',
   'draughts',
+  'dameo',
   'loa',
   'shogi',
   'xiangqi',

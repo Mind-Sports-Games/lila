@@ -51,6 +51,7 @@ final class DiscordApi(
     case _              => ":trophy:"
   }
 
+  //TODO Dameo Add Discord channel
   def gameGroupLink(gameFamilyKey: String, variant: String): String = (gameFamilyKey, variant) match {
     case ("chess", "Chess")        => "<@&1344675363279867904>"
     case ("chess", _)              => "<@&1344695574112239708>"
