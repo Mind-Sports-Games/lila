@@ -60,7 +60,7 @@ object home {
             (button(cls := "gamegroup", value := id, dataIcon := icon)(hint))
           })
         ),
-        div(cls := "variants-choice")(
+        div(cls := "variants-choice hidden")(
           div(cls := "section-title")(trans.variant()),
           div(cls := "variants-icons")(translatedVariantIconChoices.filter { case (id, _, _) =>
             id != "0_3" //from position

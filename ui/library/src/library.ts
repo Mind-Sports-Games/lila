@@ -2,16 +2,20 @@ playstrategy.load.then(() => {
   $('#library-section').each(function (this: HTMLElement) {
     const $gamegroups = $('button.gamegroup');
     const $variants = $('button.variant');
+    const $variantSection = $('.variants-choice');
+
+    const data = window.libraryChartData;
+    const allVariants: string[] = $variants.get().map(el => (el as HTMLButtonElement).value);
 
     function updateLibraryChart(allowedVariants: string[]) {
-      if (window.playstrategy && window.playstrategy.libraryChart && window.libraryChartData) {
-        playstrategy.libraryChart(window.libraryChartData, allowedVariants);
+      if (window.playstrategy && window.playstrategy.libraryChart && data) {
+        playstrategy.libraryChart(data, allowedVariants);
       }
     }
 
-    function updateStatsTable(allowedVariants: string[]) {
-      if (window.playstrategy && window.playstrategy.libraryChart && window.libraryChartData) {
-        const monthlyData = window.libraryChartData.freq;
+    function updateStatsTable(allowedVariants: string[], isGameGroup: boolean) {
+      if (data && data.freq) {
+        const monthlyData = data.freq;
         const $statsTable = $('.library-stats-table');
         const $title = $statsTable.find('.library-stats-title');
         const $totalVariants = $statsTable.find('.total-variants .library-stats-value');
@@ -20,24 +24,17 @@ playstrategy.load.then(() => {
         const $liveGames = $statsTable.find('.live-games');
         const $correspondenceGames = $statsTable.find('.correspondence-games');
 
-        const gameTypes = Array.from(
-          new Set(
-            monthlyData.map(function (row) {
-              return row[1];
-            }),
-          ),
-        );
         //js months are zero-based!
         const lastFullMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString().slice(0, 7);
 
-        if (gameTypes.length === allowedVariants.length) {
-          $title.text('Overall Game Stats');
-          $liveGames.show();
-          $correspondenceGames.show();
-        } else {
+        if (isGameGroup) {
           $title.text('Game Group Stats');
           $liveGames.hide();
           $correspondenceGames.hide();
+        } else {
+          $title.text('Overall Game Stats');
+          $liveGames.show();
+          $correspondenceGames.show();
         }
         const filteredMonthlyData = monthlyData.filter(function (row) {
           return allowedVariants.includes(row[1]);
@@ -53,8 +50,16 @@ playstrategy.load.then(() => {
     }
 
     $gamegroups.on('click', function (this: HTMLElement) {
+      if ($(this).hasClass('selected')) {
+        $gamegroups.removeClass('button button-color-choice selected');
+        $variantSection.addClass('hidden');
+        updateLibraryChart(allVariants);
+        updateStatsTable(allVariants, false);
+        return;
+      }
       $gamegroups.removeClass('button button-color-choice selected');
       $(this).addClass('button button-color-choice selected');
+      $variantSection.removeClass('hidden');
 
       const gameFamily = $(this).val() as string;
 
@@ -74,8 +79,7 @@ playstrategy.load.then(() => {
 
       const allowedVariants = toShow.map(el => $(el).val() as string);
       updateLibraryChart(allowedVariants);
-
-      updateStatsTable(allowedVariants);
+      updateStatsTable(allowedVariants, true);
     });
 
     $variants.on('click', function (this: HTMLElement, e) {
@@ -99,10 +103,5 @@ playstrategy.load.then(() => {
         $(this).removeClass('button button-color-choice');
       }
     });
-
-    // Initialise the page by clicking the first game group button
-    if ($gamegroups.length > 0) {
-      $gamegroups.first().trigger('click');
-    }
   });
 });
