@@ -20,7 +20,8 @@ playstrategy.load.then(() => {
       $variants.each(function (this: HTMLElement) {
         const gfOfVariant = ($(this).val() as string).split('_')[0];
         //add oware to mancala group or add dameo to draughts group
-        const gameGroupCases = (gfOfVariant === '6' && gameFamily === '7') || (gfOfVariant === '13' && gameFamily === '1');
+        const gameGroupCases =
+          (gfOfVariant === '6' && gameFamily === '7') || (gfOfVariant === '13' && gameFamily === '1');
         if (gfOfVariant === gameFamily || gameGroupCases) {
           toShow.push($(this)[0]);
         } else {

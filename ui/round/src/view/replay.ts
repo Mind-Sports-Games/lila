@@ -96,10 +96,10 @@ function renderMultiActionMove(
 function combinedNotationOfTurn(actionNotations: string[], notation: NotationStyle): string {
   switch (notation) {
     case NotationStyle.bkg:
-      return BackgammonFamily.combinedNotation(actionNotations)
+      return BackgammonFamily.combinedNotation(actionNotations);
       break;
     case NotationStyle.dmo:
-      return DameoFamily.combinedNotation(actionNotations)
+      return DameoFamily.combinedNotation(actionNotations);
       break;
     default:
       return actionNotations.join(' ');
