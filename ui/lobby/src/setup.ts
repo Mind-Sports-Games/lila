@@ -152,6 +152,7 @@ export default class Setup {
       case '1_6': //antidraughts
       case '1_9': //breakthrough
       case '1_10': //frisian
+      case '13_1': //dameo
         return Object.assign({}, defaultClockConfig, {
           bullet: { timemode: '1', initial: '2', increment: '1' },
           blitz: { timemode: '1', initial: '5', increment: '3' },
@@ -1391,8 +1392,9 @@ export default class Setup {
         const toHide: HTMLElement[] = [];
         $variantInput.each(function (this: HTMLElement) {
           const gfOfVariant = ($(this).val() as string).split('_')[0];
-          const additionMatches = gfOfVariant === '6' && gameFamily === '7'; //add oware to mancala group
-          if (gfOfVariant === gameFamily || additionMatches) {
+          //add oware to mancala group or add dameo to draughts group
+          const gameGroupCases = (gfOfVariant === '6' && gameFamily === '7') || (gfOfVariant === '13' && gameFamily === '1');
+          if (gfOfVariant === gameFamily || gameGroupCases) {
             toShow.push($(this).parent()[0]);
             numInGroup++;
           } else {
