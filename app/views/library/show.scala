@@ -124,8 +124,8 @@ object show {
   private def userTopPerf(users: List[User.LightPerf], perfType: PerfType)(implicit lang: Lang) =
     div(cls := "leaderboards")(
       div(cls := "color-choice title")(
-        h2("Leaderboard"),
-        a(href := routes.User.topNb(200, perfType.key))("More »")
+        h2("Leaderboard")
+        //a(href := routes.User.topNb(200, perfType.key))("More »")
       ),
       ol(users map { l =>
         li(
