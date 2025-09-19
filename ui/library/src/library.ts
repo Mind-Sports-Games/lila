@@ -7,13 +7,49 @@ playstrategy.load.then(() => {
     const data = window.libraryChartData;
     const allVariants: string[] = $variants.get().map(el => (el as HTMLButtonElement).value);
 
-    function updateLibraryChart(allowedVariants: string[]) {
+    function updateLibraryChart(allowedVariants: string[], isOverallStats: boolean) {
       if (window.playstrategy && window.playstrategy.libraryChart && data) {
-        playstrategy.libraryChart(data, allowedVariants);
+        if (isOverallStats) {
+          //aggregate data by game group
+          const dataByGameGroup = data.freq.map(row => [row[0], gameFamilyToGameGroup(row[1].split('_')[0]), row[2]]);
+          const aggregatedDataByGameGroup: Array<[string, string, number]> = [];
+          const groupMap = new Map<string, number>();
+          dataByGameGroup.forEach(([month, gameGroup, count]) => {
+            const key = `${month}|${gameGroup}`;
+            groupMap.set(key, (groupMap.get(key) || 0) + count);
+          });
+          groupMap.forEach((sum, key) => {
+            const [month, gameGroup] = key.split('|');
+            aggregatedDataByGameGroup.push([month, gameGroup, sum]);
+          });
+          const newData = {
+            ...data,
+            freq: aggregatedDataByGameGroup,
+          };
+          playstrategy.libraryChart(newData);
+        } else {
+          playstrategy.libraryChart(data, allowedVariants);
+        }
       }
     }
 
-    function updateStatsTable(allowedVariants: string[], isGameGroup: boolean) {
+    function gameFamilyToGameGroup(gf: string) {
+      switch (gf) {
+        case '3':
+          return '4'; //shogi
+        case '4':
+          return '5'; //xiangqi
+        case '5':
+          return '6'; //flipello
+        case '6':
+        case '7':
+          return '7'; //mancala
+        default:
+          return gf;
+      }
+    }
+
+    function updateStatsTable(allowedVariants: string[], isOverallStats: boolean) {
       if (data && data.freq) {
         const monthlyData = data.freq;
         const $statsTable = $('.library-stats-table');
@@ -27,14 +63,14 @@ playstrategy.load.then(() => {
         //js months are zero-based!
         const lastFullMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString().slice(0, 7);
 
-        if (isGameGroup) {
-          $title.text('Game Group Stats');
-          $liveGames.hide();
-          $correspondenceGames.hide();
-        } else {
+        if (isOverallStats) {
           $title.text('Overall Game Stats');
           $liveGames.show();
           $correspondenceGames.show();
+        } else {
+          $title.text('Game Group Stats');
+          $liveGames.hide();
+          $correspondenceGames.hide();
         }
         const filteredMonthlyData = monthlyData.filter(function (row) {
           return allowedVariants.includes(row[1]);
@@ -53,8 +89,8 @@ playstrategy.load.then(() => {
       if ($(this).hasClass('selected')) {
         $gamegroups.removeClass('button button-color-choice selected');
         $variantSection.addClass('hidden');
-        updateLibraryChart(allVariants);
-        updateStatsTable(allVariants, false);
+        updateLibraryChart(allVariants, true);
+        updateStatsTable(allVariants, true);
         return;
       }
       $gamegroups.removeClass('button button-color-choice selected');
@@ -78,8 +114,8 @@ playstrategy.load.then(() => {
       $(toHide).hide();
 
       const allowedVariants = toShow.map(el => $(el).val() as string);
-      updateLibraryChart(allowedVariants);
-      updateStatsTable(allowedVariants, true);
+      updateLibraryChart(allowedVariants, false);
+      updateStatsTable(allowedVariants, false);
     });
 
     $variants.on('click', function (this: HTMLElement, e) {
@@ -103,5 +139,8 @@ playstrategy.load.then(() => {
         $(this).removeClass('button button-color-choice');
       }
     });
+
+    //initial load
+    updateLibraryChart(allVariants, true);
   });
 });

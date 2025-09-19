@@ -12,7 +12,7 @@ import lila.game.{ MonthlyGameData }
 import play.api.i18n.Lang
 
 import strategygames.variant.Variant
-import strategygames.GameLogic
+import strategygames.GameGroup
 
 object home {
 
@@ -35,6 +35,10 @@ object home {
               Variant.all.map(v =>
                 s"${v.gameFamily.id}_${v.id}" -> Json.toJsFieldJsValueWrapper(VariantKeys.variantName(v))
               ): _*
+            ),
+            "gameGroupNames" -> Json.obj(
+              GameGroup.all
+                .map(gg => s"${gg.id}" -> Json.toJsFieldJsValueWrapper(VariantKeys.gameGroupName(gg))): _*
             )
           )
         )};"""),
