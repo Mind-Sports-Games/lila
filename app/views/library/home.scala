@@ -12,7 +12,7 @@ import lila.game.{ MonthlyGameData }
 import play.api.i18n.Lang
 
 import strategygames.variant.Variant
-import strategygames.GameLogic
+import strategygames.GameGroup
 
 object home {
 
@@ -35,6 +35,10 @@ object home {
               Variant.all.map(v =>
                 s"${v.gameFamily.id}_${v.id}" -> Json.toJsFieldJsValueWrapper(VariantKeys.variantName(v))
               ): _*
+            ),
+            "gameGroupNames" -> Json.obj(
+              GameGroup.all
+                .map(gg => s"${gg.id}" -> Json.toJsFieldJsValueWrapper(VariantKeys.gameGroupName(gg))): _*
             )
           )
         )};"""),
@@ -60,7 +64,7 @@ object home {
             (button(cls := "gamegroup", value := id, dataIcon := icon)(hint))
           })
         ),
-        div(cls := "variants-choice")(
+        div(cls := "variants-choice hidden")(
           div(cls := "section-title")(trans.variant()),
           div(cls := "variants-icons")(translatedVariantIconChoices.filter { case (id, _, _) =>
             id != "0_3" //from position
@@ -78,11 +82,16 @@ object home {
         ),
         div(cls := "library-stats-table")(
           h2(cls := "library-stats-title color-choice")("Overall Game Stats"),
-          bits.statsRow("Total Game Variants", bits.totalVariants(monthlyGameData).toString),
-          bits.statsRow("Total Games Played", bits.totalGames(monthlyGameData).toString),
-          bits.statsRow("Games Played Last Month", bits.totalGamesLastFullMonth(monthlyGameData).toString),
-          bits.statsRow("Live Games Played", clockRates._1.toString + "%"),
-          bits.statsRow("Correspondence Games Played", clockRates._2.toString + "%")
+          bits
+            .statsRow("Total Game Variants", bits.totalVariants(monthlyGameData).toString, "total-variants"),
+          bits.statsRow("Total Games Played", bits.totalGames(monthlyGameData).toString, "total-games"),
+          bits.statsRow(
+            "Games Played Last Month",
+            bits.totalGamesLastFullMonth(monthlyGameData).toString,
+            "games-last-month"
+          ),
+          bits.statsRow("Live Games Played", clockRates._1.toString + "%", "live-games"),
+          bits.statsRow("Correspondence Games Played", clockRates._2.toString + "%", "correspondence-games")
           // bits.statsRow("Human Games Played", botOrHumanGames._2.toString + "%"),
           // bits.statsRow("Bot Games Played", botOrHumanGames._1.toString + "%")
         )
