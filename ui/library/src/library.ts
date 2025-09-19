@@ -49,12 +49,13 @@ playstrategy.load.then(() => {
       }
     }
 
-    function updateStatsTable(allowedVariants: string[], isOverallStats: boolean) {
+    function updateStatsTable(allowedVariants: string[], isOverallStats: boolean, groupName: string = '') {
       if (data && data.freq) {
         const monthlyData = data.freq;
         const $statsTable = $('.library-stats-table');
         const $title = $statsTable.find('.library-stats-title');
         const $totalVariants = $statsTable.find('.total-variants .library-stats-value');
+        const $totalVariantsTitle = $statsTable.find('.total-variants .library-stats-term');
         const $totalGames = $statsTable.find('.total-games .library-stats-value');
         const $gamesLastMonth = $statsTable.find('.games-last-month .library-stats-value');
         const $liveGames = $statsTable.find('.live-games');
@@ -65,10 +66,12 @@ playstrategy.load.then(() => {
 
         if (isOverallStats) {
           $title.text('Overall Game Stats');
+          $totalVariantsTitle.text('Total Game Variants');
           $liveGames.show();
           $correspondenceGames.show();
         } else {
-          $title.text('Game Group Stats');
+          $title.text(`${groupName} Group Stats`);
+          $totalVariantsTitle.text(`Total ${groupName} Variants`);
           $liveGames.hide();
           $correspondenceGames.hide();
         }
@@ -115,7 +118,7 @@ playstrategy.load.then(() => {
 
       const allowedVariants = toShow.map(el => $(el).val() as string);
       updateLibraryChart(allowedVariants, false);
-      updateStatsTable(allowedVariants, false);
+      updateStatsTable(allowedVariants, false, $(this).text().trim());
     });
 
     $variants.on('click', function (this: HTMLElement, e) {
