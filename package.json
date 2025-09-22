@@ -49,8 +49,8 @@
   },
   "dependencies": {
     "ab": "github:lichess-org/ab-stub",
-    "chessground": "file:../chessground",
-    "stratops": "file:../stratops",
+    "chessground": "github:Mind-Sports-Games/chessground#pla-1430-unify-declaration-of-node-type",
+    "stratops": "github:Mind-Sports-Games/stratops#pla-1430-unify-declaration-of-node-type",
     "xml2js": "^0.6.2"
   },
   "scripts": {
