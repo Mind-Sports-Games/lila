@@ -1,4 +1,8 @@
 packages:
-  - 'ui'
-  - 'ui/*'
-  - 'ui/@types/*'
+  - ui
+  - ui/*
+  - ui/@types/*
+
+onlyBuiltDependencies:
+  - chessground
+  - esbuild

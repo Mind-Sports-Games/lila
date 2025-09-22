@@ -11,8 +11,10 @@
   ],
   "author": "Thibault Duplessis",
   "license": "AGPL-3.0-or-later",
+  "devDependencies": {
+    "@types/dragscroll": "^0.0.3"
+  },
   "dependencies": {
-    "@types/dragscroll": "^0.0.3",
     "dragscroll": "^0.0.8",
     "snabbdom": "^3.0.1"
   },
