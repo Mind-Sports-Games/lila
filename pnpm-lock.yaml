@@ -12,11 +12,11 @@ importers:
         specifier: github:lichess-org/ab-stub
         version: https://codeload.github.com/lichess-org/ab-stub/tar.gz/94236bf34dbc9c05daf50f4c9842d859b9142be0
       chessground:
-        specifier: github:Mind-Sports-Games/chessground#pla-1430-unify-declaration-of-node-type
-        version: https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/39a93ea148b196264476aae9c6ddd62549cbad9a
+        specifier: github:Mind-Sports-Games/chessground#v7.11.1-pstrat3.17
+        version: https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/3e107346041a87b2294f110e082c92b2768c27e8
       stratops:
-        specifier: github:Mind-Sports-Games/stratops#pla-1430-unify-declaration-of-node-type
-        version: https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/9aca134de07be9a4c0611899d28259aef071f840
+        specifier: github:Mind-Sports-Games/stratops#v0.8.1-pstrat5.12
+        version: https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/e3cc472ccb356dde799efbabbba9d64c0c1a1bc5
       xml2js:
         specifier: ^0.6.2
         version: 0.6.2
@@ -761,8 +761,8 @@ packages:
   ajv@6.12.6:
     resolution: {integrity: sha512-j3fVLgvTo527anyYyJOGTYJbG+vnnQYvE0m5mmkc1TK+nxAppkCLMIL0aZ4dblVCNoGShhm+kzE4ZUykBoMg4g==}
 
-  ansi-escapes@7.1.0:
-    resolution: {integrity: sha512-YdhtCd19sKRKfAAUsrcC1wzm4JuzJoiX4pOJqIoW2qmKj5WzG/dL8uUJ0361zaXtHqK7gEhOwtAtz7t3Yq3X5g==}
+  ansi-escapes@7.1.1:
+    resolution: {integrity: sha512-Zhl0ErHcSRUaVfGUeUdDuLgpkEo8KIFjB4Y9uAc46ScOpdDiU1Dbyplh7qWJeJ/ZHpbyMSM26+X3BySgnIz40Q==}
     engines: {node: '>=18'}
 
   ansi-regex@5.0.1:
@@ -840,9 +840,9 @@ packages:
     resolution: {tarball: https://codeload.github.com/ornicar/chess.js/tar.gz/ad0709c0b07773d9d0da8e4605a9a2a28f00d249}
     version: 0.10.2
 
-  chessground@https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/39a93ea148b196264476aae9c6ddd62549cbad9a:
-    resolution: {tarball: https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/39a93ea148b196264476aae9c6ddd62549cbad9a}
-    version: 7.11.1-pstrat3.15
+  chessground@https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/3e107346041a87b2294f110e082c92b2768c27e8:
+    resolution: {tarball: https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/3e107346041a87b2294f110e082c92b2768c27e8}
+    version: 7.11.1-pstrat3.17
     engines: {node: '>=20.19.4 <=22.19.0', pnpm: ^10.17.0}
 
   chokidar@3.6.0:
@@ -1399,9 +1399,9 @@ packages:
     resolution: {integrity: sha512-wHMNIOjkm/YNE5EM3RCbr/+DVgPg6AqQAX1eOxO46zYNvCXjKP5Y865tqQj3EXnaMBjkxmQA5jFuDpDK/dbfiA==}
     engines: {node: '>=8.3.0'}
 
-  stratops@https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/9aca134de07be9a4c0611899d28259aef071f840:
-    resolution: {tarball: https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/9aca134de07be9a4c0611899d28259aef071f840}
-    version: 0.8.1-pstrat5.7
+  stratops@https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/e3cc472ccb356dde799efbabbba9d64c0c1a1bc5:
+    resolution: {tarball: https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/e3cc472ccb356dde799efbabbba9d64c0c1a1bc5}
+    version: 0.8.1-pstrat5.12
     engines: {node: '>=20.19.4 <=22.19.0', pnpm: ^10.17.0}
 
   string-argv@0.3.2:
@@ -1717,7 +1717,7 @@ snapshots:
       json-schema-traverse: 0.4.1
       uri-js: 4.4.1
 
-  ansi-escapes@7.1.0:
+  ansi-escapes@7.1.1:
     dependencies:
       environment: 1.1.0
 
@@ -1786,7 +1786,7 @@ snapshots:
 
   chess.js@https://codeload.github.com/ornicar/chess.js/tar.gz/ad0709c0b07773d9d0da8e4605a9a2a28f00d249: {}
 
-  chessground@https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/39a93ea148b196264476aae9c6ddd62549cbad9a: {}
+  chessground@https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/3e107346041a87b2294f110e082c92b2768c27e8: {}
 
   chokidar@3.6.0:
     dependencies:
@@ -2138,7 +2138,7 @@ snapshots:
 
   log-update@6.1.0:
     dependencies:
-      ansi-escapes: 7.1.0
+      ansi-escapes: 7.1.1
       cli-cursor: 5.0.0
       slice-ansi: 7.1.2
       strip-ansi: 7.1.2
@@ -2331,7 +2331,7 @@ snapshots:
 
   snabbdom@3.5.1: {}
 
-  stratops@https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/9aca134de07be9a4c0611899d28259aef071f840:
+  stratops@https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/e3cc472ccb356dde799efbabbba9d64c0c1a1bc5:
     dependencies:
       '@badrap/result': 0.2.13
 
