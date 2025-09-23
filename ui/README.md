@@ -6,7 +6,7 @@ Client builds are performed by the ui/build script.\
 Stick to `ui/build -cr` (clean rebuild with watch mode) and leave it running when you can.\
 NOTE - always use hard refresh (google it) or disable caching in the network tab of your browser inspector to pick up fresh changes.
 
-NOTE - since we now use pnpm, it may be useful to know you can run `rm -rf node_modules pnpm-lock.yaml && pnpm store prune && pnpm i` if you want to ensure pnpm tries to solve completely the deps tree\
+NOTE - since we now use pnpm, it may be useful to know you can run `rm -rf node_modules pnpm-lock.yaml && pnpm store prune && pnpm i` if you want to ensure pnpm tries to re-solve completely the deps tree (from the root dir of this project : `rm -rf node_modules pnpm-lock.yaml && find ./ui -type d -name node_modules -prune -exec rm -rf '{}' + && pnpm store prune && pnpm i` to also clear the node_modules of )\
 Our CI uses the command `./ui/build --no-install --prod` (as the install part is handled upstream) and takes care of pruning after each run.
 When env is "prod", sass, tsc, and build will throw an error in case of failure (in order to make the pipeline fail in an efficient way).
 

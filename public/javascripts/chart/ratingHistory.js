@@ -38,47 +38,14 @@ playstrategy.ratingHistoryChart = function (data, singlePerfName) {
         text: null,
       };
       $el.each(function () {
-        var dashStyles = [
-          // order of perfs from RatingChartApi.scala
-          'Solid', // Bullet
-          'Solid', // Blitz
-          'Solid', // Rapid
-          'Solid', // Classical
-          'ShortDash', // Correspondence
-          'ShortDash', // Chess960
-          'ShortDash', // KotH
-          'ShortDot', // 3+
-          'ShortDot', // Anti
-          'ShortDot', // Atomic
-          'Dash', // Horde
-          'ShortDot', // Racing Kings
-          'Dash', // Crazyhouse
-          'Dash', // Puzzle
-          'Dash', // Ultrabullet
-        ].filter(indexFilter);
+        const dashStylesPanel = ['Solid', 'ShortDash', 'ShortDot', 'Dash'];
+        const colorsPanel = Array.from({ length: 30 }, (_, i) => `hsl(${Math.round((i * 360) / 30)}, 80%, 50%)`);
         Highcharts.stockChart(this, {
           yAxis: {
             title: noText,
           },
           credits: disabled,
           legend: disabled,
-          colors: [
-            '#56B4E9',
-            '#0072B2',
-            '#009E73',
-            '#459F3B',
-            '#F0E442',
-            '#E69F00',
-            '#D55E00',
-            '#CC79A7',
-            '#DF5353',
-            '#66558C',
-            '#99E699',
-            '#FFAEAA',
-            '#56B4E9',
-            '#0072B2',
-            '#009E73',
-          ].filter(indexFilter),
           rangeSelector: {
             enabled: true,
             selected: 1,
@@ -102,6 +69,8 @@ playstrategy.ratingHistoryChart = function (data, singlePerfName) {
               return !singlePerfName || v.name === singlePerfName;
             })
             .map(function (serie, i) {
+              var variantIndex = data.findIndex(x => x.name === serie.name);
+              if (variantIndex < 0) variantIndex = i;
               var originalDatesAndRatings = serie.points.map(function (r) {
                 if (singlePerfName && serie.name !== singlePerfName) {
                   return [];
@@ -112,7 +81,8 @@ playstrategy.ratingHistoryChart = function (data, singlePerfName) {
               return {
                 name: serie.name,
                 type: 'line',
-                dashStyle: dashStyles[i],
+                dashStyle: dashStylesPanel[variantIndex % dashStylesPanel.length],
+                color: colorsPanel[variantIndex % colorsPanel.length],
                 marker: disabled,
                 data: smoothDates(originalDatesAndRatings),
               };

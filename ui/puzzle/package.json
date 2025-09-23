@@ -11,8 +11,10 @@
   ],
   "author": "Thibault Duplessis",
   "license": "AGPL-3.0-or-later",
+  "devDependencies": {
+    "@types/chart.js": "^2.9.29"
+  },
   "dependencies": {
-    "@types/chart.js": "^2.9.29",
     "ceval": "workspace:*",
     "chart.js": "^2.9",
     "common": "workspace:*",
