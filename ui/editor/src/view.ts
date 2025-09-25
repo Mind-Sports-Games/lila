@@ -8,6 +8,7 @@ import chessground from './chessground';
 import { Selected, CastlingToggle, EditorState } from './interfaces';
 import { VariantKey } from 'stratops/variants/types';
 import { variantClassFromKey } from 'stratops/variants/util';
+import { makeSquare, parseSquare } from 'stratops';
 
 function capitalizeFirstLetter(val: string) {
   return val.charAt(0).toUpperCase() + val.slice(1);
@@ -196,7 +197,7 @@ function controls(ctrl: EditorCtrl, state: EditorState): VNode {
           }),
         ),
       ),
-      isChessRules(ctrl.variantKey)
+      variant.allowCastling
         ? h('div.castling', [
             h('strong', ctrl.trans.noarg('castling')),
             h('div', [
@@ -207,6 +208,38 @@ function controls(ctrl: EditorCtrl, state: EditorState): VNode {
               castleCheckBox(ctrl, 'k', ctrl.trans.noarg('blackCastlingKingside'), !!ctrl.options.inlineCastling),
               castleCheckBox(ctrl, 'q', 'O-O-O', true),
             ]),
+          ])
+        : null,
+      // Copied the en passant HTML generation logic from lichess (AGPL-3):
+      // https://github.com/lichess-org/lila/commit/2017682f3871d90ab68db7c3495d4886c9c9fcfe
+      variant.allowEnPassant()
+        ? h('div.enpassant', [
+            h('label', { attrs: { for: 'enpassant-select' } }, 'En passant'),
+            h(
+              'select#enpassant-select',
+              {
+                on: {
+                  change(e) {
+                    ctrl.setEnPassant(parseSquare(ctrl.rules)((e.target as HTMLSelectElement).value));
+                  },
+                },
+                props: { value: ctrl.epSquare ? makeSquare(ctrl.rules)(ctrl.epSquare) : '' },
+              },
+              ['', ...[ctrl.turn === 'p2' ? 3 : 6].flatMap(r => 'abcdefgh'.split('').map(f => f + r))].map(key =>
+                h(
+                  'option',
+                  {
+                    attrs: {
+                      value: key,
+                      selected: (key ? parseSquare(ctrl.rules)(key) : undefined) === ctrl.epSquare,
+                      hidden: Boolean(key && !state.enPassantOptions.includes(key)),
+                      disabled: Boolean(key && !state.enPassantOptions.includes(key)) /*Safari*/,
+                    },
+                  },
+                  key,
+                ),
+              ),
+            ),
           ])
         : null,
     ]),

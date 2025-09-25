@@ -146,7 +146,16 @@ export default class EditorCtrl {
   }
 
   onChange(): void {
-    const fen = this.getFenFromSetup();
+    const variant = variantClassFromKey(this.variantKey);
+    let fen = this.getFenFromSetup();
+
+    if (variant.allowEnPassant()) {
+      // @ts-expect-error TS2339
+      fen = variant.fixFenForEp(fen);
+      if (fen === this.getFenFromSetup()) {
+        this.epSquare = undefined;
+      }
+    }
     this.standardInitialPosition = this.isVariantStandardInitialPosition();
     if (!this.cfg.embed) {
       this.replaceState({ rules: this.rules, variantKey: this.variantKey, fen }, this.makeUrl('/editor/', fen));
@@ -156,10 +165,18 @@ export default class EditorCtrl {
   }
 
   getState(): EditorState {
+    const legalFen = this.getLegalFen();
+    const variant = variantClassFromKey(this.variantKey);
+    const enPassantOptions =
+      legalFen && variant.allowEnPassant()
+        ? // @ts-expect-error TS2339
+          variant.getEnPassantOptions(legalFen)
+        : [];
     return {
       fen: this.getFenFromSetup(),
-      legalFen: this.getLegalFen(),
+      legalFen,
       playable: this.rules === 'chess' && this.isPlayable(),
+      enPassantOptions,
     };
   }
 
@@ -198,6 +215,12 @@ export default class EditorCtrl {
 
   setTurn(turn: PlayerIndex): void {
     this.turn = turn;
+    this.epSquare = undefined;
+    this.onChange();
+  }
+
+  setEnPassant(epSquare: Square | undefined): void {
+    this.epSquare = epSquare;
     this.onChange();
   }
 
