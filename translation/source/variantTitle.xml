@@ -32,6 +32,8 @@
   <string name="minixiangqi">Mini Xiangqi (Chinese Chess on a smaller board)</string>
   <string name="flipello">Flip pieces between your color to get the most board area</string>
   <string name="flipello10">Flip pieces between your color to get the most board area</string>
+  <string name="antiflipello">Flip pieces between your color to get the least board area</string>
+  <string name="octagonflipello">Flip pieces between your color to get the most board area</string>
   <string name="amazons">Immobilize all the enemy pieces</string>
   <string name="breakthroughtroyka">Reach opponents home rank to win</string>
   <string name="minibreakthroughtroyka">Reach opponents home rank to win</string>  

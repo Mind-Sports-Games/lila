@@ -272,6 +272,8 @@ trait GameHelper { self: I18nHelper with UserHelper with AiHelper with StringHel
           case Variant.Draughts(strategygames.draughts.variant.Breakthrough)     => trans.promotion.txt()
           case Variant.FairySF(strategygames.fairysf.variant.Flipello)           => trans.gameFinished.txt()
           case Variant.FairySF(strategygames.fairysf.variant.Flipello10)         => trans.gameFinished.txt()
+          case Variant.FairySF(strategygames.fairysf.variant.AntiFlipello)       => trans.gameFinished.txt()
+          case Variant.FairySF(strategygames.fairysf.variant.OctagonFlipello)    => trans.gameFinished.txt()
           case Variant.FairySF(strategygames.fairysf.variant.Amazons)            => trans.gameFinished.txt()
           case Variant.FairySF(strategygames.fairysf.variant.BreakthroughTroyka) => trans.raceFinished.txt()
           case Variant.FairySF(strategygames.fairysf.variant.MiniBreakthroughTroyka) =>

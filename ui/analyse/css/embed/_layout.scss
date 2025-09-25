@@ -52,7 +52,7 @@
 }
 
 //score for games (togyzkumalak and Oware has own layout below)
-$score-variants: ('flipello', 'flipello10', 'go9x9', 'go13x13', 'go19x19', 'abalone');
+$score-variants: ('flipello', 'flipello10', 'antiflipello', 'octagonflipello', 'go9x9', 'go13x13', 'go19x19', 'abalone');
 $go-variants: ('go9x9', 'go13x13', 'go19x19');
 
 body.oware-light-wood .variant-oware .game-score {
@@ -277,6 +277,8 @@ $pocket-height-oware: 14vh;
 
 .variant-flipello .game-score,
 .variant-flipello10 .game-score,
+.variant-antiflipello .game-score,
+.variant-octagonflipello .game-score,
 .variant-go9x9 .game-score,
 .variant-go13x13 .game-score,
 .variant-go19x19 .game-score {

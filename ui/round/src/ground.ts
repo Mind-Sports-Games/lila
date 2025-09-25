@@ -142,7 +142,7 @@ export function makeConfig(ctrl: RoundController): Config {
             ? 'https://playstrategy.org/assets/piece/shogi/' +
               data.pref.pieceSet.filter(ps => ps.gameFamily === 'shogi')[0].name +
               '/'
-            : variantKey === 'flipello' || variantKey === 'flipello10'
+            : variantKey === 'flipello' || variantKey === 'flipello10' || variantKey === 'antiflipello' || variantKey === 'octagonflipello'
               ? 'https://playstrategy.org/assets/piece/flipello/' +
                 data.pref.pieceSet.filter(ps => ps.gameFamily === 'flipello')[0].name +
                 '/'

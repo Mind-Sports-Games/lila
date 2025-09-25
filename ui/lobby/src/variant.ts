@@ -22,6 +22,8 @@ type variantConfirmsType = {
   minixiangqi: string;
   flipello: string;
   flipello10: string;
+  antiflipello: string;
+  octagonflipello: string;
   amazons: string;
   breakthroughtroyka: string;
   minibreakthroughtroyka: string;
@@ -71,6 +73,10 @@ const variantConfirms: variantConfirmsType = {
     'This is a Othello game!\n\nPlayers take it in turns to place counters, flipping all opposition counters between their placed counter and another counter on the edge. The winner is the player who has the most counters face up at the end.',
   flipello10:
     'This is a Grand Othello game!\n\nPlayers take it in turns to place counters, flipping all opposition counters between their placed counter and another counter on the edge. The winner is the player who has the most counters face up at the end.',
+  antiflipello:
+    'This is an AntiOthello game!\n\nPlayers take it in turns to place counters, flipping all opposition counters between their placed counter and another counter on the edge. The winner is the player who has the fewest counters face up at the end.',
+  octagonflipello:
+    'This is an Octagon Othello game!\n\nPlayers take it in turns to place counters, flipping all opposition counters between their placed counter and another counter on the edge. The winner is the player who has the most counters face up at the end.',
   amazons: 'This is an Amazons game!\n\nImmobilize all the enemy pieces to win.',
   breakthroughtroyka:
     'This is a Breakthrough game!\n\nThe first player who reaches their last rank (opponent home row) wins.',

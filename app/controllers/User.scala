@@ -316,6 +316,8 @@ final class User(
                   "minixiangqi"            -> leaderboards.minixiangqi,
                   "flipello"               -> leaderboards.flipello,
                   "flipello10"             -> leaderboards.flipello10,
+                  "antiflipello"           -> leaderboards.antiflipello,
+                  "octagonflipello"        -> leaderboards.octagonflipello,
                   "amazons"                -> leaderboards.amazons,
                   "breakthroughtroyka"     -> leaderboards.breakthroughtroyka,
                   "minibreakthroughtroyka" -> leaderboards.minibreakthroughtroyka,

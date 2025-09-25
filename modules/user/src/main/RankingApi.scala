@@ -121,6 +121,8 @@ final class RankingApi(
       minixiangqi            <- topPerf(PerfType.orDefault("minixiangqi").id, nb)
       flipello               <- topPerf(PerfType.orDefault("flipello").id, nb)
       flipello10             <- topPerf(PerfType.orDefault("flipello10").id, nb)
+      antiflipello           <- topPerf(PerfType.orDefault("antiflipello").id, nb)
+      octagonflipello        <- topPerf(PerfType.orDefault("octagonflipello").id, nb)
       amazons                <- topPerf(PerfType.orDefault("amazons").id, nb)
       breakthroughtroyka     <- topPerf(PerfType.orDefault("breakthroughtroyka").id, nb)
       minibreakthroughtroyka <- topPerf(PerfType.orDefault("minibreakthroughtroyka").id, nb)
@@ -169,6 +171,8 @@ final class RankingApi(
       minixiangqi = minixiangqi,
       flipello = flipello,
       flipello10 = flipello10,
+      antiflipello = antiflipello,
+      octagonflipello = octagonflipello,
       amazons = amazons,
       breakthroughtroyka = breakthroughtroyka,
       minibreakthroughtroyka = minibreakthroughtroyka,

@@ -503,11 +503,13 @@ export default function (ctrl: AnalyseCtrl): VNode {
         'oware',
         'flipello',
         'flipello10',
+        'antiflipello',
+        'octagonflipello',
         'go9x9',
         'go13x13',
         'go19x19',
       ].includes(variantKey) &&
-      !((!!gaugeOn || !!playerBars) && ['flipello', 'flipello10', 'go9x9', 'go13x13', 'go19x19'].includes(variantKey)),
+      !((!!gaugeOn || !!playerBars) && ['flipello', 'flipello10', 'antiflipello', 'octagonflipello', 'go9x9', 'go13x13', 'go19x19'].includes(variantKey)),
     needsNoCoords =
       ['xiangqi', 'shogi', 'minixiangqi', 'minishogi'].includes(variantKey) && (!!gaugeOn || !!playerBars),
     tour = relayTour(ctrl),
@@ -517,8 +519,10 @@ export default function (ctrl: AnalyseCtrl): VNode {
     bottomScore = 0;
   if (ctrl.data.hasGameScore) {
     switch (variantKey) {
+      case 'flipello':
       case 'flipello10':
-      case 'flipello': {
+      case 'antiflipello':
+      case 'octagonflipello': {
         const p1Score = getScoreFromFen(variantKey, fen, 'p1');
         const p2Score = getScoreFromFen(variantKey, fen, 'p2');
         topScore = ctrl.topPlayerIndex() === 'p1' ? p1Score : p2Score;

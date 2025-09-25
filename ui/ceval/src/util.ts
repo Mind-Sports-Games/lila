@@ -15,6 +15,8 @@ const noClientEvalVariants = [
   'frysk',
   'amazons',
   'minibreakthroughtroyka', // Note: it looks like fairySF decided the board starts from a5, thus it's computations seem to be wrong
+  'antiflipello',
+  'octagonflipello',
   'oware',
   'togyzkumalak',
   'bestemshe',
@@ -27,7 +29,14 @@ const noClientEvalVariants = [
   'abalone',
 ];
 
-const noPathVizualizationVariants: VariantKey[] = ['shogi', 'minishogi', 'xiangqi', 'flipello10'];
+const noPathVizualizationVariants: VariantKey[] = [
+  'shogi',
+  'minishogi',
+  'xiangqi',
+  'flipello10',
+  'antiflipello',
+  'octagonflipello'
+];
 
 const noVariantOutcomeVariants: VariantKey[] = [
   'minishogi',
@@ -36,12 +45,16 @@ const noVariantOutcomeVariants: VariantKey[] = [
   'xiangqi',
   'flipello',
   'flipello10',
+  'antiflipello',
+  'octagonflipello',
 ];
 
 const blackStartsVariants: VariantKey[] = [
   'abalone',
   'flipello',
   'flipello10',
+  'antiflipello',
+  'octagonflipello',
   'go9x9',
   'go13x13',
   'go19x19',
@@ -61,6 +74,8 @@ const noPracticeWithComputerVariants: VariantKey[] = [
   'minixiangqi',
   'flipello',
   'flipello10',
+  'antiflipello',
+  'octagonflipello',
   'amazons',
   'breakthroughtroyka',
   'minibreakthroughtroyka',

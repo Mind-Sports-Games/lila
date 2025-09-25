@@ -149,8 +149,10 @@ export function main(ctrl: RoundController): VNode {
     captures = false;
   if (d.hasGameScore) {
     switch (variantKey) {
+      case 'flipello':
       case 'flipello10':
-      case 'flipello': {
+      case 'antiflipello':
+      case 'octagonflipello': {
         const p1Score = util.getScoreFromFen(variantKey, fen, 'p1');
         const p2Score = util.getScoreFromFen(variantKey, fen, 'p2');
         topScore = topPlayerIndex === 'p1' ? p1Score : p2Score;
@@ -256,6 +258,8 @@ export function main(ctrl: RoundController): VNode {
       'minishogi',
       'flipello',
       'flipello10',
+      'antiflipello',
+      'octagonflipello',
       'oware',
       'go9x9',
       'go13x13',

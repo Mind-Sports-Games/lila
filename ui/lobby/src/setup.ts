@@ -733,6 +733,12 @@ export default class Setup {
             case '7':
               key = 'flipello10';
               break;
+            case '11':
+              key = 'antiflipello';
+              break;
+            case '12':
+              key = 'octagonflipello';
+              break;
           }
           break;
         case '8':

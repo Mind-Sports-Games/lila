@@ -61,7 +61,7 @@ export const init = (node: HTMLElement) => {
           showUndoButton: false,
           orientation,
           lastMove: lastMove(
-            ['flipello', 'flipello10', 'go9x9', 'go13x13', 'go19x19'].includes(variantFromElement($el)),
+            ['flipello', 'flipello10', 'antiflipello', 'octagonflipello', 'go9x9', 'go13x13', 'go19x19'].includes(variantFromElement($el)),
             lm,
           ),
           highlight: {
@@ -84,7 +84,7 @@ export const init = (node: HTMLElement) => {
                 ? { width: 5, height: 5 }
                 : $el.hasClass('variant-minixiangqi')
                   ? { width: 7, height: 7 }
-                  : $el.hasClass('variant-flipello10')
+                  : $el.hasClass('variant-flipello10') || $el.hasClass('variant-octagonflipello')
                     ? { width: 10, height: 10 }
                     : $el.hasClass('variant-amazons')
                       ? { width: 10, height: 10 }
