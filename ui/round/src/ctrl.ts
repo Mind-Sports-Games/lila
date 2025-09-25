@@ -1379,7 +1379,10 @@ export default class RoundController {
     const d = this.data;
     if (this.isPlaying() && !this.replaying()) {
       //flipello pass
-      if (['flipello', 'flipello10', 'antiflipello', 'octagonflipello'].includes(d.game.variant.key) && d.possibleMoves) {
+      if (
+        ['flipello', 'flipello10', 'antiflipello', 'octagonflipello'].includes(d.game.variant.key) &&
+        d.possibleMoves
+      ) {
         this.forcePass(util.parsePossibleMoves(d.possibleMoves), d.game.variant.key);
       }
       //backgammon roll dice at start of turn or end turn when no moves

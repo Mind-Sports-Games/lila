@@ -509,7 +509,12 @@ export default function (ctrl: AnalyseCtrl): VNode {
         'go13x13',
         'go19x19',
       ].includes(variantKey) &&
-      !((!!gaugeOn || !!playerBars) && ['flipello', 'flipello10', 'antiflipello', 'octagonflipello', 'go9x9', 'go13x13', 'go19x19'].includes(variantKey)),
+      !(
+        (!!gaugeOn || !!playerBars) &&
+        ['flipello', 'flipello10', 'antiflipello', 'octagonflipello', 'go9x9', 'go13x13', 'go19x19'].includes(
+          variantKey,
+        )
+      ),
     needsNoCoords =
       ['xiangqi', 'shogi', 'minixiangqi', 'minishogi'].includes(variantKey) && (!!gaugeOn || !!playerBars),
     tour = relayTour(ctrl),

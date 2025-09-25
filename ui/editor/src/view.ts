@@ -346,7 +346,16 @@ function sparePieces(
   let pieces = ['k-piece', 'q-piece', 'r-piece', 'b-piece', 'n-piece', 'p-piece'].map(function (role) {
     return [playerIndex, role];
   });
-  if (['breakthroughtroyka', 'minibreakthroughtroyka', 'flipello', 'flipello10', 'antiflipello', 'octagonflipello'].includes(ctrl.variantKey)) {
+  if (
+    [
+      'breakthroughtroyka',
+      'minibreakthroughtroyka',
+      'flipello',
+      'flipello10',
+      'antiflipello',
+      'octagonflipello',
+    ].includes(ctrl.variantKey)
+  ) {
     pieces = ['p-piece'].map(function (role) {
       return [playerIndex, role];
     });

@@ -35,7 +35,7 @@ const noPathVizualizationVariants: VariantKey[] = [
   'xiangqi',
   'flipello10',
   'antiflipello',
-  'octagonflipello'
+  'octagonflipello',
 ];
 
 const noVariantOutcomeVariants: VariantKey[] = [
