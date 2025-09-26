@@ -3,7 +3,7 @@ import { Api as CgApi } from 'chessground/api';
 import { Rules, Square } from 'stratops/types';
 import { SquareSet } from 'stratops/squareSet';
 import { Setup, Material, RemainingChecks } from 'stratops/setup';
-import { Board, Castles } from 'stratops';
+import { Board, Castles, makeSquare } from 'stratops';
 import { makeFen, parseCastlingFen } from 'stratops/fen';
 import * as fp from 'stratops/fp';
 import { defined, prop, Prop } from 'common';
@@ -11,7 +11,7 @@ import { replacePocketsInFen } from 'common/editor';
 import throttle from 'common/throttle';
 import { variantClass, variantClassFromKey, variantKeyToRules } from 'stratops/variants/util';
 import { Variant as CGVariant } from 'chessground/types';
-import type { VariantKey } from 'stratops/variants/types';
+import { type VariantKey } from 'stratops/variants/types';
 
 export default class EditorCtrl {
   cfg: Editor.Config;
@@ -148,14 +148,20 @@ export default class EditorCtrl {
   onChange(): void {
     const variant = variantClassFromKey(this.variantKey);
     let fen = this.getFenFromSetup();
+    const legalFen = this.getLegalFen();
+    const enPassantOptions = variant.allowEnPassant() && legalFen ? (variant as any).getEnPassantOptions(legalFen) : [];
 
-    if (variant.allowEnPassant()) {
-      // @ts-expect-error TS2339
-      fen = variant.fixFenForEp(fen);
-      if (fen === this.getFenFromSetup()) {
-        this.epSquare = undefined;
-      }
+    if (
+      this.epSquare &&
+      !enPassantOptions.includes(
+        typeof this.epSquare === 'string' ? this.epSquare : makeSquare(this.rules)(this.epSquare),
+      )
+    ) {
+      this.epSquare = undefined;
     }
+
+    fen = variant.allowEnPassant() ? (variant as any).fixFenForEp(fen) : fen;
+
     this.standardInitialPosition = this.isVariantStandardInitialPosition();
     if (!this.cfg.embed) {
       this.replaceState({ rules: this.rules, variantKey: this.variantKey, fen }, this.makeUrl('/editor/', fen));
@@ -167,13 +173,9 @@ export default class EditorCtrl {
   getState(): EditorState {
     const legalFen = this.getLegalFen();
     const variant = variantClassFromKey(this.variantKey);
-    const enPassantOptions =
-      legalFen && variant.allowEnPassant()
-        ? // @ts-expect-error TS2339
-          variant.getEnPassantOptions(legalFen)
-        : [];
+    const enPassantOptions = variant.allowEnPassant() && legalFen ? (variant as any).getEnPassantOptions(legalFen) : [];
     return {
-      fen: this.getFenFromSetup(),
+      fen: variant.allowEnPassant() ? (variant as any).fixFenForEp(this.getFenFromSetup()) : this.getFenFromSetup(),
       legalFen,
       playable: this.rules === 'chess' && this.isPlayable(),
       enPassantOptions,
