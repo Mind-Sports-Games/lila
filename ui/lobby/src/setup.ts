@@ -178,6 +178,7 @@ export default class Setup {
           classical: { timemode: '3', byoyomi: '30', periods: '1', increment: '0', initial: '15' },
         });
       case '5_6': // othello
+      case '5_11': // antiothello
         return Object.assign({}, defaultClockConfig, {
           bullet: { timemode: '1', initial: '1', increment: '0' },
           blitz: { timemode: '1', initial: '5', increment: '0' },
@@ -185,6 +186,7 @@ export default class Setup {
           classical: { timemode: '1', initial: '20', increment: '10' },
         });
       case '5_7': // grand othello
+      case '5_12': // octagon othello
         return Object.assign({}, defaultClockConfig, {
           bullet: { timemode: '1', initial: '2', increment: '0' },
           blitz: { timemode: '1', initial: '8', increment: '0' },

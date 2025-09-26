@@ -67,6 +67,8 @@ export const perfIcons: any = {
   'Mini Xiangqi': '',
   Othello: '',
   'Grand Othello': '',
+  AntiOthello: '',
+  OctagonOthello: '',
   Amazons: '€',
   Breakthrough: '',
   'Mini Breakthrough': '',

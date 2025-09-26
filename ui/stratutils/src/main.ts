@@ -138,6 +138,7 @@ const noFishnetVariants: VariantKey[] = [
   'linesOfAction',
   'scrambledEggs',
   'antiflipello',
+  'octagonflipello',
   'oware',
   'togyzkumalak',
   'bestemshe',
