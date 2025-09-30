@@ -43,6 +43,21 @@
           vertical-align: middle;
         }
       }
+
+      /*
+        Copied .enpassant style from https://github.com/lichess-org/lila/commit/2017682f3871d90ab68db7c3495d4886c9c9fcfe
+        License: AGPL-3
+      */
+      .enpassant {
+        @extend %flex-between;
+        margin-top: 1em;
+        label {
+          font-weight: bold;
+        }
+        select {
+          width: 9ch;
+        }
+      }
     }
 
     .actions {
