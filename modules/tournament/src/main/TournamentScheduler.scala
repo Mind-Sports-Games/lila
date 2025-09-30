@@ -304,6 +304,7 @@ final private class TournamentScheduler(
       (nextMonday, 9),
       (nextMonday, 15),
       (nextMonday, 21),
+      (nextMonday, 23),
       (nextTuesday, 2),
       (nextTuesday, 5),
       (nextTuesday, 8),
@@ -322,6 +323,7 @@ final private class TournamentScheduler(
       (nextThursday, 3),
       (nextThursday, 6),
       (nextThursday, 9),
+      (nextThursday, 11),
       (nextThursday, 14),
       (nextThursday, 16),
       (nextThursday, 20),
@@ -356,9 +358,8 @@ final private class TournamentScheduler(
     // Because we create two weeks in advance we will then need to delete one tournament in the second week where the new variant has cycled into. It should just be one, if not its gone wrong
     // Practise locally, can always delete any newly created tournaments and try again
     val weeklyVariants: List[(Variant, Schedule.Speed)] = List(
-      (Variant.Draughts(strategygames.draughts.variant.Breakthrough), Blitz32),
-      (Variant.FairySF(strategygames.fairysf.variant.Flipello), Blitz32),
       (Variant.Chess(strategygames.chess.variant.Crazyhouse), Blitz32),
+      (Variant.FairySF(strategygames.fairysf.variant.AntiFlipello), Blitz32),
       (Variant.Draughts(strategygames.draughts.variant.Pool), Blitz32),
       (Variant.Chess(strategygames.chess.variant.LinesOfAction), Blitz32),
       (Variant.Chess(strategygames.chess.variant.FiveCheck), Blitz32),
@@ -376,6 +377,7 @@ final private class TournamentScheduler(
       (Variant.FairySF(strategygames.fairysf.variant.Xiangqi), Blitz53),
       (Variant.Chess(strategygames.chess.variant.Monster), Blitz32),
       (Variant.Chess(strategygames.chess.variant.KingOfTheHill), Blitz32),
+      (Variant.FairySF(strategygames.fairysf.variant.OctagonFlipello), Blitz32),
       (Variant.Draughts(strategygames.draughts.variant.Brazilian), Blitz32),
       (Variant.FairySF(strategygames.fairysf.variant.Shogi), Byoyomi510),
       (Variant.FairySF(strategygames.fairysf.variant.BreakthroughTroyka), Blitz32),
@@ -398,7 +400,9 @@ final private class TournamentScheduler(
       (Variant.Draughts(strategygames.draughts.variant.Antidraughts), Blitz32),
       (Variant.FairySF(strategygames.fairysf.variant.MiniShogi), Byoyomi35),
       (Variant.Chess(strategygames.chess.variant.Atomic), Blitz32),
-      (Variant.Go(strategygames.go.variant.Go19x19), Blitz53)
+      (Variant.Go(strategygames.go.variant.Go19x19), Blitz53),
+      (Variant.Draughts(strategygames.draughts.variant.Breakthrough), Blitz32),
+      (Variant.FairySF(strategygames.fairysf.variant.Flipello), Blitz32)
     )
 
     val weeklyVariantDefault: (Variant, Schedule.Speed) =
@@ -550,7 +554,7 @@ final private class TournamentScheduler(
       )(
         new DateTime(2025, 10, 17, 0, 0)
       ),
-      scheduleYearly24hr(Variant.Draughts(strategygames.draughts.variant.Brazilian), Blitz32)(
+      scheduleYearly24hr(Variant.FairySF(strategygames.fairysf.variant.AntiFlipello), Blitz32)(
         new DateTime(2025, 10, 24, 0, 0)
       ),
       scheduleYearly24hr(Variant.Togyzkumalak(strategygames.togyzkumalak.variant.Bestemshe), Blitz32)(
@@ -558,13 +562,19 @@ final private class TournamentScheduler(
       ),
       scheduleYearly24hr(Variant.Abalone(strategygames.abalone.variant.Abalone), Blitz53)(
         new DateTime(2025, 11, 7, 0, 0)
-      )
+      ),
+      scheduleYearly24hr(Variant.Draughts(strategygames.draughts.variant.Brazilian), Blitz32)(
+        new DateTime(2025, 11, 14, 0, 0)
+      ),
+      scheduleYearly24hr(Variant.FairySF(strategygames.fairysf.variant.OctagonFlipello), Blitz32)(
+        new DateTime(2025, 11, 21, 0, 0)
+      ),
       //Fri 26th is the end of year medley
     ).flatten filter { _.schedule.at isAfter rightNow }
 
     //order matters for pruning weekly/yearly tournaments
-    // yearly2025Tournaments ::: // after a tournament was created in db, no need to keep it here.
-    thisWeekMedleyShields :::
+    yearly2025Tournaments :::
+      thisWeekMedleyShields :::
       nextWeekMedleyShields :::
       thisMonthMedleyShields :::
       nextMonthMedleyShields :::
