@@ -579,15 +579,15 @@ object Tv {
           familyChannel = false,
           gameFamily = "flipello"
         )
-    case object OctagonFlipello
-        extends Channel(
-          name = VariantKeys.variantName(Variant.wrap(FV.OctagonFlipello)),
-          icon = FV.OctagonFlipello.perfIcon.toString,
-          secondsSinceLastMove = freshBlitz,
-          filters = Seq(variant(Variant.wrap(FV.OctagonFlipello)), noBot),
-          familyChannel = false,
-          gameFamily = "flipello"
-        )
+    //case object OctagonFlipello
+    //    extends Channel(
+    //      name = VariantKeys.variantName(Variant.wrap(FV.OctagonFlipello)),
+    //      icon = FV.OctagonFlipello.perfIcon.toString,
+    //      secondsSinceLastMove = freshBlitz,
+    //      filters = Seq(variant(Variant.wrap(FV.OctagonFlipello)), noBot),
+    //      familyChannel = false,
+    //      gameFamily = "flipello"
+    //    )
     case object Amazons
         extends Channel(
           name = VariantKeys.variantName(Variant.wrap(FV.Amazons)),
@@ -769,7 +769,7 @@ object Tv {
       Flipello,
       Flipello10,
       AntiFlipello,
-      OctagonFlipello,
+      //OctagonFlipello,
       Amazons,
       BreakthroughTroykaFamily,
       BreakthroughTroyka,

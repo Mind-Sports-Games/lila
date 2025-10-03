@@ -20,7 +20,6 @@ export function canUseBoardEditor(variantKey: VariantKey): boolean {
     'flipello',
     'flipello10',
     'antiflipello',
-    'octagonflipello',
     'xiangqi',
     'minixiangqi',
   ].includes(variantKey);

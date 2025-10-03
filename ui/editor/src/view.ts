@@ -102,7 +102,6 @@ const allVariants: Array<[VariantKey, string]> = [
   [VariantKey.flipello, 'Othello'],
   [VariantKey.flipello10, 'Grand Othello'],
   [VariantKey.antiflipello, 'AntiOthello'],
-  [VariantKey.octagonflipello, 'Octagon Othello'],
   [VariantKey.xiangqi, 'Xiangqi'],
   [VariantKey.minixiangqi, 'Mini Xiangqi'],
 ];
