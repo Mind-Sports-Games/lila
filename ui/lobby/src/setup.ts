@@ -479,7 +479,12 @@ export default class Setup {
       let variantCompatible = true;
       if (/^stockfish-level[1-8]$/.test(user)) {
         variantCompatible =
-          (variantId[0] === '0' && variantId[1] !== '15') || ['3', '4', '5', '11'].includes(variantId[0]);
+          //disallow monster
+          (variantId[0] === '0' && variantId[1] !== '15') ||
+          //disallow antiflipello, octagonflipello
+          (variantId[0] === '5' && !['11', '12'].includes(variantId[1])) ||
+          //allow all shogi, xiangqi, breakthrough
+          ['3', '4', '11'].includes(variantId[0]);
       } else {
         switch (user) {
           case 'ps-greedy-four-move': {
