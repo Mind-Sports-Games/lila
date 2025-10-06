@@ -871,7 +871,7 @@ object TournamentShield {
         extends Category(
           Variant.FairySF(strategygames.fairysf.variant.AntiFlipello),
           Blitz32,
-          6,
+          18,
           1
         )
 
@@ -879,7 +879,7 @@ object TournamentShield {
     //    extends Category(
     //      Variant.FairySF(strategygames.fairysf.variant.OctagonFlipello),
     //      Blitz32,
-    //      18,
+    //      6,
     //      1
     //    )
 
