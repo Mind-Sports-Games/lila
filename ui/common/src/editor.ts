@@ -19,6 +19,7 @@ export function canUseBoardEditor(variantKey: VariantKey): boolean {
     'minibreakthroughtroyka',
     'flipello',
     'flipello10',
+    'antiflipello',
     'xiangqi',
     'minixiangqi',
   ].includes(variantKey);

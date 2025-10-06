@@ -728,7 +728,7 @@ object BSONHandlers {
         case 5 => readGoGame(r)
         case 6 => readBackgammonGame(r)
         case 7 => readAbaloneGame(r)
-        case _ => sys.error("Invalid game in the database")
+        case _ => sys.error(s"Invalid game in the database, libId: ${libId}")
       }
 
       Game(

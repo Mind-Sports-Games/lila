@@ -29,8 +29,10 @@
   <string name="xiangqi">Xiangqi</string>
   <string name="minishogi">MShogi</string>
   <string name="minixiangqi">MXiangqi</string>
-  <string name="flipello">Flip</string>
-  <string name="flipello10">XFlip</string>
+  <string name="flipello">Othello</string>
+  <string name="flipello10">XOth</string>
+  <string name="antiflipello">AntiO</string>
+  <string name="octagonflipello">OctOth</string>
   <string name="amazons">Amazons</string>
   <string name="oware">Oware</string>
   <string name="togyzkumalak">Toqyz</string>

@@ -101,6 +101,7 @@ const allVariants: Array<[VariantKey, string]> = [
   [VariantKey.scrambledEggs, 'Scrambled Eggs'],
   [VariantKey.flipello, 'Othello'],
   [VariantKey.flipello10, 'Grand Othello'],
+  [VariantKey.antiflipello, 'AntiOthello'],
   [VariantKey.xiangqi, 'Xiangqi'],
   [VariantKey.minixiangqi, 'Mini Xiangqi'],
 ];
@@ -377,7 +378,16 @@ function sparePieces(
   let pieces = ['k-piece', 'q-piece', 'r-piece', 'b-piece', 'n-piece', 'p-piece'].map(function (role) {
     return [playerIndex, role];
   });
-  if (['breakthroughtroyka', 'minibreakthroughtroyka', 'flipello', 'flipello10'].includes(ctrl.variantKey)) {
+  if (
+    [
+      'breakthroughtroyka',
+      'minibreakthroughtroyka',
+      'flipello',
+      'flipello10',
+      'antiflipello',
+      'octagonflipello',
+    ].includes(ctrl.variantKey)
+  ) {
     pieces = ['p-piece'].map(function (role) {
       return [playerIndex, role];
     });
