@@ -557,6 +557,11 @@ export default class Setup {
     const c = this.stores[typ].get();
     if (c) {
       Object.keys(c).forEach(k => {
+        const possibleValues = $form
+          .find(`[name="${k}"]`)
+          .get()
+          .map(el => (el as HTMLInputElement).value);
+        if (possibleValues.indexOf(c[k]) === -1) return; //for when testing new variants
         $form.find(`[name="${k}"]`).each(function (this: HTMLInputElement) {
           if (k === 'timeMode' && this.value !== '1') return;
           if (this.type == 'checkbox') this.checked = true;
