@@ -51,6 +51,7 @@ final class JsonView(rematches: Rematches) {
       .add("threefold" -> game.situation.threefoldRepetition)
       .add("isRepetition" -> game.situation.isRepetition)
       .add("perpetualWarning" -> game.situation.perpetualPossible)
+      .add("gameMessage" -> game.situation.gameMessage)
       .add("boosted" -> game.boosted)
       .add("tournamentId" -> game.tournamentId)
       .add("swissId" -> game.swissId)

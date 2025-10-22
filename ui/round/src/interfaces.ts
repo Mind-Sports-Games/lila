@@ -185,6 +185,7 @@ export interface ApiAction extends Step {
   check: boolean;
   threefold: boolean;
   perpetualWarning: boolean;
+  gameMessage?: string;
   takebackable: boolean;
   wDraw: boolean;
   bDraw: boolean;

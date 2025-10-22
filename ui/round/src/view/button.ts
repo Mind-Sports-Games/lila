@@ -327,6 +327,28 @@ export function perpetualWarning(ctrl: RoundController) {
     : null;
 }
 
+//not technically a button
+export function gameMessage(ctrl: RoundController) {
+  if (
+    ['go9x9', 'go13x13', 'go19x19'].includes(ctrl.data.game.variant.key) &&
+    ctrl.data.deadStoneOfferState &&
+    ctrl.data.deadStoneOfferState !== 'RejectedOffer'
+  ) {
+    return null;
+  } //suppress message while selecting dead stones for go games
+  return ctrl.data.game.gameMessage
+    ? h('div.suggestion', [
+        h(
+          'p',
+          {
+            hook: onSuggestionHook,
+          },
+          ctrl.noarg(ctrl.data.game.gameMessage!),
+        ),
+      ])
+    : null;
+}
+
 export function cancelDrawOffer(ctrl: RoundController) {
   return ctrl.data.player.offeringDraw ? h('div.pending', [h('p', ctrl.noarg('drawOfferSent'))]) : null;
 }

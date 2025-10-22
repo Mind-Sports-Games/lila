@@ -46,6 +46,7 @@ export interface BaseGame {
   threefold?: boolean;
   isRepetition?: boolean;
   perpetualWarning?: boolean;
+  gameMessage?: string;
   boosted?: boolean;
   rematch?: string;
   multiMatch?: MultiMatch;
