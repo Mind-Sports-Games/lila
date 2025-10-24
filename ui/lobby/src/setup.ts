@@ -395,6 +395,7 @@ export default class Setup {
             (playerIndex !== 'random' && randomPlayerIndexVariants.includes(variantFull)) ||
             variantFull === '0_3' ||
             (vsPSBot && botUser === 'ps-random-mover') ||
+            (opponentType === 'bot' && botUser === 'ps-random-mover') ||
             (variantId[0] == '9' &&
               $goConfig.val() !== undefined &&
               (($goHandicapInput.val() as string) != '0' ||
