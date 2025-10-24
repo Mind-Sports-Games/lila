@@ -96,6 +96,7 @@ object userAnalysisI18n {
     trans.mistake,
     trans.blunder,
     trans.perpetualWarning,
+    trans.subsequentPassWarning,
     trans.threefoldRepetition,
     trans.anotherWasX,
     trans.bestWasX,

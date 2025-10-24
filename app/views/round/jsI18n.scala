@@ -81,6 +81,7 @@ object jsI18n {
     trans.forceResignation,
     trans.forceDraw,
     trans.perpetualWarning,
+    trans.subsequentPassWarning,
     trans.threefoldRepetition,
     trans.claimADraw,
     trans.drawOfferSent,
