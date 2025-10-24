@@ -395,6 +395,7 @@ export default class Setup {
             (playerIndex !== 'random' && randomPlayerIndexVariants.includes(variantFull)) ||
             variantFull === '0_3' ||
             (vsPSBot && botUser === 'ps-random-mover') ||
+            (opponentType === 'bot' && botUser === 'ps-random-mover') ||
             (variantId[0] == '9' &&
               $goConfig.val() !== undefined &&
               (($goHandicapInput.val() as string) != '0' ||
@@ -555,13 +556,23 @@ export default class Setup {
     const clearFenInput = () => $fenInput.val('');
     setBaseDefaultOptions();
     const c = this.stores[typ].get();
+    const keysWithPossibleValues = [
+      'gameGroup',
+      'variant',
+      'timeModeDefaults',
+      'periods',
+      'playerIndex',
+      'mode',
+      'opponent',
+      'bot',
+    ];
     if (c) {
       Object.keys(c).forEach(k => {
         const possibleValues = $form
           .find(`[name="${k}"]`)
           .get()
           .map(el => (el as HTMLInputElement).value);
-        if (possibleValues.indexOf(c[k]) === -1) return; //for when testing new variants
+        if (keysWithPossibleValues.includes(k) && possibleValues.indexOf(c[k]) === -1) return; //for when testing new variants
         $form.find(`[name="${k}"]`).each(function (this: HTMLInputElement) {
           if (k === 'timeMode' && this.value !== '1') return;
           if (this.type == 'checkbox') this.checked = true;
@@ -1280,6 +1291,9 @@ export default class Setup {
         showRating();
       })
       .trigger('change');
+    $periodsInput.on('change', function (this: HTMLElement) {
+      save();
+    });
     const validateFen = debounce(() => {
       $fenInput.removeClass('success failure');
       const fen = $fenInput.val() as string;
