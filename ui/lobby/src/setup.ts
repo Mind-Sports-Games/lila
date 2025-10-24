@@ -1290,6 +1290,9 @@ export default class Setup {
         showRating();
       })
       .trigger('change');
+    $periodsInput.on('change', function (this: HTMLElement) {
+      save();
+    });
     const validateFen = debounce(() => {
       $fenInput.removeClass('success failure');
       const fen = $fenInput.val() as string;
