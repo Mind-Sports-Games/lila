@@ -77,5 +77,5 @@ class BinaryPieceTest extends Specification {
       }
     }
   }
-  */
+   */
 }

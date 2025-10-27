@@ -692,7 +692,7 @@ object BinaryFormat {
       case GameLogic.Backgammon() =>
         writeBackgammon(backgammon.Board.init(backgammon.variant.Backgammon).pieces)
       case GameLogic.Abalone() => writeAbalone(abalone.Board.init(abalone.variant.Abalone).pieces)
-      case GameLogic.Dameo() => writeDameo(dameo.Board.init(dameo.variant.Dameo).pieces)
+      case GameLogic.Dameo()   => writeDameo(dameo.Board.init(dameo.variant.Dameo).pieces)
       case _ =>
         sys.error("Cant write to binary for lib")
     }

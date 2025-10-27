@@ -64,5 +64,5 @@ class BinaryCLMTest extends Specification {
       read("11110000" :: _0_ :: "00000001" :: "10000110" :: "10011111" :: "00111111" :: Nil) must_== clmt
     }
   }
-  */
+   */
 }

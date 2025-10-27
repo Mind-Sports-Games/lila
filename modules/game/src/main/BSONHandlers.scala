@@ -738,9 +738,10 @@ object BSONHandlers {
                   lastTurn = turnUcis(r strO F.historyLastTurn),
                   currentTurn = turnUcis(r strO F.historyCurrentTurn),
                   //TODO Dameo: Check this halfMoveClock logic
-                  halfMoveClock = actionStrs.flatMap(_.headOption).reverse.indexWhere(san =>
-                    san.contains("x") || san.headOption.exists(_.isLower)
-                  ) atLeast 0,
+                  halfMoveClock = actionStrs
+                    .flatMap(_.headOption)
+                    .reverse
+                    .indexWhere(san => san.contains("x") || san.headOption.exists(_.isLower)) atLeast 0,
                   positionHashes = r.getO[PositionHash](F.positionHashes) | Array.empty
                 ),
                 variant = gameVariant
@@ -945,7 +946,7 @@ object BSONHandlers {
               }),
               F.positionHashes     -> o.history.positionHashes,
               F.historyLastTurn    -> o.history.lastTurnUciString,
-              F.historyCurrentTurn -> o.history.currentTurnUciString,
+              F.historyCurrentTurn -> o.history.currentTurnUciString
             )
           case _ => //chess or fail
             if (o.variant.key == "standard")
