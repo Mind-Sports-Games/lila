@@ -140,11 +140,11 @@ object bits {
         "k" -> sitCanCastle(sit, P2, strategygames.chess.KingSide),
         "q" -> sitCanCastle(sit, P2, strategygames.chess.QueenSide)
       ),
-      "animation"  -> Json.obj("duration" -> ctx.pref.animationMillis),
-      "is3d"       -> ctx.pref.is3d,
-      "i18n"       -> i18nJsObject(i18nKeyes),
+      "animation"               -> Json.obj("duration" -> ctx.pref.animationMillis),
+      "is3d"                    -> ctx.pref.is3d,
+      "i18n"                    -> i18nJsObject(i18nKeyes),
       "standardInitialPosition" -> variant.standardInitialPosition,
-      "variantKey" -> variant.key
+      "variantKey"              -> variant.key
     )
 
   private val i18nKeyes = List(
