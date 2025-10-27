@@ -56,12 +56,12 @@ object Dependencies {
   }
 
   object reactivemongo {
-    val version = "1.0.8"
+    val version = "1.1.0-RC15"
 
     val driver = "org.reactivemongo" %% "reactivemongo"               % version
     val stream = "org.reactivemongo" %% "reactivemongo-akkastream"    % version
     val epoll  = "org.reactivemongo"  % "reactivemongo-shaded-native" % s"$version-linux-x86-64"
-    val kamon  = "org.reactivemongo" %% "reactivemongo-kamon"         % version
+    val kamon  = "org.reactivemongo" %% "reactivemongo-kamon"         % "1.0.8"
     def bundle = Seq(driver, stream)
   }
 
