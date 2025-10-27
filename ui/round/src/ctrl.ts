@@ -777,7 +777,8 @@ export default class RoundController {
       }
     }
     d.game.threefold = !!o.threefold;
-    d.game.perpetualWarning = !!o.perpetualWarning;
+    delete d.game.gameMessage;
+    if (o.gameMessage) d.game.gameMessage = o.gameMessage;
 
     //backgammon need to update initial turnCount if we switch starting player on initial dice roll
     if (
