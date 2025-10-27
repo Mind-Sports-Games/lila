@@ -77,8 +77,10 @@ export default function status(ctrl: Ctrl): string {
           return noarg('checkersConnected');
         case 'breakthrough':
           return noarg('promotion');
-        case 'flipello10':
         case 'flipello':
+        case 'flipello10':
+        case 'antiflipello':
+        case 'octagonflipello':
           return noarg('gameFinished');
         case 'amazons':
           return noarg('gameFinished');

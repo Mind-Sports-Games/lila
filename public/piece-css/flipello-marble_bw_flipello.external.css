@@ -1,2 +1,2 @@
-.flipello.is2d .p-piece.p2, .is2d .variant-flipello .p-piece.p2, .is2d .variant-flipello10 .p-piece.p2 {background-image:url('/assets/piece/flipello/marble_bw_flipello/wP.png')}
-.flipello.is2d .p-piece.p1, .is2d .variant-flipello .p-piece.p1, .is2d .variant-flipello10 .p-piece.p1 {background-image:url('/assets/piece/flipello/marble_bw_flipello/bP.png')}
+.flipello.is2d .p-piece.p2, .is2d .variant-flipello .p-piece.p2, .is2d .variant-flipello10 .p-piece.p2, .is2d .variant-antiflipello .p-piece.p2, .is2d .variant-octagonflipello .p-piece.p2 {background-image:url('/assets/piece/flipello/marble_bw_flipello/wP.png')}
+.flipello.is2d .p-piece.p1, .is2d .variant-flipello .p-piece.p1, .is2d .variant-flipello10 .p-piece.p1, .is2d .variant-antiflipello .p-piece.p1, .is2d .variant-octagonflipello .p-piece.p1 {background-image:url('/assets/piece/flipello/marble_bw_flipello/bP.png')}

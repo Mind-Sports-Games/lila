@@ -34,6 +34,8 @@ export const perf = {
     minixiangqi: '',
     flipello: '',
     flipello10: '',
+    antiflipello: '',
+    octagonflipello10: '',
     amazons: '€',
     breakthroughtroyka: '',
     minibreakthroughtroyka: '',

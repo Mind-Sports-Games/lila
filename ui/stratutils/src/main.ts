@@ -115,8 +115,10 @@ interface Piece {
 
 export function onlyDropsVariantPiece(variant: VariantKey, turnPlayerIndex: 'p1' | 'p2'): Piece | undefined {
   switch (variant) {
-    case 'flipello10':
     case 'flipello':
+    case 'flipello10':
+    case 'antiflipello':
+    case 'octagonflipello':
     case 'amazons':
       return { playerIndex: turnPlayerIndex, role: 'p-piece' };
     case 'go9x9':
@@ -135,6 +137,8 @@ export function onlyDropsVariantPiece(variant: VariantKey, turnPlayerIndex: 'p1'
 const noFishnetVariants: VariantKey[] = [
   'linesOfAction',
   'scrambledEggs',
+  'antiflipello',
+  'octagonflipello',
   'oware',
   'togyzkumalak',
   'bestemshe',

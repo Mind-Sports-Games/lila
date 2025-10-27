@@ -43,8 +43,10 @@ export const possiblePromotion = (
     case 'bestemshe':
     case 'minixiangqi':
     case 'xiangqi':
-    case 'flipello10':
     case 'flipello':
+    case 'flipello10':
+    case 'antiflipello':
+    case 'octagonflipello':
     case 'amazons':
     case 'breakthroughtroyka':
     case 'minibreakthroughtroyka':

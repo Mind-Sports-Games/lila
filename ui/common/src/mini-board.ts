@@ -46,7 +46,9 @@ export const initWith = (node: HTMLElement, fen: string, orientation: Orientatio
           doublingCube: readDoublingCube(fen, variantFromElement($el) as VariantKey),
           showUndoButton: false,
           lastMove: lastMove(
-            ['flipello', 'flipello10', 'go9x9', 'go13x13', 'go19x19'].includes(variantFromElement($el)),
+            ['flipello', 'flipello10', 'antiflipello', 'octagonflipello', 'go9x9', 'go13x13', 'go19x19'].includes(
+              variantFromElement($el),
+            ),
             lm,
           ),
           highlight: {
@@ -69,7 +71,7 @@ export const initWith = (node: HTMLElement, fen: string, orientation: Orientatio
                 ? { width: 5, height: 5 }
                 : $el.hasClass('variant-minixiangqi')
                   ? { width: 7, height: 7 }
-                  : $el.hasClass('variant-flipello10')
+                  : $el.hasClass('variant-flipello10') || $el.hasClass('variant-octagonflipello')
                     ? { width: 10, height: 10 }
                     : $el.hasClass('variant-amazons')
                       ? { width: 10, height: 10 }
@@ -123,31 +125,35 @@ export const variantFromElement = (element: Cash): string => {
             ? 'flipello'
             : element.hasClass('variant-flipello10')
               ? 'flipello10'
-              : element.hasClass('variant-amazons')
-                ? 'amazons'
-                : element.hasClass('variant-oware')
-                  ? 'oware'
-                  : element.hasClass('variant-togyzkumalak')
-                    ? 'togyzkumalak'
-                    : element.hasClass('variant-bestemshe')
-                      ? 'bestemshe'
-                      : element.hasClass('variant-go9x9')
-                        ? 'go9x9'
-                        : element.hasClass('variant-go13x13')
-                          ? 'go13x13'
-                          : element.hasClass('variant-go19x19')
-                            ? 'go19x19'
-                            : element.hasClass('variant-backgammon')
-                              ? 'backgammon'
-                              : element.hasClass('variant-hyper')
-                                ? 'hyper'
-                                : element.hasClass('variant-nackgammon')
-                                  ? 'nackgammon'
-                                  : element.hasClass('variant-abalone')
-                                    ? 'abalone'
-                                    : element.hasClass('variant-threeCheck')
-                                      ? 'threeCheck'
-                                      : element.hasClass('variant-fiveCheck')
-                                        ? 'fiveCheck'
-                                        : 'standard';
+              : element.hasClass('variant-antiflipello')
+                ? 'antiflipello'
+                : element.hasClass('variant-octagonflipello')
+                  ? 'octagonflipello'
+                  : element.hasClass('variant-amazons')
+                    ? 'amazons'
+                    : element.hasClass('variant-oware')
+                      ? 'oware'
+                      : element.hasClass('variant-togyzkumalak')
+                        ? 'togyzkumalak'
+                        : element.hasClass('variant-bestemshe')
+                          ? 'bestemshe'
+                          : element.hasClass('variant-go9x9')
+                            ? 'go9x9'
+                            : element.hasClass('variant-go13x13')
+                              ? 'go13x13'
+                              : element.hasClass('variant-go19x19')
+                                ? 'go19x19'
+                                : element.hasClass('variant-backgammon')
+                                  ? 'backgammon'
+                                  : element.hasClass('variant-hyper')
+                                    ? 'hyper'
+                                    : element.hasClass('variant-nackgammon')
+                                      ? 'nackgammon'
+                                      : element.hasClass('variant-abalone')
+                                        ? 'abalone'
+                                        : element.hasClass('variant-threeCheck')
+                                          ? 'threeCheck'
+                                          : element.hasClass('variant-fiveCheck')
+                                            ? 'fiveCheck'
+                                            : 'standard';
 };

@@ -178,6 +178,7 @@ export default class Setup {
           classical: { timemode: '3', byoyomi: '30', periods: '1', increment: '0', initial: '15' },
         });
       case '5_6': // othello
+      case '5_11': // antiothello
         return Object.assign({}, defaultClockConfig, {
           bullet: { timemode: '1', initial: '1', increment: '0' },
           blitz: { timemode: '1', initial: '5', increment: '0' },
@@ -185,6 +186,7 @@ export default class Setup {
           classical: { timemode: '1', initial: '20', increment: '10' },
         });
       case '5_7': // grand othello
+      case '5_12': // octagon othello
         return Object.assign({}, defaultClockConfig, {
           bullet: { timemode: '1', initial: '2', increment: '0' },
           blitz: { timemode: '1', initial: '8', increment: '0' },
@@ -393,6 +395,7 @@ export default class Setup {
             (playerIndex !== 'random' && randomPlayerIndexVariants.includes(variantFull)) ||
             variantFull === '0_3' ||
             (vsPSBot && botUser === 'ps-random-mover') ||
+            (opponentType === 'bot' && botUser === 'ps-random-mover') ||
             (variantId[0] == '9' &&
               $goConfig.val() !== undefined &&
               (($goHandicapInput.val() as string) != '0' ||
@@ -477,7 +480,12 @@ export default class Setup {
       let variantCompatible = true;
       if (/^stockfish-level[1-8]$/.test(user)) {
         variantCompatible =
-          (variantId[0] === '0' && variantId[1] !== '15') || ['3', '4', '5', '11'].includes(variantId[0]);
+          //disallow monster
+          (variantId[0] === '0' && variantId[1] !== '15') ||
+          //disallow antiflipello, octagonflipello
+          (variantId[0] === '5' && !['11', '12'].includes(variantId[1])) ||
+          //allow all shogi, xiangqi, breakthrough
+          ['3', '4', '11'].includes(variantId[0]);
       } else {
         switch (user) {
           case 'ps-greedy-four-move': {
@@ -548,8 +556,23 @@ export default class Setup {
     const clearFenInput = () => $fenInput.val('');
     setBaseDefaultOptions();
     const c = this.stores[typ].get();
+    const keysWithPossibleValues = [
+      'gameGroup',
+      'variant',
+      'timeModeDefaults',
+      'periods',
+      'playerIndex',
+      'mode',
+      'opponent',
+      'bot',
+    ];
     if (c) {
       Object.keys(c).forEach(k => {
+        const possibleValues = $form
+          .find(`[name="${k}"]`)
+          .get()
+          .map(el => (el as HTMLInputElement).value);
+        if (keysWithPossibleValues.includes(k) && possibleValues.indexOf(c[k]) === -1) return; //for when testing new variants
         $form.find(`[name="${k}"]`).each(function (this: HTMLInputElement) {
           if (k === 'timeMode' && this.value !== '1') return;
           if (this.type == 'checkbox') this.checked = true;
@@ -732,6 +755,12 @@ export default class Setup {
               break;
             case '7':
               key = 'flipello10';
+              break;
+            case '11':
+              key = 'antiflipello';
+              break;
+            case '12':
+              key = 'octagonflipello';
               break;
           }
           break;
@@ -1262,6 +1291,9 @@ export default class Setup {
         showRating();
       })
       .trigger('change');
+    $periodsInput.on('change', function (this: HTMLElement) {
+      save();
+    });
     const validateFen = debounce(() => {
       $fenInput.removeClass('success failure');
       const fen = $fenInput.val() as string;

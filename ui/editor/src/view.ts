@@ -101,6 +101,7 @@ const allVariants: Array<[stratopsVariantKey, string]> = [
   [stratopsVariantKey.scrambledEggs, 'Scrambled Eggs'],
   [stratopsVariantKey.flipello, 'Othello'],
   [stratopsVariantKey.flipello10, 'Grand Othello'],
+  [stratopsVariantKey.antiflipello, 'AntiOthello'],
   [stratopsVariantKey.xiangqi, 'Xiangqi'],
   [stratopsVariantKey.minixiangqi, 'Mini Xiangqi'],
   [stratopsVariantKey.amazons, 'Amazons'],
@@ -326,10 +327,10 @@ function renderMetadata(ctrl: EditorCtrl, state: EditorState): VNode {
         ])
       : null,
     ctrl.variantKey == 'amazons'
-      ? h('div.lastMove', [
-          h('label', { attrs: { for: 'last-move-select' } }, 'Last Move'),
+      ? h('div.lastAction', [
+          h('label', { attrs: { for: 'last-action-select' } }, 'Last Move'),
           h(
-            'select#last-move-select',
+            'select#last-action-select',
             {
               key: coords.join(','), // force a re-render if the list of options change
               on: {
@@ -419,7 +420,16 @@ function sparePieces(
   let pieces = ['k-piece', 'q-piece', 'r-piece', 'b-piece', 'n-piece', 'p-piece'].map(function (role) {
     return [playerIndex, role];
   });
-  if (['breakthroughtroyka', 'minibreakthroughtroyka', 'flipello', 'flipello10'].includes(ctrl.variantKey)) {
+  if (
+    [
+      'breakthroughtroyka',
+      'minibreakthroughtroyka',
+      'flipello',
+      'flipello10',
+      'antiflipello',
+      'octagonflipello',
+    ].includes(ctrl.variantKey)
+  ) {
     pieces = ['p-piece'].map(function (role) {
       return [playerIndex, role];
     });
