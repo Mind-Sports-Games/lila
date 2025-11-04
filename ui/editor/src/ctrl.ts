@@ -1,6 +1,6 @@
 import { EditorState, Selected, Redraw, CastlingToggle, CastlingToggles, CASTLING_TOGGLES } from './interfaces';
 import { Api as CgApi } from 'chessground/api';
-import { Rules, Square } from 'stratops/types';
+import { NormalMove, Rules, Square } from 'stratops/types';
 import { SquareSet } from 'stratops/squareSet';
 import { Setup, Material, RemainingChecks } from 'stratops/setup';
 import { Board, Castles, makeSquare } from 'stratops';
@@ -11,7 +11,6 @@ import { replacePocketsInFen } from 'common/editor';
 import throttle from 'common/throttle';
 import { variantClass, variantClassFromKey, variantKeyToRules } from 'stratops/variants/util';
 import { Variant as CGVariant } from 'chessground/types';
-import { type VariantKey } from 'stratops/variants/types';
 
 export default class EditorCtrl {
   cfg: Editor.Config;
@@ -23,7 +22,7 @@ export default class EditorCtrl {
 
   selected: Prop<Selected>;
 
-  initialFen: string;
+  initialFen: string; // FEN as loaded or set by user. May be distinct from getFenFromSetup() or getLegalFen() which represent the current position.
   pockets: Material | undefined;
   turn: PlayerIndex;
   unmovedRooks: SquareSet | undefined;
@@ -32,6 +31,7 @@ export default class EditorCtrl {
   remainingChecks: fp.Option<RemainingChecks>;
   halfmoves: number;
   fullmoves: number;
+  lastAction: NormalMove | undefined; // TODO: create the Action type (Move, Drop, EndTurn etc) in stratops and update this to be an Action.
 
   rules: Rules;
   standardInitialPosition: boolean;
@@ -51,14 +51,14 @@ export default class EditorCtrl {
     this.variantKey = (cfg.variantKey || 'standard') as VariantKey;
     const variant = variantClassFromKey(this.variantKey);
     this.rules = variantKeyToRules(this.variantKey);
-    this.initialFen = cfg.fen || params.get('fen') || variant.getInitialFen();
+    this.initialFen = cfg.fen || params.get('fen') || variant.getInitialFen(this.turn);
     this.standardInitialPosition = cfg.standardInitialPosition;
     this.turn = cfg.playerIndex || 'p1';
 
     this.extraPositions = [
       {
         fen: variant.getInitialBoardFen(),
-        epd: `${variant.getInitialBoardFen} ${variant.getInitialEpd()}`,
+        epd: `${variant.getInitialBoardFen} ${variant.getInitialEpd(this.turn)}`,
         name: this.trans('startPosition'),
       },
       {
@@ -104,9 +104,12 @@ export default class EditorCtrl {
     const variant = variantClassFromKey(this.variantKey);
     if (this.chessground)
       fen = this.chessground.getFen(); // @Note: chessground.getFen() returns the board part of the FEN
-    else fen = this.initialFen || variant.getInitialFen();
+    else fen = this.initialFen || variant.getInitialFen(this.turn);
 
-    if (fen.split(' ').length === 1) fen += ` ${variant.getInitialEpd()} ${variant.getInitialMovesFen()}`;
+    if (fen.split(' ').length === 1) {
+      // because it would come from chessground
+      fen += ` ${variant.getInitialEpd(this.turn)} ${variant.getInitialMovesFen(this.turn)}`;
+    }
 
     const board = variant.parseFen(fen).unwrap(
       setup => setup.board,
@@ -120,8 +123,12 @@ export default class EditorCtrl {
       unmovedRooks: this.unmovedRooks || parseCastlingFen(board)(this.castlingToggleFen()).unwrap(),
       epSquare: this.epSquare,
       remainingChecks: this.remainingChecks,
-      halfmoves: this.halfmoves ?? 0,
+      halfmoves: this.variantKey === 'amazons' ? (this.turn === 'p1' ? 0 : 1) : (this.halfmoves ?? 0),
       fullmoves: this.fullmoves ?? 1,
+      lastMove:
+        this.lastAction && 'from' in this.lastAction && 'to' in this.lastAction
+          ? { from: this.lastAction.from, to: this.lastAction.to }
+          : undefined,
     };
   }
 
@@ -148,7 +155,7 @@ export default class EditorCtrl {
   onChange(): void {
     const variant = variantClassFromKey(this.variantKey);
     let fen = this.getFenFromSetup();
-    const legalFen = this.getLegalFen();
+    let legalFen = this.getLegalFen();
     const enPassantOptions = variant.allowEnPassant() && legalFen ? (variant as any).getEnPassantOptions(legalFen) : [];
 
     if (
@@ -161,12 +168,17 @@ export default class EditorCtrl {
     }
 
     fen = variant.allowEnPassant() ? (variant as any).fixFenForEp(fen) : fen;
+    const newFen = variant.allowMultiAction() ? (variant as any).fixFenForLastAction(fen, this.lastAction) : fen;
+    if (fen !== newFen) {
+      this.lastAction = undefined;
+      legalFen = this.getLegalFen();
+    }
 
     this.standardInitialPosition = this.isVariantStandardInitialPosition();
     if (!this.cfg.embed) {
-      this.replaceState({ rules: this.rules, variantKey: this.variantKey, fen }, this.makeUrl('/editor/', fen));
+      this.replaceState({ rules: this.rules, variantKey: this.variantKey, fen: newFen }, this.makeUrl('/editor/', fen));
     }
-    this.options.onChange && this.options.onChange(fen);
+    this.options.onChange && this.options.onChange(newFen);
     this.redraw();
   }
 
@@ -189,14 +201,20 @@ export default class EditorCtrl {
   makeAnalysisUrl(legalFen: string): string {
     return (
       `/analysis/${this.variantKey}/` +
-      encodeURIComponent(replacePocketsInFen(legalFen)).replace(/%20/g, '_').replace(/%2F/g, '/')
+      encodeURIComponent(replacePocketsInFen(legalFen))
+        .replace(/%20/g, '_')
+        .replace(/%2F/g, '/')
+        .replace(/%C2%BD/g, '½')
     );
   }
 
   makeUrl(baseUrl: string, fen: string): string {
     return (
       baseUrl +
-      encodeURIComponent(fen).replace(/%20/g, '_').replace(/%2F/g, '/') +
+      encodeURIComponent(fen)
+        .replace(/%20/g, '_')
+        .replace(/%2F/g, '/')
+        .replace(/%C2%BD/g, '½') +
       `${this.variantKey === 'standard' ? '' : '?variant=' + this.variantKey}`
     );
   }
@@ -218,6 +236,7 @@ export default class EditorCtrl {
   setTurn(turn: PlayerIndex): void {
     this.turn = turn;
     this.epSquare = undefined;
+    this.lastAction = undefined;
     this.onChange();
   }
 
@@ -226,12 +245,17 @@ export default class EditorCtrl {
     this.onChange();
   }
 
+  setLastAction(lastAction: number | undefined): void {
+    this.lastAction = lastAction !== undefined ? { from: lastAction, to: lastAction } : undefined; // Note: will need to be updated when Action type is created
+    this.onChange();
+  }
+
   startPosition = () => {
-    this.setFen(variantClassFromKey(this.variantKey).getInitialFen());
+    this.setFen(variantClassFromKey(this.variantKey).getInitialFen(this.turn));
   };
 
   clearBoard = () => {
-    this.setFen(variantClassFromKey(this.variantKey).getEmptyFen());
+    this.setFen(variantClassFromKey(this.variantKey).getEmptyFen(this.turn));
   };
 
   loadNewFen(fen: string | 'prompt'): void {
@@ -270,6 +294,12 @@ export default class EditorCtrl {
           this.castlingToggles['q'] = defined(castles.rook.p2.a);
         }
 
+        if (variant.family === 'amazons') {
+          const lastAction = setup.lastMove as NormalMove | undefined;
+          if (lastAction)
+            this.setLastAction(lastAction.to); // Note: will need to be updated when Action type is created
+          else this.setLastAction(undefined);
+        }
         this.initialFen = fen;
         this.onChange();
         return true;
@@ -285,11 +315,11 @@ export default class EditorCtrl {
     this.variantKey = variantKey;
     const variant = variantClassFromKey(variantKey);
     this.turn = 'p1';
-    this.initialFen = variant.getInitialFen();
+    this.initialFen = variant.getInitialFen(this.turn);
     this.extraPositions = [
       {
-        fen: variant.getInitialFen(),
-        epd: `${variant.getInitialBoardFen()} ${variant.getInitialEpd()}`,
+        fen: variant.getInitialFen(this.turn),
+        epd: `${variant.getInitialBoardFen()} ${variant.getInitialEpd(this.turn)}`,
         name: this.trans('startPosition'),
       },
       {

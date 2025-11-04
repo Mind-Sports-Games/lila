@@ -22,6 +22,7 @@ export function canUseBoardEditor(variantKey: VariantKey): boolean {
     'antiflipello',
     'xiangqi',
     'minixiangqi',
+    'amazons',
   ].includes(variantKey);
 }
 

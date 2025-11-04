@@ -58,6 +58,17 @@
           width: 9ch;
         }
       }
+
+      .lastAction {
+        @extend %flex-between;
+        margin-top: 1em;
+        label {
+          font-weight: bold;
+        }
+        select {
+          width: 12ch;
+        }
+      }
     }
 
     .actions {
