@@ -326,10 +326,10 @@ function renderMetadata(ctrl: EditorCtrl, state: EditorState): VNode {
         ])
       : null,
     ctrl.variantKey == 'amazons'
-      ? h('div.lastMove', [
-          h('label', { attrs: { for: 'last-move-select' } }, 'Last Move'),
+      ? h('div.lastAction', [
+          h('label', { attrs: { for: 'last-action-select' } }, 'Last Move'),
           h(
-            'select#last-move-select',
+            'select#last-action-select',
             {
               key: coords.join(','), // force a re-render if the list of options change
               on: {
