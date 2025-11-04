@@ -101,6 +101,7 @@ const allVariants: Array<[stratopsVariantKey, string]> = [
   [stratopsVariantKey.scrambledEggs, 'Scrambled Eggs'],
   [stratopsVariantKey.flipello, 'Othello'],
   [stratopsVariantKey.flipello10, 'Grand Othello'],
+  [stratopsVariantKey.antiflipello, 'AntiOthello'],
   [stratopsVariantKey.xiangqi, 'Xiangqi'],
   [stratopsVariantKey.minixiangqi, 'Mini Xiangqi'],
   [stratopsVariantKey.amazons, 'Amazons'],
