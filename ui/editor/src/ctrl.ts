@@ -123,7 +123,7 @@ export default class EditorCtrl {
       unmovedRooks: this.unmovedRooks || parseCastlingFen(board)(this.castlingToggleFen()).unwrap(),
       epSquare: this.epSquare,
       remainingChecks: this.remainingChecks,
-      halfmoves: this.halfmoves ?? 0,
+      halfmoves: this.variantKey === 'amazons' ? (this.turn === 'p1' ? 0 : 1) : (this.halfmoves ?? 0),
       fullmoves: this.fullmoves ?? 1,
       lastMove:
         this.lastAction && 'from' in this.lastAction && 'to' in this.lastAction
