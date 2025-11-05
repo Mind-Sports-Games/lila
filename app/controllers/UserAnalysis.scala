@@ -58,8 +58,10 @@ final class UserAnalysis(
 
   private[controllers] def makePov(fen: Option[FEN], variant: Variant): Pov =
     makePov {
-      fen.filter(_.value.nonEmpty).flatMap {
-        Forsyth.<<<@(variant.gameLogic, variant, _)
+      fen.filter(_.value.nonEmpty)
+      .map(s => FEN.clean(variant.gameLogic, s.value))
+      .flatMap {
+        f => Forsyth.<<<@(variant.gameLogic, variant, f)
       } | SituationPlus(Situation(variant.gameLogic, variant), 1)
     }
 
