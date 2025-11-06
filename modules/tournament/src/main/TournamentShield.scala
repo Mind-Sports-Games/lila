@@ -875,13 +875,13 @@ object TournamentShield {
           1
         )
 
-    //case object OctagonFlipello
-    //    extends Category(
-    //      Variant.FairySF(strategygames.fairysf.variant.OctagonFlipello),
-    //      Blitz32,
-    //      6,
-    //      1
-    //    )
+    case object OctagonFlipello
+        extends Category(
+          Variant.FairySF(strategygames.fairysf.variant.OctagonFlipello),
+          Blitz32,
+          6,
+          1
+        )
 
     case object Amazons
         extends Category(
@@ -1010,7 +1010,7 @@ object TournamentShield {
       Flipello,
       Flipello10,
       AntiFlipello,
-      //OctagonFlipello,
+      OctagonFlipello,
       Amazons,
       BreakthroughTroyka,
       MiniBreakthroughTroyka,
