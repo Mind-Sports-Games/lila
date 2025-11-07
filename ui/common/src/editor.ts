@@ -23,6 +23,7 @@ export function canUseBoardEditor(variantKey: VariantKey): boolean {
     'octagonflipello',
     'xiangqi',
     'minixiangqi',
+    'amazons',
   ].includes(variantKey);
 }
 

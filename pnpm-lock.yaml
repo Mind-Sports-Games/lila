@@ -12,11 +12,11 @@ importers:
         specifier: github:lichess-org/ab-stub
         version: https://codeload.github.com/lichess-org/ab-stub/tar.gz/94236bf34dbc9c05daf50f4c9842d859b9142be0
       chessground:
-        specifier: github:Mind-Sports-Games/chessground#v7.11.1-pstrat3.19
-        version: https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/fd03b2cfd00bbb13e48596cb437fac842bca721a
+        specifier: github:Mind-Sports-Games/chessground#v7.11.1-pstrat3.20
+        version: https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/242db3565ed4855538e3a7256aab7df2906f02d1
       stratops:
-        specifier: github:Mind-Sports-Games/stratops#v0.8.1-pstrat5.19
-        version: https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/ed6bb11923ae4105d41a47a57dbe1361881a0c6a
+        specifier: github:Mind-Sports-Games/stratops#v0.8.1-pstrat5.20
+        version: https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/597a43e3f5997af83ac2a1384cf6e021b6f4a712
       xml2js:
         specifier: ^0.6.2
         version: 0.6.2
@@ -840,10 +840,10 @@ packages:
     resolution: {tarball: https://codeload.github.com/ornicar/chess.js/tar.gz/ad0709c0b07773d9d0da8e4605a9a2a28f00d249}
     version: 0.10.2
 
-  chessground@https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/fd03b2cfd00bbb13e48596cb437fac842bca721a:
-    resolution: {tarball: https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/fd03b2cfd00bbb13e48596cb437fac842bca721a}
+  chessground@https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/242db3565ed4855538e3a7256aab7df2906f02d1:
+    resolution: {tarball: https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/242db3565ed4855538e3a7256aab7df2906f02d1}
     version: 7.11.1-pstrat3.19
-    engines: {node: '>=20.19.4 <=22.19.0', pnpm: ^10.17.0}
+    engines: {node: ^20.19.4, pnpm: ^10.17.0}
 
   chokidar@3.6.0:
     resolution: {integrity: sha512-7VT13fmjotKpGipCW9JEQAusEPE+Ei8nl6/g4FBAmIm0GOOLMua9NDDo/DWp0ZAxCr3cPq5ZpBqmPAQgDda2Pw==}
@@ -1357,8 +1357,8 @@ packages:
   safari-14-idb-fix@1.0.6:
     resolution: {integrity: sha512-oTEQOdMwRX+uCtWCKT1nx2gAeSdpr8elg/2gcaKUH00SJU2xWESfkx11nmXwTRHy7xfQoj1o4TTQvdmuBosTnA==}
 
-  sax@1.4.2:
-    resolution: {integrity: sha512-FySGAa0RGcFiN6zfrO9JvK1r7TB59xuzCcTHOBXBNoKgDejlOQCR2KL/FGk3/iDlsqyYg1ELZpOmlg09B01Czw==}
+  sax@1.4.3:
+    resolution: {integrity: sha512-yqYn1JhPczigF94DMS+shiDMjDowYO6y9+wB/4WgO0Y19jWYk0lQ4tuG5KI7kj4FTp1wxPj5IFfcrz/s1c3jjQ==}
 
   scheduler@0.27.0:
     resolution: {integrity: sha512-eNv+WrVbKu1f3vbYJT/xtiF5syA5HPIMtf9IgY/nKg0sWqzAUEvqY/xm7OcZc/qafLx/iO9FgOmeSAp4v5ti/Q==}
@@ -1399,10 +1399,10 @@ packages:
     resolution: {integrity: sha512-wHMNIOjkm/YNE5EM3RCbr/+DVgPg6AqQAX1eOxO46zYNvCXjKP5Y865tqQj3EXnaMBjkxmQA5jFuDpDK/dbfiA==}
     engines: {node: '>=8.3.0'}
 
-  stratops@https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/ed6bb11923ae4105d41a47a57dbe1361881a0c6a:
-    resolution: {tarball: https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/ed6bb11923ae4105d41a47a57dbe1361881a0c6a}
+  stratops@https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/597a43e3f5997af83ac2a1384cf6e021b6f4a712:
+    resolution: {tarball: https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/597a43e3f5997af83ac2a1384cf6e021b6f4a712}
     version: 0.8.1-pstrat5.19
-    engines: {node: '>=20.19.4 <=22.19.0', pnpm: ^10.17.0}
+    engines: {node: ^20.19.4, pnpm: ^10.17.0}
 
   string-argv@0.3.2:
     resolution: {integrity: sha512-aqD2Q0144Z+/RqG52NeHEkZauTAUWJO8c6yTftGJKO3Tja5tUgIfmIl6kExvhtxSDP7fXB6DvzkfMpCd/F3G+Q==}
@@ -1786,7 +1786,7 @@ snapshots:
 
   chess.js@https://codeload.github.com/ornicar/chess.js/tar.gz/ad0709c0b07773d9d0da8e4605a9a2a28f00d249: {}
 
-  chessground@https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/fd03b2cfd00bbb13e48596cb437fac842bca721a: {}
+  chessground@https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/242db3565ed4855538e3a7256aab7df2906f02d1: {}
 
   chokidar@3.6.0:
     dependencies:
@@ -2301,7 +2301,7 @@ snapshots:
 
   safari-14-idb-fix@1.0.6: {}
 
-  sax@1.4.2: {}
+  sax@1.4.3: {}
 
   scheduler@0.27.0: {}
 
@@ -2331,7 +2331,7 @@ snapshots:
 
   snabbdom@3.5.1: {}
 
-  stratops@https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/ed6bb11923ae4105d41a47a57dbe1361881a0c6a:
+  stratops@https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/597a43e3f5997af83ac2a1384cf6e021b6f4a712:
     dependencies:
       '@badrap/result': 0.2.13
 
@@ -2411,7 +2411,7 @@ snapshots:
 
   xml2js@0.6.2:
     dependencies:
-      sax: 1.4.2
+      sax: 1.4.3
       xmlbuilder: 11.0.1
 
   xmlbuilder@11.0.1: {}
