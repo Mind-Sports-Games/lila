@@ -294,7 +294,7 @@ export default class EditorCtrl {
           this.castlingToggles['q'] = defined(castles.rook.p2.a);
         }
 
-        if (variant.family === 'amazons') {
+        if (variant.family === 'amazons' || this.variantKey === 'monster') {
           const lastAction = setup.lastMove as NormalMove | undefined;
           if (lastAction)
             this.setLastAction(lastAction.to); // Note: will need to be updated when Action type is created
