@@ -247,11 +247,11 @@ function controls(ctrl: EditorCtrl, state: EditorState): VNode {
 
 function renderMetadata(ctrl: EditorCtrl, state: EditorState): VNode {
   const variant = variantClassFromKey(ctrl.variantKey);
-  const coords = variant.getPiecesCoordinates(ctrl.getFenFromSetup(), ctrl.turn).map(c => c.coord);
+  const coords = variant.getPiecesCoordinates(ctrl.getFenFromSetup(), ctrl.turn);
   const lastMoveValue =
-    ctrl.variantKey === stratopsVariantKey.amazons &&
+    (ctrl.variantKey === stratopsVariantKey.amazons || ctrl.variantKey === stratopsVariantKey.monster) &&
     ctrl.lastAction &&
-    coords.includes(makeSquare(ctrl.rules)(ctrl.lastAction.to))
+    coords.map(c => c.coord).includes(makeSquare(ctrl.rules)(ctrl.lastAction.to))
       ? makeSquare(ctrl.rules)(ctrl.lastAction.to)
       : '';
 
@@ -305,6 +305,9 @@ function renderMetadata(ctrl: EditorCtrl, state: EditorState): VNode {
               on: {
                 change(e) {
                   ctrl.setEnPassant(parseSquare(ctrl.rules)((e.target as HTMLSelectElement).value));
+                  if(ctrl.variantKey == stratopsVariantKey.monster) {
+                    ctrl.setLastAction(undefined);
+                  }
                 },
               },
               props: { value: ctrl.epSquare ? makeSquare(ctrl.rules)(ctrl.epSquare) : '' },
@@ -326,21 +329,25 @@ function renderMetadata(ctrl: EditorCtrl, state: EditorState): VNode {
           ),
         ])
       : null,
-    ctrl.variantKey == 'amazons'
+    ctrl.variantKey == stratopsVariantKey.amazons
+    || (ctrl.variantKey == stratopsVariantKey.monster && ctrl.turn == 'p1')
       ? h('div.lastAction', [
           h('label', { attrs: { for: 'last-action-select' } }, 'Last Move'),
           h(
             'select#last-action-select',
             {
-              key: coords.join(','), // force a re-render if the list of options change
+              key: coords.map(c => c.coord).join(','), // force a re-render if the list of options change
               on: {
                 change(e) {
                   ctrl.setLastAction(parseSquare(ctrl.rules)((e.target as HTMLSelectElement).value));
+                  if(ctrl.variantKey == stratopsVariantKey.monster) {
+                    ctrl.setEnPassant(undefined);
+                  }
                 },
               },
               props: { value: lastMoveValue },
             },
-            [undefined, ...variant.getPiecesCoordinates(ctrl.getFenFromSetup(), ctrl.turn)].map(c =>
+            [undefined, ...coords].map(c =>
               h(
                 'option',
                 {
