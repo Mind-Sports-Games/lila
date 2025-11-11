@@ -305,7 +305,7 @@ function renderMetadata(ctrl: EditorCtrl, state: EditorState): VNode {
               on: {
                 change(e) {
                   ctrl.setEnPassant(parseSquare(ctrl.rules)((e.target as HTMLSelectElement).value));
-                  if(ctrl.variantKey == stratopsVariantKey.monster) {
+                  if (ctrl.variantKey == stratopsVariantKey.monster) {
                     ctrl.setLastAction(undefined);
                   }
                 },
@@ -329,8 +329,8 @@ function renderMetadata(ctrl: EditorCtrl, state: EditorState): VNode {
           ),
         ])
       : null,
-    ctrl.variantKey == stratopsVariantKey.amazons
-    || (ctrl.variantKey == stratopsVariantKey.monster && ctrl.turn == 'p1')
+    ctrl.variantKey == stratopsVariantKey.amazons ||
+    (ctrl.variantKey == stratopsVariantKey.monster && ctrl.turn == 'p1')
       ? h('div.lastAction', [
           h('label', { attrs: { for: 'last-action-select' } }, 'Last Move'),
           h(
@@ -340,7 +340,7 @@ function renderMetadata(ctrl: EditorCtrl, state: EditorState): VNode {
               on: {
                 change(e) {
                   ctrl.setLastAction(parseSquare(ctrl.rules)((e.target as HTMLSelectElement).value));
-                  if(ctrl.variantKey == stratopsVariantKey.monster) {
+                  if (ctrl.variantKey == stratopsVariantKey.monster) {
                     ctrl.setEnPassant(undefined);
                   }
                 },
