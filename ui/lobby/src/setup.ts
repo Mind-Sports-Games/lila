@@ -483,7 +483,7 @@ export default class Setup {
           //disallow monster
           (variantId[0] === '0' && variantId[1] !== '15') ||
           //disallow antiflipello, octagonflipello
-          (variantId[0] === '5' && !['11', '12'].includes(variantId[1])) ||
+          (variantId[0] === '5' && !['11'].includes(variantId[1])) ||
           //allow all shogi, xiangqi, breakthrough
           ['3', '4', '11'].includes(variantId[0]);
       } else {
