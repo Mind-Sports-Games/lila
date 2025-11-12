@@ -41,16 +41,16 @@ object topnav {
           a(href := routes.Memory.home)(trans.memoryGame())
         )
       ),
-      /*ctx.noBot option st.section(
+      ctx.noBot option st.section(
         linkTitle(routes.Puzzle.home.path, trans.puzzles()),
         div(role := "group")(
           a(href := routes.Puzzle.home)(trans.puzzles()),
-          a(href := routes.Puzzle.dashboard(30, "home"))(trans.puzzle.puzzleDashboard()),
-          a(href := routes.Puzzle.streak)("Puzzle Streak"),
-          a(href := routes.Storm.home)("Puzzle Storm"),
-          a(href := routes.Racer.home)("Puzzle Racer")
+          a(href := routes.Puzzle.dashboard(30, "home"))(trans.puzzle.puzzleDashboard())
+          // a(href := routes.Puzzle.streak)("Puzzle Streak")
+          // a(href := routes.Storm.home)("Puzzle Storm"),
+          // a(href := routes.Racer.home)("Puzzle Racer")
         )
-      ),*/
+      ),
       st.section(
         //linkTitle(routes.Practice.index.path, trans.learnMenu()),
         linkTitle(routes.Page.variantHome.path, trans.learnMenu()),

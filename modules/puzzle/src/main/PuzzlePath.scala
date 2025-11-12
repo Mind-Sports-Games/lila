@@ -8,9 +8,11 @@ import lila.common.Iso
 
 private object PuzzlePath {
 
+  val sep = '|'
+
   case class Id(value: String) {
 
-    val parts = value split '_'
+    val parts = value.split(sep)
 
     private[puzzle] def tier = PuzzleTier.from(~parts.lift(1))
 
@@ -25,15 +27,16 @@ final private class PuzzlePathApi(
 )(implicit ec: ExecutionContext) {
 
   import BsonHandlers._
+  import PuzzlePath._
 
   def nextFor(
       user: User,
       theme: PuzzleTheme.Key,
       tier: PuzzleTier,
       difficulty: PuzzleDifficulty,
-      previousPaths: Set[PuzzlePath.Id],
+      previousPaths: Set[Id],
       compromise: Int = 0
-  ): Fu[Option[PuzzlePath.Id]] = {
+  ): Fu[Option[Id]] = {
     val actualTier =
       if (tier == PuzzleTier.Top && PuzzleDifficulty.isExtreme(difficulty)) PuzzleTier.Good
       else tier
@@ -50,7 +53,7 @@ final private class PuzzlePathApi(
             Sample(1),
             Project($id(true))
           )
-        }.dmap(_.flatMap(_.getAsOpt[PuzzlePath.Id]("_id")))
+        }.dmap(_.flatMap(_.getAsOpt[Id]("_id")))
       }
       .flatMap {
         case Some(path) => fuccess(path.some)
@@ -65,7 +68,7 @@ final private class PuzzlePathApi(
   }.mon(_.puzzle.path.nextFor(theme.value, tier.key, difficulty.key, previousPaths.size, compromise))
 
   def select(theme: PuzzleTheme.Key, tier: PuzzleTier, rating: Range) = $doc(
-    "min" $lte f"${theme}_${tier}_${rating.max}%04d",
-    "max" $gte f"${theme}_${tier}_${rating.min}%04d"
+    "min" $lte f"${theme}${sep}${tier}${sep}${rating.max}%04d",
+    "max" $gte f"${theme}${sep}${tier}${sep}${rating.min}%04d"
   )
 }

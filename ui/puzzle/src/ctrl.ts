@@ -11,6 +11,7 @@ import { Api as CgApi } from 'chessground/api';
 import { build as treeBuild, ops as treeOps, path as treePath, TreeWrapper } from 'tree';
 import { Chess } from 'stratops/chess';
 import { chessgroundDests, scalachessCharPair } from 'stratops/compat';
+import * as cg from 'chessground/types';
 import { Config as CgConfig } from 'chessground/config';
 import { ctrl as cevalCtrl, CevalCtrl } from 'ceval';
 import { defer } from 'common/defer';
@@ -84,7 +85,7 @@ export default function (opts: PuzzleOpts, redraw: Redraw): Controller {
     vm.lastFeedback = 'init';
     vm.initialPath = initialPath;
     vm.initialNode = tree.nodeAtPath(initialPath);
-    vm.pov = vm.initialNode.playerIndex;
+    vm.pov = vm.initialNode.ply % 2 === 1 ? 'p2' : 'p1'; //vm.initialNode.playerIndex;
 
     setPath(treePath.init(initialPath));
     setTimeout(() => {
@@ -115,7 +116,7 @@ export default function (opts: PuzzleOpts, redraw: Redraw): Controller {
 
   function makeCgOpts(): CgConfig {
     const node = vm.node;
-    const playerIndex: PlayerIndex = node.playerIndex;
+    const playerIndex: PlayerIndex = node.ply % 2 === 0 ? 'p1' : 'p2'; //node.playerIndex;
     const dests = chessgroundDests('chess')(position());
     const nextNode = vm.node.children[0];
     const canMove = vm.mode === 'view' || (playerIndex === vm.pov && (!nextNode || nextNode.puzzle == 'fail'));
@@ -139,9 +140,9 @@ export default function (opts: PuzzleOpts, redraw: Redraw): Controller {
       },
       check: !!node.check,
       lastMove: uciToLastMove(node.uci),
-      dimensions: vm.cgConfig.dimensions,
-      variant: vm.cgConfig.variant,
-      chess960: vm.cgConfig.chess960,
+      dimensions: { width: 8, height: 8 }, //vm.cgConfig.dimensions,
+      variant: 'standard' as cg.Variant, //vm.cgConfig.variant,
+      chess960: false, //vm.cgConfig.chess960,
     };
     if (node.ply >= vm.initialNode.ply) {
       if (vm.mode !== 'view' && playerIndex !== vm.pov && !nextNode) {
