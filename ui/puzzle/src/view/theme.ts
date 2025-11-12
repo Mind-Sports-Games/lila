@@ -2,6 +2,7 @@ import { bind, dataIcon } from '../util';
 import { Controller, MaybeVNode } from '../interfaces';
 import { h, VNode } from 'snabbdom';
 
+//TODO create this study for chess and other variants
 const studyUrl = 'https://playstrategy.org/study/viiWlKjv';
 
 export default function theme(ctrl: Controller): MaybeVNode {

@@ -3,6 +3,7 @@ package lila.puzzle
 import cats.data.NonEmptyList
 import strategygames.format.{ FEN, Forsyth, Uci }
 import strategygames.{ Player => PlayerIndex, GameLogic }
+import strategygames.variant.Variant
 
 import lila.rating.Glicko
 import lila.common.Iso
@@ -18,6 +19,9 @@ case class Puzzle(
     themes: Set[PuzzleTheme.Key]
 ) {
 
+  //TODO support lib/variant keys in db and transform here.
+  def variant: Variant = Variant.default(GameLogic.Chess())
+
   // ply after "initial move" when we start solving
   def initialPly: Int =
     fen.fullMove ?? { fm =>
@@ -26,9 +30,9 @@ case class Puzzle(
 
   lazy val fenAfterInitialMove: FEN = {
     for {
-      sit1 <- Forsyth.<<(GameLogic.Chess(), fen)
+      sit1 <- Forsyth.<<(variant.gameLogic, fen)
       sit2 <- sit1.move(line.head).toOption.map(_.situationAfter)
-    } yield Forsyth.>>(GameLogic.Chess(), sit2)
+    } yield Forsyth.>>(variant.gameLogic, sit2)
   } err s"Can't apply puzzle $id first move"
 
   def playerIndex = fen.player.fold[PlayerIndex](PlayerIndex.P1)(!_)

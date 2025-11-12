@@ -1,6 +1,7 @@
 import { bind, dataIcon } from '../util';
 import { Controller, MaybeVNodes } from '../interfaces';
 import { h, VNode } from 'snabbdom';
+import { allowedForVariant as allowClientEvalForVariant } from 'ceval/src/util';
 
 const renderVote = (ctrl: Controller): VNode =>
   h(
@@ -59,6 +60,7 @@ const renderStreak = (ctrl: Controller): MaybeVNodes => [
 export default function (ctrl: Controller): VNode {
   const data = ctrl.getData();
   const win = ctrl.vm.lastFeedback == 'win';
+  const canUseCeval = allowClientEvalForVariant(ctrl.vm.variant);
   return h(
     'div.puzzle__feedback.after',
     ctrl.streak && !win
@@ -67,14 +69,16 @@ export default function (ctrl: Controller): VNode {
           h('div.complete', ctrl.trans.noarg(win ? 'puzzleSuccess' : 'puzzleComplete')),
           data.user ? renderVote(ctrl) : renderContinue(ctrl),
           h('div.puzzle__more', [
-            h('a', {
-              attrs: {
-                'data-icon': '',
-                href: `/analysis/${ctrl.vm.node.fen.replace(/ /g, '_')}?playerIndex=${ctrl.vm.pov}#practice`,
-                title: ctrl.trans.noarg('playWithTheMachine'),
-                target: '_blank',
-              },
-            }),
+            canUseCeval
+              ? h('a', {
+                  attrs: {
+                    'data-icon': '',
+                    href: `/analysis/${ctrl.vm.node.fen.replace(/ /g, '_')}?playerIndex=${ctrl.vm.pov}#practice`,
+                    title: ctrl.trans.noarg('playWithTheMachine'),
+                    target: '_blank',
+                  },
+                })
+              : null,
             data.user
               ? h(
                   'a',

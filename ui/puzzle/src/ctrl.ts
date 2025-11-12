@@ -14,6 +14,7 @@ import { chessgroundDests, scalachessCharPair } from 'stratops/compat';
 import * as cg from 'chessground/types';
 import { Config as CgConfig } from 'chessground/config';
 import { ctrl as cevalCtrl, CevalCtrl } from 'ceval';
+import { allowedForVariant as allowClientEvalForVariant } from 'ceval/src/util';
 import { defer } from 'common/defer';
 import { defined, prop, Prop } from 'common';
 import { makeSanAndPlay } from 'stratops/san';
@@ -45,7 +46,7 @@ export default function (opts: PuzzleOpts, redraw: Redraw): Controller {
   const session = new PuzzleSession(opts.data.theme.key, opts.data.user?.id, hasStreak);
 
   // required by ceval
-  vm.showComputer = () => vm.mode === 'view';
+  vm.showComputer = () => vm.mode === 'view' && allowClientEvalForVariant(vm.variant);
   vm.showAutoShapes = () => true;
 
   const throttleSound = (name: string) => throttle(100, () => playstrategy.sound.play(name));
@@ -86,6 +87,9 @@ export default function (opts: PuzzleOpts, redraw: Redraw): Controller {
     vm.initialPath = initialPath;
     vm.initialNode = tree.nodeAtPath(initialPath);
     vm.pov = vm.initialNode.ply % 2 === 1 ? 'p2' : 'p1'; //vm.initialNode.playerIndex;
+    vm.variant = data.game.variant.key;
+    vm.dimensions = data.game.variant.boardSize;
+    vm.playerColors = data.game.players.map(p => p.playerColor);
 
     setPath(treePath.init(initialPath));
     setTimeout(() => {
@@ -140,9 +144,9 @@ export default function (opts: PuzzleOpts, redraw: Redraw): Controller {
       },
       check: !!node.check,
       lastMove: uciToLastMove(node.uci),
-      dimensions: { width: 8, height: 8 }, //vm.cgConfig.dimensions,
-      variant: 'standard' as cg.Variant, //vm.cgConfig.variant,
-      chess960: false, //vm.cgConfig.chess960,
+      dimensions: { width: vm.dimensions.width, height: vm.dimensions.height },
+      variant: vm.variant as cg.Variant,
+      chess960: vm.variant === 'chess960',
     };
     if (node.ply >= vm.initialNode.ply) {
       if (vm.mode !== 'view' && playerIndex !== vm.pov && !nextNode) {

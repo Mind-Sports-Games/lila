@@ -3,7 +3,7 @@ package lila.puzzle
 import play.api.i18n.Lang
 import play.api.libs.json._
 
-import strategygames.{ Game, GameLogic }
+import strategygames.{ Game }
 
 import lila.common.Json._
 import lila.game.GameRepo
@@ -186,7 +186,7 @@ final class JsonView(
       import strategygames.format._
       val init =
         //TODO: Do we need to set turns through withTurnsAndPlies can the fen not decode this?
-        Game(GameLogic.Chess(), none, puzzle.fenAfterInitialMove.some).withTurnsAndPlies(
+        Game(puzzle.variant.gameLogic, none, puzzle.fenAfterInitialMove.some).withTurnsAndPlies(
           //TODO multiaction. For now plies and turns are the same whilst puzzle deals with just standard chess
           puzzle.initialPly + 1,
           puzzle.initialPly + 1
