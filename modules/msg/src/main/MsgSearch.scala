@@ -48,7 +48,7 @@ final class MsgSearch(
         $doc(
           "users" -> $doc(
             $eq(me.id),
-            "$regex" -> BSONRegex(s"^$q", "")
+            "$regex" -> BSONRegex(s"^${java.util.regex.Pattern.quote(q)}", "")
           ),
           "del" $ne me.id
         )
