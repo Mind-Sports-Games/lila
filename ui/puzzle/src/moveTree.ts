@@ -1,13 +1,15 @@
-import { Chess } from 'stratops/chess';
 import { INITIAL_FEN, makeFen, parseFen } from 'stratops/fen';
 import { makeSan, parseSan } from 'stratops/san';
 import { makeSquare, makeUci, parseUci } from 'stratops/util';
+import { Position } from 'stratops/chess';
+import { variantClassFromKey, variantKeyToRules } from 'stratops/variants/util';
+
 import { scalachessCharPair } from 'stratops/compat';
 import { TreeWrapper } from 'tree';
-import { Move } from 'stratops/types';
+import { Move, Rules } from 'stratops/types';
 
-export function pgnToTree(pgn: San[]): Tree.Node {
-  const pos = Chess.default();
+export function pgnToTree(variantKey: VariantKey, pgn: San[]): Tree.Node {
+  const pos = variantClassFromKey(variantKey).default();
   const root: Tree.Node = {
     ply: 0,
     turnCount: 0,
@@ -19,39 +21,46 @@ export function pgnToTree(pgn: San[]): Tree.Node {
   } as Tree.Node;
   let current = root;
   pgn.forEach((san, i) => {
-    const move = parseSan('chess')(pos, san)!;
+    const move = parseSan(variantKeyToRules(variantKey))(pos, san)!;
     pos.play(move);
-    const nextNode = makeNode(pos, move, i + 1, san);
+    const nextNode = makeNode(variantKeyToRules(variantKey), pos, move, i + 1, san);
     current.children.push(nextNode);
     current = nextNode;
   });
   return root;
 }
 
-export function mergeSolution(root: TreeWrapper, initialPath: Tree.Path, solution: Uci[], pov: PlayerIndex): void {
+export function mergeSolution(
+  variantKey: VariantKey,
+  root: TreeWrapper,
+  initialPath: Tree.Path,
+  solution: Uci[],
+  pov: PlayerIndex,
+): void {
   const initialNode = root.nodeAtPath(initialPath);
-  const pos = Chess.fromSetup(parseFen('chess')(initialNode.fen).unwrap()).unwrap();
+  const rules = variantKeyToRules(variantKey);
+  const pos = variantClassFromKey(variantKey).fromSetup(parseFen(rules)(initialNode.fen).unwrap()).unwrap();
   const fromPly = initialNode.ply;
   const nodes = solution.map((uci, i) => {
-    const move = parseUci('chess')(uci)!;
-    const san = makeSan('chess')(pos, move);
+    const move = parseUci(rules)(uci)!;
+    const san = makeSan(rules)(pos, move);
     pos.play(move);
-    const node = makeNode(pos, move, fromPly + i + 1, san);
+    const node = makeNode(rules, pos, move, fromPly + i + 1, san);
     if ((pov == 'p1') == (node.playedPlayerIndex === 'p1')) node.puzzle = 'good';
     return node;
   });
   root.addNodes(nodes, initialPath);
 }
 
-const makeNode = (pos: Chess, move: Move, ply: number, san: San): Tree.Node => ({
+const makeNode = (rules: Rules, pos: Position, move: Move, ply: number, san: San): Tree.Node => ({
   ply,
   turnCount: ply, //TODO currently same for single action games, fix for multiaction
   playedPlayerIndex: pos.turn === 'p1' ? 'p2' : 'p1', //todo fix for multiaction
   playerIndex: ply % 2 == 1 ? 'p1' : 'p2', // fix for multiaciton (expand stratops to include playedplayer on pos?)
   san,
-  fen: makeFen('chess')(pos.toSetup()),
-  id: scalachessCharPair('chess')(move),
-  uci: makeUci('chess')(move),
-  check: pos.isCheck() ? makeSquare('chess')(pos.toSetup().board.kingOf(pos.turn)!) : undefined,
+  fen: makeFen(rules)(pos.toSetup()),
+  id: scalachessCharPair(rules)(move),
+  uci: makeUci(rules)(move),
+  check: pos.isCheck() ? makeSquare(rules)(pos.toSetup().board.kingOf(pos.turn)!) : undefined,
   children: [],
 });

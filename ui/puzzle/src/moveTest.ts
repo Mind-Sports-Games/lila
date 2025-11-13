@@ -1,5 +1,6 @@
 import { altCastles } from 'stratutils';
 import { parseUci } from 'stratops/util';
+import { variantKeyToRules } from 'stratops/variants/util';
 import { path as pathOps } from 'tree';
 import { Vm, Puzzle, MoveTest } from './interfaces';
 
@@ -38,7 +39,7 @@ export default function moveTest(vm: Vm, puzzle: Puzzle): MoveTestReturn {
   vm.node.puzzle = 'good';
 
   return {
-    move: parseUci('chess')(nextUci)!,
+    move: parseUci(variantKeyToRules(vm.variant))(nextUci)!,
     fen: vm.node.fen,
     path: vm.path,
   };
