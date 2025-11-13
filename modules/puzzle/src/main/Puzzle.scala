@@ -11,6 +11,8 @@ import lila.common.Iso
 case class Puzzle(
     id: Puzzle.Id,
     gameId: lila.game.Game.ID,
+    lib: Int,
+    variantId: Int,
     fen: FEN,
     line: NonEmptyList[Uci.Move],
     glicko: Glicko,
@@ -19,8 +21,8 @@ case class Puzzle(
     themes: Set[PuzzleTheme.Key]
 ) {
 
-  //TODO support lib/variant keys in db and transform here.
-  def variant: Variant = Variant.default(GameLogic.Chess())
+  def gameLogic: GameLogic = GameLogic(lib)
+  def variant: Variant     = Variant.orDefault(gameLogic, variantId)
 
   // ply after "initial move" when we start solving
   def initialPly: Int =
@@ -94,6 +96,8 @@ object Puzzle {
   object BSONFields {
     val id       = "_id"
     val gameId   = "gameId"
+    val lib      = "l"
+    val variant  = "v"
     val fen      = "fen"
     val line     = "line"
     val glicko   = "glicko"
