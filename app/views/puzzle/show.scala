@@ -59,7 +59,7 @@ object show {
         st.aside(cls := "puzzle__side")(
           div(cls := "puzzle__side__metas")
         ),
-        div(cls := "puzzle__board main-board")(chessgroundBoard),
+        div(cls := s"puzzle__board main-board variant-${puzzle.variant.key}")(chessgroundBoard),
         div(cls := "puzzle__tools"),
         div(cls := "puzzle__controls")
       )

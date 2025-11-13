@@ -8,7 +8,7 @@ import * as Prefs from 'common/prefs';
 
 export default function (ctrl: Controller): VNode {
   const config = makeConfig(ctrl);
-  return h('div.cg-wrap' + '.variant-' + config.variant, {
+  return h('div.cg-wrap', {
     hook: {
       insert: vnode => ctrl.ground(Chessground(vnode.elm as HTMLElement, config)),
       destroy: _ => ctrl.ground()!.destroy(),

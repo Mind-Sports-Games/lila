@@ -55,11 +55,11 @@ object ofPlayer {
                           views.html.board.bits.mini(
                             fen = puzzle.fenAfterInitialMove,
                             playerIndex = puzzle.playerIndex,
-                            variantKey = "standard",
+                            variantKey = puzzle.variant.key,
                             lastMove = puzzle.line.head.uci
                           )(
                             a(
-                              cls := s"puzzle-of-player__puzzle__board",
+                              cls := s"puzzle-of-player__puzzle__board variant-${puzzle.variant.key}",
                               href := routes.Puzzle.show(puzzle.id.value)
                             )
                           ),

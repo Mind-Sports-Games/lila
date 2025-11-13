@@ -107,7 +107,7 @@ export default function (ctrl: Controller): VNode {
         theme(ctrl),
       ]),
       h(
-        'div.puzzle__board.main-board' + (ctrl.pref.blindfold ? '.blindfold' : ''),
+        `div.puzzle__board.main-board.variant-${ctrl.vm.variant}${ctrl.pref.blindfold ? '.blindfold' : ''}`,
         {
           hook: 'ontouchstart' in window ? undefined : bind('wheel', e => wheel(ctrl, e as WheelEvent)),
         },
