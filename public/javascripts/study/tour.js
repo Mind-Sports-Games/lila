@@ -34,12 +34,12 @@ playstrategy.studyTour = function (study) {
           'discuss positions with friends,<br>' +
           'and of course for chess lessons!<br><br>' +
           "It's a powerful tool, let's take some time to see how it works.",
-        attachTo: 'main.analyse .study__buttons .help top',
+        attachTo: 'main .analyse .study__buttons .help top',
       },
       {
         title: 'Shared and saved',
         text: 'Other members can see your moves in real time!<br>' + 'Plus, everything is saved forever.',
-        attachTo: 'main.analyse .areplay left',
+        attachTo: 'main .analyse .areplay left',
       },
       {
         title: 'Study members',
@@ -103,7 +103,7 @@ playstrategy.studyTour = function (study) {
             action: tour.next,
           },
         ],
-        attachTo: 'main.analyse .study__buttons .help top',
+        attachTo: 'main .analyse .study__buttons .help top',
       },
     ]
       .filter(function (v) {

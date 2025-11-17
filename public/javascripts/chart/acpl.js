@@ -17,6 +17,8 @@ playstrategy.advantageChart = function (data, trans, el) {
         var oppositeColorVariants = [
           'flipello',
           'flipello10',
+          'antiflipello',
+          'octagonflipello',
           'shogi',
           'minishogi',
           'abalone',

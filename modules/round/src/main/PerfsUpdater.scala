@@ -89,6 +89,10 @@ final class PerfsUpdater(
                 updateRatings(ratingsW.flipello, ratingsB.flipello, game)
               case Variant.FairySF(strategygames.fairysf.variant.Flipello10) =>
                 updateRatings(ratingsW.flipello10, ratingsB.flipello10, game)
+              case Variant.FairySF(strategygames.fairysf.variant.AntiFlipello) =>
+                updateRatings(ratingsW.antiflipello, ratingsB.antiflipello, game)
+              case Variant.FairySF(strategygames.fairysf.variant.OctagonFlipello) =>
+                updateRatings(ratingsW.octagonflipello, ratingsB.octagonflipello, game)
               case Variant.FairySF(strategygames.fairysf.variant.Amazons) =>
                 updateRatings(ratingsW.amazons, ratingsB.amazons, game)
               case Variant.FairySF(strategygames.fairysf.variant.BreakthroughTroyka) =>
@@ -181,6 +185,8 @@ final class PerfsUpdater(
       minixiangqi: Rating,
       flipello: Rating,
       flipello10: Rating,
+      antiflipello: Rating,
+      octagonflipello: Rating,
       amazons: Rating,
       breakthroughtroyka: Rating,
       minibreakthroughtroyka: Rating,
@@ -234,6 +240,8 @@ final class PerfsUpdater(
       minixiangqi = perfs.minixiangqi.toRating,
       flipello = perfs.flipello.toRating,
       flipello10 = perfs.flipello10.toRating,
+      antiflipello = perfs.antiflipello.toRating,
+      octagonflipello = perfs.octagonflipello.toRating,
       amazons = perfs.amazons.toRating,
       breakthroughtroyka = perfs.breakthroughtroyka.toRating,
       minibreakthroughtroyka = perfs.minibreakthroughtroyka.toRating,
@@ -441,6 +449,16 @@ final class PerfsUpdater(
             perfs.flipello10,
             ratings.flipello10
           ),
+          antiflipello = addRatingVariant(
+            Variant.FairySF(strategygames.fairysf.variant.AntiFlipello),
+            perfs.antiflipello,
+            ratings.antiflipello
+          ),
+          octagonflipello = addRatingVariant(
+            Variant.FairySF(strategygames.fairysf.variant.OctagonFlipello),
+            perfs.octagonflipello,
+            ratings.octagonflipello
+          ),
           amazons = addRatingVariant(
             Variant.FairySF(strategygames.fairysf.variant.Amazons),
             perfs.amazons,
@@ -546,6 +564,8 @@ final class PerfsUpdater(
           minixiangqi = r(PT.orDefault("minixiangqi"), perfs.minixiangqi, perfs1.minixiangqi),
           flipello = r(PT.orDefault("flipello"), perfs.flipello, perfs1.flipello),
           flipello10 = r(PT.orDefault("flipello10"), perfs.flipello10, perfs1.flipello10),
+          antiflipello = r(PT.orDefault("antiflipello"), perfs.antiflipello, perfs1.antiflipello),
+          octagonflipello = r(PT.orDefault("octagonflipello"), perfs.octagonflipello, perfs1.octagonflipello),
           amazons = r(PT.orDefault("amazons"), perfs.amazons, perfs1.amazons),
           breakthroughtroyka =
             r(PT.orDefault("breakthroughtroyka"), perfs.breakthroughtroyka, perfs1.breakthroughtroyka),

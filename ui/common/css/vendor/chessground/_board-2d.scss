@@ -60,6 +60,18 @@ $flipello10-board-files: (
   'wood': 'flipello10_wood_board.svg',
 );
 
+$antiflipello-board-files: (
+  'green': 'antiflipello_blue_board.svg',
+  'green-marble': 'antiflipello_blue_board.svg',
+  'wood': 'antiflipello_blue_board.svg',
+);
+
+$octagonflipello-board-files: (
+  'green': 'octagonflipello_green_board.svg',
+  'green-marble': 'octagonflipello_green_marble_board.svg',
+  'wood': 'octagonflipello_wood_board.svg',
+);
+
 $amazons-board-files: (
   'blue': 'svg/blue_100.svg',
   'blue2': 'blue2_100.jpg',
@@ -220,6 +232,18 @@ $abalone-variants: ('abalone');
   }
 }
 
+@each $color, $file in $antiflipello-board-files {
+  .flipello-#{$color} .variant-antiflipello.is2d cg-board {
+    background-image: url(../images/board/flipello/#{$file});
+  }
+}
+
+@each $color, $file in $octagonflipello-board-files {
+  .flipello-#{$color} .variant-octagonflipello.is2d cg-board {
+    background-image: url(../images/board/flipello/#{$file});
+  }
+}
+
 @each $color, $file in $amazons-board-files {
   .amazons-#{$color} .variant-amazons.is2d cg-board {
     background-image: url(../images/board/amazons/#{$file});
@@ -353,6 +377,18 @@ $abalone-variants: ('abalone');
 
 @each $color, $file in $flipello10-board-files {
   .flipello-#{$color} .is2d .variant-flipello10 cg-board {
+    background-image: url(../images/board/flipello/#{$file});
+  }
+}
+
+@each $color, $file in $antiflipello-board-files {
+  .flipello-#{$color} .is2d .variant-antiflipello cg-board {
+    background-image: url(../images/board/flipello/#{$file});
+  }
+}
+
+@each $color, $file in $octagonflipello-board-files {
+  .flipello-#{$color} .is2d .variant-octagonflipello cg-board {
     background-image: url(../images/board/flipello/#{$file});
   }
 }

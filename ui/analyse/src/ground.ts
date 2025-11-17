@@ -96,7 +96,7 @@ export function makeConfig(ctrl: AnalyseCtrl): CgConfig {
             ? 'https://playstrategy.org/assets/piece/shogi/' +
               d.pref.pieceSet.filter(ps => ps.gameFamily === 'shogi')[0].name +
               '/'
-            : cgVariantKey === 'flipello' || cgVariantKey === 'flipello10'
+            : ctrl.data.game.gameFamily === 'flipello'
               ? 'https://playstrategy.org/assets/piece/flipello/' +
                 d.pref.pieceSet.filter(ps => ps.gameFamily === 'flipello')[0].name +
                 '/'

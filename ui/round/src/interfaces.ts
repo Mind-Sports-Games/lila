@@ -186,7 +186,7 @@ export interface ApiAction extends Step {
   winner?: PlayerIndex;
   check: boolean;
   threefold: boolean;
-  perpetualWarning: boolean;
+  gameMessage?: string;
   takebackable: boolean;
   wDraw: boolean;
   bDraw: boolean;

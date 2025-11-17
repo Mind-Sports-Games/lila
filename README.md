@@ -102,3 +102,5 @@ In case you see logs similar to `reactivemongo.api.Cursor - Fails to send reques
 
 This means the manifest file was not ready to be read before you tried accessing it.  
 Try invoking the command to build front before starting the back.
+
+- seing calls trying to load /someURL/installHook.js.map is linked to your browser's inspector being opened while also having the React Dev Tool extension enabled.

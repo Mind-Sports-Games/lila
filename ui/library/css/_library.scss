@@ -105,6 +105,9 @@
   .variants-choice {
     padding: 0em 1em;
     width: 100%;
+    &.hidden {
+      display: none !important;
+    }
   }
 
   .gamegroup-icons,

@@ -86,6 +86,8 @@ object TournamentMedleyUtil {
       "minixiangqi"            -> quick,
       "flipello"               -> medium,
       "flipello10"             -> slow,
+      "antiflipello"           -> medium,
+      "octagonflipello"        -> medium,
       "amazons"                -> medium,
       "breakthroughtroyka"     -> quick,
       "minibreakthroughtroyka" -> fastest,

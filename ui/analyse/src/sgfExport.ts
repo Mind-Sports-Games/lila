@@ -57,7 +57,7 @@ export function renderFullTxt(ctrl: AnalyseCtrl): string {
     tags.push(['GM', '7']);
     tags.push(['SZ', g.variant.boardSize.height.toString()]);
   }
-  if (['flipello', 'flipello10'].includes(g.variant.key)) {
+  if (['flipello', 'flipello10', 'antiflipello', 'octagonflipello'].includes(g.variant.key)) {
     tags.push(['GM', '2']);
     tags.push(['SZ', g.variant.boardSize.height.toString()]);
   }

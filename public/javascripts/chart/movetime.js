@@ -26,6 +26,8 @@ playstrategy.movetimeChart = function (data, trans) {
             var oppositeColorVariants = [
               'flipello',
               'flipello10',
+              'antiflipello',
+              'octagonflipello',
               'shogi',
               'minishogi',
               'abalone',

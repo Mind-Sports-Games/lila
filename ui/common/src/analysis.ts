@@ -68,6 +68,8 @@ const fishnetVariants: VariantKey[] = [
   'minixiangqi',
   'flipello',
   'flipello10',
+  //'antiflipello',
+  'octagonflipello',
   'breakthroughtroyka',
   'minibreakthroughtroyka',
 ];
