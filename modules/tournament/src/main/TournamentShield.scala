@@ -240,7 +240,9 @@ object TournamentShield {
         draughtsRounds
       )
     private val draughtsVariantOptions =
-      Variant.all.filter(_.gameFamily == GameFamily.Draughts()).filterNot(_.fromPositionVariant)
+      Variant.all
+        .filter(v => v.gameFamily == GameFamily.Draughts() || v.gameFamily == GameFamily.Dameo())
+        .filterNot(_.fromPositionVariant)
     private val draughtsVariantMinutes = 90
     private val draughtsRounds         = 6
 
@@ -829,7 +831,7 @@ object TournamentShield {
         extends Category(
           Variant.Dameo(strategygames.dameo.variant.Dameo),
           Blitz32,
-          14,
+          4,
           1
         )
 
@@ -1011,6 +1013,7 @@ object TournamentShield {
       Pool,
       Portuguese,
       English,
+      Dameo,
       Shogi,
       Xiangqi,
       MiniShogi,
