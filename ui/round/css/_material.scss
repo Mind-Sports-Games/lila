@@ -69,7 +69,7 @@ $dameo-piece-roles: (
             background-image: url(../piece/mono/#{$r});
           }
         }
-      } @else if ($variant == 'dameo'){
+      } @else if ($variant == 'dameo') {
         @each $role, $r in $dameo-piece-roles {
           &.#{$role} {
             background-image: url(../piece/mono/#{$r});
