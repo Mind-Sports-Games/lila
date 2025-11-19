@@ -163,7 +163,7 @@ object Tv {
           name = s"All ${VariantKeys.gameFamilyName(GameFamily.Draughts())}",
           icon = DV.Standard.perfIcon.toString,
           secondsSinceLastMove = freshBlitz,
-          filters = Seq(anyVariant(Variant.all(GameLogic.Draughts())), noBot),
+          filters = Seq(anyVariant(Variant.all(GameLogic.Draughts()) ++ Variant.all(GameLogic.Dameo())), noBot),
           familyChannel = true,
           gameFamily = "draughts"
         )
@@ -766,6 +766,7 @@ object Tv {
       Pool,
       Portuguese,
       English,
+      Dameo,
       LinesOfActionFamily,
       LinesOfAction,
       ScrambledEggs,
