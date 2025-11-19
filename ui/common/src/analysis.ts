@@ -13,7 +13,6 @@ const noAnalysisBoardVariants: string[] = [
   'pool',
   'portuguese',
   'russian',
-  'dameo',
 ];
 
 // Means that the analysis board on playstrategy will work.
