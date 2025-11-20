@@ -39,7 +39,7 @@ export async function tsc(): Promise<void> {
     }
 
     await fs.promises.writeFile(cfgPath, JSON.stringify(cfg));
-    const thisPs = (tscPs = cps.spawn('.build/node_modules/.bin/tsc', [
+    const thisPs = (tscPs = cps.spawn('../node_modules/.bin/tsc', [
       '-b',
       cfgPath,
       ...(env.watch ? ['-w', '--preserveWatchOutput'] : ['--incremental']),

@@ -314,6 +314,8 @@ export default class RoundController {
         'minishogi',
         'flipello',
         'flipello10',
+        'antiflipello',
+        'octagonflipello',
         'oware',
         'togyzkumalak',
         'bestemshe',
@@ -779,7 +781,8 @@ export default class RoundController {
       }
     }
     d.game.threefold = !!o.threefold;
-    d.game.perpetualWarning = !!o.perpetualWarning;
+    delete d.game.gameMessage;
+    if (o.gameMessage) d.game.gameMessage = o.gameMessage;
 
     //backgammon need to update initial turnCount if we switch starting player on initial dice roll
     if (
@@ -1381,7 +1384,10 @@ export default class RoundController {
     const d = this.data;
     if (this.isPlaying() && !this.replaying()) {
       //flipello pass
-      if ((d.game.variant.key === 'flipello' || d.game.variant.key === 'flipello10') && d.possibleMoves) {
+      if (
+        ['flipello', 'flipello10', 'antiflipello', 'octagonflipello'].includes(d.game.variant.key) &&
+        d.possibleMoves
+      ) {
         this.forcePass(util.parsePossibleMoves(d.possibleMoves), d.game.variant.key);
       }
       //backgammon roll dice at start of turn or end turn when no moves

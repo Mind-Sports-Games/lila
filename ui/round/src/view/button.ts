@@ -313,15 +313,25 @@ export function threefoldClaimDraw(ctrl: RoundController) {
 }
 
 //not technically a button
-export function perpetualWarning(ctrl: RoundController) {
-  return ctrl.data.game.perpetualWarning && ctrl.data.player.playerIndex === ctrl.data.game.player
+export function gameMessage(ctrl: RoundController) {
+  if (
+    ['go9x9', 'go13x13', 'go19x19'].includes(ctrl.data.game.variant.key) &&
+    ctrl.data.deadStoneOfferState &&
+    ctrl.data.deadStoneOfferState !== 'RejectedOffer'
+  ) {
+    return null;
+  } //suppress message while selecting dead stones for go games
+  if (ctrl.data.game.variant.key === 'xiangqi' && ctrl.data.player.playerIndex !== ctrl.data.game.player) {
+    return null; //message only for current player in xiangqi
+  }
+  return ctrl.data.game.gameMessage
     ? h('div.suggestion', [
         h(
           'p',
           {
             hook: onSuggestionHook,
           },
-          ctrl.noarg('perpetualWarning'),
+          ctrl.noarg(ctrl.data.game.gameMessage!),
         ),
       ])
     : null;

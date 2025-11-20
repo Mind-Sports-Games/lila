@@ -361,7 +361,7 @@ case class Game(
 
   def calculateScore(playerIndex: PlayerIndex): String =
     variant.key match {
-      case "flipello" | "flipello10" =>
+      case "flipello" | "flipello10" | "antiflipello" | "octagonflipello" =>
         board.pieces
           .map { case (_, (piece, _)) => piece.player.name }
           .filter(p => p == playerIndex.name)

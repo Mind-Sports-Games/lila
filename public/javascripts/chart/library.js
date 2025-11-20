@@ -29,6 +29,8 @@ playstrategy.libraryChart = function (data, allowedVariants) {
         );
         allMonths.sort();
         var variantNames = data.variantNames || {};
+        var gameGroupNames = data.gameGroupNames || {};
+        var allNames = { ...variantNames, ...gameGroupNames };
         // Prepare cumulative data for each game type
         var series = gameTypes.map(function (type, idx) {
           var filtered = freq.filter(function (row) {
@@ -43,7 +45,7 @@ playstrategy.libraryChart = function (data, allowedVariants) {
           var colorList = Highcharts.getOptions().colors;
           var markerOpt = idx < colorList.length ? { enabled: false } : { enabled: true, radius: 5 };
           return {
-            name: variantNames[type] || type,
+            name: allNames[type] || type,
             data: allMonths.map(function (m) {
               var found = cumul.find(function (row) {
                 return row[0] === m;

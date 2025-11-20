@@ -312,6 +312,8 @@ declare type VariantKey =
   | 'minixiangqi'
   | 'flipello'
   | 'flipello10'
+  | 'antiflipello'
+  | 'octagonflipello'
   | 'amazons'
   | 'breakthroughtroyka'
   | 'minibreakthroughtroyka'
@@ -378,6 +380,8 @@ declare type Perf =
   | 'minixiangqi'
   | 'flipello'
   | 'flipello10'
+  | 'antiflipello'
+  | 'octagonflipello'
   | 'amazons'
   | 'breakthroughtroyka'
   | 'minibreakthroughtroyka'
@@ -631,7 +635,7 @@ declare namespace Tree {
     comp?: boolean;
     san?: string;
     threefold?: boolean;
-    perpetualWarning?: boolean;
+    gameMessage?: string;
     fail?: boolean;
     puzzle?: 'win' | 'fail' | 'good' | 'retry';
     crazy?: NodeCrazy;

@@ -147,7 +147,7 @@ shogi_colors = ['0','1']
 xiangqi_roles =['a-piece', 'b-piece', 'c-piece', 'k-piece', 'n-piece', 'p-piece', 'r-piece', 'pp-piece']
 xiangqi_colors = ['B','R']
 xiangqi_variants = ['xiangqi', 'minixiangqi']
-flipello_variants = ['flipello', 'flipello10']
+flipello_variants = ['flipello', 'flipello10', 'antiflipello', 'octagonflipello']
 amazons_variants = ['amazons']
 oware_roles=['s1-piece','s2-piece','s3-piece','s4-piece','s5-piece','s6-piece','s7-piece','s8-piece','s9-piece','s10-piece',
 's11-piece','s12-piece','s13-piece','s14-piece','s15-piece','s16-piece','s17-piece','s18-piece','s19-piece','s20-piece',
@@ -508,8 +508,10 @@ flipello_themes.map { |theme|
         base64 = Base64.strict_encode64(image)
         '.flipello.is2d .' + role + '.' + (color == 'w' ? 'p2' : 'p1') +
          ', ' + '.is2d .variant-flipello' + ' .' + role + '.' + (color == 'w' ? 'p2' : 'p1') + 
-         ', ' + '.is2d .variant-flipello10' + ' .' + role + '.' + (color == 'w' ? 'p2' : 'p1') + ' {' +
-          "background-image:url('data:image/" + types[ext] + base64 + "')}"
+         ', ' + '.is2d .variant-flipello10' + ' .' + role + '.' + (color == 'w' ? 'p2' : 'p1') +
+         ', ' + '.is2d .variant-antiflipello' + ' .' + role + '.' + (color == 'w' ? 'p2' : 'p1') +
+         ', ' + '.is2d .variant-octagonflipello' + ' .' + role + '.' + (color == 'w' ? 'p2' : 'p1') +
+         ' {' + "background-image:url('data:image/" + types[ext] + base64 + "')}"
       end
     }
   }.flatten
@@ -524,8 +526,10 @@ flipello_themes.map { |theme|
       piece = color[0] + role.upcase[0]
       '.flipello.is2d .' + role + '.' + (color == 'w' ? 'p2' : 'p1') + 
       ', ' + '.is2d .variant-flipello' + ' .' + role + '.' + (color == 'w' ? 'p2' : 'p1') + 
-      ', ' + '.is2d .variant-flipello10' + ' .' + role + '.' + (color == 'w' ? 'p2' : 'p1') + ' {' +
-        "background-image:url('/assets/piece/" + 'flipello/' + name + "/" + piece + "." + ext + "')}"
+      ', ' + '.is2d .variant-flipello10' + ' .' + role + '.' + (color == 'w' ? 'p2' : 'p1') +
+      ', ' + '.is2d .variant-antiflipello' + ' .' + role + '.' + (color == 'w' ? 'p2' : 'p1') +
+      ', ' + '.is2d .variant-octagonflipello' + ' .' + role + '.' + (color == 'w' ? 'p2' : 'p1') +
+      ' {' + "background-image:url('/assets/piece/" + 'flipello/' + name + "/" + piece + "." + ext + "')}"
     }
   }.flatten
   File.open(dest_dir + 'flipello-' + name + '.external.css', 'w') { |f| f.puts (classes_flipello).join("\n") }

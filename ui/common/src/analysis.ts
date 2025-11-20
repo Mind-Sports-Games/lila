@@ -13,7 +13,6 @@ const noAnalysisBoardVariants: string[] = [
   'pool',
   'portuguese',
   'russian',
-  'dameo',
 ];
 
 // Means that the analysis board on playstrategy will work.
@@ -68,6 +67,8 @@ const fishnetVariants: VariantKey[] = [
   'minixiangqi',
   'flipello',
   'flipello10',
+  //'antiflipello',
+  'octagonflipello',
   'breakthroughtroyka',
   'minibreakthroughtroyka',
 ];

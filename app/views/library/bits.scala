@@ -101,8 +101,8 @@ object bits {
       .getOrElse(0)
       .toString() + "%"
 
-  def statsRow(term: String, value: String) =
-    div(cls := "library-stats-row")(
+  def statsRow(term: String, value: String, className: String = "") =
+    div(cls := s"library-stats-row $className")(
       div(cls := "library-stats-term")(term),
       div(cls := "library-stats-value")(value)
     )

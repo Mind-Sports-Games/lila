@@ -341,6 +341,26 @@ const emptyConcealOf: ConcealOf = function () {
   };
 };
 
+// Note : temporary fix for multi-action games in analysis mode
+const fixAnalysisMultiActionMoves = (root: Tree.ParentedNode, studyMode: boolean, variantKey: VariantKey) => {
+  if (!studyMode) {
+    const currPlayer = root.playerIndex;
+
+    if (variantKey === 'monster') {
+      return [
+        currPlayer === 'p2' ? moveView.renderIndex(root, false) : null,
+        root.ply > 0 && root.ply % 3 == 2 ? emptyMove() : null,
+      ];
+    } else if (variantKey === 'amazons') {
+      return [
+        currPlayer === 'p2' ? moveView.renderIndex(root, false) : null,
+        root.ply > 0 && root.ply % 4 > 1 ? emptyMove() : null,
+      ];
+    }
+  }
+  return [root.ply & 1 ? moveView.renderIndex(root, false) : null, root.ply & 1 ? emptyMove() : null];
+};
+
 export default function (ctrl: AnalyseCtrl, concealOf?: ConcealOf): VNode {
   const root = parentedNode(ctrl.tree.root);
   const ctx: Ctx = {
@@ -361,8 +381,7 @@ export default function (ctrl: AnalyseCtrl, concealOf?: ConcealOf): VNode {
     (
       [
         isEmpty(commentTags) ? null : h('interrupt', commentTags),
-        root.ply & 1 ? moveView.renderIndex(root, false) : null,
-        root.ply & 1 ? emptyMove() : null,
+        ...fixAnalysisMultiActionMoves(root, !!ctrl.study, ctrl.data.game.variant.key),
       ] as MaybeVNodes
     ).concat(
       renderChildrenOf(ctx, root, {

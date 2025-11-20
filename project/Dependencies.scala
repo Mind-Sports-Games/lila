@@ -14,7 +14,7 @@ object Dependencies {
   val hasher          = "com.roundeights"            %% "hasher"                          % "1.2.1"
   val jodaTime        = "joda-time"                   % "joda-time"                       % "2.10.10"
   val compression     = "org.lichess"                %% "compression"                     % "1.6"
-  val strategyGames   = "org.playstrategy"           %% "strategygames"                   % "10.2.1-pstrat185-dameo1"
+  val strategyGames   = "org.playstrategy"           %% "strategygames"                   % "10.2.1-pstrat191-dameo"
   val maxmind         = "com.sanoma.cda"             %% "maxmind-geoip2-scala"            % "1.3.1-THIB"
   val prismic         = "io.prismic"                 %% "scala-kit"                       % "1.2.19-THIB213"
   val scrimage        = "com.sksamuel.scrimage"       % "scrimage-core"                   % "4.3.0"
@@ -56,12 +56,12 @@ object Dependencies {
   }
 
   object reactivemongo {
-    val version = "1.0.8"
+    val version = "1.1.0-RC15"
 
-    val driver = "org.reactivemongo" %% "reactivemongo"               % version
-    val stream = "org.reactivemongo" %% "reactivemongo-akkastream"    % version
-    val epoll  = "org.reactivemongo"  % "reactivemongo-shaded-native" % s"$version-linux-x86-64"
-    val kamon  = "org.reactivemongo" %% "reactivemongo-kamon"         % version
+    val driver = "org.reactivemongo" %% "reactivemongo"                            % version
+    val stream = "org.reactivemongo" %% "reactivemongo-akkastream"                 % version
+    val epoll  = "org.reactivemongo"  % "reactivemongo-shaded-native-linux-x86-64" % version
+    val kamon  = "org.reactivemongo" %% "reactivemongo-kamon"                      % "1.0.8"
     def bundle = Seq(driver, stream)
   }
 

@@ -36,6 +36,8 @@ case class History(
     minixiangqi: RatingsMap,
     flipello: RatingsMap,
     flipello10: RatingsMap,
+    antiflipello: RatingsMap,
+    octagonflipello: RatingsMap,
     amazons: RatingsMap,
     breakthroughtroyka: RatingsMap,
     minibreakthroughtroyka: RatingsMap,
@@ -96,6 +98,8 @@ case class History(
       case "minixiangqi"            => minixiangqi
       case "flipello"               => flipello
       case "flipello10"             => flipello10
+      case "antiflipello"           => antiflipello
+      case "octagonflipello"        => octagonflipello
       case "amazons"                => amazons
       case "breakthroughtroyka"     => breakthroughtroyka
       case "minibreakthroughtroyka" => minibreakthroughtroyka
@@ -172,6 +176,8 @@ object History {
           minixiangqi = ratingsMap("minixiangqi"),
           flipello = ratingsMap("flipello"),
           flipello10 = ratingsMap("flipello10"),
+          antiflipello = ratingsMap("antiflipello"),
+          octagonflipello = ratingsMap("octagonflipello"),
           amazons = ratingsMap("amazons"),
           breakthroughtroyka = ratingsMap("breakthroughtroyka"),
           minibreakthroughtroyka = ratingsMap("minibreakthroughtroyka"),

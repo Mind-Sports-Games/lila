@@ -1,14 +1,23 @@
+db.cache.createIndex({ e: 1 }, { expireAfterSeconds: 0 });
+
 db.challenge.createIndex(
   { seenAt: 1 },
   { partialFilterExpression: { status: 10, timeControl: { $exists: true }, seenAt: { $exists: true } } },
 );
 
-db.simul.createIndex({ hostId: 1 }, { partialFilterExpression: { status: 10 } });
-db.simul.createIndex({ hostSeenAt: -1 }, { partialFilterExpression: { status: 10, featurable: true } });
+db.f_categ.createIndex({ team: 1 });
 
-db.cache.createIndex({ e: 1 }, { expireAfterSeconds: 0 });
+db.f_post.createIndex({ topicId: 1, troll: 1 });
+db.f_post.createIndex({ createdAt: -1, troll: 1 });
+db.f_post.createIndex({ userId: 1 });
+db.f_post.createIndex({ categId: 1, createdAt: -1 });
+db.f_post.createIndex({ topicId: 1, createdAt: -1 });
 
-// copied from lichess because mongodb was logging some slow queries
+db.f_topic.createIndex({ categId: 1, troll: 1 });
+db.f_topic.createIndex({ categId: 1, updatedAt: -1, troll: 1 });
+db.f_topic.createIndex({ categId: 1, slug: 1 });
+db.f_topic.createIndex({ categId: 1 }, { partialFilterExpression: { sticky: true } });
+
 db.game5.createIndex({ ca: -1 });
 db.game5.createIndex({ us: 1, ca: -1 });
 db.game5.createIndex({ 'pgni.user': 1, 'pgni.ca': -1 }, { sparse: 1 });
@@ -21,8 +30,58 @@ db.game5.createIndex(
   { partialFilterExpression: { s: { $lte: 20 } } },
 );
 
+db.msg_msg.createIndex({ tid: 1, date: -1 });
+
+db.msg_thread.createIndex({ users: 1, 'lastMsg.date': -1 });
+db.msg_thread.createIndex({ users: 1 }, { partialFilterExpression: { 'lastMsg.read': false } });
+db.msg_thread.createIndex({ users: 1, 'maskWith.date': -1 });
+
 db.notify.createIndex({ notifies: 1, read: 1, createdAt: -1 });
 db.notify.createIndex({ createdAt: 1 }, { expireAfterSeconds: 2592000 });
+
+db.simul.createIndex({ hostId: 1 }, { partialFilterExpression: { status: 10 } });
+db.simul.createIndex({ hostSeenAt: -1 }, { partialFilterExpression: { status: 10, featurable: true } });
+
+db.study.createIndex({ ownerId: 1, createdAt: -1 });
+db.study.createIndex({ likes: 1, createdAt: -1 });
+db.study.createIndex({ ownerId: 1, updatedAt: -1 });
+db.study.createIndex({ likes: 1, updatedAt: -1 });
+db.study.createIndex({ rank: -1 });
+db.study.createIndex({ createdAt: -1 });
+db.study.createIndex({ updatedAt: -1 });
+db.study.createIndex({ likers: 1 });
+db.study.createIndex({ uids: 1 });
+db.study.createIndex({ topics: 1, rank: -1 }, { partialFilterExpression: { topics: { $exists: 1 } } });
+db.study.createIndex({ topics: 1, createdAt: -1 }, { partialFilterExpression: { topics: { $exists: 1 } } });
+db.study.createIndex({ topics: 1, updatedAt: -1 }, { partialFilterExpression: { topics: { $exists: 1 } } });
+db.study.createIndex({ topics: 1, likes: -1 }, { partialFilterExpression: { topics: { $exists: 1 } } });
+db.study.createIndex({ uids: 1, rank: -1 }, { partialFilterExpression: { topics: { $exists: 1 } } });
+
+db.study_chapter_flat.createIndex({ studyId: 1, order: 1 });
+db.study_chapter_flat.createIndex(
+  { 'relay.fideIds': 1 },
+  { partialFilterExpression: { 'relay.fideIds': { $exists: true } } },
+);
+
+db.swiss.createIndex({ teamId: 1, startsAt: 1 });
+db.swiss.createIndex({ nextRoundAt: 1 }, { partialFilterExpression: { nextRoundAt: { $exists: true } } });
+db.swiss.createIndex({ featurable: 1 }, { partialFilterExpression: { featurable: true, 'settings.i': { $lte: 600 } } });
+
+db.swiss_pairing.createIndex({ s: 1, p: 1, r: 1 });
+db.swiss_pairing.createIndex({ t: 1 }, { partialFilterExpression: { t: true } });
+db.swiss_pairing.createIndex({ mmids: 1 });
+
+db.swiss_player.createIndex({ s: 1, c: -1 });
+
+db.team.createIndex({ enabled: 1, nbMembers: -1 });
+db.team.createIndex({ createdAt: -1 });
+db.team.createIndex({ createdBy: 1 });
+db.team.createIndex({ leaders: 1 });
+
+db.team_member.createIndex({ team: 1 });
+db.team_member.createIndex({ user: 1 });
+db.team_member.createIndex({ team: 1, date: -1 });
+db.team_member.createIndex({ team: 1, perms: 1 }, { partialFilterExpression: { perms: { $exists: 1 } } });
 
 db.timeline_entry.createIndex({ users: 1, date: -1 });
 db.timeline_entry.createIndex({ typ: 1, date: -1 });
@@ -49,12 +108,12 @@ db.tournament2.createIndex(
   { partialFilterExpression: { createdBy: { $exists: true } } },
 );
 
-db.swiss.createIndex({ teamId: 1, startsAt: 1 });
-db.swiss.createIndex({ nextRoundAt: 1 }, { partialFilterExpression: { nextRoundAt: { $exists: true } } });
-db.swiss.createIndex({ featurable: 1 }, { partialFilterExpression: { featurable: true, 'settings.i': { $lte: 600 } } });
-
-db.swiss_pairing.createIndex({ s: 1, p: 1, r: 1 });
-db.swiss_pairing.createIndex({ t: 1 }, { partialFilterExpression: { t: true } });
-db.swiss_pairing.createIndex({ mmids: 1 });
-
-db.swiss_player.createIndex({ s: 1, c: -1 });
+db.user4.createIndex({ 'count.game': -1 });
+db.user4.createIndex({ title: 1 }, { partialFilterExpression: { title: { $exists: 1 } } });
+db.user4.createIndex({ email: 1 }, { unique: true, partialFilterExpression: { email: { $exists: 1 } } });
+db.user4.createIndex({ roles: 1 }, { partialFilterExpression: { roles: { $exists: 1 } } });
+db.user4.createIndex({ prevEmail: 1 }, { sparse: 1 });
+db.user4.createIndex(
+  { mustConfirmEmail: 1 },
+  { partialFilterExpression: { mustConfirmEmail: { $exists: 1 } }, expireAfterSeconds: 3600 * 24 * 3 },
+);

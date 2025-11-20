@@ -9,6 +9,8 @@ $pocket-height-mobile-and-names: 7em;
 $score-variants: (
   'flipello',
   'flipello10',
+  'antiflipello',
+  'octagonflipello',
   'oware',
   'togyzkumalak',
   'bestemshe',
@@ -24,6 +26,8 @@ $score-variants: (
 $score-variants-square: (
   'flipello',
   'flipello10',
+  'antiflipello',
+  'octagonflipello',
   'go9x9',
   'go13x13',
   'go19x19',
@@ -34,6 +38,8 @@ $go-variants: ('go9x9', 'go13x13', 'go19x19');
 
 .variant-flipello .game-score,
 .variant-flipello10 .game-score,
+.variant-antiflipello .game-score,
+.variant-octagonflipello .game-score,
 .variant-go9x9 .game-score,
 .variant-go13x13 .game-score,
 .variant-go19x19 .game-score {

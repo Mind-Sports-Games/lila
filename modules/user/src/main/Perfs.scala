@@ -40,6 +40,8 @@ case class Perfs(
     minixiangqi: Perf,
     flipello: Perf,
     flipello10: Perf,
+    antiflipello: Perf,
+    octagonflipello: Perf,
     amazons: Perf,
     breakthroughtroyka: Perf,
     minibreakthroughtroyka: Perf,
@@ -98,6 +100,8 @@ case class Perfs(
       "minixiangqi"            -> minixiangqi,
       "flipello"               -> flipello,
       "flipello10"             -> flipello10,
+      "antiflipello"           -> antiflipello,
+      "octagonflipello"        -> octagonflipello,
       "amazons"                -> amazons,
       "breakthroughtroyka"     -> breakthroughtroyka,
       "minibreakthroughtroyka" -> minibreakthroughtroyka,
@@ -213,6 +217,8 @@ case class Perfs(
     "minixiangqi"            -> minixiangqi,
     "flipello"               -> flipello,
     "flipello10"             -> flipello10,
+    "antiflipello"           -> antiflipello,
+    "octagonflipello"        -> octagonflipello,
     "amazons"                -> amazons,
     "breakthroughtroyka"     -> breakthroughtroyka,
     "minibreakthroughtroyka" -> minibreakthroughtroyka,
@@ -338,6 +344,8 @@ case object Perfs {
       p,
       p,
       p,
+      p,
+      p,
       Perf.Storm.default,
       Perf.Racer.default,
       Perf.Streak.default
@@ -391,6 +399,8 @@ case object Perfs {
       case Variant.FairySF(strategygames.fairysf.variant.MiniXiangqi)        => Some(_.minixiangqi)
       case Variant.FairySF(strategygames.fairysf.variant.Flipello)           => Some(_.flipello)
       case Variant.FairySF(strategygames.fairysf.variant.Flipello10)         => Some(_.flipello10)
+      case Variant.FairySF(strategygames.fairysf.variant.AntiFlipello)       => Some(_.antiflipello)
+      case Variant.FairySF(strategygames.fairysf.variant.OctagonFlipello)    => Some(_.octagonflipello)
       case Variant.FairySF(strategygames.fairysf.variant.Amazons)            => Some(_.amazons)
       case Variant.FairySF(strategygames.fairysf.variant.BreakthroughTroyka) => Some(_.breakthroughtroyka)
       case Variant.FairySF(strategygames.fairysf.variant.MiniBreakthroughTroyka) =>
@@ -456,6 +466,8 @@ case object Perfs {
         minixiangqi = perf("minixiangqi"),
         flipello = perf("flipello"),
         flipello10 = perf("flipello10"),
+        antiflipello = perf("antiflipello"),
+        octagonflipello = perf("octagonflipello"),
         amazons = perf("amazons"),
         breakthroughtroyka = perf("breakthroughtroyka"),
         minibreakthroughtroyka = perf("minibreakthroughtroyka"),
@@ -517,6 +529,8 @@ case object Perfs {
         "minixiangqi"            -> notNew(o.minixiangqi),
         "flipello"               -> notNew(o.flipello),
         "flipello10"             -> notNew(o.flipello10),
+        "antiflipello"           -> notNew(o.antiflipello),
+        "octagonflipello"        -> notNew(o.octagonflipello),
         "amazons"                -> notNew(o.amazons),
         "breakthroughtroyka"     -> notNew(o.breakthroughtroyka),
         "minibreakthroughtroyka" -> notNew(o.minibreakthroughtroyka),
@@ -579,6 +593,8 @@ case object Perfs {
       minixiangqi: List[User.LightPerf],
       flipello: List[User.LightPerf],
       flipello10: List[User.LightPerf],
+      antiflipello: List[User.LightPerf],
+      octagonflipello: List[User.LightPerf],
       amazons: List[User.LightPerf],
       breakthroughtroyka: List[User.LightPerf],
       minibreakthroughtroyka: List[User.LightPerf],
@@ -595,6 +611,8 @@ case object Perfs {
   )
 
   val emptyLeaderboards = Leaderboards(
+    Nil,
+    Nil,
     Nil,
     Nil,
     Nil,

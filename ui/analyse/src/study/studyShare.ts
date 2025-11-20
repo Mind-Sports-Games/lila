@@ -89,6 +89,8 @@ export function view(ctrl: StudyShareCtrl): VNode {
     'minibreakthroughtroyka',
     'flipello',
     'flipello10',
+    'antiflipello',
+    'octagonflipello',
     'shogi',
     'minishogi',
     'xiangqi',

@@ -163,7 +163,7 @@ object Tv {
           name = s"All ${VariantKeys.gameFamilyName(GameFamily.Draughts())}",
           icon = DV.Standard.perfIcon.toString,
           secondsSinceLastMove = freshBlitz,
-          filters = Seq(anyVariant(Variant.all(GameLogic.Draughts())), noBot),
+          filters = Seq(anyVariant(Variant.all(GameLogic.Draughts()) ++ Variant.all(GameLogic.Dameo())), noBot),
           familyChannel = true,
           gameFamily = "draughts"
         )
@@ -580,6 +580,24 @@ object Tv {
           familyChannel = false,
           gameFamily = "flipello"
         )
+    case object AntiFlipello
+        extends Channel(
+          name = VariantKeys.variantName(Variant.wrap(FV.AntiFlipello)),
+          icon = FV.AntiFlipello.perfIcon.toString,
+          secondsSinceLastMove = freshBlitz,
+          filters = Seq(variant(Variant.wrap(FV.AntiFlipello)), noBot),
+          familyChannel = false,
+          gameFamily = "flipello"
+        )
+    case object OctagonFlipello
+        extends Channel(
+          name = VariantKeys.variantName(Variant.wrap(FV.OctagonFlipello)),
+          icon = FV.OctagonFlipello.perfIcon.toString,
+          secondsSinceLastMove = freshBlitz,
+          filters = Seq(variant(Variant.wrap(FV.OctagonFlipello)), noBot),
+          familyChannel = false,
+          gameFamily = "flipello"
+        )
     case object Amazons
         extends Channel(
           name = VariantKeys.variantName(Variant.wrap(FV.Amazons)),
@@ -748,6 +766,7 @@ object Tv {
       Pool,
       Portuguese,
       English,
+      Dameo,
       LinesOfActionFamily,
       LinesOfAction,
       ScrambledEggs,
@@ -760,6 +779,8 @@ object Tv {
       FlipelloFamily,
       Flipello,
       Flipello10,
+      AntiFlipello,
+      OctagonFlipello,
       Amazons,
       BreakthroughTroykaFamily,
       BreakthroughTroyka,

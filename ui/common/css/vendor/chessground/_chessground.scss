@@ -104,6 +104,11 @@ span.mini-game.variant-togyzkumalak.is2d {
   height: calc(100% / 10);
 }
 
+.variant-octagonflipello square {
+  width: calc(100% / 10);
+  height: calc(100% / 10);
+}
+
 .variant-amazons square {
   width: calc(100% / 10);
   height: calc(100% / 10);
@@ -626,6 +631,11 @@ square {
   height: calc(100% / 10);
 }
 
+.variant-octagonflipello piece {
+  width: calc(100% / 10);
+  height: calc(100% / 10);
+}
+
 .variant-amazons piece {
   width: calc(100% / 10);
   height: calc(100% / 10);
@@ -819,6 +829,11 @@ piece {
   padding-bottom: calc(100% / 10);
 }
 
+.variant-octagonflipello cg-helper {
+  width: calc(100% / 10);
+  padding-bottom: calc(100% / 10);
+}
+
 .variant-amazons cg-helper {
   width: calc(100% / 10);
   padding-bottom: calc(100% / 10);
@@ -900,6 +915,11 @@ cg-helper {
 }
 
 .variant-flipello10 cg-container {
+  width: calc(100% * 10);
+  height: calc(100% * 10);
+}
+
+.variant-octagonflipello cg-container {
   width: calc(100% * 10);
   height: calc(100% * 10);
 }

@@ -72,7 +72,7 @@ export const renderTablePlay = (ctrl: RoundController) => {
         ? [submit]
         : [
             button.opponentGone(ctrl),
-            button.perpetualWarning(ctrl),
+            button.gameMessage(ctrl),
             button.threefoldClaimDraw(ctrl),
             button.cancelDrawOffer(ctrl),
             button.answerOpponentDrawOffer(ctrl),

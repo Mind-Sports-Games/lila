@@ -240,7 +240,9 @@ object TournamentShield {
         draughtsRounds
       )
     private val draughtsVariantOptions =
-      Variant.all.filter(_.gameFamily == GameFamily.Draughts()).filterNot(_.fromPositionVariant)
+      Variant.all
+        .filter(v => v.gameFamily == GameFamily.Draughts() || v.gameFamily == GameFamily.Dameo())
+        .filterNot(_.fromPositionVariant)
     private val draughtsVariantMinutes = 90
     private val draughtsRounds         = 6
 
@@ -359,13 +361,15 @@ object TournamentShield {
           s"Welcome to the ${VariantKeys.gameFamilyName(GameFamily.Xiangqi())} Medley Arena!"
         )
 
-    private def othelloVariantOrder(variants: List[Variant]) =
-      TournamentMedleyUtil.medleyVariantsAndIntervals(variants, None, othelloVariantMinutes, othelloRounds)
-    private val othelloVariants = List(
-      Variant.wrap(strategygames.fairysf.variant.Flipello),
-      Variant.wrap(strategygames.fairysf.variant.Flipello10),
-      Variant.wrap(strategygames.fairysf.variant.Flipello)
-    )
+    private def randomOthelloVariantOrder(variants: List[Variant]) =
+      TournamentMedleyUtil.medleyVariantsAndIntervals(
+        Random.shuffle(variants),
+        Some(5 * 60),
+        othelloVariantMinutes,
+        othelloRounds
+      )
+    private val othelloVariants =
+      Variant.all.filter(_.gameFamily == GameFamily.Flipello()).filterNot(_.fromPositionVariant)
 
     private val othelloVariantMinutes = 90
     private val othelloRounds         = othelloVariants.size
@@ -377,7 +381,7 @@ object TournamentShield {
           VariantKeys.gameFamilyName(GameFamily.Flipello()),
           Condition.TeamMember("playstrategy-flipello", "PlayStrategy Othello"),
           othelloVariants,
-          othelloVariantOrder,
+          randomOthelloVariantOrder,
           Blitz53,
           Some(4),
           7,
@@ -385,9 +389,7 @@ object TournamentShield {
           othelloVariantMinutes,
           othelloRounds,
           "",
-          s"An Arena which is divided into ${othelloRounds} equal length periods of ${othelloVariants.init
-            .map(VariantKeys.variantName)
-            .mkString(", ")} and ${VariantKeys.variantName(othelloVariants.last)} again.",
+          s"Arena which is divided between all ${othelloRounds} variants in the ${VariantKeys.gameFamilyName(GameFamily.Flipello())} family.",
           s"Welcome to the ${VariantKeys.gameFamilyName(GameFamily.Flipello())} Medley Arena!"
         )
 
@@ -472,18 +474,15 @@ object TournamentShield {
           6
         )
 
-    private def backgammonVariantOrder(variants: List[Variant]) =
+    private def randomBackgammonVariantOrder(variants: List[Variant]) =
       TournamentMedleyUtil.medleyVariantsAndIntervals(
-        variants,
-        None,
+        Random.shuffle(variants),
+        Some(3 * 60),
         backgammonVariantMinutes,
         backgammonRounds
       )
-    private val backgammonVariants = List(
-      Variant.wrap(strategygames.backgammon.variant.Backgammon),
-      Variant.wrap(strategygames.backgammon.variant.Nackgammon),
-      Variant.wrap(strategygames.backgammon.variant.Hyper)
-    )
+    private val backgammonVariants =
+      Variant.all.filter(_.gameFamily == GameFamily.Backgammon()).filterNot(_.fromPositionVariant)
 
     private val backgammonVariantMinutes = 90
     private val backgammonRounds         = backgammonVariants.size
@@ -495,7 +494,7 @@ object TournamentShield {
           VariantKeys.gameFamilyName(GameFamily.Backgammon()),
           Condition.TeamMember("playstrategy-backgammon", "PlayStrategy Backgammon"),
           backgammonVariants,
-          backgammonVariantOrder,
+          randomBackgammonVariantOrder,
           Delay310,
           Some(1),
           6,
@@ -503,9 +502,7 @@ object TournamentShield {
           backgammonVariantMinutes,
           backgammonRounds,
           "",
-          s"An Arena which is divided into ${backgammonRounds} equal length periods of ${backgammonVariants.init
-            .map(VariantKeys.variantName)
-            .mkString(", ")} and ${VariantKeys.variantName(backgammonVariants.last)}.",
+          s"Arena which is divided between all ${backgammonRounds} variants in the ${VariantKeys.gameFamilyName(GameFamily.Backgammon())} family.",
           s"Welcome to the ${VariantKeys.gameFamilyName(GameFamily.Backgammon())} Medley Arena!"
         )
 
@@ -834,7 +831,7 @@ object TournamentShield {
         extends Category(
           Variant.Dameo(strategygames.dameo.variant.Dameo),
           Blitz32,
-          14,
+          4,
           1
         )
 
@@ -878,6 +875,22 @@ object TournamentShield {
           Variant.FairySF(strategygames.fairysf.variant.Flipello10),
           Blitz32,
           27
+        )
+
+    case object AntiFlipello
+        extends Category(
+          Variant.FairySF(strategygames.fairysf.variant.AntiFlipello),
+          Blitz32,
+          18,
+          1
+        )
+
+    case object OctagonFlipello
+        extends Category(
+          Variant.FairySF(strategygames.fairysf.variant.OctagonFlipello),
+          Blitz32,
+          6,
+          1
         )
 
     case object Amazons
@@ -1000,12 +1013,15 @@ object TournamentShield {
       Pool,
       Portuguese,
       English,
+      Dameo,
       Shogi,
       Xiangqi,
       MiniShogi,
       MiniXiangqi,
       Flipello,
       Flipello10,
+      AntiFlipello,
+      OctagonFlipello,
       Amazons,
       BreakthroughTroyka,
       MiniBreakthroughTroyka,

@@ -35,6 +35,8 @@
   <string name="minixiangqi">Mini Xiangqi</string>
   <string name="flipello">Othello</string>
   <string name="flipello10">Grand Othello</string>
+  <string name="antiflipello">AntiOthello</string>
+  <string name="octagonflipello">Octagon Othello</string>
   <string name="amazons">Amazons</string>
   <string name="breakthroughtroyka">Breakthrough</string>
   <string name="minibreakthroughtroyka">Mini Breakthrough</string>    
