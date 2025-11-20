@@ -21,7 +21,7 @@ import { makeSanAndPlay } from 'stratops/san';
 import { parseFen, makeFen } from 'stratops/fen';
 import { parseSquare, parseUci, makeSquare, makeUci } from 'stratops/util';
 import { variantClassFromKey, variantKeyToRules } from 'stratops/variants/util';
-import { pgnToTree, mergeSolution } from './moveTree';
+import { actionStrsToTree, mergeSolution } from './moveTree';
 import { Redraw, Vm, Controller, PuzzleOpts, PuzzleData, PuzzleResult, MoveTest, ThemeKey } from './interfaces';
 import { Role, Move, Outcome, Rules } from 'stratops/types';
 import { storedProp } from 'common/storage';
@@ -77,7 +77,7 @@ export default function (opts: PuzzleOpts, redraw: Redraw): Controller {
 
   function initiate(fromData: PuzzleData): void {
     data = fromData;
-    tree = treeBuild(pgnToTree(data.game.variant.key, data.game.pgn.split(' ')));
+    tree = treeBuild(actionStrsToTree(data.game.variant.key, data.game.actionStrs.split(' ')));
     const initialPath = treePath.fromNodeList(treeOps.mainlineNodeList(tree.root));
     vm.mode = 'play';
     vm.next = defer();

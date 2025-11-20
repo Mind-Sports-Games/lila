@@ -8,8 +8,8 @@ import { scalachessCharPair } from 'stratops/compat';
 import { TreeWrapper } from 'tree';
 import { Move, Rules } from 'stratops/types';
 
-export function pgnToTree(variantKey: VariantKey, pgn: San[]): Tree.Node {
-  const pos = variantClassFromKey(variantKey).default();
+export function actionStrsToTree(variantKey: VariantKey, actionStrs: San[]): Tree.Node {
+  const pos: Position = variantClassFromKey(variantKey).default();
   const root: Tree.Node = {
     ply: 0,
     turnCount: 0,
@@ -20,7 +20,8 @@ export function pgnToTree(variantKey: VariantKey, pgn: San[]): Tree.Node {
     children: [],
   } as Tree.Node;
   let current = root;
-  pgn.forEach((san, i) => {
+  // actionsStrs is san for chess/loa but uci for other games
+  actionStrs.forEach((san, i) => {
     const move = parseSan(variantKeyToRules(variantKey))(pos, san)!;
     pos.play(move);
     const nextNode = makeNode(variantKeyToRules(variantKey), pos, move, i + 1, san);

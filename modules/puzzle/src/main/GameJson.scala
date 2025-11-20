@@ -67,7 +67,7 @@ final private class GameJson(
         "rated"   -> game.rated,
         "players" -> playersJson(game),
         //can flatten whilst puzzles are just chess
-        "pgn" -> game.actionStrs.flatten.take(plies + 1).mkString(" ")
+        "actionStrs" -> game.actionStrs.flatten.take(plies + 1).mkString(" ")
       )
       .add("clock", game.clock.map(_.config.show))
 

@@ -160,7 +160,7 @@ export interface PuzzleGame {
   };
   rated: boolean;
   players: [PuzzlePlayer, PuzzlePlayer];
-  pgn: string;
+  actionStrs: string;
   clock: string;
 }
 
