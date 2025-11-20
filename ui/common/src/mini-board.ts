@@ -155,5 +155,7 @@ export const variantFromElement = (element: Cash): string => {
                                           ? 'threeCheck'
                                           : element.hasClass('variant-fiveCheck')
                                             ? 'fiveCheck'
-                                            : 'standard';
+                                            : element.hasClass('variant-dameo')
+                                              ? 'dameo'
+                                              : 'standard';
 };

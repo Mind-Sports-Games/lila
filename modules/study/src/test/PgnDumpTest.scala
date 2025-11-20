@@ -186,5 +186,5 @@ class PgnDumpTest extends Specification {
       }
     }
   }
-  */
+   */
 }
