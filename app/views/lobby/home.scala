@@ -83,7 +83,7 @@ object home {
                 "button button-color-choice config_game" -> true,
                 "disabled"                               -> currentGame.isDefined
               ),
-              trans.createAGame()
+              trans.startAGame()
             )
           ),
           div(cls := "lobby__counters")(
@@ -229,7 +229,7 @@ object home {
     trans.aiNameLevelAiLevel,
     trans.yourTurn,
     trans.rating,
-    trans.createAGame,
+    trans.startAGame,
     trans.quickPairing,
     trans.lobby,
     trans.custom,

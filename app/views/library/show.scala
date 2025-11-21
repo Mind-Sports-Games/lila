@@ -94,7 +94,7 @@ object show {
               "button button-color-choice config_game" -> true
               //"disabled"                               -> currentGame.isDefined
             ),
-            trans.createAGame()
+            trans.startAGame()
           )
         ),
         div(id := "library_chart_area")(

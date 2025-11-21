@@ -54,7 +54,7 @@ function createSeek(ctrl: LobbyController): VNode | undefined {
               .trigger('click');
           }),
         },
-        ctrl.trans('createAGame'),
+        ctrl.trans('startAGame'),
       ),
     ]);
   return;
