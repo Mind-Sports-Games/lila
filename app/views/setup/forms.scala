@@ -26,7 +26,7 @@ object forms {
   )(implicit ctx: Context) =
     layout(
       "game",
-      (if (user.isDefined) trans.challenge.challengeToPlay else trans.startAGame)(),
+      (if (user.isDefined) trans.challenge.challengeToPlay else trans.createAGame)(),
       routes.Setup.game("sri-placeholder", user map (_.id)),
       inputVariant.map(v => s"${v.gameFamily.id}_${v.id}").getOrElse(""),
       error.map(e => raw(e.replace("{{user}}", userIdLink(user.map(_.id)).toString)))
