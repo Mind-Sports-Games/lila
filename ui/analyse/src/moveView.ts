@@ -6,6 +6,7 @@ import { fullTurnNodesFromNode } from './util';
 import { NotationStyle } from 'stratops/variants/types';
 import { variantClassFromKey } from 'stratops/variants/util';
 import { GameFamily as BackgammonFamily } from 'stratops/variants/backgammon/GameFamily';
+import { GameFamily as DameoFamily } from 'stratops/variants/dameo/GameFamily';
 
 export interface Ctx {
   withDots?: boolean;
@@ -65,7 +66,9 @@ export function renderMove(ctx: Ctx, node: Tree.ParentedNode): VNode[] {
 export function combinedNotationOfTurn(actionNotations: string[], notation: NotationStyle): string {
   return notation === NotationStyle.bkg
     ? BackgammonFamily.combinedNotation(actionNotations)
-    : actionNotations.join(' ');
+    : notation === NotationStyle.dmo
+      ? DameoFamily.combinedNotation(actionNotations)
+      : actionNotations.join(' ');
 }
 
 export function renderFullMove(ctx: Ctx, node: Tree.ParentedNode, style: NotationStyle): VNode[] {
