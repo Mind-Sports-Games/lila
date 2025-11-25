@@ -325,10 +325,9 @@ export default class AnalyseCtrl {
   private dameoActivePiece(fen: string) {
     if (this.data.game.variant.key === 'dameo') {
       const pieces: cg.Pieces = dameoFenRead(fen);
-      for(const [key, piece] of pieces){
-        if(['a-piece', 'b-piece'].includes(piece.role)){
-          console.log("SELECT", key);
-          return key
+      for (const [key, piece] of pieces) {
+        if (['a-piece', 'b-piece'].includes(piece.role)) {
+          return key;
         }
       }
     }
