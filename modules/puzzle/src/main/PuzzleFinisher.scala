@@ -11,6 +11,7 @@ import lila.db.dsl._
 import lila.rating.Perf
 import lila.rating.{ Glicko, PerfType }
 import lila.user.{ User, UserRepo }
+import strategygames.variant.Variant
 
 final private[puzzle] class PuzzleFinisher(
     api: PuzzleApi,
@@ -31,6 +32,7 @@ final private[puzzle] class PuzzleFinisher(
 
   def apply(
       id: Puzzle.Id,
+      variant: Variant,
       theme: PuzzleTheme.Key,
       user: User,
       result: Result

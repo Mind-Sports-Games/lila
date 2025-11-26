@@ -4,6 +4,7 @@ import cats.implicits._
 import org.joda.time.DateTime
 import scala.concurrent.duration._
 
+import strategygames.variant.Variant
 import lila.common.paginator.Paginator
 import lila.common.config.MaxPerPage
 import lila.db.dsl._
@@ -124,9 +125,9 @@ final class PuzzleApi(
 
   object theme {
 
-    def categorizedWithCount: Fu[List[(lila.i18n.I18nKey, List[PuzzleTheme.WithCount])]] =
-      countApi.countsByTheme map { counts =>
-        PuzzleTheme.categorized.map { case (cat, puzzles) =>
+    def categorizedWithCount(variant: Variant): Fu[List[(lila.i18n.I18nKey, List[PuzzleTheme.WithCount])]] =
+      countApi.countByThemeForVariant(variant) map { counts =>
+        PuzzleVariantThemes.categorizedThemesFor(variant.key) map { case (cat, puzzles) =>
           cat -> puzzles.map { pt =>
             PuzzleTheme.WithCount(pt, counts.getOrElse(pt.key, 0))
           }

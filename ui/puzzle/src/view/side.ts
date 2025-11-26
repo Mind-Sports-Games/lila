@@ -10,6 +10,7 @@ export function puzzleBox(ctrl: Controller): VNode {
 }
 
 function puzzleInfos(ctrl: Controller, puzzle: Puzzle): VNode {
+  const variant = ctrl.getData().game.variant.key;
   return h(
     'div.infos.puzzle',
     {
@@ -27,7 +28,7 @@ function puzzleInfos(ctrl: Controller, puzzle: Puzzle): VNode {
                   'a',
                   {
                     attrs: {
-                      href: `/training/${puzzle.id}`,
+                      href: `/training/${variant}/${puzzle.id}`,
                       ...(ctrl.streak ? { target: '_blank' } : {}),
                     },
                   },
@@ -156,6 +157,7 @@ const difficulties: [PuzzleDifficulty, number][] = [
 
 export function replay(ctrl: Controller): MaybeVNode {
   const replay = ctrl.getData().replay;
+  const variant = ctrl.getData().game.variant.key;
   if (!replay) return;
   const i = replay.i + (ctrl.vm.mode == 'play' ? 0 : 1);
   return h('div.puzzle__side__replay', [
@@ -163,7 +165,7 @@ export function replay(ctrl: Controller): MaybeVNode {
       'a',
       {
         attrs: {
-          href: `/training/dashboard/${replay.days}`,
+          href: `/training/${variant}/dashboard/${replay.days}`,
         },
       },
       ['« ', `Replaying ${ctrl.trans.noarg(ctrl.getData().theme.key)} puzzles`],
@@ -201,7 +203,7 @@ export function config(ctrl: Controller): MaybeVNode {
           'form.puzzle__side__config__difficulty',
           {
             attrs: {
-              action: `/training/difficulty/${ctrl.getData().theme.key}`,
+              action: `/training/${ctrl.getData().game.variant.key}/difficulty/${ctrl.getData().theme.key}`,
               method: 'post',
             },
           },

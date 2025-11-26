@@ -10,23 +10,27 @@ import lila.common.paginator.Paginator
 import lila.puzzle.PuzzleHistory.{ PuzzleSession, SessionRound }
 import lila.puzzle.PuzzleTheme
 import lila.user.User
+import strategygames.variant.Variant
 
 object history {
 
-  def apply(user: User, page: Int, pager: Paginator[PuzzleSession])(implicit ctx: Context) =
+  def apply(user: User, variant: Variant, page: Int, pager: Paginator[PuzzleSession])(implicit ctx: Context) =
     views.html.base.layout(
       title = "Puzzle history",
       moreCss = cssTag("puzzle.dashboard"),
       moreJs = infiniteScrollTag
     )(
       main(cls := "page-menu")(
-        bits.pageMenu("history"),
+        bits.pageMenu("history", variant),
         div(cls := "page-menu__content box box-pad")(
           h1(trans.puzzle.history()),
           div(cls := "puzzle-history")(
             div(cls := "infinite-scroll")(
               pager.currentPageResults map renderSession,
-              pagerNext(pager, np => s"${routes.Puzzle.history(np).url}${!ctx.is(user) ?? s"&u=${user.id}"}")
+              pagerNext(
+                pager,
+                np => s"${routes.Puzzle.history(variant.key, np).url}${!ctx.is(user) ?? s"&u=${user.id}"}"
+              )
             )
           )
         )
@@ -43,7 +47,7 @@ object history {
     )
 
   private def renderRound(r: SessionRound)(implicit ctx: Context) =
-    a(cls := "puzzle-history__round", href := routes.Puzzle.show(r.puzzle.id.value))(
+    a(cls := "puzzle-history__round", href := routes.Puzzle.show(r.puzzle.variant.key, r.puzzle.id.value))(
       views.html.board.bits.mini(r.puzzle.fenAfterInitialMove, r.puzzle.playerIndex, r.puzzle.line.head.uci)(
         span(cls := "puzzle-history__round__puzzle")
       ),

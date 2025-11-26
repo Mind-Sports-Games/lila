@@ -9,20 +9,23 @@ import lila.app.ui.ScalatagsTemplate._
 import lila.common.paginator.Paginator
 import lila.puzzle.Puzzle
 import lila.user.User
+import strategygames.variant.Variant
 
 object ofPlayer {
 
-  def apply(query: String, user: Option[User], puzzles: Option[Paginator[Puzzle]])(implicit ctx: Context) =
+  def apply(query: String, user: Option[User], variant: Variant, puzzles: Option[Paginator[Puzzle]])(implicit
+      ctx: Context
+  ) =
     views.html.base.layout(
       title = user.fold("Lookup puzzles from a player's games")(u => s"Puzzles from ${u.username}' games"),
       moreCss = cssTag("puzzle.page"),
       moreJs = infiniteScrollTag
     )(
       main(cls := "page-menu")(
-        bits.pageMenu("player"),
+        bits.pageMenu("player", variant),
         div(cls := "page-menu__content puzzle-of-player box box-pad")(
           form(
-            action := routes.Puzzle.ofPlayer(),
+            action := routes.Puzzle.ofPlayer(variant.key),
             method := "get",
             cls := "form3 puzzle-of-player__form complete-parent"
           )(
@@ -60,7 +63,7 @@ object ofPlayer {
                           )(
                             a(
                               cls := s"puzzle-of-player__puzzle__board variant-${puzzle.variant.key}",
-                              href := routes.Puzzle.show(puzzle.id.value)
+                              href := routes.Puzzle.show(puzzle.variant.key, puzzle.id.value)
                             )
                           ),
                           span(cls := "puzzle-of-player__puzzle__meta")(
@@ -69,7 +72,10 @@ object ofPlayer {
                           )
                         )
                       },
-                      pagerNext(pager, np => s"${routes.Puzzle.ofPlayer(u.username.some, np).url}")
+                      pagerNext(
+                        pager,
+                        np => s"${routes.Puzzle.ofPlayer(variant.key, u.username.some, np).url}"
+                      )
                     )
                   )
               case (_, _) => emptyFrag

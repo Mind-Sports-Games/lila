@@ -1,0 +1,83 @@
+$c-color-choice-map: (
+  'black': $c-color-choice-black,
+  'green': $c-color-choice-green,
+  'red': $c-color-choice-red,
+  'blue': $c-color-choice-blue,
+  'yellow': $c-color-choice-yellow,
+);
+
+$c-color-choice-dim-map: (
+  'black': $c-color-choice-black-dim,
+  'green': $c-color-choice-green-dim,
+  'red': $c-color-choice-red-dim,
+  'blue': $c-color-choice-blue-dim,
+  'yellow': $c-color-choice-yellow-dim,
+);
+
+.variant_group {
+  display: flex;
+  flex-flow: row wrap;
+  margin: 0 auto 4em auto;
+  width: 100%;
+  overflow: hidden;
+  border-radius: 3px;
+  box-shadow:
+    0 2px 2px 0 rgba(0, 0, 0, 0.14),
+    0 3px 1px -2px rgba(0, 0, 0, 0.2),
+    0 1px 5px 0 rgba(0, 0, 0, 0.12);
+
+  @each $c in ('black', 'green', 'red', 'blue', 'yellow') {
+    .selected-color-#{$c} & button:not(.selected):hover {
+      background: map-get($c-color-choice-dim-map, $c);
+      a {
+        color: initial;
+        text-shadow: 0 1px 0 map-get($c-color-choice-dim-map, $c);
+        font-weight: bold;
+      }
+    }
+  }
+
+  @each $c in ('black', 'green', 'red', 'blue', 'yellow') {
+    .selected-color-#{$c} & button.selected {
+      background: map-get($c-color-choice-map, $c);
+      a {
+        color: $c-color-choice-font-default;
+        text-shadow: 0 1px 0 map-get($c-color-choice-map, $c);
+        font-weight: bold;
+      }
+    }
+  }
+
+  //dont change color on hover for selected buttons
+  @each $c in ('black', 'green', 'red', 'blue', 'yellow') {
+    .selected-color-#{$c} & button.selected:hover {
+      background: map-get($c-color-choice-map, $c);
+      a {
+        color: $c-color-choice-font-default;
+        text-shadow: 0 1px 0 map-get($c-color-choice-map, $c);
+      }
+    }
+  }
+
+  button.variant {
+    height: 64px;
+    padding: 2px;
+    max-width: 25%;
+    flex: 0 0 25%;
+    border-right: 1px solid $c-border;
+    border-left: none;
+    border-top: none;
+    border-bottom: none;
+    text-transform: initial;
+
+    a {
+      flex-flow: column;
+      display: flex;
+      color: unset;
+    }
+
+    ::before {
+      font-size: 2.2em;
+    }
+  }
+}

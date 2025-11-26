@@ -466,9 +466,17 @@ object mon {
         )
     }
     object path {
-      def nextFor(theme: String, tier: String, difficulty: String, previousPaths: Int, compromise: Int) =
+      def nextFor(
+          varaintKey: String,
+          theme: String,
+          tier: String,
+          difficulty: String,
+          previousPaths: Int,
+          compromise: Int
+      ) =
         timer("puzzle.path.nextFor").withTags(
           tags(
+            "variant"       -> varaintKey,
             "theme"         -> theme,
             "tier"          -> tier,
             "difficulty"    -> difficulty,

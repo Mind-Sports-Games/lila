@@ -5,6 +5,7 @@ import scala.concurrent.ExecutionContext
 import lila.db.dsl._
 import lila.user.User
 import lila.common.Iso
+import strategygames.variant.Variant
 
 private object PuzzlePath {
 
@@ -17,6 +18,8 @@ private object PuzzlePath {
     private[puzzle] def tier = PuzzleTier.from(~parts.lift(1))
 
     def theme = PuzzleTheme.findOrAny(~parts.headOption).key
+
+    def variantKey = "linesOfAction" // TODO add variant into path
   }
 
   implicit val pathIdIso: Iso.StringIso[Id] = lila.common.Iso.string[Id](Id.apply, _.value)
@@ -31,6 +34,7 @@ final private class PuzzlePathApi(
 
   def nextFor(
       user: User,
+      variant: Variant,
       theme: PuzzleTheme.Key,
       tier: PuzzleTier,
       difficulty: PuzzleDifficulty,
@@ -58,14 +62,16 @@ final private class PuzzlePathApi(
       .flatMap {
         case Some(path) => fuccess(path.some)
         case _ if actualTier == PuzzleTier.Top =>
-          nextFor(user, theme, PuzzleTier.Good, difficulty, previousPaths)
+          nextFor(user, variant, theme, PuzzleTier.Good, difficulty, previousPaths)
         case _ if actualTier == PuzzleTier.Good && compromise == 2 =>
-          nextFor(user, theme, PuzzleTier.All, difficulty, previousPaths, compromise = 1)
+          nextFor(user, variant, theme, PuzzleTier.All, difficulty, previousPaths, compromise = 1)
         case _ if compromise < 5 =>
-          nextFor(user, theme, actualTier, difficulty, previousPaths, compromise + 1)
+          nextFor(user, variant, theme, actualTier, difficulty, previousPaths, compromise + 1)
         case _ => fuccess(none)
       }
-  }.mon(_.puzzle.path.nextFor(theme.value, tier.key, difficulty.key, previousPaths.size, compromise))
+  }.mon(
+    _.puzzle.path.nextFor(variant.key, theme.value, tier.key, difficulty.key, previousPaths.size, compromise)
+  )
 
   def select(theme: PuzzleTheme.Key, tier: PuzzleTier, rating: Range) = $doc(
     "min" $lte f"${theme}${sep}${tier}${sep}${rating.max}%04d",

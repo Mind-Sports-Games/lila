@@ -6,6 +6,8 @@ import scala.concurrent.duration._
 import scala.concurrent.ExecutionContext
 import scala.util.chaining._
 
+import strategygames.variant.Variant
+
 import lila.db.dsl._
 import lila.memo.CacheApi
 import lila.user.User
@@ -38,12 +40,13 @@ final class PuzzleReplayApi(
   def apply(
       user: User,
       maybeDays: Option[PuzzleDashboard.Days],
+      variant: Variant,
       theme: PuzzleTheme.Key
   ): Fu[Option[(Puzzle, PuzzleReplay)]] =
     maybeDays map { days =>
-      replays.getFuture(user.id, _ => createReplayFor(user, days, theme)) flatMap { current =>
+      replays.getFuture(user.id, _ => createReplayFor(user, days, variant, theme)) flatMap { current =>
         if (current.days == days && current.theme == theme && current.remaining.nonEmpty) fuccess(current)
-        else createReplayFor(user, days, theme) tap { replays.put(user.id, _) }
+        else createReplayFor(user, days, variant, theme) tap { replays.put(user.id, _) }
       } flatMap { replay =>
         replay.remaining.headOption ?? { id =>
           colls.puzzle(_.byId[Puzzle](id.value)) map2 (_ -> replay)
@@ -51,7 +54,12 @@ final class PuzzleReplayApi(
       }
     } getOrElse fuccess(None)
 
-  def onComplete(round: PuzzleRound, days: PuzzleDashboard.Days, theme: PuzzleTheme.Key): Funit =
+  def onComplete(
+      round: PuzzleRound,
+      days: PuzzleDashboard.Days,
+      variant: Variant,
+      theme: PuzzleTheme.Key
+  ): Funit =
     replays.getIfPresent(round.userId) ?? {
       _ map { replay =>
         if (replay.days == days && replay.theme == theme)
@@ -62,6 +70,7 @@ final class PuzzleReplayApi(
   private def createReplayFor(
       user: User,
       days: PuzzleDashboard.Days,
+      variant: Variant,
       theme: PuzzleTheme.Key
   ): Fu[PuzzleReplay] =
     colls

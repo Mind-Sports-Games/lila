@@ -7,10 +7,11 @@ const studyUrl = 'https://playstrategy.org/study/viiWlKjv';
 
 export default function theme(ctrl: Controller): MaybeVNode {
   const t = ctrl.getData().theme;
+  const variant = ctrl.getData().game.variant.key;
   return ctrl.streak || ctrl.getData().replay
     ? null
     : h('div.puzzle__side__theme', [
-        h('a', { attrs: { href: '/training/themes' } }, h('h2', ['« ', t.name])),
+        h('a', { attrs: { href: `/training/${variant}/themes` } }, h('h2', ['« ', t.name])),
         h('p', [
           t.desc,
           t.chapter &&
@@ -65,7 +66,7 @@ const editor = (ctrl: Controller): VNode => {
               'a',
               {
                 attrs: {
-                  href: `/training/${key}`,
+                  href: `/training/${data.game.variant.key}/${key}`,
                   title: trans(`${key}Description`),
                 },
               },

@@ -7,6 +7,7 @@ import scala.util.chaining._
 import lila.db.dsl._
 import lila.memo.CacheApi
 import lila.user.{ User, UserRepo }
+import strategygames.variant.Variant
 
 private case class PuzzleSession(
     difficulty: PuzzleDifficulty,
@@ -44,17 +45,17 @@ final class PuzzleSessionApi(
     case class PuzzleFound(puzzle: Puzzle)         extends NextPuzzleResult("puzzleFound")
   }
 
-  def nextPuzzleFor(user: User, theme: PuzzleTheme.Key, retries: Int = 0): Fu[Puzzle] =
-    continueOrCreateSessionFor(user, theme)
+  def nextPuzzleFor(user: User, variant: Variant, theme: PuzzleTheme.Key, retries: Int = 0): Fu[Puzzle] =
+    continueOrCreateSessionFor(user, variant, theme)
       .flatMap { session =>
         import NextPuzzleResult._
 
         def switchPath(tier: PuzzleTier) =
-          pathApi.nextFor(user, theme, tier, session.difficulty, session.previousPaths) orFail
+          pathApi.nextFor(user, variant, theme, tier, session.difficulty, session.previousPaths) orFail
             s"No puzzle path for ${user.id} $theme $tier" flatMap { pathId =>
               val newSession = session.switchTo(pathId)
               sessions.put(user.id, fuccess(newSession))
-              nextPuzzleFor(user, theme, retries = retries + 1)
+              nextPuzzleFor(user, variant, theme, retries = retries + 1)
             }
 
         def serveAndMonitor(puzzle: Puzzle) = {
@@ -76,10 +77,10 @@ final class PuzzleSessionApi(
             case PuzzleMissing(id) =>
               logger.warn(s"Puzzle missing: $id")
               sessions.put(user.id, fuccess(session.next))
-              nextPuzzleFor(user, theme, retries)
+              nextPuzzleFor(user, variant, theme, retries)
             case PuzzleAlreadyPlayed(_) if retries < 3 =>
               sessions.put(user.id, fuccess(session.next))
-              nextPuzzleFor(user, theme, retries = retries + 1)
+              nextPuzzleFor(user, variant, theme, retries = retries + 1)
             case PuzzleAlreadyPlayed(puzzle) =>
               session.path.tier.stepDown.fold(fuccess(serveAndMonitor(puzzle)))(switchPath)
             case PuzzleFound(puzzle) => fuccess(serveAndMonitor(puzzle))
@@ -148,7 +149,7 @@ final class PuzzleSessionApi(
         )
       }
 
-  def onComplete(round: PuzzleRound, theme: PuzzleTheme.Key): Funit =
+  def onComplete(round: PuzzleRound, variant: Variant, theme: PuzzleTheme.Key): Funit =
     sessions.getIfPresent(round.userId) ?? {
       _ map { session =>
         // yes, even if the completed puzzle was not the current session puzzle
@@ -163,9 +164,9 @@ final class PuzzleSessionApi(
       .getIfPresent(user.id)
       .fold[Fu[PuzzleDifficulty]](fuccess(PuzzleDifficulty.default))(_.dmap(_.difficulty))
 
-  def setDifficulty(user: User, difficulty: PuzzleDifficulty): Funit =
+  def setDifficulty(user: User, variant: Variant, difficulty: PuzzleDifficulty): Funit =
     sessions.getIfPresent(user.id).fold(fuccess(PuzzleTheme.mix.key))(_.dmap(_.path.theme)) flatMap { theme =>
-      createSessionFor(user, theme, difficulty).tap { sessions.put(user.id, _) }.void
+      createSessionFor(user, variant, theme, difficulty).tap { sessions.put(user.id, _) }.void
     }
 
   private val sessions = cacheApi.notLoading[User.ID, PuzzleSession](32768, "puzzle.session")(
@@ -174,11 +175,12 @@ final class PuzzleSessionApi(
 
   private[puzzle] def continueOrCreateSessionFor(
       user: User,
+      variant: Variant,
       theme: PuzzleTheme.Key
   ): Fu[PuzzleSession] =
-    sessions.getFuture(user.id, _ => createSessionFor(user, theme)) flatMap { current =>
+    sessions.getFuture(user.id, _ => createSessionFor(user, variant, theme)) flatMap { current =>
       if (current.path.theme == theme && !shouldChangeSession(user, current)) fuccess(current)
-      else createSessionFor(user, theme, current.difficulty) tap { sessions.put(user.id, _) }
+      else createSessionFor(user, variant, theme, current.difficulty) tap { sessions.put(user.id, _) }
     }
 
   private def shouldChangeSession(user: User, session: PuzzleSession) = !session.brandNew && {
@@ -188,11 +190,12 @@ final class PuzzleSessionApi(
 
   private def createSessionFor(
       user: User,
+      variant: Variant,
       theme: PuzzleTheme.Key,
       difficulty: PuzzleDifficulty = PuzzleDifficulty.default
   ): Fu[PuzzleSession] =
     pathApi
-      .nextFor(user, theme, PuzzleTier.Top, difficulty, Set.empty)
+      .nextFor(user, variant, theme, PuzzleTier.Top, difficulty, Set.empty)
       .orFail(s"No puzzle path found for ${user.id}, theme: $theme")
       .dmap(pathId => PuzzleSession(difficulty, pathId, 0))
 }

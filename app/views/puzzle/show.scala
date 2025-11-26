@@ -41,7 +41,7 @@ object show {
           title =
             if (isStreak) "Puzzle Streak"
             else s"Chess tactic #${puzzle.id} - ${puzzle.playerIndex.name.capitalize} to play",
-          url = s"$netBaseUrl${routes.Puzzle.show(puzzle.id.value).url}",
+          url = s"$netBaseUrl${routes.Puzzle.show(puzzle.variant.key, puzzle.id.value).url}",
           description =
             if (isStreak) trans.puzzle.streakDescription.txt()
             else

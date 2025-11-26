@@ -289,19 +289,22 @@ export default function (opts: PuzzleOpts, redraw: Redraw): Controller {
     if (vm.resultSent) return Promise.resolve();
     vm.resultSent = true;
     session.complete(data.puzzle.id, win);
-    return xhr.complete(data.puzzle.id, data.theme.key, win, data.replay, streak).then((res: PuzzleResult) => {
-      if (res?.replayComplete && data.replay) return playstrategy.redirect(`/training/dashboard/${data.replay.days}`);
-      if (res?.next.user && data.user) {
-        data.user.rating = res.next.user.rating;
-        data.user.provisional = res.next.user.provisional;
-        vm.round = res.round;
-        if (res.round?.ratingDiff) session.setRatingDiff(data.puzzle.id, res.round.ratingDiff);
-      }
-      if (win) speech.success();
-      vm.next.resolve(res.next);
-      if (streak && win) streak.onComplete(true, res.next);
-      redraw();
-    });
+    return xhr
+      .complete(data.puzzle.id, data.game.variant.key, data.theme.key, win, data.replay, streak)
+      .then((res: PuzzleResult) => {
+        if (res?.replayComplete && data.replay)
+          return playstrategy.redirect(`/training/${data.game.variant.key}/dashboard/${data.replay.days}`);
+        if (res?.next.user && data.user) {
+          data.user.rating = res.next.user.rating;
+          data.user.provisional = res.next.user.provisional;
+          vm.round = res.round;
+          if (res.round?.ratingDiff) session.setRatingDiff(data.puzzle.id, res.round.ratingDiff);
+        }
+        if (win) speech.success();
+        vm.next.resolve(res.next);
+        if (streak && win) streak.onComplete(true, res.next);
+        redraw();
+      });
   }
 
   function nextPuzzle(): void {
@@ -309,7 +312,7 @@ export default function (opts: PuzzleOpts, redraw: Redraw): Controller {
     vm.next.promise.then(initiate).then(redraw);
 
     if (!streak && !data.replay) {
-      const path = `/training/${data.theme.key}`;
+      const path = `/training/${data.game.variant.key}/${data.theme.key}`;
       if (location.pathname != path) history.replaceState(null, '', path);
     }
   }

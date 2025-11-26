@@ -3,6 +3,7 @@ package lila.puzzle
 import lila.i18n.I18nKeys.{ puzzleTheme => i }
 import lila.i18n.{ I18nKey, I18nKeys => trans }
 import lila.common.Iso
+import strategygames.variant.Variant
 
 case class PuzzleTheme(key: PuzzleTheme.Key, name: I18nKey, description: I18nKey)
 
@@ -235,4 +236,25 @@ object PuzzleTheme {
   def findDynamic(key: String) = find(key).filterNot(t => staticThemes(t.key))
 
   implicit val keyIso: Iso.StringIso[Key] = lila.common.Iso.string[Key](Key.apply, _.value)
+}
+
+object PuzzleVariantThemes {
+
+  val byCategorizedVariant: Map[String, List[(I18nKey, List[PuzzleTheme])]] = Map(
+    "standard" -> PuzzleTheme.categorized,
+    "linesOfAction" -> List(
+      trans.puzzle.recommended -> List(
+        PuzzleTheme.mix
+      ),
+      trans.puzzle.mates -> List(
+        PuzzleTheme.mate,
+        PuzzleTheme.mateIn1,
+        PuzzleTheme.mateIn2,
+        PuzzleTheme.mateIn3
+      )
+    )
+  )
+
+  def categorizedThemesFor(variant: String): List[(I18nKey, List[PuzzleTheme])] =
+    byCategorizedVariant.getOrElse(variant, Nil)
 }

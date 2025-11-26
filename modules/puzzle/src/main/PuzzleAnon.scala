@@ -7,6 +7,8 @@ import lila.common.ThreadLocalRandom
 import lila.db.dsl._
 import lila.memo.CacheApi
 
+import strategygames.variant.Variant
+
 final class PuzzleAnon(
     colls: PuzzleColls,
     cacheApi: CacheApi,
@@ -16,7 +18,7 @@ final class PuzzleAnon(
 
   import BsonHandlers._
 
-  def getOneFor(theme: PuzzleTheme.Key): Fu[Option[Puzzle]] =
+  def getOneFor(variant: Variant, theme: PuzzleTheme.Key): Fu[Option[Puzzle]] =
     pool
       .get(theme)
       .map(ThreadLocalRandom.oneOf)

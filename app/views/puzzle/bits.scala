@@ -6,6 +6,7 @@ import strategygames.format.FEN
 import controllers.routes
 import play.api.i18n.Lang
 import play.api.libs.json.{ JsString, Json }
+import strategygames.variant.Variant
 
 import lila.app.templating.Environment._
 import lila.app.ui.ScalatagsTemplate._
@@ -38,27 +39,30 @@ object bits {
       )
   }
 
-  def pageMenu(active: String, days: Int = 30)(implicit lang: Lang) =
+  def pageMenu(active: String, variant: Variant, days: Int = 30)(implicit lang: Lang) =
     st.nav(cls := "page-menu__menu subnav")(
-      a(href := routes.Puzzle.home)(
+      a(href := routes.Puzzle.home(variant.key))(
         trans.puzzles()
       ),
-      a(cls := active.active("themes"), href := routes.Puzzle.themes)(
+      a(cls := active.active("themes"), href := routes.Puzzle.themes(variant.key))(
         trans.puzzle.puzzleThemes()
       ),
-      a(cls := active.active("dashboard"), href := routes.Puzzle.dashboard(days, "dashboard"))(
+      a(cls := active.active("dashboard"), href := routes.Puzzle.dashboard(variant.key, days, "dashboard"))(
         trans.puzzle.puzzleDashboard()
       ),
-      a(cls := active.active("improvementAreas"), href := routes.Puzzle.dashboard(days, "improvementAreas"))(
+      a(
+        cls := active.active("improvementAreas"),
+        href := routes.Puzzle.dashboard(variant.key, days, "improvementAreas")
+      )(
         trans.puzzle.improvementAreas()
       ),
-      a(cls := active.active("strengths"), href := routes.Puzzle.dashboard(days, "strengths"))(
+      a(cls := active.active("strengths"), href := routes.Puzzle.dashboard(variant.key, days, "strengths"))(
         trans.puzzle.strengths()
       ),
-      a(cls := active.active("history"), href := routes.Puzzle.history(1))(
+      a(cls := active.active("history"), href := routes.Puzzle.history(variant.key, 1))(
         trans.puzzle.history()
       ),
-      a(cls := active.active("player"), href := routes.Puzzle.ofPlayer())(
+      a(cls := active.active("player"), href := routes.Puzzle.ofPlayer(variant.key))(
         "From my games"
       )
     )

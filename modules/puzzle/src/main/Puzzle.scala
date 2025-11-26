@@ -48,6 +48,13 @@ object Puzzle {
 
   def toId(id: String) = id.size == idSize option Id(id)
 
+  val puzzleVariants: List[Variant] = List(
+    Variant.orDefault(GameLogic.Chess(), 1),
+    Variant.orDefault(GameLogic.Chess(), 11)
+  )
+
+  val defaultVariant: Variant = puzzleVariants.head
+
   /* The mobile app requires numerical IDs.
    * We convert string ids from and to Longs using base 62
    */

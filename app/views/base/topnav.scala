@@ -5,6 +5,7 @@ import controllers.routes
 import lila.api.Context
 import lila.app.templating.Environment._
 import lila.app.ui.ScalatagsTemplate._
+import lila.puzzle.Puzzle
 
 object topnav {
 
@@ -42,10 +43,12 @@ object topnav {
         )
       ),
       ctx.noBot option st.section(
-        linkTitle(routes.Puzzle.home.path, trans.puzzles()),
+        linkTitle(routes.Puzzle.home(Puzzle.defaultVariant.key).path, trans.puzzles()),
         div(role := "group")(
-          a(href := routes.Puzzle.home)(trans.puzzles()),
-          a(href := routes.Puzzle.dashboard(30, "home"))(trans.puzzle.puzzleDashboard())
+          a(href := routes.Puzzle.home(Puzzle.defaultVariant.key))(trans.puzzles()),
+          a(href := routes.Puzzle.dashboard(Puzzle.defaultVariant.key, 30, "home"))(
+            trans.puzzle.puzzleDashboard()
+          )
           // a(href := routes.Puzzle.streak)("Puzzle Streak")
           // a(href := routes.Storm.home)("Puzzle Storm"),
           // a(href := routes.Racer.home)("Puzzle Racer")

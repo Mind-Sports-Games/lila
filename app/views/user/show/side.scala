@@ -8,6 +8,7 @@ import lila.app.templating.Environment._
 import lila.app.ui.ScalatagsTemplate._
 import lila.rating.PerfType
 import lila.user.User
+import lila.puzzle.Puzzle
 
 object side {
 
@@ -30,7 +31,8 @@ object side {
           "active" -> active.has(perfType)
         ),
         href := {
-          if (isPuzzle) ctx.is(u) option routes.Puzzle.dashboard(30, "home").url
+          if (isPuzzle)
+            ctx.is(u) option routes.Puzzle.dashboard(Puzzle.defaultVariant.key, 30, "home").url
           else routes.User.perfStat(u.username, perfType.key).url.some
         },
         span(
