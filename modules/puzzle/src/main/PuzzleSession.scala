@@ -52,7 +52,7 @@ final class PuzzleSessionApi(
 
         def switchPath(tier: PuzzleTier) =
           pathApi.nextFor(user, variant, theme, tier, session.difficulty, session.previousPaths) orFail
-            s"No puzzle path for ${user.id} $theme $tier" flatMap { pathId =>
+            s"No puzzle path for ${user.id} ${variant.name} $theme $tier" flatMap { pathId =>
               val newSession = session.switchTo(pathId)
               sessions.put(user.id, fuccess(newSession))
               nextPuzzleFor(user, variant, theme, retries = retries + 1)
@@ -179,7 +179,12 @@ final class PuzzleSessionApi(
       theme: PuzzleTheme.Key
   ): Fu[PuzzleSession] =
     sessions.getFuture(user.id, _ => createSessionFor(user, variant, theme)) flatMap { current =>
-      if (current.path.theme == theme && !shouldChangeSession(user, current)) fuccess(current)
+      if (
+        current.path.theme == theme && current.path.variant.key == variant.key && !shouldChangeSession(
+          user,
+          current
+        )
+      ) fuccess(current)
       else createSessionFor(user, variant, theme, current.difficulty) tap { sessions.put(user.id, _) }
     }
 
@@ -196,6 +201,6 @@ final class PuzzleSessionApi(
   ): Fu[PuzzleSession] =
     pathApi
       .nextFor(user, variant, theme, PuzzleTier.Top, difficulty, Set.empty)
-      .orFail(s"No puzzle path found for ${user.id}, theme: $theme")
+      .orFail(s"No puzzle path found for ${user.id}, variant: ${variant.key}, theme: $theme")
       .dmap(pathId => PuzzleSession(difficulty, pathId, 0))
 }

@@ -56,7 +56,7 @@ final class PuzzleAnon(
             colls.path {
               _.aggregateList(poolSize) { framework =>
                 import framework._
-                Match(pathApi.select(theme, tier, ratingRange)) -> List(
+                Match(pathApi.select(Puzzle.defaultVariant, theme, tier, ratingRange)) -> List(
                   Sample(pathSampleSize),
                   Project($doc("puzzleId" -> "$ids", "_id" -> false)),
                   Unwind("puzzleId"),

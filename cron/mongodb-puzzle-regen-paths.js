@@ -45,6 +45,11 @@ const mixBoundaries = [
 
 const themes = puzzleColl.distinct('themes', {}).filter(t => t && t != 'checkFirst');
 
+const variantKeys = puzzleColl
+  .aggregate([{ $group: { _id: { v: '$v', l: '$l' } } }])
+  .toArray()
+  .map(v => `${v._id.l}${sep}${v._id.v}`);
+
 function chunkify(a, n) {
   let len = a.length,
     out = [],
@@ -66,216 +71,221 @@ const padRating = r => (r < 1000 ? '0' : '') + r;
 
 let anyBuggy = false;
 
-[...themes, 'mix'].forEach(theme => {
-  // ['mix'].forEach(theme => {
-  const selector = {
-    ...{ issue: { $exists: false } },
-    themes:
-      theme == 'mix'
-        ? {
-            $ne: 'equality',
-          }
-        : theme == 'equality'
-          ? 'equality'
-          : {
-              $eq: theme,
+variantKeys.forEach(variantkey => {
+  [...themes, 'mix'].forEach(theme => {
+    const selector = {
+      ...{ issue: { $exists: false } },
+      l: parseInt(variantkey.split(sep)[0], 10),
+      v: parseInt(variantkey.split(sep)[1], 10),
+      themes:
+        theme == 'mix'
+          ? {
               $ne: 'equality',
+            }
+          : theme == 'equality'
+            ? 'equality'
+            : {
+                $eq: theme,
+                $ne: 'equality',
+              },
+    };
+
+    const bucketBase = {
+      groupBy: '$glicko.r',
+      output: { puzzle: { $push: { id: '$_id', vote: '$vote' } } },
+    };
+
+    const nbPuzzles = puzzleColl.countDocuments(selector);
+
+    if (!nbPuzzles) return [];
+
+    const themeMaxPathLength = Math.max(10, Math.min(maxPathLength, Math.round(nbPuzzles / 150)));
+    const nbRatingBuckets =
+      theme == 'mix'
+        ? mixBoundaries.length - 1
+        : Math.max(3, Math.min(maxRatingBuckets, Math.round(nbPuzzles / themeMaxPathLength / 15)));
+
+    const bucketStages =
+      theme == 'mix'
+        ? [
+            {
+              $bucket: {
+                ...bucketBase,
+                boundaries: mixBoundaries,
+              },
             },
-  };
-
-  const bucketBase = {
-    groupBy: '$glicko.r',
-    output: { puzzle: { $push: { id: '$_id', vote: '$vote' } } },
-  };
-
-  const nbPuzzles = puzzleColl.countDocuments(selector);
-
-  if (!nbPuzzles) return [];
-
-  const themeMaxPathLength = Math.max(10, Math.min(maxPathLength, Math.round(nbPuzzles / 150)));
-  const nbRatingBuckets =
-    theme == 'mix'
-      ? mixBoundaries.length - 1
-      : Math.max(3, Math.min(maxRatingBuckets, Math.round(nbPuzzles / themeMaxPathLength / 15)));
-
-  const bucketStages =
-    theme == 'mix'
-      ? [
-          {
-            $bucket: {
-              ...bucketBase,
-              boundaries: mixBoundaries,
+            { $addFields: { _id: { min: '$_id' } } },
+          ]
+        : [
+            {
+              $bucketAuto: {
+                ...bucketBase,
+                buckets: nbRatingBuckets,
+              },
             },
-          },
-          { $addFields: { _id: { min: '$_id' } } },
-        ]
-      : [
-          {
-            $bucketAuto: {
-              ...bucketBase,
-              buckets: nbRatingBuckets,
-            },
-          },
-        ];
+          ];
 
-  const pipeline = [
-    {
-      $match: selector,
-    },
-    ...(theme == 'mix' ? [{ $sample: { size: maxPuzzlesPerTheme } }] : []),
-    ...bucketStages,
-    {
-      $unwind: '$puzzle',
-    },
-    {
-      $sort: {
-        'puzzle.vote': -1,
+    const pipeline = [
+      {
+        $match: selector,
       },
-    },
-    {
-      $group: {
-        _id: '$_id',
-        total: {
-          $sum: 1,
-        },
-        puzzles: {
-          $push: '$puzzle.id',
+      ...(theme == 'mix' ? [{ $sample: { size: maxPuzzlesPerTheme } }] : []),
+      ...bucketStages,
+      {
+        $unwind: '$puzzle',
+      },
+      {
+        $sort: {
+          'puzzle.vote': -1,
         },
       },
-    },
-    {
-      $facet: tiers.reduce(
-        (facets, [name, ratio]) => ({
-          ...facets,
-          ...{
-            [name]: [
-              {
-                $project: {
-                  total: 1,
-                  puzzles: {
-                    $slice: [
-                      '$puzzles',
-                      {
-                        $round: {
-                          $multiply: ['$total', ratio],
+      {
+        $group: {
+          _id: '$_id',
+          total: {
+            $sum: 1,
+          },
+          puzzles: {
+            $push: '$puzzle.id',
+          },
+        },
+      },
+      {
+        $facet: tiers.reduce(
+          (facets, [name, ratio]) => ({
+            ...facets,
+            ...{
+              [name]: [
+                {
+                  $project: {
+                    total: 1,
+                    puzzles: {
+                      $slice: [
+                        '$puzzles',
+                        {
+                          $round: {
+                            $multiply: ['$total', ratio],
+                          },
                         },
-                      },
-                    ],
+                      ],
+                    },
                   },
                 },
-              },
-              {
-                $unwind: '$puzzles',
-              },
-              {
-                $sample: {
-                  // shuffle
-                  size: 10 * 1000 * 1000,
+                {
+                  $unwind: '$puzzles',
                 },
-              },
-              {
-                $group: {
-                  _id: '$_id',
-                  puzzles: {
-                    $addToSet: '$puzzles',
+                {
+                  $sample: {
+                    // shuffle
+                    size: 10 * 1000 * 1000,
                   },
                 },
-              },
-              {
-                $sort: {
-                  '_id.min': 1,
+                {
+                  $group: {
+                    _id: '$_id',
+                    puzzles: {
+                      $addToSet: '$puzzles',
+                    },
+                  },
                 },
-              },
-              {
-                $addFields: {
-                  tier: name,
+                {
+                  $sort: {
+                    '_id.min': 1,
+                  },
                 },
-              },
-            ],
+                {
+                  $addFields: {
+                    tier: name,
+                  },
+                },
+              ],
+            },
+          }),
+          {},
+        ),
+      },
+      {
+        $project: {
+          bucket: {
+            $concatArrays: tiers.map(t => '$' + t[0]),
           },
-        }),
-        {},
-      ),
-    },
-    {
-      $project: {
-        bucket: {
-          $concatArrays: tiers.map(t => '$' + t[0]),
         },
       },
-    },
-    {
-      $unwind: '$bucket',
-    },
-    {
-      $replaceRoot: {
-        newRoot: '$bucket',
+      {
+        $unwind: '$bucket',
       },
-    },
-  ];
-
-  if (verbose)
-    print(
-      `theme: ${theme}, puzzles: ${nbPuzzles}, path length: ${themeMaxPathLength}, rating buckets: ${nbRatingBuckets}`,
-    );
-
-  let prevTier = '',
-    indexInTier = 0,
-    buggy = false;
-
-  puzzleColl
-    .aggregate(pipeline, {
-      allowDiskUse: true,
-      comment: 'regen-paths',
-    })
-    .forEach(bucket => {
-      if (prevTier == bucket.tier) indexInTier++;
-      else {
-        indexInTier = 0;
-        prevTier = bucket.tier;
-      }
-      const isFirstOfTier = indexInTier == 0;
-      const isLastOfTier = indexInTier == nbRatingBuckets - 1;
-      const pathLength = Math.max(10, Math.min(maxPathLength, Math.round(bucket.puzzles.length / 30)));
-      const ratingMin = isFirstOfTier ? 100 : Math.ceil(bucket._id.min);
-      const ratingMax = isLastOfTier
-        ? 9999
-        : theme == 'mix'
-          ? mixBoundaries[indexInTier + 1]
-          : Math.floor(bucket._id.max);
-      const nbPaths = Math.max(1, Math.floor(bucket.puzzles.length / pathLength));
-      const allPaths = chunkify(bucket.puzzles, nbPaths);
-      const paths = allPaths.slice(0, maxPathsPerGroup);
-      buggy = buggy || (ratingMin == 100 && ratingMax == 9999) || ratingMin > ratingMax;
-      anyBuggy = anyBuggy || buggy;
-      if (verbose || buggy)
-        print(
-          `  ${theme} ${indexInTier} ${bucket.tier} ${ratingMin}->${ratingMax} puzzles: ${bucket.puzzles.length} pathLength: ${pathLength} paths: ${allPaths.length}->${paths.length}`,
-        );
-
-      pathNextColl.insertMany(
-        paths.map((ids, j) => ({
-          _id: `${theme}${sep}${bucket.tier}${sep}${padRating(ratingMin)}-${padRating(
-            ratingMax,
-          )}${sep}${generation}${sep}${j}`,
-          min: `${theme}${sep}${bucket.tier}${sep}${padRating(ratingMin)}`,
-          max: `${theme}${sep}${bucket.tier}${sep}${padRating(ratingMax)}`,
-          ids,
-          tier: bucket.tier,
-          theme: theme,
-          gen: generation,
-        })),
-        {
-          ordered: false,
+      {
+        $replaceRoot: {
+          newRoot: '$bucket',
         },
+      },
+    ];
+
+    if (verbose)
+      print(
+        `varaint: ${variantkey}, theme: ${theme}, puzzles: ${nbPuzzles}, path length: ${themeMaxPathLength}, rating buckets: ${nbRatingBuckets}`,
       );
-    });
 
-  if (!buggy) {
-    pathNextColl.aggregate([{ $merge: pathCollName }]); // much faster!
-    pathColl.deleteMany({ /* theme: theme */ _id: new RegExp('^' + theme + '\\|'), gen: { $ne: generation } });
-  }
-  pathNextColl.drop({});
+    let prevTier = '',
+      indexInTier = 0,
+      buggy = false;
+
+    puzzleColl
+      .aggregate(pipeline, {
+        allowDiskUse: true,
+        comment: 'regen-paths',
+      })
+      .forEach(bucket => {
+        if (prevTier == bucket.tier) indexInTier++;
+        else {
+          indexInTier = 0;
+          prevTier = bucket.tier;
+        }
+        const isFirstOfTier = indexInTier == 0;
+        const isLastOfTier = indexInTier == nbRatingBuckets - 1;
+        const pathLength = Math.max(10, Math.min(maxPathLength, Math.round(bucket.puzzles.length / 30)));
+        const ratingMin = isFirstOfTier ? 100 : Math.ceil(bucket._id.min);
+        const ratingMax = isLastOfTier
+          ? 9999
+          : theme == 'mix'
+            ? mixBoundaries[indexInTier + 1]
+            : Math.floor(bucket._id.max);
+        const nbPaths = Math.max(1, Math.floor(bucket.puzzles.length / pathLength));
+        const allPaths = chunkify(bucket.puzzles, nbPaths);
+        const paths = allPaths.slice(0, maxPathsPerGroup);
+        buggy = buggy || (ratingMin == 100 && ratingMax == 9999) || ratingMin > ratingMax;
+        anyBuggy = anyBuggy || buggy;
+        if (verbose || buggy)
+          print(
+            ` ${variantkey} ${theme} ${indexInTier} ${bucket.tier} ${ratingMin}->${ratingMax} puzzles: ${bucket.puzzles.length} pathLength: ${pathLength} paths: ${allPaths.length}->${paths.length}`,
+          );
+
+        pathNextColl.insertMany(
+          paths.map((ids, j) => ({
+            _id: `${variantkey}${sep}${theme}${sep}${bucket.tier}${sep}${padRating(ratingMin)}-${padRating(
+              ratingMax,
+            )}${sep}${generation}${sep}${j}`,
+            min: `${variantkey}${sep}${theme}${sep}${bucket.tier}${sep}${padRating(ratingMin)}`,
+            max: `${variantkey}${sep}${theme}${sep}${bucket.tier}${sep}${padRating(ratingMax)}`,
+            ids,
+            tier: bucket.tier,
+            theme: theme,
+            l: parseInt(variantkey.split(sep)[0], 10),
+            v: parseInt(variantkey.split(sep)[1], 10),
+            gen: generation,
+          })),
+          {
+            ordered: false,
+          },
+        );
+      });
+
+    if (!buggy) {
+      pathNextColl.aggregate([{ $merge: pathCollName }]); // much faster!
+      pathColl.deleteMany({ /* theme: theme */ _id: new RegExp('^' + theme + '\\|'), gen: { $ne: generation } });
+    }
+    pathNextColl.drop({});
+  });
 });
 
 if (!anyBuggy) {

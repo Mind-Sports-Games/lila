@@ -6,6 +6,7 @@ import lila.db.dsl._
 import lila.user.User
 import lila.common.Iso
 import strategygames.variant.Variant
+import strategygames.GameLogic
 
 private object PuzzlePath {
 
@@ -15,11 +16,14 @@ private object PuzzlePath {
 
     val parts = value.split(sep)
 
-    private[puzzle] def tier = PuzzleTier.from(~parts.lift(1))
+    private[puzzle] def tier = PuzzleTier.from(~parts.lift(3))
 
-    def theme = PuzzleTheme.findOrAny(~parts.headOption).key
+    def theme = PuzzleTheme.findOrAny(~parts.lift(2)).key
 
-    def variantKey = "linesOfAction" // TODO add variant into path
+    def lib       = ~parts.lift(0).flatMap(s => s.toIntOption)
+    def variantId = ~parts.lift(1).flatMap(s => s.toIntOption)
+    val gameLogic = GameLogic(lib)
+    def variant   = Variant.orDefault(gameLogic, variantId)
   }
 
   implicit val pathIdIso: Iso.StringIso[Id] = lila.common.Iso.string[Id](Id.apply, _.value)
@@ -51,7 +55,12 @@ final private class PuzzlePathApi(
           val rating     = user.perfs.puzzle.glicko.intRating + difficulty.ratingDelta
           val ratingFlex = (100 + math.abs(1500 - rating) / 4) * compromise.atMost(4)
           Match(
-            select(theme, actualTier, (rating - ratingFlex) to (rating + ratingFlex)) ++
+            select(
+              variant,
+              theme,
+              actualTier,
+              (rating - ratingFlex) to (rating + ratingFlex)
+            ) ++
               ((compromise != 5 && previousPaths.nonEmpty) ?? $doc("_id" $nin previousPaths))
           ) -> List(
             Sample(1),
@@ -73,8 +82,10 @@ final private class PuzzlePathApi(
     _.puzzle.path.nextFor(variant.key, theme.value, tier.key, difficulty.key, previousPaths.size, compromise)
   )
 
-  def select(theme: PuzzleTheme.Key, tier: PuzzleTier, rating: Range) = $doc(
-    "min" $lte f"${theme}${sep}${tier}${sep}${rating.max}%04d",
-    "max" $gte f"${theme}${sep}${tier}${sep}${rating.min}%04d"
+  def select(variant: Variant, theme: PuzzleTheme.Key, tier: PuzzleTier, rating: Range) = $doc(
+    "l" -> variant.gameLogic.id,
+    "v" -> variant.id,
+    "min" $lte f"${variant.gameLogic.id}${sep}${variant.id}${sep}${theme}${sep}${tier}${sep}${rating.max}%04d",
+    "max" $gte f"${variant.gameLogic.id}${sep}${variant.id}${sep}${theme}${sep}${tier}${sep}${rating.min}%04d"
   )
 }
