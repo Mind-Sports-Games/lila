@@ -155,6 +155,11 @@ const difficulties: [PuzzleDifficulty, number][] = [
   ['hardest', 600],
 ];
 
+const variants: [string, string][] = [
+  ['standard', 'Chess'],
+  ['linesOfAction', 'Lines of Action'],
+];
+
 export function replay(ctrl: Controller): MaybeVNode {
   const replay = ctrl.getData().replay;
   const variant = ctrl.getData().game.variant.key;
@@ -239,6 +244,41 @@ export function config(ctrl: Controller): MaybeVNode {
                     },
                   },
                   [ctrl.trans.noarg(key), delta ? ` (${delta > 0 ? '+' : ''}${delta})` : ''],
+                ),
+              ),
+            ),
+          ],
+        )
+      : null,
+    !ctrl.getData().replay && !ctrl.streak
+      ? h(
+          'form.puzzle__side__config__variant',
+          {
+            attrs: {
+              action: `/training/set-variant`,
+              method: 'post',
+            },
+          },
+          [
+            h('label', { attrs: { for: 'puzzle-variant' } }, ctrl.trans.noarg('variant')),
+            h(
+              'select#puzzle-variant.puzzle__variant__selector',
+              {
+                attrs: { name: 'variant' },
+                hook: onInsert(elm =>
+                  elm.addEventListener('change', () => (elm.parentNode as HTMLFormElement).submit()),
+                ),
+              },
+              variants.map(([variantKey, variantName]) =>
+                h(
+                  'option',
+                  {
+                    attrs: {
+                      value: variantKey,
+                      selected: variantKey == ctrl.getData().game.variant.key,
+                    },
+                  },
+                  ctrl.trans.noarg(variantName),
                 ),
               ),
             ),

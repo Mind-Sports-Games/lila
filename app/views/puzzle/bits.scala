@@ -74,6 +74,7 @@ object bits {
       trans.puzzle.notTheMove,
       trans.puzzle.trySomethingElse,
       trans.yourTurn,
+      trans.variant,
       trans.puzzle.findTheBestMoveForPlayerIndex,
       trans.viewTheSolution,
       trans.puzzle.puzzleSuccess,

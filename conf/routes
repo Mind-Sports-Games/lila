@@ -111,6 +111,7 @@ POST  /training/$id<\w{5}>/vote                         controllers.Puzzle.vote(
 POST  /training/$id<\w{5}>/vote/:theme                  controllers.Puzzle.voteTheme(id: String, theme: String)
 POST  /training/:variant/complete/:theme/$id<\w{5}>     controllers.Puzzle.complete(variant: String, theme: String, id: String)
 POST  /training/:variant/difficulty/:theme              controllers.Puzzle.setDifficulty(variant: String, theme: String)
+POST  /training/set-variant                             controllers.Puzzle.setVariant
 
 # Puzzle Streak
 GET   /streak                           controllers.Puzzle.streak

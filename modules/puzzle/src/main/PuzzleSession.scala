@@ -169,6 +169,11 @@ final class PuzzleSessionApi(
       createSessionFor(user, variant, theme, difficulty).tap { sessions.put(user.id, _) }.void
     }
 
+  def setVariant(user: User, variant: Variant): Funit =
+    createSessionFor(user, variant, PuzzleTheme.mix.key).tap {
+      sessions.put(user.id, _)
+    }.void
+
   private val sessions = cacheApi.notLoading[User.ID, PuzzleSession](32768, "puzzle.session")(
     _.expireAfterWrite(1 hour).buildAsync()
   )

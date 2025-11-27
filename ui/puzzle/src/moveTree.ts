@@ -1,9 +1,8 @@
-import { INITIAL_FEN, makeFen, parseFen } from 'stratops/fen';
+import { makeFen, parseFen } from 'stratops/fen';
 import { makeSan, parseSan } from 'stratops/san';
 import { makeSquare, makeUci, parseUci } from 'stratops/util';
 import { Position } from 'stratops/chess';
 import { variantClassFromKey, variantKeyToRules } from 'stratops/variants/util';
-
 import { scalachessCharPair } from 'stratops/compat';
 import { TreeWrapper } from 'tree';
 import { Move, Rules } from 'stratops/types';
@@ -16,7 +15,7 @@ export function actionStrsToTree(variantKey: VariantKey, actionStrs: San[]): Tre
     playedPlayerIndex: 'p2',
     playerIndex: 'p1',
     id: '',
-    fen: INITIAL_FEN,
+    fen: variantClassFromKey(variantKey).getInitialFen('p1'),
     children: [],
   } as Tree.Node;
   let current = root;

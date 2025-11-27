@@ -110,7 +110,6 @@ final class Puzzle(
       }
     }
 
-  //TODO pass in variant to get puzzles of player db query
   def ofPlayer(variant: String, name: Option[String], page: Int) =
     Open { implicit ctx =>
       val fixed = name.map(_.trim).filter(_.nonEmpty)
@@ -281,6 +280,22 @@ final class Puzzle(
       }
     }
 
+  def setVariant =
+    AuthBody { implicit ctx => me =>
+      NoBot {
+        implicit val req = ctx.body
+        env.puzzle.forms.variant
+          .bindFromRequest()
+          .fold(
+            jsonFormError,
+            variant => {
+              env.puzzle.session.setVariant(me, puzzleVariantFromKey(variant)) >>
+                Redirect(routes.Puzzle.show(variant, "mix")).fuccess
+            }
+          )
+      }
+    }
+
   def themes(variant: String) = Open { implicit ctx =>
     env.puzzle.api.theme.categorizedWithCount(puzzleVariantFromKey(variant)) map { themes =>
       Ok(views.html.puzzle.theme.list(puzzleVariantFromKey(variant), themes))
@@ -310,7 +325,6 @@ final class Puzzle(
     }
   }
 
-  //TODO pass in variant to get puzzles to render
   def showWithTheme(variant: String, themeKey: String, id: String) = Open { implicit ctx =>
     NoBot {
       val theme = PuzzleTheme.findOrAny(themeKey)
@@ -387,7 +401,6 @@ final class Puzzle(
       }
     }
 
-  //TODO pass in variant to get history of puzzles
   def history(variant: String, page: Int) =
     Auth { implicit ctx => me =>
       get("u")
