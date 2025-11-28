@@ -13,7 +13,7 @@ importers:
         version: https://codeload.github.com/lichess-org/ab-stub/tar.gz/94236bf34dbc9c05daf50f4c9842d859b9142be0
       chessground:
         specifier: github:Mind-Sports-Games/chessground#dameo-nov25
-        version: https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/a0c29aa83040dc05b80aaed82fd65d500ef95ae3
+        version: https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/8c6c54f6fa8b3a3113027a630c534d743de71ec4
       stratops:
         specifier: github:Mind-Sports-Games/stratops#dameo-nov25
         version: https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/e7598328d3ac823ecf4650ba079191403ef6a663
@@ -47,7 +47,7 @@ importers:
         version: 7.1.0
       prettier:
         specifier: ^3.5.3
-        version: 3.6.2
+        version: 3.7.1
       typescript:
         specifier: ^5.9.2
         version: 5.9.3
@@ -660,8 +660,8 @@ packages:
   '@types/node@20.19.25':
     resolution: {integrity: sha512-ZsJzA5thDQMSQO788d7IocwwQbI8B5OPzmqNvpf3NY/+MHDAS759Wo0gd2WQeXYt5AAAQjzcrTVC6SKCuYgoCQ==}
 
-  '@types/react@19.2.5':
-    resolution: {integrity: sha512-keKxkZMqnDicuvFoJbzrhbtdLSPhj/rZThDlKWCDbgXmUg0rEUFtRssDXKYmtXluZlIqiC5VqkCgRwzuyLHKHw==}
+  '@types/react@19.2.7':
+    resolution: {integrity: sha512-MWtvHrGZLFttgeEj28VXHxpmwYbor/ATPYbBfSFZEIRK0ecCFLl2Qo55z52Hss+UV9CRN7trSeq1zbgx7YDWWg==}
 
   '@types/web@0.0.269':
     resolution: {integrity: sha512-V0GRvvdAa79Wok8aRrlaSLcGxjixiQbcet3kq+5ixIq9L4jsG+QZd91HEYOXTMF+My745N/KtsM9eyPY1iVINg==}
@@ -840,9 +840,9 @@ packages:
     resolution: {tarball: https://codeload.github.com/ornicar/chess.js/tar.gz/ad0709c0b07773d9d0da8e4605a9a2a28f00d249}
     version: 0.10.2
 
-  chessground@https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/a0c29aa83040dc05b80aaed82fd65d500ef95ae3:
-    resolution: {tarball: https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/a0c29aa83040dc05b80aaed82fd65d500ef95ae3}
-    version: 7.11.1-pstrat3.20-d1
+  chessground@https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/8c6c54f6fa8b3a3113027a630c534d743de71ec4:
+    resolution: {tarball: https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/8c6c54f6fa8b3a3113027a630c534d743de71ec4}
+    version: 7.11.1-pstrat3.20-d2
     engines: {node: ^20.19.4, pnpm: ^10.17.0}
 
   chokidar@3.6.0:
@@ -1300,8 +1300,8 @@ packages:
     resolution: {integrity: sha512-vkcDPrRZo1QZLbn5RLGPpg/WmIQ65qoWWhcGKf/b5eplkkarX0m9z8ppCat4mlOqUsWpyNuYgO3VRyrYHSzX5g==}
     engines: {node: '>= 0.8.0'}
 
-  prettier@3.6.2:
-    resolution: {integrity: sha512-I7AIg5boAr5R0FFtJ6rCfD+LFsWHp81dolrFD8S79U9tb8Az2nGrJncnMSnys+bpQJfRUzqs9hnA81OAA3hCuQ==}
+  prettier@3.7.1:
+    resolution: {integrity: sha512-RWKXE4qB3u5Z6yz7omJkjWwmTfLdcbv44jUVHC5NpfXwFGzvpQM798FGv/6WNK879tc+Cn0AAyherCl1KjbyZQ==}
     engines: {node: '>=14'}
     hasBin: true
 
@@ -1599,7 +1599,7 @@ snapshots:
     dependencies:
       undici-types: 6.21.0
 
-  '@types/react@19.2.5':
+  '@types/react@19.2.7':
     dependencies:
       csstype: 3.2.3
 
@@ -1609,7 +1609,7 @@ snapshots:
 
   '@types/yaireo__tagify@4.27.0':
     dependencies:
-      '@types/react': 19.2.5
+      '@types/react': 19.2.7
 
   '@types/zxcvbn@4.4.5': {}
 
@@ -1786,7 +1786,7 @@ snapshots:
 
   chess.js@https://codeload.github.com/ornicar/chess.js/tar.gz/ad0709c0b07773d9d0da8e4605a9a2a28f00d249: {}
 
-  chessground@https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/a0c29aa83040dc05b80aaed82fd65d500ef95ae3: {}
+  chessground@https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/8c6c54f6fa8b3a3113027a630c534d743de71ec4: {}
 
   chokidar@3.6.0:
     dependencies:
@@ -2255,7 +2255,7 @@ snapshots:
 
   prelude-ls@1.2.1: {}
 
-  prettier@3.6.2: {}
+  prettier@3.7.1: {}
 
   prop-types@15.8.1:
     dependencies:
