@@ -16,7 +16,7 @@ importers:
         version: https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/8c6c54f6fa8b3a3113027a630c534d743de71ec4
       stratops:
         specifier: github:Mind-Sports-Games/stratops#dameo-nov25
-        version: https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/e7598328d3ac823ecf4650ba079191403ef6a663
+        version: https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/5997e1bdeb7e4429f5e9a741357dbded4720acb1
       xml2js:
         specifier: ^0.6.2
         version: 0.6.2
@@ -47,7 +47,7 @@ importers:
         version: 7.1.0
       prettier:
         specifier: ^3.5.3
-        version: 3.7.1
+        version: 3.7.3
       typescript:
         specifier: ^5.9.2
         version: 5.9.3
@@ -1300,8 +1300,8 @@ packages:
     resolution: {integrity: sha512-vkcDPrRZo1QZLbn5RLGPpg/WmIQ65qoWWhcGKf/b5eplkkarX0m9z8ppCat4mlOqUsWpyNuYgO3VRyrYHSzX5g==}
     engines: {node: '>= 0.8.0'}
 
-  prettier@3.7.1:
-    resolution: {integrity: sha512-RWKXE4qB3u5Z6yz7omJkjWwmTfLdcbv44jUVHC5NpfXwFGzvpQM798FGv/6WNK879tc+Cn0AAyherCl1KjbyZQ==}
+  prettier@3.7.3:
+    resolution: {integrity: sha512-QgODejq9K3OzoBbuyobZlUhznP5SKwPqp+6Q6xw6o8gnhr4O85L2U915iM2IDcfF2NPXVaM9zlo9tdwipnYwzg==}
     engines: {node: '>=14'}
     hasBin: true
 
@@ -1399,9 +1399,9 @@ packages:
     resolution: {integrity: sha512-wHMNIOjkm/YNE5EM3RCbr/+DVgPg6AqQAX1eOxO46zYNvCXjKP5Y865tqQj3EXnaMBjkxmQA5jFuDpDK/dbfiA==}
     engines: {node: '>=8.3.0'}
 
-  stratops@https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/e7598328d3ac823ecf4650ba079191403ef6a663:
-    resolution: {tarball: https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/e7598328d3ac823ecf4650ba079191403ef6a663}
-    version: 0.8.1-pstrat5.21-d1
+  stratops@https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/5997e1bdeb7e4429f5e9a741357dbded4720acb1:
+    resolution: {tarball: https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/5997e1bdeb7e4429f5e9a741357dbded4720acb1}
+    version: 0.8.1-pstrat5.21-d2
     engines: {node: ^20.19.4, pnpm: ^10.17.0}
 
   string-argv@0.3.2:
@@ -1506,8 +1506,8 @@ packages:
     resolution: {integrity: sha512-fDlsI/kFEx7gLvbecc0/ohLG50fugQp8ryHzMTuW9vSa1GJ0XYWKnhsUx7oie3G98+r56aTQIUB4kht42R3JvA==}
     engines: {node: '>=4.0'}
 
-  yaml@2.8.1:
-    resolution: {integrity: sha512-lcYcMxX2PO9XMGvAJkJ3OsNMw+/7FKes7/hgerGUYWIoWu5j/+YQqcZr5JnPZWzOsEBgMbSbiSTn/dv/69Mkpw==}
+  yaml@2.8.2:
+    resolution: {integrity: sha512-mplynKqc1C2hTVYxd0PU2xQAc22TI1vShAYGksCCfxbn/dFwnHTNi1bvYsBTkhdUNtGIf5xNOg938rrSSYvS9A==}
     engines: {node: '>= 14.6'}
     hasBin: true
 
@@ -2117,7 +2117,7 @@ snapshots:
       micromatch: 4.0.8
       pidtree: 0.6.0
       string-argv: 0.3.2
-      yaml: 2.8.1
+      yaml: 2.8.2
     transitivePeerDependencies:
       - supports-color
 
@@ -2255,7 +2255,7 @@ snapshots:
 
   prelude-ls@1.2.1: {}
 
-  prettier@3.7.1: {}
+  prettier@3.7.3: {}
 
   prop-types@15.8.1:
     dependencies:
@@ -2331,7 +2331,7 @@ snapshots:
 
   snabbdom@3.5.1: {}
 
-  stratops@https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/e7598328d3ac823ecf4650ba079191403ef6a663:
+  stratops@https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/5997e1bdeb7e4429f5e9a741357dbded4720acb1:
     dependencies:
       '@badrap/result': 0.2.13
 
@@ -2416,7 +2416,7 @@ snapshots:
 
   xmlbuilder@11.0.1: {}
 
-  yaml@2.8.1: {}
+  yaml@2.8.2: {}
 
   yocto-queue@0.1.0: {}
 
