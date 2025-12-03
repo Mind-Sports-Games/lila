@@ -1417,7 +1417,7 @@ export default class Setup {
     $gameGroupInput
       .on('click', function (this: HTMLElement) {
         const variantId = ($variantInput.filter(':checked').val() as string).split('_'),
-          gameFamily = $gameGroupInput.filter(':checked').val() as string;
+          gameGroup = $gameGroupInput.filter(':checked').val() as string;
 
         let numInGroup = 0;
         const toShow: HTMLElement[] = [];
@@ -1426,8 +1426,8 @@ export default class Setup {
           const gfOfVariant = ($(this).val() as string).split('_')[0];
           //add oware to mancala group or add dameo to draughts group
           const gameGroupCases =
-            (gfOfVariant === '6' && gameFamily === '7') || (gfOfVariant === '13' && gameFamily === '1');
-          if (gfOfVariant === gameFamily || gameGroupCases) {
+            (gfOfVariant === '6' && gameGroup === '7') || (gfOfVariant === '13' && gameGroup === '1');
+          if (gfOfVariant === gameGroup || gameGroupCases) {
             toShow.push($(this).parent()[0]);
             numInGroup++;
           } else {
@@ -1442,10 +1442,13 @@ export default class Setup {
           .removeClass('child-count-1 child-count-2 child-count-3')
           .addClass('child-count-' + numInGroup);
 
+        //this code is a bit a fragile for re-selecting previously used variant
         //select the default variant for each gameGroup
-        if (variantId[0] !== gameFamily) {
+        if (variantId[0] !== gameGroup) {
           const variantValue = function () {
-            switch (gameFamily) {
+            switch (gameGroup) {
+              case '1':
+                return '13_1'; // Dameo
               case '2':
                 return '2_11'; // Lines of Action
               case '4':
@@ -1461,7 +1464,7 @@ export default class Setup {
               case '11':
                 return '11_9'; // Breakthrough Troyka
               default:
-                return `${gameFamily}_1`;
+                return `${gameGroup}_1`;
             }
           };
           $variantInput.filter(`[value="${variantValue()}"]`).trigger('click');
