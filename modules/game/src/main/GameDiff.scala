@@ -358,6 +358,7 @@ object GameDiff {
           },
           writeBytes compose BinaryFormat.piece.writeDameo
         )
+        dOpt(halfMoveClock, _.history.halfMoveClock, w.intO)
         d(positionHashes, _.history.positionHashes, w.bytes)
         d(historyLastTurn, _.history.lastTurn.map(_.uci).mkString(","), w.str)
         d(historyCurrentTurn, _.history.currentTurn.map(_.uci).mkString(","), w.str)

@@ -737,11 +737,7 @@ object BSONHandlers {
                 history = dameo.History(
                   lastTurn = turnUcis(r strO F.historyLastTurn),
                   currentTurn = turnUcis(r strO F.historyCurrentTurn),
-                  //TODO Dameo: Check this halfMoveClock logic
-                  halfMoveClock = actionStrs
-                    .flatMap(_.headOption)
-                    .reverse
-                    .indexWhere(san => san.contains("x") || san.headOption.exists(_.isLower)) atLeast 0,
+                  halfMoveClock = r intD F.halfMoveClock,
                   positionHashes = r.getO[PositionHash](F.positionHashes) | Array.empty
                 ),
                 variant = gameVariant
@@ -944,6 +940,7 @@ object BSONHandlers {
                 case Board.Dameo(board) => board.pieces
                 case _                  => sys.error("invalid dameo board")
               }),
+              F.halfMoveClock      -> (o.history.halfMoveClock != 0).option(o.history.halfMoveClock),
               F.positionHashes     -> o.history.positionHashes,
               F.historyLastTurn    -> o.history.lastTurnUciString,
               F.historyCurrentTurn -> o.history.currentTurnUciString
