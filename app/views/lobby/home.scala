@@ -97,6 +97,14 @@ object home {
               )
             ),
             a(
+              id := "nb_connected_bots",
+              href := ctx.noBlind.option(routes.PlayApi.botOnline.url)
+            )(
+              trans.nbBots(
+                strong(dataCount := homepage.nbBots)(homepage.nbBots)
+              )
+            ),
+            a(
               id := "nb_games_in_play",
               href := ctx.noBlind.option(routes.Tv.games.url)
             )(
