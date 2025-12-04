@@ -1334,9 +1334,20 @@ export default class Setup {
       $gameGroupInput.val('0');
       $opponentInput.val('friend');
     }
+    const gameGroupFromVariant = (variant: string) => {
+      const gameLogicId = variant.split('_')[0];
+      switch (gameLogicId) {
+        case '6':
+          return '7'; //oware
+        case '13':
+          return '1'; //dameo
+        default:
+          return gameLogicId;
+      }
+    };
     if (forceVariant && inputVariant) {
       $variantInput.val(inputVariant);
-      $gameGroupInput.val(inputVariant.split('_')[0]);
+      $gameGroupInput.val(gameGroupFromVariant(inputVariant as string));
     }
     $form.find('optgroup').each((_, optgroup: HTMLElement) => {
       optgroup.setAttribute('label', optgroup.getAttribute('name') || '');
@@ -1423,11 +1434,7 @@ export default class Setup {
         const toShow: HTMLElement[] = [];
         const toHide: HTMLElement[] = [];
         $variantInput.each(function (this: HTMLElement) {
-          const gfOfVariant = ($(this).val() as string).split('_')[0];
-          //add oware to mancala group or add dameo to draughts group
-          const gameGroupCases =
-            (gfOfVariant === '6' && gameGroup === '7') || (gfOfVariant === '13' && gameGroup === '1');
-          if (gfOfVariant === gameGroup || gameGroupCases) {
+          if (gameGroupFromVariant($(this).val() as string) === gameGroup) {
             toShow.push($(this).parent()[0]);
             numInGroup++;
           } else {
