@@ -162,6 +162,10 @@
     <item quantity="one">%s player</item>
     <item quantity="other">%s players</item>
   </plurals>
+  <plurals name="nbBots">
+    <item quantity="one">%s bot</item>
+    <item quantity="other">%s bots</item>
+  </plurals>
   <string name="currentGames">Current games</string>
   <plurals name="nbGames">
     <item quantity="one">%s game</item>
