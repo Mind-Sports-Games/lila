@@ -19,7 +19,7 @@ object Rewind {
   //takeback
   def apply(game: Game, initialFen: Option[FEN], rewindPly: Boolean): Validated[String, Progress] =
     (game.variant.gameLogic match {
-      case GameLogic.Chess() | GameLogic.Draughts() | GameLogic.Dameo() =>
+      case GameLogic.Chess() | GameLogic.Draughts() =>
         Reader
           .replayResultFromActionStrsUsingSan(
             game.variant.gameLogic,
