@@ -19,6 +19,7 @@ import play.api.libs.json._
 final class Preload(
     tv: Tv,
     gameRepo: lila.game.GameRepo,
+    userRepo: lila.user.UserRepo,
     userCached: lila.user.Cached,
     tourWinners: lila.tournament.WinnersApi,
     timelineApi: lila.timeline.EntryApi,
@@ -30,7 +31,8 @@ final class Preload(
     lightUserApi: LightUserApi,
     roundProxy: lila.round.GameProxyRepo,
     simulIsFeaturable: SimulIsFeaturable,
-    lastPostCache: lila.blog.LastPostCache
+    lastPostCache: lila.blog.LastPostCache,
+    onlineApiUsers: lila.bot.OnlineApiUsers
 )(implicit ec: scala.concurrent.ExecutionContext) {
 
   import Preload._
@@ -60,9 +62,10 @@ final class Preload(
         .mon(_.lobby segment "streams")) zip
       (ctx.userId ?? playbanApi.currentBan).mon(_.lobby segment "playban") zip
       (ctx.blind ?? ctx.me ?? roundProxy.urgentGames) zip
+      nbBots.mon(_.lobby segment "nbBots") zip
       chatOption zip chatVersion flatMap {
         // format: off
-        case (((((((((((((((data, povs), posts), tours), events), simuls), feat), entries), lead), tWinners), puzzle), streams), playban), blindGames), chatOption), chatVersion) =>
+        case ((((((((((((((((data, povs), posts), tours), events), simuls), feat), entries), lead), tWinners), puzzle), streams), playban), blindGames), nbBots), chatOption), chatVersion) =>
         // format: on
         (ctx.me ?? currentGameMyTurn(povs, lightUserApi.sync))
           .mon(_.lobby segment "currentGame") zip
@@ -89,6 +92,7 @@ final class Preload(
               simulIsFeaturable,
               blindGames,
               lobbySocket.counters,
+              nbBots,
               chatOption,
               chatVersion,
               weeklyChallenge
@@ -102,6 +106,9 @@ final class Preload(
     } flatMap {
       currentGameMyTurn(_, lightUserApi.sync)(user)
     }
+
+  private def nbBots: Fu[Int] =
+    userRepo.botsByIds(onlineApiUsers.get.filterNot(_.startsWith("pst-"))).map(_.size)
 
   private def currentGameMyTurn(povs: List[Pov], lightUser: lila.common.LightUser.GetterSync)(
       user: User
@@ -135,6 +142,7 @@ object Preload {
       isFeaturable: Simul => Boolean,
       blindGames: List[Pov],
       counters: lila.lobby.LobbyCounters,
+      nbBots: Int,
       chatOption: Option[lila.chat.UserChat.Mine],
       chatVersion: Option[lila.socket.Socket.SocketVersion],
       weeklyChallenge: WeeklyChallenge

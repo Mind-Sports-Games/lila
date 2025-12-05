@@ -39,7 +39,7 @@
   <string name="multiMatchDefinition">Play multiple games in succession with opponents (swapping first player each game)</string>
   <string name="isMatchScore">Use Match Score</string>
   <string name="isMatchScoreDefinition">Use score of entire match against opponent as tournament points</string>
-  <string name="createAGame">Create a game</string>
+  <string name="createAGame">Start a game</string>
   <string name="playerIndexIsVictorious">%s is victorious</string>
   <string name="whiteIsVictorious">White is victorious</string>
   <string name="blackIsVictorious">Black is victorious</string>
@@ -180,6 +180,10 @@
   <plurals name="nbPlayers">
     <item quantity="one">%s player</item>
     <item quantity="other">%s players</item>
+  </plurals>
+  <plurals name="nbBots">
+    <item quantity="one">%s bot</item>
+    <item quantity="other">%s bots</item>
   </plurals>
   <string name="currentGames">Current games</string>
   <string name="gameNumberX">Game %s</string>
