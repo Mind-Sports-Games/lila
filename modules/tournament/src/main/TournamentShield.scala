@@ -831,7 +831,7 @@ object TournamentShield {
         extends Category(
           Variant.Dameo(strategygames.dameo.variant.Dameo),
           Blitz32,
-          13,
+          16,
           1
         )
 
