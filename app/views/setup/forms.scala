@@ -29,7 +29,8 @@ object forms {
       (if (user.isDefined) trans.challenge.challengeToPlay else trans.createAGame)(),
       routes.Setup.game("sri-placeholder", user map (_.id)),
       inputVariant.map(v => s"${v.gameFamily.id}_${v.id}").getOrElse(""),
-      error.map(e => raw(e.replace("{{user}}", userIdLink(user.map(_.id)).toString)))
+      error.map(e => raw(e.replace("{{user}}", userIdLink(user.map(_.id)).toString))),
+      user
     ) {
       frag(
         renderGameGroupOptions(form, translatedGameGroupIconChoices),
@@ -71,7 +72,8 @@ object forms {
       titleF: Frag,
       route: Call,
       inputVariant: String,
-      error: Option[Frag] = None
+      error: Option[Frag] = None,
+      targetUser: Option[User] = None
   )(fields: Frag)(implicit ctx: Context) =
     div(cls := error.isDefined option "error")(
       h2(titleF),
@@ -91,7 +93,8 @@ object forms {
             dataVariant := inputVariant,
             dataLobbyBan := ctx.isBot,
             dataType := typ,
-            dataAnon := ctx.isAnon.option("1")
+            dataAnon := ctx.isAnon.option("1"),
+            dataTargetIsBot := targetUser.exists(_.isBot).option("1")
           )(
             fields,
             div(cls := "submit")(
