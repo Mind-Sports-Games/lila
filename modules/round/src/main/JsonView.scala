@@ -518,8 +518,8 @@ final class JsonView(
     }
   }
 
-  //draughts
-  private def captureLength(pov: Pov): Int =
+  // draughts and dameo
+  private def captureLength(pov: Pov): Int = {
     (pov.game.situation, pov.game.variant) match {
       case (Situation.Draughts(situation), Variant.Draughts(variant)) =>
         if (situation.ghosts > 0) {
@@ -531,23 +531,27 @@ final class JsonView(
           }
         } else
           situation.allMovesCaptureLength
-      case (Situation.Dameo(situation), Variant.Dameo(_)) =>
+      case (Situation.Dameo(situation), Variant.Dameo(_)) => {
         if (situation.ghosts > 0) {
-          val move = pov.game.actionStrs(pov.game.actionStrs.length - 1)(0)
+          val action = pov.game.actionStrs(pov.game.actionStrs.length - 1)
+          val move   = action(action.length - 1)
           move match {
-            case DameoUci.Move.moveR(_, dest, _) =>
+            case DameoUci.Move.moveR(_, dest, _) => {
               val posStr = DameoPos.fromKey(dest)
               posStr match {
                 case Some(pos) => ~situation.captureLengthFrom(pos)
                 case _         => situation.allMovesCaptureLength
               }
+            }
             case _ =>
               situation.allMovesCaptureLength
           }
         } else
           situation.allMovesCaptureLength
+      }
       case _ => 0
     }
+  }
 
   private def animationMillis(pov: Pov, pref: Pref) =
     pref.animationMillis * {
