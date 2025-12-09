@@ -162,7 +162,7 @@
     'horsey': 'horsey.thumbnail.jpg',
   );
 
-  @each $gameFamily in ('chess', 'draughts', 'loa', 'amazons', 'breakthroughtroyka') {
+  @each $gameFamily in ('chess', 'draughts', 'dameo', 'loa', 'amazons', 'breakthroughtroyka') {
     @each $color, $file in $chess-board-files {
       &.d2 .#{$gameFamily}-#{$color} {
         background-image: url(../images/board/#{$gameFamily}/#{$file});
