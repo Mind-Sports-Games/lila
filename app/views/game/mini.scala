@@ -89,7 +89,7 @@ object mini {
           pov
         )}|${~pov.game.lastActionKeys}|${pov.game.multiPointResult.fold(MultiPointState.noDataChar)(_.toString)}"
       case Variant.Chess(_) | Variant.FairySF(_) | Variant.Samurai(_) | Variant.Togyzkumalak(_) |
-          Variant.Go(_) | Variant.Abalone(_) =>
+          Variant.Go(_) | Variant.Abalone(_) | Variant.Dameo(_) =>
         dataState := s"${Forsyth.>>(pov.game.variant.gameLogic, pov.game.stratGame)}|${orientation(pov)}|${~pov.game.lastActionKeys}"
       case Variant.Draughts(v) =>
         dataState := s"${Forsyth.boardAndPlayer(

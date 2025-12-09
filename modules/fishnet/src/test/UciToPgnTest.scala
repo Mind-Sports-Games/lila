@@ -294,5 +294,5 @@ final class UciToPgnTest extends Specification {
       }
     }
   }
-  */
+   */
 }

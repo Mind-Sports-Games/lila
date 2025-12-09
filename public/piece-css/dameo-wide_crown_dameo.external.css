@@ -1,0 +1,24 @@
+.dameo.is2d .m-piece.p1 {background-image:url('/assets/piece/dameo/wide_crown_dameo/wM.svg')}
+.dameo.is2d .k-piece.p1 {background-image:url('/assets/piece/dameo/wide_crown_dameo/wK.svg')}
+.dameo.is2d .g-piece.p1 {opacity:0.3; background-image:url('/assets/piece/dameo/wide_crown_dameo/wM.svg')}
+.dameo.is2d .p-piece.p1 {opacity:0.3; background-image:url('/assets/piece/dameo/wide_crown_dameo/wK.svg')}
+.dameo.is2d .a-piece.p1 {background-image:url('/assets/piece/dameo/wide_crown_dameo/wM.svg')}
+.dameo.is2d .b-piece.p1 {background-image:url('/assets/piece/dameo/wide_crown_dameo/wK.svg')}
+.dameo.is2d .m-piece.p2 {background-image:url('/assets/piece/dameo/wide_crown_dameo/bM.svg')}
+.dameo.is2d .k-piece.p2 {background-image:url('/assets/piece/dameo/wide_crown_dameo/bK.svg')}
+.dameo.is2d .g-piece.p2 {opacity:0.3; background-image:url('/assets/piece/dameo/wide_crown_dameo/bM.svg')}
+.dameo.is2d .p-piece.p2 {opacity:0.3; background-image:url('/assets/piece/dameo/wide_crown_dameo/bK.svg')}
+.dameo.is2d .a-piece.p2 {background-image:url('/assets/piece/dameo/wide_crown_dameo/bM.svg')}
+.dameo.is2d .b-piece.p2 {background-image:url('/assets/piece/dameo/wide_crown_dameo/bK.svg')}
+.is2d .variant-dameo .m-piece.p2 {background-image:url('/assets/piece/dameo/wide_crown_dameo/wM.svg')}
+.is2d .variant-dameo .k-piece.p2 {background-image:url('/assets/piece/dameo/wide_crown_dameo/wK.svg')}
+.is2d .variant-dameo .g-piece.p2 {opacity:0.3; background-image:url('/assets/piece/dameo/wide_crown_dameo/wM.svg')}
+.is2d .variant-dameo .p-piece.p2 {opacity:0.3; background-image:url('/assets/piece/dameo/wide_crown_dameo/wK.svg')}
+.is2d .variant-dameo .a-piece.p2 {background-image:url('/assets/piece/dameo/wide_crown_dameo/wM.svg')}
+.is2d .variant-dameo .b-piece.p2 {background-image:url('/assets/piece/dameo/wide_crown_dameo/wK.svg')}
+.is2d .variant-dameo .m-piece.p1 {background-image:url('/assets/piece/dameo/wide_crown_dameo/bM.svg')}
+.is2d .variant-dameo .k-piece.p1 {background-image:url('/assets/piece/dameo/wide_crown_dameo/bK.svg')}
+.is2d .variant-dameo .g-piece.p1 {opacity:0.3; background-image:url('/assets/piece/dameo/wide_crown_dameo/bM.svg')}
+.is2d .variant-dameo .p-piece.p1 {opacity:0.3; background-image:url('/assets/piece/dameo/wide_crown_dameo/bK.svg')}
+.is2d .variant-dameo .a-piece.p1 {background-image:url('/assets/piece/dameo/wide_crown_dameo/bM.svg')}
+.is2d .variant-dameo .b-piece.p1 {background-image:url('/assets/piece/dameo/wide_crown_dameo/bK.svg')}

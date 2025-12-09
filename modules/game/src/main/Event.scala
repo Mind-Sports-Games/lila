@@ -275,6 +275,11 @@ object Event {
               situation.captureLengthFrom(moveDest)
             else
               situation.allMovesCaptureLength.some
+          case (Situation.Dameo(situation), Pos.Dameo(moveDest)) =>
+            if (situation.ghosts > 0)
+              situation.captureLengthFrom(moveDest)
+            else
+              situation.allMovesCaptureLength.some
           case _ => None
         }
       )

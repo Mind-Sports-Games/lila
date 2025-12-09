@@ -45,7 +45,7 @@ z-index: 99;
     div(cls := "connect-links")(
       //a(href := "https://twitter.com/mindsportsolymp", targetBlank, noFollow)("Twitter"),
       a(href := "https://discord.gg/bVRQzgSbPq", targetBlank, noFollow)("Discord"),
-      a(href := "https://www.youtube.com/@PlayStrategyDotOrg", targetBlank, noFollow)("YouTube"),
+      a(href := "https://www.youtube.com/@PlayStrategyDotOrg", targetBlank, noFollow)("YouTube")
       //a(href := "https://www.twitch.tv/mindsportsolympiad", targetBlank, noFollow)("Twitch")
     )
 

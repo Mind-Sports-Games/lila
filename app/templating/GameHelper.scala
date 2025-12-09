@@ -52,8 +52,9 @@ trait GameHelper { self: I18nHelper with UserHelper with AiHelper with StringHel
             _,
             Mate,
             GameLogic.Chess() | GameLogic.FairySF() | GameLogic.Samurai() | GameLogic.Togyzkumalak() |
-            GameLogic.Go() | GameLogic.Backgammon() | GameLogic.Abalone()
+            GameLogic.Go() | GameLogic.Backgammon() | GameLogic.Abalone() | GameLogic.Dameo()
           ) =>
+        //TODO set this properly for non chess variants
         s"${playerText(w)} won by checkmate"
       case (Some(w), _, Mate | PerpetualCheck, _) =>
         s"${playerText(w)} won by opponent perpetually checking"
@@ -182,7 +183,8 @@ trait GameHelper { self: I18nHelper with UserHelper with AiHelper with StringHel
       case S.Mate =>
         game.variant.gameLogic match {
           case GameLogic.Chess() | GameLogic.FairySF() | GameLogic.Samurai() | GameLogic.Togyzkumalak() |
-              GameLogic.Go() | GameLogic.Backgammon() | GameLogic.Abalone() =>
+              GameLogic.Go() | GameLogic.Backgammon() | GameLogic.Abalone() | GameLogic.Dameo() =>
+            //TODO set this properly for non chess variants
             trans.checkmate.txt()
           case _ => ""
         }

@@ -279,6 +279,7 @@ export function main(ctrl: RoundController): VNode {
 
   //Add piece-letter class for games which dont want Noto Chess (font-famliy)
   const notationBasic = [
+    'dameo',
     'xiangqi',
     'shogi',
     'minixiangqi',

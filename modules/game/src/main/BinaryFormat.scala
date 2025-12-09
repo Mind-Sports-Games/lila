@@ -28,6 +28,7 @@ import strategygames.togyzkumalak
 import strategygames.go
 import strategygames.backgammon
 import strategygames.abalone
+import strategygames.dameo
 import strategygames.format
 import strategygames.variant.Variant
 import org.joda.time.DateTime
@@ -656,6 +657,26 @@ object BinaryFormat {
         .to(Map)
     }
 
+    def writeDameo(pieces: dameo.PieceMap): ByteArray = {
+      def posInt(pos: dameo.Pos): Int =
+        (pieces get pos).fold(0) { piece =>
+          piece.player.fold(0, 128) + piece.role.binaryInt
+        }
+      ByteArray(dameo.Pos.all.map(posInt(_).toByte).toArray)
+    }
+
+    def readDameo(ba: ByteArray, variant: dameo.variant.Variant): dameo.PieceMap = {
+      def intPiece(int: Int): Option[dameo.Piece] =
+        dameo.Role.allByBinaryInt.get(int & 127) map { role =>
+          dameo.Piece(PlayerIndex.fromP1((int & 128) == 0), role)
+        }
+      (dameo.Pos.all zip ba.value).view
+        .flatMap { case (pos, int) =>
+          intPiece(int) map (pos -> _)
+        }
+        .to(Map)
+    }
+
     // cache standard start position
     def standard(lib: GameLogic) = lib match {
       case GameLogic.Chess() => writeChess(chess.Board.init(chess.variant.Standard).pieces)
@@ -671,6 +692,7 @@ object BinaryFormat {
       case GameLogic.Backgammon() =>
         writeBackgammon(backgammon.Board.init(backgammon.variant.Backgammon).pieces)
       case GameLogic.Abalone() => writeAbalone(abalone.Board.init(abalone.variant.Abalone).pieces)
+      case GameLogic.Dameo()   => writeDameo(dameo.Board.init(dameo.variant.Dameo).pieces)
       case _ =>
         sys.error("Cant write to binary for lib")
     }

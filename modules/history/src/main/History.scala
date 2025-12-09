@@ -29,6 +29,7 @@ case class History(
     pool: RatingsMap,
     portuguese: RatingsMap,
     english: RatingsMap,
+    dameo: RatingsMap,
     shogi: RatingsMap,
     xiangqi: RatingsMap,
     minishogi: RatingsMap,
@@ -90,6 +91,7 @@ case class History(
       case "pool"                   => pool
       case "portuguese"             => portuguese
       case "english"                => english
+      case "dameo"                  => dameo
       case "shogi"                  => shogi
       case "xiangqi"                => xiangqi
       case "minishogi"              => minishogi
@@ -167,6 +169,7 @@ object History {
           pool = ratingsMap("pool"),
           portuguese = ratingsMap("portuguese"),
           english = ratingsMap("english"),
+          dameo = ratingsMap("dameo"),
           shogi = ratingsMap("shogi"),
           xiangqi = ratingsMap("xiangqi"),
           minishogi = ratingsMap("minishogi"),
