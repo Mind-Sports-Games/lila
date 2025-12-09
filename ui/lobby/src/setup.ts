@@ -932,11 +932,7 @@ export default class Setup {
         }
         disableNonRealTimeModes();
         // Disable 'friend' option (requires account), keep 'bot' and 'lobby'
-        $form
-          .find('input[name="opponent"][value="friend"]')
-          .prop('disabled', true)
-          .parent()
-          .addClass('disabled');
+        $form.find('input[name="opponent"][value="friend"]').prop('disabled', true).parent().addClass('disabled');
       }
     };
     setAnonOptions();
