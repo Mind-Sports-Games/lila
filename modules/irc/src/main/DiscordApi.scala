@@ -3,16 +3,20 @@ package lila.irc
 import lila.common.LightUser
 import lila.user.User
 
+import lila.i18n.VariantKeys
+
+import strategygames.variant.Variant
+
 final class DiscordApi(
     client: DiscordClient,
     baseUrl: String,
     implicit val lightUser: LightUser.Getter
 )(implicit ec: scala.concurrent.ExecutionContext) {
 
-  def matchmakingAnnouncement(text: String, gameFamilyKey: String, variant: String, isHook: Boolean): Funit =
+  def matchmakingAnnouncement(text: String, variant: Variant, isHook: Boolean): Funit =
     client(
       DiscordMessage(
-        text = linkifyUsers(text) + (if (isHook) s" ${gameGroupLink(gameFamilyKey, variant)}" else ""),
+        text = linkifyUsers(text) + (if (isHook) s" ${gameFamilyLink(variant)}" else ""),
         channel = MatchMaking
       )
     )
@@ -20,8 +24,7 @@ final class DiscordApi(
   def tournamentAnnouncement(
       freq: String,
       name: String,
-      variant: String,
-      gameFamilyKey: String,
+      variant: Variant,
       duration: String,
       id: String,
       isMedley: Boolean
@@ -29,21 +32,21 @@ final class DiscordApi(
     client(
       DiscordMessage(
         text = List(
-          s"${gameGroupLink(gameFamilyKey, variant)}",
+          s"${gameFamilyLink(variant)}",
           s":loudspeaker: Starting Now - [${name}](<$baseUrl/tournament/${id}>)",
-          s"${freqIcon(freq)} ${variantLine(variant, isMedley)}",
+          s"${freqIcon(freq)} ${variantLine(VariantKeys.variantName(variant), isMedley)}",
           s":alarm_clock: $duration"
         ).mkString("\n"),
         channel = Tournaments
       )
     )
 
-  def variantLine(variant: String, isMedley: Boolean) = {
-    if (isMedley) s"Medley beginning with $variant"
-    else variant
+  private def variantLine(variantName: String, isMedley: Boolean) = {
+    if (isMedley) s"Medley beginning with $variantName"
+    else variantName
   }
 
-  def freqIcon(freq: String): String = freq match {
+  private def freqIcon(freq: String): String = freq match {
     case "weekly"       => ":trophy:"
     case "shield"       => ":shield:"
     case "medleyshield" => ":shield:"
@@ -51,12 +54,12 @@ final class DiscordApi(
     case _              => ":trophy:"
   }
 
-  //TODO Dameo Add Discord channel
-  def gameGroupLink(gameFamilyKey: String, variant: String): String = (gameFamilyKey, variant) match {
-    case ("chess", "Chess")        => "<@&1344675363279867904>"
+  private def gameFamilyLink(variant: Variant): String = (variant.gameFamily.key, variant.key) match {
+    case ("chess", "standard")     => "<@&1344675363279867904>"
     case ("chess", _)              => "<@&1344695574112239708>"
     case ("loa", _)                => "<@&1344678278547640382>"
     case ("draughts", _)           => "<@&1344677542250025011>"
+    case ("dameo", _)              => "<@&1344677542250025011>"
     case ("shogi", _)              => "<@&1344678410055843860>"
     case ("xiangqi", _)            => "<@&1344678872322543697>"
     case ("flipello", _)           => "<@&1344678917486678066>"
