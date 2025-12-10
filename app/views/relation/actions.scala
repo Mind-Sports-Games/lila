@@ -15,7 +15,8 @@ object actions {
       relation: Option[lila.relation.Relation],
       followable: Boolean,
       blocked: Boolean,
-      signup: Boolean = false
+      signup: Boolean = false,
+      isBot: Boolean = false
   )(implicit ctx: Context) =
     div(cls := "relation-actions btn-rack")(
       ctx.userId map { myId =>
@@ -69,10 +70,19 @@ object actions {
           }
         )
       } getOrElse {
-        signup option frag(
-          trans.youNeedAnAccountToDoThat(),
-          a(href := routes.Auth.login, cls := "signup")(trans.signUp())
-        )
+        // Allow anonymous users to challenge bots
+        if (isBot)
+          a(
+            titleOrText(trans.challenge.challengeToPlay.txt()),
+            href := s"${routes.Lobby.home}?user=$userId#game",
+            cls := "btn-rack__btn",
+            dataIcon := "U"
+          )
+        else
+          signup option frag(
+            trans.youNeedAnAccountToDoThat(),
+            a(href := routes.Auth.login, cls := "signup")(trans.signUp())
+          )
       }
     )
 }

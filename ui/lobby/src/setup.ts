@@ -928,8 +928,18 @@ export default class Setup {
       if (isAnon) {
         setBaseDefaultOptions(); //defult to chess, real time, blitz clock
         $casual.trigger('click');
-        $opponentInput.val('lobby'); //default to lobby
+        // Check if target user is a bot (from server-side data attribute or known bot lists)
+        const targetIsBot = $form.data('target-is-bot') || vsPSBot || vsStockfishBot;
+        if (targetIsBot) {
+          // Set opponent to 'bot' for bot challenges
+          $opponentInput.filter('[value="bot"]').prop('checked', true).trigger('change');
+        } else {
+          // Default to lobby for non-bot games
+          $opponentInput.filter('[value="lobby"]').prop('checked', true).trigger('change');
+        }
         disableNonRealTimeModes();
+        // Disable 'friend' option (requires account), keep 'bot' and 'lobby'
+        $form.find('input[name="opponent"][value="friend"]').prop('disabled', true).parent().addClass('disabled');
       }
     };
     setAnonOptions();
@@ -1162,40 +1172,63 @@ export default class Setup {
       });
     });
     const updateBotDetails = () => {
-      let bot = $botInput.filter(':checked').val() as string;
-      if (!bot) {
-        $botInput.val('ps-greedy-two-move'); //default bot
-        bot = 'ps-greedy-two-move';
+      // If user came from a specific bot's profile, preserve that bot
+      // This includes custom bots (not in radio list) detected via data-target-is-bot
+      const targetIsBot = $form.data('target-is-bot') || vsPSBot || vsStockfishBot;
+      const isTargetingSpecificBot = user && targetIsBot;
+      let bot: string;
+
+      if (isTargetingSpecificBot) {
+        // Use the original bot from the URL - don't override with radio selection
+        bot = user;
+      } else {
+        // Use the radio button selection (no specific bot in URL)
+        bot = $botInput.filter(':checked').val() as string;
+        if (!bot) {
+          $botInput.val('ps-greedy-two-move'); //default bot
+          bot = 'ps-greedy-two-move';
+        }
       }
+
       const botText = $form.find('.opponent_bot.choice');
-      const botName = bot
-        .replace('stockfish-l', 'Stockfish-L')
-        .replace('ps-', 'PS-')
-        .replace('greedy-', 'Greedy-')
-        .replace('-move', '-Move')
-        .replace('random', 'Random')
-        .replace('one', 'One')
-        .replace('four', 'Four')
-        .replace('two', 'Two');
+      // For known bots, format the name nicely; for custom bots, use as-is
+      const isKnownBot = vsPSBot || vsStockfishBot || this.psBots.includes(bot) || this.stockfishBots.includes(bot);
+      const botName = isKnownBot
+        ? bot
+            .replace('stockfish-l', 'Stockfish-L')
+            .replace('ps-', 'PS-')
+            .replace('greedy-', 'Greedy-')
+            .replace('-move', '-Move')
+            .replace('random', 'Random')
+            .replace('one', 'One')
+            .replace('four', 'Four')
+            .replace('two', 'Two')
+        : bot; // Use username as-is for custom bots
       botText.empty();
       botText.append(
         `<a class="user-link ulpt" href="/@/${bot}"><span class="utitle" data-bot="data-bot" title="Robot">BOT</span>&nbsp${botName}</a>`,
       );
       const botSelected = $opponentInput.filter(':checked').val() === 'bot';
       if (!botSelected) return;
-      if (user || $form.attr('action').includes('user'))
-        $form.attr('action', $form.attr('action')?.replace(/user=[^&]*/, 'user=' + bot));
-      else $form.attr('action', $form.attr('action') + `&user=${bot}`);
+
+      // Only update URL if not targeting a specific bot from profile
+      if (!isTargetingSpecificBot) {
+        if ($form.attr('action')?.includes('user'))
+          $form.attr('action', $form.attr('action')?.replace(/user=[^&]*/, 'user=' + bot));
+        else $form.attr('action', $form.attr('action') + `&user=${bot}`);
+      }
     };
     const setupOpponentChoices = () => {
       $botChoices.hide();
       $form.find('.bot_title').hide();
       $form.find('.rating-range-config').hide();
       if (user) {
-        if (vsPSBot || vsStockfishBot) {
-          $opponentInput.val('bot');
+        // Check server-side flag or known bot lists
+        const targetIsBot = $form.data('target-is-bot') || vsPSBot || vsStockfishBot;
+        if (targetIsBot) {
+          $opponentInput.filter('[value="bot"]').prop('checked', true).trigger('change');
         } else {
-          $opponentInput.val('friend');
+          $opponentInput.filter('[value="friend"]').prop('checked', true).trigger('change');
         }
       }
       updateBotDetails();

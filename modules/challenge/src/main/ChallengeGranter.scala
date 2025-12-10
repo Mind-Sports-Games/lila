@@ -52,7 +52,11 @@ final class ChallengeGranter(
       ec: scala.concurrent.ExecutionContext
   ): Fu[Option[ChallengeDenied]] =
     fromOption
-      .fold[Fu[Option[ChallengeDenied.Reason]]](fuccess(YouAreAnon.some)) { from =>
+      .fold[Fu[Option[ChallengeDenied.Reason]]](
+        // Allow anonymous users to challenge bots
+        if (dest.isBot) fuccess(none)
+        else fuccess(YouAreAnon.some)
+      ) { from =>
         relationApi.fetchRelation(dest, from) zip
           prefApi.getPref(dest).map(_.challenge) map {
             case (Some(Block), _)                                  => YouAreBlocked.some
