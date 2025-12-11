@@ -44,6 +44,8 @@ playstrategy.load.then(() => {
         case '6':
         case '7':
           return '7'; //mancala
+        case '13':
+          return '1'; //draughts for dameo
         default:
           return gf;
       }
