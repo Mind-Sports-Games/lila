@@ -114,8 +114,9 @@ final class Puzzle(
     Open { implicit ctx =>
       val fixed = name.map(_.trim).filter(_.nonEmpty)
       fixed.??(env.user.repo.enabledNamed) orElse fuccess(ctx.me) flatMap { user =>
-        user.?? { env.puzzle.api.puzzle.of(_, page) dmap some } map { puzzles =>
-          Ok(views.html.puzzle.ofPlayer(~fixed, user, puzzleVariantFromKey(variant), puzzles))
+        user.?? { env.puzzle.api.puzzle.of(_, puzzleVariantFromKey(variant), page) dmap some } map {
+          puzzles =>
+            Ok(views.html.puzzle.ofPlayer(~fixed, user, puzzleVariantFromKey(variant), puzzles))
         }
       }
     }
@@ -409,7 +410,7 @@ final class Puzzle(
         .map(_ | me)
         .flatMap { user =>
           Reasonable(page) {
-            env.puzzle.history(user, page) map { history =>
+            env.puzzle.history(user, puzzleVariantFromKey(variant), page) map { history =>
               Ok(views.html.puzzle.history(user, puzzleVariantFromKey(variant), page, history))
             }
           }

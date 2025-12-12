@@ -24,6 +24,7 @@ object history {
         bits.pageMenu("history", variant),
         div(cls := "page-menu__content box box-pad")(
           h1(trans.puzzle.history()),
+          bits.variantSelector(variant, v => s"${routes.Puzzle.history(v.key)}"),
           div(cls := "puzzle-history")(
             div(cls := "infinite-scroll")(
               pager.currentPageResults map renderSession,

@@ -7,10 +7,11 @@ import controllers.routes
 import play.api.i18n.Lang
 import play.api.libs.json.{ JsString, Json }
 import strategygames.variant.Variant
+import lila.puzzle.Puzzle
 
 import lila.app.templating.Environment._
 import lila.app.ui.ScalatagsTemplate._
-import lila.i18n.MessageKey
+import lila.i18n.{ MessageKey, VariantKeys }
 import lila.puzzle.{ PuzzleDifficulty, PuzzleTheme }
 
 object bits {
@@ -38,6 +39,18 @@ object bits {
         "static"  -> static.map(_.value).mkString(" ")
       )
   }
+
+  def variantSelector(variant: Variant, link: Variant => String)(implicit lang: Lang) =
+    div(cls := s"variant_group")(
+      Puzzle.puzzleVariants.map { v =>
+        button(cls := s"variant ${if (v.key == variant.key) "selected" else ""}")(
+          a(
+            href := link(v),
+            dataIcon := v.perfIcon
+          )(VariantKeys.variantName(v))
+        )
+      }
+    )
 
   def pageMenu(active: String, variant: Variant, days: Int = 30)(implicit lang: Lang) =
     st.nav(cls := "page-menu__menu subnav")(

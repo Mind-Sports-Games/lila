@@ -24,16 +24,7 @@ object theme {
         div(cls := "page-menu__content box")(
           h1(trans.puzzle.puzzleThemes()),
           div(cls := "puzzle-themes__variant_select")(
-            div(cls := "variant_group")(
-              Puzzle.puzzleVariants.map { v =>
-                button(cls := s"variant ${if (v.key == variant.key) "selected" else ""}")(
-                  a(
-                    href := routes.Puzzle.themes(v.key),
-                    dataIcon := v.perfIcon
-                  )(VariantKeys.variantName(v))
-                )
-              }
-            )
+            bits.variantSelector(variant, v => routes.Puzzle.themes(v.key).url)
           ),
           div(cls := "puzzle-themes")(
             themes map { case (cat, themes) =>

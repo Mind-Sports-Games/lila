@@ -41,6 +41,20 @@ final class PuzzleApi(
           MaxPerPage(30)
         )
       }
+
+    def of(user: User, variant: Variant, page: Int): Fu[Paginator[Puzzle]] =
+      colls.puzzle { coll =>
+        Paginator(
+          adapter = new Adapter[Puzzle](
+            collection = coll,
+            selector = $doc("users" -> user.id, "v" -> variant.id, "l" -> variant.gameLogic.id),
+            projection = none,
+            sort = $sort desc "glicko.r"
+          ),
+          page,
+          MaxPerPage(30)
+        )
+      }
   }
 
   private[puzzle] object round {

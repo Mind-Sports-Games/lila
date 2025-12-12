@@ -10,6 +10,7 @@ import lila.common.paginator.Paginator
 import lila.puzzle.Puzzle
 import lila.user.User
 import strategygames.variant.Variant
+import lila.i18n.{ VariantKeys }
 
 object ofPlayer {
 
@@ -51,6 +52,10 @@ object ofPlayer {
                   )
                 else
                   frag(
+                    bits.variantSelector(
+                      variant,
+                      v => s"${routes.Puzzle.ofPlayer(v.key)}${!(ctx is u) ?? s"?name=${u.username}"}"
+                    ),
                     p(strong(pager.nbResults), " puzzles found in ", userLink(u), " games."),
                     div(cls := "puzzle-of-player__pager infinite-scroll")(
                       pager.currentPageResults.map { puzzle =>

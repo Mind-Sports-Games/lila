@@ -147,16 +147,9 @@ object dashboard {
               }
             )
           ),
-          div(cls := s"${baseClass}__variant_select variant_group")(
-            Puzzle.puzzleVariants.map { v =>
-              button(cls := s"variant ${if (v.key == variant.key) "selected" else ""}")(
-                a(
-                  href := s"${routes.Puzzle
-                    .dashboard(v.key, days, path)}${!(ctx is user) ?? s"?u=${user.username}"}",
-                  dataIcon := v.perfIcon
-                )(VariantKeys.variantName(v))
-              )
-            }
+          bits.variantSelector(
+            variant,
+            v => s"${routes.Puzzle.dashboard(v.key, days, path)}${!(ctx is user) ?? s"?u=${user.username}"}"
           ),
           dashOpt.flatMap(body) |
             div(cls := s"${baseClass}__empty")(
