@@ -33,7 +33,7 @@ final class PuzzleReplayApi(
 
   private val maxPuzzles = 100
 
-  private val replays = cacheApi.notLoading[User.ID, PuzzleReplay](512, "puzzle.replay")(
+  private val replays = cacheApi.notLoading[(User.ID, Variant), PuzzleReplay](512, "puzzle.replay")(
     _.expireAfterWrite(1 hour).buildAsync()
   )
 
@@ -44,9 +44,10 @@ final class PuzzleReplayApi(
       theme: PuzzleTheme.Key
   ): Fu[Option[(Puzzle, PuzzleReplay)]] =
     maybeDays map { days =>
-      replays.getFuture(user.id, _ => createReplayFor(user, days, variant, theme)) flatMap { current =>
-        if (current.days == days && current.theme == theme && current.remaining.nonEmpty) fuccess(current)
-        else createReplayFor(user, days, variant, theme) tap { replays.put(user.id, _) }
+      replays.getFuture((user.id, variant), _ => createReplayFor(user, days, variant, theme)) flatMap {
+        current =>
+          if (current.days == days && current.theme == theme && current.remaining.nonEmpty) fuccess(current)
+          else createReplayFor(user, days, variant, theme) tap { replays.put((user.id, variant), _) }
       } flatMap { replay =>
         replay.remaining.headOption ?? { id =>
           colls.puzzle(_.byId[Puzzle](id.value)) map2 (_ -> replay)
@@ -60,10 +61,10 @@ final class PuzzleReplayApi(
       variant: Variant,
       theme: PuzzleTheme.Key
   ): Funit =
-    replays.getIfPresent(round.userId) ?? {
+    replays.getIfPresent((round.userId, variant)) ?? {
       _ map { replay =>
         if (replay.days == days && replay.theme == theme)
-          replays.put(round.userId, fuccess(replay.step))
+          replays.put((round.userId, variant), fuccess(replay.step))
       }
     }
 
@@ -97,12 +98,22 @@ final class PuzzleReplayApi(
                     $doc(
                       "$match" -> $doc(
                         "$expr" -> {
-                          if (theme == PuzzleTheme.mix.key) $doc("$eq" -> $arr("$_id", "$$pid"))
+                          val baseMatch = $doc("$eq" -> $arr("$_id", "$$pid"))
+                          if (theme == PuzzleTheme.mix.key)
+                            $doc(
+                              "$and" -> $arr(
+                                baseMatch,
+                                $doc("$eq" -> $arr("$l", variant.gameLogic.id)),
+                                $doc("$eq" -> $arr("$v", variant.id))
+                              )
+                            )
                           else
                             $doc(
                               "$and" -> $arr(
-                                $doc("$eq" -> $arr("$_id", "$$pid")),
-                                $doc("$in" -> $arr(theme, "$themes"))
+                                baseMatch,
+                                $doc("$in" -> $arr(theme, "$themes")),
+                                $doc("$eq" -> $arr("$l", variant.gameLogic.id)),
+                                $doc("$eq" -> $arr("$v", variant.id))
                               )
                             )
                         }
