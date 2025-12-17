@@ -5,7 +5,7 @@ import strategygames.format.{ FEN, Forsyth, Uci }
 import strategygames.{ Player => PlayerIndex, GameLogic }
 import strategygames.variant.Variant
 
-import lila.rating.Glicko
+import lila.rating.{ Glicko, PerfType }
 import lila.common.Iso
 
 case class Puzzle(
@@ -98,7 +98,8 @@ object Puzzle {
       puzzleId: Id,
       userId: lila.user.User.ID,
       result: Result,
-      rating: (Int, Int)
+      rating: (Int, Int),
+      perfType: PerfType
   )
 
   object BSONFields {

@@ -63,15 +63,16 @@ object bits {
       a(cls := active.active("dashboard"), href := routes.Puzzle.dashboard(variant.key, days, "dashboard"))(
         trans.puzzle.puzzleDashboard()
       ),
-      a(
-        cls := active.active("improvementAreas"),
-        href := routes.Puzzle.dashboard(variant.key, days, "improvementAreas")
-      )(
-        trans.puzzle.improvementAreas()
-      ),
-      a(cls := active.active("strengths"), href := routes.Puzzle.dashboard(variant.key, days, "strengths"))(
-        trans.puzzle.strengths()
-      ),
+      //TODO we can put this back once we have more themes for our puzzles
+      // a(
+      //   cls := active.active("improvementAreas"),
+      //   href := routes.Puzzle.dashboard(variant.key, days, "improvementAreas")
+      // )(
+      //   trans.puzzle.improvementAreas()
+      // ),
+      // a(cls := active.active("strengths"), href := routes.Puzzle.dashboard(variant.key, days, "strengths"))(
+      //   trans.puzzle.strengths()
+      // ),
       a(cls := active.active("history"), href := routes.Puzzle.history(variant.key, 1))(
         trans.puzzle.history()
       ),

@@ -125,7 +125,15 @@ final private[puzzle] class PuzzleFinisher(
                 } >>- {
                   if (prevRound.isEmpty)
                     Bus.publish(
-                      Puzzle.UserResult(puzzle.id, user.id, result, formerUserRating -> userPerf.intRating),
+                      Puzzle.UserResult(
+                        puzzle.id,
+                        user.id,
+                        result,
+                        formerUserRating -> userPerf.intRating,
+                        PerfType
+                          .puzzlebyVariant(variant)
+                          .getOrElse(PerfType.orDefaultPuzzle("puzzle_standard"))
+                      ),
                       "finishPuzzle"
                     )
                 } inject (round -> userPerf).some

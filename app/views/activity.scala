@@ -9,6 +9,7 @@ import lila.app.templating.Environment._
 import lila.app.ui.ScalatagsTemplate._
 import lila.user.User
 import lila.swiss.Swiss
+import lila.rating.PerfType
 
 object activity {
 
@@ -87,6 +88,7 @@ object activity {
       scoreFrag(p.score),
       div(
         trans.activity.solvedNbPuzzles.pluralSame(p.score.size),
+        s" (${PerfType.trans(p.pt)})",
         p.score.rp.filterNot(_.isEmpty || (u.perfs.dubiousPuzzle && !ctx.is(u))).map(ratingProgFrag)
       )
     )

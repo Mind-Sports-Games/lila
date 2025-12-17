@@ -45,10 +45,16 @@ object ofPlayer {
             (user, puzzles) match {
               case (Some(u), Some(pager)) =>
                 if (pager.nbResults == 0 && ctx.is(u))
-                  p(
-                    "You have no puzzles in the database, but PlayStrategy still loves you very much.",
-                    br,
-                    "Play rapid and classical games to increase your chances of having a puzzle of yours added!"
+                  frag(
+                    bits.variantSelector(
+                      variant,
+                      v => s"${routes.Puzzle.ofPlayer(v.key)}${!(ctx is u) ?? s"?name=${u.username}"}"
+                    ),
+                    p(
+                      "You have no puzzles in the database, but PlayStrategy still loves you very much.",
+                      br,
+                      "Play rapid and classical games to increase your chances of having a puzzle of yours added!"
+                    )
                   )
                 else
                   frag(
