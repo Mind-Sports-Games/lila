@@ -60,7 +60,9 @@ case class Perfs(
     rapid: Perf,
     classical: Perf,
     correspondence: Perf,
-    puzzle: Perf,
+    puzzle_standard: Perf,
+    puzzle_atomic: Perf,
+    puzzle_linesOfAction: Perf,
     storm: Perf.Storm,
     racer: Perf.Racer,
     streak: Perf.Streak
@@ -119,7 +121,9 @@ case class Perfs(
       "rapid"                  -> rapid,
       "classical"              -> classical,
       "correspondence"         -> correspondence,
-      "puzzle"                 -> puzzle
+      "puzzle_standard"        -> puzzle_standard,
+      "puzzle_atomic"          -> puzzle_atomic,
+      "puzzle_linesOfAction"   -> puzzle_linesOfAction
     )
 
   private def fullPerfsMap: Map[String, Perf] = perfs.toMap
@@ -235,8 +239,14 @@ case class Perfs(
     "rapid"                  -> rapid,
     "classical"              -> classical,
     "correspondence"         -> correspondence,
-    "puzzle"                 -> puzzle
+    "puzzle_standard"        -> puzzle_standard,
+    "puzzle_atomic"          -> puzzle_atomic,
+    "puzzle_linesOfAction"   -> puzzle_linesOfAction
   )
+
+  lazy val perfsPuzzleMap: Map[String, Perf] = perfsMap.view
+    .filterKeys(_.startsWith("puzzle"))
+    .toMap
 
   def ratingMap: Map[String, Int] = perfsMap.view.mapValues(_.intRating).toMap
 
@@ -279,17 +289,23 @@ case class Perfs(
       case (acc, _)                              => acc
     }
 
+  //TODO also look at variant puzzles, add in logic?
+  //our current puzzles are all <2500 so not urgent to change this
   def dubiousPuzzle = {
-    puzzle.glicko.rating > 3000 && !standard.glicko.establishedIntRating.exists(_ > 2100) ||
-    puzzle.glicko.rating > 2500 && !standard.glicko.establishedIntRating.exists(_ > 1800)
+    puzzle_standard.glicko.rating > 3000 && !standard.glicko.establishedIntRating.exists(_ > 2100) ||
+    puzzle_standard.glicko.rating > 2500 && !standard.glicko.establishedIntRating.exists(_ > 1800)
   }
 }
+
+case class PerfLens(get: Perfs => Perf, set: (Perfs, Perf) => Perfs)
 
 case object Perfs {
 
   val default = {
     val p = Perf.default
     Perfs(
+      p,
+      p,
       p,
       p,
       p,
@@ -358,7 +374,9 @@ case object Perfs {
       rapid = managed,
       classical = managed,
       correspondence = managed,
-      puzzle = managedPuzzle
+      puzzle_standard = managedPuzzle,
+      puzzle_atomic = managedPuzzle,
+      puzzle_linesOfAction = managedPuzzle
     )
   }
 
@@ -411,6 +429,17 @@ case object Perfs {
       case Variant.Backgammon(strategygames.backgammon.variant.Nackgammon)       => Some(_.nackgammon)
       case Variant.Abalone(strategygames.abalone.variant.Abalone)                => Some(_.abalone)
       case _                                                                     => none
+    }
+
+  def puzzleLens(variant: Variant): Option[PerfLens] =
+    variant match {
+      case Variant.Chess(strategygames.chess.variant.Standard) =>
+        Some(PerfLens(_.puzzle_standard, (p, v) => p.copy(puzzle_standard = v)))
+      case Variant.Chess(strategygames.chess.variant.LinesOfAction) =>
+        Some(PerfLens(_.puzzle_linesOfAction, (p, v) => p.copy(puzzle_linesOfAction = v)))
+      case Variant.Chess(strategygames.chess.variant.Atomic) =>
+        Some(PerfLens(_.puzzle_atomic, (p, v) => p.copy(puzzle_atomic = v)))
+      case _ => None
     }
 
   def speedLens(speed: Speed): Perfs => Perf =
@@ -481,7 +510,9 @@ case object Perfs {
         rapid = perf("rapid"),
         classical = perf("classical"),
         correspondence = perf("correspondence"),
-        puzzle = perf("puzzle"),
+        puzzle_standard = perf("puzzle_standard"),
+        puzzle_atomic = perf("puzzle_atomic"),
+        puzzle_linesOfAction = perf("puzzle_linesOfAction"),
         storm = r.getO[Perf.Storm]("storm") getOrElse Perf.Storm.default,
         racer = r.getO[Perf.Racer]("racer") getOrElse Perf.Racer.default,
         streak = r.getO[Perf.Streak]("streak") getOrElse Perf.Streak.default
@@ -543,7 +574,9 @@ case object Perfs {
         "rapid"                  -> notNew(o.rapid),
         "classical"              -> notNew(o.classical),
         "correspondence"         -> notNew(o.correspondence),
-        "puzzle"                 -> notNew(o.puzzle),
+        "puzzle_standard"        -> notNew(o.puzzle_standard),
+        "puzzle_atomic"          -> notNew(o.puzzle_atomic),
+        "puzzle_linesOfAction"   -> notNew(o.puzzle_linesOfAction),
         "storm"                  -> (o.storm.nonEmpty option o.storm),
         "racer"                  -> (o.racer.nonEmpty option o.racer),
         "streak"                 -> (o.streak.nonEmpty option o.streak)

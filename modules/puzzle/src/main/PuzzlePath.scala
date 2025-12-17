@@ -3,7 +3,7 @@ package lila.puzzle
 import scala.concurrent.ExecutionContext
 
 import lila.db.dsl._
-import lila.user.User
+import lila.user.{ Perfs, User }
 import lila.common.Iso
 import strategygames.variant.Variant
 import strategygames.GameLogic
@@ -52,7 +52,12 @@ final private class PuzzlePathApi(
       .path {
         _.aggregateOne() { framework =>
           import framework._
-          val rating     = user.perfs.puzzle.glicko.intRating + difficulty.ratingDelta
+          val rating =
+            Perfs
+              .puzzleLens(variant)
+              .map(_.get(user.perfs))
+              .map(_.intRating)
+              .getOrElse(1500) + difficulty.ratingDelta
           val ratingFlex = (100 + math.abs(1500 - rating) / 4) * compromise.atMost(4)
           Match(
             select(

@@ -49,8 +49,9 @@ object Puzzle {
   def toId(id: String) = id.size == idSize option Id(id)
 
   val puzzleVariants: List[Variant] = List(
-    Variant.orDefault(GameLogic.Chess(), 1),
-    Variant.orDefault(GameLogic.Chess(), 11)
+    Variant.orDefault(GameLogic.Chess(), 1), //Standard
+    Variant.orDefault(GameLogic.Chess(), 7), //Atomic
+    Variant.orDefault(GameLogic.Chess(), 11) //Lines of Action
   )
 
   val defaultVariant: Variant = puzzleVariants.head

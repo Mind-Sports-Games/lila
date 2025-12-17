@@ -6,7 +6,7 @@ import scala.util.chaining._
 
 import lila.db.dsl._
 import lila.memo.CacheApi
-import lila.user.{ User, UserRepo }
+import lila.user.{ Perfs, User, UserRepo }
 import strategygames.variant.Variant
 
 private case class PuzzleSession(
@@ -64,7 +64,15 @@ final class PuzzleSessionApi(
           mon.vote(theme.value).record(100 + math.round(puzzle.vote * 100))
           mon
             .ratingDiff(theme.value, session.difficulty.key)
-            .record(math.abs(puzzle.glicko.intRating - user.perfs.puzzle.intRating))
+            .record(
+              math.abs(
+                Perfs
+                  .puzzleLens(puzzle.variant)
+                  .map(_.get(user.perfs))
+                  .map(_.intRating)
+                  .fold(0)(puzzle.glicko.intRating - _)
+              )
+            )
           mon.ratingDev(theme.value).record(puzzle.glicko.intDeviation)
           mon.tier(session.path.tier.key, theme.value, session.difficulty.key).increment().unit
           puzzle
@@ -194,8 +202,8 @@ final class PuzzleSessionApi(
     }
 
   private def shouldChangeSession(user: User, session: PuzzleSession) = !session.brandNew && {
-    val perf = user.perfs.puzzle
-    perf.clueless || (perf.provisional && perf.nb % 5 == 0)
+    val perf = Perfs.puzzleLens(session.path.variant).map(_.get(user.perfs))
+    perf.exists(_.clueless) || (perf.exists(_.provisional) && perf.exists(_.nb % 5 == 0))
   }
 
   private def createSessionFor(

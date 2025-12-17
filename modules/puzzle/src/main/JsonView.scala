@@ -10,7 +10,8 @@ import lila.game.GameRepo
 import lila.rating.Perf
 import lila.tree
 import lila.tree.Node.defaultNodeJsonWriter
-import lila.user.User
+import lila.user.{ Perfs, User }
+import strategygames.variant.Variant
 
 final class JsonView(
     gameJson: GameJson,
@@ -37,7 +38,7 @@ final class JsonView(
           "game"   -> gameJson,
           "puzzle" -> puzzleJson(puzzle)
         )
-        .add("user" -> user.map(userJson))
+        .add("user" -> user.map(userJson(_, puzzle.variant)))
         .add("replay" -> replay.map(replayJson))
         .add(
           "theme",
@@ -57,24 +58,24 @@ final class JsonView(
     }
   }
 
-  def userJson(u: User) =
+  def userJson(u: User, v: Variant) =
     Json
       .obj(
         "id"     -> u.id,
-        "rating" -> u.perfs.puzzle.intRating
+        "rating" -> Perfs.puzzleLens(v).map(_.get(u.perfs)).map(_.intRating)
       )
       .add(
-        "provisional" -> u.perfs.puzzle.provisional
+        "provisional" -> Perfs.puzzleLens(v).map(_.get(u.perfs)).map(_.provisional)
       )
 
   private def replayJson(r: PuzzleReplay) =
     Json.obj("days" -> r.days, "i" -> r.i, "of" -> r.nb)
 
-  def roundJson(u: User, round: PuzzleRound, perf: Perf) =
+  def roundJson(userIntRating: Option[Int], round: PuzzleRound, perf: Perf) =
     Json
       .obj(
         "win"        -> round.win,
-        "ratingDiff" -> (perf.intRating - u.perfs.puzzle.intRating)
+        "ratingDiff" -> userIntRating.fold(0)(perf.intRating - _)
       )
       .add("vote" -> round.vote)
       .add("themes" -> round.nonEmptyThemes.map { rt =>
@@ -141,10 +142,12 @@ final class JsonView(
             "game"   -> gameJson,
             "puzzle" -> puzzleJson(puzzle)
           )
-          .add("user" -> user.map(_.perfs.puzzle.intRating).map(userJson))
+          .add("user" -> user.map(_.perfs.puzzle_standard.intRating).map(userJson))
       }
     }
 
+    //TODO this and above doesn't work but we dont require it too as its for mobile bc batch only
+    //would need to assume the batch has all same variant??
     def batch(puzzles: Seq[Puzzle], user: Option[User])(implicit
         lang: Lang
     ): Fu[JsObject] = for {
@@ -159,7 +162,7 @@ final class JsonView(
       }.sequenceFu
     } yield Json
       .obj("puzzles" -> jsons)
-      .add("user" -> user.map(_.perfs.puzzle.intRating).map(userJson))
+      .add("user" -> user.map(_.perfs.puzzle_standard.intRating).map(userJson))
 
     def userJson(rating: Int) = Json.obj(
       "rating" -> rating,

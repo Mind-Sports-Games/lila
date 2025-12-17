@@ -56,7 +56,9 @@ case class History(
     rapid: RatingsMap,
     classical: RatingsMap,
     correspondence: RatingsMap,
-    puzzle: RatingsMap
+    puzzle_standard: RatingsMap,
+    puzzle_atomic: RatingsMap,
+    puzzle_linesOfAction: RatingsMap
 ) {
 
   def apply(perfType: PerfType): RatingsMap =
@@ -111,7 +113,9 @@ case class History(
       case "hyper"                  => hyper
       case "nackgammon"             => nackgammon
       case "abalone"                => abalone
-      case "puzzle"                 => puzzle
+      case "puzzle_standard"        => puzzle_standard
+      case "puzzle_atomic"          => puzzle_atomic
+      case "puzzle_linesOfAction"   => puzzle_linesOfAction
       case "ultraBullet"            => ultraBullet
       case x                        => sys error s"No history for perf $x"
     }
@@ -194,7 +198,9 @@ object History {
           rapid = ratingsMap("rapid"),
           classical = ratingsMap("classical"),
           correspondence = ratingsMap("correspondence"),
-          puzzle = ratingsMap("puzzle")
+          puzzle_standard = ratingsMap("puzzle_standard"),
+          puzzle_atomic = ratingsMap("puzzle_atomic"),
+          puzzle_linesOfAction = ratingsMap("puzzle_linesOfAction")
         )
       }
   }

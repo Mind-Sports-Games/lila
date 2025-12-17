@@ -13,6 +13,7 @@ import lila.common.config.MaxPerSecond
 import lila.puzzle.PuzzleForm.RoundData
 import lila.puzzle.PuzzleTheme
 import lila.puzzle.{ Result, PuzzleDashboard, PuzzleDifficulty, PuzzleReplay, PuzzleStreak, Puzzle => Puz }
+import lila.user.Perfs
 import strategygames.variant.Variant
 
 final class Puzzle(
@@ -158,7 +159,11 @@ final class Puzzle(
                   case Some(me) =>
                     env.puzzle.finisher(id, variant, theme.key, me, data.result) flatMap {
                       _ ?? { case (round, perf) =>
-                        val newUser = me.copy(perfs = me.perfs.copy(puzzle = perf))
+                        val newPerfs = Perfs
+                          .puzzleLens(variant)
+                          .map(_.set(me.perfs, perf))
+                          .getOrElse(me.perfs)
+                        val newUser = me.copy(perfs = newPerfs)
                         for {
                           _ <- env.puzzle.session.onComplete(round, variant, theme.key)
                           json <-
@@ -178,8 +183,12 @@ final class Puzzle(
                                     next     <- nextPuzzleForMe(variant, theme.key)
                                     nextJson <- renderJson(next, theme, none, newUser.some)
                                   } yield Json.obj(
-                                    "round" -> env.puzzle.jsonView.roundJson(me, round, perf),
-                                    "next"  -> nextJson
+                                    "round" -> env.puzzle.jsonView.roundJson(
+                                      Perfs.puzzleLens(variant).map(_.get(newUser.perfs)).map(_.intRating),
+                                      round,
+                                      perf
+                                    ),
+                                    "next" -> nextJson
                                   )
                                 case Some(replayDays) =>
                                   for {
@@ -190,8 +199,16 @@ final class Puzzle(
                                       case Some((puzzle, replay)) =>
                                         renderJson(puzzle, theme, replay.some) map { nextJson =>
                                           Json.obj(
-                                            "round" -> env.puzzle.jsonView.roundJson(me, round, perf),
-                                            "next"  -> nextJson
+                                            "round" -> env.puzzle.jsonView
+                                              .roundJson(
+                                                Perfs
+                                                  .puzzleLens(variant)
+                                                  .map(_.get(me.perfs))
+                                                  .map(_.intRating),
+                                                round,
+                                                perf
+                                              ),
+                                            "next" -> nextJson
                                           )
                                         }
                                     }
@@ -481,7 +498,7 @@ final class Puzzle(
                     env.puzzle
                       .finisher(id, Puz.puzzleVariants.head, PuzzleTheme.mix.key, me, Result(solution.win))
                   } map {
-                  case None => Ok(env.puzzle.jsonView.bc.userJson(me.perfs.puzzle.intRating))
+                  case None => Ok(env.puzzle.jsonView.bc.userJson(me.perfs.puzzle_standard.intRating))
                   case Some((round, perf)) =>
                     env.puzzle.session.onComplete(round, Puz.puzzleVariants.head, PuzzleTheme.mix.key)
                     Ok(env.puzzle.jsonView.bc.userJson(perf.intRating))

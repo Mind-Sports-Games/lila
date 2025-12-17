@@ -34,7 +34,7 @@ object PuzzleHistory {
 
     import BsonHandlers._
 
-    def nbResults: Fu[Int] = fuccess(user.perfs.puzzle.nb)
+    def nbResults: Fu[Int] = fuccess(user.perfs.perfsPuzzleMap.values.map(_.nb).sum)
 
     def slice(offset: Int, length: Int): Fu[Seq[PuzzleSession]] =
       colls
