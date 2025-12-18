@@ -141,7 +141,7 @@ final class PuzzleApi(
 
     def categorizedWithCount(variant: Variant): Fu[List[(lila.i18n.I18nKey, List[PuzzleTheme.WithCount])]] =
       countApi.countByThemeForVariant(variant) map { counts =>
-        PuzzleVariantThemes.categorizedThemesFor(variant.key) map { case (cat, puzzles) =>
+        PuzzleTheme.categorizedThemesFor(variant.key) map { case (cat, puzzles) =>
           cat -> puzzles.map { pt =>
             PuzzleTheme.WithCount(pt, counts.getOrElse(pt.key, 0))
           }

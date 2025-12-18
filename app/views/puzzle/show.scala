@@ -29,7 +29,7 @@ object show {
               "pref" -> pref,
               "i18n" -> bits.jsI18n(streak = isStreak)
             )
-            .add("themes" -> ctx.isAuth.option(bits.jsonThemes))
+            .add("themes" -> ctx.isAuth.option(bits.jsonThemes(puzzle.variant)))
             .add("difficulty" -> difficulty.map(_.key))
         )})""")
       ),

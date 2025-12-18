@@ -28,7 +28,8 @@ object bits {
         PuzzleTheme.enPassant.name.txt()(lila.i18n.defaultLang)
       ))
 
-  lazy val jsonThemes = PuzzleTheme.all
+  def jsonThemes(variant: Variant) = PuzzleTheme
+    .allByVariant(variant)
     .collect {
       case t if t != PuzzleTheme.mix => t.key
     }

@@ -28,37 +28,41 @@ object theme {
           ),
           div(cls := "puzzle-themes")(
             themes map { case (cat, themes) =>
-              frag(
-                h2(cat()),
-                div(
-                  cls := List(
-                    "puzzle-themes__list"     -> true,
-                    cat.key.replace(":", "-") -> true
+              themes.map(_.count).sum > 0 option {
+                frag(
+                  h2(cat()),
+                  div(
+                    cls := List(
+                      "puzzle-themes__list"     -> true,
+                      cat.key.replace(":", "-") -> true
+                    )
+                  )(
+                    themes.map { pt =>
+                      (pt.count > 0).option {
+                        val url =
+                          if (pt.theme == PuzzleTheme.mix) routes.Puzzle.home(variant.key)
+                          else routes.Puzzle.show(variant.key, pt.theme.key.value)
+                        a(cls := "puzzle-themes__link", href := url.url)(
+                          span(
+                            h3(
+                              pt.theme.name(),
+                              em(pt.count.localize)
+                            ),
+                            span(pt.theme.description())
+                          )
+                        )
+                      }
+                    },
+                    cat.key == "puzzle:origin" option
+                      a(cls := "puzzle-themes__link", href := routes.Puzzle.ofPlayer(variant.key))(
+                        span(
+                          h3("Player games"),
+                          span("Lookup puzzles generated from your games, or from another player's games.")
+                        )
+                      )
                   )
-                )(
-                  themes.map { pt =>
-                    val url =
-                      if (pt.theme == PuzzleTheme.mix) routes.Puzzle.home(variant.key)
-                      else routes.Puzzle.show(variant.key, pt.theme.key.value)
-                    a(cls := "puzzle-themes__link", href := (pt.count > 0).option(url.url))(
-                      span(
-                        h3(
-                          pt.theme.name(),
-                          em(pt.count.localize)
-                        ),
-                        span(pt.theme.description())
-                      )
-                    )
-                  },
-                  cat.key == "puzzle:origin" option
-                    a(cls := "puzzle-themes__link", href := routes.Puzzle.ofPlayer(variant.key))(
-                      span(
-                        h3("Player games"),
-                        span("Lookup puzzles generated from your games, or from another player's games.")
-                      )
-                    )
                 )
-              )
+              }
             }
             // p(cls := "puzzle-themes__db text", dataIcon := "")(
             //   "These puzzles are in the public domain, and can be downloaded from ",

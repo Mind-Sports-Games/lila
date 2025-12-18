@@ -125,7 +125,7 @@ final class JsonView(
   )
 
   private def simplifyThemes(themes: Set[PuzzleTheme.Key]) =
-    themes.filterNot(_ == PuzzleTheme.mate.key)
+    themes.filterNot(List(PuzzleTheme.mate.key, PuzzleTheme.win.key).contains(_))
 
   object bc {
 

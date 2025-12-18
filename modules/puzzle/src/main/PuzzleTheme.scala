@@ -57,6 +57,10 @@ object PuzzleTheme {
   val mateIn3        = PuzzleTheme(Key("mateIn3"), i.mateIn3, i.mateIn3Description)
   val mateIn4        = PuzzleTheme(Key("mateIn4"), i.mateIn4, i.mateIn4Description)
   val mateIn5        = PuzzleTheme(Key("mateIn5"), i.mateIn5, i.mateIn5Description)
+  val win            = PuzzleTheme(Key("win"), i.win, i.winDescription)
+  val winIn1         = PuzzleTheme(Key("winIn1"), i.winIn1, i.winIn1Description)
+  val winIn2         = PuzzleTheme(Key("winIn2"), i.winIn2, i.winIn2Description)
+  val winIn3         = PuzzleTheme(Key("winIn3"), i.winIn3, i.winIn3Description)
   val smotheredMate  = PuzzleTheme(Key("smotheredMate"), i.smotheredMate, i.smotheredMateDescription)
   val middlegame     = PuzzleTheme(Key("middlegame"), i.middlegame, i.middlegameDescription)
   val oneMove        = PuzzleTheme(Key("oneMove"), i.oneMove, i.oneMoveDescription)
@@ -80,7 +84,7 @@ object PuzzleTheme {
   val xRayAttack      = PuzzleTheme(Key("xRayAttack"), i.xRayAttack, i.xRayAttackDescription)
   val zugzwang        = PuzzleTheme(Key("zugzwang"), i.zugzwang, i.zugzwangDescription)
 
-  val categorized = List[(I18nKey, List[PuzzleTheme])](
+  val categorizedStandard = List[(I18nKey, List[PuzzleTheme])](
     trans.puzzle.recommended -> List(
       mix
     ),
@@ -158,12 +162,134 @@ object PuzzleTheme {
     ),
     trans.puzzle.origin -> List(
       master,
-      masterVsMaster,
-      superGM
+      masterVsMaster
+      //superGM
     )
   )
 
-  lazy val all: List[PuzzleTheme] = categorized.flatMap(_._2)
+  val categorizedLinesOfAction = List[(I18nKey, List[PuzzleTheme])](
+    trans.puzzle.recommended -> List(
+      mix
+    ),
+    trans.puzzle.mates -> List(
+      win,
+      winIn1,
+      winIn2,
+      winIn3
+    ),
+    trans.puzzle.phases -> List(
+      opening,
+      middlegame,
+      endgame
+    ),
+    trans.puzzle.origin -> List(
+      master,
+      masterVsMaster
+    ),
+    trans.puzzle.motifs -> List(
+      capturingDefender,
+      trappedPiece
+    ),
+    trans.puzzle.advanced -> List(
+      defensiveMove,
+      quietMove,
+      zugzwang
+    ),
+    trans.puzzle.lengths -> List(
+      oneMove,
+      short,
+      long,
+      veryLong
+    )
+  )
+
+  val categorizedAtomic = List[(I18nKey, List[PuzzleTheme])](
+    trans.puzzle.recommended -> List(
+      mix
+    ),
+    trans.puzzle.phases -> List(
+      opening,
+      middlegame,
+      endgame,
+      rookEndgame,
+      bishopEndgame,
+      pawnEndgame,
+      knightEndgame,
+      queenEndgame,
+      queenRookEndgame
+    ),
+    trans.puzzle.motifs -> List(
+      advancedPawn,
+      attackingF2F7,
+      capturingDefender,
+      discoveredAttack,
+      doubleCheck,
+      exposedKing,
+      fork,
+      hangingPiece,
+      kingsideAttack,
+      pin,
+      queensideAttack,
+      sacrifice,
+      skewer,
+      trappedPiece
+    ),
+    trans.puzzle.advanced -> List(
+      attraction,
+      clearance,
+      defensiveMove,
+      deflection,
+      interference,
+      intermezzo,
+      quietMove,
+      xRayAttack,
+      zugzwang
+    ),
+    trans.puzzle.mates -> List(
+      mate,
+      mateIn1,
+      mateIn2,
+      mateIn3,
+      mateIn4,
+      mateIn5
+    ),
+    trans.puzzle.specialMoves -> List(
+      castling,
+      enPassant,
+      promotion,
+      underPromotion
+    ),
+    trans.puzzle.goals -> List(
+      equality,
+      advantage,
+      crushing,
+      mate
+    ),
+    trans.puzzle.lengths -> List(
+      oneMove,
+      short,
+      long,
+      veryLong
+    ),
+    trans.puzzle.origin -> List(
+      master,
+      masterVsMaster
+      //superGM
+    )
+  )
+
+  val byCategorizedVariant: Map[String, List[(I18nKey, List[PuzzleTheme])]] = Map(
+    "standard"      -> categorizedStandard,
+    "atomic"        -> categorizedAtomic,
+    "linesOfAction" -> categorizedLinesOfAction
+  )
+
+  lazy val all: List[PuzzleTheme] = byCategorizedVariant.values.flatMap(_.flatMap(_._2)).toList.distinct
+
+  def categorizedThemesFor(variant: String): List[(I18nKey, List[PuzzleTheme])] =
+    byCategorizedVariant.getOrElse(variant, Nil)
+
+  def allByVariant(variant: Variant): List[PuzzleTheme] = categorizedThemesFor(variant.key).flatMap(_._2)
 
   lazy val allTranslationKeys = all.flatMap { t =>
     List(t.name, t.description)
@@ -194,6 +320,10 @@ object PuzzleTheme {
     mateIn3,
     mateIn4,
     mateIn5,
+    win,
+    winIn1,
+    winIn2,
+    winIn3,
     middlegame,
     oneMove,
     opening,
@@ -236,25 +366,4 @@ object PuzzleTheme {
   def findDynamic(key: String) = find(key).filterNot(t => staticThemes(t.key))
 
   implicit val keyIso: Iso.StringIso[Key] = lila.common.Iso.string[Key](Key.apply, _.value)
-}
-
-object PuzzleVariantThemes {
-
-  val byCategorizedVariant: Map[String, List[(I18nKey, List[PuzzleTheme])]] = Map(
-    "standard" -> PuzzleTheme.categorized,
-    "linesOfAction" -> List(
-      trans.puzzle.recommended -> List(
-        PuzzleTheme.mix
-      ),
-      trans.puzzle.mates -> List(
-        PuzzleTheme.mate,
-        PuzzleTheme.mateIn1,
-        PuzzleTheme.mateIn2,
-        PuzzleTheme.mateIn3
-      )
-    )
-  )
-
-  def categorizedThemesFor(variant: String): List[(I18nKey, List[PuzzleTheme])] =
-    byCategorizedVariant.getOrElse(variant, Nil)
 }

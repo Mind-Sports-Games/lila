@@ -168,6 +168,7 @@ final private[puzzle] class PuzzleFinisher(
       PuzzleTheme.attackingF2F7,
       PuzzleTheme.doubleCheck,
       PuzzleTheme.mateIn1,
+      PuzzleTheme.winIn1,
       PuzzleTheme.castling
     ).map(_.key)
 
