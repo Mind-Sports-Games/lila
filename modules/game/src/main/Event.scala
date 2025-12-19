@@ -1260,8 +1260,8 @@ object Event {
                 "p2"        -> bc.remainingTime(P2).centis,
                 "p1Pending" -> (bc.pending(P1) + bc.completedActionsOfTurnTime(P1)).centis,
                 "p2Pending" -> (bc.pending(P2) + bc.completedActionsOfTurnTime(P2)).centis,
-                "p1Periods" -> bc.players(P1).periodsLeft,
-                "p2Periods" -> bc.players(P2).periodsLeft
+                "p1Periods" -> (bc.config.periods - bc.players(P1).periodsLeft),
+                "p2Periods" -> (bc.config.periods - bc.players(P2).periodsLeft)
               )
           }
         })
