@@ -372,7 +372,9 @@ export class ClockController {
     this.elapsed() + this.pendingMillisOf(playerIndex) <= 1000 * this.delay &&
     //if we have a countdownDelay we are SimpleDelay which allows for a delay in berserk
     //otherwise we are Bronstein which clears the delay when berserking
-    this.countdownDelay ? true : !this.goneBerserk[playerIndex];
+    this.countdownDelay
+      ? true
+      : !this.goneBerserk[playerIndex];
 
   isNotInDelay = (playerIndex: PlayerIndex, isStoppedBetweenPlayerActions = false): boolean =>
     !!this.delay &&
@@ -380,7 +382,9 @@ export class ClockController {
     this.elapsed() + this.pendingMillisOf(playerIndex) > 1000 * this.delay &&
     //if we have a countdownDelay we are SimpleDelay which allows for a delay in berserk
     //otherwise we are Bronstein which clears the delay when berserking
-    this.countdownDelay ? true : !this.goneBerserk[playerIndex];
+    this.countdownDelay
+      ? true
+      : !this.goneBerserk[playerIndex];
 
   isRunning = () => this.times.activePlayerIndex !== undefined;
 

@@ -98,10 +98,7 @@ const renderByoyomiTime = (clock: ClockController, playerIndex: PlayerIndex) => 
   const byoyomi = clock.byoTime(playerIndex);
   const periods = clock.byoyomiData.totalPeriods - clock.byoyomiData.curPeriods[playerIndex];
   const perStr = periods > 1 ? `(${periods}x)` : '';
-  return h(
-    `div.byoyomi.per${periods}`,
-    byoyomi && periods ? `|${byoyomi}s${perStr}` : '',
-  );
+  return h(`div.byoyomi.per${periods}`, byoyomi && periods ? `|${byoyomi}s${perStr}` : '');
 };
 
 function formatClockTime(
