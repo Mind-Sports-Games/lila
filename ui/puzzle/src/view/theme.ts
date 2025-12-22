@@ -2,8 +2,8 @@ import { bind, dataIcon } from '../util';
 import { Controller, MaybeVNode } from '../interfaces';
 import { h, VNode } from 'snabbdom';
 
-//TODO create this study for chess and other variants
-const studyUrl = 'https://playstrategy.org/study/viiWlKjv';
+//TODO create this study for chess and other variants when more themes are available
+//const studyUrl = 'https://playstrategy.org/study/viiWlKjv';
 
 export default function theme(ctrl: Controller): MaybeVNode {
   const t = ctrl.getData().theme;
@@ -14,17 +14,17 @@ export default function theme(ctrl: Controller): MaybeVNode {
         h('a', { attrs: { href: `/training/${variant}/themes` } }, h('h2', ['« ', t.name])),
         h('p', [
           t.desc,
-          t.chapter &&
-            h(
-              'a.puzzle__side__theme__chapter.text',
-              {
-                attrs: {
-                  href: `${studyUrl}/${t.chapter}`,
-                  target: '_blank',
-                },
-              },
-              [' ', ctrl.trans.noarg('example')],
-            ),
+          // t.chapter &&
+          //   h(
+          //     'a.puzzle__side__theme__chapter.text',
+          //     {
+          //       attrs: {
+          //         href: `${studyUrl}/${t.chapter}`,
+          //         target: '_blank',
+          //       },
+          //     },
+          //     [' ', ctrl.trans.noarg('example')],
+          //   ),
         ]),
         ctrl.vm.mode != 'view' || ctrl.autoNexting() ? null : editor(ctrl),
       ]);
@@ -137,17 +137,17 @@ const editor = (ctrl: Controller): VNode => {
               ),
             ],
           ),
-          h(
-            'a.puzzle__themes__study.text',
-            {
-              attrs: {
-                'data-icon': '',
-                href: studyUrl,
-                target: '_blank',
-              },
-            },
-            'About puzzle themes',
-          ),
+          // h(
+          //   'a.puzzle__themes__study.text',
+          //   {
+          //     attrs: {
+          //       'data-icon': '',
+          //       href: studyUrl,
+          //       target: '_blank',
+          //     },
+          //   },
+          //   'About puzzle themes',
+          // ),
         ]
       : []),
   ]);

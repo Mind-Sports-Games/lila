@@ -108,7 +108,7 @@ case class Challenge(
     variant == Variant.Draughts(strategygames.draughts.variant.FromPosition) ||
       (draughtsFenVariants(variant) && customStartingPosition)
 
-  //When updating, also edit modules/game and ui/@types/playstrategy/index.d.ts:declare type PlayerName
+  //When updating, also edit modules/game, modules/puzzle and ui/@types/playstrategy/index.d.ts:declare type PlayerName
   def playerTrans(p: PlayerIndex)(implicit lang: Lang): String =
     variant.playerNames(p) match {
       case "White" => I18nKeys.white.txt()

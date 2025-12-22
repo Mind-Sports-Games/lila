@@ -151,8 +151,8 @@ object PuzzleTheme {
     trans.puzzle.goals -> List(
       equality,
       advantage,
-      crushing,
-      mate
+      crushing
+      //mate
     ),
     trans.puzzle.lengths -> List(
       oneMove,
@@ -262,8 +262,8 @@ object PuzzleTheme {
     trans.puzzle.goals -> List(
       equality,
       advantage,
-      crushing,
-      mate
+      crushing
+      //mate
     ),
     trans.puzzle.lengths -> List(
       oneMove,
@@ -332,6 +332,7 @@ object PuzzleTheme {
     veryLong
   ).map(_.key)
 
+  //TODO recreate these when more themes are available (also set per variant)
   val studyChapterIds: Map[PuzzleTheme.Key, String] = List(
     advancedPawn      -> "sw8VyTe1",
     attackingF2F7     -> "r1ZAcrjZ",
