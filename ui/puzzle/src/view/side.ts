@@ -157,7 +157,9 @@ const difficulties: [PuzzleDifficulty, number][] = [
 
 const variants: [string, string][] = [
   ['standard', 'Chess'],
+  ['atomic', 'Atomic'],
   ['linesOfAction', 'Lines of Action'],
+  // ['xiangqi', 'Xiangqi'],
 ];
 
 export function replay(ctrl: Controller): MaybeVNode {

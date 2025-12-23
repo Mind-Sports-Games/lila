@@ -90,8 +90,8 @@ POST  /training/coordinate/playerIndex       controllers.Coordinate.playerIndex
 
 # Training - Puzzle
 GET   /training/:variant                                controllers.Puzzle.home(variant: String)
-GET   /training/daily                                   controllers.Puzzle.daily
-GET   /training/frame                                   controllers.Puzzle.frame
+GET   /training/daily/puzzle                            controllers.Puzzle.daily
+GET   /training/frame/daily                             controllers.Puzzle.frame
 GET   /training/export/gif/thumbnail/:id.gif            controllers.Export.puzzleThumbnail(id: String)
 GET   /training/:variant/themes                         controllers.Puzzle.themes(variant: String)
 GET   /training/:variant/of-player                      controllers.Puzzle.ofPlayer(variant: String, name: Option[String] ?= None, page: Int ?= 1)

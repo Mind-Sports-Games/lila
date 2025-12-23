@@ -151,9 +151,11 @@ export const variantFromElement = (element: Cash): string => {
                                       ? 'nackgammon'
                                       : element.hasClass('variant-abalone')
                                         ? 'abalone'
-                                        : element.hasClass('variant-threeCheck')
-                                          ? 'threeCheck'
-                                          : element.hasClass('variant-fiveCheck')
-                                            ? 'fiveCheck'
-                                            : 'standard';
+                                        : element.hasClass('variant-linesOfAction')
+                                          ? 'linesOfAction'
+                                          : element.hasClass('variant-threeCheck')
+                                            ? 'threeCheck'
+                                            : element.hasClass('variant-fiveCheck')
+                                              ? 'fiveCheck'
+                                              : 'standard';
 };

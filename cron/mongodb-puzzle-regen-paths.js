@@ -38,10 +38,12 @@ const tiers = [
   ['all', 95 / 100],
 ];
 
-const mixBoundaries = [
-  100, 650, 800, 900, 1000, 1100, 1200, 1270, 1340, 1410, 1480, 1550, 1620, 1690, 1760, 1830, 1900, 2000, 2100, 2200,
-  2350, 2500, 2650, 2800, 9999,
-];
+// const mixBoundaries = [
+//   100, 650, 800, 900, 1000, 1100, 1200, 1270, 1340, 1410, 1480, 1550, 1620, 1690, 1760, 1830, 1900, 2000, 2100, 2200,
+//   2350, 2500, 2650, 2800, 9999,
+// ];
+//Due to lack of initial puzzles we require fewer buckets for reduced mix paths to allow grouping of mate-1 (1000) + mate-2 (1200)
+const reducedMixBoundaries = [100, 650, 900, 1400, 1900, 2500, 9999];
 
 const themes = puzzleColl.distinct('themes', {}).filter(t => t && t != 'checkFirst');
 
@@ -49,6 +51,8 @@ const variantKeys = puzzleColl
   .aggregate([{ $group: { _id: { v: '$v', l: '$l' } } }])
   .toArray()
   .map(v => `${v._id.l}${sep}${v._id.v}`);
+
+if (verbose) print(`variantKeys: ${variantKeys}, themes: ${themes}`);
 
 function chunkify(a, n) {
   let len = a.length,
@@ -102,7 +106,7 @@ variantKeys.forEach(variantkey => {
     const themeMaxPathLength = Math.max(10, Math.min(maxPathLength, Math.round(nbPuzzles / 150)));
     const nbRatingBuckets =
       theme == 'mix'
-        ? mixBoundaries.length - 1
+        ? reducedMixBoundaries.length - 1
         : Math.max(3, Math.min(maxRatingBuckets, Math.round(nbPuzzles / themeMaxPathLength / 15)));
 
     const bucketStages =
@@ -111,7 +115,7 @@ variantKeys.forEach(variantkey => {
             {
               $bucket: {
                 ...bucketBase,
-                boundaries: mixBoundaries,
+                boundaries: reducedMixBoundaries,
               },
             },
             { $addFields: { _id: { min: '$_id' } } },
@@ -248,7 +252,7 @@ variantKeys.forEach(variantkey => {
         const ratingMax = isLastOfTier
           ? 9999
           : theme == 'mix'
-            ? mixBoundaries[indexInTier + 1]
+            ? reducedMixBoundaries[indexInTier + 1]
             : Math.floor(bucket._id.max);
         const nbPaths = Math.max(1, Math.floor(bucket.puzzles.length / pathLength));
         const allPaths = chunkify(bucket.puzzles, nbPaths);

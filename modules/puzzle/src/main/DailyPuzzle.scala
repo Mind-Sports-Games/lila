@@ -53,7 +53,7 @@ final private[puzzle] class DailyPuzzle(
         _.aggregateOne() { framework =>
           import framework._
           Match(
-            pathApi.select(Puzzle.randomVariant, PuzzleTheme.mix.key, PuzzleTier.Top, 1500 to 1500)
+            pathApi.select(Puzzle.randomVariant, PuzzleTheme.short.key, PuzzleTier.Top, 100 to 1900)
           ) -> List(
             Sample(3),
             Project($doc("ids" -> true, "_id" -> false)),
@@ -74,8 +74,7 @@ final private[puzzle] class DailyPuzzle(
                     ),
                     $doc(
                       "$match" -> $doc(
-                        Puzzle.BSONFields.day $exists false,
-                        Puzzle.BSONFields.themes $ne PuzzleTheme.oneMove.key.value
+                        Puzzle.BSONFields.day $exists false
                       )
                     )
                   )

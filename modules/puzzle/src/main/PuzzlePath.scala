@@ -58,7 +58,7 @@ final private class PuzzlePathApi(
               .map(_.get(user.perfs))
               .map(_.intRating)
               .getOrElse(1500) + difficulty.ratingDelta
-          val ratingFlex = (100 + math.abs(1500 - rating) / 4) * compromise.atMost(4)
+          val ratingFlex = (333 + math.abs(1500 - rating) / 4) * compromise.atMost(4)
           Match(
             select(
               variant,

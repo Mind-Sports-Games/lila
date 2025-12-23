@@ -22,7 +22,8 @@ object embed {
         id := "daily-puzzle",
         cls := "embedded"
       ),
-      jsModule("puzzle.embed")
+      depsTag("javascripts/vendor/cash.min.js"),
+      jsModule("puzzleEmbed")
     )
 
   def dailyLink(daily: DailyPuzzle.WithHtml)(implicit lang: Lang) = a(

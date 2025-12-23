@@ -44,6 +44,7 @@ case class Puzzle(
       fm * 2 - playerIndex.fold(1, 2)
     }
 
+  //TODO suport all actions when adding more variants
   lazy val fenAfterInitialMove: FEN = {
     for {
       sit1 <- Forsyth.<<(variant.gameLogic, fen)

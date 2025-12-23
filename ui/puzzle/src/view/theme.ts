@@ -40,7 +40,7 @@ const editor = (ctrl: Controller): VNode => {
     .filter(t => !invisibleThemes.has(t))
     .concat(Object.keys(votedThemes).filter(t => votedThemes[t] && !data.puzzle.themes.includes(t)))
     .sort();
-  const allThemes = location.pathname == '/training/daily' ? null : ctrl.allThemes;
+  const allThemes = location.pathname == '/training/daily/puzzle' ? null : ctrl.allThemes;
   const availableThemes = allThemes ? allThemes.dynamic.filter(t => !votedThemes[t]) : null;
   if (availableThemes) availableThemes.sort((a, b) => (trans(a) < trans(b) ? -1 : 1));
   return h('div.puzzle__themes', [

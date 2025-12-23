@@ -19,7 +19,7 @@ object bits {
   private val dataLastmove = attr("data-lastmove")
 
   def daily(p: lila.puzzle.Puzzle, fen: FEN, lastMove: String) =
-    views.html.board.bits.mini(fen, p.playerIndex, lastMove)(span)
+    views.html.board.bits.mini(fen, p.playerIndex, p.variant.key, lastMove)(span)
 
   def jsI18n(streak: Boolean)(implicit lang: Lang) =
     if (streak) i18nJsObject(streakI18nKeys)
