@@ -66,6 +66,7 @@ object Puzzle {
     Variant.orDefault(GameLogic.Chess(), 1), //Standard
     Variant.orDefault(GameLogic.Chess(), 7), //Atomic
     Variant.orDefault(GameLogic.Chess(), 11) //Lines of Action
+    //Variant.orDefault(GameLogic.FairySF(), 2) //Xiangqi - requires startops support first
   )
 
   val defaultVariant: Variant = puzzleVariants.head
