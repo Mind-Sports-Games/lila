@@ -253,22 +253,19 @@ export function config(ctrl: Controller): MaybeVNode {
         )
       : null,
     !ctrl.getData().replay && !ctrl.streak
-      ? h(
-          'form.puzzle__side__config__variant',
-          {
-            attrs: {
-              action: `/training/set-variant`,
-              method: 'post',
-            },
-          },
-          [
+      ? !ctrl.getData().user
+        ? // For anonymous users, use a select and redirect on change
+          h('div.puzzle__side__config__variant', [
             h('label', { attrs: { for: 'puzzle-variant' } }, ctrl.trans.noarg('variant')),
             h(
               'select#puzzle-variant.puzzle__variant__selector',
               {
                 attrs: { name: 'variant' },
                 hook: onInsert(elm =>
-                  elm.addEventListener('change', () => (elm.parentNode as HTMLFormElement).submit()),
+                  elm.addEventListener('change', () => {
+                    const variant = (elm as HTMLSelectElement).value;
+                    window.location.href = `/training/${variant}`;
+                  }),
                 ),
               },
               variants.map(([variantKey, variantName]) =>
@@ -284,8 +281,41 @@ export function config(ctrl: Controller): MaybeVNode {
                 ),
               ),
             ),
-          ],
-        )
+          ])
+        : // For logged-in users, render the form as before
+          h(
+            'form.puzzle__side__config__variant',
+            {
+              attrs: {
+                action: `/training/set-variant/mix`,
+                method: 'post',
+              },
+            },
+            [
+              h('label', { attrs: { for: 'puzzle-variant' } }, ctrl.trans.noarg('variant')),
+              h(
+                'select#puzzle-variant.puzzle__variant__selector',
+                {
+                  attrs: { name: 'variant' },
+                  hook: onInsert(elm =>
+                    elm.addEventListener('change', () => (elm.parentNode as HTMLFormElement).submit()),
+                  ),
+                },
+                variants.map(([variantKey, variantName]) =>
+                  h(
+                    'option',
+                    {
+                      attrs: {
+                        value: variantKey,
+                        selected: variantKey == ctrl.getData().game.variant.key,
+                      },
+                    },
+                    ctrl.trans.noarg(variantName),
+                  ),
+                ),
+              ),
+            ],
+          )
       : null,
     h(
       'a.puzzle__side__config__zen',

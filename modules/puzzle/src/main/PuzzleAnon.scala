@@ -20,7 +20,7 @@ final class PuzzleAnon(
 
   def getOneFor(variant: Variant, theme: PuzzleTheme.Key): Fu[Option[Puzzle]] =
     pool
-      .get(theme)
+      .get((variant, theme))
       .map(ThreadLocalRandom.oneOf)
       .mon(_.puzzle.selector.anon.time(theme.value))
       .addEffect {
@@ -30,16 +30,16 @@ final class PuzzleAnon(
       }
 
   def getBatchFor(nb: Int): Fu[Vector[Puzzle]] = {
-    pool get PuzzleTheme.mix.key map (_ take nb)
+    pool.get((Puzzle.defaultVariant, PuzzleTheme.mix.key)) map (_ take nb)
   }.mon(_.puzzle.selector.anon.batch(nb))
 
   private val poolSize = 150
 
   private val pool =
-    cacheApi[PuzzleTheme.Key, Vector[Puzzle]](initialCapacity = 64, name = "puzzle.byTheme.anon") {
+    cacheApi[(Variant, PuzzleTheme.Key), Vector[Puzzle]](initialCapacity = 64, name = "puzzle.byTheme.anon") {
       _.expireAfterWrite(1 minute)
-        .buildAsyncFuture { theme =>
-          countApi byTheme theme flatMap { count =>
+        .buildAsyncFuture { case (variant, theme) =>
+          countApi.byVariantTheme(variant, theme) flatMap { count =>
             val tier =
               if (count > 5000) PuzzleTier.Top
               else if (count > 2000) PuzzleTier.Good
@@ -56,7 +56,7 @@ final class PuzzleAnon(
             colls.path {
               _.aggregateList(poolSize) { framework =>
                 import framework._
-                Match(pathApi.select(Puzzle.defaultVariant, theme, tier, ratingRange)) -> List(
+                Match(pathApi.select(variant, theme, tier, ratingRange)) -> List(
                   Sample(pathSampleSize),
                   Project($doc("puzzleId" -> "$ids", "_id" -> false)),
                   Unwind("puzzleId"),
