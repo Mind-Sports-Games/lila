@@ -61,9 +61,7 @@ export function renderClock(ctrl: RoundController, player: game.Player, position
   };
   const timeHook: Hooks = {
     insert: vnode => update(vnode.elm as HTMLElement),
-    postpatch: (_, vnode) => {
-      if (isClockRunning) update(vnode.elm as HTMLElement);
-    },
+    postpatch: (_, vnode) => update(vnode.elm as HTMLElement),
   };
   return h(
     'div.rclock.rclock-' + position,
