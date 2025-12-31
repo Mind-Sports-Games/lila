@@ -19,7 +19,6 @@ export function renderClock(ctrl: RoundController, player: game.Player, position
     millis = clock.millisOf(player.playerIndex),
     isPlayer = ctrl.data.player.playerIndex === player.playerIndex,
     isRunning = player.playerIndex === clock.times.activePlayerIndex,
-    isClockRunning = game.playable(ctrl.data) && (game.bothPlayersHavePlayed(ctrl.data) || ctrl.data.clock!.running),
     showDelayTime = clock.countdownDelay !== undefined && !clock.goneBerserk[player.playerIndex];
   const update = (el: HTMLElement) => {
     const els = clock.elements[player.playerIndex],
@@ -52,9 +51,7 @@ export function renderClock(ctrl: RoundController, player: game.Player, position
   };
   const timeHook: Hooks = {
     insert: vnode => update(vnode.elm as HTMLElement),
-    postpatch: (_, vnode) => {
-      if (isClockRunning) update(vnode.elm as HTMLElement);
-    },
+    postpatch: (_, vnode) => update(vnode.elm as HTMLElement),
   };
   return h(
     'div.rclock.rclock-' + position,
