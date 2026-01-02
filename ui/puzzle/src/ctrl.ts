@@ -114,8 +114,6 @@ export default function (opts: PuzzleOpts, redraw: Redraw): Controller {
     instanciateCeval();
   }
 
-  const rules: Rules = variantKeyToRules(vm.variant);
-
   function position(): Position {
     const setup = parseFen(rules)(vm.node.fen).unwrap();
     return variantClassFromKey(vm.variant).fromSetup(setup).unwrap();
@@ -489,6 +487,7 @@ export default function (opts: PuzzleOpts, redraw: Redraw): Controller {
   };
 
   initiate(opts.data);
+  const rules: Rules = variantKeyToRules(vm.variant);
 
   const promotion = makePromotion(vm, ground, redraw);
 
