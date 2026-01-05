@@ -228,7 +228,8 @@ trait SetupHelper { self: I18nHelper =>
       "1_8",  // Frysk
       "1_14", // Spanish
       "1_9",  // Breakthrough
-      "1_13"  // Pool
+      "1_13", // Pool
+      "13_1"  // Dameo
     )
     val all              = Variant.all
     val chessVariants    = chessOrder.flatMap(id => all.find(v => s"${v.gameFamily.id}_${v.id}" == id))

@@ -348,6 +348,21 @@ object GameDiff {
           (o: Score) => o.nonEmpty ?? { BSONHandlers.scoreWriter writeOpt o }
         )
       }
+      case GameLogic.Dameo() => {
+        dTry(oldPgn, _.actionStrs, writeBytes compose newLibStorageWriter)
+        dTry(
+          binaryPieces,
+          _.board match {
+            case Board.Dameo(b) => b.pieces
+            case _              => sys.error("Wrong board type")
+          },
+          writeBytes compose BinaryFormat.piece.writeDameo
+        )
+        dOpt(halfMoveClock, _.history.halfMoveClock, w.intO)
+        d(positionHashes, _.history.positionHashes, w.bytes)
+        d(historyLastTurn, _.history.lastTurn.map(_.uci).mkString(","), w.str)
+        d(historyCurrentTurn, _.history.currentTurn.map(_.uci).mkString(","), w.str)
+      }
       case _ => sys.error("GameDiff not implemented for new game logic")
     }
 

@@ -44,6 +44,8 @@ playstrategy.load.then(() => {
         case '6':
         case '7':
           return '7'; //mancala
+        case '13':
+          return '1'; //draughts for dameo
         default:
           return gf;
       }
@@ -106,8 +108,10 @@ playstrategy.load.then(() => {
       const toHide: HTMLElement[] = [];
       $variants.each(function (this: HTMLElement) {
         const gfOfVariant = ($(this).val() as string).split('_')[0];
-        const additionalMatches = gfOfVariant === '6' && gameFamily === '7'; //add oware to mancala group
-        if (gfOfVariant === gameFamily || additionalMatches) {
+        //add oware to mancala group or add dameo to draughts group
+        const gameGroupCases =
+          (gfOfVariant === '6' && gameFamily === '7') || (gfOfVariant === '13' && gameFamily === '1');
+        if (gfOfVariant === gameFamily || gameGroupCases) {
           toShow.push($(this)[0]);
         } else {
           toHide.push($(this)[0]);

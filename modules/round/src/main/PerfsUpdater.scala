@@ -75,6 +75,8 @@ final class PerfsUpdater(
                 updateRatings(ratingsW.portuguese, ratingsB.portuguese, game)
               case Variant.Draughts(strategygames.draughts.variant.English) =>
                 updateRatings(ratingsW.english, ratingsB.english, game)
+              case Variant.Dameo(strategygames.dameo.variant.Dameo) =>
+                updateRatings(ratingsW.dameo, ratingsB.dameo, game)
               case Variant.FairySF(strategygames.fairysf.variant.Shogi) =>
                 updateRatings(ratingsW.shogi, ratingsB.shogi, game)
               case Variant.FairySF(strategygames.fairysf.variant.Xiangqi) =>
@@ -176,6 +178,7 @@ final class PerfsUpdater(
       pool: Rating,
       portuguese: Rating,
       english: Rating,
+      dameo: Rating,
       shogi: Rating,
       xiangqi: Rating,
       minishogi: Rating,
@@ -230,6 +233,7 @@ final class PerfsUpdater(
       pool = perfs.pool.toRating,
       portuguese = perfs.portuguese.toRating,
       english = perfs.english.toRating,
+      dameo = perfs.dameo.toRating,
       shogi = perfs.shogi.toRating,
       xiangqi = perfs.xiangqi.toRating,
       minishogi = perfs.minishogi.toRating,
@@ -410,6 +414,11 @@ final class PerfsUpdater(
             perfs.english,
             ratings.english
           ),
+          dameo = addRatingVariant(
+            Variant.Dameo(strategygames.dameo.variant.Dameo),
+            perfs.dameo,
+            ratings.dameo
+          ),
           shogi = addRatingVariant(
             Variant.FairySF(strategygames.fairysf.variant.Shogi),
             perfs.shogi,
@@ -548,6 +557,7 @@ final class PerfsUpdater(
           pool = r(PT.orDefault("pool"), perfs.pool, perfs1.pool),
           portuguese = r(PT.orDefault("portuguese"), perfs.portuguese, perfs1.portuguese),
           english = r(PT.orDefault("english"), perfs.english, perfs1.english),
+          dameo = r(PT.orDefault("dameo"), perfs.dameo, perfs1.dameo),
           shogi = r(PT.orDefault("shogi"), perfs.shogi, perfs1.shogi),
           xiangqi = r(PT.orDefault("xiangqi"), perfs.xiangqi, perfs1.xiangqi),
           minishogi = r(PT.orDefault("minishogi"), perfs.minishogi, perfs1.minishogi),

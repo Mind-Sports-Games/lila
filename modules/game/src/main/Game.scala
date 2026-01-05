@@ -1236,6 +1236,7 @@ object Game {
     val historyLastTurn           = "hlm" // was called historyLastMove hence hlm
     val historyCurrentTurn        = "hct"
     val unmovedRooks              = "ur"
+    val halfMoveClock             = "hmc"
     val daysPerTurn               = "cd"
     val plyTimes                  = "mt"  // was called moveTimes hence mt
     val p1ClockHistory            = "cw"

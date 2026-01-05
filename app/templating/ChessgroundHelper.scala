@@ -27,6 +27,7 @@ trait ChessgroundHelper {
           else {
             def top(p: Pos) = p match {
               case Pos.Chess(p)        => orient.fold(7 - p.rank.index, p.rank.index) * 12.5
+              case Pos.Dameo(p)        => orient.fold(7 - p.rank.index, p.rank.index) * 12.5
               case Pos.FairySF(p)      => orient.fold(7 - p.rank.index, p.rank.index) * 12.5
               case Pos.Samurai(p)      => orient.fold(7 - p.rank.index, p.rank.index) * 12.5
               case Pos.Togyzkumalak(p) => orient.fold(7 - p.rank.index, p.rank.index) * 12.5
@@ -37,6 +38,7 @@ trait ChessgroundHelper {
             }
             def left(p: Pos) = p match {
               case Pos.Chess(p)        => orient.fold(p.file.index, 7 - p.file.index) * 12.5
+              case Pos.Dameo(p)        => orient.fold(p.file.index, 7 - p.file.index) * 12.5
               case Pos.FairySF(p)      => orient.fold(p.file.index, 7 - p.file.index) * 12.5
               case Pos.Samurai(p)      => orient.fold(p.file.index, 7 - p.file.index) * 12.5
               case Pos.Togyzkumalak(p) => orient.fold(p.file.index, 7 - p.file.index) * 12.5
@@ -99,7 +101,15 @@ trait ChessgroundHelper {
             List(orig, dest)
           }
         )
-      //is there a better way of duplicating the case for Chess/FairySF?
+      //is there a better way of duplicating the case for Chess/FairySF/Dameo etc?
+      case (board: Board.Dameo, history: History.Dameo) =>
+        chessground(
+          board = board,
+          orient = pov.playerIndex,
+          lastMove = history.lastAction.flatMap(_.origDest) ?? { case (orig, dest) =>
+            List(orig, dest)
+          }
+        )
       case (board: Board.FairySF, history: History.FairySF) =>
         chessground(
           board = board,

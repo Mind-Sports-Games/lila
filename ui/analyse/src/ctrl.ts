@@ -45,6 +45,7 @@ import { PLAYERINDEXES, Outcome, isNormal } from 'stratops/types';
 import { SquareSet } from 'stratops/squareSet';
 import { parseFen } from 'stratops/fen';
 import { Position, PositionError } from 'stratops/chess';
+import { read as dameoFenRead } from 'chessground/variants/dameo/fen';
 import { Result } from '@badrap/result';
 import { storedProp, StoredBooleanProp } from 'common/storage';
 import { AnaMove, AnaDrop, AnaPass, StudyCtrl } from './study/interfaces';
@@ -321,6 +322,18 @@ export default class AnalyseCtrl {
       });
   });
 
+  private dameoActivePiece(fen: string) {
+    if (this.data.game.variant.key === 'dameo') {
+      const pieces: cg.Pieces = dameoFenRead(fen);
+      for (const [key, piece] of pieces) {
+        if (['a-piece', 'b-piece'].includes(piece.role)) {
+          return key;
+        }
+      }
+    }
+    return undefined;
+  }
+
   makeCgOpts(): ChessgroundConfig {
     const node = this.node,
       playerIndex = this.turnPlayerIndex(),
@@ -351,6 +364,7 @@ export default class AnalyseCtrl {
         check: !!node.check,
         lastMove: this.uciToLastMove(node.uci),
         onlyDropsVariant: isOnlyDropsPly(node, variantKey, this.data.onlyDropsVariant),
+        selected: this.dameoActivePiece(node.fen),
       };
     if (!dests && !node.check) {
       // premove while dests are loading from server
@@ -361,6 +375,7 @@ export default class AnalyseCtrl {
     config.premovable = {
       enabled: false,
     };
+    config.selected = this.dameoActivePiece(node.fen);
     this.cgConfig = config;
     return config;
   }

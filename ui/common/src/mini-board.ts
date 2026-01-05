@@ -113,49 +113,6 @@ export const initAll = (parent?: HTMLElement) =>
 
 // @TODO: rename into variantKeyFromElement
 export const variantFromElement = (element: Cash): string => {
-  return element.hasClass('variant-shogi')
-    ? 'shogi'
-    : element.hasClass('variant-xiangqi')
-      ? 'xiangqi'
-      : element.hasClass('variant-minishogi')
-        ? 'minishogi'
-        : element.hasClass('variant-minixiangqi')
-          ? 'minixiangqi'
-          : element.hasClass('variant-flipello')
-            ? 'flipello'
-            : element.hasClass('variant-flipello10')
-              ? 'flipello10'
-              : element.hasClass('variant-antiflipello')
-                ? 'antiflipello'
-                : element.hasClass('variant-octagonflipello')
-                  ? 'octagonflipello'
-                  : element.hasClass('variant-amazons')
-                    ? 'amazons'
-                    : element.hasClass('variant-oware')
-                      ? 'oware'
-                      : element.hasClass('variant-togyzkumalak')
-                        ? 'togyzkumalak'
-                        : element.hasClass('variant-bestemshe')
-                          ? 'bestemshe'
-                          : element.hasClass('variant-go9x9')
-                            ? 'go9x9'
-                            : element.hasClass('variant-go13x13')
-                              ? 'go13x13'
-                              : element.hasClass('variant-go19x19')
-                                ? 'go19x19'
-                                : element.hasClass('variant-backgammon')
-                                  ? 'backgammon'
-                                  : element.hasClass('variant-hyper')
-                                    ? 'hyper'
-                                    : element.hasClass('variant-nackgammon')
-                                      ? 'nackgammon'
-                                      : element.hasClass('variant-abalone')
-                                        ? 'abalone'
-                                        : element.hasClass('variant-linesOfAction')
-                                          ? 'linesOfAction'
-                                          : element.hasClass('variant-threeCheck')
-                                            ? 'threeCheck'
-                                            : element.hasClass('variant-fiveCheck')
-                                              ? 'fiveCheck'
-                                              : 'standard';
+  const match = element.attr('class')?.match(/variant-([^\s]+)/);
+  return match ? match[1] : 'standard';
 };

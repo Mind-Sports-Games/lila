@@ -16,9 +16,4 @@
     <circle cx="160.5" cy="772.5" r="144.5" fill="#D6514A" opacity="0.98"/>
     <circle cx="160.5" cy="772.5" r="144.5" stroke="#FFFFFF" stroke-width="8" fill="none" opacity="1"/>
   </g>
-  <g>
-    <!-- Checker 4 -->
-    <circle cx="160.5" cy="1078.5" r="144.5" fill="#D6514A" opacity="0.98"/>
-    <circle cx="160.5" cy="1078.5" r="144.5" stroke="#FFFFFF" stroke-width="8" fill="none" opacity="1"/>
-  </g>
 </svg>

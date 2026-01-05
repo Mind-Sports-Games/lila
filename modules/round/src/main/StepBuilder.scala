@@ -44,6 +44,7 @@ object StepBuilder {
             pocketData = init.situation.board.pocketData,
             captLen = init.situation match {
               case Situation.Draughts(situation) => situation.allMovesCaptureLength.some
+              case Situation.Dameo(situation)    => situation.allMovesCaptureLength.some
               case _                             => None
             }
           )
@@ -62,6 +63,11 @@ object StepBuilder {
               pocketData = g.situation.board.pocketData,
               captLen = (g.situation, m) match {
                 case (Situation.Draughts(situation), Uci.DraughtsWithSan(m)) =>
+                  if (situation.ghosts > 0)
+                    situation.captureLengthFrom(m.uci.dest)
+                  else
+                    situation.allMovesCaptureLength.some
+                case (Situation.Dameo(situation), Uci.DameoWithSan(m)) =>
                   if (situation.ghosts > 0)
                     situation.captureLengthFrom(m.uci.dest)
                   else

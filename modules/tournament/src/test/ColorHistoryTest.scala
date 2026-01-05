@@ -1,7 +1,7 @@
 package lila.tournament
 import org.specs2.mutable.Specification
 
-import strategygames.{ P2, P1 }
+import strategygames.{ P1, P2 }
 
 object PlayerIndexHistoryTest {
   def apply(s: String): PlayerIndexHistory = {
@@ -12,10 +12,10 @@ object PlayerIndexHistoryTest {
       }
     }
   }
-  def toTuple2(history: PlayerIndexHistory): (Int, Int)                = (history.strike, history.balance)
+  def toTuple2(history: PlayerIndexHistory): (Int, Int)          = (history.strike, history.balance)
   def unpack(s: String): (Int, Int)                              = toTuple2(apply(s))
   def couldPlay(s1: String, s2: String, maxStreak: Int): Boolean = apply(s1).couldPlay(apply(s2), maxStreak)
-  def samePlayerIndexs(s1: String, s2: String): Boolean                = apply(s1).samePlayerIndexs(apply(s2))
+  def samePlayerIndexs(s1: String, s2: String): Boolean          = apply(s1).samePlayerIndexs(apply(s2))
   def firstGetsP1(s1: String, s2: String): Boolean =
     apply(s1).firstGetsP1(apply(s2)) { () =>
       true

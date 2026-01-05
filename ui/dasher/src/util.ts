@@ -120,6 +120,8 @@ export function convertVariantKeyToGameFamily(variantKey: VariantKey | DraughtsV
     case 'english':
     case 'international':
       return 'draughts';
+    case 'dameo':
+      return 'dameo';
     default:
       return 'chess';
   }

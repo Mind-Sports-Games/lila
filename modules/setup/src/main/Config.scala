@@ -129,6 +129,7 @@ trait Positional { self: Config =>
     case GameLogic.Backgammon() =>
       true //randomly chooses start player and also sets multipoint in fen - but no from position
     case GameLogic.Abalone() => true //no fromPosition yet
+    case GameLogic.Dameo()   => true //no fromPosition yet
     case _ =>
       fen exists { f =>
         (Forsyth.<<<(variant.gameLogic, f)).exists(_.situation playable strictFen)
