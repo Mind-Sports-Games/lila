@@ -15,8 +15,8 @@ importers:
         specifier: github:Mind-Sports-Games/chessground#v7.11.1-pstrat3.23
         version: https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/728074bfe50fce1e472ac065224b6a940dde3612
       stratops:
-        specifier: github:Mind-Sports-Games/stratops#v0.8.1-pstrat5.22
-        version: https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/4a4f594a285680836d22d41f41a48d3ff7f60d57
+        specifier: github:Mind-Sports-Games/stratops#pla-1467-support-loa-puzzles
+        version: https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/9ec4008cfdaad9d615be2a93a47bd1f38cf4e98b
       xml2js:
         specifier: ^0.6.2
         version: 0.6.2
@@ -466,7 +466,7 @@ importers:
         version: link:../stratutils
       tablesort:
         specifier: ^5.1
-        version: 5.6.0
+        version: 5.7.0
       zxcvbn:
         specifier: ^4.4.2
         version: 4.4.2
@@ -589,8 +589,8 @@ packages:
   '@blakeembrey/template@1.2.0':
     resolution: {integrity: sha512-w/63nURdkRPpg3AXbNr7lPv6HgOuVDyefTumiXsbXxtIwcuk5EXayWR5OpSwDjsQPgaYsfUSedMduaNOjAYY8A==}
 
-  '@eslint-community/eslint-utils@4.9.0':
-    resolution: {integrity: sha512-ayVFHdtZ+hsq1t2Dy24wCmGXGe4q9Gu3smhLYALJrr473ZH27MsnSL+LKUlimp4BWJqMDMLmPpx/Q9R3OAlL4g==}
+  '@eslint-community/eslint-utils@4.9.1':
+    resolution: {integrity: sha512-phrYmNiYppR7znFEdqgfWHXR6NCkZEK7hwWDHZUjit/2/U0r6XvkDl0SYnoM51Hq7FhCGdLDT6zxCCOY1hexsQ==}
     engines: {node: ^12.22.0 || ^14.17.0 || >=16.0.0}
     peerDependencies:
       eslint: ^6.0.0 || ^7.0.0 || >=8.0.0
@@ -946,8 +946,8 @@ packages:
     resolution: {integrity: sha512-oruZaFkjorTpF32kDSI5/75ViwGeZginGGy2NoOSg3Q9bnwlnmDm4HLnkl0RE3n+njDXR037aY1+x58Z/zFdwQ==}
     engines: {node: ^12.22.0 || ^14.17.0 || >=16.0.0}
 
-  esquery@1.6.0:
-    resolution: {integrity: sha512-ca9pw9fomFcKPvFLXhBKUK90ZvGibiGOvRJNbjljY7s7uq/5YO4BOzcYtJqExdx99rF6aAcnRxHmcUHcz6sQsg==}
+  esquery@1.7.0:
+    resolution: {integrity: sha512-Ap6G0WQwcU/LHsvLwON1fAQX9Zp0A2Y6Y/cJBl9r/JbW90Zyg4/zbG6zzKa2OTALELarYHmKu0GhpM5EO+7T0g==}
     engines: {node: '>=0.10'}
 
   esrecurse@4.3.0:
@@ -988,8 +988,8 @@ packages:
   fast-levenshtein@2.0.6:
     resolution: {integrity: sha512-DCXu6Ifhqcks7TZKY3Hxp3y6qphY5SJZmrWMDrKcERSOXWQdMhU9Ig/PYrzyw/ul9jOIyh0N4M0tbC5hodg8dw==}
 
-  fastq@1.19.1:
-    resolution: {integrity: sha512-GwLTyxkCXjXbxqIhTsMI2Nui8huMPtnxg7krajPJAjnEG/iiOS7i+zCtWGZR9G0NBKbXKh6X9m9UIsYX/N6vvQ==}
+  fastq@1.20.1:
+    resolution: {integrity: sha512-GGToxJ/w1x32s/D2EKND7kTil4n8OVk/9mycTc4VDza13lOvpUZTGX3mFSCtV9ksdGBVzvsyAVLM6mHFThxXxw==}
 
   file-entry-cache@6.0.1:
     resolution: {integrity: sha512-7Gps/XWymbLk2QLYK4NzpMOrYjMhdIxXuIvy2QBsLE6ljuodKvdkWs/cpyJJ3CVIVpH0Oi1Hvg1ovbMzLdFBBg==}
@@ -1399,9 +1399,9 @@ packages:
     resolution: {integrity: sha512-wHMNIOjkm/YNE5EM3RCbr/+DVgPg6AqQAX1eOxO46zYNvCXjKP5Y865tqQj3EXnaMBjkxmQA5jFuDpDK/dbfiA==}
     engines: {node: '>=8.3.0'}
 
-  stratops@https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/4a4f594a285680836d22d41f41a48d3ff7f60d57:
-    resolution: {tarball: https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/4a4f594a285680836d22d41f41a48d3ff7f60d57}
-    version: 0.8.1-pstrat5.22
+  stratops@https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/9ec4008cfdaad9d615be2a93a47bd1f38cf4e98b:
+    resolution: {tarball: https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/9ec4008cfdaad9d615be2a93a47bd1f38cf4e98b}
+    version: 0.8.1-pstrat5.23
     engines: {node: ^20.19.4, pnpm: ^10.17.0}
 
   string-argv@0.3.2:
@@ -1432,9 +1432,9 @@ packages:
     resolution: {integrity: sha512-qpCAvRl9stuOHveKsn7HncJRvv501qIacKzQlO/+Lwxc9+0q2wLyv4Dfvt80/DPn2pqOBsJdDiogXGR9+OvwRw==}
     engines: {node: '>=8'}
 
-  tablesort@5.6.0:
-    resolution: {integrity: sha512-cZZXK3G089PbpxH8N7vN7Z21SEKqXAaCiSVOmZdR/v7z8TFCsF/OFr0rzjhQuFlQQHy9uQtW9P2oQFJzJFGVrg==}
-    engines: {node: '>= 16', npm: '>= 8'}
+  tablesort@5.7.0:
+    resolution: {integrity: sha512-irnN1HPD08466v6DHKR1+gqZ2be2+QZBDIGTM1DFGoWywY+d38bFtfsuUqBbMGkqaMyYE1uPxE7p0AM5cmbRSA==}
+    engines: {node: '>= 22', npm: '>= 10'}
 
   text-table@0.2.0:
     resolution: {integrity: sha512-N+8UisAXDGk8PFXP4HAzVR9nbfmVJ3zYLAWiTIoqC5v5isinhr+r5uaO8+7r3BMfuNIufIsA7RdpVgacC2cSpw==}
@@ -1528,7 +1528,7 @@ snapshots:
 
   '@blakeembrey/template@1.2.0': {}
 
-  '@eslint-community/eslint-utils@4.9.0(eslint@8.57.1)':
+  '@eslint-community/eslint-utils@4.9.1(eslint@8.57.1)':
     dependencies:
       eslint: 8.57.1
       eslint-visitor-keys: 3.4.3
@@ -1577,7 +1577,7 @@ snapshots:
   '@nodelib/fs.walk@1.2.8':
     dependencies:
       '@nodelib/fs.scandir': 2.1.5
-      fastq: 1.19.1
+      fastq: 1.20.1
 
   '@types/chart.js@2.9.41':
     dependencies:
@@ -1680,7 +1680,7 @@ snapshots:
 
   '@typescript-eslint/utils@7.18.0(eslint@8.57.1)(typescript@5.9.3)':
     dependencies:
-      '@eslint-community/eslint-utils': 4.9.0(eslint@8.57.1)
+      '@eslint-community/eslint-utils': 4.9.1(eslint@8.57.1)
       '@typescript-eslint/scope-manager': 7.18.0
       '@typescript-eslint/types': 7.18.0
       '@typescript-eslint/typescript-estree': 7.18.0(typescript@5.9.3)
@@ -1872,7 +1872,7 @@ snapshots:
 
   eslint@8.57.1:
     dependencies:
-      '@eslint-community/eslint-utils': 4.9.0(eslint@8.57.1)
+      '@eslint-community/eslint-utils': 4.9.1(eslint@8.57.1)
       '@eslint-community/regexpp': 4.12.2
       '@eslint/eslintrc': 2.1.4
       '@eslint/js': 8.57.1
@@ -1889,7 +1889,7 @@ snapshots:
       eslint-scope: 7.2.2
       eslint-visitor-keys: 3.4.3
       espree: 9.6.1
-      esquery: 1.6.0
+      esquery: 1.7.0
       esutils: 2.0.3
       fast-deep-equal: 3.1.3
       file-entry-cache: 6.0.1
@@ -1919,7 +1919,7 @@ snapshots:
       acorn-jsx: 5.3.2(acorn@8.15.0)
       eslint-visitor-keys: 3.4.3
 
-  esquery@1.6.0:
+  esquery@1.7.0:
     dependencies:
       estraverse: 5.3.0
 
@@ -1963,7 +1963,7 @@ snapshots:
 
   fast-levenshtein@2.0.6: {}
 
-  fastq@1.19.1:
+  fastq@1.20.1:
     dependencies:
       reusify: 1.1.0
 
@@ -2331,7 +2331,7 @@ snapshots:
 
   snabbdom@3.5.1: {}
 
-  stratops@https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/4a4f594a285680836d22d41f41a48d3ff7f60d57:
+  stratops@https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/9ec4008cfdaad9d615be2a93a47bd1f38cf4e98b:
     dependencies:
       '@badrap/result': 0.2.13
 
@@ -2359,7 +2359,7 @@ snapshots:
     dependencies:
       has-flag: 4.0.0
 
-  tablesort@5.6.0: {}
+  tablesort@5.7.0: {}
 
   text-table@0.2.0: {}
 
