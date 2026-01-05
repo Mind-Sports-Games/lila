@@ -361,6 +361,7 @@ case object Perfs {
       p,
       p,
       p,
+      p,
       Perf.Storm.default,
       Perf.Racer.default,
       Perf.Streak.default
