@@ -23,6 +23,11 @@ function calculateRating(line) {
 }
 
 puzzles.forEach(function (puzzle) {
+  if (collection.findOne({ fen: puzzle.fen, v: puzzle.v, l: puzzle.l })) {
+    print('Puzzle with FEN ' + puzzle.fen + ', v ' + puzzle.v + ', l ' + puzzle.l + ' already exists. Not added.');
+    return;
+  }
+
   if (puzzle.vote === undefined) puzzle.vote = 1.0;
   if (puzzle.plays === undefined) puzzle.plays = 0;
   if (puzzle.glicko === undefined) {

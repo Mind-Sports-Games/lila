@@ -48,6 +48,8 @@ def process_and_update_manifest(variant, month, generator, mongo_url, mongosh_sc
     response = s3.list_objects_v2(Bucket=BUCKET, Prefix=prefix)
     manifest = load_manifest(s3, DB_MANIFEST_KEY)
     files_processed = 0
+    total_inserted = 0
+    total_duplicates = 0
 
     if 'Contents' in response:
         for obj in response['Contents']:
@@ -65,6 +67,12 @@ def process_and_update_manifest(variant, month, generator, mongo_url, mongosh_sc
                 ], capture_output=True, text=True)
                 log(result.stdout)
                 log(result.stderr)
+                # Count inserted and duplicate puzzles
+                for line in result.stdout.splitlines():
+                    if "Inserted puzzle with id:" in line:
+                        total_inserted += 1
+                    if "already exists. Not added." in line:
+                        total_duplicates += 1
                 if result.returncode == 0:
                     log(f"Imported {local_filename} successfully.")
                     files_processed += 1
@@ -72,6 +80,9 @@ def process_and_update_manifest(variant, month, generator, mongo_url, mongosh_sc
                     log(f"Import failed for {local_filename}.")
                 os.remove(local_filename)  # Clean up local file
 
+    log(f"Total puzzles inserted for {variant} {month} {generator}: {total_inserted}")
+    log(f"Total duplicate puzzles (not added) for {variant} {month} {generator}: {total_duplicates}")
+    
     if files_processed > 0:
         update_manifest(manifest, variant, month, generator)
         save_manifest(s3, DB_MANIFEST_KEY, manifest)
