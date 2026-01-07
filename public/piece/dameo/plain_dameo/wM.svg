@@ -1,0 +1,7 @@
+<svg width="320" height="320" viewBox="0 0 320 320" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Single draughts piece centered in a square -->
+  <!--<circle cx="160" cy="160" r="127.7" fill="#F8F6F2" opacity="0.98"/>-->
+  
+  <circle cx="160" cy="160" r="127.7" fill="#5E5854" opacity="0.98"/>
+  <circle cx="156" cy="156" r="123.7" fill="#F8F6F2" opacity="0.98"/>
+</svg>
