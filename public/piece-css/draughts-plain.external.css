@@ -1,0 +1,44 @@
+.draughts.is2d .man.p1 {background-image:url('/assets/piece/draughts/plain/wM.svg')}
+.draughts.is2d .king.p1 {background-image:url('/assets/piece/draughts/plain/wK.svg')}
+.draughts.is2d .man.p2 {background-image:url('/assets/piece/draughts/plain/bM.svg')}
+.draughts.is2d .king.p2 {background-image:url('/assets/piece/draughts/plain/bK.svg')}
+.is2d .variant-international .man.p1, .is2d.variant-international .man.p1 {background-image:url('/assets/piece/draughts/plain/wM.svg')}
+.is2d .variant-international .king.p1, .is2d.variant-international .king.p1 {background-image:url('/assets/piece/draughts/plain/wK.svg')}
+.is2d .variant-international .man.p2, .is2d.variant-international .man.p2 {background-image:url('/assets/piece/draughts/plain/bM.svg')}
+.is2d .variant-international .king.p2, .is2d.variant-international .king.p2 {background-image:url('/assets/piece/draughts/plain/bK.svg')}
+.is2d .variant-frisian .man.p1, .is2d.variant-frisian .man.p1 {background-image:url('/assets/piece/draughts/plain/wM.svg')}
+.is2d .variant-frisian .king.p1, .is2d.variant-frisian .king.p1 {background-image:url('/assets/piece/draughts/plain/wK.svg')}
+.is2d .variant-frisian .man.p2, .is2d.variant-frisian .man.p2 {background-image:url('/assets/piece/draughts/plain/bM.svg')}
+.is2d .variant-frisian .king.p2, .is2d.variant-frisian .king.p2 {background-image:url('/assets/piece/draughts/plain/bK.svg')}
+.is2d .variant-frysk .man.p1, .is2d.variant-frysk .man.p1 {background-image:url('/assets/piece/draughts/plain/wM.svg')}
+.is2d .variant-frysk .king.p1, .is2d.variant-frysk .king.p1 {background-image:url('/assets/piece/draughts/plain/wK.svg')}
+.is2d .variant-frysk .man.p2, .is2d.variant-frysk .man.p2 {background-image:url('/assets/piece/draughts/plain/bM.svg')}
+.is2d .variant-frysk .king.p2, .is2d.variant-frysk .king.p2 {background-image:url('/assets/piece/draughts/plain/bK.svg')}
+.is2d .variant-antidraughts .man.p1, .is2d.variant-antidraughts .man.p1 {background-image:url('/assets/piece/draughts/plain/wM.svg')}
+.is2d .variant-antidraughts .king.p1, .is2d.variant-antidraughts .king.p1 {background-image:url('/assets/piece/draughts/plain/wK.svg')}
+.is2d .variant-antidraughts .man.p2, .is2d.variant-antidraughts .man.p2 {background-image:url('/assets/piece/draughts/plain/bM.svg')}
+.is2d .variant-antidraughts .king.p2, .is2d.variant-antidraughts .king.p2 {background-image:url('/assets/piece/draughts/plain/bK.svg')}
+.is2d .variant-breakthrough .man.p1, .is2d.variant-breakthrough .man.p1 {background-image:url('/assets/piece/draughts/plain/wM.svg')}
+.is2d .variant-breakthrough .king.p1, .is2d.variant-breakthrough .king.p1 {background-image:url('/assets/piece/draughts/plain/wK.svg')}
+.is2d .variant-breakthrough .man.p2, .is2d.variant-breakthrough .man.p2 {background-image:url('/assets/piece/draughts/plain/bM.svg')}
+.is2d .variant-breakthrough .king.p2, .is2d.variant-breakthrough .king.p2 {background-image:url('/assets/piece/draughts/plain/bK.svg')}
+.is2d .variant-russian .man.p1, .is2d.variant-russian .man.p1 {background-image:url('/assets/piece/draughts/plain/wM.svg')}
+.is2d .variant-russian .king.p1, .is2d.variant-russian .king.p1 {background-image:url('/assets/piece/draughts/plain/wK.svg')}
+.is2d .variant-russian .man.p2, .is2d.variant-russian .man.p2 {background-image:url('/assets/piece/draughts/plain/bM.svg')}
+.is2d .variant-russian .king.p2, .is2d.variant-russian .king.p2 {background-image:url('/assets/piece/draughts/plain/bK.svg')}
+.is2d .variant-brazilian .man.p1, .is2d.variant-brazilian .man.p1 {background-image:url('/assets/piece/draughts/plain/wM.svg')}
+.is2d .variant-brazilian .king.p1, .is2d.variant-brazilian .king.p1 {background-image:url('/assets/piece/draughts/plain/wK.svg')}
+.is2d .variant-brazilian .man.p2, .is2d.variant-brazilian .man.p2 {background-image:url('/assets/piece/draughts/plain/bM.svg')}
+.is2d .variant-brazilian .king.p2, .is2d.variant-brazilian .king.p2 {background-image:url('/assets/piece/draughts/plain/bK.svg')}
+.is2d .variant-pool .man.p1, .is2d.variant-pool .man.p1 {background-image:url('/assets/piece/draughts/plain/wM.svg')}
+.is2d .variant-pool .king.p1, .is2d.variant-pool .king.p1 {background-image:url('/assets/piece/draughts/plain/wK.svg')}
+.is2d .variant-pool .man.p2, .is2d.variant-pool .man.p2 {background-image:url('/assets/piece/draughts/plain/bM.svg')}
+.is2d .variant-pool .king.p2, .is2d.variant-pool .king.p2 {background-image:url('/assets/piece/draughts/plain/bK.svg')}
+.is2d .variant-portuguese .man.p1, .is2d.variant-portuguese .man.p1 {background-image:url('/assets/piece/draughts/plain/wM.svg')}
+.is2d .variant-portuguese .king.p1, .is2d.variant-portuguese .king.p1 {background-image:url('/assets/piece/draughts/plain/wK.svg')}
+.is2d .variant-portuguese .man.p2, .is2d.variant-portuguese .man.p2 {background-image:url('/assets/piece/draughts/plain/bM.svg')}
+.is2d .variant-portuguese .king.p2, .is2d.variant-portuguese .king.p2 {background-image:url('/assets/piece/draughts/plain/bK.svg')}
+.is2d .variant-english .man.p2, .is2d.variant-english .man.p2 {background-image:url('/assets/piece/draughts/plain/wM.svg')}
+.is2d .variant-english .king.p2, .is2d.variant-english .king.p2 {background-image:url('/assets/piece/draughts/plain/wK.svg')}
+.is2d .variant-english .man.p1, .is2d.variant-english .man.p1 {background-image:url('/assets/piece/draughts/plain/bM.svg')}
+.is2d .variant-english .king.p1, .is2d.variant-english .king.p1 {background-image:url('/assets/piece/draughts/plain/bK.svg')}
