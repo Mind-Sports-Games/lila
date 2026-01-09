@@ -18,7 +18,6 @@ export function renderClock(ctrl: RoundController, player: game.Player, position
   const clock = ctrl.clock!,
     millis = clock.millisOf(player.playerIndex),
     isPlayer = ctrl.data.player.playerIndex === player.playerIndex,
-    isRunning = player.playerIndex === clock.times.activePlayerIndex,
     showDelayTime = clock.countdownDelay !== undefined,
     paused =
       !!ctrl.data.opponent.offeringSelectSquares ||
@@ -26,10 +25,7 @@ export function renderClock(ctrl: RoundController, player: game.Player, position
       !(!ctrl.data.deadStoneOfferState || ctrl.data.deadStoneOfferState === 'RejectedOffer'),
     isClockRunning =
       game.playable(ctrl.data) && !paused && (game.bothPlayersHavePlayed(ctrl.data) || ctrl.data.clock!.running),
-    playerTurnDuringMultiActions =
-      ctrl.data.game.player === player.playerIndex &&
-      ['monster', 'amazons'].includes(ctrl.data.game.variant.key) &&
-      isClockRunning;
+    isRunning = isClockRunning && ctrl.data.game.player === player.playerIndex;
 
   // TODO in multication render clock gets called as the move is played while it's sent, and then during apiAction update, the
   // state of ctrl.data is different here and therefore hard to obtain the correct class in all states.
@@ -68,7 +64,7 @@ export function renderClock(ctrl: RoundController, player: game.Player, position
     {
       class: {
         outoftime: millis <= 0,
-        running: isRunning || playerTurnDuringMultiActions,
+        running: isRunning,
         emerg: isEmerg(millis, clock, player.playerIndex),
       },
     },
