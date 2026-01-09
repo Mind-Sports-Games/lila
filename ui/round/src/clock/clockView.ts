@@ -40,7 +40,7 @@ export function renderClock(ctrl: RoundController, player: game.Player, position
         : '';
   const update = (el: HTMLElement) => {
     const els = clock.elements[player.playerIndex],
-      isRunning = player.playerIndex === clock.times.activePlayerIndex,
+      isRunning = isClockRunning && ctrl.data.game.player === player.playerIndex,
       millis = clock.millisOf(player.playerIndex),
       delayMillis = clock.delayMillisOf(player.playerIndex, ctrl.data.game.player, isRunning);
     els.time = el;
