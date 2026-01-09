@@ -256,9 +256,7 @@ trait GameHelper { self: I18nHelper with UserHelper with AiHelper with StringHel
           case Some(p) if p.playerIndex.p1 => trans.playerIndexWinsByGinBackgammon(game.playerTrans(P1)).v
           case _                           => trans.playerIndexWinsByGinBackgammon(game.playerTrans(P2)).v
         }
-      case S.NoStart =>
-        val playerIndex = game.loser.fold(PlayerIndex.p1)(_.playerIndex).name.capitalize
-        s"$playerIndex didn't move"
+      case S.NoStart       => trans.playerIndexDidntMove(game.playerTrans(game.loser.fold(PlayerIndex.p1)(_.playerIndex))).v
       case S.Cheat         => trans.cheatDetected.txt()
       case S.SingleWin     => trans.backgammonSingleWin.txt()
       case S.GammonWin     => trans.backgammonGammonWin.txt()
