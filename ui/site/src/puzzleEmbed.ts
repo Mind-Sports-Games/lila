@@ -1,5 +1,7 @@
 import { Chessground } from 'chessground';
 
+window.Chessground = Chessground;
+//TODO fix this for puzzle embeds (/training/daily/puzzle)
 window.onload = () => {
   const el = document.querySelector('#daily-puzzle') as HTMLElement,
     board = el.querySelector('.mini-board') as HTMLAnchorElement,

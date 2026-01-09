@@ -268,7 +268,7 @@ object teacherDashboard {
                 showPerfRating(user, _)
               }),
               td(user.count.game.localize),
-              td(user.perfs.puzzle.nb),
+              td(user.perfs.perfsPuzzleMap.values.map(_.nb).sum.localize),
               td(dataSort := user.seenAt.map(_.getMillis.toString))(user.seenAt.map(momentFromNowOnce)),
               td(
                 dataSort := (if (student.managed) 1 else 0),

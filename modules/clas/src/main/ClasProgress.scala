@@ -26,7 +26,7 @@ case class ClasProgress(
       )
     )
 
-  def isPuzzle = perfType.key == "puzzle"
+  def isPuzzle = perfType.key.startsWith("puzzle")
 }
 
 case class StudentProgress(
@@ -54,7 +54,7 @@ final class ClasProgressApi(
     val userIds = users.map(_.id)
 
     val playStatsFu =
-      if (perfType.key == "puzzle") getPuzzleStats(userIds, days)
+      if (perfType.key.startsWith("puzzle")) getPuzzleStats(userIds, days)
       else getGameStats(perfType, userIds, days)
 
     val progressesFu = historyApi.progresses(users, perfType, days)
@@ -76,6 +76,7 @@ final class ClasProgressApi(
     }
   }
 
+  //TODO should we split this by variant?
   private def getPuzzleStats(userIds: List[User.ID], days: Int): Fu[Map[User.ID, PlayStats]] =
     puzzleColls.round {
       _.aggregateList(

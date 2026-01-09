@@ -4,11 +4,13 @@ import org.joda.time.DateTime
 import org.joda.time.Days
 
 import lila.db.dsl._
-import lila.user.User
+import lila.user.{ Perfs, User }
+import strategygames.variant.Variant
 
 final private class PuzzleTrustApi(colls: PuzzleColls)(implicit ec: scala.concurrent.ExecutionContext) {
 
   import BsonHandlers._
+  import Puzzle.{ BSONFields => F }
 
   def vote(user: User, round: PuzzleRound, vote: Boolean): Fu[Option[Int]] = {
     val w = base(user, round) + {
@@ -17,14 +19,27 @@ final private class PuzzleTrustApi(colls: PuzzleColls)(implicit ec: scala.concur
     }
     // distrust provisional ratings and distant ratings
     (w > 0) ?? {
-      user.perfs.puzzle.glicko.establishedIntRating.fold(fuccess(-2)) { userRating =>
-        colls
-          .puzzle(_.primitiveOne[Float]($id(round.id.puzzleId.value), s"${Puzzle.BSONFields.glicko}.r"))
-          .map {
-            _.fold(-2) { puzzleRating =>
-              (math.abs(puzzleRating - userRating) > 300) ?? -4
-            }
+      colls.puzzle { coll =>
+        coll.one[Bdoc](
+          $id(round.id.puzzleId.value),
+          $doc(F.variant -> true, F.lib -> true, s"${F.glicko}.r" -> true)
+        ) flatMap {
+          _ ?? { doc: Bdoc =>
+            {
+              for {
+                variantId    <- doc.getAsOpt[Int](F.variant)
+                libId        <- doc.getAsOpt[Int](F.lib)
+                puzzleRating <- doc.getAsOpt[Double](s"${F.glicko}.r")
+                variant = Variant.orDefault(strategygames.GameLogic(libId), variantId)
+                userPerf = Perfs
+                  .puzzleLens(variant)
+                  .map(_.get(user.perfs))
+                  .getOrElse(user.perfs.puzzle_standard)
+                userRating = userPerf.glicko.establishedIntRating.getOrElse(1500)
+              } yield (math.abs(puzzleRating - userRating) > 300) ?? -4
+            }.fold(fuccess(-2))(fuccess(_))
           }
+        }
       }
     }.dmap(w +)
   }.dmap(_.some.filter(0 <))

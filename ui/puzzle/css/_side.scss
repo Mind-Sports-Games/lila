@@ -19,6 +19,7 @@
 
       overflow: hidden;
       white-space: nowrap;
+      text-wrap: auto;
 
       &::before {
         font-size: 3rem;
@@ -110,12 +111,14 @@
       }
     }
 
-    &__difficulty {
+    &__difficulty,
+    &__variant {
       margin-top: 2vmin;
 
-      label {
-        margin-right: 1em;
-      }
+      display: flex;
+      flex-flow: row;
+      align-items: center;
+      justify-content: space-between;
 
       select {
         border: none;

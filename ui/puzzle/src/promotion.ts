@@ -1,22 +1,46 @@
 import { h } from 'snabbdom';
 import { bind, onInsert } from './util';
 import { Api as CgApi } from 'chessground/api';
-import * as cgUtil from 'chessground/util';
-import { Role } from 'chessground/types';
+import { key2pos, opposite } from 'chessground/util';
+import * as cg from 'chessground/types';
 import { MaybeVNode, Vm, Redraw, Promotion } from './interfaces';
+import { promotion } from 'stratutils';
 import { Prop } from 'common';
 
 export default function (vm: Vm, getGround: Prop<CgApi>, redraw: Redraw): Promotion {
-  let promoting: false | { orig: Key; dest: Key; callback: (orig: Key, key: Key, prom: Role) => void } = false;
+  let promoting: false | { orig: Key; dest: Key; callback: (orig: Key, key: Key, prom: cg.Role) => void } = false;
 
-  function start(orig: Key, dest: Key, callback: (orig: Key, key: Key, prom: Role) => void) {
-    const g = getGround(),
-      piece = g.state.pieces.get(dest);
-    if (
-      piece &&
-      piece.role == 'p-piece' &&
-      ((dest[1] == '8' && g.state.turnPlayerIndex == 'p2') || (dest[1] == '1' && g.state.turnPlayerIndex == 'p1'))
-    ) {
+  function sendPromotion(
+    callback: (orig: Key, key: Key, prom: cg.Role) => void,
+    orig: cg.Key,
+    dest: cg.Key,
+    role: cg.Role,
+  ): boolean {
+    const ground = getGround(),
+      piece = ground.state.pieces.get(dest);
+    if (['shogi', 'minishogi'].includes(vm.variant) && piece && piece.role === role) {
+      // shogi decision not to promote
+      callback(orig, dest, undefined);
+    } else {
+      promote(ground, dest, role);
+      callback(orig, dest, role);
+    }
+    return true;
+  }
+
+  function start(orig: Key, dest: Key, callback: (orig: Key, key: Key, prom: cg.Role) => void) {
+    const ground = getGround(),
+      piece = ground.state.pieces.get(dest),
+      variantKey = vm.variant;
+    if (promotion.possiblePromotion(ground, orig, dest, variantKey)) {
+      if (variantKey === 'shogi' && promotion.forcedShogiPromotion(ground, orig, dest)) {
+        const role = piece!.role;
+        return sendPromotion(callback, orig, dest, ('p' + role) as cg.Role);
+      }
+      if (variantKey === 'minishogi' && promotion.forcedMiniShogiPromotion(ground, orig, dest)) {
+        const role = piece!.role;
+        return sendPromotion(callback, orig, dest, ('p' + role) as cg.Role);
+      }
       promoting = {
         orig,
         dest,
@@ -28,9 +52,15 @@ export default function (vm: Vm, getGround: Prop<CgApi>, redraw: Redraw): Promot
     return false;
   }
 
-  function promote(g: CgApi, key: Key, role: Role): void {
+  function promote(g: CgApi, key: Key, role: cg.Role): void {
     const piece = g.state.pieces.get(key);
-    if (piece && piece.role == 'p-piece') {
+    if (
+      (piece && piece.role === 'p-piece' && g.state.variant !== 'shogi' && g.state.variant !== 'minishogi') ||
+      (piece &&
+        (g.state.variant == 'shogi' || g.state.variant == 'minishogi') &&
+        piece.role !== 'k-piece' &&
+        piece.role !== 'g-piece')
+    ) {
       g.setPieces(
         new Map([
           [
@@ -46,7 +76,7 @@ export default function (vm: Vm, getGround: Prop<CgApi>, redraw: Redraw): Promot
     }
   }
 
-  function finish(role: Role): void {
+  function finish(role: cg.Role): void {
     if (promoting) {
       promote(getGround(), promoting.dest, role);
       promoting.callback(promoting.orig, promoting.dest, role);
@@ -62,12 +92,18 @@ export default function (vm: Vm, getGround: Prop<CgApi>, redraw: Redraw): Promot
     }
   }
 
-  function renderPromotion(dest: Key, pieces: Role[], playerIndex: PlayerIndex, orientation: Orientation): MaybeVNode {
+  function renderPromotion(
+    dest: Key,
+    roles: cg.Role[],
+    playerIndex: PlayerIndex,
+    orientation: Orientation,
+  ): MaybeVNode {
     if (!promoting) return;
-
-    let left = (7 - cgUtil.key2pos(dest)[0]) * 12.5;
-    if (orientation === 'p1') left = 87.5 - left;
-
+    const ground = getGround(),
+      rows = ground.state.dimensions.height,
+      columns = ground.state.dimensions.width;
+    let left = (columns - key2pos(dest)[0]) * (100 / columns);
+    if (orientation === 'p1') left = 100 - 100 / columns - left;
     const vertical = playerIndex === orientation ? 'top' : 'bottom';
 
     return h(
@@ -75,38 +111,64 @@ export default function (vm: Vm, getGround: Prop<CgApi>, redraw: Redraw): Promot
       {
         hook: onInsert(el => {
           el.addEventListener('click', cancel);
-          el.oncontextmenu = () => false;
+          el.addEventListener('contextmenu', e => {
+            e.preventDefault();
+            return false;
+          });
         }),
       },
-      pieces.map(function (serverRole, i) {
-        const top = (playerIndex === orientation ? i : 7 - i) * 12.5;
+      roles.map(function (serverRole, i) {
+        let top = 0;
+        if (playerIndex === orientation) {
+          if (playerIndex === 'p1') {
+            top = (rows - key2pos(dest)[1] + i) * (100 / rows);
+          } else {
+            top = (key2pos(dest)[1] - 1 + i) * (100 / rows);
+          }
+        } else {
+          if (playerIndex === 'p1') {
+            top = (key2pos(dest)[1] - 1 - i) * (100 / rows);
+          } else {
+            top = (rows - key2pos(dest)[1] - i) * (100 / rows);
+          }
+        }
+
         return h(
           'square',
           {
             attrs: {
-              style: 'top: ' + top + '%;left: ' + left + '%',
+              style: `top:${top}%;left:${left}%`,
             },
             hook: bind('click', e => {
               e.stopPropagation();
               finish(serverRole);
             }),
           },
-          [h('piece.' + serverRole + '.' + playerIndex)],
+          [h(`piece.${serverRole}.${playerIndex}.ally`)],
         );
       }),
     );
   }
+
+  const roles: cg.Role[] = ['q-piece', 'n-piece', 'r-piece', 'b-piece'];
 
   return {
     start,
     cancel,
     view() {
       if (!promoting) return;
-      const pieces: Role[] = ['q-piece', 'n-piece', 'r-piece', 'b-piece'];
+      const piece = getGround().state.pieces.get(promoting.dest),
+        variantKey = vm.variant,
+        rolesToChoose =
+          variantKey === 'shogi' || variantKey === 'minishogi'
+            ? (['p' + piece?.role, piece?.role] as cg.Role[])
+            : variantKey === 'antichess'
+              ? roles.concat('k-piece')
+              : roles;
       return renderPromotion(
         promoting.dest,
-        pieces,
-        cgUtil.opposite(getGround().state.turnPlayerIndex),
+        rolesToChoose,
+        opposite(getGround().state.turnPlayerIndex),
         getGround().state.orientation,
       );
     },

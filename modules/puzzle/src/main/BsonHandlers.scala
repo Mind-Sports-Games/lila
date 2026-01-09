@@ -10,6 +10,7 @@ import lila.game.Game
 import lila.rating.Glicko
 
 import strategygames.{ GameFamily, GameLogic }
+import strategygames.variant.Variant
 
 object BsonHandlers {
 
@@ -21,12 +22,16 @@ object BsonHandlers {
     def readDocument(r: BSONDocument) = for {
       id      <- r.getAsTry[Puzzle.Id](id)
       gameId  <- r.getAsTry[Game.ID](gameId)
+      lib     <- r.getAsTry[Int](lib)
+      variant <- r.getAsTry[Int](variant)
+      gameLogic = GameLogic(lib)
+      sgVariant = Variant.orDefault(gameLogic, variant)
       fen     <- r.getAsTry[String](fen)
       lineStr <- r.getAsTry[String](line)
       line <- lineStr
         .split(' ')
         .toList
-        .flatMap { line => Uci.Move.apply(GameLogic.Chess(), GameFamily.Chess(), line) }
+        .flatMap { line => Uci.Move.apply(gameLogic, sgVariant.gameFamily, line) }
         .toNel
         .toTry("Empty move list?!")
       glicko <- r.getAsTry[Glicko](glicko)
@@ -36,7 +41,9 @@ object BsonHandlers {
     } yield Puzzle(
       id = id,
       gameId = gameId,
-      fen = FEN.apply(GameLogic.Chess(), fen),
+      lib = lib,
+      variantId = variant,
+      fen = FEN.apply(gameLogic, fen),
       line = line,
       glicko = glicko,
       plays = plays,

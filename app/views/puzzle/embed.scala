@@ -22,7 +22,8 @@ object embed {
         id := "daily-puzzle",
         cls := "embedded"
       ),
-      jsModule("puzzle.embed")
+      depsTag("javascripts/vendor/cash.min.js"),
+      jsModule("puzzleEmbed")
     )
 
   def dailyLink(daily: DailyPuzzle.WithHtml)(implicit lang: Lang) = a(
@@ -31,10 +32,6 @@ object embed {
   )(
     span(cls := "text")(trans.puzzle.puzzleOfTheDay()),
     raw(daily.html),
-    span(cls := "text")(
-      trans.playerIndexPlays(
-        daily.puzzle.playerIndex.fold(trans.white.txt(), trans.black.txt())
-      )
-    )
+    span(cls := "text")(trans.playerIndexPlays(daily.puzzle.playerTrans))
   )
 }

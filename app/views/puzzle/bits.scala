@@ -6,10 +6,12 @@ import strategygames.format.FEN
 import controllers.routes
 import play.api.i18n.Lang
 import play.api.libs.json.{ JsString, Json }
+import strategygames.variant.Variant
+import lila.puzzle.Puzzle
 
 import lila.app.templating.Environment._
 import lila.app.ui.ScalatagsTemplate._
-import lila.i18n.MessageKey
+import lila.i18n.{ MessageKey, VariantKeys }
 import lila.puzzle.{ PuzzleDifficulty, PuzzleTheme }
 
 object bits {
@@ -17,7 +19,7 @@ object bits {
   private val dataLastmove = attr("data-lastmove")
 
   def daily(p: lila.puzzle.Puzzle, fen: FEN, lastMove: String) =
-    views.html.board.bits.mini(fen, p.playerIndex, lastMove)(span)
+    views.html.board.bits.mini(fen, p.playerIndex, p.variant.key, lastMove)(span)
 
   def jsI18n(streak: Boolean)(implicit lang: Lang) =
     if (streak) i18nJsObject(streakI18nKeys)
@@ -26,7 +28,8 @@ object bits {
         PuzzleTheme.enPassant.name.txt()(lila.i18n.defaultLang)
       ))
 
-  lazy val jsonThemes = PuzzleTheme.all
+  def jsonThemes(variant: Variant) = PuzzleTheme
+    .allByVariant(variant)
     .collect {
       case t if t != PuzzleTheme.mix => t.key
     }
@@ -38,27 +41,43 @@ object bits {
       )
   }
 
-  def pageMenu(active: String, days: Int = 30)(implicit lang: Lang) =
+  def variantSelector(variant: Variant, link: Variant => String)(implicit lang: Lang) =
+    div(cls := s"variant_group")(
+      Puzzle.puzzleVariants.map { v =>
+        button(cls := s"variant ${if (v.key == variant.key) "selected" else ""}")(
+          a(
+            href := link(v),
+            dataIcon := v.perfIcon
+          )(VariantKeys.variantName(v))
+        )
+      }
+    )
+
+  def pageMenu(active: String, variant: Variant, days: Int = 30)(implicit lang: Lang) =
     st.nav(cls := "page-menu__menu subnav")(
-      a(href := routes.Puzzle.home)(
+      a(href := routes.Puzzle.home(variant.key))(
         trans.puzzles()
       ),
-      a(cls := active.active("themes"), href := routes.Puzzle.themes)(
+      a(cls := active.active("themes"), href := routes.Puzzle.themes(variant.key))(
         trans.puzzle.puzzleThemes()
       ),
-      a(cls := active.active("dashboard"), href := routes.Puzzle.dashboard(days, "dashboard"))(
+      a(cls := active.active("dashboard"), href := routes.Puzzle.dashboard(variant.key, days, "dashboard"))(
         trans.puzzle.puzzleDashboard()
       ),
-      a(cls := active.active("improvementAreas"), href := routes.Puzzle.dashboard(days, "improvementAreas"))(
-        trans.puzzle.improvementAreas()
-      ),
-      a(cls := active.active("strengths"), href := routes.Puzzle.dashboard(days, "strengths"))(
-        trans.puzzle.strengths()
-      ),
-      a(cls := active.active("history"), href := routes.Puzzle.history(1))(
+      //TODO we can put this back once we have more themes for our puzzles
+      // a(
+      //   cls := active.active("improvementAreas"),
+      //   href := routes.Puzzle.dashboard(variant.key, days, "improvementAreas")
+      // )(
+      //   trans.puzzle.improvementAreas()
+      // ),
+      // a(cls := active.active("strengths"), href := routes.Puzzle.dashboard(variant.key, days, "strengths"))(
+      //   trans.puzzle.strengths()
+      // ),
+      a(cls := active.active("history"), href := routes.Puzzle.history(variant.key, 1))(
         trans.puzzle.history()
       ),
-      a(cls := active.active("player"), href := routes.Puzzle.ofPlayer())(
+      a(cls := active.active("player"), href := routes.Puzzle.ofPlayer(variant.key))(
         "From my games"
       )
     )
@@ -70,6 +89,7 @@ object bits {
       trans.puzzle.notTheMove,
       trans.puzzle.trySomethingElse,
       trans.yourTurn,
+      trans.variant,
       trans.puzzle.findTheBestMoveForPlayerIndex,
       trans.viewTheSolution,
       trans.puzzle.puzzleSuccess,

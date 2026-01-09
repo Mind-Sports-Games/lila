@@ -19,10 +19,28 @@ object PuzzlePerf {
   case object ChessPuzzle
       extends PuzzlePerf(
         GameFamily.Chess(),
-        50, // changed from 20 to 50 as was same as noCastling perf id.... currently unused as puzzles disabled
-        key = "puzzle",
-        name = "Training",
+        1000005,
+        key = "puzzle_standard",
+        name = "Chess Training",
         title = "Chess tactics trainer",
+        iconChar = '-'
+      )
+  case object AtomicPuzzle
+      extends PuzzlePerf(
+        GameFamily.Chess(),
+        1000014,
+        key = "puzzle_atomic",
+        name = "Atomic Training",
+        title = "Atomic tactics trainer",
+        iconChar = '-'
+      )
+  case object LinesOfActionPuzzle
+      extends PuzzlePerf(
+        GameFamily.LinesOfAction(),
+        1000021,
+        key = "puzzle_linesOfAction",
+        name = "Lines of Action Training",
+        title = "Lines of Action tactics trainer",
         iconChar = '-'
       )
 }
@@ -77,7 +95,11 @@ object PerfType {
     Variant.all.filter(!_.fromPositionVariant).map(v => new PerfType(Left(Right(v))))
 
   val allPuzzle: List[PerfType] =
-    List(new PerfType(Right(PuzzlePerf.ChessPuzzle)))
+    List(
+      new PerfType(Right(PuzzlePerf.ChessPuzzle)),
+      new PerfType(Right(PuzzlePerf.AtomicPuzzle)),
+      new PerfType(Right(PuzzlePerf.LinesOfActionPuzzle))
+    )
 
   val all: List[PerfType] = allSpeed ::: allVariant ::: allPuzzle
 
@@ -90,9 +112,10 @@ object PerfType {
 
   val default = byKey("standard")
 
-  def apply(key: Perf.Key): Option[PerfType]  = byKey get key
-  def orDefault(key: Perf.Key): PerfType      = apply(key) | default
-  def orDefaultSpeed(key: Perf.Key): PerfType = apply(key) | byKey("classical")
+  def apply(key: Perf.Key): Option[PerfType]   = byKey get key
+  def orDefault(key: Perf.Key): PerfType       = apply(key) | default
+  def orDefaultSpeed(key: Perf.Key): PerfType  = apply(key) | byKey("classical")
+  def orDefaultPuzzle(key: Perf.Key): PerfType = apply(key) | byKey("puzzle_standard")
 
   def apply(id: Perf.ID): Option[PerfType] = byId get id
 
@@ -101,7 +124,7 @@ object PerfType {
   def id2key(id: Perf.ID): Option[Perf.Key] = byId get id map (_.key)
 
   val nonPuzzle: List[PerfType] =
-    all.filter(p => !(List("standard", "puzzle") contains p.key))
+    all.filter(p => !((List("standard") ++ allPuzzle.map(_.key)) contains p.key))
 
   val leaderboardable: List[PerfType] = nonPuzzle.filter(_.key != "correspondence")
 
@@ -116,6 +139,12 @@ object PerfType {
 
   def byVariant(variant: Variant): Option[PerfType] =
     variants.filter(_.category == Left(Right(variant))) match {
+      case List(pt) => pt.some
+      case _        => none
+    }
+
+  def puzzlebyVariant(variant: Variant): Option[PerfType] =
+    allPuzzle.filter(pt => pt.key == s"puzzle_${variant.key}") match {
       case List(pt) => pt.some
       case _        => none
     }
@@ -150,22 +179,25 @@ object PerfType {
       case "rapid"          => s"${trimTrans(I18nKeys.rapid.txt())} Chess"
       case "classical"      => s"${trimTrans(I18nKeys.classical.txt())} Chess"
       case "correspondence" => s"${trimTrans(I18nKeys.correspondence.txt())} Chess"
-      case "puzzle"         => I18nKeys.puzzles.txt()
       case _                => pt.name
     }
 
   val translated: Set[PerfType] =
-    all.filter(List("rapid", "classical", "correspondence", "puzzle") contains _.key).toSet
+    all
+      .filter(p =>
+        (List("rapid", "classical", "correspondence").contains(p.key) || p.key.startsWith("puzzle"))
+      )
+      .toSet
 
   def desc(pt: PerfType)(implicit lang: Lang): String =
     pt.key match {
-      case "ultraBullet"    => I18nKeys.ultraBulletDesc.txt()
-      case "bullet"         => I18nKeys.bulletDesc.txt()
-      case "blitz"          => I18nKeys.blitzDesc.txt()
-      case "rapid"          => I18nKeys.rapidDesc.txt()
-      case "classical"      => I18nKeys.classicalDesc.txt()
-      case "correspondence" => I18nKeys.correspondenceDesc.txt()
-      case "puzzle"         => I18nKeys.puzzleDesc.txt()
-      case _                => pt.title
+      case "ultraBullet"                    => I18nKeys.ultraBulletDesc.txt()
+      case "bullet"                         => I18nKeys.bulletDesc.txt()
+      case "blitz"                          => I18nKeys.blitzDesc.txt()
+      case "rapid"                          => I18nKeys.rapidDesc.txt()
+      case "classical"                      => I18nKeys.classicalDesc.txt()
+      case "correspondence"                 => I18nKeys.correspondenceDesc.txt()
+      case _ if pt.key.startsWith("puzzle") => I18nKeys.puzzleDesc.txt()
+      case _                                => pt.title
     }
 }

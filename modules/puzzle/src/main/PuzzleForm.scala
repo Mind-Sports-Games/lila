@@ -38,6 +38,10 @@ object PuzzleForm {
     single("difficulty" -> stringIn(PuzzleDifficulty.all.map(_.key).toSet))
   )
 
+  val variant = Form(
+    single("variant" -> stringIn(Puzzle.puzzleVariants.map(_.key).toSet))
+  )
+
   object bc {
 
     val round = Form(

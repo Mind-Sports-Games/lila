@@ -33,7 +33,7 @@ private[lobby] object LobbyUser {
 
   private def perfMapOf(perfs: lila.user.Perfs): PerfMap =
     perfs.perfs.view.collect {
-      case (key, perf) if key != "puzzle" && perf.nonEmpty =>
+      case (key, perf) if !key.startsWith("puzzle") && perf.nonEmpty =>
         key -> LobbyPerf(perf.intRating, perf.provisional)
     }.toMap
 }

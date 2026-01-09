@@ -42,10 +42,10 @@ const viewSolution = (ctrl: Controller): VNode =>
 const initial = (ctrl: Controller): VNode =>
   h('div.puzzle__feedback.play', [
     h('div.player', [
-      h('div.no-square', h('piece.k-piece.' + ctrl.vm.pov)),
+      h('div.no-square.variant-' + ctrl.vm.variant, h('piece.k-piece.' + ctrl.vm.pov)),
       h('div.instruction', [
         h('strong', ctrl.trans.noarg('yourTurn')),
-        h('em', ctrl.trans('findTheBestMoveForPlayerIndex', ctrl.vm.pov)),
+        h('em', ctrl.trans('findTheBestMoveForPlayerIndex', ctrl.vm.playerColors[ctrl.vm.pov == 'p1' ? 0 : 1])),
       ]),
     ]),
     viewSolution(ctrl),

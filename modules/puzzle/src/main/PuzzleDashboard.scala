@@ -5,36 +5,59 @@ import reactivemongo.api.bson.BSONNull
 import scala.concurrent.duration._
 import scala.concurrent.ExecutionContext
 
+import strategygames.variant.Variant
+import strategygames.GameLogic
+
 import lila.db.dsl._
 import lila.memo.CacheApi
 import lila.user.User
 
 case class PuzzleDashboard(
     global: PuzzleDashboard.Results,
-    byTheme: Map[PuzzleTheme.Key, PuzzleDashboard.Results]
+    byTheme: Map[PuzzleTheme.Key, PuzzleDashboard.Results],
+    byVariant: Map[Variant, PuzzleDashboard.Results],
+    byVariantAndTheme: Map[(Variant, PuzzleTheme.Key), PuzzleDashboard.Results]
 ) {
 
   import PuzzleDashboard._
 
-  lazy val (weakThemes, strongThemes) = {
-    val all = byTheme.view.filter(_._2.nb > global.nb / 40).toList.sortBy { case (_, res) =>
-      (res.performance, -res.nb)
-    }
-    val weaks = all
-      .filter { case (_, r) =>
-        r.failed >= 3 && r.performance < global.performance
+  def strongAndWeakThemesByVariant
+      : Map[Variant, (List[(PuzzleTheme.Key, Results)], List[(PuzzleTheme.Key, Results)])] =
+    byVariantAndTheme
+      .groupBy { case ((variant, _), _) => variant }
+      .view
+      .mapValues { themeMap =>
+        val themes = themeMap.map { case ((_, theme), results) => (theme, results) }.toList
+        val strong = themes
+          .filter { case (_, r) => r.firstWins >= 3 && r.performance > global.performance }
+          .sortBy { case (_, r) => (-r.performance, -r.nb) }
+          .takeRight(topThemesNb)
+          .reverse
+        val weak = themes
+          .filter { case (_, r) => r.failed >= 3 && r.performance < global.performance }
+          .sortBy { case (_, r) => (r.performance, -r.nb) }
+          .take(topThemesNb)
+        (weak, strong)
       }
-      .take(topThemesNb)
-    val strong = all
-      .filter { case (_, r) =>
-        r.firstWins >= 3 && r.performance > global.performance
-      }
-      .takeRight(topThemesNb)
-      .reverse
-    (weaks, strong)
-  }
+      .toMap
+
+  def weakThemes(variant: Variant): List[(PuzzleTheme.Key, Results)] =
+    strongAndWeakThemesByVariant.get(variant).map(_._1).getOrElse(Nil)
+
+  def strongThemes(variant: Variant): List[(PuzzleTheme.Key, Results)] =
+    strongAndWeakThemesByVariant.get(variant).map(_._2).getOrElse(Nil)
+
+  def byThemeForVariant(variant: Variant): List[(PuzzleTheme.Key, PuzzleDashboard.Results)] =
+    byVariantAndTheme.collect {
+      case ((v, theme), results) if v.key == variant.key => theme -> results
+    }.toList
 
   def mostPlayed = byTheme.toList.sortBy(-_._2.nb).take(9)
+
+  def mostPlayedThemes(variant: Variant): List[(PuzzleTheme.Key, PuzzleDashboard.Results)] =
+    byThemeForVariant(variant).sortBy(-_._2.nb).take(9)
+
+  def mostPlayedVariant = byVariant.toList.sortBy(-_._2.nb).take(9)
 }
 
 object PuzzleDashboard {
@@ -53,11 +76,12 @@ object PuzzleDashboard {
     def unfixed   = nb - wins
     def failed    = fixed + unfixed
 
-    def winPercent      = wins * 100 / nb
-    def fixedPercent    = fixed * 100 / nb
-    def firstWinPercent = firstWins * 100 / nb
+    def winPercent      = if (nb == 0) 0 else wins * 100 / nb
+    def fixedPercent    = if (nb == 0) 0 else fixed * 100 / nb
+    def firstWinPercent = if (nb == 0) 0 else firstWins * 100 / nb
 
-    lazy val performance = puzzleRatingAvg - 500 + math.round(1000 * (firstWins.toFloat / nb))
+    lazy val performance =
+      if (nb == 0) puzzleRatingAvg else (puzzleRatingAvg - 500 + math.round(1000 * (firstWins.toFloat / nb)))
 
     def clear   = nb >= 6 && firstWins >= 2 && failed >= 2
     def unclear = !clear
@@ -75,6 +99,9 @@ object PuzzleDashboard {
     PuzzleTheme.mateIn3,
     PuzzleTheme.mateIn4,
     PuzzleTheme.mateIn5,
+    PuzzleTheme.winIn1,
+    PuzzleTheme.winIn2,
+    PuzzleTheme.winIn3,
     PuzzleTheme.equality,
     PuzzleTheme.advantage,
     PuzzleTheme.crushing,
@@ -103,6 +130,7 @@ final class PuzzleDashboardApi(
       }
     }
 
+  //TODO maybe remove bytheme query and data as no longer required?
   private def compute(userId: User.ID, days: Days): Fu[Option[PuzzleDashboard]] =
     colls.round {
       _.aggregateOne() { framework =>
@@ -119,7 +147,9 @@ final class PuzzleDashboardApi(
           PipelineOperator(
             PuzzleRound.puzzleLookup(
               colls,
-              List($doc("$project" -> $doc("themes" -> true, "rating" -> "$glicko.r")))
+              List(
+                $doc("$project" -> $doc("themes" -> true, "rating" -> "$glicko.r", "v" -> true, "l" -> true))
+              )
             )
           ),
           Unwind("puzzle"),
@@ -130,6 +160,25 @@ final class PuzzleDashboardApi(
                 Unwind("puzzle.themes"),
                 Match(relevantThemesSelect),
                 GroupField("puzzle.themes")(resultsGroup: _*)
+              ),
+              "byVariant" -> List(
+                Group(
+                  $doc(
+                    "variant" -> "$puzzle.v",
+                    "lib"     -> "$puzzle.l"
+                  )
+                )(resultsGroup: _*)
+              ),
+              "byVariantAndTheme" -> List(
+                Unwind("puzzle.themes"),
+                //Match(relevantThemesSelect), //With few puzzles per variant, we keep all themes
+                Group(
+                  $doc(
+                    "variant" -> "$puzzle.v",
+                    "lib"     -> "$puzzle.l",
+                    "theme"   -> "$puzzle.themes"
+                  )
+                )(resultsGroup: _*)
               )
             )
           )
@@ -148,9 +197,31 @@ final class PuzzleDashboardApi(
               theme    <- PuzzleTheme find themeStr
               results  <- readResults(doc)
             } yield theme.key -> results
+            variantDocs <- result.getAsOpt[List[Bdoc]]("byVariant")
+            byVariant = for {
+              doc       <- variantDocs
+              idDoc     <- doc.getAsOpt[Bdoc]("_id")
+              variantId <- idDoc.int("variant")
+              lib       <- idDoc.int("lib")
+              variant = Variant.orDefault(GameLogic(lib), variantId)
+              results <- readResults(doc)
+            } yield variant -> results
+            variantAndThemeDocs <- result.getAsOpt[List[Bdoc]]("byVariantAndTheme")
+            byVariantAndTheme = for {
+              doc       <- variantAndThemeDocs
+              idDoc     <- doc.getAsOpt[Bdoc]("_id")
+              variantId <- idDoc.int("variant")
+              lib       <- idDoc.int("lib")
+              themeStr  <- idDoc.string("theme")
+              variant = Variant.orDefault(GameLogic(lib), variantId)
+              theme   <- PuzzleTheme find themeStr
+              results <- readResults(doc)
+            } yield (variant, theme.key) -> results
           } yield PuzzleDashboard(
             global = global,
-            byTheme = byTheme.toMap
+            byTheme = byTheme.toMap,
+            byVariant = byVariant.toMap,
+            byVariantAndTheme = byVariantAndTheme.toMap
           )
         }
         .dmap(_.filter(_.global.nb > 0))

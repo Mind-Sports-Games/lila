@@ -36,7 +36,7 @@ $mq-not-col3: $mq-not-small;
   @include breakpoint($mq-col3) {
     grid-template-columns: repeat(3, 1fr);
     grid-template-rows: auto repeat(2, fit-content(0));
-    grid-template-areas: 'side    blog    blog' 'table   app     app' 'chat    app     app' 'tv      tours  tours' 'weekcha  winner   winner' 'puzzle   simuls  simuls' 'gamelist gamelist gamelist' 'info  forum forum ';
+    grid-template-areas: 'side    blog    blog' 'table   app     app' 'chat    app     app' 'tv      tours  tours' 'puzzle  winner   winner' '.   simuls  simuls' 'weekcha gamelist gamelist' 'info  forum forum ';
 
     &__start {
       flex-flow: column;
@@ -57,7 +57,11 @@ $mq-not-col3: $mq-not-small;
   @include breakpoint($mq-col4) {
     grid-template-columns: repeat(4, 1fr);
     grid-template-rows: repeat(2, fit-content(0));
-    grid-template-areas: 'side    blog    blog    table' 'side   app     app    chat' 'tv     tours  tours winner' '.      .       .      puzzle' '.      simuls  simuls .' 'gamelist gamelist gamelist gamelist' 'weekcha  forum    forum    info';
+    grid-template-areas: 'side    blog    blog    table' 'side   app     app    chat' 'puzzle app app chat' 'tv tours tours winner' '.      simuls  simuls .' 'gamelist gamelist gamelist gamelist' 'weekcha  forum    forum    info';
+
+    &__puzzle {
+      margin-bottom: 1.5em;
+    }
 
     &__simuls {
       max-height: 20em;

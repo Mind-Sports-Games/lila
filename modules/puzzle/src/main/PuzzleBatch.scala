@@ -18,10 +18,11 @@ final class PuzzleBatch(colls: PuzzleColls, anonApi: PuzzleAnon, pathApi: Puzzle
       case Some(user) =>
         {
           val tier =
-            if (user.perfs.puzzle.nb > 5000) PuzzleTier.Good
+            if (user.perfs.perfsPuzzleMap.values.map(_.nb).sum > 5000) PuzzleTier.Good
             else PuzzleTier.Top
           pathApi.nextFor(
             user,
+            Puzzle.defaultVariant,
             PuzzleTheme.mix.key,
             tier,
             PuzzleDifficulty.Normal,

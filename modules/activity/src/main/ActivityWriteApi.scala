@@ -59,10 +59,10 @@ final class ActivityWriteApi(
         .one(
           $id(a.id),
           $set(ActivityFields.puzzles -> {
-            ~a.puzzles + Score.make(
+            ~a.puzzles + (Score.make(
               res = res.result.win.some,
               rp = RatingProg(Rating(res.rating._1), Rating(res.rating._2)).some
-            )
+            ), res.perfType)
           }),
           upsert = true
         )

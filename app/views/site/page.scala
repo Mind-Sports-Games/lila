@@ -150,14 +150,14 @@ $('#asset-version-message').text(window.playstrategy.info.message);"""
         //   frag(
         //     h1(id := "embed-puzzle")("Embed the daily puzzle in your site"),
         //     div(cls := "center")(
-        //       raw(s"""<iframe src="/training/frame?theme=brown&bg=dark" $args></iframe>""")
+        //       raw(s"""<iframe src="/training/frame/daily?bg=auto&theme=auto" $args></iframe>""")
         //     ),
         //     p("Add the following HTML to your site:"),
         //     p(cls := "copy-zone")(
         //       input(
         //         id := "puzzle-embed-src",
         //         cls := "copyable autoselect",
-        //         value := s"""<iframe src="$netBaseUrl/training/frame?theme=brown&bg=dark" $args></iframe>"""
+        //         value := s"""<iframe src="$netBaseUrl/training/frame/daily?bg=auto&theme=auto" $args></iframe>"""
         //       ),
         //       button(
         //         title := "Copy code",
@@ -167,12 +167,12 @@ $('#asset-version-message').text(window.playstrategy.info.message);"""
         //       )
         //     ),
         //     parameters,
-        //     p("The text is automatically translated to your visitor's language."),
-        //     p(
-        //       "Alternatively, you can ",
-        //       a(href := routes.Main.dailyPuzzleSlackApp)("post the puzzle in your slack workspace"),
-        //       "."
-        //     )
+        //     p("The text is automatically translated to your visitor's language.")
+        //     // p(
+        //     //   "Alternatively, you can ",
+        //     //   a(href := routes.Main.dailyPuzzleSlackApp)("post the puzzle in your slack workspace"),
+        //     //   "."
+        //     // )
         //   )
         // },
         // br,
