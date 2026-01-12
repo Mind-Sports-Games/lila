@@ -31,10 +31,10 @@ export function renderClock(ctrl: RoundController, player: game.Player, position
   // state of ctrl.data is different here and therefore hard to obtain the correct class in all states.
   // This causes the green/orange flicker on the clock. The delayClass is an attempt to fix this which is only paritally working.
   const delayClass =
-    clock.isInDelay(player.playerIndex, ctrl.data.multiActionMetaData?.couldNextActionEndTurn) &&
+    clock.isInDelay(player.playerIndex, isRunning, ctrl.data.multiActionMetaData?.couldNextActionEndTurn) &&
     ctrl.data.game.player === player.playerIndex
       ? '.indelay'
-      : clock.isNotInDelay(player.playerIndex, ctrl.data.multiActionMetaData?.couldNextActionEndTurn) &&
+      : clock.isNotInDelay(player.playerIndex, isRunning, ctrl.data.multiActionMetaData?.couldNextActionEndTurn) &&
           ctrl.data.game.player === player.playerIndex
         ? '.notindelay'
         : '';
@@ -215,10 +215,10 @@ function updateClassList(
   isRunning: boolean,
   millis: Millis,
 ) {
-  if (clock.isInDelay(playerIndex) && isRunning) {
+  if (isRunning && clock.isInDelay(playerIndex, isRunning)) {
     cl.remove('notindelay');
     cl.add('indelay');
-  } else if (clock.isNotInDelay(playerIndex) && (cl.contains('indelay') || !cl.contains('notindelay')) && isRunning) {
+  } else if (clock.isNotInDelay(playerIndex, isRunning) && (cl.contains('indelay') || !cl.contains('notindelay')) && isRunning) {
     if (isEmerg(millis, clock, playerIndex)) clock.emergSound.lowtime();
     cl.remove('indelay');
     cl.add('notindelay');
