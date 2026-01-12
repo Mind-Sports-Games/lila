@@ -218,7 +218,11 @@ function updateClassList(
   if (isRunning && clock.isInDelay(playerIndex, isRunning)) {
     cl.remove('notindelay');
     cl.add('indelay');
-  } else if (clock.isNotInDelay(playerIndex, isRunning) && (cl.contains('indelay') || !cl.contains('notindelay')) && isRunning) {
+  } else if (
+    clock.isNotInDelay(playerIndex, isRunning) &&
+    (cl.contains('indelay') || !cl.contains('notindelay')) &&
+    isRunning
+  ) {
     if (isEmerg(millis, clock, playerIndex)) clock.emergSound.lowtime();
     cl.remove('indelay');
     cl.add('notindelay');
