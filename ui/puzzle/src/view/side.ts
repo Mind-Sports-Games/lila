@@ -136,6 +136,7 @@ export const userBox = (ctrl: Controller): VNode => {
         'yourPuzzleRatingX',
         h('strong', [
           data.user.rating - (diff || 0),
+          data.user.provisional ? h('span.provisional', '?') : null,
           ...(diff && diff > 0 ? [' ', h('good.rp', '+' + diff)] : []),
           ...(diff && diff < 0 ? [' ', h('bad.rp', '−' + -diff)] : []),
         ]),

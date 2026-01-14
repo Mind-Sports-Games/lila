@@ -113,7 +113,7 @@ object PuzzleTheme {
     )
   )
   val categorizedWin = List[(I18nKey, List[PuzzleTheme])](
-    trans.puzzle.mates -> List(
+    trans.puzzle.wins -> List(
       win,
       winIn1,
       winIn2,
@@ -207,7 +207,7 @@ object PuzzleTheme {
         promotion,
         underPromotion
       )
-    ) ::: categorizedGoals ::: categorizedLengths ::: categorizedOrigin
+    ) ::: categorizedGoals ::: categorizedOrigin
 
   val categorizedLinesOfAction =
     categorizedMix ::: categorizedWin ::: categorizedPhases ::: List[(I18nKey, List[PuzzleTheme])](
@@ -220,11 +220,11 @@ object PuzzleTheme {
         quietMove,
         zugzwang
       )
-    ) ::: categorizedLengths ::: categorizedOrigin
+    ) ::: categorizedOrigin
 
   val categorizedAtomic =
     categorizedMix ::: categorizedChessPhases ::: categorizedChessMotifs ::: categorizedAdvanced :::
-      categorizedMate ::: categorizedGoals ::: categorizedLengths ::: categorizedOrigin
+      categorizedMate ::: categorizedGoals ::: categorizedOrigin
 
   val categorizedXiangqi = categorizedMix ::: categorizedPhases ::: List[(I18nKey, List[PuzzleTheme])](
     trans.puzzle.motifs -> List(
@@ -240,7 +240,7 @@ object PuzzleTheme {
       skewer,
       trappedPiece
     )
-  ) ::: categorizedAdvanced ::: categorizedMate ::: categorizedGoals ::: categorizedLengths ::: categorizedOrigin
+  ) ::: categorizedAdvanced ::: categorizedMate ::: categorizedGoals ::: categorizedOrigin
 
   val byCategorizedVariant: Map[String, List[(I18nKey, List[PuzzleTheme])]] = Map(
     "standard"      -> categorizedStandard,

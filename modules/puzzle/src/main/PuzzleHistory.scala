@@ -11,6 +11,7 @@ import lila.db.dsl._
 import lila.memo.CacheApi
 import lila.user.User
 import strategygames.variant.Variant
+import lila.user.Perfs
 
 object PuzzleHistory {
 
@@ -34,7 +35,9 @@ object PuzzleHistory {
 
     import BsonHandlers._
 
-    def nbResults: Fu[Int] = fuccess(user.perfs.perfsPuzzleMap.values.map(_.nb).sum)
+    def nbResults: Fu[Int] = fuccess(
+      Perfs.puzzleLens(variant).map(_.get(user.perfs)).getOrElse(user.perfs.puzzle_standard).nb
+    )
 
     def slice(offset: Int, length: Int): Fu[Seq[PuzzleSession]] =
       colls
