@@ -43,10 +43,10 @@ object topnav {
         )
       ),
       ctx.noBot option st.section(
-        linkTitle(routes.Puzzle.home(Puzzle.defaultVariant.key).path, trans.puzzles()),
+        linkTitle(routes.Puzzle.base.path, trans.puzzles()),
         div(role := "group")(
-          a(href := routes.Puzzle.home(Puzzle.defaultVariant.key))(trans.puzzles()),
-          a(href := routes.Puzzle.dashboard(Puzzle.defaultVariant.key, 30, "home"))(
+          a(href := routes.Puzzle.base)(trans.puzzles()),
+          a(href := routes.Puzzle.dashboardBase)(
             trans.puzzle.puzzleDashboard()
           )
           // a(href := routes.Puzzle.streak)("Puzzle Streak")

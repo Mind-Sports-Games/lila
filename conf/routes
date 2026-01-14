@@ -89,6 +89,8 @@ POST  /training/coordinate/score       controllers.Coordinate.score
 POST  /training/coordinate/playerIndex       controllers.Coordinate.playerIndex
 
 # Training - Puzzle
+GET   /training                                         controllers.Puzzle.base
+GET   /training/dashboard                               controllers.Puzzle.dashboardBase
 GET   /training/:variant                                controllers.Puzzle.home(variant: String)
 GET   /training/daily/puzzle                            controllers.Puzzle.daily
 GET   /training/frame/daily                             controllers.Puzzle.frame

@@ -74,6 +74,34 @@ final class Puzzle(
   private def puzzleVariantFromKey(key: String): Variant =
     Variant.all.find(_.key.toLowerCase == key.toLowerCase()).getOrElse { Puz.defaultVariant }
 
+  private def mostPlayedPuzzleVariant(implicit ctx: Context): Variant =
+    ctx.me
+      .map(user =>
+        user.perfs.perfsPuzzleMap
+          .maxByOption(_._2.nb)
+          .map(_._1)
+          .flatMap(key => strategygames.variant.Variant.all.find(v => s"puzzle_${v.key}" == key))
+          .getOrElse(Puz.defaultVariant)
+      )
+      .getOrElse(Puz.defaultVariant)
+
+  def base =
+    Open { implicit ctx =>
+      NoBot {
+        val theme = PuzzleTheme.mix
+        nextPuzzleForMe(mostPlayedPuzzleVariant, theme.key) flatMap {
+          renderShow(_, theme)
+        }
+      }
+    }
+
+  def dashboardBase =
+    Open { implicit ctx =>
+      NoBot {
+        Redirect(routes.Puzzle.dashboard(mostPlayedPuzzleVariant.key, 30, "home")).fuccess
+      }
+    }
+
   def home(variant: String) =
     Open { implicit ctx =>
       NoBot {
