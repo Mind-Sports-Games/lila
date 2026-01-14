@@ -55,6 +55,16 @@ object topnav {
         )
       ),
       st.section(
+        linkTitle(routes.Tv.games.path, trans.watch()),
+        div(role := "group")(
+          a(href := routes.Tv.index)("PlayStrategy TV"),
+          a(href := routes.Tv.games)(trans.currentGames()),
+          (ctx.noKid && ctx.noBot) option a(href := routes.Streamer.index())(trans.streamersMenu())
+          //a(href := routes.RelayTour.index())(trans.broadcast.broadcasts()),
+          //ctx.noBot option a(href := routes.Video.index)(trans.videoLibrary())
+        )
+      ),
+      st.section(
         //linkTitle(routes.Practice.index.path, trans.learnMenu()),
         linkTitle(routes.Page.variantHome.path, trans.learnMenu()),
         div(role := "group")(
@@ -69,16 +79,6 @@ object topnav {
           ),
           //ctx.noKid option a(href := routes.Coach.all(1))(trans.coaches()),
           canSeeClasMenu option a(href := routes.Clas.index)(trans.clas.playstrategyClasses())
-        )
-      ),
-      st.section(
-        linkTitle(routes.Tv.games.path, trans.watch()),
-        div(role := "group")(
-          a(href := routes.Tv.index)("PlayStrategy TV"),
-          a(href := routes.Tv.games)(trans.currentGames()),
-          (ctx.noKid && ctx.noBot) option a(href := routes.Streamer.index())(trans.streamersMenu())
-          //a(href := routes.RelayTour.index())(trans.broadcast.broadcasts()),
-          //ctx.noBot option a(href := routes.Video.index)(trans.videoLibrary())
         )
       ),
       st.section(

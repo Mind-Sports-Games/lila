@@ -287,7 +287,7 @@
   <string name="thisGameIsRated">This game is rated</string>
   <string name="handicapped">Handicapped</string>
   <string name="handicappedTournament">Handicapped</string>
-  <string name="handicapTournaments">Handicap Tournaments</string>
+  <string name="handicapTournaments">Handicaps</string>
   <string name="handicappedDefinition">A handicap is given based on the players ratings to create an even game. Only supported for Go games.</string>
   <string name="mcmahon">McMahon</string>
   <string name="mcmahonDefinition">McMahon style tournament, awarding initial points to players to create fairer pairings</string>
