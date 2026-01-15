@@ -153,6 +153,9 @@ export interface PuzzleGame {
   };
   variant: {
     key: VariantKey;
+    short: string;
+    name: string;
+    lib: number;
     boardSize: {
       width: number;
       height: number;

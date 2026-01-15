@@ -321,13 +321,7 @@ export default function (opts: PuzzleOpts, redraw: Redraw): Controller {
       redraw,
       storageKeyPrefix: 'puzzle',
       multiPvDefault: 3,
-      variant: {
-        short: 'Std',
-        name: 'Standard',
-        key: 'standard',
-        lib: 0,
-        boardSize: { width: 8, height: 8 },
-      },
+      variant: data.game.variant,
       standardMaterial: true,
       possible: true,
       emit: function (ev, work) {

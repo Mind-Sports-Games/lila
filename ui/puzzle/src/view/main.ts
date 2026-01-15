@@ -122,7 +122,7 @@ export default function (ctrl: Controller): VNode {
           {
             class: { none: !showCeval },
           },
-          showCeval ? [cevalView.renderCeval(ctrl), cevalView.renderPvs('standard')(ctrl)] : [],
+          showCeval ? [cevalView.renderCeval(ctrl), cevalView.renderPvs(ctrl.getData().game.variant.key)(ctrl)] : [],
         ),
         renderAnalyse(ctrl),
         feedbackView(ctrl),

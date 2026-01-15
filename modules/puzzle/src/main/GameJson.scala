@@ -8,6 +8,7 @@ import scala.concurrent.duration._
 import lila.game.{ Game, GameRepo, PerfPicker }
 import strategygames.variant.Variant
 import lila.i18n.defaultLang
+import lila.i18n.VariantKeys
 
 final private class GameJson(
     gameRepo: GameRepo,
@@ -82,6 +83,9 @@ final private class GameJson(
   //TODO wil need to support draughts differently (see game/jsonView example)
   private def variantJson(game: Game) = Json.obj(
     "key"       -> game.variant.key,
+    "name"      -> VariantKeys.variantName(game.variant),
+    "short"     -> VariantKeys.variantShortName(game.variant),
+    "lib"       -> game.variant.gameLogic.id,
     "boardSize" -> boardSize(game.variant)
   )
 

@@ -471,7 +471,7 @@ function renderPvBoard(ctrl: ParentCtrl, variantKey: VariantKey): VNode | undefi
       visible: false,
     },
   };
-  const cgVNode = h('div.cg-wrap.is2d', {
+  const cgVNode = h(`div.cg-wrap.is2d.variant-${variantKey}`, {
     hook: {
       insert: (vnode: any) => (vnode.elm._cg = window.Chessground(vnode.elm, cgConfig)),
       update: (vnode: any) => vnode.elm._cg.set(cgConfig),
