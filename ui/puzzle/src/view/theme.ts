@@ -30,7 +30,7 @@ export default function theme(ctrl: Controller): MaybeVNode {
       ]);
 }
 
-const invisibleThemes = new Set(['master', 'masterVsMaster', 'superGM']);
+const invisibleThemes = new Set(['master', 'masterVsMaster', 'superGM', 'oneMove', 'short', 'long', 'veryLong']);
 
 const editor = (ctrl: Controller): VNode => {
   const data = ctrl.getData(),
