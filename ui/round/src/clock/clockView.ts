@@ -27,12 +27,11 @@ export function renderClock(ctrl: RoundController, player: game.Player, position
       game.playable(ctrl.data) && !paused && (game.bothPlayersHavePlayed(ctrl.data) || ctrl.data.clock!.running),
     isRunning = isClockRunning && ctrl.data.game.player === player.playerIndex;
 
-  const delayClass =
-    clock.isInDelay(player.playerIndex, isRunning)
-      ? '.indelay'
-      : clock.isNotInDelay(player.playerIndex, isRunning)
-        ? '.notindelay'
-        : '';
+  const delayClass = clock.isInDelay(player.playerIndex, isRunning)
+    ? '.indelay'
+    : clock.isNotInDelay(player.playerIndex, isRunning)
+      ? '.notindelay'
+      : '';
   const update = (el: HTMLElement) => {
     const els = clock.elements[player.playerIndex],
       isRunning = isClockRunning && ctrl.data.game.player === player.playerIndex,
