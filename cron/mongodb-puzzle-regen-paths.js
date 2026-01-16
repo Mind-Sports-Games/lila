@@ -285,8 +285,9 @@ variantKeys.forEach(variantkey => {
       });
 
     if (!buggy) {
+      const idPrefix = `${variantkey}${sep}${theme}${sep}`;
       pathNextColl.aggregate([{ $merge: pathCollName }]); // much faster!
-      pathColl.deleteMany({ /* theme: theme */ _id: new RegExp('^' + theme + '\\|'), gen: { $ne: generation } });
+      pathColl.deleteMany({ /* theme: theme */ _id: new RegExp('^' + idPrefix), gen: { $ne: generation } });
     }
     pathNextColl.drop({});
   });
