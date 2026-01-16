@@ -27,15 +27,10 @@ export function renderClock(ctrl: RoundController, player: game.Player, position
       game.playable(ctrl.data) && !paused && (game.bothPlayersHavePlayed(ctrl.data) || ctrl.data.clock!.running),
     isRunning = isClockRunning && ctrl.data.game.player === player.playerIndex;
 
-  // TODO in multication render clock gets called as the move is played while it's sent, and then during apiAction update, the
-  // state of ctrl.data is different here and therefore hard to obtain the correct class in all states.
-  // This causes the green/orange flicker on the clock. The delayClass is an attempt to fix this which is only paritally working.
   const delayClass =
-    clock.isInDelay(player.playerIndex, isRunning, ctrl.data.multiActionMetaData?.couldNextActionEndTurn) &&
-    ctrl.data.game.player === player.playerIndex
+    clock.isInDelay(player.playerIndex, isRunning)
       ? '.indelay'
-      : clock.isNotInDelay(player.playerIndex, isRunning, ctrl.data.multiActionMetaData?.couldNextActionEndTurn) &&
-          ctrl.data.game.player === player.playerIndex
+      : clock.isNotInDelay(player.playerIndex, isRunning)
         ? '.notindelay'
         : '';
   const update = (el: HTMLElement) => {
@@ -215,14 +210,10 @@ function updateClassList(
   isRunning: boolean,
   millis: Millis,
 ) {
-  if (isRunning && clock.isInDelay(playerIndex, isRunning)) {
+  if (clock.isInDelay(playerIndex, isRunning)) {
     cl.remove('notindelay');
     cl.add('indelay');
-  } else if (
-    clock.isNotInDelay(playerIndex, isRunning) &&
-    (cl.contains('indelay') || !cl.contains('notindelay')) &&
-    isRunning
-  ) {
+  } else if (clock.isNotInDelay(playerIndex, isRunning) && (cl.contains('indelay') || !cl.contains('notindelay'))) {
     if (isEmerg(millis, clock, playerIndex)) clock.emergSound.lowtime();
     cl.remove('indelay');
     cl.add('notindelay');

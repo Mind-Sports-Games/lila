@@ -637,7 +637,6 @@ export default class RoundController {
       }
       d.onlyDropsVariant = o.drops ? true : false;
     }
-    d.multiActionMetaData = o.multiActionMetaData;
 
     const playedPlayerIndex = hasJustSwitchedTurns ? opposite(d.game.player) : d.game.player,
       activePlayerIndex = d.player.playerIndex === d.game.player;

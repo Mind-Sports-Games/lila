@@ -371,25 +371,25 @@ export class ClockController {
     return 1000 * pendingSeconds;
   };
 
-  isInDelay = (playerIndex: PlayerIndex, isRunning: boolean, isStoppedBetweenPlayerActions = false): boolean =>
+  isInDelay = (playerIndex: PlayerIndex, isRunning: boolean): boolean =>
     !!this.delay &&
-    (isRunning || isStoppedBetweenPlayerActions) &&
+    isRunning &&
     this.elapsed() + this.pendingMillisOf(playerIndex) <= 1000 * this.delay &&
     //if we have a countdownDelay we are SimpleDelay which allows for a delay in berserk
     //otherwise we are Bronstein which clears the delay when berserking
-    this.countdownDelay
+    (this.countdownDelay
       ? true
-      : !this.goneBerserk[playerIndex];
+      : !this.goneBerserk[playerIndex]);
 
-  isNotInDelay = (playerIndex: PlayerIndex, isRunning: boolean, isStoppedBetweenPlayerActions = false): boolean =>
+  isNotInDelay = (playerIndex: PlayerIndex, isRunning: boolean): boolean =>
     !!this.delay &&
-    (isRunning || isStoppedBetweenPlayerActions) &&
+    isRunning &&
     this.elapsed() + this.pendingMillisOf(playerIndex) > 1000 * this.delay &&
     //if we have a countdownDelay we are SimpleDelay which allows for a delay in berserk
     //otherwise we are Bronstein which clears the delay when berserking
-    this.countdownDelay
+    (this.countdownDelay
       ? true
-      : !this.goneBerserk[playerIndex];
+      : !this.goneBerserk[playerIndex]);
 
   isNotOpponentsTurn = (playerIndex: PlayerIndex) =>
     this.times.activePlayerIndex === undefined || this.times.activePlayerIndex === playerIndex;
