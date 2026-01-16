@@ -12,8 +12,8 @@ importers:
         specifier: github:lichess-org/ab-stub
         version: https://codeload.github.com/lichess-org/ab-stub/tar.gz/94236bf34dbc9c05daf50f4c9842d859b9142be0
       chessground:
-        specifier: github:Mind-Sports-Games/chessground#v7.11.1-pstrat3.23
-        version: https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/728074bfe50fce1e472ac065224b6a940dde3612
+        specifier: github:Mind-Sports-Games/chessground#v7.11.1-pstrat3.24
+        version: https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/310c65b24a0cb1798a58e534a498e95f429131cd
       stratops:
         specifier: github:Mind-Sports-Games/stratops#v0.8.1-pstrat5.23
         version: https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/c8b03feb6f3ba7a98f95132d27cd0978e4e63e2c
@@ -840,9 +840,9 @@ packages:
     resolution: {tarball: https://codeload.github.com/ornicar/chess.js/tar.gz/ad0709c0b07773d9d0da8e4605a9a2a28f00d249}
     version: 0.10.2
 
-  chessground@https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/728074bfe50fce1e472ac065224b6a940dde3612:
-    resolution: {tarball: https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/728074bfe50fce1e472ac065224b6a940dde3612}
-    version: 7.11.1-pstrat3.23
+  chessground@https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/310c65b24a0cb1798a58e534a498e95f429131cd:
+    resolution: {tarball: https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/310c65b24a0cb1798a58e534a498e95f429131cd}
+    version: 7.11.1-pstrat3.24
     engines: {node: ^20.19.4, pnpm: ^10.17.0}
 
   chokidar@3.6.0:
@@ -1787,7 +1787,7 @@ snapshots:
 
   chess.js@https://codeload.github.com/ornicar/chess.js/tar.gz/ad0709c0b07773d9d0da8e4605a9a2a28f00d249: {}
 
-  chessground@https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/728074bfe50fce1e472ac065224b6a940dde3612: {}
+  chessground@https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/310c65b24a0cb1798a58e534a498e95f429131cd: {}
 
   chokidar@3.6.0:
     dependencies:

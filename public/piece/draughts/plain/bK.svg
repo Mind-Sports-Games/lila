@@ -1,0 +1,17 @@
+<svg width="320" height="320" viewBox="0 0 320 320" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Main draughts piece -->
+  <!--<circle cx="160" cy="160" r="127.7" fill="#191716" opacity="0.98"/>-->
+  
+  <circle cx="160" cy="160" r="127.7" fill="#4d433a" opacity="0.98"/>
+  <circle cx="156" cy="156" r="123.7" fill="#191716" opacity="0.98"/>
+  <!-- Extra-thick center ring with larger hole -->
+  <circle
+    cx="160"
+    cy="160"
+    r="40"
+    fill="none"
+    stroke="#F8F6F2"
+    stroke-width="36"
+    opacity="0.98"
+  />
+</svg>

@@ -35,12 +35,14 @@ chess_themes = [
 draughts_themes = [
   ['wide_crown', 'svg'],
   ['fabirovsky','svg'],
-  ['check_yb', 'png']
+  ['check_yb', 'png'],
+  ['plain', 'svg']
 ]
 dameo_themes = [
   ['wide_crown_dameo', 'svg'],
   ['fabirovsky_dameo','svg'],
-  ['check_yb_dameo', 'png']
+  ['check_yb_dameo', 'png'],
+  ['plain_dameo', 'svg']
 ]
 loa_themes = [
   ['wide', 'svg'],
