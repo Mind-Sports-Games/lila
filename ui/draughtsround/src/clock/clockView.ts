@@ -18,11 +18,19 @@ export function renderClock(ctrl: RoundController, player: game.Player, position
   const clock = ctrl.clock!,
     millis = clock.millisOf(player.playerIndex),
     isPlayer = ctrl.data.player.playerIndex === player.playerIndex,
-    isRunning = player.playerIndex === clock.times.activePlayerIndex,
-    showDelayTime = clock.countdownDelay !== undefined;
+    showDelayTime = clock.countdownDelay !== undefined,
+    isClockRunning = game.playable(ctrl.data) && (game.bothPlayersHavePlayed(ctrl.data) || ctrl.data.clock!.running),
+    isRunning = isClockRunning && ctrl.data.game.player === player.playerIndex;
+
+  const delayClass =
+    clock.isInDelay(player.playerIndex, isRunning)
+      ? '.indelay'
+      : clock.isNotInDelay(player.playerIndex, isRunning)
+        ? '.notindelay'
+        : '';
   const update = (el: HTMLElement) => {
     const els = clock.elements[player.playerIndex],
-      isRunning = player.playerIndex === clock.times.activePlayerIndex,
+      isRunning = isClockRunning && ctrl.data.game.player === player.playerIndex,
       millis = clock.millisOf(player.playerIndex),
       delayMillis = clock.delayMillisOf(player.playerIndex, ctrl.data.game.player, isRunning);
     els.time = el;
@@ -35,19 +43,7 @@ export function renderClock(ctrl: RoundController, player: game.Player, position
       showDelayTime,
       clock.opts.nvui,
     );
-    const cl = els.time.classList;
-    if (clock.isInDelay(player.playerIndex) && isRunning) {
-      cl.remove('notindelay');
-      cl.add('indelay');
-    } else if (
-      clock.isNotInDelay(player.playerIndex) &&
-      (cl.contains('indelay') || !cl.contains('notindelay')) &&
-      isRunning
-    ) {
-      if (cl.contains('indelay')) clock.emergSound.lowtime();
-      cl.remove('indelay');
-      cl.add('notindelay');
-    } else if (cl.contains('notindelay') && !isRunning) cl.remove('notindelay');
+    updateClassList(els.time.classList, clock, player.playerIndex, isRunning, millis);
   };
   const timeHook: Hooks = {
     insert: vnode => update(vnode.elm as HTMLElement),
@@ -65,7 +61,7 @@ export function renderClock(ctrl: RoundController, player: game.Player, position
     clock.opts.nvui
       ? [
           h('div.clock-byo', [
-            h('div.time', {
+            h('div.time' + delayClass, {
               attrs: { role: 'timer' },
               hook: timeHook,
             }),
@@ -74,7 +70,7 @@ export function renderClock(ctrl: RoundController, player: game.Player, position
       : [
           clock.showBar && game.bothPlayersHavePlayed(ctrl.data) ? showBar(ctrl, player.playerIndex) : undefined,
           h('div.clock-byo', [
-            h('div.time', {
+            h('div.time' + delayClass, {
               class: {
                 hour: millis > 3600 * 1000,
               },
@@ -183,8 +179,7 @@ function showBar(ctrl: RoundController, playerIndex: PlayerIndex) {
 
 export function updateElements(clock: ClockController, els: ClockElements, millis: Millis, playerIndex: PlayerIndex) {
   const delayMillis = clock.delayMillisOf(playerIndex, playerIndex, true),
-    showDelayTime = clock.countdownDelay !== undefined,
-    isRunning = playerIndex === clock.times.activePlayerIndex;
+    showDelayTime = clock.countdownDelay !== undefined;
   if (els.time) {
     els.time.innerHTML = formatClockTime(
       millis,
@@ -194,15 +189,7 @@ export function updateElements(clock: ClockController, els: ClockElements, milli
       showDelayTime,
       clock.opts.nvui,
     );
-    const cl = els.time.classList;
-    if (clock.isInDelay(playerIndex) && isRunning) {
-      cl.remove('notindelay');
-      cl.add('indelay');
-    } else if (clock.isNotInDelay(playerIndex) && (cl.contains('indelay') || !cl.contains('notindelay')) && isRunning) {
-      if (cl.contains('indelay')) clock.emergSound.lowtime();
-      cl.remove('indelay');
-      cl.add('notindelay');
-    } else if (cl.contains('notindelay') && !isRunning) cl.remove('notindelay');
+    updateClassList(els.time.classList, clock, playerIndex, playerIndex === clock.times.activePlayerIndex, millis);
   }
   if (els.bar) els.bar.style.transform = 'scale(' + clock.timeRatio(millis, playerIndex) + ',1)';
   if (els.clock) {
@@ -210,6 +197,23 @@ export function updateElements(clock: ClockController, els: ClockElements, milli
     if (isEmerg(millis, clock, playerIndex)) cl.add('emerg');
     else if (cl.contains('emerg')) cl.remove('emerg');
   }
+}
+
+function updateClassList(
+  cl: DOMTokenList,
+  clock: ClockController,
+  playerIndex: PlayerIndex,
+  isRunning: boolean,
+  millis: Millis,
+) {
+  if (clock.isInDelay(playerIndex, isRunning)) {
+    cl.remove('notindelay');
+    cl.add('indelay');
+  } else if (clock.isNotInDelay(playerIndex, isRunning) && (cl.contains('indelay') || !cl.contains('notindelay'))) {
+    if (isEmerg(millis, clock, playerIndex)) clock.emergSound.lowtime();
+    cl.remove('indelay');
+    cl.add('notindelay');
+  } else if (cl.contains('notindelay') && !isRunning) cl.remove('notindelay');
 }
 
 function showBerserk(ctrl: RoundController, playerIndex: PlayerIndex): boolean {
