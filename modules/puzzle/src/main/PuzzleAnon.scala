@@ -40,19 +40,23 @@ final class PuzzleAnon(
       _.expireAfterWrite(1 minute)
         .buildAsyncFuture { case (variant, theme) =>
           countApi.byVariantTheme(variant, theme) flatMap { count =>
-            val tier =
-              if (count > 5000) PuzzleTier.Top
-              else if (count > 2000) PuzzleTier.Good
-              else PuzzleTier.All
-            val ratingRange: Range =
-              if (count > 9000) 1300 to 1600
-              else if (count > 5000) 1100 to 1800
-              else 0 to 9999
-            val pathSampleSize =
-              if (count > 9000) 3
-              else if (count > 5000) 5
-              else if (count > 2000) 8
-              else 15
+            //TODO tailor selection criteria when more variety of puzzles available
+            // val tier =
+            //   if (count > 5000) PuzzleTier.Top
+            //   else if (count > 2000) PuzzleTier.Good
+            //   else PuzzleTier.All
+            // val ratingRange: Range =
+            //   if (count > 9000) 1300 to 1600
+            //   else if (count > 5000) 1100 to 1800
+            //   else 0 to 9999
+            // val pathSampleSize =
+            //   if (count > 9000) 3
+            //   else if (count > 5000) 5
+            //   else if (count > 2000) 8
+            //   else 15
+            val tier               = PuzzleTier.All
+            val ratingRange: Range = 0 to 9999
+            val pathSampleSize     = 15
             colls.path {
               _.aggregateList(poolSize) { framework =>
                 import framework._
