@@ -43,7 +43,7 @@ const tiers = [
 //   2350, 2500, 2650, 2800, 9999,
 // ];
 //Due to lack of initial puzzles we require fewer buckets for reduced mix paths to allow grouping of mate-1 (1000) + mate-2 (1200)
-const reducedMixBoundaries = [100, 650, 900, 1400, 1900, 2500, 9999];
+const reducedMixBoundaries = [100, 650, 900, 1100, 1300, 1900, 2500, 9999];
 
 const themes = puzzleColl.distinct('themes', {}).filter(t => t && t != 'checkFirst');
 
@@ -118,7 +118,6 @@ variantKeys.forEach(variantkey => {
                 boundaries: reducedMixBoundaries,
               },
             },
-            { $addFields: { _id: { min: '$_id' } } },
           ]
         : [
             {
@@ -248,12 +247,18 @@ variantKeys.forEach(variantkey => {
         const isFirstOfTier = indexInTier == 0;
         const isLastOfTier = indexInTier == nbRatingBuckets - 1;
         const pathLength = Math.max(10, Math.min(maxPathLength, Math.round(bucket.puzzles.length / 30)));
-        const ratingMin = isFirstOfTier ? 100 : Math.ceil(bucket._id.min);
-        const ratingMax = isLastOfTier
-          ? 9999
-          : theme == 'mix'
-            ? reducedMixBoundaries[indexInTier + 1]
-            : Math.floor(bucket._id.max);
+        let ratingMin, ratingMax;
+        if (theme == 'mix') {
+          const bucketIndex = reducedMixBoundaries.indexOf(bucket._id);
+          ratingMin = bucket._id;
+          ratingMax =
+            bucketIndex >= 0 && bucketIndex < reducedMixBoundaries.length - 1
+              ? reducedMixBoundaries[bucketIndex + 1]
+              : 9999;
+        } else {
+          ratingMin = isFirstOfTier ? 100 : Math.ceil(bucket._id.min);
+          ratingMax = isLastOfTier ? 9999 : Math.floor(bucket._id.max);
+        }
         const nbPaths = Math.max(1, Math.floor(bucket.puzzles.length / pathLength));
         const allPaths = chunkify(bucket.puzzles, nbPaths);
         const paths = allPaths.slice(0, maxPathsPerGroup);
