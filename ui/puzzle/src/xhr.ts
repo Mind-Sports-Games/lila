@@ -6,12 +6,13 @@ import { PuzzleReplay, PuzzleResult, ThemeKey } from './interfaces';
 
 export function complete(
   puzzleId: string,
+  variant: string,
   theme: ThemeKey,
   win: boolean,
   replay?: PuzzleReplay,
   streak?: PuzzleStreak,
 ): Promise<PuzzleResult | undefined> {
-  return xhr.json(`/training/complete/${theme}/${puzzleId}`, {
+  return xhr.json(`/training/${variant}/complete/${theme}/${puzzleId}`, {
     method: 'POST',
     body: xhr.form({
       win,

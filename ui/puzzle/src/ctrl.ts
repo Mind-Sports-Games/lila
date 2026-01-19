@@ -9,18 +9,21 @@ import PuzzleStreak from './streak';
 import throttle from 'common/throttle';
 import { Api as CgApi } from 'chessground/api';
 import { build as treeBuild, ops as treeOps, path as treePath, TreeWrapper } from 'tree';
-import { Chess } from 'stratops/chess';
+import { Position } from 'stratops/chess';
 import { chessgroundDests, scalachessCharPair } from 'stratops/compat';
+import * as cg from 'chessground/types';
 import { Config as CgConfig } from 'chessground/config';
 import { ctrl as cevalCtrl, CevalCtrl } from 'ceval';
+import { allowedForVariant as allowClientEvalForVariant } from 'ceval/src/util';
 import { defer } from 'common/defer';
 import { defined, prop, Prop } from 'common';
 import { makeSanAndPlay } from 'stratops/san';
 import { parseFen, makeFen } from 'stratops/fen';
 import { parseSquare, parseUci, makeSquare, makeUci } from 'stratops/util';
-import { pgnToTree, mergeSolution } from './moveTree';
+import { variantClassFromKey, variantKeyToRules } from 'stratops/variants/util';
+import { actionStrsToTree, mergeSolution } from './moveTree';
 import { Redraw, Vm, Controller, PuzzleOpts, PuzzleData, PuzzleResult, MoveTest, ThemeKey } from './interfaces';
-import { Role, Move, Outcome } from 'stratops/types';
+import { Role, Move, Outcome, Rules } from 'stratops/types';
 import { storedProp } from 'common/storage';
 
 export default function (opts: PuzzleOpts, redraw: Redraw): Controller {
@@ -44,7 +47,7 @@ export default function (opts: PuzzleOpts, redraw: Redraw): Controller {
   const session = new PuzzleSession(opts.data.theme.key, opts.data.user?.id, hasStreak);
 
   // required by ceval
-  vm.showComputer = () => vm.mode === 'view';
+  vm.showComputer = () => vm.mode === 'view' && allowClientEvalForVariant(vm.variant);
   vm.showAutoShapes = () => true;
 
   const throttleSound = (name: string) => throttle(100, () => playstrategy.sound.play(name));
@@ -74,7 +77,7 @@ export default function (opts: PuzzleOpts, redraw: Redraw): Controller {
 
   function initiate(fromData: PuzzleData): void {
     data = fromData;
-    tree = treeBuild(pgnToTree(data.game.pgn.split(' ')));
+    tree = treeBuild(actionStrsToTree(data.game.variant.key, data.game.actionStrs.split(' ')));
     const initialPath = treePath.fromNodeList(treeOps.mainlineNodeList(tree.root));
     vm.mode = 'play';
     vm.next = defer();
@@ -84,7 +87,10 @@ export default function (opts: PuzzleOpts, redraw: Redraw): Controller {
     vm.lastFeedback = 'init';
     vm.initialPath = initialPath;
     vm.initialNode = tree.nodeAtPath(initialPath);
-    vm.pov = vm.initialNode.playerIndex;
+    vm.pov = vm.initialNode.ply % 2 === 1 ? 'p2' : 'p1'; //vm.initialNode.playerIndex;
+    vm.variant = data.game.variant.key;
+    vm.dimensions = data.game.variant.boardSize;
+    vm.playerColors = data.game.players.map(p => p.playerColor);
 
     setPath(treePath.init(initialPath));
     setTimeout(() => {
@@ -108,15 +114,15 @@ export default function (opts: PuzzleOpts, redraw: Redraw): Controller {
     instanciateCeval();
   }
 
-  function position(): Chess {
-    const setup = parseFen('chess')(vm.node.fen).unwrap();
-    return Chess.fromSetup(setup).unwrap();
+  function position(): Position {
+    const setup = parseFen(rules)(vm.node.fen).unwrap();
+    return variantClassFromKey(vm.variant).fromSetup(setup).unwrap();
   }
 
   function makeCgOpts(): CgConfig {
     const node = vm.node;
-    const playerIndex: PlayerIndex = node.playerIndex;
-    const dests = chessgroundDests('chess')(position());
+    const playerIndex: PlayerIndex = node.ply % 2 === 0 ? 'p1' : 'p2'; //node.playerIndex;
+    const dests = chessgroundDests(rules)(position());
     const nextNode = vm.node.children[0];
     const canMove = vm.mode === 'view' || (playerIndex === vm.pov && (!nextNode || nextNode.puzzle == 'fail'));
     const movable = canMove
@@ -139,9 +145,9 @@ export default function (opts: PuzzleOpts, redraw: Redraw): Controller {
       },
       check: !!node.check,
       lastMove: uciToLastMove(node.uci),
-      dimensions: vm.cgConfig.dimensions,
-      variant: vm.cgConfig.variant,
-      chess960: vm.cgConfig.chess960,
+      dimensions: { width: vm.dimensions.width, height: vm.dimensions.height },
+      variant: vm.variant as cg.Variant,
+      chess960: vm.variant === 'chess960',
     };
     if (node.ply >= vm.initialNode.ply) {
       if (vm.mode !== 'view' && playerIndex !== vm.pov && !nextNode) {
@@ -163,13 +169,13 @@ export default function (opts: PuzzleOpts, redraw: Redraw): Controller {
   }
 
   function playUci(uci: Uci): void {
-    sendMove(parseUci('chess')(uci)!);
+    sendMove(parseUci(rules)(uci)!);
   }
 
   function playUserMove(orig: Key, dest: Key, promotion?: Role): void {
     sendMove({
-      from: parseSquare('chess')(orig)!,
-      to: parseSquare('chess')(dest)!,
+      from: parseSquare(rules)(orig)!,
+      to: parseSquare(rules)(dest)!,
       promotion,
     });
   }
@@ -178,9 +184,9 @@ export default function (opts: PuzzleOpts, redraw: Redraw): Controller {
     sendMoveAt(vm.path, position(), move);
   }
 
-  function sendMoveAt(path: Tree.Path, pos: Chess, move: Move): void {
+  function sendMoveAt(path: Tree.Path, pos: Position, move: Move): void {
     move = pos.normalizeMove(move);
-    const san = makeSanAndPlay('chess')(pos, move);
+    const san = makeSanAndPlay(rules)(pos, move);
     const check = pos.isCheck() ? pos.board.kingOf(pos.turn) : undefined;
     addNode(
       {
@@ -188,11 +194,11 @@ export default function (opts: PuzzleOpts, redraw: Redraw): Controller {
         turnCount: 2 * (pos.fullmoves - 1) + (pos.turn == 'p1' ? 0 : 1), //TODO fix for multiaction
         playedPlayerIndex: pos.turn === 'p1' ? 'p2' : 'p1', //TODO fix for multiaction
         playerIndex: pos.turn,
-        fen: makeFen('chess')(pos.toSetup()),
-        id: scalachessCharPair('chess')(move),
-        uci: makeUci('chess')(move),
+        fen: makeFen(rules)(pos.toSetup()),
+        id: scalachessCharPair(rules)(move),
+        uci: makeUci(rules)(move),
         san,
-        check: defined(check) ? makeSquare('chess')(check) : undefined,
+        check: defined(check) ? makeSquare(rules)(check) : undefined,
         children: [],
       },
       path,
@@ -262,7 +268,7 @@ export default function (opts: PuzzleOpts, redraw: Redraw): Controller {
       vm.lastFeedback = 'good';
       setTimeout(
         () => {
-          const pos = Chess.fromSetup(parseFen('chess')(progress.fen).unwrap()).unwrap();
+          const pos = variantClassFromKey(vm.variant).fromSetup(parseFen(rules)(progress.fen).unwrap()).unwrap();
           sendMoveAt(progress.path, pos, progress.move);
         },
         opts.pref.animation.duration * (autoNext() ? 1 : 1.5),
@@ -281,19 +287,22 @@ export default function (opts: PuzzleOpts, redraw: Redraw): Controller {
     if (vm.resultSent) return Promise.resolve();
     vm.resultSent = true;
     session.complete(data.puzzle.id, win);
-    return xhr.complete(data.puzzle.id, data.theme.key, win, data.replay, streak).then((res: PuzzleResult) => {
-      if (res?.replayComplete && data.replay) return playstrategy.redirect(`/training/dashboard/${data.replay.days}`);
-      if (res?.next.user && data.user) {
-        data.user.rating = res.next.user.rating;
-        data.user.provisional = res.next.user.provisional;
-        vm.round = res.round;
-        if (res.round?.ratingDiff) session.setRatingDiff(data.puzzle.id, res.round.ratingDiff);
-      }
-      if (win) speech.success();
-      vm.next.resolve(res.next);
-      if (streak && win) streak.onComplete(true, res.next);
-      redraw();
-    });
+    return xhr
+      .complete(data.puzzle.id, data.game.variant.key, data.theme.key, win, data.replay, streak)
+      .then((res: PuzzleResult) => {
+        if (res?.replayComplete && data.replay)
+          return playstrategy.redirect(`/training/${data.game.variant.key}/dashboard/${data.replay.days}`);
+        if (res?.next.user && data.user) {
+          data.user.rating = res.next.user.rating;
+          data.user.provisional = res.next.user.provisional;
+          vm.round = res.round;
+          if (res.round?.ratingDiff) session.setRatingDiff(data.puzzle.id, res.round.ratingDiff);
+        }
+        if (win) speech.success();
+        vm.next.resolve(res.next);
+        if (streak && win) streak.onComplete(true, res.next);
+        redraw();
+      });
   }
 
   function nextPuzzle(): void {
@@ -301,7 +310,7 @@ export default function (opts: PuzzleOpts, redraw: Redraw): Controller {
     vm.next.promise.then(initiate).then(redraw);
 
     if (!streak && !data.replay) {
-      const path = `/training/${data.theme.key}`;
+      const path = `/training/${data.game.variant.key}/${data.theme.key}`;
       if (location.pathname != path) history.replaceState(null, '', path);
     }
   }
@@ -312,13 +321,7 @@ export default function (opts: PuzzleOpts, redraw: Redraw): Controller {
       redraw,
       storageKeyPrefix: 'puzzle',
       multiPvDefault: 3,
-      variant: {
-        short: 'Std',
-        name: 'Standard',
-        key: 'standard',
-        lib: 0,
-        boardSize: { width: 8, height: 8 },
-      },
+      variant: data.game.variant,
       standardMaterial: true,
       possible: true,
       emit: function (ev, work) {
@@ -424,7 +427,7 @@ export default function (opts: PuzzleOpts, redraw: Redraw): Controller {
   function viewSolution(): void {
     sendResult(false);
     vm.mode = 'view';
-    mergeSolution(tree, vm.initialPath, data.puzzle.solution, vm.pov);
+    mergeSolution(vm.variant, tree, vm.initialPath, data.puzzle.solution, vm.pov);
     reorderChildren(vm.initialPath, true);
 
     // try and play the solution next move
@@ -478,6 +481,7 @@ export default function (opts: PuzzleOpts, redraw: Redraw): Controller {
   };
 
   initiate(opts.data);
+  const rules: Rules = variantKeyToRules(vm.variant);
 
   const promotion = makePromotion(vm, ground, redraw);
 

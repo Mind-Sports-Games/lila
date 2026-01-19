@@ -80,6 +80,9 @@ export interface Vm {
   mainline: Tree.Node[];
   pov: PlayerIndex;
   mode: 'play' | 'view' | 'try';
+  variant: VariantKey;
+  dimensions: { width: number; height: number };
+  playerColors: PlayerName[];
   round?: PuzzleRound;
   next: Deferred<PuzzleData>;
   justPlayed?: Key;
@@ -148,9 +151,19 @@ export interface PuzzleGame {
     icon: string;
     name: string;
   };
+  variant: {
+    key: VariantKey;
+    short: string;
+    name: string;
+    lib: number;
+    boardSize: {
+      width: number;
+      height: number;
+    };
+  };
   rated: boolean;
   players: [PuzzlePlayer, PuzzlePlayer];
-  pgn: string;
+  actionStrs: string;
   clock: string;
 }
 
@@ -159,6 +172,7 @@ export interface PuzzlePlayer {
   name: string;
   title?: string;
   playerIndex: PlayerIndex;
+  playerColor: PlayerName;
 }
 
 export interface PuzzleUser {

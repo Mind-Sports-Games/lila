@@ -93,6 +93,7 @@ object bits {
     }
     val extra =
       if (libName == "Draughts") s"is${boardSize.key} ${libName.toLowerCase()}"
+      else if (variantKey == "linesOfAction") "loa" //TODO daily puzzle (test other variants when supported)
       else s"${libName.toLowerCase()}"
     tag(
       cls := s"mini-board mini-board--init cg-wrap is2d variant-${variantKey} ${extra}",

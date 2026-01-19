@@ -29,7 +29,7 @@ object show {
               "pref" -> pref,
               "i18n" -> bits.jsI18n(streak = isStreak)
             )
-            .add("themes" -> ctx.isAuth.option(bits.jsonThemes))
+            .add("themes" -> ctx.isAuth.option(bits.jsonThemes(puzzle.variant)))
             .add("difficulty" -> difficulty.map(_.key))
         )})""")
       ),
@@ -41,7 +41,7 @@ object show {
           title =
             if (isStreak) "Puzzle Streak"
             else s"Chess tactic #${puzzle.id} - ${puzzle.playerIndex.name.capitalize} to play",
-          url = s"$netBaseUrl${routes.Puzzle.show(puzzle.id.value).url}",
+          url = s"$netBaseUrl${routes.Puzzle.show(puzzle.variant.key, puzzle.id.value).url}",
           description =
             if (isStreak) trans.puzzle.streakDescription.txt()
             else
@@ -59,7 +59,7 @@ object show {
         st.aside(cls := "puzzle__side")(
           div(cls := "puzzle__side__metas")
         ),
-        div(cls := "puzzle__board main-board")(chessgroundBoard),
+        div(cls := s"puzzle__board main-board variant-${puzzle.variant.key}")(chessgroundBoard),
         div(cls := "puzzle__tools"),
         div(cls := "puzzle__controls")
       )

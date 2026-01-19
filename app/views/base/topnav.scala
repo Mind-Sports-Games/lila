@@ -5,6 +5,7 @@ import controllers.routes
 import lila.api.Context
 import lila.app.templating.Environment._
 import lila.app.ui.ScalatagsTemplate._
+import lila.puzzle.Puzzle
 
 object topnav {
 
@@ -41,16 +42,28 @@ object topnav {
           a(href := routes.Memory.home)(trans.memoryGame())
         )
       ),
-      /*ctx.noBot option st.section(
-        linkTitle(routes.Puzzle.home.path, trans.puzzles()),
+      ctx.noBot option st.section(
+        linkTitle(routes.Puzzle.base.path, trans.puzzles()),
         div(role := "group")(
-          a(href := routes.Puzzle.home)(trans.puzzles()),
-          a(href := routes.Puzzle.dashboard(30, "home"))(trans.puzzle.puzzleDashboard()),
-          a(href := routes.Puzzle.streak)("Puzzle Streak"),
-          a(href := routes.Storm.home)("Puzzle Storm"),
-          a(href := routes.Racer.home)("Puzzle Racer")
+          a(href := routes.Puzzle.base)(trans.puzzles()),
+          a(href := routes.Puzzle.dashboardBase)(
+            trans.puzzle.puzzleDashboard()
+          )
+          // a(href := routes.Puzzle.streak)("Puzzle Streak")
+          // a(href := routes.Storm.home)("Puzzle Storm"),
+          // a(href := routes.Racer.home)("Puzzle Racer")
         )
-      ),*/
+      ),
+      st.section(
+        linkTitle(routes.Tv.games.path, trans.watch()),
+        div(role := "group")(
+          a(href := routes.Tv.index)("PlayStrategy TV"),
+          a(href := routes.Tv.games)(trans.currentGames()),
+          (ctx.noKid && ctx.noBot) option a(href := routes.Streamer.index())(trans.streamersMenu())
+          //a(href := routes.RelayTour.index())(trans.broadcast.broadcasts()),
+          //ctx.noBot option a(href := routes.Video.index)(trans.videoLibrary())
+        )
+      ),
       st.section(
         //linkTitle(routes.Practice.index.path, trans.learnMenu()),
         linkTitle(routes.Page.variantHome.path, trans.learnMenu()),
@@ -66,16 +79,6 @@ object topnav {
           ),
           //ctx.noKid option a(href := routes.Coach.all(1))(trans.coaches()),
           canSeeClasMenu option a(href := routes.Clas.index)(trans.clas.playstrategyClasses())
-        )
-      ),
-      st.section(
-        linkTitle(routes.Tv.games.path, trans.watch()),
-        div(role := "group")(
-          a(href := routes.Tv.index)("PlayStrategy TV"),
-          a(href := routes.Tv.games)(trans.currentGames()),
-          (ctx.noKid && ctx.noBot) option a(href := routes.Streamer.index())(trans.streamersMenu())
-          //a(href := routes.RelayTour.index())(trans.broadcast.broadcasts()),
-          //ctx.noBot option a(href := routes.Video.index)(trans.videoLibrary())
         )
       ),
       st.section(

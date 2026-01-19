@@ -4,6 +4,7 @@ import cats.implicits._
 import org.joda.time.DateTime
 import scala.concurrent.duration._
 
+import strategygames.variant.Variant
 import lila.common.paginator.Paginator
 import lila.common.config.MaxPerPage
 import lila.db.dsl._
@@ -33,6 +34,20 @@ final class PuzzleApi(
           adapter = new Adapter[Puzzle](
             collection = coll,
             selector = $doc("users" -> user.id),
+            projection = none,
+            sort = $sort desc "glicko.r"
+          ),
+          page,
+          MaxPerPage(30)
+        )
+      }
+
+    def of(user: User, variant: Variant, page: Int): Fu[Paginator[Puzzle]] =
+      colls.puzzle { coll =>
+        Paginator(
+          adapter = new Adapter[Puzzle](
+            collection = coll,
+            selector = $doc("users" -> user.id, "v" -> variant.id, "l" -> variant.gameLogic.id),
             projection = none,
             sort = $sort desc "glicko.r"
           ),
@@ -124,9 +139,9 @@ final class PuzzleApi(
 
   object theme {
 
-    def categorizedWithCount: Fu[List[(lila.i18n.I18nKey, List[PuzzleTheme.WithCount])]] =
-      countApi.countsByTheme map { counts =>
-        PuzzleTheme.categorized.map { case (cat, puzzles) =>
+    def categorizedWithCount(variant: Variant): Fu[List[(lila.i18n.I18nKey, List[PuzzleTheme.WithCount])]] =
+      countApi.countByThemeForVariant(variant) map { counts =>
+        PuzzleTheme.categorizedThemesFor(variant.key) map { case (cat, puzzles) =>
           cat -> puzzles.map { pt =>
             PuzzleTheme.WithCount(pt, counts.getOrElse(pt.key, 0))
           }

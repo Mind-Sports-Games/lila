@@ -107,7 +107,7 @@ export default function (ctrl: Controller): VNode {
         theme(ctrl),
       ]),
       h(
-        'div.puzzle__board.main-board' + (ctrl.pref.blindfold ? '.blindfold' : ''),
+        `div.puzzle__board.main-board.variant-${ctrl.vm.variant}${ctrl.pref.blindfold ? '.blindfold' : ''}`,
         {
           hook: 'ontouchstart' in window ? undefined : bind('wheel', e => wheel(ctrl, e as WheelEvent)),
         },
@@ -122,7 +122,7 @@ export default function (ctrl: Controller): VNode {
           {
             class: { none: !showCeval },
           },
-          showCeval ? [cevalView.renderCeval(ctrl), cevalView.renderPvs('standard')(ctrl)] : [],
+          showCeval ? [cevalView.renderCeval(ctrl), cevalView.renderPvs(ctrl.getData().game.variant.key)(ctrl)] : [],
         ),
         renderAnalyse(ctrl),
         feedbackView(ctrl),
@@ -135,7 +135,8 @@ export default function (ctrl: Controller): VNode {
 
 function session(ctrl: Controller) {
   const rounds = ctrl.session.get().rounds,
-    current = ctrl.getData().puzzle.id;
+    current = ctrl.getData().puzzle.id,
+    variant = ctrl.getData().game.variant.key;
   return h('div.puzzle__session', [
     ...rounds.map(round => {
       const rd = round.ratingDiff ? (round.ratingDiff > 0 ? '+' + round.ratingDiff : round.ratingDiff) : null;
@@ -147,7 +148,7 @@ function session(ctrl: Controller) {
             current: current == round.id,
           },
           attrs: {
-            href: `/training/${ctrl.session.theme}/${round.id}`,
+            href: `/training/${variant}/${ctrl.session.theme}/${round.id}`,
             ...(ctrl.streak ? { target: '_blank' } : {}),
           },
         },
@@ -160,7 +161,7 @@ function session(ctrl: Controller) {
         : h('a.session-new', {
             key: 'new',
             attrs: {
-              href: `/training/${ctrl.session.theme}`,
+              href: `/training/${variant}/${ctrl.session.theme}`,
             },
           })
       : h(
@@ -170,7 +171,7 @@ function session(ctrl: Controller) {
             attrs: ctrl.streak
               ? {}
               : {
-                  href: `/training/${ctrl.session.theme}/${current}`,
+                  href: `/training/${variant}/${ctrl.session.theme}/${current}`,
                 },
           },
           ctrl.streak?.data.index,

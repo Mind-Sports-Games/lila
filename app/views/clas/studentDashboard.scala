@@ -90,7 +90,7 @@ object studentDashboard {
               showPerfRating(user, _)
             }),
             td(user.count.game.localize),
-            td(user.perfs.puzzle.nb.localize),
+            td(user.perfs.perfsPuzzleMap.values.map(_.nb).sum.localize),
             challengeTd(user)
           )
         }

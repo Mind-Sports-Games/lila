@@ -2,33 +2,35 @@ import { bind, dataIcon } from '../util';
 import { Controller, MaybeVNode } from '../interfaces';
 import { h, VNode } from 'snabbdom';
 
-const studyUrl = 'https://playstrategy.org/study/viiWlKjv';
+//TODO create this study for chess and other variants when more themes are available
+//const studyUrl = 'https://playstrategy.org/study/viiWlKjv';
 
 export default function theme(ctrl: Controller): MaybeVNode {
   const t = ctrl.getData().theme;
+  const variant = ctrl.getData().game.variant.key;
   return ctrl.streak || ctrl.getData().replay
     ? null
     : h('div.puzzle__side__theme', [
-        h('a', { attrs: { href: '/training/themes' } }, h('h2', ['« ', t.name])),
+        h('a', { attrs: { href: `/training/${variant}/themes` } }, h('h2', ['« ', t.name])),
         h('p', [
           t.desc,
-          t.chapter &&
-            h(
-              'a.puzzle__side__theme__chapter.text',
-              {
-                attrs: {
-                  href: `${studyUrl}/${t.chapter}`,
-                  target: '_blank',
-                },
-              },
-              [' ', ctrl.trans.noarg('example')],
-            ),
+          // t.chapter &&
+          //   h(
+          //     'a.puzzle__side__theme__chapter.text',
+          //     {
+          //       attrs: {
+          //         href: `${studyUrl}/${t.chapter}`,
+          //         target: '_blank',
+          //       },
+          //     },
+          //     [' ', ctrl.trans.noarg('example')],
+          //   ),
         ]),
         ctrl.vm.mode != 'view' || ctrl.autoNexting() ? null : editor(ctrl),
       ]);
 }
 
-const invisibleThemes = new Set(['master', 'masterVsMaster', 'superGM']);
+const invisibleThemes = new Set(['master', 'masterVsMaster', 'superGM', 'oneMove', 'short', 'long', 'veryLong']);
 
 const editor = (ctrl: Controller): VNode => {
   const data = ctrl.getData(),
@@ -38,7 +40,7 @@ const editor = (ctrl: Controller): VNode => {
     .filter(t => !invisibleThemes.has(t))
     .concat(Object.keys(votedThemes).filter(t => votedThemes[t] && !data.puzzle.themes.includes(t)))
     .sort();
-  const allThemes = location.pathname == '/training/daily' ? null : ctrl.allThemes;
+  const allThemes = ctrl.allThemes;
   const availableThemes = allThemes ? allThemes.dynamic.filter(t => !votedThemes[t]) : null;
   if (availableThemes) availableThemes.sort((a, b) => (trans(a) < trans(b) ? -1 : 1));
   return h('div.puzzle__themes', [
@@ -64,7 +66,7 @@ const editor = (ctrl: Controller): VNode => {
               'a',
               {
                 attrs: {
-                  href: `/training/${key}`,
+                  href: `/training/${data.game.variant.key}/${key}`,
                   title: trans(`${key}Description`),
                 },
               },
@@ -135,17 +137,17 @@ const editor = (ctrl: Controller): VNode => {
               ),
             ],
           ),
-          h(
-            'a.puzzle__themes__study.text',
-            {
-              attrs: {
-                'data-icon': '',
-                href: studyUrl,
-                target: '_blank',
-              },
-            },
-            'About puzzle themes',
-          ),
+          // h(
+          //   'a.puzzle__themes__study.text',
+          //   {
+          //     attrs: {
+          //       'data-icon': '',
+          //       href: studyUrl,
+          //       target: '_blank',
+          //     },
+          //   },
+          //   'About puzzle themes',
+          // ),
         ]
       : []),
   ]);

@@ -10,6 +10,8 @@ import lila.common.paginator.Paginator
 import lila.db.dsl._
 import lila.memo.CacheApi
 import lila.user.User
+import strategygames.variant.Variant
+import lila.user.Perfs
 
 object PuzzleHistory {
 
@@ -28,12 +30,14 @@ object PuzzleHistory {
     // def performance     = puzzleRatingAvg - 500 + math.round(1000 * (firstWins.toFloat / nb))
   }
 
-  final class HistoryAdapter(user: User, colls: PuzzleColls)(implicit ec: ExecutionContext)
+  final class HistoryAdapter(user: User, variant: Variant, colls: PuzzleColls)(implicit ec: ExecutionContext)
       extends AdapterLike[PuzzleSession] {
 
     import BsonHandlers._
 
-    def nbResults: Fu[Int] = fuccess(user.perfs.puzzle.nb)
+    def nbResults: Fu[Int] = fuccess(
+      Perfs.puzzleLens(variant).map(_.get(user.perfs)).getOrElse(user.perfs.puzzle_standard).nb
+    )
 
     def slice(offset: Int, length: Int): Fu[Seq[PuzzleSession]] =
       colls
@@ -58,6 +62,7 @@ object PuzzleHistory {
           } yield SessionRound(round, puzzle, theme)
         }
         .map(groupBySessions)
+        .map(_.filter(_.puzzles.head.puzzle.variant == variant))
   }
 
   private def groupBySessions(rounds: List[SessionRound]): List[PuzzleSession] =
@@ -67,6 +72,7 @@ object PuzzleHistory {
         case (last :: sessions, r) =>
           if (
             last.puzzles.head.theme == r.theme &&
+            last.puzzles.head.puzzle.variant == r.puzzle.variant &&
             r.round.date.isAfter(last.puzzles.head.round.date minusHours 1)
           )
             last.copy(puzzles = r :: last.puzzles) :: sessions
@@ -82,9 +88,9 @@ final class PuzzleHistoryApi(
 
   import PuzzleHistory._
 
-  def apply(user: User, page: Int): Fu[Paginator[PuzzleSession]] =
+  def apply(user: User, variant: Variant, page: Int): Fu[Paginator[PuzzleSession]] =
     Paginator[PuzzleSession](
-      new HistoryAdapter(user, colls),
+      new HistoryAdapter(user, variant, colls),
       currentPage = page,
       maxPerPage = maxPerPage
     )

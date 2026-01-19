@@ -1,21 +1,20 @@
 package lila.puzzle
 
-import strategygames.GameLogic
 import strategygames.format.Forsyth
 import strategygames.format.UciCharPair
 import play.api.libs.json._
 import scala.concurrent.duration._
 
 import lila.game.{ Game, GameRepo, PerfPicker }
+import strategygames.variant.Variant
 import lila.i18n.defaultLang
+import lila.i18n.VariantKeys
 
 final private class GameJson(
     gameRepo: GameRepo,
     cacheApi: lila.memo.CacheApi,
     lightUserApi: lila.user.LightUserApi
 )(implicit ec: scala.concurrent.ExecutionContext) {
-
-  val chessLib = GameLogic.Chess()
 
   def apply(gameId: Game.ID, plies: Int, bc: Boolean): Fu[JsObject] =
     (if (bc) bcCache else cache) get writeKey(gameId, plies)
@@ -65,10 +64,11 @@ final private class GameJson(
       .obj(
         "id"      -> game.id,
         "perf"    -> perfJson(game),
+        "variant" -> variantJson(game),
         "rated"   -> game.rated,
         "players" -> playersJson(game),
         //can flatten whilst puzzles are just chess
-        "pgn" -> game.actionStrs.flatten.take(plies + 1).mkString(" ")
+        "actionStrs" -> game.actionStrs.flatten.take(plies + 1).mkString(" ")
       )
       .add("clock", game.clock.map(_.config.show))
 
@@ -80,6 +80,58 @@ final private class GameJson(
     )
   }
 
+  //TODO wil need to support draughts differently (see game/jsonView example)
+  private def variantJson(game: Game) = Json.obj(
+    "key"       -> game.variant.key,
+    "name"      -> VariantKeys.variantName(game.variant),
+    "short"     -> VariantKeys.variantShortName(game.variant),
+    "lib"       -> game.variant.gameLogic.id,
+    "boardSize" -> boardSize(game.variant)
+  )
+
+  def boardSize(variant: Variant) = variant match {
+    case Variant.Draughts(v) =>
+      Json.obj(
+        "size" -> Json.arr(v.boardSize.width, v.boardSize.height),
+        "key"  -> v.boardSize.key
+      )
+    case Variant.FairySF(fairyVariant) =>
+      Json.obj(
+        "width"  -> fairyVariant.boardSize.width,
+        "height" -> fairyVariant.boardSize.height
+      )
+    case Variant.Samurai(samuraiVariant) =>
+      Json.obj(
+        "width"  -> samuraiVariant.boardSize.width,
+        "height" -> samuraiVariant.boardSize.height
+      )
+    case Variant.Togyzkumalak(togyzkumalakVariant) =>
+      Json.obj(
+        "width"  -> togyzkumalakVariant.boardSize.width,
+        "height" -> togyzkumalakVariant.boardSize.height
+      )
+    case Variant.Go(goVariant) =>
+      Json.obj(
+        "width"  -> goVariant.boardSize.width,
+        "height" -> goVariant.boardSize.height
+      )
+    case Variant.Backgammon(backgammonVariant) =>
+      Json.obj(
+        "width"  -> backgammonVariant.boardSize.width,
+        "height" -> backgammonVariant.boardSize.height
+      )
+    case Variant.Abalone(abaloneVariant) =>
+      Json.obj(
+        "width"  -> abaloneVariant.boardSize.width,
+        "height" -> abaloneVariant.boardSize.height
+      )
+    case _ =>
+      Json.obj(
+        "width"  -> 8,
+        "height" -> 8
+      )
+  }
+
   private def playersJson(game: Game) = JsArray(game.players.map { p =>
     val userId = p.userId | "anon"
     val user   = lightUserApi.syncFallback(userId)
@@ -87,7 +139,8 @@ final private class GameJson(
       .obj(
         "userId"      -> userId,
         "name"        -> s"${user.name}${p.rating.??(r => s" ($r)")}",
-        "playerIndex" -> p.playerIndex.name
+        "playerIndex" -> p.playerIndex.name,
+        "playerColor" -> game.variant.playerColors(p.playerIndex)
       )
       .add("title" -> user.title)
   })
@@ -98,24 +151,26 @@ final private class GameJson(
         "id"      -> game.id,
         "perf"    -> perfJson(game),
         "players" -> playersJson(game),
+        "variant" -> variantJson(game),
         "rated"   -> game.rated,
         "treeParts" -> {
           val actionStrs = game.actionStrs.take(turns + 1)
+          val lib        = game.variant.gameLogic
           for {
             //TODO: multiaction ok for now as just chess puzzles
             lastPly <- actionStrs.flatten.lastOption
             situation <- strategygames.Replay
-              .situations(chessLib, actionStrs, None, game.variant)
+              .situations(lib, actionStrs, None, game.variant)
               .valueOr { err =>
                 sys.error(s"GameJson.generateBc ${game.id} $err")
               }
               .lastOption
             uciMove <- situation.board.history.lastAction
           } yield Json.obj(
-            "fen" -> Forsyth.>>(chessLib, situation).value,
+            "fen" -> Forsyth.>>(lib, situation).value,
             "ply" -> (turns + 1),
             "san" -> lastPly,
-            "id"  -> UciCharPair(chessLib, uciMove).toString,
+            "id"  -> UciCharPair(lib, uciMove).toString,
             "uci" -> uciMove.uci
           )
         }
