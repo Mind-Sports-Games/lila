@@ -47,8 +47,8 @@ case class Puzzle(
   //TODO suport all actions when adding more variants
   lazy val fenAfterInitialMove: FEN = {
     for {
-      sit1 <- Forsyth.<<(variant.gameLogic, fen)
-      sit2 <- sit1.move(line.head).toOption.map(_.situationAfter)
+      sit1 <- Forsyth.<<<@(variant.gameLogic, variant, fen)
+      sit2 <- sit1.situation.move(line.head).toOption.map(_.situationAfter)
     } yield Forsyth.>>(variant.gameLogic, sit2)
   } err s"Can't apply puzzle $id first move"
 
