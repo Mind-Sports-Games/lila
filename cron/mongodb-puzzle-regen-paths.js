@@ -106,29 +106,15 @@ variantKeys.forEach(variantkey => {
     if (!nbPuzzles) return [];
 
     const themeMaxPathLength = Math.max(10, Math.min(maxPathLength, Math.round(nbPuzzles / 150)));
-    const nbRatingBuckets =
-      theme == 'mix'
-        ? reducedMixBoundaries.length - 1
-        : Math.max(3, Math.min(maxRatingBuckets, Math.round(nbPuzzles / themeMaxPathLength / 15)));
 
-    const bucketStages =
-      theme == 'mix'
-        ? [
-            {
-              $bucket: {
-                ...bucketBase,
-                boundaries: reducedMixBoundaries,
-              },
-            },
-          ]
-        : [
-            {
-              $bucketAuto: {
-                ...bucketBase,
-                buckets: nbRatingBuckets,
-              },
-            },
-          ];
+    const bucketStages = [
+      {
+        $bucket: {
+          ...bucketBase,
+          boundaries: reducedMixBoundaries,
+        },
+      },
+    ];
 
     const pipeline = [
       {
@@ -227,9 +213,7 @@ variantKeys.forEach(variantkey => {
     ];
 
     if (verbose)
-      print(
-        `varaint: ${variantkey}, theme: ${theme}, puzzles: ${nbPuzzles}, path length: ${themeMaxPathLength}, rating buckets: ${nbRatingBuckets}`,
-      );
+      print(`varaint: ${variantkey}, theme: ${theme}, puzzles: ${nbPuzzles}, path length: ${themeMaxPathLength}`);
 
     let prevTier = '',
       indexInTier = 0,
@@ -246,21 +230,14 @@ variantKeys.forEach(variantkey => {
           indexInTier = 0;
           prevTier = bucket.tier;
         }
-        const isFirstOfTier = indexInTier == 0;
-        const isLastOfTier = indexInTier == nbRatingBuckets - 1;
         const pathLength = Math.max(10, Math.min(maxPathLength, Math.round(bucket.puzzles.length / 30)));
-        let ratingMin, ratingMax;
-        if (theme == 'mix') {
-          const bucketIndex = reducedMixBoundaries.indexOf(bucket._id);
-          ratingMin = bucket._id;
-          ratingMax =
-            bucketIndex >= 0 && bucketIndex < reducedMixBoundaries.length - 1
-              ? reducedMixBoundaries[bucketIndex + 1]
-              : 9999;
-        } else {
-          ratingMin = isFirstOfTier ? 100 : Math.ceil(bucket._id.min);
-          ratingMax = isLastOfTier ? 9999 : Math.floor(bucket._id.max);
-        }
+        const bucketIndex = reducedMixBoundaries.indexOf(bucket._id);
+        const ratingMin = bucket._id;
+        const ratingMax =
+          bucketIndex >= 0 && bucketIndex < reducedMixBoundaries.length - 1
+            ? reducedMixBoundaries[bucketIndex + 1]
+            : 9999;
+
         const nbPaths = Math.max(1, Math.floor(bucket.puzzles.length / pathLength));
         const allPaths = chunkify(bucket.puzzles, nbPaths);
         const paths = allPaths.slice(0, maxPathsPerGroup);
