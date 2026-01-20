@@ -1,7 +1,7 @@
 import { h, VNode } from 'snabbdom';
 import { parseFen } from 'stratops/fen';
 import * as chessground from './ground';
-import * as cg from 'chessground/types';
+import { Coords as CgCoords } from 'chessground/types';
 import {
   bind,
   onInsert,
@@ -328,21 +328,21 @@ function controls(ctrl: AnalyseCtrl) {
 }
 
 function forceNoCoords(ctrl: AnalyseCtrl) {
-  if (ctrl.data.pref.coords !== cg.Coords.Hidden) {
-    ctrl.chessground.displayCoordinates(cg.Coords.Hidden);
+  if (ctrl.data.pref.coords !== CgCoords.Hidden) {
+    ctrl.chessground.displayCoordinates(CgCoords.Hidden);
   }
 }
 
 function forceOutterCoords(ctrl: AnalyseCtrl, v: boolean) {
   if (v) {
-    ctrl.chessground.displayCoordinates(cg.Coords.Outside);
+    ctrl.chessground.displayCoordinates(CgCoords.Outside);
     changeColorHandle();
   }
 }
 
 function forceInnerCoords(ctrl: AnalyseCtrl, v: boolean) {
   if (v) {
-    ctrl.chessground.displayCoordinates(cg.Coords.Inside);
+    ctrl.chessground.displayCoordinates(CgCoords.Inside);
     changeColorHandle();
   }
 }

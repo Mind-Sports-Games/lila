@@ -2,7 +2,7 @@ import PuzzleSession from './session';
 import { Api as CgApi } from 'chessground/api';
 import { CevalCtrl, NodeEvals } from 'ceval';
 import { Config as CgConfig } from 'chessground/config';
-import * as cg from 'chessground/types';
+import { Coords as CgCoords } from 'chessground/types';
 import { Deferred } from 'common/defer';
 import { Outcome, Role, Move } from 'stratops/types';
 import { Prop } from 'common';
@@ -111,7 +111,7 @@ export interface PuzzleOpts {
 }
 
 export interface PuzzlePrefs {
-  coords: cg.Coords;
+  coords: CgCoords;
   is3d: boolean;
   destination: boolean;
   rookCastle: boolean;

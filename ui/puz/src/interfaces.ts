@@ -1,9 +1,8 @@
-import { Role } from 'chessground/types';
+import { Coords as CgCoords, Role } from 'chessground/types';
 import { VNode } from 'snabbdom';
 import { Clock } from './clock';
 import { Combo } from './combo';
 import CurrentPuzzle from './current';
-import * as cg from 'chessground/types';
 
 export type MaybeVNode = VNode | string | null | undefined;
 export type MaybeVNodes = MaybeVNode[];
@@ -16,7 +15,7 @@ export interface Promotion {
 }
 
 export interface PuzPrefs {
-  coords: cg.Coords;
+  coords: CgCoords;
   is3d: boolean;
   destination: boolean;
   rookCastle: boolean;

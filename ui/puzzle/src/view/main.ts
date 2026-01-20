@@ -1,9 +1,9 @@
 import * as control from '../control';
 import * as side from './side';
 import theme from './theme';
-import changePlayerIndexHandle from 'common/coordsColor';
+import changeColorHandle from 'common/coordsColor';
 import chessground from './chessground';
-import * as cg from 'chessground/types';
+import { Coords as CgCoords } from 'chessground/types';
 import feedbackView from './feedback';
 import { Controller } from '../interfaces';
 import { h, VNode } from 'snabbdom';
@@ -88,8 +88,12 @@ export default function (ctrl: Controller): VNode {
       hook: {
         postpatch(old, vnode) {
           if (old.data!.gaugeOn !== gaugeOn) {
-            if (ctrl.pref.coords === cg.Coords.Outside) {
-              changePlayerIndexHandle();
+            if (gaugeOn && ctrl.pref.coords === CgCoords.Outside) {
+              ctrl.pref.coords = CgCoords.Inside;
+              changeColorHandle();
+            } else if (!gaugeOn && ctrl.pref.coords === CgCoords.Inside) {
+              ctrl.pref.coords = CgCoords.Outside;
+              changeColorHandle();
             }
             document.body.dispatchEvent(new Event('chessground.resize'));
           }

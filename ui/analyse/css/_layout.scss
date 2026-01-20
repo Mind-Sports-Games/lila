@@ -72,20 +72,6 @@ body {
     }
 
     // in case outer coords are forced for this game
-    $forced-outer-coords-variants: (
-      'shogi',
-      'minishogi',
-      'xiangqi',
-      'minixiangqi',
-      'flipello',
-      'flipello10',
-      'antiflipello',
-      'octagonflipello',
-      'oware',
-      'go9x9',
-      'go13x13',
-      'go19x19'
-    );
     @each $variant in $forced-outer-coords-variants {
       &.variant-#{$variant} &__underboard {
         margin-top: calc($block-gap * 2);

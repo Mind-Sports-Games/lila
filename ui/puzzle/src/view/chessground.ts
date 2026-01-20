@@ -1,4 +1,4 @@
-import changePlayerIndexHandle from 'common/coordsColor';
+import changeColorHandle from 'common/coordsColor';
 import resizeHandle from 'common/resize';
 import { Chessground } from 'chessground';
 import { Config as CgConfig } from 'chessground/config';
@@ -46,7 +46,7 @@ function makeConfig(ctrl: Controller): CgConfig {
       move: ctrl.userMove,
       insert(elements) {
         resizeHandle(elements, Prefs.ShowResizeHandle.Always, ctrl.vm.node.ply, _ => true);
-        if (ctrl.pref.coords === cg.Coords.Inside) changePlayerIndexHandle();
+        if (ctrl.pref.coords === cg.Coords.Inside) changeColorHandle();
       },
     },
     premovable: {
