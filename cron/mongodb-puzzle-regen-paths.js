@@ -29,6 +29,8 @@ const maxPathsPerGroup = 30;
 const sep = '|';
 
 const generation = Date.now();
+const retentionMs = 70 * 60 * 1000; // 70 minutes (make this slightly larger than the cron interval)
+const cutoff = Date.now() - retentionMs;
 
 pathNextColl.drop({});
 
@@ -291,14 +293,15 @@ variantKeys.forEach(variantkey => {
 
     if (!buggy) {
       const idPrefix = `${variantkey}${sep}${theme}${sep}`;
-      pathNextColl.aggregate([{ $merge: pathCollName }]); // much faster!
-      pathColl.deleteMany({ /* theme: theme */ _id: new RegExp('^' + idPrefix), gen: { $ne: generation } });
+      const mergeResult = pathNextColl.aggregate([{ $merge: pathCollName }]).toArray(); // blocks until merge is done
+      // Optionally check mergeResult for errors, but .toArray() will throw if the merge fails
+      pathColl.deleteMany({ /* theme: theme */ _id: new RegExp('^' + idPrefix), gen: { $lt: cutoff } });
     }
     pathNextColl.drop({});
   });
 });
 
 if (!anyBuggy) {
-  const res = pathColl.deleteMany({ gen: { $ne: generation } });
+  const res = pathColl.deleteMany({ gen: { $lt: cutoff } });
   if (verbose) print(`Deleted ${res.deletedCount} other gen paths`);
 }
