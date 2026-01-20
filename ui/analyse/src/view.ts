@@ -334,14 +334,14 @@ function forceNoCoords(ctrl: AnalyseCtrl) {
 }
 
 function forceOutterCoords(ctrl: AnalyseCtrl, v: boolean) {
-  if(v) {
+  if (v) {
     ctrl.chessground.displayCoordinates(cg.Coords.Outside);
     changeColorHandle();
   }
 }
 
 function forceInnerCoords(ctrl: AnalyseCtrl, v: boolean) {
-  if(v) {
+  if (v) {
     ctrl.chessground.displayCoordinates(cg.Coords.Inside);
     changeColorHandle();
   }
@@ -515,12 +515,19 @@ export default function (ctrl: AnalyseCtrl): VNode {
         )
       ),
     needsNoCoords =
-    (
-      ['shogi', 'minishogi', 'go9x9', 'go13x13', 'go19x19', 'flipello', 'flipello10', 'antiflipello', 'octagonflipello'].includes(variantKey) && (!!gaugeOn || !!playerBars)
-    ) ||
-    (
-      ['xiangqi', 'minixiangqi'].includes(variantKey) && !!playerBars // coordinates for xiangqi game family only label columns
-    ), // Oware has a short height, which means we can display coords, even with player bars
+      ([
+        'shogi',
+        'minishogi',
+        'go9x9',
+        'go13x13',
+        'go19x19',
+        'flipello',
+        'flipello10',
+        'antiflipello',
+        'octagonflipello',
+      ].includes(variantKey) &&
+        (!!gaugeOn || !!playerBars)) ||
+      (['xiangqi', 'minixiangqi'].includes(variantKey) && !!playerBars), // coordinates for xiangqi game family only label columns // Oware has a short height, which means we can display coords, even with player bars
     tour = relayTour(ctrl),
     fen = ctrl.node.fen;
 

@@ -1,7 +1,8 @@
 // these used to be enums in index.d.ts, had to instantiate them because enum values
 // cannot be imported by isolated modules
 
-export const enum Coords { // remains for draughtsround compatibility
+export const enum Coords {
+  // remains for draughtsround compatibility
   Hidden = 0,
   Inside = 1,
   Outside = 2,
