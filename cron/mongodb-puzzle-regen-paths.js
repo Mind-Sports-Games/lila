@@ -107,6 +107,7 @@ variantKeys.forEach(variantkey => {
 
     const themeMaxPathLength = Math.max(10, Math.min(maxPathLength, Math.round(nbPuzzles / 150)));
 
+    //Note dynamic bucket ranges existsed priviously for non mixed themes - we might want these back in future
     const bucketStages = [
       {
         $bucket: {
