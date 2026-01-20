@@ -2,10 +2,10 @@ import changeColorHandle from 'common/coordsColor';
 import resizeHandle from 'common/resize';
 import { Chessground } from 'chessground';
 import { Config as CgConfig } from 'chessground/config';
+import { Coords as CgCoords } from 'chessground/types';
 import { Controller } from '../interfaces';
 import { h, VNode } from 'snabbdom';
 import * as Prefs from 'common/prefs';
-import * as cg from 'chessground/types';
 
 export default function (ctrl: Controller): VNode {
   const config = makeConfig(ctrl);
@@ -46,7 +46,7 @@ function makeConfig(ctrl: Controller): CgConfig {
       move: ctrl.userMove,
       insert(elements) {
         resizeHandle(elements, Prefs.ShowResizeHandle.Always, ctrl.vm.node.ply, _ => true);
-        if (ctrl.pref.coords === cg.Coords.Inside) changeColorHandle();
+        if (ctrl.pref.coords === CgCoords.Inside) changeColorHandle();
       },
     },
     premovable: {

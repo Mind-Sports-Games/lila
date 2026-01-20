@@ -91,9 +91,17 @@ export default function (ctrl: Controller): VNode {
             if (gaugeOn && ctrl.pref.coords === CgCoords.Outside) {
               ctrl.pref.coords = CgCoords.Inside;
               changeColorHandle();
-            } else if (!gaugeOn && ctrl.pref.coords === CgCoords.Inside) {
-              ctrl.pref.coords = CgCoords.Outside;
+              const cg = ctrl.ground();
+              if (cg && typeof cg.set === 'function') {
+                cg.displayCoordinates(ctrl.pref.coords);
+              }
+            } else if (!gaugeOn) {
+              ctrl.pref.coords = ctrl.pref.userCoords;
               changeColorHandle();
+              const cg = ctrl.ground();
+              if (cg && typeof cg.set === 'function') {
+                cg.displayCoordinates(ctrl.pref.coords);
+              }
             }
             document.body.dispatchEvent(new Event('chessground.resize'));
           }

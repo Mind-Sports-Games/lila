@@ -112,6 +112,7 @@ export interface PuzzleOpts {
 
 export interface PuzzlePrefs {
   coords: CgCoords;
+  userCoords: CgCoords;
   is3d: boolean;
   destination: boolean;
   rookCastle: boolean;
