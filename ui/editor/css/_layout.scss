@@ -16,6 +16,28 @@
   grid-template-areas: 'spare-top' 'board' 'spare-bottom' 'tools' 'copyables';
 
   @include breakpoint($mq-landscape-mobile) {
+    $forced-outer-coords-variants: (
+      'shogi',
+      'minishogi',
+      'xiangqi',
+      'minixiangqi',
+      'flipello',
+      'flipello10',
+      'antiflipello',
+      'octagonflipello',
+      'oware',
+      'go9x9',
+      'go13x13',
+      'go19x19'
+    );
+    @each $variant in $forced-outer-coords-variants {
+      &.variant-#{$variant} {
+        grid-template-columns: minmax(30vmin, $board-width) 4vmin minmax(200px, 300px) !important;
+      }
+      &.variant-#{$variant} .spare-bottom {
+        margin-top: calc($block-gap * 2);
+      }
+    }
     .coords-out & {
       grid-template-columns: minmax(30vmin, $board-width) 4vmin minmax(200px, 300px) !important;
     }

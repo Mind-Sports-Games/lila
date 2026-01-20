@@ -1,6 +1,7 @@
 import { h, VNode } from 'snabbdom';
 import { parseFen } from 'stratops/fen';
 import * as chessground from './ground';
+import * as cg from 'chessground/types';
 import {
   bind,
   onInsert,
@@ -45,7 +46,6 @@ import renderPlayerBars from './study/playerBars';
 import { findTag } from './study/studyChapters';
 import serverSideUnderboard from './serverSideUnderboard';
 import * as gridHacks from './gridHacks';
-import * as Prefs from 'common/prefs';
 import { allowedForVariant as allowClientEvalForVariant, allowPracticeWithComputer, allowPv } from 'ceval/src/util';
 import { variantKeyToRules } from 'stratops/variants/util';
 
@@ -328,22 +328,21 @@ function controls(ctrl: AnalyseCtrl) {
 }
 
 function forceNoCoords(ctrl: AnalyseCtrl) {
-  if (ctrl.data.pref.coords !== Prefs.Coords.Hidden) {
-    $('body').toggleClass('coords-out', false).toggleClass('coords-in', false).toggleClass('coords-no', true);
-    changeColorHandle();
+  if (ctrl.data.pref.coords !== cg.Coords.Hidden) {
+    ctrl.chessground.displayCoordinates(cg.Coords.Hidden);
   }
 }
 
 function forceOutterCoords(ctrl: AnalyseCtrl, v: boolean) {
-  if (ctrl.data.pref.coords === Prefs.Coords.Inside) {
-    $('body').toggleClass('coords-out', v).toggleClass('coords-in', !v);
+  if(v) {
+    ctrl.chessground.displayCoordinates(cg.Coords.Outside);
     changeColorHandle();
   }
 }
 
 function forceInnerCoords(ctrl: AnalyseCtrl, v: boolean) {
-  if (ctrl.data.pref.coords === Prefs.Coords.Outside) {
-    $('body').toggleClass('coords-in', v).toggleClass('coords-out', !v);
+  if(v) {
+    ctrl.chessground.displayCoordinates(cg.Coords.Inside);
     changeColorHandle();
   }
 }
@@ -516,7 +515,12 @@ export default function (ctrl: AnalyseCtrl): VNode {
         )
       ),
     needsNoCoords =
-      ['xiangqi', 'shogi', 'minixiangqi', 'minishogi'].includes(variantKey) && (!!gaugeOn || !!playerBars),
+    (
+      ['shogi', 'minishogi', 'go9x9', 'go13x13', 'go19x19', 'flipello', 'flipello10', 'antiflipello', 'octagonflipello'].includes(variantKey) && (!!gaugeOn || !!playerBars)
+    ) ||
+    (
+      ['xiangqi', 'minixiangqi'].includes(variantKey) && !!playerBars // coordinates for xiangqi game family only label columns
+    ), // Oware has a short height, which means we can display coords, even with player bars
     tour = relayTour(ctrl),
     fen = ctrl.node.fen;
 

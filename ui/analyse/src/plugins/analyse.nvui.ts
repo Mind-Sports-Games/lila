@@ -4,6 +4,7 @@ import * as xhr from 'common/xhr';
 import AnalyseController from '../ctrl';
 import { makeConfig as makeCgConfig } from '../ground';
 import { Chessground } from 'chessground';
+import * as cg from 'chessground/types';
 import { Redraw, AnalyseData, MaybeVNodes } from '../interfaces';
 import { Player } from 'game';
 import {
@@ -58,7 +59,7 @@ playstrategy.AnalyseNVUI = function (redraw: Redraw) {
           ...makeCgConfig(ctrl),
           animation: { enabled: false },
           drawable: { enabled: false },
-          coordinates: false,
+          coordinates: cg.Coords.Hidden,
         });
       return h('main.analyse', [
         h('div.nvui', [

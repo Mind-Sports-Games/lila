@@ -129,7 +129,7 @@ function makeConfig(ctrl: EditorCtrl): CgConfig {
     },
     fen: ctrl.initialFen,
     orientation: ctrl.options.orientation || 'p1',
-    coordinates: !ctrl.cfg.embed,
+    coordinates: ctrl.cfg.embed ? cg.Coords.Hidden : document.body.classList.contains('coords-out') ? cg.Coords.Outside : cg.Coords.Inside,
     autoCastle: false,
     addPieceZIndex: ctrl.cfg.is3d,
     movable: {

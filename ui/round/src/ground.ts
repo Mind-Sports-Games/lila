@@ -38,7 +38,7 @@ export function makeConfig(ctrl: RoundController): Config {
     lastMove: stratUtils.lastMove(data.onlyDropsVariant, step.uci),
     captureLength: data.captureLength,
     check: !!step.check,
-    coordinates: data.pref.coords !== Prefs.Coords.Hidden,
+    coordinates: data.pref.coords,
     boardScores: ['togyzkumalak', 'bestemshe', 'backgammon', 'hyper', 'nackgammon'].includes(data.game.variant.key),
     dice: dice,
     doublingCube: doublingCube,
@@ -63,7 +63,7 @@ export function makeConfig(ctrl: RoundController): Config {
       dropNewPiece: hooks.onNewPiece,
       insert(elements) {
         resizeHandle(elements, ctrl.data.pref.resizeHandle, ctrl.ply);
-        if (data.pref.coords === Prefs.Coords.Inside) changeColorHandle();
+        if (data.pref.coords === cg.Coords.Inside) changeColorHandle();
       },
       select: hooks.onSelect,
       selectDice: hooks.onSelectDice,

@@ -245,7 +245,7 @@ export interface Pref {
   confirmResign: boolean;
   confirmPass: boolean;
   playForcedAction: boolean;
-  coords: Prefs.Coords;
+  coords: cg.Coords;
   destination: boolean;
   playerTurnIndicator: boolean;
   enablePremove: boolean;

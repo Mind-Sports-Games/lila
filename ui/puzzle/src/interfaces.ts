@@ -2,6 +2,7 @@ import PuzzleSession from './session';
 import { Api as CgApi } from 'chessground/api';
 import { CevalCtrl, NodeEvals } from 'ceval';
 import { Config as CgConfig } from 'chessground/config';
+import * as cg from 'chessground/types';
 import { Deferred } from 'common/defer';
 import { Outcome, Role, Move } from 'stratops/types';
 import { Prop } from 'common';
@@ -9,7 +10,7 @@ import { StoredBooleanProp } from 'common/storage';
 import { TreeWrapper } from 'tree';
 import { VNode } from 'snabbdom';
 import PuzzleStreak from './streak';
-import * as Prefs from 'common/prefs';
+
 
 export type MaybeVNode = VNode | string | null | undefined;
 export type MaybeVNodes = MaybeVNode[];
@@ -111,7 +112,7 @@ export interface PuzzleOpts {
 }
 
 export interface PuzzlePrefs {
-  coords: Prefs.Coords;
+  coords: cg.Coords;
   is3d: boolean;
   destination: boolean;
   rookCastle: boolean;

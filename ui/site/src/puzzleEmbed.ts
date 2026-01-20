@@ -1,4 +1,5 @@
 import { Chessground } from 'chessground';
+import * as cg from 'chessground/types';
 
 window.Chessground = Chessground;
 //TODO fix this for puzzle embeds (/training/daily/puzzle)
@@ -9,7 +10,7 @@ window.onload = () => {
   board.innerHTML = '<div class="cg-wrap">';
 
   Chessground(board.firstChild as HTMLElement, {
-    coordinates: false,
+    coordinates: cg.Coords.Hidden,
     resizable: false,
     drawable: { enabled: false, visible: false },
     viewOnly: true,

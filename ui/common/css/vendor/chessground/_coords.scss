@@ -1,12 +1,12 @@
 $go-variants: ('go9x9', 'go13x13', 'go19x19');
 
-coords {
-  /* handle hidden coords */
-  .coords-no & {
-    display: none;
-  }
+/* hidden coords */
+cg-coords-container.hidden-coords {
+  display: none;
+}
 
-  /* handle inner coords */
+/* inner coords */
+coords {
   position: absolute;
   display: flex;
   pointer-events: none;
@@ -216,7 +216,7 @@ coords {
     }
   }
 
-  //Handle togy corrds as they are always inside the board
+  // togy coords are always inside the board
   .variant-togyzkumalak &,
   .variant-bestemshe & {
     text-shadow:
@@ -355,75 +355,29 @@ coords {
 
 @import 'coords-colors';
 
-/* negate inner coords for given games */
 @include breakpoint($mq-col1-uniboard) {
-  .coords-out .variant-shogi coords {
-    display: none;
-  }
+  $forced-outer-coords-variants: (
+    'shogi',
+    'minishogi',
+    'xiangqi',
+    'minixiangqi',
+    'flipello',
+    'flipello10',
+    'antiflipello',
+    'octagonflipello',
+    'oware',
+    'go9x9',
+    'go13x13',
+    'go19x19'
+  );
 
-  .coords-out .variant-minishogi coords {
-    display: none;
-  }
-
-  .coords-out .variant-xiangqi coords {
-    display: none;
-  }
-
-  .coords-out .variant-minixiangqi coords {
-    display: none;
-  }
-
-  .coords-out .variant-flipello coords {
-    display: none;
-  }
-
-  .coords-out .variant-flipello10 coords {
-    display: none;
-  }
-
-  .coords-out .variant-antiflipello coords {
-    display: none;
-  }
-
-  .coords-out .variant-octagonflipello coords {
-    display: none;
-  }
-
-  .coords-out .variant-oware coords {
-    display: none;
-  }
-
-  .coords-out .variant-backgammon coords {
-    display: none;
-  }
-
-  .coords-out .variant-nackgammon coords {
-    display: none;
-  }
-
-  .coords-out .variant-hyper coords {
-    display: none;
-  }
-
-  .coords-out .variant-togyzkumalak coords {
-    display: none;
-  }
-
-  .coords-out .variant-bestemshe coords {
-    display: none;
-  }
-
-  .coords-out .variant-abalone coords {
-    display: none;
-  }
-
-  @each $variant in $go-variants {
-    .coords-out .variant-#{$variant} coords {
+  // prevent outer coords to show in 1col layout
+  @each $variant in $forced-outer-coords-variants {
+    .variant-#{$variant} cg-coords-container.outer-coords {
       display: none;
     }
   }
 
-  //always show for Togy and make smaller
   .variant-togyzkumalak .orientation-p1 coords.files,
   .variant-bestemshe .orientation-p1 coords.files {
     &.p1 {
@@ -443,7 +397,6 @@ coords {
     }
   }
 
-  //always show for backgammon single column and make smaller
   .variant-nackgammon .orientation-p1 coords.files,
   .variant-hyper .orientation-p1 coords.files,
   .variant-backgammon .orientation-p1 coords.files {
@@ -467,22 +420,20 @@ coords {
 }
 
 @include breakpoint($mq-landscape-mobile) {
-  .coords-out coords {
-    &.ranks {
+  cg-coords-container.outer-coords {
+    .ranks {
       right: -10px !important;
     }
   }
 
-  //dont show xiangqi coords
-  .coords-out .variant-xiangqi coords {
+  .variant-xiangqi cg-coords-container.outer-coords {
     display: none;
   }
 
-  .coords-out .variant-minixiangqi coords {
+  .variant-minixiangqi cg-coords-container.outer-coords {
     display: none;
   }
 
-  //always show for Togy and make smaller
   .variant-togyzkumalak .orientation-p1 coords.files,
   .variant-bestemshe .orientation-p1 coords.files {
     &.p1 {
@@ -502,7 +453,6 @@ coords {
     }
   }
 
-  //always show for backgammon single column and make smaller
   .variant-nackgammon .orientation-p1 coords.files,
   .variant-hyper .orientation-p1 coords.files,
   .variant-backgammon .orientation-p1 coords.files {
@@ -525,9 +475,9 @@ coords {
   }
 }
 
-/* handle outer coords */
+/* outer coords */
 @include breakpoint($mq-col2-uniboard) {
-  .coords-out coords {
+  cg-coords-container.outer-coords coords {
     text-shadow: none;
 
     &.ranks {
@@ -551,7 +501,7 @@ coords {
     }
   }
 
-  .coords-out .orientation-right coords {
+  .orientation-right cg-coords-container.outer-coords coords {
     &.ranks.right {
       bottom: -15px;
       top: unset;
@@ -576,7 +526,7 @@ coords {
     }
   }
 
-  .coords-out .orientation-p2 coords {
+  .orientation-p2 cg-coords-container.outer-coords coords {
     &.files.p2 {
       bottom: -15px;
     }
@@ -585,7 +535,7 @@ coords {
     }
   }
 
-  .coords-out .orientation-p1 coords {
+  .orientation-p1 cg-coords-container.outer-coords coords {
     &.files.p2 {
       top: -15px;
     }
@@ -594,8 +544,9 @@ coords {
     }
   }
 
+  // Go specific outer coords adjustments
   @each $variant in $go-variants {
-    .coords-out .variant-#{$variant} .ranks {
+    .variant-#{$variant} cg-coords-container.outer-coords .ranks {
       &.p1,
       &.p2 {
         top: -4px;
