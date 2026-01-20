@@ -1,4 +1,4 @@
-import { Controller, Puzzle, PuzzleGame, MaybeVNode, PuzzleDifficulty } from '../interfaces';
+import { Controller, Puzzle, PuzzleGame, MaybeVNode } from '../interfaces';
 import { dataIcon, onInsert, bind } from '../util';
 import { h, VNode } from 'snabbdom';
 import { numberFormat } from 'common/number';
@@ -148,13 +148,14 @@ export const userBox = (ctrl: Controller): VNode => {
 export const streakBox = (ctrl: Controller) =>
   h('div.puzzle__side__user', renderStreak(ctrl.streak!, ctrl.trans.noarg));
 
-const difficulties: [PuzzleDifficulty, number][] = [
-  ['easiest', -600],
-  ['easier', -300],
-  ['normal', 0],
-  ['harder', 300],
-  ['hardest', 600],
-];
+// While we have 1 large bucket of puzzles we don't want to show difficulty selector
+// const difficulties: [PuzzleDifficulty, number][] = [
+//   ['easiest', -600],
+//   ['easier', -300],
+//   ['normal', 0],
+//   ['harder', 300],
+//   ['hardest', 600],
+// ];
 
 const variants: [string, string][] = [
   ['standard', 'Chess'],
@@ -206,53 +207,54 @@ export function config(ctrl: Controller): MaybeVNode {
       ]),
       h('label', { attrs: { for: id } }, ctrl.trans.noarg('jumpToNextPuzzleImmediately')),
     ]),
-    !ctrl.getData().replay && !ctrl.streak && ctrl.difficulty
-      ? h(
-          'form.puzzle__side__config__difficulty',
-          {
-            attrs: {
-              action: `/training/${ctrl.getData().game.variant.key}/difficulty/${ctrl.getData().theme.key}`,
-              method: 'post',
-            },
-          },
-          [
-            h(
-              'label',
-              {
-                attrs: { for: 'puzzle-difficulty' },
-              },
-              ctrl.trans.noarg('difficultyLevel'),
-            ),
-            h(
-              'select#puzzle-difficulty.puzzle__difficulty__selector',
-              {
-                attrs: { name: 'difficulty' },
-                hook: onInsert(elm =>
-                  elm.addEventListener('change', () => (elm.parentNode as HTMLFormElement).submit()),
-                ),
-              },
-              difficulties.map(([key, delta]) =>
-                h(
-                  'option',
-                  {
-                    attrs: {
-                      value: key,
-                      selected: key == ctrl.difficulty,
-                      title:
-                        !!delta &&
-                        ctrl.trans.plural(
-                          delta < 0 ? 'nbPointsBelowYourPuzzleRating' : 'nbPointsAboveYourPuzzleRating',
-                          Math.abs(delta),
-                        ),
-                    },
-                  },
-                  [ctrl.trans.noarg(key), delta ? ` (${delta > 0 ? '+' : ''}${delta})` : ''],
-                ),
-              ),
-            ),
-          ],
-        )
-      : null,
+    // While we have 1 large bucket of puzzles we don't want to show difficulty selector
+    // !ctrl.getData().replay && !ctrl.streak && ctrl.difficulty
+    //   ? h(
+    //       'form.puzzle__side__config__difficulty',
+    //       {
+    //         attrs: {
+    //           action: `/training/${ctrl.getData().game.variant.key}/difficulty/${ctrl.getData().theme.key}`,
+    //           method: 'post',
+    //         },
+    //       },
+    //       [
+    //         h(
+    //           'label',
+    //           {
+    //             attrs: { for: 'puzzle-difficulty' },
+    //           },
+    //           ctrl.trans.noarg('difficultyLevel'),
+    //         ),
+    //         h(
+    //           'select#puzzle-difficulty.puzzle__difficulty__selector',
+    //           {
+    //             attrs: { name: 'difficulty' },
+    //             hook: onInsert(elm =>
+    //               elm.addEventListener('change', () => (elm.parentNode as HTMLFormElement).submit()),
+    //             ),
+    //           },
+    //           difficulties.map(([key, delta]) =>
+    //             h(
+    //               'option',
+    //               {
+    //                 attrs: {
+    //                   value: key,
+    //                   selected: key == ctrl.difficulty,
+    //                   title:
+    //                     !!delta &&
+    //                     ctrl.trans.plural(
+    //                       delta < 0 ? 'nbPointsBelowYourPuzzleRating' : 'nbPointsAboveYourPuzzleRating',
+    //                       Math.abs(delta),
+    //                     ),
+    //                 },
+    //               },
+    //               [ctrl.trans.noarg(key), delta ? ` (${delta > 0 ? '+' : ''}${delta})` : ''],
+    //             ),
+    //           ),
+    //         ),
+    //       ],
+    //     )
+    //   : null,
     !ctrl.getData().replay && !ctrl.streak
       ? !ctrl.getData().user
         ? // For anonymous users, use a select and redirect on change

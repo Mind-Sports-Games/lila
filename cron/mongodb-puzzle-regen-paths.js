@@ -29,6 +29,8 @@ const maxPathsPerGroup = 30;
 const sep = '|';
 
 const generation = Date.now();
+const retentionMs = 70 * 60 * 1000; // 70 minutes (make this slightly larger than the cron interval)
+const cutoff = Date.now() - retentionMs;
 
 pathNextColl.drop({});
 
@@ -42,8 +44,8 @@ const tiers = [
 //   100, 650, 800, 900, 1000, 1100, 1200, 1270, 1340, 1410, 1480, 1550, 1620, 1690, 1760, 1830, 1900, 2000, 2100, 2200,
 //   2350, 2500, 2650, 2800, 9999,
 // ];
-//Due to lack of initial puzzles we require fewer buckets for reduced mix paths to allow grouping of mate-1 (1000) + mate-2 (1200)
-const reducedMixBoundaries = [100, 650, 900, 1400, 1900, 2500, 9999];
+//Due to lack of initial puzzles we essentially want one large bucket for all puzzles.
+const reducedMixBoundaries = [100, 500, 4000, 9999];
 
 const themes = puzzleColl.distinct('themes', {}).filter(t => t && t != 'checkFirst');
 
@@ -104,30 +106,16 @@ variantKeys.forEach(variantkey => {
     if (!nbPuzzles) return [];
 
     const themeMaxPathLength = Math.max(10, Math.min(maxPathLength, Math.round(nbPuzzles / 150)));
-    const nbRatingBuckets =
-      theme == 'mix'
-        ? reducedMixBoundaries.length - 1
-        : Math.max(3, Math.min(maxRatingBuckets, Math.round(nbPuzzles / themeMaxPathLength / 15)));
 
-    const bucketStages =
-      theme == 'mix'
-        ? [
-            {
-              $bucket: {
-                ...bucketBase,
-                boundaries: reducedMixBoundaries,
-              },
-            },
-            { $addFields: { _id: { min: '$_id' } } },
-          ]
-        : [
-            {
-              $bucketAuto: {
-                ...bucketBase,
-                buckets: nbRatingBuckets,
-              },
-            },
-          ];
+    //Note dynamic bucket ranges existsed priviously for non mixed themes - we might want these back in future
+    const bucketStages = [
+      {
+        $bucket: {
+          ...bucketBase,
+          boundaries: reducedMixBoundaries,
+        },
+      },
+    ];
 
     const pipeline = [
       {
@@ -226,9 +214,7 @@ variantKeys.forEach(variantkey => {
     ];
 
     if (verbose)
-      print(
-        `varaint: ${variantkey}, theme: ${theme}, puzzles: ${nbPuzzles}, path length: ${themeMaxPathLength}, rating buckets: ${nbRatingBuckets}`,
-      );
+      print(`varaint: ${variantkey}, theme: ${theme}, puzzles: ${nbPuzzles}, path length: ${themeMaxPathLength}`);
 
     let prevTier = '',
       indexInTier = 0,
@@ -245,15 +231,14 @@ variantKeys.forEach(variantkey => {
           indexInTier = 0;
           prevTier = bucket.tier;
         }
-        const isFirstOfTier = indexInTier == 0;
-        const isLastOfTier = indexInTier == nbRatingBuckets - 1;
         const pathLength = Math.max(10, Math.min(maxPathLength, Math.round(bucket.puzzles.length / 30)));
-        const ratingMin = isFirstOfTier ? 100 : Math.ceil(bucket._id.min);
-        const ratingMax = isLastOfTier
-          ? 9999
-          : theme == 'mix'
-            ? reducedMixBoundaries[indexInTier + 1]
-            : Math.floor(bucket._id.max);
+        const bucketIndex = reducedMixBoundaries.indexOf(bucket._id);
+        const ratingMin = bucket._id;
+        const ratingMax =
+          bucketIndex >= 0 && bucketIndex < reducedMixBoundaries.length - 1
+            ? reducedMixBoundaries[bucketIndex + 1]
+            : 9999;
+
         const nbPaths = Math.max(1, Math.floor(bucket.puzzles.length / pathLength));
         const allPaths = chunkify(bucket.puzzles, nbPaths);
         const paths = allPaths.slice(0, maxPathsPerGroup);
@@ -286,14 +271,15 @@ variantKeys.forEach(variantkey => {
 
     if (!buggy) {
       const idPrefix = `${variantkey}${sep}${theme}${sep}`;
-      pathNextColl.aggregate([{ $merge: pathCollName }]); // much faster!
-      pathColl.deleteMany({ /* theme: theme */ _id: new RegExp('^' + idPrefix), gen: { $ne: generation } });
+      const mergeResult = pathNextColl.aggregate([{ $merge: pathCollName }]).toArray(); // blocks until merge is done
+      // Optionally check mergeResult for errors, but .toArray() will throw if the merge fails
+      pathColl.deleteMany({ /* theme: theme */ _id: new RegExp('^' + idPrefix), gen: { $lt: cutoff } });
     }
     pathNextColl.drop({});
   });
 });
 
 if (!anyBuggy) {
-  const res = pathColl.deleteMany({ gen: { $ne: generation } });
+  const res = pathColl.deleteMany({ gen: { $lt: cutoff } });
   if (verbose) print(`Deleted ${res.deletedCount} other gen paths`);
 }
