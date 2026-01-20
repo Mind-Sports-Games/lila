@@ -44,8 +44,8 @@ const tiers = [
 //   100, 650, 800, 900, 1000, 1100, 1200, 1270, 1340, 1410, 1480, 1550, 1620, 1690, 1760, 1830, 1900, 2000, 2100, 2200,
 //   2350, 2500, 2650, 2800, 9999,
 // ];
-//Due to lack of initial puzzles we require fewer buckets for reduced mix paths to allow grouping of mate-1 (1000) + mate-2 (1200)
-const reducedMixBoundaries = [100, 650, 900, 1100, 1300, 1900, 2500, 9999];
+//Due to lack of initial puzzles we essentially want one large bucket for all puzzles.
+const reducedMixBoundaries = [100, 500, 4000, 9999];
 
 const themes = puzzleColl.distinct('themes', {}).filter(t => t && t != 'checkFirst');
 
