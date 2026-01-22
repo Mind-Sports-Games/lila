@@ -109,11 +109,13 @@ function formatClockTime(
   showDelayTime: boolean,
   nvui: boolean,
 ) {
-  const displayDate = new Date(Math.max(0, time - delay));
-  const tickDate = new Date(time);
+  const timeInt = Math.round(time),
+    delayInt = Math.round(delay),
+    displayDate = new Date(Math.max(0, timeInt - delayInt)),
+    tickDate = new Date(timeInt);
   if (nvui)
     return (
-      (time >= 3600000 ? Math.floor(time / 3600000) + 'H:' : '') +
+      (timeInt >= 3600000 ? Math.floor(timeInt / 3600000) + 'H:' : '') +
       displayDate.getUTCMinutes() +
       'M:' +
       displayDate.getUTCSeconds() +
@@ -123,10 +125,10 @@ function formatClockTime(
     tickMillis = tickDate.getUTCMilliseconds(),
     sep = isRunning && tickMillis < 500 ? sepLow : sepHigh,
     baseStr = pad2(displayDate.getUTCMinutes()) + sep + pad2(displayDate.getUTCSeconds()),
-    delayString = '<delay>' + pad2(Math.ceil(delay / 1000)) + '</delay>';
+    delayString = '<delay>' + pad2(Math.ceil(delayInt / 1000)) + '</delay>';
 
-  if (time >= 3600000) {
-    const hours = pad2(Math.floor(time / 3600000));
+  if (timeInt >= 3600000) {
+    const hours = pad2(Math.floor(timeInt / 3600000));
     let delayStr = '';
     if (showDelayTime) delayStr += delayString;
     return hours + sepHigh + baseStr + delayStr;
@@ -134,7 +136,7 @@ function formatClockTime(
     return baseStr + delayString;
   } else if (showTenths) {
     let tenthsStr = Math.floor(displayMillis / 100).toString();
-    if (!isRunning && time < 1000) {
+    if (!isRunning && timeInt < 1000) {
       tenthsStr += '<huns>' + (Math.floor(displayMillis / 10) % 10) + '</huns>';
     }
     return baseStr + '<tenths><sep>.</sep>' + tenthsStr + '</tenths>';
