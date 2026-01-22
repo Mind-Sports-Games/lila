@@ -183,7 +183,13 @@ function showBar(ctrl: RoundController, playerIndex: PlayerIndex) {
   });
 }
 
-export function updateElements(clock: ClockController, els: ClockElements, millis: Millis, delayMillis: Millis, playerIndex: PlayerIndex) {
+export function updateElements(
+  clock: ClockController,
+  els: ClockElements,
+  millis: Millis,
+  delayMillis: Millis,
+  playerIndex: PlayerIndex,
+) {
   if (els.time) {
     els.time.innerHTML = formatClockTime(
       millis,

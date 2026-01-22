@@ -319,7 +319,14 @@ export class ClockController {
       this.nextPeriod(playerIndex);
       this.opts.redraw();
     } else if (millis === 0) this.opts.onFlag();
-    else updateElements(this, this.elements[playerIndex], millis, this.delayMillisOf(playerIndex, playerIndex, true, now), playerIndex);
+    else
+      updateElements(
+        this,
+        this.elements[playerIndex],
+        millis,
+        this.delayMillisOf(playerIndex, playerIndex, true, now),
+        playerIndex,
+      );
 
     if (this.opts.soundPlayerIndex === playerIndex) {
       if (this.emergSound.playable[playerIndex]) {
@@ -357,7 +364,12 @@ export class ClockController {
       ? Math.max(0, this.times[playerIndex] - this.elapsed(now))
       : this.times[playerIndex];
 
-  delayMillisOf = (playerIndex: PlayerIndex, activePlayerInGame: PlayerIndex, isRunning: boolean, now = performance.now()): Millis => {
+  delayMillisOf = (
+    playerIndex: PlayerIndex,
+    activePlayerInGame: PlayerIndex,
+    isRunning: boolean,
+    now = performance.now(),
+  ): Millis => {
     const isBerserk = this.goneBerserk[playerIndex];
     const countDown = isBerserk ? Math.ceil((this.countdownDelay ?? 0) / 2) : (this.countdownDelay ?? 0);
     const delayMillis = 1000 * countDown;
