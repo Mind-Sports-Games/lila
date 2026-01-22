@@ -35,8 +35,9 @@ export function renderClock(ctrl: RoundController, player: game.Player, position
   const update = (el: HTMLElement) => {
     const els = clock.elements[player.playerIndex],
       isRunning = isClockRunning && ctrl.data.game.player === player.playerIndex,
-      millis = clock.millisOf(player.playerIndex),
-      delayMillis = clock.delayMillisOf(player.playerIndex, ctrl.data.game.player, isRunning);
+      now = performance.now(),
+      millis = clock.millisOf(player.playerIndex, now),
+      delayMillis = clock.delayMillisOf(player.playerIndex, ctrl.data.game.player, isRunning, now);
     els.time = el;
     els.clock = el.parentElement!;
     el.innerHTML = formatClockTime(
@@ -182,16 +183,14 @@ function showBar(ctrl: RoundController, playerIndex: PlayerIndex) {
   });
 }
 
-export function updateElements(clock: ClockController, els: ClockElements, millis: Millis, playerIndex: PlayerIndex) {
-  const delayMillis = clock.delayMillisOf(playerIndex, playerIndex, true),
-    showDelayTime = clock.countdownDelay !== undefined;
+export function updateElements(clock: ClockController, els: ClockElements, millis: Millis, delayMillis: Millis, playerIndex: PlayerIndex) {
   if (els.time) {
     els.time.innerHTML = formatClockTime(
       millis,
       delayMillis,
       clock.showTenths(millis),
       true,
-      showDelayTime,
+      clock.countdownDelay !== undefined,
       clock.opts.nvui,
     );
     updateClassList(els.time.classList, clock, playerIndex, playerIndex === clock.times.activePlayerIndex, millis);
