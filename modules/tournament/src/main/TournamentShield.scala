@@ -382,7 +382,7 @@ object TournamentShield {
           Condition.TeamMember("playstrategy-flipello", "PlayStrategy Othello"),
           othelloVariants,
           randomOthelloVariantOrder,
-          Blitz53,
+          Rapid8,
           Some(4),
           7,
           14,
@@ -423,7 +423,7 @@ object TournamentShield {
           Condition.TeamMember("playstrategy-mancala", "PlayStrategy Mancala"),
           mancalaVariants,
           mancalaVariantOrder,
-          Blitz53,
+          Blitz52,
           Some(1),
           7,
           14,
@@ -460,7 +460,7 @@ object TournamentShield {
           Condition.TeamMember("playstrategy-mancala", "PlayStrategy Mancala"),
           togyzkumalakVariants,
           togyzkumalakVariantOrder,
-          Blitz53,
+          Blitz52,
           Some(3),
           6,
           16,
@@ -495,7 +495,7 @@ object TournamentShield {
           Condition.TeamMember("playstrategy-backgammon", "PlayStrategy Backgammon"),
           backgammonVariants,
           randomBackgammonVariantOrder,
-          Delay310,
+          Delay210,
           Some(1),
           6,
           16,
@@ -530,7 +530,7 @@ object TournamentShield {
           Condition.TeamMember("playstrategy-breakthrough", "PlayStrategy Breakthrough"),
           breakthroughVariants,
           breakthroughVariantOrder,
-          Blitz53,
+          Blitz32,
           Some(4),
           6,
           16,
@@ -581,7 +581,7 @@ object TournamentShield {
           Condition.TeamMember("playstrategy-medleys", "PlayStrategy Medleys"),
           chessgammonVariants,
           chessgammonMedleyGeneration,
-          Delay310,
+          Delay210,
           Some(1),
           7,
           16,
@@ -708,7 +708,7 @@ object TournamentShield {
     case object Horde
         extends Category(
           Variant.Chess(strategygames.chess.variant.Horde),
-          Blitz32,
+          Blitz53,
           16
         )
 
@@ -758,35 +758,35 @@ object TournamentShield {
     case object International
         extends Category(
           Variant.Draughts(strategygames.draughts.variant.Standard),
-          Blitz32,
+          Blitz53,
           3
         )
 
     case object Frisian
         extends Category(
           Variant.Draughts(strategygames.draughts.variant.Frisian),
-          Blitz32,
+          Blitz53,
           12
         )
 
     case object Frysk
         extends Category(
           Variant.Draughts(strategygames.draughts.variant.Frysk),
-          Blitz32,
+          Blitz21,
           22
         )
 
     case object Antidraughts
         extends Category(
           Variant.Draughts(strategygames.draughts.variant.Antidraughts),
-          Blitz32,
+          Blitz53,
           9
         )
 
     case object Breakthrough
         extends Category(
           Variant.Draughts(strategygames.draughts.variant.Breakthrough),
-          Blitz32,
+          Blitz53,
           19
         )
 
@@ -830,7 +830,7 @@ object TournamentShield {
     case object Dameo
         extends Category(
           Variant.Dameo(strategygames.dameo.variant.Dameo),
-          Blitz32,
+          Blitz53,
           16,
           1
         )
@@ -866,21 +866,21 @@ object TournamentShield {
     case object Flipello
         extends Category(
           Variant.FairySF(strategygames.fairysf.variant.Flipello),
-          Blitz32,
+          Blitz,
           10
         )
 
     case object Flipello10
         extends Category(
           Variant.FairySF(strategygames.fairysf.variant.Flipello10),
-          Blitz32,
+          Rapid8,
           27
         )
 
     case object AntiFlipello
         extends Category(
           Variant.FairySF(strategygames.fairysf.variant.AntiFlipello),
-          Blitz32,
+          Blitz,
           18,
           1
         )
@@ -888,7 +888,7 @@ object TournamentShield {
     case object OctagonFlipello
         extends Category(
           Variant.FairySF(strategygames.fairysf.variant.OctagonFlipello),
-          Blitz32,
+          Rapid8,
           6,
           1
         )
@@ -896,7 +896,7 @@ object TournamentShield {
     case object Amazons
         extends Category(
           Variant.FairySF(strategygames.fairysf.variant.Amazons),
-          Blitz32,
+          Blitz35,
           25,
           1
         )
@@ -912,7 +912,7 @@ object TournamentShield {
     case object MiniBreakthroughTroyka
         extends Category(
           Variant.FairySF(strategygames.fairysf.variant.MiniBreakthroughTroyka),
-          Blitz32,
+          Blitz21,
           8,
           1
         )
@@ -927,7 +927,7 @@ object TournamentShield {
     case object Togyzkumalak
         extends Category(
           Variant.Togyzkumalak(strategygames.togyzkumalak.variant.Togyzkumalak),
-          Blitz53,
+          Blitz52,
           26,
           1
         )
@@ -941,42 +941,42 @@ object TournamentShield {
     case object Go9x9
         extends Category(
           Variant.Go(strategygames.go.variant.Go9x9),
-          Blitz32,
+          Byoyomi210x5,
           24,
           1
         )
     case object Go13x13
         extends Category(
           Variant.Go(strategygames.go.variant.Go13x13),
-          Blitz53,
+          Byoyomi310x5,
           12,
           1
         )
     case object Go19x19
         extends Category(
           Variant.Go(strategygames.go.variant.Go19x19),
-          Blitz53,
+          Byoyomi510x5,
           1,
           1
         )
     case object Backgammon
         extends Category(
           Variant.Backgammon(strategygames.backgammon.variant.Backgammon),
-          Delay310,
+          Delay1510,
           22,
           1
         )
     case object Hyper
         extends Category(
           Variant.Backgammon(strategygames.backgammon.variant.Hyper),
-          Delay310,
+          Delay110,
           17,
           1
         )
     case object Nackgammon
         extends Category(
           Variant.Backgammon(strategygames.backgammon.variant.Nackgammon),
-          Delay310,
+          Delay210,
           7,
           1
         )
