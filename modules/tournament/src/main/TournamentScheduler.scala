@@ -360,49 +360,49 @@ final private class TournamentScheduler(
     // Practise locally, can always delete any newly created tournaments and try again
     val weeklyVariants: List[(Variant, Schedule.Speed)] = List(
       (Variant.Chess(strategygames.chess.variant.LinesOfAction), Blitz32),
-      (Variant.FairySF(strategygames.fairysf.variant.OctagonFlipello), Blitz32),
+      (Variant.FairySF(strategygames.fairysf.variant.OctagonFlipello), Rapid8),
       (Variant.Chess(strategygames.chess.variant.FiveCheck), Blitz32),
-      (Variant.Draughts(strategygames.draughts.variant.Frysk), Blitz32),
-      (Variant.FairySF(strategygames.fairysf.variant.Amazons), Blitz32),
-      (Variant.Chess(strategygames.chess.variant.Horde), Blitz32),
+      (Variant.Draughts(strategygames.draughts.variant.Frysk), Blitz21),
+      (Variant.FairySF(strategygames.fairysf.variant.Amazons), Blitz35),
+      (Variant.Chess(strategygames.chess.variant.Horde), Blitz53),
       (Variant.Togyzkumalak(strategygames.togyzkumalak.variant.Bestemshe), Blitz32),
-      (Variant.FairySF(strategygames.fairysf.variant.MiniBreakthroughTroyka), Blitz32),
+      (Variant.FairySF(strategygames.fairysf.variant.MiniBreakthroughTroyka), Blitz21),
       (Variant.Abalone(strategygames.abalone.variant.Abalone), Blitz53),
       (Variant.Draughts(strategygames.draughts.variant.Portuguese), Blitz32),
       (Variant.Samurai(strategygames.samurai.variant.Oware), Blitz32),
       (Variant.Chess(strategygames.chess.variant.Antichess), Blitz32),
-      (Variant.Draughts(strategygames.draughts.variant.Standard), Blitz32),
-      (Variant.Go(strategygames.go.variant.Go9x9), Blitz32),
+      (Variant.Draughts(strategygames.draughts.variant.Standard), Blitz53),
+      (Variant.Go(strategygames.go.variant.Go9x9), Byoyomi210x5),
       (Variant.FairySF(strategygames.fairysf.variant.Xiangqi), Blitz53),
       (Variant.Chess(strategygames.chess.variant.Monster), Blitz32),
       (Variant.Chess(strategygames.chess.variant.KingOfTheHill), Blitz32),
-      (Variant.FairySF(strategygames.fairysf.variant.AntiFlipello), Blitz32),
+      (Variant.FairySF(strategygames.fairysf.variant.AntiFlipello), Blitz),
       (Variant.Draughts(strategygames.draughts.variant.Brazilian), Blitz32),
       (Variant.FairySF(strategygames.fairysf.variant.Shogi), Byoyomi510),
       (Variant.FairySF(strategygames.fairysf.variant.BreakthroughTroyka), Blitz32),
       (Variant.Chess(strategygames.chess.variant.RacingKings), Blitz32),
       (Variant.Draughts(strategygames.draughts.variant.Russian), Blitz32),
-      (Variant.FairySF(strategygames.fairysf.variant.Flipello10), Blitz32),
-      (Variant.Backgammon(strategygames.backgammon.variant.Backgammon), Delay310),
+      (Variant.FairySF(strategygames.fairysf.variant.Flipello10), Rapid8),
+      (Variant.Backgammon(strategygames.backgammon.variant.Backgammon), Delay1510),
       (Variant.Chess(strategygames.chess.variant.NoCastling), Blitz32),
-      (Variant.Draughts(strategygames.draughts.variant.Frisian), Blitz32),
-      (Variant.Togyzkumalak(strategygames.togyzkumalak.variant.Togyzkumalak), Blitz53),
+      (Variant.Draughts(strategygames.draughts.variant.Frisian), Blitz53),
+      (Variant.Togyzkumalak(strategygames.togyzkumalak.variant.Togyzkumalak), Blitz52),
       (Variant.Chess(strategygames.chess.variant.Chess960), Blitz32),
       (Variant.Draughts(strategygames.draughts.variant.English), Blitz32),
       (Variant.Chess(strategygames.chess.variant.ScrambledEggs), Blitz32),
       (Variant.Chess(strategygames.chess.variant.ThreeCheck), Blitz32),
       (Variant.FairySF(strategygames.fairysf.variant.MiniXiangqi), Blitz32),
-      (Variant.Backgammon(strategygames.backgammon.variant.Hyper), Delay310),
-      (Variant.Dameo(strategygames.dameo.variant.Dameo), Blitz32),
-      (Variant.Go(strategygames.go.variant.Go13x13), Blitz53),
-      (Variant.Backgammon(strategygames.backgammon.variant.Nackgammon), Delay310),
+      (Variant.Backgammon(strategygames.backgammon.variant.Hyper), Delay110),
+      (Variant.Dameo(strategygames.dameo.variant.Dameo), Blitz53),
+      (Variant.Go(strategygames.go.variant.Go13x13), Byoyomi310x5),
+      (Variant.Backgammon(strategygames.backgammon.variant.Nackgammon), Delay210),
       (Variant.Chess(strategygames.chess.variant.Standard), Blitz32),
-      (Variant.Draughts(strategygames.draughts.variant.Antidraughts), Blitz32),
+      (Variant.Draughts(strategygames.draughts.variant.Antidraughts), Blitz53),
       (Variant.FairySF(strategygames.fairysf.variant.MiniShogi), Byoyomi35),
       (Variant.Chess(strategygames.chess.variant.Atomic), Blitz32),
-      (Variant.Go(strategygames.go.variant.Go19x19), Blitz53),
-      (Variant.Draughts(strategygames.draughts.variant.Breakthrough), Blitz32),
-      (Variant.FairySF(strategygames.fairysf.variant.Flipello), Blitz32),
+      (Variant.Go(strategygames.go.variant.Go19x19), Byoyomi510x5),
+      (Variant.Draughts(strategygames.draughts.variant.Breakthrough), Blitz53),
+      (Variant.FairySF(strategygames.fairysf.variant.Flipello), Blitz),
       (Variant.Chess(strategygames.chess.variant.Crazyhouse), Blitz32),
       (Variant.Draughts(strategygames.draughts.variant.Pool), Blitz32)
     )
@@ -431,7 +431,7 @@ final private class TournamentScheduler(
       scheduleYearly24hr(Variant.Chess(strategygames.chess.variant.Standard), Blitz32)(
         new DateTime(2026, 1, 2, 0, 0)
       ),
-      scheduleYearly24hr(Variant.Draughts(strategygames.draughts.variant.Antidraughts), Blitz32)(
+      scheduleYearly24hr(Variant.Draughts(strategygames.draughts.variant.Antidraughts), Blitz53)(
         new DateTime(2026, 1, 9, 0, 0)
       ),
       scheduleYearly24hr(Variant.FairySF(strategygames.fairysf.variant.MiniShogi), Byoyomi35)(
@@ -440,16 +440,16 @@ final private class TournamentScheduler(
       scheduleYearly24hr(Variant.Chess(strategygames.chess.variant.Atomic), Blitz32)(
         new DateTime(2026, 1, 23, 0, 0)
       ),
-      scheduleYearly24hr(Variant.Backgammon(strategygames.backgammon.variant.Hyper), Delay310)(
+      scheduleYearly24hr(Variant.Backgammon(strategygames.backgammon.variant.Hyper), Delay110)(
         new DateTime(2026, 1, 30, 0, 0)
       ),
-      scheduleYearly24hr(Variant.Draughts(strategygames.draughts.variant.Breakthrough), Blitz32)(
+      scheduleYearly24hr(Variant.Draughts(strategygames.draughts.variant.Breakthrough), Blitz53)(
         new DateTime(2026, 2, 6, 0, 0)
       ),
-      scheduleYearly24hr(Variant.Go(strategygames.go.variant.Go13x13), Blitz53)(
+      scheduleYearly24hr(Variant.Go(strategygames.go.variant.Go13x13), Byoyomi310x5)(
         new DateTime(2026, 2, 13, 0, 0)
       ),
-      scheduleYearly24hr(Variant.FairySF(strategygames.fairysf.variant.Flipello), Blitz32)(
+      scheduleYearly24hr(Variant.FairySF(strategygames.fairysf.variant.Flipello), Blitz)(
         new DateTime(2026, 2, 20, 0, 0)
       ),
       scheduleYearly24hr(Variant.Chess(strategygames.chess.variant.Crazyhouse), Blitz32)(
@@ -464,13 +464,13 @@ final private class TournamentScheduler(
       scheduleYearly24hr(Variant.Chess(strategygames.chess.variant.FiveCheck), Blitz32)(
         new DateTime(2026, 3, 20, 0, 0)
       ),
-      scheduleYearly24hr(Variant.Draughts(strategygames.draughts.variant.Frysk), Blitz32)(
+      scheduleYearly24hr(Variant.Draughts(strategygames.draughts.variant.Frysk), Blitz21)(
         new DateTime(2026, 3, 27, 0, 0)
       ),
-      scheduleYearly24hr(Variant.FairySF(strategygames.fairysf.variant.Amazons), Blitz32)(
+      scheduleYearly24hr(Variant.FairySF(strategygames.fairysf.variant.Amazons), Blitz35)(
         new DateTime(2026, 4, 3, 0, 0)
       ),
-      scheduleYearly24hr(Variant.Chess(strategygames.chess.variant.Horde), Blitz32)(
+      scheduleYearly24hr(Variant.Chess(strategygames.chess.variant.Horde), Blitz53)(
         new DateTime(2026, 4, 10, 0, 0)
       ),
       scheduleYearly24hr(Variant.Draughts(strategygames.draughts.variant.Portuguese), Blitz32)(
@@ -482,7 +482,7 @@ final private class TournamentScheduler(
       scheduleYearly24hr(Variant.Chess(strategygames.chess.variant.Antichess), Blitz32)(
         new DateTime(2026, 5, 1, 0, 0)
       ),
-      scheduleYearly24hr(Variant.Backgammon(strategygames.backgammon.variant.Nackgammon), Delay310)(
+      scheduleYearly24hr(Variant.Backgammon(strategygames.backgammon.variant.Nackgammon), Delay210)(
         new DateTime(2026, 5, 8, 0, 0)
       ),
       scheduleYearly24hr(Variant.FairySF(strategygames.fairysf.variant.Xiangqi), Blitz53)(
@@ -492,7 +492,7 @@ final private class TournamentScheduler(
         new DateTime(2026, 5, 22, 0, 0)
       ),
       //skip 29th May 2026 for UKGE tournaments...
-      scheduleYearly24hr(Variant.Go(strategygames.go.variant.Go19x19), Blitz53)(
+      scheduleYearly24hr(Variant.Go(strategygames.go.variant.Go19x19), Byoyomi510x5)(
         new DateTime(2026, 6, 5, 0, 0)
       ),
       scheduleYearly24hr(Variant.FairySF(strategygames.fairysf.variant.Shogi), Byoyomi510)(
@@ -504,7 +504,7 @@ final private class TournamentScheduler(
       scheduleYearly24hr(Variant.Draughts(strategygames.draughts.variant.Russian), Blitz32)(
         new DateTime(2026, 6, 26, 0, 0)
       ),
-      scheduleYearly24hr(Variant.FairySF(strategygames.fairysf.variant.Flipello10), Blitz32)(
+      scheduleYearly24hr(Variant.FairySF(strategygames.fairysf.variant.Flipello10), Rapid8)(
         new DateTime(2026, 7, 3, 0, 0)
       ),
       scheduleYearly24hr(Variant.Chess(strategygames.chess.variant.NoCastling), Blitz32)(
@@ -512,15 +512,15 @@ final private class TournamentScheduler(
       ),
       scheduleYearly24hr(
         Variant.FairySF(strategygames.fairysf.variant.MiniBreakthroughTroyka),
-        Blitz32
+        Blitz21
       )(
         new DateTime(2026, 7, 17, 0, 0)
       ),
       //no gap for birthday tournament in 2026. Maybe we do it on the actual birthday 21st July.
-      scheduleYearly24hr(Variant.Draughts(strategygames.draughts.variant.Frisian), Blitz32)(
+      scheduleYearly24hr(Variant.Draughts(strategygames.draughts.variant.Frisian), Blitz53)(
         new DateTime(2026, 7, 24, 0, 0)
       ),
-      scheduleYearly24hr(Variant.Togyzkumalak(strategygames.togyzkumalak.variant.Togyzkumalak), Blitz53)(
+      scheduleYearly24hr(Variant.Togyzkumalak(strategygames.togyzkumalak.variant.Togyzkumalak), Blitz52)(
         new DateTime(2026, 7, 31, 0, 0)
       ),
       scheduleYearly24hr(Variant.Chess(strategygames.chess.variant.Chess960), Blitz32)(
@@ -544,13 +544,13 @@ final private class TournamentScheduler(
       scheduleYearly24hr(Variant.Abalone(strategygames.abalone.variant.Abalone), Blitz53)(
         new DateTime(2026, 9, 18, 0, 0)
       ),
-      scheduleYearly24hr(Variant.Backgammon(strategygames.backgammon.variant.Backgammon), Delay310)(
+      scheduleYearly24hr(Variant.Backgammon(strategygames.backgammon.variant.Backgammon), Delay1510)(
         new DateTime(2026, 9, 25, 0, 0)
       ),
-      scheduleYearly24hr(Variant.Draughts(strategygames.draughts.variant.Standard), Blitz32)(
+      scheduleYearly24hr(Variant.Draughts(strategygames.draughts.variant.Standard), Blitz53)(
         new DateTime(2026, 10, 2, 0, 0)
       ),
-      scheduleYearly24hr(Variant.Go(strategygames.go.variant.Go9x9), Blitz32)(
+      scheduleYearly24hr(Variant.Go(strategygames.go.variant.Go9x9), Byoyomi210x5)(
         new DateTime(2026, 10, 9, 0, 0)
       ),
       scheduleYearly24hr(
@@ -559,7 +559,7 @@ final private class TournamentScheduler(
       )(
         new DateTime(2026, 10, 16, 0, 0)
       ),
-      scheduleYearly24hr(Variant.FairySF(strategygames.fairysf.variant.AntiFlipello), Blitz32)(
+      scheduleYearly24hr(Variant.FairySF(strategygames.fairysf.variant.AntiFlipello), Blitz)(
         new DateTime(2026, 10, 23, 0, 0)
       ),
       scheduleYearly24hr(Variant.Togyzkumalak(strategygames.togyzkumalak.variant.Bestemshe), Blitz32)(
@@ -568,10 +568,10 @@ final private class TournamentScheduler(
       scheduleYearly24hr(Variant.Draughts(strategygames.draughts.variant.Brazilian), Blitz32)(
         new DateTime(2026, 11, 6, 0, 0)
       ),
-      scheduleYearly24hr(Variant.FairySF(strategygames.fairysf.variant.OctagonFlipello), Blitz32)(
+      scheduleYearly24hr(Variant.FairySF(strategygames.fairysf.variant.OctagonFlipello), Rapid8)(
         new DateTime(2026, 11, 13, 0, 0)
       ),
-      scheduleYearly24hr(Variant.Dameo(strategygames.dameo.variant.Dameo), Blitz32)(
+      scheduleYearly24hr(Variant.Dameo(strategygames.dameo.variant.Dameo), Blitz53)(
         new DateTime(2026, 11, 20, 0, 0)
       ),
     ).flatten filter { _.schedule.at isAfter rightNow }

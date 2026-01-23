@@ -263,23 +263,32 @@ object Schedule {
     val key  = lila.common.String lcfirst name
   }
   object Speed {
-    case object UltraBullet extends Speed(5)
-    case object HyperBullet extends Speed(10)
-    case object Bullet      extends Speed(20)
-    case object HippoBullet extends Speed(25)
-    case object SuperBlitz  extends Speed(30)
-    case object Blitz       extends Speed(40)
-    case object Rapid       extends Speed(50)
-    case object Classical   extends Speed(60)
-    case object Blitz32     extends Speed(70)
-    case object Blitz35     extends Speed(75)
-    case object Blitz51     extends Speed(80)
-    case object Blitz53     extends Speed(85)
-    case object Blitz55     extends Speed(90)
-    case object Delay212    extends Speed(212)
-    case object Byoyomi35   extends Speed(305)
-    case object Delay310    extends Speed(310)
-    case object Byoyomi510  extends Speed(510)
+    case object UltraBullet  extends Speed(5)
+    case object HyperBullet  extends Speed(10)
+    case object Bullet       extends Speed(20)
+    case object HippoBullet  extends Speed(25)
+    case object SuperBlitz   extends Speed(30)
+    case object Blitz        extends Speed(40)
+    case object Rapid8       extends Speed(48)
+    case object Rapid        extends Speed(50)
+    case object Classical    extends Speed(60)
+    case object Blitz21      extends Speed(65)
+    case object Blitz32      extends Speed(70)
+    case object Blitz35      extends Speed(75)
+    case object Blitz51      extends Speed(80)
+    case object Blitz52      extends Speed(82)
+    case object Blitz53      extends Speed(85)
+    case object Blitz55      extends Speed(90)
+    case object Delay110     extends Speed(110)
+    case object Delay1510    extends Speed(115)
+    case object Delay210     extends Speed(210)
+    case object Delay212     extends Speed(212)
+    case object Byoyomi210x5 extends Speed(215)
+    case object Byoyomi35    extends Speed(305)
+    case object Delay310     extends Speed(310)
+    case object Byoyomi310x5 extends Speed(315)
+    case object Byoyomi510   extends Speed(510)
+    case object Byoyomi510x5 extends Speed(515)
     val all: List[Speed] =
       List(
         UltraBullet,
@@ -288,17 +297,26 @@ object Schedule {
         HippoBullet,
         SuperBlitz,
         Blitz,
+        Blitz21,
         Blitz32,
         Blitz35,
         Blitz51,
+        Blitz52,
         Blitz53,
         Blitz55,
+        Rapid8,
+        Rapid,
+        Classical,
+        Delay110,
+        Delay1510,
+        Delay210,
         Delay212,
         Delay310,
+        Byoyomi210x5,
         Byoyomi35,
+        Byoyomi310x5,
         Byoyomi510,
-        Rapid,
-        Classical
+        Byoyomi510x5
       )
     val mostPopular: List[Speed] = List(Bullet, Blitz, Rapid, Classical)
     def apply(key: String)       = all.find(_.key == key) orElse all.find(_.key.toLowerCase == key.toLowerCase)
@@ -311,6 +329,8 @@ object Schedule {
         case _                                                       => false
       }
     def fromClock(clock: ClockConfig) =
+      //TODO Rewrite this as basing on estimates isn't great. Also consider if we want to match
+      //specific Fischer clocks. We do for Byoyomi and Simple but not Fischer.
       clock match {
         case _: ByoyomiClock.Config => {
           val time = clock.estimateTotalSeconds
@@ -319,7 +339,7 @@ object Schedule {
         }
         case Clock.SimpleDelayConfig(_, _) => {
           val time = clock.estimateTotalSeconds
-          if (time <= (180 + 10 * 25)) Delay310
+          if (time <= (180 + 10 * 40)) Delay310
           else Delay212
         }
         case Clock.Config(_, _) | Clock.BronsteinConfig(_, _) => {
@@ -334,11 +354,13 @@ object Schedule {
         }
         // NOTE: not using case _ => here, because we want an error when a new clock is added.
       }
+
     def toPerfType(speed: Speed) =
+      //TODO Consider if we want to match against other clock types
       speed match {
         case UltraBullet                        => PerfType.orDefaultSpeed("ultraBullet")
         case HyperBullet | Bullet | HippoBullet => PerfType.orDefaultSpeed("bullet")
-        case SuperBlitz | Blitz | Blitz32 | Blitz35 | Blitz51 | Blitz53 | Blitz55 =>
+        case SuperBlitz | Blitz | Blitz21 | Blitz32 | Blitz35 | Blitz51 | Blitz52 | Blitz53 | Blitz55 =>
           PerfType.orDefaultSpeed("blitz")
         case Rapid     => PerfType.orDefaultSpeed("rapid")
         case Classical => PerfType.orDefaultSpeed("classical")
@@ -440,31 +462,40 @@ object Schedule {
     val SDC = Clock.SimpleDelayConfig
 
     (s.freq, s.variant, s.speed) match {
-      // Special cases.
-      case (Weekend, strategygames.variant.Variant.Chess(Crazyhouse), Blitz)                 => zhEliteTc(s)
-      case (Hourly, strategygames.variant.Variant.Chess(Crazyhouse), SuperBlitz) if zhInc(s) => TC(3 * 60, 1)
-      case (Hourly, strategygames.variant.Variant.Chess(Crazyhouse), Blitz) if zhInc(s)      => TC(4 * 60, 2)
-      case (Hourly, strategygames.variant.Variant.Chess(Standard), Blitz) if standardInc(s)  => TC(3 * 60, 2)
+      // lichess Special cases.
+      //case (Weekend, strategygames.variant.Variant.Chess(Crazyhouse), Blitz)                 => zhEliteTc(s)
+      //case (Hourly, strategygames.variant.Variant.Chess(Crazyhouse), SuperBlitz) if zhInc(s) => TC(3 * 60, 1)
+      //case (Hourly, strategygames.variant.Variant.Chess(Crazyhouse), Blitz) if zhInc(s)      => TC(4 * 60, 2)
+      //case (Hourly, strategygames.variant.Variant.Chess(Standard), Blitz) if standardInc(s)  => TC(3 * 60, 2)
 
       case (Shield, variant, Blitz) if variant.exotic => TC(3 * 60, 2)
 
-      case (_, _, UltraBullet) => TC(15, 0)
-      case (_, _, HyperBullet) => TC(30, 0)
-      case (_, _, Bullet)      => TC(60, 0)
-      case (_, _, HippoBullet) => TC(2 * 60, 0)
-      case (_, _, SuperBlitz)  => TC(3 * 60, 0)
-      case (_, _, Blitz)       => TC(5 * 60, 0)
-      case (_, _, Blitz32)     => TC(3 * 60, 2)
-      case (_, _, Blitz35)     => TC(3 * 60, 5)
-      case (_, _, Blitz51)     => TC(5 * 60, 1)
-      case (_, _, Blitz53)     => TC(5 * 60, 3)
-      case (_, _, Blitz55)     => TC(5 * 60, 5)
-      case (_, _, Delay212)    => SDC(2 * 60, 12)
-      case (_, _, Delay310)    => SDC(3 * 60, 10)
-      case (_, _, Byoyomi510)  => BC(5 * 60, 0, 10, 1)
-      case (_, _, Byoyomi35)   => BC(3 * 60, 0, 5, 1)
-      case (_, _, Rapid)       => TC(10 * 60, 0)
-      case (_, _, Classical)   => TC(20 * 60, 10)
+      case (_, _, UltraBullet)  => TC(15, 0)
+      case (_, _, HyperBullet)  => TC(30, 0)
+      case (_, _, Bullet)       => TC(60, 0)
+      case (_, _, HippoBullet)  => TC(2 * 60, 0)
+      case (_, _, SuperBlitz)   => TC(3 * 60, 0)
+      case (_, _, Blitz)        => TC(5 * 60, 0)
+      case (_, _, Blitz21)      => TC(2 * 60, 1)
+      case (_, _, Blitz32)      => TC(3 * 60, 2)
+      case (_, _, Blitz35)      => TC(3 * 60, 5)
+      case (_, _, Blitz51)      => TC(5 * 60, 1)
+      case (_, _, Blitz52)      => TC(5 * 60, 2)
+      case (_, _, Blitz53)      => TC(5 * 60, 3)
+      case (_, _, Blitz55)      => TC(5 * 60, 5)
+      case (_, _, Rapid8)       => TC(8 * 60, 0)
+      case (_, _, Rapid)        => TC(10 * 60, 0)
+      case (_, _, Classical)    => TC(20 * 60, 10)
+      case (_, _, Delay110)     => SDC(60, 10)
+      case (_, _, Delay1510)    => SDC(90, 10)
+      case (_, _, Delay210)     => SDC(2 * 60, 10)
+      case (_, _, Delay212)     => SDC(2 * 60, 12)
+      case (_, _, Delay310)     => SDC(3 * 60, 10)
+      case (_, _, Byoyomi210x5) => BC(2 * 60, 0, 10, 5)
+      case (_, _, Byoyomi35)    => BC(3 * 60, 0, 5, 1)
+      case (_, _, Byoyomi310x5) => BC(3 * 60, 0, 10, 5)
+      case (_, _, Byoyomi510)   => BC(5 * 60, 0, 10, 1)
+      case (_, _, Byoyomi510x5) => BC(5 * 60, 0, 10, 5)
     }
   }
   private[tournament] def addCondition(s: Schedule) =
