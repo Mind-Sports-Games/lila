@@ -274,6 +274,7 @@
   <string name="playerIndexTimeOut">%s time out</string>
   <string name="whiteTimeOut">White time out</string>
   <string name="blackTimeOut">Black time out</string>
+  <string name="playerIndexDidntMove">%s did not move</string>
   <string name="playerIndexLosesByGammonTimeOut">%s time out, and loses a gammon</string>
   <string name="playerIndexLosesByBackgammonTimeOut">%s time out, and loses a backgammon</string>
   <string name="playerIndexWinsByRuleOfGin">%s time out, but win by rule of gin</string>
