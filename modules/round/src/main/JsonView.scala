@@ -190,7 +190,6 @@ final class JsonView(
           .add("possibleDropsByRole" -> possibleDropsByrole(pov))
           .add("possibleLifts" -> possibleLifts(pov))
           .add("cubeActions" -> possibleCubeActions(pov))
-          .add("multiActionMetaData" -> multiActionMetaData(pov))
           .add("selectMode" -> selectMode(pov))
           .add("selectedSquares" -> pov.game.metadata.selectedSquares.map(_.map(_.toString)))
           .add("deadStoneOfferState" -> pov.game.metadata.deadStoneOfferState.map(_.name))
@@ -481,30 +480,6 @@ final class JsonView(
       }
       case _ => None
     }
-
-  private def multiActionMetaData(pov: Pov): Option[JsObject] = {
-    pov.game.variant.key match {
-      case "monster"    => multiActionMetaJson(pov)
-      case "amazons"    => multiActionMetaJson(pov)
-      case "backgammon" => multiActionMetaJson(pov)
-      case "hyper"      => multiActionMetaJson(pov)
-      case "nackgammon" => multiActionMetaJson(pov)
-      case _            => None
-    }
-  }
-
-  private def multiActionMetaJson(pov: Pov): Option[JsObject] = {
-    //TODO future multiaction games may not end turn on the same action, and this will need to be fixed
-    pov.game.situation.actions.headOption.flatMap(_ match {
-      case m: StratMove        => Some(Json.obj("couldNextActionEndTurn" -> m.autoEndTurn))
-      case d: StratDrop        => Some(Json.obj("couldNextActionEndTurn" -> d.autoEndTurn))
-      case l: StratLift        => Some(Json.obj("couldNextActionEndTurn" -> l.autoEndTurn))
-      case dr: StratDiceRoll   => Some(Json.obj("couldNextActionEndTurn" -> dr.autoEndTurn))
-      case ca: StratCubeAction => Some(Json.obj("couldNextActionEndTurn" -> ca.autoEndTurn))
-      case _: StratEndTurn     => Some(Json.obj("couldNextActionEndTurn" -> true))
-      case _                   => None
-    })
-  }
 
   private def selectMode(pov: Pov): Boolean = {
     pov.game.situation match {

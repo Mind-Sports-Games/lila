@@ -274,7 +274,7 @@ export default class RoundController {
       ackable: true,
     };
     if (this.clock) {
-      socketOpts.withLag = !this.shouldSendMoveTime || !this.clock.isRunning();
+      socketOpts.withLag = !this.shouldSendMoveTime || !this.clock.times.activePlayerIndex !== undefined;
       if (meta.premove && this.shouldSendMoveTime) {
         this.clock.hardStopClock();
         socketOpts.millis = 0;
@@ -496,7 +496,7 @@ export default class RoundController {
     this.moveOn.next();
     this.setQuietMode();
     this.setLoading(false);
-    if (this.clock && o.clock && this.clock.byoyomiData) {
+    if (this.clock && o.clock && this.clock.byoyomiData)
       this.clock.setClock(
         d,
         o.clock.p1 * 0.01,
@@ -506,8 +506,7 @@ export default class RoundController {
         o.clock.p1Periods,
         o.clock.p2Periods,
       );
-    }
-    if (this.clock && o.clock)
+    else if (this.clock && o.clock)
       this.clock.setClock(d, o.clock.p1 * 0.01, o.clock.p2 * 0.01, o.clock.p1Pending * 0.01, o.clock.p2Pending * 0.01);
     this.redraw();
     this.autoScroll();
