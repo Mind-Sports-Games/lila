@@ -57,6 +57,7 @@
   @include breakpoint($mq-col2) {
     @include breakpoint($mq-tall) {
       flex: 1 0 17rem;
+      justify-content: space-between;
     }
   }
 
@@ -65,6 +66,15 @@
 
   &:not(.after) {
     padding: 2em;
+  }
+
+  .title {
+    display: flex;
+    align-items: center;
+    font-weight: bold;
+    .icon {
+      margin-right: 10px;
+    }
   }
 
   .player {

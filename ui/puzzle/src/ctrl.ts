@@ -44,10 +44,10 @@ export default function (opts: PuzzleOpts, redraw: Redraw): Controller {
     };
     streakFailStorage.listen(_ => failStreak(streak));
   }
-  const session = new PuzzleSession(opts.data.theme.key, opts.data.user?.id, hasStreak);
+  const session = new PuzzleSession(opts.data.theme.key, opts.data.game.variant.key, opts.data.user?.id, hasStreak);
 
   // required by ceval
-  vm.showComputer = () => vm.mode === 'view' && allowClientEvalForVariant(vm.variant);
+  vm.showComputer = () => vm.mode === 'view' && allowClientEvalForVariant(vm.variant.key);
   vm.showAutoShapes = () => true;
 
   const throttleSound = (name: string) => throttle(100, () => playstrategy.sound.play(name));
@@ -88,9 +88,10 @@ export default function (opts: PuzzleOpts, redraw: Redraw): Controller {
     vm.initialPath = initialPath;
     vm.initialNode = tree.nodeAtPath(initialPath);
     vm.pov = vm.initialNode.ply % 2 === 1 ? 'p2' : 'p1'; //vm.initialNode.playerIndex;
-    vm.variant = data.game.variant.key;
+    vm.variant = data.game.variant;
     vm.dimensions = data.game.variant.boardSize;
     vm.playerColors = data.game.players.map(p => p.playerColor);
+    vm.perfIcon = data.puzzle.perf.icon;
 
     setPath(treePath.init(initialPath));
     setTimeout(() => {
@@ -116,7 +117,7 @@ export default function (opts: PuzzleOpts, redraw: Redraw): Controller {
 
   function position(): Position {
     const setup = parseFen(rules)(vm.node.fen).unwrap();
-    return variantClassFromKey(vm.variant).fromSetup(setup).unwrap();
+    return variantClassFromKey(vm.variant.key).fromSetup(setup).unwrap();
   }
 
   function makeCgOpts(): CgConfig {
@@ -146,8 +147,8 @@ export default function (opts: PuzzleOpts, redraw: Redraw): Controller {
       check: !!node.check,
       lastMove: uciToLastMove(node.uci),
       dimensions: { width: vm.dimensions.width, height: vm.dimensions.height },
-      variant: vm.variant as cg.Variant,
-      chess960: vm.variant === 'chess960',
+      variant: vm.variant.key as cg.Variant,
+      chess960: vm.variant.key === 'chess960',
     };
     if (node.ply >= vm.initialNode.ply) {
       if (vm.mode !== 'view' && playerIndex !== vm.pov && !nextNode) {
@@ -268,7 +269,7 @@ export default function (opts: PuzzleOpts, redraw: Redraw): Controller {
       vm.lastFeedback = 'good';
       setTimeout(
         () => {
-          const pos = variantClassFromKey(vm.variant).fromSetup(parseFen(rules)(progress.fen).unwrap()).unwrap();
+          const pos = variantClassFromKey(vm.variant.key).fromSetup(parseFen(rules)(progress.fen).unwrap()).unwrap();
           sendMoveAt(progress.path, pos, progress.move);
         },
         opts.pref.animation.duration * (autoNext() ? 1 : 1.5),
@@ -427,7 +428,7 @@ export default function (opts: PuzzleOpts, redraw: Redraw): Controller {
   function viewSolution(): void {
     sendResult(false);
     vm.mode = 'view';
-    mergeSolution(vm.variant, tree, vm.initialPath, data.puzzle.solution, vm.pov);
+    mergeSolution(vm.variant.key, tree, vm.initialPath, data.puzzle.solution, vm.pov);
     reorderChildren(vm.initialPath, true);
 
     // try and play the solution next move
@@ -481,7 +482,7 @@ export default function (opts: PuzzleOpts, redraw: Redraw): Controller {
   };
 
   initiate(opts.data);
-  const rules: Rules = variantKeyToRules(vm.variant);
+  const rules: Rules = variantKeyToRules(vm.variant.key);
 
   const promotion = makePromotion(vm, ground, redraw);
 

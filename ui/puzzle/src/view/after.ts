@@ -60,7 +60,7 @@ const renderStreak = (ctrl: Controller): MaybeVNodes => [
 export default function (ctrl: Controller): VNode {
   const data = ctrl.getData();
   const win = ctrl.vm.lastFeedback == 'win';
-  const canUseCeval = allowClientEvalForVariant(ctrl.vm.variant);
+  const canUseCeval = allowClientEvalForVariant(ctrl.vm.variant.key);
   return h(
     'div.puzzle__feedback.after',
     ctrl.streak && !win

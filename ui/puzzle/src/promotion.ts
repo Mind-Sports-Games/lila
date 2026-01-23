@@ -18,7 +18,7 @@ export default function (vm: Vm, getGround: Prop<CgApi>, redraw: Redraw): Promot
   ): boolean {
     const ground = getGround(),
       piece = ground.state.pieces.get(dest);
-    if (['shogi', 'minishogi'].includes(vm.variant) && piece && piece.role === role) {
+    if (['shogi', 'minishogi'].includes(vm.variant.key) && piece && piece.role === role) {
       // shogi decision not to promote
       callback(orig, dest, undefined);
     } else {
@@ -31,7 +31,7 @@ export default function (vm: Vm, getGround: Prop<CgApi>, redraw: Redraw): Promot
   function start(orig: Key, dest: Key, callback: (orig: Key, key: Key, prom: cg.Role) => void) {
     const ground = getGround(),
       piece = ground.state.pieces.get(dest),
-      variantKey = vm.variant;
+      variantKey = vm.variant.key;
     if (promotion.possiblePromotion(ground, orig, dest, variantKey)) {
       if (variantKey === 'shogi' && promotion.forcedShogiPromotion(ground, orig, dest)) {
         const role = piece!.role;
@@ -158,7 +158,7 @@ export default function (vm: Vm, getGround: Prop<CgApi>, redraw: Redraw): Promot
     view() {
       if (!promoting) return;
       const piece = getGround().state.pieces.get(promoting.dest),
-        variantKey = vm.variant,
+        variantKey = vm.variant.key,
         rolesToChoose =
           variantKey === 'shogi' || variantKey === 'minishogi'
             ? (['p' + piece?.role, piece?.role] as cg.Role[])

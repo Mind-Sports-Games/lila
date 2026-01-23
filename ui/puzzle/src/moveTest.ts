@@ -39,7 +39,7 @@ export default function moveTest(vm: Vm, puzzle: Puzzle): MoveTestReturn {
   vm.node.puzzle = 'good';
 
   return {
-    move: parseUci(variantKeyToRules(vm.variant))(nextUci)!,
+    move: parseUci(variantKeyToRules(vm.variant.key))(nextUci)!,
     fen: vm.node.fen,
     path: vm.path,
   };
