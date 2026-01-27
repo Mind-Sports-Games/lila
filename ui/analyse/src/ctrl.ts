@@ -167,8 +167,8 @@ export default class AnalyseCtrl {
       : undefined;
     this.studyPractice = this.study ? this.study.practice : undefined;
 
-
-    if (!this.embed) { // initialize variant for dasher
+    if (!this.embed) {
+      // initialize variant for dasher
       playstrategy.pageVariant = this.data.game.variant.key;
     }
 

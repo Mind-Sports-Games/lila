@@ -182,7 +182,9 @@ coords {
 
 .variant-flipello {
   cg-coords-container.inner-coords {
-    coords.ranks, coords.files { // higher specificity to override default chess variant
+    coords.ranks,
+    coords.files {
+      // higher specificity to override default chess variant
       coord {
         text-shadow: var(--cg-coord-shadow-flipello);
         color: var(--cg-coord-color-flipello-p1);
@@ -192,7 +194,8 @@ coords {
 }
 .variant-flipello10 {
   cg-coords-container.inner-coords {
-    coords.ranks, coords.files {
+    coords.ranks,
+    coords.files {
       coord {
         text-shadow: var(--cg-coord-shadow-flipello10);
         color: var(--cg-coord-color-flipello-p1);
@@ -202,7 +205,8 @@ coords {
 }
 .variant-antiflipello {
   cg-coords-container.inner-coords {
-    coords.ranks, coords.files {
+    coords.ranks,
+    coords.files {
       coord {
         text-shadow: var(--cg-coord-shadow-antiflipello);
         color: var(--cg-coord-color-antiflipello-p1);
