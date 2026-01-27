@@ -68,6 +68,22 @@ const changeColorHandle = (): void => {
     'amazons-purple': '#9f90b0 #7d4a8d',
     'breakthroughtroyka-purple-diag': '#E5DAF0 #957AB0',
     'breakthroughtroyka-maple': '#e8ceab #bc7944',
+    'dameo-blue': '#DEE3E6 #788a94',
+    'dameo-blue2': '#97b2c7 #546f82',
+    'dameo-blue3': '#d9e0e6 #315991',
+    'dameo-canvas': '#d7daeb #547388',
+    'dameo-wood': '#d8a45b #9b4d0f',
+    'dameo-wood2': '#a38b5d #6c5017',
+    'dameo-wood3': '#d0ceca #755839',
+    'dameo-maple': '#e8ceab #bc7944',
+    'dameo-leather': '#d1d1c9 #c28e16',
+    'dameo-green': '#FFFFDD #6d8753',
+    'dameo-brown': '#F0D9B5 #946f51',
+    'dameo-marble': '#93ab91 #4f644e',
+    'dameo-grey': '#b8b8b8 #7d7d7d',
+    'dameo-metal': '#c9c9c9 #727272',
+    'dameo-olive': '#b8b19f #6d6655',
+    'dameo-purple': '#9f90b0 #7d4a8d',
   };
 
   for (const theme of document.body.className.split(' ')) {

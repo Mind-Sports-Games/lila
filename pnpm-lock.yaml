@@ -13,7 +13,7 @@ importers:
         version: https://codeload.github.com/lichess-org/ab-stub/tar.gz/94236bf34dbc9c05daf50f4c9842d859b9142be0
       chessground:
         specifier: github:Mind-Sports-Games/chessground#pla-1438-fix-inner-coordinates-for-board-editor
-        version: https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/5ae47803ce6c2365132bfb6eb95ff31e6f495baa
+        version: https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/e3fcc2cb86cbc531d7f7139e7d9a476a322ffc80
       stratops:
         specifier: github:Mind-Sports-Games/stratops#v0.8.1-pstrat5.23
         version: https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/c8b03feb6f3ba7a98f95132d27cd0978e4e63e2c
@@ -47,7 +47,7 @@ importers:
         version: 7.1.0
       prettier:
         specifier: ^3.5.3
-        version: 3.8.0
+        version: 3.8.1
       typescript:
         specifier: ^5.9.2
         version: 5.9.3
@@ -71,7 +71,7 @@ importers:
         version: 0.2.13
       '@yaireo/tagify':
         specifier: ^4.32.0
-        version: 4.36.0(prop-types@15.8.1)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
+        version: 4.36.0(prop-types@15.8.1)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
       ceval:
         specifier: workspace:*
         version: link:../ceval
@@ -433,7 +433,7 @@ importers:
         version: 0.3.10
       '@yaireo/tagify':
         specifier: ^4.32.0
-        version: 4.36.0(prop-types@15.8.1)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
+        version: 4.36.0(prop-types@15.8.1)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
       chat:
         specifier: workspace:*
         version: link:../chat
@@ -840,8 +840,8 @@ packages:
     resolution: {tarball: https://codeload.github.com/ornicar/chess.js/tar.gz/ad0709c0b07773d9d0da8e4605a9a2a28f00d249}
     version: 0.10.2
 
-  chessground@https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/5ae47803ce6c2365132bfb6eb95ff31e6f495baa:
-    resolution: {tarball: https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/5ae47803ce6c2365132bfb6eb95ff31e6f495baa}
+  chessground@https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/e3fcc2cb86cbc531d7f7139e7d9a476a322ffc80:
+    resolution: {tarball: https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/e3fcc2cb86cbc531d7f7139e7d9a476a322ffc80}
     version: 7.11.1-pstrat3.24
     engines: {node: ^20.19.4, pnpm: ^10.17.0}
 
@@ -1300,8 +1300,8 @@ packages:
     resolution: {integrity: sha512-vkcDPrRZo1QZLbn5RLGPpg/WmIQ65qoWWhcGKf/b5eplkkarX0m9z8ppCat4mlOqUsWpyNuYgO3VRyrYHSzX5g==}
     engines: {node: '>= 0.8.0'}
 
-  prettier@3.8.0:
-    resolution: {integrity: sha512-yEPsovQfpxYfgWNhCfECjG5AQaO+K3dp6XERmOepyPDVqcJm+bjyCVO3pmU+nAPe0N5dDvekfGezt/EIiRe1TA==}
+  prettier@3.8.1:
+    resolution: {integrity: sha512-UOnG6LftzbdaHZcKoPFtOcCKztrQ57WkHDeRD9t/PTQtmT0NHSeWWepj6pS0z/N7+08BHFDQVUrfmfMRcZwbMg==}
     engines: {node: '>=14'}
     hasBin: true
 
@@ -1315,16 +1315,16 @@ packages:
   queue-microtask@1.2.3:
     resolution: {integrity: sha512-NuaNSa6flKT5JaSYQzJok04JzTL1CA6aGhv5rfLW3PgqA+M2ChpZQnAC8h8i4ZFkBS8X5RqkDBHA7r4hej3K9A==}
 
-  react-dom@19.2.3:
-    resolution: {integrity: sha512-yELu4WmLPw5Mr/lmeEpox5rw3RETacE++JgHqQzd2dg+YbJuat3jH4ingc+WPZhxaoFzdv9y33G+F7Nl5O0GBg==}
+  react-dom@19.2.4:
+    resolution: {integrity: sha512-AXJdLo8kgMbimY95O2aKQqsz2iWi9jMgKJhRBAxECE4IFxfcazB2LmzloIoibJI3C12IlY20+KFaLv+71bUJeQ==}
     peerDependencies:
-      react: ^19.2.3
+      react: ^19.2.4
 
   react-is@16.13.1:
     resolution: {integrity: sha512-24e6ynE2H+OKt4kqsOvNd8kBpV65zoxbA4BVsEOB3ARVWQki/DHzaUoC5KuON/BiccDaCCTZBuOcfZs70kR8bQ==}
 
-  react@19.2.3:
-    resolution: {integrity: sha512-Ku/hhYbVjOQnXDZFv2+RibmLFGwFdeeKHFcOTlrt7xplBnya5OGn/hIRDsqDiSUcfORsDC7MPxwork8jBwsIWA==}
+  react@19.2.4:
+    resolution: {integrity: sha512-9nfp2hYpCwOjAN+8TZFGhtWEwgvWHXqESH8qT89AT/lWklpLON22Lc8pEtnpsZz7VmawabSU0gCjnj8aC0euHQ==}
     engines: {node: '>=0.10.0'}
 
   readdirp@3.6.0:
@@ -1697,11 +1697,11 @@ snapshots:
 
   '@ungap/structured-clone@1.3.0': {}
 
-  '@yaireo/tagify@4.36.0(prop-types@15.8.1)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)':
+  '@yaireo/tagify@4.36.0(prop-types@15.8.1)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)':
     dependencies:
       prop-types: 15.8.1
-      react: 19.2.3
-      react-dom: 19.2.3(react@19.2.3)
+      react: 19.2.4
+      react-dom: 19.2.4(react@19.2.4)
 
   ab@https://codeload.github.com/lichess-org/ab-stub/tar.gz/94236bf34dbc9c05daf50f4c9842d859b9142be0: {}
 
@@ -1787,7 +1787,7 @@ snapshots:
 
   chess.js@https://codeload.github.com/ornicar/chess.js/tar.gz/ad0709c0b07773d9d0da8e4605a9a2a28f00d249: {}
 
-  chessground@https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/5ae47803ce6c2365132bfb6eb95ff31e6f495baa: {}
+  chessground@https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/e3fcc2cb86cbc531d7f7139e7d9a476a322ffc80: {}
 
   chokidar@3.6.0:
     dependencies:
@@ -2256,7 +2256,7 @@ snapshots:
 
   prelude-ls@1.2.1: {}
 
-  prettier@3.8.0: {}
+  prettier@3.8.1: {}
 
   prop-types@15.8.1:
     dependencies:
@@ -2268,14 +2268,14 @@ snapshots:
 
   queue-microtask@1.2.3: {}
 
-  react-dom@19.2.3(react@19.2.3):
+  react-dom@19.2.4(react@19.2.4):
     dependencies:
-      react: 19.2.3
+      react: 19.2.4
       scheduler: 0.27.0
 
   react-is@16.13.1: {}
 
-  react@19.2.3: {}
+  react@19.2.4: {}
 
   readdirp@3.6.0:
     dependencies:

@@ -659,6 +659,7 @@ export default function (
       vm.loading = true;
       vm.nextChapterId = id;
       vm.justSetChapterId = id;
+      // note: could track nextChapter's variant for dasher here, then do playstrategy.pageVariant = nextVariantKey
       redraw();
     },
     toggleSticky() {

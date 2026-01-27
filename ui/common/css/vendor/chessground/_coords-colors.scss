@@ -14,6 +14,19 @@
   --cg-coord-color-breakthroughtroyka-p1: #fff;
   --cg-coord-color-breakthroughtroyka-p2: #fff;
   --cg-coord-shadow-breakthroughtroyka: 0 1px 2px #000;
+
+  --cg-coord-color-dameo-p1: #fff;
+  --cg-coord-color-dameo-p2: #fff;
+  --cg-coord-shadow-dameo: 0 1px 2px #000;
+
+  --cg-coord-color-flipello-p1: #ffedd1; // has to be suffixed with -p1 for "changeColorHandle" to work
+  --cg-coord-shadow-flipello: 0 1px 2px #000;
+
+  --cg-coord-color-flipello10-p1: var(--cg-coord-color-flipello-p1);
+  --cg-coord-shadow-flipello10: var(--cg-coord-shadow-flipello);
+
+  --cg-coord-color-antiflipello-p1: var(--cg-coord-color-flipello-p1);
+  --cg-coord-shadow-antiflipello: var(--cg-coord-shadow-flipello);
 }
 
 coords {
@@ -136,5 +149,64 @@ coords {
   .orientation-p2 .files coord:nth-child(2n),
   .orientation-p2 .ranks coord:nth-child(2n) {
     color: var(--cg-coord-color-breakthroughtroyka-p1);
+  }
+}
+
+.variant-dameo {
+  coords {
+    text-shadow: var(--cg-coord-shadow-dameo);
+  }
+
+  .orientation-p1 .files coord:nth-child(2n + 1),
+  .orientation-p1 .ranks coord:nth-child(2n),
+  .orientation-p2 .files coord:nth-child(2n),
+  .orientation-p2 .ranks coord:nth-child(2n + 1),
+  .orientation-right .files coord:nth-child(2n + 1),
+  .orientation-right .ranks coord:nth-child(2n + 1),
+  .orientation-left .files coord:nth-child(2n + 1),
+  .orientation-left .ranks coord:nth-child(2n + 1) {
+    color: var(--cg-coord-color-dameo-p1);
+  }
+
+  .orientation-p1 .files coord:nth-child(2n),
+  .orientation-p1 .ranks coord:nth-child(2n + 1),
+  .orientation-p2 .files coord:nth-child(2n + 1),
+  .orientation-p2 .ranks coord:nth-child(2n),
+  .orientation-right .files coord:nth-child(2n),
+  .orientation-right .ranks coord:nth-child(2n),
+  .orientation-left .files coord:nth-child(2n),
+  .orientation-left .ranks coord:nth-child(2n) {
+    color: var(--cg-coord-color-dameo-p2);
+  }
+}
+
+.variant-flipello {
+  cg-coords-container.inner-coords {
+    coords.ranks, coords.files { // higher specificity to override default chess variant
+      coord {
+        text-shadow: var(--cg-coord-shadow-flipello);
+        color: var(--cg-coord-color-flipello-p1);
+      }
+    }
+  }
+}
+.variant-flipello10 {
+  cg-coords-container.inner-coords {
+    coords.ranks, coords.files {
+      coord {
+        text-shadow: var(--cg-coord-shadow-flipello10);
+        color: var(--cg-coord-color-flipello-p1);
+      }
+    }
+  }
+}
+.variant-antiflipello {
+  cg-coords-container.inner-coords {
+    coords.ranks, coords.files {
+      coord {
+        text-shadow: var(--cg-coord-shadow-antiflipello);
+        color: var(--cg-coord-color-antiflipello-p1);
+      }
+    }
   }
 }

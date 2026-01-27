@@ -167,6 +167,11 @@ export default class AnalyseCtrl {
       : undefined;
     this.studyPractice = this.study ? this.study.practice : undefined;
 
+
+    if (!this.embed) { // initialize variant for dasher
+      playstrategy.pageVariant = this.data.game.variant.key;
+    }
+
     if (location.hash === '#practice' || (this.study && this.study.data.chapter.practice)) this.togglePractice();
     else if (location.hash === '#menu') playstrategy.requestIdleCallback(this.actionMenu.toggle, 500);
 
@@ -802,6 +807,7 @@ export default class AnalyseCtrl {
     this.setAutoShapes();
     this.startCeval();
     if (!this.ceval.enabled()) {
+      this.chessground && !this.embed && this.chessground.displayCoordinates(this.data.pref.coords);
       this.threatMode(false);
       if (this.practice) this.togglePractice();
     }
