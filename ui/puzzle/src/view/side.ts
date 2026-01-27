@@ -56,7 +56,7 @@ function gameInfos(ctrl: Controller, game: PuzzleGame, puzzle: Puzzle): VNode {
   return h(
     'div.infos',
     {
-      attrs: dataIcon(game.perf.icon),
+      attrs: dataIcon(ctrl.vm.perfIcon),
     },
     [
       h('div', [

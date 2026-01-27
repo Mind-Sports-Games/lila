@@ -88,8 +88,8 @@ object activity {
         iconTag("-"),
         scoreFrag(score),
         div(
-          trans.activity.solvedNbPuzzles.pluralSame(score.size),
-          s" (${PerfType.trans(pt)})",
+          trans.activity.solvedNbPuzzles
+            .plural(score.size, score.size, PerfType.trans(pt).stripSuffix(" Training")),
           score.rp.filterNot(_.isEmpty || (u.perfs.dubiousPuzzle && !ctx.is(u))).map(ratingProgFrag)
         )
       )

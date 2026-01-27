@@ -1,5 +1,5 @@
 import afterView from './after';
-import { bind, dataIcon } from '../util';
+import { bind } from '../util';
 import { Controller, MaybeVNode } from '../interfaces';
 import { h, VNode } from 'snabbdom';
 
@@ -50,16 +50,10 @@ const displayPiece = (variantKey: VariantKey): string => {
 
 const initial = (ctrl: Controller): VNode =>
   h('div.puzzle__feedback.play', [
-    h('div.title', [
-      h('div.icon', {
-        attrs: dataIcon(ctrl.vm.perfIcon),
-      }),
-      h('div.variant', ctrl.vm.variant.name + ' Puzzle'),
-    ]),
     h('div.player', [
       h('div.no-square.variant-' + ctrl.vm.variant.key, h(`piece.${displayPiece(ctrl.vm.variant.key)}.${ctrl.vm.pov}`)),
       h('div.instruction', [
-        h('strong', ctrl.trans.noarg('yourTurn')),
+        h('strong', ctrl.vm.variant.name + ' Puzzle'),
         h('em', ctrl.trans('findTheBestMoveForPlayerIndex', ctrl.vm.playerColors[ctrl.vm.pov == 'p1' ? 0 : 1])),
       ]),
     ]),

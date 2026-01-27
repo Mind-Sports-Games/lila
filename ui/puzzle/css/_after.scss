@@ -1,3 +1,13 @@
+.puzzle__all-feedback {
+  display: flex;
+  flex-flow: column;
+  flex: 1 0 9rem;
+
+  @include breakpoint($mq-col2) {
+    flex: 1 0 17rem;
+  }
+}
+
 .puzzle__feedback.after {
   flex-flow: row nowrap;
 
@@ -44,25 +54,25 @@
       @extend %flex-column;
     }
   }
+}
 
-  .puzzle__more {
-    @extend %flex-between;
+.puzzle__more {
+  @extend %flex-between;
 
-    display: none;
-    border-top: $border;
-    padding: 1em 2em;
+  display: flex;
+  border-top: $border;
+  padding: 1em 2em;
 
-    a {
-      color: $c-font;
+  a {
+    color: $c-font;
 
-      &:hover {
-        color: $c-link;
-      }
+    &:hover {
+      color: $c-link;
     }
+  }
 
-    @include breakpoint($mq-col2) {
-      display: flex;
-    }
+  @include breakpoint($mq-col2) {
+    display: flex;
   }
 }
 
