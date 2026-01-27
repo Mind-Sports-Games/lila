@@ -490,9 +490,8 @@ export default function (ctrl: AnalyseCtrl): VNode {
     variantKey = ctrl.data.game.variant.key,
     needsUserNameWithScore = ['togyzkumalak', 'oware'].includes(variantKey),
     needsInnerCoords =
-    isCol1() ||
-      ((gaugeOn || !!playerBars) &&
-        !['xiangqi', 'shogi', 'minixiangqi', 'minishogi', 'oware'].includes(variantKey)) ||
+      isCol1() ||
+      ((gaugeOn || !!playerBars) && !['xiangqi', 'shogi', 'minixiangqi', 'minishogi', 'oware'].includes(variantKey)) ||
       ['togyzkumalak', 'bestemshe', 'backgammon', 'hyper', 'nackgammon', 'abalone'].includes(variantKey),
     needsOutterCoords =
       [
@@ -510,7 +509,7 @@ export default function (ctrl: AnalyseCtrl): VNode {
     needsNoCoords =
       ctrl.embed ||
       (['shogi', 'minishogi', 'octagonflipello', 'go9x9', 'go13x13', 'go19x19'].includes(variantKey) &&
-        ((gaugeOn || !!playerBars))) ||
+        (gaugeOn || !!playerBars)) ||
       (['xiangqi', 'minixiangqi'].includes(variantKey) && !!playerBars), // coordinates for xiangqi game family only label columns // Oware has a short height, which means we can display coords, even with player bars
     tour = relayTour(ctrl),
     fen = ctrl.node.fen;
