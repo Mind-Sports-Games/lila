@@ -19,14 +19,8 @@
   --cg-coord-color-dameo-p2: #fff;
   --cg-coord-shadow-dameo: 0 1px 2px #000;
 
-  --cg-coord-color-flipello-p1: #ffedd1; // has to be suffixed with -p1 for "changeColorHandle" to work
+  --cg-coord-color-flipello-p1: #ffedd1;
   --cg-coord-shadow-flipello: 0 1px 2px #000;
-
-  --cg-coord-color-flipello10-p1: var(--cg-coord-color-flipello-p1);
-  --cg-coord-shadow-flipello10: var(--cg-coord-shadow-flipello);
-
-  --cg-coord-color-antiflipello-p1: var(--cg-coord-color-flipello-p1);
-  --cg-coord-shadow-antiflipello: var(--cg-coord-shadow-flipello);
 }
 
 coords {
@@ -197,7 +191,7 @@ coords {
     coords.ranks,
     coords.files {
       coord {
-        text-shadow: var(--cg-coord-shadow-flipello10);
+        text-shadow: var(--cg-coord-shadow-flipello);
         color: var(--cg-coord-color-flipello-p1);
       }
     }
@@ -208,8 +202,8 @@ coords {
     coords.ranks,
     coords.files {
       coord {
-        text-shadow: var(--cg-coord-shadow-antiflipello);
-        color: var(--cg-coord-color-antiflipello-p1);
+        text-shadow: var(--cg-coord-shadow-flipello);
+        color: var(--cg-coord-color-flipello-p1);
       }
     }
   }

@@ -341,8 +341,8 @@ function forceOutterCoords(ctrl: AnalyseCtrl, v: boolean) {
 
 function forceInnerCoords(ctrl: AnalyseCtrl, v: boolean) {
   if (v) {
-    ctrl.chessground.displayCoordinates(CgCoords.Inside);
     changeColorHandle();
+    ctrl.chessground.displayCoordinates(CgCoords.Inside);
   }
 }
 
@@ -596,6 +596,7 @@ export default function (ctrl: AnalyseCtrl): VNode {
         hook: {
           insert: vn => {
             playstrategy.miniGame.initAll();
+            changeColorHandle(); // initialize inner coords colors
             forceInnerCoords(ctrl, needsInnerCoords);
             forceOutterCoords(ctrl, needsOutterCoords);
             if (needsNoCoords) forceNoCoords(ctrl);
