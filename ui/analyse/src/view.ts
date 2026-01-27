@@ -13,6 +13,7 @@ import {
 } from './util';
 import { defined } from 'common';
 import changeColorHandle from 'common/coordsColor';
+import isCol1 from 'common/isCol1';
 import { playable } from 'game';
 import * as router from 'game/router';
 import statusView from 'game/view/status';
@@ -489,7 +490,8 @@ export default function (ctrl: AnalyseCtrl): VNode {
     variantKey = ctrl.data.game.variant.key,
     needsUserNameWithScore = ['togyzkumalak', 'oware'].includes(variantKey),
     needsInnerCoords =
-      ((!!gaugeOn || !!playerBars) &&
+    isCol1() ||
+      ((gaugeOn || !!playerBars) &&
         !['xiangqi', 'shogi', 'minixiangqi', 'minishogi', 'oware'].includes(variantKey)) ||
       ['togyzkumalak', 'bestemshe', 'backgammon', 'hyper', 'nackgammon', 'abalone'].includes(variantKey),
     needsOutterCoords =
@@ -504,11 +506,11 @@ export default function (ctrl: AnalyseCtrl): VNode {
         'go13x13',
         'go19x19',
       ].includes(variantKey) &&
-      !((!!gaugeOn || !!playerBars) && ['octagonflipello', 'go9x9', 'go13x13', 'go19x19'].includes(variantKey)),
+      !((gaugeOn || !!playerBars) && ['octagonflipello', 'go9x9', 'go13x13', 'go19x19'].includes(variantKey)),
     needsNoCoords =
       ctrl.embed ||
       (['shogi', 'minishogi', 'octagonflipello', 'go9x9', 'go13x13', 'go19x19'].includes(variantKey) &&
-        (!!gaugeOn || !!playerBars)) ||
+        ((gaugeOn || !!playerBars))) ||
       (['xiangqi', 'minixiangqi'].includes(variantKey) && !!playerBars), // coordinates for xiangqi game family only label columns // Oware has a short height, which means we can display coords, even with player bars
     tour = relayTour(ctrl),
     fen = ctrl.node.fen;
