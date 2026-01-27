@@ -292,11 +292,9 @@ case class Perfs(
       case (acc, _)                              => acc
     }
 
-  //TODO also look at variant puzzles, add in logic?
-  //our current puzzles are all <2500 so not urgent to change this
+  // Lichess use this but we dont due to not having high level puzzles and also many puzzle variants.
   def dubiousPuzzle = {
-    puzzle_standard.glicko.rating > 3000 && !standard.glicko.establishedIntRating.exists(_ > 2100) ||
-    puzzle_standard.glicko.rating > 2500 && !standard.glicko.establishedIntRating.exists(_ > 1800)
+    puzzle_standard.glicko.rating > 3000 && !standard.glicko.establishedIntRating.exists(_ > 2100)
   }
 }
 
