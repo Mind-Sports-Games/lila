@@ -5,6 +5,7 @@ import { renderClock } from '../clock/clockView';
 import { renderTableWatch, renderTablePlay, renderTableEnd } from '../view/table';
 import { makeConfig as makeCgConfig } from '../ground';
 import { Chessground } from 'chessground';
+import { Coords as CgCoords } from 'chessground/types';
 import renderCorresClock from '../corresClock/corresClockView';
 import { renderResult } from '../view/replay';
 import { plyStep } from '../round.js';
@@ -66,7 +67,7 @@ playstrategy.RoundNVUI = function (redraw: Redraw) {
             ...makeCgConfig(ctrl),
             animation: { enabled: false },
             drawable: { enabled: false },
-            coordinates: false,
+            coordinates: CgCoords.Hidden,
           }),
         );
         if (variantNope) setTimeout(() => notify.set(variantNope), 3000);

@@ -1,7 +1,8 @@
-import changePlayerIndexHandle from 'common/coordsColor';
+import changeColorHandle from 'common/coordsColor';
 import resizeHandle from 'common/resize';
 import { Chessground } from 'chessground';
 import { Config as CgConfig } from 'chessground/config';
+import { Coords as CgCoords } from 'chessground/types';
 import { Controller } from '../interfaces';
 import { h, VNode } from 'snabbdom';
 import * as Prefs from 'common/prefs';
@@ -25,7 +26,7 @@ function makeConfig(ctrl: Controller): CgConfig {
     turnPlayerIndex: opts.turnPlayerIndex,
     check: opts.check,
     lastMove: opts.lastMove,
-    coordinates: ctrl.pref.coords !== Prefs.Coords.Hidden,
+    coordinates: ctrl.pref.coords,
     addPieceZIndex: ctrl.pref.is3d,
     movable: {
       free: false,
@@ -45,7 +46,7 @@ function makeConfig(ctrl: Controller): CgConfig {
       move: ctrl.userMove,
       insert(elements) {
         resizeHandle(elements, Prefs.ShowResizeHandle.Always, ctrl.vm.node.ply, _ => true);
-        if (ctrl.pref.coords === Prefs.Coords.Inside) changePlayerIndexHandle();
+        if (ctrl.pref.coords === CgCoords.Inside) changeColorHandle();
       },
     },
     premovable: {

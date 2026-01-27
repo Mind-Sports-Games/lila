@@ -1,6 +1,7 @@
 import { h, VNode } from 'snabbdom';
 import { parseFen } from 'stratops/fen';
 import * as chessground from './ground';
+import { Coords as CgCoords } from 'chessground/types';
 import {
   bind,
   onInsert,
@@ -12,6 +13,7 @@ import {
 } from './util';
 import { defined } from 'common';
 import changeColorHandle from 'common/coordsColor';
+import isCol1 from 'common/isCol1';
 import { playable } from 'game';
 import * as router from 'game/router';
 import statusView from 'game/view/status';
@@ -45,7 +47,6 @@ import renderPlayerBars from './study/playerBars';
 import { findTag } from './study/studyChapters';
 import serverSideUnderboard from './serverSideUnderboard';
 import * as gridHacks from './gridHacks';
-import * as Prefs from 'common/prefs';
 import { allowedForVariant as allowClientEvalForVariant, allowPracticeWithComputer, allowPv } from 'ceval/src/util';
 import { variantKeyToRules } from 'stratops/variants/util';
 
@@ -328,23 +329,21 @@ function controls(ctrl: AnalyseCtrl) {
 }
 
 function forceNoCoords(ctrl: AnalyseCtrl) {
-  if (ctrl.data.pref.coords !== Prefs.Coords.Hidden) {
-    $('body').toggleClass('coords-out', false).toggleClass('coords-in', false).toggleClass('coords-no', true);
-    changeColorHandle();
+  if (ctrl.data.pref.coords !== CgCoords.Hidden) {
+    ctrl.chessground.displayCoordinates(CgCoords.Hidden);
   }
 }
 
 function forceOutterCoords(ctrl: AnalyseCtrl, v: boolean) {
-  if (ctrl.data.pref.coords === Prefs.Coords.Inside) {
-    $('body').toggleClass('coords-out', v).toggleClass('coords-in', !v);
-    changeColorHandle();
+  if (v) {
+    ctrl.chessground.displayCoordinates(CgCoords.Outside);
   }
 }
 
 function forceInnerCoords(ctrl: AnalyseCtrl, v: boolean) {
-  if (ctrl.data.pref.coords === Prefs.Coords.Outside) {
-    $('body').toggleClass('coords-in', v).toggleClass('coords-out', !v);
+  if (v) {
     changeColorHandle();
+    ctrl.chessground.displayCoordinates(CgCoords.Inside);
   }
 }
 
@@ -491,8 +490,8 @@ export default function (ctrl: AnalyseCtrl): VNode {
     variantKey = ctrl.data.game.variant.key,
     needsUserNameWithScore = ['togyzkumalak', 'oware'].includes(variantKey),
     needsInnerCoords =
-      ((!!gaugeOn || !!playerBars) &&
-        !['xiangqi', 'shogi', 'minixiangqi', 'minishogi', 'oware'].includes(variantKey)) ||
+      isCol1() ||
+      ((gaugeOn || !!playerBars) && !['xiangqi', 'shogi', 'minixiangqi', 'minishogi', 'oware'].includes(variantKey)) ||
       ['togyzkumalak', 'bestemshe', 'backgammon', 'hyper', 'nackgammon', 'abalone'].includes(variantKey),
     needsOutterCoords =
       [
@@ -501,22 +500,17 @@ export default function (ctrl: AnalyseCtrl): VNode {
         'minixiangqi',
         'minishogi',
         'oware',
-        'flipello',
-        'flipello10',
-        'antiflipello',
         'octagonflipello',
         'go9x9',
         'go13x13',
         'go19x19',
       ].includes(variantKey) &&
-      !(
-        (!!gaugeOn || !!playerBars) &&
-        ['flipello', 'flipello10', 'antiflipello', 'octagonflipello', 'go9x9', 'go13x13', 'go19x19'].includes(
-          variantKey,
-        )
-      ),
+      !((gaugeOn || !!playerBars) && ['octagonflipello', 'go9x9', 'go13x13', 'go19x19'].includes(variantKey)),
     needsNoCoords =
-      ['xiangqi', 'shogi', 'minixiangqi', 'minishogi'].includes(variantKey) && (!!gaugeOn || !!playerBars),
+      ctrl.embed ||
+      (['shogi', 'minishogi', 'octagonflipello', 'go9x9', 'go13x13', 'go19x19'].includes(variantKey) &&
+        (gaugeOn || !!playerBars)) ||
+      (['xiangqi', 'minixiangqi'].includes(variantKey) && !!playerBars), // coordinates for xiangqi game family only label columns // Oware has a short height, which means we can display coords, even with player bars
     tour = relayTour(ctrl),
     fen = ctrl.node.fen;
 
@@ -603,6 +597,7 @@ export default function (ctrl: AnalyseCtrl): VNode {
         hook: {
           insert: vn => {
             playstrategy.miniGame.initAll();
+            changeColorHandle(); // initialize inner coords colors
             forceInnerCoords(ctrl, needsInnerCoords);
             forceOutterCoords(ctrl, needsOutterCoords);
             if (needsNoCoords) forceNoCoords(ctrl);

@@ -15,7 +15,7 @@ module.exports = {
       selected: null,
       orientation: opts.orientation,
       myColor: opts.myColor,
-      coordinates: true,
+      coordinates: 1, // inner coordinates
       pieceKey: true,
       turnColor: opts.chess.color(),
       check: check,

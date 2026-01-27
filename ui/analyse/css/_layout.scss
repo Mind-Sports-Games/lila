@@ -70,6 +70,13 @@ body {
     .coords-out &__underboard {
       margin-top: calc($block-gap * 2);
     }
+
+    // in case outer coords are forced for this game
+    @each $variant in $forced-outer-coords-variants {
+      &.variant-#{$variant} &__underboard {
+        margin-top: calc($block-gap * 2);
+      }
+    }
   }
 
   @include breakpoint($mq-col2) {

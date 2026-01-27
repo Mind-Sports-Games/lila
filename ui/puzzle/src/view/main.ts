@@ -1,15 +1,15 @@
 import * as control from '../control';
 import * as side from './side';
 import theme from './theme';
-import changePlayerIndexHandle from 'common/coordsColor';
+import changeColorHandle from 'common/coordsColor';
 import chessground from './chessground';
+import { Coords as CgCoords } from 'chessground/types';
 import feedbackView from './feedback';
 import { Controller } from '../interfaces';
 import { h, VNode } from 'snabbdom';
 import { onInsert, bind, bindMobileMousedown } from '../util';
 import { render as treeView } from './tree';
 import { view as cevalView } from 'ceval';
-import * as Prefs from 'common/prefs';
 
 function renderAnalyse(ctrl: Controller): VNode {
   return h('div.puzzle__moves.areplay', [treeView(ctrl)]);
@@ -88,9 +88,20 @@ export default function (ctrl: Controller): VNode {
       hook: {
         postpatch(old, vnode) {
           if (old.data!.gaugeOn !== gaugeOn) {
-            if (ctrl.pref.coords === Prefs.Coords.Outside) {
-              $('body').toggleClass('coords-in', gaugeOn).toggleClass('coords-out', !gaugeOn);
-              changePlayerIndexHandle();
+            if (gaugeOn && ctrl.pref.coords === CgCoords.Outside) {
+              ctrl.pref.coords = CgCoords.Inside;
+              changeColorHandle();
+              const cg = ctrl.ground();
+              if (cg && typeof cg.set === 'function') {
+                cg.displayCoordinates(ctrl.pref.coords);
+              }
+            } else if (!gaugeOn) {
+              ctrl.pref.coords = ctrl.pref.userCoords;
+              changeColorHandle();
+              const cg = ctrl.ground();
+              if (cg && typeof cg.set === 'function') {
+                cg.displayCoordinates(ctrl.pref.coords);
+              }
             }
             document.body.dispatchEvent(new Event('chessground.resize'));
           }

@@ -27,6 +27,7 @@ import { Role, Move, Outcome, Rules } from 'stratops/types';
 import { storedProp } from 'common/storage';
 
 export default function (opts: PuzzleOpts, redraw: Redraw): Controller {
+  opts.pref.userCoords = opts.pref.coords;
   const vm: Vm = {
     next: defer<PuzzleData>(),
   } as Vm;

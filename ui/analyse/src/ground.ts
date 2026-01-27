@@ -12,6 +12,7 @@ import { isOnlyDropsPly } from './util';
 import * as stratUtils from 'stratutils';
 import { variantClassFromKey } from 'stratops/variants/util';
 import { NotationStyle } from 'stratops/variants/types';
+import renderPlayerBars from './study/playerBars';
 
 export function render(ctrl: AnalyseCtrl): VNode {
   return h('div.cg-wrap.cgv' + ctrl.cgVersion.js, {
@@ -60,7 +61,7 @@ export function makeConfig(ctrl: AnalyseCtrl): CgConfig {
     lastMove: opts.lastMove,
     orientation: ctrl.getOrientation(),
     myPlayerIndex: ctrl.data.player.playerIndex,
-    coordinates: pref.coords !== Prefs.Coords.Hidden && !ctrl.embed,
+    coordinates: !!ctrl.embed || !!renderPlayerBars(ctrl) ? cg.Coords.Hidden : pref.coords,
     boardScores: d.game.gameFamily == 'togyzkumalak',
     addPieceZIndex: pref.is3d,
     viewOnly: !!ctrl.embed,
@@ -76,7 +77,7 @@ export function makeConfig(ctrl: AnalyseCtrl): CgConfig {
       dropNewPiece: ctrl.userNewPiece,
       insert(elements: cg.Elements) {
         if (!ctrl.embed) resizeHandle(elements, Prefs.ShowResizeHandle.Always, ctrl.node.ply);
-        if (!ctrl.embed && ctrl.data.pref.coords == Prefs.Coords.Inside) changeColorHandle();
+        if (!ctrl.embed && ctrl.data.pref.coords == cg.Coords.Inside) changeColorHandle();
       },
     },
     premovable: {

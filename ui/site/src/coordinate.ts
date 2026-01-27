@@ -1,3 +1,4 @@
+import { Coords as CgCoords } from 'chessground/types';
 import * as xhr from 'common/xhr';
 import { sparkline } from '@fnando/sparkline';
 import throttle from 'common/throttle';
@@ -27,7 +28,7 @@ playstrategy.load.then(() => {
       playerIndex = playerIndexPref == 'random' ? ['p1', 'p2'][Math.round(Math.random())] : playerIndexPref;
       if (!ground)
         ground = window.Chessground($board[0], {
-          coordinates: false,
+          coordinates: CgCoords.Hidden,
           drawable: { enabled: false },
           movable: {
             free: false,

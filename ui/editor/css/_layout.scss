@@ -16,6 +16,14 @@
   grid-template-areas: 'spare-top' 'board' 'spare-bottom' 'tools' 'copyables';
 
   @include breakpoint($mq-landscape-mobile) {
+    @each $variant in $forced-outer-coords-variants {
+      &.variant-#{$variant} {
+        grid-template-columns: minmax(30vmin, $board-width) 4vmin minmax(200px, 300px) !important;
+      }
+      &.variant-#{$variant} .spare-bottom {
+        margin-top: calc($block-gap * 2);
+      }
+    }
     .coords-out & {
       grid-template-columns: minmax(30vmin, $board-width) 4vmin minmax(200px, 300px) !important;
     }

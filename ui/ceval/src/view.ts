@@ -8,6 +8,7 @@ import { opposite, parseUci } from 'stratops/util';
 import { parseFen, makeBoardFen } from 'stratops/fen';
 import { blackStartsVariant, noVariantOutcome, renderEval } from './util';
 import { variantClassFromKey, variantKeyToRules } from 'stratops/variants/util';
+import { Coords as CgCoords } from 'chessground/types';
 
 let gaugeLast = 0;
 const gaugeTicks: VNode[] = [...Array(8).keys()].map(i =>
@@ -463,7 +464,7 @@ function renderPvBoard(ctrl: ParentCtrl, variantKey: VariantKey): VNode | undefi
     fen,
     lastMove,
     orientation,
-    coordinates: false,
+    coordinates: CgCoords.Hidden,
     viewOnly: true,
     resizable: false,
     drawable: {
