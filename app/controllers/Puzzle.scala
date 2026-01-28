@@ -102,10 +102,10 @@ final class Puzzle(
       }
     }
 
-  def faqBase =
+  def themesBase =
     Open { implicit ctx =>
       NoBot {
-        Redirect(routes.Puzzle.faq(mostPlayedPuzzleVariant.key)).fuccess
+        Redirect(routes.Puzzle.themes(mostPlayedPuzzleVariant.key)).fuccess
       }
     }
 

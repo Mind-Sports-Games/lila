@@ -29,7 +29,7 @@ object dashboard {
       path = "dashboard",
       variant = variant,
       title =
-        if (ctx is user) "Puzzle dashboard"
+        if (ctx is user) trans.puzzle.puzzleDashboard.txt()
         else s"${user.username} puzzle dashboard",
       subtitle = "Train, analyse, improve",
       dashOpt = dashOpt,

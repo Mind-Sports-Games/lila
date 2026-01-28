@@ -14,7 +14,7 @@ object faq {
 
   def apply(variant: Variant)(implicit ctx: Context) =
     views.html.base.layout(
-      title = trans.puzzle.puzzleFAQ().toString,
+      title = trans.puzzle.puzzleFAQ.txt(),
       moreCss = cssTag("page")
     ) {
       main(cls := "page-menu page")(

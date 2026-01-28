@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
   <string name="puzzles">Puzzles</string>
-  <string name="puzzleThemes">Puzzle themes</string>
+  <string name="puzzleThemes">Puzzle Themes</string>
   <string name="puzzleFAQ">Puzzle FAQ</string>
   <string name="recommended">Recommended</string>
   <string name="phases">Phases</string>
@@ -58,7 +58,7 @@
   <string name="puzzleDashboard">Puzzle Dashboard</string>
   <string name="improvementAreas">Improvement areas</string>
   <string name="strengths">Strengths</string>
-  <string name="history">Puzzle history</string>
+  <string name="history">Puzzle History</string>
   <string name="solved">solved</string>
   <string name="failed">failed</string>
   <string name="streakDescription">Solve progressively harder puzzles and build a win streak. There is no clock, so take your time. One wrong move, and it\'s game over! But you can skip one move per session.</string>
