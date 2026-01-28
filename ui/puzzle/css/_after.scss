@@ -4,7 +4,9 @@
   flex: 1 0 9rem;
 
   @include breakpoint($mq-col2) {
-    flex: 1 0 17rem;
+    @include breakpoint($mq-tall) {
+      flex: 1 0 17rem;
+    }
   }
 }
 
