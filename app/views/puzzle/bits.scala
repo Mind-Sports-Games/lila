@@ -79,6 +79,9 @@ object bits {
       ),
       a(cls := active.active("player"), href := routes.Puzzle.ofPlayer(variant.key))(
         "From my games"
+      ),
+      a(cls := active.active("faq"), href := routes.Puzzle.faq(variant.key))(
+        trans.puzzle.puzzleFAQ()
       )
     )
 

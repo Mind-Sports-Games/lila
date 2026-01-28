@@ -60,35 +60,37 @@ const renderStreak = (ctrl: Controller): MaybeVNodes => [
 export default function (ctrl: Controller): VNode {
   const data = ctrl.getData();
   const win = ctrl.vm.lastFeedback == 'win';
-  const canUseCeval = allowClientEvalForVariant(ctrl.vm.variant);
-  return h(
-    'div.puzzle__feedback.after',
+  const canUseCeval = allowClientEvalForVariant(ctrl.vm.variant.key);
+
+  const mainContent =
     ctrl.streak && !win
       ? renderStreak(ctrl)
       : [
           h('div.complete', ctrl.trans.noarg(win ? 'puzzleSuccess' : 'puzzleComplete')),
           data.user ? renderVote(ctrl) : renderContinue(ctrl),
-          h('div.puzzle__more', [
-            canUseCeval
-              ? h('a', {
-                  attrs: {
-                    'data-icon': '',
-                    href: `/analysis/${ctrl.vm.node.fen.replace(/ /g, '_')}?playerIndex=${ctrl.vm.pov}#practice`,
-                    title: ctrl.trans.noarg('playWithTheMachine'),
-                    target: '_blank',
-                  },
-                })
-              : null,
-            data.user
-              ? h(
-                  'a',
-                  {
-                    hook: bind('click', ctrl.nextPuzzle),
-                  },
-                  ctrl.trans.noarg(ctrl.streak ? 'continueTheStreak' : 'continueTraining'),
-                )
-              : undefined,
-          ]),
-        ],
-  );
+        ];
+
+  const moreContent = h('div.puzzle__more', [
+    canUseCeval
+      ? h('a', {
+          attrs: {
+            'data-icon': '',
+            href: `/analysis/${ctrl.vm.node.fen.replace(/ /g, '_')}?playerIndex=${ctrl.vm.pov}#practice`,
+            title: ctrl.trans.noarg('playWithTheMachine'),
+            target: '_blank',
+          },
+        })
+      : null,
+    data.user
+      ? h(
+          'a',
+          {
+            hook: bind('click', ctrl.nextPuzzle),
+          },
+          ctrl.trans.noarg(ctrl.streak ? 'continueTheStreak' : 'continueTraining'),
+        )
+      : undefined,
+  ]);
+
+  return h('div.puzzle__all-feedback', [h('div.puzzle__feedback.after', mainContent), moreContent]);
 }

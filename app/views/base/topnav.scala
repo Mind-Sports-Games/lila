@@ -46,9 +46,8 @@ object topnav {
         linkTitle(routes.Puzzle.base.path, trans.puzzles()),
         div(role := "group")(
           a(href := routes.Puzzle.base)(trans.puzzles()),
-          a(href := routes.Puzzle.dashboardBase)(
-            trans.puzzle.puzzleDashboard()
-          )
+          a(href := routes.Puzzle.themesBase)(trans.puzzle.puzzleThemes()),
+          a(href := routes.Puzzle.dashboardBase)(trans.puzzle.puzzleDashboard())
           // a(href := routes.Puzzle.streak)("Puzzle Streak")
           // a(href := routes.Storm.home)("Puzzle Storm"),
           // a(href := routes.Racer.home)("Puzzle Racer")

@@ -7,11 +7,12 @@ import strategygames.{ Game }
 
 import lila.common.Json._
 import lila.game.GameRepo
-import lila.rating.Perf
+import lila.rating.{ Perf, PerfType }
 import lila.tree
 import lila.tree.Node.defaultNodeJsonWriter
 import lila.user.{ Perfs, User }
 import strategygames.variant.Variant
+import lila.i18n.defaultLang
 
 final class JsonView(
     gameJson: GameJson,
@@ -121,8 +122,17 @@ final class JsonView(
     "plays"      -> puzzle.plays,
     "initialPly" -> puzzle.initialPly,
     "solution"   -> puzzle.line.tail.map(_.uci),
-    "themes"     -> simplifyThemes(puzzle.themes)
+    "themes"     -> simplifyThemes(puzzle.themes),
+    "perf"       -> perfJson(puzzle.variant)
   )
+
+  private def perfJson(variant: Variant) = {
+    val perfType = PerfType.byVariant(variant) | PerfType.default
+    Json.obj(
+      "icon" -> perfType.iconChar.toString,
+      "name" -> perfType.trans(defaultLang)
+    )
+  }
 
   private def simplifyThemes(themes: Set[PuzzleTheme.Key]) =
     themes.filterNot(List(PuzzleTheme.mate.key, PuzzleTheme.win.key).contains(_))

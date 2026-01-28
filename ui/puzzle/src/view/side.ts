@@ -56,7 +56,7 @@ function gameInfos(ctrl: Controller, game: PuzzleGame, puzzle: Puzzle): VNode {
   return h(
     'div.infos',
     {
-      attrs: dataIcon(game.perf.icon),
+      attrs: dataIcon(ctrl.vm.perfIcon),
     },
     [
       h('div', [
@@ -134,7 +134,7 @@ export const userBox = (ctrl: Controller): VNode => {
       'div.puzzle__side__user__rating',
       ctrl.trans.vdom(
         'yourPuzzleRatingX',
-        h('strong', [
+        h('strong', { attrs: dataIcon(ctrl.vm.perfIcon) }, [
           data.user.rating - (diff || 0),
           data.user.provisional ? h('span.provisional', '?') : null,
           ...(diff && diff > 0 ? [' ', h('good.rp', '+' + diff)] : []),

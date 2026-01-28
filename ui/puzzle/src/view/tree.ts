@@ -171,7 +171,7 @@ function renderAction(variant: VariantKey, node: Tree.Node): string {
 export function renderMove(ctx: Ctx, node: Tree.Node): MaybeVNodes {
   const ev = node.eval || node.ceval;
   return [
-    renderAction(ctx.ctrl.vm.variant, node),
+    renderAction(ctx.ctrl.vm.variant.key, node),
     ev &&
       (defined(ev.cp) ? renderEval(normalizeEval(ev.cp)) : defined(ev.mate) ? renderEval('#' + ev.mate) : undefined),
     puzzleGlyph(ctx, node),
@@ -193,7 +193,7 @@ function renderVariationMoveOf(ctx: Ctx, node: Tree.Node, opts: RenderOpts): VNo
       attrs: { p: path },
       class: classes,
     },
-    [withIndex ? renderIndex(node, true) : null, renderAction(ctx.ctrl.vm.variant, node), puzzleGlyph(ctx, node)],
+    [withIndex ? renderIndex(node, true) : null, renderAction(ctx.ctrl.vm.variant.key, node), puzzleGlyph(ctx, node)],
   );
 }
 

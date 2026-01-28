@@ -9,6 +9,7 @@ interface SessionRound {
 }
 interface Store {
   theme: ThemeKey;
+  variantKey: VariantKey;
   rounds: SessionRound[];
   at: number;
 }
@@ -19,12 +20,14 @@ export default class PuzzleSession {
 
   constructor(
     readonly theme: ThemeKey,
+    readonly variantKey: VariantKey,
     readonly userId: string | undefined,
     readonly streak: boolean,
   ) {}
 
   default = () => ({
     theme: this.theme,
+    variantKey: this.variantKey,
     rounds: [],
     at: Date.now(),
   });
@@ -37,7 +40,9 @@ export default class PuzzleSession {
 
   get = () => {
     const prev = this.store();
-    return prev.theme == this.theme && prev.at > Date.now() - this.maxAge ? prev : this.default();
+    return prev.theme == this.theme && prev.variantKey == this.variantKey && prev.at > Date.now() - this.maxAge
+      ? prev
+      : this.default();
   };
 
   update = (f: (s: Store) => Store): Store => this.store(f(this.get()));

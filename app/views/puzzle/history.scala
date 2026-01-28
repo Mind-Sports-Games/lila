@@ -16,7 +16,7 @@ object history {
 
   def apply(user: User, variant: Variant, page: Int, pager: Paginator[PuzzleSession])(implicit ctx: Context) =
     views.html.base.layout(
-      title = "Puzzle history",
+      title = trans.puzzle.history.txt(),
       moreCss = cssTag("puzzle.dashboard"),
       moreJs = infiniteScrollTag
     )(

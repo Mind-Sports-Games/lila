@@ -55,15 +55,14 @@ final class ActivityWriteApi(
 
   def puzzle(res: lila.puzzle.Puzzle.UserResult): Funit =
     getOrCreate(res.userId) flatMap { a =>
+      val score = Score.make(
+        res = res.result.win.some,
+        rp = RatingProg(Rating(res.rating._1), Rating(res.rating._2)).some
+      )
       coll.update
         .one(
           $id(a.id),
-          $set(ActivityFields.puzzles -> {
-            ~a.puzzles + (Score.make(
-              res = res.result.win.some,
-              rp = RatingProg(Rating(res.rating._1), Rating(res.rating._2)).some
-            ), res.perfType)
-          }),
+          $set(ActivityFields.puzzles -> (~a.puzzles + (score, res.perfType))),
           upsert = true
         )
         .void

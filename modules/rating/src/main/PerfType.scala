@@ -23,7 +23,7 @@ object PuzzlePerf {
         key = "puzzle_standard",
         name = "Chess Training",
         title = "Chess tactics trainer",
-        iconChar = '-'
+        iconChar = Variant.orDefault(GameLogic.Chess(), "standard").perfIcon
       )
   case object AtomicPuzzle
       extends PuzzlePerf(
@@ -32,7 +32,7 @@ object PuzzlePerf {
         key = "puzzle_atomic",
         name = "Atomic Training",
         title = "Atomic tactics trainer",
-        iconChar = '-'
+        iconChar = Variant.orDefault(GameLogic.Chess(), "atomic").perfIcon
       )
   case object LinesOfActionPuzzle
       extends PuzzlePerf(
@@ -41,7 +41,7 @@ object PuzzlePerf {
         key = "puzzle_linesOfAction",
         name = "Lines of Action Training",
         title = "Lines of Action tactics trainer",
-        iconChar = '-'
+        iconChar = Variant.orDefault(GameLogic.Chess(), "linesOfAction").perfIcon
       )
 }
 
@@ -191,13 +191,12 @@ object PerfType {
 
   def desc(pt: PerfType)(implicit lang: Lang): String =
     pt.key match {
-      case "ultraBullet"                    => I18nKeys.ultraBulletDesc.txt()
-      case "bullet"                         => I18nKeys.bulletDesc.txt()
-      case "blitz"                          => I18nKeys.blitzDesc.txt()
-      case "rapid"                          => I18nKeys.rapidDesc.txt()
-      case "classical"                      => I18nKeys.classicalDesc.txt()
-      case "correspondence"                 => I18nKeys.correspondenceDesc.txt()
-      case _ if pt.key.startsWith("puzzle") => I18nKeys.puzzleDesc.txt()
-      case _                                => pt.title
+      case "ultraBullet"    => I18nKeys.ultraBulletDesc.txt()
+      case "bullet"         => I18nKeys.bulletDesc.txt()
+      case "blitz"          => I18nKeys.blitzDesc.txt()
+      case "rapid"          => I18nKeys.rapidDesc.txt()
+      case "classical"      => I18nKeys.classicalDesc.txt()
+      case "correspondence" => I18nKeys.correspondenceDesc.txt()
+      case _                => pt.title
     }
 }

@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources>
   <string name="puzzles">Puzzles</string>
-  <string name="puzzleThemes">Puzzle themes</string>
+  <string name="puzzleThemes">Puzzle Themes</string>
+  <string name="puzzleFAQ">Puzzle FAQ</string>
   <string name="recommended">Recommended</string>
   <string name="phases">Phases</string>
   <string name="motifs">Motifs</string>
@@ -57,7 +58,7 @@
   <string name="puzzleDashboard">Puzzle Dashboard</string>
   <string name="improvementAreas">Improvement areas</string>
   <string name="strengths">Strengths</string>
-  <string name="history">Puzzle history</string>
+  <string name="history">Puzzle History</string>
   <string name="solved">solved</string>
   <string name="failed">failed</string>
   <string name="streakDescription">Solve progressively harder puzzles and build a win streak. There is no clock, so take your time. One wrong move, and it's game over! But you can skip one move per session.</string>
@@ -65,4 +66,32 @@
   <string name="streakSkipExplanation">Skip this move to preserve your streak! Only works once per run.</string>
   <string name="continueTheStreak">Continue the streak</string>
   <string name="newStreak">New streak</string>
+  <string name="whatPuzzlesAreAvailable">What puzzles are available on PlayStrategy?</string>
+  <string name="whatPuzzlesAreAvailableANS">Currently we have Chess, Atomic and Lines Of Action puzzles for mate/win in 1 or 2 moves.</string>
+  <string name="whatArePuzzleThemes">What are puzzle themes and how do votes make a difference?</string>
+  <string name="whatArePuzzleThemesANS">Each puzzle can have a number of themes, e.g. mate-in-1. These themes are related to the puzzle variant, i.e. they can be different for Chess and Lines Of Action. Certain themes are locked and already present on a puzzle, e.g. mate-in-1. You can vote for a theme if you believe it matches the puzzle you have solved, if a puzzle gets enough votes then the given theme will be added to the puzzle.</string>
+  <string name="whatIsPuzzleRating">What is Puzzle rating and why vote?</string>
+  <string name="whatIsPuzzleRatingANS">Each puzzle has its own rating, and exactly like user ratings for variants, they change over time depending on their performance. You can also vote on the puzzle if you thought it was good or bad. This helps provide a better puzzle experience for our users as they are more likely to be served up-voted puzzles.
+
+Initially puzzles with win/mate in 1 are rated 1000, and win/mate in 2 are rated 1200.</string>
+  <string name="howCalculateNextPuzzle">How do we calculate what your next puzzle should be?</string>
+  <string name="howCalculateNextPuzzleANS">Puzzles are split by theme (or "mix", which currently includes all themes) and are split into 3 tiers. Puzzles are sorted by their vote score and then the top 20% make the "top tier", top 50% make "good tier" and top 95% make the "all tier".
+
+Puzzles are split into buckets for their rating, as we don't have a wide rating range available all puzzles are essentially in one large bucket. We hope to create more buckets in the future to provide a better experience to users.
+
+At a given frequency (hourly) we create puzzle paths which are lists of puzzles for the user to solve (matching their rating to the best bucket). We start on the top tier until the user has solved or played too many from the list, and work our way down.</string>
+  <string name="whyLoopingPuzzles">Why am I looping through the same puzzles again?</string>
+  <string name="whyLoopingPuzzlesANS">If you have completed all the puzzles (or a large percentage) within a theme for your rating bucket you will begin to loop back through them. As the puzzles paths are updated frequently, if you wait a little while, you should get given new paths and therefore puzzles for you to try.</string>
+  <string name="differenceBetweenRatingAndPerformance">What is the difference between my puzzle rating and my puzzle performance?</string>
+  <string name="differenceBetweenRatingAndPerformanceANS">Your puzzle rating uses the Glicko system and behaves the same as your rating for playing games on the site. Instead of playing other users you are playing against the puzzle's rating and a win/loss affects both you and the puzzle.
+
+Your puzzle performance can be seen on the puzzle dashboard and is a calculation from the last 1-90 days. It is a measure of how well you have done on your most recent puzzles (1-90 days). The calculation is the puzzle rating average you have played minus 500, plus 1000 multiplied by the percentage wins. For example if you solved 90 puzzles out of 100 with an average puzzle rating of 1100, your performance would be 1100 - 500 + 1000*0.9 = 1500.</string>
+  <string name="howDailyPuzzleChosen">How is the Puzzle of the Day selected?</string>
+  <string name="howDailyPuzzleChosenANS">Once per day, a puzzle that hasn't been the daily puzzle is selected at random to be the new daily puzzle. There is a even chance across our puzzle variants, however we will select from the top tier of puzzles and among the mate/win-in-2 theme</string>
+  <string name="whyMySolutionIsIncorrect">I tried a solution which I think should work but I was told I was wrong, why?</string>
+  <string name="whyMySolutionIsIncorrectANS">As the current puzzles only have the theme mate-in-x or win-in-x, the solution must be the best move in the position, not just a good move. Therefore if you play a mate-in-2 move on a mate-in-1 puzzle it will be deemed incorrect.
+
+In rare cases, a puzzle might have been incorrectly added to our database where there is more than 1 best move in a mate-in-2 theme. In this case please down vote the puzzle (so less users will meet it) and/or let us know so we can investigate.</string>
+  <string name="futurePuzzlePlans">What are the future plans for puzzles?</string>
+  <string name="futurePuzzlePlansANS">We plan to add more variants matching the mate-in-1 style. Then we aim to add additional themes for our variants, using Stockfish and engines to help us evaluate "good" puzzles.</string>
 </resources>

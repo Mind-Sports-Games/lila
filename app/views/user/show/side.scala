@@ -37,23 +37,21 @@ object side {
         },
         span(
           h3(perfType.trans),
-          if (isPuzzle && u.perfs.dubiousPuzzle && !ctx.is(u)) st.rating("?")
-          else
-            st.rating(
-              if (perf.glicko.clueless) strong("?")
-              else
-                strong(
-                  perf.glicko.intRating,
-                  perf.provisional option "?"
-                ),
-              " ",
-              ratingProgress(perf.progress),
-              " ",
-              span(
-                if (isPuzzle) trans.nbPuzzles(perf.nb, perf.nb.localize)
-                else trans.nbGames(perf.nb, perf.nb.localize)
-              )
-            ),
+          st.rating(
+            if (perf.glicko.clueless) strong("?")
+            else
+              strong(
+                perf.glicko.intRating,
+                perf.provisional option "?"
+              ),
+            " ",
+            ratingProgress(perf.progress),
+            " ",
+            span(
+              if (isPuzzle) trans.nbPuzzles(perf.nb, perf.nb.localize)
+              else trans.nbGames(perf.nb, perf.nb.localize)
+            )
+          ),
           rankMap get perfType map { rank =>
             span(cls := "rank", title := trans.rankIsUpdatedEveryNbMinutes.pluralSameTxt(15))(
               trans.rankX(rank.localize)

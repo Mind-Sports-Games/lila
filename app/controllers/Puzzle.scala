@@ -102,6 +102,13 @@ final class Puzzle(
       }
     }
 
+  def themesBase =
+    Open { implicit ctx =>
+      NoBot {
+        Redirect(routes.Puzzle.themes(mostPlayedPuzzleVariant.key)).fuccess
+      }
+    }
+
   def home(variant: String) =
     Open { implicit ctx =>
       NoBot {
@@ -460,6 +467,13 @@ final class Puzzle(
             }
           }
         }
+    }
+
+  def faq(variant: String) =
+    Open { implicit ctx =>
+      NoBot {
+        Ok(views.html.puzzle.faq(puzzleVariantFromKey(variant))).fuccess
+      }
     }
 
   def mobileBcLoad(nid: Long) =

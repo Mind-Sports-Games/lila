@@ -83,15 +83,17 @@ object activity {
     }
 
   private def renderPuzzles(u: User)(p: Puzzles)(implicit ctx: Context) =
-    entryTag(
-      iconTag("-"),
-      scoreFrag(p.score),
-      div(
-        trans.activity.solvedNbPuzzles.pluralSame(p.score.size),
-        s" (${PerfType.trans(p.pt)})",
-        p.score.rp.filterNot(_.isEmpty || (u.perfs.dubiousPuzzle && !ctx.is(u))).map(ratingProgFrag)
+    p.value.toSeq.map { case (pt, score) =>
+      entryTag(
+        iconTag(pt.iconChar),
+        scoreFrag(score),
+        div(
+          trans.activity.solvedNbPuzzles
+            .plural(score.size, score.size, PerfType.trans(pt).stripSuffix(" Training")),
+          score.rp.filterNot(_.isEmpty || (u.perfs.dubiousPuzzle && !ctx.is(u))).map(ratingProgFrag)
+        )
       )
-    )
+    }
 
   private def renderStorm(s: Storm)(implicit ctx: Context) =
     entryTag(

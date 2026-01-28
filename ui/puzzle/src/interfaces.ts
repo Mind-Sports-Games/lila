@@ -80,7 +80,17 @@ export interface Vm {
   mainline: Tree.Node[];
   pov: PlayerIndex;
   mode: 'play' | 'view' | 'try';
-  variant: VariantKey;
+  variant: {
+    key: VariantKey;
+    short: string;
+    name: string;
+    lib: number;
+    boardSize: {
+      width: number;
+      height: number;
+    };
+  };
+  perfIcon: string;
   dimensions: { width: number; height: number };
   playerColors: PlayerName[];
   round?: PuzzleRound;
@@ -189,6 +199,10 @@ export interface Puzzle {
   plays: number;
   initialPly: number;
   themes: ThemeKey[];
+  perf: {
+    icon: string;
+    name: string;
+  };
 }
 
 export interface PuzzleResult {
