@@ -23,7 +23,7 @@ object PuzzlePerf {
         key = "puzzle_standard",
         name = "Chess Training",
         title = "Chess tactics trainer",
-        iconChar = '-'
+        iconChar = Variant.orDefault(GameLogic.Chess(), "standard").perfIcon
       )
   case object AtomicPuzzle
       extends PuzzlePerf(
@@ -32,7 +32,7 @@ object PuzzlePerf {
         key = "puzzle_atomic",
         name = "Atomic Training",
         title = "Atomic tactics trainer",
-        iconChar = '-'
+        iconChar = Variant.orDefault(GameLogic.Chess(), "atomic").perfIcon
       )
   case object LinesOfActionPuzzle
       extends PuzzlePerf(
@@ -41,7 +41,7 @@ object PuzzlePerf {
         key = "puzzle_linesOfAction",
         name = "Lines of Action Training",
         title = "Lines of Action tactics trainer",
-        iconChar = '-'
+        iconChar = Variant.orDefault(GameLogic.Chess(), "linesOfAction").perfIcon
       )
 }
 

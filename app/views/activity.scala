@@ -85,7 +85,7 @@ object activity {
   private def renderPuzzles(u: User)(p: Puzzles)(implicit ctx: Context) =
     p.value.toSeq.map { case (pt, score) =>
       entryTag(
-        iconTag("-"),
+        iconTag(pt.iconChar),
         scoreFrag(score),
         div(
           trans.activity.solvedNbPuzzles
