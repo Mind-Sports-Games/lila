@@ -62,7 +62,10 @@ case class Perfs(
     classical: Perf,
     correspondence: Perf,
     puzzle_standard: Perf,
+    puzzle_kingOfTheHill: Perf,
     puzzle_atomic: Perf,
+    puzzle_horde: Perf,
+    puzzle_racingKings: Perf,
     puzzle_linesOfAction: Perf,
     storm: Perf.Storm,
     racer: Perf.Racer,
@@ -124,7 +127,10 @@ case class Perfs(
       "classical"              -> classical,
       "correspondence"         -> correspondence,
       "puzzle_standard"        -> puzzle_standard,
+      "puzzle_kingOfTheHill"   -> puzzle_kingOfTheHill,
       "puzzle_atomic"          -> puzzle_atomic,
+      "puzzle_horde"           -> puzzle_horde,
+      "puzzle_racingKings"     -> puzzle_racingKings,
       "puzzle_linesOfAction"   -> puzzle_linesOfAction
     )
 
@@ -243,7 +249,10 @@ case class Perfs(
     "classical"              -> classical,
     "correspondence"         -> correspondence,
     "puzzle_standard"        -> puzzle_standard,
+    "puzzle_kingOfTheHill"   -> puzzle_kingOfTheHill,
     "puzzle_atomic"          -> puzzle_atomic,
+    "puzzle_horde"           -> puzzle_horde,
+    "puzzle_racingKings"     -> puzzle_racingKings,
     "puzzle_linesOfAction"   -> puzzle_linesOfAction
   )
 
@@ -360,6 +369,9 @@ case object Perfs {
       p,
       p,
       p,
+      p,
+      p,
+      p,
       Perf.Storm.default,
       Perf.Racer.default,
       Perf.Streak.default
@@ -377,7 +389,10 @@ case object Perfs {
       classical = managed,
       correspondence = managed,
       puzzle_standard = managedPuzzle,
+      puzzle_kingOfTheHill = managedPuzzle,
       puzzle_atomic = managedPuzzle,
+      puzzle_horde = managedPuzzle,
+      puzzle_racingKings = managedPuzzle,
       puzzle_linesOfAction = managedPuzzle
     )
   }
@@ -438,10 +453,16 @@ case object Perfs {
     variant match {
       case Variant.Chess(strategygames.chess.variant.Standard) =>
         Some(PerfLens(_.puzzle_standard, (p, v) => p.copy(puzzle_standard = v)))
-      case Variant.Chess(strategygames.chess.variant.LinesOfAction) =>
-        Some(PerfLens(_.puzzle_linesOfAction, (p, v) => p.copy(puzzle_linesOfAction = v)))
+      case Variant.Chess(strategygames.chess.variant.KingOfTheHill) =>
+        Some(PerfLens(_.puzzle_kingOfTheHill, (p, v) => p.copy(puzzle_kingOfTheHill = v)))
       case Variant.Chess(strategygames.chess.variant.Atomic) =>
         Some(PerfLens(_.puzzle_atomic, (p, v) => p.copy(puzzle_atomic = v)))
+      case Variant.Chess(strategygames.chess.variant.Horde) =>
+        Some(PerfLens(_.puzzle_horde, (p, v) => p.copy(puzzle_horde = v)))
+      case Variant.Chess(strategygames.chess.variant.RacingKings) =>
+        Some(PerfLens(_.puzzle_racingKings, (p, v) => p.copy(puzzle_racingKings = v)))
+      case Variant.Chess(strategygames.chess.variant.LinesOfAction) =>
+        Some(PerfLens(_.puzzle_linesOfAction, (p, v) => p.copy(puzzle_linesOfAction = v)))
       case _ => None
     }
 
@@ -515,7 +536,10 @@ case object Perfs {
         classical = perf("classical"),
         correspondence = perf("correspondence"),
         puzzle_standard = perf("puzzle_standard"),
+        puzzle_kingOfTheHill = perf("puzzle_kingOfTheHill"),
         puzzle_atomic = perf("puzzle_atomic"),
+        puzzle_horde = perf("puzzle_horde"),
+        puzzle_racingKings = perf("puzzle_racingKings"),
         puzzle_linesOfAction = perf("puzzle_linesOfAction"),
         storm = r.getO[Perf.Storm]("storm") getOrElse Perf.Storm.default,
         racer = r.getO[Perf.Racer]("racer") getOrElse Perf.Racer.default,
@@ -580,7 +604,10 @@ case object Perfs {
         "classical"              -> notNew(o.classical),
         "correspondence"         -> notNew(o.correspondence),
         "puzzle_standard"        -> notNew(o.puzzle_standard),
+        "puzzle_kingOfTheHill"   -> notNew(o.puzzle_kingOfTheHill),
         "puzzle_atomic"          -> notNew(o.puzzle_atomic),
+        "puzzle_horde"           -> notNew(o.puzzle_horde),
+        "puzzle_racingKings"     -> notNew(o.puzzle_racingKings),
         "puzzle_linesOfAction"   -> notNew(o.puzzle_linesOfAction),
         "storm"                  -> (o.storm.nonEmpty option o.storm),
         "racer"                  -> (o.racer.nonEmpty option o.racer),

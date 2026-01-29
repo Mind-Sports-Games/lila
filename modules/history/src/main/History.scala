@@ -58,7 +58,10 @@ case class History(
     classical: RatingsMap,
     correspondence: RatingsMap,
     puzzle_standard: RatingsMap,
+    puzzle_kingOfTheHill: RatingsMap,
     puzzle_atomic: RatingsMap,
+    puzzle_horde: RatingsMap,
+    puzzle_racingKings: RatingsMap,
     puzzle_linesOfAction: RatingsMap
 ) {
 
@@ -116,7 +119,10 @@ case class History(
       case "nackgammon"             => nackgammon
       case "abalone"                => abalone
       case "puzzle_standard"        => puzzle_standard
+      case "puzzle_kingOfTheHill"   => puzzle_kingOfTheHill
       case "puzzle_atomic"          => puzzle_atomic
+      case "puzzle_horde"           => puzzle_horde
+      case "puzzle_racingKings"     => puzzle_racingKings
       case "puzzle_linesOfAction"   => puzzle_linesOfAction
       case "ultraBullet"            => ultraBullet
       case x                        => sys error s"No history for perf $x"
@@ -202,7 +208,10 @@ object History {
           classical = ratingsMap("classical"),
           correspondence = ratingsMap("correspondence"),
           puzzle_standard = ratingsMap("puzzle_standard"),
+          puzzle_kingOfTheHill = ratingsMap("puzzle_kingOfTheHill"),
           puzzle_atomic = ratingsMap("puzzle_atomic"),
+          puzzle_horde = ratingsMap("puzzle_horde"),
+          puzzle_racingKings = ratingsMap("puzzle_racingKings"),
           puzzle_linesOfAction = ratingsMap("puzzle_linesOfAction")
         )
       }
