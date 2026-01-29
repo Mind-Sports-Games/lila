@@ -92,6 +92,7 @@ POST  /training/coordinate/playerIndex       controllers.Coordinate.playerIndex
 GET   /training                                         controllers.Puzzle.base
 GET   /training/dashboard                               controllers.Puzzle.dashboardBase
 GET   /training/themes                                  controllers.Puzzle.themesBase
+GET   /training/faq                                     controllers.Puzzle.faq(variant: Option[String] ?= None)
 GET   /training/:variant                                controllers.Puzzle.home(variant: String)
 GET   /training/daily/puzzle                            controllers.Puzzle.daily
 GET   /training/frame/daily                             controllers.Puzzle.frame
@@ -102,7 +103,6 @@ GET   /training/:variant/dashboard/$days<\d+>           controllers.Puzzle.dashb
 GET   /training/:variant/dashboard/$days<\d+>/:path     controllers.Puzzle.dashboard(variant: String, days: Int, path: String)
 GET   /training/:variant/replay/$days<\d+>/:theme       controllers.Puzzle.replay(variant: String, days: Int, theme: String)
 GET   /training/:variant/history                        controllers.Puzzle.history(variant: String, page: Int ?= 1)
-GET   /training/:variant/faq                            controllers.Puzzle.faq(variant: String)
 # GET   /training/batch                  controllers.Puzzle.mobileBcBatchSelect
 # POST  /training/batch                  controllers.Puzzle.mobileBcBatchSolve
 # GET   /training/new                    controllers.Puzzle.mobileBcNew
