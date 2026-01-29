@@ -192,19 +192,15 @@ final class PuzzleSessionApi(
       theme: PuzzleTheme.Key
   ): Fu[PuzzleSession] =
     sessions.getFuture(user.id, _ => createSessionFor(user, variant, theme)) flatMap { current =>
-      if (
-        current.path.theme == theme && current.path.variant.key == variant.key && !shouldChangeSession(
-          user,
-          current
-        )
-      ) fuccess(current)
+      if (current.path.theme == theme && current.path.variant.key == variant.key) fuccess(current)
       else createSessionFor(user, variant, theme, current.difficulty) tap { sessions.put(user.id, _) }
     }
 
-  private def shouldChangeSession(user: User, session: PuzzleSession) = !session.brandNew && {
-    val perf = Perfs.puzzleLens(session.path.variant).map(_.get(user.perfs))
-    perf.exists(_.clueless) || (perf.exists(_.provisional) && perf.exists(_.nb % 5 == 0))
-  }
+  // Add this check back in above (continueOrCreateSessionFor) when we have puzzles of all rating ranges
+  // private def shouldChangeSession(user: User, session: PuzzleSession) = !session.brandNew && {
+  //   val perf = Perfs.puzzleLens(session.path.variant).map(_.get(user.perfs))
+  //   perf.exists(_.clueless) || (perf.exists(_.provisional) && perf.exists(_.nb % 5 == 0))
+  // }
 
   private def createSessionFor(
       user: User,
