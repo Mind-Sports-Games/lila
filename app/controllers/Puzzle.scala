@@ -469,10 +469,10 @@ final class Puzzle(
         }
     }
 
-  def faq(variant: String) =
+  def faq(variant: Option[String]) =
     Open { implicit ctx =>
       NoBot {
-        Ok(views.html.puzzle.faq(puzzleVariantFromKey(variant))).fuccess
+        Ok(views.html.puzzle.faq(variant.fold(mostPlayedPuzzleVariant)(puzzleVariantFromKey))).fuccess
       }
     }
 
