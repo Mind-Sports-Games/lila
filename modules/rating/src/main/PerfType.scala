@@ -25,6 +25,15 @@ object PuzzlePerf {
         title = "Chess tactics trainer",
         iconChar = Variant.orDefault(GameLogic.Chess(), "standard").perfIcon
       )
+  case object KingOfTheHillPuzzle
+      extends PuzzlePerf(
+        GameFamily.Chess(),
+        1000012,
+        key = "puzzle_kingOfTheHill",
+        name = "King of the Hill Training",
+        title = "King of the Hill tactics trainer",
+        iconChar = Variant.orDefault(GameLogic.Chess(), "kingOfTheHill").perfIcon
+      )
   case object AtomicPuzzle
       extends PuzzlePerf(
         GameFamily.Chess(),
@@ -33,6 +42,24 @@ object PuzzlePerf {
         name = "Atomic Training",
         title = "Atomic tactics trainer",
         iconChar = Variant.orDefault(GameLogic.Chess(), "atomic").perfIcon
+      )
+  case object HordePuzzle
+      extends PuzzlePerf(
+        GameFamily.Chess(),
+        1000016,
+        key = "puzzle_horde",
+        name = "Horde Training",
+        title = "Horde tactics trainer",
+        iconChar = Variant.orDefault(GameLogic.Chess(), "horde").perfIcon
+      )
+  case object RacingKingsPuzzle
+      extends PuzzlePerf(
+        GameFamily.Chess(),
+        1000017,
+        key = "puzzle_racingKings",
+        name = "Racing Kings Training",
+        title = "Racing Kings tactics trainer",
+        iconChar = Variant.orDefault(GameLogic.Chess(), "racingKings").perfIcon
       )
   case object LinesOfActionPuzzle
       extends PuzzlePerf(
@@ -97,7 +124,10 @@ object PerfType {
   val allPuzzle: List[PerfType] =
     List(
       new PerfType(Right(PuzzlePerf.ChessPuzzle)),
+      new PerfType(Right(PuzzlePerf.KingOfTheHillPuzzle)),
       new PerfType(Right(PuzzlePerf.AtomicPuzzle)),
+      new PerfType(Right(PuzzlePerf.HordePuzzle)),
+      new PerfType(Right(PuzzlePerf.RacingKingsPuzzle)),
       new PerfType(Right(PuzzlePerf.LinesOfActionPuzzle))
     )
 

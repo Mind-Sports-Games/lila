@@ -65,9 +65,11 @@ object Puzzle {
 
   val puzzleVariants: List[Variant] = List(
     Variant.orDefault(GameLogic.Chess(), 1), //Standard
+    Variant.orDefault(GameLogic.Chess(), 4), //King of the Hill
     Variant.orDefault(GameLogic.Chess(), 7), //Atomic
+    Variant.orDefault(GameLogic.Chess(), 8), //Horde
+    Variant.orDefault(GameLogic.Chess(), 9), //Racing Kings
     Variant.orDefault(GameLogic.Chess(), 11) //Lines of Action
-    //Variant.orDefault(GameLogic.FairySF(), 2) //Xiangqi - requires startops support first
   )
 
   val defaultVariant: Variant = puzzleVariants.head

@@ -222,7 +222,7 @@ object PuzzleTheme {
       )
     ) ::: categorizedOrigin
 
-  val categorizedAtomic =
+  val categorizedChessVariant =
     categorizedMix ::: categorizedChessPhases ::: categorizedChessMotifs ::: categorizedAdvanced :::
       categorizedMate ::: categorizedGoals ::: categorizedOrigin
 
@@ -244,9 +244,11 @@ object PuzzleTheme {
 
   val byCategorizedVariant: Map[String, List[(I18nKey, List[PuzzleTheme])]] = Map(
     "standard"      -> categorizedStandard,
-    "atomic"        -> categorizedAtomic,
-    "linesOfAction" -> categorizedLinesOfAction,
-    "xiangqi"       -> categorizedXiangqi
+    "kingOfTheHill" -> categorizedChessVariant,
+    "atomic"        -> categorizedChessVariant,
+    "horde"         -> categorizedChessVariant,
+    "racingKings"   -> categorizedChessVariant,
+    "linesOfAction" -> categorizedLinesOfAction
   )
 
   lazy val all: List[PuzzleTheme] = byCategorizedVariant.values.flatMap(_.flatMap(_._2)).toList.distinct
