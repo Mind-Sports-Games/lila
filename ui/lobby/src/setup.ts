@@ -926,9 +926,9 @@ export default class Setup {
     const setAnonOptions = () => {
       const isAnon = $form.data('anon');
       if (isAnon) {
-        setBaseDefaultOptions(); //defult to chess, real time, blitz clock
+        setBaseDefaultOptions(); //default to chess, real time, blitz clock
         $casual.trigger('click');
-        $opponentInput.val('lobby'); //default to lobby
+        $opponentInput.val('bot');
         disableNonRealTimeModes();
       }
     };
@@ -1162,41 +1162,46 @@ export default class Setup {
       });
     });
     const updateBotDetails = () => {
-      let bot = $botInput.filter(':checked').val() as string;
+      const fromBotProfile = user && $form.data('target-is-bot');
+      let bot = fromBotProfile ? user : ($botInput.filter(':checked').val() as string);
       if (!bot) {
-        $botInput.val('ps-greedy-two-move'); //default bot
+        $botInput.val('ps-greedy-two-move');
         bot = 'ps-greedy-two-move';
       }
+
+      const isKnownBot = this.psBots.includes(bot) || this.stockfishBots.includes(bot);
+      const botName = isKnownBot
+        ? bot
+            .replace('stockfish-l', 'Stockfish-L')
+            .replace('ps-', 'PS-')
+            .replace('greedy-', 'Greedy-')
+            .replace('-move', '-Move')
+            .replace('random', 'Random')
+            .replace('one', 'One')
+            .replace('four', 'Four')
+            .replace('two', 'Two')
+        : bot;
       const botText = $form.find('.opponent_bot.choice');
-      const botName = bot
-        .replace('stockfish-l', 'Stockfish-L')
-        .replace('ps-', 'PS-')
-        .replace('greedy-', 'Greedy-')
-        .replace('-move', '-Move')
-        .replace('random', 'Random')
-        .replace('one', 'One')
-        .replace('four', 'Four')
-        .replace('two', 'Two');
       botText.empty();
       botText.append(
         `<a class="user-link ulpt" href="/@/${bot}"><span class="utitle" data-bot="data-bot" title="Robot">BOT</span>&nbsp${botName}</a>`,
       );
-      const botSelected = $opponentInput.filter(':checked').val() === 'bot';
-      if (!botSelected) return;
-      if (user || $form.attr('action').includes('user'))
-        $form.attr('action', $form.attr('action')?.replace(/user=[^&]*/, 'user=' + bot));
-      else $form.attr('action', $form.attr('action') + `&user=${bot}`);
+
+      if ($opponentInput.filter(':checked').val() !== 'bot') return;
+
+      if (!fromBotProfile) {
+        if ($form.attr('action')?.includes('user'))
+          $form.attr('action', $form.attr('action')?.replace(/user=[^&]*/, 'user=' + bot));
+        else $form.attr('action', $form.attr('action') + `&user=${bot}`);
+      }
     };
     const setupOpponentChoices = () => {
       $botChoices.hide();
       $form.find('.bot_title').hide();
       $form.find('.rating-range-config').hide();
       if (user) {
-        if (vsPSBot || vsStockfishBot) {
-          $opponentInput.val('bot');
-        } else {
-          $opponentInput.val('friend');
-        }
+        const targetIsBot = $form.data('target-is-bot');
+        $opponentInput.val(targetIsBot ? 'bot' : 'friend');
       }
       updateBotDetails();
     };
