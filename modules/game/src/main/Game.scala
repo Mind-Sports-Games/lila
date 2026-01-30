@@ -1028,7 +1028,7 @@ case class Game(
   def playerPov(p: Player)                          = pov(p.playerIndex)
   def loserPov                                      = loser map playerPov
 
-  //When updating, also edit modules/challenge and ui/@types/playstrategy/index.d.ts:declare type PlayerName
+  //When updating, also edit modules/challenge, modules/puzzle and ui/@types/playstrategy/index.d.ts:declare type PlayerName
   def playerTrans(p: PlayerIndex)(implicit lang: Lang) =
     stratGame.board.variant.playerNames(p) match {
       case "White" => trans.white.txt()
@@ -1236,6 +1236,7 @@ object Game {
     val historyLastTurn           = "hlm" // was called historyLastMove hence hlm
     val historyCurrentTurn        = "hct"
     val unmovedRooks              = "ur"
+    val halfMoveClock             = "hmc"
     val daysPerTurn               = "cd"
     val plyTimes                  = "mt"  // was called moveTimes hence mt
     val p1ClockHistory            = "cw"

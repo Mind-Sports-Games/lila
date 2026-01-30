@@ -14,6 +14,7 @@ $all-variants: (
   'monster',
   'linesOfAction',
   'scrambledEggs',
+  'dameo',
   'xiangqi',
   'minixiangqi',
   'breakthroughtroyka',
@@ -36,6 +37,10 @@ $xiangqi-piece-roles: (
   'k-piece': 'king.svg',
   'p-piece': 'soldier.svg',
   'r-piece': 'chariot.svg',
+);
+$dameo-piece-roles: (
+  'k-piece': 'dK.svg',
+  'm-piece': 'dM.svg',
 );
 
 @each $variant in $all-variants {
@@ -60,6 +65,12 @@ $xiangqi-piece-roles: (
 
       @if ($variant == 'xiangqi' or $variant == 'minixiangqi') {
         @each $role, $r in $xiangqi-piece-roles {
+          &.#{$role} {
+            background-image: url(../piece/mono/#{$r});
+          }
+        }
+      } @else if ($variant == 'dameo') {
+        @each $role, $r in $dameo-piece-roles {
           &.#{$role} {
             background-image: url(../piece/mono/#{$r});
           }

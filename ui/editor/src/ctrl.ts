@@ -86,6 +86,8 @@ export default class EditorCtrl {
 
     this.castlingToggles = { K: false, Q: false, k: false, q: false };
 
+    playstrategy.pageVariant = this.variantKey; // initialize variant for dasher
+
     this.redraw = () => {};
     this.setFen(this.initialFen);
     this.redraw = redraw;
@@ -178,6 +180,7 @@ export default class EditorCtrl {
     if (!this.cfg.embed) {
       this.replaceState({ rules: this.rules, variantKey: this.variantKey, fen: newFen }, this.makeUrl('/editor/', fen));
     }
+    playstrategy.pageVariant = this.variantKey; // update variant for dasher
     this.options.onChange && this.options.onChange(newFen);
     this.redraw();
   }

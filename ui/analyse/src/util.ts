@@ -280,6 +280,7 @@ const noServerEvalVariants = [
   'monster',
   'linesOfAction',
   'scrambledEggs',
+  'dameo',
   'amazons',
   'oware',
   'togyzkumalak',

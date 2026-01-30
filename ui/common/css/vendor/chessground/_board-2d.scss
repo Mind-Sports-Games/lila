@@ -166,6 +166,8 @@ $chess-variants: (
 
 $loa-variants: ('linesOfAction', 'scrambledEggs');
 
+$dameo-variants: ('dameo');
+
 $shogi-variants: ('shogi'); //must use same board
 
 $xiangqi-variants: ('xiangqi'); // must use same board
@@ -185,6 +187,12 @@ $abalone-variants: ('abalone');
     .#{$gameFamily}-#{$color} .#{$gameFamily}.is2d cg-board {
       background-image: url(../images/board/chess/#{$file});
     }
+  }
+}
+
+@each $color, $file in $chess-board-files {
+  .dameo-#{$color} .variant-dameo.is2d cg-board {
+    background-image: url(../images/board/dameo/#{$file});
   }
 }
 
@@ -321,6 +329,14 @@ $abalone-variants: ('abalone');
   @each $color, $file in $chess-board-files {
     .loa-#{$color} .is2d .variant-#{$variant} cg-board {
       background-image: url(../images/board/loa/#{$file});
+    }
+  }
+}
+
+@each $variant in $dameo-variants {
+  @each $color, $file in $chess-board-files {
+    .dameo-#{$color} .is2d .variant-#{$variant} cg-board {
+      background-image: url(../images/board/dameo/#{$file});
     }
   }
 }

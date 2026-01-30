@@ -84,7 +84,8 @@ private object BSONHandlers {
     isoHandler[Posts, List[PostId]]((p: Posts) => p.value, Posts.apply _)
 
   implicit lazy val puzzlesHandler: BSONHandler[lila.activity.activities.Puzzles] =
-    isoHandler[Puzzles, Score]((p: Puzzles) => p.score, Puzzles.apply _)
+    typedMapHandler[PerfType, Score](perfTypeKeyIso)
+      .as[Puzzles](Puzzles.apply, _.value)
 
   implicit lazy val stormHandler: lila.db.BSON[lila.activity.activities.Storm] = new lila.db.BSON[Storm] {
     def reads(r: lila.db.BSON.Reader)            = Storm(r.intD("r"), r.intD("s"))

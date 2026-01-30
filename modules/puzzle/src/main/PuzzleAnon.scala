@@ -7,6 +7,8 @@ import lila.common.ThreadLocalRandom
 import lila.db.dsl._
 import lila.memo.CacheApi
 
+import strategygames.variant.Variant
+
 final class PuzzleAnon(
     colls: PuzzleColls,
     cacheApi: CacheApi,
@@ -16,9 +18,9 @@ final class PuzzleAnon(
 
   import BsonHandlers._
 
-  def getOneFor(theme: PuzzleTheme.Key): Fu[Option[Puzzle]] =
+  def getOneFor(variant: Variant, theme: PuzzleTheme.Key): Fu[Option[Puzzle]] =
     pool
-      .get(theme)
+      .get((variant, theme))
       .map(ThreadLocalRandom.oneOf)
       .mon(_.puzzle.selector.anon.time(theme.value))
       .addEffect {
@@ -28,33 +30,37 @@ final class PuzzleAnon(
       }
 
   def getBatchFor(nb: Int): Fu[Vector[Puzzle]] = {
-    pool get PuzzleTheme.mix.key map (_ take nb)
+    pool.get((Puzzle.defaultVariant, PuzzleTheme.mix.key)) map (_ take nb)
   }.mon(_.puzzle.selector.anon.batch(nb))
 
   private val poolSize = 150
 
   private val pool =
-    cacheApi[PuzzleTheme.Key, Vector[Puzzle]](initialCapacity = 64, name = "puzzle.byTheme.anon") {
+    cacheApi[(Variant, PuzzleTheme.Key), Vector[Puzzle]](initialCapacity = 64, name = "puzzle.byTheme.anon") {
       _.expireAfterWrite(1 minute)
-        .buildAsyncFuture { theme =>
-          countApi byTheme theme flatMap { count =>
-            val tier =
-              if (count > 5000) PuzzleTier.Top
-              else if (count > 2000) PuzzleTier.Good
-              else PuzzleTier.All
-            val ratingRange: Range =
-              if (count > 9000) 1300 to 1600
-              else if (count > 5000) 1100 to 1800
-              else 0 to 9999
-            val pathSampleSize =
-              if (count > 9000) 3
-              else if (count > 5000) 5
-              else if (count > 2000) 8
-              else 15
+        .buildAsyncFuture { case (variant, theme) =>
+          countApi.byVariantTheme(variant, theme) flatMap { count =>
+            //TODO tailor selection criteria when more variety of puzzles available
+            // val tier =
+            //   if (count > 5000) PuzzleTier.Top
+            //   else if (count > 2000) PuzzleTier.Good
+            //   else PuzzleTier.All
+            // val ratingRange: Range =
+            //   if (count > 9000) 1300 to 1600
+            //   else if (count > 5000) 1100 to 1800
+            //   else 0 to 9999
+            // val pathSampleSize =
+            //   if (count > 9000) 3
+            //   else if (count > 5000) 5
+            //   else if (count > 2000) 8
+            //   else 15
+            val tier               = PuzzleTier.All
+            val ratingRange: Range = 0 to 9999
+            val pathSampleSize     = 15
             colls.path {
               _.aggregateList(poolSize) { framework =>
                 import framework._
-                Match(pathApi.select(theme, tier, ratingRange)) -> List(
+                Match(pathApi.select(variant, theme, tier, ratingRange)) -> List(
                   Sample(pathSampleSize),
                   Project($doc("puzzleId" -> "$ids", "_id" -> false)),
                   Unwind("puzzleId"),

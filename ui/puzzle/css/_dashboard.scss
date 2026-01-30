@@ -1,4 +1,5 @@
 @import 'history';
+@import 'variant';
 
 .puzzle-dashboard {
   .box__top {
@@ -46,6 +47,13 @@
 
   &__metrics {
     display: flex;
+    justify-content: space-between;
+
+    @include breakpoint($mq-col1-phone) {
+      gap: 1em;
+      flex-direction: column;
+      font-size: 0.7em;
+    }
   }
 
   &__metric {
@@ -57,12 +65,7 @@
     padding: 0.4em 0 0.6em 0;
     text-transform: uppercase;
     flex: 0 0 23.5%;
-    margin-left: 2%;
     cursor: default;
-
-    &:first-child {
-      margin-left: 0;
-    }
 
     strong {
       @extend %roboto;

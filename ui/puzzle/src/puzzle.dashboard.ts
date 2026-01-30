@@ -12,6 +12,7 @@ interface RadarData {
 
 export function PlayStrategyPuzzleDashboard(data: RadarData) {
   const canvas = document.querySelector('.puzzle-dashboard__radar') as HTMLCanvasElement;
+  if (!canvas) return; // Defend against missing canvas
   const d = data.radar;
   const dark = $('body').hasClass('dark');
   d.datasets[0] = {

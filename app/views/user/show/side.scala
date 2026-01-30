@@ -8,6 +8,7 @@ import lila.app.templating.Environment._
 import lila.app.ui.ScalatagsTemplate._
 import lila.rating.PerfType
 import lila.user.User
+import lila.puzzle.Puzzle
 
 object side {
 
@@ -21,7 +22,7 @@ object side {
       perf.nonEmpty option showPerf(perf, perfType)
 
     def showPerf(perf: lila.rating.Perf, perfType: PerfType) = {
-      val isPuzzle = perfType.key == "puzzle"
+      val isPuzzle = perfType.key.startsWith("puzzle")
       a(
         dataIcon := perfType.iconChar,
         title := perfType.desc,
@@ -30,28 +31,27 @@ object side {
           "active" -> active.has(perfType)
         ),
         href := {
-          if (isPuzzle) ctx.is(u) option routes.Puzzle.dashboard(30, "home").url
+          if (isPuzzle)
+            ctx.is(u) option routes.Puzzle.dashboard(perfType.key.split("_")(1), 30, "home").url
           else routes.User.perfStat(u.username, perfType.key).url.some
         },
         span(
           h3(perfType.trans),
-          if (isPuzzle && u.perfs.dubiousPuzzle && !ctx.is(u)) st.rating("?")
-          else
-            st.rating(
-              if (perf.glicko.clueless) strong("?")
-              else
-                strong(
-                  perf.glicko.intRating,
-                  perf.provisional option "?"
-                ),
-              " ",
-              ratingProgress(perf.progress),
-              " ",
-              span(
-                if (perfType.key == "puzzle") trans.nbPuzzles(perf.nb, perf.nb.localize)
-                else trans.nbGames(perf.nb, perf.nb.localize)
-              )
-            ),
+          st.rating(
+            if (perf.glicko.clueless) strong("?")
+            else
+              strong(
+                perf.glicko.intRating,
+                perf.provisional option "?"
+              ),
+            " ",
+            ratingProgress(perf.progress),
+            " ",
+            span(
+              if (isPuzzle) trans.nbPuzzles(perf.nb, perf.nb.localize)
+              else trans.nbGames(perf.nb, perf.nb.localize)
+            )
+          ),
           rankMap get perfType map { rank =>
             span(cls := "rank", title := trans.rankIsUpdatedEveryNbMinutes.pluralSameTxt(15))(
               trans.rankX(rank.localize)
@@ -94,6 +94,7 @@ object side {
         showNonEmptyPerf(u.perfs.pool, PerfType.orDefault("pool")),
         showNonEmptyPerf(u.perfs.portuguese, PerfType.orDefault("portuguese")),
         showNonEmptyPerf(u.perfs.english, PerfType.orDefault("english")),
+        showNonEmptyPerf(u.perfs.dameo, PerfType.orDefault("dameo")),
         showNonEmptyPerf(u.perfs.shogi, PerfType.orDefault("shogi")),
         showNonEmptyPerf(u.perfs.xiangqi, PerfType.orDefault("xiangqi")),
         showNonEmptyPerf(u.perfs.minishogi, PerfType.orDefault("minishogi")),
@@ -114,14 +115,16 @@ object side {
         showNonEmptyPerf(u.perfs.backgammon, PerfType.orDefault("backgammon")),
         showNonEmptyPerf(u.perfs.hyper, PerfType.orDefault("hyper")),
         showNonEmptyPerf(u.perfs.nackgammon, PerfType.orDefault("nackgammon")),
-        showNonEmptyPerf(u.perfs.abalone, PerfType.orDefault("abalone"))
-//         u.noBot option frag(
-//           hr,
-//           showPerf(u.perfs.puzzle, PerfType.orDefault("puzzle")),
-//           showStorm(u.perfs.storm, u),
-//           showRacer(u.perfs.racer, u),
-//           showStreak(u.perfs.streak, u)
-//         )
+        showNonEmptyPerf(u.perfs.abalone, PerfType.orDefault("abalone")),
+        u.noBot option frag(
+          hr,
+          showNonEmptyPerf(u.perfs.puzzle_standard, PerfType.orDefault("puzzle_standard")),
+          showNonEmptyPerf(u.perfs.puzzle_atomic, PerfType.orDefault("puzzle_atomic")),
+          showNonEmptyPerf(u.perfs.puzzle_linesOfAction, PerfType.orDefault("puzzle_linesOfAction"))
+          // showStorm(u.perfs.storm, u),
+          // showRacer(u.perfs.racer, u),
+          // showStreak(u.perfs.streak, u)
+        )
       )
     )
   }

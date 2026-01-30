@@ -57,7 +57,7 @@ export interface AnalyseData {
 }
 
 export interface AnalysePref {
-  coords: Prefs.Coords;
+  coords: cg.Coords;
   pieceSet: Piece[];
   is3d?: boolean;
   showDests?: boolean;

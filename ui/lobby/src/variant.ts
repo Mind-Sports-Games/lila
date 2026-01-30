@@ -16,6 +16,7 @@ type variantConfirmsType = {
   frysk: string;
   antidraughts: string;
   breakthrough: string;
+  dameo: string;
   shogi: string;
   minishogi: string;
   xiangqi: string;
@@ -65,6 +66,7 @@ const variantConfirms: variantConfirmsType = {
   antidraughts:
     'This is an Antidraughts game!\n\nThe game can be won by losing all your pieces, or running out of moves.',
   breakthrough: 'This is a BRKTHRU game!\n\nThe first player who makes a king wins.',
+  dameo: 'This is a Dameo game!\n\nAll 64 squares are used, with pieces moving diagonally and orthogonally.',
   shogi: 'This is a Shogi game!\n\nThe aim of the game is to checkmate the opponent.',
   minishogi: 'This is a Mini Shogi game!\n\nThe aim of the game is to checkmate the opponent.',
   xiangqi: 'This is a Xiangqi game!\n\nThe aim of the game is to checkmate the opponent.',

@@ -249,36 +249,9 @@ export function main(ctrl: RoundController): VNode {
   const checks: CheckCount =
     d.player.checks || d.opponent.checks ? util.countChecks(ctrl.data.steps, ctrl.ply) : util.noChecks;
 
-  // fix coordinates for non-chess games to display them outside due to not working well displaying on board
-  if (
-    [
-      'xiangqi',
-      'shogi',
-      'minixiangqi',
-      'minishogi',
-      'flipello',
-      'flipello10',
-      'antiflipello',
-      'octagonflipello',
-      'oware',
-      'go9x9',
-      'go13x13',
-      'go19x19',
-    ].includes(variantKey)
-  ) {
-    if (!$('body').hasClass('coords-no')) {
-      $('body').removeClass('coords-in').addClass('coords-out');
-    }
-  }
-  //Togyzkumalak, Abalone and Backgammon board always has coodinates on the inside
-  if (['togyzkumalak', 'bestemshe', 'backgammon', 'hyper', 'nackgammon', 'abalone'].includes(variantKey)) {
-    if (!$('body').hasClass('coords-no')) {
-      $('body').removeClass('coords-out').addClass('coords-in');
-    }
-  }
-
   //Add piece-letter class for games which dont want Noto Chess (font-famliy)
   const notationBasic = [
+    'dameo',
     'xiangqi',
     'shogi',
     'minixiangqi',

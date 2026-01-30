@@ -27,10 +27,10 @@ object activities {
   case class PostId(value: String) extends AnyVal
   implicit val PostsZero: Zero[Posts] = Zero.instance(Posts(Nil))
 
-  case class Puzzles(score: Score) {
-    def +(s: Score) = Puzzles(score = score add s)
+  case class Puzzles(value: Map[PerfType, Score]) {
+    def +(s: Score, pt: PerfType) = Puzzles(value = value + (pt -> value.get(pt).fold(s)(_ add s)))
   }
-  implicit val PuzzlesZero: Zero[Puzzles] = Zero.instance(Puzzles(ScoreZero.zero))
+  implicit val PuzzlesZero: Zero[Puzzles] = Zero.instance(Puzzles(Map.empty))
 
   case class Storm(runs: Int, score: Int) {
     def +(s: Int) = Storm(runs = runs + 1, score = score atLeast s)

@@ -2,6 +2,7 @@ import PuzzleSession from './session';
 import { Api as CgApi } from 'chessground/api';
 import { CevalCtrl, NodeEvals } from 'ceval';
 import { Config as CgConfig } from 'chessground/config';
+import { Coords as CgCoords } from 'chessground/types';
 import { Deferred } from 'common/defer';
 import { Outcome, Role, Move } from 'stratops/types';
 import { Prop } from 'common';
@@ -9,7 +10,6 @@ import { StoredBooleanProp } from 'common/storage';
 import { TreeWrapper } from 'tree';
 import { VNode } from 'snabbdom';
 import PuzzleStreak from './streak';
-import * as Prefs from 'common/prefs';
 
 export type MaybeVNode = VNode | string | null | undefined;
 export type MaybeVNodes = MaybeVNode[];
@@ -80,6 +80,19 @@ export interface Vm {
   mainline: Tree.Node[];
   pov: PlayerIndex;
   mode: 'play' | 'view' | 'try';
+  variant: {
+    key: VariantKey;
+    short: string;
+    name: string;
+    lib: number;
+    boardSize: {
+      width: number;
+      height: number;
+    };
+  };
+  perfIcon: string;
+  dimensions: { width: number; height: number };
+  playerColors: PlayerName[];
   round?: PuzzleRound;
   next: Deferred<PuzzleData>;
   justPlayed?: Key;
@@ -108,7 +121,8 @@ export interface PuzzleOpts {
 }
 
 export interface PuzzlePrefs {
-  coords: Prefs.Coords;
+  coords: CgCoords;
+  userCoords: CgCoords;
   is3d: boolean;
   destination: boolean;
   rookCastle: boolean;
@@ -148,9 +162,19 @@ export interface PuzzleGame {
     icon: string;
     name: string;
   };
+  variant: {
+    key: VariantKey;
+    short: string;
+    name: string;
+    lib: number;
+    boardSize: {
+      width: number;
+      height: number;
+    };
+  };
   rated: boolean;
   players: [PuzzlePlayer, PuzzlePlayer];
-  pgn: string;
+  actionStrs: string;
   clock: string;
 }
 
@@ -159,6 +183,7 @@ export interface PuzzlePlayer {
   name: string;
   title?: string;
   playerIndex: PlayerIndex;
+  playerColor: PlayerName;
 }
 
 export interface PuzzleUser {
@@ -174,6 +199,10 @@ export interface Puzzle {
   plays: number;
   initialPly: number;
   themes: ThemeKey[];
+  perf: {
+    icon: string;
+    name: string;
+  };
 }
 
 export interface PuzzleResult {

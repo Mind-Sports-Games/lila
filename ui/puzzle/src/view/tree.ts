@@ -3,6 +3,8 @@ import { defined } from 'common';
 import throttle from 'common/throttle';
 import { renderEval as normalizeEval } from 'ceval';
 import { path as treePath } from 'tree';
+import { variantClassFromKey } from 'stratops/variants/util';
+import { fixCrazySan } from 'stratutils';
 import { Controller, MaybeVNode, MaybeVNodes } from '../interfaces';
 
 interface Ctx {
@@ -157,10 +159,19 @@ function puzzleGlyph(ctx: Ctx, node: Tree.Node): MaybeVNode {
   }
 }
 
+function renderAction(variant: VariantKey, node: Tree.Node): string {
+  return variantClassFromKey(variant).computeMoveNotation({
+    san: fixCrazySan(node.san || ''),
+    uci: node.uci || '',
+    fen: node.fen,
+    prevFen: '', //node.prevFen || '', // TODO Required for shogi
+  });
+}
+
 export function renderMove(ctx: Ctx, node: Tree.Node): MaybeVNodes {
   const ev = node.eval || node.ceval;
   return [
-    node.san,
+    renderAction(ctx.ctrl.vm.variant.key, node),
     ev &&
       (defined(ev.cp) ? renderEval(normalizeEval(ev.cp)) : defined(ev.mate) ? renderEval('#' + ev.mate) : undefined),
     puzzleGlyph(ctx, node),
@@ -182,7 +193,7 @@ function renderVariationMoveOf(ctx: Ctx, node: Tree.Node, opts: RenderOpts): VNo
       attrs: { p: path },
       class: classes,
     },
-    [withIndex ? renderIndex(node, true) : null, node.san, puzzleGlyph(ctx, node)],
+    [withIndex ? renderIndex(node, true) : null, renderAction(ctx.ctrl.vm.variant.key, node), puzzleGlyph(ctx, node)],
   );
 }
 

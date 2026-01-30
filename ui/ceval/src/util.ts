@@ -13,6 +13,7 @@ const noClientEvalVariants = [
   'fromPositionDraughts',
   'frisian',
   'frysk',
+  'dameo',
   'amazons',
   'minibreakthroughtroyka', // Note: it looks like fairySF decided the board starts from a5, thus it's computations seem to be wrong
   'antiflipello',
@@ -68,6 +69,7 @@ const noPracticeWithComputerVariants: VariantKey[] = [
   'monster',
   'linesOfAction',
   'scrambledEggs',
+  'dameo',
   'shogi',
   'xiangqi',
   'minishogi',

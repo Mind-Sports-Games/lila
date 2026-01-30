@@ -145,37 +145,37 @@ $('#asset-version-message').text(window.playstrategy.info.message);"""
           )
         },
         br,
-        // div(cls := "box box-pad developers body") {
-        //   val args = """style="width: 400px; height: 444px;" allowtransparency="true" frameborder="0""""
-        //   frag(
-        //     h1(id := "embed-puzzle")("Embed the daily puzzle in your site"),
-        //     div(cls := "center")(
-        //       raw(s"""<iframe src="/training/frame?theme=brown&bg=dark" $args></iframe>""")
-        //     ),
-        //     p("Add the following HTML to your site:"),
-        //     p(cls := "copy-zone")(
-        //       input(
-        //         id := "puzzle-embed-src",
-        //         cls := "copyable autoselect",
-        //         value := s"""<iframe src="$netBaseUrl/training/frame?theme=brown&bg=dark" $args></iframe>"""
-        //       ),
-        //       button(
-        //         title := "Copy code",
-        //         cls := "copy button",
-        //         dataRel := "puzzle-embed-src",
-        //         dataIcon := "\""
-        //       )
-        //     ),
-        //     parameters,
-        //     p("The text is automatically translated to your visitor's language."),
-        //     p(
-        //       "Alternatively, you can ",
-        //       a(href := routes.Main.dailyPuzzleSlackApp)("post the puzzle in your slack workspace"),
-        //       "."
-        //     )
-        //   )
-        // },
-        // br,
+        div(cls := "box box-pad developers body") {
+          val args = """style="width: 400px; height: 444px;" allowtransparency="true" frameborder="0""""
+          frag(
+            h1(id := "embed-puzzle")("Embed the daily puzzle in your site"),
+            div(cls := "center")(
+              raw(s"""<iframe src="/training/frame/daily?bg=auto&theme=auto" $args></iframe>""")
+            ),
+            p("Add the following HTML to your site:"),
+            p(cls := "copy-zone")(
+              input(
+                id := "puzzle-embed-src",
+                cls := "copyable autoselect",
+                value := s"""<iframe src="$netBaseUrl/training/frame/daily?bg=auto&theme=auto" $args></iframe>"""
+              ),
+              button(
+                title := "Copy code",
+                cls := "copy button",
+                dataRel := "puzzle-embed-src",
+                dataIcon := "\""
+              )
+            ),
+            parameters,
+            p("The text is automatically translated to your visitor's language.")
+            // p(
+            //   "Alternatively, you can ",
+            //   a(href := routes.Main.dailyPuzzleSlackApp)("post the puzzle in your slack workspace"),
+            //   "."
+            // )
+          )
+        },
+        br,
         div(cls := "box box-pad developers body") {
           val args = """style="width: 600px; height: 397px;" frameborder="0""""
           frag(

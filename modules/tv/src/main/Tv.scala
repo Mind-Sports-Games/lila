@@ -96,6 +96,7 @@ object Tv {
   import strategygames.go.{ variant => GV }
   import strategygames.backgammon.{ variant => BV }
   import strategygames.abalone.{ variant => AV }
+  import strategygames.dameo.{ variant => D2V }
   import strategygames.{ Speed => S, GameFamily }
 
   case class Champion(user: LightUser, rating: Int, gameId: Game.ID)
@@ -162,7 +163,7 @@ object Tv {
           name = s"All ${VariantKeys.gameFamilyName(GameFamily.Draughts())}",
           icon = DV.Standard.perfIcon.toString,
           secondsSinceLastMove = freshBlitz,
-          filters = Seq(anyVariant(Variant.all(GameLogic.Draughts())), noBot),
+          filters = Seq(anyVariant(Variant.all(GameLogic.Draughts()) ++ Variant.all(GameLogic.Dameo())), noBot),
           familyChannel = true,
           gameFamily = "draughts"
         )
@@ -516,6 +517,15 @@ object Tv {
           familyChannel = false,
           gameFamily = "draughts"
         )
+    case object Dameo
+        extends Channel(
+          name = VariantKeys.variantName(Variant.wrap(D2V.Dameo)),
+          icon = D2V.Dameo.perfIcon.toString,
+          secondsSinceLastMove = freshBlitz,
+          filters = Seq(variant(Variant.wrap(D2V.Dameo)), noBot),
+          familyChannel = false,
+          gameFamily = "draughts"
+        )
     case object Shogi
         extends Channel(
           name = VariantKeys.variantName(Variant.wrap(FV.Shogi)),
@@ -756,6 +766,7 @@ object Tv {
       Pool,
       Portuguese,
       English,
+      Dameo,
       LinesOfActionFamily,
       LinesOfAction,
       ScrambledEggs,

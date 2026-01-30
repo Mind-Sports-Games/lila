@@ -3,6 +3,7 @@ package lila.puzzle
 import lila.i18n.I18nKeys.{ puzzleTheme => i }
 import lila.i18n.{ I18nKey, I18nKeys => trans }
 import lila.common.Iso
+import strategygames.variant.Variant
 
 case class PuzzleTheme(key: PuzzleTheme.Key, name: I18nKey, description: I18nKey)
 
@@ -56,6 +57,10 @@ object PuzzleTheme {
   val mateIn3        = PuzzleTheme(Key("mateIn3"), i.mateIn3, i.mateIn3Description)
   val mateIn4        = PuzzleTheme(Key("mateIn4"), i.mateIn4, i.mateIn4Description)
   val mateIn5        = PuzzleTheme(Key("mateIn5"), i.mateIn5, i.mateIn5Description)
+  val win            = PuzzleTheme(Key("win"), i.win, i.winDescription)
+  val winIn1         = PuzzleTheme(Key("winIn1"), i.winIn1, i.winIn1Description)
+  val winIn2         = PuzzleTheme(Key("winIn2"), i.winIn2, i.winIn2Description)
+  val winIn3         = PuzzleTheme(Key("winIn3"), i.winIn3, i.winIn3Description)
   val smotheredMate  = PuzzleTheme(Key("smotheredMate"), i.smotheredMate, i.smotheredMateDescription)
   val middlegame     = PuzzleTheme(Key("middlegame"), i.middlegame, i.middlegameDescription)
   val oneMove        = PuzzleTheme(Key("oneMove"), i.oneMove, i.oneMoveDescription)
@@ -79,10 +84,43 @@ object PuzzleTheme {
   val xRayAttack      = PuzzleTheme(Key("xRayAttack"), i.xRayAttack, i.xRayAttackDescription)
   val zugzwang        = PuzzleTheme(Key("zugzwang"), i.zugzwang, i.zugzwangDescription)
 
-  val categorized = List[(I18nKey, List[PuzzleTheme])](
-    trans.puzzle.recommended -> List(
-      mix
-    ),
+  val categorizedMix = List[(I18nKey, List[PuzzleTheme])](
+    trans.puzzle.recommended -> List(mix)
+  )
+  val categorizedLengths = List[(I18nKey, List[PuzzleTheme])](
+    trans.puzzle.lengths -> List(
+      oneMove,
+      short,
+      long,
+      veryLong
+    )
+  )
+  val categorizedOrigin = List[(I18nKey, List[PuzzleTheme])](
+    trans.puzzle.origin -> List(
+      master,
+      masterVsMaster
+      //superGM
+    )
+  )
+  val categorizedMate = List[(I18nKey, List[PuzzleTheme])](
+    trans.puzzle.mates -> List(
+      mate,
+      mateIn1,
+      mateIn2,
+      mateIn3,
+      mateIn4,
+      mateIn5
+    )
+  )
+  val categorizedWin = List[(I18nKey, List[PuzzleTheme])](
+    trans.puzzle.wins -> List(
+      win,
+      winIn1,
+      winIn2,
+      winIn3
+    )
+  )
+  val categorizedChessPhases = List[(I18nKey, List[PuzzleTheme])](
     trans.puzzle.phases -> List(
       opening,
       middlegame,
@@ -93,7 +131,16 @@ object PuzzleTheme {
       knightEndgame,
       queenEndgame,
       queenRookEndgame
-    ),
+    )
+  )
+  val categorizedPhases = List[(I18nKey, List[PuzzleTheme])](
+    trans.puzzle.phases -> List(
+      opening,
+      middlegame,
+      endgame
+    )
+  )
+  val categorizedChessMotifs = List[(I18nKey, List[PuzzleTheme])](
     trans.puzzle.motifs -> List(
       advancedPawn,
       attackingF2F7,
@@ -109,7 +156,9 @@ object PuzzleTheme {
       sacrifice,
       skewer,
       trappedPiece
-    ),
+    )
+  )
+  val categorizedAdvanced = List[(I18nKey, List[PuzzleTheme])](
     trans.puzzle.advanced -> List(
       attraction,
       clearance,
@@ -120,49 +169,92 @@ object PuzzleTheme {
       quietMove,
       xRayAttack,
       zugzwang
-    ),
-    trans.puzzle.mates -> List(
-      mate,
-      mateIn1,
-      mateIn2,
-      mateIn3,
-      mateIn4,
-      mateIn5,
-      anastasiaMate,
-      arabianMate,
-      backRankMate,
-      bodenMate,
-      doubleBishopMate,
-      dovetailMate,
-      hookMate,
-      smotheredMate
-    ),
-    trans.puzzle.specialMoves -> List(
-      castling,
-      enPassant,
-      promotion,
-      underPromotion
-    ),
+    )
+  )
+  val categorizedGoals = List[(I18nKey, List[PuzzleTheme])](
     trans.puzzle.goals -> List(
       equality,
       advantage,
-      crushing,
-      mate
-    ),
-    trans.puzzle.lengths -> List(
-      oneMove,
-      short,
-      long,
-      veryLong
-    ),
-    trans.puzzle.origin -> List(
-      master,
-      masterVsMaster,
-      superGM
+      crushing
+      //mate
     )
   )
 
-  lazy val all: List[PuzzleTheme] = categorized.flatMap(_._2)
+  //todo refactor common themes between variants
+  val categorizedStandard =
+    categorizedMix ::: categorizedChessPhases ::: categorizedChessMotifs ::: categorizedAdvanced ::: List[
+      (I18nKey, List[PuzzleTheme])
+    ](
+      trans.puzzle.mates -> List(
+        mate,
+        mateIn1,
+        mateIn2,
+        mateIn3,
+        mateIn4,
+        mateIn5,
+        anastasiaMate,
+        arabianMate,
+        backRankMate,
+        bodenMate,
+        doubleBishopMate,
+        dovetailMate,
+        hookMate,
+        smotheredMate
+      ),
+      trans.puzzle.specialMoves -> List(
+        castling,
+        enPassant,
+        promotion,
+        underPromotion
+      )
+    ) ::: categorizedGoals ::: categorizedOrigin
+
+  val categorizedLinesOfAction =
+    categorizedMix ::: categorizedWin ::: categorizedPhases ::: List[(I18nKey, List[PuzzleTheme])](
+      trans.puzzle.motifs -> List(
+        capturingDefender,
+        trappedPiece
+      ),
+      trans.puzzle.advanced -> List(
+        defensiveMove,
+        quietMove,
+        zugzwang
+      )
+    ) ::: categorizedOrigin
+
+  val categorizedAtomic =
+    categorizedMix ::: categorizedChessPhases ::: categorizedChessMotifs ::: categorizedAdvanced :::
+      categorizedMate ::: categorizedGoals ::: categorizedOrigin
+
+  val categorizedXiangqi = categorizedMix ::: categorizedPhases ::: List[(I18nKey, List[PuzzleTheme])](
+    trans.puzzle.motifs -> List(
+      advancedPawn,
+      capturingDefender,
+      discoveredAttack,
+      doubleCheck,
+      exposedKing,
+      fork,
+      hangingPiece,
+      pin,
+      sacrifice,
+      skewer,
+      trappedPiece
+    )
+  ) ::: categorizedAdvanced ::: categorizedMate ::: categorizedGoals ::: categorizedOrigin
+
+  val byCategorizedVariant: Map[String, List[(I18nKey, List[PuzzleTheme])]] = Map(
+    "standard"      -> categorizedStandard,
+    "atomic"        -> categorizedAtomic,
+    "linesOfAction" -> categorizedLinesOfAction,
+    "xiangqi"       -> categorizedXiangqi
+  )
+
+  lazy val all: List[PuzzleTheme] = byCategorizedVariant.values.flatMap(_.flatMap(_._2)).toList.distinct
+
+  def categorizedThemesFor(variant: String): List[(I18nKey, List[PuzzleTheme])] =
+    byCategorizedVariant.getOrElse(variant, Nil)
+
+  def allByVariant(variant: Variant): List[PuzzleTheme] = categorizedThemesFor(variant.key).flatMap(_._2)
 
   lazy val allTranslationKeys = all.flatMap { t =>
     List(t.name, t.description)
@@ -193,6 +285,10 @@ object PuzzleTheme {
     mateIn3,
     mateIn4,
     mateIn5,
+    win,
+    winIn1,
+    winIn2,
+    winIn3,
     middlegame,
     oneMove,
     opening,
@@ -201,6 +297,7 @@ object PuzzleTheme {
     veryLong
   ).map(_.key)
 
+  //TODO recreate these when more themes are available (also set per variant)
   val studyChapterIds: Map[PuzzleTheme.Key, String] = List(
     advancedPawn      -> "sw8VyTe1",
     attackingF2F7     -> "r1ZAcrjZ",

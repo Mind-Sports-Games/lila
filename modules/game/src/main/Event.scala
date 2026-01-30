@@ -81,7 +81,6 @@ object Event {
         possibleCubeActions: Option[List[CubeInteraction]],
         forcedAction: Option[String],
         pocketData: Option[PocketData],
-        couldNextActionEndTurn: Option[Boolean] = None,
         captLen: Option[Int] = None
     )(extra: JsObject) = {
       extra ++ Json
@@ -96,8 +95,7 @@ object Event {
           "lifts"       -> possibleLifts.map { squares => JsString(squares.map(_.key).mkString) },
           "cubeActions" -> possibleCubeActions.map { interactions =>
             JsString(interactions.map(_.name).mkString(","))
-          },
-          "multiActionMetaData" -> couldNextActionEndTurn.map(b => Json.obj("couldNextActionEndTurn" -> b))
+          }
         )
         .add("clock" -> clock.map(_.data))
         .add("status" -> state.status)
@@ -148,7 +146,6 @@ object Event {
       possibleCubeActions: Option[List[CubeInteraction]],
       forcedAction: Option[String],
       pocketData: Option[PocketData],
-      couldNextActionEndTurn: Option[Boolean],
       captLen: Option[Int]
   ) extends Event {
     def typ = "move"
@@ -174,7 +171,6 @@ object Event {
         possibleCubeActions,
         forcedAction,
         pocketData,
-        couldNextActionEndTurn,
         captLen
       ) {
         Json
@@ -262,15 +258,13 @@ object Event {
         },
         forcedAction = situation.forcedAction.map(_.toUci.uci),
         pocketData = pocketData,
-        // TODO future multiaction games may not end turn on the same action, and this will need to be fixed
-        couldNextActionEndTurn = situation.actions.headOption.map(_ match {
-          case m: StratMove => m.autoEndTurn
-          case d: StratDrop => d.autoEndTurn
-          case l: StratLift => l.autoEndTurn
-          case _            => true
-        }),
         captLen = (situation, move.dest) match {
           case (Situation.Draughts(situation), Pos.Draughts(moveDest)) =>
+            if (situation.ghosts > 0)
+              situation.captureLengthFrom(moveDest)
+            else
+              situation.allMovesCaptureLength.some
+          case (Situation.Dameo(situation), Pos.Dameo(moveDest)) =>
             if (situation.ghosts > 0)
               situation.captureLengthFrom(moveDest)
             else
@@ -303,8 +297,7 @@ object Event {
       possibleDropsByRole: Option[Map[Role, List[Pos]]],
       possibleLifts: Option[List[Pos]],
       possibleCubeActions: Option[List[CubeInteraction]],
-      forcedAction: Option[String],
-      couldNextActionEndTurn: Option[Boolean]
+      forcedAction: Option[String]
   ) extends Event {
     def typ = "drop"
     def data =
@@ -328,8 +321,7 @@ object Event {
         possibleLifts,
         possibleCubeActions,
         forcedAction,
-        pocketData,
-        couldNextActionEndTurn
+        pocketData
       ) {
         Json.obj(
           "role" -> role.groundName,
@@ -381,14 +373,7 @@ object Event {
           case _                         => None
         },
         forcedAction = situation.forcedAction.map(_.toUci.uci),
-        pocketData = pocketData,
-        // TODO future multiaction games may not end turn on the same action, and this will need to be fixed
-        couldNextActionEndTurn = situation.actions.headOption.map(_ match {
-          case m: StratMove => m.autoEndTurn
-          case d: StratDrop => d.autoEndTurn
-          case l: StratLift => l.autoEndTurn
-          case _            => true
-        })
+        pocketData = pocketData
       )
   }
 
@@ -414,8 +399,7 @@ object Event {
       possibleDropsByRole: Option[Map[Role, List[Pos]]],
       possibleLifts: Option[List[Pos]],
       possibleCubeActions: Option[List[CubeInteraction]],
-      forcedAction: Option[String],
-      couldNextActionEndTurn: Option[Boolean]
+      forcedAction: Option[String]
   ) extends Event {
     def typ = "lift"
     def data =
@@ -439,8 +423,7 @@ object Event {
         possibleLifts,
         possibleCubeActions,
         forcedAction,
-        pocketData,
-        couldNextActionEndTurn
+        pocketData
       ) {
         Json.obj(
           "uci" -> s"^${pos.key}",
@@ -493,14 +476,7 @@ object Event {
           case _                         => None
         },
         forcedAction = situation.forcedAction.map(_.toUci.uci),
-        pocketData = pocketData,
-        //TODO future multiaction games may not end turn on the same action, and this will need to be fixed
-        couldNextActionEndTurn = situation.actions.headOption.map(_ match {
-          case m: StratMove => m.autoEndTurn
-          case d: StratDrop => d.autoEndTurn
-          case l: StratLift => l.autoEndTurn
-          case _            => true
-        })
+        pocketData = pocketData
       )
   }
 
@@ -1255,8 +1231,8 @@ object Event {
                 "p2"        -> bc.remainingTime(P2).centis,
                 "p1Pending" -> (bc.pending(P1) + bc.completedActionsOfTurnTime(P1)).centis,
                 "p2Pending" -> (bc.pending(P2) + bc.completedActionsOfTurnTime(P2)).centis,
-                "p1Periods" -> bc.players(P1).periodsLeft,
-                "p2Periods" -> bc.players(P2).periodsLeft
+                "p1Periods" -> (bc.config.periods - bc.players(P1).periodsLeft),
+                "p2Periods" -> (bc.config.periods - bc.players(P2).periodsLeft)
               )
           }
         })

@@ -33,6 +33,7 @@ case class Perfs(
     pool: Perf,
     portuguese: Perf,
     english: Perf,
+    dameo: Perf,
     shogi: Perf,
     xiangqi: Perf,
     minishogi: Perf,
@@ -60,7 +61,9 @@ case class Perfs(
     rapid: Perf,
     classical: Perf,
     correspondence: Perf,
-    puzzle: Perf,
+    puzzle_standard: Perf,
+    puzzle_atomic: Perf,
+    puzzle_linesOfAction: Perf,
     storm: Perf.Storm,
     racer: Perf.Racer,
     streak: Perf.Streak
@@ -92,6 +95,7 @@ case class Perfs(
       "pool"                   -> pool,
       "portuguese"             -> portuguese,
       "english"                -> english,
+      "dameo"                  -> dameo,
       "shogi"                  -> shogi,
       "xiangqi"                -> xiangqi,
       "minishogi"              -> minishogi,
@@ -119,7 +123,9 @@ case class Perfs(
       "rapid"                  -> rapid,
       "classical"              -> classical,
       "correspondence"         -> correspondence,
-      "puzzle"                 -> puzzle
+      "puzzle_standard"        -> puzzle_standard,
+      "puzzle_atomic"          -> puzzle_atomic,
+      "puzzle_linesOfAction"   -> puzzle_linesOfAction
     )
 
   private def fullPerfsMap: Map[String, Perf] = perfs.toMap
@@ -208,6 +214,7 @@ case class Perfs(
     "pool"                   -> pool,
     "portuguese"             -> portuguese,
     "english"                -> english,
+    "dameo"                  -> dameo,
     "shogi"                  -> shogi,
     "xiangqi"                -> xiangqi,
     "minishogi"              -> minishogi,
@@ -235,8 +242,14 @@ case class Perfs(
     "rapid"                  -> rapid,
     "classical"              -> classical,
     "correspondence"         -> correspondence,
-    "puzzle"                 -> puzzle
+    "puzzle_standard"        -> puzzle_standard,
+    "puzzle_atomic"          -> puzzle_atomic,
+    "puzzle_linesOfAction"   -> puzzle_linesOfAction
   )
+
+  lazy val perfsPuzzleMap: Map[String, Perf] = perfsMap.view
+    .filterKeys(_.startsWith("puzzle"))
+    .toMap
 
   def ratingMap: Map[String, Int] = perfsMap.view.mapValues(_.intRating).toMap
 
@@ -279,17 +292,22 @@ case class Perfs(
       case (acc, _)                              => acc
     }
 
+  // Lichess use this but we dont due to not having high level puzzles and also many puzzle variants.
   def dubiousPuzzle = {
-    puzzle.glicko.rating > 3000 && !standard.glicko.establishedIntRating.exists(_ > 2100) ||
-    puzzle.glicko.rating > 2500 && !standard.glicko.establishedIntRating.exists(_ > 1800)
+    puzzle_standard.glicko.rating > 3000 && !standard.glicko.establishedIntRating.exists(_ > 2100)
   }
 }
+
+case class PerfLens(get: Perfs => Perf, set: (Perfs, Perf) => Perfs)
 
 case object Perfs {
 
   val default = {
     val p = Perf.default
     Perfs(
+      p,
+      p,
+      p,
       p,
       p,
       p,
@@ -358,7 +376,9 @@ case object Perfs {
       rapid = managed,
       classical = managed,
       correspondence = managed,
-      puzzle = managedPuzzle
+      puzzle_standard = managedPuzzle,
+      puzzle_atomic = managedPuzzle,
+      puzzle_linesOfAction = managedPuzzle
     )
   }
 
@@ -388,6 +408,7 @@ case object Perfs {
       case Variant.Draughts(strategygames.draughts.variant.Pool)             => Some(_.pool)
       case Variant.Draughts(strategygames.draughts.variant.Portuguese)       => Some(_.portuguese)
       case Variant.Draughts(strategygames.draughts.variant.English)          => Some(_.english)
+      case Variant.Dameo(strategygames.dameo.variant.Dameo)                  => Some(_.dameo)
       case Variant.FairySF(strategygames.fairysf.variant.Shogi)              => Some(_.shogi)
       case Variant.FairySF(strategygames.fairysf.variant.Xiangqi)            => Some(_.xiangqi)
       case Variant.FairySF(strategygames.fairysf.variant.MiniShogi)          => Some(_.minishogi)
@@ -411,6 +432,17 @@ case object Perfs {
       case Variant.Backgammon(strategygames.backgammon.variant.Nackgammon)       => Some(_.nackgammon)
       case Variant.Abalone(strategygames.abalone.variant.Abalone)                => Some(_.abalone)
       case _                                                                     => none
+    }
+
+  def puzzleLens(variant: Variant): Option[PerfLens] =
+    variant match {
+      case Variant.Chess(strategygames.chess.variant.Standard) =>
+        Some(PerfLens(_.puzzle_standard, (p, v) => p.copy(puzzle_standard = v)))
+      case Variant.Chess(strategygames.chess.variant.LinesOfAction) =>
+        Some(PerfLens(_.puzzle_linesOfAction, (p, v) => p.copy(puzzle_linesOfAction = v)))
+      case Variant.Chess(strategygames.chess.variant.Atomic) =>
+        Some(PerfLens(_.puzzle_atomic, (p, v) => p.copy(puzzle_atomic = v)))
+      case _ => None
     }
 
   def speedLens(speed: Speed): Perfs => Perf =
@@ -454,6 +486,7 @@ case object Perfs {
         pool = perf("pool"),
         portuguese = perf("portuguese"),
         english = perf("english"),
+        dameo = perf("dameo"),
         shogi = perf("shogi"),
         xiangqi = perf("xiangqi"),
         minishogi = perf("minishogi"),
@@ -481,7 +514,9 @@ case object Perfs {
         rapid = perf("rapid"),
         classical = perf("classical"),
         correspondence = perf("correspondence"),
-        puzzle = perf("puzzle"),
+        puzzle_standard = perf("puzzle_standard"),
+        puzzle_atomic = perf("puzzle_atomic"),
+        puzzle_linesOfAction = perf("puzzle_linesOfAction"),
         storm = r.getO[Perf.Storm]("storm") getOrElse Perf.Storm.default,
         racer = r.getO[Perf.Racer]("racer") getOrElse Perf.Racer.default,
         streak = r.getO[Perf.Streak]("streak") getOrElse Perf.Streak.default
@@ -516,6 +551,7 @@ case object Perfs {
         "pool"                   -> notNew(o.pool),
         "portuguese"             -> notNew(o.portuguese),
         "english"                -> notNew(o.english),
+        "dameo"                  -> notNew(o.dameo),
         "shogi"                  -> notNew(o.shogi),
         "xiangqi"                -> notNew(o.xiangqi),
         "minishogi"              -> notNew(o.minishogi),
@@ -543,7 +579,9 @@ case object Perfs {
         "rapid"                  -> notNew(o.rapid),
         "classical"              -> notNew(o.classical),
         "correspondence"         -> notNew(o.correspondence),
-        "puzzle"                 -> notNew(o.puzzle),
+        "puzzle_standard"        -> notNew(o.puzzle_standard),
+        "puzzle_atomic"          -> notNew(o.puzzle_atomic),
+        "puzzle_linesOfAction"   -> notNew(o.puzzle_linesOfAction),
         "storm"                  -> (o.storm.nonEmpty option o.storm),
         "racer"                  -> (o.racer.nonEmpty option o.racer),
         "streak"                 -> (o.streak.nonEmpty option o.streak)
@@ -579,6 +617,7 @@ case object Perfs {
       pool: List[User.LightPerf],
       portuguese: List[User.LightPerf],
       english: List[User.LightPerf],
+      dameo: List[User.LightPerf],
       shogi: List[User.LightPerf],
       xiangqi: List[User.LightPerf],
       minishogi: List[User.LightPerf],
@@ -603,6 +642,7 @@ case object Perfs {
   )
 
   val emptyLeaderboards = Leaderboards(
+    Nil,
     Nil,
     Nil,
     Nil,

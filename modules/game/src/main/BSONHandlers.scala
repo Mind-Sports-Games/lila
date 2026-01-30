@@ -29,6 +29,7 @@ import strategygames.{
 }
 import strategygames.chess
 import strategygames.draughts
+import strategygames.dameo
 import strategygames.fairysf
 import strategygames.samurai
 import strategygames.togyzkumalak
@@ -49,6 +50,7 @@ import strategygames.togyzkumalak.variant.{
 import strategygames.go.variant.{ Variant => GoVariant, Go19x19 => GoStandard }
 import strategygames.backgammon.variant.{ Variant => BackgammonVariant, Backgammon => BackgammonStandard }
 import strategygames.abalone.variant.{ Variant => AbaloneVariant, Abalone => AbaloneStandard }
+import strategygames.dameo.variant.{ Variant => DameoVariant, Dameo => DameoStandard }
 import org.joda.time.DateTime
 import reactivemongo.api.bson._
 import scala.util.{ Success, Try }
@@ -718,6 +720,42 @@ object BSONHandlers {
         (abaloneGame, defaultMetaData)
       }
 
+      def readDameoGame(r: BSON.Reader): (StratGame, Metadata) = {
+
+        val gameVariant = DameoVariant(r intD F.variant) | DameoStandard
+
+        val actionStrs = NewLibStorage.OldBin.decode(GameLogic.Dameo(), r bytesD F.oldPgn, playedPlies)
+
+        def turnUcis(turnStr: Option[String]) =
+          turnStr.map(_.split(",").toList.flatMap(dameo.format.Uci.apply)).getOrElse(List.empty)
+
+        val dameoGame = StratGame.Dameo(
+          dameo.Game(
+            situation = dameo.Situation(
+              dameo.Board(
+                pieces = BinaryFormat.piece.readDameo(r bytes F.binaryPieces, gameVariant),
+                history = dameo.History(
+                  lastTurn = turnUcis(r strO F.historyLastTurn),
+                  currentTurn = turnUcis(r strO F.historyCurrentTurn),
+                  halfMoveClock = r intD F.halfMoveClock,
+                  positionHashes = r.getO[PositionHash](F.positionHashes) | Array.empty
+                ),
+                variant = gameVariant
+              ),
+              player = turnPlayerIndex
+            ),
+            actionStrs = actionStrs,
+            clock = clock,
+            plies = plies,
+            turnCount = turns,
+            startedAtPly = startedAtPly,
+            startedAtTurn = startedAtTurn
+          )
+        )
+
+        (dameoGame, defaultMetaData)
+      }
+
       val libId = r intD F.lib
       val (stratGame, metadata) = libId match {
         case 0 => readChessGame(r)
@@ -728,6 +766,7 @@ object BSONHandlers {
         case 5 => readGoGame(r)
         case 6 => readBackgammonGame(r)
         case 7 => readAbaloneGame(r)
+        case 8 => readDameoGame(r)
         case _ => sys.error(s"Invalid game in the database, libId: ${libId}")
       }
 
@@ -892,6 +931,19 @@ object BSONHandlers {
               F.historyLastTurn    -> o.history.lastTurnUciString,
               F.historyCurrentTurn -> o.history.currentTurnUciString,
               F.score              -> o.history.score.nonEmpty.option(o.history.score)
+            )
+          case GameLogic.Dameo() =>
+            $doc(
+              F.oldPgn -> NewLibStorage.OldBin
+                .encodeActionStrs(o.variant.gameFamily, o.actionStrs take Game.maxTurns),
+              F.binaryPieces -> BinaryFormat.piece.writeDameo(o.board match {
+                case Board.Dameo(board) => board.pieces
+                case _                  => sys.error("invalid dameo board")
+              }),
+              F.halfMoveClock      -> (o.history.halfMoveClock != 0).option(o.history.halfMoveClock),
+              F.positionHashes     -> o.history.positionHashes,
+              F.historyLastTurn    -> o.history.lastTurnUciString,
+              F.historyCurrentTurn -> o.history.currentTurnUciString
             )
           case _ => //chess or fail
             if (o.variant.key == "standard")

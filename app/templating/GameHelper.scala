@@ -52,8 +52,9 @@ trait GameHelper { self: I18nHelper with UserHelper with AiHelper with StringHel
             _,
             Mate,
             GameLogic.Chess() | GameLogic.FairySF() | GameLogic.Samurai() | GameLogic.Togyzkumalak() |
-            GameLogic.Go() | GameLogic.Backgammon() | GameLogic.Abalone()
+            GameLogic.Go() | GameLogic.Backgammon() | GameLogic.Abalone() | GameLogic.Dameo()
           ) =>
+        //TODO set this properly for non chess variants
         s"${playerText(w)} won by checkmate"
       case (Some(w), _, Mate | PerpetualCheck, _) =>
         s"${playerText(w)} won by opponent perpetually checking"
@@ -182,7 +183,8 @@ trait GameHelper { self: I18nHelper with UserHelper with AiHelper with StringHel
       case S.Mate =>
         game.variant.gameLogic match {
           case GameLogic.Chess() | GameLogic.FairySF() | GameLogic.Samurai() | GameLogic.Togyzkumalak() |
-              GameLogic.Go() | GameLogic.Backgammon() | GameLogic.Abalone() =>
+              GameLogic.Go() | GameLogic.Backgammon() | GameLogic.Abalone() | GameLogic.Dameo() =>
+            //TODO set this properly for non chess variants
             trans.checkmate.txt()
           case _ => ""
         }
@@ -254,9 +256,7 @@ trait GameHelper { self: I18nHelper with UserHelper with AiHelper with StringHel
           case Some(p) if p.playerIndex.p1 => trans.playerIndexWinsByGinBackgammon(game.playerTrans(P1)).v
           case _                           => trans.playerIndexWinsByGinBackgammon(game.playerTrans(P2)).v
         }
-      case S.NoStart =>
-        val playerIndex = game.loser.fold(PlayerIndex.p1)(_.playerIndex).name.capitalize
-        s"$playerIndex didn't move"
+      case S.NoStart       => trans.playerIndexDidntMove(game.playerTrans(game.loser.fold(PlayerIndex.p1)(_.playerIndex))).v
       case S.Cheat         => trans.cheatDetected.txt()
       case S.SingleWin     => trans.backgammonSingleWin.txt()
       case S.GammonWin     => trans.backgammonGammonWin.txt()

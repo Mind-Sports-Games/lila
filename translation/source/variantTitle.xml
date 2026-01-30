@@ -26,6 +26,7 @@
   <string name="russian">Choice of capture, promotion during a multi-capture</string>
   <string name="portuguese">Similar rules to Brazilian, but men cant jump backwards</string>
   <string name="english">English draughts, also known as American checkers. Men cannot jump backwards, and Kings are not flying</string>
+  <string name="dameo">Dameo draughts uses all 64 squares and has diagonal and orthogonal movement</string>
   <string name="shogi">Shogi (Japanese Chess)</string>
   <string name="xiangqi">Xiangqi (Chinese Chess)</string>
   <string name="minishogi">Mini Shogi (Japanese Chess on a smaller board)</string>

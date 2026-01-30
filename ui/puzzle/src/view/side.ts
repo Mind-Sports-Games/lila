@@ -1,4 +1,4 @@
-import { Controller, Puzzle, PuzzleGame, MaybeVNode, PuzzleDifficulty } from '../interfaces';
+import { Controller, Puzzle, PuzzleGame, MaybeVNode } from '../interfaces';
 import { dataIcon, onInsert, bind } from '../util';
 import { h, VNode } from 'snabbdom';
 import { numberFormat } from 'common/number';
@@ -10,6 +10,7 @@ export function puzzleBox(ctrl: Controller): VNode {
 }
 
 function puzzleInfos(ctrl: Controller, puzzle: Puzzle): VNode {
+  const variant = ctrl.getData().game.variant.key;
   return h(
     'div.infos.puzzle',
     {
@@ -27,7 +28,7 @@ function puzzleInfos(ctrl: Controller, puzzle: Puzzle): VNode {
                   'a',
                   {
                     attrs: {
-                      href: `/training/${puzzle.id}`,
+                      href: `/training/${variant}/${puzzle.id}`,
                       ...(ctrl.streak ? { target: '_blank' } : {}),
                     },
                   },
@@ -55,7 +56,7 @@ function gameInfos(ctrl: Controller, game: PuzzleGame, puzzle: Puzzle): VNode {
   return h(
     'div.infos',
     {
-      attrs: dataIcon(game.perf.icon),
+      attrs: dataIcon(ctrl.vm.perfIcon),
     },
     [
       h('div', [
@@ -133,8 +134,9 @@ export const userBox = (ctrl: Controller): VNode => {
       'div.puzzle__side__user__rating',
       ctrl.trans.vdom(
         'yourPuzzleRatingX',
-        h('strong', [
+        h('strong', { attrs: dataIcon(ctrl.vm.perfIcon) }, [
           data.user.rating - (diff || 0),
+          data.user.provisional ? h('span.provisional', '?') : null,
           ...(diff && diff > 0 ? [' ', h('good.rp', '+' + diff)] : []),
           ...(diff && diff < 0 ? [' ', h('bad.rp', '−' + -diff)] : []),
         ]),
@@ -146,16 +148,25 @@ export const userBox = (ctrl: Controller): VNode => {
 export const streakBox = (ctrl: Controller) =>
   h('div.puzzle__side__user', renderStreak(ctrl.streak!, ctrl.trans.noarg));
 
-const difficulties: [PuzzleDifficulty, number][] = [
-  ['easiest', -600],
-  ['easier', -300],
-  ['normal', 0],
-  ['harder', 300],
-  ['hardest', 600],
+// While we have 1 large bucket of puzzles we don't want to show difficulty selector
+// const difficulties: [PuzzleDifficulty, number][] = [
+//   ['easiest', -600],
+//   ['easier', -300],
+//   ['normal', 0],
+//   ['harder', 300],
+//   ['hardest', 600],
+// ];
+
+const variants: [string, string][] = [
+  ['standard', 'Chess'],
+  ['atomic', 'Atomic'],
+  ['linesOfAction', 'Lines of Action'],
+  // ['xiangqi', 'Xiangqi'],
 ];
 
 export function replay(ctrl: Controller): MaybeVNode {
   const replay = ctrl.getData().replay;
+  const variant = ctrl.getData().game.variant.key;
   if (!replay) return;
   const i = replay.i + (ctrl.vm.mode == 'play' ? 0 : 1);
   return h('div.puzzle__side__replay', [
@@ -163,7 +174,7 @@ export function replay(ctrl: Controller): MaybeVNode {
       'a',
       {
         attrs: {
-          href: `/training/dashboard/${replay.days}`,
+          href: `/training/${variant}/dashboard/${replay.days}`,
         },
       },
       ['« ', `Replaying ${ctrl.trans.noarg(ctrl.getData().theme.key)} puzzles`],
@@ -196,52 +207,118 @@ export function config(ctrl: Controller): MaybeVNode {
       ]),
       h('label', { attrs: { for: id } }, ctrl.trans.noarg('jumpToNextPuzzleImmediately')),
     ]),
-    !ctrl.getData().replay && !ctrl.streak && ctrl.difficulty
-      ? h(
-          'form.puzzle__side__config__difficulty',
-          {
-            attrs: {
-              action: `/training/difficulty/${ctrl.getData().theme.key}`,
-              method: 'post',
-            },
-          },
-          [
+    // While we have 1 large bucket of puzzles we don't want to show difficulty selector
+    // !ctrl.getData().replay && !ctrl.streak && ctrl.difficulty
+    //   ? h(
+    //       'form.puzzle__side__config__difficulty',
+    //       {
+    //         attrs: {
+    //           action: `/training/${ctrl.getData().game.variant.key}/difficulty/${ctrl.getData().theme.key}`,
+    //           method: 'post',
+    //         },
+    //       },
+    //       [
+    //         h(
+    //           'label',
+    //           {
+    //             attrs: { for: 'puzzle-difficulty' },
+    //           },
+    //           ctrl.trans.noarg('difficultyLevel'),
+    //         ),
+    //         h(
+    //           'select#puzzle-difficulty.puzzle__difficulty__selector',
+    //           {
+    //             attrs: { name: 'difficulty' },
+    //             hook: onInsert(elm =>
+    //               elm.addEventListener('change', () => (elm.parentNode as HTMLFormElement).submit()),
+    //             ),
+    //           },
+    //           difficulties.map(([key, delta]) =>
+    //             h(
+    //               'option',
+    //               {
+    //                 attrs: {
+    //                   value: key,
+    //                   selected: key == ctrl.difficulty,
+    //                   title:
+    //                     !!delta &&
+    //                     ctrl.trans.plural(
+    //                       delta < 0 ? 'nbPointsBelowYourPuzzleRating' : 'nbPointsAboveYourPuzzleRating',
+    //                       Math.abs(delta),
+    //                     ),
+    //                 },
+    //               },
+    //               [ctrl.trans.noarg(key), delta ? ` (${delta > 0 ? '+' : ''}${delta})` : ''],
+    //             ),
+    //           ),
+    //         ),
+    //       ],
+    //     )
+    //   : null,
+    !ctrl.getData().replay && !ctrl.streak
+      ? !ctrl.getData().user
+        ? // For anonymous users, use a select and redirect on change
+          h('div.puzzle__side__config__variant', [
+            h('label', { attrs: { for: 'puzzle-variant' } }, ctrl.trans.noarg('variant')),
             h(
-              'label',
+              'select#puzzle-variant.puzzle__variant__selector',
               {
-                attrs: { for: 'puzzle-difficulty' },
-              },
-              ctrl.trans.noarg('difficultyLevel'),
-            ),
-            h(
-              'select#puzzle-difficulty.puzzle__difficulty__selector',
-              {
-                attrs: { name: 'difficulty' },
+                attrs: { name: 'variant' },
                 hook: onInsert(elm =>
-                  elm.addEventListener('change', () => (elm.parentNode as HTMLFormElement).submit()),
+                  elm.addEventListener('change', () => {
+                    const variant = (elm as HTMLSelectElement).value;
+                    window.location.href = `/training/${variant}`;
+                  }),
                 ),
               },
-              difficulties.map(([key, delta]) =>
+              variants.map(([variantKey, variantName]) =>
                 h(
                   'option',
                   {
                     attrs: {
-                      value: key,
-                      selected: key == ctrl.difficulty,
-                      title:
-                        !!delta &&
-                        ctrl.trans.plural(
-                          delta < 0 ? 'nbPointsBelowYourPuzzleRating' : 'nbPointsAboveYourPuzzleRating',
-                          Math.abs(delta),
-                        ),
+                      value: variantKey,
+                      selected: variantKey == ctrl.getData().game.variant.key,
                     },
                   },
-                  [ctrl.trans.noarg(key), delta ? ` (${delta > 0 ? '+' : ''}${delta})` : ''],
+                  ctrl.trans.noarg(variantName),
                 ),
               ),
             ),
-          ],
-        )
+          ])
+        : // For logged-in users, render the form as before
+          h(
+            'form.puzzle__side__config__variant',
+            {
+              attrs: {
+                action: `/training/set-variant/mix`,
+                method: 'post',
+              },
+            },
+            [
+              h('label', { attrs: { for: 'puzzle-variant' } }, ctrl.trans.noarg('variant')),
+              h(
+                'select#puzzle-variant.puzzle__variant__selector',
+                {
+                  attrs: { name: 'variant' },
+                  hook: onInsert(elm =>
+                    elm.addEventListener('change', () => (elm.parentNode as HTMLFormElement).submit()),
+                  ),
+                },
+                variants.map(([variantKey, variantName]) =>
+                  h(
+                    'option',
+                    {
+                      attrs: {
+                        value: variantKey,
+                        selected: variantKey == ctrl.getData().game.variant.key,
+                      },
+                    },
+                    ctrl.trans.noarg(variantName),
+                  ),
+                ),
+              ),
+            ],
+          )
       : null,
     h(
       'a.puzzle__side__config__zen',

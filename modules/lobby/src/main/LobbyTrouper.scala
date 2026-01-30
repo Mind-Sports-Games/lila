@@ -53,8 +53,7 @@ final private class LobbyTrouper(
           discordApi
             .matchmakingAnnouncement(
               hook.message,
-              hook.realVariant.gameFamily.key,
-              VariantKeys.variantName(hook.realVariant),
+              hook.realVariant,
               true
             )
             .effectFold(
@@ -76,8 +75,7 @@ final private class LobbyTrouper(
       discordApi
         .matchmakingAnnouncement(
           msg.seek.message,
-          msg.seek.realVariant.gameFamily.key,
-          VariantKeys.variantName(msg.seek.realVariant),
+          msg.seek.realVariant,
           false
         )
         .effectFold(

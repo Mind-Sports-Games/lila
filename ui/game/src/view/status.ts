@@ -52,7 +52,7 @@ export default function status(ctrl: Ctrl): string {
     case 'ginBackgammon':
       return ctrl.trans('playerIndexWinsByGinBackgammon', d.game.winnerPlayer ? d.game.winnerPlayer : '');
     case 'noStart':
-      return d.game.loserPlayer + " didn't move";
+      return ctrl.trans('playerIndexDidntMove', d.game.loserPlayer ? d.game.loserPlayer : '');
     case 'cheat':
       return noarg('cheatDetected');
     case 'perpetualCheck':
@@ -75,6 +75,8 @@ export default function status(ctrl: Ctrl): string {
           return noarg('checkersConnected');
         case 'scrambledEggs':
           return noarg('checkersConnected');
+        case 'dameo':
+          return noarg('gameFinished');
         case 'breakthrough':
           return noarg('promotion');
         case 'flipello':

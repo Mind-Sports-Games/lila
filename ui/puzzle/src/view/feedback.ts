@@ -39,13 +39,22 @@ const viewSolution = (ctrl: Controller): VNode =>
         ],
       );
 
+const displayPiece = (variantKey: VariantKey): string => {
+  switch (variantKey) {
+    case 'linesOfAction':
+      return 'l-piece';
+    default:
+      return 'k-piece';
+  }
+};
+
 const initial = (ctrl: Controller): VNode =>
   h('div.puzzle__feedback.play', [
     h('div.player', [
-      h('div.no-square', h('piece.k-piece.' + ctrl.vm.pov)),
+      h('div.no-square.variant-' + ctrl.vm.variant.key, h(`piece.${displayPiece(ctrl.vm.variant.key)}.${ctrl.vm.pov}`)),
       h('div.instruction', [
-        h('strong', ctrl.trans.noarg('yourTurn')),
-        h('em', ctrl.trans('findTheBestMoveForPlayerIndex', ctrl.vm.pov)),
+        h('strong', ctrl.vm.variant.name + ' Puzzle'),
+        h('em', ctrl.trans('findTheBestMoveForPlayerIndex', ctrl.vm.playerColors[ctrl.vm.pov == 'p1' ? 0 : 1])),
       ]),
     ]),
     viewSolution(ctrl),

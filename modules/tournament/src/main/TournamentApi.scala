@@ -267,8 +267,7 @@ final class TournamentApi(
     tour.isScheduled ?? discordApi.tournamentAnnouncement(
       tour.schedule.map(_.freq.name).getOrElse(""),
       tour.name()(defaultLang),
-      VariantKeys.variantName(tour.variant),
-      tour.variant.gameFamily.key,
+      tour.variant,
       tour.durationString,
       tour.id,
       tour.isMedley

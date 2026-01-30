@@ -89,28 +89,33 @@ POST  /training/coordinate/score       controllers.Coordinate.score
 POST  /training/coordinate/playerIndex       controllers.Coordinate.playerIndex
 
 # Training - Puzzle
-GET   /training                        controllers.Puzzle.home
-GET   /training/daily                  controllers.Puzzle.daily
-GET   /training/frame                  controllers.Puzzle.frame
-GET   /training/export/gif/thumbnail/:id.gif controllers.Export.puzzleThumbnail(id: String)
-GET   /training/themes                 controllers.Puzzle.themes
-GET   /training/of-player              controllers.Puzzle.ofPlayer(name: Option[String] ?= None, page: Int ?= 1)
-GET   /training/dashboard/$days<\d+>   controllers.Puzzle.dashboard(days: Int, path: String = "home")
-GET   /training/dashboard/$days<\d+>/:path  controllers.Puzzle.dashboard(days: Int, path: String)
-GET   /training/replay/$days<\d+>/:theme controllers.Puzzle.replay(days: Int, theme: String)
-GET   /training/history                controllers.Puzzle.history(page: Int ?= 1)
-GET   /training/batch                  controllers.Puzzle.mobileBcBatchSelect
-POST  /training/batch                  controllers.Puzzle.mobileBcBatchSolve
-GET   /training/new                    controllers.Puzzle.mobileBcNew
-GET   /training/$numericalId<\d{6,}>/load      controllers.Puzzle.mobileBcLoad(numericalId: Long)
-POST  /training/$numericalId<\d{6,}>/vote      controllers.Puzzle.mobileBcVote(numericalId: Long)
-GET   /training/:themeOrId             controllers.Puzzle.show(themeOrId: String)
-GET   /training/:theme/$id<\w{5}>      controllers.Puzzle.showWithTheme(theme: String, id: String)
-POST  /training/$numericalId<\d{6,}>/round2    controllers.Puzzle.mobileBcRound(numericalId: Long)
-POST  /training/$id<\w{5}>/vote        controllers.Puzzle.vote(id: String)
-POST  /training/$id<\w{5}>/vote/:theme controllers.Puzzle.voteTheme(id: String, theme: String)
-POST  /training/complete/:theme/$id<\w{5}>  controllers.Puzzle.complete(theme: String, id: String)
-POST  /training/difficulty/:theme      controllers.Puzzle.setDifficulty(theme: String)
+GET   /training                                         controllers.Puzzle.base
+GET   /training/dashboard                               controllers.Puzzle.dashboardBase
+GET   /training/themes                                  controllers.Puzzle.themesBase
+GET   /training/faq                                     controllers.Puzzle.faq(variant: Option[String] ?= None)
+GET   /training/:variant                                controllers.Puzzle.home(variant: String)
+GET   /training/daily/puzzle                            controllers.Puzzle.daily
+GET   /training/frame/daily                             controllers.Puzzle.frame
+GET   /training/export/gif/thumbnail/:id.gif            controllers.Export.puzzleThumbnail(id: String)
+GET   /training/:variant/themes                         controllers.Puzzle.themes(variant: String)
+GET   /training/:variant/of-player                      controllers.Puzzle.ofPlayer(variant: String, name: Option[String] ?= None, page: Int ?= 1)
+GET   /training/:variant/dashboard/$days<\d+>           controllers.Puzzle.dashboard(variant: String, days: Int, path: String = "home")
+GET   /training/:variant/dashboard/$days<\d+>/:path     controllers.Puzzle.dashboard(variant: String, days: Int, path: String)
+GET   /training/:variant/replay/$days<\d+>/:theme       controllers.Puzzle.replay(variant: String, days: Int, theme: String)
+GET   /training/:variant/history                        controllers.Puzzle.history(variant: String, page: Int ?= 1)
+# GET   /training/batch                  controllers.Puzzle.mobileBcBatchSelect
+# POST  /training/batch                  controllers.Puzzle.mobileBcBatchSolve
+# GET   /training/new                    controllers.Puzzle.mobileBcNew
+# GET   /training/$numericalId<\d{6,}>/load      controllers.Puzzle.mobileBcLoad(numericalId: Long)
+# POST  /training/$numericalId<\d{6,}>/vote      controllers.Puzzle.mobileBcVote(numericalId: Long)
+GET   /training/:variant/:themeOrId                     controllers.Puzzle.show(variant: String, themeOrId: String)
+GET   /training/:variant/:theme/$id<\w{5}>              controllers.Puzzle.showWithTheme(variant: String, theme: String, id: String)
+# POST  /training/$numericalId<\d{6,}>/round2           controllers.Puzzle.mobileBcRound(numericalId: Long)
+POST  /training/$id<\w{5}>/vote                         controllers.Puzzle.vote(id: String)
+POST  /training/$id<\w{5}>/vote/:theme                  controllers.Puzzle.voteTheme(id: String, theme: String)
+POST  /training/:variant/complete/:theme/$id<\w{5}>     controllers.Puzzle.complete(variant: String, theme: String, id: String)
+POST  /training/:variant/difficulty/:theme              controllers.Puzzle.setDifficulty(variant: String, theme: String)
+POST  /training/set-variant/mix                         controllers.Puzzle.setVariant
 
 # Puzzle Streak
 GET   /streak                           controllers.Puzzle.streak

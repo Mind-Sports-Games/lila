@@ -307,6 +307,7 @@ export default class RoundController {
   private enpassant = (orig: cg.Key, dest: cg.Key): boolean => {
     if (
       [
+        'dameo',
         'xiangqi',
         'shogi',
         'minixiangqi',
@@ -434,6 +435,7 @@ export default class RoundController {
       config.liftable = {
         liftDests: util.parsePossibleLifts(this.data.possibleLifts),
       };
+      config.captureLength = this.data.captureLength;
       config.showUndoButton = this.isPlaying() && this.data.player.playerIndex == turnPlayerIndex && dice.length > 0;
       config.canUndo = this.data.canUndo;
       config.cubeActions = this.data.cubeActions ? this.data.cubeActions.split(',').map(a => a as cg.CubeAction) : [];
@@ -518,7 +520,7 @@ export default class RoundController {
       ackable: true,
     };
     if (this.clock) {
-      socketOpts.withLag = !this.shouldSendMoveTime || !this.clock.isRunning();
+      socketOpts.withLag = !this.shouldSendMoveTime || !this.clock.times.activePlayerIndex !== undefined;
       if (meta.premove && this.shouldSendMoveTime) {
         this.clock.hardStopClock();
         socketOpts.millis = 0;
@@ -635,7 +637,6 @@ export default class RoundController {
       }
       d.onlyDropsVariant = o.drops ? true : false;
     }
-    d.multiActionMetaData = o.multiActionMetaData;
 
     const playedPlayerIndex = hasJustSwitchedTurns ? opposite(d.game.player) : d.game.player,
       activePlayerIndex = d.player.playerIndex === d.game.player;
@@ -644,6 +645,7 @@ export default class RoundController {
     this.playerByPlayerIndex('p1').offeringDraw = o.wDraw;
     this.playerByPlayerIndex('p2').offeringDraw = o.bDraw;
     d.possibleMoves = activePlayerIndex ? o.dests : undefined;
+    d.captureLength = o.captLen;
     d.possibleDrops = activePlayerIndex ? o.drops : undefined;
     d.possibleDropsByRole = activePlayerIndex ? o.dropsByRole : undefined;
     d.possibleLifts = activePlayerIndex ? o.lifts : undefined;
@@ -750,6 +752,7 @@ export default class RoundController {
         movable: {
           dests: playing ? util.parsePossibleMoves(d.possibleMoves, d.activeDiceValue) : new Map(),
         },
+        captureLength: d.captureLength,
         liftable: {
           liftDests: playing ? util.parsePossibleLifts(d.possibleLifts) : [],
         },
@@ -1000,7 +1003,7 @@ export default class RoundController {
     this.moveOn.next();
     this.setQuietMode();
     this.setLoading(false);
-    if (this.clock && o.clock && this.clock.byoyomiData) {
+    if (this.clock && o.clock && this.clock.byoyomiData)
       this.clock.setClock(
         d,
         o.clock.p1 * 0.01,
@@ -1010,8 +1013,7 @@ export default class RoundController {
         o.clock.p1Periods,
         o.clock.p2Periods,
       );
-    }
-    if (this.clock && o.clock)
+    else if (this.clock && o.clock)
       this.clock.setClock(d, o.clock.p1 * 0.01, o.clock.p2 * 0.01, o.clock.p1Pending * 0.01, o.clock.p2Pending * 0.01);
     this.redraw();
     this.autoScroll();

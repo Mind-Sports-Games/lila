@@ -10,7 +10,7 @@ const patch = init([classModule, attributesModule]);
 export default function PlayStrategyPuzzle(opts: PuzzleOpts): void {
   const element = document.querySelector('main.puzzle') as HTMLElement;
   const ctrl = makeCtrl(opts, redraw);
-
+  playstrategy.pageVariant = ctrl.vm.variant.key;
   const blueprint = view(ctrl);
   element.innerHTML = '';
   let vnode = patch(element, blueprint);

@@ -77,6 +77,14 @@
   <string name="mateIn4Description">Deliver checkmate in four moves.</string>
   <string name="mateIn5">Mate in 5 or more</string>
   <string name="mateIn5Description">Figure out a long mating sequence.</string>
+  <string name="win">Forced Win</string>
+  <string name="winDescription">Win the game with style.</string>
+  <string name="winIn1">Win in 1</string>
+  <string name="winIn1Description">Win the game in one move.</string>
+  <string name="winIn2">Win in 2</string>
+  <string name="winIn2Description">Win the game in two moves.</string>
+  <string name="winIn3">Win in 3</string>
+  <string name="winIn3Description">Win the game in three moves.</string>
   <string name="middlegame">Middlegame</string>
   <string name="middlegameDescription">A tactic during the second phase of the game.</string>
   <string name="oneMove">One-move puzzle</string>

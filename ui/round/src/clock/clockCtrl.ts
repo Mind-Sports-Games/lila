@@ -99,12 +99,14 @@ interface EmergSound {
 
 export class ByoyomiCtrlData {
   byoyomi: number;
+  berserkByoyomi: number;
   initial: number;
 
   totalPeriods: number;
   curPeriods: PlayerIndexMap<number> = { p1: 0, p2: 0 };
 
   byoEmergeS: Seconds;
+  byoBersEmergeS: Seconds;
 }
 
 export class ClockController {
@@ -160,6 +162,7 @@ export class ClockController {
     if (isByoyomi(cdata)) {
       this.byoyomiData = new ByoyomiCtrlData();
       this.byoyomiData.byoyomi = cdata.byoyomi;
+      this.byoyomiData.berserkByoyomi = Math.ceil(cdata.byoyomi / 2);
       this.byoyomiData.initial = cdata.initial;
 
       this.byoyomiData.totalPeriods = cdata.periods;
@@ -167,6 +170,7 @@ export class ClockController {
       this.byoyomiData.curPeriods['p2'] = cdata.p2Periods ?? 0;
 
       this.byoyomiData.byoEmergeS = Math.max(3, this.byoyomiData.byoyomi * 0.1);
+      this.byoyomiData.byoBersEmergeS = Math.max(3, this.byoyomiData.berserkByoyomi * 0.1);
     }
 
     this.goneBerserk[d.player.playerIndex] = !!d.player.berserk;
@@ -179,10 +183,10 @@ export class ClockController {
       p2: 1000 * (Math.max(cdata.initial, 2) + 5 * delayOrIncrement),
     };
     if (isByoyomi(cdata) && this.isUsingByo(d.player.playerIndex)) {
-      this.barTime[d.player.playerIndex] = 1000 * cdata.byoyomi;
+      this.barTime[d.player.playerIndex] = 1000 * this.byoTime(d.player.playerIndex);
     }
     if (isByoyomi(cdata) && this.isUsingByo(d.opponent.playerIndex)) {
-      this.barTime[d.opponent.playerIndex] = 1000 * cdata.byoyomi;
+      this.barTime[d.opponent.playerIndex] = 1000 * this.byoTime(d.opponent.playerIndex);
     }
     this.timeRatioDivisor = {
       p1: 1 / this.barTime['p1'],
@@ -204,6 +208,12 @@ export class ClockController {
       this.byoyomiData.byoyomi > 0 && (this.byoyomiData.curPeriods[playerIndex] > 0 || this.byoyomiData.initial === 0)
     );
   };
+
+  byoTime = (playerIndex: PlayerIndex): number =>
+    this.goneBerserk[playerIndex] ? this.byoyomiData.berserkByoyomi : this.byoyomiData.byoyomi;
+
+  byoEmergeS = (playerIndex: PlayerIndex): number =>
+    this.goneBerserk[playerIndex] ? this.byoyomiData.byoBersEmergeS : this.byoyomiData.byoEmergeS;
 
   timeRatio = (millis: number, playerIndex: PlayerIndex): number =>
     Math.min(1, millis * this.timeRatioDivisor[playerIndex]);
@@ -252,7 +262,7 @@ export class ClockController {
   nextPeriod = (playerIndex: PlayerIndex): void => {
     if (this.byoyomiData) {
       this.byoyomiData.curPeriods[playerIndex] += 1;
-      this.times[playerIndex] += this.byoyomiData.byoyomi * 1000;
+      this.times[playerIndex] += this.byoTime(playerIndex) * 1000;
       if (this.opts.soundPlayerIndex === playerIndex) this.emergSound.nextPeriod();
       this.emergSound.byoTicks = undefined;
     }
@@ -301,16 +311,22 @@ export class ClockController {
     if (
       millis === 0 &&
       this.byoyomiData &&
-      !this.goneBerserk[playerIndex] &&
       this.byoyomiData.byoyomi > 0 &&
       this.byoyomiData.curPeriods[playerIndex] < this.byoyomiData.totalPeriods
     ) {
-      this.barTime[playerIndex] = 1000 * this.byoyomiData.byoyomi;
+      this.barTime[playerIndex] = 1000 * this.byoTime(playerIndex);
       this.timeRatioDivisor[playerIndex] = 1 / this.barTime[playerIndex];
       this.nextPeriod(playerIndex);
       this.opts.redraw();
     } else if (millis === 0) this.opts.onFlag();
-    else updateElements(this, this.elements[playerIndex], millis, playerIndex);
+    else
+      updateElements(
+        this,
+        this.elements[playerIndex],
+        millis,
+        this.delayMillisOf(playerIndex, playerIndex, true, now),
+        playerIndex,
+      );
 
     if (this.opts.soundPlayerIndex === playerIndex) {
       if (this.emergSound.playable[playerIndex]) {
@@ -328,9 +344,9 @@ export class ClockController {
       }
       if (this.byoyomiData) {
         if (
-          this.byoyomiData.byoyomi >= 5 &&
+          this.byoTime(playerIndex) >= 5 &&
           millis > 0 &&
-          ((this.emergSound.byoTicks === undefined && millis < this.byoyomiData.byoEmergeS * 1000) ||
+          ((this.emergSound.byoTicks === undefined && millis < this.byoEmergeS(playerIndex) * 1000) ||
             (this.emergSound.byoTicks && Math.floor(millis / 1000) < this.emergSound.byoTicks)) &&
           this.isUsingByo(playerIndex)
         ) {
@@ -343,17 +359,22 @@ export class ClockController {
 
   elapsed = (now = performance.now()) => Math.max(0, now - this.times.lastUpdate);
 
-  millisOf = (playerIndex: PlayerIndex): Millis =>
+  millisOf = (playerIndex: PlayerIndex, now = performance.now()): Millis =>
     this.times.activePlayerIndex === playerIndex
-      ? Math.max(0, this.times[playerIndex] - this.elapsed())
+      ? Math.max(0, this.times[playerIndex] - this.elapsed(now))
       : this.times[playerIndex];
 
-  delayMillisOf = (playerIndex: PlayerIndex, activePlayerInGame: PlayerIndex): Millis => {
+  delayMillisOf = (
+    playerIndex: PlayerIndex,
+    activePlayerInGame: PlayerIndex,
+    isRunning: boolean,
+    now = performance.now(),
+  ): Millis => {
     const isBerserk = this.goneBerserk[playerIndex];
-    const countDown = isBerserk ? 0 : (this.countdownDelay ?? 0);
+    const countDown = isBerserk ? Math.ceil((this.countdownDelay ?? 0) / 2) : (this.countdownDelay ?? 0);
     const delayMillis = 1000 * countDown;
-    return this.isNotOpponentsTurn(playerIndex) && playerIndex === activePlayerInGame
-      ? Math.max(0, delayMillis - (this.elapsed() + this.pendingMillisOf(playerIndex)))
+    return this.isNotOpponentsTurn(playerIndex) && playerIndex === activePlayerInGame && isRunning
+      ? Math.max(0, delayMillis - (this.elapsed(now) + this.pendingMillisOf(playerIndex)))
       : delayMillis;
   };
 
@@ -362,22 +383,22 @@ export class ClockController {
     return 1000 * pendingSeconds;
   };
 
-  isInDelay = (playerIndex: PlayerIndex, isStoppedBetweenPlayerActions = false): boolean => {
-    return (
-      !!this.delay &&
-      (this.isRunning() || isStoppedBetweenPlayerActions) &&
-      this.elapsed() + this.pendingMillisOf(playerIndex) <= 1000 * this.delay &&
-      !this.goneBerserk[playerIndex]
-    );
-  };
-
-  isNotInDelay = (playerIndex: PlayerIndex, isStoppedBetweenPlayerActions = false): boolean =>
+  isInDelay = (playerIndex: PlayerIndex, isRunning: boolean): boolean =>
     !!this.delay &&
-    (this.isRunning() || isStoppedBetweenPlayerActions) &&
-    this.elapsed() + this.pendingMillisOf(playerIndex) > 1000 * this.delay &&
-    !this.goneBerserk[playerIndex];
+    isRunning &&
+    this.elapsed() + this.pendingMillisOf(playerIndex) <= 1000 * this.delay &&
+    //if we have a countdownDelay we are SimpleDelay which allows for a delay in berserk
+    //otherwise we are Bronstein which clears the delay when berserking
+    (this.countdownDelay ? true : !this.goneBerserk[playerIndex]);
 
-  isRunning = () => this.times.activePlayerIndex !== undefined;
+  isNotInDelay = (playerIndex: PlayerIndex, isRunning: boolean): boolean =>
+    !!this.delay &&
+    isRunning &&
+    this.elapsed() + this.pendingMillisOf(playerIndex) > 1000 * this.delay &&
+    //if we have a countdownDelay we are SimpleDelay which allows for a delay in berserk
+    //otherwise we are Bronstein which clears the delay when berserking
+    (this.countdownDelay ? true : !this.goneBerserk[playerIndex]);
+
   isNotOpponentsTurn = (playerIndex: PlayerIndex) =>
     this.times.activePlayerIndex === undefined || this.times.activePlayerIndex === playerIndex;
 }

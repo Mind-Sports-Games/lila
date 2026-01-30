@@ -10,7 +10,7 @@ const otherEmerg = (millis: Millis, clock: ClockController) => millis < clock.em
 const byoyomiEmerg = (millis: Millis, clock: ClockController, playerIndex: PlayerIndex) =>
   !!clock.byoyomiData &&
   ((millis < clock.emergMs && !clock.isUsingByo(playerIndex)) ||
-    (clock.isUsingByo(playerIndex) && millis < clock.byoyomiData.byoEmergeS * 1000));
+    (clock.isUsingByo(playerIndex) && millis < clock.byoEmergeS(playerIndex) * 1000));
 const isEmerg = (millis: Millis, clock: ClockController, playerIndex: PlayerIndex) =>
   clock.byoyomiData ? byoyomiEmerg(millis, clock, playerIndex) : otherEmerg(millis, clock);
 
@@ -18,35 +18,26 @@ export function renderClock(ctrl: RoundController, player: game.Player, position
   const clock = ctrl.clock!,
     millis = clock.millisOf(player.playerIndex),
     isPlayer = ctrl.data.player.playerIndex === player.playerIndex,
-    isRunning = player.playerIndex === clock.times.activePlayerIndex,
-    showDelayTime = clock.countdownDelay !== undefined && !clock.goneBerserk[player.playerIndex],
+    showDelayTime = clock.countdownDelay !== undefined,
     paused =
       !!ctrl.data.opponent.offeringSelectSquares ||
       !!ctrl.data.player.offeringSelectSquares ||
       !(!ctrl.data.deadStoneOfferState || ctrl.data.deadStoneOfferState === 'RejectedOffer'),
     isClockRunning =
       game.playable(ctrl.data) && !paused && (game.bothPlayersHavePlayed(ctrl.data) || ctrl.data.clock!.running),
-    playerTurnDuringMultiActions =
-      ctrl.data.game.player === player.playerIndex &&
-      ['monster', 'amazons'].includes(ctrl.data.game.variant.key) &&
-      isClockRunning;
+    isRunning = isClockRunning && ctrl.data.game.player === player.playerIndex;
 
-  // TODO in multication render clock gets called as the move is played while it's sent, and then during apiAction update, the
-  // state of ctrl.data is different here and therefore hard to obtain the correct class in all states.
-  // This causes the green/orange flicker on the clock. The delayClass is an attempt to fix this which is only paritally working.
-  const delayClass =
-    clock.isInDelay(player.playerIndex, ctrl.data.multiActionMetaData?.couldNextActionEndTurn) &&
-    ctrl.data.game.player === player.playerIndex
-      ? '.indelay'
-      : clock.isNotInDelay(player.playerIndex, ctrl.data.multiActionMetaData?.couldNextActionEndTurn) &&
-          ctrl.data.game.player === player.playerIndex
-        ? '.notindelay'
-        : '';
+  const delayClass = clock.isInDelay(player.playerIndex, isRunning)
+    ? '.indelay'
+    : clock.isNotInDelay(player.playerIndex, isRunning)
+      ? '.notindelay'
+      : '';
   const update = (el: HTMLElement) => {
     const els = clock.elements[player.playerIndex],
-      millis = clock.millisOf(player.playerIndex),
-      delayMillis = clock.delayMillisOf(player.playerIndex, ctrl.data.game.player),
-      isRunning = player.playerIndex === clock.times.activePlayerIndex;
+      isRunning = isClockRunning && ctrl.data.game.player === player.playerIndex,
+      now = performance.now(),
+      millis = clock.millisOf(player.playerIndex, now),
+      delayMillis = clock.delayMillisOf(player.playerIndex, ctrl.data.game.player, isRunning, now);
     els.time = el;
     els.clock = el.parentElement!;
     el.innerHTML = formatClockTime(
@@ -61,16 +52,14 @@ export function renderClock(ctrl: RoundController, player: game.Player, position
   };
   const timeHook: Hooks = {
     insert: vnode => update(vnode.elm as HTMLElement),
-    postpatch: (_, vnode) => {
-      if (isClockRunning) update(vnode.elm as HTMLElement);
-    },
+    postpatch: (_, vnode) => update(vnode.elm as HTMLElement),
   };
   return h(
     'div.rclock.rclock-' + position,
     {
       class: {
         outoftime: millis <= 0,
-        running: isRunning || playerTurnDuringMultiActions,
+        running: isRunning,
         emerg: isEmerg(millis, clock, player.playerIndex),
       },
     },
@@ -92,7 +81,7 @@ export function renderClock(ctrl: RoundController, player: game.Player, position
               },
               hook: timeHook,
             }),
-            renderByoyomiTime(clock, player.playerIndex, ctrl.goneBerserk[player.playerIndex]),
+            renderByoyomiTime(clock, player.playerIndex),
           ]),
           renderBerserk(ctrl, player.playerIndex, position),
           isPlayer ? goBerserk(ctrl) : button.moretime(ctrl),
@@ -105,16 +94,12 @@ const pad2 = (num: number): string => (num < 10 ? '0' : '') + num;
 const sepHigh = '<sep>:</sep>';
 const sepLow = '<sep class="low">:</sep>';
 
-const renderByoyomiTime = (clock: ClockController, playerIndex: PlayerIndex, berserk = false) => {
+const renderByoyomiTime = (clock: ClockController, playerIndex: PlayerIndex) => {
   if (!clock.byoyomiData) return null;
-  const byoyomi = clock.byoyomiData.byoyomi;
+  const byoyomi = clock.byoTime(playerIndex);
   const periods = clock.byoyomiData.totalPeriods - clock.byoyomiData.curPeriods[playerIndex];
   const perStr = periods > 1 ? `(${periods}x)` : '';
-  return h(
-    `div.byoyomi.per${periods}`,
-    { berserk: berserk },
-    !berserk && byoyomi && periods ? `|${byoyomi}s${perStr}` : '',
-  );
+  return h(`div.byoyomi.per${periods}`, byoyomi && periods ? `|${byoyomi}s${perStr}` : '');
 };
 
 function formatClockTime(
@@ -125,11 +110,13 @@ function formatClockTime(
   showDelayTime: boolean,
   nvui: boolean,
 ) {
-  const displayDate = new Date(Math.max(0, time - delay));
-  const tickDate = new Date(time);
+  const timeInt = Math.round(time),
+    delayInt = Math.round(delay),
+    displayDate = new Date(Math.max(0, timeInt - delayInt)),
+    tickDate = new Date(timeInt);
   if (nvui)
     return (
-      (time >= 3600000 ? Math.floor(time / 3600000) + 'H:' : '') +
+      (timeInt >= 3600000 ? Math.floor(timeInt / 3600000) + 'H:' : '') +
       displayDate.getUTCMinutes() +
       'M:' +
       displayDate.getUTCSeconds() +
@@ -139,10 +126,10 @@ function formatClockTime(
     tickMillis = tickDate.getUTCMilliseconds(),
     sep = isRunning && tickMillis < 500 ? sepLow : sepHigh,
     baseStr = pad2(displayDate.getUTCMinutes()) + sep + pad2(displayDate.getUTCSeconds()),
-    delayString = '<delay>' + pad2(Math.ceil(delay / 1000)) + '</delay>';
+    delayString = '<delay>' + pad2(Math.ceil(delayInt / 1000)) + '</delay>';
 
-  if (time >= 3600000) {
-    const hours = pad2(Math.floor(time / 3600000));
+  if (timeInt >= 3600000) {
+    const hours = pad2(Math.floor(timeInt / 3600000));
     let delayStr = '';
     if (showDelayTime) delayStr += delayString;
     return hours + sepHigh + baseStr + delayStr;
@@ -150,7 +137,7 @@ function formatClockTime(
     return baseStr + delayString;
   } else if (showTenths) {
     let tenthsStr = Math.floor(displayMillis / 100).toString();
-    if (!isRunning && time < 1000) {
+    if (!isRunning && timeInt < 1000) {
       tenthsStr += '<huns>' + (Math.floor(displayMillis / 10) % 10) + '</huns>';
     }
     return baseStr + '<tenths><sep>.</sep>' + tenthsStr + '</tenths>';
@@ -196,16 +183,20 @@ function showBar(ctrl: RoundController, playerIndex: PlayerIndex) {
   });
 }
 
-export function updateElements(clock: ClockController, els: ClockElements, millis: Millis, playerIndex: PlayerIndex) {
-  const delayMillis = clock.delayMillisOf(playerIndex, playerIndex),
-    showDelayTime = clock.countdownDelay !== undefined && !clock.goneBerserk[playerIndex];
+export function updateElements(
+  clock: ClockController,
+  els: ClockElements,
+  millis: Millis,
+  delayMillis: Millis,
+  playerIndex: PlayerIndex,
+) {
   if (els.time) {
     els.time.innerHTML = formatClockTime(
       millis,
       delayMillis,
       clock.showTenths(millis),
       true,
-      showDelayTime,
+      clock.countdownDelay !== undefined,
       clock.opts.nvui,
     );
     updateClassList(els.time.classList, clock, playerIndex, playerIndex === clock.times.activePlayerIndex, millis);
@@ -225,10 +216,10 @@ function updateClassList(
   isRunning: boolean,
   millis: Millis,
 ) {
-  if (clock.isInDelay(playerIndex) && isRunning) {
+  if (clock.isInDelay(playerIndex, isRunning)) {
     cl.remove('notindelay');
     cl.add('indelay');
-  } else if (clock.isNotInDelay(playerIndex) && (cl.contains('indelay') || !cl.contains('notindelay')) && isRunning) {
+  } else if (clock.isNotInDelay(playerIndex, isRunning) && (cl.contains('indelay') || !cl.contains('notindelay'))) {
     if (isEmerg(millis, clock, playerIndex)) clock.emergSound.lowtime();
     cl.remove('indelay');
     cl.add('notindelay');
@@ -244,13 +235,11 @@ function renderBerserk(ctrl: RoundController, playerIndex: PlayerIndex, position
 }
 
 function goBerserk(ctrl: RoundController) {
-  const clock = ctrl.clock!;
-  const isByoyomi = !!clock.byoyomiData;
   if (!game.berserkableBy(ctrl.data)) return;
   if (ctrl.goneBerserk[ctrl.data.player.playerIndex]) return;
   return h('button.fbt.go-berserk', {
     attrs: {
-      title: `GO BERSERK! Half the time, no increment/delay,${isByoyomi ? ' no byoyomi,' : ''} bonus point`,
+      title: `GO BERSERK! Reduce your clock to win a bonus point`,
       'data-icon': '`',
     },
     hook: bind('click', ctrl.goBerserk),

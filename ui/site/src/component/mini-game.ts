@@ -1,3 +1,4 @@
+import { Coords as CgCoords } from 'chessground/types';
 import * as domData from 'common/data';
 import { variantFromElement } from 'common/mini-board';
 import { readDice, readDoublingCube, displayScore, fenPlayerIndex, lastMove } from 'stratutils';
@@ -22,7 +23,7 @@ export const init = (node: HTMLElement) => {
     if ($el.hasClass('draughts')) {
       const [fen, board, orientation, lm] = $el.data('state').split('|'),
         config = {
-          coordinates: 0,
+          coordinates: CgCoords.Hidden,
           boardSize: board ? board.split('x').map((s: string) => parseInt(s)) : [10, 10],
           viewOnly: !node.getAttribute('data-playable'),
           resizable: false,
@@ -50,7 +51,7 @@ export const init = (node: HTMLElement) => {
     } else {
       const [fen, orientation, lm, multiPointState] = node.getAttribute('data-state')!.split('|');
       const config = {
-          coordinates: false,
+          coordinates: CgCoords.Hidden,
           viewOnly: true,
           myPlayerIndex: orientation === 'p1vflip' ? 'p2' : orientation,
           turnPlayerIndex: fenPlayerIndex(variantFromElement($el) as VariantKey, fen),
