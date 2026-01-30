@@ -173,10 +173,11 @@ object Challenge {
     case object Variant     extends DeclineReason(I18nKeys.challenge.declineVariant)
     case object NoBot       extends DeclineReason(I18nKeys.challenge.declineNoBot)
     case object OnlyBot     extends DeclineReason(I18nKeys.challenge.declineOnlyBot)
+    case object NoAnon      extends DeclineReason(I18nKeys.challenge.declineNoAnon)
 
     val default: DeclineReason = Generic
     val all: List[DeclineReason] =
-      List(Generic, Later, TooFast, TooSlow, TimeControl, Rated, Casual, Standard, Variant, NoBot, OnlyBot)
+      List(Generic, Later, TooFast, TooSlow, TimeControl, Rated, Casual, Standard, Variant, NoBot, OnlyBot, NoAnon)
     val allExceptBot: List[DeclineReason] =
       all.filterNot(r => r == NoBot || r == OnlyBot)
     def apply(key: String) = all.find { d => d.key == key.toLowerCase || d.trans.key == key } | Generic
