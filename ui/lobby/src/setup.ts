@@ -928,8 +928,7 @@ export default class Setup {
       if (isAnon) {
         setBaseDefaultOptions(); //default to chess, real time, blitz clock
         $casual.trigger('click');
-        const targetIsBot = $form.data('target-is-bot');
-        $opponentInput.val(targetIsBot ? 'bot' : 'lobby');
+        $opponentInput.val('bot');
         disableNonRealTimeModes();
       }
     };
