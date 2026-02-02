@@ -4,6 +4,7 @@ import { Config as CgConfig } from 'chessground/config';
 import { type Variant as CgVariant, Coords as CgCoords, MouchEvent } from 'chessground/types';
 import * as util from 'chessground/util';
 import changeColorHandle from 'common/coordsColor';
+import isCol1 from 'common/isCol1';
 import EditorCtrl from './ctrl';
 import { variantClassFromKey } from 'stratops/variants/util';
 
@@ -130,7 +131,7 @@ function makeConfig(ctrl: EditorCtrl): CgConfig {
     orientation: ctrl.options.orientation || 'p1',
     coordinates: ctrl.cfg.embed
       ? CgCoords.Hidden
-      : document.body.classList.contains('coords-out')
+      : document.body.classList.contains('coords-out') && !isCol1()
         ? CgCoords.Outside
         : CgCoords.Inside,
     autoCastle: false,
