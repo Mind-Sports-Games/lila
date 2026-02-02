@@ -22,5 +22,6 @@
   <string name="declineVariant">I\'m not willing to play this variant right now.</string>
   <string name="declineNoBot">I\'m not accepting challenges from bots.</string>
   <string name="declineOnlyBot">I\'m only accepting challenges from bots.</string>
+  <string name="declineNoAnon">I\'m not accepting challenges from anonymous users, please sign in to play against me.</string>
   <string name="cannotChallengeYourself">You can not challenge yourself.</string>
 </resources>

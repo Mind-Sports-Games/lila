@@ -63,15 +63,16 @@ final class JsonView(
   def apply(direction: Option[Direction])(c: Challenge)(implicit lang: Lang): JsObject =
     Json
       .obj(
-        "id"         -> c.id,
-        "url"        -> s"$baseUrl/${c.id}",
-        "status"     -> c.status.name,
-        "challenger" -> c.challengerUser,
-        "destUser"   -> c.destUser,
-        "lib"        -> c.variant.gameLogic.id,
-        "variant"    -> c.variant,
-        "rated"      -> c.mode.rated,
-        "speed"      -> c.speed.key,
+        "id"               -> c.id,
+        "url"              -> s"$baseUrl/${c.id}",
+        "status"           -> c.status.name,
+        "challenger"       -> c.challengerUser,
+        "challengerIsAnon" -> c.challengerIsAnon,
+        "destUser"         -> c.destUser,
+        "lib"              -> c.variant.gameLogic.id,
+        "variant"          -> c.variant,
+        "rated"            -> c.mode.rated,
+        "speed"            -> c.speed.key,
         "timeControl" -> (c.timeControl match {
           case TimeControl.Clock(clock) =>
             Json.obj(

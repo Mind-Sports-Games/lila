@@ -98,12 +98,13 @@ object header {
             titleOrText(trans.watchGames.txt()),
             dataIcon := "1"
           ),
-          (ctx.isAuth && !ctx.is(u)) option
+          (!ctx.is(u) && (ctx.isAuth || u.isBot)) option
             views.html.relation.actions(
               u.id,
               relation = social.relation,
               followable = social.followable,
-              blocked = social.blocked
+              blocked = social.blocked,
+              isBot = u.isBot
             ),
           if (ctx is u)
             a(

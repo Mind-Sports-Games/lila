@@ -437,6 +437,7 @@ private object bits {
       .mkString(",")
 
   val dataAnon        = attr("data-anon")
+  val dataTargetIsBot = attr("data-target-is-bot")
   val dataMin         = attr("data-min")
   val dataMax         = attr("data-max")
   val dataValidateUrl = attr("data-validate-url")
