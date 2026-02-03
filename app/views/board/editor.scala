@@ -15,15 +15,18 @@ object editor {
       sit: Situation,
       fen: FEN,
       variant: strategygames.variant.Variant,
-      positionsJson: String
-  )(implicit ctx: Context) =
+      positionsJson: String,
+      orientation: Option[String] = None
+    )(implicit ctx: Context) =
     views.html.base.layout(
       title = trans.boardEditor.txt(),
       moreJs = frag(
         jsModule("editor"),
         embedJsUnsafeLoadThen(
           s"""const data=${safeJsonValue(bits.jsData(sit, fen, variant))};data.positions=$positionsJson;
-PlayStrategyEditor(document.getElementById('board-editor'), data);"""
+          data.options = data.options || {};
+          ${orientation.fold("")(o => s"data.options.orientation='${o}';\n")}
+      PlayStrategyEditor(document.getElementById('board-editor'), data);"""
         )
       ),
       moreCss = cssTag("editor"),

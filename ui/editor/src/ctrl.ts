@@ -207,18 +207,23 @@ export default class EditorCtrl {
       encodeURIComponent(replacePocketsInFen(legalFen))
         .replace(/%20/g, '_')
         .replace(/%2F/g, '/')
-        .replace(/%C2%BD/g, '½')
+        .replace(/%C2%BD/g, '½') +
+      (this.options.orientation ? `?orientation=${this.options.orientation}` : '')
     );
   }
 
   makeUrl(baseUrl: string, fen: string): string {
+    let urlParams = this.variantKey !== 'standard' ? `?variant=${this.variantKey}` : '';
+    if (this.options.orientation) {
+      urlParams += (urlParams.length === 0 ? '?' : '&') + `orientation=${this.options.orientation}`;
+    }
     return (
       baseUrl +
       encodeURIComponent(fen)
         .replace(/%20/g, '_')
         .replace(/%2F/g, '/')
         .replace(/%C2%BD/g, '½') +
-      `${this.variantKey === 'standard' ? '' : '?variant=' + this.variantKey}`
+      urlParams
     );
   }
 
