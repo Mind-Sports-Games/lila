@@ -207,8 +207,8 @@ export default class EditorCtrl {
       encodeURIComponent(replacePocketsInFen(legalFen))
         .replace(/%20/g, '_')
         .replace(/%2F/g, '/')
-        .replace(/%C2%BD/g, '½')
-      + (this.options.orientation ? `?orientation=${this.options.orientation}` : '')
+        .replace(/%C2%BD/g, '½') +
+      (this.options.orientation ? `?orientation=${this.options.orientation}` : '')
     );
   }
 

@@ -200,10 +200,8 @@ function controls(ctrl: EditorCtrl, state: EditorState): VNode {
                 attrs: { 'data-icon': 'B' },
                 on: {
                   click() {
-                    if ((ctrl.options.orientation ?? 'p1') === 'p1')
-                      ctrl.setOrientation('p2');
-                    else
-                      ctrl.setOrientation('p1');
+                    if ((ctrl.options.orientation ?? 'p1') === 'p1') ctrl.setOrientation('p2');
+                    else ctrl.setOrientation('p1');
                     ctrl.onChange();
                   },
                 },
