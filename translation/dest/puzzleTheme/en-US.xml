@@ -16,6 +16,8 @@
   <string name="backRankMateDescription">Checkmate the king on the home rank, when it is trapped there by its own pieces.</string>
   <string name="bishopEndgame">Bishop endgame</string>
   <string name="bishopEndgameDescription">An endgame with only bishops and pawns.</string>
+  <string name="black">Black</string>
+  <string name="blackDescription">Play with the Black pieces.</string>
   <string name="bodenMate">Boden\'s mate</string>
   <string name="bodenMateDescription">Two attacking bishops on criss-crossing diagonals deliver mate to a king obstructed by friendly pieces.</string>
   <string name="castling">Castling</string>
@@ -57,6 +59,14 @@
   <string name="interferenceDescription">Moving a piece between two opponent pieces to leave one or both opponent pieces undefended, such as a knight on a defended square between two rooks.</string>
   <string name="intermezzo">Intermezzo</string>
   <string name="intermezzoDescription">Instead of playing the expected move, first interpose another move posing an immediate threat that the opponent must answer. Also known as \"Zwischenzug\" or \"In between\".</string>
+  <string name="kingOnHill">King on Hill</string>
+  <string name="kingOnHillDescription">Win by getting your king to the center of the board.</string>
+  <string name="kingOnHillIn1">King on Hill in 1</string>
+  <string name="kingOnHillIn1Description">Get your king to the center of the board in one move.</string>
+  <string name="kingOnHillIn2">King on Hill in 2</string>
+  <string name="kingOnHillIn2Description">Get your king to the center of the board in two moves.</string>
+  <string name="kingOnHillIn3">King on Hill in 3</string>
+  <string name="kingOnHillIn3Description">Get your king to the center of the board in three moves.</string>
   <string name="knightEndgame">Knight endgame</string>
   <string name="knightEndgameDescription">An endgame with only knights and pawns.</string>
   <string name="long">Long puzzle</string>
@@ -123,6 +133,8 @@
   <string name="underPromotionDescription">Promotion to a knight, bishop, or rook.</string>
   <string name="veryLong">Very long puzzle</string>
   <string name="veryLongDescription">Four moves or more to win.</string>
+  <string name="white">White</string>
+  <string name="whiteDescription">Play with the White pieces.</string>
   <string name="xRayAttack">X-Ray attack</string>
   <string name="xRayAttackDescription">A piece attacks or defends a square, through an enemy piece.</string>
   <string name="zugzwang">Zugzwang</string>
