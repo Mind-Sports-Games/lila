@@ -32,6 +32,7 @@ final class Editor(env: Env) extends LilaController(env) {
         .map(_.replace('_', ' ').trim)
         .filter(_.nonEmpty)
       val variant = Variant.orDefault(urlVariant.getOrElse(""))
+      val orientation = ctx.req.getQueryString("orientation")
       fuccess {
         val situation = readFen(fenStr, variant)
         Ok(
@@ -39,7 +40,8 @@ final class Editor(env: Env) extends LilaController(env) {
             sit = situation,
             fen = Forsyth.>>(situation.board.variant.gameLogic, situation),
             variant = variant,
-            positionsJson
+            positionsJson,
+            orientation
           )
         )
       }

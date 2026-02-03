@@ -49,7 +49,7 @@ final class UserAnalysis(
         .filter(_.trim.nonEmpty)
         .orElse(get("fen")) map (s => FEN.clean(variant.gameLogic, s))
       val pov         = makePov(decodedFen, variant)
-      val orientation = get("playerIndex").flatMap(PlayerIndex.fromName) | pov.playerIndex
+      val orientation = get("orientation").flatMap(PlayerIndex.fromName) | pov.playerIndex
       env.api.roundApi
         .userAnalysisJson(pov, ctx.pref, decodedFen, orientation, owner = false, me = ctx.me) map { data =>
         EnableSharedArrayBuffer(Ok(html.board.userAnalysis(data, pov)))
