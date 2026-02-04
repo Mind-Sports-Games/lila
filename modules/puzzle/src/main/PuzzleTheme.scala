@@ -22,7 +22,6 @@ object PuzzleTheme {
   val attraction    = PuzzleTheme(Key("attraction"), i.attraction, i.attractionDescription)
   val backRankMate  = PuzzleTheme(Key("backRankMate"), i.backRankMate, i.backRankMateDescription)
   val bishopEndgame = PuzzleTheme(Key("bishopEndgame"), i.bishopEndgame, i.bishopEndgameDescription)
-  val black         = PuzzleTheme(Key("black"), i.black, i.blackDescription)
   val bodenMate     = PuzzleTheme(Key("bodenMate"), i.bodenMate, i.bodenMateDescription)
   val capturingDefender =
     PuzzleTheme(Key("capturingDefender"), i.capturingDefender, i.capturingDefenderDescription)
@@ -71,6 +70,8 @@ object PuzzleTheme {
   val oneMove        = PuzzleTheme(Key("oneMove"), i.oneMove, i.oneMoveDescription)
   val opening        = PuzzleTheme(Key("opening"), i.opening, i.openingDescription)
   val pawnEndgame    = PuzzleTheme(Key("pawnEndgame"), i.pawnEndgame, i.pawnEndgameDescription)
+  val pawns          = PuzzleTheme(Key("pawns"), i.pawns, i.pawnsDescription)
+  val pieces         = PuzzleTheme(Key("pieces"), i.pieces, i.piecesDescription)
   val pin            = PuzzleTheme(Key("pin"), i.pin, i.pinDescription)
   val promotion      = PuzzleTheme(Key("promotion"), i.promotion, i.promotionDescription)
   val queenEndgame   = PuzzleTheme(Key("queenEndgame"), i.queenEndgame, i.queenEndgameDescription)
@@ -86,7 +87,6 @@ object PuzzleTheme {
   val trappedPiece    = PuzzleTheme(Key("trappedPiece"), i.trappedPiece, i.trappedPieceDescription)
   val underPromotion  = PuzzleTheme(Key("underPromotion"), i.underPromotion, i.underPromotionDescription)
   val veryLong        = PuzzleTheme(Key("veryLong"), i.veryLong, i.veryLongDescription)
-  val white           = PuzzleTheme(Key("white"), i.white, i.whiteDescription)
   val xRayAttack      = PuzzleTheme(Key("xRayAttack"), i.xRayAttack, i.xRayAttackDescription)
   val zugzwang        = PuzzleTheme(Key("zugzwang"), i.zugzwang, i.zugzwangDescription)
 
@@ -129,11 +129,10 @@ object PuzzleTheme {
   )
   val categorizedWinIn2 = List[(I18nKey, List[PuzzleTheme])](trans.puzzle.wins -> List(winIn2))
   val categorizedKingOnHill = List[(I18nKey, List[PuzzleTheme])](
-    trans.puzzle.kingOnHill -> List(
-      //kingOnHill, //add back in when we have more than 1 puzzle type here
-      kingOnHillIn1,
-      kingOnHillIn2,
-      kingOnHillIn3
+    trans.puzzle.wins -> List(
+      winIn2,
+      mateIn2,
+      kingOnHillIn2
     )
   )
   val categorizedChessPhases = List[(I18nKey, List[PuzzleTheme])](
@@ -196,10 +195,10 @@ object PuzzleTheme {
     )
   )
 
-  val categorizedPlayer = List[(I18nKey, List[PuzzleTheme])](
-    trans.puzzle.player -> List(
-      black,
-      white
+  val categorizedSide = List[(I18nKey, List[PuzzleTheme])](
+    trans.puzzle.side -> List(
+      pawns,
+      pieces
     )
   )
 
@@ -251,10 +250,9 @@ object PuzzleTheme {
 
   val categorizedAtomicVariant = categorizedChessVariantBase ::: categorizedMate
 
-  val categorizedKingOfTheHillVariant =
-    categorizedChessVariantBase ::: categorizedMateIn2 ::: categorizedKingOnHill
+  val categorizedKingOfTheHillVariant = categorizedChessVariantBase ::: categorizedKingOnHill
 
-  val categorizedHordeVariant = categorizedChessVariantBase ::: categorizedMateIn2 ::: categorizedPlayer
+  val categorizedHordeVariant = categorizedChessVariantBase ::: categorizedMateIn2 ::: categorizedSide
 
   val categorizedRacingKingsVariant = categorizedChessVariantBase ::: categorizedWinIn2
 
@@ -305,7 +303,6 @@ object PuzzleTheme {
   // themes that can't be voted by players
   val staticThemes: Set[Key] = Set(
     advantage,
-    black,
     castling,
     crushing,
     enPassant,
@@ -334,7 +331,8 @@ object PuzzleTheme {
     short,
     smotheredMate,
     veryLong,
-    white
+    pawns,
+    pieces
   ).map(_.key)
 
   //TODO recreate these when more themes are available (also set per variant)

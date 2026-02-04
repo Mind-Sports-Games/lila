@@ -16,8 +16,6 @@
   <string name="backRankMateDescription">Checkmate the king on the home rank, when it is trapped there by its own pieces.</string>
   <string name="bishopEndgame">Bishop endgame</string>
   <string name="bishopEndgameDescription">An endgame with only bishops and pawns.</string>
-  <string name="black">Black</string>
-  <string name="blackDescription">Play with the Black pieces.</string>
   <string name="bodenMate">Boden\'s mate</string>
   <string name="bodenMateDescription">Two attacking bishops on criss-crossing diagonals deliver mate to a king obstructed by friendly pieces.</string>
   <string name="castling">Castling</string>
@@ -103,6 +101,10 @@
   <string name="openingDescription">A tactic during the first phase of the game.</string>
   <string name="pawnEndgame">Pawn endgame</string>
   <string name="pawnEndgameDescription">An endgame with only pawns.</string>
+  <string name="pawns">The Pawns</string>
+  <string name="pawnsDescription">Play with the White pawns.</string>
+  <string name="pieces">The Pieces</string>
+  <string name="piecesDescription">Play with the Black pieces.</string>
   <string name="pin">Pin</string>
   <string name="pinDescription">A tactic involving pins, where a piece is unable to move without revealing an attack on a higher value piece.</string>
   <string name="promotion">Promotion</string>
@@ -133,8 +135,6 @@
   <string name="underPromotionDescription">Promotion to a knight, bishop, or rook.</string>
   <string name="veryLong">Very long puzzle</string>
   <string name="veryLongDescription">Four moves or more to win.</string>
-  <string name="white">White</string>
-  <string name="whiteDescription">Play with the White pieces.</string>
   <string name="xRayAttack">X-Ray attack</string>
   <string name="xRayAttackDescription">A piece attacks or defends a square, through an enemy piece.</string>
   <string name="zugzwang">Zugzwang</string>
