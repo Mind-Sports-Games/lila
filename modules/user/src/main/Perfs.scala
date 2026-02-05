@@ -639,7 +639,62 @@ case object Perfs {
       hyper: List[User.LightPerf],
       nackgammon: List[User.LightPerf],
       abalone: List[User.LightPerf]
-  )
+  ) {
+    def forVariant(variant: Variant): List[User.LightPerf] = {
+      val key = variant.key
+      allLeaderboards.getOrElse(key, Nil)
+    }
+
+    lazy val allLeaderboards: Map[String, List[User.LightPerf]] = Map(
+      "ultraBullet"            -> ultraBullet,
+      "bullet"                 -> bullet,
+      "blitz"                  -> blitz,
+      "rapid"                  -> rapid,
+      "classical"              -> classical,
+      "crazyhouse"             -> crazyhouse,
+      "chess960"               -> chess960,
+      "kingOfTheHill"          -> kingOfTheHill,
+      "threeCheck"             -> threeCheck,
+      "fiveCheck"              -> fiveCheck,
+      "antichess"              -> antichess,
+      "atomic"                 -> atomic,
+      "horde"                  -> horde,
+      "racingKings"            -> racingKings,
+      "noCastling"             -> noCastling,
+      "monster"                -> monster,
+      "linesOfAction"          -> linesOfAction,
+      "scrambledEggs"          -> scrambledEggs,
+      "international"          -> international,
+      "frisian"                -> frisian,
+      "frysk"                  -> frysk,
+      "antidraughts"           -> antidraughts,
+      "breakthrough"           -> breakthrough,
+      "russian"                -> russian,
+      "brazilian"              -> brazilian,
+      "pool"                   -> pool,
+      "portuguese"             -> portuguese,
+      "english"                -> english,
+      "shogi"                  -> shogi,
+      "xiangqi"                -> xiangqi,
+      "minishogi"              -> minishogi,
+      "minixiangqi"            -> minixiangqi,
+      "flipello"               -> flipello,
+      "flipello10"             -> flipello10,
+      "amazons"                -> amazons,
+      "breakthroughtroyka"     -> breakthroughtroyka,
+      "minibreakthroughtroyka" -> minibreakthroughtroyka,
+      "oware"                  -> oware,
+      "togyzkumalak"           -> togyzkumalak,
+      "bestemshe"              -> bestemshe,
+      "go9x9"                  -> go9x9,
+      "go13x13"                -> go13x13,
+      "go19x19"                -> go19x19,
+      "backgammon"             -> backgammon,
+      "hyper"                  -> hyper,
+      "nackgammon"             -> nackgammon,
+      "abalone"                -> abalone
+    )
+  }
 
   val emptyLeaderboards = Leaderboards(
     Nil,

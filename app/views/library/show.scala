@@ -9,16 +9,20 @@ import lila.app.ui.ScalatagsTemplate._
 import lila.common.String.html.safeJsonValue
 import lila.i18n.{ I18nKeys => trans, VariantKeys }
 import lila.game.{ MonthlyGameData, WinRatePercentages }
+import lila.rating.PerfType
+import lila.user.User
 import play.api.i18n.Lang
 
 import strategygames.variant.Variant
+import strategygames.Speed
 
 object show {
 
   def apply(
       variant: Variant,
       monthlyGameData: List[MonthlyGameData],
-      winRates: List[WinRatePercentages]
+      winRates: List[WinRatePercentages],
+      leaderboard: List[User.LightPerf]
   )(implicit ctx: Context) =
     views.html.base.layout(
       title = s"${VariantKeys.variantName(variant)} • ${VariantKeys.variantTitle(variant)}",
@@ -97,6 +101,7 @@ object show {
             trans.createAGame()
           )
         ),
+        leaderboard.nonEmpty option userTopPerf(leaderboard, PerfType(variant, Speed.Blitz)),
         div(id := "library_chart_area")(
           div(id := "library_chart")(spinner)
         ),
@@ -114,6 +119,20 @@ object show {
           bits.statsRow("Draws", bits.winRateDraws(variant, winRates))
         )
       )
+    )
+
+  private def userTopPerf(users: List[User.LightPerf], perfType: PerfType)(implicit lang: Lang) =
+    div(cls := "leaderboards")(
+      div(cls := "color-choice title")(
+        h2("Leaderboard")
+        //a(href := routes.User.topNb(200, perfType.key))("More »")
+      ),
+      ol(users map { l =>
+        li(
+          lightUserLink(l.user),
+          l.rating
+        )
+      })
     )
 
 }

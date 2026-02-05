@@ -24,7 +24,9 @@ final class Library(env: Env) extends LilaController(env) {
           for {
             monthlyGameData <- env.game.cached.monthlyGames
             winRates        <- env.game.cached.gameWinRates
-          } yield Ok(views.html.library.show(variant, monthlyGameData, winRates))
+            leaderboards    <- env.user.cached.top10.get {}
+            leaderboard = leaderboards.forVariant(variant)
+          } yield Ok(views.html.library.show(variant, monthlyGameData, winRates, leaderboard))
         }
         case None => NotFound("Variant not found").fuccess
       }
