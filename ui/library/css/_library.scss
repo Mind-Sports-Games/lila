@@ -186,9 +186,8 @@
   }
 
   .library-stats-table {
-    margin: 2em 0;
     width: 100%;
-    max-width: 400px;
+    max-width: 500px;
     background: $c-bg-box;
     border-radius: 6px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
@@ -231,6 +230,62 @@
     }
   }
 
+  .tournaments {
+    @each $c in ('black', 'green', 'red', 'blue', 'yellow') {
+      .selected-color-#{$c} & .color-choice {
+        background: map-get($c-color-choice-map, $c);
+        color: $c-color-choice-font-default;
+        text-shadow: 0 1px 0 map-get($c-color-choice-map, $c);
+      }
+    }
+
+    width: 100%;
+    max-width: 500px;
+    margin-bottom: 2em;
+
+    .title {
+      display: flex;
+      justify-content: space-between;
+      padding: 0.5em 1em;
+      align-items: center;
+
+      h2 {
+        font-size: 1.3em;
+        font-weight: bold;
+      }
+
+      a {
+        color: $c-color-choice-font-default;
+        &:hover {
+          color: $c-link;
+        }
+      }
+    }
+
+    table {
+      background: $c-bg-zebra;
+      border-bottom: 1px solid $c-border;
+      &:last-child {
+        border-bottom: none;
+      }
+
+      a {
+        color: unset;
+        &:hover {
+          color: $c-link;
+        }
+      }
+
+      tr {
+        background: $c-bg-zebra;
+        border-bottom: 1px solid $c-border;
+        &:last-child {
+          border-bottom: none;
+        }
+      }
+    }
+  }
+
   .leaderboards {
     @each $c in ('black', 'green', 'red', 'blue', 'yellow') {
       .selected-color-#{$c} & .color-choice {
@@ -241,7 +296,8 @@
     }
 
     width: 100%;
-    max-width: 400px;
+    max-width: 500px;
+    margin-bottom: 2em;
 
     ::before {
       font-size: unset;
@@ -274,10 +330,11 @@
       justify-content: space-between;
       white-space: nowrap;
       padding: 0.7rem 1.2rem 0.7rem 0.5rem;
-    }
-
-    li:nth-child(even) {
       background: $c-bg-zebra;
+      border-bottom: 1px solid $c-border;
+      &:last-child {
+        border-bottom: none;
+      }
     }
 
     .user-link {

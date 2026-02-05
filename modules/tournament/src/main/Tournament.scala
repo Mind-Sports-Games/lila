@@ -173,6 +173,12 @@ case class Tournament(
       case _                                       => false
     }
 
+  def sameFreqAndVariant(other: Tournament) =
+    (schedule, other.schedule) match {
+      case (Some(s1), Some(s2)) if s1.freq == s2.freq && variant.key == other.variant.key => true
+      case _                                                                              => false
+    }
+
   def speed = Speed(clock)
 
   def perfType: PerfType = PerfType(variant, speed)

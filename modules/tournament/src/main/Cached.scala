@@ -33,6 +33,11 @@ final private[tournament] class Cached(
       .buildAsyncFuture(_ => tournamentRepo.onHomepage)
   }
 
+  val onLibraryPage = cacheApi.unit[List[Tournament]] {
+    _.refreshAfterWrite(2 seconds)
+      .buildAsyncFuture(_ => tournamentRepo.onLibraryPage)
+  }
+
   def ranking(tour: Tournament): Fu[Ranking] =
     if (tour.isFinished) finishedRanking get tour.id
     else ongoingRanking get tour.id

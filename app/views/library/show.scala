@@ -11,6 +11,7 @@ import lila.i18n.{ I18nKeys => trans, VariantKeys }
 import lila.game.{ MonthlyGameData, WinRatePercentages }
 import lila.rating.PerfType
 import lila.user.User
+import lila.tournament.Tournament
 import play.api.i18n.Lang
 
 import strategygames.variant.Variant
@@ -22,7 +23,8 @@ object show {
       variant: Variant,
       monthlyGameData: List[MonthlyGameData],
       winRates: List[WinRatePercentages],
-      leaderboard: List[User.LightPerf]
+      leaderboard: List[User.LightPerf],
+      tours: List[Tournament]
   )(implicit ctx: Context) =
     views.html.base.layout(
       title = s"${VariantKeys.variantName(variant)} • ${VariantKeys.variantTitle(variant)}",
@@ -101,10 +103,8 @@ object show {
             trans.createAGame()
           )
         ),
+        tours.nonEmpty option tournamentList(tours),
         leaderboard.nonEmpty option userTopPerf(leaderboard, PerfType(variant, Speed.Blitz)),
-        div(id := "library_chart_area")(
-          div(id := "library_chart")(spinner)
-        ),
         div(cls := "library-stats-table")(
           h2(cls := "library-stats-title color-choice")("Game Info"),
           bits.statsRow("Date Released", bits.releaseDateDisplay(monthlyGameData, variant)),
@@ -117,7 +117,21 @@ object show {
           bits.statsRow("Player 1 wins", bits.winRatePlayer1(variant, winRates)),
           bits.statsRow("Player 2 wins", bits.winRatePlayer2(variant, winRates)),
           bits.statsRow("Draws", bits.winRateDraws(variant, winRates))
+        ),
+        div(id := "library_chart_area")(
+          div(id := "library_chart")(spinner)
         )
+      )
+    )
+
+  private def tournamentList(tours: List[Tournament])(implicit ctx: Context) =
+    div(cls := "tournaments")(
+      div(cls := "color-choice title")(
+        h2(trans.openTournaments()),
+        a(href := routes.Tournament.home.url, cls := "more")(trans.more(), " »")
+      ),
+      div(cls := "enterable_list lobby__box__content")(
+        views.html.tournament.bits.enterable(tours)
       )
     )
 

@@ -318,6 +318,19 @@ final class TournamentRepo(val coll: Coll, playerCollName: CollName)(implicit
           .reverse
     }
 
+  private[tournament] def onLibraryPage: Fu[List[Tournament]] =
+    scheduledStillWorthEntering zip byScheduleCategory(
+      List(Schedule.Freq.Weekly, Schedule.Freq.Shield, Schedule.Freq.MedleyShield, Schedule.Freq.Yearly)
+    ) map { case (started, created) =>
+      (started ::: created)
+        .sortBy(_.startsAt.getSeconds)
+        .foldLeft(List.empty[Tournament]) {
+          case (acc, tour) if acc.exists(_ sameFreqAndVariant tour) => acc
+          case (acc, tour)                                          => tour :: acc
+        }
+        .reverse
+    }
+
   private[tournament] def byScheduleCategory(cats: List[Schedule.Freq]): Fu[List[Tournament]] =
     coll
       .find(createdSelect ++ $doc("schedule.freq" $in cats.map(_.name)))
