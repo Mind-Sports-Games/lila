@@ -113,7 +113,11 @@ object show {
         tours.nonEmpty option tournamentList(tours),
         leaderboard.nonEmpty option userTopPerf(leaderboard, PerfType(variant, Speed.Blitz)),
         div(cls := "library-stats-table")(
-          h2(cls := "library-stats-title color-choice")("Game Info"),
+          div(cls := "library-stats-title color-choice")(
+            div(dataIcon := "^"),
+            h2("Game Info"),
+            div(" ") //place holder to keep title centered
+          ),
           bits.statsRow("Date Released", bits.releaseDateDisplay(monthlyGameData, variant)),
           bits.statsRow("Total Games Played", bits.totalGamesForVariant(monthlyGameData, variant).toString()),
           bits.statsRow(
@@ -134,7 +138,8 @@ object show {
   private def tournamentList(tours: List[Tournament])(implicit ctx: Context) =
     div(cls := "tournaments")(
       div(cls := "color-choice title")(
-        h2(dataIcon := "g")(trans.openTournaments()),
+        div(dataIcon := "g"),
+        h2(trans.openTournaments()),
         a(href := routes.Tournament.home.url, cls := "more")(trans.more(), " »")
       ),
       div(cls := "enterable_list lobby__box__content")(
@@ -145,7 +150,9 @@ object show {
   private def userTopPerf(users: List[User.LightPerf], perfType: PerfType)(implicit lang: Lang) =
     div(cls := "leaderboards")(
       div(cls := "color-choice title")(
-        h2("Leaderboard")
+        div(dataIcon := "U"),
+        h2("Leaderboard"),
+        div(" ") //place holder to keep title centered
         //a(href := routes.User.topNb(200, perfType.key))("More »")
       ),
       ol(users map { l =>

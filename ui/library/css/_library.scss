@@ -46,7 +46,6 @@
     display: flex;
     flex-flow: column nowrap;
     width: 100%;
-    margin-bottom: 2em;
     .library-links {
       flex: 1 1 auto;
       display: flex;
@@ -84,7 +83,8 @@
   }
 
   .start {
-    margin-bottom: 2em;
+    margin: 2em 0em;
+    font-size: 175%;
   }
 
   .section-title {
@@ -169,7 +169,6 @@
 
   #library_chart_area {
     height: 500px;
-    margin-top: 2rem;
     width: 100%;
     max-width: 700px;
     display: flex;
@@ -191,6 +190,7 @@
     background: $c-bg-box;
     border-radius: 6px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    margin-bottom: 2em;
 
     @each $c in ('black', 'green', 'red', 'blue', 'yellow') {
       .selected-color-#{$c} & .library-stats-title.color-choice {
@@ -201,9 +201,15 @@
     }
     .library-stats-title {
       text-align: center;
-      font-size: 1.3em;
-      font-weight: bold;
-      padding: 0.5em;
+      h2 {
+        font-size: 1.3em;
+        font-weight: bold;
+      }
+      padding: 0.5em 1em;
+      display: flex;
+      flex-flow: row nowrap;
+      justify-content: space-between;
+      align-items: center;
     }
 
     .library-stats-row {
@@ -219,14 +225,12 @@
 
     .library-stats-term {
       flex: 8;
-      font-weight: bold;
       text-align: left;
     }
 
     .library-stats-value {
       flex: 2;
       text-align: right;
-      font-weight: bold;
     }
   }
 
@@ -241,7 +245,7 @@
 
     width: 100%;
     max-width: 500px;
-    margin-bottom: 2em;
+    margin-bottom: 1em;
 
     .title {
       display: flex;
@@ -250,8 +254,7 @@
       align-items: center;
 
       ::before {
-        font-size: 1.2em;
-        margin-right: 0.4em;
+        font-size: 2.2em;
       }
 
       h2 {
@@ -268,7 +271,7 @@
     }
 
     ::before {
-      font-size: 1.2em;
+      font-size: 1.6em;
     }
 
     table {
@@ -297,7 +300,7 @@
           max-width: 21ch;
           overflow: hidden;
           text-overflow: ellipsis;
-          padding: 0.5em 0.4em;
+          padding: 0.7em 0.4em;
         }
         td:first-child {
           padding-left: 0.7em;
@@ -319,17 +322,13 @@
     max-width: 500px;
     margin-bottom: 2em;
 
-    ::before {
-      font-size: unset;
-    }
-
     .title {
       flex: 0 0 auto;
       display: flex;
       flex-flow: row nowrap;
       align-items: center;
-      justify-content: center;
-      padding: 0.5em;
+      justify-content: space-between;
+      padding: 0.5em 1em;
 
       h2 {
         font-size: 1.3em;
@@ -345,6 +344,9 @@
     }
 
     li {
+      ::before {
+        font-size: unset;
+      }
       width: 100%;
       display: flex;
       justify-content: space-between;
