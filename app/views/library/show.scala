@@ -12,6 +12,7 @@ import lila.game.{ MonthlyGameData, WinRatePercentages }
 import lila.rating.PerfType
 import lila.user.User
 import lila.tournament.Tournament
+import lila.puzzle.Puzzle
 import play.api.i18n.Lang
 
 import strategygames.variant.Variant
@@ -83,6 +84,12 @@ object show {
             )(
               "Analysis"
             ),
+            Puzzle.puzzleVariants.exists(_.key == variant.key) option a(
+              cls := "library-puzzles",
+              href := routes.Puzzle.home(variant.key)
+            )(
+              "Puzzles"
+            ),
             ctx.userId.map(user =>
               a(
                 cls := "library-mystats",
@@ -127,7 +134,7 @@ object show {
   private def tournamentList(tours: List[Tournament])(implicit ctx: Context) =
     div(cls := "tournaments")(
       div(cls := "color-choice title")(
-        h2(trans.openTournaments()),
+        h2(dataIcon := "g")(trans.openTournaments()),
         a(href := routes.Tournament.home.url, cls := "more")(trans.more(), " »")
       ),
       div(cls := "enterable_list lobby__box__content")(

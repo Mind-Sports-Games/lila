@@ -249,6 +249,11 @@
       padding: 0.5em 1em;
       align-items: center;
 
+      ::before {
+        font-size: 1.2em;
+        margin-right: 0.4em;
+      }
+
       h2 {
         font-size: 1.3em;
         font-weight: bold;
@@ -262,7 +267,12 @@
       }
     }
 
+    ::before {
+      font-size: 1.2em;
+    }
+
     table {
+      overflow-x: hidden;
       background: $c-bg-zebra;
       border-bottom: 1px solid $c-border;
       &:last-child {
@@ -277,10 +287,20 @@
       }
 
       tr {
+        @extend %nowrap-ellipsis;
         background: $c-bg-zebra;
         border-bottom: 1px solid $c-border;
         &:last-child {
           border-bottom: none;
+        }
+        td {
+          max-width: 21ch;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          padding: 0.5em 0.4em;
+        }
+        td:first-child {
+          padding-left: 0.7em;
         }
       }
     }
