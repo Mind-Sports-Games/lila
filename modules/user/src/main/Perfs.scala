@@ -646,6 +646,7 @@ case object Perfs {
     }
 
     lazy val allLeaderboards: Map[String, List[User.LightPerf]] = Map(
+      "standard"               -> blitz, // standard leaderboard is blitz
       "ultraBullet"            -> ultraBullet,
       "bullet"                 -> bullet,
       "blitz"                  -> blitz,
@@ -674,12 +675,15 @@ case object Perfs {
       "pool"                   -> pool,
       "portuguese"             -> portuguese,
       "english"                -> english,
+      "dameo"                  -> dameo,
       "shogi"                  -> shogi,
       "xiangqi"                -> xiangqi,
       "minishogi"              -> minishogi,
       "minixiangqi"            -> minixiangqi,
       "flipello"               -> flipello,
       "flipello10"             -> flipello10,
+      "antiflipello"           -> antiflipello,
+      "octagonflipello"        -> octagonflipello,
       "amazons"                -> amazons,
       "breakthroughtroyka"     -> breakthroughtroyka,
       "minibreakthroughtroyka" -> minibreakthroughtroyka,
