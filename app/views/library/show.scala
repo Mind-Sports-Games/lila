@@ -9,16 +9,23 @@ import lila.app.ui.ScalatagsTemplate._
 import lila.common.String.html.safeJsonValue
 import lila.i18n.{ I18nKeys => trans, VariantKeys }
 import lila.game.{ MonthlyGameData, WinRatePercentages }
+import lila.rating.PerfType
+import lila.user.User
+import lila.tournament.Tournament
+import lila.puzzle.Puzzle
 import play.api.i18n.Lang
 
 import strategygames.variant.Variant
+import strategygames.Speed
 
 object show {
 
   def apply(
       variant: Variant,
       monthlyGameData: List[MonthlyGameData],
-      winRates: List[WinRatePercentages]
+      winRates: List[WinRatePercentages],
+      leaderboard: List[User.LightPerf],
+      tours: List[Tournament]
   )(implicit ctx: Context) =
     views.html.base.layout(
       title = s"${VariantKeys.variantName(variant)} • ${VariantKeys.variantTitle(variant)}",
@@ -77,6 +84,12 @@ object show {
             )(
               "Analysis"
             ),
+            Puzzle.puzzleVariants.exists(_.key == variant.key) option a(
+              cls := "library-puzzles",
+              href := routes.Puzzle.home(variant.key)
+            )(
+              "Puzzles"
+            ),
             ctx.userId.map(user =>
               a(
                 cls := "library-mystats",
@@ -97,11 +110,14 @@ object show {
             trans.createAGame()
           )
         ),
-        div(id := "library_chart_area")(
-          div(id := "library_chart")(spinner)
-        ),
+        tours.nonEmpty option tournamentList(tours),
+        leaderboard.nonEmpty option userTopPerf(leaderboard, PerfType(variant, Speed.Blitz)),
         div(cls := "library-stats-table")(
-          h2(cls := "library-stats-title color-choice")("Game Info"),
+          div(cls := "library-stats-title color-choice")(
+            div(dataIcon := "^"),
+            h2("Game Info"),
+            div(" ") //place holder to keep title centered
+          ),
           bits.statsRow("Date Released", bits.releaseDateDisplay(monthlyGameData, variant)),
           bits.statsRow("Total Games Played", bits.totalGamesForVariant(monthlyGameData, variant).toString()),
           bits.statsRow(
@@ -112,8 +128,39 @@ object show {
           bits.statsRow("Player 1 wins", bits.winRatePlayer1(variant, winRates)),
           bits.statsRow("Player 2 wins", bits.winRatePlayer2(variant, winRates)),
           bits.statsRow("Draws", bits.winRateDraws(variant, winRates))
+        ),
+        div(id := "library_chart_area")(
+          div(id := "library_chart")(spinner)
         )
       )
+    )
+
+  private def tournamentList(tours: List[Tournament])(implicit ctx: Context) =
+    div(cls := "tournaments")(
+      div(cls := "color-choice title")(
+        div(dataIcon := "g"),
+        h2(trans.openTournaments()),
+        a(href := routes.Tournament.home.url, cls := "more")(trans.more(), " »")
+      ),
+      div(cls := "enterable_list lobby__box__content")(
+        views.html.tournament.bits.enterable(tours)
+      )
+    )
+
+  private def userTopPerf(users: List[User.LightPerf], perfType: PerfType)(implicit lang: Lang) =
+    div(cls := "leaderboards")(
+      div(cls := "color-choice title")(
+        div(dataIcon := "U"),
+        h2("Leaderboard"),
+        div(" ") //place holder to keep title centered
+        //a(href := routes.User.topNb(200, perfType.key))("More »")
+      ),
+      ol(users map { l =>
+        li(
+          lightUserLink(l.user),
+          l.rating
+        )
+      })
     )
 
 }

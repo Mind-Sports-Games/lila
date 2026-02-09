@@ -81,7 +81,11 @@ object home {
           div(id := "library_chart")(spinner)
         ),
         div(cls := "library-stats-table")(
-          h2(cls := "library-stats-title color-choice")("Overall Game Stats"),
+          div(cls := "library-stats-title color-choice")(
+            div(dataIcon := "^"),
+            h2("Overall Game Stats"),
+            div(" ") //place holder to keep title centered
+          ),
           bits
             .statsRow("Total Game Variants", bits.totalVariants(monthlyGameData).toString, "total-variants"),
           bits.statsRow("Total Games Played", bits.totalGames(monthlyGameData).toString, "total-games"),

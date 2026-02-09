@@ -83,7 +83,8 @@
   }
 
   .start {
-    padding-top: 2em;
+    margin: 2em 0em;
+    font-size: 175%;
   }
 
   .section-title {
@@ -168,7 +169,6 @@
 
   #library_chart_area {
     height: 500px;
-    margin-top: 2rem;
     width: 100%;
     max-width: 700px;
     display: flex;
@@ -185,12 +185,12 @@
   }
 
   .library-stats-table {
-    margin: 2em 0;
     width: 100%;
-    max-width: 400px;
+    max-width: 500px;
     background: $c-bg-box;
     border-radius: 6px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    margin-bottom: 2em;
 
     @each $c in ('black', 'green', 'red', 'blue', 'yellow') {
       .selected-color-#{$c} & .library-stats-title.color-choice {
@@ -201,9 +201,15 @@
     }
     .library-stats-title {
       text-align: center;
-      font-size: 1.3em;
-      font-weight: bold;
-      padding: 0.5em;
+      h2 {
+        font-size: 1.3em;
+        font-weight: bold;
+      }
+      padding: 0.5em 1em;
+      display: flex;
+      flex-flow: row nowrap;
+      justify-content: space-between;
+      align-items: center;
     }
 
     .library-stats-row {
@@ -219,14 +225,142 @@
 
     .library-stats-term {
       flex: 8;
-      font-weight: bold;
       text-align: left;
     }
 
     .library-stats-value {
       flex: 2;
       text-align: right;
-      font-weight: bold;
+    }
+  }
+
+  .tournaments {
+    @each $c in ('black', 'green', 'red', 'blue', 'yellow') {
+      .selected-color-#{$c} & .color-choice {
+        background: map-get($c-color-choice-map, $c);
+        color: $c-color-choice-font-default;
+        text-shadow: 0 1px 0 map-get($c-color-choice-map, $c);
+      }
+    }
+
+    width: 100%;
+    max-width: 500px;
+    margin-bottom: 1em;
+
+    .title {
+      display: flex;
+      justify-content: space-between;
+      padding: 0.5em 1em;
+      align-items: center;
+
+      ::before {
+        font-size: 2.2em;
+      }
+
+      h2 {
+        font-size: 1.3em;
+        font-weight: bold;
+      }
+
+      a {
+        color: $c-color-choice-font-default;
+        &:hover {
+          color: $c-link;
+        }
+      }
+    }
+
+    ::before {
+      font-size: 1.6em;
+    }
+
+    table {
+      overflow-x: hidden;
+      background: $c-bg-zebra;
+      border-bottom: 1px solid $c-border;
+      &:last-child {
+        border-bottom: none;
+      }
+
+      a {
+        color: unset;
+        &:hover {
+          color: $c-link;
+        }
+      }
+
+      tr {
+        @extend %nowrap-ellipsis;
+        background: $c-bg-zebra;
+        border-bottom: 1px solid $c-border;
+        &:last-child {
+          border-bottom: none;
+        }
+        td {
+          max-width: 21ch;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          padding: 0.7em 0.4em;
+        }
+        td:first-child {
+          padding-left: 0.7em;
+        }
+      }
+    }
+  }
+
+  .leaderboards {
+    @each $c in ('black', 'green', 'red', 'blue', 'yellow') {
+      .selected-color-#{$c} & .color-choice {
+        background: map-get($c-color-choice-map, $c);
+        color: $c-color-choice-font-default;
+        text-shadow: 0 1px 0 map-get($c-color-choice-map, $c);
+      }
+    }
+
+    width: 100%;
+    max-width: 500px;
+    margin-bottom: 2em;
+
+    .title {
+      flex: 0 0 auto;
+      display: flex;
+      flex-flow: row nowrap;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.5em 1em;
+
+      h2 {
+        font-size: 1.3em;
+        font-weight: bold;
+      }
+
+      a {
+        color: $c-color-choice-font-default;
+        &:hover {
+          font-weight: bold;
+        }
+      }
+    }
+
+    li {
+      ::before {
+        font-size: unset;
+      }
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      white-space: nowrap;
+      padding: 0.7rem 1.2rem 0.7rem 0.5rem;
+      background: $c-bg-zebra;
+      border-bottom: 1px solid $c-border;
+      &:last-child {
+        border-bottom: none;
+      }
+    }
+
+    .user-link {
+      @extend %ellipsis;
     }
   }
 }
