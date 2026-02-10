@@ -298,6 +298,7 @@ export default class AnalyseCtrl {
     setDropMode(cg.state, stratUtils.onlyDropsVariantPiece(cg.state.variant as VariantKey, playerIndex));
     cg.set({
       dropmode: {
+        active: this.data.onlyDropsVariant,
         showDropDests: !['go9x9', 'go13x13', 'go19x19', 'backgammon', 'hyper', 'nackgammon'].includes(
           cg.state.variant as VariantKey,
         ),
@@ -367,6 +368,9 @@ export default class AnalyseCtrl {
               dests: (movablePlayerIndex === playerIndex && dests) || new Map(),
             },
         check: !!node.check,
+        dropmode: {
+          active: this.data.onlyDropsVariant,
+        },
         lastMove: this.uciToLastMove(node.uci),
         onlyDropsVariant: isOnlyDropsPly(node, variantKey, this.data.onlyDropsVariant),
         selected: this.dameoActivePiece(node.fen),
@@ -458,9 +462,8 @@ export default class AnalyseCtrl {
     }
     if (this.music) this.music.jump(this.node);
     playstrategy.pubsub.emit('ply', this.node.ply);
-    if (this.data.game.variant.key === 'dameo' && this.chessground) {
+    if (this.data.game.variant.key === 'dameo' && this.chessground)
       this.chessground.selectSquare(this.dameoActivePiece(this.node.fen));
-    }
   }
 
   userJump = (path: Tree.Path): void => {
