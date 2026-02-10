@@ -7,6 +7,7 @@ import {
   orientationForBackgammon,
 } from 'chessground/util';
 import * as stratUtils from 'stratutils';
+import { dameo as dameoStratUtils } from 'stratutils';
 import * as game from 'game';
 import * as keyboard from './keyboard';
 import * as promotion from './promotion';
@@ -29,7 +30,6 @@ import { ActionMenuCtrl } from './actionMenu';
 import { ctrl as cevalCtrl, isEvalBetter, sanIrreversible, CevalCtrl, Work as CevalWork, CevalOpts } from 'ceval';
 import { ctrl as treeViewCtrl, TreeView } from './treeView/treeView';
 import { defined, prop, Prop } from 'common';
-import { dameoActivePiece } from 'common/dameoActivePiece';
 import { DrawShape } from 'chessground/draw';
 import { ExplorerCtrl } from './explorer/interfaces';
 import { ForecastCtrl } from './forecast/interfaces';
@@ -361,7 +361,7 @@ export default class AnalyseCtrl {
         },
         lastMove: this.uciToLastMove(node.uci),
         onlyDropsVariant: isOnlyDropsPly(node, variantKey, this.data.onlyDropsVariant),
-        selected: this.data.game.variant.key === 'dameo' ? dameoActivePiece(node.fen) : undefined,
+        selected: this.data.game.variant.key === 'dameo' ? dameoStratUtils.activePiecePosition(node.fen) : undefined,
       };
     if (!dests && !node.check) {
       // premove while dests are loading from server
@@ -373,7 +373,7 @@ export default class AnalyseCtrl {
       enabled: false,
     };
     if (this.data.game.variant.key === 'dameo') {
-      config.selected = dameoActivePiece(node.fen);
+      config.selected = dameoStratUtils.activePiecePosition(node.fen);
     }
     this.cgConfig = config;
     return config;
@@ -453,7 +453,7 @@ export default class AnalyseCtrl {
     if (this.music) this.music.jump(this.node);
     playstrategy.pubsub.emit('ply', this.node.ply);
     if (this.data.game.variant.key === 'dameo' && this.chessground)
-      this.chessground.selectSquare(dameoActivePiece(this.node.fen));
+      this.chessground.selectSquare(dameoStratUtils.activePiecePosition(this.node.fen));
   }
 
   userJump = (path: Tree.Path): void => {

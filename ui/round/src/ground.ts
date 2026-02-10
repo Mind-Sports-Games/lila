@@ -10,13 +10,13 @@ import {
 import { Api as CgApi } from 'chessground/api';
 import { Config } from 'chessground/config';
 import changeColorHandle from 'common/coordsColor';
-import { dameoActivePiece } from 'common/dameoActivePiece';
 import resizeHandle from 'common/resize';
 import * as util from './util';
 import { plyStep } from './round';
 import RoundController from './ctrl';
 import { RoundData } from './interfaces';
 import * as stratUtils from 'stratutils';
+import { dameo as dameoStratUtils } from 'stratutils';
 import * as Prefs from 'common/prefs';
 
 export function makeConfig(ctrl: RoundController): Config {
@@ -194,7 +194,7 @@ export function makeConfig(ctrl: RoundController): Config {
       (data.game.variant.key === 'oware' && data.pref.mancalaMove),
   };
   if (data.game.variant.key === 'dameo' && turnPlayerIndex === data.player.playerIndex) {
-    return { ...config, selected: dameoActivePiece(step.fen) };
+    return { ...config, selected: dameoStratUtils.activePiecePosition(step.fen) };
   }
   return config;
 }

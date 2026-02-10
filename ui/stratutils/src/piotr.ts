@@ -1,4 +1,4 @@
-export interface Piotr {
+interface Piotr {
   [p: string]: Key;
 }
 
