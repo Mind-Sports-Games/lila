@@ -29,6 +29,7 @@ import { ActionMenuCtrl } from './actionMenu';
 import { ctrl as cevalCtrl, isEvalBetter, sanIrreversible, CevalCtrl, Work as CevalWork, CevalOpts } from 'ceval';
 import { ctrl as treeViewCtrl, TreeView } from './treeView/treeView';
 import { defined, prop, Prop } from 'common';
+import { dameoActivePiece } from 'common/dameoActivePiece';
 import { DrawShape } from 'chessground/draw';
 import { ExplorerCtrl } from './explorer/interfaces';
 import { ForecastCtrl } from './forecast/interfaces';
@@ -45,7 +46,6 @@ import { PLAYERINDEXES, Outcome, isNormal } from 'stratops/types';
 import { SquareSet } from 'stratops/squareSet';
 import { parseFen } from 'stratops/fen';
 import { Position, PositionError } from 'stratops/chess';
-import { read as dameoFenRead } from 'chessground/variants/dameo/fen';
 import { Result } from '@badrap/result';
 import { storedProp, StoredBooleanProp } from 'common/storage';
 import { AnaMove, AnaDrop, AnaPass, StudyCtrl } from './study/interfaces';
@@ -328,18 +328,6 @@ export default class AnalyseCtrl {
       });
   });
 
-  private dameoActivePiece(fen: string) {
-    if (this.data.game.variant.key === 'dameo') {
-      const pieces: cg.Pieces = dameoFenRead(fen);
-      for (const [key, piece] of pieces) {
-        if (['a-piece', 'b-piece'].includes(piece.role)) {
-          return key;
-        }
-      }
-    }
-    return undefined;
-  }
-
   makeCgOpts(): ChessgroundConfig {
     const node = this.node,
       playerIndex = this.turnPlayerIndex(),
@@ -373,7 +361,7 @@ export default class AnalyseCtrl {
         },
         lastMove: this.uciToLastMove(node.uci),
         onlyDropsVariant: isOnlyDropsPly(node, variantKey, this.data.onlyDropsVariant),
-        selected: this.dameoActivePiece(node.fen),
+        selected: this.data.game.variant.key === 'dameo' ? dameoActivePiece(node.fen) : undefined,
       };
     if (!dests && !node.check) {
       // premove while dests are loading from server
@@ -384,7 +372,9 @@ export default class AnalyseCtrl {
     config.premovable = {
       enabled: false,
     };
-    config.selected = this.dameoActivePiece(node.fen);
+    if (this.data.game.variant.key === 'dameo') {
+      config.selected = dameoActivePiece(node.fen);
+    }
     this.cgConfig = config;
     return config;
   }
@@ -463,7 +453,7 @@ export default class AnalyseCtrl {
     if (this.music) this.music.jump(this.node);
     playstrategy.pubsub.emit('ply', this.node.ply);
     if (this.data.game.variant.key === 'dameo' && this.chessground)
-      this.chessground.selectSquare(this.dameoActivePiece(this.node.fen));
+      this.chessground.selectSquare(dameoActivePiece(this.node.fen));
   }
 
   userJump = (path: Tree.Path): void => {

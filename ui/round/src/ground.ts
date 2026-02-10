@@ -10,6 +10,7 @@ import {
 import { Api as CgApi } from 'chessground/api';
 import { Config } from 'chessground/config';
 import changeColorHandle from 'common/coordsColor';
+import { dameoActivePiece } from 'common/dameoActivePiece';
 import resizeHandle from 'common/resize';
 import * as util from './util';
 import { plyStep } from './round';
@@ -30,7 +31,7 @@ export function makeConfig(ctrl: RoundController): Config {
       : stratUtils.readDice(step.fen, data.game.variant.key, data.canEndTurn, ctrl.areDiceDescending),
     doublingCube = data.doublingCube ? data.doublingCube : stratUtils.readDoublingCube(step.fen, data.game.variant.key),
     cubeActions = data.cubeActions ? data.cubeActions.split(',').map(a => a as cg.CubeAction) : [];
-  return {
+  const config: Config = {
     fen: step.fen,
     orientation: boardOrientation(data, ctrl.flip),
     myPlayerIndex: data.player.playerIndex,
@@ -192,6 +193,10 @@ export function makeConfig(ctrl: RoundController): Config {
       ['togyzkumalak', 'bestemshe', 'backgammon', 'hyper', 'nackgammon'].includes(data.game.variant.key) ||
       (data.game.variant.key === 'oware' && data.pref.mancalaMove),
   };
+  if (data.game.variant.key === 'dameo' && turnPlayerIndex === data.player.playerIndex) {
+    return { ...config, selected: dameoActivePiece(step.fen) };
+  }
+  return config;
 }
 
 export function reload(ctrl: RoundController) {
