@@ -458,6 +458,9 @@ export default class AnalyseCtrl {
     }
     if (this.music) this.music.jump(this.node);
     playstrategy.pubsub.emit('ply', this.node.ply);
+    if (this.data.game.variant.key === 'dameo' && this.chessground) {
+      this.chessground.selectSquare(this.dameoActivePiece(this.node.fen));
+    }
   }
 
   userJump = (path: Tree.Path): void => {
