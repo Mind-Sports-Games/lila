@@ -7,6 +7,7 @@ import lila.app.templating.Environment._
 import lila.app.ui.EmbedConfig
 import lila.app.ui.ScalatagsTemplate._
 import lila.puzzle.DailyPuzzle
+import lila.i18n.VariantKeys
 
 object embed {
 
@@ -30,7 +31,11 @@ object embed {
     href := routes.Puzzle.daily,
     title := trans.puzzle.clickToSolve.txt()
   )(
-    span(cls := "text")(trans.puzzle.puzzleOfTheDay()),
+    span(cls := "text")(
+      trans.puzzle.puzzleOfTheDay(),
+      " - ",
+      VariantKeys.variantName(daily.puzzle.variant)
+    ),
     raw(daily.html),
     span(cls := "text")(trans.playerIndexPlays(daily.puzzle.playerTrans))
   )

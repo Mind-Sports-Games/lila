@@ -15,15 +15,15 @@ importers:
         specifier: github:Mind-Sports-Games/chessground#7.11.1-pstrat3.25
         version: https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/2a6d33bdd34e594d3747698cef21e7cd9a97bea5
       stratops:
-        specifier: github:Mind-Sports-Games/stratops#v0.8.1-pstrat5.23
-        version: https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/c8b03feb6f3ba7a98f95132d27cd0978e4e63e2c
+        specifier: github:Mind-Sports-Games/stratops#v0.8.1-pstrat5.24
+        version: https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/9a9b296f6ad9f845b851abefb42f17e76fa6f73a
       xml2js:
         specifier: ^0.6.2
         version: 0.6.2
     devDependencies:
       '@types/node':
         specifier: ^20.19.4
-        version: 20.19.30
+        version: 20.19.33
       '@types/playstrategy':
         specifier: workspace:*
         version: link:ui/@types/playstrategy
@@ -657,11 +657,11 @@ packages:
   '@types/highcharts@4.2.57':
     resolution: {integrity: sha512-8/RF3I2Zy4I8ll9Ksa+wTbHA7ne/OHilmaTBQTVpQdNtOX6dL7EWFXfcfwiXQAfL+0r48LifHjYDmqug0t8mQA==}
 
-  '@types/node@20.19.30':
-    resolution: {integrity: sha512-WJtwWJu7UdlvzEAUm484QNg5eAoq5QR08KDNx7g45Usrs2NtOPiX8ugDqmKdXkyL03rBqU5dYNYVQetEpBHq2g==}
+  '@types/node@20.19.33':
+    resolution: {integrity: sha512-Rs1bVAIdBs5gbTIKza/tgpMuG1k3U/UMJLWecIMxNdJFDMzcM5LOiLVRYh3PilWEYDIeUDv7bpiHPLPsbydGcw==}
 
-  '@types/react@19.2.10':
-    resolution: {integrity: sha512-WPigyYuGhgZ/cTPRXB2EwUw+XvsRA3GqHlsP4qteqrnnjDrApbS7MxcGr/hke5iUoeB7E/gQtrs9I37zAJ0Vjw==}
+  '@types/react@19.2.13':
+    resolution: {integrity: sha512-KkiJeU6VbYbUOp5ITMIc7kBfqlYkKA5KhEHVrGMmUUMt7NeaZg65ojdPk+FtNrBAOXNVM5QM72jnADjM+XVRAQ==}
 
   '@types/web@0.0.269':
     resolution: {integrity: sha512-V0GRvvdAa79Wok8aRrlaSLcGxjixiQbcet3kq+5ixIq9L4jsG+QZd91HEYOXTMF+My745N/KtsM9eyPY1iVINg==}
@@ -761,8 +761,8 @@ packages:
   ajv@6.12.6:
     resolution: {integrity: sha512-j3fVLgvTo527anyYyJOGTYJbG+vnnQYvE0m5mmkc1TK+nxAppkCLMIL0aZ4dblVCNoGShhm+kzE4ZUykBoMg4g==}
 
-  ansi-escapes@7.2.0:
-    resolution: {integrity: sha512-g6LhBsl+GBPRWGWsBtutpzBYuIIdBkLEvad5C/va/74Db018+5TZiyA26cZJAr3Rft5lprVqOIPxf5Vid6tqAw==}
+  ansi-escapes@7.3.0:
+    resolution: {integrity: sha512-BvU8nYgGQBxcmMuEeUEmNTvrMVjJNSH7RgW24vXexN4Ven6qCvy4TntnvlnwnMLTVlcRQQdbRY8NKnaIoeWDNg==}
     engines: {node: '>=18'}
 
   ansi-regex@5.0.1:
@@ -1039,7 +1039,7 @@ packages:
 
   glob@7.2.3:
     resolution: {integrity: sha512-nFR0zLpU2YCaRxwoCJvL6UvCH2JFyFVIvwTLsIf21AuHlMskA1hhTdk+LlYJtOlYt9v6dvszD2BGRqBL+iQK9Q==}
-    deprecated: Glob versions prior to v9 are no longer supported
+    deprecated: Old versions of glob are not supported, and contain widely publicized security vulnerabilities, which have been fixed in the current version. Please update. Support for old versions may be purchased (at exorbitant rates) by contacting i@izs.me
 
   globals@13.24.0:
     resolution: {integrity: sha512-AhO5QUcj8llrbG09iWhPU2B204J1xnPeL8kQmVorSsy+Sjj1sk8gIyh6cUocGmH4L0UuhAJy+hJMRA4mgA4mFQ==}
@@ -1367,8 +1367,8 @@ packages:
   sdp@3.2.1:
     resolution: {integrity: sha512-lwsAIzOPlH8/7IIjjz3K0zYBk7aBVVcvjMwt3M4fLxpjMYyy7i3I97SLHebgn4YBjirkzfp3RvRDWSKsh/+WFw==}
 
-  semver@7.7.3:
-    resolution: {integrity: sha512-SdsKMrI9TdgjdweUSR9MweHA4EJ8YxHn8DFaDisvhVlUOe4BF1tLD7GAj0lIqWVl+dPb/rExr0Btby5loQm20Q==}
+  semver@7.7.4:
+    resolution: {integrity: sha512-vFKC2IEtQnVhpT78h1Yp8wzwrf8CM+MzKMHGJZfBtzhZNycRFnXsHk6E5TxIkkMsgNS7mdX3AGB7x2QM2di4lA==}
     engines: {node: '>=10'}
     hasBin: true
 
@@ -1400,9 +1400,9 @@ packages:
     resolution: {integrity: sha512-wHMNIOjkm/YNE5EM3RCbr/+DVgPg6AqQAX1eOxO46zYNvCXjKP5Y865tqQj3EXnaMBjkxmQA5jFuDpDK/dbfiA==}
     engines: {node: '>=8.3.0'}
 
-  stratops@https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/c8b03feb6f3ba7a98f95132d27cd0978e4e63e2c:
-    resolution: {tarball: https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/c8b03feb6f3ba7a98f95132d27cd0978e4e63e2c}
-    version: 0.8.1-pstrat5.23
+  stratops@https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/9a9b296f6ad9f845b851abefb42f17e76fa6f73a:
+    resolution: {tarball: https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/9a9b296f6ad9f845b851abefb42f17e76fa6f73a}
+    version: 0.8.1-pstrat5.24
     engines: {node: ^20.19.4, pnpm: ^10.17.0}
 
   string-argv@0.3.2:
@@ -1596,11 +1596,11 @@ snapshots:
     dependencies:
       '@types/geojson': 7946.0.16
 
-  '@types/node@20.19.30':
+  '@types/node@20.19.33':
     dependencies:
       undici-types: 6.21.0
 
-  '@types/react@19.2.10':
+  '@types/react@19.2.13':
     dependencies:
       csstype: 3.2.3
 
@@ -1610,7 +1610,7 @@ snapshots:
 
   '@types/yaireo__tagify@4.27.0':
     dependencies:
-      '@types/react': 19.2.10
+      '@types/react': 19.2.13
 
   '@types/zxcvbn@4.4.5': {}
 
@@ -1672,7 +1672,7 @@ snapshots:
       globby: 11.1.0
       is-glob: 4.0.3
       minimatch: 9.0.5
-      semver: 7.7.3
+      semver: 7.7.4
       ts-api-utils: 1.4.3(typescript@5.9.3)
     optionalDependencies:
       typescript: 5.9.3
@@ -1718,7 +1718,7 @@ snapshots:
       json-schema-traverse: 0.4.1
       uri-js: 4.4.1
 
-  ansi-escapes@7.2.0:
+  ansi-escapes@7.3.0:
     dependencies:
       environment: 1.1.0
 
@@ -2139,7 +2139,7 @@ snapshots:
 
   log-update@6.1.0:
     dependencies:
-      ansi-escapes: 7.2.0
+      ansi-escapes: 7.3.0
       cli-cursor: 5.0.0
       slice-ansi: 7.1.2
       strip-ansi: 7.1.2
@@ -2308,7 +2308,7 @@ snapshots:
 
   sdp@3.2.1: {}
 
-  semver@7.7.3: {}
+  semver@7.7.4: {}
 
   shebang-command@2.0.0:
     dependencies:
@@ -2332,7 +2332,7 @@ snapshots:
 
   snabbdom@3.5.1: {}
 
-  stratops@https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/c8b03feb6f3ba7a98f95132d27cd0978e4e63e2c:
+  stratops@https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/9a9b296f6ad9f845b851abefb42f17e76fa6f73a:
     dependencies:
       '@badrap/result': 0.2.13
 
