@@ -7,8 +7,8 @@ import scala.concurrent.duration._
 
 import lila.game.{ Game, GameRepo, PerfPicker }
 import strategygames.variant.Variant
-import lila.i18n.defaultLang
-import lila.i18n.VariantKeys
+import lila.i18n.{ defaultLang, I18nKeys, VariantKeys }
+import play.api.i18n.Lang
 
 final private class GameJson(
     gameRepo: GameRepo,
@@ -68,9 +68,19 @@ final private class GameJson(
         "rated"   -> game.rated,
         "players" -> playersJson(game),
         //can flatten whilst puzzles are just chess
-        "actionStrs" -> game.actionStrs.flatten.take(plies + 1).mkString(" ")
+        "actionStrs" -> game.actionStrs.flatten.take(plies + 1).mkString(" "),
+        "clock"      -> showClock(game)(defaultLang)
       )
-      .add("clock", game.clock.map(_.config.show))
+
+  private def showClock(game: Game)(implicit lang: Lang): String =
+    game.clock.map { clock => clock.config.show } getOrElse {
+      game.daysPerTurn
+        .map { days =>
+          if (days == 1) I18nKeys.oneDay.txt()
+          else I18nKeys.nbDays.pluralSame(days).toString
+        }
+        .getOrElse { "∞" }
+    }
 
   private def perfJson(game: Game) = {
     val perfType = lila.rating.PerfType orDefault PerfPicker.key(game)
