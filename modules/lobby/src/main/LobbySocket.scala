@@ -47,7 +47,7 @@ final class LobbySocket(
     // https://github.com/lichess-org/lila/commit/279a7ead3d96cf3e1a4d52a976c16a26e6ca94d2
     private val members = lila.common.LilaCache
       .scaffeine(mode)
-      .expireAfterWrite(1 minute)
+      .expireAfterWrite(1.hour)
       .build[SriStr, Member]()
     private val idleSris           = collection.mutable.Set[SriStr]()
     private val hookSubscriberSris = collection.mutable.Set[SriStr]()

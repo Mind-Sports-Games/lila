@@ -43,7 +43,7 @@ export default class LobbySocket {
     };
 
     playstrategy.idleTimer(
-      3 * 60 * 1000,
+      5 * 60 * 1000,
       () => send('idle', true),
       () => {
         send('idle', false);
