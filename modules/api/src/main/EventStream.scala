@@ -136,7 +136,8 @@ final class EventStream(
             bot = me.isBot && Game.isBotCompatible(game),
             board = Game.isBoardCompatible(game)
           ) ++ Json.obj(
-            "id" -> game.id // API BC
+            "id"        -> game.id, // API BC
+            "abortable" -> game.abortable
           )
         }
       )
