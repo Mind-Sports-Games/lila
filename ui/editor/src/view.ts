@@ -198,8 +198,12 @@ function controls(ctrl: EditorCtrl, state: EditorState): VNode {
               'a.button.button-empty.text',
               {
                 attrs: { 'data-icon': 'B' },
+                class: {
+                  disabled: ctrl.variantKey === 'racingKings',
+                },
                 on: {
                   click() {
+                    if (ctrl.variantKey === 'racingKings') return;
                     if ((ctrl.options.orientation ?? 'p1') === 'p1') ctrl.setOrientation('p2');
                     else ctrl.setOrientation('p1');
                     ctrl.onChange();
