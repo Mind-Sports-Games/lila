@@ -93,7 +93,7 @@ object mine {
                   br,
                   div(
                     cls := "board-preview",
-                    views.html.board.bits.mini(fen, c.finalPlayerIndex, c.variant.key)(div)
+                    views.html.board.bits.miniForVariant(fen, c.variant, c.finalPlayerIndex)(div)
                   )
                 )
               },

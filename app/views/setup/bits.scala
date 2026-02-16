@@ -35,7 +35,7 @@ private object bits {
         a(cls := "board_editor board_editor_link", href := url)(
           span(cls := "preview")(
             validFen.map { vf =>
-              views.html.board.bits.mini(vf.fen, vf.playerIndex, vf.situation.board.variant.key)(div)
+              views.html.board.bits.miniForVariant(vf.fen, vf.situation.board.variant, vf.playerIndex)(div)
             }
           )
         )

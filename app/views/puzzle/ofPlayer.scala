@@ -66,10 +66,10 @@ object ofPlayer {
                     div(cls := "puzzle-of-player__pager infinite-scroll")(
                       pager.currentPageResults.map { puzzle =>
                         div(cls := "puzzle-of-player__puzzle")(
-                          views.html.board.bits.mini(
+                          views.html.board.bits.miniForVariant(
                             fen = puzzle.fenAfterInitialMove,
+                            variant = puzzle.variant,
                             playerIndex = puzzle.playerIndex,
-                            variantKey = puzzle.variant.key,
                             lastMove = puzzle.line.head.uci
                           )(
                             a(
