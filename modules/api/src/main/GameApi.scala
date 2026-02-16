@@ -215,6 +215,7 @@ final private[api] class GameApi(
         "plies"       -> g.plies,
         "playerIndex" -> g.turnPlayerIndex.name,
         "status"      -> g.status.name,
+        "abortable"   -> g.abortable,
         "clock" -> g.clock.map { clock =>
           Json.obj(
             "initial"   -> clock.limitSeconds,

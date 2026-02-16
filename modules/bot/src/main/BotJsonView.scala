@@ -65,6 +65,7 @@ final class BotJsonView(
             "wdraw"           -> game.p1Player.isOfferingDraw,
             "bdraw"           -> game.p2Player.isOfferingDraw,
             "status"          -> game.status.name,
+            "abortable"       -> game.abortable,
             "selectedsquares" -> selectedSquaresJson(game)
           )
           .add("winner" -> game.winnerPlayerIndex)
