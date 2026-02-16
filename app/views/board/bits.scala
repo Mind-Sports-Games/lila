@@ -31,10 +31,12 @@ object bits {
 
   def playerIndexToOrientation(c: PlayerIndex, v: String): Orientation =
     (c, v) match {
+      case (_, "racingKings") => Orientation.P1
       case (P1, _)            => Orientation.P1
       case (P2, "backgammon") => Orientation.P1VFlip
       case (P2, "hyper")      => Orientation.P1VFlip
       case (P2, "nackgammon") => Orientation.P1VFlip
+      case (P2, "linesOfAction") | (P2, "scrambledEggs") => Orientation.Right
       case (P2, _)            => Orientation.P2
     }
 
