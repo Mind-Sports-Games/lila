@@ -118,9 +118,7 @@ object side {
         showNonEmptyPerf(u.perfs.abalone, PerfType.orDefault("abalone")),
         u.noBot option frag(
           hr,
-          showNonEmptyPerf(u.perfs.puzzle_standard, PerfType.orDefault("puzzle_standard")),
-          showNonEmptyPerf(u.perfs.puzzle_atomic, PerfType.orDefault("puzzle_atomic")),
-          showNonEmptyPerf(u.perfs.puzzle_linesOfAction, PerfType.orDefault("puzzle_linesOfAction"))
+          PerfType.allPuzzle.map(pt => showNonEmptyPerf(u.perfs.apply(pt), pt))
           // showStorm(u.perfs.storm, u),
           // showRacer(u.perfs.racer, u),
           // showStreak(u.perfs.streak, u)

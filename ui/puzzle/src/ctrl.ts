@@ -138,7 +138,7 @@ export default function (opts: PuzzleOpts, redraw: Redraw): Controller {
         };
     const config = {
       fen: node.fen,
-      orientation: vm.pov,
+      orientation: data.game.variant.key === 'racingKings' ? 'p1' : vm.pov,
       myPlayerIndex: vm.pov,
       turnPlayerIndex: playerIndex,
       movable: movable,

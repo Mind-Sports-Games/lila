@@ -48,6 +48,10 @@ object PuzzleTheme {
   val intermezzo     = PuzzleTheme(Key("intermezzo"), i.intermezzo, i.intermezzoDescription)
   val kingsideAttack = PuzzleTheme(Key("kingsideAttack"), i.kingsideAttack, i.kingsideAttackDescription)
   val knightEndgame  = PuzzleTheme(Key("knightEndgame"), i.knightEndgame, i.knightEndgameDescription)
+  val kingOnHill     = PuzzleTheme(Key("kingOnHill"), i.kingOnHill, i.kingOnHillDescription)
+  val kingOnHillIn1  = PuzzleTheme(Key("kingOnHillIn1"), i.kingOnHillIn1, i.kingOnHillIn1Description)
+  val kingOnHillIn2  = PuzzleTheme(Key("kingOnHillIn2"), i.kingOnHillIn2, i.kingOnHillIn2Description)
+  val kingOnHillIn3  = PuzzleTheme(Key("kingOnHillIn3"), i.kingOnHillIn3, i.kingOnHillIn3Description)
   val long           = PuzzleTheme(Key("long"), i.long, i.longDescription)
   val master         = PuzzleTheme(Key("master"), i.master, i.masterDescription)
   val masterVsMaster = PuzzleTheme(Key("masterVsMaster"), i.masterVsMaster, i.masterVsMasterDescription)
@@ -66,6 +70,8 @@ object PuzzleTheme {
   val oneMove        = PuzzleTheme(Key("oneMove"), i.oneMove, i.oneMoveDescription)
   val opening        = PuzzleTheme(Key("opening"), i.opening, i.openingDescription)
   val pawnEndgame    = PuzzleTheme(Key("pawnEndgame"), i.pawnEndgame, i.pawnEndgameDescription)
+  val pawns          = PuzzleTheme(Key("pawns"), i.pawns, i.pawnsDescription)
+  val pieces         = PuzzleTheme(Key("pieces"), i.pieces, i.piecesDescription)
   val pin            = PuzzleTheme(Key("pin"), i.pin, i.pinDescription)
   val promotion      = PuzzleTheme(Key("promotion"), i.promotion, i.promotionDescription)
   val queenEndgame   = PuzzleTheme(Key("queenEndgame"), i.queenEndgame, i.queenEndgameDescription)
@@ -112,12 +118,21 @@ object PuzzleTheme {
       mateIn5
     )
   )
+  val categorizedMateIn2 = List[(I18nKey, List[PuzzleTheme])](trans.puzzle.mates -> List(mateIn2))
   val categorizedWin = List[(I18nKey, List[PuzzleTheme])](
     trans.puzzle.wins -> List(
       win,
       winIn1,
       winIn2,
       winIn3
+    )
+  )
+  val categorizedWinIn2 = List[(I18nKey, List[PuzzleTheme])](trans.puzzle.wins -> List(winIn2))
+  val categorizedKingOnHill = List[(I18nKey, List[PuzzleTheme])](
+    trans.puzzle.wins -> List(
+      winIn2,
+      mateIn2,
+      kingOnHillIn2
     )
   )
   val categorizedChessPhases = List[(I18nKey, List[PuzzleTheme])](
@@ -180,6 +195,13 @@ object PuzzleTheme {
     )
   )
 
+  val categorizedSide = List[(I18nKey, List[PuzzleTheme])](
+    trans.puzzle.side -> List(
+      pawns,
+      pieces
+    )
+  )
+
   //todo refactor common themes between variants
   val categorizedStandard =
     categorizedMix ::: categorizedChessPhases ::: categorizedChessMotifs ::: categorizedAdvanced ::: List[
@@ -222,9 +244,17 @@ object PuzzleTheme {
       )
     ) ::: categorizedOrigin
 
-  val categorizedAtomic =
+  val categorizedChessVariantBase =
     categorizedMix ::: categorizedChessPhases ::: categorizedChessMotifs ::: categorizedAdvanced :::
-      categorizedMate ::: categorizedGoals ::: categorizedOrigin
+      categorizedGoals ::: categorizedOrigin
+
+  val categorizedAtomicVariant = categorizedChessVariantBase ::: categorizedMate
+
+  val categorizedKingOfTheHillVariant = categorizedChessVariantBase ::: categorizedKingOnHill
+
+  val categorizedHordeVariant = categorizedChessVariantBase ::: categorizedMateIn2 ::: categorizedSide
+
+  val categorizedRacingKingsVariant = categorizedChessVariantBase ::: categorizedWinIn2
 
   val categorizedXiangqi = categorizedMix ::: categorizedPhases ::: List[(I18nKey, List[PuzzleTheme])](
     trans.puzzle.motifs -> List(
@@ -244,9 +274,11 @@ object PuzzleTheme {
 
   val byCategorizedVariant: Map[String, List[(I18nKey, List[PuzzleTheme])]] = Map(
     "standard"      -> categorizedStandard,
-    "atomic"        -> categorizedAtomic,
-    "linesOfAction" -> categorizedLinesOfAction,
-    "xiangqi"       -> categorizedXiangqi
+    "kingOfTheHill" -> categorizedKingOfTheHillVariant,
+    "atomic"        -> categorizedAtomicVariant,
+    "horde"         -> categorizedHordeVariant,
+    "racingKings"   -> categorizedRacingKingsVariant,
+    "linesOfAction" -> categorizedLinesOfAction
   )
 
   lazy val all: List[PuzzleTheme] = byCategorizedVariant.values.flatMap(_.flatMap(_._2)).toList.distinct
@@ -276,6 +308,10 @@ object PuzzleTheme {
     enPassant,
     endgame,
     equality,
+    kingOnHill,
+    kingOnHillIn1,
+    kingOnHillIn2,
+    kingOnHillIn3,
     long,
     master,
     masterVsMaster,
@@ -294,7 +330,9 @@ object PuzzleTheme {
     opening,
     short,
     smotheredMate,
-    veryLong
+    veryLong,
+    pawns,
+    pieces
   ).map(_.key)
 
   //TODO recreate these when more themes are available (also set per variant)

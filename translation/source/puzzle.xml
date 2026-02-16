@@ -94,4 +94,5 @@ Your puzzle performance can be seen on the puzzle dashboard and is a calculation
 In rare cases, a puzzle might have been incorrectly added to our database where there is more than 1 best move in a mate-in-2 theme. In this case please down vote the puzzle (so less users will meet it) and/or let us know so we can investigate.</string>
   <string name="futurePuzzlePlans">What are the future plans for puzzles?</string>
   <string name="futurePuzzlePlansANS">We plan to add more variants matching the mate-in-1 style. Then we aim to add additional themes for our variants, using Stockfish and engines to help us evaluate "good" puzzles.</string>
+  <string name="side">Side</string>
 </resources>
