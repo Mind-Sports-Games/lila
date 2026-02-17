@@ -49,7 +49,7 @@
   },
   "dependencies": {
     "ab": "github:lichess-org/ab-stub",
-    "chessground": "github:Mind-Sports-Games/chessground#7.11.1-pstrat3.25",
+    "chessground": "github:Mind-Sports-Games/chessground#v7.11.1-pstrat3.26",
     "stratops": "github:Mind-Sports-Games/stratops#v0.8.1-pstrat5.24",
     "xml2js": "^0.6.2"
   },
