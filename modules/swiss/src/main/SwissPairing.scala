@@ -113,7 +113,11 @@ case class SwissPairingGameIds(
     isPlayX: Boolean,
     nbGamesPerRound: Int,
     openingFEN: Option[FEN]
-)
+) {
+
+  def allGameIds = id :: multiMatchGameIds.getOrElse(List())
+
+}
 
 case class SwissPairingGames(
     swissId: Swiss.Id,

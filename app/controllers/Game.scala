@@ -158,6 +158,19 @@ final class Game(
       })
   }
 
+  private def apiExportByIds(req: RequestHeader, config: GameApiV2.ByIdsConfig, chronological: Boolean) =
+    apiC
+      .GlobalConcurrencyLimitPerIP(HTTPRequest ipAddress req)(
+        env.api.gameApiV2.exportByIds(config, chronological)
+      ) { source =>
+        Ok.chunked(source)
+          .withHeaders(
+            noProxyBufferHeader
+          )
+          .as(gameContentType(config))
+      }
+      .fuccess
+
   def exportByIds =
     Action.async(parse.tolerantText) { req =>
       val config = GameApiV2.ByIdsConfig(
@@ -167,17 +180,33 @@ final class Game(
         perSecond = MaxPerSecond(30),
         playerFile = get("players", req)
       )
-      apiC
-        .GlobalConcurrencyLimitPerIP(HTTPRequest ipAddress req)(
-          env.api.gameApiV2.exportByIds(config)
-        ) { source =>
-          Ok.chunked(source)
-            .withHeaders(
-              noProxyBufferHeader
+      apiExportByIds(req, config, false)
+    }
+
+  def exportMatch(id: String) = Action.async { exportMatchGames(id, _) }
+
+  private[controllers] def exportMatchGames(gameId: GameModel.ID, req: RequestHeader): Fu[Result] =
+    //Note we don't really need to get the full game for the gameId
+    //we are only using the game to work out the format
+    env.round.proxyRepo.gameIfPresent(gameId) orElse env.game.gameRepo.game(gameId) flatMap {
+      case None => NotFound.fuccess
+      case Some(game) => {
+        env.swiss.api.getSwissPairingGameIds(game.id) flatMap {
+          case None => NotFound.fuccess
+          case Some(spg) => {
+            val config = GameApiV2.ByIdsConfig(
+              ids = spg.allGameIds.toSeq,
+              format = if (HTTPRequest acceptsJson req) { GameApiV2.Format.JSON }
+              else if (game.gameRecordFormat == "pgn") { GameApiV2.Format.PGN }
+              else { GameApiV2.Format.SGF },
+              flags = requestPgnFlags(req, extended = false),
+              perSecond = MaxPerSecond(30),
+              playerFile = get("players", req)
             )
-            .as(gameContentType(config))
+            apiExportByIds(req, config, true)
+          }
         }
-        .fuccess
+      }
     }
 
   private def WithVs(req: RequestHeader)(f: Option[lila.user.User] => Fu[Result]): Fu[Result] =
