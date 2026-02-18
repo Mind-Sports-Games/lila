@@ -9,6 +9,7 @@ import { variantClassFromKey } from 'stratops/variants/util';
 // you have to use
 // import { promotion } from 'stratutils'
 export * as promotion from './promotion';
+export * as dameo from './dameo';
 
 export const initialFen: Fen = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1';
 

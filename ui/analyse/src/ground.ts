@@ -150,6 +150,7 @@ export function makeConfig(ctrl: AnalyseCtrl): CgConfig {
       duration: pref.animationDuration,
     },
     dropmode: {
+      active: ctrl.data.onlyDropsVariant,
       showDropDests: !['go9x9', 'go13x13', 'go19x19', 'backgammon', 'hyper', 'nackgammon'].includes(variantKey),
       dropDests: stratUtils.readDropsByRole(ctrl.node.dropsByRole),
       events: {

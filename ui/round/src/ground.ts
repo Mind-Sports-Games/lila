@@ -16,6 +16,7 @@ import { plyStep } from './round';
 import RoundController from './ctrl';
 import { RoundData } from './interfaces';
 import * as stratUtils from 'stratutils';
+import { dameo as dameoStratUtils } from 'stratutils';
 import * as Prefs from 'common/prefs';
 
 export function makeConfig(ctrl: RoundController): Config {
@@ -30,7 +31,7 @@ export function makeConfig(ctrl: RoundController): Config {
       : stratUtils.readDice(step.fen, data.game.variant.key, data.canEndTurn, ctrl.areDiceDescending),
     doublingCube = data.doublingCube ? data.doublingCube : stratUtils.readDoublingCube(step.fen, data.game.variant.key),
     cubeActions = data.cubeActions ? data.cubeActions.split(',').map(a => a as cg.CubeAction) : [];
-  return {
+  const config: Config = {
     fen: step.fen,
     orientation: boardOrientation(data, ctrl.flip),
     myPlayerIndex: data.player.playerIndex,
@@ -192,6 +193,10 @@ export function makeConfig(ctrl: RoundController): Config {
       ['togyzkumalak', 'bestemshe', 'backgammon', 'hyper', 'nackgammon'].includes(data.game.variant.key) ||
       (data.game.variant.key === 'oware' && data.pref.mancalaMove),
   };
+  if (data.game.variant.key === 'dameo' && turnPlayerIndex === data.player.playerIndex) {
+    return { ...config, selected: dameoStratUtils.activePiecePosition(step.fen) };
+  }
+  return config;
 }
 
 export function reload(ctrl: RoundController) {

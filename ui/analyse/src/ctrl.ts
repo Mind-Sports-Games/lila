@@ -7,6 +7,7 @@ import {
   orientationForBackgammon,
 } from 'chessground/util';
 import * as stratUtils from 'stratutils';
+import { dameo as dameoStratUtils } from 'stratutils';
 import * as game from 'game';
 import * as keyboard from './keyboard';
 import * as promotion from './promotion';
@@ -45,7 +46,6 @@ import { PLAYERINDEXES, Outcome, isNormal } from 'stratops/types';
 import { SquareSet } from 'stratops/squareSet';
 import { parseFen } from 'stratops/fen';
 import { Position, PositionError } from 'stratops/chess';
-import { read as dameoFenRead } from 'chessground/variants/dameo/fen';
 import { Result } from '@badrap/result';
 import { storedProp, StoredBooleanProp } from 'common/storage';
 import { AnaMove, AnaDrop, AnaPass, StudyCtrl } from './study/interfaces';
@@ -298,6 +298,7 @@ export default class AnalyseCtrl {
     setDropMode(cg.state, stratUtils.onlyDropsVariantPiece(cg.state.variant as VariantKey, playerIndex));
     cg.set({
       dropmode: {
+        active: this.data.onlyDropsVariant,
         showDropDests: !['go9x9', 'go13x13', 'go19x19', 'backgammon', 'hyper', 'nackgammon'].includes(
           cg.state.variant as VariantKey,
         ),
@@ -327,18 +328,6 @@ export default class AnalyseCtrl {
       });
   });
 
-  private dameoActivePiece(fen: string) {
-    if (this.data.game.variant.key === 'dameo') {
-      const pieces: cg.Pieces = dameoFenRead(fen);
-      for (const [key, piece] of pieces) {
-        if (['a-piece', 'b-piece'].includes(piece.role)) {
-          return key;
-        }
-      }
-    }
-    return undefined;
-  }
-
   makeCgOpts(): ChessgroundConfig {
     const node = this.node,
       playerIndex = this.turnPlayerIndex(),
@@ -367,9 +356,12 @@ export default class AnalyseCtrl {
               dests: (movablePlayerIndex === playerIndex && dests) || new Map(),
             },
         check: !!node.check,
+        dropmode: {
+          active: this.data.onlyDropsVariant,
+        },
         lastMove: this.uciToLastMove(node.uci),
         onlyDropsVariant: isOnlyDropsPly(node, variantKey, this.data.onlyDropsVariant),
-        selected: this.dameoActivePiece(node.fen),
+        selected: this.data.game.variant.key === 'dameo' ? dameoStratUtils.activePiecePosition(node.fen) : undefined,
       };
     if (!dests && !node.check) {
       // premove while dests are loading from server
@@ -380,7 +372,9 @@ export default class AnalyseCtrl {
     config.premovable = {
       enabled: false,
     };
-    config.selected = this.dameoActivePiece(node.fen);
+    if (this.data.game.variant.key === 'dameo') {
+      config.selected = dameoStratUtils.activePiecePosition(node.fen);
+    }
     this.cgConfig = config;
     return config;
   }
@@ -458,6 +452,8 @@ export default class AnalyseCtrl {
     }
     if (this.music) this.music.jump(this.node);
     playstrategy.pubsub.emit('ply', this.node.ply);
+    if (this.data.game.variant.key === 'dameo' && this.chessground)
+      this.chessground.selectSquare(dameoStratUtils.activePiecePosition(this.node.fen));
   }
 
   userJump = (path: Tree.Path): void => {
