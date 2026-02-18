@@ -251,7 +251,6 @@ export function promote(ground: CgApi, key: cg.Key, role: cg.Role) {
 }
 
 export function boardOrientation(data: RoundData, flip: boolean): cg.Orientation {
-  if (data.game.variant.key === 'racingKings') return flip ? 'p2' : 'p1';
   if (data.game.variant.key === 'linesOfAction' || data.game.variant.key === 'scrambledEggs') {
     return flip ? oppositeOrientationForLOA(data.player.playerIndex) : orientationForLOA(data.player.playerIndex);
   }
