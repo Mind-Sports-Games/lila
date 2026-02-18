@@ -128,7 +128,7 @@ function makeConfig(ctrl: EditorCtrl): CgConfig {
       width: variantClassFromKey(ctrl.variantKey).width,
     },
     fen: ctrl.initialFen,
-    orientation: ctrl.options.orientation || 'p1',
+    orientation: ctrl.variantKey === 'racingKings' ? 'p1' : ctrl.options.orientation || 'p1',
     coordinates: ctrl.cfg.embed
       ? CgCoords.Hidden
       : document.body.classList.contains('coords-out') && !isCol1()
