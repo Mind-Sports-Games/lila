@@ -580,17 +580,35 @@ final class SwissApi(
       }
     }
 
-  private[swiss] def getSwissPairingForGame(game: Game): Fu[Option[SwissPairing]] =
+  def getSwissPairingGameIds(gameId: Game.ID): Fu[Option[SwissPairingGameIds]] =
+    getSwissPairingFromGameId(gameId).map {
+      _.map { pairing =>
+        SwissPairingGameIds(
+          gameId,
+          pairing.multiMatchGameIds,
+          pairing.isMatchScore,
+          pairing.isBestOfX,
+          pairing.isPlayX,
+          pairing.nbGamesPerRound,
+          pairing.openingFEN
+        )
+      }
+    }
+
+  private[swiss] def getSwissPairingFromGameId(gameId: Game.ID): Fu[Option[SwissPairing]] =
     SwissPairing.fields { f =>
       colls.pairing
         .find(
           $or(
-            $doc(f.id                -> game.id),
-            $doc(f.multiMatchGameIds -> game.id)
+            $doc(f.id                -> gameId),
+            $doc(f.multiMatchGameIds -> gameId)
           )
         )
         .one[SwissPairing]
     }
+
+  private[swiss] def getSwissPairingForGame(game: Game): Fu[Option[SwissPairing]] =
+    getSwissPairingFromGameId(game.id)
 
   private[swiss] def updateMultiMatchProgress(game: Game): Funit = {
     getSwissPairingForGame(game).flatMap {

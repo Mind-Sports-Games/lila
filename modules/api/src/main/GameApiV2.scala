@@ -139,13 +139,13 @@ final class GameApiV2(
       }
     }
 
-  def exportByIds(config: ByIdsConfig): Source[String, _] =
+  def exportByIds(config: ByIdsConfig, chronological: Boolean = false): Source[String, _] =
     Source futureSource {
       config.playerFile.??(realPlayerApi.apply) map { realPlayers =>
         gameRepo
           .sortedCursor(
             $inIds(config.ids),
-            Query.sortCreated,
+            (if (chronological) Query.sortChronological else Query.sortCreated),
             batchSize = config.perSecond.value
           )
           .documentSource()
