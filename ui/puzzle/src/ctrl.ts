@@ -138,7 +138,7 @@ export default function (opts: PuzzleOpts, redraw: Redraw): Controller {
         };
     const config = {
       fen: node.fen,
-      orientation: data.game.variant.key === 'racingKings' ? 'p1' : vm.pov,
+      orientation: boardOrientation(vm.pov, vm.variant.key),
       myPlayerIndex: vm.pov,
       turnPlayerIndex: playerIndex,
       movable: movable,
@@ -276,6 +276,13 @@ export default function (opts: PuzzleOpts, redraw: Redraw): Controller {
         opts.pref.animation.duration * (autoNext() ? 1 : 1.5),
       );
     }
+  }
+
+  function boardOrientation(playerIndex: PlayerIndex, variantKey: string): cg.Orientation {
+    if (playerIndex === 'p1' || variantKey === 'racingKings') return 'p1';
+    if (variantKey === 'linesOfAction' || variantKey === 'scrambledEggs') return 'right';
+    if (variantKey === 'backgammon' || variantKey === 'hyper' || variantKey === 'nackgammon') return 'p1vflip';
+    return 'p2';
   }
 
   function failStreak(streak: PuzzleStreak): void {
