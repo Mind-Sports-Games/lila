@@ -279,7 +279,7 @@ export default function (opts: PuzzleOpts, redraw: Redraw): Controller {
   }
 
   function boardOrientation(playerIndex: PlayerIndex, variantKey: string): cg.Orientation {
-    if (playerIndex === 'p1' || variantKey === 'racingKings') return 'p1';
+    if (playerIndex === 'p1') return 'p1';
     if (variantKey === 'linesOfAction' || variantKey === 'scrambledEggs') return 'right';
     if (variantKey === 'backgammon' || variantKey === 'hyper' || variantKey === 'nackgammon') return 'p1vflip';
     return 'p2';

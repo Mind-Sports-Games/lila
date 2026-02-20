@@ -225,7 +225,7 @@ function renderButtons(ctrl: RoundController) {
             if (action === 'flip') {
               if (d.tv) location.href = '/tv/' + d.tv.channel + (d.tv.flip ? '' : '?flip=1');
               else if (d.player.spectator) location.href = gameRoute(d, d.opponent.playerIndex);
-              else ctrl.flipNow();
+              else if (d.game.variant.key !== 'racingKings') ctrl.flipNow();
             }
           }
         },
@@ -234,7 +234,7 @@ function renderButtons(ctrl: RoundController) {
     },
     [
       h('button.fbt.flip', {
-        class: { active: ctrl.flip },
+        class: { active: ctrl.flip, disabled: d.game.variant.key === 'racingKings' },
         attrs: {
           title: ctrl.noarg('flipBoard'),
           'data-act': 'flip',
