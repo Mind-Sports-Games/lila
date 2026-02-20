@@ -73,6 +73,7 @@ object bits {
     variant.key match {
       case "abalone"       => Some("AbaloneS")
       case "linesOfAction" => Some("LinesOfA")
+      case "dameo"         => Some("DameoTut")
       case _               => None
     }
   }
