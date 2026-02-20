@@ -12,8 +12,8 @@ importers:
         specifier: github:lichess-org/ab-stub
         version: https://codeload.github.com/lichess-org/ab-stub/tar.gz/94236bf34dbc9c05daf50f4c9842d859b9142be0
       chessground:
-        specifier: github:Mind-Sports-Games/chessground#pla-1559-investigate-board-highlights-for-miniboardgame
-        version: https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/0c446843c4478ac662f96ced92645faad6ab8688
+        specifier: github:Mind-Sports-Games/chessground#v7.11.1-pstrat3.28
+        version: https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/6dc545ba263b591192da69a087e1a35dc997d14d
       stratops:
         specifier: github:Mind-Sports-Games/stratops#v0.8.1-pstrat5.24
         version: https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/9a9b296f6ad9f845b851abefb42f17e76fa6f73a
@@ -840,9 +840,9 @@ packages:
     resolution: {tarball: https://codeload.github.com/ornicar/chess.js/tar.gz/ad0709c0b07773d9d0da8e4605a9a2a28f00d249}
     version: 0.10.2
 
-  chessground@https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/0c446843c4478ac662f96ced92645faad6ab8688:
-    resolution: {tarball: https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/0c446843c4478ac662f96ced92645faad6ab8688}
-    version: 7.11.1-pstrat3.27
+  chessground@https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/6dc545ba263b591192da69a087e1a35dc997d14d:
+    resolution: {tarball: https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/6dc545ba263b591192da69a087e1a35dc997d14d}
+    version: 7.11.1-pstrat3.28
     engines: {node: ^20.19.4, pnpm: ^10.17.0}
 
   chokidar@3.6.0:
@@ -1787,7 +1787,7 @@ snapshots:
 
   chess.js@https://codeload.github.com/ornicar/chess.js/tar.gz/ad0709c0b07773d9d0da8e4605a9a2a28f00d249: {}
 
-  chessground@https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/0c446843c4478ac662f96ced92645faad6ab8688: {}
+  chessground@https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/6dc545ba263b591192da69a087e1a35dc997d14d: {}
 
   chokidar@3.6.0:
     dependencies:
