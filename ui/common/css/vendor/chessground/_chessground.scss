@@ -1087,6 +1087,16 @@ cg-container .cg-custom-svgs svg {
   padding-bottom: calc(49 * 100% / 48);
 }
 
+@keyframes cg-button-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(255, 200, 0, 0);
+  }
+  50% {
+    box-shadow: 0 0 14px 6px rgba(255, 200, 0, 0.7);
+  }
+}
+
 .variant-nackgammon,
 .variant-hyper,
 .variant-backgammon {
@@ -1141,6 +1151,12 @@ cg-container .cg-custom-svgs svg {
       width: calc(100% * 18 * 15 / 600);
       &.unavailable {
         opacity: 0.35;
+      }
+      &.available {
+        body.playing:not(:has(.action-reminder-off)) & {
+          animation: cg-button-pulse 2.2s ease-in-out infinite 5.4s;
+        }
+        border-radius: 7%;
       }
       border-radius: 7%;
       text-align: center;
@@ -1231,6 +1247,10 @@ cg-container .cg-custom-svgs svg {
       &.unavailable {
         opacity: 0.35;
       }
+    }
+    body.playing:not(:has(.action-reminder-off)) &.ally:not(:has(dice.available)) {
+      animation: cg-button-pulse 2.2s ease-in-out infinite 1s;
+      border-radius: 7%;
     }
     &.p2 dice,
     &.p1 dice {

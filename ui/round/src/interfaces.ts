@@ -248,6 +248,7 @@ export interface Pref {
   coords: cg.Coords;
   destination: boolean;
   playerTurnIndicator: boolean;
+  actionReminder: boolean;
   enablePremove: boolean;
   highlight: boolean;
   is3d: boolean;

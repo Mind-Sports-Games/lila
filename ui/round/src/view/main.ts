@@ -280,6 +280,7 @@ export function main(ctrl: RoundController): VNode {
           class: {
             'move-confirm': !!(ctrl.moveToSubmit || ctrl.dropToSubmit),
             'turn-indicator-off': !ctrl.data.pref.playerTurnIndicator,
+            'action-reminder-off': !ctrl.data.pref.actionReminder,
           },
         },
         [
