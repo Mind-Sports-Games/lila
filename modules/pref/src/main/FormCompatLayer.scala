@@ -46,6 +46,7 @@ object FormCompatLayer {
           "highlight",
           "destination",
           "playerTurnIndicator",
+          "actionReminder",
           "coords",
           "coordSystem",
           "replay",
