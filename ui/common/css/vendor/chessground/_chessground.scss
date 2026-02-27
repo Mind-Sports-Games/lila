@@ -1093,7 +1093,17 @@ cg-container .cg-custom-svgs svg {
     box-shadow: 0 0 0 0 rgba(255, 200, 0, 0);
   }
   50% {
-    box-shadow: 0 0 14px 6px rgba(255, 200, 0, 0.7);
+    box-shadow: 0 0 14px 6px #edc966;
+  }
+}
+
+@keyframes cg-button-pulse-contemporary {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(255, 200, 0, 0);
+  }
+  50% {
+    box-shadow: 0 0 14px 6px #0a8299;
   }
 }
 
@@ -1155,6 +1165,9 @@ cg-container .cg-custom-svgs svg {
       &.available {
         body.playing:not(:has(.action-reminder-off)) & {
           animation: cg-button-pulse 2.2s ease-in-out infinite 5.4s;
+        }
+        body.playing.backgammon-contemporary:not(:has(.action-reminder-off)) & {
+          animation: cg-button-pulse-contemporary 2.2s ease-in-out infinite 5.4s;
         }
         border-radius: 7%;
       }
@@ -1250,6 +1263,10 @@ cg-container .cg-custom-svgs svg {
     }
     body.playing:not(:has(.action-reminder-off)) &.ally:not(:has(dice.available)) {
       animation: cg-button-pulse 2.2s ease-in-out infinite 1s;
+      border-radius: 7%;
+    }
+    body.playing.backgammon-contemporary:not(:has(.action-reminder-off)) &.ally:not(:has(dice.available)) {
+      animation: cg-button-pulse-contemporary 2.2s ease-in-out infinite 1s;
       border-radius: 7%;
     }
     &.p2 dice,

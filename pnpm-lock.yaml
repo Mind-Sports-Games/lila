@@ -12,8 +12,8 @@ importers:
         specifier: github:lichess-org/ab-stub
         version: https://codeload.github.com/lichess-org/ab-stub/tar.gz/94236bf34dbc9c05daf50f4c9842d859b9142be0
       chessground:
-        specifier: github:Mind-Sports-Games/chessground#pla-1311-give-visual-indicator-to-click-backgammon-dice-for-new
-        version: https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/163da589a2e53b791e0438cd7a366ce6857ab059
+        specifier: github:Mind-Sports-Games/chessground#v7.11.1-pstrat3.29
+        version: https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/41ed87ce871de55222354ea16030ade13edad030
       stratops:
         specifier: github:Mind-Sports-Games/stratops#v0.8.1-pstrat5.24
         version: https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/9a9b296f6ad9f845b851abefb42f17e76fa6f73a
@@ -23,7 +23,7 @@ importers:
     devDependencies:
       '@types/node':
         specifier: ^20.19.4
-        version: 20.19.34
+        version: 20.19.35
       '@types/playstrategy':
         specifier: workspace:*
         version: link:ui/@types/playstrategy
@@ -657,8 +657,8 @@ packages:
   '@types/highcharts@4.2.57':
     resolution: {integrity: sha512-8/RF3I2Zy4I8ll9Ksa+wTbHA7ne/OHilmaTBQTVpQdNtOX6dL7EWFXfcfwiXQAfL+0r48LifHjYDmqug0t8mQA==}
 
-  '@types/node@20.19.34':
-    resolution: {integrity: sha512-by3/Z0Qp+L9cAySEsSNNwZ6WWw8ywgGLPQGgbQDhNRSitqYgkgp4pErd23ZSCavbtUA2CN4jQtoB3T8nk4j3Rg==}
+  '@types/node@20.19.35':
+    resolution: {integrity: sha512-Uarfe6J91b9HAUXxjvSOdiO2UPOKLm07Q1oh0JHxoZ1y8HoqxDAu3gVrsrOHeiio0kSsoVBt4wFrKOm0dKxVPQ==}
 
   '@types/react@19.2.14':
     resolution: {integrity: sha512-ilcTH/UniCkMdtexkoCN0bI7pMcJDvmQFPvuPvmEaYA/NSfFTAgdUSLAoVjaRJm7+6PvcM+q1zYOwS4wTYMF9w==}
@@ -798,10 +798,6 @@ packages:
   balanced-match@1.0.2:
     resolution: {integrity: sha512-3oSeUO0TMV67hN1AmbXsK4yaqU7tjiHlbxRDZOpH0KW9+CeX4bRAaX0Anxt0tx2MrpRpWwQaPwIlISEJhYU5Pw==}
 
-  balanced-match@4.0.4:
-    resolution: {integrity: sha512-BLrgEcRTwX2o6gGxGOCNyMvGSp35YofuYzw9h1IMTRmKqttAZZVU67bdb9Pr2vUHA8+j3i2tJfjO6C6+4myGTA==}
-    engines: {node: 18 || 20 || >=22}
-
   binary-extensions@2.3.0:
     resolution: {integrity: sha512-Ceh+7ox5qe7LJuLHoY0feh3pHuUDHAcRUeyL2VYghZwfpkNIy/+8Ocg0a3UuSoYzavmylwuLWQOf3hl0jjMMIw==}
     engines: {node: '>=8'}
@@ -809,9 +805,8 @@ packages:
   brace-expansion@1.1.12:
     resolution: {integrity: sha512-9T9UjW3r0UW5c1Q7GTwllptXwhvYmEzFhzMfZ9H7FQWt+uZePjZPjBP/W1ZEyZ1twGWom5/56TF4lPcqjnDHcg==}
 
-  brace-expansion@5.0.3:
-    resolution: {integrity: sha512-fy6KJm2RawA5RcHkLa1z/ScpBeA762UF9KmZQxwIbDtRJrgLzM10depAiEQ+CXYcoiqW1/m96OAAoke2nE9EeA==}
-    engines: {node: 18 || 20 || >=22}
+  brace-expansion@2.0.2:
+    resolution: {integrity: sha512-Jt0vHyM+jmUBqojB7E1NIYadt0vI0Qxjxd2TErW94wDz+E2LAm5vKMXXwg6ZZBTHPuUlDgQHKXvjGBdfcF1ZDQ==}
 
   braces@3.0.3:
     resolution: {integrity: sha512-yQbXgO/OSZVD2IsiLlro+7Hf6Q18EJrKSEsdoMzKePKXct3gvD8oLcOQdIzGupr5Fj+EDe8gO/lxc1BzfMpxvA==}
@@ -845,8 +840,8 @@ packages:
     resolution: {tarball: https://codeload.github.com/ornicar/chess.js/tar.gz/ad0709c0b07773d9d0da8e4605a9a2a28f00d249}
     version: 0.10.2
 
-  chessground@https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/163da589a2e53b791e0438cd7a366ce6857ab059:
-    resolution: {tarball: https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/163da589a2e53b791e0438cd7a366ce6857ab059}
+  chessground@https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/41ed87ce871de55222354ea16030ade13edad030:
+    resolution: {tarball: https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/41ed87ce871de55222354ea16030ade13edad030}
     version: 7.11.1-pstrat3.29
     engines: {node: ^20.19.4, pnpm: ^10.17.0}
 
@@ -1201,8 +1196,8 @@ packages:
   minimatch@3.1.5:
     resolution: {integrity: sha512-VgjWUsnnT6n+NUk6eZq77zeFdpW2LWDzP6zFGrCbHXiYNul5Dzqk2HHQ5uFH2DNW5Xbp8+jVzaeNt94ssEEl4w==}
 
-  minimatch@9.0.8:
-    resolution: {integrity: sha512-reYkDYtj/b19TeqbNZCV4q9t+Yxylf/rYBsLb42SXJatTv4/ylq5lEiAmhA/IToxO7NI2UzNMghHoHuaqDkAjw==}
+  minimatch@9.0.9:
+    resolution: {integrity: sha512-OBwBN9AL4dqmETlpS2zasx+vTeWclWzkblfZk7KTA5j3jeOONz/tRCnZomUyvNg83wL5Zv9Ss6HMJXAgL8R2Yg==}
     engines: {node: '>=16 || 14 >=14.17'}
 
   mithril@https://codeload.github.com/ornicar/mithril.js/tar.gz/dd92827aec63f921149ca9a3460ccd981e7025bb:
@@ -1422,8 +1417,8 @@ packages:
     resolution: {integrity: sha512-Y38VPSHcqkFrCpFnQ9vuSXmquuv5oXOKpGeT6aGrr3o3Gc9AlVa6JBfUSOCnbxGGZF+/0ooI7KrPuUSztUdU5A==}
     engines: {node: '>=8'}
 
-  strip-ansi@7.1.2:
-    resolution: {integrity: sha512-gmBGslpoQJtgnMAvOVqGZpEz9dyoKTCzy2nfz/n8aIFhN/jCE/rCmcxabB6jOOHV+0WNnylOxaxBQPSvcWklhA==}
+  strip-ansi@7.2.0:
+    resolution: {integrity: sha512-yDPMNjp4WyfYBkHnjIRLfca1i6KMyGCtsVgoKe/z1+6vukgaENdgGBZt+ZmKPc4gavvEZ5OgHfHdrazhgNyG7w==}
     engines: {node: '>=12'}
 
   strip-final-newline@3.0.0:
@@ -1601,7 +1596,7 @@ snapshots:
     dependencies:
       '@types/geojson': 7946.0.16
 
-  '@types/node@20.19.34':
+  '@types/node@20.19.35':
     dependencies:
       undici-types: 6.21.0
 
@@ -1676,7 +1671,7 @@ snapshots:
       debug: 4.4.3
       globby: 11.1.0
       is-glob: 4.0.3
-      minimatch: 9.0.8
+      minimatch: 9.0.9
       semver: 7.7.4
       ts-api-utils: 1.4.3(typescript@5.9.3)
     optionalDependencies:
@@ -1750,8 +1745,6 @@ snapshots:
 
   balanced-match@1.0.2: {}
 
-  balanced-match@4.0.4: {}
-
   binary-extensions@2.3.0: {}
 
   brace-expansion@1.1.12:
@@ -1759,9 +1752,9 @@ snapshots:
       balanced-match: 1.0.2
       concat-map: 0.0.1
 
-  brace-expansion@5.0.3:
+  brace-expansion@2.0.2:
     dependencies:
-      balanced-match: 4.0.4
+      balanced-match: 1.0.2
 
   braces@3.0.3:
     dependencies:
@@ -1794,7 +1787,7 @@ snapshots:
 
   chess.js@https://codeload.github.com/ornicar/chess.js/tar.gz/ad0709c0b07773d9d0da8e4605a9a2a28f00d249: {}
 
-  chessground@https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/163da589a2e53b791e0438cd7a366ce6857ab059: {}
+  chessground@https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/41ed87ce871de55222354ea16030ade13edad030: {}
 
   chokidar@3.6.0:
     dependencies:
@@ -2149,7 +2142,7 @@ snapshots:
       ansi-escapes: 7.3.0
       cli-cursor: 5.0.0
       slice-ansi: 7.1.2
-      strip-ansi: 7.1.2
+      strip-ansi: 7.2.0
       wrap-ansi: 9.0.2
 
   loose-envify@1.4.0:
@@ -2173,9 +2166,9 @@ snapshots:
     dependencies:
       brace-expansion: 1.1.12
 
-  minimatch@9.0.8:
+  minimatch@9.0.9:
     dependencies:
-      brace-expansion: 5.0.3
+      brace-expansion: 2.0.2
 
   mithril@https://codeload.github.com/ornicar/mithril.js/tar.gz/dd92827aec63f921149ca9a3460ccd981e7025bb: {}
 
@@ -2349,13 +2342,13 @@ snapshots:
     dependencies:
       emoji-regex: 10.6.0
       get-east-asian-width: 1.5.0
-      strip-ansi: 7.1.2
+      strip-ansi: 7.2.0
 
   strip-ansi@6.0.1:
     dependencies:
       ansi-regex: 5.0.1
 
-  strip-ansi@7.1.2:
+  strip-ansi@7.2.0:
     dependencies:
       ansi-regex: 6.2.2
 
@@ -2413,7 +2406,7 @@ snapshots:
     dependencies:
       ansi-styles: 6.2.3
       string-width: 7.2.0
-      strip-ansi: 7.1.2
+      strip-ansi: 7.2.0
 
   wrappy@1.0.2: {}
 
