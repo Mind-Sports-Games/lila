@@ -104,6 +104,9 @@ export function fenPlayerIndex(variant: VariantKey, fen: string) {
   if (['abalone'].includes(variant)) {
     return fen.split(' ')[3] === 'b' ? 'p1' : 'p2';
   }
+  if (['dameo'].includes(variant)) {
+    return fen.split(':')[0] === 'W' ? 'p1' : 'p2';
+  }
   const p2String = variant === 'oware' ? ' N' : ' b';
   return fen.indexOf(p2String) > 0 ? 'p2' : 'p1';
 }
