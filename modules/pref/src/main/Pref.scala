@@ -49,6 +49,7 @@ case class Pref(
     mancalaMove: Int,
     pieceNotation: Int,
     resizeHandle: Int,
+    boardIdentifier: Int,
     tags: Map[String, String] = Map.empty
 ) {
 
@@ -125,6 +126,8 @@ case class Pref(
   def canAlgebraic = coordSystem == Pref.DraughtsCoordSystem.ALGEBRAIC
 
   def isZen = zen == Zen.YES
+
+  def isBoardIdentifier = boardIdentifier == BoardIdentifier.YES
 
   def is2d = !is3d
 
@@ -265,6 +268,8 @@ object Pref {
   }
 
   object KeyboardMove extends BooleanPref
+
+  object BoardIdentifier extends BooleanPref
 
   object RookCastle {
     val NO  = 0
@@ -531,6 +536,7 @@ object Pref {
     mancalaMove = MancalaMove.SINGLE_CLICK,
     pieceNotation = PieceNotation.SYMBOL,
     resizeHandle = ResizeHandle.INITIAL,
+    boardIdentifier = BoardIdentifier.YES,
     tags = Map.empty
   )
 

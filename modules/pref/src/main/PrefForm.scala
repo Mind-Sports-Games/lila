@@ -30,9 +30,10 @@ object PrefForm {
         //"gameResult"    -> checkedNumber(Pref.DraughtsGameResult.choices),
         "coordSystem"   -> checkedNumber(Pref.DraughtsCoordSystem.choices),
         "pieceNotation" -> optional(booleanNumber),
-        "zen"           -> optional(booleanNumber),
-        "resizeHandle"  -> optional(checkedNumber(Pref.ResizeHandle.choices)),
-        "blindfold"     -> checkedNumber(Pref.Blindfold.choices)
+        "zen"             -> optional(booleanNumber),
+        "resizeHandle"    -> optional(checkedNumber(Pref.ResizeHandle.choices)),
+        "blindfold"       -> checkedNumber(Pref.Blindfold.choices),
+        "boardIdentifier" -> optional(booleanNumber)
       )(DisplayData.apply)(DisplayData.unapply),
       "behavior" -> mapping(
         "moveEvent"        -> optional(numberIn(Set(0, 1, 2))),
@@ -76,7 +77,8 @@ object PrefForm {
       pieceNotation: Option[Int],
       zen: Option[Int],
       resizeHandle: Option[Int],
-      blindfold: Int
+      blindfold: Int,
+      boardIdentifier: Option[Int]
   )
 
   case class BehaviorData(
@@ -148,7 +150,8 @@ object PrefForm {
         rookCastle = behavior.rookCastle | pref.rookCastle,
         pieceNotation = display.pieceNotation | pref.pieceNotation,
         moveEvent = behavior.moveEvent | pref.moveEvent,
-        mancalaMove = behavior.mancalaMove | pref.mancalaMove
+        mancalaMove = behavior.mancalaMove | pref.mancalaMove,
+        boardIdentifier = display.boardIdentifier | pref.boardIdentifier
       )
   }
 
@@ -169,7 +172,8 @@ object PrefForm {
           blindfold = pref.blindfold,
           zen = pref.zen.some,
           resizeHandle = pref.resizeHandle.some,
-          pieceNotation = pref.pieceNotation.some
+          pieceNotation = pref.pieceNotation.some,
+          boardIdentifier = pref.boardIdentifier.some
         ),
         behavior = BehaviorData(
           moveEvent = pref.moveEvent.some,

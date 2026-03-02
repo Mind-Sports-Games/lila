@@ -273,6 +273,7 @@ object layout {
             "dark-board"                                                                                                                                                      -> (ctx.pref.bg == lila.pref.Pref.Bg.DARKBOARD),
             "piece-letter"                                                                                                                                                    -> ctx.pref.pieceNotationIsLetter,
             "zen"                                                                                                                                                             -> ctx.pref.isZen,
+            "board-identifier"                                                                                                                                                -> ctx.pref.isBoardIdentifier,
             "blind-mode"                                                                                                                                                      -> ctx.blind,
             "kid"                                                                                                                                                             -> ctx.kid,
             "mobile"                                                                                                                                                          -> ctx.isMobileBrowser,

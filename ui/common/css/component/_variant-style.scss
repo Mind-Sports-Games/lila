@@ -1,3 +1,132 @@
+// Shared properties for variant board identifier icon overlay
+// Requires .board-identifier on body (set via user preference, default ON)
+// Uses cqw units — cg-container already has container-type: inline-size
+%variant-board-identifier {
+  font-family: 'playstrategy';
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+  opacity: 0.2;
+  color: white;
+  z-index: 1;
+  pointer-events: none;
+}
+
+// Chess 8x8 variants: icon centred over the middle 4 squares (same area as KotH highlight)
+%variant-board-identifier-chess {
+  @extend %variant-board-identifier;
+
+  width: 25%;
+  height: 25%;
+  top: 37.5%;
+  left: 37.5%;
+  font-size: 25cqw;
+}
+
+// Draughts 8x8 variants: same positioning as chess 8x8
+%variant-board-identifier-draughts8 {
+  @extend %variant-board-identifier;
+
+  width: 25%;
+  height: 25%;
+  top: 37.5%;
+  left: 37.5%;
+  font-size: 25cqw;
+}
+
+// Draughts 10x10 variants: icon centred over the 2 central non-playing (white) squares
+%variant-board-identifier-draughts10 {
+  @extend %variant-board-identifier;
+
+  width: 20%;
+  height: 20%;
+  top: 40%;
+  left: 40%;
+  font-size: 20cqw;
+}
+
+// Chess variants
+.board-identifier .variant-atomic cg-container::before {
+  @extend %variant-board-identifier-chess;
+
+  content: '\003E'; // '>'
+}
+
+.board-identifier .variant-antichess cg-container::before {
+  @extend %variant-board-identifier-chess;
+
+  content: '\0040'; // '@'
+}
+
+.board-identifier .variant-threeCheck cg-container::before {
+  @extend %variant-board-identifier-chess;
+
+  content: '\e909';
+}
+
+.board-identifier .variant-fiveCheck cg-container::before {
+  @extend %variant-board-identifier-chess;
+
+  content: '\e906';
+}
+
+.board-identifier .variant-noCastling cg-container::before {
+  @extend %variant-board-identifier-chess;
+
+  content: '\e907';
+}
+
+// Draughts 10x10 variants
+.board-identifier .variant-antidraughts cg-container::before {
+  @extend %variant-board-identifier-draughts10;
+
+  content: '\e90a';
+}
+
+.board-identifier .variant-frisian cg-container::before {
+  @extend %variant-board-identifier-draughts10;
+
+  content: '\e90d';
+}
+
+.board-identifier .variant-frysk cg-container::before {
+  @extend %variant-board-identifier-draughts10;
+
+  content: '\e90e';
+}
+
+.board-identifier .variant-breakthrough cg-container::before {
+  @extend %variant-board-identifier-draughts10;
+
+  content: '\e90c';
+}
+
+// Draughts 8x8 variants
+.board-identifier .variant-brazilian cg-container::before {
+  @extend %variant-board-identifier-draughts8;
+
+  content: '\e90b';
+}
+
+.board-identifier .variant-russian cg-container::before {
+  @extend %variant-board-identifier-draughts8;
+
+  content: '\e912';
+}
+
+.board-identifier .variant-pool cg-container::before {
+  @extend %variant-board-identifier-draughts8;
+
+  content: '\e910';
+}
+
+.board-identifier .variant-english cg-container::before {
+  @extend %variant-board-identifier-draughts8;
+
+  content: '\2039'; // '‹'
+}
+
 .variant-racingKings cg-container::before {
   @extend %popup-shadow;
 

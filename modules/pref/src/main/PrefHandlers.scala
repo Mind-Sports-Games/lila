@@ -82,6 +82,7 @@ private object PrefHandlers {
         resizeHandle = r.getD("resizeHandle", Pref.default.resizeHandle),
         moveEvent = r.getD("moveEvent", Pref.default.moveEvent),
         mancalaMove = r.getD("mancalaMove", Pref.default.mancalaMove),
+        boardIdentifier = r.getD("boardIdentifier", Pref.default.boardIdentifier),
         tags = r.getD("tags", Pref.default.tags)
       )
 
@@ -133,6 +134,7 @@ private object PrefHandlers {
         "mancalaMove"         -> o.mancalaMove,
         "pieceNotation"       -> o.pieceNotation,
         "resizeHandle"        -> o.resizeHandle,
+        "boardIdentifier"     -> o.boardIdentifier,
         "tags"                -> o.tags
       )
   }
