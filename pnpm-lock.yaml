@@ -15,8 +15,8 @@ importers:
         specifier: github:Mind-Sports-Games/chessground#v7.11.1-pstrat3.29
         version: https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/41ed87ce871de55222354ea16030ade13edad030
       stratops:
-        specifier: github:Mind-Sports-Games/stratops#v0.8.1-pstrat5.24
-        version: https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/9a9b296f6ad9f845b851abefb42f17e76fa6f73a
+        specifier: github:Mind-Sports-Games/stratops#v0.8.1-pstrat5.25
+        version: https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/163320247cb8d69628eb3711368730093be5301a
       xml2js:
         specifier: ^0.6.2
         version: 0.6.2
@@ -1010,8 +1010,8 @@ packages:
   flatpickr@4.6.13:
     resolution: {integrity: sha512-97PMG/aywoYpB4IvbvUJi0RQi8vearvU0oov1WW3k0WZPBMrTQVqekSX5CjSG/M4Q3i6A/0FKXC7RyAoAUUSPw==}
 
-  flatted@3.3.3:
-    resolution: {integrity: sha512-GX+ysw4PBCz0PzosHDepZGANEuFCMLrnRTiEy9McGjmkCQYwRq4A/X786G/fjM/+OjsWSU1ZrY5qyARZmO/uwg==}
+  flatted@3.3.4:
+    resolution: {integrity: sha512-3+mMldrTAPdta5kjX2G2J7iX4zxtnwpdA8Tr2ZSjkyPSanvbZAcy6flmtnXbEybHrDcU9641lxrMfFuUxVz9vA==}
 
   fs.realpath@1.0.0:
     resolution: {integrity: sha512-OO0pH2lK6a0hZnAdau5ItzHPI6pUlvI7jMVnxUQRtw4owF2wk8lOSabtGDCTP4Ggrg2MbGnWO9X8K1t4+fGMDw==}
@@ -1357,8 +1357,8 @@ packages:
   safari-14-idb-fix@1.0.6:
     resolution: {integrity: sha512-oTEQOdMwRX+uCtWCKT1nx2gAeSdpr8elg/2gcaKUH00SJU2xWESfkx11nmXwTRHy7xfQoj1o4TTQvdmuBosTnA==}
 
-  sax@1.4.4:
-    resolution: {integrity: sha512-1n3r/tGXO6b6VXMdFT54SHzT9ytu9yr7TaELowdYpMqY/Ao7EnlQGmAQ1+RatX7Tkkdm6hONI2owqNx2aZj5Sw==}
+  sax@1.5.0:
+    resolution: {integrity: sha512-21IYA3Q5cQf089Z6tgaUTr7lDAyzoTPx5HRtbhsME8Udispad8dC/+sziTNugOEx54ilvatQ9YCzl4KQLPcRHA==}
     engines: {node: '>=11.0.0'}
 
   scheduler@0.27.0:
@@ -1400,9 +1400,9 @@ packages:
     resolution: {integrity: sha512-wHMNIOjkm/YNE5EM3RCbr/+DVgPg6AqQAX1eOxO46zYNvCXjKP5Y865tqQj3EXnaMBjkxmQA5jFuDpDK/dbfiA==}
     engines: {node: '>=8.3.0'}
 
-  stratops@https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/9a9b296f6ad9f845b851abefb42f17e76fa6f73a:
-    resolution: {tarball: https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/9a9b296f6ad9f845b851abefb42f17e76fa6f73a}
-    version: 0.8.1-pstrat5.24
+  stratops@https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/163320247cb8d69628eb3711368730093be5301a:
+    resolution: {tarball: https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/163320247cb8d69628eb3711368730093be5301a}
+    version: 0.8.1-pstrat5.25
     engines: {node: ^20.19.4, pnpm: ^10.17.0}
 
   string-argv@0.3.2:
@@ -1983,13 +1983,13 @@ snapshots:
 
   flat-cache@3.2.0:
     dependencies:
-      flatted: 3.3.3
+      flatted: 3.3.4
       keyv: 4.5.4
       rimraf: 3.0.2
 
   flatpickr@4.6.13: {}
 
-  flatted@3.3.3: {}
+  flatted@3.3.4: {}
 
   fs.realpath@1.0.0: {}
 
@@ -2302,7 +2302,7 @@ snapshots:
 
   safari-14-idb-fix@1.0.6: {}
 
-  sax@1.4.4: {}
+  sax@1.5.0: {}
 
   scheduler@0.27.0: {}
 
@@ -2332,7 +2332,7 @@ snapshots:
 
   snabbdom@3.5.1: {}
 
-  stratops@https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/9a9b296f6ad9f845b851abefb42f17e76fa6f73a:
+  stratops@https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/163320247cb8d69628eb3711368730093be5301a:
     dependencies:
       '@badrap/result': 0.2.13
 
@@ -2412,7 +2412,7 @@ snapshots:
 
   xml2js@0.6.2:
     dependencies:
-      sax: 1.4.4
+      sax: 1.5.0
       xmlbuilder: 11.0.1
 
   xmlbuilder@11.0.1: {}
