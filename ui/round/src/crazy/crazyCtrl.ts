@@ -67,18 +67,14 @@ export function valid(data: RoundData, role: cg.Role, key: cg.Key): boolean {
   if (!isPlayerTurn(data)) return false;
 
   const dropStr = data.possibleDrops;
-  if (typeof dropStr === 'undefined' || dropStr === null) return true;
+  if (
+    data.game.variant.key !== 'crazyhouse' && // crazy interface allows proposing non possible drops.
+    (typeof dropStr === 'undefined' || dropStr === null)
+  )
+    return true;
 
-  if (data.game.variant.key === 'crazyhouse') {
-    if (role === 'p-piece' && (key[1] === '1' || key[1] === '8')) return false;
-
-    const drops: string[] = dropStr.match(/.{2}/g) || [];
-    return drops.includes(key);
-  } else {
-    //otherwise shogi and use the newer dropsByRole data
     const dropsByRole = stratUtils.readDropsByRole(data.possibleDropsByRole);
     return dropsByRole.get(role)?.includes(key) || false;
-  }
 }
 
 export function onEnd() {

@@ -448,7 +448,9 @@ final class JsonView(
 
   private def possibleDropsByrole(pov: Pov): Option[JsValue] =
     (pov.game.situation, pov.game.variant) match {
-      case (Situation.Chess(_), Variant.Chess(_)) => None
+      case (Situation.Chess(_), Variant.Chess(_)) =>
+        (pov.game playableBy pov.player) option
+          Event.PossibleDropsByRole.json(pov.game.situation.dropsByRole.getOrElse(Map.empty))
       case (Situation.FairySF(_), Variant.FairySF(_)) =>
         (pov.game playableBy pov.player) option
           Event.PossibleDropsByRole.json(pov.game.situation.dropsByRole.getOrElse(Map.empty))
