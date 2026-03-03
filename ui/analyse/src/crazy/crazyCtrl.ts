@@ -6,6 +6,8 @@ import { Api as ChessgroundApi } from 'chessground/api';
 import { setDropMode, cancelDropMode } from 'chessground/drop';
 import { AnalyseData } from '../interfaces';
 
+let dragDropMode = false;
+
 export function drag(ctrl: AnalyseCtrl, playerIndex: PlayerIndex, e: cg.MouchEvent): void {
   if (e.button !== undefined && e.button !== 0) return; // only touch or left click
   if (ctrl.chessground.state.movable.playerIndex !== playerIndex) return;
@@ -13,14 +15,22 @@ export function drag(ctrl: AnalyseCtrl, playerIndex: PlayerIndex, e: cg.MouchEve
   const role = el.getAttribute('data-role') as cg.Role,
     number = el.getAttribute('data-nb');
   if (!role || !playerIndex || number === '0') return;
+  const cur = ctrl.chessground?.state.draggable.current;
+  if (cur?.newPiece) {
+    e.preventDefault();
+    return;
+  }
   const dropMode = ctrl.chessground?.state.dropmode;
   const dropPiece = ctrl.chessground?.state.dropmode.piece;
-  if (!dropMode.active || dropPiece?.role !== role) {
-    cancelDropMode(ctrl.chessground.state);
-  }
   if (ctrl.chessground?.state.selected) {
     ctrl.cancelMove();
     ctrl.chessground.selectSquare(null);
+    ctrl.redraw();
+  }
+  if (!dropMode.active || dropPiece?.role !== role) {
+    // Display pocket as selected
+    setDropMode(ctrl.chessground.state, { playerIndex, role });
+    dragDropMode = true;
     ctrl.redraw();
   }
   e.stopPropagation();
@@ -38,7 +48,9 @@ export function selectToDrop(ctrl: AnalyseCtrl, playerIndex: PlayerIndex, e: cg.
   if (!role || !playerIndex || number === '0') return;
   const dropMode = ctrl.chessground?.state.dropmode;
   const dropPiece = ctrl.chessground?.state.dropmode.piece;
-  if (!dropMode.active || dropPiece?.role !== role) {
+  if (dragDropMode) {
+    dragDropMode = false;
+  } else if (!dropMode.active || dropPiece?.role !== role) {
     setDropMode(ctrl.chessground.state, { playerIndex, role });
   } else {
     cancelDropMode(ctrl.chessground.state);

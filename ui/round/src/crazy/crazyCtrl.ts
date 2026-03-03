@@ -18,14 +18,22 @@ export function drag(ctrl: RoundController, e: cg.MouchEvent): void {
     playerIndex = el.getAttribute('data-playerindex') as cg.PlayerIndex,
     number = el.getAttribute('data-nb');
   if (!role || !playerIndex || number === '0') return;
+  const cur = ctrl.chessground?.state.draggable.current;
+  if (cur?.newPiece) {
+    e.preventDefault();
+    return;
+  }
   const dropMode = ctrl.chessground?.state.dropmode;
   const dropPiece = ctrl.chessground?.state.dropmode.piece;
-  if (!dropMode.active || dropPiece?.role !== role) {
-    cancelDropMode(ctrl.chessground.state);
-  }
   if (ctrl.chessground?.state.selected) {
     ctrl.cancelMove();
     ctrl.chessground.selectSquare(null);
+    ctrl.redraw();
+  }
+  if (!dropMode.active || dropPiece?.role !== role) {
+    // Display pocket as selected
+    setDropMode(ctrl.chessground.state, { playerIndex, role });
+    dragDropMode = true;
     ctrl.redraw();
   }
   e.stopPropagation();
@@ -43,7 +51,9 @@ export function selectToDrop(ctrl: RoundController, e: cg.MouchEvent): void {
   if (!role || !playerIndex || number === '0') return;
   const dropMode = ctrl.chessground?.state.dropmode;
   const dropPiece = ctrl.chessground?.state.dropmode.piece;
-  if (!dropMode.active || dropPiece?.role !== role) {
+  if (dragDropMode) {
+    dragDropMode = false;
+  } else if (!dropMode.active || dropPiece?.role !== role) {
     setDropMode(ctrl.chessground.state, { playerIndex, role });
   } else {
     cancelDropMode(ctrl.chessground.state);
@@ -56,6 +66,7 @@ export function selectToDrop(ctrl: RoundController, e: cg.MouchEvent): void {
 let dropWithKey = false;
 let dropWithDrag = false;
 let mouseIconsLoaded = false;
+let dragDropMode = false;
 
 export function valid(data: RoundData, role: cg.Role, key: cg.Key): boolean {
   if (crazyKeys.length === 0) dropWithDrag = true;
@@ -73,8 +84,8 @@ export function valid(data: RoundData, role: cg.Role, key: cg.Key): boolean {
   )
     return true;
 
-    const dropsByRole = stratUtils.readDropsByRole(data.possibleDropsByRole);
-    return dropsByRole.get(role)?.includes(key) || false;
+  const dropsByRole = stratUtils.readDropsByRole(data.possibleDropsByRole);
+  return dropsByRole.get(role)?.includes(key) || false;
 }
 
 export function onEnd() {
