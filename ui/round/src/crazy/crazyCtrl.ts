@@ -10,6 +10,11 @@ export const pieceRoles: cg.Role[] = ['p-piece', 'n-piece', 'b-piece', 'r-piece'
 export const pieceShogiRoles: cg.Role[] = ['p-piece', 'l-piece', 'n-piece', 's-piece', 'g-piece', 'b-piece', 'r-piece'];
 export const pieceMiniShogiRoles: cg.Role[] = ['p-piece', 's-piece', 'g-piece', 'b-piece', 'r-piece'];
 
+let dropWithKey = false;
+let dropWithDrag = false;
+let mouseIconsLoaded = false;
+let dragDropMode = false;
+
 export function drag(ctrl: RoundController, e: cg.MouchEvent): void {
   if (e.button !== undefined && e.button !== 0) return; // only touch or left click
   if (ctrl.replaying() || !ctrl.isPlaying()) return;
@@ -62,11 +67,6 @@ export function selectToDrop(ctrl: RoundController, e: cg.MouchEvent): void {
   e.preventDefault();
   ctrl.redraw();
 }
-
-let dropWithKey = false;
-let dropWithDrag = false;
-let mouseIconsLoaded = false;
-let dragDropMode = false;
 
 export function valid(data: RoundData, role: cg.Role, key: cg.Key): boolean {
   if (crazyKeys.length === 0) dropWithDrag = true;
