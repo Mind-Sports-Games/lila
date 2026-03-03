@@ -333,14 +333,18 @@ export default class AnalyseCtrl {
       playerIndex = this.turnPlayerIndex(),
       dests = stratUtils.readDests(this.node.dests),
       drops = stratUtils.readDrops(this.node.drops),
-      dropsByRole = stratUtils.readDrops(this.node.dropsByRole),
+      dropsByRole = stratUtils.readDropsByRole(this.node.dropsByRole),
       variantKey = this.data.game.variant.key,
       movablePlayerIndex = this.gamebookPlay()
         ? playerIndex
         : this.practice
           ? this.bottomPlayerIndex()
           : !this.embed &&
-              ((dests && dests.size > 0) || drops === null || drops.length || dropsByRole == null || dropsByRole.length)
+              ((dests && dests.size > 0) ||
+                drops === null ||
+                drops.length ||
+                dropsByRole == null ||
+                dropsByRole.size === 0)
             ? playerIndex
             : undefined,
       config: ChessgroundConfig = {

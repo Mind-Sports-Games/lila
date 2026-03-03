@@ -220,7 +220,7 @@ final class JsonView(
         //"color" -> p.playerIndex.classicName,
         "playerName"   -> g.variant.playerNames(p.playerIndex),
         "playerIndex"  -> p.playerIndex.name,
-        "playerColors" -> g.variant.playerColors(p.playerIndex),
+        "playerColor" -> g.variant.playerColors(p.playerIndex),
         "name"         -> p.name
       )
       .add("user" -> user.map { userJsonView.minimal(_, g.perfType) })
@@ -448,7 +448,9 @@ final class JsonView(
 
   private def possibleDropsByrole(pov: Pov): Option[JsValue] =
     (pov.game.situation, pov.game.variant) match {
-      case (Situation.Chess(_), Variant.Chess(_)) => None
+      case (Situation.Chess(_), Variant.Chess(_)) =>
+        (pov.game playableBy pov.player) option
+          Event.PossibleDropsByRole.json(pov.game.situation.dropsByRole.getOrElse(Map.empty))
       case (Situation.FairySF(_), Variant.FairySF(_)) =>
         (pov.game playableBy pov.player) option
           Event.PossibleDropsByRole.json(pov.game.situation.dropsByRole.getOrElse(Map.empty))

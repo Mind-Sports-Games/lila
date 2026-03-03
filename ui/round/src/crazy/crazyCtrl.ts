@@ -10,6 +10,11 @@ export const pieceRoles: cg.Role[] = ['p-piece', 'n-piece', 'b-piece', 'r-piece'
 export const pieceShogiRoles: cg.Role[] = ['p-piece', 'l-piece', 'n-piece', 's-piece', 'g-piece', 'b-piece', 'r-piece'];
 export const pieceMiniShogiRoles: cg.Role[] = ['p-piece', 's-piece', 'g-piece', 'b-piece', 'r-piece'];
 
+let dropWithKey = false;
+let dropWithDrag = false;
+let mouseIconsLoaded = false;
+let dragDropMode = false;
+
 export function drag(ctrl: RoundController, e: cg.MouchEvent): void {
   if (e.button !== undefined && e.button !== 0) return; // only touch or left click
   if (ctrl.replaying() || !ctrl.isPlaying()) return;
@@ -18,14 +23,22 @@ export function drag(ctrl: RoundController, e: cg.MouchEvent): void {
     playerIndex = el.getAttribute('data-playerindex') as cg.PlayerIndex,
     number = el.getAttribute('data-nb');
   if (!role || !playerIndex || number === '0') return;
+  const cur = ctrl.chessground?.state.draggable.current;
+  if (cur?.newPiece) {
+    e.preventDefault();
+    return;
+  }
   const dropMode = ctrl.chessground?.state.dropmode;
   const dropPiece = ctrl.chessground?.state.dropmode.piece;
-  if (!dropMode.active || dropPiece?.role !== role) {
-    cancelDropMode(ctrl.chessground.state);
-  }
   if (ctrl.chessground?.state.selected) {
     ctrl.cancelMove();
     ctrl.chessground.selectSquare(null);
+    ctrl.redraw();
+  }
+  if (!dropMode.active || dropPiece?.role !== role) {
+    // Display pocket as selected
+    setDropMode(ctrl.chessground.state, { playerIndex, role });
+    dragDropMode = true;
     ctrl.redraw();
   }
   e.stopPropagation();
@@ -43,7 +56,9 @@ export function selectToDrop(ctrl: RoundController, e: cg.MouchEvent): void {
   if (!role || !playerIndex || number === '0') return;
   const dropMode = ctrl.chessground?.state.dropmode;
   const dropPiece = ctrl.chessground?.state.dropmode.piece;
-  if (!dropMode.active || dropPiece?.role !== role) {
+  if (dragDropMode) {
+    dragDropMode = false;
+  } else if (!dropMode.active || dropPiece?.role !== role) {
     setDropMode(ctrl.chessground.state, { playerIndex, role });
   } else {
     cancelDropMode(ctrl.chessground.state);
@@ -52,10 +67,6 @@ export function selectToDrop(ctrl: RoundController, e: cg.MouchEvent): void {
   e.preventDefault();
   ctrl.redraw();
 }
-
-let dropWithKey = false;
-let dropWithDrag = false;
-let mouseIconsLoaded = false;
 
 export function valid(data: RoundData, role: cg.Role, key: cg.Key): boolean {
   if (crazyKeys.length === 0) dropWithDrag = true;
@@ -67,18 +78,14 @@ export function valid(data: RoundData, role: cg.Role, key: cg.Key): boolean {
   if (!isPlayerTurn(data)) return false;
 
   const dropStr = data.possibleDrops;
-  if (typeof dropStr === 'undefined' || dropStr === null) return true;
+  if (
+    data.game.variant.key !== 'crazyhouse' && // crazy interface allows proposing non possible drops.
+    (typeof dropStr === 'undefined' || dropStr === null)
+  )
+    return true;
 
-  if (data.game.variant.key === 'crazyhouse') {
-    if (role === 'p-piece' && (key[1] === '1' || key[1] === '8')) return false;
-
-    const drops: string[] = dropStr.match(/.{2}/g) || [];
-    return drops.includes(key);
-  } else {
-    //otherwise shogi and use the newer dropsByRole data
-    const dropsByRole = stratUtils.readDropsByRole(data.possibleDropsByRole);
-    return dropsByRole.get(role)?.includes(key) || false;
-  }
+  const dropsByRole = stratUtils.readDropsByRole(data.possibleDropsByRole);
+  return dropsByRole.get(role)?.includes(key) || false;
 }
 
 export function onEnd() {
