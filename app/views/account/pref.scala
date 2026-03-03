@@ -72,6 +72,10 @@ object pref {
               radios(form("display.actionReminder"), booleanChoices)
             ),
             setting(
+              boardIdentifier(),
+              radios(form("display.boardIdentifier"), booleanChoices)
+            ),
+            setting(
               boardCoordinates(),
               radios(form("display.coords"), translatedBoardCoordinateChoices)
             ),
