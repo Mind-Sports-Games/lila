@@ -220,7 +220,7 @@ final class JsonView(
         //"color" -> p.playerIndex.classicName,
         "playerName"   -> g.variant.playerNames(p.playerIndex),
         "playerIndex"  -> p.playerIndex.name,
-        "playerColors" -> g.variant.playerColors(p.playerIndex),
+        "playerColor" -> g.variant.playerColors(p.playerIndex),
         "name"         -> p.name
       )
       .add("user" -> user.map { userJsonView.minimal(_, g.perfType) })
