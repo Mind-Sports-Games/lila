@@ -7,8 +7,8 @@
   align-items: center;
   justify-content: center;
   position: absolute;
-  opacity: 0.2;
-  color: white;
+  opacity: 0.25;
+  color: rgba(20, 85, 30);
   z-index: 1;
   pointer-events: none;
 }
@@ -44,6 +44,13 @@
   top: 40%;
   left: 40%;
   font-size: 20cqw;
+}
+
+// Modify opacity on dark boards to avoid the icon being too dim/bright
+.dark-board.board-identifier {
+  cg-container::before {
+    opacity: 0.3;
+  }
 }
 
 // Chess variants
