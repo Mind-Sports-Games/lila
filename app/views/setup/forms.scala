@@ -22,13 +22,15 @@ object forms {
       user: Option[User],
       error: Option[String],
       validFen: Option[lila.setup.ValidFen],
-      inputVariant: Option[Variant]
+      inputVariant: Option[Variant],
+      inputTimeMode: Option[String] = None
   )(implicit ctx: Context) =
     layout(
       "game",
       (if (user.isDefined) trans.challenge.challengeToPlay else trans.createAGame)(),
       routes.Setup.game("sri-placeholder", user map (_.id)),
       inputVariant.map(v => s"${v.gameFamily.id}_${v.id}").getOrElse(""),
+      inputTimeMode.getOrElse(""),
       error.map(e => raw(e.replace("{{user}}", userIdLink(user.map(_.id)).toString))),
       user
     ) {
@@ -72,6 +74,7 @@ object forms {
       titleF: Frag,
       route: Call,
       inputVariant: String,
+      inputTimeMode: String = "",
       error: Option[Frag] = None,
       targetUser: Option[User] = None
   )(fields: Frag)(implicit ctx: Context) =
@@ -91,6 +94,7 @@ object forms {
             novalidate,
             dataRandomPlayerIndexVariants,
             dataVariant := inputVariant,
+            dataTimeMode := inputTimeMode,
             dataLobbyBan := ctx.isBot,
             dataType := typ,
             dataAnon := ctx.isAnon.option("1"),

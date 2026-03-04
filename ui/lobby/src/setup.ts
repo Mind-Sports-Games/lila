@@ -343,6 +343,7 @@ export default class Setup {
       $variantInput = $variants.find('.variant_choice [name=variant]'),
       inputVariant = $form.data('variant') as string,
       forceVariant = inputVariant !== '',
+      inputTimeMode = $form.data('timemode') as string,
       $fenPosition = $form.find('.fen_position'),
       $fenInput = $fenPosition.find('input'),
       forceFromPosition = !!$fenInput.val(),
@@ -1256,6 +1257,10 @@ export default class Setup {
         showRating();
       })
       .trigger('change');
+    if (inputTimeMode === 'correspondence') {
+      $timeModeDefaults.find('input[value="correspondence"]').prop('checked', true);
+      $opponentInput.filter('[value="lobby"]').prop('checked', true);
+    }
     $timeModeDefaults
       .on('change', function (this: HTMLElement) {
         const choice = $(this).find('input').filter(':checked').val() as string;

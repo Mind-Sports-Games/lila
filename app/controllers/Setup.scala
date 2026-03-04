@@ -44,6 +44,7 @@ final class Setup(
       if (HTTPRequest isXhr ctx.req) {
         val lib                      = gameLogic(getInt("lib"))
         val variant: Option[Variant] = get("variant").map(Variant.orDefault)
+        val inputTimeMode            = get("time")
         fuccess(
           forms.filled(
             lib,
@@ -54,11 +55,11 @@ final class Setup(
           val validFen = form("fen").value map (s => FEN.clean(lib, s)) flatMap ValidFen(strict = false)
           userId ?? env.user.repo.named flatMap {
             case None =>
-              Ok(html.setup.forms.game(form, none, none, validFen, variant)).fuccess
+              Ok(html.setup.forms.game(form, none, none, validFen, variant, inputTimeMode)).fuccess
             case Some(user) =>
               env.challenge.granter(ctx.me, user, none) map {
                 case Some(denied) => BadRequest(lila.challenge.ChallengeDenied.translated(denied))
-                case None         => Ok(html.setup.forms.game(form, user.some, none, validFen, variant))
+                case None         => Ok(html.setup.forms.game(form, user.some, none, validFen, variant, inputTimeMode))
               }
           }
         }
