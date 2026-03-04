@@ -140,7 +140,12 @@ object side {
             }
           )
         },
-        initialFen
+        (initialFen orElse {
+          // Chess960 games at position 518 (standard chess start) don't store initialFen
+          if (game.variant.key == "chess960")
+            Some(FEN.Chess(strategygames.chess.variant.Standard.initialFen))
+          else None
+        })
           .ifTrue(
             game.variant.key == "chess960" ||
               game.variant.gameFamily == GameFamily.Draughts() ||
