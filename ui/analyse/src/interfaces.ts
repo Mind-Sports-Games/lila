@@ -102,6 +102,7 @@ export interface Game {
   speed: Speed;
   variant: Variant;
   gameFamily: GameFamilyKey;
+  gameFamilyId: number;
   winner?: PlayerIndex;
   winnerPlayer: PlayerName;
   loserPlayer: PlayerName;
