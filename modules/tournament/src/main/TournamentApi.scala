@@ -810,6 +810,11 @@ final class TournamentApi(
 
   def notableFinished = cached.notableFinishedCache.get {}
 
+  def fetchRecentlyActive: Fu[List[Tournament]] =
+    tournamentRepo.startedIds flatMap tournamentRepo.byIds zip notableFinished map {
+      case (started, finished) => started ::: finished
+    }
+
   private def scheduledCreatedAndStarted =
     tournamentRepo.scheduledCreated(6 * 60) zip tournamentRepo.scheduledStarted
 

@@ -33,6 +33,7 @@ final class Env(
     analysisRepo: lila.analyse.AnalysisRepo,
     userRepo: lila.user.UserRepo,
     simulEnv: lila.simul.Env,
+    swissEnv: lila.swiss.Env,
     chatApi: lila.chat.ChatApi,
     notifyApi: lila.notify.NotifyApi,
     historyApi: lila.history.HistoryApi,
