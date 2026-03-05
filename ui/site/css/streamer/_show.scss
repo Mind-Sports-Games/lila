@@ -70,11 +70,7 @@ $mq-picture: $mq-large;
   }
 
   .services {
-    display: none;
-
-    @include breakpoint($mq-large) {
-      display: block;
-    }
+    display: block;
   }
 
   .services a:hover,
