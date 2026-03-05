@@ -220,21 +220,21 @@ final class AssessApi(
       lR     <- loser.stableRating
     } yield wR <= lR - 300)
 
+    // Shared eligibility guard: conditions common to both assessment paths
+    def isEligibleForAssessment: Boolean =
+      game.mode.rated &&
+        !game.isCorrespondence &&
+        game.source.exists(assessableSources.contains) &&
+        game.playedTurns >= 36 &&
+        !(game.createdAt isBefore bottomDate)
+
     val shouldAnalyse: Fu[Option[AutoAnalysis.Reason]] =
       if (!game.analysable) fuccess(none)
       else if (game.speed >= strategygames.Speed.Blitz && (p1.hasTitle || p2.hasTitle))
         fuccess(TitledPlayer.some)
-      else if (!game.source.exists(assessableSources.contains)) fuccess(none)
-      // give up on correspondence games
-      else if (game.isCorrespondence) fuccess(none)
-      // stop here for short games
-      else if (game.playedTurns < 36) fuccess(none)
+      else if (!isEligibleForAssessment) fuccess(none)
       // stop here for long games
       else if (game.playedTurns > 95) fuccess(none)
-      // stop here for casual games
-      else if (!game.mode.rated) fuccess(none)
-      // discard old games
-      else if (game.createdAt isBefore bottomDate) fuccess(none)
       else if (isUpset) fuccess(Upset.some)
       // p1 has consistent move times
       else if (p1SuspCoefVariation.isDefined) fuccess(P1MoveTime.some)
@@ -257,11 +257,33 @@ final class AssessApi(
           else none
         }
 
-    shouldAnalyse map {
+    // For non-analysable variants (no Fishnet engine), directly report players with
+    // both very high blur rate and highly consistent move times. Thresholds are
+    // deliberately stricter than the engine-assisted path to compensate for the
+    // absence of ACPL/accuracy confirmation.
+    val assessUnanalysableGames: Funit =
+      if (!game.analysable && isEligibleForAssessment) {
+        game.players.foreach { player =>
+          val blurPct = game.playerBlurPercent(player.playerIndex)
+          // noFastCoefVariation already gates on noFastPlies internally
+          val cv = noFastCoefVariation(player)
+          if (blurPct >= 90 && cv.exists(_ < 0.25f)) {
+            val user  = player.playerIndex.fold(p1, p2)
+            val cvStr = cv.fold("?")(v => f"$v%.2f")
+            reporter ! lila.hub.actorApi.report.Cheater(
+              user.id,
+              s"Blur rate ${blurPct}% with highly consistent move times (CV $cvStr) in ${game.variant.name} game ${game.id}"
+            )
+          }
+        }
+        funit
+      } else funit
+
+    shouldAnalyse.map {
       _ ?? { reason =>
         lila.mon.cheat.autoAnalysis(reason.toString).increment()
         fishnet ! lila.hub.actorApi.fishnet.AutoAnalyse(game.id)
       }
-    }
+    } >> assessUnanalysableGames
   }
 }
