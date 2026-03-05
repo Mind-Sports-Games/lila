@@ -6,6 +6,7 @@ export interface ForecastData {
 }
 
 export interface ForecastStep {
+  gf: number;
   ply: Ply;
   turnCount: number;
   playerIndex: PlayerIndex;
