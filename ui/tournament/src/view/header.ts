@@ -16,7 +16,7 @@ function clock(d: any): VNode | undefined {
   if (d.isFinished) return;
   if (d.secondsToFinish)
     if (d.medley && d.secondsToFinish != d.secondsToFinishInterval) {
-      return h('div.clock', [
+      return h('div.clock.clock--medley', [
         h('div.time.medley-interval', {
           hook: startClock(d.secondsToFinish),
         }),

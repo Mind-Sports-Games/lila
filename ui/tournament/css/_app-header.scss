@@ -61,8 +61,13 @@
 
   .clock {
     flex: 0 0 auto;
+    min-width: 6em;
     font-weight: bold;
     color: $c-font-dim;
+
+    &--medley {
+      min-width: 11em;
+    }
 
     &-created {
       @extend %flex-column;
