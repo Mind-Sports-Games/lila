@@ -109,7 +109,8 @@ object bits {
                 src := post.image,
                 cls := "blog-post-card__image",
                 widthA := 400,
-                heightA := 400 * 10 / 16
+                heightA := 400 * 10 / 16,
+                attr("loading") := "lazy"
               ),
               span(cls := "blog-post-card__content")(
                 h2(cls := "blog-post-card__title")(post.title),

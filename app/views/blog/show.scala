@@ -35,7 +35,7 @@ object show {
           h1(doc.getText("blog.title")),
           bits.metas(doc),
           doc.getImage("blog.image", "main").map { img =>
-            div(cls := "illustration")(st.img(src := img.url))
+            div(cls := "illustration")(st.img(src := img.url, attr("loading") := "lazy"))
           },
           div(cls := "body expand-text")(
             doc
