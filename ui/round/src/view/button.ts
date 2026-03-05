@@ -321,8 +321,15 @@ export function gameMessage(ctrl: RoundController) {
   ) {
     return null;
   } //suppress message while selecting dead stones for go games
-  if (ctrl.data.game.variant.key === 'xiangqi' && ctrl.data.player.playerIndex !== ctrl.data.game.player) {
-    return null; //message only for current player in xiangqi
+  if (
+    ['xiangqi', 'minixiangqi'].includes(ctrl.data.game.variant.key) &&
+    ctrl.data.player.playerIndex !== ctrl.data.game.player
+  ) {
+    if (ctrl.data.game.gameMessage === 'perpetualWarning') {
+      return h('div.suggestion', [h('p', { hook: onSuggestionHook }, ctrl.noarg('perpetualWarningOpponent'))]);
+    } else {
+      return null; //other messages only for current player in xiangqi/minixiangqi
+    }
   }
   return ctrl.data.game.gameMessage
     ? h('div.suggestion', [
