@@ -306,8 +306,10 @@ final class TournamentApi(
                 userRepo.incToints(p.userId, p.score)
               }
             }
-            awardPrizes(tour).logFailure(logger, _ => s"${tour.id} awardPrizes")
-            callbacks.indexLeaderboard(tour).logFailure(logger, _ => s"${tour.id} indexLeaderboard")
+            // indexLeaderboard must complete before awardPrizes so that shield table
+            // recalculation (inside awardPrizes) reads the newly-written leaderboard entry
+            (callbacks.indexLeaderboard(tour) >> awardPrizes(tour))
+              .logFailure(logger, _ => s"${tour.id} indexLeaderboard/awardPrizes")
             callbacks.clearWinnersCache(tour)
             callbacks.clearTrophyCache(tour)
             duelStore.remove(tour)
