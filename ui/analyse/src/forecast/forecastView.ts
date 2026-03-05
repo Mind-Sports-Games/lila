@@ -34,6 +34,7 @@ function makeCnodes(ctrl: AnalyseCtrl, fctrl: ForecastCtrl): ForecastStep[] {
   const afterPly = ctrl.tree.getCurrentNodesAfterPly(ctrl.nodeList, ctrl.mainline, ctrl.data.game.turns);
   return fctrl.truncate(
     afterPly.map(node => ({
+      gf: ctrl.data.game.gameFamilyId,
       ply: node.ply,
       turnCount: node.turnCount,
       playerIndex: node.playerIndex,

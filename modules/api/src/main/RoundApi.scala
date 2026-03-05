@@ -180,14 +180,15 @@ final private[api] class RoundApi(
       initialFen: Option[FEN],
       orientation: PlayerIndex,
       owner: Boolean,
-      me: Option[User]
+      me: Option[User],
+      withForecast: Boolean = false
   ) =
-    owner.??(forecastApi loadForDisplay pov).map { fco =>
-      withForecast(pov, owner, fco) {
-        withTree(pov, analysis = none, initialFen, WithFlags(opening = true)) {
-          jsonView.userAnalysisJson(pov, pref, initialFen, orientation, owner = owner, me = me)
-        }
-      }
+    (if (withForecast) owner.??(forecastApi loadForDisplay pov) else fuccess(none)).map { fco =>
+      val addForecast: JsObject => JsObject =
+        if (withForecast) this.withForecast(pov, owner, fco) else identity
+      addForecast(withTree(pov, analysis = none, initialFen, WithFlags(opening = true)) {
+        jsonView.userAnalysisJson(pov, pref, initialFen, orientation, owner = owner, me = me)
+      })
     }
 
   def freeStudyJson(

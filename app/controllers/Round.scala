@@ -171,7 +171,7 @@ final class Round(
       implicit ctx: Context
   ): Fu[Result] = {
     playablePovForReq(pov.game) match {
-      case Some(player) if userTv.isEmpty =>
+      case Some(player) if userTv.isEmpty && !forceAnalysis =>
         renderPlayer(pov.withPlayerIndex(player.playerIndex))
       case _
           if pov.game.variant == Variant.Chess(
@@ -186,6 +186,33 @@ final class Round(
               forceAnalysis || pov.game.variant.hasAnalysisBoard
             if (pov.game.replayable && canAnalyse)
               analyseC.replay(pov, userTv = userTv)
+            else if (forceAnalysis && pov.game.playable)
+              env.game.gameRepo.initialFen(pov.gameId) flatMap { initialFen =>
+                val owner        = isMyPov(pov)
+                val showForecast = owner && pov.game.playable &&
+                  pov.game.variant == Variant.Chess(strategygames.chess.variant.Standard)
+                env.api.roundApi
+                  .userAnalysisJson(
+                    pov,
+                    ctx.pref,
+                    initialFen,
+                    pov.playerIndex,
+                    owner = owner,
+                    me = ctx.me,
+                    withForecast = showForecast
+                  )
+                  .map { data =>
+                    NoCache(
+                      Ok(
+                        html.board.userAnalysis(
+                          data,
+                          pov,
+                          withForecast = showForecast
+                        )
+                      )
+                    )
+                  }
+              }
             else if (HTTPRequest.isHuman(ctx.req))
               env.tournament.api.gameView.watcher(pov.game) zip
                 (pov.game.simulId ?? env.simul.repo.find) zip

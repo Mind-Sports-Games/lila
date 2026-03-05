@@ -105,7 +105,8 @@ final class UserAnalysis(
                         initialFen,
                         pov.playerIndex,
                         owner = owner,
-                        me = ctx.me
+                        me = ctx.me,
+                        withForecast = true
                       )
                 } yield NoCache(
                   Ok(
