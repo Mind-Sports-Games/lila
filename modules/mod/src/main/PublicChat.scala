@@ -30,6 +30,14 @@ final class PublicChat(
         .map(chatApi.userChat.delete(_, suspect.user, _.Global))
         .sequenceFu
         .void
+    } >> deleteLobbyChat(suspect)
+
+  private def deleteLobbyChat(suspect: Suspect): Funit =
+    chatApi.userChat.findOption(Chat.Id("lobbyhome")) flatMap {
+      _ ?? { chat =>
+        chat.hasLinesOf(suspect.user) ??
+          chatApi.userChat.delete(chat, suspect.user, _.Lobby).void
+      }
     }
 
   private def tournamentChats: Fu[List[(Tournament, UserChat)]] =
