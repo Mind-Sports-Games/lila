@@ -33,7 +33,7 @@ final class PublicChat(
     }
 
   private def tournamentChats: Fu[List[(Tournament, UserChat)]] =
-    tournamentApi.fetchRecentlyActive.flatMap { tournaments =>
+    tournamentApi.fetchAllVisibleTournaments.flatMap { tournaments =>
       val ids = tournaments.map(_.id) map Chat.Id.apply
       chatApi.userChat.findAll(ids).map { chats =>
         chats.flatMap { chat =>
@@ -43,7 +43,7 @@ final class PublicChat(
     }
 
   private def swissChats: Fu[List[(Swiss, UserChat)]] =
-    swissEnv.api.fetchRecentlyActive.flatMap { swissList =>
+    swissEnv.api.fetchAllVisibleTournaments.flatMap { swissList =>
       val ids = swissList.map(_.id.value) map Chat.Id.apply
       chatApi.userChat.findAll(ids).map { chats =>
         chats.flatMap { chat =>

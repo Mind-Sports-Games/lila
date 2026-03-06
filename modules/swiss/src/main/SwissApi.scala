@@ -62,14 +62,17 @@ final class SwissApi(
   def createdById(id: Swiss.Id)     = byId(id).dmap(_.filter(_.isCreated))
   def startedById(id: Swiss.Id)     = byId(id).dmap(_.filter(_.isStarted))
 
-  def fetchRecentlyActive: Fu[List[Swiss]] =
+  def fetchAllVisibleTournaments: Fu[List[Swiss]] =
     colls.swiss.list[Swiss]($doc("round" $gt 0, "finishedAt" $exists false)) zip
       colls.swiss
         .find($doc("finishedAt" $gte DateTime.now.minusHours(2)))
         .sort($sort desc "finishedAt")
         .cursor[Swiss]()
-        .list(20) map { case (started, finished) =>
-        started ::: finished
+        .list(20) zip
+      colls.swiss.list[Swiss](
+        $doc("round" -> 0, "finishedAt" $exists false, "startsAt" $lt DateTime.now.plusMinutes(6 * 60))
+      ) map { case ((started, finished), created) =>
+        created ::: started ::: finished
       }
 
   def create(data: SwissForm.SwissData, me: User, teamId: TeamID): Fu[Swiss] = {
