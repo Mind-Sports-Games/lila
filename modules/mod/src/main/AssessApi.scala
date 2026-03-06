@@ -78,7 +78,7 @@ final class AssessApi(
               }
               .map { case (pov, analysis) =>
                 gameRepo.holdAlert game pov.game flatMap { holdAlerts =>
-                  createPlayerAssessment(PlayerAssessment.make(pov, analysis, holdAlerts(pov.playerIndex)))
+                  createPlayerAssessment(PlayerAssessment.make(pov, Some(analysis), holdAlerts(pov.playerIndex)))
                 }
               }
               .sequenceFu
@@ -143,8 +143,8 @@ final class AssessApi(
         else if (game.createdAt isBefore bottomDate) false
         else true
       shouldAssess.?? {
-        createPlayerAssessment(PlayerAssessment.make(game pov P1, analysis, holdAlerts.p1)) >>
-          createPlayerAssessment(PlayerAssessment.make(game pov P2, analysis, holdAlerts.p2))
+        createPlayerAssessment(PlayerAssessment.make(game pov P1, Some(analysis), holdAlerts.p1)) >>
+          createPlayerAssessment(PlayerAssessment.make(game pov P2, Some(analysis), holdAlerts.p2))
       } >> {
         (shouldAssess && thenAssessUser) ?? {
           game.p1Player.userId.??(assessUser) >> game.p2Player.userId.??(assessUser)
@@ -257,27 +257,28 @@ final class AssessApi(
           else none
         }
 
-    // For non-analysable variants (no Fishnet engine), directly report players with
-    // both very high blur rate and highly consistent move times. Thresholds are
-    // deliberately stricter than the engine-assisted path to compensate for the
-    // absence of ACPL/accuracy confirmation.
+    // For non-analysable variants (no Fishnet engine), build PlayerAssessment records
+    // using blur and move-time flags only (engine accuracy flags are set to false).
+    // This feeds the same PlayerAggregateAssessment / assessUser pipeline as analysed games.
     val assessUnanalysableGames: Funit =
-      if (!game.analysable && isEligibleForAssessment) {
-        game.players.foreach { player =>
-          val blurPct = game.playerBlurPercent(player.playerIndex)
-          // noFastCoefVariation already gates on noFastPlies internally
-          val cv = noFastCoefVariation(player)
-          if (blurPct >= 90 && cv.exists(_ < 0.25f)) {
-            val user  = player.playerIndex.fold(p1, p2)
-            val cvStr = cv.fold("?")(v => f"$v%.2f")
-            reporter ! lila.hub.actorApi.report.Cheater(
-              user.id,
-              s"Blur rate ${blurPct}% with highly consistent move times (CV $cvStr) in ${game.variant.name} game ${game.id}"
-            )
+      if (!game.analysable && isEligibleForAssessment)
+        gameRepo.holdAlert game game flatMap { holdAlerts =>
+          def consistentMoveTimes(player: Player) =
+            Statistics.moderatelyConsistentPlyTimes(Pov(game, player))
+          val shouldAssess =
+            (Player.HoldAlert suspicious holdAlerts) ||
+              (game.players exists consistentMoveTimes) ||
+              (game.players exists { p => game.playerBlurPercent(p.playerIndex) > 70 })
+          shouldAssess.?? {
+            createPlayerAssessment(PlayerAssessment.make(game pov P1, None, holdAlerts.p1)) >>
+              createPlayerAssessment(PlayerAssessment.make(game pov P2, None, holdAlerts.p2))
+          } >> {
+            shouldAssess ?? {
+              game.p1Player.userId.??(assessUser) >> game.p2Player.userId.??(assessUser)
+            }
           }
         }
-        funit
-      } else funit
+      else funit
 
     shouldAnalyse.map {
       _ ?? { reason =>
