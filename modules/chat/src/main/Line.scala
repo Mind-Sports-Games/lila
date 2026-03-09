@@ -64,12 +64,12 @@ object Line {
     lineToStr
   )
 
-  private val UserLineRegex = """(?s)([\w-~]{2,}+)([ !?%])(.++)""".r
+  private val UserLineRegex = """(?s)([\w-~]{2,}+)([ !?])(.++)""".r
   private def strToUserLine(str: String): Option[UserLine] =
     str match {
       case UserLineRegex(username, sep, text) =>
-        val troll   = sep == "!" || sep == "%"
-        val deleted = sep == "?" || sep == "%"
+        val troll   = sep == "!"
+        val deleted = sep == "?"
         username split titleSep match {
           case Array(title, name) =>
             UserLine(name, Title get title, text, troll = troll, deleted = deleted).some
@@ -79,8 +79,7 @@ object Line {
     }
   def userLineToStr(x: UserLine): String = {
     val sep =
-      if (x.troll && x.deleted) "%"
-      else if (x.troll) "!"
+      if (x.troll) "!"
       else if (x.deleted) "?"
       else " "
     val tit = x.title.??(_.value + titleSep)

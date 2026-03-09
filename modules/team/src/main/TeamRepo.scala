@@ -98,6 +98,13 @@ final class TeamRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionCont
       )
       .void
 
+  def allWithChat: Fu[List[Team]] =
+    coll
+      .find(enabledSelect ++ $doc("chat" $ne Team.ChatFor.NONE))
+      .sort(sortPopular)
+      .cursor[Team](ReadPreference.secondaryPreferred)
+      .list()
+
   def cursor =
     coll
       .find(enabledSelect)

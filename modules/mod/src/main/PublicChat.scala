@@ -1,6 +1,7 @@
 package lila.mod
 
 import lila.chat.{ Chat, UserChat }
+import lila.common.Bus
 import lila.report.Suspect
 import lila.simul.Simul
 import lila.swiss.Swiss
@@ -16,8 +17,8 @@ final class PublicChat(
 )(implicit ec: scala.concurrent.ExecutionContext) {
 
   def all: Fu[(List[(Tournament, UserChat)], List[(Swiss, UserChat)], List[(Simul, UserChat)])] =
-    tournamentChats zip swissChats zip simulChats map { case ((tours, swisses), simuls) =>
-      (tours, swisses, simuls)
+    tournamentChats zip swissChats zip simulChats map {
+      case ((tours, swisses), simuls) => (tours, swisses, simuls)
     }
 
   def deleteAll(userId: User.ID): Funit =
@@ -30,7 +31,10 @@ final class PublicChat(
         .map(chatApi.userChat.delete(_, suspect.user, _.Global))
         .sequenceFu
         .void
-    } >> deleteLobbyChat(suspect)
+    } >> deleteLobbyChat(suspect) >>- Bus.publish(
+      lila.hub.actorApi.security.DeletePublicChats(suspect.user.id),
+      "deleteTeamChats"
+    )
 
   private def deleteLobbyChat(suspect: Suspect): Funit =
     chatApi.userChat.findOption(Chat.Id("lobbyhome")) flatMap {
