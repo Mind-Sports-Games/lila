@@ -53,6 +53,9 @@ final class Env(
   lazy val api = wire[TeamApi]
 
   lila.common.Bus.subscribeFuns(
+    "deleteTeamChats" -> { case lila.hub.actorApi.security.DeletePublicChats(userId) =>
+      api.deleteUserChats(userId).unit
+    },
     "shadowban" -> { case lila.hub.actorApi.mod.Shadowban(userId, true) =>
       api.deleteRequestsByUserId(userId).unit
     },

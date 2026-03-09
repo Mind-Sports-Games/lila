@@ -65,10 +65,10 @@ final class SwissApi(
   def fetchAllVisibleTournaments: Fu[List[Swiss]] =
     colls.swiss.list[Swiss]($doc("round" $gt 0, "finishedAt" $exists false)) zip
       colls.swiss
-        .find($doc("finishedAt" $gte DateTime.now.minusHours(2)))
+        .find($doc("finishedAt" $gte DateTime.now.minusHours(24*7)))
         .sort($sort desc "finishedAt")
         .cursor[Swiss]()
-        .list(20) zip
+        .list(100) zip
       colls.swiss.list[Swiss](
         $doc("round" -> 0, "finishedAt" $exists false, "startsAt" $lt DateTime.now.plusMinutes(6 * 60))
       ) map { case ((started, finished), created) =>
