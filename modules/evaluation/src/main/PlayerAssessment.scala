@@ -55,7 +55,7 @@ object PlayerAssessment {
     )
   }
 
-  def make(pov: Pov, analysis: Analysis, holdAlerts: Option[Player.HoldAlert]): PlayerAssessment = {
+  def make(pov: Pov, analysis: Option[Analysis], holdAlerts: Option[Player.HoldAlert]): PlayerAssessment = {
     import Statistics._
     import pov.{ game, playerIndex }
 
@@ -81,18 +81,22 @@ object PlayerAssessment {
       }
 
     lazy val suspiciousErrorRate: Boolean =
-      listAverage(Accuracy.diffsList(pov, analysis)) < (game.speed match {
-        case Speed.Bullet => 25
-        case Speed.Blitz  => 20
-        case _            => 15
-      })
+      analysis.exists { a =>
+        listAverage(Accuracy.diffsList(pov, a)) < (game.speed match {
+          case Speed.Bullet => 25
+          case Speed.Blitz  => 20
+          case _            => 15
+        })
+      }
 
     lazy val alwaysHasAdvantage: Boolean =
-      !analysis.infos.exists { info =>
-        info.cp.fold(info.mate.fold(false) { a =>
-          a.signum == playerIndex.fold(-1, 1)
-        }) { cp =>
-          playerIndex.fold(cp.centipawns < -100, cp.centipawns > 100)
+      analysis.exists { a =>
+        !a.infos.exists { info =>
+          info.cp.fold(info.mate.fold(false) { m =>
+            m.signum == playerIndex.fold(-1, 1)
+          }) { cp =>
+            playerIndex.fold(cp.centipawns < -100, cp.centipawns > 100)
+          }
         }
       }
 
@@ -158,7 +162,7 @@ object PlayerAssessment {
       assessment = assessment,
       date = DateTime.now,
       basics = basics,
-      analysis = intAvgSd(Accuracy.diffsList(pov, analysis)),
+      analysis = intAvgSd(analysis.fold(List.empty[Int])(Accuracy.diffsList(pov, _))),
       flags = flags,
       tcFactor = tcFactor.some
     )
