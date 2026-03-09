@@ -95,6 +95,13 @@ final class TournamentRepo(val coll: Coll, playerCollName: CollName)(implicit
       .cursor[Tournament]()
       .list(limit)
 
+  private[tournament] def allFinished(limit: Int): Fu[List[Tournament]] =
+    coll
+      .find(finishedSelect)
+      .sort($sort desc "startsAt")
+      .cursor[Tournament]()
+      .list(limit)
+
   private[tournament] def byOwnerAdapter(owner: User) =
     new lila.db.paginator.Adapter[Tournament](
       collection = coll,
@@ -260,6 +267,9 @@ final class TournamentRepo(val coll: Coll, playerCollName: CollName)(implicit
 
   def scheduledCreated(aheadMinutes: Int): Fu[List[Tournament]] =
     coll.list[Tournament](startingSoonSelect(aheadMinutes) ++ scheduledSelect)
+
+  def allCreatedStartingSoon(aheadMinutes: Int): Fu[List[Tournament]] =
+    coll.list[Tournament](startingSoonSelect(aheadMinutes))
 
   def scheduledStarted: Fu[List[Tournament]] =
     coll.list[Tournament](startedSelect ++ scheduledSelect)

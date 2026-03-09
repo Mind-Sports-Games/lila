@@ -92,11 +92,7 @@ $mq-picture: $mq-medium;
 
   .services {
     margin: 5px 0 10px 0;
-    display: none;
-
-    @include breakpoint($mq-large) {
-      display: block;
-    }
+    display: block;
   }
 
   .service {

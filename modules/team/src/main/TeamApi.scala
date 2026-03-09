@@ -305,6 +305,25 @@ final class TeamApi(
   def filterExistingIds(ids: Set[String]): Fu[Set[Team.ID]] =
     teamRepo.coll.distinctEasy[Team.ID, Set]("_id", $doc("_id" $in ids), ReadPreference.secondaryPreferred)
 
+  def fetchAllWithChat: Fu[List[Team]] =
+    teamRepo.allWithChat
+
+  def deleteUserChats(userId: User.ID): Funit =
+    userRepo.byId(userId) flatMap {
+      _ ?? { user =>
+        teamRepo.allWithChat.flatMap { teams =>
+          val ids = teams.map(_.id) map lila.chat.Chat.Id.apply
+          chatApi.userChat.findAll(ids).flatMap { chats =>
+            chats
+              .filter(_ hasLinesOf user)
+              .map(chatApi.userChat.delete(_, user, _.Global))
+              .sequenceFu
+              .void
+          }
+        }
+      }
+    }
+
   def autocomplete(term: String, max: Int): Fu[List[Team]] =
     teamRepo.coll
       .find(

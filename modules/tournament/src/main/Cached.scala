@@ -123,4 +123,9 @@ final private[tournament] class Cached(
     _.refreshAfterWrite(15 seconds)
       .buildAsyncFuture(_ => tournamentRepo.notableFinished(20))
   }
+
+  private[tournament] val allFinishedCache = cacheApi.unit[List[Tournament]] {
+    _.refreshAfterWrite(15 seconds)
+      .buildAsyncFuture(_ => tournamentRepo.allFinished(100))
+  }
 }
