@@ -16,7 +16,7 @@ Fork of Lichess. Multi-game strategy platform. Scala (Play framework) + TypeScri
 
 ## Notes
 
-- **strategygames** (Scala): backend game logic library (see playstrategy/strategygames repo)
-- **chessground** (TypeScript): board rendering library (local fork, see playstrategy/chessground repo)
+- **strategygames** (Scala): backend game logic library (see strategygames repo)
+- **chessground** (TypeScript): board rendering library (see chessground repo)
 - **stratops** (TypeScript): frontend game operations library — used in analysis, puzzles, and round notation/replay display, but not for core game/move logic
 - Variant CSS classes: `variant-{variant.key}` on board/mini-game elements (e.g. `variant-atomic`)
