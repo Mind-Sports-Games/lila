@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 60 60">
+    <defs>
+        <linearGradient id="bwK_grad">
+            <stop offset="0" stop-color="#dfb459"/>
+            <stop offset=".041" stop-color="#dead54"/>
+            <stop offset=".082" stop-color="#e1b85f"/>
+            <stop offset=".165" stop-color="#dba84d"/>
+            <stop offset=".305" stop-color="#dfb765"/>
+            <stop offset=".539" stop-color="#d8a94e"/>
+            <stop offset=".586" stop-color="#d5ab53"/>
+            <stop offset=".84" stop-color="#e0bf6e"/>
+            <stop offset=".924" stop-color="#daae52"/>
+            <stop offset=".962" stop-color="#d9af57"/>
+            <stop offset="1" stop-color="#e1b663"/>
+        </linearGradient>
+        <linearGradient xlink:href="#bwK_grad" id="bwK_fill" x1="-30.849" x2="-15.094" y1="30.267" y2="30.267" gradientUnits="userSpaceOnUse" spreadMethod="repeat"/>
+        <filter id="bwK_shadow">
+            <feGaussianBlur in="SourceAlpha" result="blur" stdDeviation="2"/>
+            <feOffset dx="2" dy="2" result="offsetBlur"/>
+            <feBlend in="SourceGraphic" in2="offsetBlur"/>
+        </filter>
+        <clipPath id="bwK_left">
+            <rect x="0" y="0" width="30" height="60"/>
+        </clipPath>
+        <clipPath id="bwK_right">
+            <rect x="30" y="0" width="30" height="60"/>
+        </clipPath>
+    </defs>
+
+    <!-- Piece tile background -->
+    <g fill="#75581b" filter="url(#bwK_shadow)">
+        <path fill="#84631f" d="m30.236 7.139-12.839 3.609-6.865 43.28-.815.001.63 1.168H50.28c-2.303-14.885-4.075-30.55-6.79-44.162l-.628-1.17.203 1.045z"/>
+    </g>
+    <path fill="url(#bwK_fill)" d="m-10.96 6.237-12.838 3.608-7.051 44.45H9.085c-2.303-14.885-4.076-30.55-6.79-44.163z" transform="translate(40.568 -.267)"/>
+    <path fill="#654b13" d="m9.719 54.029.629 1.168H50.28l-.628-1.168z"/>
+
+    <!-- Left half: outer kanji shape filled solid black -->
+    <g clip-path="url(#bwK_left)">
+        <path fill="#000" d="M18.902 18.31a.764.687 0 0 0-.734.88l.966 2.982a.764.687 0 0 0 .733.495h7.482v7.03h-5.476a.764.687 0 0 0-.724.466l-.966 2.576a.764.687 0 0 0 .725.908h6.441v8.114H16.616a.764.687 0 0 0-.733.495l-.968 2.982a.764.687 0 0 0 .733.879h28.076a.764.687 0 0 0 .733-.88l-.966-2.981a.764.687 0 0 0-.733-.495H31.894v-8.114h6.259a.764.687 0 0 0 .722-.908l-.966-2.576a.764.687 0 0 0-.724-.466h-5.291v-7.03h7.527a.764.687 0 0 0 .733-.495l.966-2.982a.764.687 0 0 0-.733-.88z"/>
+    </g>
+
+    <!-- Right half: same outer path, outline only, scaled to align edges with filled left -->
+    <g clip-path="url(#bwK_right)" transform="translate(30, 32) scale(1.01, 0.98) translate(-30, -32)">
+        <path fill="none" stroke="#000" stroke-width="0.6" d="M18.902 18.31a.764.687 0 0 0-.734.88l.966 2.982a.764.687 0 0 0 .733.495h7.482v7.03h-5.476a.764.687 0 0 0-.724.466l-.966 2.576a.764.687 0 0 0 .725.908h6.441v8.114H16.616a.764.687 0 0 0-.733.495l-.968 2.982a.764.687 0 0 0 .733.879h28.076a.764.687 0 0 0 .733-.88l-.966-2.981a.764.687 0 0 0-.733-.495H31.894v-8.114h6.259a.764.687 0 0 0 .722-.908l-.966-2.576a.764.687 0 0 0-.724-.466h-5.291v-7.03h7.527a.764.687 0 0 0 .733-.495l.966-2.982a.764.687 0 0 0-.733-.88z"/>
+    </g>
+</svg>
