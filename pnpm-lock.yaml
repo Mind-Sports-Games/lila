@@ -4,6 +4,9 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
+overrides:
+  chessground: link:../../../.local/share/pnpm/global/5/node_modules/chessground
+
 importers:
 
   .:
@@ -12,8 +15,8 @@ importers:
         specifier: github:lichess-org/ab-stub
         version: https://codeload.github.com/lichess-org/ab-stub/tar.gz/94236bf34dbc9c05daf50f4c9842d859b9142be0
       chessground:
-        specifier: github:Mind-Sports-Games/chessground#v7.11.1-pstrat3.30
-        version: https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/4442c9baf683facdd89c523ed80a5c6f09c430d2
+        specifier: link:../../../.local/share/pnpm/global/5/node_modules/chessground
+        version: link:../../../.local/share/pnpm/global/5/node_modules/chessground
       stratops:
         specifier: github:Mind-Sports-Games/stratops#v0.8.1-pstrat5.26
         version: https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/f79ca222fc81a218d8085031acc04e4237b2b613
@@ -839,11 +842,6 @@ packages:
   chess.js@https://codeload.github.com/ornicar/chess.js/tar.gz/ad0709c0b07773d9d0da8e4605a9a2a28f00d249:
     resolution: {tarball: https://codeload.github.com/ornicar/chess.js/tar.gz/ad0709c0b07773d9d0da8e4605a9a2a28f00d249}
     version: 0.10.2
-
-  chessground@https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/4442c9baf683facdd89c523ed80a5c6f09c430d2:
-    resolution: {tarball: https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/4442c9baf683facdd89c523ed80a5c6f09c430d2}
-    version: 7.11.1-pstrat3.30
-    engines: {node: ^20.19.4, pnpm: ^10.17.0}
 
   chokidar@3.6.0:
     resolution: {integrity: sha512-7VT13fmjotKpGipCW9JEQAusEPE+Ei8nl6/g4FBAmIm0GOOLMua9NDDo/DWp0ZAxCr3cPq5ZpBqmPAQgDda2Pw==}
@@ -1786,8 +1784,6 @@ snapshots:
       color-convert: 1.9.3
 
   chess.js@https://codeload.github.com/ornicar/chess.js/tar.gz/ad0709c0b07773d9d0da8e4605a9a2a28f00d249: {}
-
-  chessground@https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/4442c9baf683facdd89c523ed80a5c6f09c430d2: {}
 
   chokidar@3.6.0:
     dependencies:

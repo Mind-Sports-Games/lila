@@ -12,6 +12,8 @@ cg-board {
   line-height: 0;
   background-size: cover;
 
+  -webkit-tap-highlight-color: transparent;
+
   .manipulable & {
     cursor: pointer;
   }
