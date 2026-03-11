@@ -28,15 +28,12 @@
   "lint-staged": {
     "*.{js,ts,md,json,scss}": "prettier --write"
   },
-  "packageManager": "pnpm@10.31.0",
+  "packageManager": "pnpm@10.17.0",
   "pnpm": {
     "onlyBuiltDependencies": [
       "chessground",
       "stratops"
-    ],
-    "overrides": {
-      "chessground": "link:../../../.local/share/pnpm/global/5/node_modules/chessground"
-    }
+    ]
   },
   "devDependencies": {
     "@types/node": "^20.19.4",
@@ -52,7 +49,7 @@
   },
   "dependencies": {
     "ab": "github:lichess-org/ab-stub",
-    "chessground": "file:../chessground",
+    "chessground": "github:Mind-Sports-Games/chessground#v7.11.1-pstrat3.31",
     "stratops": "github:Mind-Sports-Games/stratops#v0.8.1-pstrat5.26",
     "xml2js": "^0.6.2"
   },
