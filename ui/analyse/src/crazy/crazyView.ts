@@ -5,7 +5,7 @@ import { onInsert } from '../util';
 import AnalyseCtrl from '../ctrl';
 
 const eventNames1 = ['mousedown', 'touchmove'];
-const eventNames2 = ['click'];
+const eventNames2 = ['click', 'touchstart'];
 const pieceRoles: cg.Role[] = ['p-piece', 'n-piece', 'b-piece', 'r-piece', 'q-piece'];
 const pieceShogiRoles: cg.Role[] = ['p-piece', 'l-piece', 'n-piece', 's-piece', 'g-piece', 'b-piece', 'r-piece'];
 const pieceMiniShogiRoles: cg.Role[] = ['p-piece', 's-piece', 'g-piece', 'b-piece', 'r-piece'];
@@ -64,6 +64,16 @@ export default function (ctrl: AnalyseCtrl, playerIndex: PlayerIndex, position: 
               'data-role': role,
               'data-playerindex': playerIndex,
               'data-nb': nb,
+            },
+            onclick: (e: MouseEvent) => {
+              e.preventDefault();
+              e.stopPropagation();
+              selectToDrop(ctrl, playerIndex, e);
+            },
+            ontouchstart: (e: TouchEvent) => {
+              e.preventDefault();
+              e.stopPropagation();
+              selectToDrop(ctrl, playerIndex, e);
             },
           }),
         ),

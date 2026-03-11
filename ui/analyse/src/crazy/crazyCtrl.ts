@@ -43,17 +43,25 @@ export function selectToDrop(ctrl: AnalyseCtrl, playerIndex: PlayerIndex, e: cg.
   if (ctrl.chessground.state.movable.playerIndex !== playerIndex) return;
   const el = e.target as HTMLElement,
     role = el.getAttribute('data-role') as cg.Role,
-    //playerIndex = el.getAttribute('data-playerindex') as cg.PlayerIndex,
     number = el.getAttribute('data-nb');
   if (!role || !playerIndex || number === '0') return;
   const dropMode = ctrl.chessground?.state.dropmode;
   const dropPiece = ctrl.chessground?.state.dropmode.piece;
   if (dragDropMode) {
     dragDropMode = false;
-  } else if (!dropMode.active || dropPiece?.role !== role) {
-    setDropMode(ctrl.chessground.state, { playerIndex, role });
-  } else {
+    e.stopPropagation();
+    e.preventDefault();
+    ctrl.redraw();
+    return;
+  }
+  if (ctrl.chessground?.state.selected) {
+    ctrl.cancelMove();
+    ctrl.chessground.selectSquare(null);
+  }
+  if (dropMode.active && dropPiece?.role === role && dropPiece?.playerIndex === playerIndex) {
     cancelDropMode(ctrl.chessground.state);
+  } else {
+    setDropMode(ctrl.chessground.state, { playerIndex, role });
   }
   e.stopPropagation();
   e.preventDefault();
