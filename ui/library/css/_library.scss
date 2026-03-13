@@ -87,6 +87,15 @@
     font-size: 175%;
   }
 
+  .library__tv {
+    width: 224px;
+    margin-bottom: 2em;
+
+    .mini-game {
+      overflow: visible;
+    }
+  }
+
   .section-title {
     display: flex;
     align-items: center;

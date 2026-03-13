@@ -8,7 +8,7 @@ import lila.app.templating.Environment._
 import lila.app.ui.ScalatagsTemplate._
 import lila.common.String.html.safeJsonValue
 import lila.i18n.{ I18nKeys => trans, VariantKeys }
-import lila.game.{ MonthlyGameData, WinRatePercentages }
+import lila.game.{ Game, MonthlyGameData, Pov, WinRatePercentages }
 import lila.rating.PerfType
 import lila.user.User
 import lila.tournament.Tournament
@@ -25,7 +25,8 @@ object show {
       monthlyGameData: List[MonthlyGameData],
       winRates: List[WinRatePercentages],
       leaderboard: List[User.LightPerf],
-      tours: List[Tournament]
+      tours: List[Tournament],
+      featuredGame: Option[Game] = None
   )(implicit ctx: Context) =
     views.html.base.layout(
       title = s"${VariantKeys.variantName(variant)} • ${VariantKeys.variantTitle(variant)}",
@@ -110,6 +111,11 @@ object show {
             trans.createAGame()
           )
         ),
+        featuredGame map { g =>
+          div(cls := "library__tv")(
+            views.html.game.mini(Pov naturalOrientation g, tv = true)
+          )
+        },
         tours.nonEmpty option tournamentList(tours),
         leaderboard.nonEmpty option userTopPerf(leaderboard, PerfType(variant, Speed.Blitz)),
         div(cls := "library-stats-table")(
