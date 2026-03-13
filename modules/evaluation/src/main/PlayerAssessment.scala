@@ -6,7 +6,7 @@ import lila.analyse.{ Accuracy, Analysis }
 import lila.game.{ Game, Player, Pov }
 import lila.user.User
 
-import strategygames.{ Player => PlayerIndex, Speed }
+import strategygames.{ GameFamily, Player => PlayerIndex, Speed }
 
 case class PlayerAssessment(
     _id: String,
@@ -34,6 +34,18 @@ object PlayerAssessment {
 
   private def highestChunkBlursOf(pov: Pov) =
     pov.player.blurs.booleans.sliding(12).map(_.count(identity)).max
+
+  private val fastActionVariants =
+    (GameFamily.Go().variants ++
+      GameFamily.Oware().variants ++
+      GameFamily.Togyzkumalak().variants ++
+      GameFamily.Flipello().variants).toSet
+
+  private def fastActionVariantAndFastMoves(pov: Pov): Boolean =
+    fastActionVariants.contains(pov.game.variant) &&
+      Statistics.listAverage(
+        ~pov.game.plyTimes(pov.playerIndex) map (_.roundTenths)
+      ) < 15 // avg move < 1.5s
 
   private def highlyConsistentMoveTimeStreaksOf(pov: Pov): Boolean =
     pov.game.clock.exists(_.estimateTotalSeconds > 60) && {
@@ -105,7 +117,7 @@ object PlayerAssessment {
       alwaysHasAdvantage,
       highBlurRate || highChunkBlurRate,
       moderateBlurRate || moderateChunkBlurRate,
-      highlyConsistentPlyTimes || highlyConsistentMoveTimeStreaksOf(pov),
+      (highlyConsistentPlyTimes || highlyConsistentMoveTimeStreaksOf(pov)) && !fastActionVariantAndFastMoves(pov),
       moderatelyConsistentPlyTimes(pov),
       noFastPlies(pov),
       basics.hold
