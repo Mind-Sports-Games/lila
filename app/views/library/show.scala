@@ -12,7 +12,7 @@ import lila.game.{ Game, MonthlyGameData, Pov, WinRatePercentages }
 import lila.rating.PerfType
 import lila.user.User
 import lila.tournament.Tournament
-import lila.puzzle.Puzzle
+import lila.puzzle.{ Puzzle, DailyPuzzle }
 import play.api.i18n.Lang
 
 import strategygames.variant.Variant
@@ -26,7 +26,8 @@ object show {
       winRates: List[WinRatePercentages],
       leaderboard: List[User.LightPerf],
       tours: List[Tournament],
-      featuredGame: Option[Game] = None
+      featuredGame: Option[Game] = None,
+      dailyPuzzle: Option[DailyPuzzle.WithHtml] = None
   )(implicit ctx: Context) =
     views.html.base.layout(
       title = s"${VariantKeys.variantName(variant)} • ${VariantKeys.variantTitle(variant)}",
@@ -111,6 +112,9 @@ object show {
             trans.createAGame()
           )
         ),
+        dailyPuzzle map { p =>
+          views.html.puzzle.embed.dailyLink(p)(ctx.lang)(cls := "library__puzzle")
+        },
         featuredGame map { g =>
           div(cls := "library__tv")(
             views.html.game.mini(Pov naturalOrientation g, tv = true)

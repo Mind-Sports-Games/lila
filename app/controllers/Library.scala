@@ -4,6 +4,7 @@ import strategygames.variant.Variant
 
 import lila.app._
 import lila.memo.CacheApi._
+import lila.puzzle.Puzzle
 
 final class Library(env: Env) extends LilaController(env) {
 
@@ -31,7 +32,10 @@ final class Library(env: Env) extends LilaController(env) {
             tours        <- env.tournament.cached.onLibraryPage.getUnit.nevermind
             filteredTours = tours.filter(_.variant.key == variant.key)
             featuredGame <- tvChannel.fold(fuccess(none[lila.game.Game]))(env.tv.tv.getGame)
-          } yield Ok(views.html.library.show(variant, monthlyGameData, winRates, leaderboard, filteredTours, featuredGame))
+            dailyPuzzle <- Puzzle.puzzleVariants
+              .exists(_.key == variant.key)
+              .??(env.puzzle.daily.getForVariant(variant))
+          } yield Ok(views.html.library.show(variant, monthlyGameData, winRates, leaderboard, filteredTours, featuredGame, dailyPuzzle))
         }
         case None => NotFound("Variant not found").fuccess
       }

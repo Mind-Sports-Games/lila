@@ -25,6 +25,24 @@ final private[puzzle] class DailyPuzzle(
 
   def get: Fu[Option[DailyPuzzle.WithHtml]] = cache.getUnit
 
+  private val variantCache =
+    cacheApi[String, Option[DailyPuzzle.WithHtml]](32, "puzzle.daily.variant") {
+      _.refreshAfterWrite(5 minutes)
+        .buildAsyncFuture(findLastForVariantKey)
+    }
+
+  def getForVariant(variant: strategygames.variant.Variant): Fu[Option[DailyPuzzle.WithHtml]] =
+    variantCache.get(variant.key)
+
+  private def findLastForVariantKey(key: String): Fu[Option[DailyPuzzle.WithHtml]] =
+    strategygames.variant.Variant.all.find(_.key == key).fold(fuccess(none[DailyPuzzle.WithHtml])) { variant =>
+      colls.puzzle {
+        _.find($doc(F.day $exists true, F.lib -> variant.gameLogic.id, F.variant -> variant.id))
+          .sort($doc(F.day -> -1))
+          .one[Puzzle]
+      } flatMap { _ ?? makeDaily }
+    }
+
   private def find: Fu[Option[DailyPuzzle.WithHtml]] =
     (findCurrent orElse findNew) recover { case e: Exception =>
       logger.error("find daily", e)
