@@ -1,9 +1,9 @@
 package lila.study
 
 import strategygames.format.pgn.Glyphs
-import strategygames.format.{ Forsyth, Uci, UciCharPair, UciDump }
+import strategygames.format.{ Forsyth, Uci, UciCharPair }
 import strategygames.variant.Variant
-import strategygames.{ Division, Game, GameLogic, Player => PlayerIndex, Replay }
+import strategygames.{ Division, Game, Player => PlayerIndex, Replay }
 import play.api.libs.json._
 import scala.concurrent.duration._
 
@@ -39,27 +39,7 @@ object ServerEval {
               chapterId = chapter.id.value,
               initialFen = chapter.root.fen.some,
               variant = chapter.setup.variant,
-              moves = UciDump(
-                lib = chapter.setup.variant.gameLogic,
-                //TODO upgrade for multiaction but fine for now as ServerEval only handles single action games
-                actionStrs = chapter.root.mainline.map(_.move.san).map(Vector(_)),
-                initialFen = chapter.root.fen.some,
-                variant = chapter.setup.variant,
-                finalSquare = chapter.setup.variant.gameLogic match {
-                  case GameLogic.Draughts() => true
-                  case _                    => false
-                }
-              ).toOption
-                .map(
-                  //TODO upgrade for multiaction but fine for now as ServerEval only handles single action games
-                  _.flatten.toList.flatMap(m =>
-                    Uci.apply(
-                      chapter.setup.variant.gameLogic,
-                      chapter.setup.variant.gameFamily,
-                      m
-                    )
-                  )
-                ) | List.empty,
+              moves = chapter.root.mainline.map(_.move.uci).toList,
               userId = userId,
               unlimited = unlimited
             )
