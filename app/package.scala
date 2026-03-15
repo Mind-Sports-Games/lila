@@ -11,4 +11,5 @@ package object app extends PackageObject {
 
   implicit def writeableOfFrag(implicit codec: Codec): Writeable[Frag] =
     Writeable(frag => codec.encode(frag.render))
+
 }

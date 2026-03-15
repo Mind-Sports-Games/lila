@@ -4,9 +4,7 @@ import reactivemongo.api.bson._
 
 import lila.db.BSON
 import lila.db.dsl._
-import play.api.libs.json._
 import lila.pref.PieceSet
-import scala.util.{ Success }
 
 private object PrefHandlers {
 
@@ -36,7 +34,7 @@ private object PrefHandlers {
 
     def reads(r: BSON.Reader): Pref =
       Pref(
-        _id = r str "_id",
+        _id = r `str` "_id",
         bg = r.getD("bg", Pref.default.bg),
         bgImg = r.strO("bgImg"),
         color = r.getD("color", Pref.default.color),

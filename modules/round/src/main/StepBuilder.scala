@@ -18,7 +18,7 @@ object StepBuilder {
       activePlayer: Player,
       variant: Variant,
       initialFen: FEN
-  ): JsArray = {
+  ): JsArray =
     Replay.gameWithUciWhileValid(
       variant.gameLogic,
       actionStrs,
@@ -79,7 +79,6 @@ object StepBuilder {
           (initStep :: moveSteps).map(_.toJson)
         }
     }
-  }
 
   private val logChessError = (id: String) =>
     (err: String) => {

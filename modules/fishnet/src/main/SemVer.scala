@@ -52,7 +52,7 @@ object SemVer {
   def isSnapshotVersion(v: String): Boolean = v.trim.endsWith(Snapshot)
 
   def isIntegrationVersion(v: String): Boolean = {
-    val Rx = """(\d+).(\d+).(\d+).(\d{14})""".r
+    val Rx = """(\d+)(\d+)(\d+)(\d{14})""".r
     v match {
       case Rx(_, _, _, _) => true
       case _              => false
@@ -65,14 +65,13 @@ object SemVer {
 case class SemVer(major: Long, minor: Long, point: Long, extra: Option[String], original: String)
     extends Ordered[SemVer] {
 
-  override def equals(obj: Any): Boolean = {
+  override def equals(obj: Any): Boolean =
     obj match {
       case version: SemVer => this.compareTo(version) == 0
       case _               => false
     }
-  }
 
-  def compare(o: SemVer): Int = {
+  def compare(o: SemVer): Int =
     if (major != o.major) major.compare(o.major)
     else if (minor != o.minor) minor.compare(o.minor)
     else if (point != o.point) point.compare(o.point)
@@ -98,7 +97,6 @@ case class SemVer(major: Long, minor: Long, point: Long, extra: Option[String], 
         case _                     => 0  // Both have no extra: They are the same
       }
     }
-  }
 
   def isSnapshotVersion    = SemVer.isSnapshotVersion(this.original)
   def isIntegrationVersion = SemVer.isIntegrationVersion(this.original)

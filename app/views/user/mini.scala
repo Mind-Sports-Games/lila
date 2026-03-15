@@ -5,7 +5,6 @@ import lila.app.templating.Environment._
 import lila.app.ui.ScalatagsTemplate._
 import lila.user.User
 
-import controllers.routes
 
 object mini {
 
@@ -30,27 +29,27 @@ object mini {
                 title := (!hasRoomForNameText).option(c.name)
               )(
                 img(cls := "flag", src := staticAssetUrl(s"images/flags/${c.code}.png")),
-                hasRoomForNameText option c.shortName
+                hasRoomForNameText `option` c.shortName
               )
             }
           ),
           ping map bits.signalBars
         ),
-        if (u.lame && !ctx.me.has(u) && !isGranted(_.UserModView))
+        if (u.lame && !ctx.me.contains(u) && !isGranted(_.UserModView))
           div(cls := "upt__info__warning")(trans.thisAccountViolatedTos())
         else
           div(cls := "upt__info__ratings")(u.best8Perfs map { showPerfRating(u, _) })
       ),
       ctx.userId map { myId =>
         frag(
-          (myId != u.id && u.enabled) option div(cls := "upt__actions btn-rack")(
+          (myId != u.id && u.enabled) `option` div(cls := "upt__actions btn-rack")(
             a(
               dataIcon := "1",
               cls := "btn-rack__btn",
               title := trans.watchGames.txt(),
               href := routes.User.tv(u.username)
             ),
-            !blocked option frag(
+            !blocked `option` frag(
               a(
                 dataIcon := "c",
                 cls := "btn-rack__btn",
@@ -76,13 +75,13 @@ object mini {
           }
         )
       },
-      isGranted(_.UserModView) option div(cls := "upt__mod")(
+      isGranted(_.UserModView) `option` div(cls := "upt__mod")(
         span(
           trans.nbGames.plural(u.count.game, u.count.game.localize),
           " ",
           momentFromNowOnce(u.createdAt)
         ),
-        (u.lameOrTroll || u.disabled) option span(cls := "upt__mod__marks")(mod.userMarks(u, None))
+        (u.lameOrTroll || u.disabled) `option` span(cls := "upt__mod__marks")(mod.userMarks(u, None))
       ),
       playing.ifFalse(ctx.pref.isBlindfold).map {
         views.html.game.mini(_)

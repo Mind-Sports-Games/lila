@@ -1,7 +1,7 @@
 package lila.blog
 
 import com.softwaremill.macwire._
-import io.methvin.play.autoconfig._
+import lila.common.autoconfig.{ AutoConfig, ConfigName }
 import play.api.Configuration
 import scala.concurrent.duration.FiniteDuration
 
@@ -21,7 +21,7 @@ final class Env(
     ws: play.api.libs.ws.StandaloneWSClient
 ) {
 
-  private val config = appConfig.get[BlogConfig]("blog")(AutoConfig.loader)
+  private val config = appConfig.get[BlogConfig]("blog")(using AutoConfig.loader)
 
   lazy val api = wire[BlogApi]
 

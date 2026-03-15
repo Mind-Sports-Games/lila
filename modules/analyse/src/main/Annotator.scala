@@ -15,7 +15,7 @@ final class Annotator(netDomain: lila.common.config.NetDomain) {
       annotateOpening(game.opening) {
         annotateTurns(
           annotateDrawOffers(p, game.drawOffers, game.variant),
-          analysis.??(_.advices)
+          analysis.so(_.advices)
         )
       }.copy(
         tags = p.tags + Tag(_.Annotator, netDomain)
@@ -51,7 +51,7 @@ final class Annotator(netDomain: lila.common.config.NetDomain) {
       )
     }
 
-  private def annotateDrawOffers(pgn: Pgn, drawOffers: GameDrawOffers, variant: Variant): Pgn =
+  private def annotateDrawOffers(pgn: Pgn, drawOffers: GameDrawOffers, @annotation.nowarn("msg=unused") _variant: Variant): Pgn =
     if (drawOffers.isEmpty) pgn
     else
       drawOffers.normalizedTurns.foldLeft(pgn) { case (pgn, turnCount) =>

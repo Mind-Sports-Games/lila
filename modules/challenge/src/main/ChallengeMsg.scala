@@ -10,7 +10,7 @@ final class ChallengeMsg(msgApi: lila.msg.MsgApi, lightUserApi: LightUserApi)(im
 ) {
 
   def onApiPair(challenge: Challenge)(managedBy: User, template: Option[Template]): Funit =
-    challenge.userIds.map(lightUserApi.async).sequenceFu.flatMap {
+    Future.sequence(challenge.userIds.map(lightUserApi.async)).flatMap {
       _.flatten match {
         case List(u1, u2) => onApiPair(challenge.id, u1, u2)(managedBy.id, template)
         case _            => funit
@@ -21,7 +21,7 @@ final class ChallengeMsg(msgApi: lila.msg.MsgApi, lightUserApi: LightUserApi)(im
       managedById: User.ID,
       template: Option[Template]
   ): Funit =
-    List(u1 -> u2, u2 -> u1)
+    Future.sequence(List(u1 -> u2, u2 -> u1)
       .map { case (u1, u2) =>
         val msg = template
           .fold("Your game with {opponent} is ready: {game}.")(_.value)
@@ -29,7 +29,6 @@ final class ChallengeMsg(msgApi: lila.msg.MsgApi, lightUserApi: LightUserApi)(im
           .replace("{opponent}", s"@${u2.name}")
           .replace("{game}", s"#${gameId}")
         msgApi.post(managedById, u1.id, msg, multi = true)
-      }
-      .sequenceFu
+      })
       .void
 }

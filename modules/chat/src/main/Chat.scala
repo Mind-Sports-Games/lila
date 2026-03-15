@@ -31,7 +31,7 @@ case class UserChat(
   val loginRequired = true
 
   def forUser(u: Option[User]): UserChat =
-    if (u.??(_.marks.troll)) this
+    if (u.so(_.marks.troll)) this
     else copy(lines = lines filterNot (_.troll))
 
   def markDeleted(u: User) =
@@ -49,16 +49,16 @@ case class UserChat(
 
   def userIds = lines.map(_.userId)
 
-  def truncate(max: Int) = copy(lines = lines.drop((lines.size - max) atLeast 0))
+  def truncate(max: Int) = copy(lines = lines.drop((lines.size - max) `atLeast` 0))
 
-  def getlast(num: Int) = copy(lines = lines.takeRight(num atMost lines.size))
+  def getlast(num: Int) = copy(lines = lines.takeRight(num `atMost` lines.size))
 
   def hasRecentLine(u: User): Boolean = lines.reverse.take(12).exists(_.userId == u.id)
 }
 
 object UserChat {
   case class Mine(chat: UserChat, timeout: Boolean) {
-    def truncate(max: Int) = copy(chat = chat truncate max)
+    def truncate(max: Int) = copy(chat = chat `truncate` max)
   }
 }
 
@@ -70,7 +70,7 @@ case class MixedChat(
   val loginRequired = false
 
   def forUser(u: Option[User]): MixedChat =
-    if (u.??(_.marks.troll)) this
+    if (u.so(_.marks.troll)) this
     else
       copy(lines = lines filter {
         case l: UserLine   => !l.troll
@@ -118,19 +118,18 @@ object Chat {
   }
 
   import BSONFields._
-  import reactivemongo.api.bson.BSONDocument
+  import reactivemongo.api.bson.{ BSONArray, BSONDocument }
   import Line.{ lineBSONHandler, userLineBSONHandler }
 
   implicit val chatIdIso: lila.common.Iso[String, Id] = lila.common.Iso.string[Id](Id.apply, _.value)
-  implicit val chatIdBSONHandler: BSONHandler[Id]     = lila.db.BSON.stringIsoHandler(chatIdIso)
+  implicit val chatIdBSONHandler: BSONHandler[Id]     = lila.db.BSON.stringIsoHandler(using chatIdIso)
 
   implicit val mixedChatBSONHandler: BSON[MixedChat] = new BSON[MixedChat] {
-    def reads(r: BSON.Reader): MixedChat = {
+    def reads(r: BSON.Reader): MixedChat =
       MixedChat(
         id = r.get[Id](id),
         lines = r.get[List[Line]](lines)
       )
-    }
     def writes(w: BSON.Writer, o: MixedChat) =
       BSONDocument(
         id    -> o.id,
@@ -139,16 +138,15 @@ object Chat {
   }
 
   implicit val userChatBSONHandler: BSON[UserChat] = new BSON[UserChat] {
-    def reads(r: BSON.Reader): UserChat = {
+    def reads(r: BSON.Reader): UserChat =
       UserChat(
         id = r.get[Id](id),
         lines = r.get[List[UserLine]](lines)
       )
-    }
     def writes(w: BSON.Writer, o: UserChat) =
       BSONDocument(
         id    -> o.id,
-        lines -> o.lines
+        lines -> BSONArray(o.lines.flatMap(userLineBSONHandler.writeOpt))
       )
   }
 }

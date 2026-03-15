@@ -16,7 +16,7 @@ final private class FishnetLimiter(
       case false => fuFalse
       case true  => perDayCheck(sender)
     } flatMap { accepted =>
-      (accepted ?? requesterApi.add(sender.userId, ownGame)) inject accepted
+      (accepted so requesterApi.add(sender.userId, ownGame)) inject accepted
     }
 
   private val RequestLimitPerIP = new lila.memo.RateLimit[IpAddress](
@@ -29,13 +29,12 @@ final private class FishnetLimiter(
     sender match {
       case Work.Sender(_, _, mod, system) if mod || system => fuTrue
       case Work.Sender(userId, ip, _, _) =>
-        !analysisColl.exists(
+        analysisColl.exists(
           $or(
             $doc("sender.ip"     -> ip),
             $doc("sender.userId" -> userId)
           )
-        )
-      case _ => fuFalse
+        ).not
     }
 
   private val maxPerDay  = 35
@@ -53,6 +52,5 @@ final private class FishnetLimiter(
         ip.fold(perUser) { ipAddress =>
           RequestLimitPerIP(ipAddress, cost = 1)(perUser)(fuccess(false))
         }
-      case _ => fuFalse
     }
 }

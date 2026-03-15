@@ -22,5 +22,5 @@ object Day {
     (0 until nb).toList.map { delta =>
       Day(Days.daysBetween(genesis, DateTime.now.minusDays(delta).withTimeAtStartOfDay).getDays)
     }
-
 }
+

@@ -4,7 +4,7 @@ import org.joda.time.DateTime
 import play.api.libs.json._
 
 import strategygames.format.Uci
-import strategygames.{ GameFamily, GameLogic, Move }
+import strategygames.{ GameFamily, Move }
 import lila.common.Json.jodaWrites
 import lila.game.Game
 
@@ -52,8 +52,8 @@ case class Forecast(
       case (None, fst :: snd :: _) if g.plies == fst.ply && fst.is(last.toShortUci) => snd.uciMove
       case (move, _)                                                                => move
     }
-
 }
+
 
 object Forecast {
 

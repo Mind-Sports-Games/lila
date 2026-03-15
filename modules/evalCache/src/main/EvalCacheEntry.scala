@@ -33,7 +33,7 @@ case class EvalCacheEntry(
   def makeBestMultiPvEval(multiPv: Int): Option[Eval] =
     evals
       .find(_.multiPv >= multiPv.atMost(nbMoves))
-      .map(_ takePvs multiPv)
+      .map(_ `takePvs` multiPv)
 
   def similarTo(other: EvalCacheEntry) =
     id == other.id && evals == other.evals
@@ -73,7 +73,7 @@ object EvalCacheEntry {
         pvs = NonEmptyList(pvs.head, pvs.tail.take(multiPv - 1))
       )
 
-    def depthAboveMin = (depth - MIN_DEPTH) atLeast 0
+    def depthAboveMin = (depth - MIN_DEPTH) `atLeast` 0
   }
 
   case class Knodes(value: Int) extends AnyVal {
@@ -102,8 +102,8 @@ object EvalCacheEntry {
     def truncate = copy(value = NonEmptyList(value.head, value.tail.take(MAX_PV_SIZE - 1)))
 
     def gameLogic: GameLogic = value.head.gameLogic
-
   }
+
 
   case class Trust(value: Double) extends AnyVal {
     def isTooLow = value <= 0
@@ -129,7 +129,7 @@ object EvalCacheEntry {
       new SmallFen(str)
     }
     def validate(variant: Variant, fen: FEN): Option[SmallFen] =
-      Forsyth.<<@(variant.gameLogic, variant, fen).exists(_ playable false) option make(variant, fen)
+      Forsyth.<<@(variant.gameLogic, variant, fen).exists(_ `playable` false) `option` make(variant, fen)
   }
 
   case class Id(variant: Variant, smallFen: SmallFen)
@@ -139,7 +139,7 @@ object EvalCacheEntry {
   object Input {
     case class Candidate(variant: Variant, fen: String, eval: Eval) {
       def input =
-        SmallFen.validate(variant, FEN.apply(variant.gameLogic, fen)) ifTrue eval.looksValid map { smallFen =>
+        SmallFen.validate(variant, FEN.apply(variant.gameLogic, fen)) `ifTrue` eval.looksValid map { smallFen =>
           Input(Id(variant, smallFen), FEN.apply(variant.gameLogic, fen), eval.truncatePvs)
         }
     }

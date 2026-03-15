@@ -6,10 +6,8 @@ import org.joda.time.DateTime
 import org.joda.time.format.DateTimeFormat
 import reactivemongo.akkastream.cursorProducer
 import reactivemongo.api.ReadPreference
-import scala.concurrent.duration._
 import scala.concurrent.ExecutionContext
 
-import lila.chat.Chat
 import lila.db.dsl._
 import lila.game.Game
 import lila.user.User
@@ -23,13 +21,13 @@ final class PersonalDataExport(
     chatEnv: lila.chat.Env,
     relationEnv: lila.relation.Env,
     userRepo: lila.user.UserRepo,
-    mongoCacheApi: lila.memo.MongoCache.Api
+    @annotation.nowarn("msg=unused") _mongoCacheApi: lila.memo.MongoCache.Api
 )(implicit ec: ExecutionContext, mat: Materializer) {
 
   private val lightPerSecond = 60
   private val heavyPerSecond = 30
 
-  def apply(user: User): Source[String, _] = {
+  def apply(user: User): Source[String, ?] = {
 
     val intro =
       Source.futureSource {
@@ -40,9 +38,9 @@ final class PersonalDataExport(
               "All dates are UTC",
               bigSep,
               s"Signup date: ${textDate(user.createdAt)}",
-              s"Last seen: ${user.seenAt ?? textDate}",
-              s"Public profile: ${user.profile.??(_.toString)}",
-              s"Email: ${email.??(_.value)}"
+              s"Last seen: ${user.seenAt so textDate}",
+              s"Public profile: ${user.profile.so(_.toString)}",
+              s"Email: ${email.so(_.value)}"
             )
           )
         }
@@ -51,7 +49,7 @@ final class PersonalDataExport(
     val connections =
       Source(List(textTitle("Connections"))) concat
         securityEnv.store.allSessions(user.id).documentSource().throttle(lightPerSecond, 1 second).map { s =>
-          s"${s.date.??(textDate)} ${s.ip} ${s.ua}"
+          s"${s.date.so(textDate)} ${s.ip} ${s.ua}"
         }
 
     val followedUsers =
@@ -92,7 +90,7 @@ final class PersonalDataExport(
           )
         }
         .documentSource()
-        .map { doc => doc.string("l").??(_.drop(user.id.size + 1)) }
+        .map { doc => doc.string("l").so(_.drop(user.id.size + 1)) }
         .throttle(heavyPerSecond, 1 second)
 
     val privateGameChats =
@@ -169,6 +167,6 @@ final class PersonalDataExport(
 
   private def textTitle(t: String) = s"\n${"=" * t.length}\n$t\n${"=" * t.length}\n"
 
-  private val englishDateTimeFormatter = DateTimeFormat forStyle "MS"
-  private def textDate(date: DateTime) = englishDateTimeFormatter print date
+  private val englishDateTimeFormatter = DateTimeFormat `forStyle` "MS"
+  private def textDate(date: DateTime) = englishDateTimeFormatter `print` date
 }

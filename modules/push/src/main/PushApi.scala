@@ -3,10 +3,9 @@ package lila.push
 import akka.actor._
 import play.api.libs.json._
 import scala.concurrent.duration._
-import strategygames.Pos
 
 import lila.challenge.Challenge
-import lila.common.{ Future, LightUser }
+import lila.common.LightUser
 import lila.game.{ Game, Namer, Pov }
 import lila.hub.actorApi.map.Tell
 import lila.hub.actorApi.round.{ IsOnGame, MoveEvent }
@@ -28,9 +27,9 @@ final private class PushApi(
   def finish(game: Game): Funit =
     if (!game.isCorrespondence || game.hasAi) funit
     else
-      game.userIds
+      Future.sequence(game.userIds
         .map { userId =>
-          Pov.ofUserId(game, userId) ?? { pov =>
+          Pov.ofUserId(game, userId) so { pov =>
             IfAway(pov) {
               gameRepo.countWhereUserTurn(userId) flatMap { nbMyTurn =>
                 asyncOpponentName(pov) flatMap { opponent =>
@@ -60,20 +59,19 @@ final private class PushApi(
               }
             }
           }
-        }
-        .sequenceFu
+        })
         .void
 
   def move(move: MoveEvent): Funit =
-    Future.delay(2 seconds) {
+    lila.common.LilaFuture.delay(2 seconds) {
       proxyRepo.game(move.gameId) flatMap {
-        _.filter(_.playable) ?? { game =>
+        _.filter(_.playable) so { game =>
           val pov = Pov(game, game.player.playerIndex)
-          game.player.userId ?? { userId =>
+          game.player.userId so { userId =>
             IfAway(pov) {
               gameRepo.countWhereUserTurn(userId) flatMap { nbMyTurn =>
                 asyncOpponentName(pov) flatMap { opponent =>
-                  game.actionStrs.filter(_.size > 0).map(_.mkString(",")).lastOption ?? { turn =>
+                  game.actionStrs.filter(_.size > 0).map(_.mkString(",")).lastOption so { turn =>
                     pushToAll(
                       userId,
                       _.move,
@@ -98,13 +96,13 @@ final private class PushApi(
     }
 
   def takebackOffer(gameId: Game.ID): Funit =
-    Future.delay(1 seconds) {
+    lila.common.LilaFuture.delay(1 seconds) {
       proxyRepo.game(gameId) flatMap {
-        _.filter(_.playable).?? { game =>
+        _.filter(_.playable).so { game =>
           game.players.collectFirst {
-            case p if p.isProposingTakeback => Pov(game, game opponent p)
-          } ?? { pov => // the pov of the receiver
-            pov.player.userId ?? { userId =>
+            case p if p.isProposingTakeback => Pov(game, game `opponent` p)
+          } so { pov => // the pov of the receiver
+            pov.player.userId so { userId =>
               IfAway(pov) {
                 asyncOpponentName(pov) flatMap { opponent =>
                   pushToAll(
@@ -129,13 +127,13 @@ final private class PushApi(
     }
 
   def drawOffer(gameId: Game.ID): Funit =
-    Future.delay(1 seconds) {
+    lila.common.LilaFuture.delay(1 seconds) {
       proxyRepo.game(gameId) flatMap {
-        _.filter(_.playable).?? { game =>
+        _.filter(_.playable).so { game =>
           game.players.collectFirst {
-            case p if p.isOfferingDraw => Pov(game, game opponent p)
-          } ?? { pov => // the pov of the receiver
-            pov.player.userId ?? { userId =>
+            case p if p.isOfferingDraw => Pov(game, game `opponent` p)
+          } so { pov => // the pov of the receiver
+            pov.player.userId so { userId =>
               IfAway(pov) {
                 asyncOpponentName(pov) flatMap { opponent =>
                   pushToAll(
@@ -160,13 +158,13 @@ final private class PushApi(
     }
 
   def selectSquaresOffer(gameId: Game.ID): Funit =
-    Future.delay(1 seconds) {
+    lila.common.LilaFuture.delay(1 seconds) {
       proxyRepo.game(gameId) flatMap {
-        _.filter(_.playable).?? { game =>
+        _.filter(_.playable).so { game =>
           game.players.collectFirst {
-            case p if p.isOfferingSelectSquares => Pov(game, game opponent p)
-          } ?? { pov => // the pov of the receiver
-            pov.player.userId ?? { userId =>
+            case p if p.isOfferingSelectSquares => Pov(game, game `opponent` p)
+          } so { pov => // the pov of the receiver
+            pov.player.userId so { userId =>
               IfAway(pov) {
                 asyncOpponentName(pov) flatMap { opponent =>
                   pushToAll(
@@ -191,13 +189,13 @@ final private class PushApi(
     }
 
   def acceptSquaresOffer(gameId: Game.ID): Funit =
-    Future.delay(1 seconds) {
+    lila.common.LilaFuture.delay(1 seconds) {
       proxyRepo.game(gameId) flatMap {
-        _.filter(_.playable).?? { game =>
+        _.filter(_.playable).so { game =>
           game.players.collectFirst {
-            case p if p.isOfferingSelectSquares => Pov(game, game opponent p)
-          } ?? { pov => // the pov of the receiver
-            pov.player.userId ?? { userId =>
+            case p if p.isOfferingSelectSquares => Pov(game, game `opponent` p)
+          } so { pov => // the pov of the receiver
+            pov.player.userId so { userId =>
               IfAway(pov) {
                 asyncOpponentName(pov) flatMap { opponent =>
                   pushToAll(
@@ -222,13 +220,13 @@ final private class PushApi(
     }
 
   def declineSquaresOffer(gameId: Game.ID): Funit =
-    Future.delay(1 seconds) {
+    lila.common.LilaFuture.delay(1 seconds) {
       proxyRepo.game(gameId) flatMap {
-        _.filter(_.playable).?? { game =>
+        _.filter(_.playable).so { game =>
           game.players.collectFirst {
-            case p if p.isOfferingSelectSquares => Pov(game, game opponent p)
-          } ?? { pov => // the pov of the receiver
-            pov.player.userId ?? { userId =>
+            case p if p.isOfferingSelectSquares => Pov(game, game `opponent` p)
+          } so { pov => // the pov of the receiver
+            pov.player.userId so { userId =>
               IfAway(pov) {
                 asyncOpponentName(pov) flatMap { opponent =>
                   pushToAll(
@@ -253,7 +251,7 @@ final private class PushApi(
     }
 
   def corresAlarm(pov: Pov): Funit =
-    pov.player.userId ?? { userId =>
+    pov.player.userId so { userId =>
       asyncOpponentName(pov) flatMap { opponent =>
         pushToAll(
           userId,
@@ -280,11 +278,12 @@ final private class PushApi(
 
   def newMsg(t: lila.msg.MsgThread): Funit =
     lightUser(t.lastMsg.user) flatMap {
-      _ ?? { sender =>
-        userRepo.isKid(t other sender) flatMap {
-          !_ ?? {
+      _ so { sender =>
+        userRepo.isKid(t `other` sender) flatMap { isKid =>
+          if (isKid) funit
+          else
             pushToAll(
-              t other sender,
+              t `other` sender,
               _.message,
               PushApi.Data(
                 title = sender.titleName,
@@ -299,16 +298,15 @@ final private class PushApi(
                 )
               )
             )
-          }
         }
       }
     }
 
   def challengeCreate(c: Challenge): Funit =
-    c.destUser ?? { dest =>
-      c.challengerUser.ifFalse(c.hasClock) ?? { challenger =>
+    c.destUser so { dest =>
+      c.challengerUser.ifFalse(c.hasClock) so { challenger =>
         lightUser(challenger.id) flatMap {
-          _ ?? { lightChallenger =>
+          _ so { lightChallenger =>
             pushToAll(
               dest.id,
               _.challenge.create,
@@ -331,8 +329,8 @@ final private class PushApi(
     }
 
   def challengeAccept(c: Challenge, joinerId: Option[String]): Funit =
-    c.challengerUser.ifTrue(c.finalPlayerIndex.p1 && !c.hasClock) ?? { challenger =>
-      joinerId ?? lightUser flatMap { lightJoiner =>
+    c.challengerUser.ifTrue(c.finalPlayerIndex.p1 && !c.hasClock) so { challenger =>
+      joinerId so lightUser flatMap { lightJoiner =>
         pushToAll(
           challenger.id,
           _.challenge.accept,
@@ -383,7 +381,7 @@ final private class PushApi(
       case false => f
     }
 
-  private def asyncOpponentName(pov: Pov): Fu[String] = Namer playerText pov.opponent
+  private def asyncOpponentName(pov: Pov): Fu[String] = Namer `playerText` pov.opponent
 }
 
 private object PushApi {

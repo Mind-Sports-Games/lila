@@ -41,8 +41,10 @@ final class EarlyMultiThrottler(
 
   implicit def scheduler: Scheduler = context.system.scheduler
 
-  def execute(work: Work): Funit =
-    lila.common.Future.makeItLast(work.cooldown) { work.run() }
+  def execute(work: Work): Funit = {
+    given Executor = context.dispatcher
+    lila.common.LilaFuture.makeItLast(work.cooldown) { work.run() }
+  }
 }
 
 object EarlyMultiThrottler {

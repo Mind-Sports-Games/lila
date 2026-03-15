@@ -5,12 +5,11 @@ import lila.app.templating.Environment._
 import lila.app.ui.ScalatagsTemplate._
 import lila.game.Crosstable
 
-import controllers.routes
 
 object crosstable {
 
   def apply(ct: Crosstable.WithMatchup, currentId: Option[String])(implicit ctx: Context): Frag =
-    apply(ct.crosstable, ct.matchup, currentId)(ctx)
+    apply(ct.crosstable, ct.matchup, currentId)(using ctx)
 
   def apply(ct: Crosstable, trueMatchup: Option[Crosstable.Matchup], currentId: Option[String])(implicit
       ctx: Context
@@ -20,7 +19,7 @@ object crosstable {
       (ct.nbGames min Crosstable.maxGames) - m.users.nbGames
     }
     div(cls := "crosstable")(
-      ct.fillSize > 0 option raw { s"""<fill style="flex:${ct.fillSize * 0.75} 1 auto"></fill>""" },
+      ct.fillSize > 0 `option` raw { s"""<fill style="flex:${ct.fillSize * 0.75} 1 auto"></fill>""" },
       ct.results.zipWithIndex.map { case (r, i) =>
         tag("povs")(
           cls := List(

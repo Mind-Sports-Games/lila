@@ -16,9 +16,9 @@ final class ApiJsonView(lightUserApi: LightUserApi)(implicit ec: scala.concurren
 
   def apply(tournaments: VisibleTournaments)(implicit lang: Lang): Fu[JsObject] =
     for {
-      created  <- tournaments.created.map(fullJson).sequenceFu
-      started  <- tournaments.started.map(fullJson).sequenceFu
-      finished <- tournaments.finished.map(fullJson).sequenceFu
+      created  <- Future.sequence(tournaments.created.map(fullJson))
+      started  <- Future.sequence(tournaments.started.map(fullJson))
+      finished <- Future.sequence(tournaments.finished.map(fullJson))
     } yield Json.obj(
       "created"  -> created,
       "started"  -> started,
@@ -26,14 +26,14 @@ final class ApiJsonView(lightUserApi: LightUserApi)(implicit ec: scala.concurren
     )
 
   def featured(tournaments: List[Tournament])(implicit lang: Lang): Fu[JsObject] =
-    tournaments.map(fullJson).sequenceFu map { objs =>
+    Future.sequence(tournaments.map(fullJson)) map { objs =>
       Json.obj("featured" -> objs)
     }
 
   def calendar(tournaments: List[Tournament])(implicit lang: Lang): JsObject =
     Json.obj(
       "since"       -> tournaments.headOption.map(_.startsAt.withTimeAtStartOfDay),
-      "to"          -> tournaments.lastOption.map(_.finishesAt.withTimeAtStartOfDay plusDays 1),
+      "to"          -> tournaments.lastOption.map(_.finishesAt.withTimeAtStartOfDay `plusDays` 1),
       "tournaments" -> JsArray(tournaments.map(baseJson))
     )
 
@@ -72,7 +72,7 @@ final class ApiJsonView(lightUserApi: LightUserApi)(implicit ec: scala.concurren
       )
 
   def fullJson(tour: Tournament)(implicit lang: Lang): Fu[JsObject] =
-    (tour.winnerId ?? lightUserApi.async) map { winner =>
+    (tour.winnerId so lightUserApi.async) map { winner =>
       baseJson(tour).add("winner" -> winner.map(userJson))
     }
 
@@ -92,7 +92,7 @@ final class ApiJsonView(lightUserApi: LightUserApi)(implicit ec: scala.concurren
       "icon"     -> p.iconChar.toString,
       "key"      -> p.key,
       "name"     -> p.trans,
-      "position" -> ~perfPositions.get(p)
+      "position" -> perfPositions.getOrElse(p, 0)
     )
 
   def variantJson(v: Variant)(implicit lang: Lang) =

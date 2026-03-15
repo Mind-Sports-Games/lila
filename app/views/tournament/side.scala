@@ -1,7 +1,6 @@
 package views
 package html.tournament
 
-import controllers.routes
 
 import strategygames.variant.Variant
 import strategygames.format.FEN
@@ -45,7 +44,7 @@ object side {
                   else VariantKeys.variantName(tour.variant)
                 )
               } else tour.perfType.trans,
-              tour.position.isDefined ?? s"$separator${trans.thematic.txt()}",
+              tour.position.isDefined so s"$separator${trans.thematic.txt()}",
               separator,
               tour.durationString
             ),
@@ -57,7 +56,7 @@ object side {
             separator,
             "Arena",
             (isGranted(_.ManageTournament) || (ctx.userId
-              .has(tour.createdBy) && !tour.isFinished)) option frag(
+              .has(tour.createdBy) && !tour.isFinished)) `option` frag(
               " ",
               a(href := routes.Tournament.edit(tour.id), title := "Edit tournament")(iconTag("%"))
             )
@@ -86,8 +85,8 @@ object side {
         tour.description map { d =>
           st.section(cls := "description")(markdownLinksOrRichText(d))
         },
-        tour.looksLikePrize option bits.userPrizeDisclaimer(tour.createdBy),
-        verdicts.relevant option st.section(
+        tour.looksLikePrize `option` bits.userPrizeDisclaimer(tour.createdBy),
+        verdicts.relevant `option` st.section(
           dataIcon := (if (ctx.isAuth && verdicts.accepted) "E"
                        else "L"),
           cls := List(
@@ -97,7 +96,7 @@ object side {
           )
         )(
           div(
-            verdicts.list.sizeIs < 2 option p(trans.conditionOfEntry()),
+            verdicts.list.sizeIs < 2 `option` p(trans.conditionOfEntry()),
             verdicts.list map { v =>
               p(
                 cls := List(
@@ -114,7 +113,7 @@ object side {
             }
           )
         ),
-        (!tour.noBerserk && tour.clock.berserkable) option div(cls := "text", dataIcon := "`")(
+        (!tour.noBerserk && tour.clock.berserkable) `option` div(cls := "text", dataIcon := "`")(
           "Berserk Clock: ",
           a(
             title := "Clock info",
@@ -122,12 +121,12 @@ object side {
             target := "_blank"
           )(tour.clock.showBerserk)
         ),
-        tour.noBerserk option div(cls := "text", dataIcon := "`")("No Berserk allowed"),
-        tour.noStreak option div(cls := "text", dataIcon := "Q")("No Arena streaks"),
-        tour.statusScoring option div(cls := "text", dataIcon := "g")(
+        tour.noBerserk `option` div(cls := "text", dataIcon := "`")("No Berserk allowed"),
+        tour.noStreak `option` div(cls := "text", dataIcon := "Q")("No Arena streaks"),
+        tour.statusScoring `option` div(cls := "text", dataIcon := "g")(
           "Extra points: +1 Gammon, +2 Backgammon."
         ),
-        !tour.isFinished option tour.trophy1st.map { trophy1st =>
+        !tour.isFinished `option` tour.trophy1st.map { trophy1st =>
           table(cls := "trophyPreview")(
             tr(
               td(
@@ -151,11 +150,11 @@ object side {
             )
           )
         },
-        !tour.isScheduled && tour.description.isEmpty option frag(
+        !tour.isScheduled && tour.description.isEmpty `option` frag(
           trans.by(userIdLink(tour.createdBy.some)),
           br
         ),
-        (!tour.isStarted || (tour.isScheduled && tour.position.isDefined)) option absClientDateTime(
+        (!tour.isStarted || (tour.isScheduled && tour.position.isDefined)) `option` absClientDateTime(
           tour.startsAt
         ),
         tour.startingPosition.map { pos =>
@@ -172,17 +171,17 @@ object side {
           )
         }
       ),
-      streamers.nonEmpty option div(cls := "context-streamers")(
+      streamers.nonEmpty `option` div(cls := "context-streamers")(
         streamers map views.html.streamer.bits.contextual
       ),
-      chat option views.html.chat.frag
+      chat `option` views.html.chat.frag
     )
 
   private def teamBattle(tour: Tournament)(battle: TeamBattle)(implicit ctx: Context) =
     st.section(cls := "team-battle")(
       p(cls := "team-battle__title text", dataIcon := "f")(
         s"Battle of ${battle.teams.size} teams and ${battle.nbLeaders} leaders",
-        (ctx.userId.has(tour.createdBy) || isGranted(_.ManageTournament)) option
+        (ctx.userId.has(tour.createdBy) || isGranted(_.ManageTournament)) `option`
           a(href := routes.Tournament.teamBattleEdit(tour.id), title := "Edit team battle")(iconTag("%"))
       )
     )

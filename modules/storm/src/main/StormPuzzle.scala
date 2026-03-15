@@ -14,7 +14,7 @@ case class StormPuzzle(
 ) {
   // ply after "initial move" when we start solving
   def initialPly: Int =
-    fen.fullMove ?? { fm =>
+    fen.fullMove so { fm =>
       fm * 2 - playerIndex.fold(1, 2)
     }
 
@@ -23,7 +23,7 @@ case class StormPuzzle(
       sit1 <- Forsyth << fen
       sit2 <- sit1.move(line.head).toOption.map(_.situationAfter)
     } yield Forsyth >> sit2
-  } err s"Can't apply puzzle $id first move"
+  } `err` s"Can't apply puzzle $id first move"
 
   def playerIndex = fen.player.fold[PlayerIndex](P1)(!_)
 }

@@ -45,5 +45,5 @@ object Json {
 
   implicit val fenFormat: Format[FEN]           = stringIsoFormat[FEN](Iso.fenIso)
   implicit val stratFenFormat: Format[StratFEN] = stringIsoFormat[StratFEN](Iso.stratFenIso)
-
 }
+

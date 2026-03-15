@@ -10,7 +10,7 @@ trait FormHelper { self: I18nHelper =>
 
   def errMsg(form: Field)(implicit ctx: Context): Frag = errMsg(form.errors)
 
-  def errMsg(form: Form[_])(implicit ctx: Context): Frag = errMsg(form.errors)
+  def errMsg(form: Form[?])(implicit ctx: Context): Frag = errMsg(form.errors)
 
   def errMsg(error: FormError)(implicit ctx: Context): Frag =
     p(cls := "error")(transKey(error.message, error.args))
@@ -18,7 +18,7 @@ trait FormHelper { self: I18nHelper =>
   def errMsg(errors: Seq[FormError])(implicit ctx: Context): Frag =
     errors map errMsg
 
-  def globalError(form: Form[_])(implicit ctx: Context): Option[Frag] =
+  def globalError(form: Form[?])(implicit ctx: Context): Option[Frag] =
     form.globalError map errMsg
 
   val booleanChoices = Seq("true" -> "✓ Yes", "false" -> "✗ No")
@@ -127,8 +127,8 @@ trait FormHelper { self: I18nHelper =>
           st.value := value,
           tpe := "checkbox",
           cls := "form-control cmn-toggle",
-          checked option st.checked,
-          disabled option st.disabled
+          checked `option` st.checked,
+          disabled `option` st.disabled
         ),
         label(`for` := fieldId)
       )
@@ -148,16 +148,16 @@ trait FormHelper { self: I18nHelper =>
           name := field.name,
           cls := "form-control",
           display := displayStyle(displayed)
-        )(disabled option (st.disabled := true))(validationModifiers(field))(
+        )(disabled `option` (st.disabled := true))(validationModifiers(field))(
           default map { option(value := "")(_) },
           options.toSeq map { case (value, name) =>
             option(
               st.value := value.toString,
-              field.value.has(value.toString) option selected
+              field.value.has(value.toString) `option` selected
             )(name)
           }
         ),
-        disabled option hidden(field)
+        disabled `option` hidden(field)
       )
 
     type SelectChoice = (String, String, Option[String])
@@ -173,7 +173,7 @@ trait FormHelper { self: I18nHelper =>
           st.id := id(field),
           name := field.name,
           cls := "form-control"
-        )(disabled option (st.disabled := true))(validationModifiers(field))(
+        )(disabled `option` (st.disabled := true))(validationModifiers(field))(
           default map { option(value := "")(_) },
           options.map { case ((ogValue, ogName, _), opts) =>
             optgroup(name := ogName)(
@@ -181,13 +181,13 @@ trait FormHelper { self: I18nHelper =>
                 option(
                   st.value := s"${ogValue}_${value}",
                   st.title := title,
-                  field.value.has(s"${ogValue}_${value}") option selected
+                  field.value.has(s"${ogValue}_${value}") `option` selected
                 )(name)
               }
             )
           }
         ),
-        disabled option hidden(field)
+        disabled `option` hidden(field)
       )
 
     def textarea(
@@ -198,7 +198,7 @@ trait FormHelper { self: I18nHelper =>
         st.id := id(field),
         name := field.name,
         cls := List("form-control" -> true, klass -> klass.nonEmpty)
-      )(validationModifiers(field))(modifiers)(~field.value)
+      )(validationModifiers(field))(modifiers)(field.value.getOrElse(""))
 
     val actions = div(cls := "form-actions")
     val action  = div(cls := "form-actions single")
@@ -245,7 +245,7 @@ trait FormHelper { self: I18nHelper =>
         )
       )
 
-    def globalError(form: Form[_])(implicit ctx: Context): Option[Frag] =
+    def globalError(form: Form[?])(implicit ctx: Context): Option[Frag] =
       form.globalError map { err =>
         div(cls := "form-group is-invalid")(error(err))
       }

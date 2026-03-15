@@ -7,9 +7,7 @@ import lila.app.templating.Environment._
 import lila.app.ui.ScalatagsTemplate._
 import lila.common.String.html.safeJsonValue
 import lila.pref.Pref.PlayerOrder
-import play.api.i18n.Lang
 
-import controllers.routes
 
 object coordinate {
 
@@ -51,7 +49,7 @@ object coordinate {
                     st.id := s"coord_playerIndex_$id",
                     name := "playerIndex",
                     value := id,
-                    (id == ctx.pref.coordPlayerIndex) option checked
+                    (id == ctx.pref.coordPlayerIndex) `option` checked
                   ),
                   label(`for` := s"coord_playerIndex_$id", cls := s"playerIndex playerIndex_$id")(i)
                 )
@@ -95,7 +93,7 @@ object coordinate {
         (trans.black.txt(), score.p2)
       ).map { case (transPlayer, s) =>
         div(cls := "chart_container")(
-          s.nonEmpty option frag(
+          s.nonEmpty `option` frag(
             p(
               trans.coordinates.averageScoreAsPlayerIndexX(
                 transPlayer,

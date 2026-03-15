@@ -2,19 +2,18 @@ package lila.base
 
 import java.lang.Math.{ max, min }
 
-import ornicar.scalalib.Zero
+import alleycats.Zero
 
 final class AugmentedAny(private val self: Any) extends AnyVal {
 
   // sugar for -Wvalue-discard
-  @scala.annotation.nowarn
   def unit: Unit = ()
 }
 
 final class PimpedBoolean(private val self: Boolean) extends AnyVal {
 
   /** Replaces scalaz boolean ops
-    * so ?? works on Zero and not Monoid
+    * so so works on Zero and not Monoid
     */
   def ??[A](a: => A)(implicit z: Zero[A]): A = if (self) a else z.zero
 

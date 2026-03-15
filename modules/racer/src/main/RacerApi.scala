@@ -1,6 +1,5 @@
 package lila.racer
 
-import scala.concurrent.duration._
 import scala.concurrent.ExecutionContext
 
 import lila.memo.CacheApi
@@ -8,7 +7,7 @@ import lila.storm.StormSelector
 import lila.user.{ User, UserRepo }
 import lila.common.Bus
 
-final class RacerApi(colls: RacerColls, selector: StormSelector, userRepo: UserRepo, cacheApi: CacheApi)(
+final class RacerApi(@annotation.nowarn("msg=unused") _colls: RacerColls, selector: StormSelector, userRepo: UserRepo, cacheApi: CacheApi)(
     implicit
     ec: ExecutionContext,
     scheduler: akka.actor.Scheduler
@@ -33,7 +32,7 @@ final class RacerApi(colls: RacerColls, selector: StormSelector, userRepo: UserR
       id
     }
 
-  def create(player: RacerPlayer.Id, countdownSeconds: Int): Fu[RacerRace.Id] =
+  def create(player: RacerPlayer.Id, @annotation.nowarn("msg=unused") _countdownSeconds: Int): Fu[RacerRace.Id] =
     selector.apply map { puzzles =>
       val race = RacerRace
         .make(
@@ -68,7 +67,7 @@ final class RacerApi(colls: RacerColls, selector: StormSelector, userRepo: UserR
   }
 
   def join(id: RacerRace.Id, player: RacerPlayer.Id): Option[RacerRace] =
-    get(id).flatMap(_ join player) map { r =>
+    get(id).flatMap(_ `join` player) map { r =>
       val race = start(r) | r
       saveAndPublish(race)
       race
@@ -94,10 +93,9 @@ final class RacerApi(colls: RacerColls, selector: StormSelector, userRepo: UserR
       publish(race)
     }
 
-  def registerPlayerScore(id: RacerRace.Id, player: RacerPlayer.Id, score: Int): Unit = {
+  def registerPlayerScore(id: RacerRace.Id, player: RacerPlayer.Id, score: Int): Unit =
     if (score >= 125) logger.warn(s"$id $player score: $score")
     else get(id).flatMap(_.registerScore(player, score)) foreach saveAndPublish
-  }
 
   private def save(race: RacerRace): Unit =
     store.put(race.id, race)
@@ -106,9 +104,8 @@ final class RacerApi(colls: RacerColls, selector: StormSelector, userRepo: UserR
     save(race)
     publish(race)
   }
-  private def publish(race: RacerRace): Unit = {
-    socket.foreach(_ publishState race)
-  }
+  private def publish(race: RacerRace): Unit =
+    socket.foreach(_ `publishState` race)
 
   // work around circular dependency
   private var socket: Option[RacerSocket] = None

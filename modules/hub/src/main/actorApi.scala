@@ -6,8 +6,6 @@ import org.joda.time.DateTime
 import play.api.libs.json._
 import scala.concurrent.Promise
 
-import strategygames.Pos
-
 // announce something to all clients
 case class Announce(msg: String, date: DateTime, json: JsObject)
 

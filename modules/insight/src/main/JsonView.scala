@@ -30,39 +30,40 @@ final class JsonView {
       Categ(
         "Setup",
         List(
-          Json.toJson(D.Date: Dimension[_]),
-          Json.toJson(D.Period: Dimension[_]),
-          Json.toJson(D.Perf: Dimension[_]),
-          Json.toJson(D.PlayerIndex: Dimension[_]),
-          Json.toJson(D.OpponentStrength: Dimension[_])
+          dimensionToJson(D.Date),
+          dimensionToJson(D.Period),
+          dimensionToJson(D.Perf),
+          dimensionToJson(D.PlayerIndex),
+          dimensionToJson(D.OpponentStrength)
         )
       ),
       Categ(
         "Game",
         List(
           openingJson,
-          Json.toJson(D.MyCastling: Dimension[_]),
-          Json.toJson(D.OpCastling: Dimension[_]),
-          Json.toJson(D.QueenTrade: Dimension[_])
+          dimensionToJson(D.MyCastling),
+          dimensionToJson(D.OpCastling),
+          dimensionToJson(D.QueenTrade)
         )
       ),
       Categ(
         "Move",
         List(
-          Json.toJson(D.PieceRole: Dimension[_]),
-          Json.toJson(D.MovetimeRange: Dimension[_]),
-          Json.toJson(D.MaterialRange: Dimension[_]),
-          Json.toJson(D.Phase: Dimension[_]),
-          Json.toJson(D.CplRange: Dimension[_])
+          dimensionToJson(D.PieceRole),
+          dimensionToJson(D.MovetimeRange),
+          dimensionToJson(D.MaterialRange),
+          dimensionToJson(D.Phase),
+          dimensionToJson(D.CplRange)
         ) ::: {
-          asMod ?? List(Json.toJson(D.Blur: Dimension[_]), Json.toJson(D.TimeVariance: Dimension[_]))
+          if (asMod) List(dimensionToJson(D.Blur), dimensionToJson(D.TimeVariance))
+          else Nil
         }
       ),
       Categ(
         "Result",
         List(
-          Json.toJson(D.Termination: Dimension[_]),
-          Json.toJson(D.Result: Dimension[_])
+          dimensionToJson(D.Termination),
+          dimensionToJson(D.Result)
         )
       )
     )
@@ -82,10 +83,11 @@ final class JsonView {
           Json.toJson(M.Material: Metric),
           Json.toJson(M.NbMoves: Metric)
         ) ++ {
-          asMod ?? List(
+          if (asMod) List(
             Json.toJson(M.Blurs: Metric),
             Json.toJson(M.TimeVariance: Metric)
           )
+          else Nil
         }
       ),
       Categ(
@@ -113,6 +115,9 @@ final class JsonView {
       "presets"         -> { if (asMod) Preset.forMod else Preset.base }
     )
   }
+
+  private def dimensionToJson[X](d: Dimension[X])(implicit lang: Lang): JsValue =
+    Json.toJson(d)(using writers.dimensionWriter)
 
   private object writers {
 

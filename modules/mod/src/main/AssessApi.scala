@@ -38,7 +38,7 @@ final class AssessApi(
   private def getPlayerAssessmentsByUserId(userId: User.ID, nb: Int) =
     assessRepo.coll
       .find($doc("userId" -> userId))
-      .sort($sort desc "date")
+      .sort($sort `desc` "date")
       .cursor[PlayerAssessment](ReadPreference.secondaryPreferred)
       .list(nb)
 
@@ -46,16 +46,16 @@ final class AssessApi(
       userId: User.ID,
       nb: Int = 100
   ): Fu[Option[PlayerAggregateAssessment]] =
-    userRepo byId userId flatMap {
-      _.filter(_.noBot) ?? { user =>
+    userRepo `byId` userId flatMap {
+      _.filter(_.noBot) so { user =>
         getPlayerAssessmentsByUserId(userId, nb) map { games =>
-          games.nonEmpty option PlayerAggregateAssessment(user, games)
+          games.nonEmpty `option` PlayerAggregateAssessment(user, games)
         }
       }
     }
 
   def withGames(pag: PlayerAggregateAssessment): Fu[PlayerAggregateAssessment.WithGames] =
-    gameRepo gamesFromSecondary pag.playerAssessments.map(_.gameId) map {
+    gameRepo `gamesFromSecondary` pag.playerAssessments.map(_.gameId) map {
       PlayerAggregateAssessment.WithGames(pag, _)
     }
 
@@ -68,20 +68,19 @@ final class AssessApi(
       val missing = povs collect {
         case pov if pov.game.metadata.analysed && !existingIds.contains(pov.gameId) => pov.gameId
       }
-      missing.nonEmpty ??
+      missing.nonEmpty so
         analysisRepo.coll
           .idsMap[Analysis, Game.ID](missing)(_.id)
           .flatMap { ans =>
-            povs
+            Future.sequence(povs
               .flatMap { pov =>
                 ans get pov.gameId map { pov -> _ }
               }
               .map { case (pov, analysis) =>
-                gameRepo.holdAlert game pov.game flatMap { holdAlerts =>
+                gameRepo.holdAlert `game` pov.game flatMap { holdAlerts =>
                   createPlayerAssessment(PlayerAssessment.make(pov, Some(analysis), holdAlerts(pov.playerIndex)))
                 }
-              }
-              .sequenceFu
+              })
               .void
           }
     }
@@ -114,47 +113,47 @@ final class AssessApi(
       nb: Int = 100
   ): Fu[Option[PlayerAggregateAssessment.WithGames]] =
     getPlayerAggregateAssessment(userId, nb) flatMap {
-      _ ?? { pag =>
-        withGames(pag) dmap some
+      _ so { pag =>
+        withGames(pag) `dmap` some
       }
     }
 
   def refreshAssessOf(user: User): Funit =
-    !user.isBot ??
+    !user.isBot so
       (gameRepo.gamesForAssessment(user.id, 100) flatMap { gs =>
-        (gs map { g =>
+        Future.sequence(gs map { g =>
           analysisRepo.byGame(g) flatMap {
-            _ ?? { onAnalysisReady(g, _, thenAssessUser = false) }
+            _ so { onAnalysisReady(g, _, thenAssessUser = false) }
           }
-        }).sequenceFu.void
+        }).void
       }) >> assessUser(user.id)
 
   def onAnalysisReady(game: Game, analysis: Analysis, thenAssessUser: Boolean = true): Funit =
-    gameRepo.holdAlert game game flatMap { holdAlerts =>
+    gameRepo.holdAlert `game` game flatMap { holdAlerts =>
       def consistentMoveTimes(game: Game)(player: Player) =
         Statistics.moderatelyConsistentPlyTimes(Pov(game, player))
       val shouldAssess =
         if (!game.source.exists(assessableSources.contains)) false
         else if (game.mode.casual) false
-        else if (Player.HoldAlert suspicious holdAlerts) true
+        else if (Player.HoldAlert `suspicious` holdAlerts) true
         else if (game.isCorrespondence) false
         else if (game.playedTurns < 40) false
         else if (game.players exists consistentMoveTimes(game)) true
-        else if (game.createdAt isBefore bottomDate) false
+        else if (game.createdAt `isBefore` bottomDate) false
         else true
-      shouldAssess.?? {
-        createPlayerAssessment(PlayerAssessment.make(game pov P1, Some(analysis), holdAlerts.p1)) >>
-          createPlayerAssessment(PlayerAssessment.make(game pov P2, Some(analysis), holdAlerts.p2))
+      shouldAssess.so {
+        createPlayerAssessment(PlayerAssessment.make(game `pov` P1, Some(analysis), holdAlerts.p1)) >>
+          createPlayerAssessment(PlayerAssessment.make(game `pov` P2, Some(analysis), holdAlerts.p2))
       } >> {
-        (shouldAssess && thenAssessUser) ?? {
-          game.p1Player.userId.??(assessUser) >> game.p2Player.userId.??(assessUser)
+        (shouldAssess && thenAssessUser) so {
+          game.p1Player.userId.so(assessUser) >> game.p2Player.userId.so(assessUser)
         }
       }
     }
 
   def assessUser(userId: User.ID): Funit =
     getPlayerAggregateAssessment(userId) flatMap {
-      _ ?? { playerAggregateAssessment =>
+      _ so { playerAggregateAssessment =>
         playerAggregateAssessment.action match {
           case AccountAction.Engine | AccountAction.EngineAndBan =>
             userRepo.getTitle(userId).flatMap {
@@ -191,15 +190,14 @@ final class AssessApi(
       game.playerBlurPercent(player.playerIndex) >= 70
 
     def winnerGreatProgress(player: Player): Boolean =
-      game.winner.has(player) && game.perfType ?? { perfType =>
+      game.winner.contains(player) && game.perfType.so { perfType =>
         player.playerIndex.fold(p1, p2).perfs(perfType).progress >= 90
       }
 
     def noFastCoefVariation(player: Player): Option[Float] =
-      Statistics.noFastPlies(Pov(game, player)) ?? Statistics.plyTimeCoefVariation(Pov(game, player))
+      Statistics.noFastPlies(Pov(game, player)) so Statistics.plyTimeCoefVariation(Pov(game, player))
 
     def winnerUserOption = game.winnerPlayerIndex.map(_.fold(p1, p2))
-    def loserUserOption  = game.winnerPlayerIndex.map(_.fold(p2, p1))
     def winnerNbGames =
       for {
         user     <- winnerUserOption
@@ -207,18 +205,18 @@ final class AssessApi(
       } yield user.perfs(perfType).nb
 
     def suspCoefVariation(c: PlayerIndex) = {
-      val x = noFastCoefVariation(game player c)
+      val x = noFastCoefVariation(game `player` c)
       x.filter(_ < 0.45f) orElse x.filter(_ < 0.5f).ifTrue(ThreadLocalRandom.nextBoolean())
     }
     lazy val p1SuspCoefVariation = suspCoefVariation(P1)
     lazy val p2SuspCoefVariation = suspCoefVariation(P2)
 
-    def isUpset = ~(for {
+    def isUpset = (for {
       winner <- game.winner
       loser  <- game.loser
       wR     <- winner.stableRating
       lR     <- loser.stableRating
-    } yield wR <= lR - 300)
+    } yield wR <= lR - 300).getOrElse(false)
 
     // Shared eligibility guard: conditions common to both assessment paths
     def isEligibleForAssessment: Boolean =
@@ -226,7 +224,7 @@ final class AssessApi(
         !game.isCorrespondence &&
         game.source.exists(assessableSources.contains) &&
         game.playedTurns >= 36 &&
-        !(game.createdAt isBefore bottomDate)
+        !(game.createdAt `isBefore` bottomDate)
 
     val shouldAnalyse: Fu[Option[AutoAnalysis.Reason]] =
       if (!game.analysable) fuccess(none)
@@ -242,8 +240,8 @@ final class AssessApi(
       else if (p2SuspCoefVariation.isDefined) fuccess(P2MoveTime.some)
       else
         // someone is using a bot
-        gameRepo.holdAlert game game map { holdAlerts =>
-          if (Player.HoldAlert suspicious holdAlerts) HoldAlert.some
+        gameRepo.holdAlert `game` game map { holdAlerts =>
+          if (Player.HoldAlert `suspicious` holdAlerts) HoldAlert.some
           // don't analyse most of other bullet games
           else if (game.speed == strategygames.Speed.Bullet && randomPercent(70)) none
           // someone blurs a lot
@@ -253,7 +251,7 @@ final class AssessApi(
           // analyse some tourney games
           // else if (game.isTournament) randomPercent(20) option "Tourney random"
           /// analyse new player games
-          else if (winnerNbGames.??(40 >) && randomPercent(75)) NewPlayerWin.some
+          else if (winnerNbGames.so(40 >) && randomPercent(75)) NewPlayerWin.some
           else none
         }
 
@@ -262,26 +260,26 @@ final class AssessApi(
     // This feeds the same PlayerAggregateAssessment / assessUser pipeline as analysed games.
     val assessUnanalysableGames: Funit =
       if (!game.analysable && isEligibleForAssessment)
-        gameRepo.holdAlert game game flatMap { holdAlerts =>
+        gameRepo.holdAlert `game` game flatMap { holdAlerts =>
           def consistentMoveTimes(player: Player) =
             Statistics.moderatelyConsistentPlyTimes(Pov(game, player))
           val shouldAssess =
-            (Player.HoldAlert suspicious holdAlerts) ||
+            (Player.HoldAlert `suspicious` holdAlerts) ||
               (game.players exists consistentMoveTimes) ||
               (game.players exists { p => game.playerBlurPercent(p.playerIndex) > 70 })
-          shouldAssess.?? {
-            createPlayerAssessment(PlayerAssessment.make(game pov P1, None, holdAlerts.p1)) >>
-              createPlayerAssessment(PlayerAssessment.make(game pov P2, None, holdAlerts.p2))
+          shouldAssess.so {
+            createPlayerAssessment(PlayerAssessment.make(game `pov` P1, None, holdAlerts.p1)) >>
+              createPlayerAssessment(PlayerAssessment.make(game `pov` P2, None, holdAlerts.p2))
           } >> {
-            shouldAssess ?? {
-              game.p1Player.userId.??(assessUser) >> game.p2Player.userId.??(assessUser)
+            shouldAssess `so` {
+              game.p1Player.userId.so(assessUser) >> game.p2Player.userId.so(assessUser)
             }
           }
         }
       else funit
 
-    shouldAnalyse.map {
-      _ ?? { reason =>
+    shouldAnalyse.map { (opt: Option[AutoAnalysis.Reason]) =>
+      opt so { reason =>
         lila.mon.cheat.autoAnalysis(reason.toString).increment()
         fishnet ! lila.hub.actorApi.fishnet.AutoAnalyse(game.id)
       }

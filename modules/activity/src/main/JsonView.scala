@@ -48,7 +48,7 @@ final class JsonView(
     // writes as percentage
     implicit val tourRatioWrites: play.api.libs.json.Writes[lila.tournament.LeaderboardApi.Ratio] =
       Writes[TourRatio] { r =>
-        JsNumber((r.value * 100).toInt atLeast 1)
+        JsNumber((r.value * 100).toInt `atLeast` 1)
       }
     implicit def tourEntryWrites(implicit
         lang: Lang
@@ -57,7 +57,7 @@ final class JsonView(
         Json.obj(
           "tournament" -> Json.obj(
             "id"   -> e.tourId,
-            "name" -> ~getTourName.get(e.tourId)
+            "name" -> getTourName.get(e.tourId).getOrElse("")
           ),
           "nbGames"     -> e.nbGames,
           "score"       -> e.score,
@@ -104,7 +104,7 @@ final class JsonView(
         Json.obj("url" -> s"/team/$id", "name" -> getTeamName(id))
       })
     }
-    implicit val patronWrites: OWrites[Patron] = Json.writes[Patron]
+    implicit val patronWrites: OWrites[Patron] = OWrites[Patron] { p => Json.obj("months" -> p.months) }
   }
   import Writers._
 

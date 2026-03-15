@@ -54,7 +54,7 @@ object JsonView {
 
   private val isoFormatter = ISODateTimeFormat.dateTime
   implicit private val dateWriter: Writes[DateTime] = Writes { d =>
-    JsString(isoFormatter print d)
+    JsString(isoFormatter `print` d)
   }
   implicit private val userWriter: OWrites[User] = OWrites { u =>
     Json.obj("name" -> u.username)

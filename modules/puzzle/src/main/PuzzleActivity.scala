@@ -4,7 +4,6 @@ import akka.stream.scaladsl._
 import play.api.libs.json._
 import reactivemongo.akkastream.cursorProducer
 import reactivemongo.api.ReadPreference
-import scala.concurrent.duration._
 
 import lila.common.config.MaxPerSecond
 import lila.common.Json.jodaWrites
@@ -22,11 +21,11 @@ final class PuzzleActivity(
   import BsonHandlers._
   import JsonView._
 
-  def stream(config: Config): Source[String, _] =
+  def stream(config: Config): Source[String, ?] =
     Source futureSource {
       colls.round.map {
         _.find($doc(PuzzleRound.BSONFields.user -> config.user.id))
-          .sort($sort desc PuzzleRound.BSONFields.date)
+          .sort($sort `desc` PuzzleRound.BSONFields.date)
           .batchSize(config.perSecond.value)
           .cursor[PuzzleRound](ReadPreference.secondaryPreferred)
           .documentSource(config.max | Int.MaxValue)

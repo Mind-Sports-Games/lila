@@ -1,6 +1,5 @@
 package views.html.clas
 
-import controllers.routes
 import lila.api.Context
 import lila.app.templating.Environment._
 import lila.app.ui.ScalatagsTemplate._
@@ -16,11 +15,11 @@ object studentDashboard {
       teachers: List[User],
       students: List[Student.WithUser]
   )(implicit ctx: Context) =
-    bits.layout(c.name, Left(c withStudents Nil))(
+    bits.layout(c.name, Left(c `withStudents` Nil))(
       cls := "clas-show dashboard dashboard-student",
       div(cls := "clas-show__top")(
         h1(dataIcon := "f", cls := "text")(c.name),
-        c.desc.trim.nonEmpty option div(cls := "clas-show__desc")(richText(c.desc))
+        c.desc.trim.nonEmpty `option` div(cls := "clas-show__desc")(richText(c.desc))
       ),
       c.archived map { archived =>
         div(cls := "box__pad")(
@@ -74,7 +73,7 @@ object studentDashboard {
         )
       ),
       tbody(
-        students.sortBy(-_.user.seenAt.??(_.getMillis)).map { case Student.WithUser(student, user) =>
+        students.sortBy(s => -s.user.seenAt.fold(0L)(_.getMillis)).map { case Student.WithUser(student, user) =>
           tr(
             td(
               userLink(
@@ -98,7 +97,7 @@ object studentDashboard {
     )
 
   private def challengeTd(user: lila.user.User)(implicit ctx: Context) =
-    if (ctx is user) td
+    if (ctx `is` user) td
     else {
       val online = isOnline(user.id)
       td(
@@ -106,7 +105,7 @@ object studentDashboard {
           dataIcon := "U",
           cls := List("button button-empty text" -> true, "disabled" -> !online),
           title := trans.challenge.challengeToPlay.txt(),
-          href := online option s"${routes.Lobby.home}?user=${user.username}#game"
+          href := online `option` s"${routes.Lobby.home}?user=${user.username}#game"
         )(trans.play())
       )
     }

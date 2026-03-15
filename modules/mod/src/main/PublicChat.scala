@@ -22,15 +22,15 @@ final class PublicChat(
     }
 
   def deleteAll(userId: User.ID): Funit =
-    userRepo byId userId map2 Suspect flatMap { _ ?? deleteAll }
+    userRepo `byId` userId `map2` Suspect.apply flatMap { _ so deleteAll }
 
   def deleteAll(suspect: Suspect): Funit =
     all.flatMap { case (tours, swisses, simuls) =>
-      (tours.map(_._2) ::: swisses.map(_._2) ::: simuls.map(_._2))
-        .filter(_ hasLinesOf suspect.user)
-        .map(chatApi.userChat.delete(_, suspect.user, _.Global))
-        .sequenceFu
-        .void
+      Future.sequence(
+        (tours.map(_._2) ::: swisses.map(_._2) ::: simuls.map(_._2))
+          .filter(_ `hasLinesOf` suspect.user)
+          .map(chatApi.userChat.delete(_, suspect.user, _.Global))
+      ).void
     } >> deleteLobbyChat(suspect) >>- Bus.publish(
       lila.hub.actorApi.security.DeletePublicChats(suspect.user.id),
       "deleteTeamChats"
@@ -38,8 +38,8 @@ final class PublicChat(
 
   private def deleteLobbyChat(suspect: Suspect): Funit =
     chatApi.userChat.findOption(Chat.Id("lobbyhome")) flatMap {
-      _ ?? { chat =>
-        chat.hasLinesOf(suspect.user) ??
+      _ so { chat =>
+        chat.hasLinesOf(suspect.user) so
           chatApi.userChat.delete(chat, suspect.user, _.Lobby).void
       }
     }

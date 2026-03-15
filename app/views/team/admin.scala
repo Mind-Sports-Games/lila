@@ -1,6 +1,5 @@
 package views.html.team
 
-import controllers.routes
 import play.api.data.Form
 
 import lila.api.Context
@@ -11,7 +10,7 @@ object admin {
 
   import trans.team._
 
-  def leaders(t: lila.team.Team, form: Form[_])(implicit ctx: Context) = {
+  def leaders(t: lila.team.Team, form: Form[?])(implicit ctx: Context) = {
     val title = s"${t.name} • ${trans.team.teamLeaders.txt()}"
     views.html.base.layout(
       title = title,
@@ -63,7 +62,7 @@ object admin {
     }
   }
 
-  def pmAll(t: lila.team.Team, form: Form[_], tours: List[lila.tournament.Tournament])(implicit
+  def pmAll(t: lila.team.Team, form: Form[?], tours: List[lila.tournament.Tournament])(implicit
       ctx: Context
   ) = {
 
@@ -82,7 +81,7 @@ $('#form3-message').val($('#form3-message').val() + $(e.target).data('copyurl') 
         div(cls := "page-menu__content box box-pad")(
           h1(title),
           p(messageAllMembersLongDescription()),
-          tours.nonEmpty option div(cls := "tournaments")(
+          tours.nonEmpty `option` div(cls := "tournaments")(
             p(youWayWantToLinkOneOfTheseTournaments()),
             p(
               ul(

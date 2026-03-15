@@ -1,6 +1,5 @@
 package views.html.streamer
 
-import controllers.routes
 import lila.api.Context
 import lila.app.templating.Environment._
 import lila.app.ui.ScalatagsTemplate._
@@ -32,7 +31,7 @@ object show {
     )(
       main(cls := "page-menu streamer-show")(
         st.aside(cls := "page-menu__menu")(
-          s.streamer.approval.chatEnabled option div(cls := "streamer-chat")(
+          s.streamer.approval.chatEnabled `option` div(cls := "streamer-chat")(
             s.stream match {
               case Some(YouTube.Stream(_, _, videoId, _)) =>
                 iframe(
@@ -45,7 +44,7 @@ object show {
                   iframe(
                     st.frameborder := "0",
                     frame.scrolling := "yes",
-                    src := s"https://twitch.tv/embed/${twitch.userId}/chat?${(ctx.currentBg != "light") ?? "darkpopout&"}parent=${netConfig.domain}"
+                    src := s"https://twitch.tv/embed/${twitch.userId}/chat?${(ctx.currentBg != "light") so "darkpopout&"}parent=${netConfig.domain}"
                   )
                 }
             }

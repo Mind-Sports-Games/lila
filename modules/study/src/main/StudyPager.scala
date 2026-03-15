@@ -67,7 +67,7 @@ final class StudyPager(
 
   def mineMember(me: User, order: Order, page: Int) =
     paginator(
-      selectMemberId(me.id) ++ $doc("ownerId" $ne me.id),
+      selectMemberId(me.id) ++ $doc("ownerId" `$ne` me.id),
       me.some,
       order,
       page
@@ -75,7 +75,7 @@ final class StudyPager(
 
   def mineLikes(me: User, order: Order, page: Int) =
     paginator(
-      selectLiker(me.id) ++ accessSelect(me.some) ++ $doc("ownerId" $ne me.id),
+      selectLiker(me.id) ++ accessSelect(me.some) ++ $doc("ownerId" `$ne` me.id),
       me.some,
       order,
       page
@@ -88,7 +88,7 @@ final class StudyPager(
       me,
       order,
       page,
-      hint = onlyMine.isDefined option $doc("uids" -> 1, "rank" -> -1)
+      hint = onlyMine.isDefined `option` $doc("uids" -> 1, "rank" -> -1)
     )
   }
 
@@ -110,17 +110,17 @@ final class StudyPager(
       selector = selector,
       projection = studyRepo.projection.some,
       sort = order match {
-        case Order.Hot          => $sort desc "rank"
-        case Order.Newest       => $sort desc "createdAt"
-        case Order.Oldest       => $sort asc "createdAt"
-        case Order.Updated      => $sort desc "updatedAt"
-        case Order.Popular      => $sort desc "likes"
-        case Order.Alphabetical => $sort asc "name"
+        case Order.Hot          => $sort `desc` "rank"
+        case Order.Newest       => $sort `desc` "createdAt"
+        case Order.Oldest       => $sort `asc` "createdAt"
+        case Order.Updated      => $sort `desc` "updatedAt"
+        case Order.Popular      => $sort `desc` "likes"
+        case Order.Alphabetical => $sort `asc` "name"
         // mine filter for topic view
-        case Order.Mine => $sort desc "rank"
+        case Order.Mine => $sort `desc` "rank"
       },
       hint = hint
-    ) mapFutureList withChaptersAndLiking(me)
+    ) `mapFutureList` withChaptersAndLiking(me)
     Paginator(
       adapter = nbResults.fold(adapter) { nb =>
         new CachedAdapter(adapter, nb)
@@ -142,14 +142,14 @@ final class StudyPager(
   ): Fu[Seq[Study.WithChapters]] =
     chapterRepo.idNamesByStudyIds(studies.map(_.id), nbChaptersPerStudy) map { chapters =>
       studies.map { study =>
-        Study.WithChapters(study, (chapters get study.id) ?? (_ map (_.name)))
+        Study.WithChapters(study, (chapters get study.id) so (_ map (_.name)))
       }
     }
 
   private def withLiking(
       me: Option[User]
   )(studies: Seq[Study.WithChapters]): Fu[Seq[Study.WithChaptersAndLiked]] =
-    me.?? { u =>
+    me.so { u =>
       studyRepo.filterLiked(u, studies.map(_.study.id))
     } map { liked =>
       studies.map { case Study.WithChapters(study, chapters) =>

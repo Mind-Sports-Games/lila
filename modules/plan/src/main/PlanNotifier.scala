@@ -18,12 +18,12 @@ final private[plan] class PlanNotifier(
       lila.common.Bus.publish(lila.hub.actorApi.plan.PlanStart(user.id), "planStart")
     }
     val msg = Propagate(lila.hub.actorApi.timeline.PlanStart(user.id))
-    timeline ! (msg toFollowersOf user.id)
+    timeline ! (msg `toFollowersOf` user.id)
   }
 
   def onRenew(user: User): Unit = {
     val msg = Propagate(lila.hub.actorApi.timeline.PlanRenew(user.id, user.plan.months))
-    timeline ! (msg toFollowersOf user.id)
+    timeline ! (msg `toFollowersOf` user.id)
   }
 
   def onExpire(user: User): Unit =

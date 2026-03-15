@@ -1,6 +1,5 @@
 package views.html.tournament
 
-import controllers.routes
 import play.api.libs.json.Json
 
 import lila.api.Context
@@ -83,7 +82,7 @@ object home {
         st.section(cls := "tour-home__schedule box")(
           div(cls := "box__top")(
             h1(trans.tournaments()),
-            ctx.isAuth option div(cls := "box__top__actions")(
+            ctx.isAuth `option` div(cls := "box__top__actions")(
               a(
                 href := routes.Tournament.form,
                 cls := "button button-green text",

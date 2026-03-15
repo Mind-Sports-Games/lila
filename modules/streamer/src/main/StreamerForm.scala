@@ -37,9 +37,9 @@ object StreamerForm {
           "ignored"   -> boolean,
           "chat"      -> boolean,
           "quick"     -> optional(nonEmptyText)
-        )(ApprovalData.apply)(ApprovalData.unapply)
+        )(ApprovalData.apply)(d => Some((d.granted, d.tier, d.requested, d.ignored, d.chat, d.quick)))
       )
-    )(UserData.apply)(UserData.unapply)
+    )(UserData.apply)(d => Some((d.name, d.headline, d.description, d.twitch, d.youTube, d.listed, d.approval)))
       .verifying(
         "Must specify a Twitch and/or YouTube channel.",
         u => u.twitch.isDefined || u.youTube.isDefined
@@ -47,7 +47,7 @@ object StreamerForm {
   )
 
   def userForm(streamer: Streamer) =
-    emptyUserForm fill UserData(
+    emptyUserForm `fill` UserData(
       name = streamer.name,
       headline = streamer.headline,
       description = streamer.description,
@@ -100,8 +100,8 @@ object StreamerForm {
           case _ =>
             streamer.approval.copy(
               granted = streamer.approval.granted &&
-                newStreamer.twitch.fold(true)(streamer.twitch.has) &&
-                newStreamer.youTube.fold(true)(streamer.youTube.has)
+                newStreamer.twitch.fold(true)(t => streamer.twitch.contains(t)) &&
+                newStreamer.youTube.fold(true)(y => streamer.youTube.contains(y))
             )
         }
       )

@@ -2,8 +2,6 @@ package lila.clas
 
 import com.github.blemale.scaffeine.LoadingCache
 
-import scala.concurrent.duration._
-
 final class ClasMarkup {
 
   private val renderer = new lila.common.Markdown(autoLink = true)

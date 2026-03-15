@@ -1,7 +1,6 @@
 package views.html
 package tournament
 
-import controllers.routes
 import play.api.data.Form
 
 import lila.api.Context
@@ -12,7 +11,7 @@ import lila.tournament.Tournament
 
 object teamBattle {
 
-  def edit(tour: Tournament, form: Form[_])(implicit ctx: Context) =
+  def edit(tour: Tournament, form: Form[?])(implicit ctx: Context) =
     views.html.base.layout(
       title = tour.name(),
       moreCss = cssTag("tournament.form"),
@@ -121,7 +120,7 @@ object teamBattle {
               tr(
                 td(index + 1),
                 td(
-                  (index < tour.teamBattle.??(_.nbLeaders)) option iconTag("8"),
+                  (index < tour.teamBattle.so(_.nbLeaders)) `option` iconTag("8"),
                   userIdLink(player.userId.some)
                 ),
                 td(player.score),

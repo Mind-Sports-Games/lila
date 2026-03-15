@@ -3,7 +3,6 @@ package lila.relation
 import akka.stream.scaladsl._
 import reactivemongo.akkastream.cursorProducer
 import reactivemongo.api.ReadPreference
-import scala.concurrent.duration._
 
 import lila.common.config.MaxPerSecond
 import lila.db.dsl._
@@ -16,7 +15,7 @@ final class RelationStream(
 
   import RelationStream._
 
-  def follow(user: User, direction: Direction, perSecond: MaxPerSecond): Source[User, _] =
+  def follow(user: User, direction: Direction, perSecond: MaxPerSecond): Source[User, ?] =
     coll
       .find(
         $doc(selectField(direction) -> user.id, "r" -> Follow),

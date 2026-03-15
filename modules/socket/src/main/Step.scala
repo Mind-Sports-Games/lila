@@ -47,7 +47,6 @@ object Step {
   }
 
   implicit val stepJsonWriter: Writes[Step] = Writes { step =>
-    import lila.common.Json._
     import step._
     Json
       .obj(
@@ -57,7 +56,7 @@ object Step {
         "lidraughtsUci" -> move.map(_.uciString),
         "san"           -> move.map(_.san),
         "fen"           -> fen.value,
-        "captLen"       -> ~captLen
+        "captLen"       -> captLen.getOrElse(0)
       )
       .add("check", check)
       .add("currentPointValueP1", currentPointValueP1)

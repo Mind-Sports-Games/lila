@@ -1,13 +1,9 @@
 package views.html
 package round
 
-import strategygames.chess.variant.Crazyhouse
 import strategygames.variant.Variant
 import strategygames.format.FEN
-import strategygames.GameLogic
 
-import controllers.routes
-import scala.util.chaining._
 
 import lila.api.Context
 import lila.app.templating.Environment._
@@ -35,7 +31,7 @@ object bits {
           if (variant.hasDetachedPocket) "round.zh"
           else "round"
         },
-        ctx.blind option cssTag("round.nvui"),
+        ctx.blind `option` cssTag("round.nvui"),
         moreCss
       ),
       chessground = chessground,
@@ -53,7 +49,7 @@ object bits {
   def underchat(game: Game)(implicit ctx: Context) =
     frag(
       views.html.chat.spectatorsFrag,
-      isGranted(_.ViewBlurs) option div(cls := "round__mod")(
+      isGranted(_.ViewBlurs) `option` div(cls := "round__mod")(
         game.players.filter(p => game.playerBlurPercent(p.playerIndex) > 30) map { p =>
           div(
             playerLink(
@@ -152,7 +148,7 @@ object bits {
       swissPairingGames
     )
 
-  def roundAppPreload(pov: Pov, controls: Boolean)(implicit ctx: Context) =
+  @annotation.nowarn("msg=unused") def roundAppPreload(pov: Pov, controls: Boolean)(implicit ctx: Context) =
     div(cls := s"round__app")(
       div(cls := "round__app__board main-board")(chessground(pov)),
       div(cls := "col1-rmoves-preload")

@@ -3,14 +3,13 @@ package controllers
 import play.api.data.Form
 import play.api.libs.json.Json
 import play.api.mvc.Results
-import scala.concurrent.duration._
 
 import strategygames.format.FEN
 import strategygames.variant.Variant
 import strategygames.{ GameFamily, GameLogic }
 
-import lila.api.{ BodyContext, Context }
-import lila.app._
+import lila.api.Context
+import lila.app.{ *, given }
 import lila.common.{ HTTPRequest, IpAddress }
 import lila.game.{ AnonCookie, Pov }
 import lila.setup.Processor.HookResult
@@ -41,7 +40,7 @@ final class Setup(
 
   def gameForm(userId: Option[String]) =
     Open { implicit ctx =>
-      if (HTTPRequest isXhr ctx.req) {
+      if (HTTPRequest `isXhr` ctx.req) {
         val lib                      = gameLogic(getInt("lib"))
         val variant: Option[Variant] = get("variant").map(Variant.orDefault)
         val inputTimeMode            = get("time")
@@ -53,7 +52,7 @@ final class Setup(
           )
         ) flatMap { form =>
           val validFen = form("fen").value map (s => FEN.clean(lib, s)) flatMap ValidFen(strict = false)
-          userId ?? env.user.repo.named flatMap {
+          userId so env.user.repo.named flatMap {
             case None =>
               Ok(html.setup.forms.game(form, none, none, validFen, variant, inputTimeMode)).fuccess
             case Some(user) =>
@@ -72,10 +71,10 @@ final class Setup(
   def game(sri: String, userId: Option[String]) =
     OpenBody { implicit ctx =>
       implicit val req = ctx.body
-      PostRateLimit(HTTPRequest ipAddress ctx.req) {
+      PostRateLimit(HTTPRequest `ipAddress` ctx.req) {
         NoPlaybanOrCurrent {
           forms
-            .game(ctx)
+            .game(using ctx)
             .bindFromRequest()
             .fold(
               err =>
@@ -86,8 +85,8 @@ final class Setup(
               config =>
                 config.opponent match {
                   case "friend" | "bot" => {
-                    userId ?? env.user.repo.enabledById flatMap { destUser =>
-                      destUser ?? { env.challenge.granter(ctx.me, _, config.perfType) } flatMap {
+                    userId so env.user.repo.enabledById flatMap { destUser =>
+                      destUser so { env.challenge.granter(ctx.me, _, config.perfType) } flatMap {
                         case Some(denied) =>
                           val message = lila.challenge.ChallengeDenied.translated(denied)
                           negotiate(
@@ -109,7 +108,7 @@ final class Setup(
                             timeControl = timeControl,
                             mode = config.mode,
                             playerIndex = config.playerIndex.name,
-                            challenger = (ctx.me, HTTPRequest sid req) match {
+                            challenger = (ctx.me, HTTPRequest `sid` req) match {
                               case (Some(user), _) => toRegistered(config.variant, timeControl)(user)
                               case (_, Some(sid))  => Challenger.Anonymous(sid)
                               case _               => Challenger.Open
@@ -137,12 +136,12 @@ final class Setup(
                     }
                   }
                   case "lobby" => {
-                    (ctx.userId ?? env.relation.api.fetchBlocking) flatMap { blocking =>
+                    (ctx.userId so env.relation.api.fetchBlocking) flatMap { blocking =>
                       processor
                         .gameHook(
                           config, // withinLimits ctx.me,
                           Sri(sri),
-                          HTTPRequest sid req,
+                          HTTPRequest `sid` req,
                           blocking
                         )
                         .map(hookResponse)
@@ -181,19 +180,19 @@ final class Setup(
     OpenBody { implicit ctx =>
       NoBot {
         implicit val req = ctx.body
-        PostRateLimit(HTTPRequest ipAddress ctx.req) {
+        PostRateLimit(HTTPRequest `ipAddress` ctx.req) {
           NoPlaybanOrCurrent {
             forms
-              .hook(ctx)
+              .hook(using ctx)
               .bindFromRequest()
               .fold(
                 jsonFormError,
                 userConfig =>
-                  (ctx.userId ?? env.relation.api.fetchBlocking) flatMap { blocking =>
+                  (ctx.userId so env.relation.api.fetchBlocking) flatMap { blocking =>
                     processor.hook(
-                      userConfig withinLimits ctx.me,
+                      userConfig `withinLimits` ctx.me,
                       Sri(sri),
-                      HTTPRequest sid req,
+                      HTTPRequest `sid` req,
                       blocking
                     ) map hookResponse
                   }
@@ -206,19 +205,19 @@ final class Setup(
   def like(sri: String, gameId: String) =
     Open { implicit ctx =>
       NoBot {
-        PostRateLimit(HTTPRequest ipAddress ctx.req) {
+        PostRateLimit(HTTPRequest `ipAddress` ctx.req) {
           NoPlaybanOrCurrent {
-            env.game.gameRepo game gameId flatMap {
-              _ ?? { game =>
+            env.game.gameRepo `game` gameId flatMap {
+              _ so { game =>
                 for {
-                  blocking <- ctx.userId ?? env.relation.api.fetchBlocking
-                  hookConfig = lila.setup.HookConfig.default(ctx.isAuth) withRatingRange get(
+                  blocking <- ctx.userId so env.relation.api.fetchBlocking
+                  hookConfig = lila.setup.HookConfig.default(ctx.isAuth) `withRatingRange` get(
                     "rr"
-                  ) updateFrom game
+                  ) `updateFrom` game
                   sameOpponents = game.userIds
                   hookResult <-
                     processor
-                      .hook(hookConfig, Sri(sri), HTTPRequest sid ctx.req, blocking ++ sameOpponents)
+                      .hook(hookConfig, Sri(sri), HTTPRequest `sid` ctx.req, blocking ++ sameOpponents)
                 } yield hookResponse(hookResult)
               }
             }
@@ -235,7 +234,7 @@ final class Setup(
   )
   def boardApiHook =
     ScopedBody(_.Board.Play) { implicit req => me =>
-      implicit val lang = reqLang
+      implicit val lang: play.api.i18n.Lang = reqLang
       if (me.isBot) notForBotAccounts.fuccess
       else
         forms.boardApiHook
@@ -247,7 +246,7 @@ final class Setup(
                 val uniqId = s"sri:${me.id}"
                 config.fixPlayerIndex.hook(Sri(uniqId), me.some, sid = uniqId.some, blocking) match {
                   case Left(hook) =>
-                    PostRateLimit(HTTPRequest ipAddress req) {
+                    PostRateLimit(HTTPRequest `ipAddress` req) {
                       BoardApiHookConcurrencyLimitPerUser(me.id)(
                         env.lobby.boardApiHookStream(hook.copy(boardApi = true))
                       )(apiC.sourceToNdJsonOption).fuccess
@@ -272,41 +271,15 @@ final class Setup(
       }
     }
 
-  private def process[A](form: Context => Form[A])(op: A => BodyContext[_] => Fu[Pov]) =
-    OpenBody { implicit ctx =>
-      PostRateLimit(HTTPRequest ipAddress ctx.req) {
-        implicit val req = ctx.body
-        form(ctx)
-          .bindFromRequest()
-          .fold(
-            err =>
-              negotiate(
-                html = keyPages.home(Results.BadRequest),
-                api = _ => jsonFormError(err)
-              ),
-            config =>
-              op(config)(ctx) flatMap { pov =>
-                negotiate(
-                  html = fuccess(redirectPov(pov)),
-                  api = apiVersion =>
-                    env.api.roundApi.player(pov, none, apiVersion) map { data =>
-                      Created(data) as JSON
-                    }
-                )
-              }
-          )
-      }(rateLimitedFu)
-    }
-
   private[controllers] def redirectPov(pov: Pov)(implicit ctx: Context) = {
     val redir = Redirect(routes.Round.watcher(pov.gameId, pov.game.variant.startPlayer.name))
     if (ctx.isAuth) redir
     else
-      redir withCookies env.lilaCookie.cookie(
+      redir.withCookies(env.lilaCookie.cookie(
         AnonCookie.name,
         pov.playerId,
         maxAge = AnonCookie.maxAge.some,
         httpOnly = false.some
-      )
+      ))
   }
 }

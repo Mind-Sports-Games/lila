@@ -40,7 +40,7 @@ case class Puzzle(
 
   // ply after "initial move" when we start solving
   def initialPly: Int =
-    fen.fullMove ?? { fm =>
+    fen.fullMove so { fm =>
       fm * 2 - playerIndex.fold(1, 2)
     }
 
@@ -50,7 +50,7 @@ case class Puzzle(
       sit1 <- Forsyth.<<<@(variant.gameLogic, variant, fen)
       sit2 <- sit1.situation.move(line.head).toOption.map(_.situationAfter)
     } yield Forsyth.>>(variant.gameLogic, sit2)
-  } err s"Can't apply puzzle $id first move"
+  } `err` s"Can't apply puzzle $id first move"
 
   def playerIndex = fen.player.fold[PlayerIndex](PlayerIndex.P1)(!_)
 }
@@ -61,7 +61,7 @@ object Puzzle {
 
   case class Id(value: String) extends AnyVal with StringValue
 
-  def toId(id: String) = id.size == idSize option Id(id)
+  def toId(id: String) = id.size == idSize `option` Id(id)
 
   val puzzleVariants: List[Variant] = List(
     Variant.orDefault(GameLogic.Chess(), 1), //Standard
@@ -90,14 +90,14 @@ object Puzzle {
         l + charToInt(char) * pow
       }
 
-    def apply(l: Long): Option[Id] = (l > 130_000) ?? {
+    def apply(l: Long): Option[Id] = (l > 130_000) so {
       val str = powers.reverse
         .foldLeft(("", l)) { case ((id, rest), pow) =>
           val frac = rest / pow
           (s"${intToChar(frac.toInt)}$id", rest - frac * pow)
         }
         ._1
-      (str.size == idSize) option Id(str)
+      (str.size == idSize) `option` Id(str)
     }
 
     private def charToInt(c: Char) = {

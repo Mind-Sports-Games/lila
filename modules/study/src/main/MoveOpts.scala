@@ -38,5 +38,5 @@ object MoveOpts {
       (__ \ "sticky").readNullable[Boolean].map(_ | default.sticky) and
       (__ \ "promote").readNullable[Boolean].map(_ | default.promoteToMainline) and
       (__ \ "clock").readNullable[Centis]
-  )(MoveOpts.apply _)
+  )((w, s, p, c) => MoveOpts(w, s, p, c))
 }

@@ -16,7 +16,7 @@ final class BoardApiHookStream(
   private val blueprint =
     Source.queue[Option[JsObject]](16, akka.stream.OverflowStrategy.dropHead)
 
-  def apply(hook: Hook): Source[Option[JsObject], _] =
+  def apply(hook: Hook): Source[Option[JsObject], ?] =
     blueprint mapMaterializedValue { queue =>
       val actor = system.actorOf(Props(mkActor(hook, queue)))
       queue.watchCompletion().foreach { _ =>
@@ -49,13 +49,12 @@ final class BoardApiHookStream(
         case actorApi.RemoveHook(_) => self ! PoisonPill
 
         case SetOnline =>
-          context.system.scheduler
+          val _ = context.system.scheduler
             .scheduleOnce(3 second) {
               // gotta send a message to check if the client has disconnected
               queue offer None
               self ! SetOnline
-            }
-            .unit
+          }
       }
     }
 }

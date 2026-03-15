@@ -1,6 +1,5 @@
 package lila.racer
 
-import scala.concurrent.duration._
 import scala.concurrent.ExecutionContext
 
 final class RacerLobby(api: RacerApi)(implicit ec: ExecutionContext, scheduler: akka.actor.Scheduler) {

@@ -3,7 +3,6 @@ package html.puzzle
 
 import strategygames.format.FEN
 
-import controllers.routes
 import play.api.i18n.Lang
 import play.api.libs.json.{ JsString, Json }
 import strategygames.variant.Variant
@@ -16,8 +15,6 @@ import lila.puzzle.{ PuzzleDifficulty, PuzzleTheme }
 
 object bits {
 
-  private val dataLastmove = attr("data-lastmove")
-
   def daily(p: lila.puzzle.Puzzle, fen: FEN, lastMove: String) =
     views.html.board.bits.miniForVariant(fen, p.variant, p.playerIndex, lastMove)(span)
 
@@ -25,7 +22,7 @@ object bits {
     if (streak) i18nJsObject(streakI18nKeys)
     else
       i18nJsObject(trainingI18nKeys) + (PuzzleTheme.enPassant.key.value -> JsString(
-        PuzzleTheme.enPassant.name.txt()(lila.i18n.defaultLang)
+        PuzzleTheme.enPassant.name.txt()(using lila.i18n.defaultLang)
       ))
 
   def jsonThemes(variant: Variant) = PuzzleTheme

@@ -1,7 +1,7 @@
 package lila.chat
 
 import com.softwaremill.macwire._
-import io.methvin.play.autoconfig._
+import lila.common.autoconfig.{ AutoConfig, ConfigName }
 import play.api.Configuration
 import scala.concurrent.duration.FiniteDuration
 
@@ -30,7 +30,7 @@ final class Env(
     scheduler: akka.actor.Scheduler
 ) {
 
-  private val config = appConfig.get[ChatConfig]("chat")(AutoConfig.loader)
+  private val config = appConfig.get[ChatConfig]("chat")(using AutoConfig.loader)
   import config._
 
   lazy val timeout = new ChatTimeout(

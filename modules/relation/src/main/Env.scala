@@ -2,7 +2,7 @@ package lila.relation
 
 import akka.actor._
 import com.softwaremill.macwire._
-import io.methvin.play.autoconfig._
+import lila.common.autoconfig.{ AutoConfig, ConfigName }
 import play.api.Configuration
 
 import lila.common.config._
@@ -28,7 +28,7 @@ final class Env(
     system: ActorSystem
 ) {
 
-  private val config = appConfig.get[RelationConfig]("relation")(AutoConfig.loader)
+  private val config = appConfig.get[RelationConfig]("relation")(using AutoConfig.loader)
 
   def maxFollow = config.maxFollow
 

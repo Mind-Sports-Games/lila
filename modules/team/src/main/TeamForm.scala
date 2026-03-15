@@ -2,13 +2,13 @@ package lila.team
 
 import play.api.data._
 import play.api.data.Forms._
-import scala.concurrent.duration._
 
 import lila.common.Form.{ cleanNonEmptyText, cleanText, numberIn }
 import lila.common.LameName
+import lila.common.extensions.*
 import lila.db.dsl._
 import lila.security.SecurityHelper
-import org.apache.http.protocol.ExecutionContext
+
 
 final private[team] class TeamForm(
     teamRepo: TeamRepo,
@@ -24,7 +24,7 @@ final private[team] class TeamForm(
     val password = "password" -> optional(cleanText(maxLength = 60))
     def passwordCheck(team: Team) = "password" -> optional(text).verifying(
       "team:incorrectTeamPassword",
-      pw => team.password.fold(true)(_ == pw.??(_.trim))
+      pw => team.password.fold(true)(_ == pw.so(_.trim))
     )
     def requestMessage(team: Team) =
       "message" -> optional(cleanText(minLength = 30, maxLength = 2000))
@@ -39,7 +39,7 @@ final private[team] class TeamForm(
     val hideForum   = "hideForum"   -> boolean
   }
 
-  def create()(implicit ctx: lila.user.UserContext) = {
+  def create()(implicit ctx: lila.user.UserContext) =
     Form(
       mapping(
         Fields.name,
@@ -52,12 +52,11 @@ final private[team] class TeamForm(
         Fields.move,
         Fields.hideMembers,
         Fields.hideForum
-      )(TeamSetup.apply)(TeamSetup.unapply)
+      )(TeamSetup.apply)(d => Some((d.name, d.location, d.password, d.description, d.descPrivate, d.request, d.gameId, d.move, d.hideMembers, d.hideForum)))
         .verifying("team:teamAlreadyExists", d => !teamExists(d).await(2 seconds, "teamExists"))
         .verifying("team:teamLameName", d => !lameName(d))
-        .verifying(captchaFailMessage, validateCaptcha _)
+        .verifying(captchaFailMessage, validateCaptcha)
     )
-  }
 
   def edit(team: Team) =
     Form(
@@ -70,8 +69,8 @@ final private[team] class TeamForm(
         Fields.chat,
         Fields.hideMembers,
         Fields.hideForum
-      )(TeamEdit.apply)(TeamEdit.unapply)
-    ) fill TeamEdit(
+      )(TeamEdit.apply)(d => Some((d.location, d.password, d.description, d.descPrivate, d.request, d.chat, d.hideMembers, d.hideForum)))
+    ) `fill` TeamEdit(
       location = team.location,
       password = team.password,
       description = team.description,
@@ -86,8 +85,8 @@ final private[team] class TeamForm(
     mapping(
       Fields.requestMessage(team),
       Fields.passwordCheck(team)
-    )(RequestSetup.apply)(RequestSetup.unapply)
-  ) fill RequestSetup(
+    )(RequestSetup.apply)(d => Some((d.message, d.password)))
+  ) `fill` RequestSetup(
     message = "Hello, I would like to join the team!".some,
     password = None
   )
@@ -96,7 +95,7 @@ final private[team] class TeamForm(
     mapping(
       Fields.requestMessage(team),
       Fields.passwordCheck(team)
-    )(RequestSetup.apply)(RequestSetup.unapply)
+    )(RequestSetup.apply)(d => Some((d.message, d.password)))
   )
 
   val processRequest = Form(
@@ -119,16 +118,16 @@ final private[team] class TeamForm(
   )
 
   def leaders(t: Team) =
-    Form(single("leaders" -> nonEmptyText)) fill t.leaders
+    Form(single("leaders" -> nonEmptyText)) `fill` t.leaders
       .flatMap(lightUserApi.sync)
       .map(_.name)
       .mkString(", ")
 
   private def teamExists(setup: TeamSetup) =
-    teamRepo.coll.exists($id(Team nameToId setup.trim.name))
+    teamRepo.coll.exists($id(Team `nameToId` setup.trim.name))
 
   private def lameName(d: TeamSetup)(implicit ctx: lila.user.UserContext) =
-    if (isGranted(_.Admin)(ctx)) false else LameName.team(d.name)
+    if (isGranted(_.Admin)(using ctx)) false else LameName.team(d.name)
 }
 
 private[team] case class TeamSetup(

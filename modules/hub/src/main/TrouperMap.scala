@@ -2,7 +2,7 @@ package lila.hub
 
 import com.github.benmanes.caffeine.cache._
 import java.util.concurrent.TimeUnit
-import ornicar.scalalib.Zero
+import alleycats.Zero
 import play.api.Mode
 import scala.concurrent.duration.FiniteDuration
 import scala.concurrent.Promise
@@ -13,9 +13,9 @@ final class TrouperMap[T <: Trouper](
     accessTimeout: FiniteDuration
 )(implicit mode: Mode) {
 
-  def getOrMake(id: String): T = troupers get id
+  def getOrMake(id: String): T = troupers.get(id)
 
-  def getIfPresent(id: String): Option[T] = Option(troupers getIfPresent id)
+  def getIfPresent(id: String): Option[T] = Option(troupers.getIfPresent(id))
 
   def tell(id: String, msg: Any): Unit = getOrMake(id) ! msg
 
@@ -28,26 +28,26 @@ final class TrouperMap[T <: Trouper](
   def ask[A](id: String)(makeMsg: Promise[A] => Any): Fu[A] = getOrMake(id).ask(makeMsg)
 
   def askIfPresent[A](id: String)(makeMsg: Promise[A] => Any): Fu[Option[A]] =
-    getIfPresent(id) ?? {
-      _ ask makeMsg dmap some
+    getIfPresent(id) so {
+      _.ask(makeMsg).dmap(some)
     }
 
   def askIfPresentOrZero[A: Zero](id: String)(makeMsg: Promise[A] => Any): Fu[A] =
-    askIfPresent(id)(makeMsg) dmap (~_)
+    askIfPresent(id)(makeMsg).dmap(~_)
 
   def exists(id: String): Boolean = troupers.getIfPresent(id) != null
 
   def size: Int = troupers.estimatedSize().toInt
 
-  def kill(id: String): Unit = troupers invalidate id
+  def kill(id: String): Unit = troupers.invalidate(id)
 
   def killAll(): Unit = troupers.invalidateAll()
 
-  def touch(id: String): Unit = troupers.getIfPresent(id).unit
+  def touch(id: String): Unit = { val _ = troupers.getIfPresent(id) }
 
-  def touchOrMake(id: String): Unit = troupers.get(id).unit
+  def touchOrMake(id: String): Unit = { val _ = troupers.get(id) }
 
-  private[this] val troupers: LoadingCache[String, T] =
+  private val troupers: LoadingCache[String, T] =
     lila.common.LilaCache
       .caffeine(mode)
       .recordStats

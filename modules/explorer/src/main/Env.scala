@@ -42,6 +42,6 @@ final class Env(
 
   lila.common.Bus.subscribeFun("finishGame") {
     case lila.game.actorApi.FinishGame(game, _, _) if !game.aborted && indexFlowSetting.get() =>
-      indexer(game).unit
+      indexer(game).discard
   }
 }

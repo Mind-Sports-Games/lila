@@ -43,7 +43,7 @@ private object Aes {
 }
 
 case class HashedPassword(bytes: Array[Byte]) extends AnyVal {
-  def parse = bytes.lengthIs == 39 option bytes.splitAt(16)
+  def parse = bytes.lengthIs == 39 `option` bytes.splitAt(16)
 }
 
 final private class PasswordHasher(
@@ -66,7 +66,7 @@ final private class PasswordHasher(
   }
 
   def check(bytes: HashedPassword, p: ClearPassword): Boolean =
-    bytes.parse ?? { case (salt, encHash) =>
+    bytes.parse so { case (salt, encHash) =>
       val hash = aes.decrypt(Aes.iv(salt), encHash)
       BCrypt.bytesEqualSecure(hash, bHash(salt, p))
     }
@@ -102,13 +102,14 @@ object PasswordHasher {
   )(username: String, req: RequestHeader)(run: RateLimit.Charge => Fu[A])(default: => Fu[A]): Fu[A] =
     if (enforce.value) {
       val cost = 1
-      val ip   = HTTPRequest ipAddress req
-      rateLimitPerUser(User normalize username, cost = cost) {
+      val ip   = HTTPRequest `ipAddress` req
+      rateLimitPerUser(User `normalize` username, cost = cost) {
         rateLimitPerIP.chargeable(ip, cost = cost) { charge =>
           rateLimitGlobal("-", cost = cost, msg = ip.value) {
             run(charge)
           }(default)
         }(default)
       }(default)
-    } else run(_ => ())
+    }
+    else run(_ => ())
 }

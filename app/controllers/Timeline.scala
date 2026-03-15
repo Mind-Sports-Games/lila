@@ -1,10 +1,10 @@
 package controllers
 
 import play.api.libs.json._
-import scala.concurrent.duration._
 
-import lila.app._
+import lila.app.*
 import lila.common.config.Max
+import lila.common.extensions.*
 import lila.common.HTTPRequest
 import lila.timeline.Entry.entryWrites
 import views._
@@ -26,7 +26,7 @@ final class Timeline(env: Env) extends LilaController(env) {
               .map { html.timeline.more(_) },
         _ =>
           env.timeline.entryApi
-            .moreUserEntries(me.id, Max(getInt("nb") | 10) atMost env.apiTimelineSetting.get())
+            .moreUserEntries(me.id, Max(getInt("nb") | 10) `atMost` env.apiTimelineSetting.get())
             .map { es =>
               Ok(Json.obj("entries" -> es))
             }

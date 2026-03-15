@@ -6,7 +6,7 @@ import lila.common.LightUser
 import lila.storm.StormJson
 import lila.storm.StormSign
 
-final class RacerJson(stormJson: StormJson, sign: StormSign, lightUserSync: LightUser.GetterSync) {
+final class RacerJson(@annotation.nowarn("msg=unused") _stormJson: StormJson, @annotation.nowarn("msg=unused") _sign: StormSign, lightUserSync: LightUser.GetterSync) {
 
   import StormJson._
 

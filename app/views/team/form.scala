@@ -1,6 +1,5 @@
 package views.html.team
 
-import controllers.routes
 import play.api.data.Form
 import play.api.i18n.Lang
 
@@ -13,7 +12,7 @@ object form {
 
   import trans.team._
 
-  def create(form: Form[_], captcha: lila.common.Captcha)(implicit ctx: Context) =
+  def create(form: Form[?], captcha: lila.common.Captcha)(implicit ctx: Context) =
     views.html.base.layout(
       title = newTeam.txt(),
       moreCss = cssTag("team"),
@@ -40,14 +39,14 @@ object form {
       )
     }
 
-  def edit(t: Team, form: Form[_])(implicit ctx: Context) = {
+  def edit(t: Team, form: Form[?])(implicit ctx: Context) = {
     val title = "Edit Team " + t.name
     bits.layout(title = title) {
       main(cls := "page-menu page-small team-edit")(
         bits.menu(none),
         div(cls := "page-menu__content box box-pad")(
           h1(title),
-          t.enabled option postForm(cls := "form3", action := routes.Team.update(t.id))(
+          t.enabled `option` postForm(cls := "form3", action := routes.Team.update(t.id))(
             div(cls := "form-group")(
               a(cls := "button button-empty", href := routes.Team.leaders(t.id))(teamLeaders()),
               a(cls := "button button-empty", href := routes.Team.kick(t.id))(kickSomeone())
@@ -71,16 +70,16 @@ object form {
               form3.submit(trans.apply())
             )
           ),
-          ctx.userId.exists(t.leaders) || isGranted(_.ManageTeam) option frag(
+          ctx.userId.exists(t.leaders) || isGranted(_.ManageTeam) `option` frag(
             hr,
-            t.enabled option postForm(cls := "inline", action := routes.Team.disable(t.id))(
+            t.enabled `option` postForm(cls := "inline", action := routes.Team.disable(t.id))(
               submitButton(
                 dataIcon := "j",
                 cls := "submit button text confirm button-empty button-red",
                 st.title := trans.team.closeTeamDescription.txt() // can actually be reverted
               )(closeTeam())
             ),
-            isGranted(_.ManageTeam) option
+            isGranted(_.ManageTeam) `option`
               postForm(cls := "inline", action := routes.Team.close(t.id))(
                 submitButton(
                   dataIcon := "q",
@@ -88,7 +87,7 @@ object form {
                   st.title := "Deletes the team and its memberships. Cannot be reverted!"
                 )(trans.delete())
               ),
-            (t.disabled && isGranted(_.ManageTeam)) option
+            (t.disabled && isGranted(_.ManageTeam)) `option`
               postForm(cls := "inline", action := routes.Team.disable(t.id))(
                 submitButton(
                   cls := "button button-empty confirm",
@@ -101,7 +100,7 @@ object form {
     }
   }
 
-  private def textFields(form: Form[_])(implicit ctx: Context) = frag(
+  private def textFields(form: Form[?])(implicit ctx: Context) = frag(
     form3.group(form("location"), trans.location())(form3.input(_)),
     form3.group(form("description"), trans.description())(form3.textarea(_)(rows := 10)),
     form3.group(form("descPrivate"), trans.descPrivate(), help = trans.descPrivateHelp().some)(
@@ -109,14 +108,14 @@ object form {
     )
   )
 
-  private def requestField(form: Form[_])(implicit lang: Lang) =
+  private def requestField(form: Form[?])(implicit lang: Lang) =
     form3.checkbox(
       form("request"),
       trans.team.manuallyReviewAdmissionRequests(),
       help = trans.team.manuallyReviewAdmissionRequestsHelp().some
     )
 
-  private def hideFields(form: Form[_])(implicit lang: Lang) =
+  @annotation.nowarn("msg=unused") private def hideFields(form: Form[?])(implicit lang: Lang) =
     form3.split(
       form3.checkbox(
         form("hideMembers"),
@@ -130,7 +129,7 @@ object form {
       )
     )
 
-  private def passwordField(form: Form[_])(implicit ctx: Context) =
+  private def passwordField(form: Form[?])(implicit ctx: Context) =
     form3.group(
       form("password"),
       trans.team.teamPassword(),

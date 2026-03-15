@@ -1,14 +1,11 @@
 package lila.bot
 
-import scala.concurrent.duration._
 import play.api.i18n.Lang
 import play.api.libs.json._
 
 import lila.common.Json.jodaWrites
 import lila.game.JsonView._
 import lila.game.{ DeadStoneOfferState, Game, GameRepo, Pov }
-
-import strategygames.GameLogic
 
 final class BotJsonView(
     lightUserApi: lila.user.LightUserApi,
@@ -51,7 +48,7 @@ final class BotJsonView(
     // while the round game json uses the round.StepBuilder object.
     // not sure why the difference.
     import wf._
-    strategygames.format.UciDump(game.variant.gameLogic, game.actionStrs, fen, game.variant).toFuture map {
+    strategygames.format.UciDump(game.variant.gameLogic, game.actionStrs, fen, game.variant).toEither.toFuture map {
       uciMoves =>
         Json
           .obj(
@@ -102,7 +99,6 @@ final class BotJsonView(
           case DeadStoneOfferState.ChooseFirstOffer => Some("pending")
           case DeadStoneOfferState.AcceptedP1Offer  => Some("accepted")
           case DeadStoneOfferState.AcceptedP2Offer  => Some("accepted")
-          case _                                    => None
         }
       )
 

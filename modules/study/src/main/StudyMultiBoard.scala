@@ -38,7 +38,7 @@ final class StudyMultiBoard(
       .expireAfterAccess(10 minutes)
       .buildAsyncFuture[Study.Id, Paginator[ChapterPreview]] { fetch(_, 1, playing = false) }
 
-  private val playingSelector = $doc("tags" -> "Result:*", "relay.path" $ne "")
+  private val playingSelector = $doc("tags" -> "Result:*", "relay.path" `$ne` "")
 
   private def fetch(studyId: Study.Id, page: Int, playing: Boolean): Fu[Paginator[ChapterPreview]] =
     Paginator[ChapterPreview](
@@ -50,16 +50,17 @@ final class StudyMultiBoard(
   final private class ChapterPreviewAdapter(studyId: Study.Id, playing: Boolean)
       extends AdapterLike[ChapterPreview] {
 
-    private val selector = $doc("studyId" -> studyId) ++ playing.??(playingSelector)
+    private val selector = $doc("studyId" -> studyId) ++ playing.so(playingSelector)
 
     def nbResults: Fu[Int] = chapterRepo.coll(_.countSel(selector))
 
     def slice(offset: Int, length: Int): Fu[Seq[ChapterPreview]] =
       chapterRepo
         .coll {
-          _.aggregateList(length, readPreference = readPref) { framework =>
+          _.aggregateWith[Bdoc](readPreference = readPref) { framework =>
             import framework._
-            Match(selector) -> List(
+            List(
+              Match(selector),
               Sort(Ascending("order")),
               Skip(offset),
               Limit(length),
@@ -81,7 +82,8 @@ final class StudyMultiBoard(
               )
             )
           }
-        }
+            .collect[List](maxDocs = length)
+      }
         .map { r =>
           for {
             doc     <- r

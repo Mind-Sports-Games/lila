@@ -45,7 +45,7 @@ object TotpSecret {
     "0" * (6 - s.length) + s
   }
 
-  private[this] val secureRandom = new SecureRandom()
+  private val secureRandom = new SecureRandom()
 
   def apply(base32: String) = new TotpSecret(new Base32().decode(base32))
 

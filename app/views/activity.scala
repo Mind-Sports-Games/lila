@@ -1,6 +1,5 @@
 package views.html
 
-import controllers.routes
 
 import lila.activity.activities._
 import lila.activity.model._
@@ -39,8 +38,8 @@ object activity {
             a.tours map renderTours,
             a.swisses map renderSwisses,
             a.teams map renderTeams,
-            a.stream option renderStream(u),
-            a.signup option renderSignup
+            a.stream `option` renderStream(u),
+            a.signup `option` renderSignup
           )
         )
       }
@@ -138,7 +137,7 @@ object activity {
     }
 
   private def renderPosts(posts: Map[lila.forum.Topic, List[lila.forum.Post]])(implicit ctx: Context) =
-    ctx.noKid option entryTag(
+    ctx.noKid `option` entryTag(
       iconTag("d"),
       div(
         posts.toSeq.map { case (topic, posts) =>
@@ -260,7 +259,7 @@ object activity {
     )
 
   private def renderTeams(teams: Teams)(implicit ctx: Context) =
-    ctx.noKid option entryTag(
+    ctx.noKid `option` entryTag(
       iconTag("f"),
       div(
         trans.activity.joinedNbTeams.pluralSame(teams.value.size),
@@ -322,7 +321,7 @@ object activity {
     )
 
   private def renderStream(u: User)(implicit ctx: Context) =
-    ctx.noKid option entryTag(
+    ctx.noKid `option` entryTag(
       iconTag(""),
       a(href := routes.Streamer.redirect(u.username))(trans.activity.hostedALiveStream())
     )

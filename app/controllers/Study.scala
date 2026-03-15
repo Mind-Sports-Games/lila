@@ -2,12 +2,11 @@ package controllers
 
 import play.api.libs.json._
 import play.api.mvc._
-import scala.concurrent.duration._
-import scala.util.chaining._
 
 import lila.api.Context
-import lila.app._
+import lila.app.{ *, given }
 import lila.chat.Chat
+import lila.common.extensions.*
 import lila.common.paginator.{ Paginator, PaginatorJson }
 import lila.common.{ HTTPRequest, IpAddress }
 import lila.study.actorApi.Who
@@ -67,7 +66,7 @@ final class Study(
   def byOwner(username: String, order: String, page: Int) =
     Open { implicit ctx =>
       env.user.repo.named(username).flatMap {
-        _.fold(notFound(ctx)) { owner =>
+        _.fold(notFound(using ctx)) { owner =>
           env.study.pager.byOwner(owner, ctx.me, Order(order), page) flatMap { pag =>
             negotiate(
               html = Ok(html.study.list.byOwner(pag, Order(order), owner)).fuccess,
@@ -134,11 +133,11 @@ final class Study(
 
   def byTopic(name: String, order: String, page: Int) =
     Open { implicit ctx =>
-      lila.study.StudyTopic fromStr name match {
+      lila.study.StudyTopic `fromStr` name match {
         case None => notFound
         case Some(topic) =>
           env.study.pager.byTopic(topic, ctx.me, Order(order), page) zip
-            ctx.me.??(u => env.study.topicApi.userTopics(u.id) dmap some) map { case (pag, topics) =>
+            ctx.me.so(u => env.study.topicApi.userTopics(u.id) `dmap` some) map { case (pag, topics) =>
               Ok(html.study.topic.show(topic, pag, Order(order), topics))
             }
       }
@@ -158,9 +157,9 @@ final class Study(
   private def orRelay(id: String, chapterId: Option[String] = None)(
       f: => Fu[Result]
   )(implicit ctx: Context): Fu[Result] =
-    if (HTTPRequest isRedirectable ctx.req) env.relay.api.getOngoing(lila.relay.RelayRound.Id(id)) flatMap {
+    if (HTTPRequest `isRedirectable` ctx.req) env.relay.api.getOngoing(lila.relay.RelayRound.Id(id)) flatMap {
       _.fold(f) { rt =>
-        Redirect(chapterId.map(Chapter.Id).fold(rt.path)(rt.path)).fuccess
+        Redirect(chapterId.map(Chapter.Id.apply).fold(rt.path)(rt.path)).fuccess
       }
     }
     else f
@@ -183,7 +182,7 @@ final class Study(
                     "study" -> data.study.add("chat" -> chatOpt.map { c =>
                       lila.chat.JsonView.mobile(
                         chat = c.chat,
-                        writeable = ctx.userId.??(sc.study.canChat)
+                        writeable = ctx.userId.so(sc.study.canChat)
                       )
                     }),
                     "analysis" -> data.analysis
@@ -202,8 +201,8 @@ final class Study(
       chapter = resetToChapter | sc.chapter
       _ <- env.user.lightUserApi preloadMany study.members.ids.toList
       pov = userAnalysisC.makePov(chapter.root.fen.some, chapter.setup.variant)
-      analysis <- chapter.serverEval.exists(_.done) ?? env.analyse.analyser.byId(chapter.id.value)
-      division = analysis.isDefined option env.study.serverEvalMerger.divisionOf(chapter)
+      analysis <- chapter.serverEval.exists(_.done) so env.analyse.analyser.byId(chapter.id.value)
+      division = analysis.isDefined `option` env.study.serverEvalMerger.divisionOf(chapter)
       baseData = env.round.jsonView.userAnalysisJson(
         pov,
         ctx.pref,
@@ -242,7 +241,7 @@ final class Study(
   def chapterMeta(id: String, chapterId: String) =
     Open { _ =>
       env.study.chapterRepo.byId(chapterId).map {
-        _.filter(_.studyId.value == id) ?? { chapter =>
+        _.filter(_.studyId.value == id) so { chapter =>
           Ok(env.study.jsonView.chapterConfig(chapter))
         }
       }
@@ -253,7 +252,7 @@ final class Study(
     ctx.me.fold(true) { // anon can see public chats
       env.chat.panic.allowed
     }
-  } ?? env.chat.api.userChat
+  } so env.chat.api.userChat
     .findMine(Chat.Id(study.id.value), ctx.me)
     .dmap(some)
     .mon(_.chat.fetch("study"))
@@ -299,7 +298,7 @@ final class Study(
   def delete(id: String) =
     Auth { _ => me =>
       env.study.api.byIdAndOwner(id, me) flatMap {
-        _ ?? { study =>
+        _ so { study =>
           env.study.api.delete(study) >> env.relay.api.deleteRound(lila.relay.RelayRound.Id(id)).map {
             case _ => Redirect(routes.Study.mine("hot"))
             //case Some(tour) => Redirect(routes.RelayTour.redirect(tour.slug, tour.id.value))
@@ -311,14 +310,14 @@ final class Study(
   def clearChat(id: String) =
     Auth { _ => me =>
       env.study.api.isOwner(id, me) flatMap {
-        _ ?? env.chat.api.userChat.clear(Chat.Id(id))
+        _ so env.chat.api.userChat.clear(Chat.Id(id))
       } inject Redirect(routes.Study.show(id))
     }
 
   def importPgn(id: String) =
     AuthBody { implicit ctx => me =>
       implicit val req = ctx.body
-      get("sri") ?? { sri =>
+      get("sri") so { sri =>
         lila.study.StudyForm.importPgn.form
           .bindFromRequest()
           .fold(
@@ -406,7 +405,7 @@ final class Study(
     Auth { implicit ctx => me =>
       val cost = if (isGranted(_.Coach) || me.hasTitle) 1 else 3
       CloneLimitPerUser(me.id, cost = cost) {
-        CloneLimitPerIP(HTTPRequest ipAddress ctx.req, cost = cost) {
+        CloneLimitPerIP(HTTPRequest `ipAddress` ctx.req, cost = cost) {
           OptionFuResult(env.study.api.byId(id)) { prev =>
             CanViewResult(prev) {
               env.study.api.clone(me, prev) map { study =>
@@ -426,12 +425,12 @@ final class Study(
 
   def pgn(id: String) =
     Open { implicit ctx =>
-      PgnRateLimitPerIp(HTTPRequest ipAddress ctx.req) {
+      PgnRateLimitPerIp(HTTPRequest `ipAddress` ctx.req) {
         OptionFuResult(env.study.api byId id) { study =>
           CanViewResult(study) {
-            lila.mon.export.pgn.study.increment()
+            lila.mon.`export`.pgn.study.increment()
             Ok.chunked(env.study.pgnDump(study, requestPgnFlags(ctx.req)))
-              .pipe(asAttachmentStream(s"${env.study.pgnDump filename study}.pgn"))
+              .pipe(asAttachmentStream(s"${env.study.pgnDump `filename` study}.pgn"))
               .as(pgnContentType)
               .fuccess
           }
@@ -441,12 +440,12 @@ final class Study(
 
   def sgf(id: String) =
     Open { implicit ctx =>
-      PgnRateLimitPerIp(HTTPRequest ipAddress ctx.req) {
+      PgnRateLimitPerIp(HTTPRequest `ipAddress` ctx.req) {
         OptionFuResult(env.study.api byId id) { study =>
           CanViewResult(study) {
-            lila.mon.export.pgn.study.increment()
+            lila.mon.`export`.pgn.study.increment()
             Ok.chunked(env.study.sgfDump(study))
-              .pipe(asAttachmentStream(s"${env.study.sgfDump filename study}.sgf"))
+              .pipe(asAttachmentStream(s"${env.study.sgfDump `filename` study}.sgf"))
               .as(sgfContentType)
               .fuccess
           }
@@ -459,7 +458,7 @@ final class Study(
       env.study.api.byIdWithChapter(id, chapterId) flatMap {
         _.fold(notFound) { case WithChapter(study, chapter) =>
           CanViewResult(study) {
-            lila.mon.export.pgn.studyChapter.increment()
+            lila.mon.`export`.pgn.studyChapter.increment()
             Ok(env.study.pgnDump.ofChapter(study, requestPgnFlags(ctx.req))(chapter).toString)
               .pipe(asAttachment(s"${env.study.pgnDump.filename(study, chapter)}.pgn"))
               .as(pgnContentType)
@@ -474,7 +473,7 @@ final class Study(
       env.study.api.byIdWithChapter(id, chapterId) flatMap {
         _.fold(notFound) { case WithChapter(study, chapter) =>
           CanViewResult(study) {
-            lila.mon.export.pgn.studyChapter.increment()
+            lila.mon.`export`.pgn.studyChapter.increment()
             Ok(env.study.sgfDump.ofChapter(study)(chapter).toString)
               .pipe(asAttachment(s"${env.study.sgfDump.filename(study, chapter)}.sgf"))
               .as(sgfContentType)
@@ -495,7 +494,7 @@ final class Study(
       me: Option[lila.user.User],
       req: RequestHeader
   ) = {
-    val userId = lila.user.User normalize username
+    val userId = lila.user.User `normalize` username
     val flags  = requestPgnFlags(req)
     val isMe   = me.exists(_.id == userId)
     apiC
@@ -559,7 +558,7 @@ final class Study(
   def topics =
     Open { implicit ctx =>
       env.study.topicApi.popular(50) zip
-        ctx.me.??(u => env.study.topicApi.userTopics(u.id) dmap some) map { case (popular, mine) =>
+        ctx.me.so(u => env.study.topicApi.userTopics(u.id) `dmap` some) map { case (popular, mine) =>
           val form = mine map lila.study.StudyForm.topicsForm
           Ok(html.study.topic.index(popular, mine, form))
         }
@@ -602,19 +601,19 @@ final class Study(
         .maximumSize(512)
         .buildAsyncFuture { studyId =>
           env.study.studyRepo.membersById(studyId) flatMap {
-            _.map(_.members).filter(_.nonEmpty) ?? { members =>
+            _.map(_.members).filter(_.nonEmpty) so { members =>
               env.streamer.liveStreamApi.all.flatMap {
-                _.streams
-                  .filter { s =>
-                    members.exists(m => s is m._2.id)
-                  }
-                  .map { stream =>
-                    env.study.isConnected(studyId, stream.streamer.userId) map {
-                      _ option stream.streamer.userId
+                liveStreams =>
+                  Future.sequence(liveStreams.streams
+                    .filter { s =>
+                      members.exists(m => s `is` m._2.id)
                     }
-                  }
-                  .sequenceFu
-                  .dmap(_.flatten)
+                    .map { stream =>
+                      env.study.isConnected(studyId, stream.streamer.userId) map {
+                        _ `option` stream.streamer.userId
+                      }
+                    })
+                    .dmap(_.flatten)
               }
             }
           }
@@ -626,7 +625,7 @@ final class Study(
     import lila.tree.Node.glyphWriter
     import lila.i18n.{ I18nKeys => trans }
 
-    play.api.i18n.Lang.get(lang) ?? { implicit lang =>
+    play.api.i18n.Lang.get(lang) so { implicit lang =>
       JsonOk(
         Json.obj(
           "move" -> List(

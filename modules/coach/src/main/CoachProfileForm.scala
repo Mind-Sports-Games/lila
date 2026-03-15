@@ -29,9 +29,9 @@ object CoachProfileForm {
           "youtubeVideos"      -> optional(nonEmptyText),
           "youtubeChannel"     -> optional(nonEmptyText),
           "publicStudies"      -> optional(nonEmptyText)
-        )(CoachProfile.apply)(CoachProfile.unapply)
-      )(Data.apply)(Data.unapply)
-    ) fill Data(
+        )(CoachProfile.apply)(d => Some((d.headline, d.languages, d.hourlyRate, d.description, d.playingExperience, d.teachingExperience, d.otherExperience, d.skills, d.methodology, d.youtubeVideos, d.youtubeChannel, d.publicStudies)))
+      )(Data.apply)(d => Some((d.listed, d.available, d.languages, d.profile)))
+    ) `fill` Data(
       listed = coach.listed.value,
       available = coach.available.value,
       languages = "",

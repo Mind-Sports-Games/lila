@@ -32,7 +32,7 @@ case class Profile(
   def completionPercent: Int =
     100 * List(country, bio, firstName, lastName).count(_.isDefined) / 4
 
-  def actualLinks: List[Link] = links ?? Links.make
+  def actualLinks: List[Link] = links so Links.make
 
   import Profile.OfficialRating
 

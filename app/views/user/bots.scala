@@ -1,7 +1,6 @@
 package views.html
 package user
 
-import controllers.routes
 
 import lila.api.Context
 import lila.app.templating.Environment._
@@ -14,7 +13,7 @@ object bots {
 
     val title = s"${users.size} Online bots"
 
-    val sorted = users.sortBy { -_.playTime.??(_.total) }
+    val sorted = users.sortBy { -_.playTime.so(_.total) }
 
     views.html.base.layout(
       title = title,

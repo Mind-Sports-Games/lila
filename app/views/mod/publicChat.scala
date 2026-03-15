@@ -4,7 +4,6 @@ import lila.api.Context
 import lila.app.templating.Environment._
 import lila.app.ui.ScalatagsTemplate._
 
-import controllers.routes
 import play.api.mvc.Call
 import lila.chat.UserChat
 import lila.chat.ChatTimeout

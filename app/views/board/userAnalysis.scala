@@ -12,7 +12,6 @@ import lila.common.String.html.safeJsonValue
 import lila.rating.PerfType.iconByVariant
 import lila.i18n.VariantKeys
 
-import controllers.routes
 
 object userAnalysis {
 
@@ -40,11 +39,11 @@ object userAnalysis {
       title = trans.analysis.txt(),
       moreCss = frag(
         cssTag("analyse.free"),
-        (pov.game.variant.hasDetachedPocket) option cssTag(
+        (pov.game.variant.hasDetachedPocket) `option` cssTag(
           "analyse.zh"
         ),
-        withForecast option cssTag("analyse.forecast"),
-        ctx.blind option cssTag("round.nvui")
+        withForecast `option` cssTag("analyse.forecast"),
+        ctx.blind `option` cssTag("round.nvui")
       ),
       moreJs = frag(
         analyseTag,
@@ -72,7 +71,7 @@ object userAnalysis {
       zoomable = true
     ) {
       main(cls := "analyse")(
-        pov.game.synthetic option st.aside(cls := "analyse__side")(
+        pov.game.synthetic `option` st.aside(cls := "analyse__side")(
           views.html.base.bits.mselect(
             "analyse-variant",
             span(cls := "text", dataIcon := iconByVariant(pov.game.variant))(

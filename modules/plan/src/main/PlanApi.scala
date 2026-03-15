@@ -1,14 +1,12 @@
 package lila.plan
 
 import com.softwaremill.tagging._
-import org.joda.time.DateTime
 import play.api.i18n.Lang
 import reactivemongo.api._
 import scala.concurrent.duration._
 import cats.syntax.all._
-import org.joda.time.{ DateTime, Days }
+import org.joda.time.DateTime
 
-import lila.common.config.Secret
 import lila.common.{ Bus, IpAddress }
 import lila.db.dsl._
 import lila.memo.CacheApi._
@@ -46,12 +44,11 @@ final class PlanApi(
   def cancel(user: User): Funit = {
     def onCancel =
       isLifetime(user).flatMap { lifetime =>
-        !lifetime ?? setDbUserPlan(user, user.plan.disable)
+        !lifetime so setDbUserPlan(user, user.plan.disable)
       } >>
         patronColl.update
           .one($id(user.id), $unset("stripe", "payPal", "payPalCheckout", "expiresAt"))
-          .void >>-
-        logger.info(s"Canceled subscription of ${user.username}")
+          .void.andDo(logger.info(s"Canceled subscription of ${user.username}"))
     stripe.userCustomer(user) flatMap {
       case Some(customer) =>
         customer.firstSubscription match {
@@ -68,7 +65,7 @@ final class PlanApi(
 
   object stripe {
 
-    def getEvent = stripeClient.getEvent _
+    def getEvent = stripeClient.getEvent
 
     def onCharge(stripeCharge: StripeCharge): Funit =
       customerIdPatron(stripeCharge.customer) flatMap { patronOption =>
@@ -84,7 +81,7 @@ final class PlanApi(
               funit
             case Some(patron) =>
               logger.info(s"Charged $charge $patron")
-              userRepo byId patron.userId orFail s"Missing user for $patron" flatMap { user =>
+              userRepo `byId` patron.userId `orFail` s"Missing user for $patron" flatMap { user =>
                 val p2 = patron
                   .copy(
                     stripe = Patron.Stripe(stripeCharge.customer).some,
@@ -93,7 +90,7 @@ final class PlanApi(
                   .levelUpIfPossible
                 patronColl.update.one($id(patron.id), p2) >>
                   setDbUserPlanOnCharge(user, patron.canLevelUp) >> {
-                    stripeCharge.lifetimeWorthy ?? setLifetime(user)
+                    stripeCharge.lifetimeWorthy so setLifetime(user)
                   }
               }
           }
@@ -102,14 +99,12 @@ final class PlanApi(
 
     def onSubscriptionDeleted(sub: StripeSubscription): Funit =
       customerIdPatron(sub.customer) flatMap {
-        _ ?? { patron =>
+        _ so { patron =>
           if (patron.isLifetime) funit
           else
-            userRepo byId patron.userId orFail s"Missing user for $patron" flatMap { user =>
+            userRepo `byId` patron.userId `orFail` s"Missing user for $patron" flatMap { user =>
               setDbUserPlan(user, user.plan.disable) >>
-                patronColl.update.one($id(user.id), patron.removeStripe).void >>-
-                notifier.onExpire(user) >>-
-                logger.info(s"Unsubed ${user.username} $sub")
+                patronColl.update.one($id(user.id), patron.removeStripe).void.andDo(notifier.onExpire(user)).andDo(logger.info(s"Unsubed ${user.username} $sub"))
             }
         }
       }
@@ -120,7 +115,7 @@ final class PlanApi(
           logger.warn(s"Completed Session of unknown patron $completedSession")
           funit
         case Some(prevPatron) =>
-          userRepo byId prevPatron.userId orFail s"Missing user for $prevPatron" flatMap { user =>
+          userRepo `byId` prevPatron.userId `orFail` s"Missing user for $prevPatron" flatMap { user =>
             val patron = prevPatron
               .copy(lastLevelUp = Some(DateTime.now))
               .removePayPal
@@ -132,7 +127,7 @@ final class PlanApi(
     def customerInfo(user: User, customer: StripeCustomer): Fu[Option[CustomerInfo]] =
       stripeClient.getNextInvoice(customer.id) zip
         stripeClient.getPastInvoices(customer.id) zip
-        customer.firstSubscription.??(stripeClient.getPaymentMethod) map {
+        customer.firstSubscription.so(stripeClient.getPaymentMethod) map {
           case ((Some(nextInvoice), pastInvoices), paymentMethod) =>
             customer.firstSubscription match {
               case Some(sub) => MonthlyCustomerInfo(sub, nextInvoice, pastInvoices, paymentMethod).some
@@ -141,7 +136,7 @@ final class PlanApi(
                 none
             }
           case ((None, _), _) => OneTimeCustomerInfo(customer).some
-        }
+      }
 
     private def saveCustomer(user: User, customerId: StripeCustomerId): Funit =
       userPatron(user) flatMap { patronOpt =>
@@ -158,11 +153,11 @@ final class PlanApi(
 
     def userCustomer(user: User): Fu[Option[StripeCustomer]] =
       userCustomerId(user) flatMap {
-        _ ?? stripeClient.getCustomer
+        _ so stripeClient.getCustomer
       }
 
     def getOrMakeCustomer(user: User, data: PlanCheckout): Fu[StripeCustomer] =
-      userCustomer(user) getOrElse makeCustomer(user, data)
+      userCustomer(user) `getOrElse` makeCustomer(user, data)
 
     def makeCustomer(user: User, data: PlanCheckout): Fu[StripeCustomer] =
       stripeClient.createCustomer(user, data) flatMap { customer =>
@@ -173,7 +168,7 @@ final class PlanApi(
       getOrMakeCustomer(user, data).map(_.id)
 
     def patronCustomer(patron: Patron): Fu[Option[StripeCustomer]] =
-      patron.stripe.map(_.customerId) ?? stripeClient.getCustomer
+      patron.stripe.map(_.customerId) so stripeClient.getCustomer
 
     private def customerIdPatron(id: StripeCustomerId): Fu[Option[Patron]] =
       patronColl.one[Patron]($doc("stripe.customerId" -> id))
@@ -189,7 +184,7 @@ final class PlanApi(
 
     def updatePayment(sub: StripeSubscription, sessionId: String) =
       stripeClient.getSession(sessionId) flatMap {
-        _ ?? { session =>
+        _ so { session =>
           stripeClient.setCustomerPaymentMethod(sub.customer, session.setup_intent.payment_method) zip
             stripeClient.setSubscriptionPaymentMethod(sub, session.setup_intent.payment_method) void
         }
@@ -198,7 +193,7 @@ final class PlanApi(
 
   object payPal {
 
-    def getEvent = payPalClient.getEvent _
+    def getEvent = payPalClient.getEvent
 
     def userSubscriptionId(user: User): Fu[Option[PayPalSubscriptionId]] =
       userPatron(user) map {
@@ -207,7 +202,7 @@ final class PlanApi(
 
     def userSubscription(user: User): Fu[Option[PayPalSubscription]] =
       userSubscriptionId(user) flatMap {
-        _ ?? payPalClient.getSubscription
+        _ so payPalClient.getSubscription
       }
 
     def createOrder(checkout: PlanCheckout, user: User) =
@@ -226,15 +221,16 @@ final class PlanApi(
         if (cents.value < 100) {
           logger.info(s"Ignoring invalid paypal amount from $ip ${order.userId} $cents ${orderId}")
           funit
-        } else {
+        }
+        else {
           val charge = Charge.make(
             userId = order.userId,
             payPalCheckout = Patron.PayPalCheckout(order.payer.id, none).some,
             cents = cents
           )
           addCharge(charge, order.country) >>
-            (order.userId ?? userRepo.named) flatMap {
-              _ ?? { user =>
+            (order.userId so userRepo.named) flatMap {
+              _ so { user =>
                 def newPayPalCheckout = Patron.PayPalCheckout(order.payer.id, none)
                 userPatron(user).flatMap {
                   case None =>
@@ -257,10 +253,10 @@ final class PlanApi(
                     patronColl.update.one($id(patron.id), p2) >>
                       setDbUserPlanOnCharge(user, patron.canLevelUp)
                 } >> {
-                  charge.lifetimeWorthy ?? setLifetime(user)
-                } >>- logger.info(s"Charged ${user.username} with paypal: $cents")
+                  charge.lifetimeWorthy so setLifetime(user)
+                }.andDo(logger.info(s"Charged ${user.username} with paypal: $cents"))
               }
-            }
+          }
         }
     } yield ()
 
@@ -270,14 +266,15 @@ final class PlanApi(
         user: User,
         ip: IpAddress
     ) = for {
-      order <- payPalClient.getOrder(orderId) orFail s"Missing paypal order for id $orderId"
-      sub   <- payPalClient.getSubscription(subId) orFail s"Missing paypal subscription for order $order"
+      order <- payPalClient.getOrder(orderId) `orFail` s"Missing paypal order for id $orderId"
+      sub   <- payPalClient.getSubscription(subId) `orFail` s"Missing paypal subscription for order $order"
       cents = sub.capturedMoney
       _ <-
         if (cents.value < 100) {
           logger.info(s"Ignoring invalid paypal amount from $ip ${order.userId} $cents $orderId")
           funit
-        } else {
+        }
+        else {
           val charge = Charge.make(
             userId = user.id.some,
             payPalCheckout = Patron.PayPalCheckout(order.payer.id, sub.id.some).some,
@@ -307,14 +304,14 @@ final class PlanApi(
                 patronColl.update.one($id(patron.id), p2) >>
                   setDbUserPlanOnCharge(user, patron.canLevelUp)
             } >> {
-              charge.lifetimeWorthy ?? setLifetime(user)
-            } >>- logger.info(s"Charged ${user.username} with paypal checkout: $cents")
+              charge.lifetimeWorthy so setLifetime(user)
+            }.andDo(logger.info(s"Charged ${user.username} with paypal checkout: $cents"))
           }
         }
     } yield ()
 
     def subscriptionUser(id: PayPalSubscriptionId): Fu[Option[User]] =
-      subscriptionIdPatron(id) flatMap { _.map(_.id.value) ?? userRepo.byId }
+      subscriptionIdPatron(id) flatMap { _.map(_.id.value) so userRepo.byId }
 
     private def subscriptionIdPatron(id: PayPalSubscriptionId): Fu[Option[Patron]] =
       patronColl.one[Patron]($doc("payPalCheckout.subscriptionId" -> id))
@@ -369,7 +366,8 @@ final class PlanApi(
             if (!user.plan.active) {
               logger.warn(s"${user.username} sync: enable plan of customer with paypal")
               setDbUserPlan(user, user.plan.enable) inject ReloadUser
-            } else fuccess(Synced(patron.some, none, none))
+            }
+            else fuccess(Synced(patron.some, none, none))
 
           case (None, None, None) if patron.isLifetime => fuccess(Synced(patron.some, none, none))
 
@@ -401,7 +399,7 @@ final class PlanApi(
         ),
         upsert = true
       )
-      .void >>- lightUserApi.invalidate(user.id)
+      .void.andDo(lightUserApi.invalidate(user.id))
   }
 
   def giveMonth(user: User): Funit =
@@ -420,8 +418,7 @@ final class PlanApi(
 
   def remove(user: User): Funit =
     userRepo.unsetPlan(user) >>
-      patronColl.unsetField($id(user.id), "lifetime").void >>-
-      lightUserApi.invalidate(user.id)
+      patronColl.unsetField($id(user.id), "lifetime").void.andDo(lightUserApi.invalidate(user.id))
 
   private val recentChargeUserIdsNb = 100
   private val recentChargeUserIdsCache = cacheApi.unit[List[User.ID]] {
@@ -432,7 +429,7 @@ final class PlanApi(
           sort = $doc("date" -> -1),
           nb = recentChargeUserIdsNb * 3 / 2,
           "userId"
-        ) flatMap filterUserIds dmap (_ take recentChargeUserIdsNb)
+        ) flatMap filterUserIds `dmap` (_ take recentChargeUserIdsNb)
       }
   }
 
@@ -442,10 +439,10 @@ final class PlanApi(
     chargeColl.find($doc("userId" -> user.id)).sort($doc("date" -> -1)).cursor[Charge]().list()
 
   private[plan] def onEmailChange(userId: User.ID, email: EmailAddress): Funit =
-    userRepo enabledById userId flatMap {
-      _ ?? { user =>
+    userRepo `enabledById` userId flatMap {
+      _ so { user =>
         stripe.userCustomer(user) flatMap {
-          _.filterNot(_.email.has(email.value)) ?? {
+          _.filterNot(_.email.has(email.value)) so {
             stripeClient.setCustomerEmail(_, email)
           }
         }
@@ -461,22 +458,21 @@ final class PlanApi(
       .buildAsyncFuture {
         loader { _ =>
           chargeColl
-            .aggregateList(
-              maxDocs = topPatronUserIdsNb * 2,
-              readPreference = ReadPreference.secondaryPreferred
-            ) { framework =>
+            .aggregateWith[Bdoc](readPreference = ReadPreference.secondaryPreferred) { framework =>
               import framework._
-              Match($doc("userId" $exists true)) -> List(
+              List(
+                Match($doc("userId" `$exists` true)),
                 GroupField("userId")("total" -> SumField("cents")),
                 Sort(Descending("total")),
                 Limit(topPatronUserIdsNb * 3 / 2)
               )
             }
+            .collect[List](maxDocs = topPatronUserIdsNb * 2)
             .dmap {
               _.flatMap { _.getAsOpt[User.ID]("_id") }
-            } flatMap filterUserIds dmap (_ take topPatronUserIdsNb)
+            } flatMap filterUserIds `dmap` (_ take topPatronUserIdsNb)
         }
-      }
+    }
   }
 
   def topPatronUserIds: Fu[List[User.ID]] = topPatronUserIdsCache.get {}
@@ -490,7 +486,7 @@ final class PlanApi(
 
   private def addCharge(charge: Charge, country: Option[Country]): Funit =
     monitorCharge(charge, country) >>
-      chargeColl.insert.one(charge).void >>- {
+      chargeColl.insert.one(charge).void.andDo {
         recentChargeUserIdsCache.invalidateUnit()
         monthlyGoalApi.get foreach { m =>
           Bus.publish(
@@ -508,22 +504,22 @@ final class PlanApi(
           if (charge.isPayPalCheckout) lila.mon.plan.paypalCheckout.amount.record(charge.cents.value)
           else if (charge.isStripe) lila.mon.plan.stripe.record(charge.cents.value)
         }
-      }
+    }
 
   private def monitorCharge(charge: Charge, country: Option[Country]): Funit = {
     lila.mon.plan.charge
       .countryCents(country = country.fold("unknown")(_.code), service = charge.serviceName)
       .record(charge.cents.value)
-    charge.userId ?? { userId =>
+    charge.userId so { userId =>
       chargeColl.exists($doc("userId" -> userId)) map {
-        case false => lila.mon.plan.charge.first(charge.serviceName).increment().unit
+        case false => val _ = lila.mon.plan.charge.first(charge.serviceName).increment()
         case _     =>
       }
     }
   }
 
   private def setDbUserPlan(user: User, plan: lila.user.Plan): Funit =
-    userRepo.setPlan(user, plan) >>- lightUserApi.invalidate(user.id)
+    userRepo.setPlan(user, plan).andDo(lightUserApi.invalidate(user.id))
 
   def userPatron(user: User): Fu[Option[Patron]] = patronColl.one[Patron]($id(user.id))
 }

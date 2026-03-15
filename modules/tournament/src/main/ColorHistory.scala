@@ -1,7 +1,6 @@
 package lila.tournament
 
 import strategygames.{ Player => PlayerIndex }
-import scala.concurrent.duration._
 
 import lila.memo.CacheApi
 
@@ -9,13 +8,12 @@ import lila.memo.CacheApi
 //negative strike -> p2 pieces
 case class PlayerIndexHistory(strike: Int, balance: Int) extends Ordered[PlayerIndexHistory] {
 
-  override def compare(that: PlayerIndexHistory): Int = {
+  override def compare(that: PlayerIndexHistory): Int =
     if (strike < that.strike) -1
     else if (strike > that.strike) 1
     else if (balance < that.balance) -1
     else if (balance > that.balance) 1
     else 0
-  }
 
   def firstGetsP1(that: PlayerIndexHistory)(fallback: () => Boolean) = {
     val c = compare(that)
@@ -24,7 +22,7 @@ case class PlayerIndexHistory(strike: Int, balance: Int) extends Ordered[PlayerI
 
   def inc(playerIndex: PlayerIndex): PlayerIndexHistory =
     copy(
-      strike = playerIndex.fold((strike + 1) atLeast 1, (strike - 1) atMost -1),
+      strike = playerIndex.fold((strike + 1) `atLeast` 1, (strike - 1) `atMost` -1),
       balance = balance + playerIndex.fold(1, -1)
     )
 
@@ -51,5 +49,5 @@ final class PlayerIndexHistoryApi(cacheApi: CacheApi) {
 
   def get(playerId: Player.ID) = cache.getIfPresent(playerId) | default
 
-  def inc(playerId: Player.ID, playerIndex: PlayerIndex) = cache.put(playerId, get(playerId) inc playerIndex)
+  def inc(playerId: Player.ID, playerIndex: PlayerIndex) = cache.put(playerId, get(playerId) `inc` playerIndex)
 }

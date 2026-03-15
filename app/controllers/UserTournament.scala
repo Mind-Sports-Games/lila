@@ -1,6 +1,6 @@
 package controllers
 
-import lila.app._
+import lila.app.*
 import views._
 
 final class UserTournament(env: Env) extends LilaController(env) {
@@ -8,7 +8,7 @@ final class UserTournament(env: Env) extends LilaController(env) {
   def path(username: String, path: String, page: Int) =
     Open { implicit ctx =>
       Reasonable(page) {
-        val userOption = env.user.repo enabledNamed username map {
+        val userOption = env.user.repo `enabledNamed` username map {
           _ filter {
             _.enabled || isGranted(_.Hunter)
           }
@@ -35,7 +35,7 @@ final class UserTournament(env: Env) extends LilaController(env) {
               env.tournament.api.byOwnerPager(user, page).map { pager =>
                 Ok(html.userTournament.created(user, pager))
               }
-            case "upcoming" if ctx is user => // only mine because it's very expensive
+            case "upcoming" if ctx `is` user => // only mine because it's very expensive
               env.tournament.api.upcomingByPlayerPager(user, page).map { pager =>
                 Ok(html.userTournament.upcoming(user, pager))
               }

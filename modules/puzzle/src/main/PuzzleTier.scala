@@ -2,7 +2,7 @@ package lila.puzzle
 
 sealed abstract class PuzzleTier(val key: String) {
 
-  def stepDown = PuzzleTier stepDown this
+  def stepDown = PuzzleTier `stepDown` this
 
   override def toString = key
 }

@@ -2,9 +2,8 @@ package controllers
 
 import play.api.mvc._
 import play.api.i18n.Lang
-import scala.util.chaining._
 
-import lila.app._
+import lila.app.*
 import lila.game.Pov
 import lila.user.{ User => UserModel }
 import strategygames.Pos
@@ -15,7 +14,7 @@ final class PlayApi(
     apiC: => Api
 ) extends LilaController(env) {
 
-  implicit private def autoReqLang(implicit req: RequestHeader): Lang = reqLang(req)
+  implicit private def autoReqLang(implicit req: RequestHeader): Lang = reqLang(using req)
 
   // bot endpoints
 
@@ -40,8 +39,7 @@ final class PlayApi(
                 env.team.cached.teamIdsList(me.id).flatMap { env.swiss.api.withdrawAll(me, _) } >>
                 env.user.repo.setBot(me) >>
                 env.pref.api.setBot(me) >>
-                env.streamer.api.delete(me) >>-
-                env.user.lightUserApi.invalidate(me.id) pipe
+                env.streamer.api.delete(me).andDo(env.user.lightUserApi.invalidate(me.id)) `pipe`
                 toResult recover { case lila.base.LilaInvalid(msg) =>
                   BadRequest(jsonError(msg))
                 }
@@ -78,11 +76,11 @@ final class PlayApi(
       }
 
     def move(me: UserModel, pov: Pov, uci: String, offeringDraw: Option[Boolean]) =
-      env.bot.player(pov, me, uci, offeringDraw) pipe toResult
+      env.bot.player(pov, me, uci, offeringDraw) `pipe` toResult
 
     def command(me: UserModel, cmd: String)(
         as: (String, UserModel) => (Pov => Fu[Result]) => Fu[Result]
-    )(implicit req: Request[_]): Fu[Result] =
+    )(implicit req: Request[?]): Fu[Result] =
       cmd.split('/') match {
         case Array("game", id, "chat") =>
           as(id, me) { pov =>
@@ -91,28 +89,27 @@ final class PlayApi(
               .fold(
                 jsonFormErrorDefaultLang,
                 res => env.bot.player.chat(pov.gameId, me, res) inject jsonOkResult
-              ) pipe catchClientError
+              ) `pipe` catchClientError
           }
         case Array("game", id, "abort") =>
           as(id, me) { pov =>
-            env.bot.player.abort(pov) pipe toResult
+            env.bot.player.abort(pov) `pipe` toResult
           }
         case Array("game", id, "resign") =>
           as(id, me) { pov =>
-            env.bot.player.resign(pov) pipe toResult
+            env.bot.player.resign(pov) `pipe` toResult
           }
         case Array("game", id, "draw", bool) =>
           as(id, me) { pov =>
-            fuccess(env.bot.player.setDraw(pov, lila.common.Form.trueish(bool))) pipe toResult
+            fuccess(env.bot.player.setDraw(pov, lila.common.Form.trueish(bool))) `pipe` toResult
           }
         case Array("game", id, "decide-select-squares", bool) =>
           as(id, me) { pov =>
-            fuccess(env.bot.player.decideSelectSquares(pov, lila.common.Form.trueish(bool))) pipe toResult
+            fuccess(env.bot.player.decideSelectSquares(pov, lila.common.Form.trueish(bool))) `pipe` toResult
           }
         case Array("game", id, "select-squares") =>
           as(id, me) { pov =>
             {
-              val gf = pov.game.variant.gameFamily
               fuccess(
                 env.bot.player.selectSquares(pov, List.empty)
               ).pipe(toResult)
@@ -160,7 +157,7 @@ final class PlayApi(
     }
 
   private def WithPov(anyId: String, me: lila.user.User)(f: Pov => Fu[Result]) =
-    env.round.proxyRepo.game(lila.game.Game takeGameId anyId) flatMap {
+    env.round.proxyRepo.game(lila.game.Game `takeGameId` anyId) flatMap {
       case None => NotFound(jsonError("No such game")).fuccess
       case Some(game) =>
         Pov(game, me) match {

@@ -6,13 +6,12 @@ import lila.api.Context
 import lila.app.templating.Environment._
 import lila.app.ui.ScalatagsTemplate._
 
-import controllers.routes
 
 object checkYourEmail {
 
   def apply(
       userEmail: Option[lila.security.EmailConfirm.UserEmail],
-      form: Option[Form[_]] = None
+      form: Option[Form[?]] = None
   )(implicit ctx: Context) =
     views.html.base.layout(
       title = "Check your email",

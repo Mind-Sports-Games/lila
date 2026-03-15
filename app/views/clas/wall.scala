@@ -2,7 +2,6 @@ package views.html.clas
 
 import play.api.data.Form
 
-import controllers.routes
 import lila.api.Context
 import lila.app.templating.Environment._
 import lila.app.ui.ScalatagsTemplate._
@@ -26,7 +25,7 @@ object wall {
         div(cls := "box__pad clas-wall")(html)
     )
 
-  def edit(c: Clas, students: List[Student.WithUser], form: Form[_])(implicit ctx: Context) =
+  def edit(c: Clas, students: List[Student.WithUser], form: Form[?])(implicit ctx: Context) =
     teacherDashboard.layout(c, students, "wall")(
       div(cls := "box-pad clas-wall__edit")(
         p(

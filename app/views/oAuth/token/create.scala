@@ -1,6 +1,5 @@
 package views.html.oAuth.token
 
-import controllers.routes
 import play.api.data.Form
 
 import lila.api.Context
@@ -41,7 +40,7 @@ object create {
                   isGranted(_.Shusher) || isGranted(_.Hunter)
                 )
               val id = s"oauth-scope-${scope.key.replace(":", "_")}"
-              !hidden option div(
+              !hidden `option` div(
                 span(
                   form3.cmnToggle(
                     id,

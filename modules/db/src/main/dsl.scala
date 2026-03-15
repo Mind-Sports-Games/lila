@@ -16,7 +16,7 @@
 
 package lila.db
 
-import ornicar.scalalib.Zero
+import alleycats.Zero
 
 import reactivemongo.api.bson._
 
@@ -30,11 +30,11 @@ trait dsl {
   // Helpers
   val $empty: Bdoc = document.asStrict
 
-  def $doc(elements: ElementProducer*): Bdoc = BSONDocument.strict(elements: _*)
+  def $doc(elements: ElementProducer*): Bdoc = BSONDocument.strict(elements*)
 
   def $doc(elements: Iterable[(String, BSONValue)]): Bdoc = BSONDocument.strict(elements)
 
-  def $arr(elements: Producer[BSONValue]*): Barr = BSONArray(elements: _*)
+  def $arr(elements: Producer[BSONValue]*): Barr = BSONArray(elements*)
 
   def $id[T: BSONWriter](id: T): Bdoc = $doc("_id" -> id)
 
@@ -48,7 +48,7 @@ trait dsl {
   // End of Helpers
   //**********************************************************************************************//
 
-  implicit val LilaBSONDocumentZero: Zero[Bdoc] = Zero.instance($empty)
+  implicit val LilaBSONDocumentZero: Zero[Bdoc] = Zero($empty)
 
   //**********************************************************************************************//
   // Top Level Logical Operators
@@ -85,7 +85,7 @@ trait dsl {
   //**********************************************************************************************//
   // Top Level Field Update Operators
   def $inc(item: ElementProducer, items: ElementProducer*): Bdoc = {
-    $doc("$inc" -> $doc((Seq(item) ++ items): _*))
+    $doc("$inc" -> $doc((Seq(item) ++ items)*))
   }
   def $inc(doc: Bdoc): Bdoc =
     $doc("$inc" -> doc)
@@ -95,11 +95,11 @@ trait dsl {
   }
 
   def $setOnInsert(item: ElementProducer, items: ElementProducer*): Bdoc = {
-    $doc("$setOnInsert" -> $doc((Seq(item) ++ items): _*))
+    $doc("$setOnInsert" -> $doc((Seq(item) ++ items)*))
   }
 
   def $set(item: ElementProducer, items: ElementProducer*): Bdoc = {
-    $doc("$set" -> $doc((Seq(item) ++ items): _*))
+    $doc("$set" -> $doc((Seq(item) ++ items)*))
   }
 
   def $unset(field: String, fields: String*): Bdoc = {
@@ -107,7 +107,7 @@ trait dsl {
   }
 
   def $unset(fields: Seq[String]): Bdoc =
-    fields.nonEmpty ?? {
+    fields.nonEmpty so {
       $doc("$unset" -> $doc(fields.map(k => (k, BSONString("")))))
     }
 
@@ -176,7 +176,7 @@ trait dsl {
   // Top Level Array Update Operators
 
   def $addToSet(item: ElementProducer, items: ElementProducer*): Bdoc =
-    $doc("$addToSet" -> $doc((Seq(item) ++ items): _*))
+    $doc("$addToSet" -> $doc((Seq(item) ++ items)*))
 
   def $pop(item: (String, Int)): Bdoc = {
     if (item._2 != -1 && item._2 != 1)
@@ -321,7 +321,7 @@ trait dsl {
     }
 
     def $elemMatch(query: ElementProducer*): SimpleExpression[Bdoc] = {
-      SimpleExpression(field, $doc("$elemMatch" -> $doc(query: _*)))
+      SimpleExpression(field, $doc("$elemMatch" -> $doc(query*)))
     }
 
     def $size(s: Int): SimpleExpression[Bdoc] = {

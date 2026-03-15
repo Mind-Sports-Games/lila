@@ -44,15 +44,15 @@ final class GameApiV2(
   private val keepAliveInterval = 70.seconds // play's idleTimeout = 75s
 
   def exportOne(game: Game, config: OneConfig): Fu[String] =
-    game.pgnImport ifTrue config.imported match {
+    game.pgnImport `ifTrue` config.imported match {
       case Some(imported) => fuccess(imported.pgn)
       case None =>
         for {
-          realPlayers                  <- config.playerFile.??(realPlayerApi.apply)
+          realPlayers                  <- config.playerFile.so(realPlayerApi.apply)
           (game, initialFen, analysis) <- enrich(config.flags)(game)
           _export <- config.format match {
             case Format.JSON =>
-              toJson(game, initialFen, analysis, config.flags, realPlayers = realPlayers) dmap Json.stringify
+              toJson(game, initialFen, analysis, config.flags, realPlayers = realPlayers) `dmap` Json.stringify
             case Format.PGN =>
               pgnDump(
                 game,
@@ -60,7 +60,7 @@ final class GameApiV2(
                 analysis,
                 config.flags,
                 realPlayers = realPlayers
-              ) dmap pgnDump.toPgnString
+              ) `dmap` pgnDump.toPgnString
             case Format.SGF =>
               sgfDump(
                 game,
@@ -117,19 +117,19 @@ final class GameApiV2(
       "_"
     )
 
-  def exportByUser(config: ByUserConfig): Source[String, _] =
+  def exportByUser(config: ByUserConfig): Source[String, ?] =
     Source futureSource {
-      config.playerFile.??(realPlayerApi.apply) map { realPlayers =>
+      config.playerFile.so(realPlayerApi.apply) map { realPlayers =>
         gameRepo
           .sortedCursor(
             config.vs.fold(Query.user(config.user.id)) { Query.opponents(config.user, _) } ++
               Query.createdBetween(config.since, config.until) ++
-              (!config.ongoing).??(Query.finished),
+              (!config.ongoing).so(Query.finished),
             Query.sortCreated,
             batchSize = config.perSecond.value
           )
           .documentSource()
-          .map(g => config.postFilter(g) option g)
+          .map(g => config.postFilter(g) `option` g)
           .throttle(config.perSecond.value * 10, 1 second, e => if (e.isDefined) 10 else 2)
           .mapConcat(_.toList)
           .take(config.max | Int.MaxValue)
@@ -139,9 +139,9 @@ final class GameApiV2(
       }
     }
 
-  def exportByIds(config: ByIdsConfig, chronological: Boolean = false): Source[String, _] =
+  def exportByIds(config: ByIdsConfig, chronological: Boolean = false): Source[String, ?] =
     Source futureSource {
-      config.playerFile.??(realPlayerApi.apply) map { realPlayers =>
+      config.playerFile.so(realPlayerApi.apply) map { realPlayers =>
         gameRepo
           .sortedCursor(
             $inIds(config.ids),
@@ -155,7 +155,7 @@ final class GameApiV2(
       }
     }
 
-  def exportByTournament(config: ByTournamentConfig): Source[String, _] =
+  def exportByTournament(config: ByTournamentConfig): Source[String, ?] =
     Source futureSource {
       tournamentRepo.isTeamBattle(config.tournamentId) map { isTeamBattle =>
         pairingRepo
@@ -167,7 +167,7 @@ final class GameApiV2(
           .grouped(config.perSecond.value)
           .throttle(1, 1 second)
           .mapAsync(1) { pairings =>
-            isTeamBattle.?? {
+            isTeamBattle.so {
               playerRepo.teamsOfPlayers(config.tournamentId, pairings.flatMap(_.users).distinct).dmap(_.toMap)
             } flatMap { playerTeams =>
               gameRepo.gameOptionsFromSecondary(pairings.map(_.gameId)) map {
@@ -197,13 +197,13 @@ final class GameApiV2(
               case Format.SGF => sgfDump.formatter(config.flags)(game, fen, analysis, teams, none)
               case Format.JSON =>
                 def addBerserk(playerIndex: PlayerIndex)(json: JsObject) =
-                  if (pairing berserkOf playerIndex)
+                  if (pairing `berserkOf` playerIndex)
                     json deepMerge Json.obj(
                       "players" -> Json.obj(playerIndex.name -> Json.obj("berserk" -> true))
                     )
                   else json
-                toJson(game, fen, analysis, config.flags, teams) dmap
-                  addBerserk(P1) dmap
+                toJson(game, fen, analysis, config.flags, teams) `dmap`
+                  addBerserk(P1) `dmap`
                   addBerserk(P2) dmap { json =>
                     s"${Json.stringify(json)}\n"
                   }
@@ -212,7 +212,7 @@ final class GameApiV2(
       }
     }
 
-  def exportBySwiss(config: BySwissConfig): Source[String, _] =
+  def exportBySwiss(config: BySwissConfig): Source[String, ?] =
     swissApi
       .gameIdSource(
         swissId = config.swissId,
@@ -234,7 +234,7 @@ final class GameApiV2(
         }
       }
 
-  def exportByVariant(config: ByVariantConfig): Source[String, _] =
+  def exportByVariant(config: ByVariantConfig): Source[String, ?] =
     gameRepo
       .sortedCursor(
         Query.createdBetween(config.since, config.until) ++ Query.finished ++ Query.variant(config.variant),
@@ -258,8 +258,8 @@ final class GameApiV2(
       }
 
   private def enrich(flags: WithFlags)(game: Game) =
-    gameRepo initialFen game flatMap { initialFen =>
-      (flags.evals ?? analysisRepo.byGame(game)) dmap {
+    gameRepo `initialFen` game flatMap { initialFen =>
+      (flags.evals so analysisRepo.byGame(game)) dmap {
         (game, initialFen, _)
       }
     }
@@ -301,7 +301,7 @@ final class GameApiV2(
     for {
       lightUsers <- gameLightUsers(g) dmap { case (wu, bu) => List(wu, bu) }
       pgn <-
-        withFlags.pgnInJson ?? pgnDump
+        withFlags.pgnInJson so pgnDump
           .apply(g, initialFen, analysisOption, withFlags, realPlayers = realPlayers)
           .dmap(pgnDump.toPgnString)
           .dmap(some)
@@ -326,9 +326,9 @@ final class GameApiV2(
             .add("provisional" -> p.provisional)
             .add("isInputRating" -> p.isInputRating)
             .add("aiLevel" -> p.aiLevel)
-            .add("analysis" -> analysisOption.flatMap(analysisJson.player(g pov p.playerIndex)))
+            .add("analysis" -> analysisOption.flatMap(analysisJson.player(g `pov` p.playerIndex)))
             .add("team" -> teams.map(_(p.playerIndex)))
-        // .add("plyCentis" -> withFlags.plyTimes ?? g.plyTimes(p.playerIndex).map(_.map(_.centis)))
+        // .add("plyCentis" -> withFlags.plyTimes so g.plyTimes(p.playerIndex).map(_.map(_.centis)))
         })
       )
       .add("initialFen" -> initialFen)
@@ -336,7 +336,7 @@ final class GameApiV2(
       .add("winner" -> g.winnerPlayerIndex.map(_.name))
       .add("opening" -> g.opening.ifTrue(withFlags.opening))
       .add("moves" -> withFlags.turns.option {
-        withFlags keepDelayIf g.playable applyDelay g.actionStrs.map(_.mkString(",")) mkString " "
+        withFlags `keepDelayIf` g.playable `applyDelay` g.actionStrs.map(_.mkString(",")) mkString " "
       })
       .add("pgn" -> pgn)
       .add("daysPerTurn" -> g.daysPerTurn)
@@ -352,7 +352,7 @@ final class GameApiV2(
       })
 
   private def gameLightUsers(game: Game): Fu[(Option[LightUser], Option[LightUser])] =
-    (game.p1Player.userId ?? getLightUser) zip (game.p2Player.userId ?? getLightUser)
+    (game.p1Player.userId so getLightUser) zip (game.p2Player.userId so getLightUser)
 }
 
 object GameApiV2 {
@@ -362,7 +362,7 @@ object GameApiV2 {
     case object PGN  extends Format
     case object JSON extends Format
     case object SGF  extends Format
-    def byRequest(req: play.api.mvc.RequestHeader) = if (HTTPRequest acceptsNdJson req) JSON else PGN
+    def byRequest(req: play.api.mvc.RequestHeader) = if (HTTPRequest `acceptsNdJson` req) JSON else PGN
   }
 
   sealed trait Config {
@@ -397,7 +397,7 @@ object GameApiV2 {
       rated.fold(true)(g.rated ==) && {
         perfType.isEmpty || g.perfType.exists(perfType.contains)
       } && playerIndex.fold(true) { c =>
-        g.player(c).userId has user.id
+        g.player(c).userId `has` user.id
       } && analysed.fold(true)(g.metadata.analysed ==)
   }
 

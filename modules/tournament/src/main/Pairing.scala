@@ -40,7 +40,7 @@ case class Pairing(
   def notSoQuickFinish = finished && turns.exists(14 <=)
   def longGame         = turns.exists(60 <=)
 
-  def wonBy(user: User.ID): Boolean     = winner.has(user)
+  def wonBy(user: User.ID): Boolean     = winner.contains(user)
   def lostBy(user: User.ID): Boolean    = winner.exists(user !=)
   def notLostBy(user: User.ID): Boolean = winner.fold(true)(user ==)
   def draw: Boolean                     = finished && winner.isEmpty
@@ -97,11 +97,11 @@ private[tournament] object Pairing {
       p1: RankedPlayerWithPlayerIndexHistory,
       p2: RankedPlayerWithPlayerIndexHistory
   ) =
-    if (tour.handicapped) {
+    if (tour.handicapped)
       //in go handicapped tournament weaker player must go first
       if (p1.player.actualRating <= p2.player.actualRating) Prep(tour.id, p1.player.userId, p2.player.userId)
       else Prep(tour.id, p2.player.userId, p1.player.userId)
-    } else {
+    else
       if (
         p1.playerIndexHistory.firstGetsP1(p2.playerIndexHistory)(() =>
           lila.common.ThreadLocalRandom.nextBoolean()
@@ -109,5 +109,4 @@ private[tournament] object Pairing {
       )
         Prep(tour.id, p1.player.userId, p2.player.userId)
       else Prep(tour.id, p2.player.userId, p1.player.userId)
-    }
 }

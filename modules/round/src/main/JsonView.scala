@@ -7,16 +7,8 @@ import strategygames.dameo.{ Pos => DameoPos }
 import strategygames.{
   ClockBase,
   Player => PlayerIndex,
-  P1,
-  P2,
   Pos,
-  Situation,
-  Move => StratMove,
-  Drop => StratDrop,
-  Lift => StratLift,
-  DiceRoll => StratDiceRoll,
-  CubeAction => StratCubeAction,
-  EndTurn => StratEndTurn
+  Situation
 }
 import strategygames.variant.Variant
 import play.api.libs.json._
@@ -43,22 +35,21 @@ final class JsonView(
   import JsonView._
 
   private def checkCount(game: Game, playerIndex: PlayerIndex) =
-    (game.variant == strategygames.chess.variant.ThreeCheck || game.variant == strategygames.chess.variant.FiveCheck) option game.history
+    (game.variant == strategygames.chess.variant.ThreeCheck || game.variant == strategygames.chess.variant.FiveCheck) `option` game.history
       .checkCount(playerIndex)
 
   private def score(game: Game, playerIndex: PlayerIndex) =
     game.displayScore.map(_.apply(playerIndex))
 
   private def kingMoves(game: Game, playerIndex: PlayerIndex) =
-    (game.variant.frisianVariant) option game.history.kingMoves(playerIndex)
+    (game.variant.frisianVariant) `option` game.history.kingMoves(playerIndex)
 
   // TODO: in analysis mode, this will be evaluated against the last move, but we don't want to set onlyDropsVariant
   // in this case. Instead just have a return of pov.game.variant.onlyDropsVariant
-  private def onlyDropsVariantForCurrentAction(pov: Pov): Boolean = {
+  private def onlyDropsVariantForCurrentAction(pov: Pov): Boolean =
     pov.game.variant.onlyDropsVariant ||
     (pov.game.situation.canOnlyDrop &&
       !(List("crazyhouse", "minishogi", "shogi").contains(pov.game.variant.key)))
-  }
 
   private def coordSystemForVariant(prefCoordSystem: Int, gameVariant: Variant): Int =
     gameVariant match {
@@ -92,7 +83,7 @@ final class JsonView(
       .add("score" -> score(g, p.playerIndex))
       .add("kingMoves" -> kingMoves(g, p.playerIndex))
       .add("berserk" -> p.berserk)
-      .add("blurs" -> (withFlags.blurs ?? blurs(g, p)))
+      .add("blurs" -> (withFlags.blurs so blurs(g, p)))
 
   def playerJson(
       pov: Pov,
@@ -104,7 +95,7 @@ final class JsonView(
       nvui: Boolean
   ): Fu[JsObject] =
     getSocketStatus(pov.game) zip
-      (pov.opponent.userId ?? userRepo.byId) zip
+      (pov.opponent.userId so userRepo.byId) zip
       takebacker.isAllowedIn(pov.game) zip
       moretimer.isAllowedIn(pov.game) map { case (((socket, opponentUser), takebackable), moretimeable) =>
         import pov._
@@ -234,7 +225,7 @@ final class JsonView(
       .add("score" -> score(g, p.playerIndex))
       .add("kingMoves" -> kingMoves(g, p.playerIndex))
       .add("berserk" -> p.berserk)
-      .add("blurs" -> (withFlags.blurs ?? blurs(g, p)))
+      .add("blurs" -> (withFlags.blurs so blurs(g, p)))
 
   def watcherJson(
       pov: Pov,
@@ -251,7 +242,7 @@ final class JsonView(
         Json
           .obj(
             "game" -> gameJsonView(game, initialFen)
-              .add("plyCentis" -> (withFlags.plytimes ?? game.plyTimes.map(_.map(_.centis))))
+              .add("plyCentis" -> (withFlags.plytimes so game.plyTimes.map(_.map(_.centis))))
               .add("division" -> withFlags.division.option(divider(game, initialFen)))
               .add("opening" -> game.opening)
               .add("importedBy" -> game.pgnImport.flatMap(_.user)),
@@ -295,9 +286,9 @@ final class JsonView(
               .add("actionReminder" -> false)
               .add("rookCastle" -> (pref.rookCastle == Pref.RookCastle.YES))
               .add("showCaptured" -> pref.captured),
-            "evalPut" -> JsBoolean(me.??(evalCache.shouldPut))
+            "evalPut" -> JsBoolean(me.so(evalCache.shouldPut))
           )
-          .add("evalPut" -> me.??(evalCache.shouldPut))
+          .add("evalPut" -> me.so(evalCache.shouldPut))
           .add("tv" -> tv.collect { case OnPlayStrategyTv(channel, flip) =>
             Json.obj("channel" -> channel, "flip" -> flip)
           })
@@ -372,7 +363,7 @@ final class JsonView(
         "gameRecordFormat" -> pov.game.gameRecordFormat,
         "userAnalysis"     -> true
       )
-      .add("evalPut" -> me.??(evalCache.shouldPut))
+      .add("evalPut" -> me.so(evalCache.shouldPut))
       .add("possibleDropsByRole" -> possibleDropsByrole(pov))
       .add("onlyDropsVariant" -> onlyDropsVariantForCurrentAction(pov))
       .add("hasGameScore" -> pov.game.variant.hasGameScore)
@@ -396,54 +387,54 @@ final class JsonView(
       //and should be ready to go now validMoves handles this ghosts logic internally
       //see Situation.Draughts.destinations
       case (Situation.Chess(_), Variant.Chess(_)) =>
-        (pov.game playableBy pov.player) option
+        (pov.game `playableBy` pov.player) `option`
           Event.PossibleMoves.json(pov.game.situation.destinations, apiVersion)
       case (Situation.Draughts(situation), Variant.Draughts(variant)) =>
-        (pov.game playableBy pov.player) option {
+        (pov.game `playableBy` pov.player) option {
           if (situation.ghosts > 0) {
             val move    = pov.game.actionStrs(pov.game.actionStrs.length - 1)(0)
             val destPos = variant.boardSize.pos.posAt(move.substring(move.lastIndexOf('x') + 1))
             destPos match {
               case Some(dest) =>
                 Event.PossibleMoves.json(
-                  Map(Pos.Draughts(dest) -> situation.destinationsFrom(dest).map(Pos.Draughts)),
+                  Map(Pos.Draughts(dest) -> situation.destinationsFrom(dest).map(Pos.Draughts.apply)),
                   apiVersion
                 )
               case _ =>
                 Event.PossibleMoves.json(
                   situation.allDestinations.map { case (p, lp) =>
-                    (Pos.Draughts(p), lp.map(Pos.Draughts))
+                    (Pos.Draughts(p), lp.map(Pos.Draughts.apply))
                   },
                   apiVersion
                 )
             }
-          } else {
+          }
+          else
             Event.PossibleMoves.json(
               situation.allDestinations.map { case (p, lp) =>
-                (Pos.Draughts(p), lp.map(Pos.Draughts))
+                (Pos.Draughts(p), lp.map(Pos.Draughts.apply))
               },
               apiVersion
             )
-          }
         }
       case (Situation.FairySF(_), Variant.FairySF(_)) =>
-        (pov.game playableBy pov.player) option
+        (pov.game `playableBy` pov.player) `option`
           Event.PossibleMoves.json(pov.game.situation.destinations, apiVersion)
       case (Situation.Samurai(_), Variant.Samurai(_)) =>
-        (pov.game playableBy pov.player) option
+        (pov.game `playableBy` pov.player) `option`
           Event.PossibleMoves.json(pov.game.situation.destinations, apiVersion)
       case (Situation.Togyzkumalak(_), Variant.Togyzkumalak(_)) =>
-        (pov.game playableBy pov.player) option
+        (pov.game `playableBy` pov.player) `option`
           Event.PossibleMoves.json(pov.game.situation.destinations, apiVersion)
       case (Situation.Go(_), Variant.Go(_)) => None
       case (Situation.Backgammon(_), Variant.Backgammon(_)) =>
-        (pov.game playableBy pov.player) option
+        (pov.game `playableBy` pov.player) `option`
           Event.PossibleMoves.json(pov.game.situation.destinations, apiVersion)
       case (Situation.Abalone(_), Variant.Abalone(_)) =>
-        (pov.game playableBy pov.player) option
+        (pov.game `playableBy` pov.player) `option`
           Event.PossibleMoves.json(pov.game.situation.destinations, apiVersion)
       case (Situation.Dameo(_), Variant.Dameo(_)) =>
-        (pov.game playableBy pov.player) option
+        (pov.game `playableBy` pov.player) `option`
           Event.PossibleMoves.json(pov.game.situation.destinations, apiVersion)
       case _ => sys.error("Mismatch of types for possibleMoves")
     }
@@ -451,18 +442,18 @@ final class JsonView(
   private def possibleDropsByrole(pov: Pov): Option[JsValue] =
     (pov.game.situation, pov.game.variant) match {
       case (Situation.Chess(_), Variant.Chess(_)) =>
-        (pov.game playableBy pov.player) option
+        (pov.game `playableBy` pov.player) `option`
           Event.PossibleDropsByRole.json(pov.game.situation.dropsByRole.getOrElse(Map.empty))
       case (Situation.FairySF(_), Variant.FairySF(_)) =>
-        (pov.game playableBy pov.player) option
+        (pov.game `playableBy` pov.player) `option`
           Event.PossibleDropsByRole.json(pov.game.situation.dropsByRole.getOrElse(Map.empty))
       case (Situation.Samurai(_), Variant.Samurai(_))           => None
       case (Situation.Togyzkumalak(_), Variant.Togyzkumalak(_)) => None
       case (Situation.Go(_), Variant.Go(_)) =>
-        (pov.game playableBy pov.player) option
+        (pov.game `playableBy` pov.player) `option`
           Event.PossibleDropsByRole.json(pov.game.situation.dropsByRole.getOrElse(Map.empty))
       case (Situation.Backgammon(_), Variant.Backgammon(_)) =>
-        (pov.game playableBy pov.player) option
+        (pov.game `playableBy` pov.player) `option`
           Event.PossibleDropsByRole.json(pov.game.situation.dropsByRole.getOrElse(Map.empty))
       case (Situation.Abalone(_), Variant.Abalone(_))   => None
       case (Situation.Dameo(_), Variant.Dameo(_))       => None
@@ -471,14 +462,14 @@ final class JsonView(
     }
 
   private def possibleDrops(pov: Pov): Option[JsValue] =
-    (pov.game playableBy pov.player) ?? {
+    (pov.game `playableBy` pov.player) so {
       pov.game.situation.drops map { drops =>
         JsString(drops.map(_.key).mkString)
       }
     }
 
   private def possibleLifts(pov: Pov): Option[JsValue] =
-    (pov.game playableBy pov.player) option { JsString(pov.game.situation.lifts.map(_.pos.key).mkString) }
+    (pov.game `playableBy` pov.player) option { JsString(pov.game.situation.lifts.map(_.pos.key).mkString) }
 
   private def possibleCubeActions(pov: Pov): Option[JsValue] =
     (pov.game.situation, pov.game.variant) match {
@@ -488,20 +479,19 @@ final class JsonView(
       case _ => None
     }
 
-  private def selectMode(pov: Pov): Boolean = {
+  private def selectMode(pov: Pov): Boolean =
     pov.game.situation match {
       case Situation.Go(s) =>
         s.canSelectSquares && (
           (pov.game.turnOf(pov.player) && !pov.player.isOfferingSelectSquares)
             ||
               pov.opponent.isOfferingSelectSquares
-        ) && !pov.game.deadStoneOfferState.map(_.is(DeadStoneOfferState.RejectedOffer)).has(true)
+        ) && !pov.game.deadStoneOfferState.map(_.is(DeadStoneOfferState.RejectedOffer)).contains(true)
       case _ => false
     }
-  }
 
   // draughts and dameo
-  private def captureLength(pov: Pov): Int = {
+  private def captureLength(pov: Pov): Int =
     (pov.game.situation, pov.game.variant) match {
       case (Situation.Draughts(situation), Variant.Draughts(variant)) =>
         if (situation.ghosts > 0) {
@@ -511,7 +501,8 @@ final class JsonView(
             case Some(dest) => ~situation.captureLengthFrom(dest)
             case _          => situation.allMovesCaptureLength
           }
-        } else
+        }
+        else
           situation.allMovesCaptureLength
       case (Situation.Dameo(situation), Variant.Dameo(_)) => {
         if (situation.ghosts > 0) {
@@ -528,12 +519,12 @@ final class JsonView(
             case _ =>
               situation.allMovesCaptureLength
           }
-        } else
+        }
+        else
           situation.allMovesCaptureLength
       }
       case _ => 0
     }
-  }
 
   private def animationMillis(pov: Pov, pref: Pref) =
     pref.animationMillis * {

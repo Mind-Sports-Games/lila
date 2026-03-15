@@ -5,7 +5,6 @@ import lila.api.Context
 import lila.app.templating.Environment._
 import lila.app.ui.ScalatagsTemplate._
 
-import controllers.routes
 
 object notFound {
 
@@ -14,7 +13,7 @@ object notFound {
       title = "Page not found",
       moreJs = prismicJs,
       moreCss = cssTag("not-found"),
-      csp = isGranted(_.Prismic) option defaultCsp.withPrismic(true)
+      csp = isGranted(_.Prismic) `option` defaultCsp.withPrismic(true)
     ) {
       main(cls := "not-found page-small box box-pad")(
         header(

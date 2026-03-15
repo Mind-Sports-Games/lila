@@ -6,7 +6,6 @@ import strategygames.variant.Variant
 import strategygames.{ GameLogic, Situation }
 import strategygames.draughts.Board
 
-import controllers.routes
 import play.api.libs.json.Json
 
 import lila.api.Context
@@ -22,11 +21,11 @@ object bits {
   //Orientation P1,P2,Left,Right is the view of the boar as though you are sat down at that position
   //Orientation P1VFlip is for backgammon where for P2 they essentially view as P1 but flip the board vertically
   object Orientation {
-    final case object P1      extends Orientation
-    final case object P2      extends Orientation
-    final case object Left    extends Orientation
-    final case object Right   extends Orientation
-    final case object P1VFlip extends Orientation
+    case object P1      extends Orientation
+    case object P2      extends Orientation
+    case object Left    extends Orientation
+    case object Right   extends Orientation
+    case object P1VFlip extends Orientation
   }
 
   def playerIndexToOrientation(c: PlayerIndex, v: String): Orientation =
@@ -75,7 +74,7 @@ object bits {
       boardSize(pov),
       pov.game.variant.key,
       pov.game.multiPointResult
-    ) _
+    )(_)
 
   def miniWithOrientation(
       fen: FEN,
@@ -124,7 +123,7 @@ object bits {
       side: strategygames.chess.Side
   ): Boolean =
     sit match {
-      case Situation.Chess(sit) => sit canCastle playerIndex on side
+      case Situation.Chess(sit) => sit canCastle playerIndex `on` side
       case _                    => false
     }
 

@@ -20,13 +20,13 @@ case class Plan(
   def enable =
     copy(
       active = true,
-      months = months atLeast 1,
+      months = months `atLeast` 1,
       since = since orElse DateTime.now.some
     )
 
   def isEmpty = months == 0
 
-  def nonEmpty = !isEmpty option this
+  def nonEmpty = !isEmpty `option` this
 
   def sinceDate = since | DateTime.now
 }

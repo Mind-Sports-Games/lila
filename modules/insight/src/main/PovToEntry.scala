@@ -1,6 +1,5 @@
 package lila.insight
 
-import scala.util.chaining._
 import cats.data.NonEmptyList
 
 import strategygames.format.FEN
@@ -42,20 +41,20 @@ final private class PovToEntry(
     enrich(game, userId, provisional) map
       (_ flatMap convert toRight game)
 
-  private def removeWrongAnalysis(game: Game): Boolean = {
+  private def removeWrongAnalysis(game: Game): Boolean =
     if (game.metadata.analysed && !game.analysable) {
-      gameRepo setUnanalysed game.id
-      analysisRepo remove game.id
+      gameRepo `setUnanalysed` game.id
+      analysisRepo `remove` game.id
       true
-    } else false
-  }
+    }
+    else false
 
   private def enrich(game: Game, userId: String, provisional: Boolean): Fu[Option[RichPov]] =
     if (removeWrongAnalysis(game)) fuccess(none)
     else
-      lila.game.Pov.ofUserId(game, userId) ?? { pov =>
+      lila.game.Pov.ofUserId(game, userId) so { pov =>
         gameRepo.initialFen(game) zip
-          (game.metadata.analysed ?? analysisRepo.byId(game.id)) map { case (fen, an) =>
+          (game.metadata.analysed so analysisRepo.byId(game.id)) map { case (fen, an) =>
             for {
               boards <-
                 Replay
@@ -77,7 +76,7 @@ final private class PovToEntry(
               moveAccuracy = an.map { Accuracy.diffsList(pov, _) },
               boards = boards,
               plytimes = plytimes,
-              advices = an.?? {
+              advices = an.so {
                 _.advices.view.map { a =>
                   a.info.ply -> a
                 }.toMap
@@ -91,7 +90,7 @@ final private class PovToEntry(
 
   private def makeMoves(from: RichPov): List[InsightMove] = {
     val cpDiffs = ~from.moveAccuracy toVector
-    val prevInfos = from.analysis.?? { an =>
+    val prevInfos = from.analysis.so { an =>
       Accuracy.prevPlayerIndexInfos(from.pov, an) pipe { is =>
         from.pov.playerIndex.fold(is, is.map(_.invert))
       }
@@ -192,14 +191,14 @@ final private class PovToEntry(
       opRating <- pov.opponent.rating
       perfType <- game.perfType
     } yield InsightEntry(
-      id = InsightEntry povToId pov,
+      id = InsightEntry `povToId` pov,
       number = 0, // temporary :-/ the Indexer will set it
       userId = myId,
       playerIndex = pov.playerIndex,
       perf = perfType,
       eco =
         if (game.playable || game.turnCount < 4 || game.fromPosition || game.variant.exotic) none
-        else strategygames.chess.opening.Ecopening fromGame game.actionStrs,
+        else strategygames.chess.opening.Ecopening `fromGame` game.actionStrs,
       //flatten until insights support something other than chess
       myCastling = Castling.fromMoves(game.actionStrs(pov.playerIndex).flatten),
       opponentRating = opRating,
@@ -213,7 +212,7 @@ final private class PovToEntry(
         case Some(u) if u == myId => Result.Win
         case _                    => Result.Loss
       },
-      termination = Termination fromStatus game.status,
+      termination = Termination `fromStatus` game.status,
       ratingDiff = ~pov.player.ratingDiff,
       analysed = analysis.isDefined,
       provisional = provisional,

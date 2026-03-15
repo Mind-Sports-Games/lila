@@ -8,13 +8,12 @@ import lila.app.templating.Environment._
 import lila.app.ui.ScalatagsTemplate._
 import lila.security.EmailConfirm.Help._
 
-import controllers.routes
 
 object emailConfirmHelp {
 
   private val title = "Help with email confirmation"
 
-  def apply(form: Form[_], status: Option[Status])(implicit ctx: Context) =
+  def apply(form: Form[?], status: Option[Status])(implicit ctx: Context) =
     views.html.base.layout(
       title = title,
       moreCss = cssTag("email-confirm")

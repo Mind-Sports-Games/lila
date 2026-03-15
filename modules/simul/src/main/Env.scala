@@ -1,7 +1,7 @@
 package lila.simul
 
 import com.softwaremill.macwire._
-import io.methvin.play.autoconfig._
+import lila.common.autoconfig.{ AutoConfig, ConfigName }
 import play.api.Configuration
 import scala.concurrent.duration._
 
@@ -35,7 +35,7 @@ final class Env(
     mode: play.api.Mode
 ) {
 
-  private val config = appConfig.get[SimulConfig]("simul")(AutoConfig.loader)
+  private val config = appConfig.get[SimulConfig]("simul")(using AutoConfig.loader)
 
   private lazy val simulColl = db(config.simulColl)
 
@@ -47,7 +47,7 @@ final class Env(
 
   private val simulSocket = wire[SimulSocket]
 
-  val isHosting = new lila.round.IsSimulHost(u => api.currentHostIds dmap (_ contains u))
+  val isHosting = new lila.round.IsSimulHost(u => api.currentHostIds `dmap` (_ contains u))
 
   val allCreatedFeaturable = cacheApi.unit[List[Simul]] {
     _.refreshAfterWrite(3 seconds)
@@ -66,15 +66,15 @@ final class Env(
   )
 
   def version(simulId: Simul.ID) =
-    simulSocket.rooms.ask[SocketVersion](simulId)(GetVersion)
+    simulSocket.rooms.ask[SocketVersion](simulId)(GetVersion.apply)
 
   Bus.subscribeFuns(
     "finishGame" -> { case lila.game.actorApi.FinishGame(game, _, _) =>
-      api finishGame game
+      api `finishGame` game
       ()
     },
     "adjustCheater" -> { case lila.hub.actorApi.mod.MarkCheater(userId, true) =>
-      api ejectCheater userId
+      api `ejectCheater` userId
       ()
     },
     "simulGetHosts" -> { case lila.hub.actorApi.simul.GetHostIds(promise) =>

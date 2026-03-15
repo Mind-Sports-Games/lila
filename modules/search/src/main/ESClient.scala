@@ -3,7 +3,7 @@ package lila.search
 import play.api.libs.json._
 import play.api.libs.ws._
 import play.api.libs.ws.JsonBodyWritables._
-import scala.annotation.nowarn
+import lila.common.extensions.*
 
 sealed trait ESClient {
 
@@ -28,7 +28,7 @@ final class ESClientHttp(
     extends ESClient {
 
   def store(id: Id, doc: JsObject) =
-    config.writeable ?? monitor("store") {
+    config.writeable so monitor("store") {
       HTTP(s"store/${index.name}/${id.value}", doc)
     }
 
@@ -43,11 +43,11 @@ final class ESClientHttp(
     }
 
   def deleteById(id: lila.search.Id) =
-    config.writeable ??
+    config.writeable so
       HTTP(s"delete/id/${index.name}/${id.value}", Json.obj())
 
   def deleteByIds(ids: List[lila.search.Id]) =
-    config.writeable ??
+    config.writeable so
       HTTP(s"delete/ids/${index.name}", Json.obj("ids" -> ids.map(_.value)))
 
   def putMapping =
@@ -79,8 +79,7 @@ final class ESClientStub extends ESClient {
   def search[Q: Writes](query: Q, from: From, size: Size) = fuccess(SearchResponse(Nil))
   def count[Q: Writes](query: Q)                          = fuccess(CountResponse(0))
   def store(id: Id, doc: JsObject)                        = funit
-  @nowarn("msg=parameter value")
-  def storeBulk(docs: Seq[(Id, JsObject)]) = funit
+  def storeBulk(@annotation.nowarn("msg=unused") _docs: Seq[(Id, JsObject)]) = funit
   def deleteById(id: Id)                   = funit
   def deleteByIds(ids: List[Id])           = funit
   def putMapping                           = funit

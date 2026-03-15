@@ -8,7 +8,7 @@ case class JsonQuestion(
     filters: Map[String, List[String]]
 ) {
 
-  def question: Option[Question[_]] = {
+  def question: Option[Question[?]] = {
     import Dimension._
     for {
       realMetric <- Metric.byKey get metric
@@ -44,7 +44,7 @@ case class JsonQuestion(
                 case _                    => none
               }
             }
-          }
+        }
           .filterNot(_.isEmpty)
           .toList
       question <- {
@@ -76,7 +76,7 @@ case class JsonQuestion(
 
 object JsonQuestion {
 
-  def fromQuestion(q: Question[_]) =
+  def fromQuestion(q: Question[?]) =
     JsonQuestion(
       dimension = q.dimension.key,
       metric = q.metric.key,

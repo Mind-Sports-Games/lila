@@ -1,6 +1,5 @@
 package views.html.setup
 
-import controllers.routes
 import play.api.data.Form
 import play.api.mvc.Call
 
@@ -8,9 +7,7 @@ import lila.api.Context
 import lila.app.templating.Environment._
 import lila.app.ui.ScalatagsTemplate._
 import lila.user.User
-import lila.common.LightUser
 
-import strategygames.GameFamily
 import strategygames.variant.Variant
 
 object forms {
@@ -18,7 +15,7 @@ object forms {
   import bits._
 
   def game(
-      form: Form[_],
+      form: Form[?],
       user: Option[User],
       error: Option[String],
       validFen: Option[lila.setup.ValidFen],
@@ -55,21 +52,13 @@ object forms {
       )
     }
 
-  private def translatedVariantChoicesForUser(user: Option[User])(implicit cts: Context) = {
-    user match {
-      case Some(u) if LightUser.stockfishBotsIDs.contains(u.id) => translatedAiVariantChoices
-      case Some(u) if u.id == "ps-greedy-four-move"             => translatedGreedyFourMoveChoices
-      case _                                                    => translatedVariantChoicesWithVariantsAndFen
-    }
-  }
-
-  private def blindSideChoice(form: Form[_])(implicit ctx: Context) =
-    ctx.blind option frag(
+  private def blindSideChoice(form: Form[?])(implicit ctx: Context) =
+    ctx.blind `option` frag(
       renderLabel(form("playerIndex"), trans.side()),
       renderSelect(form("playerIndex").copy(value = "random".some), translatedSideChoices)
     )
 
-  private def layout(
+  @annotation.nowarn("msg=unused") private def layout(
       typ: String,
       titleF: Frag,
       route: Call,
@@ -78,7 +67,7 @@ object forms {
       error: Option[Frag] = None,
       targetUser: Option[User] = None
   )(fields: Frag)(implicit ctx: Context) =
-    div(cls := error.isDefined option "error")(
+    div(cls := error.isDefined `option` "error")(
       h2(titleF),
       error
         .map { e =>

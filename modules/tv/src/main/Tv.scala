@@ -5,7 +5,7 @@ import lila.game.{ Game, GameRepo, Pov }
 import lila.hub.Trouper
 import lila.i18n.VariantKeys
 import strategygames.variant.Variant
-import strategygames.{ GameFamily, GameGroup, GameLogic }
+import strategygames.{ GameGroup, GameLogic }
 import cats.implicits._
 
 final class Tv(
@@ -18,22 +18,21 @@ final class Tv(
   import Tv._
   import ChannelTrouper._
 
-  private def roundProxyGame = gameProxyRepo.game _
+  private def roundProxyGame = gameProxyRepo.game
 
   def getGame(channel: Tv.Channel): Fu[Option[Game]] =
-    trouper.ask[Option[Game.ID]](TvTrouper.GetGameId(channel, _)) flatMap { _ ?? roundProxyGame }
+    trouper.ask[Option[Game.ID]](TvTrouper.GetGameId(channel, _)) flatMap { _ so roundProxyGame }
 
   def getGameAndHistory(channel: Tv.Channel): Fu[Option[(Game, List[Pov])]] =
     trouper.ask[GameIdAndHistory](TvTrouper.GetGameIdAndHistory(channel, _)) flatMap {
       case GameIdAndHistory(gameId, historyIds) =>
         for {
-          game <- gameId ?? roundProxyGame
+          game <- gameId so roundProxyGame
           games <-
-            historyIds
+            Future.sequence(historyIds
               .map { id =>
-                roundProxyGame(id) orElse gameRepo.game(id)
-              }
-              .sequenceFu
+                roundProxyGame(id) `orElse` gameRepo.game(id)
+              })
               .dmap(_.flatten)
           history = games map Pov.naturalOrientation
         } yield game map (_ -> history)
@@ -41,34 +40,32 @@ final class Tv(
 
   def getGames(channel: Tv.Channel, max: Int): Fu[List[Game]] =
     trouper.ask[List[Game.ID]](TvTrouper.GetGameIds(channel, max, _)) flatMap {
-      _.map(roundProxyGame).sequenceFu.map(_.flatten)
+      ids => Future.sequence(ids.map(roundProxyGame)).map(_.flatten)
     }
 
-  def getBestGame = getGame(Tv.Channel.AllGames) orElse gameRepo.random
+  def getBestGame = getGame(Tv.Channel.AllGames) `orElse` gameRepo.random
 
   def getBestAndHistory = getGameAndHistory(Tv.Channel.AllGames)
 
   def getChampions: Fu[Champions] =
     trouper.ask[Champions](TvTrouper.GetChampions.apply)
 
-  def getCorrespondenceGames: Fu[List[Game]] = {
+  def getCorrespondenceGames: Fu[List[Game]] =
     gameRepo.playingCorrespondenceNoAi flatMap {
-      _.map(gameRepo.game(_)).sequenceFu.map(_.flatten)
+      ids => Future.sequence(ids.map(gameRepo.game(_))).map(_.flatten)
     }
-  }
 
   def getNonLiveCorrespondenceGamesOfChannel(
       channel: Tv.Channel,
       cGames: List[Game],
       max: Int,
       lGames: List[Game]
-  ): List[Game] = {
+  ): List[Game] =
     cGames
       .filter(g => channel.filter(Candidate(g, false)))
       .filter(g => !lGames.map(_.id).contains(g.id))
       .sortBy(g => -(~g.averageUsersRating))
       .take(max)
-  }
 
   def getCorrespondenceChampions(games: List[Game]): Champions = {
     var champions = Map[Channel, Champion]()
@@ -101,10 +98,9 @@ object Tv {
 
   case class Champion(user: LightUser, rating: Int, gameId: Game.ID)
   case class Champions(channels: Map[Channel, Champion]) {
-    def get = channels.get _
-    def combineWithAndFavour(overWritingChampions: Champions) = {
+    def get = channels.get
+    def combineWithAndFavour(overWritingChampions: Champions) =
       Champions(channels ++ overWritingChampions.channels)
-    }
   }
 
   private[tv] case class Candidate(game: Game, hasBot: Boolean)
@@ -824,10 +820,10 @@ object Tv {
     val byKey = all.map { c =>
       c.key -> c
     }.toMap
-
   }
 
-  private def rated(min: Int)                           = (c: Candidate) => c.game.rated && hasMinRating(c.game, min)
+
+  // private def rated(min: Int)                           = (c: Candidate) => c.game.rated && hasMinRating(c.game, min)
   private def speed(speed: strategygames.Speed)         = (c: Candidate) => c.game.speed == speed
   private def variant(variant: Variant)                 = (c: Candidate) => c.game.variant == variant
   private def anyVariant(variantList: List[Variant])    = (c: Candidate) => variantList.contains(c.game.variant)
@@ -838,17 +834,14 @@ object Tv {
   private def hasBot(c: Candidate)                      = c.hasBot
   private def noBot(c: Candidate)                       = !c.hasBot
 
-  private def onGoingGame(game: Game): Boolean = {
+  private def onGoingGame(game: Game): Boolean =
     !game.finished || (game.finished && !game.olderThan(7))
-  }
 
   private def fresh(seconds: Int, game: Game): Boolean = {
     game.isBeingPlayed && !game.olderThan(seconds)
   } || {
     game.finished && !game.olderThan(7)
   } // rematch time
-
-  private def hasMinRating(g: Game, min: Int) = g.players.exists(_.rating.exists(_ >= min))
 
   private[tv] val titleScores = Map(
     "GM"  -> 500,

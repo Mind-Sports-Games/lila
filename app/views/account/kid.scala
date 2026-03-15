@@ -5,11 +5,10 @@ import lila.api.Context
 import lila.app.templating.Environment._
 import lila.app.ui.ScalatagsTemplate._
 
-import controllers.routes
 
 object kid {
 
-  def apply(u: lila.user.User, form: play.api.data.Form[_], managed: Boolean)(implicit ctx: Context) =
+  def apply(u: lila.user.User, form: play.api.data.Form[?], managed: Boolean)(implicit ctx: Context) =
     account.layout(
       title = s"${u.username} - ${trans.kidMode.txt()}",
       active = "kid"

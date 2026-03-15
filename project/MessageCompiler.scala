@@ -74,7 +74,7 @@ private object `$locale` {
 
   def load: java.util.HashMap[MessageKey, Translation] = {
     val m = new java.util.HashMap[MessageKey, Translation](${puts.size + 1})
-${puts mkString "\n"}
+    ${puts.mkString("\n    ")}
     m
   }
 }

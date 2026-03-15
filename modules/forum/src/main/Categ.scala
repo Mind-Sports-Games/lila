@@ -43,5 +43,5 @@ object Categ {
 
   def isTeamSlug(slug: String) = slug.startsWith("team-")
 
-  def slugToTeamId(slug: String) = isTeamSlug(slug) option slug.drop(5)
+  def slugToTeamId(slug: String) = isTeamSlug(slug) `option` slug.drop(5)
 }

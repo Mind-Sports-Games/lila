@@ -1,7 +1,5 @@
 package lila.study
 
-import scala.util.chaining._
-
 import strategygames.format.FEN
 import strategygames.chess.format.pgn.Parser
 import lila.game.{ Game, Namer }
@@ -15,7 +13,7 @@ final private class ExplorerGame(
 
   def quote(gameId: Game.ID): Fu[Option[Comment]] =
     importer(gameId) map {
-      _ ?? { game =>
+      _ so { game =>
         gameComment(game).some
       }
     }
@@ -24,16 +22,17 @@ final private class ExplorerGame(
     if (position.chapter.isOverweight) {
       logger.info(s"Overweight chapter ${study.id}/${position.chapter.id}")
       fuccess(none)
-    } else
+    }
+    else
       importer(gameId) map {
-        _ ?? { game =>
-          position.node ?? { fromNode =>
+        _ so { game =>
+          position.node so { fromNode =>
             GameToRoot(game, none, withClocks = false).pipe { root =>
               root.setCommentAt(
                 comment = gameComment(game),
                 path = Path(root.mainline.map(_.id))
               )
-            } ?? { gameRoot =>
+            } so { gameRoot =>
               merge(fromNode, position.path, gameRoot) flatMap { case (newNode, path) =>
                 position.chapter.addNode(newNode, path) map (_ -> path)
               }
@@ -68,8 +67,8 @@ final private class ExplorerGame(
 
   private def gameTitle(g: Game): String = {
     val pgn    = g.pgnImport.flatMap(pgnImport => Parser.full(pgnImport.pgn).toOption)
-    val p1     = pgn.flatMap(_.tags(_.P1)) | Namer.playerTextBlocking(g.p1Player)(lightUserApi.sync)
-    val p2     = pgn.flatMap(_.tags(_.P2)) | Namer.playerTextBlocking(g.p2Player)(lightUserApi.sync)
+    val p1     = pgn.flatMap(_.tags(_.P1)) | Namer.playerTextBlocking(g.p1Player)(using lightUserApi.sync)
+    val p2     = pgn.flatMap(_.tags(_.P2)) | Namer.playerTextBlocking(g.p2Player)(using lightUserApi.sync)
     val result = strategygames.Player.showResult(g.winnerPlayerIndex)
     val event: Option[String] =
       (pgn.flatMap(_.tags(_.Event)), pgn.flatMap(_.tags.year).map(_.toString)) match {

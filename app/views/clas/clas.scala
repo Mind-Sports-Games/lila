@@ -8,7 +8,6 @@ import lila.app.templating.Environment._
 import lila.app.ui.ScalatagsTemplate._
 import lila.clas.{ Clas, Student }
 import lila.clas.ClasForm.ClasData
-import controllers.routes
 
 object clas {
 
@@ -100,7 +99,7 @@ object clas {
       div(cls := "box-pad")(
         innerForm(form, c.some),
         hr,
-        c.isActive option postForm(
+        c.isActive `option` postForm(
           action := routes.Clas.archive(c.id.value, v = true),
           cls := "clas-edit__archive"
         )(
@@ -111,7 +110,7 @@ object clas {
       )
     )
 
-  def notify(c: lila.clas.Clas, students: List[Student.WithUser], form: Form[_])(implicit ctx: Context) =
+  def notify(c: lila.clas.Clas, students: List[Student.WithUser], form: Form[?])(implicit ctx: Context) =
     teacherDashboard.layout(c, students, "wall")(
       div(cls := "box-pad clas-wall__edit")(
         p(

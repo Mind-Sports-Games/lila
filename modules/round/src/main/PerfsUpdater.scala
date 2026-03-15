@@ -24,8 +24,8 @@ final class PerfsUpdater(
     botFarming(game) flatMap {
       case true => fuccess(none)
       case _ =>
-        PerfPicker.main(game) ?? { mainPerf =>
-          (game.finished && game.updateRatingsOnFinish && !p1.lame && !p2.lame) ?? {
+        PerfPicker.main(game) so { mainPerf =>
+          (game.finished && game.updateRatingsOnFinish && !p1.lame && !p2.lame) so {
             val ratingsW = mkRatings(p1.perfs)
             val ratingsB = mkRatings(p2.perfs)
             game.ratingVariant match {
@@ -279,9 +279,9 @@ final class PerfsUpdater(
       case Glicko.Result.Win  => results.addResult(p1, p2)
       case Glicko.Result.Loss => results.addResult(p2, p1)
     }
-    try {
+    try
       Glicko.system.updateRatings(results, true)
-    } catch {
+    catch {
       case e: Exception => logger.error(s"update ratings #${game.id}", e)
     }
   }
@@ -297,9 +297,10 @@ final class PerfsUpdater(
           if (cond) {
             val p = perf.addOrReset(_.round.error.glicko, s"game ${game.id}")(rating, game.updatedAt)
             if (isHumanVsMachine)
-              p.copy(glicko = p.glicko average perf.glicko) // halve rating diffs for human
+              p.copy(glicko = p.glicko `average` perf.glicko) // halve rating diffs for human
             else p
-          } else perf
+          }
+          else perf
         def addRatingVariant(variant: Variant, perf: Perf, rating: Rating) =
           addRatingIf(game.ratingVariant == variant, perf, rating)
         val perfs1 = perfs.copy(
@@ -542,7 +543,7 @@ final class PerfsUpdater(
           correspondence =
             addRatingIf(isStd && speed == Speed.Correspondence, perfs.correspondence, ratings.correspondence)
         )
-        val r = RatingRegulator(ratingFactors()) _
+        val r = RatingRegulator(ratingFactors())
         val perfs2 = perfs1.copy(
           chess960 = r(PT.orDefault("chess960"), perfs.chess960, perfs1.chess960),
           kingOfTheHill = r(PT.orDefault("kingOfTheHill"), perfs.kingOfTheHill, perfs1.kingOfTheHill),

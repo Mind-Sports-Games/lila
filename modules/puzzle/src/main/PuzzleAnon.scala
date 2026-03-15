@@ -1,9 +1,9 @@
 package lila.puzzle
 
-import scala.concurrent.duration._
 import scala.concurrent.ExecutionContext
 
 import lila.common.ThreadLocalRandom
+import lila.common.extensions.*
 import lila.db.dsl._
 import lila.memo.CacheApi
 
@@ -27,7 +27,7 @@ final class PuzzleAnon(
         _ foreach { puzzle =>
           lila.mon.puzzle.selector.anon.vote(theme.value).record(100 + math.round(puzzle.vote * 100))
         }
-      }
+    }
 
   def getBatchFor(nb: Int): Fu[Vector[Puzzle]] = {
     pool.get((Puzzle.defaultVariant, PuzzleTheme.mix.key)) map (_ take nb)
@@ -39,7 +39,7 @@ final class PuzzleAnon(
     cacheApi[(Variant, PuzzleTheme.Key), Vector[Puzzle]](initialCapacity = 64, name = "puzzle.byTheme.anon") {
       _.expireAfterWrite(1 minute)
         .buildAsyncFuture { case (variant, theme) =>
-          countApi.byVariantTheme(variant, theme) flatMap { count =>
+          countApi.byVariantTheme(variant, theme) flatMap { _ =>
             //TODO tailor selection criteria when more variety of puzzles available
             // val tier =
             //   if (count > 5000) PuzzleTier.Top
@@ -58,9 +58,10 @@ final class PuzzleAnon(
             val ratingRange: Range = 0 to 9999
             val pathSampleSize     = 15
             colls.path {
-              _.aggregateList(poolSize) { framework =>
+              _.aggregateWith[Bdoc]() { framework =>
                 import framework._
-                Match(pathApi.select(variant, theme, tier, ratingRange)) -> List(
+                List(
+                  Match(pathApi.select(variant, theme, tier, ratingRange)),
                   Sample(pathSampleSize),
                   Project($doc("puzzleId" -> "$ids", "_id" -> false)),
                   Unwind("puzzleId"),
@@ -81,7 +82,9 @@ final class PuzzleAnon(
                     )
                   )
                 )
-              }.map {
+              }
+                .collect[List](maxDocs = poolSize)
+                .map {
                 _.view.flatMap(PuzzleBSONReader.readOpt).toVector
               }
             }

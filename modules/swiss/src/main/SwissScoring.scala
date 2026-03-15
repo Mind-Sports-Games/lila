@@ -3,6 +3,7 @@ package lila.swiss
 import reactivemongo.api.bson._
 import scala.concurrent.duration._
 
+import lila.common.extensions.*
 import lila.db.dsl._
 
 import strategygames.tiebreaks.{ Player => TiebreakPlayer, Result => TiebreakResult, Tiebreak, Tournament }
@@ -14,7 +15,7 @@ final private class SwissTiebreak(
 ) extends Tournament {
   val rounds   = swiss.tieBreakRounds
   val nbRounds = rounds.length
-  def resultsForPlayer(hero: TiebreakPlayer): List[TiebreakResult] = {
+  def resultsForPlayer(hero: TiebreakPlayer): List[TiebreakResult] =
     playerMap
       .get(hero.id)
       .fold[List[TiebreakResult]](List())(player => {
@@ -26,7 +27,7 @@ final private class SwissTiebreak(
             val r = Tiebreak.Round(round.value - 1)
             playerPairingMap get round match {
               case Some(pairing) => {
-                val foe = TiebreakPlayer(pairing opponentOf hero.id)
+                val foe = TiebreakPlayer(pairing `opponentOf` hero.id)
                 pairing.status match {
                   case Left(_)     => None
                   case Right(None) => Some(r.draw(hero, foe))
@@ -44,7 +45,6 @@ final private class SwissTiebreak(
           }
         }
       })
-  }
 }
 
 final private class SwissScoring(
@@ -65,7 +65,7 @@ final private class SwissScoring(
 
   private def recompute(id: Swiss.Id): Fu[Option[SwissScoring.Result]] =
     colls.swiss.byId[Swiss](id.value) flatMap {
-      _.?? { (swiss: Swiss) =>
+      _.so { (swiss: Swiss) =>
         for {
           (prevPlayers, pairings) <- fetchPlayers(swiss) zip fetchPairings(swiss)
           pairingMap = SwissPairing.toMap(pairings)
@@ -88,9 +88,9 @@ final private class SwissScoring(
               val bhTieBreak     = 0.5 * tiebreaks.fideBuchholz(TiebreakPlayer(p.userId))
               // TODO: should the perf rating be in stratgames too?
               val perfSum = playerPairings.foldLeft(0f) { case (perfSum, pairing) =>
-                val opponent = playerMap.get(pairing opponentOf p.userId)
+                val opponent = playerMap.get(pairing `opponentOf` p.userId)
                 val result   = pairing.resultFor(p.userId)
-                val newPerf = perfSum + opponent.??(_.actualRating) + result.?? { win =>
+                val newPerf = perfSum + opponent.so(_.actualRating) + result.so { win =>
                   if (win) 500 else -500
                 }
                 newPerf
@@ -98,12 +98,12 @@ final private class SwissScoring(
               p.copy(
                 sbTieBreak = Swiss.SonnenbornBerger(sbTieBreak),
                 bhTieBreak = Some(Swiss.Buchholz(bhTieBreak)),
-                performance = playerPairings.nonEmpty option Swiss.Performance(perfSum / playerPairings.size)
+                performance = playerPairings.nonEmpty `option` Swiss.Performance(perfSum / playerPairings.size)
               ).recomputeScore
             }
           }
           _ <- SwissPlayer.fields { f =>
-            prevPlayers
+            Future.sequence(prevPlayers
               .zip(players)
               .withFilter { case (a, b) =>
                 a != b
@@ -121,15 +121,14 @@ final private class SwissScoring(
                     )
                   )
                   .void
-              }
-              .sequenceFu
+              })
               .void
           }
         } yield SwissScoring
           .Result(
             swiss,
             players.zip(sheets).sortBy(-_._1.score.value),
-            SwissPlayer toMap players,
+            SwissPlayer `toMap` players,
             pairingMap
           )
           .some
@@ -140,13 +139,13 @@ final private class SwissScoring(
     SwissPlayer.fields { f =>
       colls.player
         .find($doc(f.swissId -> swiss.id))
-        .sort($sort asc f.score)
+        .sort($sort `asc` f.score)
         .cursor[SwissPlayer]()
         .list()
     }
 
   private def fetchPairings(swiss: Swiss) =
-    !swiss.isCreated ?? SwissPairing.fields { f =>
+    !swiss.isCreated so SwissPairing.fields { f =>
       colls.pairing.list[SwissPairing]($doc(f.swissId -> swiss.id))
     }
 }

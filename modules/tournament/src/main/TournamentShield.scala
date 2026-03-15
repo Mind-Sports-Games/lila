@@ -2,7 +2,6 @@ package lila.tournament
 
 import org.joda.time.{ DateTime, Months, Weeks }
 import reactivemongo.api.ReadPreference
-import scala.concurrent.duration._
 import scala.util.Random
 
 import lila.db.dsl._
@@ -34,7 +33,7 @@ final class TournamentShieldApi(
     }
 
   def byCategKey(k: String): Fu[Option[(Category, List[Award])]] =
-    Category.byKey(k) ?? { categ =>
+    Category.byKey(k) so { categ =>
       cache.getUnit dmap {
         _.value get categ map {
           categ -> _
@@ -45,13 +44,13 @@ final class TournamentShieldApi(
   def byMedleyKey(k: String): Option[MedleyShield] = MedleyShield.byKey(k)
 
   def currentOwner(tour: Tournament): Fu[Option[OwnerId]] =
-    tour.isShield ?? {
-      Category.of(tour) ?? { cat =>
+    tour.isShield so {
+      Category.of(tour) so { cat =>
         history(none).map(_.current(cat).map(_.owner))
       }
     }
 
-  private[tournament] def clear(): Unit = cache.invalidateUnit().unit
+  private[tournament] def clear(): Unit = cache.invalidateUnit()
 
   private[tournament] def clearAfterMarking(userId: User.ID): Funit = cache.getUnit map { hist =>
     import cats.implicits._
@@ -68,12 +67,12 @@ final class TournamentShieldApi(
               "status"        -> statusBSONHandler.writeTry(Status.Finished).get
             )
           )
-          .sort($sort asc "startsAt")
+          .sort($sort `asc` "startsAt")
           .cursor[Tournament](ReadPreference.secondaryPreferred)
           .list() map { tours =>
           for {
             tour   <- tours
-            categ  <- Category of tour
+            categ  <- Category `of` tour
             winner <- tour.winnerId
           } yield Award(
             categ = categ,
@@ -85,7 +84,7 @@ final class TournamentShieldApi(
           _.foldLeft(Map.empty[Category, List[Award]]) { case (hist, entry) =>
             hist + (entry.categ -> hist.get(entry.categ).fold(List(entry))(entry :: _))
           }
-        } dmap History.apply
+        } `dmap` History.apply
       }
   }
 }
@@ -657,7 +656,7 @@ object TournamentShield {
     def byKey(k: String): Option[MedleyShield] = all.find(_.key == k)
 
     private val medleyStartDate              = new DateTime(2022, 6, 11, 0, 0)
-    private val arenaMedleyStartDate         = new DateTime(2022, 8, 7, 22, 0)
+    // private val arenaMedleyStartDate         = new DateTime(2022, 8, 7, 22, 0)
     private val monthlyMedleyShieldStartDate = new DateTime(2024, 4, 1, 0, 0)
 
     def weeksSinceStart(startsAt: DateTime) =
@@ -683,7 +682,7 @@ object TournamentShield {
     def key                       = variant.key
     def name                      = VariantKeys.variantName(variant)
     def iconChar                  = variant.perfIcon
-    def matches(tour: Tournament) = Some(variant).has(tour.variant)
+    def matches(tour: Tournament) = Some(variant).contains(tour.variant)
 
     private def hoursList(month: Int) =
       if (month % 2 == 0) TournamentShield.defaultShieldHours
@@ -1084,7 +1083,7 @@ object TournamentShield {
       GrandAbalone
     )
 
-    def of(t: Tournament): Option[Category] = all.find(_ matches t)
+    def of(t: Tournament): Option[Category] = all.find(_ `matches` t)
 
     def byKey(k: String): Option[Category] = all.find(_.key == k)
   }

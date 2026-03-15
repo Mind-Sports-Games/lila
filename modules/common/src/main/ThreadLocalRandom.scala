@@ -28,7 +28,7 @@ object ThreadLocalRandom {
     sb.result()
   }
   def oneOf[A](vec: Vector[A]): Option[A] =
-    vec.nonEmpty ?? {
+    vec.nonEmpty so {
       vec lift nextInt(vec.size)
     }
 }

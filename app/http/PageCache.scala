@@ -20,7 +20,7 @@ final class PageCache(cacheApi: lila.memo.CacheApi) {
       compute()
 
   private def cacheKey(ctx: Context) =
-    s"${HTTPRequest actionName ctx.req}(${ctx.lang.language})"
+    s"${HTTPRequest `actionName` ctx.req}(${ctx.lang.language})"
 
   private def defaultPrefs(req: RequestHeader) =
     lila.pref.RequestPref.fromRequest(req) == lila.pref.Pref.default

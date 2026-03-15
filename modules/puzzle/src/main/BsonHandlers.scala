@@ -9,12 +9,12 @@ import lila.db.dsl._
 import lila.game.Game
 import lila.rating.Glicko
 
-import strategygames.{ GameFamily, GameLogic }
+import strategygames.GameLogic
 import strategygames.variant.Variant
 
 object BsonHandlers {
 
-  implicit val PuzzleIdBSONHandler: BSONHandler[Puzzle.Id] = stringIsoHandler(Puzzle.idIso)
+  implicit val PuzzleIdBSONHandler: BSONHandler[Puzzle.Id] = stringIsoHandler(using Puzzle.idIso)
 
   import Puzzle.BSONFields._
 
@@ -96,10 +96,10 @@ object BsonHandlers {
   }
 
   implicit private[puzzle] val PathIdBSONHandler: BSONHandler[PuzzlePath.Id] = stringIsoHandler(
-    PuzzlePath.pathIdIso
+    using PuzzlePath.pathIdIso
   )
 
   implicit private[puzzle] val ThemeKeyBSONHandler: BSONHandler[PuzzleTheme.Key] = stringIsoHandler(
-    PuzzleTheme.keyIso
+    using PuzzleTheme.keyIso
   )
 }

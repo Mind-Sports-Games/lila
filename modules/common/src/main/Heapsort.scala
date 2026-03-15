@@ -10,10 +10,10 @@ import scala.math.Ordering
  */
 object Heapsort {
 
-  private[this] def moveN[T](p: PriorityQueue[T], g: Growable[T], n: Int): Unit = {
-    //Only the dequeue and dequeueAll methods will return elements in priority order (while removing elements from the heap).
-    var k = p.length atMost n
-    while (k > 0) {
+  private def moveN[T](p: PriorityQueue[T], g: Growable[T], n: Int): Unit = {
+    // Only the dequeue and dequeueAll methods will return elements in priority order (while removing elements from the heap).
+    var k = p.length.atMost(n)
+    while k > 0 do {
       g += p.dequeue()
       k -= 1
     }
@@ -26,15 +26,15 @@ object Heapsort {
   def topN[T, C](xs: IterableOnce[T], nb: Int, ord: Ordering[T])(implicit
       bf: BuildFrom[xs.type, T, C]
   ): C = {
-    val p = PriorityQueue.from(xs)(ord)
+    val p = PriorityQueue.from(xs)(using ord)
     val b = bf.newBuilder(xs)
-    b.sizeHint(p.length atMost nb)
+    b.sizeHint(p.length.atMost(nb))
     moveN(p, b, nb)
     b.result()
   }
 
   def topNToList[T, C](xs: IterableOnce[T], nb: Int, ord: Ordering[T]): List[T] = {
-    val p = PriorityQueue.from(xs)(ord)
+    val p = PriorityQueue.from(xs)(using ord)
     val b = List.newBuilder[T]
     moveN(p, b, nb)
     b.result()

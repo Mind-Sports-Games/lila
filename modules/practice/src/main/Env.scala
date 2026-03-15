@@ -20,6 +20,6 @@ final class Env(
   lazy val api: PracticeApi = wire[PracticeApi]
 
   lila.common.Bus.subscribeFun("study") { case lila.study.actorApi.SaveStudy(study) =>
-    api.structure onSave study
+    api.structure `onSave` study
   }
 }

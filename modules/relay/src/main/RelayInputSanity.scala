@@ -26,7 +26,7 @@ private object RelayInputSanity {
         case None => Missing(relay.index).some
         case Some(game) if !game.staticTagsMatch(chapter) =>
           games.zipWithIndex collectFirst {
-            case (otherGame, otherPos) if otherGame staticTagsMatch chapter =>
+            case (otherGame, otherPos) if otherGame `staticTagsMatch` chapter =>
               Misplaced(otherPos, relay.index)
           }
         case _ => None
@@ -38,7 +38,7 @@ private object RelayInputSanity {
     games match {
       case Vector(onlyGame) =>
         chapters.lastOption.exists { c =>
-          onlyGame staticTagsMatch c.tags
+          onlyGame `staticTagsMatch` c.tags
         }
       case _ => false
     }

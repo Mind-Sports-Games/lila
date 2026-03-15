@@ -1,7 +1,6 @@
 package views.html
 package appeal
 
-import controllers.routes
 
 import lila.api.Context
 import lila.app.templating.Environment._
@@ -176,7 +175,7 @@ object tree {
     )
   }
 
-  private def playbanMenu(implicit ctx: Context): Branch = {
+  private def playbanMenu(implicit @annotation.nowarn("msg=unused") ctx: Context): Branch = {
     Branch(
       "root",
       "You have a play timeout.",
@@ -240,7 +239,7 @@ object tree {
 
   def apply(me: User, playban: Boolean)(implicit ctx: Context) =
     bits.layout("Appeal a moderation decision") {
-      val query = isGranted(_.Appeals) ?? ctx.req.queryString.toMap
+      val query = if (isGranted(_.Appeals)) ctx.req.queryString.toMap else Map.empty[String, Seq[String]]
       main(cls := "page page-small box box-pad appeal")(
         h1("Appeal"),
         div(cls := "nav-tree")(
@@ -283,6 +282,7 @@ object tree {
       presets = none
     )
 
+  @annotation.nowarn("msg=unused")
   private def renderHelp =
     div(cls := "appeal__help")(
       p(

@@ -1,7 +1,7 @@
 package lila.plan
 
 import com.softwaremill.macwire._
-import io.methvin.play.autoconfig._
+import lila.common.autoconfig.{ AutoConfig, ConfigName }
 import com.softwaremill.tagging._
 import play.api.Configuration
 import play.api.libs.ws.StandaloneWSClient
@@ -32,7 +32,7 @@ final class Env(
     system: akka.actor.ActorSystem
 ) {
 
-  private val config = appConfig.get[PlanConfig]("plan")(AutoConfig.loader)
+  private val config = appConfig.get[PlanConfig]("plan")(using AutoConfig.loader)
 
   val stripePublicKey = config.stripe.publicKey
   val payPalPublicKey = config.payPal.publicKey
@@ -74,22 +74,22 @@ final class Env(
   )
 
   system.scheduler.scheduleWithFixedDelay(15 minutes, 15 minutes) { () =>
-    expiration.run.unit
+    expiration.run.discard
   }
 
   lila.common.Bus.subscribeFun("email") { case lila.hub.actorApi.user.ChangeEmail(userId, email) =>
-    api.onEmailChange(userId, email).unit
+    api.onEmailChange(userId, email).discard
   }
 
   def cli =
     new lila.common.Cli {
       def process = {
         case "patron" :: "lifetime" :: user :: Nil =>
-          userRepo named user flatMap { _ ?? api.setLifetime } inject "ok"
+          userRepo `named` user flatMap { _ so api.setLifetime } inject "ok"
         case "patron" :: "month" :: user :: Nil =>
-          userRepo named user flatMap { _ ?? api.giveMonth } inject "ok"
+          userRepo `named` user flatMap { _ so api.giveMonth } inject "ok"
         case "patron" :: "remove" :: user :: Nil =>
-          userRepo named user flatMap { _ ?? api.remove } inject "ok"
+          userRepo `named` user flatMap { _ so api.remove } inject "ok"
       }
     }
 }

@@ -2,7 +2,6 @@ package lila.user
 
 import reactivemongo.api.bson._
 import scala.concurrent.duration._
-import scala.util.Success
 
 import lila.common.LightUser
 import lila.db.dsl._
@@ -17,22 +16,22 @@ final class LightUserApi(
   import LightUserApi._
 
   val async = new LightUser.Getter(id =>
-    if (User isGhost id) fuccess(LightUser.ghost.some) else cache.async(id)
+    if (User `isGhost` id) fuccess(LightUser.ghost.some) else cache.async(id)
   )
-  val sync = new LightUser.GetterSync(id => if (User isGhost id) LightUser.ghost.some else cache.sync(id))
+  val sync = new LightUser.GetterSync(id => if (User `isGhost` id) LightUser.ghost.some else cache.sync(id))
 
   def syncFallback(id: User.ID)  = sync(id) | LightUser.fallback(id)
-  def asyncFallback(id: User.ID) = async(id) dmap (_ | LightUser.fallback(id))
+  def asyncFallback(id: User.ID) = async(id) `dmap` (_ | LightUser.fallback(id))
 
-  def asyncMany = cache.asyncMany _
+  def asyncMany = cache.asyncMany
 
   def asyncManyFallback(ids: Seq[User.ID]): Fu[Seq[LightUser]] =
-    ids.map(asyncFallback).sequenceFu
+    Future.sequence(ids.map(asyncFallback))
 
-  def invalidate = cache invalidate _
+  def invalidate = (id: User.ID) => cache.invalidate(id)
 
-  def preloadOne                     = cache preloadOne _
-  def preloadMany                    = cache preloadMany _
+  def preloadOne                     = (id: User.ID) => cache.preloadOne(id)
+  def preloadMany                    = (ids: Seq[User.ID]) => cache.preloadMany(ids)
   def preloadUser(user: User)        = cache.set(user.id, user.light.some)
   def preloadUsers(users: Seq[User]) = users.foreach(preloadUser)
 
@@ -40,7 +39,7 @@ final class LightUserApi(
     name = "user.light",
     initialCapacity = 1024 * 1024,
     compute = id =>
-      if (User isGhost id) fuccess(LightUser.ghost.some)
+      if (User `isGhost` id) fuccess(LightUser.ghost.some)
       else
         repo.coll.find($id(id), projection).one[LightUser] recover {
           case _: reactivemongo.api.bson.exceptions.BSONValueNotFoundException => LightUser.ghost.some

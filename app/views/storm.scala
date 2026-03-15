@@ -1,6 +1,5 @@
 package views.html
 
-import controllers.routes
 import play.api.i18n.Lang
 import play.api.libs.json._
 
@@ -55,7 +54,7 @@ object storm {
       )
     }
 
-  private def renderHigh(high: StormHigh)(implicit lang: Lang) =
+  @annotation.nowarn("msg=unused") private def renderHigh(high: StormHigh)(implicit lang: Lang) =
     frag(
       List(
         (high.allTime, "All-time"),
@@ -81,7 +80,7 @@ object storm {
       main(cls := "storm-dashboard page-small")(
         div(cls := "storm-dashboard__high box box-pad")(
           h1(
-            !ctx.is(user) option frag(
+            !ctx.is(user) `option` frag(
               userLink(user),
               " • "
             ),
@@ -124,7 +123,7 @@ object storm {
                 history,
                 np =>
                   addQueryParameter(
-                    if (ctx is user) routes.Storm.dashboard().url
+                    if (ctx `is` user) routes.Storm.dashboard().url
                     else routes.Storm.dashboardOf(user.username).url,
                     "page",
                     np

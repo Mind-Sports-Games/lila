@@ -20,9 +20,10 @@ final private class RelationRepo(coll: Coll, userRepo: lila.user.UserRepo)(impli
 
   def freshFollowersFromSecondary(userId: ID): Fu[List[User.ID]] =
     coll
-      .aggregateOne(readPreference = ReadPreference.secondaryPreferred) { implicit framework =>
+      .aggregateWith[Bdoc](readPreference = ReadPreference.secondaryPreferred) { implicit framework =>
         import framework._
-        Match($doc("u2" -> userId, "r" -> Follow)) -> List(
+        List(
+          Match($doc("u2" -> userId, "r" -> Follow)),
           PipelineOperator(
             $doc(
               "$lookup" -> $doc(
@@ -45,21 +46,23 @@ final private class RelationRepo(coll: Coll, userRepo: lila.user.UserRepo)(impli
               )
             )
           ),
-          Match("follower" $ne $arr()),
+          Match("follower" `$ne` $arr()),
           Group(BSONNull)(
             "ids" -> PushField("u1")
           )
         )
       }
+      .collect[List](maxDocs = 1)
+      .dmap(_.headOption)
       .map(~_.flatMap(_.getAsOpt[List[User.ID]]("ids")))
 
   def followingLike(userId: ID, term: String): Fu[List[ID]] =
-    User.validateId(term) ?? { valid =>
+    User.validateId(term) so { valid =>
       coll.secondaryPreferred.distinctEasy[ID, List](
         "u2",
         $doc(
           "u1" -> userId,
-          "u2" $startsWith valid,
+          "u2" `$startsWith` valid,
           "r" -> Follow
         )
       )

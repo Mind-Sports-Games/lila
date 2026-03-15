@@ -11,13 +11,13 @@ final class Env(
     shutdown: CoordinatedShutdown,
     notification: lila.hub.actors.Notification
 )(implicit
-    ec: scala.concurrent.ExecutionContext,
+    ec: Executor,
     scheduler: Scheduler
 ) {
 
   private val RedisUri = appConfig.get[String]("socket.redis.uri")
 
-  private val redisClient = RedisClient create RedisURI.create(RedisUri)
+  private val redisClient = RedisClient `create` RedisURI.create(RedisUri)
 
   val remoteSocket: RemoteSocket = wire[RemoteSocket]
 

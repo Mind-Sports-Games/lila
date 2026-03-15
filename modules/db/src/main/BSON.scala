@@ -1,16 +1,16 @@
 package lila.db
 
 import org.joda.time.DateTime
-import ornicar.scalalib.Zero
-import reactivemongo.api.bson._
+import alleycats.Zero
+import reactivemongo.api.bson.*
 
 import scala.util.{ Success, Try }
 
-import dsl._
+import dsl.*
 
 abstract class BSON[T] extends BSONReadOnly[T] with BSONDocumentReader[T] with BSONDocumentWriter[T] {
 
-  import BSON._
+  import BSON.*
 
   def writes(writer: Writer, obj: T): Bdoc
 
@@ -21,7 +21,7 @@ abstract class BSON[T] extends BSONReadOnly[T] with BSONDocumentReader[T] with B
 
 abstract class BSONReadOnly[T] extends BSONDocumentReader[T] {
 
-  import BSON._
+  import BSON.*
 
   def reads(reader: Reader): T
 
@@ -42,7 +42,7 @@ object BSON extends Handlers {
     def getO[A: BSONReader](k: String): Option[A] =
       doc.getAsOpt[A](k)
     def getD[A](k: String)(implicit zero: Zero[A], reader: BSONReader[A]): A =
-      doc.getAsOpt[A](k) getOrElse zero.zero
+      doc.getAsOpt[A](k)(using reader) getOrElse zero.zero
     def getD[A: BSONReader](k: String, default: => A): A =
       doc.getAsOpt[A](k) getOrElse default
     def getsD[A: BSONReader](k: String): List[A] =
@@ -50,8 +50,8 @@ object BSON extends Handlers {
     def getsO[A: BSONReader](k: String): Option[List[A]] =
       doc.getAsOpt[List[A]](k)
 
-    def str(k: String)                         = get[String](k)(BSONStringHandler)
-    def strO(k: String)                        = getO[String](k)(BSONStringHandler)
+    def str(k: String)                         = get[String](k)(using BSONStringHandler)
+    def strO(k: String)                        = getO[String](k)(using BSONStringHandler)
     def strD(k: String)                        = strO(k) getOrElse ""
     def int(k: String)                         = get[Int](k)
     def intO(k: String)                        = getO[Int](k)
@@ -74,24 +74,24 @@ object BSON extends Handlers {
     def intsD(k: String)                       = getO[List[Int]](k) getOrElse Nil
     def strsD(k: String)                       = getO[List[String]](k) getOrElse Nil
 
-    def contains = doc.contains _
+    def contains = doc.contains
 
-    def debug = BSON debug doc
+    def debug = BSON.debug(doc)
   }
 
   final class Writer {
 
-    def bool(b: Boolean): BSONBoolean          = BSONBoolean(b)
-    def boolO(b: Boolean): Option[BSONBoolean] = if (b) Some(BSONBoolean(true)) else None
-    def str(s: String): BSONString             = BSONString(s)
-    def strO(s: String): Option[BSONString]    = if (s.nonEmpty) Some(BSONString(s)) else None
-    def int(i: Int): BSONInteger               = BSONInteger(i)
-    def intO(i: Int): Option[BSONInteger]      = if (i != 0) Some(BSONInteger(i)) else None
-    def date(d: DateTime): BSONValue           = BSONJodaDateTimeHandler.writeTry(d).get
+    def bool(b: Boolean): BSONBoolean               = BSONBoolean(b)
+    def boolO(b: Boolean): Option[BSONBoolean]      = if b then Some(BSONBoolean(true)) else None
+    def str(s: String): BSONString                  = BSONString(s)
+    def strO(s: String): Option[BSONString]         = if s.nonEmpty then Some(BSONString(s)) else None
+    def int(i: Int): BSONInteger                    = BSONInteger(i)
+    def intO(i: Int): Option[BSONInteger]           = if i != 0 then Some(BSONInteger(i)) else None
+    def date(d: DateTime): BSONValue                = BSONJodaDateTimeHandler.writeTry(d).get
     def byteArrayO(b: ByteArray): Option[BSONValue] =
-      if (b.isEmpty) None else ByteArray.ByteArrayBSONHandler.writeOpt(b)
-    def bytesO(b: Array[Byte]): Option[BSONValue] = byteArrayO(ByteArray(b))
-    def bytes(b: Array[Byte]): BSONBinary         = BSONBinary(b, ByteArray.subtype)
+      if b.isEmpty then None else ByteArray.ByteArrayBSONHandler.writeOpt(b)
+    def bytesO(b: Array[Byte]): Option[BSONValue]          = byteArrayO(ByteArray(b))
+    def bytes(b: Array[Byte]): BSONBinary                  = BSONBinary(b, ByteArray.subtype)
     def strListO(list: List[String]): Option[List[String]] =
       list match {
         case Nil          => None
@@ -101,12 +101,12 @@ object BSON extends Handlers {
         case full         => Some(full)
       }
     def listO[A](list: List[A])(implicit writer: BSONWriter[A]): Option[Barr] =
-      if (list.isEmpty) None
+      if list.isEmpty then None
       else Some(BSONArray(list flatMap writer.writeOpt))
-    def docO(o: Bdoc): Option[Bdoc]                      = if (o.isEmpty) None else Some(o)
+    def docO(o: Bdoc): Option[Bdoc]                      = if o.isEmpty then None else Some(o)
     def double(i: Double): BSONDouble                    = BSONDouble(i)
-    def doubleO(i: Double): Option[BSONDouble]           = if (i != 0) Some(BSONDouble(i)) else None
-    def zero[A](a: A)(implicit zero: Zero[A]): Option[A] = if (zero.zero == a) None else Some(a)
+    def doubleO(i: Double): Option[BSONDouble]           = if i != 0 then Some(BSONDouble(i)) else None
+    def zero[A](a: A)(implicit zero: Zero[A]): Option[A] = if zero.zero == a then None else Some(a)
   }
 
   val writer = new Writer

@@ -1,6 +1,5 @@
 package lila.pool
 
-import scala.concurrent.duration._
 import lila.common.ThreadLocalRandom
 
 import akka.actor._
@@ -21,7 +20,7 @@ final private class PoolActor(
 
   var members = Vector.empty[PoolMember]
 
-  var nextWave: Cancellable = _
+  var nextWave: Cancellable = scala.compiletime.uninitialized
 
   implicit def ec: ExecutionContextExecutor = context.dispatcher
 
@@ -43,7 +42,7 @@ final private class PoolActor(
           if (members.sizeIs >= config.wave.players.value) self ! FullWave
         case Some(member) if member.ratingRange != joiner.ratingRange =>
           members = members.map {
-            case m if m == member => m withRange joiner.ratingRange
+            case m if m == member => m `withRange` joiner.ratingRange
             case m                => m
           }
         case _ => // no change

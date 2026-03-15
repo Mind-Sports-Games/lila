@@ -2,13 +2,11 @@ package lila.tournament
 
 import org.joda.time.DateTime
 import reactivemongo.api.ReadPreference
-import scala.concurrent.duration._
 
 import strategygames.variant.Variant
-import strategygames.GameLogic
 
 import lila.db.dsl._
-import Schedule.{ Freq, Speed }
+import Schedule.Freq
 import lila.user.User
 import reactivemongo.api.bson.BSONDocumentHandler
 
@@ -33,10 +31,10 @@ case class FreqWinners(
 
   lazy val top: Option[Winner] =
     //daily.filter(_.date isAfter DateTime.now.minusHours(2)) orElse
-    weekly.filter(_.date isAfter DateTime.now.minusDays(1)) orElse
+    weekly.filter(_.date `isAfter` DateTime.now.minusDays(1)) orElse
       //monthly.filter(_.date isAfter DateTime.now.minusDays(3)) orElse
-      shield.filter(_.date isAfter DateTime.now.minusDays(3)) orElse
-      yearly.filter(_.date isAfter DateTime.now.minusDays(28)) orElse
+      shield.filter(_.date `isAfter` DateTime.now.minusDays(3)) orElse
+      yearly.filter(_.date `isAfter` DateTime.now.minusDays(28)) orElse
       //mso21.filter(_.date isAfter DateTime.now.minusDays(60)) orElse
       //msoGP.filter(_.date isAfter DateTime.now.minusDays(60)) orElse
       //msoWarmUp.filter(_.date isAfter DateTime.now.minusDays(14)) orElse
@@ -124,20 +122,20 @@ final class WinnersApi(
       .find(
         $doc(
           "schedule.freq" -> freq.name,
-          "startsAt" $gt since.minusHours(12),
-          "winner" $exists true
+          "startsAt" `$gt` since.minusHours(12),
+          "winner" `$exists` true
         )
       )
-      .sort($sort desc "startsAt")
+      .sort($sort `desc` "startsAt")
       .cursor[Tournament](ReadPreference.secondaryPreferred)
       .list(Int.MaxValue)
 
-  private def firstStandardWinner(tours: List[Tournament], speed: Speed): Option[Winner] =
-    tours
-      .find { t =>
-        t.variant.key == "standard" && t.schedule.exists(_.speed == speed)
-      }
-      .flatMap(_.winner)
+  // private def firstStandardWinner(tours: List[Tournament], speed: Speed): Option[Winner] =
+  //   tours
+  //     .find { t =>
+  //       t.variant.key == "standard" && t.schedule.exists(_.speed == speed)
+  //     }
+  //     .flatMap(_.winner)
 
   private def firstVariantWinner(tours: List[Tournament], variant: Variant): Option[Winner] =
     tours.find(_.variant == variant).flatMap(_.winner)
@@ -157,7 +155,7 @@ final class WinnersApi(
       introductory <- fetchLastFreq(Freq.Introductory, DateTime.now.minusYears(1))
       //elites    <- fetchLastFreq(Freq.Weekend, DateTime.now.minusWeeks(3))
       //marathons <- fetchLastFreq(Freq.Marathon, DateTime.now.minusMonths(13))
-    } yield {
+    } yield
       //def standardFreqWinners(speed: Speed): FreqWinners =
       //  FreqWinners(
       //    yearly = firstStandardWinner(yearlies, speed),
@@ -192,7 +190,6 @@ final class WinnersApi(
           )
         }.toMap
       )
-    }
 
   private val allCache = mongoCache.unit[AllWinners](
     "tournament:winner:all",
@@ -206,11 +203,12 @@ final class WinnersApi(
 
   // because we read on secondaries, delay cache clear
   def clearCache(tour: Tournament): Unit =
-    if (tour.schedule.exists(_.freq.isDailyOrBetter))
-      scheduler.scheduleOnce(5.seconds) { allCache.invalidate {}.unit }.unit
+    if (tour.schedule.exists(_.freq.isDailyOrBetter)) {
+      { val _ = scheduler.scheduleOnce(5.seconds) { allCache.invalidate {} } }
+    }
 
   private[tournament] def clearAfterMarking(userId: User.ID): Funit = all map { winners =>
-    if (winners.userIds contains userId) allCache.invalidate {}.unit
+    if (winners.userIds contains userId) allCache.invalidate {}
   }
 }
 

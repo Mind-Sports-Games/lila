@@ -22,13 +22,14 @@ final class PaginatorBuilder(
 
   final class UserAdapter(user: User) extends AdapterLike[Game] {
 
-    def nbResults: Fu[Int] = coll countSel selector
+    def nbResults: Fu[Int] = coll `countSel` selector
 
     def slice(offset: Int, length: Int): Fu[Seq[Game]] =
       coll
-        .aggregateList(length, readPreference = ReadPreference.secondaryPreferred) { framework =>
+        .aggregateWith[Bdoc](readPreference = ReadPreference.secondaryPreferred) { framework =>
           import framework._
-          Match(selector) -> List(
+          List(
+            Match(selector),
             Sort(Descending("d")),
             Skip(offset),
             Limit(length),
@@ -47,9 +48,10 @@ final class PaginatorBuilder(
             ReplaceRootField("game")
           )
         }
+        .collect[List](maxDocs = length)
         .map {
           _.flatMap(lila.game.BSONHandlers.gameBSONHandler.readOpt)
-        }
+      }
 
     private def selector = $doc("u" -> user.id)
   }

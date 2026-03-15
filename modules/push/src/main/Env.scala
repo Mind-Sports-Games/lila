@@ -3,7 +3,7 @@ package lila.push
 import akka.actor._
 import com.google.auth.oauth2.{ GoogleCredentials, ServiceAccountCredentials }
 import com.softwaremill.macwire._
-import io.methvin.play.autoconfig._
+import lila.common.autoconfig.{ AutoConfig, ConfigName }
 import play.api.Configuration
 import play.api.libs.ws.StandaloneWSClient
 import scala.jdk.CollectionConverters._
@@ -32,24 +32,24 @@ final class Env(
     scheduler: akka.actor.Scheduler
 ) {
 
-  private val config = appConfig.get[PushConfig]("push")(AutoConfig.loader)
+  private val config = appConfig.get[PushConfig]("push")(using AutoConfig.loader)
 
   def vapidPublicKey = config.web.vapidPublicKey
 
   private lazy val deviceApi  = new DeviceApi(db(config.deviceColl))
   lazy val webSubscriptionApi = new WebSubscriptionApi(db(config.subscriptionColl))
 
-  def registerDevice    = deviceApi.register _
-  def unregisterDevices = deviceApi.unregister _
+  def registerDevice    = deviceApi.register
+  def unregisterDevices = deviceApi.unregister
 
   private lazy val googleCredentials: Option[GoogleCredentials] =
-    try {
+    try
       config.firebase.json.value.some.filter(_.nonEmpty).map { json =>
         ServiceAccountCredentials
           .fromStream(new java.io.ByteArrayInputStream(json.getBytes()))
           .createScoped(Set("https://www.googleapis.com/auth/firebase.messaging").asJava)
       }
-    } catch {
+    catch {
       case e: Exception =>
         logger.warn("Failed to create google credentials", e)
         none
@@ -62,8 +62,8 @@ final class Env(
 
   private lazy val pushApi: PushApi = wire[PushApi]
 
-  private def logUnit(f: Fu[_]): Unit = {
-    f logFailure logger
+  private def logUnit(f: Fu[?]): Unit = {
+    f `logFailure` logger
     ()
   }
   lila.common.Bus.subscribeFun(
@@ -78,11 +78,11 @@ final class Env(
     case lila.game.actorApi.FinishGame(game, _, _) =>
       logUnit { pushApi.finish(game) }
     case lila.hub.actorApi.round.CorresMoveEvent(move, _, pushable, _, _) if pushable =>
-      logUnit { pushApi move move }
+      logUnit { pushApi `move` move }
     case lila.hub.actorApi.round.CorresTakebackOfferEvent(gameId) =>
-      logUnit { pushApi takebackOffer gameId }
+      logUnit { pushApi `takebackOffer` gameId }
     case lila.hub.actorApi.round.CorresDrawOfferEvent(gameId) =>
-      logUnit { pushApi drawOffer gameId }
+      logUnit { pushApi `drawOffer` gameId }
     case lila.hub.actorApi.round.CorresSelectSquaresOfferEvent(gameId) =>
       logUnit { pushApi.selectSquaresOffer(gameId) }
     case lila.hub.actorApi.round.CorresAcceptSquaresOfferEvent(gameId) =>
@@ -90,12 +90,12 @@ final class Env(
     case lila.hub.actorApi.round.CorresDeclineSquaresOfferEvent(gameId) =>
       logUnit { pushApi.declineSquaresOffer(gameId) }
     case lila.msg.MsgThread.Unread(t) =>
-      logUnit { pushApi newMsg t }
+      logUnit { pushApi `newMsg` t }
     case lila.challenge.Event.Create(c) =>
-      logUnit { pushApi challengeCreate c }
+      logUnit { pushApi `challengeCreate` c }
     case lila.challenge.Event.Accept(c, joinerId) =>
       logUnit { pushApi.challengeAccept(c, joinerId) }
     case lila.game.actorApi.CorresAlarmEvent(pov) =>
-      logUnit { pushApi corresAlarm pov }
+      logUnit { pushApi `corresAlarm` pov }
   }
 }

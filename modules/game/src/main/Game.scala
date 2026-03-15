@@ -1,7 +1,5 @@
 package lila.game
 
-import scala.annotation.nowarn
-
 import strategygames.format.{ FEN, Forsyth, Uci }
 import strategygames.opening.{ FullOpening, FullOpeningDB }
 import strategygames.chess.{ Castles, CheckCount }
@@ -40,7 +38,6 @@ import strategygames.{
 import strategygames.variant.Variant
 import org.joda.time.DateTime
 
-import lila.common.Sequence
 import lila.db.ByteArray
 import lila.rating.PerfType
 import lila.user.User
@@ -89,7 +86,7 @@ case class Game(
     players find (_.id == playerId)
 
   def player(user: User): Option[Player] =
-    players find (_ isUser user)
+    players find (_ `isUser` user)
 
   def player(c: PlayerIndex.type => PlayerIndex): Player = player(c(PlayerIndex))
 
@@ -117,7 +114,7 @@ case class Game(
 
   def turnOf(p: Player): Boolean      = p == player
   def turnOf(c: PlayerIndex): Boolean = c == turnPlayerIndex
-  def turnOf(u: User): Boolean        = player(u) ?? turnOf
+  def turnOf(u: User): Boolean        = player(u) so turnOf
 
   def playedTurns = turnCount - stratGame.startedAtTurn
   //once draughts is converted to multiaction we should be able to use actionStrs.flatten.size
@@ -126,7 +123,7 @@ case class Game(
   def flagged = (Status.flagged.contains(status)).option(turnPlayerIndex)
 
   def fullIdOf(player: Player): Option[String] =
-    (players contains player) option s"$id${player.id}"
+    (players contains player) `option` s"$id${player.id}"
 
   def fullIdOf(playerIndex: PlayerIndex): String = s"$id${player(playerIndex).id}"
 
@@ -154,7 +151,7 @@ case class Game(
   // we can't rely on the clock, because if moretime was given,
   // elapsed time is no longer representing the game duration
   def durationSeconds: Option[Int] =
-    updatedAt.getSeconds - createdAt.getSeconds match {
+    (updatedAt.getMillis / 1000) - (createdAt.getMillis / 1000) match {
       case seconds if seconds > 60 * 60 * 12 => none // no way it lasted more than 12 hours, come on.
       case seconds                           => seconds.toInt.some
     }
@@ -264,9 +261,9 @@ case class Game(
       stratGame = game,
       binaryPlyTimes = (!isPgnImport && stratGame.clock.isEmpty).option {
         BinaryFormat.plyTime.write {
-          binaryPlyTimes.?? { t =>
+          binaryPlyTimes.so { t =>
             BinaryFormat.plyTime.read(t, playedPlies)
-          } :+ Centis(nowCentis - updatedAt.getCentis).nonNeg
+          } :+ Centis(nowCentis - (updatedAt.getMillis / 10).toInt).nonNeg
         }
       },
       loadClockHistory = action match {
@@ -283,7 +280,7 @@ case class Game(
       playerIndex = game.situation.player,
       turnCount = game.turnCount,
       plies = game.plies,
-      status = (status != updated.status) option updated.status,
+      status = (status != updated.status) `option` updated.status,
       winner = game.situation.winner,
       p1OffersDraw = p1Player.isOfferingDraw,
       p2OffersDraw = p2Player.isOfferingDraw,
@@ -319,32 +316,32 @@ case class Game(
     } :: {
       // abstraction leak, I know.
       if (updated.board.variant.gameLogic == GameLogic.Draughts())
-        (updated.board.variant.frisianVariant || updated.board.variant.draughts64Variant) ?? List(
+        (updated.board.variant.frisianVariant || updated.board.variant.draughts64Variant) so List(
           Event.KingMoves(
             p1 = updated.history.kingMoves.p1,
             p2 = updated.history.kingMoves.p2,
-            p1King = updated.history.kingMoves.p1King.map(Pos.Draughts),
-            p2King = updated.history.kingMoves.p2King.map(Pos.Draughts)
+            p1King = updated.history.kingMoves.p1King.map(Pos.Draughts.apply),
+            p2King = updated.history.kingMoves.p2King.map(Pos.Draughts.apply)
           )
         )
       else if (updated.board.variant.gameLogic == GameLogic.Togyzkumalak())
         //Is this even necessary as score is in the fen?
-        (updated.board.variant.gameFamily == GameFamily.Togyzkumalak()) ?? List(
+        (updated.board.variant.gameFamily == GameFamily.Togyzkumalak()) so List(
           Event.Score(p1 = updated.history.score.p1, p2 = updated.history.score.p2)
         )
       else if (updated.board.variant.gameLogic == GameLogic.Backgammon())
         //Is this even necessary as score is in the fen?
-        (updated.board.variant.gameFamily == GameFamily.Backgammon()) ?? List(
+        (updated.board.variant.gameFamily == GameFamily.Backgammon()) so List(
           Event.Score(p1 = updated.history.score.p1, p2 = updated.history.score.p2)
         )
       // TODO Abalone is this how we want to represent score? Maybe look at Backgammon
       else if (updated.board.variant.gameLogic == GameLogic.Abalone())
         //Is this even necessary as score is in the fen?
-        (updated.board.variant.gameFamily == GameFamily.Abalone()) ?? List(
+        (updated.board.variant.gameFamily == GameFamily.Abalone()) so List(
           Event.Score(p1 = updated.history.score.p1, p2 = updated.history.score.p2)
         )
       else //chess. Is this even necessary as checkCount is in the fen?
-        ((updated.board.variant.key == "threeCheck" || updated.board.variant.key == "fiveCheck") && game.situation.check) ?? List(
+        ((updated.board.variant.key == "threeCheck" || updated.board.variant.key == "fiveCheck") && game.situation.check) so List(
           Event.CheckCount(
             p1 = updated.history.checkCount.p1,
             p2 = updated.history.checkCount.p2
@@ -440,7 +437,7 @@ case class Game(
   def correspondenceClock: Option[CorrespondenceClock] =
     daysPerTurn map { days =>
       val increment   = days * 24 * 60 * 60
-      val secondsLeft = (updatedAt.getSeconds + increment - nowSeconds).toInt max 0
+      val secondsLeft = ((updatedAt.getMillis / 1000) + increment - nowSeconds).toInt max 0
       CorrespondenceClock(
         increment = increment,
         p1Time = activePlayerIndex.fold(secondsLeft, increment).toFloat,
@@ -449,7 +446,7 @@ case class Game(
     }
 
   def playableCorrespondenceClock: Option[CorrespondenceClock] =
-    playable ?? correspondenceClock
+    playable so correspondenceClock
 
   def speed = Speed(stratGame.clock.map(_.config))
 
@@ -645,7 +642,7 @@ case class Game(
       !playerHasOfferedDrawRecently(playerIndex)
 
   def playerHasOfferedDrawRecently(playerIndex: PlayerIndex) =
-    drawOffers.lastBy(playerIndex) ?? (_ >= turnCount - 20)
+    drawOffers.lastBy(playerIndex) so (_ >= turnCount - 20)
 
   def offerDraw(playerIndex: PlayerIndex) = copy(
     metadata = metadata.copy(drawOffers = drawOffers.add(playerIndex, turnCount))
@@ -668,7 +665,7 @@ case class Game(
 
   def moretimeable(playerIndex: PlayerIndex) =
     playable && nonMandatory && {
-      clock.??(_ moretimeable playerIndex) || correspondenceClock.??(_ moretimeable playerIndex)
+      clock.so(_ `moretimeable` playerIndex) || correspondenceClock.so(_ `moretimeable` playerIndex)
     }
 
   def abortable =
@@ -676,7 +673,7 @@ case class Game(
       metadata.multiMatchGameNr.fold(true)(x => x < 2)
 
   def berserkable =
-    clock.??(_.config.berserkable) && status == Status.Started && playedTurns < 2
+    clock.so(_.config.berserkable) && status == Status.Started && playedTurns < 2
 
   def goBerserk(playerIndex: PlayerIndex): Option[Progress] =
     clock.ifTrue(berserkable && !player(playerIndex).berserk).map { c =>
@@ -726,7 +723,7 @@ case class Game(
           }
       ),
       // Events here for BC.
-      List(Event.End(winner)) ::: newClock.??(c => List(Event.Clock(c)))
+      List(Event.End(winner)) ::: newClock.so(c => List(Event.Clock(c)))
     )
   }
 
@@ -750,7 +747,7 @@ case class Game(
     if (isTournament && variant.fromPositionVariant) Variant.libStandard(variant.gameLogic)
     else variant
 
-  def fromPosition = variant.fromPositionVariant || source.??(Source.Position ==)
+  def fromPosition = variant.fromPositionVariant || source.so(Source.Position ==)
 
   def imported = source contains Source.Import
 
@@ -785,7 +782,7 @@ case class Game(
       !c.isRunning && !c.isPaused
 
   private def outoftimeClock(withGrace: Boolean): Boolean =
-    clock ?? { c =>
+    clock so { c =>
       started && playable && (bothPlayersHaveMoved || isSimul || isSwiss || fromFriend || fromApi) && {
         c.outOfTime(turnPlayerIndex, withGrace) || {
           canBeOutOfTime(c) && c.clockPlayerExists(_.elapsed.centis > 0)
@@ -794,7 +791,7 @@ case class Game(
     }
 
   private def outoftimeCorrespondence: Boolean =
-    playableCorrespondenceClock ?? { _ outoftime activePlayerIndex }
+    playableCorrespondenceClock so { _ `outoftime` activePlayerIndex }
 
   def isCorrespondence = speed == Speed.Correspondence
 
@@ -834,7 +831,7 @@ case class Game(
 
   def isUnlimited = !hasClock && !hasCorrespondenceClock
 
-  def isClockRunning = clock ?? (_.isRunning)
+  def isClockRunning = clock so (_.isRunning)
 
   def withClock(c: ClockBase) = Progress(this, copy(stratGame = stratGame.copy(clock = Some(c))))
 
@@ -928,11 +925,11 @@ case class Game(
 
   def isBeingPlayed = !isPgnImport && !finishedOrAborted
 
-  def olderThan(seconds: Int) = updatedAt isBefore DateTime.now.minusSeconds(seconds)
+  def olderThan(seconds: Int) = updatedAt `isBefore` DateTime.now.minusSeconds(seconds)
 
-  def justCreated = createdAt isAfter DateTime.now.minusSeconds(1)
+  def justCreated = createdAt `isAfter` DateTime.now.minusSeconds(1)
 
-  def unplayed = !bothPlayersHaveMoved && (createdAt isBefore Game.unplayedDate)
+  def unplayed = !bothPlayersHaveMoved && (createdAt `isBefore` Game.unplayedDate)
 
   def abandoned =
     (status <= Status.Started) && {
@@ -946,7 +943,7 @@ case class Game(
 
   def hasBookmarks = bookmarks > 0
 
-  def showBookmarks = hasBookmarks ?? bookmarks.toString
+  def showBookmarks = hasBookmarks so bookmarks.toString
 
   def userIds = playerMaps(_.userId)
 
@@ -1042,7 +1039,7 @@ case class Game(
 
   def setAnalysed = copy(metadata = metadata.copy(analysed = true))
 
-  def secondsSinceCreation = (nowSeconds - createdAt.getSeconds).toInt
+  def secondsSinceCreation = (nowSeconds - (createdAt.getMillis / 1000)).toInt
 
   override def toString = s"""Game($id)"""
 }
@@ -1092,7 +1089,7 @@ object Game {
 
   def allowRated(variant: Variant, clock: Option[ClockConfig]) =
     variant.key == "standard" || {
-      clock ?? { c =>
+      clock so { c =>
         c.estimateTotalTime >= Centis(3000) &&
         c.limitSeconds > 0 || c.graceSeconds > 1
       }
@@ -1116,13 +1113,13 @@ object Game {
   val tokenSize    = 4
 
   val unplayedHours = 24
-  def unplayedDate  = DateTime.now minusHours unplayedHours
+  def unplayedDate  = DateTime.now `minusHours` unplayedHours
 
   val abandonedDays = 21
-  def abandonedDate = DateTime.now minusDays abandonedDays
+  def abandonedDate = DateTime.now `minusDays` abandonedDays
 
   val aiAbandonedHours = 6
-  def aiAbandonedDate  = DateTime.now minusHours aiAbandonedHours
+  def aiAbandonedDate  = DateTime.now `minusHours` aiAbandonedHours
 
   def takeGameId(fullId: String)   = fullId take gameIdSize
   def takePlayerId(fullId: String) = fullId drop gameIdSize
@@ -1368,7 +1365,7 @@ object CastleLastMove {
         }
       def writeTry(clmt: CastleLastMove) =
         ByteArrayBSONHandler writeTry {
-          BinaryFormat.castleLastMove write clmt
+          BinaryFormat.castleLastMove `write` clmt
         }
     }
 }
@@ -1463,7 +1460,7 @@ case class FischerClockHistory(
       (pairs.map { case (first, second) =>
         ({
           val mt     = first - second
-          val cGrace = (pairs.hasNext || !noLastInc) ?? grace
+          val cGrace = (pairs.hasNext || !noLastInc) so grace
 
           (mt + cGrace)
         } nonNeg)
@@ -1493,8 +1490,8 @@ case class DelayClockHistory(
   // Issues seen in analysis clock times (not correct for delay)
   private def timeRemaining(moveTimes: Vector[Centis], remainingTime: Option[Centis]): Vector[Centis] =
     moveTimes.reverse.scanLeft(remainingTime.getOrElse(Centis(0)))(_ + _).reverse
-  lazy val p1: Vector[Centis] = timeRemaining(p1ActionTimes, p1RemainingTime)
-  lazy val p2: Vector[Centis] = timeRemaining(p2ActionTimes, p2RemainingTime)
+  val p1: Vector[Centis] = timeRemaining(p1ActionTimes, p1RemainingTime)
+  val p2: Vector[Centis] = timeRemaining(p2ActionTimes, p2RemainingTime)
 
   def update(playerIndex: PlayerIndex, f: Vector[Centis] => Vector[Centis]): ClockHistory =
     playerIndex.fold(copy(p1ActionTimes = f(p1ActionTimes)), copy(p2ActionTimes = f(p2ActionTimes)))
@@ -1519,13 +1516,13 @@ case class DelayClockHistory(
   //       of storing the ply times directly. :heart:
   override def plyTimes(
       playerIndex: PlayerIndex,
-      @nowarn turnPlayerIndex: PlayerIndex,
-      @nowarn playedPlies: Int,
-      @nowarn startedAtTurn: Int,
-      @nowarn finished: Boolean,
-      @nowarn status: Status,
-      @nowarn grace: Centis = Centis(0),
-      @nowarn byo: Centis = Centis(0)
+      _turnPlayerIndex: PlayerIndex,
+      _playedPlies: Int,
+      _startedAtTurn: Int,
+      _finished: Boolean,
+      _status: Status,
+      _grace: Centis = Centis(0),
+      _byo: Centis = Centis(0)
   ): List[Centis] = dbTimes(playerIndex).toList
 
   override def lastX(playerIndex: PlayerIndex, plies: Int): Option[Centis] =
@@ -1590,13 +1587,13 @@ case class ByoyomiClockHistory(
         ({
           //TODO multiaction need to calculate fullTurncount (expand on pairs to get an actual full turn of times)
           val fullTurnCount = index + 2 + startedAtTurn / 2
-          val afterByoyomi  = byoyomiStart ?? (_ <= fullTurnCount)
+          val afterByoyomi  = byoyomiStart so (_ <= fullTurnCount)
           // after byoyomi we store movetimes directly, not remaining time
           val mt     = if (afterByoyomi) second else first - second
-          val cGrace = (!afterByoyomi && (pairs.hasNext || !noLastInc)) ?? grace
+          val cGrace = (!afterByoyomi && (pairs.hasNext || !noLastInc)) so grace
 
           (if (!pairs.hasNext && byoyomiTimeout) {
-             val prevTurnByoyomi = byoyomiStart ?? (_ < fullTurnCount)
+             val prevTurnByoyomi = byoyomiStart so (_ < fullTurnCount)
              (if (prevTurnByoyomi) byo else first) + byo * countSpentPeriods(playerIndex, fullTurnCount)
            } else mt + cGrace)
         } nonNeg)
@@ -1614,7 +1611,7 @@ case class ByoyomiClockHistory(
     copy(periodEntries = periodEntries.update(playerIndex, f))
 
   override def record(playerIndex: PlayerIndex, clock: ClockBase, fullTurnCount: Int): ClockHistory = {
-    val curClock        = clock currentClockFor playerIndex
+    val curClock        = clock `currentClockFor` playerIndex
     val initiatePeriods = clock.config.startsAtZero && periodEntries(playerIndex).isEmpty
     val isUsingByoyomi  = curClock.periods > 0 && !initiatePeriods
 
@@ -1623,8 +1620,8 @@ case class ByoyomiClockHistory(
     updateInternal(playerIndex, _ :+ timeToStore)
       .updatePeriods(
         playerIndex,
-        _.padTo(initiatePeriods ?? 1, 0)
-          .padTo(curClock.periods atMost PeriodEntries.maxPeriods, fullTurnCount)
+        _.padTo(initiatePeriods so 1, 0)
+          .padTo(curClock.periods `atMost` PeriodEntries.maxPeriods, fullTurnCount)
       )
   }
 

@@ -59,6 +59,6 @@ object StatusText {
 
   def apply(game: lila.game.Game): String = apply(game.status, game.winnerPlayerIndex, game.variant)
 
-  private def winner(win: Option[PlayerIndex]) = win.??(_.toString)
+  private def winner(win: Option[PlayerIndex]) = win.so(_.toString)
   private def loser(win: Option[PlayerIndex])  = winner(win.map(!_))
 }

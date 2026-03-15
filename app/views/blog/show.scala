@@ -4,7 +4,6 @@ import lila.api.Context
 import lila.app.templating.Environment._
 import lila.app.ui.ScalatagsTemplate._
 
-import controllers.routes
 
 object show {
 
@@ -45,14 +44,14 @@ object show {
               .map(lila.blog.BlogTransform.markdown.apply)
               .map(raw)
           ),
-          ctx.noKid option
+          ctx.noKid `option`
             div(cls := "footer")(
               if (prismic.maybeRef.isEmpty) {
                 (doc
                   .getDate("blog.date")
                   .exists(
-                    _.value.toDateTimeAtStartOfDay isAfter org.joda.time.DateTime.now.minusWeeks(2)
-                  )) option
+                    d => new org.joda.time.DateTime(d.value.atStartOfDay(java.time.ZoneOffset.UTC).toInstant.toEpochMilli).isAfter(org.joda.time.DateTime.now.minusWeeks(2))
+                  )) `option`
                   a(href := routes.Blog.discuss(doc.id), cls := "button text discuss", dataIcon := "d")(
                     "Discuss this blog post in the forum"
                   )

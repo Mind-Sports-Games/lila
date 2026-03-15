@@ -11,7 +11,7 @@ object filter {
 
   import bits._
 
-  def apply(form: Form[_])(implicit ctx: Context) =
+  def apply(form: Form[?])(implicit ctx: Context) =
     frag(
       cssTag("lobby.setup"),
       st.form(novalidate)(
@@ -41,11 +41,11 @@ object filter {
                 )
               )
             ),
-            ctx.isAuth option tr(cls := "inline")(
+            ctx.isAuth `option` tr(cls := "inline")(
               td(trans.mode()),
               td(renderCheckboxes(form, "mode", translatedModeChoices))
             ),
-            ctx.isAuth option tr(
+            ctx.isAuth `option` tr(
               td(trans.ratingRange()),
               td(
                 label(cls := "range")("? - ?"),
@@ -74,7 +74,7 @@ object filter {
             )
           )
         ),
-        ctx.isAnon option frag(
+        ctx.isAnon `option` frag(
           renderInput(form("mode")),
           renderInput(form("ratingRange"))
         ),
@@ -86,7 +86,7 @@ object filter {
     )
 
   def renderCheckboxes(
-      form: Form[_],
+      form: Form[?],
       key: String,
       options: Seq[(Any, String, Option[String])],
       checks: Set[String] = Set.empty
@@ -98,7 +98,7 @@ object filter {
     }
 
   def renderCheckbox(
-      form: Form[_],
+      form: Form[?],
       key: String,
       index: Int,
       value: String,
@@ -112,7 +112,7 @@ object filter {
         cls := "regular-checkbox",
         name := s"${form(key).name}[$index]",
         st.value := value,
-        checks(value) option checked
+        checks(value) `option` checked
       )(content)
     )
 }

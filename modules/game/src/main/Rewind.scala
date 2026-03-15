@@ -43,7 +43,7 @@ object Rewind {
             },
             tags = createTags(initialFen, game)
           )
-    }).flatMap(_.valid) map { replay =>
+    }).andThen(_.valid) map { replay =>
       val switchPlayer = game.turnPlayerIndex != replay.state.player
       val playerIndex  = if (switchPlayer) game.turnPlayerIndex else !game.turnPlayerIndex
       val rewindedGame = replay.state
@@ -70,5 +70,5 @@ object Rewind {
       )
       Progress(game, newGame)
     }
-
 }
+

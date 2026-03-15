@@ -33,7 +33,7 @@ object Notification {
 
   def make(notifies: Notification.Notifies, content: NotificationContent): Notification = {
     val idSize = 8
-    val id     = lila.common.ThreadLocalRandom nextString idSize
+    val id     = lila.common.ThreadLocalRandom `nextString` idSize
     new Notification(id, notifies, content, NotificationRead(false), DateTime.now)
   }
 }

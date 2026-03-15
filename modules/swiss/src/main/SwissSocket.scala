@@ -1,7 +1,5 @@
 package lila.swiss
 
-import scala.concurrent.duration._
-
 import lila.hub.actorApi.team.IsLeader
 import lila.hub.LateMultiThrottler
 import lila.hub.LightTeam.TeamID
@@ -43,7 +41,7 @@ final private class SwissSocket(
       roomId => _.Swiss(roomId.value).some,
       localTimeout = Some { (roomId, modId, _) =>
         teamOf(Swiss.Id(roomId.value)) flatMap {
-          _ ?? { teamId =>
+          _ so { teamId =>
             lila.common.Bus.ask[Boolean]("teamIsLeader") { IsLeader(teamId, modId, _) }
           }
         }
@@ -51,9 +49,9 @@ final private class SwissSocket(
       chatBusChan = _.Swiss
     )
 
-  private lazy val send: String => Unit = remoteSocketApi.makeSender("swiss-out").apply _
+  private lazy val send: String => Unit = remoteSocketApi.makeSender("swiss-out").apply
 
   remoteSocketApi.subscribe("swiss-in", RP.In.reader)(
     handler orElse remoteSocketApi.baseHandler
-  ) >>- send(P.Out.boot)
+  ).andDo(send(P.Out.boot))
 }

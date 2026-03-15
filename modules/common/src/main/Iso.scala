@@ -69,5 +69,5 @@ object Iso {
   implicit val fenIso: Iso[String, FEN]           = string[FEN](FEN.apply, _.value)
   implicit val stratFenIso: Iso[String, StratFEN] = string[StratFEN](f => StratFEN.wrap(FEN(f)), _.value)
   //implicit val StratFENHandler: BSONHandler[StratFEN] = stringAnyValHandler[StratFEN](_.value, f => StratFEN.wrap(FEN(f)))
-
 }
+

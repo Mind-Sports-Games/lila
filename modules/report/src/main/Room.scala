@@ -54,7 +54,7 @@ object Room {
     }
 
   case class Scores(value: Map[Room, Int]) {
-    def get     = value.get _
+    def get     = value.get
     def highest = ~value.values.maxOption
   }
 

@@ -1,8 +1,7 @@
 package views.html.base
 
-import controllers.routes
 import play.api.libs.json.Json
-import scala.language.reflectiveCalls
+import scala.reflect.Selectable.reflectiveSelectable
 
 import strategygames.{ Player => PlayerIndex, GameLogic }
 import strategygames.format.FEN

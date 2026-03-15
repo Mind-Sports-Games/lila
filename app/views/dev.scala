@@ -6,11 +6,10 @@ import lila.api.Context
 import lila.app.templating.Environment._
 import lila.app.ui.ScalatagsTemplate._
 
-import controllers.routes
 
 object dev {
 
-  def settings(settings: List[lila.memo.SettingStore[_]])(implicit ctx: Context) = {
+  def settings(settings: List[lila.memo.SettingStore[?]])(implicit ctx: Context) = {
     val title = "Settings"
     views.html.base.layout(
       title = title,
@@ -35,7 +34,6 @@ object dev {
                     value := (v match {
                       case None    => ""
                       case Some(x) => x.toString
-                      case x       => x.toString
                     })
                   )
               },
@@ -47,7 +45,7 @@ object dev {
     )
   }
 
-  def cli(form: Form[_], res: Option[String])(implicit ctx: Context) = {
+  def cli(form: Form[?], res: Option[String])(implicit ctx: Context) = {
     val title = "Command Line Interface"
     views.html.base.layout(
       title = title,

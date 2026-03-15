@@ -6,7 +6,6 @@ import lila.app.ui.ScalatagsTemplate._
 import lila.common.paginator.Paginator
 import lila.common.String.html.nl2br
 
-import controllers.routes
 
 object search {
 

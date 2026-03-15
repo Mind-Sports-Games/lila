@@ -7,7 +7,6 @@ import lila.app.templating.Environment._
 import lila.app.ui.ScalatagsTemplate._
 import lila.mod.Gamify.Period
 
-import controllers.routes
 
 object gamify {
 
@@ -44,7 +43,7 @@ object gamify {
               },
               history.map { h =>
                 frag(
-                  h.date.getMonthOfYear == 12 option yearHeader(h.date.getYear),
+                  h.date.getMonthOfYear == 12 `option` yearHeader(h.date.getYear),
                   tr(
                     th(h.date.monthOfYear.getAsText),
                     th(userIdLink(h.champion.modId.some, withOnline = false)),

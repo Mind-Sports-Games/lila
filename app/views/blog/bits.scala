@@ -6,7 +6,6 @@ import lila.app.ui.ScalatagsTemplate._
 import lila.blog.MiniPost
 import lila.common.String.html.richText
 
-import controllers.routes
 
 object bits {
 
@@ -14,7 +13,7 @@ object bits {
     st.nav(cls := "page-menu__menu subnav")(
       a(cls := (year.isEmpty && hasActive).option("active"), href := routes.Blog.index())("Latest"),
       lila.blog.allYears map { y =>
-        a(cls := (year has y).option("active"), href := routes.Blog.year(y))(y)
+        a(cls := (year `has` y).option("active"), href := routes.Blog.year(y))(y)
       }
     )
 
@@ -38,7 +37,7 @@ object bits {
     div(cls := "meta-headline")(
       div(cls := "meta")(
         doc.getDate("blog.date").map { date =>
-          span(cls := "text", dataIcon := "p")(semanticDate(date.value.toDateTimeAtStartOfDay))
+          span(cls := "text", dataIcon := "p")(semanticDate(new org.joda.time.DateTime(date.value.atStartOfDay(java.time.ZoneOffset.UTC).toInstant.toEpochMilli)))
         },
         doc.getText("blog.author").map { author =>
           span(cls := "text", dataIcon := "r")(richText(author))

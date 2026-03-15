@@ -1,12 +1,9 @@
 package lila.pool
 
-import scala.concurrent.duration._
-
-import strategygames.{ Game => StratGame, P1, P2, Situation, GameLogic }
-import strategygames.chess
+import strategygames.{ P1, P2, Situation, GameLogic }
 
 import lila.game.{ Game, GameRepo, IdGenerator, Player, Source }
-import lila.rating.{ Perf, PerfType }
+import lila.rating.Perf
 import lila.user.{ User, UserRepo }
 import lila.common.LightUser
 
@@ -25,12 +22,12 @@ final private class GameStarter(
   private val workQueue = new lila.hub.DuctSequencer(maxSize = 32, timeout = 10 seconds, name = "gameStarter")
 
   def apply(pool: PoolConfig, couples: Vector[MatchMaking.Couple]): Funit =
-    couples.nonEmpty ?? {
+    couples.nonEmpty so {
       workQueue {
         val userIds = couples.flatMap(_.userIds)
         userRepo.perfOf(userIds, pool.perfType) flatMap { perfs =>
           idGenerator.games(couples.size) flatMap { ids =>
-            couples.zip(ids).map((one(pool, perfs) _).tupled).sequenceFu.map { pairings =>
+            Future.sequence(couples.zip(ids).map((one(pool, perfs)).tupled)).map { pairings =>
               lila.common.Bus.publish(Pairings(pairings.flatten.toList), "poolPairings")
             }
           }
@@ -44,7 +41,7 @@ final private class GameStarter(
   ): Fu[Option[Pairing]] = {
     import couple._
     import cats.implicits._
-    (perfs.get(p1.userId), perfs.get(p2.userId)).mapN((_, _)) ?? { case (perf1, perf2) =>
+    (perfs.get(p1.userId), perfs.get(p2.userId)).mapN((_, _)) so { case (perf1, perf2) =>
       for {
         p1P1 <- userRepo.firstGetsP1(p1.userId, p2.userId)
         (p1Perf, p2Perf)     = if (p1P1) perf1 -> perf2 else perf2 -> perf1
@@ -55,7 +52,7 @@ final private class GameStarter(
           p1Member.userId -> p1Perf,
           p2Member.userId -> p2Perf
         ).start
-        _ <- gameRepo insertDenormalized game
+        _ <- gameRepo `insertDenormalized` game
       } yield {
         onStart(Game.Id(game.id))
         Pairing(
@@ -95,8 +92,8 @@ final private class GameStarter(
       )
       .withId(id)
   }
-
 }
+
 
 final private class BotGameStarter(
     userRepo: UserRepo,
@@ -142,7 +139,7 @@ final private class BotGameStarter(
   ): Fu[Option[Pairing]] = {
     import couple._
     import cats.implicits._
-    (perfs.get(p1.userId), perfs.get(p2.userId)).mapN((_, _)) ?? { case (perf1, perf2) =>
+    (perfs.get(p1.userId), perfs.get(p2.userId)).mapN((_, _)) so { case (perf1, perf2) =>
       for {
         p1P1 <- userRepo.firstGetsP1(p1.userId, p2.userId)
         (p1Perf, p2Perf)     = if (p1P1) perf1 -> perf2 else perf2 -> perf1
@@ -153,7 +150,7 @@ final private class BotGameStarter(
           p1Member.userId -> p1Perf,
           p2Member.userId -> p2Perf
         ).start
-        _ <- gameRepo insertDenormalized game
+        _ <- gameRepo `insertDenormalized` game
       } yield {
         onStart(Game.Id(game.id))
         Pairing(

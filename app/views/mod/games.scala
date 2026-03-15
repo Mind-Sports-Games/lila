@@ -1,8 +1,6 @@
 package views.html.mod
 
 import controllers.GameMod
-import scala.util.chaining._
-import controllers.routes
 import play.api.data.Form
 
 import lila.api.Context
@@ -101,7 +99,7 @@ object games {
               games.map { case (pov, assessment) =>
                 tr(
                   td(cls := pov.game.analysable.option("input"))(
-                    pov.game.analysable option input(
+                    pov.game.analysable `option` input(
                       tpe := "checkbox",
                       name := s"game[]",
                       st.value := pov.gameId
@@ -157,7 +155,7 @@ object games {
                     frag(
                       td(dataSort := basics.plyTimes.avg)(
                         s"${basics.plyTimes / 10}",
-                        basics.mtStreak ?? frag(br, "streak")
+                        basics.mtStreak so frag(br, "streak")
                       ),
                       td(dataSort := basics.blurs)(
                         s"${basics.blurs}%",
@@ -167,7 +165,7 @@ object games {
                       )
                     )
                   },
-                  td(dataSort := pov.game.updatedAt.getSeconds.toString)(
+                  td(dataSort := (pov.game.updatedAt.getMillis / 1000).toString)(
                     a(href := routes.Round.watcher(pov.gameId, pov.playerIndex.name), cls := "glpt")(
                       momentFromNowServerText(pov.game.updatedAt)
                     )

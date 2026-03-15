@@ -47,14 +47,14 @@ case class UserRecord(
     rageSitRecidive || {
       outcomes.lastOption.exists(_ != Outcome.Good) && {
         // too many bad overall
-        badOutcomeScore >= (badOutcomeRatio * nbOutcomes atLeast minBadOutcomes.toFloat) || {
+        badOutcomeScore >= (badOutcomeRatio * nbOutcomes `atLeast` minBadOutcomes.toFloat) || {
           // bad result streak
           outcomes.sizeIs >= badOutcomesStreakSize &&
           outcomes.takeRight(badOutcomesStreakSize).forall(Outcome.Good !=)
         }
       }
     }
-  } option TempBan.make(bans, accountCreationDate)
+  } `option` TempBan.make(bans, accountCreationDate)
 
   def rageSitRecidive =
     outcomes.lastOption.exists(Outcome.rageSitLike.contains) && {
@@ -76,15 +76,15 @@ case class TempBan(
     mins: Int
 ) {
 
-  def endsAt = date plusMinutes mins
+  def endsAt = date `plusMinutes` mins
 
-  def remainingSeconds: Int = (endsAt.getSeconds - nowSeconds).toInt atLeast 0
+  def remainingSeconds: Int = ((endsAt.getMillis / 1000) - nowSeconds).toInt `atLeast` 0
 
-  def remainingMinutes: Int = (remainingSeconds / 60) atLeast 1
+  def remainingMinutes: Int = (remainingSeconds / 60) `atLeast` 1
 
   def inEffect = endsAt.isAfterNow
-
 }
+
 
 object TempBan {
 
@@ -93,7 +93,7 @@ object TempBan {
   private def make(minutes: Int) =
     TempBan(
       DateTime.now,
-      minutes atMost 3 * 24 * 60
+      minutes `atMost` 3 * 24 * 60
     )
 
   private val baseMinutes = 10
@@ -107,12 +107,12 @@ object TempBan {
     */
   def make(bans: Vector[TempBan], accountCreationDate: DateTime): TempBan =
     make {
-      (bans.lastOption ?? { prev =>
-        prev.endsAt.toNow.getStandardHours.toSaturatedInt match {
+      (bans.lastOption so { prev =>
+        new org.joda.time.Duration(prev.endsAt, DateTime.now).getStandardHours.toSaturatedInt match {
           case h if h < 72 => prev.mins * (132 - h) / 60
           case h           => (55.6 * prev.mins / (Math.pow(5.56 * prev.mins - 54.6, h / 720) + 54.6)).toInt
         }
-      } atLeast baseMinutes) * (if (accountCreationDate.plusDays(3).isAfterNow) 2 else 1)
+      } `atLeast` baseMinutes) * (if (accountCreationDate.plusDays(3).isAfterNow) 2 else 1)
     }
 }
 

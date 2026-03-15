@@ -28,7 +28,7 @@ final class JsonView(
       user: Option[User]
   )(implicit
       lang: Lang
-  ): Fu[JsObject] = {
+  ): Fu[JsObject] =
     gameJson(
       gameId = puzzle.gameId,
       plies = puzzle.initialPly,
@@ -57,7 +57,6 @@ final class JsonView(
           }
         )
     }
-  }
 
   def userJson(u: User, v: Variant) =
     Json
@@ -130,7 +129,7 @@ final class JsonView(
     val perfType = PerfType.byVariant(variant) | PerfType.default
     Json.obj(
       "icon" -> perfType.iconChar.toString,
-      "name" -> perfType.trans(defaultLang)
+      "name" -> perfType.trans(using defaultLang)
     )
   }
 
@@ -140,8 +139,8 @@ final class JsonView(
   object bc {
 
     def apply(puzzle: Puzzle, user: Option[User])(implicit
-        lang: Lang
-    ): Fu[JsObject] = {
+        @annotation.nowarn("msg=unused") _lang: Lang
+    ): Fu[JsObject] =
       gameJson(
         gameId = puzzle.gameId,
         plies = puzzle.initialPly,
@@ -154,22 +153,21 @@ final class JsonView(
           )
           .add("user" -> user.map(_.perfs.puzzle_standard.intRating).map(userJson))
       }
-    }
 
     //TODO this and above doesn't work but we dont require it too as its for mobile bc batch only
     //would need to assume the batch has all same variant??
     def batch(puzzles: Seq[Puzzle], user: Option[User])(implicit
-        lang: Lang
+        @annotation.nowarn("msg=unused") _lang: Lang
     ): Fu[JsObject] = for {
       games <- gameRepo.gameOptionsFromSecondary(puzzles.map(_.gameId))
-      jsons <- (puzzles zip games).collect { case (puzzle, Some(game)) =>
+      jsons <- Future.sequence((puzzles zip games).collect { case (puzzle, Some(game)) =>
         gameJson.noCacheBc(game, puzzle.initialPly) map { gameJson =>
           Json.obj(
             "game"   -> gameJson,
             "puzzle" -> puzzleJson(puzzle)
           )
         }
-      }.sequenceFu
+      })
     } yield Json
       .obj("puzzles" -> jsons)
       .add("user" -> user.map(_.perfs.puzzle_standard.intRating).map(userJson))
@@ -226,7 +224,7 @@ final class JsonView(
       }
       branchList.foldLeft[Option[tree.Branch]](None) {
         case (None, branch)        => branch.some
-        case (Some(child), branch) => Some(branch addChild child)
+        case (Some(child), branch) => Some(branch.copy(children = branch.children :+ child))
       }
     }
   }

@@ -53,7 +53,7 @@ object Student {
     private val random     = new java.security.SecureRandom()
     private val chars      = ('2' to '9') ++ (('a' to 'z').toSet - 'l') mkString
     private val nbChars    = chars.length
-    private def secureChar = chars(random nextInt nbChars)
+    private def secureChar = chars(random `nextInt` nbChars)
 
     def generate =
       User.ClearPassword {

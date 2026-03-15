@@ -1,6 +1,5 @@
 package views.html.puzzle
 
-import controllers.routes
 import play.api.libs.json.{ JsObject, Json }
 
 import lila.api.Context

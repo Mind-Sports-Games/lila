@@ -1,6 +1,5 @@
 package views.html.streamer
 
-import controllers.routes
 import play.api.data.Form
 
 import lila.api.Context
@@ -14,7 +13,7 @@ object edit extends Context.ToLang {
 
   def apply(
       s: lila.streamer.Streamer.WithUserAndStream,
-      form: Form[_],
+      form: Form[?],
       modData: Option[((List[lila.mod.Modlog], List[lila.user.Note]), List[lila.streamer.Streamer])]
   )(implicit ctx: Context) = {
 
@@ -33,7 +32,7 @@ object edit extends Context.ToLang {
                 )
               else
                 div(cls := "picture-create")(
-                  ctx.is(s.user) option
+                  ctx.is(s.user) `option`
                     a(targetBlank, cls := "button", href := routes.Streamer.picture)(
                       uploadPicture()
                     )
@@ -47,14 +46,14 @@ object edit extends Context.ToLang {
           div(cls := "box__pad") {
             val granted = s.streamer.approval.granted
             frag(
-              (ctx.is(s.user) && s.streamer.listed.value) option div(
-                cls := s"status is${granted ?? "-green"}",
+              (ctx.is(s.user) && s.streamer.listed.value) `option` div(
+                cls := s"status is${granted so "-green"}",
                 dataIcon := (if (granted) "E" else "")
               )(
                 if (granted)
                   frag(
                     approved(),
-                    s.streamer.approval.tier > 0 option frag(
+                    s.streamer.approval.tier > 0 `option` frag(
                       br,
                       strong("You have been selected for frontpage featuring!"),
                       p(
@@ -71,7 +70,7 @@ object edit extends Context.ToLang {
                         if (s.streamer.completeEnough)
                           whenReady(
                             postForm(action := routes.Streamer.approvalRequest)(
-                              button(tpe := "submit", cls := "button", (!ctx.is(s.user)) option disabled)(
+                              button(tpe := "submit", cls := "button", (!ctx.is(s.user)) `option` disabled)(
                                 requestReview()
                               )
                             )
@@ -80,7 +79,7 @@ object edit extends Context.ToLang {
                       )
                   )
               ),
-              ctx.is(s.user) option div(cls := "status")(
+              ctx.is(s.user) `option` div(cls := "status")(
                 anotherLanguage(
                   a(href := "https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes")(
                     "2-letter ISO 639-1 code"
@@ -91,9 +90,9 @@ object edit extends Context.ToLang {
                 div(cls := "mod_log status")(
                   strong(cls := "text", dataIcon := "!")(
                     "Moderation history",
-                    log.isEmpty option ": nothing to show."
+                    log.isEmpty `option` ": nothing to show."
                   ),
-                  log.nonEmpty option ul(
+                  log.nonEmpty `option` ul(
                     log.map { e =>
                       li(
                         userIdLink(e.mod.some, withTitle = false),
@@ -109,11 +108,11 @@ object edit extends Context.ToLang {
                   br,
                   strong(cls := "text", dataIcon := "!")(
                     "Moderator notes",
-                    notes.isEmpty option ": nothing to show."
+                    notes.isEmpty `option` ": nothing to show."
                   ),
-                  notes.nonEmpty option ul(
+                  notes.nonEmpty `option` ul(
                     notes.map { note =>
-                      (isGranted(_.Admin) || !note.dox) option
+                      (isGranted(_.Admin) || !note.dox) `option`
                         li(
                           p(cls := "meta")(userIdLink(note.from.some), " ", momentFromNow(note.date)),
                           p(cls := "text")(richText(note.text))
@@ -123,9 +122,9 @@ object edit extends Context.ToLang {
                   br,
                   strong(cls := "text", dataIcon := "!")(
                     "Streamers with same Twitch or YouTube",
-                    same.isEmpty option ": nothing to show."
+                    same.isEmpty `option` ": nothing to show."
                   ),
-                  same.nonEmpty option table(cls := "slist")(
+                  same.nonEmpty `option` table(cls := "slist")(
                     same.map { s =>
                       tr(
                         td(userIdLink(s.userId.some)),
@@ -144,9 +143,9 @@ object edit extends Context.ToLang {
               },
               postForm(
                 cls := "form3",
-                action := s"${routes.Streamer.edit}${!ctx.is(s.user) ?? s"?u=${s.user.id}"}"
+                action := s"${routes.Streamer.edit}${!ctx.is(s.user) so s"?u=${s.user.id}"}"
               )(
-                isGranted(_.Streamers) option div(cls := "mod")(
+                isGranted(_.Streamers) `option` div(cls := "mod")(
                   form3.split(
                     form3.checkbox(
                       form("approval.granted"),

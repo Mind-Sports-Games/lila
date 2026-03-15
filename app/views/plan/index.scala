@@ -6,7 +6,6 @@ import lila.api.Context
 import lila.app.templating.Environment._
 import lila.app.ui.ScalatagsTemplate._
 
-import controllers.routes
 
 object index {
 
@@ -28,7 +27,7 @@ object index {
     views.html.base.layout(
       title = becomePatron.txt(),
       moreCss = cssTag("plan"),
-      moreJs = ctx.isAuth option
+      moreJs = ctx.isAuth `option`
         frag(
           stripeScript,
           frag(
@@ -63,7 +62,7 @@ object index {
           )
         ),
         div(cls := "page-menu__content box")(
-          patron.ifTrue(ctx.me.??(_.isPatron)).map { p =>
+          patron.ifTrue(ctx.me.so(_.isPatron)).map { p =>
             div(cls := "banner one_time_active")(
               iconTag(patronIconChar),
               div(
@@ -97,7 +96,7 @@ object index {
               div(cls := "content")(
                 div(
                   cls := "plan_checkout",
-                  attr("data-email") := email.??(_.value),
+                  attr("data-email") := email.so(_.value),
                   attr("data-lifetime-usd") := lila.plan.Cents.lifetime.usd.toString,
                   attr("data-lifetime-cents") := lila.plan.Cents.lifetime.value
                 )(
@@ -122,7 +121,7 @@ object index {
                         tpe := "radio",
                         name := "freq",
                         id := "freq_lifetime",
-                        patron.exists(_.isLifetime) option disabled,
+                        patron.exists(_.isLifetime) `option` disabled,
                         value := "lifetime"
                       ),
                       label(`for` := "freq_lifetime")(lifetime())
@@ -159,7 +158,7 @@ object index {
                             tpe := "radio",
                             name := "plan",
                             st.id := id,
-                            cents.usd.value == 10 option checked,
+                            cents.usd.value == 10 `option` checked,
                             value := cents.value,
                             attr("data-usd") := cents.usd.toString,
                             attr("data-amount") := cents.value
@@ -190,7 +189,7 @@ object index {
                       if (ctx.isAuth)
                         frag(
                           button(cls := "stripe button")(withCreditCard()),
-                          (payPalPublicKey != "") option frag(
+                          (payPalPublicKey != "") `option` frag(
                             div(cls := "paypal paypal--order"),
                             div(cls := "paypal paypal--subscription"),
                             button(cls := "paypal button disabled paypal--disabled")("PAYPAL")

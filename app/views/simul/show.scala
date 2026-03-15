@@ -2,7 +2,6 @@ package views.html.simul
 
 import strategygames.format.FEN
 
-import controllers.routes
 import play.api.libs.json.Json
 
 import lila.api.Context
@@ -39,7 +38,7 @@ object show {
                 timeout = c.timeout,
                 public = true,
                 resourceId = lila.chat.Chat.ResourceId(s"simul/${c.chat.id}"),
-                localMod = ctx.userId has sim.hostId
+                localMod = ctx.userId `has` sim.hostId
               )
             }
           )
@@ -58,7 +57,7 @@ object show {
                     sim.variants.map(VariantKeys.variantName).mkString(", "),
                     " • ",
                     trans.casual(),
-                    (isGranted(_.ManageSimul) || ctx.userId.has(sim.hostId)) && sim.isCreated option frag(
+                    (isGranted(_.ManageSimul) || ctx.userId.has(sim.hostId)) && sim.isCreated `option` frag(
                       " • ",
                       a(href := routes.Simul.edit(sim.id), title := "Edit simul")(iconTag("%"))
                     )
@@ -106,7 +105,7 @@ object show {
           stream.map { s =>
             views.html.streamer.bits.contextual(s.streamer.userId)
           },
-          chatOption.isDefined option views.html.chat.frag
+          chatOption.isDefined `option` views.html.chat.frag
         ),
         div(cls := "simul__main box")(spinner)
       )

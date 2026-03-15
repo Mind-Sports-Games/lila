@@ -19,7 +19,7 @@ final private[gameSearch] class GameSearchForm {
         "loser"  -> optional(nonEmptyText),
         "p1"     -> optional(nonEmptyText),
         "p2"     -> optional(nonEmptyText)
-      )(SearchPlayer.apply)(SearchPlayer.unapply),
+      )(SearchPlayer.apply)(d => Some((d.a, d.b, d.winner, d.loser, d.p1, d.p2))),
       "winnerPlayerIndex" -> optional(numberIn(Query.winnerPlayerIndexs)),
       "perf"              -> optional(numberIn(lila.rating.PerfType.nonPuzzle.map(_.id))),
       "source"            -> optional(numberIn(Query.sources)),
@@ -38,7 +38,7 @@ final private[gameSearch] class GameSearchForm {
         "initMax" -> optional(numberIn(Query.clockInits)),
         "incMin"  -> optional(numberIn(Query.clockIncs)),
         "incMax"  -> optional(numberIn(Query.clockIncs))
-      )(SearchClock.apply)(SearchClock.unapply),
+      )(SearchClock.apply)(d => Some((d.initMin, d.initMax, d.incMin, d.incMax))),
       "dateMin"  -> GameSearchForm.dateField,
       "dateMax"  -> GameSearchForm.dateField,
       "status"   -> optional(numberIn(Query.statuses)),
@@ -47,10 +47,10 @@ final private[gameSearch] class GameSearchForm {
         mapping(
           "field" -> stringIn(Sorting.fields),
           "order" -> stringIn(Sorting.orders)
-        )(SearchSort.apply)(SearchSort.unapply)
+        )(SearchSort.apply)(d => Some((d.field, d.order)))
       )
-    )(SearchData.apply)(SearchData.unapply)
-  ) fill SearchData()
+    )(SearchData.apply)(d => Some((d.players, d.winnerPlayerIndex, d.perf, d.source, d.mode, d.turnsMin, d.turnsMax, d.ratingMin, d.ratingMax, d.hasAi, d.aiLevelMin, d.aiLevelMax, d.durationMin, d.durationMax, d.clock, d.dateMin, d.dateMax, d.status, d.analysed, d.sort)))
+  ) `fill` SearchData()
 }
 
 private[gameSearch] object GameSearchForm {

@@ -1,11 +1,9 @@
 package views.html.base
 
-import controllers.routes
 
 import lila.api.Context
 import lila.app.templating.Environment._
 import lila.app.ui.ScalatagsTemplate._
-import lila.puzzle.Puzzle
 
 object topnav {
 
@@ -27,11 +25,11 @@ object topnav {
         ),
         div(role := "group")(
           a(href := "/?any#game")(trans.createAGame()),
-          ctx.noBot option frag(
+          ctx.noBot `option` frag(
             a(href := routes.Tournament.home)(trans.arena.arenaTournaments()),
             a(href := routes.Swiss.home)(trans.swiss.swissTournaments()),
             a(href := routes.Simul.home)(trans.simultaneousExhibitions()),
-            ctx.pref.hasDgt option a(href := routes.DgtCtrl.index)("DGT board")
+            ctx.pref.hasDgt `option` a(href := routes.DgtCtrl.index)("DGT board")
           )
         )
       ),
@@ -42,7 +40,7 @@ object topnav {
           a(href := routes.Memory.home)(trans.memoryGame())
         )
       ),
-      ctx.noBot option st.section(
+      ctx.noBot `option` st.section(
         linkTitle(routes.Puzzle.base.path, trans.puzzles()),
         div(role := "group")(
           a(href := routes.Puzzle.base)(trans.puzzles()),
@@ -58,7 +56,7 @@ object topnav {
         div(role := "group")(
           a(href := routes.Tv.index)("PlayStrategy TV"),
           a(href := routes.Tv.games)(trans.currentGames()),
-          (ctx.noKid && ctx.noBot) option a(href := routes.Streamer.index())(trans.streamersMenu())
+          (ctx.noKid && ctx.noBot) `option` a(href := routes.Streamer.index())(trans.streamersMenu())
           //a(href := routes.RelayTour.index())(trans.broadcast.broadcasts()),
           //ctx.noBot option a(href := routes.Video.index)(trans.videoLibrary())
         )
@@ -71,13 +69,13 @@ object topnav {
           a(href := routes.Page.lonePage("medley"))(trans.medleyTournaments()),
           a(href := routes.Page.lonePage("handicaps"))(trans.handicapTournaments()),
           a(href := routes.Page.lonePage("clocks"))(trans.clockTypes()),
-          ctx.noBot option frag(
+          ctx.noBot `option` frag(
             //a(href := routes.Learn.index)(trans.chessBasics()),
             //a(href := routes.Practice.index)(trans.practice()),
             a(href := routes.Coordinate.home)(s"Chess ${trans.coordinates.coordinates.txt()}")
           ),
           //ctx.noKid option a(href := routes.Coach.all(1))(trans.coaches()),
-          canSeeClasMenu option a(href := routes.Clas.index)(trans.clas.playstrategyClasses())
+          canSeeClasMenu `option` a(href := routes.Clas.index)(trans.clas.playstrategyClasses())
         )
       ),
       st.section(
@@ -85,9 +83,9 @@ object topnav {
         div(role := "group")(
           a(href := routes.User.list)(trans.players()),
           a(href := routes.Team.home())(trans.team.teams()),
-          ctx.noKid option a(href := routes.ForumCateg.index)(trans.forum()),
-          ctx.noKid option a(href := routes.Blog.index(1))(trans.blog()),
-          ctx.me.exists(!_.kid) option a(href := routes.Plan.index)(trans.patron.donate())
+          ctx.noKid `option` a(href := routes.ForumCateg.index)(trans.forum()),
+          ctx.noKid `option` a(href := routes.Blog.index(1))(trans.blog()),
+          ctx.me.exists(!_.kid) `option` a(href := routes.Plan.index)(trans.patron.donate())
         )
       ),
       st.section(

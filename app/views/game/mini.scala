@@ -3,7 +3,6 @@ package views.html.game
 import strategygames.format.Forsyth
 import strategygames.variant.Variant
 import strategygames.{ ByoyomiClock, Clock }
-import controllers.routes
 import play.api.i18n.Lang
 
 import lila.api.Context
@@ -62,13 +61,13 @@ object mini {
     val variant = game.variant.key
     a(
       href := (if (tv) routes.Tv.index else routes.Round.watcher(pov.gameId, pov.playerIndex.name)),
-      cls := s"mini-game mini-game-${game.id} mini-game--init is2d ${isLive ?? "mini-game--live"} ${extra} ${variant} variant-${variant}",
+      cls := s"mini-game mini-game-${game.id} mini-game--init is2d ${isLive so "mini-game--live"} ${extra} ${variant} variant-${variant}",
       dataLive := isLive.option(game.id),
       renderState(pov)
     )(
-      renderPlayer(!pov)(defaultLang),
+      renderPlayer(!pov)(using defaultLang),
       cgWrap,
-      renderPlayer(pov)(defaultLang)
+      renderPlayer(pov)(using defaultLang)
     )
   }
 
@@ -104,7 +103,7 @@ object mini {
         cls := s"mini-game__user playerIndex-icon is ${pov.game.variant.playerColors(pov.player.playerIndex)} text"
       )(
         playerUsername(pov.player, withRating = false),
-        span(cls := "rating")(lila.game.Namer ratingString pov.player),
+        span(cls := "rating")(lila.game.Namer `ratingString` pov.player),
         if (pov.player.berserk) iconTag("`")
       ),
       span(cls := s"mini-game__score--${pov.playerIndex.name}")(

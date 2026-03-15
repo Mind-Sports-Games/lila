@@ -5,7 +5,6 @@ import lila.app.templating.Environment._
 import lila.app.ui.ScalatagsTemplate._
 import lila.challenge.Challenge.Status
 
-import controllers.routes
 
 object mine {
 
@@ -71,7 +70,7 @@ object mine {
                       ),
                       p(trans.theFirstPersonToComeOnThisUrlWillPlayWithYou())
                     ),
-                    ctx.isAuth option div(
+                    ctx.isAuth `option` div(
                       h2(cls := "ninja-title", "Or invite a PlayStrategy user:"),
                       br,
                       postForm(
@@ -97,7 +96,7 @@ object mine {
                   )
                 )
               },
-              !c.isOpen option cancelForm
+              !c.isOpen `option` cancelForm
             )
           case Status.Declined =>
             div(cls := "follow-up")(

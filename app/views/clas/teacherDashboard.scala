@@ -1,6 +1,5 @@
 package views.html.clas
 
-import controllers.routes
 import lila.api.Context
 import lila.app.templating.Environment._
 import lila.app.ui.ScalatagsTemplate._
@@ -18,7 +17,7 @@ object teacherDashboard {
       students: List[Student.WithUser],
       active: String
   )(modifiers: Modifier*)(implicit ctx: Context) =
-    bits.layout(c.name, Left(c withStudents students.map(_.student)))(
+    bits.layout(c.name, Left(c `withStudents` students.map(_.student)))(
       cls := s"clas-show dashboard dashboard-teacher dashboard-teacher-$active",
       div(cls := "clas-show__top")(
         h1(dataIcon := "f", cls := "text")(c.name),
@@ -53,7 +52,7 @@ object teacherDashboard {
   )(implicit ctx: Context) =
     layout(c, students, "overview")(
       div(cls := "clas-show__overview")(
-        c.desc.trim.nonEmpty option div(cls := "clas-show__desc")(richText(c.desc)),
+        c.desc.trim.nonEmpty `option` div(cls := "clas-show__desc")(richText(c.desc)),
         div(cls := "clas-show__overview__manage")(
           clas.teachers(c),
           a(
@@ -89,7 +88,7 @@ object teacherDashboard {
                     td(userIdLink(i.userId.some)),
                     td(i.realName),
                     td(
-                      if (i.accepted has false) "Declined" else "Pending"
+                      if (i.accepted `has` false) "Declined" else "Pending"
                     ),
                     td(momentFromNow(i.created.at)),
                     td(
@@ -272,7 +271,7 @@ object teacherDashboard {
               td(dataSort := user.seenAt.map(_.getMillis.toString))(user.seenAt.map(momentFromNowOnce)),
               td(
                 dataSort := (if (student.managed) 1 else 0),
-                student.managed option iconTag("5")(title := trans.clas.managed.txt())
+                student.managed `option` iconTag("5")(title := trans.clas.managed.txt())
               )
             )
           }

@@ -4,9 +4,8 @@ import io.lemonlabs.uri.AbsoluteUrl
 import org.joda.time.DateTime
 import play.api.data._
 import play.api.data.Forms._
-import scala.util.chaining._
 
-import lila.common.Form.{ cleanNonEmptyText, cleanText }
+import lila.common.Form.cleanText
 import lila.game.Game
 import lila.security.Granter
 import lila.study.Study
@@ -21,12 +20,12 @@ final class RelayRoundForm {
     mapping(
       "name" -> cleanText(minLength = 3, maxLength = 80),
       "syncUrl" -> optional {
-        cleanText(minLength = 8, maxLength = 600).verifying("Invalid source", validSource _)
+        cleanText(minLength = 8, maxLength = 600).verifying("Invalid source", validSource)
       },
       "syncUrlRound" -> optional(number(min = 1, max = 999)),
       "startsAt"     -> optional(ISODateTimeOrTimestamp.isoDateTimeOrTimestamp),
       "throttle"     -> optional(number(min = 2, max = 60))
-    )(Data.apply)(Data.unapply)
+    )(Data.apply)(d => Some((d.name, d.syncUrl, d.syncUrlRound, d.startsAt, d.throttle)))
       .verifying("This source requires a round number. See the new form field below.", !_.roundMissing)
 
   def create(trs: RelayTour.WithRounds) = Form {
@@ -37,7 +36,7 @@ final class RelayRoundForm {
       )
   }.fill(Data(name = s"Round ${trs.rounds.size + 1}", syncUrlRound = Some(trs.rounds.size + 1)))
 
-  def edit(r: RelayRound) = Form(roundMapping) fill Data.make(r)
+  def edit(r: RelayRound) = Form(roundMapping) `fill` Data.make(r)
 }
 
 object RelayRoundForm {
@@ -46,7 +45,7 @@ object RelayRoundForm {
 
   private def toGameIds(ids: String): Option[GameIds] = {
     val list = ids.split(' ').view.map(_.trim take Game.gameIdSize).filter(Game.validId).toList
-    (list.sizeIs > 0 && list.sizeIs <= Study.maxChapters) option GameIds(list)
+    (list.sizeIs > 0 && list.sizeIs <= Study.maxChapters) `option` GameIds(list)
   }
 
   private def validSource(source: String): Boolean =
@@ -115,13 +114,13 @@ object RelayRoundForm {
     private def makeSync(user: User) =
       RelayRound.Sync(
         upstream = cleanUrl.map { u =>
-          RelayRound.Sync.UpstreamUrl(s"$u${syncUrlRound.??(" " +)}")
+          RelayRound.Sync.UpstreamUrl(s"$u${syncUrlRound.so(" " +)}")
         } orElse gameIds.map { ids =>
           RelayRound.Sync.UpstreamIds(ids.ids)
         },
         until = none,
         nextAt = none,
-        delay = throttle ifTrue Granter(_.Relay)(user),
+        delay = throttle `ifTrue` Granter(_.Relay)(user),
         log = SyncLog.empty
       )
 

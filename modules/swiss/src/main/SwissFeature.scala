@@ -2,7 +2,6 @@ package lila.swiss
 
 import org.joda.time.DateTime
 import reactivemongo.api.ReadPreference
-import scala.concurrent.duration._
 
 import lila.common.Heapsort
 import lila.db.dsl._
@@ -31,7 +30,7 @@ final class SwissFeature(
   private val startsAtOrdering = Ordering.by[Swiss, Long](_.startsAt.getMillis)
 
   private def getForTeams(teams: Seq[TeamID]): Fu[FeaturedSwisses] =
-    teams.map(swissCache.featuredInTeam.get).sequenceFu.map(_.flatten) flatMap { ids =>
+    Future.sequence(teams.map(swissCache.featuredInTeam.get)).map(_.flatten) flatMap { ids =>
       colls.swiss.byIds[Swiss](ids.map(_.value), ReadPreference.secondaryPreferred)
     } map {
       _.filter(_.isNotFinished).partition(_.isCreated) match {
@@ -59,12 +58,12 @@ final class SwissFeature(
       .find(
         $doc(
           "featurable" -> true,
-          "settings.i" $lte 600, // hits the partial index
+          "settings.i" `$lte` 600, // hits the partial index
           "startsAt" -> startsAtRange,
-          "garbage" $ne true
+          "garbage" `$ne` true
         )
       )
-      .sort($sort desc "nbPlayers")
+      .sort($sort `desc` "nbPlayers")
       .cursor[Swiss]()
       .list(5)
 }

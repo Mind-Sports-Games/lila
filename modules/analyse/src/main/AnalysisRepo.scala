@@ -14,7 +14,7 @@ final class AnalysisRepo(val coll: Coll)(implicit ec: scala.concurrent.Execution
   def byId(id: ID): Fu[Option[Analysis]] = coll.byId[Analysis](id)
 
   def byGame(game: Game): Fu[Option[Analysis]] =
-    game.metadata.analysed ?? byId(game.id)
+    game.metadata.analysed so byId(game.id)
 
   def byIds(ids: Seq[ID]): Fu[Seq[Option[Analysis]]] =
     coll.optionsByOrderedIds[Analysis, Analysis.ID](ids)(_.id)
@@ -28,5 +28,5 @@ final class AnalysisRepo(val coll: Coll)(implicit ec: scala.concurrent.Execution
 
   def remove(id: String) = coll.delete one $id(id)
 
-  def exists(id: String) = coll exists $id(id)
+  def exists(id: String) = coll `exists` $id(id)
 }

@@ -2,7 +2,6 @@ package views.html
 package base
 
 import strategygames.format.FEN
-import controllers.routes
 import play.api.i18n.Lang
 import play.api.mvc.Call
 
@@ -52,11 +51,11 @@ z-index: 99;
   def fenAnalysisLink(fen: FEN)(implicit lang: Lang) =
     a(href := routes.UserAnalysis.parseArg(fen.value.replace(" ", "_")))(trans.analysis())
 
-  def paginationByQuery(route: Call, pager: Paginator[_], showPost: Boolean): Option[Frag] =
+  def paginationByQuery(route: Call, pager: Paginator[?], showPost: Boolean): Option[Frag] =
     pagination(page => s"$route?page=$page", pager, showPost)
 
-  def pagination(url: Int => String, pager: Paginator[_], showPost: Boolean): Option[Frag] =
-    pager.hasToPaginate option pagination(url, pager.currentPage, pager.nbPages, showPost)
+  def pagination(url: Int => String, pager: Paginator[?], showPost: Boolean): Option[Frag] =
+    pager.hasToPaginate `option` pagination(url, pager.currentPage, pager.nbPages, showPost)
 
   def pagination(url: Int => String, page: Int, nbPages: Int, showPost: Boolean): Tag =
     st.nav(cls := "pagination")(
@@ -71,7 +70,8 @@ z-index: 99;
       else span(cls := "disabled", dataIcon := "H")
     )
 
-  private def sliding(pager: Paginator[_], length: Int, showPost: Boolean): List[Option[Int]] =
+  @annotation.nowarn("msg=unused")
+  private def sliding(pager: Paginator[?], length: Int, showPost: Boolean): List[Option[Int]] =
     sliding(pager.currentPage, pager.nbPages, length, showPost)
 
   private def sliding(page: Int, nbPages: Int, length: Int, showPost: Boolean): List[Option[Int]] = {

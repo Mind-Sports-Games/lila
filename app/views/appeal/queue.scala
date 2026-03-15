@@ -1,7 +1,6 @@
 package views.html
 package appeal
 
-import controllers.routes
 
 import lila.api.Context
 import lila.app.templating.Environment._
@@ -25,7 +24,7 @@ object queue {
           tr(
             th("By"),
             th("Last message"),
-            th(isGranted(_.Presets) option a(href := routes.Mod.presets("appeal"))("Presets"))
+            th(isGranted(_.Presets) `option` a(href := routes.Mod.presets("appeal"))("Presets"))
           )
         ),
         tbody(

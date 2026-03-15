@@ -7,7 +7,6 @@ import lila.i18n.{ I18nKeys => trans, VariantKeys }
 import lila.tournament.Tournament
 import strategygames.variant.Variant
 
-import controllers.routes
 
 object bits {
 
@@ -44,7 +43,7 @@ object bits {
     )
 
   def userPrizeDisclaimer(ownerId: lila.user.User.ID) =
-    !env.prizeTournamentMakers.get().value.contains(ownerId) option
+    !env.prizeTournamentMakers.get().value.contains(ownerId) `option`
       div(cls := "tour__prize")(
         "This tournament is NOT organized by PlayStrategy.",
         br,

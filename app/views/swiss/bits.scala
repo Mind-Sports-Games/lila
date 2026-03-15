@@ -7,7 +7,6 @@ import lila.i18n.{ I18nKeys => trans, VariantKeys }
 import lila.swiss.Swiss
 import strategygames.variant.Variant
 
-import controllers.routes
 
 object bits {
 

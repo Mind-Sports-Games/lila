@@ -2,14 +2,12 @@ package views.html.library
 
 import play.api.libs.json.Json
 
-import controllers.routes
 import lila.api.Context
 import lila.app.templating.Environment._
 import lila.app.ui.ScalatagsTemplate._
 import lila.common.String.html.safeJsonValue
 import lila.i18n.{ I18nKeys => trans, VariantKeys }
 import lila.game.{ MonthlyGameData }
-import play.api.i18n.Lang
 
 import strategygames.variant.Variant
 import strategygames.GameGroup
@@ -34,11 +32,11 @@ object home {
             "variantNames" -> Json.obj(
               Variant.all.map(v =>
                 s"${v.gameFamily.id}_${v.id}" -> Json.toJsFieldJsValueWrapper(VariantKeys.variantName(v))
-              ): _*
+              )*
             ),
             "gameGroupNames" -> Json.obj(
               GameGroup.all
-                .map(gg => s"${gg.id}" -> Json.toJsFieldJsValueWrapper(VariantKeys.gameGroupName(gg))): _*
+                .map(gg => s"${gg.id}" -> Json.toJsFieldJsValueWrapper(VariantKeys.gameGroupName(gg)))*
             )
           )
         )};"""),

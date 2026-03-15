@@ -25,7 +25,7 @@ trait I18nHelper extends HasEnv with UserContext.ToLang {
       ~TimeagoLocales.js.get("en")
   }
 
-  def langName = LangList.nameByStr _
+  def langName = LangList.nameByStr
 
   def shortLangName(str: String) = langName(str).takeWhile(','.!=)
 }

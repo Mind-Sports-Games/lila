@@ -9,7 +9,6 @@ import lila.socket.Socket.{ makeMessage, GetVersion, SocketVersion }
 import lila.user.User
 
 import play.api.libs.json._
-import scala.concurrent.duration._
 import scala.concurrent.ExecutionContext
 
 object RoomSocket {
@@ -33,8 +32,8 @@ object RoomSocket {
         version = version.inc
         send {
           val tell =
-            if (chatMsgs(nv.tpe)) Protocol.Out.tellRoomChat _
-            else Protocol.Out.tellRoomVersion _
+            if (chatMsgs(nv.tpe)) Protocol.Out.tellRoomChat
+            else Protocol.Out.tellRoomVersion
           tell(roomId, nv.msg, version, nv.troll)
         }
     }
@@ -75,10 +74,10 @@ object RoomSocket {
             publicSource(roomId)(PublicSource),
             chatBusChan
           )
-          .unit
+          .discard
       case Protocol.In.ChatTimeout(roomId, modId, suspect, reason, text) =>
         lila.chat.ChatTimeout.Reason(reason) foreach { r =>
-          localTimeout.?? { _(roomId, modId, suspect) } foreach { local =>
+          localTimeout.so { _(roomId, modId, suspect) } foreach { local =>
             val scope = if (local) ChatTimeout.Scope.Local else ChatTimeout.Scope.Global
             chat.userChat.timeout(
               Chat.Id(roomId.value),
@@ -96,7 +95,7 @@ object RoomSocket {
   def minRoomHandler(rooms: TrouperMap[RoomState], logger: Logger): Handler = {
     case Protocol.In.KeepAlives(roomIds) =>
       roomIds foreach { roomId =>
-        rooms touchOrMake roomId.value
+        rooms `touchOrMake` roomId.value
       }
     case P.In.WsBoot =>
       logger.warn("Remote socket boot")

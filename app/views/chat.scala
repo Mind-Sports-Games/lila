@@ -88,8 +88,8 @@ object chat {
       I18nKeys.toggleTheChat.some,
       I18nKeys.loginToChat.some,
       I18nKeys.youHaveBeenTimedOut.some,
-      withNote option I18nKeys.notes,
-      withNote option I18nKeys.typePrivateNotesHere
+      withNote `option` I18nKeys.notes,
+      withNote `option` I18nKeys.typePrivateNotesHere
     )
 
   val spectatorsFrag =

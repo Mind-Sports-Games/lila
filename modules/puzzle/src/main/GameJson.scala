@@ -3,7 +3,6 @@ package lila.puzzle
 import strategygames.format.Forsyth
 import strategygames.format.UciCharPair
 import play.api.libs.json._
-import scala.concurrent.duration._
 
 import lila.game.{ Game, GameRepo, PerfPicker }
 import strategygames.variant.Variant
@@ -52,7 +51,7 @@ final private class GameJson(
   }
 
   private def generate(gameId: Game.ID, plies: Int, bc: Boolean): Fu[JsObject] =
-    gameRepo game gameId orFail s"Missing puzzle game $gameId!" flatMap { game =>
+    gameRepo `game` gameId `orFail` s"Missing puzzle game $gameId!" flatMap { game =>
       lightUserApi preloadMany game.userIds map { _ =>
         if (bc) generateBc(game, plies)
         else generate(game, plies)
@@ -69,7 +68,7 @@ final private class GameJson(
         "players" -> playersJson(game),
         //can flatten whilst puzzles are just chess
         "actionStrs" -> game.actionStrs.flatten.take(plies + 1).mkString(" "),
-        "clock"      -> showClock(game)(defaultLang)
+        "clock"      -> showClock(game)(using defaultLang)
       )
 
   private def showClock(game: Game)(implicit lang: Lang): String =
@@ -83,10 +82,10 @@ final private class GameJson(
     }
 
   private def perfJson(game: Game) = {
-    val perfType = lila.rating.PerfType orDefault PerfPicker.key(game)
+    val perfType = lila.rating.PerfType `orDefault` PerfPicker.key(game)
     Json.obj(
       "icon" -> perfType.iconChar.toString,
-      "name" -> perfType.trans(defaultLang)
+      "name" -> perfType.trans(using defaultLang)
     )
   }
 
@@ -148,7 +147,7 @@ final private class GameJson(
     Json
       .obj(
         "userId"      -> userId,
-        "name"        -> s"${user.name}${p.rating.??(r => s" ($r)")}",
+        "name"        -> s"${user.name}${p.rating.so(r => s" ($r)")}",
         "playerIndex" -> p.playerIndex.name,
         "playerColor" -> game.variant.playerColors(p.playerIndex)
       )

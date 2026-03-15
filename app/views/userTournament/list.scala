@@ -9,7 +9,6 @@ import lila.common.paginator.Paginator
 import lila.user.User
 import lila.i18n.VariantKeys
 
-import controllers.routes
 
 object list {
 

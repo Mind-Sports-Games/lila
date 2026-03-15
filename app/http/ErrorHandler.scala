@@ -17,22 +17,26 @@ final class ErrorHandler(
     mainC: => controllers.Main,
     lobbyC: => controllers.Lobby
 )(implicit ec: scala.concurrent.ExecutionContext)
-    extends DefaultHttpErrorHandler(environment, config, router.some) {
+    extends DefaultHttpErrorHandler(
+      environment,
+      config,
+      router = Some(router)
+    ) {
 
   override def onProdServerError(req: RequestHeader, exception: UsefulException) =
     Future {
-      val actionName = HTTPRequest actionName req
-      val client     = HTTPRequest clientName req
+      val actionName = HTTPRequest `actionName` req
+      val client     = HTTPRequest `clientName` req
       lila.mon.http.error(actionName, client, req.method, 500).increment()
       lila.log("http").error(s"ERROR 500 $actionName", exception)
       if (canShowErrorPage(req))
-        InternalServerError(views.html.site.bits.errorPage {
+        InternalServerError(views.html.site.bits.errorPage(using
           lila.api.Context.error(
             req,
             lila.i18n.defaultLang,
-            HTTPRequest.isSynchronousHttp(req) option lila.common.Nonce.random
+            HTTPRequest.isSynchronousHttp(req) `option` lila.common.Nonce.random
           )
-        })
+        ))
       else InternalServerError("Sorry, something went wrong.")
     } recover { case scala.util.control.NonFatal(e) =>
       lila.log("http").error(s"""Error handler exception on "${exception.getMessage}\"""", e)

@@ -30,7 +30,7 @@ case class UserMarks(value: List[UserMark]) extends AnyVal {
   def rankban               = apply(UserMark.Rankban)
   def alt                   = apply(UserMark.Alt)
 
-  def nonEmpty = value.nonEmpty option this
+  def nonEmpty = value.nonEmpty `option` this
   def dirty    = value.exists(UserMark.bannable.contains)
   def clean    = !dirty
 

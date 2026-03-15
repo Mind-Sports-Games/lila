@@ -12,5 +12,5 @@ final class Env(environment: Environment, net: NetConfig)(implicit
 ) {
 
   val manifest = wire[AssetManifest]
-
 }
+

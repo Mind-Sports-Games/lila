@@ -26,11 +26,11 @@ case class Info(
 
   def encode: String =
     List(
-      best ?? (_.piotr),
+      best so (_.piotr),
       //TODO Wrong for multiaction
       (variation take Info.LineMaxTurns).flatten mkString " ",
-      mate ?? (_.value.toString),
-      cp ?? (_.value.toString)
+      mate so (_.value.toString),
+      cp so (_.value.toString)
     ).dropWhile(_.isEmpty).reverse mkString Info.separator
 
   def hasVariation  = variation.nonEmpty
@@ -55,7 +55,7 @@ case class Info(
     }
 
   override def toString =
-    s"Info $playerIndex [$ply] ${cp.fold("?")(_.showPawns)} ${mate.??(_.value)} $best"
+    s"Info $playerIndex [$ply] ${cp.fold("?")(_.showPawns)} ${mate.so(_.value)} $best"
 }
 
 object Info {

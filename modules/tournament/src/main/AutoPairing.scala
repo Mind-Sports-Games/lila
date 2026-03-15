@@ -1,8 +1,7 @@
 package lila.tournament
 
-import strategygames.{ P2, Player => PlayerIndex, P1, Game => StratGame, GameLogic }
+import strategygames.{ P2, Player => PlayerIndex, P1, Game => StratGame }
 import strategygames.variant.Variant
-import scala.util.chaining._
 
 import lila.game.{ Game, Player => GamePlayer, GameRepo, Source, Handicaps }
 import lila.user.User
@@ -21,8 +20,8 @@ final class AutoPairing(
       playersMap: Map[User.ID, Player],
       ranking: Ranking
   ): Fu[Game] = {
-    val player1 = playersMap get pairing.user1 err s"Missing pairing player1 $pairing"
-    val player2 = playersMap get pairing.user2 err s"Missing pairing player2 $pairing"
+    val player1 = playersMap get pairing.user1 `err` s"Missing pairing player1 $pairing"
+    val player2 = playersMap get pairing.user2 `err` s"Missing pairing player2 $pairing"
     val clock   = tour.clock.toClock
     val game = Game
       .make(
@@ -61,7 +60,7 @@ final class AutoPairing(
       .withTournamentId(tour.id)
       .withHandicappedTournament(tour.handicapped)
       .start
-    (gameRepo insertDenormalized game) >>- {
+    (gameRepo `insertDenormalized` game).andDo {
       onStart(game.id)
       duelStore.add(
         tour = tour,

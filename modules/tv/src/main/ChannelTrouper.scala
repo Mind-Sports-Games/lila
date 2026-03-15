@@ -1,7 +1,6 @@
 package lila.tv
 
 import strategygames.{ Player => PlayerIndex }
-import scala.concurrent.duration._
 import scala.concurrent.Promise
 
 import lila.common.LightUser
@@ -43,17 +42,16 @@ final private[tv] class ChannelTrouper(
       history = game.id :: history.take(2)
 
     case TvTrouper.Select =>
-      candidateIds.keys
-        .map(proxyGame)
-        .sequenceFu
+      Future.sequence(candidateIds.keys
+        .map(proxyGame).toSeq)
         .map(_.view.collect {
-          case Some(g) if channel isOngoingGame g => g
+          case Some(g) if channel `isOngoingGame` g => g
         }.toList)
         .foreach { candidates =>
-          oneId ?? proxyGame foreach {
-            case Some(current) if channel isOngoingGame current =>
-              fuccess(wayBetter(current, candidates)) orElse rematch(current) foreach elect
-            case Some(current) => rematch(current) orElse fuccess(bestOf(candidates)) foreach elect
+          oneId so proxyGame foreach {
+            case Some(current) if channel `isOngoingGame` current =>
+              fuccess(wayBetter(current, candidates)) `orElse` rematch(current) foreach elect
+            case Some(current) => rematch(current) `orElse` fuccess(bestOf(candidates)) foreach elect
             case _             => elect(bestOf(candidates))
           }
           manyIds = candidates
@@ -67,7 +65,7 @@ final private[tv] class ChannelTrouper(
         }
   }
 
-  def addCandidate(game: Game): Unit = candidateIds put game.id
+  def addCandidate(game: Game): Unit = candidateIds `put` game.id
 
   private def elect(gameOption: Option[Game]): Unit = gameOption foreach { this ! SetGame(_) }
 
@@ -76,7 +74,7 @@ final private[tv] class ChannelTrouper(
 
   private def isWayBetter(g1: Game, g2: Game) = score(g2.resetTurns) > (score(g1.resetTurns) * 1.17)
 
-  private def rematch(game: Game): Fu[Option[Game]] = rematchOf(game.id) ?? proxyGame
+  private def rematch(game: Game): Fu[Option[Game]] = rematchOf(game.id) so proxyGame
 
   private def bestOf(candidates: List[Game]) = {
     import cats.implicits._
@@ -105,7 +103,7 @@ final private[tv] class ChannelTrouper(
       .player(playerIndex)
       .some
       .flatMap { p =>
-        p.stableRating.exists(2100 <) ?? p.userId
+        p.stableRating.exists(2100 <) so p.userId
       }
       .flatMap(lightUserSync)
       .flatMap(_.title)

@@ -94,7 +94,7 @@ object widgets {
           ),
           if (g.actionStrs.length > 0)
             div(cls := "opening")(
-              (!g.fromPosition ?? g.opening) map { opening =>
+              (!g.fromPosition so g.opening) map { opening =>
                 strong(opening.opening.toString())
               },
               div(cls := "pgn")(
@@ -103,11 +103,11 @@ object widgets {
                   case (Vector(p1), i)     => s"${i + 1}. $p1"
                   case _                   => ""
                 } mkString " ",
-                g.actionStrs.length > 6 option s" ... ${1 + (g.actionStrs.length - 1) / 2} turns "
+                g.actionStrs.length > 6 `option` s" ... ${1 + (g.actionStrs.length - 1) / 2} turns "
               )
             )
           else frag(br, br),
-          g.metadata.analysed option
+          g.metadata.analysed `option`
             div(cls := "metadata text", dataIcon := "")(trans.computerAnalysisAvailable()),
           g.pgnImport.flatMap(_.user).map { user =>
             div(cls := "metadata")("PGN import by ", userIdLink(user.some))
@@ -140,10 +140,10 @@ object widgets {
         frag(
           userIdLink(playerUser.id.some, withOnline = false),
           br,
-          player.berserk option berserkIconSpan,
+          player.berserk `option` berserkIconSpan,
           playerUser.rating,
-          player.isInputRating option "*",
-          player.provisional option "?",
+          player.isInputRating `option` "*",
+          player.provisional `option` "?",
           playerUser.ratingDiff map { d =>
             frag(" ", showRatingDiff(d))
           }

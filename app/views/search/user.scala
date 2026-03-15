@@ -7,35 +7,33 @@ import lila.app.templating.Environment._
 import lila.app.ui.ScalatagsTemplate._
 import lila.user.User
 
-import controllers.routes
 
 object user {
 
   import trans.search._
 
-  def apply(u: User, form: Form[_])(implicit ctx: Context) = {
-    val commons = bits of form
-    import commons._
+  def apply(u: User, form: Form[?])(implicit ctx: Context) = {
+    val commons = bits.of(form)
     st.form(
       noFollow,
       cls := "search__form",
       action := routes.User.games(u.username, "search"),
       method := "GET"
-    )(dataReqs)(
+    )(commons.dataReqs)(
       table(
-        date,
-        rating,
-        turns,
-        duration,
-        clockTime,
-        clockIncrement,
-        source,
-        perf,
-        mode
+        commons.date,
+        commons.rating,
+        commons.turns,
+        commons.duration,
+        commons.clockTime,
+        commons.clockIncrement,
+        commons.source,
+        commons.perf,
+        commons.mode
       ),
       table(
-        hasAi,
-        aiLevel,
+        commons.hasAi,
+        commons.aiLevel,
         tr(cls := "opponentName")(
           th(label(`for` := form3.id(form("players")("b")))(opponentName())),
           td(cls := "usernames")(
@@ -43,13 +41,13 @@ object user {
             form3.input(form("players")("b"))(tpe := "text")
           )
         ),
-        winner(hide = false),
-        loser(hide = false),
-        playerIndexs(hide = false),
-        status,
-        winnerPlayerIndex,
-        sort,
-        analysed,
+        commons.winner(hide = false),
+        commons.loser(hide = false),
+        commons.playerIndexs(hide = false),
+        commons.status,
+        commons.winnerPlayerIndex,
+        commons.sort,
+        commons.analysed,
         tr(cls := "action")(
           th,
           td(button(cls := "button")(search()))

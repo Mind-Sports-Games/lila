@@ -2,9 +2,7 @@ package lila.puzzle
 
 import org.joda.time.DateTime
 import reactivemongo.api.bson.BSONNull
-import scala.concurrent.duration._
 import scala.concurrent.ExecutionContext
-import scala.util.chaining._
 
 import strategygames.variant.Variant
 
@@ -49,8 +47,8 @@ final class PuzzleReplayApi(
           if (current.days == days && current.theme == theme && current.remaining.nonEmpty) fuccess(current)
           else createReplayFor(user, days, variant, theme) tap { replays.put((user.id, variant), _) }
       } flatMap { replay =>
-        replay.remaining.headOption ?? { id =>
-          colls.puzzle(_.byId[Puzzle](id.value)) map2 (_ -> replay)
+        replay.remaining.headOption so { id =>
+          colls.puzzle(_.byId[Puzzle](id.value)) `map2` (_ -> replay)
         }
       }
     } getOrElse fuccess(None)
@@ -61,7 +59,7 @@ final class PuzzleReplayApi(
       variant: Variant,
       theme: PuzzleTheme.Key
   ): Funit =
-    replays.getIfPresent((round.userId, variant)) ?? {
+    replays.getIfPresent((round.userId, variant)) so {
       _ map { replay =>
         if (replay.days == days && replay.theme == theme)
           replays.put((round.userId, variant), fuccess(replay.step))
@@ -76,15 +74,16 @@ final class PuzzleReplayApi(
   ): Fu[PuzzleReplay] =
     colls
       .round {
-        _.aggregateOne() { framework =>
+        _.aggregateWith[Bdoc]() { framework =>
           import framework._
-          Match(
-            $doc(
-              "u" -> user.id,
-              "d" $gt DateTime.now.minusDays(days),
-              "w" $ne true
-            )
-          ) -> List(
+          List(
+            Match(
+              $doc(
+                "u" -> user.id,
+                "d" `$gt` DateTime.now.minusDays(days),
+                "w" `$ne` true
+              )
+            ),
             Sort(Ascending("d")),
             PipelineOperator(
               $doc(
@@ -129,31 +128,13 @@ final class PuzzleReplayApi(
             Group(BSONNull)("ids" -> PushField("puzzle._id"))
           )
         }
-      }
+          .collect[List](maxDocs = 1)
+          .dmap(_.headOption)
+    }
       .map {
         ~_.flatMap(_.getAsOpt[Vector[Puzzle.Id]]("ids"))
       } map { ids =>
       PuzzleReplay(days, theme, ids.size, ids)
     }
 
-  private val puzzleLookup =
-    $doc(
-      "$lookup" -> $doc(
-        "from" -> colls.puzzle.name.value,
-        "as"   -> "puzzle",
-        "let" -> $doc(
-          "pid" -> $doc("$arrayElemAt" -> $arr($doc("$split" -> $arr("$_id", ":")), 1))
-        ),
-        "pipeline" -> $arr(
-          $doc(
-            "$match" -> $doc(
-              "$expr" -> $doc(
-                $doc("$eq" -> $arr("$_id", "$$pid"))
-              )
-            )
-          ),
-          $doc("$project" -> $doc("_id" -> true))
-        )
-      )
-    )
 }

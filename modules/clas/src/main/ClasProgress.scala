@@ -66,10 +66,10 @@ final class ClasProgressApi(
         users zip progresses map { case (u, rating) =>
           val playStat = playStats get u.id
           u.id -> StudentProgress(
-            nb = playStat.??(_.nb),
+            nb = playStat.so(_.nb),
             rating = rating,
-            wins = playStat.??(_.wins),
-            millis = playStat.??(_.millis)
+            wins = playStat.so(_.wins),
+            millis = playStat.so(_.millis)
           )
         } toMap
       )
@@ -79,17 +79,15 @@ final class ClasProgressApi(
   //TODO should we split this by variant?
   private def getPuzzleStats(userIds: List[User.ID], days: Int): Fu[Map[User.ID, PlayStats]] =
     puzzleColls.round {
-      _.aggregateList(
-        maxDocs = Int.MaxValue,
-        ReadPreference.secondaryPreferred
-      ) { framework =>
+      _.aggregateWith[Bdoc](readPreference = ReadPreference.secondaryPreferred) { framework =>
         import framework._
-        Match(
-          $doc(
-            PuzzleRound.BSONFields.user $in userIds,
-            PuzzleRound.BSONFields.date $gt DateTime.now.minusDays(days)
-          )
-        ) -> List(
+        List(
+          Match(
+            $doc(
+              PuzzleRound.BSONFields.user `$in` userIds,
+              PuzzleRound.BSONFields.date `$gt` DateTime.now.minusDays(days)
+            )
+          ),
           GroupField("u")(
             "nb" -> SumAll,
             "win" -> Sum(
@@ -99,7 +97,9 @@ final class ClasProgressApi(
             )
           )
         )
-      }.map {
+      }
+        .collect[List](maxDocs = Int.MaxValue)
+        .map {
         _.flatMap { obj =>
           obj.string("_id") map { id =>
             id -> PlayStats(
@@ -120,18 +120,16 @@ final class ClasProgressApi(
     import Game.{ BSONFields => F }
     import lila.game.Query
     gameRepo.coll
-      .aggregateList(
-        maxDocs = Int.MaxValue,
-        ReadPreference.secondaryPreferred
-      ) { framework =>
+      .aggregateWith[Bdoc](readPreference = ReadPreference.secondaryPreferred) { framework =>
         import framework._
-        Match(
-          $doc(
-            F.playerUids $in userIds,
-            Query.createdSince(DateTime.now minusDays days),
-            F.perfType -> perfType.id
-          )
-        ) -> List(
+        List(
+          Match(
+            $doc(
+              F.playerUids `$in` userIds,
+              Query.createdSince(DateTime.now `minusDays` days),
+              F.perfType -> perfType.id
+            )
+          ),
           Project(
             $doc(
               F.playerUids -> true,
@@ -141,7 +139,7 @@ final class ClasProgressApi(
             )
           ),
           UnwindField(F.playerUids),
-          Match($doc(F.playerUids $in userIds)),
+          Match($doc(F.playerUids `$in` userIds)),
           GroupField(F.playerUids)(
             "nb" -> SumAll,
             "win" -> Sum(
@@ -153,6 +151,7 @@ final class ClasProgressApi(
           )
         )
       }
+      .collect[List](maxDocs = Int.MaxValue)
       .map {
         _.flatMap { obj =>
           obj.string(F.id) map { id =>
@@ -163,7 +162,7 @@ final class ClasProgressApi(
             )
           }
         }.toMap
-      }
+    }
   }
 
   private[clas] def onFinishGame(game: lila.game.Game): Unit =

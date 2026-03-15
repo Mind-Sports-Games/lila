@@ -1,6 +1,5 @@
 package lila.swiss
 import strategygames.{ GameFamily }
-import strategygames.variant.Variant
 
 private case class SwissSheet(outcomes: List[List[SwissSheet.Outcome]]) {
   import SwissSheet._
@@ -69,21 +68,20 @@ private object SwissSheet {
                   outcomeListFromMultiMatch(player, pairing)
                 else List(Draw)
               case Right(Some(playerIndex)) =>
-                if (swiss.settings.isMatchScore) {
+                if (swiss.settings.isMatchScore)
                   outcomeListFromMultiMatch(player, pairing)
-                } else if (pairing(playerIndex) == player.userId) List(Win)
+                else if (pairing(playerIndex) == player.userId) List(Win)
                 else List(Loss)
             }
           case None if player.byes(round) =>
-            if (swiss.settings.isMatchScore) {
-              if (swiss.settings.isBestOfX) {
+            if (swiss.settings.isMatchScore)
+              if (swiss.settings.isBestOfX)
                 List.fill(swiss.settings.nbGamesPerRound / 2 + 1)(
                   Bye
                 ) // odd nbGamesPerRound not allowed in form for this setup...
-              } else {
+              else
                 List.fill(swiss.settings.nbGamesPerRound)(Bye)
-              }
-            } else List(Bye)
+            else List(Bye)
           case None => List(Absent)
         }
       }
@@ -112,8 +110,8 @@ private object SwissSheet {
             })
           }
     }
-
 }
+
 
 final private class SwissSheetApi(colls: SwissColls)(implicit
     ec: scala.concurrent.ExecutionContext,
@@ -130,9 +128,9 @@ final private class SwissSheetApi(colls: SwissColls)(implicit
   def source(
       swiss: Swiss,
       sort: Bdoc
-  ): Source[(SwissPlayer, Map[SwissRound.Number, SwissPairing], SwissSheet), _] = {
+  ): Source[(SwissPlayer, Map[SwissRound.Number, SwissPairing], SwissSheet), ?] = {
     val readPreference =
-      if (swiss.finishedAt.exists(_ isBefore DateTime.now.minusSeconds(10)))
+      if (swiss.finishedAt.exists(_ `isBefore` DateTime.now.minusSeconds(10)))
         ReadPreference.secondaryPreferred
       else ReadPreference.primary
     SwissPlayer

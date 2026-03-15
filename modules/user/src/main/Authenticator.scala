@@ -24,13 +24,13 @@ final class Authenticator(
   }
 
   def authenticateById(id: User.ID, passwordAndToken: PasswordAndToken): Fu[Option[User]] =
-    loginCandidateById(id) map { _ flatMap { _ option passwordAndToken } }
+    loginCandidateById(id) map { _ flatMap { _ `option` passwordAndToken } }
 
   def authenticateByEmail(
       email: NormalizedEmailAddress,
       passwordAndToken: PasswordAndToken
   ): Fu[Option[User]] =
-    loginCandidateByEmail(email) map { _ flatMap { _ option passwordAndToken } }
+    loginCandidateByEmail(email) map { _ flatMap { _ `option` passwordAndToken } }
 
   def loginCandidate(u: User): Fu[User.LoginCandidate] =
     loginCandidateById(u.id) dmap { _ | User.LoginCandidate(u, _ => false) }
@@ -52,12 +52,12 @@ final class Authenticator(
   private def authWithBenefits(auth: AuthData)(p: ClearPassword): Boolean = {
     val res = compare(auth, p)
     if (res && auth.salt.isDefined)
-      setPassword(id = auth._id, p) >>- lila.mon.user.auth.bcFullMigrate.increment().unit
+      setPassword(id = auth._id, p).andDo { val _ = lila.mon.user.auth.bcFullMigrate.increment() }
     res
   }
 
   private def loginCandidate(select: Bdoc): Fu[Option[User.LoginCandidate]] =
-    userRepo.coll.one[AuthData](select, authProjection)(AuthDataBSONHandler) zip userRepo.coll
+    userRepo.coll.one[AuthData](select, authProjection)(using AuthDataBSONHandler) zip userRepo.coll
       .one[User](select) map {
       case (Some(authData), Some(user)) =>
         User.LoginCandidate(user, authWithBenefits(authData)).some

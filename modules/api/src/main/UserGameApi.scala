@@ -4,7 +4,6 @@ import play.api.i18n.Lang
 import play.api.libs.json._
 
 import strategygames.format.Forsyth
-import strategygames.GameLogic
 
 import lila.common.Json.jodaWrites
 import lila.common.LightUser
@@ -27,7 +26,7 @@ final class UserGameApi(
       _             <- lightUser.preloadMany(pag.currentPageResults.flatMap(_.userIds))
     } yield {
       implicit val gameWriter = Writes[Game] { g =>
-        write(g, bookmarkedIds(g.id), ctx.me)(ctx.lang)
+        write(g, bookmarkedIds(g.id), ctx.me)(using ctx.lang)
       }
       Json.obj(
         "paginator" -> lila.common.paginator.PaginatorJson(pag)

@@ -2,10 +2,8 @@ package lila.analyse
 
 import org.joda.time._
 import reactivemongo.api.bson.{ BSONBoolean, BSONInteger }
-import scala.concurrent.duration._
 
 import lila.db.dsl._
-import lila.memo.CacheApi
 import lila.user.User
 
 final class RequesterApi(coll: Coll)(implicit ec: scala.concurrent.ExecutionContext) {
@@ -35,7 +33,7 @@ final class RequesterApi(coll: Coll)(implicit ec: scala.concurrent.ExecutionCont
       )
       .map { doc =>
         val daily = doc.flatMap(_ int formatter.print(now))
-        val weekly = doc ?? {
+        val weekly = doc so {
           _.values.foldLeft(0) {
             case (acc, BSONInteger(v)) => acc + v
             case (acc, _)              => acc

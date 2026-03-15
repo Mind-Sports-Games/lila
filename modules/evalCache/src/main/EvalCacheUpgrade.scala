@@ -3,13 +3,10 @@ package lila.evalCache
 import java.util.concurrent.ConcurrentHashMap
 import play.api.libs.json.{ JsObject, JsString }
 
-import scala.concurrent.duration._
 import strategygames.format.FEN
 import strategygames.variant.Variant
 import lila.socket.Socket
 import lila.memo.ExpireCallbackMemo
-
-import scala.collection.mutable
 
 /* Upgrades the user's eval when a better one becomes available,
  * by remembering the last evalGet of each socket member,
@@ -32,10 +29,10 @@ final private class EvalCacheUpgrade(scheduler: akka.actor.Scheduler)(implicit
     val setupId = makeSetupId(variant, fen, multiPv)
     members.put(sri.value, WatchingMember(push, setupId, path))
     evals.put(setupId, (~Option(evals.get(setupId)) + sri.value))
-    expirableSris put sri.value
+    expirableSris `put` sri.value
   }
 
-  def onEval(input: EvalCacheEntry.Input, sri: Socket.Sri): Unit = {
+  def onEval(input: EvalCacheEntry.Input, sri: Socket.Sri): Unit =
     (1 to input.eval.multiPv) flatMap { multiPv =>
       Option(evals.get(makeSetupId(input.id.variant, input.fen, multiPv)))
     } foreach { sris =>
@@ -48,13 +45,12 @@ final private class EvalCacheUpgrade(scheduler: akka.actor.Scheduler)(implicit
         upgradeMon.count.increment(wms.size)
       }
     }
-  }
 
   def unregister(sri: Socket.Sri): Unit =
     Option(members.get(sri.value)) foreach { wm =>
       unregisterEval(wm.setupId, sri)
       members.remove(sri.value)
-      expirableSris remove sri.value
+      expirableSris `remove` sri.value
     }
 
   private def unregisterEval(setupId: SetupId, sri: Socket.Sri): Unit =
@@ -67,7 +63,7 @@ final private class EvalCacheUpgrade(scheduler: akka.actor.Scheduler)(implicit
   scheduler.scheduleWithFixedDelay(1 minute, 1 minute) { () =>
     upgradeMon.members.update(members.size)
     upgradeMon.evals.update(evals.size)
-    upgradeMon.expirable.update(expirableSris.count).unit
+    val _ = upgradeMon.expirable.update(expirableSris.count)
   }
 }
 

@@ -5,7 +5,6 @@ import strategygames.format.{ Forsyth, Uci, UciCharPair }
 import strategygames.variant.Variant
 import strategygames.{ Division, Game, Player => PlayerIndex, Replay }
 import play.api.libs.json._
-import scala.concurrent.duration._
 
 import lila.analyse.{ Analysis, Info }
 import lila.hub.actorApi.fishnet.StudyChapterRequest
@@ -27,13 +26,13 @@ object ServerEval {
     def apply(study: Study, chapter: Chapter, userId: User.ID): Funit =
       chapter.serverEval.fold(true) { eval =>
         !eval.done && onceEvery(chapter.id.value)
-      } ?? {
+      } so {
         val unlimitedFu =
           fuccess(userId == User.playstrategyId) >>| userRepo
             .byId(userId)
             .map(_.exists(Granter(_.Relay)))
         unlimitedFu flatMap { unlimited =>
-          chapterRepo.startServerEval(chapter) >>- {
+          chapterRepo.startServerEval(chapter).andDo {
             fishnet ! StudyChapterRequest(
               studyId = study.id.value,
               chapterId = chapter.id.value,
@@ -56,24 +55,24 @@ object ServerEval {
   )(implicit ec: scala.concurrent.ExecutionContext) {
 
     def apply(analysis: Analysis, complete: Boolean): Funit =
-      analysis.studyId.map(Study.Id.apply) ?? { studyId =>
+      analysis.studyId.map(Study.Id.apply) so { studyId =>
         sequencer.sequenceStudyWithChapter(studyId, Chapter.Id(analysis.id)) {
           case Study.WithChapter(_, chapter) => {
             implicit val variant = chapter.root.variant
-            (complete ?? chapterRepo.completeServerEval(chapter)) >> {
-              lila.common.Future
+            (complete so chapterRepo.completeServerEval(chapter)) >> {
+              lila.common.LilaFuture
                 .fold(chapter.root.mainline.zip(analysis.infoAdvices).toList)(Path.root) {
                   case (path, (node, (info, advOpt))) =>
-                    chapter.root.nodeAt(path).flatMap { parent =>
+                    (chapter.root.nodeAt(path).flatMap { parent =>
                       analysisLine(parent, chapter.setup.variant, info) map { subTree =>
                         parent.addChild(subTree) -> subTree
                       }
-                    } ?? { case (newParent, subTree) =>
+                    }).fold(funit) { case (newParent, subTree) =>
                       chapterRepo.addSubTree(subTree, newParent, path)(chapter)
                     } >> {
                       import BSONHandlers._
                       import Node.{ BsonFields => F }
-                      ((info.eval.score.isDefined && node.score.isEmpty) || (advOpt.isDefined && !node.comments.hasPlayStrategyComment)) ??
+                      ((info.eval.score.isDefined && node.score.isEmpty) || (advOpt.isDefined && !node.comments.hasPlayStrategyComment)) so
                         chapterRepo
                           .setNodeValues(
                             chapter,
@@ -98,16 +97,16 @@ object ServerEval {
                                 .flatMap(CommentsBSONHandler.writeOpt),
                               F.glyphs -> advOpt
                                 .map { adv =>
-                                  node.glyphs merge Glyphs.fromList(List(adv.judgment.glyph))
+                                  node.glyphs `merge` Glyphs.fromList(List(adv.judgment.glyph))
                                 }
                                 .flatMap(GlyphsBSONHandler.writeOpt)
                             )
                           )
                     } inject path + node
                 } void
-            } >>- {
+            }.andDo {
               chapterRepo.byId(Chapter.Id(analysis.id)).foreach {
-                _ ?? { chapter =>
+                _ so { chapter =>
                   socket.onServerEval(
                     studyId,
                     ServerEval.Progress(
@@ -119,7 +118,7 @@ object ServerEval {
                   )
                 }
               }
-            } logFailure logger
+            } `logFailure` logger
           }
         }
       }
@@ -150,7 +149,7 @@ object ServerEval {
             case (g, m) :: rest =>
               rest
                 .foldLeft(makeBranch(g, m)) { case (node, (g, m)) =>
-                  makeBranch(g, m) addChild node
+                  makeBranch(g, m).addChild(node).asInstanceOf[Node]
                 } some
           }
       }

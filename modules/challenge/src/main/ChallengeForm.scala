@@ -8,7 +8,7 @@ final class ChallengeForm {
   val decline = Form(
     mapping(
       "reason" -> optional(nonEmptyText)
-    )(DeclineData.apply _)(DeclineData.unapply _)
+    )(DeclineData.apply)(d => Some(d.reason))
   )
 
   case class DeclineData(reason: Option[String]) {

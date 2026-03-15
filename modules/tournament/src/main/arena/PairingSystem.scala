@@ -2,6 +2,7 @@ package lila.tournament
 package arena
 
 import lila.common.LightUser
+import lila.common.extensions.*
 import lila.user.{ User, UserRepo }
 
 import scala.concurrent.Future
@@ -9,7 +10,7 @@ import scala.concurrent.Future
 final private[tournament] class PairingSystem(
     pairingRepo: PairingRepo,
     playerRepo: PlayerRepo,
-    userRepo: UserRepo,
+    @annotation.nowarn("msg=unused") _userRepo: UserRepo,
     playerIndexHistoryApi: PlayerIndexHistoryApi
 )(implicit
     ec: scala.concurrent.ExecutionContext,
@@ -37,7 +38,7 @@ final private[tournament] class PairingSystem(
       usersWithBots = users.addBotUsers(botsToAdd)
       lastOpponents <- limitLastOpponents(tour, users, activePlayers)
       data = Data(tour, lastOpponents, ranking, activePlayers == 2)
-      preps <- readyToRunPreps(lastOpponents, usersWithBots, activePlayers) ?? evenOrAll(
+      preps <- readyToRunPreps(lastOpponents, usersWithBots, activePlayers) so evenOrAll(
         data,
         usersWithBots
       )
@@ -72,7 +73,7 @@ final private[tournament] class PairingSystem(
     lastOpponents.hash.isEmpty || users.haveWaitedEnough(Math.min(2, activePlayers))
 
   private def isBotAvailable(tourId: Tournament.ID)(botId: User.ID): Fu[Option[User.ID]] =
-    pairingRepo.isPlaying(tourId, botId).fold(_ => None, if (_) None else Some(botId))
+    pairingRepo.isPlaying(tourId, botId).map(isPlaying => if (isPlaying) None else Some(botId)).recover { case _ => None }
 
   private def availableBots(tourId: Tournament.ID)(joinedBots: List[Player]): Fu[Set[User.ID]] =
     Future
@@ -93,12 +94,11 @@ final private[tournament] class PairingSystem(
         .flatMap { availableBots(tour.id) }
     else fuccess(Set())
 
-  private def evenOrAll(data: Data, users: WaitingUsers) = {
+  private def evenOrAll(data: Data, users: WaitingUsers) =
     makePreps(data, users.evenNumber) flatMap {
       case Nil if users.isOdd => makePreps(data, users.all)
       case x                  => fuccess(x)
     }
-  }
 
   private val maxGroupSize = 100
 
@@ -111,10 +111,11 @@ final private[tournament] class PairingSystem(
         if (data.tour.isRecentlyStarted && !data.tour.isTeamBattle) proximityPairings(tour, idles)
         else if (nbIdles > maxGroupSize) {
           // make sure groupSize is even with / 4 * 2
-          val groupSize = (nbIdles / 4 * 2) atMost maxGroupSize
+          val groupSize = (nbIdles / 4 * 2) `atMost` maxGroupSize
           bestPairings(data, idles take groupSize) :::
             bestPairings(data, idles.slice(groupSize, groupSize + groupSize))
-        } else if (nbIdles > 1) bestPairings(data, idles)
+        }
+        else if (nbIdles > 1) bestPairings(data, idles)
         else Nil
       }
   }.monSuccess(_.tournament.pairing.prep)
@@ -138,10 +139,10 @@ final private[tournament] class PairingSystem(
     } toList
 
   private def bestPairings(data: Data, players: RankedPlayers): List[Pairing.Prep] =
-    (players.sizeIs > 1) ?? AntmaPairing(data, addPlayerIndexHistory(players))
+    (players.sizeIs > 1) so AntmaPairing(data, addPlayerIndexHistory(players))
 
   private def addPlayerIndexHistory(players: RankedPlayers) =
-    players.map(_ withPlayerIndexHistory playerIndexHistoryApi.get)
+    players.map(_ `withPlayerIndexHistory` playerIndexHistoryApi.get)
 }
 
 private object PairingSystem {

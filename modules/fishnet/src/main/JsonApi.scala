@@ -2,7 +2,6 @@ package lila.fishnet
 
 import strategygames.format.{ FEN, LexicalUci, Uci, UciDump }
 import strategygames.variant.Variant
-import strategygames.{ GameFamily, GameLogic }
 import org.joda.time.DateTime
 import play.api.libs.json._
 
@@ -11,7 +10,6 @@ import lila.common.{ IpAddress, Maths }
 import lila.fishnet.{ Work => W }
 import lila.tree.Eval.JsonHandlers._
 import lila.tree.Eval.{ Cp, Mate }
-import akka.actor.typed.PostStop
 
 object JsonApi {
 
@@ -34,7 +32,7 @@ object JsonApi {
     case class Stockfish(
         flavor: Option[String]
     ) {
-      def isNnue = flavor.has("nnue")
+      def isNnue = flavor.contains("nnue")
     }
 
     case class Acquire(
@@ -69,7 +67,7 @@ object JsonApi {
         with Result {
 
       def completeOrPartial =
-        if (analysis.headOption.??(_.isDefined)) CompleteAnalysis(fishnet, stockfish, analysis.flatten)
+        if (analysis.headOption.so(_.isDefined)) CompleteAnalysis(fishnet, stockfish, analysis.flatten)
         else PartialAnalysis(fishnet, stockfish, analysis)
     }
 
@@ -117,9 +115,9 @@ object JsonApi {
 
       val cappedPv = pv take lila.analyse.Info.LineMaxTurns
 
-      def isCheckmate = score.mate has Mate(0)
+      def isCheckmate = score.mate.contains(Mate(0))
       def mateFound   = score.mate.isDefined
-      def deadDraw    = score.cp has Cp(0)
+      def deadDraw    = score.cp.contains(Cp(0))
     }
 
     object Evaluation {
@@ -227,7 +225,7 @@ object JsonApi {
       Reads[Option[Request.Evaluation.OrSkipped[LexicalUci]]] {
         case JsNull => JsSuccess(None)
         case obj =>
-          if (~(obj boolean "skipped")) JsSuccess(Left(Request.Evaluation.Skipped).some)
+          if (~(obj `boolean` "skipped")) JsSuccess(Left(Request.Evaluation.Skipped).some)
           else EvaluationReads reads obj map Right.apply map some
       }
     implicit val PostAnalysisReads: Reads[Request.PostAnalysisLexicalUci] =

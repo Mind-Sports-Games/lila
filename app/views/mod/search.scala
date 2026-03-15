@@ -9,9 +9,7 @@ import lila.common.IpAddress
 import lila.security.FingerHash
 import lila.mod.IpRender.RenderIp
 
-import controllers.routes
 import lila.user.User
-import lila.security.Granter
 import lila.user.Holder
 
 object search {
@@ -19,7 +17,7 @@ object search {
   private val email = tag("email")
   private val mark  = tag("marked")
 
-  def apply(mod: Holder, form: Form[_], users: List[User.WithEmails])(implicit ctx: Context) =
+  def apply(mod: Holder, form: Form[?], users: List[User.WithEmails])(implicit ctx: Context) =
     views.html.base.layout(
       title = "Search users",
       moreCss = cssTag("mod.misc")
@@ -105,7 +103,7 @@ object search {
               )(if (blocked) "Banned" else "Ban this IP")
             )
           ),
-          isGranted(_.Admin) option div(cls := "box__pad")(
+          isGranted(_.Admin) `option` div(cls := "box__pad")(
             h2("User agents"),
             ul(uas map { ua =>
               li(ua)
@@ -137,8 +135,8 @@ object search {
       )
     }
 
-  private def userTable(mod: Holder, users: List[User.WithEmails])(implicit ctx: Context) =
-    users.nonEmpty option table(cls := "slist slist-pad")(
+  @annotation.nowarn("msg=unused") private def userTable(mod: Holder, users: List[User.WithEmails])(implicit ctx: Context) =
+    users.nonEmpty `option` table(cls := "slist slist-pad")(
       thead(
         tr(
           th("User"),
@@ -155,18 +153,18 @@ object search {
             if (isGranted(_.ViewAltUsernames))
               td(
                 userLink(u, withBestRating = true, params = "?mod"),
-                (isGranted(_.Admin) && isGranted(_.SetEmail)) option
+                (isGranted(_.Admin) && isGranted(_.SetEmail)) `option`
                   email(emails.list.map(_.value).mkString(", "))
               )
             else td,
             td(u.count.game.localize),
             td(
-              u.marks.alt option mark("ALT"),
-              u.marks.engine option mark("ENGINE"),
-              u.marks.boost option mark("BOOSTER"),
-              u.marks.troll option mark("SHADOWBAN")
+              u.marks.alt `option` mark("ALT"),
+              u.marks.engine `option` mark("ENGINE"),
+              u.marks.boost `option` mark("BOOSTER"),
+              u.marks.troll `option` mark("SHADOWBAN")
             ),
-            td(u.disabled option mark("CLOSED")),
+            td(u.disabled `option` mark("CLOSED")),
             td(momentFromNow(u.createdAt)),
             td(u.seenAt.map(momentFromNow(_)))
           )

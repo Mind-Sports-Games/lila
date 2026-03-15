@@ -5,7 +5,6 @@ import lila.app.templating.Environment._
 import lila.app.ui.ScalatagsTemplate._
 import lila.hub.actorApi.timeline._
 
-import controllers.routes
 
 object timeline {
 

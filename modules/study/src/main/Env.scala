@@ -38,7 +38,7 @@ final class Env(
   private lazy val studyDb = mongo.asyncDb("study", appConfig.get[String]("study.mongodb.uri"))
 
   def version(studyId: Study.Id): Fu[SocketVersion] =
-    socket.rooms.ask[SocketVersion](studyId.value)(GetVersion)
+    socket.rooms.ask[SocketVersion](studyId.value)(GetVersion.apply)
 
   def isConnected(studyId: Study.Id, userId: User.ID): Fu[Boolean] =
     socket.isPresent(studyId, userId)
@@ -93,6 +93,6 @@ final class Env(
 
   lila.common.Bus.subscribeFun("studyAnalysisProgress") {
     case lila.analyse.actorApi.StudyAnalysisProgress(analysis, complete) =>
-      serverEvalMerger(analysis, complete).unit
+      serverEvalMerger(analysis, complete).discard
   }
 }

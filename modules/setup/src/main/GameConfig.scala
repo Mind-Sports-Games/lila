@@ -93,8 +93,8 @@ case class GameConfig(
       variant.gameFamily == GameFamily.Backgammon() &&
         backgammonPoints.getOrElse(1) % 2 == 1
     )
-
 }
+
 
 object GameConfig extends BaseHumanConfig {
 
@@ -119,14 +119,14 @@ object GameConfig extends BaseHumanConfig {
     val gameLogic = GameFamily(v.split("_")(0).toInt).gameLogic
     val variantId = v.split("_")(1).toInt
     new GameConfig(
-      variant = Variant(gameLogic, variantId) err s"Invalid game variant $v",
+      variant = Variant(gameLogic, variantId) `err` s"Invalid game variant $v",
       fenVariant = gameLogic match {
         case GameLogic.Draughts() =>
-          v2.flatMap(strategygames.draughts.variant.Variant.apply).map(Variant.Draughts)
-        case GameLogic.Go() => v2.flatMap(strategygames.go.variant.Variant.apply).map(Variant.Go)
+          v2.flatMap(strategygames.draughts.variant.Variant.apply).map(Variant.Draughts.apply)
+        case GameLogic.Go() => v2.flatMap(strategygames.go.variant.Variant.apply).map(Variant.Go.apply)
         case _              => none
       },
-      timeMode = TimeMode(tm) err s"Invalid time mode $tm",
+      timeMode = TimeMode(tm) `err` s"Invalid time mode $tm",
       time = t,
       increment = i,
       byoyomi = b,
@@ -136,7 +136,7 @@ object GameConfig extends BaseHumanConfig {
       backgammonPoints = bp,
       days = d,
       mode = m.fold(Mode.default)(Mode.orDefault),
-      playerIndex = PlayerIndex(c) err "Invalid playerIndex " + c,
+      playerIndex = PlayerIndex(c) `err` "Invalid playerIndex " + c,
       fen = fen.map(f => FEN.apply(gameLogic, f)),
       multiMatch = mm,
       opponent = o
@@ -169,24 +169,24 @@ object GameConfig extends BaseHumanConfig {
 
     def reads(r: BSON.Reader): GameConfig =
       GameConfig(
-        variant = Variant.orDefault(GameLogic(r intD "l"), r int "v"),
-        fenVariant = r intD "l" match {
+        variant = Variant.orDefault(GameLogic(r `intD` "l"), r `int` "v"),
+        fenVariant = r `intD` "l" match {
           case 0 => none
-          case 1 => (r intO "v2").flatMap(strategygames.draughts.variant.Variant.apply).map(Variant.Draughts)
-          case 5 => (r intO "v2").flatMap(strategygames.go.variant.Variant.apply).map(Variant.Go)
+          case 1 => (r `intO` "v2").flatMap(strategygames.draughts.variant.Variant.apply).map(Variant.Draughts.apply)
+          case 5 => (r `intO` "v2").flatMap(strategygames.go.variant.Variant.apply).map(Variant.Go.apply)
           case 6 =>
-            (r intO "v2").flatMap(strategygames.backgammon.variant.Variant.apply).map(Variant.Backgammon)
+            (r `intO` "v2").flatMap(strategygames.backgammon.variant.Variant.apply).map(Variant.Backgammon.apply)
         },
-        timeMode = TimeMode orDefault (r int "tm"),
-        time = r double "t",
-        increment = r int "i",
-        byoyomi = r intD "b",
-        periods = r intD "p",
-        goHandicap = r intD "gh",
-        goKomi = r intD "gk",
-        backgammonPoints = r intO "bp",
-        days = r int "d",
-        mode = Mode orDefault (r int "m"),
+        timeMode = TimeMode `orDefault` (r `int` "tm"),
+        time = r `double` "t",
+        increment = r `int` "i",
+        byoyomi = r `intD` "b",
+        periods = r `intD` "p",
+        goHandicap = r `intD` "gh",
+        goKomi = r `intD` "gk",
+        backgammonPoints = r `intO` "bp",
+        days = r `int` "d",
+        mode = Mode `orDefault` (r `int` "m"),
         playerIndex = PlayerIndex.P1,
         fen = r.getO[FEN]("f") filter (_.value.nonEmpty),
         multiMatch = ~r.boolO("mm"),

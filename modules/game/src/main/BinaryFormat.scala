@@ -1,7 +1,6 @@
 package lila.game
 
 import strategygames.{
-  Board,
   ByoyomiClock,
   ByoyomiClockPlayer,
   Centis,
@@ -12,11 +11,8 @@ import strategygames.{
   GameLogic,
   P1,
   P2,
-  Piece,
-  PieceMap,
   Player => PlayerIndex,
   Pos,
-  Role,
   Timestamp
 }
 import strategygames.chess.{ Castles, Rank, UnmovedRooks }
@@ -29,8 +25,6 @@ import strategygames.go
 import strategygames.backgammon
 import strategygames.abalone
 import strategygames.dameo
-import strategygames.format
-import strategygames.variant.Variant
 import org.joda.time.DateTime
 import org.lichess.compression.clock.{ Encoder => ClockEncoder }
 import scala.util.Try
@@ -56,8 +50,8 @@ object BinaryFormat {
     def read(start: Centis, bw: ByteArray, bb: ByteArray, flagged: Option[PlayerIndex]) =
       Try {
         FischerClockHistory(
-          readSide(start, bw, flagged has P1),
-          readSide(start, bb, flagged has P2)
+          readSide(start, bw, flagged.contains(P1)),
+          readSide(start, bb, flagged.contains(P2))
         )
       }.fold(
         e => { logger.warn(s"Exception decoding history", e); none },
@@ -77,8 +71,8 @@ object BinaryFormat {
     def read(start: Centis, bw: ByteArray, bb: ByteArray, flagged: Option[PlayerIndex]) =
       Try {
         DelayClockHistory( // NOTE: this is the only difference from the above fischerClockHistory
-          readSide(start, bw, flagged has P1),
-          readSide(start, bb, flagged has P2)
+          readSide(start, bw, flagged.contains(P1)),
+          readSide(start, bb, flagged.contains(P2))
         )
       }.fold(
         e => { logger.warn(s"Exception decoding history", e); none },
@@ -111,8 +105,8 @@ object BinaryFormat {
       Try {
         ByoyomiClockHistory(
           byoyomi,
-          readSide(start, bs, flagged has P1),
-          readSide(start, bg, flagged has P2),
+          readSide(start, bs, flagged.contains(P1)),
+          readSide(start, bg, flagged.contains(P2)),
           pe
         )
       }.fold(
@@ -179,7 +173,7 @@ object BinaryFormat {
         ba: ByteArray,
         p1Berserk: Boolean,
         p2Berserk: Boolean
-    ): PlayerIndex => Clock =
+    ): PlayerIndex => Clock = {
       playerIndex => {
         val ia = ba.value map toInt
 
@@ -214,6 +208,7 @@ object BinaryFormat {
           case _ => sys error s"BinaryFormat.clock.read invalid bytes: ${ba.showBytes}"
         }
       }
+    }
 
     private def writeTimestamp(timestamp: Timestamp) = {
       val centis = (timestamp - start).centis
@@ -224,7 +219,7 @@ object BinaryFormat {
        * This can happen when the clock was started at the same time as the game
        * For instance in simuls
        */
-      val nonZero = centis atLeast 1
+      val nonZero = centis `atLeast` 1
       writeInt(nonZero)
     }
 
@@ -273,7 +268,7 @@ object BinaryFormat {
         periodEntries: PeriodEntries,
         p1Berserk: Boolean,
         p2Berserk: Boolean
-    ): PlayerIndex => ByoyomiClock =
+    ): PlayerIndex => ByoyomiClock = {
       playerIndex => {
         val ia = ba.value map toInt
 
@@ -310,12 +305,12 @@ object BinaryFormat {
                   .withConfig(config)
                   .copy(berserk = p1Berserk)
                   .setRemaining(computeRemaining(config, legacyP1))
-                  .setPeriods(periodEntries(P1).size atLeast config.initPeriod),
+                  .setPeriods(periodEntries(P1).size `atLeast` config.initPeriod),
                 ByoyomiClockPlayer
                   .withConfig(config)
                   .copy(berserk = p2Berserk)
                   .setRemaining(computeRemaining(config, legacyP2))
-                  .setPeriods(periodEntries(P2).size atLeast config.initPeriod)
+                  .setPeriods(periodEntries(P2).size `atLeast` config.initPeriod)
               ),
               timestamp = timestamp
             )
@@ -323,6 +318,7 @@ object BinaryFormat {
           case _ => sys error s"BinaryFormat.clock.read invalid bytes: ${ba.showBytes}"
         }
       }
+    }
 
     private def writeTimestamp(timestamp: Timestamp) = {
       val centis = (timestamp - start).centis
@@ -333,7 +329,7 @@ object BinaryFormat {
        * This can happen when the clock was started at the same time as the game
        * For instance in simuls
        */
-      val nonZero = centis atLeast 1
+      val nonZero = centis `atLeast` 1
       writeInt(nonZero)
     }
 
@@ -364,7 +360,7 @@ object BinaryFormat {
 
     def writeSide(v: Vector[Int]): ByteArray = {
       def intToShort(i: Int): Array[Byte] = Array((i >> 8).toByte, i.toByte)
-      (v.flatMap(intToShort _)).toArray
+      (v.flatMap(intToShort)).toArray
     }
     def readSide(ba: ByteArray): Vector[Int] = {
       def backToInt(b: Array[Byte]): Int =
@@ -373,7 +369,7 @@ object BinaryFormat {
           case _             => 0
         }
       val pairs = ba.value.grouped(2)
-      (pairs map (backToInt _)).toVector
+      (pairs map (backToInt)).toVector
     }
     def read(bs: ByteArray, bg: ByteArray): Option[PeriodEntries] =
       Try {
@@ -452,11 +448,7 @@ object BinaryFormat {
       ByteArray(chess.Pos.all.map(posInt(_).toByte).toArray)
     }
 
-    def readChess(ba: ByteArray, variant: chess.variant.Variant): chess.PieceMap = {
-      def splitInts(b: Byte) = {
-        val int = b.toInt
-        Array(int >> 4, int & 0x0f)
-      }
+    def readChess(ba: ByteArray, @annotation.nowarn("msg=unused") _variant: chess.variant.Variant): chess.PieceMap = {
       def intPiece(int: Int): Option[chess.Piece] =
         chess.Role.binaryInt(int & 127) map { role =>
           chess.Piece(PlayerIndex.fromP1((int & 128) == 0), role)
@@ -598,7 +590,7 @@ object BinaryFormat {
       ByteArray(go.Pos.all.map(posInt(_).toByte).toArray)
     }
 
-    def readGo(ba: ByteArray, variant: go.variant.Variant): go.PieceMap = {
+    def readGo(ba: ByteArray, @annotation.nowarn("msg=unused") _variant: go.variant.Variant): go.PieceMap = {
       // def splitInts(b: Byte) = {
       //  val int = b.toInt
       //  Array(int >> 4, int & 0x0f)
@@ -667,7 +659,7 @@ object BinaryFormat {
       ByteArray(dameo.Pos.all.map(posInt(_).toByte).toArray)
     }
 
-    def readDameo(ba: ByteArray, variant: dameo.variant.Variant): dameo.PieceMap = {
+    def readDameo(ba: ByteArray, @annotation.nowarn("msg=unused") _variant: dameo.variant.Variant): dameo.PieceMap = {
       def intPiece(int: Int): Option[dameo.Piece] =
         dameo.Role.allByBinaryInt.get(int & 127) map { role =>
           dameo.Piece(PlayerIndex.fromP1((int & 128) == 0), role)

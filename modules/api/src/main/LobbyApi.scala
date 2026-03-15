@@ -1,14 +1,11 @@
 package lila.api
 
-import strategygames.P1
-import strategygames.variant.Variant
-import strategygames.format.Forsyth
 
 import play.api.libs.json.{ JsArray, JsObject, Json }
 
+import lila.common.extensions.*
 import lila.game.Pov
 import lila.lobby.SeekApi
-import lila.i18n.VariantKeys
 
 final class LobbyApi(
     lightUserApi: lila.user.LightUserApi,
@@ -18,8 +15,8 @@ final class LobbyApi(
 )(implicit ec: scala.concurrent.ExecutionContext) {
 
   def apply(implicit ctx: Context): Fu[(JsObject, List[Pov])] =
-    ctx.me.fold(seekApi.forAnon)(seekApi.forUser).mon(_.lobby segment "seeks") zip
-      (ctx.me ?? gameProxyRepo.urgentGames).mon(_.lobby segment "urgentGames") flatMap { case (seeks, povs) =>
+    ctx.me.fold(seekApi.forAnon)(seekApi.forUser).mon(_.lobby `segment` "seeks") zip
+      (ctx.me so gameProxyRepo.urgentGames).mon(_.lobby `segment` "urgentGames") flatMap { case (seeks, povs) =>
         val displayedPovs = povs take 9
         lightUserApi.preloadMany(displayedPovs.flatMap(_.opponent.userId)) inject {
           implicit val lang = ctx.lang

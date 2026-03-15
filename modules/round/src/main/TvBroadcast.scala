@@ -13,7 +13,7 @@ import lila.socket.Socket
 import scala.concurrent.ExecutionContextExecutor
 
 final private class TvBroadcast(
-    userJsonView: lila.user.JsonView,
+    @annotation.nowarn("msg=unused") _userJsonView: lila.user.JsonView,
     lightUserSync: LightUser.GetterSync
 ) extends Actor {
 
@@ -43,7 +43,7 @@ final private class TvBroadcast(
           queue.watchCompletion().foreach { _ =>
             self ! Remove(client)
           }
-          featured ifFalse compat foreach { f =>
+          featured `ifFalse` compat foreach { f =>
             client.queue.offer(Socket.makeMessage("featured", f.dataWithFen))
           }
         }
@@ -53,7 +53,7 @@ final private class TvBroadcast(
 
     case ChangeFeatured(pov, msg) =>
       unsubscribeFromFeaturedId()
-      Bus.subscribe(self, MoveGameEvent makeChan pov.gameId)
+      Bus.subscribe(self, MoveGameEvent `makeChan` pov.gameId)
       val feat = Featured(
         pov.gameId,
         Json.obj(
@@ -102,13 +102,13 @@ final private class TvBroadcast(
 
   def unsubscribeFromFeaturedId() =
     featured foreach { previous =>
-      Bus.unsubscribe(self, MoveGameEvent makeChan previous.id)
+      Bus.unsubscribe(self, MoveGameEvent `makeChan` previous.id)
     }
 }
 
 object TvBroadcast {
 
-  type SourceType = Source[JsValue, _]
+  type SourceType = Source[JsValue, ?]
   type Queue      = SourceQueueWithComplete[JsValue]
 
   case class Featured(id: Game.ID, data: JsObject, fen: String) {

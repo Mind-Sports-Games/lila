@@ -1,6 +1,5 @@
 package views.html
 
-import controllers.routes
 import play.api.libs.json._
 
 import lila.api.Context
@@ -33,7 +32,7 @@ object racer {
       )
     }
 
-  def show(race: RacerRace, data: JsObject, pref: JsObject)(implicit ctx: Context) =
+  @annotation.nowarn("msg=unused") def show(race: RacerRace, data: JsObject, pref: JsObject)(implicit ctx: Context) =
     views.html.base.layout(
       moreCss = frag(cssTag("racer")),
       moreJs = frag(

@@ -2,7 +2,7 @@ package lila.msg
 
 import akka.stream.scaladsl._
 import org.joda.time.DateTime
-import reactivemongo.akkastream.{ cursorProducer, AkkaStreamCursor }
+import reactivemongo.akkastream.cursorProducer
 import reactivemongo.api.ReadPreference
 import scala.util.Try
 
@@ -35,8 +35,8 @@ final class MsgApi(
 
   def threadsOf(me: User): Fu[List[MsgThread]] =
     colls.thread
-      .find($doc("users" -> me.id, "del" $ne me.id))
-      .sort($sort desc "lastMsg.date")
+      .find($doc("users" -> me.id, "del" `$ne` me.id))
+      .sort($sort `desc` "lastMsg.date")
       .cursor[MsgThread]()
       .list(50)
       .map(prioritize)
@@ -53,16 +53,17 @@ final class MsgApi(
     val before = beforeMillis flatMap { millis =>
       Try(new DateTime(millis)).toOption
     }
-    (userId != me.id) ?? lightUserApi.async(userId).flatMap {
-      _ ?? { contact =>
+    if (userId != me.id) lightUserApi.async(userId).flatMap {
+      case None => fuccess(none)
+      case Some(contact) =>
         for {
           _         <- setReadBy(threadId, me, userId)
           msgs      <- threadMsgsFor(threadId, me, before)
           relations <- relationApi.fetchRelations(me.id, userId)
           postable  <- security.may.post(me.id, userId, isNew = msgs.headOption.isEmpty)
         } yield MsgConvo(contact, msgs, relations, postable).some
-      }
     }
+    else fuccess(none)
   }
 
   def delete(me: User, username: String): Funit = {
@@ -83,8 +84,8 @@ final class MsgApi(
     Msg.make(text, orig).fold[Fu[PostResult]](fuccess(PostResult.Invalid)) { msgPre =>
       val threadId = MsgThread.id(orig, dest)
       for {
-        contacts <- userRepo.contacts(orig, dest) orFail s"Missing convo contact user $orig->$dest"
-        isNew    <- !colls.thread.exists($id(threadId))
+        contacts <- userRepo.contacts(orig, dest) `orFail` s"Missing convo contact user $orig->$dest"
+        isNew    <- colls.thread.exists($id(threadId)).not
         verdict  <- security.can.post(contacts, msgPre.text, isNew, unlimited = multi)
         _ = lila.mon.msg.post(verdict.toString, isNew = isNew, multi = multi).increment()
         res <- verdict match {
@@ -100,8 +101,8 @@ final class MsgApi(
                   writeThread(
                     MsgThread.make(orig, dest, msg),
                     delBy = List(
-                      multi option orig,
-                      send.mute option dest
+                      multi `option` orig,
+                      send.mute `option` dest
                     ).flatten
                   )
                 }.void
@@ -114,12 +115,12 @@ final class MsgApi(
                       else
                         $pull(
                           // unset "deleted by receiver" unless the message is muted
-                          "del" $in (orig :: (!send.mute).option(dest).toList)
+                          "del" `$in` (orig :: (!send.mute).option(dest).toList)
                         )
                     }
                   )
                   .void
-            (msgWrite zip threadWrite).void >>- {
+            (msgWrite zip threadWrite).void.andDo {
               if (!send.mute) {
                 notifier.onPost(threadId)
                 Bus.publish(
@@ -145,7 +146,7 @@ final class MsgApi(
         true
       )
       .flatMap { res =>
-        (res.nModified > 0) ?? notifier.onRead(threadId, userId, contactId)
+        (res.nModified > 0) so notifier.onRead(threadId, userId, contactId)
       }
   }
 
@@ -155,17 +156,17 @@ final class MsgApi(
   def systemPost(destId: User.ID, text: String) =
     post(User.playstrategyId, destId, text, multi = true)
 
-  def multiPost(orig: Holder, destSource: Source[User.ID, _], text: String): Fu[Int] =
+  def multiPost(orig: Holder, destSource: Source[User.ID, ?], text: String): Fu[Int] =
     destSource
-      .filter(orig.id !=)
+      .filter(_ != orig.id)
       .mapAsync(4) {
-        post(orig.id, _, text, multi = true).logFailure(logger).nevermind(PostResult.Invalid)
-      }
+        post(orig.id, _, text, multi = true).logFailure(logger).recoverDefault(PostResult.Invalid)
+    }
       .toMat(LilaStream.sinkCount)(Keep.right)
       .run()
 
   def cliMultiPost(orig: String, dests: Seq[User.ID], text: String): Fu[String] =
-    userRepo named orig flatMap {
+    userRepo `named` orig flatMap {
       case None         => fuccess(s"Unknown sender $orig")
       case Some(sender) => multiPost(Holder(sender), Source(dests), text) inject "done"
     }
@@ -173,33 +174,34 @@ final class MsgApi(
   def recentByForMod(user: User, nb: Int): Fu[List[MsgConvo]] =
     colls.thread
       .find($doc("users" -> user.id))
-      .sort($sort desc "lastMsg.date")
+      .sort($sort `desc` "lastMsg.date")
       .cursor[MsgThread]()
       .list(nb)
       .flatMap {
-        _.map { thread =>
-          colls.msg
-            .find($doc("tid" -> thread.id), msgProjection)
-            .sort($sort desc "date")
-            .cursor[Msg]()
-            .list(10)
-            .flatMap { msgs =>
-              lightUserApi async thread.other(user) map { contact =>
-                MsgConvo(
-                  contact | LightUser.fallback(thread other user),
-                  msgs,
-                  lila.relation.Relations(none, none),
-                  postable = false
-                )
+        threads =>
+          Future.sequence(threads.map { thread =>
+            colls.msg
+              .find($doc("tid" -> thread.id), msgProjection)
+              .sort($sort `desc` "date")
+              .cursor[Msg]()
+              .list(10)
+              .flatMap { msgs =>
+                lightUserApi `async` thread.other(user) map { contact =>
+                  MsgConvo(
+                    contact | LightUser.fallback(thread `other` user),
+                    msgs,
+                    lila.relation.Relations(none, none),
+                    postable = false
+                  )
+                }
               }
-            }
-        }.sequenceFu
-      }
+          })
+    }
 
   def deleteAllBy(user: User): Funit =
     colls.thread.list[MsgThread]($doc("users" -> user.id)) flatMap { threads =>
       colls.thread.delete.one($doc("users" -> user.id)) >>
-        colls.msg.delete.one($doc("tid" $in threads.map(_.id))) >>
+        colls.msg.delete.one($doc("tid" `$in` threads.map(_.id))) >>
         notifier.deleteAllBy(threads, user)
     }
 
@@ -208,28 +210,28 @@ final class MsgApi(
   private def threadMsgsFor(threadId: MsgThread.Id, me: User, before: Option[DateTime]): Fu[List[Msg]] =
     colls.msg
       .find(
-        $doc("tid" -> threadId, "del" $ne me.id) ++ before.?? { b =>
-          $doc("date" $lt b)
+        $doc("tid" -> threadId, "del" `$ne` me.id) ++ before.so { b =>
+          $doc("date" `$lt` b)
         },
         msgProjection
       )
-      .sort($sort desc "date")
+      .sort($sort `desc` "date")
       .cursor[Msg]()
       .list(msgsPerPage.value)
 
   private def setReadBy(threadId: MsgThread.Id, me: User, contactId: User.ID): Funit =
     colls.thread.updateField(
       $id(threadId) ++ $doc(
-        "lastMsg.user" $ne me.id,
+        "lastMsg.user" `$ne` me.id,
         "lastMsg.read" -> false
       ),
       "lastMsg.read",
       true
     ) flatMap { res =>
-      (res.nModified > 0) ?? notifier.onRead(threadId, me.id, contactId)
+      (res.nModified > 0) so notifier.onRead(threadId, me.id, contactId)
     }
 
-  def allMessagesOf(userId: User.ID): Source[(String, DateTime), _] =
+  def allMessagesOf(userId: User.ID): Source[(String, DateTime), ?] =
     colls.thread
       .aggregateWith[Bdoc](
         readPreference = ReadPreference.secondaryPreferred

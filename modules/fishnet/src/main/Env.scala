@@ -3,7 +3,7 @@ package lila.fishnet
 import akka.actor._
 import com.softwaremill.macwire._
 import io.lettuce.core._
-import io.methvin.play.autoconfig._
+import lila.common.autoconfig.{ AutoConfig, ConfigName }
 import play.api.Configuration
 
 import lila.common.Bus
@@ -40,12 +40,12 @@ final class Env(
     scheduler: akka.actor.Scheduler
 ) {
 
-  private val config = appConfig.get[FishnetConfig]("fishnet")(AutoConfig.loader)
+  private val config = appConfig.get[FishnetConfig]("fishnet")(using AutoConfig.loader)
 
   private lazy val analysisColl = db(config.analysisColl)
 
   private lazy val redis = new FishnetRedis(
-    RedisClient create RedisURI.create(config.redisUri),
+    RedisClient `create` RedisURI.create(config.redisUri),
     "fishnet-in",
     "fishnet-out",
     shutdown
@@ -98,15 +98,15 @@ final class Env(
           analyser(
             gameId,
             Work.Sender(userId = lila.user.User.playstrategyId, ip = none, mod = false, system = true)
-          ).unit
-        case req: lila.hub.actorApi.fishnet.StudyChapterRequest => analyser.study(req).unit
+          ).discard
+        case req: lila.hub.actorApi.fishnet.StudyChapterRequest => analyser.study(req).discard
       }
     }),
     name = config.actorName
   )
 
   private def disable(username: String) =
-    repo toKey username flatMap { repo.enableClient(_, v = false) }
+    repo `toKey` username flatMap { repo.enableClient(_, v = false) }
 
   def cli =
     new lila.common.Cli {
@@ -118,16 +118,16 @@ final class Env(
             s"Created key: ${client.key.value} for: $userId"
           }
         case "fishnet" :: "client" :: "delete" :: key :: Nil =>
-          repo toKey key flatMap repo.deleteClient inject "done!"
+          repo `toKey` key flatMap repo.deleteClient inject "done!"
         case "fishnet" :: "client" :: "enable" :: key :: Nil =>
-          repo toKey key flatMap { repo.enableClient(_, v = true) } inject "done!"
+          repo `toKey` key flatMap { repo.enableClient(_, v = true) } inject "done!"
         case "fishnet" :: "client" :: "disable" :: key :: Nil => disable(key) inject "done!"
       }
     }
 
   Bus.subscribeFun("adjustCheater", "adjustBooster", "shadowban") {
-    case lila.hub.actorApi.mod.MarkCheater(userId, true) => disable(userId).unit
-    case lila.hub.actorApi.mod.MarkBooster(userId)       => disable(userId).unit
-    case lila.hub.actorApi.mod.Shadowban(userId, true)   => disable(userId).unit
+    case lila.hub.actorApi.mod.MarkCheater(userId, true) => disable(userId).discard
+    case lila.hub.actorApi.mod.MarkBooster(userId)       => disable(userId).discard
+    case lila.hub.actorApi.mod.Shadowban(userId, true)   => disable(userId).discard
   }
 }

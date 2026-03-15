@@ -8,9 +8,7 @@ import lila.app.ui.ScalatagsTemplate._
 import lila.challenge.Challenge
 import lila.common.String.html.safeJsonValue
 import strategygames.GameFamily
-import strategygames.format.FEN
 
-import controllers.routes
 
 object bits {
 
@@ -72,7 +70,7 @@ object bits {
         modeName(c.mode)
       )
     ),
-    c.isMultiMatch option div(cls := "multi-match")(
+    c.isMultiMatch `option` div(cls := "multi-match")(
       trans.multiMatchChallenge(),
       " ",
       trans.multiMatchDefinition()

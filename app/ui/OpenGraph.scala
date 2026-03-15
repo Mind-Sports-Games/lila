@@ -26,7 +26,7 @@ case class OpenGraph(
         content := value
       )
 
-    private val tupledTag = (tag _).tupled
+    private val tupledTag = (tag).tupled
 
     def frags: List[Frag] =
       List(
@@ -48,7 +48,7 @@ case class OpenGraph(
         content := value
       )
 
-    private val tupledTag = (tag _).tupled
+    private val tupledTag = (tag).tupled
 
     def frags: List[Frag] =
       List(

@@ -17,7 +17,7 @@ final class Env(
     appConfig: Configuration,
     ws: StandaloneWSClient,
     net: NetConfig,
-    captcher: lila.hub.actors.Captcher,
+    @annotation.nowarn("msg=unused") _captcher: lila.hub.actors.Captcher,
     userRepo: UserRepo,
     authenticator: Authenticator,
     slack: lila.irc.SlackApi,
@@ -33,8 +33,10 @@ final class Env(
     scheduler: Scheduler
 ) {
   import net.{ baseUrl, domain }
+  implicit private val netDomain: NetDomain = domain
+  implicit private val netBaseUrl: BaseUrl = baseUrl
 
-  private val config = appConfig.get[SecurityConfig]("security")(SecurityConfig.loader)
+  private val config = appConfig.get[SecurityConfig]("security")(using SecurityConfig.loader)
 
   private def hcaptchaPublicConfig = config.hcaptcha.public
 
@@ -76,7 +78,7 @@ final class Env(
 
   lazy val garbageCollector = {
     def mk: (() => Boolean) => GarbageCollector = isArmed => wire[GarbageCollector]
-    mk(ugcArmedSetting.get _)
+    mk((() => ugcArmedSetting.get()))
   }
 
   lazy val mailerSecondaryPermilleSetting = settingStore[Int](
@@ -146,7 +148,7 @@ final class Env(
     text = "Spam keywords separated by a comma".some
   )
 
-  lazy val spam = new Spam(spamKeywordsSetting.get _)
+  lazy val spam = new Spam((() => spamKeywordsSetting.get()))
 
   lazy val promotion = wire[PromotionApi]
 
@@ -163,7 +165,7 @@ final class Env(
   lazy val tor: Tor = wire[Tor]
 
   if (config.tor.enabled) {
-    scheduler.scheduleOnce(31 seconds)(tor.refresh.unit)
+    scheduler.scheduleOnce(31 seconds)(tor.refresh.discard)
     scheduler.scheduleWithFixedDelay(config.tor.refreshDelay, config.tor.refreshDelay) { () =>
       tor.refresh flatMap firewall.unblockIps
       ()
@@ -179,6 +181,6 @@ final class Env(
   def cli = wire[Cli]
 
   lila.common.Bus.subscribeFun("fishnet") { case lila.hub.actorApi.fishnet.NewKey(userId, key) =>
-    automaticEmail.onFishnetKey(userId, key).unit
+    automaticEmail.onFishnetKey(userId, key).discard
   }
 }

@@ -28,7 +28,7 @@ case class Glicko(
     }
   def provisional          = deviation >= Glicko.provisionalDeviation
   def established          = !provisional
-  def establishedIntRating = established option intRating
+  def establishedIntRating = established `option` intRating
 
   def clueless = deviation >= Glicko.cluelessDeviation
 
@@ -44,9 +44,9 @@ case class Glicko(
 
   def cap =
     copy(
-      rating = rating atLeast Glicko.minRating,
-      deviation = deviation atLeast Glicko.minDeviation atMost Glicko.maxDeviation,
-      volatility = volatility atMost Glicko.maxVolatility
+      rating = rating `atLeast` Glicko.minRating,
+      deviation = deviation `atLeast` Glicko.minDeviation `atMost` Glicko.maxDeviation,
+      volatility = volatility `atMost` Glicko.maxVolatility
     )
 
   def average(other: Glicko, weight: Float = 0.5f) =
@@ -59,7 +59,7 @@ case class Glicko(
         volatility = volatility * (1 - weight) + other.volatility * weight
       )
 
-  def display = s"$intRating${provisional ?? "?"}"
+  def display = s"$intRating${provisional so "?"}"
 
   override def toString = f"$intRating/$intDeviation/${volatility}%.3f"
 }
@@ -97,15 +97,15 @@ case object Glicko {
 
   def liveDeviation(p: Perf, reverse: Boolean): Double = {
     system.previewDeviation(p.toRating, new DateTime, reverse)
-  } atLeast minDeviation atMost maxDeviation
+  } `atLeast` minDeviation `atMost` maxDeviation
 
   implicit val glickoBSONHandler: BSON[Glicko] = new BSON[Glicko] {
 
     def reads(r: BSON.Reader): Glicko =
       Glicko(
-        rating = r double "r",
-        deviation = r double "d",
-        volatility = r double "v"
+        rating = r `double` "r",
+        deviation = r `double` "d",
+        volatility = r `double` "v"
       )
 
     def writes(w: BSON.Writer, o: Glicko) =

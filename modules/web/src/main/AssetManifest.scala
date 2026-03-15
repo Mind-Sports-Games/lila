@@ -3,10 +3,10 @@ package lila.web
 import play.api.Environment
 import play.api.libs.ws.StandaloneWSClient
 import play.api.libs.ws.JsonBodyReadables._
-import play.api.libs.json.{ JsObject, JsString, JsValue, Json }
+import play.api.libs.json.{ JsObject, JsValue, Json }
 import play.api.Mode
 
-import java.nio.file.{ Files, Path, Paths }
+import java.nio.file.Files
 import java.time.Instant
 
 import lila.common.AssetVersion
@@ -32,7 +32,7 @@ final class AssetManifest(val environment: Environment, net: NetConfig)(implicit
   def js(key: String): Option[SplitAsset]    = maps.js.get(key)
   def css(key: String): Option[String]       = maps.css.get(key)
   def hashed(path: String): Option[String]   = maps.hashed.get(path)
-  def deps(keys: List[String]): List[String] = keys.flatMap { key => js(key).??(_.imports) }.distinct
+  def deps(keys: List[String]): List[String] = keys.flatMap { key => js(key).so(_.imports) }.distinct
   def lastUpdate: Instant                    = lastModified
 
   def update(): Unit =
@@ -51,12 +51,13 @@ final class AssetManifest(val environment: Environment, net: NetConfig)(implicit
           maps = readMaps(Json.parse(Files.newInputStream(pathname)))
           lastModified = current
         }
-      } catch {
+      }
+      catch {
         case e: Throwable => logger.error(s"Error reading $pathname", e)
       }
     }
 
-  private val keyRe = """^(?!common\.)(\S+)\.([A-Z0-9]{8})\.(?:js|css)""".r
+  private val keyRe = """^(?!common\.)(\S+)\([A-Z0-9]{8})\(?:js|css)""".r
   private def keyOf(fullName: String): String =
     fullName match {
       case keyRe(k, _) => k
@@ -89,7 +90,7 @@ final class AssetManifest(val environment: Environment, net: NetConfig)(implicit
           val imports = (value \ "imports").asOpt[List[String]].getOrElse(Nil)
           (k, SplitAsset(name, imports))
         }
-      }
+    }
       .toMap
     val js = splits.map {
       case (k, asset) => {
@@ -105,7 +106,7 @@ final class AssetManifest(val environment: Environment, net: NetConfig)(implicit
           val hash = (asset \ "hash").as[String]
           (k, s"$k.$hash.css")
         }
-      }
+    }
       .toMap
     val hashed = (manifest \ "hashed")
       .as[JsObject]
@@ -120,7 +121,7 @@ final class AssetManifest(val environment: Environment, net: NetConfig)(implicit
             else s"${name.slice(0, extPos)}.$hash${name.substring(extPos)}"
           (k, s"hashed/$hashedName")
         }
-      }
+    }
       .toMap
     AssetMaps(js, css, hashed)
   }
@@ -136,7 +137,7 @@ final class AssetManifest(val environment: Environment, net: NetConfig)(implicit
           logger.error(s"${res.status} fetching $resource")
           none
         }
-      }
+    }
       .recoverWith { case e: Exception =>
         logger.error(s"fetching $resource", e)
         fuccess(none)

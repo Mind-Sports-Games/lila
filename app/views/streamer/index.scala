@@ -1,6 +1,5 @@
 package views.html.streamer
 
-import controllers.routes
 
 import lila.api.Context
 import lila.app.templating.Environment._
@@ -26,7 +25,7 @@ object index {
         if (requests) a(href := s"${routes.Streamer.edit}?u=${s.user.username}", cls := "overlay")
         else
           bits.redirectLink(s.user.username, stream.isDefined.some)(cls := "overlay"),
-        stream.isDefined option span(cls := "ribbon")(span(trans.streamer.live())),
+        stream.isDefined `option` span(cls := "ribbon")(span(trans.streamer.live())),
         bits.pic(s.streamer, s.user),
         div(cls := "overview")(
           h1(dataIcon := "")(titleTag(s.user.title), s.streamer.name),
@@ -64,16 +63,16 @@ object index {
       moreJs = infiniteScrollTag
     ) {
       main(cls := "page-menu")(
-        bits.menu(if (requests) "requests" else "index", none)(ctx)(cls := " page-menu__menu"),
+        bits.menu(if (requests) "requests" else "index", none)(using ctx)(cls := " page-menu__menu"),
         div(cls := "page-menu__content box streamer-list")(
           h1(dataIcon := "", cls := "text")(title),
-          !requests option div(cls := "list live")(
+          !requests `option` div(cls := "list live")(
             live.map { s =>
               st.article(cls := "streamer")(widget(s.withoutStream, s.stream))
             }
           ),
           div(cls := "list infinite-scroll")(
-            (live.size % 2 == 1) option div(cls := "none"),
+            (live.size % 2 == 1) `option` div(cls := "none"),
             pager.currentPageResults.map { s =>
               st.article(cls := "streamer paginated", dataDedup := s.streamer.id.value)(widget(s, none))
             },

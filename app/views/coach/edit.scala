@@ -1,15 +1,6 @@
 package views.html.coach
 
-import play.api.data.Form
-import play.api.libs.json.Json
 
-import lila.api.Context
-import lila.app.templating.Environment._
-import lila.i18n.LangList
-import lila.app.ui.ScalatagsTemplate._
-import lila.common.String.html.{ richText, safeJsonValue }
-
-import controllers.routes
 
 object edit {
   /*

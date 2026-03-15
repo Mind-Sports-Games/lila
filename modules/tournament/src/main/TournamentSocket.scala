@@ -8,7 +8,6 @@ import scala.concurrent.Promise
 import play.api.libs.json.JsObject
 
 import lila.chat.Chat
-import lila.common.LightUser
 import lila.game.Game
 import lila.hub.LateMultiThrottler
 import lila.room.RoomSocket.{ Protocol => RP, _ }
@@ -20,7 +19,7 @@ final private class TournamentSocket(
     repo: TournamentRepo,
     remoteSocketApi: lila.socket.RemoteSocket,
     chat: lila.chat.ChatApi,
-    lightUserApi: lila.user.LightUserApi
+    @annotation.nowarn("msg=unused") _lightUserApi: lila.user.LightUserApi
 )(implicit
     ec: scala.concurrent.ExecutionContext,
     system: ActorSystem,
@@ -46,7 +45,7 @@ final private class TournamentSocket(
       player.userId foreach { userId =>
         send(
           RP.Out
-            .tellRoomUser(RoomId(tourId), userId, makeMessage("redirect", game fullIdOf player.playerIndex))
+            .tellRoomUser(RoomId(tourId), userId, makeMessage("redirect", game `fullIdOf` player.playerIndex))
         )
       }
     }
@@ -57,21 +56,21 @@ final private class TournamentSocket(
     send(RP.Out.tellRoom(RoomId(tourId), makeMessage("newVariant", variantName)))
 
   def getWaitingUsers(tour: Tournament): Fu[WaitingUsers] = {
-    send(Protocol.Out.getWaitingUsers(RoomId(tour.id), tour.name()(lila.i18n.defaultLang)))
+    send(Protocol.Out.getWaitingUsers(RoomId(tour.id), tour.name()(using lila.i18n.defaultLang)))
     val promise = Promise[WaitingUsers]()
     allWaitingUsers.compute(
       tour.id,
       (_: Tournament.ID, cur: WaitingUsers.WithNext) =>
-        Option(cur).getOrElse(WaitingUsers emptyWithNext tour.clock).copy(next = promise.some)
+        Option(cur).getOrElse(WaitingUsers `emptyWithNext` tour.clock).copy(next = promise.some)
     )
-    promise.future.withTimeout(2.seconds, lila.base.LilaException("getWaitingUsers timeout"))
+    promise.future.withTimeout(2.seconds, "getWaitingUsers timeout")
   }
 
   def hasUser(tourId: Tournament.ID, userId: User.ID): Boolean =
-    Option(allWaitingUsers.get(tourId)).exists(_.waiting hasUser userId)
+    Option(allWaitingUsers.get(tourId)).exists(_.waiting `hasUser` userId)
 
   def finish(tourId: Tournament.ID): Unit = {
-    allWaitingUsers remove tourId
+    allWaitingUsers `remove` tourId
     reload(tourId)
   }
 
@@ -87,12 +86,12 @@ final private class TournamentSocket(
       roomId => _.Tournament(roomId.value).some,
       chatBusChan = _.Tournament,
       localTimeout = Some { (roomId, modId, _) =>
-        repo.fetchCreatedBy(roomId.value).map(_ has modId)
+        repo.fetchCreatedBy(roomId.value).map(_.contains(modId))
       }
     )
 
   private lazy val tourHandler: Handler = { case Protocol.In.WaitingUsers(roomId, users) =>
-    allWaitingUsers
+    val _ = allWaitingUsers
       .computeIfPresent(
         roomId.value,
         (_: Tournament.ID, cur: WaitingUsers.WithNext) => {
@@ -101,14 +100,13 @@ final private class TournamentSocket(
           WaitingUsers.WithNext(newWaiting, none)
         }
       )
-      .unit
   }
 
-  private lazy val send: String => Unit = remoteSocketApi.makeSender("tour-out").apply _
+  private lazy val send: String => Unit = remoteSocketApi.makeSender("tour-out").apply
 
   remoteSocketApi.subscribe("tour-in", Protocol.In.reader)(
     tourHandler orElse handler orElse remoteSocketApi.baseHandler
-  ) >>- send(P.Out.boot)
+  ).andDo(send(P.Out.boot))
 
   object Protocol {
 
@@ -135,5 +133,5 @@ final private class TournamentSocket(
 
   def systemChat(tourId: Tournament.ID, text: String, volatile: Boolean = false): Unit =
     chat.userChat.service(Chat.Id(tourId), text, _.Tournament, volatile)
-
 }
+

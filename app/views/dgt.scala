@@ -1,7 +1,5 @@
 package views.html
 
-import controllers.routes
-import scala.util.chaining._
 
 import lila.api.Context
 import lila.app.templating.Environment._

@@ -6,8 +6,8 @@ import strategygames.format.pgn.{ Tag, TagType }
 import org.joda.time.DateTime
 import org.joda.time.format.DateTimeFormat
 import play.api.libs.json._
-import scala.concurrent.duration._
 
+import lila.common.extensions.*
 import lila.hub.LateMultiThrottler
 import lila.search._
 import lila.study.{ Chapter, ChapterRepo, RootOrNode, Study, StudyRepo }
@@ -26,16 +26,16 @@ final class StudySearchApi(
 
   def search(query: Query, from: From, size: Size) =
     client.search(query, from, size) flatMap { res =>
-      studyRepo byOrderedIds res.ids.map(Study.Id.apply)
+      studyRepo `byOrderedIds` res.ids.map(Study.Id.apply)
     }
 
-  def count(query: Query) = client.count(query) dmap (_.count)
+  def count(query: Query) = client.count(query) `dmap` (_.count)
 
   def store(study: Study) =
     fuccess {
       indexThrottler ! LateMultiThrottler.work(
         id = study.id.value,
-        run = studyRepo byId study.id flatMap { _ ?? doStore },
+        run = studyRepo `byId` study.id flatMap { _ so doStore },
         delay = 30.seconds.some
       )
     }
@@ -77,17 +77,16 @@ final class StudySearchApi(
     Tag.Annotator
   )
 
-  private def chapterText(c: Chapter): List[String] = {
+  private def chapterText(c: Chapter): List[String] =
     nodeText(c.root) :: c.tags.value.collect {
       case Tag(name, value) if relevantPgnTags.contains(name) => value
     } ::: extraText(c)
-  }
 
   private def extraText(c: Chapter): List[String] =
     List(
-      c.isPractice option "practice",
-      c.isConceal option "conceal puzzle",
-      c.isGamebook option "lesson",
+      c.isPractice `option` "practice",
+      c.isConceal `option` "conceal puzzle",
+      c.isGamebook `option` "lesson",
       c.description
     ).flatten
 
@@ -126,14 +125,14 @@ final class StudySearchApi(
             .futureSource {
               studyRepo
                 .sortedCursor(
-                  $doc("createdAt" $gte since),
-                  sort = $sort asc "createdAt"
+                  $doc("createdAt" `$gte` since),
+                  sort = $sort `asc` "createdAt"
                 )
                 .map(_.documentSource())
-            }
+          }
             .via(lila.common.LilaStream.logRate[Study]("study index")(logger))
             .mapAsyncUnordered(8) { study =>
-              lila.common.Future.retry(() => doStore(study), 5 seconds, 10, retryLogger.some)
+              lila.common.LilaFuture.retry(() => doStore(study), 5 seconds, 10, retryLogger.some)
             }
             .toMat(Sink.ignore)(Keep.right)
             .run()
@@ -143,7 +142,7 @@ final class StudySearchApi(
 
   private def parseDate(str: String): Option[DateTime] = {
     val datePattern   = "yyyy-MM-dd"
-    val dateFormatter = DateTimeFormat forPattern datePattern
-    scala.util.Try(dateFormatter parseDateTime str).toOption
+    val dateFormatter = DateTimeFormat `forPattern` datePattern
+    scala.util.Try(dateFormatter `parseDateTime` str).toOption
   }
 }

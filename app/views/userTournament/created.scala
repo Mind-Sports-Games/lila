@@ -7,7 +7,6 @@ import lila.app.ui.ScalatagsTemplate._
 import lila.common.paginator.Paginator
 import lila.user.User
 
-import controllers.routes
 
 object created {
 
@@ -40,7 +39,7 @@ object created {
                   views.html.tournament.finishedList.header(t),
                   td(momentFromNow(t.startsAt)),
                   td(cls := "winner")(
-                    t.winnerId.isDefined option userIdLink(t.winnerId, withOnline = false)
+                    t.winnerId.isDefined `option` userIdLink(t.winnerId, withOnline = false)
                   ),
                   td(cls := "text", dataIcon := "r")(t.nbPlayers.localize)
                 )

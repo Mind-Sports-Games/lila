@@ -1,14 +1,7 @@
 package views.html
 package coach
 
-import controllers.routes
-import play.api.i18n.Lang
 
-import lila.api.Context
-import lila.app.templating.Environment._
-import lila.app.ui.ScalatagsTemplate._
-import lila.common.paginator.Paginator
-import lila.i18n.LangList
 
 object index {
   /*

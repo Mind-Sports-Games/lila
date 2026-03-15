@@ -12,11 +12,11 @@ object embed {
   def apply(title: String, cssModule: String)(body: Modifier*)(implicit config: EmbedConfig) =
     frag(
       layout.bits.doctype,
-      layout.bits.htmlTag(config.lang)(
+      layout.bits.htmlTag(using config.lang)(
         head(
           layout.bits.charset,
           layout.bits.viewport,
-          layout.bits.metaCsp(basicCsp withNonce config.nonce),
+          layout.bits.metaCsp(basicCsp `withNonce` config.nonce),
           st.headTitle(title),
           config.pieceSets.map(ps => layout.bits.pieceSprite(ps)),
           cssTagWithTheme(cssModule, config.bg),

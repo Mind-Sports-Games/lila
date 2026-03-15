@@ -99,9 +99,9 @@ object Sheet {
       val streaks = streakable == Streaks
       val nexts   = (pairings drop 1 map some) :+ None
       pairings.zip(nexts).foldLeft(List.empty[Score]) { case (scores, (p, n)) =>
-        val berserk = if (p berserkOf userId) {
+        val berserk = if (p `berserkOf` userId)
           if (p.notSoQuickFinish) ValidBerserk else InvalidBerserk
-        } else NoBerserk
+        else NoBerserk
         val statusScoreWin = (statusScoring, p.status) match {
           case (true, BackgammonWin | ResignBackgammon | GinBackgammon | OutoftimeBackgammon) =>
             SSBackgammon
@@ -142,7 +142,7 @@ object Sheet {
   private val v2date = new DateTime(2020, 4, 21, 0, 0, 0)
 
   def versionOf(date: DateTime) =
-    if (date isBefore v2date) V1 else V2
+    if (date `isBefore` v2date) V1 else V2
 
   private def isOnFire(scores: List[Score]) =
     scores.headOption.exists(_.res == ResWin) &&

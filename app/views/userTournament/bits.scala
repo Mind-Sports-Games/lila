@@ -7,7 +7,6 @@ import lila.app.ui.ScalatagsTemplate._
 import lila.common.paginator.Paginator
 import lila.user.User
 
-import controllers.routes
 
 object bits {
 
@@ -56,7 +55,7 @@ object bits {
           a(cls := path.active("created"), href := routes.UserTournament.path(u.username, "created"))(
             "Created"
           ),
-          ctx.is(u) option
+          ctx.is(u) `option`
             a(cls := path.active("upcoming"), href := routes.UserTournament.path(u.username, "upcoming"))(
               "Upcoming"
             ),

@@ -14,7 +14,7 @@ final class ExpireCallbackMemo(ttl: FiniteDuration, callback: String => Unit)(im
 
   @inline private def isNotNull[A](a: A) = a != null
 
-  def get(key: String): Boolean = isNotNull(cache.underlying getIfPresent key)
+  def get(key: String): Boolean = isNotNull(cache.underlying `getIfPresent` key)
 
   def put(key: String) = cache.put(key, true)
 

@@ -2,6 +2,7 @@ package lila.puzzle
 
 import scala.concurrent.ExecutionContext
 
+import lila.common.extensions.*
 import lila.db.dsl._
 import lila.user.User
 
@@ -12,7 +13,7 @@ final class PuzzleBatch(colls: PuzzleColls, anonApi: PuzzleAnon, pathApi: Puzzle
 
   import BsonHandlers._
 
-  def nextFor(user: Option[User], nb: Int): Fu[Vector[Puzzle]] = (nb > 0) ?? {
+  def nextFor(user: Option[User], nb: Int): Fu[Vector[Puzzle]] = (nb > 0) so {
     user match {
       case None => anonApi.getBatchFor(nb)
       case Some(user) =>
@@ -27,12 +28,13 @@ final class PuzzleBatch(colls: PuzzleColls, anonApi: PuzzleAnon, pathApi: Puzzle
             tier,
             PuzzleDifficulty.Normal,
             Set.empty
-          ) orFail
+          ) `orFail`
             s"No puzzle path for ${user.id} $tier" flatMap { pathId =>
               colls.path {
-                _.aggregateList(nb) { framework =>
+                _.aggregateWith[Bdoc]() { framework =>
                   import framework._
-                  Match($id(pathId)) -> List(
+                  List(
+                    Match($id(pathId)),
                     Project($doc("puzzleId" -> "$ids", "_id" -> false)),
                     Unwind("puzzleId"),
                     Sample(nb),
@@ -52,7 +54,9 @@ final class PuzzleBatch(colls: PuzzleColls, anonApi: PuzzleAnon, pathApi: Puzzle
                       )
                     )
                   )
-                }.map {
+                }
+                  .collect[List](maxDocs = nb)
+                  .map {
                   _.view.flatMap(PuzzleBSONReader.readOpt).toVector
                 }
               }

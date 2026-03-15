@@ -3,13 +3,11 @@ package controllers
 import play.api.mvc._
 
 import lila.api.Context
-import lila.app._
+import lila.app.*
 import views._
 import lila.pref.PieceSet
 import lila.pref.Theme
 import lila.pref.JsonView._
-import scala.concurrent.{ Future }
-import strategygames.{ GameFamily }
 
 import play.api.libs.json._
 
@@ -34,7 +32,7 @@ final class Pref(env: Env) extends LilaController(env) {
       lila.pref.PrefCateg(categSlug) match {
         case None => notFound
         case Some(categ) =>
-          Ok(html.account.pref(me, forms prefOf ctx.pref, categ)).fuccess
+          Ok(html.account.pref(me, forms `prefOf` ctx.pref, categ)).fuccess
       }
     }
 
@@ -62,7 +60,7 @@ final class Pref(env: Env) extends LilaController(env) {
         Ok.withCookies(env.lilaCookie.session("zoom2", (getInt("v") | 185).toString)).fuccess
       } else {
         implicit val req = ctx.body
-        (setters get name) ?? { case (form, fn) =>
+        (setters get name) so { case (form, fn) =>
           FormResult(form) { v =>
             fn(v, ctx) map { cookie =>
               Ok(()).withCookies(cookie)
@@ -93,44 +91,44 @@ final class Pref(env: Env) extends LilaController(env) {
     }
 
   private lazy val setters = Map(
-    "theme3d"    -> (forms.theme3d    -> save("theme3d") _),
-    "pieceSet3d" -> (forms.pieceSet3d -> save("pieceSet3d") _),
-    "soundSet"   -> (forms.soundSet   -> save("soundSet") _),
-    "bg"         -> (forms.bg         -> save("bg") _),
-    "bgImg"      -> (forms.bgImg      -> save("bgImg") _),
-    "color"      -> (forms.color      -> save("color") _),
-    "is3d"       -> (forms.is3d       -> save("is3d") _),
-    "zen"        -> (forms.zen        -> save("zen") _)
+    "theme3d"    -> (forms.theme3d    -> save("theme3d")),
+    "pieceSet3d" -> (forms.pieceSet3d -> save("pieceSet3d")),
+    "soundSet"   -> (forms.soundSet   -> save("soundSet")),
+    "bg"         -> (forms.bg         -> save("bg")),
+    "bgImg"      -> (forms.bgImg      -> save("bgImg")),
+    "color"      -> (forms.color      -> save("color")),
+    "is3d"       -> (forms.is3d       -> save("is3d")),
+    "zen"        -> (forms.zen        -> save("zen"))
   )
 
   private def updatePieceSetForFamily(gameFamily: String, value: String, ctx: Context): Fu[Cookie] =
     ctx.me match {
       case Some(u) =>
-        api.updatePrefPieceSet(u, gameFamily, value).map(j => env.lilaCookie.session("pieceSet", j)(ctx.req))
+        api.updatePrefPieceSet(u, gameFamily, value).map(j => env.lilaCookie.session("pieceSet", j)(using ctx.req))
       case _ => //get PieceSet pref from session and update the cookie
         val currentPS = ctx.req.session
           .get("pieceSet")
-          .fold(PieceSet.defaults)(p => Json.parse(p).validate(pieceSetsRead).getOrElse(PieceSet.defaults))
+          .fold(PieceSet.defaults)(p => Json.parse(p).validate(using pieceSetsRead).getOrElse(PieceSet.defaults))
         val newPS = PieceSet.updatePieceSet(currentPS, value)
         val j     = Json.toJson(newPS).toString
-        fuccess(env.lilaCookie.session("pieceSet", j)(ctx.req))
+        fuccess(env.lilaCookie.session("pieceSet", j)(using ctx.req))
     }
 
   private def updateThemeForFamily(gameFamily: String, value: String, ctx: Context): Fu[Cookie] =
     ctx.me match {
       case Some(u) =>
-        api.updatePrefTheme(u, gameFamily, value).map(j => env.lilaCookie.session("theme", j)(ctx.req))
+        api.updatePrefTheme(u, gameFamily, value).map(j => env.lilaCookie.session("theme", j)(using ctx.req))
       case _ => //get Theme pref from session and update the cookie
         val currentT = ctx.req.session
           .get("theme")
-          .fold(Theme.defaults)(p => Json.parse(p).validate(themesRead).getOrElse(Theme.defaults))
+          .fold(Theme.defaults)(p => Json.parse(p).validate(using themesRead).getOrElse(Theme.defaults))
         val newT = Theme.updateBoardTheme(currentT, value, gameFamily)
         val j    = Json.toJson(newT).toString
-        fuccess(env.lilaCookie.session("theme", j)(ctx.req))
+        fuccess(env.lilaCookie.session("theme", j)(using ctx.req))
     }
 
   private def save(name: String)(value: String, ctx: Context): Fu[Cookie] =
-    ctx.me ?? {
+    ctx.me so {
       api.setPrefString(_, name, value)
-    } inject env.lilaCookie.session(name, value)(ctx.req)
+    } inject env.lilaCookie.session(name, value)(using ctx.req)
 }

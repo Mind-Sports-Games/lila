@@ -24,16 +24,16 @@ final class ChapterRepo(val coll: AsyncColl)(implicit
 
   def deleteByStudy(s: Study): Funit = coll(_.delete.one($studyId(s.id))).void
 
-  def deleteByStudyIds(ids: List[Study.Id]): Funit = coll(_.delete.one($doc("studyId" $in ids))).void
+  def deleteByStudyIds(ids: List[Study.Id]): Funit = coll(_.delete.one($doc("studyId" `$in` ids))).void
 
   def byIdAndStudy(id: Chapter.Id, studyId: Study.Id): Fu[Option[Chapter]] =
     coll(_.byId[Chapter, Chapter.Id](id)).dmap { _.filter(_.studyId == studyId) }
 
   def firstByStudy(studyId: Study.Id): Fu[Option[Chapter]] =
-    coll(_.find($studyId(studyId)).sort($sort asc "order").one[Chapter])
+    coll(_.find($studyId(studyId)).sort($sort `asc` "order").one[Chapter])
 
   def existsByStudy(studyId: Study.Id): Fu[Boolean] =
-    coll(_ exists $studyId(studyId))
+    coll(_ `exists` $studyId(studyId))
 
   private val metadataProjection =
     $doc(
@@ -46,16 +46,16 @@ final class ChapterRepo(val coll: AsyncColl)(implicit
   def orderedMetadataByStudy(studyId: Study.Id): Fu[List[Chapter.Metadata]] =
     coll {
       _.find($studyId(studyId), metadataProjection)
-        .sort($sort asc "order")
+        .sort($sort `asc` "order")
         .cursor[Chapter.Metadata]()
         .list()
     }
 
-  def orderedByStudySource(studyId: Study.Id): Source[Chapter, _] =
+  def orderedByStudySource(studyId: Study.Id): Source[Chapter, ?] =
     Source futureSource {
       coll map {
         _.find($studyId(studyId))
-          .sort($sort asc "order")
+          .sort($sort `asc` "order")
           .cursor[Chapter](readPreference = readPref)
           .documentSource()
       }
@@ -65,7 +65,7 @@ final class ChapterRepo(val coll: AsyncColl)(implicit
   def orderedByStudy(studyId: Study.Id): Fu[List[Chapter]] =
     coll {
       _.find($studyId(studyId))
-        .sort($sort asc "order")
+        .sort($sort `asc` "order")
         .cursor[Chapter]()
         .list()
     }
@@ -89,16 +89,15 @@ final class ChapterRepo(val coll: AsyncColl)(implicit
 
   def sort(study: Study, ids: List[Chapter.Id]): Funit =
     coll { c =>
-      ids.zipWithIndex
+      Future.sequence(ids.zipWithIndex
         .map { case (id, index) =>
           c.updateField($studyId(study.id) ++ $id(id), "order", index + 1)
-        }
-        .sequenceFu
+        })
         .void
     }
 
   def nextOrderByStudy(studyId: Study.Id): Fu[Int] =
-    coll(_.primitiveOne[Int]($studyId(studyId), $sort desc "order", "order")) dmap { ~_ + 1 }
+    coll(_.primitiveOne[Int]($studyId(studyId), $sort `desc` "order", "order")) dmap { _.getOrElse(0) + 1 }
 
   def setConceal(chapterId: Chapter.Id, conceal: Chapter.Ply) =
     coll(_.updateField($id(chapterId), "conceal", conceal)).void
@@ -118,21 +117,21 @@ final class ChapterRepo(val coll: AsyncColl)(implicit
   def setShapes(shapes: lila.tree.Node.Shapes)(implicit variant: Variant) = {
     val variantHandlers = VariantHandlers()
     import variantHandlers._
-    setNodeValue(Node.BsonFields.shapes, shapes.value.nonEmpty option shapes) _
+    setNodeValue(Node.BsonFields.shapes, shapes.value.nonEmpty `option` shapes)
   }
 
   def setComments(comments: lila.tree.Node.Comments) =
-    setNodeValue(Node.BsonFields.comments, comments.value.nonEmpty option comments) _
+    setNodeValue(Node.BsonFields.comments, comments.value.nonEmpty `option` comments)
 
   def setGamebook(gamebook: lila.tree.Node.Gamebook) =
-    setNodeValue(Node.BsonFields.gamebook, gamebook.nonEmpty option gamebook) _
+    setNodeValue(Node.BsonFields.gamebook, gamebook.nonEmpty `option` gamebook)
 
   def setGlyphs(glyphs: strategygames.format.pgn.Glyphs) =
-    setNodeValue(Node.BsonFields.glyphs, glyphs.nonEmpty) _
+    setNodeValue(Node.BsonFields.glyphs, glyphs.nonEmpty)
 
-  def setClock(clock: Option[Centis]) = setNodeValue(Node.BsonFields.clock, clock) _
+  def setClock(clock: Option[Centis]) = setNodeValue(Node.BsonFields.clock, clock)
 
-  def forceVariation(force: Boolean) = setNodeValue(Node.BsonFields.forceVariation, force option true) _
+  def forceVariation(force: Boolean) = setNodeValue(Node.BsonFields.forceVariation, force `option` true)
 
   // insert node and its children
   // and sets the parent order field
@@ -142,7 +141,7 @@ final class ChapterRepo(val coll: AsyncColl)(implicit
     val variantHandlers = VariantHandlers()
     import variantHandlers._
     val set = $doc(subTreeToBsonElements(parentPath, subTree)) ++ {
-      (newParent.children.nodes.sizeIs > 1) ?? $doc(
+      (newParent.children.nodes.sizeIs > 1) so $doc(
         pathToField(parentPath, Node.BsonFields.order) -> newParent.children.nodes.map(_.id)
       )
     }
@@ -154,7 +153,7 @@ final class ChapterRepo(val coll: AsyncColl)(implicit
   ): Vector[(String, Bdoc)] = {
     val variantHandlers = VariantHandlers()
     import variantHandlers._
-    (parentPath.depth < Node.maxPlies) ?? {
+    (parentPath.depth < Node.maxPlies) so {
       val path = parentPath + subTree
       subTree.children.nodes.flatMap(subTreeToBsonElements(path, _)) appended {
         path.toDbField -> writeNode(subTree)
@@ -167,7 +166,7 @@ final class ChapterRepo(val coll: AsyncColl)(implicit
     val variantHandlers = VariantHandlers()
     import variantHandlers._
     val set: Bdoc = {
-      (children.nodes.sizeIs > 1) ?? $doc(
+      (children.nodes.sizeIs > 1) so $doc(
         pathToField(path, Node.BsonFields.order) -> children.nodes.map(_.id)
       )
     } ++ $doc(childrenTreeToBsonElements(path, children))
@@ -180,7 +179,7 @@ final class ChapterRepo(val coll: AsyncColl)(implicit
   ): Vector[(String, Bdoc)] = {
     val variantHandlers = VariantHandlers()
     import variantHandlers._
-    (parentPath.depth < Node.maxPlies) ??
+    (parentPath.depth < Node.maxPlies) so
       children.nodes.flatMap { node =>
         val path = parentPath + node
         childrenTreeToBsonElements(path, node.children) appended (path.toDbField -> writeNode(node))
@@ -193,7 +192,7 @@ final class ChapterRepo(val coll: AsyncColl)(implicit
   )(chapter: Chapter, path: Path): Funit =
     coll {
       _.updateOrUnsetField(
-        $id(chapter.id) ++ $doc(path.toDbField $exists true),
+        $id(chapter.id) ++ $doc(path.toDbField `$exists` true),
         pathToField(path, field),
         value
       ).void
@@ -212,7 +211,7 @@ final class ChapterRepo(val coll: AsyncColl)(implicit
         coll {
           _.update
             .one(
-              $id(chapter.id) ++ $doc(path.toDbField $exists true),
+              $id(chapter.id) ++ $doc(path.toDbField `$exists` true),
               $set($doc(sets))
             )
             .void
@@ -226,12 +225,12 @@ final class ChapterRepo(val coll: AsyncColl)(implicit
       studyIds: Seq[Study.Id],
       nbChaptersPerStudy: Int
   ): Fu[Map[Study.Id, Vector[Chapter.IdName]]] =
-    studyIds.nonEmpty ?? coll(
+    studyIds.nonEmpty so coll(
       _.find(
-        $doc("studyId" $in studyIds),
+        $doc("studyId" `$in` studyIds),
         $doc("studyId" -> true, "_id" -> true, "name" -> true).some
       )
-        .sort($sort asc "order")
+        .sort($sort `asc` "order")
         .cursor[Bdoc]()
         .list(nbChaptersPerStudy * studyIds.size)
     )
@@ -241,7 +240,7 @@ final class ChapterRepo(val coll: AsyncColl)(implicit
             hash get studyId match {
               case Some(chapters) if chapters.sizeIs >= nbChaptersPerStudy => hash
               case maybe =>
-                val chapters = ~maybe
+                val chapters = maybe.getOrElse(Vector.empty)
                 hash + (studyId -> readIdName(doc).fold(chapters)(chapters :+ _))
             }
           }
@@ -254,11 +253,11 @@ final class ChapterRepo(val coll: AsyncColl)(implicit
         $studyId(studyId),
         $doc("_id" -> true, "name" -> true).some
       )
-        .sort($sort asc "order")
+        .sort($sort `asc` "order")
         .cursor[Bdoc](readPref)
         .list(Study.maxChapters * 2)
-    }
       .dmap { _ flatMap readIdName }
+    }
 
   private def readIdName(doc: Bdoc) =
     for {

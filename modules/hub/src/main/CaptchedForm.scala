@@ -2,14 +2,14 @@ package lila.hub
 
 import akka.pattern.ask
 import play.api.data._
-import scala.concurrent.duration._
+import lila.common.extensions.*
 
 import actorApi.captcha._
 import lila.common.Captcha
 
 trait CaptchedForm {
 
-  import makeTimeout.large
+  given akka.util.Timeout = makeTimeout.large
 
   type CaptchedData = {
     def gameId: String
@@ -27,9 +27,9 @@ trait CaptchedForm {
   def withCaptcha[A](form: Form[A])(implicit ec: scala.concurrent.ExecutionContext): Fu[(Form[A], Captcha)] =
     anyCaptcha map (form -> _)
 
-  import scala.language.reflectiveCalls
+  import scala.reflect.Selectable.reflectiveSelectable
   def validateCaptcha(data: CaptchedData) =
-    getCaptcha(data.gameId).await(2 seconds, "getCaptcha") valid data.move.trim.toLowerCase
+    getCaptcha(data.gameId).await(2 seconds, "getCaptcha").valid(data.move.trim.toLowerCase)
 
   def captchaFailMessage = Captcha.failMessage
 }

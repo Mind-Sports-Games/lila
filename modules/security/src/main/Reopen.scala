@@ -1,7 +1,6 @@
 package lila.security
 
 import play.api.i18n.Lang
-import scala.concurrent.duration._
 import scalatags.Text.all._
 
 import lila.common.config._
@@ -27,7 +26,7 @@ final class Reopen(
       case Some(_) =>
         fuccess(Left("emailUsed" -> "This email address is already in use by an active account."))
       case _ =>
-        val userId = User normalize username
+        val userId = User `normalize` username
         userRepo.byIdNotErased(userId) flatMap {
           case None =>
             fuccess(Left("noUser" -> "No account found with this username."))
@@ -51,10 +50,10 @@ final class Reopen(
     }
 
   def send(user: User, email: EmailAddress)(implicit lang: Lang): Funit =
-    tokener make user.id flatMap { token =>
+    tokener `make` user.id flatMap { token =>
       lila.mon.email.send.reopen.increment()
       val url = s"$baseUrl/account/reopen/login/$token"
-      mailer send Mailer.Message(
+      mailer `send` Mailer.Message(
         to = email,
         subject = s"Reopen your playstrategy.org account: ${user.username}",
         text = s"""
@@ -75,9 +74,9 @@ ${Mailer.txt.serviceNote}
     }
 
   def confirm(token: String): Fu[Option[User]] =
-    tokener read token flatMap { _ ?? userRepo.disabledById } flatMap {
-      _ ?? { user =>
-        userRepo reopen user.id inject user.some
+    tokener `read` token flatMap { _ so userRepo.disabledById } flatMap {
+      _ so { user =>
+        userRepo `reopen` user.id inject user.some
       }
     }
 

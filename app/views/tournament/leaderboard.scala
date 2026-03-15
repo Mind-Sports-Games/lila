@@ -8,7 +8,6 @@ import lila.app.ui.ScalatagsTemplate._
 import lila.rating.PerfType
 import lila.i18n.VariantKeys
 
-import controllers.routes
 
 import strategygames.variant.Variant
 

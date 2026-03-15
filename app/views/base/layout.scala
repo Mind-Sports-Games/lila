@@ -1,6 +1,5 @@
 package views.html.base
 
-import controllers.routes
 import play.api.i18n.Lang
 
 import lila.api.{ AnnounceStore, Context }
@@ -47,11 +46,13 @@ object layout {
     raw {
       s"""<link rel="preload" href="${assetUrl(
         s"font/playstrategy.woff2"
-      )}" as="font" type="font/woff2" crossorigin>""" +
-        !ctx.pref.pieceNotationIsLetter ??
-        s"""<link rel="preload" href="${assetUrl(
-          s"font/playstrategy.chess.woff2"
-        )}" as="font" type="font/woff2" crossorigin>"""
+      )}" as="font" type="font/woff2" crossorigin>""" + (
+        if (!ctx.pref.pieceNotationIsLetter)
+          s"""<link rel="preload" href="${assetUrl(
+            s"font/playstrategy.chess.woff2"
+          )}" as="font" type="font/woff2" crossorigin>"""
+        else ""
+      )
     }
   private val manifests = raw(
     """<link rel="manifest" href="/manifest.json"><meta name="twitter:site" content="@playstrategy">"""
@@ -158,9 +159,9 @@ object layout {
 
   private def loadScripts(moreJs: Frag, ground: Boolean)(implicit ctx: Context) =
     frag(
-      ground option chessgroundTag,
-      ground option draughtsgroundTag,
-      ctx.requiresFingerprint option fingerprintTag,
+      ground `option` chessgroundTag,
+      ground `option` draughtsgroundTag,
+      ctx.requiresFingerprint `option` fingerprintTag,
       ctx.nonce map playstrategyJsObject,
       frag(
         jsModule("manifest"),
@@ -171,7 +172,7 @@ object layout {
         jsModule("site")
       ),
       moreJs,
-      ctx.pageData.inquiry.isDefined option jsTag("inquiry.js")
+      ctx.pageData.inquiry.isDefined `option` jsTag("inquiry.js")
     )
 
   private val spaceRegex              = """\s{2,}+""".r
@@ -222,7 +223,7 @@ object layout {
 
     frag(
       doctype,
-      htmlTag(ctx.lang)(
+      htmlTag(using ctx.lang)(
         topComment,
         head(
           charset,
@@ -235,10 +236,10 @@ object layout {
             else s"[dev] ${fullTitle | s"$title • playstrategy.dev"}"
           },
           cssTag("site"),
-          ctx.pref.is3d option cssTag("board-3d"),
-          ctx.pageData.inquiry.isDefined option cssTagNoTheme("mod.inquiry"),
-          ctx.userContext.impersonatedBy.isDefined option cssTagNoTheme("mod.impersonate"),
-          ctx.blind option cssTagNoTheme("blind"),
+          ctx.pref.is3d `option` cssTag("board-3d"),
+          ctx.pageData.inquiry.isDefined `option` cssTagNoTheme("mod.inquiry"),
+          ctx.userContext.impersonatedBy.isDefined `option` cssTagNoTheme("mod.impersonate"),
+          ctx.blind `option` cssTagNoTheme("blind"),
           moreCss,
           pieceSprite,
           meta(
@@ -247,7 +248,7 @@ object layout {
           ),
           link(rel := "mask-icon", href := staticAssetUrl("logo/playstrategy.svg"), color := "black"),
           favicons,
-          !robots option raw("""<meta content="noindex, nofollow" name="robots">"""),
+          !robots `option` raw("""<meta content="noindex, nofollow" name="robots">"""),
           noTranslate,
           openGraph.map(_.frags),
           link(
@@ -256,7 +257,7 @@ object layout {
             rel := "alternate",
             st.title := trans.blog.txt()
           ),
-          ctx.currentBg == "transp" option ctx.pref.bgImgOrDefault map { img =>
+          ctx.currentBg == "transp" `option` ctx.pref.bgImgOrDefault map { img =>
             raw(
               s"""<style id="bg-data">body.transp::before{background-image:url("${escapeHtmlRaw(img)
                 .replace("&amp;", "&")}");}</style>"""
@@ -291,17 +292,17 @@ object layout {
           dataTheme := ctx.currentBg,
           dataSelectedColor := ctx.currentSelectedColorCls,
           dataAnnounce := AnnounceStore.get.map(a => safeJsonValue(a.json)),
-          style := zoomable option s"--zoom:${ctx.zoom}"
+          style := zoomable `option` s"--zoom:${ctx.zoom}"
         )(
           blindModeForm,
           ctx.pageData.inquiry map { views.html.mod.inquiry(_) },
-          ctx.me ifTrue ctx.userContext.impersonatedBy.isDefined map { views.html.mod.impersonate(_) },
-          netConfig.stageBanner option views.html.base.bits.stage,
+          ctx.me `ifTrue` ctx.userContext.impersonatedBy.isDefined map { views.html.mod.impersonate(_) },
+          netConfig.stageBanner `option` views.html.base.bits.stage,
           lila.security.EmailConfirm.cookie
             .get(ctx.req)
             .ifTrue(ctx.isAnon)
             .map(views.html.auth.bits.checkYourEmailBanner(_)),
-          playing option zenToggle,
+          playing `option` zenToggle,
           siteHeader(playing),
           div(
             id := "main-wrap",
@@ -311,7 +312,7 @@ object layout {
               "is3d"    -> ctx.pref.is3d
             )
           )(body),
-          ctx.me.exists(_.enabled) option div(
+          ctx.me.exists(_.enabled) `option` div(
             id := "friend_box",
             dataI18n := safeJsonValue(i18nJsObject(i18nKeys))
           )(
@@ -354,7 +355,7 @@ object layout {
         }
       }.some
       else
-        (isGranted(_.PublicChatView)) option
+        (isGranted(_.PublicChatView)) `option`
           a(
             cls := "link",
             title := "Moderation",
@@ -363,7 +364,7 @@ object layout {
           )
 
     private def teamRequests(implicit ctx: Context) =
-      ctx.teamNbRequests > 0 option
+      ctx.teamNbRequests > 0 `option`
         a(
           cls := "link data-count link-center",
           href := routes.Team.requests,
@@ -375,20 +376,20 @@ object layout {
     def apply(playing: Boolean)(implicit ctx: Context) =
       header(id := "top")(
         div(cls := "site-title-nav")(
-          !ctx.isAppealUser option topnavToggle,
+          !ctx.isAppealUser `option` topnavToggle,
           h1(cls := "site-title")(
             if (ctx.kid) span(title := trans.kidMode.txt(), cls := "kiddo")(":)")
-            else ctx.isBot option botImage,
+            else ctx.isBot `option` botImage,
             a(href := "/")(
               "playstrategy",
               span(if (netConfig.isProd) ".org" else ".dev")
             )
           ),
-          ctx.blind option h2("Navigation"),
-          !ctx.isAppealUser option topnav()
+          ctx.blind `option` h2("Navigation"),
+          !ctx.isAppealUser `option` topnav()
         ),
         div(cls := "site-buttons")(
-          !ctx.isAppealUser option clinput,
+          !ctx.isAppealUser `option` clinput,
           reports,
           teamRequests,
           if (ctx.isAppealUser)
@@ -398,7 +399,7 @@ object layout {
           else
             ctx.me map { me =>
               frag(allNotifications, dasher(me))
-            } getOrElse { !ctx.pageData.error option anonDasher(playing) }
+            } getOrElse { !ctx.pageData.error `option` anonDasher(playing) }
         )
       )
   }

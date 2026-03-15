@@ -27,27 +27,25 @@ final private class Cleaner(
 
   private def cleanAnalysis: Funit =
     analysisColl
-      .find($doc("acquired.date" $lt durationAgo(analysisTimeoutBase)))
-      .sort($sort desc "acquired.date")
+      .find($doc("acquired.date" `$lt` durationAgo(analysisTimeoutBase)))
+      .sort($sort `desc` "acquired.date")
       .cursor[Work.Analysis]()
       .documentSource()
       .filter { ana =>
-        ana.acquiredAt.??(_ isBefore durationAgo(analysisTimeout(ana.nbMoves)))
+        ana.acquiredAt.so(_ `isBefore` durationAgo(analysisTimeout(ana.nbMoves)))
       }
       .take(200)
       .mapAsyncUnordered(4) { ana =>
-        repo.updateOrGiveUpAnalysis(ana.timeout) >>-
-          logger.info(s"Timeout analysis $ana") >>-
-          ana.acquired.foreach { ack =>
+        repo.updateOrGiveUpAnalysis(ana.timeout).andDo(logger.info(s"Timeout analysis $ana")).andDo(ana.acquired.foreach { ack =>
             Monitor.timeout(ack.userId)
-          }
+          })
       }
       .toMat(Sink.ignore)(Keep.right)
       .run()
       .void
 
   system.scheduler.scheduleWithFixedDelay(15 seconds, 10 seconds) { () =>
-    cleanAnalysis.unit
+    cleanAnalysis.discard
   }
 }
 

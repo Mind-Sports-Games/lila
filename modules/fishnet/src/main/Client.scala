@@ -1,6 +1,5 @@
 package lila.fishnet
 
-import ornicar.scalalib.Random
 import com.gilt.gfc.semver.SemVer
 import lila.common.IpAddress
 import scala.util.{ Failure, Success, Try }
@@ -21,7 +20,7 @@ case class Client(
   def fullId = s"$userId:$key"
 
   def updateInstance(i: Client.Instance): Option[Client] =
-    instance.fold(i.some)(_ update i) map { newInstance =>
+    instance.fold(i.some)(_ `update` i) map { newInstance =>
       copy(instance = newInstance.some)
     }
 
@@ -59,10 +58,10 @@ object Client {
     def update(i: Instance): Option[Instance] =
       if (i.version != version) i.some
       else if (i.ip != ip) i.some
-      else if (i.seenAt isAfter seenAt.plusMinutes(5)) i.some
+      else if (i.seenAt `isAfter` seenAt.plusMinutes(5)) i.some
       else none
 
-    def seenRecently = seenAt isAfter Instance.recentSince
+    def seenRecently = seenAt `isAfter` Instance.recentSince
   }
 
   object Instance {

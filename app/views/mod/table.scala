@@ -1,6 +1,5 @@
 package views.html.mod
 
-import controllers.routes
 
 import lila.api.Context
 import lila.app.templating.Environment._

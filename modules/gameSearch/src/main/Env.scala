@@ -1,7 +1,7 @@
 package lila.gameSearch
 
 import com.softwaremill.macwire._
-import io.methvin.play.autoconfig._
+import lila.common.autoconfig.{ AutoConfig, ConfigName }
 import play.api.Configuration
 
 import lila.game.actorApi.{ FinishGame, InsertGame }
@@ -11,7 +11,7 @@ import lila.common.config._
 @Module
 private class GameSearchConfig(
     @ConfigName("index") val indexName: String,
-    @ConfigName("paginator.max_per_page") val paginatorMaxPerPage: MaxPerPage,
+    @ConfigName("paginator.max_per_page") val paginatorMaxPerPage: lila.common.config.MaxPerPage,
     @ConfigName("actor.name") val actorName: String
 )
 
@@ -25,7 +25,7 @@ final class Env(
     scheduler: akka.actor.Scheduler
 ) {
 
-  private val config = appConfig.get[GameSearchConfig]("gameSearch")(AutoConfig.loader)
+  private val config = appConfig.get[GameSearchConfig]("gameSearch")(using AutoConfig.loader)
 
   private lazy val client = makeClient(Index(config.indexName))
 
@@ -38,7 +38,7 @@ final class Env(
   lazy val userGameSearch = wire[UserGameSearch]
 
   lila.common.Bus.subscribeFun("finishGame", "gameSearchInsert") {
-    case FinishGame(game, _, _) if !game.aborted => api.store(game).unit
-    case InsertGame(game)                        => api.store(game).unit
+    case FinishGame(game, _, _) if !game.aborted => api.store(game).discard
+    case InsertGame(game)                        => api.store(game).discard
   }
 }

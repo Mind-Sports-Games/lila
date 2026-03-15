@@ -5,7 +5,7 @@ import strategygames.format.FEN
 
 object Handicaps {
 
-  def startingFen(variant: Option[Variant], p1Rating: Int, p2Rating: Int): Option[FEN] = {
+  def startingFen(variant: Option[Variant], p1Rating: Int, p2Rating: Int): Option[FEN] =
     variant.flatMap { v =>
       v.gameFamily match {
         case GameFamily.Go() => {
@@ -20,9 +20,8 @@ object Handicaps {
         case _ => None
       }
     }
-  }
 
-  def startingFenMcMahon(variant: Option[Variant], scoreDiff: Int): Option[FEN] = {
+  def startingFenMcMahon(variant: Option[Variant], scoreDiff: Int): Option[FEN] =
     variant.flatMap { v =>
       v.gameFamily match {
         case GameFamily.Go() => {
@@ -37,7 +36,6 @@ object Handicaps {
         case _ => None
       }
     }
-  }
 
   def playerInputRatings(inputPlayerRatingsInput: String): Map[String, Int] =
     inputPlayerRatingsInput.linesIterator.flatMap {
@@ -56,7 +54,7 @@ object Handicaps {
       }
     }.toMap
 
-  def playerRatingFromInput(inputRating: String): Option[Int] = {
+  def playerRatingFromInput(inputRating: String): Option[Int] =
     inputRating match {
       case psRating(grade) if grade.toInt >= 600 && grade.toInt <= 2900 =>
         Some(inputRating.toInt)
@@ -66,7 +64,6 @@ object Handicaps {
         Some(convertGoRating(grade.toInt, DanRating))
       case _ => None
     }
-  }
 
   private def calcGoHandicap(size: Int, p1Rating: Int, p2Rating: Int): GoHandicap = {
     val ratingDiff = Math.abs(p1Rating - p2Rating)
@@ -136,15 +133,13 @@ object Handicaps {
   val goDanRating = s"^([1-7]+)d$$".r
   val psRating    = s"^([0-9]+)$$".r
 
-  def goRatingDisplay(rating: Int): String = {
-    if (rating >= 2100) {
+  def goRatingDisplay(rating: Int): String =
+    if (rating >= 2100)
       (mcMahonScoreFromRating(rating).toInt + 1).toString() + "d"
-    } else {
+    else
       (mcMahonScoreFromRating(rating).toInt * -1).toString() + "k"
-    }
-  }
 
-  def mcMahonScoreFromRating(rating: Int): Double = {
+  def mcMahonScoreFromRating(rating: Int): Double =
     rating match {
       case x if x >= 2800 => 7.0
       case x if x >= 2700 => 6.0
@@ -186,14 +181,13 @@ object Handicaps {
       case x if x < 636   => -30.0
       case _              => 0.0
     }
-  }
 
   private def calcGoMcMahonHandicap(size: Int, scoreDiff: Int): GoHandicap = {
     val rankDiff = Math.max(scoreDiff - 1, 0);
     goHandicap(size, rankDiff)
   }
-
 }
+
 case class GoHandicap(komi: Int, stones: Int) //komi is 10x to be int
 
 sealed trait GoRatingType

@@ -27,7 +27,7 @@ object PageData {
       teamNbRequests = 0,
       nbChallenges = 0,
       nbNotifications = 0,
-      lila.pref.RequestPref fromRequest req,
+      lila.pref.RequestPref `fromRequest` req,
       blindMode = blindMode,
       hasFingerprint = false,
       hasClas = false,
@@ -72,19 +72,19 @@ sealed trait Context extends lila.user.UserContextWrapper {
   def currentSelectedColorCls = Pref.Color.asString.get(pref.color).getOrElse(Pref.Color.default)
   def currentSelectedColor    = s"selected-color-${currentSelectedColorCls}"
 
-  lazy val mobileApiVersion = Mobile.Api requestVersion req
+  lazy val mobileApiVersion = Mobile.Api `requestVersion` req
 
   def isMobileApi = mobileApiVersion.isDefined
 
-  lazy val isMobileBrowser = HTTPRequest isMobile req
+  lazy val isMobileBrowser = HTTPRequest `isMobile` req
 
   def requiresFingerprint = isAuth && !pageData.hasFingerprint
 
   def zoom: Int = {
-    req.session get "zoom2" flatMap (_.toIntOption) map (_ - 100) filter (0 <=) filter (100 >=)
+    req.session `get` "zoom2" flatMap (_.toIntOption) map (_ - 100) filter (0 <=) filter (100 >=)
   } | 85
 
-  def flash(name: String): Option[String] = req.flash get name
+  def flash(name: String): Option[String] = req.flash `get` name
 }
 
 sealed abstract class BaseContext(

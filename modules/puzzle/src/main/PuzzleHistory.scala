@@ -42,17 +42,19 @@ object PuzzleHistory {
     def slice(offset: Int, length: Int): Fu[Seq[PuzzleSession]] =
       colls
         .round {
-          _.aggregateList(length, readPreference = ReadPreference.secondaryPreferred) { framework =>
+          _.aggregateWith[Bdoc](readPreference = ReadPreference.secondaryPreferred) { framework =>
             import framework._
-            Match($doc("u" -> user.id)) -> List(
+            List(
+              Match($doc("u" -> user.id)),
               Sort(Descending("d")),
               Skip(offset),
               Limit(length),
-              PipelineOperator(PuzzleRound puzzleLookup colls),
+              PipelineOperator(PuzzleRound `puzzleLookup` colls),
               Unwind("puzzle")
             )
           }
-        }
+            .collect[List](maxDocs = length)
+      }
         .map { r =>
           for {
             doc   <- r
@@ -73,17 +75,17 @@ object PuzzleHistory {
           if (
             last.puzzles.head.theme == r.theme &&
             last.puzzles.head.puzzle.variant == r.puzzle.variant &&
-            r.round.date.isAfter(last.puzzles.head.round.date minusHours 1)
+            r.round.date.isAfter(last.puzzles.head.round.date `minusHours` 1)
           )
             last.copy(puzzles = r :: last.puzzles) :: sessions
           else PuzzleSession(r.theme, NonEmptyList(r, Nil)) :: last :: sessions
-      }
+    }
       .reverse
 }
 
 final class PuzzleHistoryApi(
     colls: PuzzleColls,
-    cacheApi: CacheApi
+    @annotation.nowarn("msg=unused") _cacheApi: CacheApi
 )(implicit ec: ExecutionContext) {
 
   import PuzzleHistory._
@@ -94,5 +96,5 @@ final class PuzzleHistoryApi(
       currentPage = page,
       maxPerPage = maxPerPage
     )
-
 }
+

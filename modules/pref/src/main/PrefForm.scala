@@ -34,7 +34,7 @@ object PrefForm {
         "resizeHandle"    -> optional(checkedNumber(Pref.ResizeHandle.choices)),
         "blindfold"       -> checkedNumber(Pref.Blindfold.choices),
         "boardIdentifier" -> optional(booleanNumber)
-      )(DisplayData.apply)(DisplayData.unapply),
+      )(DisplayData.apply)(d => Some((d.animation, d.captured, d.highlight, d.destination, d.playerTurnIndicator, d.actionReminder, d.coords, d.replay, d.coordSystem, d.pieceNotation, d.zen, d.resizeHandle, d.blindfold, d.boardIdentifier))),
       "behavior" -> mapping(
         "moveEvent"        -> optional(numberIn(Set(0, 1, 2))),
         "mancalaMove"      -> optional(booleanNumber),
@@ -49,19 +49,19 @@ object PrefForm {
         "playForcedAction"    -> checkedNumber(Pref.PlayForcedAction.choices),
         "keyboardMove"     -> optional(booleanNumber),
         "rookCastle"       -> optional(booleanNumber)
-      )(BehaviorData.apply)(BehaviorData.unapply),
+      )(BehaviorData.apply)(d => Some((d.moveEvent, d.mancalaMove, d.premove, d.takeback, d.autoQueen, d.autoThreefold, d.submitMove, d.confirmResign, d.confirmPass, d.confirmCubeActions, d.playForcedAction, d.keyboardMove, d.rookCastle))),
       "clock" -> mapping(
         "tenths"   -> checkedNumber(Pref.ClockTenths.choices),
         "bar"      -> booleanNumber,
         "sound"    -> booleanNumber,
         "moretime" -> checkedNumber(Pref.Moretime.choices)
-      )(ClockData.apply)(ClockData.unapply),
+      )(ClockData.apply)(d => Some((d.tenths, d.bar, d.sound, d.moretime))),
       "follow"       -> booleanNumber,
       "challenge"    -> checkedNumber(Pref.Challenge.choices),
       "message"      -> checkedNumber(Pref.Message.choices),
       "studyInvite"  -> optional(checkedNumber(Pref.StudyInvite.choices)),
       "insightShare" -> numberIn(Set(0, 1, 2))
-    )(PrefData.apply)(PrefData.unapply)
+    )(PrefData.apply)(d => Some((d.display, d.behavior, d.clock, d.follow, d.challenge, d.message, d.studyInvite, d.insightShare)))
   )
 
   case class DisplayData(
@@ -207,35 +207,35 @@ object PrefForm {
       )
   }
 
-  def prefOf(p: Pref): Form[PrefData] = pref fill PrefData(p)
+  def prefOf(p: Pref): Form[PrefData] = pref `fill` PrefData(p)
 
   val theme = Form(
     single(
-      "theme" -> text.verifying(Theme contains _)
+      "theme" -> text.verifying(Theme `contains` _)
     )
   )
 
   val pieceSet = Form(
     single(
-      "set" -> text.verifying(PieceSet contains _)
+      "set" -> text.verifying(PieceSet `contains` _)
     )
   )
 
   val theme3d = Form(
     single(
-      "theme" -> text.verifying(Theme3d contains _)
+      "theme" -> text.verifying(Theme3d `contains` _)
     )
   )
 
   val pieceSet3d = Form(
     single(
-      "set" -> text.verifying(PieceSet3d contains _)
+      "set" -> text.verifying(PieceSet3d `contains` _)
     )
   )
 
   val soundSet = Form(
     single(
-      "set" -> text.verifying(SoundSet contains _)
+      "set" -> text.verifying(SoundSet `contains` _)
     )
   )
 

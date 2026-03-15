@@ -1,6 +1,5 @@
 package views.html.mod
 
-import controllers.routes
 
 import lila.api.Context
 import lila.app.templating.Environment._
@@ -29,10 +28,10 @@ object communication {
       title = u.username + " communications",
       moreCss = frag(
         cssTag("mod.communication"),
-        isGranted(_.UserModView) option cssTag("mod.user")
+        isGranted(_.UserModView) `option` cssTag("mod.user")
       ),
       moreJs = frag(
-        isGranted(_.UserModView) option jsModule("mod.user")
+        isGranted(_.UserModView) `option` jsModule("mod.user")
       )
     ) {
       main(id := "communication", cls := "box box-pad")(
@@ -57,13 +56,13 @@ object communication {
             }
           )
         ),
-        isGranted(_.UserModView) option frag(
+        isGranted(_.UserModView) `option` frag(
           div(cls := "mod-zone mod-zone-full none"),
-          views.html.user.mod.otherUsers(mod, u, logins, appeals)(ctx, renderIp)(
+          views.html.user.mod.otherUsers(mod, u, logins, appeals)(using ctx, renderIp)(
             cls := "mod-zone communication__logins"
           )
         ),
-        history.nonEmpty option frag(
+        history.nonEmpty `option` frag(
           h2("Moderation history"),
           div(cls := "history")(
             history.map { e =>
@@ -81,11 +80,11 @@ object communication {
             }
           )
         ),
-        notes.nonEmpty option frag(
+        notes.nonEmpty `option` frag(
           h2("Notes from other users"),
           div(cls := "notes")(
             notes.map { note =>
-              (isGranted(_.Admin) || !note.dox) option
+              (isGranted(_.Admin) || !note.dox) `option`
                 div(
                   userIdLink(note.from.some),
                   " ",
@@ -118,7 +117,7 @@ object communication {
               )
             }
           ),
-        priv option frag(
+        priv `option` frag(
           h2("Recent private chats"),
           div(cls := "player_chats")(
             players.map { case (pov, chat) =>

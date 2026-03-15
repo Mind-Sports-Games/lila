@@ -1,7 +1,5 @@
 package lila.team
 
-import scala.concurrent.duration._
-
 import lila.memo.Syncache
 import lila.user.User
 
@@ -21,9 +19,9 @@ final class Cached(
     expireAfter = Syncache.ExpireAfterAccess(20 minutes)
   )
 
-  def blockingTeamName(id: Team.ID) = nameCache sync id
+  def blockingTeamName(id: Team.ID) = nameCache `sync` id
 
-  def preloadSet = nameCache preloadSet _
+  def preloadSet = nameCache.preloadSet
 
   private val teamIdsCache = cacheApi.sync[User.ID, Team.IdsStr](
     name = "team.ids",
@@ -38,18 +36,18 @@ final class Cached(
     expireAfter = Syncache.ExpireAfterWrite(1 hour)
   )
 
-  def syncTeamIds                  = teamIdsCache sync _
-  def teamIds                      = teamIdsCache async _
+  def syncTeamIds                  = teamIdsCache.sync
+  def teamIds                      = teamIdsCache.async
   def teamIdsList(userId: User.ID) = teamIds(userId).dmap(_.toList)
 
-  def invalidateTeamIds = teamIdsCache invalidate _
+  def invalidateTeamIds = teamIdsCache.invalidate
 
   val nbRequests = cacheApi[User.ID, Int](32768, "team.nbRequests") {
     _.expireAfterAccess(25 minutes)
       .maximumSize(65536)
       .buildAsyncFuture[User.ID, Int] { userId =>
         teamIds(userId) flatMap { ids =>
-          ids.value.nonEmpty ?? teamRepo.countRequestsOfLeader(userId, requestRepo.coll)
+          ids.value.nonEmpty so teamRepo.countRequestsOfLeader(userId, requestRepo.coll)
         }
       }
   }

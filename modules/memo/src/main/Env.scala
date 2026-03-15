@@ -1,7 +1,7 @@
 package lila.memo
 
 import com.softwaremill.macwire._
-import io.methvin.play.autoconfig._
+import lila.common.autoconfig.{ AutoConfig, ConfigName }
 import play.api.Configuration
 
 import lila.common.config._
@@ -18,7 +18,7 @@ final class Env(
     db: lila.db.Db
 )(implicit ec: scala.concurrent.ExecutionContext, system: akka.actor.ActorSystem) {
 
-  private val config = appConfig.get[MemoConfig]("memo")(AutoConfig.loader)
+  private val config = appConfig.get[MemoConfig]("memo")(using AutoConfig.loader)
 
   lazy val configStore = wire[ConfigStore.Builder]
 

@@ -6,7 +6,6 @@ import lila.app.ui.ScalatagsTemplate._
 import lila.challenge.Challenge
 import lila.challenge.Challenge.Status
 
-import controllers.routes
 
 object theirs {
 
@@ -45,14 +44,14 @@ object theirs {
                   views.html.board.bits.miniForVariant(fen, c.variant, !c.finalPlayerIndex)(div)
                 )
               },
-              if (playerIndex.map(Challenge.PlayerIndexChoice.apply).has(c.playerIndexChoice))
+              if (playerIndex.map(Challenge.PlayerIndexChoice.apply).contains(c.playerIndexChoice))
                 badTag(
                   // very rare message, don't translate
-                  s"You have the wrong playerIndex link for this open challenge. The ${playerIndex.??(_.name)} player has already joined."
+                  s"You have the wrong playerIndex link for this open challenge. The ${playerIndex.so(_.name)} player has already joined."
                 )
               else if (!c.mode.rated || ctx.isAuth) {
                 frag(
-                  (c.mode.rated && c.unlimited) option
+                  (c.mode.rated && c.unlimited) `option`
                     badTag(trans.bewareTheGameIsRatedButHasNoClock()),
                   postForm(cls := "accept", action := routes.Challenge.accept(c.id, playerIndex.map(_.name)))(
                     submitButton(cls := "text button button-fat", dataIcon := "G")(trans.joinTheGame())

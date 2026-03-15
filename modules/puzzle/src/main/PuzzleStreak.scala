@@ -1,8 +1,8 @@
 package lila.puzzle
 
-import scala.concurrent.duration._
 import scala.concurrent.ExecutionContext
 
+import lila.common.extensions.*
 import lila.db.dsl._
 import lila.memo.CacheApi
 
@@ -41,17 +41,17 @@ final class PuzzleStreakApi(colls: PuzzleColls, cacheApi: CacheApi)(implicit ec:
       .buildAsyncFuture { _ =>
         colls
           .path {
-            _.aggregateList(poolSize) { framework =>
+            _.aggregateWith[Bdoc]() { framework =>
               import framework._
-              Facet(
+              List(Facet(
                 buckets.map { case (rating, nbPuzzles) =>
                   val (tier, samples, deviation) =
                     if (rating > 2300) (PuzzleTier.Good, 5, 110) else (PuzzleTier.Top, 1, 85)
                   rating.toString -> List(
                     Match(
                       $doc(
-                        "min" $lte f"${theme}_${tier}_${rating}%04d",
-                        "max" $gte f"${theme}_${tier}_${rating}%04d"
+                        "min" `$lte` f"${theme}_${tier}_${rating}%04d",
+                        "max" `$gte` f"${theme}_${tier}_${rating}%04d"
                       )
                     ),
                     Sample(samples),
@@ -85,16 +85,18 @@ final class PuzzleStreakApi(colls: PuzzleColls, cacheApi: CacheApi)(implicit ec:
                     ReplaceRootField("puzzle")
                   )
                 }
-              ) -> List(
+              ),
                 Project($doc("all" -> $doc("$setUnion" -> buckets.map(r => s"$$${r._1}")))),
                 UnwindField("all"),
                 ReplaceRootField("all"),
                 Sort(Ascending("glicko.r"))
               )
-            }.map {
+            }
+              .collect[List](maxDocs = poolSize)
+              .map {
               _.flatMap(PuzzleBSONReader.readOpt)
             }
-          }
+        }
           .mon(_.streak.selector.time)
           .addEffect(monitor)
           .map { puzzles =>
@@ -113,7 +115,7 @@ final class PuzzleStreakApi(colls: PuzzleColls, cacheApi: CacheApi)(implicit ec:
     if (nb > 1) {
       val rest = puzzles.toVector drop 1
       lila.common.Maths.mean(rest.map(_.glicko.intRating)) foreach { r =>
-        lila.mon.streak.selector.rating.record(r.toInt).unit
+        val _ = lila.mon.streak.selector.rating.record(r.toInt)
       }
       (0 to poolSize by 10) foreach { i =>
         val slice = rest drop i take 10

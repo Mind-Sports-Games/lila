@@ -58,7 +58,7 @@ object Chart {
           "id"          -> pov.gameId,
           "fen"         -> Forsyth.exportBoard(pov.game.variant.gameLogic, pov.game.board),
           "playerIndex" -> pov.player.playerIndex.name,
-          "lastMove"    -> ~pov.game.lastActionKeys,
+          "lastMove"    -> pov.game.lastActionKeys.getOrElse(""),
           "user1"       -> gameUserJson(pov.player),
           "user2"       -> gameUserJson(pov.opponent)
         )
@@ -68,7 +68,7 @@ object Chart {
       Xaxis(
         name = dimension.name,
         categories = clusters.map(_.x).map(Dimension.valueJson(dimension)),
-        dataType = Dimension dataTypeOf dimension
+        dataType = Dimension `dataTypeOf` dimension
       )
 
     def sizeSerie =
@@ -131,7 +131,7 @@ object Chart {
       }
 
     Chart(
-      question = JsonQuestion fromQuestion question,
+      question = JsonQuestion `fromQuestion` question,
       xAxis = xAxis,
       valueYaxis = Yaxis(metric.name, metric.dataType.name),
       sizeYaxis = Yaxis(metric.per.tellNumber, Metric.DataType.Count.name),

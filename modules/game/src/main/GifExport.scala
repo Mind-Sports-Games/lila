@@ -9,7 +9,6 @@ import play.api.libs.ws.JsonBodyWritables._
 import play.api.libs.ws.StandaloneWSClient
 
 import lila.common.config.BaseUrl
-import lila.common.Json._
 import lila.common.Maths
 
 final class GifExport(
@@ -21,15 +20,15 @@ final class GifExport(
   private val targetMedianTime = Centis(80)
   private val targetMaxTime    = Centis(200)
 
-  def fromPov(pov: Pov, initialFen: Option[FEN]): Fu[Source[ByteString, _]] =
+  def fromPov(pov: Pov, initialFen: Option[FEN]): Fu[Source[ByteString, ?]] =
     lightUserApi preloadMany pov.game.userIds flatMap { _ =>
       ws.url(s"$url/game.gif")
         .withMethod("POST")
         .addHttpHeaders("Content-Type" -> "application/json")
         .withBody(
           Json.obj(
-            "p1"          -> Namer.playerTextBlocking(pov.game.p1Player, withRating = true)(lightUserApi.sync),
-            "p2"          -> Namer.playerTextBlocking(pov.game.p2Player, withRating = true)(lightUserApi.sync),
+            "p1"          -> Namer.playerTextBlocking(pov.game.p1Player, withRating = true)(using lightUserApi.sync),
+            "p2"          -> Namer.playerTextBlocking(pov.game.p2Player, withRating = true)(using lightUserApi.sync),
             "comment"     -> s"${baseUrl.value}/${pov.game.id} rendered with https://github.com/niklasf/lila-gif",
             "orientation" -> pov.playerIndex.name,
             "delay"       -> targetMedianTime.centis, // default delay for frames
@@ -44,11 +43,11 @@ final class GifExport(
       }
     }
 
-  def gameThumbnail(game: Game): Fu[Source[ByteString, _]] = {
+  def gameThumbnail(game: Game): Fu[Source[ByteString, ?]] = {
     val query = List(
       "fen"         -> (Forsyth.>>(game.variant.gameLogic, game.stratGame)).value,
-      "p1"          -> Namer.playerTextBlocking(game.p1Player, withRating = true)(lightUserApi.sync),
-      "p2"          -> Namer.playerTextBlocking(game.p2Player, withRating = true)(lightUserApi.sync),
+      "p1"          -> Namer.playerTextBlocking(game.p1Player, withRating = true)(using lightUserApi.sync),
+      "p2"          -> Namer.playerTextBlocking(game.p2Player, withRating = true)(using lightUserApi.sync),
       "orientation" -> game.naturalOrientation.name
     ) ::: List(
       game.lastActionKeys.map { "lastMove" -> _ },
@@ -58,7 +57,7 @@ final class GifExport(
     lightUserApi preloadMany game.userIds flatMap { _ =>
       ws.url(s"$url/image.gif")
         .withMethod("GET")
-        .withQueryStringParameters(query: _*)
+        .withQueryStringParameters(query*)
         .stream() flatMap {
         case res if res.status != 200 =>
           logger.warn(s"GifExport gameThumbnail ${game.id} ${res.status}")
@@ -68,7 +67,7 @@ final class GifExport(
     }
   }
 
-  def thumbnail(fen: FEN, lastMove: Option[String], orientation: PlayerIndex): Fu[Source[ByteString, _]] = {
+  def thumbnail(fen: FEN, lastMove: Option[String], orientation: PlayerIndex): Fu[Source[ByteString, ?]] = {
     val query = List(
       "fen"         -> fen.value,
       "orientation" -> orientation.name
@@ -78,7 +77,7 @@ final class GifExport(
 
     ws.url(s"$url/image.gif")
       .withMethod("GET")
-      .withQueryStringParameters(query: _*)
+      .withQueryStringParameters(query*)
       .stream() flatMap {
       case res if res.status != 200 =>
         logger.warn(s"GifExport thumbnail $fen ${res.status}")
@@ -87,7 +86,7 @@ final class GifExport(
     }
   }
 
-  private def scaleMoveTimes(plyTimes: Vector[Centis]): Vector[Centis] = {
+  private def scaleMoveTimes(plyTimes: Vector[Centis]): Vector[Centis] =
     // goal for bullet: close to real-time
     // goal for classical: speed up to reach target median, avoid extremely
     // fast moves, unless they were actually played instantly
@@ -95,14 +94,13 @@ final class GifExport(
       case Some(median) =>
         val scale = targetMedianTime.centis.toDouble / median.centis.atLeast(1).toDouble
         plyTimes.map { t =>
-          if (t * 2 < median) t atMost (targetMedianTime *~ 0.5)
-          else t *~ scale atLeast (targetMedianTime *~ 0.5) atMost targetMaxTime
+          if (t * 2 < median) t `atMost` (targetMedianTime *~ 0.5)
+          else t *~ scale `atLeast` (targetMedianTime *~ 0.5) `atMost` targetMaxTime
         }
-      case None => plyTimes.map(_ atMost targetMaxTime)
+      case None => plyTimes.map(_ `atMost` targetMaxTime)
     }
-  }
 
-  private def frames(game: Game, initialFen: Option[FEN]) = {
+  private def frames(game: Game, initialFen: Option[FEN]) =
     Replay.gameWithUciWhileValid(
       game.variant.gameLogic,
       game.actionStrs,
@@ -122,7 +120,6 @@ final class GifExport(
           Json.arr()
         )
     }
-  }
 
   @annotation.tailrec
   private def framesRec(games: List[((ChessGame, Option[Uci]), Option[Centis])], arr: JsArray): JsArray =

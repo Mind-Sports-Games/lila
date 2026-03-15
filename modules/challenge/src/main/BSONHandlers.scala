@@ -31,10 +31,7 @@ private object BSONHandlers {
   // NOTE: the following works because all of our clock type representations are different enough
   //       from each other that we can distinguish between them by the existence of their attributes
   //       New clock types will need to continue this pattern.
-  implicit val TimeControlBSONHandler: BSON[TimeControl] {
-    def reads(r: lila.db.BSON.Reader)
-        : Product with lila.challenge.Challenge.TimeControl with java.io.Serializable
-  } = new BSON[TimeControl] {
+  implicit val TimeControlBSONHandler: BSON[TimeControl] = new BSON[TimeControl] {
     def reads(r: Reader) =
       (r.intO("l"), r.intO("i"), r.intO("b"), r.intO("p"))
         .mapN((limit, inc, byoyomi, periods) =>
@@ -42,12 +39,12 @@ private object BSONHandlers {
         )
         .getOrElse(
           (r.strO("t").filter(_ == "bronstein"), r.intO("l"), r.intO("d"))
-            .mapN((_type, limit, delay) =>
+            .mapN((_, limit, delay) =>
               TimeControl.Clock(strategygames.Clock.BronsteinConfig(limit, delay))
             )
             .getOrElse(
               (r.strO("t").filter(_ == "usdelay"), r.intO("l"), r.intO("d"))
-                .mapN((_type, limit, delay) =>
+                .mapN((_, limit, delay) =>
                   TimeControl.Clock(strategygames.Clock.SimpleDelayConfig(limit, delay))
                 )
                 .getOrElse(
@@ -56,7 +53,7 @@ private object BSONHandlers {
                       TimeControl.Clock(strategygames.Clock.Config(limit, inc))
                     }
                     .orElse(
-                      r intO "d" map TimeControl.Correspondence.apply
+                      r `intO` "d" map TimeControl.Correspondence.apply
                     )
                     .getOrElse(TimeControl.Unlimited)
                 )
@@ -85,7 +82,7 @@ private object BSONHandlers {
   }
 
   implicit val StatusBSONHandler: BSONHandler[Status] = tryHandler[Status](
-    { case BSONInteger(v) => Status(v) toTry s"No such status: $v" },
+    { case BSONInteger(v) => Status(v) `toTry` s"No such status: $v" },
     x => BSONInteger(x.id)
   )
   implicit val RatingBSONHandler: BSON[Rating] = new BSON[Rating] {
@@ -117,8 +114,8 @@ private object BSONHandlers {
   )
   implicit val ChallengerBSONHandler: BSON[Challenger] = new BSON[Challenger] {
     def reads(r: Reader) =
-      if (r contains "id") RegisteredBSONHandler reads r
-      else if (r contains "s") AnonymousBSONHandler reads r
+      if (r contains "id") RegisteredBSONHandler `reads` r
+      else if (r contains "s") AnonymousBSONHandler `reads` r
       else Challenger.Open
     def writes(w: Writer, c: Challenger) =
       c match {

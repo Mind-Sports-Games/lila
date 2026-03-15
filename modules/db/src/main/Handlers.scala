@@ -34,28 +34,28 @@ trait Handlers {
   def stringIsoHandler[A](implicit iso: StringIso[A]): BSONHandler[A] =
     BSONStringHandler.as[A](iso.from, iso.to)
   def stringAnyValHandler[A](to: A => String, from: String => A): BSONHandler[A] =
-    stringIsoHandler(Iso(from, to))
+    stringIsoHandler(using Iso(from, to))
 
   def intIsoHandler[A](implicit iso: IntIso[A]): BSONHandler[A]         = BSONIntegerHandler.as[A](iso.from, iso.to)
-  def intAnyValHandler[A](to: A => Int, from: Int => A): BSONHandler[A] = intIsoHandler(Iso(from, to))
+  def intAnyValHandler[A](to: A => Int, from: Int => A): BSONHandler[A] = intIsoHandler(using Iso(from, to))
 
   def longIsoHandler[A](implicit iso: LongIso[A]): BSONHandler[A]          = BSONLongHandler.as[A](iso.from, iso.to)
-  def longAnyValHandler[A](to: A => Long, from: Long => A): BSONHandler[A] = longIsoHandler(Iso(from, to))
+  def longAnyValHandler[A](to: A => Long, from: Long => A): BSONHandler[A] = longIsoHandler(using Iso(from, to))
 
   def booleanIsoHandler[A](implicit iso: BooleanIso[A]): BSONHandler[A] =
     BSONBooleanHandler.as[A](iso.from, iso.to)
   def booleanAnyValHandler[A](to: A => Boolean, from: Boolean => A): BSONHandler[A] =
-    booleanIsoHandler(Iso(from, to))
+    booleanIsoHandler(using Iso(from, to))
 
   def doubleIsoHandler[A](implicit iso: DoubleIso[A]): BSONHandler[A] =
     BSONDoubleHandler.as[A](iso.from, iso.to)
   def doubleAnyValHandler[A](to: A => Double, from: Double => A): BSONHandler[A] =
-    doubleIsoHandler(Iso(from, to))
+    doubleIsoHandler(using Iso(from, to))
 
   def floatIsoHandler[A](implicit iso: FloatIso[A]): BSONHandler[A] =
     BSONFloatHandler.as[A](iso.from, iso.to)
   def floatAnyValHandler[A](to: A => Float, from: Float => A): BSONHandler[A] =
-    floatIsoHandler(Iso(from, to))
+    floatIsoHandler(using Iso(from, to))
 
   def dateIsoHandler[A](implicit iso: Iso[DateTime, A]): BSONHandler[A] =
     BSONJodaDateTimeHandler.as[A](iso.from, iso.to)
@@ -106,12 +106,12 @@ trait Handlers {
   implicit def bsonArrayToNonEmptyListHandler[T](implicit
       handler: BSONHandler[T]
   ): BSONHandler[NonEmptyList[T]] = {
-    def listWriter = collectionWriter[T, List[T]]
+    def listWriter = summon[BSONWriter[List[T]]]
     def listReader = collectionReader[List, T]
     tryHandler[NonEmptyList[T]](
       { case array: BSONArray =>
         listReader.readTry(array).flatMap {
-          _.toNel toTry s"BSONArray is empty, can't build NonEmptyList"
+          _.toNel.toTry(s"BSONArray is empty, can't build NonEmptyList")
         }
       },
       nel => listWriter.writeTry(nel.toList).get
@@ -153,7 +153,7 @@ trait Handlers {
 
   val variantByKeyHandler: BSONHandler[Variant] = quickHandler[Variant](
     {
-      case BSONString(v) => Variant orDefault v
+      case BSONString(v) => Variant.orDefault(v)
       case _             => Variant.default
     },
     v => BSONString(v.key)
@@ -163,8 +163,8 @@ trait Handlers {
     {
       case BSONString(v) =>
         v.split(":") match {
-          case Array(lib, v) => StratVariant orDefault (GameLogic(lib.toInt), v)
-          case Array(v)      => StratVariant orDefault (GameLogic.Chess(), v)
+          case Array(lib, v) => StratVariant.orDefault(GameLogic(lib.toInt), v)
+          case Array(v)      => StratVariant.orDefault(GameLogic.Chess(), v)
           case _             => sys.error("lib not encoded into variant handler")
         }
       case _ => sys.error("variant not encoded in handler. Previously this defaulted to standard chess")

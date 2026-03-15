@@ -16,6 +16,6 @@ object WebSubscription {
       (__ \ "endpoint").read[String] and
         (__ \ "keys" \ "auth").read[String] and
         (__ \ "keys" \ "p256dh").read[String]
-    )(WebSubscription.apply _)
+    )(WebSubscription.apply)
   }
 }

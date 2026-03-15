@@ -3,7 +3,6 @@ package templating
 
 import strategygames.{ Status => S, ClockConfig, Mode, Player => PlayerIndex, P2, P1, GameLogic }
 import strategygames.variant.Variant
-import controllers.routes
 import play.api.i18n.Lang
 
 import lila.api.Context
@@ -12,7 +11,7 @@ import lila.game.{ Game, Namer, Player, Pov }
 import lila.i18n.{ I18nKeys => trans, VariantKeys, defaultLang }
 import lila.user.Title
 
-trait GameHelper { self: I18nHelper with UserHelper with AiHelper with StringHelper with ChessgroundHelper =>
+trait GameHelper { self: I18nHelper & UserHelper & AiHelper & StringHelper & ChessgroundHelper =>
 
   def netBaseUrl: String
   def cdnUrl(path: String): String
@@ -88,7 +87,7 @@ trait GameHelper { self: I18nHelper with UserHelper with AiHelper with StringHel
   def variantName(variant: Variant)(implicit lang: Lang) =
     VariantKeys.variantName(variant)
 
-  def variantNameNoCtx(variant: Variant) = variantName(variant)(defaultLang)
+  def variantNameNoCtx(variant: Variant) = variantName(variant)(using defaultLang)
 
   def shortClockName(clock: Option[ClockConfig])(implicit lang: Lang): Frag =
     clock.fold[Frag](trans.unlimited())(shortClockName)
@@ -107,7 +106,7 @@ trait GameHelper { self: I18nHelper with UserHelper with AiHelper with StringHel
       case Mode.Rated  => trans.rated.txt()
     }
 
-  def modeNameNoCtx(mode: Mode): String = modeName(mode)(defaultLang)
+  def modeNameNoCtx(mode: Mode): String = modeName(mode)(using defaultLang)
 
   def playerUsername(player: Player, withRating: Boolean = true, withTitle: Boolean = true)(implicit
       lang: Lang
@@ -115,8 +114,8 @@ trait GameHelper { self: I18nHelper with UserHelper with AiHelper with StringHel
     player.aiLevel.fold[Frag](
       player.userId.flatMap(lightUser).fold[Frag](trans.anonymous.txt()) { user =>
         frag(
-          titleTag(user.title ifTrue withTitle map Title.apply),
-          if (withRating) s"${user.name} (${lila.game.Namer ratingString player})"
+          titleTag(user.title `ifTrue` withTitle map Title.apply),
+          if (withRating) s"${user.name} (${lila.game.Namer `ratingString` player})"
           else user.name
         )
       }
@@ -125,10 +124,10 @@ trait GameHelper { self: I18nHelper with UserHelper with AiHelper with StringHel
     }
 
   def playerText(player: Player, withRating: Boolean = false) =
-    Namer.playerTextBlocking(player, withRating)(lightUser)
+    Namer.playerTextBlocking(player, withRating)(using lightUser)
 
   def gameVsText(game: Game, withRatings: Boolean = false): String =
-    Namer.gameVsTextBlocking(game, withRatings)(lightUser)
+    Namer.gameVsTextBlocking(game, withRatings)(using lightUser)
 
   val berserkIconSpan = iconTag("`")
 
@@ -143,10 +142,10 @@ trait GameHelper { self: I18nHelper with UserHelper with AiHelper with StringHel
       mod: Boolean = false,
       link: Boolean = true
   )(implicit lang: Lang): Frag = {
-    val statusIcon = (withBerserk && player.berserk) option berserkIconSpan
+    val statusIcon = (withBerserk && player.berserk) `option` berserkIconSpan
     player.userId.flatMap(lightUser) match {
       case None =>
-        val klass = cssClass.??(" " + _)
+        val klass = cssClass.so(" " + _)
         span(cls := s"user-link$klass")(
           (player.aiLevel, player.name) match {
             case (Some(level), _) => aiNameFrag(level, withRating)
@@ -160,14 +159,14 @@ trait GameHelper { self: I18nHelper with UserHelper with AiHelper with StringHel
         frag(
           (if (link) a else span)(
             cls := userClass(user.id, cssClass, withOnline),
-            href := s"${routes.User show user.name}${if (mod) "?mod" else ""}"
+            href := s"${routes.User `show` user.name}${if (mod) "?mod" else ""}"
           )(
-            withOnline option frag(lineIcon(user), " "),
+            withOnline `option` frag(lineIcon(user), " "),
             playerUsername(player, withRating),
-            (player.ratingDiff ifTrue withDiff) map { d =>
+            (player.ratingDiff `ifTrue` withDiff) map { d =>
               frag(" ", showRatingDiff(d))
             },
-            engine option span(
+            engine `option` span(
               cls := "tos_violation",
               title := trans.thisAccountViolatedTos.txt()
             )
@@ -320,11 +319,11 @@ trait GameHelper { self: I18nHelper with UserHelper with AiHelper with StringHel
       ownerLink: Boolean = false,
       tv: Boolean = false
   )(implicit ctx: Context): String = {
-    val owner = ownerLink ?? ctx.me.flatMap(game.player)
+    val owner = ownerLink so ctx.me.flatMap(game.player)
     if (tv) routes.Tv.index
     else
       owner.fold(routes.Round.watcher(game.id, playerIndex.name)) { o =>
-        routes.Round.player(game fullIdOf o.playerIndex)
+        routes.Round.player(game `fullIdOf` o.playerIndex)
       }
   }.toString
 

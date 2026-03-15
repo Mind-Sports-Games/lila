@@ -50,7 +50,7 @@ object SimulForm {
   private def nameType(host: User) =
     eventName(2, 40).verifying(
       Constraint[String] { (t: String) =>
-        if (t.toLowerCase contains "playstrategy")
+        if (t.toLowerCase `contains` "playstrategy")
           validation.Invalid(validation.ValidationError("Must not contain \"playstrategy\""))
         else validation.Valid
       },
@@ -58,7 +58,7 @@ object SimulForm {
         if (
           t.toUpperCase.split(' ').exists { word =>
             lila.user.Title.all.exists { case (title, name) =>
-              !host.title.has(title) && {
+              !host.title.contains(title) && {
                 title.value == word || name.toUpperCase == word
               }
             }
@@ -70,7 +70,7 @@ object SimulForm {
     )
 
   def create(host: User, teams: List[LeaderTeam]) =
-    baseForm(host, teams) fill Setup(
+    baseForm(host, teams) `fill` Setup(
       name = host.titleUsername,
       clockConfig = Clock.Config(15, 0),
       clockExtra = clockExtraDefault,
@@ -84,7 +84,7 @@ object SimulForm {
     )
 
   def edit(host: User, teams: List[LeaderTeam], simul: Simul) =
-    baseForm(host, teams) fill Setup(
+    baseForm(host, teams) `fill` Setup(
       name = simul.name,
       clockConfig = simul.clock.config,
       clockExtra = simul.clock.hostExtraMinutes,
@@ -118,7 +118,7 @@ object SimulForm {
         "estimatedStartAt" -> optional(inTheFuture(ISODateTimeOrTimestamp.isoDateTimeOrTimestamp)),
         "team"             -> optional(nonEmptyText.verifying(id => teams.exists(_.id == id))),
         "featured"         -> optional(boolean)
-      )(Setup.apply)(Setup.unapply)
+      )(Setup.apply)(d => Some((d.name, d.clockConfig, d.clockExtra, d.variants, d.position, d.playerIndex, d.text, d.estimatedStartAt, d.team, d.featured)))
         .verifying("Only allowed a different starting fen if only playing standard chess", _.validUsePosition)
     )
 

@@ -1,25 +1,22 @@
 package views.html.user.show
 
-import controllers.routes
-import play.api.i18n.Lang
 
 import lila.api.Context
 import lila.app.templating.Environment._
 import lila.app.ui.ScalatagsTemplate._
 import lila.rating.PerfType
 import lila.user.User
-import lila.puzzle.Puzzle
 
 object side {
 
   def apply(
       u: User,
-      rankMap: lila.rating.UserRankMap,
+      @annotation.nowarn("msg=unused") rankMap: lila.rating.UserRankMap,
       active: Option[lila.rating.PerfType]
   )(implicit ctx: Context) = {
 
     def showNonEmptyPerf(perf: lila.rating.Perf, perfType: PerfType) =
-      perf.nonEmpty option showPerf(perf, perfType)
+      perf.nonEmpty `option` showPerf(perf, perfType)
 
     def showPerf(perf: lila.rating.Perf, perfType: PerfType) = {
       val isPuzzle = perfType.key.startsWith("puzzle")
@@ -28,11 +25,11 @@ object side {
         title := perfType.desc,
         cls := List(
           "empty"  -> perf.isEmpty,
-          "active" -> active.has(perfType)
+          "active" -> active.contains(perfType)
         ),
         href := {
           if (isPuzzle)
-            ctx.is(u) option routes.Puzzle.dashboard(perfType.key.split("_")(1), 30, "home").url
+            ctx.is(u) `option` routes.Puzzle.dashboard(perfType.key.split("_")(1), 30, "home").url
           else routes.User.perfStat(u.username, perfType.key).url.some
         },
         span(
@@ -42,7 +39,7 @@ object side {
             else
               strong(
                 perf.glicko.intRating,
-                perf.provisional option "?"
+                perf.provisional `option` "?"
               ),
             " ",
             ratingProgress(perf.progress),
@@ -63,14 +60,14 @@ object side {
     }
 
     div(cls := "side sub-ratings")(
-      (!u.lame || ctx.is(u) || isGranted(_.UserModView)) option frag(
+      (!u.lame || ctx.is(u) || isGranted(_.UserModView)) `option` frag(
         showNonEmptyPerf(u.perfs.ultraBullet, PerfType.orDefaultSpeed("ultraBullet")),
         showPerf(u.perfs.bullet, PerfType.orDefaultSpeed("bullet")),
         showPerf(u.perfs.blitz, PerfType.orDefaultSpeed("blitz")),
         showPerf(u.perfs.rapid, PerfType.orDefaultSpeed("rapid")),
         showPerf(u.perfs.classical, PerfType.orDefaultSpeed("classical")),
         showPerf(u.perfs.correspondence, PerfType.orDefaultSpeed("correspondence")),
-        u.hasVariantRating option hr,
+        u.hasVariantRating `option` hr,
         showNonEmptyPerf(u.perfs.crazyhouse, PerfType.orDefault("crazyhouse")),
         showNonEmptyPerf(u.perfs.chess960, PerfType.orDefault("chess960")),
         showNonEmptyPerf(u.perfs.kingOfTheHill, PerfType.orDefault("kingOfTheHill")),
@@ -117,71 +114,15 @@ object side {
         showNonEmptyPerf(u.perfs.nackgammon, PerfType.orDefault("nackgammon")),
         showNonEmptyPerf(u.perfs.abalone, PerfType.orDefault("abalone")),
         showNonEmptyPerf(u.perfs.grandabalone, PerfType.orDefault("grandabalone")),
-        u.noBot option frag(
+        u.noBot `option` frag(
           hr,
-          PerfType.allPuzzle.map(pt => showNonEmptyPerf(u.perfs.apply(pt), pt))
+          PerfType.allPuzzle.map[Option[Tag]](pt => showNonEmptyPerf(u.perfs.apply(pt), pt))
+          // showStorm(u.perfs.storm, u),
+          // showRacer(u.perfs.racer, u),
+          // showStreak(u.perfs.streak, u)
         )
       )
     )
   }
 
-  private def showStorm(storm: lila.rating.Perf.Storm, user: User)(implicit lang: Lang) =
-    a(
-      dataIcon := '~',
-      cls := List(
-        "empty" -> !storm.nonEmpty
-      ),
-      href := routes.Storm.dashboardOf(user.username),
-      span(
-        h3("Puzzle Storm"),
-        st.rating(
-          strong(storm.score),
-          storm.nonEmpty option frag(
-            " ",
-            span(trans.storm.xRuns.plural(storm.runs, storm.runs.localize))
-          )
-        )
-      ),
-      iconTag("G")
-    )
-
-  private def showRacer(racer: lila.rating.Perf.Racer, user: User)(implicit lang: Lang) =
-    a(
-      dataIcon := ',',
-      cls := List(
-        "empty" -> !racer.nonEmpty
-      ),
-      href := routes.Racer.home,
-      span(
-        h3("Puzzle Racer"),
-        st.rating(
-          strong(racer.score),
-          racer.nonEmpty option frag(
-            " ",
-            span(trans.storm.xRuns.plural(racer.runs, racer.runs.localize))
-          )
-        )
-      ),
-      iconTag("G")
-    )
-
-  private def showStreak(streak: lila.rating.Perf.Streak, user: User)(implicit lang: Lang) =
-    a(
-      dataIcon := '}',
-      cls := List(
-        "empty" -> !streak.nonEmpty
-      ),
-      href := routes.Puzzle.streak,
-      span(
-        h3("Puzzle Streak"),
-        st.rating(
-          strong(streak.score),
-          streak.nonEmpty option frag(
-            " ",
-            span(trans.storm.xRuns.plural(streak.runs, streak.runs.localize))
-          )
-        )
-      ),
-      iconTag("G")
-    )
 }

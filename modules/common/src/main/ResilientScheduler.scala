@@ -4,26 +4,18 @@ import scala.concurrent.duration._
 
 object ResilientScheduler {
 
-  private case object Tick
-  private case object Done
-
   def apply(
       every: Every,
       atMost: AtMost,
       initialDelay: FiniteDuration
-  )(f: => Funit)(implicit ec: scala.concurrent.ExecutionContext, scheduler: akka.actor.Scheduler): Unit = {
+  )(f: => Funit)(using ec: Executor, scheduler: Scheduler): Unit = {
     val run = () => f
     def runAndScheduleNext(): Unit =
       run()
-        .withTimeout(atMost.value)
+        .withTimeout(atMost.value, "ResilientScheduler")
         .addEffectAnyway {
-          scheduler.scheduleOnce(every.value) { runAndScheduleNext() }.unit
-        }
-        .unit
-    scheduler
-      .scheduleOnce(initialDelay) {
-        runAndScheduleNext()
+          scheduler.scheduleOnce(every.value) { runAndScheduleNext() }
       }
-      .unit
+    scheduler.scheduleOnce(initialDelay) { runAndScheduleNext() }
   }
 }

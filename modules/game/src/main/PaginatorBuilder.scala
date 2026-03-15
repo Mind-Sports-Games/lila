@@ -12,7 +12,7 @@ final class PaginatorBuilder(gameRepo: GameRepo)(implicit ec: scala.concurrent.E
   import BSONHandlers.gameBSONHandler
 
   def recentlyCreated(selector: Bdoc, nb: Option[Int] = None) =
-    apply(selector, Query.sortCreated, nb) _
+    apply(selector, Query.sortCreated, nb)
 
   def apply(selector: Bdoc, sort: Bdoc, nb: Option[Int] = None)(page: Int): Fu[Paginator[Game]] =
     apply(nb.fold(noCacheAdapter(selector, sort)) { cached =>

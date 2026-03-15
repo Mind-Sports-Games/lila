@@ -1,6 +1,5 @@
 package views.html.user
 
-import controllers.routes
 import play.api.i18n.Lang
 
 import lila.api.Context
@@ -10,7 +9,6 @@ import lila.evaluation.Display
 import lila.mod.IpRender.RenderIp
 import lila.mod.ModPresets
 import lila.playban.RageSit
-import lila.security.Granter
 import lila.security.{ Permission, UserLogins }
 import lila.user.{ Holder, User }
 import lila.appeal.Appeal
@@ -182,12 +180,12 @@ object mod {
           )
         }
       ),
-      isGranted(_.ModMessage) option
+      isGranted(_.ModMessage) `option`
         postForm(action := routes.Mod.warn(u.username, ""), cls := "pm-preset")(
           st.select(
-            option(value := "")("Send PM"),
+            scalatags.Text.tags.option(value := "")("Send PM"),
             pmPresets.value.map { preset =>
-              option(st.value := preset.name, title := preset.text)(preset.name)
+              scalatags.Text.tags.option(st.value := preset.name, title := preset.text)(preset.name)
             }
           )
         ),
@@ -200,11 +198,11 @@ object mod {
           )
         )
       },
-      (isGranted(_.Admin) && isGranted(_.SetEmail)) ?? frag(
+      (isGranted(_.Admin) && isGranted(_.SetEmail)) so frag(
         postForm(cls := "email", action := routes.Mod.setEmail(u.username))(
           st.input(
             tpe := "email",
-            value := emails.current.??(_.value),
+            value := emails.current.so(_.value),
             name := "email",
             placeholder := "Email address"
           ),
@@ -218,7 +216,7 @@ object mod {
 
   def prefs(u: User)(pref: lila.pref.Pref)(implicit ctx: Context) =
     frag(
-      canViewRoles(u) option mzSection("roles")(
+      canViewRoles(u) `option` mzSection("roles")(
         (if (isGranted(_.ChangePermission)) a(href := routes.Mod.permissions(u.username)) else span)(
           strong(cls := "text inline", dataIcon := " ")("Permissions: "),
           if (u.roles.isEmpty) "Add some" else Permission(u.roles).map(_.name).mkString(", ")
@@ -227,8 +225,8 @@ object mod {
       mzSection("preferences")(
         strong(cls := "text inline", dataIcon := "%")("Notable preferences:"),
         ul(
-          (pref.keyboardMove != lila.pref.Pref.KeyboardMove.NO) option li("keyboard moves"),
-          pref.botCompatible option li(
+          (pref.keyboardMove != lila.pref.Pref.KeyboardMove.NO) `option` li("keyboard moves"),
+          pref.botCompatible `option` li(
             strong(
               a(
                 cls := "text",
@@ -286,9 +284,9 @@ object mod {
       div(cls := "mod_log mod_log--history")(
         strong(cls := "text", dataIcon := "!")(
           "Moderation history",
-          history.isEmpty option ": nothing to show"
+          history.isEmpty `option` ": nothing to show"
         ),
-        history.nonEmpty ?? frag(
+        history.nonEmpty so frag(
           ul(
             history.map { e =>
               li(
@@ -296,8 +294,8 @@ object mod {
                 " ",
                 b(e.showAction),
                 " ",
-                e.gameId.fold[Frag](~e.details) { gameId =>
-                  a(href := s"${routes.Round.watcher(gameId, "p1").url}?pov=${~e.user}")(~e.details)
+                e.gameId.fold[Frag](e.details.getOrElse("")) { gameId =>
+                  a(href := s"${routes.Round.watcher(gameId, "p1").url}?pov=${e.user.getOrElse("")}")(e.details.getOrElse(""))
                 },
                 " ",
                 momentFromNowServer(e.date)
@@ -318,7 +316,7 @@ object mod {
             ),
             br,
             a.msgs.map(_.text).map(shorten(_, 140)).map(p(_)),
-            a.msgs.size > 1 option st.a(href := routes.Appeal.show(a.id))(
+            a.msgs.size > 1 `option` st.a(href := routes.Appeal.show(a.id))(
               frag("and ", pluralize("more message", a.msgs.size - 1))
             )
           )
@@ -331,7 +329,7 @@ object mod {
       div(cls := "mz_reports mz_reports--out")(
         strong(cls := "text", dataIcon := "!")(
           s"Reports sent by ${u.username}",
-          reports.by.isEmpty option ": nothing to show."
+          reports.by.isEmpty `option` ": nothing to show."
         ),
         reports.by.map { r =>
           r.atomBy(lila.report.ReporterId(u.id)).map { atom =>
@@ -350,7 +348,7 @@ object mod {
       div(cls := "mz_reports mz_reports--in")(
         strong(cls := "text", dataIcon := "!")(
           s"Reports concerning ${u.username}",
-          reports.about.isEmpty option ": nothing to show."
+          reports.about.isEmpty `option` ": nothing to show."
         ),
         reports.about.map { r =>
           postForm(action := routes.Report.inquiry(r.id))(
@@ -366,7 +364,7 @@ object mod {
                   shorten(atom.text, 200)
                 )
               },
-              (r.atoms.size > 3) option s"(and ${r.atoms.size - 3} more)"
+              (r.atoms.size > 3) `option` s"(and ${r.atoms.size - 3} more)"
             )
           )
         }
@@ -386,7 +384,7 @@ object mod {
           " , ",
           blursYes._3,
           "]",
-          pag.pag.sfAvgNoBlurs ?? { blursNo =>
+          pag.pag.sfAvgNoBlurs so { blursNo =>
             frag(
               " against ",
               strong(blursNo._1),
@@ -408,7 +406,7 @@ object mod {
           ", ",
           lowVar._3,
           "]",
-          pag.pag.sfAvgHighVar ?? { highVar =>
+          pag.pag.sfAvgHighVar so { highVar =>
             frag(
               " against ",
               strong(highVar._1),
@@ -430,7 +428,7 @@ object mod {
           ", ",
           holdYes._3,
           "]",
-          pag.pag.sfAvgNoHold ?? { holdNo =>
+          pag.pag.sfAvgNoHold so { holdNo =>
             frag(
               " against ",
               strong(holdNo._1),
@@ -471,7 +469,7 @@ object mod {
                 td(
                   pag.pov(result).map { p =>
                     a(href := routes.Round.watcher(p.gameId, p.playerIndex.name))(
-                      p.game.isTournament option iconTag("g"),
+                      p.game.isTournament `option` iconTag("g"),
                       p.game.perfType.map { pt =>
                         iconTag(pt.iconChar)(cls := "text")
                       },
@@ -486,7 +484,7 @@ object mod {
                 td(
                   span(cls := s"sig sig_${Display.plyTimeSig(result)}", dataIcon := "J"),
                   s" ${result.basics.plyTimes / 10}",
-                  result.basics.mtStreak ?? frag(br, "streak")
+                  result.basics.mtStreak so frag(br, "streak")
                 ),
                 td(
                   span(cls := s"sig sig_${Display.blurSig(result)}", dataIcon := "J"),
@@ -526,7 +524,7 @@ object mod {
     if (nb > 0) td(cls := "i", dataSort := nb)(content)
     else td
 
-  def otherUsers(mod: Holder, u: User, data: UserLogins.TableData, appeals: List[Appeal])(implicit
+  @annotation.nowarn("msg=unused") def otherUsers(mod: Holder, u: User, data: UserLogins.TableData, appeals: List[Appeal])(implicit
       ctx: Context,
       renderIp: RenderIp
   ): Tag = {
@@ -537,12 +535,12 @@ object mod {
           tr(
             th(
               pluralize("linked user", userLogins.otherUsers.size),
-              (max < 1000 && true || othersWithEmail.others.sizeIs >= max) option frag(
+              (max < 1000 && true || othersWithEmail.others.sizeIs >= max) `option` frag(
                 nbsp,
                 a(cls := "more-others")("Load more")
               )
             ),
-            isGranted(_.Admin) option th("Email"),
+            isGranted(_.Admin) `option` th("Email"),
             sortNumberTh(dataSortDefault)("Same"),
             th("Games"),
             sortNumberTh(playban)(cls := "i", title := "Playban"),
@@ -556,7 +554,7 @@ object mod {
             sortNumberTh(iconTag("6"))(cls := "i", title := "Appeals"),
             sortNumberTh("Created"),
             sortNumberTh("Active"),
-            isGranted(_.CloseAccount) option th
+            isGranted(_.CloseAccount) `option` th
           )
         ),
         tbody(
@@ -566,15 +564,15 @@ object mod {
             val userAppeal = appeals.find(_.isAbout(o.id))
             tr(
               dataTags := s"${other.ips.map(renderIp).mkString(" ")} ${other.fps.mkString(" ")}",
-              cls := (o == u) option "same"
+              cls := (o == u) `option` "same"
             )(
               if (o == u || isGranted(_.ViewAltUsernames))
                 td(dataSort := o.id)(userLink(o, withBestRating = true, params = "?mod"))
               else td,
-              isGranted(_.Admin) option td(othersWithEmail emailValueOf o),
+              isGranted(_.Admin) `option` td(othersWithEmail `emailValueOf` o),
               td(
                 // show prints and ips separately
-                dataSort := other.score + (other.ips.nonEmpty ?? 1000000) + (other.fps.nonEmpty ?? 3000000)
+                dataSort := other.score + (other.ips.nonEmpty so 1000000) + (other.fps.nonEmpty so 3000000)
               )(
                 List(other.ips.size -> "IP", other.fps.size -> "Print")
                   .collect {
@@ -583,14 +581,14 @@ object mod {
                   .mkString(", ")
               ),
               td(dataSort := o.count.game)(o.count.game.localize),
-              markTd(~bans.get(o.id), playban(cls := "text")(~bans.get(o.id))),
-              markTd(o.marks.alt ?? 1, alt),
-              markTd(o.marks.troll ?? 1, shadowban),
-              markTd(o.marks.boost ?? 1, boosting),
-              markTd(o.marks.engine ?? 1, engine),
-              markTd(o.disabled ?? 1, closed),
-              markTd(o.marks.reportban ?? 1, reportban),
-              userNotes.nonEmpty option {
+              markTd(bans.getOrElse(o.id, 0), playban(cls := "text")(bans.getOrElse(o.id, 0))),
+              markTd(o.marks.alt so 1, alt),
+              markTd(o.marks.troll so 1, shadowban),
+              markTd(o.marks.boost so 1, boosting),
+              markTd(o.marks.engine so 1, engine),
+              markTd(o.disabled so 1, closed),
+              markTd(o.marks.reportban so 1, reportban),
+              userNotes.nonEmpty.option {
                 td(dataSort := userNotes.size)(
                   a(href := s"${routes.User.show(o.username)}?notes")(
                     notesText(
@@ -600,7 +598,7 @@ object mod {
                     userNotes.size
                   )
                 )
-              } getOrElse td(dataSort := 0),
+              }.getOrElse(td(dataSort := 0)),
               userAppeal match {
                 case None => td(dataSort := 0)
                 case Some(appeal) =>
@@ -615,8 +613,8 @@ object mod {
               },
               td(dataSort := o.createdAt.getMillis)(momentFromNowServer(o.createdAt)),
               td(dataSort := o.seenAt.map(_.getMillis.toString))(o.seenAt.map(momentFromNowServer)),
-              isGranted(_.CloseAccount) option td(
-                !o.marks.alt option button(
+              isGranted(_.CloseAccount) `option` td(
+                !o.marks.alt `option` button(
                   cls := "button button-empty button-thin button-red mark-alt",
                   href := routes.Mod.alt(o.id, !o.marks.alt)
                 )("ALT")
@@ -628,7 +626,7 @@ object mod {
     )
   }
 
-  def identification(mod: Holder, user: User, logins: UserLogins)(implicit
+  @annotation.nowarn("msg=unused") def identification(mod: Holder, user: User, logins: UserLogins)(implicit
       ctx: Context,
       renderIp: RenderIp
   ): Frag = {
@@ -636,7 +634,7 @@ object mod {
     val canFpBan  = isGranted(_.PrintBan)
     val canLocate = isGranted(_.Admin) || user.lameOrTrollOrAlt
     mzSection("identification")(
-      canLocate option div(cls := "spy_locs")(
+      canLocate `option` div(cls := "spy_locs")(
         table(cls := "slist slist--sort")(
           thead(
             tr(
@@ -661,7 +659,7 @@ object mod {
           )
         )
       ),
-      canLocate option div(cls := "spy_uas")(
+      canLocate `option` div(cls := "spy_uas")(
         table(cls := "slist slist--sort")(
           thead(
             tr(
@@ -699,19 +697,19 @@ object mod {
               th,
               th("Client"),
               sortNumberTh("Date"),
-              canIpBan option sortNumberTh
+              canIpBan `option` sortNumberTh
             )
           ),
           tbody(
             logins.ips.sortBy(ip => (-ip.alts.score, -ip.ip.seconds)).map { ip =>
               val renderedIp = renderIp(ip.ip.value)
-              tr(cls := ip.blocked option "blocked")(
+              tr(cls := ip.blocked `option` "blocked")(
                 td(a(href := routes.Mod.singleIp(renderedIp))(renderedIp)),
                 td(dataSort := ip.alts.score)(altMarks(ip.alts)),
-                td(ip.proxy option span(cls := "proxy")("PROXY")),
+                td(ip.proxy `option` span(cls := "proxy")("PROXY")),
                 td(ip.clients.toList.map(_.toString).sorted mkString ", "),
                 td(dataSort := ip.ip.date.getMillis)(momentFromNowServer(ip.ip.date)),
-                canIpBan option td(dataSort := (9999 - ip.alts.cleans))(
+                canIpBan `option` td(dataSort := (9999 - ip.alts.cleans))(
                   button(
                     cls := List(
                       "button button-empty" -> true,
@@ -733,17 +731,17 @@ object mod {
               sortNumberTh("Alts"),
               th("Client"),
               sortNumberTh("Date"),
-              canFpBan option sortNumberTh
+              canFpBan `option` sortNumberTh
             )
           ),
           tbody(
             logins.prints.sortBy(fp => (-fp.alts.score, -fp.fp.seconds)).map { fp =>
-              tr(cls := fp.banned option "blocked")(
+              tr(cls := fp.banned `option` "blocked")(
                 td(a(href := routes.Mod.print(fp.fp.value.value))(fp.fp.value)),
                 td(dataSort := fp.alts.score)(altMarks(fp.alts)),
                 td(fp.client.toString),
                 td(dataSort := fp.fp.date.getMillis)(momentFromNowServer(fp.fp.date)),
-                canFpBan option td(dataSort := (9999 - fp.alts.cleans))(
+                canFpBan `option` td(dataSort := (9999 - fp.alts.cleans))(
                   button(
                     cls := List(
                       "button button-empty" -> true,
@@ -780,10 +778,10 @@ object mod {
       playbans.map { nb =>
         playban(nb)
       },
-      o.marks.troll option shadowban,
-      o.marks.boost option boosting,
-      o.marks.engine option engine,
-      o.disabled option closed,
-      o.marks.reportban option reportban
+      o.marks.troll `option` shadowban,
+      o.marks.boost `option` boosting,
+      o.marks.engine `option` engine,
+      o.disabled `option` closed,
+      o.marks.reportban `option` reportban
     )
 }

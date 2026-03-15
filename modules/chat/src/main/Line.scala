@@ -10,7 +10,7 @@ sealed trait Line {
   def deleted: Boolean
   def isSystem    = author == systemUserId
   def isHuman     = !isSystem
-  def humanAuthor = isHuman option author
+  def humanAuthor = isHuman `option` author
   def troll: Boolean
   def userIdMaybe: Option[User.ID]
 }
@@ -25,7 +25,7 @@ case class UserLine(
 
   def author = username
 
-  def userId = User normalize username
+  def userId = User `normalize` username
 
   def userIdMaybe = userId.some
 
@@ -72,7 +72,7 @@ object Line {
         val deleted = sep == "?"
         username split titleSep match {
           case Array(title, name) =>
-            UserLine(name, Title get title, text, troll = troll, deleted = deleted).some
+            UserLine(name, Title `get` title, text, troll = troll, deleted = deleted).some
           case _ => UserLine(username, None, text, troll = troll, deleted = deleted).some
         }
       case _ => none
@@ -82,7 +82,7 @@ object Line {
       if (x.troll) "!"
       else if (x.deleted) "?"
       else " "
-    val tit = x.title.??(_.value + titleSep)
+    val tit = x.title.so(_.value + titleSep)
     s"$tit${x.username}$sep${x.text}"
   }
 

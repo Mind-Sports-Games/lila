@@ -3,7 +3,7 @@ package lila.round
 import actorApi.{ GetSocketStatus, SocketStatus }
 import akka.actor._
 import com.softwaremill.macwire._
-import io.methvin.play.autoconfig._
+import lila.common.autoconfig.{ AutoConfig, ConfigName }
 import play.api.Configuration
 import scala.concurrent.duration._
 
@@ -59,12 +59,12 @@ final class Env(
     scheduler: akka.actor.Scheduler
 ) {
 
-  import lightUserApi._
+  implicit private val lightUserSync: lila.common.LightUser.GetterSync = lightUserApi.sync
 
-  implicit private val animationLoader: ConfigLoader[AnimationDuration] = durationLoader(
+  @annotation.nowarn("msg=unused") implicit private val animationLoader: ConfigLoader[AnimationDuration] = durationLoader(
     AnimationDuration.apply
   )
-  private val config = appConfig.get[RoundConfig]("round")(AutoConfig.loader)
+  private val config = appConfig.get[RoundConfig]("round")(using AutoConfig.loader)
 
   private val defaultGoneWeight                      = fuccess(1f)
   private def goneWeight(userId: User.ID): Fu[Float] = playban.getRageSit(userId).dmap(_.goneWeight)
@@ -76,7 +76,7 @@ final class Env(
         game.p2Player.userId.fold(defaultGoneWeight)(goneWeight)
 
   private val isSimulHost = new IsSimulHost(userId =>
-    Bus.ask[Set[User.ID]]("simulGetHosts")(GetHostIds).dmap(_ contains userId)
+    Bus.ask[Set[User.ID]]("simulGetHosts")(GetHostIds.apply).dmap(_ contains userId)
   )
 
   private val scheduleExpiration = new ScheduleExpiration(game => {
@@ -102,7 +102,7 @@ final class Env(
   lazy val roundSocket: RoundSocket = wire[RoundSocket]
 
   private def resignAllGamesOf(userId: User.ID) =
-    gameRepo allPlaying userId foreach {
+    gameRepo `allPlaying` userId foreach {
       _ foreach { pov => tellRound(pov.gameId, Resign(pov.playerId)) }
     }
 
@@ -116,14 +116,13 @@ final class Env(
     "finishGame" -> {
       case lila.game.actorApi.FinishGame(game, _, _)
           if !game.aborted && game.metadata.needsMultiMatchRematch =>
-        scheduler
-          .scheduleOnce(2 seconds) {
+        val _ = scheduler
+          .scheduleOnce(2.seconds) {
             tellRound(game.id, MultiMatchRematch)
           }
-          .unit
     },
     "selfReport" -> { case RoundSocket.Protocol.In.SelfReport(fullId, ip, userId, name) =>
-      selfReport(userId, ip, fullId, name).unit
+      selfReport(userId, ip, fullId, name).discard
     },
     "adjustCheater" -> { case lila.hub.actorApi.mod.MarkCheater(userId, true) =>
       resignAllGamesOf(userId)
@@ -135,9 +134,9 @@ final class Env(
   )
 
   lazy val onStart: OnStart = new OnStart((gameId: Game.ID) =>
-    proxyRepo game gameId foreach {
+    proxyRepo `game` gameId foreach {
       _ foreach { game =>
-        lightUserApi.preloadMany(game.userIds) >>- {
+        lightUserApi.preloadMany(game.userIds).andDo {
           val sg = lila.game.actorApi.StartGame(game)
           Bus.publish(sg, "startGame")
           game.userIds foreach { userId =>
@@ -183,7 +182,7 @@ final class Env(
 
   lazy val messenger = wire[Messenger]
 
-  lazy val getSocketStatus = (game: Game) => roundSocket.rounds.ask[SocketStatus](game.id)(GetSocketStatus)
+  lazy val getSocketStatus = (game: Game) => roundSocket.rounds.ask[SocketStatus](game.id)(GetSocketStatus.apply)
 
   private def isUserPresent(game: Game, userId: lila.user.User.ID): Fu[Boolean] =
     roundSocket.rounds.askIfPresentOrZero[Boolean](game.id)(RoundDuct.HasUserId(userId, _))

@@ -1,9 +1,8 @@
 package lila.puzzle
 
-import scala.concurrent.duration._
 import scala.concurrent.ExecutionContext
-import scala.util.chaining._
 
+import lila.common.extensions.*
 import lila.db.dsl._
 import lila.memo.CacheApi
 import lila.user.{ Perfs, User, UserRepo }
@@ -31,7 +30,7 @@ final class PuzzleSessionApi(
     colls: PuzzleColls,
     pathApi: PuzzlePathApi,
     cacheApi: CacheApi,
-    userRepo: UserRepo
+    @annotation.nowarn("msg=unused") _userRepo: UserRepo
 )(implicit ec: ExecutionContext) {
 
   import BsonHandlers._
@@ -51,7 +50,7 @@ final class PuzzleSessionApi(
         import NextPuzzleResult._
 
         def switchPath(tier: PuzzleTier) =
-          pathApi.nextFor(user, variant, theme, tier, session.difficulty, session.previousPaths) orFail
+          pathApi.nextFor(user, variant, theme, tier, session.difficulty, session.previousPaths) `orFail`
             s"No puzzle path for ${user.id} ${variant.name} $theme $tier" flatMap { pathId =>
               val newSession = session.switchTo(pathId)
               sessions.put(user.id, fuccess(newSession))
@@ -74,7 +73,7 @@ final class PuzzleSessionApi(
               )
             )
           mon.ratingDev(theme.value).record(puzzle.glicko.intDeviation)
-          mon.tier(session.path.tier.key, theme.value, session.difficulty.key).increment().unit
+          val _ = mon.tier(session.path.tier.key, theme.value, session.difficulty.key).increment()
           puzzle
         }
 
@@ -92,16 +91,17 @@ final class PuzzleSessionApi(
             case PuzzleAlreadyPlayed(puzzle) =>
               session.path.tier.stepDown.fold(fuccess(serveAndMonitor(puzzle)))(switchPath)
             case PuzzleFound(puzzle) => fuccess(serveAndMonitor(puzzle))
-          }
+        }
       }
       .mon(_.puzzle.selector.user.time(theme.value))
 
   private def nextPuzzleResult(user: User, session: PuzzleSession): Fu[NextPuzzleResult] =
     colls
       .path {
-        _.aggregateOne() { framework =>
+        _.aggregateWith[Bdoc]() { framework =>
           import framework._
-          Match($id(session.path)) -> List(
+          List(
+            Match($id(session.path)),
             // get the puzzle ID from session position
             Project($doc("puzzleId" -> $doc("$arrayElemAt" -> $arr("$ids", session.positionInPath)))),
             Project(
@@ -134,7 +134,9 @@ final class PuzzleSessionApi(
             )
           )
         }
-      }
+          .collect[List](maxDocs = 1)
+          .dmap(_.headOption)
+    }
       .map { docOpt =>
         import NextPuzzleResult._
         docOpt.fold[NextPuzzleResult](PathMissing) { doc =>
@@ -157,8 +159,8 @@ final class PuzzleSessionApi(
         )
       }
 
-  def onComplete(round: PuzzleRound, variant: Variant, theme: PuzzleTheme.Key): Funit =
-    sessions.getIfPresent(round.userId) ?? {
+  def onComplete(round: PuzzleRound, @annotation.nowarn("msg=unused") _variant: Variant, theme: PuzzleTheme.Key): Funit =
+    sessions.getIfPresent(round.userId) so {
       _ map { session =>
         // yes, even if the completed puzzle was not the current session puzzle
         // in that case we just skip a puzzle on the path, which doesn't matter

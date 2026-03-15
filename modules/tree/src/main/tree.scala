@@ -8,7 +8,6 @@ import strategygames.variant.Variant
 import strategygames.{ GameLogic, Player => PlayerIndex, Pocket, PocketData, Pos, Role }
 import play.api.libs.json._
 
-import lila.common.Json._
 import lila.base.PimpedJsObject
 
 sealed trait Node {
@@ -133,14 +132,14 @@ private object DropsByRole {
       var first = true
       drops foreach { case (orig, dests) =>
         if (first) first = false
-        else sb append " "
-        sb append orig.forsyth
-        dests foreach { sb append _.key }
+        else sb `append` " "
+        sb `append` orig.forsyth
+        dests foreach { sb `append` _.key }
       }
       JsString(sb.toString)
     }
-
 }
+
 
 object Node {
 
@@ -171,7 +170,7 @@ object Node {
   object Comment {
     case class Id(value: String) extends AnyVal
     object Id {
-      def make = Id(lila.common.ThreadLocalRandom nextString 4)
+      def make = Id(lila.common.ThreadLocalRandom `nextString` 4)
     }
     private val metaReg = """\[%[^\]]+\]""".r
     case class Text(value: String) extends AnyVal {
@@ -360,7 +359,8 @@ object Node {
             else None
           )
           .add("forceVariation", forceVariation)
-      } catch {
+      }
+      catch {
         case e: StackOverflowError =>
           e.printStackTrace()
           sys error s"### StackOverflowError ### in tree.makeNodeJsonWriter($alwaysChildren)"
@@ -372,9 +372,9 @@ object Node {
     var first = true
     dests foreach { case (orig, dests) =>
       if (first) first = false
-      else sb append " "
-      sb append orig.piotr
-      dests foreach { sb append _.piotr }
+      else sb `append` " "
+      sb `append` orig.piotr
+      dests foreach { sb `append` _.piotr }
     }
     sb.toString
   }

@@ -19,12 +19,12 @@ final private class RoundNotifier(
       game.perfType foreach { perfType =>
         timeline ! (Propagate(
           TLGameEnd(
-            playerId = game fullIdOf playerIndex,
+            playerId = game `fullIdOf` playerIndex,
             opponent = game.player(!playerIndex).userId,
             win = game.winnerPlayerIndex map (playerIndex ==),
             perf = perfType.key
           )
-        ) toUser userId)
+        ) `toUser` userId)
       }
       isUserPresent(game, userId) foreach {
         case false =>
@@ -32,7 +32,7 @@ final private class RoundNotifier(
             Notification.make(
               Notification.Notifies(userId),
               GameEnd(
-                GameEnd.GameId(game fullIdOf playerIndex),
+                GameEnd.GameId(game `fullIdOf` playerIndex),
                 game.opponent(playerIndex).userId map GameEnd.OpponentId.apply,
                 game.wonBy(playerIndex) map GameEnd.Win.apply
               )

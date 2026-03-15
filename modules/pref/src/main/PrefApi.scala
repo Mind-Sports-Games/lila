@@ -36,19 +36,19 @@ final class PrefApi(
     else
       coll.update
         .one($id(user.id), $unset(s"tags.${tag(Pref.Tag)}"))
-        .void >>- { cache invalidate user.id }
-  } >>- { cache invalidate user.id }
+        .void.andDo { cache `invalidate` user.id }
+  }.andDo { cache `invalidate` user.id }
 
-  def getPrefById(id: User.ID): Fu[Pref]    = cache get id dmap (_ getOrElse Pref.create(id))
-  val getPref                               = getPrefById _
+  def getPrefById(id: User.ID): Fu[Pref]    = cache get id `dmap` (_ getOrElse Pref.create(id))
+  val getPref                               = getPrefById
   def getPref(user: User): Fu[Pref]         = getPref(user.id)
   def getPref(user: Option[User]): Fu[Pref] = user.fold(fuccess(Pref.default))(getPref)
 
-  def getPref[A](user: User, pref: Pref => A): Fu[A]      = getPref(user) dmap pref
-  def getPref[A](userId: User.ID, pref: Pref => A): Fu[A] = getPref(userId) dmap pref
+  def getPref[A](user: User, pref: Pref => A): Fu[A]      = getPref(user) `dmap` pref
+  def getPref[A](userId: User.ID, pref: Pref => A): Fu[A] = getPref(userId) `dmap` pref
 
   def getPref(user: User, req: RequestHeader): Fu[Pref] =
-    getPref(user) dmap RequestPref.queryParamOverride(req)
+    getPref(user) `dmap` RequestPref.queryParamOverride(req)
 
   def followable(userId: User.ID): Fu[Boolean] =
     coll.primitiveOne[Boolean]($id(userId), "follow") map (_ | Pref.default.follow)
@@ -68,8 +68,7 @@ final class PrefApi(
     }
 
   def setPref(pref: Pref): Funit =
-    coll.update.one($id(pref.id), pref, upsert = true).void >>-
-      cache.put(pref.id, fuccess(pref.some))
+    coll.update.one($id(pref.id), pref, upsert = true).void.andDo(cache.put(pref.id, fuccess(pref.some)))
 
   def setPref(user: User, change: Pref => Pref): Funit =
     getPref(user) map change flatMap setPref
@@ -78,17 +77,17 @@ final class PrefApi(
     getPref(userId) map change flatMap setPref
 
   def setPrefString(user: User, name: String, value: String): Funit =
-    getPref(user) map { _.set(name, value) } orFail
+    getPref(user) map { _.set(name, value) } `orFail`
       s"Bad pref ${user.id} $name -> $value" flatMap setPref
 
-  def updatePrefPieceSet(user: User, gameFamily: String, value: String): Fu[String] =
-    getPref(user) map { _.set("pieceSet", value) } orFail
+  def updatePrefPieceSet(user: User, @annotation.nowarn("msg=unused") _gameFamily: String, value: String): Fu[String] =
+    getPref(user) map { _.set("pieceSet", value) } `orFail`
       s"Bad pref ${user.id} pieceSet -> $value" flatMap (pref => {
         setPref(pref) inject (Json.toJson(pref.pieceSet).toString)
       })
 
   def updatePrefTheme(user: User, gameFamily: String, value: String): Fu[String] =
-    getPref(user) map { _.setTheme(value, gameFamily) } orFail
+    getPref(user) map { _.setTheme(value, gameFamily) } `orFail`
       s"Bad pref ${user.id} theme -> $value" flatMap (pref => {
         setPref(pref) inject (Json.toJson(pref.theme).toString)
       })
@@ -105,7 +104,7 @@ final class PrefApi(
     )
 
   def saveNewUserPrefs(user: User, req: RequestHeader): Funit = {
-    val reqPref = RequestPref fromRequest req
-    (reqPref != Pref.default) ?? setPref(reqPref.copy(_id = user.id))
+    val reqPref = RequestPref `fromRequest` req
+    (reqPref != Pref.default) so setPref(reqPref.copy(_id = user.id))
   }
 }

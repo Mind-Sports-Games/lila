@@ -7,6 +7,7 @@ import org.joda.time.DateTime
 import scala.concurrent.duration._
 
 import lila.common.LilaStream
+import lila.common.extensions.*
 import lila.db.dsl._
 import lila.game.{ Game, GameRepo, Query }
 import lila.round.actorApi.round.{ Abandon, QuietFlag }
@@ -36,7 +37,7 @@ final private[round] class Titivate(
   implicit def ec: ExecutionContextExecutor = context.system.dispatcher
   def scheduler                             = context.system.scheduler
 
-  def scheduleNext(): Unit = scheduler.scheduleOnce(5 seconds, self, Run).unit
+  def scheduleNext(): Unit = { val _ = scheduler.scheduleOnce(5 seconds, self, Run) }
 
   def receive = {
     case ReceiveTimeout =>
@@ -54,19 +55,19 @@ final private[round] class Titivate(
           .via(gameFlow)
           .toMat(LilaStream.sinkCount)(Keep.right)
           .run()
-          .addEffect(lila.mon.round.titivate.game.record(_).unit)
-          .>> {
+          .addEffect(n => { val _ = lila.mon.round.titivate.game.record(n) })
+          .>>(
             gameRepo
               .count(_.checkableOld)
               .dmap(lila.mon.round.titivate.old.record(_))
-          }
+          )
           .monSuccess(_.round.titivate.time)
           .logFailure(logBranch)
-          .addEffectAnyway(scheduleNext().unit)
+          .addEffectAnyway(scheduleNext())
       }
   }
 
-  private val logBranch = logger branch "titivate"
+  private val logBranch = logger `branch` "titivate"
 
   private val gameRead = Flow[Bdoc].map { doc =>
     lila.game.BSONHandlers.gameBSONHandler
@@ -77,18 +78,18 @@ final private[round] class Titivate(
       )
   }
 
-  private val gameFlow: Flow[GameOrFail, Unit, _] = Flow[GameOrFail].mapAsyncUnordered(8) {
+  private val gameFlow: Flow[GameOrFail, Unit, ?] = Flow[GameOrFail].mapAsyncUnordered(8) {
 
     case Left((id, err)) =>
       lila.mon.round.titivate.broken(err.getClass.getSimpleName).increment()
       logBranch.warn(s"Can't read game $id", err)
-      gameRepo unsetCheckAt id
+      gameRepo `unsetCheckAt` id
 
     case Right(game) =>
       game match {
 
         case game if game.finished || game.isPgnImport || game.playedThenAborted =>
-          gameRepo unsetCheckAt game.id
+          gameRepo `unsetCheckAt` game.id
 
         case game if game.outoftime(withGrace = true) =>
           fuccess {
@@ -103,25 +104,25 @@ final private[round] class Titivate(
         case game if game.unplayed =>
           bookmark ! lila.hub.actorApi.bookmark.Remove(game.id)
           chatApi.remove(lila.chat.Chat.Id(game.id))
-          gameRepo remove game.id
+          gameRepo `remove` game.id
 
         case game =>
           game.clock match {
 
             case Some(clock) if clock.isRunning =>
               val minutes = clock.estimateTotalSeconds / 60
-              gameRepo.setCheckAt(game, DateTime.now plusMinutes minutes).void
+              gameRepo.setCheckAt(game, DateTime.now `plusMinutes` minutes).void
 
             case Some(_) =>
               val hours = Game.unplayedHours
-              gameRepo.setCheckAt(game, DateTime.now plusHours hours).void
+              gameRepo.setCheckAt(game, DateTime.now `plusHours` hours).void
 
             case None =>
               val hours = game.daysPerTurn.fold(
                 if (game.hasAi) Game.aiAbandonedHours
                 else Game.abandonedDays * 24
               )(_ * 24)
-              gameRepo.setCheckAt(game, DateTime.now plusHours hours).void
+              gameRepo.setCheckAt(game, DateTime.now `plusHours` hours).void
           }
       }
   }

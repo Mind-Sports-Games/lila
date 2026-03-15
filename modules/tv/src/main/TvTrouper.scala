@@ -2,7 +2,6 @@ package lila.tv
 
 import akka.pattern.{ ask => actorAsk }
 import play.api.libs.json.Json
-import scala.concurrent.duration._
 import scala.concurrent.Promise
 
 import lila.common.{ Bus, LightUser }
@@ -48,8 +47,8 @@ final private[tv] class TvTrouper(
       if (g.hasClock || g.hasCorrespondenceClock || g.isUnlimited) {
         val candidate = Tv.toCandidate(lightUserSync)(g)
         channelTroupers collect {
-          case (chan, trouper) if chan filter candidate => trouper
-        } foreach (_ addCandidate g)
+          case (chan, trouper) if chan `filter` candidate => trouper
+        } foreach (_ `addCandidate` g)
       }
 
     case s @ TvTrouper.Select => channelTroupers.foreach(_._2 ! s)
@@ -79,9 +78,9 @@ final private[tv] class TvTrouper(
       )
       Bus.publish(lila.hub.actorApi.tv.TvSelect(game.id, game.speed, data), "tvSelect")
       if (channel == Tv.Channel.AllGames) {
-        implicit def timeout = makeTimeout(100 millis)
+        implicit val timeout: akka.util.Timeout = makeTimeout(100 millis)
         actorAsk(renderer.actor, actorApi.RenderFeaturedJs(game)) foreach { case html: String =>
-          val pov = Pov naturalOrientation game
+          val pov = Pov `naturalOrientation` game
           val event = lila.round.ChangeFeatured(
             pov,
             makeMessage(

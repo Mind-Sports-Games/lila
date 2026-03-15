@@ -1,6 +1,5 @@
 package views.html.analyse
 
-import controllers.routes
 import play.api.libs.json.{ JsObject, Json }
 
 import lila.app.templating.Environment._
@@ -10,11 +9,9 @@ import lila.common.String.html.safeJsonValue
 
 object embed {
 
-  import EmbedConfig.implicits._
-
   def apply(pov: lila.game.Pov, data: JsObject)(config: EmbedConfig) =
     views.html.base.embed(
-      title = replay.titleOf(pov)(config.lang),
+      title = replay.titleOf(pov)(using config.lang),
       cssModule = "analyse.embed"
     )(
       div(cls := "is2d")(
@@ -31,7 +28,7 @@ object embed {
           a(targetBlank, cls := "open", href := url)("Open")
         )
       },
-      views.html.base.layout.playstrategyJsObject(config.nonce)(config.lang),
+      views.html.base.layout.playstrategyJsObject(config.nonce)(using config.lang),
       depsTag("javascripts/vendor/cash.min.js"),
       depsTag("javascripts/vendor/powertip.min.js"),
       depsTag("javascripts/vendor/howler.min.js"),
@@ -43,12 +40,12 @@ object embed {
           Json.obj(
             "data"  -> data,
             "embed" -> true,
-            "i18n"  -> views.html.board.userAnalysisI18n(withCeval = false, withExplorer = false)(config.lang)
+            "i18n"  -> views.html.board.userAnalysisI18n(withCeval = false, withExplorer = false)(using config.lang)
           )
         )})""",
         config.nonce
       )
-    )(config)
+    )(using config)
 
   def notFound(config: EmbedConfig) =
     views.html.base.embed(
@@ -58,5 +55,5 @@ object embed {
       div(cls := "not-found")(
         h1("Game not found")
       )
-    )(config)
+    )(using config)
 }

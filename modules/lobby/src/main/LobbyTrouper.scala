@@ -7,12 +7,12 @@ import scala.concurrent.duration._
 import scala.concurrent.Promise
 
 import lila.common.config.Max
+import lila.common.extensions.*
 import lila.common.{ AtMost, Bus, Every }
 import lila.game.Game
 import lila.hub.Trouper
 import lila.socket.Socket.{ Sri, Sris }
 import lila.user.User
-import lila.i18n.VariantKeys
 
 final private class LobbyTrouper(
     seekApi: SeekApi,
@@ -23,7 +23,7 @@ final private class LobbyTrouper(
     discordApi: lila.irc.DiscordApi,
     poolApi: lila.pool.PoolApi,
     onStart: lila.round.OnStart
-)(implicit ec: scala.concurrent.ExecutionContext, scheduler: akka.actor.Scheduler)
+)(implicit ec: scala.concurrent.ExecutionContext, @annotation.nowarn("msg=unused") _scheduler: akka.actor.Scheduler)
     extends Trouper {
 
   import LobbyTrouper._
@@ -41,11 +41,11 @@ final private class LobbyTrouper(
 
     case msg @ AddHook(hook) =>
       lila.mon.lobby.hook.create.increment()
-      hookRepo bySri hook.sri foreach remove
-      hook.sid ?? { sid =>
-        hookRepo bySid sid foreach remove
+      hookRepo `bySri` hook.sri foreach remove
+      hook.sid so { sid =>
+        hookRepo `bySid` sid foreach remove
       }
-      !hook.compatibleWithPools(hook.realVariant) ?? findCompatible(hook) match {
+      !hook.compatibleWithPools(hook.realVariant) so findCompatible(hook) match {
         case Some(h) => biteHook(h.id, hook.sri, hook.user)
         case None =>
           hookRepo.save(msg.hook)
@@ -56,10 +56,10 @@ final private class LobbyTrouper(
               hook.realVariant,
               true
             )
-            .effectFold(
-              err => logger.warn(s"discord hook failed: $err"),
-              _ => ()
-            )
+            .onComplete {
+              case scala.util.Failure(err) => logger.warn(s"discord hook failed: $err")
+              case _ => ()
+          }
       }
 
     case msg @ AddSeek(seek) =>
@@ -78,13 +78,13 @@ final private class LobbyTrouper(
           msg.seek.realVariant,
           false
         )
-        .effectFold(
-          err => logger.warn(s"discord seek failed: $err"),
-          _ => ()
-        )
+        .onComplete {
+          case scala.util.Failure(err) => logger.warn(s"discord seek failed: $err")
+          case _ => ()
+      }
 
     case CancelHook(sri) =>
-      hookRepo bySri sri foreach remove
+      hookRepo `bySri` sri foreach remove
 
     case CancelSeek(seekId, user) =>
       seekApi.removeBy(seekId, user.id)
@@ -100,7 +100,7 @@ final private class LobbyTrouper(
         gameCache.nbPlaying(user.id) foreach { nbPlaying =>
           if (maxPlaying > nbPlaying) {
             lila.mon.lobby.seek.join.increment()
-            seekApi find seekId foreach {
+            seekApi `find` seekId foreach {
               _ foreach { seek =>
                 biter(seek, user) foreach this.!
               }
@@ -125,7 +125,7 @@ final private class LobbyTrouper(
     case Tick(promise) =>
       hookRepo.truncateIfNeeded()
       socket
-        .ask[Sris](GetSrisP)
+        .ask[Sris](GetSrisP.apply)
         .chronometer
         .logIfSlow(100, logger) { r =>
           s"GetSris size=${r.sris.size}"
@@ -136,13 +136,13 @@ final private class LobbyTrouper(
         .foreach { this ! WithPromise(_, promise) }
 
     case WithPromise(Sris(sris), promise) =>
-      poolApi socketIds Sris(sris)
-      val fewSecondsAgo = DateTime.now minusSeconds 5
-      if (remoteDisconnectAllAt isBefore fewSecondsAgo) this ! RemoveHooks {
+      poolApi `socketIds` Sris(sris)
+      val fewSecondsAgo = DateTime.now `minusSeconds` 5
+      if (remoteDisconnectAllAt `isBefore` fewSecondsAgo) this ! RemoveHooks {
         hookRepo
           .notInSris(sris)
           .filter { h =>
-            !h.boardApi && (h.createdAt isBefore fewSecondsAgo)
+            !h.boardApi && (h.createdAt `isBefore` fewSecondsAgo)
           }
           .toSet ++ hookRepo.cleanupOld
       }
@@ -162,35 +162,34 @@ final private class LobbyTrouper(
       promise success lila.pool.HookThieve.PoolHooks(hookRepo.poolCandidates(clock, variant))
 
     case lila.pool.HookThieve.StolenHookIds(ids) =>
-      hookRepo byIds ids.toSet foreach remove
+      hookRepo `byIds` ids.toSet foreach remove
   }
 
-  private def NoPlayban(user: Option[LobbyUser])(f: => Unit): Unit = {
-    user.?? { u =>
+  private def NoPlayban(user: Option[LobbyUser])(f: => Unit): Unit =
+    user.so { u =>
       playbanApi.currentBan(u.id)
     } foreach {
       case None => f
       case _    =>
     }
-  }
 
   private def biteHook(hookId: String, sri: Sri, user: Option[LobbyUser]) =
-    hookRepo byId hookId foreach { hook =>
+    hookRepo `byId` hookId foreach { hook =>
       remove(hook)
-      hookRepo bySri sri foreach remove
+      hookRepo `bySri` sri foreach remove
       biter(hook, sri, user) foreach this.!
     }
 
   private def findCompatible(hook: Hook): Option[Hook] =
-    hookRepo.filter(_ compatibleWith hook).find { existing =>
+    hookRepo.filter(_ `compatibleWith` hook).find { existing =>
       biter.canJoin(existing, hook.user) && !(
-        (existing.user, hook.user).mapN((_, _)) ?? { case (u1, u2) =>
+        (existing.user, hook.user).mapN((_, _)) so { case (u1, u2) =>
           recentlyAbortedUserIdPairs.exists(u1.id, u2.id)
         }
       )
     }
 
-  def registerAbortedGame(g: Game) = recentlyAbortedUserIdPairs register g
+  def registerAbortedGame(g: Game) = recentlyAbortedUserIdPairs `register` g
 
   private object recentlyAbortedUserIdPairs {
     private val cache                                     = new lila.memo.ExpireSetMemo(1 hour)
@@ -205,12 +204,12 @@ final private class LobbyTrouper(
   }
 
   private def findCompatible(seek: Seek): Fu[Option[Seek]] =
-    seekApi forUser seek.user map {
-      _ find (_ compatibleWith seek)
+    seekApi `forUser` seek.user map {
+      _ find (_ `compatibleWith` seek)
     }
 
   private def remove(hook: Hook) = {
-    hookRepo remove hook
+    hookRepo `remove` hook
     socket ! RemoveHook(hook.id)
     Bus.publish(RemoveHook(hook.id), s"hookRemove:${hook.id}")
   }
@@ -237,7 +236,7 @@ private object LobbyTrouper {
       every = Every(broomPeriod),
       atMost = AtMost(10 seconds),
       initialDelay = 7 seconds
-    ) { trouper.ask[Unit](Tick) }
+    ) { trouper.ask[Unit](Tick.apply) }
     trouper
   }
 }

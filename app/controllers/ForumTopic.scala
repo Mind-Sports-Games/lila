@@ -2,10 +2,9 @@ package controllers
 
 import cats.implicits._
 import play.api.libs.json._
-import scala.concurrent.duration._
 import views._
 
-import lila.app._
+import lila.app.*
 import lila.common.{ HTTPRequest, IpAddress }
 import lila.user.Holder
 
@@ -18,8 +17,8 @@ final class ForumTopic(env: Env) extends LilaController(env) with ForumControlle
     Auth { implicit ctx => me =>
       NoBot {
         NotForKids {
-          OptionFuOk(env.forum.categRepo bySlug categSlug) { categ =>
-            categ.team.?? { env.team.cached.isLeader(_, me.id) } flatMap { inOwnTeam =>
+          OptionFuOk(env.forum.categRepo `bySlug` categSlug) { categ =>
+            categ.team.fold(fuFalse) { t => env.team.cached.isLeader(t, me.id) } flatMap { inOwnTeam =>
               forms.anyCaptcha map { html.forum.topic.form(categ, forms.topic(me, inOwnTeam), _) }
             }
           }
@@ -32,8 +31,8 @@ final class ForumTopic(env: Env) extends LilaController(env) with ForumControlle
       NoBot {
         CategGrantWrite(categSlug) {
           implicit val req = ctx.body
-          OptionFuResult(env.forum.categRepo bySlug categSlug) { categ =>
-            categ.team.?? { env.team.cached.isLeader(_, me.id) } flatMap { inOwnTeam =>
+          OptionFuResult(env.forum.categRepo `bySlug` categSlug) { categ =>
+            categ.team.fold(fuFalse) { t => env.team.cached.isLeader(t, me.id) } flatMap { inOwnTeam =>
               forms
                 .topic(me, inOwnTeam)
                 .bindFromRequest()
@@ -43,7 +42,7 @@ final class ForumTopic(env: Env) extends LilaController(env) with ForumControlle
                       BadRequest(html.forum.topic.form(categ, err, captcha))
                     },
                   data =>
-                    CreateRateLimit(HTTPRequest ipAddress ctx.req) {
+                    CreateRateLimit(HTTPRequest `ipAddress` ctx.req) {
                       topicApi.makeTopic(categ, data, me) map { topic =>
                         Redirect(routes.ForumTopic.show(categ.slug, topic.slug, 1))
                       }
@@ -59,15 +58,21 @@ final class ForumTopic(env: Env) extends LilaController(env) with ForumControlle
     Open { implicit ctx =>
       NotForKids {
         OptionFuOk(topicApi.show(categSlug, slug, page, ctx.me)) { case (categ, topic, posts) =>
+          val unsubFu: Fu[Option[Boolean]] = ctx.userId.fold(fuccess(Option.empty[Boolean]))(uid =>
+            env.timeline.status(s"forum:${topic.id}")(uid)
+          )
           for {
-            unsub    <- ctx.userId ?? env.timeline.status(s"forum:${topic.id}")
+            unsub    <- unsubFu
             canWrite <- isGrantedWrite(categSlug)
-            inOwnTeam <- ~(categ.team, ctx.me).mapN { case (teamId, me) =>
+            inOwnTeam <- (categ.team, ctx.me).mapN { case (teamId, me) =>
               env.team.cached.isLeader(teamId, me.id)
-            }
+            }.getOrElse(fuFalse)
             form <- ctx.me.ifTrue(
               !posts.hasNextPage && canWrite && topic.open && !topic.isOld
-            ) ?? { me => forms.postWithCaptcha(me, inOwnTeam) map some }
+            ) match {
+              case Some(me) => forms.postWithCaptcha(me, inOwnTeam) map (Some(_))
+              case None     => fuccess(None)
+            }
             canModCateg <- isGrantedMod(categ.slug)
             _           <- env.user.lightUserApi preloadMany posts.currentPageResults.flatMap(_.userId)
           } yield html.forum.topic.show(categ, topic, posts, form, unsub, canModCateg = canModCateg)
@@ -108,8 +113,8 @@ final class ForumTopic(env: Env) extends LilaController(env) with ForumControlle
   def participants(topicId: String) =
     Auth { _ => _ =>
       for {
-        userIds   <- postApi allUserIds topicId
-        usernames <- env.user.repo usernamesByIds userIds
+        userIds   <- postApi `allUserIds` topicId
+        usernames <- env.user.repo `usernamesByIds` userIds
       } yield Ok(Json.toJson(usernames.sortBy(_.toLowerCase)))
     }
 }

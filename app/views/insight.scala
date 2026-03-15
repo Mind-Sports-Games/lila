@@ -8,7 +8,6 @@ import lila.app.ui.ScalatagsTemplate._
 import lila.common.String.html.safeJsonValue
 import lila.user.User
 
-import controllers.routes
 
 object insight {
 
@@ -52,7 +51,7 @@ object insight {
     )(
       frag(
         main(id := "insight"),
-        stale option div(cls := "insight-stale none")(
+        stale `option` div(cls := "insight-stale none")(
           p("There are new games to learn from!"),
           refreshForm(u, "Update insights")
         )

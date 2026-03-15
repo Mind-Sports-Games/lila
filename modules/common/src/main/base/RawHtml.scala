@@ -1,31 +1,29 @@
 package lila.base
 
 import java.lang.Character.isLetterOrDigit
-import java.lang.{ StringBuilder => jStringBuilder, Math }
+import java.lang.{ StringBuilder as jStringBuilder, Math }
 import scala.annotation.{ switch, tailrec }
 
 import lila.common.base.StringUtils.escapeHtmlRaw
 
-final object RawHtml {
+object RawHtml {
 
   def nl2br(s: String): String = {
     val sb      = new jStringBuilder(s.length)
     var counter = 0
-    for (char <- s) {
-      if (char == '\n') {
+    for char <- s do
+      if char == '\n' then {
         counter += 1
-        if (counter < 3) {
-          sb.append("<br>")
-        }
-      } else if (char != '\r') {
+        if counter < 3 then sb.append("<br>")
+      }
+      else if char != '\r' then {
         counter = 0
         sb.append(char)
       }
-    }
     sb.toString
   }
 
-  private[this] val urlPattern = (
+  private val urlPattern = (
     """(?i)\b[a-z](?>""" +                                     // pull out first char for perf.
       """ttp(?<=http)s?://(\w[-\w.~!$&';=:@]{0,100})|""" +     // http(s) links
       """(?<![/@.-].)(?:\w{1,15}+\.){1,3}(?>com|org|edu))""" + // "playstrategy.org", etc
@@ -33,33 +31,34 @@ final object RawHtml {
       """(?![\w/~$&*+=#@%])"""                                 // neg lookahead
   ).r.pattern
 
-  private[this] val USER_LINK = """/@/([\w-]{2,30}+)?""".r
+  private val USER_LINK = """/@/([\w-]{2,30}+)?""".r
 
-  final private[this] val DOMAIN      = "playstrategy.org"
-  final private[this] val linkReplace = DOMAIN + "/@/$1"
+  private val DOMAIN      = "playstrategy.org"
 
   // Matches a playstrategy username with an '@' prefix if it is used as a single
   // word (i.e. preceded and followed by space or appropriate punctuation):
   // Yes: everyone says @ornicar is a pretty cool guy
   // No: contact@playstrategy.org, @1, http://example.com/@happy0, @playstrategy.org
-  // TODO(isaac): support @user/<subpath> syntax
   val atUsernameRegex = """@(?<![\w@#/]@)([\w-]{2,30}+)(?![@\w-]|\.\w)""".r
 
-  private[this] val atUsernamePat = atUsernameRegex.pattern
+  private val atUsernamePat = atUsernameRegex.pattern
 
   def expandAtUser(text: String): List[String] = {
     val m = atUsernamePat.matcher(text)
-    if (m.find) {
+    if m.find then {
       var idx = 0
       val buf = List.newBuilder[String]
-      do {
-        if (idx < m.start) buf += text.substring(idx, m.start)
+      while {
+        if idx < m.start then buf += text.substring(idx, m.start)
         buf += DOMAIN + "/@/" + m.group(1)
         idx = m.end
-      } while (m.find)
-      if (idx < text.length) buf += text.substring(idx)
+        m.find
+      }
+      do ()
+      if idx < text.length then buf += text.substring(idx)
       buf.result()
-    } else List(text)
+    }
+    else List(text)
   }
 
   def hasLinks(text: String) = urlPattern.matcher(text).find
@@ -68,13 +67,13 @@ final object RawHtml {
     expandAtUser(text).map { expanded =>
       val m = urlPattern.matcher(expanded)
 
-      if (!m.find) escapeHtmlRaw(expanded) // preserve fast case!
+      if !m.find then escapeHtmlRaw(expanded) // preserve fast case!
       else {
         val sb            = new jStringBuilder(expanded.length + 200)
         val sArr          = expanded.toCharArray
         var lastAppendIdx = 0
 
-        do {
+        while {
           val start = m.start
           escapeHtmlRaw(sb, sArr, lastAppendIdx, start)
 
@@ -83,7 +82,7 @@ final object RawHtml {
 
           val end = {
             val e = m.end
-            if (isLetterOrDigit(sArr(e - 1))) e
+            if isLetterOrDigit(sArr(e - 1)) then e
             else adjustUrlEnd(sArr, Math.max(pathS, domainS), e)
           }
 
@@ -98,28 +97,28 @@ final object RawHtml {
           val isTldInternal = DOMAIN == domain
 
           val csb = new jStringBuilder()
-          if (!isTldInternal) csb.append(domain)
-          if (pathS >= 0) {
-            if (sArr(pathS) != '/') csb.append('/')
+          if !isTldInternal then csb.append(domain)
+          if pathS >= 0 then {
+            if sArr(pathS) != '/' then csb.append('/')
             csb.append(sArr, pathS, end - pathS)
           }
 
           val allButScheme = escapeHtmlRaw(csb.toString)
 
-          if (isTldInternal) {
-            sb.append(s"""<a href="${if (allButScheme.isEmpty) "/"
+          if isTldInternal then
+            sb.append(s"""<a href="${if allButScheme.isEmpty then "/"
             else allButScheme}">${allButScheme match {
               case USER_LINK(user) => "@" + user
               case _               => DOMAIN + allButScheme
-            }}</a>""")
-          } else {
+              }
+            }</a>""")
+          else {
             val isHttp = domainS - start == 7
-            val url    = (if (isHttp) "http://" else "https://") + allButScheme
-            val text   = if (isHttp) url else allButScheme
-            val imgHtml = {
-              if ((end < sArr.length && sArr(end) == '"') || !expandImg) None
+            val url    = (if isHttp then "http://" else "https://") + allButScheme
+            val text   = if isHttp then url else allButScheme
+            val imgHtml =
+              if (end < sArr.length && sArr(end) == '"') || !expandImg then None
               else imgUrl(url)
-            }
             sb.append(
               imgHtml.getOrElse(
                 s"""<a rel="nofollow noopener noreferrer" href="$url" target="_blank">$text</a>"""
@@ -127,28 +126,30 @@ final object RawHtml {
             )
           }
           lastAppendIdx = end
-        } while (m.find)
+          m.find
+        }
+        do ()
 
         escapeHtmlRaw(sb, sArr, lastAppendIdx, sArr.length)
         sb.toString
       }
     } match {
       case one :: Nil => one
-      case many       => many mkString ""
+      case many       => many.mkString("")
     }
 
-  private[this] def adjustUrlEnd(sArr: Array[Char], start: Int, end: Int): Int = {
+  private def adjustUrlEnd(sArr: Array[Char], start: Int, end: Int): Int = {
     var last = end - 1
-    while (
+    while
       (sArr(last): @switch) match {
         case '.' | ',' | '?' | '!' | ':' | ';' | '–' | '—' | '@' | '\'' | '(' => true
         case _                                                                => false
       }
-    ) { last -= 1 }
+    do last -= 1
 
-    if (sArr(last) == ')') {
+    if sArr(last) == ')' then {
       @tailrec def pCnter(idx: Int, acc: Int): Int =
-        if (idx >= last) acc
+        if idx >= last then acc
         else
           pCnter(
             idx + 1,
@@ -156,35 +157,37 @@ final object RawHtml {
               case '(' => 1
               case ')' => -1
               case _   => 0
-            })
+            }
+            )
           )
       var parenCnt = pCnter(start, -1)
-      while (
+      while
         (sArr(last): @switch) match {
           case '.' | ',' | '?' | '!' | ':' | ';' | '–' | '—' | '@' | '\'' => true
           case '('                                                        => parenCnt -= 1; true
           case ')'                                                        => parenCnt += 1; parenCnt <= 0
           case _                                                          => false
         }
-      ) { last -= 1 }
+      do last -= 1
     }
     last + 1
   }
 
-  private[this] val imgurRegex = """https?://(?:i\.)?imgur\.com/(\w+)(?:\.jpe?g|\.png|\.gif)?""".r
-  private[this] val giphyRegex =
+  private val imgurRegex = """https?://(?:i\.)?imgur\.com/(\w+)(?:\.jpe?g|\.png|\.gif)?""".r
+  private val giphyRegex =
     """https://(?:media\.giphy\.com/media/|giphy\.com/gifs/(?:\w+-)*)(\w+)(?:/giphy\.gif)?""".r
 
-  private[this] def imgUrl(url: String): Option[String] =
+  private def imgUrl(url: String): Option[String] =
     (url match {
       case imgurRegex(id) => Some(s"""https://i.imgur.com/$id.jpg""")
       case giphyRegex(id) => Some(s"""https://media.giphy.com/media/$id/giphy.gif""")
       case _              => None
-    }) map { img =>
+    }
+    ).map { img =>
       s"""<img class="embed" src="$img" alt="$url"/>"""
     }
 
-  private[this] val markdownLinkRegex = """\[([^]]++)\]\((https?://[^)]++)\)""".r
+  private val markdownLinkRegex = """\[([^]]++)\]\((https?://[^)]++)\)""".r
 
   def justMarkdownLinks(escapedHtml: String): String =
     markdownLinkRegex.replaceAllIn(escapedHtml, """<a href="$2">$1</a>""")

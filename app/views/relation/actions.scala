@@ -4,7 +4,6 @@ import lila.api.Context
 import lila.app.templating.Environment._
 import lila.app.ui.ScalatagsTemplate._
 
-import controllers.routes
 
 object actions {
 
@@ -20,8 +19,8 @@ object actions {
   )(implicit ctx: Context) =
     div(cls := "relation-actions btn-rack")(
       ctx.userId map { myId =>
-        (myId != userId) ?? frag(
-          !blocked option frag(
+        (myId != userId) so frag(
+          !blocked `option` frag(
             a(
               titleOrText(trans.challenge.challengeToPlay.txt()),
               href := s"${routes.Lobby.home}?user=$userId#game",
@@ -38,7 +37,7 @@ object actions {
           relation match {
             case None =>
               frag(
-                followable && !blocked option a(
+                followable && !blocked `option` a(
                   cls := "btn-rack__btn relation-button",
                   href := routes.Relation.follow(userId),
                   titleOrText(trans.follow.txt()),
@@ -79,7 +78,7 @@ object actions {
             dataIcon := "U"
           )
         else
-          signup option frag(
+          signup `option` frag(
             trans.youNeedAnAccountToDoThat(),
             a(href := routes.Auth.login, cls := "signup")(trans.signUp())
           )

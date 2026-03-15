@@ -1,9 +1,8 @@
 package lila.perfStat
 
-import strategygames.variant.Variant
-import scala.concurrent.duration._
 import reactivemongo.api.ReadPreference
 
+import lila.common.extensions.*
 import lila.game.{ Game, GameRepo, Pov, Query }
 import lila.rating.PerfType
 import lila.user.User
@@ -21,12 +20,12 @@ final class PerfStatIndexer(
 
   private[perfStat] def userPerf(user: User, perfType: PerfType): Fu[PerfStat] =
     workQueue {
-      storage.find(user.id, perfType) getOrElse gameRepo
+      storage.find(user.id, perfType) `getOrElse` gameRepo
         .sortedCursor(
           Query.user(user.id) ++
             Query.finished ++
             Query.turnsGt(2) ++
-            Query.variant(PerfType variantOf perfType),
+            Query.variant(PerfType `variantOf` perfType),
           Query.sortChronological,
           readPreference = ReadPreference.secondaryPreferred
         )
@@ -34,28 +33,27 @@ final class PerfStatIndexer(
           case (perfStat, game) if game.perfType.contains(perfType) =>
             Pov.ofUserId(game, user.id).fold(perfStat)(perfStat.agg)
           case (perfStat, _) => perfStat
-        }
+      }
         .flatMap { ps =>
-          storage insert ps recover lila.db.recoverDuplicateKey(_ => ()) inject ps
+          storage `insert` ps recover lila.db.recoverDuplicateKey(_ => ()) inject ps
         }
         .mon(_.perfStat.indexTime)
     }
 
   def addGame(game: Game): Funit =
-    game.players
+    Future.sequence(game.players
       .flatMap { player =>
         player.userId.map { userId =>
           addPov(Pov(game, player), userId)
         }
-      }
-      .sequenceFu
+      })
       .void
 
   private def addPov(pov: Pov, userId: String): Funit =
-    pov.game.perfType ?? { perfType =>
+    pov.game.perfType so { perfType =>
       storage.find(userId, perfType) flatMap {
-        _ ?? { perfStat =>
-          storage.update(perfStat, perfStat agg pov)
+        _ so { perfStat =>
+          storage.update(perfStat, perfStat `agg` pov)
         }
       }
     }

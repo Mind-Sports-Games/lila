@@ -5,10 +5,9 @@ import org.joda.time.DateTime
 import lila.api.Context
 import lila.app.templating.Environment._
 import lila.app.ui.ScalatagsTemplate._
-import lila.user.{ Trophy, TrophyKind }
+import lila.user.Trophy
 import lila.i18n.VariantKeys
 
-import controllers.routes
 
 object otherTrophies {
 

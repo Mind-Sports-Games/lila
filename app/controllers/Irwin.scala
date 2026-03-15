@@ -1,6 +1,6 @@
 package controllers
 
-import lila.app._
+import lila.app.*
 
 final class Irwin(env: Env) extends LilaController(env) {
 
@@ -21,7 +21,7 @@ final class Irwin(env: Env) extends LilaController(env) {
           .fold(
             err => fuccess(BadRequest(err.toString)),
             report => env.irwin.api.reports.insert(report) inject Ok
-          ) map (_ as TEXT)
+          ) map (_ `as` TEXT)
       }
     }
 

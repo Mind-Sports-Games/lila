@@ -1,7 +1,6 @@
 package lila.game
 
 import com.github.blemale.scaffeine.Cache
-import scala.concurrent.duration._
 
 import strategygames.{ ActionStrs, Divider, Division, Replay }
 import strategygames.variant.Variant

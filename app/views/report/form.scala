@@ -7,11 +7,10 @@ import lila.app.templating.Environment._
 import lila.app.ui.ScalatagsTemplate._
 import lila.user.User
 
-import controllers.routes
 
 object form {
 
-  def apply(form: Form[_], reqUser: Option[User] = None, captcha: lila.common.Captcha)(implicit
+  def apply(form: Form[?], reqUser: Option[User] = None, captcha: lila.common.Captcha)(implicit
       ctx: Context
   ) =
     views.html.base.layout(
@@ -23,7 +22,7 @@ object form {
         h1(trans.reportAUser()),
         postForm(
           cls := "form3",
-          action := s"${routes.Report.create}${reqUser.??(u => "?username=" + u.username)}"
+          action := s"${routes.Report.create}${reqUser.so(u => "?username=" + u.username)}"
         )(
           div(cls := "form-group")(
             a(href := routes.Page.lonePage("report-faq"), dataIcon := "", cls := "text")(

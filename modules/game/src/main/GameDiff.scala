@@ -87,7 +87,7 @@ object GameDiff {
         },
         clk.limit,
         times,
-        g.flagged has playerIndex
+        g.flagged contains playerIndex
       )
 
     def clockHistoryToBytes(o: Option[ClockHistorySide]) =
@@ -148,7 +148,7 @@ object GameDiff {
             dOpt(
               checkCount,
               _.history.checkCount,
-              (o: CheckCount) => o.nonEmpty ?? { BSONHandlers.checkCountWriter writeOpt o }
+              (o: CheckCount) => o.nonEmpty so { BSONHandlers.checkCountWriter writeOpt o }
             )
           if (a.variant.dropsVariant)
             dOpt(
@@ -165,7 +165,7 @@ object GameDiff {
             case Board.Draughts(b) => b.pieces
             case _                 => sys.error("Wrong board type")
           },
-          writeBytes compose { m: strategygames.draughts.PieceMap =>
+          writeBytes compose { (m: strategygames.draughts.PieceMap) =>
             BinaryFormat.piece.writeDraughts(
               m,
               a.variant match {
@@ -257,7 +257,7 @@ object GameDiff {
         dOpt(
           score,
           _.history.score,
-          (o: Score) => o.nonEmpty ?? { BSONHandlers.scoreWriter writeOpt o }
+          (o: Score) => o.nonEmpty so { BSONHandlers.scoreWriter writeOpt o }
         )
       }
       case GameLogic.Go() => {
@@ -276,7 +276,7 @@ object GameDiff {
         dOpt(
           score,
           _.history.score,
-          (o: Score) => o.nonEmpty ?? { BSONHandlers.scoreWriter writeOpt o }
+          (o: Score) => o.nonEmpty so { BSONHandlers.scoreWriter writeOpt o }
         )
         if (a.variant.dropsVariant)
           dOpt(
@@ -326,7 +326,7 @@ object GameDiff {
         dOpt(
           score,
           _.history.score,
-          (o: Score) => o.nonEmpty ?? { BSONHandlers.scoreWriter writeOpt o }
+          (o: Score) => o.nonEmpty so { BSONHandlers.scoreWriter writeOpt o }
         )
       }
       case GameLogic.Abalone() => {
@@ -345,7 +345,7 @@ object GameDiff {
         dOpt(
           score,
           _.history.score,
-          (o: Score) => o.nonEmpty ?? { BSONHandlers.scoreWriter writeOpt o }
+          (o: Score) => o.nonEmpty so { BSONHandlers.scoreWriter writeOpt o }
         )
       }
       case GameLogic.Dameo() => {
@@ -363,7 +363,6 @@ object GameDiff {
         d(historyLastTurn, _.history.lastTurn.map(_.uci).mkString(","), w.str)
         d(historyCurrentTurn, _.history.currentTurn.map(_.uci).mkString(","), w.str)
       }
-      case _ => sys.error("GameDiff not implemented for new game logic")
     }
 
     d(turns, _.turnCount, w.int)
@@ -400,7 +399,7 @@ object GameDiff {
 
   private val bTrue = BSONBoolean(true)
 
-  private val writeBytes = ByteArrayBSONHandler.writeTry _
+  private val writeBytes = ByteArrayBSONHandler.writeTry
 
   private def makeCastleLastMove(g: Game) =
     CastleLastMove(

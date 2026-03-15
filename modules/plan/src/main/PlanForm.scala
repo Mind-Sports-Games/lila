@@ -21,7 +21,7 @@ object PlanForm {
       "first_name"        -> optional(text),
       "last_name"         -> optional(text),
       "residence_country" -> optional(text)
-    )(Ipn.apply)(Ipn.unapply)
+    )(Ipn.apply)(d => Some((d.txnId, d.subId, d.txnType, d.gross, d.fee, d.userId, d.email, d.firstName, d.lastName, d.countryCode)))
   )
 
   case class Ipn(
@@ -43,6 +43,6 @@ object PlanForm {
 
     def feeCents = (fee * 100).toInt
 
-    def country = countryCode.map(Country)
+    def country = countryCode.map(Country.apply)
   }
 }

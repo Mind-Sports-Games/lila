@@ -14,7 +14,7 @@ final class HttpFilter(env: Env)(implicit val mat: Materializer) extends Filter 
   private val logRequests = env.config.get[Boolean]("net.http.log")
 
   def apply(nextFilter: RequestHeader => Fu[Result])(req: RequestHeader): Fu[Result] =
-    if (HTTPRequest isAssets req) nextFilter(req) dmap { result =>
+    if (HTTPRequest `isAssets` req) nextFilter(req) dmap { result =>
       result.withHeaders(
         "Service-Worker-Allowed"       -> "/",
         "Cross-Origin-Embedder-Policy" -> "require-corp"
@@ -23,7 +23,7 @@ final class HttpFilter(env: Env)(implicit val mat: Materializer) extends Filter 
     else {
       val startTime = nowMillis
       redirectWrongDomain(req) map fuccess getOrElse {
-        nextFilter(req) dmap addApiResponseHeaders(req) dmap { result =>
+        nextFilter(req) `dmap` addApiResponseHeaders(req) dmap { result =>
           monitoring(req, startTime, result)
           result
         }
@@ -31,10 +31,10 @@ final class HttpFilter(env: Env)(implicit val mat: Materializer) extends Filter 
     }
 
   private def monitoring(req: RequestHeader, startTime: Long, result: Result) = {
-    val actionName = HTTPRequest actionName req
+    val actionName = HTTPRequest `actionName` req
     val reqTime    = nowMillis - startTime
     val statusCode = result.header.status
-    val client     = HTTPRequest clientName req
+    val client     = HTTPRequest `clientName` req
     if (env.net.isProd) httpMon.time(actionName, client, req.method, statusCode).record(reqTime)
     else if (logRequests) logger.info(s"$statusCode $client $req $actionName ${reqTime}ms")
   }
@@ -46,11 +46,11 @@ final class HttpFilter(env: Env)(implicit val mat: Materializer) extends Filter 
         !HTTPRequest.isProgrammatic(req) &&
         // asset request going through the CDN, don't redirect
         !(req.host == net.assetDomain.value && HTTPRequest.hasFileExtension(req))
-    ) option Results.MovedPermanently(s"http${if (req.secure) "s" else ""}://${net.domain}${req.uri}")
+    ) `option` Results.MovedPermanently(s"http${if (req.secure) "s" else ""}://${net.domain}${req.uri}")
 
   private def addApiResponseHeaders(req: RequestHeader)(result: Result) =
     if (HTTPRequest.isApiOrApp(req))
-      result.withHeaders(ResponseHeaders.headersForApiOrApp(req): _*)
+      result.withHeaders(ResponseHeaders.headersForApiOrApp(req)*)
     else
       result
 }

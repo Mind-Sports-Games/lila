@@ -1,6 +1,6 @@
 package lila.study
 
-import strategygames.{ Centis, GameLogic, Pos }
+import strategygames.{ Centis, Pos }
 import strategygames.variant.Variant
 import lila.common.Maths
 import lila.tree.Node.{ Shape, Shapes }

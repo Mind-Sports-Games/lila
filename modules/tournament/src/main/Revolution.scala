@@ -1,7 +1,6 @@
 package lila.tournament
 
 import org.joda.time.DateTime
-import scala.concurrent.duration._
 import reactivemongo.api.ReadPreference
 
 import strategygames.variant.Variant
@@ -30,8 +29,8 @@ final class RevolutionApi(
           .find(
             $doc(
               "schedule.freq" -> scheduleFreqHandler.writeTry(Schedule.Freq.Unique).get,
-              "startsAt" $lt DateTime.now $gt DateTime.now.minusYears(1).minusDays(1),
-              "name" $regex Revolution.namePattern,
+              "startsAt" `$lt` DateTime.now `$gt` DateTime.now.minusYears(1).minusDays(1),
+              "name" `$regex` Revolution.namePattern,
               "status" -> statusBSONHandler.writeTry(Status.Finished).get
             ),
             $doc("winner" -> true, "variant" -> true).some
@@ -75,7 +74,7 @@ object Revolution {
       variant: Variant,
       tourId: Tournament.ID
   ) {
-    val iconChar = lila.rating.PerfType iconByVariant variant
+    val iconChar = lila.rating.PerfType `iconByVariant` variant
   }
 
   type PerOwner = Map[User.ID, List[Award]]

@@ -3,11 +3,11 @@ package controllers
 import play.api.data._, Forms._
 import views._
 
-import lila.app._
+import lila.app.*
 
 final class Dev(env: Env) extends LilaController(env) {
 
-  private lazy val settingsList = List[lila.memo.SettingStore[_]](
+  private lazy val settingsList = List[lila.memo.SettingStore[?]](
     env.security.ugcArmedSetting,
     env.security.spamKeywordsSetting,
     env.security.mailerSecondaryPermilleSetting,
@@ -33,7 +33,7 @@ final class Dev(env: Env) extends LilaController(env) {
 
   def settingsPost(id: String) =
     SecureBody(_.Settings) { implicit ctx => _ =>
-      settingsList.find(_.id == id) ?? { setting =>
+      settingsList.find(_.id == id) so { setting =>
         implicit val req = ctx.body
         setting.form
           .bindFromRequest()
@@ -60,14 +60,14 @@ final class Dev(env: Env) extends LilaController(env) {
           err => BadRequest(html.dev.cli(err, "Invalid command".some)).fuccess,
           command =>
             runAs(me.id, command) map { res =>
-              Ok(html.dev.cli(commandForm fill command, s"$command\n\n$res".some))
+              Ok(html.dev.cli(commandForm `fill` command, s"$command\n\n$res".some))
             }
         )
     }
 
   def command =
     ScopedBody(parse.tolerantText)(Seq(_.Preference.Write)) { implicit req => me =>
-      lila.security.Granter(_.Cli)(me) ?? {
+      lila.security.Granter(_.Cli)(me) so {
         runAs(me.id, req.body) map { Ok(_) }
       }
     }

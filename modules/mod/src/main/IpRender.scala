@@ -1,7 +1,6 @@
 package lila.mod
 
 import com.github.blemale.scaffeine.LoadingCache
-import scala.concurrent.duration._
 import scala.jdk.CollectionConverters._
 
 import lila.common.CuteNameGenerator
@@ -32,7 +31,7 @@ final class IpRender {
     cache.underlying.asMap.asScala.collectFirst {
       case (ip, encrypted) if encrypted == str =>
         ip
-    }
+  }
 
   private val cache: LoadingCache[IpAddress, Rendered] = CacheApi.scaffeineNoScheduler
     .expireAfterAccess(30 minutes)

@@ -9,7 +9,7 @@ import lila.common.config.CollName
 final class Env(
     appConfig: Configuration,
     messenger: lila.msg.MsgApi,
-    reporter: lila.hub.actors.Report,
+    @annotation.nowarn("msg=unused") _reporter: lila.hub.actors.Report,
     chatApi: lila.chat.ChatApi,
     userRepo: lila.user.UserRepo,
     noteApi: lila.user.NoteApi,

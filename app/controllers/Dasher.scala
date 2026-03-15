@@ -3,9 +3,9 @@ package controllers
 import play.api.libs.json._
 
 import lila.api.Context
-import lila.app._
+import lila.app.*
 import lila.common.LightUser.lightUserWrites
-import lila.i18n.{ enLang, I18nKeys => trans, I18nLangPicker, LangList, VariantKeys }
+import lila.i18n.{ enLang, I18nKeys => trans, I18nLangPicker, LangList }
 import strategygames.{ GameFamily }
 
 final class Dasher(env: Env) extends LilaController(env) {
@@ -46,7 +46,7 @@ final class Dasher(env: Env) extends LilaController(env) {
     ) ++ lila.i18n.JsDump.keysToObject(
       // the language settings should never be in a totally foreign language
       List(trans.language.key),
-      if (I18nLangPicker.allFromRequestHeaders(ctx.req).has(ctx.lang)) ctx.lang
+      if (I18nLangPicker.allFromRequestHeaders(ctx.req).contains(ctx.lang)) ctx.lang
       else I18nLangPicker.bestFromRequestHeaders(ctx.req) | enLang
     )
 
@@ -55,7 +55,7 @@ final class Dasher(env: Env) extends LilaController(env) {
       negotiate(
         html = notFound,
         api = _ =>
-          ctx.me.??(env.streamer.api.isPotentialStreamer) map { isStreamer =>
+          ctx.me.fold(fuFalse)(env.streamer.api.isPotentialStreamer) map { isStreamer =>
             Ok {
               Json.obj(
                 "user" -> ctx.me.map(_.light),

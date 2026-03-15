@@ -4,7 +4,6 @@ import lila.api.Context
 import lila.app.templating.Environment._
 import lila.app.ui.ScalatagsTemplate._
 
-import controllers.routes
 
 object emailConfirm {
 
@@ -52,10 +51,10 @@ this.setSelectionRange(this.value.length, this.value.length);
                   td(email.fold("-")(_.value)),
                   td(u.count.game.localize),
                   td(
-                    u.marks.engine option "ENGINE",
-                    u.marks.boost option "BOOSTER",
-                    u.marks.troll option "SHADOWBAN",
-                    u.disabled option "CLOSED"
+                    u.marks.engine `option` "ENGINE",
+                    u.marks.boost `option` "BOOSTER",
+                    u.marks.troll `option` "SHADOWBAN",
+                    u.disabled `option` "CLOSED"
                   ),
                   td(momentFromNow(u.createdAt)),
                   td(u.seenAt.map(momentFromNow(_))),

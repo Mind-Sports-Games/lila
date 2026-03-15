@@ -2,10 +2,9 @@ package lila.teamSearch
 
 import akka.actor._
 import com.softwaremill.macwire._
-import io.methvin.play.autoconfig._
+import lila.common.autoconfig.{ AutoConfig, ConfigName }
 import play.api.Configuration
 
-import lila.common.config._
 import lila.search._
 
 @Module
@@ -23,9 +22,9 @@ final class Env(
     system: ActorSystem
 ) {
 
-  private val config = appConfig.get[TeamSearchConfig]("teamSearch")(AutoConfig.loader)
+  private val config = appConfig.get[TeamSearchConfig]("teamSearch")(using AutoConfig.loader)
 
-  private val maxPerPage = MaxPerPage(15)
+  private val maxPerPage = lila.common.config.MaxPerPage(15)
 
   private lazy val client = makeClient(Index(config.indexName))
 
@@ -46,8 +45,8 @@ final class Env(
     Props(new Actor {
       import lila.team.actorApi._
       def receive = {
-        case InsertTeam(team) => api.store(team).unit
-        case RemoveTeam(id)   => client.deleteById(Id(id)).unit
+        case InsertTeam(team) => api.store(team).discard
+        case RemoveTeam(id)   => client.deleteById(Id(id)).discard
       }
     }),
     name = config.actorName

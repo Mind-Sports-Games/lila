@@ -39,7 +39,7 @@ object Accuracy {
           (if (pov.playerIndex.p1) -diff else diff).max(0) :: list
         }
       case (list, _) => list
-    }
+  }
     .reverse
 
   def prevPlayerIndexInfos(pov: PovLike, analysis: Analysis): List[Info] = {
@@ -52,7 +52,7 @@ object Accuracy {
   def mean(pov: PovLike, analysis: Analysis): Option[Int] = {
     val diffs = diffsList(pov, analysis)
     val nb    = diffs.size
-    (nb != 0) option (diffs.sum / nb)
+    (nb != 0) `option` (diffs.sum / nb)
   }
   def mean(pov: Pov, analysis: Analysis): Option[Int] = mean(povToPovLike(pov), analysis)
 }

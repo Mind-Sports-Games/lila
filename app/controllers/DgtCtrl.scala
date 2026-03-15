@@ -1,6 +1,6 @@
 package controllers
 
-import lila.app._
+import lila.app.*
 import lila.oauth.OAuthScope
 
 final class DgtCtrl(env: Env) extends LilaController(env) {
@@ -20,11 +20,11 @@ final class DgtCtrl(env: Env) extends LilaController(env) {
   def generateToken =
     Auth { _ => me =>
       findToken(me) flatMap { t =>
-        t.isEmpty.?? {
+        t.isEmpty.so {
           val token = lila.oauth.OAuthForm.token.Data(
             description = "DGT board automatic token",
             scopes = dgtScopes.toList.map(_.key)
-          ) make me
+          ) `make` me
           env.oAuth.tokenApi.create(token) >>
             env.pref.api.saveTag(me, _.dgt, true)
         } inject Redirect(routes.DgtCtrl.config)

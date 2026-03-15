@@ -4,6 +4,7 @@ import org.joda.time.{ DateTime, Interval }
 import reactivemongo.api.ReadPreference
 
 import lila.common.Heapsort
+import lila.common.extensions.*
 import lila.db.dsl._
 import lila.game.LightPov
 import lila.practice.PracticeStructure
@@ -35,31 +36,31 @@ final class ActivityReadApi(
       activities <-
         coll
           .find(regexId(u.id))
-          .sort($sort desc "_id")
+          .sort($sort `desc` "_id")
           .cursor[Activity](ReadPreference.secondaryPreferred)
           .vector(nb)
           .dmap(_.filterNot(_.isEmpty))
-          .mon(_.user segment "activity.raws")
-      practiceStructure <- activities.exists(_.practice.isDefined) ?? {
-        practiceApi.structure.get dmap some
+          .mon(_.user `segment` "activity.raws")
+      practiceStructure <- activities.exists(_.practice.isDefined) so {
+        practiceApi.structure.get `dmap` some
       }
-      views <- activities.map { a =>
-        one(practiceStructure, a).mon(_.user segment "activity.view")
-      }.sequenceFu
+      views <- Future.sequence(activities.map { a =>
+        one(practiceStructure, a).mon(_.user `segment` "activity.view")
+      })
     } yield addSignup(u.createdAt, views)
 
   private def one(practiceStructure: Option[PracticeStructure], a: Activity): Fu[ActivityView] =
     for {
-      posts <- a.posts ?? { p =>
+      posts <- a.posts so { p =>
         postApi
           .liteViewsByIds(p.value.map(_.value))
-          .mon(_.user segment "activity.posts") dmap some
+          .mon(_.user `segment` "activity.posts") `dmap` some
       }
       practice = (for {
         p      <- a.practice
         struct <- practiceStructure
       } yield p.value flatMap { case (studyId, nb) =>
-        struct study studyId map (_ -> nb)
+        struct `study` studyId map (_ -> nb)
       } toMap)
       postView = posts.map { p =>
         p.groupBy(_.topic)
@@ -69,12 +70,12 @@ final class ActivityReadApi(
           }
           .toMap
       } filter (_.nonEmpty)
-      corresMoves <- a.corres ?? { corres =>
+      corresMoves <- a.corres so { corres =>
         getLightPovs(a.id.userId, corres.movesIn) dmap {
           _.map(corres.moves -> _)
         }
       }
-      corresEnds <- a.corres ?? { corres =>
+      corresEnds <- a.corres so { corres =>
         getLightPovs(a.id.userId, corres.end) dmap {
           _.map { povs =>
             Score.make(povs) -> povs
@@ -83,22 +84,22 @@ final class ActivityReadApi(
       }
       simuls <-
         a.simuls
-          .?? { simuls =>
-            simulApi byIds simuls.value.map(_.value) dmap some
+          .so { simuls =>
+            simulApi byIds simuls.value.map(_.value) `dmap` some
           }
           .dmap(_.filter(_.nonEmpty))
       studies <-
         a.studies
-          .?? { studies =>
-            studyApi publicIdNames studies.value dmap some
+          .so { studies =>
+            studyApi publicIdNames studies.value `dmap` some
           }
           .dmap(_.filter(_.nonEmpty))
-      tours <- a.games.exists(_.hasNonCorres) ?? {
+      tours <- a.games.exists(_.hasNonCorres) so {
         val dateRange = a.date -> a.date.plusDays(1)
         tourLeaderApi
           .timeRange(a.id.userId, dateRange)
           .dmap { entries =>
-            entries.nonEmpty option ActivityView.Tours(
+            entries.nonEmpty `option` ActivityView.Tours(
               nb = entries.size,
               best = Heapsort.topN(
                 entries,
@@ -107,11 +108,11 @@ final class ActivityReadApi(
               )
             )
           }
-          .mon(_.user segment "activity.tours")
+          .mon(_.user `segment` "activity.tours")
       }
       swisses <-
         a.swisses
-          .?? { swisses =>
+          .so { swisses =>
             toSwissesView(swisses.value).dmap(_.some.filter(_.nonEmpty))
           }
 
@@ -138,12 +139,12 @@ final class ActivityReadApi(
 
   def recentSwissRanks(userId: User.ID): Fu[List[(Swiss.IdName, Int)]] =
     coll
-      .find(regexId(userId) ++ $doc(BSONHandlers.ActivityFields.swisses $exists true))
-      .sort($sort desc "_id")
+      .find(regexId(userId) ++ $doc(BSONHandlers.ActivityFields.swisses `$exists` true))
+      .sort($sort `desc` "_id")
       .cursor[Activity](ReadPreference.secondaryPreferred)
       .list(10)
       .flatMap { activities =>
-        toSwissesView(activities.flatMap(_.swisses.??(_.value)))
+        toSwissesView(activities.flatMap(_.swisses.so(_.value)))
       }
 
   private def toSwissesView(swisses: List[activities.SwissRank]): Fu[List[(Swiss.IdName, Int)]] =
@@ -155,23 +156,23 @@ final class ActivityReadApi(
             (idName, s.rank)
           }
         }
-      }
+    }
 
   private def addSignup(at: DateTime, recent: Vector[ActivityView]) = {
     val (found, views) = recent.foldLeft(false -> Vector.empty[ActivityView]) {
-      case ((false, as), a) if a.interval contains at => (true, as :+ a.copy(signup = true))
+      case ((false, as), a) if a.interval `contains` at => (true, as :+ a.copy(signup = true))
       case ((found, as), a)                           => (found, as :+ a)
     }
     if (!found && views.sizeIs < recentNb && DateTime.now.minusDays(8).isBefore(at))
       views :+ ActivityView(
-        interval = new Interval(at.withTimeAtStartOfDay, at.withTimeAtStartOfDay plusDays 1),
+        interval = new Interval(at.withTimeAtStartOfDay, at.withTimeAtStartOfDay `plusDays` 1),
         signup = true
       )
     else views
   }
 
   private def getLightPovs(userId: User.ID, gameIds: List[GameId]): Fu[Option[List[LightPov]]] =
-    gameIds.nonEmpty ?? {
+    gameIds.nonEmpty so {
       gameRepo.light.gamesFromSecondary(gameIds.map(_.value)).dmap {
         _.flatMap { LightPov.ofUserId(_, userId) }.some.filter(_.nonEmpty)
       }

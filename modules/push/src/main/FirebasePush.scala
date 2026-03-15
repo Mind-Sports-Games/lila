@@ -1,7 +1,7 @@
 package lila.push
 
 import com.google.auth.oauth2.{ AccessToken, GoogleCredentials }
-import io.methvin.play.autoconfig._
+import lila.common.autoconfig.AutoConfig
 import play.api.libs.json._
 import play.api.libs.ws.JsonBodyWritables._
 import play.api.libs.ws.StandaloneWSClient
@@ -9,6 +9,7 @@ import scala.concurrent.duration._
 import scala.concurrent.{ blocking, Future }
 
 import lila.common.Chronometer
+import lila.common.extensions.*
 import lila.user.User
 import play.api.ConfigLoader
 
@@ -26,14 +27,14 @@ final private class FirebasePush(
     new lila.hub.DuctSequencer(maxSize = 512, timeout = 10 seconds, name = "firebasePush")
 
   def apply(userId: User.ID, data: => PushApi.Data): Funit =
-    credentialsOpt ?? { creds =>
+    credentialsOpt so { creds =>
       deviceApi.findLastManyByUserId("firebase", 3)(userId) flatMap {
         case Nil => funit
         // access token has 1h lifetime and is requested only if expired
         case devices =>
           workQueue {
             Future {
-              Chronometer.syncMon(_.blocking time "firebase") {
+              Chronometer.syncMon(_.blocking `time` "firebase") {
                 blocking {
                   creds.refreshIfExpired()
                   creds.getAccessToken
@@ -43,7 +44,7 @@ final private class FirebasePush(
           }.chronometer.mon(_.push.googleTokenTime).result flatMap { token =>
             // TODO http batch request is possible using a multipart/mixed content
             // unfortuntely it doesn't seem easily doable with play WS
-            devices.map(send(token, _, data)).sequenceFu.void
+            Future.sequence(devices.map(send(token, _, data))).void
           }
       }
     }
@@ -83,8 +84,9 @@ final private class FirebasePush(
       if (res.status == 200) funit
       else if (res.status == 404) {
         logger.info(s"Delete missing firebase device $device")
-        deviceApi delete device
-      } else {
+        deviceApi `delete` device
+      }
+      else {
         logger.warn(s"[push] firebase: ${res.status}")
         funit
       }

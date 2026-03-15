@@ -19,12 +19,12 @@ final class UnsubApi(coll: Coll)(implicit ec: scala.concurrent.ExecutionContext)
   }
 
   def get(channel: String, userId: User.ID): Fu[Boolean] =
-    coll.countSel(select(channel, userId)) dmap (0 !=)
+    coll.countSel(select(channel, userId)) `dmap` (0 !=)
 
-  private def canUnsub(channel: String) = channel startsWith "forum:"
+  private def canUnsub(channel: String) = channel `startsWith` "forum:"
 
   def filterUnsub(channel: String, userIds: List[User.ID]): Fu[List[String]] =
-    canUnsub(channel) ?? coll.distinctEasy[String, List](
+    canUnsub(channel) so coll.distinctEasy[String, List](
       "_id",
       $inIds(userIds.map { makeId(channel, _) })
     ) dmap { unsubs =>

@@ -30,7 +30,7 @@ private object ReportThresholds {
   implicit val scoreThresholdsStringReader: StringReader[ScoreThresholds] =
     StringReader.fromIso(thresholdsIso)
   implicit val scoreThresholdsFormable: Formable[ScoreThresholds] =
-    new Formable[ScoreThresholds](t => Form(single("v" -> text)) fill thresholdsIso.to(t))
+    new Formable[ScoreThresholds](t => Form(single("v" -> text)) `fill` thresholdsIso.to(t))
 
   def makeScoreSetting(store: lila.memo.SettingStore.Builder) =
     store[ScoreThresholds](

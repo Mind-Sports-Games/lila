@@ -3,7 +3,6 @@ package lila.analyse
 import strategygames.{ Player => PlayerIndex }
 
 import org.joda.time.DateTime
-import lila.user.User
 
 case class Analysis(
     id: Analysis.ID, // game ID, or chapter ID if studyId is set
@@ -17,7 +16,7 @@ case class Analysis(
   lazy val infoAdvices: InfoAdvices = {
     (Info.start(startPly) :: infos) sliding 2 collect { case List(prev, info) =>
       info -> {
-        info.hasVariation ?? Advice(prev, info)
+        info.hasVariation so Advice(prev, info)
       }
     }
   }.toList
@@ -51,15 +50,15 @@ object Analysis {
 
   implicit val analysisBSONHandler: BSON[Analysis] = new BSON[Analysis] {
     def reads(r: BSON.Reader) = {
-      val startPly = r intD "ply"
-      val raw      = r str "data"
+      val startPly = r `intD` "ply"
+      val raw      = r `str` "data"
       Analysis(
-        id = r str "_id",
-        studyId = r strO "studyId",
-        infos = Info.decodeList(raw, startPly) err s"Invalid analysis data $raw",
+        id = r `str` "_id",
+        studyId = r `strO` "studyId",
+        infos = Info.decodeList(raw, startPly) `err` s"Invalid analysis data $raw",
         startPly = startPly,
-        date = r date "date",
-        fk = r strO "fk"
+        date = r `date` "date",
+        fk = r `strO` "fk"
       )
     }
     def writes(w: BSON.Writer, a: Analysis) =

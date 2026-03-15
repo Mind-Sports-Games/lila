@@ -21,11 +21,11 @@ final class IrwinStream {
       }
       .keepAlive(60.seconds, () => keepAliveMsg)
 
-  def apply(): Source[String, _] =
+  def apply(): Source[String, ?] =
     blueprint mapMaterializedValue { queue =>
       val sub = Bus.subscribeFun(channel) { case req: IrwinRequest =>
         lila.mon.mod.irwin.streamEventType("request").increment()
-        queue.offer(req).unit
+        val _ = queue.offer(req)
       }
 
       queue.watchCompletion() dforeach { _ =>
@@ -50,7 +50,7 @@ final class IrwinStream {
           "p2" -> game.p2Player.userId,
           //flatten until Irwin supports non chess
           "pgn"  -> game.actionStrs.flatten.mkString(" "),
-          "emts" -> game.clockHistory.isDefined ?? game.plyTimes.map(_.map(_.centis)),
+          "emts" -> (if (game.clockHistory.isDefined) game.plyTimes.map(_.map(_.centis)) else None),
           "analysis" -> analysis.map {
             _.infos.map { info =>
               info.cp.map { cp =>

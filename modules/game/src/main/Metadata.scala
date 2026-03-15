@@ -35,7 +35,7 @@ private[game] case class Metadata(
   def needsMultiMatchRematch =
     multiMatch.fold(false)(x => x.contains("challengeMultiMatch"))
 
-  def multiMatchGameNr = multiMatch ?? { mm =>
+  def multiMatchGameNr = multiMatch so { mm =>
     if (mm == "multiMatch") 1.some
     else if (mm.length() == 10 && mm.substring(1, 2) == ":") toInt(mm.take(1))
     else none
@@ -46,13 +46,12 @@ private[game] case class Metadata(
     else "*"
   }
 
-  private def toInt(s: String): Option[Int] = {
-    try {
+  private def toInt(s: String): Option[Int] =
+    try
       Some(s.toInt)
-    } catch {
+    catch {
       case _: Exception => None
     }
-  }
 
   def pgnDate = pgnImport flatMap (_.date)
 
@@ -101,7 +100,7 @@ object PgnImport {
 
   def hash(pgn: String) =
     ByteArray {
-      MessageDigest getInstance "MD5" digest {
+      MessageDigest `getInstance` "MD5" digest {
         pgn.linesIterator
           .map(_.replace(" ", ""))
           .filter(_.nonEmpty)

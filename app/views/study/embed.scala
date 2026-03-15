@@ -1,6 +1,5 @@
 package views.html.study
 
-import controllers.routes
 import play.api.libs.json.Json
 
 import lila.app.templating.Environment._
@@ -31,9 +30,9 @@ object embed {
         frag(
           div(cls := "left")(
             select(id := "chapter-selector")(chapters.map { c =>
-              option(
+              scalatags.Text.tags.option(
                 value := c.id.value,
-                (c.id == chapter.id) option selected
+                (c.id == chapter.id).option(selected)
               )(c.name.value)
             }),
             a(targetBlank, href := url)(h1(s.name.value))
@@ -47,7 +46,7 @@ object embed {
           )
         )
       },
-      views.html.base.layout.playstrategyJsObject(config.nonce)(config.lang),
+      views.html.base.layout.playstrategyJsObject(config.nonce)(using config.lang),
       depsTag("javascripts/vendor/cash.min.js"),
       depsTag("javascripts/vendor/powertip.min.js"),
       depsTag("javascripts/vendor/howler.min.js"),

@@ -44,7 +44,7 @@ object help {
           row(frag(k("c")), "Focus chat"),
           row(frag(k("shift"), k("C")), trans.keyShowOrHideComments()),
           row(frag(k("?")), "Show this help dialog"),
-          isStudy option frag(
+          isStudy `option` frag(
             header("Study actions"),
             row(frag(k("d")), trans.study.commentThisPosition()),
             row(frag(k("g")), trans.study.annotateWithGlyphs()),

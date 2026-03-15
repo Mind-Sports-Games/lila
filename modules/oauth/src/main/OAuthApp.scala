@@ -21,8 +21,8 @@ object OAuthApp {
   case class Id(value: String)     extends AnyVal
   case class Secret(value: String) extends AnyVal
 
-  def makeId     = Id(ornicar.scalalib.Random secureString 16)
-  def makeSecret = Secret(ornicar.scalalib.Random secureString 32)
+  def makeId     = Id(Random.secureString(16))
+  def makeSecret = Secret(Random.secureString(32))
 
   object BSONFields {
     val clientId     = "client_id"
@@ -52,13 +52,13 @@ object OAuthApp {
       OAuthApp(
         clientId = r.get[Id](clientId),
         clientSecret = r.get[Secret](clientSecret),
-        name = r str name,
+        name = r `str` name,
         homepageUri = r.get[AbsoluteUrl](homepageUri),
         redirectUri =
-          r.get[List[AbsoluteUrl]](redirectUri).headOption err "Missing OAuthApp.redirectUri array",
-        author = r str author,
+          r.get[List[AbsoluteUrl]](redirectUri).headOption `err` "Missing OAuthApp.redirectUri array",
+        author = r `str` author,
         createdAt = r.get[DateTime](createdAt),
-        description = r strO description
+        description = r `strO` description
       )
 
     def writes(w: BSON.Writer, o: OAuthApp) =

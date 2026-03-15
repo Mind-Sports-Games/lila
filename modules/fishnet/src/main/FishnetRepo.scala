@@ -26,20 +26,19 @@ final private class FishnetRepo(
   def getClient(key: Client.Key)        = clientCache get key
   def getEnabledClient(key: Client.Key) = getClient(key).map { _.filter(_.enabled) }
   def getOfflineClient: Fu[Client] =
-    getEnabledClient(Client.offline.key) getOrElse fuccess(Client.offline)
+    getEnabledClient(Client.offline.key) `getOrElse` fuccess(Client.offline)
   def updateClientInstance(client: Client, instance: Client.Instance): Fu[Client] =
     client.updateInstance(instance).fold(fuccess(client)) { updated =>
-      clientColl.update.one(selectClient(client.key), $set("instance" -> updated.instance)) >>-
-        clientCache.invalidate(client.key) inject updated
+      clientColl.update.one(selectClient(client.key), $set("instance" -> updated.instance)).andDo(clientCache.invalidate(client.key)) inject updated
     }
   def addClient(client: Client)     = clientColl.insert.one(client)
-  def deleteClient(key: Client.Key) = clientColl.delete.one(selectClient(key)) >>- clientCache.invalidate(key)
+  def deleteClient(key: Client.Key) = clientColl.delete.one(selectClient(key)).andDo(clientCache.invalidate(key))
   def enableClient(key: Client.Key, v: Boolean): Funit =
-    clientColl.update.one(selectClient(key), $set("enabled" -> v)).void >>- clientCache.invalidate(key)
+    clientColl.update.one(selectClient(key), $set("enabled" -> v)).void.andDo(clientCache.invalidate(key))
   def allRecentClients =
     clientColl.list[Client](
       $doc(
-        "instance.seenAt" $gt Client.Instance.recentSince
+        "instance.seenAt" `$gt` Client.Instance.recentSince
       )
     )
 
@@ -47,20 +46,20 @@ final private class FishnetRepo(
   def getAnalysis(id: Work.Id)           = analysisColl.find(selectWork(id)).one[Work.Analysis]
   def updateAnalysis(ana: Work.Analysis) = analysisColl.update.one(selectWork(ana.id), ana).void
   def deleteAnalysis(ana: Work.Analysis) = analysisColl.delete.one(selectWork(ana.id)).void
-  def giveUpAnalysis(ana: Work.Analysis) = deleteAnalysis(ana) >>- logger.warn(s"Give up on analysis $ana")
+  def giveUpAnalysis(ana: Work.Analysis) = deleteAnalysis(ana).andDo(logger.warn(s"Give up on analysis $ana"))
   def updateOrGiveUpAnalysis(ana: Work.Analysis) =
     if (ana.isOutOfTries) giveUpAnalysis(ana) else updateAnalysis(ana)
 
   object status {
     private def system(v: Boolean)   = $doc("sender.system" -> v)
-    private def acquired(v: Boolean) = $doc("acquired" $exists v)
+    private def acquired(v: Boolean) = $doc("acquired" `$exists` v)
     private def oldestSeconds(system: Boolean): Fu[Int] =
       analysisColl
         .find($doc("sender.system" -> system) ++ acquired(false), $doc("createdAt" -> true).some)
-        .sort($sort asc "createdAt")
+        .sort($sort `asc` "createdAt")
         .one[Bdoc]
         .map(~_.flatMap(_.getAsOpt[DateTime]("createdAt").map { date =>
-          (nowSeconds - date.getSeconds).toInt atLeast 0
+          ((DateTime.now.getMillis / 1000) - (date.getMillis / 1000)).toInt `atLeast` 0
         }))
 
     def compute =
@@ -88,9 +87,9 @@ final private class FishnetRepo(
   private[fishnet] def toKey(keyOrUser: String): Fu[Client.Key] =
     clientColl.primitiveOne[String](
       $or(
-        "_id" $eq keyOrUser,
-        "userId" $eq lila.user.User.normalize(keyOrUser)
+        "_id" `$eq` keyOrUser,
+        "userId" `$eq` lila.user.User.normalize(keyOrUser)
       ),
       "_id"
-    ) orFail "client not found" map Client.Key.apply
+    ) `orFail` "client not found" map Client.Key.apply
 }

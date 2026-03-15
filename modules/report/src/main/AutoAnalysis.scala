@@ -1,7 +1,6 @@
 package lila.report
 
 import org.joda.time.DateTime
-import scala.concurrent.duration._
 
 import lila.game.{ Game, GameRepo }
 
@@ -17,7 +16,7 @@ final class AutoAnalysis(
     if (candidate.isCheat) doItNow(candidate)
     else if (candidate.isPrint) fuccess {
       List(30, 90) foreach { minutes =>
-        scheduler.scheduleOnce(minutes minutes) { doItNow(candidate).unit }
+        scheduler.scheduleOnce(minutes minutes) { val _ = doItNow(candidate) }
       }
     }
     else funit
@@ -45,7 +44,7 @@ final class AutoAnalysis(
     _.filter { g =>
       g.analysable && !g.metadata.analysed
     }.distinct
-      .sortBy(-_.createdAt.getSeconds)
+      .sortBy(-_.createdAt.getMillis / 1000)
       .take(10)
   }
 }

@@ -6,15 +6,15 @@ import play.api.libs.json._
 import play.api.mvc._
 import scala.annotation.nowarn
 
-import lila.app._
+import lila.app.*
 import lila.common.HTTPRequest
 import lila.hub.actorApi.captcha.ValidCaptcha
-import makeTimeout.large
+implicit private val defaultTimeout: akka.util.Timeout = makeTimeout.large
 import views._
 
 final class Main(
     env: Env,
-    prismicC: Prismic,
+    @annotation.nowarn("msg=unused") prismicC: Prismic,
     assetsC: ExternalAssets
 ) extends LilaController(env) {
 
@@ -34,7 +34,7 @@ final class Main(
           .fold(
             _ => BadRequest,
             { case (enable, redirect) =>
-              Redirect(redirect) withCookies env.lilaCookie.cookie(
+              Redirect(redirect) `withCookies` env.lilaCookie.cookie(
                 env.api.config.accessibility.blindCookieName,
                 if (enable == "0") "" else env.api.config.accessibility.hash,
                 maxAge = env.api.config.accessibility.blindCookieMaxAge.toSeconds.toInt.some,
@@ -45,11 +45,11 @@ final class Main(
       }
     }
 
-  def handlerNotFound(req: RequestHeader) = reqToCtx(req) map renderNotFound
+  def handlerNotFound(req: play.api.mvc.RequestHeader) = reqToCtx(req) map renderNotFound
 
   def captchaCheck(id: String) =
     Open { implicit ctx =>
-      env.hub.captcher.actor ? ValidCaptcha(id, ~get("solution")) map { case valid: Boolean =>
+      env.hub.captcher.actor ? ValidCaptcha(id, get("solution").getOrElse("")) map { case valid: Boolean =>
         Ok(if (valid) 1 else 0)
       }
     }
@@ -92,7 +92,7 @@ final class Main(
     Open { ctx =>
       env.round.selfReport(
         userId = ctx.userId,
-        ip = HTTPRequest ipAddress ctx.req,
+        ip = HTTPRequest `ipAddress` ctx.req,
         fullId = lila.game.Game.FullId(id),
         name = get("n", ctx.req) | "?"
       )
@@ -107,7 +107,7 @@ final class Main(
       NoContent
     }
 
-  def image(id: String, @nowarn("cat=unused") hash: String, @nowarn("cat=unused") name: String) =
+  def image(id: String, @nowarn("msg=unused") hash: String, @nowarn("msg=unused") name: String) =
     Action.async {
       env.imageRepo
         .fetch(id)
@@ -117,11 +117,11 @@ final class Main(
             lila.mon.http.imageBytes.record(image.size.toLong)
             Ok(image.data).withHeaders(
               CACHE_CONTROL -> "max-age=1209600"
-            ) as image.contentType.getOrElse("image/jpeg")
+            ) `as` image.contentType.getOrElse("image/jpeg")
         }
     }
 
-  val robots = Action { req =>
+  val robots = Action { (req: play.api.mvc.RequestHeader) =>
     Ok {
       if (env.net.crawlable && req.domain == env.net.domain.value) """User-agent: *
 Allow: /
@@ -155,7 +155,7 @@ Allow: /
             )
           }
         )
-      } withHeaders (CACHE_CONTROL -> "max-age=1209600")
+      } `withHeaders` (CACHE_CONTROL -> "max-age=1209600")
     }
 
   def getFishnet =
@@ -165,13 +165,13 @@ Allow: /
     }
 
   def costs =
-    Action { req =>
+    Action { (req: play.api.mvc.RequestHeader) =>
       pageHit(req)
       Redirect("https://docs.google.com/spreadsheets/d/1Si3PMUJGR9KrpE5lngSkHLJKJkb0ZuI4/preview")
     }
 
   def verifyTitle =
-    Action { req =>
+    Action { (req: play.api.mvc.RequestHeader) =>
       pageHit(req)
       Redirect(
         "https://docs.google.com/forms/d/e/1FAIpQLSelXSHdiFw_PmZetxY8AaIJSM-Ahb5QnJcfQMDaiPJSf24lDQ/viewform"
@@ -209,7 +209,7 @@ Allow: /
         }
     }
 
-  def legacyQaQuestion(id: Int, @nowarn("cat=unused") slug: String) =
+  def legacyQaQuestion(id: Int, @nowarn("msg=unused") slug: String) =
     Open { _ =>
       MovedPermanently {
         val faq = routes.Main.faq.url
@@ -236,5 +236,5 @@ Allow: /
       }.fuccess
     }
 
-  def devAsset(@nowarn("cat=unused") v: String, path: String, file: String) = assetsC.at(path, file)
+  def devAsset(@nowarn("msg=unused") v: String, path: String, file: String) = assetsC.at(path, file)
 }

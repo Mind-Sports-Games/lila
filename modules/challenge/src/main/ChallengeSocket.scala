@@ -18,7 +18,7 @@ final private class ChallengeSocket(
   def reload(challengeId: Challenge.ID): Unit =
     rooms.tell(challengeId, NotifyVersion("reload", JsNull))
 
-  private lazy val send: String => Unit = remoteSocketApi.makeSender("chal-out").apply _
+  private lazy val send: String => Unit = remoteSocketApi.makeSender("chal-out").apply
 
   lazy val rooms = makeRoomMap(send)
 
@@ -27,10 +27,10 @@ final private class ChallengeSocket(
   }
 
   remoteSocketApi.subscribe("chal-in", Protocol.In.reader)(
-    challengeHandler orElse minRoomHandler(rooms, lila log "challenge") orElse remoteSocketApi.baseHandler
+    challengeHandler orElse minRoomHandler(rooms, lila `log` "challenge") orElse remoteSocketApi.baseHandler
   )
 
-  api registerSocket this
+  api `registerSocket` this
 }
 
 object ChallengeSocket {

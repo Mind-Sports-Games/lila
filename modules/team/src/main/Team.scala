@@ -1,7 +1,6 @@
 package lila.team
 
 import org.joda.time.DateTime
-import scala.util.chaining._
 
 import lila.user.User
 import org.joda.time.Days
@@ -38,8 +37,8 @@ case class Team(
   def publicForum: Boolean = !hideForum.has(true)
 
   def isOfficial: Boolean = createdBy == "playstrategy"
-
 }
+
 
 object Team {
 
@@ -51,7 +50,7 @@ object Team {
     if (u.isVerified) maxJoinCeiling * 2
     else {
       30 + Days.daysBetween(u.createdAt, DateTime.now).getDays / 7
-    } atMost maxJoinCeiling
+    } `atMost` maxJoinCeiling
 
   type ID = String
 
@@ -74,7 +73,7 @@ object Team {
         value.contains(s"$separator$teamId$separator")
 
     def toArray: Array[String] = value split IdsStr.separator
-    def toList                 = value.nonEmpty ?? toArray.toList
+    def toList                 = value.nonEmpty so toArray.toList
   }
 
   object IdsStr {
@@ -117,10 +116,10 @@ object Team {
     )
 
   def nameToId(name: String) =
-    (lila.common.String slugify name) pipe { slug =>
+    (lila.common.String `slugify` name) pipe { slug =>
       // if most chars are not latin, go for random slug
       if (slug.lengthIs > (name.lengthIs / 2)) slug else randomId()
     }
 
-  private[team] def randomId() = lila.common.ThreadLocalRandom nextString 8
+  private[team] def randomId() = lila.common.ThreadLocalRandom `nextString` 8
 }

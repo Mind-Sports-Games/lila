@@ -2,7 +2,6 @@ package views.html.library
 
 import play.api.libs.json.Json
 
-import controllers.routes
 import lila.api.Context
 import lila.app.templating.Environment._
 import lila.app.ui.ScalatagsTemplate._
@@ -44,7 +43,7 @@ object show {
             "variantNames" -> Json.obj(
               Variant.all.map(v =>
                 s"${v.gameFamily.id}_${v.id}" -> Json.toJsFieldJsValueWrapper(VariantKeys.variantName(v))
-              ): _*
+              )*
             )
           )
         )})""")
@@ -80,13 +79,13 @@ object show {
             a(cls := "library-editor", href := s"${routes.Editor.index}?variant=${variant.key}")(
               "Editor"
             ),
-            variant.hasAnalysisBoard option a(
+            variant.hasAnalysisBoard `option` a(
               cls := "library-analysis",
               href := routes.UserAnalysis.parseArg(variant.key)
             )(
               "Analysis"
             ),
-            Puzzle.puzzleVariants.exists(_.key == variant.key) option a(
+            Puzzle.puzzleVariants.exists(_.key == variant.key) `option` a(
               cls := "library-puzzles",
               href := routes.Puzzle.home(variant.key)
             )(
@@ -113,15 +112,15 @@ object show {
           )
         ),
         dailyPuzzle map { p =>
-          views.html.puzzle.embed.dailyLink(p)(ctx.lang)(cls := "library__puzzle")
+          views.html.puzzle.embed.dailyLink(p)(using ctx.lang)(cls := "library__puzzle")
         },
         featuredGame map { g =>
           div(cls := "library__tv")(
-            views.html.game.mini(Pov naturalOrientation g, tv = false)
+            views.html.game.mini(Pov `naturalOrientation` g, tv = false)
           )
         },
-        tours.nonEmpty option tournamentList(tours),
-        leaderboard.nonEmpty option userTopPerf(leaderboard, PerfType(variant, Speed.Blitz)),
+        tours.nonEmpty `option` tournamentList(tours),
+        leaderboard.nonEmpty `option` userTopPerf(leaderboard, PerfType(variant, Speed.Blitz)),
         div(cls := "library-stats-table")(
           div(cls := "library-stats-title color-choice")(
             div(dataIcon := "^"),
@@ -157,7 +156,7 @@ object show {
       )
     )
 
-  private def userTopPerf(users: List[User.LightPerf], perfType: PerfType)(implicit lang: Lang) =
+  @annotation.nowarn("msg=unused") private def userTopPerf(users: List[User.LightPerf], perfType: PerfType)(implicit lang: Lang) =
     div(cls := "leaderboards")(
       div(cls := "color-choice title")(
         div(dataIcon := "U"),

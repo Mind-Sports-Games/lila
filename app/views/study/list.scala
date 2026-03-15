@@ -11,7 +11,6 @@ import lila.study.{ Order, StudyTopic, StudyTopics }
 import lila.study.Study.WithChaptersAndLiked
 import lila.user.User
 
-import controllers.routes
 
 object list {
 
@@ -133,7 +132,7 @@ object list {
     val nonMineOrder = if (order == Order.Mine) Order.Hot else order
     st.aside(cls := "page-menu__menu subnav")(
       a(cls := active.active("all"), href := routes.Study.all(nonMineOrder.key))(trans.study.allStudies()),
-      ctx.isAuth option bits.authLinks(active, nonMineOrder),
+      ctx.isAuth `option` bits.authLinks(active, nonMineOrder),
       a(cls := List("active" -> active.startsWith("topic")), href := routes.Study.topics)("Topics"),
       topics.map { topic =>
         a(cls := active.active(s"topic:$topic"), href := routes.Study.byTopic(topic.value, order.key))(
@@ -168,10 +167,10 @@ object list {
       moreJs = infiniteScrollTag
     ) {
       main(cls := "page-menu")(
-        menu(active, order, topics.??(_.value)),
+        menu(active, order, topics.so(_.value)),
         main(cls := "page-menu__content study-index box")(
           div(cls := "box__top")(
-            searchForm(title, s"$searchFilter${searchFilter.nonEmpty ?? " "}"),
+            searchForm(title, s"$searchFilter${searchFilter.nonEmpty so " "}"),
             bits.orderSelect(order, active, url),
             bits.newForm()
           ),

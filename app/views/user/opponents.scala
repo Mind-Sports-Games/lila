@@ -7,7 +7,6 @@ import lila.app.ui.ScalatagsTemplate._
 import lila.user.User
 import lila.game.FavoriteOpponents
 
-import controllers.routes
 
 object opponents {
   def apply(u: User, sugs: List[lila.relation.Related])(implicit ctx: Context) =

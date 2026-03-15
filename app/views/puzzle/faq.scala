@@ -6,11 +6,7 @@ import lila.app.templating.Environment._
 import lila.app.ui.ScalatagsTemplate._
 import strategygames.variant.Variant
 
-import controllers.routes
-
 object faq {
-
-  import trans.puzzle._
 
   def apply(variant: Variant)(implicit ctx: Context) =
     views.html.base.layout(

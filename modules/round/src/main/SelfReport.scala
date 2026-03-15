@@ -1,7 +1,5 @@
 package lila.round
 
-import scala.concurrent.duration._
-
 import lila.common.IpAddress
 import lila.game.Game
 import lila.user.{ User, UserRepo }
@@ -24,11 +22,11 @@ final class SelfReport(
       fullId: Game.FullId,
       name: String
   ): Funit =
-    !userId.exists(p1list.contains) ?? {
-      userId.??(userRepo.named) flatMap { user =>
+    !userId.exists(p1list.contains) so {
+      userId.so(userRepo.named) flatMap { user =>
         val known = user.exists(_.marks.engine)
         lila.mon.cheat.cssBot.increment()
-        // user.ifTrue(!known && name != "ceval") ?? { u =>
+        // user.ifTrue(!known && name != "ceval") so { u =>
         //   Env.report.api.autoBotReport(u.id, referer, name)
         // }
         def doLog(): Unit =
@@ -51,7 +49,7 @@ final class SelfReport(
         if (name == "kb" || fullId.value == "____________") fuccess(doLog())
         else
           proxyRepo.pov(fullId.value) flatMap {
-            _ ?? { pov =>
+            _ so { pov =>
               if (!known) doLog()
               if (
                 Set("ceval", "rcb", "cma", "lga")(name) ||

@@ -19,9 +19,8 @@ object AnnounceStore {
     current
   }
 
-  def set(announce: Option[Announce]) = {
+  def set(announce: Option[Announce]) =
     current = announce
-  }
 
   // examples:
   // 5 minutes PlayStrategy will restart
@@ -31,8 +30,8 @@ object AnnounceStore {
       case length :: unit :: rest =>
         Try {
           val msg     = rest mkString " "
-          val date    = DateTime.now plusSeconds Duration(s"$length $unit").toSeconds.toInt
-          val isoDate = ISODateTimeFormat.dateTime print date
+          val date    = DateTime.now `plusSeconds` Duration(s"$length $unit").toSeconds.toInt
+          val isoDate = ISODateTimeFormat.dateTime `print` date
           val json    = Json.obj("msg" -> msg, "date" -> isoDate)
           Announce(msg, date, json)
         }.toOption

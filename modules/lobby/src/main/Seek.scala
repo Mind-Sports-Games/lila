@@ -25,27 +25,27 @@ case class Seek(
 
   def id = _id
 
-  val realPlayerIndex = PlayerIndex orDefault playerIndex
+  val realPlayerIndex = PlayerIndex `orDefault` playerIndex
 
   val realVariant = strategygames.variant.Variant.orDefault(gameLogic, variant)
 
-  val realMode = Mode orDefault mode
+  val realMode = Mode `orDefault` mode
 
   def compatibleWith(h: Seek) =
     user.id != h.user.id &&
       compatibilityProperties == h.compatibilityProperties &&
-      (realPlayerIndex compatibleWith h.realPlayerIndex) &&
+      (realPlayerIndex `compatibleWith` h.realPlayerIndex) &&
       ratingRangeCompatibleWith(h) && h.ratingRangeCompatibleWith(this)
 
   private def ratingRangeCompatibleWith(s: Seek) =
     realRatingRange.fold(true) { range =>
-      s.rating ?? range.contains
+      s.rating so range.contains
     }
 
   private def compatibilityProperties =
     (gameLogic, variant, mode, daysPerTurn)
 
-  lazy val realRatingRange: Option[RatingRange] = RatingRange noneIfDefault ratingRange
+  lazy val realRatingRange: Option[RatingRange] = RatingRange `noneIfDefault` ratingRange
 
   def perf = perfType map user.perfAt
 
@@ -68,7 +68,7 @@ case class Seek(
         ),
         "mode"        -> realMode.id,
         "days"        -> daysPerTurn,
-        "playerIndex" -> strategygames.Player.fromName(playerIndex).??(_.name),
+        "playerIndex" -> strategygames.Player.fromName(playerIndex).fold("")(_.name),
         "perf" -> Json.obj(
           "icon" -> perfType.map(_.iconChar.toString),
           "name" -> perfType.map(_.trans)
@@ -93,7 +93,7 @@ object Seek {
       blocking: Set[String]
   ): Seek =
     new Seek(
-      _id = lila.common.ThreadLocalRandom nextString idSize,
+      _id = lila.common.ThreadLocalRandom `nextString` idSize,
       gameLogic = variant.gameLogic,
       variant = variant.id,
       daysPerTurn = daysPerTurn,
@@ -106,7 +106,7 @@ object Seek {
 
   def renew(seek: Seek) =
     new Seek(
-      _id = lila.common.ThreadLocalRandom nextString idSize,
+      _id = lila.common.ThreadLocalRandom `nextString` idSize,
       gameLogic = seek.gameLogic,
       variant = seek.variant,
       daysPerTurn = seek.daysPerTurn,

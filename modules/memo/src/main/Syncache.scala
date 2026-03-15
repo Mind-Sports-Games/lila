@@ -3,10 +3,10 @@ package lila.memo
 import com.github.benmanes.caffeine.cache._
 import java.util.concurrent.TimeUnit
 import scala.concurrent.duration._
-import scala.util.chaining._
 import scala.util.Success
 
 import lila.common.Uptime
+import lila.common.extensions.*
 
 /** A synchronous cache from asynchronous computations.
   * It will attempt to serve cached responses synchronously.
@@ -43,43 +43,43 @@ final private[memo] class Syncache[K, V](
             .mon(_ => recCompute) // monitoring: record async time
             .recover { case e: Exception =>
               logger.branch(s"syncache $name").warn(s"key=$k", e)
-              cache invalidate k
+              cache `invalidate` k
               default(k)
             }
       })
 
   // get the value asynchronously, never blocks (preferred)
-  def async(k: K): Fu[V] = cache get k
+  def async(k: K): Fu[V] = cache `get` k
 
   // get the value synchronously, might block depending on strategy
   def sync(k: K): V = {
-    val future = cache get k
+    val future = cache `get` k
     future.value match {
       case Some(Success(v)) => v
       case Some(_) =>
-        cache invalidate k
+        cache `invalidate` k
         default(k)
       case _ =>
         incMiss()
         strategy match {
           case NeverWait => default(k)
           case WaitAfterUptime(duration, uptime) =>
-            if (Uptime startedSinceSeconds uptime) waitForResult(k, future, duration)
+            if (Uptime `startedSinceSeconds` uptime) waitForResult(k, future, duration)
             else default(k)
         }
     }
   }
 
   // maybe optimize later with cache batching
-  def asyncMany(ks: List[K]): Fu[List[V]] = ks.map(async).sequenceFu
+  def asyncMany(ks: List[K]): Fu[List[V]] = Future.sequence(ks.map(async))
 
-  def invalidate(k: K): Unit = cache invalidate k
+  def invalidate(k: K): Unit = cache `invalidate` k
 
   def preloadOne(k: K): Funit = async(k).void
 
   // maybe optimize later with cach batching
-  def preloadMany(ks: Seq[K]): Funit = ks.distinct.map(preloadOne).sequenceFu.void
-  def preloadSet(ks: Set[K]): Funit  = ks.map(preloadOne).sequenceFu.void
+  def preloadMany(ks: Seq[K]): Funit = Future.sequence(ks.distinct.map(preloadOne)).void
+  def preloadSet(ks: Set[K]): Funit  = Future.sequence(ks.toSeq.map(preloadOne)).void
 
   def set(k: K, v: V): Unit = cache.put(k, fuccess(v))
 
@@ -94,8 +94,8 @@ final private[memo] class Syncache[K, V](
         default(k)
     }
 
-  private val incMiss    = lila.mon.syncache.miss(name).increment _
-  private val incTimeout = lila.mon.syncache.timeout(name).increment _
+  private val incMiss    = (() => lila.mon.syncache.miss(name).increment())
+  private val incTimeout = (() => lila.mon.syncache.timeout(name).increment())
   private val recWait    = lila.mon.syncache.wait(name)
   private val recCompute = lila.mon.syncache.compute(name)
 }

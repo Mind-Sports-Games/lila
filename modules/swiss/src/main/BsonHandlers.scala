@@ -37,10 +37,10 @@ object BsonHandlers {
       SwissPlayer(
         id = r.get[SwissPlayer.Id](id),
         swissId = r.get[Swiss.Id](swissId),
-        userId = r str userId,
-        rating = r int rating,
-        inputRating = r intO inputRating,
-        provisional = r boolD provisional,
+        userId = r `str` userId,
+        rating = r `int` rating,
+        inputRating = r `intO` inputRating,
+        provisional = r `boolD` provisional,
         points = r.get[Swiss.Points](points),
         sbTieBreak = r.get[Swiss.SonnenbornBerger](sbTieBreak),
         bhTieBreak = r.getO[Swiss.Buchholz](bhTieBreak),
@@ -110,7 +110,6 @@ object BsonHandlers {
               case _       => BSONInteger(0)
             }
           })
-        case _ => BSONNull
       }
     )
   implicit val pairingHandler: BSON[SwissPairing] = new BSON[SwissPairing] {
@@ -120,7 +119,7 @@ object BsonHandlers {
         case List(w, b) => {
           val variant = r.getO[Variant]("v")
           SwissPairing(
-            id = r str id,
+            id = r `str` id,
             swissId = r.get[Swiss.Id](swissId),
             round = r.get[SwissRound.Number](round),
             p1 = w,
@@ -172,7 +171,7 @@ object BsonHandlers {
     import SwissPairing.Fields._
     def reads(r: BSON.Reader) =
       SwissPairingGameIds(
-        id = r str id,
+        id = r `str` id,
         multiMatchGameIds = r.getsO[String](multiMatchGameIds),
         isMatchScore = r.get[Boolean](isMatchScore),
         isBestOfX = r.get[Boolean](isBestOfX),
@@ -255,7 +254,7 @@ object BsonHandlers {
   // "featurable" mostly means that the tournament isn't over yet
   def addFeaturable(s: Swiss) =
     swissHandler.writeTry(s).get ++ {
-      s.isNotFinished ?? $doc(
+      s.isNotFinished so $doc(
         "featurable" -> true,
         "garbage"    -> s.unrealisticSettings.option(true)
       )

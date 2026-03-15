@@ -1,11 +1,8 @@
 package lila.tournament
 
 import akka.actor._
-import strategygames.chess.StartingPosition
 import strategygames.variant.Variant
 import org.joda.time.DateTime
-import org.joda.time.DateTimeConstants._
-import scala.util.chaining._
 import lila.i18n.VariantKeys
 import scala.concurrent.ExecutionContextExecutor
 
@@ -35,16 +32,14 @@ final private class TournamentScheduler(
   // )
   private[tournament] def allWithConflicts(rightNow: DateTime): List[Plan] = {
     val today       = rightNow.withTimeAtStartOfDay
-    val tomorrow    = rightNow plusDays 1
-    val startOfYear = today.dayOfYear.withMinimumValue
 
     class OfMonth(fromNow: Int) {
       val firstDay = today.plusMonths(fromNow).dayOfMonth.withMinimumValue
       val lastDay  = firstDay.dayOfMonth.withMaximumValue
 
       val firstWeek  = firstDay.plusDays(7 - (firstDay.getDayOfWeek - 1) % 7)
-      val secondWeek = firstWeek plusDays 7
-      val thirdWeek  = secondWeek plusDays 7
+      val secondWeek = firstWeek `plusDays` 7
+      val thirdWeek  = secondWeek `plusDays` 7
       val lastWeek   = lastDay.minusDays((lastDay.getDayOfWeek - 1) % 7)
 
       val index = firstDay.getMonthOfYear()
@@ -84,52 +79,6 @@ final private class TournamentScheduler(
 
     def nextMonthWeekAndDayOfWeek(weekOfMonth: Int, dayOfWeek: Int) =
       monthOfWithWeekAndDayOfWeek(nextMonth, weekOfMonth, dayOfWeek)
-
-    def secondWeekOf(month: Int) = {
-      val start = orNextYear(startOfYear.withMonthOfYear(month))
-      start.plusDays(15 - start.getDayOfWeek)
-    }
-
-    def orTomorrow(date: DateTime) = if (date isBefore rightNow) date plusDays 1 else date
-    def orNextWeek(date: DateTime) = if (date isBefore rightNow) date plusWeeks 1 else date
-    def orNextYear(date: DateTime) = if (date isBefore rightNow) date plusYears 1 else date
-
-    val isHalloween = today.getDayOfMonth == 31 && today.getMonthOfYear == OCTOBER
-
-    def opening(offset: Int) = {
-      val positions = StartingPosition.featurable
-      positions((today.getDayOfYear + offset) % positions.size)
-    }
-
-    val farFuture = today plusMonths 7
-
-    val birthday = new DateTime(2021, 7, 21, 12, 0, 0)
-
-    val fss  = List(nextFriday, nextSaturday, nextSunday)
-    val mwfs = List(nextMonday, nextWednesday, nextFriday, nextSunday)
-    val tts  = List(nextTuesday, nextThursday, nextSaturday)
-
-    def schedule10(hour: Int, v: Variant)(day: DateTime) =
-      at(day, hour) map { date =>
-        Schedule(Weekly, Bullet, v, none, date).plan
-      }
-
-    def schedule32(hour: Int, v: Variant)(day: DateTime) =
-      at(day, hour) map { date =>
-        Schedule(Weekly, Blitz32, v, none, date).plan
-      }
-
-    def schedule51(hour: Int, v: Variant)(day: DateTime) =
-      at(day, hour) map { date =>
-        Schedule(Weekly, Blitz51, v, none, date).plan
-      }
-
-    def scheduleUnique(hour: Int, speed: Schedule.Speed, variant: Variant, duration: Int)(
-        day: DateTime
-    ) =
-      at(day, hour) map { date =>
-        Schedule(Unique, speed, variant, none, date, Some(duration)).plan
-      }
 
     def scheduleMedleyShield(medleyShield: TournamentShield.MedleyShield)(
         day: DateTime
@@ -213,7 +162,7 @@ final private class TournamentScheduler(
           nextDayOfWeek(ms.dayOfWeek)
         )
       )
-      .flatten filter { _.schedule.at isAfter rightNow }
+      .flatten filter { _.schedule.at `isAfter` rightNow }
 
     //and schedule two weeks in advance
     val nextWeekMedleyShields = TournamentShield.MedleyShield.allWeekly
@@ -222,7 +171,7 @@ final private class TournamentScheduler(
           nextDayOfFortnight(ms.dayOfWeek + 7)
         )
       )
-      .flatten filter { _.schedule.at isAfter rightNow }
+      .flatten filter { _.schedule.at `isAfter` rightNow }
 
     //schedule this month
     val thisMonthMedleyShields = TournamentShield.MedleyShield.allMonthly
@@ -231,7 +180,7 @@ final private class TournamentScheduler(
           thisMonthWeekAndDayOfWeek(ms.weekOfMonth.getOrElse(1), ms.dayOfWeek)
         )
       )
-      .flatten filter { _.schedule.at isAfter rightNow }
+      .flatten filter { _.schedule.at `isAfter` rightNow }
 
     //and schedule two months in advance
     val nextMonthMedleyShields = TournamentShield.MedleyShield.allMonthly
@@ -240,7 +189,7 @@ final private class TournamentScheduler(
           nextMonthWeekAndDayOfWeek(ms.weekOfMonth.getOrElse(1), ms.dayOfWeek)
         )
       )
-      .flatten filter { _.schedule.at isAfter rightNow }
+      .flatten filter { _.schedule.at `isAfter` rightNow }
 
     val shieldDuration = Some(90)
 
@@ -269,7 +218,7 @@ final private class TournamentScheduler(
           }
         }
       )
-      .flatten filter { _.schedule.at isAfter rightNow }
+      .flatten filter { _.schedule.at `isAfter` rightNow }
 
     //and schedule next month
     val nextMonthShields = TournamentShield.Category.all
@@ -296,7 +245,7 @@ final private class TournamentScheduler(
           }
         }
       )
-      .flatten filter { _.schedule.at isAfter rightNow }
+      .flatten filter { _.schedule.at `isAfter` rightNow }
 
     val weeklySchedule = List(
       (nextMonday, 1),
@@ -412,11 +361,10 @@ final private class TournamentScheduler(
     val weeklyVariantDefault: (Variant, Schedule.Speed) =
       (Variant.Chess(strategygames.chess.variant.Standard), Blitz32)
 
-    def rotate[A](l: List[A], x: Int): List[A] = {
+    def rotate[A](l: List[A], x: Int): List[A] =
       if (x <= 0 || l.size <= 1) l
       else if (x >= l.size) rotate(l, x % l.size)
       else rotate(l.tail ++ List(l.head), x - 1)
-    }
 
     // weekly tournaments
     val weeklyTourmaments = (weeklySchedule.zipWithIndex ++ nextWeeklySchedule.zipWithIndex).map {
@@ -426,7 +374,7 @@ final private class TournamentScheduler(
       }
     } flatMap { case ((day, hour), (variant, speed)) =>
       scheduleWeekly(speed, variant)(day, hour)
-    } filter { _.schedule.at isAfter rightNow }
+    } filter { _.schedule.at `isAfter` rightNow }
 
     //yearly tournaments 2026
     val yearly2026Tournaments = List(
@@ -579,7 +527,7 @@ final private class TournamentScheduler(
       scheduleYearly24hr(Variant.Abalone(strategygames.abalone.variant.GrandAbalone), Delay66)(
         new DateTime(2026, 11, 27, 0, 0)
       ),
-    ).flatten filter { _.schedule.at isAfter rightNow }
+    ).flatten filter { _.schedule.at `isAfter` rightNow }
 
     //order matters for pruning weekly/yearly tournaments
     yearly2026Tournaments :::
@@ -590,6 +538,7 @@ final private class TournamentScheduler(
       thisMonthShields :::
       nextMonthShields :::
       weeklyTourmaments
+  }
 
 //          List( // lichess shield tournaments!
 //            month.firstWeek.withDayOfWeek(MONDAY)    -> Bullet,
@@ -1041,7 +990,7 @@ Thank you all, you rock!"""
               titled = none,
               teamMember = none
             )
-            at(date, hour) ?? { date =>
+            at(date, hour) so { date =>
               val finalDate = date plusHours hourDelay
               if (speed == Bullet)
                 List(
@@ -1133,7 +1082,6 @@ Thank you all, you rock!"""
         ).flatten
       }*/
     //).flatten filter { _.schedule.at isAfter rightNow }
-  }
 
   private[tournament] def pruneConflicts(scheds: List[Tournament], newTourns: List[Tournament]) =
     newTourns
@@ -1149,11 +1097,11 @@ Thank you all, you rock!"""
     t.schedule exists { s =>
       ts exists { t2 =>
         ((!t.isMedley && !t2.isMedley && t.variant == t2.variant) || (t.isMedley && t2.isMedley && t.trophy1st == t2.trophy1st)) && t2.schedule
-          .?? {
+          .so {
             // prevent daily && weekly on the same day - we don't care about this.
             // case s2 if s.freq.isDailyOrBetter && s2.freq.isDailyOrBetter && s.sameSpeed(s2) => s sameDay s2
             // dont let yearly's block shields and vice versa
-            case s2 if s.freq == Shield || s.freq == MedleyShield   => s2.freq == s.freq && (s sameDay s2)
+            case s2 if s.freq == Shield || s.freq == MedleyShield   => s2.freq == s.freq && (s `sameDay` s2)
             case s2 if s2.freq == Shield || s2.freq == MedleyShield => false
             case s2 =>
               (
@@ -1161,14 +1109,14 @@ Thank you all, you rock!"""
                   s.hasMaxRating ||  // overlapping same rating limit
                   s.similarSpeed(s2) // overlapping similar
               ) && s.similarConditions(s2) && t.overlaps(t2)
-          }
+        }
       }
     }
 
   private def at(day: DateTime, hour: Int, minute: Int = 0): Option[DateTime] =
-    try {
-      Some(day.withTimeAtStartOfDay plusHours hour plusMinutes minute)
-    } catch {
+    try
+      Some(day.withTimeAtStartOfDay `plusHours` hour `plusMinutes` minute)
+    catch {
       case e: Exception =>
         logger.error(s"failed to schedule one: ${e.getMessage}")
         None
@@ -1188,8 +1136,9 @@ Thank you all, you rock!"""
         (tournamentRepo
           .insert(pruned)
           .logFailure(logger) >>
-          api.subscribeBotsToArenas).unit
-      } catch {
+          api.subscribeBotsToArenas).discard
+      }
+      catch {
         case e: org.joda.time.IllegalInstantException =>
           logger.error(s"failed to schedule all: ${e.getMessage}")
       }

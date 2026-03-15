@@ -3,7 +3,7 @@ package controllers
 import play.api.libs.json._
 import play.api.mvc._
 
-import lila.app._
+import lila.app.*
 import views._
 
 final class Lobby(
@@ -39,7 +39,7 @@ final class Lobby(
 
   def handleStatus(req: RequestHeader, status: Results.Status): Fu[Result] =
     reqToCtx(req) flatMap { ctx =>
-      keyPages.home(status)(ctx)
+      keyPages.home(status)(using ctx)
     }
 
   def seeks =

@@ -40,7 +40,7 @@ final class PerfStatStorage(coll: Coll)(implicit ec: scala.concurrent.ExecutionC
           resultsDiff(a, b)(_.worstLosses).map { set =>
             "worstLosses" -> set
           },
-          (a.worstLosses != b.worstLosses).??(ResultsBSONHandler.writeOpt(b.worstLosses)) map { worstLosses =>
+          (a.worstLosses != b.worstLosses).so(ResultsBSONHandler.writeOpt(b.worstLosses)) map { worstLosses =>
             "worstLosses" -> worstLosses
           },
           streakDiff(a, b)(_.resultStreak.win.cur).map { set =>
@@ -85,14 +85,14 @@ final class PerfStatStorage(coll: Coll)(implicit ec: scala.concurrent.ExecutionC
   }
 
   private def resultsDiff(a: PerfStat, b: PerfStat)(getter: PerfStat => Results): Option[Bdoc] =
-    (getter(a) != getter(b)) ?? ResultsBSONHandler.writeOpt(getter(b))
+    (getter(a) != getter(b)) so ResultsBSONHandler.writeOpt(getter(b))
 
   private def streakDiff(a: PerfStat, b: PerfStat)(getter: PerfStat => Streak): Option[Bdoc] =
-    (getter(a) != getter(b)) ?? StreakBSONHandler.writeOpt(getter(b))
+    (getter(a) != getter(b)) so StreakBSONHandler.writeOpt(getter(b))
 
   private def ratingAtDiff(a: PerfStat, b: PerfStat)(getter: PerfStat => Option[RatingAt]): Option[Bdoc] =
-    getter(b) ?? { r =>
-      getter(a).fold(true)(_ != r) ?? RatingAtBSONHandler.writeOpt(r)
+    getter(b) so { r =>
+      getter(a).fold(true)(_ != r) so RatingAtBSONHandler.writeOpt(r)
     }
 
   private def docDiff[T: BSONDocumentWriter](a: T, b: T): Map[String, BSONValue] = {

@@ -4,7 +4,7 @@ import play.api.libs.json._
 import scala.annotation.nowarn
 
 import lila.api.Context
-import lila.app._
+import lila.app.*
 import lila.practice.JsonView._
 import lila.practice.{ PracticeSection, PracticeStudy, UserStudy }
 import lila.study.Study.WithChapter
@@ -28,8 +28,8 @@ final class Practice(
     }
 
   def show(
-      @nowarn("cat=unused") sectionId: String,
-      @nowarn("cat=unused") studySlug: String,
+      @nowarn("msg=unused") sectionId: String,
+      @nowarn("msg=unused") studySlug: String,
       studyId: String
   ) =
     Open { implicit ctx =>
@@ -37,8 +37,8 @@ final class Practice(
     }
 
   def showChapter(
-      @nowarn("cat=unused") sectionId: String,
-      @nowarn("cat=unused") studySlug: String,
+      @nowarn("msg=unused") sectionId: String,
+      @nowarn("msg=unused") studySlug: String,
       studyId: String,
       chapterId: String
   ) =
@@ -56,7 +56,7 @@ final class Practice(
     Open { implicit ctx =>
       api.structure.get.flatMap { struct =>
         struct.sections.find(_.id == sectionId).fold(notFound) { section =>
-          select(section) ?? { study =>
+          select(section) so { study =>
             Redirect(routes.Practice.show(section.id, study.slug, study.id.value)).fuccess
           }
         }
@@ -145,8 +145,7 @@ final class Practice(
         FormFuResult(form) { err =>
           api.structure.get map { html.practice.config(_, err) }
         } { text =>
-          ~api.config.set(text).toOption >>-
-            api.structure.clear() >>
+          { val r = api.config.set(text).toOption; api.structure.clear(); r.getOrElse(funit) } >>
             env.mod.logApi.practiceConfig(me.id) inject Redirect(routes.Practice.config)
         }
       }

@@ -72,7 +72,7 @@ object SetupBulk {
           rated,
           pairTs.map { new DateTime(_) },
           clockTs.map { new DateTime(_) },
-          message map Template
+          message map Template.apply
         )
     }(_ => None)
   )
@@ -81,13 +81,13 @@ object SetupBulk {
     str
       .split(',')
       .view
-      .map(_ split ":")
+      .map(_ `split` ":")
       .collect { case Array(w, b) =>
         w.trim -> b.trim
       }
       .collect {
         case (w, b) if w.nonEmpty && b.nonEmpty => (AccessToken.Id(w), AccessToken.Id(b))
-      }
+    }
       .toList
 
   case class BadToken(token: AccessToken.Id, error: OAuthServer.AuthError)
@@ -145,8 +145,8 @@ object SetupBulk {
       )
       .add("message" -> message.map(_.value))
   }
-
 }
+
 
 final class SetupBulkApi(oauthServer: OAuthServer, idGenerator: IdGenerator)(implicit
     ec: scala.concurrent.ExecutionContext,
@@ -178,7 +178,7 @@ final class SetupBulkApi(oauthServer: OAuthServer, idGenerator: IdGenerator)(imp
         case (Left(bads), _)               => Left(bads)
         case (Right(_), Left(bad))         => Left(bad :: Nil)
         case (Right(users), Right(scoped)) => Right(scoped.user.id :: users)
-      }
+    }
       .flatMap {
         case Left(errors) => fuccess(Left(BadTokens(errors.reverse)))
         case Right(allPlayers) =>
@@ -188,7 +188,7 @@ final class SetupBulkApi(oauthServer: OAuthServer, idGenerator: IdGenerator)(imp
             .mapValues(_.size)
             .collect {
               case (u, nb) if nb > 1 => u
-            }
+          }
             .toList
           if (dups.nonEmpty) fuccess(Left(DuplicateUsers(dups)))
           else {
@@ -198,20 +198,20 @@ final class SetupBulkApi(oauthServer: OAuthServer, idGenerator: IdGenerator)(imp
               .toList
             val nbGames = pairs.size
             rateLimit[Fu[Result]](me.id, cost = nbGames) {
-              lila.mon.api.challenge.bulk.scheduleNb(me.id).increment(nbGames).unit
+              val _ = lila.mon.api.challenge.bulk.scheduleNb(me.id).increment(nbGames)
               idGenerator
                 .games(nbGames)
                 .map {
                   _.toList zip pairs
-                }
+              }
                 .map {
                   _.map { case (id, (w, b)) =>
                     ScheduledGame(id, w, b)
                   }
-                }
+              }
                 .dmap {
                   ScheduledBulk(
-                    _id = lila.common.ThreadLocalRandom nextString 8,
+                    _id = lila.common.ThreadLocalRandom `nextString` 8,
                     by = me.id,
                     _,
                     data.variant,
@@ -222,9 +222,9 @@ final class SetupBulkApi(oauthServer: OAuthServer, idGenerator: IdGenerator)(imp
                     message = data.message,
                     scheduledAt = DateTime.now
                   )
-                }
+              }
                 .dmap(Right.apply)
             }(fuccess(Left(RateLimited)))
           }
-      }
+    }
 }

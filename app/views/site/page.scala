@@ -1,6 +1,5 @@
 package views.html.site
 
-import controllers.routes
 
 import lila.api.Context
 import lila.app.templating.Environment._
@@ -12,7 +11,7 @@ object page {
   def lone(doc: io.prismic.Document, resolver: io.prismic.DocumentLinkResolver)(implicit ctx: Context) =
     views.html.base.layout(
       moreCss = cssTag("page"),
-      title = ~doc.getText("pages.title")
+      title = doc.getText("pages.title").getOrElse("")
     ) {
       main(cls := "page-small box box-pad page")(pageContent(doc, resolver))
     }
@@ -21,7 +20,7 @@ object page {
       ctx: Context
   ) =
     layout(
-      title = ~doc.getText("pages.title"),
+      title = doc.getText("pages.title").getOrElse(""),
       active = active,
       contentCls = "page box box-pad",
       moreCss = cssTag("page")
@@ -31,15 +30,16 @@ object page {
     h1(doc.getText("pages.title")),
     div(cls := "body")(
       raw {
-        ~doc
+        doc
           .getHtml("pages.content", resolver)
           .map(lila.blog.BlogTransform.markdown.apply)
+          .getOrElse("")
       }
     )
   )
 
   def source(doc: io.prismic.Document, resolver: io.prismic.DocumentLinkResolver)(implicit ctx: Context) = {
-    val title = ~doc.getText("pages.title")
+    val title = doc.getText("pages.title").getOrElse("")
     layout(
       title = title,
       active = "source",
@@ -54,7 +54,7 @@ $('#asset-version-message').text(window.playstrategy.info.message);"""
       frag(
         st.section(cls := "box box-pad body")(
           h1(title),
-          raw(~doc.getHtml("pages.content", resolver))
+          raw(doc.getHtml("pages.content", resolver).getOrElse(""))
         ),
         br,
         st.section(cls := "box")(

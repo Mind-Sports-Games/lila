@@ -24,7 +24,7 @@ final class TopicRepo(val coll: Coll, filter: Filter = Safe)(implicit
     case Unsafe     => $empty
   }
 
-  private lazy val notStickyQuery = $doc("sticky" $ne true)
+  private lazy val notStickyQuery = $doc("sticky" `$ne` true)
   private lazy val stickyQuery    = $doc("sticky" -> true)
 
   def close(id: String, value: Boolean): Funit =

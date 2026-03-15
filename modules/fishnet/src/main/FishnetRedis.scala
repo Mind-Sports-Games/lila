@@ -3,7 +3,7 @@ package lila.fishnet
 import scala.util.control.Exception._
 
 import strategygames.format.{ Uci, UciDump }
-import strategygames.{ GameFamily, GameLogic }
+import strategygames.GameFamily
 import io.lettuce.core._
 import io.lettuce.core.pubsub._
 import scala.concurrent.Future
@@ -26,7 +26,7 @@ final class FishnetRedis(
   private var stopping = false
 
   def request(work: Work.Move): Unit =
-    if (!stopping) connOut.async.publish(chanOut, writeWork(work)).unit
+    if (!stopping) { val _ = connOut.async.publish(chanOut, writeWork(work)) }
 
   connIn.async.subscribe(chanIn)
 
@@ -57,9 +57,9 @@ final class FishnetRedis(
     List(
       work.game.id,
       work.level.toString(),
-      work.clock ?? writeClock,
-      work.game.variant.some.filter(_.exotic).??(_.key),
-      work.game.initialFen.??(_.value),
+      work.clock so writeClock,
+      work.game.variant.some.filter(_.exotic).so(_.key),
+      work.game.initialFen.so(_.value),
       UciDump.fishnetUci(work.game.variant, work.game.moves)
     ).mkString(";")
 

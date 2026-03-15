@@ -11,7 +11,6 @@ import lila.tournament.Tournament
 import lila.user.User
 import lila.i18n.VariantKeys
 
-import controllers.routes
 
 object show {
 
@@ -39,7 +38,7 @@ object show {
                 timeout = c.timeout,
                 public = true,
                 resourceId = lila.chat.Chat.ResourceId(s"tournament/${c.chat.id}"),
-                localMod = ctx.userId has tour.createdBy
+                localMod = ctx.userId `has` tour.createdBy
               )
             }
           )
@@ -67,14 +66,14 @@ object show {
         .some
     )(
       main(cls := s"tour${tour.schedule
-        .?? { sched =>
+        .so { sched =>
           s" tour-sched tour-sched-${sched.freq.name} tour-speed-${sched.speed.name} tour-variant-${sched.variant.key} tour-id-${tour.id}"
         }}")(
         st.aside(cls := "tour__side")(
           tournament.side(tour, verdicts, streamers, shieldOwner, chatOption.isDefined)
         ),
         div(cls := "tour__main")(div(cls := "box")),
-        tour.isCreated option div(cls := "tour__faq")(
+        tour.isCreated `option` div(cls := "tour__faq")(
           faq(
             tour.mode.rated.some,
             Some(tour.handicapped),

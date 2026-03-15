@@ -4,7 +4,7 @@ sealed abstract class Permission(val key: String, val children: List[Permission]
 
   def this(key: String, name: String) = this(key, Nil, name)
 
-  final def is(p: Permission): Boolean = this == p || children.exists(_ is p)
+  final def is(p: Permission): Boolean = this == p || children.exists(_ `is` p)
 
   val dbKey = s"ROLE_$key"
 }
@@ -281,7 +281,7 @@ object Permission {
   def apply(dbKeys: Seq[String]): Set[Permission] = dbKeys flatMap allByDbKey.get toSet
 
   def findGranterPackage(perms: Set[Permission], perm: Permission): Option[Permission] =
-    !perms(perm) ?? perms.find(_ is perm)
+    !perms(perm) so perms.find(_ `is` perm)
 
   def diff(orig: Set[Permission], dest: Set[Permission]): Map[Permission, Boolean] = {
     orig.diff(dest).map(_ -> false) ++ dest.diff(orig).map(_ -> true)

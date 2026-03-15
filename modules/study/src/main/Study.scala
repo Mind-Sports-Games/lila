@@ -29,7 +29,7 @@ case class Study(
 
   def isOwner(id: User.ID) = ownerId == id
 
-  def isMember(id: User.ID) = members contains id
+  def isMember(id: User.ID) = members `contains` id
 
   def canChat(id: User.ID) = Settings.UserSelection.allows(settings.chat, this, id.some)
 
@@ -47,9 +47,9 @@ case class Study(
   def isUnlisted = visibility == Study.Visibility.Unlisted
   def isPrivate  = visibility == Study.Visibility.Private
 
-  def isNew = (nowSeconds - createdAt.getSeconds) < 4
+  def isNew = (nowSeconds - (createdAt.getMillis / 1000)) < 4
 
-  def isOld = (nowSeconds - updatedAt.getSeconds) > 20 * 60
+  def isOld = (nowSeconds - (updatedAt.getMillis / 1000)) > 20 * 60
 
   def cloneFor(user: User): Study = {
     val owner = StudyMember(id = user.id, role = StudyMember.Role.Write)
@@ -115,7 +115,7 @@ object Study {
   object Rank {
     def compute(likes: Likes, createdAt: DateTime) =
       Rank {
-        createdAt plusHours likesToHours(likes)
+        createdAt `plusHours` likesToHours(likes)
       }
     private def likesToHours(likes: Likes): Int =
       if (likes.value < 1) 0
@@ -167,7 +167,7 @@ object Study {
 
   val idSize = 8
 
-  def makeId = Id(lila.common.ThreadLocalRandom nextString idSize)
+  def makeId = Id(lila.common.ThreadLocalRandom `nextString` idSize)
 
   def make(
       user: User,

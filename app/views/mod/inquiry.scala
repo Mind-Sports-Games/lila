@@ -1,7 +1,6 @@
 package views.html.mod
 
 import cats.data.NonEmptyList
-import controllers.routes
 import scala.util.matching.Regex
 
 import lila.api.Context
@@ -55,7 +54,7 @@ object inquiry {
       )
 
     def renderNote(r: lila.user.Note)(implicit ctx: Context) =
-      (!r.dox || isGranted(_.Admin)) option div(cls := "doc note")(
+      (!r.dox || isGranted(_.Admin)) `option` div(cls := "doc note")(
         h3("by ", userIdLink(r.from.some, withOnline = false), ", ", momentFromNow(r.date)),
         p(richText(r.text, expandImg = false))
       )
@@ -79,7 +78,7 @@ object inquiry {
             in.allReports.map(renderReport)
           )
         ),
-        isGranted(_.ModLog) option div(
+        isGranted(_.ModLog) `option` div(
           cls := List(
             "dropper counter history" -> true,
             "empty"                   -> in.history.isEmpty
@@ -89,7 +88,7 @@ object inquiry {
             countTag(in.history.size),
             "Mod log"
           ),
-          in.history.nonEmpty option div(
+          in.history.nonEmpty `option` div(
             ul(
               in.history.map { e =>
                 li(
@@ -135,11 +134,11 @@ object inquiry {
             "Games"
           )
         },
-        isGranted(_.Shadowban) option
+        isGranted(_.Shadowban) `option`
           a(href := routes.Mod.communicationPublic(in.user.id))("View", br, "Comms")
       ),
       div(cls := "actions")(
-        isGranted(_.ModMessage) option div(cls := "dropper warn buttons")(
+        isGranted(_.ModMessage) `option` div(cls := "dropper warn buttons")(
           iconTag("e"),
           div(
             env.mod.presets.pmPresets.get().value.map { preset =>
@@ -196,7 +195,7 @@ object inquiry {
         },
         div(cls := "dropper more buttons")(
           iconTag("u"),
-          isGranted(_.NotifySlack) option div(
+          isGranted(_.NotifySlack) `option` div(
             postForm(action := routes.Mod.notifySlack(in.user.id))(
               submitButton(cls := "fbt")("Notify Slack")
             ),
@@ -246,7 +245,7 @@ object inquiry {
     else routes.Report.snooze(report.id, duration).url
 
   private def boostOpponents(report: Report): Option[NonEmptyList[User.ID]] =
-    (report.reason == Reason.Boost) ?? {
+    (report.reason == Reason.Boost) so {
       report.atoms.toList
         .withFilter(_.byPlayStrategy)
         .flatMap(_.text.linesIterator)

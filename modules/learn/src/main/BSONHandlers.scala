@@ -12,7 +12,7 @@ object BSONHandlers {
   implicit private val StageProgressHandler: BSONHandler[StageProgress] =
     isoHandler[StageProgress, Vector[Score]](
       (s: StageProgress) => s.scores,
-      StageProgress.apply _
+      StageProgress.apply
     )
 
   implicit val LearnProgressIdHandler: BSONHandler[LearnProgress.Id] =

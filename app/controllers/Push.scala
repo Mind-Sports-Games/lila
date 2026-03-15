@@ -1,6 +1,6 @@
 package controllers
 
-import lila.app._
+import lila.app.*
 import lila.push.WebSubscription
 import lila.push.WebSubscription.readers._
 

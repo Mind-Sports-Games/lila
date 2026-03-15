@@ -3,12 +3,12 @@ package lila.challenge
 import strategygames.format.FEN
 import strategygames.variant.Variant
 import strategygames.chess.variant.Chess960
-import strategygames.{ P2, Player => PlayerIndex, GameFamily, GameLogic, Mode, Speed, P1 }
+import strategygames.{ P2, Player => PlayerIndex, GameFamily, Mode, Speed, P1 }
 
 import org.joda.time.DateTime
 import scala.util.Random
 
-import lila.game.{ Game, PerfPicker }
+import lila.game.Game
 import lila.i18n.{ I18nKey, I18nKeys }
 import play.api.i18n.Lang
 import lila.rating.PerfType
@@ -96,8 +96,8 @@ case class Challenge(
   def notableInitialFen: Option[FEN] =
     variant match {
       case Variant.Chess(variant)                => if (variant.standardInitialPosition) none else initialFen
-      case Variant.Draughts(_)                   => draughtsCustomStartingPosition ?? initialFen
-      case Variant.Go(_) | Variant.Backgammon(_) => customStartingPosition ?? initialFen
+      case Variant.Draughts(_)                   => draughtsCustomStartingPosition so initialFen
+      case Variant.Go(_) | Variant.Backgammon(_) => customStartingPosition so initialFen
       case _                                     => none
     }
 
@@ -233,7 +233,7 @@ object Challenge {
 
   private val idSize = 8
 
-  private def randomId = lila.common.ThreadLocalRandom nextString idSize
+  private def randomId = lila.common.ThreadLocalRandom `nextString` idSize
 
   def toRegistered(variant: Variant, timeControl: TimeControl)(u: User) =
     Challenger.Registered(u.id, Rating(u.perfs(perfTypeOf(variant, timeControl))))
@@ -246,7 +246,7 @@ object Challenge {
 
   def make(
       variant: Variant,
-      fenVariant: Option[Variant],
+      @annotation.nowarn("msg=unused") fenVariant: Option[Variant],
       initialFen: Option[FEN],
       timeControl: TimeControl,
       mode: Mode,
@@ -264,18 +264,9 @@ object Challenge {
       case "p2" => PlayerIndexChoice.P2     -> P2
       case _    => PlayerIndexChoice.Random -> randomPlayerIndex
     }
-    val finalVariant = fenVariant match {
-      case Some(v) if draughtsFenVariants(variant) =>
-        if (variant.fromPositionVariant && v.standardVariant)
-          Variant
-            .byName(GameLogic.Draughts(), "From Position")
-            .getOrElse(Variant.orDefault(GameLogic.Draughts(), 3))
-        else v
-      case _ => variant
-    }
     //val finalInitialFen = finalVariant match {
     //  case Variant.Draughts(v) =>
-    //    draughtsFenVariants(v) ?? {
+    //    draughtsFenVariants(v) so {
     //      initialFen.flatMap(fen => Forsyth.<<@(finalVariant.gameLogic, finalVariant, fen.value))
     //        .map(sit => FEN(Forsyth.>>(finalVariant.gameLogic, sit.withoutGhosts)))
     //    } match {
@@ -302,7 +293,7 @@ object Challenge {
         }
         else if (variant.initialFens.size > 1)
           Random.shuffle(variant.initialFens).headOption
-        else !variant.standardInitialPosition option variant.initialFen,
+        else !variant.standardInitialPosition `option` variant.initialFen,
       timeControl = timeControl,
       mode = finalMode,
       playerIndexChoice = playerIndexChoice,
@@ -311,11 +302,11 @@ object Challenge {
       destUser = destUser map toRegistered(variant, timeControl),
       rematchOf = rematchOf,
       createdAt = DateTime.now,
-      seenAt = !isOpen option DateTime.now,
+      seenAt = !isOpen `option` DateTime.now,
       expiresAt = if (isOpen) DateTime.now.plusDays(1) else inTwoWeeks,
-      open = isOpen option true,
+      open = isOpen `option` true,
       name = name,
-      multiMatch = multiMatch option true,
+      multiMatch = multiMatch `option` true,
       backgammonPoints = backgammonPoints
     )
     if (multiMatch && !challenge.customStartingPosition)

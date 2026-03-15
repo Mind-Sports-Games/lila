@@ -150,7 +150,7 @@ object Castling {
     (p.id, p)
   } toMap
   def fromMoves(moves: Iterable[String]) =
-    moves.find(_ startsWith "O") match {
+    moves.find(_ `startsWith` "O") match {
       case Some("O-O")   => Kingside
       case Some("O-O-O") => Queenside
       case _             => None

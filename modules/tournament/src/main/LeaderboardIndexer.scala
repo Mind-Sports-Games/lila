@@ -24,7 +24,7 @@ final private class LeaderboardIndexer(
     leaderboardRepo.coll.delete.one($empty) >>
       tournamentRepo.coll
         .find(tournamentRepo.finishedSelect)
-        .sort($sort desc "startsAt")
+        .sort($sort `desc` "startsAt")
         .cursor[Tournament](ReadPreference.secondaryPreferred)
         .documentSource()
         .via(lila.common.LilaStream.logRate[Tournament]("leaderboard index tour")(logger))
@@ -42,7 +42,7 @@ final private class LeaderboardIndexer(
       generateTourEntries(tour) flatMap saveEntries
 
   private def saveEntries(entries: Seq[Entry]): Funit =
-    entries.nonEmpty ?? leaderboardRepo.coll.insert
+    entries.nonEmpty so leaderboardRepo.coll.insert
       .many(
         entries.flatMap(BSONHandlers.leaderboardEntryHandler.writeOpt)
       )

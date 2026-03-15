@@ -21,15 +21,15 @@ final private class ChapterMaker(
   import ChapterMaker._
 
   def apply(study: Study, data: Data, order: Int, userId: User.ID): Fu[Chapter] =
-    data.game.??(parseGame) flatMap {
+    data.game.so(parseGame) flatMap {
       case None =>
-        data.game ?? pgnFetch.fromUrl flatMap {
+        data.game so pgnFetch.fromUrl flatMap {
           case Some(pgn) => fromFenOrPgnOrBlank(study, data.copy(pgn = pgn.some), order, userId)
           case _         => fromFenOrPgnOrBlank(study, data, order, userId)
         }
       case Some(game) => fromGame(study, game, data, order, userId)
     } map { (c: Chapter) =>
-      if (c.name.value.isEmpty) c.copy(name = Chapter defaultName order) else c
+      if (c.name.value.isEmpty) c.copy(name = Chapter `defaultName` order) else c
     }
 
   def fromFenOrPgnOrBlank(study: Study, data: Data, order: Int, userId: User.ID): Fu[Chapter] =
@@ -43,7 +43,7 @@ final private class ChapterMaker(
     // TODO: support PGN parsing for other variants later.
     for {
       contributors <- lightUser.asyncMany(study.members.contributorIds.toList)
-      parsed <- PgnImport(pgn, contributors.flatten).toFuture recoverWith { case e: Exception =>
+      parsed <- PgnImport(pgn, contributors.flatten).toEither.toFuture recoverWith { case e: Exception =>
         fufail(ValidationException(e.getMessage))
       }
     } yield Chapter.make(
@@ -69,7 +69,7 @@ final private class ChapterMaker(
       ownerId = userId,
       practice = data.isPractice,
       gamebook = data.isGamebook,
-      conceal = data.isConceal option Chapter.Ply(parsed.root.ply)
+      conceal = data.isConceal `option` Chapter.Ply(parsed.root.ply)
     )
   }
 
@@ -111,7 +111,7 @@ final private class ChapterMaker(
           fen = variant.initialFen,
           check = false,
           clock = none,
-          pocketData = variant.dropsVariant option PocketData.init(variant.gameLogic),
+          pocketData = variant.dropsVariant `option` PocketData.init(variant.gameLogic),
           children = Node.emptyChildren
         ) -> false
     }) match {
@@ -123,7 +123,7 @@ final private class ChapterMaker(
             none,
             variant,
             resolveOrientation(data.realOrientation, root),
-            fromFen = isFromFen option true
+            fromFen = isFromFen `option` true
           ),
           root = root,
           tags = Tags.empty,
@@ -147,17 +147,16 @@ final private class ChapterMaker(
     for {
       root <- game2root(game, initialFen)
       tags <- pgnDump.tags(game, initialFen, none, withOpening = true)
-      name <- {
+      name <-
         if (data.isDefaultName)
-          Namer.gameVsText(game, withRatings = false)(lightUser.async) dmap Chapter.Name.apply
+          Namer.gameVsText(game, withRatings = false)(using lightUser.async) `dmap` Chapter.Name.apply
         else fuccess(data.name)
-      }
       _ = notifyChat(study, game, userId)
     } yield Chapter.make(
       studyId = study.id,
       name = name,
       setup = Chapter.Setup(
-        !game.synthetic option game.id,
+        !game.synthetic `option` game.id,
         game.variant,
         data.realOrientation match {
           case Orientation.Auto               => PlayerIndex.p1
@@ -170,7 +169,7 @@ final private class ChapterMaker(
       ownerId = userId,
       practice = data.isPractice,
       gamebook = data.isGamebook,
-      conceal = data.isConceal option Chapter.Ply(root.ply)
+      conceal = data.isConceal `option` Chapter.Ply(root.ply)
     )
 
   def notifyChat(study: Study, game: Game, userId: User.ID) =
@@ -186,7 +185,7 @@ final private class ChapterMaker(
     }
 
   private[study] def game2root(game: Game, initialFen: Option[FEN]): Fu[Node.Root] =
-    initialFen.fold(gameRepo initialFen game) { fen =>
+    initialFen.fold(gameRepo `initialFen` game) { fen =>
       fuccess(fen.some)
     } map { GameToRoot(game, _, withClocks = true) }
 
@@ -225,7 +224,7 @@ private[study] object ChapterMaker {
     def orientation: String
     def mode: String
     def realOrientation =
-      PlayerIndex.fromName(orientation).fold[Orientation](Orientation.Auto)(Orientation.Fixed)
+      PlayerIndex.fromName(orientation).fold[Orientation](Orientation.Auto)(Orientation.Fixed.apply)
     def isPractice = mode == Mode.Practice.key
     def isGamebook = mode == Mode.Gamebook.key
     def isConceal  = mode == Mode.Conceal.key
@@ -251,7 +250,7 @@ private[study] object ChapterMaker {
 
     def manyGames =
       game
-        .??(_.linesIterator.take(Study.maxChapters).toList)
+        .so(_.linesIterator.take(Study.maxChapters).toList)
         .map(_.trim)
         .filter(_.nonEmpty)
         .map { g => copy(game = g.some) }

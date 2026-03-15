@@ -11,7 +11,6 @@ import lila.app.templating.Environment._
 import lila.app.ui.ScalatagsTemplate._
 import lila.i18n.VariantKeys
 
-import controllers.routes
 
 object side {
 
@@ -28,7 +27,7 @@ object side {
       bookmarked: Boolean,
       swissPairingGames: Option[lila.swiss.SwissPairingGames]
   )(implicit ctx: Context): Option[Frag] =
-    ctx.noBlind option frag(
+    ctx.noBlind `option` frag(
       meta(pov, initialFen, tour, simul, userTv, bookmarked, swissPairingGames),
       pov.game.userIds.filter(isStreaming) map views.html.streamer.bits.contextual
     )
@@ -74,7 +73,7 @@ object side {
                         title := "Clock info",
                         href := s"${routes.Page.lonePage("clocks")}",
                         target := "_blank"
-                      )(widgets showClock game),
+                      )(widgets `showClock` game),
                       separator,
                       if (game.fromHandicappedTournament) {
                         a(
@@ -108,7 +107,7 @@ object side {
                   )
                 }
               ),
-              game.pgnImport.exists(_.date.isDefined) option small(
+              game.pgnImport.exists(_.date.isDefined) `option` small(
                 "Imported ",
                 game.pgnImport.flatMap(_.user).map { user =>
                   trans.by(userIdLink(user.some, None, withOnline = false))

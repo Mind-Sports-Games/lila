@@ -18,10 +18,10 @@ object ResponseHeaders {
           "Authorization",
           "If-Modified-Since",
           "Cache-Control"
-        ) ::: appOrigin.isDefined.??(List("X-Requested-With", "sessionId", "Content-Type"))
+        ) ::: appOrigin.isDefined.so(List("X-Requested-With", "sessionId", "Content-Type"))
       }.mkString(", "),
       "Vary" -> "Origin"
-    ) ::: appOrigin.isDefined.??(
+    ) ::: appOrigin.isDefined.so(
       List(
         "Access-Control-Allow-Credentials" -> "true"
       )

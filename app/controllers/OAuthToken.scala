@@ -2,7 +2,7 @@ package controllers
 
 import views._
 
-import lila.app._
+import lila.app.*
 
 final class OAuthToken(env: Env) extends LilaController(env) {
 
@@ -17,10 +17,10 @@ final class OAuthToken(env: Env) extends LilaController(env) {
 
   def create =
     Auth { implicit ctx => me =>
-      val form = env.oAuth.forms.token.create fill lila.oauth.OAuthForm.token
+      val form = env.oAuth.forms.token.create `fill` lila.oauth.OAuthForm.token
         .Data(
-          description = ~get("description"),
-          scopes = (~ctx.req.queryString.get("scopes[]")).toList
+          description = get("description").getOrElse(""),
+          scopes = ctx.req.queryString.getOrElse("scopes[]", Nil).toList
         )
       Ok(html.oAuth.token.create(form, me)).fuccess
     }
@@ -33,7 +33,7 @@ final class OAuthToken(env: Env) extends LilaController(env) {
         .fold(
           err => BadRequest(html.oAuth.token.create(err, me)).fuccess,
           setup =>
-            tokenApi.create(setup make me) inject
+            tokenApi.create(setup `make` me) inject
               Redirect(routes.OAuthToken.index).flashSuccess
         )
     }

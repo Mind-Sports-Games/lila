@@ -1,6 +1,6 @@
 package controllers
 
-import lila.app._
+import lila.app.*
 import lila.oauth.{ AccessToken, OAuthApp => App }
 import views._
 
@@ -31,7 +31,7 @@ final class OAuthApp(env: Env) extends LilaController(env) {
         .fold(
           err => BadRequest(html.oAuth.app.form.create(err)).fuccess,
           setup => {
-            val app = setup make me
+            val app = setup `make` me
             appApi.create(app) inject
               Redirect(routes.OAuthApp.edit(app.clientId.value)).flashSuccess
           }

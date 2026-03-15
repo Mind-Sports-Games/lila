@@ -58,7 +58,7 @@ object PgnImport {
                 ).fold(variations)(_ :: variations).toVector
               }
             )
-            val end: Option[End] = (game.finished option game.status).map { status =>
+            val end: Option[End] = (game.finished `option` game.status).map { status =>
               End(
                 status = status,
                 winner = game.winnerPlayerIndex,
@@ -67,7 +67,7 @@ object PgnImport {
               )
             }
             val commented =
-              if (root.mainline.lastOption.??(_.isCommented)) root
+              if (root.mainline.lastOption.so(_.isCommented)) root
               else
                 end.map(endComment).fold(root) { comment =>
                   root updateMainlineLast { _.setComment(comment) }
@@ -82,7 +82,7 @@ object PgnImport {
     }
 
   private def findAnnotator(pgn: ParsedPgn, contributors: List[LightUser]): Option[Comment.Author] =
-    pgn tags "annotator" map { a =>
+    pgn `tags` "annotator" map { a =>
       val lowered = a.toLowerCase
       contributors.find { c =>
         c.name == lowered || c.titleName == lowered || lowered.endsWith(s"/${c.id}")
@@ -99,7 +99,7 @@ object PgnImport {
   }
 
   private def makeVariations(sans: List[San], game: Game, annotator: Option[Comment.Author]) =
-    sans.headOption.?? {
+    sans.headOption.so {
       _.metas.variations.flatMap { variation =>
         makeNode(game, variation.value, annotator)
       }
@@ -129,7 +129,7 @@ object PgnImport {
     }
 
   private def makeNode(prev: Game, sans: List[San], annotator: Option[Comment.Author]): Option[Node] =
-    try {
+    try
       sans match {
         case Nil => none
         case san :: rest =>
@@ -169,7 +169,7 @@ object PgnImport {
             }
           )
       }
-    } catch {
+    catch {
       case _: StackOverflowError =>
         logger.warn(s"study PgnImport.makeNode StackOverflowError")
         None

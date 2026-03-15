@@ -19,7 +19,7 @@ object replayBot {
   )(implicit ctx: Context) = {
 
     views.html.analyse.bits.layout(
-      title = replay titleOf pov,
+      title = replay `titleOf` pov,
       moreCss = cssTag("analyse.round"),
       openGraph = povOpenGraph(pov).some
     ) {

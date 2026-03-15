@@ -6,7 +6,6 @@ import lila.app.ui.ScalatagsTemplate._
 import lila.blog.MiniPost
 import lila.common.paginator.Paginator
 
-import controllers.routes
 
 object index {
 
@@ -17,7 +16,7 @@ object index {
       pager: Paginator[io.prismic.Document]
   )(implicit ctx: Context, prismic: lila.blog.BlogApi.Context) = {
 
-    val primaryPost = (pager.currentPage == 1).??(pager.currentPageResults.headOption)
+    val primaryPost = (pager.currentPage == 1).so(pager.currentPageResults.headOption)
     views.html.base.layout(
       title = "Blog",
       moreCss = cssTag("blog"),
@@ -39,7 +38,7 @@ object index {
           },
           div(cls := "blog-cards list infinite-scroll")(
             pager.currentPageResults flatMap MiniPost.fromDocument("blog", "wide") map { post =>
-              primaryPost.fold(true)(_.id != post.id) option bits.postCard(post, "paginated".some, h3)
+              primaryPost.fold(true)(_.id != post.id) `option` bits.postCard(post, "paginated".some, h3)
             },
             pagerNext(pager, np => routes.Blog.index(np).url)
           )

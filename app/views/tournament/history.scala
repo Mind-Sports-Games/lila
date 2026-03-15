@@ -1,6 +1,5 @@
 package views.html.tournament
 
-import controllers.routes
 
 import lila.api.Context
 import lila.app.templating.Environment._

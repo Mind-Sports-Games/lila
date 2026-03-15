@@ -19,10 +19,11 @@ object FingerHash {
       import org.apache.commons.codec.binary.Hex
       FingerHash {
         Base64.getEncoder encodeToString {
-          Hex decodeHex normalize(print).toArray
+          Hex `decodeHex` normalize(print).toArray
         } take length
       } some
-    } catch {
+    }
+    catch {
       case _: Exception => none
     }
 

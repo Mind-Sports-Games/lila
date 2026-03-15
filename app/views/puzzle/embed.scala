@@ -1,6 +1,5 @@
 package views.html.puzzle
 
-import controllers.routes
 import play.api.i18n.Lang
 
 import lila.app.templating.Environment._
@@ -11,14 +10,12 @@ import lila.i18n.VariantKeys
 
 object embed {
 
-  import EmbedConfig.implicits._
-
   def apply(daily: DailyPuzzle.WithHtml)(implicit config: EmbedConfig) =
     views.html.base.embed(
       title = "playstrategy.org chess puzzle",
       cssModule = "tv.embed"
     )(
-      dailyLink(daily)(config.lang)(
+      dailyLink(daily)(using config.lang)(
         targetBlank,
         id := "daily-puzzle",
         cls := "embedded"

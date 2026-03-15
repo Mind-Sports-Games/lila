@@ -1,14 +1,6 @@
 package views.html.relay
 
-import controllers.routes
-import play.api.data.Form
 
-import lila.api.Context
-import lila.app.templating.Environment._
-import lila.app.ui.ScalatagsTemplate._
-import lila.relay.RelayRound.Sync.UpstreamUrl.LccRegex
-import lila.relay.RelayRoundForm.Data
-import lila.relay.{ RelayRound, RelayTour }
 
 object roundForm {
   /*

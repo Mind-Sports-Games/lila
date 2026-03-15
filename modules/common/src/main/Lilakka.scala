@@ -15,7 +15,7 @@ object Lilakka {
       logger.info(msg)
       Chronometer(f())
         .log(logger)(_ => msg)
-        .result inject akka.Done
+        .result.inject(akka.Done)
     }
   }
 }

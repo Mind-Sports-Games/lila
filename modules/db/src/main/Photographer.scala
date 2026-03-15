@@ -24,7 +24,7 @@ final class Photographer(repo: ImageRepo, prefix: String) {
         createdBy = createdBy
       )
 
-      repo save image inject image
+      repo.save(image).inject(image)
     }
 
   private def process(path: Path) = {

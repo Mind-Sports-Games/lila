@@ -26,7 +26,7 @@ object AccessToken {
     def isPersonal = value.lengthIs == idSize
   }
 
-  def makeId = Id(ornicar.scalalib.Random secureString idSize)
+  def makeId = Id(Random.secureString(idSize))
 
   case class ForAuth(userId: User.ID, scopes: List[OAuthScope])
 
@@ -72,10 +72,10 @@ object AccessToken {
       AccessToken(
         id = r.get[Id](id),
         publicId = r.get[BSONObjectID](publicId),
-        clientId = r str clientId,
-        userId = r str userId,
+        clientId = r `str` clientId,
+        userId = r `str` userId,
         createdAt = r.getO[DateTime](createdAt),
-        description = r strO description,
+        description = r `strO` description,
         usedAt = r.getO[DateTime](usedAt),
         scopes = r.get[List[OAuthScope]](scopes)
       )

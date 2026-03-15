@@ -10,7 +10,7 @@ final class OAuthAppApi(colls: OauthColls)(implicit ec: scala.concurrent.Executi
 
   def mine(u: User): Fu[List[OAuthApp]] =
     colls.app {
-      _.find($doc(F.author -> u.id)).sort($sort desc F.createdAt).cursor[OAuthApp]().list(30)
+      _.find($doc(F.author -> u.id)).sort($sort `desc` F.createdAt).cursor[OAuthApp]().list(30)
     }
 
   def create(app: OAuthApp) = colls.app(_.insert.one(app).void)
@@ -29,9 +29,10 @@ final class OAuthAppApi(colls: OauthColls)(implicit ec: scala.concurrent.Executi
     colls.app { appColl =>
       import OAuthApp.AppBSONHandler
       colls.token {
-        _.aggregateList(maxDocs = 100) { implicit framework =>
+        _.aggregateWith[Bdoc]() { implicit framework =>
           import framework._
-          Match($doc("user_id" -> user.id)) -> List(
+          List(
+            Match($doc("user_id" -> user.id)),
             Sort(Descending("used_at")),
             PipelineOperator(
               $doc(
@@ -44,11 +45,13 @@ final class OAuthAppApi(colls: OauthColls)(implicit ec: scala.concurrent.Executi
               )
             )
           )
-        }.map { docs =>
+        }
+          .collect[List](maxDocs = 100)
+          .map { docs =>
           for {
             doc   <- docs
             token <- AccessToken.AccessTokenBSONHandler.readOpt(doc)
-            app   <- doc.getAsOpt[List[OAuthApp]]("app").??(_.headOption)
+            app   <- doc.getAsOpt[List[OAuthApp]]("app").so(_.headOption)
           } yield AccessToken.WithApp(token, app)
         }
       }

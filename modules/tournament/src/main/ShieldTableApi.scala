@@ -1,17 +1,10 @@
 package lila.tournament
 
-import org.joda.time.DateTime
 import reactivemongo.api.bson._
-import reactivemongo.api.ReadPreference
 
 import lila.common.LightUser
-import lila.common.Maths
-import lila.common.config.MaxPerPage
-import lila.common.paginator.Paginator
 import lila.common.ThreadLocalRandom
 import lila.db.dsl._
-import lila.db.paginator.Adapter
-import lila.rating.PerfType
 import lila.user.User
 
 final class ShieldTableApi(
@@ -22,7 +15,7 @@ final class ShieldTableApi(
   import ShieldTableApi._
   import BSONHandlers._
 
-  private val maxPerPage = MaxPerPage(15)
+  // private val maxPerPage = MaxPerPage(15)
 
   def byCategoryId(id: Int) =
     repo.coll
@@ -31,16 +24,16 @@ final class ShieldTableApi(
           "c" -> id
         )
       )
-      .sort($sort desc "p")
+      .sort($sort `desc` "p")
       .cursor[ShieldTableEntry]()
       .list()
 
   def clearRepo(category: Category) =
     byCategoryId(category.id) flatMap { entries =>
-      (entries.nonEmpty ?? repo.coll.delete.one($inIds(entries.map(_.id))).void)
+      (entries.nonEmpty so repo.coll.delete.one($inIds(entries.map(_.id))).void)
     }
 
-  def insert(userPoints: Seq[ShieldTableEntry]) = userPoints.nonEmpty ??
+  def insert(userPoints: Seq[ShieldTableEntry]) = userPoints.nonEmpty so
     repo.coll.insert(ordered = false).many(userPoints).void
 
   def recalculate(category: Category): Funit =
@@ -54,9 +47,9 @@ final class ShieldTableApi(
         )
       }
 
-  def recalculateAll = Category.all.map(recalculate).sequenceFu.void
-
+  def recalculateAll = Future.sequence(Category.all.map(recalculate)).void
 }
+
 
 object ShieldTableApi {
 
@@ -113,8 +106,8 @@ object ShieldTableApi {
 
     type ID = String
 
-    def makeId = ThreadLocalRandom nextString 8
-
+    def makeId = ThreadLocalRandom `nextString` 8
   }
-
 }
+
+

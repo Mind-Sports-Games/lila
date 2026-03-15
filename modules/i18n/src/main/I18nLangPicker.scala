@@ -7,7 +7,7 @@ object I18nLangPicker {
 
   def apply(req: RequestHeader, userLang: Option[String] = None): Lang =
     userLang
-      .orElse(req.session get "lang")
+      .orElse(req.session `get` "lang")
       .flatMap(Lang.get)
       .flatMap(findCloser)
       .orElse(bestFromRequestHeaders(req))
@@ -23,7 +23,7 @@ object I18nLangPicker {
     req.acceptLanguages.flatMap(findCloser).distinct.toList
 
   def byStr(str: String): Option[Lang] =
-    Lang get str flatMap findCloser
+    Lang `get` str flatMap findCloser
 
   def byStrOrDefault(str: Option[String]): Lang =
     str.flatMap(byStr) | defaultLang

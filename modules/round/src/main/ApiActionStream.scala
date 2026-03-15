@@ -1,6 +1,5 @@
 package lila.round
 
-import akka.stream.OverflowStrategy
 import akka.stream.scaladsl._
 import strategygames.{ Player => PlayerIndex }
 import strategygames.format.Forsyth
@@ -20,7 +19,7 @@ final class ApiActionStream(gameRepo: GameRepo, gameJsonView: lila.game.JsonView
   private val delayMovesBy         = 3
   private val delayKeepsFirstMoves = 5
 
-  def apply(game: Game): Source[JsObject, _] =
+  def apply(game: Game): Source[JsObject, ?] =
     Source futureSource {
       gameRepo.initialFen(game) map { initialFen =>
         val buffer = scala.collection.mutable.Queue.empty[JsObject]
@@ -33,7 +32,7 @@ final class ApiActionStream(gameRepo: GameRepo, gameJsonView: lila.game.JsonView
               if (game.finished || moves <= delayKeepsFirstMoves) List(js)
               else {
                 buffer.enqueue(js)
-                (buffer.size > delayMovesBy) ?? List(buffer.dequeue())
+                (buffer.size > delayMovesBy) so List(buffer.dequeue())
               }
             }
             .mapMaterializedValue { queue =>
@@ -66,11 +65,12 @@ final class ApiActionStream(gameRepo: GameRepo, gameJsonView: lila.game.JsonView
               if (game.finished) {
                 queue offer gameJsonView(game, initialFen)
                 queue.complete()
-              } else {
-                val chans = List(MoveGameEvent makeChan game.id, "finishGame")
-                val sub = Bus.subscribeFun(chans: _*) {
+              }
+              else {
+                val chans = List(MoveGameEvent `makeChan` game.id, "finishGame")
+                val sub = Bus.subscribeFun(chans*) {
                   case MoveGameEvent(g, fen, move) =>
-                    queue.offer(toJson(g, fen, move.some)).unit
+                    queue.offer(toJson(g, fen, move.some)).discard
                   case FinishGame(g, _, _) if g.id == game.id =>
                     queue offer gameJsonView(g, initialFen)
                     (1 to buffer.size) foreach { _ => queue.offer(Json.obj()) } // push buffer content out

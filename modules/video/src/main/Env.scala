@@ -3,7 +3,7 @@ package lila.video
 import play.api.libs.ws.StandaloneWSClient
 import play.api.Mode
 import com.softwaremill.macwire._
-import io.methvin.play.autoconfig._
+import lila.common.autoconfig.{ AutoConfig, ConfigName }
 import play.api.Configuration
 import scala.concurrent.duration._
 
@@ -30,7 +30,7 @@ final class Env(
     mode: Mode
 )(implicit ec: scala.concurrent.ExecutionContext) {
 
-  private val config = appConfig.get[VideoConfig]("video")(AutoConfig.loader)
+  private val config = appConfig.get[VideoConfig]("video")(using AutoConfig.loader)
 
   lazy val api = new VideoApi(
     cacheApi = cacheApi,
@@ -50,11 +50,11 @@ final class Env(
 
   if (mode == Mode.Prod) {
     scheduler.scheduleWithFixedDelay(config.sheetDelay * 2, config.sheetDelay) { () =>
-      sheet.fetchAll.logFailure(logger).unit
+      sheet.fetchAll.logFailure(logger).discard
     }
 
     scheduler.scheduleWithFixedDelay(config.youtubeDelay * 2, config.youtubeDelay) { () =>
-      youtube.updateAll.logFailure(logger).unit
+      youtube.updateAll.logFailure(logger).discard
     }
   }
 }

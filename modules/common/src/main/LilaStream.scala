@@ -2,8 +2,6 @@ package lila.common
 
 import akka.NotUsed
 import akka.stream.scaladsl._
-import com.github.blemale.scaffeine.Scaffeine
-import scala.annotation.nowarn
 import scala.concurrent.duration._
 
 object LilaStream {

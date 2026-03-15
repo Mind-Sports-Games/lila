@@ -7,7 +7,7 @@ import play.api.data.Forms._
 
 import strategygames.variant.Variant
 import strategygames.format.FEN
-import strategygames.{ ByoyomiClock, Clock, ClockConfig, GameFamily, GameLogic }
+import strategygames.{ Clock, ClockConfig, GameFamily, GameLogic }
 
 import lila.common.Form._
 import lila.common.Clock._
@@ -43,10 +43,10 @@ object CrudForm {
       "statusScoring" -> boolean,
       "teamBattle"    -> boolean,
       "hasChat"       -> boolean
-    )(CrudForm.Data.apply)(CrudForm.Data.unapply)
+    )(CrudForm.Data.apply)(d => Some((d.name, d.homepageHours, d.clock, d.minutes, d.variant, d.handicapped, d.position, d.date, d.image, d.headline, d.description, d.conditions, d.berserkable, d.streakable, d.statusScoring, d.teamBattle, d.hasChat)))
       .verifying("Invalid clock", _.validClock)
       .verifying("Increase tournament duration, or decrease game clock", _.validTiming)
-  ) fill CrudForm.Data(
+  ) `fill` CrudForm.Data(
     name = "",
     homepageHours = 0,
     clock = Clock.Config(180, 0),
@@ -54,7 +54,7 @@ object CrudForm {
     variant = s"${GameFamily.Chess().id}_${Variant.default(GameLogic.Chess()).id}".some,
     handicapped = false,
     position = none,
-    date = DateTime.now plusDays 7,
+    date = DateTime.now `plusDays` 7,
     image = "",
     headline = "",
     description = "",
@@ -95,7 +95,7 @@ object CrudForm {
       Variant.apply(gameLogic, v.split("_")(1).toInt)
     } getOrElse Variant.default(gameLogic)
 
-    def realPosition = position ifTrue realVariant.key == "standard"
+    def realPosition = position `ifTrue` realVariant.key == "standard"
 
     def validClock = (clock.limitSeconds + clock.graceSeconds) > 0
 

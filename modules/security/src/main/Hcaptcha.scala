@@ -1,6 +1,6 @@
 package lila.security
 
-import io.methvin.play.autoconfig._
+import lila.common.autoconfig.{ AutoConfig, ConfigName }
 import play.api.data.Form
 import play.api.data.FormBinding
 import play.api.data.Forms._
@@ -18,7 +18,7 @@ trait Hcaptcha {
 
   def verify(response: String, req: RequestHeader): Fu[Hcaptcha.Result]
 
-  def verify()(implicit req: play.api.mvc.Request[_], formBinding: FormBinding): Fu[Hcaptcha.Result] =
+  def verify()(implicit req: play.api.mvc.Request[?], formBinding: FormBinding): Fu[Hcaptcha.Result] =
     verify(~Hcaptcha.form.bindFromRequest().value.flatten, req)
 }
 
@@ -48,8 +48,8 @@ object Hcaptcha {
 object HcaptchaSkip extends Hcaptcha {
 
   def verify(response: String, req: RequestHeader) = fuccess(Hcaptcha.Result.Valid)
-
 }
+
 
 final class HcaptchaReal(
     ws: StandaloneWSClient,
@@ -72,7 +72,7 @@ final class HcaptchaReal(
   implicit private val badReader: Reads[BadResponse] = Json.reads[BadResponse]
 
   def verify(response: String, req: RequestHeader): Fu[Result] = {
-    val client = HTTPRequest clientName req
+    val client = HTTPRequest `clientName` req
     ws.url(config.endpoint)
       .post(
         Map(
@@ -91,7 +91,7 @@ final class HcaptchaReal(
           case JsError(err) =>
             res.body[JsValue].validate[BadResponse].asOpt match {
               case Some(err) if err.missingInput =>
-                logger.info(s"hcaptcha missing ${HTTPRequest printClient req}")
+                logger.info(s"hcaptcha missing ${HTTPRequest `printClient` req}")
                 lila.mon.security.hCaptcha.hit(client, "missing").increment()
                 if (HTTPRequest.apiVersion(req).isDefined) Result.Pass else Result.Fail
               case Some(err) =>

@@ -4,7 +4,6 @@ import lila.api.Context
 import lila.app.templating.Environment._
 import lila.app.ui.ScalatagsTemplate._
 
-import controllers.routes
 
 object index {
 
@@ -13,7 +12,7 @@ object index {
   ) =
     views.html.account.layout(title = "OAuth Apps", active = "oauth.app")(
       div(cls := "account oauth")(
-        used.nonEmpty option div(cls := "oauth-used box")(
+        used.nonEmpty `option` div(cls := "oauth-used box")(
           h1(id := "used")("OAuth Apps"),
           standardFlash(cls := "box__pad"),
           table(cls := "slist slist-pad")(

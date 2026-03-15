@@ -3,7 +3,7 @@ package lila.socket
 import cats.data.Validated
 import strategygames.format.{ FEN, Forsyth, Uci, UciCharPair }
 import strategygames.opening.FullOpeningDB
-import strategygames.{ Game, GameLogic, Pos, Role, Situation }
+import strategygames.{ Game, GameLogic, Pos, Role }
 import strategygames.variant.Variant
 import play.api.libs.json.JsObject
 
@@ -23,7 +23,7 @@ case class AnaDrop(
   private lazy val newGame = Game(lib, variant.some, fen.some).drop(role, pos)
 
   def branch: Validated[String, Branch] =
-    newGame.flatMap { case (game, drop) =>
+    newGame.andThen { case (game, drop) =>
       game.actionStrs.flatten.lastOption toValid "Dropped but no last move!" map { lastAction =>
         val gameRecordNotation =
           if (lib == GameLogic.FairySF() || lib == GameLogic.Go() || lib == GameLogic.Backgammon())
@@ -41,8 +41,8 @@ case class AnaDrop(
           move = Uci.WithSan(lib, uci, gameRecordNotation),
           fen = fen,
           check = game.situation.check,
-          dests = Some(movable ?? game.situation.destinations),
-          opening = Variant.openingSensibleVariants(variant.gameLogic)(variant) ?? FullOpeningDB
+          dests = Some(movable so game.situation.destinations),
+          opening = Variant.openingSensibleVariants(variant.gameLogic)(variant) so FullOpeningDB
             .findByFen(variant.gameLogic, fen),
           dropsByRole = game.situation.dropsByRole,
           pocketData = game.situation.board.pocketData
@@ -55,11 +55,11 @@ case class AnaDrop(
 object AnaDrop {
 
   private def dataGameLogic(d: JsObject): GameLogic =
-    GameLogic(d int "lib" getOrElse 0)
+    GameLogic(d `int` "lib" getOrElse 0)
 
   def parse(o: JsObject) =
     for {
-      d <- o obj "d"
+      d <- o `obj` "d"
       gl      = dataGameLogic(d)
       variant = Variant.orDefault(gl, ~d.str("variant"))
       role <- d.str("role").flatMap(Role.allByGroundName(gl, variant.gameFamily).get)
@@ -72,6 +72,6 @@ object AnaDrop {
       variant = variant,
       fen = fen,
       path = path,
-      chapterId = d str "ch"
+      chapterId = d `str` "ch"
     )
 }

@@ -87,9 +87,8 @@ object RateLimit {
         if (accepted) op else default
       }
 
-      def chargeable[A](k: K, cost: Cost = 1, msg: => String = "")(op: Charge => A)(default: => A): A = {
+      def chargeable[A](k: K, cost: Cost = 1, msg: => String = "")(op: Charge => A)(default: => A): A =
         apply(k, cost, msg) { op(c => apply(k, c, s"charge: $msg") {} {}) }(default)
-      }
     }
   }
 

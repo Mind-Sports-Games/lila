@@ -1,6 +1,5 @@
 package views.html.lobby
 
-import controllers.routes
 import play.api.libs.json.Json
 
 import lila.api.Context
@@ -76,7 +75,7 @@ object home {
             div(cls := "bg-switch__thumb")
           ),
           div(cls := "lobby__start")(
-            ctx.blind option h2("Play"),
+            ctx.blind `option` h2("Play"),
             a(
               href := routes.Setup.gameForm(none),
               cls := List(
@@ -87,7 +86,7 @@ object home {
             )
           ),
           div(cls := "lobby__counters")(
-            ctx.blind option h2("Counters"),
+            ctx.blind `option` h2("Counters"),
             a(
               id := "nb_connected_players",
               href := ctx.noBlind.option(routes.User.list.url)
@@ -115,7 +114,7 @@ object home {
           )
         ),
         div(cls := "lobby__chat")(
-          chatOption.isDefined option frag(views.html.chat.frag)
+          chatOption.isDefined `option` frag(views.html.chat.frag)
         ),
         currentGame.map(bits.currentGameInfo) orElse
           playban.map(bits.playbanInfo) getOrElse {
@@ -123,17 +122,17 @@ object home {
             else bits.lobbyApp
           },
         div(cls := "lobby__side")(
-          ctx.blind option h2("Highlights"),
-          ctx.noKid option st.section(cls := "lobby__streams")(
-            views.html.streamer.bits liveStreams streams,
-            streams.live.streams.nonEmpty option a(href := routes.Streamer.index(), cls := "more")(
+          ctx.blind `option` h2("Highlights"),
+          ctx.noKid `option` st.section(cls := "lobby__streams")(
+            views.html.streamer.bits `liveStreams` streams,
+            streams.live.streams.nonEmpty `option` a(href := routes.Streamer.index(), cls := "more")(
               trans.streamersMenu(),
               " »"
             )
           ),
           div(cls := "lobby__spotlights")(
             events.map(bits.spotlight),
-            !ctx.isBot option frag(
+            !ctx.isBot `option` frag(
               lila.tournament.Spotlight.select(tours, ctx.me, maxSpotlights - events.size) map {
                 views.html.tournament.homepageSpotlight(_)
               },
@@ -142,16 +141,16 @@ object home {
           ),
           if (ctx.isAuth)
             div(cls := "timeline")(
-              ctx.blind option h2("Timeline"),
-              views.html.timeline entries userTimeline,
-              userTimeline.nonEmpty option a(cls := "more", href := routes.Timeline.home)(
+              ctx.blind `option` h2("Timeline"),
+              views.html.timeline `entries` userTimeline,
+              userTimeline.nonEmpty `option` a(cls := "more", href := routes.Timeline.home)(
                 trans.more(),
                 " »"
               )
             )
           else
             div(cls := "about-side")(
-              ctx.blind option h2("About"),
+              ctx.blind `option` h2("About"),
               trans.playstrategyAboutSummary("PlayStrategy"),
               " ",
               a(href := "/about")(trans.aboutX("PlayStrategy"), "...")
@@ -159,24 +158,24 @@ object home {
         ),
         featured map { g =>
           div(cls := "lobby__tv")(
-            views.html.game.mini(Pov naturalOrientation g, tv = (homepage.counters.rounds > 3))
+            views.html.game.mini(Pov `naturalOrientation` g, tv = (homepage.counters.rounds > 3))
           )
         },
         puzzle map { p =>
-          views.html.puzzle.embed.dailyLink(p)(ctx.lang)(cls := "lobby__puzzle")
+          views.html.puzzle.embed.dailyLink(p)(using ctx.lang)(cls := "lobby__puzzle")
         },
-        ctx.noBot option bits.underboards(tours, simuls, leaderboard, tournamentWinners),
-        ctx.noKid option div(cls := "lobby__forum lobby__box")(
+        ctx.noBot `option` bits.underboards(tours, simuls, leaderboard, tournamentWinners),
+        ctx.noKid `option` div(cls := "lobby__forum lobby__box")(
           a(cls := "lobby__box__top", href := routes.ForumCateg.index)(
             h2(cls := "title text", dataIcon := "d")(trans.latestForumPosts()),
             span(cls := "more")(trans.more(), " »")
           ),
           div(cls := "lobby__box__content")(
-            views.html.forum.post recent forumRecent
+            views.html.forum.post `recent` forumRecent
           )
         ),
         bits.lastPosts(lastPost),
-        ctx.noKid option bits.weeklyChallenge(weeklyChallenge),
+        ctx.noKid `option` bits.weeklyChallenge(weeklyChallenge),
         bits.gameList,
         div(cls := "lobby__info")(
           div(cls := "lobby__support")(
@@ -196,7 +195,7 @@ object home {
             )
           ),
           div(cls := "lobby__about")(
-            ctx.blind option h2("About"),
+            ctx.blind `option` h2("About"),
             a(href := "/about")(trans.aboutX("PlayStrategy")),
             a(href := "/faq")(trans.faq.faqAbbreviation()),
             a(href := "/contact")(trans.contact.contact()),

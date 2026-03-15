@@ -5,7 +5,6 @@ import lila.app.templating.Environment._
 import play.api.i18n.Lang
 import lila.app.ui.ScalatagsTemplate._
 
-import controllers.routes
 
 object homeInner {
 
@@ -18,7 +17,7 @@ object homeInner {
     div(cls := "box")(
       h1(trans.simultaneousExhibitions()),
       table(cls := "slist slist-pad")(
-        pendings.nonEmpty option frag(
+        pendings.nonEmpty `option` frag(
           thead(
             tr(
               th("Your pending simuls"),
@@ -51,13 +50,13 @@ object homeInner {
               td(cls := "players text", dataIcon := "r")(sim.applicants.size)
             )
           },
-          ctx.isAuth option tr(cls := "create")(
+          ctx.isAuth `option` tr(cls := "create")(
             td(colspan := "4")(
               a(href := routes.Simul.form, cls := "action button text")(trans.hostANewSimul())
             )
           )
         ),
-        starteds.nonEmpty option (
+        starteds.nonEmpty `option` (
           frag(
             thead(
               tr(

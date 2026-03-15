@@ -5,7 +5,6 @@ import actorApi.round._
 import akka.actor.{ ActorSystem, Cancellable, CoordinatedShutdown, Scheduler }
 import strategygames.format.Uci
 import strategygames.{ P2, Centis, Player => PlayerIndex, GameFamily, MoveMetrics, Speed, P1, Pos }
-import strategygames.variant.Variant
 import play.api.libs.json._
 import scala.concurrent.duration._
 import scala.concurrent.ExecutionContext
@@ -54,11 +53,11 @@ final class RoundSocket(
       if (g.isEmpty) finishRound(Game.Id(gameId))
     }
   def getGames(gameIds: List[Game.ID]): Fu[List[(Game.ID, Option[Game])]] =
-    gameIds.map { id =>
+    Future.sequence(gameIds.map { id =>
       rounds.getOrMake(id).getGame dmap { id -> _ }
-    }.sequenceFu
+    })
 
-  def gameIfPresent(gameId: Game.ID): Fu[Option[Game]] = rounds.getIfPresent(gameId).??(_.getGame)
+  def gameIfPresent(gameId: Game.ID): Fu[Option[Game]] = rounds.getIfPresent(gameId).so(_.getGame)
 
   // get the proxied version of the game
   def upgradeIfPresent(game: Game): Fu[Game] =
@@ -66,8 +65,8 @@ final class RoundSocket(
 
   // update the proxied game
   def updateIfPresent(gameId: Game.ID)(f: Game => Game): Funit =
-    rounds.getIfPresent(gameId) ?? {
-      _ updateGame f
+    rounds.getIfPresent(gameId) so {
+      _ `updateGame` f
     }
 
   val rounds = new DuctConcMap[RoundDuct](
@@ -77,8 +76,8 @@ final class RoundSocket(
         dependencies = roundDependencies,
         gameId = id,
         socketSend = sendForGameId(id)
-      )(ec, proxy)
-      terminationDelay schedule Game.Id(id)
+      )(using ec, proxy)
+      terminationDelay `schedule` Game.Id(id)
       duct.getGame dforeach {
         _ foreach { game =>
           scheduleExpiration(game)
@@ -124,23 +123,23 @@ final class RoundSocket(
     case Protocol.In.PlayerChatSay(id, Right(playerIndex), msg) =>
       gameIfPresent(id.value) foreach {
         _ foreach {
-          messenger.owner(_, playerIndex, msg).unit
+          messenger.owner(_, playerIndex, msg).discard
         }
       }
     case Protocol.In.PlayerChatSay(id, Left(userId), msg) =>
-      messenger.owner(id, userId, msg).unit
+      messenger.owner(id, userId, msg).discard
     case Protocol.In.WatcherChatSay(id, userId, msg) =>
-      messenger.watcher(id, userId, msg).unit
+      messenger.watcher(id, userId, msg).discard
     case RP.In.ChatTimeout(roomId, modId, suspect, reason, text) =>
-      messenger.timeout(Chat.Id(s"$roomId/w"), modId, suspect, reason, text).unit
+      messenger.timeout(Chat.Id(s"$roomId/w"), modId, suspect, reason, text).discard
     case Protocol.In.Berserk(gameId, userId) => tournamentActor ! Berserk(gameId.value, userId)
     case Protocol.In.PlayerOnlines(onlines) =>
       onlines foreach {
         case (gameId, Some(on)) =>
           tellRound(gameId, on)
-          terminationDelay cancel gameId
+          terminationDelay `cancel` gameId
         case (gameId, _) =>
-          if (rounds exists gameId.value) terminationDelay schedule gameId
+          if (rounds `exists` gameId.value) terminationDelay `schedule` gameId
       }
     case Protocol.In.Bye(fullId) => tellRound(fullId.gameId, ByePlayer(fullId.playerId))
     case RP.In.TellRoomSri(_, P.In.TellSri(_, _, tpe, _)) =>
@@ -160,7 +159,7 @@ final class RoundSocket(
       // schedule termination for all game ducts
       // until players actually reconnect
       rounds foreachKey { id =>
-        terminationDelay schedule Game.Id(id)
+        terminationDelay `schedule` Game.Id(id)
       }
       rounds.tellAll(RoundDuct.WsBoot)
   }
@@ -174,7 +173,7 @@ final class RoundSocket(
 
   remoteSocketApi.subscribeRoundRobin("r-in", Protocol.In.reader, parallelism = 8)(
     roundHandler orElse remoteSocketApi.baseHandler
-  ) >>- send(P.Out.boot)
+  ).andDo(send(P.Out.boot))
 
   Bus.subscribeFun("tvSelect", "roundSocket", "tourStanding", "startGame", "finishGame") {
     case TvSelect(gameId, speed, json) => sendForGameId(gameId)(Protocol.Out.tvSelect(gameId, speed, json))
@@ -199,11 +198,11 @@ final class RoundSocket(
       }
   }
 
-  {
+  locally {
     import lila.chat.actorApi._
     Bus.subscribeFun(BusChan.Round.chan, BusChan.Global.chan) {
       case ChatLine(Chat.Id(id), l) =>
-        val line = RoundLine(l, id endsWith "/w")
+        val line = RoundLine(l, id `endsWith` "/w")
         rounds.tellIfPresent(if (line.watcher) id take Game.gameIdSize else id, line)
       case OnTimeout(Chat.Id(id), userId) =>
         send(RP.Out.tellRoom(RoomId(id take Game.gameIdSize), makeMessage("chat_timeout", userId)))
@@ -216,7 +215,7 @@ final class RoundSocket(
     rounds.tellAll(RoundDuct.Tick)
   }
   system.scheduler.scheduleWithFixedDelay(60 seconds, 60 seconds) { () =>
-    lila.mon.round.ductCount.update(rounds.size).unit
+    val _ = lila.mon.round.ductCount.update(rounds.size)
   }
 
   private val terminationDelay = new TerminationDelay(system.scheduler, 1 minute, finishRound)
@@ -286,7 +285,7 @@ object RoundSocket {
             raw.get(2) { case Array(fullId, payload) =>
               for {
                 obj <- Json.parse(payload).asOpt[JsObject]
-                tpe <- obj str "t"
+                tpe <- obj `str` "t"
               } yield PlayerDo(FullId(fullId), tpe)
             }
           case "r/select-squares" =>
@@ -408,23 +407,23 @@ object RoundSocket {
   )(implicit ec: scala.concurrent.ExecutionContext) {
     import java.util.concurrent.ConcurrentHashMap
 
-    private[this] val terminations = new ConcurrentHashMap[String, Cancellable](65536)
+    private val terminations = new ConcurrentHashMap[String, Cancellable](65536)
 
-    def schedule(gameId: Game.Id): Unit =
-      terminations
+    def schedule(gameId: Game.Id): Unit = {
+      val _ = terminations
         .compute(
           gameId.value,
           (id, canc) => {
             Option(canc).foreach(_.cancel())
             scheduler.scheduleOnce(duration) {
-              terminations remove id
+              terminations `remove` id
               terminate(Game.Id(id))
             }
           }
         )
-        .unit
+    }
 
     def cancel(gameId: Game.Id): Unit =
-      Option(terminations remove gameId.value).foreach(_.cancel())
+      Option(terminations `remove` gameId.value).foreach(_.cancel())
   }
 }

@@ -2,7 +2,6 @@ package lila.studySearch
 
 import akka.actor._
 import com.softwaremill.macwire._
-import scala.concurrent.duration._
 
 import lila.common.Bus
 import lila.common.paginator._
@@ -34,9 +33,9 @@ final class Env(
     Paginator[Study.WithChaptersAndLiked](
       adapter = new AdapterLike[Study] {
         def query                           = Query(text, me.map(_.id))
-        def nbResults                       = api count query
+        def nbResults                       = api `count` query
         def slice(offset: Int, length: Int) = api.search(query, From(offset), Size(length))
-      } mapFutureList pager.withChaptersAndLiking(me),
+      } `mapFutureList` pager.withChaptersAndLiking(me),
       currentPage = page,
       maxPerPage = pager.maxPerPage
     )
@@ -50,7 +49,7 @@ final class Env(
     }
 
   Bus.subscribeFun("study") {
-    case lila.study.actorApi.SaveStudy(study) => api.store(study).unit
-    case RemoveStudy(id, _)                   => client.deleteById(Id(id)).unit
+    case lila.study.actorApi.SaveStudy(study) => api.store(study).discard
+    case RemoveStudy(id, _)                   => client.deleteById(Id(id)).discard
   }
 }

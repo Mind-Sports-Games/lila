@@ -12,7 +12,7 @@ final class JSONHandlers(getLightUser: LightUser.GetterSync) {
 
   implicit val notificationWrites: Writes[Notification] = new Writes[Notification] {
 
-    private def writeBody(notificationContent: NotificationContent) = {
+    private def writeBody(notificationContent: NotificationContent) =
       notificationContent match {
         case MentionedInThread(mentionedBy, topic, _, category, postId) =>
           Json.obj(
@@ -73,7 +73,6 @@ final class JSONHandlers(getLightUser: LightUser.GetterSync) {
             "icon"  -> icon
           )
       }
-    }
 
     def writes(notification: Notification) =
       Json.obj(

@@ -1,6 +1,6 @@
 package lila.round
 
-import strategygames.{ Player => PlayerIndex, Centis, Game, GameLogic, Pos, Replay, Situation }
+import strategygames.{ Player => PlayerIndex, Centis, Game, Replay, Situation }
 import strategygames.format.pgn.Glyphs
 import strategygames.format.{ FEN, Forsyth, Uci, UciCharPair }
 import strategygames.opening.{ FullOpening, FullOpeningDB }
@@ -12,7 +12,7 @@ import lila.tree._
 object TreeBuilder {
 
   private type Ply       = Int
-  private type OpeningOf = FEN => Option[FullOpening]
+  // private type OpeningOf = FEN => Option[FullOpening]
 
   private def makeEval(info: Info) =
     Eval(
@@ -32,7 +32,7 @@ object TreeBuilder {
       initialFen: FEN,
       withFlags: WithFlags
   ): Root = {
-    val withClocks: Option[Vector[Centis]] = withFlags.clocks ?? game.bothClockStates
+    val withClocks: Option[Vector[Centis]] = withFlags.clocks so game.bothClockStates
     val drawOfferTurnCount                 = game.drawOffers.normalizedTurns
     Replay.gameWithUciWhileValid(
       game.variant.gameLogic,
@@ -45,8 +45,8 @@ object TreeBuilder {
       case (init, games, error) =>
         error foreach logChessError(game.id)
         val fen                 = Forsyth.>>(game.variant.gameLogic, init)
-        val infos: Vector[Info] = analysis.??(_.infos.toVector)
-        val advices: Map[Ply, Advice] = analysis.??(_.advices.view.map { a =>
+        val infos: Vector[Info] = analysis.so(_.infos.toVector)
+        val advices: Map[Ply, Advice] = analysis.so(_.advices.view.map { a =>
           a.ply -> a
         }.toMap)
         val root = Root(
@@ -125,8 +125,8 @@ object TreeBuilder {
         games.zipWithIndex.reverse match {
           case Nil => root
           case ((g, m), i) :: rest =>
-            root prependChild rest.foldLeft(makeBranch(i + 1, g, m)) { case (node, ((g, m), i)) =>
-              makeBranch(i + 1, g, m) prependChild node
+            root `prependChild` rest.foldLeft(makeBranch(i + 1, g, m)) { case (node, ((g, m), i)) =>
+              makeBranch(i + 1, g, m) `prependChild` node
             }
         }
     }
@@ -177,11 +177,10 @@ object TreeBuilder {
         games.reverse match {
           case Nil => root
           case (g, m) :: rest =>
-            root addChild rest
-              .foldLeft(makeBranch(g, m)) { case (node, (g, m)) =>
-                makeBranch(g, m) addChild node
-              }
-              .setComp
+            root.addChild(rest
+              .foldLeft(makeBranch(g, m))((branch, gm) =>
+                makeBranch(gm._1, gm._2).addChild(branch).asInstanceOf[Branch]
+              ).setComp).asInstanceOf[Branch]
         }
     }
   }

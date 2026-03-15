@@ -5,7 +5,6 @@ import lila.app.templating.Environment._
 import lila.app.ui.ScalatagsTemplate._
 import lila.user.User
 
-import controllers.routes
 
 object newPlayer {
 
@@ -14,7 +13,7 @@ object newPlayer {
       h2(trans.onboarding.welcome.txt()),
       p(
         trans.onboarding.profilePage.txt(),
-        u.profile.isEmpty option frag(
+        u.profile.isEmpty `option` frag(
           br,
           trans.onboarding.wouldYou(
             a(href := routes.Account.profile)(trans.onboarding.improveIt())

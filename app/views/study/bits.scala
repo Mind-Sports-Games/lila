@@ -9,14 +9,13 @@ import lila.app.templating.Environment._
 import lila.app.ui.ScalatagsTemplate._
 import lila.study.Order
 
-import controllers.routes
 
 object bits {
 
   def orderSelect(order: lila.study.Order, active: String, url: String => Call)(implicit ctx: Context) = {
     val orders =
       if (active == "all") Order.withoutSelector
-      else if (active startsWith "topic") Order.allWithMine
+      else if (active `startsWith` "topic") Order.allWithMine
       else Order.all
     views.html.base.bits.mselect(
       "orders",
@@ -54,7 +53,7 @@ object bits {
         div(
           tag(cls := "study-name")(s.study.name.value),
           span(
-            !s.study.isPublic option frag(
+            !s.study.isPublic `option` frag(
               iconTag("a")(cls := "private", ariaTitle(trans.study.`private`.txt())),
               " "
             ),
@@ -86,7 +85,7 @@ object bits {
     )
 
   def streamers(streamers: List[lila.user.User.ID])(implicit lang: Lang) =
-    streamers.nonEmpty option div(cls := "context-streamers none")(
+    streamers.nonEmpty `option` div(cls := "context-streamers none")(
       streamers map views.html.streamer.bits.contextual
     )
 }

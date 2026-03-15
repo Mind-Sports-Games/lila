@@ -6,11 +6,10 @@ import lila.api.Context
 import lila.app.templating.Environment._
 import lila.app.ui.ScalatagsTemplate._
 
-import controllers.routes
 
 object form {
 
-  def create(form: Form[_])(implicit ctx: Context) = {
+  def create(form: Form[?])(implicit ctx: Context) = {
     val title = "New OAuth App"
     views.html.account.layout(title = title, active = "oauth.app") {
       div(cls := "account oauth box box-pad")(
@@ -25,7 +24,7 @@ object form {
     }
   }
 
-  def edit(app: lila.oauth.OAuthApp, form: Form[_])(implicit ctx: Context) = {
+  def edit(app: lila.oauth.OAuthApp, form: Form[?])(implicit ctx: Context) = {
     val title = s"Edit ${app.name}"
     views.html.account.layout(title = title, active = "oauth.app") {
       div(cls := "account oauth box box-pad")(
@@ -55,7 +54,7 @@ object form {
     }
   }
 
-  private def inner(form: Form[_])(implicit ctx: Context) =
+  private def inner(form: Form[?])(implicit ctx: Context) =
     frag(
       errMsg(form),
       form3.group(form("name"), raw("App name"))(form3.input(_)),

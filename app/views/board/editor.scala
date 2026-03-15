@@ -2,7 +2,6 @@ package views.html.board
 
 import strategygames.format.FEN
 import strategygames.Situation
-import controllers.routes
 
 import lila.api.Context
 import lila.app.templating.Environment._

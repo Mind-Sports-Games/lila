@@ -5,7 +5,6 @@ import lila.app.ui.ScalatagsTemplate._
 import lila.common.paginator.Paginator
 import lila.common.config.BaseUrl
 
-import controllers.routes
 
 object atom {
 

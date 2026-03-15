@@ -29,7 +29,7 @@ case class Path(ids: Vector[UciCharPair]) extends AnyVal {
 
   def toDbField =
     if (ids.isEmpty) s"root.${Path.rootDbKey}"
-    else s"root.${Path encodeDbKey this}"
+    else s"root.${Path `encodeDbKey` this}"
 
   def depth = ids.size
 
@@ -83,7 +83,7 @@ object Path {
 
   def isMainline(node: RootOrNode, path: Path): Boolean =
     path.split.fold(true) { case (id, rest) =>
-      node.children.first ?? { child =>
+      node.children.first so { child =>
         child.id == id && isMainline(child, rest)
       }
     }

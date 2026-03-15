@@ -2,7 +2,7 @@ package lila.user
 
 import akka.actor.Scheduler
 import com.softwaremill.macwire._
-import io.methvin.play.autoconfig._
+import lila.common.autoconfig.{ AutoConfig, ConfigName }
 import play.api.Configuration
 import play.api.libs.ws.StandaloneWSClient
 import scala.concurrent.duration._
@@ -35,7 +35,7 @@ final class Env(
     ws: StandaloneWSClient
 ) {
 
-  private val config = appConfig.get[UserConfig]("user")(AutoConfig.loader)
+  private val config = appConfig.get[UserConfig]("user")(using AutoConfig.loader)
 
   val repo = new UserRepo(db(config.collectionUser))
 
@@ -74,15 +74,15 @@ final class Env(
 
   lila.common.Bus.subscribeFuns(
     "adjustCheater" -> { case lila.hub.actorApi.mod.MarkCheater(userId, true) =>
-      rankingApi remove userId
-      repo.setRoles(userId, Nil).unit
+      rankingApi `remove` userId
+      repo.setRoles(userId, Nil).discard
     },
     "adjustBooster" -> { case lila.hub.actorApi.mod.MarkBooster(userId) =>
-      rankingApi.remove(userId).unit
-      repo.setRoles(userId, Nil).unit
+      rankingApi.remove(userId).discard
+      repo.setRoles(userId, Nil).discard
     },
     "kickFromRankings" -> { case lila.hub.actorApi.mod.KickFromRankings(userId) =>
-      rankingApi.remove(userId).unit
+      rankingApi.remove(userId).discard
     }
   )
 }

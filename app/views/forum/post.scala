@@ -7,7 +7,6 @@ import lila.app.ui.ScalatagsTemplate._
 import lila.common.String.html.richText
 import lila.forum.Post
 
-import controllers.routes
 
 object post {
 
@@ -41,7 +40,7 @@ object post {
   )(implicit ctx: Context) = {
     st.article(cls := List("forum-post" -> true, "erased" -> post.erased), id := post.number)(
       div(cls := "forum-post__metas")(
-        (!post.erased || canModCateg) option div(
+        (!post.erased || canModCateg) `option` div(
           authorLink(post = post, cssClass = "author".some, modIcon = post.displayModIcon),
           a(href := url)(
             post.updatedAt
@@ -55,7 +54,7 @@ object post {
                 momentFromNow(post.createdAt)
               }
           ),
-          (!post.erased && ctx.userId.exists(post.shouldShowEditForm)) option
+          (!post.erased && ctx.userId.exists(post.shouldShowEditForm)) `option`
             a(cls := "mod edit button button-empty text", dataIcon := "m")("Edit"),
           if (!post.erased && ctx.userId.has(~post.userId))
             postForm(action := routes.ForumPost.delete(categ.slug, post.id))(
@@ -92,8 +91,8 @@ object post {
         if (post.erased) "<Comment deleted by user>"
         else richText(post.text)
       ),
-      !post.erased option reactions(post, canReact),
-      ctx.userId.exists(post.shouldShowEditForm) option
+      !post.erased `option` reactions(post, canReact),
+      ctx.userId.exists(post.shouldShowEditForm) `option`
         postForm(cls := "edit-post-form", action := routes.ForumPost.edit(post.id))(
           textarea(
             bits.dataTopic := topic.id,
@@ -117,14 +116,14 @@ object post {
   }
 
   def reactions(post: Post, canReact: Boolean)(implicit ctx: Context) = {
-    val mine             = ctx.me ?? { Post.Reaction.of(~post.reactions, _) }
+    val mine             = ctx.me so { Post.Reaction.of(~post.reactions, _) }
     val canActuallyReact = canReact && ctx.me.exists(!_.isBot)
     div(cls := List("reactions" -> true, "reactions-auth" -> canActuallyReact))(
       Post.Reaction.list.map { r =>
         val users = ~post.reactions.flatMap(_ get r)
         val size  = users.size
         button(
-          dataHref := canActuallyReact option routes.ForumPost.react(post.id, r, !mine(r)).url,
+          dataHref := canActuallyReact `option` routes.ForumPost.react(post.id, r, !mine(r)).url,
           cls := List("mine" -> mine(r), "yes" -> (size > 0), "no" -> (size < 1)),
           title := {
             if (size > 0) {
@@ -136,7 +135,7 @@ object post {
           }
         )(
           img(src := staticAssetUrl(s"images/emoji/$r.png"), alt := r),
-          size > 0 option size
+          size > 0 `option` size
         )
       }
     )

@@ -18,10 +18,10 @@ final class PasswordReset(
   import Mailer.html._
 
   def send(user: User, email: EmailAddress)(implicit lang: Lang): Funit =
-    tokener make user.id flatMap { token =>
+    tokener `make` user.id flatMap { token =>
       lila.mon.email.send.resetPassword.increment()
       val url = s"$baseUrl/password/reset/confirm/$token"
-      mailer send Mailer.Message(
+      mailer `send` Mailer.Message(
         to = email,
         subject = trans.passwordReset_subject.txt(user.username),
         text = s"""
@@ -45,7 +45,7 @@ ${Mailer.txt.serviceNote}
     }
 
   def confirm(token: String): Fu[Option[User]] =
-    tokener read token flatMap { _ ?? userRepo.byId } map {
+    tokener `read` token flatMap { _ so userRepo.byId } map {
       _.filter(_.canFullyLogin)
     }
 
@@ -53,8 +53,8 @@ ${Mailer.txt.serviceNote}
     secret = tokenerSecret,
     getCurrentValue = id =>
       for {
-        hash  <- userRepo getPasswordHash id
-        email <- userRepo email id
+        hash  <- userRepo `getPasswordHash` id
+        email <- userRepo `email` id
       } yield ~hash + email.fold("")(_.value)
   )
 }

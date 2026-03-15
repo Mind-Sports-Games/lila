@@ -51,9 +51,9 @@ case class Entry(
       none
   }
 
-  def userIds = decode.??(_.userIds)
+  def userIds = decode.so(_.userIds)
 
-  def okForKid = decode ?? (_.okForKid)
+  def okForKid = decode so (_.okForKid)
 }
 
 object Entry {
@@ -73,14 +73,15 @@ object Entry {
       case d: GameEnd     => "game-end"     -> toBson(d)
       case d: SimulCreate => "simul-create" -> toBson(d)
       case d: SimulJoin   => "simul-join"   -> toBson(d)
-      case d: StudyCreate => "study-create" -> toBson(d)(studyCreateHandler)
-      case d: StudyLike   => "study-like"   -> toBson(d)(studyLikeHandler)
-      case d: PlanStart   => "plan-start"   -> toBson(d)(planStartHandler)
-      case d: PlanRenew   => "plan-renew"   -> toBson(d)(planRenewHandler)
-      case d: BlogPost    => "blog-post"    -> toBson(d)(blogPostHandler)
-      case d: StreamStart => "stream-start" -> toBson(d)(streamStartHandler)
+      case d: StudyCreate => "study-create" -> toBson(d)(using studyCreateHandler)
+      case d: StudyLike   => "study-like"   -> toBson(d)(using studyLikeHandler)
+      case d: PlanStart   => "plan-start"   -> toBson(d)(using planStartHandler)
+      case d: PlanRenew   => "plan-renew"   -> toBson(d)(using planRenewHandler)
+      case d: BlogPost    => "blog-post"    -> toBson(d)(using blogPostHandler)
+      case d: StreamStart => "stream-start" -> toBson(d)(using streamStartHandler)
     }
-  } match {
+  }
+  match {
     case (typ, bson) =>
       new Entry(BSONObjectID.generate(), typ, data.channel.some, bson, DateTime.now)
   }

@@ -2,7 +2,6 @@ package views.html.analyse
 
 import bits.dataPanel
 import strategygames.format.FEN
-import controllers.routes
 import play.api.i18n.Lang
 import play.api.libs.json.Json
 
@@ -41,7 +40,7 @@ object replay {
         c.chat,
         name = trans.spectatorRoom.txt(),
         timeout = c.timeout,
-        withNoteAge = ctx.isAuth option game.secondsSinceCreation,
+        withNoteAge = ctx.isAuth `option` game.secondsSinceCreation,
         public = true,
         resourceId = lila.chat.Chat.ResourceId(s"game/${c.chat.id}"),
         palantir = ctx.me.exists(_.canPalantir)
@@ -64,13 +63,13 @@ object replay {
       )(
         trans.downloadRaw()
       ),
-      game.isPgnImport option a(
+      game.isPgnImport `option` a(
         dataIcon := "x",
         cls := "text",
         href := s"${routes.Game.exportOne(game.id)}?imported=1",
         downloadAttr
       )(trans.downloadImported()),
-      ctx.noBlind option frag(
+      ctx.noBlind `option` frag(
         a(dataIcon := "=", cls := "text embed-howto")(trans.embedInYourWebsite())
         // a(
         //   dataIcon := "$",
@@ -87,10 +86,10 @@ object replay {
       title = titleOf(pov),
       moreCss = frag(
         cssTag("analyse.round"),
-        (pov.game.variant.hasDetachedPocket) option cssTag(
+        (pov.game.variant.hasDetachedPocket) `option` cssTag(
           "analyse.zh"
         ),
-        ctx.blind option cssTag("round.nvui")
+        ctx.blind `option` cssTag("round.nvui")
       ),
       moreJs = frag(
         analyseTag,
@@ -130,14 +129,14 @@ object replay {
           div(cls := "analyse__board main-board")(chessgroundBoard),
           div(cls := "analyse__tools")(div(cls := "ceval")),
           div(cls := "analyse__controls"),
-          !ctx.blind option frag(
+          !ctx.blind `option` frag(
             div(cls := "analyse__underboard")(
               div(cls := "analyse__underboard__panels")(
-                game.analysable option div(cls := "computer-analysis")(
+                game.analysable `option` div(cls := "computer-analysis")(
                   if (analysis.isDefined || analysisStarted) div(id := "acpl-chart")
                   else
                     postForm(
-                      cls := s"future-game-analysis${ctx.isAnon ?? " must-login"}",
+                      cls := s"future-game-analysis${ctx.isAnon so " must-login"}",
                       action := routes.Analyse.requestAnalysis(gameId)
                     )(
                       submitButton(cls := "button text")(
@@ -146,7 +145,7 @@ object replay {
                     )
                 ),
                 div(cls := "move-times")(
-                  game.plies > 1 option div(id := "movetimes-chart")
+                  game.plies > 1 `option` div(id := "movetimes-chart")
                 ),
                 div(cls := "fen-pgn")(
                   div(
@@ -173,14 +172,14 @@ object replay {
                 }
               ),
               div(cls := "analyse__underboard__menu")(
-                game.analysable option
+                game.analysable `option`
                   span(
                     cls := "computer-analysis",
                     dataPanel := "computer-analysis"
                   )(trans.computerAnalysis()),
-                !game.isPgnImport option frag(
-                  game.plies > 1 option span(dataPanel := "move-times")(trans.moveTimes()),
-                  cross.isDefined option span(dataPanel := "ctable")(trans.crosstable())
+                !game.isPgnImport `option` frag(
+                  game.plies > 1 `option` span(dataPanel := "move-times")(trans.moveTimes()),
+                  cross.isDefined `option` span(dataPanel := "ctable")(trans.crosstable())
                 ),
                 span(dataPanel := "fen-pgn")(raw("FEN &amp; PGN"))
               )

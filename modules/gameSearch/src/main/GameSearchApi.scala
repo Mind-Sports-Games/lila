@@ -1,7 +1,6 @@
 package lila.gameSearch
 
 import play.api.libs.json._
-import scala.concurrent.duration._
 
 import strategygames.{ ByoyomiClock, Clock }
 
@@ -18,19 +17,19 @@ final class GameSearchApi(
 
   def search(query: Query, from: From, size: Size) =
     client.search(query, from, size) flatMap { res =>
-      gameRepo gamesFromSecondary res.ids
+      gameRepo `gamesFromSecondary` res.ids
     }
 
   def count(query: Query) =
-    client.count(query) dmap (_.count)
+    client.count(query) `dmap` (_.count)
 
   def ids(query: Query, max: Int): Fu[List[String]] =
     client.search(query, From(0), Size(max)).map(_.ids)
 
   def store(game: Game) =
-    storable(game) ?? {
-      gameRepo isAnalysed game.id flatMap { analysed =>
-        lila.common.Future.retry(
+    storable(game) so {
+      gameRepo `isAnalysed` game.id flatMap { analysed =>
+        lila.common.LilaFuture.retry(
           () => client.store(Id(game.id), toDoc(game, analysed)),
           delay = 20.seconds,
           retries = 2,
@@ -59,7 +58,7 @@ final class GameSearchApi(
         Fields.winnerPlayerIndex  -> game.winner.fold(3)(_.playerIndex.fold(1, 2)),
         Fields.averageRating      -> game.averageUsersRating,
         Fields.ai                 -> game.aiLevel,
-        Fields.date               -> (lila.search.Date.formatter print game.updatedAt),
+        Fields.date               -> (lila.search.Date.formatter `print` game.updatedAt),
         Fields.duration           -> game.durationSeconds, // for realtime games only
         Fields.clockInit          -> game.clock.map(_.limitSeconds),
         Fields.clockInc -> game.clock.map(_.config match {

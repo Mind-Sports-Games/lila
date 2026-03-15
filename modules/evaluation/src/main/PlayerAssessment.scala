@@ -49,7 +49,7 @@ object PlayerAssessment {
 
   private def highlyConsistentMoveTimeStreaksOf(pov: Pov): Boolean =
     pov.game.clock.exists(_.estimateTotalSeconds > 60) && {
-      Statistics.slidingMoveTimesCvs(pov) ?? {
+      Statistics.slidingMoveTimesCvs(pov) so {
         _ exists Statistics.cvIndicatesHighlyFlatTimesForStreaks
       }
     }
@@ -60,7 +60,7 @@ object PlayerAssessment {
 
     Basics(
       plyTimes = intAvgSd(~game.plyTimes(playerIndex) map (_.roundTenths)),
-      blurs = game playerBlurPercent playerIndex,
+      blurs = game `playerBlurPercent` playerIndex,
       hold = holdAlerts.exists(_.suspicious),
       blurStreak = highestChunkBlursOf(pov).some.filter(0 <),
       mtStreak = highlyConsistentMoveTimeStreaksOf(pov)
@@ -89,7 +89,7 @@ object PlayerAssessment {
 
     lazy val highlyConsistentPlyTimes: Boolean =
       game.clock.exists(_.estimateTotalSeconds > 60) && {
-        plyTimeCoefVariation(pov) ?? cvIndicatesHighlyFlatTimes
+        plyTimeCoefVariation(pov) so cvIndicatesHighlyFlatTimes
       }
 
     lazy val suspiciousErrorRate: Boolean =

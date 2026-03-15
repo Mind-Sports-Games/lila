@@ -1,7 +1,6 @@
 package lila.irc
 
 import lila.common.LightUser
-import lila.user.User
 
 import lila.i18n.VariantKeys
 
@@ -11,7 +10,7 @@ final class DiscordApi(
     client: DiscordClient,
     baseUrl: String,
     implicit val lightUser: LightUser.Getter
-)(implicit ec: scala.concurrent.ExecutionContext) {
+)(implicit @annotation.nowarn("msg=unused") _ec: scala.concurrent.ExecutionContext) {
 
   def matchmakingAnnouncement(text: String, variant: Variant, isHook: Boolean): Funit =
     client(
@@ -41,10 +40,9 @@ final class DiscordApi(
       )
     )
 
-  private def variantLine(variantName: String, isMedley: Boolean) = {
+  private def variantLine(variantName: String, isMedley: Boolean) =
     if (isMedley) s"Medley beginning with $variantName"
     else variantName
-  }
 
   private def freqIcon(freq: String): String = freq match {
     case "weekly"       => ":trophy:"
@@ -78,7 +76,7 @@ final class DiscordApi(
   private val userReplace                     = link(baseUrl + "/@/$1", "$1")
 
   private def linkifyUsers(msg: String) =
-    userRegex matcher msg replaceAll userReplace
+    userRegex `matcher` msg `replaceAll` userReplace
 
   sealed abstract class DiscordRole(val id: String)
 
@@ -100,7 +98,7 @@ final class DiscordApi(
     case object Abalone extends DiscordRole("<@&1344679243082108988>")
 
     case object Default extends DiscordRole("<@&1344676517237755925>")
-
   }
-
 }
+
+

@@ -20,9 +20,9 @@ final class UserSearch(
     }) flatMap userRepo.withEmailsU
 
   private def searchIp(ip: IpAddress) =
-    securityApi recentUserIdsByIp ip map (_.reverse) flatMap userRepo.usersFromSecondary
+    securityApi `recentUserIdsByIp` ip map (_.reverse) flatMap userRepo.usersFromSecondary
 
-  private def searchUsername(username: String) = userRepo named username map (_.toList)
+  private def searchUsername(username: String) = userRepo `named` username map (_.toList)
 
   private def searchEmail(email: EmailAddress): Fu[List[User]] = {
     val normalized = email.normalize
@@ -47,6 +47,6 @@ object UserSearch {
     mapping(
       "q"  -> nonEmptyText,
       "as" -> optional(nonEmptyText.verifying(asValues contains _))
-    )(Query.apply)(Query.unapply)
+    )(Query.apply)(d => Some((d.q, d.as)))
   )
 }

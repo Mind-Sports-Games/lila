@@ -5,7 +5,6 @@ import scala.util.Success
 
 import lila.common.{ Day, Iso }
 import lila.db.dsl._
-import lila.db.BSON
 import lila.rating.BSONHandlers.perfTypeKeyIso
 import lila.rating.PerfType
 import lila.study.BSONHandlers.StudyIdBSONHandler
@@ -20,7 +19,7 @@ private object BSONHandlers {
   import activities._
   import model._
 
-  def regexId(userId: User.ID): Bdoc = "_id" $startsWith s"$userId:"
+  def regexId(userId: User.ID): Bdoc = "_id" `$startsWith` s"$userId:"
 
   implicit lazy val activityIdHandler: BSONHandler[lila.activity.Activity.Id] = {
     val sep = ':'
@@ -81,7 +80,7 @@ private object BSONHandlers {
   implicit private lazy val postIdHandler: BSONHandler[lila.activity.activities.PostId] =
     BSONStringHandler.as[PostId](PostId.apply, _.value)
   implicit lazy val postsHandler: BSONHandler[lila.activity.activities.Posts] =
-    isoHandler[Posts, List[PostId]]((p: Posts) => p.value, Posts.apply _)
+    isoHandler[Posts, List[PostId]]((p: Posts) => p.value, Posts.apply)
 
   implicit lazy val puzzlesHandler: BSONHandler[lila.activity.activities.Puzzles] =
     typedMapHandler[PerfType, Score](perfTypeKeyIso)
@@ -113,7 +112,7 @@ private object BSONHandlers {
   implicit private lazy val simulIdHandler: BSONHandler[lila.activity.activities.SimulId] =
     BSONStringHandler.as[SimulId](SimulId.apply, _.value)
   implicit private lazy val simulsHandler: BSONHandler[lila.activity.activities.Simuls] =
-    isoHandler[Simuls, List[SimulId]]((s: Simuls) => s.value, Simuls.apply _)
+    isoHandler[Simuls, List[SimulId]]((s: Simuls) => s.value, Simuls.apply)
 
   implicit lazy val corresHandler
       : reactivemongo.api.bson.BSONDocumentHandler[lila.activity.activities.Corres] = Macros.handler[Corres]
@@ -139,9 +138,9 @@ private object BSONHandlers {
     }
 
   implicit private lazy val studiesHandler: BSONHandler[lila.activity.activities.Studies] =
-    isoHandler[Studies, List[Study.Id]]((s: Studies) => s.value, Studies.apply _)
+    isoHandler[Studies, List[Study.Id]]((s: Studies) => s.value, Studies.apply)
   implicit private lazy val teamsHandler: BSONHandler[lila.activity.activities.Teams] =
-    isoHandler[Teams, List[String]]((s: Teams) => s.value, Teams.apply _)
+    isoHandler[Teams, List[String]]((s: Teams) => s.value, Teams.apply)
 
   implicit lazy val swissRankHandler: lila.db.BSON[lila.activity.activities.SwissRank] =
     new lila.db.BSON[SwissRank] {
@@ -149,7 +148,7 @@ private object BSONHandlers {
       def writes(w: lila.db.BSON.Writer, s: SwissRank) = BSONDocument("i" -> s.id, "r" -> s.rank)
     }
   implicit private lazy val swissesHandler: BSONHandler[lila.activity.activities.Swisses] =
-    isoHandler[Swisses, List[SwissRank]]((s: Swisses) => s.value, Swisses.apply _)
+    isoHandler[Swisses, List[SwissRank]]((s: Swisses) => s.value, Swisses.apply)
 
   object ActivityFields {
     val id       = "_id"

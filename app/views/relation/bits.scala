@@ -9,7 +9,6 @@ import lila.common.paginator.Paginator
 import lila.relation.Related
 import lila.user.User
 
-import controllers.routes
 
 object bits {
 

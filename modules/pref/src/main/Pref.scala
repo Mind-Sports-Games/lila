@@ -68,7 +68,7 @@ case class Pref(
   def realSoundSet = SoundSet(soundSet)
 
   def coordPlayerIndexName = PlayerOrder.choices.toMap.get(coordPlayerIndex).fold("random")(_.toLowerCase)
-  def coordsClass          = Coords classOf coords
+  def coordsClass          = Coords `classOf` coords
 
   def hasDgt = tags contains Tag.dgt
 
@@ -98,9 +98,8 @@ case class Pref(
       case _     => none
     }
 
-  def setTheme(value: String, gameFamily: String): Option[Pref] = {
+  def setTheme(value: String, gameFamily: String): Option[Pref] =
     copy(theme = Theme.updateBoardTheme(theme, value, gameFamily)).some
-  }
 
   def animationMillis: Int =
     animation match {
@@ -543,6 +542,6 @@ object Pref {
     tags = Map.empty
   )
 
-  import ornicar.scalalib.Zero
-  implicit def PrefZero: Zero[Pref] = Zero.instance(default)
+  import alleycats.Zero
+  implicit def PrefZero: Zero[Pref] = Zero(default)
 }

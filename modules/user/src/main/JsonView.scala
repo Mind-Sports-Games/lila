@@ -108,19 +108,19 @@ object JsonView {
         key -> perfWrites.writes(perf)
     }).add(
       "storm",
-      u.perfs.storm.nonEmpty option Json.obj(
+      u.perfs.storm.nonEmpty `option` Json.obj(
         "runs"  -> u.perfs.storm.runs,
         "score" -> u.perfs.storm.score
       )
     ).add(
       "racer",
-      u.perfs.racer.nonEmpty option Json.obj(
+      u.perfs.racer.nonEmpty `option` Json.obj(
         "runs"  -> u.perfs.racer.runs,
         "score" -> u.perfs.racer.score
       )
     ).add(
       "streak",
-      u.perfs.streak.nonEmpty option Json.obj(
+      u.perfs.streak.nonEmpty `option` Json.obj(
         "runs"  -> u.perfs.streak.runs,
         "score" -> u.perfs.streak.score
       )

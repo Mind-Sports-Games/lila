@@ -7,13 +7,12 @@ import lila.api.Context
 import lila.app.templating.Environment._
 import lila.app.ui.ScalatagsTemplate._
 
-import controllers.routes
 
 object login {
 
   import trans.tfa._
 
-  def apply(form: Form[_], referrer: Option[String])(implicit ctx: Context) =
+  def apply(form: Form[?], referrer: Option[String])(implicit ctx: Context) =
     views.html.base.layout(
       title = trans.signIn.txt(),
       moreJs = frag(
@@ -26,7 +25,7 @@ object login {
         h1(trans.signIn()),
         postForm(
           cls := "form3",
-          action := s"${routes.Auth.authenticate}${referrer.?? { ref =>
+          action := s"${routes.Auth.authenticate}${referrer.fold("") { ref =>
             s"?referrer=${urlencode(ref)}"
           }}"
         )(

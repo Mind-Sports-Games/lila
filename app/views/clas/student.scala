@@ -1,6 +1,5 @@
 package views.html.clas
 
-import controllers.routes
 import play.api.data.Form
 import play.api.i18n.Lang
 
@@ -18,7 +17,7 @@ object student {
       s: Student.WithUser,
       activities: Vector[lila.activity.ActivityView]
   )(implicit ctx: Context) =
-    bits.layout(s.user.username, Left(clas withStudents students), s.student.some)(
+    bits.layout(s.user.username, Left(clas `withStudents` students), s.student.some)(
       cls := "student-show",
       top(clas, s),
       div(cls := "box__pad")(
@@ -39,13 +38,13 @@ object student {
             )
           )
         },
-        s.student.notes.nonEmpty option div(cls := "student-show__notes")(richText(s.student.notes)),
-        s.student.managed option div(cls := "student-show__managed")(
+        s.student.notes.nonEmpty `option` div(cls := "student-show__notes")(richText(s.student.notes)),
+        s.student.managed `option` div(cls := "student-show__managed")(
           p(trans.clas.thisStudentAccountIsManaged()),
           div(cls := "student-show__managed__actions")(
             postForm(action := routes.Clas.studentResetPassword(clas.id.value, s.user.username))(
               form3.submit(trans.clas.resetPassword(), icon = none)(
-                s.student.isArchived option disabled,
+                s.student.isArchived `option` disabled,
                 cls := List("confirm button button-empty" -> true, "disabled" -> s.student.isArchived),
                 title := trans.clas.generateANewPassword.txt()
               )
@@ -95,7 +94,7 @@ object student {
       )
     )
 
-  private def realNameField(form: Form[_], fieldName: String = "realName")(implicit ctx: Context) =
+  private def realNameField(form: Form[?], fieldName: String = "realName")(implicit ctx: Context) =
     form3.group(
       form(fieldName),
       trans.clas.realName(),
@@ -105,18 +104,18 @@ object student {
   def form(
       clas: Clas,
       students: List[Student],
-      invite: Form[_],
-      create: Form[_],
+      invite: Form[?],
+      create: Form[?],
       nbStudents: Int,
       created: Option[lila.clas.Student.WithPassword] = none
   )(implicit ctx: Context) =
-    bits.layout(trans.clas.addStudent.txt(), Left(clas withStudents students))(
+    bits.layout(trans.clas.addStudent.txt(), Left(clas `withStudents` students))(
       cls := "box-pad student-add",
       h1(
         trans.clas.addStudent(),
         s" ($nbStudents/${lila.clas.Clas.maxStudents})"
       ),
-      nbStudents > (lila.clas.Clas.maxStudents / 2) option maxStudentsWarning(clas),
+      nbStudents > (lila.clas.Clas.maxStudents / 2) `option` maxStudentsWarning(clas),
       created map { case Student.WithPassword(student, password) =>
         flashMessage(cls := "student-add__created")(
           strong(
@@ -132,7 +131,7 @@ object student {
         )
       },
       standardFlash(),
-      (nbStudents <= lila.clas.Clas.maxStudents) option frag(
+      (nbStudents <= lila.clas.Clas.maxStudents) `option` frag(
         div(cls := "student-add__choice")(
           div(cls := "info")(
             h2(trans.clas.inviteAPlayStrategyAccount()),
@@ -147,7 +146,7 @@ object student {
           postForm(cls := "form3", action := routes.Clas.studentInvite(clas.id.value))(
             form3.group(invite("username"), trans.clas.playstrategyUsername())(field =>
               div(cls := "complete-parent")(
-                form3.input(field, klass = "user-autocomplete")(created.isEmpty option autofocus)(
+                form3.input(field, klass = "user-autocomplete")(created.isEmpty `option` autofocus)(
                   dataTag := "span"
                 )
               )
@@ -172,7 +171,7 @@ object student {
                 trans.clas.generateANewUsername()
               ).some
             )(
-              form3.input(_)(created.isDefined option autofocus)
+              form3.input(_)(created.isDefined `option` autofocus)
             ),
             realNameField(create, "create-realName"),
             form3.submit(trans.signUp(), icon = none)
@@ -246,7 +245,7 @@ object student {
     )
    */
 
-  private def maxStudentsWarning(clas: Clas)(implicit lang: Lang) =
+  @annotation.nowarn("msg=unused") private def maxStudentsWarning(clas: Clas)(implicit lang: Lang) =
     p(dataIcon := "", cls := "text")(
       s"Note that a class can have up to ${lila.clas.Clas.maxStudents} students.",
       "To manage more students, ",
@@ -254,8 +253,8 @@ object student {
       "."
     )
 
-  def edit(clas: Clas, students: List[Student], s: Student.WithUser, form: Form[_])(implicit ctx: Context) =
-    bits.layout(s.user.username, Left(clas withStudents students), s.student.some)(
+  def edit(clas: Clas, students: List[Student], s: Student.WithUser, form: Form[?])(implicit ctx: Context) =
+    bits.layout(s.user.username, Left(clas `withStudents` students), s.student.some)(
       cls := "student-show student-edit",
       top(clas, s),
       div(cls := "box__pad")(
@@ -271,7 +270,7 @@ object student {
             form3.submit(trans.apply())
           )
         ),
-        s.student.isActive option frag(
+        s.student.isActive `option` frag(
           hr,
           postForm(
             action := routes.Clas.studentArchive(clas.id.value, s.user.username, v = true),
@@ -285,10 +284,10 @@ object student {
       )
     )
 
-  def release(clas: Clas, students: List[Student], s: Student.WithUser, form: Form[_])(implicit
+  def release(clas: Clas, students: List[Student], s: Student.WithUser, form: Form[?])(implicit
       ctx: Context
   ) =
-    bits.layout(s.user.username, Left(clas withStudents students), s.student.some)(
+    bits.layout(s.user.username, Left(clas `withStudents` students), s.student.some)(
       cls := "student-show student-edit",
       top(clas, s),
       div(cls := "box__pad")(

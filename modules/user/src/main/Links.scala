@@ -12,11 +12,11 @@ object Links {
   private def toLink(line: String): Option[Link] =
     line match {
       case UrlRegex(domain) =>
-        Link.Site.allKnown find (_ matches domain) orElse
-          Try(Url.parse(domain).toStringPunycode).toOption.map(Link.Site.Other) map { site =>
+        Link.Site.allKnown find (_ `matches` domain) orElse
+          Try(Url.parse(domain).toStringPunycode).toOption.map(Link.Site.Other.apply) map { site =>
             Link(
               site = site,
-              url = if (line startsWith "http") line else s"https://$line"
+              url = if (line `startsWith` "http") line else s"https://$line"
             )
           }
       case _ => none

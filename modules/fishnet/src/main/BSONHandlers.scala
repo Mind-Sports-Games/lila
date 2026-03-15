@@ -20,7 +20,7 @@ private object BSONHandlers {
     stringAnyValHandler[Client.UserId](_.value, Client.UserId.apply)
 
   implicit val ClientSkillBSONHandler: BSONHandler[Client.Skill] = tryHandler[Client.Skill](
-    { case BSONString(v) => Client.Skill byKey v toTry s"Invalid client skill $v" },
+    { case BSONString(v) => Client.Skill `byKey` v `toTry` s"Invalid client skill $v" },
     x => BSONString(x.key)
   )
 

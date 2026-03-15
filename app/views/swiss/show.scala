@@ -3,7 +3,6 @@ package swiss
 
 import strategygames.{ P1, P2 }
 
-import controllers.routes
 import play.api.libs.json.Json
 
 import lila.api.Context
@@ -34,7 +33,7 @@ object show {
       title = fullName(s),
       moreJs = frag(
         jsModule("swiss"),
-        hasScheduleInput option jsModule("flatpickr"),
+        hasScheduleInput `option` jsModule("flatpickr"),
         embedJsUnsafeLoadThen(s"""PlayStrategySwiss.start(${safeJsonValue(
           Json
             .obj(
@@ -57,7 +56,7 @@ object show {
       ),
       moreCss = frag(
         cssTag("swiss.show"),
-        hasScheduleInput option cssTag("flatpickr")
+        hasScheduleInput `option` cssTag("flatpickr")
       ),
       chessground = false,
       openGraph = lila.app.ui
@@ -102,12 +101,12 @@ object show {
               tr(cls := "paginated")(
                 td(a(href := routes.Round.watcher(p.gameId, "p1"), cls := "glpt")(s"#${p.gameId}")),
                 td(userIdLink(p.p1.some)),
-                td(p strResultOf P1),
-                td(p strResultOf P2),
+                td(p `strResultOf` P1),
+                td(p `strResultOf` P2),
                 td(userIdLink(p.p2.some))
               )
             },
-            pagerNextTable(pairings, p => routes.Swiss.round(s.id.value, r.value).url)
+            pagerNextTable(pairings, _ => routes.Swiss.round(s.id.value, r.value).url)
           )
         ),
         pager(cls := "pagination--bottom")

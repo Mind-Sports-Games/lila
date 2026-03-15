@@ -1,6 +1,5 @@
 package views.html.team
 
-import controllers.routes
 import play.api.libs.json.Json
 
 import lila.api.Context
@@ -68,7 +67,7 @@ object show {
         ),
         div(cls := "team-show__content")(
           div(cls := "team-show__content__col1")(
-            enabledOrLeader option st.section(cls := "team-show__meta")(
+            enabledOrLeader `option` st.section(cls := "team-show__meta")(
               p(
                 teamLeaders.pluralSame(t.leaders.size),
                 ": ",
@@ -76,18 +75,18 @@ object show {
                   userIdLink(l.some)
                 })
               ),
-              info.ledByMe option a(
+              info.ledByMe `option` a(
                 dataIcon := "",
                 href := routes.Page.lonePage("team-etiquette"),
                 cls := "text team-show__meta__etiquette"
               )("Team Etiquette")
             ),
-            (t.enabled && chatOption.isDefined) option frag(
+            (t.enabled && chatOption.isDefined) `option` frag(
               views.html.chat.frag,
               views.html.chat.spectatorsFrag
             ),
             div(cls := "team-show__actions")(
-              (t.enabled && !info.mine) option frag(
+              (t.enabled && !info.mine) `option` frag(
                 if (info.requestedByMe)
                   frag(
                     strong(beingReviewed()),
@@ -95,9 +94,9 @@ object show {
                       submitButton(cls := "button button-red button-empty confirm")(trans.cancel())
                     )
                   )
-                else ctx.isAuth option joinButton(t)
+                else ctx.isAuth `option` joinButton(t)
               ),
-              ctx.userId.ifTrue(t.enabled && info.mine) map { myId =>
+              ctx.userId.ifTrue(t.enabled && info.mine) map { _ =>
                 postForm(
                   cls := "team-show__subscribe form3",
                   action := routes.Team.subscribe(t.id)
@@ -108,11 +107,11 @@ object show {
                   )
                 )
               },
-              (info.mine && !info.ledByMe) option
+              (info.mine && !info.ledByMe) `option`
                 postForm(cls := "quit", action := routes.Team.quit(t.id))(
                   submitButton(cls := "button button-empty button-red confirm")(quitTeam.txt())
                 ),
-              t.enabled && info.ledByMe option frag(
+              t.enabled && info.ledByMe `option` frag(
                 a(
                   href := routes.Tournament.teamBattleForm(t.id),
                   cls := "button button-empty text",
@@ -154,12 +153,12 @@ object show {
                   )
                 )
               ),
-              ((t.enabled && info.ledByMe) || isGranted(_.Admin)) option
+              ((t.enabled && info.ledByMe) || isGranted(_.Admin)) `option`
                 a(href := routes.Team.edit(t.id), cls := "button button-empty text", dataIcon := "%")(
                   trans.settings.settings()
                 )
             ),
-            t.enabled && (t.publicMembers || info.mine || isGranted(_.ManageTeam)) option div(
+            t.enabled && (t.publicMembers || info.mine || isGranted(_.ManageTeam)) `option` div(
               cls := "team-show__members"
             )(
               st.section(cls := "recent-members")(
@@ -183,18 +182,18 @@ object show {
                 frag(br, trans.location(), ": ", richText(loc))
               }
             ),
-            t.enabled && info.hasRequests option div(cls := "team-show__requests")(
+            t.enabled && info.hasRequests `option` div(cls := "team-show__requests")(
               h2(xJoinRequests.pluralSame(info.requests.size)),
               views.html.team.request.list(info.requests, t.some)
             ),
             div(
-              t.enabled && info.simuls.nonEmpty option frag(
+              t.enabled && info.simuls.nonEmpty `option` frag(
                 st.section(cls := "team-show__tour team-events team-simuls")(
                   h2(trans.simultaneousExhibitions()),
                   views.html.simul.bits.allCreated(info.simuls)
                 )
               ),
-              t.enabled && info.tours.nonEmpty option frag(
+              t.enabled && info.tours.nonEmpty `option` frag(
                 st.section(cls := "team-show__tour team-events team-tournaments")(
                   h2(a(href := routes.Team.tournaments(t.id))(trans.tournaments())),
                   table(cls := "slist")(
@@ -204,7 +203,7 @@ object show {
                   )
                 )
               ),
-              t.enabled && (t.publicForum || info.mine || isGranted(_.ManageTeam)) && ctx.noKid option
+              t.enabled && (t.publicForum || info.mine || isGranted(_.ManageTeam)) && ctx.noKid `option`
                 st.section(cls := "team-show__forum")(
                   h2(a(href := teamForumUrl(t.id))(trans.forum())),
                   info.forumPosts.take(10).map { post =>

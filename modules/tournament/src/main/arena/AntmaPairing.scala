@@ -7,12 +7,12 @@ import PairingSystem.Data
 
 private object AntmaPairing {
 
-  private[this] val maxStrike = 3
+  private val maxStrike = 3
 
   private type RPlayer = RankedPlayerWithPlayerIndexHistory
 
   def apply(data: Data, players: List[RPlayer]): List[Pairing.Prep] =
-    players.nonEmpty ?? {
+    players.nonEmpty so {
       import data._
 
       def rankFactor = PairingSystem.rankFactorFor(players)
@@ -33,7 +33,7 @@ private object AntmaPairing {
           }
 
       def battleScore(a: RPlayer, b: RPlayer): Option[Int] =
-        (a.player.team != b.player.team) ?? pairScore(a, b)
+        (a.player.team != b.player.team) so pairScore(a, b)
 
       def duelScore: (RPlayer, RPlayer) => Option[Int] = (_, _) => Some(1)
 

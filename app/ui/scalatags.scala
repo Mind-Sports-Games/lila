@@ -1,7 +1,7 @@
 package lila.app
 package ui
 
-import ornicar.scalalib.Zero
+import alleycats.Zero
 import scalatags.Text.all._
 import scalatags.text.Builder
 import scalatags.Text.{ Aggregate, Cap }
@@ -40,9 +40,9 @@ trait ScalatagsAttrs {
 
 // collection of lila snippets
 trait ScalatagsSnippets extends Cap {
-  this: ScalatagsExtensions with ScalatagsAttrs =>
+  this: ScalatagsExtensions & ScalatagsAttrs =>
 
-  import scalatags.Text.all._
+  import scalatags.Text.all.{ stringAttr as _, * }
 
   val nbsp                                   = raw("&nbsp;")
   val amp                                    = raw("&amp;")
@@ -60,11 +60,11 @@ trait ScalatagsSnippets extends Cap {
   def userTitleTag(t: Title) =
     span(
       cls := "utitle",
-      t == lila.user.Title.BOT option dataBotAttr,
-      title := Title titleName t
+      t == lila.user.Title.BOT `option` dataBotAttr,
+      title := Title.titleName(t)
     )(t.value)
 
-  val utcLink =
+  lazy val utcLink =
     a(
       href := "https://time.is/UTC",
       targetBlank,
@@ -104,11 +104,18 @@ trait ScalatagsTemplate
     with ScalatagsSnippets
     with ScalatagsPrefix {
 
+  // Resolve Scala 3 ambiguity between Cap.stringAttrX and Aggregate.stringAttr
+  implicit override val stringAttr: scalatags.generic.AttrValue[Builder, String] =
+    new scalatags.generic.AttrValue[Builder, String] {
+      def apply(t: Builder, a: scalatags.generic.Attr, v: String): Unit =
+        t.setAttr(a.name, Builder.GenericAttrValueSource(v))
+    }
+
   val trans = lila.i18n.I18nKeys
   def main  = scalatags.Text.tags2.main
 
   /* Convert play URLs to scalatags attributes with toString */
-  implicit val playCallAttr: Text.GenericAttr[Call] = genericAttr[play.api.mvc.Call]
+  implicit val playCallAttr: AttrValue[Call] = genericAttr[play.api.mvc.Call]
 }
 
 object ScalatagsTemplate extends ScalatagsTemplate
@@ -123,7 +130,7 @@ trait ScalatagsExtensions {
       t.setAttr(a.name, scalatags.text.Builder.GenericAttrValueSource(v.value))
   }
 
-  implicit val charAttr: Text.GenericAttr[Char] = genericAttr[Char]
+  implicit val charAttr: AttrValue[Char] = genericAttr[Char]
 
   implicit val optionStringAttr: AttrValue[Option[String]] = new AttrValue[Option[String]] {
     def apply(t: scalatags.text.Builder, a: Attr, v: Option[String]): Unit = {
@@ -142,7 +149,7 @@ trait ScalatagsExtensions {
   }
 
   val emptyFrag: Frag                   = new RawFrag("")
-  implicit val LilaFragZero: Zero[Frag] = Zero.instance(emptyFrag)
+  implicit val LilaFragZero: Zero[Frag] = Zero(emptyFrag)
 
   val targetBlank: Modifier = (t: Builder) => {
     // Prevent tab nabbing when opening untrusted links. Apply also to trusted
@@ -162,7 +169,7 @@ trait ScalatagsExtensions {
   }
 
   def titleOrText(blind: Boolean, v: String): Modifier = (t: Builder) =>
-    if (blind) t.addChild(v)
+    if (blind) t.addChild(scalatags.Text.StringFrag(v))
     else t.setAttr("title", Builder.GenericAttrValueSource(v))
 
   def titleOrText(v: String)(implicit ctx: Context): Modifier = titleOrText(ctx.blind, v)

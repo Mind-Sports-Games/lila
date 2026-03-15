@@ -2,7 +2,6 @@ package lila.pool
 
 import scala.concurrent.duration._
 import strategygames.variant.Variant
-import strategygames.chess.variant.Standard
 import lila.i18n.VariantKeys
 import lila.rating.PerfType
 
@@ -47,7 +46,7 @@ object PoolConfig {
           "id"         -> p.id.value,
           "lim"        -> fc.limitInMinutes,
           "inc"        -> fc.incrementSeconds,
-          "perf"       -> p.perfType.trans(lila.i18n.defaultLang),
+          "perf"       -> p.perfType.trans(using lila.i18n.defaultLang),
           "variantKey" -> VariantKeys.variantName(p.variant)
         )
       case fc: Clock.BronsteinConfig =>
@@ -56,7 +55,7 @@ object PoolConfig {
           "lim"        -> fc.limitInMinutes,
           "delay"      -> fc.delaySeconds,
           "delayType"  -> "bronstein",
-          "perf"       -> p.perfType.trans(lila.i18n.defaultLang),
+          "perf"       -> p.perfType.trans(using lila.i18n.defaultLang),
           "variantKey" -> VariantKeys.variantName(p.variant)
         )
       case udc: Clock.SimpleDelayConfig =>
@@ -65,7 +64,7 @@ object PoolConfig {
           "lim"        -> udc.limitInMinutes,
           "delay"      -> udc.delaySeconds,
           "delayType"  -> "usdelay",
-          "perf"       -> p.perfType.trans(lila.i18n.defaultLang),
+          "perf"       -> p.perfType.trans(using lila.i18n.defaultLang),
           "variantKey" -> VariantKeys.variantName(p.variant)
         )
       case bc: ByoyomiClock.Config =>
@@ -75,7 +74,7 @@ object PoolConfig {
           "inc"        -> bc.incrementSeconds,
           "byoyomi"    -> bc.byoyomiSeconds,
           "periods"    -> bc.periodsTotal,
-          "perf"       -> p.perfType.trans(lila.i18n.defaultLang),
+          "perf"       -> p.perfType.trans(using lila.i18n.defaultLang),
           "variantKey" -> VariantKeys.variantName(p.variant)
         )
     }

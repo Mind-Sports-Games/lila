@@ -2,7 +2,7 @@ package lila.report
 
 import akka.actor._
 import com.softwaremill.macwire._
-import io.methvin.play.autoconfig._
+import lila.common.autoconfig.{ AutoConfig, ConfigName }
 import play.api.Configuration
 import scala.concurrent.duration._
 
@@ -27,7 +27,7 @@ final class Env(
     securityApi: lila.security.SecurityApi,
     userLoginsApi: lila.security.UserLoginsApi,
     playbanApi: lila.playban.PlaybanApi,
-    discordApi: lila.irc.DiscordApi,
+    @annotation.nowarn("msg=unused") _discordApi: lila.irc.DiscordApi,
     captcher: lila.hub.actors.Captcher,
     fishnet: lila.hub.actors.Fishnet,
     settingStore: lila.memo.SettingStore.Builder,
@@ -38,17 +38,17 @@ final class Env(
     scheduler: Scheduler
 ) {
 
-  private val config = appConfig.get[ReportConfig]("report")(AutoConfig.loader)
+  private val config = appConfig.get[ReportConfig]("report")(using AutoConfig.loader)
 
   private lazy val reportColl = db(config.reportColl)
 
-  lazy val scoreThresholdsSetting = ReportThresholds makeScoreSetting settingStore
+  lazy val scoreThresholdsSetting = ReportThresholds `makeScoreSetting` settingStore
 
-  lazy val discordScoreThresholdSetting = ReportThresholds makeDiscordSetting settingStore
+  lazy val discordScoreThresholdSetting = ReportThresholds `makeDiscordSetting` settingStore
 
   private val thresholds = Thresholds(
-    score = scoreThresholdsSetting.get _,
-    discord = discordScoreThresholdSetting.get _
+    score = (() => scoreThresholdsSetting.get()),
+    discord = (() => discordScoreThresholdSetting.get())
   )
 
   lazy val forms = wire[ReportForm]
@@ -66,21 +66,21 @@ final class Env(
     Props(new Actor {
       def receive = {
         case lila.hub.actorApi.report.Cheater(userId, text) =>
-          api.autoCheatReport(userId, text).unit
+          api.autoCheatReport(userId, text).discard
         case lila.hub.actorApi.report.Shutup(userId, text) =>
-          api.autoCommReport(userId, text).unit
+          api.autoCommReport(userId, text).discard
       }
     }),
     name = config.actorName
   )
 
   lila.common.Bus.subscribeFun("playban", "autoFlag") {
-    case lila.hub.actorApi.playban.Playban(userId, _) => api.maybeAutoPlaybanReport(userId).unit
+    case lila.hub.actorApi.playban.Playban(userId, _) => api.maybeAutoPlaybanReport(userId).discard
     case lila.hub.actorApi.report.AutoFlag(suspectId, resource, text) =>
-      api.autoCommFlag(SuspectId(suspectId), resource, text).unit
+      api.autoCommFlag(SuspectId(suspectId), resource, text).discard
   }
 
   system.scheduler.scheduleWithFixedDelay(1 minute, 1 minute) { () =>
-    api.inquiries.expire.unit
+    api.inquiries.expire.discard
   }
 }

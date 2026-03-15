@@ -5,7 +5,6 @@ import lila.api.Context
 import lila.app.templating.Environment._
 import lila.app.ui.ScalatagsTemplate._
 
-import controllers.routes
 
 object profile {
 
@@ -15,7 +14,7 @@ object profile {
     "One URL per line."
   )
 
-  def apply(u: lila.user.User, form: play.api.data.Form[_])(implicit ctx: Context) =
+  def apply(u: lila.user.User, form: play.api.data.Form[?])(implicit ctx: Context) =
     account.layout(
       title = s"${u.username} - ${trans.editProfile.txt()}",
       active = "editProfile"
@@ -31,7 +30,7 @@ object profile {
             },
             form3.group(form("location"), trans.location(), half = true)(form3.input(_))
           ),
-          ctx.noKid option
+          ctx.noKid `option`
             form3.group(form("bio"), trans.biography(), help = trans.biographyDescription().some) { f =>
               form3.textarea(f)(rows := 5)
             },

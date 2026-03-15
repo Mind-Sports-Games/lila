@@ -300,14 +300,13 @@ case class Perfs(
   def latest: Option[DateTime] =
     perfsMap.values.flatMap(_.latest).foldLeft(none[DateTime]) {
       case (None, date)                          => date.some
-      case (Some(acc), date) if date isAfter acc => date.some
+      case (Some(acc), date) if date `isAfter` acc => date.some
       case (acc, _)                              => acc
     }
 
   // Lichess use this but we dont due to not having high level puzzles and also many puzzle variants.
-  def dubiousPuzzle = {
+  def dubiousPuzzle =
     puzzle_standard.glicko.rating > 3000 && !standard.glicko.establishedIntRating.exists(_ > 2100)
-  }
 }
 
 case class PerfLens(get: Perfs => Perf, set: (Perfs, Perf) => Perfs)
@@ -553,7 +552,7 @@ case object Perfs {
       )
     }
 
-    private def notNew(p: Perf): Option[Perf] = p.nonEmpty option p
+    private def notNew(p: Perf): Option[Perf] = p.nonEmpty `option` p
 
     def writes(w: BSON.Writer, o: Perfs) =
       reactivemongo.api.bson.BSONDocument(
@@ -616,9 +615,9 @@ case object Perfs {
         "puzzle_horde"           -> notNew(o.puzzle_horde),
         "puzzle_racingKings"     -> notNew(o.puzzle_racingKings),
         "puzzle_linesOfAction"   -> notNew(o.puzzle_linesOfAction),
-        "storm"                  -> (o.storm.nonEmpty option o.storm),
-        "racer"                  -> (o.racer.nonEmpty option o.racer),
-        "streak"                 -> (o.streak.nonEmpty option o.streak)
+        "storm"                  -> (o.storm.nonEmpty `option` o.storm),
+        "racer"                  -> (o.racer.nonEmpty `option` o.racer),
+        "streak"                 -> (o.streak.nonEmpty `option` o.streak)
       )
   }
 

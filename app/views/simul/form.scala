@@ -1,6 +1,5 @@
 package views.html.simul
 
-import controllers.routes
 import play.api.data.Form
 
 import lila.api.Context
@@ -9,8 +8,6 @@ import lila.app.ui.ScalatagsTemplate._
 import lila.hub.LeaderTeam
 import lila.simul.Simul
 import lila.simul.SimulForm
-
-import strategygames.GameFamily
 
 object form {
 
@@ -85,7 +82,7 @@ object form {
             val options = translatedAllVariantChoicesWithVariants(v => s"${v.gameFamily.id}_${v.id}")
             val checks = form.value
               .map(_.variants.map(_.toString))
-              .getOrElse(simul.??(_.variants.map(v => s"${v.gameFamily.id}_${v.id}")))
+              .getOrElse(simul.so(_.variants.map(v => s"${v.gameFamily.id}_${v.id}")))
               .toSet
             val checkboxes = options.zipWithIndex.map { case ((value, text, hint), index) =>
               div(cls := "checkable")(
@@ -147,7 +144,7 @@ object form {
         )
       ),
       form3.split(
-        teams.nonEmpty option
+        teams.nonEmpty `option`
           form3.group(form("team"), raw("Only members of team"), half = true)(
             form3.select(_, List(("", "No Restriction")) ::: teams.map(_.pair))
           ),
@@ -169,7 +166,7 @@ object form {
         raw("Simul description"),
         help = frag("Anything you want to tell the participants?").some
       )(form3.textarea(_)(rows := 10)),
-      ctx.me.exists(_.isSimulFeatured) option form3.checkbox(
+      ctx.me.exists(_.isSimulFeatured) `option` form3.checkbox(
         form("featured"),
         frag("Feature on playstrategy.org/simul"),
         help = frag("Show your simul to everyone on playstrategy.org/simul. Disable for private simuls.").some

@@ -20,7 +20,6 @@ import strategygames.{
 }
 import strategygames.variant.Variant
 import lila.common.Json.jodaWrites
-import lila.common.Json._
 import lila.common.LightUser
 import lila.i18n.VariantKeys
 
@@ -89,7 +88,7 @@ final class JsonView(rematches: Rematches) {
         "gameId"      -> pov.gameId,
         "fen"         -> Forsyth.>>(pov.game.variant.gameLogic, pov.game.stratGame),
         "playerIndex" -> pov.playerIndex.name,
-        "lastMove"    -> ~pov.game.lastActionKeys,
+        "lastMove"    -> pov.game.lastActionKeys.getOrElse(""),
         "source"      -> pov.game.source,
         "status"      -> pov.game.status,
         "variant" -> Json.obj(
@@ -110,7 +109,7 @@ final class JsonView(rematches: Rematches) {
           .obj(
             "id" -> pov.opponent.userId,
             "username" -> lila.game.Namer
-              .playerTextBlocking(pov.opponent, withRating = false)(lightUserSync)
+              .playerTextBlocking(pov.opponent, withRating = false)(using lightUserSync)
           )
           .add("rating" -> pov.opponent.rating)
           .add("ai" -> pov.opponent.aiLevel),

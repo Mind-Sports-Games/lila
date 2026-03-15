@@ -1,30 +1,34 @@
 package lila
 
-trait PackageObject extends Lilaisms {
+trait PackageObject {
 
-  def nowNanos: Long  = System.nanoTime()
-  def nowMillis: Long = System.currentTimeMillis()
-  def nowCentis: Long = nowMillis / 10
-  def nowTenths: Long = nowMillis / 100
-  def nowSeconds: Int = (nowMillis / 1000).toInt
+  export lila.core.lilaism.Lilaism.{ *, given }
+
+  given ecToExecutor(using ec: scala.concurrent.ExecutionContext): Executor =
+    ec.asInstanceOf[Executor]
+
+  implicit def toPimpedFuture[A](fua: Fu[A]): lila.base.PimpedFuture[A] =
+    new lila.base.PimpedFuture(fua)
+  implicit def toPimpedFutureBoolean(fua: Fu[Boolean]): lila.base.PimpedFutureBoolean =
+    new lila.base.PimpedFutureBoolean(fua)
+  implicit def toPimpedFutureOption[A](fua: Fu[Option[A]]): lila.base.PimpedFutureOption[A] =
+    new lila.base.PimpedFutureOption(fua)
 
   object makeTimeout {
-
     import akka.util.Timeout
-    import scala.concurrent.duration._
+    import scala.concurrent.duration.*
 
-    implicit val short: Timeout     = seconds(1)
-    implicit val large: Timeout     = seconds(5)
-    implicit val larger: Timeout    = seconds(30)
-    implicit val veryLarge: Timeout = minutes(5)
+    def apply(duration: FiniteDuration): Timeout = Timeout(duration)
+    def millis(s: Int): Timeout  = Timeout(s.millis)
+    def seconds(s: Int): Timeout = Timeout(s.seconds)
+    def minutes(m: Int): Timeout = Timeout(m.minutes)
 
-    implicit val halfSecond: Timeout = millis(500)
+    val short: Timeout     = seconds(1)
+    val large: Timeout     = seconds(5)
+    val larger: Timeout    = seconds(30)
+    val veryLarge: Timeout = minutes(5)
+    val halfSecond: Timeout = millis(500)
 
-    def apply(duration: FiniteDuration) = Timeout(duration)
-    def millis(s: Int): Timeout         = Timeout(s.millis)
-    def seconds(s: Int): Timeout        = Timeout(s.seconds)
-    def minutes(m: Int): Timeout        = Timeout(m.minutes)
+    given Timeout = short
   }
-
-  def some[A](a: A): Option[A] = Some(a)
 }

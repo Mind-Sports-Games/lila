@@ -22,7 +22,7 @@ final class ChatTimeout(
     isActive(chat.id, user.id) flatMap {
       case true => fuccess(false)
       case false =>
-        if (scope == Scope.Global) global put user.id
+        if (scope == Scope.Global) global `put` user.id
         coll.insert
           .one(
             $doc(
@@ -42,17 +42,17 @@ final class ChatTimeout(
       $doc(
         "chat" -> chatId,
         "user" -> userId,
-        "expiresAt" $exists true
+        "expiresAt" `$exists` true
       )
     )
 
   def history(user: User, nb: Int): Fu[List[UserEntry]] =
-    coll.find($doc("user" -> user.id)).sort($sort desc "createdAt").cursor[UserEntry]().list(nb)
+    coll.find($doc("user" -> user.id)).sort($sort `desc` "createdAt").cursor[UserEntry]().list(nb)
 
   def checkExpired: Fu[List[Reinstate]] =
     coll.list[Reinstate](
       $doc(
-        "expiresAt" $lt DateTime.now
+        "expiresAt" `$lt` DateTime.now
       )
     ) flatMap {
       case Nil => fuccess(Nil)
@@ -62,7 +62,7 @@ final class ChatTimeout(
 
   private val idSize = 8
 
-  private def makeId = lila.common.ThreadLocalRandom nextString idSize
+  private def makeId = lila.common.ThreadLocalRandom `nextString` idSize
 }
 
 object ChatTimeout {
@@ -82,7 +82,7 @@ object ChatTimeout {
     def apply(key: String) = all.find(_.key == key)
   }
   implicit val ReasonBSONHandler: BSONHandler[Reason] = tryHandler[Reason](
-    { case BSONString(value) => Reason(value) toTry s"Invalid reason $value" },
+    { case BSONString(value) => Reason(value) `toTry` s"Invalid reason $value" },
     x => BSONString(x.key)
   )
 
@@ -105,7 +105,7 @@ object ChatTimeout {
       "userId" -> nonEmptyText,
       "reason" -> nonEmptyText,
       "text"   -> nonEmptyText
-    )(TimeoutFormData.apply)(TimeoutFormData.unapply)
+    )(TimeoutFormData.apply)(d => Some((d.roomId, d.chan, d.userId, d.reason, d.text)))
   )
 
   case class TimeoutFormData(roomId: String, chan: String, userId: User.ID, reason: String, text: String)

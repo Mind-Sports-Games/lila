@@ -1,12 +1,9 @@
 package views.html.team
 
-import scala.util.chaining._
-
 import lila.api.Context
 import lila.app.templating.Environment._
 import lila.app.ui.ScalatagsTemplate._
 
-import controllers.routes
 
 object bits {
 
@@ -21,22 +18,22 @@ object bits {
   def menu(currentTab: Option[String])(implicit ctx: Context) =
     ~currentTab pipe { tab =>
       st.nav(cls := "page-menu__menu subnav")(
-        (ctx.teamNbRequests > 0) option
+        (ctx.teamNbRequests > 0) `option`
           a(cls := tab.active("requests"), href := routes.Team.requests)(
             xJoinRequests.pluralSame(ctx.teamNbRequests)
           ),
-        ctx.isAuth option
+        ctx.isAuth `option`
           a(cls := tab.active("mine"), href := routes.Team.mine)(
             myTeams()
           ),
-        ctx.isAuth option
+        ctx.isAuth `option`
           a(cls := tab.active("leader"), href := routes.Team.leader)(
             "Leader teams"
           ),
         a(cls := tab.active("all"), href := routes.Team.all())(
           allTeams()
         ),
-        ctx.isAuth option
+        ctx.isAuth `option`
           a(cls := tab.active("form"), href := routes.Team.form)(
             newTeam()
           )
@@ -56,14 +53,14 @@ object bits {
           href := routes.Team.show(t.id)
         )(
           t.name,
-          ctx.userId.exists(t.leaders.contains) option em(cls := "leader")("leader"),
-          t.isOfficial option em(cls := "official")("official")
+          ctx.userId.exists(t.leaders.contains) `option` em(cls := "leader")("leader"),
+          t.isOfficial `option` em(cls := "official")("official")
         ),
         shorten(t.description, 200)
       ),
       td(cls := "info")(
         p(nbMembers.plural(t.nbMembers, t.nbMembers.localize)),
-        isMine option form(action := routes.Team.quit(t.id), method := "post")(
+        isMine `option` form(action := routes.Team.quit(t.id), method := "post")(
           submitButton(cls := "button button-empty button-red button-thin confirm team__quit")(quitTeam.txt())
         )
       )

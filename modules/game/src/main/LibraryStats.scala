@@ -1,31 +1,26 @@
 package lila.game
 
-import scala.concurrent.duration._
-
-import lila.user.{ User, UserRepo }
+import lila.user.UserRepo
 import lila.db.dsl._
 import lila.memo.{ CacheApi }
-import reactivemongo.api.{ Cursor, ReadPreference }
+import reactivemongo.api.ReadPreference
 
 final class LibraryStats(
     gameColl: Coll,
-    userRepo: UserRepo,
+    @annotation.nowarn("msg=unused") _userRepo: UserRepo,
     cacheApi: lila.memo.CacheApi
 )(implicit ec: scala.concurrent.ExecutionContext) {
-  import BSONHandlers._
-  import Game.{ ID, BSONFields => F }
+  import Game.BSONFields => F
 
   def gameClockRates: Fu[(Int, Int)] = gameClockRatesCache.get {}
   // def botOrHumanGames: Fu[(Int, Int)] = botOrHumanGameCache.get {}
 
   def finishedGameClockStats: Fu[(Int, Int, Int)] =
     gameColl
-      .aggregateList(
-        maxDocs = 1,
-        ReadPreference.secondaryPreferred
-      ) { framework =>
+      .aggregateWith[Bdoc](readPreference = ReadPreference.secondaryPreferred) { framework =>
         import framework._
-        Match(Query.finished) -> List(
+        List(
+          Match(Query.finished),
           Project(
             $doc(
               "clock"   -> $doc("$cond" -> $arr($doc("$ifNull" -> $arr(s"$$${F.clock}", false)), 1, 0)),
@@ -39,6 +34,7 @@ final class LibraryStats(
           )
         )
       }
+      .collect[List](maxDocs = 1)
       .map { docs =>
         docs.headOption.flatMap { doc =>
           for {
@@ -62,6 +58,7 @@ final class LibraryStats(
         finishedGameClockPercentages
       }
   }
+}
 
   // def finishedBotOrHumanGameStats: Fu[(Int, Int)] =
   //   for {
@@ -99,4 +96,3 @@ final class LibraryStats(
   //     }
   // }
 
-}

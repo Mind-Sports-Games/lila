@@ -40,7 +40,7 @@ final class RelayPush(sync: RelaySync, api: RelayApi)(implicit
           .flatMap { event =>
             api
               .update(rt.round)(
-                _.withSync(_ addLog event).copy(finished = games.forall(_.end.isDefined))
+                _.withSync(_ `addLog` event).copy(finished = games.forall(_.end.isDefined))
               )
               .void
           }

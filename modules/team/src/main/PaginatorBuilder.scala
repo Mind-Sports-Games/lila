@@ -51,7 +51,7 @@ final private[team] class PaginatorBuilder(
         userIds = docs.flatMap(_ string "user")
         users <- lightUserApi asyncMany userIds
       } yield users.flatten
-    private def selector = memberRepo teamQuery team.id
-    private def sorting  = $sort desc "date"
+    private def selector = memberRepo `teamQuery` team.id
+    private def sorting  = $sort `desc` "date"
   }
 }

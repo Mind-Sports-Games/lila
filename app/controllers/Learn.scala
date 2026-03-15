@@ -1,6 +1,6 @@
 package controllers
 
-import lila.app._
+import lila.app.*
 
 import play.api.data._
 import play.api.data.Forms._
@@ -15,7 +15,7 @@ final class Learn(env: Env) extends LilaController(env) {
     Open { implicit ctx =>
       pageHit
       ctx.me
-        .?? { me =>
+        .so { me =>
           env.learn.api.get(me) map { Json.toJson(_) } map some
         }
         .map { progress =>
@@ -28,7 +28,7 @@ final class Learn(env: Env) extends LilaController(env) {
       "stage" -> nonEmptyText,
       "level" -> number,
       "score" -> number
-    )(Tuple3.apply)(Tuple3.unapply)
+    )(Tuple3.apply)(t => Some((t._1, t._2, t._3)))
   )
 
   def score =

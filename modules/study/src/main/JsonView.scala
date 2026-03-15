@@ -3,9 +3,8 @@ package lila.study
 import strategygames.format.{ FEN, Uci }
 import strategygames.format.pgn.{ Tag, Tags }
 import strategygames.variant.Variant
-import strategygames.{ GameLogic, Player => PlayerIndex, Pos }
+import strategygames.{ Player => PlayerIndex, Pos }
 import play.api.libs.json._
-import scala.util.chaining._
 
 import lila.common.Json._
 import lila.socket.Socket.Sri
@@ -30,7 +29,7 @@ final class JsonView(
     def allowed(selection: Settings.UserSelection): Boolean =
       Settings.UserSelection.allows(selection, study, me.map(_.id))
 
-    me.?? { studyRepo.liked(study, _) } map { liked =>
+    me.so { studyRepo.liked(study, _) } map { liked =>
       studyWrites.writes(study) ++ Json
         .obj(
           "liked" -> liked,
@@ -55,7 +54,7 @@ final class JsonView(
             )
             .add("description", currentChapter.description)
             .add("serverEval", currentChapter.serverEval)
-            .add("relay", currentChapter.relay)(relayWrites)
+            .add("relay", currentChapter.relay)(using relayWrites)
             .pipe(addChapterMode(currentChapter))
         )
         .add("description", study.description)
@@ -70,7 +69,7 @@ final class JsonView(
         "variant"     -> c.setup.variant,
         "orientation" -> c.setup.orientation
       )
-      .add("description", c.description) pipe addChapterMode(c)
+      .add("description", c.description) `pipe` addChapterMode(c)
 
   def pagerData(s: Study.WithChaptersAndLiked) =
     Json.obj(
@@ -111,11 +110,11 @@ final class JsonView(
         "settings"           -> s.settings,
         "visibility"         -> s.visibility,
         "createdAt"          -> s.createdAt,
-        "secondsSinceUpdate" -> (nowSeconds - s.updatedAt.getSeconds).toInt,
+        "secondsSinceUpdate" -> (nowSeconds - s.updatedAt.getMillis / 1000).toInt,
         "from"               -> s.from,
         "likes"              -> s.likes
       )
-      .add("isNew" -> s.isNew)
+      .add("isNew", s.isNew)
   }
 }
 
@@ -217,7 +216,7 @@ object JsonView {
       js.asOpt[JsObject]
         .flatMap { o =>
           for {
-            brush <- o str "brush"
+            brush <- o `str` "brush"
             orig  <- o.get[Pos]("orig")
           } yield o.get[Pos]("dest") match {
             case Some(dest) => Shape.Arrow(brush, orig, dest)
@@ -227,5 +226,5 @@ object JsonView {
         .fold[JsResult[Shape]](JsError(Nil))(JsSuccess(_))
     }
   }
-
 }
+

@@ -7,17 +7,15 @@ import lila.app.templating.Environment._
 import lila.app.ui.ScalatagsTemplate._
 import lila.common.paginator.Paginator
 
-import controllers.routes
 
 object index {
 
   import trans.search._
 
-  def apply(form: Form[_], paginator: Option[Paginator[lila.game.Game]] = None, nbGames: Long)(implicit
+  def apply(form: Form[?], paginator: Option[Paginator[lila.game.Game]] = None, nbGames: Long)(implicit
       ctx: Context
   ) = {
-    val commons = bits of form
-    import commons._
+    val commons = bits.of(form)
     views.html.base.layout(
       title = searchInXGames.txt(nbGames.localize, nbGames),
       moreJs = frag(
@@ -33,7 +31,7 @@ object index {
           cls := "box__pad search__form",
           action := s"${routes.Search.index()}#results",
           method := "GET"
-        )(dataReqs)(
+        )(commons.dataReqs)(
           globalError(form),
           table(
             tr(
@@ -42,24 +40,24 @@ object index {
                 div(cls := "half")(form3.input(form("players")(p))(tpe := "text"))
               })
             ),
-            playerIndexs(hide = true),
-            winner(hide = true),
-            loser(hide = true),
-            rating,
-            hasAi,
-            aiLevel,
-            source,
-            perf,
-            mode,
-            turns,
-            duration,
-            clockTime,
-            clockIncrement,
-            status,
-            winnerPlayerIndex,
-            date,
-            sort,
-            analysed,
+            commons.playerIndexs(hide = true),
+            commons.winner(hide = true),
+            commons.loser(hide = true),
+            commons.rating,
+            commons.hasAi,
+            commons.aiLevel,
+            commons.source,
+            commons.perf,
+            commons.mode,
+            commons.turns,
+            commons.duration,
+            commons.clockTime,
+            commons.clockIncrement,
+            commons.status,
+            commons.winnerPlayerIndex,
+            commons.date,
+            commons.sort,
+            commons.analysed,
             tr(
               th,
               td(cls := "action")(

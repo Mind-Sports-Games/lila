@@ -1,6 +1,5 @@
 package views.html.streamer
 
-import controllers.routes
 
 import lila.api.Context
 import lila.app.templating.Environment._
@@ -34,7 +33,7 @@ $('.streamer-picture form.upload input[type=file]').on('change', function() {
             form3.file.image("picture"),
             submitButton(cls := "button")(uploadPicture())
           ),
-          s.streamer.hasPicture option
+          s.streamer.hasPicture `option`
             postForm(action := routes.Streamer.pictureDelete, cls := "delete")(
               submitButton(cls := "button button-red")(deletePicture())
             ),

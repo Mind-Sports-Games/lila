@@ -1,9 +1,9 @@
 package lila.security
 
 import play.api.data.validation._
-import scala.concurrent.duration._
 
 import lila.common.EmailAddress
+import lila.common.extensions.*
 import lila.user.{ User, UserRepo }
 
 /** Validate and normalize emails
@@ -19,7 +19,7 @@ final class EmailAddressValidator(
     email.domain exists disposable.isOk
 
   def validate(email: EmailAddress): Option[EmailAddressValidator.Acceptable] =
-    isAcceptable(email) option EmailAddressValidator.Acceptable(email)
+    isAcceptable(email) `option` EmailAddressValidator.Acceptable(email)
 
   /** Returns true if an E-mail address is taken by another user.
     * @param email The E-mail address to be checked
@@ -28,7 +28,7 @@ final class EmailAddressValidator(
     * @return
     */
   private def isTakenBySomeoneElse(email: EmailAddress, forUser: Option[User]): Fu[Boolean] =
-    userRepo.idByEmail(email.normalize) dmap (_ -> forUser) dmap {
+    userRepo.idByEmail(email.normalize) `dmap` (_ -> forUser) dmap {
       case (None, _)                  => false
       case (Some(userId), Some(user)) => userId != user.id
       case (_, _)                     => true
@@ -58,7 +58,7 @@ final class EmailAddressValidator(
 
   def differentConstraint(than: Option[EmailAddress]) =
     Constraint[String]("constraint.email_different") { e =>
-      if (than has EmailAddress(e))
+      if (than.contains(EmailAddress(e)))
         Invalid(ValidationError("error.email_different"))
       else Valid
     }
@@ -68,8 +68,8 @@ final class EmailAddressValidator(
 
   // only compute valid and non-p1listed email domains
   private def hasAcceptableDns(e: EmailAddress): Fu[Boolean] =
-    isAcceptable(e) ?? e.domain.map(_.lower) ?? { domain =>
-      if (DisposableEmailDomain p1listed domain) fuccess(true)
+    isAcceptable(e) so e.domain.map(_.lower) so { domain =>
+      if (DisposableEmailDomain `p1listed` domain) fuccess(true)
       else
         dnsApi.mx(domain).dmap { domains =>
           domains.nonEmpty && !domains.exists { disposable(_) }

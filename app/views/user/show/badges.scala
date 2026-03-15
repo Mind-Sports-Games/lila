@@ -1,13 +1,9 @@
 package views.html.user.show
 
-import org.joda.time.DateTime
-
 import lila.api.Context
 import lila.app.templating.Environment._
 import lila.app.ui.ScalatagsTemplate._
-import lila.user.{ Trophy, TrophyKind }
-
-import controllers.routes
+import lila.user.Trophy
 
 object badges {
 

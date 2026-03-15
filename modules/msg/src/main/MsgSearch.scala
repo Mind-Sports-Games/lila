@@ -36,7 +36,7 @@ final class MsgSearch(
     threads  <- searchThreads(me, q)
     allMates <- Bus.ask[Set[User.ID]]("clas") { ClasMatesAndTeachers(KidId(me.id), _) }
     lower   = q.toLowerCase
-    mateIds = allMates.view.filter(_ startsWith lower).toList take 15
+    mateIds = allMates.view.filter(_ `startsWith` lower).toList take 15
     mates <- lightUserApi asyncMany mateIds
   } yield MsgSearch.Result(threads, mates.flatten, Nil)
 
@@ -50,10 +50,10 @@ final class MsgSearch(
             $eq(me.id),
             "$regex" -> BSONRegex(s"^${java.util.regex.Pattern.quote(q)}", "")
           ),
-          "del" $ne me.id
+          "del" `$ne` me.id
         )
       )
-      .sort($sort desc "lastMsg.date")
+      .sort($sort `desc` "lastMsg.date")
       .hint(
         colls.thread hint $doc(
           "users"        -> 1,
@@ -64,10 +64,10 @@ final class MsgSearch(
       .list(5)
 
   private def searchFriends(me: User, q: String): Fu[List[LightUser]] =
-    relationApi.searchFollowedBy(me, q, 15) flatMap lightUserApi.asyncMany dmap (_.flatten)
+    relationApi.searchFollowedBy(me, q, 15) flatMap lightUserApi.asyncMany `dmap` (_.flatten)
 
-  private def searchUsers(me: User, q: String): Fu[List[LightUser]] =
-    userCache.userIdsLike(q) flatMap lightUserApi.asyncMany dmap (_.flatten)
+  private def searchUsers(@annotation.nowarn("msg=unused") _me: User, q: String): Fu[List[LightUser]] =
+    userCache.userIdsLike(q) flatMap lightUserApi.asyncMany `dmap` (_.flatten)
 }
 
 object MsgSearch {

@@ -2,7 +2,7 @@ package lila.fishnet
 
 import org.joda.time.DateTime
 
-import strategygames.format.{ FEN, Uci }
+import strategygames.format.Uci
 import strategygames.Replay
 import JsonApi.Request.Evaluation
 import lila.analyse.{ Analysis, Info }
@@ -20,7 +20,7 @@ final private class AnalysisBuilder(evalCache: FishnetEvalCache)(implicit
       work: Work.Analysis,
       evals: List[Option[Evaluation.OrSkipped[Uci]]],
       isPartial: Boolean = true
-  ): Fu[Analysis] = {
+  ): Fu[Analysis] =
     evalCache.evals(work) flatMap { cachedFull =>
       /* remove first eval in partial analysis
        * to prevent the mobile app from thinking it's complete
@@ -44,7 +44,7 @@ final private class AnalysisBuilder(evalCache: FishnetEvalCache)(implicit
                 studyId = work.game.studyId,
                 infos = makeInfos(mergeEvalsAndCached(work, evals, cached), work.game.uciList, work.startPly),
                 startPly = work.startPly,
-                fk = !client.playstrategy option client.key.value,
+                fk = !client.playstrategy `option` client.key.value,
                 date = DateTime.now
               ),
               work.game.variant
@@ -63,7 +63,6 @@ final private class AnalysisBuilder(evalCache: FishnetEvalCache)(implicit
             }
         )
     }
-  }
 
   private def duplicateValsForMultiMoveGames(
       work: Work.Analysis,
@@ -91,7 +90,7 @@ final private class AnalysisBuilder(evalCache: FishnetEvalCache)(implicit
       moves: List[Uci],
       startedAtTurn: Int
   ): List[Info] =
-    (evals filterNot (_ ?? (_.isCheckmate)) sliding 2).toList.zip(moves).zipWithIndex map {
+    (evals filterNot (_ so (_.isCheckmate)) sliding 2).toList.zip(moves).zipWithIndex map {
       case ((List(Some(before), Some(after)), move), index) =>
         val variation = before.cappedPv match {
           case first :: rest if first != move => first :: rest

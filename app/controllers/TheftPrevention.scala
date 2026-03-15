@@ -1,7 +1,7 @@
 package controllers
 
 import lila.api.Context
-import lila.app._
+import lila.app.*
 import lila.game.{ Game => GameModel, Pov, AnonCookie }
 import play.api.mvc._
 
@@ -25,7 +25,7 @@ private[controllers] trait TheftPrevention { self: LilaController =>
   protected def isMyPov(pov: Pov)(implicit ctx: Context) = !isTheft(pov)
 
   protected def playablePovForReq(game: GameModel)(implicit ctx: Context) =
-    (!game.isPgnImport && game.playable) ?? {
+    (!game.isPgnImport && game.playable) so {
       ctx.userId
         .flatMap(game.playerByUserId)
         .orElse {
@@ -43,5 +43,5 @@ private[controllers] trait TheftPrevention { self: LilaController =>
     jsonError(
       "This game requires authentication"
     )
-  ) as JSON
+  ) `as` JSON
 }

@@ -4,7 +4,7 @@ import akka.stream.scaladsl.Source
 
 object SwissCsv {
 
-  def apply(results: Source[SwissPlayer.WithUserAndRank, _]): Source[String, _] =
+  def apply(results: Source[SwissPlayer.WithUserAndRank, ?]): Source[String, ?] =
     Source(
       List(
         toCsv(
@@ -27,7 +27,7 @@ object SwissCsv {
     p.player.rating.toString,
     p.player.points.value.toString,
     p.player.tieBreak.toString,
-    p.player.performance.??(_.value.toString)
+    p.player.performance.so(_.value.toString)
   )
 
   private def toCsv(values: String*) = values mkString ","

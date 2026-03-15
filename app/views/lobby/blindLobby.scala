@@ -10,7 +10,7 @@ object blindLobby {
   def apply(games: List[Pov])(implicit ctx: Context) =
     div(
       h2(games.size, " ongoing games"),
-      games.nonEmpty option ongoingGames(games),
+      games.nonEmpty `option` ongoingGames(games),
       div(cls := "lobby__app")
     )
 
@@ -30,7 +30,7 @@ object blindLobby {
       a(href := gameLink(pov))(
         playerText(pov.opponent),
         " ",
-        pov.isMyTurn ?? pov.remainingSeconds map { secondsFromNow(_, alwaysRelative = true) }
+        pov.isMyTurn so pov.remainingSeconds map { secondsFromNow(_, alwaysRelative = true) }
       )
     )
 }

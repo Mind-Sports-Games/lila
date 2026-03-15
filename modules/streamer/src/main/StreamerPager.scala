@@ -28,11 +28,11 @@ final class StreamerPager(
           $doc(
             "approval.granted" -> true,
             "listed"           -> Streamer.Listed(true),
-            "_id" $nin live.streams.map(_.streamer.id)
+            "_id" `$nin` live.streams.map(_.streamer.id)
           ),
       projection = none,
-      sort = if (approvalRequested) $sort asc "updatedAt" else $sort desc "liveAt"
-    ) mapFutureList withUsers
+      sort = if (approvalRequested) $sort `asc` "updatedAt" else $sort `desc` "liveAt"
+    ) `mapFutureList` withUsers
     Paginator(
       adapter = new CachedAdapter(adapter, nbResults = fuccess(6000)),
       currentPage = page,
@@ -43,7 +43,7 @@ final class StreamerPager(
   def nextRequestId: Fu[Option[Streamer.Id]] =
     coll.primitiveOne[Streamer.Id](
       $doc(approvalRequestedSelector),
-      $sort asc "updatedAt",
+      $sort `asc` "updatedAt",
       "_id"
     )
 

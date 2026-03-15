@@ -70,8 +70,8 @@ final class UserLoginsApi(
             ips = ips.map { ip =>
               IPData(
                 ip,
-                firewall blocksIp ip.value,
-                geoIP orUnknown ip.value,
+                firewall `blocksIp` ip.value,
+                geoIP `orUnknown` ip.value,
                 proxies(ip.value),
                 Alts(othersByIp.getOrElse(ip.value, Set.empty)),
                 ipClients.getOrElse(ip.value, Set.empty)
@@ -80,7 +80,7 @@ final class UserLoginsApi(
             prints = fps.map { fp =>
               FPData(
                 fp,
-                printBan blocks fp.value,
+                printBan `blocks` fp.value,
                 Alts(othersByFp.getOrElse(fp.value, Set.empty)),
                 fpClients.getOrElse(fp.value, UserAgent.Client.PC)
               )
@@ -92,7 +92,7 @@ final class UserLoginsApi(
     }
 
   private[security] def userHasPrint(u: User): Fu[Boolean] =
-    store.coll.secondaryPreferred.exists($doc("user" -> u.id, "fp" $exists true))
+    store.coll.secondaryPreferred.exists($doc("user" -> u.id, "fp" `$exists` true))
 
   private def fetchOtherUsers(
       user: User,
@@ -100,20 +100,21 @@ final class UserLoginsApi(
       fpSet: Set[FingerHash],
       max: Int
   ): Fu[List[OtherUser]] =
-    ipSet.nonEmpty ?? store.coll
-      .aggregateList(max, readPreference = ReadPreference.secondaryPreferred) { implicit framework =>
+    ipSet.nonEmpty so store.coll
+      .aggregateWith[Bdoc](readPreference = ReadPreference.secondaryPreferred) { implicit framework =>
         import framework._
         import FingerHash.fingerHashHandler
-        Match(
-          $doc(
-            $or(
-              "ip" $in ipSet,
-              "fp" $in fpSet
-            ),
-            "user" $ne user.id,
-            "date" $gt DateTime.now.minusYears(1)
-          )
-        ) -> List(
+        List(
+          Match(
+            $doc(
+              $or(
+                "ip" `$in` ipSet,
+                "fp" `$in` fpSet
+              ),
+              "user" `$ne` user.id,
+              "date" `$gt` DateTime.now.minusYears(1)
+            )
+          ),
           GroupField("user")(
             "ips" -> AddFieldToSet("ip"),
             "fps" -> AddFieldToSet("fp")
@@ -146,6 +147,7 @@ final class UserLoginsApi(
           UnwindField("user")
         )
       }
+      .collect[List](maxDocs = max)
       .map { docs =>
         import lila.user.User.userBSONHandler
         for {
@@ -159,12 +161,12 @@ final class UserLoginsApi(
   def getUserIdsWithSameIpAndPrint(userId: User.ID): Fu[Set[User.ID]] =
     for {
       (ips, fps) <- nextValues("ip", userId) zip nextValues("fp", userId)
-      users <- (ips.nonEmpty && fps.nonEmpty) ?? store.coll.secondaryPreferred.distinctEasy[User.ID, Set](
+      users <- (ips.nonEmpty && fps.nonEmpty) so store.coll.secondaryPreferred.distinctEasy[User.ID, Set](
         "user",
         $doc(
-          "ip" $in ips,
-          "fp" $in fps,
-          "user" $ne userId
+          "ip" `$in` ips,
+          "fp" `$in` fps,
+          "user" `$ne` userId
         )
       )
     } yield users
@@ -188,7 +190,7 @@ object UserLogins {
       .foldLeft(Map.empty[V, DateTime]) {
         case (acc, Dated(v, _)) if acc.contains(v) => acc
         case (acc, Dated(v, date))                 => acc + (v -> date)
-      }
+    }
       .view
       .map { case (v, date) => Dated(v, date) }
 

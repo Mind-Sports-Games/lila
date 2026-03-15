@@ -17,7 +17,7 @@ final class PgnDump(
 
   import PgnDump._
 
-  def apply(study: Study, flags: WithFlags): Source[String, _] =
+  def apply(study: Study, flags: WithFlags): Source[String, ?] =
     chapterRepo
       .orderedByStudySource(study.id)
       .map(ofChapter(study, flags))
@@ -27,7 +27,7 @@ final class PgnDump(
   def ofChapter(study: Study, flags: WithFlags)(chapter: Chapter) =
     Pgn(
       tags = makeTags(study, chapter),
-      fullTurns = toFullTurns(chapter.root)(flags).toList,
+      fullTurns = toFullTurns(chapter.root)(using flags).toList,
       initial = Initial(
         chapter.root.comments.list.map(_.text.value) ::: shapeComment(chapter.root.shapes).toList
       )
@@ -56,7 +56,7 @@ final class PgnDump(
   private def chapterUrl(studyId: Study.Id, chapterId: Chapter.Id) =
     s"${net.baseUrl}/study/$studyId/$chapterId"
 
-  private val dateFormat = DateTimeFormat forPattern "yyyy.MM.dd"
+  private val dateFormat = DateTimeFormat `forPattern` "yyyy.MM.dd"
 
   private def annotatorTag(study: Study) =
     Tag(_.Annotator, s"https://playstrategy.org/@/${ownerName(study)}")
@@ -73,7 +73,7 @@ final class PgnDump(
         Tag(_.ECO, opening.fold("?")(_.eco)),
         Tag(_.Opening, opening.fold("?")(_.name)),
         Tag(_.Result, "*") // required for SCID to import
-      ) ::: List(annotatorTag(study)) ::: (!chapter.root.fen.initial).??(
+      ) ::: List(annotatorTag(study)) ::: (!chapter.root.fen.initial).so(
         List(
           Tag(_.FEN, chapter.root.fen.value),
           Tag("SetUp", "1")
@@ -96,25 +96,24 @@ object PgnDump {
   private val noVariations: Variations = Vector.empty
 
   //assume comments and info is stored on first node of turn
-  private def nodes2Multiaction(nodes: Vector[Node], variations: Variations)(implicit flags: WithFlags) = {
+  private def nodes2Multiaction(nodes: Vector[Node], variations: Variations)(implicit flags: WithFlags) =
     nodes.headOption.map { firstNode =>
       Turn(
         san = nodes.map(_.move.san).mkString(","),
         glyphs = if (flags.comments) firstNode.glyphs else Glyphs.empty,
-        comments = flags.comments ?? {
+        comments = flags.comments so {
           firstNode.comments.list.map(_.text.value) ::: shapeComment(firstNode.shapes).toList
         },
         opening = none,
         result = none,
-        variations = flags.variations ?? {
+        variations = flags.variations so {
           variations.view.map { child =>
             toFullTurns(child.mainline, noVariations).toList
           }.toList
         },
-        secondsLeft = flags.clocks ?? firstNode.clock.map(_.roundSeconds)
+        secondsLeft = flags.clocks so firstNode.clock.map(_.roundSeconds)
       )
     }
-  }
 
   // [%csl Gb4,Yd5,Rf6][%cal Ge2e4,Ye2d4,Re2g4]
   private def shapeComment(shapes: Shapes): Option[String] = {
@@ -186,16 +185,14 @@ object PgnDump {
       ._2
       .reverse
 
-  def toNodeTurns(line: Vector[Node]): Vector[Vector[Node]] = {
+  def toNodeTurns(line: Vector[Node]): Vector[Vector[Node]] =
     line
       .drop(1)
       .foldLeft(Vector(line.take(1))) { case (turn, node) =>
-        if (turn.head.head.playedPlayerIndex != node.playedPlayerIndex) {
+        if (turn.head.head.playedPlayerIndex != node.playedPlayerIndex)
           Vector(node) +: turn
-        } else {
+        else
           (turn.head :+ node) +: turn.tail
-        }
       }
       .reverse
-  }
 }

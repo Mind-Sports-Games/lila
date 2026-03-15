@@ -1,14 +1,9 @@
 package views.html
 
-import play.api.libs.json.Json
-
 import lila.api.Context
 import lila.app.templating.Environment._
 import lila.app.ui.ScalatagsTemplate._
-import lila.common.String.html.safeJsonValue
-import play.api.i18n.Lang
 
-import controllers.routes
 
 object memory {
 

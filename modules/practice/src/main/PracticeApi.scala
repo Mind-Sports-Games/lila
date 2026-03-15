@@ -1,6 +1,5 @@
 package lila.practice
 
-import scala.concurrent.duration._
 import reactivemongo.api.ReadPreference
 
 import lila.common.Bus
@@ -28,8 +27,8 @@ final class PracticeApi(
     for {
       up       <- get(user)
       chapters <- studyApi.chapterMetadatas(studyId)
-      chapter = up.progress firstOngoingIn chapters
-      studyOption <- chapter.fold(studyApi byIdWithFirstChapter studyId) { chapter =>
+      chapter = up.progress `firstOngoingIn` chapters
+      studyOption <- chapter.fold(studyApi `byIdWithFirstChapter` studyId) { chapter =>
         studyApi.byIdWithChapter(studyId, chapter.id)
       }
     } yield makeUserStudy(studyOption, up, chapters)
@@ -56,17 +55,17 @@ final class PracticeApi(
         study = rawSc.study.rewindTo(rawSc.chapter).withoutMembers,
         chapter = rawSc.chapter.withoutChildrenIfPractice
       )
-      practiceStudy <- up.structure study sc.study.id
-      section       <- up.structure findSection sc.study.id
+      practiceStudy <- up.structure `study` sc.study.id
+      section       <- up.structure `findSection` sc.study.id
       publishedChapters = chapters.filterNot { c =>
-        PracticeStructure isChapterNameCommented c.name
+        PracticeStructure `isChapterNameCommented` c.name
       }
       if publishedChapters.exists(_.id == sc.chapter.id)
     } yield UserStudy(up, practiceStudy, publishedChapters, sc, section)
 
   object config {
-    def get  = configStore.get dmap (_ | PracticeConfig.empty)
-    def set  = configStore.set _
+    def get  = configStore.get `dmap` (_ | PracticeConfig.empty)
+    def set  = configStore.set
     def form = configStore.makeForm
   }
 
@@ -105,23 +104,21 @@ final class PracticeApi(
       get(user) flatMap { prog =>
         save(prog.withNbMoves(chapterId, score))
       }
-    } >>- studyApi.studyIdOf(chapterId).foreach {
-      _ ?? { studyId =>
+    }.andDo(studyApi.studyIdOf(chapterId).foreach {
+      _ so { studyId =>
         Bus.publish(PracticeProgress.OnComplete(user.id, studyId, chapterId), "finishPractice")
       }
-    }
+    })
 
     def reset(user: User) =
       coll.delete.one($id(user.id)).void
 
     def completionPercent(userIds: List[User.ID]): Fu[Map[User.ID, Int]] =
       coll
-        .aggregateList(
-          maxDocs = Int.MaxValue,
-          readPreference = ReadPreference.secondaryPreferred
-        ) { framework =>
+        .aggregateWith[Bdoc](readPreference = ReadPreference.secondaryPreferred) { framework =>
           import framework._
-          Match($doc("_id" $in userIds)) -> List(
+          List(
+            Match($doc("_id" `$in` userIds)),
             Project(
               $doc(
                 "nb" -> $doc(
@@ -133,6 +130,7 @@ final class PracticeApi(
             )
           )
         }
+        .collect[List](maxDocs = Int.MaxValue)
         .map {
           _.view.flatMap { obj =>
             import cats.implicits._
@@ -140,6 +138,6 @@ final class PracticeApi(
               k -> (v * 100f / PracticeStructure.totalChapters).toInt
             }
           }.toMap
-        }
+      }
   }
 }

@@ -6,7 +6,6 @@ import lila.app.templating.Environment._
 import lila.app.ui.ScalatagsTemplate._
 import lila.pref.PrefCateg
 
-import controllers.routes
 
 object pref {
 
@@ -21,11 +20,11 @@ object pref {
     st.group(cls := "radio")(
       options.map { v =>
         val id      = s"${field.id}_${v._1}"
-        val checked = field.value has v._1.toString
+        val checked = field.value `has` v._1.toString
         div(
           input(
             st.id := s"$prefix$id",
-            checked option st.checked,
+            checked `option` st.checked,
             tpe := "radio",
             value := v._1.toString,
             name := field.name
@@ -35,7 +34,7 @@ object pref {
       }.toList
     )
 
-  def apply(u: lila.user.User, form: play.api.data.Form[_], categ: lila.pref.PrefCateg)(implicit
+  def apply(u: lila.user.User, form: play.api.data.Form[?], categ: lila.pref.PrefCateg)(implicit
       ctx: Context
   ) =
     account.layout(

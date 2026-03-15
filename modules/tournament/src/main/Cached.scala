@@ -1,7 +1,6 @@
 package lila.tournament
 
 import play.api.i18n.Lang
-import scala.concurrent.duration._
 
 import lila.hub.LightTeam.TeamID
 import lila.memo._
@@ -21,7 +20,7 @@ final private[tournament] class Cached(
     name = "tournament.name",
     initialCapacity = 65536,
     compute = { case (id, lang) =>
-      tournamentRepo byId id dmap2 { _.name()(lang) }
+      tournamentRepo `byId` id dmap2 { _.name()(using lang) }
     },
     default = _ => none,
     strategy = Syncache.WaitAfterUptime(20 millis),
@@ -47,7 +46,7 @@ final private[tournament] class Cached(
       _.expireAfterWrite(5 seconds)
         .maximumSize(64)
         .buildAsyncFuture { case (tourId, teamId) =>
-          playerRepo.teamInfo(tourId, teamId) dmap some
+          playerRepo.teamInfo(tourId, teamId) `dmap` some
         }
     }
 
@@ -70,8 +69,8 @@ final private[tournament] class Cached(
       cacheApi[Tournament.ID, List[TeamBattle.RankedTeam]](8, "tournament.teamStanding") {
         _.expireAfterWrite(1 second)
           .buildAsyncFuture { id =>
-            tournamentRepo teamBattleOf id flatMap {
-              _ ?? { playerRepo.bestTeamIdsByTour(id, _) }
+            tournamentRepo `teamBattleOf` id flatMap {
+              _ so { playerRepo.bestTeamIdsByTour(id, _) }
             }
           }
       }
@@ -102,7 +101,7 @@ final private[tournament] class Cached(
       SheetKey(
         tour.id,
         userId,
-        Sheet versionOf tour.startsAt,
+        Sheet `versionOf` tour.startsAt,
         if (tour.streakable) Sheet.Streaks else Sheet.NoStreaks,
         tour.statusScoring
       )

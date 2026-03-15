@@ -1,6 +1,5 @@
 package views.html.user.show
 
-import controllers.routes
 
 import lila.api.Context
 import lila.app.templating.Environment._
@@ -22,7 +21,7 @@ object gamesContent {
       div(cls := "number-menu number-menu--tabs menu-box-pop", id := "games")(
         filters.list.map { f =>
           a(
-            cls := s"nm-item to-${f.name}${(filters.current == f) ?? " active"}",
+            cls := s"nm-item to-${f.name}${(filters.current == f) so " active"}",
             href := routes.User.games(u.username, f.name)
           )(userGameFilterTitle(u, nbs, f))
         }
@@ -38,7 +37,7 @@ object gamesContent {
                 strong(pager.nbResults.localize, " games found")
               ),
               div(cls := "search__rows infinite-scroll")(
-                views.html.game.widgets(pager.currentPageResults, user = u.some, ownerLink = ctx is u),
+                views.html.game.widgets(pager.currentPageResults, user = u.some, ownerLink = ctx `is` u),
                 pagerNext(pager, np => routes.User.games(u.username, filterName, np).url)
               )
             )
@@ -53,9 +52,9 @@ object gamesContent {
           )(
             if (filterName == "playing" && pager.nbResults > 2)
               pager.currentPageResults.flatMap { Pov(_, u) }.map { pov =>
-                views.html.game.mini(pov)(ctx)(cls := "paginated")
+                views.html.game.mini(pov)(using ctx)(cls := "paginated")
               }
-            else views.html.game.widgets(pager.currentPageResults, user = u.some, ownerLink = ctx is u),
+            else views.html.game.widgets(pager.currentPageResults, user = u.some, ownerLink = ctx `is` u),
             pagerNext(pager, np => routes.User.games(u.username, filterName, np).url)
           )
       )

@@ -2,11 +2,10 @@ package lila.tournament
 
 import strategygames.ClockConfig
 import strategygames.format.FEN
-import strategygames.{ GameFamily, GameGroup, Mode, Speed }
+import strategygames.{ GameGroup, Mode, Speed }
 import strategygames.variant.Variant
 import org.joda.time.{ DateTime, Duration, Interval }
 import play.api.i18n.Lang
-import scala.util.chaining._
 
 import lila.common.GreatPlayer
 import lila.common.ThreadLocalRandom
@@ -76,19 +75,19 @@ case class Tournament(
       case _                                                           => false
     }
 
-  def isShield = schedule.map(_.freq) has Schedule.Freq.Shield
+  def isShield = schedule.map(_.freq).contains(Schedule.Freq.Shield)
 
-  def isUnique = schedule.map(_.freq) has Schedule.Freq.Unique
+  def isUnique = schedule.map(_.freq).contains(Schedule.Freq.Unique)
 
   def isMarathonOrUnique = isMarathon || isUnique
 
-  def isMSO = (schedule.map(_.freq) has Schedule.Freq.MSO21) || (schedule.map(_.freq) has Schedule.Freq.MSOGP)
+  def isMSO = schedule.map(_.freq).contains(Schedule.Freq.MSO21) || schedule.map(_.freq).contains(Schedule.Freq.MSOGP)
 
-  def isMSOWarmUp = schedule.map(_.freq) has Schedule.Freq.MSOWarmUp
+  def isMSOWarmUp = schedule.map(_.freq).contains(Schedule.Freq.MSOWarmUp)
 
-  def isIntro = schedule.map(_.freq) has Schedule.Freq.Introductory
+  def isIntro = schedule.map(_.freq).contains(Schedule.Freq.Introductory)
 
-  def isAnnual = schedule.map(_.freq) has Schedule.Freq.Annual
+  def isAnnual = schedule.map(_.freq).contains(Schedule.Freq.Annual)
 
   def isScheduled = schedule.isDefined
 
@@ -111,11 +110,11 @@ case class Tournament(
       (secondsToFinish - _.drop(medleyRound + 1).sum)
     )
 
-  def finishesAt = startsAt plusMinutes minutes
+  def finishesAt = startsAt `plusMinutes` minutes
 
-  def secondsToStart = (startsAt.getSeconds - nowSeconds).toInt atLeast 0
+  def secondsToStart = (startsAt.getMillis / 1000 - nowSeconds).toInt `atLeast` 0
 
-  def secondsToFinish = (finishesAt.getSeconds - nowSeconds).toInt atLeast 0
+  def secondsToFinish = (finishesAt.getMillis / 1000 - nowSeconds).toInt `atLeast` 0
 
   def pairingsClosedSeconds = math.max(30, math.min(clock.limitSeconds / 2, 120))
 
@@ -129,7 +128,7 @@ case class Tournament(
 
   //start at 0 as it's actually an index for medley variants in front end
   def medleyRound: Int = {
-    val cutoff = (nowSeconds - startsAt.getSeconds).toInt
+    val cutoff = (nowSeconds - startsAt.getMillis / 1000).toInt
     medleyIntervalSeconds
       .map(_.scanLeft(0)(_ + _).count(_ <= cutoff) - 1)
       .getOrElse(0)
@@ -151,25 +150,25 @@ case class Tournament(
 
   def medleyVariantsInTournament: Option[List[Variant]] =
     medleyVariants
-      .map(v => v.take(medleyNumIntervals.getOrElse(medleyVariants.size)))
+      .map(v => v.take(medleyNumIntervals.getOrElse(medleyVariants.map(_.size).getOrElse(0))))
 
-  def isRecentlyFinished = isFinished && (nowSeconds - finishesAt.getSeconds) < 30 * 60
+  def isRecentlyFinished = isFinished && (nowSeconds - finishesAt.getMillis / 1000) < 30 * 60
 
-  def isRecentlyStarted = isStarted && (nowSeconds - startsAt.getSeconds) < 15
+  def isRecentlyStarted = isStarted && (nowSeconds - startsAt.getMillis / 1000) < 15
 
-  def isNowOrSoon = startsAt.isBefore(DateTime.now plusMinutes 15) && !isFinished
+  def isNowOrSoon = startsAt.isBefore(DateTime.now `plusMinutes` 15) && !isFinished
 
-  def isDistant = startsAt.isAfter(DateTime.now plusDays 1)
+  def isDistant = startsAt.isAfter(DateTime.now `plusDays` 1)
 
   def duration = new Duration(minutes * 60 * 1000)
 
   def interval = new Interval(startsAt, duration)
 
-  def overlaps(other: Tournament) = interval overlaps other.interval
+  def overlaps(other: Tournament) = interval `overlaps` other.interval
 
   def similarTo(other: Tournament) =
     (schedule, other.schedule) match {
-      case (Some(s1), Some(s2)) if s1 similarTo s2 => true
+      case (Some(s1), Some(s2)) if s1 `similarTo` s2 => true
       case _                                       => false
     }
 
@@ -214,7 +213,7 @@ case class Tournament(
       )
     }
 
-  def nonPlayStrategyCreatedBy = (createdBy != User.playstrategyId) option createdBy
+  def nonPlayStrategyCreatedBy = (createdBy != User.playstrategyId) `option` createdBy
 
   def ratingVariant =
     if (variant.fromPositionVariant) Variant.libStandard(variant.gameLogic) else variant
@@ -232,7 +231,7 @@ case class Tournament(
 
   val minWaitingUsersForPairings: Int = if (botsAllowed) 1 else 2
 
-  override def toString = s"$id $startsAt ${name()(defaultLang)} $minutes minutes, $clock, $nbPlayers players"
+  override def toString = s"$id $startsAt ${name()(using defaultLang)} $minutes minutes, $clock, $nbPlayers players"
 }
 
 case class EnterableTournaments(tours: List[Tournament], scheduled: List[Tournament])
@@ -292,8 +291,8 @@ object Tournament {
       statusScoring = statusScoring,
       schedule = None,
       startsAt = startDate match {
-        case Some(startDate) => startDate plusSeconds ThreadLocalRandom.nextInt(60)
-        case None            => DateTime.now plusMinutes waitMinutes
+        case Some(startDate) => startDate `plusSeconds` ThreadLocalRandom.nextInt(60)
+        case None            => DateTime.now `plusMinutes` waitMinutes
       },
       description = description,
       hasChat = hasChat
@@ -303,12 +302,12 @@ object Tournament {
     val medleyVariantsAndIntervals = sched.medleyShield.map(ms => ms.generateVariants(ms.variants))
     Tournament(
       id = makeId,
-      name = sched.medleyShield.fold(sched.name(full = false)(defaultLang))(ms =>
+      name = sched.medleyShield.fold(sched.name(full = false)(using defaultLang))(ms =>
         TournamentShield.MedleyShield
           .makeName(ms.medleyName, sched.at, ms.weekOfMonth.isEmpty, ms.countOffset)
       ),
       status = Status.Created,
-      clock = Schedule clockFor sched,
+      clock = Schedule `clockFor` sched,
       minutes = minutes,
       createdBy = User.playstrategyId,
       createdAt = DateTime.now,
@@ -322,7 +321,7 @@ object Tournament {
       conditions = sched.conditions,
       statusScoring = sched.statusScoring,
       schedule = Some(sched),
-      startsAt = sched.at plusSeconds ThreadLocalRandom.nextInt(60),
+      startsAt = sched.at `plusSeconds` ThreadLocalRandom.nextInt(60),
       description = sched.medleyShield.map(_.arenaDescriptionFull),
       trophy1st = sched.medleyShield.map(_.key),
       trophyExpiryDays = sched.trophyExpiryDays,
@@ -333,7 +332,7 @@ object Tournament {
 
   def tournamentUrl(tourId: String): String = s"https://playstrategy.org/tournament/$tourId"
 
-  def makeId = ThreadLocalRandom nextString 8
+  def makeId = ThreadLocalRandom `nextString` 8
 
   case class PastAndNext(past: List[Tournament], next: List[Tournament])
 

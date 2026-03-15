@@ -18,7 +18,7 @@ final class Env(
     userRepo: lila.user.UserRepo,
     lightUserGetter: LightUser.GetterSync,
     remoteSocketApi: lila.socket.RemoteSocket,
-    db: lila.db.Db
+    @annotation.nowarn("msg=unused") _db: lila.db.Db
 )(implicit
     ec: scala.concurrent.ExecutionContext,
     scheduler: akka.actor.Scheduler,
@@ -33,7 +33,7 @@ final class Env(
 
   lazy val json = wire[RacerJson]
 
-  private val socket = wire[RacerSocket] // requires eager eval
+  @annotation.nowarn("msg=unused") private val socket = wire[RacerSocket] // requires eager eval
 }
 
 final private class RacerColls(val puzzle: AsyncColl)

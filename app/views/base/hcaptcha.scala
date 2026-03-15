@@ -10,9 +10,9 @@ object hcaptcha {
 
   private val dataSitekey = attr("data-sitekey")
 
-  def script(re: HcaptchaForm[_])(implicit ctx: Context) =
-    re.enabled option raw("""<script src="https://hcaptcha.com/1/api.js" async defer></script>""")
+  @annotation.nowarn("msg=unused") def script(re: HcaptchaForm[?])(implicit ctx: Context) =
+    re.enabled `option` raw("""<script src="https://hcaptcha.com/1/api.js" async defer></script>""")
 
-  def tag(form: HcaptchaForm[_]) =
+  def tag(form: HcaptchaForm[?]) =
     div(cls := "h-captcha form-group", dataSitekey := form.config.key)
 }

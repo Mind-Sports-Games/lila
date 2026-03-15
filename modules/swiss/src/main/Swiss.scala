@@ -1,6 +1,7 @@
 package lila.swiss
 
-import ornicar.scalalib.Zero
+import alleycats.Zero
+import lila.base.IntValue
 
 import strategygames.format.FEN
 import strategygames.{ ByoyomiClock, Clock, ClockConfig, GameFamily, GameGroup, Speed }
@@ -41,13 +42,13 @@ case class Swiss(
   def isStarted          = !isCreated && !isFinished
   def isFinished         = finishedAt.isDefined
   def isNotFinished      = !isFinished
-  def isNowOrSoon        = startsAt.isBefore(DateTime.now plusMinutes 15) && !isFinished
-  def isRecentlyFinished = finishedAt.exists(f => (nowSeconds - f.getSeconds) < 30 * 60)
+  def isNowOrSoon        = startsAt.isBefore(DateTime.now `plusMinutes` 15) && !isFinished
+  def isRecentlyFinished = finishedAt.exists(f => (nowSeconds - f.getMillis / 1000) < 30 * 60)
   def isEnterable =
     isNotFinished && round.value <= settings.nbRounds / 2 && nbPlayers < Swiss.maxPlayers && settings.minutesBeforeStartToJoin
       .fold(true)(mbs =>
         DateTime.now
-          .isAfter(startsAt minusMinutes mbs)
+          .isAfter(startsAt `minusMinutes` mbs)
       )
   def isHalfway = round.value == (settings.nbRounds + 1) / 2
   def isMedley  = settings.medleyVariants.nonEmpty
@@ -55,9 +56,9 @@ case class Swiss(
   def allRounds: List[SwissRound.Number]      = (1 to round.value).toList.map(SwissRound.Number.apply)
   def finishedRounds: List[SwissRound.Number] = (1 until round.value).toList.map(SwissRound.Number.apply)
   def tieBreakRounds: List[SwissRound.Number] = if (isFinished) allRounds
-  else (1 until ((round.value + 1) atMost settings.nbRounds)).toList.map(SwissRound.Number.apply)
+  else (1 until ((round.value + 1) `atMost` settings.nbRounds)).toList.map(SwissRound.Number.apply)
   def allAcceleratedRounds: List[SwissRound.Number] = if (isFinished) allRounds
-  else (1 to ((round.value + 1) atMost settings.nbRounds)).toList.map(SwissRound.Number.apply)
+  else (1 to ((round.value + 1) `atMost` settings.nbRounds)).toList.map(SwissRound.Number.apply)
 
   def actualNbRounds = if (isFinished) round.value else settings.nbRounds
 
@@ -121,7 +122,8 @@ case class Swiss(
       val firstGameFamily = medleyGameFamilies.flatMap(_.headOption)
       if (firstGameFamily.toList.some == medleyGameFamilies) firstGameFamily
       else None
-    } else variant.gameFamily.some
+    }
+    else variant.gameFamily.some
 
   def withConditions(conditions: SwissCondition.All) = copy(
     settings = settings.copy(conditions = conditions)
@@ -157,8 +159,8 @@ object Swiss {
   case class Performance(value: Float)           extends AnyVal
   case class Score(value: Long)                  extends AnyVal
 
-  implicit val SonnenbornBergerZero: Zero[SonnenbornBerger] = Zero.instance(SonnenbornBerger(0))
-  implicit val BuchholzZero: Zero[Buchholz]                 = Zero.instance(Buchholz(0))
+  implicit val SonnenbornBergerZero: Zero[SonnenbornBerger] = Zero(SonnenbornBerger(0))
+  implicit val BuchholzZero: Zero[Buchholz]                 = Zero(Buchholz(0))
 
   case class IdName(_id: Id, name: String) {
     def id = _id
@@ -204,7 +206,7 @@ object Swiss {
     }).map(s => s"${s} break after round ${halfwayBreakRound}")
     lazy val halfwayBreakRound  = (nbRounds + 1) / 2
     def manualRounds            = intervalSeconds == Swiss.RoundInterval.manual
-    def dailyInterval           = (!manualRounds && intervalSeconds >= 24 * 3600) option intervalSeconds / 3600 / 24
+    def dailyInterval           = (!manualRounds && intervalSeconds >= 24 * 3600) `option` intervalSeconds / 3600 / 24
     def usingDrawTables         = useDrawTables || usePerPairingDrawTables
     def mcmahonCutoffGrade: Int = Handicaps.playerRatingFromInput(mcmahonCutoff).getOrElse(1500)
     def isMultiPoint            = backgammonPoints.exists(_ > 1)
@@ -246,7 +248,7 @@ object Swiss {
     )
   }
 
-  def makeId = Id(lila.common.ThreadLocalRandom nextString 8)
+  def makeId = Id(lila.common.ThreadLocalRandom `nextString` 8)
 
   case class PastAndNext(past: List[Swiss], next: List[Swiss])
 
@@ -256,5 +258,5 @@ object Swiss {
   )
 
   def swissUrl(swissId: Swiss.Id): String = s"https://playstrategy.org/swiss/${swissId.value}"
-
 }
+

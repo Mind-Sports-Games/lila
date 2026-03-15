@@ -6,7 +6,7 @@ import lila.common.Bus
 
 final private class HookThieve()(implicit
     ec: scala.concurrent.ExecutionContext,
-    system: akka.actor.ActorSystem,
+    @annotation.nowarn("msg=unused") _system: akka.actor.ActorSystem,
     scheduler: akka.actor.Scheduler
 ) {
 
@@ -16,7 +16,7 @@ final private class HookThieve()(implicit
     Bus
       .ask[PoolHooks]("lobbyTrouper")(GetCandidates(clock, variant, _))
       .logFailure(logger)
-      .nevermind(PoolHooks(Vector.empty))
+      .recoverDefault(PoolHooks(Vector.empty))
 
   def stolen(poolHooks: Vector[PoolHook], monId: String) = {
     lila.mon.lobby.pool.thieve.stolen(monId).record(poolHooks.size)

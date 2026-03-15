@@ -9,7 +9,7 @@ final class NoteApi(coll: Coll)(implicit ec: scala.concurrent.ExecutionContext) 
   def collName = coll.name
 
   def get(gameId: String, userId: String): Fu[String] =
-    coll.primitiveOne[String]($id(makeId(gameId, userId)), "t") dmap (~_)
+    coll.primitiveOne[String]($id(makeId(gameId, userId)), "t") `dmap` (~_)
 
   def set(gameId: String, userId: String, text: String) = {
     if (text.isEmpty) coll.delete.one($id(makeId(gameId, userId)))

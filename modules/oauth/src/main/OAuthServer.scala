@@ -3,7 +3,6 @@ package lila.oauth
 import org.joda.time.DateTime
 import play.api.http.HeaderNames.AUTHORIZATION
 import play.api.mvc.{ RequestHeader, Result }
-import scala.concurrent.duration._
 
 import lila.db.dsl._
 import lila.user.{ User, UserRepo }
@@ -27,22 +26,22 @@ final class OAuthServer(
     }
 
   def auth(tokenId: AccessToken.Id, scopes: List[OAuthScope]): Fu[AuthResult] =
-    accessTokenCache.get(tokenId) orFailWith NoSuchToken flatMap {
+    accessTokenCache.get(tokenId) `orFailWith` NoSuchToken flatMap {
       case at if scopes.nonEmpty && !scopes.exists(at.scopes.contains) => fufail(MissingScope(at.scopes))
       case at =>
-        userRepo enabledById at.userId flatMap {
+        userRepo `enabledById` at.userId flatMap {
           case None    => fufail(NoSuchUser)
           case Some(u) => fuccess(OAuthScope.Scoped(u, at.scopes))
         }
-    } dmap Right.apply recover { case e: AuthError =>
+    } `dmap` Right.apply recover { case e: AuthError =>
       Left(e)
     }
 
   def fetchAppAuthor(req: RequestHeader): Fu[Option[User.ID]] =
-    reqToTokenId(req) ?? { tokenId =>
+    reqToTokenId(req) so { tokenId =>
       colls.token {
         _.primitiveOne[OAuthApp.Id]($doc(F.id -> tokenId), F.clientId) flatMap {
-          _ ?? appApi.authorOf
+          _ so appApi.authorOf
         }
       }
     }

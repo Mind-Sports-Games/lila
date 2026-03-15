@@ -16,10 +16,10 @@ final class TeamSearchApi(
 
   def search(query: Query, from: From, size: Size) =
     client.search(query, from, size) flatMap { res =>
-      teamRepo byOrderedIds res.ids
+      teamRepo `byOrderedIds` res.ids
     }
 
-  def count(query: Query) = client.count(query) dmap (_.count)
+  def count(query: Query) = client.count(query) `dmap` (_.count)
 
   def store(team: Team) = client.store(Id(team.id), toDoc(team))
 

@@ -9,7 +9,7 @@ import reactivemongo.api.bson.BSONHandler
 
 final class ModPresetsApi(
     settingStore: lila.memo.SettingStore.Builder
-)(implicit ec: ExecutionContext) {
+)(implicit @annotation.nowarn("msg=unused") _ec: ExecutionContext) {
 
   import ModPresets.setting._
 
@@ -65,7 +65,7 @@ object ModPresets {
           .flatMap {
             case name :: text => ModPreset(name, text.dropWhile(_.isEmpty) mkString "\n").some
             case _            => none
-          }
+        }
       }
 
     private val presetsIso = lila.common.Iso[String, ModPresets](read, write)
@@ -73,6 +73,6 @@ object ModPresets {
     implicit val presetsBsonHandler: BSONHandler[ModPresets]   = lila.db.dsl.isoHandler(presetsIso)
     implicit val presetsStringReader: StringReader[ModPresets] = StringReader.fromIso(presetsIso)
     implicit val presetsFormable: Formable[ModPresets] =
-      new Formable[ModPresets](presets => Form(single("v" -> text)) fill write(presets))
+      new Formable[ModPresets](presets => Form(single("v" -> text)) `fill` write(presets))
   }
 }

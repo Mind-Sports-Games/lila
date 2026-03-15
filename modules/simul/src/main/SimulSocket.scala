@@ -22,7 +22,7 @@ final private class SimulSocket(
     rooms.tell(simulId, NotifyVersion("hostGame", gameId))
 
   def reload(simulId: Simul.ID): Unit =
-    repo find simulId foreach {
+    repo `find` simulId foreach {
       _ foreach { simul =>
         jsonView(simul, none) foreach { obj =>
           rooms.tell(simulId, NotifyVersion("reload", obj))
@@ -66,15 +66,15 @@ final private class SimulSocket(
       roomId => _.Simul(roomId.value).some,
       chatBusChan = _.Simul,
       localTimeout = Some { (roomId, modId, _) =>
-        repo.hostId(roomId.value).map(_ has modId)
+        repo.hostId(roomId.value).map(_.contains(modId))
       }
     )
 
-  private lazy val send: String => Unit = remoteSocketApi.makeSender("simul-out").apply _
+  private lazy val send: String => Unit = remoteSocketApi.makeSender("simul-out").apply
 
   remoteSocketApi.subscribe("simul-in", RP.In.reader)(
     handler orElse remoteSocketApi.baseHandler
-  ) >>- send(P.Out.boot)
+  ).andDo(send(P.Out.boot))
 }
 
 private object SimulSocket {

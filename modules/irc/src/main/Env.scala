@@ -36,12 +36,12 @@ final class Env(
 
   if (mode == Mode.Prod) {
     slack.publishInfo("PlayStrategy has started!")
-    Lilakka.shutdown(shutdown, _.PhaseBeforeServiceUnbind, "Tell slack")(slack.stop _)
+    Lilakka.shutdown(shutdown, _.PhaseBeforeServiceUnbind, "Tell slack")((() => slack.stop()))
   }
 
   lila.common.Bus.subscribeFun("slack", "plan", "userNote") {
-    case d: ChargeEvent                                => slack.charge(d).unit
-    case Note(from, to, text, true) if from != "Irwin" => slack.userModNote(from, to, text).unit
-    case e: Event                                      => slack.publishEvent(e).unit
+    case d: ChargeEvent                                => slack.charge(d).discard
+    case Note(from, to, text, true) if from != "Irwin" => slack.userModNote(from, to, text).discard
+    case e: Event                                      => slack.publishEvent(e).discard
   }
 }

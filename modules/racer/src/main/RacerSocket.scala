@@ -16,16 +16,16 @@ final private class RacerSocket(
   import RacerSocket._
 
   def publishState(race: RacerRace): Unit = send(
-    Protocol.Out.publishState(race.id, json state race)
+    Protocol.Out.publishState(race.id, json `state` race)
   )
 
-  private lazy val send: String => Unit = remoteSocketApi.makeSender("racer-out").apply _
+  private lazy val send: String => Unit = remoteSocketApi.makeSender("racer-out").apply
 
   lazy val rooms = makeRoomMap(send)
 
   private lazy val racerHandler: Handler = {
     case Protocol.In.PlayerJoin(raceId, playerId) =>
-      api.join(raceId, playerId).unit
+      val _ = api.join(raceId, playerId)
     case Protocol.In.PlayerScore(raceId, playerId, score) =>
       api.registerPlayerScore(raceId, playerId, score)
   }
@@ -34,7 +34,7 @@ final private class RacerSocket(
     racerHandler orElse minRoomHandler(rooms, logger) orElse remoteSocketApi.baseHandler
   )
 
-  api registerSocket this
+  api `registerSocket` this
 }
 
 object RacerSocket {

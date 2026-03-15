@@ -7,7 +7,6 @@ import lila.tournament.{ ShieldTableApi, Tournament, TournamentShield }
 import lila.swiss.Swiss
 import lila.i18n.VariantKeys
 
-import controllers.routes
 
 object shields {
 

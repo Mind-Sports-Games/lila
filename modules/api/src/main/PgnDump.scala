@@ -27,10 +27,10 @@ final class PgnDump(
       realPlayers: Option[RealPlayers] = None
   ): Fu[Pgn] =
     dumper(game, initialFen, flags, teams) flatMap { pgn =>
-      if (flags.tags) (game.simulId ?? simulApi.idToName) map { simulName =>
+      if (flags.tags) (game.simulId so simulApi.idToName) map { simulName =>
         simulName
           .orElse(game.tournamentId flatMap getTournamentName.get)
-          .orElse(game.swissId map lila.swiss.Swiss.Id flatMap getSwissName.apply)
+          .orElse(game.swissId map lila.swiss.Swiss.Id.apply flatMap getSwissName.apply)
           .fold(pgn)(pgn.withEvent)
       }
       else fuccess(pgn)
@@ -68,12 +68,11 @@ final class PgnDump(
         analysis: Option[Analysis],
         teams: Option[GameTeams],
         realPlayers: Option[RealPlayers]
-    ) => apply(game, initialFen, analysis, flags, teams, realPlayers) dmap toPgnString
+    ) => apply(game, initialFen, analysis, flags, teams, realPlayers) `dmap` toPgnString
 
-  def toPgnString(pgn: Pgn) = {
+  def toPgnString(pgn: Pgn) =
     // merge analysis & eval comments
     // 1. e4 { [%eval 0.17] } { [%clk 0:00:30] }
     // 1. e4 { [%eval 0.17] [%clk 0:00:30] }
     s"$pgn\n\n\n".replaceIf("] } { [", "] [")
-  }
 }

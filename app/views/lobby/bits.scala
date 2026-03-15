@@ -1,6 +1,5 @@
 package views.html.lobby
 
-import controllers.routes
 
 import lila.api.Context
 import lila.app.templating.Environment._
@@ -22,7 +21,7 @@ object bits {
   def underboards(
       tours: List[lila.tournament.Tournament],
       simuls: List[lila.simul.Simul],
-      leaderboard: List[lila.user.User.LightPerf],
+      @annotation.nowarn("msg=unused") leaderboard: List[lila.user.User.LightPerf],
       tournamentWinners: List[lila.tournament.Winner]
   )(implicit ctx: Context) =
     frag(
@@ -79,7 +78,7 @@ object bits {
             .enterable(truncateTournamentList(tours, maxUnderboardRows))
         )
       ),
-      simuls.nonEmpty option div(cls := "lobby__simuls lobby__box")(
+      simuls.nonEmpty `option` div(cls := "lobby__simuls lobby__box")(
         a(cls := "lobby__box__top", href := routes.Simul.home)(
           h2(cls := "title text", dataIcon := "f")(trans.simultaneousExhibitions()),
           span(cls := "more")(trans.more(), " »")
@@ -100,7 +99,7 @@ object bits {
   }
 
   def lastPosts(posts: List[lila.blog.MiniPost])(implicit ctx: Context): Option[Frag] =
-    posts.nonEmpty option
+    posts.nonEmpty `option`
       div(cls := "lobby__blog blog-post-cards")(
         posts map { post =>
           a(cls := "blog-post-card blog-post-card--link", href := routes.Blog.show(post.id, post.slug))(
@@ -114,7 +113,7 @@ object bits {
               ),
               span(cls := "blog-post-card__content")(
                 h2(cls := "blog-post-card__title")(post.title),
-                semanticDate(post.date)(ctx.lang)(cls := "blog-post-card__over-image")
+                semanticDate(post.date)(using ctx.lang)(cls := "blog-post-card__over-image")
               )
             )
           )

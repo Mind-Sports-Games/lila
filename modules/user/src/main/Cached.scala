@@ -7,6 +7,7 @@ import lila.common.LightUser
 import lila.memo.CacheApi._
 import lila.rating.{ Perf, PerfType }
 import lila.db.dsl._
+import lila.common.extensions.*
 import User.{ LightCount, LightPerf }
 
 final class Cached(
@@ -29,7 +30,7 @@ final class Cached(
       .buildAsyncFuture { _ =>
         rankingApi
           .fetchLeaderboard(10)
-          .withTimeout(2 minutes)
+          .withTimeout(2 minutes, "Cached timeout")
           .monSuccess(_.user.leaderboardCompute)
       }
   }
@@ -55,11 +56,10 @@ final class Cached(
     _.refreshAfterWrite(10 minutes)
       .buildAsyncFuture {
         loader { _ =>
-          PerfType.leaderboardable
+          Future.sequence(PerfType.leaderboardable
             .map { perf =>
               rankingApi.topPerf(perf.id, 1)
-            }
-            .sequenceFu
+            })
             .dmap(_.flatten)
         }
       }
@@ -99,7 +99,7 @@ final class Cached(
 
   def getTop50Online = top50OnlineCache.getUnit
 
-  def rankingsOf(userId: User.ID): Fu[Map[PerfType, Int]] = rankingApi.weeklyStableRanking of userId
+  def rankingsOf(userId: User.ID): Fu[Map[PerfType, Int]] = rankingApi.weeklyStableRanking `of` userId
 
   private[user] val botIds = cacheApi.unit[Set[User.ID]] {
     _.refreshAfterWrite(10 minutes)

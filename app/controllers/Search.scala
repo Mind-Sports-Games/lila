@@ -1,9 +1,8 @@
 package controllers
 
-import scala.concurrent.duration._
 import views._
 
-import lila.app._
+import lila.app.*
 import lila.common.{ HTTPRequest, IpAddress }
 
 final class Search(env: Env) extends LilaController(env) {
@@ -31,11 +30,11 @@ final class Search(env: Env) extends LilaController(env) {
           )
         else
           NotForBots {
-            val page = p atLeast 1
+            val page = p `atLeast` 1
             Reasonable(page, 100) {
-              val ip           = HTTPRequest ipAddress ctx.req
+              val ip           = HTTPRequest `ipAddress` ctx.req
               val cost         = scala.math.sqrt(page.toDouble).toInt
-              implicit def req = ctx.body
+              implicit def req: play.api.mvc.Request[?] = ctx.body
               def limited =
                 fuccess {
                   val form = searchForm
@@ -54,10 +53,10 @@ final class Search(env: Env) extends LilaController(env) {
                       .fold(
                         failure => Ok(html.search.index(failure, none, nbGames)).fuccess,
                         data =>
-                          data.nonEmptyQuery ?? { query =>
+                          data.nonEmptyQuery so { query =>
                             env.gameSearch.paginator(query, page) map some
                           } map { pager =>
-                            Ok(html.search.index(searchForm fill data, pager, nbGames))
+                            Ok(html.search.index(searchForm `fill` data, pager, nbGames))
                           } recover { _ =>
                             InternalServerError("Sorry, we can't process that query at the moment")
                           }
@@ -71,8 +70,8 @@ final class Search(env: Env) extends LilaController(env) {
                               jsonError("Could not process search query")
                             }.fuccess,
                           data =>
-                            data.nonEmptyQuery ?? { query =>
-                              env.gameSearch.paginator(query, page) dmap some
+                            data.nonEmptyQuery so { query =>
+                              env.gameSearch.paginator(query, page) `dmap` some
                             } flatMap {
                               case Some(s) =>
                                 env.api.userGameApi.jsPaginator(s) dmap {

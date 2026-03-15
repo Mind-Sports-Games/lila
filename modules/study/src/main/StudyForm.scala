@@ -21,7 +21,7 @@ object StudyForm {
         "pgn"         -> optional(nonEmptyText),
         "variant"     -> optional(nonEmptyText),
         "as"          -> optional(nonEmptyText)
-      )(Data.apply)(Data.unapply)
+      )(Data.apply)(d => Some((d.gameId, d.orientationStr, d.fen, d.pgnStr, d.variantStr, d.asStr)))
         .verifying(s"Fen does not match variant given", _.validFen)
     )
 
@@ -82,7 +82,7 @@ object StudyForm {
         "initial"     -> boolean,
         "sticky"      -> boolean,
         "pgn"         -> nonEmptyText
-      )(Data.apply)(Data.unapply)
+      )(Data.apply)(d => Some((d.name, d.orientationStr, d.variantStr, d.mode, d.initial, d.sticky, d.pgn)))
     )
 
     case class Data(
@@ -100,7 +100,7 @@ object StudyForm {
         pgns.zipWithIndex map { case (onePgn, index) =>
           ChapterMaker.Data(
             // only the first chapter can be named
-            name = Chapter.Name((index == 0) ?? name),
+            name = Chapter.Name((index == 0) so name),
             variant = variantStr,
             pgn = onePgn.some,
             orientation =
@@ -117,5 +117,5 @@ object StudyForm {
   def topicsForm = Form(single("topics" -> text))
 
   def topicsForm(topics: StudyTopics) =
-    Form(single("topics" -> text)) fill topics.value.map(_.value).mkString(", ")
+    Form(single("topics" -> text)) `fill` topics.value.map(_.value).mkString(", ")
 }

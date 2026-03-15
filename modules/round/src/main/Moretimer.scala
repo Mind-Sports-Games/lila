@@ -14,7 +14,7 @@ final private class Moretimer(
   // pov of the player giving more time
   def apply(pov: Pov, duration: FiniteDuration): Fu[Option[Progress]] =
     IfAllowed(pov.game) {
-      (pov.game moretimeable !pov.playerIndex) ?? {
+      (pov.game `moretimeable` !pov.playerIndex) so {
         if (pov.game.hasClock) give(pov.game, List(!pov.playerIndex), duration).some
         else
           pov.game.hasCorrespondenceClock option {
@@ -38,13 +38,13 @@ final private class Moretimer(
       playerIndexs.foreach { c =>
         messenger.volatile(game, s"$c + ${duration.toSeconds} seconds")
       }
-      (game withClock newClock) ++ playerIndexs.map { Event.ClockInc(_, centis) }
+      (game `withClock` newClock) ++ playerIndexs.map { Event.ClockInc(_, centis) }
     }
 
   private def isAllowedByPrefs(game: Game): Fu[Boolean] =
-    game.userIds.map {
+    Future.sequence(game.userIds.map {
       prefApi.getPref(_, (p: Pref) => p.moretime)
-    }.sequenceFu dmap {
+    }) dmap {
       _.forall { p =>
         p == Pref.Takeback.ALWAYS || (p == Pref.Takeback.CASUAL && game.casual)
       }

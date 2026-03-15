@@ -3,7 +3,6 @@ package lila.clas
 import play.api.Mode
 import reactivemongo.api.bson.BSONNull
 import reactivemongo.api.ReadPreference
-import scala.concurrent.duration._
 import scala.concurrent.ExecutionContext
 
 import lila.db.dsl._
@@ -13,11 +12,11 @@ import reactivemongo.core.errors.DatabaseException
 
 final class ClasMatesCache(colls: ClasColls, cacheApi: CacheApi, studentCache: ClasStudentCache)(implicit
     ec: ExecutionContext,
-    mode: Mode
+    _mode: Mode
 ) {
 
   def get(studentId: User.ID): Fu[Set[User.ID]] =
-    studentCache.isStudent(studentId) ?? cache.get(studentId)
+    studentCache.isStudent(studentId) so cache.get(studentId)
 
   private val cache = cacheApi[User.ID, Set[User.ID]](256, "clas.mates") {
     _.expireAfterWrite(5 minutes)
@@ -26,9 +25,10 @@ final class ClasMatesCache(colls: ClasColls, cacheApi: CacheApi, studentCache: C
 
   private def fetchMatesAndTeachers(studentId: User.ID): Fu[Set[User.ID]] =
     colls.student
-      .aggregateOne(ReadPreference.secondaryPreferred) { framework =>
+      .aggregateWith[Bdoc](readPreference = ReadPreference.secondaryPreferred) { framework =>
         import framework._
-        Match($doc("userId" -> studentId)) -> List(
+        List(
+          Match($doc("userId" -> studentId)),
           Group(BSONNull)("classes" -> PushField("clasId")),
           Facet(
             List(
@@ -100,6 +100,8 @@ final class ClasMatesCache(colls: ClasColls, cacheApi: CacheApi, studentCache: C
           )
         )
       }
+      .collect[List](maxDocs = 1)
+      .dmap(_.headOption)
       .map { docO =>
         for {
           doc      <- docO
@@ -111,5 +113,5 @@ final class ClasMatesCache(colls: ClasColls, cacheApi: CacheApi, studentCache: C
       .recover {
         // can happen, probably in case of student cache bloom filter false positive
         case e: DatabaseException if e.getMessage.contains("resulting value was: MISSING") => Set.empty
-      }
+    }
 }

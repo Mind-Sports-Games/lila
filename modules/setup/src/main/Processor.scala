@@ -2,24 +2,23 @@ package lila.setup
 
 import lila.common.Bus
 import lila.common.config.Max
-import lila.game.Pov
 import lila.lobby.actorApi.{ AddHook, AddSeek }
-import lila.user.{ User, UserContext }
+import lila.user.UserContext
 
 final private[setup] class Processor(
     gameCache: lila.game.Cached,
-    gameRepo: lila.game.GameRepo,
+    @annotation.nowarn("msg=unused") _gameRepo: lila.game.GameRepo,
     maxPlaying: Max,
-    fishnetPlayer: lila.fishnet.FishnetPlayer,
-    onStart: lila.round.OnStart
-)(implicit ec: scala.concurrent.ExecutionContext) {
+    @annotation.nowarn("msg=unused") _fishnetPlayer: lila.fishnet.FishnetPlayer,
+    @annotation.nowarn("msg=unused") _onStart: lila.round.OnStart
+)(using @annotation.nowarn("msg=unused") _ec: scala.concurrent.ExecutionContext) {
 
   def hook(
       configBase: HookConfig,
       sri: lila.socket.Socket.Sri,
       sid: Option[String],
       blocking: Set[String]
-  )(implicit ctx: UserContext): Fu[Processor.HookResult] = {
+  )(using ctx: UserContext): Fu[Processor.HookResult] = {
     import Processor.HookResult._
     val config = configBase.fixPlayerIndex
     config.hook(sri, ctx.me, sid, blocking) match {
@@ -29,7 +28,7 @@ final private[setup] class Processor(
           Created(hook.id)
         }
       case Right(Some(seek)) =>
-        ctx.userId.??(gameCache.nbPlaying) dmap { nbPlaying =>
+        ctx.userId.so(gameCache.nbPlaying) dmap { nbPlaying =>
           if (maxPlaying <= nbPlaying) Refused
           else {
             Bus.publish(AddSeek(seek), "lobbyTrouper")
@@ -45,7 +44,7 @@ final private[setup] class Processor(
       sri: lila.socket.Socket.Sri,
       sid: Option[String],
       blocking: Set[String]
-  )(implicit ctx: UserContext): Fu[Processor.HookResult] = {
+  )(using ctx: UserContext): Fu[Processor.HookResult] = {
     import Processor.HookResult._
     val config = configBase.toHookConfig.fixPlayerIndex
     config.hook(sri, ctx.me, sid, blocking) match {
@@ -55,7 +54,7 @@ final private[setup] class Processor(
           Created(hook.id)
         }
       case Right(Some(seek)) =>
-        ctx.userId.??(gameCache.nbPlaying) dmap { nbPlaying =>
+        ctx.userId.so(gameCache.nbPlaying) dmap { nbPlaying =>
           if (maxPlaying <= nbPlaying) Refused
           else {
             Bus.publish(AddSeek(seek), "lobbyTrouper")

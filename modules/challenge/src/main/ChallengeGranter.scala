@@ -66,24 +66,24 @@ final class ChallengeGranter(
             case (_, _) if from.id == dest.id                      => Yourself.some
             case (_, Pref.Challenge.FRIEND)                        => FriendsOnly.some
             case (_, Pref.Challenge.RATING) =>
-              perfType ?? { pt =>
+              perfType so { pt =>
                 if (from.perfs(pt).provisional || dest.perfs(pt).provisional)
                   RatingIsProvisional(pt).some
                 else {
                   val diff = math.abs(from.perfs(pt).intRating - dest.perfs(pt).intRating)
-                  (diff > ratingThreshold) option RatingOutsideRange(pt)
+                  (diff > ratingThreshold) `option` RatingOutsideRange(pt)
                 }
               }
             case (_, Pref.Challenge.ALWAYS) => none
             case _                          => none
-          }
+        }
       }
       .map {
-        case None if dest.isBot && perfType.has(PerfType.orDefaultSpeed("ultraBullet")) => BotUltraBullet.some
+        case None if dest.isBot && perfType.contains(PerfType.orDefaultSpeed("ultraBullet")) => BotUltraBullet.some
         case res                                                                        => res
-      }
+    }
       .map {
         _.map { ChallengeDenied(dest, _) }
-      }
-
+    }
 }
+

@@ -46,8 +46,8 @@ object StormDay {
   case class Id(userId: User.ID, day: Day)
   object Id {
     def today(userId: User.ID)     = Id(userId, Day.today)
-    def lastWeek(userId: User.ID)  = Id(userId, Day daysAgo 7)
-    def lastMonth(userId: User.ID) = Id(userId, Day daysAgo 30)
+    def lastWeek(userId: User.ID)  = Id(userId, Day `daysAgo` 7)
+    def lastMonth(userId: User.ID) = Id(userId, Day `daysAgo` 30)
     def allTime(userId: User.ID)   = Id(userId, Day(0))
   }
 
@@ -62,17 +62,17 @@ final class StormDayApi(coll: Coll, highApi: StormHighApi, userRepo: UserRepo, s
   import StormBsonHandlers._
 
   def addRun(data: StormForm.RunData, user: Option[User]): Fu[Option[StormHigh.NewHigh]] = {
-    lila.mon.storm.run.score(user.isDefined).record(data.score).unit
-    user ?? { u =>
+    val _ = lila.mon.storm.run.score(user.isDefined).record(data.score)
+    user so { u =>
       if (sign.check(u, ~data.signed)) {
         Bus.publish(lila.hub.actorApi.puzzle.StormRun(u.id, data.score), "stormRun")
-        highApi get u.id flatMap { prevHigh =>
-          val todayId = Id today u.id
+        highApi `get` u.id flatMap { prevHigh =>
+          val todayId = Id `today` u.id
           coll
             .one[StormDay]($id(todayId))
             .map {
-              _.getOrElse(StormDay empty todayId) add data
-            }
+              _.getOrElse(StormDay `empty` todayId) `add` data
+          }
             .flatMap { day =>
               coll.update.one($id(day._id), day, upsert = true)
             }
@@ -81,7 +81,8 @@ final class StormDayApi(coll: Coll, highApi: StormHighApi, userRepo: UserRepo, s
               userRepo.addStormRun(u.id, data.score) inject high
             }
         }
-      } else {
+      }
+      else {
         if (data.time > 40) {
           if (data.score > 99) logger.warn(s"badly signed run from ${u.username} $data")
           lila.mon.storm.run
@@ -104,7 +105,7 @@ final class StormDayApi(coll: Coll, highApi: StormHighApi, userRepo: UserRepo, s
         collection = coll,
         selector = idRegexFor(userId),
         projection = none,
-        sort = $sort desc "_id"
+        sort = $sort `desc` "_id"
       ),
       page,
       MaxPerPage(30)
@@ -113,9 +114,9 @@ final class StormDayApi(coll: Coll, highApi: StormHighApi, userRepo: UserRepo, s
   def apiHistory(userId: User.ID, days: Int): Fu[List[StormDay]] =
     coll
       .find(idRegexFor(userId))
-      .sort($sort desc "_id")
+      .sort($sort `desc` "_id")
       .cursor[StormDay](ReadPreference.secondaryPreferred)
       .list(days)
 
-  private def idRegexFor(userId: User.ID) = $doc("_id" $startsWith s"${userId}:")
+  private def idRegexFor(userId: User.ID) = $doc("_id" `$startsWith` s"${userId}:")
 }

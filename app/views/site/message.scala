@@ -6,7 +6,6 @@ import lila.app.templating.Environment._
 import lila.app.ui.ScalatagsTemplate._
 import lila.user.User
 
-import controllers.routes
 import lila.common.HTTPRequest
 
 object message {
@@ -19,7 +18,7 @@ object message {
   )(message: Modifier*)(implicit ctx: Context) =
     views.html.base.layout(title = title, moreCss = ~moreCss) {
       main(cls := "box box-pad")(
-        h1(dataIcon := icon ifTrue back.isEmpty, cls := List("text" -> (icon.isDefined && back.isEmpty)))(
+        h1(dataIcon := icon `ifTrue` back.isEmpty, cls := List("text" -> (icon.isDefined && back.isEmpty)))(
           back map { url =>
             a(href := url, dataIcon := "I", cls := "text")
           },
@@ -45,7 +44,7 @@ object message {
     }
 
   def p2listedMessage(implicit ctx: Context) =
-    s"Sorry, your IP address ${HTTPRequest ipAddress ctx.req} has been used to violate the ToS, and is now p2listed."
+    s"Sorry, your IP address ${HTTPRequest `ipAddress` ctx.req} has been used to violate the ToS, and is now p2listed."
 
   def privateStudy(study: lila.study.Study)(implicit ctx: Context) =
     apply(
@@ -53,7 +52,7 @@ object message {
       back = routes.Study.allDefault(1).url.some
     )(
       "Sorry! This study is private, you cannot access it.",
-      isGranted(_.StudyAdmin) option postForm(action := routes.Study.admin(study.id.value))(
+      isGranted(_.StudyAdmin) `option` postForm(action := routes.Study.admin(study.id.value))(
         submitButton("View as admin")(cls := "button button-red")
       )
     )

@@ -33,7 +33,7 @@ object watcher {
         c.chat,
         name = trans.spectatorRoom.txt(),
         timeout = c.timeout,
-        withNoteAge = ctx.isAuth option pov.game.secondsSinceCreation,
+        withNoteAge = ctx.isAuth `option` pov.game.secondsSinceCreation,
         public = true,
         resourceId = lila.chat.Chat.ResourceId(s"game/${c.chat.id}"),
         palantir = ctx.me.exists(_.canPalantir)
@@ -64,7 +64,7 @@ object watcher {
         ),
         bits.roundAppPreload(pov, controls = false),
         div(cls := "round__underboard")(bits.crosstable(cross, pov.game)),
-        div(cls := "round__underchat")(bits underchat pov.game)
+        div(cls := "round__underchat")(bits `underchat` pov.game)
       )
     )
   }

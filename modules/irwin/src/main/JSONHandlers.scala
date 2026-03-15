@@ -14,7 +14,7 @@ object JSONHandlers {
       (__ \ "m").read[Int] and         // ambiguity
       (__ \ "o").read[Int] and         // odds
       (__ \ "l").read[Int]             // loss
-  )(MoveReport.apply _)
+  )(MoveReport.apply)
 
   implicit private val gameReportReader: Reads[GameReport] = Json.reads[GameReport]
 
@@ -24,5 +24,5 @@ object JSONHandlers {
       (__ \ "games").read[List[GameReport]] and
       (__ \ "owner").read[String] and
       Reads(_ => JsSuccess(DateTime.now))
-  )(IrwinReport.apply _)
+  )(IrwinReport.apply)
 }

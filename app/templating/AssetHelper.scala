@@ -10,14 +10,13 @@ import lila.web.AssetManifest
 
 import strategygames.GameLogic
 
-trait AssetHelper { self: I18nHelper with SecurityHelper =>
+trait AssetHelper { self: I18nHelper & SecurityHelper =>
 
   private lazy val netDomain      = env.net.domain
   private lazy val assetDomain    = env.net.assetDomain
   private lazy val assetBaseUrl   = env.net.assetBaseUrl
   private lazy val baseUrl        = env.net.baseUrl
   private lazy val socketDomains  = env.net.socketDomains
-  private lazy val minifiedAssets = env.net.minifiedAssets
   lazy val vapidPublicKey         = env.push.vapidPublicKey
 
   lazy val sameAssetDomain = netDomain.value == assetDomain.value
@@ -48,6 +47,7 @@ trait AssetHelper { self: I18nHelper with SecurityHelper =>
     else s"${manifest.css(s"$name").getOrElse(s"$name")}"
 
   private def jsNameFromManifest(key: String): String = manifest.js(key).fold(key)(_.name)
+  @annotation.nowarn("msg=unused")
   private def jsAtESM(key: String, path: String = "compiled/"): Frag = {
     script(
       deferAttr,
@@ -55,6 +55,7 @@ trait AssetHelper { self: I18nHelper with SecurityHelper =>
       tpe := "module"
     )
   }
+  @annotation.nowarn("msg=unused")
   private def staticJsAtESM(key: String, path: String = "compiled/"): Frag = {
     script(
       deferAttr,
@@ -90,10 +91,10 @@ trait AssetHelper { self: I18nHelper with SecurityHelper =>
     case GameLogic.Draughts() => "PlayStrategyDraughtsRound"
     case _                    => "PlayStrategyRound"
   }
-  def roundNvuiTag(implicit ctx: Context) = ctx.blind option jsModule("round.nvui")
+  def roundNvuiTag(implicit ctx: Context) = ctx.blind `option` jsModule("round.nvui")
 
   def analyseTag                            = jsModule("analysisBoard")
-  def analyseNvuiTag(implicit ctx: Context) = ctx.blind option jsModule("analysisBoard.nvui")
+  def analyseNvuiTag(implicit ctx: Context) = ctx.blind `option` jsModule("analysisBoard.nvui")
 
   def captchaTag        = jsModule("captcha")
   def infiniteScrollTag = jsModule("infiniteScroll")
@@ -108,7 +109,7 @@ trait AssetHelper { self: I18nHelper with SecurityHelper =>
 
   def prismicJs(implicit ctx: Context): Frag =
     raw {
-      isGranted(_.Prismic) ?? { // @TODO: check why lichess prismic is used here
+      isGranted(_.Prismic) so { // @TODO: check why lichess prismic is used here
         embedJsUnsafe("""window.prismic={endpoint:'https://playstrategy.prismic.io/api/v2'}""").render ++
           """<script src="//static.cdn.prismic.io/prismic.min.js"></script>"""
       }
@@ -133,13 +134,13 @@ trait AssetHelper { self: I18nHelper with SecurityHelper =>
   }
 
   def defaultCsp(implicit ctx: Context): ContentSecurityPolicy = {
-    val csp = basicCsp(ctx.req)
+    val csp = basicCsp(using ctx.req)
     ctx.nonce.fold(csp)(csp.withNonce(_))
   }
 
   def embedJsUnsafe(js: String)(implicit ctx: Context): Frag =
     raw {
-      val nonce = ctx.nonce ?? { nonce =>
+      val nonce = ctx.nonce so { nonce =>
         s""" nonce="$nonce""""
       }
       s"""<script$nonce>$js</script>"""

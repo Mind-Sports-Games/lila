@@ -13,5 +13,5 @@ final class Env(settingStore: lila.memo.SettingStore.Builder) {
     text = "Rating gain factor per perf type".some
   )
 
-  val getFactors = ratingFactorsSetting.get _
+  val getFactors = (() => ratingFactorsSetting.get())
 }

@@ -31,7 +31,7 @@ object BSONHandlers {
   implicit val syncLogEventHandler: BSONDocumentHandler[Event] = Macros.handler[Event]
 
   implicit val syncLogHandler: BSONHandler[SyncLog] =
-    isoHandler[SyncLog, Vector[Event]]((s: SyncLog) => s.events, SyncLog.apply _)
+    isoHandler[SyncLog, Vector[Event]]((s: SyncLog) => s.events, SyncLog.apply)
 
   implicit val syncHandler: BSONDocumentHandler[Sync] = Macros.handler[Sync]
 

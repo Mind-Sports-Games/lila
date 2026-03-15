@@ -1,12 +1,5 @@
 package views.html.video
 
-import lila.common.String.html.richText
-
-import lila.api.Context
-import lila.app.templating.Environment._
-import lila.app.ui.ScalatagsTemplate._
-
-import controllers.routes
 
 object show {
   /*

@@ -9,7 +9,6 @@ import lila.app.ui.ScalatagsTemplate._
 import lila.common.String.html.safeJsonValue
 import lila.rating.PerfType
 
-import controllers.routes
 
 object ratingDistribution {
 

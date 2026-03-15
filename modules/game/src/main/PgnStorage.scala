@@ -1,6 +1,5 @@
 package lila.game
 
-import strategygames.chess
 import strategygames.chess.format
 import strategygames.chess.{ Castles, Piece, PieceMap, Pos, PositionHash, Role, UnmovedRooks }
 import strategygames.{ ActionStrs, Player => PlayerIndex, VActionStrs }
@@ -46,7 +45,7 @@ private object PgnStorage {
       }
     def decode(bytes: ByteArray, plies: Int): Decoded =
       monitor(_.game.pgn.decode("huffman")) {
-        val decoded      = Encoder.decode(bytes.value, plies)
+        val decoded = Encoder.decode(bytes.value, plies)
         val unmovedRooks = decoded.unmovedRooks.asScala.view.flatMap(chessPos).to(Set)
         Decoded(
           actionStrs = decoded.pgnMoves.toVector.map(Vector(_)),

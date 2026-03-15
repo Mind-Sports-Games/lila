@@ -8,11 +8,10 @@ import lila.app.templating.Environment._
 import lila.app.ui.ScalatagsTemplate._
 import lila.common.paginator.Paginator
 
-import controllers.routes
 
 object topic {
 
-  def form(categ: lila.forum.Categ, form: Form[_], captcha: lila.common.Captcha)(implicit ctx: Context) =
+  def form(categ: lila.forum.Categ, form: Form[?], captcha: lila.common.Captcha)(implicit ctx: Context) =
     views.html.base.layout(
       title = "New forum topic",
       moreCss = cssTag("forum"),
@@ -56,7 +55,7 @@ object topic {
           views.html.base.captcha(form("post"), captcha),
           form3.actions(
             a(href := routes.ForumCateg.show(categ.slug))(trans.cancel()),
-            isGranted(_.PublicMod) option
+            isGranted(_.PublicMod) `option`
               form3.submit(
                 frag("Create as a mod"),
                 nameValue = (form("post")("modIcon").name, "true").some,
@@ -80,7 +79,7 @@ object topic {
       title = s"${topic.name} • page ${posts.currentPage}/${posts.nbPages} • ${categ.name}",
       moreJs = frag(
         jsModule("forum"),
-        formWithCaptcha.isDefined option captchaTag,
+        formWithCaptcha.isDefined `option` captchaTag,
         jsModule("expandText")
       ),
       moreCss = cssTag("forum"),
@@ -88,7 +87,7 @@ object topic {
         .OpenGraph(
           title = topic.name,
           url = s"$netBaseUrl${routes.ForumTopic.show(categ.slug, topic.slug, posts.currentPage).url}",
-          description = shorten(posts.currentPageResults.headOption.??(_.text), 152)
+          description = shorten(posts.currentPageResults.headOption.so(_.text), 152)
         )
         .some
     ) {
@@ -134,7 +133,7 @@ object topic {
               )
             } orElse {
               if (ctx.me.exists(_.isBot)) p("Bots cannot post in the forum.").some
-              else ctx.isAuth option p(trans.youCannotPostYetPlaySomeGames())
+              else ctx.isAuth `option` p(trans.youCannotPostYetPlaySomeGames())
             },
           div(
             unsub.map { uns =>
@@ -150,19 +149,19 @@ object topic {
                 )
               )
             },
-            isGranted(_.ModerateForum) option
+            isGranted(_.ModerateForum) `option`
               postForm(action := routes.ForumTopic.hide(categ.slug, topic.slug))(
                 button(cls := "button button-empty button-green")(
                   if (topic.hidden) "Feature" else "Un-feature"
                 )
               ),
-            canModCateg option
+            canModCateg `option`
               postForm(action := routes.ForumTopic.close(categ.slug, topic.slug))(
                 button(cls := "button button-empty button-red")(
                   if (topic.closed) "Reopen" else "Close"
                 )
               ),
-            canModCateg option
+            canModCateg `option`
               postForm(action := routes.ForumTopic.sticky(categ.slug, topic.slug))(
                 button(cls := "button button-empty button-brag")(
                   if (topic.isSticky) "Unsticky" else "Sticky"
@@ -188,7 +187,7 @@ object topic {
             views.html.base.captcha(form, captcha),
             form3.actions(
               a(href := routes.ForumCateg.show(categ.slug))(trans.cancel()),
-              isGranted(_.PublicMod) option
+              isGranted(_.PublicMod) `option`
                 form3.submit(
                   frag("Reply as a mod"),
                   nameValue = (form("modIcon").name, "true").some,

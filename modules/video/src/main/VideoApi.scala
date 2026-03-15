@@ -61,7 +61,7 @@ final private[video] class VideoApi(
           projection = textScore.some,
           sort = textScore,
           readPreference = ReadPreference.secondaryPreferred
-        ) mapFutureList videoViews(user),
+        ) `mapFutureList` videoViews(user),
         currentPage = page,
         maxPerPage = maxPerPage
       )
@@ -77,7 +77,7 @@ final private[video] class VideoApi(
         .void
 
     def removeNotIn(ids: List[Video.ID]) =
-      videoColl.delete.one($doc("_id" $nin ids)).void
+      videoColl.delete.one($doc("_id" `$nin` ids)).void
 
     def setMetadata(id: Video.ID, metadata: Youtube.Metadata) =
       videoColl.update
@@ -99,7 +99,7 @@ final private[video] class VideoApi(
           projection = none,
           sort = $doc("metadata.likes" -> -1),
           readPreference = ReadPreference.secondaryPreferred
-        ) mapFutureList videoViews(user),
+        ) `mapFutureList` videoViews(user),
         currentPage = page,
         maxPerPage = maxPerPage
       )
@@ -110,11 +110,11 @@ final private[video] class VideoApi(
         Paginator(
           adapter = new Adapter[Video](
             collection = videoColl,
-            selector = $doc("tags" $all tags),
+            selector = $doc("tags" `$all` tags),
             projection = none,
             sort = $doc("metadata.likes" -> -1),
             readPreference = ReadPreference.secondaryPreferred
-          ) mapFutureList videoViews(user),
+          ) `mapFutureList` videoViews(user),
           currentPage = page,
           maxPerPage = maxPerPage
         )
@@ -127,24 +127,22 @@ final private[video] class VideoApi(
           projection = none,
           sort = $doc("metadata.likes" -> -1),
           readPreference = ReadPreference.secondaryPreferred
-        ) mapFutureList videoViews(user),
+        ) `mapFutureList` videoViews(user),
         currentPage = page,
         maxPerPage = maxPerPage
       )
 
     def similar(user: Option[User], video: Video, max: Int): Fu[Seq[VideoView]] =
       videoColl
-        .aggregateList(
-          maxDocs = max,
-          ReadPreference.secondaryPreferred
-        ) { framework =>
+        .aggregateWith[Bdoc](readPreference = ReadPreference.secondaryPreferred) { framework =>
           import framework._
-          Match(
-            $doc(
-              "tags" $in video.tags,
-              "_id" $ne video.id
-            )
-          ) -> List(
+          List(
+            Match(
+              $doc(
+                "tags" `$in` video.tags,
+                "_id" `$ne` video.id
+              )
+            ),
             AddFields(
               $doc(
                 "int" -> $doc(
@@ -161,6 +159,7 @@ final private[video] class VideoApi(
             Limit(max)
           )
         }
+        .collect[List](maxDocs = max)
         .map(_.flatMap(_.asOpt[Video])) flatMap videoViews(user)
 
     object count {
@@ -223,17 +222,16 @@ final private[video] class VideoApi(
             }
             else
               videoColl
-                .aggregateList(
-                  maxDocs = Int.MaxValue,
-                  ReadPreference.secondaryPreferred
-                ) { framework =>
+                .aggregateWith[Bdoc](readPreference = ReadPreference.secondaryPreferred) { framework =>
                   import framework._
-                  Match($doc("tags" $all filterTags)) -> List(
+                  List(
+                    Match($doc("tags" `$all` filterTags)),
                     Project($doc("tags" -> true)),
                     UnwindField("tags"),
                     GroupField("tags")("nb" -> SumAll)
                   )
                 }
+                .collect[List](maxDocs = Int.MaxValue)
                 .dmap { _.flatMap(_.asOpt[TagNb]) }
 
           allPopular zip allPaths map { case (all, paths) =>
@@ -258,20 +256,19 @@ final private[video] class VideoApi(
       _.refreshAfterWrite(1.day)
         .buildAsyncFuture { _ =>
           videoColl
-            .aggregateList(
-              maxDocs = Int.MaxValue,
-              readPreference = ReadPreference.secondaryPreferred
-            ) { framework =>
+            .aggregateWith[Bdoc](readPreference = ReadPreference.secondaryPreferred) { framework =>
               import framework._
-              Project($doc("tags" -> true)) -> List(
+              List(
+                Project($doc("tags" -> true)),
                 UnwindField("tags"),
                 GroupField("tags")("nb" -> SumAll),
                 Sort(Descending("nb"))
               )
             }
+            .collect[List](maxDocs = Int.MaxValue)
             .dmap {
               _.flatMap(_.asOpt[TagNb])
-            }
+          }
         }
     }
   }

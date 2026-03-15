@@ -5,6 +5,7 @@ import reactivemongo.api._
 import reactivemongo.api.bson._
 
 import BSONHandlers._
+import lila.common.extensions.*
 import lila.db.dsl._
 import lila.hub.LightTeam.TeamID
 import lila.rating.PerfType
@@ -14,16 +15,16 @@ final class PlayerRepo(coll: Coll)(implicit ec: scala.concurrent.ExecutionContex
 
   private def selectId(id: Tournament.ID)           = $doc("_id" -> id)
   private def selectTour(tourId: Tournament.ID)     = $doc("tid" -> tourId)
-  private def selectTourNoDQ(tourId: Tournament.ID) = $doc("tid" -> tourId, "dq" $ne true)
+  private def selectTourNoDQ(tourId: Tournament.ID) = $doc("tid" -> tourId, "dq" `$ne` true)
   private def selectTourUser(tourId: Tournament.ID, userId: User.ID) =
     $doc(
       "tid" -> tourId,
       "uid" -> userId
     )
-  private val selectActive      = $doc("w" $ne true)
+  private val selectActive      = $doc("w" `$ne` true)
   private val selectWithdraw    = $doc("w" -> true)
   private val selectInputRating = $doc("ir" -> true)
-  private val selectNonBot      = $doc("b" $ne true)
+  private val selectNonBot      = $doc("b" `$ne` true)
   //_id is added as a secondary sort to ensure the same order is returned for the paginator
   private val bestSort = $doc("m" -> -1, "_id" -> 1)
 
@@ -69,9 +70,10 @@ final class PlayerRepo(coll: Coll)(implicit ec: scala.concurrent.ExecutionContex
   ): Fu[List[TeamBattle.RankedTeam]] = {
     import TeamBattle.{ RankedTeam, TeamLeader }
     coll
-      .aggregateList(maxDocs = TeamBattle.maxTeams) { framework =>
-        import framework._
-        Match(selectTourNoDQ(tourId)) -> List(
+      .aggregateWith[Bdoc]() { (framework) =>
+        import framework.*
+        List(
+          Match(selectTourNoDQ(tourId)),
           Sort(Descending("m")),
           GroupField("t")(
             "m" -> Push(
@@ -90,12 +92,13 @@ final class PlayerRepo(coll: Coll)(implicit ec: scala.concurrent.ExecutionContex
           )
         )
       }
+      .collect[List](maxDocs = TeamBattle.maxTeams)
       .map {
         _.flatMap { doc =>
           for {
             teamId      <- doc.getAsOpt[TeamID]("_id")
             leadersBson <- doc.getAsOpt[List[Bdoc]]("p")
-            leaders = leadersBson.flatMap { p: Bdoc =>
+            leaders = leadersBson.flatMap { (p: Bdoc) =>
               for {
                 id    <- p.getAsOpt[User.ID]("u")
                 magic <- p.int("m")
@@ -113,7 +116,7 @@ final class PlayerRepo(coll: Coll)(implicit ec: scala.concurrent.ExecutionContex
             case (missing, team) if !ranked.exists(_.teamId == team) =>
               new RankedTeam(missing.headOption.fold(ranked.size)(_.rank) + 1, team, Nil, 0) :: missing
             case (acc, _) => acc
-          }
+        }
           .reverse
     }
   }
@@ -122,10 +125,10 @@ final class PlayerRepo(coll: Coll)(implicit ec: scala.concurrent.ExecutionContex
   private[tournament] def teamInfo(
       tourId: Tournament.ID,
       teamId: TeamID
-  ): Fu[TeamBattle.TeamInfo] = {
+  ): Fu[TeamBattle.TeamInfo] =
     coll
-      .aggregateWith[Bdoc]() { framework =>
-        import framework._
+      .aggregateWith[Bdoc]() { (framework) =>
+        import framework.*
         List(
           Match(selectTourNoDQ(tourId) ++ $doc("t" -> teamId)),
           Sort(Descending("m")),
@@ -151,24 +154,23 @@ final class PlayerRepo(coll: Coll)(implicit ec: scala.concurrent.ExecutionContex
             aggs      <- doc.getAsOpt[List[Bdoc]]("agg")
             agg       <- aggs.headOption
             nbPlayers <- agg.int("nb")
-            rating = agg.double("rating").??(math.round)
-            perf   = agg.double("perf").??(math.round)
-            score  = agg.double("score").??(math.round)
+            rating = agg.double("rating").so(math.round)
+            perf   = agg.double("perf").so(math.round)
+            score  = agg.double("score").so(math.round)
             topPlayers <- doc.getAsOpt[List[Player]]("topPlayers")
           } yield TeamBattle.TeamInfo(teamId, nbPlayers, rating.toInt, perf.toInt, score.toInt, topPlayers)
         } | TeamBattle.TeamInfo(teamId, 0, 0, 0, 0, Nil)
-      }
-  }
+    }
 
   def bestTeamPlayers(tourId: Tournament.ID, teamId: TeamID, nb: Int): Fu[List[Player]] =
-    coll.find($doc("tid" -> tourId, "t" -> teamId)).sort($sort desc "m").cursor[Player]().list(nb)
+    coll.find($doc("tid" -> tourId, "t" -> teamId)).sort($sort `desc` "m").cursor[Player]().list(nb)
 
   def countTeamPlayers(tourId: Tournament.ID, teamId: TeamID): Fu[Int] =
     coll.countSel($doc("tid" -> tourId, "t" -> teamId))
 
   def teamsOfPlayers(tourId: Tournament.ID, userIds: Seq[User.ID]): Fu[List[(User.ID, TeamID)]] =
     coll
-      .find($doc("tid" -> tourId, "uid" $in userIds), $doc("_id" -> false, "uid" -> true, "t" -> true).some)
+      .find($doc("tid" -> tourId, "uid" `$in` userIds), $doc("_id" -> false, "uid" -> true, "t" -> true).some)
       .cursor[Bdoc]()
       .list()
       .map {
@@ -177,13 +179,13 @@ final class PlayerRepo(coll: Coll)(implicit ec: scala.concurrent.ExecutionContex
             doc.getAsOpt[TeamID]("t") map { (userId, _) }
           }
         }
-      }
+    }
 
   def teamVs(tourId: Tournament.ID, game: lila.game.Game): Fu[Option[TeamBattle.TeamVs]] =
-    game.twoUserIds ?? { case (w, b) =>
+    game.twoUserIds so { case (w, b) =>
       teamsOfPlayers(tourId, List(w, b)).dmap(_.toMap) map { m =>
         import cats.implicits._
-        (m.get(w), m.get(b)).mapN((_, _)) ?? { case (wt, bt) =>
+        (m.get(w), m.get(b)).mapN((_, _)) so { case (wt, bt) =>
           TeamBattle.TeamVs(strategygames.Player.Map(wt, bt)).some
         }
       }
@@ -221,7 +223,7 @@ final class PlayerRepo(coll: Coll)(implicit ec: scala.concurrent.ExecutionContex
     coll.find(selectTourUser(tourId, userId)).one[Player]
 
   def update(tourId: Tournament.ID, userId: User.ID)(f: Player => Fu[Player]) =
-    find(tourId, userId) orFail s"No such player: $tourId/$userId" flatMap f flatMap { player =>
+    find(tourId, userId) `orFail` s"No such player: $tourId/$userId" flatMap f flatMap { player =>
       coll.update.one(selectId(player._id), player).void
     }
 
@@ -243,7 +245,7 @@ final class PlayerRepo(coll: Coll)(implicit ec: scala.concurrent.ExecutionContex
 
   private[tournament] def withPoints(tourId: Tournament.ID): Fu[List[Player]] =
     coll.list[Player](
-      selectTour(tourId) ++ $doc("m" $gt 0)
+      selectTour(tourId) ++ $doc("m" `$gt` 0)
     )
 
   private[tournament] def nbActiveUserIds(tourId: Tournament.ID): Fu[Int] =
@@ -255,12 +257,12 @@ final class PlayerRepo(coll: Coll)(implicit ec: scala.concurrent.ExecutionContex
   // freaking expensive (marathons)
   private[tournament] def computeRanking(tourId: Tournament.ID): Fu[Ranking] =
     coll
-      .aggregateWith[Bdoc]() { framework =>
-        import framework._
+      .aggregateWith[Bdoc]() { (framework) =>
+        import framework.*
         List(Match(selectTour(tourId)), Sort(Descending("m")), Group(BSONNull)("uids" -> PushField("uid")))
       }
       .headOption map {
-      _ ?? {
+      _ so {
         _ get "uids" match {
           case Some(BSONArray(uids)) =>
             // mutable optimized implementation
@@ -277,13 +279,13 @@ final class PlayerRepo(coll: Coll)(implicit ec: scala.concurrent.ExecutionContex
     }
 
   def computeRankOf(player: Player): Fu[Int] =
-    coll.countSel(selectTour(player.tourId) ++ $doc("m" $gt player.magicScore))
+    coll.countSel(selectTour(player.tourId) ++ $doc("m" `$gt` player.magicScore))
 
   // expensive, cache it
   private[tournament] def averageRating(tourId: Tournament.ID): Fu[Int] =
     coll
-      .aggregateWith[Bdoc]() { framework =>
-        import framework._
+      .aggregateWith[Bdoc]() { (framework) =>
+        import framework.*
         List(Match(selectTour(tourId)), Group(BSONNull)("rating" -> AvgField("r")))
       }
       .headOption map {
@@ -292,7 +294,7 @@ final class PlayerRepo(coll: Coll)(implicit ec: scala.concurrent.ExecutionContex
 
   def byTourAndUserIds(tourId: Tournament.ID, userIds: Iterable[User.ID]): Fu[List[Player]] =
     coll
-      .list[Player](selectTour(tourId) ++ $doc("uid" $in userIds))
+      .list[Player](selectTour(tourId) ++ $doc("uid" `$in` userIds))
       .chronometer
       .logIfSlow(200, logger) { players =>
         s"PlayerRepo.byTourAndUserIds $tourId ${userIds.size} user IDs, ${players.size} players"
@@ -321,7 +323,7 @@ final class PlayerRepo(coll: Coll)(implicit ec: scala.concurrent.ExecutionContex
 
   def nonActivePlayers(tourId: Tournament.ID, userIds: Iterable[User.ID]): Fu[List[Player]] =
     coll
-      .list[Player](selectTour(tourId) ++ selectActive ++ selectNonBot ++ $doc("uid" $nin userIds))
+      .list[Player](selectTour(tourId) ++ selectActive ++ selectNonBot ++ $doc("uid" `$nin` userIds))
       .chronometer
       .logIfSlow(200, logger) { players =>
         s"PlayerRepo.nonActivePlayers $tourId ${userIds.size} user IDs, ${players.size} players"
@@ -359,13 +361,13 @@ final class PlayerRepo(coll: Coll)(implicit ec: scala.concurrent.ExecutionContex
       .result
 
   def searchPlayers(tourId: Tournament.ID, term: String, nb: Int): Fu[List[User.ID]] =
-    User.validateId(term) ?? { valid =>
+    User.validateId(term) so { valid =>
       coll.primitive[User.ID](
         selector = $doc(
           "tid" -> tourId,
-          "uid" $startsWith valid
+          "uid" `$startsWith` valid
         ),
-        sort = $sort desc "m",
+        sort = $sort `desc` "m",
         nb = nb,
         field = "uid"
       )
@@ -378,8 +380,8 @@ final class PlayerRepo(coll: Coll)(implicit ec: scala.concurrent.ExecutionContex
   ): AkkaStreamCursor[Player] =
     coll
       .find(selectTour(tournamentId))
-      .sort($sort desc "m")
+      .sort($sort `desc` "m")
       .batchSize(batchSize)
       .cursor[Player](readPreference)
-
 }
+

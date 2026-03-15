@@ -2,7 +2,6 @@ package views.html.streamer
 
 import play.api.i18n.Lang
 
-import controllers.routes
 import lila.api.Context
 import lila.app.templating.Environment._
 import lila.app.ui.ScalatagsTemplate._
@@ -59,13 +58,13 @@ object bits extends Context.ToLang {
           a(cls := active.active("show"), href := routes.Streamer.show(st.streamer.id.value))(
             st.streamer.name
           ),
-          (ctx.is(st.user) || isGranted(_.Streamers)) option
+          (ctx.is(st.user) || isGranted(_.Streamers)) `option`
             a(cls := active.active("edit"), href := s"${routes.Streamer.edit}?u=${st.streamer.id.value}")(
               editPage()
             )
         )
       } getOrElse a(href := routes.Streamer.edit)(yourPage()),
-      isGranted(_.Streamers) option a(
+      isGranted(_.Streamers) `option` a(
         cls := active.active("requests"),
         href := s"${routes.Streamer.index()}?requests=1"
       )("Approval requests"),
@@ -96,7 +95,7 @@ object bits extends Context.ToLang {
         cls := "stream highlight",
         title := s.status
       )(
-        strong(cls := "text", dataIcon := "")(l titleName s),
+        strong(cls := "text", dataIcon := "")(l `titleName` s),
         " ",
         s.cleanStatus
       )

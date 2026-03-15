@@ -22,8 +22,8 @@ final class TournamentForm {
   import TournamentForm._
 
   def create(user: User, leaderTeams: List[LeaderTeam], teamBattleId: Option[TeamID] = None) =
-    form(user, leaderTeams) fill TournamentSetup(
-      name = teamBattleId.isEmpty option user.titleUsername,
+    form(user, leaderTeams) `fill` TournamentSetup(
+      name = teamBattleId.isEmpty `option` user.titleUsername,
       clock = Clock.Config(180, 0),
       minutes = minuteDefault,
       waitMinutes = waitMinuteDefault.some,
@@ -74,7 +74,7 @@ final class TournamentForm {
     )
 
   def edit(user: User, leaderTeams: List[LeaderTeam], tour: Tournament) =
-    form(user, leaderTeams) fill TournamentSetup(
+    form(user, leaderTeams) `fill` TournamentSetup(
       name = tour.name.some,
       clock = tour.clock,
       minutes = if (tour.isMedley) tour.medleyDurationMinutes else tour.minutes,
@@ -177,12 +177,12 @@ final class TournamentForm {
           "medleyMinutes"    -> optional(numberIn(medleyMinutes)),
           "balanceIntervals" -> optional(boolean),
           "numIntervals"     -> optional(number(min = 2, max = maxMedleyIntervals))
-        )(MedleyIntervalOptions.apply)(MedleyIntervalOptions.unapply),
+        )(MedleyIntervalOptions.apply)(d => Some((d.medleyMinutes, d.balanceIntervals, d.numIntervals))),
         "medleyDefaults" -> mapping(
           "onePerGameFamily"    -> optional(boolean),
           "exoticChessVariants" -> optional(boolean),
           "draughts64Variants"  -> optional(boolean)
-        )(MedleyDefaults.apply)(MedleyDefaults.unapply),
+        )(MedleyDefaults.apply)(d => Some((d.onePerGameFamily, d.exoticChessVariants, d.draughts64Variants))),
         "medleyGameFamilies" -> mapping(
           "chess"              -> optional(boolean),
           "draughts"           -> optional(boolean),
@@ -196,15 +196,15 @@ final class TournamentForm {
           "go"                 -> optional(boolean),
           "backgammon"         -> optional(boolean),
           "abalone"            -> optional(boolean)
-        )(MedleyGameFamilies.apply)(MedleyGameFamilies.unapply),
+        )(MedleyGameFamilies.apply)(d => Some((d.chess, d.draughts, d.shogi, d.xiangqi, d.loa, d.flipello, d.mancala, d.amazons, d.breakthroughtroyka, d.go, d.backgammon, d.abalone))),
         "variantSettings" -> mapping(
           "handicaps" -> mapping(
             "handicapped"        -> optional(boolean),
             "inputPlayerRatings" -> optional(cleanNonEmptyText)
-          )(Handicaps.apply)(Handicaps.unapply)
-        )(VariantSettings.apply)(VariantSettings.unapply),
+          )(Handicaps.apply)(d => Some((d.handicapped, d.inputPlayerRatings)))
+        )(VariantSettings.apply)(d => Some(d.handicaps)),
         "position"         -> optional(lila.common.Form.fen.playableStrict),
-        "mode"             -> optional(number.verifying(Mode.all.map(_.id) contains _)), // deprecated, use rated
+        "mode"             -> optional(number.verifying(Mode.all.map(_.id).contains)), // deprecated, use rated
         "rated"            -> optional(boolean),
         "password"         -> optional(cleanNonEmptyText),
         "conditions"       -> Condition.DataForm.all(leaderTeams),
@@ -214,7 +214,7 @@ final class TournamentForm {
         "statusScoring"    -> optional(boolean),
         "description"      -> optional(cleanNonEmptyText),
         "hasChat"          -> optional(boolean)
-      )(TournamentSetup.apply)(TournamentSetup.unapply)
+      )(TournamentSetup.apply)(d => Some((d.name, d.clock, d.minutes, d.waitMinutes, d.startDate, d.variant, d.medley, d.medleyIntervalOptions, d.medleyDefaults, d.medleyGameFamilies, d.variantSettings, d.position, d.mode, d.rated, d.password, d.conditions, d.teamBattleByTeam, d.berserkable, d.streakable, d.statusScoring, d.description, d.hasChat)))
         .verifying("Invalid clock", _.validClock)
         .verifying("15s and 0+1 variant games cannot be rated", _.validRatedVariant)
         .verifying("Increase tournament duration, or decrease game clock", _.sufficientDuration)
@@ -278,7 +278,7 @@ object TournamentForm {
       mapping(
         "team"     -> optional(nonEmptyText),
         "password" -> optional(nonEmptyText)
-      )(TournamentJoin.apply)(TournamentJoin.unapply)
+      )(TournamentJoin.apply)(d => Some((d.team, d.password)))
     )
 
   case class TournamentJoin(team: Option[String], password: Option[String])
@@ -330,7 +330,7 @@ private[tournament] case class TournamentSetup(
     Variant.apply(gameLogic, v.split("_")(1).toInt)
   } getOrElse Variant.default(gameLogic)
 
-  def realPosition = position ifTrue realVariant.standardVariant
+  def realPosition = position `ifTrue` realVariant.standardVariant
 
   def validRatedVariant =
     realMode == Mode.Casual ||
@@ -339,7 +339,7 @@ private[tournament] case class TournamentSetup(
   def handicaps = variantSettings.handicaps
 
   def validHandicapSetup =
-    !handicaps.handicapped.has(true) || (gameLogic == GameLogic.Go() && !isMedley && realMode == Mode.Casual)
+    !handicaps.handicapped.contains(true) || (gameLogic == GameLogic.Go() && !isMedley && realMode == Mode.Casual)
 
   def sufficientDuration = estimateNumberOfGamesOneCanPlay >= 3
   def excessiveDuration  = estimateNumberOfGamesOneCanPlay <= 150
@@ -358,8 +358,8 @@ private[tournament] case class TournamentSetup(
         clock = if (old.isCreated) clock else old.clock,
         minutes = if (isMedley) medleyDuration else minutes,
         mode = realMode,
-        handicapped = handicaps.handicapped.has(true),
-        inputPlayerRatings = if (handicaps.handicapped.has(true)) handicaps.inputPlayerRatings else None,
+        handicapped = handicaps.handicapped.contains(true),
+        inputPlayerRatings = if (handicaps.handicapped.contains(true)) handicaps.inputPlayerRatings else None,
         variant = newVariant,
         medleyVariantsAndIntervals =
           if (
@@ -374,7 +374,7 @@ private[tournament] case class TournamentSetup(
         medleyMinutes = medleyIntervalOptions.medleyMinutes,
         startsAt = startDate | old.startsAt,
         password = password,
-        position = newVariant.standardVariant ?? {
+        position = newVariant.standardVariant so {
           if (old.isCreated || old.position.isDefined) realPosition
           else old.position
         },
@@ -398,13 +398,13 @@ private[tournament] case class TournamentSetup(
         minutes = minutes,
         mode = if (rated.isDefined) realMode else old.mode,
         handicapped = handicaps.handicapped | old.handicapped,
-        inputPlayerRatings = if (handicaps.handicapped.has(true)) {
+        inputPlayerRatings = if (handicaps.handicapped.contains(true)) {
           handicaps.inputPlayerRatings.fold(old.inputPlayerRatings)(_.some.filter(_.nonEmpty))
         } else None,
         variant = newVariant,
         startsAt = startDate | old.startsAt,
         password = password.fold(old.password)(_.some.filter(_.nonEmpty)),
-        position = newVariant.standardVariant ?? {
+        position = newVariant.standardVariant so {
           if (position.isDefined && (old.isCreated || old.position.isDefined)) realPosition
           else old.position
         },
@@ -469,7 +469,8 @@ private[tournament] case class TournamentSetup(
       onePerGameGroupVariantList ::: generateNoDefaultsMedleyVariants.filterNot(
         onePerGameGroupVariantList.contains(_)
       )
-    } else if (medleyDefaults.exoticChessVariants.getOrElse(false))
+    }
+    else if (medleyDefaults.exoticChessVariants.getOrElse(false))
       scala.util.Random.shuffle(Variant.all.filter(_.exoticChessVariant))
     else if (medleyDefaults.draughts64Variants.getOrElse(false))
       scala.util.Random.shuffle(Variant.all.filter(_.draughts64Variant))
@@ -489,9 +490,10 @@ private[tournament] case class TournamentSetup(
           medleyIntervalOptions.numIntervals.getOrElse(fullMedleyList.length)
         )
         .some
-    } else None
-
+    }
+    else None
 }
+
 
 case class VariantSettings(
     handicaps: Handicaps
@@ -544,5 +546,5 @@ case class MedleyGameFamilies(
     .filterNot(gg => if (!go.getOrElse(false)) gg == GameGroup.Go() else false)
     .filterNot(gg => if (!backgammon.getOrElse(false)) gg == GameGroup.Backgammon() else false)
     .filterNot(gg => if (!abalone.getOrElse(false)) gg == GameGroup.Abalone() else false)
-
 }
+

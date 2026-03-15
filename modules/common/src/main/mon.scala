@@ -1,6 +1,6 @@
 package lila
 
-import com.github.benmanes.caffeine.cache.{ Cache => CaffeineCache }
+import com.github.benmanes.caffeine.cache.Cache as CaffeineCache
 import kamon.metric.{ Counter, Timer }
 import kamon.tag.TagSet
 
@@ -11,7 +11,7 @@ object mon {
   private def tags(elems: (String, Any)*): Map[String, Any] = Map.from(elems)
 
   object http {
-    private val t = timer("http.time")
+    private val t                                                       = timer("http.time")
     def time(action: String, client: String, method: String, code: Int) =
       t.withTags(
         tags(
@@ -30,8 +30,8 @@ object mon {
           "code"   -> code.toLong
         )
       )
-    def path(p: String) = counter("http.path.count").withTag("path", p)
-    val userGamesCost   = counter("http.userGames.cost").withoutTags()
+    def path(p: String)                                        = counter("http.path.count").withTag("path", p)
+    val userGamesCost                                          = counter("http.userGames.cost").withoutTags()
     def csrfError(tpe: String, action: String, client: String) =
       counter("http.csrf.error").withTags(tags("type" -> tpe, "action" -> action, "client" -> client))
     val fingerPrint          = timer("http.fingerPrint.time").withoutTags()
@@ -44,12 +44,12 @@ object mon {
     def compute(name: String) = timer("syncache.compute").withTag("name", name)
     def wait(name: String)    = timer("syncache.wait").withTag("name", name)
   }
-  def caffeineStats(cache: CaffeineCache[_, _], name: String): Unit = {
+  def caffeineStats(cache: CaffeineCache[?, ?], name: String): Unit = {
     val stats = cache.stats
     gauge("caffeine.request").withTags(tags("name" -> name, "hit" -> true)).update(stats.hitCount.toDouble)
     gauge("caffeine.request").withTags(tags("name" -> name, "hit" -> false)).update(stats.missCount.toDouble)
     histogram("caffeine.hit.rate").withTag("name", name).record((stats.hitRate * 100000).toLong)
-    if (stats.totalLoadTime > 0) {
+    if stats.totalLoadTime > 0 then {
       gauge("caffeine.load.count")
         .withTags(tags("name" -> name, "success" -> "success"))
         .update(stats.loadSuccessCount.toDouble)
@@ -76,9 +76,9 @@ object mon {
     def compute(name: String) = timer("mongocache.compute").withTag("name", name)
   }
   object evalCache {
-    private val r = counter("evalCache.request")
+    private val r                         = counter("evalCache.request")
     def request(ply: Int, isHit: Boolean) =
-      r.withTags(tags("ply" -> (if (ply < 15) ply.toString else "15+"), "hit" -> isHit))
+      r.withTags(tags("ply" -> (if ply < 15 then ply.toString else "15+"), "hit" -> isHit))
     object upgrade {
       val count     = counter("evalCache.upgrade.count").withoutTags()
       val members   = gauge("evalCache.upgrade.members").withoutTags()
@@ -159,10 +159,10 @@ object mon {
       val other   = counter("round.error").withTag("from", "other")
     }
     object titivate {
-      val time                  = future("round.titivate.time")
-      val game                  = histogram("round.titivate.game").withoutTags()           // how many games were processed
-      val total                 = histogram("round.titivate.total").withoutTags()          // how many games should have been processed
-      val old                   = histogram("round.titivate.old").withoutTags()            // how many old games remain
+      val time  = future("round.titivate.time")
+      val game  = histogram("round.titivate.game").withoutTags()  // how many games were processed
+      val total = histogram("round.titivate.total").withoutTags() // how many games should have been processed
+      val old   = histogram("round.titivate.old").withoutTags()   // how many old games remain
       def broken(error: String) = counter("round.titivate.broken").withTag("error", error) // broken game
     }
     object alarm {
@@ -209,8 +209,8 @@ object mon {
   object user {
     val online = gauge("user.online").withoutTags()
     object register {
-      def count(api: Option[ApiVersion]) = counter("user.register.count").withTag("api", apiTag(api))
-      def mustConfirmEmail(v: String)    = counter("user.register.mustConfirmEmail").withTag("type", v)
+      def count(api: Option[ApiVersion])       = counter("user.register.count").withTag("api", apiTag(api))
+      def mustConfirmEmail(v: String)          = counter("user.register.mustConfirmEmail").withTag("type", v)
       def confirmEmailResult(success: Boolean) =
         counter("user.register.confirmEmail").withTag("success", successTag(success))
       val modConfirmEmail = counter("user.register.modConfirmEmail").withoutTags()
@@ -260,7 +260,7 @@ object mon {
     def zoneSegment(name: String) = future("mod.zone.segment", name)
   }
   object relay {
-    private def by(official: Boolean) = if (official) "official" else "user"
+    private def by(official: Boolean)                  = if official then "official" else "user"
     private def relay(official: Boolean, slug: String) =
       tags("by" -> by(official), "slug" -> slug)
     def ongoing(official: Boolean)                 = gauge("relay.ongoing").withTag("by", by(official))
@@ -410,10 +410,10 @@ object mon {
       val amount           = histogram("plan.amount").withTag("service", "paypalCheckout")
       val fetchAccessToken = future("plan.paypal.accessToken")
     }
-    val stripe  = histogram("plan.amount").withTag("service", "stripe")
-    val goal    = gauge("plan.goal").withoutTags()
-    val current = gauge("plan.current").withoutTags()
-    val percent = gauge("plan.percent").withoutTags()
+    val stripe                                = histogram("plan.amount").withTag("service", "stripe")
+    val goal                                  = gauge("plan.goal").withoutTags()
+    val current                               = gauge("plan.current").withoutTags()
+    val percent                               = gauge("plan.percent").withoutTags()
     def webhook(service: String, tpe: String) =
       counter("plan.webhook").withTags(tags("service" -> service, "tpe" -> tpe))
     object charge {
@@ -526,9 +526,9 @@ object mon {
     }
   }
   object racer {
-    private def tpe(lobby: Boolean) = if (lobby) "lobby" else "friend"
+    private def tpe(lobby: Boolean) = if lobby then "lobby" else "friend"
     def race(lobby: Boolean)        = counter("racer.lobby.race").withTag("tpe", tpe(lobby))
-    def players(lobby: Boolean) =
+    def players(lobby: Boolean)     =
       histogram("racer.lobby.players").withTag("tpe", tpe(lobby))
     def score(lobby: Boolean, auth: Boolean) = histogram("racer.player.score").withTags(
       tags(
@@ -596,14 +596,14 @@ object mon {
           .increment()
         ()
       }
-      val move        = send("move") _
-      val takeback    = send("takeback") _
-      val corresAlarm = send("corresAlarm") _
-      val finish      = send("finish") _
-      val message     = send("message") _
+      val move        = send("move")
+      val takeback    = send("takeback")
+      val corresAlarm = send("corresAlarm")
+      val finish      = send("finish")
+      val message     = send("message")
       object challenge {
-        val create = send("challengeCreate") _
-        val accept = send("challengeAccept") _
+        val create = send("challengeCreate")
+        val accept = send("challengeAccept")
       }
     }
     val googleTokenTime             = timer("push.send.googleToken").withoutTags()
@@ -612,16 +612,16 @@ object mon {
   object fishnet {
     object client {
       object result {
-        private val c = counter("fishnet.client.result")
+        private val c                                = counter("fishnet.client.result")
         private def apply(r: String)(client: String) =
           c.withTags(tags("client" -> client, "result" -> r))
-        val success     = apply("success") _
-        val failure     = apply("failure") _
-        val weak        = apply("weak") _
-        val timeout     = apply("timeout") _
-        val notFound    = apply("notFound") _
-        val notAcquired = apply("notAcquired") _
-        val abort       = apply("abort") _
+        val success     = apply("success")
+        val failure     = apply("failure")
+        val weak        = apply("weak")
+        val timeout     = apply("timeout")
+        val notFound    = apply("notFound")
+        val notAcquired = apply("notAcquired")
+        val abort       = apply("abort")
       }
       def status(enabled: Boolean) = gauge("fishnet.client.status").withTag("enabled", enabled)
       def version(v: String)       = gauge("fishnet.client.version").withTag("version", v)
@@ -688,7 +688,8 @@ object mon {
     def ask(name: String) = future("bus.ask", name)
   }
   object blocking {
-    def time(name: String) = timer("blocking.time").withTag("name", name)
+    def time(name: String)    = timer("blocking.time").withTag("name", name)
+    def timeout(name: String) = counter("blocking.timeout").withTag("name", name)
   }
   object workQueue {
     def offerFail(name: String, result: String) =
@@ -701,7 +702,7 @@ object mon {
     def timeout(name: String) = counter("workQueue.timeout").withTag("name", name)
   }
 
-  def chronoSync[A] = lila.common.Chronometer.syncMon[A] _
+  def chronoSync[A] = lila.common.Chronometer.syncMon[A]
 
   type TimerPath   = lila.mon.type => Timer
   type CounterPath = lila.mon.type => Counter
@@ -718,7 +719,7 @@ object mon {
         tags("success" -> successTag(success), "segment" -> segment)
       )
 
-  private def successTag(success: Boolean) = if (success) "success" else "failure"
+  private def successTag(success: Boolean) = if success then "success" else "failure"
 
   private def apiTag(api: Option[ApiVersion]) = api.fold("-")(_.toString)
 

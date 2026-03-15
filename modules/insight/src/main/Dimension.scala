@@ -197,7 +197,7 @@ object Dimension {
         raw("Centipawns lost by each move, according to Stockfish evaluation.")
       )
 
-  def requiresStableRating(d: Dimension[_]) =
+  def requiresStableRating(d: Dimension[?]) =
     d match {
       case OpponentStrength => true
       case _                => false
@@ -245,12 +245,11 @@ object Dimension {
       case TimeVariance            => key.toFloatOption map lila.insight.TimeVariance.byId
     }
 
-  def valueToJson[X](d: Dimension[X])(v: X)(implicit lang: Lang): play.api.libs.json.JsObject = {
+  def valueToJson[X](d: Dimension[X])(v: X)(implicit lang: Lang): play.api.libs.json.JsObject =
     play.api.libs.json.Json.obj(
       "key"  -> valueKey(d)(v),
       "name" -> valueJson(d)(v)
     )
-  }
 
   def valueKey[X](d: Dimension[X])(v: X): String =
     (d match {
@@ -275,7 +274,7 @@ object Dimension {
 
   def valueJson[X](d: Dimension[X])(v: X)(implicit lang: Lang): JsValue =
     d match {
-      case Date                    => JsNumber(v.min.getSeconds)
+      case Date                    => JsNumber(v.min.getMillis / 1000)
       case Period                  => JsString(v.toString)
       case Perf                    => JsString(v.trans)
       case Phase                   => JsString(v.name)
@@ -303,13 +302,13 @@ object Dimension {
           case many =>
             $doc(
               "$or" -> many.map(lila.insight.MovetimeRange.toRange).map { range =>
-                $doc(d.dbKey $gte range._1 $lt range._2)
+                $doc(d.dbKey `$gte` range._1 `$lt` range._2)
               }
             )
         }
       case Dimension.Period =>
         selected.maximumByOption(_.days).fold($empty) { period =>
-          $doc(d.dbKey $gt period.min)
+          $doc(d.dbKey `$gt` period.min)
         }
       case Dimension.MaterialRange =>
         selected match {
@@ -320,9 +319,9 @@ object Dimension {
                 val intRange = lila.insight.MaterialRange.toRange(range)
                 if (intRange._1 == intRange._2) $doc(d.dbKey -> intRange._1)
                 else if (range.negative)
-                  $doc(d.dbKey $gte intRange._1 $lt intRange._2)
+                  $doc(d.dbKey `$gte` intRange._1 `$lt` intRange._2)
                 else
-                  $doc(d.dbKey $gt intRange._1 $lte intRange._2)
+                  $doc(d.dbKey `$gt` intRange._1 `$lte` intRange._2)
               }
             )
         }
@@ -332,7 +331,7 @@ object Dimension {
           case many =>
             $doc(
               "$or" -> many.map(lila.insight.TimeVariance.toRange).map { range =>
-                $doc(d.dbKey $gt range._1 $lte range._2)
+                $doc(d.dbKey `$gt` range._1 `$lte` range._2)
               }
             )
         }
@@ -340,7 +339,7 @@ object Dimension {
         selected flatMap d.bson.writeOpt match {
           case Nil     => $empty
           case List(x) => $doc(d.dbKey -> x)
-          case xs      => d.dbKey $in xs
+          case xs      => d.dbKey `$in` xs
         }
     }
   }

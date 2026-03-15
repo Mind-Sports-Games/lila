@@ -2,10 +2,9 @@ package controllers
 
 import play.api.libs.json._
 import play.api.mvc._
-import scala.concurrent.duration._
 
 import lila.api.Context
-import lila.app._
+import lila.app.*
 import lila.common.{ EmailAddress, HTTPRequest }
 import lila.plan.StripeClient.StripeException
 import lila.plan.{
@@ -26,7 +25,7 @@ import lila.plan.{
 import lila.user.{ User => UserModel }
 import views._
 
-final class Plan(env: Env)(implicit system: akka.actor.ActorSystem) extends LilaController(env) {
+final class Plan(env: Env)(implicit @annotation.nowarn("msg=unused") system: akka.actor.ActorSystem) extends LilaController(env) {
 
   private val logger = lila.log("plan")
 
@@ -38,7 +37,7 @@ final class Plan(env: Env)(implicit system: akka.actor.ActorSystem) extends Lila
         env.plan.api.sync(me) flatMap {
           case ReloadUser => Redirect(routes.Plan.index).fuccess
           case Synced(Some(patron), None, None) =>
-            env.user.repo email me.id flatMap { email =>
+            env.user.repo `email` me.id flatMap { email =>
               renderIndex(email, patron.some)
             }
           case Synced(Some(patron), Some(stripeCus), _) => indexStripePatron(me, patron, stripeCus)
@@ -63,7 +62,7 @@ final class Plan(env: Env)(implicit system: akka.actor.ActorSystem) extends Lila
   private def indexAnon(implicit ctx: Context) = renderIndex(email = none, patron = none)
 
   private def indexFreeUser(me: UserModel)(implicit ctx: Context) =
-    env.user.repo email me.id flatMap { email =>
+    env.user.repo `email` me.id flatMap { email =>
       renderIndex(email, patron = none)
     }
 
@@ -94,7 +93,7 @@ final class Plan(env: Env)(implicit system: akka.actor.ActorSystem) extends Lila
       case Some(info: OneTimeCustomerInfo) =>
         renderIndex(info.customer.email map EmailAddress.apply, patron.some)
       case None =>
-        env.user.repo email me.id flatMap { email =>
+        env.user.repo `email` me.id flatMap { email =>
           renderIndex(email, patron.some)
         }
     }
@@ -130,9 +129,9 @@ final class Plan(env: Env)(implicit system: akka.actor.ActorSystem) extends Lila
   def thanks =
     Open { implicit ctx =>
       // wait for the payment data from stripe or paypal
-      lila.common.Future.delay(2.seconds) {
-        ctx.me ?? env.plan.api.userPatron flatMap { patron =>
-          patron ?? env.plan.api.stripe.patronCustomer map { customer =>
+      lila.common.LilaFuture.delay(2.seconds) {
+        ctx.me so env.plan.api.userPatron flatMap { patron =>
+          patron so env.plan.api.stripe.patronCustomer map { customer =>
             Ok(html.plan.thanks(patron, customer))
           }
         }
@@ -198,7 +197,7 @@ final class Plan(env: Env)(implicit system: akka.actor.ActorSystem) extends Lila
   def stripeCheckout =
     AuthBody { implicit ctx => me =>
       implicit val req = ctx.body
-      CheckoutRateLimit(HTTPRequest ipAddress req) {
+      CheckoutRateLimit(HTTPRequest `ipAddress` req) {
         lila.plan.PlanCheckout.form
           .bindFromRequest()
           .fold(
@@ -224,9 +223,9 @@ final class Plan(env: Env)(implicit system: akka.actor.ActorSystem) extends Lila
   def updatePayment =
     AuthBody { implicit ctx => me =>
       implicit val req = ctx.body
-      CaptureRateLimit(HTTPRequest ipAddress req) {
+      CaptureRateLimit(HTTPRequest `ipAddress` req) {
         env.plan.api.stripe.userCustomer(me) flatMap {
-          _.flatMap(_.firstSubscription) ?? { sub =>
+          _.flatMap(_.firstSubscription) so { sub =>
             env.plan.api.stripe
               .createPaymentUpdateSession(
                 sub,
@@ -245,9 +244,9 @@ final class Plan(env: Env)(implicit system: akka.actor.ActorSystem) extends Lila
 
   def updatePaymentCallback =
     AuthBody { implicit ctx => me =>
-      get("session") ?? { session =>
+      get("session") so { session =>
         env.plan.api.stripe.userCustomer(me) flatMap {
-          _.flatMap(_.firstSubscription) ?? { sub =>
+          _.flatMap(_.firstSubscription) so { sub =>
             env.plan.api.stripe.updatePayment(sub, session) inject Redirect(routes.Plan.index)
           }
         }
@@ -281,7 +280,7 @@ final class Plan(env: Env)(implicit system: akka.actor.ActorSystem) extends Lila
   def payPalCapture(orderId: String) =
     Auth { implicit ctx => me =>
       CaptureRateLimit(ctx.ip) {
-        (get("sub") map PayPalSubscriptionId match {
+        (get("sub") map PayPalSubscriptionId.apply match {
           case None => env.plan.api.payPal.captureOrder(PayPalOrderId(orderId), ctx.ip)
           case Some(subId) =>
             env.plan.api.payPal.captureSubscription(PayPalOrderId(orderId), subId, me, ctx.ip)

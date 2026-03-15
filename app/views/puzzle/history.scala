@@ -1,7 +1,6 @@
 package views
 package html.puzzle
 
-import controllers.routes
 
 import lila.api.Context
 import lila.app.templating.Environment._
@@ -14,7 +13,7 @@ import strategygames.variant.Variant
 
 object history {
 
-  def apply(user: User, variant: Variant, page: Int, pager: Paginator[PuzzleSession])(implicit ctx: Context) =
+  @annotation.nowarn("msg=unused") def apply(user: User, variant: Variant, page: Int, pager: Paginator[PuzzleSession])(implicit ctx: Context) =
     views.html.base.layout(
       title = trans.puzzle.history.txt(),
       moreCss = cssTag("puzzle.dashboard"),
@@ -25,7 +24,7 @@ object history {
         div(cls := "page-menu__content box box-pad")(
           h1(trans.puzzle.history()),
           bits.variantSelector(variant, v => s"${routes.Puzzle.history(v.key)}"),
-          pager.nbResults == 0 option div(cls := "puzzle-history__empty")(
+          pager.nbResults == 0 `option` div(cls := "puzzle-history__empty")(
             a(href := routes.Puzzle.home(variant.key))("Nothing to show, go play some puzzles first!")
           ),
           div(cls := "puzzle-history")(
@@ -33,7 +32,7 @@ object history {
               pager.currentPageResults map renderSession,
               pagerNext(
                 pager,
-                np => s"${routes.Puzzle.history(variant.key, np).url}${!ctx.is(user) ?? s"&u=${user.id}"}"
+                np => s"${routes.Puzzle.history(variant.key, np).url}${!ctx.is(user) so s"&u=${user.id}"}"
               )
             )
           )

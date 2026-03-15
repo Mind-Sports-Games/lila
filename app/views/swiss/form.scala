@@ -1,6 +1,5 @@
 package views.html.swiss
 
-import controllers.routes
 import play.api.data.Form
 
 import lila.api.Context
@@ -11,11 +10,11 @@ import lila.swiss.{ Swiss, SwissCondition, SwissForm }
 import lila.tournament.TournamentForm
 import lila.i18n.VariantKeys
 
-import strategygames.{ GameFamily, GameGroup }
+import strategygames.GameGroup
 
 object form {
 
-  def create(form: Form[_], teamId: TeamID)(implicit ctx: Context) =
+  def create(form: Form[?], teamId: TeamID)(implicit ctx: Context) =
     views.html.base.layout(
       title = "New Swiss tournament",
       moreCss = cssTag("swiss.form"),
@@ -65,7 +64,7 @@ object form {
       )
     }
 
-  def edit(swiss: Swiss, form: Form[_])(implicit ctx: Context) =
+  def edit(swiss: Swiss, form: Form[?])(implicit ctx: Context) =
     views.html.base.layout(
       title = swiss.name,
       moreCss = cssTag("swiss.form"),
@@ -93,7 +92,7 @@ object form {
             form3.split(fields.description, fields.position),
             form3.split(
               fields.roundInterval,
-              swiss.isCreated option fields.startsAt
+              swiss.isCreated `option` fields.startsAt
             ),
             form3.split(
               fields.halfwayBreak,
@@ -120,13 +119,13 @@ object form {
       )
     }
 
-  private def condition(form: Form[_], fields: SwissFields, swiss: Option[Swiss])(implicit ctx: Context) =
+  @annotation.nowarn("msg=unused") private def condition(form: Form[?], fields: SwissFields, swiss: Option[Swiss])(implicit ctx: Context) =
     frag(
       form3.split(
         form3.group(form("conditions.nbRatedGame.nb"), frag("Minimum rated games"), half = true)(
           form3.select(_, SwissCondition.DataForm.nbRatedGameChoices)
         ),
-        (ctx.me.exists(_.hasTitle) || isGranted(_.ManageTournament)) ?? {
+        (ctx.me.exists(_.hasTitle) || isGranted(_.ManageTournament)) so {
           form3.checkbox(
             form("conditions.titled"),
             frag("Only titled players"),
@@ -146,7 +145,7 @@ object form {
     )
 }
 
-final private class SwissFields(form: Form[_], swiss: Option[Swiss])(implicit ctx: Context) {
+final private class SwissFields(form: Form[?], swiss: Option[Swiss])(implicit ctx: Context) {
 
   private def disabledAfterStart = swiss.exists(!_.isCreated)
 

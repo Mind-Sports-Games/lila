@@ -31,14 +31,14 @@ final private[forum] class TopicApi(
       forUser: Option[User]
   ): Fu[Option[(Categ, Topic, Paginator[Post])]] =
     for {
-      data <- env.categRepo bySlug categSlug flatMap {
-        _ ?? { categ =>
+      data <- env.categRepo `bySlug` categSlug flatMap {
+        _ so { categ =>
           env.topicRepo.forUser(forUser).byTree(categSlug, slug) dmap {
             _ map (categ -> _)
           }
         }
       }
-      res <- data ?? { case (categ, topic) =>
+      res <- data so { case (categ, topic) =>
         lila.mon.forum.topic.view.increment()
         env.postApi.paginator(topic, page, forUser) map { (categ, topic, _).some }
       }
@@ -71,10 +71,10 @@ final private[forum] class TopicApi(
         modIcon = (~data.post.modIcon && MasterGranter(_.PublicMod)(me)).option(true)
       )
       env.postRepo.coll.insert.one(post) >>
-        env.topicRepo.coll.insert.one(topic withPost post) >>
-        env.categRepo.coll.update.one($id(categ.id), categ.withPost(topic, post)) >>- {
-          !categ.quiet ?? (indexer ! InsertPost(post))
-          !categ.quiet ?? env.recent.invalidate()
+        env.topicRepo.coll.insert.one(topic `withPost` post) >>
+        env.categRepo.coll.update.one($id(categ.id), categ.withPost(topic, post)).andDo {
+          !categ.quiet so (indexer ! InsertPost(post))
+          !categ.quiet so env.recent.invalidate()
           promotion.save(me, post.text)
           shutup ! {
             val text = s"${topic.name} ${post.text}"
@@ -111,24 +111,21 @@ final private[forum] class TopicApi(
       modIcon = true.some
     )
     env.postRepo.coll.insert.one(post) >>
-      env.topicRepo.coll.insert.one(topic withPost post) >>
-      env.categRepo.coll.update.one($id(categ.id), categ.withPost(topic, post)) >>-
-      (indexer ! InsertPost(post)) >>-
-      env.recent.invalidate() >>-
-      Bus.publish(actorApi.CreatePost(post), "forumPost") void
+      env.topicRepo.coll.insert.one(topic `withPost` post) >>
+      env.categRepo.coll.update.one($id(categ.id), categ.withPost(topic, post)).andDo(indexer ! InsertPost(post)).andDo(env.recent.invalidate()).andDo(Bus.publish(actorApi.CreatePost(post), "forumPost")) void
   }
 
   def paginator(categ: Categ, page: Int, forUser: Option[User]): Fu[Paginator[TopicView]] = {
     val adapter = new Adapter[Topic](
       collection = env.topicRepo.coll,
-      selector = env.topicRepo.forUser(forUser) byCategNotStickyQuery categ,
+      selector = env.topicRepo.forUser(forUser) `byCategNotStickyQuery` categ,
       projection = none,
       sort = $sort.updatedDesc
     ) mapFutureList { topics =>
-      env.postRepo.coll.optionsByOrderedIds[Post, String](topics.map(_ lastPostId forUser))(_.id) map {
+      env.postRepo.coll.optionsByOrderedIds[Post, String](topics.map(_ `lastPostId` forUser))(_.id) map {
         posts =>
           topics zip posts map { case (topic, post) =>
-            TopicView(categ, topic, post, env.postApi lastPageOf topic, forUser)
+            TopicView(categ, topic, post, env.postApi `lastPageOf` topic, forUser)
           }
       }
     }
@@ -144,57 +141,55 @@ final private[forum] class TopicApi(
 
   def getSticky(categ: Categ, forUser: Option[User]): Fu[List[TopicView]] =
     env.topicRepo.stickyByCateg(categ) flatMap { topics =>
-      topics.map { topic =>
-        env.postRepo.coll.byId[Post](topic lastPostId forUser) map { post =>
-          TopicView(categ, topic, post, env.postApi lastPageOf topic, forUser)
+      Future.sequence(topics.map { topic =>
+        env.postRepo.coll.byId[Post](topic `lastPostId` forUser) map { post =>
+          TopicView(categ, topic, post, env.postApi `lastPageOf` topic, forUser)
         }
-      }.sequenceFu
+      })
     }
 
   def delete(categ: Categ, topic: Topic): Funit =
     env.postRepo.idsByTopicId(topic.id) flatMap { postIds =>
-      (env.postRepo removeByTopic topic.id zip env.topicRepo.coll.delete.one($id(topic.id))) >>
-        (env.categApi denormalize categ) >>-
-        (indexer ! RemovePosts(postIds)) >>-
-        env.recent.invalidate()
+      (env.postRepo `removeByTopic` topic.id zip env.topicRepo.coll.delete.one($id(topic.id))) >>
+        (env.categApi `denormalize` categ).andDo(indexer ! RemovePosts(postIds)).andDo(env.recent.invalidate())
     }
 
   def toggleClose(categ: Categ, topic: Topic, mod: Holder): Funit =
     env.topicRepo.close(topic.id, topic.open) >> {
-      MasterGranter.is(_.ModerateForum)(mod) ??
+      MasterGranter.is(_.ModerateForum)(mod) so
         modLog.toggleCloseTopic(mod.id, categ.name, topic.name, topic.open)
     }
 
   def toggleHide(categ: Categ, topic: Topic, mod: Holder): Funit =
     env.topicRepo.hide(topic.id, topic.visibleOnHome) >> {
-      MasterGranter.is(_.ModerateForum)(mod) ?? {
+      MasterGranter.is(_.ModerateForum)(mod) so {
         env.postRepo.hideByTopic(topic.id, topic.visibleOnHome) >>
           modLog.toggleHideTopic(mod.id, categ.name, topic.name, topic.visibleOnHome)
-      } >>- env.recent.invalidate()
+      }.andDo(env.recent.invalidate())
     }
 
   def toggleSticky(categ: Categ, topic: Topic, mod: Holder): Funit =
     env.topicRepo.sticky(topic.id, !topic.isSticky) >> {
-      MasterGranter.is(_.ModerateForum)(mod) ??
+      MasterGranter.is(_.ModerateForum)(mod) so
         modLog.toggleStickyTopic(mod.id, categ.name, topic.name, !topic.isSticky)
     }
 
   def denormalize(topic: Topic): Funit =
     for {
-      nbPosts       <- env.postRepo countByTopic topic
-      lastPost      <- env.postRepo lastByTopic topic
-      nbPostsTroll  <- env.postRepo.unsafe countByTopic topic
-      lastPostTroll <- env.postRepo.unsafe lastByTopic topic
+      nbPosts       <- env.postRepo `countByTopic` topic
+      lastPost      <- env.postRepo `lastByTopic` topic
+      nbPostsTroll  <- env.postRepo.unsafe `countByTopic` topic
+      lastPostTroll <- env.postRepo.unsafe `lastByTopic` topic
       _ <-
         env.topicRepo.coll.update
           .one(
             $id(topic.id),
             topic.copy(
               nbPosts = nbPosts,
-              lastPostId = lastPost ?? (_.id),
+              lastPostId = lastPost so (_.id),
               updatedAt = lastPost.fold(topic.updatedAt)(_.createdAt),
               nbPostsTroll = nbPostsTroll,
-              lastPostIdTroll = lastPostTroll ?? (_.id),
+              lastPostIdTroll = lastPostTroll so (_.id),
               updatedAtTroll = lastPostTroll.fold(topic.updatedAtTroll)(_.createdAt)
             )
           )

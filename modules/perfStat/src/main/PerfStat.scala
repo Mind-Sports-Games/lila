@@ -24,15 +24,15 @@ case class PerfStat(
   def agg(pov: Pov) =
     if (!pov.game.finished) this
     else {
-      val thisYear = pov.game.createdAt isAfter DateTime.now.minusYears(1)
+      val thisYear = pov.game.createdAt `isAfter` DateTime.now.minusYears(1)
       copy(
         highest = RatingAt.agg(highest, pov, 1),
         lowest = if (thisYear) RatingAt.agg(lowest, pov, -1) else lowest,
         bestWins = if (~pov.win) bestWins.agg(pov, 1) else bestWins,
         worstLosses = if (thisYear && ~pov.loss) worstLosses.agg(pov, -1) else worstLosses,
         count = count(pov),
-        resultStreak = resultStreak agg pov,
-        playStreak = playStreak agg pov
+        resultStreak = resultStreak `agg` pov,
+        playStreak = playStreak `agg` pov
       )
     }
 
@@ -83,7 +83,7 @@ case class PlayStreak(nb: Streaks, time: Streaks, lastDate: Option[DateTime]) {
     else copy(nb = nb.reset, time = time.reset)
   private def isContinued(at: DateTime) =
     lastDate.fold(true) { ld =>
-      at.isBefore(ld plusMinutes PlayStreak.expirationMinutes)
+      at.isBefore(ld `plusMinutes` PlayStreak.expirationMinutes)
     }
 }
 object PlayStreak {
@@ -191,7 +191,7 @@ object RatingAt {
 
 case class Result(opInt: Int, opId: UserId, at: DateTime, gameId: String)
 
-case class Results(results: List[Result]) extends AnyVal {
+case class Results(results: List[Result]) {
   def agg(pov: Pov, comp: Int) =
     pov.opponent.stableRating
       .ifTrue(pov.game.rated)

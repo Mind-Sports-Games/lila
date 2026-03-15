@@ -1,7 +1,7 @@
 package lila.forum
 
 import com.softwaremill.macwire._
-import io.methvin.play.autoconfig._
+import lila.common.autoconfig.{ AutoConfig, ConfigName }
 import play.api.Configuration
 
 import lila.common.config._
@@ -35,7 +35,7 @@ final class Env(
     ws: StandaloneWSClient
 )(implicit ec: scala.concurrent.ExecutionContext) {
 
-  private val config = appConfig.get[ForumConfig]("forum")(AutoConfig.loader)
+  private val config = appConfig.get[ForumConfig]("forum")(using AutoConfig.loader)
 
   lazy val categRepo = new CategRepo(db(CollName("f_categ")))
   lazy val topicRepo = new TopicRepo(db(CollName("f_topic")))
@@ -44,27 +44,22 @@ final class Env(
   private lazy val detectLanguage =
     new DetectLanguage(ws, appConfig.get[DetectLanguage.Config]("detectlanguage.api"))
 
-  lazy val categApi: CategApi = {
-    val mk = (env: Env) => wire[CategApi]
-    mk(this)
-  }
+  private val env: Env = this
 
-  lazy val topicApi: TopicApi = {
-    val mk = (max: MaxPerPage, env: Env) => wire[TopicApi]
-    mk(config.topicMaxPerPage, this)
-  }
+  lazy val categApi: CategApi = wire[CategApi]
 
-  lazy val postApi: PostApi = {
-    val mk = (max: MaxPerPage, env: Env) => wire[PostApi]
-    mk(config.postMaxPerPage, this)
-  }
+  lazy val topicApi: TopicApi =
+    new TopicApi(env, forumSearch, config.topicMaxPerPage, modLog, spam, promotion, timeline, shutup, detectLanguage)
+
+  lazy val postApi: PostApi =
+    new PostApi(env, forumSearch, config.postMaxPerPage, modLog, spam, promotion, timeline, shutup, detectLanguage)
 
   lazy val mentionNotifier: MentionNotifier = wire[MentionNotifier]
   lazy val forms                            = wire[ForumForm]
   lazy val recent                           = wire[ForumRecent]
 
   lila.common.Bus.subscribeFun("team", "gdprErase") {
-    case CreateTeam(id, name, _)        => categApi.makeTeam(id, name).unit
-    case lila.user.User.GDPRErase(user) => postApi.eraseFromSearchIndex(user).unit
+    case CreateTeam(id, name, _)        => categApi.makeTeam(id, name).discard
+    case lila.user.User.GDPRErase(user) => postApi.eraseFromSearchIndex(user).discard
   }
 }

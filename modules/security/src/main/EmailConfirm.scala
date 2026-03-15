@@ -22,7 +22,7 @@ final class EmailConfirmSkip(userRepo: UserRepo) extends EmailConfirm {
 
   def effective = false
 
-  def send(user: User, email: EmailAddress)(implicit lang: Lang) = userRepo setEmailConfirmed user.id void
+  def send(user: User, email: EmailAddress)(implicit lang: Lang) = userRepo `setEmailConfirmed` user.id void
 
   def confirm(token: String): Fu[EmailConfirm.Result] = fuccess(EmailConfirm.Result.NotFound)
 }
@@ -42,11 +42,11 @@ final class EmailConfirmMailer(
   val maxTries = 3
 
   def send(user: User, email: EmailAddress)(implicit lang: Lang): Funit =
-    tokener make user.id flatMap { token =>
+    tokener `make` user.id flatMap { token =>
       lila.mon.email.send.confirmation.increment()
       val url = s"$baseUrl/signup/confirm/$token"
       lila.log("auth").info(s"Confirm URL ${user.username} ${email.value} $url")
-      mailer send Mailer.Message(
+      mailer `send` Mailer.Message(
         to = email,
         subject = trans.emailConfirm_subject.txt(user.username),
         text = s"""
@@ -76,12 +76,12 @@ ${trans.emailConfirm_ignore.txt("https://playstrategy.org")}
   import EmailConfirm.Result
 
   def confirm(token: String): Fu[Result] =
-    tokener read token flatMap {
-      _ ?? userRepo.enabledById
+    tokener `read` token flatMap {
+      _ so userRepo.enabledById
     } flatMap {
       _.fold[Fu[Result]](fuccess(Result.NotFound)) { user =>
         userRepo.mustConfirmEmail(user.id) flatMap {
-          case true  => (userRepo setEmailConfirmed user.id) inject Result.JustConfirmed(user)
+          case true  => (userRepo `setEmailConfirmed` user.id) inject Result.JustConfirmed(user)
           case false => fuccess(Result.AlreadyConfirmed(user))
         }
       }
@@ -89,7 +89,7 @@ ${trans.emailConfirm_ignore.txt("https://playstrategy.org")}
 
   private val tokener = new StringToken[User.ID](
     secret = tokenerSecret,
-    getCurrentValue = id => userRepo email id dmap (_.??(_.value))
+    getCurrentValue = id => userRepo `email` id `dmap` (_.so(_.value))
   )
 }
 
@@ -118,14 +118,14 @@ object EmailConfirm {
     def has(req: RequestHeader) = req.session.data contains name
 
     def get(req: RequestHeader): Option[UserEmail] =
-      req.session get name map (_.split(sep, 2)) collect { case Array(username, email) =>
+      req.session `get` name map (_.split(sep, 2)) collect { case Array(username, email) =>
         UserEmail(username, EmailAddress(email))
       }
   }
 
   import scala.concurrent.duration._
   import play.api.mvc.RequestHeader
-  import ornicar.scalalib.Zero
+  import alleycats.Zero
   import lila.memo.RateLimit
   import lila.common.{ HTTPRequest, IpAddress }
 
@@ -147,10 +147,10 @@ object EmailConfirm {
     key = "email.confirms.email"
   )
 
-  def rateLimit[A: Zero](userEmail: UserEmail, req: RequestHeader)(run: => Fu[A])(default: => Fu[A]): Fu[A] =
+  @annotation.nowarn("msg=unused") def rateLimit[A: Zero](userEmail: UserEmail, req: RequestHeader)(run: => Fu[A])(default: => Fu[A]): Fu[A] =
     rateLimitPerUser(userEmail.username, cost = 1) {
       rateLimitPerEmail(userEmail.email.value, cost = 1) {
-        rateLimitPerIP(HTTPRequest ipAddress req, cost = 1) {
+        rateLimitPerIP(HTTPRequest `ipAddress` req, cost = 1) {
           run
         }(default)
       }(default)
@@ -172,8 +172,8 @@ object EmailConfirm {
     val helpForm = Form(
       single(
         "username" -> text.verifying(
-          Constraints minLength 2,
-          Constraints maxLength 30,
+          Constraints `minLength` 2,
+          Constraints `maxLength` 30,
           Constraints.pattern(regex = User.newUsernameRegex)
         )
       )
@@ -182,12 +182,12 @@ object EmailConfirm {
     def getStatus(userRepo: UserRepo, username: String)(implicit
         ec: scala.concurrent.ExecutionContext
     ): Fu[Status] =
-      userRepo withEmails username flatMap {
+      userRepo `withEmails` username flatMap {
         case None => fuccess(NoSuchUser(username))
         case Some(User.WithEmails(user, emails)) =>
           if (!user.enabled) fuccess(Closed(username))
           else
-            userRepo mustConfirmEmail user.id dmap {
+            userRepo `mustConfirmEmail` user.id dmap {
               case true =>
                 emails.current match {
                   case None        => NoEmail(user.username)

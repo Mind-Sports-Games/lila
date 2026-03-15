@@ -3,7 +3,7 @@ package controllers
 import play.api.mvc._
 
 import lila.api.Context
-import lila.app._
+import lila.app.*
 import lila.forum
 
 private[controllers] trait ForumController extends forum.Granter { self: LilaController =>

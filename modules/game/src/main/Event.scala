@@ -31,7 +31,6 @@ import strategygames.{
   Status
 }
 import strategygames.chess
-import strategygames.variant.Variant
 import strategygames.format.Forsyth
 import strategygames.format.pgn.Dumper
 import JsonView._
@@ -82,14 +81,14 @@ object Event {
         forcedAction: Option[String],
         pocketData: Option[PocketData],
         captLen: Option[Int] = None
-    )(extra: JsObject) = {
+    )(extra: JsObject) =
       extra ++ Json
         .obj(
           "fen"         -> fen,
           "ply"         -> state.plies,
           "turnCount"   -> state.turnCount,
           "dests"       -> PossibleMoves.oldJson(possibleMoves),
-          "captLen"     -> ~captLen,
+          "captLen"     -> captLen.getOrElse(0),
           "gf"          -> gf.id,
           "dropsByRole" -> PossibleDropsByRole.json(possibleDropsByRole.getOrElse(Map.empty)),
           "lifts"       -> possibleLifts.map { squares => JsString(squares.map(_.key).mkString) },
@@ -116,7 +115,6 @@ object Event {
           JsString(squares.map(_.key).mkString)
         })
         .add("forcedAction" -> forcedAction)
-    }
   }
 
   case class Move(
@@ -218,7 +216,7 @@ object Event {
         threefold = situation.threefoldRepetition,
         gameMessage = situation.gameMessage,
         promotion = move.promotion.map { Promotion(_, move.dest) },
-        enpassant = (move.capture ifTrue move.enpassant).map { (capture: List[Pos]) =>
+        enpassant = (move.capture `ifTrue` move.enpassant).map { (capture: List[Pos]) =>
           Event.Enpassant(capture(0), !move.player)
         },
         castle = move.castle.map { case (king, rook) =>
@@ -238,11 +236,11 @@ object Event {
             if (situation.ghosts > 0)
               Map(
                 Pos.Draughts(moveDest) ->
-                  situation.destinationsFrom(moveDest).map(Pos.Draughts)
+                  situation.destinationsFrom(moveDest).map(Pos.Draughts.apply)
               )
             else
               situation.allDestinations.map { case (from, to) =>
-                (Pos.Draughts(from), to.map(Pos.Draughts))
+                (Pos.Draughts(from), to.map(Pos.Draughts.apply))
               }
           case _ => situation.destinations
         },
@@ -537,7 +535,7 @@ object Event {
 
   object EndTurn {
     def apply(
-        endTurn: StratEndTurn,
+        @annotation.nowarn("msg=unused") _endTurn: StratEndTurn,
         situation: Situation,
         state: State,
         clock: Option[ClockEvent],
@@ -647,7 +645,7 @@ object Event {
 
   object Pass {
     def apply(
-        pass: StratPass,
+        @annotation.nowarn("msg=unused") _pass: StratPass,
         situation: Situation,
         state: State,
         clock: Option[ClockEvent],
@@ -1048,7 +1046,7 @@ object Event {
 
   object Undo {
     def apply(
-        undo: StratUndo,
+        @annotation.nowarn("msg=unused") _undo: StratUndo,
         situation: Situation,
         state: State,
         clock: Option[ClockEvent],
@@ -1102,19 +1100,19 @@ object Event {
         var first = true
         drops foreach { case (orig, dests) =>
           if (first) first = false
-          else sb append " "
-          sb append orig.forsyth
-          dests foreach { sb append _.key }
+          else sb `append` " "
+          sb `append` orig.forsyth
+          dests foreach { sb `append` _.key }
         }
         JsString(sb.toString)
       }
-
   }
+
 
   object PossibleMoves {
 
     def json(moves: Map[Pos, List[Pos]], apiVersion: ApiVersion) =
-      if (apiVersion gte 4) newJson(moves)
+      if (apiVersion `gte` 4) newJson(moves)
       else oldJson(moves)
 
     def newJson(moves: Map[Pos, List[Pos]]) =
@@ -1124,9 +1122,9 @@ object Event {
         var first = true
         moves foreach { case (orig, dests) =>
           if (first) first = false
-          else sb append " "
-          sb append orig.key
-          dests foreach { sb append _.key }
+          else sb `append` " "
+          sb `append` orig.key
+          dests foreach { sb `append` _.key }
         }
         JsString(sb.toString)
       }

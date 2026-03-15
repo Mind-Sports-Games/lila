@@ -7,7 +7,6 @@ import lila.app.templating.Environment._
 import lila.app.ui.ScalatagsTemplate._
 import lila.i18n.VariantKeys
 
-import controllers.routes
 
 object bits {
 

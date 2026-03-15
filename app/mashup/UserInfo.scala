@@ -6,6 +6,7 @@ import play.api.data.Form
 
 import lila.api.Context
 import lila.bookmark.BookmarkApi
+import lila.common.extensions.*
 import lila.forum.PostApi
 import lila.game.Crosstable
 import lila.relation.RelationApi
@@ -56,7 +57,7 @@ object UserInfo {
   sealed abstract class Angle(val key: String)
   object Angle {
     case object Activity                          extends Angle("activity")
-    case class Games(searchForm: Option[Form[_]]) extends Angle("games")
+    case class Games(searchForm: Option[Form[?]]) extends Angle("games")
     case object Other                             extends Angle("other")
   }
 
@@ -73,19 +74,19 @@ object UserInfo {
       prefApi: lila.pref.PrefApi
   ) {
     def apply(u: User, ctx: Context): Fu[Social] =
-      ctx.userId.?? {
-        relationApi.fetchRelation(_, u.id).mon(_.user segment "relation")
+      ctx.userId.so {
+        relationApi.fetchRelation(_, u.id).mon(_.user `segment` "relation")
       } zip
-        ctx.me.?? { me =>
+        ctx.me.so { me =>
           noteApi
             .get(u, me, Granter(_.ModNote)(me))
-            .mon(_.user segment "notes")
+            .mon(_.user `segment` "notes")
         } zip
-        ctx.isAuth.?? {
-          prefApi.followable(u.id).mon(_.user segment "followable")
+        ctx.isAuth.so {
+          prefApi.followable(u.id).mon(_.user `segment` "followable")
         } zip
-        ctx.userId.?? { myId =>
-          relationApi.fetchBlocks(u.id, myId).mon(_.user segment "blocks")
+        ctx.userId.so { myId =>
+          relationApi.fetchBlocks(u.id, myId).mon(_.user `segment` "blocks")
         } dmap { case (((relation, notes), followable), blocked) =>
           Social(relation, notes, followable, blocked)
         }
@@ -106,12 +107,12 @@ object UserInfo {
       crosstableApi: lila.game.CrosstableApi
   ) {
     def apply(u: User, ctx: Context, withCrosstable: Boolean): Fu[NbGames] =
-      (withCrosstable ?? ctx.me.filter(u.!=) ?? { me =>
-        crosstableApi.withMatchup(me.id, u.id) dmap some
-      }).mon(_.user segment "crosstable") zip
-        gameCached.nbPlaying(u.id).mon(_.user segment "nbPlaying") zip
-        gameCached.nbImportedBy(u.id).mon(_.user segment "nbImported") zip
-        bookmarkApi.countByUser(u).mon(_.user segment "nbBookmarks") dmap {
+      (withCrosstable so ctx.me.filter(u.!=) so { me =>
+        crosstableApi.withMatchup(me.id, u.id) `dmap` some
+      }).mon(_.user `segment` "crosstable") zip
+        gameCached.nbPlaying(u.id).mon(_.user `segment` "nbPlaying") zip
+        gameCached.nbImportedBy(u.id).mon(_.user `segment` "nbImported") zip
+        bookmarkApi.countByUser(u).mon(_.user `segment` "nbBookmarks") dmap {
           case (((crosstable, playing), imported), bookmark) =>
             NbGames(
               crosstable,
@@ -139,22 +140,22 @@ object UserInfo {
       playbanApi: lila.playban.PlaybanApi
   )(implicit ec: scala.concurrent.ExecutionContext) {
     def apply(user: User, nbs: NbGames, ctx: Context): Fu[UserInfo] =
-      (ctx.noBlind ?? ratingChartApi(user)).mon(_.user segment "ratingChart") zip
-        relationApi.countFollowers(user.id).mon(_.user segment "nbFollowers") zip
-        postApi.nbByUser(user.id).mon(_.user segment "nbPosts") zip
-        studyRepo.countByOwner(user.id).nevermind.mon(_.user segment "nbStudies") zip
-        trophyApi.findByUser(user).mon(_.user segment "trophy") zip
-        shieldApi.active(user).mon(_.user segment "shields") zip
-        revolutionApi.active(user).mon(_.user segment "revolutions") zip
+      (ctx.noBlind so ratingChartApi(user)).mon(_.user `segment` "ratingChart") zip
+        relationApi.countFollowers(user.id).mon(_.user `segment` "nbFollowers") zip
+        postApi.nbByUser(user.id).mon(_.user `segment` "nbPosts") zip
+        studyRepo.countByOwner(user.id).recoverDefault.mon(_.user `segment` "nbStudies") zip
+        trophyApi.findByUser(user).mon(_.user `segment` "trophy") zip
+        shieldApi.active(user).mon(_.user `segment` "shields") zip
+        revolutionApi.active(user).mon(_.user `segment` "revolutions") zip
         teamCached
           .teamIdsList(user.id)
           .map(_.take(lila.team.Team.maxJoinCeiling))
-          .mon(_.user segment "teamIds") zip
-        coachApi.isListedCoach(user).mon(_.user segment "coach") zip
-        streamerApi.isActualStreamer(user).mon(_.user segment "streamer") zip
-        (user.count.rated >= 10).??(insightShare.grant(user, ctx.me)) zip
-        playbanApi.completionRate(user.id).mon(_.user segment "completion") zip
-        (nbs.playing > 0) ?? isHostingSimul(user.id).mon(_.user segment "simul") zip
+          .mon(_.user `segment` "teamIds") zip
+        coachApi.isListedCoach(user).mon(_.user `segment` "coach") zip
+        streamerApi.isActualStreamer(user).mon(_.user `segment` "streamer") zip
+        (user.count.rated >= 10).so(insightShare.grant(user, ctx.me)) zip
+        playbanApi.completionRate(user.id).mon(_.user `segment` "completion") zip
+        (if (nbs.playing > 0) isHostingSimul(user.id).mon(_.user `segment` "simul") else fuFalse) zip
         userCached.rankingsOf(user.id) map {
           // format: off
           case (((((((((((((ratingChart, nbFollowers), nbPosts), nbStudies), trophies), shields), revols), teamIds), isCoach), isStreamer), insightVisible), completionRate), hasSimul), ranks) =>

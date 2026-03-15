@@ -85,7 +85,7 @@ case class StripeCustomer(
 ) {
 
   def firstSubscription = subscriptions.data.headOption
-  def renew             = firstSubscription ?? (_.renew)
+  def renew             = firstSubscription so (_.renew)
 }
 
 case class StripeCharge(
@@ -95,7 +95,7 @@ case class StripeCharge(
     billing_details: Option[StripeCharge.BillingDetails]
 ) {
   def lifetimeWorthy = amount >= Cents.lifetime
-  def country        = billing_details.flatMap(_.address).flatMap(_.country).map(Country)
+  def country        = billing_details.flatMap(_.address).flatMap(_.country).map(Country.apply)
 }
 
 object StripeCharge {
@@ -145,13 +145,13 @@ case class PayPalOrder(
     purchase_units: List[PayPalPurchaseUnit],
     payer: PayPalPayer
 ) {
-  val userId = purchase_units.headOption.flatMap(_.custom_id).??(_.trim) match {
+  val userId = purchase_units.headOption.flatMap(_.custom_id).so(_.trim) match {
     case s"$userId" => userId.some
     case _          => none
   }
   def isCompleted        = status == "COMPLETED"
   def isCompletedCapture = isCompleted && intent == "CAPTURE"
-  def capturedMoney      = isCompletedCapture ?? purchase_units.headOption.map(_.amount.cents)
+  def capturedMoney      = isCompletedCapture so purchase_units.headOption.map(_.amount.cents)
   def country            = payer.address.flatMap(_.country_code)
 }
 case class PayPalPayment(amount: PayPalAmount)
@@ -187,7 +187,7 @@ case class PayPalEventId(value: String) extends AnyVal with StringValue
 case class PayPalEvent(id: PayPalEventId, event_type: String, resource_type: String, resource: JsObject) {
   def tpe         = event_type
   def resourceTpe = resource_type
-  def resourceId  = resource str "id"
+  def resourceId  = resource `str` "id"
 }
 
 case class PayPalPlanId(value: String) extends AnyVal with StringValue

@@ -4,14 +4,13 @@ package templating
 import play.api.i18n.Lang
 import play.api.libs.json.Json
 
-import controllers.routes
 import lila.app.ui.ScalatagsTemplate._
 import lila.rating.PerfType
 import strategygames.Speed
 import lila.tournament.{ Schedule, Tournament }
 import lila.user.User
 
-trait TournamentHelper { self: I18nHelper with DateHelper with UserHelper =>
+trait TournamentHelper { self: I18nHelper & DateHelper & UserHelper =>
 
   def netBaseUrl: String
 
@@ -43,7 +42,7 @@ trait TournamentHelper { self: I18nHelper with DateHelper with UserHelper =>
     )(tournamentIdToName(tourId))
 
   def tournamentIdToName(id: String)(implicit lang: Lang) =
-    env.tournament.getTourName get id getOrElse "Tournament"
+    env.tournament.getTourName `get` id getOrElse "Tournament"
 
   object scheduledTournamentNameShortHtml {
     private def icon(c: Char) = s"""<span data-icon="$c"></span>"""
@@ -58,7 +57,7 @@ trait TournamentHelper { self: I18nHelper with DateHelper with UserHelper =>
     ) ++ PerfType.leaderboardable
       .filterNot(PerfType.translated.contains)
       .map { pt =>
-        pt.trans(lila.i18n.defaultLang) -> icon(pt.iconChar)
+        pt.trans(using lila.i18n.defaultLang) -> icon(pt.iconChar)
       }
       .sortBy(-_._1.length) ++
       List(

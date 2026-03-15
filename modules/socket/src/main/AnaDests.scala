@@ -7,7 +7,7 @@ import play.api.libs.json._
 import strategygames.format.FEN
 import strategygames.variant.Variant
 import strategygames.opening.FullOpeningDB
-import strategygames.{ Board, Game, GameLogic, Move, Pos, Situation }
+import strategygames.{ Game, GameLogic, Pos, Situation }
 import lila.tree.Node.{ destString, openingWriter }
 
 //We think this code is deprecated and never used!
@@ -30,7 +30,7 @@ case class AnaDests(
   private val orig: Option[strategygames.draughts.Pos] =
     (sit, variant) match {
       case (Situation.Draughts(sit), Variant.Draughts(variant)) =>
-        (lastUci.exists(_.length >= 4) && sit.ghosts > 0) ?? lastUci.flatMap { uci =>
+        (lastUci.exists(_.length >= 4) && sit.ghosts > 0) so lastUci.flatMap { uci =>
           variant.boardSize.pos.posAt(uci.substring(uci.length - 2))
         }
       case _ => None
@@ -49,13 +49,13 @@ case class AnaDests(
 
   //draughts
   private val truncatedMoves: Option[MapView[strategygames.draughts.Pos, List[String]]] =
-    (!isInitial && ~fullCapture && captureLength > 1) option AnaDests.truncateMoves(validMoves)
+    (!isInitial && ~fullCapture && captureLength > 1) `option` AnaDests.truncateMoves(validMoves)
 
   val dests: String = variant match {
     case Variant.Draughts(variant) =>
       if (isInitial) AnaDests.initialDraughtsDests
       else
-        sit.playable(false) ?? {
+        sit.playable(false) so {
           val truncatedDests = truncatedMoves.map {
             _ mapValues { _ flatMap (uci => variant.boardSize.pos.posAt(uci.takeRight(2))) }
           }
@@ -63,20 +63,20 @@ case class AnaDests(
             truncatedDests
               .getOrElse(validMoves.view.mapValues { _ map (_.dest) })
               .to(Map)
-              .map { case (p, lp) => (Pos.Draughts(p), lp.map(Pos.Draughts)) }
+              .map { case (p, lp) => (Pos.Draughts(p), lp.map(Pos.Draughts.apply)) }
           val destStr = destString(destsToConvert)
           if (captureLength > 0) s"#$captureLength $destStr"
           else destStr
         }
     case _ =>
       if (isInitial) AnaDests.initialChessDests
-      else sit.playable(false) ?? destString(sit.destinations)
+      else sit.playable(false) so destString(sit.destinations)
   }
 
   //draughts
   val destsUci: Option[List[String]] = truncatedMoves.map(_.values.toList.flatten)
 
-  lazy val opening = Variant.openingSensibleVariants(variant.gameLogic)(variant) ?? {
+  lazy val opening = Variant.openingSensibleVariants(variant.gameLogic)(variant) so {
     FullOpeningDB.findByFen(variant.gameLogic, fen)
   }
 
@@ -143,7 +143,8 @@ object AnaDests {
           if (!acc.contains(newUci)) {
             if (newUci._2.length != uci._2.length) truncated = true
             newUci :: acc
-          } else {
+          }
+          else {
             truncated = true
             acc
           }
@@ -172,7 +173,8 @@ object AnaDests {
           if (!acc.contains(newUci)) {
             if (newUci._2.length != uci._2.length) truncated = true
             newUci :: acc
-          } else {
+          }
+          else {
             truncated = true
             acc
           }
@@ -184,16 +186,16 @@ object AnaDests {
 
   def parse(o: JsObject) =
     for {
-      d   <- o obj "d"
-      lib <- d int "lib"
+      d   <- o `obj` "d"
+      lib <- d `int` "lib"
       variant = Variant.orDefault(GameLogic(lib), ~d.str("variant"))
-      fen  <- d str "fen"
-      path <- d str "path"
+      fen  <- d `str` "fen"
+      path <- d `str` "path"
     } yield AnaDests(
       variant = variant,
       fen = FEN(GameLogic(lib), fen),
       path = path,
-      chapterId = d str "ch",
-      fullCapture = d boolean "fullCapture"
+      chapterId = d `str` "ch",
+      fullCapture = d `boolean` "fullCapture"
     )
 }

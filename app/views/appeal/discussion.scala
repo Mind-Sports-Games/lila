@@ -1,7 +1,6 @@
 package views.html
 package appeal
 
-import controllers.routes
 import play.api.data.Form
 
 import lila.api.Context
@@ -48,7 +47,7 @@ object discussion {
               postForm(action := routes.Mod.spontaneousInquiry(appeal.id))(
                 submitButton(cls := "button")("Handle this appeal")
               )
-            case Some(Inquiry(mod, _)) if ctx.userId has mod =>
+            case Some(Inquiry(mod, _)) if ctx.userId `has` mod =>
               postForm(action := routes.Appeal.mute(modData.suspect.user.username))(
                 if (appeal.isMuted)
                   submitButton("Un-mute")(
@@ -82,7 +81,7 @@ object discussion {
       h1(
         div(cls := "title")(
           "Appeal",
-          modData.isDefined option frag(" by ", userIdLink(appeal.id.some))
+          modData.isDefined `option` frag(" by ", userIdLink(appeal.id.some))
         ),
         div(cls := "actions")(
           a(
@@ -96,7 +95,7 @@ object discussion {
       modData map { m =>
         frag(
           div(cls := "mod-zone mod-zone-full none"),
-          views.html.user.mod.otherUsers(m.mod, m.suspect.user, m.logins, m.appeals)(ctx, m.renderIp)(
+          views.html.user.mod.otherUsers(m.mod, m.suspect.user, m.logins, m.appeals)(using ctx, m.renderIp)(
             cls := "mod-zone communication__logins"
           )
         )
@@ -104,7 +103,7 @@ object discussion {
       standardFlash(),
       div(cls := "body")(
         appeal.msgs.map { msg =>
-          div(cls := s"appeal__msg appeal__msg--${if (appeal isByMod msg) "mod" else "suspect"}")(
+          div(cls := s"appeal__msg appeal__msg--${if (appeal `isByMod` msg) "mod" else "suspect"}")(
             div(cls := "appeal__msg__header")(
               renderUser(appeal, msg.by, modData.isDefined),
               momentFromNowOnce(msg.at)
@@ -114,7 +113,7 @@ object discussion {
         },
         if (modData.isEmpty && !appeal.canAddMsg) p("Please wait for a moderator to reply.")
         else
-          modData.fold(true)(_.inquiry.isDefined) option renderForm(
+          modData.fold(true)(_.inquiry.isDefined) `option` renderForm(
             textForm,
             action =
               if (modData.isDefined) routes.Appeal.reply(appeal.id).url
@@ -126,11 +125,11 @@ object discussion {
     )
 
   private def renderUser(appeal: Appeal, userId: User.ID, asMod: Boolean)(implicit ctx: Context) =
-    if (appeal isAbout userId) userIdLink(userId.some, params = asMod ?? "?mod")
+    if (appeal `isAbout` userId) userIdLink(userId.some, params = if (asMod) "?mod" else "")
     else
       span(
         userIdLink(User.playstrategyId.some),
-        isGranted(_.Appeals) option frag(
+        isGranted(_.Appeals) `option` frag(
           " (",
           userIdLink(userId.some),
           ")"
@@ -145,7 +144,7 @@ object discussion {
       form3.group(
         form("text"),
         if (isNew) "Create an appeal" else "Add something to the appeal",
-        help = !isGranted(_.Appeals) option frag("Please be concise. Maximum 1000 chars.")
+        help = !isGranted(_.Appeals) `option` frag("Please be concise. Maximum 1000 chars.")
       )(
         form3.textarea(_)(rows := 6)
       ),
@@ -153,15 +152,15 @@ object discussion {
         form3.actions(
           div(
             select(cls := "appeal-presets")(
-              option(st.value := "")("Presets"),
+              st.option(st.value := "")("Presets"),
               ps.value.map { case ModPreset(name, text) =>
-                option(
+                st.option(
                   st.value := text,
                   st.title := text
                 )(name)
               }
             ),
-            isGranted(_.Presets) option a(href := routes.Mod.presets("appeal"))("Edit presets")
+            isGranted(_.Presets) `option` a(href := routes.Mod.presets("appeal"))("Edit presets")
           ),
           form3.submit(trans.send())
         )

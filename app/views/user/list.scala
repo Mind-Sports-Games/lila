@@ -9,12 +9,11 @@ import lila.app.ui.ScalatagsTemplate._
 import lila.rating.PerfType
 import lila.user.User
 
-import controllers.routes
 
 object list {
 
   def apply(
-      tourneyWinners: List[lila.tournament.Winner],
+      @annotation.nowarn("msg=unused") tourneyWinners: List[lila.tournament.Winner],
       online: List[User],
       leaderboards: lila.user.Perfs.Leaderboards,
       nbAllTime: List[User.LightCount]
@@ -105,21 +104,6 @@ object list {
         )
       )
     }
-
-  private def tournamentWinners(winners: List[lila.tournament.Winner])(implicit ctx: Context) =
-    st.section(cls := "user-top")(
-      h2(cls := "text", dataIcon := "g")(
-        a(href := routes.Tournament.leaderboard)(trans.tournament())
-      ),
-      ol(winners take 10 map { w =>
-        li(
-          userIdLink(w.userId.some),
-          a(title := w.tourName, href := routes.Tournament.show(w.tourId))(
-            scheduledTournamentNameShortHtml(w.tourName)
-          )
-        )
-      })
-    )
 
   private def userTopPerf(users: List[User.LightPerf], perfType: PerfType)(implicit lang: Lang) =
     st.section(cls := "user-top")(

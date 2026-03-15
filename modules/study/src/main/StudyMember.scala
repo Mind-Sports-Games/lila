@@ -37,7 +37,7 @@ case class StudyMembers(members: StudyMember.MemberMap) {
   def contains(userId: User.ID): Boolean = members contains userId
   def contains(user: User): Boolean      = contains(user.id)
 
-  def get = members.get _
+  def get = members.get
 
   def ids   = members.keys
   def idSet = members.keySet

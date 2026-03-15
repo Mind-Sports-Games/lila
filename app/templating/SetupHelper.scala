@@ -140,7 +140,7 @@ trait SetupHelper { self: I18nHelper =>
       (Mode.Rated.id.toString, "\uE92B", trans.rated.txt().some)
     )
 
-  def translatedTimeModeIconChoices(implicit lang: Lang): List[SelectChoice] =
+  def translatedTimeModeIconChoices(implicit @annotation.nowarn("msg=unused") lang: Lang): List[SelectChoice] =
     List(
       ("bullet", "\u0054", "1+0".some),
       ("blitz", "\u0029", "3+2".some),
@@ -167,7 +167,7 @@ trait SetupHelper { self: I18nHelper =>
   private val encodeGameGroupId = (g: GameGroup) =>
     encodeGameFamilyId(g.variants.headOption.map(_.gameFamily).getOrElse(GameFamily.Chess()))
 
-  private def variantTupleId = variantTuple(encodeId) _
+  private def variantTupleId = variantTuple(encodeId)
 
   private def variantTuple(
       encode: Variant => String,
@@ -272,7 +272,7 @@ trait SetupHelper { self: I18nHelper =>
   private def translatedVariantChoicesByGameFamily(
       gameFamily: GameFamily,
       encode: Variant => String
-  )(implicit lang: Lang): List[SelectChoice] =
+  )(implicit @annotation.nowarn("msg=unused") lang: Lang): List[SelectChoice] =
     List(gameFamily.defaultVariant).map(variantTuple(encode))
 
   def translatedVariantChoicesWithVariants(implicit
@@ -396,7 +396,7 @@ trait SetupHelper { self: I18nHelper =>
       ("bot", "\uE933", trans.bot.txt().some)
     )
 
-  def translatedPSBotChoices(implicit lang: Lang): List[SelectChoice] =
+  def translatedPSBotChoices(implicit @annotation.nowarn("msg=unused") lang: Lang): List[SelectChoice] =
     LightUser.lobbyBotsIDs.map { id =>
       (
         id.toString(),
@@ -411,7 +411,7 @@ trait SetupHelper { self: I18nHelper =>
       )
     }
 
-  def translatedStockfishChoices(implicit lang: Lang): List[SelectChoice] =
+  def translatedStockfishChoices(implicit @annotation.nowarn("msg=unused") lang: Lang): List[SelectChoice] =
     LightUser.stockfishBotsIDs.map { id => (id.toString(), id.takeRight(1), none) }
 
   def translatedAnimationChoices(implicit lang: Lang) =

@@ -6,9 +6,9 @@ import play.api.mvc._
 import views._
 
 import lila.api.Context
-import lila.app._
+import lila.app.*
 import lila.common.HTTPRequest
-import lila.game.{ PgnDump, Pov, SgfDump }
+import lila.game.{ PgnDump, Pov }
 import lila.round.JsonView.WithFlags
 
 final class Analyse(
@@ -19,7 +19,7 @@ final class Analyse(
 
   def requestAnalysis(id: String) =
     Auth { implicit ctx => me =>
-      OptionFuResult(env.game.gameRepo game id) { game =>
+      OptionFuResult(env.game.gameRepo `game` id) { game =>
         env.fishnet.analyser(
           game,
           lila.fishnet.Work.Sender(
@@ -36,15 +36,15 @@ final class Analyse(
     }
 
   def replay(pov: Pov, userTv: Option[lila.user.User])(implicit ctx: Context) =
-    if (HTTPRequest isCrawler ctx.req) replayBot(pov)
+    if (HTTPRequest `isCrawler` ctx.req) replayBot(pov)
     else
-      env.game.gameRepo initialFen pov.gameId flatMap { initialFen =>
+      env.game.gameRepo `initialFen` pov.gameId flatMap { initialFen =>
         gameC.preloadUsers(pov.game) >> redirectAtFen(pov, initialFen) {
-          (env.analyse.analyser get pov.game) zip
-            (!pov.game.metadata.analysed ?? env.fishnet.api.userAnalysisExists(pov.gameId)) zip
-            (pov.game.simulId ?? env.simul.repo.find) zip
+          (env.analyse.analyser `get` pov.game) zip
+            (if (!pov.game.metadata.analysed) env.fishnet.api.userAnalysisExists(pov.gameId) else fuccess(false)) zip
+            (pov.game.simulId.fold(fuccess(none[lila.simul.Simul]))(env.simul.repo.find)) zip
             roundC.getWatcherChat(pov.game) zip
-            (ctx.noBlind ?? env.game.crosstableApi.withMatchup(pov.game)) zip
+            (ctx.noBlind so env.game.crosstableApi.withMatchup(pov.game)) zip
             env.bookmark.api.exists(pov.game, ctx.me) zip
             env.swiss.api.getSwissPairingGamesForGame(pov.game) zip
             env.api.pgnDump(
@@ -121,7 +121,7 @@ final class Analyse(
             Ok(html.analyse.embed(pov, data)(ui.EmbedConfig.fromContext(ctx)))
           }
         case _ => fuccess(NotFound(html.analyse.embed.notFound(ui.EmbedConfig.fromContext(ctx))))
-      } dmap EnableSharedArrayBuffer
+      } `dmap` EnableSharedArrayBuffer
     }
 
   private def redirectAtFen(pov: Pov, initialFen: Option[FEN])(or: => Fu[Result])(implicit ctx: Context) =
@@ -143,9 +143,9 @@ final class Analyse(
 
   private def replayBot(pov: Pov)(implicit ctx: Context) =
     for {
-      initialFen <- env.game.gameRepo initialFen pov.gameId
-      analysis   <- env.analyse.analyser get pov.game
-      simul      <- pov.game.simulId ?? env.simul.repo.find
+      initialFen <- env.game.gameRepo `initialFen` pov.gameId
+      analysis   <- env.analyse.analyser `get` pov.game
+      simul      <- pov.game.simulId.fold(fuccess(none[lila.simul.Simul]))(env.simul.repo.find)
       crosstable <- env.game.crosstableApi.withMatchup(pov.game)
       pgn        <- env.api.pgnDump(pov.game, initialFen, analysis, PgnDump.WithFlags(clocks = false))
       sgf        <- env.api.sgfDump(pov.game, initialFen, PgnDump.WithFlags(clocks = false))
