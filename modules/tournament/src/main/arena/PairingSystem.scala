@@ -37,7 +37,7 @@ final private[tournament] class PairingSystem(
       usersWithBots = users.addBotUsers(botsToAdd)
       lastOpponents <- limitLastOpponents(tour, users, activePlayers)
       data = Data(tour, lastOpponents, ranking, activePlayers == 2)
-      preps <- readyToRunPreps(lastOpponents, usersWithBots, activePlayers) ?? evenOrAll(
+      preps <- readyToRunPreps(lastOpponents, usersWithBots, activePlayers) so evenOrAll(
         data,
         usersWithBots
       )
@@ -138,7 +138,7 @@ final private[tournament] class PairingSystem(
     } toList
 
   private def bestPairings(data: Data, players: RankedPlayers): List[Pairing.Prep] =
-    (players.sizeIs > 1) ?? AntmaPairing(data, addPlayerIndexHistory(players))
+    (players.sizeIs > 1) so AntmaPairing(data, addPlayerIndexHistory(players))
 
   private def addPlayerIndexHistory(players: RankedPlayers) =
     players.map(_ withPlayerIndexHistory playerIndexHistoryApi.get)

@@ -1,6 +1,6 @@
 package lila.relay
 
-import akka.actor._
+import org.apache.pekko.actor._
 import strategygames.format.pgn.{ Tag, Tags, Turn }
 import com.github.blemale.scaffeine.LoadingCache
 import io.lemonlabs.uri.Url
@@ -29,7 +29,7 @@ final private class RelayFetch(
     pgnDump: PgnDump,
     gameProxy: GameProxyRepo,
     ws: StandaloneWSClient
-)(implicit scheduler: akka.actor.Scheduler)
+)(implicit scheduler: org.apache.pekko.actor.Scheduler)
     extends Actor {
 
   implicit def system: ActorSystem          = context.system
@@ -44,7 +44,7 @@ final private class RelayFetch(
   case object Tick
 
   def scheduleNext(): Unit =
-    context.system.scheduler.scheduleOnce(500 millis, self, Tick).unit
+    { val _ = context.system.scheduler.scheduleOnce(500 millis, self, Tick) }
 
   def receive = {
 
@@ -58,7 +58,7 @@ final private class RelayFetch(
         List(true, false) foreach { official =>
           lila.mon.relay.ongoing(official).update(relays.count(_.tour.official == official))
         }
-        relays.map { rt =>
+        Future.sequence(relays.map { rt =>
           if (rt.round.sync.ongoing) processRelay(rt) flatMap { newRelay =>
             api.update(rt.round)(_ => newRelay)
           }
@@ -69,7 +69,7 @@ final private class RelayFetch(
             logger.info(s"Finish for lack of start ${rt.round}")
             api.update(rt.round)(_.finish)
           } else fuccess(rt.round)
-        }.sequenceFu addEffectAnyway scheduleNext()
+        }) addEffectAnyway scheduleNext()
       }.unit
   }
 
@@ -79,7 +79,7 @@ final private class RelayFetch(
     else
       fetchGames(rt)
         .mon(_.relay.fetchTime(rt.tour.official, rt.round.slug))
-        .addEffect(gs => lila.mon.relay.games(rt.tour.official, rt.round.slug).update(gs.size).unit)
+        .addEffect(gs => { val _ = lila.mon.relay.games(rt.tour.official, rt.round.slug).update(gs.size) })
         .flatMap { games =>
           sync(rt, games)
             .withTimeout(7 seconds, SyncResult.Timeout)
@@ -152,14 +152,15 @@ final private class RelayFetch(
   )
 
   private def fetchGames(rt: RelayRound.WithTour): Fu[RelayGames] =
-    rt.round.sync.upstream ?? {
+    rt.round.sync.upstream so {
       case UpstreamIds(ids) =>
         gameRepo.gamesFromSecondary(ids) flatMap
           gameProxy.upgradeIfPresent flatMap
           gameRepo.withInitialFens flatMap {
-            _.map { case (game, fen) =>
-              pgnDump(game, fen, gameIdsUpstreamPgnFlags).dmap(_.render)
-            }.sequenceFu dmap MultiPgn.apply
+            games =>
+              Future.sequence(games.map { case (game, fen) =>
+                pgnDump(game, fen, gameIdsUpstreamPgnFlags).dmap(_.render)
+              }) dmap MultiPgn.apply
           } flatMap RelayFetch.multiPgnToGames.apply
       case url: UpstreamUrl =>
         cache.asMap
@@ -199,7 +200,7 @@ final private class RelayFetch(
         }
       case RelayFormat.ManyFiles(indexUrl, makeGameDoc) =>
         httpGetJson[RoundJson](indexUrl) flatMap { round =>
-          round.pairings.zipWithIndex
+          Future.sequence(round.pairings.zipWithIndex
             .map { case (pairing, i) =>
               val number  = i + 1
               val gameDoc = makeGameDoc(number)
@@ -208,8 +209,7 @@ final private class RelayFetch(
                 case RelayFormat.DocFormat.Json =>
                   httpGetJson[GameJson](gameDoc.url) map { _.toPgn(pairing.tags) }
               }) map (number -> _)
-            }
-            .sequenceFu
+            })
             .map { results =>
               MultiPgn(results.sortBy(_._1).map(_._2))
             }

@@ -29,13 +29,12 @@ final private class FishnetRepo(
     getEnabledClient(Client.offline.key) getOrElse fuccess(Client.offline)
   def updateClientInstance(client: Client, instance: Client.Instance): Fu[Client] =
     client.updateInstance(instance).fold(fuccess(client)) { updated =>
-      clientColl.update.one(selectClient(client.key), $set("instance" -> updated.instance)) >>-
-        clientCache.invalidate(client.key) inject updated
+      clientColl.update.one(selectClient(client.key), $set("instance" -> updated.instance)).andDo(clientCache.invalidate(client.key)) inject updated
     }
   def addClient(client: Client)     = clientColl.insert.one(client)
-  def deleteClient(key: Client.Key) = clientColl.delete.one(selectClient(key)) >>- clientCache.invalidate(key)
+  def deleteClient(key: Client.Key) = clientColl.delete.one(selectClient(key)).andDo(clientCache.invalidate(key))
   def enableClient(key: Client.Key, v: Boolean): Funit =
-    clientColl.update.one(selectClient(key), $set("enabled" -> v)).void >>- clientCache.invalidate(key)
+    clientColl.update.one(selectClient(key), $set("enabled" -> v)).void.andDo(clientCache.invalidate(key))
   def allRecentClients =
     clientColl.list[Client](
       $doc(
@@ -47,7 +46,7 @@ final private class FishnetRepo(
   def getAnalysis(id: Work.Id)           = analysisColl.find(selectWork(id)).one[Work.Analysis]
   def updateAnalysis(ana: Work.Analysis) = analysisColl.update.one(selectWork(ana.id), ana).void
   def deleteAnalysis(ana: Work.Analysis) = analysisColl.delete.one(selectWork(ana.id)).void
-  def giveUpAnalysis(ana: Work.Analysis) = deleteAnalysis(ana) >>- logger.warn(s"Give up on analysis $ana")
+  def giveUpAnalysis(ana: Work.Analysis) = deleteAnalysis(ana).andDo(logger.warn(s"Give up on analysis $ana"))
   def updateOrGiveUpAnalysis(ana: Work.Analysis) =
     if (ana.isOutOfTries) giveUpAnalysis(ana) else updateAnalysis(ana)
 

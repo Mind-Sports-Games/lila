@@ -49,7 +49,7 @@ final private class SwissTiebreak(
 
 final private class SwissScoring(
     colls: SwissColls
-)(implicit scheduler: akka.actor.Scheduler, ec: scala.concurrent.ExecutionContext, mode: play.api.Mode) {
+)(implicit scheduler: org.apache.pekko.actor.Scheduler, ec: scala.concurrent.ExecutionContext, mode: play.api.Mode) {
 
   import BsonHandlers._
 
@@ -65,7 +65,7 @@ final private class SwissScoring(
 
   private def recompute(id: Swiss.Id): Fu[Option[SwissScoring.Result]] =
     colls.swiss.byId[Swiss](id.value) flatMap {
-      _.?? { (swiss: Swiss) =>
+      _.so { (swiss: Swiss) =>
         for {
           (prevPlayers, pairings) <- fetchPlayers(swiss) zip fetchPairings(swiss)
           pairingMap = SwissPairing.toMap(pairings)
@@ -90,7 +90,7 @@ final private class SwissScoring(
               val perfSum = playerPairings.foldLeft(0f) { case (perfSum, pairing) =>
                 val opponent = playerMap.get(pairing opponentOf p.userId)
                 val result   = pairing.resultFor(p.userId)
-                val newPerf = perfSum + opponent.??(_.actualRating) + result.?? { win =>
+                val newPerf = perfSum + opponent.so(_.actualRating) + result.so { win =>
                   if (win) 500 else -500
                 }
                 newPerf
@@ -103,7 +103,7 @@ final private class SwissScoring(
             }
           }
           _ <- SwissPlayer.fields { f =>
-            prevPlayers
+            Future.sequence(prevPlayers
               .zip(players)
               .withFilter { case (a, b) =>
                 a != b
@@ -121,8 +121,7 @@ final private class SwissScoring(
                     )
                   )
                   .void
-              }
-              .sequenceFu
+              })
               .void
           }
         } yield SwissScoring
@@ -146,7 +145,7 @@ final private class SwissScoring(
     }
 
   private def fetchPairings(swiss: Swiss) =
-    !swiss.isCreated ?? SwissPairing.fields { f =>
+    !swiss.isCreated so SwissPairing.fields { f =>
       colls.pairing.list[SwissPairing]($doc(f.swissId -> swiss.id))
     }
 }

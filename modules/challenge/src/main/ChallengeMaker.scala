@@ -15,10 +15,10 @@ final class ChallengeMaker(
 
   def makeRematchFor(gameId: Game.ID, dest: User): Fu[Option[Challenge]] =
     gameRepo game gameId flatMap {
-      _ ?? { game =>
-        game.opponentByUserId(dest.id).flatMap(_.userId) ?? userRepo.byId flatMap {
-          _ ?? { challenger =>
-            Pov(game, challenger) ?? { pov =>
+      _ so { game =>
+        game.opponentByUserId(dest.id).flatMap(_.userId) so userRepo.byId flatMap {
+          _ so { challenger =>
+            Pov(game, challenger) so { pov =>
               makeRematch(pov, challenger, dest) dmap some
             }
           }
@@ -27,9 +27,9 @@ final class ChallengeMaker(
     }
 
   def makeRematchOf(game: Game, challenger: User): Fu[Option[Challenge]] =
-    Pov.ofUserId(game, challenger.id) ?? { pov =>
-      pov.opponent.userId ?? userRepo.byId flatMap {
-        _ ?? { dest =>
+    Pov.ofUserId(game, challenger.id) so { pov =>
+      pov.opponent.userId so userRepo.byId flatMap {
+        _ so { dest =>
           makeRematch(pov, challenger, dest) dmap some
         }
       }

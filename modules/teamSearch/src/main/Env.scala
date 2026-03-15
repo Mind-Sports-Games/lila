@@ -1,8 +1,8 @@
 package lila.teamSearch
 
-import akka.actor._
+import org.apache.pekko.actor._
 import com.softwaremill.macwire._
-import io.methvin.play.autoconfig._
+import lila.common.autoconfig.{ AutoConfig, ConfigName }
 import play.api.Configuration
 
 import lila.common.config._

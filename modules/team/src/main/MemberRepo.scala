@@ -36,7 +36,7 @@ final class MemberRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionCo
     coll.countSel(teamQuery(teamId))
 
   def filterUserIdsInTeam(teamId: Team.ID, userIds: Set[User.ID]): Fu[Set[User.ID]] =
-    userIds.nonEmpty ??
+    userIds.nonEmpty so
       coll.distinctEasy[User.ID, Set]("user", $inIds(userIds.map { Member.makeId(teamId, _) }))
 
   def isSubscribed(team: Team, user: User): Fu[Boolean] =

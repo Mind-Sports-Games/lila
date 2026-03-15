@@ -35,7 +35,7 @@ final class Simul(env: Env) extends LilaController(env) {
   }
 
   private def fetchSimuls(me: Option[lila.user.User]) =
-    me.?? { u =>
+    me.so { u =>
       env.simul.repo.findPending(u.id)
     } zip
       env.simul.repo.allCreatedRecently zip
@@ -47,7 +47,7 @@ final class Simul(env: Env) extends LilaController(env) {
       env.simul.repo find id flatMap {
         _.fold(simulNotFound.fuccess) { sim =>
           for {
-            team    <- sim.team ?? env.team.api.team
+            team    <- sim.team so env.team.api.team
             version <- env.simul.version(sim.id)
             json <- env.simul.jsonView(
               sim,
@@ -62,8 +62,8 @@ final class Simul(env: Env) extends LilaController(env) {
               }
             )
             chat <-
-              canHaveChat(sim) ?? env.chat.api.userChat.cached.findMine(Chat.Id(sim.id), ctx.me).map(some)
-            _ <- chat ?? { c =>
+              canHaveChat(sim) so env.chat.api.userChat.cached.findMine(Chat.Id(sim.id), ctx.me).map(some)
+            _ <- chat so { c =>
               env.user.lightUserApi.preloadMany(c.chat.userIds)
             }
             stream <- env.streamer.liveStreamApi one sim.hostId

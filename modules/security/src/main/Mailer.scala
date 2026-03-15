@@ -1,7 +1,7 @@
 package lila.security
 
-import akka.actor.ActorSystem
-import io.methvin.play.autoconfig._
+import org.apache.pekko.actor.ActorSystem
+import lila.common.autoconfig.{ AutoConfig, ConfigName }
 import play.api.i18n.Lang
 import play.api.libs.mailer.{ Email, SMTPConfiguration, SMTPMailer }
 import scala.concurrent.duration.{ span => _, _ }
@@ -13,7 +13,7 @@ import lila.common.String.html.{ nl2br }
 import lila.common.{ Chronometer, EmailAddress, ThreadLocalRandom }
 import lila.i18n.I18nKeys.{ emails => trans }
 import play.api.ConfigLoader
-import akka.dispatch.MessageDispatcher
+import org.apache.pekko.dispatch.MessageDispatcher
 
 final class Mailer(
     config: Mailer.Config,

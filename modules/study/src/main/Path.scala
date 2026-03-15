@@ -65,7 +65,7 @@ object Path {
 
   def isMainline(node: RootOrNode, path: Path): Boolean =
     path.split.fold(true) { case (id, rest) =>
-      node.children.first ?? { child =>
+      node.children.first so { child =>
         child.id == id && isMainline(child, rest)
       }
     }

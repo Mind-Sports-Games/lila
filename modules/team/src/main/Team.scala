@@ -74,7 +74,7 @@ object Team {
         value.contains(s"$separator$teamId$separator")
 
     def toArray: Array[String] = value split IdsStr.separator
-    def toList                 = value.nonEmpty ?? toArray.toList
+    def toList                 = value.nonEmpty so toArray.toList
   }
 
   object IdsStr {

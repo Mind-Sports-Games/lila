@@ -26,7 +26,7 @@ final class ModApi(
     }
 
   def setEngine(mod: Mod, prev: Suspect, v: Boolean): Funit =
-    (prev.user.marks.engine != v) ?? {
+    (prev.user.marks.engine != v) so {
       for {
         _ <- userRepo.setEngine(prev.user.id, v)
         sus = prev.set(_.withMarks(_.set(_.Engine, v)))
@@ -45,9 +45,9 @@ final class ModApi(
     for {
       sus       <- reportApi.getSuspect(suspectId.value) orFail s"No such suspect $suspectId"
       unengined <- logApi.wasUnengined(sus)
-      _ <- (!sus.user.isBot && !sus.user.marks.engine && !unengined) ?? {
+      _ <- (!sus.user.isBot && !sus.user.marks.engine && !unengined) so {
         reportApi.getMod(modId.value) flatMap {
-          _ ?? { mod =>
+          _ so { mod =>
             lila.mon.cheat.autoMark.increment()
             setEngine(mod, sus, v = true) >>
               noteApi.playstrategyWrite(sus.user, note)
@@ -75,13 +75,13 @@ final class ModApi(
   def setTroll(mod: Mod, prev: Suspect, value: Boolean): Fu[Suspect] = {
     val changed = value != prev.user.marks.troll
     val sus     = prev.set(_.withMarks(_.set(_.Troll, value)))
-    changed ?? {
-      userRepo.updateTroll(sus.user).void >>- {
+    changed so {
+      userRepo.updateTroll(sus.user).void.andDo {
         logApi.troll(mod, sus)
         Bus.publish(lila.hub.actorApi.mod.Shadowban(sus.user.id, value), "shadowban")
       }
     } >>
-      reportApi.process(mod, sus, Set(Room.Comm)) >>- {
+      reportApi.process(mod, sus, Set(Room.Comm)).andDo {
         if (value) notifier.reporters(mod, sus).unit
       } inject sus
   }
@@ -106,7 +106,7 @@ final class ModApi(
 
   def reopenAccount(mod: String, username: String): Funit =
     withUser(username) { user =>
-      !user.enabled ?? {
+      !user.enabled so {
         (userRepo reopen user.id) >> logApi.reopenAccount(mod, user.id)
       }
     }
@@ -114,7 +114,7 @@ final class ModApi(
   def setKid(mod: String, username: String): Funit =
     withUser(username) { user =>
       userRepo.isKid(user.id) flatMap {
-        !_ ?? { (userRepo.setKid(user, true)) } >> logApi.setKidMode(mod, user.id)
+        !_ so { (userRepo.setKid(user, true)) } >> logApi.setKidMode(mod, user.id)
       }
     }
 
@@ -123,13 +123,11 @@ final class ModApi(
       title match {
         case None =>
           userRepo.removeTitle(user.id) >>
-            logApi.removeTitle(mod, user.id) >>-
-            lightUserApi.invalidate(user.id)
+            logApi.removeTitle(mod, user.id).andDo(lightUserApi.invalidate(user.id))
         case Some(t) =>
-          Title.names.get(t) ?? { tFull =>
+          Title.names.get(t) so { tFull =>
             userRepo.addTitle(user.id, t) >>
-              logApi.addTitle(mod, user.id, s"$t ($tFull)") >>-
-              lightUserApi.invalidate(user.id)
+              logApi.addTitle(mod, user.id, s"$t ($tFull)").andDo(lightUserApi.invalidate(user.id))
           }
       }
     }
@@ -159,12 +157,12 @@ final class ModApi(
     }
 
   def setReportban(mod: Mod, sus: Suspect, v: Boolean): Funit =
-    (sus.user.marks.reportban != v) ?? {
+    (sus.user.marks.reportban != v) so {
       userRepo.setReportban(sus.user.id, v) >> logApi.reportban(mod, sus, v)
     }
 
   def setRankban(mod: Mod, sus: Suspect, v: Boolean): Funit =
-    (sus.user.marks.rankban != v) ?? {
+    (sus.user.marks.rankban != v) so {
       if (v) Bus.publish(lila.hub.actorApi.mod.KickFromRankings(sus.user.id), "kickFromRankings")
       userRepo.setRankban(sus.user.id, v) >> logApi.rankban(mod, sus, v)
     }

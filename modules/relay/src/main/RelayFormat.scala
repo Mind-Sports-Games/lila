@@ -58,7 +58,7 @@ final private class RelayFormatApi(ws: StandaloneWSClient, cacheApi: CacheApi)(i
       lila.common.Future.find(
         List(url) ::: mostCommonIndexNames.filterNot(url.path.parts.contains).map(addPart(url, _))
       )(looksLikeJson) flatMap {
-        _ ?? { index =>
+        _ so { index =>
           val jsonUrl = (n: Int) => jsonDoc(replaceLastPart(index, s"game-$n.json"))
           val pgnUrl  = (n: Int) => pgnDoc(replaceLastPart(index, s"game-$n.pgn"))
           looksLikeJson(jsonUrl(1).url).map(_ option jsonUrl) orElse
@@ -87,7 +87,7 @@ final private class RelayFormatApi(ws: StandaloneWSClient, cacheApi: CacheApi)(i
   private def looksLikePgn(body: String): Boolean = {
     // TODO: Only support chess PGN for now.
     implicit val variant = Variant.Chess(ChessVariant.default)
-    MultiPgn.split(body, 1).value.headOption ?? { pgn =>
+    MultiPgn.split(body, 1).value.headOption so { pgn =>
       lila.study.PgnImport(pgn, Nil).isValid
     }
   }

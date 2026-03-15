@@ -28,7 +28,7 @@ final class Ip2ProxyServer(
     checkUrl: String
 )(implicit
     ec: scala.concurrent.ExecutionContext,
-    scheduler: akka.actor.Scheduler
+    scheduler: org.apache.pekko.actor.Scheduler
 ) extends Ip2Proxy {
 
   def apply(ip: IpAddress): Fu[Boolean] =
@@ -57,7 +57,7 @@ final class Ip2ProxyServer(
       case Nil      => fuccess(Seq.empty[Boolean])
       case List(ip) => apply(ip).dmap(Seq(_))
       case ips =>
-        ips.flatMap(cache.getIfPresent).sequenceFu flatMap { cached =>
+        Future.sequence(ips.flatMap(cache.getIfPresent)) flatMap { cached =>
           if (cached.sizeIs == ips.size) fuccess(cached)
           else
             ws.url(s"$checkUrl/batch")
@@ -65,7 +65,7 @@ final class Ip2ProxyServer(
               .get()
               .withTimeout(3 seconds)
               .map {
-                _.body[JsValue].asOpt[Seq[JsObject]] ?? {
+                _.body[JsValue].asOpt[Seq[JsObject]] so {
                   _.map(readIsProxy)
                 }
               }
@@ -85,7 +85,7 @@ final class Ip2ProxyServer(
   private val cache: AsyncLoadingCache[IpAddress, Boolean] = cacheApi.scaffeine
     .expireAfterWrite(1 days)
     .buildAsyncFuture { ip =>
-      checkUrl.nonEmpty ?? ws
+      checkUrl.nonEmpty so ws
         .url(checkUrl)
         .addQueryStringParameters("ip" -> ip.value)
         .get()

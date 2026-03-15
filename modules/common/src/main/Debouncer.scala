@@ -1,53 +1,40 @@
 package lila.common
 
-import akka.actor._
+import org.apache.pekko.actor._
 import java.util.concurrent.ConcurrentHashMap
 import scala.concurrent.duration._
-import scala.jdk.CollectionConverters._
 
 final class Debouncer[Id](scheduler: Scheduler, duration: FiniteDuration, initialCapacity: Int = 64)(
     f: Id => Unit
-)(implicit
-    ec: scala.concurrent.ExecutionContext
-) {
-  import Debouncer._
+)(using ec: Executor):
 
-  private val debounces = new ConcurrentHashMap[Id, Queued](initialCapacity)
+  private enum Queued:
+    case Another, Empty
+
+  private val debounces = ConcurrentHashMap[Id, Queued](initialCapacity)
 
   def push(id: Id): Unit = debounces
     .compute(
       id,
       (_, prev) =>
-        Option(prev) match {
+        Option(prev) match
           case None =>
             f(id)
             scheduler.scheduleOnce(duration) { runScheduled(id) }
-            Empty
-          case _ => Another
-        }
+            Queued.Empty
+          case _ => Queued.Another
     )
-    .unit
 
   private def runScheduled(id: Id): Unit = debounces
     .computeIfPresent(
       id,
       (_, queued) =>
-        if (queued == Another) {
+        if queued == Queued.Another then
           f(id)
           scheduler.scheduleOnce(duration) { runScheduled(id) }
-          Empty
-        } else nullToRemove
+          Queued.Empty
+        else nullToRemove
     )
-    .unit
 
-  private[this] var nullToRemove: Queued = _
-}
-
-private object Debouncer {
-
-  // can't use a boolean or int,
-  // the ConcurrentHashMap uses weird defaults instead of null for missing values
-  sealed private trait Queued
-  private object Another extends Queued
-  private object Empty   extends Queued
-}
+  @scala.annotation.nowarn
+  private var nullToRemove: Queued = scala.compiletime.uninitialized

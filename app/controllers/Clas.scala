@@ -1,6 +1,6 @@
 package controllers
 
-import akka.stream.scaladsl._
+import org.apache.pekko.stream.scaladsl._
 import play.api.data._
 import play.api.data.Forms._
 import play.api.mvc._
@@ -84,7 +84,7 @@ final class Clas(
         orDefault = _ =>
           if (isGranted(_.UserModView))
             env.clas.api.clas.byId(lila.clas.Clas.Id(id)) flatMap {
-              _ ?? { clas =>
+              _ so { clas =>
                 env.clas.api.student.allWithUsers(clas) flatMap { students =>
                   env.user.repo.withEmailsU(students.map(_.user)) map { users =>
                     Ok(html.mod.search.clas(Holder(me), clas, users))
@@ -101,11 +101,11 @@ final class Clas(
       forStudent: (lila.clas.Clas, List[lila.clas.Student.WithUser]) => Fu[Result],
       orDefault: Context => Fu[Result] = notFound(_)
   )(implicit ctx: Context): Fu[Result] =
-    isGranted(_.Teacher).??(env.clas.api.clas.isTeacherOf(me, lila.clas.Clas.Id(id))) flatMap {
+    isGranted(_.Teacher).so(env.clas.api.clas.isTeacherOf(me, lila.clas.Clas.Id(id))) flatMap {
       case true => forTeacher
       case _ =>
         env.clas.api.clas.byId(lila.clas.Clas.Id(id)) flatMap {
-          _ ?? { clas =>
+          _ so { clas =>
             env.clas.api.student.activeWithUsers(clas) flatMap { students =>
               if (students.exists(_.student is me)) forStudent(clas, students)
               else orDefault(ctx)
@@ -182,7 +182,7 @@ final class Clas(
                   env.msg.api
                     .multiPost(me, Source(students.map(_.user.id)), full)
                     .addEffect { nb =>
-                      lila.mon.msg.clasBulk(clas.id.value).record(nb).unit
+                      val _ = lila.mon.msg.clasBulk(clas.id.value).record(nb)
                     }
                     .inject {
                       Redirect(routes.Clas.show(clas.id.value)).flashSuccess
@@ -206,7 +206,7 @@ final class Clas(
 
   def progress(id: String, key: String, days: Int) =
     Secure(_.Teacher) { implicit ctx => me =>
-      lila.rating.PerfType(key) ?? { perfType =>
+      lila.rating.PerfType(key) so { perfType =>
         WithClass(me, id) { clas =>
           env.clas.api.student.activeWithUsers(clas) flatMap { students =>
             Reasonable(clas, students, "progress") {
@@ -279,7 +279,7 @@ final class Clas(
       else
         WithClassAndStudents(me, id) { (clas, students) =>
           for {
-            created <- ctx.req.flash.get("created").map(_ split ' ').?? {
+            created <- ctx.req.flash.get("created").map(_ split ' ').so {
               case Array(userId, password) =>
                 env.clas.api.student
                   .get(clas, userId)
@@ -338,7 +338,7 @@ final class Clas(
   // def studentManyForm(id: String) =
   //   Secure(_.Teacher) { implicit ctx => me =>
   //     WithClassAndStudents(me, id) { (clas, students) =>
-  //       ctx.req.flash.get("created").?? {
+  //       ctx.req.flash.get("created").so {
   //         _.split('/').toList
   //           .flatMap {
   //             _.split(' ') match {
@@ -416,7 +416,7 @@ final class Clas(
               },
             data =>
               env.user.repo enabledNamed data.username flatMap {
-                _ ?? { user =>
+                _ so { user =>
                   import lila.clas.ClasInvite.{ Feedback => F }
                   env.clas.api.invite.create(clas, user, data.realName, me) map { feedback =>
                     Redirect(routes.Clas.studentForm(clas.id.value)).flashing {
@@ -540,7 +540,7 @@ final class Clas(
       couldBeTeacher flatMap {
         case true =>
           val perm = lila.security.Permission.Teacher.dbKey
-          (!me.roles.has(perm) ?? env.user.repo.setRoles(me.id, perm :: me.roles).void) inject
+          (!me.roles.has(perm) so env.user.repo.setRoles(me.id, perm :: me.roles).void) inject
             Redirect(routes.Clas.index)
         case _ => notFound
       }
@@ -570,7 +570,7 @@ final class Clas(
           v => {
             val inviteId = lila.clas.ClasInvite.Id(id)
             if (v) env.clas.api.invite.accept(inviteId, me) map {
-              _ ?? { student =>
+              _ so { student =>
                 Redirect(routes.Clas.show(student.clasId.value))
               }
             }
@@ -584,7 +584,7 @@ final class Clas(
   def invitationRevoke(id: String) =
     Secure(_.Teacher) { _ => me =>
       env.clas.api.invite.get(lila.clas.ClasInvite.Id(id)) flatMap {
-        _ ?? { invite =>
+        _ so { invite =>
           WithClass(me, invite.clasId.value) { clas =>
             env.clas.api.invite.delete(invite._id) inject Redirect(routes.Clas.students(clas.id.value))
           }
@@ -601,7 +601,7 @@ final class Clas(
   private def WithClass(me: Holder, clasId: String)(
       f: lila.clas.Clas => Fu[Result]
   ): Fu[Result] =
-    env.clas.api.clas.getAndView(lila.clas.Clas.Id(clasId), me.user) flatMap { _ ?? f }
+    env.clas.api.clas.getAndView(lila.clas.Clas.Id(clasId), me.user) flatMap { _ so f }
 
   private def WithClassAndStudents(me: Holder, clasId: String)(
       f: (lila.clas.Clas, List[lila.clas.Student]) => Fu[Result]
@@ -614,8 +614,8 @@ final class Clas(
       f: lila.clas.Student.WithUser => Fu[Result]
   ): Fu[Result] =
     env.user.repo named username flatMap {
-      _ ?? { user =>
-        env.clas.api.student.get(clas, user) flatMap { _ ?? f }
+      _ so { user =>
+        env.clas.api.student.get(clas, user) flatMap { _ so f }
       }
     }
 

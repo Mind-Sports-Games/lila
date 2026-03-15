@@ -6,7 +6,7 @@ final class Coordinate(env: Env) extends LilaController(env) {
 
   def home =
     Open { implicit ctx =>
-      ctx.userId ?? { userId =>
+      ctx.userId so { userId =>
         env.coordinate.api getScore userId map (_.some)
       } map { score =>
         views.html.coordinate.home(score)

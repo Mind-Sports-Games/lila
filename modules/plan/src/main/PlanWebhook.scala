@@ -11,7 +11,7 @@ final class PlanWebhook(api: PlanApi)(implicit ec: scala.concurrent.ExecutionCon
   // then fetch the event from the stripe API.
   def stripe(js: JsValue): Funit = {
     def log = logger branch "stripe.webhook"
-    (js \ "id").asOpt[String] ?? api.stripe.getEvent flatMap {
+    (js \ "id").asOpt[String] so api.stripe.getEvent flatMap {
       case None =>
         log.warn(s"Forged webhook $js")
         funit
@@ -43,7 +43,7 @@ final class PlanWebhook(api: PlanApi)(implicit ec: scala.concurrent.ExecutionCon
   def payPal(js: JsValue): Funit = {
     def log = logger branch "payPal.webhook"
     import JsonHandlers.payPal._
-    js.get[PayPalEventId]("id") ?? api.payPal.getEvent flatMap {
+    js.get[PayPalEventId]("id") so api.payPal.getEvent flatMap {
       case None =>
         log.warn(s"Forged event ${js str "id"} ${Json.stringify(js).take(2000)}")
         funit
@@ -55,8 +55,8 @@ final class PlanWebhook(api: PlanApi)(implicit ec: scala.concurrent.ExecutionCon
         event.tpe match {
           case "BILLING.SUBSCRIPTION.ACTIVATED" => funit
           case "BILLING.SUBSCRIPTION.CANCELLED" =>
-            event.resourceId.map(PayPalSubscriptionId) ?? api.payPal.subscriptionUser flatMap {
-              _ ?? api.cancel
+            event.resourceId.map(PayPalSubscriptionId) so api.payPal.subscriptionUser flatMap {
+              _ so api.cancel
             }
           case _ => funit
         }

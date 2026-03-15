@@ -152,7 +152,7 @@ final class SecurityForm(
       ).fill(
         ChangeEmail(
           passwd = "",
-          email = old.??(_.value)
+          email = old.so(_.value)
         )
       )
     }
@@ -182,7 +182,7 @@ final class SecurityForm(
       Form(
         tuple(
           "passwd" -> passwordMapping(candidate),
-          "token"  -> text.verifying("invalidAuthenticationCode", t => u.totpSecret.??(_.verify(TotpToken(t))))
+          "token"  -> text.verifying("invalidAuthenticationCode", t => u.totpSecret.so(_.verify(TotpToken(t))))
         )
       )
     }

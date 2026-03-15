@@ -9,7 +9,7 @@ final class GameProxyRepo(
     roundSocket: RoundSocket
 )(implicit ec: scala.concurrent.ExecutionContext) {
 
-  def game(gameId: Game.ID): Fu[Option[Game]] = Game.validId(gameId) ?? roundSocket.getGame(gameId)
+  def game(gameId: Game.ID): Fu[Option[Game]] = Game.validId(gameId) so roundSocket.getGame(gameId)
 
   def pov(gameId: Game.ID, user: lila.user.User): Fu[Option[Pov]] =
     game(gameId) dmap { _ flatMap { Pov(_, user) } }
@@ -33,7 +33,7 @@ final class GameProxyRepo(
     upgradeIfPresent(pov.game).dmap(_ pov pov.playerIndex)
 
   def upgradeIfPresent(games: List[Game]): Fu[List[Game]] =
-    games.map(upgradeIfPresent).sequenceFu
+    Future.sequence(games.map(upgradeIfPresent))
 
   // update the proxied game
   def updateIfPresent = roundSocket.updateIfPresent _
@@ -48,9 +48,10 @@ final class GameProxyRepo(
 
   def urgentGames(user: lila.user.User): Fu[List[Pov]] =
     gameRepo urgentPovsUnsorted user flatMap {
-      _.map { pov =>
-        gameIfPresent(pov.gameId) dmap { _.fold(pov)(pov.withGame) }
-      }.sequenceFu map { povs =>
+      povs =>
+        Future.sequence(povs.map { pov =>
+          gameIfPresent(pov.gameId) dmap { _.fold(pov)(pov.withGame) }
+        }) map { povs =>
         try {
           povs sortWith Pov.priority
         } catch { case _: IllegalArgumentException => povs.sortBy(-_.game.updatedAt.getSeconds) }

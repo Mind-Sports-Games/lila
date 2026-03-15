@@ -1,6 +1,6 @@
 package lila.api
 
-import akka.stream.scaladsl._
+import org.apache.pekko.stream.scaladsl._
 import strategygames.format.FEN
 import strategygames.format.pgn.Tag
 import strategygames.{ Player => PlayerIndex, P2, P1 }
@@ -36,7 +36,7 @@ final class GameApiV2(
     gameProxy: GameProxyRepo
 )(implicit
     ec: scala.concurrent.ExecutionContext,
-    system: akka.actor.ActorSystem
+    system: org.apache.pekko.actor.ActorSystem
 ) {
 
   import GameApiV2._
@@ -48,7 +48,7 @@ final class GameApiV2(
       case Some(imported) => fuccess(imported.pgn)
       case None =>
         for {
-          realPlayers                  <- config.playerFile.??(realPlayerApi.apply)
+          realPlayers                  <- config.playerFile.so(realPlayerApi.apply)
           (game, initialFen, analysis) <- enrich(config.flags)(game)
           _export <- config.format match {
             case Format.JSON =>
@@ -119,12 +119,12 @@ final class GameApiV2(
 
   def exportByUser(config: ByUserConfig): Source[String, _] =
     Source futureSource {
-      config.playerFile.??(realPlayerApi.apply) map { realPlayers =>
+      config.playerFile.so(realPlayerApi.apply) map { realPlayers =>
         gameRepo
           .sortedCursor(
             config.vs.fold(Query.user(config.user.id)) { Query.opponents(config.user, _) } ++
               Query.createdBetween(config.since, config.until) ++
-              (!config.ongoing).??(Query.finished),
+              (!config.ongoing).so(Query.finished),
             Query.sortCreated,
             batchSize = config.perSecond.value
           )
@@ -141,7 +141,7 @@ final class GameApiV2(
 
   def exportByIds(config: ByIdsConfig, chronological: Boolean = false): Source[String, _] =
     Source futureSource {
-      config.playerFile.??(realPlayerApi.apply) map { realPlayers =>
+      config.playerFile.so(realPlayerApi.apply) map { realPlayers =>
         gameRepo
           .sortedCursor(
             $inIds(config.ids),
@@ -167,7 +167,7 @@ final class GameApiV2(
           .grouped(config.perSecond.value)
           .throttle(1, 1 second)
           .mapAsync(1) { pairings =>
-            isTeamBattle.?? {
+            isTeamBattle.so {
               playerRepo.teamsOfPlayers(config.tournamentId, pairings.flatMap(_.users).distinct).dmap(_.toMap)
             } flatMap { playerTeams =>
               gameRepo.gameOptionsFromSecondary(pairings.map(_.gameId)) map {
@@ -259,7 +259,7 @@ final class GameApiV2(
 
   private def enrich(flags: WithFlags)(game: Game) =
     gameRepo initialFen game flatMap { initialFen =>
-      (flags.evals ?? analysisRepo.byGame(game)) dmap {
+      (flags.evals so analysisRepo.byGame(game)) dmap {
         (game, initialFen, _)
       }
     }
@@ -301,7 +301,7 @@ final class GameApiV2(
     for {
       lightUsers <- gameLightUsers(g) dmap { case (wu, bu) => List(wu, bu) }
       pgn <-
-        withFlags.pgnInJson ?? pgnDump
+        withFlags.pgnInJson so pgnDump
           .apply(g, initialFen, analysisOption, withFlags, realPlayers = realPlayers)
           .dmap(pgnDump.toPgnString)
           .dmap(some)
@@ -328,7 +328,7 @@ final class GameApiV2(
             .add("aiLevel" -> p.aiLevel)
             .add("analysis" -> analysisOption.flatMap(analysisJson.player(g pov p.playerIndex)))
             .add("team" -> teams.map(_(p.playerIndex)))
-        // .add("plyCentis" -> withFlags.plyTimes ?? g.plyTimes(p.playerIndex).map(_.map(_.centis)))
+        // .add("plyCentis" -> withFlags.plyTimes so g.plyTimes(p.playerIndex).map(_.map(_.centis)))
         })
       )
       .add("initialFen" -> initialFen)
@@ -352,7 +352,7 @@ final class GameApiV2(
       })
 
   private def gameLightUsers(game: Game): Fu[(Option[LightUser], Option[LightUser])] =
-    (game.p1Player.userId ?? getLightUser) zip (game.p2Player.userId ?? getLightUser)
+    (game.p1Player.userId so getLightUser) zip (game.p2Player.userId so getLightUser)
 }
 
 object GameApiV2 {

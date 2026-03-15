@@ -1,7 +1,7 @@
 package lila.search
 
 import com.softwaremill.macwire._
-import io.methvin.play.autoconfig._
+import lila.common.autoconfig.{ AutoConfig, ConfigName }
 import play.api.Configuration
 import play.api.libs.ws.StandaloneWSClient
 

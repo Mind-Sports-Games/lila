@@ -22,7 +22,7 @@ final class RequestRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionC
     coll.list[Request](teamQuery(teamId))
 
   def findByTeams(teamIds: List[ID]): Fu[List[Request]] =
-    teamIds.nonEmpty ?? coll.list[Request](teamsQuery(teamIds))
+    teamIds.nonEmpty so coll.list[Request](teamsQuery(teamIds))
 
   def selectId(teamId: ID, userId: ID) = $id(Request.makeId(teamId, userId))
   def teamQuery(teamId: ID)            = $doc("team" -> teamId)

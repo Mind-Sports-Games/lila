@@ -1,8 +1,8 @@
 package lila.clas
 
-import akka.actor.Scheduler
-import akka.stream.Materializer
-import akka.stream.scaladsl._
+import org.apache.pekko.actor.Scheduler
+import org.apache.pekko.stream.Materializer
+import org.apache.pekko.stream.scaladsl._
 import bloomfilter.mutable.BloomFilter
 import reactivemongo.akkastream.cursorProducer
 import reactivemongo.api.ReadPreference
@@ -47,5 +47,5 @@ final class ClasStudentCache(colls: ClasColls, cacheApi: CacheApi)(implicit
         .unit
     }
 
-  scheduler.scheduleWithFixedDelay(23 seconds, 1 hour) { rebuildBloomFilter _ }.unit
+  val _ = scheduler.scheduleWithFixedDelay(23 seconds, 1 hour) { rebuildBloomFilter _ }
 }

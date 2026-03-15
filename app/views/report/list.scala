@@ -111,7 +111,7 @@ object list {
                 "All",
                 scoreTag(scores.highest)
               ),
-              ctx.me ?? { me =>
+              ctx.me so { me =>
                 lila.report.Room.all.filter(lila.report.Room.isGrantedFor(Holder(me))).map { room =>
                   a(
                     href := routes.Report.listWithFilter(room.key),

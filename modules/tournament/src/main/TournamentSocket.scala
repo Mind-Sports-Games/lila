@@ -1,6 +1,6 @@
 package lila.tournament
 
-import akka.actor._
+import org.apache.pekko.actor._
 import java.util.concurrent.ConcurrentHashMap
 import scala.concurrent.duration._
 import scala.concurrent.Promise
@@ -24,7 +24,7 @@ final private class TournamentSocket(
 )(implicit
     ec: scala.concurrent.ExecutionContext,
     system: ActorSystem,
-    scheduler: akka.actor.Scheduler,
+    scheduler: org.apache.pekko.actor.Scheduler,
     mode: play.api.Mode
 ) {
 
@@ -92,7 +92,7 @@ final private class TournamentSocket(
     )
 
   private lazy val tourHandler: Handler = { case Protocol.In.WaitingUsers(roomId, users) =>
-    allWaitingUsers
+    val _ = allWaitingUsers
       .computeIfPresent(
         roomId.value,
         (_: Tournament.ID, cur: WaitingUsers.WithNext) => {
@@ -101,14 +101,13 @@ final private class TournamentSocket(
           WaitingUsers.WithNext(newWaiting, none)
         }
       )
-      .unit
   }
 
   private lazy val send: String => Unit = remoteSocketApi.makeSender("tour-out").apply _
 
   remoteSocketApi.subscribe("tour-in", Protocol.In.reader)(
     tourHandler orElse handler orElse remoteSocketApi.baseHandler
-  ) >>- send(P.Out.boot)
+  ).andDo(send(P.Out.boot))
 
   object Protocol {
 

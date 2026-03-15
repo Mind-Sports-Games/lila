@@ -41,7 +41,7 @@ final class ForumRecent(
   private val defaultLang = "en"
 
   private def userCacheKey(user: Option[User], getTeams: GetTeamIds): Fu[String] =
-    (user.map(_.id) ?? getTeams).map { teamIds =>
+    (user.map(_.id) so getTeams).map { teamIds =>
       val langs =
         user
           .flatMap(_.realLang)

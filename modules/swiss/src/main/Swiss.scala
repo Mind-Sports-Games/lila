@@ -1,6 +1,6 @@
 package lila.swiss
 
-import ornicar.scalalib.Zero
+import alleycats.Zero
 
 import strategygames.format.FEN
 import strategygames.{ ByoyomiClock, Clock, ClockConfig, GameFamily, GameGroup, Speed }
@@ -157,8 +157,8 @@ object Swiss {
   case class Performance(value: Float)           extends AnyVal
   case class Score(value: Long)                  extends AnyVal
 
-  implicit val SonnenbornBergerZero: Zero[SonnenbornBerger] = Zero.instance(SonnenbornBerger(0))
-  implicit val BuchholzZero: Zero[Buchholz]                 = Zero.instance(Buchholz(0))
+  implicit val SonnenbornBergerZero: Zero[SonnenbornBerger] = Zero(SonnenbornBerger(0))
+  implicit val BuchholzZero: Zero[Buchholz]                 = Zero(Buchholz(0))
 
   case class IdName(_id: Id, name: String) {
     def id = _id

@@ -12,7 +12,7 @@ final private class StudyMaker(
 )(implicit ec: scala.concurrent.ExecutionContext) {
 
   def apply(data: StudyMaker.ImportGame, user: User): Fu[Study.WithChapter] =
-    (data.form.gameId ?? gameRepo.gameWithInitialFen).flatMap {
+    (data.form.gameId so gameRepo.gameWithInitialFen).flatMap {
       case Some((game, initialFen)) => createFromPov(data, Pov(game, data.form.orientation), initialFen, user)
       case None                     => createFromScratch(data, user)
     } map { sc =>

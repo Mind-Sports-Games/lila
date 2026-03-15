@@ -5,7 +5,7 @@ import lila.user.{ User, UserContext }
 trait SecurityHelper {
 
   def isGranted(permission: Permission)(implicit ctx: UserContext): Boolean =
-    ctx.me ?? Granter(permission)
+    ctx.me so Granter(permission)
 
   def isGranted(permission: Permission.Selector)(implicit ctx: UserContext): Boolean =
     isGranted(permission(Permission))

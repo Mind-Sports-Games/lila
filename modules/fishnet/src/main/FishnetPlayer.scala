@@ -7,7 +7,7 @@ import strategygames.format.Uci
 
 import lila.common.Future
 import lila.game.{ Game, GameRepo, UciMemo }
-import ornicar.scalalib.Random.approximately
+import scalalib.Random.approximately
 
 final class FishnetPlayer(
     redis: FishnetRedis,
@@ -16,11 +16,11 @@ final class FishnetPlayer(
     val maxTurns: Int
 )(implicit
     ec: scala.concurrent.ExecutionContext,
-    scheduler: akka.actor.Scheduler
+    scheduler: org.apache.pekko.actor.Scheduler
 ) {
 
   def apply(game: Game): Funit =
-    game.aiLevel ?? { level =>
+    game.aiLevel so { level =>
       Future.delay(delayFor(game) | 0.millis) {
         makeWork(game, level) addEffect redis.request void
       }

@@ -3,7 +3,7 @@ package lila.video
 import play.api.libs.ws.StandaloneWSClient
 import play.api.Mode
 import com.softwaremill.macwire._
-import io.methvin.play.autoconfig._
+import lila.common.autoconfig.{ AutoConfig, ConfigName }
 import play.api.Configuration
 import scala.concurrent.duration._
 
@@ -24,7 +24,7 @@ private class VideoConfig(
 final class Env(
     appConfig: Configuration,
     ws: StandaloneWSClient,
-    scheduler: akka.actor.Scheduler,
+    scheduler: org.apache.pekko.actor.Scheduler,
     db: lila.db.Db,
     cacheApi: lila.memo.CacheApi,
     mode: Mode

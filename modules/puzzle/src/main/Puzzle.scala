@@ -40,7 +40,7 @@ case class Puzzle(
 
   // ply after "initial move" when we start solving
   def initialPly: Int =
-    fen.fullMove ?? { fm =>
+    fen.fullMove so { fm =>
       fm * 2 - playerIndex.fold(1, 2)
     }
 
@@ -90,7 +90,7 @@ object Puzzle {
         l + charToInt(char) * pow
       }
 
-    def apply(l: Long): Option[Id] = (l > 130_000) ?? {
+    def apply(l: Long): Option[Id] = (l > 130_000) so {
       val str = powers.reverse
         .foldLeft(("", l)) { case ((id, rest), pow) =>
           val frac = rest / pow

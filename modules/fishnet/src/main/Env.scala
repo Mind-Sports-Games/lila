@@ -1,9 +1,9 @@
 package lila.fishnet
 
-import akka.actor._
+import org.apache.pekko.actor._
 import com.softwaremill.macwire._
 import io.lettuce.core._
-import io.methvin.play.autoconfig._
+import lila.common.autoconfig.{ AutoConfig, ConfigName }
 import play.api.Configuration
 
 import lila.common.Bus
@@ -33,11 +33,11 @@ final class Env(
     db: lila.db.Db,
     cacheApi: lila.memo.CacheApi,
     sink: lila.analyse.Analyser,
-    shutdown: akka.actor.CoordinatedShutdown
+    shutdown: org.apache.pekko.actor.CoordinatedShutdown
 )(implicit
     ec: scala.concurrent.ExecutionContext,
     system: ActorSystem,
-    scheduler: akka.actor.Scheduler
+    scheduler: org.apache.pekko.actor.Scheduler
 ) {
 
   private val config = appConfig.get[FishnetConfig]("fishnet")(AutoConfig.loader)

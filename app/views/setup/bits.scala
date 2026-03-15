@@ -22,7 +22,7 @@ private object bits {
       frag(
         div(
           cls := "fen_form",
-          dataValidateUrl := s"""${routes.Setup.validateFen}${strict.??("?strict=1")}"""
+          dataValidateUrl := s"""${routes.Setup.validateFen}${strict.so("?strict=1")}"""
         )(
           form3.input(field)(st.placeholder := trans.pasteTheFenStringHere.txt()),
           a(

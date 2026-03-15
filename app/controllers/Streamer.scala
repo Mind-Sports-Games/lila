@@ -18,7 +18,7 @@ final class Streamer(
   def index(page: Int) =
     Open { implicit ctx =>
       NoBot {
-        ctx.noKid ?? {
+        ctx.noKid so {
           pageHit
           val requests = getBool("requests") && isGranted(_.Streamers)
           for {
@@ -88,7 +88,7 @@ final class Streamer(
 
   def create =
     AuthBody { implicit ctx => me =>
-      ctx.noKid ?? {
+      ctx.noKid so {
         NoLameOrBot {
           NoShadowban {
             api find me flatMap {
@@ -101,7 +101,7 @@ final class Streamer(
     }
 
   private def modData(streamer: StreamerModel)(implicit ctx: Context) =
-    isGranted(_.ModLog) ?? {
+    isGranted(_.ModLog) so {
       env.mod.logApi.userHistory(streamer.userId) zip
         env.user.noteApi.forMod(streamer.userId) zip
         env.streamer.api.sameChannels(streamer) map some
@@ -204,8 +204,8 @@ final class Streamer(
     }
 
   private def WithVisibleStreamer(s: StreamerModel.WithUser)(f: Fu[Result])(implicit ctx: Context) =
-    ctx.noKid ?? {
-      if (s.streamer.isListed || ctx.me.??(s.streamer.is) || isGranted(_.Admin)) f
+    ctx.noKid so {
+      if (s.streamer.isListed || ctx.me.so(s.streamer.is) || isGranted(_.Admin)) f
       else notFound
     }
 }

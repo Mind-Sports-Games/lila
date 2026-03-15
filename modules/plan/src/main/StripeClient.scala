@@ -37,7 +37,7 @@ final private class StripeClient(
       "line_items[0][price_data][currency]"    -> "USD",
       "line_items[0][price_data][unit_amount]" -> data.checkout.amount.value,
       "line_items[0][quantity]"                -> 1
-    ) ::: data.isLifetime.?? {
+    ) ::: data.isLifetime.so {
       List(
         "line_items[0][description]" ->
           lila.i18n.I18nKeys.patron.payLifetimeOnce.txt(data.checkout.amount.usd.toString)
@@ -100,7 +100,7 @@ final private class StripeClient(
     getList[StripeInvoice]("invoices", "customer" -> customerId.value)
 
   def getPaymentMethod(sub: StripeSubscription): Fu[Option[StripePaymentMethod]] =
-    sub.default_payment_method ?? { id =>
+    sub.default_payment_method so { id =>
       getOne[StripePaymentMethod](s"payment_methods/$id")
     }
 
@@ -214,7 +214,7 @@ object StripeClient {
   class NotFoundException(status: Int, msg: String)       extends StatusException(status, msg)
   class InvalidRequestException(status: Int, msg: String) extends StatusException(status, msg)
 
-  import io.methvin.play.autoconfig._
+  import lila.common.autoconfig.{ AutoConfig, ConfigName }
   private[plan] case class Config(
       endpoint: String,
       @ConfigName("keys.public") publicKey: String,

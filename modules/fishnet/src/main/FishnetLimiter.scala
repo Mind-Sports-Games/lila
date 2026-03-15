@@ -16,7 +16,7 @@ final private class FishnetLimiter(
       case false => fuFalse
       case true  => perDayCheck(sender)
     } flatMap { accepted =>
-      (accepted ?? requesterApi.add(sender.userId, ownGame)) inject accepted
+      (accepted so requesterApi.add(sender.userId, ownGame)) inject accepted
     }
 
   private val RequestLimitPerIP = new lila.memo.RateLimit[IpAddress](

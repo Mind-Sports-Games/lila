@@ -60,7 +60,7 @@ final private class LinkCheck(
       case _                           => fuccess(none)
     }
   } flatMap {
-    _ ?? { source =>
+    _ so { source =>
       // the owners of a chat can post whichever link they like
       if (source.owners(line.userId)) fuTrue
       else f(id, source)
@@ -69,9 +69,9 @@ final private class LinkCheck(
 
   private def tourLink(tourId: Tournament.ID, source: FullSource) =
     tournamentRepo byId tourId flatMap {
-      _ ?? { tour =>
+      _ so { tour =>
         fuccess(tour.isScheduled) >>| {
-          source.teamId ?? { sourceTeamId =>
+          source.teamId so { sourceTeamId =>
             fuccess(tour.conditions.teamMember.exists(_.teamId == sourceTeamId)) >>|
               tournamentRepo.isForTeam(tour.id, sourceTeamId)
           }

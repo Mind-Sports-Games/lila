@@ -7,7 +7,7 @@ import lila.common.CuteNameGenerator
 final class NameGenerator(userRepo: lila.user.UserRepo)(implicit ec: ExecutionContext) {
 
   def apply(maxSize: Int = 17, triesLeft: Int = 20): Fu[Option[String]] = {
-    CuteNameGenerator.make(maxSize) ?? { name =>
+    CuteNameGenerator.make(maxSize) so { name =>
       userRepo.nameExists(name) flatMap {
         case true if triesLeft > 0 => apply(maxSize, triesLeft - 1)
         case true                  => fuccess(none)

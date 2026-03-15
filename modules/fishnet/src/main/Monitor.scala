@@ -8,7 +8,7 @@ final private class Monitor(
     cacheApi: lila.memo.CacheApi
 )(implicit
     ec: scala.concurrent.ExecutionContext,
-    system: akka.actor.ActorSystem
+    system: org.apache.pekko.actor.ActorSystem
 ) {
 
   val statusCache = cacheApi.unit[Monitor.Status] {

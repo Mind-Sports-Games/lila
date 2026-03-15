@@ -42,7 +42,7 @@ final class Importer(env: Env) extends LilaController(env) {
             ImportRateLimitPerIP(HTTPRequest ipAddress req, cost = 1) {
               doImport(data, req, ctx.me) flatMap {
                 case Some(game) =>
-                  ctx.me.ifTrue(data.analyse.isDefined && game.analysable) ?? { me =>
+                  ctx.me.ifTrue(data.analyse.isDefined && game.analysable) so { me =>
                     env.fishnet.analyser(
                       game,
                       lila.fishnet.Work.Sender(
@@ -91,7 +91,7 @@ final class Importer(env: Env) extends LilaController(env) {
       me: Option[lila.user.User]
   ): Fu[Option[lila.game.Game]] =
     env.importer.importer(data, me.map(_.id)) flatMap { game =>
-      me.map(_.id).??(env.game.cached.clearNbImportedByCache) inject game.some
+      me.map(_.id).so(env.game.cached.clearNbImportedByCache) inject game.some
     } recover { case e: Exception =>
       lila
         .log("importer")
@@ -102,9 +102,9 @@ final class Importer(env: Env) extends LilaController(env) {
   def masterGame(id: String, orientation: String) =
     Open { implicit ctx =>
       env.explorer.importer(id) map {
-        _ ?? { game =>
+        _ so { game =>
           val url      = routes.Round.watcher(game.id, orientation).url
-          val fenParam = get("fen").??(f => s"?fen=$f")
+          val fenParam = get("fen").so(f => s"?fen=$f")
           Redirect(s"$url$fenParam")
         }
       }

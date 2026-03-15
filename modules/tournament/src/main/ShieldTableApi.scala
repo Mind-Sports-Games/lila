@@ -37,10 +37,10 @@ final class ShieldTableApi(
 
   def clearRepo(category: Category) =
     byCategoryId(category.id) flatMap { entries =>
-      (entries.nonEmpty ?? repo.coll.delete.one($inIds(entries.map(_.id))).void)
+      (entries.nonEmpty so repo.coll.delete.one($inIds(entries.map(_.id))).void)
     }
 
-  def insert(userPoints: Seq[ShieldTableEntry]) = userPoints.nonEmpty ??
+  def insert(userPoints: Seq[ShieldTableEntry]) = userPoints.nonEmpty so
     repo.coll.insert(ordered = false).many(userPoints).void
 
   def recalculate(category: Category): Funit =
@@ -54,7 +54,7 @@ final class ShieldTableApi(
         )
       }
 
-  def recalculateAll = Category.all.map(recalculate).sequenceFu.void
+  def recalculateAll = Future.sequence(Category.all.map(recalculate)).void
 
 }
 

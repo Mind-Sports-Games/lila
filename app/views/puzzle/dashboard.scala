@@ -33,7 +33,7 @@ object dashboard {
         else s"${user.username} puzzle dashboard",
       subtitle = "Train, analyse, improve",
       dashOpt = dashOpt,
-      moreJs = dashOpt ?? { dash =>
+      moreJs = dashOpt so { dash =>
         val mostPlayedVariant = dash.mostPlayedVariant.sortBy { case (key, _) =>
           VariantKeys.variantName(key)
         }
@@ -142,14 +142,14 @@ object dashboard {
                 a(
                   cls := (d == days).option("current"),
                   href := s"${routes.Puzzle
-                    .dashboard(variant.key, d, path)}${!(ctx is user) ?? s"?u=${user.username}"}"
+                    .dashboard(variant.key, d, path)}${!(ctx is user) so s"?u=${user.username}"}"
                 )(trans.nbDays.pluralSame(d))
               }
             )
           ),
           bits.variantSelector(
             variant,
-            v => s"${routes.Puzzle.dashboard(v.key, days, path)}${!(ctx is user) ?? s"?u=${user.username}"}"
+            v => s"${routes.Puzzle.dashboard(v.key, days, path)}${!(ctx is user) so s"?u=${user.username}"}"
           ),
           dashOpt.flatMap(body) |
             div(cls := s"${baseClass}__empty")(
@@ -192,7 +192,7 @@ object dashboard {
         span("played")
       ),
       div(cls := s"$metricClass $metricClass--perf")(
-        strong(results.performance, results.unclear ?? "?"),
+        strong(results.performance, results.unclear so "?"),
         span("performance")
       ),
       div(

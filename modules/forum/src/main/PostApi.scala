@@ -55,11 +55,11 @@ final class PostApi(
           case _ =>
             env.postRepo.coll.insert.one(post) >>
               env.topicRepo.coll.update.one($id(topic.id), topic withPost post) >> {
-                shouldHideOnPost(topic) ?? env.topicRepo.hide(topic.id, value = true)
+                shouldHideOnPost(topic) so env.topicRepo.hide(topic.id, value = true)
               } >>
-              env.categRepo.coll.update.one($id(categ.id), categ.withPost(topic, post)) >>- {
-                !categ.quiet ?? (indexer ! InsertPost(post))
-                !categ.quiet ?? env.recent.invalidate()
+              env.categRepo.coll.update.one($id(categ.id), categ.withPost(topic, post)).andDo {
+                !categ.quiet so (indexer ! InsertPost(post))
+                !categ.quiet so env.recent.invalidate()
                 promotion.save(me, post.text)
                 shutup ! {
                   if (post.isTeam) lila.hub.actorApi.shutup.RecordTeamForumMessage(me.id, post.text)
@@ -86,7 +86,7 @@ final class PostApi(
           fufail("Post can no longer be edited")
         case (_, post) =>
           val newPost = post.editPost(DateTime.now, spam replace newText)
-          (newPost.text != post.text).?? {
+          (newPost.text != post.text).so {
             env.postRepo.coll.update.one($id(post.id), newPost).void
           } inject newPost
       }
@@ -116,7 +116,7 @@ final class PostApi(
 
   def get(postId: String): Fu[Option[(Topic, Post)]] =
     getPost(postId) flatMap {
-      _ ?? { post =>
+      _ so { post =>
         env.topicRepo.coll.byId[Topic](post.topicId) dmap2 { _ -> post }
       }
     }
@@ -125,7 +125,7 @@ final class PostApi(
     env.postRepo.coll.byId[Post](postId)
 
   def react(postId: String, me: User, reaction: String, v: Boolean): Fu[Option[Post]] =
-    Post.Reaction.set(reaction) ?? {
+    Post.Reaction.set(reaction) so {
       if (v) lila.mon.forum.reaction(reaction).increment()
       env.postRepo.coll.ext
         .findAndUpdate[Post](
@@ -184,7 +184,7 @@ final class PostApi(
     }
 
   def lastNumberOf(topic: Topic): Fu[Int] =
-    env.postRepo lastByTopic topic dmap { _ ?? (_.number) }
+    env.postRepo lastByTopic topic dmap { _ so (_.number) }
 
   def lastPageOf(topic: Topic): Int =
     (topic.nbPosts + maxPerPage.value - 1) / maxPerPage.value
@@ -203,9 +203,9 @@ final class PostApi(
 
   def delete(categSlug: String, postId: String, mod: User): Funit =
     env.postRepo.unsafe.byCategAndId(categSlug, postId) flatMap {
-      _ ?? { post =>
+      _ so { post =>
         viewOf(post) flatMap {
-          _ ?? { view =>
+          _ so { view =>
             for {
               first <- env.postRepo.isFirstPost(view.topic.id, view.post.id)
               _ <-
@@ -213,10 +213,8 @@ final class PostApi(
                 else
                   env.postRepo.coll.delete.one($id(view.post.id)) >>
                     (env.topicApi denormalize view.topic) >>
-                    (env.categApi denormalize view.categ) >>-
-                    env.recent.invalidate() >>-
-                    (indexer ! RemovePost(post.id))
-              _ <- MasterGranter(_.ModerateForum)(mod) ?? modLog.deletePost(
+                    (env.categApi denormalize view.categ).andDo(env.recent.invalidate()).andDo(indexer ! RemovePost(post.id))
+              _ <- MasterGranter(_.ModerateForum)(mod) so modLog.deletePost(
                 mod.id,
                 post.userId,
                 post.author,
@@ -251,8 +249,7 @@ final class PostApi(
       )
 
   def erasePost(post: Post) =
-    env.postRepo.coll.update.one($id(post.id), post.erase).void >>-
-      (indexer ! RemovePost(post.id))
+    env.postRepo.coll.update.one($id(post.id), post.erase).void.andDo(indexer ! RemovePost(post.id))
 
   def eraseFromSearchIndex(user: User): Funit =
     env.postRepo.coll
@@ -263,7 +260,7 @@ final class PostApi(
 
   def teamIdOfPostId(postId: Post.ID): Fu[Option[TeamID]] =
     env.postRepo.coll.byId[Post](postId) flatMap {
-      _ ?? { post =>
+      _ so { post =>
         env.categRepo.coll.primitiveOne[TeamID]($id(post.categId), "team")
       }
     }

@@ -51,7 +51,7 @@ object bits {
       href := (variant match {
         case Variant.Chess(strategygames.chess.variant.Standard) => "https://en.wikipedia.org/wiki/Chess"
         case Variant.Chess(strategygames.chess.variant.FromPosition) =>
-          s"""${routes.Editor.index}?fen=${initialFen.??(_.value.replace(' ', '_'))}"""
+          s"""${routes.Editor.index}?fen=${initialFen.so(_.value.replace(' ', '_'))}"""
         case v => routes.Page.variant(v.key).url
       }),
       targetBlank,

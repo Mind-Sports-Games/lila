@@ -151,9 +151,9 @@ final class PlayerRepo(coll: Coll)(implicit ec: scala.concurrent.ExecutionContex
             aggs      <- doc.getAsOpt[List[Bdoc]]("agg")
             agg       <- aggs.headOption
             nbPlayers <- agg.int("nb")
-            rating = agg.double("rating").??(math.round)
-            perf   = agg.double("perf").??(math.round)
-            score  = agg.double("score").??(math.round)
+            rating = agg.double("rating").so(math.round)
+            perf   = agg.double("perf").so(math.round)
+            score  = agg.double("score").so(math.round)
             topPlayers <- doc.getAsOpt[List[Player]]("topPlayers")
           } yield TeamBattle.TeamInfo(teamId, nbPlayers, rating.toInt, perf.toInt, score.toInt, topPlayers)
         } | TeamBattle.TeamInfo(teamId, 0, 0, 0, 0, Nil)
@@ -180,10 +180,10 @@ final class PlayerRepo(coll: Coll)(implicit ec: scala.concurrent.ExecutionContex
       }
 
   def teamVs(tourId: Tournament.ID, game: lila.game.Game): Fu[Option[TeamBattle.TeamVs]] =
-    game.twoUserIds ?? { case (w, b) =>
+    game.twoUserIds so { case (w, b) =>
       teamsOfPlayers(tourId, List(w, b)).dmap(_.toMap) map { m =>
         import cats.implicits._
-        (m.get(w), m.get(b)).mapN((_, _)) ?? { case (wt, bt) =>
+        (m.get(w), m.get(b)).mapN((_, _)) so { case (wt, bt) =>
           TeamBattle.TeamVs(strategygames.Player.Map(wt, bt)).some
         }
       }
@@ -260,7 +260,7 @@ final class PlayerRepo(coll: Coll)(implicit ec: scala.concurrent.ExecutionContex
         List(Match(selectTour(tourId)), Sort(Descending("m")), Group(BSONNull)("uids" -> PushField("uid")))
       }
       .headOption map {
-      _ ?? {
+      _ so {
         _ get "uids" match {
           case Some(BSONArray(uids)) =>
             // mutable optimized implementation
@@ -359,7 +359,7 @@ final class PlayerRepo(coll: Coll)(implicit ec: scala.concurrent.ExecutionContex
       .result
 
   def searchPlayers(tourId: Tournament.ID, term: String, nb: Int): Fu[List[User.ID]] =
-    User.validateId(term) ?? { valid =>
+    User.validateId(term) so { valid =>
       coll.primitive[User.ID](
         selector = $doc(
           "tid" -> tourId,

@@ -1,6 +1,6 @@
 package lila.puzzle
 
-import akka.stream.scaladsl._
+import org.apache.pekko.stream.scaladsl._
 import play.api.libs.json._
 import reactivemongo.akkastream.cursorProducer
 import reactivemongo.api.ReadPreference
@@ -15,7 +15,7 @@ final class PuzzleActivity(
     colls: PuzzleColls
 )(implicit
     ec: scala.concurrent.ExecutionContext,
-    system: akka.actor.ActorSystem
+    system: org.apache.pekko.actor.ActorSystem
 ) {
 
   import PuzzleActivity._

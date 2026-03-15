@@ -1,38 +1,33 @@
 package lila.user
 
-import org.specs2.mutable.Specification
-import User.TotpToken
+import java.nio.charset.StandardCharsets.UTF_8
 
-class TotpTest extends Specification {
+import lila.core.user.TotpSecret
+import lila.user.TotpSecret.*
 
-  "totp" should {
-    "read and write secret" in {
-      val secret = TotpSecret.random
-      TotpSecret(secret.base32).base32 must_== secret.base32
-    }
+class TotpTest extends munit.FunSuite:
 
-    "authenticate" in {
-      val secret = TotpSecret.random
-      val token  = secret.currentTotp
-      secret.verify(token) must beTrue
-    }
+  test("read and write secret"):
+    val secret = random
+    assertEquals(decode(secret.base32).base32, secret.base32)
 
-    "not authenticate" in {
-      val secret = TotpSecret("base32secret3232")
-      secret.verify(TotpToken("")) must beFalse
-      secret.verify(TotpToken("000000")) must beFalse
-      secret.verify(TotpToken("123456")) must beFalse
-    }
+  test("authenticate"):
+    val secret = random
+    val token  = secret.currentTotp
+    assert(secret.verify(token))
 
-    "reference" in {
-      // https://tools.ietf.org/html/rfc6238#appendix-B
-      val secret = TotpSecret("12345678901234567890".getBytes)
-      secret.totp(59 / 30) must_== TotpToken("287082")
-      secret.totp(1111111109L / 30) must_== TotpToken("081804")
-      secret.totp(1111111111L / 30) must_== TotpToken("050471")
-      secret.totp(1234567890L / 30) must_== TotpToken("005924")
-      secret.totp(2000000000L / 30) must_== TotpToken("279037")
-      secret.totp(20000000000L / 30) must_== TotpToken("353130")
-    }
-  }
-}
+  test("not authenticate"):
+    val secret = decode("base32secret3232")
+    assert(!secret.verify(TotpToken("")))
+    assert(!secret.verify(TotpToken("000000")))
+    assert(!secret.verify(TotpToken("123456")))
+
+  test("reference"):
+    // https://tools.ietf.org/html/rfc6238#appendix-B
+    val secret = new TotpSecret("12345678901234567890".getBytes(UTF_8))
+    assertEquals(secret.totp(59 / 30), TotpToken("287082"))
+    assertEquals(secret.totp(1111111109L / 30), TotpToken("081804"))
+    assertEquals(secret.totp(1111111111L / 30), TotpToken("050471"))
+    assertEquals(secret.totp(1234567890L / 30), TotpToken("005924"))
+    assertEquals(secret.totp(2000000000L / 30), TotpToken("279037"))
+    assertEquals(secret.totp(20000000000L / 30), TotpToken("353130"))

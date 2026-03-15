@@ -26,7 +26,7 @@ import lila.plan.{
 import lila.user.{ User => UserModel }
 import views._
 
-final class Plan(env: Env)(implicit system: akka.actor.ActorSystem) extends LilaController(env) {
+final class Plan(env: Env)(implicit system: org.apache.pekko.actor.ActorSystem) extends LilaController(env) {
 
   private val logger = lila.log("plan")
 
@@ -131,8 +131,8 @@ final class Plan(env: Env)(implicit system: akka.actor.ActorSystem) extends Lila
     Open { implicit ctx =>
       // wait for the payment data from stripe or paypal
       lila.common.Future.delay(2.seconds) {
-        ctx.me ?? env.plan.api.userPatron flatMap { patron =>
-          patron ?? env.plan.api.stripe.patronCustomer map { customer =>
+        ctx.me so env.plan.api.userPatron flatMap { patron =>
+          patron so env.plan.api.stripe.patronCustomer map { customer =>
             Ok(html.plan.thanks(patron, customer))
           }
         }
@@ -226,7 +226,7 @@ final class Plan(env: Env)(implicit system: akka.actor.ActorSystem) extends Lila
       implicit val req = ctx.body
       CaptureRateLimit(HTTPRequest ipAddress req) {
         env.plan.api.stripe.userCustomer(me) flatMap {
-          _.flatMap(_.firstSubscription) ?? { sub =>
+          _.flatMap(_.firstSubscription) so { sub =>
             env.plan.api.stripe
               .createPaymentUpdateSession(
                 sub,
@@ -245,9 +245,9 @@ final class Plan(env: Env)(implicit system: akka.actor.ActorSystem) extends Lila
 
   def updatePaymentCallback =
     AuthBody { implicit ctx => me =>
-      get("session") ?? { session =>
+      get("session") so { session =>
         env.plan.api.stripe.userCustomer(me) flatMap {
-          _.flatMap(_.firstSubscription) ?? { sub =>
+          _.flatMap(_.firstSubscription) so { sub =>
             env.plan.api.stripe.updatePayment(sub, session) inject Redirect(routes.Plan.index)
           }
         }

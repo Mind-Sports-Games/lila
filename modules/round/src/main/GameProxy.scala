@@ -1,6 +1,6 @@
 package lila.round
 
-import akka.actor.{ Cancellable, Scheduler }
+import org.apache.pekko.actor.{ Cancellable, Scheduler }
 import scala.concurrent.duration._
 import scala.util.Success
 
@@ -90,14 +90,14 @@ final private class GameProxy(
 
   private def flushProgress(): Funit = {
     scheduledFlush.cancel()
-    dirtyProgress ?? gameRepo.update addEffect { _ =>
+    dirtyProgress so gameRepo.update addEffect { _ =>
       dirtyProgress = none
     }
   }
 
-  private[this] var cache: Fu[Option[Game]] = fetch
+  private var cache: Fu[Option[Game]] = fetch
 
-  private[this] def fetch = gameRepo.game(id)
+  private def fetch = gameRepo.game(id)
 }
 
 private object GameProxy {

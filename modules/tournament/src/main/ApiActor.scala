@@ -1,6 +1,6 @@
 package lila.tournament
 
-import akka.actor._
+import org.apache.pekko.actor._
 import org.joda.time.DateTime
 
 import lila.game.actorApi.FinishGame
@@ -51,8 +51,9 @@ final private[tournament] class ApiActor(
 
   private def ejectFromEnterable(userId: User.ID) =
     tournamentRepo.withdrawableIds(userId) flatMap {
-      _.map {
-        api.ejectLameFromEnterable(_, userId)
-      }.sequenceFu
+      ids =>
+        Future.sequence(ids.map {
+          api.ejectLameFromEnterable(_, userId)
+        })
     }
 }

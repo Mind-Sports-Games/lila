@@ -1,6 +1,6 @@
 package lila.streamer
 
-import akka.actor._
+import org.apache.pekko.actor._
 import org.joda.time.DateTime
 import play.api.libs.json._
 import play.api.libs.ws.JsonBodyReadables._
@@ -40,7 +40,7 @@ final private class Streaming(
     case Tick => updateStreams.addEffectAnyway(scheduleTick()).unit
   }
 
-  private def scheduleTick(): Unit = context.system.scheduler.scheduleOnce(15 seconds, self, Tick).unit
+  private def scheduleTick(): Unit = { val _ = context.system.scheduler.scheduleOnce(15 seconds, self, Tick) }
 
   scheduleTick()
 
@@ -106,7 +106,7 @@ final private class Streaming(
 
   def fetchYouTubeStreams(streamers: List[Streamer]): Fu[List[YouTube.Stream]] = {
     val youtubeStreamers = streamers.filter(_.youTube.isDefined)
-    (youtubeStreamers.nonEmpty && googleApiKey.value.nonEmpty) ?? {
+    (youtubeStreamers.nonEmpty && googleApiKey.value.nonEmpty) so {
       val now = DateTime.now
       val res =
         if (prevYouTubeStreams.at.isAfter(now minusMinutes 15))

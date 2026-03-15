@@ -143,9 +143,9 @@ final class Appeal(env: Env, reportC: => Report, prismicC: => Prismic, userC: =>
       username: String
   )(f: (lila.appeal.Appeal, Suspect) => Fu[Result])(implicit ctx: Context): Fu[Result] =
     env.user.repo named username flatMap {
-      _ ?? { user =>
+      _ so { user =>
         env.appeal.api get user flatMap {
-          _ ?? { appeal =>
+          _ so { appeal =>
             f(appeal, Suspect(user)) dmap some
           }
         }

@@ -13,7 +13,7 @@ final class GameSearchApi(
     gameRepo: GameRepo
 )(implicit
     ec: scala.concurrent.ExecutionContext,
-    scheduler: akka.actor.Scheduler
+    scheduler: org.apache.pekko.actor.Scheduler
 ) extends SearchReadApi[Game, Query] {
 
   def search(query: Query, from: From, size: Size) =
@@ -28,7 +28,7 @@ final class GameSearchApi(
     client.search(query, From(0), Size(max)).map(_.ids)
 
   def store(game: Game) =
-    storable(game) ?? {
+    storable(game) so {
       gameRepo isAnalysed game.id flatMap { analysed =>
         lila.common.Future.retry(
           () => client.store(Id(game.id), toDoc(game, analysed)),

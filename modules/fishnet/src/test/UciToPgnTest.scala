@@ -1,35 +1,31 @@
 package lila.fishnet
 
-import strategygames.Replay
-import strategygames.chess.format.pgn.Reader
-import org.specs2.mutable._
+import chess.format.pgn.SanStr
+import chess.{ Ply, Position }
+import chess.eval.*
+import chess.eval.Eval.*
+
+import scala.language.implicitConversions
 
 import lila.analyse.{ Analysis, Info }
 import lila.tree.Eval
-import lila.tree.Eval._
 
-final class UciToPgnTest extends Specification {
+final class UciToSanTest extends munit.FunSuite:
 
-  /*
-  private val now = org.joda.time.DateTime.now
+  private given Conversion[Int, Ply] = Ply(_)
 
-  private def evenIncomplete(result: Reader.Result): Replay =
-    result match {
-      case Reader.Result.Complete(replay)      => replay
-      case Reader.Result.Incomplete(replay, _) => replay
-    }
+  private val now = nowInstant
 
-  "convert UCI analysis to PGN" should {
-    "work :)" in {
-      val uciAnalysis = Analysis(
-        "ke5ssdgj",
-        None,
-        List(
-          Info(1, Eval(Some(Cp(12)), None, None), List()),
-          Info(2, Eval(Some(Cp(36)), None, None), List()),
-          Info(
-            3,
-            Eval(Some(Cp(22)), None, None),
+  test("convert UCI analysis to PGN"):
+    val uciAnalysis = Analysis(
+      Analysis.Id(GameId("ke5ssdgj")),
+      List(
+        Info(1, Eval(Some(Cp(12)), None, None), Nil),
+        Info(2, Eval(Some(Cp(36)), None, None), Nil),
+        Info(
+          3,
+          Eval(Some(Cp(22)), None, None),
+          SanStr.from(
             List(
               "g1f3",
               "g8f6",
@@ -46,30 +42,46 @@ final class UciToPgnTest extends Specification {
               "b5d6",
               "d8d6"
             )
-          ),
-          Info(4, Eval(Some(Cp(-30)), None, None), List()),
-          Info(5, Eval(Some(Cp(-48)), None, None), List()),
-          Info(
-            6,
-            Eval(Some(Cp(-80)), None, None),
-            List("g8f6", "e2e3", "c7c5", "g1f3", "b8c6", "b1c3", "c5d4", "e3d4", "f8e7", "f1e2", "f6e4")
-          ),
-          Info(7, Eval(Some(Cp(-22)), None, None), List()),
-          Info(8, Eval(Some(Cp(-64)), None, None), List()),
-          Info(9, Eval(Some(Cp(-38)), None, None), List()),
-          Info(10, Eval(Some(Cp(-56)), None, None), List()),
-          Info(11, Eval(Some(Cp(-48)), None, None), List()),
-          Info(12, Eval(Some(Cp(-48)), None, None), List()),
-          Info(13, Eval(Some(Cp(-52)), None, None), List()),
-          Info(14, Eval(Some(Cp(-98)), None, None), List()),
-          Info(15, Eval(Some(Cp(-56)), None, None), List()),
-          Info(16, Eval(Some(Cp(-98)), None, None), List()),
-          Info(17, Eval(Some(Cp(-54)), None, None), List()),
-          Info(18, Eval(Some(Cp(-96)), None, None), List()),
-          Info(19, Eval(Some(Cp(-96)), None, None), List()),
-          Info(
-            20,
-            Eval(Some(Cp(-113)), None, None),
+          )
+        ),
+        Info(4, Eval(Some(Cp(-30)), None, None), Nil),
+        Info(5, Eval(Some(Cp(-48)), None, None), Nil),
+        Info(
+          6,
+          Eval(Some(Cp(-80)), None, None),
+          SanStr.from(
+            List(
+              "g8f6",
+              "e2e3",
+              "c7c5",
+              "g1f3",
+              "b8c6",
+              "b1c3",
+              "c5d4",
+              "e3d4",
+              "f8e7",
+              "f1e2",
+              "f6e4"
+            )
+          )
+        ),
+        Info(7, Eval(Some(Cp(-22)), None, None), Nil),
+        Info(8, Eval(Some(Cp(-64)), None, None), Nil),
+        Info(9, Eval(Some(Cp(-38)), None, None), Nil),
+        Info(10, Eval(Some(Cp(-56)), None, None), Nil),
+        Info(11, Eval(Some(Cp(-48)), None, None), Nil),
+        Info(12, Eval(Some(Cp(-48)), None, None), Nil),
+        Info(13, Eval(Some(Cp(-52)), None, None), Nil),
+        Info(14, Eval(Some(Cp(-98)), None, None), Nil),
+        Info(15, Eval(Some(Cp(-56)), None, None), Nil),
+        Info(16, Eval(Some(Cp(-98)), None, None), Nil),
+        Info(17, Eval(Some(Cp(-54)), None, None), Nil),
+        Info(18, Eval(Some(Cp(-96)), None, None), Nil),
+        Info(19, Eval(Some(Cp(-96)), None, None), Nil),
+        Info(
+          20,
+          Eval(Some(Cp(-113)), None, None),
+          SanStr.from(
             List(
               "c8d7",
               "b1d2",
@@ -89,10 +101,12 @@ final class UciToPgnTest extends Specification {
               "e2e5",
               "c8c2"
             )
-          ),
-          Info(
-            21,
-            Eval(Some(Cp(-42)), None, None),
+          )
+        ),
+        Info(
+          21,
+          Eval(Some(Cp(-42)), None, None),
+          SanStr.from(
             List(
               "g5e4",
               "d5e4",
@@ -109,10 +123,12 @@ final class UciToPgnTest extends Specification {
               "b1c3",
               "f8d8"
             )
-          ),
-          Info(
-            22,
-            Eval(Some(Cp(-535)), None, None),
+          )
+        ),
+        Info(
+          22,
+          Eval(Some(Cp(-535)), None, None),
+          SanStr.from(
             List(
               "c8e6",
               "g5e4",
@@ -130,10 +146,12 @@ final class UciToPgnTest extends Specification {
               "h1h4",
               "g5h4"
             )
-          ),
-          Info(
-            23,
-            Eval(Some(Cp(-296)), None, None),
+          )
+        ),
+        Info(
+          23,
+          Eval(Some(Cp(-296)), None, None),
+          SanStr.from(
             List(
               "g5e4",
               "d5e4",
@@ -155,11 +173,13 @@ final class UciToPgnTest extends Specification {
               "h1h2",
               "g6g2"
             )
-          ),
-          Info(24, Eval(None, Some(Mate(3)), None), List("d8h4", "e1e2", "h4f2", "e2d3", "c6b4")),
-          Info(
-            25,
-            Eval(Some(Cp(-935)), None, None),
+          )
+        ),
+        Info(24, Eval(None, Some(Mate(3)), None), SanStr.from(List("d8h4", "e1e2", "h4f2", "e2d3", "c6b4"))),
+        Info(
+          25,
+          Eval(Some(Cp(-935)), None, None),
+          SanStr.from(
             List(
               "e1g1",
               "e6h3",
@@ -177,11 +197,13 @@ final class UciToPgnTest extends Specification {
               "c6e5",
               "d4e5"
             )
-          ),
-          Info(26, Eval(Some(Cp(-2165)), None, None), List()),
-          Info(
-            27,
-            Eval(Some(Cp(-2731)), None, None),
+          )
+        ),
+        Info(26, Eval(Some(Cp(-2165)), None, None), Nil),
+        Info(
+          27,
+          Eval(Some(Cp(-2731)), None, None),
+          SanStr.from(
             List(
               "g1g3",
               "h4h2",
@@ -204,24 +226,26 @@ final class UciToPgnTest extends Specification {
               "c1d2",
               "e8e3"
             )
-          ),
-          Info(28, Eval(None, Some(Mate(2)), None), List("h4f2", "e2d3", "c6b4")),
-          Info(29, Eval(None, Some(Mate(-2)), None), List())
+          )
         ),
-        0,
-        now,
-        None
-      )
+        Info(28, Eval(None, Some(Mate(2)), None), SanStr.from(List("h4f2", "e2d3", "c6b4"))),
+        Info(29, Eval(None, Some(Mate(-2)), None), Nil)
+      ),
+      0,
+      now,
+      None,
+      None
+    )
 
-      val pgn =
-        "d4 d5 f3 e6 f4 g6 g3 Bg7 Nf3 Nf6 e3 O-O Bh3 Nc6 g4 h6 g5 hxg5 Nxg5 Ne4 Bxe6 fxe6 Nxe6 Bxe6 Rg1 Qh4+ Ke2 Qxh2+ Kd3 Nb4#"
-      val rep = Replay(pgn.split(' ').toList, None, strategygames.chess.variant.Standard).map(evenIncomplete).toOption.get
-      UciToPgn(rep, uciAnalysis) match {
-        case (_, errs) => errs must beEmpty
-      }
-    }
-    "even in KotH" in {
-      val pgn = List(
+    val pgn =
+      "d4 d5 f3 e6 f4 g6 g3 Bg7 Nf3 Nf6 e3 O-O Bh3 Nc6 g4 h6 g5 hxg5 Nxg5 Ne4 Bxe6 fxe6 Nxe6 Bxe6 Rg1 Qh4+ Ke2 Qxh2+ Kd3 Nb4#"
+    val andPly    = Position.AndFullMoveNumber(chess.variant.Standard, none)
+    val positions = andPly.playPositions(SanStr.from(pgn.split(' ').toList)).toOption.get
+    UciToSan(positions, andPly.ply, uciAnalysis) match
+      case (_, errs) => assertEquals(errs, Nil)
+  test("even in KotH"):
+    val pgn = SanStr.from(
+      List(
         "e4",
         "e5",
         "d4",
@@ -287,12 +311,9 @@ final class UciToPgnTest extends Specification {
         "Kh4",
         "Qxg5#"
       )
-      val rep         = Replay(pgn, None, strategygames.chess.variant.KingOfTheHill).map(evenIncomplete).toOption.get
-      val uciAnalysis = Analysis("g5hX8efz", None, Nil, 0, now, None)
-      UciToPgn(rep, uciAnalysis) match {
-        case (_, errs) => errs must beEmpty
-      }
-    }
-  }
-   */
-}
+    )
+    val andPly      = Position.AndFullMoveNumber(chess.variant.KingOfTheHill, none)
+    val positions   = andPly.playPositions(pgn).toOption.get
+    val uciAnalysis = Analysis(Analysis.Id(GameId("g5hX8efz")), Nil, 0, now, None, None)
+    UciToSan(positions, andPly.ply, uciAnalysis) match
+      case (_, errs) => assertEquals(errs, Nil)

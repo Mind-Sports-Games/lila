@@ -108,7 +108,7 @@ case class AllWinners(
 final class WinnersApi(
     tournamentRepo: TournamentRepo,
     mongoCache: lila.memo.MongoCache.Api,
-    scheduler: akka.actor.Scheduler
+    scheduler: org.apache.pekko.actor.Scheduler
 )(implicit ec: scala.concurrent.ExecutionContext) {
 
   import BSONHandlers._
@@ -207,10 +207,10 @@ final class WinnersApi(
   // because we read on secondaries, delay cache clear
   def clearCache(tour: Tournament): Unit =
     if (tour.schedule.exists(_.freq.isDailyOrBetter))
-      scheduler.scheduleOnce(5.seconds) { allCache.invalidate {}.unit }.unit
+      { val _ = scheduler.scheduleOnce(5.seconds) { allCache.invalidate {} } }
 
   private[tournament] def clearAfterMarking(userId: User.ID): Funit = all map { winners =>
-    if (winners.userIds contains userId) allCache.invalidate {}.unit
+    if (winners.userIds contains userId) allCache.invalidate {}
   }
 }
 

@@ -81,7 +81,7 @@ object RelayRound {
       if (hasUpstream) copy(until = DateTime.now.plusHours(1).some)
       else pause
 
-    def ongoing = until ?? DateTime.now.isBefore
+    def ongoing = until so DateTime.now.isBefore
 
     def play =
       if (hasUpstream) renew.copy(nextAt = nextAt orElse DateTime.now.plusSeconds(3).some)

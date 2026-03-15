@@ -1,6 +1,6 @@
 package lila.app
 
-import akka.actor.CoordinatedShutdown
+import org.apache.pekko.actor.CoordinatedShutdown
 import com.softwaremill.macwire._
 import play.api._
 import play.api.libs.crypto.CookieSignerProvider
@@ -10,7 +10,7 @@ import play.api.mvc.request._
 import play.api.routing.Router
 import router.Routes
 import scala.annotation.nowarn
-import akka.actor.ActorSystem
+import org.apache.pekko.actor.ActorSystem
 import play.api.http.FileMimeTypes
 
 final class AppLoader extends ApplicationLoader {

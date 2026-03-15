@@ -1,8 +1,8 @@
 package lila.tournament
 
-import akka.actor._
+import org.apache.pekko.actor._
 import com.softwaremill.macwire._
-import io.methvin.play.autoconfig._
+import lila.common.autoconfig.{ AutoConfig, ConfigName }
 import play.api.Configuration
 import scala.concurrent.duration._
 
@@ -43,7 +43,7 @@ final class Env(
 )(implicit
     ec: scala.concurrent.ExecutionContext,
     system: ActorSystem,
-    scheduler: akka.actor.Scheduler,
+    scheduler: org.apache.pekko.actor.Scheduler,
     mat: akka.stream.Materializer,
     idGenerator: lila.game.IdGenerator,
     mode: play.api.Mode
@@ -84,9 +84,9 @@ final class Env(
     clearWinnersCache = winners.clearCache,
     clearTrophyCache = tour =>
       {
-        if (tour.isShield) scheduler.scheduleOnce(10 seconds) { shieldApi.clear() }
-        else if (Revolution is tour) scheduler.scheduleOnce(10 seconds) { revolutionApi.clear() }.unit
-      }.unit,
+        if (tour.isShield) { val _ = scheduler.scheduleOnce(10 seconds) { shieldApi.clear() } }
+        else if (Revolution is tour) { val _ = scheduler.scheduleOnce(10 seconds) { revolutionApi.clear() } }
+      },
     indexLeaderboard = leaderboardIndexer.indexOne
   )
 

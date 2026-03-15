@@ -45,7 +45,7 @@ object side {
                   else VariantKeys.variantName(tour.variant)
                 )
               } else tour.perfType.trans,
-              tour.position.isDefined ?? s"$separator${trans.thematic.txt()}",
+              tour.position.isDefined so s"$separator${trans.thematic.txt()}",
               separator,
               tour.durationString
             ),

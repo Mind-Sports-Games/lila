@@ -54,7 +54,7 @@ It is now visible on your profile page: $baseUrl/@/${user.username}.
 $regards
 """
       }
-      _ <- emailOption ?? { email =>
+      _ <- emailOption so { email =>
         implicit val lang = userLang(user)
         mailer send Mailer.Message(
           to = email,
@@ -83,7 +83,7 @@ $regards
 """
     }
     userRepo email user.id flatMap {
-      _ ?? { email =>
+      _ so { email =>
         implicit val lang = userLang(user)
         mailer send Mailer.Message(
           to = email,
@@ -117,7 +117,7 @@ $key
 $regards
 """
       }
-      _ <- emailOption.?? { email =>
+      _ <- emailOption.so { email =>
         implicit val lang = userLang(user)
         mailer send Mailer.Message(
           to = email,
@@ -153,7 +153,7 @@ Following your request, the PlayStrategy account "${user.username} will be fully
 $regards
 """
     userRepo emailOrPrevious user.id flatMap {
-      _ ?? { email =>
+      _ so { email =>
         implicit val lang = userLang(user)
         mailer send Mailer.Message(
           to = email,
@@ -196,7 +196,7 @@ To make a new donation, head to $baseUrl/patron"""
   private def sendAsPrivateMessageAndEmail(user: User)(subject: Lang => String, body: Lang => String): Funit =
     alsoSendAsPrivateMessage(user)(body) pipe { body =>
       userRepo email user.id flatMap {
-        _ ?? { email =>
+        _ so { email =>
           implicit val lang = userLang(user)
           mailer send Mailer.Message(
             to = email,
@@ -212,7 +212,7 @@ To make a new donation, head to $baseUrl/patron"""
       username: String
   )(subject: Lang => String, body: Lang => String): Funit =
     userRepo named username flatMap {
-      _ ?? { user =>
+      _ so { user =>
         sendAsPrivateMessageAndEmail(user)(subject, body)
       }
     }

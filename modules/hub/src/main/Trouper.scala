@@ -43,14 +43,14 @@ abstract class Trouper(implicit ec: ExecutionContext) extends lila.common.Tellab
    * Busy: Some(Queue.empty)
    * Busy with backlog: Some(Queue.nonEmpty)
    */
-  private[this] val stateRef: AtomicReference[State] = new AtomicReference(None)
+  private val stateRef: AtomicReference[State] = new AtomicReference(None)
 
-  private[this] def run(msg: Any): Unit =
+  private def run(msg: Any): Unit =
     Future {
       process.applyOrElse(msg, fallback)
     } onComplete postRun
 
-  private[this] val postRun = (_: Any) =>
+  private val postRun = (_: Any) =>
     stateRef.getAndUpdate(postRunUpdate) flatMap (_.headOption) foreach run
 
   private val fallback: Receive = { case msg =>

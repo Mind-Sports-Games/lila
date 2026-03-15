@@ -35,7 +35,7 @@ private[game] case class Metadata(
   def needsMultiMatchRematch =
     multiMatch.fold(false)(x => x.contains("challengeMultiMatch"))
 
-  def multiMatchGameNr = multiMatch ?? { mm =>
+  def multiMatchGameNr = multiMatch so { mm =>
     if (mm == "multiMatch") 1.some
     else if (mm.length() == 10 && mm.substring(1, 2) == ":") toInt(mm.take(1))
     else none

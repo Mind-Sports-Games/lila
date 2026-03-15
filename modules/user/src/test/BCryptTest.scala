@@ -1,31 +1,33 @@
 package lila.user
 
-import org.specs2.mutable.Specification
 import org.mindrot.BCrypt
 
-class BCryptTest extends Specification {
+import java.nio.charset.StandardCharsets.UTF_8
+
+class BCryptTest extends munit.FunSuite:
 
   // From jBcrypt test suite.
   val pass    = "abc"
   val b64Hash = "$2a$06$If6bvum7DFjUnE9p2uDeDu0YHzrHM6tf.iqN8.yx.jNN1ILEf7h0i"
 
-  "bcrypt" should {
-    "accept correct pass" >> BCrypt.checkpw(pass, b64Hash)
-    "reject bad password" >> !BCrypt.checkpw("", b64Hash)
+  test("accept correct pass"):
+    assert(BCrypt.checkpw(pass, b64Hash))
+  test("reject bad password"):
+    assert(!BCrypt.checkpw("", b64Hash))
 
-    val salt = BCrypt.gensaltRaw
-    "have uniq salts" >> { salt !== BCrypt.gensaltRaw }
+  val salt = BCrypt.gensaltRaw
+  test("have uniq salts"):
+    assertNotEquals(salt, BCrypt.gensaltRaw)
 
-    "raw bytes" in {
-      val rawHash = BCrypt.hashpwRaw(pass.getBytes("UTF-8"), 'a', 6, salt)
+  val rawHash = BCrypt.hashpwRaw(pass.getBytes(UTF_8), 'a', 6, salt)
 
-      salt.size must_== 16
-      rawHash.size must_== 23
+  test("sizes"):
+    assertEquals(salt.size, 16)
+    assertEquals(rawHash.size, 23)
 
-      import BCrypt.{ encode_base64 => bc64 }
-      val bString = "$2a$06$" + bc64(salt) + bc64(rawHash)
-      "accept good" >> BCrypt.checkpw(pass, bString)
-      "reject bad" >> !BCrypt.checkpw("", bString)
-    }
-  }
-}
+  import BCrypt.encode_base64 as bc64
+  val bString = "$2a$06$" + bc64(salt) + bc64(rawHash)
+  test("raw bytes accept good"):
+    assert(BCrypt.checkpw(pass, bString))
+  test("raw bytes reject bad"):
+    assert(!BCrypt.checkpw("", bString))

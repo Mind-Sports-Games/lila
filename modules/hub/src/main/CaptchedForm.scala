@@ -1,7 +1,8 @@
 package lila.hub
 
-import akka.pattern.ask
+import org.apache.pekko.pattern.ask
 import play.api.data._
+import lila.common.extensions.*
 import scala.concurrent.duration._
 
 import actorApi.captcha._
@@ -9,7 +10,7 @@ import lila.common.Captcha
 
 trait CaptchedForm {
 
-  import makeTimeout.large
+  given org.apache.pekko.util.Timeout = makeTimeout.large
 
   type CaptchedData = {
     def gameId: String
@@ -29,7 +30,7 @@ trait CaptchedForm {
 
   import scala.language.reflectiveCalls
   def validateCaptcha(data: CaptchedData) =
-    getCaptcha(data.gameId).await(2 seconds, "getCaptcha") valid data.move.trim.toLowerCase
+    getCaptcha(data.gameId).await(2 seconds, "getCaptcha").valid(data.move.trim.toLowerCase)
 
   def captchaFailMessage = Captcha.failMessage
 }

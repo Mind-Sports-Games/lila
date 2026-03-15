@@ -14,7 +14,7 @@ case class StormPuzzle(
 ) {
   // ply after "initial move" when we start solving
   def initialPly: Int =
-    fen.fullMove ?? { fm =>
+    fen.fullMove so { fm =>
       fm * 2 - playerIndex.fold(1, 2)
     }
 

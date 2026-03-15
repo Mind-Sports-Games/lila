@@ -8,12 +8,12 @@ import lila.game.Game
 import lila.common.Bus
 
 /* async wait for analysis to complete */
-final class FishnetAwaiter(implicit ec: ExecutionContext, scheduler: akka.actor.Scheduler) {
+final class FishnetAwaiter(implicit ec: ExecutionContext, scheduler: org.apache.pekko.actor.Scheduler) {
 
   private val busChannel = "analysisReady"
 
   def apply(gameIds: Seq[Game.ID], atMost: FiniteDuration): Funit =
-    gameIds.nonEmpty ?? {
+    gameIds.nonEmpty so {
       val promise      = Promise[Unit]()
       var remainingIds = gameIds.toSet
       val listener = Bus.subscribeFun(busChannel) {

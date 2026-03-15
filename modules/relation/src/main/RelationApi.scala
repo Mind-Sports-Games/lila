@@ -28,7 +28,7 @@ final class RelationApi(
   import RelationRepo.makeId
 
   def fetchRelation(u1: ID, u2: ID): Fu[Option[Relation]] =
-    (u1 != u2) ?? {
+    (u1 != u2) so {
       coll.primitiveOne[Relation]($doc("u1" -> u1, "u2" -> u2), "r")
     }
   def fetchRelation(u1: User, u2: User): Fu[Option[Relation]] = fetchRelation(u1.id, u2.id)
@@ -68,12 +68,12 @@ final class RelationApi(
       }
 
   def fetchFollows(u1: ID, u2: ID): Fu[Boolean] =
-    (u1 != u2) ?? {
+    (u1 != u2) so {
       coll.exists($doc("_id" -> makeId(u1, u2), "r" -> Follow))
     }
 
   def fetchBlocks(u1: ID, u2: ID): Fu[Boolean] =
-    (u1 != u2) ?? {
+    (u1 != u2) so {
       coll.exists($doc("_id" -> makeId(u1, u2), "r" -> Block))
     }
 
@@ -136,20 +136,20 @@ final class RelationApi(
     ).map(_.userId)
 
   def follow(u1: ID, u2: ID): Funit =
-    (u1 != u2) ?? prefApi.followable(u2).flatMap {
-      _ ?? {
+    (u1 != u2) so prefApi.followable(u2).flatMap {
+      _ so {
         userRepo.isEnabled(u2) flatMap {
-          _ ?? {
+          _ so {
             fetchRelation(u1, u2) zip fetchRelation(u2, u1) flatMap {
               case (Some(Follow), _) => funit
               case (_, Some(Block))  => funit
               case _ =>
-                repo.follow(u1, u2) >> limitFollow(u1) >>- {
+                repo.follow(u1, u2) >> limitFollow(u1).andDo {
                   countFollowersCache.update(u2, 1 +)
                   countFollowingCache.update(u1, prev => (prev + 1) atMost config.maxFollow.value)
                   timeline ! Propagate(FollowUser(u1, u2)).toFriendsOf(u1).toUsers(List(u2))
                   Bus.publish(lila.hub.actorApi.relation.Follow(u1, u2), "relation")
-                  lila.mon.relation.follow.increment().unit
+                  val _ = lila.mon.relation.follow.increment()
                 }
             }
           }
@@ -165,48 +165,47 @@ final class RelationApi(
 
   private def limitFollow(u: ID) =
     countFollowing(u) flatMap { nb =>
-      (config.maxFollow < nb) ?? {
+      (config.maxFollow < nb) so {
         limitFollowRateLimiter(u) {
           fetchFollowing(u) flatMap userRepo.filterClosedOrInactiveIds(DateTime.now.minusDays(90))
         }(fuccess(Nil)) flatMap {
           case Nil => repo.drop(u, true, nb - config.maxFollow.value)
           case inactiveIds =>
-            repo.unfollowMany(u, inactiveIds) >>-
-              countFollowingCache.update(u, _ - inactiveIds.size)
+            repo.unfollowMany(u, inactiveIds).andDo(countFollowingCache.update(u, _ - inactiveIds.size))
         }
       }
     }
 
   private def limitBlock(u: ID) =
     countBlocking(u) flatMap { nb =>
-      (config.maxBlock < nb) ?? repo.drop(u, false, nb - config.maxBlock.value)
+      (config.maxBlock < nb) so repo.drop(u, false, nb - config.maxBlock.value)
     }
 
   def block(u1: ID, u2: ID): Funit =
-    (u1 != u2 && u2 != User.playstrategyId) ?? {
+    (u1 != u2 && u2 != User.playstrategyId) so {
       fetchBlocks(u1, u2) flatMap {
         case true => funit
         case _ =>
-          repo.block(u1, u2) >> limitBlock(u1) >> unfollow(u2, u1) >>- {
+          repo.block(u1, u2) >> limitBlock(u1) >> unfollow(u2, u1).andDo {
             Bus.publish(lila.hub.actorApi.relation.Block(u1, u2), "relation")
             Bus.publish(
               lila.hub.actorApi.socket.SendTo(u2, lila.socket.Socket.makeMessage("blockedBy", u1)),
               "socketUsers"
             )
-            lila.mon.relation.block.increment().unit
+            val _ = lila.mon.relation.block.increment()
           }
       }
     }
 
   def unfollow(u1: ID, u2: ID): Funit =
-    (u1 != u2) ?? {
+    (u1 != u2) so {
       fetchFollows(u1, u2) flatMap {
         case true =>
-          repo.unfollow(u1, u2) >>- {
+          repo.unfollow(u1, u2).andDo {
             countFollowersCache.update(u2, _ - 1)
             countFollowingCache.update(u1, _ - 1)
             Bus.publish(lila.hub.actorApi.relation.UnFollow(u1, u2), "relation")
-            lila.mon.relation.unfollow.increment().unit
+            val _ = lila.mon.relation.unfollow.increment()
           }
         case _ => funit
       }
@@ -215,16 +214,16 @@ final class RelationApi(
   def unfollowAll(u1: ID): Funit = repo.unfollowAll(u1)
 
   def unblock(u1: ID, u2: ID): Funit =
-    (u1 != u2) ?? {
+    (u1 != u2) so {
       fetchBlocks(u1, u2) flatMap {
         case true =>
-          repo.unblock(u1, u2) >>- {
+          repo.unblock(u1, u2).andDo {
             Bus.publish(lila.hub.actorApi.relation.UnBlock(u1, u2), "relation")
             Bus.publish(
               lila.hub.actorApi.socket.SendTo(u2, lila.socket.Socket.makeMessage("unblockedBy", u1)),
               "socketUsers"
             )
-            lila.mon.relation.unblock.increment().unit
+            val _ = lila.mon.relation.unblock.increment()
           }
         case _ => funit
       }

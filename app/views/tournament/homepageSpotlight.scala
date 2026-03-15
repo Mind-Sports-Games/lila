@@ -9,10 +9,10 @@ import lila.app.ui.ScalatagsTemplate._
 object homepageSpotlight {
 
   def apply(tour: lila.tournament.Tournament)(implicit ctx: Context) = {
-    val schedClass = tour.schedule ?? { sched =>
-      val invert      = (sched.freq.isWeeklyOrBetter && tour.isNowOrSoon) ?? " invert"
-      val highlighted = (tour.isStarted && !tour.isFinished) ?? " highlighted"
-      val distant     = tour.isDistant ?? " distant little"
+    val schedClass = tour.schedule so { sched =>
+      val invert      = (sched.freq.isWeeklyOrBetter && tour.isNowOrSoon) so " invert"
+      val highlighted = (tour.isStarted && !tour.isFinished) so " highlighted"
+      val distant     = tour.isDistant so " distant little"
       s"${sched.freq} ${sched.speed} ${sched.variant.key}$invert$highlighted$distant ${ctx.currentSelectedColor}"
     }
     val tourClass = s"tour-spotlight id_${tour.id} $schedClass"

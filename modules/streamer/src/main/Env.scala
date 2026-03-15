@@ -1,8 +1,8 @@
 package lila.streamer
 
-import akka.actor._
+import org.apache.pekko.actor._
 import com.softwaremill.macwire._
-import io.methvin.play.autoconfig._
+import lila.common.autoconfig.{ AutoConfig, ConfigName }
 import play.api.Configuration
 import scala.concurrent.duration._
 
@@ -34,7 +34,7 @@ final class Env(
 )(implicit
     ec: scala.concurrent.ExecutionContext,
     system: ActorSystem,
-    scheduler: akka.actor.Scheduler
+    scheduler: org.apache.pekko.actor.Scheduler
 ) {
 
   implicit private val twitchLoader: ConfigLoader[TwitchConfig]    = AutoConfig.loader[TwitchConfig]

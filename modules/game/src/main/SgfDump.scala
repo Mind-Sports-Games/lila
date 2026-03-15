@@ -50,7 +50,7 @@ final class SgfDump(
   }
 
   private def gameLightUsers(game: Game): Fu[(Option[LightUser], Option[LightUser])] =
-    (game.p1Player.userId ?? lightUserApi.async) zip (game.p2Player.userId ?? lightUserApi.async)
+    (game.p1Player.userId so lightUserApi.async) zip (game.p2Player.userId so lightUserApi.async)
 
   private def eventOf(game: Game) = {
     val perf = game.perfType.fold("Standard")(_.trans(lila.i18n.defaultLang))

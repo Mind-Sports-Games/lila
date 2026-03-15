@@ -33,7 +33,7 @@ final class Dev(env: Env) extends LilaController(env) {
 
   def settingsPost(id: String) =
     SecureBody(_.Settings) { implicit ctx => _ =>
-      settingsList.find(_.id == id) ?? { setting =>
+      settingsList.find(_.id == id) so { setting =>
         implicit val req = ctx.body
         setting.form
           .bindFromRequest()
@@ -67,7 +67,7 @@ final class Dev(env: Env) extends LilaController(env) {
 
   def command =
     ScopedBody(parse.tolerantText)(Seq(_.Preference.Write)) { implicit req => me =>
-      lila.security.Granter(_.Cli)(me) ?? {
+      lila.security.Granter(_.Cli)(me) so {
         runAs(me.id, req.body) map { Ok(_) }
       }
     }

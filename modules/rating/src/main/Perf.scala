@@ -83,7 +83,7 @@ case class Perf(
   def provisional                = glicko.provisional
   def established                = glicko.established
 
-  def showRatingProvisional = s"$intRating${provisional ?? "?"}"
+  def showRatingProvisional = s"$intRating${provisional so "?"}"
 }
 
 case object Perf {

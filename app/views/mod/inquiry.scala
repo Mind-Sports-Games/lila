@@ -246,7 +246,7 @@ object inquiry {
     else routes.Report.snooze(report.id, duration).url
 
   private def boostOpponents(report: Report): Option[NonEmptyList[User.ID]] =
-    (report.reason == Reason.Boost) ?? {
+    (report.reason == Reason.Boost) so {
       report.atoms.toList
         .withFilter(_.byPlayStrategy)
         .flatMap(_.text.linesIterator)

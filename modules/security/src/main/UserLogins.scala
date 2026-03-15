@@ -100,7 +100,7 @@ final class UserLoginsApi(
       fpSet: Set[FingerHash],
       max: Int
   ): Fu[List[OtherUser]] =
-    ipSet.nonEmpty ?? store.coll
+    ipSet.nonEmpty so store.coll
       .aggregateList(max, readPreference = ReadPreference.secondaryPreferred) { implicit framework =>
         import framework._
         import FingerHash.fingerHashHandler
@@ -159,7 +159,7 @@ final class UserLoginsApi(
   def getUserIdsWithSameIpAndPrint(userId: User.ID): Fu[Set[User.ID]] =
     for {
       (ips, fps) <- nextValues("ip", userId) zip nextValues("fp", userId)
-      users <- (ips.nonEmpty && fps.nonEmpty) ?? store.coll.secondaryPreferred.distinctEasy[User.ID, Set](
+      users <- (ips.nonEmpty && fps.nonEmpty) so store.coll.secondaryPreferred.distinctEasy[User.ID, Set](
         "user",
         $doc(
           "ip" $in ips,

@@ -16,7 +16,7 @@ final class Env(
     getLightUser: lila.common.LightUser.Getter,
     noteApi: lila.user.NoteApi,
     ws: StandaloneWSClient,
-    shutdown: akka.actor.CoordinatedShutdown,
+    shutdown: org.apache.pekko.actor.CoordinatedShutdown,
     mode: Mode
 )(implicit ec: scala.concurrent.ExecutionContext) {
 

@@ -51,11 +51,11 @@ final class ShutupApi(
     userRepo isTroll userId flatMap {
       case true => funit
       case false =>
-        toUserId ?? { relationApi.fetchFollows(_, userId) } flatMap {
+        toUserId so { relationApi.fetchFollows(_, userId) } flatMap {
           case true => funit
           case false =>
             val analysed = Analyser(text)
-            val pushPublicLine = source.ifTrue(analysed.nbBadWords > 0) ?? { source =>
+            val pushPublicLine = source.ifTrue(analysed.nbBadWords > 0) so { source =>
               $doc(
                 "pub" -> $doc(
                   "$each"  -> List(PublicLine.make(text, source)),
@@ -84,7 +84,7 @@ final class ShutupApi(
     }
 
   private def legiferate(userRecord: UserRecord): Funit =
-    userRecord.reports.exists(_.unacceptable) ?? {
+    userRecord.reports.exists(_.unacceptable) so {
       reporter ! lila.hub.actorApi.report.Shutup(userRecord.userId, reportText(userRecord))
       coll.update
         .one(

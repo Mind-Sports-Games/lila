@@ -20,7 +20,7 @@ final class TournamentStandingApi(
     lightUserApi: lila.user.LightUserApi
 )(implicit
     ec: scala.concurrent.ExecutionContext,
-    scheduler: akka.actor.Scheduler,
+    scheduler: org.apache.pekko.actor.Scheduler,
     mat: akka.stream.Materializer
 ) {
 
@@ -75,13 +75,12 @@ final class TournamentStandingApi(
     for {
       rankedPlayers <- playerRepo.bestByTourWithRankByPage(tour.id, 10, page max 1)
       sheets <-
-        rankedPlayers
+        Future.sequence(rankedPlayers
           .map { p =>
             cached.sheet(tour, p.player.userId) dmap { p.player.userId -> _ }
-          }
-          .sequenceFu
+          })
           .dmap(_.toMap)
-      players <- rankedPlayers.map(JsonView.playerJson(lightUserApi, sheets, tour.streakable)).sequenceFu
+      players <- Future.sequence(rankedPlayers.map(JsonView.playerJson(lightUserApi, sheets, tour.streakable)))
     } yield Json.obj(
       "page"    -> page,
       "players" -> players

@@ -92,7 +92,7 @@ final class JsonView(
       .add("score" -> score(g, p.playerIndex))
       .add("kingMoves" -> kingMoves(g, p.playerIndex))
       .add("berserk" -> p.berserk)
-      .add("blurs" -> (withFlags.blurs ?? blurs(g, p)))
+      .add("blurs" -> (withFlags.blurs so blurs(g, p)))
 
   def playerJson(
       pov: Pov,
@@ -104,7 +104,7 @@ final class JsonView(
       nvui: Boolean
   ): Fu[JsObject] =
     getSocketStatus(pov.game) zip
-      (pov.opponent.userId ?? userRepo.byId) zip
+      (pov.opponent.userId so userRepo.byId) zip
       takebacker.isAllowedIn(pov.game) zip
       moretimer.isAllowedIn(pov.game) map { case (((socket, opponentUser), takebackable), moretimeable) =>
         import pov._
@@ -233,7 +233,7 @@ final class JsonView(
       .add("score" -> score(g, p.playerIndex))
       .add("kingMoves" -> kingMoves(g, p.playerIndex))
       .add("berserk" -> p.berserk)
-      .add("blurs" -> (withFlags.blurs ?? blurs(g, p)))
+      .add("blurs" -> (withFlags.blurs so blurs(g, p)))
 
   def watcherJson(
       pov: Pov,
@@ -250,7 +250,7 @@ final class JsonView(
         Json
           .obj(
             "game" -> gameJsonView(game, initialFen)
-              .add("plyCentis" -> (withFlags.plytimes ?? game.plyTimes.map(_.map(_.centis))))
+              .add("plyCentis" -> (withFlags.plytimes so game.plyTimes.map(_.map(_.centis))))
               .add("division" -> withFlags.division.option(divider(game, initialFen)))
               .add("opening" -> game.opening)
               .add("importedBy" -> game.pgnImport.flatMap(_.user)),
@@ -294,9 +294,9 @@ final class JsonView(
               .add("actionReminder" -> false)
               .add("rookCastle" -> (pref.rookCastle == Pref.RookCastle.YES))
               .add("showCaptured" -> pref.captured),
-            "evalPut" -> JsBoolean(me.??(evalCache.shouldPut))
+            "evalPut" -> JsBoolean(me.so(evalCache.shouldPut))
           )
-          .add("evalPut" -> me.??(evalCache.shouldPut))
+          .add("evalPut" -> me.so(evalCache.shouldPut))
           .add("tv" -> tv.collect { case OnPlayStrategyTv(channel, flip) =>
             Json.obj("channel" -> channel, "flip" -> flip)
           })
@@ -371,7 +371,7 @@ final class JsonView(
         "gameRecordFormat" -> pov.game.gameRecordFormat,
         "userAnalysis"     -> true
       )
-      .add("evalPut" -> me.??(evalCache.shouldPut))
+      .add("evalPut" -> me.so(evalCache.shouldPut))
       .add("possibleDropsByRole" -> possibleDropsByrole(pov))
       .add("onlyDropsVariant" -> onlyDropsVariantForCurrentAction(pov))
       .add("hasGameScore" -> pov.game.variant.hasGameScore)
@@ -470,7 +470,7 @@ final class JsonView(
     }
 
   private def possibleDrops(pov: Pov): Option[JsValue] =
-    (pov.game playableBy pov.player) ?? {
+    (pov.game playableBy pov.player) so {
       pov.game.situation.drops map { drops =>
         JsString(drops.map(_.key).mkString)
       }

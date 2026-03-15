@@ -86,7 +86,7 @@ final private[api] class GameApi(
 
   def one(id: String, withFlags: WithFlags): Fu[Option[JsObject]] =
     gameRepo game id flatMap {
-      _ ?? { g =>
+      _ so { g =>
         gamesJson(withFlags)(List(g)) map (_.headOption)
       }
     }
@@ -185,7 +185,7 @@ final private[api] class GameApi(
       if (withFlags.analysis) analysisRepo byIds games.map(_.id)
       else fuccess(List.fill(games.size)(none[Analysis]))
     allAnalysis flatMap { analysisOptions =>
-      (games map gameRepo.initialFen).sequenceFu map { initialFens =>
+      Future.sequence(games map gameRepo.initialFen) map { initialFens =>
         games zip analysisOptions zip initialFens map { case ((g, analysisOption), initialFen) =>
           gameToJson(g, analysisOption, initialFen, checkToken(withFlags))
         }
@@ -234,7 +234,7 @@ final private[api] class GameApi(
             .add("name", p.name)
             .add("provisional" -> p.provisional)
             .add("isInputRating" -> p.isInputRating)
-            .add("plyCentis" -> withFlags.plyTimes ?? g.plyTimes(p.playerIndex).map(_.map(_.centis)))
+            .add("plyCentis" -> withFlags.plyTimes so g.plyTimes(p.playerIndex).map(_.map(_.centis)))
             .add("blurs" -> withFlags.blurs.option(p.blurs.nb))
             .add("analysis" -> analysisOption.flatMap(analysisJson.player(g pov p.playerIndex)))
         }),
@@ -255,8 +255,8 @@ final private[api] class GameApi(
             }
           case _ => g.actionStrs.map(_.mkString(",")).mkString(" ")
         }),
-        "opening" -> withFlags.opening.??(g.opening),
-        "fens" -> (withFlags.fens && g.finished) ?? {
+        "opening" -> withFlags.opening.so(g.opening),
+        "fens" -> (withFlags.fens && g.finished) so {
           Replay
             .boards(
               lib = g.variant.gameLogic,

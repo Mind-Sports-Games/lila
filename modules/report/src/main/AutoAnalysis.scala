@@ -10,7 +10,7 @@ final class AutoAnalysis(
     fishnet: lila.hub.actors.Fishnet
 )(implicit
     ec: scala.concurrent.ExecutionContext,
-    scheduler: akka.actor.Scheduler
+    scheduler: org.apache.pekko.actor.Scheduler
 ) {
 
   def apply(candidate: Report.Candidate): Funit =

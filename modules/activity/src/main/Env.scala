@@ -19,7 +19,7 @@ final class Env(
     swissApi: lila.swiss.SwissApi
 )(implicit
     ec: scala.concurrent.ExecutionContext,
-    scheduler: akka.actor.Scheduler
+    scheduler: org.apache.pekko.actor.Scheduler
 ) {
 
   private lazy val coll = db(CollName("activity"))
@@ -68,7 +68,7 @@ final class Env(
     case lila.hub.actorApi.relation.Follow(from, to)      => write.follow(from, to).unit
     case lila.study.actorApi.StartStudy(id)               =>
       // wait some time in case the study turns private
-      scheduler.scheduleOnce(5 minutes) { write.study(id).unit }.unit
+      { val _ = scheduler.scheduleOnce(5 minutes) { write.study(id).unit } }
     case lila.hub.actorApi.team.CreateTeam(id, _, userId) => write.team(id, userId).unit
     case lila.hub.actorApi.team.JoinTeam(id, userId)      => write.team(id, userId).unit
     case lila.hub.actorApi.streamer.StreamStart(userId)   => write.streamStart(userId).unit

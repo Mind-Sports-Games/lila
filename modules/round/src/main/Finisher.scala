@@ -25,7 +25,7 @@ final private class Finisher(
   implicit private val chatLang: Lang = defaultLang
 
   def abort(pov: Pov)(implicit proxy: GameProxy): Fu[Events] =
-    apply(pov.game, _.Aborted, None) >>- {
+    apply(pov.game, _.Aborted, None).andDo {
       getSocketStatus(pov.game) foreach { ss =>
         playban.abort(pov, ss.playerIndexsOnGame)
       }
@@ -33,10 +33,9 @@ final private class Finisher(
     }
 
   def rageQuit(game: Game, winner: Option[PlayerIndex])(implicit proxy: GameProxy): Fu[Events] =
-    apply(game, _.Timeout, winner) >>-
-      winner.foreach { playerIndex =>
+    apply(game, _.Timeout, winner).andDo(winner.foreach { playerIndex =>
         playban.rageQuit(game, !playerIndex)
-      }
+      })
 
   def outOfTime(game: Game)(implicit proxy: GameProxy): Fu[Events] =
     if (
@@ -52,14 +51,13 @@ final private class Finisher(
       apply(game, game.situation.insufficientMaterialStatus, Some(game.player.playerIndex))
     } else {
       val winner = Some(!game.player.playerIndex) ifFalse game.situation.opponentHasInsufficientMaterial
-      apply(game, game.situation.outOfTimeStatus, winner) >>-
-        winner.foreach { w =>
+      apply(game, game.situation.outOfTimeStatus, winner).andDo(winner.foreach { w =>
           playban.flag(game, !w)
-        }
+        })
     }
 
   def noStart(game: Game)(implicit proxy: GameProxy): Fu[Events] =
-    game.playerWhoDidNotMove ?? { culprit =>
+    game.playerWhoDidNotMove so { culprit =>
       lila.mon.round.expiration.count.increment()
       playban.noStart(Pov(game, culprit))
       if (game.isMandatory) apply(game, _.NoStart, Some(!culprit.playerIndex))
@@ -72,7 +70,7 @@ final private class Finisher(
       winner: Option[PlayerIndex],
       message: Option[String] = None
   )(implicit proxy: GameProxy): Fu[Events] =
-    apply(game, status, winner, message) >>- playban.other(game, status, winner).unit
+    apply(game, status, winner, message).andDo(playban.other(game, status, winner).unit)
 
   private def recordLagStats(game: Game): Unit =
     for {
@@ -155,18 +153,18 @@ final private class Finisher(
   }
 
   private def updateCountAndPerfs(finish: FinishGame): Fu[Option[RatingDiffs]] =
-    (!finish.isVsSelf && !finish.game.aborted) ?? {
+    (!finish.isVsSelf && !finish.game.aborted) so {
       import cats.implicits._
-      (finish.p1, finish.p2).mapN((_, _)) ?? { case (p1, p2) =>
+      (finish.p1, finish.p2).mapN((_, _)) so { case (p1, p2) =>
         crosstableApi.add(finish.game) zip perfsUpdater.save(finish.game, p1, p2) dmap (_._2)
       } zip
-        (finish.p1 ?? incNbGames(finish.game)) zip
-        (finish.p2 ?? incNbGames(finish.game)) dmap (_._1._1)
+        (finish.p1 so incNbGames(finish.game)) zip
+        (finish.p2 so incNbGames(finish.game)) dmap (_._1._1)
     }
 
   private def incNbGames(game: Game)(user: User): Funit =
-    game.finished ?? {
-      val totalTime = (game.hasClock && user.playTime.isDefined) ?? game.durationSeconds
+    game.finished so {
+      val totalTime = (game.hasClock && user.playTime.isDefined) so game.durationSeconds
       val tvTime    = totalTime ifTrue recentTvGames.get(game.id)
       val result =
         if (game.winnerUserId has user.id) 1

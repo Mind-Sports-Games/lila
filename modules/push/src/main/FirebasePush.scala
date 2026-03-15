@@ -1,7 +1,7 @@
 package lila.push
 
 import com.google.auth.oauth2.{ AccessToken, GoogleCredentials }
-import io.methvin.play.autoconfig._
+import lila.common.autoconfig.{ AutoConfig, ConfigName }
 import play.api.libs.json._
 import play.api.libs.ws.JsonBodyWritables._
 import play.api.libs.ws.StandaloneWSClient
@@ -19,14 +19,14 @@ final private class FirebasePush(
     config: FirebasePush.Config
 )(implicit
     ec: scala.concurrent.ExecutionContext,
-    scheduler: akka.actor.Scheduler
+    scheduler: org.apache.pekko.actor.Scheduler
 ) {
 
   private val workQueue =
     new lila.hub.DuctSequencer(maxSize = 512, timeout = 10 seconds, name = "firebasePush")
 
   def apply(userId: User.ID, data: => PushApi.Data): Funit =
-    credentialsOpt ?? { creds =>
+    credentialsOpt so { creds =>
       deviceApi.findLastManyByUserId("firebase", 3)(userId) flatMap {
         case Nil => funit
         // access token has 1h lifetime and is requested only if expired
@@ -43,7 +43,7 @@ final private class FirebasePush(
           }.chronometer.mon(_.push.googleTokenTime).result flatMap { token =>
             // TODO http batch request is possible using a multipart/mixed content
             // unfortuntely it doesn't seem easily doable with play WS
-            devices.map(send(token, _, data)).sequenceFu.void
+            Future.sequence(devices.map(send(token, _, data))).void
           }
       }
     }

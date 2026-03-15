@@ -55,7 +55,7 @@ final class JsonView {
           Json.toJson(D.Phase: Dimension[_]),
           Json.toJson(D.CplRange: Dimension[_])
         ) ::: {
-          asMod ?? List(Json.toJson(D.Blur: Dimension[_]), Json.toJson(D.TimeVariance: Dimension[_]))
+          asMod so List(Json.toJson(D.Blur: Dimension[_]), Json.toJson(D.TimeVariance: Dimension[_]))
         }
       ),
       Categ(
@@ -82,7 +82,7 @@ final class JsonView {
           Json.toJson(M.Material: Metric),
           Json.toJson(M.NbMoves: Metric)
         ) ++ {
-          asMod ?? List(
+          asMod so List(
             Json.toJson(M.Blurs: Metric),
             Json.toJson(M.TimeVariance: Metric)
           )

@@ -1,6 +1,6 @@
 package lila.socket
 
-import akka.actor.{ CoordinatedShutdown, Scheduler }
+import org.apache.pekko.actor.{ CoordinatedShutdown, Scheduler }
 import strategygames.{ Centis, Player => PlayerIndex }
 import io.lettuce.core._
 import io.lettuce.core.pubsub.{ StatefulRedisPubSubConnection => PubSub }
@@ -25,7 +25,7 @@ final class RemoteSocket(
     notification: lila.hub.actors.Notification,
     shutdown: CoordinatedShutdown
 )(implicit
-    ec: scala.concurrent.ExecutionContext,
+    ec: Executor,
     scheduler: Scheduler
 ) {
 
@@ -49,20 +49,20 @@ final class RemoteSocket(
 
   val baseHandler: Handler = {
     case In.ConnectUser(userId) =>
-      onlineUserIds.getAndUpdate(_ + userId).unit
+      val _ = onlineUserIds.getAndUpdate(_ + userId)
     case In.DisconnectUsers(userIds) =>
-      onlineUserIds.getAndUpdate(_ -- userIds).unit
+      val _ = onlineUserIds.getAndUpdate(_ -- userIds)
     case In.NotifiedBatch(userIds) => notification ! lila.hub.actorApi.notify.NotifiedBatch(userIds)
     case In.Lags(lags) =>
       lags foreach (UserLagCache.put _).tupled
       // this shouldn't be necessary... ensure that users are known to be online
-      onlineUserIds.getAndUpdate((x: UserIds) => x ++ lags.keys).unit
+      val _ = onlineUserIds.getAndUpdate((x: UserIds) => x ++ lags.keys)
     case In.TellSri(sri, userId, typ, msg) =>
       Bus.publish(TellSriIn(sri.value, userId, msg), s"remoteSocketIn:$typ")
     case In.TellUser(userId, typ, msg) =>
       Bus.publish(TellUserIn(userId, msg), s"remoteSocketIn:$typ")
     case In.ReqResponse(reqId, response) =>
-      requests
+      val _ = requests
         .computeIfPresent(
           reqId,
           (_: Int, promise: Promise[String]) => {
@@ -70,7 +70,6 @@ final class RemoteSocket(
             null // remove from promises
           }
         )
-        .unit
     case In.Ping(id) => send(Out.pong(id))
     case In.WsBoot =>
       logger.warn("Remote socket boot")
@@ -114,13 +113,13 @@ final class RemoteSocket(
       send(Out.impersonate(userId, modId))
     case ApiUserIsOnline(userId, value) =>
       send(Out.apiUserOnline(userId, value))
-      if (value) onlineUserIds.getAndUpdate(_ + userId).unit
+      if (value) { val _ = onlineUserIds.getAndUpdate(_ + userId) }
     case Follow(u1, u2)   => send(Out.follow(u1, u2))
     case UnFollow(u1, u2) => send(Out.unfollow(u1, u2))
   }
 
   final class StoppableSender(conn: PubSub[String, String], channel: Channel) extends Sender {
-    def apply(msg: String): Unit               = if (!stopping) conn.async.publish(channel, msg).unit
+    def apply(msg: String): Unit               = if (!stopping) { val _ = conn.async.publish(channel, msg) }
     def sticky(_id: String, msg: String): Unit = apply(msg)
   }
 
@@ -131,7 +130,7 @@ final class RemoteSocket(
     def sticky(id: String, msg: String): Unit = publish(id.hashCode.abs % parallelism, msg)
 
     private def publish(subChannel: Int, msg: String) =
-      if (!stopping) conn.async.publish(s"$channel:$subChannel", msg).unit
+      if (!stopping) { val _ = conn.async.publish(s"$channel:$subChannel", msg) }
   }
 
   def makeSender(channel: Channel, parallelism: Int = 1): Sender =
@@ -154,11 +153,10 @@ final class RemoteSocket(
     // subscribe to main channel
     subscribe(channel, reader)(handler) >> {
       // and subscribe to subchannels
-      (0 to parallelism)
+      Future.sequence((0 to parallelism)
         .map { index =>
           subscribe(s"$channel:$index", reader)(handler)
-        }
-        .sequenceFu
+        })
         .void
     }
 
@@ -178,9 +176,9 @@ final class RemoteSocket(
     request[Unit](
       id => send(Protocol.Out.stop(id)),
       res => logger.info(s"lila-ws says: $res")
-    ).withTimeout(1 second)
+    ).withTimeout(1 second, "RemoteSocket stop")
       .addFailureEffect(e => logger.error("lila-ws stop", e))
-      .nevermind
+      .recoverDefault
   }
 
   Lilakka.shutdown(shutdown, _.PhaseServiceUnbind, "Stopping the socket redis pool") { () =>

@@ -91,7 +91,7 @@ final private class AnalysisBuilder(evalCache: FishnetEvalCache)(implicit
       moves: List[Uci],
       startedAtTurn: Int
   ): List[Info] =
-    (evals filterNot (_ ?? (_.isCheckmate)) sliding 2).toList.zip(moves).zipWithIndex map {
+    (evals filterNot (_ so (_.isCheckmate)) sliding 2).toList.zip(moves).zipWithIndex map {
       case ((List(Some(before), Some(after)), move), index) =>
         val variation = before.cappedPv match {
           case first :: rest if first != move => first :: rest

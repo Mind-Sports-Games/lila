@@ -39,9 +39,9 @@ object Settings {
       sel match {
         case Nobody      => false
         case Everyone    => true
-        case Member      => userId ?? study.isMember
-        case Contributor => userId ?? study.canContribute
-        case Owner       => userId ?? study.isOwner
+        case Member      => userId so study.isMember
+        case Contributor => userId so study.canContribute
+        case Owner       => userId so study.isOwner
       }
   }
 }

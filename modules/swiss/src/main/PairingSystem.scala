@@ -1,7 +1,7 @@
 package lila.swiss
 
-import akka.stream.scaladsl._
-import akka.util.ByteString
+import org.apache.pekko.stream.scaladsl._
+import org.apache.pekko.util.ByteString
 import java.io.File
 import scala.concurrent.blocking
 import scala.sys.process._

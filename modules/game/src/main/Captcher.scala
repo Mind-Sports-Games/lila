@@ -1,7 +1,7 @@
 package lila.game
 
-import akka.actor._
-import akka.pattern.pipe
+import org.apache.pekko.actor._
+import org.apache.pekko.pattern.pipe
 import cats.data.NonEmptyList
 import strategygames.format.pgn.{ Sans, Tags }
 import strategygames.chess.format.pgn
@@ -61,14 +61,14 @@ final private class Captcher(gameRepo: GameRepo)(implicit ec: scala.concurrent.E
       findCheckmateInDb(10) flatMap {
         _.fold(findCheckmateInDb(1))(g => fuccess(g.some))
       } flatMap {
-        _ ?? fromGame
+        _ so fromGame
       }
 
     private def findCheckmateInDb(distribution: Int): Fu[Option[Game]] =
       gameRepo findRandomStandardCheckmate distribution
 
     private def getFromDb(id: String): Fu[Option[Captcha]] =
-      gameRepo game id flatMap { _ ?? fromGame }
+      gameRepo game id flatMap { _ so fromGame }
 
     private def fromGame(game: Game): Fu[Option[Captcha]] =
       gameRepo getOptionActionStrs game.id map {

@@ -66,7 +66,7 @@ final class ChallengeGranter(
             case (_, _) if from.id == dest.id                      => Yourself.some
             case (_, Pref.Challenge.FRIEND)                        => FriendsOnly.some
             case (_, Pref.Challenge.RATING) =>
-              perfType ?? { pt =>
+              perfType so { pt =>
                 if (from.perfs(pt).provisional || dest.perfs(pt).provisional)
                   RatingIsProvisional(pt).some
                 else {

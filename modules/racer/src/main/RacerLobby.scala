@@ -3,7 +3,7 @@ package lila.racer
 import scala.concurrent.duration._
 import scala.concurrent.ExecutionContext
 
-final class RacerLobby(api: RacerApi)(implicit ec: ExecutionContext, scheduler: akka.actor.Scheduler) {
+final class RacerLobby(api: RacerApi)(implicit ec: ExecutionContext, scheduler: org.apache.pekko.actor.Scheduler) {
 
   def join(player: RacerPlayer.Id): Fu[RacerRace.Id] = workQueue {
     currentRace flatMap {

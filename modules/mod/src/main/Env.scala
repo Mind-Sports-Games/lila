@@ -1,8 +1,8 @@
 package lila.mod
 
-import akka.actor._
+import org.apache.pekko.actor._
 import com.softwaremill.macwire._
-import io.methvin.play.autoconfig._
+import lila.common.autoconfig.{ AutoConfig, ConfigName }
 import play.api.Configuration
 
 import lila.common.config._
@@ -94,7 +94,7 @@ final class Env(
           game.loserUserId foreach { userId =>
             logApi.cheatDetected(userId, game.id) >>
               logApi.countRecentCheatDetected(userId) flatMap { count =>
-                (count >= 3) ?? {
+                (count >= 3) so {
                   if (game.hasClock)
                     api.autoMark(
                       lila.report.SuspectId(userId),

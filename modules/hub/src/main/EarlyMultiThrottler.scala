@@ -1,6 +1,6 @@
 package lila.hub
 
-import akka.actor._
+import org.apache.pekko.actor._
 import scala.concurrent.duration._
 
 /** Runs the work then waits cooldown
@@ -42,7 +42,8 @@ final class EarlyMultiThrottler(
   implicit def scheduler: Scheduler = context.system.scheduler
 
   def execute(work: Work): Funit =
-    lila.common.Future.makeItLast(work.cooldown) { work.run() }
+    given Executor = context.dispatcher
+    lila.common.LilaFuture.makeItLast(work.cooldown) { work.run() }
 }
 
 object EarlyMultiThrottler {

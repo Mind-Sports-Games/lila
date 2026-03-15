@@ -107,7 +107,7 @@ object TempBan {
     */
   def make(bans: Vector[TempBan], accountCreationDate: DateTime): TempBan =
     make {
-      (bans.lastOption ?? { prev =>
+      (bans.lastOption so { prev =>
         prev.endsAt.toNow.getStandardHours.toSaturatedInt match {
           case h if h < 72 => prev.mins * (132 - h) / 60
           case h           => (55.6 * prev.mins / (Math.pow(5.56 * prev.mins - 54.6, h / 720) + 54.6)).toInt

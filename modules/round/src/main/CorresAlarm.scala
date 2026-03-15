@@ -1,6 +1,6 @@
 package lila.round
 
-import akka.stream.scaladsl._
+import org.apache.pekko.stream.scaladsl._
 import org.joda.time.DateTime
 import reactivemongo.akkastream.cursorProducer
 
@@ -18,7 +18,7 @@ final private class CorresAlarm(
     proxyGame: Game.ID => Fu[Option[Game]]
 )(implicit
     ec: scala.concurrent.ExecutionContext,
-    scheduler: akka.actor.Scheduler,
+    scheduler: org.apache.pekko.actor.Scheduler,
     mat: akka.stream.Materializer
 ) {
 
@@ -30,7 +30,7 @@ final private class CorresAlarm(
 
   implicit private val AlarmHandler: BSONDocumentHandler[Alarm] = reactivemongo.api.bson.Macros.handler[Alarm]
 
-  private def scheduleNext(): Unit = scheduler.scheduleOnce(10 seconds) { run().unit }.unit
+  private def scheduleNext(): Unit = { val _ = scheduler.scheduleOnce(10 seconds) { run().unit } }
 
   scheduler.scheduleOnce(10 seconds) { scheduleNext() }
 
@@ -42,8 +42,8 @@ final private class CorresAlarm(
     case lila.hub.actorApi.round.CorresMoveEvent(move, _, _, alarmable, _) if alarmable =>
       proxyGame(move.gameId) foreach {
         _ foreach { game =>
-          game.bothPlayersHaveMoved ?? {
-            game.playableCorrespondenceClock ?? { clock =>
+          game.bothPlayersHaveMoved so {
+            game.playableCorrespondenceClock so { clock =>
               val remainingTime = clock remainingTime game.turnPlayerIndex
               val ringsAt       = DateTime.now.plusSeconds(remainingTime.toInt * 8 / 10)
               coll.update

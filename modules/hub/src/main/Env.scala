@@ -1,6 +1,6 @@
 package lila.hub
 
-import akka.actor._
+import org.apache.pekko.actor._
 import com.softwaremill.macwire._
 import com.typesafe.config.Config
 import play.api.Configuration
@@ -8,7 +8,7 @@ import play.api.Configuration
 object actors {
   trait Actor {
     val actor: ActorSelection
-    val ! = actor ! _
+    val ! = (msg: Any) => actor ! msg
   }
   case class GameSearch(actor: ActorSelection)    extends Actor
   case class ForumSearch(actor: ActorSelection)   extends Actor

@@ -1,6 +1,6 @@
 package lila.timeline
 
-import akka.actor._
+import org.apache.pekko.actor._
 import org.joda.time.DateTime
 
 import lila.common.config.Max
@@ -24,8 +24,7 @@ final private[timeline] class Push(
       unsubApi.filterUnsub(data.channel, users)
     } foreach { users =>
       if (users.nonEmpty)
-        makeEntry(users, data) >>-
-          lila.common.Bus.publish(ReloadTimelines(users), "lobbySocket")
+        makeEntry(users, data).andDo(lila.common.Bus.publish(ReloadTimelines(users), "lobbySocket"))
       lila.mon.timeline.notification.increment(users.size)
     }
   }

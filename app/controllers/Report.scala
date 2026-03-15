@@ -57,7 +57,7 @@ final class Report(
   def inquiry(id: String) =
     Secure(_.SeeReport) { _ => me =>
       api.inquiries.toggle(me, id) flatMap { case (prev, next) =>
-        prev.filter(_.isAppeal).map(_.user).??(env.appeal.api.setUnreadById) inject
+        prev.filter(_.isAppeal).map(_.user).so(env.appeal.api.setUnreadById) inject
           next.fold(
             Redirect {
               if (prev.exists(_.isAppeal)) routes.Appeal.queue
@@ -121,7 +121,7 @@ final class Report(
   def process(id: String) =
     SecureBody(_.SeeReport) { implicit ctx => me =>
       api byId id flatMap { inquiry =>
-        inquiry.filter(_.isAppeal).map(_.user).??(env.appeal.api.setReadById) >>
+        inquiry.filter(_.isAppeal).map(_.user).so(env.appeal.api.setReadById) >>
           api.process(me, id) >>
           onInquiryClose(inquiry, me, none, force = true)
       }
@@ -143,7 +143,7 @@ final class Report(
     Secure(_.Hunter) { implicit ctx => me =>
       OptionFuResult(env.user.repo named username) { user =>
         api.currentCheatReport(lila.report.Suspect(user)) flatMap {
-          _ ?? { report =>
+          _ so { report =>
             api.inquiries.toggle(me, report.id).void
           } inject modC.redirect(username, mod = true)
         }
@@ -152,7 +152,7 @@ final class Report(
 
   def form =
     Auth { implicit ctx => _ =>
-      get("username") ?? env.user.repo.named flatMap { user =>
+      get("username") so env.user.repo.named flatMap { user =>
         if (user.map(_.id) has UserModel.playstrategyId) Redirect(routes.Main.contact).fuccess
         else
           env.report.forms.createWithCaptcha map { case (form, captcha) =>
@@ -173,7 +173,7 @@ final class Report(
         .bindFromRequest()
         .fold(
           err =>
-            get("username") ?? env.user.repo.named flatMap { user =>
+            get("username") so env.user.repo.named flatMap { user =>
               env.report.forms.anyCaptcha map { captcha =>
                 BadRequest(html.report.form(err, user, captcha))
               }
@@ -195,7 +195,7 @@ final class Report(
           _ => BadRequest.fuccess,
           data =>
             env.user.repo named data.username flatMap {
-              _ ?? { user =>
+              _ so { user =>
                 if (user == me) BadRequest.fuccess
                 else api.commFlag(Reporter(me), Suspect(user), data.resource, data.text) inject Ok
               }

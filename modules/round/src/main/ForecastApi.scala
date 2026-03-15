@@ -64,7 +64,7 @@ final class ForecastApi(coll: Coll, tellRound: TellRound)(implicit ec: scala.con
         }
 
   def loadForDisplay(pov: Pov): Fu[Option[Forecast]] =
-    pov.forecastable ?? coll.byId[Forecast](pov.fullId) flatMap {
+    pov.forecastable so coll.byId[Forecast](pov.fullId) flatMap {
       case None => fuccess(none)
       case Some(fc) =>
         if (firstStep(fc.steps).exists(_.ply != pov.game.plies + 1)) clearPov(pov) inject none
@@ -72,7 +72,7 @@ final class ForecastApi(coll: Coll, tellRound: TellRound)(implicit ec: scala.con
     }
 
   def loadForPlay(pov: Pov): Fu[Option[Forecast]] =
-    pov.game.forecastable ?? coll.byId[Forecast](pov.fullId) flatMap {
+    pov.game.forecastable so coll.byId[Forecast](pov.fullId) flatMap {
       case None => fuccess(none)
       case Some(fc) =>
         if (firstStep(fc.steps).exists(_.ply != pov.game.plies)) clearPov(pov) inject none
@@ -80,7 +80,7 @@ final class ForecastApi(coll: Coll, tellRound: TellRound)(implicit ec: scala.con
     }
 
   def nextMove(g: Game, last: Move): Fu[Option[Uci.Move]] =
-    g.forecastable ?? {
+    g.forecastable so {
       loadForPlay(Pov player g) flatMap {
         case None => fuccess(none)
         case Some(fc) =>
@@ -93,7 +93,7 @@ final class ForecastApi(coll: Coll, tellRound: TellRound)(implicit ec: scala.con
       }
     }
 
-  def moveOpponent(g: Game, last: Move): Fu[Option[Uci.Move]] = g.forecastable ?? {
+  def moveOpponent(g: Game, last: Move): Fu[Option[Uci.Move]] = g.forecastable so {
     loadForPlay(Pov opponent g) flatMap {
       case None =>
         fuccess(none)

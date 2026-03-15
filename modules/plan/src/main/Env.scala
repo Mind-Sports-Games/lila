@@ -1,7 +1,7 @@
 package lila.plan
 
 import com.softwaremill.macwire._
-import io.methvin.play.autoconfig._
+import lila.common.autoconfig.{ AutoConfig, ConfigName }
 import com.softwaremill.tagging._
 import play.api.Configuration
 import play.api.libs.ws.StandaloneWSClient
@@ -29,7 +29,7 @@ final class Env(
     settingStore: lila.memo.SettingStore.Builder
 )(implicit
     ec: scala.concurrent.ExecutionContext,
-    system: akka.actor.ActorSystem
+    system: org.apache.pekko.actor.ActorSystem
 ) {
 
   private val config = appConfig.get[PlanConfig]("plan")(AutoConfig.loader)
@@ -85,11 +85,11 @@ final class Env(
     new lila.common.Cli {
       def process = {
         case "patron" :: "lifetime" :: user :: Nil =>
-          userRepo named user flatMap { _ ?? api.setLifetime } inject "ok"
+          userRepo named user flatMap { _ so api.setLifetime } inject "ok"
         case "patron" :: "month" :: user :: Nil =>
-          userRepo named user flatMap { _ ?? api.giveMonth } inject "ok"
+          userRepo named user flatMap { _ so api.giveMonth } inject "ok"
         case "patron" :: "remove" :: user :: Nil =>
-          userRepo named user flatMap { _ ?? api.remove } inject "ok"
+          userRepo named user flatMap { _ so api.remove } inject "ok"
       }
     }
 }

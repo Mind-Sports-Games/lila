@@ -1,6 +1,6 @@
 package lila.insight
 
-import akka.stream.scaladsl._
+import org.apache.pekko.stream.scaladsl._
 import org.joda.time.DateTime
 import reactivemongo.api._
 import reactivemongo.api.bson._
@@ -19,7 +19,7 @@ final private class InsightIndexer(
     storage: Storage
 )(implicit
     ec: scala.concurrent.ExecutionContext,
-    scheduler: akka.actor.Scheduler,
+    scheduler: org.apache.pekko.actor.Scheduler,
     mat: akka.stream.Materializer
 ) {
 
@@ -29,7 +29,7 @@ final private class InsightIndexer(
   def all(userId: User.ID): Funit =
     workQueue {
       userRepo byId userId flatMap {
-        _ ?? { user =>
+        _ so { user =>
           storage.fetchLast(user.id) flatMap {
             case None    => fromScratch(user)
             case Some(e) => computeFrom(user, e.date plusSeconds 1, e.number + 1)
@@ -46,7 +46,7 @@ final private class InsightIndexer(
 
   private def fromScratch(user: User): Funit =
     fetchFirstGame(user) flatMap {
-      _.?? { g =>
+      _.so { g =>
         computeFrom(user, g.createdAt, 1)
       }
     }
@@ -64,7 +64,7 @@ final private class InsightIndexer(
   private def fetchFirstGame(user: User): Fu[Option[Game]] =
     if (user.count.rated == 0) fuccess(none)
     else {
-      (user.count.rated >= maxGames) ?? gameRepo.coll
+      (user.count.rated >= maxGames) so gameRepo.coll
         .find(gameQuery(user))
         .sort(Query.sortCreated)
         .skip(maxGames - 1)
@@ -78,7 +78,7 @@ final private class InsightIndexer(
     storage nbByPerf user.id flatMap { nbs =>
       var nbByPerf = nbs
       def toEntry(game: Game): Fu[Option[InsightEntry]] =
-        game.perfType ?? { pt =>
+        game.perfType so { pt =>
           val nb = nbByPerf.getOrElse(pt, 0) + 1
           nbByPerf = nbByPerf.updated(pt, nb)
           povToEntry(game, user.id, provisional = nb < 10).addFailureEffect { e =>

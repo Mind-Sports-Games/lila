@@ -25,7 +25,7 @@ final class RealPlayerApi(
                 res.headers
                   .get("Content-Type")
                   .exists(_.exists(_ startsWith "text/plain"))
-            valid ?? {
+            valid so {
               res.body.linesIterator
                 .take(9999)
                 .toList
@@ -58,7 +58,7 @@ case class RealPlayers(players: Map[User.ID, RealPlayer]) {
     pgn.copy(
       tags = pgn.tags ++ Tags {
         game.players.flatMap { player =>
-          player.userId.flatMap(players.get) ?? { rp =>
+          player.userId.flatMap(players.get) so { rp =>
             List(
               rp.name.map { name => Tag(player.playerIndex.fold(Tag.P1, Tag.P2), name) },
               rp.rating.map { rating => Tag(player.playerIndex.fold(Tag.P1Elo, Tag.P2Elo), rating.toString) }

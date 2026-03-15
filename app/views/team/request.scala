@@ -26,11 +26,11 @@ object request {
           h1(title),
           p(style := "margin:2em 0")(richText(t.description)),
           postForm(cls := "form3", action := routes.Team.requestCreate(t.id))(
-            !t.open ?? frag(
+            !t.open so frag(
               form3.group(form("message"), trans.message())(form3.textarea(_)()),
               p(willBeReviewed())
             ),
-            t.password.nonEmpty ?? form3.passwordModified(form("password"), teamPassword())(
+            t.password.nonEmpty so form3.passwordModified(form("password"), teamPassword())(
               autocomplete := "new-password"
             ),
             form3.globalError(form),

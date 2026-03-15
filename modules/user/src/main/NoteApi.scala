@@ -72,8 +72,7 @@ final class NoteApi(
       date = DateTime.now
     )
 
-    coll.insert.one(note) >>-
-      lila.common.Bus.publish(
+    coll.insert.one(note).andDo(lila.common.Bus.publish(
         lila.hub.actorApi.user.Note(
           from = from.username,
           to = to.username,
@@ -81,16 +80,16 @@ final class NoteApi(
           mod = modOnly
         ),
         "userNote"
-      )
+      ))
   } >> {
-    modOnly ?? Title.fromUrl(text) flatMap {
-      _ ?? { userRepo.addTitle(to.id, _) }
+    modOnly so Title.fromUrl(text) flatMap {
+      _ so { userRepo.addTitle(to.id, _) }
     }
   }
 
   def playstrategyWrite(to: User, text: String) =
     userRepo.playstrategy flatMap {
-      _ ?? {
+      _ so {
         write(to, text, _, modOnly = true, dox = false)
       }
     }

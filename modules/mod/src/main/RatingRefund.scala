@@ -15,7 +15,7 @@ import lila.user.{ User, UserRepo }
 final private class RatingRefund(
     gameRepo: GameRepo,
     userRepo: UserRepo,
-    scheduler: akka.actor.Scheduler,
+    scheduler: org.apache.pekko.actor.Scheduler,
     notifier: ModNotifier,
     historyApi: lila.history.HistoryApi,
     rankingApi: lila.user.RankingApi,
@@ -25,7 +25,7 @@ final private class RatingRefund(
 
   import RatingRefund._
 
-  def schedule(sus: Suspect): Unit = scheduler.scheduleOnce(delay)(apply(sus).unit).unit
+  def schedule(sus: Suspect): Unit = { val _ = scheduler.scheduleOnce(delay)(apply(sus).unit) }
 
   private def apply(sus: Suspect): Funit =
     logApi.wasUnengined(sus) flatMap {
@@ -69,14 +69,14 @@ final private class RatingRefund(
 
         def applyRefund(ref: Refund) =
           userRepo byId ref.victim flatMap {
-            _ ?? { user =>
+            _ so { user =>
               perfStat.get(user, ref.perf) flatMap { perfs =>
                 val points = pointsToRefund(
                   ref,
                   curRating = user.perfs(ref.perf).intRating,
                   perfs = perfs
                 )
-                (points > 0) ?? {
+                (points > 0) so {
                   logger.info(s"Refunding $ref -> $points")
                   refundPoints(Victim(user), ref.perf, points)
                 }
@@ -84,7 +84,7 @@ final private class RatingRefund(
             }
           }
 
-        lastGames map makeRefunds flatMap { _.all.map(applyRefund).sequenceFu } void
+        lastGames map makeRefunds flatMap { r => Future.sequence(r.all.map(applyRefund)) } void
     }
 }
 

@@ -157,7 +157,7 @@ object games {
                     frag(
                       td(dataSort := basics.plyTimes.avg)(
                         s"${basics.plyTimes / 10}",
-                        basics.mtStreak ?? frag(br, "streak")
+                        basics.mtStreak so frag(br, "streak")
                       ),
                       td(dataSort := basics.blurs)(
                         s"${basics.blurs}%",

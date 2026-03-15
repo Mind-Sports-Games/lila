@@ -74,7 +74,7 @@ final class PuzzleSessionApi(
               )
             )
           mon.ratingDev(theme.value).record(puzzle.glicko.intDeviation)
-          mon.tier(session.path.tier.key, theme.value, session.difficulty.key).increment().unit
+          val _ = mon.tier(session.path.tier.key, theme.value, session.difficulty.key).increment()
           puzzle
         }
 
@@ -158,7 +158,7 @@ final class PuzzleSessionApi(
       }
 
   def onComplete(round: PuzzleRound, variant: Variant, theme: PuzzleTheme.Key): Funit =
-    sessions.getIfPresent(round.userId) ?? {
+    sessions.getIfPresent(round.userId) so {
       _ map { session =>
         // yes, even if the completed puzzle was not the current session puzzle
         // in that case we just skip a puzzle on the path, which doesn't matter

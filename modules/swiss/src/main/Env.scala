@@ -27,8 +27,8 @@ final class Env(
     baseUrl: lila.common.config.BaseUrl
 )(implicit
     ec: scala.concurrent.ExecutionContext,
-    system: akka.actor.ActorSystem,
-    scheduler: akka.actor.Scheduler,
+    system: org.apache.pekko.actor.ActorSystem,
+    scheduler: org.apache.pekko.actor.Scheduler,
     mat: akka.stream.Materializer,
     idGenerator: lila.game.IdGenerator,
     mode: play.api.Mode

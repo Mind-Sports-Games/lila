@@ -1,6 +1,6 @@
 package lila.swiss
 
-import akka.stream.scaladsl._
+import org.apache.pekko.stream.scaladsl._
 import reactivemongo.api.bson._
 
 import lila.db.dsl._
@@ -23,13 +23,13 @@ final class SwissTrf(
     SwissPlayer.fields { f =>
       tournamentLines(swiss) concat
         forbiddenPairings(swiss, playerIds) concat sheetApi
-          .source(swiss, sort = sorted.??($doc(f.inputRating -> -1, f.rating -> -1)))
+          .source(swiss, sort = sorted.so($doc(f.inputRating -> -1, f.rating -> -1)))
           .map((playerLine(swiss, playerIds) _).tupled)
           .map(formatLine) concat (if (swiss.settings.mcmahon || swiss.settings.isMatchScore)
                                      sheetApi
                                        .source(
                                          swiss,
-                                         sort = sorted.??($doc(f.inputRating -> -1, f.rating -> -1))
+                                         sort = sorted.so($doc(f.inputRating -> -1, f.rating -> -1))
                                        )
                                        .map((acceleratedPairingLine(swiss, playerIds) _).tupled)
                                        .map(formatLine)
@@ -43,7 +43,7 @@ final class SwissTrf(
         s"022 $baseUrl/swiss/${swiss.id}",
         s"032 PlayStrategy",
         s"042 ${dateFormatter print swiss.startsAt}",
-        s"052 ${swiss.finishedAt ?? dateFormatter.print}",
+        s"052 ${swiss.finishedAt so dateFormatter.print}",
         s"062 ${swiss.nbPlayers}",
         s"092 Individual: Swiss-System",
         s"102 $baseUrl/swiss",
@@ -97,8 +97,8 @@ final class SwissTrf(
       swiss.allRounds.zip(sheet.outcomes).flatMap { case (rn, outcome) =>
         val pairing = pairings get rn
         List(
-          95 -> pairing.map(_ opponentOf p.userId).flatMap(playerIds.get).??(_.toString),
-          97 -> pairing.map(_ bbpPairingPlayerIndexOf p.userId).??(_.fold("w", "b")),
+          95 -> pairing.map(_ opponentOf p.userId).flatMap(playerIds.get).so(_.toString),
+          97 -> pairing.map(_ bbpPairingPlayerIndexOf p.userId).so(_.fold("w", "b")),
           99 -> {
             import SwissSheet._
             outcome match {
@@ -124,7 +124,7 @@ final class SwissTrf(
       }
     } ::: {
       p.absent && swiss.round.value < swiss.settings.nbRounds
-    }.?? {
+    }.so {
       List( // http://www.rrweb.org/javafo/aum/JaVaFo2_AUM.htm#_Unusual_info_extensions
         95 -> "0000",
         97 -> "",

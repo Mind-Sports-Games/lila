@@ -23,7 +23,7 @@ final private class MsgSecurity(
     chatPanic: lila.chat.ChatPanic
 )(implicit
     ec: scala.concurrent.ExecutionContext,
-    scheduler: akka.actor.Scheduler
+    scheduler: org.apache.pekko.actor.Scheduler
 ) {
 
   import BsonHandlers._
@@ -105,13 +105,13 @@ final private class MsgSecurity(
         }
 
     private def isSpam(text: String): Fu[Option[Verdict]] =
-      spam.detect(text) ?? fuccess(Spam.some)
+      spam.detect(text) so fuccess(Spam.some)
 
     private def isTroll(contacts: User.Contacts): Fu[Option[Verdict]] =
-      (contacts.orig.isTroll && !contacts.dest.isTroll) ?? fuccess(Troll.some)
+      (contacts.orig.isTroll && !contacts.dest.isTroll) so fuccess(Troll.some)
 
     private def isDirt(user: User.Contact, text: String, isNew: Boolean): Fu[Option[Verdict]] =
-      (isNew && Analyser(text).dirty) ??
+      (isNew && Analyser(text).dirty) so
         !userRepo.isCreatedSince(user.id, DateTime.now.minusDays(30)) dmap { _ option Dirt }
   }
 
@@ -119,7 +119,7 @@ final private class MsgSecurity(
 
     def post(orig: User.ID, dest: User.ID, isNew: Boolean): Fu[Boolean] =
       userRepo.contacts(orig, dest) flatMap {
-        _ ?? { post(_, isNew) }
+        _ so { post(_, isNew) }
       }
 
     def post(contacts: User.Contacts, isNew: Boolean): Fu[Boolean] =

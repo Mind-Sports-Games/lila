@@ -25,8 +25,8 @@ final private class Biter(
 
   private def join(hook: Hook, sri: Sri, lobbyUserOption: Option[LobbyUser]): Fu[JoinHook] =
     for {
-      userOption         <- lobbyUserOption.map(_.id) ?? userRepo.byId
-      ownerOption        <- hook.userId ?? userRepo.byId
+      userOption         <- lobbyUserOption.map(_.id) so userRepo.byId
+      ownerOption        <- hook.userId so userRepo.byId
       creatorPlayerIndex <- assignCreatorPlayerIndex(ownerOption, userOption, hook.realPlayerIndex)
       game <- makeGame(
         hook,
@@ -118,10 +118,10 @@ final private class Biter(
     hook.isAuth == user.isDefined && user.fold(true) { u =>
       u.lame == hook.lame &&
       !hook.userId.contains(u.id) &&
-      !hook.userId.??(u.blocking.contains) &&
-      !hook.user.??(_.blocking).contains(u.id) &&
+      !hook.userId.so(u.blocking.contains) &&
+      !hook.user.so(_.blocking).contains(u.id) &&
       hook.realRatingRange.fold(true) { range =>
-        (hook.perfType map u.ratingAt) ?? range.contains
+        (hook.perfType map u.ratingAt) so range.contains
       }
     }
 
@@ -131,7 +131,7 @@ final private class Biter(
       !(user.blocking contains seek.user.id) &&
       !(seek.user.blocking contains user.id) &&
       seek.realRatingRange.fold(true) { range =>
-        (seek.perfType map user.ratingAt) ?? range.contains
+        (seek.perfType map user.ratingAt) so range.contains
       }
 
   def showHookTo(hook: Hook, member: LobbySocket.Member): Boolean =

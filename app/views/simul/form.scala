@@ -88,7 +88,7 @@ object form {
               translatedAllVariantChoicesWithVariants(v => s"${v.gameFamily.id}_${v.id}"),
               checks = form.value
                 .map(_.variants.map(_.toString))
-                .getOrElse(simul.??(_.variants.map(v => s"${v.gameFamily.id}_${v.id}")))
+                .getOrElse(simul.so(_.variants.map(v => s"${v.gameFamily.id}_${v.id}")))
                 .toSet
             )
           ),

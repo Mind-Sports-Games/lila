@@ -1,7 +1,7 @@
 package lila.simul
 
 import com.softwaremill.macwire._
-import io.methvin.play.autoconfig._
+import lila.common.autoconfig.{ AutoConfig, ConfigName }
 import play.api.Configuration
 import scala.concurrent.duration._
 
@@ -31,7 +31,7 @@ final class Env(
     proxyRepo: lila.round.GameProxyRepo
 )(implicit
     ec: scala.concurrent.ExecutionContext,
-    scheduler: akka.actor.Scheduler,
+    scheduler: org.apache.pekko.actor.Scheduler,
     mode: play.api.Mode
 ) {
 

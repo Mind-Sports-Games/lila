@@ -15,7 +15,7 @@ final class Analyser(
     limiter: FishnetLimiter
 )(implicit
     ec: scala.concurrent.ExecutionContext,
-    scheduler: akka.actor.Scheduler
+    scheduler: org.apache.pekko.actor.Scheduler
 ) {
 
   val maxPlies = 200
@@ -23,7 +23,7 @@ final class Analyser(
   private val workQueue = new lila.hub.DuctSequencer(maxSize = 256, timeout = 5 seconds, "fishnetAnalyser")
 
   def apply(game: Game, sender: Work.Sender): Fu[Boolean] =
-    (game.metadata.analysed ?? analysisRepo.exists(game.id)) flatMap {
+    (game.metadata.analysed so analysisRepo.exists(game.id)) flatMap {
       case true                  => fuFalse
       case _ if !game.analysable => fuFalse
       case _ =>
@@ -32,7 +32,7 @@ final class Analyser(
           ignoreConcurrentCheck = false,
           ownGame = game.userIds contains sender.userId
         ) flatMap { accepted =>
-          accepted ?? {
+          accepted so {
             makeWork(game, sender) flatMap { work =>
               workQueue {
                 repo getSimilarAnalysis work flatMap {
@@ -58,7 +58,7 @@ final class Analyser(
     }
 
   def apply(gameId: String, sender: Work.Sender): Fu[Boolean] =
-    gameRepo game gameId flatMap { _ ?? { apply(_, sender) } }
+    gameRepo game gameId flatMap { _ so { apply(_, sender) } }
 
   def study(req: lila.hub.actorApi.fishnet.StudyChapterRequest): Fu[Boolean] =
     analysisRepo exists req.chapterId flatMap {
@@ -69,7 +69,7 @@ final class Analyser(
         (fuccess(req.unlimited) >>| limiter(sender, ignoreConcurrentCheck = true, ownGame = false)) flatMap {
           accepted =>
             if (!accepted) logger.info(s"Study request declined: ${req.studyId}/${req.chapterId} by $sender")
-            accepted ?? {
+            accepted so {
               val work = makeWork(
                 game = Work.Game(
                   id = chapterId,
@@ -79,12 +79,12 @@ final class Analyser(
                   moves = moves take maxPlies map (_.uci) mkString " "
                 ),
                 // if p2 moves first, use 1 as startPly so the analysis doesn't get reversed
-                startPly = initialFen.flatMap(_.player).??(_.fold(0, 1)),
+                startPly = initialFen.flatMap(_.player).so(_.fold(0, 1)),
                 sender = sender
               )
               workQueue {
                 repo getSimilarAnalysis work flatMap {
-                  _.isEmpty ?? {
+                  _.isEmpty so {
                     lila.mon.fishnet.analysis.requestCount("study").increment()
                     evalCache skipPositions work.game flatMap { skipPositions =>
                       lila.mon.fishnet.analysis.evalCacheHits.record(skipPositions.size)

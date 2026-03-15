@@ -14,7 +14,7 @@ final class TournamentStatsApi(
 )(implicit ec: scala.concurrent.ExecutionContext) {
 
   def apply(tournament: Tournament): Fu[Option[TournamentStats]] =
-    tournament.isFinished ?? cache.get(tournament.id).dmap(some)
+    tournament.isFinished so cache.get(tournament.id).dmap(some)
 
   implicit private val statsBSONHandler: BSONDocumentHandler[TournamentStats] =
     Macros.handler[TournamentStats]
@@ -66,9 +66,9 @@ private object TournamentStats {
     TournamentStats(
       games = playerIndexStats.foldLeft(0)(_ + _._2.games),
       moves = playerIndexStats.foldLeft(0)(_ + _._2.moves),
-      p1Wins = playerIndexStats.get(PlayerIndex.P1.some).??(_.games),
-      p2Wins = playerIndexStats.get(PlayerIndex.P2.some).??(_.games),
-      draws = playerIndexStats.get(none).??(_.games),
+      p1Wins = playerIndexStats.get(PlayerIndex.P1.some).so(_.games),
+      p2Wins = playerIndexStats.get(PlayerIndex.P2.some).so(_.games),
+      draws = playerIndexStats.get(none).so(_.games),
       berserks = playerIndexStats.foldLeft(0)(_ + _._2.berserks),
       averageRating = rating
     )

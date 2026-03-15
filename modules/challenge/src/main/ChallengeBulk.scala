@@ -1,7 +1,7 @@
 package lila.challenge
 
-import akka.actor.ActorSystem
-import akka.stream.scaladsl._
+import org.apache.pekko.actor.ActorSystem
+import org.apache.pekko.stream.scaladsl._
 import org.joda.time.DateTime
 import reactivemongo.api.bson.Macros
 import scala.concurrent.duration._
@@ -34,7 +34,7 @@ final class ChallengeBulkApi(
     ec: scala.concurrent.ExecutionContext,
     mat: akka.stream.Materializer,
     system: ActorSystem,
-    scheduler: akka.actor.Scheduler,
+    scheduler: org.apache.pekko.actor.Scheduler,
     mode: play.api.Mode
 ) {
 
@@ -78,7 +78,7 @@ final class ChallengeBulkApi(
 
   private def checkForPairing: Funit =
     coll.one[ScheduledBulk]($doc("pairAt" $lte DateTime.now, "pairedAt" $exists false)) flatMap {
-      _ ?? { bulk =>
+      _ so { bulk =>
         workQueue(bulk.by) {
           makePairings(bulk).void
         }
@@ -87,7 +87,7 @@ final class ChallengeBulkApi(
 
   private def checkForClocks: Funit =
     coll.one[ScheduledBulk]($doc("startClocksAt" $lte DateTime.now, "pairedAt" $exists true)) flatMap {
-      _ ?? { bulk =>
+      _ so { bulk =>
         workQueue(bulk.by) {
           startClocksNow(bulk)
         }
@@ -127,7 +127,7 @@ final class ChallengeBulkApi(
         (game, p1, p2)
       }
       .mapAsyncUnordered(8) { case (game, p1, p2) =>
-        gameRepo.insertDenormalized(game) >>- onStart(game.id) inject {
+        gameRepo.insertDenormalized(game).andDo(onStart(game.id)) inject {
           (game, p1, p2)
         }
       }
@@ -137,7 +137,7 @@ final class ChallengeBulkApi(
       .toMat(LilaStream.sinkCount)(Keep.right)
       .run()
       .addEffect { nb =>
-        lila.mon.api.challenge.bulk.createNb(bulk.by).increment(nb).unit
+        val _ = lila.mon.api.challenge.bulk.createNb(bulk.by).increment(nb)
       } >> {
       if (bulk.startClocksAt.isDefined)
         coll.updateField($id(bulk._id), "pairedAt", DateTime.now)

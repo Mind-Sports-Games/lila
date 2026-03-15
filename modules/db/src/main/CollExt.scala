@@ -7,7 +7,7 @@ import reactivemongo.api._
 import reactivemongo.api.bson._
 import reactivemongo.api.{ WriteConcern => CWC }
 
-trait CollExt { self: dsl with QueryBuilderExt =>
+trait CollExt { self: dsl & QueryBuilderExt =>
 
   implicit final class ExtendColl(val coll: Coll)(implicit ec: scala.concurrent.ExecutionContext) {
 
@@ -126,7 +126,7 @@ trait CollExt { self: dsl with QueryBuilderExt =>
         }
 
     def primitive[V: BSONReader](selector: Bdoc, sort: Bdoc, nb: Int, field: String): Fu[List[V]] =
-      (nb > 0) ?? coll
+      (nb > 0) so coll
         .find(selector, $doc(field -> true).some)
         .sort(sort)
         .cursor[Bdoc]()
@@ -176,7 +176,7 @@ trait CollExt { self: dsl with QueryBuilderExt =>
       coll
         .update(ordered = false, writeConcern = WriteConcern.Unacknowledged)
         .one(selector, $set(field -> value))
-        .unit
+        .discard
 
     def incField(selector: Bdoc, field: String, value: Int = 1) =
       coll.update.one(selector, $inc(field -> value))
@@ -185,7 +185,7 @@ trait CollExt { self: dsl with QueryBuilderExt =>
       coll
         .update(ordered = false, writeConcern = WriteConcern.Unacknowledged)
         .one(selector, $inc(field -> value))
-        .unit
+        .discard
 
     def unsetField(selector: Bdoc, field: String, multi: Boolean = false) =
       coll.update.one(selector, $unset(field), multi = multi)
@@ -198,7 +198,7 @@ trait CollExt { self: dsl with QueryBuilderExt =>
 
     def fetchUpdate[D: BSONDocumentHandler](selector: Bdoc)(update: D => Bdoc): Funit =
       one[D](selector) flatMap {
-        _ ?? { doc =>
+        _ so { doc =>
           coll.update.one(selector, update(doc)).void
         }
       }
@@ -254,7 +254,7 @@ trait CollExt { self: dsl with QueryBuilderExt =>
         .headOption
         .dmap(_.isDefined)
 
-    def distinctEasy[T, M[_] <: Iterable[_]](
+    def distinctEasy[T, M[_] <: Iterable[?]](
         key: String,
         selector: coll.pack.Document,
         readPreference: ReadPreference = ReadPreference.primary

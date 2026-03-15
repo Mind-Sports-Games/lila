@@ -148,7 +148,7 @@ final private class GameJson(
     Json
       .obj(
         "userId"      -> userId,
-        "name"        -> s"${user.name}${p.rating.??(r => s" ($r)")}",
+        "name"        -> s"${user.name}${p.rating.so(r => s" ($r)")}",
         "playerIndex" -> p.playerIndex.name,
         "playerColor" -> game.variant.playerColors(p.playerIndex)
       )

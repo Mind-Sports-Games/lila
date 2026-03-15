@@ -38,15 +38,14 @@ final class IrwinApi(
     def insert(report: IrwinReport) =
       reportColl.update.one($id(report._id), report, upsert = true) >>
         markOrReport(report) >>
-        notification(report) >>-
-        lila.mon.mod.irwin.ownerReport(report.owner).increment().unit
+        notification(report).andDo { val _ = lila.mon.mod.irwin.ownerReport(report.owner).increment() }
 
     def get(user: User): Fu[Option[IrwinReport]] =
       reportColl.find($id(user.id)).one[IrwinReport]
 
     def withPovs(user: User): Fu[Option[IrwinReport.WithPovs]] =
       get(user) flatMap {
-        _ ?? { report =>
+        _ so { report =>
           gameRepo.gamesFromSecondary(report.games.map(_.gameId)) dmap { games =>
             val povs = games.flatMap { g =>
               Pov(g, user) map { g.id -> _ }
@@ -62,8 +61,7 @@ final class IrwinApi(
     private def markOrReport(report: IrwinReport): Funit =
       userRepo.getTitle(report.suspectId.value) flatMap { title =>
         if (report.activation >= thresholds.get().mark && title.isEmpty)
-          modApi.autoMark(report.suspectId, ModId.irwin, report.note) >>-
-            lila.mon.mod.irwin.mark.increment().unit
+          modApi.autoMark(report.suspectId, ModId.irwin, report.note).andDo { val _ = lila.mon.mod.irwin.mark.increment() }
         else if (report.activation >= thresholds.get().report) for {
           suspect <- getSuspect(report.suspectId.value)
           irwin   <- userRepo byId "irwin" orFail s"Irwin user not found" dmap Mod.apply
@@ -76,7 +74,7 @@ final class IrwinApi(
             ),
             (x: Report.Score) => Report.Score(60)
           )
-        } yield lila.mon.mod.irwin.report.increment().unit
+        } yield { val _ = lila.mon.mod.irwin.report.increment() }
         else funit
       }
   }
@@ -142,7 +140,7 @@ final class IrwinApi(
         .flatMap(analysisRepo.associateToGames)
 
     private def getMoreGames(suspect: Suspect, nb: Int): Fu[List[Game]] =
-      (nb > 0) ??
+      (nb > 0) so
         gameRepo.coll
           .find(baseQuery(suspect) ++ Query.analysed(false))
           .sort(Query.sortCreated)
@@ -158,16 +156,15 @@ final class IrwinApi(
       subs = subs.updated(suspectId, ~subs.get(suspectId) + modId)
 
     private[IrwinApi] def apply(report: IrwinReport): Funit =
-      subs.get(report.suspectId) ?? { modIds =>
+      subs.get(report.suspectId) so { modIds =>
         subs = subs - report.suspectId
         import lila.notify.{ IrwinDone, Notification }
-        modIds
+        Future.sequence(modIds
           .map { modId =>
             notifyApi.addNotification(
               Notification.make(Notification.Notifies(modId.value), IrwinDone(report.suspectId.value))
             )
-          }
-          .sequenceFu
+          })
           .void
       }
   }

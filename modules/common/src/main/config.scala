@@ -1,7 +1,7 @@
 package lila.common
 
 import scala.concurrent.duration.FiniteDuration
-import io.methvin.play.autoconfig._
+import lila.common.autoconfig.{ AutoConfig, ConfigName }
 import scala.jdk.CollectionConverters._
 import play.api.ConfigLoader
 
@@ -21,7 +21,7 @@ object config {
 
   case class Max(value: Int) extends AnyVal with IntValue with Ordered[Int] {
     def compare(other: Int) = Integer.compare(value, other)
-    def atMost(max: Int)    = Max(value atMost max)
+    def atMost(max: Int)    = Max(value.atMost(max))
   }
   case class MaxPerPage(value: Int) extends AnyVal with IntValue
 

@@ -72,7 +72,7 @@ final class Msg(
 
   def compatCreate =
     AuthBody { implicit ctx => me =>
-      ctx.noKid ?? {
+      ctx.noKid so {
         env.msg.compat
           .create(me)(ctx.body, formBinding)
           .fold(
@@ -99,7 +99,7 @@ final class Msg(
       // new API: create/reply
       scoped = implicit req =>
         me =>
-          (!me.kid && userId != me.id) ?? {
+          (!me.kid && userId != me.id) so {
             import play.api.data._
             import play.api.data.Forms._
             Form(single("text" -> nonEmptyText))

@@ -1,6 +1,6 @@
 package lila.tournament
 
-import akka.stream.scaladsl.Source
+import org.apache.pekko.stream.scaladsl.Source
 
 object TournamentCsv {
 
@@ -28,7 +28,7 @@ object TournamentCsv {
         user.name,
         player.actualRating.toString,
         player.score.toString,
-        player.performanceOption.??(_.toString),
+        player.performanceOption.so(_.toString),
         ~player.team
       )
   }

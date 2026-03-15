@@ -138,7 +138,7 @@ final class Study(
         case None => notFound
         case Some(topic) =>
           env.study.pager.byTopic(topic, ctx.me, Order(order), page) zip
-            ctx.me.??(u => env.study.topicApi.userTopics(u.id) dmap some) map { case (pag, topics) =>
+            ctx.me.so(u => env.study.topicApi.userTopics(u.id) dmap some) map { case (pag, topics) =>
               Ok(html.study.topic.show(topic, pag, Order(order), topics))
             }
       }
@@ -183,7 +183,7 @@ final class Study(
                     "study" -> data.study.add("chat" -> chatOpt.map { c =>
                       lila.chat.JsonView.mobile(
                         chat = c.chat,
-                        writeable = ctx.userId.??(sc.study.canChat)
+                        writeable = ctx.userId.so(sc.study.canChat)
                       )
                     }),
                     "analysis" -> data.analysis
@@ -202,7 +202,7 @@ final class Study(
       chapter = resetToChapter | sc.chapter
       _ <- env.user.lightUserApi preloadMany study.members.ids.toList
       pov = userAnalysisC.makePov(chapter.root.fen.some, chapter.setup.variant)
-      analysis <- chapter.serverEval.exists(_.done) ?? env.analyse.analyser.byId(chapter.id.value)
+      analysis <- chapter.serverEval.exists(_.done) so env.analyse.analyser.byId(chapter.id.value)
       division = analysis.isDefined option env.study.serverEvalMerger.divisionOf(chapter)
       baseData = env.round.jsonView.userAnalysisJson(
         pov,
@@ -242,7 +242,7 @@ final class Study(
   def chapterMeta(id: String, chapterId: String) =
     Open { _ =>
       env.study.chapterRepo.byId(chapterId).map {
-        _.filter(_.studyId.value == id) ?? { chapter =>
+        _.filter(_.studyId.value == id) so { chapter =>
           Ok(env.study.jsonView.chapterConfig(chapter))
         }
       }
@@ -253,7 +253,7 @@ final class Study(
     ctx.me.fold(true) { // anon can see public chats
       env.chat.panic.allowed
     }
-  } ?? env.chat.api.userChat
+  } so env.chat.api.userChat
     .findMine(Chat.Id(study.id.value), ctx.me)
     .dmap(some)
     .mon(_.chat.fetch("study"))
@@ -299,7 +299,7 @@ final class Study(
   def delete(id: String) =
     Auth { _ => me =>
       env.study.api.byIdAndOwner(id, me) flatMap {
-        _ ?? { study =>
+        _ so { study =>
           env.study.api.delete(study) >> env.relay.api.deleteRound(lila.relay.RelayRound.Id(id)).map {
             case _ => Redirect(routes.Study.mine("hot"))
             //case Some(tour) => Redirect(routes.RelayTour.redirect(tour.slug, tour.id.value))
@@ -311,14 +311,14 @@ final class Study(
   def clearChat(id: String) =
     Auth { _ => me =>
       env.study.api.isOwner(id, me) flatMap {
-        _ ?? env.chat.api.userChat.clear(Chat.Id(id))
+        _ so env.chat.api.userChat.clear(Chat.Id(id))
       } inject Redirect(routes.Study.show(id))
     }
 
   def importPgn(id: String) =
     AuthBody { implicit ctx => me =>
       implicit val req = ctx.body
-      get("sri") ?? { sri =>
+      get("sri") so { sri =>
         lila.study.StudyForm.importPgn.form
           .bindFromRequest()
           .fold(
@@ -559,7 +559,7 @@ final class Study(
   def topics =
     Open { implicit ctx =>
       env.study.topicApi.popular(50) zip
-        ctx.me.??(u => env.study.topicApi.userTopics(u.id) dmap some) map { case (popular, mine) =>
+        ctx.me.so(u => env.study.topicApi.userTopics(u.id) dmap some) map { case (popular, mine) =>
           val form = mine map lila.study.StudyForm.topicsForm
           Ok(html.study.topic.index(popular, mine, form))
         }
@@ -602,19 +602,19 @@ final class Study(
         .maximumSize(512)
         .buildAsyncFuture { studyId =>
           env.study.studyRepo.membersById(studyId) flatMap {
-            _.map(_.members).filter(_.nonEmpty) ?? { members =>
+            _.map(_.members).filter(_.nonEmpty) so { members =>
               env.streamer.liveStreamApi.all.flatMap {
-                _.streams
-                  .filter { s =>
-                    members.exists(m => s is m._2.id)
-                  }
-                  .map { stream =>
-                    env.study.isConnected(studyId, stream.streamer.userId) map {
-                      _ option stream.streamer.userId
+                liveStreams =>
+                  Future.sequence(liveStreams.streams
+                    .filter { s =>
+                      members.exists(m => s is m._2.id)
                     }
-                  }
-                  .sequenceFu
-                  .dmap(_.flatten)
+                    .map { stream =>
+                      env.study.isConnected(studyId, stream.streamer.userId) map {
+                        _ option stream.streamer.userId
+                      }
+                    })
+                    .dmap(_.flatten)
               }
             }
           }
@@ -626,7 +626,7 @@ final class Study(
     import lila.tree.Node.glyphWriter
     import lila.i18n.{ I18nKeys => trans }
 
-    play.api.i18n.Lang.get(lang) ?? { implicit lang =>
+    play.api.i18n.Lang.get(lang) so { implicit lang =>
       JsonOk(
         Json.obj(
           "move" -> List(

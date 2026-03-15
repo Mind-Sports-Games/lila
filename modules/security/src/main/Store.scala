@@ -83,7 +83,7 @@ final class Store(val coll: Coll, cacheApi: lila.memo.CacheApi)(implicit
         $id(sessionId),
         $set("up" -> false)
       )
-      .void >>- uncache(sessionId)
+      .void.andDo(uncache(sessionId))
 
   def closeUserAndSessionId(userId: User.ID, sessionId: String): Funit =
     coll.update
@@ -91,7 +91,7 @@ final class Store(val coll: Coll, cacheApi: lila.memo.CacheApi)(implicit
         $doc("user" -> userId, "_id" -> sessionId, "up" -> true),
         $set("up"   -> false)
       )
-      .void >>- uncache(sessionId)
+      .void.andDo(uncache(sessionId))
 
   def closeUserExceptSessionId(userId: User.ID, sessionId: String): Funit =
     coll.update
@@ -129,7 +129,7 @@ final class Store(val coll: Coll, cacheApi: lila.memo.CacheApi)(implicit
     FingerHash(fp) match {
       case None => fufail(s"Can't hash $id's fingerprint $fp")
       case Some(hash) =>
-        coll.updateField($id(id), "fp", hash) >>- {
+        coll.updateField($id(id), "fp", hash).andDo {
           authInfo(id) foreach {
             _ foreach { i =>
               authCache.put(id, fuccess(i.copy(hasFp = true).some))
@@ -217,7 +217,7 @@ final class Store(val coll: Coll, cacheApi: lila.memo.CacheApi)(implicit
     )
 
   private[security] def recentByPrintExists(fp: FingerPrint): Fu[Boolean] =
-    FingerHash(fp) ?? { hash =>
+    FingerHash(fp) so { hash =>
       coll.secondaryPreferred.exists(
         $doc("fp" -> hash, "date" -> $gt(DateTime.now minusDays 7))
       )

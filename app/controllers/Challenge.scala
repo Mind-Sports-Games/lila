@@ -65,7 +65,7 @@ final class Challenge(
             }
           }
           else
-            (c.challengerUserId ?? env.user.repo.named) map { user =>
+            (c.challengerUserId so env.user.repo.named) map { user =>
               Ok(
                 html.challenge.theirs(c, json, user, playerIndex)
               )
@@ -89,7 +89,7 @@ final class Challenge(
     Open { implicit ctx =>
       OptionFuResult(api byId id) { c =>
         val cc = playerIndex flatMap strategygames.Player.fromName
-        isForMe(c) ?? api
+        isForMe(c) so api
           .accept(c, ctx.me, HTTPRequest sid ctx.req, cc)
           .flatMap {
             case Some(pov) =>
@@ -111,7 +111,7 @@ final class Challenge(
   def apiAccept(id: String) =
     Scoped(_.Challenge.Write, _.Bot.Play, _.Board.Play) { _ => me =>
       api.onlineByIdFor(id, me) flatMap {
-        _ ?? { api.accept(_, me.some, none) }
+        _ so { api.accept(_, me.some, none) }
       } flatMap { res =>
         if (res.isDefined) jsonOkResult.fuccess
         else
@@ -125,7 +125,7 @@ final class Challenge(
   private def withChallengeAnonCookie(cond: Boolean, c: ChallengeModel, owner: Boolean)(
       res: Result
   )(implicit ctx: Context): Fu[Result] =
-    cond ?? {
+    cond so {
       env.game.gameRepo.game(c.id).map {
         _ map { game =>
           env.lilaCookie.cookie(
@@ -144,7 +144,7 @@ final class Challenge(
     AuthBody { implicit ctx => _ =>
       OptionFuResult(api byId id) { c =>
         implicit val req = ctx.body
-        isForMe(c) ??
+        isForMe(c) so
           api.decline(
             c,
             env.challenge.forms.decline
@@ -191,7 +191,7 @@ final class Challenge(
               env.game.gameRepo game id dmap {
                 _ flatMap { Pov.ofUserId(_, me.id) }
               } flatMap {
-                _ ?? { p => env.round.proxyRepo.upgradeIfPresent(p) dmap some }
+                _ so { p => env.round.proxyRepo.upgradeIfPresent(p) dmap some }
               } dmap (_.filter(_.game.abortable)) flatMap {
                 case Some(pov) =>
                   import lila.hub.actorApi.map.Tell
@@ -210,17 +210,17 @@ final class Challenge(
       val scopes = List(OAuthScope.Challenge.Write)
       (get("token1", req) map AccessToken.Id, get("token2", req) map AccessToken.Id).mapN {
         env.oAuth.server.authBoth(scopes)
-      } ?? {
+      } so {
         _ flatMap {
           case Left(e) => handleScopedFail(scopes, e)
           case Right((u1, u2)) =>
             env.game.gameRepo game id flatMap {
-              _ ?? { g =>
+              _ so { g =>
                 env.round.proxyRepo.upgradeIfPresent(g) dmap some dmap
                   (_.filter(_.hasUserIds(u1.id, u2.id)))
               }
             } map {
-              _ ?? { game =>
+              _ so { game =>
                 env.round.tellRound(game.id, lila.round.actorApi.round.StartClock)
                 jsonOkResult
               }
@@ -293,7 +293,7 @@ final class Challenge(
                     case (Some(dest), Some(strToken)) =>
                       apiChallengeAccept(dest, challenge, strToken)(me, config.message)
                     case _ =>
-                      destUser ?? { env.challenge.granter(me.some, _, config.perfType) } flatMap {
+                      destUser so { env.challenge.granter(me.some, _, config.perfType) } flatMap {
                         case Some(denied) =>
                           BadRequest(jsonError(lila.challenge.ChallengeDenied.translated(denied))).fuccess
                         case _ =>
@@ -319,7 +319,7 @@ final class Challenge(
     ScopedBody(_.Challenge.Write) { implicit req => admin =>
       IfGranted(_.ApiChallengeAdmin, req, admin) {
         env.user.repo.namePair(origName, destName) flatMap {
-          _ ?? { case (orig, dest) =>
+          _ so { case (orig, dest) =>
             env.setup.forms.api.admin
               .bindFromRequest()
               .fold(
@@ -438,8 +438,8 @@ final class Challenge(
   def rematchOf(gameId: String) =
     Auth { implicit ctx => me =>
       OptionFuResult(env.game.gameRepo game gameId) { g =>
-        Pov.opponentOfUserId(g, me.id).flatMap(_.userId) ?? env.user.repo.byId flatMap {
-          _ ?? { opponent =>
+        Pov.opponentOfUserId(g, me.id).flatMap(_.userId) so env.user.repo.byId flatMap {
+          _ so { opponent =>
             env.challenge.granter(me.some, opponent, g.perfType) flatMap {
               case Some(d) =>
                 BadRequest(jsonError {

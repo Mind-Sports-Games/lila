@@ -17,7 +17,7 @@ final class Cached(
     rankingApi: RankingApi
 )(implicit
     ec: scala.concurrent.ExecutionContext,
-    scheduler: akka.actor.Scheduler
+    scheduler: org.apache.pekko.actor.Scheduler
 ) {
 
   implicit private val LightUserBSONHandler: BSONDocumentHandler[LightUser]   = Macros.handler[LightUser]
@@ -55,11 +55,10 @@ final class Cached(
     _.refreshAfterWrite(10 minutes)
       .buildAsyncFuture {
         loader { _ =>
-          PerfType.leaderboardable
+          Future.sequence(PerfType.leaderboardable
             .map { perf =>
               rankingApi.topPerf(perf.id, 1)
-            }
-            .sequenceFu
+            })
             .dmap(_.flatten)
         }
       }

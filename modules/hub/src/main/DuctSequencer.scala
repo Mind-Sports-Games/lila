@@ -2,14 +2,14 @@ package lila.hub
 
 import com.github.blemale.scaffeine.LoadingCache
 import scala.concurrent.duration.FiniteDuration
-import scala.concurrent.{ ExecutionContext, Promise }
+import scala.concurrent.Promise
 
 import lila.base.LilaTimeout
 
 final class DuctSequencer(maxSize: Int, timeout: FiniteDuration, name: String, logging: Boolean = true)(
     implicit
-    scheduler: akka.actor.Scheduler,
-    ec: ExecutionContext
+    scheduler: org.apache.pekko.actor.Scheduler,
+    ec: Executor
 ) {
 
   import DuctSequencer._
@@ -18,10 +18,10 @@ final class DuctSequencer(maxSize: Int, timeout: FiniteDuration, name: String, l
 
   def run[A](task: Task[A]): Fu[A] = duct.ask[A](TaskWithPromise(task, _))
 
-  private[this] val duct = new BoundedDuct(maxSize, name, logging)({ case TaskWithPromise(task, promise) =>
+  private val duct = new BoundedDuct(maxSize, name, logging)({ case TaskWithPromise(task, promise) =>
     promise.completeWith {
       task()
-        .withTimeout(timeout)
+        .withTimeout(timeout, s"$name DuctSequencer")
         .transform(
           identity,
           {
@@ -44,8 +44,8 @@ final class DuctSequencers(
     name: String,
     logging: Boolean = true
 )(implicit
-    scheduler: akka.actor.Scheduler,
-    ec: ExecutionContext,
+    scheduler: org.apache.pekko.actor.Scheduler,
+    ec: Executor,
     mode: play.api.Mode
 ) {
 

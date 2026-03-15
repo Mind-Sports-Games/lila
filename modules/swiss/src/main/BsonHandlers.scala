@@ -255,7 +255,7 @@ object BsonHandlers {
   // "featurable" mostly means that the tournament isn't over yet
   def addFeaturable(s: Swiss) =
     swissHandler.writeTry(s).get ++ {
-      s.isNotFinished ?? $doc(
+      s.isNotFinished so $doc(
         "featurable" -> true,
         "garbage"    -> s.unrealisticSettings.option(true)
       )

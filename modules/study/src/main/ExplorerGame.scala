@@ -15,7 +15,7 @@ final private class ExplorerGame(
 
   def quote(gameId: Game.ID): Fu[Option[Comment]] =
     importer(gameId) map {
-      _ ?? { game =>
+      _ so { game =>
         gameComment(game).some
       }
     }
@@ -26,14 +26,14 @@ final private class ExplorerGame(
       fuccess(none)
     } else
       importer(gameId) map {
-        _ ?? { game =>
-          position.node ?? { fromNode =>
+        _ so { game =>
+          position.node so { fromNode =>
             GameToRoot(game, none, withClocks = false).pipe { root =>
               root.setCommentAt(
                 comment = gameComment(game),
                 path = Path(root.mainline.map(_.id))
               )
-            } ?? { gameRoot =>
+            } so { gameRoot =>
               merge(fromNode, position.path, gameRoot) flatMap { case (newNode, path) =>
                 position.chapter.addNode(newNode, path) map (_ -> path)
               }

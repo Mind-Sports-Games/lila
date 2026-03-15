@@ -16,7 +16,7 @@ final private class DnsApi(
     mongoCache: lila.memo.MongoCache.Api
 )(implicit
     ec: scala.concurrent.ExecutionContext,
-    scheduler: akka.actor.Scheduler
+    scheduler: org.apache.pekko.actor.Scheduler
 ) {
 
   // only valid email domains that are not p1listed should make it here

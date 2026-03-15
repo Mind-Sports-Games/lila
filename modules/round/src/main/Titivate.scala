@@ -1,7 +1,7 @@
 package lila.round
 
-import akka.actor._
-import akka.stream.scaladsl._
+import org.apache.pekko.actor._
+import org.apache.pekko.stream.scaladsl._
 import org.joda.time.DateTime
 
 import scala.concurrent.duration._
@@ -36,7 +36,7 @@ final private[round] class Titivate(
   implicit def ec: ExecutionContextExecutor = context.system.dispatcher
   def scheduler                             = context.system.scheduler
 
-  def scheduleNext(): Unit = scheduler.scheduleOnce(5 seconds, self, Run).unit
+  def scheduleNext(): Unit = { val _ = scheduler.scheduleOnce(5 seconds, self, Run) }
 
   def receive = {
     case ReceiveTimeout =>
@@ -54,7 +54,7 @@ final private[round] class Titivate(
           .via(gameFlow)
           .toMat(LilaStream.sinkCount)(Keep.right)
           .run()
-          .addEffect(lila.mon.round.titivate.game.record(_).unit)
+          .addEffect(n => { val _ = lila.mon.round.titivate.game.record(n) })
           .>> {
             gameRepo
               .count(_.checkableOld)
@@ -62,7 +62,7 @@ final private[round] class Titivate(
           }
           .monSuccess(_.round.titivate.time)
           .logFailure(logBranch)
-          .addEffectAnyway(scheduleNext().unit)
+          .addEffectAnyway(scheduleNext())
       }
   }
 

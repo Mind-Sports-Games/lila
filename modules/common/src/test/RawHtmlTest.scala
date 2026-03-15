@@ -1,205 +1,222 @@
-package lila.base
+package lila.common
 
-import org.specs2.mutable.Specification
-// import scalatags.Text.all._
+import lila.common.config.NetDomain
 
-import RawHtml._
+import lila.base.RawHtml.*
 
-class RawHtmlTest extends Specification {
+class RawHtmlTest extends munit.FunSuite:
 
-  val htmlTags = "<[^>]++>".r
-  def copyLinkConsistency(text: String) = {
-    // Plain text of linkified text should linkify to the same result.
+  given NetDomain = NetDomain("playstrategy.org")
+  val htmlTags                          = "<[^>]++>".r
+  def copyLinkConsistency(text: String) =
+    // Plain text of linkified text >> linkify to the same result.
     val firstHtml = addLinks(text)
     val copyText  = htmlTags.replaceAllIn(firstHtml, "")
-    firstHtml must_== addLinks(copyText)
-  }
+    assertEquals(firstHtml, addLinks(copyText))
 
-  "links" should {
-    "http external" in {
-      val url = "http://zombo.com"
-      addLinks(s"""link to $url here""") must_==
-        s"""link to <a rel="nofollow noopener noreferrer" href="$url" target="_blank">$url</a> here"""
-    }
-    "hide https in text" in {
-      val url = "zombo.com"
-      addLinks(s"""link to https://$url here""") must_==
-        s"""link to <a rel="nofollow noopener noreferrer" href="https://$url" target="_blank">$url</a> here"""
-    }
-    "default to https" in {
-      val url = "zombo.com"
-      addLinks(s"""link to $url here""") must_==
-        s"""link to <a rel="nofollow noopener noreferrer" href="https://$url" target="_blank">$url</a> here"""
-    }
-    "skip buggy url like http://foo@bar" in {
-      val url = "http://foo@bar"
-      addLinks(s"""link to $url here""") must not contain """href="http://foo""""
-    }
-    "ignore image from untrusted host" in {
-      val url = "http://zombo.com/pic.jpg"
-      addLinks(s"""link to $url here""") must_==
-        s"""link to <a rel="nofollow noopener noreferrer" href="$url" target="_blank">$url</a> here"""
-    }
-    "detect direct giphy gif URL" in {
-      val url    = "https://media.giphy.com/media/s0mE1d/giphy.gif"
-      val picUrl = "https://media.giphy.com/media/s0mE1d/giphy.gif"
-      addLinks(s"""img to $url here""") must_==
-        s"""img to <img class="embed" src="$picUrl" alt="$url"/> here"""
-    }
-    "detect indirect without tags giphy gif URL" in {
-      val url    = "https://giphy.com/gifs/s0mE1d"
-      val picUrl = "https://media.giphy.com/media/s0mE1d/giphy.gif"
-      addLinks(s"""img to $url here""") must_==
-        s"""img to <img class="embed" src="$picUrl" alt="$url"/> here"""
-    }
-    "detect indirect with tags giphy gif URL" in {
-      val url    = "https://giphy.com/gifs/some-text-1-s0mE1d"
-      val picUrl = "https://media.giphy.com/media/s0mE1d/giphy.gif"
-      addLinks(s"""img to $url here""") must_==
-        s"""img to <img class="embed" src="$picUrl" alt="$url"/> here"""
-    }
-    "detect imgur image URL" in {
-      val url    = "https://imgur.com/NXy19Im"
-      val picUrl = "https://i.imgur.com/NXy19Im.jpg"
-      addLinks(s"""img to $url here""") must_==
-        s"""img to <img class="embed" src="$picUrl" alt="$url"/> here"""
-    }
-    "ignore imgur image URL in quotes" in {
-      val url = "http://i.imgur.com/Cku31nh.png"
-      addLinks(s"""img to "$url" here""") must_==
-        s"""img to &quot;<a rel="nofollow noopener noreferrer" href="$url" target="_blank">$url</a>&quot; here"""
-    }
-    "ignore imgur gallery URL" in {
-      val url = "http://imgur.com/gallery/pMtTE"
-      addLinks(s"""link to $url here""") must_==
-        s"""link to <a rel="nofollow noopener noreferrer" href="$url" target="_blank">$url</a> here"""
-    }
+  test("http external"):
+    val url = "http://zombo.com"
+    assertEquals(
+      addLinks(s"""link to $url here"""),
+      s"""link to <a rel="nofollow noreferrer" href="$url" target="_blank">$url</a> here"""
+    )
+  test("hide https >> text"):
+    val url = "zombo.com"
+    assertEquals(
+      addLinks(s"""link to https://$url here"""),
+      s"""link to <a rel="nofollow noreferrer" href="https://$url" target="_blank">$url</a> here"""
+    )
+  test("default to https"):
+    val url = "zombo.com"
+    assertEquals(
+      addLinks(s"""link to $url here"""),
+      s"""link to <a rel="nofollow noreferrer" href="https://$url" target="_blank">$url</a> here"""
+    )
+  test("skip buggy url like http://foo@bar"):
+    val url = "http://foo@bar"
+    assert(!addLinks(s"""link to $url here""").contains("""href="http://foo""""))
+  test("ignore image from untrusted host"):
+    val url = "http://zombo.com/pic.jpg"
+    assertEquals(
+      addLinks(s"""link to $url here"""),
+      s"""link to <a rel="nofollow noreferrer" href="$url" target="_blank">$url</a> here"""
+    )
+  test("detect direct giphy gif URL"):
+    val url    = "https://media.giphy.com/media/s0mE1d/giphy.gif"
+    val picUrl = "https://media.giphy.com/media/s0mE1d/giphy.gif"
+    assertEquals(
+      addLinks(s"""img to $url here"""),
+      s"""img to <img class="embed" src="$picUrl" alt="$url"/> here"""
+    )
+  test("detect indirect without tags giphy gif URL"):
+    val url    = "https://giphy.com/gifs/s0mE1d"
+    val picUrl = "https://media.giphy.com/media/s0mE1d/giphy.gif"
+    assertEquals(
+      addLinks(s"""img to $url here"""),
+      s"""img to <img class="embed" src="$picUrl" alt="$url"/> here"""
+    )
+  test("detect indirect with tags giphy gif URL"):
+    val url    = "https://giphy.com/gifs/some-text-1-s0mE1d"
+    val picUrl = "https://media.giphy.com/media/s0mE1d/giphy.gif"
+    assertEquals(
+      addLinks(s"""img to $url here"""),
+      s"""img to <img class="embed" src="$picUrl" alt="$url"/> here"""
+    )
+  test("detect imgur image URL"):
+    val url    = "https://imgur.com/NXy19Im"
+    val picUrl = "https://i.imgur.com/NXy19Im.jpg"
+    assertEquals(
+      addLinks(s"""img to $url here"""),
+      s"""img to <img class="embed" src="$picUrl" alt="$url"/> here"""
+    )
+  test("ignore imgur image URL >> quotes"):
+    val url = "http://i.imgur.com/Cku31nh.png"
+    assertEquals(
+      addLinks(s"""img to "$url" here"""),
+      s"""img to &quot;<a rel="nofollow noreferrer" href="$url" target="_blank">$url</a>&quot; here"""
+    )
+  test("ignore imgur gallery URL"):
+    val url = "http://imgur.com/gallery/pMtTE"
+    assertEquals(
+      addLinks(s"""link to $url here"""),
+      s"""link to <a rel="nofollow noreferrer" href="$url" target="_blank">$url</a> here"""
+    )
+  test("detect i.ibb image URL"):
+    val url    = "https://i.ibb.co/DH1h40Wc/4d1c3ca94244.png"
+    val picUrl = url
+    assertEquals(
+      addLinks(s"""img to $url here"""),
+      s"""img to <img class="embed" src="$picUrl" alt="$url"/> here"""
+    )
+  test("ignore i.ibb image URL >> quotes"):
+    val url = "https://i.ibb.co/DH1h40Wc/4d1c3ca94244.png"
+    assertEquals(
+      addLinks(s"""img to "$url" here"""),
+      s"""img to &quot;<a rel="nofollow noreferrer" href="$url" target="_blank">i.ibb.co/DH1h40Wc/4d1c3ca94244.png</a>&quot; here"""
+    )
 
-    "internal links" in {
-      addLinks("playstrategy.org/@/foo/games") must_==
-        """<a href="/@/foo/games">playstrategy.org/@/foo/games</a>"""
-      addLinks("playstrategy.org/@/foo") must_== """<a href="/@/foo">@foo</a>"""
-      addLinks("http://playstrategy.org/") must_== """<a href="/">playstrategy.org/</a>"""
-      addLinks("http://playstrategy.org") must_== """<a href="/">playstrategy.org</a>"""
-      addLinks("@foo") must_== """<a href="/@/foo">@foo</a>"""
-    }
+  test("internal links"):
+    assertEquals(
+      addLinks("playstrategy.org/@/foo/games"),
+      """<a href="/@/foo/games">playstrategy.org/@/foo/games</a>"""
+    )
+    assertEquals(addLinks("playstrategy.org/@/foo"), """<a href="/@/foo">@foo</a>""")
+    assertEquals(addLinks("http://playstrategy.org/"), """<a href="/">playstrategy.org/</a>""")
+    assertEquals(addLinks("http://playstrategy.org"), """<a href="/">playstrategy.org</a>""")
+    assertEquals(addLinks("@foo"), """<a href="/@/foo">@foo</a>""")
 
-    "handle weird characters" in {
-      addLinks("playstrategy.org/-–%20") must_== """<a href="/-–%20">playstrategy.org/-–%20</a>"""
-    }
+  test("handle weird characters"):
+    assertEquals(addLinks("playstrategy.org/-?%20"), """<a href="/-?%20">playstrategy.org/-?%20</a>""")
 
-    "handle multiple links" in {
-      addLinks(
-        "@foo blah playstrategy.org"
-      ) must_== """<a href="/@/foo">@foo</a> blah <a href="/">playstrategy.org</a>"""
-      addLinks("b foo.com blah playstrategy.org") must_==
-        """b <a rel="nofollow noopener noreferrer" href="https://foo.com" target="_blank">foo.com</a> blah <a href="/">playstrategy.org</a>"""
-    }
+  test("handle multiple links"):
+    assertEquals(
+      addLinks("@foo blah playstrategy.org"),
+      """<a href="/@/foo">@foo</a> blah <a href="/">playstrategy.org</a>"""
+    )
+    assertEquals(
+      addLinks("b foo.com blah playstrategy.org"),
+      """b <a rel="nofollow noreferrer" href="https://foo.com" target="_blank">foo.com</a> blah <a href="/">playstrategy.org</a>"""
+    )
 
-    "handle trailing punctuation" in {
-      addLinks("playstrategy.org.") must_== """<a href="/">playstrategy.org</a>."""
-      addLinks("playstrategy.org)") must_== """<a href="/">playstrategy.org</a>)"""
-      addLinks("playstrategy.org/()") must_== """<a href="/()">playstrategy.org/()</a>"""
+  test("handle trailing punctuation"):
+    assertEquals(addLinks("playstrategy.org."), """<a href="/">playstrategy.org</a>.""")
+    assertEquals(addLinks("playstrategy.org)"), """<a href="/">playstrategy.org</a>)""")
+    assertEquals(addLinks("playstrategy.org/()"), """<a href="/()">playstrategy.org/()</a>""")
 
-      addLinks("playstrategy.org/())") must_== """<a href="/()">playstrategy.org/()</a>)"""
-      addLinks("playstrategy.org/(2)-)?") must_== """<a href="/(2)-">playstrategy.org/(2)-</a>)?"""
+    assertEquals(addLinks("playstrategy.org/())"), """<a href="/()">playstrategy.org/()</a>)""")
+    assertEquals(addLinks("playstrategy.org/(2)-)?"), """<a href="/(2)-">playstrategy.org/(2)-</a>)?""")
 
-      addLinks("playstrategy.org.-") must_== """<a href="/">playstrategy.org</a>.-"""
+    assertEquals(addLinks("playstrategy.org.-"), """<a href="/">playstrategy.org</a>.-""")
 
-      addLinks("playstrategy.org/foo:bar") must_== """<a href="/foo:bar">playstrategy.org/foo:bar</a>"""
-      addLinks("playstrategy.org/foo:bar:") must_== """<a href="/foo:bar">playstrategy.org/foo:bar</a>:"""
-    }
+    assertEquals(addLinks("playstrategy.org/foo:bar"), """<a href="/foo:bar">playstrategy.org/foo:bar</a>""")
+    assertEquals(addLinks("playstrategy.org/foo:bar:"), """<a href="/foo:bar">playstrategy.org/foo:bar</a>:""")
 
-    "handle embedded links" in {
-      addLinks(".playstrategy.org") must_== """.playstrategy.org"""
-      addLinks("/playstrategy.org") must_== """/playstrategy.org"""
-      addLinks(".http://playstrategy.org") must_== """.<a href="/">playstrategy.org</a>"""
+  test("handle embedded links"):
+    assertEquals(addLinks(".playstrategy.org"), """.playstrategy.org""")
+    assertEquals(addLinks("/playstrategy.org"), """/playstrategy.org""")
+    assertEquals(addLinks(".http://playstrategy.org"), """.<a href="/">playstrategy.org</a>""")
 
-      addLinks("/http://playstrategy.org") must_== """/<a href="/">playstrategy.org</a>"""
-    }
+    assertEquals(addLinks("/http://playstrategy.org"), """/<a href="/">playstrategy.org</a>""")
 
-    "handle ambig path separator" in {
-      addLinks("playstrategy.org#f") must_== """<a href="/#f">playstrategy.org/#f</a>"""
-      addLinks("playstrategy.org?f") must_== """<a href="/?f">playstrategy.org/?f</a>"""
-    }
+  test("handle ambig path separator"):
+    assertEquals(addLinks("playstrategy.org#f"), """<a href="/#f">playstrategy.org/#f</a>""")
+    assertEquals(addLinks("playstrategy.org?f"), """<a href="/?f">playstrategy.org/?f</a>""")
 
-    "pass through plain text (fast case)" in {
-      val noUrl = "blah blah foobar"
-      addLinks(noUrl) must_== noUrl  // eq
-      addLinks(noUrl) must be(noUrl) // instance eq - fails in scala 2.13
-    }
-  }
+  test("pass through plain text (fast case)"):
+    val noUrl = "blah blah foobar"
+    assertEquals(addLinks(noUrl), noUrl)
 
-  "markdown links" should {
-    "add http links" in {
-      val md = "[Example](http://example.com)"
-      justMarkdownLinks(md) must_== """<a href="http://example.com">Example</a>"""
-    }
+  test("markdown add http links"):
+    val md = "[Example](http://example.com)"
+    assertEquals(
+      justMarkdownLinks(md),
+      """<a href="http://example.com">Example</a>"""
+    )
 
-    "only allow safe protocols" in {
-      val md = "A [link](javascript:powned) that is not safe."
-      justMarkdownLinks(md) must_== md
-    }
+  test("markdown handle $ >> link content"):
+    val md =
+      "[$$$ test 9$ prize](https://playstrategy.org/tournament)"
+    assertEquals(
+      justMarkdownLinks(md),
+      """<a href="https://playstrategy.org/tournament">$$$ test 9$ prize</a>"""
+    )
 
-    "not addBr" in {
-      justMarkdownLinks("\n") must_== "\n"
-    }
+  test("markdown only allow safe protocols"):
+    val md = "A [link](javascript:powned) that is not safe."
+    assertEquals(justMarkdownLinks(md), md)
 
-    "not escape html" in {
-      justMarkdownLinks("&") must_== "&"
-    }
-  }
+  test("markdown not add br"):
+    assertEquals(justMarkdownLinks("\n"), "\n")
 
-  "atUser" should {
-    "expand valid" in {
-      expandAtUser("@foo") must_== List("playstrategy.org/@/foo")
-      expandAtUser("@2foo") must_== List("playstrategy.org/@/2foo")
-      expandAtUser("@foo.") must_== List("playstrategy.org/@/foo", ".")
-      expandAtUser("@foo.com") must_== List("@foo.com")
+  test("markdown not escape html"):
+    assertEquals(justMarkdownLinks("&"), "&")
 
-      expandAtUser("@foo./") must_== List("playstrategy.org/@/foo", "./")
-      expandAtUser("@foo/games") must_== List("playstrategy.org/@/foo", "/games")
-    }
-  }
+  test("markdown remove tracking tags"):
+    val md = "[Example](http://example.com?utm_campaign=spy&utm_source=evil)"
+    assertEquals(
+      justMarkdownLinks(md),
+      """<a href="http://example.com?utm_campaign=spy&utm_source=evil">Example</a>"""
+    )
 
-  "linkConsistency" should {
-    "at user links" in {
-      copyLinkConsistency("http://example.com")
-      copyLinkConsistency("https://example.com/@foo")
-      copyLinkConsistency("playstrategy.org/@/foo")
-      copyLinkConsistency("playstrategy.org/@/foo/games")
-      copyLinkConsistency("@foo/games")
-      copyLinkConsistency("@foo")
-    }
-  }
+  test("atUser expand valid"):
+    assertEquals(expandAtUser("@foo"), List("playstrategy.org/@/foo"))
+    assertEquals(expandAtUser("@2foo"), List("playstrategy.org/@/2foo"))
+    assertEquals(expandAtUser("@foo."), List("playstrategy.org/@/foo", "."))
+    assertEquals(expandAtUser("@foo.com"), List("@foo.com"))
 
-  "nl2br" should {
-    "convert windows style newlines into <br>" in {
-      nl2br("hello\r\nworld") must_== "hello<br>world"
-      nl2br("\r\nworld") must_== "<br>world"
-      nl2br("hello\r\n") must_== "hello<br>"
-      nl2br("hello\r\nworld\r\nagain") must_== "hello<br>world<br>again"
-    }
+    assertEquals(expandAtUser("@foo./"), List("playstrategy.org/@/foo", "./"))
+    assertEquals(expandAtUser("@foo/games"), List("playstrategy.org/@/foo", "/games"))
 
-    "convert posix style newlines into <br>" in {
-      nl2br("hello\nworld") must_== "hello<br>world"
-      nl2br("\nworld") must_== "<br>world"
-      nl2br("hello\n") must_== "hello<br>"
-      nl2br("hello\nworld\nagain") must_== "hello<br>world<br>again"
-    }
+  test("linkConsistency at user links"):
+    copyLinkConsistency("http://example.com")
+    copyLinkConsistency("https://example.com/@foo")
+    copyLinkConsistency("playstrategy.org/@/foo")
+    copyLinkConsistency("playstrategy.org/@/foo/games")
+    copyLinkConsistency("@foo/games")
+    copyLinkConsistency("@foo")
 
-    "not output more than two consecutive <br> chars" in {
-      nl2br("\n\n\n\ndef") must_== "<br><br>def"
-      nl2br("abc\n\n\n\n") must_== "abc<br><br>"
-      nl2br("abc\n\n\n\ndef") must_== "abc<br><br>def"
-      nl2br("abc\n\n\n\ndef\n\n\n\nabc\n\n\n\ndef") must_== "abc<br><br>def<br><br>abc<br><br>def"
+  test("nl2br convert windows style newlines into <br>"):
+    assertEquals(nl2br("hello\r\nworld"), "hello<br>world")
+    assertEquals(nl2br("\r\nworld"), "<br>world")
+    assertEquals(nl2br("hello\r\n"), "hello<br>")
+    assertEquals(nl2br("hello\r\nworld\r\nagain"), "hello<br>world<br>again")
 
-      nl2br("\r\n\r\n\r\n\ndef") must_== "<br><br>def"
-      nl2br("abc\r\n\r\n\r\n\r\n") must_== "abc<br><br>"
-      nl2br("abc\r\n\r\n\r\n\r\ndef") must_== "abc<br><br>def"
-      nl2br(
-        "abc\r\n\r\n\r\n\r\ndef\r\n\r\n\r\n\r\nabc\r\n\r\n\r\n\r\ndef"
-      ) must_== "abc<br><br>def<br><br>abc<br><br>def"
-    }
-  }
-}
+  test("nl2br convert posix style newlines into <br>"):
+    assertEquals(nl2br("hello\nworld"), "hello<br>world")
+    assertEquals(nl2br("\nworld"), "<br>world")
+    assertEquals(nl2br("hello\n"), "hello<br>")
+    assertEquals(nl2br("hello\nworld\nagain"), "hello<br>world<br>again")
+
+  test("nl2br not output more than two consecutive <br> chars"):
+    assertEquals(nl2br("\n\n\n\ndef"), "<br><br>def")
+    assertEquals(nl2br("abc\n\n\n\n"), "abc<br><br>")
+    assertEquals(nl2br("abc\n\n\n\ndef"), "abc<br><br>def")
+    assertEquals(nl2br("abc\n\n\n\ndef\n\n\n\nabc\n\n\n\ndef"), "abc<br><br>def<br><br>abc<br><br>def")
+
+    assertEquals(nl2br("\r\n\r\n\r\n\ndef"), "<br><br>def")
+    assertEquals(nl2br("abc\r\n\r\n\r\n\r\n"), "abc<br><br>")
+    assertEquals(nl2br("abc\r\n\r\n\r\n\r\ndef"), "abc<br><br>def")
+    assertEquals(
+      nl2br("abc\r\n\r\n\r\n\r\ndef\r\n\r\n\r\n\r\nabc\r\n\r\n\r\n\r\ndef"),
+      "abc<br><br>def<br><br>abc<br><br>def"
+    )

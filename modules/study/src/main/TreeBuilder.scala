@@ -16,11 +16,11 @@ object TreeBuilder {
       if (variant.key == "standard" && root.fen.initial) initialStandardDests(variant.gameLogic)
       else {
         val sit = Game(variant.gameLogic, variant.some, root.fen.some).situation
-        sit.playable(false) ?? sit.destinations
+        sit.playable(false) so sit.destinations
       }
     val dropsByRole = {
       val sit = Game(variant.gameLogic, variant.some, root.fen.some).situation
-      sit.playable(false) ?? sit.dropsByRole
+      sit.playable(false) so sit.dropsByRole
     }
     makeRoot(root, variant).copy(dests = dests.some, dropsByRole = dropsByRole)
   }
@@ -44,7 +44,7 @@ object TreeBuilder {
       pocketData = node.pocketData,
       eval = node.score.map(_.eval),
       children = toBranches(node.children, variant),
-      opening = Variant.openingSensibleVariants(variant.gameLogic)(variant) ?? (
+      opening = Variant.openingSensibleVariants(variant.gameLogic)(variant) so (
         FullOpeningDB.findByFen(variant.gameLogic, node.fen)
       ),
       forceVariation = node.forceVariation,
@@ -68,7 +68,7 @@ object TreeBuilder {
       pocketData = root.pocketData,
       eval = root.score.map(_.eval),
       children = toBranches(root.children, variant),
-      opening = Variant.openingSensibleVariants(variant.gameLogic)(variant) ?? (
+      opening = Variant.openingSensibleVariants(variant.gameLogic)(variant) so (
         FullOpeningDB.findByFen(variant.gameLogic, root.fen)
       ),
       dropsByRole = Game(variant.gameLogic, variant.some, root.fen.some).situation.dropsByRole

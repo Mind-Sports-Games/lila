@@ -39,7 +39,7 @@ final class RatingChartApi(
 
   private def build(userId: User.ID): Fu[Option[String]] =
     userRepo.createdAtById(userId) flatMap {
-      _ ?? { createdAt =>
+      _ so { createdAt =>
         historyApi get userId map2 { (history: History) =>
           lila.common.String.html.safeJsonValue {
             Json.toJson {

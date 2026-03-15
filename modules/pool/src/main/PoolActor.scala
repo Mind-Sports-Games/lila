@@ -3,8 +3,8 @@ package lila.pool
 import scala.concurrent.duration._
 import lila.common.ThreadLocalRandom
 
-import akka.actor._
-import akka.pattern.pipe
+import org.apache.pekko.actor._
+import org.apache.pekko.pattern.pipe
 
 import lila.socket.Socket.Sris
 import lila.user.User

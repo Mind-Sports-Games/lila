@@ -1,7 +1,7 @@
 package lila.game
 
-import akka.stream.scaladsl._
-import akka.util.ByteString
+import org.apache.pekko.stream.scaladsl._
+import org.apache.pekko.util.ByteString
 import strategygames.format.{ FEN, Forsyth, Uci }
 import strategygames.{ Centis, Player => PlayerIndex, Replay, Situation, Game => ChessGame }
 import play.api.libs.json._

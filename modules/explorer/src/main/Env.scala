@@ -16,7 +16,7 @@ final class Env(
     ws: play.api.libs.ws.StandaloneWSClient
 )(implicit
     ec: scala.concurrent.ExecutionContext,
-    system: akka.actor.ActorSystem
+    system: org.apache.pekko.actor.ActorSystem
 ) {
 
   private lazy val internalEndpoint = InternalEndpoint {

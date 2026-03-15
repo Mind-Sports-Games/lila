@@ -41,10 +41,10 @@ final class Analyse(
       env.game.gameRepo initialFen pov.gameId flatMap { initialFen =>
         gameC.preloadUsers(pov.game) >> redirectAtFen(pov, initialFen) {
           (env.analyse.analyser get pov.game) zip
-            (!pov.game.metadata.analysed ?? env.fishnet.api.userAnalysisExists(pov.gameId)) zip
-            (pov.game.simulId ?? env.simul.repo.find) zip
+            (!pov.game.metadata.analysed so env.fishnet.api.userAnalysisExists(pov.gameId)) zip
+            (pov.game.simulId so env.simul.repo.find) zip
             roundC.getWatcherChat(pov.game) zip
-            (ctx.noBlind ?? env.game.crosstableApi.withMatchup(pov.game)) zip
+            (ctx.noBlind so env.game.crosstableApi.withMatchup(pov.game)) zip
             env.bookmark.api.exists(pov.game, ctx.me) zip
             env.swiss.api.getSwissPairingGamesForGame(pov.game) zip
             env.api.pgnDump(
@@ -145,7 +145,7 @@ final class Analyse(
     for {
       initialFen <- env.game.gameRepo initialFen pov.gameId
       analysis   <- env.analyse.analyser get pov.game
-      simul      <- pov.game.simulId ?? env.simul.repo.find
+      simul      <- pov.game.simulId so env.simul.repo.find
       crosstable <- env.game.crosstableApi.withMatchup(pov.game)
       pgn        <- env.api.pgnDump(pov.game, initialFen, analysis, PgnDump.WithFlags(clocks = false))
       sgf        <- env.api.sgfDump(pov.game, initialFen, PgnDump.WithFlags(clocks = false))

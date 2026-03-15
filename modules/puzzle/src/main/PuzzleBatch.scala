@@ -12,7 +12,7 @@ final class PuzzleBatch(colls: PuzzleColls, anonApi: PuzzleAnon, pathApi: Puzzle
 
   import BsonHandlers._
 
-  def nextFor(user: Option[User], nb: Int): Fu[Vector[Puzzle]] = (nb > 0) ?? {
+  def nextFor(user: Option[User], nb: Int): Fu[Vector[Puzzle]] = (nb > 0) so {
     user match {
       case None => anonApi.getBatchFor(nb)
       case Some(user) =>

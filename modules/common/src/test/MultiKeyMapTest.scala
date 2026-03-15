@@ -1,30 +1,20 @@
 package lila.common
 
-import org.specs2.mutable.Specification
-
-class MultiKeyMapTest extends Specification {
+class MultiKeyMapTest extends munit.FunSuite:
 
   case class V(a: Int, b: Int)
 
-  "MultiKeyMap.removed" should {
-    val m = MultiKeyMap(Set(V(1, 100)))(_.a, _.b)
-    "have entries" in {
-      m.values.toSet == Set(V(1, 100))
-    }
-    "add a new entry" in {
-      m.updated(V(2, 200)).values.toSet must_== Set(V(1, 100), V(2, 200))
-    }
-    "replace an entry" in {
-      m.updated(V(1, 200)).values.toSet must_== Set(V(1, 200))
-    }
-    "remove empty entries" in {
-      m.removed(Set.empty[V]).values.toSet must_== m.values.toSet
-    }
-    "remove entries" in {
-      m.removed(Set(V(1, 100))).values.toSet must_== Set.empty
-    }
-    "expose keys" in {
-      m.key1s.toSet must_== Set(1)
-    }
-  }
-}
+  val m = MultiKeyMap(Set(V(1, 100)))(_.a, _.b)
+
+  test("have entries"):
+    assertEquals(m.values.toSet, Set(V(1, 100)))
+  test("add a new entry"):
+    assertEquals(m.updated(V(2, 200)).values.toSet, Set(V(1, 100), V(2, 200)))
+  test("replace an entry"):
+    assertEquals(m.updated(V(1, 200)).values.toSet, Set(V(1, 200)))
+  test("remove empty entries"):
+    assertEquals(m.removed(Set.empty[V]).values.toSet, m.values.toSet)
+  test("remove entries"):
+    assertEquals(m.removed(Set(V(1, 100))).values.toSet, Set.empty)
+  test("expose keys"):
+    assertEquals(m.key1s.toSet, Set(1))

@@ -1,7 +1,7 @@
 package lila.oauth
 
 import com.softwaremill.macwire._
-import io.methvin.play.autoconfig._
+import lila.common.autoconfig.{ AutoConfig, ConfigName }
 import play.api.Configuration
 import scala.concurrent.duration._
 
@@ -22,7 +22,7 @@ final class Env(
     mongo: lila.db.Env
 )(implicit
     ec: scala.concurrent.ExecutionContext,
-    scheduler: akka.actor.Scheduler
+    scheduler: org.apache.pekko.actor.Scheduler
 ) {
 
   private val config = appConfig.get[OauthConfig]("oauth")(AutoConfig.loader)

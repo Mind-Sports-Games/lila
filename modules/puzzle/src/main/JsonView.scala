@@ -162,14 +162,14 @@ final class JsonView(
         lang: Lang
     ): Fu[JsObject] = for {
       games <- gameRepo.gameOptionsFromSecondary(puzzles.map(_.gameId))
-      jsons <- (puzzles zip games).collect { case (puzzle, Some(game)) =>
+      jsons <- Future.sequence((puzzles zip games).collect { case (puzzle, Some(game)) =>
         gameJson.noCacheBc(game, puzzle.initialPly) map { gameJson =>
           Json.obj(
             "game"   -> gameJson,
             "puzzle" -> puzzleJson(puzzle)
           )
         }
-      }.sequenceFu
+      })
     } yield Json
       .obj("puzzles" -> jsons)
       .add("user" -> user.map(_.perfs.puzzle_standard.intRating).map(userJson))

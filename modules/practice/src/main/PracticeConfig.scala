@@ -1,6 +1,6 @@
 package lila.practice
 
-import io.methvin.play.autoconfig._
+import lila.common.autoconfig.{ AutoConfig, ConfigName }
 import lila.study.Study
 import lila.common.config._
 import play.api.ConfigLoader

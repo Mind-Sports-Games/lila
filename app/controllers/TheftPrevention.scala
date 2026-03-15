@@ -25,7 +25,7 @@ private[controllers] trait TheftPrevention { self: LilaController =>
   protected def isMyPov(pov: Pov)(implicit ctx: Context) = !isTheft(pov)
 
   protected def playablePovForReq(game: GameModel)(implicit ctx: Context) =
-    (!game.isPgnImport && game.playable) ?? {
+    (!game.isPgnImport && game.playable) so {
       ctx.userId
         .flatMap(game.playerByUserId)
         .orElse {

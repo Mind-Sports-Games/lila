@@ -1,6 +1,6 @@
 package lila.team
 
-import akka.stream.scaladsl._
+import org.apache.pekko.stream.scaladsl._
 import reactivemongo.akkastream.cursorProducer
 import reactivemongo.api.ReadPreference
 import scala.concurrent.duration._

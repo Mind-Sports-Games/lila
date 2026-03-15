@@ -41,7 +41,7 @@ case class User(
   override def hashCode: Int = id.hashCode
 
   override def toString =
-    s"User $username(${perfs.bestRating}) games:${count.game}${marks.troll ?? " troll"}${marks.engine ?? " engine"}${!enabled ?? " closed"}"
+    s"User $username(${perfs.bestRating}) games:${count.game}${marks.troll so " troll"}${marks.engine so " engine"}${!enabled so " closed"}"
 
   def light = LightUser(
     id = id,
@@ -84,7 +84,7 @@ case class User(
 
   def timeNoSee: Duration = (nowMillis - (seenAt | createdAt).getMillis).millis
 
-  def everLoggedIn = seenAt.??(createdAt !=)
+  def everLoggedIn = seenAt.so(createdAt !=)
 
   def lame = marks.boost || marks.engine
 

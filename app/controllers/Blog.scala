@@ -63,7 +63,7 @@ final class Blog(
       .buildAsyncFuture { _ =>
         blogApi.masterContext flatMap { implicit prismic =>
           blogApi.recent(prismic.api, 1, MaxPerPage(50), none) map {
-            _ ?? { docs =>
+            _ so { docs =>
               views.html.blog.atom(docs, env.net.baseUrl).render
             }
           }
@@ -123,9 +123,9 @@ final class Blog(
         case true => fuccess(redirect)
         case _ =>
           blogApi.one(prismic.api, none, id) flatMap {
-            _ ?? { doc =>
+            _ so { doc =>
               env.forum.categRepo.bySlug(categSlug) flatMap {
-                _ ?? { categ =>
+                _ so { categ =>
                   env.forum.topicApi.makeBlogDiscuss(
                     categ = categ,
                     slug = topicSlug,

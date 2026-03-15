@@ -1,8 +1,8 @@
 package lila.user
 
-import akka.actor.Scheduler
+import org.apache.pekko.actor.Scheduler
 import com.softwaremill.macwire._
-import io.methvin.play.autoconfig._
+import lila.common.autoconfig.{ AutoConfig, ConfigName }
 import play.api.Configuration
 import play.api.libs.ws.StandaloneWSClient
 import scala.concurrent.duration._

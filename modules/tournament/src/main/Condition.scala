@@ -139,11 +139,11 @@ object Condition {
     )(user: User, getUserTeamIds: User => Fu[List[TeamID]])(implicit
         ec: scala.concurrent.ExecutionContext
     ): Fu[All.WithVerdicts] =
-      list.map {
+      Future.sequence(list.map {
         case c: MaxRating  => c(getMaxRating)(user) map c.withVerdict
         case c: FlatCond   => fuccess(c withVerdict c(user))
         case c: TeamMember => c(user, getUserTeamIds) map { c withVerdict _ }
-      }.sequenceFu dmap All.WithVerdicts.apply
+      }) dmap All.WithVerdicts.apply
 
     def accepted = All.WithVerdicts(list.map { WithVerdict(_, Accepted) })
 

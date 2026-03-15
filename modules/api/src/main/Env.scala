@@ -1,6 +1,6 @@
 package lila.api
 
-import akka.actor._
+import org.apache.pekko.actor._
 import com.softwaremill.macwire._
 import play.api.libs.ws.StandaloneWSClient
 import play.api.{ Configuration, Mode }
@@ -54,7 +54,7 @@ final class Env(
     val mode: Mode
 )(implicit
     ec: scala.concurrent.ExecutionContext,
-    scheduler: akka.actor.Scheduler,
+    scheduler: org.apache.pekko.actor.Scheduler,
     system: ActorSystem
 ) {
 

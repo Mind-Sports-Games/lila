@@ -1,6 +1,6 @@
 package lila.common
 
-import akka.actor._
+import org.apache.pekko.actor._
 
 object Lilakka {
 
@@ -15,7 +15,7 @@ object Lilakka {
       logger.info(msg)
       Chronometer(f())
         .log(logger)(_ => msg)
-        .result inject akka.Done
+        .result.inject(org.apache.pekko.Done)
     }
   }
 }

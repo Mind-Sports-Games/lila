@@ -1,8 +1,8 @@
 package lila.relay
 
-import akka.stream.scaladsl.Source
+import org.apache.pekko.stream.scaladsl.Source
 import org.joda.time.DateTime
-import ornicar.scalalib.Zero
+import alleycats.Zero
 import play.api.libs.json._
 import reactivemongo.akkastream.cursorProducer
 import reactivemongo.api.bson._
@@ -51,7 +51,7 @@ final class RelayApi(
 
   def byIdWithStudy(id: RelayRound.Id): Fu[Option[RelayRound.WithTourAndStudy]] =
     byIdWithTour(id) flatMap {
-      _ ?? { case RelayRound.WithTour(relay, tour) =>
+      _ so { case RelayRound.WithTour(relay, tour) =>
         studyApi.byId(relay.studyId) dmap2 {
           RelayRound.WithTourAndStudy(relay, tour, _)
         }
@@ -68,7 +68,7 @@ final class RelayApi(
       tourRepo.setActive(tourId, _)
     }
 
-  def activeTourNextRound(tour: RelayTour): Fu[Option[RelayRound]] = tour.active ??
+  def activeTourNextRound(tour: RelayTour): Fu[Option[RelayRound]] = tour.active so
     roundRepo.coll
       .find($doc("tourId" -> tour.id, "finished" -> false))
       .sort(roundRepo.sort.chrono)
@@ -152,7 +152,7 @@ final class RelayApi(
 
   def create(data: RelayRoundForm.Data, user: User, tour: RelayTour): Fu[RelayRound] =
     roundRepo.lastByTour(tour) flatMap {
-      _ ?? { last => studyRepo.byId(last.studyId) }
+      _ so { last => studyRepo.byId(last.studyId) }
     } flatMap { lastStudy =>
       import lila.study.{ StudyMember, StudyMembers }
       val relay = data.make(user, tour)
@@ -200,14 +200,14 @@ final class RelayApi(
       if (round == from) fuccess(round)
       else
         roundRepo.coll.update.one($id(round.id), round).void >> {
-          (round.sync.playing != from.sync.playing) ?? sendToContributors(
+          (round.sync.playing != from.sync.playing) so sendToContributors(
             round.id,
             "relaySync",
             jsonView sync round
           )
         } >> {
-          (round.finished != from.finished) ?? denormalizeTourActive(round.tourId)
-        } >>- {
+          (round.finished != from.finished) so denormalizeTourActive(round.tourId)
+        }.andDo {
           round.sync.log.events.lastOption.ifTrue(round.sync.log != from.sync.log).foreach { event =>
             sendToContributors(round.id, "relayLog", JsonView.syncLogEventWrites writes event)
           }
@@ -216,13 +216,12 @@ final class RelayApi(
   }
 
   def reset(relay: RelayRound, by: User): Funit =
-    studyApi.deleteAllChapters(relay.studyId, by) >>-
-      multiboard.invalidate(relay.studyId) >>
+    studyApi.deleteAllChapters(relay.studyId, by).andDo(multiboard.invalidate(relay.studyId)) >>
       requestPlay(relay.id, v = true)
 
   def deleteRound(roundId: RelayRound.Id): Fu[Option[RelayTour]] =
     byIdWithTour(roundId) flatMap {
-      _ ?? { rt =>
+      _ so { rt =>
         roundRepo.coll.delete.one($id(rt.round.id)) >>
           denormalizeTourActive(rt.tour.id) inject rt.tour.some
       }
@@ -230,7 +229,7 @@ final class RelayApi(
 
   def getOngoing(id: RelayRound.Id): Fu[Option[RelayRound.WithTour]] =
     roundRepo.coll.one[RelayRound]($doc("_id" -> id, "finished" -> false)) flatMap {
-      _ ?? { relay =>
+      _ so { relay =>
         tourById(relay.tourId) map2 relay.withTour
       }
     }
@@ -283,10 +282,11 @@ final class RelayApi(
         "sync.until" $exists false
       )
     ) flatMap {
-      _.map { relay =>
-        logger.info(s"Automatically start $relay")
-        requestPlay(relay.id, v = true)
-      }.sequenceFu.void
+      relays =>
+        Future.sequence(relays.map { relay =>
+          logger.info(s"Automatically start $relay")
+          requestPlay(relay.id, v = true)
+        }).void
     }
 
   private[relay] def autoFinishNotSyncing: Funit =
@@ -301,14 +301,15 @@ final class RelayApi(
         )
       )
     ) flatMap {
-      _.map { relay =>
-        logger.info(s"Automatically finish $relay")
-        update(relay)(_.finish)
-      }.sequenceFu.void
+      relays =>
+        Future.sequence(relays.map { relay =>
+          logger.info(s"Automatically finish $relay")
+          update(relay)(_.finish)
+        }).void
     }
 
   private[relay] def WithRelay[A: Zero](id: RelayRound.Id)(f: RelayRound => Fu[A]): Fu[A] =
-    byId(id) flatMap { _ ?? f }
+    byId(id) flatMap { _ so f }
 
   private[relay] def onStudyRemove(studyId: String) =
     roundRepo.coll.delete.one($id(RelayRound.Id(studyId))).void

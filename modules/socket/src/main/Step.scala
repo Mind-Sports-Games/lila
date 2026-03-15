@@ -57,7 +57,7 @@ object Step {
         "lidraughtsUci" -> move.map(_.uciString),
         "san"           -> move.map(_.san),
         "fen"           -> fen.value,
-        "captLen"       -> ~captLen
+        "captLen"       -> captLen.getOrElse(0)
       )
       .add("check", check)
       .add("currentPointValueP1", currentPointValueP1)

@@ -75,8 +75,8 @@ ${Mailer.txt.serviceNote}
     }
 
   def confirm(token: String): Fu[Option[User]] =
-    tokener read token flatMap { _ ?? userRepo.disabledById } flatMap {
-      _ ?? { user =>
+    tokener read token flatMap { _ so userRepo.disabledById } flatMap {
+      _ so { user =>
         userRepo reopen user.id inject user.some
       }
     }

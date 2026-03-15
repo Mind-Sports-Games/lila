@@ -16,7 +16,7 @@ final class GarbageCollector(
     isArmed: () => Boolean
 )(implicit
     ec: scala.concurrent.ExecutionContext,
-    scheduler: akka.actor.Scheduler
+    scheduler: org.apache.pekko.actor.Scheduler
 ) {
 
   private val logger = lila.security.logger.branch("GarbageCollector")
@@ -70,12 +70,12 @@ final class GarbageCollector(
             printOpt.filter(_.banned).map(_.fp.value) match {
               case Some(print) => collect(user, email, msg = s"Print ban: ${print.value}")
               case _ =>
-                badOtherAccounts(spy.otherUsers.map(_.user)) ?? { others =>
+                badOtherAccounts(spy.otherUsers.map(_.user)) so { others =>
                   logger.debug(s"other ${data.user.username} others=${others.map(_.username)}")
                   lila.common.Future
                     .exists(spy.ips)(ipTrust.isSuspicious)
                     .map {
-                      _ ?? collect(
+                      _ so collect(
                         user,
                         email,
                         msg = s"Prev users: ${others.map(o => "@" + o.username).mkString(", ")}"
@@ -98,14 +98,14 @@ final class GarbageCollector(
   private def isBadAccount(user: User) = user.lameOrTrollOrAlt
 
   private def collect(user: User, email: EmailAddress, msg: => String): Funit =
-    justOnce(user.id) ?? {
+    justOnce(user.id) so {
       val armed = isArmed()
       val wait  = (30 + ThreadLocalRandom.nextInt(300)).seconds
       val message =
-        s"Will dispose of @${user.username} in $wait. Email: ${email.value}. $msg${!armed ?? " [SIMULATION]"}"
+        s"Will dispose of @${user.username} in $wait. Email: ${email.value}. $msg${!armed so " [SIMULATION]"}"
       logger.info(message)
       noteApi.playstrategyWrite(user, s"Garbage collected because of $msg")
-      slack.garbageCollector(message) >>- {
+      slack.garbageCollector(message).andDo {
         if (armed) {
           doInitialSb(user)
           scheduler

@@ -45,7 +45,7 @@ ${Mailer.txt.serviceNote}
     }
 
   def confirm(token: String): Fu[Option[User]] =
-    tokener read token flatMap { _ ?? userRepo.byId } map {
+    tokener read token flatMap { _ so userRepo.byId } map {
       _.filter(_.canFullyLogin)
     }
 

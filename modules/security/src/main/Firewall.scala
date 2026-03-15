@@ -11,7 +11,7 @@ import lila.db.dsl._
 
 final class Firewall(
     coll: Coll,
-    scheduler: akka.actor.Scheduler
+    scheduler: org.apache.pekko.actor.Scheduler
 )(implicit ec: scala.concurrent.ExecutionContext) {
 
   private var current: Set[String] = Set.empty
@@ -31,7 +31,7 @@ final class Firewall(
   def accepts(req: RequestHeader): Boolean = !blocks(req)
 
   def blockIps(ips: Iterable[IpAddress]): Funit =
-    ips.map { ip =>
+    Future.sequence(ips.map { ip =>
       coll.update
         .one(
           $id(ip),
@@ -39,14 +39,14 @@ final class Firewall(
           upsert = true
         )
         .void
-    }.sequenceFu >> loadFromDb
+    }) >> loadFromDb
 
   def unblockIps(ips: Iterable[IpAddress]): Funit =
-    coll.delete.one($inIds(ips)).void >>- loadFromDb.unit
+    coll.delete.one($inIds(ips)).void.andDo(loadFromDb.unit)
 
   private def loadFromDb: Funit =
     coll.distinctEasy[String, Set]("_id", $empty, ReadPreference.secondaryPreferred).map { ips =>
       current = ips
-      lila.mon.security.firewall.ip.update(ips.size).unit
+      val _ = lila.mon.security.firewall.ip.update(ips.size)
     }
 }

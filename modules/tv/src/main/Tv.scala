@@ -21,19 +21,18 @@ final class Tv(
   private def roundProxyGame = gameProxyRepo.game _
 
   def getGame(channel: Tv.Channel): Fu[Option[Game]] =
-    trouper.ask[Option[Game.ID]](TvTrouper.GetGameId(channel, _)) flatMap { _ ?? roundProxyGame }
+    trouper.ask[Option[Game.ID]](TvTrouper.GetGameId(channel, _)) flatMap { _ so roundProxyGame }
 
   def getGameAndHistory(channel: Tv.Channel): Fu[Option[(Game, List[Pov])]] =
     trouper.ask[GameIdAndHistory](TvTrouper.GetGameIdAndHistory(channel, _)) flatMap {
       case GameIdAndHistory(gameId, historyIds) =>
         for {
-          game <- gameId ?? roundProxyGame
+          game <- gameId so roundProxyGame
           games <-
-            historyIds
+            Future.sequence(historyIds
               .map { id =>
                 roundProxyGame(id) orElse gameRepo.game(id)
-              }
-              .sequenceFu
+              })
               .dmap(_.flatten)
           history = games map Pov.naturalOrientation
         } yield game map (_ -> history)
@@ -41,7 +40,7 @@ final class Tv(
 
   def getGames(channel: Tv.Channel, max: Int): Fu[List[Game]] =
     trouper.ask[List[Game.ID]](TvTrouper.GetGameIds(channel, max, _)) flatMap {
-      _.map(roundProxyGame).sequenceFu.map(_.flatten)
+      ids => Future.sequence(ids.map(roundProxyGame)).map(_.flatten)
     }
 
   def getBestGame = getGame(Tv.Channel.AllGames) orElse gameRepo.random
@@ -53,7 +52,7 @@ final class Tv(
 
   def getCorrespondenceGames: Fu[List[Game]] = {
     gameRepo.playingCorrespondenceNoAi flatMap {
-      _.map(gameRepo.game(_)).sequenceFu.map(_.flatten)
+      ids => Future.sequence(ids.map(gameRepo.game(_))).map(_.flatten)
     }
   }
 

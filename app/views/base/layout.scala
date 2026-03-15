@@ -48,7 +48,7 @@ object layout {
       s"""<link rel="preload" href="${assetUrl(
         s"font/playstrategy.woff2"
       )}" as="font" type="font/woff2" crossorigin>""" +
-        !ctx.pref.pieceNotationIsLetter ??
+        !ctx.pref.pieceNotationIsLetter so
         s"""<link rel="preload" href="${assetUrl(
           s"font/playstrategy.chess.woff2"
         )}" as="font" type="font/woff2" crossorigin>"""

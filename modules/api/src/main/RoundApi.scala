@@ -43,13 +43,13 @@ final private[api] class RoundApi(
           ctx.pref,
           apiVersion,
           ctx.me,
-          withFlags = WithFlags(blurs = ctx.me ?? Granter(_.ViewBlurs)),
+          withFlags = WithFlags(blurs = ctx.me so Granter(_.ViewBlurs)),
           initialFen = initialFen,
           nvui = ctx.blind
         ) zip
-          (pov.game.simulId ?? simulApi.find) zip
+          (pov.game.simulId so simulApi.find) zip
           swissApi.gameView(pov) zip
-          (ctx.me.ifTrue(ctx.isMobileApi) ?? (me => noteApi.get(pov.gameId, me.id))) zip
+          (ctx.me.ifTrue(ctx.isMobileApi) so (me => noteApi.get(pov.gameId, me.id))) zip
           forecastApi.loadForDisplay(pov) zip
           bookmarkApi.exists(pov.game, ctx.me) map {
             case (((((json, simul), swiss), note), forecast), bookmarked) =>
@@ -84,11 +84,11 @@ final private[api] class RoundApi(
           ctx.me,
           tv,
           initialFen = initialFen,
-          withFlags = WithFlags(blurs = ctx.me ?? Granter(_.ViewBlurs))
+          withFlags = WithFlags(blurs = ctx.me so Granter(_.ViewBlurs))
         ) zip
-          (pov.game.simulId ?? simulApi.find) zip
+          (pov.game.simulId so simulApi.find) zip
           swissApi.gameView(pov) zip
-          (ctx.me.ifTrue(ctx.isMobileApi) ?? (me => noteApi.get(pov.gameId, me.id))) zip
+          (ctx.me.ifTrue(ctx.isMobileApi) so (me => noteApi.get(pov.gameId, me.id))) zip
           bookmarkApi.exists(pov.game, ctx.me) map { case ((((json, simul), swiss), note), bookmarked) =>
             (
               withTournament(pov, tour) _ compose
@@ -122,15 +122,15 @@ final private[api] class RoundApi(
           ctx.me,
           tv,
           initialFen = initialFen,
-          withFlags = withFlags.copy(blurs = ctx.me ?? Granter(_.ViewBlurs))
+          withFlags = withFlags.copy(blurs = ctx.me so Granter(_.ViewBlurs))
         ) zip
           tourApi.gameView.analysis(pov.game) zip
-          (pov.game.simulId ?? simulApi.find) zip
+          (pov.game.simulId so simulApi.find) zip
           swissApi.gameView(pov) zip
-          ctx.userId.ifTrue(ctx.isMobileApi).?? {
+          ctx.userId.ifTrue(ctx.isMobileApi).so {
             noteApi.get(pov.gameId, _)
           } zip
-          (owner.??(forecastApi loadForDisplay pov)) zip
+          (owner.so(forecastApi loadForDisplay pov)) zip
           bookmarkApi.exists(pov.game, ctx.me) map {
             case ((((((json, tour), simul), swiss), note), fco), bookmarked) =>
               (
@@ -183,7 +183,7 @@ final private[api] class RoundApi(
       me: Option[User],
       withForecast: Boolean = false
   ) =
-    (if (withForecast) owner.??(forecastApi loadForDisplay pov) else fuccess(none)).map { fco =>
+    (if (withForecast) owner.so(forecastApi loadForDisplay pov) else fuccess(none)).map { fco =>
       val addForecast: JsObject => JsObject =
         if (withForecast) this.withForecast(pov, owner, fco) else identity
       addForecast(withTree(pov, analysis = none, initialFen, WithFlags(opening = true)) {

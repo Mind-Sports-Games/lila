@@ -100,7 +100,7 @@ object StudyForm {
         pgns.zipWithIndex map { case (onePgn, index) =>
           ChapterMaker.Data(
             // only the first chapter can be named
-            name = Chapter.Name((index == 0) ?? name),
+            name = Chapter.Name((index == 0) so name),
             variant = variantStr,
             pgn = onePgn.some,
             orientation =

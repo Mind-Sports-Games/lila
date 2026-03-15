@@ -22,7 +22,7 @@ final class Tv(
 
   def sides(gameId: String, playerIndex: String) =
     Open { implicit ctx =>
-      OptionFuResult(strategygames.Player.fromName(playerIndex) ?? { env.round.proxyRepo.pov(gameId, _) }) {
+      OptionFuResult(strategygames.Player.fromName(playerIndex) so { env.round.proxyRepo.pov(gameId, _) }) {
         pov =>
           env.game.crosstableApi.withMatchup(pov.game) map { ct =>
             Ok(html.tv.side.sides(pov, ct))
@@ -63,7 +63,7 @@ final class Tv(
 
   def gamesChannel(chanKey: String) =
     Open { implicit ctx =>
-      (lila.tv.Tv.Channel.byKey get chanKey) ?? { channel =>
+      (lila.tv.Tv.Channel.byKey get chanKey) so { channel =>
         env.tv.tv.getChampions zip env.tv.tv.getGames(channel, 15) zip env.tv.tv.getCorrespondenceGames map {
           case ((champs, lGames), cGames) =>
             NoCache {
@@ -83,7 +83,7 @@ final class Tv(
   def feed =
     Action.async { req =>
       import makeTimeout.short
-      import akka.pattern.ask
+      import org.apache.pekko.pattern.ask
       import lila.round.TvBroadcast
       import play.api.libs.EventSource
       val bc = getBool("bc", req)

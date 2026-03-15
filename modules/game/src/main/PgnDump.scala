@@ -49,7 +49,7 @@ final class PgnDump(
         )
       else fuccess(Tags(Nil))
     tagsFuture map { tags =>
-      val fullTurns = flags.turns ?? {
+      val fullTurns = flags.turns so {
         val fenSituation = tags.fen.flatMap { fen => Forsyth.<<<(game.variant.gameLogic, fen) }
         makeFullTurns(
           game.variant match {
@@ -84,7 +84,7 @@ final class PgnDump(
               }).toVector
           },
           fenSituation.map(_.fullTurnCount) | 1,
-          flags.clocks ?? ~game.bothClockStates,
+          flags.clocks so ~game.bothClockStates,
           game.startPlayerIndex
         )
       }
@@ -116,7 +116,7 @@ final class PgnDump(
   //TODO figure out how this works for Draughts to replicate lidraughts functionality
   /*private def namedLightUser(userId: String) =
     lila.user.UserRepo.byId(userId) map {
-      _ ?? { u =>
+      _ so { u =>
         LightUser(
           id = u.id,
           name = u.profile.flatMap(_.nonEmptyRealName).fold(u.username)(n => s"$n (${u.username})"),
@@ -127,11 +127,11 @@ final class PgnDump(
     }
 
   private def gameLightUsers(game: Game, withProfileName: Boolean): Fu[(Option[LightUser], Option[LightUser])] =
-    (game.p1Player.userId ?? { if (withProfileName) namedLightUser else lightUserApi.async}) zip (game.p2Player.userId ?? { if (withProfileName) namedLightUser else lightUserApi.async})
+    (game.p1Player.userId so { if (withProfileName) namedLightUser else lightUserApi.async}) zip (game.p2Player.userId so { if (withProfileName) namedLightUser else lightUserApi.async})
    */
 
   private def gameLightUsers(game: Game): Fu[(Option[LightUser], Option[LightUser])] =
-    (game.p1Player.userId ?? lightUserApi.async) zip (game.p2Player.userId ?? lightUserApi.async)
+    (game.p1Player.userId so lightUserApi.async) zip (game.p2Player.userId so lightUserApi.async)
 
   private def rating(p: Player) = p.rating.fold("?")(_.toString)
 
@@ -197,8 +197,8 @@ final class PgnDump(
           ),
           withRatings option Tag(_.P1Elo, rating(game.p1Player)),
           withRatings option Tag(_.P2Elo, rating(game.p2Player)),
-          withRatings ?? ratingDiffTag(game.p1Player, _.P1RatingDiff),
-          withRatings ?? ratingDiffTag(game.p2Player, _.P2RatingDiff),
+          withRatings so ratingDiffTag(game.p1Player, _.P1RatingDiff),
+          withRatings so ratingDiffTag(game.p2Player, _.P2RatingDiff),
           wu.flatMap(_.title).map { t =>
             Tag(_.P1Title, t)
           },
@@ -228,7 +228,7 @@ final class PgnDump(
               }
             }
           ).some
-        ).flatten ::: customStartPosition(game.variant).??(game.variant match {
+        ).flatten ::: customStartPosition(game.variant).so(game.variant match {
           case Variant.Draughts(variant) =>
             List(
               Tag(

@@ -1,6 +1,6 @@
 package lila.study
 
-import akka.stream.scaladsl._
+import org.apache.pekko.stream.scaladsl._
 import strategygames.format.pgn.{ FullTurn, Glyphs, Initial, Pgn, Tag, Tags, Turn }
 import strategygames.Player
 import org.joda.time.format.DateTimeFormat
@@ -73,7 +73,7 @@ final class PgnDump(
         Tag(_.ECO, opening.fold("?")(_.eco)),
         Tag(_.Opening, opening.fold("?")(_.name)),
         Tag(_.Result, "*") // required for SCID to import
-      ) ::: List(annotatorTag(study)) ::: (!chapter.root.fen.initial).??(
+      ) ::: List(annotatorTag(study)) ::: (!chapter.root.fen.initial).so(
         List(
           Tag(_.FEN, chapter.root.fen.value),
           Tag("SetUp", "1")
@@ -101,17 +101,17 @@ object PgnDump {
       Turn(
         san = nodes.map(_.move.san).mkString(","),
         glyphs = if (flags.comments) firstNode.glyphs else Glyphs.empty,
-        comments = flags.comments ?? {
+        comments = flags.comments so {
           firstNode.comments.list.map(_.text.value) ::: shapeComment(firstNode.shapes).toList
         },
         opening = none,
         result = none,
-        variations = flags.variations ?? {
+        variations = flags.variations so {
           variations.view.map { child =>
             toFullTurns(child.mainline, noVariations).toList
           }.toList
         },
-        secondsLeft = flags.clocks ?? firstNode.clock.map(_.roundSeconds)
+        secondsLeft = flags.clocks so firstNode.clock.map(_.roundSeconds)
       )
     }
   }

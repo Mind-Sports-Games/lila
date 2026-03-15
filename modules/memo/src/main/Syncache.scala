@@ -7,6 +7,7 @@ import scala.util.chaining._
 import scala.util.Success
 
 import lila.common.Uptime
+import lila.common.extensions.*
 
 /** A synchronous cache from asynchronous computations.
   * It will attempt to serve cached responses synchronously.
@@ -71,15 +72,15 @@ final private[memo] class Syncache[K, V](
   }
 
   // maybe optimize later with cache batching
-  def asyncMany(ks: List[K]): Fu[List[V]] = ks.map(async).sequenceFu
+  def asyncMany(ks: List[K]): Fu[List[V]] = Future.sequence(ks.map(async))
 
   def invalidate(k: K): Unit = cache invalidate k
 
   def preloadOne(k: K): Funit = async(k).void
 
   // maybe optimize later with cach batching
-  def preloadMany(ks: Seq[K]): Funit = ks.distinct.map(preloadOne).sequenceFu.void
-  def preloadSet(ks: Set[K]): Funit  = ks.map(preloadOne).sequenceFu.void
+  def preloadMany(ks: Seq[K]): Funit = Future.sequence(ks.distinct.map(preloadOne)).void
+  def preloadSet(ks: Set[K]): Funit  = Future.sequence(ks.toSeq.map(preloadOne)).void
 
   def set(k: K, v: V): Unit = cache.put(k, fuccess(v))
 

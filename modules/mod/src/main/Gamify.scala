@@ -49,7 +49,7 @@ final class Gamify(
   }
 
   private def buildHistoryAfter(afterYear: Int, afterMonth: Int, until: DateTime): Funit =
-    (afterYear to until.getYear)
+    Future.sequence((afterYear to until.getYear)
       .flatMap { year =>
         ((if (year == afterYear) afterMonth + 1 else 1) to
           (if (year == until.getYear) until.getMonthOfYear else 12)).map { month =>
@@ -63,13 +63,12 @@ final class Gamify(
           }
         }.toList
       }
-      .toList
-      .sequenceFu
+      .toList)
       .map(_.flatten)
-      .flatMap {
-        _.map { month =>
+      .flatMap { months =>
+        Future.sequence(months.map { month =>
           historyRepo.coll.update.one($doc("_id" -> month._id), month, upsert = true).void
-        }.sequenceFu
+        })
       }
       .void
 
@@ -94,13 +93,13 @@ final class Gamify(
     } yield actions.map(_.modId) intersect modList.map(_.id) diff hidden map { modId =>
       ModMixed(
         modId,
-        action = actions.find(_.modId == modId) ?? (_.count),
-        report = reports.find(_.modId == modId) ?? (_.count)
+        action = actions.find(_.modId == modId) so (_.count),
+        report = reports.find(_.modId == modId) so (_.count)
       )
     } sortBy (-_.score)
 
   private def dateRange(from: DateTime, toOption: Option[DateTime]) =
-    $doc("$gte" -> from) ++ toOption.?? { to =>
+    $doc("$gte" -> from) ++ toOption.so { to =>
       $doc("$lt" -> to)
     }
 

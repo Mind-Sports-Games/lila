@@ -1,7 +1,7 @@
 package lila.bot
 
-import akka.actor._
-import akka.stream.scaladsl._
+import org.apache.pekko.actor._
+import org.apache.pekko.stream.scaladsl._
 import play.api.i18n.Lang
 import play.api.libs.json._
 import scala.concurrent.duration._
@@ -95,7 +95,7 @@ final class GameStateStream(
           Bus.publish(Tell(init.game.id, BotConnected(as, v = false)), "roundSocket")
         }
         queue.complete()
-        lila.mon.bot.gameStream("stop").increment().unit
+        val _ = lila.mon.bot.gameStream("stop").increment()
       }
 
       def receive = {
@@ -108,14 +108,13 @@ final class GameStateStream(
         case lila.game.actorApi.BoardOfferSquares(pov) if pov.gameId == id => pushState(pov.game).unit
         case SetOnline =>
           onlineApiUsers.setOnline(user.id)
-          context.system.scheduler
+          val _ = context.system.scheduler
             .scheduleOnce(6 second) {
               // gotta send a message to check if the client has disconnected
               queue offer None
               self ! SetOnline
               Bus.publish(Tell(id, QuietFlag), "roundSocket")
             }
-            .unit
       }
 
       def pushState(g: Game): Funit =
@@ -129,7 +128,7 @@ final class GameStateStream(
         queue.offer(jsonView.chatLine(username, text, player).some).void
 
       def onGameOver(g: Option[Game]) =
-        g ?? pushState >>- {
+        g so pushState.andDo {
           gameOver = true
           self ! PoisonPill
         }

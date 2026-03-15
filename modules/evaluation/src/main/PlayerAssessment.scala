@@ -37,7 +37,7 @@ object PlayerAssessment {
 
   private def highlyConsistentMoveTimeStreaksOf(pov: Pov): Boolean =
     pov.game.clock.exists(_.estimateTotalSeconds > 60) && {
-      Statistics.slidingMoveTimesCvs(pov) ?? {
+      Statistics.slidingMoveTimesCvs(pov) so {
         _ exists Statistics.cvIndicatesHighlyFlatTimesForStreaks
       }
     }
@@ -77,7 +77,7 @@ object PlayerAssessment {
 
     lazy val highlyConsistentPlyTimes: Boolean =
       game.clock.exists(_.estimateTotalSeconds > 60) && {
-        plyTimeCoefVariation(pov) ?? cvIndicatesHighlyFlatTimes
+        plyTimeCoefVariation(pov) so cvIndicatesHighlyFlatTimes
       }
 
     lazy val suspiciousErrorRate: Boolean =

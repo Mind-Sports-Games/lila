@@ -1,7 +1,7 @@
 package lila.puzzle
 
 import com.softwaremill.macwire._
-import io.methvin.play.autoconfig._
+import lila.common.autoconfig.{ AutoConfig, ConfigName }
 import play.api.Configuration
 
 import lila.common.config._
@@ -27,8 +27,8 @@ final class Env(
     mongo: lila.db.Env
 )(implicit
     ec: scala.concurrent.ExecutionContext,
-    system: akka.actor.ActorSystem,
-    scheduler: akka.actor.Scheduler,
+    system: org.apache.pekko.actor.ActorSystem,
+    scheduler: org.apache.pekko.actor.Scheduler,
     mode: play.api.Mode
 ) {
 

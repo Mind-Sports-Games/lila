@@ -29,7 +29,7 @@ final private[setup] class Processor(
           Created(hook.id)
         }
       case Right(Some(seek)) =>
-        ctx.userId.??(gameCache.nbPlaying) dmap { nbPlaying =>
+        ctx.userId.so(gameCache.nbPlaying) dmap { nbPlaying =>
           if (maxPlaying <= nbPlaying) Refused
           else {
             Bus.publish(AddSeek(seek), "lobbyTrouper")
@@ -55,7 +55,7 @@ final private[setup] class Processor(
           Created(hook.id)
         }
       case Right(Some(seek)) =>
-        ctx.userId.??(gameCache.nbPlaying) dmap { nbPlaying =>
+        ctx.userId.so(gameCache.nbPlaying) dmap { nbPlaying =>
           if (maxPlaying <= nbPlaying) Refused
           else {
             Bus.publish(AddSeek(seek), "lobbyTrouper")

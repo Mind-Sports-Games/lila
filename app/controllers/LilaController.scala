@@ -1,6 +1,6 @@
 package controllers
 
-import ornicar.scalalib.Zero
+import alleycats.Zero
 import play.api.data.Form
 import play.api.data.FormBinding
 import play.api.http._
@@ -19,7 +19,7 @@ import lila.oauth.{ OAuthScope, OAuthServer }
 import lila.security.{ AppealUser, FingerPrintedUser, Granter, Permission }
 import lila.user.{ UserContext, User => UserModel, Holder }
 import scala.concurrent.ExecutionContext
-import akka.actor.Scheduler
+import org.apache.pekko.actor.Scheduler
 import lila.app.ui.EmbedConfig
 
 abstract private[controllers] class LilaController(val env: Env)
@@ -32,7 +32,7 @@ abstract private[controllers] class LilaController(val env: Env)
   implicit def executionContext: ExecutionContext = env.executionContext
   implicit def scheduler: Scheduler               = env.scheduler
 
-  implicit protected val LilaResultZero: Zero[Result] = Zero.instance[Result](Results.NotFound)
+  implicit protected val LilaResultZero: Zero[Result] = Zero[Result](Results.NotFound)
 
   implicit final protected class LilaPimpedResult(result: Result) {
     def fuccess                           = scala.concurrent.Future successful result
@@ -326,7 +326,7 @@ abstract private[controllers] class LilaController(val env: Env)
     if (ctx.me.exists(_.marks.troll)) notFound else a
 
   protected def NoPlayban(a: => Fu[Result])(implicit ctx: Context): Fu[Result] =
-    ctx.userId.??(env.playban.api.currentBan) flatMap {
+    ctx.userId.so(env.playban.api.currentBan) flatMap {
       _.fold(a) { ban =>
         negotiate(
           html = keyPages.home(Results.Forbidden),
@@ -343,7 +343,7 @@ abstract private[controllers] class LilaController(val env: Env)
     }
 
   protected def NoCurrentGame(a: => Fu[Result])(implicit ctx: Context): Fu[Result] =
-    ctx.me.??(env.preloader.currentGameMyTurn) flatMap {
+    ctx.me.so(env.preloader.currentGameMyTurn) flatMap {
       _.fold(a) { current =>
         negotiate(
           html = keyPages.home(Results.Forbidden),
@@ -465,7 +465,7 @@ abstract private[controllers] class LilaController(val env: Env)
     isGranted(permission(Permission))
 
   protected def isGranted(permission: Permission)(implicit ctx: Context): Boolean =
-    ctx.me ?? Granter(permission)
+    ctx.me so Granter(permission)
 
   protected def authenticationFailed(implicit ctx: Context): Fu[Result] =
     negotiate(
@@ -537,9 +537,9 @@ abstract private[controllers] class LilaController(val env: Env)
         if (isPage) {
           env.user.lightUserApi preloadUser me
           val enabledId = me.enabled option me.id
-          enabledId.??(env.team.api.nbRequests) zip
-            enabledId.??(env.challenge.api.countInFor.get) zip
-            enabledId.??(id => env.notifyM.api.unreadCount(Notifies(id)).dmap(_.value)) zip
+          enabledId.so(env.team.api.nbRequests) zip
+            enabledId.so(env.challenge.api.countInFor.get) zip
+            enabledId.so(id => env.notifyM.api.unreadCount(Notifies(id)).dmap(_.value)) zip
             env.mod.inquiryApi.forMod(me)
         } else
           fuccess {
@@ -562,7 +562,7 @@ abstract private[controllers] class LilaController(val env: Env)
   }
 
   private def blindMode(implicit ctx: UserContext) =
-    ctx.req.cookies.get(env.api.config.accessibility.blindCookieName) ?? { c =>
+    ctx.req.cookies.get(env.api.config.accessibility.blindCookieName) so { c =>
       c.value.nonEmpty && c.value == env.api.config.accessibility.hash
     }
 
@@ -626,7 +626,7 @@ abstract private[controllers] class LilaController(val env: Env)
     else result
 
   protected def NotManaged(result: => Fu[Result])(implicit ctx: Context) =
-    ctx.me.??(env.clas.api.student.isManaged) flatMap {
+    ctx.me.so(env.clas.api.student.isManaged) flatMap {
       case true => notFound
       case _    => result
     }
@@ -671,7 +671,7 @@ abstract private[controllers] class LilaController(val env: Env)
     fuccess(BadRequest(errorsAsJson(err)))
 
   protected def pageHit(req: RequestHeader): Unit =
-    if (HTTPRequest isHuman req) lila.mon.http.path(req.path).increment().unit
+    if (HTTPRequest isHuman req) { val _ = lila.mon.http.path(req.path).increment() }
 
   protected def BadRequestWithReason(reason: String) = makeCustomResult(BAD_REQUEST, reason).pp
 

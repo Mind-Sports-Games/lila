@@ -1,7 +1,7 @@
 package lila.studySearch
 
-import akka.actor._
-import akka.stream.scaladsl._
+import org.apache.pekko.actor._
+import org.apache.pekko.stream.scaladsl._
 import strategygames.format.pgn.{ Tag, TagType }
 import org.joda.time.DateTime
 import org.joda.time.format.DateTimeFormat
@@ -20,7 +20,7 @@ final class StudySearchApi(
     chapterRepo: ChapterRepo
 )(implicit
     ec: scala.concurrent.ExecutionContext,
-    scheduler: akka.actor.Scheduler,
+    scheduler: org.apache.pekko.actor.Scheduler,
     mat: akka.stream.Materializer
 ) extends SearchReadApi[Study, Query] {
 
@@ -35,7 +35,7 @@ final class StudySearchApi(
     fuccess {
       indexThrottler ! LateMultiThrottler.work(
         id = study.id.value,
-        run = studyRepo byId study.id flatMap { _ ?? doStore },
+        run = studyRepo byId study.id flatMap { _ so doStore },
         delay = 30.seconds.some
       )
     }

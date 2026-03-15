@@ -1,6 +1,6 @@
 package lila.forumSearch
 
-import akka.stream.scaladsl._
+import org.apache.pekko.stream.scaladsl._
 import play.api.libs.json._
 
 import lila.common.Json.jodaWrites
@@ -26,7 +26,7 @@ final class ForumSearchApi(
 
   def store(post: Post) =
     postApi liteView post flatMap {
-      _ ?? { view =>
+      _ so { view =>
         client.store(Id(view.post.id), toDoc(view))
       }
     }

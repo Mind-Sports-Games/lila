@@ -112,7 +112,7 @@ final private class Rematcher(
           onStart(nextGame.id)
           redirectEvents(nextGame)
         }
-      case Some(rematchId) => gameRepo game rematchId map { _ ?? redirectEvents }
+      case Some(rematchId) => gameRepo game rematchId map { _ so redirectEvents }
     }
 
   private def rematchCreate(pov: Pov): Events = {
@@ -192,10 +192,10 @@ final private class Rematcher(
           clock = game.clock map { c =>
             c.config.toClock
           },
-          turnCount = situation ?? (_.turnCount),
-          plies = situation ?? (_.plies),
-          startedAtPly = situation ?? (_.plies),
-          startedAtTurn = situation ?? (_.turnCount)
+          turnCount = situation so (_.turnCount),
+          plies = situation so (_.plies),
+          startedAtPly = situation so (_.plies),
+          startedAtTurn = situation so (_.turnCount)
         ),
         p1Player = returnPlayer(game, P1, users),
         p2Player = returnPlayer(game, P2, users),

@@ -1,6 +1,6 @@
 package lila.tournament
 
-import akka.stream.scaladsl._
+import org.apache.pekko.stream.scaladsl._
 import reactivemongo.akkastream.cursorProducer
 import reactivemongo.api._
 import reactivemongo.api.bson._
@@ -42,7 +42,7 @@ final private class LeaderboardIndexer(
       generateTourEntries(tour) flatMap saveEntries
 
   private def saveEntries(entries: Seq[Entry]): Funit =
-    entries.nonEmpty ?? leaderboardRepo.coll.insert
+    entries.nonEmpty so leaderboardRepo.coll.insert
       .many(
         entries.flatMap(BSONHandlers.leaderboardEntryHandler.writeOpt)
       )

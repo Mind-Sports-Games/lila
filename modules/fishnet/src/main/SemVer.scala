@@ -52,7 +52,7 @@ object SemVer {
   def isSnapshotVersion(v: String): Boolean = v.trim.endsWith(Snapshot)
 
   def isIntegrationVersion(v: String): Boolean = {
-    val Rx = """(\d+).(\d+).(\d+).(\d{14})""".r
+    val Rx = """(\d+)(\d+)(\d+)(\d{14})""".r
     v match {
       case Rx(_, _, _, _) => true
       case _              => false

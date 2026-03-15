@@ -21,7 +21,7 @@ final class CoachPager(
   def apply(lang: Option[Lang], order: Order, page: Int): Fu[Paginator[Coach.WithUser]] = {
     val adapter = new Adapter[Coach](
       collection = coll,
-      selector = listableSelector ++ lang.?? { l =>
+      selector = listableSelector ++ lang.so { l =>
         $doc("languages" -> l.code)
       },
       projection = none,

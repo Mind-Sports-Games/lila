@@ -11,7 +11,7 @@ import lila.app.ui.ScalatagsTemplate._
 trait TeamHelper { self: HasEnv =>
 
   def myTeam(teamId: String)(implicit ctx: Context): Boolean =
-    ctx.userId.?? { env.team.api.syncBelongsTo(teamId, _) }
+    ctx.userId.so { env.team.api.syncBelongsTo(teamId, _) }
 
   def teamIdToName(id: String): String = env.team.getTeamName(id).getOrElse(id)
 

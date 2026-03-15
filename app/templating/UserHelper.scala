@@ -92,7 +92,7 @@ trait UserHelper { self: I18nHelper with StringHelper with NumberHelper =>
         userId = user.id,
         username = user.name,
         isPatron = user.isPatron,
-        title = withTitle ?? user.title map Title.apply,
+        title = withTitle so user.title map Title.apply,
         cssClass = cssClass,
         withOnline = withOnline,
         truncate = truncate,
@@ -114,7 +114,7 @@ trait UserHelper { self: I18nHelper with StringHelper with NumberHelper =>
       userId = user.id,
       username = user.name,
       isPatron = user.isPatron,
-      title = withTitle ?? user.title map Title.apply,
+      title = withTitle so user.title map Title.apply,
       cssClass = cssClass,
       withOnline = withOnline,
       truncate = truncate,
@@ -146,7 +146,7 @@ trait UserHelper { self: I18nHelper with StringHelper with NumberHelper =>
       href := userUrl(username, params = params)
     )(
       dataIcon.map(iconTag),
-      withOnline ?? (if (modIcon) moderatorIcon else lineIcon(isPatron)),
+      withOnline so (if (modIcon) moderatorIcon else lineIcon(isPatron)),
       titleTag(title),
       truncate.fold(username)(username.take)
     )
@@ -166,7 +166,7 @@ trait UserHelper { self: I18nHelper with StringHelper with NumberHelper =>
       cls := userClass(user.id, cssClass, withOnline, withPowerTip),
       href := userUrl(user.username, params)
     )(
-      withOnline ?? lineIcon(user),
+      withOnline so lineIcon(user),
       withTitle option titleTag(user.title),
       name | user.username,
       userRating(user, withPerfRating, withBestRating)
@@ -186,7 +186,7 @@ trait UserHelper { self: I18nHelper with StringHelper with NumberHelper =>
       cls := userClass(user.id, cssClass, withOnline, withPowerTip),
       dataHref := userUrl(user.username)
     )(
-      withOnline ?? lineIcon(user),
+      withOnline so lineIcon(user),
       withTitle option titleTag(user.title),
       name | user.username,
       userRating(user, withPerfRating, withBestRating)
@@ -199,8 +199,8 @@ trait UserHelper { self: I18nHelper with StringHelper with NumberHelper =>
       cls := userClass(userId, none, withOnline),
       dataHref := userUrl(name)
     )(
-      withOnline ?? lineIcon(user),
-      user.??(u => titleTag(u.title map Title.apply)),
+      withOnline so lineIcon(user),
+      user.so(u => titleTag(u.title map Title.apply)),
       name
     )
   }
@@ -217,7 +217,7 @@ trait UserHelper { self: I18nHelper with StringHelper with NumberHelper =>
     withPerfRating match {
       case Some(perfType) => renderRating(user.perfs(perfType))
       case _ if withBestRating =>
-        user.perfs.bestPerf ?? { case (_, perf) =>
+        user.perfs.bestPerf so { case (_, perf) =>
           renderRating(perf)
         }
       case _ => ""
@@ -234,7 +234,7 @@ trait UserHelper { self: I18nHelper with StringHelper with NumberHelper =>
   ): List[(String, Boolean)] =
     if (userId == "ghost") List("user-link" -> true, ~cssClass -> cssClass.isDefined)
     else
-      (withOnline ?? List((if (isOnline(userId)) "online" else "offline") -> true)) ::: List(
+      (withOnline so List((if (isOnline(userId)) "online" else "offline") -> true)) ::: List(
         "user-link" -> true,
         ~cssClass   -> cssClass.isDefined,
         "ulpt"      -> withPowerTip
@@ -254,7 +254,7 @@ trait UserHelper { self: I18nHelper with StringHelper with NumberHelper =>
   ): String =
     filter match {
       case GameFilter.All      => transLocalize(trans.nbGames, u.count.game)
-      case GameFilter.Me       => nbs.withMe ?? { transLocalize(trans.nbGamesWithYou, _) }
+      case GameFilter.Me       => nbs.withMe so { transLocalize(trans.nbGamesWithYou, _) }
       case GameFilter.Rated    => transLocalize(trans.nbRated, u.count.rated)
       case GameFilter.Win      => transLocalize(trans.nbWins, u.count.win)
       case GameFilter.Loss     => transLocalize(trans.nbLosses, u.count.loss)
@@ -269,7 +269,7 @@ trait UserHelper { self: I18nHelper with StringHelper with NumberHelper =>
     val name      = user.titleUsername
     val nbGames   = user.count.game
     val createdAt = org.joda.time.format.DateTimeFormat forStyle "M-" print user.createdAt
-    val currentRating = user.perfs.bestPerf ?? { case (pt, perf) =>
+    val currentRating = user.perfs.bestPerf so { case (pt, perf) =>
       s" Current ${pt.trans} rating: ${perf.intRating}."
     }
     s"$name played $nbGames games since $createdAt.$currentRating"
@@ -283,7 +283,7 @@ trait UserHelper { self: I18nHelper with StringHelper with NumberHelper =>
     i(cls := "line patron", title := trans.patron.playstrategyPatron.txt())
   val moderatorIcon: Frag                                                  = i(cls := "line moderator", title := "PlayStrategy Mod")
   private def lineIcon(patron: Boolean)(implicit lang: Lang): Frag         = if (patron) patronIcon else lineIcon
-  private def lineIcon(user: Option[LightUser])(implicit lang: Lang): Frag = lineIcon(user.??(_.isPatron))
+  private def lineIcon(user: Option[LightUser])(implicit lang: Lang): Frag = lineIcon(user.so(_.isPatron))
   def lineIcon(user: LightUser)(implicit lang: Lang): Frag                 = lineIcon(user.isPatron)
   def lineIcon(user: User)(implicit lang: Lang): Frag                      = lineIcon(user.isPatron)
   def lineIconChar(user: User): Frag                                       = if (user.isPatron) patronIconChar else lineIconChar

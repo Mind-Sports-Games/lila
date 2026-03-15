@@ -1,6 +1,6 @@
 package lila.study
 
-import akka.stream.scaladsl._
+import org.apache.pekko.stream.scaladsl._
 import strategygames.format.pgn.Tags
 import strategygames.Centis
 import strategygames.variant.Variant
@@ -89,11 +89,10 @@ final class ChapterRepo(val coll: AsyncColl)(implicit
 
   def sort(study: Study, ids: List[Chapter.Id]): Funit =
     coll { c =>
-      ids.zipWithIndex
+      Future.sequence(ids.zipWithIndex
         .map { case (id, index) =>
           c.updateField($studyId(study.id) ++ $id(id), "order", index + 1)
-        }
-        .sequenceFu
+        })
         .void
     }
 
@@ -142,7 +141,7 @@ final class ChapterRepo(val coll: AsyncColl)(implicit
     val variantHandlers = VariantHandlers()
     import variantHandlers._
     val set = $doc(subTreeToBsonElements(parentPath, subTree)) ++ {
-      (newParent.children.nodes.sizeIs > 1) ?? $doc(
+      (newParent.children.nodes.sizeIs > 1) so $doc(
         pathToField(parentPath, Node.BsonFields.order) -> newParent.children.nodes.map(_.id)
       )
     }
@@ -154,7 +153,7 @@ final class ChapterRepo(val coll: AsyncColl)(implicit
   ): Vector[(String, Bdoc)] = {
     val variantHandlers = VariantHandlers()
     import variantHandlers._
-    (parentPath.depth < Node.maxPlies) ?? {
+    (parentPath.depth < Node.maxPlies) so {
       val path = parentPath + subTree
       subTree.children.nodes.flatMap(subTreeToBsonElements(path, _)) appended {
         path.toDbField -> writeNode(subTree)
@@ -167,7 +166,7 @@ final class ChapterRepo(val coll: AsyncColl)(implicit
     val variantHandlers = VariantHandlers()
     import variantHandlers._
     val set: Bdoc = {
-      (children.nodes.sizeIs > 1) ?? $doc(
+      (children.nodes.sizeIs > 1) so $doc(
         pathToField(path, Node.BsonFields.order) -> children.nodes.map(_.id)
       )
     } ++ $doc(childrenTreeToBsonElements(path, children))
@@ -180,7 +179,7 @@ final class ChapterRepo(val coll: AsyncColl)(implicit
   ): Vector[(String, Bdoc)] = {
     val variantHandlers = VariantHandlers()
     import variantHandlers._
-    (parentPath.depth < Node.maxPlies) ??
+    (parentPath.depth < Node.maxPlies) so
       children.nodes.flatMap { node =>
         val path = parentPath + node
         childrenTreeToBsonElements(path, node.children) appended (path.toDbField -> writeNode(node))
@@ -226,7 +225,7 @@ final class ChapterRepo(val coll: AsyncColl)(implicit
       studyIds: Seq[Study.Id],
       nbChaptersPerStudy: Int
   ): Fu[Map[Study.Id, Vector[Chapter.IdName]]] =
-    studyIds.nonEmpty ?? coll(
+    studyIds.nonEmpty so coll(
       _.find(
         $doc("studyId" $in studyIds),
         $doc("studyId" -> true, "_id" -> true, "name" -> true).some

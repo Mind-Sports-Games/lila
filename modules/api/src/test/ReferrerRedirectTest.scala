@@ -1,35 +1,40 @@
-package lila.api
+package lila.web
 
-import org.specs2.mutable.Specification
+import lila.core.config.BaseUrl
 
-import lila.common.config.BaseUrl
+class ReferrerRedirectTest extends munit.FunSuite:
 
-class ReferrerRedirectTest extends Specification {
+  def r = new ReferrerRedirect(BaseUrl("https://lichess.org"))
 
-  def r = new ReferrerRedirect(BaseUrl("https://playstrategy.org"))
+  test("be valid"):
+    assertEquals(r.valid("/tournament"), Some("https://lichess.org/tournament"))
+    assertEquals(r.valid("/@/neio"), Some("https://lichess.org/@/neio"))
+    assertEquals(r.valid("/@/Neio"), Some("https://lichess.org/@/Neio"))
+    assertEquals(r.valid("/"), Some("https://lichess.org/"))
+    assertEquals(r.valid("https://lichess.org/tournament"), Some("https://lichess.org/tournament"))
+    assertEquals(
+      r.valid("https://lichess.org/?a_a=b-b&C[]=#hash"),
+      Some("https://lichess.org/?a_a=b-b&C[]=#hash")
+    )
+    assertEquals(r.valid("/api"), Some("https://lichess.org/api"))
+    assertEquals(r.valid("/something/api/something"), Some("https://lichess.org/something/api/something"))
 
-  "referrer" should {
-    "be valid" in {
-      r.valid("/tournament") must beTrue
-      r.valid("/@/neio") must beTrue
-      r.valid("/@/Neio") must beTrue
-      r.valid("//playstrategy.org") must beTrue
-      r.valid("//foo.playstrategy.org") must beTrue
-      r.valid("https://playstrategy.org/tournament") must beTrue
-      r.valid("https://playstrategy.org/?a_a=b-b&C[]=#hash") must beTrue
-      r.valid(
-        "https://oauth.playstrategy.org/oauth/authorize?response_type=code&client_id=NotReal1&redirect_uri=http%3A%2F%2Fexample.playstrategy.ovh%3A9371%2Foauth-callback&scope=challenge:read+challenge:write+board:play&state=123abc"
-      ) must beTrue
-    }
-    "be invalid" in {
-      r.valid("") must beFalse
-      r.valid("ftp://playstrategy.org/tournament") must beFalse
-      r.valid("https://evil.com") must beFalse
-      r.valid("https://evil.com/foo") must beFalse
-      r.valid("//evil.com") must beFalse
-      r.valid("//playstrategy.org.evil.com") must beFalse
-      r.valid("/\t/evil.com") must beFalse
-      r.valid("/ /evil.com") must beFalse
-    }
-  }
-}
+  test("be invalid"):
+    assertEquals(r.valid(""), None)
+    assertEquals(r.valid("//foo.lichess.org"), None)
+    assertEquals(r.valid("ftp://lichess.org/tournament"), None)
+    assertEquals(r.valid("https://evil.com"), None)
+    assertEquals(r.valid("https://evil.com/foo"), None)
+    assertEquals(r.valid("//evil.com"), None)
+    assertEquals(r.valid("//lichess.org.evil.com"), None)
+    assertEquals(r.valid("/\t/evil.com"), None)
+    assertEquals(r.valid("/ /evil.com"), None)
+    assertEquals(r.valid("http://lichess.org/"), None) // downgrade to http
+    assertEquals(r.valid("/login"), None)
+    assertEquals(r.valid("/account/personal-data"), None)
+    assertEquals(r.valid("/api/games/user/Cammy"), None)
+    assertEquals(r.valid("/api/broadcast/abcdefgh"), None)
+    assertEquals(r.valid("https://lichess.org/api/broadcast/abcdefgh"), None)
+    assertEquals(r.valid("https://lichess.org/something.pgn"), None)
+    assertEquals(r.valid("https://lichess.org/swiss/abcdefgh.trf"), None)
+    assertEquals(r.valid("https://lichess.org/games/export/Cammy"), None)

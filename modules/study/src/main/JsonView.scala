@@ -30,7 +30,7 @@ final class JsonView(
     def allowed(selection: Settings.UserSelection): Boolean =
       Settings.UserSelection.allows(selection, study, me.map(_.id))
 
-    me.?? { studyRepo.liked(study, _) } map { liked =>
+    me.so { studyRepo.liked(study, _) } map { liked =>
       studyWrites.writes(study) ++ Json
         .obj(
           "liked" -> liked,

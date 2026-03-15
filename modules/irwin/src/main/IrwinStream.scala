@@ -1,6 +1,6 @@
 package lila.irwin
 
-import akka.stream.scaladsl._
+import org.apache.pekko.stream.scaladsl._
 import play.api.libs.json._
 import scala.concurrent.duration._
 
@@ -25,7 +25,7 @@ final class IrwinStream {
     blueprint mapMaterializedValue { queue =>
       val sub = Bus.subscribeFun(channel) { case req: IrwinRequest =>
         lila.mon.mod.irwin.streamEventType("request").increment()
-        queue.offer(req).unit
+        val _ = queue.offer(req)
       }
 
       queue.watchCompletion() dforeach { _ =>
@@ -50,7 +50,7 @@ final class IrwinStream {
           "p2" -> game.p2Player.userId,
           //flatten until Irwin supports non chess
           "pgn"  -> game.actionStrs.flatten.mkString(" "),
-          "emts" -> game.clockHistory.isDefined ?? game.plyTimes.map(_.map(_.centis)),
+          "emts" -> game.clockHistory.isDefined so game.plyTimes.map(_.map(_.centis)),
           "analysis" -> analysis.map {
             _.infos.map { info =>
               info.cp.map { cp =>

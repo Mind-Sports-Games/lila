@@ -17,15 +17,15 @@ sealed trait Advice {
   def mate           = info.mate
 
   def makeComment(withEval: Boolean, withBestMove: Boolean): String =
-    withEval.??(evalComment ?? { c =>
+    withEval.so(evalComment so { c =>
       s"($c) "
     }) +
       (this match {
         case MateAdvice(seq, _, _, _) => seq.desc
         case CpAdvice(judgment, _, _) => judgment.toString
       }) + "." + {
-        withBestMove ?? {
-          info.variation.headOption ?? { move =>
+        withBestMove so {
+          info.variation.headOption so { move =>
             // TODO: put this back in when we have proper move notation in scala: s" $move was best."
             s" The following was best."
           }
@@ -115,8 +115,8 @@ private[analyse] object MateAdvice {
   def apply(prev: Info, info: Info): Option[MateAdvice] = {
     def invertCp(cp: Cp)       = cp invertIf info.playerIndex.p2
     def invertMate(mate: Mate) = mate invertIf info.playerIndex.p2
-    def prevCp                 = prev.cp.map(invertCp).??(_.centipawns)
-    def nextCp                 = info.cp.map(invertCp).??(_.centipawns)
+    def prevCp                 = prev.cp.map(invertCp).so(_.centipawns)
+    def nextCp                 = info.cp.map(invertCp).so(_.centipawns)
     MateSequence(prev.mate map invertMate, info.mate map invertMate) flatMap { sequence =>
       import Advice.Judgement._
       val judgment: Option[Advice.Judgement] = sequence match {

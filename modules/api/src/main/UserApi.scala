@@ -29,7 +29,7 @@ final private[api] class UserApi(
 
   def extended(username: String, as: Option[User]): Fu[Option[JsObject]] =
     userRepo named username flatMap {
-      _ ?? { extended(_, as) dmap some }
+      _ so { extended(_, as) dmap some }
     }
 
   def extended(u: User, as: Option[User]): Fu[JsObject] =
@@ -42,14 +42,14 @@ final private[api] class UserApi(
     }
     else {
       gameProxyRepo.urgentGames(u).dmap(_.headOption) zip
-        (as.filter(u !=) ?? { me =>
+        (as.filter(u !=) so { me =>
           crosstableApi.nbGames(me.id, u.id)
         }) zip
         relationApi.countFollowing(u.id) zip
         relationApi.countFollowers(u.id) zip
-        as.isDefined.?? { prefApi followable u.id } zip
-        as.map(_.id).?? { relationApi.fetchRelation(_, u.id) } zip
-        as.map(_.id).?? { relationApi.fetchFollows(u.id, _) } zip
+        as.isDefined.so { prefApi followable u.id } zip
+        as.map(_.id).so { relationApi.fetchRelation(_, u.id) } zip
+        as.map(_.id).so { relationApi.fetchFollows(u.id, _) } zip
         bookmarkApi.countByUser(u) zip
         gameCache.nbPlaying(u.id) zip
         gameCache.nbImportedBy(u.id) zip
@@ -87,7 +87,7 @@ final private[api] class UserApi(
                 )
               )
               .add("streaming", liveStreamApi.isStreaming(u.id)) ++
-              as.isDefined.??(
+              as.isDefined.so(
                 Json.obj(
                   "followable" -> followable,
                   "following"  -> relation.has(true),

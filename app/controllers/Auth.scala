@@ -1,6 +1,6 @@
 package controllers
 
-import ornicar.scalalib.Zero
+import alleycats.Zero
 import play.api.data.FormError
 import play.api.libs.json._
 import play.api.mvc._
@@ -245,7 +245,7 @@ final class Auth(
   // after signup and before confirmation
   def fixEmail =
     OpenBody { implicit ctx =>
-      lila.security.EmailConfirm.cookie.get(ctx.req) ?? { userEmail =>
+      lila.security.EmailConfirm.cookie.get(ctx.req) so { userEmail =>
         implicit val req = ctx.body
         forms.preloadEmailDns >> forms
           .fixEmail(userEmail.email)
@@ -289,7 +289,7 @@ final class Auth(
         case Result.JustConfirmed(user) =>
           lila.mon.user.register.confirmEmailResult(true).increment()
           env.user.repo.email(user.id).flatMap {
-            _.?? { email =>
+            _.so { email =>
               authLog(user.username, email.value, s"Confirmed email ${email.value}")
               welcome(user, email, sendWelcomeEmail = false)
             }
@@ -310,10 +310,10 @@ final class Auth(
     Auth { ctx => me =>
       lila.mon.http.fingerPrint.record(ms)
       api.setFingerPrint(ctx.req, FingerPrint(fp)) flatMap {
-        _ ?? { hash =>
-          !me.lame ?? (for {
+        _ so { hash =>
+          !me.lame so (for {
             otherIds <- api.recentUserIdsByFingerHash(hash).map(_.filter(me.id.!=))
-            _ <- (otherIds.sizeIs >= 2) ?? env.user.repo.countLameOrTroll(otherIds).flatMap {
+            _ <- (otherIds.sizeIs >= 2) so env.user.repo.countLameOrTroll(otherIds).flatMap {
               case nb if nb >= 2 && nb >= otherIds.size / 2 => env.report.api.autoAltPrintReport(me.id)
               case _                                        => funit
             }
@@ -391,13 +391,12 @@ final class Auth(
             HasherRateLimit(user.username, ctx.req) { _ =>
               env.user.authenticator.setPassword(user.id, ClearPassword(data.newPasswd1)) >>
                 env.user.repo.setEmailConfirmed(user.id).flatMap {
-                  _ ?? { welcome(user, _, sendWelcomeEmail = false) }
+                  _ so { welcome(user, _, sendWelcomeEmail = false) }
                 } >>
                 env.user.repo.disableTwoFactor(user.id) >>
                 env.security.store.closeAllSessionsOf(user.id) >>
                 env.push.webSubscriptionApi.unsubscribeByUser(user) >>
-                authenticateUser(user) >>-
-                lila.mon.user.auth.passwordResetConfirm("success").increment().unit
+                authenticateUser(user).andDo { val _ = lila.mon.user.auth.passwordResetConfirm("success").increment() }
             }(rateLimitedFu)
           }
       }
@@ -469,8 +468,7 @@ final class Auth(
               notFound
             case Some(user) =>
               authLog(user.username, "-", "Magic link")
-              authenticateUser(user) >>-
-                lila.mon.user.auth.magicLinkConfirm("success").increment().unit
+              authenticateUser(user).andDo { val _ = lila.mon.user.auth.magicLinkConfirm("success").increment() }
           }
         }(rateLimitedFu)
       }
@@ -521,7 +519,7 @@ final class Auth(
     }
 
   implicit private val limitedDefault: Zero[Result] =
-    Zero.instance[Result](TooManyRequests("Too many requests, try again later."))
+    Zero[Result](TooManyRequests("Too many requests, try again later."))
 
   private[controllers] def HasherRateLimit =
     PasswordHasher.rateLimit[Result](enforce = env.net.rateLimit) _

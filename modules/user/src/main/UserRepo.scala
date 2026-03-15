@@ -24,7 +24,7 @@ final class UserRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionCont
   def topNbGame(nb: Int): Fu[List[User]] =
     coll.find(enabledNoBotSelect ++ notLame).sort($sort desc "count.game").cursor[User]().list(nb)
 
-  def byId(id: ID): Fu[Option[User]] = User.noGhost(id) ?? coll.byId[User](id)
+  def byId(id: ID): Fu[Option[User]] = User.noGhost(id) so coll.byId[User](id)
 
   def byIds(ids: Iterable[ID]): Fu[List[User]] = coll.byIds[User](ids)
 
@@ -60,8 +60,8 @@ final class UserRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionCont
 
   def pair(x: Option[ID], y: Option[ID]): Fu[(Option[User], Option[User])] =
     coll.byIds[User](List(x, y).flatten) map { users =>
-      x.??(xx => users.find(_.id == xx)) ->
-        y.??(yy => users.find(_.id == yy))
+      x.so(xx => users.find(_.id == xx)) ->
+        y.so(yy => users.find(_.id == yy))
     }
 
   def pair(x: ID, y: ID): Fu[Option[(User, User)]] =
@@ -89,16 +89,16 @@ final class UserRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionCont
     coll.list[User](enabledSelect ++ $inIds(ids), ReadPreference.secondaryPreferred)
 
   def enabledById(id: ID): Fu[Option[User]] =
-    User.noGhost(id) ?? coll.one[User](enabledSelect ++ $id(id))
+    User.noGhost(id) so coll.one[User](enabledSelect ++ $id(id))
 
   def isEnabled(id: ID): Fu[Boolean] =
-    User.noGhost(id) ?? coll.exists(enabledSelect ++ $id(id))
+    User.noGhost(id) so coll.exists(enabledSelect ++ $id(id))
 
   def disabledById(id: ID): Fu[Option[User]] =
-    User.noGhost(id) ?? coll.one[User](disabledSelect ++ $id(id))
+    User.noGhost(id) so coll.one[User](disabledSelect ++ $id(id))
 
   def named(username: String): Fu[Option[User]] =
-    User.noGhost(username) ?? coll.byId[User](normalize(username)).recover {
+    User.noGhost(username) so coll.byId[User](normalize(username)).recover {
       case _: reactivemongo.api.bson.exceptions.BSONValueNotFoundException => none // probably GDPRed user
     }
 
@@ -191,7 +191,7 @@ final class UserRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionCont
     coll
       .update(ordered = false, WriteConcern.Unacknowledged)
       .one(
-        $id(userId) ++ (value < 0).??($doc(F.playerIndexIt $gt -3)),
+        $id(userId) ++ (value < 0).so($doc(F.playerIndexIt $gt -3)),
         $inc(F.playerIndexIt -> value)
       )
       .unit
@@ -210,7 +210,7 @@ final class UserRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionCont
         )
       }
     }
-    diff.nonEmpty ?? coll.update
+    diff.nonEmpty so coll.update
       .one(
         $id(user.id),
         $doc("$set" -> $doc(diff: _*))
@@ -353,7 +353,7 @@ final class UserRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionCont
       lang: Option[String] = None
   ): Fu[Option[User]] =
     !nameExists(username) flatMap {
-      _ ?? {
+      _ so {
         val doc = newUser(username, passwordHash, email, blind, mobileApiVersion, mustConfirmEmail, lang) ++
           ("len" -> BSONInteger(username.length))
         coll.insert.one(doc) >> named(normalize(username))
@@ -375,7 +375,7 @@ final class UserRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionCont
     userIdsLikeFilter(text, $doc(F.roles -> role), max)
 
   private[user] def userIdsLikeFilter(text: String, filter: Bdoc, max: Int): Fu[List[User.ID]] =
-    User.couldBeUsername(text) ?? {
+    User.couldBeUsername(text) so {
       coll
         .find(
           $doc(F.id $startsWith normalize(text)) ++ enabledSelect ++ filter,
@@ -469,7 +469,7 @@ final class UserRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionCont
         }
       )
       .void
-  } >>- lila.common.Bus.publish(lila.hub.actorApi.user.ChangeEmail(id, email), "email")
+  }.andDo(lila.common.Bus.publish(lila.hub.actorApi.user.ChangeEmail(id, email), "email"))
 
   private def anyEmail(doc: Bdoc): Option[EmailAddress] =
     doc.getAsOpt[EmailAddress](F.verbatimEmail) orElse doc.getAsOpt[EmailAddress](F.email)
@@ -481,13 +481,13 @@ final class UserRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionCont
     coll
       .find($id(id), $doc(F.email -> true, F.verbatimEmail -> true).some)
       .one[Bdoc]
-      .map { _ ?? anyEmail }
+      .map { _ so anyEmail }
 
   def emailOrPrevious(id: ID): Fu[Option[EmailAddress]] =
     coll
       .find($id(id), $doc(F.email -> true, F.verbatimEmail -> true, F.prevEmail -> true).some)
       .one[Bdoc]
-      .map { _ ?? anyEmailOrPrevious }
+      .map { _ so anyEmailOrPrevious }
 
   def enabledWithEmail(email: NormalizedEmailAddress): Fu[Option[(User, EmailAddress)]] =
     coll
@@ -508,14 +508,14 @@ final class UserRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionCont
       .find($id(id), $doc(F.email -> true, F.verbatimEmail -> true, F.prevEmail -> true).some)
       .one[Bdoc]
       .map {
-        _ ?? { doc =>
+        _ so { doc =>
           anyEmail(doc) orElse doc.getAsOpt[EmailAddress](F.prevEmail)
         }
       }
 
   def withEmails(name: String): Fu[Option[User.WithEmails]] =
     coll.find($id(normalize(name))).one[Bdoc].map {
-      _ ?? { doc =>
+      _ so { doc =>
         User
           .WithEmails(
             userBSONHandler read doc,
@@ -658,7 +658,7 @@ final class UserRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionCont
   def setEmailConfirmed(id: User.ID): Fu[Option[EmailAddress]] =
     coll.update.one($id(id) ++ $doc(F.mustConfirmEmail $exists true), $unset(F.mustConfirmEmail)) flatMap {
       res =>
-        (res.nModified == 1) ?? email(id)
+        (res.nModified == 1) so email(id)
     }
 
   def speaker(id: User.ID): Fu[Option[User.Speaker]] = {
@@ -678,7 +678,7 @@ final class UserRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionCont
   }
 
   def isErased(user: User): Fu[User.Erased] =
-    user.disabled ?? {
+    user.disabled so {
       coll.exists($id(user.id) ++ $doc(F.erasedAt $exists true))
     } map User.Erased.apply
 
@@ -723,7 +723,7 @@ final class UserRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionCont
       F.playTime              -> User.PlayTime(0, 0),
       F.lang                  -> lang
     ) ++ {
-      (email.value != normalizedEmail.value) ?? $doc(F.verbatimEmail -> email)
+      (email.value != normalizedEmail.value) so $doc(F.verbatimEmail -> email)
     } ++ {
       if (blind) $doc(F.blind -> true) else $empty
     }

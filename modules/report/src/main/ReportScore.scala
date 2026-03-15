@@ -22,13 +22,13 @@ final private class ReportScore(
     val baseScore = 20
 
     def accuracyScore(a: Option[Accuracy]): Double =
-      a ?? { accuracy =>
+      a so { accuracy =>
         (accuracy.value - 50) * 0.8d
       }
 
-    def reporterScore(r: Reporter) = r.user.lameOrTroll ?? -30d
+    def reporterScore(r: Reporter) = r.user.lameOrTroll so -30d
 
-    def autoScore(candidate: Report.Candidate) = candidate.isAutomatic ?? 25d
+    def autoScore(candidate: Report.Candidate) = candidate.isAutomatic so 25d
 
     // https://github.com/ornicar/lila/issues/4093
     // https://github.com/ornicar/lila/issues/4587

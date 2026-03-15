@@ -1,6 +1,6 @@
 package lila.setup
 
-import akka.stream.scaladsl._
+import org.apache.pekko.stream.scaladsl._
 import org.joda.time.DateTime
 import play.api.data._
 import play.api.data.Forms._
@@ -198,7 +198,7 @@ final class SetupBulkApi(oauthServer: OAuthServer, idGenerator: IdGenerator)(imp
               .toList
             val nbGames = pairs.size
             rateLimit[Fu[Result]](me.id, cost = nbGames) {
-              lila.mon.api.challenge.bulk.scheduleNb(me.id).increment(nbGames).unit
+              val _ = lila.mon.api.challenge.bulk.scheduleNb(me.id).increment(nbGames)
               idGenerator
                 .games(nbGames)
                 .map {

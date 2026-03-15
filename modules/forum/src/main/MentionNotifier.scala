@@ -19,7 +19,7 @@ final class MentionNotifier(
   private val forbidden = Set("playstrategy")
 
   def notifyMentionedUsers(post: Post, topic: Topic): Funit =
-    post.userId.ifFalse(post.troll) ?? { author =>
+    post.userId.ifFalse(post.troll) so { author =>
       filterValidUsers(extractMentionedUsers(post), author) flatMap { validUsers =>
         val mentionedBy   = MentionedInThread.MentionedBy(author)
         val notifications = validUsers.map(createMentionNotification(post, topic, _, mentionedBy))
@@ -65,7 +65,7 @@ final class MentionNotifier(
   }
 
   private def extractMentionedUsers(post: Post): Set[User.ID] =
-    post.text.contains('@') ?? {
+    post.text.contains('@') so {
       val m = lila.common.String.atUsernameRegex.findAllMatchIn(post.text)
       (post.author foldLeft m.map(_ group 1).map(User.normalize).toSet) { _ - _ }
     }

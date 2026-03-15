@@ -22,7 +22,7 @@ final class FishnetApi(
     config: FishnetApi.Config
 )(implicit
     ec: scala.concurrent.ExecutionContext,
-    scheduler: akka.actor.Scheduler
+    scheduler: org.apache.pekko.actor.Scheduler
 ) {
 
   import FishnetApi._
@@ -59,9 +59,9 @@ final class FishnetApi(
       analysisColl
         .find(
           $doc("acquired" $exists false) ++ {
-            !client.offline ?? $doc("lastTryByKey" $ne client.key) // client alternation
+            !client.offline so $doc("lastTryByKey" $ne client.key) // client alternation
           } ++ {
-            slow ?? $doc("sender.system" -> true)
+            slow so $doc("sender.system" -> true)
           }
         )
         .sort(
@@ -72,7 +72,7 @@ final class FishnetApi(
         )
         .one[Work.Analysis]
         .flatMap {
-          _ ?? { work =>
+          _ so { work =>
             repo.updateAnalysis(work assignTo client) inject work.some
           }
         }
@@ -140,7 +140,7 @@ final class FishnetApi(
   def abort(workId: Work.Id, client: Client): Funit =
     workQueue {
       repo.getAnalysis(workId).map(_.filter(_ isAcquiredBy client)) flatMap {
-        _ ?? { work =>
+        _ so { work =>
           Monitor.abort(client)
           repo.updateAnalysis(work.abort)
         }

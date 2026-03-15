@@ -22,11 +22,11 @@ final class CoordinateApi(scoreColl: Coll)(implicit ec: scala.concurrent.Executi
         $push(
           $doc(
             "p1" -> BSONDocument(
-              "$each"  -> (p1 ?? List(BSONInteger(hits))),
+              "$each"  -> (p1 so List(BSONInteger(hits))),
               "$slice" -> -20
             ),
             "p2" -> BSONDocument(
-              "$each"  -> (!p1 ?? List(BSONInteger(hits))),
+              "$each"  -> (!p1 so List(BSONInteger(hits))),
               "$slice" -> -20
             )
           )

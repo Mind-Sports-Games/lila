@@ -33,7 +33,7 @@ object history {
               pager.currentPageResults map renderSession,
               pagerNext(
                 pager,
-                np => s"${routes.Puzzle.history(variant.key, np).url}${!ctx.is(user) ?? s"&u=${user.id}"}"
+                np => s"${routes.Puzzle.history(variant.key, np).url}${!ctx.is(user) so s"&u=${user.id}"}"
               )
             )
           )

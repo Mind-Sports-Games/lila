@@ -1,6 +1,6 @@
 package lila.hub
 
-import akka.actor._
+import org.apache.pekko.actor._
 import scala.concurrent.duration._
 import scala.concurrent.ExecutionContext
 
@@ -20,12 +20,13 @@ final class LateMultiThrottler(
   def receive: Receive = {
 
     case Work(id, run, delayOption, timeoutOption) if !executions.contains(id) =>
+      given Executor = context.dispatcher
       implicit val scheduler = context.system.scheduler
-      lila.common.Future.delay(delayOption | 0.seconds) {
+      lila.common.LilaFuture.delay(delayOption | 0.seconds) {
         timeoutOption.orElse(executionTimeout).fold(run()) { timeout =>
           run().withTimeout(
             duration = timeout,
-            error = lila.base.LilaException(s"LateMultiThrottler timed out after $timeout")
+            error = s"LateMultiThrottler timed out after $timeout"
           )
         } addEffectAnyway {
           self ! Done(id)
@@ -47,7 +48,7 @@ object LateMultiThrottler {
   def apply(
       executionTimeout: Option[FiniteDuration] = None,
       logger: lila.log.Logger
-  )(implicit ec: ExecutionContext, system: akka.actor.ActorSystem, bscheduler: akka.actor.Scheduler) =
+  )(implicit ec: ExecutionContext, system: ActorSystem, bscheduler: Scheduler) =
     system.actorOf(Props(new LateMultiThrottler(executionTimeout, logger)))
 
   case class Work(

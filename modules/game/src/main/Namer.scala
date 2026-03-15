@@ -12,7 +12,7 @@ object Namer {
   def playerText(player: Player, withRating: Boolean = false)(implicit
       lightUser: LightUser.Getter
   ): Fu[String] =
-    player.userId.??(lightUser) dmap {
+    player.userId.so(lightUser) dmap {
       playerTextUser(player, _, withRating)
     }
 
@@ -33,8 +33,8 @@ object Namer {
     s"${playerTextBlocking(game.p1Player, withRatings)} - ${playerTextBlocking(game.p2Player, withRatings)}"
 
   def gameVsText(game: Game, withRatings: Boolean = false)(implicit lightUser: LightUser.Getter): Fu[String] =
-    game.p1Player.userId.??(lightUser) zip
-      game.p2Player.userId.??(lightUser) dmap { case (wu, bu) =>
+    game.p1Player.userId.so(lightUser) zip
+      game.p2Player.userId.so(lightUser) dmap { case (wu, bu) =>
         s"${playerTextUser(game.p1Player, wu, withRatings)} - ${playerTextUser(game.p2Player, bu, withRatings)}"
       }
 

@@ -1,55 +1,35 @@
 package lila.common
 
-import scalatags.Text.all._
+import scalatags.Text.all.*
 
-import org.specs2.mutable.Specification
+import lila.common.config.NetDomain
 
-class StringTest extends Specification {
+class StringTest extends munit.FunSuite:
 
-  "slugify" should {
-    "be safe in html" in {
-      String.slugify("hello \" world") must not contain "\""
-      String.slugify("<<<") must not contain "<"
-    }
-  }
+  given NetDomain = NetDomain("lichess.org")
 
-  "richText" should {
-    "handle nl" in {
-      val url = "http://imgur.com/gallery/pMtTE"
-      String.html.richText(s"link to $url here\n") must_== raw {
-        s"""link to <a rel="nofollow noopener noreferrer" href="$url" target="_blank">$url</a> here<br>"""
-      }
+  test("richText handle nl"):
+    val url = "http://imgur.com/gallery/pMtTE"
+    assertEquals(
+      String.html.richText(s"link to $url here\n"),
+      raw:
+        s"""link to <a rel="nofollow noreferrer" href="$url" target="_blank">$url</a> here<br>"""
+    )
 
-      String.html.richText(s"link\n", false) must_== raw("link\n")
-    }
+    assertEquals(String.html.richText(s"link\n", false), raw("link\n"))
 
-    "escape chars" in {
-      String.html.richText(s"&") must_== raw("&amp;")
-    }
+  test("richText escape chars"):
+    assertEquals(String.html.richText(s"&"), raw("&amp;"))
 
-    "keep trailing dash on url" in {
-      // We use trailing dashes (-) in our own URL slugs. Always consider them
-      // to be part of the URL.
-      String.html.richText("a https://example.com/foo--. b") must_== raw {
-        """a <a rel="nofollow noopener noreferrer" href="https://example.com/foo--" target="_blank">example.com/foo--</a>. b"""
-      }
-    }
+  test("richText keep trailing dash on url"):
+    // We use trailing dashes (-) >> our own URL slugs. Always consider them
+    // to be part of the URL.
+    assertEquals(
+      String.html.richText("a https://example.com/foo--. b"),
+      raw:
+        """a <a rel="nofollow noreferrer" href="https://example.com/foo--" target="_blank">example.com/foo--</a>. b"""
+    )
 
-    "prize regex" should {
-      "not find btc in url" in {
-        String.looksLikePrize(s"HqVrbTcy") must beFalse
-        String.looksLikePrize(s"10btc") must beTrue
-        String.looksLikePrize(s"ten btc") must beTrue
-      }
-    }
-  }
-
-  "remove garbage chars" should {
-    val rms = String.removeMultibyteSymbols _
-    "remove multibyte garbage" in {
-      rms(
-        """🚌🚎🚐🚑🚒🚓🚕🚗🚙🚚🚛🚜🚲🛴🛵🛺🦼🦽 with new and better !pizzes on lichess.org"""
-      ) must_== " with new and better !pizzes on lichess.org"
-    }
-  }
-}
+  test("noShouting"):
+    assertEquals(String.noShouting("HELLO SIR"), "hello sir")
+    assertEquals(String.noShouting("1. Nf3 O-O-O#"), "1. Nf3 O-O-O#")

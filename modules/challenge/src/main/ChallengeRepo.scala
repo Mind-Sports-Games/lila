@@ -25,10 +25,10 @@ final private class ChallengeRepo(colls: ChallengeColls, maxPerUser: Max)(implic
   def exists(id: Challenge.ID) = coll.countSel($id(id)).dmap(0 <)
 
   def insert(c: Challenge): Funit =
-    coll.insert.one(c) >> c.challengerUser.?? { challenger =>
+    coll.insert.one(c) >> c.challengerUser.so { challenger =>
       createdByChallengerId(challenger.id).flatMap {
         case challenges if challenges.sizeIs <= maxPerUser.value => funit
-        case challenges                                          => challenges.drop(maxPerUser.value).map(_.id).map(remove).sequenceFu.void
+        case challenges                                          => Future.sequence(challenges.drop(maxPerUser.value).map(_.id).map(remove)).void
       }
     }
 
@@ -52,7 +52,7 @@ final private class ChallengeRepo(colls: ChallengeColls, maxPerUser: Max)(implic
     coll.update
       .one(
         $id(c.id),
-        $set($doc("challenger" -> c.challenger) ++ playerIndex.?? { c =>
+        $set($doc("challenger" -> c.challenger) ++ playerIndex.so { c =>
           $doc("playerIndexChoice" -> Challenge.PlayerIndexChoice(c), "finalPlayerIndex" -> c)
         })
       )
@@ -116,7 +116,7 @@ final private class ChallengeRepo(colls: ChallengeColls, maxPerUser: Max)(implic
   def cancel(challenge: Challenge)  = setStatus(challenge, Status.Canceled, Some(_ plusHours 3))
   def decline(challenge: Challenge, reason: Challenge.DeclineReason) =
     setStatus(challenge, Status.Declined, Some(_ plusHours 3)) >> {
-      (reason != Challenge.DeclineReason.default) ??
+      (reason != Challenge.DeclineReason.default) so
         coll.updateField($id(challenge.id), "declineReason", reason).void
     }
   def accept(challenge: Challenge) = setStatus(challenge, Status.Accepted, Some(_ plusHours 3))

@@ -129,7 +129,7 @@ final class StormSelector(colls: PuzzleColls, cacheApi: CacheApi)(implicit ec: E
     if (nb > 1) {
       val rest = puzzles.toVector drop 1
       lila.common.Maths.mean(rest.map(_.rating)) foreach { r =>
-        lila.mon.storm.selector.rating.record(r.toInt).unit
+        val _ = lila.mon.storm.selector.rating.record(r.toInt)
       }
       (0 to poolSize by 10) foreach { i =>
         val slice = rest drop i take 10

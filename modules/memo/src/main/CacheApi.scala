@@ -1,6 +1,6 @@
 package lila.memo
 
-import akka.actor.ActorSystem
+import org.apache.pekko.actor.ActorSystem
 import com.github.benmanes.caffeine
 import com.github.blemale.scaffeine._
 import play.api.Mode
@@ -99,11 +99,10 @@ object CacheApi {
       name: String,
       cache: caffeine.cache.Cache[_, _]
   )(implicit ec: ExecutionContext, system: ActorSystem): Unit =
-    system.scheduler
+    val _ = system.scheduler
       .scheduleWithFixedDelay(1 minute, 1 minute) { () =>
         lila.mon.caffeineStats(cache, name)
       }
-      .unit
 }
 
 final class BeafedAsync[K, V](val cache: AsyncCache[K, V]) extends AnyVal {

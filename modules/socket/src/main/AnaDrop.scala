@@ -23,7 +23,7 @@ case class AnaDrop(
   private lazy val newGame = Game(lib, variant.some, fen.some).drop(role, pos)
 
   def branch: Validated[String, Branch] =
-    newGame.flatMap { case (game, drop) =>
+    newGame.andThen { case (game, drop) =>
       game.actionStrs.flatten.lastOption toValid "Dropped but no last move!" map { lastAction =>
         val gameRecordNotation =
           if (lib == GameLogic.FairySF() || lib == GameLogic.Go() || lib == GameLogic.Backgammon())
@@ -41,8 +41,8 @@ case class AnaDrop(
           move = Uci.WithSan(lib, uci, gameRecordNotation),
           fen = fen,
           check = game.situation.check,
-          dests = Some(movable ?? game.situation.destinations),
-          opening = Variant.openingSensibleVariants(variant.gameLogic)(variant) ?? FullOpeningDB
+          dests = Some(movable so game.situation.destinations),
+          opening = Variant.openingSensibleVariants(variant.gameLogic)(variant) so FullOpeningDB
             .findByFen(variant.gameLogic, fen),
           dropsByRole = game.situation.dropsByRole,
           pocketData = game.situation.board.pocketData

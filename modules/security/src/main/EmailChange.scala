@@ -46,7 +46,7 @@ ${Mailer.txt.serviceNote}
   // also returns the previous email address
   def confirm(token: String): Fu[Option[(User, Option[EmailAddress])]] =
     tokener read token dmap (_.flatten) flatMap {
-      _ ?? { case TokenPayload(userId, email) =>
+      _ so { case TokenPayload(userId, email) =>
         userRepo.email(userId) flatMap { previous =>
           (userRepo.setEmail(userId, email).nevermind >> userRepo.byId(userId))
             .map2(_ -> previous)
@@ -65,7 +65,7 @@ ${Mailer.txt.serviceNote}
           case _                => none
         }
       def write(a: Option[TokenPayload]) =
-        a ?? { case TokenPayload(userId, EmailAddress(email)) =>
+        a so { case TokenPayload(userId, EmailAddress(email)) =>
           s"$userId$sep$email"
         }
     }
@@ -73,8 +73,8 @@ ${Mailer.txt.serviceNote}
   private val tokener = new StringToken[Option[TokenPayload]](
     secret = tokenerSecret,
     getCurrentValue = p =>
-      p ?? { case TokenPayload(userId, _) =>
-        userRepo email userId dmap (_.??(_.value))
+      p so { case TokenPayload(userId, _) =>
+        userRepo email userId dmap (_.so(_.value))
       }
   )
 }

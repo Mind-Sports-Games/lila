@@ -15,8 +15,8 @@ final private class SwissSocket(
     teamOf: Swiss.Id => Fu[Option[TeamID]]
 )(implicit
     ec: scala.concurrent.ExecutionContext,
-    system: akka.actor.ActorSystem,
-    scheduler: akka.actor.Scheduler,
+    system: org.apache.pekko.actor.ActorSystem,
+    scheduler: org.apache.pekko.actor.Scheduler,
     mode: play.api.Mode
 ) {
 
@@ -43,7 +43,7 @@ final private class SwissSocket(
       roomId => _.Swiss(roomId.value).some,
       localTimeout = Some { (roomId, modId, _) =>
         teamOf(Swiss.Id(roomId.value)) flatMap {
-          _ ?? { teamId =>
+          _ so { teamId =>
             lila.common.Bus.ask[Boolean]("teamIsLeader") { IsLeader(teamId, modId, _) }
           }
         }
@@ -55,5 +55,5 @@ final private class SwissSocket(
 
   remoteSocketApi.subscribe("swiss-in", RP.In.reader)(
     handler orElse remoteSocketApi.baseHandler
-  ) >>- send(P.Out.boot)
+  ).andDo(send(P.Out.boot))
 }

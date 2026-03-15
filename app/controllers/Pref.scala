@@ -62,7 +62,7 @@ final class Pref(env: Env) extends LilaController(env) {
         Ok.withCookies(env.lilaCookie.session("zoom2", (getInt("v") | 185).toString)).fuccess
       } else {
         implicit val req = ctx.body
-        (setters get name) ?? { case (form, fn) =>
+        (setters get name) so { case (form, fn) =>
           FormResult(form) { v =>
             fn(v, ctx) map { cookie =>
               Ok(()).withCookies(cookie)
@@ -130,7 +130,7 @@ final class Pref(env: Env) extends LilaController(env) {
     }
 
   private def save(name: String)(value: String, ctx: Context): Fu[Cookie] =
-    ctx.me ?? {
+    ctx.me so {
       api.setPrefString(_, name, value)
     } inject env.lilaCookie.session(name, value)(ctx.req)
 }

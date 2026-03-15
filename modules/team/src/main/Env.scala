@@ -1,6 +1,6 @@
 package lila.team
 
-import akka.actor._
+import org.apache.pekko.actor._
 import com.softwaremill.macwire._
 
 import lila.common.config._

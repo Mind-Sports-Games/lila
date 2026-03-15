@@ -30,13 +30,13 @@ final class StringToken[A](
     }
 
   def read(token: String): Fu[Option[A]] =
-    (base64 decode token) ?? {
+    (base64 decode token) so {
       _ split separator match {
         case Array(payloadStr, hashed, checksum) =>
           BCrypt.bytesEqualSecure(
             makeHash(signPayload(payloadStr, hashed)).getBytes("utf-8"),
             checksum.getBytes("utf-8")
-          ) ?? {
+          ) so {
             val payload = serializer read payloadStr
             (valueChecker match {
               case ValueChecker.Same      => hashCurrentValue(payload) map (hashed ==)

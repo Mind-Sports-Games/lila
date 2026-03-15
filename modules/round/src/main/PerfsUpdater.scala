@@ -24,8 +24,8 @@ final class PerfsUpdater(
     botFarming(game) flatMap {
       case true => fuccess(none)
       case _ =>
-        PerfPicker.main(game) ?? { mainPerf =>
-          (game.finished && game.updateRatingsOnFinish && !p1.lame && !p2.lame) ?? {
+        PerfPicker.main(game) so { mainPerf =>
+          (game.finished && game.updateRatingsOnFinish && !p1.lame && !p2.lame) so {
             val ratingsW = mkRatings(p1.perfs)
             val ratingsB = mkRatings(p2.perfs)
             game.ratingVariant match {

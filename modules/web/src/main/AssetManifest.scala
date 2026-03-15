@@ -32,7 +32,7 @@ final class AssetManifest(val environment: Environment, net: NetConfig)(implicit
   def js(key: String): Option[SplitAsset]    = maps.js.get(key)
   def css(key: String): Option[String]       = maps.css.get(key)
   def hashed(path: String): Option[String]   = maps.hashed.get(path)
-  def deps(keys: List[String]): List[String] = keys.flatMap { key => js(key).??(_.imports) }.distinct
+  def deps(keys: List[String]): List[String] = keys.flatMap { key => js(key).so(_.imports) }.distinct
   def lastUpdate: Instant                    = lastModified
 
   def update(): Unit =
@@ -56,7 +56,7 @@ final class AssetManifest(val environment: Environment, net: NetConfig)(implicit
       }
     }
 
-  private val keyRe = """^(?!common\.)(\S+)\.([A-Z0-9]{8})\.(?:js|css)""".r
+  private val keyRe = """^(?!common\.)(\S+)\([A-Z0-9]{8})\(?:js|css)""".r
   private def keyOf(fullName: String): String =
     fullName match {
       case keyRe(k, _) => k

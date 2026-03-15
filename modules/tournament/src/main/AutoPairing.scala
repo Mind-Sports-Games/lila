@@ -61,7 +61,7 @@ final class AutoPairing(
       .withTournamentId(tour.id)
       .withHandicappedTournament(tour.handicapped)
       .start
-    (gameRepo insertDenormalized game) >>- {
+    (gameRepo insertDenormalized game).andDo {
       onStart(game.id)
       duelStore.add(
         tour = tour,

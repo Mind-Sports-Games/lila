@@ -66,10 +66,10 @@ final class ClasProgressApi(
         users zip progresses map { case (u, rating) =>
           val playStat = playStats get u.id
           u.id -> StudentProgress(
-            nb = playStat.??(_.nb),
+            nb = playStat.so(_.nb),
             rating = rating,
-            wins = playStat.??(_.wins),
-            millis = playStat.??(_.millis)
+            wins = playStat.so(_.wins),
+            millis = playStat.so(_.millis)
           )
         } toMap
       )

@@ -1,6 +1,6 @@
 package lila.study
 
-import akka.stream.scaladsl._
+import org.apache.pekko.stream.scaladsl._
 import org.joda.time.DateTime
 import reactivemongo.akkastream.{ cursorProducer, AkkaStreamCursor }
 import reactivemongo.api._
@@ -75,7 +75,7 @@ final class StudyRepo(private[study] val coll: AsyncColl)(implicit
   def sourceByOwner(ownerId: User.ID, isMe: Boolean): Source[Study, _] =
     Source futureSource {
       coll map {
-        _.find(selectOwnerId(ownerId) ++ (!isMe ?? selectPublic))
+        _.find(selectOwnerId(ownerId) ++ (!isMe so selectPublic))
           .sort($sort desc "updatedAt")
           .cursor[Study](readPreference = readPref)
           .documentSource()
@@ -222,7 +222,7 @@ final class StudyRepo(private[study] val coll: AsyncColl)(implicit
     coll(_.exists($id(study.id) ++ selectLiker(user.id)))
 
   def filterLiked(user: User, studyIds: Seq[Study.Id]): Fu[Set[Study.Id]] =
-    studyIds.nonEmpty ??
+    studyIds.nonEmpty so
       coll(_.primitive[Study.Id]($inIds(studyIds) ++ selectLiker(user.id), "_id").dmap(_.toSet))
 
   def resetAllRanks: Fu[Int] =

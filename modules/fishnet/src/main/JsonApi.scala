@@ -11,7 +11,7 @@ import lila.common.{ IpAddress, Maths }
 import lila.fishnet.{ Work => W }
 import lila.tree.Eval.JsonHandlers._
 import lila.tree.Eval.{ Cp, Mate }
-import akka.actor.typed.PostStop
+import org.apache.pekko.actor.typed.PostStop
 
 object JsonApi {
 
@@ -69,7 +69,7 @@ object JsonApi {
         with Result {
 
       def completeOrPartial =
-        if (analysis.headOption.??(_.isDefined)) CompleteAnalysis(fishnet, stockfish, analysis.flatten)
+        if (analysis.headOption.so(_.isDefined)) CompleteAnalysis(fishnet, stockfish, analysis.flatten)
         else PartialAnalysis(fishnet, stockfish, analysis)
     }
 

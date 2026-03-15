@@ -47,7 +47,7 @@ final class AssessApi(
       nb: Int = 100
   ): Fu[Option[PlayerAggregateAssessment]] =
     userRepo byId userId flatMap {
-      _.filter(_.noBot) ?? { user =>
+      _.filter(_.noBot) so { user =>
         getPlayerAssessmentsByUserId(userId, nb) map { games =>
           games.nonEmpty option PlayerAggregateAssessment(user, games)
         }
@@ -68,11 +68,11 @@ final class AssessApi(
       val missing = povs collect {
         case pov if pov.game.metadata.analysed && !existingIds.contains(pov.gameId) => pov.gameId
       }
-      missing.nonEmpty ??
+      missing.nonEmpty so
         analysisRepo.coll
           .idsMap[Analysis, Game.ID](missing)(_.id)
           .flatMap { ans =>
-            povs
+            Future.sequence(povs
               .flatMap { pov =>
                 ans get pov.gameId map { pov -> _ }
               }
@@ -80,8 +80,7 @@ final class AssessApi(
                 gameRepo.holdAlert game pov.game flatMap { holdAlerts =>
                   createPlayerAssessment(PlayerAssessment.make(pov, analysis, holdAlerts(pov.playerIndex)))
                 }
-              }
-              .sequenceFu
+              })
               .void
           }
     }
@@ -114,19 +113,19 @@ final class AssessApi(
       nb: Int = 100
   ): Fu[Option[PlayerAggregateAssessment.WithGames]] =
     getPlayerAggregateAssessment(userId, nb) flatMap {
-      _ ?? { pag =>
+      _ so { pag =>
         withGames(pag) dmap some
       }
     }
 
   def refreshAssessOf(user: User): Funit =
-    !user.isBot ??
+    !user.isBot so
       (gameRepo.gamesForAssessment(user.id, 100) flatMap { gs =>
-        (gs map { g =>
+        Future.sequence(gs map { g =>
           analysisRepo.byGame(g) flatMap {
-            _ ?? { onAnalysisReady(g, _, thenAssessUser = false) }
+            _ so { onAnalysisReady(g, _, thenAssessUser = false) }
           }
-        }).sequenceFu.void
+        }).void
       }) >> assessUser(user.id)
 
   def onAnalysisReady(game: Game, analysis: Analysis, thenAssessUser: Boolean = true): Funit =
@@ -142,19 +141,19 @@ final class AssessApi(
         else if (game.players exists consistentMoveTimes(game)) true
         else if (game.createdAt isBefore bottomDate) false
         else true
-      shouldAssess.?? {
+      shouldAssess.so {
         createPlayerAssessment(PlayerAssessment.make(game pov P1, analysis, holdAlerts.p1)) >>
           createPlayerAssessment(PlayerAssessment.make(game pov P2, analysis, holdAlerts.p2))
       } >> {
-        (shouldAssess && thenAssessUser) ?? {
-          game.p1Player.userId.??(assessUser) >> game.p2Player.userId.??(assessUser)
+        (shouldAssess && thenAssessUser) so {
+          game.p1Player.userId.so(assessUser) >> game.p2Player.userId.so(assessUser)
         }
       }
     }
 
   def assessUser(userId: User.ID): Funit =
     getPlayerAggregateAssessment(userId) flatMap {
-      _ ?? { playerAggregateAssessment =>
+      _ so { playerAggregateAssessment =>
         playerAggregateAssessment.action match {
           case AccountAction.Engine | AccountAction.EngineAndBan =>
             userRepo.getTitle(userId).flatMap {
@@ -191,12 +190,12 @@ final class AssessApi(
       game.playerBlurPercent(player.playerIndex) >= 70
 
     def winnerGreatProgress(player: Player): Boolean =
-      game.winner.has(player) && game.perfType ?? { perfType =>
+      game.winner.has(player) && game.perfType so { perfType =>
         player.playerIndex.fold(p1, p2).perfs(perfType).progress >= 90
       }
 
     def noFastCoefVariation(player: Player): Option[Float] =
-      Statistics.noFastPlies(Pov(game, player)) ?? Statistics.plyTimeCoefVariation(Pov(game, player))
+      Statistics.noFastPlies(Pov(game, player)) so Statistics.plyTimeCoefVariation(Pov(game, player))
 
     def winnerUserOption = game.winnerPlayerIndex.map(_.fold(p1, p2))
     def loserUserOption  = game.winnerPlayerIndex.map(_.fold(p2, p1))
@@ -253,12 +252,12 @@ final class AssessApi(
           // analyse some tourney games
           // else if (game.isTournament) randomPercent(20) option "Tourney random"
           /// analyse new player games
-          else if (winnerNbGames.??(40 >) && randomPercent(75)) NewPlayerWin.some
+          else if (winnerNbGames.so(40 >) && randomPercent(75)) NewPlayerWin.some
           else none
         }
 
     shouldAnalyse map {
-      _ ?? { reason =>
+      _ so { reason =>
         lila.mon.cheat.autoAnalysis(reason.toString).increment()
         fishnet ! lila.hub.actorApi.fishnet.AutoAnalyse(game.id)
       }

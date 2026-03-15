@@ -20,9 +20,9 @@ final class Relation(
   val api = env.relation.api
 
   private def renderActions(userId: String, mini: Boolean)(implicit ctx: Context) =
-    (ctx.userId ?? { api.fetchRelation(_, userId) }) zip
-      (ctx.isAuth ?? { env.pref.api followable userId }) zip
-      (ctx.userId ?? { api.fetchBlocks(userId, _) }) flatMap { case ((relation, followable), blocked) =>
+    (ctx.userId so { api.fetchRelation(_, userId) }) zip
+      (ctx.isAuth so { env.pref.api followable userId }) zip
+      (ctx.userId so { api.fetchBlocks(userId, _) }) flatMap { case ((relation, followable), blocked) =>
         negotiate(
           html = fuccess(Ok {
             if (mini)
@@ -123,7 +123,7 @@ final class Relation(
   private def apiRelation(name: String, direction: Direction) =
     Action.async { implicit req =>
       env.user.repo.named(name) flatMap {
-        _ ?? { user =>
+        _ so { user =>
           apiC.jsonStream {
             env.relation.stream
               .follow(user, direction, MaxPerSecond(20))
@@ -165,12 +165,12 @@ final class Relation(
 
   private def followship(userIds: Seq[String])(implicit ctx: Context): Fu[List[Related]] =
     env.user.repo usersFromSecondary userIds.map(UserModel.normalize) flatMap { users =>
-      (ctx.isAuth ?? { env.pref.api.followableIds(users map (_.id)) }) flatMap { followables =>
-        users.map { u =>
-          ctx.userId ?? { api.fetchRelation(_, u.id) } map { rel =>
+      (ctx.isAuth so { env.pref.api.followableIds(users map (_.id)) }) flatMap { followables =>
+        Future.sequence(users.map { u =>
+          ctx.userId so { api.fetchRelation(_, u.id) } map { rel =>
             lila.relation.Related(u, none, followables(u.id), rel)
           }
-        }.sequenceFu
+        })
       }
     }
 }

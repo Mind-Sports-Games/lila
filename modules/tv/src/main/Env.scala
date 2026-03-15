@@ -1,6 +1,6 @@
 package lila.tv
 
-import akka.actor.ActorSystem
+import org.apache.pekko.actor.ActorSystem
 import com.softwaremill.macwire._
 import scala.concurrent.duration._
 

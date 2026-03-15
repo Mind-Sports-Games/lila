@@ -16,32 +16,31 @@ final class ActivityWriteApi(
   import model._
 
   def game(game: Game): Funit =
-    game.userIds
+    Future.sequence(game.userIds
       .flatMap { userId =>
         for {
           pt     <- game.perfType
           player <- game playerByUserId userId
         } yield for {
           a <- getOrCreate(userId)
-          setGames = !game.isCorrespondence ?? $doc(
+          setGames = !game.isCorrespondence so $doc(
             ActivityFields.games -> a.games.orDefault
               .add(pt, Score.make(game wonBy player.playerIndex, RatingProg make player))
           )
-          setCorres = game.hasCorrespondenceClock ?? $doc(
+          setCorres = game.hasCorrespondenceClock so $doc(
             ActivityFields.corres -> a.corres.orDefault.add(GameId(game.id), moved = false, ended = true)
           )
           setters = setGames ++ setCorres
           _ <-
-            (!setters.isEmpty) ?? coll.update
+            (!setters.isEmpty) so coll.update
               .one($id(a.id), $set(setters), upsert = true)
               .void
         } yield ()
-      }
-      .sequenceFu
+      })
       .void
 
   def forumPost(post: lila.forum.Post): Funit =
-    post.userId.filter(User.playstrategyId !=) ?? { userId =>
+    post.userId.filter(User.playstrategyId !=) so { userId =>
       getOrCreate(userId) flatMap { a =>
         coll.update
           .one(
@@ -113,7 +112,7 @@ final class ActivityWriteApi(
 
   def simul(simul: lila.simul.Simul) =
     simulParticipant(simul, simul.hostId) >>
-      simul.pairings.map(_.player.user).map { simulParticipant(simul, _) }.sequenceFu.void
+      Future.sequence(simul.pairings.map(_.player.user).map { simulParticipant(simul, _) }).void
 
   def corresMove(gameId: Game.ID, userId: User.ID) =
     update(userId) { a =>
@@ -139,23 +138,22 @@ final class ActivityWriteApi(
       regexId(from.id)
     ) flatMap { extra =>
       val all = following ++ extra
-      all.nonEmpty.?? {
+      all.nonEmpty.so {
         logger.info(s"${from.id} unfollow ${all.size} users")
-        all
+        Future.sequence(all.toSeq
           .map { userId =>
             coll.update.one(
               regexId(userId) ++ $doc("f.i.ids" -> from.id),
               $pull("f.i.ids" -> from.id)
             )
-          }
-          .sequenceFu
+          })
           .void
       }
     }
 
   def study(id: Study.Id) =
     studyApi byId id flatMap {
-      _.filter(_.isPublic) ?? { s =>
+      _.filter(_.isPublic) so { s =>
         update(s.ownerId) { a =>
           a.copy(studies = Some(~a.studies + s.id)).some
         }
@@ -171,9 +169,9 @@ final class ActivityWriteApi(
     update(userId) { _.copy(stream = true).some }
 
   def swiss(id: lila.swiss.Swiss.Id, ranking: lila.swiss.Ranking) =
-    ranking.map { case (userId, rank) =>
+    Future.sequence(ranking.map { case (userId, rank) =>
       update(userId) { a => a.copy(swisses = Some(~a.swisses + SwissRank(id, rank))).some }
-    }.sequenceFu
+    }.toSeq)
 
   private def simulParticipant(simul: lila.simul.Simul, userId: String) =
     update(userId) { a =>
@@ -185,6 +183,6 @@ final class ActivityWriteApi(
   private def save(activity: Activity)     = coll.update.one($id(activity.id), activity, upsert = true).void
   private def update(userId: User.ID)(f: Activity => Option[Activity]): Funit =
     getOrCreate(userId) flatMap { old =>
-      f(old) ?? save
+      f(old) so save
     }
 }

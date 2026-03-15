@@ -3,17 +3,43 @@ package lila.common
 import strategygames.format.FEN
 import strategygames.format.Forsyth
 import strategygames.GameLogic
-import io.lemonlabs.uri._
+import io.lemonlabs.uri.*
 import org.joda.time.{ DateTime, DateTimeZone }
-import play.api.data.format.Formats._
-import play.api.data.format.{ Formatter, JodaFormats }
-import play.api.data.Forms._
-import play.api.data.JodaForms._
+import org.joda.time.format.DateTimeFormat
+import play.api.data.format.Formats.*
+import play.api.data.format.Formatter
+import play.api.data.Forms.*
 import play.api.data.validation.{ Constraint, Constraints }
 import play.api.data.{ Field, FormError, Mapping }
 import scala.util.Try
 
 import lila.common.base.StringUtils
+
+// Joda formatters - Play 3 removed JodaForms, so we provide our own
+object JodaForms {
+  def jodaDate(pattern: String, timeZone: DateTimeZone = DateTimeZone.getDefault): Mapping[DateTime] =
+    of[DateTime](using jodaDateTimeFormat(pattern, timeZone))
+
+  def jodaDateTimeFormat(
+      pattern: String,
+      timeZone: DateTimeZone = DateTimeZone.getDefault
+  ): Formatter[DateTime] =
+    new Formatter[DateTime] {
+      val formatter                                    = DateTimeFormat.forPattern(pattern).withZone(timeZone)
+      def bind(key: String, data: Map[String, String]) =
+        data
+          .get(key)
+          .filter(_.nonEmpty)
+          .map { value =>
+            Try(formatter.parseDateTime(value)).toEither.left.map(_ => Seq(FormError(key, "error.date", Nil)))
+          }
+          .getOrElse(Left(Seq(FormError(key, "error.required", Nil))))
+      def unbind(key: String, value: DateTime) =
+        Map(key -> formatter.print(value))
+    }
+}
+
+import JodaForms.*
 
 object Form {
 
@@ -55,10 +81,10 @@ object Form {
     number.verifying(mustBeOneOf(choices.map(_._1)), hasKey(choices, _))
 
   def numberIn(choices: Set[Int]) =
-    number.verifying(mustBeOneOf(choices), choices.contains _)
+    number.verifying(mustBeOneOf(choices), choices.contains)
 
   def numberIn(choices: Seq[Int]) =
-    number.verifying(mustBeOneOf(choices), choices.contains _)
+    number.verifying(mustBeOneOf(choices), choices.contains)
 
   def numberInDouble(choices: Options[Double]) =
     of[Double].verifying(mustBeOneOf(choices.map(_._1)), hasKey(choices, _))
@@ -76,7 +102,7 @@ object Form {
     def unbind(key: String, value: String) = Map(key -> StringUtils.removeGarbageChars(value.trim))
   }
 
-  val cleanText: Mapping[String] = of(cleanTextFormatter)
+  val cleanText: Mapping[String] = of(using cleanTextFormatter)
   def cleanText(minLength: Int = 0, maxLength: Int = Int.MaxValue): Mapping[String] =
     (minLength, maxLength) match {
       case (min, Int.MaxValue) => cleanText.verifying(Constraints.minLength(min))
@@ -102,9 +128,9 @@ object Form {
     text.verifying(mustBeOneOf(choices.map(_._1)), hasKey(choices, _))
 
   def stringIn(choices: Set[String]) =
-    text.verifying(mustBeOneOf(choices), choices.contains _)
+    text.verifying(mustBeOneOf(choices), choices.contains)
 
-  def tolerantBoolean = of[Boolean](formatter.tolerantBooleanFormatter)
+  def tolerantBoolean = of[Boolean](using formatter.tolerantBooleanFormatter)
 
   def hasKey[A](choices: Options[A], key: A) =
     choices.map(_._1).toList contains key
@@ -112,9 +138,9 @@ object Form {
   def trueish(v: Any) = v == 1 || v == "1" || v == "true" || v == "on" || v == "yes"
 
   private def pluralize(pattern: String, nb: Int) =
-    pattern.replace("{s}", if (nb == 1) "" else "s")
+    pattern.replace("{s}", if nb == 1 then "" else "s")
 
-  def absoluteUrl = of[AbsoluteUrl](formatter.absoluteUrlFormatter)
+  def absoluteUrl = of[AbsoluteUrl](using formatter.absoluteUrlFormatter)
 
   object formatter {
     def stringFormatter[A](from: A => String, to: String => A): Formatter[A] =
@@ -128,7 +154,7 @@ object Form {
         def unbind(key: String, value: A)                = intFormat.unbind(key, from(value))
       }
     val tolerantBooleanFormatter: Formatter[Boolean] = new Formatter[Boolean] {
-      override val format = Some(("format.boolean", Nil))
+      override val format                              = Some(("format.boolean", Nil))
       def bind(key: String, data: Map[String, String]) =
         Right(data.getOrElse(key, "false")).flatMap { v =>
           Right(trueish(v))
@@ -136,7 +162,7 @@ object Form {
       def unbind(key: String, value: Boolean) = Map(key -> value.toString)
     }
     val absoluteUrlFormatter: Formatter[AbsoluteUrl] = new Formatter[AbsoluteUrl] {
-      override val format = Some(("format.url", Nil))
+      override val format                              = Some(("format.url", Nil))
       def bind(key: String, data: Map[String, String]) =
         data
           .get(key)
@@ -144,32 +170,34 @@ object Form {
           .toRight("error.required")
           .flatMap(str => AbsoluteUrl.parseTry(str).toEither.left.map(_.getMessage))
           .left
-          .map(err => (Seq(FormError(key, err.toString, Nil))))
+          .map(err => Seq(FormError(key, err.toString, Nil)))
       def unbind(key: String, value: AbsoluteUrl) = Map(key -> value.toString)
     }
   }
 
   object constraint {
-    import play.api.data.{ validation => V }
+    import play.api.data.validation as V
     def minLength[A](from: A => String)(length: Int): Constraint[A] =
       Constraint[A]("constraint.minLength", length) { o =>
-        if (from(o).lengthIs >= length) V.Valid else V.Invalid(V.ValidationError("error.minLength", length))
+        if from(o).lengthIs >= length then V.Valid
+        else V.Invalid(V.ValidationError("error.minLength", length))
       }
     def maxLength[A](from: A => String)(length: Int): Constraint[A] =
       Constraint[A]("constraint.maxLength", length) { o =>
-        if (from(o).lengthIs <= length) V.Valid else V.Invalid(V.ValidationError("error.maxLength", length))
+        if from(o).lengthIs <= length then V.Valid
+        else V.Invalid(V.ValidationError("error.maxLength", length))
       }
   }
 
   object fen {
     implicit private val fenFormat: Formatter[FEN] =
       formatter.stringFormatter[FEN](_.value, fen => FEN.apply(GameLogic.Chess(), fen))
-    val playableStrict = playable(strict = true)
-    def playable(strict: Boolean) = of[FEN](fenFormat)
+    val playableStrict            = playable(strict = true)
+    def playable(strict: Boolean) = of[FEN](using fenFormat)
       .transform[FEN](f => FEN(GameLogic.Chess(), f.value.trim), identity)
       .verifying(
         "Invalid position",
-        fen => (Forsyth.<<<(GameLogic.Chess(), fen)).exists(_.situation playable strict)
+        fen => Forsyth.<<<(GameLogic.Chess(), fen).exists(_.situation.playable(strict))
       )
   }
 
@@ -182,25 +210,25 @@ object Form {
   object UTCDate {
     val dateTimePattern                              = "yyyy-MM-dd HH:mm"
     val utcDate                                      = jodaDate(dateTimePattern, DateTimeZone.UTC)
-    implicit val dateTimeFormat: Formatter[DateTime] = JodaFormats.jodaDateTimeFormat(dateTimePattern)
+    implicit val dateTimeFormat: Formatter[DateTime] = JodaForms.jodaDateTimeFormat(dateTimePattern)
   }
   object ISODateTime {
-    val dateTimePattern                              = "yyyy-MM-dd'T'HH:mm:ss.SSSZ"
-    val formatter                                    = JodaFormats.jodaDateTimeFormat(dateTimePattern, DateTimeZone.UTC)
-    val isoDateTime                                  = jodaDate(dateTimePattern, DateTimeZone.UTC)
-    implicit val dateTimeFormat: Formatter[DateTime] = JodaFormats.jodaDateTimeFormat(dateTimePattern)
+    val dateTimePattern = "yyyy-MM-dd'T'HH:mm:ss.SSSZ"
+    val formatter       = JodaForms.jodaDateTimeFormat(dateTimePattern, DateTimeZone.UTC)
+    val isoDateTime     = jodaDate(dateTimePattern, DateTimeZone.UTC)
+    implicit val dateTimeFormat: Formatter[DateTime] = JodaForms.jodaDateTimeFormat(dateTimePattern)
   }
   object ISODate {
     val datePattern                              = "yyyy-MM-dd"
-    val formatter                                = JodaFormats.jodaDateTimeFormat(datePattern, DateTimeZone.UTC)
+    val formatter                                = JodaForms.jodaDateTimeFormat(datePattern, DateTimeZone.UTC)
     val isoDateTime                              = jodaDate(datePattern, DateTimeZone.UTC)
-    implicit val dateFormat: Formatter[DateTime] = JodaFormats.jodaDateTimeFormat(datePattern)
+    implicit val dateFormat: Formatter[DateTime] = JodaForms.jodaDateTimeFormat(datePattern)
   }
   object Timestamp {
     val formatter = new Formatter[org.joda.time.DateTime] {
       def bind(key: String, data: Map[String, String]) =
         for {
-          str <- stringFormat.bind(key, data)
+          str  <- stringFormat.bind(key, data)
           long <- Try(java.lang.Long.parseLong(str)).toEither.left.map(_ =>
             Seq(FormError(key, "Invalid number format", Nil))
           )
@@ -211,7 +239,7 @@ object Form {
       def unbind(key: String, value: org.joda.time.DateTime): Map[String, String] =
         stringFormat.unbind(key, value.getMillis.toString)
     }
-    val timestamp = of[org.joda.time.DateTime](formatter)
+    val timestamp = of[org.joda.time.DateTime](using formatter)
   }
   object ISODateOrTimestamp {
     val formatter = new Formatter[org.joda.time.DateTime] {
@@ -219,7 +247,7 @@ object Form {
         ISODate.formatter.bind(key, data) orElse Timestamp.formatter.bind(key, data)
       def unbind(key: String, value: org.joda.time.DateTime) = ISODate.formatter.unbind(key, value)
     }
-    val isoDateOrTimestamp = of[org.joda.time.DateTime](formatter)
+    val isoDateOrTimestamp = of[org.joda.time.DateTime](using formatter)
   }
   object ISODateTimeOrTimestamp {
     val formatter = new Formatter[org.joda.time.DateTime] {
@@ -227,6 +255,6 @@ object Form {
         ISODateTime.formatter.bind(key, data) orElse Timestamp.formatter.bind(key, data)
       def unbind(key: String, value: org.joda.time.DateTime) = ISODateTime.formatter.unbind(key, value)
     }
-    val isoDateTimeOrTimestamp = of[org.joda.time.DateTime](formatter)
+    val isoDateTimeOrTimestamp = of[org.joda.time.DateTime](using formatter)
   }
 }

@@ -1,6 +1,6 @@
 package lila.mod
 
-import akka.stream.scaladsl._
+import org.apache.pekko.stream.scaladsl._
 import play.api.libs.json._
 
 import lila.common.{ Bus, HTTPRequest }

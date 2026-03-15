@@ -46,7 +46,7 @@ case class AnaMove(
     )
 
   def branch: Validated[String, Branch] =
-    newGame flatMap { case (game, move) =>
+    newGame.andThen { case (game, move) =>
       game.actionStrs.flatten.lastOption toValid "Moved but no last move!" map { lastAction =>
         val gameRecordNotation =
           if (lib == GameLogic.FairySF() || lib == GameLogic.Go() || lib == GameLogic.Backgammon())
@@ -102,14 +102,14 @@ case class AnaMove(
                   .map { case (p, m) => (Pos.Draughts(p), m.map(Pos.Draughts)) }
               movable option draughtsDests
             }
-            case _ => Some(movable ?? game.situation.destinations)
+            case _ => Some(movable so game.situation.destinations)
           },
           destsUci = lib match {
-            case GameLogic.Draughts() => movable ?? truncatedMoves.map(_.values.toList.flatten)
+            case GameLogic.Draughts() => movable so truncatedMoves.map(_.values.toList.flatten)
             case _                    => None
           },
-          captureLength = movable ?? captLen,
-          opening = (game.turnCount <= 30 && Variant.openingSensibleVariants(lib)(variant)) ?? {
+          captureLength = movable so captLen,
+          opening = (game.turnCount <= 30 && Variant.openingSensibleVariants(lib)(variant)) so {
             FullOpeningDB.findByFen(lib, fen)
           },
           drops = if (movable) game.situation.drops else Some(Nil),

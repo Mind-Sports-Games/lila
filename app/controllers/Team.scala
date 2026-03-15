@@ -33,7 +33,7 @@ final class Team(
 
   def home(page: Int) =
     Open { implicit ctx =>
-      ctx.me.??(api.hasTeams) map {
+      ctx.me.so(api.hasTeams) map {
         case true  => Redirect(routes.Team.mine)
         case false => Redirect(routes.Team.all(page))
       }
@@ -61,13 +61,13 @@ final class Team(
       members <- paginator.teamMembers(team, page)
       hasChat = canHaveChat(team, info)
       chat <-
-        hasChat ?? env.chat.api.userChat.cached
+        hasChat so env.chat.api.userChat.cached
           .findMine(lila.chat.Chat.Id(team.id), ctx.me)
           .map(some)
       _ <- env.user.lightUserApi preloadMany {
-        info.userIds ::: chat.??(_.chat.userIds)
+        info.userIds ::: chat.so(_.chat.userIds)
       }
-      version <- hasChat ?? env.team.version(team.id).dmap(some)
+      version <- hasChat so env.team.version(team.id).dmap(some)
     } yield html.team.show(team, members, info, chat, version)
 
   private def canHaveChat(team: TeamModel, info: lila.app.mashup.TeamInfo)(implicit ctx: Context): Boolean =
@@ -85,7 +85,7 @@ final class Team(
 
   private def usersExport(teamId: String, me: Option[lila.user.User], req: RequestHeader) = {
     api teamEnabled teamId flatMap {
-      _ ?? { team =>
+      _ so { team =>
         val canView: Fu[Boolean] =
           if (team.publicMembers) fuccess(true)
           else
@@ -109,7 +109,7 @@ final class Team(
   def tournaments(teamId: String) =
     Open { implicit ctx =>
       api teamEnabled teamId flatMap {
-        _ ?? { team =>
+        _ so { team =>
           env.teamInfo.tournaments(team, 30, 30) map { tours =>
             Ok(html.team.tournaments.page(team, tours))
           }
@@ -151,7 +151,7 @@ final class Team(
     AuthBody { implicit ctx => me =>
       WithOwnedTeamEnabled(id) { team =>
         implicit val req = ctx.body
-        forms.selectMember.bindFromRequest().value ?? { api.kick(team, _, me) } inject Redirect(
+        forms.selectMember.bindFromRequest().value so { api.kick(team, _, me) } inject Redirect(
           routes.Team.kickForm(team.id)
         ).flashSuccess
       }
@@ -159,7 +159,7 @@ final class Team(
   def kickUser(teamId: String, userId: String) =
     Scoped(_.Team.Write) { _ => me =>
       api teamEnabled teamId flatMap {
-        _ ?? { team =>
+        _ so { team =>
           if (team leaders me.id) api.kick(team, userId, me) inject jsonOkResult
           else Forbidden(jsonError("Not your team")).fuccess
         }
@@ -177,7 +177,7 @@ final class Team(
     AuthBody { implicit ctx => me =>
       WithOwnedTeamEnabled(id) { team =>
         implicit val req = ctx.body
-        forms.leaders(team).bindFromRequest().value ?? {
+        forms.leaders(team).bindFromRequest().value so {
           api.setLeaders(team, _, me, isGranted(_.ManageTeam))
         } inject Redirect(
           routes.Team.show(team.id)
@@ -258,7 +258,7 @@ final class Team(
       auth = implicit ctx =>
         me =>
           api.teamEnabled(id) flatMap {
-            _ ?? { team =>
+            _ so { team =>
               api hasJoinedTooManyTeams me flatMap { tooMany =>
                 if (tooMany)
                   negotiate(
@@ -293,7 +293,7 @@ final class Team(
       scoped = implicit req =>
         me =>
           api.team(id) flatMap {
-            _ ?? { team =>
+            _ so { team =>
               implicit val lang = reqLang
               forms
                 .apiRequest(team)
@@ -356,7 +356,7 @@ final class Team(
             setup =>
               if (team.open) webJoin(team, me, request = none, password = setup.password)
               else
-                setup.message ?? { msg =>
+                setup.message so { msg =>
                   api.createRequest(team, me, msg) inject Redirect(routes.Team.show(team.id)).flashSuccess
                 }
           )
@@ -375,7 +375,7 @@ final class Team(
       import cats.implicits._
       OptionFuRedirectUrl(for {
         requestOption <- api request requestId
-        teamOption    <- requestOption.??(req => env.team.teamRepo.byLeader(req.team, me.id))
+        teamOption    <- requestOption.so(req => env.team.teamRepo.byLeader(req.team, me.id))
       } yield (teamOption, requestOption).mapN((_, _))) { case (team, request) =>
         implicit val req = ctx.body
         forms.processRequest
@@ -458,7 +458,7 @@ final class Team(
       scoped = implicit req =>
         me =>
           api teamEnabled id flatMap {
-            _.filter(_ leaders me.id) ?? { team =>
+            _.filter(_ leaders me.id) so { team =>
               doPmAll(team, me).fold(
                 err => BadRequest(errorsAsJson(err)(reqLang)).fuccess,
                 done => done inject jsonOkResult
@@ -484,10 +484,10 @@ final class Team(
     Open { ctx =>
       JsonOptionOk {
         api teamEnabled id flatMap {
-          _ ?? { team =>
+          _ so { team =>
             for {
-              joined    <- ctx.userId.?? { api.belongsTo(id, _) }
-              requested <- ctx.userId.ifFalse(joined).?? { env.team.requestRepo.exists(id, _) }
+              joined    <- ctx.userId.so { api.belongsTo(id, _) }
+              requested <- ctx.userId.ifFalse(joined).so { env.team.requestRepo.exists(id, _) }
             } yield {
               env.team.jsonView.teamWrites.writes(team) ++ Json
                 .obj(
@@ -535,7 +535,7 @@ You received this because you are subscribed to messages of the team $url."""
               env.msg.api
                 .multiPost(Holder(me), env.team.memberStream.subscribedIds(team, MaxPerSecond(50)), full)
                 .addEffect { nb =>
-                  lila.mon.msg.teamBulk(team.id).record(nb).unit
+                  val _ = lila.mon.msg.teamBulk(team.id).record(nb)
                 }
               funit // we don't wait for the stream to complete, it would make playstrategy time out
             }(funit)

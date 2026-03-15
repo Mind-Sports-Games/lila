@@ -38,10 +38,10 @@ object show {
                 c.chat,
                 name = trans.chatRoom.txt(),
                 timeout = c.timeout,
-                writeable = ctx.userId.??(rt.study.canChat),
+                writeable = ctx.userId.so(rt.study.canChat),
                 public = false,
                 resourceId = lila.chat.Chat.ResourceId(s"relay/${c.chat.id}"),
-                localMod = ctx.userId.??(rt.study.canContribute)
+                localMod = ctx.userId.so(rt.study.canContribute)
               )
             ),
             "explorer" -> Json.obj(

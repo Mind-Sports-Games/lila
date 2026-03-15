@@ -17,7 +17,7 @@ final class InsightApi(
   def insightUser(user: User): Fu[InsightUser] =
     insightUserApi find user.id flatMap {
       case Some(u) =>
-        u.lastSeen.isBefore(DateTime.now minusDays 1) ?? {
+        u.lastSeen.isBefore(DateTime.now minusDays 1) so {
           insightUserApi setSeenNow user
         } inject u
       case None =>
@@ -59,17 +59,16 @@ final class InsightApi(
       insightUserApi.remove(userId)
 
   def updateGame(g: Game) =
-    Pov(g)
+    Future.sequence(Pov(g)
       .map { pov =>
-        pov.player.userId ?? { userId =>
+        pov.player.userId so { userId =>
           storage find InsightEntry.povToId(pov) flatMap {
-            _ ?? { old =>
+            _ so { old =>
               indexer.update(g, userId, old)
             }
           }
         }
-      }
-      .sequenceFu
+      })
       .void
 }
 

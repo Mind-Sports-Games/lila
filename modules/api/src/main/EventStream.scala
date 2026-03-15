@@ -1,7 +1,7 @@
 package lila.api
 
-import akka.actor._
-import akka.stream.scaladsl._
+import org.apache.pekko.actor._
+import org.apache.pekko.stream.scaladsl._
 import org.joda.time.DateTime
 import play.api.libs.json._
 import scala.concurrent.duration._
@@ -22,7 +22,7 @@ final class EventStream(
 )(implicit
     ec: scala.concurrent.ExecutionContext,
     system: ActorSystem,
-    scheduler: akka.actor.Scheduler
+    scheduler: org.apache.pekko.actor.Scheduler
 ) {
 
   private case object SetOnline
@@ -89,7 +89,7 @@ final class EventStream(
             lastSetSeenAt = DateTime.now
           }
 
-          context.system.scheduler
+          val _ = context.system.scheduler
             .scheduleOnce(6 second) {
               if (online) {
                 // gotta send a message to check if the client has disconnected
@@ -97,7 +97,6 @@ final class EventStream(
                 self ! SetOnline
               }
             }
-            .unit
 
         case StartGame(game) => queue.offer(gameJson("gameStart", me)(game)).unit
 

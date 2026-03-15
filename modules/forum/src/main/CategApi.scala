@@ -11,7 +11,7 @@ final class CategApi(env: Env)(implicit ec: scala.concurrent.ExecutionContext) {
   def list(teams: Iterable[String], forUser: Option[User]): Fu[List[CategView]] =
     for {
       categs <- env.categRepo withTeams teams
-      views <- (categs map { categ =>
+      views <- Future.sequence(categs map { categ =>
         env.postApi get (categ lastPostId forUser) map { topicPost =>
           CategView(
             categ,
@@ -21,7 +21,7 @@ final class CategApi(env: Env)(implicit ec: scala.concurrent.ExecutionContext) {
             forUser
           )
         }
-      }).sequenceFu
+      })
     } yield views
 
   def makeTeam(slug: String, name: String): Funit = {
@@ -66,7 +66,7 @@ final class CategApi(env: Env)(implicit ec: scala.concurrent.ExecutionContext) {
 
   def show(slug: String, page: Int, forUser: Option[User]): Fu[Option[(Categ, Paginator[TopicView])]] =
     env.categRepo bySlug slug flatMap {
-      _ ?? { categ =>
+      _ so { categ =>
         env.topicApi.paginator(categ, page, forUser) dmap { (categ, _).some }
       }
     }
@@ -86,10 +86,10 @@ final class CategApi(env: Env)(implicit ec: scala.concurrent.ExecutionContext) {
             categ.copy(
               nbTopics = nbTopics,
               nbPosts = nbPosts,
-              lastPostId = lastPost ?? (_.id),
+              lastPostId = lastPost so (_.id),
               nbTopicsTroll = nbTopicsTroll,
               nbPostsTroll = nbPostsTroll,
-              lastPostIdTroll = lastPostTroll ?? (_.id)
+              lastPostIdTroll = lastPostTroll so (_.id)
             )
           )
           .void

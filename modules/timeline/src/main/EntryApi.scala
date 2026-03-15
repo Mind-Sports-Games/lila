@@ -28,7 +28,7 @@ final class EntryApi(
     userEntries(userId, nb) flatMap broadcast.interleave
 
   private def userEntries(userId: User.ID, max: Max): Fu[Vector[Entry]] =
-    (max.value > 0) ?? coll
+    (max.value > 0) so coll
       .find(
         $doc(
           "users" -> userId,
@@ -110,6 +110,6 @@ final class EntryApi(
         }
       }
 
-    def insert(atom: Atom): Funit = coll.insert.one(Entry make atom).void >>- cache.invalidateUnit()
+    def insert(atom: Atom): Funit = coll.insert.one(Entry make atom).void.andDo(cache.invalidateUnit())
   }
 }

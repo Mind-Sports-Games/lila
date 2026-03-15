@@ -37,16 +37,16 @@ final class Messenger(api: ChatApi) {
         val source = PublicSource.Watcher(gameId.value)
         api.userChat.write(watcherId(gameId), userId, text drop command.length, source.some, _.Round)
     } getOrElse {
-      !text.startsWith("/") ?? // mistyped command?
+      !text.startsWith("/") so // mistyped command?
         api.userChat.write(Chat.Id(gameId.value), userId, text, publicSource = none, _.Round)
     }
 
   def owner(game: Game, anonPlayerIndex: PlayerIndex, text: String): Funit =
-    (game.fromFriend || presets.contains(text)) ??
+    (game.fromFriend || presets.contains(text)) so
       api.playerChat.write(Chat.Id(game.id), anonPlayerIndex, text, _.Round)
 
   def timeout(chatId: Chat.Id, modId: User.ID, suspect: User.ID, reason: String, text: String): Funit =
-    ChatTimeout.Reason(reason) ?? { r =>
+    ChatTimeout.Reason(reason) so { r =>
       api.userChat.timeout(chatId, modId, suspect, r, ChatTimeout.Scope.Global, text, _.Round)
     }
 

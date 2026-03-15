@@ -1,6 +1,6 @@
 package lila.activity
 
-import ornicar.scalalib.Zero
+import alleycats.Zero
 
 object model {
 
@@ -35,9 +35,9 @@ object model {
   object Score {
     def make(res: Option[Boolean], rp: Option[RatingProg]): Score =
       Score(
-        win = res.has(true) ?? 1,
-        loss = res.has(false) ?? 1,
-        draw = res.isEmpty ?? 1,
+        win = res.has(true) so 1,
+        loss = res.has(false) so 1,
+        draw = res.isEmpty so 1,
         rp = rp
       )
     def make(povs: List[lila.game.LightPov]): Score =
@@ -50,7 +50,7 @@ object model {
         case (score, _) => score
       }
   }
-  implicit val ScoreZero: Zero[Score] = Zero.instance(Score(0, 0, 0, none))
+  implicit val ScoreZero: Zero[Score] = Zero(Score(0, 0, 0, none))
 
   case class GameId(value: String) extends AnyVal
 }

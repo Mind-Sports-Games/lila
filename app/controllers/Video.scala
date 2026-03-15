@@ -11,7 +11,7 @@ final class Video(env: Env) extends LilaController(env) {
   private def api = env.video.api
 
   private def WithUserControl[A](f: UserControl => Fu[A])(implicit ctx: Context): Fu[A] = {
-    val reqTags = get("tags") ?? (_.split('/').toList.map(_.trim.toLowerCase))
+    val reqTags = get("tags") so (_.split('/').toList.map(_.trim.toLowerCase))
     api.tag.paths(reqTags) map { tags =>
       UserControl(
         filter = Filter(reqTags),
@@ -47,7 +47,7 @@ final class Video(env: Env) extends LilaController(env) {
           case None => fuccess(NotFound(html.video.bits.notFound(control)))
           case Some(video) =>
             api.video.similar(ctx.me, video, 9) zip
-              ctx.userId.?? { userId =>
+              ctx.userId.so { userId =>
                 api.view.add(View.make(videoId = video.id, userId = userId))
               } map { case (similar, _) =>
                 Ok(html.video.show(video, similar, control))

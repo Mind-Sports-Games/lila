@@ -77,7 +77,7 @@ ${trans.emailConfirm_ignore.txt("https://playstrategy.org")}
 
   def confirm(token: String): Fu[Result] =
     tokener read token flatMap {
-      _ ?? userRepo.enabledById
+      _ so userRepo.enabledById
     } flatMap {
       _.fold[Fu[Result]](fuccess(Result.NotFound)) { user =>
         userRepo.mustConfirmEmail(user.id) flatMap {
@@ -89,7 +89,7 @@ ${trans.emailConfirm_ignore.txt("https://playstrategy.org")}
 
   private val tokener = new StringToken[User.ID](
     secret = tokenerSecret,
-    getCurrentValue = id => userRepo email id dmap (_.??(_.value))
+    getCurrentValue = id => userRepo email id dmap (_.so(_.value))
   )
 }
 
@@ -125,7 +125,7 @@ object EmailConfirm {
 
   import scala.concurrent.duration._
   import play.api.mvc.RequestHeader
-  import ornicar.scalalib.Zero
+  import alleycats.Zero
   import lila.memo.RateLimit
   import lila.common.{ HTTPRequest, IpAddress }
 

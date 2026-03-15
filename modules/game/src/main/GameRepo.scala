@@ -73,7 +73,7 @@ final class GameRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionCont
     }
 
   def pov(gameId: ID, playerIndex: String): Fu[Option[Pov]] =
-    PlayerIndex.fromName(playerIndex) ?? (pov(gameId, _))
+    PlayerIndex.fromName(playerIndex) so (pov(gameId, _))
 
   def pov(playerRef: PlayerRef): Fu[Option[Pov]] =
     game(playerRef.gameId) dmap { _ flatMap { _ playerIdPov playerRef.playerId } }
@@ -392,7 +392,7 @@ final class GameRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionCont
         "$unset" -> finishUnsets.++ {
           // keep the checkAt field when game is aborted,
           // so it gets deleted in 24h
-          (status >= Status.Mate) ?? $doc(F.checkAt -> true)
+          (status >= Status.Mate) so $doc(F.checkAt -> true)
         }
       )
     )
@@ -430,7 +430,7 @@ final class GameRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionCont
       F.playingUids -> (g2.started && userIds.nonEmpty).option(userIds)
     )
     coll.insert.one(bson) addFailureEffect {
-      case wr: WriteResult if isDuplicateKey(wr) => lila.mon.game.idCollision.increment().unit
+      case wr: WriteResult if isDuplicateKey(wr) => val _ = lila.mon.game.idCollision.increment()
     } void
   }
 
@@ -465,7 +465,7 @@ final class GameRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionCont
 
   def gameWithInitialFen(gameId: ID): Fu[Option[(Game, Option[FEN])]] =
     game(gameId) flatMap {
-      _ ?? { game =>
+      _ so { game =>
         initialFen(game) dmap { fen =>
           Option(game -> fen)
         }
@@ -476,9 +476,9 @@ final class GameRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionCont
     initialFen(game) dmap { Game.WithInitialFen(game, _) }
 
   def withInitialFens(games: List[Game]): Fu[List[(Game, Option[FEN])]] =
-    games.map { game =>
+    Future.sequence(games.map { game =>
       initialFen(game) dmap { game -> _ }
-    }.sequenceFu
+    })
 
   def count(query: Query.type => Bdoc): Fu[Int] = coll countSel query(Query)
 
@@ -540,7 +540,7 @@ final class GameRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionCont
     )
 
   def lastGamesBetween(u1: User, u2: User, since: DateTime, nb: Int): Fu[List[Game]] =
-    List(u1, u2).forall(_.count.game > 0) ??
+    List(u1, u2).forall(_.count.game > 0) so
       coll.secondaryPreferred.list[Game](
         $doc(
           F.playerUids $all List(u1.id, u2.id),
@@ -570,7 +570,7 @@ final class GameRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionCont
 
   // only for student games, for aggregation
   def denormalizePerfType(game: Game): Unit =
-    game.perfType ?? { pt =>
+    game.perfType so { pt =>
       coll.updateFieldUnchecked($id(game.id), F.perfType, pt.id)
     }
 

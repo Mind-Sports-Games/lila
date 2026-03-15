@@ -82,7 +82,7 @@ object TeamBattle {
         val lines = teams.linesIterator.toList
         val dirtyIds =
           if (lines.sizeIs > 1) lines.map(_.takeWhile(' ' !=))
-          else lines.headOption.??(_.split(',').toList)
+          else lines.headOption.so(_.split(',').toList)
         dirtyIds.map(_.trim).filter(_.nonEmpty).toSet
       }
     }

@@ -66,7 +66,7 @@ private object StudyFlatTree {
       }
 
     private def traverse(node: Node, parentPath: Path): Vector[(String, Bdoc)] =
-      (parentPath.depth < Node.maxPlies) ?? {
+      (parentPath.depth < Node.maxPlies) so {
         val path = parentPath + node.id
         node.children.nodes.flatMap {
           traverse(_, path)

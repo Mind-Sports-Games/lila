@@ -2,7 +2,7 @@ package lila.round
 
 import actorApi._
 import actorApi.round._
-import akka.actor.{ ActorSystem, Cancellable, CoordinatedShutdown, Scheduler }
+import org.apache.pekko.actor.{ ActorSystem, Cancellable, CoordinatedShutdown, Scheduler }
 import strategygames.format.Uci
 import strategygames.{ P2, Centis, Player => PlayerIndex, GameFamily, MoveMetrics, Speed, P1, Pos }
 import strategygames.variant.Variant
@@ -54,11 +54,11 @@ final class RoundSocket(
       if (g.isEmpty) finishRound(Game.Id(gameId))
     }
   def getGames(gameIds: List[Game.ID]): Fu[List[(Game.ID, Option[Game])]] =
-    gameIds.map { id =>
+    Future.sequence(gameIds.map { id =>
       rounds.getOrMake(id).getGame dmap { id -> _ }
-    }.sequenceFu
+    })
 
-  def gameIfPresent(gameId: Game.ID): Fu[Option[Game]] = rounds.getIfPresent(gameId).??(_.getGame)
+  def gameIfPresent(gameId: Game.ID): Fu[Option[Game]] = rounds.getIfPresent(gameId).so(_.getGame)
 
   // get the proxied version of the game
   def upgradeIfPresent(game: Game): Fu[Game] =
@@ -66,7 +66,7 @@ final class RoundSocket(
 
   // update the proxied game
   def updateIfPresent(gameId: Game.ID)(f: Game => Game): Funit =
-    rounds.getIfPresent(gameId) ?? {
+    rounds.getIfPresent(gameId) so {
       _ updateGame f
     }
 
@@ -174,7 +174,7 @@ final class RoundSocket(
 
   remoteSocketApi.subscribeRoundRobin("r-in", Protocol.In.reader, parallelism = 8)(
     roundHandler orElse remoteSocketApi.baseHandler
-  ) >>- send(P.Out.boot)
+  ).andDo(send(P.Out.boot))
 
   Bus.subscribeFun("tvSelect", "roundSocket", "tourStanding", "startGame", "finishGame") {
     case TvSelect(gameId, speed, json) => sendForGameId(gameId)(Protocol.Out.tvSelect(gameId, speed, json))
@@ -216,7 +216,7 @@ final class RoundSocket(
     rounds.tellAll(RoundDuct.Tick)
   }
   system.scheduler.scheduleWithFixedDelay(60 seconds, 60 seconds) { () =>
-    lila.mon.round.ductCount.update(rounds.size).unit
+    val _ = lila.mon.round.ductCount.update(rounds.size)
   }
 
   private val terminationDelay = new TerminationDelay(system.scheduler, 1 minute, finishRound)
@@ -408,10 +408,10 @@ object RoundSocket {
   )(implicit ec: scala.concurrent.ExecutionContext) {
     import java.util.concurrent.ConcurrentHashMap
 
-    private[this] val terminations = new ConcurrentHashMap[String, Cancellable](65536)
+    private val terminations = new ConcurrentHashMap[String, Cancellable](65536)
 
-    def schedule(gameId: Game.Id): Unit =
-      terminations
+    def schedule(gameId: Game.Id): Unit = {
+      val _ = terminations
         .compute(
           gameId.value,
           (id, canc) => {
@@ -422,7 +422,7 @@ object RoundSocket {
             }
           }
         )
-        .unit
+    }
 
     def cancel(gameId: Game.Id): Unit =
       Option(terminations remove gameId.value).foreach(_.cancel())

@@ -3,6 +3,7 @@ package lila.rating
 import play.api.data.Form
 import play.api.data.Forms.{ single, text }
 
+import lila.base.DoubleValue
 import lila.memo.SettingStore.{ Formable, StringReader }
 import reactivemongo.api.bson.BSONHandler
 

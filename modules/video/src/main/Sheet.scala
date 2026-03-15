@@ -40,7 +40,7 @@ final private[video] class Sheet(
                   ads = entry.ads,
                   startTime = entry.startTime
                 )
-                (video != updated) ?? {
+                (video != updated) so {
                   logger.info(s"sheet update $updated")
                   api.video.save(updated)
                 }

@@ -1,6 +1,6 @@
 package lila.tournament
 
-import akka.actor._
+import org.apache.pekko.actor._
 import strategygames.chess.StartingPosition
 import strategygames.variant.Variant
 import org.joda.time.DateTime
@@ -1036,7 +1036,7 @@ Thank you all, you rock!"""
               titled = none,
               teamMember = none
             )
-            at(date, hour) ?? { date =>
+            at(date, hour) so { date =>
               val finalDate = date plusHours hourDelay
               if (speed == Bullet)
                 List(
@@ -1144,7 +1144,7 @@ Thank you all, you rock!"""
     t.schedule exists { s =>
       ts exists { t2 =>
         ((!t.isMedley && !t2.isMedley && t.variant == t2.variant) || (t.isMedley && t2.isMedley && t.trophy1st == t2.trophy1st)) && t2.schedule
-          .?? {
+          .so {
             // prevent daily && weekly on the same day - we don't care about this.
             // case s2 if s.freq.isDailyOrBetter && s2.freq.isDailyOrBetter && s.sameSpeed(s2) => s sameDay s2
             // dont let yearly's block shields and vice versa

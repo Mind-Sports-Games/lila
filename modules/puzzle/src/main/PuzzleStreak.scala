@@ -113,7 +113,7 @@ final class PuzzleStreakApi(colls: PuzzleColls, cacheApi: CacheApi)(implicit ec:
     if (nb > 1) {
       val rest = puzzles.toVector drop 1
       lila.common.Maths.mean(rest.map(_.glicko.intRating)) foreach { r =>
-        lila.mon.streak.selector.rating.record(r.toInt).unit
+        val _ = lila.mon.streak.selector.rating.record(r.toInt)
       }
       (0 to poolSize by 10) foreach { i =>
         val slice = rest drop i take 10

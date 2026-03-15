@@ -148,7 +148,7 @@ object GameDiff {
             dOpt(
               checkCount,
               _.history.checkCount,
-              (o: CheckCount) => o.nonEmpty ?? { BSONHandlers.checkCountWriter writeOpt o }
+              (o: CheckCount) => o.nonEmpty so { BSONHandlers.checkCountWriter writeOpt o }
             )
           if (a.variant.dropsVariant)
             dOpt(
@@ -257,7 +257,7 @@ object GameDiff {
         dOpt(
           score,
           _.history.score,
-          (o: Score) => o.nonEmpty ?? { BSONHandlers.scoreWriter writeOpt o }
+          (o: Score) => o.nonEmpty so { BSONHandlers.scoreWriter writeOpt o }
         )
       }
       case GameLogic.Go() => {
@@ -276,7 +276,7 @@ object GameDiff {
         dOpt(
           score,
           _.history.score,
-          (o: Score) => o.nonEmpty ?? { BSONHandlers.scoreWriter writeOpt o }
+          (o: Score) => o.nonEmpty so { BSONHandlers.scoreWriter writeOpt o }
         )
         if (a.variant.dropsVariant)
           dOpt(
@@ -326,7 +326,7 @@ object GameDiff {
         dOpt(
           score,
           _.history.score,
-          (o: Score) => o.nonEmpty ?? { BSONHandlers.scoreWriter writeOpt o }
+          (o: Score) => o.nonEmpty so { BSONHandlers.scoreWriter writeOpt o }
         )
       }
       case GameLogic.Abalone() => {
@@ -345,7 +345,7 @@ object GameDiff {
         dOpt(
           score,
           _.history.score,
-          (o: Score) => o.nonEmpty ?? { BSONHandlers.scoreWriter writeOpt o }
+          (o: Score) => o.nonEmpty so { BSONHandlers.scoreWriter writeOpt o }
         )
       }
       case GameLogic.Dameo() => {

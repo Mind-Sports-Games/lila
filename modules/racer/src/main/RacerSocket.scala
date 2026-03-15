@@ -25,7 +25,7 @@ final private class RacerSocket(
 
   private lazy val racerHandler: Handler = {
     case Protocol.In.PlayerJoin(raceId, playerId) =>
-      api.join(raceId, playerId).unit
+      val _ = api.join(raceId, playerId)
     case Protocol.In.PlayerScore(raceId, playerId, score) =>
       api.registerPlayerScore(raceId, playerId, score)
   }

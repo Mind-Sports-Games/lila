@@ -38,7 +38,7 @@ final class GameMod(env: Env)(implicit mat: akka.stream.Materializer) extends Li
     filter.speed
       .flatMap(k => strategygames.Speed.all.find(_.key == k))
       .fold(env.game.gameRepo.recentPovsByUserFromSecondary(user, nbGames, select)) { speed =>
-        import akka.stream.scaladsl._
+        import org.apache.pekko.stream.scaladsl._
         env.game.gameRepo
           .recentGamesByUserFromSecondaryCursor(user, select)
           .documentSource(10_000)
@@ -71,7 +71,7 @@ final class GameMod(env: Env)(implicit mat: akka.stream.Materializer) extends Li
 
   private def multipleAnalysis(me: Holder, gameIds: Seq[lila.game.Game.ID])(implicit ctx: Context) =
     env.game.gameRepo.unanalysedGames(gameIds).flatMap { games =>
-      games.map { game =>
+      Future.sequence(games.map { game =>
         env.fishnet.analyser(
           game,
           lila.fishnet.Work.Sender(
@@ -81,7 +81,7 @@ final class GameMod(env: Env)(implicit mat: akka.stream.Materializer) extends Li
             system = false
           )
         )
-      }.sequenceFu >> env.fishnet.awaiter(games.map(_.id), 2 minutes)
+      }) >> env.fishnet.awaiter(games.map(_.id), 2 minutes)
     } inject NoContent
 
   private def downloadPgn(user: lila.user.User, gameIds: Seq[lila.game.Game.ID]) =
@@ -141,9 +141,9 @@ object GameMod {
   val emptyFilter = Filter(none, none, none, none)
 
   def toDbSelect(filter: Filter): Bdoc =
-    lila.game.Query.notSimul ++ lila.game.Query.clock(true) ++ filter.arena.?? { id =>
+    lila.game.Query.notSimul ++ lila.game.Query.clock(true) ++ filter.arena.so { id =>
       $doc(lila.game.Game.BSONFields.tournamentId -> id)
-    } ++ filter.swiss.?? { id =>
+    } ++ filter.swiss.so { id =>
       $doc(lila.game.Game.BSONFields.swissId -> id)
     } ++ (filter.opponentIds match {
       case Nil      => $empty

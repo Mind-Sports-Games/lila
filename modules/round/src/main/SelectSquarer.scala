@@ -22,7 +22,7 @@ final private[round] class SelectSquarer(
 
   implicit private val chatLang: Lang = defaultLang
 
-  def accept(pov: Pov)(implicit proxy: GameProxy): Fu[Events] = pov.game.playable ?? {
+  def accept(pov: Pov)(implicit proxy: GameProxy): Fu[Events] = pov.game.playable so {
     val squares: List[Pos] = pov.game.selectedSquares.getOrElse(List[Pos]().empty)
     pov match {
       case Pov(g, playerIndex) if pov.opponent.isOfferingSelectSquares =>
@@ -41,14 +41,14 @@ final private[round] class SelectSquarer(
     }
   }
 
-  def decline(pov: Pov)(implicit proxy: GameProxy): Fu[Events] = pov.game.playable ?? {
+  def decline(pov: Pov)(implicit proxy: GameProxy): Fu[Events] = pov.game.playable so {
     val squares: List[Pos] = pov.game.selectedSquares.getOrElse(List[Pos]().empty)
     pov match {
       case Pov(g, playerIndex) if pov.opponent.isOfferingSelectSquares =>
         proxy.save {
           messenger.system(g, trans.selectSquareOfferDeclined.txt())
           Progress(g) map { _.declineSelectSquares(playerIndex) }
-        } >>- publishSquareOfferEvent(pov) inject List(
+        }.andDo(publishSquareOfferEvent(pov)) inject List(
           Event.SelectSquaresOffer(playerIndex, squares, Some(false))
         )
       case _ => fuccess(List(Event.ReloadOwner))
@@ -56,13 +56,13 @@ final private[round] class SelectSquarer(
   }
 
   def selectSquares(squares: List[Pos])(pov: Pov)(implicit proxy: GameProxy): Fu[Events] =
-    pov.game.playable ?? {
+    pov.game.playable so {
       pov match {
         case Pov(g, playerIndex) if g playerCanOfferSelectSquares playerIndex =>
           proxy.save {
             messenger.system(g, trans.playerIndexOffersSelectSquares(pov.game.playerTrans(playerIndex)).v)
             Progress(g) map { _.offerSelectSquares(playerIndex, squares) }
-          } >>- publishSquareOfferEvent(pov) inject List(
+          }.andDo(publishSquareOfferEvent(pov)) inject List(
             Event.SelectSquaresOffer(playerIndex, squares)
           )
         case _ => fuccess(List(Event.ReloadOwner))

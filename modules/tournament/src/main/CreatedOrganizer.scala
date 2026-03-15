@@ -1,7 +1,7 @@
 package lila.tournament
 
-import akka.actor._
-import akka.stream.scaladsl._
+import org.apache.pekko.actor._
+import org.apache.pekko.stream.scaladsl._
 import scala.concurrent.duration._
 
 final private class CreatedOrganizer(
@@ -10,19 +10,19 @@ final private class CreatedOrganizer(
     playerRepo: PlayerRepo
 )(implicit
     ec: scala.concurrent.ExecutionContext,
-    scheduler: akka.actor.Scheduler,
+    scheduler: org.apache.pekko.actor.Scheduler,
     mat: akka.stream.Materializer
 ) extends Actor {
 
   override def preStart(): Unit = {
     context.setReceiveTimeout(15.seconds)
-    scheduler.scheduleOnce(10 seconds, self, Tick).unit
+    val _ = scheduler.scheduleOnce(10 seconds, self, Tick)
   }
 
   case object Tick
 
   def scheduleNext(): Unit =
-    scheduler.scheduleOnce(2 seconds, self, Tick).unit
+    { val _ = scheduler.scheduleOnce(2 seconds, self, Tick) }
 
   def receive = {
 

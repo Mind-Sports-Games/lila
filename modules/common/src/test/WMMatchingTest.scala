@@ -1,94 +1,96 @@
 package lila.common
-import scala.util.{ Failure, Success }
-import org.specs2.mutable.Specification
 
-object WMMatchingTest {
-  def toMate(n: Int, l: List[(Int, Int)]): Array[Int] = {
+import scala.util.{ Failure, Success }
+
+object WMMatchingTest:
+  def toMate(n: Int, l: List[(Int, Int)]): Array[Int] =
     val a = Array.fill(n)(-1)
-    l.foreach { case (i, j) => { a(i) = j; a(j) = i; } }
-    if (a.count(_ >= 0) != 2 * l.length) null else a
-  }
-  def check0(a: Array[(Int, Int, Int)], maxcardinality: Boolean, expectedMate: Seq[Int]): Boolean = {
+    l.foreach { case (i, j) => a(i) = j; a(j) = i }
+    if a.count(_ >= 0) != 2 * l.length then null else a
+
+  def check0(a: Array[(Int, Int, Int)], maxcardinality: Boolean, expectedMate: Seq[Int]): Boolean =
     val n = a.view.map(p => p._1.max(p._2)).max + 1
     val e = Array.newBuilder[Int]
     val w = Array.newBuilder[Int]
-    for (p <- a) {
+    for p <- a do
       e += p._1
       e += p._2
       w += p._3
-    }
     val l = toMate(n, WMMatching.maxWeightMatching(e.result(), w.result(), maxcardinality))
-    if (l eq null) false else expectedMate.sameElements(l)
-  }
-  //  check(Array((0,1,1)), false, List (1, 0))
-  def check(n: Int, a: Array[Int], res: (Int, Int)): Boolean = {
+    if l eq null then false else expectedMate.sameElements(l)
+
+  def check(n: Int, a: Array[Int], res: (Int, Int)): Boolean =
     val v           = Array.range(0, n)
     def f(x: Int)   = (x * (x + 1)) / 2
     def off(i: Int) = f(n - 1) - f(n - 1 - i)
-    def pairScore(i: Int, j: Int): Option[Int] = {
-      if (i > j) pairScore(j, i)
-      else {
+    def pairScore(i: Int, j: Int): Option[Int] =
+      if i > j then pairScore(j, i)
+      else
         val o = off(i) + (j - (i + 1))
-        if (a(o) < 0) None else Some(a(o))
-      }
-    }
+        if a(o) < 0 then None else Some(a(o))
     def score(l: List[(Int, Int)]): (Int, Int) = (l.length, l.map(t => pairScore(t._1, t._2).head).sum)
     def checkScore(ans: (Int, Int)): Boolean   = res == ans
-    WMMatching(v, pairScore) match {
+    WMMatching(v, pairScore) match
       case Success(l) => checkScore(score(l))
       case Failure(_) => false
-    }
-  }
-}
 
-class WMMatchingTest extends Specification {
-  import WMMatchingTest.{ check0 }
-  "WMMatching" should {
-    "create S-blossom and use it for augmentation" in {
-      check0(Array((1, 2, 8), (1, 3, 9), (2, 3, 10), (3, 4, 7)), false, List(-1, 2, 1, 4, 3)) must beTrue
+class WMMatchingTest extends munit.FunSuite:
+  import WMMatchingTest.check0
+
+  test("WMMatching - create S-blossom and use it for augmentation"):
+    assert(check0(Array((1, 2, 8), (1, 3, 9), (2, 3, 10), (3, 4, 7)), false, List(-1, 2, 1, 4, 3)))
+    assert(
       check0(
         Array((1, 2, 9), (1, 3, 8), (2, 3, 10), (1, 4, 5), (4, 5, 3), (1, 6, 4)),
         false,
         List(-1, 6, 3, 2, 5, 4, 1)
-      ) must beTrue
+      )
+    )
+    assert(
       check0(
         Array((1, 2, 9), (1, 3, 8), (2, 3, 10), (1, 4, 5), (4, 5, 3), (3, 6, 4)),
         false,
         List(-1, 2, 1, 6, 5, 4, 3)
-      ) must beTrue
-    }
-    "create S-blossom, relabel as T-blossom, use for augmentation" in {
+      )
+    )
+
+  test("WMMatching - create S-blossom, relabel as T-blossom, use for augmentation"):
+    assert(
       check0(
         Array((1, 2, 9), (1, 3, 8), (2, 3, 10), (1, 4, 5), (4, 5, 4), (1, 6, 3)),
         false,
         List(-1, 6, 3, 2, 5, 4, 1)
-      ) must beTrue
-    }
-    "create nested S-blossom, use for augmentation" in {
+      )
+    )
+
+  test("WMMatching - create nested S-blossom, use for augmentation"):
+    assert(
       check0(
         Array((1, 2, 9), (1, 3, 9), (2, 3, 10), (2, 4, 8), (3, 5, 8), (4, 5, 10), (5, 6, 6)),
         false,
         List(-1, 3, 4, 1, 2, 6, 5)
-      ) must beTrue
-    }
-    "create S-blossom, relabel as S, include in nested S-blossom" in {
-      check0(
-        Array(
-          (1, 2, 10),
-          (1, 7, 10),
-          (2, 3, 12),
-          (3, 4, 20),
-          (3, 5, 20),
-          (4, 5, 25),
-          (5, 6, 10),
-          (6, 7, 10),
-          (7, 8, 8)
-        ),
-        false,
-        List(-1, 2, 1, 4, 3, 6, 5, 8, 7)
       )
-    }
-    "create nested S-blossom, augment, expand recursively" in {
+    )
+
+  test("WMMatching - create S-blossom, relabel as S, include in nested S-blossom"):
+    check0(
+      Array(
+        (1, 2, 10),
+        (1, 7, 10),
+        (2, 3, 12),
+        (3, 4, 20),
+        (3, 5, 20),
+        (4, 5, 25),
+        (5, 6, 10),
+        (6, 7, 10),
+        (7, 8, 8)
+      ),
+      false,
+      List(-1, 2, 1, 4, 3, 6, 5, 8, 7)
+    )
+
+  test("WMMatching - create nested S-blossom, augment, expand recursively"):
+    assert(
       check0(
         Array(
           (1, 2, 8),
@@ -104,16 +106,20 @@ class WMMatchingTest extends Specification {
         ),
         false,
         List(-1, 2, 1, 5, 6, 3, 4, 8, 7)
-      ) must beTrue
-    }
-    "create S-blossom, relabel as T, expand" in {
+      )
+    )
+
+  test("WMMatching - create S-blossom, relabel as T, expand"):
+    assert(
       check0(
         Array((1, 2, 23), (1, 5, 22), (1, 6, 15), (2, 3, 25), (3, 4, 22), (4, 5, 25), (4, 8, 14), (5, 7, 13)),
         false,
         List(-1, 6, 3, 2, 8, 7, 1, 5, 4)
-      ) must beTrue
-    }
-    "create blossom, relabel as T in more than one way, expand, augment" in {
+      )
+    )
+
+  test("WMMatching - create blossom, relabel as T in more than one way, expand, augment"):
+    assert(
       check0(
         Array(
           (1, 2, 45),
@@ -129,7 +135,9 @@ class WMMatchingTest extends Specification {
         ),
         false,
         List(-1, 6, 3, 2, 8, 7, 1, 5, 4, 10, 9)
-      ) must beTrue
+      )
+    )
+    assert(
       check0(
         Array(
           (1, 2, 45),
@@ -145,9 +153,11 @@ class WMMatchingTest extends Specification {
         ),
         false,
         List(-1, 6, 3, 2, 8, 7, 1, 5, 4, 10, 9)
-      ) must beTrue
-    }
-    "create blossom, relabel as T, expand such that a new least-slack S-to-free edge is produced, augment" in {
+      )
+    )
+
+  test("WMMatching - create blossom, relabel as T, expand such that a new least-slack S-to-free edge is produced, augment"):
+    assert(
       check0(
         Array(
           (1, 2, 45),
@@ -163,9 +173,11 @@ class WMMatchingTest extends Specification {
         ),
         false,
         List(-1, 6, 3, 2, 8, 7, 1, 5, 4, 10, 9)
-      ) must beTrue
-    }
-    "create nested blossom, relabel as T in more than one way, expand outer blossom such that inner blossom ends up on an augmenting path" in {
+      )
+    )
+
+  test("WMMatching - create nested blossom, relabel as T in more than one way, expand outer blossom such that inner blossom ends up on an augmenting path"):
+    assert(
       check0(
         Array(
           (1, 2, 45),
@@ -184,9 +196,11 @@ class WMMatchingTest extends Specification {
         ),
         false,
         List(-1, 8, 3, 2, 6, 9, 4, 10, 1, 5, 7, 12, 11)
-      ) must beTrue
-    }
-    "create nested S-blossom, relabel as S, expand recursively" in {
+      )
+    )
+
+  test("WMMatching - create nested S-blossom, relabel as S, expand recursively"):
+    assert(
       check0(
         Array(
           (1, 2, 40),
@@ -203,144 +217,186 @@ class WMMatchingTest extends Specification {
         ),
         false,
         List(-1, 2, 1, 5, 9, 3, 7, 6, 10, 4, 8)
-      ) must beTrue
-    }
-    "hand" in {
-      check0(Array((0, 1, 1)), false, List(1, 0)) must beTrue
-      check0(Array((0, 1, 1)), false, List(1, 0)) must beTrue
-      check0(Array((1, 2, 10), (2, 3, 11)), false, List(-1, -1, 3, 2)) must beTrue
-      check0(Array((1, 2, 5), (2, 3, 11), (3, 4, 5)), false, List(-1, -1, 3, 2, -1)) must beTrue
-      check0(Array((1, 2, 5), (2, 3, 11), (3, 4, 5)), true, List(-1, 2, 1, 4, 3)) must beTrue
+      )
+    )
+
+  test("WMMatching - hand"):
+    assert(check0(Array((0, 1, 1)), false, List(1, 0)))
+    assert(check0(Array((0, 1, 1)), false, List(1, 0)))
+    assert(check0(Array((1, 2, 10), (2, 3, 11)), false, List(-1, -1, 3, 2)))
+    assert(check0(Array((1, 2, 5), (2, 3, 11), (3, 4, 5)), false, List(-1, -1, 3, 2, -1)))
+    assert(check0(Array((1, 2, 5), (2, 3, 11), (3, 4, 5)), true, List(-1, 2, 1, 4, 3)))
+    assert(
       check0(
         Array((1, 2, 8), (1, 3, 9), (2, 3, 10), (3, 4, 7), (1, 6, 5), (4, 5, 6)),
         false,
         List(-1, 6, 3, 2, 5, 4, 1)
-      ) must beTrue
-    }
-    "random tests" in {
-      WMMatchingTest.check(2, Array(7), (1, 7)) must beTrue
-      WMMatchingTest.check(3, Array(-1, 20, -1), (1, 20)) must beTrue
-      WMMatchingTest.check(3, Array(37, 13, 5), (1, 5)) must beTrue
-      WMMatchingTest.check(4, Array(-1, -1, -1, -1, 46, -1), (1, 46)) must beTrue
-      WMMatchingTest.check(4, Array(6, -1, 22, 25, -1, -1), (2, 47)) must beTrue
-      WMMatchingTest.check(4, Array(34, 67, 30, 35, 20, 0), (2, 34)) must beTrue
-      WMMatchingTest.check(5, Array(-1, -1, 16, -1, -1, -1, -1, -1, -1, -1), (1, 16)) must beTrue
-      WMMatchingTest.check(5, Array(-1, -1, -1, -1, -1, 9, -1, 74, -1, -1), (1, 9)) must beTrue
-      WMMatchingTest.check(5, Array(-1, -1, -1, -1, 48, 42, 70, 47, -1, 95), (2, 117)) must beTrue
-      WMMatchingTest.check(5, Array(71, 46, 31, 61, 42, 13, 20, 98, 27, 16), (2, 40)) must beTrue
+      )
+    )
+
+  test("WMMatching - random tests"):
+    assert(WMMatchingTest.check(2, Array(7), (1, 7)))
+    assert(WMMatchingTest.check(3, Array(-1, 20, -1), (1, 20)))
+    assert(WMMatchingTest.check(3, Array(37, 13, 5), (1, 5)))
+    assert(WMMatchingTest.check(4, Array(-1, -1, -1, -1, 46, -1), (1, 46)))
+    assert(WMMatchingTest.check(4, Array(6, -1, 22, 25, -1, -1), (2, 47)))
+    assert(WMMatchingTest.check(4, Array(34, 67, 30, 35, 20, 0), (2, 34)))
+    assert(WMMatchingTest.check(5, Array(-1, -1, 16, -1, -1, -1, -1, -1, -1, -1), (1, 16)))
+    assert(WMMatchingTest.check(5, Array(-1, -1, -1, -1, -1, 9, -1, 74, -1, -1), (1, 9)))
+    assert(WMMatchingTest.check(5, Array(-1, -1, -1, -1, 48, 42, 70, 47, -1, 95), (2, 117)))
+    assert(WMMatchingTest.check(5, Array(71, 46, 31, 61, 42, 13, 20, 98, 27, 16), (2, 40)))
+    assert(
       WMMatchingTest.check(
         6,
         Array(
           -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 94, -1
         ),
         (1, 94)
-      ) must beTrue
+      )
+    )
+    assert(
       WMMatchingTest.check(
         6,
         Array(
           -1, -1, -1, -1, -1, -1, -1, 51, -1, -1, 2, -1, -1, 89, -1
         ),
         (2, 91)
-      ) must beTrue
+      )
+    )
+    assert(
       WMMatchingTest.check(
         6,
         Array(
           -1, -1, 67, 92, 11, -1, 37, -1, 70, -1, -1, -1, 29, -1, 10
         ),
         (2, 40)
-      ) must beTrue
+      )
+    )
+    assert(
       WMMatchingTest.check(
         6,
         Array(
           91, 45, 1, 43, 24, 17, 28, 38, 52, 26, 47, 9, 0, 54, 62
         ),
         (3, 41)
-      ) must beTrue
+      )
+    )
+    assert(
       WMMatchingTest.check(
         7,
         Array(-1, -1, -1, -1, -1, -1, -1, -1, 42, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1),
         (1, 42)
-      ) must beTrue
+      )
+    )
+    assert(
       WMMatchingTest.check(
         7,
         Array(12, -1, -1, -1, -1, -1, -1, -1, -1, -1, 92, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1),
         (1, 12)
-      ) must beTrue
+      )
+    )
+    assert(
       WMMatchingTest.check(
         7,
         Array(44, -1, -1, 32, -1, -1, -1, -1, 41, -1, -1, -1, -1, 15, -1, 85, -1, -1, -1, -1, -1),
         (3, 144)
-      ) must beTrue
+      )
+    )
+    assert(
       WMMatchingTest.check(
         7,
         Array(-1, -1, -1, 14, 32, 89, -1, -1, 26, -1, -1, -1, 3, 57, -1, 86, -1, 85, 93, -1, 41),
         (3, 120)
-      ) must beTrue
+      )
+    )
+    assert(
       WMMatchingTest.check(
         7,
         Array(93, 13, 67, 27, 76, 20, 42, 11, 49, 42, 39, 72, 38, 9, 14, 49, 11, 94, 59, 20, 15),
         (3, 39)
-      ) must beTrue
+      )
+    )
+    assert(
       WMMatchingTest.check(
         8,
         Array(-1, -1, -1, -1, -1, -1, -1, -1, 10, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
           -1, -1, -1, -1),
         (1, 10)
-      ) must beTrue
+      )
+    )
+    assert(
       WMMatchingTest.check(
         8,
         Array(-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 7, -1, 54, -1, -1, -1, -1,
           -1, -1, -1, -1),
         (2, 61)
-      ) must beTrue
+      )
+    )
+    assert(
       WMMatchingTest.check(
         8,
         Array(-1, -1, -1, 51, -1, 99, -1, -1, -1, -1, -1, 96, 60, -1, -1, -1, -1, 72, -1, -1, -1, 96, -1, -1,
           -1, 24, -1, -1),
         (3, 135)
-      ) must beTrue
+      )
+    )
+    assert(
       WMMatchingTest.check(
         8,
         Array(83, 26, 40, -1, -1, -1, -1, -1, 96, 17, -1, 56, 45, 9, -1, -1, -1, -1, 10, 78, 93, 88, 5, 15,
           -1, -1, -1, -1),
         (4, 164)
-      ) must beTrue
+      )
+    )
+    assert(
       WMMatchingTest.check(
         8,
         Array(14, 98, 5, 28, 55, 74, 53, 40, 44, 85, 30, 79, 68, 16, 85, 68, 91, 36, 48, 36, 65, 5, 6, 21, 18,
           42, 31, 84),
         (4, 82)
-      ) must beTrue
+      )
+    )
+    assert(
       WMMatchingTest.check(
         9,
         Array(-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
           -1, -1, -1, -1, -1, -1, 78, -1, -1, -1, -1, -1),
         (1, 78)
-      ) must beTrue
+      )
+    )
+    assert(
       WMMatchingTest.check(
         9,
         Array(-1, -1, -1, -1, -1, -1, -1, -1, 41, -1, -1, -1, -1, -1, -1, -1, -1, -1, 40, -1, -1, -1, -1, -1,
           -1, -1, -1, -1, -1, -1, -1, 43, -1, -1, -1, -1),
         (2, 83)
-      ) must beTrue
+      )
+    )
+    assert(
       WMMatchingTest.check(
         9,
         Array(12, 46, -1, 64, -1, 53, 30, -1, -1, -1, -1, -1, 6, -1, -1, -1, -1, 12, -1, -1, -1, -1, -1, -1,
           -1, -1, 97, -1, -1, 26, -1, -1, -1, -1, -1, -1),
         (4, 74)
-      ) must beTrue
+      )
+    )
+    assert(
       WMMatchingTest.check(
         9,
         Array(-1, 30, 66, -1, 53, -1, -1, -1, 69, 35, -1, -1, 51, 25, -1, -1, 23, -1, -1, 89, 83, -1, -1, 69,
           91, 95, -1, -1, 8, 19, 69, -1, -1, 81, -1, 28),
         (4, 139)
-      ) must beTrue
+      )
+    )
+    assert(
       WMMatchingTest.check(
         9,
         Array(72, 38, 28, 39, 83, 12, 53, 19, 15, 19, 25, 97, 41, 83, 78, 70, 6, 68, 83, 0, 90, 25, 46, 55,
           72, 91, 79, 61, 56, 13, 69, 19, 69, 43, 46, 28),
         (4, 44)
-      ) must beTrue
+      )
+    )
+    assert(
       WMMatchingTest.check(
         10,
         Array(
@@ -348,7 +404,9 @@ class WMMatchingTest extends Specification {
           -1, -1, -1, -1, -1, 4, -1, 90, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1
         ),
         (1, 4)
-      ) must beTrue
+      )
+    )
+    assert(
       WMMatchingTest.check(
         10,
         Array(
@@ -356,7 +414,9 @@ class WMMatchingTest extends Specification {
           -1, -1, -1, -1, -1, -1, -1, -1, -1, 70, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1
         ),
         (2, 44)
-      ) must beTrue
+      )
+    )
+    assert(
       WMMatchingTest.check(
         10,
         Array(
@@ -364,7 +424,9 @@ class WMMatchingTest extends Specification {
           -1, -1, 43, -1, 89, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1
         ),
         (4, 90)
-      ) must beTrue
+      )
+    )
+    assert(
       WMMatchingTest.check(
         10,
         Array(
@@ -372,7 +434,9 @@ class WMMatchingTest extends Specification {
           -1, 92, -1, -1, -1, 42, -1, -1, -1, 6, 49, -1, 74, -1, 99, -1, 40, -1, 95
         ),
         (5, 105)
-      ) must beTrue
+      )
+    )
+    assert(
       WMMatchingTest.check(
         10,
         Array(
@@ -380,77 +444,99 @@ class WMMatchingTest extends Specification {
           55, 82, 57, 80, 75, 71, 85, 82, 4, 1, 26, 24, 65, 25, 85, 31, 2, 53, 87
         ),
         (5, 18)
-      ) must beTrue
+      )
+    )
+    assert(
       WMMatchingTest.check(
         11,
         Array(-1, -1, -1, -1, -1, -1, -1, -1, -1, 2, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
           -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
           -1, 77, -1, -1, -1, -1),
         (2, 79)
-      ) must beTrue
+      )
+    )
+    assert(
       WMMatchingTest.check(
         11,
         Array(-1, -1, 87, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 96, -1,
           -1, -1, 77, -1, -1, -1, -1, -1, -1, -1, 93, -1, 65, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
           -1, -1, -1, -1, -1, -1),
         (3, 229)
-      ) must beTrue
+      )
+    )
+    assert(
       WMMatchingTest.check(
         11,
         Array(-1, -1, -1, 99, -1, -1, 84, -1, -1, -1, 5, 73, -1, 10, -1, -1, -1, 5, -1, 43, -1, -1, -1, 97,
           -1, -1, 34, -1, 26, -1, 27, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 28, -1, -1, -1, -1,
           -1, -1, 3, -1, -1, -1),
         (4, 133)
-      ) must beTrue
+      )
+    )
+    assert(
       WMMatchingTest.check(
         11,
         Array(15, -1, -1, -1, 31, 41, -1, -1, 42, 15, -1, 69, 34, -1, -1, 50, -1, 99, -1, 63, -1, 84, -1, 17,
           66, -1, -1, -1, -1, -1, 73, 32, 36, 99, 68, -1, -1, -1, -1, -1, -1, 29, 4, -1, -1, -1, -1, 83, -1,
           43, 43, 61, 95, 47, 21),
         (5, 106)
-      ) must beTrue
+      )
+    )
+    assert(
       WMMatchingTest.check(
         11,
         Array(58, 50, 92, 71, 11, 53, 16, 8, 19, 34, 40, 13, 57, 80, 79, 66, 82, 42, 54, 52, 8, 82, 81, 23,
           59, 84, 28, 61, 59, 67, 23, 0, 24, 42, 42, 96, 94, 34, 99, 96, 16, 7, 10, 44, 15, 84, 52, 67, 99,
           52, 7, 63, 8, 9, 75),
         (5, 48)
-      ) must beTrue
+      )
+    )
+    assert(
       WMMatchingTest.check(
         12,
         Array(-1, -1, -1, -1, -1, 92, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
           -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 22, -1, -1, -1, 88, -1, -1, -1, -1, -1, -1,
           -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1),
         (2, 114)
-      ) must beTrue
+      )
+    )
+    assert(
       WMMatchingTest.check(
         12,
         Array(-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
           -1, -1, -1, -1, -1, -1, 55, -1, -1, 39, -1, -1, -1, -1, 76, -1, -1, -1, -1, -1, -1, -1, -1, -1, 84,
           -1, -1, -1, -1, -1, -1, -1, 24, -1, -1, -1, -1, -1, -1, -1, -1, 88),
         (4, 251)
-      ) must beTrue
+      )
+    )
+    assert(
       WMMatchingTest.check(
         12,
         Array(34, -1, 24, -1, -1, 47, 29, -1, -1, 4, -1, 20, -1, -1, -1, -1, -1, -1, -1, -1, 97, -1, 11, -1,
           -1, -1, -1, -1, 84, -1, -1, -1, 91, -1, -1, -1, 19, -1, 62, -1, -1, -1, -1, -1, -1, -1, -1, 45, -1,
           -1, -1, 33, 64, 16, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1),
         (6, 217)
-      ) must beTrue
+      )
+    )
+    assert(
       WMMatchingTest.check(
         12,
         Array(-1, 65, 10, -1, -1, -1, -1, -1, 93, -1, -1, 58, -1, 70, -1, 21, 79, 77, 74, 59, 2, 67, -1, -1,
           88, -1, 79, -1, 38, 34, -1, -1, -1, 25, 54, -1, 4, -1, 27, 50, 92, -1, -1, 64, 98, -1, 49, -1, -1,
           84, -1, 10, 29, 50, -1, 52, -1, 43, -1, -1, 55, 2, -1, -1, -1, -1),
         (6, 137)
-      ) must beTrue
+      )
+    )
+    assert(
       WMMatchingTest.check(
         12,
         Array(43, 17, 78, 32, 36, 23, 73, 52, 65, 58, 32, 0, 80, 46, 71, 1, 16, 89, 81, 38, 6, 57, 51, 0, 18,
           67, 40, 12, 88, 74, 24, 67, 65, 94, 44, 44, 48, 3, 0, 97, 83, 46, 47, 47, 75, 83, 94, 45, 23, 45,
           60, 59, 20, 89, 71, 90, 92, 76, 35, 51, 96, 26, 42, 70, 14, 6),
         (6, 80)
-      ) must beTrue
+      )
+    )
+    assert(
       WMMatchingTest.check(
         13,
         Array(-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 3, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
@@ -458,7 +544,9 @@ class WMMatchingTest extends Specification {
           -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 92, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
           -1, -1, 82, -1),
         (2, 85)
-      ) must beTrue
+      )
+    )
+    assert(
       WMMatchingTest.check(
         13,
         Array(-1, -1, -1, -1, -1, -1, -1, -1, -1, 43, -1, 59, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
@@ -466,7 +554,9 @@ class WMMatchingTest extends Specification {
           32, 39, -1, -1, -1, -1, -1, -1, -1, -1, 15, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
           -1, -1, -1, 26),
         (4, 133)
-      ) must beTrue
+      )
+    )
+    assert(
       WMMatchingTest.check(
         13,
         Array(-1, 8, -1, -1, -1, -1, -1, -1, -1, -1, -1, 19, -1, -1, -1, -1, -1, -1, 26, -1, -1, -1, -1, -1,
@@ -474,7 +564,9 @@ class WMMatchingTest extends Specification {
           90, 77, -1, -1, 86, -1, -1, -1, -1, -1, -1, -1, 45, -1, -1, 60, 71, -1, -1, -1, 3, -1, -1, 33, 62,
           -1, 70, -1, -1),
         (6, 266)
-      ) must beTrue
+      )
+    )
+    assert(
       WMMatchingTest.check(
         13,
         Array(-1, -1, -1, 44, 37, -1, -1, 0, 3, 48, 29, -1, 34, -1, 99, 15, -1, -1, 11, -1, 31, 44, 49, -1,
@@ -482,7 +574,9 @@ class WMMatchingTest extends Specification {
           20, 4, -1, 38, -1, 85, 29, -1, -1, -1, -1, 47, -1, 53, 25, -1, -1, 55, 86, -1, -1, -1, 44, 10, -1,
           85, 81, -1, 81),
         (6, 122)
-      ) must beTrue
+      )
+    )
+    assert(
       WMMatchingTest.check(
         13,
         Array(84, 50, 9, 33, 33, 74, 99, 65, 80, 95, 70, 66, 4, 9, 41, 76, 28, 23, 55, 70, 96, 56, 20, 0, 53,
@@ -490,7 +584,9 @@ class WMMatchingTest extends Specification {
           6, 3, 62, 92, 44, 74, 53, 23, 31, 82, 71, 45, 6, 4, 82, 8, 54, 55, 6, 28, 54, 78, 18, 59, 58, 83,
           75),
         (6, 38)
-      ) must beTrue
+      )
+    )
+    assert(
       WMMatchingTest.check(
         14,
         Array(-1, -1, -1, 31, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 82, -1, -1, -1, -1, -1,
@@ -498,7 +594,9 @@ class WMMatchingTest extends Specification {
           -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
           -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1),
         (3, 125)
-      ) must beTrue
+      )
+    )
+    assert(
       WMMatchingTest.check(
         14,
         Array(-1, -1, 81, -1, -1, 25, -1, 96, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
@@ -506,7 +604,9 @@ class WMMatchingTest extends Specification {
           -1, -1, 95, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 50,
           -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 45, -1, -1, -1, 69, -1),
         (4, 230)
-      ) must beTrue
+      )
+    )
+    assert(
       WMMatchingTest.check(
         14,
         Array(-1, -1, -1, -1, -1, -1, 74, -1, -1, -1, -1, -1, 45, -1, -1, 93, -1, -1, -1, -1, -1, -1, -1, -1,
@@ -514,7 +614,9 @@ class WMMatchingTest extends Specification {
           -1, -1, -1, -1, -1, 94, -1, -1, -1, 32, 60, -1, 76, 92, -1, -1, 45, -1, -1, -1, 77, 54, -1, -1, -1,
           62, -1, -1, -1, -1, 91, -1, -1, -1, 71, -1, -1, -1, 45, 74, -1, -1),
         (7, 443)
-      ) must beTrue
+      )
+    )
+    assert(
       WMMatchingTest.check(
         14,
         Array(-1, 56, -1, 89, -1, 75, -1, 44, -1, 23, -1, -1, -1, 59, -1, -1, 99, 18, 45, -1, 71, -1, 96, -1,
@@ -522,7 +624,9 @@ class WMMatchingTest extends Specification {
           -1, -1, 58, 83, -1, 59, 12, -1, 15, 47, 97, -1, -1, 43, 30, 93, -1, 3, -1, 17, 33, 54, 41, 26, -1,
           -1, 84, 72, -1, 25, 2, -1, 26, -1, 32, 41, -1, -1, 63, -1, -1, -1),
         (7, 170)
-      ) must beTrue
+      )
+    )
+    assert(
       WMMatchingTest.check(
         14,
         Array(94, 48, 72, 88, 6, 60, 20, 41, 17, 87, 12, 44, 72, 67, 58, 91, 1, 72, 4, 83, 57, 44, 22, 19, 93,
@@ -530,7 +634,9 @@ class WMMatchingTest extends Specification {
           21, 30, 30, 40, 30, 28, 89, 22, 17, 8, 82, 56, 28, 49, 89, 55, 3, 55, 18, 41, 75, 10, 16, 18, 9, 60,
           23, 17, 28, 6, 69, 84, 37, 88, 95, 93, 16, 42, 66, 49, 7),
         (7, 92)
-      ) must beTrue
+      )
+    )
+    assert(
       WMMatchingTest.check(
         15,
         Array(
@@ -541,7 +647,9 @@ class WMMatchingTest extends Specification {
           -1, -1, -1, -1, -1
         ),
         (4, 161)
-      ) must beTrue
+      )
+    )
+    assert(
       WMMatchingTest.check(
         15,
         Array(
@@ -552,7 +660,9 @@ class WMMatchingTest extends Specification {
           -1, -1, -1, -1, 11
         ),
         (6, 207)
-      ) must beTrue
+      )
+    )
+    assert(
       WMMatchingTest.check(
         15,
         Array(
@@ -563,7 +673,9 @@ class WMMatchingTest extends Specification {
           -1, -1, -1, -1, -1
         ),
         (7, 247)
-      ) must beTrue
+      )
+    )
+    assert(
       WMMatchingTest.check(
         15,
         Array(
@@ -574,7 +686,9 @@ class WMMatchingTest extends Specification {
           -1, 20, -1, 2, 62
         ),
         (7, 138)
-      ) must beTrue
+      )
+    )
+    assert(
       WMMatchingTest.check(
         15,
         Array(
@@ -585,7 +699,9 @@ class WMMatchingTest extends Specification {
           47, 93, 11
         ),
         (7, 49)
-      ) must beTrue
+      )
+    )
+    assert(
       WMMatchingTest.check(
         16,
         Array(
@@ -596,7 +712,9 @@ class WMMatchingTest extends Specification {
           -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 48, -1, -1
         ),
         (5, 259)
-      ) must beTrue
+      )
+    )
+    assert(
       WMMatchingTest.check(
         16,
         Array(
@@ -607,7 +725,9 @@ class WMMatchingTest extends Specification {
           -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 76, -1, -1, -1, -1, 63, -1, -1, -1
         ),
         (7, 324)
-      ) must beTrue
+      )
+    )
+    assert(
       WMMatchingTest.check(
         16,
         Array(
@@ -618,7 +738,9 @@ class WMMatchingTest extends Specification {
           -1, -1, -1, -1, -1, -1, -1, 69, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1
         ),
         (7, 184)
-      ) must beTrue
+      )
+    )
+    assert(
       WMMatchingTest.check(
         16,
         Array(
@@ -629,7 +751,9 @@ class WMMatchingTest extends Specification {
           -1, 95, 89, 18, -1, -1, -1, -1, 52, 3, -1, -1, 74, 48, -1, 36, -1, -1
         ),
         (8, 133)
-      ) must beTrue
+      )
+    )
+    assert(
       WMMatchingTest.check(
         16,
         Array(
@@ -640,7 +764,9 @@ class WMMatchingTest extends Specification {
           55, 7, 30, 54, 50, 50, 25, 69, 31, 53, 54, 84, 17, 53, 65, 20, 0
         ),
         (8, 81)
-      ) must beTrue
+      )
+    )
+    assert(
       WMMatchingTest.check(
         17,
         Array(-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
@@ -650,7 +776,9 @@ class WMMatchingTest extends Specification {
           -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
           85, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1),
         (4, 200)
-      ) must beTrue
+      )
+    )
+    assert(
       WMMatchingTest.check(
         17,
         Array(-1, -1, -1, -1, 70, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 47, -1,
@@ -660,7 +788,9 @@ class WMMatchingTest extends Specification {
           -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 4, -1, -1, -1, -1, -1, -1, -1, 11, -1, -1, -1, -1,
           -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1),
         (6, 90)
-      ) must beTrue
+      )
+    )
+    assert(
       WMMatchingTest.check(
         17,
         Array(82, 5, -1, -1, 47, -1, -1, -1, -1, 73, -1, 99, -1, -1, 75, -1, -1, -1, -1, -1, 60, -1, -1, -1,
@@ -670,7 +800,9 @@ class WMMatchingTest extends Specification {
           -1, 14, -1, -1, -1, -1, -1, 65, 74, -1, -1, -1, -1, -1, -1, 48, -1, -1, -1, 48, 24, -1, -1, 13, -1,
           13, 62, -1, 37, -1, -1, 19, -1, -1, -1, -1, -1),
         (8, 164)
-      ) must beTrue
+      )
+    )
+    assert(
       WMMatchingTest.check(
         17,
         Array(-1, -1, 43, 57, 4, 59, 2, -1, 37, -1, 60, 61, 5, -1, -1, -1, -1, -1, -1, 2, -1, -1, -1, -1, -1,
@@ -680,7 +812,9 @@ class WMMatchingTest extends Specification {
           21, 30, -1, -1, -1, -1, -1, -1, 8, -1, 81, -1, 29, -1, -1, -1, 81, 9, 45, -1, -1, -1, 35, 78, -1,
           -1, 92, -1, 7, -1, 56, 97, -1, 63),
         (8, 63)
-      ) must beTrue
+      )
+    )
+    assert(
       WMMatchingTest.check(
         17,
         Array(29, 48, 66, 72, 57, 98, 86, 50, 85, 53, 7, 1, 32, 88, 67, 53, 36, 74, 67, 65, 66, 3, 23, 21, 23,
@@ -690,18 +824,22 @@ class WMMatchingTest extends Specification {
           70, 95, 87, 42, 10, 15, 23, 25, 1, 33, 50, 77, 69, 24, 49, 50, 67, 52, 76, 98, 6, 10, 59, 27, 29,
           41, 87, 54, 39, 69, 82, 10, 55, 19, 23),
         (8, 42)
-      ) must beTrue
+      )
+    )
+    assert(
       WMMatchingTest.check(
         18,
         Array(-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 25, -1, -1, -1, -1, 67, -1,
           -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
           -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 34, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
           69, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 68, -1, -1, -1, 54, -1, -1, -1,
-          -1, -1, -1, -1, -1, -1, -1, -1, -1, 56, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
           -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-          -1, -1, -1, -1),
+          -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 56, -1, -1, -1,
+          -1, -1, -1, -1, -1),
         (4, 169)
-      ) must beTrue
+      )
+    )
+    assert(
       WMMatchingTest.check(
         18,
         Array(-1, 93, -1, 35, -1, -1, -1, 73, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
@@ -712,7 +850,9 @@ class WMMatchingTest extends Specification {
           -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
           -1, 1, -1, 11),
         (6, 253)
-      ) must beTrue
+      )
+    )
+    assert(
       WMMatchingTest.check(
         18,
         Array(-1, -1, -1, 57, -1, 67, -1, -1, -1, -1, 30, 73, -1, 7, 78, -1, -1, -1, -1, -1, -1, -1, -1, -1,
@@ -723,7 +863,9 @@ class WMMatchingTest extends Specification {
           -1, 69, -1, -1, -1, -1, -1, -1, -1, -1, -1, 91, -1, -1, -1, -1, -1, 9, 70, 44, 51, 87, -1, -1, -1,
           -1, 0, -1, -1),
         (9, 424)
-      ) must beTrue
+      )
+    )
+    assert(
       WMMatchingTest.check(
         18,
         Array(-1, 46, 68, 59, -1, 68, -1, -1, -1, -1, 89, -1, 21, 92, -1, 12, 40, -1, -1, -1, 39, -1, 84, -1,
@@ -734,7 +876,9 @@ class WMMatchingTest extends Specification {
           76, -1, -1, 15, 30, -1, 41, 13, -1, -1, -1, -1, -1, -1, 37, 30, -1, 93, 98, 25, 40, -1, -1, 15, -1,
           67, 84, -1, -1),
         (9, 194)
-      ) must beTrue
+      )
+    )
+    assert(
       WMMatchingTest.check(
         18,
         Array(10, 75, 28, 0, 99, 6, 10, 59, 63, 19, 91, 96, 78, 46, 79, 63, 93, 76, 24, 68, 92, 55, 41, 42,
@@ -745,7 +889,9 @@ class WMMatchingTest extends Specification {
           67, 58, 49, 85, 51, 10, 35, 13, 1, 77, 99, 19, 12, 94, 43, 22, 92, 55, 30, 71, 8, 43, 16, 89, 36,
           29, 37),
         (9, 52)
-      ) must beTrue
+      )
+    )
+    assert(
       WMMatchingTest.check(
         19,
         Array(-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
@@ -756,7 +902,9 @@ class WMMatchingTest extends Specification {
           -1, -1, -1, -1, -1, -1, -1, 95, -1, -1, -1, -1, -1, 70, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, -1,
           -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 60),
         (5, 154)
-      ) must beTrue
+      )
+    )
+    assert(
       WMMatchingTest.check(
         19,
         Array(53, -1, -1, 42, -1, -1, -1, -1, -1, -1, -1, -1, 37, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
@@ -764,10 +912,12 @@ class WMMatchingTest extends Specification {
           -1, -1, -1, -1, -1, -1, 12, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 90, -1, -1, -1, -1, -1,
           -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 50, -1, -1, 22, -1, -1, -1, 33, -1, 48, -1,
           24, -1, -1, -1, -1, 98, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 91, -1, -1,
-          -1, -1, 3, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 38, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-          -1, -1, -1, -1, -1, -1, -1, -1, 92, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 65, -1, -1),
+          -1, -1, 3, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 38, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+          -1, -1, -1, -1, -1, -1, -1, -1, -1, 92, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 65, -1, -1),
         (8, 378)
-      ) must beTrue
+      )
+    )
+    assert(
       WMMatchingTest.check(
         19,
         Array(-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 76, 84, -1, -1, -1, 49,
@@ -778,7 +928,9 @@ class WMMatchingTest extends Specification {
           -1, -1, -1, -1, -1, 39, -1, -1, -1, -1, -1, -1, -1, -1, 8, -1, -1, -1, -1, -1, -1, 6, 41, -1, -1,
           -1, -1, -1, -1, -1, -1, -1, -1, 11, -1, 76, -1, -1, -1, 58, 54, -1, 80, 69, 4, -1, 2),
         (9, 331)
-      ) must beTrue
+      )
+    )
+    assert(
       WMMatchingTest.check(
         19,
         Array(-1, -1, -1, 62, 93, 59, 75, -1, -1, 86, 74, -1, 88, 19, -1, -1, 4, 96, 45, 23, -1, 95, -1, 27,
@@ -789,7 +941,9 @@ class WMMatchingTest extends Specification {
           28, -1, -1, -1, -1, 37, -1, 42, -1, -1, 28, -1, -1, -1, 81, -1, -1, 96, -1, 96, -1, 36, -1, -1, -1,
           -1, 79, 78, -1, 1, -1, 15, 31, -1, 96, 81, -1, -1, -1, 56, 35, 57, -1, -1, -1, 65),
         (9, 176)
-      ) must beTrue
+      )
+    )
+    assert(
       WMMatchingTest.check(
         19,
         Array(79, 63, 11, 12, 27, 79, 41, 1, 82, 83, 80, 32, 2, 73, 59, 69, 78, 63, 71, 1, 38, 13, 95, 89, 25,
@@ -800,7 +954,9 @@ class WMMatchingTest extends Specification {
           64, 1, 32, 62, 13, 86, 45, 36, 83, 3, 17, 21, 84, 89, 6, 52, 21, 4, 21, 1, 59, 75, 95, 27, 80, 63,
           95, 75, 1, 99, 83, 97, 67, 0, 35, 51, 20, 30, 17, 7, 71, 47, 3),
         (9, 20)
-      ) must beTrue
+      )
+    )
+    assert(
       WMMatchingTest.check(
         20,
         Array(29, -1, -1, -1, 48, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 11, -1, -1, -1, -1, -1, -1, -1,
@@ -812,7 +968,9 @@ class WMMatchingTest extends Specification {
           -1, -1, 28, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
           -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1),
         (5, 141)
-      ) must beTrue
+      )
+    )
+    assert(
       WMMatchingTest.check(
         20,
         Array(-1, 12, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
@@ -824,7 +982,9 @@ class WMMatchingTest extends Specification {
           -1, -1, 76, 47, -1, -1, -1, -1, -1, -1, -1, -1, 47, -1, -1, -1, -1, -1, -1, 59, -1, -1, -1, -1, -1,
           -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 92, -1, -1, -1, -1),
         (9, 510)
-      ) must beTrue
+      )
+    )
+    assert(
       WMMatchingTest.check(
         20,
         Array(35, 20, -1, 44, -1, -1, -1, -1, -1, 15, -1, -1, -1, 51, -1, -1, -1, -1, -1, -1, -1, -1, -1, 7,
@@ -836,7 +996,9 @@ class WMMatchingTest extends Specification {
           43, -1, -1, -1, -1, -1, 2, -1, 19, -1, -1, -1, 78, -1, 57, -1, -1, -1, -1, -1, -1, 64, -1, -1, -1,
           -1, 19, 86, 49, -1, -1, -1, -1, -1, -1, -1, -1, -1, 25, -1, -1),
         (10, 234)
-      ) must beTrue
+      )
+    )
+    assert(
       WMMatchingTest.check(
         20,
         Array(-1, -1, -1, -1, 32, -1, -1, 40, -1, -1, -1, -1, 91, -1, -1, 49, -1, 74, 37, -1, -1, -1, -1, -1,
@@ -848,7 +1010,9 @@ class WMMatchingTest extends Specification {
           12, 16, 65, 44, 78, 7, -1, 7, -1, 20, 41, 21, 75, 2, 84, 68, 68, 40, 12, -1, -1, -1, -1, 24, -1, 81,
           87, 11, 92, 2, 42, 62, 85, -1, -1, 76, -1, -1, -1, -1),
         (10, 158)
-      ) must beTrue
+      )
+    )
+    assert(
       WMMatchingTest.check(
         20,
         Array(27, 33, 27, 6, 74, 2, 16, 52, 84, 5, 83, 72, 63, 17, 18, 33, 75, 62, 38, 89, 45, 80, 22, 52, 78,
@@ -860,8 +1024,5 @@ class WMMatchingTest extends Specification {
           92, 74, 48, 50, 4, 29, 38, 22, 64, 88, 81, 76, 16, 60, 3, 90, 7, 86, 53, 21, 93, 21, 52, 59, 94, 6,
           22, 94, 80, 24, 9, 43, 20, 52, 33, 74),
         (10, 46)
-      ) must beTrue
-
-    }
-  }
-}
+      )
+    )

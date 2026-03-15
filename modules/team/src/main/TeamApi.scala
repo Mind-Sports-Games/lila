@@ -63,7 +63,7 @@ final class TeamApi(
         hideForum = Some(s.hideForum)
       )
       teamRepo.coll.insert.one(team) >>
-        memberRepo.add(team.id, me.id) >>- {
+        memberRepo.add(team.id, me.id).andDo {
           cached invalidateTeamIds me.id
           indexer ! InsertTeam(team)
           timeline ! Propagate(
@@ -87,10 +87,9 @@ final class TeamApi(
         hideForum = Some(e.hideForum)
       ) pipe { team =>
         teamRepo.coll.update.one($id(team.id), team).void >>
-          !team.leaders(me.id) ?? {
+          !team.leaders(me.id) so {
             modLog.teamEdit(me.id, team.createdBy, team.name)
-          } >>-
-          (indexer ! InsertTeam(team))
+          }.andDo(indexer ! InsertTeam(team))
       }
     }
 
@@ -147,7 +146,7 @@ final class TeamApi(
   def requestable(teamId: Team.ID, user: User): Fu[Option[Team]] =
     for {
       teamOption <- teamEnabled(teamId)
-      able       <- teamOption.??(requestable(_, user))
+      able       <- teamOption.so(requestable(_, user))
     } yield teamOption ifTrue able
 
   def requestable(team: Team, user: User): Fu[Boolean] =
@@ -158,15 +157,15 @@ final class TeamApi(
 
   def createRequest(team: Team, user: User, msg: String): Funit =
     requestable(team, user) flatMap {
-      _ ?? {
+      _ so {
         val request = Request.make(team = team.id, user = user.id, message = msg)
-        requestRepo.coll.insert.one(request).void >>- (cached.nbRequests invalidate team.createdBy)
+        requestRepo.coll.insert.one(request).void.andDo(cached.nbRequests invalidate team.createdBy)
       }
     }
 
   def cancelRequest(teamId: Team.ID, user: User): Fu[Option[Team]] =
     teamRepo.coll.byId[Team](teamId) flatMap {
-      _ ?? { team =>
+      _ so { team =>
         requestRepo.cancel(team.id, user) map (_ option team)
       }
     }
@@ -179,24 +178,25 @@ final class TeamApi(
       _ <-
         userOption
           .filter(_ => accept)
-          .??(user => doJoin(team, user) >> notifier.acceptRequest(team, request))
+          .so(user => doJoin(team, user) >> notifier.acceptRequest(team, request))
     } yield ()
 
   def deleteRequestsByUserId(userId: User.ID) =
     requestRepo.getByUserId(userId) flatMap {
-      _.map { request =>
-        requestRepo.remove(request.id) >>
-          teamRepo.leadersOf(request.team).map {
-            _ foreach cached.nbRequests.invalidate
-          }
-      }.sequenceFu
+      requests =>
+        Future.sequence(requests.map { request =>
+          requestRepo.remove(request.id) >>
+            teamRepo.leadersOf(request.team).map {
+              _ foreach cached.nbRequests.invalidate
+            }
+        })
     }
 
   def doJoin(team: Team, user: User): Funit =
     !belongsTo(team.id, user.id) flatMap {
-      _ ?? {
+      _ so {
         memberRepo.add(team.id, user.id) >>
-          teamRepo.incMembers(team.id, +1) >>- {
+          teamRepo.incMembers(team.id, +1).andDo {
             cached invalidateTeamIds user.id
             timeline ! Propagate(TeamJoin(user.id, team.id)).toFollowersOf(user.id)
             Bus.publish(JoinTeam(id = team.id, userId = user.id), "team")
@@ -206,7 +206,7 @@ final class TeamApi(
 
   def quit(teamId: Team.ID, me: User): Fu[Option[Team]] =
     teamRepo.coll.byId[Team](teamId) flatMap {
-      _ ?? { team =>
+      _ so { team =>
         doQuit(team, me.id) inject team.some
       }
     }
@@ -226,23 +226,21 @@ final class TeamApi(
     cached.teamIdsList(userId) flatMap { teamIds =>
       memberRepo.removeByUser(userId) >>
         requestRepo.removeByUser(userId) >>
-        teamIds.map { teamRepo.incMembers(_, -1) }.sequenceFu.void >>-
-        cached.invalidateTeamIds(userId) inject teamIds
+        Future.sequence(teamIds.map { teamRepo.incMembers(_, -1) }).void.andDo(cached.invalidateTeamIds(userId)) inject teamIds
     }
 
   def kick(team: Team, userId: User.ID, me: User): Funit =
     doQuit(team, userId) >>
-      (!team.leaders(me.id)).?? {
+      (!team.leaders(me.id)).so {
         modLog.teamKick(me.id, userId, team.name)
-      } >>-
-      Bus.publish(KickFromTeam(teamId = team.id, userId = userId), "teamKick")
+      }.andDo(Bus.publish(KickFromTeam(teamId = team.id, userId = userId), "teamKick"))
 
   private case class TagifyUser(value: String)
   implicit private val TagifyUserReads: Reads[TagifyUser] = Json.reads[TagifyUser]
 
   def setLeaders(team: Team, json: String, by: User, byMod: Boolean): Funit = {
     val leaders: Set[User.ID] = Try {
-      json.trim.nonEmpty ?? {
+      json.trim.nonEmpty so {
         Json.parse(json).validate[List[TagifyUser]] match {
           case JsSuccess(users, _) =>
             users
@@ -254,7 +252,7 @@ final class TeamApi(
       }
     } getOrElse Set.empty
     memberRepo.filterUserIdsInTeam(team.id, leaders) flatMap { ids =>
-      ids.nonEmpty ?? {
+      ids.nonEmpty so {
         if (ids(team.createdBy) || !team.leaders(team.createdBy) || by.id == team.createdBy || byMod) {
           cached.leaders.put(team.id, fuccess(ids))
           logger.info(s"valid setLeaders ${team.id}: ${ids mkString ", "} by @${by.id}")
@@ -269,7 +267,7 @@ final class TeamApi(
 
   def isLeaderOf(leader: User.ID, member: User.ID) =
     cached.teamIdsList(member) flatMap { teamIds =>
-      teamIds.nonEmpty ?? teamRepo.coll.exists($inIds(teamIds) ++ $doc("leaders" -> leader))
+      teamIds.nonEmpty so teamRepo.coll.exists($inIds(teamIds) ++ $doc("leaders" -> leader))
     }
 
   def toggleEnabled(team: Team, by: User): Funit =
@@ -280,18 +278,16 @@ final class TeamApi(
       if (team.enabled)
         teamRepo.disable(team).void >>
           memberRepo.userIdsByTeam(team.id).map { _ foreach cached.invalidateTeamIds } >>
-          requestRepo.removeByTeam(team.id).void >>-
-          (indexer ! RemoveTeam(team.id))
+          requestRepo.removeByTeam(team.id).void.andDo(indexer ! RemoveTeam(team.id))
       else
-        teamRepo.enable(team).void >>- (indexer ! InsertTeam(team))
+        teamRepo.enable(team).void.andDo(indexer ! InsertTeam(team))
     } else
       teamRepo.setLeaders(team.id, team.leaders - by.id)
 
   // delete for ever, with members but not forums
   def delete(team: Team): Funit =
     teamRepo.coll.delete.one($id(team.id)) >>
-      memberRepo.removeByteam(team.id) >>-
-      (indexer ! RemoveTeam(team.id))
+      memberRepo.removeByteam(team.id).andDo(indexer ! RemoveTeam(team.id))
 
   def syncBelongsTo(teamId: Team.ID, userId: User.ID): Boolean =
     cached.syncTeamIds(userId) contains teamId

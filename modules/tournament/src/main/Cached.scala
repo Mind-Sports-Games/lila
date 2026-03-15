@@ -71,7 +71,7 @@ final private[tournament] class Cached(
         _.expireAfterWrite(1 second)
           .buildAsyncFuture { id =>
             tournamentRepo teamBattleOf id flatMap {
-              _ ?? { playerRepo.bestTeamIdsByTour(id, _) }
+              _ so { playerRepo.bestTeamIdsByTour(id, _) }
             }
           }
       }

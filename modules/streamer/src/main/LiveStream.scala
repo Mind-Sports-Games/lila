@@ -1,7 +1,7 @@
 package lila.streamer
 
-import akka.actor._
-import akka.pattern.ask
+import org.apache.pekko.actor._
+import org.apache.pekko.pattern.ask
 import makeTimeout.short
 import play.api.i18n.Lang
 import play.api.mvc.RequestHeader
@@ -9,7 +9,7 @@ import scala.concurrent.duration._
 
 import lila.memo.CacheApi._
 import lila.user.User
-import ornicar.scalalib.Zero
+import alleycats.Zero
 
 case class LiveStreams(streams: List[Stream]) {
 
@@ -65,7 +65,7 @@ object LiveStreams {
   }
 
   implicit val zero: Zero[WithTitles] =
-    ornicar.scalalib.Zero.instance(WithTitles(LiveStreams(Nil), Map.empty))
+    Zero(WithTitles(LiveStreams(Nil), Map.empty))
 }
 
 final class LiveStreamApi(

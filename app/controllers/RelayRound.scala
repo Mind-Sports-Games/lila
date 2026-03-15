@@ -50,9 +50,9 @@ final class RelayRound(
       scoped = req =>
         me =>
           env.relay.api tourById TourModel.Id(tourId) flatMap {
-            _ ?? { tour =>
+            _ so { tour =>
               env.relay.api.withRounds(tour) flatMap { trs =>
-                !(me.isBot || me.lame) ??
+                !(me.isBot || me.lame) so
                   env.relay.roundForm
                     .create(trs)
                     .bindFromRequest()(req, formBinding)
@@ -105,7 +105,7 @@ final class RelayRound(
       req: Request[_]
   ): Fu[Option[Either[(RoundModel.WithTour, Form[RelayRoundForm.Data]), RoundModel.WithTour]]] =
     env.relay.api.byIdAndContributor(id, me) flatMap {
-      _ ?? { rt =>
+      _ so { rt =>
         env.relay.roundForm
           .edit(rt.round)
           .bindFromRequest()
@@ -138,7 +138,7 @@ final class RelayRound(
                 }
               }
             else env.study.api byIdWithChapter rt.round.studyId
-          sc flatMap { _ ?? { doShow(rt, _) } }
+          sc flatMap { _ so { doShow(rt, _) } }
         }
       },
       scoped = _ =>
@@ -153,7 +153,7 @@ final class RelayRound(
     Open { implicit ctx =>
       WithRoundAndTour(ts, rs, id) { rt =>
         env.study.api.byIdWithChapter(rt.round.studyId, chapterId) flatMap {
-          _ ?? { doShow(rt, _) }
+          _ so { doShow(rt, _) }
         }
       }
     }
@@ -183,8 +183,8 @@ final class RelayRound(
       f: TourModel.WithRounds => Fu[Result]
   )(implicit ctx: Context): Fu[Result] =
     WithTour(id) { tour =>
-      ctx.me.?? { env.relay.api.canUpdate(_, tour) } flatMap {
-        _ ?? {
+      ctx.me.so { env.relay.api.canUpdate(_, tour) } flatMap {
+        _ so {
           env.relay.api withRounds tour flatMap f
         }
       }

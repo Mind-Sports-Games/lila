@@ -16,7 +16,7 @@ object Spotlight {
   import Schedule.Freq._
 
   //if re-enabling original lichess ordering, will want to change botN to topN
-  //implicit private val importanceOrdering = Ordering.by[Tournament, Int](_.schedule.??(_.freq.importance))
+  //implicit private val importanceOrdering = Ordering.by[Tournament, Int](_.schedule.so(_.freq.importance))
   implicit private val importanceOrdering: Ordering[Tournament] =
     Ordering.by[Tournament, org.joda.time.DateTime](_.startsAt)
 
@@ -36,9 +36,9 @@ object Spotlight {
     }
 
   private def automatically(tour: Tournament, user: User): Boolean =
-    tour.schedule ?? { sched =>
+    tour.schedule so { sched =>
       def playedSinceWeeks(weeks: Int) =
-        user.perfs(tour.perfType).latest ?? {
+        user.perfs(tour.perfType).latest so {
           _.plusWeeks(weeks).isAfterNow
         }
       sched.freq match {

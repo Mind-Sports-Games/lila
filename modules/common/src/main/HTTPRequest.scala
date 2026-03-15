@@ -4,15 +4,15 @@ import play.api.http.HeaderNames
 import play.api.mvc.RequestHeader
 import play.api.routing.Router
 
-object HTTPRequest {
+object HTTPRequest:
 
   def isXhr(req: RequestHeader): Boolean =
-    req.headers get "X-Requested-With" contains "XMLHttpRequest"
+    req.headers.get("X-Requested-With").contains("XMLHttpRequest")
 
   def isSynchronousHttp(req: RequestHeader) = !isXhr(req)
 
   def isEventSource(req: RequestHeader): Boolean =
-    req.headers get "Accept" contains "text/event-stream"
+    req.headers.get("Accept").contains("text/event-stream")
 
   def isSafe(req: RequestHeader)   = req.method == "GET" || req.method == "HEAD" || req.method == "OPTIONS"
   def isUnsafe(req: RequestHeader) = !isSafe(req)
@@ -22,7 +22,7 @@ object HTTPRequest {
   def isProgrammatic(req: RequestHeader) =
     !isSynchronousHttp(req) || isFishnet(req) || isApi(req) || req.headers
       .get(HeaderNames.ACCEPT)
-      .exists(_ startsWith "application/vnd.playstrategy.v")
+      .exists(_.startsWith("application/vnd.playstrategy.v"))
 
   private val appOrigins = Set(
     "capacitor://localhost", // ios
@@ -31,31 +31,31 @@ object HTTPRequest {
     "http://localhost:8080"  // local dev
   )
 
-  def appOrigin(req: RequestHeader) = origin(req) filter appOrigins
+  def appOrigin(req: RequestHeader) = origin(req).filter(appOrigins)
 
-  def isApi(req: RequestHeader)      = req.path startsWith "/api/"
+  def isApi(req: RequestHeader)      = req.path.startsWith("/api/")
   def isApiOrApp(req: RequestHeader) = isApi(req) || appOrigin(req).isDefined
 
-  def isAssets(req: RequestHeader) = req.path startsWith "/assets/"
+  def isAssets(req: RequestHeader) = req.path.startsWith("/assets/")
 
-  def userAgent(req: RequestHeader): Option[String] = req.headers get HeaderNames.USER_AGENT
+  def userAgent(req: RequestHeader): Option[String] = req.headers.get(HeaderNames.USER_AGENT)
 
   val isAndroid = UaMatcher("""(?i)android.+mobile""")
   val isMobile  = UaMatcher("""(?i)iphone|ipad|ipod|android.+mobile""")
 
-  private def uaContains(req: RequestHeader, str: String) = userAgent(req).exists(_ contains str)
+  private def uaContains(req: RequestHeader, str: String) = userAgent(req).exists(_.contains(str))
   def isChrome(req: RequestHeader)                        = uaContains(req, "Chrome/")
 
-  def origin(req: RequestHeader): Option[String] = req.headers get HeaderNames.ORIGIN
+  def origin(req: RequestHeader): Option[String] = req.headers.get(HeaderNames.ORIGIN)
 
-  def referer(req: RequestHeader): Option[String] = req.headers get HeaderNames.REFERER
+  def referer(req: RequestHeader): Option[String] = req.headers.get(HeaderNames.REFERER)
 
   def ipAddress(req: RequestHeader) =
     IpAddress.unchecked {
       req.remoteAddress.split(", ").lastOption | req.remoteAddress // trusted
     }
 
-  def sid(req: RequestHeader): Option[String] = req.session get LilaCookie.sessionId
+  def sid(req: RequestHeader): Option[String] = req.session.get(LilaCookie.sessionId)
 
   val isCrawler = UaMatcher {
     """(?i)googlebot|googlebot-mobile|googlebot-image|mediapartners-google|bingbot|slurp|java|wget|curl|commons-httpclient|python-urllib|libwww|httpunit|nutch|phpcrawl|msnbot|adidxbot|blekkobot|teoma|ia_archiver|gingercrawler|webmon|httrack|webcrawler|fast-webcrawler|fastenterprisecrawler|convera|biglotron|grub\.org|usinenouvellecrawler|antibot|netresearchserver|speedy|fluffy|jyxobot|bibnum\.bnf|findlink|exabot|gigabot|msrbot|seekbot|ngbot|panscient|yacybot|aisearchbot|ioi|ips-agent|tagoobot|mj12bot|dotbot|woriobot|yanga|buzzbot|mlbot|purebot|lingueebot|yandex\.com/bots|""" +
@@ -63,24 +63,22 @@ object HTTPRequest {
       """coccoc|integromedb|contentcrawlerspider|toplistbot|seokicks-robot|it2media-domain-crawler|ip-web-crawler\.com|siteexplorer\.info|elisabot|proximic|changedetection|blexbot|arabot|wesee:search|niki-bot|crystalsemanticsbot|rogerbot|360spider|psbot|interfaxscanbot|lipperheyseoservice|ccmetadatascaper|g00g1e\.net|grapeshotcrawler|urlappendbot|brainobot|fr-crawler|binlar|simplecrawler|simplecrawler|livelapbot|twitterbot|cxensebot|smtbot|facebookexternalhit|daumoa|sputnikimagebot|visionutils|yisouspider|parsijoobot|mediatoolkit\.com|semrushbot"""
   }
 
-  case class UaMatcher(rStr: String) {
+  final class UaMatcher(rStr: String):
     private val regex = rStr.r
+    def apply(req: RequestHeader): Boolean = userAgent(req).exists(regex.findFirstIn(_).isDefined)
 
-    def apply(req: RequestHeader): Boolean = userAgent(req) ?? regex.find
-  }
-
-  def isFishnet(req: RequestHeader) = req.path startsWith "/fishnet/"
+  def isFishnet(req: RequestHeader) = req.path.startsWith("/fishnet/")
 
   def isHuman(req: RequestHeader) = !isCrawler(req) && !isFishnet(req)
 
   def isFacebookOrTwitterBot(req: RequestHeader) =
-    userAgent(req) ?? { ua =>
+    userAgent(req).exists { ua =>
       ua.contains("facebookexternalhit/") || ua.contains("twitterbot/")
     }
 
-  private[this] val fileExtensionRegex = """\.(?<!^\.)[a-zA-Z0-9]{2,4}$""".r
+  private val fileExtensionRegex = """\(?<!^\.)[a-zA-Z0-9]{2,4}$""".r
 
-  def hasFileExtension(req: RequestHeader) = fileExtensionRegex.find(req.path)
+  def hasFileExtension(req: RequestHeader) = fileExtensionRegex.findFirstIn(req.path).isDefined
 
   def weirdUA(req: RequestHeader) = userAgent(req).fold(true)(_.lengthIs < 30)
 
@@ -93,21 +91,20 @@ object HTTPRequest {
 
   def isOAuth(req: RequestHeader) = req.headers.toMap.contains(HeaderNames.AUTHORIZATION)
 
-  def acceptsNdJson(req: RequestHeader) = req.headers get HeaderNames.ACCEPT contains "application/x-ndjson"
-  def acceptsJson(req: RequestHeader)   = req.headers get HeaderNames.ACCEPT contains "application/json"
-  def acceptsCsv(req: RequestHeader)    = req.headers get HeaderNames.ACCEPT contains "text/csv"
+  def acceptsNdJson(req: RequestHeader) = req.headers.get(HeaderNames.ACCEPT).contains("application/x-ndjson")
+  def acceptsJson(req: RequestHeader)   = req.headers.get(HeaderNames.ACCEPT).contains("application/json")
+  def acceptsCsv(req: RequestHeader)    = req.headers.get(HeaderNames.ACCEPT).contains("text/csv")
 
   def actionName(req: RequestHeader): String =
-    req.attrs.get(Router.Attrs.ActionName).getOrElse("NoHandler")
+    req.attrs.get(Router.Attrs.HandlerDef).fold("NoHandler")(_.method)
 
   private val ApiVersionHeaderPattern = """application/vnd\.playstrategy\.v(\d++)\+json""".r
 
-  def apiVersion(req: RequestHeader): Option[ApiVersion] = {
-    req.headers.get(HeaderNames.ACCEPT) flatMap {
-      case ApiVersionHeaderPattern(v) => v.toIntOption map ApiVersion.apply
+  def apiVersion(req: RequestHeader): Option[ApiVersion] =
+    req.headers.get(HeaderNames.ACCEPT).flatMap {
+      case ApiVersionHeaderPattern(v) => v.toIntOption.map(ApiVersion.apply)
       case _                          => none
     }
-  }
 
   private def isDataDump(req: RequestHeader) = req.path == "/account/personal-data"
 
@@ -117,9 +114,6 @@ object HTTPRequest {
 
   def clientName(req: RequestHeader) =
     // the mobile app sends XHR headers
-    if (isXhr(req)) apiVersion(req).fold("xhr") { v =>
-      s"mobile/$v"
-    }
-    else if (isCrawler(req)) "crawler"
+    if isXhr(req) then apiVersion(req).fold("xhr") { v => s"mobile/$v" }
+    else if isCrawler(req) then "crawler"
     else "browser"
-}

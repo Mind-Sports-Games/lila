@@ -50,7 +50,7 @@ final class SwissJson(
       playerInfo: Option[SwissPlayer.ViewExt] = None
   )(implicit lang: Lang): Fu[JsObject] = {
     for {
-      myInfo <- me.?? { fetchMyInfo(swiss, _) }
+      myInfo <- me.so { fetchMyInfo(swiss, _) }
       page = reqPage orElse myInfo.map(_.page) getOrElse 1
       standing <- standingApi(swiss, page)
       podium   <- podiumJson(swiss)
@@ -84,11 +84,11 @@ final class SwissJson(
 
   def fetchMyInfo(swiss: Swiss, me: User): Fu[Option[MyInfo]] =
     colls.player.byId[SwissPlayer](SwissPlayer.makeId(swiss.id, me.id).value) flatMap {
-      _ ?? { player =>
+      _ so { player =>
         updatePlayerRating(swiss, player, me) >>
           SwissPairing.fields { f =>
             (swiss.nbOngoing > 0)
-              .?? {
+              .so {
                 colls.pairing
                   .find(
                     $doc(f.swissId -> swiss.id, f.players -> player.userId, f.status -> SwissPairing.ongoing),
@@ -116,7 +116,7 @@ final class SwissJson(
     swiss.settings.rated
       .option(user perfs swiss.roundPerfType)
       .filter(_.intRating != player.rating)
-      .?? { perf =>
+      .so { perf =>
         SwissPlayer.fields { f =>
           colls.player.update
             .one(
@@ -128,7 +128,7 @@ final class SwissJson(
       }
 
   private def podiumJson(swiss: Swiss): Fu[Option[JsArray]] =
-    swiss.isFinished ?? {
+    swiss.isFinished so {
       SwissPlayer.fields { f =>
         colls.player
           .find($doc(f.swissId -> swiss.id, f.disqualified $ne true))
@@ -142,7 +142,6 @@ final class SwissJson(
             .foreach {
               colls.swiss.updateField($id(swiss.id), "winnerId", _).void
             }
-            .unit
           userRepo.filterEngine(top3.map(_.userId)) map { engines =>
             JsArray(
               top3.map { player =>
@@ -246,7 +245,7 @@ object SwissJson {
           }
           .mkString("|")
       ) ++ Json.obj(
-      "mmStartingScore" -> (swiss.settings.mcmahon ?? view.player.mcMahonStartingScore(
+      "mmStartingScore" -> (swiss.settings.mcmahon so view.player.mcMahonStartingScore(
         swiss.settings.mcmahonCutoffGrade
       ))
     )
@@ -264,13 +263,13 @@ object SwissJson {
                 "rating"      -> p.player.player.rating,
                 "inputRating" -> p.player.player.inputRating,
                 "ratingDisplay" -> (swiss.variant.gameFamily == GameFamily
-                  .Go() && (swiss.settings.handicapped || swiss.settings.mcmahon)) ?? p.player.player.inputRating
+                  .Go() && (swiss.settings.handicapped || swiss.settings.mcmahon)) so p.player.player.inputRating
                   .map(goRatingDisplay(_))
               )
           }
         }
     ) ++ Json.obj(
-      "mmStartingScore" -> (swiss.settings.mcmahon ?? playerView.player.mcMahonStartingScore(
+      "mmStartingScore" -> (swiss.settings.mcmahon so playerView.player.mcMahonStartingScore(
         swiss.settings.mcmahonCutoffGrade
       ))
     )
@@ -345,7 +344,7 @@ object SwissJson {
         "tieBreak"      -> p.tieBreak,
         "tieBreak2"     -> p.tieBreak2
       )
-      .add("performance" -> (performance ?? p.performance))
+      .add("performance" -> (performance so p.performance))
       .add("provisional" -> p.provisional)
       .add("absent" -> p.absent)
       .add("disqualified" -> p.disqualified)

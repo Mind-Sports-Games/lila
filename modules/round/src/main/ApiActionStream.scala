@@ -1,7 +1,7 @@
 package lila.round
 
-import akka.stream.OverflowStrategy
-import akka.stream.scaladsl._
+import org.apache.pekko.stream.OverflowStrategy
+import org.apache.pekko.stream.scaladsl._
 import strategygames.{ Player => PlayerIndex }
 import strategygames.format.Forsyth
 import play.api.libs.json._
@@ -33,7 +33,7 @@ final class ApiActionStream(gameRepo: GameRepo, gameJsonView: lila.game.JsonView
               if (game.finished || moves <= delayKeepsFirstMoves) List(js)
               else {
                 buffer.enqueue(js)
-                (buffer.size > delayMovesBy) ?? List(buffer.dequeue())
+                (buffer.size > delayMovesBy) so List(buffer.dequeue())
               }
             }
             .mapMaterializedValue { queue =>

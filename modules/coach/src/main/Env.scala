@@ -1,7 +1,7 @@
 package lila.coach
 
 import com.softwaremill.macwire._
-import io.methvin.play.autoconfig._
+import lila.common.autoconfig.{ AutoConfig, ConfigName }
 import play.api.Configuration
 
 import lila.common.config._
@@ -60,8 +60,8 @@ final class Env(
       api.toggleApproved(userId, permissions.has(Permission.Coach.dbKey)).unit
     case lila.game.actorApi.FinishGame(game, p1, p2) if game.rated =>
       if (game.perfType.exists(lila.rating.PerfType.standard.contains)) {
-        p1 ?? api.setRating
-        p2 ?? api.setRating
+        p1 so api.setRating
+        p2 so api.setRating
       }.unit
   }
 

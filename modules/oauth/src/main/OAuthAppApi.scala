@@ -48,7 +48,7 @@ final class OAuthAppApi(colls: OauthColls)(implicit ec: scala.concurrent.Executi
           for {
             doc   <- docs
             token <- AccessToken.AccessTokenBSONHandler.readOpt(doc)
-            app   <- doc.getAsOpt[List[OAuthApp]]("app").??(_.headOption)
+            app   <- doc.getAsOpt[List[OAuthApp]]("app").so(_.headOption)
           } yield AccessToken.WithApp(token, app)
         }
       }

@@ -1,6 +1,6 @@
 package lila.irwin
 
-import akka.actor._
+import org.apache.pekko.actor._
 import com.softwaremill.macwire._
 import scala.concurrent.duration._
 
@@ -20,7 +20,7 @@ final class Env(
     db: lila.db.Db
 )(implicit
     ec: scala.concurrent.ExecutionContext,
-    scheduler: akka.actor.Scheduler
+    scheduler: org.apache.pekko.actor.Scheduler
 ) {
 
   private lazy val reportColl = db(CollName("irwin_report"))

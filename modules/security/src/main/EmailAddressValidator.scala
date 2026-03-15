@@ -68,7 +68,7 @@ final class EmailAddressValidator(
 
   // only compute valid and non-p1listed email domains
   private def hasAcceptableDns(e: EmailAddress): Fu[Boolean] =
-    isAcceptable(e) ?? e.domain.map(_.lower) ?? { domain =>
+    isAcceptable(e) so e.domain.map(_.lower) so { domain =>
       if (DisposableEmailDomain p1listed domain) fuccess(true)
       else
         dnsApi.mx(domain).dmap { domains =>

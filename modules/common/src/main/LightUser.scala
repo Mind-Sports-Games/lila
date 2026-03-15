@@ -1,6 +1,6 @@
 package lila.common
 
-import play.api.libs.json._
+import play.api.libs.json.*
 
 case class LightUser(
     id: String,
@@ -12,7 +12,7 @@ case class LightUser(
 
   def titleName = title.fold(name)(_ + " " + name)
 
-  def isBot = title has "BOT"
+  def isBot = title.has("BOT")
 }
 
 object LightUser {
@@ -53,13 +53,13 @@ object LightUser {
     def apply(userId: UserID) = f(userId)
   }
 
-  //If adding a second bot to the list will need to consider the pairing algorithm in
-  //modules/tournament/src/main/arena/PairingSystem.scala
-  //as this will only use the first bot in this list that is in a tournament
-  //but the auto subscribeBotsToShields code will make all bots that are listed here
-  //join any shield tournaments
+  // If adding a second bot to the list will need to consider the pairing algorithm in
+  // modules/tournament/src/main/arena/PairingSystem.scala
+  // as this will only use the first bot in this list that is in a tournament
+  // but the auto subscribeBotsToShields code will make all bots that are listed here
+  // join any shield tournaments
   val tourBots: List[LightUser] = List(
-    //LightUser("pst-rando", "PST-Rando", "_playstrategy".some, "BOT".some, false)
+    // LightUser("pst-rando", "PST-Rando", "_playstrategy".some, "BOT".some, false)
     LightUser("pst-greedy-tom", "PST-Greedy-Tom", "_playstrategy".some, "BOT".some, false)
   )
 
@@ -67,7 +67,7 @@ object LightUser {
     LightUser("ps-greedy-one-move", "PS-Greedy-One-Move", "_playstrategy".some, "BOT".some, false),
     LightUser("ps-greedy-two-move", "PS-Greedy-Two-Move", "_playstrategy".some, "BOT".some, false),
     LightUser("ps-greedy-four-move", "PS-Greedy-Four-Move", "_playstrategy".some, "BOT".some, false)
-    //LightUser("bot1", "bot1", "_playstrategy".some, "BOT".some, false)
+    // LightUser("bot1", "bot1", "_playstrategy".some, "BOT".some, false)
   )
 
   val stockfishBots: List[LightUser] = List(

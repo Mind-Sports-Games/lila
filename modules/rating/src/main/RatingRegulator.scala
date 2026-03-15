@@ -3,7 +3,7 @@ package lila.rating
 object RatingRegulator {
 
   def apply(factors: RatingFactors)(perfType: PerfType, before: Perf, after: Perf): Perf =
-    factors.get(perfType).filter(1 !=).fold(after) {
+    factors.get(perfType).filter(_.value != 1).fold(after) {
       apply(_, perfType, before, after)
     }
 

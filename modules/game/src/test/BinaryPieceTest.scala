@@ -1,81 +1,41 @@
 package lila.game
 
-import strategygames.chess._
-import strategygames.chess.Pos._
-import org.specs2.mutable._
+import chess.*
+import chess.Square.*
+import chess.variant.Standard
 
 import lila.db.ByteArray
-import strategygames.chess.variant._
 
-class BinaryPieceTest extends Specification {
+class BinaryPieceTest extends munit.FunSuite:
 
-  /*
   val noop = "00000000"
   def write(all: PieceMap): List[String] =
-    (BinaryFormat.piece write all).showBytes.split(',').toList
-  def read(bytes: List[String], variant: Variant = Standard): PieceMap =
-    BinaryFormat.piece.read(ByteArray.parseBytes(bytes), variant)
+    (BinaryFormat.piece.write(all)).showBytes.split(',').toList
+  def read(bytes: List[String]): PieceMap =
+    BinaryFormat.piece.read(ByteArray.parseBytes(bytes), Standard)
 
-  "binary pieces" should {
-    "write" should {
-      "empty board" in {
-        write(Map.empty) must_== List.fill(64)(noop)
-      }
-      "A1 p1 king" in {
-        write(Map(A1 -> Piece(P1, King))) must_== {
-          "00000001" :: List.fill(63)(noop)
-        }
-      }
-      "A1 p2 knight" in {
-        write(Map(A1 -> Piece(P2, Knight))) must_== {
-          "10000100" :: List.fill(63)(noop)
-        }
-      }
-      "B1 p2 pawn" in {
-        write(Map(B1 -> Piece(P2, Pawn))) must_== {
-          noop :: "10000110" :: List.fill(62)(noop)
-        }
-      }
-      "A1 p2 knight, B1 p1 bishop" in {
-        write(Map(A1 -> Piece(P2, Knight), B1 -> Piece(P1, Bishop))) must_== {
-          "10000100" :: "00000101" :: List.fill(62)(noop)
-        }
-      }
-      "A1 p2 knight, B1 p1 bishop, C1 p1 queen" in {
-        write(Map(A1 -> Piece(P2, Knight), B1 -> Piece(P1, Bishop), C1 -> Piece(P1, Queen))) must_== {
-          "10000100" :: "00000101" :: "00000010" :: List.fill(61)(noop)
-        }
-      }
-      "H8 p2 knight" in {
-        write(Map(H8 -> Piece(P2, Knight))) must_== {
-          List.fill(63)(noop) :+ "10000100"
-        }
-      }
-      "G8 p2 knight, H8 p1 bishop" in {
-        write(Map(G8 -> Piece(P2, Knight), H8 -> Piece(P1, Bishop))) must_== {
-          List.fill(62)(noop) :+ "10000100" :+ "00000101"
-        }
-      }
-      "A1 p2 LOAChecker, B1 p1 LOAChecker" in {
-        write(Map(A1 -> Piece(P2, LOAChecker), B1 -> Piece(P1, LOAChecker))) must_== {
-          "10001000" :: "00001000" :: List.fill(62)(noop)
-        }
-      }
-    }
-    "read" should {
-      "empty board" in {
-        read(List.fill(64)(noop)) must_== Map.empty
-        "A1 p1 king" in {
-          read("00000001" :: List.fill(63)(noop)) must_== Map(A1 -> Piece(P1, King))
-        }
-        "B1 p2 pawn" in {
-          read(noop :: "10000110" :: List.fill(62)(noop)) must_== Map(B1 -> Piece(P2, Pawn))
-        }
-        "A1 p2 LOAChecker, B1 p1 LOAChecker" in {
-          read("10001000" :: "00001000" :: List.fill(62)(noop), LinesOfAction) must_== Map(A1 -> Piece(P2, LOAChecker), B1 -> Piece(P1, LOAChecker))
-        }
-      }
-    }
-  }
-   */
-}
+  test("write empty board"):
+    assertEquals(write(Map.empty), List.fill(32)(noop))
+  test("write A1 white king"):
+    assertEquals(write(Map(A1 -> White.king)), "00010000" :: List.fill(31)(noop))
+  test("write A1 black knight"):
+    assertEquals(write(Map(A1 -> Black.knight)), "11000000" :: List.fill(31)(noop))
+  test("write B1 black pawn"):
+    assertEquals(write(Map(B1 -> Black.pawn)), "00001110" :: List.fill(31)(noop))
+  test("write A1 black knight, B1 white bishop"):
+    assertEquals(write(Map(A1 -> Black.knight, B1 -> White.bishop)), "11000101" :: List.fill(31)(noop))
+  test("write A1 black knight, B1 white bishop, C1 white queen"):
+    assertEquals(
+      write(Map(A1 -> Black.knight, B1 -> White.bishop, C1 -> White.queen)),
+      "11000101" :: "00100000" :: List.fill(30)(noop)
+    )
+  test("write H8 black knight"):
+    assertEquals(write(Map(H8 -> Black.knight)), List.fill(31)(noop) :+ "00001100")
+  test("write G8 black knight, H8 white bishop"):
+    assertEquals(write(Map(G8 -> Black.knight, H8 -> White.bishop)), List.fill(31)(noop) :+ "11000101")
+  test("read empty board"):
+    assertEquals(read(List.fill(32)(noop)), Map.empty)
+  test("read A1 white king"):
+    assertEquals(read("00010000" :: List.fill(31)(noop)), Map(A1 -> White.king))
+  test("read B1 black pawn"):
+    assertEquals(read("00001110" :: List.fill(31)(noop)), Map(B1 -> Black.pawn))

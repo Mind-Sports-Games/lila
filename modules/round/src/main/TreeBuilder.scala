@@ -32,7 +32,7 @@ object TreeBuilder {
       initialFen: FEN,
       withFlags: WithFlags
   ): Root = {
-    val withClocks: Option[Vector[Centis]] = withFlags.clocks ?? game.bothClockStates
+    val withClocks: Option[Vector[Centis]] = withFlags.clocks so game.bothClockStates
     val drawOfferTurnCount                 = game.drawOffers.normalizedTurns
     Replay.gameWithUciWhileValid(
       game.variant.gameLogic,
@@ -45,8 +45,8 @@ object TreeBuilder {
       case (init, games, error) =>
         error foreach logChessError(game.id)
         val fen                 = Forsyth.>>(game.variant.gameLogic, init)
-        val infos: Vector[Info] = analysis.??(_.infos.toVector)
-        val advices: Map[Ply, Advice] = analysis.??(_.advices.view.map { a =>
+        val infos: Vector[Info] = analysis.so(_.infos.toVector)
+        val advices: Map[Ply, Advice] = analysis.so(_.advices.view.map { a =>
           a.ply -> a
         }.toMap)
         val root = Root(

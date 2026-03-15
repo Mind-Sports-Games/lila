@@ -53,7 +53,7 @@ final class Setup(
           )
         ) flatMap { form =>
           val validFen = form("fen").value map (s => FEN.clean(lib, s)) flatMap ValidFen(strict = false)
-          userId ?? env.user.repo.named flatMap {
+          userId so env.user.repo.named flatMap {
             case None =>
               Ok(html.setup.forms.game(form, none, none, validFen, variant, inputTimeMode)).fuccess
             case Some(user) =>
@@ -86,8 +86,8 @@ final class Setup(
               config =>
                 config.opponent match {
                   case "friend" | "bot" => {
-                    userId ?? env.user.repo.enabledById flatMap { destUser =>
-                      destUser ?? { env.challenge.granter(ctx.me, _, config.perfType) } flatMap {
+                    userId so env.user.repo.enabledById flatMap { destUser =>
+                      destUser so { env.challenge.granter(ctx.me, _, config.perfType) } flatMap {
                         case Some(denied) =>
                           val message = lila.challenge.ChallengeDenied.translated(denied)
                           negotiate(
@@ -139,7 +139,7 @@ final class Setup(
                     }
                   }
                   case "lobby" => {
-                    (ctx.userId ?? env.relation.api.fetchBlocking) flatMap { blocking =>
+                    (ctx.userId so env.relation.api.fetchBlocking) flatMap { blocking =>
                       processor
                         .gameHook(
                           config, // withinLimits ctx.me,
@@ -191,7 +191,7 @@ final class Setup(
               .fold(
                 jsonFormError,
                 userConfig =>
-                  (ctx.userId ?? env.relation.api.fetchBlocking) flatMap { blocking =>
+                  (ctx.userId so env.relation.api.fetchBlocking) flatMap { blocking =>
                     processor.hook(
                       userConfig withinLimits ctx.me,
                       Sri(sri),
@@ -211,9 +211,9 @@ final class Setup(
         PostRateLimit(HTTPRequest ipAddress ctx.req) {
           NoPlaybanOrCurrent {
             env.game.gameRepo game gameId flatMap {
-              _ ?? { game =>
+              _ so { game =>
                 for {
-                  blocking <- ctx.userId ?? env.relation.api.fetchBlocking
+                  blocking <- ctx.userId so env.relation.api.fetchBlocking
                   hookConfig = lila.setup.HookConfig.default(ctx.isAuth) withRatingRange get(
                     "rr"
                   ) updateFrom game

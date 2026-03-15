@@ -1,6 +1,6 @@
 package lila.puzzle
 
-import akka.pattern.ask
+import org.apache.pekko.pattern.ask
 import org.joda.time.DateTime
 import Puzzle.{ BSONFields => F }
 import scala.concurrent.duration._
@@ -29,7 +29,7 @@ final private[puzzle] class DailyPuzzle(
     (findCurrent orElse findNew) recover { case e: Exception =>
       logger.error("find daily", e)
       none
-    } flatMap { _ ?? makeDaily }
+    } flatMap { _ so makeDaily }
 
   private def makeDaily(puzzle: Puzzle): Fu[Option[DailyPuzzle.WithHtml]] = {
     import makeTimeout.short
@@ -90,7 +90,7 @@ final private[puzzle] class DailyPuzzle(
         }
       }
       .flatMap { docOpt =>
-        docOpt.flatMap(PuzzleBSONReader.readOpt) ?? { puzzle =>
+        docOpt.flatMap(PuzzleBSONReader.readOpt) so { puzzle =>
           colls.puzzle {
             _.update.one($id(puzzle.id), $set(F.day -> DateTime.now))
           } inject puzzle.some

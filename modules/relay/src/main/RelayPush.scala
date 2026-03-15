@@ -1,6 +1,6 @@
 package lila.relay
 
-import akka.actor._
+import org.apache.pekko.actor._
 import scala.concurrent.duration._
 
 import lila.study.MultiPgn

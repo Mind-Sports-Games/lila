@@ -31,7 +31,7 @@ final class SwissFeature(
   private val startsAtOrdering = Ordering.by[Swiss, Long](_.startsAt.getMillis)
 
   private def getForTeams(teams: Seq[TeamID]): Fu[FeaturedSwisses] =
-    teams.map(swissCache.featuredInTeam.get).sequenceFu.map(_.flatten) flatMap { ids =>
+    Future.sequence(teams.map(swissCache.featuredInTeam.get)).map(_.flatten) flatMap { ids =>
       colls.swiss.byIds[Swiss](ids.map(_.value), ReadPreference.secondaryPreferred)
     } map {
       _.filter(_.isNotFinished).partition(_.isCreated) match {

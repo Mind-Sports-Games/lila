@@ -13,7 +13,7 @@ final class PerfStatIndexer(
     storage: PerfStatStorage
 )(implicit
     ec: scala.concurrent.ExecutionContext,
-    scheduler: akka.actor.Scheduler
+    scheduler: org.apache.pekko.actor.Scheduler
 ) {
 
   private val workQueue =
@@ -42,19 +42,18 @@ final class PerfStatIndexer(
     }
 
   def addGame(game: Game): Funit =
-    game.players
+    Future.sequence(game.players
       .flatMap { player =>
         player.userId.map { userId =>
           addPov(Pov(game, player), userId)
         }
-      }
-      .sequenceFu
+      })
       .void
 
   private def addPov(pov: Pov, userId: String): Funit =
-    pov.game.perfType ?? { perfType =>
+    pov.game.perfType so { perfType =>
       storage.find(userId, perfType) flatMap {
-        _ ?? { perfStat =>
+        _ so { perfStat =>
           storage.update(perfStat, perfStat agg pov)
         }
       }

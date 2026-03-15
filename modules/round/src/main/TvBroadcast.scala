@@ -1,7 +1,7 @@
 package lila.round
 
-import akka.actor._
-import akka.stream.scaladsl._
+import org.apache.pekko.actor._
+import org.apache.pekko.stream.scaladsl._
 import strategygames.format.Forsyth
 import play.api.libs.json._
 

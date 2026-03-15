@@ -10,10 +10,10 @@ final class ExpireSetMemo(ttl: FiniteDuration) {
     .expireAfterWrite(ttl)
     .build[String, Boolean]()
 
-  @nowarn def get(key: String): Boolean = cache.underlying.getIfPresent(key) != null
+  def get(key: String): Boolean = cache.getIfPresent(key).isDefined
 
   def intersect(keys: Iterable[String]): Set[String] =
-    keys.nonEmpty ?? {
+    keys.nonEmpty so {
       val res = cache getAllPresent keys
       keys filter res.contains toSet
     }

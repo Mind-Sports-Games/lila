@@ -1,6 +1,6 @@
 package lila.study
 
-import ornicar.scalalib.Zero
+import alleycats.Zero
 import scala.concurrent.duration._
 
 import lila.hub.DuctSequencers
@@ -10,7 +10,7 @@ final private class StudySequencer(
     chapterRepo: ChapterRepo
 )(implicit
     ec: scala.concurrent.ExecutionContext,
-    scheduler: akka.actor.Scheduler,
+    scheduler: org.apache.pekko.actor.Scheduler,
     mode: play.api.Mode
 ) {
 
@@ -20,7 +20,7 @@ final private class StudySequencer(
   def sequenceStudy[A: Zero](studyId: Study.Id)(f: Study => Fu[A]): Fu[A] =
     workQueue(studyId.value) {
       studyRepo.byId(studyId) flatMap {
-        _ ?? { f(_) }
+        _ so { f(_) }
       }
     }
 
@@ -31,7 +31,7 @@ final private class StudySequencer(
       chapterRepo
         .byId(chapterId)
         .flatMap {
-          _.filter(_.studyId == studyId) ?? { chapter =>
+          _.filter(_.studyId == studyId) so { chapter =>
             f(Study.WithChapter(study, chapter))
           }
         }

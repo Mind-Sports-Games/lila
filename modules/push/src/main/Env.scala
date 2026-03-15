@@ -1,9 +1,9 @@
 package lila.push
 
-import akka.actor._
+import org.apache.pekko.actor._
 import com.google.auth.oauth2.{ GoogleCredentials, ServiceAccountCredentials }
 import com.softwaremill.macwire._
-import io.methvin.play.autoconfig._
+import lila.common.autoconfig.{ AutoConfig, ConfigName }
 import play.api.Configuration
 import play.api.libs.ws.StandaloneWSClient
 import scala.jdk.CollectionConverters._
@@ -29,7 +29,7 @@ final class Env(
     gameRepo: lila.game.GameRepo
 )(implicit
     ec: scala.concurrent.ExecutionContext,
-    scheduler: akka.actor.Scheduler
+    scheduler: org.apache.pekko.actor.Scheduler
 ) {
 
   private val config = appConfig.get[PushConfig]("push")(AutoConfig.loader)

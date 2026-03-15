@@ -1,6 +1,6 @@
 package lila.fishnet
 
-import ornicar.scalalib.Random
+import scalalib.Random
 import com.gilt.gfc.semver.SemVer
 import lila.common.IpAddress
 import scala.util.{ Failure, Success, Try }

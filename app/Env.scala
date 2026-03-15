@@ -1,6 +1,6 @@
 package lila.app
 
-import akka.actor._
+import org.apache.pekko.actor._
 import com.softwaremill.macwire._
 import play.api.libs.ws.StandaloneWSClient
 import play.api.mvc.{ ControllerComponents, SessionCookieBaker }
@@ -90,7 +90,7 @@ final class Env(
     val web: lila.web.Env
 )(implicit
     val system: ActorSystem,
-    val scheduler: akka.actor.Scheduler,
+    val scheduler: org.apache.pekko.actor.Scheduler,
     val executionContext: ExecutionContext,
     val mode: play.api.Mode
 ) {
@@ -161,12 +161,12 @@ final class Env(
       _       <- streamer.api.demote(u.id)
       _       <- coach.api.remove(u.id)
       reports <- report.api.processAndGetBySuspect(lila.report.Suspect(u))
-      _       <- selfClose ?? mod.logApi.selfCloseAccount(u.id, reports)
+      _       <- selfClose so mod.logApi.selfCloseAccount(u.id, reports)
       _       <- appeal.api.onAccountClose(u)
-      _ <- u.marks.troll ?? relation.api.fetchFollowing(u.id).flatMap {
+      _ <- u.marks.troll so relation.api.fetchFollowing(u.id).flatMap {
         activity.write.unfollowAll(u, _)
       }
-      _ <- !selfClose ?? mod.logApi.closeAccount(by.id, u.id)
+      _ <- !selfClose so mod.logApi.closeAccount(by.id, u.id)
     } yield Bus.publish(lila.hub.actorApi.security.CloseAccount(u.id), "accountClose")
 
   Bus.subscribeFun("garbageCollect") { case lila.hub.actorApi.security.GarbageCollect(userId) =>
@@ -182,7 +182,7 @@ final class Env(
   }
   private def playstrategyClose(userId: User.ID) =
     user.repo.playstrategyAnd(userId) flatMap {
-      _ ?? { case (playstrategy, user) =>
+      _ so { case (playstrategy, user) =>
         closeAccount(user, playstrategy)
       }
     }

@@ -15,13 +15,13 @@ object userAnalysisI18n {
   )(implicit lang: Lang) =
     i18nJsObject(
       baseTranslations ++ {
-        withCeval ?? cevalTranslations
+        withCeval so cevalTranslations
       } ++ {
-        withExplorer ?? explorerTranslations
+        withExplorer so explorerTranslations
       } ++ {
-        withForecast ?? forecastTranslations
+        withForecast so forecastTranslations
       } ++ {
-        withAdvantageChart ?? advantageChartTranslations
+        withAdvantageChart so advantageChartTranslations
       }
     )
 

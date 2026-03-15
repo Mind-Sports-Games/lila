@@ -26,13 +26,13 @@ final class BotPlayer(
     spam: lila.security.Spam
 )(implicit
     ec: scala.concurrent.ExecutionContext,
-    scheduler: akka.actor.Scheduler
+    scheduler: org.apache.pekko.actor.Scheduler
 ) {
 
   private def clientError[A](msg: String): Fu[A] = fufail(lila.round.ClientError(msg))
 
   def apply(pov: Pov, me: User, uciStr: String, offeringDraw: Option[Boolean]): Funit =
-    lila.common.Future.delay((pov.game.hasAi ?? 500) millis) {
+    lila.common.Future.delay((pov.game.hasAi so 500) millis) {
       Uci(
         pov.game.variant.gameLogic,
         pov.game.variant.gameFamily,
@@ -53,7 +53,7 @@ final class BotPlayer(
     }
 
   def chat(gameId: Game.ID, me: User, d: BotForm.ChatData) =
-    !spam.detect(d.text) ??
+    !spam.detect(d.text) so
       fuccess {
         lila.mon.bot.chats(me.username).increment()
         val chatId = lila.chat.Chat.Id {
@@ -71,7 +71,7 @@ final class BotPlayer(
 
   private def rematch(id: Game.ID, me: User, accept: Boolean): Fu[Boolean] =
     gameRepo game id map {
-      _.flatMap(Pov(_, me)).filter(p => isOfferingRematch(!p)) ?? { pov =>
+      _.flatMap(Pov(_, me)).filter(p => isOfferingRematch(!p)) so { pov =>
         // delay so it feels more natural
         lila.common.Future.delay(if (accept) 100.millis else 2.seconds) {
           fuccess {

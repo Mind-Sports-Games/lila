@@ -22,10 +22,10 @@ final class Analyser(
     analysis.studyId match {
       case None =>
         gameRepo game analysis.id flatMap {
-          _ ?? { game =>
+          _ so { game =>
             gameRepo.setAnalysed(game.id)
             analysisRepo.save(analysis) >>
-              sendAnalysisProgress(analysis, complete = true) >>- {
+              sendAnalysisProgress(analysis, complete = true).andDo {
                 Bus.publish(actorApi.AnalysisReady(game, analysis), "analysisReady")
                 Bus.publish(InsertGame(game), "gameSearchInsert")
               }
@@ -42,7 +42,7 @@ final class Analyser(
     analysis.studyId match {
       case None =>
         gameRepo gameWithInitialFen analysis.id map {
-          _ ?? { case (game, initialFen) =>
+          _ so { case (game, initialFen) =>
             Bus.publish(
               TellIfExists(
                 analysis.id,

@@ -1,7 +1,7 @@
 package lila.security
 
 import org.joda.time.DateTime
-import ornicar.scalalib.Random
+import scalalib.Random
 import play.api.data._
 import play.api.data.Forms._
 import play.api.data.validation.{ Constraint, Valid => FormValid, Invalid, ValidationError }
@@ -30,7 +30,7 @@ final class SecurityApi(
     tor: Tor
 )(implicit
     ec: scala.concurrent.ExecutionContext,
-    scheduler: akka.actor.Scheduler
+    scheduler: org.apache.pekko.actor.Scheduler
 ) {
 
   val AccessUri = "access_uri"
@@ -105,12 +105,12 @@ final class SecurityApi(
   }
 
   def restoreUser(req: RequestHeader): Fu[Option[Either[AppealUser, FingerPrintedUser]]] =
-    firewall.accepts(req) ?? reqSessionId(req) ?? { sessionId =>
+    firewall.accepts(req) so reqSessionId(req) so { sessionId =>
       appeal.authenticate(sessionId) match {
         case Some(userId) => userRepo byId userId map2 { u => Left(AppealUser(u)) }
         case None =>
           store.authInfo(sessionId) flatMap {
-            _ ?? { d =>
+            _ so { d =>
               userRepo byId d.user dmap { _ map { u => Right(FingerPrintedUser(u, d.hasFp)) } }
             }
           }
@@ -154,10 +154,10 @@ final class SecurityApi(
     }
 
   def dedup(userId: User.ID, req: RequestHeader): Funit =
-    reqSessionId(req) ?? { store.dedup(userId, _) }
+    reqSessionId(req) so { store.dedup(userId, _) }
 
   def setFingerPrint(req: RequestHeader, fp: FingerPrint): Fu[Option[FingerHash]] =
-    reqSessionId(req) ?? { store.setFingerPrint(_, fp) map some }
+    reqSessionId(req) so { store.setFingerPrint(_, fp) map some }
 
   val sessionIdKey = "sessionId"
 
@@ -198,7 +198,7 @@ final class SecurityApi(
     )
 
     def authenticate(sessionId: SessionId): Option[User.ID] =
-      sessionId.startsWith(prefix) ?? store.getIfPresent(sessionId)
+      sessionId.startsWith(prefix) so store.getIfPresent(sessionId)
 
     def saveAuthentication(userId: User.ID)(implicit req: RequestHeader): Fu[SessionId] = {
       val sessionId = s"$prefix${Random secureString 22}"

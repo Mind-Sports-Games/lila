@@ -1,6 +1,6 @@
 package lila.pool
 
-import akka.actor._
+import org.apache.pekko.actor._
 
 import lila.game.Game
 import lila.rating.{ PerfType, RatingRange }

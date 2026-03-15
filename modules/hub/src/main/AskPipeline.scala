@@ -2,15 +2,15 @@ package lila.hub
 
 import com.github.blemale.scaffeine.LoadingCache
 import scala.concurrent.duration.FiniteDuration
-import scala.concurrent.{ ExecutionContext, Promise }
+import scala.concurrent.Promise
 
 /*
  * Only processes one computation at a time
  * and only enqueues one.
  */
 final class AskPipeline[A](compute: () => Fu[A], timeout: FiniteDuration, name: String)(implicit
-    scheduler: akka.actor.Scheduler,
-    ec: scala.concurrent.ExecutionContext
+    scheduler: org.apache.pekko.actor.Scheduler,
+    ec: Executor
 ) extends Trouper {
 
   private var state: State = Idle
@@ -38,7 +38,7 @@ final class AskPipeline[A](compute: () => Fu[A], timeout: FiniteDuration, name: 
 
   private def startComputing() =
     compute()
-      .withTimeout(timeout)
+      .withTimeout(timeout, s"AskPipeline:$name")
       .addEffects(
         err => this ! Fail(err),
         res => this ! Done(res)
@@ -75,8 +75,8 @@ final class AskPipelines[K, R](
     timeout: FiniteDuration,
     name: String
 )(implicit
-    ec: ExecutionContext,
-    scheduler: akka.actor.Scheduler,
+    ec: Executor,
+    scheduler: org.apache.pekko.actor.Scheduler,
     mode: play.api.Mode
 ) {
 

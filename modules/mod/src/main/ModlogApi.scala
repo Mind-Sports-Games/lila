@@ -117,7 +117,7 @@ final class ModlogApi(repo: ModlogRepo, userRepo: UserRepo, slackApi: SlackApi)(
         user,
         Modlog.deletePost,
         details = Some(
-          author.??(_ + " ") + text.take(400)
+          author.so(_ + " ") + text.take(400)
         )
       )
     }
@@ -269,8 +269,8 @@ final class ModlogApi(repo: ModlogRepo, userRepo: UserRepo, slackApi: SlackApi)(
   private def add(m: Modlog): Funit = {
     lila.mon.mod.log.create.increment()
     lila.log("mod").info(m.toString)
-    m.notable ?? {
-      coll.insert.one(m) >> (m.notableSlack ?? slackMonitor(m))
+    m.notable so {
+      coll.insert.one(m) >> (m.notableSlack so slackMonitor(m))
     }
   }
 
@@ -286,9 +286,9 @@ final class ModlogApi(repo: ModlogRepo, userRepo: UserRepo, slackApi: SlackApi)(
       case M.modMessage                                                     => "left_speech_bubble"
       case _                                                                => "gear"
     }
-    val text = s"""${m.showAction.capitalize} ${m.user.??(u => s"@$u ")}${~m.details}"""
+    val text = s"""${m.showAction.capitalize} ${m.user.so(u => s"@$u ")}${~m.details}"""
     userRepo.isMonitoredMod(m.mod) flatMap {
-      _ ?? {
+      _ so {
         val monitorType = m.action match {
           case M.engine | M.unengine | M.booster | M.unbooster | M.closeAccount | M.reopenAccount | M.alt |
               M.unalt =>

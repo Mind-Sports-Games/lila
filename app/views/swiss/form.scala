@@ -126,7 +126,7 @@ object form {
         form3.group(form("conditions.nbRatedGame.nb"), frag("Minimum rated games"), half = true)(
           form3.select(_, SwissCondition.DataForm.nbRatedGameChoices)
         ),
-        (ctx.me.exists(_.hasTitle) || isGranted(_.ManageTournament)) ?? {
+        (ctx.me.exists(_.hasTitle) || isGranted(_.ManageTournament)) so {
           form3.checkbox(
             form("conditions.titled"),
             frag("Only titled players"),

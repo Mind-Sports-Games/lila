@@ -41,7 +41,7 @@ final class Puzzle(
       replay: Option[PuzzleReplay] = None
   )(implicit ctx: Context) =
     renderJson(puzzle, theme, replay) zip
-      ctx.me.??(u => env.puzzle.session.getDifficulty(u) dmap some) map { case (json, difficulty) =>
+      ctx.me.so(u => env.puzzle.session.getDifficulty(u) dmap some) map { case (json, difficulty) =>
         EnableSharedArrayBuffer(
           Ok(
             views.html.puzzle
@@ -128,7 +128,7 @@ final class Puzzle(
   def complete(variant: String, themeStr: String, id: String) =
     OpenBody { implicit ctx =>
       NoBot {
-        Puz.toId(id) ?? { pid =>
+        Puz.toId(id) so { pid =>
           onComplete(env.puzzle.forms.round)(
             pid,
             puzzleVariantFromKey(variant),
@@ -141,7 +141,7 @@ final class Puzzle(
 
   def mobileBcRound(nid: Long) =
     OpenBody { implicit ctx =>
-      Puz.numericalId(nid) ?? {
+      Puz.numericalId(nid) so {
         onComplete(env.puzzle.forms.bc.round)(_, Puz.puzzleVariants.head, PuzzleTheme.mix, mobileBc = true)
       }
     }
@@ -149,8 +149,8 @@ final class Puzzle(
   def ofPlayer(variant: String, name: Option[String], page: Int) =
     Open { implicit ctx =>
       val fixed = name.map(_.trim).filter(_.nonEmpty)
-      fixed.??(env.user.repo.enabledNamed) orElse fuccess(ctx.me) flatMap { user =>
-        user.?? { env.puzzle.api.puzzle.of(_, puzzleVariantFromKey(variant), page) dmap some } map {
+      fixed.so(env.user.repo.enabledNamed) orElse fuccess(ctx.me) flatMap { user =>
+        user.so { env.puzzle.api.puzzle.of(_, puzzleVariantFromKey(variant), page) dmap some } map {
           puzzles =>
             Ok(views.html.puzzle.ofPlayer(~fixed, user, puzzleVariantFromKey(variant), puzzles))
         }
@@ -193,7 +193,7 @@ final class Puzzle(
                 ctx.me match {
                   case Some(me) =>
                     env.puzzle.finisher(id, variant, theme.key, me, data.result) flatMap {
-                      _ ?? { case (round, perf) =>
+                      _ so { case (round, perf) =>
                         val newPerfs = Perfs
                           .puzzleLens(variant)
                           .map(_.set(me.perfs, perf))
@@ -271,7 +271,7 @@ final class Puzzle(
     Open { implicit ctx =>
       NoBot {
         env.puzzle.streak.apply flatMap {
-          _ ?? { case PuzzleStreak(ids, puzzle) =>
+          _ so { case PuzzleStreak(ids, puzzle) =>
             env.puzzle.jsonView(puzzle = puzzle, PuzzleTheme.mix.some, none, user = ctx.me) map { preJson =>
               val json = preJson ++ Json.obj("streak" -> ids)
               EnableSharedArrayBuffer {
@@ -304,7 +304,7 @@ final class Puzzle(
   def voteTheme(id: String, themeStr: String) =
     AuthBody { implicit ctx => me =>
       NoBot {
-        PuzzleTheme.findDynamic(themeStr) ?? { theme =>
+        PuzzleTheme.findDynamic(themeStr) so { theme =>
           implicit val req = ctx.body
           env.puzzle.forms.themeVote
             .bindFromRequest()
@@ -325,7 +325,7 @@ final class Puzzle(
           .fold(
             jsonFormError,
             diff =>
-              PuzzleDifficulty.find(diff) ?? {
+              PuzzleDifficulty.find(diff) so {
                 env.puzzle.session.setDifficulty(me, puzzleVariantFromKey(variant), _)
               } inject
                 Redirect(routes.Puzzle.show(variant, theme))
@@ -364,13 +364,13 @@ final class Puzzle(
           }
         case None if themeOrId.size == Puz.idSize =>
           OptionFuResult(env.puzzle.api.puzzle find Puz.Id(themeOrId)) { puzzle =>
-            ctx.me.?? { env.puzzle.api.casual.setCasualIfNotYetPlayed(_, puzzle) } >>
+            ctx.me.so { env.puzzle.api.casual.setCasualIfNotYetPlayed(_, puzzle) } >>
               renderShow(puzzle, PuzzleTheme.mix)
           }
         case None =>
           themeOrId.toLongOption
             .flatMap(Puz.numericalId.apply)
-            .??(env.puzzle.api.puzzle.find) map {
+            .so(env.puzzle.api.puzzle.find) map {
             case None      => Redirect(routes.Puzzle.home(variant))
             case Some(puz) => Redirect(routes.Puzzle.show(variant, puz.id.value))
           }
@@ -383,7 +383,7 @@ final class Puzzle(
       val theme = PuzzleTheme.findOrAny(themeKey)
       OptionFuResult(env.puzzle.api.puzzle find Puz.Id(id)) { puzzle =>
         if (puzzle.themes contains theme.key)
-          ctx.me.?? { env.puzzle.api.casual.setCasualIfNotYetPlayed(_, puzzle) } >>
+          ctx.me.so { env.puzzle.api.casual.setCasualIfNotYetPlayed(_, puzzle) } >>
             renderShow(puzzle, theme)
         else Redirect(routes.Puzzle.show(variant, puzzle.id.value)).fuccess
       }
@@ -425,7 +425,7 @@ final class Puzzle(
     Auth { implicit ctx => me =>
       get("u")
         .ifTrue(isGranted(_.Hunter))
-        .??(env.user.repo.named)
+        .so(env.user.repo.named)
         .map(_ | me)
         .flatMap { user =>
           env.puzzle.dashboard(user, days) map { dashboard =>
@@ -458,7 +458,7 @@ final class Puzzle(
     Auth { implicit ctx => me =>
       get("u")
         .ifTrue(isGranted(_.Hunter))
-        .??(env.user.repo.named)
+        .so(env.user.repo.named)
         .map(_ | me)
         .flatMap { user =>
           Reasonable(page) {
@@ -481,7 +481,7 @@ final class Puzzle(
       negotiate(
         html = notFound,
         _ =>
-          OptionFuOk(Puz.numericalId(nid) ?? env.puzzle.api.puzzle.find) { puz =>
+          OptionFuOk(Puz.numericalId(nid) so env.puzzle.api.puzzle.find) { puz =>
             env.puzzle.jsonView.bc(puzzle = puz, user = ctx.me)
           }.dmap(_ as JSON)
       )
@@ -536,7 +536,7 @@ final class Puzzle(
                       .numericalId(solution.id)
                       .map(_ -> Result(solution.win))
                   }
-                  .?? { case (id, solution) =>
+                  .so { case (id, solution) =>
                     env.puzzle
                       .finisher(id, Puz.puzzleVariants.head, PuzzleTheme.mix.key, me, Result(solution.win))
                   } map {
@@ -561,7 +561,7 @@ final class Puzzle(
             .fold(
               jsonFormError,
               intVote =>
-                Puz.numericalId(nid) ?? {
+                Puz.numericalId(nid) so {
                   env.puzzle.api.vote.update(_, me, intVote == 1) inject jsonOkResult
                 }
             )

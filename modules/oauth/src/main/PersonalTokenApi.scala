@@ -35,18 +35,18 @@ final class PersonalTokenApi(colls: OauthColls)(implicit ec: scala.concurrent.Ex
       )
     }
 
-  def create(token: AccessToken) = colls.token(_.insert.one(token).void) >>- {
+  def create(token: AccessToken) = colls.token(_.insert.one(token).void).andDo {
     if (token.scopes contains OAuthScope.Web.Login)
       logger.warn(s"web:login token created by ${token.userId} ${~token.description}")
   }
 
   def deleteByPublicId(publicId: String, user: User): Fu[Option[AccessToken]] =
-    BSONObjectID.parse(publicId).toOption ?? { objectId =>
+    BSONObjectID.parse(publicId).toOption so { objectId =>
       colls.token { coll =>
         coll
           .one[AccessToken]($doc(F.publicId -> objectId, F.clientId -> clientId, F.userId -> user.id))
           .flatMap {
-            _ ?? { token =>
+            _ so { token =>
               coll.delete.one($doc(F.publicId -> token.publicId)) inject token.some
             }
           }

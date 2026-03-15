@@ -102,7 +102,7 @@ final class LeaderboardApi(
         "d" $gt since
       )
     ) flatMap { entries =>
-      (entries.nonEmpty ?? ejectEntries(entries.map(_.id), disqualify)) inject entries.map(_.tourId)
+      (entries.nonEmpty so ejectEntries(entries.map(_.id), disqualify)) inject entries.map(_.tourId)
     }
 
   def ejectEntry(userId: User.ID, tourId: Tournament.ID, disqualify: Boolean) =

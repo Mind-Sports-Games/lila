@@ -1,6 +1,6 @@
 package lila.socket
 
-import akka.actor.{ CoordinatedShutdown, Scheduler }
+import org.apache.pekko.actor.{ CoordinatedShutdown, Scheduler }
 import com.softwaremill.macwire._
 import io.lettuce.core._
 import play.api.Configuration
@@ -11,7 +11,7 @@ final class Env(
     shutdown: CoordinatedShutdown,
     notification: lila.hub.actors.Notification
 )(implicit
-    ec: scala.concurrent.ExecutionContext,
+    ec: Executor,
     scheduler: Scheduler
 ) {
 

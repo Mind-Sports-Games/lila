@@ -110,10 +110,10 @@ object SwissCondition {
     )(user: User)(implicit
         ec: scala.concurrent.ExecutionContext
     ): Fu[All.WithVerdicts] =
-      list.map {
+      Future.sequence(list.map {
         case c: MaxRating => c(perf, getMaxRating)(user) map c.withVerdict
         case c: FlatCond  => fuccess(c withVerdict c(user, perf))
-      }.sequenceFu dmap All.WithVerdicts
+      }) dmap All.WithVerdicts
 
     def accepted = All.WithVerdicts(list.map { WithVerdict(_, Accepted) })
 

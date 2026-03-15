@@ -43,7 +43,7 @@ final class Account(
               .exists(env.security.spam.detect)
               .option("profile.links" -> ~profile.links)
           }
-          .?? { case (resource, text) =>
+          .so { case (resource, text) =>
             env.report.api.autoCommFlag(lila.report.Suspect(me).id, resource, text)
           } >> env.user.repo.setProfile(me.id, profile) inject Redirect(routes.Account.profile).flashSuccess
       }
@@ -180,7 +180,7 @@ final class Account(
   def apiEmail =
     Scoped(_.Email.Read) { _ => me =>
       env.user.repo email me.id map {
-        _ ?? { email =>
+        _ so { email =>
           JsonOk(Json.obj("email" -> email.value))
         }
       }
@@ -214,8 +214,8 @@ final class Account(
   def emailConfirm(token: String) =
     Open { implicit ctx =>
       env.security.emailChange.confirm(token) flatMap {
-        _ ?? { case (user, prevEmail) =>
-          (prevEmail.exists(_.isNoReply) ?? env.clas.api.student.release(user)) >>
+        _ so { case (user, prevEmail) =>
+          (prevEmail.exists(_.isNoReply) so env.clas.api.student.release(user)) >>
             auth.authenticateUser(
               user,
               result =
@@ -434,8 +434,7 @@ final class Account(
           notFound
         case Some(user) =>
           env.report.api.reopenReports(lila.report.Suspect(user)) >>
-            auth.authenticateUser(user) >>-
-            lila.mon.user.auth.reopenConfirm("success").increment().unit
+            auth.authenticateUser(user).andDo { val _ = lila.mon.user.auth.reopenConfirm("success").increment() }
       }
     }
 
@@ -445,7 +444,7 @@ final class Account(
         .map(lila.user.User.normalize)
         .filter(id => me.id == id || isGranted(_.Impersonate)) | me.id
       env.user.repo byId userId map {
-        _ ?? { user =>
+        _ so { user =>
           if (getBool("text"))
             apiC.GlobalConcurrencyLimitUser(me.id)(
               env.api.personalDataExport(user)

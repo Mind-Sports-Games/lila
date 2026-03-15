@@ -62,8 +62,8 @@ final class StormDayApi(coll: Coll, highApi: StormHighApi, userRepo: UserRepo, s
   import StormBsonHandlers._
 
   def addRun(data: StormForm.RunData, user: Option[User]): Fu[Option[StormHigh.NewHigh]] = {
-    lila.mon.storm.run.score(user.isDefined).record(data.score).unit
-    user ?? { u =>
+    val _ = lila.mon.storm.run.score(user.isDefined).record(data.score)
+    user so { u =>
       if (sign.check(u, ~data.signed)) {
         Bus.publish(lila.hub.actorApi.puzzle.StormRun(u.id, data.score), "stormRun")
         highApi get u.id flatMap { prevHigh =>

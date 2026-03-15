@@ -1,6 +1,6 @@
 package controllers
 
-import akka.stream.scaladsl._
+import org.apache.pekko.stream.scaladsl._
 import play.api.data.Form
 import play.api.http.ContentTypes
 import play.api.libs.EventSource
@@ -144,7 +144,7 @@ final class User(
       )
     else
       env.user.repo named username flatMap {
-        case None if isGranted(_.UserModView)                 => ctx.me.map(Holder) ?? { modC.searchTerm(_, username.trim) }
+        case None if isGranted(_.UserModView)                 => ctx.me.map(Holder) so { modC.searchTerm(_, username.trim) }
         case None                                             => notFound
         case Some(u) if u.enabled || isGranted(_.UserModView) => f(u)
         case Some(u) =>
@@ -160,14 +160,14 @@ final class User(
     Open { implicit ctx =>
       OptionFuResult(env.user.repo named username) { user =>
         if (user.enabled || isGranted(_.UserModView))
-          ctx.userId.?? { relationApi.fetchBlocks(user.id, _) } zip
-            ctx.userId.?? { env.game.crosstableApi(user.id, _) dmap some } zip
-            ctx.isAuth.?? { env.pref.api.followable(user.id) } zip
-            ctx.userId.?? { relationApi.fetchRelation(_, user.id) } flatMap {
+          ctx.userId.so { relationApi.fetchBlocks(user.id, _) } zip
+            ctx.userId.so { env.game.crosstableApi(user.id, _) dmap some } zip
+            ctx.isAuth.so { env.pref.api.followable(user.id) } zip
+            ctx.userId.so { relationApi.fetchRelation(_, user.id) } flatMap {
               case (((blocked, crosstable), followable), relation) =>
-                val ping = env.socket.isOnline(user.id) ?? UserLagCache.getLagRating(user.id)
+                val ping = env.socket.isOnline(user.id) so UserLagCache.getLagRating(user.id)
                 negotiate(
-                  html = !ctx.is(user) ?? currentlyPlaying(user) map { pov =>
+                  html = !ctx.is(user) so currentlyPlaying(user) map { pov =>
                     Ok(html.user.mini(user, pov, blocked, followable, relation, ping, crosstable))
                       .withHeaders(CACHE_CONTROL -> "max-age=5")
                   },
@@ -218,13 +218,13 @@ final class User(
 
   private def currentlyPlaying(user: UserModel): Fu[Option[Pov]] =
     env.game.cached.lastPlayedPlayingId(user.id) flatMap {
-      _ ?? { env.round.proxyRepo.pov(_, user) }
+      _ so { env.round.proxyRepo.pov(_, user) }
     }
 
   private def lastPlayed(user: UserModel): Fu[Option[Pov]] =
     env.game.gameRepo
       .lastPlayed(user)
-      .flatMap(_ ?? { p =>
+      .flatMap(_ so { p =>
         env.round.proxyRepo.upgradeIfPresent(p) dmap some
       })
 
@@ -341,7 +341,7 @@ final class User(
 
   def topNb(nb: Int, perfKey: String) =
     Open { implicit ctx =>
-      PerfType(perfKey) ?? { perfType =>
+      PerfType(perfKey) so { perfType =>
         env.user.cached.top200Perf get perfType.id dmap { _ take (nb atLeast 1 atMost 200) } flatMap {
           users =>
             negotiate(
@@ -389,7 +389,7 @@ final class User(
       ctx: Context
   ): Fu[UserLogins.TableData] = {
     val familyUserIds = user.id :: userLogins.otherUserIds
-    (isGranted(_.ModNote) ?? env.user.noteApi
+    (isGranted(_.ModNote) so env.user.noteApi
       .forMod(familyUserIds)
       .logTimeIfGt(s"${user.username} noteApi.forMod", 2 seconds)) zip
       env.playban.api.bans(familyUserIds).logTimeIfGt(s"${user.username} playban.bans", 2 seconds) zip
@@ -412,14 +412,14 @@ final class User(
 
         val modLog = for {
           history <- env.mod.logApi.userHistory(user.id)
-          appeal  <- isGranted(_.Appeals) ?? env.appeal.api.get(user)
+          appeal  <- isGranted(_.Appeals) so env.appeal.api.get(user)
         } yield view.modLog(history, appeal)
 
-        val plan = isGranted(_.Admin) ?? env.plan.api.recentChargesOf(user).map(view.plan).dmap(~_)
+        val plan = isGranted(_.Admin) so env.plan.api.recentChargesOf(user).map(view.plan).dmap(~_)
 
         val student = env.clas.api.student.findManaged(user).map2(view.student).dmap(~_)
 
-        val reportLog = isGranted(_.SeeReport) ?? env.report.api
+        val reportLog = isGranted(_.SeeReport) so env.report.api
           .byAndAbout(user, 20)
           .flatMap { rs =>
             env.user.lightUserApi.preloadMany(rs.userIds) inject rs
@@ -441,18 +441,18 @@ final class User(
         } yield html.user.mod.otherUsers(holder, user, data, appeals)
 
         val identification = userLoginsFu map { logins =>
-          Granter.is(_.ViewPrintNoIP)(holder) ??
+          Granter.is(_.ViewPrintNoIP)(holder) so
             html.user.mod.identification(holder, user, logins)
         }
-        val irwin = isGranted(_.MarkEngine) ?? env.irwin.api.reports.withPovs(user).map {
-          _ ?? { reps =>
+        val irwin = isGranted(_.MarkEngine) so env.irwin.api.reports.withPovs(user).map {
+          _ so { reps =>
             html.irwin.report(reps)
           }
         }
-        val assess = isGranted(_.MarkEngine) ?? env.mod.assessApi.getPlayerAggregateAssessmentWithGames(
+        val assess = isGranted(_.MarkEngine) so env.mod.assessApi.getPlayerAggregateAssessmentWithGames(
           user.id
         ) flatMap {
-          _ ?? { as =>
+          _ so { as =>
             env.user.lightUserApi
               .preloadMany(as.games.flatMap(_.userIds)) inject html.user.mod.assessments(user, as)
           }
@@ -505,7 +505,7 @@ final class User(
       me: UserModel
   )(err: Form[_] => UserModel => Fu[Result], suc: => Result)(implicit req: Request[_]) =
     env.user.repo named username flatMap {
-      _ ?? { user =>
+      _ so { user =>
         env.user.forms.note
           .bindFromRequest()
           .fold(
@@ -522,7 +522,7 @@ final class User(
   def deleteNote(id: String) =
     Auth { implicit ctx => me =>
       OptionFuResult(env.user.noteApi.byId(id)) { note =>
-        (note.isFrom(me) && !note.mod) ?? {
+        (note.isFrom(me) && !note.mod) so {
           env.user.noteApi.delete(note._id) inject Redirect(routes.User.show(note.to).url + "?note")
         }
       }
@@ -534,14 +534,13 @@ final class User(
         ops         <- env.game.favoriteOpponents(me.id)
         followables <- env.pref.api.followables(ops map (_._1.id))
         relateds <-
-          ops
+          Future.sequence(ops
             .zip(followables)
             .map { case ((u, nb), followable) =>
               relationApi.fetchRelation(me.id, u.id) map {
                 lila.relation.Related(u, nb.some, followable, _)
               }
-            }
-            .sequenceFu
+            })
       } yield html.user.opponents(me, relateds)
     }
 
@@ -555,7 +554,7 @@ final class User(
               ranks       <- env.user.cached rankingsOf u.id
               oldPerfStat <- env.perfStat.get(u, perfType)
               perfStat = oldPerfStat.copy(playStreak = oldPerfStat.playStreak.checkCurrent)
-              distribution <- u.perfs(perfType).established ?? {
+              distribution <- u.perfs(perfType).established so {
                 env.user.rankingApi.weeklyRatingDistribution(perfType) dmap some
               }
               percentile = distribution.map { distrib =>
@@ -568,7 +567,7 @@ final class User(
               response <- negotiate(
                 html = Ok(html.user.perfStat(u, ranks, perfType, percentile, perfStat, ratingChart)).fuccess,
                 api = _ =>
-                  getBool("graph").?? {
+                  getBool("graph").so {
                     env.history.ratingChartApi.singlePerf(u, perfType).map(_.some)
                   } map {
                     val data = env.perfStat.jsonView(u, perfStat, ranks get perfType, percentile)

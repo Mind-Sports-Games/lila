@@ -66,7 +66,7 @@ final private class PuzzlePathApi(
               actualTier,
               (rating - ratingFlex) to (rating + ratingFlex)
             ) ++
-              ((compromise != 5 && previousPaths.nonEmpty) ?? $doc("_id" $nin previousPaths))
+              ((compromise != 5 && previousPaths.nonEmpty) so $doc("_id" $nin previousPaths))
           ) -> List(
             Sample(1),
             Project($id(true))

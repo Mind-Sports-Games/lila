@@ -25,18 +25,17 @@ final class JsonView(
 
   private def fetchGames(simul: Simul) =
     if (simul.isFinished) gameRepo gamesFromSecondary simul.gameIds
-    else simul.gameIds.map(proxyRepo.game).sequenceFu.dmap(_.flatten)
+    else Future.sequence(simul.gameIds.map(proxyRepo.game)).dmap(_.flatten)
 
   def apply(simul: Simul, team: Option[SimulTeam]): Fu[JsObject] =
     for {
       games      <- fetchGames(simul)
       lightHost  <- getLightUser(simul.hostId)
-      applicants <- simul.applicants.sortBy(-_.player.rating).map(applicantJson).sequenceFu
+      applicants <- Future.sequence(simul.applicants.sortBy(-_.player.rating).map(applicantJson))
       pairingOptions <-
-        simul.pairings
+        Future.sequence(simul.pairings
           .sortBy(-_.player.rating)
-          .map(pairingJson(games, simul.hostId))
-          .sequenceFu
+          .map(pairingJson(games, simul.hostId)))
       pairings = pairingOptions.flatten
     } yield baseSimul(simul, lightHost) ++ Json
       .obj(
@@ -58,7 +57,7 @@ final class JsonView(
     }
 
   def api(simuls: List[Simul]): Fu[JsArray] =
-    simuls.map(api).sequenceFu map JsArray.apply
+    Future.sequence(simuls.map(api)) map JsArray.apply
 
   def apiAll(
       pending: List[Simul],
@@ -118,7 +117,7 @@ final class JsonView(
         .add("name" -> light.map(_.name))
         .add("title" -> light.map(_.title))
         .add("provisional" -> ~player.provisional)
-        .add("patron" -> light.??(_.isPatron))
+        .add("patron" -> light.so(_.isPatron))
     }
 
   private def applicantJson(app: SimulApplicant): Fu[JsObject] =
@@ -165,7 +164,7 @@ final class JsonView(
       .add("winner" -> g.winnerPlayerIndex.map(_.name))
 
   private def pairingJson(games: List[Game], hostId: String)(p: SimulPairing): Fu[Option[JsObject]] =
-    games.find(_.id == p.gameId) ?? { game =>
+    games.find(_.id == p.gameId) so { game =>
       playerJson(p.player) map { player =>
         Json
           .obj(

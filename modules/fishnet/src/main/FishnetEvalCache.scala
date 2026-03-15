@@ -44,13 +44,13 @@ final private class FishnetEvalCache(
       )
       .fold(
         _ => fuccess(Nil),
-        _.zipWithIndex
-          .map { case (sit, index) =>
-            evalCacheApi.getSinglePvEval(game.variant, Forsyth.>>(game.variant.gameLogic, sit)) dmap2 {
-              index -> _
-            }
-          }
-          .sequenceFu
-          .map(_.flatten)
+        sits =>
+          Future.sequence(sits.zipWithIndex
+            .map { case (sit, index) =>
+              evalCacheApi.getSinglePvEval(game.variant, Forsyth.>>(game.variant.gameLogic, sit)) dmap2 {
+                index -> _
+              }
+            })
+            .map(_.flatten)
       )
 }

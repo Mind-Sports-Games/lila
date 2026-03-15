@@ -23,7 +23,7 @@ final private class LobbyTrouper(
     discordApi: lila.irc.DiscordApi,
     poolApi: lila.pool.PoolApi,
     onStart: lila.round.OnStart
-)(implicit ec: scala.concurrent.ExecutionContext, scheduler: akka.actor.Scheduler)
+)(implicit ec: scala.concurrent.ExecutionContext, scheduler: org.apache.pekko.actor.Scheduler)
     extends Trouper {
 
   import LobbyTrouper._
@@ -42,10 +42,10 @@ final private class LobbyTrouper(
     case msg @ AddHook(hook) =>
       lila.mon.lobby.hook.create.increment()
       hookRepo bySri hook.sri foreach remove
-      hook.sid ?? { sid =>
+      hook.sid so { sid =>
         hookRepo bySid sid foreach remove
       }
-      !hook.compatibleWithPools(hook.realVariant) ?? findCompatible(hook) match {
+      !hook.compatibleWithPools(hook.realVariant) so findCompatible(hook) match {
         case Some(h) => biteHook(h.id, hook.sri, hook.user)
         case None =>
           hookRepo.save(msg.hook)
@@ -166,7 +166,7 @@ final private class LobbyTrouper(
   }
 
   private def NoPlayban(user: Option[LobbyUser])(f: => Unit): Unit = {
-    user.?? { u =>
+    user.so { u =>
       playbanApi.currentBan(u.id)
     } foreach {
       case None => f
@@ -184,7 +184,7 @@ final private class LobbyTrouper(
   private def findCompatible(hook: Hook): Option[Hook] =
     hookRepo.filter(_ compatibleWith hook).find { existing =>
       biter.canJoin(existing, hook.user) && !(
-        (existing.user, hook.user).mapN((_, _)) ?? { case (u1, u2) =>
+        (existing.user, hook.user).mapN((_, _)) so { case (u1, u2) =>
           recentlyAbortedUserIdPairs.exists(u1.id, u2.id)
         }
       )
@@ -229,7 +229,7 @@ private object LobbyTrouper {
       resyncIdsPeriod: FiniteDuration
   )(
       makeTrouper: () => LobbyTrouper
-  )(implicit ec: scala.concurrent.ExecutionContext, scheduler: akka.actor.Scheduler) = {
+  )(implicit ec: scala.concurrent.ExecutionContext, scheduler: org.apache.pekko.actor.Scheduler) = {
     val trouper = makeTrouper()
     Bus.subscribe(trouper, "lobbyTrouper")
     scheduler.scheduleWithFixedDelay(15 seconds, resyncIdsPeriod)(() => trouper ! actorApi.Resync)

@@ -17,7 +17,7 @@ object index {
       pager: Paginator[io.prismic.Document]
   )(implicit ctx: Context, prismic: lila.blog.BlogApi.Context) = {
 
-    val primaryPost = (pager.currentPage == 1).??(pager.currentPageResults.headOption)
+    val primaryPost = (pager.currentPage == 1).so(pager.currentPageResults.headOption)
     views.html.base.layout(
       title = "Blog",
       moreCss = cssTag("blog"),

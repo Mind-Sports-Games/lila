@@ -56,7 +56,7 @@ final class Practice(
     Open { implicit ctx =>
       api.structure.get.flatMap { struct =>
         struct.sections.find(_.id == sectionId).fold(notFound) { section =>
-          select(section) ?? { study =>
+          select(section) so { study =>
             Redirect(routes.Practice.show(section.id, study.slug, study.id.value)).fuccess
           }
         }
@@ -145,8 +145,7 @@ final class Practice(
         FormFuResult(form) { err =>
           api.structure.get map { html.practice.config(_, err) }
         } { text =>
-          ~api.config.set(text).toOption >>-
-            api.structure.clear() >>
+          ~api.config.set(text).toOption.andDo(api.structure.clear()) >>
             env.mod.logApi.practiceConfig(me.id) inject Redirect(routes.Practice.config)
         }
       }

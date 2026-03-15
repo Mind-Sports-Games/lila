@@ -146,7 +146,7 @@ trait GameHelper { self: I18nHelper with UserHelper with AiHelper with StringHel
     val statusIcon = (withBerserk && player.berserk) option berserkIconSpan
     player.userId.flatMap(lightUser) match {
       case None =>
-        val klass = cssClass.??(" " + _)
+        val klass = cssClass.so(" " + _)
         span(cls := s"user-link$klass")(
           (player.aiLevel, player.name) match {
             case (Some(level), _) => aiNameFrag(level, withRating)
@@ -318,7 +318,7 @@ trait GameHelper { self: I18nHelper with UserHelper with AiHelper with StringHel
       ownerLink: Boolean = false,
       tv: Boolean = false
   )(implicit ctx: Context): String = {
-    val owner = ownerLink ?? ctx.me.flatMap(game.player)
+    val owner = ownerLink so ctx.me.flatMap(game.player)
     if (tv) routes.Tv.index
     else
       owner.fold(routes.Round.watcher(game.id, playerIndex.name)) { o =>

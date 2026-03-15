@@ -116,7 +116,7 @@ trait Positional { self: Config =>
       !(variant.fromPositionVariant && Config
         .fenVariants(GameFamily.Draughts().id)
         .contains((fenVariant | Variant.libStandard(GameLogic.Draughts())).id)) || {
-        fen ?? { f =>
+        fen so { f =>
           ~Forsyth
             .<<<@(variant.gameLogic, fenVariant | Variant.libStandard(GameLogic.Draughts()), f)
             .map(_.situation playable strictFen)
@@ -141,7 +141,7 @@ trait Positional { self: Config =>
       !(variant.fromPositionVariant && Config
         .fenVariants(GameFamily.Draughts().id)
         .contains((fenVariant | Variant.libStandard(GameLogic.Draughts())).id)) || {
-        fen ?? { f =>
+        fen so { f =>
           strategygames.draughts.format.Forsyth.countKings(
             strategygames.draughts.format.FEN(f.value)
           ) <= 30

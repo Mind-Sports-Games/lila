@@ -5,7 +5,7 @@ import play.api.libs.ws.StandaloneWSClient
 import play.api.libs.ws.DefaultBodyWritables._
 import play.api.libs.ws.JsonBodyReadables._
 import play.api.i18n.Lang
-import io.methvin.play.autoconfig._
+import lila.common.autoconfig.{ AutoConfig, ConfigName }
 import scala.math.Ordering.Float.TotalOrdering
 
 import lila.common.config.Secret

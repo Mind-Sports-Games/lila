@@ -26,7 +26,7 @@ object AccessToken {
     def isPersonal = value.lengthIs == idSize
   }
 
-  def makeId = Id(ornicar.scalalib.Random secureString idSize)
+  def makeId = Id(scalalib.Random secureString idSize)
 
   case class ForAuth(userId: User.ID, scopes: List[OAuthScope])
 

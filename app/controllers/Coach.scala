@@ -17,7 +17,7 @@ final class Coach(env: Env) extends LilaController(env) {
     Open { implicit ctx =>
       pageHit
       val order = CoachPager.Order(o)
-      val lang  = (l != "all") ?? play.api.i18n.Lang.get(l)
+      val lang  = (l != "all") so play.api.i18n.Lang.get(l)
       env.coach.api.allLanguages flatMap { langCodes =>
         env.coach.pager(lang, order, page) map { pager =>
           Ok(html.coach.index(pager, lang, order, langCodes))
@@ -33,7 +33,7 @@ final class Coach(env: Env) extends LilaController(env) {
             c.coach.profile.studyIds.map(_.value).map(lila.study.Study.Id.apply)
           } flatMap env.study.pager.withChaptersAndLiking(ctx.me, 4) flatMap { studies =>
             api.reviews.approvedByCoach(c.coach) flatMap { reviews =>
-              ctx.me.?? { api.reviews.mine(_, c.coach) } map { myReview =>
+              ctx.me.so { api.reviews.mine(_, c.coach) } map { myReview =>
                 lila.mon.coach.pageView.profile(c.coach.id.value).increment()
                 Ok(html.coach.show(c, reviews, studies, myReview))
               }
@@ -91,7 +91,7 @@ final class Coach(env: Env) extends LilaController(env) {
     }
 
   private def WithVisibleCoach(c: CoachModel.WithUser)(f: Fu[Result])(implicit ctx: Context) =
-    if (c.coach.isListed || ctx.me.??(c.coach.is) || isGranted(_.Admin)) f
+    if (c.coach.isListed || ctx.me.so(c.coach.is) || isGranted(_.Admin)) f
     else notFound
 
   def edit =

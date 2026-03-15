@@ -17,23 +17,22 @@ final private[round] class Drawer(
 
   implicit private val chatLang: Lang = defaultLang
 
-  def autoThreefold(game: Game): Fu[Option[Pov]] = game.playable ??
-    Pov(game)
+  def autoThreefold(game: Game): Fu[Option[Pov]] = game.playable so
+    Future.sequence(Pov(game)
       .map { pov =>
         import Pref.PrefZero
         if (game.playerHasOfferedDrawRecently(pov.playerIndex)) fuccess(pov.some)
         else
-          pov.player.userId ?? prefApi.getPref map { pref =>
+          pov.player.userId so prefApi.getPref map { pref =>
             pref.autoThreefold == Pref.AutoThreefold.ALWAYS || {
               pref.autoThreefold == Pref.AutoThreefold.TIME &&
-              game.clock ?? { _.remainingTime(pov.playerIndex) < Centis.ofSeconds(30) }
+              game.clock so { _.remainingTime(pov.playerIndex) < Centis.ofSeconds(30) }
             } || pov.player.userId.exists(isBotSync)
           } map (_ option pov)
-      }
-      .sequenceFu
+      })
       .dmap(_.flatten.headOption)
 
-  def yes(pov: Pov)(implicit proxy: GameProxy): Fu[Events] = pov.game.playable ?? {
+  def yes(pov: Pov)(implicit proxy: GameProxy): Fu[Events] = pov.game.playable so {
     pov match {
       case pov if pov.game.situation.threefoldRepetition =>
         finisher.other(pov.game, _.Draw, None)
@@ -43,12 +42,12 @@ final private[round] class Drawer(
         proxy.save {
           messenger.system(g, trans.playerIndexOffersDraw(pov.game.playerTrans(playerIndex)).v)
           Progress(g) map { _ offerDraw playerIndex }
-        } >>- publishDrawOffer(pov) inject List(Event.DrawOffer(by = playerIndex.some))
+        }.andDo(publishDrawOffer(pov)) inject List(Event.DrawOffer(by = playerIndex.some))
       case _ => fuccess(List(Event.ReloadOwner))
     }
   }
 
-  def no(pov: Pov)(implicit proxy: GameProxy): Fu[Events] = pov.game.playable ?? {
+  def no(pov: Pov)(implicit proxy: GameProxy): Fu[Events] = pov.game.playable so {
     pov match {
       case Pov(g, playerIndex) if pov.player.isOfferingDraw =>
         proxy.save {
@@ -69,7 +68,7 @@ final private[round] class Drawer(
   }
 
   def claim(pov: Pov)(implicit proxy: GameProxy): Fu[Events] =
-    (pov.game.playable && pov.game.situation.threefoldRepetition) ?? finisher.other(
+    (pov.game.playable && pov.game.situation.threefoldRepetition) so finisher.other(
       pov.game,
       _.Draw,
       None

@@ -240,7 +240,7 @@ object tree {
 
   def apply(me: User, playban: Boolean)(implicit ctx: Context) =
     bits.layout("Appeal a moderation decision") {
-      val query = isGranted(_.Appeals) ?? ctx.req.queryString.toMap
+      val query = isGranted(_.Appeals) so ctx.req.queryString.toMap
       main(cls := "page page-small box box-pad appeal")(
         h1("Appeal"),
         div(cls := "nav-tree")(

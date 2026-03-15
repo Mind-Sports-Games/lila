@@ -48,7 +48,7 @@ final private class DuelStore {
   def get(tourId: Tournament.ID): Option[TreeSet[Duel]] = Option(byTourId get tourId)
 
   def bestRated(tourId: Tournament.ID, nb: Int): List[Duel] =
-    get(tourId) ?? {
+    get(tourId) so {
       lila.common.Heapsort.topNToList(_, nb, ratingOrdering)
     }
 
@@ -83,5 +83,5 @@ final private class DuelStore {
         }
       )
     }
-  def remove(tour: Tournament): Unit = byTourId.remove(tour.id).unit
+  def remove(tour: Tournament): Unit = { val _ = byTourId.remove(tour.id) }
 }

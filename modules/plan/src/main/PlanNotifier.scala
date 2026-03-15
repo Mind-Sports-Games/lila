@@ -1,6 +1,6 @@
 package lila.plan
 
-import akka.actor._
+import org.apache.pekko.actor._
 import scala.concurrent.duration._
 
 import lila.hub.actorApi.timeline.Propagate

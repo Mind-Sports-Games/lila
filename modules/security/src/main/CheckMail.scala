@@ -18,7 +18,7 @@ final private class CheckMail(
     mongoCache: lila.memo.MongoCache.Api
 )(implicit
     ec: scala.concurrent.ExecutionContext,
-    scheduler: akka.actor.Scheduler
+    scheduler: org.apache.pekko.actor.Scheduler
 ) {
 
   def apply(domain: Domain.Lower): Fu[Boolean] =

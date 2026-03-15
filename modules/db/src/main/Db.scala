@@ -5,6 +5,7 @@ import scala.concurrent.duration._
 import scala.concurrent.Future
 
 import lila.common.Chronometer
+import lila.common.extensions.*
 import lila.common.config.CollName
 import lila.db.dsl.Coll
 
@@ -33,7 +34,7 @@ final class Db(
     driver: AsyncDriver
 )(implicit ec: scala.concurrent.ExecutionContext) {
 
-  private val logger = lila.db.logger branch name
+  private val logger = lila.db.logger.branch(name)
 
   private lazy val db: DB = Chronometer.syncEffect(
     MongoConnection
@@ -41,7 +42,7 @@ final class Db(
       .flatMap { parsedUri =>
         driver
           .connect(parsedUri, name.some)
-          .flatMap(_ database parsedUri.db.getOrElse("lichess"))
+          .flatMap(_.database(parsedUri.db.getOrElse("lichess")))
       }
       .await(5.seconds, s"db:$name")
   ) { lap =>

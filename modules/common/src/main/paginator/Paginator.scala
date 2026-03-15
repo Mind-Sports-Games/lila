@@ -8,33 +8,31 @@ import lila.common.config.MaxPerPage
 final class Paginator[A] private[paginator] (
     val currentPage: Int,
     val maxPerPage: MaxPerPage,
-    /** Returns the results for the current page.
-      * The result is cached.
+    /** Returns the results for the current page. The result is cached.
       */
     val currentPageResults: Seq[A],
-    /** Returns the number of results.
-      * The result is cached.
+    /** Returns the number of results. The result is cached.
       */
     val nbResults: Int
-) {
+):
 
   /** Returns the previous page.
     */
-  def previousPage: Option[Int] = (currentPage > 1) option (currentPage - 1)
+  def previousPage: Option[Int] = (currentPage > 1).option(currentPage - 1)
 
   /** Returns the next page.
     */
   def nextPage: Option[Int] =
-    (currentPage < nbPages && currentPageResults.nonEmpty) option (currentPage + 1)
+    (currentPage < nbPages && currentPageResults.nonEmpty).option(currentPage + 1)
 
   /** Returns the number of pages.
     */
   def nbPages: Int =
-    if (maxPerPage.value > 0) (nbResults + maxPerPage.value - 1) / maxPerPage.value
+    if maxPerPage.value > 0 then (nbResults + maxPerPage.value - 1) / maxPerPage.value
     else 0
 
-  /** Returns whether we have to paginate or not.
-    * This is true if the number of results is higher than the max per page.
+  /** Returns whether we have to paginate or not. This is true if the number of results is higher than the max
+    * per page.
     */
   def hasToPaginate: Boolean = nbResults > maxPerPage.value
 
@@ -58,10 +56,9 @@ final class Paginator[A] private[paginator] (
     withCurrentPageResults(currentPageResults map f)
 
   def mapFutureResults[B](f: A => Fu[B])(implicit ec: scala.concurrent.ExecutionContext): Fu[Paginator[B]] =
-    currentPageResults.map(f).sequenceFu dmap withCurrentPageResults
-}
+    Future.sequence(currentPageResults.map(f)).dmap(withCurrentPageResults)
 
-object Paginator {
+object Paginator:
 
   def apply[A](
       adapter: AdapterLike[A],
@@ -90,11 +87,10 @@ object Paginator {
       currentPage: Int = 1,
       maxPerPage: MaxPerPage = MaxPerPage(10)
   )(implicit ec: scala.concurrent.ExecutionContext): Validated[String, Fu[Paginator[A]]] =
-    if (currentPage < 1) Validated.invalid("Max per page must be greater than zero")
-    else if (maxPerPage.value <= 0) Validated.invalid("Current page must be greater than zero")
+    if currentPage < 1 then Validated.invalid("Max per page must be greater than zero")
+    else if maxPerPage.value <= 0 then Validated.invalid("Current page must be greater than zero")
     else
-      Validated.valid(for {
+      Validated.valid(for
         results   <- adapter.slice((currentPage - 1) * maxPerPage.value, maxPerPage.value)
         nbResults <- adapter.nbResults
-      } yield new Paginator(currentPage, maxPerPage, results, nbResults))
-}
+      yield new Paginator(currentPage, maxPerPage, results, nbResults))

@@ -26,7 +26,7 @@ object login {
         h1(trans.signIn()),
         postForm(
           cls := "form3",
-          action := s"${routes.Auth.authenticate}${referrer.?? { ref =>
+          action := s"${routes.Auth.authenticate}${referrer.so { ref =>
             s"?referrer=${urlencode(ref)}"
           }}"
         )(

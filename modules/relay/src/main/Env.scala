@@ -1,6 +1,6 @@
 package lila.relay
 
-import akka.actor._
+import org.apache.pekko.actor._
 import com.softwaremill.macwire._
 import play.api.libs.ws.StandaloneWSClient
 import scala.concurrent.duration._
@@ -23,7 +23,7 @@ final class Env(
 )(implicit
     ec: scala.concurrent.ExecutionContext,
     system: ActorSystem,
-    scheduler: akka.actor.Scheduler
+    scheduler: org.apache.pekko.actor.Scheduler
 ) {
 
   lazy val roundForm = wire[RelayRoundForm]
@@ -59,7 +59,7 @@ final class Env(
     case lila.hub.actorApi.study.RemoveStudy(studyId, _) => api.onStudyRemove(studyId).unit
     case lila.study.actorApi.RelayToggle(id, v, who) =>
       studyApi.isContributor(id, who.u) foreach {
-        _ ?? {
+        _ so {
           api.requestPlay(RelayRound.Id(id.value), v)
         }
       }

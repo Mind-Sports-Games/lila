@@ -20,7 +20,7 @@ object actions {
   )(implicit ctx: Context) =
     div(cls := "relation-actions btn-rack")(
       ctx.userId map { myId =>
-        (myId != userId) ?? frag(
+        (myId != userId) so frag(
           !blocked option frag(
             a(
               titleOrText(trans.challenge.challengeToPlay.txt()),

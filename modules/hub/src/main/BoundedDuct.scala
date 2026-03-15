@@ -13,14 +13,14 @@ final class BoundedDuct(maxSize: Int, name: String, logging: Boolean = true)(pro
     implicit ec: scala.concurrent.ExecutionContext
 ) {
 
-  import BoundedDuct._
+  import BoundedDuct.*
 
   def !(msg: Any): Boolean =
     stateRef.getAndUpdate { state =>
       Some {
         state.fold(emptyQueue) { q =>
-          if (q.size >= maxSize) q
-          else q enqueue msg
+          if q.size >= maxSize then q
+          else q.enqueue(msg)
         }
       }
     } match {
@@ -29,9 +29,9 @@ final class BoundedDuct(maxSize: Int, name: String, logging: Boolean = true)(pro
         true
       case Some(q) =>
         val success = q.size < maxSize
-        if (!success) {
+        if !success then {
           lila.mon.duct.overflow(name).increment()
-          if (logging) lila.log("duct").warn(s"[$name] queue is full ($maxSize)")
+          if logging then lila.log("duct").warn(s"[$name] queue is full ($maxSize)")
         }
         success
     }
@@ -39,7 +39,7 @@ final class BoundedDuct(maxSize: Int, name: String, logging: Boolean = true)(pro
   def ask[A](makeMsg: Promise[A] => Any): Fu[A] = {
     val promise = Promise[A]()
     val success = this ! makeMsg(promise)
-    if (!success) promise failure new EnqueueException(s"The $name duct queue is full ($maxSize)")
+    if !success then promise failure new EnqueueException(s"The $name duct queue is full ($maxSize)")
     promise.future
   }
 
@@ -50,15 +50,14 @@ final class BoundedDuct(maxSize: Int, name: String, logging: Boolean = true)(pro
    * Busy: Some(Queue.empty)
    * Busy with backlog: Some(Queue.nonEmpty)
    */
-  private[this] val stateRef: AtomicReference[State] = new AtomicReference(None)
+  private val stateRef: AtomicReference[State] = new AtomicReference(None)
 
-  private[this] def run(msg: Any): Unit =
-    process.applyOrElse(msg, fallback) onComplete postRun
+  private def run(msg: Any): Unit =
+    process.applyOrElse(msg, fallback).onComplete(postRun)
 
-  private[this] val postRun = (_: Any) =>
-    stateRef.getAndUpdate(postRunUpdate) flatMap (_.headOption) foreach run
+  private val postRun = (_: Any) => stateRef.getAndUpdate(postRunUpdate).flatMap(_.headOption).foreach(run)
 
-  private[this] lazy val fallback = { msg: Any =>
+  private lazy val fallback = (msg: Any) => {
     lila.log("duct").warn(s"[$name] unhandled msg: $msg")
     funit
   }
@@ -69,9 +68,9 @@ object BoundedDuct {
   final class EnqueueException(msg: String) extends Exception(msg)
 
   private case class SizedQueue(queue: Queue[Any], size: Int) {
-    def enqueue(a: Any) = SizedQueue(queue enqueue a, size + 1)
+    def enqueue(a: Any) = SizedQueue(queue.enqueue(a), size + 1)
     def isEmpty         = size == 0
-    def tailOption      = !isEmpty option SizedQueue(queue.tail, size - 1)
+    def tailOption      = (!isEmpty).option(SizedQueue(queue.tail, size - 1))
     def headOption      = queue.headOption
   }
   private val emptyQueue = SizedQueue(Queue.empty, 0)

@@ -74,7 +74,7 @@ final class SwissStandingApi(
   private def compute(swiss: Swiss, page: Int): Fu[JsObject] =
     for {
       rankedPlayers <- bestWithRankByPage(swiss.id, 10, page atLeast 1)
-      pairings <- !swiss.isCreated ?? SwissPairing.fields { f =>
+      pairings <- !swiss.isCreated so SwissPairing.fields { f =>
         colls.pairing
           .find($doc(f.swissId -> swiss.id, f.players $in rankedPlayers.map(_.player.userId)))
           .sort($sort asc f.round)

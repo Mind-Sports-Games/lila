@@ -49,7 +49,7 @@ final class PuzzleReplayApi(
           if (current.days == days && current.theme == theme && current.remaining.nonEmpty) fuccess(current)
           else createReplayFor(user, days, variant, theme) tap { replays.put((user.id, variant), _) }
       } flatMap { replay =>
-        replay.remaining.headOption ?? { id =>
+        replay.remaining.headOption so { id =>
           colls.puzzle(_.byId[Puzzle](id.value)) map2 (_ -> replay)
         }
       }
@@ -61,7 +61,7 @@ final class PuzzleReplayApi(
       variant: Variant,
       theme: PuzzleTheme.Key
   ): Funit =
-    replays.getIfPresent((round.userId, variant)) ?? {
+    replays.getIfPresent((round.userId, variant)) so {
       _ map { replay =>
         if (replay.days == days && replay.theme == theme)
           replays.put((round.userId, variant), fuccess(replay.step))

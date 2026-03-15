@@ -1,7 +1,7 @@
 package lila.tournament
 
-import akka.stream.Materializer
-import akka.stream.scaladsl._
+import org.apache.pekko.stream.Materializer
+import org.apache.pekko.stream.scaladsl._
 import BSONHandlers._
 import org.joda.time.DateTime
 import reactivemongo.akkastream.{ cursorProducer, AkkaStreamCursor }
@@ -37,7 +37,7 @@ final class PairingRepo(coll: Coll)(implicit ec: scala.concurrent.ExecutionConte
       userIds: Set[User.ID],
       max: Int
   ): Fu[Pairing.LastOpponents] =
-    userIds.nonEmpty.?? {
+    userIds.nonEmpty.so {
       val nbUsers = userIds.size
       coll
         .find(
@@ -111,14 +111,15 @@ final class PairingRepo(coll: Coll)(implicit ec: scala.concurrent.ExecutionConte
     coll
       .list[Pairing](selectTourUser(tourId, userId))
       .flatMap {
-        _.withFilter(_ notLostBy userId).map { p =>
-          coll.update.one(
-            $id(p.id),
-            $set(
-              "w" -> p.playerIndexOf(userId).map(_.p2)
+        pairings =>
+          Future.sequence(pairings.withFilter(_ notLostBy userId).map { p =>
+            coll.update.one(
+              $id(p.id),
+              $set(
+                "w" -> p.playerIndexOf(userId).map(_.p2)
+              )
             )
-          )
-        }.sequenceFu
+          })
       }
       .void
 
@@ -217,7 +218,7 @@ final class PairingRepo(coll: Coll)(implicit ec: scala.concurrent.ExecutionConte
     if (pairing.user1 == userId) "b1".some
     else if (pairing.user2 == userId) "b2".some
     else none
-  } ?? { field =>
+  } so { field =>
     coll.update
       .one(
         $id(pairing.id),

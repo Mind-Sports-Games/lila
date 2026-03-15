@@ -78,7 +78,7 @@ case class Node(
 
   def toggleGlyph(glyph: Glyph) = copy(glyphs = glyphs toggle glyph)
 
-  def mainline: Vector[Node] = this +: children.first.??(_.mainline)
+  def mainline: Vector[Node] = this +: children.first.so(_.mainline)
 
   def updateMainlineLast(f: Node => Node): Node =
     children.first.fold(f(this)) { main =>
@@ -130,8 +130,8 @@ object Node {
 
     // select all nodes on that path
     def nodesOn(path: Path): Vector[(Node, Path)] =
-      path.split ?? { case (head, tail) =>
-        get(head) ?? { first =>
+      path.split so { case (head, tail) =>
+        get(head) so { first =>
           (first, Path(Vector(head))) +: first.children.nodesOn(tail).map { case (n, p) =>
             (n, p prepend head)
           }
@@ -306,9 +306,9 @@ object Node {
         copy(children = children.update(main updateMainlineLast f))
       }
 
-    lazy val mainline: Vector[Node] = children.first.??(_.mainline)
+    lazy val mainline: Vector[Node] = children.first.so(_.mainline)
 
-    def lastMainlinePly = Chapter.Ply(mainline.lastOption.??(_.ply))
+    def lastMainlinePly = Chapter.Ply(mainline.lastOption.so(_.ply))
 
     def lastMainlinePlyOf(path: Path) =
       Chapter.Ply {
@@ -318,7 +318,7 @@ object Node {
             node.id == id
           }
           .lastOption
-          .?? { case (node, _) =>
+          .so { case (node, _) =>
             node.ply
           }
       }

@@ -17,7 +17,7 @@ final class RelayTour(env: Env, apiC: => Api) extends LilaController(env) {
     Open { implicit ctx =>
       Reasonable(page) {
         for {
-          active <- (page == 1).??(env.relay.api.officialActive)
+          active <- (page == 1).so(env.relay.api.officialActive)
           pager  <- env.relay.pager.inactive(page)
         } yield Ok(html.relay.tour.index(active, pager))
       }
@@ -66,7 +66,7 @@ final class RelayTour(env: Env, apiC: => Api) extends LilaController(env) {
   def redirect(@nowarn("msg=unused") slug: String, anyId: String) = Open { implicit ctx =>
     env.relay.api byIdWithTour RoundModel.Id(anyId) flatMap {
       case Some(rt) => Redirect(rt.path).fuccess // BC old broadcast URLs
-      case None     => env.relay.api tourById TourModel.Id(anyId) flatMap { _ ?? redirectToTour }
+      case None     => env.relay.api tourById TourModel.Id(anyId) flatMap { _ so redirectToTour }
     }
   }
 
@@ -82,8 +82,8 @@ final class RelayTour(env: Env, apiC: => Api) extends LilaController(env) {
   private def redirectToTour(tour: TourModel)(implicit ctx: Context): Fu[Result] =
     env.relay.api.activeTourNextRound(tour) orElse env.relay.api.tourLastRound(tour) flatMap {
       case None =>
-        ctx.me.?? { env.relay.api.canUpdate(_, tour) } flatMap {
-          _ ?? Redirect(routes.RelayRound.form(tour.id.value)).fuccess
+        ctx.me.so { env.relay.api.canUpdate(_, tour) } flatMap {
+          _ so Redirect(routes.RelayRound.form(tour.id.value)).fuccess
         }
       case Some(round) => Redirect(round.withTour(tour).path).fuccess
     }
@@ -97,8 +97,8 @@ final class RelayTour(env: Env, apiC: => Api) extends LilaController(env) {
       f: TourModel => Fu[Result]
   )(implicit ctx: Context): Fu[Result] =
     WithTour(id) { tour =>
-      ctx.me.?? { env.relay.api.canUpdate(_, tour) } flatMap {
-        _ ?? f(tour)
+      ctx.me.so { env.relay.api.canUpdate(_, tour) } flatMap {
+        _ so f(tour)
       }
     }
    */

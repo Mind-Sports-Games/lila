@@ -39,12 +39,12 @@ final class NotifyApi(
     getNotifications(userId, page) zip unreadCount(userId) dmap (Notification.AndUnread.apply _).tupled
 
   def markAllRead(userId: Notification.Notifies) =
-    repo.markAllRead(userId) >>- unreadCountCache.put(userId, fuccess(0))
+    repo.markAllRead(userId).andDo(unreadCountCache.put(userId, fuccess(0)))
 
   def markAllRead(userIds: Iterable[Notification.Notifies]) =
-    repo.markAllRead(userIds) >>- userIds.foreach {
+    repo.markAllRead(userIds).andDo(userIds.foreach {
       unreadCountCache.put(_, fuccess(0))
-    }
+    })
 
   private val unreadCountCache = cacheApi[Notification.Notifies, Int](32768, "notify.unreadCountCache") {
     _.expireAfterAccess(20 minutes)
@@ -63,22 +63,21 @@ final class NotifyApi(
     }
 
   def addNotificationWithoutSkipOrEvent(notification: Notification): Funit =
-    repo.insert(notification) >>- unreadCountCache.update(notification.notifies, _ + 1)
+    repo.insert(notification).andDo(unreadCountCache.update(notification.notifies, _ + 1))
 
   def addNotifications(notifications: List[Notification]): Funit =
-    notifications.map(addNotification).sequenceFu.void
+    Future.sequence(notifications.map(addNotification)).void
 
   def remove(notifies: Notification.Notifies, selector: Bdoc): Funit =
-    repo.remove(notifies, selector) >>- unreadCountCache.invalidate(notifies)
+    repo.remove(notifies, selector).andDo(unreadCountCache.invalidate(notifies))
 
   def markRead(notifies: Notification.Notifies, selector: Bdoc): Funit =
-    repo.markManyRead(selector ++ $doc("notifies" -> notifies, "read" -> false)) >>-
-      unreadCountCache.invalidate(notifies)
+    repo.markManyRead(selector ++ $doc("notifies" -> notifies, "read" -> false)).andDo(unreadCountCache.invalidate(notifies))
 
   def exists = repo.exists _
 
   private def shouldSkip(notification: Notification) =
-    (!notification.isMsg ?? userRepo.isKid(notification.notifies.value)) >>| {
+    (!notification.isMsg so userRepo.isKid(notification.notifies.value)) >>| {
       notification.content match {
         case MentionedInThread(_, _, topicId, _, _) =>
           repo.hasRecentNotificationsInThread(notification.notifies, topicId)

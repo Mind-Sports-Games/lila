@@ -94,7 +94,7 @@ object widgets {
           ),
           if (g.actionStrs.length > 0)
             div(cls := "opening")(
-              (!g.fromPosition ?? g.opening) map { opening =>
+              (!g.fromPosition so g.opening) map { opening =>
                 strong(opening.opening.toString())
               },
               div(cls := "pgn")(

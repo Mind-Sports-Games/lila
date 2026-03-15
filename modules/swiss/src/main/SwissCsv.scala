@@ -1,6 +1,6 @@
 package lila.swiss
 
-import akka.stream.scaladsl.Source
+import org.apache.pekko.stream.scaladsl.Source
 
 object SwissCsv {
 
@@ -27,7 +27,7 @@ object SwissCsv {
     p.player.rating.toString,
     p.player.points.value.toString,
     p.player.tieBreak.toString,
-    p.player.performance.??(_.value.toString)
+    p.player.performance.so(_.value.toString)
   )
 
   private def toCsv(values: String*) = values mkString ","

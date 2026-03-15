@@ -48,7 +48,7 @@ object edit extends Context.ToLang {
             val granted = s.streamer.approval.granted
             frag(
               (ctx.is(s.user) && s.streamer.listed.value) option div(
-                cls := s"status is${granted ?? "-green"}",
+                cls := s"status is${granted so "-green"}",
                 dataIcon := (if (granted) "E" else "")
               )(
                 if (granted)
@@ -144,7 +144,7 @@ object edit extends Context.ToLang {
               },
               postForm(
                 cls := "form3",
-                action := s"${routes.Streamer.edit}${!ctx.is(s.user) ?? s"?u=${s.user.id}"}"
+                action := s"${routes.Streamer.edit}${!ctx.is(s.user) so s"?u=${s.user.id}"}"
               )(
                 isGranted(_.Streamers) option div(cls := "mod")(
                   form3.split(

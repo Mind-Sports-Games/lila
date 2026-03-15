@@ -20,9 +20,9 @@ final private class ChallengeJoiner(
       case true                                                                             => fuccess(None)
       case _ if playerIndex.map(Challenge.PlayerIndexChoice.apply).has(c.playerIndexChoice) => fuccess(None)
       case _ =>
-        c.challengerUserId.??(userRepo.byId) flatMap { origUser =>
+        c.challengerUserId.so(userRepo.byId) flatMap { origUser =>
           val game = ChallengeJoiner.createGame(c, origUser, destUser, playerIndex)
-          (gameRepo.insertDenormalized(game, c.initialFen)) >>- onStart(game.id) inject Pov(
+          (gameRepo.insertDenormalized(game, c.initialFen)).andDo(onStart(game.id)) inject Pov(
             game,
             !c.finalPlayerIndex
           ).some

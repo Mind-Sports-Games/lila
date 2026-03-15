@@ -1,6 +1,6 @@
 package lila.security
 
-import akka.actor._
+import org.apache.pekko.actor._
 import com.softwaremill.macwire._
 import play.api.Configuration
 import play.api.libs.ws.StandaloneWSClient

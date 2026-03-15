@@ -161,7 +161,7 @@ final class TournamentRepo(val coll: Coll, playerCollName: CollName)(implicit
       .cursor[Tournament]()
 
   private[tournament] def upcomingByTeam(teamId: TeamID, nb: Int) =
-    (nb > 0) ?? coll
+    (nb > 0) so coll
       .find(
         forTeamSelect(teamId) ++ enterableSelect ++ $doc(
           "startsAt" $gt DateTime.now.minusDays(1)
@@ -172,7 +172,7 @@ final class TournamentRepo(val coll: Coll, playerCollName: CollName)(implicit
       .list(nb)
 
   private[tournament] def finishedByTeam(teamId: TeamID, nb: Int) =
-    (nb > 0) ?? coll
+    (nb > 0) so coll
       .find(forTeamSelect(teamId) ++ finishedSelect)
       .sort($sort desc "startsAt")
       .cursor[Tournament]()
@@ -192,7 +192,7 @@ final class TournamentRepo(val coll: Coll, playerCollName: CollName)(implicit
     coll
       .aggregateList(Int.MaxValue, readPreference = ReadPreference.secondaryPreferred) { implicit framework =>
         import framework._
-        Match(enterableSelect ++ nonEmptySelect ++ teamId.??(forTeamSelect)) -> List(
+        Match(enterableSelect ++ nonEmptySelect ++ teamId.so(forTeamSelect)) -> List(
           PipelineOperator(
             $doc(
               "$lookup" -> $doc(
@@ -431,7 +431,7 @@ final class TournamentRepo(val coll: Coll, playerCollName: CollName)(implicit
 
   def insert(tour: Tournament) = coll.insert.one(tour)
 
-  def insert(tours: Seq[Tournament]) = tours.nonEmpty ??
+  def insert(tours: Seq[Tournament]) = tours.nonEmpty so
     coll.insert(ordered = false).many(tours).void
 
   def remove(tour: Tournament) = coll.delete.one($id(tour.id))

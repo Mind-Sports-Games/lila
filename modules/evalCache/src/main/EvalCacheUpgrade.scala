@@ -15,7 +15,7 @@ import scala.collection.mutable
  * by remembering the last evalGet of each socket member,
  * and listening to new evals stored.
  */
-final private class EvalCacheUpgrade(scheduler: akka.actor.Scheduler)(implicit
+final private class EvalCacheUpgrade(scheduler: org.apache.pekko.actor.Scheduler)(implicit
     ec: scala.concurrent.ExecutionContext,
     mode: play.api.Mode
 ) {
@@ -67,7 +67,7 @@ final private class EvalCacheUpgrade(scheduler: akka.actor.Scheduler)(implicit
   scheduler.scheduleWithFixedDelay(1 minute, 1 minute) { () =>
     upgradeMon.members.update(members.size)
     upgradeMon.evals.update(evals.size)
-    upgradeMon.expirable.update(expirableSris.count).unit
+    val _ = upgradeMon.expirable.update(expirableSris.count)
   }
 }
 

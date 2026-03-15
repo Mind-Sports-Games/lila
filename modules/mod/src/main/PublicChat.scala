@@ -17,14 +17,13 @@ final class PublicChat(
     tournamentChats zip simulChats
 
   def deleteAll(userId: User.ID): Funit =
-    userRepo byId userId map2 Suspect flatMap { _ ?? deleteAll }
+    userRepo byId userId map2 Suspect flatMap { _ so deleteAll }
 
   def deleteAll(suspect: Suspect): Funit =
     all.flatMap { case (tours, simuls) =>
-      (tours.map(_._2) ::: simuls.map(_._2))
+      Future.sequence((tours.map(_._2) ::: simuls.map(_._2))
         .filter(_ hasLinesOf suspect.user)
-        .map(chatApi.userChat.delete(_, suspect.user, _.Global))
-        .sequenceFu
+        .map(chatApi.userChat.delete(_, suspect.user, _.Global)))
         .void
     }
 

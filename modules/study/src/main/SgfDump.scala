@@ -1,6 +1,6 @@
 package lila.study
 
-import akka.stream.scaladsl._
+import org.apache.pekko.stream.scaladsl._
 import strategygames.format.sgf.{ Dumper, Tag, Tags }
 import strategygames.format.FEN
 import strategygames.{ ActionStrs, GameFamily, GameLogic }
@@ -82,7 +82,7 @@ final class SgfDump(
         Tag(_.EV, s"${study.name}: ${chapter.name}"),
         Tag(_.PC, chapterUrl(study.id, chapter.id)),
         Tag(_.DT, Tag.DT.format.print(chapter.createdAt))
-      ) ::: (!chapter.root.fen.initial && !isGo).??(
+      ) ::: (!chapter.root.fen.initial && !isGo).so(
         List(
           Tag(_.IP, chapter.root.fen.value)
         )

@@ -17,7 +17,7 @@ case class Modlog(
   def notable      = action != Modlog.terminateTournament
   def notableSlack = notable && !isPlayStrategy
 
-  def gameId = details.ifTrue(action == Modlog.cheatDetected).??(_.split(' ').lift(1))
+  def gameId = details.ifTrue(action == Modlog.cheatDetected).so(_.split(' ').lift(1))
 
   def showAction =
     action match {

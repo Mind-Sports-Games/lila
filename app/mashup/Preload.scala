@@ -53,21 +53,21 @@ final class Preload(
       events.mon(_.lobby segment "events") zip
       simuls.mon(_.lobby segment "simuls") zip
       tv.getBestGame.mon(_.lobby segment "tvBestGame") zip
-      (ctx.userId ?? timelineApi.userEntries).mon(_.lobby segment "timeline") zip
+      (ctx.userId so timelineApi.userEntries).mon(_.lobby segment "timeline") zip
       userCached.topWeek.mon(_.lobby segment "userTopWeek") zip
       tourWinners.all.dmap(_.top10).mon(_.lobby segment "tourWinners") zip
-      (ctx.noBot ?? dailyPuzzle()).mon(_.lobby segment "puzzle") zip
-      (ctx.noKid ?? liveStreamApi.all
+      (ctx.noBot so dailyPuzzle()).mon(_.lobby segment "puzzle") zip
+      (ctx.noKid so liveStreamApi.all
         .dmap(_.homepage(streamerSpots, ctx.req, ctx.me.flatMap(_.lang)) withTitles lightUserApi)
         .mon(_.lobby segment "streams")) zip
-      (ctx.userId ?? playbanApi.currentBan).mon(_.lobby segment "playban") zip
-      (ctx.blind ?? ctx.me ?? roundProxy.urgentGames) zip
+      (ctx.userId so playbanApi.currentBan).mon(_.lobby segment "playban") zip
+      (ctx.blind so ctx.me so roundProxy.urgentGames) zip
       nbBots.mon(_.lobby segment "nbBots") zip
       chatOption zip chatVersion flatMap {
         // format: off
         case ((((((((((((((((data, povs), posts), tours), events), simuls), feat), entries), lead), tWinners), puzzle), streams), playban), blindGames), nbBots), chatOption), chatVersion) =>
         // format: on
-        (ctx.me ?? currentGameMyTurn(povs, lightUserApi.sync))
+        (ctx.me so currentGameMyTurn(povs, lightUserApi.sync))
           .mon(_.lobby segment "currentGame") zip
           lightUserApi
             .preloadMany {
@@ -102,7 +102,7 @@ final class Preload(
 
   def currentGameMyTurn(user: User): Fu[Option[CurrentGame]] =
     gameRepo.playingRealtimeNoAi(user).flatMap {
-      _.map { roundProxy.pov(_, user) }.sequenceFu.dmap(_.flatten)
+      games => Future.sequence(games.map { roundProxy.pov(_, user) }).dmap(_.flatten)
     } flatMap {
       currentGameMyTurn(_, lightUserApi.sync)(user)
     }

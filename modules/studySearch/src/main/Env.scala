@@ -1,6 +1,6 @@
 package lila.studySearch
 
-import akka.actor._
+import org.apache.pekko.actor._
 import com.softwaremill.macwire._
 import scala.concurrent.duration._
 
@@ -19,8 +19,8 @@ final class Env(
     makeClient: Index => ESClient
 )(implicit
     ec: scala.concurrent.ExecutionContext,
-    system: akka.actor.ActorSystem,
-    scheduler: akka.actor.Scheduler,
+    system: org.apache.pekko.actor.ActorSystem,
+    scheduler: org.apache.pekko.actor.Scheduler,
     mat: akka.stream.Materializer
 ) {
 

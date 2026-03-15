@@ -17,7 +17,7 @@ final class ClasMatesCache(colls: ClasColls, cacheApi: CacheApi, studentCache: C
 ) {
 
   def get(studentId: User.ID): Fu[Set[User.ID]] =
-    studentCache.isStudent(studentId) ?? cache.get(studentId)
+    studentCache.isStudent(studentId) so cache.get(studentId)
 
   private val cache = cacheApi[User.ID, Set[User.ID]](256, "clas.mates") {
     _.expireAfterWrite(5 minutes)

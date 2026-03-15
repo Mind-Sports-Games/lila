@@ -73,18 +73,18 @@ object UserInfo {
       prefApi: lila.pref.PrefApi
   ) {
     def apply(u: User, ctx: Context): Fu[Social] =
-      ctx.userId.?? {
+      ctx.userId.so {
         relationApi.fetchRelation(_, u.id).mon(_.user segment "relation")
       } zip
-        ctx.me.?? { me =>
+        ctx.me.so { me =>
           noteApi
             .get(u, me, Granter(_.ModNote)(me))
             .mon(_.user segment "notes")
         } zip
-        ctx.isAuth.?? {
+        ctx.isAuth.so {
           prefApi.followable(u.id).mon(_.user segment "followable")
         } zip
-        ctx.userId.?? { myId =>
+        ctx.userId.so { myId =>
           relationApi.fetchBlocks(u.id, myId).mon(_.user segment "blocks")
         } dmap { case (((relation, notes), followable), blocked) =>
           Social(relation, notes, followable, blocked)
@@ -106,7 +106,7 @@ object UserInfo {
       crosstableApi: lila.game.CrosstableApi
   ) {
     def apply(u: User, ctx: Context, withCrosstable: Boolean): Fu[NbGames] =
-      (withCrosstable ?? ctx.me.filter(u.!=) ?? { me =>
+      (withCrosstable so ctx.me.filter(u.!=) so { me =>
         crosstableApi.withMatchup(me.id, u.id) dmap some
       }).mon(_.user segment "crosstable") zip
         gameCached.nbPlaying(u.id).mon(_.user segment "nbPlaying") zip
@@ -139,7 +139,7 @@ object UserInfo {
       playbanApi: lila.playban.PlaybanApi
   )(implicit ec: scala.concurrent.ExecutionContext) {
     def apply(user: User, nbs: NbGames, ctx: Context): Fu[UserInfo] =
-      (ctx.noBlind ?? ratingChartApi(user)).mon(_.user segment "ratingChart") zip
+      (ctx.noBlind so ratingChartApi(user)).mon(_.user segment "ratingChart") zip
         relationApi.countFollowers(user.id).mon(_.user segment "nbFollowers") zip
         postApi.nbByUser(user.id).mon(_.user segment "nbPosts") zip
         studyRepo.countByOwner(user.id).nevermind.mon(_.user segment "nbStudies") zip
@@ -152,9 +152,9 @@ object UserInfo {
           .mon(_.user segment "teamIds") zip
         coachApi.isListedCoach(user).mon(_.user segment "coach") zip
         streamerApi.isActualStreamer(user).mon(_.user segment "streamer") zip
-        (user.count.rated >= 10).??(insightShare.grant(user, ctx.me)) zip
+        (user.count.rated >= 10).so(insightShare.grant(user, ctx.me)) zip
         playbanApi.completionRate(user.id).mon(_.user segment "completion") zip
-        (nbs.playing > 0) ?? isHostingSimul(user.id).mon(_.user segment "simul") zip
+        (nbs.playing > 0) so isHostingSimul(user.id).mon(_.user segment "simul") zip
         userCached.rankingsOf(user.id) map {
           // format: off
           case (((((((((((((ratingChart, nbFollowers), nbPosts), nbStudies), trophies), shields), revols), teamIds), isCoach), isStreamer), insightVisible), completionRate), hasSimul), ranks) =>

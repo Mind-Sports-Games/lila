@@ -126,7 +126,7 @@ object discussion {
     )
 
   private def renderUser(appeal: Appeal, userId: User.ID, asMod: Boolean)(implicit ctx: Context) =
-    if (appeal isAbout userId) userIdLink(userId.some, params = asMod ?? "?mod")
+    if (appeal isAbout userId) userIdLink(userId.some, params = asMod so "?mod")
     else
       span(
         userIdLink(User.playstrategyId.some),

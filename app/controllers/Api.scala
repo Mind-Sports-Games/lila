@@ -4,7 +4,7 @@ import strategygames.variant.Variant
 import strategygames.format.FEN
 import strategygames.GameLogic
 
-import akka.stream.scaladsl._
+import org.apache.pekko.stream.scaladsl._
 import play.api.libs.json._
 import play.api.mvc._
 import scala.concurrent.duration._
@@ -74,7 +74,7 @@ final class Api(
 
   def usersStatus =
     ApiRequest { req =>
-      val ids = get("ids", req).??(_.split(',').take(50).toList map lila.user.User.normalize)
+      val ids = get("ids", req).so(_.split(',').take(50).toList map lila.user.User.normalize)
       env.user.lightUserApi asyncMany ids dmap (_.flatten) map { users =>
         val streamingIds = env.streamer.liveStreamApi.userIds
         toApiResult {
@@ -137,7 +137,7 @@ final class Api(
       UserGamesRateLimit(cost, req) {
         lila.mon.api.userGames.increment(cost.toLong)
         env.user.repo named name flatMap {
-          _ ?? { user =>
+          _ so { user =>
             gameApi.byUser(
               user = user,
               rated = getBoolOpt("rated", req),
@@ -178,7 +178,7 @@ final class Api(
         import lila.user.User.normalize
         val (u1, u2) = (normalize(name1), normalize(name2))
         env.game.crosstableApi(u1, u2) flatMap { ct =>
-          (ct.results.nonEmpty && getBool("matchup", req)).?? {
+          (ct.results.nonEmpty && getBool("matchup", req)).so {
             env.game.crosstableApi.getMatchup(u1, u2)
           } map { matchup =>
             toApiResult {
@@ -199,7 +199,7 @@ final class Api(
   def tournament(id: String) =
     ApiRequest { implicit req =>
       env.tournament.tournamentRepo byId id flatMap {
-        _ ?? { tour =>
+        _ so { tour =>
           val page = (getInt("page", req) | 1) atLeast 1 atMost 200
           env.tournament.jsonView(
             tour = tour,
@@ -218,7 +218,7 @@ final class Api(
   def tournamentGames(id: String) =
     Action.async { req =>
       env.tournament.tournamentRepo byId id flatMap {
-        _ ?? { tour =>
+        _ so { tour =>
           val config = GameApiV2.ByTournamentConfig(
             tournamentId = tour.id,
             format = GameApiV2.Format byRequest req,
@@ -241,7 +241,7 @@ final class Api(
     Action.async { implicit req =>
       val csv = HTTPRequest.acceptsCsv(req) || get("as", req).has("csv")
       env.tournament.tournamentRepo byId id map {
-        _ ?? { tour =>
+        _ so { tour =>
           import lila.tournament.JsonView.playerResultWrites
           val source =
             env.tournament.api
@@ -257,7 +257,7 @@ final class Api(
   def tournamentTeams(id: String) =
     Action.async {
       env.tournament.tournamentRepo byId id flatMap {
-        _ ?? { tour =>
+        _ so { tour =>
           env.tournament.jsonView.apiTeamStanding(tour) map { arr =>
             JsonOk(
               Json.obj(
@@ -273,8 +273,8 @@ final class Api(
   def tournamentsByOwner(name: String) =
     Action.async { implicit req =>
       implicit val lang = reqLang
-      (name != "playstrategy") ?? env.user.repo.named(name) flatMap {
-        _ ?? { user =>
+      (name != "playstrategy") so env.user.repo.named(name) flatMap {
+        _ so { user =>
           val nb = getInt("nb", req) | Int.MaxValue
           jsonStream {
             env.tournament.api
@@ -288,7 +288,7 @@ final class Api(
   def swissGames(id: String) =
     Action.async { req =>
       env.swiss.api byId lila.swiss.Swiss.Id(id) flatMap {
-        _ ?? { swiss =>
+        _ so { swiss =>
           val config = GameApiV2.BySwissConfig(
             swissId = swiss.id,
             format = GameApiV2.Format byRequest req,
@@ -310,7 +310,7 @@ final class Api(
   def swissResults(id: String) = Action.async { implicit req =>
     val csv = HTTPRequest.acceptsCsv(req) || get("as", req).has("csv")
     env.swiss.api byId lila.swiss.Swiss.Id(id) map {
-      _ ?? { swiss =>
+      _ so { swiss =>
         val source = env.swiss.api
           .resultStream(swiss, MaxPerSecond(50), getInt("nb", req) | Int.MaxValue)
           .mapAsync(8) { p =>
@@ -374,9 +374,9 @@ final class Api(
       UserActivityRateLimitPerIP(HTTPRequest ipAddress req, cost = 1) {
         lila.mon.api.activity.increment(1)
         env.user.repo named name flatMap {
-          _ ?? { user =>
+          _ so { user =>
             env.activity.read.recent(user) flatMap {
-              _.map { env.activity.jsonView(_, user) }.sequenceFu
+              activities => Future.sequence(activities.map { env.activity.jsonView(_, user) })
             }
           }
         } map toApiResult
@@ -446,7 +446,7 @@ final class Api(
 
   def sourceToNdJsonOption(source: Source[Option[JsValue], _]): Result =
     sourceToNdJsonString {
-      source.map { _ ?? Json.stringify + "\n" }
+      source.map { _ so Json.stringify + "\n" }
     }
 
   private def sourceToNdJsonString(source: Source[String, _]): Result =

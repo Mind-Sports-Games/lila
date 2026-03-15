@@ -374,7 +374,7 @@ private[tournament] case class TournamentSetup(
         medleyMinutes = medleyIntervalOptions.medleyMinutes,
         startsAt = startDate | old.startsAt,
         password = password,
-        position = newVariant.standardVariant ?? {
+        position = newVariant.standardVariant so {
           if (old.isCreated || old.position.isDefined) realPosition
           else old.position
         },
@@ -404,7 +404,7 @@ private[tournament] case class TournamentSetup(
         variant = newVariant,
         startsAt = startDate | old.startsAt,
         password = password.fold(old.password)(_.some.filter(_.nonEmpty)),
-        position = newVariant.standardVariant ?? {
+        position = newVariant.standardVariant so {
           if (position.isDefined && (old.isCreated || old.position.isDefined)) realPosition
           else old.position
         },

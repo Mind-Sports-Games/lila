@@ -63,7 +63,7 @@ object index {
           )
         ),
         div(cls := "page-menu__content box")(
-          patron.ifTrue(ctx.me.??(_.isPatron)).map { p =>
+          patron.ifTrue(ctx.me.so(_.isPatron)).map { p =>
             div(cls := "banner one_time_active")(
               iconTag(patronIconChar),
               div(
@@ -97,7 +97,7 @@ object index {
               div(cls := "content")(
                 div(
                   cls := "plan_checkout",
-                  attr("data-email") := email.??(_.value),
+                  attr("data-email") := email.so(_.value),
                   attr("data-lifetime-usd") := lila.plan.Cents.lifetime.usd.toString,
                   attr("data-lifetime-cents") := lila.plan.Cents.lifetime.value
                 )(

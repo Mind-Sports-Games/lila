@@ -26,10 +26,10 @@ final class KeyPages(env: Env)(implicit ec: scala.concurrent.ExecutionContext) {
         simuls = env.simul.allCreatedFeaturable.get {}.nevermind,
         streamerSpots = env.streamer.homepageMaxSetting.get(),
         weeklyChallenge = env.lobby.weeklyChallenge,
-        chatOption = ctx.noKid ?? env.chat.api.userChat.cached
+        chatOption = ctx.noKid so env.chat.api.userChat.cached
           .findMine(lila.chat.Chat.Id("lobbyhome"), ctx.me)
           .map(some),
-        chatVersion = ctx.noKid ?? env.lobby.version("lobbyhome").dmap(some)
+        chatVersion = ctx.noKid so env.lobby.version("lobbyhome").dmap(some)
       )
       .mon(_.lobby segment "preloader.total")
       .map { h =>

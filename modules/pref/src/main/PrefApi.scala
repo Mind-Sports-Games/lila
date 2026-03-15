@@ -36,8 +36,8 @@ final class PrefApi(
     else
       coll.update
         .one($id(user.id), $unset(s"tags.${tag(Pref.Tag)}"))
-        .void >>- { cache invalidate user.id }
-  } >>- { cache invalidate user.id }
+        .void.andDo { cache invalidate user.id }
+  }.andDo { cache invalidate user.id }
 
   def getPrefById(id: User.ID): Fu[Pref]    = cache get id dmap (_ getOrElse Pref.create(id))
   val getPref                               = getPrefById _
@@ -68,8 +68,7 @@ final class PrefApi(
     }
 
   def setPref(pref: Pref): Funit =
-    coll.update.one($id(pref.id), pref, upsert = true).void >>-
-      cache.put(pref.id, fuccess(pref.some))
+    coll.update.one($id(pref.id), pref, upsert = true).void.andDo(cache.put(pref.id, fuccess(pref.some)))
 
   def setPref(user: User, change: Pref => Pref): Funit =
     getPref(user) map change flatMap setPref
@@ -106,6 +105,6 @@ final class PrefApi(
 
   def saveNewUserPrefs(user: User, req: RequestHeader): Funit = {
     val reqPref = RequestPref fromRequest req
-    (reqPref != Pref.default) ?? setPref(reqPref.copy(_id = user.id))
+    (reqPref != Pref.default) so setPref(reqPref.copy(_id = user.id))
   }
 }

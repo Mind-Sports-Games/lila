@@ -1,7 +1,7 @@
 package lila.app
 package actor
 
-import akka.actor._
+import org.apache.pekko.actor._
 
 import lila.game.Pov
 import views.{ html => V }

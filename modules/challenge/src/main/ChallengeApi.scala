@@ -22,7 +22,7 @@ final class ChallengeApi(
     cacheApi: lila.memo.CacheApi
 )(implicit
     ec: scala.concurrent.ExecutionContext,
-    scheduler: akka.actor.Scheduler
+    scheduler: org.apache.pekko.actor.Scheduler
 ) {
 
   import Challenge._
@@ -36,8 +36,8 @@ final class ChallengeApi(
       case true => fuFalse
       case false =>
         {
-          repo like c flatMap { _ ?? repo.cancel }
-        } >> (repo insert c) >>- {
+          repo like c flatMap { _ so repo.cancel }
+        } >> (repo insert c).andDo {
           uncacheAndNotify(c)
           Bus.publish(Event.Create(c), "challenge")
         } inject true
@@ -60,12 +60,12 @@ final class ChallengeApi(
   def createdByDestId = repo createdByDestId _
 
   def cancel(c: Challenge) =
-    repo.cancel(c) >>- {
+    repo.cancel(c).andDo {
       uncacheAndNotify(c)
       Bus.publish(Event.Cancel(c), "challenge")
     }
 
-  private def offline(c: Challenge) = (repo offline c) >>- uncacheAndNotify(c)
+  private def offline(c: Challenge) = (repo offline c).andDo(uncacheAndNotify(c))
 
   private[challenge] def ping(id: Challenge.ID): Funit =
     repo statusById id flatMap {
@@ -75,7 +75,7 @@ final class ChallengeApi(
     }
 
   def decline(c: Challenge, reason: Challenge.DeclineReason) =
-    repo.decline(c, reason) >>- {
+    repo.decline(c, reason).andDo {
       uncacheAndNotify(c)
       Bus.publish(Event.Decline(c declineWith reason), "challenge")
     }
@@ -95,8 +95,8 @@ final class ChallengeApi(
         repo.setChallenger(c.setChallenger(user, sid), playerIndex) inject none
       else
         joiner(c, user, playerIndex).flatMap {
-          _ ?? { pov =>
-            (repo accept c) >>- {
+          _ so { pov =>
+            (repo accept c).andDo {
               uncacheAndNotify(c)
               Bus.publish(Event.Accept(c, user.map(_.id)), "challenge")
             } inject pov.some
@@ -105,11 +105,11 @@ final class ChallengeApi(
     }
 
   def sendRematchOf(game: Game, user: User): Fu[Boolean] =
-    challengeMaker.makeRematchOf(game, user) flatMap { _ ?? create }
+    challengeMaker.makeRematchOf(game, user) flatMap { _ so create }
 
   def setDestUser(c: Challenge, u: User): Funit = {
     val challenge = c setDestUser u
-    repo.update(challenge) >>- {
+    repo.update(challenge).andDo {
       uncacheAndNotify(challenge)
       Bus.publish(Event.Create(challenge), "challenge")
     }
@@ -126,11 +126,10 @@ final class ChallengeApi(
   private def isLimitedByMaxPlaying(c: Challenge) =
     if (c.hasClock) fuFalse
     else
-      c.userIds
+      Future.sequence(c.userIds
         .map { userId =>
           gameCache.nbPlaying(userId) dmap (maxPlaying <=)
-        }
-        .sequenceFu
+        })
         .dmap(_ exists identity)
 
   private[challenge] def sweep: Funit =
@@ -142,12 +141,12 @@ final class ChallengeApi(
       }
 
   private def remove(c: Challenge) =
-    repo.remove(c.id) >>- uncacheAndNotify(c)
+    repo.remove(c.id).andDo(uncacheAndNotify(c))
 
   private def uncacheAndNotify(c: Challenge): Unit = {
-    c.destUserId ?? countInFor.invalidate
-    c.destUserId ?? notify
-    c.challengerUserId ?? notify
+    c.destUserId so countInFor.invalidate
+    c.destUserId so notify
+    c.challengerUserId so notify
     socketReload(c.id)
   }
 

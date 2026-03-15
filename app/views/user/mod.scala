@@ -200,11 +200,11 @@ object mod {
           )
         )
       },
-      (isGranted(_.Admin) && isGranted(_.SetEmail)) ?? frag(
+      (isGranted(_.Admin) && isGranted(_.SetEmail)) so frag(
         postForm(cls := "email", action := routes.Mod.setEmail(u.username))(
           st.input(
             tpe := "email",
-            value := emails.current.??(_.value),
+            value := emails.current.so(_.value),
             name := "email",
             placeholder := "Email address"
           ),
@@ -288,7 +288,7 @@ object mod {
           "Moderation history",
           history.isEmpty option ": nothing to show"
         ),
-        history.nonEmpty ?? frag(
+        history.nonEmpty so frag(
           ul(
             history.map { e =>
               li(
@@ -386,7 +386,7 @@ object mod {
           " , ",
           blursYes._3,
           "]",
-          pag.pag.sfAvgNoBlurs ?? { blursNo =>
+          pag.pag.sfAvgNoBlurs so { blursNo =>
             frag(
               " against ",
               strong(blursNo._1),
@@ -408,7 +408,7 @@ object mod {
           ", ",
           lowVar._3,
           "]",
-          pag.pag.sfAvgHighVar ?? { highVar =>
+          pag.pag.sfAvgHighVar so { highVar =>
             frag(
               " against ",
               strong(highVar._1),
@@ -430,7 +430,7 @@ object mod {
           ", ",
           holdYes._3,
           "]",
-          pag.pag.sfAvgNoHold ?? { holdNo =>
+          pag.pag.sfAvgNoHold so { holdNo =>
             frag(
               " against ",
               strong(holdNo._1),
@@ -486,7 +486,7 @@ object mod {
                 td(
                   span(cls := s"sig sig_${Display.plyTimeSig(result)}", dataIcon := "J"),
                   s" ${result.basics.plyTimes / 10}",
-                  result.basics.mtStreak ?? frag(br, "streak")
+                  result.basics.mtStreak so frag(br, "streak")
                 ),
                 td(
                   span(cls := s"sig sig_${Display.blurSig(result)}", dataIcon := "J"),
@@ -574,7 +574,7 @@ object mod {
               isGranted(_.Admin) option td(othersWithEmail emailValueOf o),
               td(
                 // show prints and ips separately
-                dataSort := other.score + (other.ips.nonEmpty ?? 1000000) + (other.fps.nonEmpty ?? 3000000)
+                dataSort := other.score + (other.ips.nonEmpty so 1000000) + (other.fps.nonEmpty so 3000000)
               )(
                 List(other.ips.size -> "IP", other.fps.size -> "Print")
                   .collect {
@@ -584,12 +584,12 @@ object mod {
               ),
               td(dataSort := o.count.game)(o.count.game.localize),
               markTd(~bans.get(o.id), playban(cls := "text")(~bans.get(o.id))),
-              markTd(o.marks.alt ?? 1, alt),
-              markTd(o.marks.troll ?? 1, shadowban),
-              markTd(o.marks.boost ?? 1, boosting),
-              markTd(o.marks.engine ?? 1, engine),
-              markTd(o.disabled ?? 1, closed),
-              markTd(o.marks.reportban ?? 1, reportban),
+              markTd(o.marks.alt so 1, alt),
+              markTd(o.marks.troll so 1, shadowban),
+              markTd(o.marks.boost so 1, boosting),
+              markTd(o.marks.engine so 1, engine),
+              markTd(o.disabled so 1, closed),
+              markTd(o.marks.reportban so 1, reportban),
               userNotes.nonEmpty option {
                 td(dataSort := userNotes.size)(
                   a(href := s"${routes.User.show(o.username)}?notes")(

@@ -39,17 +39,18 @@ final private class SwissBoardApi(
     .build[Swiss.Id, List[SwissBoard]]()
 
   def apply(id: Swiss.Id): Fu[List[SwissBoard.WithGame]] =
-    boardsCache.getIfPresent(id) ?? {
-      _.map { board =>
-        (gameProxyRepo.game(board.gameId) zip (
-          board.multiMatchGameIds
-            .traverse(l => l.traverse(gid => gameProxyRepo.game(gid)).map(_.flatten))
-        ))
-          .map { case (game: Option[Game], multiMatchGames: Option[List[Game]]) =>
-            game.map(g => SwissBoard.WithGame(board, g, multiMatchGames))
-          }
-      }.sequenceFu
-        .dmap(_.flatten)
+    boardsCache.getIfPresent(id) so {
+      boards =>
+        Future.sequence(boards.map { board =>
+          (gameProxyRepo.game(board.gameId) zip (
+            board.multiMatchGameIds
+              .traverse(l => l.traverse(gid => gameProxyRepo.game(gid)).map(_.flatten))
+          ))
+            .map { case (game: Option[Game], multiMatchGames: Option[List[Game]]) =>
+              game.map(g => SwissBoard.WithGame(board, g, multiMatchGames))
+            }
+        })
+          .dmap(_.flatten)
     }
 
   def update(data: SwissScoring.Result): Funit =

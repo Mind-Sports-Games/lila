@@ -1,6 +1,6 @@
 package lila.tv
 
-import akka.pattern.{ ask => actorAsk }
+import org.apache.pekko.pattern.{ ask => actorAsk }
 import play.api.libs.json.Json
 import scala.concurrent.duration._
 import scala.concurrent.Promise

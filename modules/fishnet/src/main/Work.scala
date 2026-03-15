@@ -26,7 +26,7 @@ sealed trait Work {
   def nonAcquired                  = !isAcquired
   def canAcquire(client: Client)   = lastTryByKey.fold(true)(client.key !=)
 
-  def acquiredBefore(date: DateTime) = acquiredAt.??(_ isBefore date)
+  def acquiredBefore(date: DateTime) = acquiredAt.so(_ isBefore date)
 }
 
 object Work {

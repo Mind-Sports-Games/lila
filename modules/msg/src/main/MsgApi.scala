@@ -1,6 +1,6 @@
 package lila.msg
 
-import akka.stream.scaladsl._
+import org.apache.pekko.stream.scaladsl._
 import org.joda.time.DateTime
 import reactivemongo.akkastream.{ cursorProducer, AkkaStreamCursor }
 import reactivemongo.api.ReadPreference
@@ -53,8 +53,8 @@ final class MsgApi(
     val before = beforeMillis flatMap { millis =>
       Try(new DateTime(millis)).toOption
     }
-    (userId != me.id) ?? lightUserApi.async(userId).flatMap {
-      _ ?? { contact =>
+    (userId != me.id) so lightUserApi.async(userId).flatMap {
+      _ so { contact =>
         for {
           _         <- setReadBy(threadId, me, userId)
           msgs      <- threadMsgsFor(threadId, me, before)
@@ -119,7 +119,7 @@ final class MsgApi(
                     }
                   )
                   .void
-            (msgWrite zip threadWrite).void >>- {
+            (msgWrite zip threadWrite).void.andDo {
               if (!send.mute) {
                 notifier.onPost(threadId)
                 Bus.publish(
@@ -145,7 +145,7 @@ final class MsgApi(
         true
       )
       .flatMap { res =>
-        (res.nModified > 0) ?? notifier.onRead(threadId, userId, contactId)
+        (res.nModified > 0) so notifier.onRead(threadId, userId, contactId)
       }
   }
 
@@ -177,23 +177,24 @@ final class MsgApi(
       .cursor[MsgThread]()
       .list(nb)
       .flatMap {
-        _.map { thread =>
-          colls.msg
-            .find($doc("tid" -> thread.id), msgProjection)
-            .sort($sort desc "date")
-            .cursor[Msg]()
-            .list(10)
-            .flatMap { msgs =>
-              lightUserApi async thread.other(user) map { contact =>
-                MsgConvo(
-                  contact | LightUser.fallback(thread other user),
-                  msgs,
-                  lila.relation.Relations(none, none),
-                  postable = false
-                )
+        threads =>
+          Future.sequence(threads.map { thread =>
+            colls.msg
+              .find($doc("tid" -> thread.id), msgProjection)
+              .sort($sort desc "date")
+              .cursor[Msg]()
+              .list(10)
+              .flatMap { msgs =>
+                lightUserApi async thread.other(user) map { contact =>
+                  MsgConvo(
+                    contact | LightUser.fallback(thread other user),
+                    msgs,
+                    lila.relation.Relations(none, none),
+                    postable = false
+                  )
+                }
               }
-            }
-        }.sequenceFu
+          })
       }
 
   def deleteAllBy(user: User): Funit =
@@ -208,7 +209,7 @@ final class MsgApi(
   private def threadMsgsFor(threadId: MsgThread.Id, me: User, before: Option[DateTime]): Fu[List[Msg]] =
     colls.msg
       .find(
-        $doc("tid" -> threadId, "del" $ne me.id) ++ before.?? { b =>
+        $doc("tid" -> threadId, "del" $ne me.id) ++ before.so { b =>
           $doc("date" $lt b)
         },
         msgProjection
@@ -226,7 +227,7 @@ final class MsgApi(
       "lastMsg.read",
       true
     ) flatMap { res =>
-      (res.nModified > 0) ?? notifier.onRead(threadId, me.id, contactId)
+      (res.nModified > 0) so notifier.onRead(threadId, me.id, contactId)
     }
 
   def allMessagesOf(userId: User.ID): Source[(String, DateTime), _] =

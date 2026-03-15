@@ -35,7 +35,7 @@ final class EvalCacheApi(
     }
 
   def put(trustedUser: TrustedUser, candidate: Input.Candidate, sri: Socket.Sri): Funit =
-    candidate.input ?? { put(trustedUser, _, sri) }
+    candidate.input so { put(trustedUser, _, sri) }
 
   def shouldPut = truster shouldPut _
 
@@ -47,7 +47,7 @@ final class EvalCacheApi(
 
   private[evalCache] def drop(variant: Variant, fen: FEN): Funit = {
     val id = Id(variant, SmallFen.make(variant, fen))
-    coll.delete.one($id(id)).void >>- cache.invalidate(id)
+    coll.delete.one($id(id)).void.andDo(cache.invalidate(id))
   }
 
   private val cache = cacheApi[Id, Option[EvalCacheEntry]](65536, "evalCache") {
@@ -82,15 +82,11 @@ final class EvalCacheApi(
               usedAt = DateTime.now,
               updatedAt = DateTime.now
             )
-            coll.insert.one(entry).void.recover(lila.db.ignoreDuplicateKey) >>-
-              cache.put(input.id, fuccess(entry.some)) >>-
-              upgrade.onEval(input, sri)
+            coll.insert.one(entry).void.recover(lila.db.ignoreDuplicateKey).andDo(cache.put(input.id, fuccess(entry.some))).andDo(upgrade.onEval(input, sri))
           case Some(oldEntry) =>
             val entry = oldEntry add input.eval
-            !(entry similarTo oldEntry) ?? {
-              coll.update.one($id(entry.id), entry, upsert = true).void >>-
-                cache.put(input.id, fuccess(entry.some)) >>-
-                upgrade.onEval(input, sri)
+            !(entry similarTo oldEntry) so {
+              coll.update.one($id(entry.id), entry, upsert = true).void.andDo(cache.put(input.id, fuccess(entry.some))).andDo(upgrade.onEval(input, sri))
             }
 
         }

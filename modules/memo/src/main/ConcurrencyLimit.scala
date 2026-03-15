@@ -1,6 +1,6 @@
 package lila.memo
 
-import akka.stream.scaladsl._
+import org.apache.pekko.stream.scaladsl._
 import play.api.libs.json.Json
 import play.api.mvc.Result
 import play.api.mvc.Results.TooManyRequests

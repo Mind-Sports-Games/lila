@@ -10,17 +10,17 @@ final private class ModNotifier(
 
   def reporters(mod: Mod, sus: Suspect): Funit =
     reportApi.recentReportersOf(sus) flatMap {
-      _.filter(r => mod.user.id != r.value)
-        .map { reporterId =>
-          notifyApi.addNotification(
-            Notification.make(
-              notifies = Notification.Notifies(reporterId.value),
-              content = lila.notify.ReportedBanned
+      reporters =>
+        Future.sequence(reporters.filter(r => mod.user.id != r.value)
+          .map { reporterId =>
+            notifyApi.addNotification(
+              Notification.make(
+                notifies = Notification.Notifies(reporterId.value),
+                content = lila.notify.ReportedBanned
+              )
             )
-          )
-        }
-        .sequenceFu
-        .void
+          })
+          .void
     }
 
   def refund(victim: Victim, pt: lila.rating.PerfType, points: Int): Funit =

@@ -1,7 +1,7 @@
 package lila.api
 
-import akka.stream.Materializer
-import akka.stream.scaladsl._
+import org.apache.pekko.stream.Materializer
+import org.apache.pekko.stream.scaladsl._
 import org.joda.time.DateTime
 import org.joda.time.format.DateTimeFormat
 import reactivemongo.akkastream.cursorProducer
@@ -40,9 +40,9 @@ final class PersonalDataExport(
               "All dates are UTC",
               bigSep,
               s"Signup date: ${textDate(user.createdAt)}",
-              s"Last seen: ${user.seenAt ?? textDate}",
-              s"Public profile: ${user.profile.??(_.toString)}",
-              s"Email: ${email.??(_.value)}"
+              s"Last seen: ${user.seenAt so textDate}",
+              s"Public profile: ${user.profile.so(_.toString)}",
+              s"Email: ${email.so(_.value)}"
             )
           )
         }
@@ -51,7 +51,7 @@ final class PersonalDataExport(
     val connections =
       Source(List(textTitle("Connections"))) concat
         securityEnv.store.allSessions(user.id).documentSource().throttle(lightPerSecond, 1 second).map { s =>
-          s"${s.date.??(textDate)} ${s.ip} ${s.ua}"
+          s"${s.date.so(textDate)} ${s.ip} ${s.ua}"
         }
 
     val followedUsers =
@@ -92,7 +92,7 @@ final class PersonalDataExport(
           )
         }
         .documentSource()
-        .map { doc => doc.string("l").??(_.drop(user.id.size + 1)) }
+        .map { doc => doc.string("l").so(_.drop(user.id.size + 1)) }
         .throttle(heavyPerSecond, 1 second)
 
     val privateGameChats =

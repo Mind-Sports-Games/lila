@@ -12,7 +12,7 @@ final class Env(
     db: lila.db.Db
 )(implicit
     ec: scala.concurrent.ExecutionContext,
-    scheduler: akka.actor.Scheduler
+    scheduler: org.apache.pekko.actor.Scheduler
 ) {
 
   lazy val storage = new PerfStatStorage(

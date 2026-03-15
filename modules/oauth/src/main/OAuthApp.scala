@@ -21,8 +21,8 @@ object OAuthApp {
   case class Id(value: String)     extends AnyVal
   case class Secret(value: String) extends AnyVal
 
-  def makeId     = Id(ornicar.scalalib.Random secureString 16)
-  def makeSecret = Secret(ornicar.scalalib.Random secureString 32)
+  def makeId     = Id(scalalib.Random secureString 16)
+  def makeSecret = Secret(scalalib.Random secureString 32)
 
   object BSONFields {
     val clientId     = "client_id"

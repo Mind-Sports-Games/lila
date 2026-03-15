@@ -49,7 +49,7 @@ final private class EvalCacheTruster(
 
   private def patronBonus(user: User) = (~user.planMonths * 5) atMost 20
 
-  private def titleBonus(user: User) = user.hasTitle ?? 20
+  private def titleBonus(user: User) = user.hasTitle so 20
 
   // 0 games    = -1
   // 100 games  = 0

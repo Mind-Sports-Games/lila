@@ -96,8 +96,8 @@ case class Challenge(
   def notableInitialFen: Option[FEN] =
     variant match {
       case Variant.Chess(variant)                => if (variant.standardInitialPosition) none else initialFen
-      case Variant.Draughts(_)                   => draughtsCustomStartingPosition ?? initialFen
-      case Variant.Go(_) | Variant.Backgammon(_) => customStartingPosition ?? initialFen
+      case Variant.Draughts(_)                   => draughtsCustomStartingPosition so initialFen
+      case Variant.Go(_) | Variant.Backgammon(_) => customStartingPosition so initialFen
       case _                                     => none
     }
 
@@ -275,7 +275,7 @@ object Challenge {
     }
     //val finalInitialFen = finalVariant match {
     //  case Variant.Draughts(v) =>
-    //    draughtsFenVariants(v) ?? {
+    //    draughtsFenVariants(v) so {
     //      initialFen.flatMap(fen => Forsyth.<<@(finalVariant.gameLogic, finalVariant, fen.value))
     //        .map(sit => FEN(Forsyth.>>(finalVariant.gameLogic, sit.withoutGhosts)))
     //    } match {

@@ -1,6 +1,6 @@
 package lila.game
 
-import akka.stream.scaladsl._
+import org.apache.pekko.stream.scaladsl._
 import play.api.libs.json._
 import scala.concurrent.duration._
 

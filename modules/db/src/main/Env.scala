@@ -1,6 +1,6 @@
 package lila.db
 
-import akka.actor.CoordinatedShutdown
+import org.apache.pekko.actor.CoordinatedShutdown
 import com.typesafe.config.Config
 import play.api.Configuration
 import reactivemongo.api._

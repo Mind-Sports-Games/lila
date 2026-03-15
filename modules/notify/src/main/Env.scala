@@ -1,8 +1,8 @@
 package lila.notify
 
-import akka.actor._
+import org.apache.pekko.actor._
 import com.softwaremill.macwire._
-import io.methvin.play.autoconfig._
+import lila.common.autoconfig.{ AutoConfig, ConfigName }
 import play.api.Configuration
 
 import lila.common.Bus
@@ -46,7 +46,7 @@ final class Env(
           case lila.hub.actorApi.notify.NotifiedBatch(userIds) =>
             api.markAllRead(userIds.map(Notification.Notifies.apply)).unit
           case lila.game.actorApi.CorresAlarmEvent(pov) =>
-            pov.player.userId ?? { userId =>
+            pov.player.userId so { userId =>
               lila.game.Namer.playerText(pov.opponent)(getLightUser) foreach { opponent =>
                 api addNotification Notification.make(
                   Notification.Notifies(userId),

@@ -82,7 +82,7 @@ object Line {
       if (x.troll) "!"
       else if (x.deleted) "?"
       else " "
-    val tit = x.title.??(_.value + titleSep)
+    val tit = x.title.so(_.value + titleSep)
     s"$tit${x.username}$sep${x.text}"
   }
 

@@ -23,17 +23,17 @@ final class CoachApi(
   def byId(id: Coach.Id): Fu[Option[Coach]] = coachColl.byId[Coach](id.value)
 
   def find(username: String): Fu[Option[Coach.WithUser]] =
-    userRepo named username flatMap { _ ?? find }
+    userRepo named username flatMap { _ so find }
 
   def find(user: User): Fu[Option[Coach.WithUser]] =
-    Granter(_.Coach)(user) ?? {
+    Granter(_.Coach)(user) so {
       byId(Coach.Id(user.id)) dmap {
         _ map withUser(user)
       }
     }
 
   def findOrInit(coach: Holder): Fu[Option[Coach.WithUser]] =
-    Granter.is(_.Coach)(coach) ?? {
+    Granter.is(_.Coach)(coach) so {
       find(coach.user) orElse {
         val c = Coach.WithUser(Coach make coach.user, coach.user)
         coachColl.insert.one(c.coach) inject c.some
@@ -41,15 +41,15 @@ final class CoachApi(
     }
 
   def isListedCoach(user: User): Fu[Boolean] =
-    Granter(_.Coach)(user) ?? coachColl.exists($id(user.id) ++ $doc("listed" -> true))
+    Granter(_.Coach)(user) so coachColl.exists($id(user.id) ++ $doc("listed" -> true))
 
   def setSeenAt(user: User): Funit =
-    Granter(_.Coach)(user) ?? coachColl.update.one($id(user.id), $set("user.seenAt" -> DateTime.now)).void
+    Granter(_.Coach)(user) so coachColl.update.one($id(user.id), $set("user.seenAt" -> DateTime.now)).void
 
   def setRating(userPre: User): Funit =
-    Granter(_.Coach)(userPre) ?? {
+    Granter(_.Coach)(userPre) so {
       userRepo.byId(userPre.id) flatMap {
-        _ ?? { user =>
+        _ so { user =>
           coachColl.update.one($id(user.id), $set("user.rating" -> user.perfs.bestStandardRating)).void
         }
       }
@@ -178,10 +178,10 @@ final class CoachApi(
     def deleteAllBy(userId: User.ID): Funit =
       for {
         reviews <- reviewColl.list[CoachReview]($doc("userId" -> userId))
-        _ <- reviews.map { review =>
+        _ <- Future.sequence(reviews.map { review =>
           reviewColl.delete.one($doc("userId" -> review.userId)).void
-        }.sequenceFu
-        _ <- reviews.map(_.coachId).distinct.map(refreshCoachNbReviews).sequenceFu
+        })
+        _ <- Future.sequence(reviews.map(_.coachId).distinct.map(refreshCoachNbReviews))
       } yield ()
 
     private def findRecent(selector: Bdoc): Fu[CoachReview.Reviews] =

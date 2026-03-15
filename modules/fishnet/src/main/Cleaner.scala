@@ -1,6 +1,6 @@
 package lila.fishnet
 
-import akka.stream.scaladsl._
+import org.apache.pekko.stream.scaladsl._
 import org.joda.time.DateTime
 import reactivemongo.akkastream.cursorProducer
 import reactivemongo.api.bson._
@@ -12,7 +12,7 @@ import lila.db.dsl._
 final private class Cleaner(
     repo: FishnetRepo,
     analysisColl: Coll,
-    system: akka.actor.ActorSystem
+    system: org.apache.pekko.actor.ActorSystem
 )(implicit
     ec: scala.concurrent.ExecutionContext,
     mat: akka.stream.Materializer
@@ -32,15 +32,13 @@ final private class Cleaner(
       .cursor[Work.Analysis]()
       .documentSource()
       .filter { ana =>
-        ana.acquiredAt.??(_ isBefore durationAgo(analysisTimeout(ana.nbMoves)))
+        ana.acquiredAt.so(_ isBefore durationAgo(analysisTimeout(ana.nbMoves)))
       }
       .take(200)
       .mapAsyncUnordered(4) { ana =>
-        repo.updateOrGiveUpAnalysis(ana.timeout) >>-
-          logger.info(s"Timeout analysis $ana") >>-
-          ana.acquired.foreach { ack =>
+        repo.updateOrGiveUpAnalysis(ana.timeout).andDo(logger.info(s"Timeout analysis $ana")).andDo(ana.acquired.foreach { ack =>
             Monitor.timeout(ack.userId)
-          }
+          })
       }
       .toMat(Sink.ignore)(Keep.right)
       .run()

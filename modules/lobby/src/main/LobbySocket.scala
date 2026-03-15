@@ -28,7 +28,7 @@ final class LobbySocket(
     lobby: LobbyTrouper,
     relationApi: lila.relation.RelationApi,
     poolApi: PoolApi,
-    system: akka.actor.ActorSystem,
+    system: org.apache.pekko.actor.ActorSystem,
     chat: lila.chat.ChatApi
 )(implicit
     ec: scala.concurrent.ExecutionContext,
@@ -60,7 +60,7 @@ final class LobbySocket(
       case GetSrisP(promise) =>
         promise success Sris(members.asMap().keySet.view.map(Sri.apply).toSet)
         lila.mon.lobby.socket.idle.update(idleSris.size)
-        lila.mon.lobby.socket.hookSubscribers.update(hookSubscriberSris.size).unit
+        val _ = lila.mon.lobby.socket.hookSubscribers.update(hookSubscriberSris.size)
 
       case Cleanup =>
         idleSris filterInPlace { sri => members.getIfPresent(sri).isDefined }
@@ -86,14 +86,14 @@ final class LobbySocket(
           )
         )
 
-      case RemoveHook(hookId) => removedHookIds.append(hookId).unit
+      case RemoveHook(hookId) => val _ = removedHookIds.append(hookId)
 
       case SendHookRemovals =>
         if (removedHookIds.nonEmpty) {
           tellActiveHookSubscribers(makeMessage("hrm", removedHookIds.toString))
           removedHookIds.clear()
         }
-        system.scheduler.scheduleOnce(1249 millis)(this ! SendHookRemovals).unit
+        val _ = system.scheduler.scheduleOnce(1249 millis)(this ! SendHookRemovals)
 
       case JoinHook(sri, hook, game, creatorPlayerIndex) =>
         lila.mon.lobby.hook.join.increment()
@@ -238,8 +238,8 @@ final class LobbySocket(
 
   private def getOrConnect(sri: Sri, userOpt: Option[User.ID]): Fu[Member] =
     trouper.ask[Option[Member]](GetMember(sri, _)) getOrElse {
-      userOpt ?? userRepo.enabledById flatMap { user =>
-        (user ?? { u =>
+      userOpt so userRepo.enabledById flatMap { user =>
+        (user so { u =>
           remoteSocketApi.baseHandler(P.In.ConnectUser(u.id))
           relationApi.fetchBlocking(u.id)
         }) map { blocks =>
@@ -298,7 +298,7 @@ final class LobbySocket(
 
   remoteSocketApi.subscribe("lobby-in", Protocol.In.reader)(
     lobbyHandler orElse chatHandler orElse remoteSocketApi.baseHandler
-  ) >>- send(P.Out.boot)
+  ).andDo(send(P.Out.boot))
 
 }
 

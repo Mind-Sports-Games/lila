@@ -41,7 +41,7 @@ final private class Takebacker(
             val progress = Progress(game) map { g =>
               g.updatePlayer(playerIndex, _ proposeTakeback g.plies)
             }
-            proxy.save(progress) >>- publishTakebackOffer(pov) inject
+            proxy.save(progress).andDo(publishTakebackOffer(pov)) inject
               List(Event.TakebackOffers(playerIndex.p1, playerIndex.p2))
           } dmap (_ -> situation)
         case _ => fufail(ClientError("[takebacker] invalid yes " + pov))
@@ -78,9 +78,9 @@ final private class Takebacker(
   private def isAllowedByPrefs(game: Game): Fu[Boolean] =
     if (game.hasAi) fuTrue
     else
-      game.userIds.map {
+      Future.sequence(game.userIds.map {
         prefApi.getPref(_, (p: Pref) => p.takeback)
-      }.sequenceFu dmap {
+      }) dmap {
         _.forall { p =>
           p == Pref.Takeback.ALWAYS || (p == Pref.Takeback.CASUAL && game.casual)
         }

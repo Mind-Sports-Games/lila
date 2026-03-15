@@ -120,7 +120,7 @@ final private class SwissSheetApi(colls: SwissColls)(implicit
     mat: akka.stream.Materializer
 ) {
 
-  import akka.stream.scaladsl._
+  import org.apache.pekko.stream.scaladsl._
   import org.joda.time.DateTime
   import reactivemongo.akkastream.cursorProducer
   import reactivemongo.api.ReadPreference

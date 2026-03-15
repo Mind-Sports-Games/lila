@@ -23,7 +23,7 @@ final class Swiss(
 
   def home =
     Open { implicit ctx =>
-      ctx.userId.??(env.team.cached.teamIdsList) flatMap
+      ctx.userId.so(env.team.cached.teamIdsList) flatMap
         env.swiss.feature.get map html.swiss.home.apply map { Ok(_) }
     }
 
@@ -37,7 +37,7 @@ final class Swiss(
               verdicts   <- env.swiss.api.verdicts(swiss, ctx.me)
               version    <- env.swiss.version(swiss.id)
               isInTeam   <- isCtxInTheTeam(swiss.teamId)
-              playerInfo <- get("playerInfo").?? { env.swiss.api.playerInfo(swiss, _) }
+              playerInfo <- get("playerInfo").so { env.swiss.api.playerInfo(swiss, _) }
               json <- env.swiss.json(
                 swiss = swiss,
                 me = ctx.me,
@@ -49,22 +49,22 @@ final class Swiss(
               )
               canChat <- canHaveChat(swiss)
               chat <-
-                canChat ?? env.chat.api.userChat.cached
+                canChat so env.chat.api.userChat.cached
                   .findMine(lila.chat.Chat.Id(swiss.id.value), ctx.me)
                   .dmap(some)
-              _ <- chat ?? { c =>
+              _ <- chat so { c =>
                 env.user.lightUserApi.preloadMany(c.chat.userIds)
               }
               streamers  <- streamerCache get swiss.id
-              isLocalMod <- canChat ?? canModChat(swiss)
+              isLocalMod <- canChat so canModChat(swiss)
             } yield Ok(html.swiss.show(swiss, verdicts, json, chat, streamers, isLocalMod))
           },
           api = _ =>
             swissOption.fold(notFoundJson("No such swiss tournament")) { swiss =>
               for {
-                socketVersion <- getBool("socketVersion").??(env.swiss version swiss.id dmap some)
+                socketVersion <- getBool("socketVersion").so(env.swiss version swiss.id dmap some)
                 isInTeam      <- isCtxInTheTeam(swiss.teamId)
-                playerInfo    <- get("playerInfo").?? { env.swiss.api.playerInfo(swiss, _) }
+                playerInfo    <- get("playerInfo").so { env.swiss.api.playerInfo(swiss, _) }
                 verdicts      <- env.swiss.api.verdicts(swiss, ctx.me)
                 json <- env.swiss.json(
                   swiss = swiss,
@@ -82,12 +82,12 @@ final class Swiss(
     }
 
   private def isCtxInTheTeam(teamId: lila.team.Team.ID)(implicit ctx: Context) =
-    ctx.userId.??(u => env.team.cached.teamIds(u).dmap(_ contains teamId))
+    ctx.userId.so(u => env.team.cached.teamIds(u).dmap(_ contains teamId))
 
   def round(id: String, round: Int) =
     Open { implicit ctx =>
       OptionFuResult(env.swiss.api.byId(SwissId(id))) { swiss =>
-        (round > 0 && round <= swiss.round.value).option(lila.swiss.SwissRound.Number(round)) ?? { r =>
+        (round > 0 && round <= swiss.round.value).option(lila.swiss.SwissRound.Number(round)) so { r =>
           val page = getInt("page").filter(0.<)
           env.swiss.roundPager(swiss, r, page | 0) map { pager =>
             Ok(html.swiss.show.round(swiss, r, pager))
@@ -97,7 +97,7 @@ final class Swiss(
     }
 
   private def CheckTeamLeader(teamId: String)(f: => Fu[Result])(implicit ctx: Context): Fu[Result] =
-    ctx.userId ?? { env.team.cached.isLeader(teamId, _) } flatMap { _ ?? f }
+    ctx.userId so { env.team.cached.isLeader(teamId, _) } flatMap { _ so f }
 
   def form(teamId: String) =
     Auth { implicit ctx => _ =>
@@ -147,7 +147,7 @@ final class Swiss(
   def apiTerminate(id: String) =
     ScopedBody(_.Tournament.Write) { implicit req => me =>
       env.swiss.api byId lila.swiss.Swiss.Id(id) flatMap {
-        _ ?? {
+        _ so {
           case swiss if swiss.createdBy == me.id || isGranted(_.ManageTournament, me) =>
             env.swiss.api
               .kill(swiss)
@@ -238,7 +238,7 @@ final class Swiss(
     Action.async {
       WithSwiss(id) { swiss =>
         env.swiss.api.pageOf(swiss, lila.user.User normalize userId) flatMap {
-          _ ?? { page =>
+          _ so { page =>
             JsonOk {
               env.swiss.standingApi(swiss, page)
             }
@@ -290,7 +290,7 @@ final class Swiss(
     }
 
   private def WithSwiss(id: String)(f: SwissModel => Fu[Result]): Fu[Result] =
-    env.swiss.api.byId(SwissId(id)) flatMap { _ ?? f }
+    env.swiss.api.byId(SwissId(id)) flatMap { _ so f }
 
   private def WithEditableSwiss(id: String, me: lila.user.User)(
       f: SwissModel => Fu[Result]
@@ -305,19 +305,19 @@ final class Swiss(
     canHaveChat(swiss.roundInfo)
 
   private[controllers] def canHaveChat(swiss: SwissModel.RoundInfo)(implicit ctx: Context): Fu[Boolean] =
-    ctx.noKid ?? {
+    ctx.noKid so {
       swiss.chatFor match {
         case ChatFor.NONE                  => fuFalse
         case _ if isGranted(_.ChatTimeout) => fuTrue
-        case ChatFor.LEADERS               => ctx.userId ?? { env.team.cached.isLeader(swiss.teamId, _) }
-        case ChatFor.MEMBERS               => ctx.userId ?? { env.team.api.belongsTo(swiss.teamId, _) }
+        case ChatFor.LEADERS               => ctx.userId so { env.team.cached.isLeader(swiss.teamId, _) }
+        case ChatFor.MEMBERS               => ctx.userId so { env.team.api.belongsTo(swiss.teamId, _) }
         case _                             => fuTrue
       }
     }
 
   private def canModChat(swiss: SwissModel)(implicit ctx: Context): Fu[Boolean] =
     if (isGranted(_.ChatTimeout)) fuTrue
-    else ctx.userId ?? { env.team.cached.isLeader(swiss.teamId, _) }
+    else ctx.userId so { env.team.cached.isLeader(swiss.teamId, _) }
 
   private val streamerCache =
     env.memo.cacheApi[SwissModel.Id, List[lila.user.User.ID]](64, "swiss.streamers") {

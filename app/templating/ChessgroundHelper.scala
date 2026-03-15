@@ -47,7 +47,7 @@ trait ChessgroundHelper {
               case Pos.Abalone(p)      => orient.fold(p.file.index, 7 - p.file.index) * 12.5
               case _                   => sys.error("Invalid Pos type")
             }
-            val highlights = ctx.pref.highlight ?? lastMove.distinct.map { pos =>
+            val highlights = ctx.pref.highlight so lastMove.distinct.map { pos =>
               s"""<square class="last-move" style="top:${top(pos)}%;left:${left(pos)}%"></square>"""
             } mkString ""
             val pieces =
@@ -74,7 +74,7 @@ trait ChessgroundHelper {
         def addX(p: draughts.PosMotion) = if (p.y % 2 != 0) -0.5 else -1.0
         def top(p: draughts.PosMotion)  = orient.fold(p.y - 1, 10 - p.y) * 10.0
         def left(p: draughts.PosMotion) = orient.fold(addX(p) + p.x, 4.5 - (addX(p) + p.x)) * 20.0
-        val highlights = ctx.pref.highlight ?? lastMove.distinct.map { pos =>
+        val highlights = ctx.pref.highlight so lastMove.distinct.map { pos =>
           val pm = board.posAt(pos)
           s"""<square class="last-move" style="top:${top(pm)}%;left:${left(pm)}%"></square>"""
         } mkString ""
@@ -97,7 +97,7 @@ trait ChessgroundHelper {
         chessground(
           board = board,
           orient = pov.playerIndex,
-          lastMove = history.lastAction.flatMap(_.origDest) ?? { case (orig, dest) =>
+          lastMove = history.lastAction.flatMap(_.origDest) so { case (orig, dest) =>
             List(orig, dest)
           }
         )
@@ -106,7 +106,7 @@ trait ChessgroundHelper {
         chessground(
           board = board,
           orient = pov.playerIndex,
-          lastMove = history.lastAction.flatMap(_.origDest) ?? { case (orig, dest) =>
+          lastMove = history.lastAction.flatMap(_.origDest) so { case (orig, dest) =>
             List(orig, dest)
           }
         )
@@ -114,7 +114,7 @@ trait ChessgroundHelper {
         chessground(
           board = board,
           orient = pov.playerIndex,
-          lastMove = history.lastAction.flatMap(_.origDest) ?? { case (orig, dest) =>
+          lastMove = history.lastAction.flatMap(_.origDest) so { case (orig, dest) =>
             List(orig, dest)
           }
         )
@@ -122,7 +122,7 @@ trait ChessgroundHelper {
         chessground(
           board = board,
           orient = pov.playerIndex,
-          lastMove = history.lastAction.flatMap(_.origDest) ?? { case (orig, dest) =>
+          lastMove = history.lastAction.flatMap(_.origDest) so { case (orig, dest) =>
             List(orig, dest)
           }
         )
@@ -130,7 +130,7 @@ trait ChessgroundHelper {
         chessground(
           board = board,
           orient = pov.playerIndex,
-          lastMove = history.lastAction.flatMap(_.origDest) ?? { case (orig, dest) =>
+          lastMove = history.lastAction.flatMap(_.origDest) so { case (orig, dest) =>
             List(orig, dest)
           }
         )
@@ -138,7 +138,7 @@ trait ChessgroundHelper {
         chessground(
           board = board,
           orient = pov.playerIndex,
-          lastMove = history.lastAction.flatMap(_.origDest) ?? { case (orig, dest) =>
+          lastMove = history.lastAction.flatMap(_.origDest) so { case (orig, dest) =>
             List(orig, dest)
           }
         )
@@ -146,7 +146,7 @@ trait ChessgroundHelper {
         chessground(
           board = board,
           orient = pov.playerIndex,
-          lastMove = history.lastAction.flatMap(_.origDest) ?? { case (orig, dest) =>
+          lastMove = history.lastAction.flatMap(_.origDest) so { case (orig, dest) =>
             List(orig, dest)
           }
         )
@@ -154,7 +154,7 @@ trait ChessgroundHelper {
         chessground(
           board = board,
           orient = pov.playerIndex,
-          lastMove = history.lastAction.flatMap(_.origDest) ?? { case (orig, dest) =>
+          lastMove = history.lastAction.flatMap(_.origDest) so { case (orig, dest) =>
             List(orig, dest)
           }
         )
@@ -162,7 +162,7 @@ trait ChessgroundHelper {
         draughtsground(
           board = board,
           orient = pov.playerIndex,
-          lastMove = history.lastMove.flatMap(_.origDest) ?? { case (orig, dest) =>
+          lastMove = history.lastMove.flatMap(_.origDest) so { case (orig, dest) =>
             List(orig, dest)
           }
         )

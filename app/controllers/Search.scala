@@ -54,7 +54,7 @@ final class Search(env: Env) extends LilaController(env) {
                       .fold(
                         failure => Ok(html.search.index(failure, none, nbGames)).fuccess,
                         data =>
-                          data.nonEmptyQuery ?? { query =>
+                          data.nonEmptyQuery so { query =>
                             env.gameSearch.paginator(query, page) map some
                           } map { pager =>
                             Ok(html.search.index(searchForm fill data, pager, nbGames))
@@ -71,7 +71,7 @@ final class Search(env: Env) extends LilaController(env) {
                               jsonError("Could not process search query")
                             }.fuccess,
                           data =>
-                            data.nonEmptyQuery ?? { query =>
+                            data.nonEmptyQuery so { query =>
                               env.gameSearch.paginator(query, page) dmap some
                             } flatMap {
                               case Some(s) =>

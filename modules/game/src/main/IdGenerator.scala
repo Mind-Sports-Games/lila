@@ -2,7 +2,7 @@ package lila.game
 
 import strategygames.{ Player => PlayerIndex }
 import java.security.SecureRandom
-import ornicar.scalalib.Random
+import scalalib.Random
 
 import lila.db.dsl._
 
@@ -21,7 +21,7 @@ final class IdGenerator(gameRepo: GameRepo)(implicit ec: scala.concurrent.Execut
   def games(nb: Int): Fu[Set[Game.ID]] =
     if (nb < 1) fuccess(Set.empty)
     else if (nb == 1) game.dmap(Set(_))
-    else if (nb < 5) Set.fill(nb)(game).sequenceFu
+    else if (nb < 5) Future.sequence(Set.fill(nb)(game))
     else {
       val ids = Set.fill(nb)(uncheckedGame)
       gameRepo.coll.distinctEasy[Game.ID, Set]("_id", $inIds(ids)) flatMap { collisions =>
@@ -32,9 +32,9 @@ final class IdGenerator(gameRepo: GameRepo)(implicit ec: scala.concurrent.Execut
 
 object IdGenerator {
 
-  private[this] val secureRandom  = new SecureRandom()
-  private[this] val p1SuffixChars = ('0' to '4') ++ ('A' to 'Z') mkString
-  private[this] val p2SuffixChars = ('5' to '9') ++ ('a' to 'z') mkString
+  private val secureRandom  = new SecureRandom()
+  private val p1SuffixChars = ('0' to '4') ++ ('A' to 'Z') mkString
+  private val p2SuffixChars = ('5' to '9') ++ ('a' to 'z') mkString
 
   def uncheckedGame: Game.ID = lila.common.ThreadLocalRandom nextString Game.gameIdSize
 

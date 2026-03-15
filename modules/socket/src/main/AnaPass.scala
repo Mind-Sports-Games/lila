@@ -22,7 +22,7 @@ case class AnaPass(
   def branch: Validated[String, Branch] =
     (Game(variant.gameLogic, variant.some, fen.some)) match {
       case (Game.Go(game)) =>
-        game.pass() flatMap { case (game, pass) =>
+        game.pass().andThen { case (game, pass) =>
           game.actionStrs.flatten.lastOption toValid "Passed but no last move!" map { san =>
             val uci     = Uci(pass)
             val movable = !game.situation.end
@@ -36,8 +36,8 @@ case class AnaPass(
               move = strategygames.format.Uci.GoWithSan(Uci.WithSan(uci, san)),
               fen = fen,
               check = false,
-              dests = Some(movable ?? Game.Go(game).situation.destinations),
-              opening = Variant.openingSensibleVariants(variant.gameLogic)(variant) ?? FullOpeningDB
+              dests = Some(movable so Game.Go(game).situation.destinations),
+              opening = Variant.openingSensibleVariants(variant.gameLogic)(variant) so FullOpeningDB
                 .findByFen(variant.gameLogic, fen),
               drops = if (movable) Game.Go(game).situation.drops else Some(Nil),
               pocketData = Game.Go(game).situation.board.pocketData

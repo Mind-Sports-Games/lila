@@ -117,7 +117,7 @@ case class Game(
 
   def turnOf(p: Player): Boolean      = p == player
   def turnOf(c: PlayerIndex): Boolean = c == turnPlayerIndex
-  def turnOf(u: User): Boolean        = player(u) ?? turnOf
+  def turnOf(u: User): Boolean        = player(u) so turnOf
 
   def playedTurns = turnCount - stratGame.startedAtTurn
   //once draughts is converted to multiaction we should be able to use actionStrs.flatten.size
@@ -264,7 +264,7 @@ case class Game(
       stratGame = game,
       binaryPlyTimes = (!isPgnImport && stratGame.clock.isEmpty).option {
         BinaryFormat.plyTime.write {
-          binaryPlyTimes.?? { t =>
+          binaryPlyTimes.so { t =>
             BinaryFormat.plyTime.read(t, playedPlies)
           } :+ Centis(nowCentis - updatedAt.getCentis).nonNeg
         }
@@ -319,7 +319,7 @@ case class Game(
     } :: {
       // abstraction leak, I know.
       if (updated.board.variant.gameLogic == GameLogic.Draughts())
-        (updated.board.variant.frisianVariant || updated.board.variant.draughts64Variant) ?? List(
+        (updated.board.variant.frisianVariant || updated.board.variant.draughts64Variant) so List(
           Event.KingMoves(
             p1 = updated.history.kingMoves.p1,
             p2 = updated.history.kingMoves.p2,
@@ -329,22 +329,22 @@ case class Game(
         )
       else if (updated.board.variant.gameLogic == GameLogic.Togyzkumalak())
         //Is this even necessary as score is in the fen?
-        (updated.board.variant.gameFamily == GameFamily.Togyzkumalak()) ?? List(
+        (updated.board.variant.gameFamily == GameFamily.Togyzkumalak()) so List(
           Event.Score(p1 = updated.history.score.p1, p2 = updated.history.score.p2)
         )
       else if (updated.board.variant.gameLogic == GameLogic.Backgammon())
         //Is this even necessary as score is in the fen?
-        (updated.board.variant.gameFamily == GameFamily.Backgammon()) ?? List(
+        (updated.board.variant.gameFamily == GameFamily.Backgammon()) so List(
           Event.Score(p1 = updated.history.score.p1, p2 = updated.history.score.p2)
         )
       // TODO Abalone is this how we want to represent score? Maybe look at Backgammon
       else if (updated.board.variant.gameLogic == GameLogic.Abalone())
         //Is this even necessary as score is in the fen?
-        (updated.board.variant.key == "abalone") ?? List(
+        (updated.board.variant.key == "abalone") so List(
           Event.Score(p1 = updated.history.score.p1, p2 = updated.history.score.p2)
         )
       else //chess. Is this even necessary as checkCount is in the fen?
-        ((updated.board.variant.key == "threeCheck" || updated.board.variant.key == "fiveCheck") && game.situation.check) ?? List(
+        ((updated.board.variant.key == "threeCheck" || updated.board.variant.key == "fiveCheck") && game.situation.check) so List(
           Event.CheckCount(
             p1 = updated.history.checkCount.p1,
             p2 = updated.history.checkCount.p2
@@ -449,7 +449,7 @@ case class Game(
     }
 
   def playableCorrespondenceClock: Option[CorrespondenceClock] =
-    playable ?? correspondenceClock
+    playable so correspondenceClock
 
   def speed = Speed(stratGame.clock.map(_.config))
 
@@ -645,7 +645,7 @@ case class Game(
       !playerHasOfferedDrawRecently(playerIndex)
 
   def playerHasOfferedDrawRecently(playerIndex: PlayerIndex) =
-    drawOffers.lastBy(playerIndex) ?? (_ >= turnCount - 20)
+    drawOffers.lastBy(playerIndex) so (_ >= turnCount - 20)
 
   def offerDraw(playerIndex: PlayerIndex) = copy(
     metadata = metadata.copy(drawOffers = drawOffers.add(playerIndex, turnCount))
@@ -668,7 +668,7 @@ case class Game(
 
   def moretimeable(playerIndex: PlayerIndex) =
     playable && nonMandatory && {
-      clock.??(_ moretimeable playerIndex) || correspondenceClock.??(_ moretimeable playerIndex)
+      clock.so(_ moretimeable playerIndex) || correspondenceClock.so(_ moretimeable playerIndex)
     }
 
   def abortable =
@@ -676,7 +676,7 @@ case class Game(
       metadata.multiMatchGameNr.fold(true)(x => x < 2)
 
   def berserkable =
-    clock.??(_.config.berserkable) && status == Status.Started && playedTurns < 2
+    clock.so(_.config.berserkable) && status == Status.Started && playedTurns < 2
 
   def goBerserk(playerIndex: PlayerIndex): Option[Progress] =
     clock.ifTrue(berserkable && !player(playerIndex).berserk).map { c =>
@@ -726,7 +726,7 @@ case class Game(
           }
       ),
       // Events here for BC.
-      List(Event.End(winner)) ::: newClock.??(c => List(Event.Clock(c)))
+      List(Event.End(winner)) ::: newClock.so(c => List(Event.Clock(c)))
     )
   }
 
@@ -750,7 +750,7 @@ case class Game(
     if (isTournament && variant.fromPositionVariant) Variant.libStandard(variant.gameLogic)
     else variant
 
-  def fromPosition = variant.fromPositionVariant || source.??(Source.Position ==)
+  def fromPosition = variant.fromPositionVariant || source.so(Source.Position ==)
 
   def imported = source contains Source.Import
 
@@ -785,7 +785,7 @@ case class Game(
       !c.isRunning && !c.isPaused
 
   private def outoftimeClock(withGrace: Boolean): Boolean =
-    clock ?? { c =>
+    clock so { c =>
       started && playable && (bothPlayersHaveMoved || isSimul || isSwiss || fromFriend || fromApi) && {
         c.outOfTime(turnPlayerIndex, withGrace) || {
           canBeOutOfTime(c) && c.clockPlayerExists(_.elapsed.centis > 0)
@@ -794,7 +794,7 @@ case class Game(
     }
 
   private def outoftimeCorrespondence: Boolean =
-    playableCorrespondenceClock ?? { _ outoftime activePlayerIndex }
+    playableCorrespondenceClock so { _ outoftime activePlayerIndex }
 
   def isCorrespondence = speed == Speed.Correspondence
 
@@ -834,7 +834,7 @@ case class Game(
 
   def isUnlimited = !hasClock && !hasCorrespondenceClock
 
-  def isClockRunning = clock ?? (_.isRunning)
+  def isClockRunning = clock so (_.isRunning)
 
   def withClock(c: ClockBase) = Progress(this, copy(stratGame = stratGame.copy(clock = Some(c))))
 
@@ -946,7 +946,7 @@ case class Game(
 
   def hasBookmarks = bookmarks > 0
 
-  def showBookmarks = hasBookmarks ?? bookmarks.toString
+  def showBookmarks = hasBookmarks so bookmarks.toString
 
   def userIds = playerMaps(_.userId)
 
@@ -1092,7 +1092,7 @@ object Game {
 
   def allowRated(variant: Variant, clock: Option[ClockConfig]) =
     variant.key == "standard" || {
-      clock ?? { c =>
+      clock so { c =>
         c.estimateTotalTime >= Centis(3000) &&
         c.limitSeconds > 0 || c.graceSeconds > 1
       }
@@ -1463,7 +1463,7 @@ case class FischerClockHistory(
       (pairs.map { case (first, second) =>
         ({
           val mt     = first - second
-          val cGrace = (pairs.hasNext || !noLastInc) ?? grace
+          val cGrace = (pairs.hasNext || !noLastInc) so grace
 
           (mt + cGrace)
         } nonNeg)
@@ -1590,13 +1590,13 @@ case class ByoyomiClockHistory(
         ({
           //TODO multiaction need to calculate fullTurncount (expand on pairs to get an actual full turn of times)
           val fullTurnCount = index + 2 + startedAtTurn / 2
-          val afterByoyomi  = byoyomiStart ?? (_ <= fullTurnCount)
+          val afterByoyomi  = byoyomiStart so (_ <= fullTurnCount)
           // after byoyomi we store movetimes directly, not remaining time
           val mt     = if (afterByoyomi) second else first - second
-          val cGrace = (!afterByoyomi && (pairs.hasNext || !noLastInc)) ?? grace
+          val cGrace = (!afterByoyomi && (pairs.hasNext || !noLastInc)) so grace
 
           (if (!pairs.hasNext && byoyomiTimeout) {
-             val prevTurnByoyomi = byoyomiStart ?? (_ < fullTurnCount)
+             val prevTurnByoyomi = byoyomiStart so (_ < fullTurnCount)
              (if (prevTurnByoyomi) byo else first) + byo * countSpentPeriods(playerIndex, fullTurnCount)
            } else mt + cGrace)
         } nonNeg)
@@ -1623,7 +1623,7 @@ case class ByoyomiClockHistory(
     updateInternal(playerIndex, _ :+ timeToStore)
       .updatePeriods(
         playerIndex,
-        _.padTo(initiatePeriods ?? 1, 0)
+        _.padTo(initiatePeriods so 1, 0)
           .padTo(curClock.periods atMost PeriodEntries.maxPeriods, fullTurnCount)
       )
   }

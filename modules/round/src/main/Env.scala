@@ -1,9 +1,9 @@
 package lila.round
 
 import actorApi.{ GetSocketStatus, SocketStatus }
-import akka.actor._
+import org.apache.pekko.actor._
 import com.softwaremill.macwire._
-import io.methvin.play.autoconfig._
+import lila.common.autoconfig.{ AutoConfig, ConfigName }
 import play.api.Configuration
 import scala.concurrent.duration._
 
@@ -52,11 +52,11 @@ final class Env(
     lightUserApi: lila.user.LightUserApi,
     slackApi: lila.irc.SlackApi,
     ratingFactors: () => lila.rating.RatingFactors,
-    shutdown: akka.actor.CoordinatedShutdown
+    shutdown: org.apache.pekko.actor.CoordinatedShutdown
 )(implicit
     ec: scala.concurrent.ExecutionContext,
     system: ActorSystem,
-    scheduler: akka.actor.Scheduler
+    scheduler: org.apache.pekko.actor.Scheduler
 ) {
 
   import lightUserApi._
@@ -137,7 +137,7 @@ final class Env(
   lazy val onStart: OnStart = new OnStart((gameId: Game.ID) =>
     proxyRepo game gameId foreach {
       _ foreach { game =>
-        lightUserApi.preloadMany(game.userIds) >>- {
+        lightUserApi.preloadMany(game.userIds).andDo {
           val sg = lila.game.actorApi.StartGame(game)
           Bus.publish(sg, "startGame")
           game.userIds foreach { userId =>

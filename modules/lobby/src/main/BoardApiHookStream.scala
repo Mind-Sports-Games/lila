@@ -1,7 +1,7 @@
 package lila.lobby
 
-import akka.actor._
-import akka.stream.scaladsl._
+import org.apache.pekko.actor._
+import org.apache.pekko.stream.scaladsl._
 import play.api.libs.json._
 import scala.concurrent.duration._
 
@@ -49,13 +49,12 @@ final class BoardApiHookStream(
         case actorApi.RemoveHook(_) => self ! PoisonPill
 
         case SetOnline =>
-          context.system.scheduler
+          val _ = context.system.scheduler
             .scheduleOnce(3 second) {
               // gotta send a message to check if the client has disconnected
               queue offer None
               self ! SetOnline
             }
-            .unit
       }
     }
 }

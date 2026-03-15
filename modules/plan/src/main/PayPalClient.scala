@@ -243,7 +243,7 @@ object PayPalClient {
   case class CantParseException(json: JsValue, err: JsError)
       extends PayPalException(s"[payPal] Can't parse $json --- ${err.errors}")
 
-  import io.methvin.play.autoconfig._
+  import lila.common.autoconfig.{ AutoConfig, ConfigName }
   private[plan] case class Config(
       endpoint: String,
       @ConfigName("products.monthly") monthly: String,

@@ -38,7 +38,7 @@ object MatchMaking {
     // quality of a potential pairing. Lower is better.
     // None indicates a forbidden pairing
     private def pairScore(a: PoolMember, b: PoolMember): Option[Int] =
-      !(rangeMalus(a, b) || rangeMalus(b, a) || blockMalus(a, b) || blockMalus(b, a)) ?? {
+      !(rangeMalus(a, b) || rangeMalus(b, a) || blockMalus(a, b) || blockMalus(b, a)) so {
         a.ratingDiff(b) - {
           missBonus(a) atMost missBonus(b)
         } - {

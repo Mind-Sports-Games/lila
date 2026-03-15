@@ -62,7 +62,7 @@ object mini {
     val variant = game.variant.key
     a(
       href := (if (tv) routes.Tv.index else routes.Round.watcher(pov.gameId, pov.playerIndex.name)),
-      cls := s"mini-game mini-game-${game.id} mini-game--init is2d ${isLive ?? "mini-game--live"} ${extra} ${variant} variant-${variant}",
+      cls := s"mini-game mini-game-${game.id} mini-game--init is2d ${isLive so "mini-game--live"} ${extra} ${variant} variant-${variant}",
       dataLive := isLive.option(game.id),
       renderState(pov)
     )(

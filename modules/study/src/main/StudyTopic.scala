@@ -60,7 +60,7 @@ final private class StudyUserTopicRepo(val coll: AsyncColl)
 final class StudyTopicApi(topicRepo: StudyTopicRepo, userTopicRepo: StudyUserTopicRepo, studyRepo: StudyRepo)(
     implicit
     ec: scala.concurrent.ExecutionContext,
-    scheduler: akka.actor.Scheduler
+    scheduler: org.apache.pekko.actor.Scheduler
 ) {
 
   import BSONHandlers.{ StudyTopicBSONHandler, StudyTopicsBSONHandler }
@@ -69,9 +69,9 @@ final class StudyTopicApi(topicRepo: StudyTopicRepo, userTopicRepo: StudyUserTop
     topicRepo.coll(_.byId[Bdoc](str)) dmap { _ flatMap docTopic }
 
   def findLike(str: String, myId: Option[User.ID], nb: Int = 10): Fu[StudyTopics] = {
-    (str.lengthIs >= 2) ?? {
+    (str.lengthIs >= 2) so {
       val favsFu: Fu[List[StudyTopic]] =
-        myId.?? { userId =>
+        myId.so { userId =>
           userTopics(userId).map {
             _.value.filter(_.value startsWith str) take nb
           }
@@ -116,7 +116,7 @@ final class StudyTopicApi(topicRepo: StudyTopicRepo, userTopicRepo: StudyUserTop
   }
 
   def userTopicsAdd(userId: User.ID, topics: StudyTopics): Funit =
-    topics.value.nonEmpty ??
+    topics.value.nonEmpty so
       userTopicRepo.coll {
         _.update
           .one(

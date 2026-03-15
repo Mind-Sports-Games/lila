@@ -125,10 +125,7 @@ final private class Player(
         .flatMap {
           case Flagged => finisher.outOfTime(game)
           case ActionApplied(progress, action) =>
-            proxy.save(progress) >>-
-              uciMemo.add(progress.game, action) >>-
-              lila.mon.fishnet.move(~game.aiLevel).increment().unit >>-
-              notifyMove(action, progress.game) >> {
+            proxy.save(progress).andDo(uciMemo.add(progress.game, action)).andDo { val _ = lila.mon.fishnet.move(~game.aiLevel).increment() }.andDo(notifyMove(action, progress.game)) >> {
                 if (progress.game.finished) moveFinish(progress.game) dmap { progress.events ::: _ }
                 else
                   fuccess(progress.events)
@@ -142,7 +139,7 @@ final private class Player(
       )
 
   private[round] def requestFishnet(game: Game, round: RoundDuct): Funit =
-    game.playableByAi ?? {
+    game.playableByAi so {
       if (game.turnCount <= fishnetPlayer.maxTurns) fishnetPlayer(game)
       else fuccess(round ! actorApi.round.ResignAi)
     }

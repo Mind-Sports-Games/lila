@@ -25,7 +25,7 @@ final class StreamerApi(
   def byIds(ids: Iterable[Streamer.Id]): Fu[List[Streamer]] = coll.byIds[Streamer](ids.map(_.value))
 
   def find(username: String): Fu[Option[Streamer.WithUser]] =
-    userRepo named username flatMap { _ ?? find }
+    userRepo named username flatMap { _ so find }
 
   def find(user: User): Fu[Option[Streamer.WithUser]] =
     byId(Streamer.Id(user.id)) dmap {
@@ -46,13 +46,13 @@ final class StreamerApi(
     }
 
   def withUsers(live: LiveStreams): Fu[List[Streamer.WithUserAndStream]] =
-    live.streams.map(withUser).sequenceFu.dmap(_.flatten)
+    Future.sequence(live.streams.map(withUser)).dmap(_.flatten)
 
   def allListedIds: Fu[Set[Streamer.Id]] = cache.listedIds.getUnit
 
   def setSeenAt(user: User): Funit =
     cache.listedIds.getUnit flatMap { ids =>
-      ids.contains(Streamer.Id(user.id)) ??
+      ids.contains(Streamer.Id(user.id)) so
         coll.update.one($id(user.id), $set("seenAt" -> DateTime.now)).void
     }
 
@@ -64,8 +64,7 @@ final class StreamerApi(
 
   def update(prev: Streamer, data: StreamerForm.UserData, asMod: Boolean): Fu[Streamer.ModChange] = {
     val streamer = data(prev, asMod)
-    coll.update.one($id(streamer.id), streamer) >>-
-      cache.listedIds.invalidateUnit() inject {
+    coll.update.one($id(streamer.id), streamer).andDo(cache.listedIds.invalidateUnit()) inject {
         val modChange = Streamer.ModChange(
           list = prev.approval.granted != streamer.approval.granted option streamer.approval.granted,
           tier = prev.approval.tier != streamer.approval.tier option streamer.approval.tier,
@@ -73,7 +72,7 @@ final class StreamerApi(
         )
         import lila.notify.Notification.Notifies
         import lila.notify.Notification
-        ~modChange.list ?? {
+        ~modChange.list so {
           notifyApi.addNotification(
             Notification.make(
               Notifies(streamer.userId),
@@ -84,7 +83,7 @@ final class StreamerApi(
                 icon = ""
               )
             )
-          ) >>- cache.candidateIds.invalidateUnit()
+          ).andDo(cache.candidateIds.invalidateUnit())
         }
         modChange
       }
@@ -145,7 +144,7 @@ final class StreamerApi(
 
     def request(user: User) =
       find(user) flatMap {
-        _.filter(!_.streamer.approval.granted) ?? { s =>
+        _.filter(!_.streamer.approval.granted) so { s =>
           coll.updateField($id(s.streamer.id), "approval.requested", true).void
         }
       }

@@ -37,7 +37,7 @@ case class Player(
 
   def isHuman = !isAi && !isPSBot
 
-  def isPSBot = userId ?? LightUser.psBotsIDs.contains
+  def isPSBot = userId so LightUser.psBotsIDs.contains
 
   def hasUser = userId.isDefined
 
@@ -238,7 +238,7 @@ object Player {
           ratingDiff              -> p.ratingDiff,
           provisional             -> w.boolO(p.provisional),
           isInputRating           -> w.boolO(p.isInputRating),
-          blursBits               -> p.blurs.nonEmpty.??(BlursBSONHandler writeOpt p.blurs),
+          blursBits               -> p.blurs.nonEmpty.so(BlursBSONHandler writeOpt p.blurs),
           name                    -> p.name
         )
       }

@@ -39,7 +39,7 @@ case class Seek(
 
   private def ratingRangeCompatibleWith(s: Seek) =
     realRatingRange.fold(true) { range =>
-      s.rating ?? range.contains
+      s.rating so range.contains
     }
 
   private def compatibilityProperties =
@@ -68,7 +68,7 @@ case class Seek(
         ),
         "mode"        -> realMode.id,
         "days"        -> daysPerTurn,
-        "playerIndex" -> strategygames.Player.fromName(playerIndex).??(_.name),
+        "playerIndex" -> strategygames.Player.fromName(playerIndex).so(_.name),
         "perf" -> Json.obj(
           "icon" -> perfType.map(_.iconChar.toString),
           "name" -> perfType.map(_.trans)

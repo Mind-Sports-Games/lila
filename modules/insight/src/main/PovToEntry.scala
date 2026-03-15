@@ -53,9 +53,9 @@ final private class PovToEntry(
   private def enrich(game: Game, userId: String, provisional: Boolean): Fu[Option[RichPov]] =
     if (removeWrongAnalysis(game)) fuccess(none)
     else
-      lila.game.Pov.ofUserId(game, userId) ?? { pov =>
+      lila.game.Pov.ofUserId(game, userId) so { pov =>
         gameRepo.initialFen(game) zip
-          (game.metadata.analysed ?? analysisRepo.byId(game.id)) map { case (fen, an) =>
+          (game.metadata.analysed so analysisRepo.byId(game.id)) map { case (fen, an) =>
             for {
               boards <-
                 Replay
@@ -77,7 +77,7 @@ final private class PovToEntry(
               moveAccuracy = an.map { Accuracy.diffsList(pov, _) },
               boards = boards,
               plytimes = plytimes,
-              advices = an.?? {
+              advices = an.so {
                 _.advices.view.map { a =>
                   a.info.ply -> a
                 }.toMap
@@ -91,7 +91,7 @@ final private class PovToEntry(
 
   private def makeMoves(from: RichPov): List[InsightMove] = {
     val cpDiffs = ~from.moveAccuracy toVector
-    val prevInfos = from.analysis.?? { an =>
+    val prevInfos = from.analysis.so { an =>
       Accuracy.prevPlayerIndexInfos(from.pov, an) pipe { is =>
         from.pov.playerIndex.fold(is, is.map(_.invert))
       }

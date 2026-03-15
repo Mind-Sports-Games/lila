@@ -34,7 +34,7 @@ final class TournamentShieldApi(
     }
 
   def byCategKey(k: String): Fu[Option[(Category, List[Award])]] =
-    Category.byKey(k) ?? { categ =>
+    Category.byKey(k) so { categ =>
       cache.getUnit dmap {
         _.value get categ map {
           categ -> _
@@ -45,13 +45,13 @@ final class TournamentShieldApi(
   def byMedleyKey(k: String): Option[MedleyShield] = MedleyShield.byKey(k)
 
   def currentOwner(tour: Tournament): Fu[Option[OwnerId]] =
-    tour.isShield ?? {
-      Category.of(tour) ?? { cat =>
+    tour.isShield so {
+      Category.of(tour) so { cat =>
         history(none).map(_.current(cat).map(_.owner))
       }
     }
 
-  private[tournament] def clear(): Unit = cache.invalidateUnit().unit
+  private[tournament] def clear(): Unit = cache.invalidateUnit()
 
   private[tournament] def clearAfterMarking(userId: User.ID): Funit = cache.getUnit map { hist =>
     import cats.implicits._

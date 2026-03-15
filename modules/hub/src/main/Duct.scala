@@ -17,7 +17,7 @@ abstract class Duct(implicit ec: scala.concurrent.ExecutionContext) extends lila
   protected val process: ReceiveAsync
 
   def !(msg: Any): Unit =
-    if (stateRef.getAndUpdate(state => Some(state.fold(Queue.empty[Any])(_ enqueue msg))).isEmpty) run(msg)
+    if (stateRef.getAndUpdate(state => Some(state.fold(Queue.empty[Any])(_.enqueue(msg)))).isEmpty) run(msg)
 
   def ask[A](makeMsg: Promise[A] => Any): Fu[A] = {
     val promise = Promise[A]()
@@ -30,13 +30,13 @@ abstract class Duct(implicit ec: scala.concurrent.ExecutionContext) extends lila
    * Busy: Some(Queue.empty)
    * Busy with backlog: Some(Queue.nonEmpty)
    */
-  private[this] val stateRef: AtomicReference[State] = new AtomicReference(None)
+  private val stateRef: AtomicReference[State] = new AtomicReference(None)
 
-  private[this] def run(msg: Any): Unit =
-    process.applyOrElse(msg, Duct.fallback) onComplete postRun
+  private def run(msg: Any): Unit =
+    process.applyOrElse(msg, Duct.fallback).onComplete(postRun)
 
-  private[this] val postRun = (_: Any) =>
-    stateRef.getAndUpdate(postRunUpdate) flatMap (_.headOption) foreach run
+  private val postRun = (_: Any) =>
+    stateRef.getAndUpdate(postRunUpdate).flatMap(_.headOption).foreach(run)
 }
 
 object Duct {
@@ -52,7 +52,7 @@ object Duct {
       }
   }
 
-  private val fallback = { msg: Any =>
+  private val fallback = (msg: Any) => {
     lila.log("Duct").warn(s"unhandled msg: $msg")
     funit
   }

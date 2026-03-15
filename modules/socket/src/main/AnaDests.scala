@@ -30,7 +30,7 @@ case class AnaDests(
   private val orig: Option[strategygames.draughts.Pos] =
     (sit, variant) match {
       case (Situation.Draughts(sit), Variant.Draughts(variant)) =>
-        (lastUci.exists(_.length >= 4) && sit.ghosts > 0) ?? lastUci.flatMap { uci =>
+        (lastUci.exists(_.length >= 4) && sit.ghosts > 0) so lastUci.flatMap { uci =>
           variant.boardSize.pos.posAt(uci.substring(uci.length - 2))
         }
       case _ => None
@@ -55,7 +55,7 @@ case class AnaDests(
     case Variant.Draughts(variant) =>
       if (isInitial) AnaDests.initialDraughtsDests
       else
-        sit.playable(false) ?? {
+        sit.playable(false) so {
           val truncatedDests = truncatedMoves.map {
             _ mapValues { _ flatMap (uci => variant.boardSize.pos.posAt(uci.takeRight(2))) }
           }
@@ -70,13 +70,13 @@ case class AnaDests(
         }
     case _ =>
       if (isInitial) AnaDests.initialChessDests
-      else sit.playable(false) ?? destString(sit.destinations)
+      else sit.playable(false) so destString(sit.destinations)
   }
 
   //draughts
   val destsUci: Option[List[String]] = truncatedMoves.map(_.values.toList.flatten)
 
-  lazy val opening = Variant.openingSensibleVariants(variant.gameLogic)(variant) ?? {
+  lazy val opening = Variant.openingSensibleVariants(variant.gameLogic)(variant) so {
     FullOpeningDB.findByFen(variant.gameLogic, fen)
   }
 

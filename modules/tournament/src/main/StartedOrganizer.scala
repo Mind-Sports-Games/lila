@@ -1,7 +1,7 @@
 package lila.tournament
 
-import akka.actor._
-import akka.stream.scaladsl._
+import org.apache.pekko.actor._
+import org.apache.pekko.stream.scaladsl._
 import scala.concurrent.duration._
 import scala.util.chaining._
 import lila.common.ThreadLocalRandom
@@ -13,7 +13,7 @@ final private class StartedOrganizer(
     socket: TournamentSocket
 )(implicit
     ec: scala.concurrent.ExecutionContext,
-    scheduler: akka.actor.Scheduler,
+    scheduler: org.apache.pekko.actor.Scheduler,
     mat: akka.stream.Materializer
 ) extends Actor {
 
@@ -25,7 +25,7 @@ final private class StartedOrganizer(
   case object Tick
 
   def scheduleNext(): Unit =
-    scheduler.scheduleOnce(2.seconds, self, Tick).unit
+    { val _ = scheduler.scheduleOnce(2.seconds, self, Tick) }
 
   def receive = {
 
@@ -49,7 +49,7 @@ final private class StartedOrganizer(
         .run()
         .addEffect { case (tours, users) =>
           lila.mon.tournament.started.update(tours)
-          lila.mon.tournament.waitingPlayers.record(users).unit
+          val _ = lila.mon.tournament.waitingPlayers.record(users)
         }
         .monSuccess(_.tournament.startedOrganizer.tick)
         .addEffectAnyway(scheduleNext())
@@ -63,7 +63,7 @@ final private class StartedOrganizer(
   private def processPairings(tour: Tournament) =
     if (!tour.isScheduled && tour.nbPlayers < 30 && ThreadLocalRandom.nextInt(10) == 0) {
       playerRepo nbActiveUserIds tour.id flatMap { nb =>
-        (nb >= 2) ?? startPairing(tour)
+        (nb >= 2) so startPairing(tour)
       }
     } else startPairing(tour)
 
@@ -77,7 +77,7 @@ final private class StartedOrganizer(
 
   // returns number of users actively awaiting a pairing
   private def startPairing(tour: Tournament): Fu[Int] =
-    (!tour.pairingsClosed && tour.nbPlayers > 1) ??
+    (!tour.pairingsClosed && tour.nbPlayers > 1) so
       socket
         .getWaitingUsers(tour)
         .monSuccess(_.tournament.startedOrganizer.waitingUsers)

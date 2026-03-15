@@ -48,7 +48,7 @@ object theirs {
               if (playerIndex.map(Challenge.PlayerIndexChoice.apply).has(c.playerIndexChoice))
                 badTag(
                   // very rare message, don't translate
-                  s"You have the wrong playerIndex link for this open challenge. The ${playerIndex.??(_.name)} player has already joined."
+                  s"You have the wrong playerIndex link for this open challenge. The ${playerIndex.so(_.name)} player has already joined."
                 )
               else if (!c.mode.rated || ctx.isAuth) {
                 frag(

@@ -43,7 +43,7 @@ ${Mailer.txt.serviceNote}
     }
 
   def confirm(token: String): Fu[Option[User]] =
-    tokener read token flatMap { _ ?? userRepo.enabledById } map {
+    tokener read token flatMap { _ so userRepo.enabledById } map {
       _.filter(_.canFullyLogin)
     }
 
@@ -54,7 +54,7 @@ object MagicLink {
 
   import scala.concurrent.duration._
   import play.api.mvc.RequestHeader
-  import ornicar.scalalib.Zero
+  import alleycats.Zero
   import lila.memo.RateLimit
   import lila.common.{ HTTPRequest, IpAddress }
 

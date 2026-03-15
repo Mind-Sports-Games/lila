@@ -1,6 +1,6 @@
 package lila.explorer
 
-import akka.stream.scaladsl._
+import org.apache.pekko.stream.scaladsl._
 import strategygames.{ Player => PlayerIndex, P2, P1 }
 import strategygames.GameLogic
 import strategygames.format.pgn.Tag
@@ -150,7 +150,7 @@ final private class ExplorerIndexer(
           game.player(playerIndex).userId flatMap { id =>
             usernames.find(_.toLowerCase == id)
           } orElse game.player(playerIndex).userId getOrElse "?"
-        val fenTags = initialFen.?? { fen =>
+        val fenTags = initialFen.so { fen =>
           List(Tag(_.FEN, fen))
         }
         val otherTags = List(

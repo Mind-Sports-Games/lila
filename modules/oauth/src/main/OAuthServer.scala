@@ -39,10 +39,10 @@ final class OAuthServer(
     }
 
   def fetchAppAuthor(req: RequestHeader): Fu[Option[User.ID]] =
-    reqToTokenId(req) ?? { tokenId =>
+    reqToTokenId(req) so { tokenId =>
       colls.token {
         _.primitiveOne[OAuthApp.Id]($doc(F.id -> tokenId), F.clientId) flatMap {
-          _ ?? appApi.authorOf
+          _ so appApi.authorOf
         }
       }
     }
