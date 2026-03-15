@@ -70,7 +70,7 @@ final private class RelayFetch(
             api.update(rt.round)(_.finish)
           } else fuccess(rt.round)
         }) addEffectAnyway scheduleNext()
-      }.unit
+      }.discard
   }
 
   // no writing the relay; only reading!

@@ -32,9 +32,9 @@ final class Env(
   lazy val api = wire[IrwinApi]
 
   scheduler.scheduleWithFixedDelay(5 minutes, 5 minutes) { () =>
-    tournamentApi.allCurrentLeadersInStandard.flatMap(api.requests.fromTournamentLeaders).unit
+    tournamentApi.allCurrentLeadersInStandard.flatMap(api.requests.fromTournamentLeaders).discard
   }
   scheduler.scheduleWithFixedDelay(15 minutes, 15 minutes) { () =>
-    userCache.getTop50Online.flatMap(api.requests.fromLeaderboard).unit
+    userCache.getTop50Online.flatMap(api.requests.fromLeaderboard).discard
   }
 }

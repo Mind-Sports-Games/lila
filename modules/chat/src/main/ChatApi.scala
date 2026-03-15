@@ -147,7 +147,7 @@ final class ChatApi(
     }
 
     def service(chatId: Chat.Id, text: String, busChan: BusChan.Select, isVolatile: Boolean): Unit =
-      (if (isVolatile) volatile _ else system _)(chatId, text, busChan).unit
+      (if (isVolatile) volatile _ else system _)(chatId, text, busChan).discard
 
     def timeout(
         chatId: Chat.Id,

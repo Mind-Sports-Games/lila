@@ -8,6 +8,8 @@ case class Title(value: String) extends AnyVal with StringValue
 
 object Title {
 
+  given cats.Eq[Title] = cats.Eq.fromUniversalEquals
+
   implicit val titleIso: Iso.StringIso[Title]       = lila.common.Iso.string[Title](Title.apply, _.value)
   implicit val titleBsonHandler: BSONHandler[Title] = lila.db.dsl.stringIsoHandler(Title.titleIso)
   implicit val titleJsonWrites: Writes[Title]       = lila.common.Json.stringIsoWriter(Title.titleIso)

@@ -70,7 +70,7 @@ final class Env(
   def version(id: String = "lobbyhome") = socket.rooms.ask[SocketVersion](id)(GetVersion)
 
   lila.common.Bus.subscribeFun("abortGame") { case lila.game.actorApi.AbortedBy(pov) =>
-    abortListener(pov).unit
+    abortListener(pov).discard
   }
 
 }

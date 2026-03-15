@@ -45,7 +45,7 @@ final private class RelayFormatApi(ws: StandaloneWSClient, cacheApi: CacheApi)(i
       }
 
     def guessSingleFile(url: Url): Fu[Option[RelayFormat]] =
-      lila.common.Future.find(
+      lila.common.LilaFuture.find(
         List(
           url.some,
           !url.path.parts.contains(mostCommonSingleFileName) option addPart(url, mostCommonSingleFileName)
@@ -55,7 +55,7 @@ final private class RelayFormatApi(ws: StandaloneWSClient, cacheApi: CacheApi)(i
       }
 
     def guessManyFiles(url: Url): Fu[Option[RelayFormat]] =
-      lila.common.Future.find(
+      lila.common.LilaFuture.find(
         List(url) ::: mostCommonIndexNames.filterNot(url.path.parts.contains).map(addPart(url, _))
       )(looksLikeJson) flatMap {
         _ so { index =>

@@ -92,6 +92,6 @@ final private[round] class Drawer(
             )
           )
         }
-        .unit
+        .discard
   }
 }

@@ -154,7 +154,7 @@ final class Env(
       _       <- challenge.api.removeByUserId(u.id)
       _       <- tournament.api.withdrawAll(u)
       _       <- swiss.api.withdrawAll(u, teamIds)
-      _       <- plan.api.cancel(u).nevermind
+      _       <- plan.api.cancel(u).recoverDefault
       _       <- lobby.seekApi.removeByUser(u)
       _       <- security.store.closeAllSessionsOf(u.id)
       _       <- push.webSubscriptionApi.unsubscribeByUser(u)
@@ -173,12 +173,12 @@ final class Env(
     // GC can be aborted by reverting the initial SB mark
     user.repo.isTroll(userId) foreach { troll =>
       if (troll) scheduler.scheduleOnce(1.second) {
-        playstrategyClose(userId).unit
+        playstrategyClose(userId).discard
       }
     }
   }
   Bus.subscribeFun("rageSitClose") { case lila.hub.actorApi.playban.RageSitClose(userId) =>
-    playstrategyClose(userId).unit
+    playstrategyClose(userId).discard
   }
   private def playstrategyClose(userId: User.ID) =
     user.repo.playstrategyAnd(userId) flatMap {

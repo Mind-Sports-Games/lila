@@ -21,10 +21,10 @@ final class Messenger(api: ChatApi) {
       else api.userChat.volatile _
     apiCall(watcherId(Chat.Id(game.id)), message, _.Round)
     if (game.nonAi) apiCall(Chat.Id(game.id), message, _.Round)
-  }.unit
+  }.discard
 
   def systemForOwners(chatId: Chat.Id, message: String): Unit =
-    api.userChat.system(chatId, message, _.Round).unit
+    api.userChat.system(chatId, message, _.Round).discard
 
   def watcher(gameId: Game.Id, userId: User.ID, text: String) =
     api.userChat.write(watcherId(gameId), userId, text, PublicSource.Watcher(gameId.value).some, _.Round)

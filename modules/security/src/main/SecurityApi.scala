@@ -124,7 +124,7 @@ final class SecurityApi(
   ): Fu[lila.oauth.OAuthServer.AuthResult] =
     tryOauthServer().flatMap {
       case None if retries > 0 =>
-        lila.common.Future.delay(2 seconds) {
+        lila.common.LilaFuture.delay(2 seconds) {
           oauthScoped(req, scopes, retries - 1)
         }
       case None         => fuccess(Left(OAuthServer.ServerOffline))

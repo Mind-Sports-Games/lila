@@ -19,7 +19,7 @@ final class TrophyApi(
     name = "trophy.kind",
     initialCapacity = 32,
     compute = id =>
-      kindColl.byId(id)(trophyKindObjectBSONHandler) map { k =>
+      kindColl.byId(id)(using trophyKindObjectBSONHandler) map { k =>
         k.getOrElse(TrophyKind.Unknown)
       },
     default = _ => TrophyKind.Unknown,

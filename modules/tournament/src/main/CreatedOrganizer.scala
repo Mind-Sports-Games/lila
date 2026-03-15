@@ -45,6 +45,6 @@ final private class CreatedOrganizer(
         .run()
         .monSuccess(_.tournament.createdOrganizer.tick)
         .addEffectAnyway(scheduleNext())
-        .unit
+        .discard
   }
 }

@@ -159,7 +159,7 @@ final class MsgApi(
     destSource
       .filter(orig.id !=)
       .mapAsync(4) {
-        post(orig.id, _, text, multi = true).logFailure(logger).nevermind(PostResult.Invalid)
+        post(orig.id, _, text, multi = true).logFailure(logger).recoverDefault(PostResult.Invalid)
       }
       .toMat(LilaStream.sinkCount)(Keep.right)
       .run()

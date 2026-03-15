@@ -249,7 +249,7 @@ final class PlaybanApi(
                     noteApi.playstrategyWrite(user, "Closed for ragesit recidive").andDo(Bus.publish(lila.hub.actorApi.playban.RageSitClose(user.id), "rageSitClose"))
                   }
                 }
-                .unit
+                .discard
           }
         }
       case _ => funit

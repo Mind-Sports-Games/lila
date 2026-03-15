@@ -223,7 +223,7 @@ final class SwissApi(
       Future.sequence(players
         .filter(p => !retainedPlayerIds.contains(p.id))
         .map { p => unsetPlayerInputRating(p.id) })
-        .unit
+        .discard
     }
   }
 
@@ -511,7 +511,7 @@ final class SwissApi(
               $set("winnerId" -> winnerUserId)
             )
             .void
-        }.unit
+        }.discard
         trophyApi
           .trophiesByUrl(Swiss.swissUrl(swiss.id))
           .map(_.filter(_.user == userId))
@@ -521,7 +521,7 @@ final class SwissApi(
                 awardTrophies(swiss, trophy.date)
             }
           }
-          .unit
+          .discard
       } >>
         recomputeAndUpdateAll(swiss.id).andDo(socket.reload(swiss.id))
     }
@@ -649,7 +649,7 @@ final class SwissApi(
               )
             }
           }
-        }.unit
+        }.discard
       }
     }
 
@@ -806,9 +806,9 @@ final class SwissApi(
           rankingApi(swiss) foreach { ranking =>
             Bus.publish(SwissFinish(swiss.id, ranking), "swissFinish")
           }
-          awardTrophies(swiss).unit
+          awardTrophies(swiss).discard
         }
-        .unit
+        .discard
     }
 
   def kill(swiss: Swiss): Funit = {
@@ -843,7 +843,7 @@ final class SwissApi(
               date
             )
           }
-          .unit
+          .discard
       )
   }
 
@@ -888,7 +888,7 @@ final class SwissApi(
       .list(10)
       .map(_.flatMap(_.getAsOpt[Swiss.Id]("_id")))
       .flatMap { ids =>
-        lila.common.Future.applySequentially(ids) { id =>
+        lila.common.LilaFuture.applySequentially(ids) { id =>
           Sequencing(id)(notFinishedById) { swiss =>
             if (swiss.round.value >= swiss.settings.nbRounds) doFinish(swiss)
             else if (swiss.nbPlayers >= 2)

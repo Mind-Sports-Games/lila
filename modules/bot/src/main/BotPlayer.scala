@@ -32,7 +32,7 @@ final class BotPlayer(
   private def clientError[A](msg: String): Fu[A] = fufail(lila.round.ClientError(msg))
 
   def apply(pov: Pov, me: User, uciStr: String, offeringDraw: Option[Boolean]): Funit =
-    lila.common.Future.delay((pov.game.hasAi so 500) millis) {
+    lila.common.LilaFuture.delay((pov.game.hasAi so 500) millis) {
       Uci(
         pov.game.variant.gameLogic,
         pov.game.variant.gameFamily,
@@ -73,7 +73,7 @@ final class BotPlayer(
     gameRepo game id map {
       _.flatMap(Pov(_, me)).filter(p => isOfferingRematch(!p)) so { pov =>
         // delay so it feels more natural
-        lila.common.Future.delay(if (accept) 100.millis else 2.seconds) {
+        lila.common.LilaFuture.delay(if (accept) 100.millis else 2.seconds) {
           fuccess {
             tellRound(pov.gameId, (if (accept) RematchYes else RematchNo)(pov.playerId))
           }

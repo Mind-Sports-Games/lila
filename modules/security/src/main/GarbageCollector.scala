@@ -42,10 +42,10 @@ final class GarbageCollector(
               retries = 5,
               logger = none
             )
-            .nevermind >> apply(applyData)
+            .recoverDefault >> apply(applyData)
           ()
         }
-        .unit
+        .discard
     }
 
   private def ensurePrintAvailable(data: ApplyData): Funit =
@@ -112,7 +112,7 @@ final class GarbageCollector(
             .scheduleOnce(wait) {
               doCollect(user)
             }
-            .unit
+            .discard
         }
       }
     }

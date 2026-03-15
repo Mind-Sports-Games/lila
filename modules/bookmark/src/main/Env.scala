@@ -35,8 +35,8 @@ final class Env(
   system.actorOf(
     Props(new Actor {
       def receive = {
-        case Toggle(gameId, userId) => api.toggle(gameId, userId).unit
-        case Remove(gameId)         => api.removeByGameId(gameId).unit
+        case Toggle(gameId, userId) => api.toggle(gameId, userId).discard
+        case Remove(gameId)         => api.removeByGameId(gameId).discard
       }
     }),
     name = config.actorName

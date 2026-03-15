@@ -39,6 +39,6 @@ final private class SlackClient(ws: StandaloneWSClient, url: Secret)(implicit
             case res if res.status == 200 => funit
             case res                      => fufail(s"[slack] $url $msg ${res.status} ${res.body}")
           }
-          .nevermind
+          .recoverDefault
     }(funit)
 }

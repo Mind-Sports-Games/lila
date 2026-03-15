@@ -98,8 +98,8 @@ final class Env(
           analyser(
             gameId,
             Work.Sender(userId = lila.user.User.playstrategyId, ip = none, mod = false, system = true)
-          ).unit
-        case req: lila.hub.actorApi.fishnet.StudyChapterRequest => analyser.study(req).unit
+          ).discard
+        case req: lila.hub.actorApi.fishnet.StudyChapterRequest => analyser.study(req).discard
       }
     }),
     name = config.actorName
@@ -126,8 +126,8 @@ final class Env(
     }
 
   Bus.subscribeFun("adjustCheater", "adjustBooster", "shadowban") {
-    case lila.hub.actorApi.mod.MarkCheater(userId, true) => disable(userId).unit
-    case lila.hub.actorApi.mod.MarkBooster(userId)       => disable(userId).unit
-    case lila.hub.actorApi.mod.Shadowban(userId, true)   => disable(userId).unit
+    case lila.hub.actorApi.mod.MarkCheater(userId, true) => disable(userId).discard
+    case lila.hub.actorApi.mod.MarkBooster(userId)       => disable(userId).discard
+    case lila.hub.actorApi.mod.Shadowban(userId, true)   => disable(userId).discard
   }
 }

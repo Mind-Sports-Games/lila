@@ -247,7 +247,7 @@ final class ClasApi(
         teacher: User
     ): Fu[List[Student.WithPassword]] =
       count(clas.id) flatMap { nbCurrentStudents =>
-        lila.common.Future.linear(data.realNames.take(Clas.maxStudents - nbCurrentStudents)) { realName =>
+        lila.common.LilaFuture.linear(data.realNames.take(Clas.maxStudents - nbCurrentStudents)) { realName =>
           nameGenerator() flatMap { username =>
             val data = ClasForm.NewStudent(
               username = username | lila.common.ThreadLocalRandom.nextString(10),

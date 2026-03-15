@@ -63,7 +63,7 @@ final class Ip2ProxyServer(
             ws.url(s"$checkUrl/batch")
               .addQueryStringParameters("ips" -> ips.mkString(","))
               .get()
-              .withTimeout(3 seconds)
+              .withTimeout(3 seconds, "Ip2ProxyServer timeout")
               .map {
                 _.body[JsValue].asOpt[Seq[JsObject]] so {
                   _.map(readIsProxy)
@@ -89,7 +89,7 @@ final class Ip2ProxyServer(
         .url(checkUrl)
         .addQueryStringParameters("ip" -> ip.value)
         .get()
-        .withTimeout(2 seconds)
+        .withTimeout(2 seconds, "Ip2ProxyServer timeout")
         .dmap(_.body[JsValue])
         .dmap(readIsProxy)
         .monSuccess(_.security.proxy.request)

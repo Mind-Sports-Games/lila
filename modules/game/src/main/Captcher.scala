@@ -20,12 +20,12 @@ final private class Captcher(gameRepo: GameRepo)(implicit ec: scala.concurrent.E
 
     case AnyCaptcha => sender() ! Impl.current
 
-    case GetCaptcha(id: String) => Impl.get(id).pipeTo(sender()).unit
+    case GetCaptcha(id: String) => Impl.get(id).pipeTo(sender()).discard
 
-    case actorApi.NewCaptcha => Impl.refresh.unit
+    case actorApi.NewCaptcha => Impl.refresh.discard
 
     case ValidCaptcha(id: String, solution: String) =>
-      Impl.get(id).map(_ valid solution).pipeTo(sender()).unit
+      Impl.get(id).map(_ valid solution).pipeTo(sender()).discard
   }
 
   private object Impl {

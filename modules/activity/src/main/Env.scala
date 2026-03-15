@@ -32,19 +32,19 @@ final class Env(
 
   lila.common.Bus.subscribeFuns(
     "finishGame" -> {
-      case lila.game.actorApi.FinishGame(game, _, _) if !game.aborted => write.game(game).unit
+      case lila.game.actorApi.FinishGame(game, _, _) if !game.aborted => write.game(game).discard
     },
     "finishPuzzle" -> { case res: lila.puzzle.Puzzle.UserResult =>
-      write.puzzle(res).unit
+      write.puzzle(res).discard
     },
     "stormRun" -> { case lila.hub.actorApi.puzzle.StormRun(userId, score) =>
-      write.storm(userId, score).unit
+      write.storm(userId, score).discard
     },
     "racerRun" -> { case lila.hub.actorApi.puzzle.RacerRun(userId, score) =>
-      write.racer(userId, score).unit
+      write.racer(userId, score).discard
     },
     "streakRun" -> { case lila.hub.actorApi.puzzle.StreakRun(userId, score) =>
-      write.streak(userId, score).unit
+      write.streak(userId, score).discard
     }
   )
 
@@ -60,18 +60,18 @@ final class Env(
     "streamStart",
     "swissFinish"
   ) {
-    case lila.forum.actorApi.CreatePost(post)             => write.forumPost(post).unit
-    case prog: lila.practice.PracticeProgress.OnComplete  => write.practice(prog).unit
-    case lila.simul.Simul.OnStart(simul)                  => write.simul(simul).unit
-    case CorresMoveEvent(move, Some(userId), _, _, false) => write.corresMove(move.gameId, userId).unit
-    case lila.hub.actorApi.plan.MonthInc(userId, months)  => write.plan(userId, months).unit
-    case lila.hub.actorApi.relation.Follow(from, to)      => write.follow(from, to).unit
+    case lila.forum.actorApi.CreatePost(post)             => write.forumPost(post).discard
+    case prog: lila.practice.PracticeProgress.OnComplete  => write.practice(prog).discard
+    case lila.simul.Simul.OnStart(simul)                  => write.simul(simul).discard
+    case CorresMoveEvent(move, Some(userId), _, _, false) => write.corresMove(move.gameId, userId).discard
+    case lila.hub.actorApi.plan.MonthInc(userId, months)  => write.plan(userId, months).discard
+    case lila.hub.actorApi.relation.Follow(from, to)      => write.follow(from, to).discard
     case lila.study.actorApi.StartStudy(id)               =>
       // wait some time in case the study turns private
-      { val _ = scheduler.scheduleOnce(5 minutes) { write.study(id).unit } }
-    case lila.hub.actorApi.team.CreateTeam(id, _, userId) => write.team(id, userId).unit
-    case lila.hub.actorApi.team.JoinTeam(id, userId)      => write.team(id, userId).unit
-    case lila.hub.actorApi.streamer.StreamStart(userId)   => write.streamStart(userId).unit
-    case lila.swiss.SwissFinish(swissId, ranking)         => write.swiss(swissId, ranking).unit
+      { val _ = scheduler.scheduleOnce(5 minutes) { write.study(id).discard } }
+    case lila.hub.actorApi.team.CreateTeam(id, _, userId) => write.team(id, userId).discard
+    case lila.hub.actorApi.team.JoinTeam(id, userId)      => write.team(id, userId).discard
+    case lila.hub.actorApi.streamer.StreamStart(userId)   => write.streamStart(userId).discard
+    case lila.swiss.SwissFinish(swissId, ranking)         => write.swiss(swissId, ranking).discard
   }
 }

@@ -117,7 +117,7 @@ final class ChallengeApi(
 
   def removeByUserId(userId: User.ID) =
     repo allWithUserId userId flatMap { cs =>
-      lila.common.Future.applySequentially(cs)(remove).void
+      lila.common.LilaFuture.applySequentially(cs)(remove).void
     }
 
   def oauthAccept(dest: User, challenge: Challenge): Fu[Option[Game]] =
@@ -134,10 +134,10 @@ final class ChallengeApi(
 
   private[challenge] def sweep: Funit =
     repo.realTimeUnseenSince(DateTime.now minusSeconds 20, max = 50).flatMap { cs =>
-      lila.common.Future.applySequentially(cs)(offline).void
+      lila.common.LilaFuture.applySequentially(cs)(offline).void
     } >>
       repo.expired(50).flatMap { cs =>
-        lila.common.Future.applySequentially(cs)(remove).void
+        lila.common.LilaFuture.applySequentially(cs)(remove).void
       }
 
   private def remove(c: Challenge) =

@@ -42,9 +42,9 @@ final class Env(
       Props(new Actor {
         def receive = {
           case lila.hub.actorApi.notify.Notified(userId) =>
-            api.markAllRead(Notification.Notifies(userId)).unit
+            api.markAllRead(Notification.Notifies(userId)).discard
           case lila.hub.actorApi.notify.NotifiedBatch(userIds) =>
-            api.markAllRead(userIds.map(Notification.Notifies.apply)).unit
+            api.markAllRead(userIds.map(Notification.Notifies.apply)).discard
           case lila.game.actorApi.CorresAlarmEvent(pov) =>
             pov.player.userId so { userId =>
               lila.game.Namer.playerText(pov.opponent)(getLightUser) foreach { opponent =>

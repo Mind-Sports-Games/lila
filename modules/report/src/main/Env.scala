@@ -66,21 +66,21 @@ final class Env(
     Props(new Actor {
       def receive = {
         case lila.hub.actorApi.report.Cheater(userId, text) =>
-          api.autoCheatReport(userId, text).unit
+          api.autoCheatReport(userId, text).discard
         case lila.hub.actorApi.report.Shutup(userId, text) =>
-          api.autoCommReport(userId, text).unit
+          api.autoCommReport(userId, text).discard
       }
     }),
     name = config.actorName
   )
 
   lila.common.Bus.subscribeFun("playban", "autoFlag") {
-    case lila.hub.actorApi.playban.Playban(userId, _) => api.maybeAutoPlaybanReport(userId).unit
+    case lila.hub.actorApi.playban.Playban(userId, _) => api.maybeAutoPlaybanReport(userId).discard
     case lila.hub.actorApi.report.AutoFlag(suspectId, resource, text) =>
-      api.autoCommFlag(SuspectId(suspectId), resource, text).unit
+      api.autoCommFlag(SuspectId(suspectId), resource, text).discard
   }
 
   system.scheduler.scheduleWithFixedDelay(1 minute, 1 minute) { () =>
-    api.inquiries.expire.unit
+    api.inquiries.expire.discard
   }
 }

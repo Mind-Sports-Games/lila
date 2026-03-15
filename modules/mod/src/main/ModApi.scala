@@ -22,7 +22,7 @@ final class ModApi(
       _ <- reportApi.process(mod, sus, Set(Room.Cheat, Room.Print))
       _ <- logApi.alt(mod, sus, v)
     } yield {
-      if (v) notifier.reporters(mod, sus).unit
+      if (v) notifier.reporters(mod, sus).discard
     }
 
   def setEngine(mod: Mod, prev: Suspect, v: Boolean): Funit =
@@ -82,7 +82,7 @@ final class ModApi(
       }
     } >>
       reportApi.process(mod, sus, Set(Room.Comm)).andDo {
-        if (value) notifier.reporters(mod, sus).unit
+        if (value) notifier.reporters(mod, sus).discard
       } inject sus
   }
 

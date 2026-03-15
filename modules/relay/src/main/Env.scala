@@ -56,7 +56,7 @@ final class Env(
   }
 
   lila.common.Bus.subscribeFun("study", "relayToggle") {
-    case lila.hub.actorApi.study.RemoveStudy(studyId, _) => api.onStudyRemove(studyId).unit
+    case lila.hub.actorApi.study.RemoveStudy(studyId, _) => api.onStudyRemove(studyId).discard
     case lila.study.actorApi.RelayToggle(id, v, who) =>
       studyApi.isContributor(id, who.u) foreach {
         _ so {

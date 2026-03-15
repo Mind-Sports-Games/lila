@@ -37,7 +37,7 @@ final private class Streaming(
 
     case Streaming.Get => sender() ! liveStreams
 
-    case Tick => updateStreams.addEffectAnyway(scheduleTick()).unit
+    case Tick => updateStreams.addEffectAnyway(scheduleTick()).discard
   }
 
   private def scheduleTick(): Unit = { val _ = context.system.scheduler.scheduleOnce(15 seconds, self, Tick) }

@@ -179,6 +179,6 @@ final class Env(
   def cli = wire[Cli]
 
   lila.common.Bus.subscribeFun("fishnet") { case lila.hub.actorApi.fishnet.NewKey(userId, key) =>
-    automaticEmail.onFishnetKey(userId, key).unit
+    automaticEmail.onFishnetKey(userId, key).discard
   }
 }

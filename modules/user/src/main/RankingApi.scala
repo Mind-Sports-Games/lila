@@ -205,7 +205,7 @@ final class RankingApi(
     private val cache = cacheApi.unit[Map[PerfType, Map[User.ID, Rank]]] {
       _.refreshAfterWrite(15 minutes)
         .buildAsyncFuture { _ =>
-          lila.common.Future
+          lila.common.LilaFuture
             .linear(PerfType.leaderboardable) { pt =>
               compute(pt) dmap (pt -> _)
             }
@@ -251,14 +251,14 @@ final class RankingApi(
 
     // from 600 to 2800 by Stat.group
     private def compute(perfId: Perf.ID): Fu[List[NbUsers]] =
-      lila.rating.PerfType(perfId).exists(lila.rating.PerfType.leaderboardable.contains) so {
-        coll
-          .aggregateList(
-            maxDocs = Int.MaxValue,
-            ReadPreference.secondaryPreferred
+      if (!lila.rating.PerfType(perfId).exists(lila.rating.PerfType.leaderboardable.contains)) fuccess(Nil)
+      else coll
+          .aggregateWith[Bdoc](
+            readPreference = ReadPreference.secondaryPreferred
           ) { framework =>
             import framework._
-            Match($doc("perf" -> perfId)) -> List(
+            List(
+              Match($doc("perf" -> perfId)),
               Project(
                 $doc(
                   "_id" -> false,
@@ -273,6 +273,7 @@ final class RankingApi(
               GroupField("r")("nb" -> SumAll)
             )
           }
+          .collect[List](maxDocs = Int.MaxValue)
           .map { res =>
             val hash: Map[Int, NbUsers] = res.view
               .flatMap { obj =>
@@ -285,8 +286,7 @@ final class RankingApi(
             (Glicko.minRating to 2800 by Stat.group).map { r =>
               hash.getOrElse(r, 0)
             }.toList
-          } addEffect monitorRatingDistribution(perfId)
-      }
+          }.addEffect(monitorRatingDistribution(perfId))
 
     /* monitors cumulated ratio of players in each rating group, for a perf
      *

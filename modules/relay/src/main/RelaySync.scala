@@ -21,7 +21,7 @@ final private class RelaySync(
         RelayInputSanity(chapters, games) match {
           case Some(fail) => fufail(fail.msg)
           case None =>
-            lila.common.Future.linear(games) { game =>
+            lila.common.LilaFuture.linear(games) { game =>
               findCorrespondingChapter(game, chapters, games.size) match {
                 case Some(chapter) => updateChapter(rt.tour, study, chapter, game)
                 case None =>
@@ -91,7 +91,7 @@ final private class RelaySync(
             toMainline = true
           )(who) >> chapterRepo.setRelayPath(chapter.id, path)
         } >> newNode.so { node =>
-          lila.common.Future.fold(node.mainline.toList)(Position(chapter, path).ref) { case (position, n) =>
+          lila.common.LilaFuture.fold(node.mainline.toList)(Position(chapter, path).ref) { case (position, n) =>
             studyApi.addNode(
               studyId = study.id,
               position = position,

@@ -1,7 +1,7 @@
 package controllers
 
-import akka.stream.scaladsl._
-import akka.util.ByteString
+import org.apache.pekko.stream.scaladsl._
+import org.apache.pekko.util.ByteString
 import strategygames.{ Player => PlayerIndex }
 import play.api.mvc.Result
 import scala.concurrent.duration._

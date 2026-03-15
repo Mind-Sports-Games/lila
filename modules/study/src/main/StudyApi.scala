@@ -182,7 +182,7 @@ final class StudyApi(
           }
         }
       }
-      .unit
+      .discard
 
   def talk(userId: User.ID, studyId: Study.Id, text: String) =
     byId(studyId) foreach {
@@ -559,7 +559,7 @@ final class StudyApi(
   def addChapter(studyId: Study.Id, data: ChapterMaker.Data, sticky: Boolean)(who: Who): Funit =
     data.manyGames match {
       case Some(datas) =>
-        lila.common.Future.applySequentially(datas) { data =>
+        lila.common.LilaFuture.applySequentially(datas) { data =>
           addChapter(studyId, data, sticky)(who)
         }
       case _ =>
@@ -593,7 +593,7 @@ final class StudyApi(
     }
 
   def importPgns(studyId: Study.Id, datas: List[ChapterMaker.Data], sticky: Boolean)(who: Who) =
-    lila.common.Future.applySequentially(datas) { data =>
+    lila.common.LilaFuture.applySequentially(datas) { data =>
       addChapter(studyId, data, sticky)(who)
     }
 

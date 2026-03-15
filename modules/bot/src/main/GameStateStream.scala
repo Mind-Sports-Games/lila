@@ -99,13 +99,13 @@ final class GameStateStream(
       }
 
       def receive = {
-        case MoveGameEvent(g, _, _) if g.id == id && !g.finished => pushState(g).unit
+        case MoveGameEvent(g, _, _) if g.id == id && !g.finished => pushState(g).discard
         case lila.chat.actorApi.ChatLine(chatId, UserLine(username, _, text, false, false)) =>
-          pushChatLine(username, text, chatId.value.lengthIs == Game.gameIdSize).unit
-        case FinishGame(g, _, _) if g.id == id                             => onGameOver(g.some).unit
-        case AbortedBy(pov) if pov.gameId == id                            => onGameOver(pov.game.some).unit
-        case lila.game.actorApi.BoardDrawOffer(pov) if pov.gameId == id    => pushState(pov.game).unit
-        case lila.game.actorApi.BoardOfferSquares(pov) if pov.gameId == id => pushState(pov.game).unit
+          pushChatLine(username, text, chatId.value.lengthIs == Game.gameIdSize).discard
+        case FinishGame(g, _, _) if g.id == id                             => onGameOver(g.some).discard
+        case AbortedBy(pov) if pov.gameId == id                            => onGameOver(pov.game.some).discard
+        case lila.game.actorApi.BoardDrawOffer(pov) if pov.gameId == id    => pushState(pov.game).discard
+        case lila.game.actorApi.BoardOfferSquares(pov) if pov.gameId == id => pushState(pov.game).discard
         case SetOnline =>
           onlineApiUsers.setOnline(user.id)
           val _ = context.system.scheduler

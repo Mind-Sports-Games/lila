@@ -139,7 +139,7 @@ final private class SwissDirector(
             }
             _ <- colls.pairing.insert.many(pairings).void
             games = pairings.map(makeGame(swiss, SwissPlayer.toMap(players)))
-            _ <- lila.common.Future.applySequentially(games) { game =>
+            _ <- lila.common.LilaFuture.applySequentially(games) { game =>
               gameRepo.insertDenormalized(game).andDo(onStart(game.id))
             }
           } yield swiss.some

@@ -30,12 +30,12 @@ final private class CorresAlarm(
 
   implicit private val AlarmHandler: BSONDocumentHandler[Alarm] = reactivemongo.api.bson.Macros.handler[Alarm]
 
-  private def scheduleNext(): Unit = { val _ = scheduler.scheduleOnce(10 seconds) { run().unit } }
+  private def scheduleNext(): Unit = { val _ = scheduler.scheduleOnce(10 seconds) { run().discard } }
 
   scheduler.scheduleOnce(10 seconds) { scheduleNext() }
 
   Bus.subscribeFun("finishGame") { case lila.game.actorApi.FinishGame(game, _, _) =>
-    if (game.hasCorrespondenceClock && !game.hasAi) coll.delete.one($id(game.id)).unit
+    if (game.hasCorrespondenceClock && !game.hasAi) coll.delete.one($id(game.id)).discard
   }
 
   Bus.subscribeFun("moveEventCorres") {

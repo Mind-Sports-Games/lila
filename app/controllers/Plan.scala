@@ -130,7 +130,7 @@ final class Plan(env: Env)(implicit system: org.apache.pekko.actor.ActorSystem) 
   def thanks =
     Open { implicit ctx =>
       // wait for the payment data from stripe or paypal
-      lila.common.Future.delay(2.seconds) {
+      lila.common.LilaFuture.delay(2.seconds) {
         ctx.me so env.plan.api.userPatron flatMap { patron =>
           patron so env.plan.api.stripe.patronCustomer map { customer =>
             Ok(html.plan.thanks(patron, customer))

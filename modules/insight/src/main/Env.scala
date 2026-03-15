@@ -42,6 +42,6 @@ final class Env(
   lazy val api = wire[InsightApi]
 
   lila.common.Bus.subscribeFun("analysisReady") { case lila.analyse.actorApi.AnalysisReady(game, _) =>
-    api.updateGame(game).unit
+    api.updateGame(game).discard
   }
 }

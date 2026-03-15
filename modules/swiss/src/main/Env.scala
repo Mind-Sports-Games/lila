@@ -83,10 +83,10 @@ final class Env(
     "adjustBooster",
     "teamKick"
   ) {
-    case lila.game.actorApi.FinishGame(game, _, _)           => api.updateMultiMatchProgress(game).unit
-    case lila.hub.actorApi.team.KickFromTeam(teamId, userId) => api.kickFromTeam(teamId, userId).unit
-    case lila.hub.actorApi.mod.MarkCheater(userId, true)     => api.kickLame(userId).unit
-    case lila.hub.actorApi.mod.MarkBooster(userId)           => api.kickLame(userId).unit
+    case lila.game.actorApi.FinishGame(game, _, _)           => api.updateMultiMatchProgress(game).discard
+    case lila.hub.actorApi.team.KickFromTeam(teamId, userId) => api.kickFromTeam(teamId, userId).discard
+    case lila.hub.actorApi.mod.MarkCheater(userId, true)     => api.kickLame(userId).discard
+    case lila.hub.actorApi.mod.MarkBooster(userId)           => api.kickLame(userId).discard
   }
 
   ResilientScheduler(

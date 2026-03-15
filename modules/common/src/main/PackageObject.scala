@@ -4,6 +4,9 @@ trait PackageObject:
 
   export lila.core.lilaism.Lilaism.{ *, given }
 
+  given ecToExecutor(using ec: scala.concurrent.ExecutionContext): Executor =
+    ec.asInstanceOf[Executor]
+
   object makeTimeout:
     import org.apache.pekko.util.Timeout
     import scala.concurrent.duration.*

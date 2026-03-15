@@ -124,15 +124,15 @@ final class RoundSocket(
     case Protocol.In.PlayerChatSay(id, Right(playerIndex), msg) =>
       gameIfPresent(id.value) foreach {
         _ foreach {
-          messenger.owner(_, playerIndex, msg).unit
+          messenger.owner(_, playerIndex, msg).discard
         }
       }
     case Protocol.In.PlayerChatSay(id, Left(userId), msg) =>
-      messenger.owner(id, userId, msg).unit
+      messenger.owner(id, userId, msg).discard
     case Protocol.In.WatcherChatSay(id, userId, msg) =>
-      messenger.watcher(id, userId, msg).unit
+      messenger.watcher(id, userId, msg).discard
     case RP.In.ChatTimeout(roomId, modId, suspect, reason, text) =>
-      messenger.timeout(Chat.Id(s"$roomId/w"), modId, suspect, reason, text).unit
+      messenger.timeout(Chat.Id(s"$roomId/w"), modId, suspect, reason, text).discard
     case Protocol.In.Berserk(gameId, userId) => tournamentActor ! Berserk(gameId.value, userId)
     case Protocol.In.PlayerOnlines(onlines) =>
       onlines foreach {

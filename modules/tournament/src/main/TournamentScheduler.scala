@@ -1183,7 +1183,7 @@ Thank you all, you rock!"""
         (tournamentRepo
           .insert(pruned)
           .logFailure(logger) >>
-          api.subscribeBotsToArenas).unit
+          api.subscribeBotsToArenas).discard
       } catch {
         case e: org.joda.time.IllegalInstantException =>
           logger.error(s"failed to schedule all: ${e.getMessage}")

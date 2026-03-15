@@ -53,7 +53,7 @@ final private class StartedOrganizer(
         }
         .monSuccess(_.tournament.startedOrganizer.tick)
         .addEffectAnyway(scheduleNext())
-        .unit
+        .discard
   }
 
   private def processMedleyRoundChange(tour: Tournament) =

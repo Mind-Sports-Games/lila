@@ -20,10 +20,10 @@ final class KeyPages(env: Env)(implicit ec: scala.concurrent.ExecutionContext) {
   def homeHtml(implicit ctx: Context): Fu[Frag] =
     env
       .preloader(
-        posts = env.forum.recent(ctx.me, env.team.cached.teamIdsList).nevermind,
-        tours = env.tournament.cached.onHomepage.getUnit.nevermind,
-        events = env.event.api.promoteTo(ctx.req).nevermind,
-        simuls = env.simul.allCreatedFeaturable.get {}.nevermind,
+        posts = env.forum.recent(ctx.me, env.team.cached.teamIdsList).recoverDefault,
+        tours = env.tournament.cached.onHomepage.getUnit.recoverDefault,
+        events = env.event.api.promoteTo(ctx.req).recoverDefault,
+        simuls = env.simul.allCreatedFeaturable.get {}.recoverDefault,
         streamerSpots = env.streamer.homepageMaxSetting.get(),
         weeklyChallenge = env.lobby.weeklyChallenge,
         chatOption = ctx.noKid so env.chat.api.userChat.cached

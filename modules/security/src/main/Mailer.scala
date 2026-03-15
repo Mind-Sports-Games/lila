@@ -49,7 +49,7 @@ final class Mailer(
                   bodyHtml = msg.htmlBody map { body => Mailer.html.wrap(msg.subject, body).render }
                 )
               )
-              .unit
+              .discard
           }
         }
       }

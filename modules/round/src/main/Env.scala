@@ -120,10 +120,10 @@ final class Env(
           .scheduleOnce(2 seconds) {
             tellRound(game.id, MultiMatchRematch)
           }
-          .unit
+          .discard
     },
     "selfReport" -> { case RoundSocket.Protocol.In.SelfReport(fullId, ip, userId, name) =>
-      selfReport(userId, ip, fullId, name).unit
+      selfReport(userId, ip, fullId, name).discard
     },
     "adjustCheater" -> { case lila.hub.actorApi.mod.MarkCheater(userId, true) =>
       resignAllGamesOf(userId)

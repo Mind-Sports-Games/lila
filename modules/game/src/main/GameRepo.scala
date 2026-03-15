@@ -447,7 +447,7 @@ final class GameRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionCont
     coll.update.one($id(id), $unset(F.checkAt)).void
 
   def unsetPlayingUids(g: Game): Unit =
-    coll.update(ordered = false, WriteConcern.Unacknowledged).one($id(g.id), $unset(F.playingUids)).unit
+    coll.update(ordered = false, WriteConcern.Unacknowledged).one($id(g.id), $unset(F.playingUids)).discard
 
   // used to make a compound sparse index
   def setImportCreatedAt(g: Game) =

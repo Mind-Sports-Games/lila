@@ -19,7 +19,7 @@ final class UserRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionCont
 
   def withColl[A](f: Coll => A): A = f(coll)
 
-  val normalize = User normalize _
+  val normalize = (name: String) => User.normalize(name)
 
   def topNbGame(nb: Int): Fu[List[User]] =
     coll.find(enabledNoBotSelect ++ notLame).sort($sort desc "count.game").cursor[User]().list(nb)
@@ -194,7 +194,7 @@ final class UserRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionCont
         $id(userId) ++ (value < 0).so($doc(F.playerIndexIt $gt -3)),
         $inc(F.playerIndexIt -> value)
       )
-      .unit
+      .discard
 
   def playstrategy = byId(User.playstrategyId)
 
@@ -352,7 +352,7 @@ final class UserRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionCont
       mustConfirmEmail: Boolean,
       lang: Option[String] = None
   ): Fu[Option[User]] =
-    !nameExists(username) flatMap {
+    nameExists(username).dmap(!_) flatMap {
       _ so {
         val doc = newUser(username, passwordHash, email, blind, mobileApiVersion, mustConfirmEmail, lang) ++
           ("len" -> BSONInteger(username.length))
@@ -704,7 +704,7 @@ final class UserRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionCont
       lang: Option[String]
   ) = {
 
-    implicit def countHandler = Count.countBSONHandler
+    implicit def countHandler: lila.db.BSON[Count] = Count.countBSONHandler
     import lila.db.BSON.BSONJodaDateTimeHandler
 
     val normalizedEmail = email.normalize

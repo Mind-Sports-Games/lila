@@ -105,7 +105,7 @@ final private[round] class SelectSquarer(
             Bus.publish(lila.game.actorApi.BoardOfferSquares(p), s"boardSelectSquaresOffer:${pov.gameId}")
           )
         }
-        .unit
+        .discard
   }
 
 }

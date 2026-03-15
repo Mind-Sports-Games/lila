@@ -29,10 +29,10 @@ final class LightUserApi(
   def asyncManyFallback(ids: Seq[User.ID]): Fu[Seq[LightUser]] =
     Future.sequence(ids.map(asyncFallback))
 
-  def invalidate = cache invalidate _
+  def invalidate = (id: User.ID) => cache.invalidate(id)
 
-  def preloadOne                     = cache preloadOne _
-  def preloadMany                    = cache preloadMany _
+  def preloadOne                     = (id: User.ID) => cache.preloadOne(id)
+  def preloadMany                    = (ids: Seq[User.ID]) => cache.preloadMany(ids)
   def preloadUser(user: User)        = cache.set(user.id, user.light.some)
   def preloadUsers(users: Seq[User]) = users.foreach(preloadUser)
 

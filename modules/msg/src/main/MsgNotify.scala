@@ -59,7 +59,7 @@ final private class MsgNotify(
           Option(canc).foreach(_.cancel())
           scheduler.scheduleOnce(delay) {
             delayed remove id
-            doNotify(threadId).unit
+            doNotify(threadId).discard
           }
         }
       )

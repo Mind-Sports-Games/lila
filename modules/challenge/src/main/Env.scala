@@ -59,11 +59,11 @@ final class Env(
   val forms = new ChallengeForm
 
   system.scheduler.scheduleWithFixedDelay(10 seconds, 3343 millis) { () =>
-    api.sweep.unit
+    api.sweep.discard
   }
 
   system.scheduler.scheduleWithFixedDelay(20 seconds, 2897 millis) { () =>
-    bulk.tick.unit
+    bulk.tick.discard
   }
 }
 

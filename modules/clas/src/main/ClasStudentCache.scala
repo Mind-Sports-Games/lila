@@ -44,7 +44,7 @@ final class ClasStudentCache(colls: ClasColls, cacheApi: CacheApi)(implicit
           bloomFilter = nextBloom
         }
         .monSuccess(_.clas.student.bloomFilter.fu)
-        .unit
+        .discard
     }
 
   val _ = scheduler.scheduleWithFixedDelay(23 seconds, 1 hour) { rebuildBloomFilter _ }

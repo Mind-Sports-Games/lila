@@ -60,7 +60,7 @@ final class Relation(
                 lila.msg.MsgPreset.maxFollow(me.username, env.relation.maxFollow.value)
               ) inject Ok
           case _ =>
-            api.follow(me.id, UserModel normalize userId).nevermind >> renderActions(userId, getBool("mini"))
+            api.follow(me.id, UserModel normalize userId).recoverDefault >> renderActions(userId, getBool("mini"))
         }
       }(rateLimitedFu)
     }
@@ -68,20 +68,20 @@ final class Relation(
   def unfollow(userId: String) =
     Auth { implicit ctx => me =>
       FollowLimitPerUser(me.id) {
-        api.unfollow(me.id, UserModel normalize userId).nevermind >> renderActions(userId, getBool("mini"))
+        api.unfollow(me.id, UserModel normalize userId).recoverDefault >> renderActions(userId, getBool("mini"))
       }(rateLimitedFu)
     }
 
   def block(userId: String) =
     Auth { implicit ctx => me =>
       FollowLimitPerUser(me.id) {
-        api.block(me.id, UserModel normalize userId).nevermind >> renderActions(userId, getBool("mini"))
+        api.block(me.id, UserModel normalize userId).recoverDefault >> renderActions(userId, getBool("mini"))
       }(rateLimitedFu)
     }
 
   def unblock(userId: String) =
     Auth { implicit ctx => me =>
-      api.unblock(me.id, UserModel normalize userId).nevermind >> renderActions(userId, getBool("mini"))
+      api.unblock(me.id, UserModel normalize userId).recoverDefault >> renderActions(userId, getBool("mini"))
     }
 
   def following(username: String, page: Int) =

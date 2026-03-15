@@ -93,6 +93,6 @@ final class Env(
 
   lila.common.Bus.subscribeFun("studyAnalysisProgress") {
     case lila.analyse.actorApi.StudyAnalysisProgress(analysis, complete) =>
-      serverEvalMerger(analysis, complete).unit
+      serverEvalMerger(analysis, complete).discard
   }
 }

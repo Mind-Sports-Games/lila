@@ -32,3 +32,26 @@ object LilaFuture:
       case e if retries > 0 =>
         logger.foreach { _.info(s"$retries retries - ${e.getMessage}") }
         org.apache.pekko.pattern.after(delay, scheduler)(retry(op, delay, retries - 1, logger))
+
+  def linear[A, B](list: Iterable[A])(f: A => Fu[B])(using ec: scala.concurrent.ExecutionContext): Fu[List[B]] =
+    list.foldLeft(fuccess(List.empty[B])) { (acc, a) =>
+      acc.flatMap { bs => f(a).map(bs :+ _) }
+    }
+
+  def applySequentially[A](list: Iterable[A])(f: A => Funit)(using ec: scala.concurrent.ExecutionContext): Funit =
+    list.foldLeft(funit) { (acc, a) =>
+      acc.flatMap { _ => f(a) }
+    }
+
+  def find[A](list: Iterable[A])(f: A => Fu[Boolean])(using ec: scala.concurrent.ExecutionContext): Fu[Option[A]] =
+    list.foldLeft(fuccess(none[A])) { (acc, a) =>
+      acc.flatMap {
+        case None => f(a).map { if _ then Some(a) else None }
+        case res  => fuccess(res)
+      }
+    }
+
+  def fold[A, B](list: List[A])(zero: B)(f: (B, A) => Fu[B])(using ec: scala.concurrent.ExecutionContext): Fu[B] =
+    list.foldLeft(fuccess(zero)) { (acc, a) =>
+      acc.flatMap { b => f(b, a) }
+    }

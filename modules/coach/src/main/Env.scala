@@ -49,20 +49,20 @@ final class Env(
   ) {
     case lila.hub.actorApi.mod.Shadowban(userId, true) =>
       api.toggleApproved(userId, value = false)
-      api.reviews.deleteAllBy(userId).unit
+      api.reviews.deleteAllBy(userId).discard
     case lila.hub.actorApi.mod.MarkCheater(userId, true) =>
       api.toggleApproved(userId, value = false)
-      api.reviews.deleteAllBy(userId).unit
+      api.reviews.deleteAllBy(userId).discard
     case lila.hub.actorApi.mod.MarkBooster(userId) =>
       api.toggleApproved(userId, value = false)
-      api.reviews.deleteAllBy(userId).unit
+      api.reviews.deleteAllBy(userId).discard
     case lila.hub.actorApi.mod.SetPermissions(userId, permissions) =>
-      api.toggleApproved(userId, permissions.has(Permission.Coach.dbKey)).unit
+      api.toggleApproved(userId, permissions.has(Permission.Coach.dbKey)).discard
     case lila.game.actorApi.FinishGame(game, p1, p2) if game.rated =>
       if (game.perfType.exists(lila.rating.PerfType.standard.contains)) {
         p1 so api.setRating
         p2 so api.setRating
-      }.unit
+      }.discard
   }
 
   def cli =

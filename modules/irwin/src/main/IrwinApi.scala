@@ -105,19 +105,19 @@ final class IrwinApi(
       )
 
     private[irwin] def fromTournamentLeaders(leaders: Map[Tournament, TournamentTop]): Funit =
-      lila.common.Future.applySequentially(leaders.toList) { case (tour, top) =>
+      lila.common.LilaFuture.applySequentially(leaders.toList) { case (tour, top) =>
         userRepo byIds top.value.zipWithIndex
           .filter(_._2 <= tour.nbPlayers * 2 / 100)
           .map(_._1.userId)
           .take(20) flatMap { users =>
-          lila.common.Future.applySequentially(users) { user =>
+          lila.common.LilaFuture.applySequentially(users) { user =>
             insert(Suspect(user), _.Tournament)
           }
         }
       }
 
     private[irwin] def fromLeaderboard(leaders: List[User]): Funit =
-      lila.common.Future.applySequentially(leaders) { user =>
+      lila.common.LilaFuture.applySequentially(leaders) { user =>
         insert(Suspect(user), _.Leaderboard)
       }
 

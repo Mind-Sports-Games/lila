@@ -70,7 +70,7 @@ final class ApiActionStream(gameRepo: GameRepo, gameJsonView: lila.game.JsonView
                 val chans = List(MoveGameEvent makeChan game.id, "finishGame")
                 val sub = Bus.subscribeFun(chans: _*) {
                   case MoveGameEvent(g, fen, move) =>
-                    queue.offer(toJson(g, fen, move.some)).unit
+                    queue.offer(toJson(g, fen, move.some)).discard
                   case FinishGame(g, _, _) if g.id == game.id =>
                     queue offer gameJsonView(g, initialFen)
                     (1 to buffer.size) foreach { _ => queue.offer(Json.obj()) } // push buffer content out

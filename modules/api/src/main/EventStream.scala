@@ -98,18 +98,18 @@ final class EventStream(
               }
             }
 
-        case StartGame(game) => queue.offer(gameJson("gameStart", me)(game)).unit
+        case StartGame(game) => queue.offer(gameJson("gameStart", me)(game)).discard
 
-        case FinishGame(game, _, _) => queue.offer(gameJson("gameFinish", me)(game)).unit
+        case FinishGame(game, _, _) => queue.offer(gameJson("gameFinish", me)(game)).discard
 
         case lila.challenge.Event.Create(c) if isMyChallenge(c) =>
-          queue.offer(challengeJson("challenge")(c).some).unit
+          queue.offer(challengeJson("challenge")(c).some).discard
 
         case lila.challenge.Event.Decline(c) if isMyChallenge(c) =>
-          queue.offer(challengeJson("challengeDeclined")(c).some).unit
+          queue.offer(challengeJson("challengeDeclined")(c).some).discard
 
         case lila.challenge.Event.Cancel(c) if isMyChallenge(c) =>
-          queue.offer(challengeJson("challengeCanceled")(c).some).unit
+          queue.offer(challengeJson("challengeCanceled")(c).some).discard
 
         // pretend like the rematch is a challenge
         case lila.hub.actorApi.round.RematchOffer(gameId) =>

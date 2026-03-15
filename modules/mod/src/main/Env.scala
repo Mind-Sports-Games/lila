@@ -107,7 +107,7 @@ final class Env(
           }
     },
     "analysisReady" -> { case lila.analyse.actorApi.AnalysisReady(game, analysis) =>
-      assessApi.onAnalysisReady(game, analysis).unit
+      assessApi.onAnalysisReady(game, analysis).discard
     },
     "garbageCollect" -> {
       case lila.hub.actorApi.security.GCImmediateSb(userId) =>
@@ -122,18 +122,18 @@ final class Env(
         }
     },
     "deletePublicChats" -> { case lila.hub.actorApi.security.DeletePublicChats(userId) =>
-      publicChat.deleteAll(userId).unit
+      publicChat.deleteAll(userId).discard
     },
     "autoWarning" -> { case lila.hub.actorApi.mod.AutoWarning(userId, subject) =>
-      logApi.modMessage(User.playstrategyId, userId, subject).unit
+      logApi.modMessage(User.playstrategyId, userId, subject).discard
     },
     "selfReportMark" -> { case lila.hub.actorApi.mod.SelfReportMark(suspectId, name) =>
       api
         .autoMark(lila.report.SuspectId(suspectId), lila.report.ModId.playstrategy, s"Self report: ${name}")
-        .unit
+        .discard
     },
     "chatTimeout" -> { case lila.hub.actorApi.mod.ChatTimeout(mod, user, reason, text) =>
-      logApi.chatTimeout(mod, user, reason, text).unit
+      logApi.chatTimeout(mod, user, reason, text).discard
     }
   )
 }

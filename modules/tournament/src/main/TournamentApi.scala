@@ -663,7 +663,7 @@ final class TournamentApi(
             }
           } >> pairingRepo.opponentsOf(tour.id, userId).flatMap { uids =>
             pairingRepo.forfeitByTourAndUserId(tour.id, userId) >>
-              lila.common.Future.applySequentially(uids.toList)(updatePlayer(tour, tour.variant, none))
+              lila.common.LilaFuture.applySequentially(uids.toList)(updatePlayer(tour, tour.variant, none))
           }
         }
       } >>

@@ -74,11 +74,11 @@ final class Env(
   )
 
   system.scheduler.scheduleWithFixedDelay(15 minutes, 15 minutes) { () =>
-    expiration.run.unit
+    expiration.run.discard
   }
 
   lila.common.Bus.subscribeFun("email") { case lila.hub.actorApi.user.ChangeEmail(userId, email) =>
-    api.onEmailChange(userId, email).unit
+    api.onEmailChange(userId, email).discard
   }
 
   def cli =

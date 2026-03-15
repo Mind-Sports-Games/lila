@@ -50,11 +50,11 @@ final class Env(
 
   if (mode == Mode.Prod) {
     scheduler.scheduleWithFixedDelay(config.sheetDelay * 2, config.sheetDelay) { () =>
-      sheet.fetchAll.logFailure(logger).unit
+      sheet.fetchAll.logFailure(logger).discard
     }
 
     scheduler.scheduleWithFixedDelay(config.youtubeDelay * 2, config.youtubeDelay) { () =>
-      youtube.updateAll.logFailure(logger).unit
+      youtube.updateAll.logFailure(logger).discard
     }
   }
 }

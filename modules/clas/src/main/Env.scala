@@ -42,7 +42,7 @@ final class Env(
 
   lila.common.Bus.subscribeFuns(
     "finishGame" -> { case lila.game.actorApi.FinishGame(game, _, _) =>
-      progressApi.onFinishGame(game).unit
+      progressApi.onFinishGame(game).discard
     },
     "clas" -> { case lila.hub.actorApi.clas.IsTeacherOf(teacher, student, promise) =>
       promise completeWith api.clas.isTeacherOf(teacher, student)
