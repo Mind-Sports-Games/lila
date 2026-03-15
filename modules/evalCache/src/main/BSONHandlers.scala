@@ -18,10 +18,7 @@ private object BSONHandlers {
   implicit private val KnodesBSONHandler: BSONHandler[Knodes] =
     intAnyValHandler[Knodes](_.value, Knodes.apply)
 
-  implicit val PvsHandler: BSONHandler[NonEmptyList[Pv]] {
-    def writeTry(x: cats.data.NonEmptyList[lila.evalCache.EvalCacheEntry.Pv])
-        : scala.util.Success[reactivemongo.api.bson.BSONString]
-  } = new BSONHandler[NonEmptyList[Pv]] {
+  implicit val PvsHandler: BSONHandler[NonEmptyList[Pv]] = new BSONHandler[NonEmptyList[Pv]] {
     private def scoreWrite(s: Score): String = s.value.fold(_.value.toString, m => s"#${m.value}")
     private def scoreRead(str: String): Option[Score] =
       if (str startsWith "#") str.drop(1).toIntOption map { m =>

@@ -7,6 +7,7 @@ import org.joda.time.DateTime
 import scala.concurrent.duration._
 
 import lila.common.LilaStream
+import lila.common.extensions.*
 import lila.db.dsl._
 import lila.game.{ Game, GameRepo, Query }
 import lila.round.actorApi.round.{ Abandon, QuietFlag }

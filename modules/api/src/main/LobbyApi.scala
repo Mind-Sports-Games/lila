@@ -6,6 +6,7 @@ import strategygames.format.Forsyth
 
 import play.api.libs.json.{ JsArray, JsObject, Json }
 
+import lila.common.extensions.*
 import lila.game.Pov
 import lila.lobby.SeekApi
 import lila.i18n.VariantKeys

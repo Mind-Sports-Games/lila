@@ -2,7 +2,7 @@ package lila.common
 
 import org.apache.pekko.actor.Scheduler
 
-import scala.concurrent.Promise
+import scala.concurrent.{ Promise, Future => ScalaFu }
 import scala.concurrent.duration.FiniteDuration
 
 object LilaFuture:
@@ -48,6 +48,28 @@ object LilaFuture:
       acc.flatMap {
         case None => f(a).map { if _ then Some(a) else None }
         case res  => fuccess(res)
+      }
+    }
+
+  def filter[A](list: List[A])(f: A => Fu[Boolean])(using ec: scala.concurrent.ExecutionContext): Fu[List[A]] =
+    ScalaFu
+      .sequence {
+        list.map { element =>
+          f(element).dmap(_ option element)
+        }
+      }
+      .dmap(_.flatten)
+
+  def filterNot[A](list: List[A])(f: A => Fu[Boolean])(using ec: scala.concurrent.ExecutionContext): Fu[List[A]] =
+    filter(list)(a => f(a).dmap(!_))
+
+  def exists[A](list: List[A])(pred: A => Fu[Boolean])(using ec: scala.concurrent.ExecutionContext): Fu[Boolean] =
+    find(list)(pred).dmap(_.isDefined)
+
+  def lazyFold[T, R](futures: LazyList[Fu[T]])(zero: R)(op: (R, T) => R)(using ec: scala.concurrent.ExecutionContext): Fu[R] =
+    LazyList.cons.unapply(futures).fold(fuccess(zero)) { case (future, rest) =>
+      future.flatMap { f =>
+        lazyFold(rest)(op(zero, f))(op)
       }
     }
 

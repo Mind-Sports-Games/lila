@@ -11,6 +11,7 @@ import scala.util.control.NonFatal
 import lila.db.dsl._
 import lila.memo.CacheApi._
 import lila.socket.Socket
+import lila.user.User
 
 final class EvalCacheApi(
     coll: Coll,
@@ -37,7 +38,7 @@ final class EvalCacheApi(
   def put(trustedUser: TrustedUser, candidate: Input.Candidate, sri: Socket.Sri): Funit =
     candidate.input so { put(trustedUser, _, sri) }
 
-  def shouldPut = truster shouldPut _
+  def shouldPut = (user: User) => truster.shouldPut(user)
 
   def getSinglePvEval(variant: Variant, fen: FEN): Fu[Option[Eval]] =
     getEval(

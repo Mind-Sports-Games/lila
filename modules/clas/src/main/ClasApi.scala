@@ -145,9 +145,10 @@ final class ClasApi(
 
     def allWithUsers(clas: Clas, selector: Bdoc = $empty): Fu[List[Student.WithUser]] =
       colls.student
-        .aggregateList(Int.MaxValue, ReadPreference.secondaryPreferred) { framework =>
+        .aggregateWith[Bdoc](readPreference = ReadPreference.secondaryPreferred) { framework =>
           import framework._
-          Match($doc("clasId" -> clas.id) ++ selector) -> List(
+          List(
+            Match($doc("clasId" -> clas.id) ++ selector),
             PipelineOperator(
               $doc(
                 "$lookup" -> $doc(
@@ -161,6 +162,7 @@ final class ClasApi(
             UnwindField("user")
           )
         }
+        .collect[List](maxDocs = Int.MaxValue)
         .map { docs =>
           for {
             doc     <- docs

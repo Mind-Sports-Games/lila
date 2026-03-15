@@ -43,7 +43,7 @@ object CrudForm {
       "statusScoring" -> boolean,
       "teamBattle"    -> boolean,
       "hasChat"       -> boolean
-    )(CrudForm.Data.apply)(CrudForm.Data.unapply)
+    )(CrudForm.Data.apply)(d => Some((d.name, d.homepageHours, d.clock, d.minutes, d.variant, d.handicapped, d.position, d.date, d.image, d.headline, d.description, d.conditions, d.berserkable, d.streakable, d.statusScoring, d.teamBattle, d.hasChat)))
       .verifying("Invalid clock", _.validClock)
       .verifying("Increase tournament duration, or decrease game clock", _.validTiming)
   ) fill CrudForm.Data(

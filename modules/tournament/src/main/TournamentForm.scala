@@ -177,12 +177,12 @@ final class TournamentForm {
           "medleyMinutes"    -> optional(numberIn(medleyMinutes)),
           "balanceIntervals" -> optional(boolean),
           "numIntervals"     -> optional(number(min = 2, max = maxMedleyIntervals))
-        )(MedleyIntervalOptions.apply)(MedleyIntervalOptions.unapply),
+        )(MedleyIntervalOptions.apply)(d => Some((d.medleyMinutes, d.balanceIntervals, d.numIntervals))),
         "medleyDefaults" -> mapping(
           "onePerGameFamily"    -> optional(boolean),
           "exoticChessVariants" -> optional(boolean),
           "draughts64Variants"  -> optional(boolean)
-        )(MedleyDefaults.apply)(MedleyDefaults.unapply),
+        )(MedleyDefaults.apply)(d => Some((d.onePerGameFamily, d.exoticChessVariants, d.draughts64Variants))),
         "medleyGameFamilies" -> mapping(
           "chess"              -> optional(boolean),
           "draughts"           -> optional(boolean),
@@ -196,13 +196,13 @@ final class TournamentForm {
           "go"                 -> optional(boolean),
           "backgammon"         -> optional(boolean),
           "abalone"            -> optional(boolean)
-        )(MedleyGameFamilies.apply)(MedleyGameFamilies.unapply),
+        )(MedleyGameFamilies.apply)(d => Some((d.chess, d.draughts, d.shogi, d.xiangqi, d.loa, d.flipello, d.mancala, d.amazons, d.breakthroughtroyka, d.go, d.backgammon, d.abalone))),
         "variantSettings" -> mapping(
           "handicaps" -> mapping(
             "handicapped"        -> optional(boolean),
             "inputPlayerRatings" -> optional(cleanNonEmptyText)
-          )(Handicaps.apply)(Handicaps.unapply)
-        )(VariantSettings.apply)(VariantSettings.unapply),
+          )(Handicaps.apply)(d => Some((d.handicapped, d.inputPlayerRatings)))
+        )(VariantSettings.apply)(d => Some(d.handicaps)),
         "position"         -> optional(lila.common.Form.fen.playableStrict),
         "mode"             -> optional(number.verifying(Mode.all.map(_.id) contains _)), // deprecated, use rated
         "rated"            -> optional(boolean),
@@ -214,7 +214,7 @@ final class TournamentForm {
         "statusScoring"    -> optional(boolean),
         "description"      -> optional(cleanNonEmptyText),
         "hasChat"          -> optional(boolean)
-      )(TournamentSetup.apply)(TournamentSetup.unapply)
+      )(TournamentSetup.apply)(d => Some((d.name, d.clock, d.minutes, d.waitMinutes, d.startDate, d.variant, d.medley, d.medleyIntervalOptions, d.medleyDefaults, d.medleyGameFamilies, d.variantSettings, d.position, d.mode, d.rated, d.password, d.conditions, d.teamBattleByTeam, d.berserkable, d.streakable, d.statusScoring, d.description, d.hasChat)))
         .verifying("Invalid clock", _.validClock)
         .verifying("15s and 0+1 variant games cannot be rated", _.validRatedVariant)
         .verifying("Increase tournament duration, or decrease game clock", _.sufficientDuration)
@@ -278,7 +278,7 @@ object TournamentForm {
       mapping(
         "team"     -> optional(nonEmptyText),
         "password" -> optional(nonEmptyText)
-      )(TournamentJoin.apply)(TournamentJoin.unapply)
+      )(TournamentJoin.apply)(d => Some((d.team, d.password)))
     )
 
   case class TournamentJoin(team: Option[String], password: Option[String])

@@ -5,6 +5,7 @@ import reactivemongo.api._
 import reactivemongo.api.bson._
 
 import BSONHandlers._
+import lila.common.extensions.*
 import lila.db.dsl._
 import lila.hub.LightTeam.TeamID
 import lila.rating.PerfType
@@ -69,9 +70,10 @@ final class PlayerRepo(coll: Coll)(implicit ec: scala.concurrent.ExecutionContex
   ): Fu[List[TeamBattle.RankedTeam]] = {
     import TeamBattle.{ RankedTeam, TeamLeader }
     coll
-      .aggregateList(maxDocs = TeamBattle.maxTeams) { framework =>
+      .aggregateWith[Bdoc]() { framework =>
         import framework._
-        Match(selectTourNoDQ(tourId)) -> List(
+        List(
+          Match(selectTourNoDQ(tourId)),
           Sort(Descending("m")),
           GroupField("t")(
             "m" -> Push(
@@ -90,6 +92,7 @@ final class PlayerRepo(coll: Coll)(implicit ec: scala.concurrent.ExecutionContex
           )
         )
       }
+      .collect[List](maxDocs = TeamBattle.maxTeams)
       .map {
         _.flatMap { doc =>
           for {

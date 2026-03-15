@@ -9,6 +9,7 @@ import scala.concurrent.duration._
 import scala.concurrent.{ blocking, Future }
 
 import lila.common.Chronometer
+import lila.common.extensions.*
 import lila.user.User
 import play.api.ConfigLoader
 

@@ -57,9 +57,10 @@ final class StudyMultiBoard(
     def slice(offset: Int, length: Int): Fu[Seq[ChapterPreview]] =
       chapterRepo
         .coll {
-          _.aggregateList(length, readPreference = readPref) { framework =>
+          _.aggregateWith[Bdoc](readPreference = readPref) { framework =>
             import framework._
-            Match(selector) -> List(
+            List(
+              Match(selector),
               Sort(Ascending("order")),
               Skip(offset),
               Limit(length),
@@ -81,6 +82,7 @@ final class StudyMultiBoard(
               )
             )
           }
+            .collect[List](maxDocs = length)
         }
         .map { r =>
           for {

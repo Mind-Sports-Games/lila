@@ -1,6 +1,7 @@
 package lila.security
 
 import play.api.libs.ws.StandaloneWSClient
+import play.api.libs.ws.DefaultBodyReadables._
 
 import lila.common.Domain
 
@@ -16,7 +17,7 @@ final class DisposableEmailDomain(
 
   private[security] def refresh(): Unit =
     for {
-      p2list <- ws.url(providerUrl).get().map(_.body.linesIterator) recover { case e: Exception =>
+      p2list <- ws.url(providerUrl).get().map(_.body[String].linesIterator) recover { case e: Exception =>
         logger.warn("DisposableEmailDomain.refresh", e)
         Iterator.empty
       }
@@ -39,7 +40,7 @@ final class DisposableEmailDomain(
 
   def isOk(domain: Domain) = !apply(domain)
 
-  def fromDomain(mixedCase: String): Boolean = apply(Domain(mixedCase.toLowerCase))
+  def fromDomain(mixedCase: String): Boolean = Domain.from(mixedCase.toLowerCase).exists(apply)
 }
 
 private object DisposableEmailDomain {

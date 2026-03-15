@@ -1,6 +1,6 @@
 package lila.forum
 
-import lila.common.Future
+import lila.common.LilaFuture
 import lila.notify.NotifyApi
 import lila.notify.{ MentionedInThread, Notification }
 import lila.relation.RelationApi
@@ -45,7 +45,7 @@ final class MentionNotifier(
       usersMentioned: List[User.ID],
       mentionedBy: User.ID
   ): Fu[List[User.ID]] =
-    Future.filterNot(usersMentioned) { relationApi.fetchBlocks(_, mentionedBy) }
+    LilaFuture.filterNot(usersMentioned) { relationApi.fetchBlocks(_, mentionedBy) }
 
   private def createMentionNotification(
       post: Post,

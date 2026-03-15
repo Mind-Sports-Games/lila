@@ -11,6 +11,7 @@ import play.api.i18n.Lang
 import play.api.libs.json._
 import scala.concurrent.ExecutionContext
 
+import lila.common.extensions.*
 import lila.common.{ GreatPlayer, LightUser }
 import lila.db.dsl._
 import lila.game.{ Game, MultiPointState }

@@ -9,6 +9,7 @@ import scala.util.{ Failure, Success, Try }
 
 import Client.Skill
 import lila.common.IpAddress
+import lila.common.extensions.*
 import lila.db.dsl._
 
 final class FishnetApi(

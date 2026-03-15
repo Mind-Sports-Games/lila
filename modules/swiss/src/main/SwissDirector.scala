@@ -7,6 +7,7 @@ import org.joda.time.DateTime
 import scala.util.chaining._
 import scala.util.Random
 
+import lila.common.extensions.*
 import lila.db.dsl._
 import lila.game.{ Game, Handicaps, MultiPointState }
 import lila.user.User

@@ -1,7 +1,6 @@
 package lila.security
 
 import org.joda.time.DateTime
-import scalalib.Random
 import play.api.data._
 import play.api.data.Forms._
 import play.api.data.validation.{ Constraint, Valid => FormValid, Invalid, ValidationError }
@@ -105,13 +104,14 @@ final class SecurityApi(
   }
 
   def restoreUser(req: RequestHeader): Fu[Option[Either[AppealUser, FingerPrintedUser]]] =
-    firewall.accepts(req) so reqSessionId(req) so { sessionId =>
+    if (!firewall.accepts(req)) fuccess(none)
+    else reqSessionId(req).fold(fuccess(none[Either[AppealUser, FingerPrintedUser]])) { sessionId =>
       appeal.authenticate(sessionId) match {
-        case Some(userId) => userRepo byId userId map2 { u => Left(AppealUser(u)) }
+        case Some(userId) => userRepo.byId(userId).map2 { u => Left(AppealUser(u)) }
         case None =>
           store.authInfo(sessionId) flatMap {
-            _ so { d =>
-              userRepo byId d.user dmap { _ map { u => Right(FingerPrintedUser(u, d.hasFp)) } }
+            _.fold(fuccess(none[Either[AppealUser, FingerPrintedUser]])) { d =>
+              userRepo.byId(d.user).dmap { _.map { u => Right(FingerPrintedUser(u, d.hasFp)) } }
             }
           }
       }
@@ -134,7 +134,7 @@ final class SecurityApi(
   private lazy val nonModRoles: Set[String] = Permission.nonModPermissions.map(_.dbKey)
 
   private def stripRolesOfOAuthUser(scoped: OAuthScope.Scoped) =
-    if (scoped.scopes has OAuthScope.Web.Mod) scoped
+    if (scoped.scopes.contains(OAuthScope.Web.Mod)) scoped
     else scoped.copy(user = scoped.user.copy(roles = scoped.user.roles.filter(nonModRoles.contains)))
 
   def oauthScoped(

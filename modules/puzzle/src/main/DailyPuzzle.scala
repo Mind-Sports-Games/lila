@@ -50,11 +50,12 @@ final private[puzzle] class DailyPuzzle(
   private def findNew: Fu[Option[Puzzle]] =
     colls
       .path {
-        _.aggregateOne() { framework =>
+        _.aggregateWith[Bdoc]() { framework =>
           import framework._
-          Match(
-            pathApi.select(Puzzle.randomVariant, PuzzleTheme.short.key, PuzzleTier.Top, 100 to 1900)
-          ) -> List(
+          List(
+            Match(
+              pathApi.select(Puzzle.randomVariant, PuzzleTheme.short.key, PuzzleTier.Top, 100 to 1900)
+            ),
             Sample(3),
             Project($doc("ids" -> true, "_id" -> false)),
             UnwindField("ids"),
@@ -88,6 +89,8 @@ final private[puzzle] class DailyPuzzle(
             Limit(1)
           )
         }
+          .collect[List](maxDocs = 1)
+          .dmap(_.headOption)
       }
       .flatMap { docOpt =>
         docOpt.flatMap(PuzzleBSONReader.readOpt) so { puzzle =>

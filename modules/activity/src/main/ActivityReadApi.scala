@@ -4,6 +4,7 @@ import org.joda.time.{ DateTime, Interval }
 import reactivemongo.api.ReadPreference
 
 import lila.common.Heapsort
+import lila.common.extensions.*
 import lila.db.dsl._
 import lila.game.LightPov
 import lila.practice.PracticeStructure

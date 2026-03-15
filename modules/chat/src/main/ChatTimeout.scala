@@ -105,7 +105,7 @@ object ChatTimeout {
       "userId" -> nonEmptyText,
       "reason" -> nonEmptyText,
       "text"   -> nonEmptyText
-    )(TimeoutFormData.apply)(TimeoutFormData.unapply)
+    )(TimeoutFormData.apply)(d => Some((d.roomId, d.chan, d.userId, d.reason, d.text)))
   )
 
   case class TimeoutFormData(roomId: String, chan: String, userId: User.ID, reason: String, text: String)

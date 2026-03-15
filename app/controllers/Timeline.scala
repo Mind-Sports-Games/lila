@@ -5,6 +5,7 @@ import scala.concurrent.duration._
 
 import lila.app._
 import lila.common.config.Max
+import lila.common.extensions.*
 import lila.common.HTTPRequest
 import lila.timeline.Entry.entryWrites
 import views._

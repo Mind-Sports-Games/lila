@@ -39,7 +39,7 @@ final class Mailer(
         Chronometer.syncMon(_.email.send.time) {
           blocking {
             val (client, config) = randomClient()
-            client
+            val _ = client
               .send(
                 Email(
                   subject = msg.subject,
@@ -49,7 +49,6 @@ final class Mailer(
                   bodyHtml = msg.htmlBody map { body => Mailer.html.wrap(msg.subject, body).render }
                 )
               )
-              .discard
           }
         }
       }

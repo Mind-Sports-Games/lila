@@ -5,7 +5,7 @@ import scala.concurrent.duration._
 import strategygames.{ Clock, P1, P2 }
 import strategygames.format.Uci
 
-import lila.common.Future
+import lila.common.LilaFuture
 import lila.game.{ Game, GameRepo, UciMemo }
 import scalalib.Random.approximately
 
@@ -21,7 +21,7 @@ final class FishnetPlayer(
 
   def apply(game: Game): Funit =
     game.aiLevel so { level =>
-      Future.delay(delayFor(game) | 0.millis) {
+      LilaFuture.delay(delayFor(game) | 0.millis) {
         makeWork(game, level) addEffect redis.request void
       }
     } recover { case e: Exception =>

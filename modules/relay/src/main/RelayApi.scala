@@ -32,13 +32,16 @@ final class RelayApi(
 
   def byIdWithTour(id: RelayRound.Id): Fu[Option[RelayRound.WithTour]] =
     roundRepo.coll
-      .aggregateOne() { framework =>
+      .aggregateWith[Bdoc]() { framework =>
         import framework._
-        Match($id(id)) -> List(
+        List(
+          Match($id(id)),
           PipelineOperator(tourRepo lookup "tourId"),
           UnwindField("tour")
         )
       }
+      .collect[List](maxDocs = 1)
+      .dmap(_.headOption)
       .map(_ flatMap readRoundWithTour)
 
   def byIdAndContributor(id: RelayRound.Id, me: User) =
@@ -82,9 +85,10 @@ final class RelayApi(
 
   def officialActive: Fu[List[RelayTour.ActiveWithNextRound]] =
     tourRepo.coll
-      .aggregateList(20) { framework =>
+      .aggregateWith[Bdoc]() { framework =>
         import framework._
-        Match(tourRepo.selectors.official ++ tourRepo.selectors.active) -> List(
+        List(
+          Match(tourRepo.selectors.official ++ tourRepo.selectors.active),
           PipelineOperator(
             $doc(
               "$lookup" -> $doc(
@@ -112,6 +116,7 @@ final class RelayApi(
           UnwindField("round")
         )
       }
+      .collect[List](maxDocs = 20)
       .map { docs =>
         for {
           doc   <- docs
@@ -133,13 +138,15 @@ final class RelayApi(
 
   def fetchWithTours(query: Bdoc, maxDocs: Int, readPreference: ReadPreference = ReadPreference.primary) =
     roundRepo.coll
-      .aggregateList(maxDocs, readPreference) { framework =>
+      .aggregateWith[Bdoc](readPreference = readPreference) { framework =>
         import framework._
-        Match(query) -> List(
+        List(
+          Match(query),
           PipelineOperator(tourRepo lookup "tourId"),
           UnwindField("tour")
         )
       }
+      .collect[List](maxDocs = maxDocs)
       .map(_ flatMap readRoundWithTour)
 
   def tourCreate(data: RelayTourForm.Data, user: User): Fu[RelayTour] = {

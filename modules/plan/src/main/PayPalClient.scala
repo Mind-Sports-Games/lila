@@ -9,6 +9,7 @@ import play.api.libs.ws.{ StandaloneWSClient, StandaloneWSResponse }
 import scala.concurrent.duration._
 
 import lila.common.config
+import lila.common.extensions.*
 import lila.memo.CacheApi
 import lila.user.User
 import play.api.libs.ws.StandaloneWSRequest
@@ -114,10 +115,11 @@ final private class PayPalClient(
 
   private val plansPerPage = 20
 
+  private implicit val plansReads: Reads[List[PayPalPlan]] = (__ \ "plans").read[List[PayPalPlan]]
+
   def getPlans(page: Int = 1): Fu[List[PayPalPlan]] =
-    get(s"${path.plans}?product_id=$patronMonthProductId&page_size=$plansPerPage&page=$page") {
-      (__ \ "plans").read[List[PayPalPlan]]
-    }.flatMap { plans =>
+    get[List[PayPalPlan]](s"${path.plans}?product_id=$patronMonthProductId&page_size=$plansPerPage&page=$page")
+    .flatMap { plans =>
       if (plans.size == plansPerPage) getPlans(page + 1).map(plans ::: _)
       else fuccess(plans)
     }.map(_.filter(_.active))
@@ -210,10 +212,10 @@ final private class PayPalClient(
         .post(Map("grant_type" -> Seq("client_credentials")))
         .flatMap {
           case res if res.status != 200 =>
-            fufail(s"PayPal access token ${res.statusText} ${res.body take 200}")
+            fufail(s"PayPal access token ${res.statusText} ${res.body.toString.take(200)}")
           case res =>
             (res.body[JsValue] \ "access_token").validate[String] match {
-              case JsError(err)        => fufail(s"PayPal access token ${err} ${res.body take 200}")
+              case JsError(err)        => fufail(s"PayPal access token ${err} ${res.body.toString.take(200)}")
               case JsSuccess(token, _) => fuccess(AccessToken(token))
             }
         }

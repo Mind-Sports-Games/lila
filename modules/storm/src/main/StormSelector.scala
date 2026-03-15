@@ -3,6 +3,7 @@ package lila.storm
 import scala.concurrent.duration._
 import scala.concurrent.ExecutionContext
 
+import lila.common.extensions.*
 import lila.db.dsl._
 import lila.memo.CacheApi
 import lila.puzzle.PuzzleColls
@@ -48,7 +49,7 @@ final class StormSelector(colls: PuzzleColls, cacheApi: CacheApi)(implicit ec: E
       .buildAsyncFuture { _ =>
         colls
           .path {
-            _.aggregateList(poolSize) { framework =>
+            _.aggregateWith[Bdoc]() { framework =>
               import framework._
               val fenPlayerIndexRegex = $doc(
                 "$regexMatch" -> $doc(
@@ -56,7 +57,7 @@ final class StormSelector(colls: PuzzleColls, cacheApi: CacheApi)(implicit ec: E
                   "regex" -> { if (scala.util.Random.nextBoolean()) " w " else " b " }
                 )
               )
-              Facet(
+              List(Facet(
                 ratingBuckets.map { case (rating, nbPuzzles) =>
                   rating.toString -> List(
                     Match(
@@ -104,13 +105,15 @@ final class StormSelector(colls: PuzzleColls, cacheApi: CacheApi)(implicit ec: E
                     ReplaceRootField("puzzle")
                   )
                 }
-              ) -> List(
+              ),
                 Project($doc("all" -> $doc("$setUnion" -> ratingBuckets.map(r => s"$$${r._1}")))),
                 UnwindField("all"),
                 ReplaceRootField("all"),
                 Sort(Ascending("rating"))
               )
-            }.map {
+            }
+              .collect[List](maxDocs = poolSize)
+              .map {
               _.flatMap(StormPuzzleBSONReader.readOpt)
             }
           }

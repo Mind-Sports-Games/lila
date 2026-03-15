@@ -8,6 +8,7 @@ import scala.concurrent.duration._
 
 import lila.common.Bus
 import lila.common.LilaStream
+import lila.common.extensions.*
 import lila.db.dsl._
 import lila.game.{ Game, Pov }
 import reactivemongo.api.bson.BSONDocumentHandler

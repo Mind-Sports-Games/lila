@@ -6,6 +6,7 @@ import play.api.data.Form
 
 import lila.api.Context
 import lila.bookmark.BookmarkApi
+import lila.common.extensions.*
 import lila.forum.PostApi
 import lila.game.Crosstable
 import lila.relation.RelationApi

@@ -18,7 +18,7 @@ object OAuthForm {
       mapping(
         "description" -> text(minLength = 3, maxLength = 140),
         "scopes"      -> scopesField
-      )(Data.apply)(Data.unapply)
+      )(Data.apply)(d => Some((d.description, d.scopes)))
     )
 
     def create = form
@@ -48,7 +48,7 @@ object OAuthForm {
         "description" -> optional(nonEmptyText(maxLength = 400)),
         "homepageUri" -> absoluteUrl,
         "redirectUri" -> absoluteUrl
-      )(Data.apply)(Data.unapply)
+      )(Data.apply)(d => Some((d.name, d.description, d.homepageUri, d.redirectUri)))
     )
 
     def create = form

@@ -7,6 +7,7 @@ import reactivemongo.api.ReadPreference
 import scala.concurrent.duration._
 
 import lila.common.config._
+import lila.common.extensions.*
 import lila.common.Json.jodaWrites
 import lila.common.LightUser
 import lila.common.paginator._
@@ -58,15 +59,18 @@ final class MsgCompat(
     _.expireAfterWrite(10 seconds)
       .buildAsyncFuture[User.ID, Int] { userId =>
         colls.thread
-          .aggregateOne(ReadPreference.secondaryPreferred) { framework =>
+          .aggregateWith[Bdoc](readPreference = ReadPreference.secondaryPreferred) { framework =>
             import framework._
-            Match($doc("users" -> userId, "del" $ne userId)) -> List(
+            List(
+              Match($doc("users" -> userId, "del" $ne userId)),
               Sort(Descending("lastMsg.date")),
               Limit(maxPerPage.value),
               Match($doc("lastMsg.read" -> false, "lastMsg.user" $ne userId)),
               Count("nb")
             )
           }
+          .collect[List](maxDocs = 1)
+          .dmap(_.headOption)
           .map(~_.flatMap(_.getAsOpt[Int]("nb")))
       }
   }
@@ -102,7 +106,7 @@ final class MsgCompat(
           ),
         "subject" -> text(minLength = 3, maxLength = 100),
         "text"    -> text(minLength = 3, maxLength = 8000)
-      )(ThreadData.apply)(ThreadData.unapply)
+      )(ThreadData.apply)(d => Some((d.user, d.subject, d.text)))
     ).bindFromRequest()
       .fold(
         err => Left(err),

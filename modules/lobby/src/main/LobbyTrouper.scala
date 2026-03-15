@@ -7,6 +7,7 @@ import scala.concurrent.duration._
 import scala.concurrent.Promise
 
 import lila.common.config.Max
+import lila.common.extensions.*
 import lila.common.{ AtMost, Bus, Every }
 import lila.game.Game
 import lila.hub.Trouper

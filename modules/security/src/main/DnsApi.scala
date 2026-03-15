@@ -7,6 +7,7 @@ import scala.concurrent.duration._
 
 import lila.base.LilaException
 import lila.common.Domain
+import lila.common.extensions.*
 import lila.db.dsl._
 import reactivemongo.api.bson.BSONHandler
 
@@ -26,7 +27,7 @@ final private class DnsApi(
     }
 
   implicit private val DomainBSONHandler: BSONHandler[Domain] =
-    stringAnyValHandler[Domain](_.value, Domain.apply)
+    stringAnyValHandler[Domain](_.value, Domain.unsafe)
 
   private val mxCache = mongoCache.only[Domain.Lower, List[Domain]](
     "security.mx",
@@ -36,7 +37,7 @@ final private class DnsApi(
     fetch(domain, "mx") {
       _ take 20 flatMap { obj =>
         (obj \ "data").asOpt[String].map(_ split ' ') collect { case Array(_, domain) =>
-          Domain {
+          Domain.unsafe {
             if (domain endsWith ".") domain.init
             else domain
           }
@@ -49,7 +50,7 @@ final private class DnsApi(
     ws.url(config.url)
       .withQueryStringParameters("name" -> domain.value, "type" -> tpe)
       .withHttpHeaders("Accept" -> "application/dns-json")
-      .get() withTimeout config.timeout map {
+      .get().withTimeout(config.timeout, "DnsApi fetch") map {
       case res if res.status == 200 || res.status == 404 =>
         f(~(res.body[JsValue] \ "Answer").asOpt[List[JsObject]])
       case res => throw LilaException(s"Status ${res.status}")

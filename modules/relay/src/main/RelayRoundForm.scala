@@ -26,7 +26,7 @@ final class RelayRoundForm {
       "syncUrlRound" -> optional(number(min = 1, max = 999)),
       "startsAt"     -> optional(ISODateTimeOrTimestamp.isoDateTimeOrTimestamp),
       "throttle"     -> optional(number(min = 2, max = 60))
-    )(Data.apply)(Data.unapply)
+    )(Data.apply)(d => Some((d.name, d.syncUrl, d.syncUrlRound, d.startsAt, d.throttle)))
       .verifying("This source requires a round number. See the new form field below.", !_.roundMissing)
 
   def create(trs: RelayTour.WithRounds) = Form {

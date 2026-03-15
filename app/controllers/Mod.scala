@@ -10,6 +10,7 @@ import views._
 import lila.api.{ BodyContext, Context }
 import lila.app._
 import lila.chat.Chat
+import lila.common.extensions.*
 import lila.common.{ EmailAddress, HTTPRequest, IpAddress }
 import lila.mod.UserSearch
 import lila.report.{ Suspect, Mod => AsMod }

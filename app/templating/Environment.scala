@@ -4,6 +4,7 @@ package templating
 import scala.concurrent.duration._
 
 import lila.app.ui.ScalatagsTemplate._
+import lila.common.extensions.*
 
 object Environment
     extends lila.Lilaisms

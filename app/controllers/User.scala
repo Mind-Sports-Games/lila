@@ -15,6 +15,7 @@ import views._
 import lila.api.{ BodyContext, Context }
 import lila.app._
 import lila.app.mashup.{ GameFilter, GameFilterMenu }
+import lila.common.extensions.*
 import lila.common.paginator.Paginator
 import lila.common.{ HTTPRequest, IpAddress }
 import lila.game.{ Pov, Game => GameModel }

@@ -31,11 +31,11 @@ final class GarbageCollector(
   def delay(user: User, email: EmailAddress, req: RequestHeader): Unit =
     if (user.createdAt.isAfter(DateTime.now minusDays 3)) {
       val ip = HTTPRequest ipAddress req
-      scheduler
+      val _ = scheduler
         .scheduleOnce(6 seconds) {
           val applyData = ApplyData(user, ip, email, req)
           logger.debug(s"delay $applyData")
-          lila.common.Future
+          lila.common.LilaFuture
             .retry(
               () => ensurePrintAvailable(applyData),
               delay = 10 seconds,
@@ -45,7 +45,6 @@ final class GarbageCollector(
             .recoverDefault >> apply(applyData)
           ()
         }
-        .discard
     }
 
   private def ensurePrintAvailable(data: ApplyData): Funit =
@@ -72,7 +71,7 @@ final class GarbageCollector(
               case _ =>
                 badOtherAccounts(spy.otherUsers.map(_.user)) so { others =>
                   logger.debug(s"other ${data.user.username} others=${others.map(_.username)}")
-                  lila.common.Future
+                  lila.common.LilaFuture
                     .exists(spy.ips)(ipTrust.isSuspicious)
                     .map {
                       _ so collect(
@@ -89,7 +88,7 @@ final class GarbageCollector(
 
   private def badOtherAccounts(accounts: List[User]): Option[List[User]] = {
     val others = accounts
-      .sortBy(-_.createdAt.getSeconds)
+      .sortBy(-_.createdAt.getMillis / 1000)
       .takeWhile(_.createdAt.isAfter(DateTime.now minusDays 10))
       .take(4)
     (others.sizeIs > 1 && others.forall(isBadAccount) && others.headOption.exists(_.disabled)) option others
@@ -108,11 +107,9 @@ final class GarbageCollector(
       slack.garbageCollector(message).andDo {
         if (armed) {
           doInitialSb(user)
-          scheduler
-            .scheduleOnce(wait) {
+          val _ = scheduler.scheduleOnce(wait) {
               doCollect(user)
             }
-            .discard
         }
       }
     }

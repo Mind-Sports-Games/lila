@@ -33,6 +33,8 @@ final class Env(
     scheduler: Scheduler
 ) {
   import net.{ baseUrl, domain }
+  implicit private val netDomain: NetDomain = domain
+  implicit private val netBaseUrl: BaseUrl = baseUrl
 
   private val config = appConfig.get[SecurityConfig]("security")(SecurityConfig.loader)
 
@@ -163,7 +165,7 @@ final class Env(
   lazy val tor: Tor = wire[Tor]
 
   if (config.tor.enabled) {
-    scheduler.scheduleOnce(31 seconds)(tor.refresh.unit)
+    scheduler.scheduleOnce(31 seconds)(tor.refresh.discard)
     scheduler.scheduleWithFixedDelay(config.tor.refreshDelay, config.tor.refreshDelay) { () =>
       tor.refresh flatMap firewall.unblockIps
       ()

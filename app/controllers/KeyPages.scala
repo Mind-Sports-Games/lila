@@ -6,6 +6,7 @@ import scalatags.Text.all.Frag
 
 import lila.api.Context
 import lila.app._
+import lila.common.extensions.*
 import lila.memo.CacheApi._
 import views._
 

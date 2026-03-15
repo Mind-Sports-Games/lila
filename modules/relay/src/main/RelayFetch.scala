@@ -13,6 +13,7 @@ import scala.concurrent.duration._
 import strategygames.variant.Variant
 import strategygames.chess.variant.{ Variant => ChessVariant }
 import lila.base.LilaException
+import lila.common.extensions.*
 import lila.memo.CacheApi
 import lila.study.MultiPgn
 import lila.tree.Node.Comments

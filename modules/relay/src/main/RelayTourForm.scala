@@ -22,7 +22,7 @@ final class RelayTourForm {
       "description" -> cleanText(minLength = 3, maxLength = 400),
       "markup"      -> optional(cleanText(maxLength = 20000)),
       "official"    -> optional(boolean)
-    )(Data.apply)(Data.unapply)
+    )(Data.apply)(d => Some((d.name, d.description, d.markup, d.official)))
   )
 
   def create = form

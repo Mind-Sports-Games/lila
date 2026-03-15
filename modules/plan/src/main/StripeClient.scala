@@ -138,7 +138,7 @@ final private class StripeClient(
     }
 
   private def getList[A: Reads](url: String, queryString: (String, Any)*): Fu[List[A]] =
-    get[List[A]](url, queryString)(listReader[A])
+    get[List[A]](url, queryString)(using listReader[A])
 
   private def postOne[A: Reads](url: String, data: (String, Any)*): Fu[A] = post[A](url, data)
 

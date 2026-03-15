@@ -55,6 +55,6 @@ object Switch {
       "amount" -> bigDecimal(precision = 10, scale = 2)
         .verifying(_ >= 1)
         .verifying(_ <= 10000)
-    )(Switch.apply)(Switch.unapply)
+    )(Switch.apply)(d => Some(d.amount))
   )
 }

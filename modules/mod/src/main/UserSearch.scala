@@ -47,6 +47,6 @@ object UserSearch {
     mapping(
       "q"  -> nonEmptyText,
       "as" -> optional(nonEmptyText.verifying(asValues contains _))
-    )(Query.apply)(Query.unapply)
+    )(Query.apply)(d => Some((d.q, d.as)))
   )
 }

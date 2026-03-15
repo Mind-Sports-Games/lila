@@ -3,6 +3,7 @@ package lila.swiss
 import reactivemongo.api.bson._
 import scala.concurrent.duration._
 
+import lila.common.extensions.*
 import lila.db.dsl._
 
 import strategygames.tiebreaks.{ Player => TiebreakPlayer, Result => TiebreakResult, Tiebreak, Tournament }

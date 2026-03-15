@@ -11,6 +11,7 @@ import scala.util.chaining._
 
 import lila.chat.Chat
 import lila.common.config.MaxPerSecond
+import lila.common.extensions.*
 import lila.common.{ Bus, GreatPlayer, LightUser }
 import lila.db.dsl._
 import lila.game.{ Game, Handicaps, Pov }
@@ -450,34 +451,37 @@ final class SwissApi(
     Bus
       .ask[List[TeamID]]("teamJoinedBy")(lila.hub.actorApi.team.TeamIdsJoinedBy(userId, _))
       .flatMap { teamIds =>
-        colls.swiss.aggregateList(100) { framework =>
-          import framework._
-          Match($doc("teamId" $in teamIds, "featurable" -> true)) -> List(
-            PipelineOperator(
-              $doc(
-                "$lookup" -> $doc(
-                  "as"   -> "player",
-                  "from" -> colls.player.name,
-                  "let"  -> $doc("s" -> "$_id"),
-                  "pipeline" -> $arr(
-                    $doc(
-                      "$match" -> $doc(
-                        "$expr" -> $doc(
-                          "$and" -> $arr(
-                            $doc("$eq" -> $arr("$u", userId)),
-                            $doc("$eq" -> $arr("$s", "$$s"))
+        colls.swiss
+          .aggregateWith[Bdoc]() { framework =>
+            import framework._
+            List(
+              Match($doc("teamId" $in teamIds, "featurable" -> true)),
+              PipelineOperator(
+                $doc(
+                  "$lookup" -> $doc(
+                    "as"   -> "player",
+                    "from" -> colls.player.name,
+                    "let"  -> $doc("s" -> "$_id"),
+                    "pipeline" -> $arr(
+                      $doc(
+                        "$match" -> $doc(
+                          "$expr" -> $doc(
+                            "$and" -> $arr(
+                              $doc("$eq" -> $arr("$u", userId)),
+                              $doc("$eq" -> $arr("$s", "$$s"))
+                            )
                           )
                         )
                       )
                     )
                   )
                 )
-              )
-            ),
-            Match("player" $ne $arr()),
-            Project($id(true))
-          )
-        }
+              ),
+              Match("player" $ne $arr()),
+              Project($id(true))
+            )
+          }
+          .collect[List](maxDocs = 100)
       }
       .map(_.flatMap(_.getAsOpt[Swiss.Id]("_id")))
       .flatMap { kickFromSwissIds(userId, _) }
@@ -924,10 +928,11 @@ final class SwissApi(
   private[swiss] def checkOngoingGames: Funit =
     SwissPairing
       .fields { f =>
-        colls.pairing.ext
-          .aggregateList(100) { framework =>
+        colls.pairing
+          .aggregateWith[Bdoc]() { framework =>
             import framework._
-            Match($doc(f.status -> SwissPairing.ongoing)) -> List(
+            List(
+              Match($doc(f.status -> SwissPairing.ongoing)),
               GroupField(f.swissId)(
                 "ids" -> Push(
                   $doc(
@@ -942,6 +947,7 @@ final class SwissApi(
               )
             )
           }
+          .collect[List](maxDocs = 100)
       }
       .map {
         _.flatMap { doc =>
@@ -983,9 +989,10 @@ final class SwissApi(
 
   def withdrawAll(user: User, teamIds: List[TeamID]): Funit =
     colls.swiss
-      .aggregateList(Int.MaxValue, readPreference = ReadPreference.secondaryPreferred) { implicit framework =>
+      .aggregateWith[Bdoc](readPreference = ReadPreference.secondaryPreferred) { implicit framework =>
         import framework._
-        Match($doc("finishedAt" $exists false, "nbPlayers" $gt 0, "teamId" $in teamIds)) -> List(
+        List(
+          Match($doc("finishedAt" $exists false, "nbPlayers" $gt 0, "teamId" $in teamIds)),
           PipelineOperator(
             $doc(
               "$lookup" -> $doc(
@@ -1011,6 +1018,7 @@ final class SwissApi(
           Project($id(true))
         )
       }
+      .collect[List](maxDocs = Int.MaxValue)
       .map(_.flatMap(_.getAsOpt[Swiss.Id]("_id")))
       .flatMap {
         ids => Future.sequence(ids.map { withdraw(_, user.id) }).void

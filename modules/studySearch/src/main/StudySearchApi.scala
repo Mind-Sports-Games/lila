@@ -8,6 +8,7 @@ import org.joda.time.format.DateTimeFormat
 import play.api.libs.json._
 import scala.concurrent.duration._
 
+import lila.common.extensions.*
 import lila.hub.LateMultiThrottler
 import lila.search._
 import lila.study.{ Chapter, ChapterRepo, RootOrNode, Study, StudyRepo }

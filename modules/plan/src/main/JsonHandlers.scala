@@ -44,7 +44,9 @@ private[plan] object JsonHandlers {
   }
 
   object payPal {
-    import play.api.libs.json.JodaReads._
+    implicit val jodaDateTimeReads: Reads[org.joda.time.DateTime] = Reads[org.joda.time.DateTime] { json =>
+      json.validate[String].map(org.joda.time.DateTime.parse)
+    }
     implicit val PayerIdReads: Reads[PayPalPayerId]               = Reads.of[String].map(PayPalPayerId)
     implicit val OrderIdReads: Reads[PayPalOrderId]               = Reads.of[String].map(PayPalOrderId)
     implicit val SubscriptionIdReads: Reads[PayPalSubscriptionId] = Reads.of[String].map(PayPalSubscriptionId)

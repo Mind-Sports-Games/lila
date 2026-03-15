@@ -7,6 +7,7 @@ import play.api.libs.ws.JsonBodyReadables._
 import scala.concurrent.duration._
 
 import lila.common.Domain
+import lila.common.extensions.*
 import lila.db.dsl._
 
 /* An expensive API detecting disposable email.
@@ -76,7 +77,7 @@ final private class CheckMail(
           logger.info(s"CheckMail $domain = $ok ($reason) {valid:$valid,block:$block,disposable:$disposable}")
           ok
         case res =>
-          throw lila.base.LilaException(s"${config.url} $domain ${res.status} ${res.body take 200}")
+          throw lila.base.LilaException(s"${config.url} $domain ${res.status} ${res.body.toString.take(200)}")
       }
       .monTry(res => _.security.checkMailApi.fetch(res.isSuccess, res.getOrElse(true)))
 

@@ -3,6 +3,7 @@ package lila.study
 import alleycats.Zero
 import scala.concurrent.duration._
 
+import lila.common.extensions.*
 import lila.hub.DuctSequencers
 
 final private class StudySequencer(

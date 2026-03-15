@@ -7,6 +7,7 @@ import play.api.libs.ws.StandaloneWSClient
 import scala.concurrent.duration._
 
 import lila.common.IpAddress
+import lila.common.extensions.*
 
 trait Ip2Proxy {
 
@@ -55,7 +56,7 @@ final class Ip2ProxyServer(
   private def batch(ips: Seq[IpAddress]): Fu[Seq[Boolean]] =
     ips.take(50) match { // 50 * ipv6 length < max url length
       case Nil      => fuccess(Seq.empty[Boolean])
-      case List(ip) => apply(ip).dmap(Seq(_))
+      case Seq(ip) => apply(ip).dmap(Seq(_))
       case ips =>
         Future.sequence(ips.flatMap(cache.getIfPresent)) flatMap { cached =>
           if (cached.sizeIs == ips.size) fuccess(cached)

@@ -4,6 +4,8 @@ import org.apache.pekko.actor._
 import org.apache.pekko.stream.scaladsl._
 import scala.concurrent.duration._
 
+import lila.common.extensions.*
+
 final private class CreatedOrganizer(
     api: TournamentApi,
     tournamentRepo: TournamentRepo,

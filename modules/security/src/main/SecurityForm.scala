@@ -6,6 +6,7 @@ import play.api.data.validation.Constraints
 import scala.concurrent.duration._
 
 import lila.common.{ EmailAddress, LameName, Form => LilaForm }
+import lila.common.extensions.*
 import lila.user.{ TotpSecret, User, UserRepo }
 import User.{ ClearPassword, TotpToken }
 
@@ -76,7 +77,7 @@ final class SecurityForm(
       "nice"       -> agreementBool,
       "account"    -> agreementBool,
       "policy"     -> agreementBool
-    )(AgreementData.apply)(AgreementData.unapply)
+    )(AgreementData.apply)(d => Some((d.assistance, d.nice, d.account, d.policy)))
 
     val emailField = withAcceptableDns(acceptableUniqueEmail(none))
 
@@ -125,7 +126,7 @@ final class SecurityForm(
     mapping(
       "newPasswd1" -> nonEmptyText(minLength = passwordMinLength),
       "newPasswd2" -> nonEmptyText(minLength = passwordMinLength)
-    )(PasswordResetConfirm.apply)(PasswordResetConfirm.unapply).verifying(
+    )(PasswordResetConfirm.apply)(d => Some((d.newPasswd1, d.newPasswd2))).verifying(
       "newPasswordsDontMatch",
       _.samePasswords
     )
@@ -148,7 +149,7 @@ final class SecurityForm(
           "email" -> withAcceptableDns {
             acceptableUniqueEmail(candidate.user.some).verifying(emailValidator differentConstraint old)
           }
-        )(ChangeEmail.apply)(ChangeEmail.unapply)
+        )(ChangeEmail.apply)(d => Some((d.passwd, d.email)))
       ).fill(
         ChangeEmail(
           passwd = "",
@@ -164,7 +165,7 @@ final class SecurityForm(
           "secret" -> nonEmptyText,
           "passwd" -> passwordMapping(candidate),
           "token"  -> nonEmptyText
-        )(TwoFactor.apply)(TwoFactor.unapply).verifying(
+        )(TwoFactor.apply)(d => Some((d.secret, d.passwd, d.token))).verifying(
           "invalidAuthenticationCode",
           _.tokenValid
         )

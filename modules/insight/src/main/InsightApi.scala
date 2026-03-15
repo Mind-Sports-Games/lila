@@ -1,5 +1,6 @@
 package lila.insight
 
+import lila.common.extensions.*
 import lila.game.{ Game, GameRepo, Pov }
 import lila.user.User
 import org.joda.time.DateTime

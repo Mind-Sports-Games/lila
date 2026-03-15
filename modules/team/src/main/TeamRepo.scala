@@ -105,9 +105,10 @@ final class TeamRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionCont
 
   def countRequestsOfLeader(userId: User.ID, requestColl: Coll): Fu[Int] =
     coll
-      .aggregateOne(readPreference = ReadPreference.secondaryPreferred) { implicit framework =>
+      .aggregateWith[Bdoc](readPreference = ReadPreference.secondaryPreferred) { implicit framework =>
         import framework._
-        Match($doc("leaders" -> userId)) -> List(
+        List(
+          Match($doc("leaders" -> userId)),
           PipelineOperator(
             $doc(
               "$lookup" -> $doc(
@@ -123,6 +124,8 @@ final class TeamRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionCont
           )
         )
       }
+      .collect[List](maxDocs = 1)
+      .dmap(_.headOption)
       .map(~_.flatMap(_.int("nb")))
 
   private[team] val enabledSelect = $doc("enabled" -> true)

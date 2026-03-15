@@ -13,6 +13,7 @@ import scala.util.chaining._
 import scala.concurrent.Future
 
 import lila.common.config.{ MaxPerPage, MaxPerSecond }
+import lila.common.extensions.*
 import lila.common.paginator.Paginator
 import lila.common.{ Bus, Debouncer, LightUser }
 import lila.game.{ Game, GameRepo, Handicaps, LightPov, Pov }

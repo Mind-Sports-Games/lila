@@ -81,7 +81,7 @@ object ServerEval {
           case Study.WithChapter(_, chapter) => {
             implicit val variant = chapter.root.variant
             (complete so chapterRepo.completeServerEval(chapter)) >> {
-              lila.common.Future
+              lila.common.LilaFuture
                 .fold(chapter.root.mainline.zip(analysis.infoAdvices).toList)(Path.root) {
                   case (path, (node, (info, advOpt))) =>
                     chapter.root.nodeAt(path).flatMap { parent =>

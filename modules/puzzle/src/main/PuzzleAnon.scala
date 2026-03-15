@@ -4,6 +4,7 @@ import scala.concurrent.duration._
 import scala.concurrent.ExecutionContext
 
 import lila.common.ThreadLocalRandom
+import lila.common.extensions.*
 import lila.db.dsl._
 import lila.memo.CacheApi
 
@@ -58,9 +59,10 @@ final class PuzzleAnon(
             val ratingRange: Range = 0 to 9999
             val pathSampleSize     = 15
             colls.path {
-              _.aggregateList(poolSize) { framework =>
+              _.aggregateWith[Bdoc]() { framework =>
                 import framework._
-                Match(pathApi.select(variant, theme, tier, ratingRange)) -> List(
+                List(
+                  Match(pathApi.select(variant, theme, tier, ratingRange)),
                   Sample(pathSampleSize),
                   Project($doc("puzzleId" -> "$ids", "_id" -> false)),
                   Unwind("puzzleId"),
@@ -81,7 +83,9 @@ final class PuzzleAnon(
                     )
                   )
                 )
-              }.map {
+              }
+                .collect[List](maxDocs = poolSize)
+                .map {
                 _.view.flatMap(PuzzleBSONReader.readOpt).toVector
               }
             }

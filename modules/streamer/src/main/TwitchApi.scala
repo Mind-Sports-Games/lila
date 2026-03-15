@@ -7,6 +7,7 @@ import play.api.libs.ws.StandaloneWSClient
 import scala.concurrent.ExecutionContext
 
 import lila.common.config.Secret
+import lila.common.extensions.*
 
 final private class TwitchApi(ws: StandaloneWSClient, config: TwitchConfig)(implicit ec: ExecutionContext) {
 

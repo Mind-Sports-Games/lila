@@ -4,7 +4,7 @@ import play.api.libs.json._
 import reactivemongo.api.bson._
 import scala.concurrent.duration._
 
-import lila.common.Future
+import lila.common.LilaFuture
 import lila.db.AsyncColl
 import lila.db.dsl._
 import lila.user.User
@@ -150,7 +150,7 @@ final class StudyTopicApi(topicRepo: StudyTopicRepo, userTopicRepo: StudyUserTop
   )
 
   def recompute(): Unit =
-    recomputeWorkQueue(Future.makeItLast(60 seconds)(recomputeNow)).recover {
+    recomputeWorkQueue(LilaFuture.makeItLast(60 seconds)(recomputeNow)).recover {
       case _: lila.hub.BoundedDuct.EnqueueException => ()
       case e: Exception                             => logger.warn("Can't recompute study topics!", e)
     }.discard

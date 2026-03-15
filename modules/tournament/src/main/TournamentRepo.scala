@@ -106,9 +106,10 @@ final class TournamentRepo(val coll: Coll, playerCollName: CollName)(implicit
 
   private[tournament] def upcomingAdapterExpensiveCacheMe(userId: User.ID, max: Int) =
     coll
-      .aggregateList(max, readPreference = ReadPreference.secondaryPreferred) { implicit framework =>
+      .aggregateWith[Bdoc](readPreference = ReadPreference.secondaryPreferred) { implicit framework =>
         import framework._
-        Match(enterableSelect ++ nonEmptySelect) -> List(
+        List(
+          Match(enterableSelect ++ nonEmptySelect),
           PipelineOperator(
             $doc(
               "$lookup" -> $doc(
@@ -136,6 +137,7 @@ final class TournamentRepo(val coll: Coll, playerCollName: CollName)(implicit
           Limit(max)
         )
       }
+      .collect[List](maxDocs = max)
       .map(_.flatMap(_.asOpt[Tournament]))
       .dmap { new lila.db.paginator.StaticAdapter(_) }
 
@@ -190,9 +192,10 @@ final class TournamentRepo(val coll: Coll, playerCollName: CollName)(implicit
       teamId: Option[TeamID] = None
   ): Fu[List[Tournament.ID]] =
     coll
-      .aggregateList(Int.MaxValue, readPreference = ReadPreference.secondaryPreferred) { implicit framework =>
+      .aggregateWith[Bdoc](readPreference = ReadPreference.secondaryPreferred) { implicit framework =>
         import framework._
-        Match(enterableSelect ++ nonEmptySelect ++ teamId.so(forTeamSelect)) -> List(
+        List(
+          Match(enterableSelect ++ nonEmptySelect ++ teamId.so(forTeamSelect)),
           PipelineOperator(
             $doc(
               "$lookup" -> $doc(
@@ -218,6 +221,7 @@ final class TournamentRepo(val coll: Coll, playerCollName: CollName)(implicit
           Project($id(true))
         )
       }
+      .collect[List](maxDocs = Int.MaxValue)
       .map(_.flatMap(_.string("_id")))
 
   def setStatus(tourId: Tournament.ID, status: Status) =

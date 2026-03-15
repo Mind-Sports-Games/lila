@@ -5,6 +5,7 @@ import play.api.data.Forms._
 import scala.concurrent.duration._
 
 import lila.common.Form.{ cleanNonEmptyText, cleanText }
+import lila.common.extensions.*
 import lila.user.User
 
 final class ClasForm(
@@ -30,7 +31,7 @@ final class ClasForm(
             }
           }
         )
-      )(ClasData.apply)(ClasData.unapply)
+      )(ClasData.apply)(d => Some((d.name, d.desc, d.teachers)))
     )
 
     def create = form
@@ -54,7 +55,7 @@ final class ClasForm(
         mapping(
           "create-username" -> securityForms.signup.username,
           "create-realName" -> cleanNonEmptyText(maxLength = 100)
-        )(NewStudent.apply)(NewStudent.unapply)
+        )(NewStudent.apply)(d => Some((d.username, d.realName)))
       )
 
     def generate: Fu[Form[NewStudent]] =
@@ -73,7 +74,7 @@ final class ClasForm(
             .verifying("Unknown username", { blockingFetchUser(_).isDefined })
             .verifying("This is a teacher", u => !c.teachers.toList.contains(u.toLowerCase)),
           "realName" -> cleanNonEmptyText
-        )(NewStudent.apply)(NewStudent.unapply)
+        )(NewStudent.apply)(d => Some((d.username, d.realName)))
       )
 
     def edit(s: Student) =
@@ -81,7 +82,7 @@ final class ClasForm(
         mapping(
           "realName" -> cleanNonEmptyText,
           "notes"    -> text(maxLength = 20000)
-        )(StudentData.apply)(StudentData.unapply)
+        )(StudentData.apply)(d => Some((d.realName, d.notes)))
       ) fill StudentData(s.realName, s.notes)
 
     def release =
@@ -95,7 +96,7 @@ final class ClasForm(
       Form(
         mapping(
           "realNames" -> cleanNonEmptyText
-        )(ManyNewStudent.apply)(ManyNewStudent.unapply).verifying(
+        )(ManyNewStudent.apply)(d => Some(d.realNamesText)).verifying(
           s"There can't be more than ${lila.clas.Clas.maxStudents} per class. Split the students into more classes.",
           _.realNames.lengthIs <= max
         )

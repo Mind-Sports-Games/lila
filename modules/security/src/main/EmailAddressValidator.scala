@@ -4,6 +4,7 @@ import play.api.data.validation._
 import scala.concurrent.duration._
 
 import lila.common.EmailAddress
+import lila.common.extensions.*
 import lila.user.{ User, UserRepo }
 
 /** Validate and normalize emails
@@ -58,7 +59,7 @@ final class EmailAddressValidator(
 
   def differentConstraint(than: Option[EmailAddress]) =
     Constraint[String]("constraint.email_different") { e =>
-      if (than has EmailAddress(e))
+      if (than.contains(EmailAddress(e)))
         Invalid(ValidationError("error.email_different"))
       else Valid
     }

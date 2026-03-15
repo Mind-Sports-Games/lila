@@ -12,6 +12,7 @@ import lila.api.Context
 import lila.app._
 import lila.chat.Chat
 import lila.common.HTTPRequest
+import lila.common.extensions.*
 import lila.hub.LightTeam._
 import lila.memo.CacheApi._
 import lila.tournament.TournamentForm

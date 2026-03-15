@@ -488,12 +488,10 @@ final class GameRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionCont
       gameLimit: Int
   ): Fu[List[(User.ID, Int)]] = {
     coll
-      .aggregateList(
-        maxDocs = opponentLimit,
-        ReadPreference.secondaryPreferred
-      ) { framework =>
+      .aggregateWith[Bdoc](readPreference = ReadPreference.secondaryPreferred) { framework =>
         import framework._
-        Match($doc(F.playerUids -> userId)) -> List(
+        List(
+          Match($doc(F.playerUids -> userId)),
           Match($doc(F.playerUids -> $doc("$size" -> 2))),
           Sort(Descending(F.createdAt)),
           Limit(gameLimit), // only look in the last n games
@@ -510,6 +508,7 @@ final class GameRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionCont
           Limit(opponentLimit)
         )
       }
+      .collect[List](maxDocs = opponentLimit)
       .map(_.flatMap { obj =>
         obj.string(F.id) flatMap { id =>
           obj.int("gs") map { id -> _ }
@@ -576,16 +575,14 @@ final class GameRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionCont
 
   def countByMonthly: Fu[List[MonthlyGameData]] =
     coll
-      .aggregateList(
-        maxDocs = Int.MaxValue,
-        ReadPreference.secondaryPreferred
-      ) { framework =>
+      .aggregateWith[Bdoc](readPreference = ReadPreference.secondaryPreferred) { framework =>
         import framework._
-        Match(
-          $doc(
-            F.status -> $gte(30)
-          )
-        ) -> List(
+        List(
+          Match(
+            $doc(
+              F.status -> $gte(30)
+            )
+          ),
           Project(
             $doc(
               "ym" -> $doc(
@@ -622,6 +619,7 @@ final class GameRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionCont
           )
         )
       }
+      .collect[List](maxDocs = Int.MaxValue)
       .map { docs =>
         docs.flatMap { doc =>
           for {
@@ -634,16 +632,14 @@ final class GameRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionCont
 
   def calculateWinRates: Fu[List[WinRate]] =
     coll
-      .aggregateList(
-        maxDocs = Int.MaxValue,
-        ReadPreference.secondaryPreferred
-      ) { framework =>
+      .aggregateWith[Bdoc](readPreference = ReadPreference.secondaryPreferred) { framework =>
         import framework._
-        Match(
-          $doc(
-            F.status -> $gte(30)
-          )
-        ) -> List(
+        List(
+          Match(
+            $doc(
+              F.status -> $gte(30)
+            )
+          ),
           Project(
             $doc(
               "lib_var" -> $doc(
@@ -696,6 +692,7 @@ final class GameRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionCont
           Sort(Ascending(F.id))
         )
       }
+      .collect[List](maxDocs = Int.MaxValue)
       .map { docs =>
         docs.flatMap { doc =>
           for {

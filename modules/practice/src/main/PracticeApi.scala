@@ -116,12 +116,10 @@ final class PracticeApi(
 
     def completionPercent(userIds: List[User.ID]): Fu[Map[User.ID, Int]] =
       coll
-        .aggregateList(
-          maxDocs = Int.MaxValue,
-          readPreference = ReadPreference.secondaryPreferred
-        ) { framework =>
+        .aggregateWith[Bdoc](readPreference = ReadPreference.secondaryPreferred) { framework =>
           import framework._
-          Match($doc("_id" $in userIds)) -> List(
+          List(
+            Match($doc("_id" $in userIds)),
             Project(
               $doc(
                 "nb" -> $doc(
@@ -133,6 +131,7 @@ final class PracticeApi(
             )
           )
         }
+        .collect[List](maxDocs = Int.MaxValue)
         .map {
           _.view.flatMap { obj =>
             import cats.implicits._

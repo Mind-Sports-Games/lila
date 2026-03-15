@@ -45,7 +45,7 @@ object Theme extends ThemeObject {
     "horsey" -> (HexColor("f1d9b6") -> HexColor("8e6547"))
   )
 
-  lazy val default = allByName(0) get "maple" err "Can't find default theme D:"
+  val default = allByName(0) get "maple" err "Can't find default theme D:"
 
   val defaults = GameFamily.all.map(gf =>
     new Theme(
@@ -123,5 +123,5 @@ object Theme3d extends ThemeObject {
     new Theme(name, Theme.defaultHexColors, 0)
   }
 
-  lazy val default = allByName(0) get "Woodi" err "Can't find default theme D:"
+  val default = allByName(0) get "Woodi" err "Can't find default theme D:"
 }

@@ -457,17 +457,16 @@ final class PlanApi(
       .buildAsyncFuture {
         loader { _ =>
           chargeColl
-            .aggregateList(
-              maxDocs = topPatronUserIdsNb * 2,
-              readPreference = ReadPreference.secondaryPreferred
-            ) { framework =>
+            .aggregateWith[Bdoc](readPreference = ReadPreference.secondaryPreferred) { framework =>
               import framework._
-              Match($doc("userId" $exists true)) -> List(
+              List(
+                Match($doc("userId" $exists true)),
                 GroupField("userId")("total" -> SumField("cents")),
                 Sort(Descending("total")),
                 Limit(topPatronUserIdsNb * 3 / 2)
               )
             }
+            .collect[List](maxDocs = topPatronUserIdsNb * 2)
             .dmap {
               _.flatMap { _.getAsOpt[User.ID]("_id") }
             } flatMap filterUserIds dmap (_ take topPatronUserIdsNb)

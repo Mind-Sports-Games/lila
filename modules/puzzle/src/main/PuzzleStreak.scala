@@ -3,6 +3,7 @@ package lila.puzzle
 import scala.concurrent.duration._
 import scala.concurrent.ExecutionContext
 
+import lila.common.extensions.*
 import lila.db.dsl._
 import lila.memo.CacheApi
 
@@ -41,9 +42,9 @@ final class PuzzleStreakApi(colls: PuzzleColls, cacheApi: CacheApi)(implicit ec:
       .buildAsyncFuture { _ =>
         colls
           .path {
-            _.aggregateList(poolSize) { framework =>
+            _.aggregateWith[Bdoc]() { framework =>
               import framework._
-              Facet(
+              List(Facet(
                 buckets.map { case (rating, nbPuzzles) =>
                   val (tier, samples, deviation) =
                     if (rating > 2300) (PuzzleTier.Good, 5, 110) else (PuzzleTier.Top, 1, 85)
@@ -85,13 +86,15 @@ final class PuzzleStreakApi(colls: PuzzleColls, cacheApi: CacheApi)(implicit ec:
                     ReplaceRootField("puzzle")
                   )
                 }
-              ) -> List(
+              ),
                 Project($doc("all" -> $doc("$setUnion" -> buckets.map(r => s"$$${r._1}")))),
                 UnwindField("all"),
                 ReplaceRootField("all"),
                 Sort(Ascending("glicko.r"))
               )
-            }.map {
+            }
+              .collect[List](maxDocs = poolSize)
+              .map {
               _.flatMap(PuzzleBSONReader.readOpt)
             }
           }

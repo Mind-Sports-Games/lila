@@ -10,6 +10,7 @@ import scala.concurrent.Promise
 import scala.util.chaining._
 import java.io.{ PrintWriter, StringWriter }
 
+import lila.common.extensions.*
 import lila.game.Game.{ FullId, PlayerId }
 import lila.game.{ Game, GameRepo, Pov, Event, Progress, Player => GamePlayer }
 import lila.hub.actorApi.round.{

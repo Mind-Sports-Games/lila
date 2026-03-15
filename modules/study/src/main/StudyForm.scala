@@ -21,7 +21,7 @@ object StudyForm {
         "pgn"         -> optional(nonEmptyText),
         "variant"     -> optional(nonEmptyText),
         "as"          -> optional(nonEmptyText)
-      )(Data.apply)(Data.unapply)
+      )(Data.apply)(d => Some((d.gameId, d.orientationStr, d.fen, d.pgnStr, d.variantStr, d.asStr)))
         .verifying(s"Fen does not match variant given", _.validFen)
     )
 
@@ -82,7 +82,7 @@ object StudyForm {
         "initial"     -> boolean,
         "sticky"      -> boolean,
         "pgn"         -> nonEmptyText
-      )(Data.apply)(Data.unapply)
+      )(Data.apply)(d => Some((d.name, d.orientationStr, d.variantStr, d.mode, d.initial, d.sticky, d.pgn)))
     )
 
     case class Data(

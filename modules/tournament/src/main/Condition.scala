@@ -233,7 +233,7 @@ object Condition {
     val nbRatedGame = mapping(
       "perf" -> optional(text.verifying(perfKeys.contains _)),
       "nb"   -> numberIn(nbRatedGameChoices)
-    )(NbRatedGameSetup.apply)(NbRatedGameSetup.unapply)
+    )(NbRatedGameSetup.apply)(d => Some((d.perf, d.nb)))
     case class NbRatedGameSetup(perf: Option[String], nb: Int) {
       def convert(tourPerf: PerfType): Option[NbRatedGame] =
         nb > 0 option NbRatedGame(
@@ -261,7 +261,7 @@ object Condition {
     val maxRating = mapping(
       "perf"   -> optional(text.verifying(perfKeys.contains _)),
       "rating" -> optional(numberIn(maxRatings))
-    )(RatingSetup.apply)(RatingSetup.unapply)
+    )(RatingSetup.apply)(d => Some((d.perf, d.rating)))
     val minRatings = List(1000, 1100, 1200, 1300, 1400, 1500, 1600, 1700, 1800, 1900, 2000, 2100, 2200, 2300,
       2400, 2500, 2600)
     val minRatingChoices = ("", "No restriction") ::
@@ -269,11 +269,11 @@ object Condition {
     val minRating = mapping(
       "perf"   -> optional(text.verifying(perfKeys.contains _)),
       "rating" -> optional(numberIn(minRatings))
-    )(RatingSetup.apply)(RatingSetup.unapply)
+    )(RatingSetup.apply)(d => Some((d.perf, d.rating)))
     def teamMember(leaderTeams: List[LeaderTeam]) =
       mapping(
         "teamId" -> optional(text.verifying(id => leaderTeams.exists(_.id == id)))
-      )(TeamMemberSetup.apply)(TeamMemberSetup.unapply)
+      )(TeamMemberSetup.apply)(d => Some(d.teamId))
     case class TeamMemberSetup(teamId: Option[TeamID]) {
       def convert(teams: Map[TeamID, TeamName]): Option[TeamMember] =
         teamId flatMap { id =>
@@ -290,7 +290,7 @@ object Condition {
         "minRating"   -> minRating,
         "titled"      -> optional(boolean),
         "teamMember"  -> optional(teamMember(leaderTeams))
-      )(AllSetup.apply)(AllSetup.unapply)
+      )(AllSetup.apply)(d => Some((d.nbRatedGame, d.maxRating, d.minRating, d.titled, d.teamMember)))
         .verifying("Invalid ratings", _.validRatings)
 
     case class AllSetup(

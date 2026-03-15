@@ -4,6 +4,7 @@ import strategygames.variant.Variant
 import scala.concurrent.duration._
 import reactivemongo.api.ReadPreference
 
+import lila.common.extensions.*
 import lila.game.{ Game, GameRepo, Pov, Query }
 import lila.rating.PerfType
 import lila.user.User

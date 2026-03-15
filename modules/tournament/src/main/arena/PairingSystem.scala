@@ -2,6 +2,7 @@ package lila.tournament
 package arena
 
 import lila.common.LightUser
+import lila.common.extensions.*
 import lila.user.{ User, UserRepo }
 
 import scala.concurrent.Future

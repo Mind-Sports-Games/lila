@@ -2,6 +2,7 @@ package lila.app
 package mashup
 
 import lila.api.Context
+import lila.common.extensions.*
 import lila.event.Event
 import lila.forum.MiniForumPost
 import lila.game.{ Game, Pov }

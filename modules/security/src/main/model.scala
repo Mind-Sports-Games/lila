@@ -12,7 +12,7 @@ import reactivemongo.api.bson.BSONHandler
 case class Dated[V](value: V, date: DateTime) extends Ordered[Dated[V]] {
   def compare(other: Dated[V]) = other.date compareTo date
   def map[X](f: V => X)        = copy(value = f(value))
-  def seconds                  = date.getSeconds
+  def seconds                  = date.getMillis / 1000
 }
 
 case class AuthInfo(user: User.ID, hasFp: Boolean)

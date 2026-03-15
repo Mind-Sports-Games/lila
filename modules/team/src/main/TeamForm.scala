@@ -6,6 +6,7 @@ import scala.concurrent.duration._
 
 import lila.common.Form.{ cleanNonEmptyText, cleanText, numberIn }
 import lila.common.LameName
+import lila.common.extensions.*
 import lila.db.dsl._
 import lila.security.SecurityHelper
 import org.apache.http.protocol.ExecutionContext
@@ -52,7 +53,7 @@ final private[team] class TeamForm(
         Fields.move,
         Fields.hideMembers,
         Fields.hideForum
-      )(TeamSetup.apply)(TeamSetup.unapply)
+      )(TeamSetup.apply)(d => Some((d.name, d.location, d.password, d.description, d.descPrivate, d.request, d.gameId, d.move, d.hideMembers, d.hideForum)))
         .verifying("team:teamAlreadyExists", d => !teamExists(d).await(2 seconds, "teamExists"))
         .verifying("team:teamLameName", d => !lameName(d))
         .verifying(captchaFailMessage, validateCaptcha _)
@@ -70,7 +71,7 @@ final private[team] class TeamForm(
         Fields.chat,
         Fields.hideMembers,
         Fields.hideForum
-      )(TeamEdit.apply)(TeamEdit.unapply)
+      )(TeamEdit.apply)(d => Some((d.location, d.password, d.description, d.descPrivate, d.request, d.chat, d.hideMembers, d.hideForum)))
     ) fill TeamEdit(
       location = team.location,
       password = team.password,
@@ -86,7 +87,7 @@ final private[team] class TeamForm(
     mapping(
       Fields.requestMessage(team),
       Fields.passwordCheck(team)
-    )(RequestSetup.apply)(RequestSetup.unapply)
+    )(RequestSetup.apply)(d => Some((d.message, d.password)))
   ) fill RequestSetup(
     message = "Hello, I would like to join the team!".some,
     password = None
@@ -96,7 +97,7 @@ final private[team] class TeamForm(
     mapping(
       Fields.requestMessage(team),
       Fields.passwordCheck(team)
-    )(RequestSetup.apply)(RequestSetup.unapply)
+    )(RequestSetup.apply)(d => Some((d.message, d.password)))
   )
 
   val processRequest = Form(

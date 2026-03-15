@@ -10,6 +10,7 @@ import scala.util.chaining._
 
 import lila.common.Bus
 import lila.common.config.Secret
+import lila.common.extensions.*
 import lila.user.User
 import scala.concurrent.ExecutionContextExecutor
 

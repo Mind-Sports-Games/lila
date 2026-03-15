@@ -56,11 +56,12 @@ final class StormHighApi(coll: Coll, cacheApi: CacheApi)(implicit ctx: Execution
 
   private def compute(userId: User.ID): Fu[StormHigh] =
     coll
-      .aggregateOne() { framework =>
+      .aggregateWith[Bdoc]() { framework =>
         import framework._
         def matchSince(sinceId: User.ID => StormDay.Id) = Match($doc("_id" $gte sinceId(userId)))
         val scoreSort                                   = Sort(Descending("score"))
-        Match($doc("_id" $lte StormDay.Id.today(userId) $gt StormDay.Id.allTime(userId))) -> List(
+        List(
+          Match($doc("_id" $lte StormDay.Id.today(userId) $gt StormDay.Id.allTime(userId))),
           Project($doc("score" -> true)),
           Sort(Descending("_id")),
           Facet(
@@ -73,6 +74,8 @@ final class StormHighApi(coll: Coll, cacheApi: CacheApi)(implicit ctx: Execution
           )
         )
       }
+      .collect[List](maxDocs = 1)
+      .dmap(_.headOption)
       .map2 { doc =>
         def readScore(doc: Bdoc, field: String) =
           ~doc.getAsOpt[List[Bdoc]](field).flatMap(_.headOption).flatMap(_.getAsOpt[Int]("score"))

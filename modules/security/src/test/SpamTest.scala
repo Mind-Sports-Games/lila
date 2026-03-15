@@ -1,6 +1,6 @@
 package lila.security
 
-import lila.core.data.Strings
+import lila.common.Strings
 
 class SpamTest extends munit.FunSuite:
 
@@ -9,8 +9,8 @@ class SpamTest extends munit.FunSuite:
   val _c2 = """https://aimchess.com/try?ref=spammyboy"""
 
   test("detect"):
-    assert(!spam.detect(foobar))
-    assert(spam.detect(_c2))
+    assert(!spam.detect(foobar), "foobar is not spam")
+    assert(spam.detect(_c2), "referral link is spam")
   test("replace"):
     assertEquals(spam.replace(foobar), foobar)
     assertEquals(spam.replace(_c2), """https://aimchess.com""")

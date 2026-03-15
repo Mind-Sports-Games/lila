@@ -6,6 +6,7 @@ import play.api.data.validation._
 import scala.concurrent.duration._
 
 import lila.common.LightUser
+import lila.common.extensions.*
 import lila.user.User
 
 final private[report] class ReportForm(
@@ -55,7 +56,7 @@ final private[report] class ReportForm(
       "username" -> lila.user.UserForm.historicalUsernameField,
       "resource" -> nonEmptyText,
       "text"     -> text(minLength = 3, maxLength = 140)
-    )(ReportFlag.apply)(ReportFlag.unapply)
+    )(ReportFlag.apply)(d => Some((d.username, d.resource, d.text)))
   )
 
   private def blockingFetchUser(username: String) =

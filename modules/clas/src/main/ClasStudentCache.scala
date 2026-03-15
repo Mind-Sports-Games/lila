@@ -9,6 +9,7 @@ import reactivemongo.api.ReadPreference
 import scala.concurrent.duration._
 import scala.concurrent.ExecutionContext
 
+import lila.common.extensions.*
 import lila.db.dsl._
 import lila.memo.CacheApi
 import lila.user.User

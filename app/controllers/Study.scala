@@ -8,6 +8,7 @@ import scala.util.chaining._
 import lila.api.Context
 import lila.app._
 import lila.chat.Chat
+import lila.common.extensions.*
 import lila.common.paginator.{ Paginator, PaginatorJson }
 import lila.common.{ HTTPRequest, IpAddress }
 import lila.study.actorApi.Who

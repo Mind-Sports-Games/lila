@@ -2,7 +2,7 @@ package lila.security
 
 import org.joda.time.DateTime
 import play.api.mvc.RequestHeader
-import reactivemongo.akkastream.{ cursorProducer, AkkaStreamCursor }
+import reactivemongo.pekkostream.{ cursorProducer, PekkoStreamCursor }
 import reactivemongo.api.bson.BSONNull
 import reactivemongo.api.bson.{ BSONHandler, Macros }
 import reactivemongo.api.CursorProducer
@@ -119,7 +119,7 @@ final class Store(val coll: Coll, cacheApi: lila.memo.CacheApi)(implicit
       .cursor[UserSession]()
       .gather[List](nb)
 
-  def allSessions(userId: User.ID): AkkaStreamCursor[UserSession] =
+  def allSessions(userId: User.ID): PekkoStreamCursor[UserSession] =
     coll
       .find($doc("user" -> userId))
       .sort($doc("date" -> -1))
@@ -143,7 +143,7 @@ final class Store(val coll: Coll, cacheApi: lila.memo.CacheApi)(implicit
       .find(
         $doc(
           "user" -> user.id,
-          "date" $gt (user.createdAt atLeast DateTime.now.minusYears(1))
+          "date" $gt (if (user.createdAt.isAfter(DateTime.now.minusYears(1))) user.createdAt else DateTime.now.minusYears(1))
         ),
         $doc("_id" -> false, "ip" -> true, "ua" -> true, "fp" -> true, "date" -> true).some
       )
@@ -185,9 +185,12 @@ final class Store(val coll: Coll, cacheApi: lila.memo.CacheApi)(implicit
   implicit private val IpAndFpReader: BSONDocumentReader[IpAndFp] = Macros.reader[IpAndFp]
 
   def shareAnIpOrFp(u1: User.ID, u2: User.ID): Fu[Boolean] =
-    coll.aggregateExists(ReadPreference.secondaryPreferred) { framework =>
+    coll.aggregateWith[Bdoc](
+      readPreference = ReadPreference.secondaryPreferred
+    ) { framework =>
       import framework._
-      Match($doc("user" $in List(u1, u2))) -> List(
+      List(
+        Match($doc("user" $in List(u1, u2))),
         Limit(500),
         Project(
           $doc(
@@ -206,7 +209,7 @@ final class Store(val coll: Coll, cacheApi: lila.memo.CacheApi)(implicit
         ),
         Limit(1)
       )
-    }
+    }.collect[List](maxDocs = 1).dmap(_.nonEmpty)
 
   def ips(user: User): Fu[Set[IpAddress]] =
     coll.distinctEasy[IpAddress, Set]("ip", $doc("user" -> user.id))

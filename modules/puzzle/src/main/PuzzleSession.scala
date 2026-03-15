@@ -4,6 +4,7 @@ import scala.concurrent.duration._
 import scala.concurrent.ExecutionContext
 import scala.util.chaining._
 
+import lila.common.extensions.*
 import lila.db.dsl._
 import lila.memo.CacheApi
 import lila.user.{ Perfs, User, UserRepo }
@@ -99,9 +100,10 @@ final class PuzzleSessionApi(
   private def nextPuzzleResult(user: User, session: PuzzleSession): Fu[NextPuzzleResult] =
     colls
       .path {
-        _.aggregateOne() { framework =>
+        _.aggregateWith[Bdoc]() { framework =>
           import framework._
-          Match($id(session.path)) -> List(
+          List(
+            Match($id(session.path)),
             // get the puzzle ID from session position
             Project($doc("puzzleId" -> $doc("$arrayElemAt" -> $arr("$ids", session.positionInPath)))),
             Project(
@@ -134,6 +136,8 @@ final class PuzzleSessionApi(
             )
           )
         }
+          .collect[List](maxDocs = 1)
+          .dmap(_.headOption)
       }
       .map { docOpt =>
         import NextPuzzleResult._
