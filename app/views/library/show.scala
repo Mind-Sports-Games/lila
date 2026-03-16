@@ -60,7 +60,7 @@ object show {
     )(
       main(
         id := "library-section",
-        cls := "library-all"
+        cls := "library-all library-all--variant"
       )(
         div(cls := "library-header color-choice")(
           h1(cls := "library-title")(
