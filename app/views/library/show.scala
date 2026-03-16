@@ -117,7 +117,7 @@ object show {
         },
         featuredGame map { g =>
           div(cls := "library__tv")(
-            views.html.game.mini(Pov naturalOrientation g, tv = true)
+            views.html.game.mini(Pov naturalOrientation g, tv = g.isBeingPlayed)
           )
         },
         tours.nonEmpty option tournamentList(tours),
