@@ -31,7 +31,7 @@ final class Library(env: Env) extends LilaController(env) {
             leaderboard = leaderboards.forVariant(variant)
             tours        <- env.tournament.cached.onLibraryPage.getUnit.nevermind
             filteredTours = tours.filter(_.variant.key == variant.key)
-            featuredGame <- tvChannel.fold(fuccess(none[lila.game.Game]))(env.tv.tv.getGame)
+            featuredGame <- tvChannel.map(env.tv.tv.getGame).getOrElse(env.game.gameRepo.randomByVariant(variant))
             dailyPuzzle <- Puzzle.puzzleVariants
               .exists(_.key == variant.key)
               .??(env.puzzle.daily.getForVariant(variant))

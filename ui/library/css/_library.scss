@@ -96,6 +96,10 @@
 
   .library__tv .mini-game {
     overflow: visible;
+
+    ::before {
+      font-size: 1em;
+    }
   }
 
   .library__puzzle {
@@ -106,6 +110,14 @@
       display: block;
       text-align: right;
       margin-right: 1ch;
+
+      &:first-of-type {
+        padding-bottom: 2px;
+      }
+
+      &:last-of-type {
+        padding-top: 3px;
+      }
     }
   }
 

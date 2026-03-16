@@ -524,6 +524,13 @@ final class GameRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionCont
       .skip(ThreadLocalRandom nextInt 1000)
       .one[Game]
 
+  def randomByVariant(variant: Variant): Fu[Option[Game]] =
+    coll
+      .find(Query.variant(variant))
+      .sort(Query.sortCreated)
+      .skip(ThreadLocalRandom nextInt 1000)
+      .one[Game]
+
   def findPgnImport(pgn: String): Fu[Option[Game]] =
     coll.one[Game](
       $doc(s"${F.pgnImport}.h" -> PgnImport.hash(pgn))
