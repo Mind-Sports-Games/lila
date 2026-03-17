@@ -87,6 +87,40 @@
     font-size: 175%;
   }
 
+  .library__tv,
+  .library__puzzle {
+    width: 100%;
+    max-width: 350px;
+    margin-bottom: 2em;
+  }
+
+  .library__tv .mini-game {
+    overflow: visible;
+
+    .playerIndex-icon::before {
+      font-size: 1em;
+    }
+  }
+
+  .library__puzzle {
+    display: block;
+
+    .text {
+      color: $c-font-dim;
+      display: block;
+      text-align: right;
+      margin-right: 1ch;
+
+      &:first-of-type {
+        padding-bottom: 2px;
+      }
+
+      &:last-of-type {
+        padding-top: 3px;
+      }
+    }
+  }
+
   .section-title {
     display: flex;
     align-items: center;
@@ -305,6 +339,60 @@
         td:first-child {
           padding-left: 0.7em;
         }
+      }
+    }
+  }
+
+  &--variant {
+    > *:not(.library-header) {
+      padding-left: 1em;
+      padding-right: 1em;
+    }
+
+    @include breakpoint($mq-small) {
+      max-width: 950px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      column-gap: 1em;
+      align-items: start;
+      grid-template-areas:
+        'header header'
+        'start  start'
+        'puzzle tv'
+        'tours  leader'
+        'stats  stats'
+        'chart  chart';
+
+      .library-header {
+        grid-area: header;
+      }
+      .start {
+        grid-area: start;
+        text-align: center;
+      }
+      .library__puzzle {
+        grid-area: puzzle;
+        max-width: 100%;
+      }
+      .library__tv {
+        grid-area: tv;
+        max-width: 100%;
+      }
+      .tournaments {
+        grid-area: tours;
+        max-width: 100%;
+      }
+      .leaderboards {
+        grid-area: leader;
+        max-width: 100%;
+      }
+      .library-stats-table {
+        grid-area: stats;
+        max-width: 100%;
+      }
+      #library_chart_area {
+        grid-area: chart;
+        max-width: 100%;
       }
     }
   }

@@ -8,11 +8,11 @@ import lila.app.templating.Environment._
 import lila.app.ui.ScalatagsTemplate._
 import lila.common.String.html.safeJsonValue
 import lila.i18n.{ I18nKeys => trans, VariantKeys }
-import lila.game.{ MonthlyGameData, WinRatePercentages }
+import lila.game.{ Game, MonthlyGameData, Pov, WinRatePercentages }
 import lila.rating.PerfType
 import lila.user.User
 import lila.tournament.Tournament
-import lila.puzzle.Puzzle
+import lila.puzzle.{ Puzzle, DailyPuzzle }
 import play.api.i18n.Lang
 
 import strategygames.variant.Variant
@@ -25,7 +25,9 @@ object show {
       monthlyGameData: List[MonthlyGameData],
       winRates: List[WinRatePercentages],
       leaderboard: List[User.LightPerf],
-      tours: List[Tournament]
+      tours: List[Tournament],
+      featuredGame: Option[Game] = None,
+      dailyPuzzle: Option[DailyPuzzle.WithHtml] = None
   )(implicit ctx: Context) =
     views.html.base.layout(
       title = s"${VariantKeys.variantName(variant)} • ${VariantKeys.variantTitle(variant)}",
@@ -58,7 +60,7 @@ object show {
     )(
       main(
         id := "library-section",
-        cls := "library-all"
+        cls := "library-all library-all--variant"
       )(
         div(cls := "library-header color-choice")(
           h1(cls := "library-title")(
@@ -110,6 +112,14 @@ object show {
             trans.createAGame()
           )
         ),
+        dailyPuzzle map { p =>
+          views.html.puzzle.embed.dailyLink(p)(ctx.lang)(cls := "library__puzzle")
+        },
+        featuredGame map { g =>
+          div(cls := "library__tv")(
+            views.html.game.mini(Pov naturalOrientation g, tv = false)
+          )
+        },
         tours.nonEmpty option tournamentList(tours),
         leaderboard.nonEmpty option userTopPerf(leaderboard, PerfType(variant, Speed.Blitz)),
         div(cls := "library-stats-table")(
