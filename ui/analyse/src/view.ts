@@ -398,7 +398,6 @@ function renderPlayerScore(
     const pieceClass = `piece.${defaultMancalaRole}${score.toString()}-piece.`;
     children.push(h(pieceClass + playerIndex, { attrs: { 'data-score': score } }));
     return h('div.game-score.game-score-' + position + '.' + playerIndex, children);
-  //TODO Grand Abalone handle 10 hole scoreboard
   } else if (variantKey === 'abalone') {
     const opp = playerIndex === 'p1' ? 'p2' : 'p1';
 
@@ -410,8 +409,23 @@ function renderPlayerScore(
     children.push(h(`piece.${score > 5 ? 's-piece' : 'hole-piece'}.slot-bot-right.${opp}`));
 
     return h('div.game-score.game-score-top' + '.' + playerIndex, { attrs: { 'data-score': score } }, children);
+  } else if (variantKey === 'grandabalone') {
+    const opp = playerIndex === 'p1' ? 'p2' : 'p1';
+    
+    children.push(h(`piece.${score > 0 ? 's-piece' : 'hole-piece'}.slot-top.${opp}`));
+    children.push(h(`piece.${score > 1 ? 's-piece' : 'hole-piece'}.slot-top-left.${opp}`));
+    children.push(h(`piece.${score > 2 ? 's-piece' : 'hole-piece'}.slot-top-right.${opp}`));
+    children.push(h(`piece.${score > 3 ? 's-piece' : 'hole-piece'}.slot-mid-left.${opp}`));
+    children.push(h(`piece.${score > 4 ? 's-piece' : 'hole-piece'}.slot-mid-mid.${opp}`));
+    children.push(h(`piece.${score > 5 ? 's-piece' : 'hole-piece'}.slot-mid-right.${opp}`));
+    children.push(h(`piece.${score > 6 ? 's-piece' : 'hole-piece'}.slot-bot-left.${opp}`));
+    children.push(h(`piece.${score > 7 ? 's-piece' : 'hole-piece'}.slot-bot-mid-left.${opp}`));
+    children.push(h(`piece.${score > 8 ? 's-piece' : 'hole-piece'}.slot-bot-mid-right.${opp}`));
+    children.push(h(`piece.${score > 9 ? 's-piece' : 'hole-piece'}.slot-bot-right.${opp}`));
+
+    return h('div.game-score.game-score-top' + '.' + playerIndex, { attrs: { 'data-score': score } }, children);
   } else {
-    //filpello variants
+    //flipello variants
     const pieceClass = 'piece.p-piece.';
     children.push(h(pieceClass + playerIndex, { attrs: { 'data-score': score } }));
     return h('div.game-score.game-score-top' + '.' + playerIndex, children);

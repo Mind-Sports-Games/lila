@@ -136,12 +136,43 @@ $directions: ('W', 'NW', 'NE', 'E', 'SE', 'SW');
 }
 
 .variant-grandabalone {
+  cg-container {
+    width: calc(100% * 13);
+    height: calc(100% * 13);
+  }
+
+  cg-helper {
+    width: calc(100% / 13);
+    padding-bottom: calc(100% / 13);
+  }
+
   piece {
     width: calc(100% / 11 * 0.865);
     height: calc(100% / 11 * 0.865);
     background-position: center center;
     margin-top: .7%;
     margin-left: .7%;
+  }
+
+  square {
+    width: calc(100% / 11 * 0.865);
+    height: calc(100% / 11 * 0.865);
+    background-color: transparent;
+    margin-top: .90%;
+    margin-left: .90%;
+
+    &.last-move.to {
+      @each $player in $players {
+        @each $direction in $directions {
+          &.#{$player}#{$direction} {
+            background-image: url('../images/board/abalone/highlights/#{$player}#{$direction}.svg');
+            background-color: transparent;
+            background-size: cover;
+            z-index: z('cg__svg.direction');
+          }
+        }
+      }
+    }
   }
 }
 
