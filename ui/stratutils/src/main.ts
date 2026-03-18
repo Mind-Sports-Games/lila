@@ -1,4 +1,4 @@
-import { abalonePiotrMap, abalonePiotrToKey, piotr } from './piotr';
+import { abalonePiotrToKey, piotr } from './piotr';
 import * as status from 'game/status';
 import type * as cg from 'chessground/types';
 import type { BaseGame } from 'game';
@@ -82,12 +82,19 @@ export function displayScore(variant: VariantKey, fen: string, playerIndex: stri
   else return '';
 }
 
+// Works for all games including those with multi-digit ranks (e.g. Xiangqi "e9e10", Grand Abalone "k10h8").
+export function parseLastMove(lm: string): Key[] | undefined {
+  if (!lm || lm === 'pass') return undefined;
+  if (lm[1] === '@') return [lm.slice(2) as Key];
+  return lm.match(/[a-z]\d+/g) as Key[] | null ?? undefined;
+}
+
 export function fenPlayerIndex(variant: VariantKey, fen: string) {
   //different trick for Go due to fen structure
   if (['go9x9', 'go13x13', 'go19x19'].includes(variant)) {
     return fen.split(' ')[1] === 'b' ? 'p1' : 'p2';
   }
-  if (['abalone'].includes(variant)) {
+  if (['abalone', 'grandabalone'].includes(variant)) {
     return fen.split(' ')[3] === 'b' ? 'p1' : 'p2';
   }
   const p2String = variant === 'oware' ? ' N' : ' b';

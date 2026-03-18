@@ -1,5 +1,5 @@
 import * as domData from './data';
-import { readDice, fenPlayerIndex, readDoublingCube } from 'stratutils';
+import { readDice, fenPlayerIndex, readDoublingCube, parseLastMove } from 'stratutils';
 
 export const init = (node: HTMLElement): void => {
   const [fen, orientation, lm, multiPointState] = node.getAttribute('data-state')!.split('|');
@@ -51,7 +51,7 @@ export const initWith = (
           dice: readDice(fen, variantFromElement($el) as VariantKey),
           doublingCube: readDoublingCube(fen, variantFromElement($el) as VariantKey),
           showUndoButton: false,
-          lastMove: lm && (lm == 'pass' ? undefined : lm[1] === '@' ? [lm.slice(2)] : [lm[0] + lm[1], lm[2] + lm[3]]),
+          lastMove: parseLastMove(lm),
           highlight: {
             lastMove:
               lm != undefined &&
@@ -92,10 +92,11 @@ export const initWith = (
                                       $el.hasClass('variant-hyper') ||
                                       $el.hasClass('variant-nackgammon')
                                     ? { width: 12, height: 2 }
-                                    : $el.hasClass('variant-abalone')
-                                      ? { width: 9, height: 9 }
-                                      //TODO Grand Abalone set correctly
-                                      : { width: 8, height: 8 },
+                                    : $el.hasClass('variant-grandabalone')
+                                      ? { width: 11, height: 11 }
+                                      : $el.hasClass('variant-abalone')
+                                        ? { width: 9, height: 9 }
+                                        : { width: 8, height: 8 },
           variant: variantFromElement($el),
           ...(multiPointState?.length === 6 && {
             multiPointState: {

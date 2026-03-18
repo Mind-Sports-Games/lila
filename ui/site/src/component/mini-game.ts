@@ -1,6 +1,6 @@
 import * as domData from 'common/data';
 import { variantFromElement } from 'common/mini-board';
-import { readDice, readDoublingCube, displayScore, fenPlayerIndex } from 'stratutils';
+import { readDice, readDoublingCube, displayScore, fenPlayerIndex, parseLastMove } from 'stratutils';
 import clockWidget from './clock-widget';
 
 interface UpdateData {
@@ -60,7 +60,7 @@ export const init = (node: HTMLElement) => {
           doublingCube: readDoublingCube(fen, variantFromElement($el) as VariantKey),
           showUndoButton: false,
           orientation,
-          lastMove: lm && (lm[1] === '@' ? [lm.slice(2)] : [lm[0] + lm[1], lm[2] + lm[3]]),
+          lastMove: lm && (lm[1] === '@' ? [lm.slice(2)] : parseLastMove(lm)),
           highlight: {
             lastMove:
               variantFromElement($el) != 'backgammon' &&
@@ -99,9 +99,11 @@ export const init = (node: HTMLElement) => {
                                       $el.hasClass('variant-hyper') ||
                                       $el.hasClass('variant-nackgammon')
                                     ? { width: 12, height: 2 }
-                                    : $el.hasClass('variant-abalone')
-                                      ? { width: 9, height: 9 }
-                                      : { width: 8, height: 8 },
+                                    : $el.hasClass('variant-grandabalone')
+                                      ? { width: 11, height: 11 }
+                                      : $el.hasClass('variant-abalone')
+                                        ? { width: 9, height: 9 }
+                                        : { width: 8, height: 8 },
           variant: variantFromElement($el),
           ...(multiPointState?.length === 6 && {
             multiPointState: {
@@ -138,7 +140,7 @@ export const initAll = (parent?: HTMLElement) => {
 export const update = (node: HTMLElement, data: UpdateData) => {
   const $el = $(node),
     lm = data.lm,
-    lastMove = lm && (lm[1] === '@' ? [lm.slice(2)] : [lm[0] + lm[1], lm[2] + lm[3]]),
+    lastMove = lm && (lm[1] === '@' ? [lm.slice(2)] : parseLastMove(lm)),
     cg = domData.get(node.querySelector('.cg-wrap')!, 'chessground'),
     dg = domData.get(node.querySelector('.cg-wrap')!, 'draughtsground'),
     [, , , multiPointState] = node.getAttribute('data-state')!.split('|');

@@ -301,8 +301,10 @@ export const piotr: Piotr = {
 
 export function abalonePiotrToKey(k: string): Key {
 	let i = piotrKeys.findIndex(x => x === k);
-	if (i < 0) return undefined;
-	
+	if (i < 0) {
+		console.error("abalonePiotrToKey: invalid piotr key", k);
+		return undefined;
+	}
 	const pos: [number, number] = i < 81? [i%9, i/9]: abaloneHashPosToIndex(i);
 	return String.fromCharCode(pos[1] + 97) + "" + (pos[0] + 1) as Key;
 }
