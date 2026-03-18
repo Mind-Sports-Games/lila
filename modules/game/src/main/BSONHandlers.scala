@@ -700,14 +700,11 @@ object BSONHandlers {
                     val completedPlies    = if (turns == 0) 0 else 2 * turns - 1
                     Some((if (turns == 0) 1 else 2) - (plies - completedPlies))
                   } else None,
-                  // halfMoveClock can't be derived from stored actionStrs (UCIs only — captures have no marker in UCI).
-                  // Replay the game to get the correct value from finalizeBoardAfter_hist.
-                  halfMoveClock = abalone.Replay
-                    .gameWithUciWhileValid(actionStrs, initialFen, gameVariant)
-                    ._2
-                    .lastOption
-                    .map(_._1.halfMoveClock)
-                    .getOrElse(0),
+                  // halfMoveClock only affects FEN serialization and has no impact on game logic
+                  // (3-fold repetition uses positionHashes; no N-move rule for Abalone).
+                  // It cannot be derived from UCIs (captures have no marker), and a full replay
+                  // just for this cosmetic field is too expensive.
+                  halfMoveClock = 0,
                   positionHashes = r.getO[PositionHash](F.positionHashes) | Array.empty,
                   score = {
                     val counts = r.intsD(F.score)
