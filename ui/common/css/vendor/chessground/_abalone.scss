@@ -150,16 +150,16 @@ $directions: ('W', 'NW', 'NE', 'E', 'SE', 'SW');
     width: calc(100% / 11 * 0.865);
     height: calc(100% / 11 * 0.865);
     background-position: center center;
-    margin-top: .7%;
-    margin-left: .7%;
+    margin-top: 0.7%;
+    margin-left: 0.7%;
   }
 
   square {
     width: calc(100% / 11 * 0.865);
     height: calc(100% / 11 * 0.865);
     background-color: transparent;
-    margin-top: .90%;
-    margin-left: .90%;
+    margin-top: 0.9%;
+    margin-left: 0.9%;
 
     &.last-move.to {
       @each $player in $players {

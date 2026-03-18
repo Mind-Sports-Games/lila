@@ -130,9 +130,7 @@ function inputs(ctrl: AnalyseCtrl): VNode | undefined {
             });
             el.addEventListener('input', _ => {
               ctrl.fenInput = el.value;
-              el.setCustomValidity(
-                parseFen(rules)(el.value.trim()).isOk ? '' : 'Invalid FEN',
-              );
+              el.setCustomValidity(parseFen(rules)(el.value.trim()).isOk ? '' : 'Invalid FEN');
             });
           },
           postpatch: (_, vnode) => {
@@ -410,7 +408,7 @@ function renderPlayerScore(
     return h('div.game-score.game-score-top' + '.' + playerIndex, { attrs: { 'data-score': score } }, children);
   } else if (variantKey === 'grandabalone') {
     const opp = playerIndex === 'p1' ? 'p2' : 'p1';
-    
+
     children.push(h(`piece.${score > 0 ? 's-piece' : 'hole-piece'}.slot-top.${opp}`));
     children.push(h(`piece.${score > 1 ? 's-piece' : 'hole-piece'}.slot-top-left.${opp}`));
     children.push(h(`piece.${score > 2 ? 's-piece' : 'hole-piece'}.slot-top-right.${opp}`));
@@ -510,7 +508,9 @@ export default function (ctrl: AnalyseCtrl): VNode {
       isCol1() ||
       ((!!gaugeOn || !!playerBars) &&
         !['xiangqi', 'shogi', 'minixiangqi', 'minishogi', 'oware'].includes(variantKey)) ||
-      ['togyzkumalak', 'bestemshe', 'backgammon', 'hyper', 'nackgammon', 'abalone', 'grandabalone'].includes(variantKey),
+      ['togyzkumalak', 'bestemshe', 'backgammon', 'hyper', 'nackgammon', 'abalone', 'grandabalone'].includes(
+        variantKey,
+      ),
     needsOutterCoords =
       [
         'xiangqi',
@@ -604,7 +604,7 @@ export default function (ctrl: AnalyseCtrl): VNode {
     'hyper',
     'nackgammon',
     'abalone',
-    'grandabalone'
+    'grandabalone',
   ].includes(variantKey)
     ? '.piece-letter'
     : '';

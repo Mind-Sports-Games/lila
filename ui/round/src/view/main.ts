@@ -284,7 +284,7 @@ export function main(ctrl: RoundController): VNode {
     'hyper',
     'nackgammon',
     'abalone',
-    'grandabalone'
+    'grandabalone',
   ].includes(variantKey)
     ? '.piece-letter'
     : '';

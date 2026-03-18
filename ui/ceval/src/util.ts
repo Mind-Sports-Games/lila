@@ -28,7 +28,7 @@ const noClientEvalVariants = [
   'hyper',
   'nackgammon',
   'abalone',
-  'grandabalone'
+  'grandabalone',
 ];
 
 const noPathVizualizationVariants: VariantKey[] = [

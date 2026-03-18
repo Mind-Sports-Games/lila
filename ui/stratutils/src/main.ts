@@ -116,7 +116,7 @@ export function displayScore(variant: VariantKey, fen: string, playerIndex: stri
 export function parseLastMove(lm: string): Key[] | undefined {
   if (!lm || lm === 'pass') return undefined;
   if (lm[1] === '@') return [lm.slice(2) as Key];
-  return lm.match(/[a-z]\d+/g) as Key[] | null ?? undefined;
+  return (lm.match(/[a-z]\d+/g) as Key[] | null) ?? undefined;
 }
 
 export function fenPlayerIndex(variant: VariantKey, fen: string) {

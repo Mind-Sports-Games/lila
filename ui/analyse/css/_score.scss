@@ -256,9 +256,15 @@ body .variant-grandabalone .game-score piece.hole-piece {
 
 //additional piece spaces for abalone (triangle)
 .variant-abalone .game-score {
-  .abalone-yellow & { background-color: #f0bc67; }
-  .abalone-classic & { background-color: #6c6c6c; }
-  .abalone-dark & { background-color: #5a5a5a; }
+  .abalone-yellow & {
+    background-color: #f0bc67;
+  }
+  .abalone-classic & {
+    background-color: #6c6c6c;
+  }
+  .abalone-dark & {
+    background-color: #5a5a5a;
+  }
   display: grid !important;
   grid-template-columns: repeat(6, calc($pocket-height / 6));
   grid-template-rows: repeat(3, calc($pocket-height / 3));
@@ -315,9 +321,15 @@ body .variant-grandabalone .game-score piece.hole-piece {
 
 //additional piece spaces for grandabalone (4-row triangle: 1+2+3+4=10 marbles)
 .variant-grandabalone .game-score {
-  .abalone-yellow & { background-color: #f0bc67; }
-  .abalone-classic & { background-color: #6c6c6c; }
-  .abalone-dark & { background-color: #5a5a5a; }
+  .abalone-yellow & {
+    background-color: #f0bc67;
+  }
+  .abalone-classic & {
+    background-color: #6c6c6c;
+  }
+  .abalone-dark & {
+    background-color: #5a5a5a;
+  }
   display: grid !important;
   grid-template-columns: repeat(8, calc($pocket-height / 8));
   grid-template-rows: repeat(4, calc($pocket-height / 4));
@@ -399,7 +411,6 @@ body .variant-grandabalone .game-score piece.hole-piece {
     }
   }
 }
-
 
 @each $variant in $score-variants-square {
   .variant-#{$variant} .game-score {
