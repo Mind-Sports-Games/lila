@@ -93,6 +93,21 @@ function renderPlayerScore(
       }),
     );
     return h('div.game-score.game-score-' + position, children);
+  } else if (variantKey === 'grandabalone') {
+    const opp = playerIndex === 'p1' ? 'p2' : 'p1';
+
+    children.push(h(`piece.${score > 0 ? 's-piece' : 'hole-piece'}.slot-top.${opp}`));
+    children.push(h(`piece.${score > 1 ? 's-piece' : 'hole-piece'}.slot-top-left.${opp}`));
+    children.push(h(`piece.${score > 2 ? 's-piece' : 'hole-piece'}.slot-top-right.${opp}`));
+    children.push(h(`piece.${score > 3 ? 's-piece' : 'hole-piece'}.slot-mid-left.${opp}`));
+    children.push(h(`piece.${score > 4 ? 's-piece' : 'hole-piece'}.slot-mid-mid.${opp}`));
+    children.push(h(`piece.${score > 5 ? 's-piece' : 'hole-piece'}.slot-mid-right.${opp}`));
+    children.push(h(`piece.${score > 6 ? 's-piece' : 'hole-piece'}.slot-bot-left.${opp}`));
+    children.push(h(`piece.${score > 7 ? 's-piece' : 'hole-piece'}.slot-bot-mid-left.${opp}`));
+    children.push(h(`piece.${score > 8 ? 's-piece' : 'hole-piece'}.slot-bot-mid-right.${opp}`));
+    children.push(h(`piece.${score > 9 ? 's-piece' : 'hole-piece'}.slot-bot-right.${opp}`));
+
+    return h('div.game-score.game-score-' + position, { attrs: { 'data-score': score } }, children);
   } else if (variantKey === 'abalone') {
     const opp = playerIndex === 'p1' ? 'p2' : 'p1';
 
@@ -159,7 +174,8 @@ export function main(ctrl: RoundController): VNode {
         bottomScore = topPlayerIndex === 'p2' ? p1Score : p2Score;
         break;
       }
-      case 'abalone': {
+      case 'abalone':
+      case 'grandabalone': {
         const fen = plyStep(ctrl.data, ctrl.ply).fen;
         const p1Score = util.getScoreFromFen(variantKey, fen, 'p1');
         const p2Score = util.getScoreFromFen(variantKey, fen, 'p2');
@@ -268,6 +284,7 @@ export function main(ctrl: RoundController): VNode {
     'hyper',
     'nackgammon',
     'abalone',
+    'grandabalone'
   ].includes(variantKey)
     ? '.piece-letter'
     : '';

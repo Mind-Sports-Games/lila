@@ -38,6 +38,7 @@ type variantConfirmsType = {
   hyper: string;
   nackgammon: string;
   abalone: string;
+  grandabalone: string;
 };
 
 const variantConfirms: variantConfirmsType = {
@@ -97,7 +98,9 @@ const variantConfirms: variantConfirmsType = {
   nackgammon:
     'This is a Nackgammon game!\n\nThe aim of the game is to get all your pieces into your home, and then take them all off the board first.',
   abalone:
-    'This is a Abalone game!\n\nThe aim of the game is to be the first to push six of your opponents marbles off the board.',
+    'This is an Abalone game!\n\nThe aim of the game is to be the first to push six of your opponent\'s marbles off the board.',
+  grandabalone:
+    'This is a Grand Abalone game!\n\nThe aim of the game is to be the first to push ten of your opponent\'s marbles off the board.',
 };
 
 function storageKey(key: string) {

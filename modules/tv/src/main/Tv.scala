@@ -246,6 +246,15 @@ object Tv {
           familyChannel = true,
           gameFamily = "backgammon"
         )
+    case object AbaloneFamily
+        extends Channel(
+          name = s"All ${GameGroup(12).name}",
+          icon = AV.Abalone.perfIcon.toString,
+          secondsSinceLastMove = freshBlitz,
+          filters = Seq(anyVariant(GameGroup(12).variants), noBot),
+          familyChannel = true,
+          gameFamily = "abalone"
+        )
     case object BreakthroughTroykaFamily
         extends Channel(
           name = s"All ${VariantKeys.gameFamilyName(GameFamily.BreakthroughTroyka())}",
@@ -714,7 +723,16 @@ object Tv {
           icon = AV.Abalone.perfIcon.toString,
           secondsSinceLastMove = freshBlitz,
           filters = Seq(variant(Variant.wrap(AV.Abalone)), noBot),
-          familyChannel = true,
+          familyChannel = false,
+          gameFamily = "abalone"
+        )
+    case object GrandAbalone
+        extends Channel(
+          name = VariantKeys.variantName(Variant.wrap(AV.GrandAbalone)),
+          icon = AV.GrandAbalone.perfIcon.toString,
+          secondsSinceLastMove = freshBlitz,
+          filters = Seq(variant(Variant.wrap(AV.GrandAbalone)), noBot),
+          familyChannel = false,
           gameFamily = "abalone"
         )
     case object Bot
@@ -797,7 +815,9 @@ object Tv {
       Backgammon,
       Hyper,
       Nackgammon,
+      AbaloneFamily,
       Abalone,
+      GrandAbalone,
       Bot,
       Computer
     )

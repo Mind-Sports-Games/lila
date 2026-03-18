@@ -143,6 +143,7 @@ $backgammon-board-files: (
   'contemporary': 'svg/backgammon_contemporary_board.svg',
 );
 
+//TODO Grand Abalone add new board files
 $abalone-board-files: (
   'classic': 'svg/classic.svg',
   // base64 encoded
@@ -184,7 +185,7 @@ $togyzkumalak-variants: ('togyzkumalak'); // must use same board
 
 $backgammon-variants: ('backgammon', 'hyper', 'nackgammon'); // must use same board
 
-$abalone-variants: ('abalone');
+$abalone-variants: ('abalone', 'grandabalone');
 
 @each $gameFamily in ('chess', 'loa') {
   @each $color, $file in $chess-board-files {
@@ -314,7 +315,7 @@ $abalone-variants: ('abalone');
 @each $variant in $abalone-variants {
   @each $theme, $path in $abalone-board-files {
     .abalone-#{$theme} .variant-#{$variant}.is2d cg-board {
-      background-image: url(../images/board/abalone/#{$path});
+      background-image: url(../images/board/abalone/#{$variant}/#{$path});
     }
   }
 }
@@ -463,7 +464,8 @@ $abalone-variants: ('abalone');
 @each $variant in $abalone-variants {
   @each $theme, $path in $abalone-board-files {
     .abalone-#{$theme} .is2d .variant-#{$variant} cg-board {
-      background-image: url(../images/board/abalone/#{$path});
+      background-image: url(../images/board/abalone/#{$variant}/#{$path});
     }
   }
 }
+

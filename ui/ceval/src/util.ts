@@ -28,6 +28,7 @@ const noClientEvalVariants = [
   'hyper',
   'nackgammon',
   'abalone',
+  'grandabalone'
 ];
 
 const noPathVizualizationVariants: VariantKey[] = [
@@ -52,6 +53,7 @@ const noVariantOutcomeVariants: VariantKey[] = [
 
 const blackStartsVariants: VariantKey[] = [
   'abalone',
+  'grandabalone',
   'flipello',
   'flipello10',
   'antiflipello',
@@ -91,6 +93,7 @@ const noPracticeWithComputerVariants: VariantKey[] = [
   'hyper',
   'nackgammon',
   'abalone',
+  'grandabalone',
 ];
 
 export function isEvalBetter(a: Tree.ClientEval, b?: Tree.ClientEval): boolean {
