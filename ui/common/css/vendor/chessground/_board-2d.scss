@@ -279,7 +279,7 @@ $abalone-variants: ('abalone', 'grandabalone');
 @each $variant in $abalone-variants {
   @each $theme, $path in $abalone-board-files {
     .abalone-#{$theme} .variant-#{$variant}.is2d cg-board {
-      background-image: url(../images/board/abalone/#{$path});
+      background-image: url(../images/board/abalone/#{$variant}/#{$path});
     }
   }
 }
