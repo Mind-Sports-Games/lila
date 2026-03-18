@@ -683,6 +683,11 @@ object BSONHandlers {
         def turnUcis(turnStr: Option[String]) =
           turnStr.map(_.split(",").toList.flatMap(abalone.format.Uci.apply)).getOrElse(List.empty)
 
+        val currentTurnUcis = turnUcis(r strO F.historyCurrentTurn)
+
+        val initialFen: abalone.format.FEN =
+          r.getO[FEN](F.initialFen).map(_.toAbalone) | gameVariant.initialFen
+
         val abaloneGame = StratGame.Abalone(
           abalone.Game(
             situation = abalone.Situation(
@@ -690,12 +695,19 @@ object BSONHandlers {
                 pieces = BinaryFormat.piece.readAbalone(r bytes F.binaryPieces, gameVariant),
                 history = abalone.History(
                   lastTurn = turnUcis(r strO F.historyLastTurn),
-                  currentTurn = turnUcis(r strO F.historyCurrentTurn),
-                  //we can flatten as abalone does not have any multiaction games
-                  //TODO: Is halfMoveClock even doing anything for abalone?
-                  halfMoveClock = actionStrs.flatten.reverse.indexWhere(san =>
-                    san.contains("x") || san.headOption.exists(_.isLower)
-                  ) atLeast 0,
+                  currentTurn = currentTurnUcis,
+                  pliesRemainingThisTurn = if (gameVariant.hasPrevPlayer) {
+                    val completedPlies    = if (turns == 0) 0 else 2 * turns - 1
+                    Some((if (turns == 0) 1 else 2) - (plies - completedPlies))
+                  } else None,
+                  // halfMoveClock can't be derived from stored actionStrs (UCIs only — captures have no marker in UCI).
+                  // Replay the game to get the correct value from finalizeBoardAfter_hist.
+                  halfMoveClock = abalone.Replay
+                    .gameWithUciWhileValid(actionStrs, initialFen, gameVariant)
+                    ._2
+                    .lastOption
+                    .map(_._1.halfMoveClock)
+                    .getOrElse(0),
                   positionHashes = r.getO[PositionHash](F.positionHashes) | Array.empty,
                   score = {
                     val counts = r.intsD(F.score)
@@ -884,10 +896,12 @@ object BSONHandlers {
             $doc(
               F.oldPgn -> NewLibStorage.OldBin
                 .encodeActionStrs(o.variant.gameFamily, o.actionStrs take Game.maxTurns),
-              F.binaryPieces -> BinaryFormat.piece.writeAbalone(o.board match {
-                case Board.Abalone(board) => board.pieces
-                case _                    => sys.error("invalid abalone board")
-              }),
+              F.binaryPieces -> BinaryFormat.piece.writeAbalone(
+                o.board match {
+                  case Board.Abalone(board) => board
+                  case _                    => sys.error("invalid abalone board")
+                }
+              ),
               F.positionHashes     -> o.history.positionHashes,
               F.historyLastTurn    -> o.history.lastTurnUciString,
               F.historyCurrentTurn -> o.history.currentTurnUciString,

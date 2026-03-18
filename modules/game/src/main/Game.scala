@@ -1217,7 +1217,7 @@ object Game {
     val playerUids                = "us"
     val playingUids               = "pl"
     val binaryPieces              = "ps"
-    val oldPgn                    = "pg"
+    val oldPgn                    = "pg" // list of moves
     val huffmanPgn                = "hp"
     val status                    = "s"
     val turns                     = "t"
