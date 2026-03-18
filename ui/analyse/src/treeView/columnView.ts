@@ -47,7 +47,11 @@ function renderChildrenOf(ctx: Ctx, node: Tree.ParentedNode, opts: Opts): MaybeV
   const conceal = opts.noConceal ? null : opts.conceal || ctx.concealOf(true)(opts.parentPath + main.id, main);
   if (conceal === 'hide') return;
   if (opts.isMainline) {
-    const isP1 = main.playedPlayerIndex === 'p1';
+    // A node is "mid-turn" when playedPlayerIndex === playerIndex, meaning the same player
+    // still has actions remaining. Continuation actions within a multi-action turn should
+    // not show a new turn index (e.g. Grand Abalone where P1 or P2 plays 2 actions per turn).
+    const isMidTurn = node.playedPlayerIndex === node.playerIndex;
+    const isP1 = main.playedPlayerIndex === 'p1' && !isMidTurn;
     const commentTags = renderMainlineCommentsOf(ctx, main, conceal, true).filter(nonEmpty);
     if (!cs[1] && isEmpty(commentTags) && !main.forceVariation)
       return ((isP1 ? [moveView.renderIndex(main, false)] : []) as MaybeVNodes).concat(
@@ -85,7 +89,7 @@ function renderChildrenOf(ctx: Ctx, node: Tree.ParentedNode, opts: Opts): MaybeV
         ),
       ] as MaybeVNodes)
       .concat(
-        mainChildren && main.playerIndex === 'p2'
+        mainChildren && main.playerIndex === 'p2' && !isMidTurn
           ? [moveView.renderIndex(main, false), emptyMove(passOpts.conceal)]
           : [],
       )
