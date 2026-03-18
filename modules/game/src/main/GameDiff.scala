@@ -334,7 +334,7 @@ object GameDiff {
         dTry(
           binaryPieces,
           _.board match {
-            case Board.Abalone(b) => b.pieces
+            case Board.Abalone(b) => b
             case _                => sys.error("Wrong board type")
           },
           writeBytes compose BinaryFormat.piece.writeAbalone
