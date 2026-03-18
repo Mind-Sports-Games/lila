@@ -52,8 +52,7 @@
 }
 
 //score for games (togyzkumalak and Oware has own layout below)
-//TODO Grand Abalone handle 10 hole pocket
-$score-variants: ('flipello', 'flipello10', 'go9x9', 'go13x13', 'go19x19', 'abalone', 'grandablone');
+$score-variants: ('flipello', 'flipello10', 'go9x9', 'go13x13', 'go19x19', 'abalone', 'grandabalone');
 $go-variants: ('go9x9', 'go13x13', 'go19x19');
 
 body.oware-light-wood .variant-oware .game-score {
@@ -129,9 +128,17 @@ body .variant-abalone .game-score piece.hole-piece {
   background-size: cover;
 }
 
+body .variant-grandabalone .game-score piece.hole-piece {
+  background: url(../images/board/abalone/score/hole.svg);
+  background-size: cover;
+}
+
 $pocket-col1-size: 9.5vw;
 //additional piece spaces for abalone (triangle)
 .variant-abalone .game-score {
+  .abalone-yellow & { background-color: #f0bc67; }
+  .abalone-classic & { background-color: #6c6c6c; }
+  .abalone-dark & { background-color: #5a5a5a; }
   display: grid !important;
   grid-template-columns: repeat(6, calc($pocket-col1-size / 6));
   grid-template-rows: repeat(3, calc($pocket-col1-size / 3));
@@ -182,6 +189,94 @@ $pocket-col1-size: 9.5vw;
   }
 }
 
+$pocket-col1-size-grandabalone: 6vw;
+
+//additional piece spaces for grandabalone (4-row triangle: 1+2+3+4=10 marbles)
+.variant-grandabalone .game-score {
+  @extend %box-radius;
+  display: grid !important;
+  width: $pocket-col1-size-grandabalone;
+  height: $pocket-col1-size-grandabalone;
+  background-color: #aaa;
+  .abalone-yellow & { background-color: #f0bc67; }
+  .abalone-classic & { background-color: #6c6c6c; }
+  .abalone-dark & { background-color: #5a5a5a; }
+  grid-template-columns: repeat(8, calc($pocket-col1-size-grandabalone / 8));
+  grid-template-rows: repeat(4, calc($pocket-col1-size-grandabalone / 4));
+  piece {
+    display: block;
+    width: 100% !important;
+    height: 100% !important;
+    position: relative;
+    &.slot-top {
+      grid-row: 1;
+      grid-column: 4 / 6;
+      &.hole-piece { scale: 60%; }
+    }
+    &.slot-top-left {
+      grid-row: 2;
+      grid-column: 3 / 5;
+      &.hole-piece { scale: 60%; }
+    }
+    &.slot-top-right {
+      grid-row: 2;
+      grid-column: 5 / 7;
+      &.hole-piece { scale: 60%; }
+    }
+    &.slot-mid-left {
+      grid-row: 3;
+      grid-column: 2 / 4;
+      &.hole-piece { scale: 60%; }
+    }
+    &.slot-mid-mid {
+      grid-row: 3;
+      grid-column: 4 / 6;
+      &.hole-piece { scale: 60%; }
+    }
+    &.slot-mid-right {
+      grid-row: 3;
+      grid-column: 6 / 8;
+      &.hole-piece { scale: 60%; }
+    }
+    &.slot-bot-left {
+      grid-row: 4;
+      grid-column: 1 / 3;
+      &.hole-piece { scale: 60%; }
+    }
+    &.slot-bot-mid-left {
+      grid-row: 4;
+      grid-column: 3 / 5;
+      &.hole-piece { scale: 60%; }
+    }
+    &.slot-bot-mid-right {
+      grid-row: 4;
+      grid-column: 5 / 7;
+      &.hole-piece { scale: 60%; }
+    }
+    &.slot-bot-right {
+      grid-row: 4;
+      grid-column: 7 / 9;
+      &.hole-piece { scale: 60%; }
+    }
+  }
+  &-top.p1 { grid-area: pocket-top; }
+  &-top.p2 {
+    grid-area: pocket-top;
+    margin-left: calc(100% - #{$pocket-col1-size-grandabalone});
+  }
+  &-names {
+    grid-area: pocket-top;
+    width: calc(100% - 2 * #{$pocket-col1-size-grandabalone});
+    margin-left: $pocket-col1-size-grandabalone;
+    display: grid;
+    padding: 0.5vw;
+    align-content: space-between;
+    .p2 { justify-self: right; }
+    .vs { display: none; }
+  }
+}
+
+$pocket-col1-size: 9.5vw;
 @each $variant in $score-variants {
   .analyse.variant-#{$variant} {
     grid-template-rows: $pocket-col1-size auto 3rem;
@@ -194,16 +289,6 @@ $pocket-col1-size: 9.5vw;
     width: $pocket-col1-size;
     height: $pocket-col1-size;
     background-color: #aaa;
-    //TODO Abalone specific code shouldn't be in a general place
-    .abalone-yellow & {
-      background-color: #f0bc67;
-    }
-    .abalone-classic & {
-      background-color: #6c6c6c;
-    }
-    .abalone-dark & {
-      background-color: #5a5a5a;
-    }
 
     piece {
       display: block;
@@ -236,6 +321,11 @@ $pocket-col1-size: 9.5vw;
       }
     }
   }
+}
+
+// grandabalone overrides: different pocket size than the generic $pocket-col1-size
+.analyse.variant-grandabalone {
+  grid-template-rows: $pocket-col1-size-grandabalone auto 3rem;
 }
 
 $pocket-height-oware: 14vh;
@@ -308,6 +398,24 @@ $pocket-height-oware: 14vh;
   padding: 3px 0em;
   font-weight: bold;
   font-size: 3vw;
+}
+
+.variant-grandabalone .game-score::after {
+  @extend %active, %box-radius;
+
+  content: attr(data-score);
+  top: 0em;
+  position: relative;
+  grid-row: 1;
+  grid-column: 1 / -1;
+  justify-self: end;
+  align-self: start;
+  width: fit-content;
+  height: fit-content;
+  line-height: 0.9em;
+  padding: 3px 0.1em;
+  font-weight: bold;
+  font-size: 2vw;
 }
 
 //togyzkumalak and backgammon (large score) layout different
