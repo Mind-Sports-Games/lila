@@ -310,7 +310,6 @@ export function abalonePiotrToKey(k: string): Key {
 }
 
 function abaloneHashPosToIndex(i: number): [number, number] {
-  // k² <= i < (k + 1)² => (0, k)...(k, k)...(k, 0)
   const k = Math.floor(Math.sqrt(i));
   const j = i - k * k;
 
