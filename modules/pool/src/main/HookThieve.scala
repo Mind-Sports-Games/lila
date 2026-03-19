@@ -8,7 +8,7 @@ final private class HookThieve()(implicit
     ec: scala.concurrent.ExecutionContext,
     system: org.apache.pekko.actor.ActorSystem,
     scheduler: org.apache.pekko.actor.Scheduler
-) {
+):
 
   import HookThieve._
 
@@ -18,13 +18,11 @@ final private class HookThieve()(implicit
       .logFailure(logger)
       .recoverDefault(PoolHooks(Vector.empty))
 
-  def stolen(poolHooks: Vector[PoolHook], monId: String) = {
+  def stolen(poolHooks: Vector[PoolHook], monId: String) =
     lila.mon.lobby.pool.thieve.stolen(monId).record(poolHooks.size)
     if (poolHooks.nonEmpty) Bus.publish(StolenHookIds(poolHooks.map(_.hookId)), "lobbyTrouper")
-  }
-}
 
-object HookThieve {
+object HookThieve:
 
   case class GetCandidates(
       clock: strategygames.ClockConfig,
@@ -33,9 +31,7 @@ object HookThieve {
   )
   case class StolenHookIds(ids: Vector[String])
 
-  case class PoolHook(hookId: String, member: PoolMember) {
+  case class PoolHook(hookId: String, member: PoolMember):
     def is(m: PoolMember) = member.userId == m.userId
-  }
 
   case class PoolHooks(hooks: Vector[PoolHook])
-}

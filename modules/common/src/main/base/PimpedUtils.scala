@@ -13,7 +13,7 @@ import strategygames.Centis
 
 import lila.core.lilaism.Lilaism.{ fuccess, fufail, Fu }
 
-final class PimpedOption[A](private val self: Option[A]) extends AnyVal {
+final class PimpedOption[A](private val self: Option[A]) extends AnyVal:
 
   def fold[X](some: A => X, none: => X): X = self.fold(none)(some)
 
@@ -29,9 +29,8 @@ final class PimpedOption[A](private val self: Option[A]) extends AnyVal {
   def ifNone(n: => Unit): Unit = if self.isEmpty then n
 
   def has(a: A) = self contains a
-}
 
-final class PimpedString(private val s: String) extends AnyVal {
+final class PimpedString(private val s: String) extends AnyVal:
 
   def replaceIf(t: Char, r: Char): String =
     if s.indexOf(t.toInt) >= 0 then s.replace(t, r) else s
@@ -41,65 +40,53 @@ final class PimpedString(private val s: String) extends AnyVal {
 
   def replaceIf(t: CharSequence, r: CharSequence): String =
     if s.contains(t) then s.replace(t, r) else s
-}
 
-final class PimpedConfig(private val config: Config) extends AnyVal {
+final class PimpedConfig(private val config: Config) extends AnyVal:
 
   def millis(name: String): Int              = config.getDuration(name, TimeUnit.MILLISECONDS).toInt
   def seconds(name: String): Int             = config.getDuration(name, TimeUnit.SECONDS).toInt
   def duration(name: String): FiniteDuration = millis(name).millis
-}
 
-final class PimpedDateTime(private val date: DateTime) extends AnyVal {
+final class PimpedDateTime(private val date: DateTime) extends AnyVal:
   def getSeconds: Long         = date.getMillis / 1000
   def getCentis: Long          = date.getMillis / 10
   def toNow                    = new Duration(date, DateTime.now)
   def atMost(other: DateTime)  = if other.isBefore(date) then other else date
   def atLeast(other: DateTime) = if other.isAfter(date) then other else date
-}
 
-final class PimpedTry[A](private val v: Try[A]) extends AnyVal {
+final class PimpedTry[A](private val v: Try[A]) extends AnyVal:
 
   def fold[B](fe: Exception => B, fa: A => B): B =
-    v match {
+    v match
       case scala.util.Failure(e: Exception) => fe(e)
       case scala.util.Failure(e)            => throw e
       case scala.util.Success(a)            => fa(a)
-    }
 
   def future: Fu[A] = fold(Future.failed, fuccess)
 
   def toEither: Either[Throwable, A] =
-    v match {
+    v match
       case scala.util.Success(res) => Right(res)
       case scala.util.Failure(err) => Left(err)
-    }
-}
 
-final class PimpedEither[A, B](private val v: Either[A, B]) extends AnyVal {
+final class PimpedEither[A, B](private val v: Either[A, B]) extends AnyVal:
 
   def orElse(other: => Either[A, B]): Either[A, B] =
-    v match {
+    v match
       case scala.util.Right(res) => Right(res)
       case scala.util.Left(_)    => other
-    }
-}
 
-final class PimpedFiniteDuration(private val d: FiniteDuration) extends AnyVal {
+final class PimpedFiniteDuration(private val d: FiniteDuration) extends AnyVal:
 
   def toCentis =
-    Centis {
+    Centis:
       // divide by Double, then round, to avoid rounding issues with just `/10`!
-      math.round {
+      math.round:
         if d.unit eq MILLISECONDS then d.length / 10d
         else d.toMillis / 10d
-      }
-    }
 
   def abs = if d.length < 0 then -d else d
-}
 
-final class RichValidated[E, A](private val v: Validated[E, A]) extends AnyVal {
+final class RichValidated[E, A](private val v: Validated[E, A]) extends AnyVal:
 
   def toFuture: Fu[A] = v.fold(err => fufail(err.toString), fuccess)
-}

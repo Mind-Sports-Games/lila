@@ -86,7 +86,7 @@ final class Insight(env: Env) extends LilaController(env) {
 
   private def processQuestion(user: lila.user.User, body: Request[JsValue]) = {
     import lila.insight.JsonQuestion, JsonQuestion._
-    implicit val lang = reqLang(body)
+    implicit val lang: play.api.i18n.Lang = reqLang(body)
     body.body
       .validate[JsonQuestion]
       .fold(

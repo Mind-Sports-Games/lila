@@ -2,46 +2,39 @@ package lila.game
 
 import strategygames.{ Player => PlayerIndex }
 import java.security.SecureRandom
-import scalalib.Random
 
 import lila.db.dsl._
 
-final class IdGenerator(gameRepo: GameRepo)(implicit ec: scala.concurrent.ExecutionContext) {
+final class IdGenerator(gameRepo: GameRepo)(implicit ec: scala.concurrent.ExecutionContext):
 
   import IdGenerator._
 
-  def game: Fu[Game.ID] = {
+  def game: Fu[Game.ID] =
     val id = uncheckedGame
-    gameRepo.exists(id).flatMap {
+    gameRepo.exists(id).flatMap:
       case true  => game
       case false => fuccess(id)
-    }
-  }
 
   def games(nb: Int): Fu[Set[Game.ID]] =
     if (nb < 1) fuccess(Set.empty)
     else if (nb == 1) game.dmap(Set(_))
     else if (nb < 5) Future.sequence(Set.fill(nb)(game))
-    else {
+    else
       val ids = Set.fill(nb)(uncheckedGame)
       gameRepo.coll.distinctEasy[Game.ID, Set]("_id", $inIds(ids)) flatMap { collisions =>
         games(collisions.size) dmap { _ ++ (ids diff collisions) }
       }
-    }
-}
 
-object IdGenerator {
+object IdGenerator:
 
   private val secureRandom  = new SecureRandom()
   private val p1SuffixChars = ('0' to '4') ++ ('A' to 'Z') mkString
   private val p2SuffixChars = ('5' to '9') ++ ('a' to 'z') mkString
 
-  def uncheckedGame: Game.ID = lila.common.ThreadLocalRandom nextString Game.gameIdSize
+  def uncheckedGame: Game.ID = lila.common.ThreadLocalRandom `nextString` Game.gameIdSize
 
-  def player(playerIndex: PlayerIndex): Player.ID = {
+  def player(playerIndex: PlayerIndex): Player.ID =
     // Trick to avoid collisions between player ids in the same game.
     val suffixChars = playerIndex.fold(p1SuffixChars, p2SuffixChars)
-    val suffix      = suffixChars(secureRandom nextInt suffixChars.length)
+    val suffix      = suffixChars(secureRandom `nextInt` suffixChars.length)
     Random.secureString(Game.playerIdSize - 1) + suffix
-  }
-}

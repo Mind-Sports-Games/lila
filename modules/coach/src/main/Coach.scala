@@ -14,7 +14,7 @@ case class Coach(
     languages: List[String],
     createdAt: DateTime,
     updatedAt: DateTime
-) {
+):
 
   def id = _id
 
@@ -25,9 +25,8 @@ case class Coach(
   def isListed = listed.value && approved.value
 
   def daysOld = Days.daysBetween(createdAt, DateTime.now).getDays
-}
 
-object Coach {
+object Coach:
 
   def make(user: lila.user.User) =
     Coach(
@@ -52,4 +51,3 @@ object Coach {
   case class Approved(value: Boolean)   extends AnyVal
   case class PicturePath(value: String) extends AnyVal with StringValue
   case class User(rating: Int, seenAt: DateTime)
-}

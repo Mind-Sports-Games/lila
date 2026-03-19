@@ -2,7 +2,6 @@ package lila.mod
 
 import org.joda.time.DateTime
 import reactivemongo.api.ReadPreference
-import scala.concurrent.duration._
 
 import lila.db.dsl._
 import lila.game.BSONHandlers._
@@ -21,21 +20,21 @@ final private class RatingRefund(
     rankingApi: lila.user.RankingApi,
     logApi: ModlogApi,
     perfStat: lila.perfStat.Env
-)(implicit ec: scala.concurrent.ExecutionContext) {
+)(implicit ec: scala.concurrent.ExecutionContext):
 
   import RatingRefund._
 
-  def schedule(sus: Suspect): Unit = { val _ = scheduler.scheduleOnce(delay)(apply(sus).unit) }
+  def schedule(sus: Suspect): Unit = { val _ = scheduler.scheduleOnce(delay) { apply(sus); () } }
 
   private def apply(sus: Suspect): Funit =
-    logApi.wasUnengined(sus) flatMap {
+    logApi.wasUnengined(sus) flatMap:
       case true => funit
       case false =>
         def lastGames =
           gameRepo.coll
             .find(
               Query.user(sus.user.id) ++ Query.rated ++ Query
-                .createdSince(DateTime.now minusDays 3) ++ Query.finished
+                .createdSince(DateTime.now `minusDays` 3) ++ Query.finished
             )
             .sort(Query.sortCreated)
             .cursor[Game](ReadPreference.secondaryPreferred)
@@ -55,20 +54,19 @@ final private class RatingRefund(
           }
 
         def pointsToRefund(ref: Refund, curRating: Int, perfs: PerfStat): Int = {
-          ref.diff - (ref.diff + curRating - ref.topRating atLeast 0) / 2 atMost
+          ref.diff - (ref.diff + curRating - ref.topRating `atLeast` 0) / 2 `atMost`
             perfs.highest.fold(100) { _.int - curRating + 20 }
         }.squeeze(0, 150)
 
-        def refundPoints(victim: Victim, pt: PerfType, points: Int): Funit = {
-          val newPerf = victim.user.perfs(pt) refund points
+        def refundPoints(victim: Victim, pt: PerfType, points: Int): Funit =
+          val newPerf = victim.user.perfs(pt) `refund` points
           userRepo.setPerf(victim.user.id, pt, newPerf) >>
             historyApi.setPerfRating(victim.user, pt, newPerf.intRating) >>
             rankingApi.save(victim.user, pt, newPerf) >>
             notifier.refund(victim, pt, points)
-        }
 
         def applyRefund(ref: Refund) =
-          userRepo byId ref.victim flatMap {
+          userRepo `byId` ref.victim flatMap:
             _ so { user =>
               perfStat.get(user, ref.perf) flatMap { perfs =>
                 val points = pointsToRefund(
@@ -76,33 +74,26 @@ final private class RatingRefund(
                   curRating = user.perfs(ref.perf).intRating,
                   perfs = perfs
                 )
-                (points > 0) so {
+                (points > 0) so:
                   logger.info(s"Refunding $ref -> $points")
                   refundPoints(Victim(user), ref.perf, points)
-                }
               }
             }
-          }
 
         lastGames map makeRefunds flatMap { r => Future.sequence(r.all.map(applyRefund)) } void
-    }
-}
 
-private object RatingRefund {
+private object RatingRefund:
 
   val delay = 1 minute
 
-  case class Refund(victim: User.ID, perf: PerfType, diff: Int, topRating: Int) {
+  case class Refund(victim: User.ID, perf: PerfType, diff: Int, topRating: Int):
     def is(v: User.ID, p: PerfType): Boolean = v == victim && p == perf
     def is(r: Refund): Boolean               = is(r.victim, r.perf)
     def add(d: Int, r: Int)                  = copy(diff = diff + d, topRating = topRating max r)
-  }
 
-  case class Refunds(all: List[Refund]) {
+  case class Refunds(all: List[Refund]):
     def add(victim: User.ID, perf: PerfType, diff: Int, rating: Int) =
       copy(all = all.find(_.is(victim, perf)) match {
         case None    => Refund(victim, perf, diff, rating) :: all
-        case Some(r) => r.add(diff, rating) :: all.filterNot(_ is r)
+        case Some(r) => r.add(diff, rating) :: all.filterNot(_ `is` r)
       })
-  }
-}

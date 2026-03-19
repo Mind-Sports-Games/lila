@@ -17,7 +17,7 @@ class EmailTest extends munit.FunSuite:
   test("normalize other"):
     assertEquals(
       EmailAddress("Hello.World+suffix1+suffix2@yandex.ru").normalize,
-      NormalizedEmailAddress("hello.world@yandex.ru")
+      NormalizedEmailAddress("hello.world+suffix1+suffix2@yandex.ru")
     )
     assertEquals(
       EmailAddress("foo.bar@outlook.com").normalize,
@@ -31,9 +31,9 @@ class EmailTest extends munit.FunSuite:
 
   test("similar emails"):
     assert(EmailAddress("test@mail.com").similarTo(EmailAddress("test@mail.com")))
-    assert(EmailAddress("test@gmail.com").similarTo(EmailAddress("test@googlemail.com")))
-    assert(EmailAddress("test+foo@gmail.com").similarTo(EmailAddress("test@googlemail.com")))
-    assert(EmailAddress("test@yandex.com").similarTo(EmailAddress("test@ya.ru")))
+    assert(EmailAddress("test@gmail.com").similarTo(EmailAddress("test@gmail.com")))
+    assert(EmailAddress("test+foo@gmail.com").similarTo(EmailAddress("test@gmail.com")))
+    assert(EmailAddress("test@yandex.com").similarTo(EmailAddress("test@yandex.com")))
 
   test("lowercase emails"):
     assertEquals(

@@ -10,7 +10,7 @@ case class UserRecord(
     o: Option[Vector[Outcome]],
     b: Option[Vector[TempBan]],
     c: Option[RageSit]
-) {
+):
 
   def userId                    = _id
   def outcomes: Vector[Outcome] = ~o
@@ -30,31 +30,29 @@ case class UserRecord(
   def badOutcomeRatio: Float = if (bans.sizeIs < 3) 0.4f else 0.3f
 
   def minBadOutcomes: Int =
-    bans.size match {
+    bans.size match
       case 0 | 1 => 4
       case 2 | 3 => 3
       case _     => 2
-    }
 
   def badOutcomesStreakSize: Int =
-    bans.size match {
+    bans.size match
       case 0     => 6
       case 1 | 2 => 5
       case _     => 4
-    }
 
   def bannable(accountCreationDate: DateTime): Option[TempBan] = {
     rageSitRecidive || {
       outcomes.lastOption.exists(_ != Outcome.Good) && {
         // too many bad overall
-        badOutcomeScore >= (badOutcomeRatio * nbOutcomes atLeast minBadOutcomes.toFloat) || {
+        badOutcomeScore >= (badOutcomeRatio * nbOutcomes `atLeast` minBadOutcomes.toFloat) || {
           // bad result streak
           outcomes.sizeIs >= badOutcomesStreakSize &&
           outcomes.takeRight(badOutcomesStreakSize).forall(Outcome.Good !=)
         }
       }
     }
-  } option TempBan.make(bans, accountCreationDate)
+  } `option` TempBan.make(bans, accountCreationDate)
 
   def rageSitRecidive =
     outcomes.lastOption.exists(Outcome.rageSitLike.contains) && {
@@ -69,31 +67,29 @@ case class UserRecord(
     rageSit.counter <= -250 &&
       rageSitRecidive &&
       bans.lastOption.exists(_.remainingMinutes > 60 * 12)
-}
 
 case class TempBan(
     date: DateTime,
     mins: Int
-) {
+):
 
-  def endsAt = date plusMinutes mins
+  def endsAt = date `plusMinutes` mins
 
-  def remainingSeconds: Int = (endsAt.getSeconds - nowSeconds).toInt atLeast 0
+  def remainingSeconds: Int = ((endsAt.getMillis / 1000) - nowSeconds).toInt `atLeast` 0
 
-  def remainingMinutes: Int = (remainingSeconds / 60) atLeast 1
+  def remainingMinutes: Int = (remainingSeconds / 60) `atLeast` 1
 
   def inEffect = endsAt.isAfterNow
 
-}
 
-object TempBan {
+object TempBan:
 
   implicit val tempbanWrites: OWrites[TempBan] = Json.writes[TempBan]
 
   private def make(minutes: Int) =
     TempBan(
       DateTime.now,
-      minutes atMost 3 * 24 * 60
+      minutes `atMost` 3 * 24 * 60
     )
 
   private val baseMinutes = 10
@@ -106,24 +102,21 @@ object TempBan {
     * Account less than 3 days old --> 2x the usual time
     */
   def make(bans: Vector[TempBan], accountCreationDate: DateTime): TempBan =
-    make {
+    make:
       (bans.lastOption so { prev =>
-        prev.endsAt.toNow.getStandardHours.toSaturatedInt match {
+        new org.joda.time.Duration(prev.endsAt, DateTime.now).getStandardHours.toSaturatedInt match {
           case h if h < 72 => prev.mins * (132 - h) / 60
           case h           => (55.6 * prev.mins / (Math.pow(5.56 * prev.mins - 54.6, h / 720) + 54.6)).toInt
         }
-      } atLeast baseMinutes) * (if (accountCreationDate.plusDays(3).isAfterNow) 2 else 1)
-    }
-}
+      } `atLeast` baseMinutes) * (if (accountCreationDate.plusDays(3).isAfterNow) 2 else 1)
 
 sealed abstract class Outcome(
     val id: Int,
     val name: String
-) {
+):
   val key = s"${toString.head.toLower}${toString.tail}"
-}
 
-object Outcome {
+object Outcome:
 
   case object Good      extends Outcome(0, "Nothing unusual")
   case object Abort     extends Outcome(1, "Aborts the game")
@@ -143,4 +136,3 @@ object Outcome {
   } toMap
 
   def apply(id: Int): Option[Outcome] = byId get id
-}

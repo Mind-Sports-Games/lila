@@ -5,7 +5,7 @@ import play.api.libs.json._
 import lila.common.Json._
 import lila.study.JsonView._
 
-object JsonView {
+object JsonView:
 
   case class JsData(study: JsObject, analysis: JsObject, practice: JsObject)
 
@@ -18,14 +18,13 @@ object JsonView {
     )
   }
   import PracticeGoal._
-  implicit val practiceGoalWrites: Writes[PracticeGoal] = OWrites {
+  implicit val practiceGoalWrites: Writes[PracticeGoal] = OWrites:
     case Mate              => Json.obj("result" -> "mate")
     case MateIn(moves)     => Json.obj("result" -> "mateIn", "moves" -> moves)
     case DrawIn(moves)     => Json.obj("result" -> "drawIn", "moves" -> moves)
     case EqualIn(moves)    => Json.obj("result" -> "equalIn", "moves" -> moves)
     case EvalIn(cp, moves) => Json.obj("result" -> "evalIn", "cp" -> cp, "moves" -> moves)
     case Promotion(cp)     => Json.obj("result" -> "promotion", "cp" -> cp)
-  }
 
   def apply(us: UserStudy) =
     Json.obj(
@@ -52,4 +51,3 @@ object JsonView {
         )
       }
     )
-}

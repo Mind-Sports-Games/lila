@@ -13,11 +13,11 @@ final class PgnDump(
     chapterRepo: ChapterRepo,
     lightUserApi: lila.user.LightUserApi,
     net: lila.common.config.NetConfig
-) {
+):
 
   import PgnDump._
 
-  def apply(study: Study, flags: WithFlags): Source[String, _] =
+  def apply(study: Study, flags: WithFlags): Source[String, ?] =
     chapterRepo
       .orderedByStudySource(study.id)
       .map(ofChapter(study, flags))
@@ -37,32 +37,30 @@ final class PgnDump(
 
   def ownerName(study: Study) = lightUserApi.sync(study.ownerId).fold(study.ownerId)(_.name)
 
-  def filename(study: Study): String = {
+  def filename(study: Study): String =
     val date = dateFormat.print(study.createdAt)
     fileR.replaceAllIn(
       s"playstrategy_study_${slugify(study.name.value)}_by_${ownerName(study)}_$date",
       ""
     )
-  }
 
-  def filename(study: Study, chapter: Chapter): String = {
+  def filename(study: Study, chapter: Chapter): String =
     val date = dateFormat.print(chapter.createdAt)
     fileR.replaceAllIn(
       s"playstrategy_study_${slugify(study.name.value)}_${slugify(chapter.name.value)}_by_${ownerName(study)}_$date",
       ""
     )
-  }
 
   private def chapterUrl(studyId: Study.Id, chapterId: Chapter.Id) =
     s"${net.baseUrl}/study/$studyId/$chapterId"
 
-  private val dateFormat = DateTimeFormat forPattern "yyyy.MM.dd"
+  private val dateFormat = DateTimeFormat `forPattern` "yyyy.MM.dd"
 
   private def annotatorTag(study: Study) =
     Tag(_.Annotator, s"https://playstrategy.org/@/${ownerName(study)}")
 
   private def makeTags(study: Study, chapter: Chapter): Tags =
-    Tags {
+    Tags:
       val opening = chapter.opening
       val genTags = List(
         Tag(_.Event, s"${study.name}: ${chapter.name}"),
@@ -85,10 +83,8 @@ final class PgnDump(
           else tag :: tags
         }
         .reverse
-    }
-}
 
-object PgnDump {
+object PgnDump:
 
   case class WithFlags(comments: Boolean, variations: Boolean, clocks: Boolean)
 
@@ -96,7 +92,7 @@ object PgnDump {
   private val noVariations: Variations = Vector.empty
 
   //assume comments and info is stored on first node of turn
-  private def nodes2Multiaction(nodes: Vector[Node], variations: Variations)(implicit flags: WithFlags) = {
+  private def nodes2Multiaction(nodes: Vector[Node], variations: Variations)(implicit flags: WithFlags) =
     nodes.headOption.map { firstNode =>
       Turn(
         san = nodes.map(_.move.san).mkString(","),
@@ -114,27 +110,22 @@ object PgnDump {
         secondsLeft = flags.clocks so firstNode.clock.map(_.roundSeconds)
       )
     }
-  }
 
   // [%csl Gb4,Yd5,Rf6][%cal Ge2e4,Ye2d4,Re2g4]
-  private def shapeComment(shapes: Shapes): Option[String] = {
+  private def shapeComment(shapes: Shapes): Option[String] =
     def render(as: String)(shapes: List[String]) =
-      shapes match {
+      shapes match
         case Nil    => ""
         case shapes => s"[%$as ${shapes.mkString(",")}]"
-      }
-    val circles = render("csl") {
+    val circles = render("csl"):
       shapes.value.collect { case Shape.Circle(brush, orig) =>
         s"${brush.head.toUpper}$orig"
       }
-    }
-    val arrows = render("cal") {
+    val arrows = render("cal"):
       shapes.value.collect { case Shape.Arrow(brush, orig, dest) =>
         s"${brush.head.toUpper}$orig$dest"
       }
-    }
     s"$circles$arrows".some.filter(_.nonEmpty)
-  }
 
   def toFullTurn(first: Vector[Node], second: Option[Vector[Node]], variations: Variations)(implicit
       flags: WithFlags
@@ -153,7 +144,7 @@ object PgnDump {
       variations: Variations
   )(implicit flags: WithFlags): Vector[FullTurn] = {
     val nodeTurns: Vector[Vector[Node]] = toNodeTurns(line)
-    nodeTurns match {
+    nodeTurns match
       case Vector(Vector()) => Vector()
       case first +: rest if first.head.playedPlayerIndex == Player.P2 =>
         FullTurn(
@@ -165,7 +156,6 @@ object PgnDump {
           first.head.children.variations
         )
       case l => toFullTurnsFromP1(l, variations)
-    }
   }.filterNot(_.isEmpty)
 
   def toFullTurnsFromP1(line: Vector[Vector[Node]], variations: Variations)(implicit
@@ -186,16 +176,13 @@ object PgnDump {
       ._2
       .reverse
 
-  def toNodeTurns(line: Vector[Node]): Vector[Vector[Node]] = {
+  def toNodeTurns(line: Vector[Node]): Vector[Vector[Node]] =
     line
       .drop(1)
       .foldLeft(Vector(line.take(1))) { case (turn, node) =>
-        if (turn.head.head.playedPlayerIndex != node.playedPlayerIndex) {
+        if (turn.head.head.playedPlayerIndex != node.playedPlayerIndex)
           Vector(node) +: turn
-        } else {
+        else
           (turn.head :+ node) +: turn.tail
-        }
       }
       .reverse
-  }
-}

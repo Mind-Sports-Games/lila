@@ -8,21 +8,17 @@ import lila.game.Game
 import lila.common.Bus
 
 /* async wait for analysis to complete */
-final class FishnetAwaiter(implicit ec: ExecutionContext, scheduler: org.apache.pekko.actor.Scheduler) {
+final class FishnetAwaiter(implicit ec: ExecutionContext, scheduler: org.apache.pekko.actor.Scheduler):
 
   private val busChannel = "analysisReady"
 
   def apply(gameIds: Seq[Game.ID], atMost: FiniteDuration): Funit =
-    gameIds.nonEmpty so {
+    gameIds.nonEmpty so:
       val promise      = Promise[Unit]()
       var remainingIds = gameIds.toSet
-      val listener = Bus.subscribeFun(busChannel) {
+      val listener = Bus.subscribeFun(busChannel):
         case lila.analyse.actorApi.AnalysisReady(game, _) if remainingIds(game.id) =>
           remainingIds = remainingIds - game.id
           if (remainingIds.isEmpty) promise.success {}
-      }
-      promise.future.withTimeoutDefault(atMost, {}) addEffectAnyway {
+      promise.future.withTimeoutDefault(atMost, {}) addEffectAnyway:
         Bus.unsubscribe(listener, busChannel)
-      }
-    }
-}

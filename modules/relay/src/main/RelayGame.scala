@@ -9,7 +9,7 @@ case class RelayGame(
     variant: strategygames.variant.Variant,
     root: Node.Root,
     end: Option[PgnImport.End]
-) {
+):
 
   def staticTagsMatch(chapterTags: Tags): Boolean =
     RelayGame.staticTags forall { name =>
@@ -21,14 +21,12 @@ case class RelayGame(
 
   lazy val looksLikePlayStrategy = tags(_.Site) exists { site =>
     RelayGame.playstrategyDomains exists { domain =>
-      site startsWith s"https://$domain/"
+      site `startsWith` s"https://$domain/"
     }
   }
-}
 
-private object RelayGame {
+private object RelayGame:
 
   val playstrategyDomains = List("playstrategy.org", "playstrategy.dev")
 
   val staticTags = List("p1", "p2", "round", "event", "site")
-}

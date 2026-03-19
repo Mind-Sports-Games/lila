@@ -8,7 +8,7 @@ import reactivemongo.api.bson.BSONHandler
 
 case class IrwinThresholds(report: Int, mark: Int)
 
-private object IrwinThresholds {
+private object IrwinThresholds:
 
   private val defaultThresholds = IrwinThresholds(88, 95)
 
@@ -33,4 +33,3 @@ private object IrwinThresholds {
       default = defaultThresholds,
       text = "Irwin report and mark thresholds, separated with a comma. Set to 101 to disable.".some
     )
-}

@@ -10,7 +10,7 @@ final class Env(
     studyApi: lila.study.StudyApi,
     cacheApi: lila.memo.CacheApi,
     db: lila.db.Db
-)(implicit ec: scala.concurrent.ExecutionContext) {
+)(implicit ec: scala.concurrent.ExecutionContext):
 
   private lazy val coll = db(CollName("practice_progress"))
 
@@ -20,6 +20,5 @@ final class Env(
   lazy val api: PracticeApi = wire[PracticeApi]
 
   lila.common.Bus.subscribeFun("study") { case lila.study.actorApi.SaveStudy(study) =>
-    api.structure onSave study
+    api.structure `onSave` study
   }
-}

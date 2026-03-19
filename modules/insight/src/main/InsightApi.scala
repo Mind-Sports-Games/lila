@@ -11,24 +11,23 @@ final class InsightApi(
     insightUserApi: InsightUserApi,
     gameRepo: GameRepo,
     indexer: InsightIndexer
-)(implicit ec: scala.concurrent.ExecutionContext) {
+)(implicit ec: scala.concurrent.ExecutionContext):
 
   import InsightApi._
 
   def insightUser(user: User): Fu[InsightUser] =
-    insightUserApi find user.id flatMap {
+    insightUserApi `find` user.id flatMap:
       case Some(u) =>
-        u.lastSeen.isBefore(DateTime.now minusDays 1) so {
-          insightUserApi setSeenNow user
+        u.lastSeen.isBefore(DateTime.now `minusDays` 1) so {
+          insightUserApi `setSeenNow` user
         } inject u
       case None =>
         for {
-          count <- storage count user.id
-          ecos  <- storage ecos user.id
+          count <- storage `count` user.id
+          ecos  <- storage `ecos` user.id
           c = InsightUser.make(user.id, count, ecos)
-          _ <- insightUserApi save c
+          _ <- insightUserApi `save` c
         } yield c
-    }
 
   def ask[X](question: Question[X], user: User): Fu[Answer[X]] =
     pipeline
@@ -43,15 +42,13 @@ final class InsightApi(
       .monSuccess(_.insight.request)
 
   def userStatus(user: User): Fu[UserStatus] =
-    gameRepo lastFinishedRatedNotFromPosition user flatMap {
+    gameRepo `lastFinishedRatedNotFromPosition` user flatMap:
       case None => fuccess(UserStatus.NoGame)
       case Some(game) =>
-        storage fetchLast user.id map {
+        storage `fetchLast` user.id map:
           case None                                              => UserStatus.Empty
-          case Some(entry) if entry.date isBefore game.createdAt => UserStatus.Stale
+          case Some(entry) if entry.date `isBefore` game.createdAt => UserStatus.Stale
           case _                                                 => UserStatus.Fresh
-        }
-    }
 
   def indexAll(userId: User.ID) =
     indexer
@@ -63,7 +60,7 @@ final class InsightApi(
     Future.sequence(Pov(g)
       .map { pov =>
         pov.player.userId so { userId =>
-          storage find InsightEntry.povToId(pov) flatMap {
+          storage `find` InsightEntry.povToId(pov) flatMap {
             _ so { old =>
               indexer.update(g, userId, old)
             }
@@ -71,15 +68,12 @@ final class InsightApi(
         }
       })
       .void
-}
 
-object InsightApi {
+object InsightApi:
 
   sealed trait UserStatus
-  object UserStatus {
+  object UserStatus:
     case object NoGame extends UserStatus // the user has no rated games
     case object Empty  extends UserStatus // insights not yet generated
     case object Stale  extends UserStatus // new games not yet generated
     case object Fresh  extends UserStatus // up to date
-  }
-}

@@ -3,7 +3,7 @@ package lila.streamer
 import lila.db.dsl._
 import reactivemongo.api.bson._
 
-private object BsonHandlers {
+private object BsonHandlers:
 
   implicit val StreamerIdBSONHandler: BSONHandler[Streamer.Id] =
     stringAnyValHandler[Streamer.Id](_.value, Streamer.Id.apply)
@@ -23,4 +23,3 @@ private object BsonHandlers {
   implicit val StreamerYouTubeBSONHandler: BSONDocumentHandler[YouTube]   = Macros.handler[YouTube]
   implicit val StreamerApprovalBSONHandler: BSONDocumentHandler[Approval] = Macros.handler[Approval]
   implicit val StreamerBSONHandler: BSONDocumentHandler[Streamer]         = Macros.handler[Streamer]
-}

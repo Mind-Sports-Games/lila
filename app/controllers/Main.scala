@@ -9,7 +9,7 @@ import scala.annotation.nowarn
 import lila.app._
 import lila.common.HTTPRequest
 import lila.hub.actorApi.captcha.ValidCaptcha
-import makeTimeout.large
+implicit private val defaultTimeout: org.apache.pekko.util.Timeout = makeTimeout.large
 import views._
 
 final class Main(
@@ -45,11 +45,11 @@ final class Main(
       }
     }
 
-  def handlerNotFound(req: RequestHeader) = reqToCtx(req) map renderNotFound
+  def handlerNotFound(req: play.api.mvc.RequestHeader) = reqToCtx(req) map renderNotFound
 
   def captchaCheck(id: String) =
     Open { implicit ctx =>
-      env.hub.captcher.actor ? ValidCaptcha(id, ~get("solution")) map { case valid: Boolean =>
+      env.hub.captcher.actor ? ValidCaptcha(id, get("solution").getOrElse("")) map { case valid: Boolean =>
         Ok(if (valid) 1 else 0)
       }
     }
@@ -121,7 +121,7 @@ final class Main(
         }
     }
 
-  val robots = Action { req =>
+  val robots = Action { (req: play.api.mvc.RequestHeader) =>
     Ok {
       if (env.net.crawlable && req.domain == env.net.domain.value) """User-agent: *
 Allow: /
@@ -165,13 +165,13 @@ Allow: /
     }
 
   def costs =
-    Action { req =>
+    Action { (req: play.api.mvc.RequestHeader) =>
       pageHit(req)
       Redirect("https://docs.google.com/spreadsheets/d/1Si3PMUJGR9KrpE5lngSkHLJKJkb0ZuI4/preview")
     }
 
   def verifyTitle =
-    Action { req =>
+    Action { (req: play.api.mvc.RequestHeader) =>
       pageHit(req)
       Redirect(
         "https://docs.google.com/forms/d/e/1FAIpQLSelXSHdiFw_PmZetxY8AaIJSM-Ahb5QnJcfQMDaiPJSf24lDQ/viewform"

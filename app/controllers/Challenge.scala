@@ -155,7 +155,7 @@ final class Challenge(
     }
   def apiDecline(id: String) =
     ScopedBody(_.Challenge.Write, _.Bot.Play, _.Board.Play) { implicit req => me =>
-      implicit val lang = reqLang
+      implicit val lang: play.api.i18n.Lang = reqLang
       api.activeByIdFor(id, me) flatMap {
         case None =>
           env.bot.player.rematchDecline(id, me) flatMap {
@@ -248,7 +248,7 @@ final class Challenge(
     AuthBody { implicit ctx => _ =>
       import play.api.data._
       import play.api.data.Forms._
-      implicit def req = ctx.body
+      implicit def req: play.api.mvc.Request[?] = ctx.body
       OptionFuResult(api byId id) { c =>
         if (isMine(c))
           Form(
@@ -277,7 +277,7 @@ final class Challenge(
 
   def apiCreate(userId: String) =
     ScopedBody(_.Challenge.Write, _.Bot.Play, _.Board.Play) { implicit req => me =>
-      implicit val lang = reqLang
+      implicit val lang: play.api.i18n.Lang = reqLang
       env.setup.forms.api
         .user(me)
         .bindFromRequest()
@@ -396,7 +396,7 @@ final class Challenge(
 
   def openCreate =
     Action.async { implicit req =>
-      implicit val lang = reqLang
+      implicit val lang: play.api.i18n.Lang = reqLang
       env.setup.forms.api.open
         .bindFromRequest()
         .fold(

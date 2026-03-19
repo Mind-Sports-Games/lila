@@ -16,7 +16,7 @@ case class Report(
     inquiry: Option[Report.Inquiry],
     open: Boolean,
     processedBy: Option[User.ID]
-) extends Reason.WithReason {
+) extends Reason.WithReason:
 
   import Report.{ Atom, Score }
 
@@ -32,7 +32,7 @@ case class Report(
   def add(atom: Atom) =
     atomBy(atom.by)
       .fold(copy(atoms = atom :: atoms)) { existing =>
-        if (existing.text contains atom.text) this
+        if (existing.text `contains` atom.text) this
         else
           copy(
             atoms = {
@@ -56,9 +56,9 @@ case class Report(
   def bestAtom: Atom   = bestAtoms(1).headOption | recentAtom
   def bestAtoms(nb: Int): List[Atom] =
     atoms.toList.sortBy { a =>
-      (-a.score.value, -a.at.getSeconds)
+      (-a.score.value, -a.at.getMillis / 1000)
     } take nb
-  def onlyAtom: Option[Atom]                       = atoms.tail.isEmpty option atoms.head
+  def onlyAtom: Option[Atom]                       = atoms.tail.isEmpty `option` atoms.head
   def atomBy(reporterId: ReporterId): Option[Atom] = atoms.toList.find(_.by == reporterId)
   def bestAtomByHuman: Option[Atom]                = bestAtoms(10).find(_.byHuman)
 
@@ -78,21 +78,19 @@ case class Report(
   def isRecentCommOf(sus: Suspect) = isRecentComm && user == sus.user.id
 
   def isAppeal = room == Room.Other && atoms.head.text == Report.appealText
-}
 
-object Report {
+object Report:
 
   type ID = String
 
-  case class Score(value: Double) extends AnyVal {
+  case class Score(value: Double) extends AnyVal:
     def +(s: Score) = Score(s.value + value)
     def playerIndex =
       if (value >= 150) "red"
       else if (value >= 100) "orange"
       else if (value >= 50) "yellow"
       else "green"
-    def atLeast(v: Int) = Score(value atLeast v)
-  }
+    def atLeast(v: Int) = Score(value `atLeast` v)
   implicit val scoreIso: Iso.DoubleIso[Score] = lila.common.Iso.double[Score](Score.apply, _.value)
 
   case class Atom(
@@ -100,44 +98,40 @@ object Report {
       text: String,
       score: Score,
       at: DateTime
-  ) {
-    def simplifiedText = text.linesIterator.filterNot(_ startsWith "[AUTOREPORT]") mkString "\n"
+  ):
+    def simplifiedText = text.linesIterator.filterNot(_ `startsWith` "[AUTOREPORT]") mkString "\n"
 
     def byHuman = !byPlayStrategy && by != ReporterId.irwin
 
     def byPlayStrategy = by == ReporterId.playstrategy
-  }
 
   case class Inquiry(mod: User.ID, seenAt: DateTime)
 
-  case class WithSuspect(report: Report, suspect: Suspect, isOnline: Boolean) {
+  case class WithSuspect(report: Report, suspect: Suspect, isOnline: Boolean):
 
     def urgency: Int =
       report.score.value.toInt +
         (isOnline so 1000) +
         (report.closed so -999999)
-  }
 
-  case class ByAndAbout(by: List[Report], about: List[Report]) {
+  case class ByAndAbout(by: List[Report], about: List[Report]):
     def userIds = by.flatMap(_.userIds) ::: about.flatMap(_.userIds)
-  }
 
   case class Candidate(
       reporter: Reporter,
       suspect: Suspect,
       reason: Reason,
       text: String
-  ) extends Reason.WithReason {
+  ) extends Reason.WithReason:
     def scored(score: Score) = Candidate.Scored(this, score)
     def isAutomatic          = reporter.id == ReporterId.playstrategy
     def isAutoComm           = isAutomatic && isComm
     def isAutoBoost          = isAutomatic && isBoost
     def isCoachReview        = isOther && text.contains("COACH REVIEW")
-    def isCommFlag           = text contains Reason.Comm.flagText
-  }
+    def isCommFlag           = text `contains` Reason.Comm.flagText
 
-  object Candidate {
-    case class Scored(candidate: Candidate, score: Score) {
+  object Candidate:
+    case class Scored(candidate: Candidate, score: Score):
       def withScore(f: Score => Score) = copy(score = f(score))
       def atom =
         Atom(
@@ -146,18 +140,16 @@ object Report {
           score = score,
           at = DateTime.now
         )
-    }
-  }
 
   private[report] val spontaneousText = "Spontaneous inquiry"
   private[report] val appealText      = "Appeal"
 
   def make(c: Candidate.Scored, existing: Option[Report]) =
-    c match {
+    c match
       case c @ Candidate.Scored(candidate, score) =>
         existing.fold(
           Report(
-            _id = lila.common.ThreadLocalRandom nextString 8,
+            _id = lila.common.ThreadLocalRandom `nextString` 8,
             user = candidate.suspect.user.id,
             reason = candidate.reason,
             room = Room(candidate.reason),
@@ -167,8 +159,6 @@ object Report {
             open = true,
             processedBy = none
           )
-        )(_ add c.atom)
-    }
+        )(_ `add` c.atom)
 
   private[report] case class SnoozeKey(snoozerId: User.ID, reportId: Report.ID) extends lila.memo.Snooze.Key
-}

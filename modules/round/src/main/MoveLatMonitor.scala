@@ -2,14 +2,12 @@ package lila.round
 
 import org.apache.pekko.actor.Scheduler
 import java.util.concurrent.atomic.AtomicReference
-import scala.concurrent.duration._
 
-private object MoveLatMonitor {
+private object MoveLatMonitor:
 
-  private case class Latency(totalMicros: Long = 0, count: Int = 0) {
+  private case class Latency(totalMicros: Long = 0, count: Int = 0):
     def record(micros: Int) = copy(totalMicros + micros, count + 1)
     def average             = (totalMicros / count.atLeast(1)).toInt
-  }
   private val latency = new AtomicReference(Latency())
 
   def start(scheduler: Scheduler)(implicit ec: scala.concurrent.ExecutionContext) =
@@ -20,5 +18,4 @@ private object MoveLatMonitor {
       )
     }
 
-  def record(micros: Int): Unit = { val _ = latency.getAndUpdate(_ record micros) }
-}
+  def record(micros: Int): Unit = { val _ = latency.getAndUpdate(_ `record` micros) }

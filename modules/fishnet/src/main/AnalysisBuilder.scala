@@ -2,7 +2,7 @@ package lila.fishnet
 
 import org.joda.time.DateTime
 
-import strategygames.format.{ FEN, Uci }
+import strategygames.format.Uci
 import strategygames.Replay
 import JsonApi.Request.Evaluation
 import lila.analyse.{ Analysis, Info }
@@ -10,7 +10,7 @@ import lila.tree.Eval
 
 final private class AnalysisBuilder(evalCache: FishnetEvalCache)(implicit
     ec: scala.concurrent.ExecutionContext
-) {
+):
 
   def apply(client: Client, work: Work.Analysis, evals: List[Evaluation.OrSkipped[Uci]]): Fu[Analysis] =
     partial(client, work, evals map some, isPartial = false)
@@ -20,7 +20,7 @@ final private class AnalysisBuilder(evalCache: FishnetEvalCache)(implicit
       work: Work.Analysis,
       evals: List[Option[Evaluation.OrSkipped[Uci]]],
       isPartial: Boolean = true
-  ): Fu[Analysis] = {
+  ): Fu[Analysis] =
     evalCache.evals(work) flatMap { cachedFull =>
       /* remove first eval in partial analysis
        * to prevent the mobile app from thinking it's complete
@@ -44,7 +44,7 @@ final private class AnalysisBuilder(evalCache: FishnetEvalCache)(implicit
                 studyId = work.game.studyId,
                 infos = makeInfos(mergeEvalsAndCached(work, evals, cached), work.game.uciList, work.startPly),
                 startPly = work.startPly,
-                fk = !client.playstrategy option client.key.value,
+                fk = !client.playstrategy `option` client.key.value,
                 date = DateTime.now
               ),
               work.game.variant
@@ -63,7 +63,6 @@ final private class AnalysisBuilder(evalCache: FishnetEvalCache)(implicit
             }
         )
     }
-  }
 
   private def duplicateValsForMultiMoveGames(
       work: Work.Analysis,
@@ -76,27 +75,24 @@ final private class AnalysisBuilder(evalCache: FishnetEvalCache)(implicit
       evals: List[Option[Evaluation.OrSkipped[Uci]]],
       cached: Map[Int, Evaluation[Uci]]
   ): List[Option[Evaluation[Uci]]] =
-    duplicateValsForMultiMoveGames(work, evals).zipWithIndex.map {
+    duplicateValsForMultiMoveGames(work, evals).zipWithIndex.map:
       case (None, i)              => cached get i
       case (Some(Right(eval)), i) => cached.getOrElse(i, eval).some
       case (_, i) =>
-        cached get i orElse {
+        cached get i orElse:
           logger.error(s"Missing cached eval for skipped position at index $i in $work")
           none[Evaluation[Uci]]
-        }
-    }
 
   private def makeInfos(
       evals: List[Option[Evaluation[Uci]]],
       moves: List[Uci],
       startedAtTurn: Int
   ): List[Info] =
-    (evals filterNot (_ so (_.isCheckmate)) sliding 2).toList.zip(moves).zipWithIndex map {
+    (evals filterNot (_ so (_.isCheckmate)) sliding 2).toList.zip(moves).zipWithIndex map:
       case ((List(Some(before), Some(after)), move), index) =>
-        val variation = before.cappedPv match {
+        val variation = before.cappedPv match
           case first :: rest if first != move => first :: rest
           case _                              => Nil
-        }
         val best = variation.headOption
         val info = Info(
           //can use startedAtTurn as startedAtPly as fishnet doesnt deal with multiaction
@@ -110,5 +106,3 @@ final private class AnalysisBuilder(evalCache: FishnetEvalCache)(implicit
         )
         if (info.ply % 2 == 1) info.invert else info
       case ((_, _), index) => Info(index + 1 + startedAtTurn, Eval.empty)
-    }
-}

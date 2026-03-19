@@ -2,7 +2,6 @@ package lila.tv
 
 import org.apache.pekko.pattern.{ ask => actorAsk }
 import play.api.libs.json.Json
-import scala.concurrent.duration._
 import scala.concurrent.Promise
 
 import lila.common.{ Bus, LightUser }
@@ -16,7 +15,7 @@ final private[tv] class TvTrouper(
     gameProxyRepo: lila.round.GameProxyRepo,
     rematches: lila.game.Rematches
 )(implicit ec: scala.concurrent.ExecutionContext)
-    extends Trouper {
+    extends Trouper:
 
   import TvTrouper._
 
@@ -31,7 +30,7 @@ final private[tv] class TvTrouper(
   private def forward[A](channel: Tv.Channel, msg: Any) =
     channelTroupers get channel foreach { _ ! msg }
 
-  protected val process: Trouper.Receive = {
+  protected val process: Trouper.Receive =
 
     case GetGameId(channel, promise) =>
       forward(channel, ChannelTrouper.GetGameId(promise))
@@ -45,12 +44,11 @@ final private[tv] class TvTrouper(
     case GetChampions(promise) => promise success Tv.Champions(channelChampions)
 
     case lila.game.actorApi.StartGame(g) =>
-      if (g.hasClock || g.hasCorrespondenceClock || g.isUnlimited) {
+      if (g.hasClock || g.hasCorrespondenceClock || g.isUnlimited)
         val candidate = Tv.toCandidate(lightUserSync)(g)
         channelTroupers collect {
-          case (chan, trouper) if chan filter candidate => trouper
-        } foreach (_ addCandidate g)
-      }
+          case (chan, trouper) if chan `filter` candidate => trouper
+        } foreach (_ `addCandidate` g)
 
     case s @ TvTrouper.Select => channelTroupers.foreach(_._2 ! s)
 
@@ -78,10 +76,10 @@ final private[tv] class TvTrouper(
         }
       )
       Bus.publish(lila.hub.actorApi.tv.TvSelect(game.id, game.speed, data), "tvSelect")
-      if (channel == Tv.Channel.AllGames) {
-        implicit def timeout = makeTimeout(100 millis)
+      if (channel == Tv.Channel.AllGames)
+        implicit val timeout: org.apache.pekko.util.Timeout = makeTimeout(100 millis)
         actorAsk(renderer.actor, actorApi.RenderFeaturedJs(game)) foreach { case html: String =>
-          val pov = Pov naturalOrientation game
+          val pov = Pov `naturalOrientation` game
           val event = lila.round.ChangeFeatured(
             pov,
             makeMessage(
@@ -95,11 +93,8 @@ final private[tv] class TvTrouper(
           )
           Bus.publish(event, "changeFeaturedGame")
         }
-      }
-  }
-}
 
-private[tv] object TvTrouper {
+private[tv] object TvTrouper:
 
   case class GetGameId(channel: Tv.Channel, promise: Promise[Option[Game.ID]])
   case class GetGameIds(channel: Tv.Channel, max: Int, promise: Promise[List[Game.ID]])
@@ -110,4 +105,3 @@ private[tv] object TvTrouper {
   case class Selected(channel: Tv.Channel, game: Game)
 
   case class GetChampions(promise: Promise[Tv.Champions])
-}

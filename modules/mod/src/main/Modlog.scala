@@ -10,7 +10,7 @@ case class Modlog(
     action: String,
     details: Option[String] = None,
     date: DateTime = DateTime.now
-) {
+):
 
   def isPlayStrategy = mod == lila.user.User.playstrategyId
 
@@ -20,7 +20,7 @@ case class Modlog(
   def gameId = details.ifTrue(action == Modlog.cheatDetected).so(_.split(' ').lift(1))
 
   def showAction =
-    action match {
+    action match
       case Modlog.alt                 => "mark as alt"
       case Modlog.unalt               => "un-mark as alt"
       case Modlog.engine              => "mark as engine"
@@ -71,12 +71,10 @@ case class Modlog(
       case Modlog.appealPost          => "posted in appeal"
       case Modlog.setKidMode          => "set kid mode"
       case a                          => a
-    }
 
   override def toString = s"$mod $showAction ${~user} $details"
-}
 
-object Modlog {
+object Modlog:
 
   def make(mod: Mod, sus: Suspect, action: String, details: Option[String] = None): Modlog =
     Modlog(
@@ -135,4 +133,3 @@ object Modlog {
   val teamEdit            = "teamEdit"
   val appealPost          = "appealPost"
   val setKidMode          = "setKidMode"
-}

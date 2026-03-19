@@ -17,8 +17,8 @@ final class Env(
 )(implicit
     ec: scala.concurrent.ExecutionContext,
     scheduler: org.apache.pekko.actor.Scheduler,
-    mat: akka.stream.Materializer
-) {
+    mat: org.apache.pekko.stream.Materializer
+):
 
   private lazy val db = mongo.asyncDb(
     "insight",
@@ -44,4 +44,3 @@ final class Env(
   lila.common.Bus.subscribeFun("analysisReady") { case lila.analyse.actorApi.AnalysisReady(game, _) =>
     api.updateGame(game).discard
   }
-}

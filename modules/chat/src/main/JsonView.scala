@@ -5,17 +5,16 @@ import play.api.libs.json._
 import lila.common.LightUser
 import lila.common.Json._
 
-object JsonView {
+object JsonView:
 
   import writers._
 
   lazy val timeoutReasons = Json toJson ChatTimeout.Reason.all
 
   def apply(chat: AnyChat): JsValue =
-    chat match {
+    chat match
       case c: MixedChat => mixedChatWriter writes c
       case c: UserChat  => userChatWriter writes c
-    }
 
   def apply(line: Line): JsObject = lineWriter writes line
 
@@ -30,7 +29,7 @@ object JsonView {
       "writeable" -> writeable
     )
 
-  object writers {
+  object writers:
 
     implicit val chatIdWrites: Writes[Chat.Id] = stringIsoWriter(Chat.chatIdIso)
 
@@ -57,10 +56,9 @@ object JsonView {
       JsArray(c.lines map userLineWriter.writes)
     }
 
-    implicit private[chat] val lineWriter: OWrites[Line] = OWrites[Line] {
+    implicit private[chat] val lineWriter: OWrites[Line] = OWrites[Line]:
       case l: UserLine   => userLineWriter writes l
       case l: PlayerLine => playerLineWriter writes l
-    }
 
     implicit private val userLineWriter: OWrites[UserLine] = OWrites[UserLine] { l =>
       Json
@@ -79,5 +77,3 @@ object JsonView {
         "t" -> l.text
       )
     }
-  }
-}

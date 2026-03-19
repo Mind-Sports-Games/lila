@@ -2,7 +2,6 @@ package lila.swiss
 
 import org.joda.time.DateTime
 import reactivemongo.api.ReadPreference
-import scala.concurrent.duration._
 
 import lila.common.Heapsort
 import lila.db.dsl._
@@ -14,7 +13,7 @@ final class SwissFeature(
     colls: SwissColls,
     cacheApi: CacheApi,
     swissCache: SwissCache
-)(implicit ec: scala.concurrent.ExecutionContext) {
+)(implicit ec: scala.concurrent.ExecutionContext):
 
   import BsonHandlers._
 
@@ -33,17 +32,15 @@ final class SwissFeature(
   private def getForTeams(teams: Seq[TeamID]): Fu[FeaturedSwisses] =
     Future.sequence(teams.map(swissCache.featuredInTeam.get)).map(_.flatten) flatMap { ids =>
       colls.swiss.byIds[Swiss](ids.map(_.value), ReadPreference.secondaryPreferred)
-    } map {
-      _.filter(_.isNotFinished).partition(_.isCreated) match {
+    } map:
+      _.filter(_.isNotFinished).partition(_.isCreated) match
         case (created, started) =>
           FeaturedSwisses(
             created = Heapsort.topN(created, 10, startsAtOrdering.reverse),
             started = Heapsort.topN(started, 10, startsAtOrdering)
           )
-      }
-    }
 
-  private val cache = cacheApi.unit[FeaturedSwisses] {
+  private val cache = cacheApi.unit[FeaturedSwisses]:
     _.refreshAfterWrite(10 seconds)
       .buildAsyncFuture { _ =>
         val now = DateTime.now
@@ -52,19 +49,17 @@ final class SwissFeature(
             FeaturedSwisses(created, started)
           }
       }
-  }
 
   private def cacheCompute(startsAtRange: Bdoc): Fu[List[Swiss]] =
     colls.swiss
       .find(
         $doc(
           "featurable" -> true,
-          "settings.i" $lte 600, // hits the partial index
+          "settings.i" `$lte` 600, // hits the partial index
           "startsAt" -> startsAtRange,
-          "garbage" $ne true
+          "garbage" `$ne` true
         )
       )
-      .sort($sort desc "nbPlayers")
+      .sort($sort `desc` "nbPlayers")
       .cursor[Swiss]()
       .list(5)
-}

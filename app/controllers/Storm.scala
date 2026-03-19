@@ -5,7 +5,7 @@ import play.api.mvc._
 import lila.api.Context
 import lila.app._
 
-final class Storm(env: Env)(implicit mat: akka.stream.Materializer) extends LilaController(env) {
+final class Storm(env: Env)(implicit mat: org.apache.pekko.stream.Materializer) extends LilaController(env) {
 
   def home =
     Open { implicit ctx =>

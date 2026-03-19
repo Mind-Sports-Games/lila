@@ -2,7 +2,6 @@ package lila.puzzle
 
 import org.joda.time.DateTime
 import reactivemongo.api.bson.BSONNull
-import scala.concurrent.duration._
 import scala.concurrent.ExecutionContext
 
 import strategygames.variant.Variant
@@ -17,7 +16,7 @@ case class PuzzleDashboard(
     byTheme: Map[PuzzleTheme.Key, PuzzleDashboard.Results],
     byVariant: Map[Variant, PuzzleDashboard.Results],
     byVariantAndTheme: Map[(Variant, PuzzleTheme.Key), PuzzleDashboard.Results]
-) {
+):
 
   import PuzzleDashboard._
 
@@ -58,9 +57,8 @@ case class PuzzleDashboard(
     byThemeForVariant(variant).sortBy(-_._2.nb).take(9)
 
   def mostPlayedVariant = byVariant.toList.sortBy(-_._2.nb).take(9)
-}
 
-object PuzzleDashboard {
+object PuzzleDashboard:
 
   type Days = Int
 
@@ -70,7 +68,7 @@ object PuzzleDashboard {
 
   val topThemesNb = 8
 
-  case class Results(nb: Int, wins: Int, fixed: Int, puzzleRatingAvg: Int) {
+  case class Results(nb: Int, wins: Int, fixed: Int, puzzleRatingAvg: Int):
 
     def firstWins = wins - fixed
     def unfixed   = nb - wins
@@ -87,7 +85,6 @@ object PuzzleDashboard {
     def unclear = !clear
 
     def canReplay = unfixed > 0
-  }
 
   val irrelevantThemes = List(
     PuzzleTheme.oneMove,
@@ -109,30 +106,27 @@ object PuzzleDashboard {
     PuzzleTheme.masterVsMaster
   ).map(_.key)
 
-  val relevantThemes = PuzzleTheme.all collect {
+  val relevantThemes = PuzzleTheme.all collect:
     case t if !irrelevantThemes.contains(t.key) => t.key
-  }
-}
 
 final class PuzzleDashboardApi(
     colls: PuzzleColls,
     cacheApi: CacheApi
-)(implicit ec: ExecutionContext) {
+)(implicit ec: ExecutionContext):
 
   import PuzzleDashboard._
 
   def apply(u: User, days: Days): Fu[Option[PuzzleDashboard]] = cache.get(u.id -> days)
 
   private val cache =
-    cacheApi[(User.ID, Days), Option[PuzzleDashboard]](1024, "puzzle.dashboard") {
+    cacheApi[(User.ID, Days), Option[PuzzleDashboard]](1024, "puzzle.dashboard"):
       _.expireAfterWrite(10 seconds).buildAsyncFuture { case (userId, days) =>
         compute(userId, days)
       }
-    }
 
   //TODO maybe remove bytheme query and data as no longer required?
   private def compute(userId: User.ID, days: Days): Fu[Option[PuzzleDashboard]] =
-    colls.round {
+    colls.round:
       _.aggregateWith[Bdoc]() { framework =>
         import framework._
         val resultsGroup = List(
@@ -142,7 +136,7 @@ final class PuzzleDashboardApi(
           "rating" -> AvgField("puzzle.rating")
         )
         List(
-          Match($doc("u" -> userId, "d" $gt DateTime.now.minusDays(days))),
+          Match($doc("u" -> userId, "d" `$gt` DateTime.now.minusDays(days))),
           Sort(Descending("d")),
           Limit(10_000),
           PipelineOperator(
@@ -156,11 +150,11 @@ final class PuzzleDashboardApi(
           Unwind("puzzle"),
           Facet(
             List(
-              "global" -> List(Group(BSONNull)(resultsGroup: _*)),
+              "global" -> List(Group(BSONNull)(resultsGroup*)),
               "byTheme" -> List(
                 Unwind("puzzle.themes"),
                 Match(relevantThemesSelect),
-                GroupField("puzzle.themes")(resultsGroup: _*)
+                GroupField("puzzle.themes")(resultsGroup*)
               ),
               "byVariant" -> List(
                 Group(
@@ -168,7 +162,7 @@ final class PuzzleDashboardApi(
                     "variant" -> "$puzzle.v",
                     "lib"     -> "$puzzle.l"
                   )
-                )(resultsGroup: _*)
+                )(resultsGroup*)
               ),
               "byVariantAndTheme" -> List(
                 Unwind("puzzle.themes"),
@@ -179,7 +173,7 @@ final class PuzzleDashboardApi(
                     "lib"     -> "$puzzle.l",
                     "theme"   -> "$puzzle.themes"
                   )
-                )(resultsGroup: _*)
+                )(resultsGroup*)
               )
             )
           )
@@ -197,7 +191,7 @@ final class PuzzleDashboardApi(
             byTheme = for {
               doc      <- themeDocs
               themeStr <- doc.string("_id")
-              theme    <- PuzzleTheme find themeStr
+              theme    <- PuzzleTheme `find` themeStr
               results  <- readResults(doc)
             } yield theme.key -> results
             variantDocs <- result.getAsOpt[List[Bdoc]]("byVariant")
@@ -217,7 +211,7 @@ final class PuzzleDashboardApi(
               lib       <- idDoc.int("lib")
               themeStr  <- idDoc.string("theme")
               variant = Variant.orDefault(GameLogic(lib), variantId)
-              theme   <- PuzzleTheme find themeStr
+              theme   <- PuzzleTheme `find` themeStr
               results <- readResults(doc)
             } yield (variant, theme.key) -> results
           } yield PuzzleDashboard(
@@ -228,7 +222,6 @@ final class PuzzleDashboardApi(
           )
         }
         .dmap(_.filter(_.global.nb > 0))
-    }
 
   private def countField(field: String) = $doc("$cond" -> $arr("$" + field, 1, 0))
 
@@ -240,6 +233,5 @@ final class PuzzleDashboardApi(
   } yield Results(nb, wins, fixes, rating.toInt)
 
   val relevantThemesSelect = $doc(
-    "puzzle.themes" $nin irrelevantThemes.map(_.value)
+    "puzzle.themes" `$nin` irrelevantThemes.map(_.value)
   )
-}

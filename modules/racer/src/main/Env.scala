@@ -23,7 +23,7 @@ final class Env(
     ec: scala.concurrent.ExecutionContext,
     scheduler: org.apache.pekko.actor.Scheduler,
     mode: play.api.Mode
-) {
+):
 
   private lazy val colls = new RacerColls(puzzle = puzzleColls.puzzle)
 
@@ -34,6 +34,5 @@ final class Env(
   lazy val json = wire[RacerJson]
 
   private val socket = wire[RacerSocket] // requires eager eval
-}
 
 final private class RacerColls(val puzzle: AsyncColl)

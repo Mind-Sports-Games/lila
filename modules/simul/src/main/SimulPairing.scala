@@ -8,13 +8,13 @@ final case class SimulPairing(
     status: strategygames.Status,
     wins: Option[Boolean],
     hostPlayerIndex: strategygames.Player
-) {
+):
 
   def finished = status >= strategygames.Status.Aborted
   def ongoing  = !finished
 
-  def is(userId: String): Boolean     = player is userId
-  def is(other: SimulPlayer): Boolean = player is other
+  def is(userId: String): Boolean     = player `is` userId
+  def is(other: SimulPlayer): Boolean = player `is` other
 
   def finish(s: strategygames.Status, w: Option[String]) =
     copy(
@@ -26,9 +26,8 @@ final case class SimulPairing(
     wins.map { w =>
       if (w) !hostPlayerIndex else hostPlayerIndex
     }
-}
 
-private[simul] object SimulPairing {
+private[simul] object SimulPairing:
 
   def apply(player: SimulPlayer): SimulPairing =
     new SimulPairing(
@@ -38,4 +37,3 @@ private[simul] object SimulPairing {
       wins = none,
       hostPlayerIndex = strategygames.P1
     )
-}

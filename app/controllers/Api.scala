@@ -35,7 +35,7 @@ final class Api(
     )
   }
 
-  val status = Action { req =>
+  val status = Action { (req: RequestHeader) =>
     val appVersion  = get("v", req)
     val mustUpgrade = appVersion exists lila.api.Mobile.AppVersion.mustUpgrade
     JsonOk(apiStatusJson.add("mustUpgrade", mustUpgrade))
@@ -74,7 +74,7 @@ final class Api(
 
   def usersStatus =
     ApiRequest { req =>
-      val ids = get("ids", req).so(_.split(',').take(50).toList map lila.user.User.normalize)
+      val ids = get("ids", req).fold(List.empty[String])(_.split(',').take(50).toList map lila.user.User.normalize)
       env.user.lightUserApi asyncMany ids dmap (_.flatten) map { users =>
         val streamingIds = env.streamer.liveStreamApi.userIds
         toApiResult {
@@ -110,7 +110,7 @@ final class Api(
   private def UserGamesRateLimit(cost: Int, req: RequestHeader)(run: => Fu[ApiResult]) = {
     val ip = HTTPRequest ipAddress req
     UserGamesRateLimitPerIP(ip, cost = cost) {
-      UserGamesRateLimitPerUA(~HTTPRequest.userAgent(req), cost = cost, msg = ip.value) {
+      UserGamesRateLimitPerUA(HTTPRequest.userAgent(req).getOrElse(""), cost = cost, msg = ip.value) {
         UserGamesRateLimitGlobal("-", cost = cost, msg = ip.value) {
           run
         }(fuccess(Limited))
@@ -137,7 +137,7 @@ final class Api(
       UserGamesRateLimit(cost, req) {
         lila.mon.api.userGames.increment(cost.toLong)
         env.user.repo named name flatMap {
-          _ so { user =>
+          case Some(user) =>
             gameApi.byUser(
               user = user,
               rated = getBoolOpt("rated", req),
@@ -147,7 +147,7 @@ final class Api(
               nb = nb,
               page = page
             ) map some
-          }
+          case None => fuccess(none)
         } map toApiResult
       }
     }
@@ -178,9 +178,9 @@ final class Api(
         import lila.user.User.normalize
         val (u1, u2) = (normalize(name1), normalize(name2))
         env.game.crosstableApi(u1, u2) flatMap { ct =>
-          (ct.results.nonEmpty && getBool("matchup", req)).so {
+          (if (ct.results.nonEmpty && getBool("matchup", req))
             env.game.crosstableApi.getMatchup(u1, u2)
-          } map { matchup =>
+          else fuccess(none)) map { matchup =>
             toApiResult {
               lila.game.JsonView.crosstable(ct, matchup).some
             }
@@ -191,7 +191,7 @@ final class Api(
 
   def currentTournaments =
     ApiRequest { implicit req =>
-      implicit val lang = reqLang
+      implicit val lang: play.api.i18n.Lang = reqLang
       env.tournament.api.fetchVisibleTournaments flatMap
         env.tournament.apiJsonView.apply map Data.apply
     }
@@ -199,7 +199,7 @@ final class Api(
   def tournament(id: String) =
     ApiRequest { implicit req =>
       env.tournament.tournamentRepo byId id flatMap {
-        _ so { tour =>
+        case Some(tour) =>
           val page = (getInt("page", req) | 1) atLeast 1 atMost 200
           env.tournament.jsonView(
             tour = tour,
@@ -211,14 +211,14 @@ final class Api(
             socketVersion = none,
             partial = false
           )(reqLang) map some
-        }
+        case None => fuccess(none)
       } map toApiResult
     }
 
   def tournamentGames(id: String) =
     Action.async { req =>
       env.tournament.tournamentRepo byId id flatMap {
-        _ so { tour =>
+        case Some(tour) =>
           val config = GameApiV2.ByTournamentConfig(
             tournamentId = tour.id,
             format = GameApiV2.Format byRequest req,
@@ -233,7 +233,7 @@ final class Api(
               .pipe(asAttachmentStream(env.api.gameApiV2.filename(tour, config.format)))
               .as(gameC gameContentType config)
           }.fuccess
-        }
+        case None => fuccess(NotFound)
       }
     }
 
@@ -241,7 +241,7 @@ final class Api(
     Action.async { implicit req =>
       val csv = HTTPRequest.acceptsCsv(req) || get("as", req).has("csv")
       env.tournament.tournamentRepo byId id map {
-        _ so { tour =>
+        case Some(tour) =>
           import lila.tournament.JsonView.playerResultWrites
           val source =
             env.tournament.api
@@ -250,14 +250,14 @@ final class Api(
             if (csv) csvStream(lila.tournament.TournamentCsv(source))
             else jsonStream(source.map(lila.tournament.JsonView.playerResultWrites.writes))
           result.pipe(asAttachment(env.api.gameApiV2.filename(tour, if (csv) "csv" else "ndjson")))
-        }
+        case None => NotFound
       }
     }
 
   def tournamentTeams(id: String) =
     Action.async {
       env.tournament.tournamentRepo byId id flatMap {
-        _ so { tour =>
+        case Some(tour) =>
           env.tournament.jsonView.apiTeamStanding(tour) map { arr =>
             JsonOk(
               Json.obj(
@@ -266,29 +266,29 @@ final class Api(
               )
             )
           }
-        }
+        case None => fuccess(NotFound)
       }
     }
 
   def tournamentsByOwner(name: String) =
     Action.async { implicit req =>
-      implicit val lang = reqLang
-      (name != "playstrategy") so env.user.repo.named(name) flatMap {
-        _ so { user =>
+      implicit val lang: play.api.i18n.Lang = reqLang
+      (if (name != "playstrategy") env.user.repo.named(name) else fuccess(none)) flatMap {
+        case Some(user) =>
           val nb = getInt("nb", req) | Int.MaxValue
           jsonStream {
             env.tournament.api
               .byOwnerStream(user, MaxPerSecond(20), nb)
               .mapAsync(1)(env.tournament.apiJsonView.fullJson)
           }.fuccess
-        }
+        case None => fuccess(NotFound)
       }
     }
 
   def swissGames(id: String) =
     Action.async { req =>
       env.swiss.api byId lila.swiss.Swiss.Id(id) flatMap {
-        _ so { swiss =>
+        case Some(swiss) =>
           val config = GameApiV2.BySwissConfig(
             swissId = swiss.id,
             format = GameApiV2.Format byRequest req,
@@ -303,14 +303,14 @@ final class Api(
               .pipe(asAttachmentStream(filename))
               .as(gameC gameContentType config)
           }.fuccess
-        }
+        case None => fuccess(NotFound)
       }
     }
 
   def swissResults(id: String) = Action.async { implicit req =>
     val csv = HTTPRequest.acceptsCsv(req) || get("as", req).has("csv")
     env.swiss.api byId lila.swiss.Swiss.Id(id) map {
-      _ so { swiss =>
+      case Some(swiss) =>
         val source = env.swiss.api
           .resultStream(swiss, MaxPerSecond(50), getInt("nb", req) | Int.MaxValue)
           .mapAsync(8) { p =>
@@ -320,7 +320,7 @@ final class Api(
           if (csv) csvStream(lila.swiss.SwissCsv(source))
           else jsonStream(source.map(env.swiss.json.playerResult))
         result.pipe(asAttachment(env.api.gameApiV2.filename(swiss, if (csv) "csv" else "ndjson")))
-      }
+      case None => NotFound
     }
   }
 
@@ -333,7 +333,7 @@ final class Api(
   def cloudEval =
     Action.async { req =>
       {
-        val variant = Variant.orDefault(~get("variant", req))
+        val variant = Variant.orDefault(get("variant", req).getOrElse(""))
         get("fen", req).fold(notFoundJson("Missing FEN")) { fen =>
           JsonOptionOk(
             env.evalCache.api.getEvalJson(
@@ -370,16 +370,16 @@ final class Api(
 
   def activity(name: String) =
     ApiRequest { implicit req =>
-      implicit val lang = reqLang
+      implicit val lang: play.api.i18n.Lang = reqLang
       UserActivityRateLimitPerIP(HTTPRequest ipAddress req, cost = 1) {
         lila.mon.api.activity.increment(1)
         env.user.repo named name flatMap {
-          _ so { user =>
+          case Some(user) =>
             env.activity.read.recent(user) flatMap {
               activities => Future.sequence(activities.map { env.activity.jsonView(_, user) })
-            }
-          }
-        } map toApiResult
+            } map { js => toApiResult(js: Seq[play.api.libs.json.JsValue]) }
+          case None => fuccess(NoData)
+        }
       }(fuccess(Limited))
     }
 
@@ -446,7 +446,7 @@ final class Api(
 
   def sourceToNdJsonOption(source: Source[Option[JsValue], _]): Result =
     sourceToNdJsonString {
-      source.map { _ so Json.stringify + "\n" }
+      source.map { _.fold("\n")(Json.stringify(_) + "\n") }
     }
 
   private def sourceToNdJsonString(source: Source[String, _]): Result =

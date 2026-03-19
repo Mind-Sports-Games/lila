@@ -14,7 +14,7 @@ final class PoolApi(
     botGameStarter: BotGameStarter,
     playbanApi: lila.playban.PlaybanApi,
     system: ActorSystem
-) {
+):
 
   import PoolApi._
   import PoolActor._
@@ -32,15 +32,13 @@ final class PoolApi(
     }.toMap
 
   def join(poolId: PoolConfig.Id, joiner: Joiner): Unit =
-    playbanApi.hasCurrentBan(joiner.userId) dforeach {
+    playbanApi.hasCurrentBan(joiner.userId) dforeach:
       case false =>
-        actors foreach {
+        actors foreach:
           case (id, actor) if id == poolId =>
             playbanApi.getRageSit(joiner.userId).dforeach(actor ! Join(joiner, _))
           case (_, actor) => actor ! Leave(joiner.userId)
-        }
       case _ =>
-    }
 
   def leave(poolId: PoolConfig.Id, userId: User.ID) = sendTo(poolId, Leave(userId))
 
@@ -48,9 +46,8 @@ final class PoolApi(
 
   private def sendTo(poolId: PoolConfig.Id, msg: Any) =
     actors get poolId foreach { _ ! msg }
-}
 
-object PoolApi {
+object PoolApi:
 
   case class Joiner(
       userId: User.ID,
@@ -59,13 +56,10 @@ object PoolApi {
       ratingRange: Option[RatingRange],
       lame: Boolean,
       blocking: Set[User.ID]
-  ) {
+  ):
 
     def is(member: PoolMember) = userId == member.userId
-  }
 
-  case class Pairing(game: Game, p1Sri: Sri, p2Sri: Sri) {
+  case class Pairing(game: Game, p1Sri: Sri, p2Sri: Sri):
     def sri(playerIndex: strategygames.Player) = playerIndex.fold(p1Sri, p2Sri)
-  }
   case class Pairings(pairings: List[Pairing])
-}

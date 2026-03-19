@@ -8,19 +8,17 @@ import lila.timeline.EntryApi
 final private[blog] class Notifier(
     blogApi: BlogApi,
     timelineApi: EntryApi
-)(implicit ec: scala.concurrent.ExecutionContext) {
+)(implicit ec: scala.concurrent.ExecutionContext):
 
   def apply(id: String): Funit =
     blogApi.prismicApi flatMap { prismicApi =>
-      blogApi.one(prismicApi, none, id) orFail
+      blogApi.one(prismicApi, none, id) `orFail`
         s"No such document: $id" flatMap doSend
     }
 
   private def doSend(post: Document): Funit =
     post.getText("blog.title") so { title =>
-      timelineApi.broadcast.insert {
+      timelineApi.broadcast.insert:
         BlogPost(id = post.id, slug = post.slug, title = title)
-      }
     }
 
-}

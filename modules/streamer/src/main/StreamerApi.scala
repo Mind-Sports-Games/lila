@@ -2,7 +2,6 @@ package lila.streamer
 
 import org.joda.time.DateTime
 import reactivemongo.api.ReadPreference
-import scala.concurrent.duration._
 
 import lila.db.dsl._
 import lila.db.Photographer
@@ -15,7 +14,7 @@ final class StreamerApi(
     cacheApi: lila.memo.CacheApi,
     photographer: Photographer,
     notifyApi: lila.notify.NotifyApi
-)(implicit ec: scala.concurrent.ExecutionContext) {
+)(implicit ec: scala.concurrent.ExecutionContext):
 
   import BsonHandlers._
 
@@ -25,25 +24,22 @@ final class StreamerApi(
   def byIds(ids: Iterable[Streamer.Id]): Fu[List[Streamer]] = coll.byIds[Streamer](ids.map(_.value))
 
   def find(username: String): Fu[Option[Streamer.WithUser]] =
-    userRepo named username flatMap { _ so find }
+    userRepo `named` username flatMap { _ so find }
 
   def find(user: User): Fu[Option[Streamer.WithUser]] =
-    byId(Streamer.Id(user.id)) dmap {
+    byId(Streamer.Id(user.id)) dmap:
       _ map { Streamer.WithUser(_, user) }
-    }
 
   def findOrInit(user: User): Fu[Option[Streamer.WithUser]] =
-    find(user) orElse {
-      val s = Streamer.WithUser(Streamer make user, user)
+    find(user) orElse:
+      val s = Streamer.WithUser(Streamer `make` user, user)
       coll.insert.one(s.streamer) inject s.some
-    }
 
   def withUser(s: Stream): Fu[Option[Streamer.WithUserAndStream]] =
-    userRepo named s.streamer.userId dmap {
+    userRepo `named` s.streamer.userId dmap:
       _ map { user =>
         Streamer.WithUserAndStream(s.streamer, user, s.some)
       }
-    }
 
   def withUsers(live: LiveStreams): Fu[List[Streamer.WithUserAndStream]] =
     Future.sequence(live.streams.map(withUser)).dmap(_.flatten)
@@ -57,22 +53,22 @@ final class StreamerApi(
     }
 
   def setLiveNow(ids: List[Streamer.Id]): Funit =
-    coll.update.one($doc("_id" $in ids), $set("liveAt" -> DateTime.now), multi = true) >>
+    coll.update.one($doc("_id" `$in` ids), $set("liveAt" -> DateTime.now), multi = true) >>
       cache.candidateIds.getUnit.map { candidateIds =>
         if (ids.exists(candidateIds.contains)) cache.candidateIds.invalidateUnit()
       }
 
-  def update(prev: Streamer, data: StreamerForm.UserData, asMod: Boolean): Fu[Streamer.ModChange] = {
+  def update(prev: Streamer, data: StreamerForm.UserData, asMod: Boolean): Fu[Streamer.ModChange] =
     val streamer = data(prev, asMod)
-    coll.update.one($id(streamer.id), streamer).andDo(cache.listedIds.invalidateUnit()) inject {
+    coll.update.one($id(streamer.id), streamer).andDo(cache.listedIds.invalidateUnit()) inject:
         val modChange = Streamer.ModChange(
-          list = prev.approval.granted != streamer.approval.granted option streamer.approval.granted,
-          tier = prev.approval.tier != streamer.approval.tier option streamer.approval.tier,
+          list = prev.approval.granted != streamer.approval.granted `option` streamer.approval.granted,
+          tier = prev.approval.tier != streamer.approval.tier `option` streamer.approval.tier,
           decline = !streamer.approval.granted && !streamer.approval.requested && prev.approval.requested
         )
         import lila.notify.Notification.Notifies
         import lila.notify.Notification
-        ~modChange.list so {
+        ~modChange.list so:
           notifyApi.addNotification(
             Notification.make(
               Notifies(streamer.userId),
@@ -84,10 +80,7 @@ final class StreamerApi(
               )
             )
           ).andDo(cache.candidateIds.invalidateUnit())
-        }
         modChange
-      }
-  }
 
   def demote(userId: User.ID): Funit =
     coll.update
@@ -104,7 +97,7 @@ final class StreamerApi(
     coll.delete.one($id(user.id)).void
 
   def create(u: User): Funit =
-    coll.insert.one(Streamer make u).void.recover(lila.db.ignoreDuplicateKey)
+    coll.insert.one(Streamer `make` u).void.recover(lila.db.ignoreDuplicateKey)
 
   def isPotentialStreamer(user: User): Fu[Boolean] =
     cache.listedIds.getUnit.dmap(_ contains Streamer.Id(user.id))
@@ -113,7 +106,7 @@ final class StreamerApi(
     cache.candidateIds.getUnit.dmap(_ contains Streamer.Id(user.id))
 
   def isActualStreamer(user: User): Fu[Boolean] =
-    isPotentialStreamer(user) >>& !isCandidateStreamer(user)
+    isPotentialStreamer(user) >>& isCandidateStreamer(user).not
 
   def uploadPicture(s: Streamer, picture: Photographer.Uploaded, by: User): Funit =
     photographer(s.id.value, picture, createdBy = by.id).flatMap { pic =>
@@ -128,9 +121,9 @@ final class StreamerApi(
     coll.update
       .one(
         $doc(
-          "liveAt" $exists false,
+          "liveAt" `$exists` false,
           "approval.granted" -> true,
-          "approval.lastGrantedAt" $lt DateTime.now.minusWeeks(4)
+          "approval.lastGrantedAt" `$lt` DateTime.now.minusWeeks(4)
         ),
         $set(
           "approval.granted" -> false,
@@ -140,14 +133,13 @@ final class StreamerApi(
       )
       .void
 
-  object approval {
+  object approval:
 
     def request(user: User) =
-      find(user) flatMap {
+      find(user) flatMap:
         _.filter(!_.streamer.approval.granted) so { s =>
           coll.updateField($id(s.streamer.id), "approval.requested", true).void
         }
-      }
 
     def countRequests: Fu[Int] =
       coll.countSel(
@@ -156,7 +148,6 @@ final class StreamerApi(
           "approval.ignored"   -> false
         )
       )
-  }
 
   def sameChannels(streamer: Streamer): Fu[List[Streamer]] =
     coll
@@ -170,14 +161,14 @@ final class StreamerApi(
               $doc("youTube.channelId" -> t)
             }
           ).flatten,
-          "_id" $ne streamer.userId
+          "_id" `$ne` streamer.userId
         )
       )
-      .sort($sort desc "createdAt")
+      .sort($sort `desc` "createdAt")
       .cursor[Streamer](readPreference = ReadPreference.secondaryPreferred)
       .list(10)
 
-  private object cache {
+  private object cache:
 
     private def selectListedApproved =
       $doc(
@@ -185,7 +176,7 @@ final class StreamerApi(
         "approval.granted" -> true
       )
 
-    val listedIds = cacheApi.unit[Set[Streamer.Id]] {
+    val listedIds = cacheApi.unit[Set[Streamer.Id]]:
       _.refreshAfterWrite(1 hour)
         .buildAsyncFuture { _ =>
           coll.secondaryPreferred.distinctEasy[Streamer.Id, Set](
@@ -193,16 +184,12 @@ final class StreamerApi(
             selectListedApproved
           )
         }
-    }
 
-    val candidateIds = cacheApi.unit[Set[Streamer.Id]] {
+    val candidateIds = cacheApi.unit[Set[Streamer.Id]]:
       _.refreshAfterWrite(1 hour)
         .buildAsyncFuture { _ =>
           coll.secondaryPreferred.distinctEasy[Streamer.Id, Set](
             "_id",
-            selectListedApproved ++ $doc("liveAt" $exists false)
+            selectListedApproved ++ $doc("liveAt" `$exists` false)
           )
         }
-    }
-  }
-}

@@ -16,7 +16,7 @@ import lila.common.Clock._
 import lila.hub.LeaderTeam
 import lila.user.User
 
-object SimulForm {
+object SimulForm:
 
   val clockTimes       = (5 to 15 by 5) ++ (20 to 90 by 10) ++ (120 to 180 by 20)
   val clockTimeDefault = 20
@@ -50,7 +50,7 @@ object SimulForm {
   private def nameType(host: User) =
     eventName(2, 40).verifying(
       Constraint[String] { (t: String) =>
-        if (t.toLowerCase contains "playstrategy")
+        if (t.toLowerCase `contains` "playstrategy")
           validation.Invalid(validation.ValidationError("Must not contain \"playstrategy\""))
         else validation.Valid
       },
@@ -58,7 +58,7 @@ object SimulForm {
         if (
           t.toUpperCase.split(' ').exists { word =>
             lila.user.Title.all.exists { case (title, name) =>
-              !host.title.has(title) && {
+              !host.title.contains(title) && {
                 title.value == word || name.toUpperCase == word
               }
             }
@@ -141,7 +141,7 @@ object SimulForm {
       estimatedStartAt: Option[DateTime] = None,
       team: Option[String],
       featured: Option[Boolean]
-  ) {
+  ):
     def clock =
       SimulClock(
         // TODO: this one is a bit odd, I feel like `copy` might just be enough.
@@ -171,5 +171,3 @@ object SimulForm {
 
     def validUsePosition: Boolean =
       position.fold(true)(_ => variants.size == 1 && variants(0) == "0_1")
-  }
-}

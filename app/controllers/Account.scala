@@ -31,30 +31,32 @@ final class Account(
 
   def profileApply =
     AuthBody { implicit ctx => me =>
-      implicit val req: Request[_] = ctx.body
-      FormFuResult(env.user.forms.profile) { err =>
+      implicit val req: Request[?] = ctx.body
+      FormFuResult(env.user.forms.profile)(err =>
         fuccess(html.account.profile(me, err))
-      } { profile =>
-        profile.bio
+      ) { profile =>
+        val spamReport = profile.bio
           .exists(env.security.spam.detect)
-          .option("profile.bio" -> ~profile.bio)
+          .option("profile.bio" -> profile.bio.getOrElse(""))
           .orElse {
             profile.links
               .exists(env.security.spam.detect)
-              .option("profile.links" -> ~profile.links)
+              .option("profile.links" -> profile.links.getOrElse(""))
           }
-          .so { case (resource, text) =>
+        (spamReport match {
+          case Some((resource, text)) =>
             env.report.api.autoCommFlag(lila.report.Suspect(me).id, resource, text)
-          } >> env.user.repo.setProfile(me.id, profile) inject Redirect(routes.Account.profile).flashSuccess
+          case None => funit
+        }) >> env.user.repo.setProfile(me.id, profile) inject Redirect(routes.Account.profile).flashSuccess
       }
     }
 
   def usernameApply =
     AuthBody { implicit ctx => me =>
-      implicit val req: Request[_] = ctx.body
-      FormFuResult(env.user.forms.username(me)) { err =>
+      implicit val req: Request[?] = ctx.body
+      FormFuResult(env.user.forms.username(me))(err =>
         fuccess(html.account.username(me, err))
-      } { username =>
+      ) { username =>
         env.user.repo
           .setUsernameCased(me.id, username) inject
           Redirect(routes.User show me.username).flashSuccess recover { case e =>
@@ -156,7 +158,7 @@ final class Account(
       }(rateLimitedFu)
     }
 
-  private def refreshSessionId(me: UserModel, result: Result)(implicit ctx: Context): Fu[Result] =
+  private def refreshSessionId(me: UserModel, result: Result)(implicit ctx: Context, ec: scala.concurrent.ExecutionContext): Fu[Result] =
     env.security.store.closeAllSessionsOf(me.id) >>
       env.push.webSubscriptionApi.unsubscribeByUser(me) >>
       env.security.api.saveAuthentication(me.id, ctx.mobileApiVersion) map { sessionId =>
@@ -180,9 +182,8 @@ final class Account(
   def apiEmail =
     Scoped(_.Email.Read) { _ => me =>
       env.user.repo email me.id map {
-        _ so { email =>
-          JsonOk(Json.obj("email" -> email.value))
-        }
+        case Some(email) => JsonOk(Json.obj("email" -> email.value))
+        case None => NotFound
       }
     }
 
@@ -214,8 +215,9 @@ final class Account(
   def emailConfirm(token: String) =
     Open { implicit ctx =>
       env.security.emailChange.confirm(token) flatMap {
-        _ so { case (user, prevEmail) =>
-          (prevEmail.exists(_.isNoReply) so env.clas.api.student.release(user)) >>
+        case None => Redirect(routes.Account.email).fuccess
+        case Some((user, prevEmail)) =>
+          (if (prevEmail.exists(_.isNoReply)) env.clas.api.student.release(user) else funit) >>
             auth.authenticateUser(
               user,
               result =
@@ -224,7 +226,6 @@ final class Account(
                 else
                   Some(_ => Redirect(routes.Account.email).flashSuccess)
             )
-        }
       }
     }
 
@@ -267,9 +268,9 @@ final class Account(
       auth.HasherRateLimit(me.username, ctx.req) { _ =>
         implicit val req = ctx.body
         env.security.forms.setupTwoFactor(me) flatMap { form =>
-          FormFuResult(form) { err =>
+          FormFuResult(form)(err =>
             fuccess(html.account.twoFactor.setup(me, err))
-          } { data =>
+          ) { data =>
             env.user.repo.setupTwoFactor(me.id, TotpSecret(data.secret)) >>
               refreshSessionId(me, Redirect(routes.Account.twoFactor).flashSuccess)
           }
@@ -282,9 +283,9 @@ final class Account(
       auth.HasherRateLimit(me.username, ctx.req) { _ =>
         implicit val req = ctx.body
         env.security.forms.disableTwoFactor(me) flatMap { form =>
-          FormFuResult(form) { err =>
+          FormFuResult(form)(err =>
             fuccess(html.account.twoFactor.disable(me, err))
-          } { _ =>
+          ) { _ =>
             env.user.repo.disableTwoFactor(me.id) inject
               Redirect(routes.Account.twoFactor).flashSuccess
           }
@@ -360,7 +361,7 @@ final class Account(
     }
 
   private def currentSessionId(implicit ctx: Context) =
-    ~env.security.api.reqSessionId(ctx.req)
+    env.security.api.reqSessionId(ctx.req).getOrElse("")
 
   def security =
     Auth { implicit ctx => me =>
@@ -444,7 +445,7 @@ final class Account(
         .map(lila.user.User.normalize)
         .filter(id => me.id == id || isGranted(_.Impersonate)) | me.id
       env.user.repo byId userId map {
-        _ so { user =>
+        case Some(user) =>
           if (getBool("text"))
             apiC.GlobalConcurrencyLimitUser(me.id)(
               env.api.personalDataExport(user)
@@ -453,7 +454,7 @@ final class Account(
                 .pipe(asAttachmentStream(s"playstrategy_${user.username}.txt"))
             }
           else Ok(html.account.bits.data(user))
-        }
+        case None => NotFound
       }
     }
 }

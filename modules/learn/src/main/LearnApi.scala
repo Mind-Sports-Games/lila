@@ -6,7 +6,7 @@ import cats.implicits._
 import lila.db.dsl._
 import lila.user.User
 
-final class LearnApi(coll: Coll)(implicit ec: scala.concurrent.ExecutionContext) {
+final class LearnApi(coll: Coll)(implicit ec: scala.concurrent.ExecutionContext):
 
   import BSONHandlers._
 
@@ -31,7 +31,7 @@ final class LearnApi(coll: Coll)(implicit ec: scala.concurrent.ExecutionContext)
       .aggregateWith[Bdoc](readPreference = ReadPreference.secondaryPreferred) { framework =>
         import framework._
         List(
-          Match($doc("_id" $in userIds)),
+          Match($doc("_id" `$in` userIds)),
           Project($doc("stages" -> $doc("$objectToArray" -> "$stages"))),
           UnwindField("stages"),
           Project(
@@ -53,11 +53,9 @@ final class LearnApi(coll: Coll)(implicit ec: scala.concurrent.ExecutionContext)
         )
       }
       .collect[List](maxDocs = Int.MaxValue)
-      .map {
+      .map:
         _.view.flatMap { obj =>
           (obj string "_id", obj int "nb") mapN { (k, v) =>
             k -> (v * 100f / maxCompletion).toInt
           }
         }.toMap
-      }
-}

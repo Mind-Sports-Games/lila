@@ -4,16 +4,15 @@ import strategygames.{ Player => PlayerIndex }
 
 import lila.user.{ Title, User }
 
-sealed trait Line {
+sealed trait Line:
   def text: String
   def author: String
   def deleted: Boolean
   def isSystem    = author == systemUserId
   def isHuman     = !isSystem
-  def humanAuthor = isHuman option author
+  def humanAuthor = isHuman `option` author
   def troll: Boolean
   def userIdMaybe: Option[User.ID]
-}
 
 case class UserLine(
     username: String,
@@ -21,11 +20,11 @@ case class UserLine(
     text: String,
     troll: Boolean,
     deleted: Boolean
-) extends Line {
+) extends Line:
 
   def author = username
 
-  def userId = User normalize username
+  def userId = User `normalize` username
 
   def userIdMaybe = userId.some
 
@@ -34,18 +33,16 @@ case class UserLine(
   def isVisible = !troll && !deleted
 
   def isPlayStrategy = userId == User.playstrategyId
-}
 case class PlayerLine(
     playerIndex: PlayerIndex,
     text: String
-) extends Line {
+) extends Line:
   def deleted     = false
   def author      = playerIndex.name
   def troll       = false
   def userIdMaybe = none
-}
 
-object Line {
+object Line:
 
   val textMaxSize = 140
   val titleSep    = '~'
@@ -66,35 +63,29 @@ object Line {
 
   private val UserLineRegex = """(?s)([\w-~]{2,}+)([ !?])(.++)""".r
   private def strToUserLine(str: String): Option[UserLine] =
-    str match {
+    str match
       case UserLineRegex(username, sep, text) =>
         val troll   = sep == "!"
         val deleted = sep == "?"
-        username split titleSep match {
+        username split titleSep match
           case Array(title, name) =>
-            UserLine(name, Title get title, text, troll = troll, deleted = deleted).some
+            UserLine(name, Title `get` title, text, troll = troll, deleted = deleted).some
           case _ => UserLine(username, None, text, troll = troll, deleted = deleted).some
-        }
       case _ => none
-    }
-  def userLineToStr(x: UserLine): String = {
+  def userLineToStr(x: UserLine): String =
     val sep =
       if (x.troll) "!"
       else if (x.deleted) "?"
       else " "
     val tit = x.title.so(_.value + titleSep)
     s"$tit${x.username}$sep${x.text}"
-  }
 
   def strToLine(str: String): Option[Line] =
-    strToUserLine(str) orElse {
+    strToUserLine(str) orElse:
       str.headOption flatMap PlayerIndex.apply map { playerIndex =>
         PlayerLine(playerIndex, str drop 2)
       }
-    }
   def lineToStr(x: Line) =
-    x match {
+    x match
       case u: UserLine   => userLineToStr(u)
       case p: PlayerLine => s"${p.playerIndex.letter} ${p.text}"
-    }
-}

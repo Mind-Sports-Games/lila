@@ -4,15 +4,14 @@ import io.lemonlabs.uri.AbsoluteUrl
 import org.joda.time.DateTime
 import play.api.data._
 import play.api.data.Forms._
-import scala.util.chaining._
 
-import lila.common.Form.{ cleanNonEmptyText, cleanText }
+import lila.common.Form.cleanText
 import lila.game.Game
 import lila.security.Granter
 import lila.study.Study
 import lila.user.User
 
-final class RelayRoundForm {
+final class RelayRoundForm:
 
   import RelayRoundForm._
   import lila.common.Form.ISODateTimeOrTimestamp
@@ -21,7 +20,7 @@ final class RelayRoundForm {
     mapping(
       "name" -> cleanText(minLength = 3, maxLength = 80),
       "syncUrl" -> optional {
-        cleanText(minLength = 8, maxLength = 600).verifying("Invalid source", validSource _)
+        cleanText(minLength = 8, maxLength = 600).verifying("Invalid source", validSource)
       },
       "syncUrlRound" -> optional(number(min = 1, max = 999)),
       "startsAt"     -> optional(ISODateTimeOrTimestamp.isoDateTimeOrTimestamp),
@@ -38,16 +37,14 @@ final class RelayRoundForm {
   }.fill(Data(name = s"Round ${trs.rounds.size + 1}", syncUrlRound = Some(trs.rounds.size + 1)))
 
   def edit(r: RelayRound) = Form(roundMapping) fill Data.make(r)
-}
 
-object RelayRoundForm {
+object RelayRoundForm:
 
   case class GameIds(ids: List[Game.ID])
 
-  private def toGameIds(ids: String): Option[GameIds] = {
+  private def toGameIds(ids: String): Option[GameIds] =
     val list = ids.split(' ').view.map(_.trim take Game.gameIdSize).filter(Game.validId).toList
-    (list.sizeIs > 0 && list.sizeIs <= Study.maxChapters) option GameIds(list)
-  }
+    (list.sizeIs > 0 && list.sizeIs <= Study.maxChapters) `option` GameIds(list)
 
   private def validSource(source: String): Boolean =
     validUrl(source) || toGameIds(source).isDefined
@@ -89,7 +86,7 @@ object RelayRoundForm {
       syncUrlRound: Option[Int] = None,
       startsAt: Option[DateTime] = None,
       throttle: Option[Int] = None
-  ) {
+  ):
 
     def requiresRound = syncUrl exists RelayRound.Sync.UpstreamUrl.LccRegex.matches
 
@@ -121,7 +118,7 @@ object RelayRoundForm {
         },
         until = none,
         nextAt = none,
-        delay = throttle ifTrue Granter(_.Relay)(user),
+        delay = throttle `ifTrue` Granter(_.Relay)(user),
         log = SyncLog.empty
       )
 
@@ -136,9 +133,8 @@ object RelayRoundForm {
         startsAt = startsAt,
         startedAt = none
       )
-  }
 
-  object Data {
+  object Data:
 
     def make(relay: RelayRound) =
       Data(
@@ -151,5 +147,3 @@ object RelayRoundForm {
         startsAt = relay.startsAt,
         throttle = relay.sync.delay
       )
-  }
-}

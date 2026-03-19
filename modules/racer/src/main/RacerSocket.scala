@@ -11,37 +11,35 @@ final private class RacerSocket(
 )(implicit
     ec: scala.concurrent.ExecutionContext,
     mode: play.api.Mode
-) {
+):
 
   import RacerSocket._
 
   def publishState(race: RacerRace): Unit = send(
-    Protocol.Out.publishState(race.id, json state race)
+    Protocol.Out.publishState(race.id, json `state` race)
   )
 
-  private lazy val send: String => Unit = remoteSocketApi.makeSender("racer-out").apply _
+  private lazy val send: String => Unit = remoteSocketApi.makeSender("racer-out").apply
 
   lazy val rooms = makeRoomMap(send)
 
-  private lazy val racerHandler: Handler = {
+  private lazy val racerHandler: Handler =
     case Protocol.In.PlayerJoin(raceId, playerId) =>
       val _ = api.join(raceId, playerId)
     case Protocol.In.PlayerScore(raceId, playerId, score) =>
       api.registerPlayerScore(raceId, playerId, score)
-  }
 
   remoteSocketApi.subscribe("racer-in", Protocol.In.reader)(
     racerHandler orElse minRoomHandler(rooms, logger) orElse remoteSocketApi.baseHandler
   )
 
-  api registerSocket this
-}
+  api `registerSocket` this
 
-object RacerSocket {
+object RacerSocket:
 
-  object Protocol {
+  object Protocol:
 
-    object In {
+    object In:
 
       case class PlayerJoin(race: RacerRace.Id, player: RacerPlayer.Id)              extends P.In
       case class PlayerScore(race: RacerRace.Id, player: RacerPlayer.Id, score: Int) extends P.In
@@ -49,7 +47,7 @@ object RacerSocket {
       val reader: P.In.Reader = raw => raceReader(raw) orElse RP.In.reader(raw)
 
       val raceReader: P.In.Reader = raw =>
-        raw.path match {
+        raw.path match
           case "racer/join" =>
             raw.get(2) { case Array(raceId, playerId) =>
               PlayerJoin(RacerRace.Id(raceId), RacerPlayer.Id(playerId)).some
@@ -59,12 +57,7 @@ object RacerSocket {
               scoreStr.toIntOption map { PlayerScore(RacerRace.Id(raceId), RacerPlayer.Id(playerId), _) }
             }
           case _ => none
-        }
-    }
 
-    object Out {
+    object Out:
 
       def publishState(id: RacerRace.Id, data: JsObject) = s"racer/state $id ${Json stringify data}"
-    }
-  }
-}

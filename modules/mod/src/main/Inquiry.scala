@@ -11,21 +11,20 @@ case class Inquiry(
     notes: List[Note],
     history: List[lila.mod.Modlog],
     user: User
-) {
+):
 
   def allReports = report :: moreReports
-}
 
 final class InquiryApi(
     userRepo: UserRepo,
     reportApi: ReportApi,
     noteApi: NoteApi,
     logApi: ModlogApi
-) {
+):
 
   def forMod(mod: User)(implicit ec: scala.concurrent.ExecutionContext): Fu[Option[Inquiry]] =
-    lila.security.Granter(_.SeeReport)(mod).so {
-      reportApi.inquiries.ofModId(mod.id).flatMap {
+    lila.security.Granter(_.SeeReport)(mod).so:
+      reportApi.inquiries.ofModId(mod.id).flatMap:
         _ so { report =>
           reportApi.moreLike(report, 10) zip
             userRepo.named(report.user) zip
@@ -36,6 +35,3 @@ final class InquiryApi(
               }
             }
         }
-      }
-    }
-}

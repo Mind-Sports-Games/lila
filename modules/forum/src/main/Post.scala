@@ -1,7 +1,6 @@
 package lila.forum
 
 import org.joda.time.DateTime
-import scala.concurrent.duration._
 
 import lila.user.User
 
@@ -24,7 +23,7 @@ case class Post(
     erasedAt: Option[DateTime] = None,
     modIcon: Option[Boolean],
     reactions: Option[Post.Reactions] = None
-) {
+):
 
   private val permitEditsFor  = 4 hours
   private val showEditFormFor = 3 hours
@@ -35,20 +34,20 @@ case class Post(
 
   def showUserIdOrAuthor = if (erased) "<erased>" else userId | showAuthor
 
-  def isTeam = categId startsWith teamSlug("")
+  def isTeam = categId `startsWith` teamSlug("")
 
   def updatedOrCreatedAt = updatedAt | createdAt
 
   def canStillBeEdited =
     updatedOrCreatedAt.plus(permitEditsFor.toMillis).isAfterNow
 
-  def canBeEditedBy(editingId: User.ID): Boolean = userId has editingId
+  def canBeEditedBy(editingId: User.ID): Boolean = userId `has` editingId
 
   def shouldShowEditForm(editingId: User.ID) =
     canBeEditedBy(editingId) &&
       updatedOrCreatedAt.plus(showEditFormFor.toMillis).isAfterNow
 
-  def editPost(updated: DateTime, newText: String): Post = {
+  def editPost(updated: DateTime, newText: String): Post =
     val oldVersion = OldVersion(text, updatedOrCreatedAt)
 
     // We only store a maximum of 5 historical versions of the post to prevent abuse of storage space
@@ -60,7 +59,6 @@ case class Post(
       updatedAt = updated.some,
       reactions = reactions.map(_.view.filterKeys(k => !Post.Reaction.positive(k)).toMap)
     )
-  }
 
   def erase = editPost(DateTime.now, "").copy(erasedAt = DateTime.now.some)
 
@@ -72,16 +70,15 @@ case class Post(
   def visibleBy(u: User): Boolean         = !troll || userId.exists(_ == u.id && u.marks.troll)
 
   def erased = erasedAt.isDefined
-}
 
-object Post {
+object Post:
 
   type ID        = String
   type Reactions = Map[String, Set[User.ID]]
 
   val idSize = 8
 
-  object Reaction {
+  object Reaction:
     val PlusOne      = "+1"
     val MinusOne     = "-1"
     val Laugh        = "laugh"
@@ -98,7 +95,6 @@ object Post {
       reactions.view.collect {
         case (reaction, users) if users(me.id) => reaction
       }.toSet
-  }
 
   def make(
       topicId: String,
@@ -111,10 +107,10 @@ object Post {
       troll: Boolean,
       hidden: Boolean,
       modIcon: Option[Boolean]
-  ): Post = {
+  ): Post =
 
     Post(
-      _id = lila.common.ThreadLocalRandom nextString idSize,
+      _id = lila.common.ThreadLocalRandom `nextString` idSize,
       topicId = topicId,
       author = author,
       userId = userId.some,
@@ -127,5 +123,3 @@ object Post {
       categId = categId,
       modIcon = modIcon
     )
-  }
-}

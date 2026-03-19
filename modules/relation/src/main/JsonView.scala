@@ -2,7 +2,7 @@ package lila.relation
 
 import play.api.libs.json._
 
-object JsonView {
+object JsonView:
 
   implicit def relatedWrites(implicit userWrites: Writes[lila.user.User]): OWrites[Related] =
     OWrites[Related] { r =>
@@ -14,4 +14,3 @@ object JsonView {
         "relation"   -> r.relation
       )
     }
-}

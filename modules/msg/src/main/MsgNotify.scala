@@ -2,7 +2,6 @@ package lila.msg
 
 import org.apache.pekko.actor.Cancellable
 import java.util.concurrent.ConcurrentHashMap
-import scala.concurrent.duration._
 
 import lila.db.dsl._
 import lila.notify.{ Notification, PrivateMessage }
@@ -15,7 +14,7 @@ final private class MsgNotify(
 )(implicit
     ec: scala.concurrent.ExecutionContext,
     scheduler: org.apache.pekko.actor.Scheduler
-) {
+):
 
   import BsonHandlers._
 
@@ -25,7 +24,7 @@ final private class MsgNotify(
 
   def onPost(threadId: MsgThread.Id): Unit = schedule(threadId)
 
-  def onRead(threadId: MsgThread.Id, userId: User.ID, contactId: User.ID): Funit = {
+  def onRead(threadId: MsgThread.Id, userId: User.ID, contactId: User.ID): Funit =
     !cancel(threadId) so
       notifyApi
         .markRead(
@@ -36,7 +35,6 @@ final private class MsgNotify(
           )
         )
         .void
-  }
 
   def deleteAllBy(threads: List[MsgThread], user: User): Funit =
     Future.sequence(threads
@@ -44,45 +42,41 @@ final private class MsgNotify(
         cancel(thread.id)
         notifyApi
           .remove(
-            lila.notify.Notification.Notifies(thread other user),
+            lila.notify.Notification.Notifies(thread `other` user),
             $doc("content.user" -> user.id)
           )
           .void
       })
       .void
 
-  private def schedule(threadId: MsgThread.Id): Unit = {
+  private def schedule(threadId: MsgThread.Id): Unit =
     val _ = delayed
       .compute(
         threadId,
         (id, canc) => {
           Option(canc).foreach(_.cancel())
           scheduler.scheduleOnce(delay) {
-            delayed remove id
+            delayed `remove` id
             doNotify(threadId).discard
           }
         }
       )
-  }
 
   private def cancel(threadId: MsgThread.Id): Boolean =
-    Option(delayed remove threadId).map(_.cancel()).isDefined
+    Option(delayed `remove` threadId).map(_.cancel()).isDefined
 
   private def doNotify(threadId: MsgThread.Id): Funit =
-    colls.thread.byId[MsgThread](threadId.value) flatMap {
+    colls.thread.byId[MsgThread](threadId.value) flatMap:
       _ so { thread =>
         val msg  = thread.lastMsg
-        val dest = thread other msg.user
-        !thread.delBy(dest) so {
+        val dest = thread `other` msg.user
+        !thread.delBy(dest) so:
           lila.common.Bus.publish(MsgThread.Unread(thread), "msgUnread")
-          notifyApi addNotification Notification.make(
+          notifyApi `addNotification` Notification.make(
             Notification.Notifies(dest),
             PrivateMessage(
               PrivateMessage.Sender(msg.user),
               PrivateMessage.Text(shorten(msg.text, 80))
             )
           )
-        }
       }
-    }
-}

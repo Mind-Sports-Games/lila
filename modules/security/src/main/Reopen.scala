@@ -1,7 +1,6 @@
 package lila.security
 
 import play.api.i18n.Lang
-import scala.concurrent.duration._
 import scalatags.Text.all._
 
 import lila.common.config._
@@ -14,7 +13,7 @@ final class Reopen(
     userRepo: UserRepo,
     baseUrl: BaseUrl,
     tokenerSecret: Secret
-)(implicit ec: scala.concurrent.ExecutionContext) {
+)(implicit ec: scala.concurrent.ExecutionContext):
 
   import Mailer.html._
 
@@ -23,18 +22,18 @@ final class Reopen(
       email: EmailAddress,
       closedByMod: User => Fu[Boolean]
   ): Fu[Either[(String, String), User]] =
-    userRepo.enabledWithEmail(email.normalize) flatMap {
+    userRepo.enabledWithEmail(email.normalize) flatMap:
       case Some(_) =>
         fuccess(Left("emailUsed" -> "This email address is already in use by an active account."))
       case _ =>
-        val userId = User normalize username
-        userRepo.byIdNotErased(userId) flatMap {
+        val userId = User `normalize` username
+        userRepo.byIdNotErased(userId) flatMap:
           case None =>
             fuccess(Left("noUser" -> "No account found with this username."))
           case Some(user) if user.enabled =>
             fuccess(Left("alreadyActive" -> "This account is already active."))
           case Some(user) =>
-            userRepo.currentOrPrevEmail(user.id) flatMap {
+            userRepo.currentOrPrevEmail(user.id) flatMap:
               case None =>
                 fuccess(
                   Left("noEmail" -> "That account doesn't have any associated email, and cannot be reopened.")
@@ -42,19 +41,15 @@ final class Reopen(
               case Some(prevEmail) if !email.similarTo(prevEmail) =>
                 fuccess(Left("differentEmail" -> "That account has a different email address."))
               case _ =>
-                closedByMod(user) map {
+                closedByMod(user) map:
                   case true => Left("nope" -> "Sorry, that account can no longer be reopened.")
                   case _    => Right(user)
-                }
-            }
-        }
-    }
 
   def send(user: User, email: EmailAddress)(implicit lang: Lang): Funit =
-    tokener make user.id flatMap { token =>
+    tokener `make` user.id flatMap { token =>
       lila.mon.email.send.reopen.increment()
       val url = s"$baseUrl/account/reopen/login/$token"
-      mailer send Mailer.Message(
+      mailer `send` Mailer.Message(
         to = email,
         subject = s"Reopen your playstrategy.org account: ${user.username}",
         text = s"""
@@ -75,11 +70,9 @@ ${Mailer.txt.serviceNote}
     }
 
   def confirm(token: String): Fu[Option[User]] =
-    tokener read token flatMap { _ so userRepo.disabledById } flatMap {
+    tokener `read` token flatMap { _ so userRepo.disabledById } flatMap:
       _ so { user =>
-        userRepo reopen user.id inject user.some
+        userRepo `reopen` user.id inject user.some
       }
-    }
 
   private val tokener = LoginToken.makeTokener(tokenerSecret, 20 minutes)
-}

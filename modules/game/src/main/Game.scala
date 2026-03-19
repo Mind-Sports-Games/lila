@@ -154,7 +154,7 @@ case class Game(
   // we can't rely on the clock, because if moretime was given,
   // elapsed time is no longer representing the game duration
   def durationSeconds: Option[Int] =
-    updatedAt.getSeconds - createdAt.getSeconds match {
+    (updatedAt.getMillis / 1000) - (createdAt.getMillis / 1000) match {
       case seconds if seconds > 60 * 60 * 12 => none // no way it lasted more than 12 hours, come on.
       case seconds                           => seconds.toInt.some
     }
@@ -266,7 +266,7 @@ case class Game(
         BinaryFormat.plyTime.write {
           binaryPlyTimes.so { t =>
             BinaryFormat.plyTime.read(t, playedPlies)
-          } :+ Centis(nowCentis - updatedAt.getCentis).nonNeg
+          } :+ Centis(nowCentis - (updatedAt.getMillis / 10).toInt).nonNeg
         }
       },
       loadClockHistory = action match {
@@ -440,7 +440,7 @@ case class Game(
   def correspondenceClock: Option[CorrespondenceClock] =
     daysPerTurn map { days =>
       val increment   = days * 24 * 60 * 60
-      val secondsLeft = (updatedAt.getSeconds + increment - nowSeconds).toInt max 0
+      val secondsLeft = ((updatedAt.getMillis / 1000) + increment - nowSeconds).toInt max 0
       CorrespondenceClock(
         increment = increment,
         p1Time = activePlayerIndex.fold(secondsLeft, increment).toFloat,
@@ -1042,7 +1042,7 @@ case class Game(
 
   def setAnalysed = copy(metadata = metadata.copy(analysed = true))
 
-  def secondsSinceCreation = (nowSeconds - createdAt.getSeconds).toInt
+  def secondsSinceCreation = (nowSeconds - (createdAt.getMillis / 1000)).toInt
 
   override def toString = s"""Game($id)"""
 }
@@ -1493,8 +1493,8 @@ case class DelayClockHistory(
   // Issues seen in analysis clock times (not correct for delay)
   private def timeRemaining(moveTimes: Vector[Centis], remainingTime: Option[Centis]): Vector[Centis] =
     moveTimes.reverse.scanLeft(remainingTime.getOrElse(Centis(0)))(_ + _).reverse
-  lazy val p1: Vector[Centis] = timeRemaining(p1ActionTimes, p1RemainingTime)
-  lazy val p2: Vector[Centis] = timeRemaining(p2ActionTimes, p2RemainingTime)
+  val p1: Vector[Centis] = timeRemaining(p1ActionTimes, p1RemainingTime)
+  val p2: Vector[Centis] = timeRemaining(p2ActionTimes, p2RemainingTime)
 
   def update(playerIndex: PlayerIndex, f: Vector[Centis] => Vector[Centis]): ClockHistory =
     playerIndex.fold(copy(p1ActionTimes = f(p1ActionTimes)), copy(p2ActionTimes = f(p2ActionTimes)))

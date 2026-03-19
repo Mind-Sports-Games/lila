@@ -1,6 +1,5 @@
 package lila.puzzle
 
-import scala.concurrent.duration._
 import scala.concurrent.ExecutionContext
 
 import lila.common.ThreadLocalRandom
@@ -15,7 +14,7 @@ final class PuzzleAnon(
     cacheApi: CacheApi,
     pathApi: PuzzlePathApi,
     countApi: PuzzleCountApi
-)(implicit ec: ExecutionContext) {
+)(implicit ec: ExecutionContext):
 
   import BsonHandlers._
 
@@ -24,11 +23,10 @@ final class PuzzleAnon(
       .get((variant, theme))
       .map(ThreadLocalRandom.oneOf)
       .mon(_.puzzle.selector.anon.time(theme.value))
-      .addEffect {
+      .addEffect:
         _ foreach { puzzle =>
           lila.mon.puzzle.selector.anon.vote(theme.value).record(100 + math.round(puzzle.vote * 100))
         }
-      }
 
   def getBatchFor(nb: Int): Fu[Vector[Puzzle]] = {
     pool.get((Puzzle.defaultVariant, PuzzleTheme.mix.key)) map (_ take nb)
@@ -37,7 +35,7 @@ final class PuzzleAnon(
   private val poolSize = 150
 
   private val pool =
-    cacheApi[(Variant, PuzzleTheme.Key), Vector[Puzzle]](initialCapacity = 64, name = "puzzle.byTheme.anon") {
+    cacheApi[(Variant, PuzzleTheme.Key), Vector[Puzzle]](initialCapacity = 64, name = "puzzle.byTheme.anon"):
       _.expireAfterWrite(1 minute)
         .buildAsyncFuture { case (variant, theme) =>
           countApi.byVariantTheme(variant, theme) flatMap { count =>
@@ -58,7 +56,7 @@ final class PuzzleAnon(
             val tier               = PuzzleTier.All
             val ratingRange: Range = 0 to 9999
             val pathSampleSize     = 15
-            colls.path {
+            colls.path:
               _.aggregateWith[Bdoc]() { framework =>
                 import framework._
                 List(
@@ -85,11 +83,7 @@ final class PuzzleAnon(
                 )
               }
                 .collect[List](maxDocs = poolSize)
-                .map {
+                .map:
                 _.view.flatMap(PuzzleBSONReader.readOpt).toVector
-              }
-            }
           }
         }
-    }
-}

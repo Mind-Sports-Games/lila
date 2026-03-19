@@ -11,7 +11,7 @@ import lila.common.LightUser
 import lila.importer.{ ImportData, Preprocessed }
 import lila.tree.Node.{ Comment, Comments, Shapes }
 
-object PgnImport {
+object PgnImport:
 
   case class Result(
       root: Node.Root,
@@ -30,10 +30,10 @@ object PgnImport {
   def apply(pgn: String, contributors: List[LightUser])(implicit
       variant: Variant
   ): Validated[String, Result] =
-    ImportData(pgn, analyse = none).preprocess(user = none).map {
+    ImportData(pgn, analyse = none).preprocess(user = none).map:
       case Preprocessed(game, replay, initialFen, parsedPgn) =>
         val annotator = findAnnotator(parsedPgn, contributors)
-        parseComments(parsedPgn.initialPosition.comments, annotator) match {
+        parseComments(parsedPgn.initialPosition.comments, annotator) match
           case (shapes, _, comments) =>
             val root = Node.Root(
               ply = replay.setup.plies,
@@ -58,7 +58,7 @@ object PgnImport {
                 ).fold(variations)(_ :: variations).toVector
               }
             )
-            val end: Option[End] = (game.finished option game.status).map { status =>
+            val end: Option[End] = (game.finished `option` game.status).map { status =>
               End(
                 status = status,
                 winner = game.winnerPlayerIndex,
@@ -78,11 +78,9 @@ object PgnImport {
               tags = PgnTags(parsedPgn.tags),
               end = end
             )
-        }
-    }
 
   private def findAnnotator(pgn: ParsedPgn, contributors: List[LightUser]): Option[Comment.Author] =
-    pgn tags "annotator" map { a =>
+    pgn `tags` "annotator" map { a =>
       val lowered = a.toLowerCase
       contributors.find { c =>
         c.name == lowered || c.titleName == lowered || lowered.endsWith(s"/${c.id}")
@@ -91,26 +89,24 @@ object PgnImport {
       } getOrElse Comment.Author.External(a)
     }
 
-  private def endComment(end: End): Comment = {
+  private def endComment(end: End): Comment =
     import lila.tree.Node.Comment
     import end._
     val text = s"$resultText $statusText"
     Comment(Comment.Id.make, Comment.Text(text), Comment.Author.PlayStrategy)
-  }
 
   private def makeVariations(sans: List[San], game: Game, annotator: Option[Comment.Author]) =
-    sans.headOption.so {
+    sans.headOption.so:
       _.metas.variations.flatMap { variation =>
         makeNode(game, variation.value, annotator)
       }
-    }
 
   private def parseComments(
       comments: List[String],
       annotator: Option[Comment.Author]
   )(implicit variant: Variant): (Shapes, Option[Centis], Comments) =
     comments.foldLeft((Shapes(Nil), none[Centis], Comments(Nil))) { case ((shapes, clock, comments), txt) =>
-      CommentParser(txt) match {
+      CommentParser(txt) match
         case CommentParser.ParsedComment(s, c, str) =>
           (
             (shapes ++ s),
@@ -125,12 +121,11 @@ object PgnImport {
                 )
             })
           )
-      }
     }
 
   private def makeNode(prev: Game, sans: List[San], annotator: Option[Comment.Author]): Option[Node] =
-    try {
-      sans match {
+    try
+      sans match
         case Nil => none
         case san :: rest =>
           san(prev.situation).fold(
@@ -168,12 +163,10 @@ object PgnImport {
               }
             }
           )
-      }
-    } catch {
+    catch
       case _: StackOverflowError =>
         logger.warn(s"study PgnImport.makeNode StackOverflowError")
         None
-    }
 
   /*
    * Fix bad PGN like this one found on reddit:
@@ -181,14 +174,11 @@ object PgnImport {
    * where 7. c4 appears three times
    */
   private def removeDuplicatedChildrenFirstNode(children: Node.Children): Node.Children =
-    children.first match {
+    children.first match
       case Some(main) if children.variations.exists(_.id == main.id) =>
-        Node.Children {
+        Node.Children:
           main +: children.variations.flatMap { node =>
             if (node.id == main.id) node.children.nodes
             else Vector(node)
           }
-        }
       case _ => children
-    }
-}

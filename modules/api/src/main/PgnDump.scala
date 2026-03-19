@@ -14,7 +14,7 @@ final class PgnDump(
     simulApi: lila.simul.SimulApi,
     getTournamentName: lila.tournament.GetTourName,
     getSwissName: lila.swiss.GetSwissName
-)(implicit ec: scala.concurrent.ExecutionContext) {
+)(implicit ec: scala.concurrent.ExecutionContext):
 
   implicit private val lang: Lang = lila.i18n.defaultLang
 
@@ -68,12 +68,10 @@ final class PgnDump(
         analysis: Option[Analysis],
         teams: Option[GameTeams],
         realPlayers: Option[RealPlayers]
-    ) => apply(game, initialFen, analysis, flags, teams, realPlayers) dmap toPgnString
+    ) => apply(game, initialFen, analysis, flags, teams, realPlayers) `dmap` toPgnString
 
-  def toPgnString(pgn: Pgn) = {
+  def toPgnString(pgn: Pgn) =
     // merge analysis & eval comments
     // 1. e4 { [%eval 0.17] } { [%clk 0:00:30] }
     // 1. e4 { [%eval 0.17] [%clk 0:00:30] }
     s"$pgn\n\n\n".replaceIf("] } { [", "] [")
-  }
-}

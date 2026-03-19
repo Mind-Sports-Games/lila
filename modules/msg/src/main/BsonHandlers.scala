@@ -6,7 +6,7 @@ import lila.user.User
 import lila.db.dsl._
 import lila.db.BSON
 
-private object BsonHandlers {
+private object BsonHandlers:
 
   import Msg.Last
   implicit val msgContentHandler: BSONDocumentHandler[Last] = Macros.handler[Last]
@@ -14,9 +14,9 @@ private object BsonHandlers {
   implicit val threadIdHandler: BSONHandler[MsgThread.Id] =
     stringAnyValHandler[MsgThread.Id](_.value, MsgThread.Id.apply)
 
-  implicit val threadHandler: BSON[MsgThread] = new BSON[MsgThread] {
+  implicit val threadHandler: BSON[MsgThread] = new BSON[MsgThread]:
     def reads(r: BSON.Reader) =
-      r.strsD("users") match {
+      r.strsD("users") match
         case List(u1, u2) =>
           MsgThread(
             id = r.get[MsgThread.Id]("_id"),
@@ -25,14 +25,12 @@ private object BsonHandlers {
             lastMsg = r.get[Last]("lastMsg")
           )
         case x => sys error s"Invalid MsgThread users: $x"
-      }
     def writes(w: BSON.Writer, t: MsgThread) =
       $doc(
         "_id"     -> t.id,
         "users"   -> t.users.sorted,
         "lastMsg" -> t.lastMsg
       )
-  }
 
   implicit val msgIdHandler: BSONHandler[Msg.Id]    = stringAnyValHandler[Msg.Id](_.value, Msg.Id.apply)
   implicit val msgHandler: BSONDocumentHandler[Msg] = Macros.handler[Msg]
@@ -45,4 +43,3 @@ private object BsonHandlers {
 
   def writeThread(thread: MsgThread, delBy: List[User.ID]): Bdoc =
     threadHandler.writeTry(thread).get ++ $doc("del" -> delBy)
-}

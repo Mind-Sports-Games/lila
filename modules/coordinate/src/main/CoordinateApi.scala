@@ -8,7 +8,7 @@ import lila.db.dsl._
 
 import strategygames.{ Player => PlayerIndex }
 
-final class CoordinateApi(scoreColl: Coll)(implicit ec: scala.concurrent.ExecutionContext) {
+final class CoordinateApi(scoreColl: Coll)(implicit ec: scala.concurrent.ExecutionContext):
 
   implicit private val scoreBSONHandler: BSONDocumentHandler[Score] = Macros.handler[Score]
 
@@ -40,7 +40,7 @@ final class CoordinateApi(scoreColl: Coll)(implicit ec: scala.concurrent.Executi
       .aggregateWith[Bdoc](readPreference = ReadPreference.secondaryPreferred) { framework =>
         import framework._
         List(
-          Match($doc("_id" $in userIds)),
+          Match($doc("_id" `$in` userIds)),
           Project(
             $doc(
               "p1" -> $doc("$max" -> "$p1"),
@@ -50,14 +50,11 @@ final class CoordinateApi(scoreColl: Coll)(implicit ec: scala.concurrent.Executi
         )
       }
       .collect[List](maxDocs = Int.MaxValue)
-      .map {
+      .map:
         _.flatMap { doc =>
-          doc.string("_id") map {
+          doc.string("_id") map:
             _ -> PlayerIndex.Map(
               ~doc.int("p1"),
               ~doc.int("p2")
             )
-          }
         }.toMap
-      }
-}

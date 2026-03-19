@@ -2,7 +2,7 @@ package lila.fishnet
 
 import org.apache.pekko.stream.scaladsl._
 import org.joda.time.DateTime
-import reactivemongo.akkastream.cursorProducer
+import reactivemongo.pekkostream.cursorProducer
 import reactivemongo.api.bson._
 import scala.concurrent.duration._
 
@@ -15,8 +15,8 @@ final private class Cleaner(
     system: org.apache.pekko.actor.ActorSystem
 )(implicit
     ec: scala.concurrent.ExecutionContext,
-    mat: akka.stream.Materializer
-) {
+    mat: org.apache.pekko.stream.Materializer
+):
 
   import BSONHandlers._
 
@@ -27,12 +27,12 @@ final private class Cleaner(
 
   private def cleanAnalysis: Funit =
     analysisColl
-      .find($doc("acquired.date" $lt durationAgo(analysisTimeoutBase)))
-      .sort($sort desc "acquired.date")
+      .find($doc("acquired.date" `$lt` durationAgo(analysisTimeoutBase)))
+      .sort($sort `desc` "acquired.date")
       .cursor[Work.Analysis]()
       .documentSource()
       .filter { ana =>
-        ana.acquiredAt.so(_ isBefore durationAgo(analysisTimeout(ana.nbMoves)))
+        ana.acquiredAt.so(_ `isBefore` durationAgo(analysisTimeout(ana.nbMoves)))
       }
       .take(200)
       .mapAsyncUnordered(4) { ana =>
@@ -47,8 +47,6 @@ final private class Cleaner(
   system.scheduler.scheduleWithFixedDelay(15 seconds, 10 seconds) { () =>
     cleanAnalysis.discard
   }
-}
 
-object Cleaner {
+object Cleaner:
   val timeoutPerPly = 120.seconds
-}

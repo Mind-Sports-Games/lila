@@ -1,18 +1,14 @@
 package lila.relay
 
-import io.lemonlabs.uri.AbsoluteUrl
 import org.joda.time.DateTime
 import play.api.data._
 import play.api.data.Forms._
-import scala.util.chaining._
 
-import lila.common.Form.{ cleanNonEmptyText, cleanText }
-import lila.game.Game
+import lila.common.Form.cleanText
 import lila.security.Granter
-import lila.study.Study
 import lila.user.User
 
-final class RelayTourForm {
+final class RelayTourForm:
 
   import RelayTourForm._
 
@@ -28,16 +24,15 @@ final class RelayTourForm {
   def create = form
 
   def edit(t: RelayTour) = form fill Data.make(t)
-}
 
-object RelayTourForm {
+object RelayTourForm:
 
   case class Data(
       name: String,
       description: String,
       markup: Option[String],
       official: Option[Boolean]
-  ) {
+  ):
 
     def update(tour: RelayTour, user: User) =
       tour.copy(
@@ -59,16 +54,13 @@ object RelayTourForm {
         createdAt = DateTime.now,
         syncedAt = none
       )
-  }
 
-  object Data {
+  object Data:
 
     def make(tour: RelayTour) =
       Data(
         name = tour.name,
         description = tour.description,
         markup = tour.markup,
-        official = tour.official option true
+        official = tour.official `option` true
       )
-  }
-}

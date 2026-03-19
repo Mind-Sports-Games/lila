@@ -1,7 +1,6 @@
 package lila.evalCache
 
 import org.joda.time.{ DateTime, Days }
-import scala.concurrent.duration._
 
 import lila.security.Granter
 import lila.user.{ User, UserRepo }
@@ -9,7 +8,7 @@ import lila.user.{ User, UserRepo }
 final private class EvalCacheTruster(
     cacheApi: lila.memo.CacheApi,
     userRepo: UserRepo
-)(implicit ec: scala.concurrent.ExecutionContext) {
+)(implicit ec: scala.concurrent.ExecutionContext):
 
   import EvalCacheEntry.{ Trust, TrustedUser }
 
@@ -20,19 +19,17 @@ final private class EvalCacheTruster(
     if (user.lameOrTroll) LOWER
     else if (Granter(_.SeeReport)(user)) HIGHER
     else
-      Trust {
+      Trust:
         seniorityBonus(user) +
           patronBonus(user) +
           titleBonus(user) +
           nbGamesBonus(user)
-      }
 
-  private val userIdCache = cacheApi[User.ID, Option[TrustedUser]](256, "evalCache.userIdTrustCache") {
+  private val userIdCache = cacheApi[User.ID, Option[TrustedUser]](256, "evalCache.userIdTrustCache"):
     _.expireAfterWrite(10 minutes)
       .buildAsyncFuture { userId =>
-        userRepo named userId map2 makeTrusted
+        userRepo `named` userId `map2` makeTrusted
       }
-  }
 
   def cachedTrusted(userId: User.ID): Fu[Option[TrustedUser]] = userIdCache get userId
 
@@ -47,7 +44,7 @@ final private class EvalCacheTruster(
   private def seniorityBonus(user: User) =
     math.sqrt(Days.daysBetween(user.createdAt, DateTime.now).getDays.toDouble / 30) - 1
 
-  private def patronBonus(user: User) = (~user.planMonths * 5) atMost 20
+  private def patronBonus(user: User) = (~user.planMonths * 5) `atMost` 20
 
   private def titleBonus(user: User) = user.hasTitle so 20
 
@@ -57,4 +54,3 @@ final private class EvalCacheTruster(
   // 1000 games = 2.16
   private def nbGamesBonus(user: User) =
     math.sqrt(user.count.game / 100) - 1
-}

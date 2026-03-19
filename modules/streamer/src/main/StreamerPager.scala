@@ -11,7 +11,7 @@ final class StreamerPager(
     coll: Coll,
     userRepo: UserRepo,
     maxPerPage: lila.common.config.MaxPerPage
-)(implicit ec: scala.concurrent.ExecutionContext) {
+)(implicit ec: scala.concurrent.ExecutionContext):
 
   import BsonHandlers._
 
@@ -19,7 +19,7 @@ final class StreamerPager(
       page: Int,
       live: LiveStreams,
       approvalRequested: Boolean = false
-  ): Fu[Paginator[Streamer.WithUser]] = {
+  ): Fu[Paginator[Streamer.WithUser]] =
     val adapter = new Adapter[Streamer](
       collection = coll,
       selector =
@@ -28,22 +28,21 @@ final class StreamerPager(
           $doc(
             "approval.granted" -> true,
             "listed"           -> Streamer.Listed(true),
-            "_id" $nin live.streams.map(_.streamer.id)
+            "_id" `$nin` live.streams.map(_.streamer.id)
           ),
       projection = none,
-      sort = if (approvalRequested) $sort asc "updatedAt" else $sort desc "liveAt"
-    ) mapFutureList withUsers
+      sort = if (approvalRequested) $sort `asc` "updatedAt" else $sort `desc` "liveAt"
+    ) `mapFutureList` withUsers
     Paginator(
       adapter = new CachedAdapter(adapter, nbResults = fuccess(6000)),
       currentPage = page,
       maxPerPage = maxPerPage
     )
-  }
 
   def nextRequestId: Fu[Option[Streamer.Id]] =
     coll.primitiveOne[Streamer.Id](
       $doc(approvalRequestedSelector),
-      $sort asc "updatedAt",
+      $sort `asc` "updatedAt",
       "_id"
     )
 
@@ -65,4 +64,3 @@ final class StreamerPager(
         Streamer.WithUser(streamer, user)
       }
     }
-}

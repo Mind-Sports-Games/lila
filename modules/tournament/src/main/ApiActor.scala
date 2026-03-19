@@ -1,7 +1,6 @@
 package lila.tournament
 
 import org.apache.pekko.actor._
-import org.joda.time.DateTime
 
 import lila.game.actorApi.FinishGame
 import lila.user.User
@@ -12,7 +11,7 @@ final private[tournament] class ApiActor(
     shieldApi: TournamentShieldApi,
     winnersApi: WinnersApi,
     tournamentRepo: TournamentRepo
-) extends Actor {
+) extends Actor:
 
   implicit def ec: ExecutionContextExecutor = context.dispatcher
 
@@ -27,7 +26,7 @@ final private[tournament] class ApiActor(
 
   val markCheaterDQs = true
 
-  def receive = {
+  def receive =
 
     case FinishGame(game, _, _) => api.finishGame(game).discard
 
@@ -47,13 +46,10 @@ final private[tournament] class ApiActor(
     case lila.hub.actorApi.playban.Playban(userId, _) => api.pausePlaybanned(userId).discard
 
     case lila.hub.actorApi.team.KickFromTeam(teamId, userId) => api.kickFromTeam(teamId, userId).discard
-  }
 
   private def ejectFromEnterable(userId: User.ID) =
-    tournamentRepo.withdrawableIds(userId) flatMap {
+    tournamentRepo.withdrawableIds(userId) flatMap:
       ids =>
         Future.sequence(ids.map {
           api.ejectLameFromEnterable(_, userId)
         })
-    }
-}

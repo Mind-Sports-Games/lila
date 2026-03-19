@@ -15,7 +15,7 @@ case class Categ(
     nbPostsTroll: Int,
     lastPostIdTroll: String,
     quiet: Boolean = false
-) {
+):
 
   def id = _id
 
@@ -37,11 +37,9 @@ case class Categ(
     )
 
   def slug = id
-}
 
-object Categ {
+object Categ:
 
   def isTeamSlug(slug: String) = slug.startsWith("team-")
 
-  def slugToTeamId(slug: String) = isTeamSlug(slug) option slug.drop(5)
-}
+  def slugToTeamId(slug: String) = isTeamSlug(slug) `option` slug.drop(5)

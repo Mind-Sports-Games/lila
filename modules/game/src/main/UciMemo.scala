@@ -1,12 +1,11 @@
 package lila.game
 
 import com.github.blemale.scaffeine.Cache
-import scala.concurrent.duration._
 
 import strategygames.format.{ FEN, UciDump }
 import strategygames.{ Action, ActionStrs, Player }
 
-final class UciMemo(gameRepo: GameRepo)(implicit ec: scala.concurrent.ExecutionContext) {
+final class UciMemo(gameRepo: GameRepo)(implicit ec: scala.concurrent.ExecutionContext):
 
   private val cache: Cache[Game.ID, ActionStrs] = lila.memo.CacheApi.scaffeineNoScheduler
     .expireAfterAccess(5 minutes)
@@ -14,14 +13,13 @@ final class UciMemo(gameRepo: GameRepo)(implicit ec: scala.concurrent.ExecutionC
 
   private val maxTurns = 300
 
-  def add(game: Game, uci: String, playerIndex: Player): Unit = {
+  def add(game: Game, uci: String, playerIndex: Player): Unit =
     val current = ~cache.getIfPresent(game.id)
     val newActionStrs =
       if (Player.fromTurnCount(current.size + game.stratGame.startedAtTurn) == playerIndex)
         current :+ List(uci)
       else current.dropRight(1) :+ (current.takeRight(1).flatten :+ uci)
     cache.put(game.id, newActionStrs)
-  }
 
   def add(game: Game, action: Action): Unit =
     add(
@@ -44,7 +42,7 @@ final class UciMemo(gameRepo: GameRepo)(implicit ec: scala.concurrent.ExecutionC
   private def uciStrsFromGame(game: Game, max: Int, fen: Option[FEN]): Fu[ActionStrs] =
     UciDump(game.variant.gameLogic, game.actionStrs take maxTurns, fen, game.variant)
       .map(_.toVector.map(_.toVector))
-      .toFuture
+      .fold(fufail(_), fuccess(_))
 
   // These API methods will query for the initial fen and then use it.
   def set(game: Game): Fu[Unit] =
@@ -56,4 +54,3 @@ final class UciMemo(gameRepo: GameRepo)(implicit ec: scala.concurrent.ExecutionC
     gameRepo
       .initialFen(game)
       .flatMap(uciStrsFromGame(game, max, _))
-}

@@ -1,7 +1,6 @@
 package lila.activity
 
 import com.softwaremill.macwire._
-import scala.concurrent.duration._
 
 import lila.common.config._
 import lila.hub.actorApi.round.CorresMoveEvent
@@ -20,7 +19,7 @@ final class Env(
 )(implicit
     ec: scala.concurrent.ExecutionContext,
     scheduler: org.apache.pekko.actor.Scheduler
-) {
+):
 
   private lazy val coll = db(CollName("activity"))
 
@@ -59,7 +58,7 @@ final class Env(
     "startStudy",
     "streamStart",
     "swissFinish"
-  ) {
+  ):
     case lila.forum.actorApi.CreatePost(post)             => write.forumPost(post).discard
     case prog: lila.practice.PracticeProgress.OnComplete  => write.practice(prog).discard
     case lila.simul.Simul.OnStart(simul)                  => write.simul(simul).discard
@@ -73,5 +72,3 @@ final class Env(
     case lila.hub.actorApi.team.JoinTeam(id, userId)      => write.team(id, userId).discard
     case lila.hub.actorApi.streamer.StreamStart(userId)   => write.streamStart(userId).discard
     case lila.swiss.SwissFinish(swissId, ranking)         => write.swiss(swissId, ranking).discard
-  }
-}

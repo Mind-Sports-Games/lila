@@ -17,8 +17,7 @@ import strategygames.{
   P1,
   Mode,
   Piece,
-  PieceMap,
-  Pos
+  PieceMap
 }
 import strategygames.chess.Castles
 import com.github.blemale.scaffeine.Cache
@@ -39,7 +38,7 @@ final private class Rematcher(
     messenger: Messenger,
     onStart: OnStart,
     rematches: Rematches
-)(implicit ec: scala.concurrent.ExecutionContext) {
+)(implicit ec: scala.concurrent.ExecutionContext):
 
   implicit private val chatLang: Lang = defaultLang
 
@@ -63,7 +62,7 @@ final private class Rematcher(
   def isOffering(pov: Pov): Boolean = offers.getIfPresent(pov.gameId).exists(_(pov.playerIndex))
 
   def yes(pov: Pov): Fu[Events] =
-    pov match {
+    pov match
       case Pov(game, playerIndex) if game.playerCouldRematch =>
         if (isOffering(!pov) || game.opponent(playerIndex).isAi)
           rematches.of(game.id).fold(rematchJoin(pov.game))(rematchExists(pov))
@@ -71,27 +70,23 @@ final private class Rematcher(
           fuccess(rematchCreate(pov))
         else fuccess(List(Event.RematchOffer(by = none)))
       case _ => fuccess(List(Event.ReloadOwner))
-    }
 
-  def no(pov: Pov): Fu[Events] = {
+  def no(pov: Pov): Fu[Events] =
     if (isOffering(pov)) messenger.system(pov.game, trans.rematchOfferCanceled.txt())
-    else if (isOffering(!pov)) {
-      declined put pov.fullId
+    else if (isOffering(!pov))
+      declined `put` pov.fullId
       messenger.system(pov.game, trans.rematchOfferDeclined.txt())
-    }
     offers invalidate pov.game.id
     fuccess(List(Event.RematchOffer(by = none)))
-  }
 
   def multiMatch(game: Game): Fu[Events] = rematchJoin(game)
 
   private def rematchExists(pov: Pov)(nextId: Game.ID): Fu[Events] =
-    gameRepo game nextId flatMap {
+    gameRepo `game` nextId flatMap:
       _.fold(rematchJoin(pov.game))(g => fuccess(redirectEvents(g)))
-    }
 
   private def rematchJoin(game: Game): Fu[Events] =
-    rematches.of(game.id) match {
+    rematches.of(game.id) match
       case None =>
         for {
           nextGame <- returnGame(game) map (_.start)
@@ -105,36 +100,33 @@ final private class Rematcher(
               Some(Forsyth.>>(game.variant.gameLogic, nextGame.stratGame))
             else None
           _ <- gameRepo.insertDenormalized(nextGame, initialFen)
-        } yield {
+        } yield
           if (nextGame.metadata.multiMatchGameNr.fold(false)(x => x >= 2))
             messenger.system(game, trans.multiMatchRematchStarted.txt())
           else messenger.system(game, trans.rematchOfferAccepted.txt())
           onStart(nextGame.id)
           redirectEvents(nextGame)
-        }
-      case Some(rematchId) => gameRepo game rematchId map { _ so redirectEvents }
-    }
+      case Some(rematchId) => gameRepo `game` rematchId map { _ so redirectEvents }
 
-  private def rematchCreate(pov: Pov): Events = {
+  private def rematchCreate(pov: Pov): Events =
     messenger.system(pov.game, trans.rematchOfferSent.txt())
     pov.opponent.userId foreach { forId =>
       Bus.publish(lila.hub.actorApi.round.RematchOffer(pov.gameId), s"rematchFor:$forId")
     }
     offers.put(pov.gameId, Offers(p1 = pov.playerIndex.p1, p2 = pov.playerIndex.p2))
     List(Event.RematchOffer(by = pov.playerIndex.some))
-  }
 
   //<game number>:<first game id in set>
   private def multiMatchEntry(g: Game): Option[String] =
-    if (!g.aborted) {
-      g.metadata.multiMatch.fold(g.metadata.multiMatch.isDefined option "multiMatch") { s =>
-        if (s.contains("multiMatch")) {
+    if (!g.aborted)
+      g.metadata.multiMatch.fold(g.metadata.multiMatch.isDefined `option` "multiMatch") { s =>
+        if (s.contains("multiMatch"))
           s"2:${g.id}".some
-        } else if (s.substring(1, 2) == ":") {
+        else if (s.substring(1, 2) == ":")
           s"${s.take(1).toInt + 1}:${s.drop(2)}".some
-        } else "multiMatch".some
+        else "multiMatch".some
       }
-    } else g.metadata.multiMatch.isDefined option "multiMatch"
+    else g.metadata.multiMatch.isDefined `option` "multiMatch"
 
   //when rematching we want the same fen unless we are backgammon and the players
   //aren't flipping colour, but we want the start player to be randomized again
@@ -143,15 +135,15 @@ final private class Rematcher(
       scala.util.Random.shuffle(variant.initialFens).headOption
     else initialFen
 
-  private def returnGame(game: Game): Fu[Game] = {
+  private def returnGame(game: Game): Fu[Game] =
     for {
       initialFen <- gameRepo.initialFen(game)
       situation = generateRematchFen(game.variant, initialFen).flatMap { fen =>
         Forsyth.<<<(game.variant.gameLogic, fen)
       }
-      pieces: PieceMap = game.variant match {
+      pieces: PieceMap = game.variant match
         case Variant.Chess(Chess960) =>
-          if (chess960 get game.id) Piece.pieceMapForChess(Chess960.pieces)
+          if (chess960 `get` game.id) Piece.pieceMapForChess(Chess960.pieces)
           else
             situation.fold(
               Piece.pieceMapForChess(Chess960.pieces)
@@ -161,10 +153,9 @@ final private class Rematcher(
             Variant.libStandard(game.variant.gameLogic).pieces
           )(_.situation.board.pieces)
         case variant => variant.pieces
-      }
-      users <- userRepo byIds game.userIds
+      users <- userRepo `byIds` game.userIds
       //Support go from position, i.e. handicapped start pos.
-      board = (game.variant.gameLogic, game.variant, situation.map(_.situation)) match {
+      board = (game.variant.gameLogic, game.variant, situation.map(_.situation)) match
         case (GameLogic.Go(), Variant.Go(variant), Some(strategygames.Situation.Go(sit))) =>
           Board.Go(
             strategygames.go
@@ -180,7 +171,6 @@ final private class Rematcher(
               castles = situation.fold(Castles.init)(_.situation.board.history.castles)
             )
           )
-      }
       game <- Game.make(
         stratGame = StratGame(
           game.variant.gameLogic,
@@ -204,12 +194,11 @@ final private class Rematcher(
         daysPerTurn = game.daysPerTurn,
         pgnImport = None,
         multiMatch = multiMatchEntry(game)
-      ) withUniqueId idGenerator
+      ) `withUniqueId` idGenerator
     } yield game
-  }
 
   private def returnPlayer(game: Game, playerIndex: PlayerIndex, users: List[User]): lila.game.Player =
-    (game.opponent(playerIndex).aiLevel, game.player(playerIndex).aiLevel, game.swapPlayersOnRematch) match {
+    (game.opponent(playerIndex).aiLevel, game.player(playerIndex).aiLevel, game.swapPlayersOnRematch) match
       case (Some(ai), Some(_), _) => lila.game.Player.make(playerIndex, ai.some)
       case (Some(ai), None, true) => lila.game.Player.make(playerIndex, ai.some)
       case (Some(_), None, false) =>
@@ -245,24 +234,19 @@ final private class Rematcher(
           },
           PerfPicker.mainOrDefault(game)
         )
-    }
 
-  private def redirectEvents(game: Game): Events = {
-    val p1Id = game fullIdOf P1
-    val p2Id = game fullIdOf P2
+  private def redirectEvents(game: Game): Events =
+    val p1Id = game `fullIdOf` P1
+    val p2Id = game `fullIdOf` P2
 
     List(
-      Event.RedirectOwner(if (game.swapPlayersOnRematch) P1 else P2, p2Id, AnonCookie.json(game pov P2)),
-      Event.RedirectOwner(if (game.swapPlayersOnRematch) P2 else P1, p1Id, AnonCookie.json(game pov P1)),
+      Event.RedirectOwner(if (game.swapPlayersOnRematch) P1 else P2, p2Id, AnonCookie.json(game `pov` P2)),
+      Event.RedirectOwner(if (game.swapPlayersOnRematch) P2 else P1, p1Id, AnonCookie.json(game `pov` P1)),
       // tell spectators about the rematch
       Event.RematchTaken(game.id)
     )
-  }
-}
 
-private object Rematcher {
+private object Rematcher:
 
-  case class Offers(p1: Boolean, p2: Boolean) {
+  case class Offers(p1: Boolean, p2: Boolean):
     def apply(playerIndex: PlayerIndex) = playerIndex.fold(p1, p2)
-  }
-}

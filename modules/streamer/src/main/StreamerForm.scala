@@ -8,7 +8,7 @@ import play.api.data.validation.Constraints
 import lila.common.Form.{ constraint, formatter }
 import play.api.data.format.Formatter
 
-object StreamerForm {
+object StreamerForm:
 
   import Streamer.{ Description, Headline, Listed, Name, Twitch, YouTube }
 
@@ -71,9 +71,9 @@ object StreamerForm {
       youTube: Option[String],
       listed: Boolean,
       approval: Option[ApprovalData]
-  ) {
+  ):
 
-    def apply(streamer: Streamer, asMod: Boolean) = {
+    def apply(streamer: Streamer, asMod: Boolean) =
       val newStreamer = streamer.copy(
         name = name,
         headline = headline,
@@ -100,13 +100,11 @@ object StreamerForm {
           case _ =>
             streamer.approval.copy(
               granted = streamer.approval.granted &&
-                newStreamer.twitch.fold(true)(streamer.twitch.has) &&
-                newStreamer.youTube.fold(true)(streamer.youTube.has)
+                newStreamer.twitch.fold(true)(t => streamer.twitch.contains(t)) &&
+                newStreamer.youTube.fold(true)(y => streamer.youTube.contains(y))
             )
         }
       )
-    }
-  }
 
   case class ApprovalData(
       granted: Boolean,
@@ -115,13 +113,11 @@ object StreamerForm {
       ignored: Boolean,
       chat: Boolean,
       quick: Option[String] = None
-  ) {
+  ):
     def resolve =
-      quick.fold(this) {
+      quick.fold(this):
         case "approve" => copy(granted = true, requested = false)
         case "decline" => copy(granted = false, requested = false)
-      }
-  }
 
   implicit private val headlineFormat: Formatter[Headline] =
     formatter.stringFormatter[Headline](_.value, Headline.apply)
@@ -135,4 +131,3 @@ object StreamerForm {
       constraint.minLength[Name](_.value)(3),
       constraint.maxLength[Name](_.value)(30)
     )
-}

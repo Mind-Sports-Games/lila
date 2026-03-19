@@ -9,7 +9,7 @@ import lila.common.HTTPRequest
 import lila.racer.RacerPlayer
 import lila.racer.RacerRace
 
-final class Racer(env: Env)(implicit mat: akka.stream.Materializer) extends LilaController(env) {
+final class Racer(env: Env)(implicit mat: org.apache.pekko.stream.Materializer) extends LilaController(env) {
 
   def home =
     Open { implicit ctx =>

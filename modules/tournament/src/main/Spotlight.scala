@@ -11,7 +11,7 @@ case class Spotlight(
     iconImg: Option[String] = None
 )
 
-object Spotlight {
+object Spotlight:
 
   import Schedule.Freq._
 
@@ -21,10 +21,10 @@ object Spotlight {
     Ordering.by[Tournament, org.joda.time.DateTime](_.startsAt)
 
   def select(tours: List[Tournament], user: Option[User], max: Int): List[Tournament] =
-    user.fold(tours botN max) { select(tours, _, max) }
+    user.fold(tours `botN` max) { select(tours, _, max) }
 
   def select(tours: List[Tournament], user: User, max: Int): List[Tournament] =
-    tours.filter { select(_, user) } botN max
+    tours.filter { select(_, user) } `botN` max
 
   private def select(tour: Tournament, user: User): Boolean =
     !tour.isFinished &&
@@ -38,10 +38,9 @@ object Spotlight {
   private def automatically(tour: Tournament, user: User): Boolean =
     tour.schedule so { sched =>
       def playedSinceWeeks(weeks: Int) =
-        user.perfs(tour.perfType).latest so {
+        user.perfs(tour.perfType).latest so:
           _.plusWeeks(weeks).isAfterNow
-        }
-      sched.freq match {
+      sched.freq match
         case Hourly                    => canMaybeJoinLimited(tour, user) && playedSinceWeeks(2)
         case Daily                     => playedSinceWeeks(2)
         case Weekly | Weekend          => playedSinceWeeks(4)
@@ -53,7 +52,6 @@ object Spotlight {
         case Annual | Introductory     => true
         case MSO21 | MSOGP | MSOWarmUp => true
         case ExperimentalMarathon      => false
-      }
     }
 
   private def canMaybeJoinLimited(tour: Tournament, user: User): Boolean =
@@ -64,5 +62,4 @@ object Spotlight {
       tour.conditions.minRating.fold(true) { c =>
         c(user).accepted
       } &&
-      tour.conditions.maxRating.fold(true)(_ maybe user)
-}
+      tour.conditions.maxRating.fold(true)(_ `maybe` user)

@@ -7,14 +7,13 @@ import strategygames.format.pgn.{ Reader, Sans, Tag, Tags }
 import org.joda.time.DateTime
 import lila.i18n.VariantKeys
 
-object Rewind {
+object Rewind:
 
-  private def createTags(fen: Option[FEN], game: Game) = {
+  private def createTags(fen: Option[FEN], game: Game) =
     val variantTag = Some(Tag(_.Variant, VariantKeys.variantName(game.variant)))
     val fenTag     = fen.map(f => Tag(_.FEN, f.value))
 
     Tags(List(variantTag, fenTag).flatten)
-  }
 
   //takeback
   def apply(game: Game, initialFen: Option[FEN], rewindPly: Boolean): Validated[String, Progress] =
@@ -43,7 +42,7 @@ object Rewind {
             },
             tags = createTags(initialFen, game)
           )
-    }).flatMap(_.valid) map { replay =>
+    }).andThen(_.valid) map { replay =>
       val switchPlayer = game.turnPlayerIndex != replay.state.player
       val playerIndex  = if (switchPlayer) game.turnPlayerIndex else !game.turnPlayerIndex
       val rewindedGame = replay.state
@@ -71,4 +70,3 @@ object Rewind {
       Progress(game, newGame)
     }
 
-}

@@ -18,19 +18,19 @@ class RawHtmlTest extends munit.FunSuite:
     val url = "http://zombo.com"
     assertEquals(
       addLinks(s"""link to $url here"""),
-      s"""link to <a rel="nofollow noreferrer" href="$url" target="_blank">$url</a> here"""
+      s"""link to <a rel="nofollow noopener noreferrer" href="$url" target="_blank">$url</a> here"""
     )
   test("hide https >> text"):
     val url = "zombo.com"
     assertEquals(
       addLinks(s"""link to https://$url here"""),
-      s"""link to <a rel="nofollow noreferrer" href="https://$url" target="_blank">$url</a> here"""
+      s"""link to <a rel="nofollow noopener noreferrer" href="https://$url" target="_blank">$url</a> here"""
     )
   test("default to https"):
     val url = "zombo.com"
     assertEquals(
       addLinks(s"""link to $url here"""),
-      s"""link to <a rel="nofollow noreferrer" href="https://$url" target="_blank">$url</a> here"""
+      s"""link to <a rel="nofollow noopener noreferrer" href="https://$url" target="_blank">$url</a> here"""
     )
   test("skip buggy url like http://foo@bar"):
     val url = "http://foo@bar"
@@ -39,7 +39,7 @@ class RawHtmlTest extends munit.FunSuite:
     val url = "http://zombo.com/pic.jpg"
     assertEquals(
       addLinks(s"""link to $url here"""),
-      s"""link to <a rel="nofollow noreferrer" href="$url" target="_blank">$url</a> here"""
+      s"""link to <a rel="nofollow noopener noreferrer" href="$url" target="_blank">$url</a> here"""
     )
   test("detect direct giphy gif URL"):
     val url    = "https://media.giphy.com/media/s0mE1d/giphy.gif"
@@ -73,26 +73,25 @@ class RawHtmlTest extends munit.FunSuite:
     val url = "http://i.imgur.com/Cku31nh.png"
     assertEquals(
       addLinks(s"""img to "$url" here"""),
-      s"""img to &quot;<a rel="nofollow noreferrer" href="$url" target="_blank">$url</a>&quot; here"""
+      s"""img to &quot;<a rel="nofollow noopener noreferrer" href="$url" target="_blank">$url</a>&quot; here"""
     )
   test("ignore imgur gallery URL"):
     val url = "http://imgur.com/gallery/pMtTE"
     assertEquals(
       addLinks(s"""link to $url here"""),
-      s"""link to <a rel="nofollow noreferrer" href="$url" target="_blank">$url</a> here"""
+      s"""link to <a rel="nofollow noopener noreferrer" href="$url" target="_blank">$url</a> here"""
     )
   test("detect i.ibb image URL"):
     val url    = "https://i.ibb.co/DH1h40Wc/4d1c3ca94244.png"
-    val picUrl = url
     assertEquals(
       addLinks(s"""img to $url here"""),
-      s"""img to <img class="embed" src="$picUrl" alt="$url"/> here"""
+      s"""img to <a rel="nofollow noopener noreferrer" href="$url" target="_blank">i.ibb.co/DH1h40Wc/4d1c3ca94244.png</a> here"""
     )
   test("ignore i.ibb image URL >> quotes"):
     val url = "https://i.ibb.co/DH1h40Wc/4d1c3ca94244.png"
     assertEquals(
       addLinks(s"""img to "$url" here"""),
-      s"""img to &quot;<a rel="nofollow noreferrer" href="$url" target="_blank">i.ibb.co/DH1h40Wc/4d1c3ca94244.png</a>&quot; here"""
+      s"""img to &quot;<a rel="nofollow noopener noreferrer" href="$url" target="_blank">i.ibb.co/DH1h40Wc/4d1c3ca94244.png</a>&quot; here"""
     )
 
   test("internal links"):
@@ -115,7 +114,7 @@ class RawHtmlTest extends munit.FunSuite:
     )
     assertEquals(
       addLinks("b foo.com blah playstrategy.org"),
-      """b <a rel="nofollow noreferrer" href="https://foo.com" target="_blank">foo.com</a> blah <a href="/">playstrategy.org</a>"""
+      """b <a rel="nofollow noopener noreferrer" href="https://foo.com" target="_blank">foo.com</a> blah <a href="/">playstrategy.org</a>"""
     )
 
   test("handle trailing punctuation"):

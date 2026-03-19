@@ -3,6 +3,7 @@ package lila.tournament
 import java.util.concurrent.ConcurrentHashMap
 import scala.collection.immutable.TreeSet
 
+import lila.base.IntValue
 import lila.game.Game
 import lila.user.User
 
@@ -11,21 +12,19 @@ case class Duel(
     p1: Duel.DuelPlayer,
     p2: Duel.DuelPlayer,
     averageRating: Duel.Rating
-) {
+):
 
   def has(u: User) = p1.name.id == u.id || p2.name.id == u.id
 
   def userIds = List(p1.name.id, p2.name.id)
-}
 
-object Duel {
+object Duel:
 
   type UsernameRating = (String, Int, Boolean)
 
   case class DuelPlayer(name: Name, rating: Rating, rank: Rank, isInputRating: Boolean)
-  case class Name(value: String) extends AnyVal with StringValue {
-    def id = User normalize value
-  }
+  case class Name(value: String) extends AnyVal with StringValue:
+    def id = User `normalize` value
   case class Rating(value: Int) extends AnyVal with IntValue
   case class Rank(value: Int)   extends AnyVal with IntValue
 
@@ -37,23 +36,21 @@ object Duel {
   private[tournament] val ratingOrdering               = Ordering.by[Duel, Int](_.averageRating.value)
   private[tournament] val gameIdOrdering               = Ordering.by[Duel, Game.ID](_.gameId)
   private[tournament] def emptyGameId(gameId: Game.ID) = Duel(gameId, null, null, Rating(0))
-}
 
-final private class DuelStore {
+final private class DuelStore:
 
   import Duel._
 
   private val byTourId = new ConcurrentHashMap[Tournament.ID, TreeSet[Duel]](256)
 
-  def get(tourId: Tournament.ID): Option[TreeSet[Duel]] = Option(byTourId get tourId)
+  def get(tourId: Tournament.ID): Option[TreeSet[Duel]] = Option(byTourId `get` tourId)
 
   def bestRated(tourId: Tournament.ID, nb: Int): List[Duel] =
-    get(tourId) so {
+    get(tourId) so:
       lila.common.Heapsort.topNToList(_, nb, ratingOrdering)
-    }
 
   def find(tour: Tournament, user: User): Option[Game.ID] =
-    get(tour.id) flatMap { _.find(_ has user).map(_.gameId) }
+    get(tour.id) flatMap { _.find(_ `has` user).map(_.gameId) }
 
   def add(tour: Tournament, game: Game, p1: UsernameRating, p2: UsernameRating, ranking: Ranking): Unit =
     for {
@@ -84,4 +81,3 @@ final private class DuelStore {
       )
     }
   def remove(tour: Tournament): Unit = { val _ = byTourId.remove(tour.id) }
-}

@@ -294,7 +294,7 @@ final class Team(
         me =>
           api.team(id) flatMap {
             _ so { team =>
-              implicit val lang = reqLang
+              implicit val lang: play.api.i18n.Lang = reqLang
               forms
                 .apiRequest(team)
                 .bindFromRequest()
@@ -320,8 +320,8 @@ final class Team(
     )
 
   def subscribe(teamId: String) = {
-    def doSub(req: Request[_], me: UserModel) =
-      Form(single("subscribe" -> optional(boolean)))
+    def doSub(req: Request[?], me: UserModel) =
+      Form(single("subscribe" -> optional(play.api.data.Forms.boolean)))
         .bindFromRequest()(req, formBinding)
         .fold(_ => funit, v => api.subscribe(teamId, me.id, ~v))
     AuthOrScopedBody(_.Team.Write)(

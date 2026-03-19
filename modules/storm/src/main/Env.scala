@@ -15,7 +15,7 @@ final class Env(
     userRepo: UserRepo
 )(implicit
     ec: scala.concurrent.ExecutionContext
-) {
+):
 
   private lazy val dayColl = db(CollName("storm_day"))
 
@@ -32,4 +32,3 @@ final class Env(
   lazy val dayApi = wire[StormDayApi]
 
   val forms = StormForm
-}

@@ -3,7 +3,6 @@ package lila.tournament
 import org.apache.pekko.actor._
 import org.apache.pekko.stream.scaladsl._
 import scala.concurrent.duration._
-import scala.util.chaining._
 import lila.common.ThreadLocalRandom
 import lila.common.extensions.*
 
@@ -15,20 +14,19 @@ final private class StartedOrganizer(
 )(implicit
     ec: scala.concurrent.ExecutionContext,
     scheduler: org.apache.pekko.actor.Scheduler,
-    mat: akka.stream.Materializer
-) extends Actor {
+    mat: org.apache.pekko.stream.Materializer
+) extends Actor:
 
-  override def preStart(): Unit = {
+  override def preStart(): Unit =
     context.setReceiveTimeout(120.seconds)
     scheduleNext()
-  }
 
   case object Tick
 
   def scheduleNext(): Unit =
     { val _ = scheduler.scheduleOnce(2.seconds, self, Tick) }
 
-  def receive = {
+  def receive =
 
     case ReceiveTimeout =>
       val msg = "tournament.StartedOrganizer timed out!"
@@ -55,18 +53,17 @@ final private class StartedOrganizer(
         .monSuccess(_.tournament.startedOrganizer.tick)
         .addEffectAnyway(scheduleNext())
         .discard
-  }
 
   private def processMedleyRoundChange(tour: Tournament) =
     if (tour.needsNewMedleyRound) api.newMedleyRound(tour)
     else tour
 
   private def processPairings(tour: Tournament) =
-    if (!tour.isScheduled && tour.nbPlayers < 30 && ThreadLocalRandom.nextInt(10) == 0) {
-      playerRepo nbActiveUserIds tour.id flatMap { nb =>
+    if (!tour.isScheduled && tour.nbPlayers < 30 && ThreadLocalRandom.nextInt(10) == 0)
+      playerRepo `nbActiveUserIds` tour.id flatMap { nb =>
         (nb >= 2) so startPairing(tour)
       }
-    } else startPairing(tour)
+    else startPairing(tour)
 
   private def processTour(tour: Tournament): Fu[Int] =
     if (tour.isOver)
@@ -85,4 +82,3 @@ final private class StartedOrganizer(
         .flatMap { waiting =>
           api.makePairings(tour, waiting) inject waiting.size
         }
-}

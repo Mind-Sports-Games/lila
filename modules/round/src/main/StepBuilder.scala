@@ -7,7 +7,7 @@ import play.api.libs.json._
 
 import lila.socket.Step
 
-object StepBuilder {
+object StepBuilder:
 
   private val logger = lila.round.logger.branch("StepBuilder")
 
@@ -18,7 +18,7 @@ object StepBuilder {
       activePlayer: Player,
       variant: Variant,
       initialFen: FEN
-  ): JsArray = {
+  ): JsArray =
     Replay.gameWithUciWhileValid(
       variant.gameLogic,
       actionStrs,
@@ -26,10 +26,10 @@ object StepBuilder {
       activePlayer,
       initialFen,
       variant
-    ) match {
+    ) match
       case (init, games, error) =>
         error foreach logChessError(id)
-        JsArray {
+        JsArray:
           val initStep = Step(
             ply = init.plies,
             turnCount = init.turnCount,
@@ -77,13 +77,9 @@ object StepBuilder {
             )
           }
           (initStep :: moveSteps).map(_.toJson)
-        }
-    }
-  }
 
   private val logChessError = (id: String) =>
     (err: String) => {
       val path = if (id == "synthetic") "analysis" else id
       logger.info(s"https://playstrategy.org/$path ${err.linesIterator.toList.headOption | "?"}")
     }
-}

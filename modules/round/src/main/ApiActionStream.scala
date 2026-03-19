@@ -1,6 +1,5 @@
 package lila.round
 
-import org.apache.pekko.stream.OverflowStrategy
 import org.apache.pekko.stream.scaladsl._
 import strategygames.{ Player => PlayerIndex }
 import strategygames.format.Forsyth
@@ -15,26 +14,25 @@ import lila.game.actorApi.FinishGame
 
 final class ApiActionStream(gameRepo: GameRepo, gameJsonView: lila.game.JsonView)(implicit
     ec: ExecutionContext
-) {
+):
 
   private val delayMovesBy         = 3
   private val delayKeepsFirstMoves = 5
 
-  def apply(game: Game): Source[JsObject, _] =
-    Source futureSource {
+  def apply(game: Game): Source[JsObject, ?] =
+    Source futureSource:
       gameRepo.initialFen(game) map { initialFen =>
         val buffer = scala.collection.mutable.Queue.empty[JsObject]
         var moves  = 0
         Source(List(gameJsonView(game, initialFen))) concat
           Source
-            .queue[JsObject](16, akka.stream.OverflowStrategy.dropHead)
+            .queue[JsObject](16, org.apache.pekko.stream.OverflowStrategy.dropHead)
             .statefulMapConcat { () => js =>
               moves += 1
               if (game.finished || moves <= delayKeepsFirstMoves) List(js)
-              else {
+              else
                 buffer.enqueue(js)
                 (buffer.size > delayMovesBy) so List(buffer.dequeue())
-              }
             }
             .mapMaterializedValue { queue =>
               val clocks = ~(for {
@@ -46,7 +44,7 @@ final class ApiActionStream(gameRepo: GameRepo, gameJsonView: lila.game.JsonView
                 clk.config.initTime
               ) ++ times)
               val clockOffset = game.startPlayerIndex.fold(0, 1)
-              Replay.situations(game.variant.gameLogic, game.actionStrs, initialFen, game.variant) foreach {
+              Replay.situations(game.variant.gameLogic, game.actionStrs, initialFen, game.variant) foreach:
                 _.zipWithIndex foreach { case (s, index) =>
                   val clkValues = for {
                     p1           <- clocks.lift(index + 2 - clockOffset)
@@ -62,27 +60,23 @@ final class ApiActionStream(gameRepo: GameRepo, gameJsonView: lila.game.JsonView
                     )
                   )
                 }
-              }
-              if (game.finished) {
+              if (game.finished)
                 queue offer gameJsonView(game, initialFen)
                 queue.complete()
-              } else {
-                val chans = List(MoveGameEvent makeChan game.id, "finishGame")
-                val sub = Bus.subscribeFun(chans: _*) {
+              else
+                val chans = List(MoveGameEvent `makeChan` game.id, "finishGame")
+                val sub = Bus.subscribeFun(chans*):
                   case MoveGameEvent(g, fen, move) =>
                     queue.offer(toJson(g, fen, move.some)).discard
                   case FinishGame(g, _, _) if g.id == game.id =>
                     queue offer gameJsonView(g, initialFen)
                     (1 to buffer.size) foreach { _ => queue.offer(Json.obj()) } // push buffer content out
                     queue.complete()
-                }
                 queue.watchCompletion() dforeach { _ =>
                   Bus.unsubscribe(sub, chans)
                 }
-              }
             }
       }
-    }
 
   private def toJson(game: Game, fen: String, lastMoveUci: Option[String]): JsObject =
     toJson(
@@ -122,4 +116,3 @@ final class ApiActionStream(gameRepo: GameRepo, gameJsonView: lila.game.JsonView
         "p2Delay"   -> clk._6.roundSeconds
       )
     }
-}

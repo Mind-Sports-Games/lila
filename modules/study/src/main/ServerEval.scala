@@ -5,7 +5,6 @@ import strategygames.format.{ Forsyth, Uci, UciCharPair, UciDump }
 import strategygames.variant.Variant
 import strategygames.{ Division, Game, GameLogic, Player => PlayerIndex, Replay }
 import play.api.libs.json._
-import scala.concurrent.duration._
 
 import lila.analyse.{ Analysis, Info }
 import lila.hub.actorApi.fishnet.StudyChapterRequest
@@ -14,26 +13,26 @@ import lila.tree.Node.Comment
 import lila.user.{ User, UserRepo }
 import lila.{ tree => T }
 
-object ServerEval {
+object ServerEval:
 
   final class Requester(
       fishnet: lila.hub.actors.Fishnet,
       chapterRepo: ChapterRepo,
       userRepo: UserRepo
-  )(implicit ec: scala.concurrent.ExecutionContext) {
+  )(implicit ec: scala.concurrent.ExecutionContext):
 
     private val onceEvery = lila.memo.OnceEvery(5 minutes)
 
     def apply(study: Study, chapter: Chapter, userId: User.ID): Funit =
       chapter.serverEval.fold(true) { eval =>
         !eval.done && onceEvery(chapter.id.value)
-      } so {
+      } so:
         val unlimitedFu =
           fuccess(userId == User.playstrategyId) >>| userRepo
             .byId(userId)
             .map(_.exists(Granter(_.Relay)))
         unlimitedFu flatMap { unlimited =>
-          chapterRepo.startServerEval(chapter).andDo {
+          chapterRepo.startServerEval(chapter).andDo:
             fishnet ! StudyChapterRequest(
               studyId = study.id.value,
               chapterId = chapter.id.value,
@@ -63,32 +62,29 @@ object ServerEval {
               userId = userId,
               unlimited = unlimited
             )
-          }
         }
-      }
-  }
 
   final class Merger(
       sequencer: StudySequencer,
       socket: StudySocket,
       chapterRepo: ChapterRepo,
       divider: lila.game.Divider
-  )(implicit ec: scala.concurrent.ExecutionContext) {
+  )(implicit ec: scala.concurrent.ExecutionContext):
 
     def apply(analysis: Analysis, complete: Boolean): Funit =
       analysis.studyId.map(Study.Id.apply) so { studyId =>
-        sequencer.sequenceStudyWithChapter(studyId, Chapter.Id(analysis.id)) {
+        sequencer.sequenceStudyWithChapter(studyId, Chapter.Id(analysis.id)):
           case Study.WithChapter(_, chapter) => {
             implicit val variant = chapter.root.variant
             (complete so chapterRepo.completeServerEval(chapter)) >> {
               lila.common.LilaFuture
                 .fold(chapter.root.mainline.zip(analysis.infoAdvices).toList)(Path.root) {
                   case (path, (node, (info, advOpt))) =>
-                    chapter.root.nodeAt(path).flatMap { parent =>
+                    (chapter.root.nodeAt(path).flatMap { parent =>
                       analysisLine(parent, chapter.setup.variant, info) map { subTree =>
                         parent.addChild(subTree) -> subTree
                       }
-                    } so { case (newParent, subTree) =>
+                    }).fold(funit) { case (newParent, subTree) =>
                       chapterRepo.addSubTree(subTree, newParent, path)(chapter)
                     } >> {
                       import BSONHandlers._
@@ -118,7 +114,7 @@ object ServerEval {
                                 .flatMap(CommentsBSONHandler.writeOpt),
                               F.glyphs -> advOpt
                                 .map { adv =>
-                                  node.glyphs merge Glyphs.fromList(List(adv.judgment.glyph))
+                                  node.glyphs `merge` Glyphs.fromList(List(adv.judgment.glyph))
                                 }
                                 .flatMap(GlyphsBSONHandler.writeOpt)
                             )
@@ -126,7 +122,7 @@ object ServerEval {
                     } inject path + node
                 } void
             }.andDo {
-              chapterRepo.byId(Chapter.Id(analysis.id)).foreach {
+              chapterRepo.byId(Chapter.Id(analysis.id)).foreach:
                 _ so { chapter =>
                   socket.onServerEval(
                     studyId,
@@ -138,10 +134,8 @@ object ServerEval {
                     )
                   )
                 }
-              }
-            } logFailure logger
+            } `logFailure` logger
           }
-        }
       }
 
     def divisionOf(chapter: Chapter) =
@@ -162,18 +156,16 @@ object ServerEval {
         PlayerIndex.fromTurnCount(info.variation.take(20).size),
         root.fen,
         variant
-      ) match {
+      ) match
         case (_, games, error) =>
           error foreach { logger.info(_) }
-          games.reverse match {
+          games.reverse match
             case Nil => none
             case (g, m) :: rest =>
               rest
                 .foldLeft(makeBranch(g, m)) { case (node, (g, m)) =>
-                  makeBranch(g, m) addChild node
+                  makeBranch(g, m).addChild(node).asInstanceOf[Node]
                 } some
-          }
-      }
 
     private def makeBranch(g: Game, m: Uci.WithSan) =
       Node(
@@ -190,7 +182,6 @@ object ServerEval {
         children = Node.emptyChildren,
         forceVariation = false
       )
-  }
 
   case class Progress(chapterId: Chapter.Id, tree: T.Root, analysis: JsObject, division: Division)
 
@@ -199,4 +190,3 @@ object ServerEval {
       lila.analyse.Accuracy.PovLike(PlayerIndex.P1, chapter.root.playerIndex, chapter.root.ply),
       analysis
     )
-}

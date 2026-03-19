@@ -4,9 +4,8 @@ import org.apache.pekko.actor.Scheduler
 import org.apache.pekko.stream.Materializer
 import org.apache.pekko.stream.scaladsl._
 import bloomfilter.mutable.BloomFilter
-import reactivemongo.akkastream.cursorProducer
+import reactivemongo.pekkostream.cursorProducer
 import reactivemongo.api.ReadPreference
-import scala.concurrent.duration._
 import scala.concurrent.ExecutionContext
 
 import lila.common.extensions.*
@@ -18,7 +17,7 @@ final class ClasStudentCache(colls: ClasColls, cacheApi: CacheApi)(implicit
     ec: ExecutionContext,
     scheduler: Scheduler,
     mat: Materializer
-) {
+):
 
   private val falsePositiveRate = 0.00003
   private var bloomFilter       = BloomFilter[User.ID](10, 0.1) // temporary empty filter
@@ -31,7 +30,7 @@ final class ClasStudentCache(colls: ClasColls, cacheApi: CacheApi)(implicit
     colls.student.countAll foreach { count =>
       val nextBloom = BloomFilter[User.ID](count + 1, falsePositiveRate)
       colls.student
-        .find($doc("archived" $exists false), $doc("userId" -> true).some)
+        .find($doc("archived" `$exists` false), $doc("userId" -> true).some)
         .cursor[Bdoc](ReadPreference.secondaryPreferred)
         .documentSource()
         .toMat(Sink.fold[Int, Bdoc](0) { case (total, doc) =>
@@ -48,5 +47,4 @@ final class ClasStudentCache(colls: ClasColls, cacheApi: CacheApi)(implicit
         .discard
     }
 
-  val _ = scheduler.scheduleWithFixedDelay(23 seconds, 1 hour) { rebuildBloomFilter _ }
-}
+  val _ = scheduler.scheduleWithFixedDelay(23 seconds, 1 hour) { (() => rebuildBloomFilter()) }

@@ -20,9 +20,9 @@ final class Env(
 )(implicit
     ec: scala.concurrent.ExecutionContext,
     scheduler: org.apache.pekko.actor.Scheduler,
-    mat: akka.stream.Materializer,
+    mat: org.apache.pekko.stream.Materializer,
     mode: play.api.Mode
-) {
+):
 
   lazy val nameGenerator: NameGenerator = wire[NameGenerator]
 
@@ -42,7 +42,7 @@ final class Env(
 
   lila.common.Bus.subscribeFuns(
     "finishGame" -> { case lila.game.actorApi.FinishGame(game, _, _) =>
-      progressApi.onFinishGame(game).discard
+      progressApi.onFinishGame(game)
     },
     "clas" -> { case lila.hub.actorApi.clas.IsTeacherOf(teacher, student, promise) =>
       promise completeWith api.clas.isTeacherOf(teacher, student)
@@ -54,10 +54,8 @@ final class Env(
       promise completeWith matesCache.get(kid.id)
     }
   )
-}
 
-private class ClasColls(db: lila.db.Db) {
+private class ClasColls(db: lila.db.Db):
   val clas    = db(CollName("clas_clas"))
   val student = db(CollName("clas_student"))
   val invite  = db(CollName("clas_invite"))
-}

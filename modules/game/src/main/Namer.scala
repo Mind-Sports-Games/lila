@@ -2,7 +2,7 @@ package lila.game
 
 import lila.common.LightUser
 
-object Namer {
+object Namer:
 
   def playerTextBlocking(player: Player, withRating: Boolean = false)(implicit
       lightUser: LightUser.GetterSync
@@ -12,9 +12,8 @@ object Namer {
   def playerText(player: Player, withRating: Boolean = false)(implicit
       lightUser: LightUser.Getter
   ): Fu[String] =
-    player.userId.so(lightUser) dmap {
+    player.userId.so(lightUser) dmap:
       playerTextUser(player, _, withRating)
-    }
 
   private def playerTextUser(player: Player, user: Option[LightUser], withRating: Boolean = false): String =
     player.aiLevel.fold(
@@ -39,8 +38,6 @@ object Namer {
       }
 
   def ratingString(p: Player) =
-    p.rating match {
+    p.rating match
       case Some(rating) => s"$rating${if (p.isInputRating) "*" else if (p.provisional) "?" else ""}"
       case _            => "?"
-    }
-}

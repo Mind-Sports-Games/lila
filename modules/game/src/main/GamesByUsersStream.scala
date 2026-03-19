@@ -2,7 +2,6 @@ package lila.game
 
 import org.apache.pekko.stream.scaladsl._
 import play.api.libs.json._
-import scala.concurrent.duration._
 
 import actorApi.{ FinishGame, StartGame }
 import strategygames.{ ByoyomiClock, Clock }
@@ -14,26 +13,24 @@ import lila.user.User
 
 final class GamesByUsersStream(gameRepo: lila.game.GameRepo)(implicit
     ec: scala.concurrent.ExecutionContext
-) {
+):
 
   private val chans = List("startGame", "finishGame")
 
   private val blueprint = Source
-    .queue[Game](64, akka.stream.OverflowStrategy.dropHead)
+    .queue[Game](64, org.apache.pekko.stream.OverflowStrategy.dropHead)
     .mapAsync(1)(gameRepo.withInitialFen)
     .map(gameWithInitialFenWriter.writes)
 
-  def apply(userIds: Set[User.ID]): Source[JsValue, _] =
+  def apply(userIds: Set[User.ID]): Source[JsValue, ?] =
     blueprint mapMaterializedValue { queue =>
       def matches(game: Game) =
-        game.userIds match {
+        game.userIds match
           case List(u1, u2) if u1 != u2 => userIds(u1) && userIds(u2)
           case _                        => false
-        }
-      val sub = Bus.subscribeFun(chans: _*) {
+      val sub = Bus.subscribeFun(chans*):
         case StartGame(game) if matches(game)        => queue.offer(game).discard
         case FinishGame(game, _, _) if matches(game) => queue.offer(game).discard
-      }
       queue.watchCompletion().foreach { _ =>
         Bus.unsubscribe(sub, chans)
       }
@@ -43,7 +40,7 @@ final class GamesByUsersStream(gameRepo: lila.game.GameRepo)(implicit
     JsString(f.value)
   }
 
-  private val gameWithInitialFenWriter: OWrites[Game.WithInitialFen] = OWrites {
+  private val gameWithInitialFenWriter: OWrites[Game.WithInitialFen] = OWrites:
     case Game.WithInitialFen(g, initialFen) =>
       Json
         .obj(
@@ -96,5 +93,3 @@ final class GamesByUsersStream(gameRepo: lila.game.GameRepo)(implicit
           }
         })
         .add("daysPerTurn" -> g.daysPerTurn)
-  }
-}

@@ -10,7 +10,7 @@ import strategygames.{ GameFamily, GameLogic }
 import lila.db.dsl._
 import lila.tree.Eval._
 
-private object BSONHandlers {
+private object BSONHandlers:
 
   import EvalCacheEntry._
 
@@ -18,15 +18,15 @@ private object BSONHandlers {
   implicit private val KnodesBSONHandler: BSONHandler[Knodes] =
     intAnyValHandler[Knodes](_.value, Knodes.apply)
 
-  implicit val PvsHandler: BSONHandler[NonEmptyList[Pv]] = new BSONHandler[NonEmptyList[Pv]] {
+  implicit val PvsHandler: BSONHandler[NonEmptyList[Pv]] = new BSONHandler[NonEmptyList[Pv]]:
     private def scoreWrite(s: Score): String = s.value.fold(_.value.toString, m => s"#${m.value}")
     private def scoreRead(str: String): Option[Score] =
-      if (str startsWith "#") str.drop(1).toIntOption map { m =>
-        Score mate Mate(m)
+      if (str `startsWith` "#") str.drop(1).toIntOption map { m =>
+        Score `mate` Mate(m)
       }
       else
         str.toIntOption map { c =>
-          Score cp Cp(c)
+          Score `cp` Cp(c)
         }
     //TODO GameFamily defaults to chess here, will need to access this to make this work for anything non chess
     private def movesWrite(moves: Moves): String = Uci.writeListPiotr(GameFamily.Chess(), moves.value.toList)
@@ -36,44 +36,40 @@ private object BSONHandlers {
     private val pvSeparator    = '/'
     private val pvSeparatorStr = pvSeparator.toString
     def readTry(bs: BSONValue) =
-      bs match {
+      bs match
         case BSONString(value) =>
           Try {
             value.split(pvSeparator).toList.map { pvStr =>
-              pvStr.split(scoreSeparator) match {
+              pvStr.split(scoreSeparator) match
                 case Array(score, moves) =>
                   Pv(
-                    scoreRead(score) err s"Invalid score $score",
-                    movesRead(moves) err s"Invalid moves $moves"
+                    scoreRead(score) `err` s"Invalid score $score",
+                    movesRead(moves) `err` s"Invalid moves $moves"
                   )
                 case x => sys error s"Invalid PV $pvStr: ${x.toList} (in $value)"
-              }
             }
-          }.flatMap {
-            _.toNel toTry s"Empty PVs $value"
-          }
+          }.flatMap:
+            _.toNel `toTry` s"Empty PVs $value"
         case b => lila.db.BSON.handlerBadType[NonEmptyList[Pv]](b)
-      }
     def writeTry(x: NonEmptyList[Pv]) =
       Success(BSONString {
         x.toList.map { pv =>
           s"${scoreWrite(pv.score)}$scoreSeparator${movesWrite(pv.moves)}"
         } mkString pvSeparatorStr
       })
-  }
 
   implicit val EntryIdHandler: BSONHandler[Id] = tryHandler[Id](
     { case BSONString(value) =>
       value split ':' match {
         case Array(lib, fen) =>
-          Success(Id(Variant.libStandard(GameLogic(lib.toInt)), SmallFen raw fen)) //legacy db entries
+          Success(Id(Variant.libStandard(GameLogic(lib.toInt)), SmallFen `raw` fen)) //legacy db entries
         case Array(lib, variantId, fen) =>
           Success(
             Id(
               variantId.toIntOption flatMap { id =>
                 Variant.apply(GameLogic(lib.toInt), id)
-              } err s"Invalid evalcache variant $variantId",
-              SmallFen raw fen
+              } `err` s"Invalid evalcache variant $variantId",
+              SmallFen `raw` fen
             )
           )
         case _ => lila.db.BSON.handlerBadValue(s"Invalid evalcache id $value")
@@ -94,4 +90,3 @@ private object BSONHandlers {
 
   implicit val evalHandler: BSONDocumentHandler[Eval]            = Macros.handler[Eval]
   implicit val entryHandler: BSONDocumentHandler[EvalCacheEntry] = Macros.handler[EvalCacheEntry]
-}

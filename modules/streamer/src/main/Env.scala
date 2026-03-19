@@ -35,7 +35,7 @@ final class Env(
     ec: scala.concurrent.ExecutionContext,
     system: ActorSystem,
     scheduler: org.apache.pekko.actor.Scheduler
-) {
+):
 
   implicit private val twitchLoader: ConfigLoader[TwitchConfig]    = AutoConfig.loader[TwitchConfig]
   implicit private val keywordLoader: ConfigLoader[Stream.Keyword] = strLoader(Stream.Keyword.apply)
@@ -45,7 +45,7 @@ final class Env(
 
   private lazy val photographer = new lila.db.Photographer(imageRepo, "streamer")
 
-  lazy val alwaysFeaturedSetting = {
+  lazy val alwaysFeaturedSetting =
     import lila.memo.SettingStore.UserIds._
     import lila.common.UserIds
     settingStore[UserIds](
@@ -54,7 +54,6 @@ final class Env(
       text =
         "Twitch streamers who get featured without the keyword - playstrategy usernames separated by a comma".some
     )
-  }
 
   lazy val homepageMaxSetting =
     settingStore[Int](
@@ -77,7 +76,7 @@ final class Env(
         isOnline = isOnline,
         timeline = timeline,
         keyword = config.keyword,
-        alwaysFeatured = alwaysFeaturedSetting.get _,
+        alwaysFeatured = (() => alwaysFeaturedSetting.get()),
         googleApiKey = config.googleApiKey,
         twitchApi = twitchApi
       )
@@ -93,4 +92,3 @@ final class Env(
   scheduler.scheduleWithFixedDelay(1 hour, 1 day) { () =>
     api.autoDemoteFakes.discard
   }
-}

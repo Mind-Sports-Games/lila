@@ -17,7 +17,7 @@ import lila.i18n.defaultLang
 final class JsonView(
     gameJson: GameJson,
     gameRepo: GameRepo
-)(implicit ec: scala.concurrent.ExecutionContext) {
+)(implicit ec: scala.concurrent.ExecutionContext):
 
   import JsonView._
 
@@ -28,7 +28,7 @@ final class JsonView(
       user: Option[User]
   )(implicit
       lang: Lang
-  ): Fu[JsObject] = {
+  ): Fu[JsObject] =
     gameJson(
       gameId = puzzle.gameId,
       plies = puzzle.initialPly,
@@ -57,7 +57,6 @@ final class JsonView(
           }
         )
     }
-  }
 
   def userJson(u: User, v: Variant) =
     Json
@@ -126,22 +125,21 @@ final class JsonView(
     "perf"       -> perfJson(puzzle.variant)
   )
 
-  private def perfJson(variant: Variant) = {
+  private def perfJson(variant: Variant) =
     val perfType = PerfType.byVariant(variant) | PerfType.default
     Json.obj(
       "icon" -> perfType.iconChar.toString,
       "name" -> perfType.trans(defaultLang)
     )
-  }
 
   private def simplifyThemes(themes: Set[PuzzleTheme.Key]) =
     themes.filterNot(List(PuzzleTheme.mate.key, PuzzleTheme.win.key).contains(_))
 
-  object bc {
+  object bc:
 
     def apply(puzzle: Puzzle, user: Option[User])(implicit
         lang: Lang
-    ): Fu[JsObject] = {
+    ): Fu[JsObject] =
       gameJson(
         gameId = puzzle.gameId,
         plies = puzzle.initialPly,
@@ -154,7 +152,6 @@ final class JsonView(
           )
           .add("user" -> user.map(_.perfs.puzzle_standard.intRating).map(userJson))
       }
-    }
 
     //TODO this and above doesn't work but we dont require it too as its for mobile bc batch only
     //would need to assume the batch has all same variant??
@@ -195,7 +192,7 @@ final class JsonView(
       "branch" -> makeBranch(puzzle).map(defaultNodeJsonWriter.writes)
     )
 
-    private def makeBranch(puzzle: Puzzle): Option[tree.Branch] = {
+    private def makeBranch(puzzle: Puzzle): Option[tree.Branch] =
       import strategygames.format._
       val init =
         //TODO: Do we need to set turns through withTurnsAndPlies can the fen not decode this?
@@ -204,7 +201,7 @@ final class JsonView(
           puzzle.initialPly + 1,
           puzzle.initialPly + 1
         )
-      val (_, branchList) = puzzle.line.tail.foldLeft[(Game, List[tree.Branch])]((init, Nil)) {
+      val (_, branchList) = puzzle.line.tail.foldLeft[(Game, List[tree.Branch])]((init, Nil)):
         case ((prev, branches), uci) =>
           val (game, move) =
             prev(uci.orig, uci.dest, uci.promotion)
@@ -223,18 +220,12 @@ final class JsonView(
             pocketData = none
           )
           (game, branch :: branches)
-      }
-      branchList.foldLeft[Option[tree.Branch]](None) {
+      branchList.foldLeft[Option[tree.Branch]](None):
         case (None, branch)        => branch.some
-        case (Some(child), branch) => Some(branch addChild child)
-      }
-    }
-  }
-}
+        case (Some(child), branch) => Some(branch.copy(children = branch.children :+ child))
 
-object JsonView {
+object JsonView:
 
   implicit val puzzleIdWrites: Writes[Puzzle.Id] = stringIsoWriter(Puzzle.idIso)
 
   implicit val puzzleThemeKeyWrites: Writes[PuzzleTheme.Key] = stringIsoWriter(PuzzleTheme.keyIso)
-}

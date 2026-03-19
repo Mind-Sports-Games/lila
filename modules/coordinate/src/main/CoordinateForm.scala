@@ -3,7 +3,7 @@ package lila.coordinate
 import play.api.data._
 import play.api.data.Forms._
 
-object CoordinateForm {
+object CoordinateForm:
 
   val playerIndex = Form(
     single(
@@ -18,8 +18,6 @@ object CoordinateForm {
     )(ScoreData.apply)(d => Some((d.playerIndex, d.score)))
   )
 
-  case class ScoreData(playerIndex: String, score: Int) {
+  case class ScoreData(playerIndex: String, score: Int):
 
     def isP1 = playerIndex == "p1"
-  }
-}

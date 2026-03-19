@@ -1,7 +1,5 @@
 package lila.api
 
-import scala.concurrent.duration._
-
 import lila.common.config._
 
 final class ApiConfig(
@@ -15,18 +13,16 @@ final class ApiConfig(
     val accessibility: ApiConfig.Accessibility
 )
 
-object ApiConfig {
+object ApiConfig:
 
   final class Accessibility(
       val blindCookieName: String,
       blindCookieSalt: Secret
-  ) {
+  ):
     val blindCookieMaxAge = 365 days
-    def hash(implicit ctx: lila.user.UserContext) = {
+    def hash(implicit ctx: lila.user.UserContext) =
       import com.roundeights.hasher.Implicits._
       (ctx.userId | "anon").salt(blindCookieSalt.value).md5.hex
-    }
-  }
 
   def loadFrom(c: play.api.Configuration) =
     new ApiConfig(
@@ -42,4 +38,3 @@ object ApiConfig {
         c.get[Secret]("accessibility.blind.cookie.salt")
       )
     )
-}

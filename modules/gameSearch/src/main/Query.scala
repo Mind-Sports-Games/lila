@@ -28,7 +28,7 @@ case class Query(
     analysed: Option[Boolean] = None,
     p1User: Option[String] = None,
     p2User: Option[String] = None
-) {
+):
 
   def nonEmpty =
     user1.nonEmpty ||
@@ -48,9 +48,8 @@ case class Query(
       duration.nonEmpty ||
       clock.nonEmpty ||
       analysed.nonEmpty
-}
 
-object Query {
+object Query:
 
   import lila.common.Form._
   import play.api.libs.json._
@@ -131,7 +130,7 @@ object Query {
     options(1 to 6, "m", "%d month{s} ago") ++
     options(1 to 5, "y", "%d year{s} ago")
 
-  val statuses = Status.finishedNotCheated.flatMap {
+  val statuses = Status.finishedNotCheated.flatMap:
     case s if s.is(_.Timeout)       => none
     case s if s.is(_.NoStart)       => none
     case s if s.is(_.UnknownFinish) => none
@@ -143,5 +142,3 @@ object Query {
       Some(s.id -> "Variant End")
     case s =>
       Some(s.id -> s.toString)
-  }
-}

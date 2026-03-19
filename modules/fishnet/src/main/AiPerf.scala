@@ -1,6 +1,6 @@
 package lila.fishnet
 
-final class AiPerfApi {
+final class AiPerfApi:
 
   def intRatings: Map[Int, Int] =
     Map(
@@ -13,4 +13,3 @@ final class AiPerfApi {
       7 -> 2700,
       8 -> 3000
     )
-}

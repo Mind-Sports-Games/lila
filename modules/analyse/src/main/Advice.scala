@@ -2,10 +2,9 @@ package lila.analyse
 
 import strategygames.format.pgn.Glyph
 import lila.tree.Eval._
-import scala.util.chaining._
 
 //TODO to work for multiaction we need add turnCount to advice from Info
-sealed trait Advice {
+sealed trait Advice:
   def judgment: Advice.Judgement
   def info: Info
   def prev: Info
@@ -24,34 +23,29 @@ sealed trait Advice {
         case MateAdvice(seq, _, _, _) => seq.desc
         case CpAdvice(judgment, _, _) => judgment.toString
       }) + "." + {
-        withBestMove so {
+        withBestMove so:
           info.variation.headOption so { move =>
             // TODO: put this back in when we have proper move notation in scala: s" $move was best."
             s" The following was best."
           }
-        }
       }
 
   def evalComment: Option[String] = {
     List(prev.evalComment, info.evalComment).flatten mkString " → "
   }.some filter (_.nonEmpty)
-}
 
-object Advice {
+object Advice:
 
-  sealed abstract class Judgement(val glyph: Glyph, val name: String) {
+  sealed abstract class Judgement(val glyph: Glyph, val name: String):
     override def toString = name
     def isBlunder         = this == Judgement.Blunder
-  }
-  object Judgement {
+  object Judgement:
     object Inaccuracy extends Judgement(Glyph.MoveAssessment.dubious, "Inaccuracy")
     object Mistake    extends Judgement(Glyph.MoveAssessment.mistake, "Mistake")
     object Blunder    extends Judgement(Glyph.MoveAssessment.blunder, "Blunder")
     val all = List(Inaccuracy, Mistake, Blunder)
-  }
 
   def apply(prev: Info, info: Info): Option[Advice] = CpAdvice(prev, info) orElse MateAdvice(prev, info)
-}
 
 private[analyse] case class CpAdvice(
     judgment: Advice.Judgement,
@@ -59,7 +53,7 @@ private[analyse] case class CpAdvice(
     prev: Info
 ) extends Advice
 
-private[analyse] object CpAdvice {
+private[analyse] object CpAdvice:
 
   private def cpWinningChances(cp: Double): Double = 2 / (1 + Math.exp(-0.004 * cp)) - 1
 
@@ -80,7 +74,6 @@ private[analyse] object CpAdvice {
       }
       judgement <- winningChanceJudgements find { case (d, _) => d <= delta } map (_._2)
     } yield CpAdvice(judgement, info, prev)
-}
 
 sealed abstract private[analyse] class MateSequence(val desc: String)
 private[analyse] case object MateCreated
@@ -96,30 +89,28 @@ private[analyse] case object MateLost
       desc = "Lost forced winning sequence"
     )
 
-private[analyse] object MateSequence {
+private[analyse] object MateSequence:
   def apply(prev: Option[Mate], next: Option[Mate]): Option[MateSequence] =
-    (prev, next).some collect {
+    (prev, next).some collect:
       case (None, Some(n)) if n.negative                  => MateCreated
       case (Some(p), None) if p.positive                  => MateLost
       case (Some(p), Some(n)) if p.positive && n.negative => MateLost
-    }
-}
 private[analyse] case class MateAdvice(
     sequence: MateSequence,
     judgment: Advice.Judgement,
     info: Info,
     prev: Info
 ) extends Advice
-private[analyse] object MateAdvice {
+private[analyse] object MateAdvice:
 
-  def apply(prev: Info, info: Info): Option[MateAdvice] = {
-    def invertCp(cp: Cp)       = cp invertIf info.playerIndex.p2
-    def invertMate(mate: Mate) = mate invertIf info.playerIndex.p2
+  def apply(prev: Info, info: Info): Option[MateAdvice] =
+    def invertCp(cp: Cp)       = cp `invertIf` info.playerIndex.p2
+    def invertMate(mate: Mate) = mate `invertIf` info.playerIndex.p2
     def prevCp                 = prev.cp.map(invertCp).so(_.centipawns)
     def nextCp                 = info.cp.map(invertCp).so(_.centipawns)
     MateSequence(prev.mate map invertMate, info.mate map invertMate) flatMap { sequence =>
       import Advice.Judgement._
-      val judgment: Option[Advice.Judgement] = sequence match {
+      val judgment: Option[Advice.Judgement] = sequence match
         case MateCreated if prevCp < -999 => Option(Inaccuracy)
         case MateCreated if prevCp < -700 => Option(Mistake)
         case MateCreated                  => Option(Blunder)
@@ -127,8 +118,5 @@ private[analyse] object MateAdvice {
         case MateLost if nextCp > 700     => Option(Mistake)
         case MateLost                     => Option(Blunder)
         case MateDelayed                  => None
-      }
       judgment map { MateAdvice(sequence, _, info, prev) }
     }
-  }
-}

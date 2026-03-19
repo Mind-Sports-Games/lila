@@ -6,7 +6,7 @@ import reactivemongo.api.commands.WriteResult
 import lila.db.dsl._
 import lila.user.User
 
-final class MemberRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionContext) {
+final class MemberRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionContext):
 
   import BSONHandlers._
 
@@ -40,7 +40,7 @@ final class MemberRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionCo
       coll.distinctEasy[User.ID, Set]("user", $inIds(userIds.map { Member.makeId(teamId, _) }))
 
   def isSubscribed(team: Team, user: User): Fu[Boolean] =
-    !coll.exists(selectId(team.id, user.id) ++ $doc("unsub" -> true))
+    coll.exists(selectId(team.id, user.id) ++ $doc("unsub" -> true)).not
 
   def subscribe(teamId: Team.ID, userId: User.ID, v: Boolean): Funit =
     coll.update
@@ -54,4 +54,3 @@ final class MemberRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionCo
   def teamQuery(teamId: Team.ID)                         = $doc("team" -> teamId)
   private def selectId(teamId: Team.ID, userId: User.ID) = $id(Member.makeId(teamId, userId))
   private def userQuery(userId: User.ID)                 = $doc("user" -> userId)
-}

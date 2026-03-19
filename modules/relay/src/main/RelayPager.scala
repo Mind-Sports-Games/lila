@@ -8,7 +8,7 @@ import lila.db.dsl._
 
 final class RelayPager(tourRepo: RelayTourRepo, roundRepo: RelayRoundRepo)(implicit
     ec: scala.concurrent.ExecutionContext
-) {
+):
 
   import BSONHandlers._
 
@@ -20,7 +20,7 @@ final class RelayPager(tourRepo: RelayTourRepo, roundRepo: RelayRoundRepo)(impli
 
         def slice(offset: Int, length: Int): Fu[List[RelayTour.WithLastRound]] =
           tourRepo.coll
-            .aggregateWith[Bdoc](readPreference = ReadPreference.secondaryPreferred) { framework =>
+            .aggregateWith[Bdoc](readPreference = ReadPreference.secondaryPreferred) { (framework) =>
               import framework._
               List(
                 Match(tourRepo.selectors.official ++ tourRepo.selectors.inactive),
@@ -67,4 +67,3 @@ final class RelayPager(tourRepo: RelayTourRepo, roundRepo: RelayRoundRepo)(impli
       currentPage = page,
       maxPerPage = MaxPerPage(20)
     )
-}

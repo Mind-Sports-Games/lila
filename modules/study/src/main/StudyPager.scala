@@ -9,7 +9,7 @@ import lila.user.User
 final class StudyPager(
     studyRepo: StudyRepo,
     chapterRepo: ChapterRepo
-)(implicit ec: scala.concurrent.ExecutionContext) {
+)(implicit ec: scala.concurrent.ExecutionContext):
 
   val maxPerPage                = lila.common.config.MaxPerPage(16)
   val defaultNbChaptersPerStudy = 4
@@ -67,7 +67,7 @@ final class StudyPager(
 
   def mineMember(me: User, order: Order, page: Int) =
     paginator(
-      selectMemberId(me.id) ++ $doc("ownerId" $ne me.id),
+      selectMemberId(me.id) ++ $doc("ownerId" `$ne` me.id),
       me.some,
       order,
       page
@@ -75,22 +75,21 @@ final class StudyPager(
 
   def mineLikes(me: User, order: Order, page: Int) =
     paginator(
-      selectLiker(me.id) ++ accessSelect(me.some) ++ $doc("ownerId" $ne me.id),
+      selectLiker(me.id) ++ accessSelect(me.some) ++ $doc("ownerId" `$ne` me.id),
       me.some,
       order,
       page
     )
 
-  def byTopic(topic: StudyTopic, me: Option[User], order: Order, page: Int) = {
+  def byTopic(topic: StudyTopic, me: Option[User], order: Order, page: Int) =
     val onlyMine = me.ifTrue(order == Order.Mine)
     paginator(
       selectTopic(topic) ++ onlyMine.fold(accessSelect(me))(m => selectMemberId(m.id)),
       me,
       order,
       page,
-      hint = onlyMine.isDefined option $doc("uids" -> 1, "rank" -> -1)
+      hint = onlyMine.isDefined `option` $doc("uids" -> 1, "rank" -> -1)
     )
-  }
 
   private def accessSelect(me: Option[User]) =
     me.fold(selectPublic) { u =>
@@ -110,17 +109,17 @@ final class StudyPager(
       selector = selector,
       projection = studyRepo.projection.some,
       sort = order match {
-        case Order.Hot          => $sort desc "rank"
-        case Order.Newest       => $sort desc "createdAt"
-        case Order.Oldest       => $sort asc "createdAt"
-        case Order.Updated      => $sort desc "updatedAt"
-        case Order.Popular      => $sort desc "likes"
-        case Order.Alphabetical => $sort asc "name"
+        case Order.Hot          => $sort `desc` "rank"
+        case Order.Newest       => $sort `desc` "createdAt"
+        case Order.Oldest       => $sort `asc` "createdAt"
+        case Order.Updated      => $sort `desc` "updatedAt"
+        case Order.Popular      => $sort `desc` "likes"
+        case Order.Alphabetical => $sort `asc` "name"
         // mine filter for topic view
-        case Order.Mine => $sort desc "rank"
+        case Order.Mine => $sort `desc` "rank"
       },
       hint = hint
-    ) mapFutureList withChaptersAndLiking(me)
+    ) `mapFutureList` withChaptersAndLiking(me)
     Paginator(
       adapter = nbResults.fold(adapter) { nb =>
         new CachedAdapter(adapter, nb)
@@ -156,11 +155,10 @@ final class StudyPager(
         Study.WithChaptersAndLiked(study, chapters, liked(study.id))
       }
     }
-}
 
 sealed abstract class Order(val key: String, val name: I18nKey)
 
-object Order {
+object Order:
   case object Hot          extends Order("hot", trans.study.hot)
   case object Newest       extends Order("newest", trans.study.dateAddedNewest)
   case object Oldest       extends Order("oldest", trans.study.dateAddedOldest)
@@ -177,4 +175,3 @@ object Order {
     o.key -> o
   }.toMap
   def apply(key: String): Order = byKey.getOrElse(key, default)
-}

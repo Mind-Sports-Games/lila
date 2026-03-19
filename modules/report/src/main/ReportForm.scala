@@ -3,7 +3,6 @@ package lila.report
 import play.api.data._
 import play.api.data.Forms._
 import play.api.data.validation._
-import scala.concurrent.duration._
 
 import lila.common.LightUser
 import lila.common.extensions.*
@@ -14,7 +13,7 @@ final private[report] class ReportForm(
     val captcher: lila.hub.actors.Captcher,
     domain: lila.common.config.NetDomain
 )(implicit ec: scala.concurrent.ExecutionContext)
-    extends lila.hub.CaptchedForm {
+    extends lila.hub.CaptchedForm:
   val cheatLinkConstraint: Constraint[ReportSetup] = Constraint("constraints.cheatgamelink") { setup =>
     if (setup.reason != "cheat" || (domain.value + """/(\w{8}|\w{12})""").r.findFirstIn(setup.text).isDefined)
       Valid
@@ -40,13 +39,13 @@ final private[report] class ReportForm(
       "move"   -> text
     )({ case (username, reason, text, gameId, move) =>
       ReportSetup(
-        user = blockingFetchUser(username) err "Unknown username " + username,
+        user = blockingFetchUser(username) `err` "Unknown username " + username,
         reason = reason,
         text = text,
         gameId = gameId,
         move = move
       )
-    })(_.values.some).verifying(captchaFailMessage, validateCaptcha _).verifying(cheatLinkConstraint)
+    })(_.values.some).verifying(captchaFailMessage, validateCaptcha).verifying(cheatLinkConstraint)
   )
 
   def createWithCaptcha = withCaptcha(create)
@@ -60,8 +59,7 @@ final private[report] class ReportForm(
   )
 
   private def blockingFetchUser(username: String) =
-    lightUserAsync(User normalize username).await(1 second, "reportUser")
-}
+    lightUserAsync(User `normalize` username).await(1 second, "reportUser")
 
 private[report] case class ReportFlag(
     username: String,
@@ -75,9 +73,8 @@ case class ReportSetup(
     text: String,
     gameId: String,
     move: String
-) {
+):
 
   def suspect = SuspectId(user.id)
 
   def values = (user.name, reason, text, gameId, move)
-}

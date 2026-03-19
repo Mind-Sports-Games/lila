@@ -31,9 +31,9 @@ object embed {
         frag(
           div(cls := "left")(
             select(id := "chapter-selector")(chapters.map { c =>
-              option(
+              scalatags.Text.tags.option(
                 value := c.id.value,
-                (c.id == chapter.id) option selected
+                (c.id == chapter.id).option(selected)
               )(c.name.value)
             }),
             a(targetBlank, href := url)(h1(s.name.value))

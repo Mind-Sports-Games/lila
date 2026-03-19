@@ -46,7 +46,7 @@ private object PgnStorage {
       }
     def decode(bytes: ByteArray, plies: Int): Decoded =
       monitor(_.game.pgn.decode("huffman")) {
-        val decoded      = Encoder.decode(bytes.value, plies)
+        val decoded = Encoder.decode(bytes.value, plies)
         val unmovedRooks = decoded.unmovedRooks.asScala.view.flatMap(chessPos).to(Set)
         Decoded(
           actionStrs = decoded.pgnMoves.toVector.map(Vector(_)),

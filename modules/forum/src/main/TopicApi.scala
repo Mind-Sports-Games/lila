@@ -20,7 +20,7 @@ final private[forum] class TopicApi(
     timeline: lila.hub.actors.Timeline,
     shutup: lila.hub.actors.Shutup,
     detectLanguage: DetectLanguage
-)(implicit ec: scala.concurrent.ExecutionContext) {
+)(implicit ec: scala.concurrent.ExecutionContext):
 
   import BSONHandlers._
 
@@ -31,13 +31,11 @@ final private[forum] class TopicApi(
       forUser: Option[User]
   ): Fu[Option[(Categ, Topic, Paginator[Post])]] =
     for {
-      data <- env.categRepo bySlug categSlug flatMap {
+      data <- env.categRepo `bySlug` categSlug flatMap:
         _ so { categ =>
-          env.topicRepo.forUser(forUser).byTree(categSlug, slug) dmap {
+          env.topicRepo.forUser(forUser).byTree(categSlug, slug) dmap:
             _ map (categ -> _)
-          }
         }
-      }
       res <- data so { case (categ, topic) =>
         lila.mon.forum.topic.view.increment()
         env.postApi.paginator(topic, page, forUser) map { (categ, topic, _).some }
@@ -71,7 +69,7 @@ final private[forum] class TopicApi(
         modIcon = (~data.post.modIcon && MasterGranter(_.PublicMod)(me)).option(true)
       )
       env.postRepo.coll.insert.one(post) >>
-        env.topicRepo.coll.insert.one(topic withPost post) >>
+        env.topicRepo.coll.insert.one(topic `withPost` post) >>
         env.categRepo.coll.update.one($id(categ.id), categ.withPost(topic, post)).andDo {
           !categ.quiet so (indexer ! InsertPost(post))
           !categ.quiet so env.recent.invalidate()
@@ -89,7 +87,7 @@ final private[forum] class TopicApi(
         } inject topic
     }
 
-  def makeBlogDiscuss(categ: Categ, slug: String, name: String, url: String): Funit = {
+  def makeBlogDiscuss(categ: Categ, slug: String, name: String, url: String): Funit =
     val topic = Topic.make(
       categId = categ.slug,
       slug = slug,
@@ -111,23 +109,21 @@ final private[forum] class TopicApi(
       modIcon = true.some
     )
     env.postRepo.coll.insert.one(post) >>
-      env.topicRepo.coll.insert.one(topic withPost post) >>
+      env.topicRepo.coll.insert.one(topic `withPost` post) >>
       env.categRepo.coll.update.one($id(categ.id), categ.withPost(topic, post)).andDo(indexer ! InsertPost(post)).andDo(env.recent.invalidate()).andDo(Bus.publish(actorApi.CreatePost(post), "forumPost")) void
-  }
 
-  def paginator(categ: Categ, page: Int, forUser: Option[User]): Fu[Paginator[TopicView]] = {
+  def paginator(categ: Categ, page: Int, forUser: Option[User]): Fu[Paginator[TopicView]] =
     val adapter = new Adapter[Topic](
       collection = env.topicRepo.coll,
-      selector = env.topicRepo.forUser(forUser) byCategNotStickyQuery categ,
+      selector = env.topicRepo.forUser(forUser) `byCategNotStickyQuery` categ,
       projection = none,
       sort = $sort.updatedDesc
     ) mapFutureList { topics =>
-      env.postRepo.coll.optionsByOrderedIds[Post, String](topics.map(_ lastPostId forUser))(_.id) map {
+      env.postRepo.coll.optionsByOrderedIds[Post, String](topics.map(_ `lastPostId` forUser))(_.id) map:
         posts =>
           topics zip posts map { case (topic, post) =>
-            TopicView(categ, topic, post, env.postApi lastPageOf topic, forUser)
+            TopicView(categ, topic, post, env.postApi `lastPageOf` topic, forUser)
           }
-      }
     }
     val cachedAdapter =
       if (categ.isTeam) adapter
@@ -137,21 +133,20 @@ final private[forum] class TopicApi(
       currentPage = page,
       maxPerPage = maxPerPage
     )
-  }
 
   def getSticky(categ: Categ, forUser: Option[User]): Fu[List[TopicView]] =
     env.topicRepo.stickyByCateg(categ) flatMap { topics =>
       Future.sequence(topics.map { topic =>
-        env.postRepo.coll.byId[Post](topic lastPostId forUser) map { post =>
-          TopicView(categ, topic, post, env.postApi lastPageOf topic, forUser)
+        env.postRepo.coll.byId[Post](topic `lastPostId` forUser) map { post =>
+          TopicView(categ, topic, post, env.postApi `lastPageOf` topic, forUser)
         }
       })
     }
 
   def delete(categ: Categ, topic: Topic): Funit =
     env.postRepo.idsByTopicId(topic.id) flatMap { postIds =>
-      (env.postRepo removeByTopic topic.id zip env.topicRepo.coll.delete.one($id(topic.id))) >>
-        (env.categApi denormalize categ).andDo(indexer ! RemovePosts(postIds)).andDo(env.recent.invalidate())
+      (env.postRepo `removeByTopic` topic.id zip env.topicRepo.coll.delete.one($id(topic.id))) >>
+        (env.categApi `denormalize` categ).andDo(indexer ! RemovePosts(postIds)).andDo(env.recent.invalidate())
     }
 
   def toggleClose(categ: Categ, topic: Topic, mod: Holder): Funit =
@@ -176,10 +171,10 @@ final private[forum] class TopicApi(
 
   def denormalize(topic: Topic): Funit =
     for {
-      nbPosts       <- env.postRepo countByTopic topic
-      lastPost      <- env.postRepo lastByTopic topic
-      nbPostsTroll  <- env.postRepo.unsafe countByTopic topic
-      lastPostTroll <- env.postRepo.unsafe lastByTopic topic
+      nbPosts       <- env.postRepo `countByTopic` topic
+      lastPost      <- env.postRepo `lastByTopic` topic
+      nbPostsTroll  <- env.postRepo.unsafe `countByTopic` topic
+      lastPostTroll <- env.postRepo.unsafe `lastByTopic` topic
       _ <-
         env.topicRepo.coll.update
           .one(
@@ -195,4 +190,3 @@ final private[forum] class TopicApi(
           )
           .void
     } yield ()
-}

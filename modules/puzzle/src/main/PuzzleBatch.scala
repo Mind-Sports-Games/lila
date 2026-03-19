@@ -9,12 +9,12 @@ import lila.user.User
 // mobile app BC
 final class PuzzleBatch(colls: PuzzleColls, anonApi: PuzzleAnon, pathApi: PuzzlePathApi)(implicit
     ec: ExecutionContext
-) {
+):
 
   import BsonHandlers._
 
-  def nextFor(user: Option[User], nb: Int): Fu[Vector[Puzzle]] = (nb > 0) so {
-    user match {
+  def nextFor(user: Option[User], nb: Int): Fu[Vector[Puzzle]] = (nb > 0) so:
+    user match
       case None => anonApi.getBatchFor(nb)
       case Some(user) =>
         {
@@ -28,9 +28,9 @@ final class PuzzleBatch(colls: PuzzleColls, anonApi: PuzzleAnon, pathApi: Puzzle
             tier,
             PuzzleDifficulty.Normal,
             Set.empty
-          ) orFail
+          ) `orFail`
             s"No puzzle path for ${user.id} $tier" flatMap { pathId =>
-              colls.path {
+              colls.path:
                 _.aggregateWith[Bdoc]() { framework =>
                   import framework._
                   List(
@@ -56,12 +56,7 @@ final class PuzzleBatch(colls: PuzzleColls, anonApi: PuzzleAnon, pathApi: Puzzle
                   )
                 }
                   .collect[List](maxDocs = nb)
-                  .map {
+                  .map:
                   _.view.flatMap(PuzzleBSONReader.readOpt).toVector
-                }
-              }
             }
         }.mon(_.puzzle.selector.user.batch(nb = nb))
-    }
-  }
-}

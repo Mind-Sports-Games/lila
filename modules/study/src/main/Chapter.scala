@@ -1,7 +1,6 @@
 package lila.study
 
 import strategygames.format.pgn.{ Glyph, Tags }
-import strategygames.format.FEN
 import strategygames.variant.Variant
 import strategygames.{ Centis, Player => PlayerIndex }
 import org.joda.time.DateTime
@@ -9,7 +8,6 @@ import org.joda.time.DateTime
 import strategygames.opening.{ FullOpening, FullOpeningDB }
 import lila.tree.Node.{ Comment, Gamebook, Shapes }
 import lila.user.User
-import lila.common.Form
 import lila.common.Iso
 
 case class Chapter(
@@ -28,7 +26,7 @@ case class Chapter(
     relay: Option[Chapter.Relay] = None,
     serverEval: Option[Chapter.ServerEval] = None,
     createdAt: DateTime
-) extends Chapter.Like {
+) extends Chapter.Like:
 
   def updateRoot(f: Node.Root => Option[Node.Root]) =
     f(root) map { newRoot =>
@@ -38,9 +36,8 @@ case class Chapter(
   def addNode(node: Node, path: Path, newRelay: Option[Chapter.Relay] = None): Option[Chapter] =
     updateRoot {
       _.withChildren(_.addNodeAt(node, path))
-    } map {
+    } map:
       _.copy(relay = newRelay orElse relay)
-    }
 
   def setShapes(shapes: Shapes, path: Path): Option[Chapter] =
     updateRoot(_.setShapesAt(shapes, path))
@@ -77,18 +74,17 @@ case class Chapter(
       createdAt = DateTime.now
     )
 
-  private def tagsResultPlayerIndex = tags.resultPlayer match {
+  private def tagsResultPlayerIndex = tags.resultPlayer match
     case Some(Some(playerIndex)) => Some(Some(playerIndex))
     case Some(None)              => Some(None)
     case None                    => None
     case _                       => sys.error("Not implemented for draughts yet")
-  }
 
   def metadata = Chapter.Metadata(
     _id = _id,
     name = name,
     setup = setup,
-    resultPlayerIndex = tagsResultPlayerIndex.isDefined option tagsResultPlayerIndex,
+    resultPlayerIndex = tagsResultPlayerIndex.isDefined `option` tagsResultPlayerIndex,
     hasRelayPath = relay.exists(!_.path.isEmpty)
   )
 
@@ -103,9 +99,8 @@ case class Chapter(
   def relayAndTags = relay map { Chapter.RelayAndTags(id, _, tags) }
 
   def isOverweight = root.children.countRecursive >= Chapter.maxNodes
-}
 
-object Chapter {
+object Chapter:
 
   // I've seen chapters with 35,000 nodes on prod.
   // It works but could be used for DoS.
@@ -117,46 +112,40 @@ object Chapter {
   case class Name(value: String) extends AnyVal with StringValue
   implicit val nameIso: Iso.StringIso[Name] = lila.common.Iso.string[Name](Name.apply, _.value)
 
-  sealed trait Like {
+  sealed trait Like:
     val _id: Chapter.Id
     val name: Chapter.Name
     val setup: Chapter.Setup
     def id = _id
 
     def initialPosition = Position.Ref(id, Path.root)
-  }
 
   case class Setup(
       gameId: Option[lila.game.Game.ID],
       variant: Variant,
       orientation: PlayerIndex,
       fromFen: Option[Boolean] = None
-  ) {
+  ):
     def isFromFen = ~fromFen
-  }
 
   case class Relay(
       index: Int, // game index in the source URL
       path: Path,
       lastMoveAt: DateTime
-  ) {
-    def secondsSinceLastMove: Int = (nowSeconds - lastMoveAt.getSeconds).toInt
-  }
+  ):
+    def secondsSinceLastMove: Int = (nowSeconds - (lastMoveAt.getMillis / 1000)).toInt
 
   case class ServerEval(path: Path, done: Boolean)
 
-  case class RelayAndTags(id: Id, relay: Relay, tags: Tags) {
+  case class RelayAndTags(id: Id, relay: Relay, tags: Tags):
 
     def looksAlive =
       tags.resultPlayer.isEmpty &&
-        relay.lastMoveAt.isAfter {
-          DateTime.now.minusMinutes {
-            tags.clockConfig.fold(40)(_.limitInMinutes.toInt / 2 atLeast 15 atMost 60)
-          }
-        }
+        relay.lastMoveAt.isAfter:
+          DateTime.now.minusMinutes:
+            tags.clockConfig.fold(40)(_.limitInMinutes.toInt / 2 `atLeast` 15 `atMost` 60)
 
     def looksOver = !looksAlive
-  }
 
   case class Metadata(
       _id: Id,
@@ -164,19 +153,17 @@ object Chapter {
       setup: Setup,
       resultPlayerIndex: Option[Option[Option[PlayerIndex]]],
       hasRelayPath: Boolean
-  ) extends Like {
+  ) extends Like:
 
     def looksOngoing = resultPlayerIndex.exists(_.isEmpty) && hasRelayPath
 
     def resultStr: Option[String] =
       resultPlayerIndex.map(_.fold("*")(c => PlayerIndex.showResult(c)).replace("1/2", "½"))
-  }
 
   case class IdName(id: Id, name: Name)
 
-  case class Ply(value: Int) extends AnyVal with Ordered[Ply] {
+  case class Ply(value: Int) extends AnyVal with Ordered[Ply]:
     def compare(that: Ply) = Integer.compare(value, that.value)
-  }
 
   def defaultName(order: Int) = Name(s"Chapter $order")
 
@@ -187,7 +174,7 @@ object Chapter {
 
   val idSize = 8
 
-  def makeId = Id(lila.common.ThreadLocalRandom nextString idSize)
+  def makeId = Id(lila.common.ThreadLocalRandom `nextString` idSize)
 
   def make(
       studyId: Study.Id,
@@ -211,10 +198,9 @@ object Chapter {
       tags = tags,
       order = order,
       ownerId = ownerId,
-      practice = practice option true,
-      gamebook = gamebook option true,
+      practice = practice `option` true,
+      gamebook = gamebook `option` true,
       conceal = conceal,
       relay = relay,
       createdAt = DateTime.now
     )
-}

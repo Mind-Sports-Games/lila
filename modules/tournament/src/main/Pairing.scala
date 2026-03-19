@@ -15,7 +15,7 @@ case class Pairing(
     invertStartPlayer: Boolean,
     berserk1: Boolean,
     berserk2: Boolean
-) {
+):
 
   def gameId = id
 
@@ -40,7 +40,7 @@ case class Pairing(
   def notSoQuickFinish = finished && turns.exists(14 <=)
   def longGame         = turns.exists(60 <=)
 
-  def wonBy(user: User.ID): Boolean     = winner.has(user)
+  def wonBy(user: User.ID): Boolean     = winner.contains(user)
   def lostBy(user: User.ID): Boolean    = winner.exists(user !=)
   def notLostBy(user: User.ID): Boolean = winner.fold(true)(user ==)
   def draw: Boolean                     = finished && winner.isEmpty
@@ -58,15 +58,13 @@ case class Pairing(
   def berserkOf(playerIndex: PlayerIndex) = playerIndex.fold(berserk1, berserk2)
 
   def similar(other: Pairing) = other.contains(user1, user2)
-}
 
-private[tournament] object Pairing {
+private[tournament] object Pairing:
 
   case class LastOpponents(hash: Map[User.ID, User.ID]) extends AnyVal
 
-  object LastOpponents {
+  object LastOpponents:
     val empty = LastOpponents(Map[User.ID, User.ID]().empty)
-  }
 
   private def make(
       gameId: Game.ID,
@@ -87,21 +85,20 @@ private[tournament] object Pairing {
       berserk2 = false
     )
 
-  case class Prep(tourId: Tournament.ID, user1: User.ID, user2: User.ID) {
+  case class Prep(tourId: Tournament.ID, user1: User.ID, user2: User.ID):
     def toPairing(gameId: Game.ID): Pairing =
       make(gameId, tourId, user1, user2)
-  }
 
   def prepWithPlayerIndex(
       tour: Tournament,
       p1: RankedPlayerWithPlayerIndexHistory,
       p2: RankedPlayerWithPlayerIndexHistory
   ) =
-    if (tour.handicapped) {
+    if (tour.handicapped)
       //in go handicapped tournament weaker player must go first
       if (p1.player.actualRating <= p2.player.actualRating) Prep(tour.id, p1.player.userId, p2.player.userId)
       else Prep(tour.id, p2.player.userId, p1.player.userId)
-    } else {
+    else
       if (
         p1.playerIndexHistory.firstGetsP1(p2.playerIndexHistory)(() =>
           lila.common.ThreadLocalRandom.nextBoolean()
@@ -109,5 +106,3 @@ private[tournament] object Pairing {
       )
         Prep(tour.id, p1.player.userId, p2.player.userId)
       else Prep(tour.id, p2.player.userId, p1.player.userId)
-    }
-}

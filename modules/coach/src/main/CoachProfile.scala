@@ -13,14 +13,12 @@ case class CoachProfile(
     youtubeVideos: Option[String] = None,
     youtubeChannel: Option[String] = None,
     publicStudies: Option[String] = None
-) {
+):
 
   lazy val youtubeUrls = youtubeVideos so UrlList.youtube.apply
 
   lazy val studyIds = publicStudies so UrlList.study.apply
-}
 
-object CoachProfile {
+object CoachProfile:
 
   case class RichText(value: String) extends AnyVal with StringValue
-}

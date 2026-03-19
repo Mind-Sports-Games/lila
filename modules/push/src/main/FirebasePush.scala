@@ -1,7 +1,7 @@
 package lila.push
 
 import com.google.auth.oauth2.{ AccessToken, GoogleCredentials }
-import lila.common.autoconfig.{ AutoConfig, ConfigName }
+import lila.common.autoconfig.AutoConfig
 import play.api.libs.json._
 import play.api.libs.ws.JsonBodyWritables._
 import play.api.libs.ws.StandaloneWSClient
@@ -21,32 +21,28 @@ final private class FirebasePush(
 )(implicit
     ec: scala.concurrent.ExecutionContext,
     scheduler: org.apache.pekko.actor.Scheduler
-) {
+):
 
   private val workQueue =
     new lila.hub.DuctSequencer(maxSize = 512, timeout = 10 seconds, name = "firebasePush")
 
   def apply(userId: User.ID, data: => PushApi.Data): Funit =
     credentialsOpt so { creds =>
-      deviceApi.findLastManyByUserId("firebase", 3)(userId) flatMap {
+      deviceApi.findLastManyByUserId("firebase", 3)(userId) flatMap:
         case Nil => funit
         // access token has 1h lifetime and is requested only if expired
         case devices =>
           workQueue {
-            Future {
-              Chronometer.syncMon(_.blocking time "firebase") {
-                blocking {
+            Future:
+              Chronometer.syncMon(_.blocking `time` "firebase"):
+                blocking:
                   creds.refreshIfExpired()
                   creds.getAccessToken
-                }
-              }
-            }
           }.chronometer.mon(_.push.googleTokenTime).result flatMap { token =>
             // TODO http batch request is possible using a multipart/mixed content
             // unfortuntely it doesn't seem easily doable with play WS
             Future.sequence(devices.map(send(token, _, data))).void
           }
-      }
     }
 
   private def send(token: AccessToken, device: Device, data: => PushApi.Data): Funit =
@@ -82,13 +78,12 @@ final private class FirebasePush(
       ) flatMap { res =>
       lila.mon.push.firebaseStatus(res.status).increment()
       if (res.status == 200) funit
-      else if (res.status == 404) {
+      else if (res.status == 404)
         logger.info(s"Delete missing firebase device $device")
-        deviceApi delete device
-      } else {
+        deviceApi `delete` device
+      else
         logger.warn(s"[push] firebase: ${res.status}")
         funit
-      }
     }
 
   // filter out any non string value, otherwise Firebase API silently rejects
@@ -98,13 +93,11 @@ final private class FirebasePush(
       case (k, v: JsString) => s"playstrategy.$k" -> v
       case (k, v: JsNumber) => s"playstrategy.$k" -> JsString(v.toString)
     })
-}
 
-private object FirebasePush {
+private object FirebasePush:
 
   final class Config(
       val url: String,
       val json: lila.common.config.Secret
   )
   implicit val configLoader: ConfigLoader[Config] = AutoConfig.loader[Config]
-}

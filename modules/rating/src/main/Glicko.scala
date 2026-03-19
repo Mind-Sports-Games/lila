@@ -12,7 +12,7 @@ case class Glicko(
     rating: Double,
     deviation: Double,
     volatility: Double
-) {
+):
 
   def intRating    = rating.toInt
   def intDeviation = deviation.toInt
@@ -28,7 +28,7 @@ case class Glicko(
     }
   def provisional          = deviation >= Glicko.provisionalDeviation
   def established          = !provisional
-  def establishedIntRating = established option intRating
+  def establishedIntRating = established `option` intRating
 
   def clueless = deviation >= Glicko.cluelessDeviation
 
@@ -44,9 +44,9 @@ case class Glicko(
 
   def cap =
     copy(
-      rating = rating atLeast Glicko.minRating,
-      deviation = deviation atLeast Glicko.minDeviation atMost Glicko.maxDeviation,
-      volatility = volatility atMost Glicko.maxVolatility
+      rating = rating `atLeast` Glicko.minRating,
+      deviation = deviation `atLeast` Glicko.minDeviation `atMost` Glicko.maxDeviation,
+      volatility = volatility `atMost` Glicko.maxVolatility
     )
 
   def average(other: Glicko, weight: Float = 0.5f) =
@@ -62,9 +62,8 @@ case class Glicko(
   def display = s"$intRating${provisional so "?"}"
 
   override def toString = f"$intRating/$intDeviation/${volatility}%.3f"
-}
 
-case object Glicko {
+case object Glicko:
 
   val minRating = 600
 
@@ -97,15 +96,15 @@ case object Glicko {
 
   def liveDeviation(p: Perf, reverse: Boolean): Double = {
     system.previewDeviation(p.toRating, new DateTime, reverse)
-  } atLeast minDeviation atMost maxDeviation
+  } `atLeast` minDeviation `atMost` maxDeviation
 
-  implicit val glickoBSONHandler: BSON[Glicko] = new BSON[Glicko] {
+  implicit val glickoBSONHandler: BSON[Glicko] = new BSON[Glicko]:
 
     def reads(r: BSON.Reader): Glicko =
       Glicko(
-        rating = r double "r",
-        deviation = r double "d",
-        volatility = r double "v"
+        rating = r `double` "r",
+        deviation = r `double` "d",
+        volatility = r `double` "v"
       )
 
     def writes(w: BSON.Writer, o: Glicko) =
@@ -114,14 +113,10 @@ case object Glicko {
         "d" -> w.double(o.deviation),
         "v" -> w.double(o.volatility)
       )
-  }
 
-  sealed abstract class Result {
+  sealed abstract class Result:
     def negate: Result
-  }
-  object Result {
+  object Result:
     case object Win  extends Result { def negate = Loss }
     case object Loss extends Result { def negate = Win  }
     case object Draw extends Result { def negate = Draw }
-  }
-}

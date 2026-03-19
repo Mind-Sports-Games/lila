@@ -8,7 +8,7 @@ final class Country(
     val shortName: String
 )
 
-object Countries {
+object Countries:
 
   @inline private def C(code: String, name: String)                    = new Country(code, name, name)
   @inline private def C(code: String, name: String, shortName: String) = new Country(code, name, shortName)
@@ -299,4 +299,3 @@ object Countries {
   val codeSet = map.keySet
 
   def info(code: String): Option[Country] = map get code
-}

@@ -62,15 +62,11 @@ object BSONHandlers {
 
   import lila.db.ByteArray.ByteArrayBSONHandler
 
-  implicit private[game] val checkCountWriter: BSONWriter[chess.CheckCount] {
-    def writeTry(cc: strategygames.chess.CheckCount): scala.util.Success[reactivemongo.api.bson.BSONArray]
-  } = new BSONWriter[chess.CheckCount] {
+  implicit private[game] val checkCountWriter: BSONWriter[chess.CheckCount] = new BSONWriter[chess.CheckCount] {
     def writeTry(cc: chess.CheckCount) = Success(BSONArray(cc.p1, cc.p2))
   }
 
-  implicit private[game] val scoreWriter: BSONWriter[Score] {
-    def writeTry(sc: strategygames.Score): scala.util.Success[reactivemongo.api.bson.BSONArray]
-  } = new BSONWriter[Score] {
+  implicit private[game] val scoreWriter: BSONWriter[Score] = new BSONWriter[Score] {
     def writeTry(sc: Score) = Success(BSONArray(sc.p1, sc.p2))
   }
 
@@ -230,9 +226,7 @@ object BSONHandlers {
   import Player.playerBSONHandler
   private val emptyPlayerBuilder = playerBSONHandler.read($empty)
 
-  implicit private[game] val kingMovesWriter: BSONWriter[draughts.KingMoves] {
-    def writeTry(km: strategygames.draughts.KingMoves): scala.util.Try[reactivemongo.api.bson.BSONArray]
-  } = new BSONWriter[draughts.KingMoves] {
+  implicit private[game] val kingMovesWriter: BSONWriter[draughts.KingMoves] = new BSONWriter[draughts.KingMoves] {
     def writeTry(km: draughts.KingMoves) = Try {
       BSONArray(km.p1, km.p2, km.p1King.fold(0)(_.fieldNumber), km.p2King.fold(0)(_.fieldNumber))
     }
@@ -266,7 +260,7 @@ object BSONHandlers {
       val defaultMetaData =
         Metadata(
           source = r intO F.source flatMap Source.apply,
-          pgnImport = r.getO[PgnImport](F.pgnImport)(PgnImport.pgnImportBSONHandler),
+          pgnImport = r.getO[PgnImport](F.pgnImport)(using PgnImport.pgnImportBSONHandler),
           tournamentId = r strO F.tournamentId,
           swissId = r strO F.swissId,
           simulId = r strO F.simulId,
@@ -276,7 +270,7 @@ object BSONHandlers {
           drawOffers = r.getD(F.drawOffers, GameDrawOffers.empty)
         )
 
-      val clock = r.getO[PlayerIndex => ClockBase](F.clock) {
+      val clock = r.getO[PlayerIndex => ClockBase](F.clock)(using
         clockBSONReader(
           r.intO(F.clockType),
           createdAt,
@@ -284,7 +278,7 @@ object BSONHandlers {
           light.p1Player.berserk,
           light.p2Player.berserk
         )
-      } map (_(turnPlayerIndex))
+      ).map(_(turnPlayerIndex))
 
       def readChessGame(r: BSON.Reader): (StratGame, Metadata) = {
 
@@ -1009,7 +1003,7 @@ object BSONHandlers {
       val uids           = ~r.getO[List[lila.user.User.ID]](F.playerUids)
       val (p1Uid, p2Uid) = (uids.headOption.filter(_.nonEmpty), uids.lift(1).filter(_.nonEmpty))
       def makePlayer(field: String, playerIndex: PlayerIndex, id: Player.ID, uid: Player.UserId): Player = {
-        val builder = r.getO[Player.Builder](field)(playerBSONHandler) | emptyPlayerBuilder
+        val builder = r.getO[Player.Builder](field)(using playerBSONHandler) | emptyPlayerBuilder
         builder(playerIndex)(id)(uid)(winC map (_ == playerIndex))
       }
       LightGame(
@@ -1053,13 +1047,13 @@ object BSONHandlers {
       times = history.dbTimes(playerIndex)
     } yield clk.config match {
       case fc: Clock.Config =>
-        BinaryFormat.fischerClockHistory.writeSide(fc.limit, times, flagged has playerIndex)
+        BinaryFormat.fischerClockHistory.writeSide(fc.limit, times, flagged.contains(playerIndex))
       case bdc: Clock.BronsteinConfig =>
-        BinaryFormat.delayClockHistory.writeSide(bdc.limit, times, flagged has playerIndex)
+        BinaryFormat.delayClockHistory.writeSide(bdc.limit, times, flagged.contains(playerIndex))
       case sdc: Clock.SimpleDelayConfig =>
-        BinaryFormat.delayClockHistory.writeSide(sdc.limit, times, flagged has playerIndex)
+        BinaryFormat.delayClockHistory.writeSide(sdc.limit, times, flagged.contains(playerIndex))
       case bc: ByoyomiClock.Config =>
-        BinaryFormat.byoyomiClockHistory.writeSide(bc.limit, times, flagged has playerIndex)
+        BinaryFormat.byoyomiClockHistory.writeSide(bc.limit, times, flagged.contains(playerIndex))
     }
 
   private[game] def clockBSONReader(

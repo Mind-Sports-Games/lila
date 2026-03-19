@@ -15,7 +15,7 @@ import lila.user.User
 final class LeaderboardApi(
     repo: LeaderboardRepo,
     tournamentRepo: TournamentRepo
-)(implicit ec: scala.concurrent.ExecutionContext) {
+)(implicit ec: scala.concurrent.ExecutionContext):
 
   import LeaderboardApi._
   import BSONHandlers._
@@ -30,10 +30,10 @@ final class LeaderboardApi(
     )
 
   def recentByUser(user: User, page: Int) =
-    paginator(user, page, userSelector(user.id), $sort desc "d")
+    paginator(user, page, userSelector(user.id), $sort `desc` "d")
 
   def bestByUser(user: User, page: Int) =
-    paginator(user, page, userSelector(user.id), $sort asc "w")
+    paginator(user, page, userSelector(user.id), $sort `asc` "w")
 
   def shieldLeaderboardByUser(user: User, page: Int, lastXMonths: Int = 2) =
     paginator(
@@ -41,11 +41,11 @@ final class LeaderboardApi(
       page,
       $doc(
         "u" -> user.id,
-        "d" $gt DateTime.now().plusMonths(lastXMonths * -1) $lt DateTime.now(),
-        "mp" $exists true,
-        "k" $exists true
+        "d" `$gt` DateTime.now().plusMonths(lastXMonths * -1) `$lt` DateTime.now(),
+        "mp" `$exists` true,
+        "k" `$exists` true
       ),
-      $sort desc "d"
+      $sort `desc` "d"
     )
 
   def timeRange(userId: User.ID, range: (DateTime, DateTime)): Fu[List[Entry]] =
@@ -53,42 +53,38 @@ final class LeaderboardApi(
       .find(
         $doc(
           "u" -> userId,
-          "d" $gt range._1 $lt range._2
+          "d" `$gt` range._1 `$lt` range._2
         )
       )
-      .sort($sort desc "d")
+      .sort($sort `desc` "d")
       .cursor[Entry]()
       .list()
 
-  def chart(user: User): Fu[ChartData] = {
+  def chart(user: User): Fu[ChartData] =
     repo.coll
-      .aggregateWith[Bdoc](readPreference = ReadPreference.secondaryPreferred) { framework =>
-        import framework._
+      .aggregateWith[Bdoc](readPreference = ReadPreference.secondaryPreferred) { (framework) =>
+        import framework.*
         List(
           Match($doc("u" -> user.id)),
           GroupField("v")("nb" -> SumAll, "points" -> PushField("s"), "ratios" -> PushField("w"))
         )
       }
       .collect[List](maxDocs = Int.MaxValue)
-      .map {
+      .map:
         _ flatMap leaderboardAggregationResultBSONHandler.readOpt
-      }
       .map { aggs =>
-        ChartData {
+        ChartData:
           aggs
             .flatMap { agg =>
-              PerfType.byId get agg._id map {
+              PerfType.byId get agg._id map:
                 _ -> ChartData.PerfResult(
                   nb = agg.nb,
                   points = ChartData.Ints(agg.points),
                   rank = ChartData.Ints(agg.ratios)
                 )
-              }
             }
             .sortLike(PerfType.leaderboardable, _._1)
-        }
       }
-  }
 
   private def ejectEntries(entryIds: List[String], disqualify: Boolean) =
     if (disqualify) repo.coll.update.one($inIds(entryIds), $set("dq" -> true)).void
@@ -98,7 +94,7 @@ final class LeaderboardApi(
     repo.coll.list[Entry](
       $doc(
         "u" -> userId,
-        "d" $gt since
+        "d" `$gt` since
       )
     ) flatMap { entries =>
       (entries.nonEmpty so ejectEntries(entries.map(_.id), disqualify)) inject entries.map(_.tourId)
@@ -116,13 +112,13 @@ final class LeaderboardApi(
         projection = none,
         sort = sort,
         readPreference = ReadPreference.secondaryPreferred
-      ) mapFutureList withTournaments,
+      ) `mapFutureList` withTournaments,
       currentPage = page,
       maxPerPage = maxPerPage
     )
 
   private def withTournaments(entries: Seq[Entry]): Fu[Seq[TourEntry]] =
-    tournamentRepo byIds entries.map(_.tourId) map { tours =>
+    tournamentRepo `byIds` entries.map(_.tourId) map { tours =>
       entries.flatMap { entry =>
         tours.find(_.id == entry.tourId).map { TourEntry(_, entry) }
       }
@@ -130,8 +126,8 @@ final class LeaderboardApi(
 
   private def findByCategory(lastXMonths: Int, category: ShieldTableApi.Category) =
     $doc(
-      "d" $gt DateTime.now().plusMonths(lastXMonths * -1) $lt DateTime.now(),
-      "mp" $exists true,
+      "d" `$gt` DateTime.now().plusMonths(lastXMonths * -1) `$lt` DateTime.now(),
+      "mp" `$exists` true,
       "k" -> $doc(
         "$regex" -> BSONRegex(s"^${category.id - 1}_|${category.medleyShieldCode}", "")
       )
@@ -139,9 +135,9 @@ final class LeaderboardApi(
 
   private def findAll(lastXMonths: Int) =
     $doc(
-      "d" $gt DateTime.now().plusMonths(lastXMonths * -1) $lt DateTime.now(),
-      "mp" $exists true,
-      "k" $exists true
+      "d" `$gt` DateTime.now().plusMonths(lastXMonths * -1) `$lt` DateTime.now(),
+      "mp" `$exists` true,
+      "k" `$exists` true
     )
 
   def shieldLeaderboardMetaPoints(lastXMonths: Int, category: ShieldTableApi.Category) =
@@ -171,17 +167,15 @@ final class LeaderboardApi(
           .map { case (u, v) => (u, v.map { case (_, p) => p }.sum) }
       }
 
-}
 
-object LeaderboardApi {
+object LeaderboardApi:
 
   private val rankRatioMultiplier = 100 * 1000
 
   case class TourEntry(tour: Tournament, entry: Entry)
 
-  case class Ratio(value: Double) extends AnyVal {
-    def percent = (value * 100).toInt atLeast 1
-  }
+  case class Ratio(value: Double) extends AnyVal:
+    def percent = (value * 100).toInt `atLeast` 1
 
   case class Entry(
       id: String, // same as tournament player id
@@ -199,9 +193,9 @@ object LeaderboardApi {
       date: DateTime
   )
 
-  case class ChartData(perfResults: List[(PerfType, ChartData.PerfResult)]) {
+  case class ChartData(perfResults: List[(PerfType, ChartData.PerfResult)]):
     import ChartData._
-    lazy val allPerfResults: PerfResult = perfResults.map(_._2) match {
+    lazy val allPerfResults: PerfResult = perfResults.map(_._2) match
       case head :: tail =>
         tail.foldLeft(head) { case (acc, res) =>
           PerfResult(
@@ -211,24 +205,18 @@ object LeaderboardApi {
           )
         }
       case Nil => PerfResult(0, Ints(Nil), Ints(Nil))
-    }
-  }
 
-  object ChartData {
+  object ChartData:
 
-    case class Ints(v: List[Int]) {
+    case class Ints(v: List[Int]):
       def mean         = Maths.mean(v)
       def median       = Maths.median(v)
       def sum          = v.sum
       def :::(i: Ints) = Ints(v ::: i.v)
-    }
 
-    case class PerfResult(nb: Int, points: Ints, rank: Ints) {
+    case class PerfResult(nb: Int, points: Ints, rank: Ints):
       private def rankPercent(n: Double) = (n * 100 / rankRatioMultiplier).toInt
       def rankPercentMean                = rank.mean map rankPercent
       def rankPercentMedian              = rank.median map rankPercent
-    }
 
     case class AggregationResult(_id: Int, nb: Int, points: List[Int], ratios: List[Int])
-  }
-}

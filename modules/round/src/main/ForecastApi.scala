@@ -13,12 +13,12 @@ import Forecast.Step
 import lila.game.Game.PlayerId
 import lila.game.{ Game, Pov }
 
-final class ForecastApi(coll: Coll, tellRound: TellRound)(implicit ec: scala.concurrent.ExecutionContext) {
+final class ForecastApi(coll: Coll, tellRound: TellRound)(implicit ec: scala.concurrent.ExecutionContext):
 
   implicit private val stepBSONHandler: BSONDocumentHandler[Step]         = Macros.handler[Step]
   implicit private val forecastBSONHandler: BSONDocumentHandler[Forecast] = Macros.handler[Forecast]
 
-  private def saveSteps(pov: Pov, steps: Forecast.Steps): Funit = {
+  private def saveSteps(pov: Pov, steps: Forecast.Steps): Funit =
     lila.mon.round.forecast.create.increment()
     coll.update
       .one(
@@ -31,14 +31,12 @@ final class ForecastApi(coll: Coll, tellRound: TellRound)(implicit ec: scala.con
         upsert = true
       )
       .void
-  }
 
   def save(pov: Pov, steps: Forecast.Steps): Funit =
-    firstStep(steps) match {
+    firstStep(steps) match
       case None                                         => coll.delete.one($id(pov.fullId)).void
       case Some(step) if pov.game.plies == step.ply - 1 => saveSteps(pov, steps)
       case _                                            => fufail(Forecast.OutOfSync)
-    }
 
   def playAndSave(
       pov: Pov,
@@ -64,52 +62,43 @@ final class ForecastApi(coll: Coll, tellRound: TellRound)(implicit ec: scala.con
         }
 
   def loadForDisplay(pov: Pov): Fu[Option[Forecast]] =
-    pov.forecastable so coll.byId[Forecast](pov.fullId) flatMap {
+    pov.forecastable so coll.byId[Forecast](pov.fullId) flatMap:
       case None => fuccess(none)
       case Some(fc) =>
         if (firstStep(fc.steps).exists(_.ply != pov.game.plies + 1)) clearPov(pov) inject none
         else fuccess(fc.some)
-    }
 
   def loadForPlay(pov: Pov): Fu[Option[Forecast]] =
-    pov.game.forecastable so coll.byId[Forecast](pov.fullId) flatMap {
+    pov.game.forecastable so coll.byId[Forecast](pov.fullId) flatMap:
       case None => fuccess(none)
       case Some(fc) =>
         if (firstStep(fc.steps).exists(_.ply != pov.game.plies)) clearPov(pov) inject none
         else fuccess(fc.some)
-    }
 
   def nextMove(g: Game, last: Move): Fu[Option[Uci.Move]] =
-    g.forecastable so {
-      loadForPlay(Pov player g) flatMap {
+    g.forecastable so:
+      loadForPlay(Pov `player` g) flatMap:
         case None => fuccess(none)
         case Some(fc) =>
-          fc(g, last) match {
+          fc(g, last) match
             case Some((newFc, uciMove)) if newFc.steps.nonEmpty =>
               coll.update.one($id(fc._id), newFc) inject uciMove.some
-            case Some((_, uciMove)) => clearPov(Pov player g) inject uciMove.some
-            case _                  => clearPov(Pov player g) inject none
-          }
-      }
-    }
+            case Some((_, uciMove)) => clearPov(Pov `player` g) inject uciMove.some
+            case _                  => clearPov(Pov `player` g) inject none
 
-  def moveOpponent(g: Game, last: Move): Fu[Option[Uci.Move]] = g.forecastable so {
-    loadForPlay(Pov opponent g) flatMap {
+  def moveOpponent(g: Game, last: Move): Fu[Option[Uci.Move]] = g.forecastable so:
+    loadForPlay(Pov `opponent` g) flatMap:
       case None =>
         fuccess(none)
       case Some(fc) =>
-        fc.moveOpponent(g, last) match {
+        fc.moveOpponent(g, last) match
           case Some((newFc, uciMove)) if newFc.steps.nonEmpty =>
             coll.update.one($id(fc._id), newFc) inject uciMove.some
-          case Some((_, uciMove)) => clearPov(Pov player g) inject uciMove.some
-          case _                  => clearPov(Pov player g) inject none
-        }
-    }
-  }
+          case Some((_, uciMove)) => clearPov(Pov `player` g) inject uciMove.some
+          case _                  => clearPov(Pov `player` g) inject none
 
   private def firstStep(steps: Forecast.Steps) = steps.headOption.flatMap(_.headOption)
 
   def clearGame(g: Game) = coll.delete.one($inIds(PlayerIndex.all.map(g.fullIdOf))).void
 
   def clearPov(pov: Pov) = coll.delete.one($id(pov.fullId)).void
-}

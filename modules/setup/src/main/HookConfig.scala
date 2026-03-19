@@ -1,6 +1,6 @@
 package lila.setup
 
-import strategygames.{ ByoyomiClock, Clock, GameFamily, GameLogic, Mode, Speed }
+import strategygames.{ ByoyomiClock, GameFamily, GameLogic, Mode, Speed }
 import strategygames.variant.Variant
 import lila.lobby.PlayerIndex
 import lila.lobby.{ Hook, Seek }
@@ -18,7 +18,7 @@ case class HookConfig(
     mode: Mode,
     playerIndex: PlayerIndex,
     ratingRange: RatingRange
-) extends HumanConfig {
+) extends HumanConfig:
 
   def withinLimits(user: Option[User]): HookConfig =
     (for {
@@ -62,13 +62,12 @@ case class HookConfig(
     ).some
 
   def withTimeModeString(tc: Option[String]) =
-    tc match {
+    tc match
       case Some("fischerClock")   => copy(timeMode = TimeMode.FischerClock)
       case Some("byoyomiClock")   => copy(timeMode = TimeMode.ByoyomiClock)
       case Some("correspondence") => copy(timeMode = TimeMode.Correspondence)
       case Some("unlimited")      => copy(timeMode = TimeMode.Unlimited)
       case _                      => this
-    }
 
   def hook(
       sri: lila.socket.Socket.Sri,
@@ -76,7 +75,7 @@ case class HookConfig(
       sid: Option[String],
       blocking: Set[String]
   ): Either[Hook, Option[Seek]] =
-    timeMode match {
+    timeMode match
       case TimeMode.FischerClock | TimeMode.ByoyomiClock | TimeMode.BronsteinDelayClock |
           TimeMode.SimpleDelayClock =>
         val clock = justMakeClock
@@ -105,16 +104,15 @@ case class HookConfig(
             ratingRange = ratingRange
           )
         })
-    }
 
   def noRatedUnlimited = mode.casual || hasClock || makeDaysPerTurn.isDefined
 
   def updateFrom(game: lila.game.Game) =
-    game.clock match {
+    game.clock match
       case Some(c: ByoyomiClock) =>
         copy(
           variant = game.variant,
-          timeMode = TimeMode ofGame game,
+          timeMode = TimeMode `ofGame` game,
           time = c.limitInMinutes,
           increment = c.config.incrementSeconds,
           byoyomi = c.byoyomiSeconds,
@@ -125,7 +123,7 @@ case class HookConfig(
       case _ =>
         copy(
           variant = game.variant,
-          timeMode = TimeMode ofGame game,
+          timeMode = TimeMode `ofGame` game,
           time = game.clock.map(_.limitInMinutes) | time,
           // TODO: We are reusing the name 'increment' even for Bronstein and Simple Delay. This should probably be renamed
           increment = game.clock.map(_.config.graceSeconds) | increment,
@@ -134,12 +132,10 @@ case class HookConfig(
           days = game.daysPerTurn | days,
           mode = game.mode
         )
-    }
 
-  def withRatingRange(str: Option[String]) = copy(ratingRange = RatingRange orDefault str)
-}
+  def withRatingRange(str: Option[String]) = copy(ratingRange = RatingRange `orDefault` str)
 
-object HookConfig extends BaseHumanConfig {
+object HookConfig extends BaseHumanConfig:
 
   def from(
       v: String,
@@ -152,13 +148,13 @@ object HookConfig extends BaseHumanConfig {
       m: Option[Int],
       e: Option[String],
       c: String
-  ) = {
+  ) =
     val realMode   = m.fold(Mode.default)(Mode.orDefault)
     val gameFamily = GameFamily(v.split("_")(0).toInt)
     val variantId  = v.split("_")(1).toInt
     new HookConfig(
-      variant = Variant(gameFamily.gameLogic, variantId) err s"Invalid game variant $v",
-      timeMode = TimeMode(tm) err s"Invalid time mode $tm",
+      variant = Variant(gameFamily.gameLogic, variantId) `err` s"Invalid game variant $v",
+      timeMode = TimeMode(tm) `err` s"Invalid time mode $tm",
       time = t,
       increment = i,
       byoyomi = b,
@@ -166,9 +162,8 @@ object HookConfig extends BaseHumanConfig {
       days = d,
       mode = realMode,
       ratingRange = e.fold(RatingRange.default)(RatingRange.orDefault),
-      playerIndex = PlayerIndex(c) err s"Invalid playerIndex $c"
+      playerIndex = PlayerIndex(c) `err` s"Invalid playerIndex $c"
     )
-  }
 
   def default(auth: Boolean): HookConfig = default.copy(mode = Mode(auth))
 
@@ -188,20 +183,20 @@ object HookConfig extends BaseHumanConfig {
   import lila.db.BSON
   import lila.db.dsl._
 
-  implicit private[setup] val hookConfigBSONHandler: BSON[HookConfig] = new BSON[HookConfig] {
+  implicit private[setup] val hookConfigBSONHandler: BSON[HookConfig] = new BSON[HookConfig]:
 
     def reads(r: BSON.Reader): HookConfig =
       HookConfig(
-        variant = Variant.orDefault(GameLogic(r intD "l"), r int "v"),
-        timeMode = TimeMode orDefault (r int "tm"),
-        time = r double "t",
-        increment = r int "i",
-        byoyomi = r intD "b",
-        periods = r intD "p",
-        days = r int "d",
-        mode = Mode orDefault (r int "m"),
+        variant = Variant.orDefault(GameLogic(r `intD` "l"), r `int` "v"),
+        timeMode = TimeMode `orDefault` (r `int` "tm"),
+        time = r `double` "t",
+        increment = r `int` "i",
+        byoyomi = r `intD` "b",
+        periods = r `intD` "p",
+        days = r `int` "d",
+        mode = Mode `orDefault` (r `int` "m"),
         playerIndex = PlayerIndex.Random,
-        ratingRange = r strO "e" flatMap RatingRange.apply getOrElse RatingRange.default
+        ratingRange = r `strO` "e" flatMap RatingRange.apply getOrElse RatingRange.default
       )
 
     def writes(w: BSON.Writer, o: HookConfig) =
@@ -217,5 +212,3 @@ object HookConfig extends BaseHumanConfig {
         "m"  -> o.mode.id,
         "e"  -> o.ratingRange.toString
       )
-  }
-}

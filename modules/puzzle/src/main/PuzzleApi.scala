@@ -15,12 +15,11 @@ final class PuzzleApi(
     colls: PuzzleColls,
     trustApi: PuzzleTrustApi,
     countApi: PuzzleCountApi
-)(implicit ec: scala.concurrent.ExecutionContext, scheduler: org.apache.pekko.actor.Scheduler, mode: play.api.Mode) {
+)(implicit ec: scala.concurrent.ExecutionContext, scheduler: org.apache.pekko.actor.Scheduler, mode: play.api.Mode):
 
-  import Puzzle.{ BSONFields => F }
   import BsonHandlers._
 
-  object puzzle {
+  object puzzle:
 
     def find(id: Puzzle.Id): Fu[Option[Puzzle]] =
       colls.puzzle(_.byId[Puzzle](id.value))
@@ -35,7 +34,7 @@ final class PuzzleApi(
             collection = coll,
             selector = $doc("users" -> user.id),
             projection = none,
-            sort = $sort desc "glicko.r"
+            sort = $sort `desc` "glicko.r"
           ),
           page,
           MaxPerPage(30)
@@ -49,15 +48,14 @@ final class PuzzleApi(
             collection = coll,
             selector = $doc("users" -> user.id, "v" -> variant.id, "l" -> variant.gameLogic.id),
             projection = none,
-            sort = $sort desc "glicko.r"
+            sort = $sort `desc` "glicko.r"
           ),
           page,
           MaxPerPage(30)
         )
       }
-  }
 
-  private[puzzle] object round {
+  private[puzzle] object round:
 
     def find(user: User, puzzleId: Puzzle.Id): Fu[Option[PuzzleRound]] =
       colls.round(_.byId[PuzzleRound](PuzzleRound.Id(user.id, puzzleId).toString))
@@ -65,17 +63,15 @@ final class PuzzleApi(
     private[PuzzleApi] def exists(user: User, puzzleId: Puzzle.Id): Fu[Boolean] =
       colls.round(_.exists($id(PuzzleRound.Id(user.id, puzzleId).toString)))
 
-    def upsert(r: PuzzleRound, theme: PuzzleTheme.Key): Funit = {
+    def upsert(r: PuzzleRound, theme: PuzzleTheme.Key): Funit =
       val roundDoc = RoundHandler.write(r) ++
         $doc(
           PuzzleRound.BSONFields.user  -> r.id.userId,
           PuzzleRound.BSONFields.theme -> theme.some.filter(_ != PuzzleTheme.mix.key)
         )
       colls.round(_.update.one($id(r.id), roundDoc, upsert = true)).void
-    }
-  }
 
-  object vote {
+  object vote:
 
     private val sequencer =
       new lila.hub.DuctSequencers(
@@ -86,12 +82,12 @@ final class PuzzleApi(
       )
 
     def update(id: Puzzle.Id, user: User, vote: Boolean): Funit =
-      sequencer(id.value) {
+      sequencer(id.value):
         round
           .find(user, id)
-          .flatMap {
+          .flatMap:
             _ so { prevRound =>
-              trustApi.vote(user, prevRound, vote) flatMap {
+              trustApi.vote(user, prevRound, vote) flatMap:
                 _ so { weight =>
                   val voteValue = (if (vote) 1 else -1) * weight
                   lila.mon.puzzle.vote(vote, prevRound.win).increment()
@@ -100,10 +96,7 @@ final class PuzzleApi(
                       _.updateField($id(prevRound.id), PuzzleRound.BSONFields.vote, voteValue)
                     } void
                 }
-              }
             }
-          }
-      }
 
     private def updatePuzzle(puzzleId: Puzzle.Id, newVote: Int, prevVote: Option[Int]): Funit =
       colls.puzzle { coll =>
@@ -111,7 +104,7 @@ final class PuzzleApi(
         coll.one[Bdoc](
           $id(puzzleId.value),
           $doc(F.voteUp -> true, F.voteDown -> true, F.day -> true, F.id -> false)
-        ) flatMap {
+        ) flatMap:
           _ so { doc =>
             val prevUp   = ~doc.int(F.voteUp)
             val prevDown = ~doc.int(F.voteDown)
@@ -127,17 +120,15 @@ final class PuzzleApi(
                 ) ++ {
                   (newVote <= -100 && doc
                     .getAsOpt[DateTime](F.day)
-                    .exists(_ isAfter DateTime.now.minusDays(1))) so
+                    .exists(_ `isAfter` DateTime.now.minusDays(1))) so
                     $unset(F.day)
                 }
               )
               .void
           }
-        }
       }
-  }
 
-  object theme {
+  object theme:
 
     def categorizedWithCount(variant: Variant): Fu[List[(lila.i18n.I18nKey, List[PuzzleTheme.WithCount])]] =
       countApi.countByThemeForVariant(variant) map { counts =>
@@ -149,7 +140,7 @@ final class PuzzleApi(
       }
 
     def vote(user: User, id: Puzzle.Id, theme: PuzzleTheme.Key, vote: Option[Boolean]): Funit =
-      round.find(user, id) flatMap {
+      round.find(user, id) flatMap:
         _ so { round =>
           round.themeVote(theme, vote) so { newThemes =>
             import PuzzleRound.{ BSONFields => F }
@@ -157,7 +148,7 @@ final class PuzzleApi(
               if (newThemes.isEmpty || !PuzzleRound.themesLookSane(newThemes))
                 fuccess($unset(F.themes, F.puzzle).some)
               else
-                vote match {
+                vote match
                   case None =>
                     fuccess(
                       $set(
@@ -172,30 +163,23 @@ final class PuzzleApi(
                         F.weight -> weight
                       )
                     }
-                }
-            update flatMap {
+            update flatMap:
               _ so { up =>
                 lila.mon.puzzle.voteTheme(theme.value, vote, round.win).increment()
                 colls.round(_.update.one($id(round.id), up)) zip
                   colls.puzzle(_.updateField($id(round.id.puzzleId), Puzzle.BSONFields.dirty, true)) void
               }
-            }
           }
         }
-      }
-  }
 
-  object casual {
+  object casual:
 
     private val store = new lila.memo.ExpireSetMemo(30 minutes)
 
     private def key(user: User, id: Puzzle.Id) = s"${user.id}:${id}"
 
     def setCasualIfNotYetPlayed(user: User, puzzle: Puzzle): Funit =
-      !round.exists(user, puzzle.id) map {
+      round.exists(user, puzzle.id).not map:
         _ so store.put(key(user, puzzle.id))
-      }
 
     def apply(user: User, id: Puzzle.Id) = store.get(key(user, id))
-  }
-}

@@ -12,7 +12,7 @@ import Query.jsonWriter
 @Module
 private class ForumSearchConfig(
     @ConfigName("index") val indexName: String,
-    @ConfigName("paginator.max_per_page") val maxPerPage: MaxPerPage,
+    @ConfigName("paginator.max_per_page") val maxPerPage: lila.common.config.MaxPerPage,
     @ConfigName("actor.name") val actorName: String
 )
 
@@ -24,8 +24,8 @@ final class Env(
 )(implicit
     ec: scala.concurrent.ExecutionContext,
     system: ActorSystem,
-    mat: akka.stream.Materializer
-) {
+    mat: org.apache.pekko.stream.Materializer
+):
 
   private val config = appConfig.get[ForumSearchConfig]("forumSearch")(AutoConfig.loader)
 
@@ -37,11 +37,10 @@ final class Env(
     paginatorBuilder(Query(text, troll), page)
 
   def cli =
-    new lila.common.Cli {
+    new lila.common.Cli:
       def process = { case "forum" :: "search" :: "reset" :: Nil =>
         api.reset inject "done"
       }
-    }
 
   private lazy val paginatorBuilder = wire[lila.search.PaginatorBuilder[lila.forum.PostView, Query]]
 
@@ -56,4 +55,3 @@ final class Env(
     }),
     name = config.actorName
   )
-}

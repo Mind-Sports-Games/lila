@@ -67,9 +67,9 @@ final class Simul(env: Env) extends LilaController(env) {
               env.user.lightUserApi.preloadMany(c.chat.userIds)
             }
             stream <- env.streamer.liveStreamApi one sim.hostId
-          } yield html.simul.show(sim, version, json, chat, stream, team)
+          } yield Ok(html.simul.show(sim, version, json, chat, stream, team))
         }
-      } map NoCache
+      } map { NoCache(_) }
     }
 
   private[controllers] def canHaveChat(simul: Sim)(implicit ctx: Context): Boolean =

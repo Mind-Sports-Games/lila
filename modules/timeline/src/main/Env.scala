@@ -25,7 +25,7 @@ final class Env(
 )(implicit
     ec: scala.concurrent.ExecutionContext,
     system: ActorSystem
-) {
+):
 
   private val config = appConfig.get[TimelineConfig]("timeline")(AutoConfig.loader)
 
@@ -41,18 +41,15 @@ final class Env(
     unsubApi.get(channel, userId)
 
   def status(channel: String)(userId: String): Fu[Option[Boolean]] =
-    unsubApi.get(channel, userId) flatMap {
+    unsubApi.get(channel, userId) flatMap:
       case true => fuccess(Some(true)) // unsubed
       case false =>
-        entryApi.channelUserIdRecentExists(channel, userId) map {
+        entryApi.channelUserIdRecentExists(channel, userId) map:
           case true  => Some(false) // subed
           case false => None        // not applicable
-        }
-    }
 
   system.actorOf(Props(wire[Push]), name = config.userActorName)
 
   lila.common.Bus.subscribeFun("shadowban") { case lila.hub.actorApi.mod.Shadowban(userId, true) =>
     entryApi.removeRecentFollowsBy(userId).discard
   }
-}

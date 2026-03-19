@@ -145,7 +145,7 @@ final class Practice(
         FormFuResult(form) { err =>
           api.structure.get map { html.practice.config(_, err) }
         } { text =>
-          ~api.config.set(text).toOption.andDo(api.structure.clear()) >>
+          { val r = api.config.set(text).toOption; api.structure.clear(); r.getOrElse(funit) } >>
             env.mod.logApi.practiceConfig(me.id) inject Redirect(routes.Practice.config)
         }
       }

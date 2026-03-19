@@ -8,13 +8,12 @@ import org.joda.time.DateTime
 import play.api.data._
 import play.api.data.Forms._
 import play.api.Mode
-import scala.concurrent.duration._
 
 import lila.common.Form._
 import lila.common.Clock._
 import lila.game.Handicaps.{ playerRatingFromInput }
 
-final class SwissForm(implicit mode: Mode) {
+final class SwissForm(implicit mode: Mode):
 
   import SwissForm._
 
@@ -252,13 +251,12 @@ final class SwissForm(implicit mode: Mode) {
   private def gameGroupInMedley(medleyVariants: Option[List[Variant]], gg: GameGroup) =
     gg.variants.exists(medleyVariantsList(medleyVariants).contains(_))
 
-  private def onePerGameGroupInMedley(medleyVariants: Option[List[Variant]]) = {
+  private def onePerGameGroupInMedley(medleyVariants: Option[List[Variant]]) =
     val mvList               = medleyVariantsList(medleyVariants)
     val gameGroups           = GameGroup.medley.filter(gg => gg.variants.exists(mvList.contains(_)))
     val selectedMVList       = mvList.take(gameGroups.size)
     val gameGroupsInSelected = gameGroups.filter(gg => gg.variants.exists(selectedMVList.contains(_)))
     gameGroups.size > 1 && gameGroups.size == gameGroupsInSelected.size
-  }
 
   private def exoticChessVariants(medleyVariants: Option[List[Variant]]) =
     medleyVariantsList(medleyVariants).filterNot(_.exoticChessVariant).isEmpty
@@ -266,9 +264,8 @@ final class SwissForm(implicit mode: Mode) {
   private def draughts64Variants(medleyVariants: Option[List[Variant]]) =
     medleyVariantsList(medleyVariants).filterNot(_.draughts64Variant).isEmpty
 
-}
 
-object SwissForm {
+object SwissForm:
 
   val clockLimits: Seq[Int] = Seq(0, 15, 30, 45, 60, 90, 120, 150) ++ {
     (180 to 720 by 60) ++ (900 to 1800 by 300) ++ (2400 to 10800 by 600)
@@ -396,41 +393,37 @@ object SwissForm {
       conditions: SwissCondition.DataForm.AllSetup,
       forbiddenPairings: Option[String],
       minutesBeforeStartToJoin: Option[Int]
-  ) {
-    def gameLogic = variant match {
+  ):
+    def gameLogic = variant match
       case Some(v) => GameFamily(v.split("_")(0).toInt).gameLogic
       case None    => GameLogic.Chess()
-    }
     def realVariant = variant flatMap { v =>
       Variant.apply(gameLogic, v.split("_")(1).toInt)
     } getOrElse Variant.default(gameLogic)
     def realStartsAt = startsAt | DateTime.now.plusMinutes(10)
     def realChatFor  = chatFor | Swiss.ChatFor.default
     def realRoundInterval = {
-      (roundInterval | Swiss.RoundInterval.auto) match {
+      (roundInterval | Swiss.RoundInterval.auto) match
         case Swiss.RoundInterval.auto =>
           import strategygames.Speed._
-          strategygames.Speed(clock) match {
+          strategygames.Speed(clock) match
             case UltraBullet                               => 5
             case Bullet                                    => 10
             case Blitz if clock.estimateTotalSeconds < 300 => 20
             case Blitz                                     => 30
             case Rapid                                     => 60
             case _                                         => 300
-          }
         case i => i
-      }
     }.seconds
     def realHalfwayBreak = halfwayBreak.fold(0)(i => i).seconds
     def realMinutesBeforeStartToJoin: Option[Int] =
-      minutesBeforeStartToJoin match {
+      minutesBeforeStartToJoin match
         case Some(Swiss.TimeBeforeStartToJoin.nolimit) => None
         case Some(mbs)                                 => Some(mbs)
         case _                                         => None
-      }
     def useDrawTables           = drawTables.drawTables | false
     def usePerPairingDrawTables = drawTables.perPairingDrawTables | false
-    def realPosition            = position ifTrue realVariant.standardVariant
+    def realPosition            = position `ifTrue` realVariant.standardVariant
 
     def isRated            = rated | true
     def isMcMahon          = mcmahon.mcmahon | false
@@ -458,13 +451,12 @@ object SwissForm {
         .Go() && !isMedley && !isRated && !isHandicapped && !isBestOfX && !isPlayX)
     def validMcMahonCutoff = !isMcMahon || (mcmahonCutoff.fold(false)(playerRatingFromInput(_) != None))
 
-    def validClock = clock match {
+    def validClock = clock match
       case fc: Clock.Config             => (fc.limitSeconds + fc.incrementSeconds) > 0
       case bc: Clock.BronsteinConfig    => (bc.limitSeconds + bc.delaySeconds) > 0 && bc.delaySeconds > 0
       case udc: Clock.SimpleDelayConfig => (udc.limitSeconds + udc.delaySeconds) > 0 && udc.delaySeconds > 0
       case bc: ByoyomiClock.Config =>
         (bc.limitSeconds + bc.incrementSeconds) > 0 || (bc.limitSeconds + bc.byoyomiSeconds) > 0
-    }
 
     def isMedley = (medley | false) && medleyGameFamilies.ggList.nonEmpty
 
@@ -476,7 +468,7 @@ object SwissForm {
         )
 
     private def generateMedleyVariants: List[Variant] =
-      if (medleyDefaults.onePerGameFamily.getOrElse(false)) {
+      if (medleyDefaults.onePerGameFamily.getOrElse(false))
         //take a shuffled list of all variants and pull the first for each game group to the front
         val onePerGameGroupVariantList = scala.util.Random.shuffle(
           medleyGameFamilies.ggList.map(gg =>
@@ -486,21 +478,20 @@ object SwissForm {
         onePerGameGroupVariantList ::: generateNoDefaultsMedleyVariants.filterNot(
           onePerGameGroupVariantList.contains(_)
         )
-      } else if (medleyDefaults.exoticChessVariants.getOrElse(false))
+      else if (medleyDefaults.exoticChessVariants.getOrElse(false))
         scala.util.Random.shuffle(Variant.all.filter(_.exoticChessVariant))
       else if (medleyDefaults.draughts64Variants.getOrElse(false))
         scala.util.Random.shuffle(Variant.all.filter(_.draughts64Variant))
       else generateNoDefaultsMedleyVariants
 
     def medleyVariants: Option[List[Variant]] =
-      if (isMedley) {
+      if (isMedley)
         val medleyList     = generateMedleyVariants
         var fullMedleyList = medleyList
         while (fullMedleyList.size < nbRounds) fullMedleyList = fullMedleyList ::: medleyList
         fullMedleyList.some
-      } else None
+      else None
 
-  }
 
   case class DrawTables(
       drawTables: Option[Boolean],
@@ -548,7 +539,7 @@ object SwissForm {
       go: Option[Boolean],
       backgammon: Option[Boolean],
       abalone: Option[Boolean]
-  ) {
+  ):
 
     lazy val ggList: List[GameGroup] = GameGroup.medley
       .filterNot(gg => if (!chess.getOrElse(false)) gg == GameGroup.Chess() else false)
@@ -566,5 +557,3 @@ object SwissForm {
       .filterNot(gg => if (!backgammon.getOrElse(false)) gg == GameGroup.Backgammon() else false)
       .filterNot(gg => if (!abalone.getOrElse(false)) gg == GameGroup.Abalone() else false)
 
-  }
-}

@@ -23,7 +23,7 @@ case class SwissPairing(
     nbGamesPerRound: Int,
     openingFEN: Option[FEN],
     variant: Option[Variant] = None
-) {
+):
   def apply(c: PlayerIndex)                    = c.fold(p1, p2)
   def gameId                                   = id
   def players                                  = List(p1, p2)
@@ -49,14 +49,13 @@ case class SwissPairing(
   def numDraws = matchStatus.fold(_ => 0, l => l.count(None.==))
   def numGames = matchStatus.fold(_ => 0, l => l.length)
 
-  def multiMatchResultsFor(userId: User.ID): Option[List[String]] = {
+  def multiMatchResultsFor(userId: User.ID): Option[List[String]] =
     if (nbGamesPerRound > 1 || multiMatchGameIds.nonEmpty)
       matchStatus.fold(
         _ => None,
         SwissPairing.matchResultsMap(variant)("draw", "win", "loss")(playerIndexOf(userId))(_).some
       )
     else None
-  }
 
   // matchScoreFor returns a two digit score (or empty string)
   def matchScoreFor(userId: User.ID) =
@@ -76,7 +75,7 @@ case class SwissPairing(
   def strResultOf(playerIndex: PlayerIndex) =
     if (nbGamesPerRound == 1)
       status.fold(_ => "*", _.fold("1/2")(c => if (c == playerIndex) "1" else "0"))
-    else {
+    else
       matchStatus
         .fold(
           _ => "*",
@@ -85,14 +84,13 @@ case class SwissPairing(
             .foldLeft(0)(_ + _)
             .toString()
         )
-    }
 
   //works because we can't change variant midway through a multipoint match
   //TODO convert fenFromSetupConfig into a wrapped function
   def fenForNextGame(prevGame: Game): Option[FEN] =
     if (prevGame.metadata.multiPointState.isEmpty) openingFEN
     else
-      prevGame.variant match {
+      prevGame.variant match
         case Variant.Backgammon(v) =>
           Some(
             FEN(
@@ -101,9 +99,7 @@ case class SwissPairing(
             )
           )
         case _ => openingFEN
-      }
 
-}
 
 case class SwissPairingGameIds(
     id: Game.ID,
@@ -113,11 +109,10 @@ case class SwissPairingGameIds(
     isPlayX: Boolean,
     nbGamesPerRound: Int,
     openingFEN: Option[FEN]
-) {
+):
 
   def allGameIds = id :: multiMatchGameIds.getOrElse(List())
 
-}
 
 case class SwissPairingGames(
     swissId: Swiss.Id,
@@ -128,7 +123,7 @@ case class SwissPairingGames(
     isPlayX: Boolean,
     nbGamesPerRound: Int,
     openingFEN: Option[FEN]
-) {
+):
 
   def lastGame: Game =
     multiMatchGames.fold(game)(_.reverse.headOption.getOrElse(game))
@@ -183,17 +178,16 @@ case class SwissPairingGames(
     )
 
   def winnerPlayerIndex: Option[PlayerIndex] =
-    if (nbGamesPerRound > 1) { //multimatch
-      multiMatchGamesScoreDiff match {
+    if (nbGamesPerRound > 1) //multimatch
+      multiMatchGamesScoreDiff match
         case x if x > 0 => Some(PlayerIndex.P1)
         case x if x < 0 => Some(PlayerIndex.P2)
         case _          => None
-      }
-    } else if (
+    else if (
       isMultiPoint && List(SGStatus.RuleOfGin, SGStatus.GinGammon, SGStatus.GinBackgammon).contains(
         lastGame.status
       )
-    ) {
+    )
       lastGame.metadata.multiPointState.flatMap { mps =>
         lastGame.winnerPlayerIndex.map { p =>
           if (
@@ -205,18 +199,18 @@ case class SwissPairingGames(
           else !p
         }
       }
-    } else lastGame.winnerPlayerIndex
+    else lastGame.winnerPlayerIndex
 
   def playersWhoDidNotMove = lastGame.playersWhoDidNotMove
 
-  def createdAt = if (isBestOfX || isPlayX) {
+  def createdAt = if (isBestOfX || isPlayX)
     multiMatchGames.fold(game.createdAt)(_.last.createdAt)
-  } else game.createdAt
+  else game.createdAt
 
   def matchOutcome: List[Option[PlayerIndex]] =
-    if (nbGamesPerRound > 1 || multiMatchGames.exists(_.length > 0)) {
+    if (nbGamesPerRound > 1 || multiMatchGames.exists(_.length > 0))
       multiMatchGames.foldLeft(List(game))(_ ++ _).map(_.winnerPlayerIndex)
-    } else List(lastGame.winnerPlayerIndex)
+    else List(lastGame.winnerPlayerIndex)
 
   private def startPlayerNormalisation(g: Game): Option[PlayerIndex] =
     if (g.startPlayerIndex == PlayerIndex.P2 && g.variant.recalcStartPlayerForStats)
@@ -225,34 +219,32 @@ case class SwissPairingGames(
       g.winnerPlayerIndex
 
   def startPlayerWinners: List[Option[PlayerIndex]] =
-    if (nbGamesPerRound > 1 || multiMatchGames.exists(_.length > 0)) {
+    if (nbGamesPerRound > 1 || multiMatchGames.exists(_.length > 0))
       multiMatchGames.foldLeft(List(game))(_ ++ _).map(g => startPlayerNormalisation(g))
-    } else List(startPlayerNormalisation(lastGame))
+    else List(startPlayerNormalisation(lastGame))
 
   def strResultOf(playerIndex: PlayerIndex) =
-    if (isMultiPoint) {
+    if (isMultiPoint)
       lastGame.metadata.multiPointState
         .fold(0) { mps =>
-          (lastGame.status, lastGame.winnerPlayerIndex == Some(playerIndex)) match {
+          (lastGame.status, lastGame.winnerPlayerIndex == Some(playerIndex)) match
             case (s, true)
                 if List(SGStatus.RuleOfGin, SGStatus.GinGammon, SGStatus.GinBackgammon).contains(s) =>
               if (
                 playerIndex.fold(mps.p1Points, mps.p2Points) + lastGame.pointValue.getOrElse(0) < mps.target
-              ) {
+              )
                 playerIndex.fold(mps.p1Points, mps.p2Points) + lastGame.pointValue.getOrElse(0)
-              } else {
+              else
                 mps.target
-              }
             case (s, false)
                 if List(SGStatus.RuleOfGin, SGStatus.GinGammon, SGStatus.GinBackgammon).contains(s) =>
               if (
                 (!playerIndex)
                   .fold(mps.p1Points, mps.p2Points) + lastGame.pointValue.getOrElse(0) < mps.target
-              ) {
+              )
                 mps.target
-              } else {
+              else
                 playerIndex.fold(mps.p1Points, mps.p2Points)
-              }
             case (s, true) if SGStatus.flagged.contains(s)  => mps.target
             case (s, false) if SGStatus.flagged.contains(s) => playerIndex.fold(mps.p1Points, mps.p2Points)
             case (_, true) =>
@@ -261,10 +253,9 @@ case class SwissPairingGames(
                 mps.target
               )
             case (_, false) => playerIndex.fold(mps.p1Points, mps.p2Points)
-          }
         }
         .toString()
-    } else
+    else
       SwissPairing
         .matchResultsMap(game.variant.some)(1, 2, 0)(playerIndex)(
           multiMatchGames
@@ -272,15 +263,13 @@ case class SwissPairingGames(
             .filter(g => g.finished)
             .map(g => g.winnerPlayerIndex)
         )
-        .foldLeft(0)(_ + _) match {
+        .foldLeft(0)(_ + _) match
         case x if x % 2 == 0 => s"${(x / 2)}"
         case x if x % 2 == 1 => s"${(x / 2)}.5"
         case _ => "*"
-      }
 
-}
 
-object SwissPairing {
+object SwissPairing:
 
   implicit def toSwissPairingGameIds(swissPairing: SwissPairing): SwissPairingGameIds =
     SwissPairingGameIds(
@@ -295,7 +284,7 @@ object SwissPairing {
 
   def matchResultsMap[A](variant: Option[Variant])(draw: A, win: A, loss: A)(
       playerIndex: PlayerIndex
-  )(l: List[Option[PlayerIndex]]): List[A] = {
+  )(l: List[Option[PlayerIndex]]): List[A] =
     l.zipWithIndex.map { case (outcome, index) =>
       outcome.fold(draw)(c =>
         variant match {
@@ -309,7 +298,6 @@ object SwissPairing {
         }
       )
     }
-  }
 
   sealed trait Ongoing
   case object Ongoing extends Ongoing
@@ -331,7 +319,7 @@ object SwissPairing {
 
   case class View(pairing: SwissPairing, player: SwissPlayer.WithUser)
 
-  object Fields {
+  object Fields:
     val id                 = "_id"
     val swissId            = "s"
     val round              = "r"
@@ -348,7 +336,6 @@ object SwissPairing {
     val nbGamesPerRound    = "gpr"
     val openingFEN         = "of"
     val variant            = "v"
-  }
   def fields[A](f: Fields.type => A): A = f(Fields)
 
   def toMap(pairings: List[SwissPairing]): PairingMap =
@@ -359,4 +346,3 @@ object SwissPairing {
         }
       }
     }
-}

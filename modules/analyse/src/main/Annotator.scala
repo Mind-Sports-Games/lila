@@ -8,10 +8,10 @@ import strategygames.variant.Variant
 import lila.game.GameDrawOffers
 import lila.game.Game
 
-final class Annotator(netDomain: lila.common.config.NetDomain) {
+final class Annotator(netDomain: lila.common.config.NetDomain):
 
   def apply(p: Pgn, game: Game, analysis: Option[Analysis]): Pgn =
-    annotateStatus(game.winnerPlayerIndex, game.status, game.variant) {
+    annotateStatus(game.winnerPlayerIndex, game.status, game.variant):
       annotateOpening(game.opening) {
         annotateTurns(
           annotateDrawOffers(p, game.drawOffers, game.variant),
@@ -20,13 +20,11 @@ final class Annotator(netDomain: lila.common.config.NetDomain) {
       }.copy(
         tags = p.tags + Tag(_.Annotator, netDomain)
       )
-    }
 
   private def annotateStatus(winner: Option[PlayerIndex], status: Status, variant: Variant)(p: Pgn) =
-    lila.game.StatusText(status, winner, variant) match {
+    lila.game.StatusText(status, winner, variant) match
       case ""   => p
       case text => p.updateLastTurnCount(_.copy(result = text.some))
-    }
 
   private def annotateOpening(opening: Option[FullOpening.AtPly])(p: Pgn) =
     opening.fold(p) { o =>
@@ -72,4 +70,3 @@ final class Annotator(netDomain: lila.common.config.NetDomain) {
       },
       fullTurn.turnOf(advice.playerIndex)
     )
-}

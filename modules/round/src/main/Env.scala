@@ -60,6 +60,7 @@ final class Env(
 ) {
 
   import lightUserApi._
+  implicit private val lightUserSync: lila.common.LightUser.GetterSync = lightUserApi.sync
 
   implicit private val animationLoader: ConfigLoader[AnimationDuration] = durationLoader(
     AnimationDuration.apply
@@ -116,11 +117,10 @@ final class Env(
     "finishGame" -> {
       case lila.game.actorApi.FinishGame(game, _, _)
           if !game.aborted && game.metadata.needsMultiMatchRematch =>
-        scheduler
-          .scheduleOnce(2 seconds) {
+        val _ = scheduler
+          .scheduleOnce(2.seconds) {
             tellRound(game.id, MultiMatchRematch)
           }
-          .discard
     },
     "selfReport" -> { case RoundSocket.Protocol.In.SelfReport(fullId, ip, userId, name) =>
       selfReport(userId, ip, fullId, name).discard

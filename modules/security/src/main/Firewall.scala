@@ -2,7 +2,6 @@ package lila.security
 
 import org.joda.time.DateTime
 import play.api.mvc.RequestHeader
-import scala.concurrent.duration._
 import reactivemongo.api.ReadPreference
 
 import lila.common.IpAddress
@@ -12,7 +11,7 @@ import lila.db.dsl._
 final class Firewall(
     coll: Coll,
     scheduler: org.apache.pekko.actor.Scheduler
-)(implicit ec: scala.concurrent.ExecutionContext) {
+)(implicit ec: scala.concurrent.ExecutionContext):
 
   private var current: Set[String] = Set.empty
 
@@ -20,13 +19,11 @@ final class Firewall(
 
   def blocksIp(ip: IpAddress): Boolean = current contains ip.value
 
-  def blocks(req: RequestHeader): Boolean = {
-    val v = blocksIp {
-      lila.common.HTTPRequest ipAddress req
-    }
+  def blocks(req: RequestHeader): Boolean =
+    val v = blocksIp:
+      lila.common.HTTPRequest `ipAddress` req
     if (v) lila.mon.security.firewall.block.increment()
     v
-  }
 
   def accepts(req: RequestHeader): Boolean = !blocks(req)
 
@@ -49,4 +46,3 @@ final class Firewall(
       current = ips
       val _ = lila.mon.security.firewall.ip.update(ips.size)
     }
-}

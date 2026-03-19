@@ -21,22 +21,20 @@ final class WorkQueue(buffer: Int, timeout: FiniteDuration, name: String, parall
     ec: Executor,
     scheduler: org.apache.pekko.actor.Scheduler,
     mat: Materializer
-) {
+):
 
   import WorkQueue.*
 
   def apply[A](future: => Fu[A]): Fu[A] = run(() => future)
 
-  def run[A](task: () => Fu[A]): Fu[A] = {
+  def run[A](task: () => Fu[A]): Fu[A] =
     val promise = Promise[A]()
-    queue.offer(TaskWithPromise(task, promise)) match {
+    queue.offer(TaskWithPromise(task, promise)) match
       case QueueOfferResult.Enqueued =>
         promise.future
       case result =>
         lila.mon.workQueue.offerFail(name, result.toString).increment()
         Future failed new EnqueueException(s"Can't enqueue in $name: $result")
-    }
-  }
 
   private val queue = Source
     // TODO: Replace WorkQueue with scalalib.actor.AsyncActorSequencer/AsyncActorSequencers
@@ -46,13 +44,12 @@ final class WorkQueue(buffer: Int, timeout: FiniteDuration, name: String, parall
     }
     .toMat(Sink.ignore)(Keep.left)
     .run()
-}
 
-object WorkQueue {
+object WorkQueue:
 
   final class EnqueueException(msg: String) extends Exception(msg)
 
-  private case class TaskWithPromise[A](task: () => Fu[A], promise: Promise[A]) {
+  private case class TaskWithPromise[A](task: () => Fu[A], promise: Promise[A]):
     def run(timeout: FiniteDuration, name: String)(implicit ec: Executor, scheduler: org.apache.pekko.actor.Scheduler): Future[A] =
       task()
         .withTimeout(timeout, s"WorkQueue:$name")
@@ -71,5 +68,3 @@ object WorkQueue {
             e
           }
         )
-  }
-}

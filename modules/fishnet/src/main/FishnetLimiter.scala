@@ -9,7 +9,7 @@ import lila.db.dsl._
 final private class FishnetLimiter(
     analysisColl: Coll,
     requesterApi: lila.analyse.RequesterApi
-)(implicit ec: scala.concurrent.ExecutionContext) {
+)(implicit ec: scala.concurrent.ExecutionContext):
 
   def apply(sender: Work.Sender, ignoreConcurrentCheck: Boolean, ownGame: Boolean): Fu[Boolean] =
     (fuccess(ignoreConcurrentCheck) >>| concurrentCheck(sender)) flatMap {
@@ -26,23 +26,22 @@ final private class FishnetLimiter(
   )
 
   private def concurrentCheck(sender: Work.Sender) =
-    sender match {
+    sender match
       case Work.Sender(_, _, mod, system) if mod || system => fuTrue
       case Work.Sender(userId, ip, _, _) =>
-        !analysisColl.exists(
+        analysisColl.exists(
           $or(
             $doc("sender.ip"     -> ip),
             $doc("sender.userId" -> userId)
           )
-        )
+        ).not
       case _ => fuFalse
-    }
 
   private val maxPerDay  = 35
   private val maxPerWeek = 160
 
   private def perDayCheck(sender: Work.Sender) =
-    sender match {
+    sender match
       case Work.Sender(_, _, mod, system) if mod || system => fuTrue
       case Work.Sender(userId, ip, _, _) =>
         def perUser =
@@ -54,5 +53,3 @@ final private class FishnetLimiter(
           RequestLimitPerIP(ipAddress, cost = 1)(perUser)(fuccess(false))
         }
       case _ => fuFalse
-    }
-}

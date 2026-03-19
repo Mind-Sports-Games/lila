@@ -20,11 +20,10 @@ import strategygames.{
 }
 import strategygames.variant.Variant
 import lila.common.Json.jodaWrites
-import lila.common.Json._
 import lila.common.LightUser
 import lila.i18n.VariantKeys
 
-final class JsonView(rematches: Rematches) {
+final class JsonView(rematches: Rematches):
 
   import JsonView._
 
@@ -71,7 +70,7 @@ final class JsonView(rematches: Rematches) {
       .add("multiPointState" -> game.metadata.multiPointState)
       .add("pointValue" -> game.pointValue)
 
-  def boardSize(variant: Variant) = variant match {
+  def boardSize(variant: Variant) = variant match
     case Variant.Draughts(v) =>
       Some(
         Json.obj(
@@ -80,7 +79,6 @@ final class JsonView(rematches: Rematches) {
         )
       )
     case _ => None
-  }
 
   def ownerPreview(pov: Pov)(lightUserSync: LightUser.GetterSync) =
     Json
@@ -89,7 +87,7 @@ final class JsonView(rematches: Rematches) {
         "gameId"      -> pov.gameId,
         "fen"         -> Forsyth.>>(pov.game.variant.gameLogic, pov.game.stratGame),
         "playerIndex" -> pov.playerIndex.name,
-        "lastMove"    -> ~pov.game.lastActionKeys,
+        "lastMove"    -> pov.game.lastActionKeys.getOrElse(""),
         "source"      -> pov.game.source,
         "status"      -> pov.game.status,
         "variant" -> Json.obj(
@@ -120,9 +118,8 @@ final class JsonView(rematches: Rematches) {
       .add("tournamentId" -> pov.game.tournamentId)
       .add("swissId" -> pov.game.tournamentId)
       .add("winner" -> pov.game.winnerPlayerIndex)
-}
 
-object JsonView {
+object JsonView:
 
   implicit val statusWrites: OWrites[Status] = OWrites { s =>
     Json.obj(
@@ -183,7 +180,7 @@ object JsonView {
   }
 
   implicit val variantWriter: OWrites[Variant] = OWrites { v =>
-    v match {
+    v match
       case Variant.Draughts(draughtsVariant) =>
         Json.obj(
           "key"       -> v.key,
@@ -261,7 +258,6 @@ object JsonView {
             "height" -> 8
           )
         )
-    }
   }
 
   implicit val boardSizeFairyWriter: Writes[strategygames.fairysf.Board.BoardSize] =
@@ -342,9 +338,9 @@ object JsonView {
     )
 
   implicit val clockWriter: OWrites[ClockBase] = OWrites { c =>
-    c match {
+    c match
       case fc: Clock =>
-        fc.config match {
+        fc.config match
           case fConfig: Clock.Config =>
             Json.obj(
               "initial"   -> fConfig.limitSeconds,
@@ -363,7 +359,6 @@ object JsonView {
               "delayType" -> "usdelay"
             ) ++ baseClockJson(fc)
           case _: ByoyomiClock.Config => Json.obj() // TODO: this is annoying
-        }
       case bc: ByoyomiClock => {
         val p1Clock = bc.currentClockFor(P1)
         val p2Clock = bc.currentClockFor(P2)
@@ -380,7 +375,6 @@ object JsonView {
           "p2Periods" -> p2Clock.periods
         )
       }
-    }
   }
 
   implicit val correspondenceWriter: OWrites[CorrespondenceClock] = OWrites { c =>
@@ -426,4 +420,3 @@ object JsonView {
       "p2"     -> m.p2Points
     )
   }
-}

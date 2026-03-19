@@ -10,16 +10,16 @@ import play.api.data.Forms._
 import lila.rating.RatingRange
 import lila.user.{ User, UserContext }
 
-object SetupForm {
+object SetupForm:
 
   import Mappings._
 
   val filter = Form(single("local" -> text))
 
-  def filled(lib: GameLogic, fen: Option[FEN], variant: Option[Variant])(implicit
+  def filled(lib: GameLogic, fen: Option[FEN], variant: Option[Variant])(using
       ctx: UserContext
   ): Form[GameConfig] =
-    game(ctx) fill {
+    game(using ctx) fill:
       val baseConfig = GameConfig.default(lib.id)
       val withFen = fen.fold(baseConfig) { f =>
         baseConfig.copy(
@@ -32,9 +32,8 @@ object SetupForm {
         )
       }
       variant.fold(withFen)(v => withFen.copy(variant = v))
-    }
 
-  def game(ctx: UserContext) =
+  def game(using ctx: UserContext) =
     Form(
       mapping(
         "variant"          -> variant(Config.variantsWithFenAndVariants),
@@ -61,7 +60,7 @@ object SetupForm {
         .verifying("Invalid Points", _.validPoints)
     )
 
-  def hook(implicit ctx: UserContext) =
+  def hook(using ctx: UserContext) =
     Form(
       mapping(
         "variant"     -> variant(Config.variantsWithVariants),
@@ -112,16 +111,16 @@ object SetupForm {
       .verifying("Invalid clock", _.validClock)
       .verifying(
         "Invalid time control",
-        hook => hook.makeClock so lila.game.Game.isBoardCompatible
+        hook => hook.makeClock.forall(lila.game.Game.isBoardCompatible)
       )
   )
 
-  object api {
+  object api:
 
     // TODO: There has to be a way to reduce this code.
     lazy val fischerClockMapping =
       mapping(
-        "limit"     -> number.verifying(ApiConfig.clockLimitSeconds.contains _),
+        "limit"     -> number.verifying(ApiConfig.clockLimitSeconds.contains),
         "increment" -> increment
       )(strategygames.Clock.Config.apply)(c => Some((c.limitSeconds, c.incrementSeconds)))
         .verifying("Invalid clock", c => c.estimateTotalTime > Centis(0))
@@ -130,7 +129,7 @@ object SetupForm {
 
     lazy val bronsteinDelayClockMapping =
       mapping(
-        "limit" -> number.verifying(ApiConfig.clockLimitSeconds.contains _),
+        "limit" -> number.verifying(ApiConfig.clockLimitSeconds.contains),
         "delay" -> increment
       )(strategygames.Clock.BronsteinConfig.apply)(c => Some((c.limitSeconds, c.delaySeconds)))
         .verifying("Invalid clock", c => c.estimateTotalTime > Centis(0))
@@ -138,7 +137,7 @@ object SetupForm {
 
     lazy val simpleDelayMapping =
       mapping(
-        "limit" -> number.verifying(ApiConfig.clockLimitSeconds.contains _),
+        "limit" -> number.verifying(ApiConfig.clockLimitSeconds.contains),
         "delay" -> increment
       )(strategygames.Clock.SimpleDelayConfig.apply)(c => Some((c.limitSeconds, c.delaySeconds)))
         .verifying("Invalid clock", c => c.estimateTotalTime > Centis(0))
@@ -146,7 +145,7 @@ object SetupForm {
 
     lazy val byoyomiClockMapping =
       mapping(
-        "limit"     -> number.verifying(ApiConfig.clockLimitSeconds.contains _),
+        "limit"     -> number.verifying(ApiConfig.clockLimitSeconds.contains),
         "increment" -> increment,
         "byoyomi"   -> byoyomi,
         "periods"   -> periods
@@ -155,17 +154,17 @@ object SetupForm {
     lazy val byoyomiClock = "clock" -> optional(byoyomiClockMapping)
 
     lazy val variant =
-      "variant" -> optional(text.verifying(Variant.byKey.contains _))
+      "variant" -> optional(text.verifying(Variant.byKey.contains))
 
     lazy val message = optional(
       nonEmptyText.verifying(
         "The message must contain {game}, which will be replaced with the game URL.",
-        _ contains "{game}"
+        _ `contains` "{game}"
       )
     )
 
     def user(from: User) =
-      Form(challengeMapping.verifying("Invalid speed", _ validSpeed from.isBot))
+      Form(challengeMapping.verifying("Invalid speed", _ `validSpeed` from.isBot))
 
     def admin = Form(challengeMapping)
 
@@ -203,5 +202,3 @@ object SetupForm {
         .verifying("invalidFen", _.validFen)
         .verifying("rated without a clock", c => c.clock.isDefined || !c.rated)
     )
-  }
-}

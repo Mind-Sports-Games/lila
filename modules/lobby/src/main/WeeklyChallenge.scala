@@ -8,9 +8,8 @@ case class WeeklyChallenge(
     previousName: String,
     previousIcon: Option[Char],
     winner: String
-) {
+):
 
   val currentIconChar  = currentIcon.getOrElse('5')
   val previousIconChar = previousIcon.getOrElse('5')
 
-}

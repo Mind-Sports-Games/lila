@@ -28,7 +28,7 @@ final private class SecurityConfig(
     @ConfigName("lame_name_check") val lameNameCheck: LameNameCheck
 )
 
-private object SecurityConfig {
+private object SecurityConfig:
 
   case class Collection(
       security: CollName,
@@ -79,4 +79,3 @@ private object SecurityConfig {
   implicit val lameNameCheckLoader: ConfigLoader[LameNameCheck] = boolLoader(LameNameCheck.apply)
 
   implicit val loader: ConfigLoader[SecurityConfig] = AutoConfig.loader[SecurityConfig]
-}

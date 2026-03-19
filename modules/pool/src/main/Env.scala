@@ -15,7 +15,7 @@ final class Env(
     ec: scala.concurrent.ExecutionContext,
     system: org.apache.pekko.actor.ActorSystem,
     scheduler: org.apache.pekko.actor.Scheduler
-) {
+):
 
   private lazy val hookThieve = wire[HookThieve]
 
@@ -27,4 +27,3 @@ final class Env(
   lazy val api = wire[PoolApi]
 
   def poolConfigs = PoolList.all
-}

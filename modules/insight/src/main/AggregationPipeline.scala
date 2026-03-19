@@ -5,13 +5,13 @@ import reactivemongo.api.bson._
 import lila.db.dsl._
 import lila.user.User
 
-final private class AggregationPipeline(store: Storage)(implicit ec: scala.concurrent.ExecutionContext) {
+final private class AggregationPipeline(store: Storage)(implicit ec: scala.concurrent.ExecutionContext):
 
   def aggregate[X](question: Question[X], user: User): Fu[List[Bdoc]] =
-    store.coll {
+    store.coll:
       _.aggregateWith[Bdoc](
         allowDiskUse = true
-      ) { implicit framework =>
+      ) { (framework) =>
         import framework._
         import question.{ dimension, filters, metric }
 
@@ -32,7 +32,7 @@ final private class AggregationPipeline(store: Storage)(implicit ec: scala.concu
         )
 
         lazy val movetimeIdDispatcher =
-          MovetimeRange.reversedNoInf.foldLeft[BSONValue](BSONInteger(MovetimeRange.MTRInf.id)) {
+          MovetimeRange.reversedNoInf.foldLeft[BSONValue](BSONInteger(MovetimeRange.MTRInf.id)):
             case (acc, mtr) =>
               $doc(
                 "$cond" -> $arr(
@@ -41,7 +41,6 @@ final private class AggregationPipeline(store: Storage)(implicit ec: scala.concu
                   acc
                 )
               )
-          }
 
         lazy val cplIdDispatcher =
           CplRange.all.reverse.foldLeft[BSONValue](BSONInteger(CplRange.worse.cpl)) { case (acc, cpl) =>
@@ -81,30 +80,27 @@ final private class AggregationPipeline(store: Storage)(implicit ec: scala.concu
                 )
               )
             }
-        def dimensionGroupId(dim: Dimension[_]): BSONValue =
-          dim match {
+        def dimensionGroupId(dim: Dimension[?]): BSONValue =
+          dim match
             case Dimension.MovetimeRange => movetimeIdDispatcher
             case Dimension.CplRange      => cplIdDispatcher
             case Dimension.MaterialRange => materialIdDispatcher
             case Dimension.TimeVariance  => timeVarianceIdDispatcher
             case d                       => BSONString("$" + d.dbKey)
-          }
         sealed trait Grouping
-        object Grouping {
+        object Grouping:
           object Group                                                            extends Grouping
           case class BucketAuto(buckets: Int, granularity: Option[String] = None) extends Grouping
-        }
-        def dimensionGrouping(dim: Dimension[_]): Grouping =
-          dim match {
+        def dimensionGrouping(dim: Dimension[?]): Grouping =
+          dim match
             case D.Date => Grouping.BucketAuto(buckets = 12)
             case _      => Grouping.Group
-          }
 
         val gameIdsSlice       = $doc("ids" -> $doc("$slice" -> $arr("$ids", 4)))
         val includeSomeGameIds = AddFields(gameIdsSlice)
         val toPercent          = $doc("v" -> $doc("$multiply" -> $arr(100, $doc("$avg" -> "$v"))))
 
-        def group(d: Dimension[_], f: GroupFunction): List[Option[PipelineOperator]] =
+        def group(d: Dimension[?], f: GroupFunction): List[Option[PipelineOperator]] =
           List(dimensionGrouping(d) match {
             case Grouping.Group =>
               Group(dimensionGroupId(d))(
@@ -120,7 +116,7 @@ final private class AggregationPipeline(store: Storage)(implicit ec: scala.concu
               )
           }) map { Option(_) }
 
-        def groupMulti(d: Dimension[_], metricDbKey: String): List[Option[PipelineOperator]] =
+        def groupMulti(d: Dimension[?], metricDbKey: String): List[Option[PipelineOperator]] =
           (dimensionGrouping(d) match {
             case Grouping.Group =>
               List[PipelineOperator](
@@ -160,8 +156,8 @@ final private class AggregationPipeline(store: Storage)(implicit ec: scala.concu
           combineDocs(extraMatcher :: question.filters.collect {
             case f if f.dimension.isInMove => f.matcher
           } ::: (dimension match {
-            case D.TimeVariance => List($doc(F.moves("v") $exists true))
-            case D.CplRange     => List($doc(F.moves("c") $exists true))
+            case D.TimeVariance => List($doc(F.moves("v") `$exists` true))
+            case D.CplRange     => List($doc(F.moves("c") `$exists` true))
             case _              => List.empty[Bdoc]
           })).some.filterNot(_.isEmpty) map Match.apply
 
@@ -175,10 +171,10 @@ final private class AggregationPipeline(store: Storage)(implicit ec: scala.concu
         val pipeline = Match(
           selectUserId(user.id) ++
             gameMatcher ++
-            (dimension == Dimension.Opening).so($doc(F.eco $exists true)) ++
+            (dimension == Dimension.Opening).so($doc(F.eco `$exists` true)) ++
             Metric.requiresAnalysis(metric).so($doc(F.analysed -> true)) ++
             (Metric.requiresStableRating(metric) || Dimension.requiresStableRating(dimension)).so {
-              $doc(F.provisional $ne true)
+              $doc(F.provisional `$ne` true)
             }
         ) :: /* sortDate :: */ {
           sampleGames :: ((metric match {
@@ -213,7 +209,7 @@ final private class AggregationPipeline(store: Storage)(implicit ec: scala.concu
               List(
                 projectForMove,
                 unwindMoves,
-                matchMoves($doc(F.moves("o") $exists true)),
+                matchMoves($doc(F.moves("o") `$exists` true)),
                 sampleMoves
               ) :::
                 group(dimension, GroupFunction("$push", $doc("$cond" -> $arr("$" + F.moves("o"), 1, 0)))) :::
@@ -222,7 +218,7 @@ final private class AggregationPipeline(store: Storage)(implicit ec: scala.concu
               List(
                 projectForMove,
                 unwindMoves,
-                matchMoves($doc(F.moves("l") $exists true)),
+                matchMoves($doc(F.moves("l") `$exists` true)),
                 sampleMoves
               ) :::
                 group(dimension, GroupFunction("$push", $doc("$cond" -> $arr("$" + F.moves("l"), 1, 0)))) :::
@@ -292,7 +288,7 @@ final private class AggregationPipeline(store: Storage)(implicit ec: scala.concu
               List(
                 projectForMove,
                 unwindMoves,
-                matchMoves($doc(F.moves("v") $exists true)),
+                matchMoves($doc(F.moves("v") `$exists` true)),
                 sampleMoves
               ) :::
                 group(
@@ -311,5 +307,3 @@ final private class AggregationPipeline(store: Storage)(implicit ec: scala.concu
         pipeline
       }
         .collect[List](maxDocs = Int.MaxValue)
-    }
-}

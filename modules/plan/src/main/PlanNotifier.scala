@@ -11,21 +11,17 @@ final private[plan] class PlanNotifier(
 )(implicit
     ec: scala.concurrent.ExecutionContext,
     system: ActorSystem
-) {
+):
 
-  def onStart(user: User): Unit = {
-    system.scheduler.scheduleOnce(5 seconds) {
+  def onStart(user: User): Unit =
+    system.scheduler.scheduleOnce(5 seconds):
       lila.common.Bus.publish(lila.hub.actorApi.plan.PlanStart(user.id), "planStart")
-    }
     val msg = Propagate(lila.hub.actorApi.timeline.PlanStart(user.id))
-    timeline ! (msg toFollowersOf user.id)
-  }
+    timeline ! (msg `toFollowersOf` user.id)
 
-  def onRenew(user: User): Unit = {
+  def onRenew(user: User): Unit =
     val msg = Propagate(lila.hub.actorApi.timeline.PlanRenew(user.id, user.plan.months))
-    timeline ! (msg toFollowersOf user.id)
-  }
+    timeline ! (msg `toFollowersOf` user.id)
 
   def onExpire(user: User): Unit =
     lila.common.Bus.publish(lila.hub.actorApi.plan.PlanExpire(user.id), "planExpire")
-}

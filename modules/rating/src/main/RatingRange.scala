@@ -2,13 +2,13 @@ package lila.rating
 
 import lila.common.Maths.closestMultipleOf
 
-case class RatingRange(min: Int, max: Int) {
+case class RatingRange(min: Int, max: Int):
 
   def contains(rating: Int) =
     (min <= RatingRange.min || rating >= min) &&
       (max >= RatingRange.max || rating <= max)
 
-  def notBroad: Option[RatingRange] = (this != RatingRange.broad) option this
+  def notBroad: Option[RatingRange] = (this != RatingRange.broad) `option` this
 
   def withinLimits(rating: Int, delta: Int, multipleOf: Int) =
     copy(
@@ -17,9 +17,8 @@ case class RatingRange(min: Int, max: Int) {
     )
 
   override def toString = s"$min-$max"
-}
 
-object RatingRange {
+object RatingRange:
 
   val min = Glicko.minRating
   val max = 2900
@@ -46,5 +45,4 @@ object RatingRange {
 
   def valid(from: String) = apply(from).isDefined
 
-  private def acceptable(rating: Int) = broad contains rating
-}
+  private def acceptable(rating: Int) = broad `contains` rating

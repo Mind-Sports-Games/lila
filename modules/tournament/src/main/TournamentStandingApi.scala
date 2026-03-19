@@ -1,7 +1,6 @@
 package lila.tournament
 
 import play.api.libs.json._
-import scala.concurrent.duration._
 
 import lila.common.WorkQueue
 import lila.memo.CacheApi._
@@ -21,8 +20,8 @@ final class TournamentStandingApi(
 )(implicit
     ec: scala.concurrent.ExecutionContext,
     scheduler: org.apache.pekko.actor.Scheduler,
-    mat: akka.stream.Materializer
-) {
+    mat: org.apache.pekko.stream.Materializer
+):
 
   private val workQueue = new WorkQueue(
     buffer = 256,
@@ -33,28 +32,25 @@ final class TournamentStandingApi(
 
   def apply(tour: Tournament, page: Int): Fu[JsObject] =
     if (page == 1) first get tour.id
-    else if (page > 50) {
+    else if (page > 50)
       if (tour.isCreated) createdCache.get(tour.id -> page)
       else computeMaybe(tour.id, page)
-    } else compute(tour, page)
+    else compute(tour, page)
 
-  private val first = cacheApi[Tournament.ID, JsObject](64, "tournament.page.first") {
+  private val first = cacheApi[Tournament.ID, JsObject](64, "tournament.page.first"):
     _.expireAfterWrite(1 second)
       .buildAsyncFuture { compute(_, 1) }
-  }
 
   // useful for highly anticipated, highly populated tournaments
-  private val createdCache = cacheApi[(Tournament.ID, Int), JsObject](64, "tournament.page.createdCache") {
+  private val createdCache = cacheApi[(Tournament.ID, Int), JsObject](64, "tournament.page.createdCache"):
     _.expireAfterWrite(15 second)
       .buildAsyncFuture { case (tourId, page) =>
         computeMaybe(tourId, page)
       }
-  }
 
-  def clearCache(tour: Tournament): Unit = {
-    first invalidate tour.id
+  def clearCache(tour: Tournament): Unit =
+    first `invalidate` tour.id
     // no need to invalidate createdCache, these are only cached when tour.isCreated
-  }
 
   private def computeMaybe(id: Tournament.ID, page: Int): Fu[JsObject] =
     workQueue {
@@ -69,7 +65,7 @@ final class TournamentStandingApi(
     }
 
   private def compute(id: Tournament.ID, page: Int): Fu[JsObject] =
-    tournamentRepo byId id orFail s"No such tournament: $id" flatMap { compute(_, page) }
+    tournamentRepo `byId` id `orFail` s"No such tournament: $id" flatMap { compute(_, page) }
 
   private def compute(tour: Tournament, page: Int): Fu[JsObject] =
     for {
@@ -85,4 +81,3 @@ final class TournamentStandingApi(
       "page"    -> page,
       "players" -> players
     )
-}

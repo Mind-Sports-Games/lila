@@ -3,7 +3,6 @@ package lila.security
 import play.api.data._
 import play.api.data.Forms._
 import play.api.data.validation.Constraints
-import scala.concurrent.duration._
 
 import lila.common.{ EmailAddress, LameName, Form => LilaForm }
 import lila.common.extensions.*
@@ -16,7 +15,7 @@ final class SecurityForm(
     emailValidator: EmailAddressValidator,
     lameNameCheck: LameNameCheck,
     hcaptchaPublicConfig: HcaptchaPublicConfig
-)(implicit ec: scala.concurrent.ExecutionContext) {
+)(implicit ec: scala.concurrent.ExecutionContext):
 
   import SecurityForm._
 
@@ -27,13 +26,13 @@ final class SecurityForm(
   private val sendableEmail   = anyEmail.verifying(emailValidator.sendableConstraint)
   private val acceptableEmail = anyEmail.verifying(emailValidator.acceptableConstraint)
   private def acceptableUniqueEmail(forUser: Option[User]) =
-    acceptableEmail.verifying(emailValidator uniqueConstraint forUser)
+    acceptableEmail.verifying(emailValidator `uniqueConstraint` forUser)
 
   private def withAcceptableDns(m: Mapping[String]) = m verifying emailValidator.withAcceptableDns
 
   private val preloadEmailDnsForm = Form(single("email" -> acceptableEmail))
 
-  def preloadEmailDns(implicit req: play.api.mvc.Request[_], formBinding: FormBinding): Funit =
+  def preloadEmailDns(implicit req: play.api.mvc.Request[?], formBinding: FormBinding): Funit =
     preloadEmailDnsForm
       .bindFromRequest()
       .fold(
@@ -41,7 +40,7 @@ final class SecurityForm(
         email => emailValidator.preloadDns(EmailAddress(email))
       )
 
-  object signup {
+  object signup:
 
     val username = LilaForm.cleanNonEmptyText
       .verifying(
@@ -101,7 +100,6 @@ final class SecurityForm(
         "email"    -> emailField
       )(MobileSignupData.apply)(_ => None)
     )
-  }
 
   val passwordReset = HcaptchaForm(
     Form(
@@ -118,9 +116,8 @@ final class SecurityForm(
     )
   )
 
-  case class PasswordResetConfirm(newPasswd1: String, newPasswd2: String) {
+  case class PasswordResetConfirm(newPasswd1: String, newPasswd2: String):
     def samePasswords = newPasswd1 == newPasswd2
-  }
 
   val passwdReset = Form(
     mapping(
@@ -142,12 +139,12 @@ final class SecurityForm(
   )
 
   def changeEmail(u: User, old: Option[EmailAddress]) =
-    authenticator loginCandidate u map { candidate =>
+    authenticator `loginCandidate` u map { candidate =>
       Form(
         mapping(
           "passwd" -> passwordMapping(candidate),
           "email" -> withAcceptableDns {
-            acceptableUniqueEmail(candidate.user.some).verifying(emailValidator differentConstraint old)
+            acceptableUniqueEmail(candidate.user.some).verifying(emailValidator `differentConstraint` old)
           }
         )(ChangeEmail.apply)(d => Some((d.passwd, d.email)))
       ).fill(
@@ -159,7 +156,7 @@ final class SecurityForm(
     }
 
   def setupTwoFactor(u: User) =
-    authenticator loginCandidate u map { candidate =>
+    authenticator `loginCandidate` u map { candidate =>
       Form(
         mapping(
           "secret" -> nonEmptyText,
@@ -179,7 +176,7 @@ final class SecurityForm(
     }
 
   def disableTwoFactor(u: User) =
-    authenticator loginCandidate u map { candidate =>
+    authenticator `loginCandidate` u map { candidate =>
       Form(
         tuple(
           "passwd" -> passwordMapping(candidate),
@@ -192,7 +189,7 @@ final class SecurityForm(
     Form(
       single(
         "email" -> withAcceptableDns {
-          acceptableUniqueEmail(none).verifying(emailValidator differentConstraint old.some)
+          acceptableUniqueEmail(none).verifying(emailValidator `differentConstraint` old.some)
         }
       )
     ).fill(old.value)
@@ -200,13 +197,13 @@ final class SecurityForm(
   def modEmail(user: User) = Form(single("email" -> acceptableUniqueEmail(user.some)))
 
   private def passwordProtected(u: User) =
-    authenticator loginCandidate u map { candidate =>
+    authenticator `loginCandidate` u map { candidate =>
       Form(single("passwd" -> passwordMapping(candidate)))
     }
 
-  def closeAccount = passwordProtected _
+  def closeAccount = passwordProtected
 
-  def toggleKid = passwordProtected _
+  def toggleKid = passwordProtected
 
   val reopen = HcaptchaForm(
     Form(
@@ -220,9 +217,8 @@ final class SecurityForm(
 
   private def passwordMapping(candidate: User.LoginCandidate) =
     text.verifying("incorrectPassword", p => candidate.check(ClearPassword(p)))
-}
 
-object SecurityForm {
+object SecurityForm:
 
   case class AgreementData(
       assistance: Boolean,
@@ -237,44 +233,36 @@ object SecurityForm {
       email: String,
       agreement: AgreementData,
       fp: Option[String]
-  ) {
+  ):
     def realEmail = EmailAddress(email)
 
     def fingerPrint = fp.filter(_.nonEmpty) map FingerPrint.apply
-  }
 
   case class MobileSignupData(
       username: String,
       password: String,
       email: String
-  ) {
+  ):
     def realEmail = EmailAddress(email)
-  }
 
   case class PasswordReset(
       email: String
-  ) {
+  ):
     def realEmail = EmailAddress(email)
-  }
 
   case class MagicLink(
       email: String
-  ) {
+  ):
     def realEmail = EmailAddress(email)
-  }
 
   case class Reopen(
       username: String,
       email: String
-  ) {
+  ):
     def realEmail = EmailAddress(email)
-  }
 
-  case class ChangeEmail(passwd: String, email: String) {
+  case class ChangeEmail(passwd: String, email: String):
     def realEmail = EmailAddress(email)
-  }
 
-  case class TwoFactor(secret: String, passwd: String, token: String) {
+  case class TwoFactor(secret: String, passwd: String, token: String):
     def tokenValid = TotpSecret(secret).verify(User.TotpToken(token))
-  }
-}

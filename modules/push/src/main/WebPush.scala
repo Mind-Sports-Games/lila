@@ -13,14 +13,14 @@ final private class WebPush(
     webSubscriptionApi: WebSubscriptionApi,
     config: WebPush.Config,
     ws: StandaloneWSClient
-)(implicit ec: scala.concurrent.ExecutionContext) {
+)(implicit ec: scala.concurrent.ExecutionContext):
 
   def apply(userId: User.ID, data: => PushApi.Data): Funit =
     webSubscriptionApi.getSubscriptions(5)(userId) flatMap { subscriptions =>
       subscriptions.toNel so send(data)
     }
 
-  private def send(data: => PushApi.Data)(subscriptions: NonEmptyList[WebSubscription]): Funit = {
+  private def send(data: => PushApi.Data)(subscriptions: NonEmptyList[WebSubscription]): Funit =
     ws.url(config.url)
       .withHttpHeaders("ContentType" -> "application/json")
       .post(
@@ -44,18 +44,14 @@ final private class WebPush(
             .toString,
           "ttl" -> 43200
         )
-      ) flatMap {
+      ) flatMap:
       case res if res.status == 200 => funit
       case res                      => fufail(s"[push] web: ${res.status} ${res.body}")
-    }
-  }
-}
 
-private object WebPush {
+private object WebPush:
 
   final class Config(
       val url: String,
       @ConfigName("vapid_public_key") val vapidPublicKey: String
   )
   implicit val configLoader: ConfigLoader[Config] = AutoConfig.loader[Config]
-}

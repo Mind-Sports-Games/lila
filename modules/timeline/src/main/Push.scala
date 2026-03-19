@@ -15,7 +15,7 @@ final private[timeline] class Push(
     userRepo: UserRepo,
     entryApi: EntryApi,
     unsubApi: UnsubApi
-) extends Actor {
+) extends Actor:
 
   implicit def ec: ExecutionContextExecutor = context.dispatcher
 
@@ -37,7 +37,7 @@ final private[timeline] class Push(
       case ExceptUser(_) => fuccess(Nil)
       case ModsOnly(_)   => fuccess(Nil)
     } flatMap { users =>
-      propagations.foldLeft(fuccess(users.flatten.distinct)) {
+      propagations.foldLeft(fuccess(users.flatten.distinct)):
         case (fus, ExceptUser(id)) => fus.dmap(_.filter(id !=))
         case (fus, ModsOnly(true)) =>
           fus flatMap { us =>
@@ -46,7 +46,6 @@ final private[timeline] class Push(
             }
           }
         case (fus, _) => fus
-      }
     }
 
   private def modPermissions =
@@ -56,11 +55,9 @@ final private[timeline] class Push(
       Permission.SuperAdmin
     )
 
-  private def makeEntry(users: List[User.ID], data: Atom): Fu[Entry] = {
+  private def makeEntry(users: List[User.ID], data: Atom): Fu[Entry] =
     val entry = Entry.make(data)
-    entryApi.findRecent(entry.typ, DateTime.now minusMinutes 60, Max(1000)) flatMap { entries =>
-      if (entries.exists(_ similarTo entry)) fufail[Entry]("[timeline] a similar entry already exists")
-      else entryApi insert Entry.ForUsers(entry, users) inject entry
+    entryApi.findRecent(entry.typ, DateTime.now `minusMinutes` 60, Max(1000)) flatMap { entries =>
+      if (entries.exists(_ `similarTo` entry)) fufail[Entry]("[timeline] a similar entry already exists")
+      else entryApi `insert` Entry.ForUsers(entry, users) inject entry
     }
-  }
-}

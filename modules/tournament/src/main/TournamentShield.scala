@@ -2,7 +2,6 @@ package lila.tournament
 
 import org.joda.time.{ DateTime, Months, Weeks }
 import reactivemongo.api.ReadPreference
-import scala.concurrent.duration._
 import scala.util.Random
 
 import lila.db.dsl._
@@ -18,15 +17,14 @@ import strategygames.{ GameFamily, GameGroup }
 final class TournamentShieldApi(
     tournamentRepo: TournamentRepo,
     cacheApi: lila.memo.CacheApi
-)(implicit ec: scala.concurrent.ExecutionContext) {
+)(implicit ec: scala.concurrent.ExecutionContext):
 
   import TournamentShield._
   import BSONHandlers._
 
   def active(u: User): Fu[List[Award]] =
-    cache.getUnit dmap {
+    cache.getUnit dmap:
       _.value.values.flatMap(_.headOption.filter(_.owner.value == u.id)).toList
-    }
 
   def history(maxPerCateg: Option[Int]): Fu[History] =
     cache.getUnit dmap { h =>
@@ -35,21 +33,18 @@ final class TournamentShieldApi(
 
   def byCategKey(k: String): Fu[Option[(Category, List[Award])]] =
     Category.byKey(k) so { categ =>
-      cache.getUnit dmap {
-        _.value get categ map {
+      cache.getUnit dmap:
+        _.value get categ map:
           categ -> _
-        }
-      }
     }
 
   def byMedleyKey(k: String): Option[MedleyShield] = MedleyShield.byKey(k)
 
   def currentOwner(tour: Tournament): Fu[Option[OwnerId]] =
-    tour.isShield so {
+    tour.isShield so:
       Category.of(tour) so { cat =>
         history(none).map(_.current(cat).map(_.owner))
       }
-    }
 
   private[tournament] def clear(): Unit = cache.invalidateUnit()
 
@@ -58,7 +53,7 @@ final class TournamentShieldApi(
     if (hist.value.exists(_._2.exists(_.owner.value === userId))) clear()
   }
 
-  private val cache = cacheApi.unit[History] {
+  private val cache = cacheApi.unit[History]:
     _.refreshAfterWrite(1 day)
       .buildAsyncFuture { _ =>
         tournamentRepo.coll
@@ -68,12 +63,12 @@ final class TournamentShieldApi(
               "status"        -> statusBSONHandler.writeTry(Status.Finished).get
             )
           )
-          .sort($sort asc "startsAt")
+          .sort($sort `asc` "startsAt")
           .cursor[Tournament](ReadPreference.secondaryPreferred)
           .list() map { tours =>
           for {
             tour   <- tours
-            categ  <- Category of tour
+            categ  <- Category `of` tour
             winner <- tour.winnerId
           } yield Award(
             categ = categ,
@@ -85,12 +80,10 @@ final class TournamentShieldApi(
           _.foldLeft(Map.empty[Category, List[Award]]) { case (hist, entry) =>
             hist + (entry.categ -> hist.get(entry.categ).fold(List(entry))(entry :: _))
           }
-        } dmap History.apply
+        } `dmap` History.apply
       }
-  }
-}
 
-object TournamentShield {
+object TournamentShield:
 
   case class OwnerId(value: String) extends AnyVal
 
@@ -101,7 +94,7 @@ object TournamentShield {
       tourId: Tournament.ID
   )
   // newer entry first
-  case class History(value: Map[Category, List[Award]]) {
+  case class History(value: Map[Category, List[Award]]):
 
     def sorted: List[(Category, List[Award])] =
       Category.all.sortBy(_.dayOfMonth) map { categ =>
@@ -116,7 +109,6 @@ object TournamentShield {
       copy(
         value = value.view.mapValues(_ take max).toMap
       )
-  }
 
   sealed abstract class MedleyShield(
       val key: String,
@@ -135,7 +127,7 @@ object TournamentShield {
       val arenaFormat: String,
       val arenaDescription: String,
       val countOffset: Int = 0
-  ) {
+  ):
     def eligibleVariants = variants.distinct
     def hasAllVariants   = eligibleVariants == Variant.all.filterNot(_.fromPositionVariant)
     def medleyName       = s"${name} Medley Shield"
@@ -153,9 +145,8 @@ object TournamentShield {
       .map(_.gameFamily)
       .headOption
       .getOrElse(GameFamily.Chess()) == GameFamily.Backgammon()
-  }
 
-  object MedleyShield {
+  object MedleyShield:
 
     private def generateOnePerGameGroup(variants: List[Variant], gameGroups: List[GameGroup]) =
       Random.shuffle(
@@ -168,7 +159,7 @@ object TournamentShield {
         )
       )
 
-    private def playStrategyMedleyGeneration(variants: List[Variant]) = {
+    private def playStrategyMedleyGeneration(variants: List[Variant]) =
       val thisOrder       = Random.shuffle(variants)
       val gameGroups      = GameGroup.medley.filter(gg => gg.variants.exists(thisOrder.contains(_)))
       val onePerGameGroup = generateOnePerGameGroup(thisOrder, gameGroups)
@@ -179,7 +170,6 @@ object TournamentShield {
         playStrategyMinutes,
         playStrategyRounds
       )
-    }
     private val playStrategyMinutes = 120
     private val playStrategyRounds  = GameGroup.medley.length
 
@@ -633,18 +623,17 @@ object TournamentShield {
 
     def makeName(baseName: String, startsAt: DateTime, isWeekly: Boolean, countOffset: Int) =
       s"${baseName} ${countSinceStart(startsAt, isWeekly) - countOffset + 1}"
-  }
 
   sealed abstract class Category(
       val variant: Variant,
       val speed: Schedule.Speed,
       val dayOfMonth: Int,
       val group: Int = 0
-  ) {
+  ):
     def key                       = variant.key
     def name                      = VariantKeys.variantName(variant)
     def iconChar                  = variant.perfIcon
-    def matches(tour: Tournament) = Some(variant).has(tour.variant)
+    def matches(tour: Tournament) = Some(variant).contains(tour.variant)
 
     private def hoursList(month: Int) =
       if (month % 2 == 0) TournamentShield.defaultShieldHours
@@ -652,9 +641,8 @@ object TournamentShield {
 
     def scheduleHour(month: Int) =
       hoursList(month).lift(group).getOrElse(TournamentShield.defaultShieldHours(0))
-  }
 
-  object Category {
+  object Category:
 
     case object Chess
         extends Category(
@@ -1037,10 +1025,9 @@ object TournamentShield {
       Abalone
     )
 
-    def of(t: Tournament): Option[Category] = all.find(_ matches t)
+    def of(t: Tournament): Option[Category] = all.find(_ `matches` t)
 
     def byKey(k: String): Option[Category] = all.find(_.key == k)
-  }
 
   val defaultShieldHours   = List(18, 12) //UTC
   val alternateShieldHours = defaultShieldHours.reverse
@@ -1053,4 +1040,3 @@ object TournamentShield {
         s"The winner keeps the shield trophy for one month, and then must defend it during the next $name Shield tournament!",
       homepageHours = 168.some
     )
-}

@@ -10,7 +10,7 @@ final private[team] class PaginatorBuilder(
     teamRepo: TeamRepo,
     memberRepo: MemberRepo,
     lightUserApi: lila.user.LightUserApi
-)(implicit ec: scala.concurrent.ExecutionContext) {
+)(implicit ec: scala.concurrent.ExecutionContext):
   private val maxPerPage     = MaxPerPage(15)
   private val maxUserPerPage = MaxPerPage(30)
 
@@ -35,7 +35,7 @@ final private[team] class PaginatorBuilder(
       maxUserPerPage
     )
 
-  final private class TeamAdapter(team: Team) extends AdapterLike[LightUser] {
+  final private class TeamAdapter(team: Team) extends AdapterLike[LightUser]:
 
     val nbResults = fuccess(team.nbMembers)
 
@@ -51,7 +51,5 @@ final private[team] class PaginatorBuilder(
         userIds = docs.flatMap(_ string "user")
         users <- lightUserApi asyncMany userIds
       } yield users.flatten
-    private def selector = memberRepo teamQuery team.id
-    private def sorting  = $sort desc "date"
-  }
-}
+    private def selector = memberRepo `teamQuery` team.id
+    private def sorting  = $sort `desc` "date"

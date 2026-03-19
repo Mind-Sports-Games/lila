@@ -5,7 +5,7 @@ import play.api.libs.ws.StandaloneWSClient
 import play.api.libs.ws.DefaultBodyWritables._
 import play.api.libs.ws.JsonBodyReadables._
 import play.api.i18n.Lang
-import lila.common.autoconfig.{ AutoConfig, ConfigName }
+import lila.common.autoconfig.AutoConfig
 import scala.math.Ordering.Float.TotalOrdering
 
 import lila.common.config.Secret
@@ -15,7 +15,7 @@ import play.api.ConfigLoader
 final class DetectLanguage(
     ws: StandaloneWSClient,
     config: DetectLanguage.Config
-)(implicit ec: scala.concurrent.ExecutionContext) {
+)(implicit ec: scala.concurrent.ExecutionContext):
 
   import DetectLanguage.Detection
 
@@ -35,7 +35,7 @@ final class DetectLanguage(
             "q"   -> message.take(messageMaxLength)
           )
         ) map { response =>
-        (response.body[JsValue] \ "data" \ "detections").asOpt[List[Detection]] match {
+        (response.body[JsValue] \ "data" \ "detections").asOpt[List[Detection]] match
           case None =>
             lila.log("DetectLanguage").warn(s"Invalide service response ${response.body[JsValue]}")
             None
@@ -44,14 +44,12 @@ final class DetectLanguage(
               .filter(_.isReliable)
               .sortBy(-_.confidence)
               .headOption map (_.language) flatMap Lang.get
-        }
       } recover { case e: Exception =>
         lila.log("DetectLanguage").warn(e.getMessage, e)
         defaultLang.some
       }
-}
 
-object DetectLanguage {
+object DetectLanguage:
 
   final class Config(val url: String, val key: Secret)
   implicit val configLoader: ConfigLoader[Config] = AutoConfig.loader[Config]
@@ -61,4 +59,3 @@ object DetectLanguage {
       confidence: Float,
       isReliable: Boolean
   )
-}

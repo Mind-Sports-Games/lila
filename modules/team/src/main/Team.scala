@@ -1,7 +1,6 @@
 package lila.team
 
 import org.joda.time.DateTime
-import scala.util.chaining._
 
 import lila.user.User
 import org.joda.time.Days
@@ -22,7 +21,7 @@ case class Team(
     chat: Team.ChatFor,
     hideMembers: Option[Boolean],
     hideForum: Option[Boolean]
-) {
+):
 
   def id = _id
 
@@ -39,9 +38,8 @@ case class Team(
 
   def isOfficial: Boolean = createdBy == "playstrategy"
 
-}
 
-object Team {
+object Team:
 
   case class Mini(id: Team.ID, name: String)
 
@@ -51,19 +49,18 @@ object Team {
     if (u.isVerified) maxJoinCeiling * 2
     else {
       30 + Days.daysBetween(u.createdAt, DateTime.now).getDays / 7
-    } atMost maxJoinCeiling
+    } `atMost` maxJoinCeiling
 
   type ID = String
 
   type ChatFor = Int
-  object ChatFor {
+  object ChatFor:
     val NONE    = 0
     val LEADERS = 10
     val MEMBERS = 20
     val all     = List(NONE, LEADERS, MEMBERS)
-  }
 
-  case class IdsStr(value: String) extends AnyVal {
+  case class IdsStr(value: String) extends AnyVal:
 
     import IdsStr.separator
 
@@ -75,16 +72,14 @@ object Team {
 
     def toArray: Array[String] = value split IdsStr.separator
     def toList                 = value.nonEmpty so toArray.toList
-  }
 
-  object IdsStr {
+  object IdsStr:
 
     private val separator = ' '
 
     val empty = IdsStr("")
 
     def apply(ids: Iterable[ID]): IdsStr = IdsStr(ids mkString separator.toString)
-  }
 
   def make(
       id: String,
@@ -117,10 +112,9 @@ object Team {
     )
 
   def nameToId(name: String) =
-    (lila.common.String slugify name) pipe { slug =>
+    (lila.common.String `slugify` name) pipe { slug =>
       // if most chars are not latin, go for random slug
       if (slug.lengthIs > (name.lengthIs / 2)) slug else randomId()
     }
 
-  private[team] def randomId() = lila.common.ThreadLocalRandom nextString 8
-}
+  private[team] def randomId() = lila.common.ThreadLocalRandom `nextString` 8

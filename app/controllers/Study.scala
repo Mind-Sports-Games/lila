@@ -430,7 +430,7 @@ final class Study(
       PgnRateLimitPerIp(HTTPRequest ipAddress ctx.req) {
         OptionFuResult(env.study.api byId id) { study =>
           CanViewResult(study) {
-            lila.mon.export.pgn.study.increment()
+            lila.mon.`export`.pgn.study.increment()
             Ok.chunked(env.study.pgnDump(study, requestPgnFlags(ctx.req)))
               .pipe(asAttachmentStream(s"${env.study.pgnDump filename study}.pgn"))
               .as(pgnContentType)
@@ -445,7 +445,7 @@ final class Study(
       PgnRateLimitPerIp(HTTPRequest ipAddress ctx.req) {
         OptionFuResult(env.study.api byId id) { study =>
           CanViewResult(study) {
-            lila.mon.export.pgn.study.increment()
+            lila.mon.`export`.pgn.study.increment()
             Ok.chunked(env.study.sgfDump(study))
               .pipe(asAttachmentStream(s"${env.study.sgfDump filename study}.sgf"))
               .as(sgfContentType)
@@ -460,7 +460,7 @@ final class Study(
       env.study.api.byIdWithChapter(id, chapterId) flatMap {
         _.fold(notFound) { case WithChapter(study, chapter) =>
           CanViewResult(study) {
-            lila.mon.export.pgn.studyChapter.increment()
+            lila.mon.`export`.pgn.studyChapter.increment()
             Ok(env.study.pgnDump.ofChapter(study, requestPgnFlags(ctx.req))(chapter).toString)
               .pipe(asAttachment(s"${env.study.pgnDump.filename(study, chapter)}.pgn"))
               .as(pgnContentType)
@@ -475,7 +475,7 @@ final class Study(
       env.study.api.byIdWithChapter(id, chapterId) flatMap {
         _.fold(notFound) { case WithChapter(study, chapter) =>
           CanViewResult(study) {
-            lila.mon.export.pgn.studyChapter.increment()
+            lila.mon.`export`.pgn.studyChapter.increment()
             Ok(env.study.sgfDump.ofChapter(study)(chapter).toString)
               .pipe(asAttachment(s"${env.study.sgfDump.filename(study, chapter)}.sgf"))
               .as(sgfContentType)
@@ -505,7 +505,7 @@ final class Study(
           .sourceByOwner(userId, isMe)
           .flatMapConcat(env.study.pgnDump(_, flags))
           .withAttributes(
-            akka.stream.ActorAttributes.supervisionStrategy(akka.stream.Supervision.resumingDecider)
+            org.apache.pekko.stream.ActorAttributes.supervisionStrategy(org.apache.pekko.stream.Supervision.resumingDecider)
           )
           .throttle(30, 1 second)
       } { source =>

@@ -5,14 +5,15 @@ import scala.concurrent.ExecutionContext
 import lila.db.dsl._
 import lila.user.{ Perfs, User }
 import lila.common.Iso
+import lila.common.extensions.*
 import strategygames.variant.Variant
 import strategygames.GameLogic
 
-private object PuzzlePath {
+private object PuzzlePath:
 
   val sep = '|'
 
-  case class Id(value: String) {
+  case class Id(value: String):
 
     val parts = value.split(sep)
 
@@ -24,14 +25,12 @@ private object PuzzlePath {
     def variantId = ~parts.lift(1).flatMap(s => s.toIntOption)
     val gameLogic = GameLogic(lib)
     def variant   = Variant.orDefault(gameLogic, variantId)
-  }
 
   implicit val pathIdIso: Iso.StringIso[Id] = lila.common.Iso.string[Id](Id.apply, _.value)
-}
 
 final private class PuzzlePathApi(
     colls: PuzzleColls
-)(implicit ec: ExecutionContext) {
+)(implicit ec: ExecutionContext):
 
   import BsonHandlers._
   import PuzzlePath._
@@ -49,7 +48,7 @@ final private class PuzzlePathApi(
       if (tier == PuzzleTier.Top && PuzzleDifficulty.isExtreme(difficulty)) PuzzleTier.Good
       else tier
     colls
-      .path {
+      .path:
         _.aggregateWith[Bdoc]() { framework =>
           import framework._
           val rating =
@@ -67,7 +66,7 @@ final private class PuzzlePathApi(
                 actualTier,
                 (rating - ratingFlex) to (rating + ratingFlex)
               ) ++
-                ((compromise != 5 && previousPaths.nonEmpty) so $doc("_id" $nin previousPaths))
+                ((compromise != 5 && previousPaths.nonEmpty) so $doc("_id" `$nin` previousPaths))
             ),
             Sample(1),
             Project($id(true))
@@ -76,8 +75,7 @@ final private class PuzzlePathApi(
           .collect[List](maxDocs = 1)
           .dmap(_.headOption)
           .dmap(_.flatMap(_.getAsOpt[Id]("_id")))
-      }
-      .flatMap {
+      .flatMap:
         case Some(path) => fuccess(path.some)
         case _ if actualTier == PuzzleTier.Top =>
           nextFor(user, variant, theme, PuzzleTier.Good, difficulty, previousPaths)
@@ -86,7 +84,6 @@ final private class PuzzlePathApi(
         case _ if compromise < 5 =>
           nextFor(user, variant, theme, actualTier, difficulty, previousPaths, compromise + 1)
         case _ => fuccess(none)
-      }
   }.mon(
     _.puzzle.path.nextFor(variant.key, theme.value, tier.key, difficulty.key, previousPaths.size, compromise)
   )
@@ -94,7 +91,6 @@ final private class PuzzlePathApi(
   def select(variant: Variant, theme: PuzzleTheme.Key, tier: PuzzleTier, rating: Range) = $doc(
     "l" -> variant.gameLogic.id,
     "v" -> variant.id,
-    "min" $lte f"${variant.gameLogic.id}${sep}${variant.id}${sep}${theme}${sep}${tier}${sep}${rating.max}%04d",
-    "max" $gte f"${variant.gameLogic.id}${sep}${variant.id}${sep}${theme}${sep}${tier}${sep}${rating.min}%04d"
+    "min" `$lte` f"${variant.gameLogic.id}${sep}${variant.id}${sep}${theme}${sep}${tier}${sep}${rating.max}%04d",
+    "max" `$gte` f"${variant.gameLogic.id}${sep}${variant.id}${sep}${theme}${sep}${tier}${sep}${rating.min}%04d"
   )
-}

@@ -10,11 +10,10 @@ final class Env(
     noteApi: lila.user.NoteApi,
     userRepo: lila.user.UserRepo,
     cacheApi: lila.memo.CacheApi
-)(implicit ec: scala.concurrent.ExecutionContext) {
+)(implicit ec: scala.concurrent.ExecutionContext):
 
   private val coll = db(CollName("appeal"))
 
   private lazy val snoozer = new lila.memo.Snoozer[Appeal.SnoozeKey](cacheApi)
 
   lazy val api: AppealApi = wire[AppealApi]
-}

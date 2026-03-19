@@ -82,7 +82,7 @@ final class Tv(
 
   def feed =
     Action.async { req =>
-      import makeTimeout.short
+      implicit val timeout: org.apache.pekko.util.Timeout = makeTimeout.short
       import org.apache.pekko.pattern.ask
       import lila.round.TvBroadcast
       import play.api.libs.EventSource

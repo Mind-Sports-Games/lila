@@ -2,7 +2,7 @@ package lila.report
 
 final private class ReportScore(
     getAccuracy: ReporterId => Fu[Option[Accuracy]]
-)(implicit ec: scala.concurrent.ExecutionContext) {
+)(implicit ec: scala.concurrent.ExecutionContext):
 
   def apply(candidate: Report.Candidate): Fu[Report.Candidate.Scored] =
     getAccuracy(candidate.reporter.id) map { accuracy =>
@@ -14,10 +14,10 @@ final private class ReportScore(
       impl.fixedAutoCommPrintScore(candidate) map
       impl.fixedBoostScore(candidate) map
       impl.commFlagScore(candidate) map { score =>
-        candidate scored Report.Score(score atLeast 5 atMost 100)
+        candidate `scored` Report.Score(score `atLeast` 5 `atMost` 100)
       }
 
-  private object impl {
+  private object impl:
 
     val baseScore = 20
 
@@ -44,5 +44,3 @@ final private class ReportScore(
     def commFlagScore(c: Report.Candidate)(score: Double): Double =
       if (c.isCommFlag) score / 2
       else score
-  }
-}

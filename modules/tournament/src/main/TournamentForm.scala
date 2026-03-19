@@ -17,13 +17,13 @@ import lila.hub.LeaderTeam
 import lila.hub.LightTeam._
 import lila.user.User
 
-final class TournamentForm {
+final class TournamentForm:
 
   import TournamentForm._
 
   def create(user: User, leaderTeams: List[LeaderTeam], teamBattleId: Option[TeamID] = None) =
     form(user, leaderTeams) fill TournamentSetup(
-      name = teamBattleId.isEmpty option user.titleUsername,
+      name = teamBattleId.isEmpty `option` user.titleUsername,
       clock = Clock.Config(180, 0),
       minutes = minuteDefault,
       waitMinutes = waitMinuteDefault.some,
@@ -141,13 +141,12 @@ final class TournamentForm {
   private def gameGroupInMedley(medleyVariants: Option[List[Variant]], gg: GameGroup) =
     gg.variants.exists(medleyVariantsList(medleyVariants).contains(_))
 
-  private def onePerGameGroupInMedley(medleyVariants: Option[List[Variant]]) = {
+  private def onePerGameGroupInMedley(medleyVariants: Option[List[Variant]]) =
     val mvList               = medleyVariantsList(medleyVariants)
     val gameGroups           = GameGroup.medley.filter(gg => gg.variants.exists(mvList.contains(_)))
     val selectedMVList       = mvList.take(gameGroups.size)
     val gameGroupsInSelected = gameGroups.filter(gg => gg.variants.exists(selectedMVList.contains(_)))
     gameGroups.size > 1 && gameGroups.size == gameGroupsInSelected.size
-  }
 
   private def exoticChessVariants(medleyVariants: Option[List[Variant]]) =
     medleyVariantsList(medleyVariants).filterNot(_.exoticChessVariant).isEmpty
@@ -204,7 +203,7 @@ final class TournamentForm {
           )(Handicaps.apply)(d => Some((d.handicapped, d.inputPlayerRatings)))
         )(VariantSettings.apply)(d => Some(d.handicaps)),
         "position"         -> optional(lila.common.Form.fen.playableStrict),
-        "mode"             -> optional(number.verifying(Mode.all.map(_.id) contains _)), // deprecated, use rated
+        "mode"             -> optional(number.verifying(Mode.all.map(_.id).contains)), // deprecated, use rated
         "rated"            -> optional(boolean),
         "password"         -> optional(cleanNonEmptyText),
         "conditions"       -> Condition.DataForm.all(leaderTeams),
@@ -222,9 +221,8 @@ final class TournamentForm {
         .verifying("Must have more than 1 game type for medley tournaments", _.validMedleySetup)
         .verifying("Hanidcapped mode requires a Go variant, non-rated and non-medley", _.validHandicapSetup)
     )
-}
 
-object TournamentForm {
+object TournamentForm:
 
   val clockTimes: Seq[Double] = Seq(0d, 1 / 4d, 1 / 2d, 3 / 4d, 1d, 3 / 2d) ++ {
     (2 to 7 by 1) ++ (10 to 30 by 5) ++ (40 to 60 by 10)
@@ -282,7 +280,6 @@ object TournamentForm {
     )
 
   case class TournamentJoin(team: Option[String], password: Option[String])
-}
 
 private[tournament] case class TournamentSetup(
     name: Option[String],
@@ -307,30 +304,28 @@ private[tournament] case class TournamentSetup(
     statusScoring: Option[Boolean],
     description: Option[String],
     hasChat: Option[Boolean]
-) {
+):
 
-  def validClock = clock match {
+  def validClock = clock match
     case fc: Clock.Config             => (fc.limitSeconds + fc.incrementSeconds) > 0
     case bc: Clock.BronsteinConfig    => (bc.limitSeconds + bc.delaySeconds) > 0 && bc.delaySeconds > 0
     case udc: Clock.SimpleDelayConfig => (udc.limitSeconds + udc.delaySeconds) > 0 && udc.delaySeconds > 0
     case bc: ByoyomiClock.Config =>
       (bc.limitSeconds + bc.incrementSeconds) > 0 || (bc.limitSeconds + bc.byoyomiSeconds) > 0
-  }
 
   def realMode =
     if (realPosition.isDefined) Mode.Casual
     else Mode(rated.orElse(mode.map(Mode.Rated.id ===)) | true)
 
-  def gameLogic = variant match {
+  def gameLogic = variant match
     case Some(v) => GameFamily(v.split("_")(0).toInt).gameLogic
     case None    => GameLogic.Chess()
-  }
 
   def realVariant = variant flatMap { v =>
     Variant.apply(gameLogic, v.split("_")(1).toInt)
   } getOrElse Variant.default(gameLogic)
 
-  def realPosition = position ifTrue realVariant.standardVariant
+  def realPosition = position `ifTrue` realVariant.standardVariant
 
   def validRatedVariant =
     realMode == Mode.Casual ||
@@ -339,7 +334,7 @@ private[tournament] case class TournamentSetup(
   def handicaps = variantSettings.handicaps
 
   def validHandicapSetup =
-    !handicaps.handicapped.has(true) || (gameLogic == GameLogic.Go() && !isMedley && realMode == Mode.Casual)
+    !handicaps.handicapped.contains(true) || (gameLogic == GameLogic.Go() && !isMedley && realMode == Mode.Casual)
 
   def sufficientDuration = estimateNumberOfGamesOneCanPlay >= 3
   def excessiveDuration  = estimateNumberOfGamesOneCanPlay <= 150
@@ -350,7 +345,7 @@ private[tournament] case class TournamentSetup(
 
   // update all fields and use default values for missing fields
   // meant for HTML form updates
-  def updateAll(old: Tournament): Tournament = {
+  def updateAll(old: Tournament): Tournament =
     val newVariant = if (old.isCreated && variant.isDefined) realVariant else old.variant
     old
       .copy(
@@ -358,8 +353,8 @@ private[tournament] case class TournamentSetup(
         clock = if (old.isCreated) clock else old.clock,
         minutes = if (isMedley) medleyDuration else minutes,
         mode = realMode,
-        handicapped = handicaps.handicapped.has(true),
-        inputPlayerRatings = if (handicaps.handicapped.has(true)) handicaps.inputPlayerRatings else None,
+        handicapped = handicaps.handicapped.contains(true),
+        inputPlayerRatings = if (handicaps.handicapped.contains(true)) handicaps.inputPlayerRatings else None,
         variant = newVariant,
         medleyVariantsAndIntervals =
           if (
@@ -385,11 +380,10 @@ private[tournament] case class TournamentSetup(
         description = description,
         hasChat = hasChat | true
       )
-  }
 
   // update only fields that are specified
   // meant for API updates
-  def updatePresent(old: Tournament): Tournament = {
+  def updatePresent(old: Tournament): Tournament =
     val newVariant = if (old.isCreated) realVariant else old.variant
     old
       .copy(
@@ -398,7 +392,7 @@ private[tournament] case class TournamentSetup(
         minutes = minutes,
         mode = if (rated.isDefined) realMode else old.mode,
         handicapped = handicaps.handicapped | old.handicapped,
-        inputPlayerRatings = if (handicaps.handicapped.has(true)) {
+        inputPlayerRatings = if (handicaps.handicapped.contains(true)) {
           handicaps.inputPlayerRatings.fold(old.inputPlayerRatings)(_.some.filter(_.nonEmpty))
         } else None,
         variant = newVariant,
@@ -415,14 +409,13 @@ private[tournament] case class TournamentSetup(
         description = description.fold(old.description)(_.some.filter(_.nonEmpty)),
         hasChat = hasChat | old.hasChat
       )
-  }
 
   private def estimateNumberOfGamesOneCanPlay: Double =
     ((if (isMedley) medleyDuration else minutes) * 60) / estimatedGameSeconds
 
   // There are 2 players, and they don't always use all their time (0.8)
   // add 15 seconds for pairing delay
-  private def estimatedGameSeconds: Double = clock match {
+  private def estimatedGameSeconds: Double = clock match
     case bc: ByoyomiClock.Config =>
       {
         (bc.limitSeconds + 30 * bc.incrementSeconds + bc.byoyomiSeconds * 20 * bc.periodsTotal) * 2 * 0.8
@@ -439,7 +432,6 @@ private[tournament] case class TournamentSetup(
       {
         (udc.limitSeconds + 30 * udc.delaySeconds) * 2 * 0.8
       } + 15
-  }
 
   def isMedley = (medley | false) && medleyGameFamilies.ggList.nonEmpty
 
@@ -459,7 +451,7 @@ private[tournament] case class TournamentSetup(
       )
 
   private def generateMedleyVariants: List[Variant] =
-    if (medleyDefaults.onePerGameFamily.getOrElse(false)) {
+    if (medleyDefaults.onePerGameFamily.getOrElse(false))
       //take a shuffled list of all variants and pull the first for each game family to the front
       val onePerGameGroupVariantList = scala.util.Random.shuffle(
         medleyGameFamilies.ggList.map(gg =>
@@ -469,14 +461,14 @@ private[tournament] case class TournamentSetup(
       onePerGameGroupVariantList ::: generateNoDefaultsMedleyVariants.filterNot(
         onePerGameGroupVariantList.contains(_)
       )
-    } else if (medleyDefaults.exoticChessVariants.getOrElse(false))
+    else if (medleyDefaults.exoticChessVariants.getOrElse(false))
       scala.util.Random.shuffle(Variant.all.filter(_.exoticChessVariant))
     else if (medleyDefaults.draughts64Variants.getOrElse(false))
       scala.util.Random.shuffle(Variant.all.filter(_.draughts64Variant))
     else generateNoDefaultsMedleyVariants
 
   def medleyVariantsAndIntervals: Option[List[(Variant, Int)]] =
-    if (isMedley) {
+    if (isMedley)
       val medleyList     = generateMedleyVariants
       var fullMedleyList = medleyList
       while (fullMedleyList.size < maxMedleyRounds.getOrElse(0))
@@ -489,9 +481,8 @@ private[tournament] case class TournamentSetup(
           medleyIntervalOptions.numIntervals.getOrElse(fullMedleyList.length)
         )
         .some
-    } else None
+    else None
 
-}
 
 case class VariantSettings(
     handicaps: Handicaps
@@ -527,7 +518,7 @@ case class MedleyGameFamilies(
     go: Option[Boolean],
     backgammon: Option[Boolean],
     abalone: Option[Boolean]
-) {
+):
 
   lazy val ggList: List[GameGroup] = GameGroup.medley
     .filterNot(gg => if (!chess.getOrElse(false)) gg == GameGroup.Chess() else false)
@@ -545,4 +536,3 @@ case class MedleyGameFamilies(
     .filterNot(gg => if (!backgammon.getOrElse(false)) gg == GameGroup.Backgammon() else false)
     .filterNot(gg => if (!abalone.getOrElse(false)) gg == GameGroup.Abalone() else false)
 
-}

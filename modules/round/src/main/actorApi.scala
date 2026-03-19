@@ -19,15 +19,14 @@ case class SocketStatus(
     p1IsGone: Boolean,
     p2OnGame: Boolean,
     p2IsGone: Boolean
-) {
+):
   def onGame(playerIndex: PlayerIndex)     = playerIndex.fold(p1OnGame, p2OnGame)
   def isGone(playerIndex: PlayerIndex)     = playerIndex.fold(p1IsGone, p2IsGone)
   def playerIndexsOnGame: Set[PlayerIndex] = PlayerIndex.all.filter(onGame).toSet
-}
 case class RoomCrowd(p1: Boolean, p2: Boolean)
 case class BotConnected(playerIndex: PlayerIndex, v: Boolean)
 
-package round {
+package round:
 
   case class HumanPlay(
       playerId: PlayerId,
@@ -66,4 +65,3 @@ package round {
   case object ForceExpiredAction
   case object StartClock
   case object TooManyPlies
-}

@@ -13,7 +13,7 @@ case class UserLogins(
     prints: List[UserLogins.FPData],
     uas: List[Dated[UserAgent]],
     otherUsers: List[UserLogins.OtherUser]
-) {
+):
 
   import UserLogins.OtherUser
 
@@ -23,12 +23,10 @@ case class UserLogins(
   def otherUserIds = otherUsers.map(_.user.id)
 
   def usersSharingIp =
-    otherUsers.collect {
+    otherUsers.collect:
       case OtherUser(user, ips, _) if ips.nonEmpty => user
-    }
 
   def distinctLocations = UserLogins.distinctRecent(ips.map(_.datedLocation).sortBy(-_.seconds))
-}
 
 final class UserLoginsApi(
     firewall: Firewall,
@@ -37,7 +35,7 @@ final class UserLoginsApi(
     geoIP: GeoIP,
     ip2proxy: Ip2Proxy,
     printBan: PrintBan
-)(implicit ec: scala.concurrent.ExecutionContext) {
+)(implicit ec: scala.concurrent.ExecutionContext):
 
   import UserLogins._
 
@@ -70,8 +68,8 @@ final class UserLoginsApi(
             ips = ips.map { ip =>
               IPData(
                 ip,
-                firewall blocksIp ip.value,
-                geoIP orUnknown ip.value,
+                firewall `blocksIp` ip.value,
+                geoIP `orUnknown` ip.value,
                 proxies(ip.value),
                 Alts(othersByIp.getOrElse(ip.value, Set.empty)),
                 ipClients.getOrElse(ip.value, Set.empty)
@@ -80,7 +78,7 @@ final class UserLoginsApi(
             prints = fps.map { fp =>
               FPData(
                 fp,
-                printBan blocks fp.value,
+                printBan `blocks` fp.value,
                 Alts(othersByFp.getOrElse(fp.value, Set.empty)),
                 fpClients.getOrElse(fp.value, UserAgent.Client.PC)
               )
@@ -92,7 +90,7 @@ final class UserLoginsApi(
     }
 
   private[security] def userHasPrint(u: User): Fu[Boolean] =
-    store.coll.secondaryPreferred.exists($doc("user" -> u.id, "fp" $exists true))
+    store.coll.secondaryPreferred.exists($doc("user" -> u.id, "fp" `$exists` true))
 
   private def fetchOtherUsers(
       user: User,
@@ -108,11 +106,11 @@ final class UserLoginsApi(
           Match(
             $doc(
               $or(
-                "ip" $in ipSet,
-                "fp" $in fpSet
+                "ip" `$in` ipSet,
+                "fp" `$in` fpSet
               ),
-              "user" $ne user.id,
-              "date" $gt DateTime.now.minusYears(1)
+              "user" `$ne` user.id,
+              "date" `$gt` DateTime.now.minusYears(1)
             )
           ),
           GroupField("user")(
@@ -164,37 +162,34 @@ final class UserLoginsApi(
       users <- (ips.nonEmpty && fps.nonEmpty) so store.coll.secondaryPreferred.distinctEasy[User.ID, Set](
         "user",
         $doc(
-          "ip" $in ips,
-          "fp" $in fps,
-          "user" $ne userId
+          "ip" `$in` ips,
+          "fp" `$in` fps,
+          "user" `$ne` userId
         )
       )
     } yield users
 
   private def nextValues(field: String, userId: User.ID): Fu[Set[String]] =
     store.coll.secondaryPreferred.distinctEasy[String, Set](field, $doc("user" -> userId))
-}
 
-object UserLogins {
+object UserLogins:
 
-  case class OtherUser(user: User, ips: Set[IpAddress], fps: Set[FingerHash]) {
+  case class OtherUser(user: User, ips: Set[IpAddress], fps: Set[FingerHash]):
     val nbIps = ips.size
     val nbFps = fps.size
     val score = nbIps + nbFps + nbIps * nbFps
-  }
 
   // distinct values, keeping the most recent of duplicated values
   // assumes all is sorted by most recent first
   def distinctRecent[V](all: List[Dated[V]]): scala.collection.View[Dated[V]] =
     all
-      .foldLeft(Map.empty[V, DateTime]) {
+      .foldLeft(Map.empty[V, DateTime]):
         case (acc, Dated(v, _)) if acc.contains(v) => acc
         case (acc, Dated(v, date))                 => acc + (v -> date)
-      }
       .view
       .map { case (v, date) => Dated(v, date) }
 
-  case class Alts(users: Set[User]) {
+  case class Alts(users: Set[User]):
     lazy val boosters = users.count(_.marks.boost)
     lazy val engines  = users.count(_.marks.engine)
     lazy val trolls   = users.count(_.marks.troll)
@@ -202,11 +197,9 @@ object UserLogins {
     lazy val closed   = users.count(u => u.disabled && u.marks.clean)
     lazy val cleans   = users.count(u => u.enabled && u.marks.clean)
     def score =
-      (boosters * 10 + engines * 10 + trolls * 10 + alts * 10 + closed * 2 + cleans) match {
+      (boosters * 10 + engines * 10 + trolls * 10 + alts * 10 + closed * 2 + cleans) match
         case 0 => -999999 // rank empty alts last
         case n => n
-      }
-  }
 
   case class IPData(
       ip: Dated[IpAddress],
@@ -215,9 +208,8 @@ object UserLogins {
       proxy: Boolean,
       alts: Alts,
       clients: Set[UserAgent.Client]
-  ) {
+  ):
     def datedLocation = Dated(location, ip.date)
-  }
 
   case class FPData(
       fp: Dated[FingerHash],
@@ -226,9 +218,8 @@ object UserLogins {
       client: UserAgent.Client
   )
 
-  case class WithMeSortedWithEmails(others: List[OtherUser], emails: Map[User.ID, EmailAddress]) {
+  case class WithMeSortedWithEmails(others: List[OtherUser], emails: Map[User.ID, EmailAddress]):
     def emailValueOf(u: User) = emails.get(u.id).map(_.value)
-  }
 
   def withMeSortedWithEmails(
       userRepo: UserRepo,
@@ -249,4 +240,3 @@ object UserLogins {
       bans: Map[String, Int],
       max: Int
   )
-}

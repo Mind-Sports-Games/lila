@@ -6,7 +6,7 @@ import strategygames.chess.format.FEN
 import strategygames.format.{ FEN => StratFEN }
 import strategygames.Centis
 
-object Json {
+object Json:
 
   def anyValWriter[O, A: Writes](f: O => A) =
     Writes[O] { o =>
@@ -46,4 +46,3 @@ object Json {
   implicit val fenFormat: Format[FEN]           = stringIsoFormat[FEN](Iso.fenIso)
   implicit val stratFenFormat: Format[StratFEN] = stringIsoFormat[StratFEN](Iso.stratFenIso)
 
-}

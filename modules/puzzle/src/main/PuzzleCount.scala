@@ -1,7 +1,5 @@
 package lila.puzzle
 
-import scala.concurrent.duration._
-
 import strategygames.variant.Variant
 import lila.db.dsl._
 import lila.memo.CacheApi
@@ -9,7 +7,7 @@ import lila.memo.CacheApi
 final private class PuzzleCountApi(
     colls: PuzzleColls,
     cacheApi: CacheApi
-)(implicit ec: scala.concurrent.ExecutionContext) {
+)(implicit ec: scala.concurrent.ExecutionContext):
 
   def countsByTheme: Fu[Map[PuzzleTheme.Key, Int]] =
     byThemeCache get {}
@@ -27,7 +25,7 @@ final private class PuzzleCountApi(
     countByThemeForVariant(variant) dmap { _.getOrElse(theme, 0) }
 
   private val mixCounts = colls
-    .puzzle {
+    .puzzle:
       _.aggregateWith[Bdoc]() { framework =>
         import framework._
         import Puzzle.BSONFields._
@@ -47,7 +45,6 @@ final private class PuzzleCountApi(
         )
       }
         .collect[List](maxDocs = Int.MaxValue)
-    }
     .map { docs =>
       docs.flatMap { doc =>
         for {
@@ -60,12 +57,12 @@ final private class PuzzleCountApi(
     }
 
   private val byVariantThemeCache =
-    cacheApi.unit[Map[String, Map[PuzzleTheme.Key, Int]]] {
+    cacheApi.unit[Map[String, Map[PuzzleTheme.Key, Int]]]:
       _.refreshAfterWrite(20 minutes)
         .buildAsyncFuture { _ =>
           import Puzzle.BSONFields._
           for {
-            themeDocs <- colls.puzzle {
+            themeDocs <- colls.puzzle:
               _.aggregateWith[Bdoc]() { framework =>
                 import framework._
                 List(
@@ -87,9 +84,8 @@ final private class PuzzleCountApi(
                 )
               }
                 .collect[List](maxDocs = Int.MaxValue)
-            }
             mixCountsMap <- mixCounts
-          } yield {
+          } yield
             themeDocs
               .flatMap { doc =>
                 for {
@@ -108,16 +104,14 @@ final private class PuzzleCountApi(
                 themeMap + (PuzzleTheme.mix.key -> total)
               }
               .toMap
-          }
         }
-    }
 
   private val byThemeCache =
-    cacheApi.unit[Map[PuzzleTheme.Key, Int]] {
+    cacheApi.unit[Map[PuzzleTheme.Key, Int]]:
       _.refreshAfterWrite(20 minutes)
         .buildAsyncFuture { _ =>
           import Puzzle.BSONFields._
-          colls.puzzle {
+          colls.puzzle:
             _.aggregateWith[Bdoc]() { framework =>
               import framework._
               List(
@@ -139,7 +133,4 @@ final private class PuzzleCountApi(
                 themed + (PuzzleTheme.mix.key -> all.toInt)
               }
             }
-          }
         }
-    }
-}

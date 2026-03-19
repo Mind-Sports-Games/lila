@@ -2,9 +2,7 @@ package lila.puzzle
 
 import org.joda.time.DateTime
 import reactivemongo.api.bson.BSONNull
-import scala.concurrent.duration._
 import scala.concurrent.ExecutionContext
-import scala.util.chaining._
 
 import strategygames.variant.Variant
 
@@ -17,17 +15,16 @@ case class PuzzleReplay(
     theme: PuzzleTheme.Key,
     nb: Int,
     remaining: Vector[Puzzle.Id]
-) {
+):
 
   def i = nb - remaining.size
 
   def step = copy(remaining = remaining drop 1)
-}
 
 final class PuzzleReplayApi(
     colls: PuzzleColls,
     cacheApi: CacheApi
-)(implicit ec: ExecutionContext) {
+)(implicit ec: ExecutionContext):
 
   import BsonHandlers._
 
@@ -50,7 +47,7 @@ final class PuzzleReplayApi(
           else createReplayFor(user, days, variant, theme) tap { replays.put((user.id, variant), _) }
       } flatMap { replay =>
         replay.remaining.headOption so { id =>
-          colls.puzzle(_.byId[Puzzle](id.value)) map2 (_ -> replay)
+          colls.puzzle(_.byId[Puzzle](id.value)) `map2` (_ -> replay)
         }
       }
     } getOrElse fuccess(None)
@@ -61,12 +58,11 @@ final class PuzzleReplayApi(
       variant: Variant,
       theme: PuzzleTheme.Key
   ): Funit =
-    replays.getIfPresent((round.userId, variant)) so {
+    replays.getIfPresent((round.userId, variant)) so:
       _ map { replay =>
         if (replay.days == days && replay.theme == theme)
           replays.put((round.userId, variant), fuccess(replay.step))
       }
-    }
 
   private def createReplayFor(
       user: User,
@@ -75,15 +71,15 @@ final class PuzzleReplayApi(
       theme: PuzzleTheme.Key
   ): Fu[PuzzleReplay] =
     colls
-      .round {
+      .round:
         _.aggregateWith[Bdoc]() { framework =>
           import framework._
           List(
             Match(
               $doc(
                 "u" -> user.id,
-                "d" $gt DateTime.now.minusDays(days),
-                "w" $ne true
+                "d" `$gt` DateTime.now.minusDays(days),
+                "w" `$ne` true
               )
             ),
             Sort(Ascending("d")),
@@ -132,7 +128,6 @@ final class PuzzleReplayApi(
         }
           .collect[List](maxDocs = 1)
           .dmap(_.headOption)
-      }
       .map {
         ~_.flatMap(_.getAsOpt[Vector[Puzzle.Id]]("ids"))
       } map { ids =>
@@ -159,4 +154,3 @@ final class PuzzleReplayApi(
         )
       )
     )
-}

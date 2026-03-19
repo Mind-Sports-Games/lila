@@ -11,14 +11,14 @@ import lila.user.{ User, UserRepo }
 final class CoachPager(
     userRepo: UserRepo,
     coll: Coll
-)(implicit ec: scala.concurrent.ExecutionContext) {
+)(implicit ec: scala.concurrent.ExecutionContext):
 
   val maxPerPage = lila.common.config.MaxPerPage(10)
 
   import CoachPager._
   import BsonHandlers._
 
-  def apply(lang: Option[Lang], order: Order, page: Int): Fu[Paginator[Coach.WithUser]] = {
+  def apply(lang: Option[Lang], order: Order, page: Int): Fu[Paginator[Coach.WithUser]] =
     val adapter = new Adapter[Coach](
       collection = coll,
       selector = listableSelector ++ lang.so { l =>
@@ -26,13 +26,12 @@ final class CoachPager(
       },
       projection = none,
       sort = order.predicate
-    ) mapFutureList withUsers
+    ) `mapFutureList` withUsers
     Paginator(
       adapter = adapter,
       currentPage = page,
       maxPerPage = maxPerPage
     )
-  }
 
   private val listableSelector = $doc(
     "listed"    -> Coach.Listed(true),
@@ -50,9 +49,8 @@ final class CoachPager(
         Coach.WithUser(coach, user)
       }
     }
-}
 
-object CoachPager {
+object CoachPager:
 
   sealed abstract class Order(
       val key: String,
@@ -60,14 +58,12 @@ object CoachPager {
       val predicate: Bdoc
   )
 
-  object Order {
-    case object Login              extends Order("login", "Last login", $sort desc "user.seenAt")
-    case object PlayStrategyRating extends Order("rating", "PlayStrategy rating", $sort desc "user.rating")
-    case object NbReview           extends Order("review", "User reviews", $sort desc "nbReviews")
-    case object Alphabetical       extends Order("alphabetical", "Alphabetical", $sort asc "_id")
+  object Order:
+    case object Login              extends Order("login", "Last login", $sort `desc` "user.seenAt")
+    case object PlayStrategyRating extends Order("rating", "PlayStrategy rating", $sort `desc` "user.rating")
+    case object NbReview           extends Order("review", "User reviews", $sort `desc` "nbReviews")
+    case object Alphabetical       extends Order("alphabetical", "Alphabetical", $sort `asc` "_id")
 
     val default                   = Login
     val all                       = List(Login, PlayStrategyRating, NbReview, Alphabetical)
     def apply(key: String): Order = all.find(_.key == key) | default
-  }
-}

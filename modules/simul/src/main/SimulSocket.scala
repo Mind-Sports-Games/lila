@@ -16,19 +16,18 @@ final private class SimulSocket(
 )(implicit
     ec: scala.concurrent.ExecutionContext,
     mode: play.api.Mode
-) {
+):
 
   def hostIsOn(simulId: Simul.ID, gameId: Game.ID): Unit =
     rooms.tell(simulId, NotifyVersion("hostGame", gameId))
 
   def reload(simulId: Simul.ID): Unit =
-    repo find simulId foreach {
+    repo `find` simulId foreach:
       _ foreach { simul =>
         jsonView(simul, none) foreach { obj =>
           rooms.tell(simulId, NotifyVersion("reload", obj))
         }
       }
-    }
 
   def aborted(simulId: Simul.ID): Unit =
     rooms.tell(simulId, NotifyVersion("aborted", Json.obj()))
@@ -66,23 +65,19 @@ final private class SimulSocket(
       roomId => _.Simul(roomId.value).some,
       chatBusChan = _.Simul,
       localTimeout = Some { (roomId, modId, _) =>
-        repo.hostId(roomId.value).map(_ has modId)
+        repo.hostId(roomId.value).map(_.contains(modId))
       }
     )
 
-  private lazy val send: String => Unit = remoteSocketApi.makeSender("simul-out").apply _
+  private lazy val send: String => Unit = remoteSocketApi.makeSender("simul-out").apply
 
   remoteSocketApi.subscribe("simul-in", RP.In.reader)(
     handler orElse remoteSocketApi.baseHandler
   ).andDo(send(P.Out.boot))
-}
 
-private object SimulSocket {
-  object Protocol {
-    object Out {
+private object SimulSocket:
+  object Protocol:
+    object Out:
       import lila.socket.RemoteSocket.Protocol.Out.commas
       def filterPresent(reqId: Int, simulId: Simul.ID, userIds: Set[User.ID]) =
         s"room/filter-present $reqId $simulId ${commas(userIds)}"
-    }
-  }
-}

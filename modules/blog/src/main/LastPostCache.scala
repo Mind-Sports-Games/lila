@@ -7,7 +7,7 @@ final class LastPostCache(
     notifier: Notifier,
     config: BlogConfig,
     cacheApi: CacheApi
-)(implicit ec: scala.concurrent.ExecutionContext) {
+)(implicit ec: scala.concurrent.ExecutionContext):
 
   private val cache = cacheApi.sync[Boolean, List[MiniPost]](
     name = "blog.lastPost",
@@ -20,13 +20,11 @@ final class LastPostCache(
 
   private def fetch: Fu[List[MiniPost]] = {
     api.prismicApi flatMap { prismic =>
-      api.recent(prismic, page = 1, lila.common.config.MaxPerPage(3), none) map {
-        _ so {
+      api.recent(prismic, page = 1, lila.common.config.MaxPerPage(3), none) map:
+        _ so:
           _.currentPageResults.toList flatMap MiniPost.fromDocument(config.collection, "main")
-        }
-      }
     }
-  } addEffect maybeNotifyLastPost
+  } `addEffect` maybeNotifyLastPost
 
   private var lastNotifiedId = none[String]
 
@@ -36,6 +34,5 @@ final class LastPostCache(
       lastNotifiedId = last.id.some
     }
 
-  def apply: List[MiniPost] = cache sync true
+  def apply: List[MiniPost] = cache `sync` true
 
-}

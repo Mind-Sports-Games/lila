@@ -3,7 +3,7 @@ package lila.forum
 import lila.db.dsl._
 import reactivemongo.api.ReadPreference
 
-final class CategRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionContext) {
+final class CategRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionContext):
 
   import BSONHandlers.CategBSONHandler
 
@@ -13,8 +13,8 @@ final class CategRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionCon
     coll
       .find(
         $or(
-          "team" $exists false,
-          $doc("team" $in teams)
+          "team" `$exists` false,
+          $doc("team" `$in` teams)
         )
       )
       .cursor[Categ](ReadPreference.secondaryPreferred)
@@ -22,4 +22,3 @@ final class CategRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionCon
 
   def nbPosts(id: String): Fu[Int] =
     coll.primitiveOne[Int]($id(id), "nbPosts").dmap(~_)
-}

@@ -2,14 +2,13 @@ package lila.team
 
 import play.api.data._
 import play.api.data.Forms._
-import scala.concurrent.duration._
 
 import lila.common.Form.{ cleanNonEmptyText, cleanText, numberIn }
 import lila.common.LameName
 import lila.common.extensions.*
 import lila.db.dsl._
 import lila.security.SecurityHelper
-import org.apache.http.protocol.ExecutionContext
+
 
 final private[team] class TeamForm(
     teamRepo: TeamRepo,
@@ -17,9 +16,9 @@ final private[team] class TeamForm(
     val captcher: lila.hub.actors.Captcher
 )(implicit ec: scala.concurrent.ExecutionContext)
     extends lila.hub.CaptchedForm
-    with SecurityHelper {
+    with SecurityHelper:
 
-  private object Fields {
+  private object Fields:
     val name     = "name"     -> cleanText(minLength = 3, maxLength = 60)
     val location = "location" -> optional(cleanText(minLength = 3, maxLength = 80))
     val password = "password" -> optional(cleanText(maxLength = 60))
@@ -38,9 +37,8 @@ final private[team] class TeamForm(
     val chat        = "chat"        -> numberIn(Team.ChatFor.all)
     val hideMembers = "hideMembers" -> boolean
     val hideForum   = "hideForum"   -> boolean
-  }
 
-  def create()(implicit ctx: lila.user.UserContext) = {
+  def create()(implicit ctx: lila.user.UserContext) =
     Form(
       mapping(
         Fields.name,
@@ -56,9 +54,8 @@ final private[team] class TeamForm(
       )(TeamSetup.apply)(d => Some((d.name, d.location, d.password, d.description, d.descPrivate, d.request, d.gameId, d.move, d.hideMembers, d.hideForum)))
         .verifying("team:teamAlreadyExists", d => !teamExists(d).await(2 seconds, "teamExists"))
         .verifying("team:teamLameName", d => !lameName(d))
-        .verifying(captchaFailMessage, validateCaptcha _)
+        .verifying(captchaFailMessage, validateCaptcha)
     )
-  }
 
   def edit(team: Team) =
     Form(
@@ -126,11 +123,10 @@ final private[team] class TeamForm(
       .mkString(", ")
 
   private def teamExists(setup: TeamSetup) =
-    teamRepo.coll.exists($id(Team nameToId setup.trim.name))
+    teamRepo.coll.exists($id(Team `nameToId` setup.trim.name))
 
   private def lameName(d: TeamSetup)(implicit ctx: lila.user.UserContext) =
     if (isGranted(_.Admin)(ctx)) false else LameName.team(d.name)
-}
 
 private[team] case class TeamSetup(
     name: String,
@@ -143,7 +139,7 @@ private[team] case class TeamSetup(
     move: String,
     hideMembers: Boolean,
     hideForum: Boolean
-) {
+):
 
   def isOpen = !request
 
@@ -154,7 +150,6 @@ private[team] case class TeamSetup(
       description = description.trim,
       descPrivate = descPrivate map (_.trim) filter (_.nonEmpty)
     )
-}
 
 private[team] case class TeamEdit(
     location: Option[String],
@@ -165,7 +160,7 @@ private[team] case class TeamEdit(
     chat: Team.ChatFor,
     hideMembers: Boolean,
     hideForum: Boolean
-) {
+):
 
   def isOpen = !request
 
@@ -175,7 +170,6 @@ private[team] case class TeamEdit(
       description = description.trim,
       descPrivate = descPrivate map (_.trim) filter (_.nonEmpty)
     )
-}
 
 private[team] case class RequestSetup(
     message: Option[String],

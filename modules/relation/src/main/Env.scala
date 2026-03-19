@@ -26,7 +26,7 @@ final class Env(
 )(implicit
     ec: scala.concurrent.ExecutionContext,
     system: ActorSystem
-) {
+):
 
   private val config = appConfig.get[RelationConfig]("relation")(AutoConfig.loader)
 
@@ -39,4 +39,3 @@ final class Env(
   lazy val api: RelationApi = wire[RelationApi]
 
   lazy val stream = wire[RelationStream]
-}

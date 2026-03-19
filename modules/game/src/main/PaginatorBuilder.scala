@@ -7,12 +7,12 @@ import lila.common.config.MaxPerPage
 import lila.db.dsl._
 import lila.db.paginator._
 
-final class PaginatorBuilder(gameRepo: GameRepo)(implicit ec: scala.concurrent.ExecutionContext) {
+final class PaginatorBuilder(gameRepo: GameRepo)(implicit ec: scala.concurrent.ExecutionContext):
 
   import BSONHandlers.gameBSONHandler
 
   def recentlyCreated(selector: Bdoc, nb: Option[Int] = None) =
-    apply(selector, Query.sortCreated, nb) _
+    apply(selector, Query.sortCreated, nb)
 
   def apply(selector: Bdoc, sort: Bdoc, nb: Option[Int] = None)(page: Int): Fu[Paginator[Game]] =
     apply(nb.fold(noCacheAdapter(selector, sort)) { cached =>
@@ -39,4 +39,3 @@ final class PaginatorBuilder(gameRepo: GameRepo)(implicit ec: scala.concurrent.E
 
   private def paginator(adapter: AdapterLike[Game], page: Int): Fu[Paginator[Game]] =
     Paginator(adapter, currentPage = page, maxPerPage = MaxPerPage(12))
-}

@@ -11,17 +11,17 @@ final class EmailChange(
     mailer: Mailer,
     baseUrl: BaseUrl,
     tokenerSecret: Secret
-)(implicit ec: scala.concurrent.ExecutionContext) {
+)(implicit ec: scala.concurrent.ExecutionContext):
 
   import Mailer.html._
 
   def send(user: User, email: EmailAddress): Funit =
-    tokener make TokenPayload(user.id, email).some flatMap { token =>
+    tokener `make` TokenPayload(user.id, email).some flatMap { token =>
       lila.mon.email.send.change.increment()
       implicit val lang = user.realLang | lila.i18n.defaultLang
       val url           = s"$baseUrl/account/email/confirm/$token"
       lila.log("auth").info(s"Change email URL ${user.username} $email $url")
-      mailer send Mailer.Message(
+      mailer `send` Mailer.Message(
         to = email,
         subject = trans.emailChange_subject.txt(user.username),
         text = s"""
@@ -45,36 +45,32 @@ ${Mailer.txt.serviceNote}
 
   // also returns the previous email address
   def confirm(token: String): Fu[Option[(User, Option[EmailAddress])]] =
-    tokener read token dmap (_.flatten) flatMap {
+    tokener `read` token `dmap` (_.flatten) flatMap:
       _ so { case TokenPayload(userId, email) =>
         userRepo.email(userId) flatMap { previous =>
           (userRepo.setEmail(userId, email).recoverDefault >> userRepo.byId(userId))
             .map2(_ -> previous)
         }
       }
-    }
 
   case class TokenPayload(userId: User.ID, email: EmailAddress)
 
   implicit final private val payloadSerializable: StringToken.Serializable[Option[TokenPayload]] =
-    new StringToken.Serializable[Option[TokenPayload]] {
+    new StringToken.Serializable[Option[TokenPayload]]:
       private val sep = ' '
       def read(str: String) =
-        str.split(sep) match {
-          case Array(id, email) => EmailAddress from email map { TokenPayload(id, _) }
+        str.split(sep) match
+          case Array(id, email) => EmailAddress `from` email map { TokenPayload(id, _) }
           case _                => none
-        }
       def write(a: Option[TokenPayload]) =
         a so { case TokenPayload(userId, EmailAddress(email)) =>
           s"$userId$sep$email"
         }
-    }
 
   private val tokener = new StringToken[Option[TokenPayload]](
     secret = tokenerSecret,
     getCurrentValue = p =>
       p so { case TokenPayload(userId, _) =>
-        userRepo email userId dmap (_.so(_.value))
+        userRepo `email` userId `dmap` (_.so(_.value))
       }
   )
-}

@@ -18,7 +18,7 @@ final class Env(
     ws: StandaloneWSClient,
     shutdown: org.apache.pekko.actor.CoordinatedShutdown,
     mode: Mode
-)(implicit ec: scala.concurrent.ExecutionContext) {
+)(implicit ec: scala.concurrent.ExecutionContext):
 
   private lazy val slackClient = new SlackClient(ws, appConfig.get[Secret]("slack.incoming.url"))
 
@@ -34,14 +34,11 @@ final class Env(
 
   lazy val discord: DiscordApi = wire[DiscordApi]
 
-  if (mode == Mode.Prod) {
+  if (mode == Mode.Prod)
     slack.publishInfo("PlayStrategy has started!")
-    Lilakka.shutdown(shutdown, _.PhaseBeforeServiceUnbind, "Tell slack")(slack.stop _)
-  }
+    Lilakka.shutdown(shutdown, _.PhaseBeforeServiceUnbind, "Tell slack")((() => slack.stop()))
 
-  lila.common.Bus.subscribeFun("slack", "plan", "userNote") {
+  lila.common.Bus.subscribeFun("slack", "plan", "userNote"):
     case d: ChargeEvent                                => slack.charge(d).discard
     case Note(from, to, text, true) if from != "Irwin" => slack.userModNote(from, to, text).discard
     case e: Event                                      => slack.publishEvent(e).discard
-  }
-}

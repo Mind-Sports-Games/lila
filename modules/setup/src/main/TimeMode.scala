@@ -2,7 +2,7 @@ package lila.setup
 
 sealed abstract class TimeMode(val id: Int)
 
-object TimeMode {
+object TimeMode:
 
   case object Unlimited           extends TimeMode(0)
   case object FischerClock        extends TimeMode(1)
@@ -32,4 +32,3 @@ object TimeMode {
     else if (game.hasSimpleDelayClock) SimpleDelayClock
     else if (game.hasCorrespondenceClock) Correspondence
     else Unlimited
-}

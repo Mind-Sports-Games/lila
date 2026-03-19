@@ -9,23 +9,21 @@ import lila.common.{ EmailAddress, LilaCookie }
 import lila.i18n.I18nKeys.{ emails => trans }
 import lila.user.{ User, UserRepo }
 
-trait EmailConfirm {
+trait EmailConfirm:
 
   def effective: Boolean
 
   def send(user: User, email: EmailAddress)(implicit lang: Lang): Funit
 
   def confirm(token: String): Fu[EmailConfirm.Result]
-}
 
-final class EmailConfirmSkip(userRepo: UserRepo) extends EmailConfirm {
+final class EmailConfirmSkip(userRepo: UserRepo) extends EmailConfirm:
 
   def effective = false
 
-  def send(user: User, email: EmailAddress)(implicit lang: Lang) = userRepo setEmailConfirmed user.id void
+  def send(user: User, email: EmailAddress)(implicit lang: Lang) = userRepo `setEmailConfirmed` user.id void
 
   def confirm(token: String): Fu[EmailConfirm.Result] = fuccess(EmailConfirm.Result.NotFound)
-}
 
 final class EmailConfirmMailer(
     userRepo: UserRepo,
@@ -33,7 +31,7 @@ final class EmailConfirmMailer(
     baseUrl: BaseUrl,
     tokenerSecret: Secret
 )(implicit ec: scala.concurrent.ExecutionContext)
-    extends EmailConfirm {
+    extends EmailConfirm:
 
   import Mailer.html._
 
@@ -42,11 +40,11 @@ final class EmailConfirmMailer(
   val maxTries = 3
 
   def send(user: User, email: EmailAddress)(implicit lang: Lang): Funit =
-    tokener make user.id flatMap { token =>
+    tokener `make` user.id flatMap { token =>
       lila.mon.email.send.confirmation.increment()
       val url = s"$baseUrl/signup/confirm/$token"
       lila.log("auth").info(s"Confirm URL ${user.username} ${email.value} $url")
-      mailer send Mailer.Message(
+      mailer `send` Mailer.Message(
         to = email,
         subject = trans.emailConfirm_subject.txt(user.username),
         text = s"""
@@ -76,35 +74,31 @@ ${trans.emailConfirm_ignore.txt("https://playstrategy.org")}
   import EmailConfirm.Result
 
   def confirm(token: String): Fu[Result] =
-    tokener read token flatMap {
+    tokener `read` token flatMap {
       _ so userRepo.enabledById
-    } flatMap {
+    } flatMap:
       _.fold[Fu[Result]](fuccess(Result.NotFound)) { user =>
-        userRepo.mustConfirmEmail(user.id) flatMap {
-          case true  => (userRepo setEmailConfirmed user.id) inject Result.JustConfirmed(user)
+        userRepo.mustConfirmEmail(user.id) flatMap:
+          case true  => (userRepo `setEmailConfirmed` user.id) inject Result.JustConfirmed(user)
           case false => fuccess(Result.AlreadyConfirmed(user))
-        }
       }
-    }
 
   private val tokener = new StringToken[User.ID](
     secret = tokenerSecret,
-    getCurrentValue = id => userRepo email id dmap (_.so(_.value))
+    getCurrentValue = id => userRepo `email` id `dmap` (_.so(_.value))
   )
-}
 
-object EmailConfirm {
+object EmailConfirm:
 
   sealed trait Result
-  object Result {
+  object Result:
     case class JustConfirmed(user: User)    extends Result
     case class AlreadyConfirmed(user: User) extends Result
     case object NotFound                    extends Result
-  }
 
   case class UserEmail(username: String, email: EmailAddress)
 
-  object cookie {
+  object cookie:
 
     val name        = "email_confirm"
     private val sep = ":"
@@ -121,7 +115,6 @@ object EmailConfirm {
       req.session get name map (_.split(sep, 2)) collect { case Array(username, email) =>
         UserEmail(username, EmailAddress(email))
       }
-  }
 
   import scala.concurrent.duration._
   import play.api.mvc.RequestHeader
@@ -150,13 +143,13 @@ object EmailConfirm {
   def rateLimit[A: Zero](userEmail: UserEmail, req: RequestHeader)(run: => Fu[A])(default: => Fu[A]): Fu[A] =
     rateLimitPerUser(userEmail.username, cost = 1) {
       rateLimitPerEmail(userEmail.email.value, cost = 1) {
-        rateLimitPerIP(HTTPRequest ipAddress req, cost = 1) {
+        rateLimitPerIP(HTTPRequest `ipAddress` req, cost = 1) {
           run
         }(default)
       }(default)
     }(default)
 
-  object Help {
+  object Help:
 
     sealed trait Status { val name: String }
     case class NoSuchUser(name: String)                     extends Status
@@ -182,19 +175,14 @@ object EmailConfirm {
     def getStatus(userRepo: UserRepo, username: String)(implicit
         ec: scala.concurrent.ExecutionContext
     ): Fu[Status] =
-      userRepo withEmails username flatMap {
+      userRepo `withEmails` username flatMap:
         case None => fuccess(NoSuchUser(username))
         case Some(User.WithEmails(user, emails)) =>
           if (!user.enabled) fuccess(Closed(username))
           else
-            userRepo mustConfirmEmail user.id dmap {
+            userRepo `mustConfirmEmail` user.id dmap:
               case true =>
-                emails.current match {
+                emails.current match
                   case None        => NoEmail(user.username)
                   case Some(email) => EmailSent(user.username, email)
-                }
               case false => Confirmed(user.username)
-            }
-      }
-  }
-}

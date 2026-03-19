@@ -29,7 +29,7 @@ final class Importer(env: Env) extends LilaController(env) {
 
   def sendGame =
     OpenBody { implicit ctx =>
-      implicit def req = ctx.body
+      implicit def req: play.api.mvc.Request[?] = ctx.body
       env.importer.forms.importForm
         .bindFromRequest()
         .fold(
@@ -60,7 +60,7 @@ final class Importer(env: Env) extends LilaController(env) {
     }
 
   def apiSendGame = {
-    def commonImport(req: Request[_], me: Option[lila.user.User]): Fu[Result] =
+    def commonImport(req: Request[?], me: Option[lila.user.User]): Fu[Result] =
       ImportRateLimitPerIP(HTTPRequest ipAddress req, cost = if (me.isDefined) 1 else 2) {
         env.importer.forms.importForm
           .bindFromRequest()(req, formBinding)

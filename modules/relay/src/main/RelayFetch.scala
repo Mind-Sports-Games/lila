@@ -31,23 +31,22 @@ final private class RelayFetch(
     gameProxy: GameProxyRepo,
     ws: StandaloneWSClient
 )(implicit scheduler: org.apache.pekko.actor.Scheduler)
-    extends Actor {
+    extends Actor:
 
   implicit def system: ActorSystem          = context.system
   implicit def ec: ExecutionContextExecutor = context.dispatcher
 
-  override def preStart(): Unit = {
+  override def preStart(): Unit =
     context setReceiveTimeout 20.seconds
     context.system.scheduler.scheduleOnce(10.seconds)(scheduleNext())
     ()
-  }
 
   case object Tick
 
   def scheduleNext(): Unit =
     { val _ = context.system.scheduler.scheduleOnce(500 millis, self, Tick) }
 
-  def receive = {
+  def receive =
 
     case ReceiveTimeout =>
       val msg = "RelaySync timed out!"
@@ -70,9 +69,8 @@ final private class RelayFetch(
             logger.info(s"Finish for lack of start ${rt.round}")
             api.update(rt.round)(_.finish)
           } else fuccess(rt.round)
-        }) addEffectAnyway scheduleNext()
+        }) `addEffectAnyway` scheduleNext()
       }.discard
-  }
 
   // no writing the relay; only reading!
   def processRelay(rt: RelayRound.WithTour): Fu[RelayRound] =
@@ -83,41 +81,40 @@ final private class RelayFetch(
         .addEffect(gs => { val _ = lila.mon.relay.games(rt.tour.official, rt.round.slug).update(gs.size) })
         .flatMap { games =>
           sync(rt, games)
-            .withTimeout(7 seconds, SyncResult.Timeout)
+            .withTimeout(7.seconds, SyncResult.Timeout.getMessage)
             .mon(_.relay.syncTime(rt.tour.official, rt.round.slug))
             .map { res =>
               res -> rt.round
-                .withSync(_ addLog SyncLog.event(res.moves, none))
+                .withSync(_ `addLog` SyncLog.event(res.moves, none))
                 .copy(finished = games.forall(_.end.isDefined))
             }
         }
         .recover { case e: Exception =>
           (e match {
-            case SyncResult.Timeout =>
+            case _: lila.core.lilaism.LilaTimeout =>
               if (rt.tour.official) logger.info(s"Sync timeout ${rt.round}")
               SyncResult.Timeout
             case _ =>
               if (rt.tour.official) logger.info(s"Sync error ${rt.round} ${e.getMessage take 80}")
               SyncResult.Error(e.getMessage)
-          }) -> rt.round.withSync(_ addLog SyncLog.event(0, e.some))
+          }) -> rt.round.withSync(_ `addLog` SyncLog.event(0, e.some))
         }
         .map { case (result, newRelay) =>
-          afterSync(result, newRelay withTour rt.tour)
+          afterSync(result, newRelay `withTour` rt.tour)
         }
 
   def afterSync(result: SyncResult, rt: RelayRound.WithTour): RelayRound =
-    result match {
+    result match
       case SyncResult.Ok(0, _) => continueRelay(rt)
       case SyncResult.Ok(nbMoves, _) =>
         lila.mon.relay.moves(rt.tour.official, rt.round.slug).increment(nbMoves)
-        continueRelay(rt.round.ensureStarted.resume withTour rt.tour)
+        continueRelay(rt.round.ensureStarted.resume `withTour` rt.tour)
       case _ => continueRelay(rt)
-    }
 
   def continueRelay(rt: RelayRound.WithTour): RelayRound =
     rt.round.sync.upstream.fold(rt.round) { upstream =>
       val seconds =
-        if (rt.round.sync.log.alwaysFails && !upstream.local) {
+        if (rt.round.sync.log.alwaysFails && !upstream.local)
           rt.round.sync.log.events.lastOption
             .filterNot(_.isTimeout)
             .flatMap(_.error)
@@ -125,17 +122,15 @@ final private class RelayFetch(
             slackApi.broadcastError(rt.round.id.value, rt.round.name, error)
           }
           60
-        } else
-          rt.round.sync.delay getOrElse {
+        else
+          rt.round.sync.delay getOrElse:
             if (upstream.local) 3 else 6
-          }
-      rt.round.withSync {
+      rt.round.withSync:
         _.copy(
           nextAt = DateTime.now plusSeconds {
             seconds atLeast { if (rt.round.sync.log.justTimedOut) 10 else 2 }
           } some
         )
-      }
     }
 
   import com.github.benmanes.caffeine.cache.Cache
@@ -153,7 +148,7 @@ final private class RelayFetch(
   )
 
   private def fetchGames(rt: RelayRound.WithTour): Fu[RelayGames] =
-    rt.round.sync.upstream so {
+    rt.round.sync.upstream so:
       case UpstreamIds(ids) =>
         gameRepo.gamesFromSecondary(ids) flatMap
           gameProxy.upgradeIfPresent flatMap
@@ -161,7 +156,7 @@ final private class RelayFetch(
             games =>
               Future.sequence(games.map { case (game, fen) =>
                 pgnDump(game, fen, gameIdsUpstreamPgnFlags).dmap(_.render)
-              }) dmap MultiPgn.apply
+              }) `dmap` MultiPgn.apply
           } flatMap RelayFetch.multiPgnToGames.apply
       case url: UpstreamUrl =>
         cache.asMap
@@ -176,7 +171,6 @@ final private class RelayFetch(
               }
           )
           .games
-    }
 
   // The goal of this is to make sure that an upstream used by several broadcast
   // is only pulled from as many times as necessary, and not more.
@@ -186,19 +180,18 @@ final private class RelayFetch(
     .build[UpstreamUrl, GamesSeenBy]()
     .underlying
 
-  private def doFetchUrl(upstream: UpstreamUrl, max: Int): Fu[RelayGames] = {
+  private def doFetchUrl(upstream: UpstreamUrl, max: Int): Fu[RelayGames] =
     import RelayFetch.DgtJson._
-    formatApi get upstream.withRound flatMap {
+    formatApi `get` upstream.withRound flatMap {
       case RelayFormat.SingleFile(doc) =>
-        doc.format match {
+        doc.format match
           // all games in a single PGN file
           case RelayFormat.DocFormat.Pgn => httpGet(doc.url) map { MultiPgn.split(_, max) }
           // maybe a single JSON game? Why not
           case RelayFormat.DocFormat.Json =>
-            httpGetJson[GameJson](doc.url)(gameReads) map { game =>
+            httpGetJson[GameJson](doc.url)(using gameReads) map { game =>
               MultiPgn(List(game.toPgn()))
             }
-        }
       case RelayFormat.ManyFiles(indexUrl, makeGameDoc) =>
         httpGetJson[RoundJson](indexUrl) flatMap { round =>
           Future.sequence(round.pairings.zipWithIndex
@@ -216,16 +209,14 @@ final private class RelayFetch(
             }
         }
     } flatMap RelayFetch.multiPgnToGames.apply
-  }
 
   private def httpGet(url: Url): Fu[String] =
     ws.url(url.toString)
       .withRequestTimeout(4.seconds)
       .get()
-      .flatMap {
+      .flatMap:
         case res if res.status == 200 => fuccess(res.body)
         case res                      => fufail(s"[${res.status}] $url")
-      }
 
   private def httpGetJson[A: Reads](url: Url): Fu[A] =
     for {
@@ -239,28 +230,26 @@ final private class RelayFetch(
             fuccess
           )
     } yield data
-}
 
-private object RelayFetch {
+private object RelayFetch:
 
   case class GamesSeenBy(games: Fu[RelayGames], seenBy: Set[RelayRound.Id])
 
   def maxChapters(tour: RelayTour) =
     lila.study.Study.maxChapters * (if (tour.official) 2 else 1)
 
-  private object DgtJson {
+  private object DgtJson:
     case class PairingPlayer(
         fname: Option[String],
         mname: Option[String],
         lname: Option[String],
         title: Option[String]
-    ) {
+    ):
       def fullName =
         some {
           List(fname, mname, lname).flatten mkString " "
         }.filter(_.nonEmpty)
-    }
-    case class RoundJsonPairing(p1: PairingPlayer, p2: PairingPlayer, result: String) {
+    case class RoundJsonPairing(p1: PairingPlayer, p2: PairingPlayer, result: String):
       def tags =
         Tags(
           List(
@@ -279,52 +268,48 @@ private object RelayFetch {
             Tag(_.Result, result).some
           ).flatten
         )
-    }
     case class RoundJson(pairings: List[RoundJsonPairing])
-    implicit val pairingPlayerReads: Reads[PairingPlayer]   = Json.reads[PairingPlayer]
-    implicit val roundPairingReads: Reads[RoundJsonPairing] = Json.reads[RoundJsonPairing]
-    implicit val roundReads: Reads[RoundJson]               = Json.reads[RoundJson]
+    implicit val pairingPlayerReads: Reads[PairingPlayer]         = Json.reads[PairingPlayer]
+    implicit val roundPairingReads: Reads[RoundJsonPairing]     = Json.reads[RoundJsonPairing]
+    implicit val roundReads: Reads[RoundJson]                   = Json.reads[RoundJson]
 
     //This is compatible with multiaction if turns include comma separated actions
-    case class GameJson(turns: List[String], result: Option[String]) {
-      def toPgn(extraTags: Tags = Tags.empty) = {
+    case class GameJson(turns: List[String], result: Option[String]):
+      def toPgn(extraTags: Tags = Tags.empty) =
         val strTurns = turns.map(_ split ' ') map { turn =>
           Turn(
-            san = ~turn.headOption,
+            san = turn.headOption.getOrElse(""),
             secondsLeft = turn.lift(1).map(_.takeWhile(_.isDigit)) flatMap (_.toIntOption)
           )
         } mkString " "
         s"$extraTags\n\n$strTurns"
-      }
-    }
     implicit val gameReads: Reads[GameJson] = Json.reads[GameJson]
-  }
 
-  object multiPgnToGames {
+  object multiPgnToGames:
 
     import scala.util.{ Failure, Success, Try }
 
     def apply(multiPgn: MultiPgn): Fu[Vector[RelayGame]] =
-      multiPgn.value
-        .foldLeft[Try[(Vector[RelayGame], Int)]](Success(Vector.empty -> 0)) {
-          case (Success((acc, index)), pgn) =>
-            pgnCache.get(pgn) flatMap { f =>
-              val game = f(index)
-              if (game.isEmpty) Failure(LilaException(s"Found an empty PGN at index $index"))
-              else Success((acc :+ game, index + 1))
-            }
-          case (acc, _) => acc
-        }
-        .future
-        .dmap(_._1)
+      Future.fromTry(
+        multiPgn.value
+          .foldLeft[Try[(Vector[RelayGame], Int)]](Success(Vector.empty -> 0)) {
+            case (Success((acc, index)), pgn) =>
+              pgnCache.get(pgn) flatMap { f =>
+                val game = f(index)
+                if (game.isEmpty) Failure(LilaException(s"Found an empty PGN at index $index"))
+                else Success((acc :+ game, index + 1))
+              }
+            case (acc, _) => acc
+          }
+      ).dmap(_._1)
 
     private val pgnCache: LoadingCache[String, Try[Int => RelayGame]] = CacheApi.scaffeineNoScheduler
       .expireAfterAccess(2 minutes)
       .maximumSize(512)
       .build(compute)
 
-    private def compute(pgn: String): Try[Int => RelayGame] = {
-      implicit val variant = Variant.Chess(ChessVariant.default)
+    private def compute(pgn: String): Try[Int => RelayGame] =
+      implicit val variant: Variant = Variant.Chess(ChessVariant.default)
       lila.study
         .PgnImport(pgn, Nil)
         .fold(
@@ -343,6 +328,3 @@ private object RelayFetch {
               )
             )
         )
-    }
-  }
-}

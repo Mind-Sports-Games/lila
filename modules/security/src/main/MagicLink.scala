@@ -1,6 +1,5 @@
 package lila.security
 
-import scala.concurrent.duration._
 import scalatags.Text.all._
 
 import lila.common.config._
@@ -13,16 +12,16 @@ final class MagicLink(
     userRepo: UserRepo,
     baseUrl: BaseUrl,
     tokenerSecret: Secret
-)(implicit ec: scala.concurrent.ExecutionContext) {
+)(implicit ec: scala.concurrent.ExecutionContext):
 
   import Mailer.html._
 
   def send(user: User, email: EmailAddress): Funit =
-    tokener make user.id flatMap { token =>
+    tokener `make` user.id flatMap { token =>
       lila.mon.email.send.magicLink.increment()
       val url           = s"$baseUrl/auth/magic-link/login/$token"
       implicit val lang = user.realLang | lila.i18n.defaultLang
-      mailer send Mailer.Message(
+      mailer `send` Mailer.Message(
         to = email,
         subject = trans.logInToPlayStrategy.txt(user.username),
         text = s"""
@@ -43,14 +42,12 @@ ${Mailer.txt.serviceNote}
     }
 
   def confirm(token: String): Fu[Option[User]] =
-    tokener read token flatMap { _ so userRepo.enabledById } map {
+    tokener `read` token flatMap { _ so userRepo.enabledById } map:
       _.filter(_.canFullyLogin)
-    }
 
   private val tokener = LoginToken.makeTokener(tokenerSecret, 10 minutes)
-}
 
-object MagicLink {
+object MagicLink:
 
   import scala.concurrent.duration._
   import play.api.mvc.RequestHeader
@@ -81,9 +78,8 @@ object MagicLink {
   )(default: => Fu[A]): Fu[A] =
     rateLimitPerUser(user.id, cost = 1) {
       rateLimitPerEmail(email.value, cost = 1) {
-        rateLimitPerIP(HTTPRequest ipAddress req, cost = 1) {
+        rateLimitPerIP(HTTPRequest `ipAddress` req, cost = 1) {
           run
         }(default)
       }(default)
     }(default)
-}

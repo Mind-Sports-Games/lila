@@ -185,9 +185,9 @@ object mod {
       isGranted(_.ModMessage) option
         postForm(action := routes.Mod.warn(u.username, ""), cls := "pm-preset")(
           st.select(
-            option(value := "")("Send PM"),
+            scalatags.Text.tags.option(value := "")("Send PM"),
             pmPresets.value.map { preset =>
-              option(st.value := preset.name, title := preset.text)(preset.name)
+              scalatags.Text.tags.option(st.value := preset.name, title := preset.text)(preset.name)
             }
           )
         ),
@@ -296,8 +296,8 @@ object mod {
                 " ",
                 b(e.showAction),
                 " ",
-                e.gameId.fold[Frag](~e.details) { gameId =>
-                  a(href := s"${routes.Round.watcher(gameId, "p1").url}?pov=${~e.user}")(~e.details)
+                e.gameId.fold[Frag](e.details.getOrElse("")) { gameId =>
+                  a(href := s"${routes.Round.watcher(gameId, "p1").url}?pov=${e.user.getOrElse("")}")(e.details.getOrElse(""))
                 },
                 " ",
                 momentFromNowServer(e.date)
@@ -583,7 +583,7 @@ object mod {
                   .mkString(", ")
               ),
               td(dataSort := o.count.game)(o.count.game.localize),
-              markTd(~bans.get(o.id), playban(cls := "text")(~bans.get(o.id))),
+              markTd(bans.getOrElse(o.id, 0), playban(cls := "text")(bans.getOrElse(o.id, 0))),
               markTd(o.marks.alt so 1, alt),
               markTd(o.marks.troll so 1, shadowban),
               markTd(o.marks.boost so 1, boosting),

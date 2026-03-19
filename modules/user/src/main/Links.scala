@@ -3,39 +3,36 @@ package lila.user
 import io.lemonlabs.uri.Url
 import scala.util.Try
 
-object Links {
+object Links:
 
   def make(text: String): List[Link] = text.linesIterator.to(List).map(_.trim).flatMap(toLink)
 
   private val UrlRegex = """^(?:https?://)?+([^/]+)""".r.unanchored
 
   private def toLink(line: String): Option[Link] =
-    line match {
+    line match
       case UrlRegex(domain) =>
-        Link.Site.allKnown find (_ matches domain) orElse
+        Link.Site.allKnown find (_ `matches` domain) orElse
           Try(Url.parse(domain).toStringPunycode).toOption.map(Link.Site.Other) map { site =>
             Link(
               site = site,
-              url = if (line startsWith "http") line else s"https://$line"
+              url = if (line `startsWith` "http") line else s"https://$line"
             )
           }
       case _ => none
-    }
-}
 
 case class Link(site: Link.Site, url: String)
 
-object Link {
+object Link:
 
-  sealed abstract class Site(val name: String, val domains: List[String]) {
+  sealed abstract class Site(val name: String, val domains: List[String]):
 
     def matches(domain: String) =
       domains.exists { d =>
         domain == d || domain.endsWith(s".$d")
       }
-  }
 
-  object Site {
+  object Site:
     case object Twitter              extends Site("Twitter", List("twitter.com"))
     case object Facebook             extends Site("Facebook", List("facebook.com"))
     case object YouTube              extends Site("YouTube", List("youtube.com"))
@@ -58,5 +55,3 @@ object Link {
       Chess24,
       ChessTempo
     )
-  }
-}

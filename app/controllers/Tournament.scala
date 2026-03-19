@@ -24,7 +24,7 @@ final class Tournament(
     env: Env,
     apiC: => Api
 )(implicit
-    mat: akka.stream.Materializer
+    mat: org.apache.pekko.stream.Materializer
 ) extends LilaController(env) {
 
   private def repo     = env.tournament.tournamentRepo
@@ -397,7 +397,7 @@ final class Tournament(
 
   def apiUpdate(id: String) =
     ScopedBody(_.Tournament.Write) { implicit req => me =>
-      implicit def lang = reqLang
+      implicit def lang: play.api.i18n.Lang = reqLang
       repo byId id flatMap {
         _.filter(_.createdBy == me.id || isGranted(_.ManageTournament, me)) so { tour =>
           env.team.api.lightsByLeader(me.id) flatMap { teams =>
@@ -484,7 +484,7 @@ final class Tournament(
 
   def apiTeamBattleUpdate(id: String) =
     ScopedBody(_.Tournament.Write) { implicit req => me =>
-      implicit def lang = reqLang
+      implicit def lang: play.api.i18n.Lang = reqLang
       repo byId id flatMap {
         _ so {
           case tour if (tour.createdBy == me.id || isGranted(_.ManageTournament, me)) && !tour.isFinished =>
@@ -646,7 +646,7 @@ final class Tournament(
 
   def byTeam(id: String) =
     Action.async { implicit req =>
-      implicit val lang = reqLang
+      implicit val lang: play.api.i18n.Lang = reqLang
       apiC.jsonStream {
         repo
           .byTeamCursor(id)

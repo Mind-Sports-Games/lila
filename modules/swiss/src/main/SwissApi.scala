@@ -3,11 +3,10 @@ package lila.swiss
 import org.apache.pekko.stream.scaladsl._
 import org.joda.time.DateTime
 import alleycats.Zero
-import reactivemongo.akkastream.cursorProducer
+import reactivemongo.pekkostream.cursorProducer
 import reactivemongo.api._
 import reactivemongo.api.bson._
 import scala.concurrent.duration._
-import scala.util.chaining._
 
 import lila.chat.Chat
 import lila.common.config.MaxPerSecond
@@ -19,8 +18,6 @@ import lila.hub.LightTeam.TeamID
 import lila.round.actorApi.round.QuietFlag
 import lila.user.{ User, UserRepo }
 import lila.i18n.VariantKeys
-
-import strategygames.{ GameLogic, Player }
 
 final class SwissApi(
     colls: SwissColls,
@@ -43,9 +40,9 @@ final class SwissApi(
 )(implicit
     ec: scala.concurrent.ExecutionContext,
     scheduler: org.apache.pekko.actor.Scheduler,
-    mat: akka.stream.Materializer,
+    mat: org.apache.pekko.stream.Materializer,
     mode: play.api.Mode
-) {
+):
 
   private val sequencer =
     new lila.hub.DuctSequencers(
@@ -63,7 +60,7 @@ final class SwissApi(
   def createdById(id: Swiss.Id)     = byId(id).dmap(_.filter(_.isCreated))
   def startedById(id: Swiss.Id)     = byId(id).dmap(_.filter(_.isStarted))
 
-  def create(data: SwissForm.SwissData, me: User, teamId: TeamID): Fu[Swiss] = {
+  def create(data: SwissForm.SwissData, me: User, teamId: TeamID): Fu[Swiss] =
     val swiss = Swiss(
       _id = Swiss.makeId,
       name = data.name | GreatPlayer.randomName,
@@ -109,7 +106,6 @@ final class SwissApi(
       )
     )
     colls.swiss.insert.one(addFeaturable(swiss)).andDo(cache.featuredInTeam.invalidate(swiss.teamId)) inject swiss
-  }
 
   def update(swiss: Swiss, data: SwissForm.SwissData): Funit =
     Sequencing(swiss.id)(byId) { old =>
@@ -185,7 +181,7 @@ final class SwissApi(
         }
       if (
         (swiss.settings.handicapped || swiss.settings.mcmahon) && old.settings.inputPlayerRatings != ~data.inputPlayerRatings
-      ) {
+      )
         val playerRatingMap = Handicaps.playerInputRatings(swiss.settings.inputPlayerRatings)
         Future.sequence(playerRatingMap.toList.map { case (u, r) =>
           colls.player
@@ -200,16 +196,14 @@ final class SwissApi(
           playerRatingMap.keys.toList.map(u => SwissPlayer.Id(s"${swiss.id}:${u}"))
         ) >>
           recomputeAndUpdateAll(swiss.id)
-      } else if (
+      else if (
         !(swiss.settings.handicapped || swiss.settings.mcmahon) && (old.settings.handicapped || old.settings.mcmahon)
-      ) {
+      )
         unsetAllPlayerInputRating(swiss.id) >>
           recomputeAndUpdateAll(swiss.id)
-      }
-      colls.swiss.update.one($id(old.id), addFeaturable(swiss)).void.andDo {
+      colls.swiss.update.one($id(old.id), addFeaturable(swiss)).void.andDo:
         cache.roundInfo.put(swiss.id, fuccess(swiss.roundInfo.some))
         socket.reload(swiss.id)
-      }
     } >> {
       if (swiss.settings.mcmahon)
         recomputeAndUpdateAll(swiss.id) //need to update player points preStart
@@ -219,14 +213,13 @@ final class SwissApi(
   private def unsetAllPlayerInputRating(
       swissId: Swiss.Id,
       retainedPlayerIds: List[SwissPlayer.Id] = List()
-  ): Funit = {
+  ): Funit =
     colls.player.list[SwissPlayer]($doc(SwissPlayer.Fields.swissId -> swissId)) map { players =>
       Future.sequence(players
         .filter(p => !retainedPlayerIds.contains(p.id))
         .map { p => unsetPlayerInputRating(p.id) })
         .discard
     }
-  }
 
   private def unsetPlayerInputRating(playerId: SwissPlayer.Id): Funit =
     colls.player.update
@@ -241,19 +234,17 @@ final class SwissApi(
       old.settings.manualRounds so {
         if (old.isCreated) colls.swiss.updateField($id(old.id), "startsAt", date).void
         else if (old.isStarted && old.nbOngoing == 0)
-          colls.swiss.updateField($id(old.id), "nextRoundAt", date).void.andDo {
-            val show = org.joda.time.format.DateTimeFormat.forStyle("MS") print date
+          colls.swiss.updateField($id(old.id), "nextRoundAt", date).void.andDo:
+            val show = org.joda.time.format.DateTimeFormat.forStyle("MS") `print` date
             systemChat(swiss.id, s"Round ${swiss.round.value + 1} scheduled at $show UTC")
-          }
         else funit
       }.andDo(socket.reload(swiss.id))
     }
 
   def verdicts(swiss: Swiss, me: Option[User]): Fu[SwissCondition.All.WithVerdicts] =
-    me match {
+    me match
       case None       => fuccess(swiss.settings.conditions.accepted)
       case Some(user) => verify(swiss, user)
-    }
 
   def join(id: Swiss.Id, me: User, isInTeam: TeamID => Boolean, password: Option[String]): Fu[Boolean] =
     Sequencing(id)(notFinishedById) { swiss =>
@@ -263,7 +254,7 @@ final class SwissApi(
           .updateField($id(SwissPlayer.makeId(swiss.id, me.id)), SwissPlayer.Fields.absent, false)
           .flatMap { rejoin =>
             fuccess(rejoin.n == 1) >>| { // if the match failed (not the update!), try a join
-              (swiss.isEnterable && isInTeam(swiss.teamId)) so {
+              (swiss.isEnterable && isInTeam(swiss.teamId)) so:
                 colls.player.insert.one(
                   SwissPlayer.make(
                     swiss.id,
@@ -273,7 +264,6 @@ final class SwissApi(
                   )
                 ) zip
                   colls.swiss.update.one($id(swiss.id), $inc("nbPlayers" -> 1)) inject true
-              }
             }
           }
     } flatMap { res =>
@@ -284,11 +274,11 @@ final class SwissApi(
       swissId: Swiss.Id,
       batchSize: Int = 0,
       readPreference: ReadPreference = ReadPreference.secondaryPreferred
-  ): Source[Game.ID, _] =
+  ): Source[Game.ID, ?] =
     SwissPairing.fields { f =>
       colls.pairing
         .find($doc(f.swissId -> swissId), $id(true).some)
-        .sort($sort asc f.round)
+        .sort($sort `asc` f.round)
         .batchSize(batchSize)
         .cursor[Bdoc](readPreference)
         .documentSource()
@@ -303,36 +293,36 @@ final class SwissApi(
   def visibleByTeam(teamId: TeamID, nbPast: Int, nbSoon: Int): Fu[Swiss.PastAndNext] =
     (nbPast > 0).so {
       colls.swiss
-        .find($doc("teamId" -> teamId, "finishedAt" $exists true))
-        .sort($sort desc "startsAt")
+        .find($doc("teamId" -> teamId, "finishedAt" `$exists` true))
+        .sort($sort `desc` "startsAt")
         .cursor[Swiss]()
         .list(nbPast)
     } zip
       (nbSoon > 0).so {
         colls.swiss
-          .find($doc("teamId" -> teamId, "finishedAt" $exists false))
-          .sort($sort asc "startsAt")
+          .find($doc("teamId" -> teamId, "finishedAt" `$exists` false))
+          .sort($sort `asc` "startsAt")
           .cursor[Swiss]()
           .list(nbSoon)
       } map
-      (Swiss.PastAndNext.apply _).tupled
+      Swiss.PastAndNext.apply.tupled
 
   def playerInfo(swiss: Swiss, userId: User.ID): Fu[Option[SwissPlayer.ViewExt]] =
-    userRepo named userId flatMap {
+    userRepo `named` userId flatMap:
       _ so { user =>
-        colls.player.byId[SwissPlayer](SwissPlayer.makeId(swiss.id, user.id).value) flatMap {
+        colls.player.byId[SwissPlayer](SwissPlayer.makeId(swiss.id, user.id).value) flatMap:
           _ so { player =>
             SwissPairing.fields { f =>
               colls.pairing
                 .find($doc(f.swissId -> swiss.id, f.players -> player.userId))
-                .sort($sort asc f.round)
+                .sort($sort `asc` f.round)
                 .cursor[SwissPairing]()
                 .list()
             } flatMap {
               pairingViews(_, player)
             } flatMap { pairings =>
               SwissPlayer.fields { f =>
-                colls.player.countSel($doc(f.swissId -> swiss.id, f.score $gt player.score)).dmap(1.+)
+                colls.player.countSel($doc(f.swissId -> swiss.id, f.score `$gt` player.score)).dmap(1.+)
               } map { rank =>
                 val pairingMap = pairings.view.map { p =>
                   p.pairing.round -> p
@@ -349,9 +339,7 @@ final class SwissApi(
               }
             }
           }
-        }
       }
-    }
 
   def playerToPairingGames(playerView: SwissPlayer.ViewExt): Fu[List[SwissPairingGames]] =
     playerView.pairings.values.toList.map(_.pairing).map { p =>
@@ -364,15 +352,14 @@ final class SwissApi(
         p.nbGamesPerRound,
         p.openingFEN
       )
-    } match {
+    } match
       case Nil => fuccess(List.empty[SwissPairingGames])
       case ids => toSwissPairingGames(playerView.player.swissId, ids)
-    }
 
   def pairingViews(pairings: Seq[SwissPairing], player: SwissPlayer): Fu[Seq[SwissPairing.View]] =
     pairings.headOption so { first =>
       colls.player
-        .list[SwissPlayer]($inIds(pairings.map(_ opponentOf player.userId).map {
+        .list[SwissPlayer]($inIds(pairings.map(_ `opponentOf` player.userId).map {
           SwissPlayer.makeId(first.swissId, _)
         }))
         .flatMap { opponents =>
@@ -382,9 +369,8 @@ final class SwissApi(
             }
           } map { opponents =>
             pairings flatMap { pairing =>
-              opponents.find(_.player.userId == pairing.opponentOf(player.userId)) map {
+              opponents.find(_.player.userId == pairing.opponentOf(player.userId)) map:
                 SwissPairing.View(pairing, _)
-              }
             }
           }
         }
@@ -396,9 +382,9 @@ final class SwissApi(
         colls.player.primitive[User.ID](
           selector = $doc(
             f.swissId -> id,
-            f.userId $startsWith valid
+            f.userId `$startsWith` valid
           ),
-          sort = $sort desc f.score,
+          sort = $sort `desc` f.score,
           nb = nb,
           field = f.userId
         )
@@ -406,23 +392,20 @@ final class SwissApi(
     }
 
   def pageOf(swiss: Swiss, userId: User.ID): Fu[Option[Int]] =
-    rankingApi(swiss) map {
+    rankingApi(swiss) map:
       _ get userId map { rank =>
         (rank - 1) / 10 + 1
       }
-    }
 
   def gameView(pov: Pov): Fu[Option[GameView]] =
-    (pov.game.swissId.map(Swiss.Id.apply) so byId) flatMap {
+    (pov.game.swissId.map(Swiss.Id.apply) so byId) flatMap:
       _ so { swiss =>
-        getGameRanks(swiss, pov.game) dmap {
+        getGameRanks(swiss, pov.game) dmap:
           GameView(swiss, _).some
-        }
       }
-    }
 
   private def getGameRanks(swiss: Swiss, game: Game): Fu[Option[GameRanks]] =
-    ~ {
+    ~
       game.p1Player.userId.ifTrue(swiss.isStarted) flatMap { p1Id =>
         game.p2Player.userId map { p2Id =>
           rankingApi(swiss) map { ranking =>
@@ -433,7 +416,6 @@ final class SwissApi(
           }
         }
       }
-    }
 
   private[swiss] def kickFromTeam(teamId: TeamID, userId: User.ID) =
     colls.swiss.secondaryPreferred
@@ -455,7 +437,7 @@ final class SwissApi(
           .aggregateWith[Bdoc]() { framework =>
             import framework._
             List(
-              Match($doc("teamId" $in teamIds, "featurable" -> true)),
+              Match($doc("teamId" `$in` teamIds, "featurable" -> true)),
               PipelineOperator(
                 $doc(
                   "$lookup" -> $doc(
@@ -477,7 +459,7 @@ final class SwissApi(
                   )
                 )
               ),
-              Match("player" $ne $arr()),
+              Match("player" `$ne` $arr()),
               Project($id(true))
             )
           }
@@ -536,7 +518,7 @@ final class SwissApi(
   private[swiss] def toGamesMap(pairs: List[(Game.ID, Option[Game])]): Map[Game.ID, Game] =
     pairs.collect { case (id, Some(g)) =>
       (id, g)
-    } toMap
+    }.toMap
 
   private[swiss] def getGamesMap(ids: List[Game.ID]): Fu[Map[Game.ID, Game]] =
     roundSocket.getGames(ids) map toGamesMap
@@ -573,16 +555,15 @@ final class SwissApi(
     }
 
   def getSwissPairingGamesForGame(game: Game): Fu[Option[SwissPairingGames]] =
-    getSwissPairingForGame(game).flatMap {
+    getSwissPairingForGame(game).flatMap:
       _ so { pairing =>
         getGamesMap(pairing.multiMatchGameIds.foldLeft(List(pairing.id))(_ ++ _)) map { gamesById =>
           toSwissPairingGames(pairing.swissId, pairing, gamesById).head.some
         }
       }
-    }
 
   def getSwissPairingGameIds(gameId: Game.ID): Fu[Option[SwissPairingGameIds]] =
-    getSwissPairingFromGameId(gameId).map {
+    getSwissPairingFromGameId(gameId).map:
       _.map { pairing =>
         SwissPairingGameIds(
           gameId,
@@ -594,7 +575,6 @@ final class SwissApi(
           pairing.openingFEN
         )
       }
-    }
 
   private[swiss] def getSwissPairingFromGameId(gameId: Game.ID): Fu[Option[SwissPairing]] =
     SwissPairing.fields { f =>
@@ -611,16 +591,14 @@ final class SwissApi(
   private[swiss] def getSwissPairingForGame(game: Game): Fu[Option[SwissPairing]] =
     getSwissPairingFromGameId(game.id)
 
-  private[swiss] def updateMultiMatchProgress(game: Game): Funit = {
-    getSwissPairingForGame(game).flatMap {
+  private[swiss] def updateMultiMatchProgress(game: Game): Funit =
+    getSwissPairingForGame(game).flatMap:
       _ so { pairing =>
         getGamesMap(pairing.multiMatchGameIds.foldLeft(List(pairing.id))(_ ++ _)) map { gamesById =>
           toSwissPairingGames(pairing.swissId, pairing, gamesById) map updateMultiMatchProgress
         }
       }
-    }
     funit
-  }
 
   private[swiss] def rematchForMultiGame(spgame: SwissPairingGames): Funit =
     getSwissPairingForGame(spgame.game) map { pairing =>
@@ -653,7 +631,8 @@ final class SwissApi(
               )
             }
           }
-        }.discard
+        }
+        ()
       }
     }
 
@@ -662,7 +641,7 @@ final class SwissApi(
       spgame.finishedOrAborted,
       spgame.isBestOfX || spgame.isPlayX || spgame.isMultiPoint,
       spgame.multiMatchGames
-    ) match {
+    ) match
       case (true, _, _)        => finishGame(spgame)
       case (false, true, None) => rematchForMultiGame(spgame)
       case (false, true, Some(g)) => {
@@ -674,14 +653,13 @@ final class SwissApi(
       }
       case (false, false, _) =>
         sys.error("Why is this being called when the game isn't finished and not a multimatch!?")
-    }
 
   private[swiss] def finishGame(game: SwissPairingGames): Funit =
     Sequencing(game.swissId)(byId) { swiss =>
-      if (!swiss.isStarted) {
+      if (!swiss.isStarted)
         logger.info(s"Removing pairing ${game.game.id} finished after swiss ${swiss.id}")
         colls.pairing.delete.one($id(game.game.id)) inject false
-      } else {
+      else
         colls.pairing.update
           .one(
             $id(game.game.id),
@@ -703,9 +681,8 @@ final class SwissApi(
               if (swiss.nbOngoing > 0)
                 colls.swiss.update.one($id(swiss.id), $inc("nbOngoing" -> -1))
               else
-                fuccess {
+                fuccess:
                   logger.warn(s"swiss ${swiss.id} nbOngoing = ${swiss.nbOngoing}")
-                }
             } >>
               Future.sequence(game.playersWhoDidNotMove
                 .filter(p =>
@@ -721,18 +698,17 @@ final class SwissApi(
                       .void
                   }
                 }) >> {
-                (swiss.nbOngoing <= 1) so {
+                (swiss.nbOngoing <= 1) so:
                   if (swiss.round.value == swiss.settings.nbRounds) doFinish(swiss)
-                  else if (swiss.settings.manualRounds) fuccess {
+                  else if (swiss.settings.manualRounds) fuccess:
                     systemChat(swiss.id, s"Round ${swiss.round.value + 1} needs to be scheduled.")
-                  }
                   else
                     colls.swiss
                       .updateField(
                         $id(swiss.id),
                         "nextRoundAt",
                         swiss.settings.dailyInterval match {
-                          case Some(days) => game.createdAt plusDays days
+                          case Some(days) => game.createdAt `plusDays` days
                           case None =>
                             DateTime.now.plusSeconds(
                               if (swiss.isHalfway && swiss.settings.halfwayBreak.toSeconds.toInt != 0)
@@ -745,14 +721,11 @@ final class SwissApi(
                         swiss.id,
                         s"Round ${swiss.round.value + 1}${medleyRoundText(swiss, 1)} will start soon."
                       ))
-                }
               } inject true
           }
-      }
-    }.flatMap {
+    }.flatMap:
       case true => recomputeAndUpdateAll(game.swissId)
       case _    => funit
-    }
 
   private def medleyRoundText(swiss: Swiss, offset: Int = 0) =
     if (swiss.isMedley)
@@ -766,18 +739,17 @@ final class SwissApi(
 
   private[swiss] def finish(oldSwiss: Swiss): Funit =
     Sequencing(oldSwiss.id)(startedById) { swiss =>
-      colls.pairing.exists($doc(SwissPairing.Fields.swissId -> swiss.id)) flatMap {
+      colls.pairing.exists($doc(SwissPairing.Fields.swissId -> swiss.id)) flatMap:
         if (_) doFinish(swiss)
         else destroy(swiss)
-      }
     }
 
   private def getWinner(id: Swiss.Id) =
     SwissPlayer
       .fields { f =>
         colls.player.primitiveOne[User.ID](
-          $doc(f.swissId -> id, f.disqualified $ne true),
-          $sort desc f.score,
+          $doc(f.swissId -> id, f.disqualified `$ne` true),
+          $sort `desc` f.score,
           f.userId
         )
       }
@@ -794,26 +766,23 @@ final class SwissApi(
               "winnerId"   -> winnerUserId
             )
           )
-          .void zip
+          .void >>
           SwissPairing.fields { f =>
             colls.pairing.delete.one($doc(f.swissId -> swiss.id, f.status -> true)) map { res =>
               if (res.n > 0) logger.warn(s"Swiss ${swiss.id} finished with ${res.n} ongoing pairings")
             }
-          } void
-      }.andDo {
+          }.void
+      }.andDo:
       systemChat(swiss.id, s"Tournament completed!")
       socket.reload(swiss.id)
-      scheduler
-        .scheduleOnce(10 seconds) {
+      val _ = scheduler
+        .scheduleOnce(10 seconds):
           // we're delaying this to make sure the ranking has been recomputed
           // since doFinish is called by finishGame before that
           rankingApi(swiss) foreach { ranking =>
             Bus.publish(SwissFinish(swiss.id, ranking), "swissFinish")
           }
-          awardTrophies(swiss).discard
-        }
-        .discard
-    }
+          val _ = awardTrophies(swiss)
 
   def kill(swiss: Swiss): Funit = {
     if (swiss.isStarted)
@@ -822,18 +791,18 @@ final class SwissApi(
     else funit
   }.andDo(cache.featuredInTeam.invalidate(swiss.teamId))
 
-  private def awardTrophies(swiss: Swiss, date: DateTime = DateTime.now): Funit = {
+  private def awardTrophies(swiss: Swiss, date: DateTime = DateTime.now): Funit =
     SwissPlayer
       .fields { f =>
         colls.player.primitive[User.ID](
-          $doc(f.swissId -> swiss.id, f.disqualified $ne true),
-          $sort desc f.score,
+          $doc(f.swissId -> swiss.id, f.disqualified `$ne` true),
+          $sort `desc` f.score,
           3,
           f.userId
         )
       }
-      .map(userIds =>
-        swiss.trophies
+      .map { userIds =>
+        val _ = swiss.trophies
           .zip(userIds)
           .map { case (t, p) => t.zip(p.some) }
           .flatten
@@ -847,47 +816,44 @@ final class SwissApi(
               date
             )
           }
-          .discard
-      )
-  }
+      }
 
   def winnersByTrophy(trophy: String): Fu[List[Swiss]] =
     colls.swiss
-      .find($doc("trophy1st" -> trophy, "finishedAt" $exists true))
-      .sort($sort desc "startsAt")
+      .find($doc("trophy1st" -> trophy, "finishedAt" `$exists` true))
+      .sort($sort `desc` "startsAt")
       .cursor[Swiss]()
       .list()
 
   def nextByTrophy(trophy: String): Fu[Option[Swiss]] =
     colls.swiss
-      .find($doc("trophy1st" -> trophy, "finishedAt" $exists false))
-      .sort($sort asc "startsAt")
+      .find($doc("trophy1st" -> trophy, "finishedAt" `$exists` false))
+      .sort($sort `asc` "startsAt")
       .cursor[Swiss]()
       .headOption
 
-  def roundInfo = cache.roundInfo.get _
+  def roundInfo = cache.roundInfo.get
 
   def byTeamCursor(teamId: TeamID) =
     colls.swiss
       .find($doc("teamId" -> teamId))
-      .sort($sort desc "startsAt")
+      .sort($sort `desc` "startsAt")
       .cursor[Swiss]()
 
   def teamOf(id: Swiss.Id): Fu[Option[TeamID]] =
     colls.swiss.primitiveOne[TeamID]($id(id), "teamId")
 
   private def recomputeAndUpdateAll(id: Swiss.Id): Funit =
-    scoring(id).flatMap {
+    scoring(id).flatMap:
       _ so { res =>
         rankingApi.update(res)
         standingApi.update(res) >>
           boardApi.update(res).andDo(socket.reload(id))
       }
-    }
 
   private[swiss] def startPendingRounds: Funit =
     colls.swiss
-      .find($doc("nextRoundAt" $lt DateTime.now), $id(true).some)
+      .find($doc("nextRoundAt" `$lt` DateTime.now), $id(true).some)
       .cursor[Bdoc]()
       .list(10)
       .map(_.flatMap(_.getAsOpt[Swiss.Id]("_id")))
@@ -896,11 +862,11 @@ final class SwissApi(
           Sequencing(id)(notFinishedById) { swiss =>
             if (swiss.round.value >= swiss.settings.nbRounds) doFinish(swiss)
             else if (swiss.nbPlayers >= 2)
-              director.startRound(swiss).flatMap {
+              director.startRound(swiss).flatMap:
                 _.fold {
                   systemChat(swiss.id, "All possible pairings were played.")
                   doFinish(swiss)
-                } {
+                }:
                   case s if s.nextRoundAt.isEmpty =>
                     systemChat(s.id, s"Round ${s.round.value}${medleyRoundText(s)} started.")
                     funit
@@ -909,17 +875,13 @@ final class SwissApi(
                     colls.swiss.update
                       .one($id(s.id), $set("nextRoundAt" -> DateTime.now.plusSeconds(61)))
                       .void
-                }
-              }
-            else {
-              if (swiss.startsAt isBefore DateTime.now.minusMinutes(60)) destroy(swiss)
-              else {
+            else
+              if (swiss.startsAt `isBefore` DateTime.now.minusMinutes(60)) destroy(swiss)
+              else
                 systemChat(swiss.id, "Not enough players for first round; delaying start.", volatile = true)
                 colls.swiss.update
                   .one($id(swiss.id), $set("nextRoundAt" -> DateTime.now.plusSeconds(121)))
                   .void
-              }
-            }
           } >> recomputeAndUpdateAll(id)
         }
       }
@@ -949,14 +911,13 @@ final class SwissApi(
           }
           .collect[List](maxDocs = 100)
       }
-      .map {
+      .map:
         _.flatMap { doc =>
           for {
             swissId        <- doc.getAsOpt[Swiss.Id]("_id")
             pairingGameIds <- doc.getAsOpt[List[SwissPairingGameIds]]("ids")
           } yield swissId -> pairingGameIds
         }
-      }
       .flatMap { items =>
         Future.sequence(items.map { case (swissId, pairingGameIds) =>
           Sequencing[List[SwissPairingGames]](swissId)(byId) { _ =>
@@ -989,10 +950,10 @@ final class SwissApi(
 
   def withdrawAll(user: User, teamIds: List[TeamID]): Funit =
     colls.swiss
-      .aggregateWith[Bdoc](readPreference = ReadPreference.secondaryPreferred) { implicit framework =>
+      .aggregateWith[Bdoc](readPreference = ReadPreference.secondaryPreferred) { (framework) =>
         import framework._
         List(
-          Match($doc("finishedAt" $exists false, "nbPlayers" $gt 0, "teamId" $in teamIds)),
+          Match($doc("finishedAt" `$exists` false, "nbPlayers" `$gt` 0, "teamId" `$in` teamIds)),
           PipelineOperator(
             $doc(
               "$lookup" -> $doc(
@@ -1014,38 +975,36 @@ final class SwissApi(
               )
             )
           ),
-          Match("player" $ne $arr()),
+          Match("player" `$ne` $arr()),
           Project($id(true))
         )
       }
       .collect[List](maxDocs = Int.MaxValue)
       .map(_.flatMap(_.getAsOpt[Swiss.Id]("_id")))
-      .flatMap {
+      .flatMap:
         ids => Future.sequence(ids.map { withdraw(_, user.id) }).void
-      }
 
   def isUnfinished(id: Swiss.Id): Fu[Boolean] =
-    colls.swiss.exists($id(id) ++ $doc("finishedAt" $exists false))
+    colls.swiss.exists($id(id) ++ $doc("finishedAt" `$exists` false))
 
   def filterPlaying(id: Swiss.Id, userIds: Seq[User.ID]): Fu[List[User.ID]] =
     userIds.nonEmpty so
-      colls.swiss.exists($id(id) ++ $doc("finishedAt" $exists false)) flatMap {
+      colls.swiss.exists($id(id) ++ $doc("finishedAt" `$exists` false)) flatMap:
         _ so SwissPlayer.fields { f =>
           colls.player.distinctEasy[User.ID, List](
             f.userId,
             $doc(
-              f.id $in userIds.map(SwissPlayer.makeId(id, _)),
-              f.absent $ne true
+              f.id `$in` userIds.map(SwissPlayer.makeId(id, _)),
+              f.absent `$ne` true
             )
           )
         }
-      }
 
-  def resultStream(swiss: Swiss, perSecond: MaxPerSecond, nb: Int): Source[SwissPlayer.WithRank, _] =
+  def resultStream(swiss: Swiss, perSecond: MaxPerSecond, nb: Int): Source[SwissPlayer.WithRank, ?] =
     SwissPlayer.fields { f =>
       colls.player
         .find($doc(f.swissId -> swiss.id))
-        .sort($sort desc f.score)
+        .sort($sort `desc` f.score)
         .batchSize(perSecond.value)
         .cursor[SwissPlayer](ReadPreference.secondaryPreferred)
         .documentSource(nb)
@@ -1064,9 +1023,6 @@ final class SwissApi(
   private def Sequencing[A: Zero](
       id: Swiss.Id
   )(fetch: Swiss.Id => Fu[Option[Swiss]])(run: Swiss => Fu[A]): Fu[A] =
-    sequencer(id.value) {
-      fetch(id) flatMap {
+    sequencer(id.value):
+      fetch(id) flatMap:
         _ so run
-      }
-    }
-}

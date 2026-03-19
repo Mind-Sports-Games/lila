@@ -9,9 +9,9 @@ import play.api.data.Forms._
 
 import lila.common.Form.cleanNonEmptyText
 
-object StudyForm {
+object StudyForm:
 
-  object importGame {
+  object importGame:
 
     lazy val form = Form(
       mapping(
@@ -32,7 +32,7 @@ object StudyForm {
         pgnStr: Option[String] = None,
         variantStr: Option[String] = None,
         asStr: Option[String] = None
-    ) {
+    ):
 
       def orientation = orientationStr.flatMap(PlayerIndex.fromName) | P1
 
@@ -48,10 +48,9 @@ object StudyForm {
         }
 
       def as: As =
-        asStr match {
+        asStr match
           case None | Some("study") => AsNewStudy
           case Some(studyId)        => AsChapterOf(Study.Id(studyId))
-        }
 
       def toChapterData =
         ChapterMaker.Data(
@@ -64,14 +63,12 @@ object StudyForm {
           mode = ChapterMaker.Mode.Normal.key,
           initial = false
         )
-    }
 
     sealed trait As
     case object AsNewStudy                    extends As
     case class AsChapterOf(studyId: Study.Id) extends As
-  }
 
-  object importPgn {
+  object importPgn:
 
     lazy val form = Form(
       mapping(
@@ -93,9 +90,9 @@ object StudyForm {
         initial: Boolean,
         sticky: Boolean,
         pgn: String
-    ) {
+    ):
 
-      def toChapterDatas = {
+      def toChapterDatas =
         val pgns = MultiPgn.split(pgn, max = 32).value
         pgns.zipWithIndex map { case (onePgn, index) =>
           ChapterMaker.Data(
@@ -110,12 +107,8 @@ object StudyForm {
             initial = initial && index == 0
           )
         }
-      }
-    }
-  }
 
   def topicsForm = Form(single("topics" -> text))
 
   def topicsForm(topics: StudyTopics) =
     Form(single("topics" -> text)) fill topics.value.map(_.value).mkString(", ")
-}

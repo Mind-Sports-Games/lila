@@ -1,7 +1,6 @@
 package lila.round
 
 import org.apache.pekko.actor.{ Cancellable, Scheduler }
-import scala.concurrent.duration._
 import scala.util.Success
 
 import strategygames.{ Player => PlayerIndex }
@@ -11,40 +10,36 @@ import lila.game.{ Game, GameRepo, Pov, Progress }
 final private class GameProxy(
     id: Game.ID,
     dependencies: GameProxy.Dependencies
-)(implicit ec: scala.concurrent.ExecutionContext) {
+)(implicit ec: scala.concurrent.ExecutionContext):
 
   import GameProxy._
   import dependencies._
 
   private[round] def game: Fu[Option[Game]] = cache
 
-  def save(progress: Progress): Funit = {
+  def save(progress: Progress): Funit =
     set(progress.game)
-    dirtyProgress = dirtyProgress.fold(progress.dropEvents)(_ withGame progress.game).some
+    dirtyProgress = dirtyProgress.fold(progress.dropEvents)(_ `withGame` progress.game).some
     if (shouldFlushProgress(progress)) flushProgress()
     else fuccess(scheduleFlushProgress())
-  }
 
   def update(f: Game => Game): Funit =
     withGame { g =>
       fuccess(set(f(g)))
     }
 
-  private[round] def saveAndFlush(progress: Progress): Funit = {
+  private[round] def saveAndFlush(progress: Progress): Funit =
     set(progress.game)
-    dirtyProgress = dirtyProgress.fold(progress)(_ withGame progress.game).some
+    dirtyProgress = dirtyProgress.fold(progress)(_ `withGame` progress.game).some
     flushProgress()
-  }
 
-  private def set(game: Game): Unit = {
+  private def set(game: Game): Unit =
     cache = fuccess(game.some)
-  }
 
-  private[round] def setFinishedGame(game: Game): Unit = {
+  private[round] def setFinishedGame(game: Game): Unit =
     scheduledFlush.cancel()
     set(game)
     dirtyProgress = none
-  }
 
   // convenience helpers
 
@@ -55,21 +50,18 @@ final private class GameProxy(
     withGame(g => f(Pov(g, playerId.value)))
 
   def withGame[A](f: Game => Fu[A]): Fu[A] =
-    cache.value match {
+    cache.value match
       case Some(Success(Some(g))) => f(g)
       case Some(Success(None))    => fufail(s"No proxy game: $id")
       case _ =>
-        cache flatMap {
+        cache flatMap:
           case None    => fufail(s"No proxy game: $id")
           case Some(g) => f(g)
-        }
-    }
 
   def withGameOptionSync[A](f: Game => A): Option[A] =
-    cache.value match {
+    cache.value match
       case Some(Success(Some(g))) => Some(f(g))
       case _                      => None
-    }
 
   def terminate() = flushProgress()
 
@@ -83,24 +75,21 @@ final private class GameProxy(
       p.game.hasCorrespondenceClock && !p.game.hasAi && p.game.rated
     )
 
-  private def scheduleFlushProgress(): Unit = {
+  private def scheduleFlushProgress(): Unit =
     scheduledFlush.cancel()
-    scheduledFlush = scheduler.scheduleOnce(scheduleDelay) { flushProgress().unit }
-  }
+    scheduledFlush = scheduler.scheduleOnce(scheduleDelay) { val _ = flushProgress() }
 
-  private def flushProgress(): Funit = {
+  private def flushProgress(): Funit =
     scheduledFlush.cancel()
     dirtyProgress so gameRepo.update addEffect { _ =>
       dirtyProgress = none
     }
-  }
 
   private var cache: Fu[Option[Game]] = fetch
 
   private def fetch = gameRepo.game(id)
-}
 
-private object GameProxy {
+private object GameProxy:
 
   class Dependencies(
       val gameRepo: GameRepo,
@@ -110,8 +99,6 @@ private object GameProxy {
   // must be way under the round duct termination delay (60s)
   private val scheduleDelay = 30.seconds
 
-  private val emptyCancellable = new Cancellable {
+  private val emptyCancellable = new Cancellable:
     def cancel()    = true
     def isCancelled = true
-  }
-}

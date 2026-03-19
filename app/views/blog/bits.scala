@@ -38,7 +38,7 @@ object bits {
     div(cls := "meta-headline")(
       div(cls := "meta")(
         doc.getDate("blog.date").map { date =>
-          span(cls := "text", dataIcon := "p")(semanticDate(date.value.toDateTimeAtStartOfDay))
+          span(cls := "text", dataIcon := "p")(semanticDate(new org.joda.time.DateTime(date.value.atStartOfDay(java.time.ZoneOffset.UTC).toInstant.toEpochMilli)))
         },
         doc.getText("blog.author").map { author =>
           span(cls := "text", dataIcon := "r")(richText(author))

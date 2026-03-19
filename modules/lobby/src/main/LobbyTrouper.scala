@@ -13,7 +13,6 @@ import lila.game.Game
 import lila.hub.Trouper
 import lila.socket.Socket.{ Sri, Sris }
 import lila.user.User
-import lila.i18n.VariantKeys
 
 final private class LobbyTrouper(
     seekApi: SeekApi,
@@ -25,7 +24,7 @@ final private class LobbyTrouper(
     poolApi: lila.pool.PoolApi,
     onStart: lila.round.OnStart
 )(implicit ec: scala.concurrent.ExecutionContext, scheduler: org.apache.pekko.actor.Scheduler)
-    extends Trouper {
+    extends Trouper:
 
   import LobbyTrouper._
 
@@ -35,18 +34,18 @@ final private class LobbyTrouper(
 
   private var socket: Trouper = Trouper.stub
 
-  val process: Trouper.Receive = {
+  val process: Trouper.Receive =
 
     // solve circular reference
     case SetSocket(trouper) => socket = trouper
 
     case msg @ AddHook(hook) =>
       lila.mon.lobby.hook.create.increment()
-      hookRepo bySri hook.sri foreach remove
+      hookRepo `bySri` hook.sri foreach remove
       hook.sid so { sid =>
-        hookRepo bySid sid foreach remove
+        hookRepo `bySid` sid foreach remove
       }
-      !hook.compatibleWithPools(hook.realVariant) so findCompatible(hook) match {
+      !hook.compatibleWithPools(hook.realVariant) so findCompatible(hook) match
         case Some(h) => biteHook(h.id, hook.sri, hook.user)
         case None =>
           hookRepo.save(msg.hook)
@@ -57,18 +56,15 @@ final private class LobbyTrouper(
               hook.realVariant,
               true
             )
-            .effectFold(
-              err => logger.warn(s"discord hook failed: $err"),
-              _ => ()
-            )
-      }
+            .onComplete:
+              case scala.util.Failure(err) => logger.warn(s"discord hook failed: $err")
+              case _ => ()
 
     case msg @ AddSeek(seek) =>
       lila.mon.lobby.seek.create.increment()
-      findCompatible(seek) foreach {
+      findCompatible(seek) foreach:
         case Some(s) => this ! BiteSeek(s.id, seek.user)
         case None    => this ! SaveSeek(msg)
-      }
 
     case SaveSeek(msg) =>
       seekApi.insert(msg.seek)
@@ -79,36 +75,31 @@ final private class LobbyTrouper(
           msg.seek.realVariant,
           false
         )
-        .effectFold(
-          err => logger.warn(s"discord seek failed: $err"),
-          _ => ()
-        )
+        .onComplete:
+          case scala.util.Failure(err) => logger.warn(s"discord seek failed: $err")
+          case _ => ()
 
     case CancelHook(sri) =>
-      hookRepo bySri sri foreach remove
+      hookRepo `bySri` sri foreach remove
 
     case CancelSeek(seekId, user) =>
       seekApi.removeBy(seekId, user.id)
       socket ! RemoveSeek(seekId)
 
     case BiteHook(hookId, sri, user) =>
-      NoPlayban(user) {
+      NoPlayban(user):
         biteHook(hookId, sri, user)
-      }
 
     case BiteSeek(seekId, user) =>
-      NoPlayban(user.some) {
+      NoPlayban(user.some):
         gameCache.nbPlaying(user.id) foreach { nbPlaying =>
-          if (maxPlaying > nbPlaying) {
+          if (maxPlaying > nbPlaying)
             lila.mon.lobby.seek.join.increment()
-            seekApi find seekId foreach {
+            seekApi `find` seekId foreach:
               _ foreach { seek =>
                 biter(seek, user) foreach this.!
               }
-            }
-          }
         }
-      }
 
     case msg @ JoinHook(_, hook, game, _) =>
       onStart(game.id)
@@ -137,16 +128,15 @@ final private class LobbyTrouper(
         .foreach { this ! WithPromise(_, promise) }
 
     case WithPromise(Sris(sris), promise) =>
-      poolApi socketIds Sris(sris)
-      val fewSecondsAgo = DateTime.now minusSeconds 5
-      if (remoteDisconnectAllAt isBefore fewSecondsAgo) this ! RemoveHooks {
+      poolApi `socketIds` Sris(sris)
+      val fewSecondsAgo = DateTime.now `minusSeconds` 5
+      if (remoteDisconnectAllAt `isBefore` fewSecondsAgo) this ! RemoveHooks:
         hookRepo
           .notInSris(sris)
           .filter { h =>
-            !h.boardApi && (h.createdAt isBefore fewSecondsAgo)
+            !h.boardApi && (h.createdAt `isBefore` fewSecondsAgo)
           }
           .toSet ++ hookRepo.cleanupOld
-      }
       lila.mon.lobby.socket.member.update(sris.size)
       lila.mon.lobby.hook.size.record(hookRepo.size)
       lila.mon.trouper.queueSize("lobby").update(queueSize)
@@ -163,27 +153,24 @@ final private class LobbyTrouper(
       promise success lila.pool.HookThieve.PoolHooks(hookRepo.poolCandidates(clock, variant))
 
     case lila.pool.HookThieve.StolenHookIds(ids) =>
-      hookRepo byIds ids.toSet foreach remove
-  }
+      hookRepo `byIds` ids.toSet foreach remove
 
-  private def NoPlayban(user: Option[LobbyUser])(f: => Unit): Unit = {
+  private def NoPlayban(user: Option[LobbyUser])(f: => Unit): Unit =
     user.so { u =>
       playbanApi.currentBan(u.id)
-    } foreach {
+    } foreach:
       case None => f
       case _    =>
-    }
-  }
 
   private def biteHook(hookId: String, sri: Sri, user: Option[LobbyUser]) =
-    hookRepo byId hookId foreach { hook =>
+    hookRepo `byId` hookId foreach { hook =>
       remove(hook)
-      hookRepo bySri sri foreach remove
+      hookRepo `bySri` sri foreach remove
       biter(hook, sri, user) foreach this.!
     }
 
   private def findCompatible(hook: Hook): Option[Hook] =
-    hookRepo.filter(_ compatibleWith hook).find { existing =>
+    hookRepo.filter(_ `compatibleWith` hook).find { existing =>
       biter.canJoin(existing, hook.user) && !(
         (existing.user, hook.user).mapN((_, _)) so { case (u1, u2) =>
           recentlyAbortedUserIdPairs.exists(u1.id, u2.id)
@@ -191,9 +178,9 @@ final private class LobbyTrouper(
       )
     }
 
-  def registerAbortedGame(g: Game) = recentlyAbortedUserIdPairs register g
+  def registerAbortedGame(g: Game) = recentlyAbortedUserIdPairs `register` g
 
-  private object recentlyAbortedUserIdPairs {
+  private object recentlyAbortedUserIdPairs:
     private val cache                                     = new lila.memo.ExpireSetMemo(1 hour)
     private def makeKey(u1: User.ID, u2: User.ID): String = if (u1 < u2) s"$u1/$u2" else s"$u2/$u1"
     def register(g: Game) =
@@ -203,21 +190,17 @@ final private class LobbyTrouper(
         if g.fromLobby
       } cache.put(makeKey(w, b))
     def exists(u1: User.ID, u2: User.ID) = cache.get(makeKey(u1, u2))
-  }
 
   private def findCompatible(seek: Seek): Fu[Option[Seek]] =
-    seekApi forUser seek.user map {
-      _ find (_ compatibleWith seek)
-    }
+    seekApi `forUser` seek.user map:
+      _ find (_ `compatibleWith` seek)
 
-  private def remove(hook: Hook) = {
-    hookRepo remove hook
+  private def remove(hook: Hook) =
+    hookRepo `remove` hook
     socket ! RemoveHook(hook.id)
     Bus.publish(RemoveHook(hook.id), s"hookRemove:${hook.id}")
-  }
-}
 
-private object LobbyTrouper {
+private object LobbyTrouper:
 
   case class SetSocket(trouper: Trouper)
 
@@ -230,7 +213,7 @@ private object LobbyTrouper {
       resyncIdsPeriod: FiniteDuration
   )(
       makeTrouper: () => LobbyTrouper
-  )(implicit ec: scala.concurrent.ExecutionContext, scheduler: org.apache.pekko.actor.Scheduler) = {
+  )(implicit ec: scala.concurrent.ExecutionContext, scheduler: org.apache.pekko.actor.Scheduler) =
     val trouper = makeTrouper()
     Bus.subscribe(trouper, "lobbyTrouper")
     scheduler.scheduleWithFixedDelay(15 seconds, resyncIdsPeriod)(() => trouper ! actorApi.Resync)
@@ -240,5 +223,3 @@ private object LobbyTrouper {
       initialDelay = 7 seconds
     ) { trouper.ask[Unit](Tick) }
     trouper
-  }
-}

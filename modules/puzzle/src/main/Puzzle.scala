@@ -21,14 +21,14 @@ case class Puzzle(
     plays: Int,
     vote: Float, // denormalized ratio of voteUp/voteDown
     themes: Set[PuzzleTheme.Key]
-) {
+):
 
   def gameLogic: GameLogic = GameLogic(lib)
   def variant: Variant     = Variant.orDefault(gameLogic, variantId)
 
   //When updating, also edit modules/game, modules/challenge, and ui/@types/playstrategy/index.d.ts:declare type PlayerName
   def playerTrans(implicit lang: Lang): String =
-    variant.playerNames(playerIndex) match {
+    variant.playerNames(playerIndex) match
       case "White" => I18nKeys.white.txt()
       case "Black" => I18nKeys.black.txt()
       //Xiangqi add back in when adding red as a colour for Xiangqi
@@ -36,7 +36,6 @@ case class Puzzle(
       case "Sente"   => I18nKeys.sente.txt()
       case "Gote"    => I18nKeys.gote.txt()
       case s: String => s
-    }
 
   // ply after "initial move" when we start solving
   def initialPly: Int =
@@ -50,18 +49,17 @@ case class Puzzle(
       sit1 <- Forsyth.<<<@(variant.gameLogic, variant, fen)
       sit2 <- sit1.situation.move(line.head).toOption.map(_.situationAfter)
     } yield Forsyth.>>(variant.gameLogic, sit2)
-  } err s"Can't apply puzzle $id first move"
+  } `err` s"Can't apply puzzle $id first move"
 
   def playerIndex = fen.player.fold[PlayerIndex](PlayerIndex.P1)(!_)
-}
 
-object Puzzle {
+object Puzzle:
 
   val idSize = 5
 
   case class Id(value: String) extends AnyVal with StringValue
 
-  def toId(id: String) = id.size == idSize option Id(id)
+  def toId(id: String) = id.size == idSize `option` Id(id)
 
   val puzzleVariants: List[Variant] = List(
     Variant.orDefault(GameLogic.Chess(), 1), //Standard
@@ -79,7 +77,7 @@ object Puzzle {
   /* The mobile app requires numerical IDs.
    * We convert string ids from and to Longs using base 62
    */
-  object numericalId {
+  object numericalId:
 
     private val powers: List[Long] =
       (0 until idSize).toList.map(m => Math.pow(62, m).toLong)
@@ -90,29 +88,26 @@ object Puzzle {
         l + charToInt(char) * pow
       }
 
-    def apply(l: Long): Option[Id] = (l > 130_000) so {
+    def apply(l: Long): Option[Id] = (l > 130_000) so:
       val str = powers.reverse
         .foldLeft(("", l)) { case ((id, rest), pow) =>
           val frac = rest / pow
           (s"${intToChar(frac.toInt)}$id", rest - frac * pow)
         }
         ._1
-      (str.size == idSize) option Id(str)
-    }
+      (str.size == idSize) `option` Id(str)
 
-    private def charToInt(c: Char) = {
+    private def charToInt(c: Char) =
       val i = c.toInt
       if (i > 96) i - 71
       else if (i > 64) i - 65
       else i + 4
-    }
 
     private def intToChar(i: Int): Char = {
       if (i < 26) i + 65
       else if (i < 52) i + 71
       else i - 4
     }.toChar
-  }
 
   case class UserResult(
       puzzleId: Id,
@@ -122,7 +117,7 @@ object Puzzle {
       perfType: PerfType
   )
 
-  object BSONFields {
+  object BSONFields:
     val id       = "_id"
     val gameId   = "gameId"
     val lib      = "l"
@@ -137,7 +132,5 @@ object Puzzle {
     val themes   = "themes"
     val day      = "day"
     val dirty    = "dirty" // themes need to be denormalized
-  }
 
   implicit val idIso: Iso.StringIso[Id] = lila.common.Iso.string[Id](Id.apply, _.value)
-}

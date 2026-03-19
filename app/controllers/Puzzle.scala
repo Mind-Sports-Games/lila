@@ -415,7 +415,7 @@ final class Puzzle(
 
   def apiDashboard(days: Int) =
     Scoped(_.Puzzle.Read) { implicit req => me =>
-      implicit val lang = reqLang
+      implicit val lang: play.api.i18n.Lang = reqLang
       JsonOptionOk {
         env.puzzle.dashboard(me, days) map2 { env.puzzle.jsonView.dashboardJson(_, days) }
       }

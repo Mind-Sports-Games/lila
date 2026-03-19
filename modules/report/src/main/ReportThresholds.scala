@@ -11,7 +11,7 @@ case class ScoreThresholds(mid: Int, high: Int)
 
 private case class Thresholds(score: () => ScoreThresholds, discord: () => Int)
 
-private object ReportThresholds {
+private object ReportThresholds:
 
   private val defaultScoreThresholds = ScoreThresholds(40, 50)
 
@@ -45,4 +45,3 @@ private object ReportThresholds {
       default = 80,
       text = "Discord score threshold. Comm reports with higher scores are notified in discord".some
     )
-}

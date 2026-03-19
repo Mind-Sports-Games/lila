@@ -113,7 +113,7 @@ final class Auth(
                         negotiate(
                           html = fuccess {
                             err.errors match {
-                              case List(FormError("", List(err), _)) if is2fa(err) => Ok(err)
+                              case List(FormError("", List(err: String), _)) if is2fa(err) => Ok(err)
                               case _                                               => Unauthorized(html.auth.login(err, referrer))
                             }
                           },
@@ -147,7 +147,7 @@ final class Auth(
 
   def logout =
     Open { implicit ctx =>
-      val currentSessionId = ~env.security.api.reqSessionId(ctx.req)
+      val currentSessionId = env.security.api.reqSessionId(ctx.req).getOrElse("")
       env.security.store.delete(currentSessionId) >>
         env.push.webSubscriptionApi.unsubscribeBySession(currentSessionId) >>
         negotiate(
@@ -245,33 +245,35 @@ final class Auth(
   // after signup and before confirmation
   def fixEmail =
     OpenBody { implicit ctx =>
-      lila.security.EmailConfirm.cookie.get(ctx.req) so { userEmail =>
-        implicit val req = ctx.body
-        forms.preloadEmailDns >> forms
-          .fixEmail(userEmail.email)
-          .bindFromRequest()
-          .fold(
-            err => BadRequest(html.auth.checkYourEmail(userEmail.some, err.some)).fuccess,
-            email =>
-              env.user.repo.named(userEmail.username) flatMap {
-                _.fold(Redirect(routes.Auth.signup).fuccess) { user =>
-                  env.user.repo.mustConfirmEmail(user.id) flatMap {
-                    case false => Redirect(routes.Auth.login).fuccess
-                    case _ =>
-                      val newUserEmail = userEmail.copy(email = EmailAddress(email))
-                      EmailConfirmRateLimit(newUserEmail, ctx.req) {
-                        lila.mon.email.send.fix.increment()
-                        env.user.repo.setEmail(user.id, newUserEmail.email) >>
-                          env.security.emailConfirm.send(user, newUserEmail.email) inject {
-                            Redirect(routes.Auth.checkYourEmail) withCookies
-                              lila.security.EmailConfirm.cookie
-                                .make(env.lilaCookie, user, newUserEmail.email)(ctx.req)
-                          }
-                      }(rateLimitedFu)
+      lila.security.EmailConfirm.cookie.get(ctx.req) match {
+        case None => Redirect(routes.Auth.signup).fuccess
+        case Some(userEmail) =>
+          implicit val req = ctx.body
+          forms.preloadEmailDns >> forms
+            .fixEmail(userEmail.email)
+            .bindFromRequest()
+            .fold(
+              err => BadRequest(html.auth.checkYourEmail(userEmail.some, err.some)).fuccess,
+              email =>
+                env.user.repo.named(userEmail.username) flatMap {
+                  _.fold(Redirect(routes.Auth.signup).fuccess) { user =>
+                    env.user.repo.mustConfirmEmail(user.id) flatMap {
+                      case false => Redirect(routes.Auth.login).fuccess
+                      case _ =>
+                        val newUserEmail = userEmail.copy(email = EmailAddress(email))
+                        EmailConfirmRateLimit(newUserEmail, ctx.req) {
+                          lila.mon.email.send.fix.increment()
+                          env.user.repo.setEmail(user.id, newUserEmail.email) >>
+                            env.security.emailConfirm.send(user, newUserEmail.email) inject {
+                              Redirect(routes.Auth.checkYourEmail) withCookies
+                                lila.security.EmailConfirm.cookie
+                                  .make(env.lilaCookie, user, newUserEmail.email)(ctx.req)
+                            }
+                        }(rateLimitedFu)
+                    }
                   }
                 }
-              }
-          )
+            )
       }
     }
 
@@ -289,10 +291,10 @@ final class Auth(
         case Result.JustConfirmed(user) =>
           lila.mon.user.register.confirmEmailResult(true).increment()
           env.user.repo.email(user.id).flatMap {
-            _.so { email =>
+            case Some(email) =>
               authLog(user.username, email.value, s"Confirmed email ${email.value}")
               welcome(user, email, sendWelcomeEmail = false)
-            }
+            case None => funit
           } >> redirectNewUser(user)
       }
     }
@@ -310,15 +312,15 @@ final class Auth(
     Auth { ctx => me =>
       lila.mon.http.fingerPrint.record(ms)
       api.setFingerPrint(ctx.req, FingerPrint(fp)) flatMap {
-        _ so { hash =>
-          !me.lame so (for {
+        case Some(hash) if !me.lame =>
+          for {
             otherIds <- api.recentUserIdsByFingerHash(hash).map(_.filter(me.id.!=))
-            _ <- (otherIds.sizeIs >= 2) so env.user.repo.countLameOrTroll(otherIds).flatMap {
+            _ <- if (otherIds.sizeIs >= 2) env.user.repo.countLameOrTroll(otherIds).flatMap {
               case nb if nb >= 2 && nb >= otherIds.size / 2 => env.report.api.autoAltPrintReport(me.id)
               case _                                        => funit
-            }
-          } yield ())
-        }
+            } else funit
+          } yield ()
+        case _ => funit
       } inject NoContent
     }
 
@@ -391,7 +393,8 @@ final class Auth(
             HasherRateLimit(user.username, ctx.req) { _ =>
               env.user.authenticator.setPassword(user.id, ClearPassword(data.newPasswd1)) >>
                 env.user.repo.setEmailConfirmed(user.id).flatMap {
-                  _ so { welcome(user, _, sendWelcomeEmail = false) }
+                  case Some(email) => welcome(user, email, sendWelcomeEmail = false)
+                  case None => funit
                 } >>
                 env.user.repo.disableTwoFactor(user.id) >>
                 env.security.store.closeAllSessionsOf(user.id) >>
@@ -425,8 +428,7 @@ final class Auth(
               .fold(
                 err => BadRequest(renderMagicLink(err.some, fail = true)).fuccess,
                 data =>
-                  env.user.repo.enabledWithEmail(data.realEmail.normalize)
-                    flatMap {
+                  env.user.repo.enabledWithEmail(data.realEmail.normalize).flatMap {
                       case Some((user, storedEmail)) =>
                         MagicLinkRateLimit(user, storedEmail, ctx.req) {
                           lila.mon.user.auth.magicLinkRequest("success").increment()

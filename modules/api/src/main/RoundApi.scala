@@ -1,6 +1,6 @@
 package lila.api
 
-import strategygames.format.{ FEN, Forsyth }
+import strategygames.format.FEN
 import strategygames.{ Player => PlayerIndex }
 import play.api.i18n.Lang
 import play.api.libs.json._
@@ -30,7 +30,7 @@ final private[api] class RoundApi(
     simulApi: lila.simul.SimulApi,
     getTeamName: lila.team.GetTeamName,
     getLightUser: lila.common.LightUser.GetterSync
-)(implicit ec: scala.concurrent.ExecutionContext) {
+)(implicit ec: scala.concurrent.ExecutionContext):
 
   def player(pov: Pov, tour: Option[TourView], apiVersion: ApiVersion)(implicit
       ctx: Context
@@ -52,10 +52,10 @@ final private[api] class RoundApi(
           swissApi.gameView(pov) zip
           (ctx.me.ifTrue(ctx.isMobileApi) so (me => noteApi.get(pov.gameId, me.id))) zip
           forecastApi.loadForDisplay(pov) zip
-          bookmarkApi.exists(pov.game, ctx.me) map {
+          bookmarkApi.exists(pov.game, ctx.me) map:
             case (((((json, simul), swiss), note), forecast), bookmarked) =>
               (
-                withTournament(pov, tour) _ compose
+                withTournament(pov, tour) compose
                   withSwiss(swiss) compose
                   withSimul(simul) compose
                   withSteps(pov, initialFen) compose
@@ -63,7 +63,6 @@ final private[api] class RoundApi(
                   withBookmark(bookmarked) compose
                   withForecastCount(forecast.map(_.steps.size))
               )(json)
-          }
       }
       .mon(_.round.api.player)
 
@@ -75,7 +74,7 @@ final private[api] class RoundApi(
       initialFenO: Option[Option[FEN]] = None
   )(implicit ctx: Context): Fu[JsObject] =
     initialFenO
-      .fold(gameRepo initialFen pov.game)(fuccess)
+      .fold(gameRepo `initialFen` pov.game)(fuccess)
       .flatMap { initialFen =>
         implicit val lang = ctx.lang
         jsonView.watcherJson(
@@ -92,7 +91,7 @@ final private[api] class RoundApi(
           (ctx.me.ifTrue(ctx.isMobileApi) so (me => noteApi.get(pov.gameId, me.id))) zip
           bookmarkApi.exists(pov.game, ctx.me) map { case ((((json, simul), swiss), note), bookmarked) =>
             (
-              withTournament(pov, tour) _ compose
+              withTournament(pov, tour) compose
                 withSwiss(swiss) compose
                 withSimul(simul) compose
                 withNote(note) compose
@@ -113,7 +112,7 @@ final private[api] class RoundApi(
       owner: Boolean = false
   )(implicit ctx: Context): Fu[JsObject] =
     initialFenO
-      .fold(gameRepo initialFen pov.game)(fuccess)
+      .fold(gameRepo `initialFen` pov.game)(fuccess)
       .flatMap { initialFen =>
         implicit val lang = ctx.lang
         jsonView.watcherJson(
@@ -131,11 +130,11 @@ final private[api] class RoundApi(
           ctx.userId.ifTrue(ctx.isMobileApi).so {
             noteApi.get(pov.gameId, _)
           } zip
-          (owner.so(forecastApi loadForDisplay pov)) zip
-          bookmarkApi.exists(pov.game, ctx.me) map {
+          (owner.so(forecastApi `loadForDisplay` pov)) zip
+          bookmarkApi.exists(pov.game, ctx.me) map:
             case ((((((json, tour), simul), swiss), note), fco), bookmarked) =>
               (
-                withTournament(pov, tour) _ compose
+                withTournament(pov, tour) compose
                   withSwiss(swiss) compose
                   withSimul(simul) compose
                   withNote(note) compose
@@ -144,7 +143,6 @@ final private[api] class RoundApi(
                   withAnalysis(pov.game, analysis) compose
                   withForecast(pov, owner, fco)
               )(json)
-          }
       }
       .mon(_.round.api.watcher)
 
@@ -156,7 +154,7 @@ final private[api] class RoundApi(
       withFlags: WithFlags
   ): Fu[JsObject] =
     initialFenO
-      .fold(gameRepo initialFen pov.game)(fuccess)
+      .fold(gameRepo `initialFen` pov.game)(fuccess)
       .flatMap { initialFen =>
         jsonView.watcherJson(
           pov,
@@ -168,7 +166,7 @@ final private[api] class RoundApi(
           withFlags = withFlags
         ) map { json =>
           (
-            withTree(pov, analysis, initialFen, withFlags) _ compose
+            withTree(pov, analysis, initialFen, withFlags) compose
               withAnalysis(pov.game, analysis)
           )(json)
         }
@@ -184,7 +182,7 @@ final private[api] class RoundApi(
       me: Option[User],
       withForecast: Boolean = false
   ) =
-    (if (withForecast) owner.so(forecastApi loadForDisplay pov) else fuccess(none)).map { fco =>
+    (if (withForecast) owner.so(forecastApi `loadForDisplay` pov) else fuccess(none)).map { fco =>
       val addForecast: JsObject => JsObject =
         if (withForecast) this.withForecast(pov, owner, fco) else identity
       addForecast(withTree(pov, analysis = none, initialFen, WithFlags(opening = true)) {
@@ -317,4 +315,3 @@ final private[api] class RoundApi(
         )
       }
     )
-}

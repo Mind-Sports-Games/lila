@@ -3,10 +3,9 @@ package lila.game
 import scala.language.existentials
 
 import strategygames.format.{ FEN, Forsyth }
-import strategygames.variant.Variant
 import strategygames.{ ActionStrs, Mode, Player => PlayerIndex, P1, P2, Status }
 import org.joda.time.DateTime
-import reactivemongo.akkastream.{ cursorProducer, AkkaStreamCursor }
+import reactivemongo.pekkostream.{ cursorProducer, PekkoStreamCursor }
 import reactivemongo.api.commands.WriteResult
 import reactivemongo.api.{ ReadPreference, WriteConcern }
 
@@ -17,7 +16,7 @@ import lila.db.isDuplicateKey
 import lila.user.User
 import lila.game.{ MonthlyGameData, WinRate, WinRatePercentages }
 
-final class GameRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionContext) {
+final class GameRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionContext):
 
   import BSONHandlers._
   import Game.{ ID, BSONFields => F }
@@ -31,13 +30,13 @@ final class GameRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionCont
   def gameOptionsFromSecondary(gameIds: Seq[ID]): Fu[List[Option[Game]]] =
     coll.optionsByOrderedIds[Game, ID](gameIds, none, ReadPreference.secondaryPreferred)(_.id)
 
-  object light {
+  object light:
 
     def game(gameId: ID): Fu[Option[LightGame]] = coll.byId[LightGame](gameId, LightGame.projection)
 
     def pov(gameId: ID, playerIndex: PlayerIndex): Fu[Option[LightPov]] =
       game(gameId) dmap2 { (game: LightGame) =>
-        LightPov(game, game player playerIndex)
+        LightPov(game, game `player` playerIndex)
       }
 
     def pov(ref: PovRef): Fu[Option[LightPov]] = pov(ref.gameId, ref.playerIndex)
@@ -51,17 +50,16 @@ final class GameRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionCont
         projection = LightGame.projection.some,
         readPreference = ReadPreference.secondaryPreferred
       )(_.id)
-  }
 
   def finished(gameId: ID): Fu[Option[Game]] =
     coll.one[Game]($id(gameId) ++ Query.finished)
 
   def player(gameId: ID, playerIndex: PlayerIndex): Fu[Option[Player]] =
-    game(gameId) dmap2 { _ player playerIndex }
+    game(gameId) dmap2 { _ `player` playerIndex }
 
   def player(gameId: ID, playerId: ID): Fu[Option[Player]] =
     game(gameId) dmap { gameOption =>
-      gameOption flatMap { _ player playerId }
+      gameOption flatMap { _ `player` playerId }
     }
 
   def player(playerRef: PlayerRef): Fu[Option[Player]] =
@@ -69,14 +67,14 @@ final class GameRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionCont
 
   def pov(gameId: ID, playerIndex: PlayerIndex): Fu[Option[Pov]] =
     game(gameId) dmap2 { (game: Game) =>
-      Pov(game, game player playerIndex)
+      Pov(game, game `player` playerIndex)
     }
 
   def pov(gameId: ID, playerIndex: String): Fu[Option[Pov]] =
     PlayerIndex.fromName(playerIndex) so (pov(gameId, _))
 
   def pov(playerRef: PlayerRef): Fu[Option[Pov]] =
-    game(playerRef.gameId) dmap { _ flatMap { _ playerIdPov playerRef.playerId } }
+    game(playerRef.gameId) dmap { _ flatMap { _ `playerIdPov` playerRef.playerId } }
 
   def pov(fullId: ID): Fu[Option[Pov]] = pov(PlayerRef(fullId))
 
@@ -89,9 +87,8 @@ final class GameRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionCont
       user: User,
       readPreference: ReadPreference = ReadPreference.secondaryPreferred
   ): Fu[List[Pov]] =
-    coll.byOrderedIds[Game, ID](gameIds, readPreference = readPreference)(_.id) dmap {
+    coll.byOrderedIds[Game, ID](gameIds, readPreference = readPreference)(_.id) dmap:
       _.flatMap(g => Pov(g, user))
-    }
 
   def recentPovsByUserFromSecondary(user: User, nb: Int, select: Bdoc = $empty): Fu[List[Pov]] =
     recentGamesByUserFromSecondaryCursor(user, select)
@@ -114,7 +111,7 @@ final class GameRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionCont
           ++ Query.turnsGt(20)
           ++ Query.clockHistory(true)
       )
-      .sort($sort asc F.createdAt)
+      .sort($sort `asc` F.createdAt)
       .cursor[Game](ReadPreference.secondaryPreferred)
       .list(nb)
 
@@ -128,7 +125,7 @@ final class GameRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionCont
           ++ Query.variantStandard
           ++ Query.clock(true)
       )
-      .sort($sort asc F.createdAt)
+      .sort($sort `asc` F.createdAt)
       .cursor[Game](ReadPreference.secondaryPreferred)
       .list(nb)
 
@@ -141,13 +138,13 @@ final class GameRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionCont
   def cursor(
       selector: Bdoc,
       readPreference: ReadPreference = ReadPreference.secondaryPreferred
-  ): AkkaStreamCursor[Game] =
+  ): PekkoStreamCursor[Game] =
     coll.find(selector).cursor[Game](readPreference)
 
   def docCursor(
       selector: Bdoc,
       readPreference: ReadPreference = ReadPreference.secondaryPreferred
-  ): AkkaStreamCursor[Bdoc] =
+  ): PekkoStreamCursor[Bdoc] =
     coll.find(selector).cursor[Bdoc](readPreference)
 
   def sortedCursor(
@@ -155,7 +152,7 @@ final class GameRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionCont
       sort: Bdoc,
       batchSize: Int = 0,
       readPreference: ReadPreference = ReadPreference.secondaryPreferred
-  ): AkkaStreamCursor[Game] =
+  ): PekkoStreamCursor[Game] =
     coll.find(selector).sort(sort).batchSize(batchSize).cursor[Game](readPreference)
 
   def goBerserk(pov: Pov): Funit =
@@ -172,7 +169,7 @@ final class GameRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionCont
     saveDiff(progress.origin, GameDiff(progress.origin, progress.game))
 
   private def saveDiff(origin: Game, diff: GameDiff.Diff): Funit =
-    diff match {
+    diff match
       case (Nil, Nil) => funit
       case (sets, unsets) =>
         coll.update
@@ -181,7 +178,6 @@ final class GameRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionCont
             nonEmptyMod("$set", $doc(sets)) ++ nonEmptyMod("$unset", $doc(unsets))
           )
           .void
-    }
 
   private def nonEmptyMod(mod: String, doc: Bdoc) =
     if (doc.isEmpty) $empty else $doc(mod -> doc)
@@ -197,9 +193,8 @@ final class GameRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionCont
 
   // Use Env.round.proxy.urgentGames to get in-heap states!
   def urgentPovsUnsorted(user: User): Fu[List[Pov]] =
-    coll.list[Game](Query nowPlaying user.id, Game.maxPlaying + 5) dmap {
+    coll.list[Game](Query `nowPlaying` user.id, Game.maxPlaying + 5) dmap:
       _ flatMap { Pov(_, user) }
-    }
 
   def countWhereUserTurn(userId: User.ID): Fu[Int] =
     coll
@@ -237,30 +232,29 @@ final class GameRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionCont
 
   def lastPlayedPlayingId(userId: User.ID): Fu[Option[Game.ID]] =
     coll
-      .find(Query recentlyPlaying userId, $id(true).some)
+      .find(Query `recentlyPlaying` userId, $id(true).some)
       .sort(Query.sortMovedAtNoIndex)
       .one[Bdoc](readPreference = ReadPreference.primary)
       .dmap { _.flatMap(_.getAsOpt[Game.ID](F.id)) }
 
   def allPlaying(userId: User.ID): Fu[List[Pov]] =
     coll
-      .list[Game](Query nowPlaying userId)
+      .list[Game](Query `nowPlaying` userId)
       .dmap { _ flatMap { Pov.ofUserId(_, userId) } }
 
   def lastPlayed(user: User): Fu[Option[Pov]] =
     coll
-      .find(Query user user.id)
-      .sort($sort desc F.createdAt)
+      .find(Query `user` user.id)
+      .sort($sort `desc` F.createdAt)
       .cursor[Game]()
       .list(2)
-      .dmap {
+      .dmap:
         _.sortBy(_.updatedAt).lastOption flatMap { Pov(_, user) }
-      }
 
   def quickLastPlayedId(userId: User.ID): Fu[Option[Game.ID]] =
     coll
-      .find(Query user userId, $id(true).some)
-      .sort($sort desc F.createdAt)
+      .find(Query `user` userId, $id(true).some)
+      .sort($sort `desc` F.createdAt)
       .one[Bdoc]
       .dmap { _.flatMap(_.getAsOpt[Game.ID](F.id)) }
 
@@ -305,10 +299,10 @@ final class GameRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionCont
 
   def setBorderAlert(pov: Pov) = setHoldAlert(pov, Player.HoldAlert(0, 0, 20))
 
-  object holdAlert {
+  object holdAlert:
     private val holdAlertSelector = $or(
-      holdAlertField(P1) $exists true,
-      holdAlertField(P2) $exists true
+      holdAlertField(P1) `$exists` true,
+      holdAlertField(P2) `$exists` true
     )
     private val holdAlertProjection = $doc(
       holdAlertField(P1) -> true,
@@ -323,11 +317,10 @@ final class GameRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionCont
       coll.one[Bdoc](
         $doc(F.id -> game.id, holdAlertSelector),
         holdAlertProjection
-      ) map {
+      ) map:
         _.fold(Player.HoldAlert.emptyMap) { doc =>
           PlayerIndex.Map(p1 = holdAlertOf(doc, P1), p2 = holdAlertOf(doc, P2))
         }
-      }
 
     def povs(povs: Seq[Pov]): Fu[Map[Game.ID, Player.HoldAlert]] =
       coll
@@ -348,13 +341,12 @@ final class GameRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionCont
         } yield id -> holds
         holds.toMap
       }
-  }
 
   def hasHoldAlert(pov: Pov): Fu[Boolean] =
     coll.exists(
       $doc(
         $id(pov.gameId),
-        holdAlertField(pov.playerIndex) $exists true
+        holdAlertField(pov.playerIndex) `$exists` true
       )
     )
 
@@ -403,28 +395,27 @@ final class GameRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionCont
         Query.mate ++ Query.variantStandard
       )
       .sort(Query.sortCreated)
-      .skip(ThreadLocalRandom nextInt distribution)
+      .skip(ThreadLocalRandom `nextInt` distribution)
       .one[Game]
 
-  def insertDenormalized(g: Game, initialFen: Option[FEN] = None): Funit = {
+  def insertDenormalized(g: Game, initialFen: Option[FEN] = None): Funit =
     val g2 =
       if (g.rated && (g.userIds.distinct.size != 2 || !Game.allowRated(g.variant, g.clock.map(_.config))))
         g.copy(mode = Mode.Casual)
       else g
     val userIds = g2.userIds.distinct
 
-    val fen: Option[FEN] = initialFen orElse {
+    val fen: Option[FEN] = initialFen orElse:
       (!g2.variant.standardInitialPosition)
         .option(Forsyth.>>(g2.variant.gameLogic, g2.stratGame))
         .filterNot(_.initial)
-    }
     val checkInHours =
       if (g2.isPgnImport) none
       else if (g2.hasClock) 1.some
       else if (g2.hasAi) (Game.aiAbandonedHours + 1).some
       else (24 * 10).some
     val isMultiMatch = g.metadata.multiMatch
-    val bson = (gameBSONHandler write g2) ++ $doc(
+    val bson = (gameBSONHandler `write` g2) ++ $doc(
       F.initialFen  -> fen,
       F.checkAt     -> checkInHours.map(DateTime.now.plusHours),
       F.playingUids -> (g2.started && userIds.nonEmpty).option(userIds)
@@ -432,12 +423,11 @@ final class GameRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionCont
     coll.insert.one(bson) addFailureEffect {
       case wr: WriteResult if isDuplicateKey(wr) => val _ = lila.mon.game.idCollision.increment()
     } void
-  }
 
   def removeRecentChallengesOf(userId: String) =
     coll.delete.one(
       Query.created ++ Query.friend ++ Query.user(userId) ++
-        Query.createdSince(DateTime.now minusHours 1)
+        Query.createdSince(DateTime.now `minusHours` 1)
     )
 
   def setCheckAt(g: Game, at: DateTime) =
@@ -457,20 +447,18 @@ final class GameRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionCont
     coll.primitiveOne[FEN]($id(gameId), F.initialFen)
 
   def initialFen(game: Game): Fu[Option[FEN]] =
-    if (game.imported || !game.variant.standardInitialPosition) initialFen(game.id) dmap {
+    if (game.imported || !game.variant.standardInitialPosition) initialFen(game.id) dmap:
       case None if game.variant.variableInitialFen => Some(game.variant.initialFen)
       case fen                                     => fen
-    }
     else fuccess(none)
 
   def gameWithInitialFen(gameId: ID): Fu[Option[(Game, Option[FEN])]] =
-    game(gameId) flatMap {
+    game(gameId) flatMap:
       _ so { game =>
         initialFen(game) dmap { fen =>
           Option(game -> fen)
         }
       }
-    }
 
   def withInitialFen(game: Game): Fu[Game.WithInitialFen] =
     initialFen(game) dmap { Game.WithInitialFen(game, _) }
@@ -480,13 +468,13 @@ final class GameRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionCont
       initialFen(game) dmap { game -> _ }
     })
 
-  def count(query: Query.type => Bdoc): Fu[Int] = coll countSel query(Query)
+  def count(query: Query.type => Bdoc): Fu[Int] = coll `countSel` query(Query)
 
   private[game] def favoriteOpponents(
       userId: String,
       opponentLimit: Int,
       gameLimit: Int
-  ): Fu[List[(User.ID, Int)]] = {
+  ): Fu[List[(User.ID, Int)]] =
     coll
       .aggregateWith[Bdoc](readPreference = ReadPreference.secondaryPreferred) { framework =>
         import framework._
@@ -502,7 +490,7 @@ final class GameRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionCont
             )
           ),
           UnwindField(F.playerUids),
-          Match($doc(F.playerUids $ne userId)),
+          Match($doc(F.playerUids `$ne` userId)),
           GroupField(F.playerUids)("gs" -> SumAll),
           Sort(Descending("gs")),
           Limit(opponentLimit)
@@ -514,13 +502,12 @@ final class GameRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionCont
           obj.int("gs") map { id -> _ }
         }
       })
-  }
 
   def random: Fu[Option[Game]] =
     coll
       .find($empty)
       .sort(Query.sortCreated)
-      .skip(ThreadLocalRandom nextInt 1000)
+      .skip(ThreadLocalRandom `nextInt` 1000)
       .one[Game]
 
   def findPgnImport(pgn: String): Fu[Option[Game]] =
@@ -533,8 +520,8 @@ final class GameRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionCont
   def lastGameBetween(u1: String, u2: String, since: DateTime): Fu[Option[Game]] =
     coll.one[Game](
       $doc(
-        F.playerUids $all List(u1, u2),
-        F.createdAt $gt since
+        F.playerUids `$all` List(u1, u2),
+        F.createdAt `$gt` since
       )
     )
 
@@ -542,18 +529,17 @@ final class GameRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionCont
     List(u1, u2).forall(_.count.game > 0) so
       coll.secondaryPreferred.list[Game](
         $doc(
-          F.playerUids $all List(u1.id, u2.id),
-          F.createdAt $gt since
+          F.playerUids `$all` List(u1.id, u2.id),
+          F.createdAt `$gt` since
         ),
         nb
       )
 
   def getSourceAndUserIds(id: ID): Fu[(Option[Source], List[User.ID])] =
-    coll.one[Bdoc]($id(id), $doc(F.playerUids -> true, F.source -> true)) dmap {
+    coll.one[Bdoc]($id(id), $doc(F.playerUids -> true, F.source -> true)) dmap:
       _.fold(none[Source] -> List.empty[User.ID]) { doc =>
         (doc.int(F.source) flatMap Source.apply, ~doc.getAsOpt[List[User.ID]](F.playerUids))
       }
-    }
 
   def recentAnalysableGamesByUserId(userId: User.ID, nb: Int) =
     coll
@@ -708,15 +694,13 @@ final class GameRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionCont
   def calculateWinRatePercentages: Fu[List[WinRatePercentages]] =
     calculateWinRates.map { list =>
       list.map { wr =>
-        if (wr.total > 0) {
+        if (wr.total > 0)
           val p2Pct   = (wr.p2 * 100) / wr.total
           val drawPct = (wr.draws * 100) / wr.total
           val p1Pct   = 100 - p2Pct - drawPct
           WinRatePercentages(wr.libVar, p1Pct, p2Pct, drawPct)
-        } else {
+        else
           WinRatePercentages(wr.libVar, 0, 0, 0)
-        }
       }
     }
 
-}

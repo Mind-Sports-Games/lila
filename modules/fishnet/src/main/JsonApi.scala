@@ -2,7 +2,6 @@ package lila.fishnet
 
 import strategygames.format.{ FEN, LexicalUci, Uci, UciDump }
 import strategygames.variant.Variant
-import strategygames.{ GameFamily, GameLogic }
 import org.joda.time.DateTime
 import play.api.libs.json._
 
@@ -11,17 +10,15 @@ import lila.common.{ IpAddress, Maths }
 import lila.fishnet.{ Work => W }
 import lila.tree.Eval.JsonHandlers._
 import lila.tree.Eval.{ Cp, Mate }
-import org.apache.pekko.actor.typed.PostStop
 
-object JsonApi {
+object JsonApi:
 
-  sealed trait Request {
+  sealed trait Request:
     val fishnet: Request.Fishnet
 
     def instance(ip: IpAddress) = Client.Instance(fishnet.version, ip, DateTime.now)
-  }
 
-  object Request {
+  object Request:
 
     sealed trait Result
 
@@ -33,9 +30,8 @@ object JsonApi {
 
     case class Stockfish(
         flavor: Option[String]
-    ) {
-      def isNnue = flavor.has("nnue")
-    }
+    ):
+      def isNnue = flavor.contains("nnue")
 
     case class Acquire(
         fishnet: Fishnet
@@ -46,7 +42,7 @@ object JsonApi {
         stockfish: Stockfish,
         analysis: List[Option[Evaluation.OrSkipped[LexicalUci]]]
     ) extends Request
-        with Result {
+        with Result:
 
       def toUci(variant: Variant) =
         PostAnalysisUci(
@@ -59,40 +55,36 @@ object JsonApi {
             })
           )
         )
-    }
 
     case class PostAnalysisUci(
         fishnet: Fishnet,
         stockfish: Stockfish,
         analysis: List[Option[Evaluation.OrSkipped[Uci]]]
     ) extends Request
-        with Result {
+        with Result:
 
       def completeOrPartial =
         if (analysis.headOption.so(_.isDefined)) CompleteAnalysis(fishnet, stockfish, analysis.flatten)
         else PartialAnalysis(fishnet, stockfish, analysis)
-    }
 
     case class CompleteAnalysis(
         fishnet: Fishnet,
         stockfish: Stockfish,
         analysis: List[Evaluation.OrSkipped[Uci]]
-    ) {
+    ):
 
       def evaluations = analysis.collect { case Right(e) => e }
 
       def medianNodes =
-        Maths.median {
+        Maths.median:
           evaluations
             .withFilter(e => !(e.mateFound || e.deadDraw))
             .flatMap(_.nodes)
-        }
 
       // fishnet 2.x analysis is never weak in this sense. It is either exactly
       // the same as analysis provided by any other instance, or failed.
       def strong = stockfish.flavor.isDefined || medianNodes.fold(true)(_ > Evaluation.legacyAcceptableNodes)
       def weak   = !strong
-    }
 
     case class PartialAnalysis(
         fishnet: Fishnet,
@@ -112,26 +104,24 @@ object JsonApi {
         nodes: Option[Int],
         nps: Option[Int],
         depth: Option[Int]
-    ) {
+    ):
       val cappedNps = nps.map(_ min Evaluation.npsCeil)
 
       val cappedPv = pv take lila.analyse.Info.LineMaxTurns
 
-      def isCheckmate = score.mate has Mate(0)
+      def isCheckmate = score.mate.contains(Mate(0))
       def mateFound   = score.mate.isDefined
-      def deadDraw    = score.cp has Cp(0)
-    }
+      def deadDraw    = score.cp.contains(Cp(0))
 
-    object Evaluation {
+    object Evaluation:
 
       object Skipped
 
       type OrSkipped[T] = Either[Skipped.type, Evaluation[T]]
 
-      case class Score(cp: Option[Cp], mate: Option[Mate]) {
+      case class Score(cp: Option[Cp], mate: Option[Mate]):
         def invert                  = copy(cp.map(_.invert), mate.map(_.invert))
         def invertIf(cond: Boolean) = if (cond) invert else this
-      }
 
       val npsCeil = 10_000_000
 
@@ -149,8 +139,6 @@ object JsonApi {
           eval.nps,
           eval.depth
         )
-    }
-  }
 
   case class UciGame(
       game_id: String,
@@ -164,10 +152,9 @@ object JsonApi {
       position: FEN,
       variant: Variant,
       moves: String
-  ) {
+  ):
     def uciMoves = ~(Uci.readList(variant.gameLogic, variant.gameFamily, moves))
     def toUci    = UciGame(game_id, position, variant, uciMoves)
-  }
 
   def fromGame(g: W.Game) =
     Game(
@@ -180,10 +167,9 @@ object JsonApi {
       moves = g.moves
     )
 
-  sealed trait Work {
+  sealed trait Work:
     val id: String
     val game: Game
-  }
 
   case class Analysis(
       id: String,
@@ -200,7 +186,7 @@ object JsonApi {
       skipPositions = m.skipPositions
     )
 
-  object readers {
+  object readers:
     import play.api.libs.functional.syntax._
     implicit val ClientVersionReads: Reads[Client.Version]   = Reads.of[String].map(Client.Version(_))
     implicit val ClientPythonReads: Reads[Client.Python]     = Reads.of[String].map(Client.Python(_))
@@ -224,17 +210,15 @@ object JsonApi {
       Request.Evaluation[LexicalUci](moves, score, time, nodes, nps, depth)
     )
     implicit val EvaluationOptionReads: Reads[Option[Request.Evaluation.OrSkipped[LexicalUci]]] =
-      Reads[Option[Request.Evaluation.OrSkipped[LexicalUci]]] {
+      Reads[Option[Request.Evaluation.OrSkipped[LexicalUci]]]:
         case JsNull => JsSuccess(None)
         case obj =>
-          if (~(obj boolean "skipped")) JsSuccess(Left(Request.Evaluation.Skipped).some)
+          if (~(obj `boolean` "skipped")) JsSuccess(Left(Request.Evaluation.Skipped).some)
           else EvaluationReads reads obj map Right.apply map some
-      }
     implicit val PostAnalysisReads: Reads[Request.PostAnalysisLexicalUci] =
       Json.reads[Request.PostAnalysisLexicalUci]
-  }
 
-  object writers {
+  object writers:
     implicit val VariantWrites: Writes[Variant] = Writes[Variant] { v => JsString(v.fishnetKey) }
     implicit val GameWrites: Writes[UciGame] = Writes[UciGame] { g =>
       Json.obj(
@@ -266,5 +250,3 @@ object JsonApi {
           )
       }) ++ Json.toJson(work.game.toUci).as[JsObject]
     }
-  }
-}

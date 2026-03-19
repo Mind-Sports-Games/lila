@@ -2,7 +2,7 @@ package lila.common
 
 import scala.collection.mutable.StringBuilder
 
-object ThreadLocalRandom {
+object ThreadLocalRandom:
 
   import java.util.concurrent.ThreadLocalRandom.current
 
@@ -22,13 +22,10 @@ object ThreadLocalRandom {
   }.toChar
   def shuffle[T, C](xs: IterableOnce[T])(implicit bf: scala.collection.BuildFrom[xs.type, T, C]): C =
     new scala.util.Random(current).shuffle(xs)
-  def nextString(len: Int): String = {
+  def nextString(len: Int): String =
     val sb = new StringBuilder(len)
     for (_ <- 0 until len) sb += nextChar()
     sb.result()
-  }
   def oneOf[A](vec: Vector[A]): Option[A] =
-    vec.nonEmpty so {
+    vec.nonEmpty so:
       vec lift nextInt(vec.size)
-    }
-}

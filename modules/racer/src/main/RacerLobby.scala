@@ -1,11 +1,10 @@
 package lila.racer
 
-import scala.concurrent.duration._
 import scala.concurrent.ExecutionContext
 
-final class RacerLobby(api: RacerApi)(implicit ec: ExecutionContext, scheduler: org.apache.pekko.actor.Scheduler) {
+final class RacerLobby(api: RacerApi)(implicit ec: ExecutionContext, scheduler: org.apache.pekko.actor.Scheduler):
 
-  def join(player: RacerPlayer.Id): Fu[RacerRace.Id] = workQueue {
+  def join(player: RacerPlayer.Id): Fu[RacerRace.Id] = workQueue:
     currentRace flatMap {
       case race if race.players.sizeIs >= RacerRace.maxPlayers => makeNewRace(7)
       case race if race.startsInMillis.exists(_ < 3000)        => makeNewRace(10)
@@ -14,7 +13,6 @@ final class RacerLobby(api: RacerApi)(implicit ec: ExecutionContext, scheduler: 
       api.join(raceId, player)
       raceId
     }
-  }
 
   private val workQueue =
     new lila.hub.DuctSequencer(
@@ -29,8 +27,6 @@ final class RacerLobby(api: RacerApi)(implicit ec: ExecutionContext, scheduler: 
 
   private def currentRace: Fu[RacerRace] = currentId.map(api.get) dmap { _ | fallbackRace }
 
-  private def makeNewRace(countdownSeconds: Int): Fu[RacerRace.Id] = {
+  private def makeNewRace(countdownSeconds: Int): Fu[RacerRace.Id] =
     currentId = api.create(RacerPlayer.playstrategy, countdownSeconds)
     currentId
-  }
-}

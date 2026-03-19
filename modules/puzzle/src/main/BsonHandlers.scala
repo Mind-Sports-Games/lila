@@ -9,16 +9,16 @@ import lila.db.dsl._
 import lila.game.Game
 import lila.rating.Glicko
 
-import strategygames.{ GameFamily, GameLogic }
+import strategygames.GameLogic
 import strategygames.variant.Variant
 
-object BsonHandlers {
+object BsonHandlers:
 
   implicit val PuzzleIdBSONHandler: BSONHandler[Puzzle.Id] = stringIsoHandler(Puzzle.idIso)
 
   import Puzzle.BSONFields._
 
-  implicit private[puzzle] val PuzzleBSONReader: BSONDocumentReader[Puzzle] = new BSONDocumentReader[Puzzle] {
+  implicit private[puzzle] val PuzzleBSONReader: BSONDocumentReader[Puzzle] = new BSONDocumentReader[Puzzle]:
     def readDocument(r: BSONDocument) = for {
       id      <- r.getAsTry[Puzzle.Id](id)
       gameId  <- r.getAsTry[Game.ID](gameId)
@@ -50,7 +50,6 @@ object BsonHandlers {
       vote = vote,
       themes = themes
     )
-  }
 
   implicit private[puzzle] val RoundIdHandler: BSONHandler[PuzzleRound.Id] = tryHandler[PuzzleRound.Id](
     { case BSONString(v) =>
@@ -74,7 +73,7 @@ object BsonHandlers {
       rt => BSONString(s"${if (rt.vote) "+" else "-"}${rt.theme}")
     )
 
-  implicit private[puzzle] val RoundHandler: BSON[PuzzleRound] = new BSON[PuzzleRound] {
+  implicit private[puzzle] val RoundHandler: BSON[PuzzleRound] = new BSON[PuzzleRound]:
     import PuzzleRound.BSONFields._
     def reads(r: BSON.Reader) = PuzzleRound(
       id = r.get[PuzzleRound.Id](id),
@@ -93,7 +92,6 @@ object BsonHandlers {
         vote    -> r.vote,
         themes  -> w.listO(r.themes)
       )
-  }
 
   implicit private[puzzle] val PathIdBSONHandler: BSONHandler[PuzzlePath.Id] = stringIsoHandler(
     PuzzlePath.pathIdIso
@@ -102,4 +100,3 @@ object BsonHandlers {
   implicit private[puzzle] val ThemeKeyBSONHandler: BSONHandler[PuzzleTheme.Key] = stringIsoHandler(
     PuzzleTheme.keyIso
   )
-}

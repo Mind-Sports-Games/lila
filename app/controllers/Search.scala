@@ -35,7 +35,7 @@ final class Search(env: Env) extends LilaController(env) {
             Reasonable(page, 100) {
               val ip           = HTTPRequest ipAddress ctx.req
               val cost         = scala.math.sqrt(page.toDouble).toInt
-              implicit def req = ctx.body
+              implicit def req: play.api.mvc.Request[?] = ctx.body
               def limited =
                 fuccess {
                   val form = searchForm

@@ -47,11 +47,13 @@ object layout {
     raw {
       s"""<link rel="preload" href="${assetUrl(
         s"font/playstrategy.woff2"
-      )}" as="font" type="font/woff2" crossorigin>""" +
-        !ctx.pref.pieceNotationIsLetter so
-        s"""<link rel="preload" href="${assetUrl(
-          s"font/playstrategy.chess.woff2"
-        )}" as="font" type="font/woff2" crossorigin>"""
+      )}" as="font" type="font/woff2" crossorigin>""" + (
+        if (!ctx.pref.pieceNotationIsLetter)
+          s"""<link rel="preload" href="${assetUrl(
+            s"font/playstrategy.chess.woff2"
+          )}" as="font" type="font/woff2" crossorigin>"""
+        else ""
+      )
     }
   private val manifests = raw(
     """<link rel="manifest" href="/manifest.json"><meta name="twitter:site" content="@playstrategy">"""

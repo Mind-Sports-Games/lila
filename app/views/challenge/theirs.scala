@@ -45,7 +45,7 @@ object theirs {
                   views.html.board.bits.miniForVariant(fen, c.variant, !c.finalPlayerIndex)(div)
                 )
               },
-              if (playerIndex.map(Challenge.PlayerIndexChoice.apply).has(c.playerIndexChoice))
+              if (playerIndex.map(Challenge.PlayerIndexChoice.apply).contains(c.playerIndexChoice))
                 badTag(
                   // very rare message, don't translate
                   s"You have the wrong playerIndex link for this open challenge. The ${playerIndex.so(_.name)} player has already joined."

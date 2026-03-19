@@ -45,7 +45,7 @@ case class EmailAddress(value: String) extends AnyVal with StringValue:
       case _                   => value
 
   def normalize =
-    NormalizedEmailAddress {
+    NormalizedEmailAddress:
       // changing normalization requires database migration!
       val lower = value.toLowerCase
       lower.split('@') match
@@ -55,7 +55,6 @@ case class EmailAddress(value: String) extends AnyVal with StringValue:
             .takeWhile('+' !=) // skip everything after the first '+'
           if normalizedName.isEmpty then lower else s"$normalizedName@$domain"
         case _ => lower
-    }
 
   def domain: Option[Domain] =
     value split '@' match

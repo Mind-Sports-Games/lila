@@ -1,12 +1,9 @@
 package lila.pool
 
-import scala.concurrent.duration._
-
-import strategygames.{ Game => StratGame, P1, P2, Situation, GameLogic }
-import strategygames.chess
+import strategygames.{ P1, P2, Situation, GameLogic }
 
 import lila.game.{ Game, GameRepo, IdGenerator, Player, Source }
-import lila.rating.{ Perf, PerfType }
+import lila.rating.Perf
 import lila.user.{ User, UserRepo }
 import lila.common.LightUser
 
@@ -18,30 +15,28 @@ final private class GameStarter(
 )(implicit
     ec: scala.concurrent.ExecutionContext,
     scheduler: org.apache.pekko.actor.Scheduler
-) {
+):
 
   import PoolApi._
 
   private val workQueue = new lila.hub.DuctSequencer(maxSize = 32, timeout = 10 seconds, name = "gameStarter")
 
   def apply(pool: PoolConfig, couples: Vector[MatchMaking.Couple]): Funit =
-    couples.nonEmpty so {
-      workQueue {
+    couples.nonEmpty so:
+      workQueue:
         val userIds = couples.flatMap(_.userIds)
         userRepo.perfOf(userIds, pool.perfType) flatMap { perfs =>
           idGenerator.games(couples.size) flatMap { ids =>
-            Future.sequence(couples.zip(ids).map((one(pool, perfs) _).tupled)).map { pairings =>
+            Future.sequence(couples.zip(ids).map((one(pool, perfs)).tupled)).map { pairings =>
               lila.common.Bus.publish(Pairings(pairings.flatten.toList), "poolPairings")
             }
           }
         }
-      }
-    }
 
   private def one(pool: PoolConfig, perfs: Map[User.ID, Perf])(
       couple: MatchMaking.Couple,
       id: Game.ID
-  ): Fu[Option[Pairing]] = {
+  ): Fu[Option[Pairing]] =
     import couple._
     import cats.implicits._
     (perfs.get(p1.userId), perfs.get(p2.userId)).mapN((_, _)) so { case (perf1, perf2) =>
@@ -55,24 +50,22 @@ final private class GameStarter(
           p1Member.userId -> p1Perf,
           p2Member.userId -> p2Perf
         ).start
-        _ <- gameRepo insertDenormalized game
-      } yield {
+        _ <- gameRepo `insertDenormalized` game
+      } yield
         onStart(Game.Id(game.id))
         Pairing(
           game,
           p1Sri = p1Member.sri,
           p2Sri = p2Member.sri
         ).some
-      }
     }
-  }
 
   private def makeGame(
       id: Game.ID,
       pool: PoolConfig,
       p1User: (User.ID, Perf),
       p2User: (User.ID, Perf)
-  ) = {
+  ) =
     val stratSit = Situation(pool.variant.gameLogic, pool.variant)
     Game
       .make(
@@ -94,9 +87,7 @@ final private class GameStarter(
         pgnImport = None
       )
       .withId(id)
-  }
 
-}
 
 final private class BotGameStarter(
     userRepo: UserRepo,
@@ -106,7 +97,7 @@ final private class BotGameStarter(
 )(implicit
     ec: scala.concurrent.ExecutionContext,
     scheduler: org.apache.pekko.actor.Scheduler
-) {
+):
 
   import PoolApi._
 
@@ -115,7 +106,7 @@ final private class BotGameStarter(
 
   //assumption - if a bot has a rating it can play a variant
   def apply(pool: PoolConfig, poolUser: PoolMember): Funit =
-    workQueue {
+    workQueue:
       val userIds = List(poolUser.userId) ++ LightUser.poolBotsIDs
       userRepo.perfOf(userIds, pool.perfType) flatMap { perfs =>
         {
@@ -134,12 +125,11 @@ final private class BotGameStarter(
           }
         }
       }
-    }
 
   private def one(pool: PoolConfig, perfs: Map[User.ID, Perf])(
       couple: MatchMaking.Couple,
       id: Game.ID
-  ): Fu[Option[Pairing]] = {
+  ): Fu[Option[Pairing]] =
     import couple._
     import cats.implicits._
     (perfs.get(p1.userId), perfs.get(p2.userId)).mapN((_, _)) so { case (perf1, perf2) =>
@@ -153,24 +143,22 @@ final private class BotGameStarter(
           p1Member.userId -> p1Perf,
           p2Member.userId -> p2Perf
         ).start
-        _ <- gameRepo insertDenormalized game
-      } yield {
+        _ <- gameRepo `insertDenormalized` game
+      } yield
         onStart(Game.Id(game.id))
         Pairing(
           game,
           p1Sri = p1Member.sri,
           p2Sri = p2Member.sri
         ).some
-      }
     }
-  }
 
   private def makeGame(
       id: Game.ID,
       pool: PoolConfig,
       p1User: (User.ID, Perf),
       p2User: (User.ID, Perf)
-  ) = {
+  ) =
     val stratSit = Situation(pool.variant.gameLogic, pool.variant)
     Game
       .make(
@@ -192,7 +180,6 @@ final private class BotGameStarter(
         pgnImport = None
       )
       .withId(id)
-  }
 
   def botPoolMember(userPoolMember: PoolMember, botId: User.ID) =
     PoolMember(
@@ -205,4 +192,3 @@ final private class BotGameStarter(
       0,
       0
     )
-}

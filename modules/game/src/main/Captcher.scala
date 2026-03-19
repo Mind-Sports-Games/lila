@@ -14,9 +14,9 @@ import lila.hub.actorApi.captcha._
 
 // only works with standard chess
 final private class Captcher(gameRepo: GameRepo)(implicit ec: scala.concurrent.ExecutionContext)
-    extends Actor {
+    extends Actor:
 
-  def receive = {
+  def receive =
 
     case AnyCaptcha => sender() ! Impl.current
 
@@ -25,16 +25,14 @@ final private class Captcher(gameRepo: GameRepo)(implicit ec: scala.concurrent.E
     case actorApi.NewCaptcha => Impl.refresh.discard
 
     case ValidCaptcha(id: String, solution: String) =>
-      Impl.get(id).map(_ valid solution).pipeTo(sender()).discard
-  }
+      Impl.get(id).map(_ `valid` solution).pipeTo(sender()).discard
 
-  private object Impl {
+  private object Impl:
 
     def get(id: String): Fu[Captcha] =
-      find(id) match {
-        case None    => getFromDb(id) map (c => (c | Captcha.default) ~ add)
+      find(id) match
+        case None    => getFromDb(id) map { c => val result = c | Captcha.default; add(result); result }
         case Some(c) => fuccess(c)
-      }
 
     def current = challenges.head
 
@@ -48,11 +46,9 @@ final private class Captcher(gameRepo: GameRepo)(implicit ec: scala.concurrent.E
     private val capacity   = 256
     private var challenges = NonEmptyList.one(Captcha.default)
 
-    private def add(c: Captcha): Unit = {
-      find(c.gameId) ifNone {
+    private def add(c: Captcha): Unit =
+      find(c.gameId).getOrElse:
         challenges = NonEmptyList(c, challenges.toList take capacity)
-      }
-    }
 
     private def find(id: String): Option[Captcha] =
       challenges.find(_.gameId == id)
@@ -60,20 +56,18 @@ final private class Captcher(gameRepo: GameRepo)(implicit ec: scala.concurrent.E
     private def createFromDb: Fu[Option[Captcha]] =
       findCheckmateInDb(10) flatMap {
         _.fold(findCheckmateInDb(1))(g => fuccess(g.some))
-      } flatMap {
+      } flatMap:
         _ so fromGame
-      }
 
     private def findCheckmateInDb(distribution: Int): Fu[Option[Game]] =
-      gameRepo findRandomStandardCheckmate distribution
+      gameRepo `findRandomStandardCheckmate` distribution
 
     private def getFromDb(id: String): Fu[Option[Captcha]] =
-      gameRepo game id flatMap { _ so fromGame }
+      gameRepo `game` id flatMap { _ so fromGame }
 
     private def fromGame(game: Game): Fu[Option[Captcha]] =
-      gameRepo getOptionActionStrs game.id map {
+      gameRepo `getOptionActionStrs` game.id map:
         _ flatMap { makeCaptcha(game, _) }
-      }
 
     private def makeCaptcha(game: Game, actionStrs: ActionStrs): Option[Captcha] =
       for {
@@ -88,7 +82,7 @@ final private class Captcher(gameRepo: GameRepo)(implicit ec: scala.concurrent.E
       game.situation.moves.view
         .flatMap { case (_, moves) =>
           moves filter { move =>
-            (move.after situationOf !game.player).checkMate
+            (move.after `situationOf` !game.player).checkMate
           }
         }
         .to(List) map { move =>
@@ -102,19 +96,16 @@ final private class Captcher(gameRepo: GameRepo)(implicit ec: scala.concurrent.E
           sans => Sans(safeInit(sans.value)),
           tags = Tags.empty
         )
-        .flatMap(_.valid)
+        .andThen(_.valid)
         .map(_.state)
         .toOption
         .map(StratGame.Chess)
 
     private def safeInit[A](list: List[A]): List[A] =
-      list match {
+      list match
         case _ :: Nil => Nil
         case x :: xs  => x :: safeInit(xs)
         case _        => Nil
-      }
 
     private def fen(game: StratGame): String =
       Forsyth.exportBoard(game.board.variant.gameLogic, game.board)
-  }
-}

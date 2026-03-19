@@ -11,14 +11,14 @@ final private class ChallengeSocket(
 )(implicit
     ec: scala.concurrent.ExecutionContext,
     mode: play.api.Mode
-) {
+):
 
   import ChallengeSocket._
 
   def reload(challengeId: Challenge.ID): Unit =
     rooms.tell(challengeId, NotifyVersion("reload", JsNull))
 
-  private lazy val send: String => Unit = remoteSocketApi.makeSender("chal-out").apply _
+  private lazy val send: String => Unit = remoteSocketApi.makeSender("chal-out").apply
 
   lazy val rooms = makeRoomMap(send)
 
@@ -27,25 +27,20 @@ final private class ChallengeSocket(
   }
 
   remoteSocketApi.subscribe("chal-in", Protocol.In.reader)(
-    challengeHandler orElse minRoomHandler(rooms, lila log "challenge") orElse remoteSocketApi.baseHandler
+    challengeHandler orElse minRoomHandler(rooms, lila `log` "challenge") orElse remoteSocketApi.baseHandler
   )
 
-  api registerSocket this
-}
+  api `registerSocket` this
 
-object ChallengeSocket {
+object ChallengeSocket:
 
-  object Protocol {
+  object Protocol:
 
-    object In {
+    object In:
 
       case class OwnerPings(ids: Iterable[String]) extends P.In
 
       val reader: P.In.Reader = raw =>
-        raw.path match {
+        raw.path match
           case "challenge/pings" => OwnerPings(P.In.commas(raw.args)).some
           case _                 => RP.In.reader(raw)
-        }
-    }
-  }
-}

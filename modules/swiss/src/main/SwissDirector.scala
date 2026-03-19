@@ -4,7 +4,6 @@ import strategygames.{ P2, Player => PlayerIndex, P1, GameLogic, GameFamily, Cen
 import strategygames.variant.Variant
 import strategygames.format.FEN
 import org.joda.time.DateTime
-import scala.util.chaining._
 import scala.util.Random
 
 import lila.common.extensions.*
@@ -20,28 +19,26 @@ final private class SwissDirector(
 )(implicit
     ec: scala.concurrent.ExecutionContext,
     idGenerator: lila.game.IdGenerator
-) {
+):
   import BsonHandlers._
 
   private def availableDrawTables(variant: Variant) =
-    variant match {
+    variant match
       case Variant.Draughts(variant) =>
         strategygames.draughts.OpeningTable.fensForVariant(variant).map(FEN.Draughts)
       case _ => List()
-    }
 
-  private def randomDrawForVariant(variant: Variant)(): Option[FEN] = {
+  private def randomDrawForVariant(variant: Variant)(): Option[FEN] =
     val tables: List[FEN] = availableDrawTables(variant)
     if (tables.isEmpty) None
     else tables.lift(Random.nextInt(tables.size))
-  }
 
   private def playersAndStartingFen(
       swiss: Swiss,
       players: List[SwissPlayer],
       w: User.ID,
       b: User.ID
-  ): (User.ID, User.ID, Option[FEN]) = {
+  ): (User.ID, User.ID, Option[FEN]) =
     //weaker player must be p1 in handicap go games
     val wRating = players.filter(_.userId == w).map(_.actualRating).headOption.getOrElse(1500)
     val bRating = players.filter(_.userId == b).map(_.actualRating).headOption.getOrElse(1500)
@@ -56,7 +53,7 @@ final private class SwissDirector(
     val mmp1Id             = if (wPoints <= bPoints) w else b
     val mmp2Id             = if (wPoints <= bPoints) b else w
 
-    if (swiss.settings.handicapped) {
+    if (swiss.settings.handicapped)
       (
         p1Id,
         p2Id,
@@ -66,16 +63,14 @@ final private class SwissDirector(
           if (p2Id == w) wRating else bRating
         )
       )
-    } else if (mcMahonHandicapped) {
+    else if (mcMahonHandicapped)
       (mmp1Id, mmp2Id, Handicaps.startingFenMcMahon(swiss.roundVariant.some, scoreDiff))
-    } else if (
+    else if (
       swiss.settings.backgammonPoints.getOrElse(1) > 1 && swiss.variant.gameFamily == GameFamily.Backgammon()
-    ) {
+    )
       (w, b, Some(FEN(swiss.variant.gameLogic, swiss.variant.toBackgammon.fenFromSetupConfig(true).value)))
-    } else {
+    else
       (w, b, None)
-    }
-  }
 
   // sequenced by SwissApi
   private[swiss] def startRound(from: Swiss): Fu[Option[Swiss]] =
@@ -83,9 +78,9 @@ final private class SwissDirector(
       .flatMap { pendings =>
         val pendingPairings = pendings.collect { case Right(p) => p }
         if (pendingPairings.isEmpty) fuccess(none) // terminate
-        else {
+        else
           val swiss            = from.startRound
-          val randomPos        = randomDrawForVariant(swiss.roundVariant) _
+          val randomPos: () => Option[FEN] = () => randomDrawForVariant(swiss.roundVariant)()
           val randomPairingPos = swiss.settings.usePerPairingDrawTables
           val randomRoundPos   = swiss.settings.useDrawTables && !randomPairingPos
           val perSwissPos      = swiss.settings.position
@@ -95,7 +90,7 @@ final private class SwissDirector(
               colls.player.list[SwissPlayer]($doc(f.swissId -> swiss.id))
             }
             ids <- idGenerator.games(pendingPairings.size)
-            pairings = pendingPairings.zip(ids).map {
+            pairings = pendingPairings.zip(ids).map:
               case (SwissPairing.Pending(w, b), id) => {
                 val p1p2sf = playersAndStartingFen(swiss, players, w, b)
 
@@ -120,7 +115,6 @@ final private class SwissDirector(
                   swiss.roundVariant.some
                 )
               }
-            }
             _ <-
               colls.swiss.update
                 .one(
@@ -135,7 +129,7 @@ final private class SwissDirector(
             byes = pendings.collect { case Left(bye) => bye.player }
             _ <- SwissPlayer.fields { f =>
               colls.player.update
-                .one($doc(f.userId $in byes, f.swissId -> swiss.id), $addToSet(f.byes -> swiss.round))
+                .one($doc(f.userId `$in` byes, f.swissId -> swiss.id), $addToSet(f.byes -> swiss.round))
                 .void
             }
             _ <- colls.pairing.insert.many(pairings).void
@@ -144,15 +138,13 @@ final private class SwissDirector(
               gameRepo.insertDenormalized(game).andDo(onStart(game.id))
             }
           } yield swiss.some
-        }
       }
       .recover { case PairingSystem.BBPairingException(msg, input) =>
-        if (msg contains "The number of rounds is larger than the reported number of rounds.") none
-        else {
+        if (msg `contains` "The number of rounds is larger than the reported number of rounds.") none
+        else
           logger.warn(s"BBPairing ${from.id} $msg")
           logger.info(s"BBPairing ${from.id} $input")
           from.some
-        }
       }
       .monSuccess(_.swiss.startRound)
 
@@ -214,7 +206,7 @@ final private class SwissDirector(
                 .Backgammon() && !swiss.settings.handicapped
             ) pairing.p2
             else pairing.p1
-          ) err s"Missing pairing p1 $pairing"
+          ) `err` s"Missing pairing p1 $pairing"
         ),
         p2Player = makePlayer(
           P2,
@@ -225,7 +217,7 @@ final private class SwissDirector(
                 .Backgammon() && !swiss.settings.handicapped
             ) pairing.p1
             else pairing.p2
-          ) err s"Missing pairing p2 $pairing"
+          ) `err` s"Missing pairing p2 $pairing"
         ),
         mode = strategygames.Mode(swiss.settings.rated),
         source = lila.game.Source.Swiss,
@@ -266,4 +258,3 @@ final private class SwissDirector(
       player.inputRating.fold(player.provisional)(_ => false),
       player.inputRating.fold(false)(_ => true)
     )
-}

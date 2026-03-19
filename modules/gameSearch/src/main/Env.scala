@@ -11,7 +11,7 @@ import lila.common.config._
 @Module
 private class GameSearchConfig(
     @ConfigName("index") val indexName: String,
-    @ConfigName("paginator.max_per_page") val paginatorMaxPerPage: MaxPerPage,
+    @ConfigName("paginator.max_per_page") val paginatorMaxPerPage: lila.common.config.MaxPerPage,
     @ConfigName("actor.name") val actorName: String
 )
 
@@ -23,7 +23,7 @@ final class Env(
 )(implicit
     ec: scala.concurrent.ExecutionContext,
     scheduler: org.apache.pekko.actor.Scheduler
-) {
+):
 
   private val config = appConfig.get[GameSearchConfig]("gameSearch")(AutoConfig.loader)
 
@@ -37,8 +37,6 @@ final class Env(
 
   lazy val userGameSearch = wire[UserGameSearch]
 
-  lila.common.Bus.subscribeFun("finishGame", "gameSearchInsert") {
+  lila.common.Bus.subscribeFun("finishGame", "gameSearchInsert"):
     case FinishGame(game, _, _) if !game.aborted => api.store(game).discard
     case InsertGame(game)                        => api.store(game).discard
-  }
-}

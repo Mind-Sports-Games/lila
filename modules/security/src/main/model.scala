@@ -9,11 +9,10 @@ import lila.user.User
 import lila.common.Iso
 import reactivemongo.api.bson.BSONHandler
 
-case class Dated[V](value: V, date: DateTime) extends Ordered[Dated[V]] {
-  def compare(other: Dated[V]) = other.date compareTo date
+case class Dated[V](value: V, date: DateTime) extends Ordered[Dated[V]]:
+  def compare(other: Dated[V]) = other.date `compareTo` date
   def map[X](f: V => X)        = copy(value = f(value))
   def seconds                  = date.getMillis / 1000
-}
 
 case class AuthInfo(user: User.ID, hasFp: Boolean)
 
@@ -27,12 +26,11 @@ case class UserSession(
     ua: String,
     api: Option[Int],
     date: Option[DateTime]
-) {
+):
 
   def id = _id
 
   def isMobile = api.isDefined
-}
 
 case class LocatedSession(session: UserSession, location: Option[Location])
 
@@ -40,11 +38,10 @@ case class IpAndFp(ip: IpAddress, fp: Option[String], user: User.ID)
 
 case class HcaptchaPublicConfig(key: String, enabled: Boolean)
 
-case class HcaptchaForm[A](form: Form[A], config: HcaptchaPublicConfig) {
+case class HcaptchaForm[A](form: Form[A], config: HcaptchaPublicConfig):
   def enabled                    = config.enabled
   def apply(key: String)         = form(key)
   def withForm[B](form: Form[B]) = HcaptchaForm(form, config)
-}
 
 case class LameNameCheck(value: Boolean) extends AnyVal
 
@@ -56,28 +53,25 @@ case class UserSignup(
     suspIp: Boolean
 )
 
-case class UserAgent(value: String) {
+case class UserAgent(value: String):
 
   import UserAgent.Client
 
   lazy val client: Client =
-    if (value contains "Lichobile") Client.App
-    else if (value contains "Mobile") Client.Mob
+    if (value `contains` "Lichobile") Client.App
+    else if (value `contains` "Mobile") Client.Mob
     else Client.PC
 
   def parse = org.uaparser.scala.Parser.default.parse(value)
-}
 
-object UserAgent {
+object UserAgent:
 
   implicit val userAgentIso: Iso.StringIso[UserAgent] = Iso.string[UserAgent](UserAgent.apply, _.value)
   implicit val userAgentHandler: BSONHandler[UserAgent] =
     lila.db.BSON.isoHandler[UserAgent, String](userAgentIso)
 
   sealed trait Client
-  object Client {
+  object Client:
     case object PC  extends Client
     case object Mob extends Client
     case object App extends Client
-  }
-}

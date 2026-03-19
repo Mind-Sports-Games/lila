@@ -20,6 +20,8 @@ final class AppLoader extends ApplicationLoader {
 final class LilaComponents(ctx: ApplicationLoader.Context) extends BuiltInComponentsFromContext(ctx) {
 
   // https://www.scala-lang.org/api/2.13.4/scala/concurrent/ExecutionContext%24.html#global:scala.concurrent.ExecutionContextExecutor
+  implicit lazy val mat: org.apache.pekko.stream.Materializer = materializer
+
   implicit val ec: scala.concurrent.ExecutionContext =
     scala.concurrent.ExecutionContext.getClass
       .getDeclaredMethod("opportunistic")
@@ -33,8 +35,8 @@ final class LilaComponents(ctx: ApplicationLoader.Context) extends BuiltInCompon
   lila.log("boot").info {
     val java             = System.getProperty("java.version")
     val mem              = Runtime.getRuntime.maxMemory() / 1024 / 1024
-    val appVersionCommit = ~configuration.getOptional[String]("app.version.commit")
-    val appVersionDate   = ~configuration.getOptional[String]("app.version.date")
+    val appVersionCommit = configuration.getOptional[String]("app.version.commit").getOrElse("")
+    val appVersionDate   = configuration.getOptional[String]("app.version.date").getOrElse("")
     s"lila ${ctx.environment.mode} $appVersionCommit $appVersionDate / java $java, memory: ${mem}MB"
   }
 

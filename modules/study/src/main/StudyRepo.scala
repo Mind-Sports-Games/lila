@@ -2,7 +2,7 @@ package lila.study
 
 import org.apache.pekko.stream.scaladsl._
 import org.joda.time.DateTime
-import reactivemongo.akkastream.{ cursorProducer, AkkaStreamCursor }
+import reactivemongo.pekkostream.{ cursorProducer, PekkoStreamCursor }
 import reactivemongo.api._
 
 import lila.db.AsyncColl
@@ -11,19 +11,18 @@ import lila.user.User
 
 final class StudyRepo(private[study] val coll: AsyncColl)(implicit
     ec: scala.concurrent.ExecutionContext,
-    mat: akka.stream.Materializer
-) {
+    mat: org.apache.pekko.stream.Materializer
+):
 
   import BSONHandlers._
 
-  private object F {
+  private object F:
     val uids      = "uids"
     val likers    = "likers"
     val rank      = "rank"
     val likes     = "likes"
     val topics    = "topics"
     val createdAt = "createdAt"
-  }
 
   private[study] val projection = $doc(
     F.uids   -> false,
@@ -48,7 +47,7 @@ final class StudyRepo(private[study] val coll: AsyncColl)(implicit
       selector: Bdoc,
       sort: Bdoc,
       readPreference: ReadPreference = readPref
-  ): Fu[AkkaStreamCursor[Study]] =
+  ): Fu[PekkoStreamCursor[Study]] =
     coll.map(_.find(selector).sort(sort).cursor[Study](readPreference))
 
   def exists(id: Study.Id) = coll(_.exists($id(id)))
@@ -60,37 +59,34 @@ final class StudyRepo(private[study] val coll: AsyncColl)(implicit
   private[study] val selectPublic = $doc(
     "visibility" -> VisibilityHandler.writeTry(Study.Visibility.Public).get
   )
-  private[study] val selectPrivateOrUnlisted = "visibility" $ne VisibilityHandler
+  private[study] val selectPrivateOrUnlisted = "visibility" `$ne` VisibilityHandler
     .writeTry(Study.Visibility.Public)
     .get
   private[study] def selectLiker(userId: User.ID) = $doc(F.likers -> userId)
   private[study] def selectContributorId(userId: User.ID) =
     selectMemberId(userId) ++ // use the index
-      $doc("ownerId" $ne userId) ++
+      $doc("ownerId" `$ne` userId) ++
       $doc(s"members.$userId.role" -> "w")
   private[study] def selectTopic(topic: StudyTopic) = $doc(F.topics -> topic)
 
   def countByOwner(ownerId: User.ID) = coll(_.countSel(selectOwnerId(ownerId)))
 
-  def sourceByOwner(ownerId: User.ID, isMe: Boolean): Source[Study, _] =
-    Source futureSource {
-      coll map {
+  def sourceByOwner(ownerId: User.ID, isMe: Boolean): Source[Study, ?] =
+    Source futureSource:
+      coll map:
         _.find(selectOwnerId(ownerId) ++ (!isMe so selectPublic))
-          .sort($sort desc "updatedAt")
+          .sort($sort `desc` "updatedAt")
           .cursor[Study](readPreference = readPref)
           .documentSource()
-      }
-    }
 
   def insert(s: Study): Funit =
     coll {
-      _.insert.one {
+      _.insert.one:
         StudyBSONHandler.writeTry(s).get ++ $doc(
           F.uids   -> s.members.ids,
           F.likers -> List(s.ownerId),
           F.rank   -> Study.Rank.compute(s.likes, s.createdAt)
         )
-      }
     }.void
 
   def updateSomeFields(s: Study): Funit =
@@ -103,7 +99,7 @@ final class StudyRepo(private[study] val coll: AsyncColl)(implicit
             "name"        -> s.name,
             "settings"    -> s.settings,
             "visibility"  -> s.visibility,
-            "description" -> ~s.description,
+            "description" -> s.description.getOrElse(""),
             "updatedAt"   -> DateTime.now
           )
         )
@@ -171,7 +167,7 @@ final class StudyRepo(private[study] val coll: AsyncColl)(implicit
     }.void
 
   def uids(studyId: Study.Id): Fu[Set[User.ID]] =
-    coll(_.primitiveOne[Set[User.ID]]($id(studyId), F.uids)) dmap (~_)
+    coll(_.primitiveOne[Set[User.ID]]($id(studyId), F.uids)) `dmap` (_.getOrElse(Set.empty))
 
   private val idNameProjection = $doc("name" -> true)
 
@@ -179,33 +175,31 @@ final class StudyRepo(private[study] val coll: AsyncColl)(implicit
     coll(_.find($inIds(ids) ++ selectPublic, idNameProjection.some).cursor[Study.IdName]().list())
 
   def recentByOwner(userId: User.ID, nb: Int) =
-    coll {
+    coll:
       _.find(selectOwnerId(userId), idNameProjection.some)
-        .sort($sort desc "updatedAt")
+        .sort($sort `desc` "updatedAt")
         .cursor[Study.IdName](readPref)
         .list(nb)
-    }
 
   def recentByContributor(userId: User.ID, nb: Int) =
-    coll {
+    coll:
       _.find(selectContributorId(userId), idNameProjection.some)
-        .sort($sort desc "updatedAt")
+        .sort($sort `desc` "updatedAt")
         .cursor[Study.IdName](readPref)
         .list(nb)
-    }
 
   def isContributor(studyId: Study.Id, userId: User.ID) =
     coll(_.exists($id(studyId) ++ $doc(s"members.$userId.role" -> "w")))
 
   def isMember(studyId: Study.Id, userId: User.ID) =
-    coll(_.exists($id(studyId) ++ (s"members.$userId" $exists true)))
+    coll(_.exists($id(studyId) ++ (s"members.$userId" `$exists` true)))
 
   def like(studyId: Study.Id, userId: User.ID, v: Boolean): Fu[Study.Likes] =
-    countLikes(studyId).flatMap {
+    countLikes(studyId).flatMap:
       case None => fuccess(Study.Likes(0))
       case Some((prevLikes, createdAt)) =>
         val likes = Study.Likes(prevLikes.value + (if (v) 1 else -1))
-        coll {
+        coll:
           _.update.one(
             $id(studyId),
             $set(
@@ -215,8 +209,6 @@ final class StudyRepo(private[study] val coll: AsyncColl)(implicit
               if (v) $addToSet(F.likers -> userId) else $pull(F.likers -> userId)
             }
           ) inject likes
-        }
-    }
 
   def liked(study: Study, user: User): Fu[Boolean] =
     coll(_.exists($id(study.id) ++ selectLiker(user.id)))
@@ -226,14 +218,14 @@ final class StudyRepo(private[study] val coll: AsyncColl)(implicit
       coll(_.primitive[Study.Id]($inIds(studyIds) ++ selectLiker(user.id), "_id").dmap(_.toSet))
 
   def resetAllRanks: Fu[Int] =
-    coll {
+    coll:
       _.find(
         $empty,
         $doc(F.likes -> true, F.createdAt -> true).some
       )
         .cursor[Bdoc]()
         .foldWhileM(0) { (count, doc) =>
-          ~(for {
+          (for {
             id        <- doc.getAsOpt[Study.Id]("_id")
             likes     <- doc.getAsOpt[Study.Likes](F.likes)
             createdAt <- doc.getAsOpt[DateTime](F.createdAt)
@@ -243,9 +235,8 @@ final class StudyRepo(private[study] val coll: AsyncColl)(implicit
                 $id(id),
                 $set(F.rank -> Study.Rank.compute(likes, createdAt))
               )
-          }.void) inject Cursor.Cont(count + 1)
+          }.void).getOrElse(funit) inject Cursor.Cont(count + 1)
         }
-    }
 
   private[study] def isAdminMember(study: Study, userId: User.ID): Fu[Boolean] =
     coll(_.exists($id(study.id) ++ $doc(s"members.$userId.admin" -> true)))
@@ -272,4 +263,3 @@ final class StudyRepo(private[study] val coll: AsyncColl)(implicit
         createdAt <- doc.getAsOpt[DateTime](F.createdAt)
       } yield likes -> createdAt
     }
-}

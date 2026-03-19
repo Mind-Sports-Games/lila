@@ -2,9 +2,7 @@ package lila.clas
 
 import com.github.blemale.scaffeine.LoadingCache
 
-import scala.concurrent.duration._
-
-final class ClasMarkup {
+final class ClasMarkup:
 
   private val renderer = new lila.common.Markdown(autoLink = true)
 
@@ -14,4 +12,3 @@ final class ClasMarkup {
     .build(renderer.apply)
 
   def apply(text: String): String = cache.get(text)
-}

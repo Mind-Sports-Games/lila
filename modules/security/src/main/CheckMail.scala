@@ -20,7 +20,7 @@ final private class CheckMail(
 )(implicit
     ec: scala.concurrent.ExecutionContext,
     scheduler: org.apache.pekko.actor.Scheduler
-) {
+):
 
   def apply(domain: Domain.Lower): Fu[Boolean] =
     if (config.key.value.isEmpty) fuccess(true)
@@ -39,7 +39,7 @@ final private class CheckMail(
       .distinctEasy[String, List](
         "_id",
         $doc(
-          "_id" $regex s"^$prefix:",
+          "_id" `$regex` s"^$prefix:",
           "v" -> false
         ),
         ReadPreference.secondaryPreferred
@@ -66,9 +66,9 @@ final private class CheckMail(
       .withHttpHeaders("x-rapidapi-key" -> config.key.value)
       .get()
       .withTimeout(15.seconds, "CheckMail timeout")
-      .map {
+      .map:
         case res if res.status == 200 =>
-          val readBool   = readRandomBoolean(res.body[JsValue]) _
+          val readBool   = readRandomBoolean(res.body[JsValue])
           val valid      = readBool("valid")
           val block      = readBool("block")
           val disposable = readBool("disposable")
@@ -78,15 +78,12 @@ final private class CheckMail(
           ok
         case res =>
           throw lila.base.LilaException(s"${config.url} $domain ${res.status} ${res.body.toString.take(200)}")
-      }
       .monTry(res => _.security.checkMailApi.fetch(res.isSuccess, res.getOrElse(true)))
 
   // sometimes it's "1" and sometimes it's "true"
   // and we're paying for that shit
   private def readRandomBoolean(js: JsValue)(key: String) =
-    ~ {
+    ~
       (js \ key).asOpt[Boolean] orElse
         (js \ key).asOpt[Int].map(1.==) orElse
         (js \ key).asOpt[String].map("1".==)
-    }
-}

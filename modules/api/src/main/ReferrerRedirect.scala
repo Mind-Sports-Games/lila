@@ -5,7 +5,7 @@ import scala.util.Try
 
 import lila.common.config.BaseUrl
 
-final class ReferrerRedirect(baseUrl: BaseUrl) {
+final class ReferrerRedirect(baseUrl: BaseUrl):
 
   val sillyLoginReferrers = Set("/login", "/signup", "/mobile")
 
@@ -22,4 +22,3 @@ final class ReferrerRedirect(baseUrl: BaseUrl) {
         url.schemeOption.fold(true)(scheme => scheme == "http" || scheme == "https") &&
         url.hostOption.fold(true)(host => s".${host.value}".endsWith(s".$lilaHost"))
       }.getOrElse(false)
-}

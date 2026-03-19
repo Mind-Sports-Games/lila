@@ -1,7 +1,5 @@
 package lila.team
 
-import scala.concurrent.duration._
-
 import lila.memo.Syncache
 import lila.user.User
 
@@ -10,7 +8,7 @@ final class Cached(
     memberRepo: MemberRepo,
     requestRepo: RequestRepo,
     cacheApi: lila.memo.CacheApi
-)(implicit ec: scala.concurrent.ExecutionContext) {
+)(implicit ec: scala.concurrent.ExecutionContext):
 
   val nameCache = cacheApi.sync[String, Option[String]](
     name = "team.name",
@@ -21,9 +19,9 @@ final class Cached(
     expireAfter = Syncache.ExpireAfterAccess(20 minutes)
   )
 
-  def blockingTeamName(id: Team.ID) = nameCache sync id
+  def blockingTeamName(id: Team.ID) = nameCache `sync` id
 
-  def preloadSet = nameCache preloadSet _
+  def preloadSet = nameCache.preloadSet
 
   private val teamIdsCache = cacheApi.sync[User.ID, Team.IdsStr](
     name = "team.ids",
@@ -38,13 +36,13 @@ final class Cached(
     expireAfter = Syncache.ExpireAfterWrite(1 hour)
   )
 
-  def syncTeamIds                  = teamIdsCache sync _
-  def teamIds                      = teamIdsCache async _
+  def syncTeamIds                  = teamIdsCache.sync
+  def teamIds                      = teamIdsCache.async
   def teamIdsList(userId: User.ID) = teamIds(userId).dmap(_.toList)
 
-  def invalidateTeamIds = teamIdsCache invalidate _
+  def invalidateTeamIds = teamIdsCache.invalidate
 
-  val nbRequests = cacheApi[User.ID, Int](32768, "team.nbRequests") {
+  val nbRequests = cacheApi[User.ID, Int](32768, "team.nbRequests"):
     _.expireAfterAccess(25 minutes)
       .maximumSize(65536)
       .buildAsyncFuture[User.ID, Int] { userId =>
@@ -52,13 +50,10 @@ final class Cached(
           ids.value.nonEmpty so teamRepo.countRequestsOfLeader(userId, requestRepo.coll)
         }
       }
-  }
 
-  val leaders = cacheApi[Team.ID, Set[User.ID]](128, "team.leaders") {
+  val leaders = cacheApi[Team.ID, Set[User.ID]](128, "team.leaders"):
     _.expireAfterWrite(1 minute)
       .buildAsyncFuture(teamRepo.leadersOf)
-  }
 
   def isLeader(teamId: Team.ID, userId: User.ID): Fu[Boolean] =
     leaders.get(teamId).dmap(_ contains userId)
-}

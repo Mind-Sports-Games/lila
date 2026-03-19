@@ -101,7 +101,7 @@ final class Clas(
       forStudent: (lila.clas.Clas, List[lila.clas.Student.WithUser]) => Fu[Result],
       orDefault: Context => Fu[Result] = notFound(_)
   )(implicit ctx: Context): Fu[Result] =
-    isGranted(_.Teacher).so(env.clas.api.clas.isTeacherOf(me, lila.clas.Clas.Id(id))) flatMap {
+    (if (isGranted(_.Teacher)) env.clas.api.clas.isTeacherOf(me, lila.clas.Clas.Id(id)) else fuFalse) flatMap {
       case true => forTeacher
       case _ =>
         env.clas.api.clas.byId(lila.clas.Clas.Id(id)) flatMap {
@@ -550,7 +550,7 @@ final class Clas(
     ctx.me match {
       case None             => fuTrue
       case _ if ctx.hasClas => fuTrue
-      case Some(me)         => !env.mod.logApi.wasUnteachered(me.id)
+      case Some(me)         => env.mod.logApi.wasUnteachered(me.id).not
     }
 
   def invitation(id: String) =
@@ -563,7 +563,7 @@ final class Clas(
   def invitationAccept(id: String) =
     AuthBody { implicit ctx => me =>
       implicit val req = ctx.body
-      Form(single("v" -> boolean))
+      Form(single("v" -> play.api.data.Forms.boolean))
         .bindFromRequest()
         .fold(
           _ => Redirect(routes.Clas.invitation(id)).fuccess,

@@ -22,18 +22,18 @@ final private[api] class Cli(
     swiss: lila.swiss.Env,
     web: lila.web.Env
 )(implicit ec: scala.concurrent.ExecutionContext)
-    extends lila.common.Cli {
+    extends lila.common.Cli:
 
   private val logger = lila.log("cli")
 
   def apply(args: List[String]): Fu[String] =
-    run(args).dmap(_ + "\n") ~ {
-      _.logFailure(logger, _ => args mkString " ") foreach { output =>
-        logger.info("%s\n%s".format(args mkString " ", output))
-      }
+    val result = run(args).dmap(_ + "\n")
+    result.logFailure(logger, _ => args mkString " ") foreach { output =>
+      logger.info("%s\n%s".format(args mkString " ", output))
     }
+    result
 
-  def process = {
+  def process =
     case "uptime" :: Nil => fuccess(s"${lila.common.Uptime.seconds} seconds")
     case "change" :: ("asset" | "assets") :: "version" :: Nil => {
       import lila.common.AssetVersion
@@ -47,22 +47,21 @@ final private[api] class Cli(
     case "swiss" :: "dq" :: username :: id :: Nil =>
       swiss.api.disqualify(id, username).map(_ => s"Byebye $username from $id")
     case "gdpr" :: "erase" :: username :: "forever" :: Nil =>
-      userRepo named username map {
+      userRepo `named` username map:
         case None                       => "No such user."
         case Some(user) if user.enabled => "That user account is not closed. Can't erase."
         case Some(user) =>
-          slackApi gdprErase user
-          userRepo setEraseAt user
-          email gdprErase user
+          slackApi `gdprErase` user
+          userRepo `setEraseAt` user
+          email `gdprErase` user
           Bus.publish(lila.user.User.GDPRErase(user), "gdprErase")
           s"Erasing all search data about ${user.username} now"
-      }
     case "announce" :: "cancel" :: Nil =>
-      AnnounceStore set none
+      AnnounceStore `set` none
       Bus.publish(AnnounceStore.cancel, "announce")
       fuccess("Removed announce")
     case "announce" :: msgWords =>
-      AnnounceStore.set(msgWords mkString " ") match {
+      AnnounceStore.set(msgWords mkString " ") match
         case Some(announce) =>
           Bus.publish(announce, "announce")
           fuccess(announce.json.toString)
@@ -70,11 +69,9 @@ final private[api] class Cli(
           fuccess(
             "Invalid announce. Format: `announce <length> <unit> <words...>` or just `announce cancel` to cancel it"
           )
-      }
     case "bus" :: "dump" :: Nil =>
       val keys = Bus.keys
       fuccess(s"${keys.size}\n ${keys mkString "\n"}")
-  }
 
   private def run(args: List[String]): Fu[String] = {
     (processors lift args) | fufail("Unknown command: " + args.mkString(" "))
@@ -97,4 +94,3 @@ final private[api] class Cli(
       plan.cli.process orElse
       msg.cli.process orElse
       process
-}

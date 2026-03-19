@@ -8,7 +8,7 @@ import play.api.data.Forms._
 import lila.common.Form._
 import lila.search.Range
 
-final private[gameSearch] class GameSearchForm {
+final private[gameSearch] class GameSearchForm:
 
   val search = Form(
     mapping(
@@ -51,11 +51,9 @@ final private[gameSearch] class GameSearchForm {
       )
     )(SearchData.apply)(d => Some((d.players, d.winnerPlayerIndex, d.perf, d.source, d.mode, d.turnsMin, d.turnsMax, d.ratingMin, d.ratingMax, d.hasAi, d.aiLevelMin, d.aiLevelMax, d.durationMin, d.durationMax, d.clock, d.dateMin, d.dateMax, d.status, d.analysed, d.sort)))
   ) fill SearchData()
-}
 
-private[gameSearch] object GameSearchForm {
+private[gameSearch] object GameSearchForm:
   val dateField = optional(ISODateOrTimestamp.isoDateOrTimestamp)
-}
 
 private[gameSearch] case class SearchData(
     players: SearchPlayer = SearchPlayer(),
@@ -78,7 +76,7 @@ private[gameSearch] case class SearchData(
     status: Option[Int] = None,
     analysed: Option[Int] = None,
     sort: Option[SearchSort] = None
-) {
+):
 
   def sortOrDefault = sort | SearchSort()
 
@@ -107,7 +105,6 @@ private[gameSearch] case class SearchData(
     )
 
   def nonEmptyQuery = Some(query).filter(_.nonEmpty)
-}
 
 private[gameSearch] case class SearchPlayer(
     a: Option[String] = None,
@@ -116,7 +113,7 @@ private[gameSearch] case class SearchPlayer(
     loser: Option[String] = None,
     p1: Option[String] = None,
     p2: Option[String] = None
-) {
+):
 
   lazy val cleanA = clean(a)
   lazy val cleanB = clean(b)
@@ -127,7 +124,6 @@ private[gameSearch] case class SearchPlayer(
 
   private def oneOf(s: Option[String]) = clean(s).filter(List(cleanA, cleanB).flatten.contains)
   private def clean(s: Option[String]) = s map (_.trim.toLowerCase) filter (_.nonEmpty)
-}
 
 private[gameSearch] case class SearchSort(
     field: String = Sorting.default.f,

@@ -9,8 +9,7 @@ import lila.common.config.NetConfig
 final class Env(environment: Environment, net: NetConfig)(implicit
     ec: scala.concurrent.ExecutionContext,
     ws: StandaloneWSClient
-) {
+):
 
   val manifest = wire[AssetManifest]
 
-}

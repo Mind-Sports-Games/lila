@@ -1,8 +1,7 @@
 package lila.tournament
 
-import strategygames.{ P2, Player => PlayerIndex, P1, Game => StratGame, GameLogic }
+import strategygames.{ P2, Player => PlayerIndex, P1, Game => StratGame }
 import strategygames.variant.Variant
-import scala.util.chaining._
 
 import lila.game.{ Game, Player => GamePlayer, GameRepo, Source, Handicaps }
 import lila.user.User
@@ -12,7 +11,7 @@ final class AutoPairing(
     duelStore: DuelStore,
     lightUserApi: lila.user.LightUserApi,
     onStart: Game.ID => Unit
-)(implicit ec: scala.concurrent.ExecutionContext) {
+)(implicit ec: scala.concurrent.ExecutionContext):
 
   def apply(
       tour: Tournament,
@@ -20,9 +19,9 @@ final class AutoPairing(
       pairing: Pairing,
       playersMap: Map[User.ID, Player],
       ranking: Ranking
-  ): Fu[Game] = {
-    val player1 = playersMap get pairing.user1 err s"Missing pairing player1 $pairing"
-    val player2 = playersMap get pairing.user2 err s"Missing pairing player2 $pairing"
+  ): Fu[Game] =
+    val player1 = playersMap get pairing.user1 `err` s"Missing pairing player1 $pairing"
+    val player2 = playersMap get pairing.user2 `err` s"Missing pairing player2 $pairing"
     val clock   = tour.clock.toClock
     val game = Game
       .make(
@@ -61,7 +60,7 @@ final class AutoPairing(
       .withTournamentId(tour.id)
       .withHandicappedTournament(tour.handicapped)
       .start
-    (gameRepo insertDenormalized game).andDo {
+    (gameRepo `insertDenormalized` game).andDo {
       onStart(game.id)
       duelStore.add(
         tour = tour,
@@ -71,7 +70,6 @@ final class AutoPairing(
         ranking = ranking
       )
     } inject game
-  }
 
   private def makePlayer(playerIndex: PlayerIndex, player: Player) =
     GamePlayer.make(
@@ -84,4 +82,3 @@ final class AutoPairing(
 
   private def usernameOf(userId: User.ID) =
     lightUserApi.sync(userId).fold(userId)(_.name)
-}

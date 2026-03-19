@@ -30,7 +30,7 @@ final class Env(
     system: org.apache.pekko.actor.ActorSystem,
     scheduler: org.apache.pekko.actor.Scheduler,
     mode: play.api.Mode
-) {
+):
 
   private val config = appConfig.get[PuzzleConfig]("puzzle")(AutoConfig.loader)
 
@@ -77,12 +77,10 @@ final class Env(
   lazy val streak = wire[PuzzleStreakApi]
 
   def cli =
-    new lila.common.Cli {
+    new lila.common.Cli:
       def process = { case "puzzle" :: "delete" :: id :: Nil =>
-        api.puzzle delete Puzzle.Id(id) inject "Done"
+        api.puzzle `delete` Puzzle.Id(id) inject "Done"
       }
-    }
-}
 
 final class PuzzleColls(
     val puzzle: AsyncColl,

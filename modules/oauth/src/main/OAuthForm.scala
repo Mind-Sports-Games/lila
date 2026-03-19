@@ -8,11 +8,11 @@ import reactivemongo.api.bson.BSONObjectID
 
 import lila.common.Form.absoluteUrl
 
-object OAuthForm {
+object OAuthForm:
 
-  private val scopesField = list(nonEmptyText.verifying(OAuthScope.byKey.contains _))
+  private val scopesField = list(nonEmptyText.verifying(OAuthScope.byKey.contains))
 
-  object token {
+  object token:
 
     val form = Form(
       mapping(
@@ -26,7 +26,7 @@ object OAuthForm {
     case class Data(
         description: String,
         scopes: List[String]
-    ) {
+    ):
       def make(user: lila.user.User) =
         AccessToken(
           id = AccessToken.makeId,
@@ -37,10 +37,8 @@ object OAuthForm {
           description = description.some,
           scopes = scopes.flatMap(OAuthScope.byKey.get)
         )
-    }
-  }
 
-  object app {
+  object app:
 
     val form = Form(
       mapping(
@@ -60,7 +58,7 @@ object OAuthForm {
         description: Option[String],
         homepageUri: AbsoluteUrl,
         redirectUri: AbsoluteUrl
-    ) {
+    ):
       def make(user: lila.user.User) =
         OAuthApp(
           name = name,
@@ -80,9 +78,8 @@ object OAuthForm {
           homepageUri = homepageUri,
           redirectUri = redirectUri
         )
-    }
 
-    object Data {
+    object Data:
 
       def make(app: OAuthApp) =
         Data(
@@ -91,6 +88,3 @@ object OAuthForm {
           homepageUri = app.homepageUri,
           redirectUri = app.redirectUri
         )
-    }
-  }
-}

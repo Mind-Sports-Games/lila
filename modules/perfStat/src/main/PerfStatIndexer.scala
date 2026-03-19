@@ -1,7 +1,5 @@
 package lila.perfStat
 
-import strategygames.variant.Variant
-import scala.concurrent.duration._
 import reactivemongo.api.ReadPreference
 
 import lila.common.extensions.*
@@ -15,32 +13,30 @@ final class PerfStatIndexer(
 )(implicit
     ec: scala.concurrent.ExecutionContext,
     scheduler: org.apache.pekko.actor.Scheduler
-) {
+):
 
   private val workQueue =
     new lila.hub.DuctSequencer(maxSize = 64, timeout = 10 seconds, name = "perfStatIndexer")
 
   private[perfStat] def userPerf(user: User, perfType: PerfType): Fu[PerfStat] =
-    workQueue {
-      storage.find(user.id, perfType) getOrElse gameRepo
+    workQueue:
+      storage.find(user.id, perfType) `getOrElse` gameRepo
         .sortedCursor(
           Query.user(user.id) ++
             Query.finished ++
             Query.turnsGt(2) ++
-            Query.variant(PerfType variantOf perfType),
+            Query.variant(PerfType `variantOf` perfType),
           Query.sortChronological,
           readPreference = ReadPreference.secondaryPreferred
         )
-        .fold(PerfStat.init(user.id, perfType)) {
+        .fold(PerfStat.init(user.id, perfType)):
           case (perfStat, game) if game.perfType.contains(perfType) =>
             Pov.ofUserId(game, user.id).fold(perfStat)(perfStat.agg)
           case (perfStat, _) => perfStat
-        }
         .flatMap { ps =>
-          storage insert ps recover lila.db.recoverDuplicateKey(_ => ()) inject ps
+          storage `insert` ps recover lila.db.recoverDuplicateKey(_ => ()) inject ps
         }
         .mon(_.perfStat.indexTime)
-    }
 
   def addGame(game: Game): Funit =
     Future.sequence(game.players
@@ -53,10 +49,8 @@ final class PerfStatIndexer(
 
   private def addPov(pov: Pov, userId: String): Funit =
     pov.game.perfType so { perfType =>
-      storage.find(userId, perfType) flatMap {
+      storage.find(userId, perfType) flatMap:
         _ so { perfStat =>
-          storage.update(perfStat, perfStat agg pov)
+          storage.update(perfStat, perfStat `agg` pov)
         }
-      }
     }
-}

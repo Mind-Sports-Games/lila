@@ -2,11 +2,9 @@ package lila.study
 
 case class MultiPgn(value: List[String]) extends AnyVal
 
-object MultiPgn {
+object MultiPgn:
 
   private val splitPat = """\n\n(?=\[)""".r.pattern
   def split(str: String, max: Int) =
-    MultiPgn {
+    MultiPgn:
       splitPat.split(str.replaceIf('\r', ""), max + 1).take(max).toList
-    }
-}

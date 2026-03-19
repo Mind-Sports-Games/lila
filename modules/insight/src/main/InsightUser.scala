@@ -12,18 +12,16 @@ case class InsightUser(
     count: Int,   // nb insight entries
     ecos: Set[String],
     lastSeen: DateTime
-) {
+):
 
   def id = _id
-}
 
-object InsightUser {
+object InsightUser:
 
   def make(userId: User.ID, count: Int, ecos: Set[String]) =
     InsightUser(userId, count, ecos, DateTime.now)
-}
 
-final private class InsightUserApi(coll: AsyncColl)(implicit ec: scala.concurrent.ExecutionContext) {
+final private class InsightUserApi(coll: AsyncColl)(implicit ec: scala.concurrent.ExecutionContext):
 
   implicit private val userCacheBSONHandler: BSONDocumentHandler[InsightUser] = Macros.handler[InsightUser]
 
@@ -35,4 +33,3 @@ final private class InsightUserApi(coll: AsyncColl)(implicit ec: scala.concurren
     coll(_.updateField($id(u.id), "lastSeen", DateTime.now).void)
 
   def remove(id: String) = coll(_.delete.one($id(id)).void)
-}

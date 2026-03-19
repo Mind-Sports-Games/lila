@@ -1,7 +1,6 @@
 package lila.mod
 
 import com.github.blemale.scaffeine.LoadingCache
-import scala.concurrent.duration._
 import scala.jdk.CollectionConverters._
 
 import lila.common.CuteNameGenerator
@@ -11,14 +10,13 @@ import lila.security.Granter
 import lila.user.Holder
 import lila.common.ThreadLocalRandom
 
-object IpRender {
+object IpRender:
 
   type Raw      = String
   type Rendered = String
   type RenderIp = IpAddress => Rendered
-}
 
-final class IpRender {
+final class IpRender:
 
   import IpRender._
 
@@ -29,14 +27,12 @@ final class IpRender {
   val encrypted = (ip: IpAddress) => cache get ip
 
   def decrypt(str: String): Option[IpAddress] = IpAddress.from(str) orElse
-    cache.underlying.asMap.asScala.collectFirst {
+    cache.underlying.asMap.asScala.collectFirst:
       case (ip, encrypted) if encrypted == str =>
         ip
-    }
 
   private val cache: LoadingCache[IpAddress, Rendered] = CacheApi.scaffeineNoScheduler
     .expireAfterAccess(30 minutes)
     .build((_: IpAddress) =>
       s"NoIP:${~CuteNameGenerator.make(maxSize = 30)}-${ThreadLocalRandom.nextString(3)}"
     )
-}

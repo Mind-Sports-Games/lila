@@ -25,7 +25,7 @@ final class Env(
     ec: scala.concurrent.ExecutionContext,
     system: org.apache.pekko.actor.ActorSystem,
     scheduler: org.apache.pekko.actor.Scheduler
-) {
+):
 
   private val colls = wire[MsgColls]
 
@@ -42,30 +42,27 @@ final class Env(
   lazy val compat = wire[MsgCompat]
 
   def cli =
-    new lila.common.Cli {
+    new lila.common.Cli:
       def process = { case "msg" :: "multi" :: orig :: dests :: words =>
         api.cliMultiPost(orig, dests.map(_.toLower).split(',').toIndexedSeq, words mkString " ")
       }
-    }
 
   Bus.subscribeFuns(
     "msgSystemSend" -> { case lila.hub.actorApi.msg.SystemMsg(userId, text) =>
       api.systemPost(userId, text).discard
     },
     "remoteSocketIn:msgRead" -> { case TellUserIn(userId, msg) =>
-      msg str "d" map User.normalize foreach { api.setRead(userId, _) }
+      msg `str` "d" map User.normalize foreach { api.setRead(userId, _) }
     },
     "remoteSocketIn:msgSend" -> { case TellUserIn(userId, msg) =>
       for {
-        obj  <- msg obj "d"
-        dest <- obj str "dest" map User.normalize
-        text <- obj str "text"
+        obj  <- msg `obj` "d"
+        dest <- obj `str` "dest" map User.normalize
+        text <- obj `str` "text"
       } api.post(userId, dest, text)
     }
   )
-}
 
-private class MsgColls(db: lila.db.Db) {
+private class MsgColls(db: lila.db.Db):
   val thread = db(CollName("msg_thread"))
   val msg    = db(CollName("msg_msg"))
-}

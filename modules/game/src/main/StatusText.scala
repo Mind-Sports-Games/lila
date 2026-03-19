@@ -3,12 +3,12 @@ package lila.game
 import strategygames.variant.Variant
 import strategygames.{ Player => PlayerIndex, Status }
 
-object StatusText {
+object StatusText:
 
   import Status._
 
   def apply(status: Status, win: Option[PlayerIndex], variant: Variant): String =
-    status match {
+    status match
       case Aborted                               => "Game was aborted."
       case Mate                                  => s"${winner(win)} wins by checkmate."
       case PerpetualCheck                        => s"${winner(win)} wins by opponent causing perpetual check."
@@ -34,7 +34,7 @@ object StatusText {
       case GammonWin                             => s"${winner(win)} wins by gammon."
       case BackgammonWin                         => s"${winner(win)} wins by backgammon."
       case VariantEnd =>
-        variant match {
+        variant match
           case Variant.Chess(strategygames.chess.variant.KingOfTheHill) =>
             s"${winner(win)} brings the king in the center."
           case Variant.Chess(strategygames.chess.variant.ThreeCheck) =>
@@ -53,12 +53,9 @@ object StatusText {
           case Variant.FairySF(strategygames.fairysf.variant.MiniBreakthroughTroyka) =>
             s"${winner(win)} wins the race."
           case _ => "Game ends by variant rule."
-        }
       case _ => ""
-    }
 
   def apply(game: lila.game.Game): String = apply(game.status, game.winnerPlayerIndex, game.variant)
 
   private def winner(win: Option[PlayerIndex]) = win.so(_.toString)
   private def loser(win: Option[PlayerIndex])  = winner(win.map(!_))
-}

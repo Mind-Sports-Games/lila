@@ -18,7 +18,7 @@ import lila.oauth.OAuthServer
 import lila.user.User
 import lila.common.Template
 
-object SetupBulk {
+object SetupBulk:
 
   val maxGames = 500
 
@@ -81,13 +81,12 @@ object SetupBulk {
     str
       .split(',')
       .view
-      .map(_ split ":")
+      .map(_ `split` ":")
       .collect { case Array(w, b) =>
         w.trim -> b.trim
       }
-      .collect {
+      .collect:
         case (w, b) if w.nonEmpty && b.nonEmpty => (AccessToken.Id(w), AccessToken.Id(b))
-      }
       .toList
 
   case class BadToken(token: AccessToken.Id, error: OAuthServer.AuthError)
@@ -106,19 +105,18 @@ object SetupBulk {
       scheduledAt: DateTime,
       message: Option[Template],
       pairedAt: Option[DateTime] = None
-  ) {
+  ):
     def userSet = Set(games.flatMap(g => List(g.p1, g.p2)))
     def collidesWith(other: ScheduledBulk) = {
       pairAt == other.pairAt || startClocksAt == startClocksAt
     } && userSet.exists(other.userSet.contains)
-  }
 
   sealed trait ScheduleError
   case class BadTokens(tokens: List[BadToken])    extends ScheduleError
   case class DuplicateUsers(users: List[User.ID]) extends ScheduleError
   case object RateLimited                         extends ScheduleError
 
-  def toJson(bulk: ScheduledBulk) = {
+  def toJson(bulk: ScheduledBulk) =
     import bulk._
     import lila.common.Json.jodaWrites
     Json
@@ -144,14 +142,12 @@ object SetupBulk {
         "pairedAt"      -> pairedAt
       )
       .add("message" -> message.map(_.value))
-  }
 
-}
 
 final class SetupBulkApi(oauthServer: OAuthServer, idGenerator: IdGenerator)(implicit
     ec: scala.concurrent.ExecutionContext,
-    mat: akka.stream.Materializer
-) {
+    mat: org.apache.pekko.stream.Materializer
+):
 
   import SetupBulk._
 
@@ -169,29 +165,26 @@ final class SetupBulkApi(oauthServer: OAuthServer, idGenerator: IdGenerator)(imp
         List(p1Token, p2Token) // flatten now, re-pair later!
       }
       .mapAsync(8) { token =>
-        oauthServer.auth(token, List(OAuthScope.Challenge.Write)) map {
+        oauthServer.auth(token, List(OAuthScope.Challenge.Write)) map:
           _.left.map { BadToken(token, _) }
-        }
       }
-      .runFold[Either[List[BadToken], List[User.ID]]](Right(Nil)) {
+      .runFold[Either[List[BadToken], List[User.ID]]](Right(Nil)):
         case (Left(bads), Left(bad))       => Left(bad :: bads)
         case (Left(bads), _)               => Left(bads)
         case (Right(_), Left(bad))         => Left(bad :: Nil)
         case (Right(users), Right(scoped)) => Right(scoped.user.id :: users)
-      }
-      .flatMap {
+      .flatMap:
         case Left(errors) => fuccess(Left(BadTokens(errors.reverse)))
         case Right(allPlayers) =>
           val dups = allPlayers
             .groupBy(identity)
             .view
             .mapValues(_.size)
-            .collect {
+            .collect:
               case (u, nb) if nb > 1 => u
-            }
             .toList
           if (dups.nonEmpty) fuccess(Left(DuplicateUsers(dups)))
-          else {
+          else
             val pairs = allPlayers.reverse
               .grouped(2)
               .collect { case List(w, b) => (w, b) }
@@ -201,17 +194,15 @@ final class SetupBulkApi(oauthServer: OAuthServer, idGenerator: IdGenerator)(imp
               val _ = lila.mon.api.challenge.bulk.scheduleNb(me.id).increment(nbGames)
               idGenerator
                 .games(nbGames)
-                .map {
+                .map:
                   _.toList zip pairs
-                }
-                .map {
+                .map:
                   _.map { case (id, (w, b)) =>
                     ScheduledGame(id, w, b)
                   }
-                }
-                .dmap {
+                .dmap:
                   ScheduledBulk(
-                    _id = lila.common.ThreadLocalRandom nextString 8,
+                    _id = lila.common.ThreadLocalRandom `nextString` 8,
                     by = me.id,
                     _,
                     data.variant,
@@ -222,9 +213,5 @@ final class SetupBulkApi(oauthServer: OAuthServer, idGenerator: IdGenerator)(imp
                     message = data.message,
                     scheduledAt = DateTime.now
                   )
-                }
                 .dmap(Right.apply)
             }(fuccess(Left(RateLimited)))
-          }
-      }
-}

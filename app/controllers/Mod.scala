@@ -180,7 +180,7 @@ final class Mod(
 
   def setTitle(username: String) =
     SecureBody(_.SetTitle) { implicit ctx => me =>
-      implicit def req = ctx.body
+      implicit def req: play.api.mvc.Request[?] = ctx.body
       lila.user.UserForm.title
         .bindFromRequest()
         .fold(
@@ -194,7 +194,7 @@ final class Mod(
 
   def setEmail(username: String) =
     SecureBody(_.SetEmail) { implicit ctx => me =>
-      implicit def req = ctx.body
+      implicit def req: play.api.mvc.Request[?] = ctx.body
       OptionFuResult(env.user.repo named username) { user =>
         env.security.forms
           .modEmail(user)
@@ -232,16 +232,16 @@ final class Mod(
           .recentPovsByUserFromSecondary(user, 80)
           .mon(_.mod.comm.segment("recentPovs"))
           .flatMap { povs =>
-            priv.so {
+            (if (priv)
               env.chat.api.playerChat
                 .optionsByOrderedIds(povs.map(_.gameId).map(Chat.Id.apply))
                 .mon(_.mod.comm.segment("playerChats"))
-            } zip
-              priv.so {
+            else fuccess(Nil)) zip
+              (if (priv)
                 env.msg.api
                   .recentByForMod(user, 30)
                   .mon(_.mod.comm.segment("pms"))
-              } zip
+              else fuccess(Nil)) zip
               (env.shutup.api getPublicLines user.id)
                 .mon(_.mod.comm.segment("publicChats")) zip
               env.user.noteApi
@@ -312,8 +312,8 @@ final class Mod(
       OptionFuResult(env.user.repo named username) { user =>
         env.appeal.api.exists(user) flatMap { isAppeal =>
           val f =
-            if (isAppeal) env.report.api.inquiries.appeal _
-            else env.report.api.inquiries.spontaneous _
+            if (isAppeal) (m: Holder, s: Suspect) => env.report.api.inquiries.appeal(m, s)
+            else (m: Holder, s: Suspect) => env.report.api.inquiries.spontaneous(m, s)
           f(me, Suspect(user)) inject {
             if (isAppeal) Redirect(s"${routes.Appeal.show(user.username)}#appeal-actions")
             else redirect(user.username, mod = true)
@@ -340,7 +340,7 @@ final class Mod(
 
   def search =
     SecureBody(_.UserSearch) { implicit ctx => me =>
-      implicit def req = ctx.body
+      implicit def req: play.api.mvc.Request[?] = ctx.body
       val f            = UserSearch.form
       f.bindFromRequest()
         .fold(
@@ -389,9 +389,9 @@ final class Mod(
   def singleIpBan(v: Boolean, ip: String) =
     Secure(_.IpBan) { ctx => _ =>
       val op =
-        if (v) env.security.firewall.blockIps _
-        else env.security.firewall.unblockIps _
-      op(IpAddress from ip) inject {
+        if (v) (a: IpAddress) => env.security.firewall.blockIps(List(a))
+        else (a: IpAddress) => env.security.firewall.unblockIps(List(a))
+      (IpAddress from ip).fold(funit)(op) inject {
         if (HTTPRequest isXhr ctx.req) jsonOkResult
         else Redirect(routes.Mod.singleIp(ip))
       }
@@ -414,11 +414,11 @@ final class Mod(
 
   def savePermissions(username: String) =
     SecureBody(_.ChangePermission) { implicit ctx => me =>
-      implicit def req = ctx.body
+      implicit def req: play.api.mvc.Request[?] = ctx.body
       import lila.security.Permission
       OptionFuResult(env.user.repo named username) { user =>
         Form(
-          single("permissions" -> list(text.verifying(Permission.allByDbKey.contains _)))
+          single("permissions" -> list(text.verifying(Permission.allByDbKey.contains)))
         ).bindFromRequest()
           .fold(
             _ => BadRequest(html.mod.permissions(user, me)).fuccess,
@@ -520,7 +520,7 @@ final class Mod(
           }
     )
   private def OAuthModBody[A](perm: Permission.Selector)(f: Holder => Fu[Option[A]])(
-      secure: BodyContext[_] => Holder => A => Fu[Result]
+      secure: BodyContext[?] => Holder => A => Fu[Result]
   ): Action[AnyContent] =
     SecureOrScopedBody(perm)(
       secure = ctx => me => f(me) flatMap { _ so secure(ctx)(me) },

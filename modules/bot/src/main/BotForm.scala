@@ -3,7 +3,7 @@ package lila.bot
 import play.api.data._
 import play.api.data.Forms._
 
-object BotForm {
+object BotForm:
 
   val chat = Form(
     mapping(
@@ -16,4 +16,3 @@ object BotForm {
       text: String,
       room: String
   )
-}

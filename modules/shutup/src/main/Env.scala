@@ -24,7 +24,7 @@ final class Env(
 )(implicit
     ec: scala.concurrent.ExecutionContext,
     system: ActorSystem
-) {
+):
 
   private val config = appConfig.get[ShutupConfig]("shutup")(AutoConfig.loader)
 
@@ -51,4 +51,3 @@ final class Env(
     }),
     name = config.actorName
   )
-}

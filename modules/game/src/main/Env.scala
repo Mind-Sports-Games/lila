@@ -8,7 +8,6 @@ import play.api.libs.ws.StandaloneWSClient
 import scala.concurrent.duration._
 
 import lila.common.config._
-import lila.mon.user
 
 final private class GameConfig(
     @ConfigName("collection.game") val gameColl: CollName,
@@ -33,7 +32,7 @@ final class Env(
     ec: scala.concurrent.ExecutionContext,
     system: ActorSystem,
     scheduler: Scheduler
-) {
+):
 
   private val config = appConfig.get[GameConfig]("game")(AutoConfig.loader)
 
@@ -79,4 +78,3 @@ final class Env(
   scheduler.scheduleWithFixedDelay(config.captcherDuration, config.captcherDuration) { () =>
     captcher ! actorApi.NewCaptcha
   }
-}

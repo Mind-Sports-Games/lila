@@ -18,7 +18,7 @@ import lila.db.dsl._
 final class StudyMultiBoard(
     chapterRepo: ChapterRepo,
     cacheApi: lila.memo.CacheApi
-)(implicit ec: scala.concurrent.ExecutionContext) {
+)(implicit ec: scala.concurrent.ExecutionContext):
 
   private val maxPerPage = MaxPerPage(9)
 
@@ -38,7 +38,7 @@ final class StudyMultiBoard(
       .expireAfterAccess(10 minutes)
       .buildAsyncFuture[Study.Id, Paginator[ChapterPreview]] { fetch(_, 1, playing = false) }
 
-  private val playingSelector = $doc("tags" -> "Result:*", "relay.path" $ne "")
+  private val playingSelector = $doc("tags" -> "Result:*", "relay.path" `$ne` "")
 
   private def fetch(studyId: Study.Id, page: Int, playing: Boolean): Fu[Paginator[ChapterPreview]] =
     Paginator[ChapterPreview](
@@ -48,7 +48,7 @@ final class StudyMultiBoard(
     )
 
   final private class ChapterPreviewAdapter(studyId: Study.Id, playing: Boolean)
-      extends AdapterLike[ChapterPreview] {
+      extends AdapterLike[ChapterPreview]:
 
     private val selector = $doc("studyId" -> studyId) ++ playing.so(playingSelector)
 
@@ -56,7 +56,7 @@ final class StudyMultiBoard(
 
     def slice(offset: Int, length: Int): Fu[Seq[ChapterPreview]] =
       chapterRepo
-        .coll {
+        .coll:
           _.aggregateWith[Bdoc](readPreference = readPref) { framework =>
             import framework._
             List(
@@ -83,16 +83,14 @@ final class StudyMultiBoard(
             )
           }
             .collect[List](maxDocs = length)
-        }
         .map { r =>
           for {
             doc     <- r
             preview <- chapterPreview(doc)
           } yield preview
         }
-  }
 
-  private object handlers {
+  private object handlers:
 
     implicit val previewPlayerWriter: Writes[ChapterPreview.Player] = Writes[ChapterPreview.Player] { p =>
       Json
@@ -101,16 +99,13 @@ final class StudyMultiBoard(
         .add("rating" -> p.rating)
     }
 
-    implicit val previewPlayersWriter: Writes[ChapterPreview.Players] = Writes[ChapterPreview.Players] {
+    implicit val previewPlayersWriter: Writes[ChapterPreview.Players] = Writes[ChapterPreview.Players]:
       players =>
         Json.obj("p1" -> players.p1, "p2" -> players.p2)
-    }
 
     implicit val previewWriter: Writes[ChapterPreview] = Json.writes[ChapterPreview]
-  }
-}
 
-object StudyMultiBoard {
+object StudyMultiBoard:
 
   case class ChapterPreview(
       id: Chapter.Id,
@@ -122,7 +117,7 @@ object StudyMultiBoard {
       playing: Boolean
   )
 
-  object ChapterPreview {
+  object ChapterPreview:
 
     case class Player(name: String, title: Option[String], rating: Option[Int])
 
@@ -136,5 +131,3 @@ object StudyMultiBoard {
         p1 = Player(wName, tags(_.P1Title), tags(_.P1Elo) flatMap (_.toIntOption)),
         p2 = Player(bName, tags(_.P2Title), tags(_.P2Elo) flatMap (_.toIntOption))
       )
-  }
-}

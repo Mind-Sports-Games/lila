@@ -1,10 +1,9 @@
 package lila.pool
 
 import play.api.libs.json.Json
-import scala.concurrent.duration._
 import strategygames.variant.Variant
 
-object PoolList {
+object PoolList:
 
   import PoolConfig._
 
@@ -53,8 +52,6 @@ object PoolList {
 
   val json = Json toJson all
 
-  implicit private class PimpedInt(self: Int) {
+  implicit private class PimpedInt(self: Int):
     def ++(increment: Int) = strategygames.Clock.Config(self * 60, increment)
     def players            = NbPlayers(self)
-  }
-}

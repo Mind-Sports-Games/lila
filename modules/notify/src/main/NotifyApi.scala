@@ -1,7 +1,5 @@
 package lila.notify
 
-import scala.concurrent.duration._
-
 import lila.common.Bus
 import lila.common.config.MaxPerPage
 import lila.common.paginator.Paginator
@@ -18,10 +16,9 @@ final class NotifyApi(
     userRepo: UserRepo,
     cacheApi: lila.memo.CacheApi,
     maxPerPage: MaxPerPage
-)(implicit ec: scala.concurrent.ExecutionContext) {
+)(implicit ec: scala.concurrent.ExecutionContext):
 
   import BSONHandlers.{ NotificationBSONHandler, NotifiesHandler }
-  import jsonHandlers._
 
   def getNotifications(userId: Notification.Notifies, page: Int): Fu[Paginator[Notification]] =
     Paginator(
@@ -36,7 +33,7 @@ final class NotifyApi(
     )
 
   def getNotificationsAndCount(userId: Notification.Notifies, page: Int): Fu[Notification.AndUnread] =
-    getNotifications(userId, page) zip unreadCount(userId) dmap (Notification.AndUnread.apply _).tupled
+    getNotifications(userId, page) zip unreadCount(userId) `dmap` (Notification.AndUnread.apply).tupled
 
   def markAllRead(userId: Notification.Notifies) =
     repo.markAllRead(userId).andDo(unreadCountCache.put(userId, fuccess(0)))
@@ -46,21 +43,19 @@ final class NotifyApi(
       unreadCountCache.put(_, fuccess(0))
     })
 
-  private val unreadCountCache = cacheApi[Notification.Notifies, Int](32768, "notify.unreadCountCache") {
+  private val unreadCountCache = cacheApi[Notification.Notifies, Int](32768, "notify.unreadCountCache"):
     _.expireAfterAccess(20 minutes)
       .buildAsyncFuture(repo.unreadNotificationsCount)
-  }
 
   def unreadCount(userId: Notification.Notifies): Fu[Notification.UnreadCount] =
-    unreadCountCache get userId dmap Notification.UnreadCount.apply
+    unreadCountCache get userId `dmap` Notification.UnreadCount.apply
 
   def addNotification(notification: Notification): Funit =
     // Add to database and then notify any connected clients of the new notification
-    insertOrDiscardNotification(notification) map {
+    insertOrDiscardNotification(notification) map:
       _ foreach { notif =>
         notifyUser(notif.notifies)
       }
-    }
 
   def addNotificationWithoutSkipOrEvent(notification: Notification): Funit =
     repo.insert(notification).andDo(unreadCountCache.update(notification.notifies, _ + 1))
@@ -74,17 +69,16 @@ final class NotifyApi(
   def markRead(notifies: Notification.Notifies, selector: Bdoc): Funit =
     repo.markManyRead(selector ++ $doc("notifies" -> notifies, "read" -> false)).andDo(unreadCountCache.invalidate(notifies))
 
-  def exists = repo.exists _
+  def exists = repo.exists
 
   private def shouldSkip(notification: Notification) =
     (!notification.isMsg so userRepo.isKid(notification.notifies.value)) >>| {
-      notification.content match {
+      notification.content match
         case MentionedInThread(_, _, topicId, _, _) =>
           repo.hasRecentNotificationsInThread(notification.notifies, topicId)
         case InvitedToStudy(_, _, studyId) => repo.hasRecentStudyInvitation(notification.notifies, studyId)
         case PrivateMessage(sender, _)     => repo.hasRecentPrivateMessageFrom(notification.notifies, sender)
         case _                             => fuFalse
-      }
     }
 
   /** Inserts notification into the repository.
@@ -94,10 +88,9 @@ final class NotifyApi(
     * If the user does not already have an unread notification on the topic, returns it unmodified.
     */
   private def insertOrDiscardNotification(notification: Notification): Fu[Option[Notification]] =
-    shouldSkip(notification) flatMap {
+    shouldSkip(notification) flatMap:
       case true  => fuccess(none)
       case false => addNotificationWithoutSkipOrEvent(notification) inject notification.some
-    }
 
   private def notifyUser(notifies: Notification.Notifies): Funit =
     getNotificationsAndCount(notifies, 1) map { msg =>
@@ -106,7 +99,7 @@ final class NotifyApi(
           notifies.value,
           "notifications",
           () => {
-            userRepo langOf notifies.value map I18nLangPicker.byStrOrDefault map { implicit lang =>
+            userRepo `langOf` notifies.value map I18nLangPicker.byStrOrDefault map { implicit lang =>
               jsonHandlers(msg)
             }
           }
@@ -114,4 +107,3 @@ final class NotifyApi(
         "socketUsers"
       )
     }
-}

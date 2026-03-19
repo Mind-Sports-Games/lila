@@ -2,7 +2,6 @@ package lila.tournament
 
 import strategygames.format.FEN
 import strategygames.variant.Variant
-import strategygames.GameLogic
 import strategygames.{ ByoyomiClock, Clock, ClockConfig }
 import org.joda.time.DateTime
 import play.api.i18n.Lang
@@ -20,22 +19,20 @@ case class Schedule(
     medleyShield: Option[TournamentShield.MedleyShield] = None,
     conditions: Condition.All = Condition.All.empty,
     statusScoring: Boolean = false
-) {
+):
 
   // Simpler naming for now.
-  def name(full: Boolean = true)(implicit lang: Lang): String = {
+  def name(full: Boolean = true)(implicit lang: Lang): String =
     import Schedule.Freq._
-    import Schedule.Speed._
     import lila.i18n.I18nKeys.tourname._
 
-    freq match {
+    freq match
       case Weekly if full => weeklyXArena.txt(VariantKeys.variantName(variant))
       case Weekly =>
         weeklyX.txt(VariantKeys.variantName(variant))
       case Yearly if full => s"Yearly ${VariantKeys.variantName(variant)} Arena"
       case Yearly         => s"Yearly ${VariantKeys.variantName(variant)}"
       case _              => s"${VariantKeys.variantName(variant)} Mind Sports Olympiad Warm-up"
-    }
     /*
     import Schedule.Freq._
     import Schedule.Speed._
@@ -117,7 +114,6 @@ case class Schedule(
           val n = s"${freq.name} ${VariantKeys.variantName(variant)}"
           if (full) xArena.txt(n) else n
       }*/
-  }
 
   def day = at.withTimeAtStartOfDay
 
@@ -134,9 +130,9 @@ case class Schedule(
 
   def sameConditions(other: Schedule) = conditions == other.conditions
 
-  def sameMaxRating(other: Schedule) = conditions sameMaxRating other.conditions
+  def sameMaxRating(other: Schedule) = conditions `sameMaxRating` other.conditions
 
-  def similarConditions(other: Schedule) = conditions similar other.conditions
+  def similarConditions(other: Schedule) = conditions `similar` other.conditions
 
   def sameDay(other: Schedule) = day == other.day
 
@@ -164,34 +160,31 @@ case class Schedule(
   def plan(build: Tournament => Tournament) = Schedule.Plan(this, build.some)
 
   override def toString = s"$freq $variant $speed $conditions $at"
-}
 
-object Schedule {
+object Schedule:
 
   def uniqueFor(tour: Tournament) =
     Schedule(
       freq = Freq.Unique,
-      speed = Speed fromClock tour.clock,
+      speed = Speed `fromClock` tour.clock,
       variant = tour.variant,
       position = tour.position,
       at = tour.startsAt,
       statusScoring = tour.statusScoring
     )
 
-  case class Plan(schedule: Schedule, buildFunc: Option[Tournament => Tournament]) {
+  case class Plan(schedule: Schedule, buildFunc: Option[Tournament => Tournament]):
 
-    def build: Tournament = {
+    def build: Tournament =
       val t = Tournament.scheduleAs(addCondition(schedule), durationFor(schedule))
-      buildFunc.foldRight(t) { _(_) }
-    }
+      buildFunc.fold(t)(f => f(t))
 
     def map(f: Tournament => Tournament) =
       copy(
         buildFunc = buildFunc.fold(f)(f.compose).some
       )
-  }
 
-  sealed abstract class Freq(val id: Int, val importance: Int) extends Ordered[Freq] {
+  sealed abstract class Freq(val id: Int, val importance: Int) extends Ordered[Freq]:
 
     val name    = toString.toLowerCase
     val display = toString
@@ -201,8 +194,7 @@ object Schedule {
     def isDaily          = this == Schedule.Freq.Daily
     def isDailyOrBetter  = this >= Schedule.Freq.Daily
     def isWeeklyOrBetter = this >= Schedule.Freq.Weekly
-  }
-  object Freq {
+  object Freq:
     case object Hourly extends Freq(10, 10)
     case object Daily  extends Freq(20, 20)
     //case object Eastern  extends Freq(30, 15)
@@ -212,25 +204,20 @@ object Schedule {
     case object Shield       extends Freq(51, 51)
     case object MedleyShield extends Freq(52, 52)
     case object Marathon     extends Freq(60, 60)
-    case object ExperimentalMarathon extends Freq(61, 55) { // for DB BC
+    case object ExperimentalMarathon extends Freq(61, 55): // for DB BC
       override val display = "Experimental Marathon"
-    }
-    case object MedleyMarathon extends Freq(65, 70) {
+    case object MedleyMarathon extends Freq(65, 70):
       override val display = "Medley Marathon"
-    }
     case object Yearly       extends Freq(70, 70)
     case object Annual       extends Freq(75, 80)
     case object Introductory extends Freq(80, 65)
     case object Unique       extends Freq(90, 59)
-    case object MSOWarmUp extends Freq(120, 41) {
+    case object MSOWarmUp extends Freq(120, 41):
       override val display = "MSO Warm-Up"
-    }
-    case object MSO21 extends Freq(121, 61) {
+    case object MSO21 extends Freq(121, 61):
       override val display = "MSO 2021"
-    }
-    case object MSOGP extends Freq(122, 75) {
+    case object MSOGP extends Freq(122, 75):
       override val display = "MSO Grand Prix"
-    }
 
     val all: List[Freq] = List(
       Hourly,
@@ -256,13 +243,11 @@ object Schedule {
 
     def apply(name: String) = all.find(_.name == name)
     def byId(id: Int)       = all.find(_.id == id)
-  }
 
-  sealed abstract class Speed(val id: Int) {
+  sealed abstract class Speed(val id: Int):
     val name = s"${toString} Chess"
-    val key  = lila.common.String lcfirst name
-  }
-  object Speed {
+    val key  = lila.common.String `lcfirst` name
+  object Speed:
     case object UltraBullet  extends Speed(5)
     case object HyperBullet  extends Speed(10)
     case object Bullet       extends Speed(20)
@@ -322,16 +307,15 @@ object Schedule {
     def apply(key: String)       = all.find(_.key == key) orElse all.find(_.key.toLowerCase == key.toLowerCase)
     def byId(id: Int)            = all find (_.id == id)
     def similar(s1: Speed, s2: Speed) =
-      (s1, s2) match {
+      (s1, s2) match
         case (a, b) if a == b                                        => true
         case (Bullet, HippoBullet) | (HippoBullet, Bullet)           => true
         case (HyperBullet, UltraBullet) | (UltraBullet, HyperBullet) => true
         case _                                                       => false
-      }
     def fromClock(clock: ClockConfig) =
       //TODO Rewrite this as basing on estimates isn't great. Also consider if we want to match
       //specific Fischer clocks. We do for Byoyomi and Simple but not Fischer.
-      clock match {
+      clock match
         case _: ByoyomiClock.Config => {
           val time = clock.estimateTotalSeconds
           if (time <= (180 + 5 * 25)) Byoyomi35
@@ -353,11 +337,10 @@ object Schedule {
           else Classical
         }
         // NOTE: not using case _ => here, because we want an error when a new clock is added.
-      }
 
     def toPerfType(speed: Speed) =
       //TODO Consider if we want to match against other clock types
-      speed match {
+      speed match
         case UltraBullet                        => PerfType.orDefaultSpeed("ultraBullet")
         case HyperBullet | Bullet | HippoBullet => PerfType.orDefaultSpeed("bullet")
         case SuperBlitz | Blitz | Blitz21 | Blitz32 | Blitz35 | Blitz51 | Blitz52 | Blitz53 | Blitz55 =>
@@ -365,23 +348,19 @@ object Schedule {
         case Rapid     => PerfType.orDefaultSpeed("rapid")
         case Classical => PerfType.orDefaultSpeed("classical")
         case _         => PerfType.orDefaultSpeed("standard")
-      }
-  }
 
   sealed trait Season
-  object Season {
+  object Season:
     case object Spring extends Season
     case object Summer extends Season
     case object Autumn extends Season
     case object Winter extends Season
-  }
 
   private val defaultDuration: Int = 55
 
-  private[tournament] def durationFor(s: Schedule): Int = s.duration match {
+  private[tournament] def durationFor(s: Schedule): Int = s.duration match
     case Some(duration) => duration
     case None           => defaultDuration
-  }
   /*{
     import Freq._, Speed._
     import strategygames.chess.variant._
@@ -442,26 +421,23 @@ object Schedule {
   private def standardInc(s: Schedule) = standardIncHours(s.at.getHourOfDay)
   private def zhInc(s: Schedule)       = s.at.getHourOfDay % 2 == 0
 
-  private def zhEliteTc(s: Schedule) = {
+  private def zhEliteTc(s: Schedule) =
     val TC = Clock.Config
-    s.at.getDayOfMonth / 7 match {
+    s.at.getDayOfMonth / 7 match
       case 0 => TC(3 * 60, 0)
       case 1 => TC(1 * 60, 1)
       case 2 => TC(3 * 60, 2)
       case 3 => TC(1 * 60, 0)
       case _ => TC(2 * 60, 0) // for the sporadic 5th Saturday
-    }
-  }
 
-  private[tournament] def clockFor(s: Schedule) = {
+  private[tournament] def clockFor(s: Schedule) =
     import Freq._, Speed._
-    import strategygames.chess.variant._
 
     val TC  = Clock.Config
     val BC  = ByoyomiClock.Config
     val SDC = Clock.SimpleDelayConfig
 
-    (s.freq, s.variant, s.speed) match {
+    (s.freq, s.variant, s.speed) match
       // lichess Special cases.
       //case (Weekend, strategygames.variant.Variant.Chess(Crazyhouse), Blitz)                 => zhEliteTc(s)
       //case (Hourly, strategygames.variant.Variant.Chess(Crazyhouse), SuperBlitz) if zhInc(s) => TC(3 * 60, 1)
@@ -496,15 +472,12 @@ object Schedule {
       case (_, _, Byoyomi310x5) => BC(3 * 60, 0, 10, 5)
       case (_, _, Byoyomi510)   => BC(5 * 60, 0, 10, 1)
       case (_, _, Byoyomi510x5) => BC(5 * 60, 0, 10, 5)
-    }
-  }
   private[tournament] def addCondition(s: Schedule) =
     s.copy(conditions = conditionFor(s))
 
   private[tournament] def conditionFor(s: Schedule) =
     if (s.conditions.relevant) s.conditions
-    else {
-      import Freq._, Speed._
+    else
 
       // No rated games required, because no-one has them.
       val nbRatedGame = 0 /*(s.freq, s.speed) match {
@@ -538,5 +511,3 @@ object Schedule {
         titled = none,
         teamMember = none
       )
-    }
-}

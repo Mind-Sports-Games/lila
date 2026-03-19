@@ -1,7 +1,6 @@
 package lila.lobby
 
 import org.joda.time.DateTime
-import scala.concurrent.duration._
 
 import lila.common.config._
 import lila.db.dsl._
@@ -13,7 +12,7 @@ final class SeekApi(
     biter: Biter,
     relationApi: lila.relation.RelationApi,
     cacheApi: lila.memo.CacheApi
-)(implicit ec: scala.concurrent.ExecutionContext) {
+)(implicit ec: scala.concurrent.ExecutionContext):
   import config._
 
   sealed private trait CacheKey
@@ -23,21 +22,18 @@ final class SeekApi(
   private def allCursor =
     coll
       .find($empty)
-      .sort($sort desc "createdAt")
+      .sort($sort `desc` "createdAt")
       .cursor[Seek]()
 
-  private val cache = cacheApi[CacheKey, List[Seek]](2, "lobby.seek.list") {
+  private val cache = cacheApi[CacheKey, List[Seek]](2, "lobby.seek.list"):
     _.refreshAfterWrite(3 seconds)
-      .buildAsyncFuture {
+      .buildAsyncFuture:
         case ForAnon => allCursor.list(maxPerPage.value)
         case ForUser => allCursor.list()
-      }
-  }
 
-  private def cacheClear() = {
-    cache invalidate ForAnon
-    cache invalidate ForUser
-  }
+  private def cacheClear() =
+    cache `invalidate` ForAnon
+    cache `invalidate` ForUser
 
   def forAnon = cache get ForAnon
 
@@ -56,7 +52,7 @@ final class SeekApi(
 
   private def noDupsFor(user: LobbyUser, seeks: List[Seek]) =
     seeks
-      .foldLeft(List.empty[Seek] -> Set.empty[String]) {
+      .foldLeft(List.empty[Seek] -> Set.empty[String]):
         case ((res, h), seek) if seek.user.id == user.id => (seek :: res, h)
         case ((res, h), seek) =>
           val seekH =
@@ -70,7 +66,6 @@ final class SeekApi(
               .mkString(",")
           if (h contains seekH) (res, h)
           else (seek :: res, h + seekH)
-      }
       ._1
       .reverse
 
@@ -86,21 +81,20 @@ final class SeekApi(
   def findByUser(userId: String): Fu[List[Seek]] =
     coll
       .find($doc("user.id" -> userId))
-      .sort($sort desc "createdAt")
+      .sort($sort `desc` "createdAt")
       .cursor[Seek]()
       .list()
 
   def remove(seek: Seek) =
     coll.delete.one($doc("_id" -> seek.id)).void.andDo(cacheClear())
 
-  def archive(seek: Seek, gameId: String) = {
+  def archive(seek: Seek, gameId: String) =
     val archiveDoc = Seek.seekBSONHandler.writeTry(seek).get ++ $doc(
       "gameId"     -> gameId,
       "archivedAt" -> DateTime.now
     )
     coll.delete.one($doc("_id" -> seek.id)).void.andDo(cacheClear()) >>
       archiveColl.insert.one(archiveDoc)
-  }
 
   def findArchived(gameId: String): Fu[Option[Seek]] =
     archiveColl.find($doc("gameId" -> gameId)).one[Seek]
@@ -117,9 +111,8 @@ final class SeekApi(
 
   def removeByUser(user: User) =
     coll.delete.one($doc("user.id" -> user.id)).void.andDo(cacheClear())
-}
 
-private object SeekApi {
+private object SeekApi:
 
   final class Config(
       val coll: Coll,
@@ -127,4 +120,3 @@ private object SeekApi {
       val maxPerPage: MaxPerPage,
       val maxPerUser: Max
   )
-}

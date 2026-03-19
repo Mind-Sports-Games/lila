@@ -3,7 +3,7 @@ package lila.fishnet
 import scala.util.control.Exception._
 
 import strategygames.format.{ Uci, UciDump }
-import strategygames.{ GameFamily, GameLogic }
+import strategygames.GameFamily
 import io.lettuce.core._
 import io.lettuce.core.pubsub._
 import scala.concurrent.Future
@@ -18,7 +18,7 @@ final class FishnetRedis(
     chanIn: String,
     chanOut: String,
     shutdown: CoordinatedShutdown
-)(implicit ec: scala.concurrent.ExecutionContext) {
+)(implicit ec: scala.concurrent.ExecutionContext):
 
   val connIn  = client.connectPubSub()
   val connOut = client.connectPubSub()
@@ -47,10 +47,9 @@ final class FishnetRedis(
   })
 
   Lilakka.shutdown(shutdown, _.PhaseServiceUnbind, "Stopping the fishnet redis pool") { () =>
-    Future {
+    Future:
       stopping = true
       client.shutdown()
-    }
   }
 
   private def writeWork(work: Work.Move): String =
@@ -69,4 +68,3 @@ final class FishnetRedis(
       clock.btime,
       clock.inc
     ).mkString(" ")
-}

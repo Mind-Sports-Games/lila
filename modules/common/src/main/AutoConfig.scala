@@ -3,10 +3,9 @@ package lila.common.autoconfig
 import scala.quoted.*
 import scala.annotation.StaticAnnotation
 
-import play.api.{ ConfigLoader, Configuration }
+import play.api.ConfigLoader
 
 import com.typesafe.config.*
-import scala.Symbol
 
 // Copied from https://github.com/keynmol/autoconfig-lichess-play-derivation/blob/main/macros.scala
 // Thanks velvetbaldmime :)
@@ -42,11 +41,10 @@ object AutoConfig:
 
             // see if the name needs to be overriden using ConfigName annotation
             val nameOverride = param.annotations
-              .collectFirst {
+              .collectFirst:
                 case a if a.tpe.derivesFrom(TypeRepr.of[ConfigName].typeSymbol) =>
                   val annot = a.asExprOf[ConfigName]
                   annot
-              }
               .map(ac => '{ $ac.name })
               .getOrElse(paramName)
 

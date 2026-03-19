@@ -16,7 +16,7 @@ final class Swiss(
     tourC: Tournament,
     apiC: Api
 )(implicit
-    mat: akka.stream.Materializer
+    mat: org.apache.pekko.stream.Materializer
 ) extends LilaController(env) {
 
   private def swissNotFound(implicit ctx: Context) = NotFound(html.swiss.bits.notFound())

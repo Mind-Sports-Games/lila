@@ -7,20 +7,20 @@ import strategygames.{ Player => PlayerIndex }
 import lila.db.BSON
 import lila.db.dsl._
 
-object EvaluationBsonHandlers {
+object EvaluationBsonHandlers:
 
-  implicit val playerFlagsHandler: lila.db.BSON[lila.evaluation.PlayerFlags] = new BSON[PlayerFlags] {
+  implicit val playerFlagsHandler: lila.db.BSON[lila.evaluation.PlayerFlags] = new BSON[PlayerFlags]:
 
     def reads(r: BSON.Reader): PlayerFlags =
       PlayerFlags(
-        suspiciousErrorRate = r boolD "ser",
-        alwaysHasAdvantage = r boolD "aha",
-        highBlurRate = r boolD "hbr",
-        moderateBlurRate = r boolD "mbr",
-        highlyConsistentPlyTimes = r boolD "hcmt",
-        moderatelyConsistentPlyTimes = r boolD "cmt",
-        noFastPlies = r boolD "nfm",
-        suspiciousHoldAlert = r boolD "sha"
+        suspiciousErrorRate = r `boolD` "ser",
+        alwaysHasAdvantage = r `boolD` "aha",
+        highBlurRate = r `boolD` "hbr",
+        moderateBlurRate = r `boolD` "mbr",
+        highlyConsistentPlyTimes = r `boolD` "hcmt",
+        moderatelyConsistentPlyTimes = r `boolD` "cmt",
+        noFastPlies = r `boolD` "nfm",
+        suspiciousHoldAlert = r `boolD` "sha"
       )
 
     def writes(w: BSON.Writer, o: PlayerFlags) =
@@ -34,36 +34,35 @@ object EvaluationBsonHandlers {
         "nfm"  -> w.boolO(o.noFastPlies),
         "sha"  -> w.boolO(o.suspiciousHoldAlert)
       )
-  }
 
   implicit val GameAssessmentBSONHandler: BSONHandler[GameAssessment] =
     BSONIntegerHandler.as[GameAssessment](GameAssessment.orDefault, _.id)
 
-  implicit val playerAssessmentHandler: BSON[PlayerAssessment] = new BSON[PlayerAssessment] {
+  implicit val playerAssessmentHandler: BSON[PlayerAssessment] = new BSON[PlayerAssessment]:
 
     def reads(r: BSON.Reader): PlayerAssessment = PlayerAssessment(
-      _id = r str "_id",
-      gameId = r str "gameId",
-      userId = r str "userId",
-      playerIndex = PlayerIndex.fromP1(r bool "p1"),
+      _id = r `str` "_id",
+      gameId = r `str` "gameId",
+      userId = r `str` "userId",
+      playerIndex = PlayerIndex.fromP1(r `bool` "p1"),
       assessment = r.get[GameAssessment]("assessment"),
-      date = r date "date",
+      date = r `date` "date",
       basics = PlayerAssessment.Basics(
         plyTimes = Statistics.IntAvgSd(
-          avg = r int "mtAvg",
-          sd = r int "mtSd"
+          avg = r `int` "mtAvg",
+          sd = r `int` "mtSd"
         ),
-        hold = r bool "hold",
-        blurs = r int "blurs",
-        blurStreak = r intO "blurStreak",
-        mtStreak = r boolD "mtStreak"
+        hold = r `bool` "hold",
+        blurs = r `int` "blurs",
+        blurStreak = r `intO` "blurStreak",
+        mtStreak = r `boolD` "mtStreak"
       ),
       analysis = Statistics.IntAvgSd(
-        avg = r int "sfAvg",
-        sd = r int "sfSd"
+        avg = r `int` "sfAvg",
+        sd = r `int` "sfSd"
       ),
       flags = r.get[PlayerFlags]("flags"),
-      tcFactor = r doubleO "tcFactor"
+      tcFactor = r `doubleO` "tcFactor"
     )
 
     def writes(w: BSON.Writer, o: PlayerAssessment) =
@@ -85,5 +84,3 @@ object EvaluationBsonHandlers {
         "mtStreak"   -> w.boolO(o.basics.mtStreak),
         "tcFactor"   -> o.tcFactor
       )
-  }
-}

@@ -21,7 +21,7 @@ final class Env(
     ec: scala.concurrent.ExecutionContext,
     scheduler: org.apache.pekko.actor.Scheduler,
     mode: play.api.Mode
-) {
+):
 
   private lazy val coll = db(appConfig.get[CollName]("evalCache.collection.evalCache"))
 
@@ -35,24 +35,22 @@ final class Env(
 
   // remote socket support
   Bus.subscribeFun("remoteSocketIn:evalGet") { case TellSriIn(sri, _, msg) =>
-    msg obj "d" foreach { d =>
+    msg `obj` "d" foreach { d =>
       // TODO send once, let lila-ws distribute
       socketHandler.evalGet(Sri(sri), d, res => Bus.publish(TellSriOut(sri, res), "remoteSocketOut"))
     }
   }
   Bus.subscribeFun("remoteSocketIn:evalPut") { case TellSriIn(sri, Some(userId), msg) =>
-    msg obj "d" foreach { d =>
+    msg `obj` "d" foreach { d =>
       socketHandler.untrustedEvalPut(Sri(sri), userId, d)
     }
   }
   // END remote socket support
 
   def cli =
-    new lila.common.Cli {
+    new lila.common.Cli:
       def process = { case "eval-cache" :: "drop" :: variantKey :: fenParts =>
         Variant(GameLogic.Chess(), variantKey).fold(fufail[String]("Invalid variant")) { variant =>
           api.drop(variant, FEN(variant.gameLogic, fenParts mkString " ")) inject "done!"
         }
       }
-    }
-}

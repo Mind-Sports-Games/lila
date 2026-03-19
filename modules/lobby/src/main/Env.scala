@@ -2,7 +2,6 @@ package lila.lobby
 
 import com.softwaremill.macwire._
 import play.api.Configuration
-import scala.concurrent.duration._
 import lila.socket.Socket.{ GetVersion, SocketVersion }
 
 import lila.common.config._
@@ -28,7 +27,7 @@ final class Env(
     scheduler: org.apache.pekko.actor.Scheduler,
     idGenerator: lila.game.IdGenerator,
     mode: play.api.Mode
-) {
+):
 
   private lazy val maxPlaying = appConfig.get[Max]("setup.max_playing")
 
@@ -73,4 +72,3 @@ final class Env(
     abortListener(pov).discard
   }
 
-}

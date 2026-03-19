@@ -24,7 +24,7 @@ final class Env(
 )(implicit
     ec: scala.concurrent.ExecutionContext,
     system: ActorSystem
-) {
+):
 
   private val config = appConfig.get[NotifyConfig]("notify")(AutoConfig.loader)
 
@@ -48,7 +48,7 @@ final class Env(
           case lila.game.actorApi.CorresAlarmEvent(pov) =>
             pov.player.userId so { userId =>
               lila.game.Namer.playerText(pov.opponent)(getLightUser) foreach { opponent =>
-                api addNotification Notification.make(
+                api `addNotification` Notification.make(
                   Notification.Notifies(userId),
                   CorresAlarm(
                     gameId = pov.gameId,
@@ -63,4 +63,3 @@ final class Env(
     ),
     "corresAlarm"
   )
-}

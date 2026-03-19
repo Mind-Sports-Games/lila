@@ -44,10 +44,10 @@ final class Env(
     ec: scala.concurrent.ExecutionContext,
     system: ActorSystem,
     scheduler: org.apache.pekko.actor.Scheduler,
-    mat: akka.stream.Materializer,
+    mat: org.apache.pekko.stream.Materializer,
     idGenerator: lila.game.IdGenerator,
     mode: play.api.Mode
-) {
+):
 
   private val config = appConfig.get[TournamentConfig]("tournament")(AutoConfig.loader)
 
@@ -85,7 +85,7 @@ final class Env(
     clearTrophyCache = tour =>
       {
         if (tour.isShield) { val _ = scheduler.scheduleOnce(10 seconds) { shieldApi.clear() } }
-        else if (Revolution is tour) { val _ = scheduler.scheduleOnce(10 seconds) { revolutionApi.clear() } }
+        else if (Revolution `is` tour) { val _ = scheduler.scheduleOnce(10 seconds) { revolutionApi.clear() } }
       },
     indexLeaderboard = leaderboardIndexer.indexOne
   )
@@ -136,8 +136,8 @@ final class Env(
     fuccess(socket.hasUser(tourId, userId)) >>| pairingRepo.isPlaying(tourId, userId)
 
   def cli =
-    new lila.common.Cli {
-      def process = {
+    new lila.common.Cli:
+      def process =
         case "tournament" :: "leaderboard" :: "generate" :: Nil =>
           leaderboardIndexer.generateAll inject "Done!"
         case "tournament" :: "feature" :: id :: Nil =>
@@ -148,6 +148,3 @@ final class Env(
           shieldTableApi.recalculateAll inject "Done!"
         case "tournament" :: "dq" :: username :: id :: Nil =>
           api.disqualify(id, username) inject s"Byebye $username from $id"
-      }
-    }
-}

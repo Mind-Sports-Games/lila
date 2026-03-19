@@ -12,7 +12,7 @@ case class LightGame(
     status: Status,
     lib: Int,
     variant_id: Int
-) {
+):
   def playable                                        = status < Status.Aborted
   def player(playerIndex: PlayerIndex): Player        = playerIndex.fold(p1Player, p2Player)
   def player(playerId: Player.ID): Option[Player]     = players find (_.id == playerId)
@@ -22,9 +22,8 @@ case class LightGame(
   def wonBy(c: PlayerIndex): Option[Boolean]          = winner.map(_.playerIndex == c)
   def finished                                        = status >= Status.Mate
   def variant                                         = Variant.orDefault(GameLogic(lib), variant_id)
-}
 
-object LightGame {
+object LightGame:
 
   import Game.{ BSONFields => F }
 
@@ -38,4 +37,3 @@ object LightGame {
       F.lib               -> true,
       F.variant           -> true
     )
-}

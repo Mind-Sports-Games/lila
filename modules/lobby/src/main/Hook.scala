@@ -26,13 +26,13 @@ case class Hook(
     ratingRange: String,
     createdAt: DateTime,
     boardApi: Boolean
-) {
+):
 
-  val realPlayerIndex = PlayerIndex orDefault playerIndex
+  val realPlayerIndex = PlayerIndex `orDefault` playerIndex
 
   val realVariant = Variant.orDefault(lib, variant)
 
-  val realMode = Mode orDefault mode
+  val realMode = Mode `orDefault` mode
 
   val isAuth = user.nonEmpty
 
@@ -42,7 +42,7 @@ case class Hook(
       lib == h.lib &&
       variant == h.variant &&
       clock == h.clock &&
-      (realPlayerIndex compatibleWith h.realPlayerIndex) &&
+      (realPlayerIndex `compatibleWith` h.realPlayerIndex) &&
       ratingRangeCompatibleWith(h) && h.ratingRangeCompatibleWith(this) &&
       (userId.isEmpty || userId != h.userId)
 
@@ -51,9 +51,8 @@ case class Hook(
       h.rating so range.contains
     }
 
-  lazy val realRatingRange: Option[RatingRange] = isAuth so {
-    RatingRange noneIfDefault ratingRange
-  }
+  lazy val realRatingRange: Option[RatingRange] = isAuth so:
+    RatingRange `noneIfDefault` ratingRange
 
   def userId   = user.map(_.id)
   def username = user.fold(User.anonymous)(_.username)
@@ -61,7 +60,7 @@ case class Hook(
 
   lazy val perfType = PerfPicker.perfType(speed, realVariant, none)
 
-  lazy val perf: Option[LobbyPerf] = for { u <- user; pt <- perfType } yield u perfAt pt
+  lazy val perf: Option[LobbyPerf] = for { u <- user; pt <- perfType } yield u `perfAt` pt
   def rating: Option[Int]          = perf.map(_.rating)
 
   val message = s"[Play](<https://playstrategy.org>) live **${VariantKeys
@@ -111,9 +110,8 @@ case class Hook(
     )
 
   private lazy val speed = Speed(clock)
-}
 
-object Hook {
+object Hook:
 
   val idSize = 8
 
@@ -130,7 +128,7 @@ object Hook {
       boardApi: Boolean = false
   ): Hook =
     new Hook(
-      id = lila.common.ThreadLocalRandom nextString idSize,
+      id = lila.common.ThreadLocalRandom `nextString` idSize,
       sri = sri,
       lib = variant.gameLogic,
       variant = variant.id,
@@ -143,4 +141,3 @@ object Hook {
       createdAt = DateTime.now,
       boardApi = boardApi
     )
-}

@@ -126,7 +126,7 @@ object discussion {
     )
 
   private def renderUser(appeal: Appeal, userId: User.ID, asMod: Boolean)(implicit ctx: Context) =
-    if (appeal isAbout userId) userIdLink(userId.some, params = asMod so "?mod")
+    if (appeal isAbout userId) userIdLink(userId.some, params = if (asMod) "?mod" else "")
     else
       span(
         userIdLink(User.playstrategyId.some),
@@ -153,9 +153,9 @@ object discussion {
         form3.actions(
           div(
             select(cls := "appeal-presets")(
-              option(st.value := "")("Presets"),
+              st.option(st.value := "")("Presets"),
               ps.value.map { case ModPreset(name, text) =>
-                option(
+                st.option(
                   st.value := text,
                   st.title := text
                 )(name)

@@ -3,7 +3,7 @@ package lila.game
 import alleycats.Zero
 import scala.util.Success
 
-case class Blurs(bits: Long) extends AnyVal {
+case class Blurs(bits: Long) extends AnyVal:
 
   def nb = java.lang.Long.bitCount(bits)
 
@@ -11,7 +11,7 @@ case class Blurs(bits: Long) extends AnyVal {
     if (moveIndex < 0 || moveIndex > 63) this
     else Blurs(bits | (1L << moveIndex))
 
-  def asInt = ((bits >>> 32) == 0) option bits.toInt
+  def asInt = ((bits >>> 32) == 0) `option` bits.toInt
 
   def binaryString = java.lang.Long.toBinaryString(bits).reverse
 
@@ -20,9 +20,8 @@ case class Blurs(bits: Long) extends AnyVal {
   def nonEmpty = bits != 0
 
   override def toString = s"Blurs.Bits($binaryString)"
-}
 
-object Blurs {
+object Blurs:
 
   implicit val blursZero: Zero[Blurs] = Zero(Blurs(0L))
 
@@ -36,4 +35,3 @@ object Blurs {
     },
     blurs => blurs.asInt.fold[BSONValue](BSONLong(blurs.bits))(BSONInteger.apply)
   )
-}

@@ -7,7 +7,7 @@ import reactivemongo.api.bson._
 import lila.db.dsl._
 import lila.user.User
 
-final class WebSubscriptionApi(coll: Coll)(implicit ec: scala.concurrent.ExecutionContext) {
+final class WebSubscriptionApi(coll: Coll)(implicit ec: scala.concurrent.ExecutionContext):
 
   def getSubscriptions(max: Int)(userId: User.ID): Fu[List[WebSubscription]] =
     coll
@@ -44,15 +44,13 @@ final class WebSubscriptionApi(coll: Coll)(implicit ec: scala.concurrent.Executi
       )
       .void
 
-  def unsubscribeBySession(sessionId: String): Funit = {
+  def unsubscribeBySession(sessionId: String): Funit =
     coll.delete.one($id(sessionId)).void
-  }
 
-  def unsubscribeByUser(user: User): Funit = {
+  def unsubscribeByUser(user: User): Funit =
     coll.delete.one($doc("userId" -> user.id)).void
-  }
 
-  def unsubscribeByUserExceptSession(user: User, sessionId: String): Funit = {
+  def unsubscribeByUserExceptSession(user: User, sessionId: String): Funit =
     coll.delete
       .one(
         $doc(
@@ -61,5 +59,3 @@ final class WebSubscriptionApi(coll: Coll)(implicit ec: scala.concurrent.Executi
         )
       )
       .void
-  }
-}

@@ -24,11 +24,11 @@ case class Activity(
     teams: Option[Teams] = None,
     swisses: Option[Swisses] = None,
     stream: Boolean = false
-) {
+):
 
   def date = id.day.toDate
 
-  def interval = new Interval(date, date plusDays 1)
+  def interval = new Interval(date, date `plusDays` 1)
 
   def isEmpty =
     !stream && List(
@@ -49,16 +49,13 @@ case class Activity(
       swisses
     )
       .forall(_.isEmpty)
-}
 
-object Activity {
+object Activity:
 
   case class Id(userId: User.ID, day: Day)
-  object Id {
+  object Id:
     def today(userId: User.ID) = Id(userId, Day.today)
-  }
 
   case class WithUserId(activity: Activity, userId: User.ID)
 
-  def make(userId: User.ID) = Activity(Id today userId)
-}
+  def make(userId: User.ID) = Activity(Id `today` userId)

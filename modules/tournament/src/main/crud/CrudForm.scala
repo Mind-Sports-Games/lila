@@ -7,12 +7,12 @@ import play.api.data.Forms._
 
 import strategygames.variant.Variant
 import strategygames.format.FEN
-import strategygames.{ ByoyomiClock, Clock, ClockConfig, GameFamily, GameLogic }
+import strategygames.{ Clock, ClockConfig, GameFamily, GameLogic }
 
 import lila.common.Form._
 import lila.common.Clock._
 
-object CrudForm {
+object CrudForm:
 
   import TournamentForm._
   import lila.common.Form.ISODateTime._
@@ -54,7 +54,7 @@ object CrudForm {
     variant = s"${GameFamily.Chess().id}_${Variant.default(GameLogic.Chess()).id}".some,
     handicapped = false,
     position = none,
-    date = DateTime.now plusDays 7,
+    date = DateTime.now `plusDays` 7,
     image = "",
     headline = "",
     description = "",
@@ -84,29 +84,26 @@ object CrudForm {
       statusScoring: Boolean,
       teamBattle: Boolean,
       hasChat: Boolean
-  ) {
+  ):
 
-    def gameLogic = variant match {
+    def gameLogic = variant match
       case Some(v) => GameFamily(v.split("_")(0).toInt).gameLogic
       case None    => GameLogic.Chess()
-    }
 
     def realVariant = variant flatMap { v =>
       Variant.apply(gameLogic, v.split("_")(1).toInt)
     } getOrElse Variant.default(gameLogic)
 
-    def realPosition = position ifTrue realVariant.key == "standard"
+    def realPosition = position `ifTrue` realVariant.key == "standard"
 
     def validClock = (clock.limitSeconds + clock.graceSeconds) > 0
 
     def validTiming = (minutes * 60) >= (3 * estimatedGameDuration)
 
     private def estimatedGameDuration = clock.limitSeconds + 30 * clock.graceSeconds
-  }
 
   val imageChoices = List(
     ""             -> "PlayStrategy",
     "mso.logo.png" -> "MSO"
   )
   val imageDefault = ""
-}

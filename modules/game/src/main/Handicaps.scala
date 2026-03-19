@@ -3,11 +3,11 @@ import strategygames.{ GameFamily }
 import strategygames.variant.Variant
 import strategygames.format.FEN
 
-object Handicaps {
+object Handicaps:
 
-  def startingFen(variant: Option[Variant], p1Rating: Int, p2Rating: Int): Option[FEN] = {
+  def startingFen(variant: Option[Variant], p1Rating: Int, p2Rating: Int): Option[FEN] =
     variant.flatMap { v =>
-      v.gameFamily match {
+      v.gameFamily match
         case GameFamily.Go() => {
           val goHandicap = calcGoHandicap(v.toGo.boardSize.height, p1Rating, p2Rating)
           Some(
@@ -18,13 +18,11 @@ object Handicaps {
           )
         }
         case _ => None
-      }
     }
-  }
 
-  def startingFenMcMahon(variant: Option[Variant], scoreDiff: Int): Option[FEN] = {
+  def startingFenMcMahon(variant: Option[Variant], scoreDiff: Int): Option[FEN] =
     variant.flatMap { v =>
-      v.gameFamily match {
+      v.gameFamily match
         case GameFamily.Go() => {
           val goHandicap = calcGoMcMahonHandicap(v.toGo.boardSize.height, scoreDiff)
           Some(
@@ -35,15 +33,13 @@ object Handicaps {
           )
         }
         case _ => None
-      }
     }
-  }
 
   def playerInputRatings(inputPlayerRatingsInput: String): Map[String, Int] =
     inputPlayerRatingsInput.linesIterator.flatMap {
-      _.trim.toLowerCase.split(' ').map(_.trim) match {
+      _.trim.toLowerCase.split(' ').map(_.trim) match
         case Array(u, r) =>
-          r match {
+          r match
             case psRating(grade) if grade.toInt >= 600 && grade.toInt <= 2900 =>
               Map(u -> r.toInt)
             case goKyuRating(grade) if grade.toInt > 0 && grade.toInt <= 60 =>
@@ -51,13 +47,11 @@ object Handicaps {
             case goDanRating(grade) if grade.toInt > 0 && grade.toInt <= 7 =>
               Map(u -> convertGoRating(grade.toInt, DanRating))
             case _ => None
-          }
         case _ => None
-      }
     }.toMap
 
-  def playerRatingFromInput(inputRating: String): Option[Int] = {
-    inputRating match {
+  def playerRatingFromInput(inputRating: String): Option[Int] =
+    inputRating match
       case psRating(grade) if grade.toInt >= 600 && grade.toInt <= 2900 =>
         Some(inputRating.toInt)
       case goKyuRating(grade) if grade.toInt > 0 && grade.toInt <= 60 =>
@@ -65,19 +59,16 @@ object Handicaps {
       case goDanRating(grade) if grade.toInt > 0 && grade.toInt <= 7 =>
         Some(convertGoRating(grade.toInt, DanRating))
       case _ => None
-    }
-  }
 
-  private def calcGoHandicap(size: Int, p1Rating: Int, p2Rating: Int): GoHandicap = {
+  private def calcGoHandicap(size: Int, p1Rating: Int, p2Rating: Int): GoHandicap =
     val ratingDiff = Math.abs(p1Rating - p2Rating)
     val rankDiff   = goRankDiff(Math.min(p1Rating, p2Rating), ratingDiff)
     goHandicap(size, rankDiff)
-  }
 
   private def goHandicap(size: Int, rankDiff: Int) =
-    size match {
+    size match
       case 9 =>
-        rankDiff match {
+        rankDiff match
           case 0 => GoHandicap(60, 0)
           case 1 => GoHandicap(40, 0)
           case 2 => GoHandicap(20, 0)
@@ -87,9 +78,8 @@ object Handicaps {
           case x if (x - 4) % 5 == 2 => GoHandicap(40, (((x - 6) / 5) + 2))
           case x if (x - 4) % 5 == 3 => GoHandicap(20, (((x - 7) / 5) + 2))
           case x if (x - 4) % 5 == 4 => GoHandicap(0, (((x - 8) / 5) + 2))
-        }
       case 13 =>
-        rankDiff match {
+        rankDiff match
           case 0 => GoHandicap(60, 0)
           case 1 => GoHandicap(20, 0)
           case 2 => GoHandicap(80, 2)
@@ -102,50 +92,41 @@ object Handicaps {
           case x if (x - 2) % 5 == 2 => GoHandicap(0, (((x - 4) / 5) + 1) * 2)
           case x if (x - 2) % 5 == 3 => GoHandicap(60, (((x - 5) / 5) + 1) * 2 + 1)
           case x if (x - 2) % 5 == 4 => GoHandicap(20, (((x - 6) / 5) + 1) * 2 + 1)
-        }
       case 19 =>
-        rankDiff match {
+        rankDiff match
           case 0 => GoHandicap(75, 0)
           case _ => GoHandicap(5, rankDiff)
-        }
-    }
 
-  private def goRankDiff(rating: Int, diff: Int): Int = {
-    def computeRankDiff(r: Int, diffLeft: Int, rank: Int): Int = {
+  private def goRankDiff(rating: Int, diff: Int): Int =
+    def computeRankDiff(r: Int, diffLeft: Int, rank: Int): Int =
       val ratingIncrease = if (r < 1000) 33 else if (r < 1700) 50 else 100
       if (!(diffLeft >= ratingIncrease)) return rank
       else computeRankDiff(r + ratingIncrease, diffLeft - ratingIncrease, rank + 1)
-    }
 
     computeRankDiff(rating, diff, 0)
-  }
 
   private def convertGoRating(goRating: Int, ratingType: GoRatingType): Int =
-    ratingType match {
+    ratingType match
       case KyuRating =>
-        goRating match {
+        goRating match
           case y if y > 18 => Math.max(1593 - y * 33, 600) //lowest rating is 600 on site
           case y if y > 4  => 1900 - y * 50
           case y if y > 0  => 2100 - y * 100
           case _           => 1500
-        }
       case DanRating => Math.min(Math.max(goRating * 100 + 2000, 2100), 2700)
-    }
 
   val goKyuRating = s"^([0-9]+)k$$".r
   val goDanRating = s"^([1-7]+)d$$".r
   val psRating    = s"^([0-9]+)$$".r
 
-  def goRatingDisplay(rating: Int): String = {
-    if (rating >= 2100) {
+  def goRatingDisplay(rating: Int): String =
+    if (rating >= 2100)
       (mcMahonScoreFromRating(rating).toInt + 1).toString() + "d"
-    } else {
+    else
       (mcMahonScoreFromRating(rating).toInt * -1).toString() + "k"
-    }
-  }
 
-  def mcMahonScoreFromRating(rating: Int): Double = {
-    rating match {
+  def mcMahonScoreFromRating(rating: Int): Double =
+    rating match
       case x if x >= 2800 => 7.0
       case x if x >= 2700 => 6.0
       case x if x >= 2600 => 5.0
@@ -185,15 +166,11 @@ object Handicaps {
       case x if x >= 636  => -29.0
       case x if x < 636   => -30.0
       case _              => 0.0
-    }
-  }
 
-  private def calcGoMcMahonHandicap(size: Int, scoreDiff: Int): GoHandicap = {
+  private def calcGoMcMahonHandicap(size: Int, scoreDiff: Int): GoHandicap =
     val rankDiff = Math.max(scoreDiff - 1, 0);
     goHandicap(size, rankDiff)
-  }
 
-}
 case class GoHandicap(komi: Int, stones: Int) //komi is 10x to be int
 
 sealed trait GoRatingType

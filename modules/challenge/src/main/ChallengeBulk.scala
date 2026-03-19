@@ -32,11 +32,11 @@ final class ChallengeBulkApi(
     onStart: lila.round.OnStart
 )(implicit
     ec: scala.concurrent.ExecutionContext,
-    mat: akka.stream.Materializer,
+    mat: org.apache.pekko.stream.Materializer,
     system: ActorSystem,
     scheduler: org.apache.pekko.actor.Scheduler,
     mode: play.api.Mode
-) {
+):
 
   implicit private val gameHandler: BSONDocumentHandler[ScheduledGame]   = Macros.handler[ScheduledGame]
   implicit private val variantHandler: BSONHandler[Variant]              = variantByKeyHandler
@@ -59,47 +59,41 @@ final class ChallengeBulkApi(
 
   def startClocks(id: String, me: User): Fu[Boolean] =
     coll
-      .updateField($doc("_id" -> id, "by" -> me.id, "pairedAt" $exists true), "startClocksAt", DateTime.now)
+      .updateField($doc("_id" -> id, "by" -> me.id, "pairedAt" `$exists` true), "startClocksAt", DateTime.now)
       .map(_.n == 1)
 
-  def schedule(bulk: ScheduledBulk): Fu[Either[String, ScheduledBulk]] = workQueue(bulk.by) {
-    coll.list[ScheduledBulk]($doc("by" -> bulk.by, "pairedAt" $exists false)) flatMap { bulks =>
+  def schedule(bulk: ScheduledBulk): Fu[Either[String, ScheduledBulk]] = workQueue(bulk.by):
+    coll.list[ScheduledBulk]($doc("by" -> bulk.by, "pairedAt" `$exists` false)) flatMap { bulks =>
       val nbGames = bulks.map(_.games.size).sum
       if (bulks.sizeIs >= 10) fuccess(Left("Already too many bulks queued"))
       else if (bulks.map(_.games.size).sum >= 1000) fuccess(Left("Already too many games queued"))
-      else if (bulks.exists(_ collidesWith bulk))
+      else if (bulks.exists(_ `collidesWith` bulk))
         fuccess(Left("A bulk containing the same players is scheduled at the same time"))
       else coll.insert.one(bulk) inject Right(bulk)
     }
-  }
 
   private[challenge] def tick: Funit =
     checkForPairing >> checkForClocks
 
   private def checkForPairing: Funit =
-    coll.one[ScheduledBulk]($doc("pairAt" $lte DateTime.now, "pairedAt" $exists false)) flatMap {
+    coll.one[ScheduledBulk]($doc("pairAt" `$lte` DateTime.now, "pairedAt" `$exists` false)) flatMap:
       _ so { bulk =>
-        workQueue(bulk.by) {
+        workQueue(bulk.by):
           makePairings(bulk).void
-        }
       }
-    }
 
   private def checkForClocks: Funit =
-    coll.one[ScheduledBulk]($doc("startClocksAt" $lte DateTime.now, "pairedAt" $exists true)) flatMap {
+    coll.one[ScheduledBulk]($doc("startClocksAt" `$lte` DateTime.now, "pairedAt" `$exists` true)) flatMap:
       _ so { bulk =>
-        workQueue(bulk.by) {
+        workQueue(bulk.by):
           startClocksNow(bulk)
-        }
       }
-    }
 
-  private def startClocksNow(bulk: ScheduledBulk): Funit = {
+  private def startClocksNow(bulk: ScheduledBulk): Funit =
     Bus.publish(TellMany(bulk.games.map(_.id), lila.round.actorApi.round.StartClock), "roundSocket")
     coll.delete.one($id(bulk._id)).void
-  }
 
-  private def makePairings(bulk: ScheduledBulk): Funit = {
+  private def makePairings(bulk: ScheduledBulk): Funit =
     val perfType = PerfType(bulk.variant, Speed(bulk.clock))
     Source(bulk.games)
       .mapAsyncUnordered(8) { game =>
@@ -127,9 +121,8 @@ final class ChallengeBulkApi(
         (game, p1, p2)
       }
       .mapAsyncUnordered(8) { case (game, p1, p2) =>
-        gameRepo.insertDenormalized(game).andDo(onStart(game.id)) inject {
+        gameRepo.insertDenormalized(game).andDo(onStart(game.id)) inject:
           (game, p1, p2)
-        }
       }
       .mapAsyncUnordered(8) { case (game, p1, p2) =>
         msgApi.onApiPair(game.id, p1.light, p2.light)(bulk.by, bulk.message)
@@ -143,5 +136,3 @@ final class ChallengeBulkApi(
         coll.updateField($id(bulk._id), "pairedAt", DateTime.now)
       else coll.delete.one($id(bulk._id))
     }.void
-  }
-}

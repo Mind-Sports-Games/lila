@@ -2,7 +2,7 @@ package lila.security
 
 import lila.user.{ Holder, User }
 
-object Granter {
+object Granter:
 
   def apply(permission: Permission)(user: User): Boolean =
     user.enabled && apply(permission, user.roles)
@@ -17,7 +17,7 @@ object Granter {
     apply(f)(holder.user)
 
   def apply(permission: Permission, roles: Seq[String]): Boolean =
-    Permission(roles).exists(_ is permission)
+    Permission(roles).exists(_ `is` permission)
 
   def byRoles(f: Permission.Selector)(roles: Seq[String]): Boolean =
     apply(f(Permission), roles)
@@ -34,4 +34,3 @@ object Granter {
       }
     }
 
-}

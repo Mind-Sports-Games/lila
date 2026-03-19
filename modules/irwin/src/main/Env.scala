@@ -21,11 +21,11 @@ final class Env(
 )(implicit
     ec: scala.concurrent.ExecutionContext,
     scheduler: org.apache.pekko.actor.Scheduler
-) {
+):
 
   private lazy val reportColl = db(CollName("irwin_report"))
 
-  lazy val irwinThresholdsSetting = IrwinThresholds makeSetting settingStore
+  lazy val irwinThresholdsSetting = IrwinThresholds `makeSetting` settingStore
 
   lazy val stream = wire[IrwinStream]
 
@@ -37,4 +37,3 @@ final class Env(
   scheduler.scheduleWithFixedDelay(15 minutes, 15 minutes) { () =>
     userCache.getTop50Online.flatMap(api.requests.fromLeaderboard).discard
   }
-}

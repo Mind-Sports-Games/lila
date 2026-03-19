@@ -2,9 +2,7 @@ package lila.relay
 
 import com.github.blemale.scaffeine.LoadingCache
 
-import scala.concurrent.duration._
-
-final class RelayMarkup {
+final class RelayMarkup:
 
   private val renderer = new lila.common.Markdown(autoLink = true)
 
@@ -14,4 +12,3 @@ final class RelayMarkup {
     .build(renderer.apply)
 
   def apply(text: String): String = cache.get(text)
-}

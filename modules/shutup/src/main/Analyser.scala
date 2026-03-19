@@ -2,9 +2,9 @@ package lila.shutup
 
 import lila.common.constants.bannedYoutubeIds
 
-object Analyser {
+object Analyser:
 
-  def apply(raw: String) = {
+  def apply(raw: String) =
     val lower = raw.toLowerCase
     TextAnalysis(
       lower,
@@ -13,10 +13,9 @@ object Analyser {
           ruBigRegex.findAllMatchIn(lower).toList
       ).map(_.toString)
     )
-  }
 
   private def latinify(text: String): String =
-    text map {
+    text map:
       case 'е' => 'e'
       case 'а' => 'a'
       case 'у' => 'y'
@@ -25,11 +24,10 @@ object Analyser {
       case 'Н' => 'h'
       case 'о' => 'o'
       case c   => c
-    }
 
   private def latinWordsRegexes =
     Dictionary.en.map { word =>
-      word + (if (word endsWith "e") "" else "e?+") + "[ds]?+"
+      word + (if (word `endsWith` "e") "" else "e?+") + "[ds]?+"
     } ++
       Dictionary.es ++
       Dictionary.hi ++
@@ -50,4 +48,3 @@ object Analyser {
       Dictionary.ru.mkString("(", "|", ")") +
       """\b"""
   }.r
-}

@@ -31,14 +31,13 @@ import strategygames.{
   Status
 }
 import strategygames.chess
-import strategygames.variant.Variant
 import strategygames.format.Forsyth
 import strategygames.format.pgn.Dumper
 import JsonView._
 import lila.chat.{ PlayerLine, UserLine }
 import lila.common.ApiVersion
 
-sealed trait Event {
+sealed trait Event:
   def typ: String
   def data: JsValue
   def only: Option[PlayerIndex]   = None
@@ -46,19 +45,16 @@ sealed trait Event {
   def watcher: Boolean            = false
   def troll: Boolean              = false
   def moveBy: Option[PlayerIndex] = None
-}
 
-object Event {
+object Event:
 
-  sealed trait Empty extends Event {
+  sealed trait Empty extends Event:
     def data = JsNull
-  }
 
-  object Start extends Empty {
+  object Start extends Empty:
     def typ = "start"
-  }
 
-  object Action {
+  object Action:
 
     def data(
         gf: GameFamily,
@@ -82,14 +78,14 @@ object Event {
         forcedAction: Option[String],
         pocketData: Option[PocketData],
         captLen: Option[Int] = None
-    )(extra: JsObject) = {
+    )(extra: JsObject) =
       extra ++ Json
         .obj(
           "fen"         -> fen,
           "ply"         -> state.plies,
           "turnCount"   -> state.turnCount,
           "dests"       -> PossibleMoves.oldJson(possibleMoves),
-          "captLen"     -> ~captLen,
+          "captLen"     -> captLen.getOrElse(0),
           "gf"          -> gf.id,
           "dropsByRole" -> PossibleDropsByRole.json(possibleDropsByRole.getOrElse(Map.empty)),
           "lifts"       -> possibleLifts.map { squares => JsString(squares.map(_.key).mkString) },
@@ -116,8 +112,6 @@ object Event {
           JsString(squares.map(_.key).mkString)
         })
         .add("forcedAction" -> forcedAction)
-    }
-  }
 
   case class Move(
       gf: GameFamily,
@@ -147,7 +141,7 @@ object Event {
       forcedAction: Option[String],
       pocketData: Option[PocketData],
       captLen: Option[Int]
-  ) extends Event {
+  ) extends Event:
     def typ = "move"
     def data =
       Action.data(
@@ -172,7 +166,7 @@ object Event {
         forcedAction,
         pocketData,
         captLen
-      ) {
+      ):
         Json
           .obj(
             "uci" -> s"${orig.key}${dest.key}",
@@ -181,10 +175,8 @@ object Event {
           .add("promotion" -> promotion.map(_.data))
           .add("enpassant" -> enpassant.map(_.data))
           .add("castle" -> castle.map(_.data))
-      }
     override def moveBy = Some(!state.playerIndex)
-  }
-  object Move {
+  object Move:
     def apply(
         move: StratMove,
         situation: Situation,
@@ -218,7 +210,7 @@ object Event {
         threefold = situation.threefoldRepetition,
         gameMessage = situation.gameMessage,
         promotion = move.promotion.map { Promotion(_, move.dest) },
-        enpassant = (move.capture ifTrue move.enpassant).map { (capture: List[Pos]) =>
+        enpassant = (move.capture `ifTrue` move.enpassant).map { (capture: List[Pos]) =>
           Event.Enpassant(capture(0), !move.player)
         },
         castle = move.castle.map { case (king, rook) =>
@@ -272,7 +264,6 @@ object Event {
           case _ => None
         }
       )
-  }
 
   case class Drop(
       gf: GameFamily,
@@ -298,7 +289,7 @@ object Event {
       possibleLifts: Option[List[Pos]],
       possibleCubeActions: Option[List[CubeInteraction]],
       forcedAction: Option[String]
-  ) extends Event {
+  ) extends Event:
     def typ = "drop"
     def data =
       Action.data(
@@ -322,16 +313,14 @@ object Event {
         possibleCubeActions,
         forcedAction,
         pocketData
-      ) {
+      ):
         Json.obj(
           "role" -> role.groundName,
           "uci"  -> s"${role.pgn}@${pos.key}",
           "san"  -> san
         )
-      }
     override def moveBy = Some(!state.playerIndex)
-  }
-  object Drop {
+  object Drop:
     def apply(
         drop: StratDrop,
         situation: Situation,
@@ -375,7 +364,6 @@ object Event {
         forcedAction = situation.forcedAction.map(_.toUci.uci),
         pocketData = pocketData
       )
-  }
 
   case class Lift(
       gf: GameFamily,
@@ -400,7 +388,7 @@ object Event {
       possibleLifts: Option[List[Pos]],
       possibleCubeActions: Option[List[CubeInteraction]],
       forcedAction: Option[String]
-  ) extends Event {
+  ) extends Event:
     def typ = "lift"
     def data =
       Action.data(
@@ -424,15 +412,13 @@ object Event {
         possibleCubeActions,
         forcedAction,
         pocketData
-      ) {
+      ):
         Json.obj(
           "uci" -> s"^${pos.key}",
           "san" -> san
         )
-      }
     override def moveBy = Some(!state.playerIndex)
-  }
-  object Lift {
+  object Lift:
     def apply(
         lift: StratLift,
         situation: Situation,
@@ -478,7 +464,6 @@ object Event {
         forcedAction = situation.forcedAction.map(_.toUci.uci),
         pocketData = pocketData
       )
-  }
 
   case class EndTurn(
       gf: GameFamily,
@@ -502,7 +487,7 @@ object Event {
       possibleLifts: Option[List[Pos]],
       possibleCubeActions: Option[List[CubeInteraction]],
       forcedAction: Option[String]
-  ) extends Event {
+  ) extends Event:
     def typ = "endturn"
     def data =
       Action.data(
@@ -526,16 +511,14 @@ object Event {
         possibleCubeActions,
         forcedAction,
         pocketData
-      ) {
+      ):
         Json.obj(
           "uci" -> "endturn",
           "san" -> san
         )
-      }
     override def moveBy = Some(!state.playerIndex)
-  }
 
-  object EndTurn {
+  object EndTurn:
     def apply(
         endTurn: StratEndTurn,
         situation: Situation,
@@ -580,7 +563,6 @@ object Event {
         forcedAction = situation.forcedAction.map(_.toUci.uci),
         pocketData = pocketData
       )
-  }
 
   case class Pass(
       gf: GameFamily,
@@ -607,7 +589,7 @@ object Event {
       possibleLifts: Option[List[Pos]],
       possibleCubeActions: Option[List[CubeInteraction]],
       forcedAction: Option[String]
-  ) extends Event {
+  ) extends Event:
     def typ = "pass"
     def data =
       Action.data(
@@ -631,21 +613,19 @@ object Event {
         possibleCubeActions,
         forcedAction,
         pocketData
-      ) {
+      ):
         Json.obj(
           "canSelectSquares"    -> canSelectSquares,
           "deadStoneOfferState" -> deadStoneOfferStateJson(canSelectSquares),
           "uci"                 -> "pass",
           "san"                 -> san
         )
-      }
     override def moveBy = Some(!state.playerIndex)
-  }
 
   def deadStoneOfferStateJson(canSelectSquares: Boolean): Option[String] =
     if (canSelectSquares) Some("ChooseFirstOffer") else None
 
-  object Pass {
+  object Pass:
     def apply(
         pass: StratPass,
         situation: Situation,
@@ -686,7 +666,6 @@ object Event {
         forcedAction = situation.forcedAction.map(_.toUci.uci),
         pocketData = pocketData
       )
-  }
 
   case class SelectSquares(
       gf: GameFamily,
@@ -711,7 +690,7 @@ object Event {
       possibleLifts: Option[List[Pos]],
       possibleCubeActions: Option[List[CubeInteraction]],
       forcedAction: Option[String]
-  ) extends Event {
+  ) extends Event:
     def typ = "selectSquares"
     def data =
       Action.data(
@@ -735,17 +714,15 @@ object Event {
         possibleCubeActions,
         forcedAction,
         pocketData
-      ) {
+      ):
         Json.obj(
           "squares"          -> squares.mkString(","),
           "canSelectSquares" -> false,
           "uci"              -> s"ss:${squares.mkString(",")}",
           "san"              -> san
         )
-      }
     override def moveBy = Some(!state.playerIndex)
-  }
-  object SelectSquares {
+  object SelectSquares:
     def apply(
         ss: StratSelectSquares,
         situation: Situation,
@@ -783,7 +760,6 @@ object Event {
         forcedAction = situation.forcedAction.map(_.toUci.uci),
         pocketData = pocketData
       )
-  }
 
   case class DiceRoll(
       gf: GameFamily,
@@ -808,7 +784,7 @@ object Event {
       possibleLifts: Option[List[Pos]],
       possibleCubeActions: Option[List[CubeInteraction]],
       forcedAction: Option[String]
-  ) extends Event {
+  ) extends Event:
     def typ = "diceroll"
     def data =
       Action.data(
@@ -832,15 +808,13 @@ object Event {
         possibleCubeActions,
         forcedAction,
         pocketData
-      ) {
+      ):
         Json.obj(
           "uci" -> dice.mkString("/"),
           "san" -> san
         )
-      }
     override def moveBy = Some(!state.playerIndex)
-  }
-  object DiceRoll {
+  object DiceRoll:
     def apply(
         dr: StratDiceRoll,
         situation: Situation,
@@ -886,7 +860,6 @@ object Event {
         forcedAction = situation.forcedAction.map(_.toUci.uci),
         pocketData = pocketData
       )
-  }
 
   case class CubeAction(
       gf: GameFamily,
@@ -911,7 +884,7 @@ object Event {
       possibleLifts: Option[List[Pos]],
       possibleCubeActions: Option[List[CubeInteraction]],
       forcedAction: Option[String]
-  ) extends Event {
+  ) extends Event:
     def typ = "cubeaction"
     def data =
       Action.data(
@@ -935,15 +908,13 @@ object Event {
         possibleCubeActions,
         forcedAction,
         pocketData
-      ) {
+      ):
         Json.obj(
           "uci" -> s"cube${interaction.char}",
           "san" -> san
         )
-      }
     override def moveBy = Some(!state.playerIndex)
-  }
-  object CubeAction {
+  object CubeAction:
     def apply(
         ca: StratCubeAction,
         situation: Situation,
@@ -989,7 +960,6 @@ object Event {
         forcedAction = situation.forcedAction.map(_.toUci.uci),
         pocketData = pocketData
       )
-  }
 
   case class Undo(
       gf: GameFamily,
@@ -1013,7 +983,7 @@ object Event {
       possibleLifts: Option[List[Pos]],
       possibleCubeActions: Option[List[CubeInteraction]],
       forcedAction: Option[String]
-  ) extends Event {
+  ) extends Event:
     def typ = "undo"
     def data =
       Action.data(
@@ -1037,16 +1007,14 @@ object Event {
         possibleCubeActions,
         forcedAction,
         pocketData
-      ) {
+      ):
         Json.obj(
           "uci" -> "undo",
           "san" -> san
         )
-      }
     override def moveBy = Some(!state.playerIndex)
-  }
 
-  object Undo {
+  object Undo:
     def apply(
         undo: StratUndo,
         situation: Situation,
@@ -1091,45 +1059,41 @@ object Event {
         forcedAction = situation.forcedAction.map(_.toUci.uci),
         pocketData = pocketData
       )
-  }
 
-  object PossibleDropsByRole {
+  object PossibleDropsByRole:
 
     def json(drops: Map[Role, List[Pos]]) =
       if (drops.isEmpty) JsNull
-      else {
+      else
         val sb    = new java.lang.StringBuilder(128)
         var first = true
         drops foreach { case (orig, dests) =>
           if (first) first = false
-          else sb append " "
-          sb append orig.forsyth
-          dests foreach { sb append _.key }
+          else sb `append` " "
+          sb `append` orig.forsyth
+          dests foreach { sb `append` _.key }
         }
         JsString(sb.toString)
-      }
 
-  }
 
-  object PossibleMoves {
+  object PossibleMoves:
 
     def json(moves: Map[Pos, List[Pos]], apiVersion: ApiVersion) =
-      if (apiVersion gte 4) newJson(moves)
+      if (apiVersion `gte` 4) newJson(moves)
       else oldJson(moves)
 
     def newJson(moves: Map[Pos, List[Pos]]) =
       if (moves.isEmpty) JsNull
-      else {
+      else
         val sb    = new java.lang.StringBuilder(128)
         var first = true
         moves foreach { case (orig, dests) =>
           if (first) first = false
-          else sb append " "
-          sb append orig.key
-          dests foreach { sb append _.key }
+          else sb `append` " "
+          sb `append` orig.key
+          dests foreach { sb `append` _.key }
         }
         JsString(sb.toString)
-      }
 
     def oldJson(moves: Map[Pos, List[Pos]]) =
       if (moves.isEmpty) JsNull
@@ -1137,18 +1101,16 @@ object Event {
         moves.foldLeft(JsObject(Nil)) { case (res, (o, d)) =>
           res + (o.key -> JsString(d map (_.key) mkString))
         }
-  }
 
-  case class Enpassant(pos: Pos, playerIndex: PlayerIndex) extends Event {
+  case class Enpassant(pos: Pos, playerIndex: PlayerIndex) extends Event:
     def typ = "enpassant"
     def data =
       Json.obj(
         "key"         -> pos.key,
         "playerIndex" -> playerIndex
       )
-  }
 
-  case class Castling(king: (Pos, Pos), rook: (Pos, Pos), playerIndex: PlayerIndex) extends Event {
+  case class Castling(king: (Pos, Pos), rook: (Pos, Pos), playerIndex: PlayerIndex) extends Event:
     def typ = "castling"
     def data =
       Json.obj(
@@ -1156,13 +1118,12 @@ object Event {
         "rook"        -> Json.arr(rook._1.key, rook._2.key),
         "playerIndex" -> playerIndex
       )
-  }
 
   case class RedirectOwner(
       playerIndex: PlayerIndex,
       id: String,
       cookie: Option[JsObject]
-  ) extends Event {
+  ) extends Event:
     def typ = "redirect"
     def data =
       Json
@@ -1172,9 +1133,8 @@ object Event {
         )
         .add("cookie" -> cookie)
     override def only = Some(playerIndex)
-  }
 
-  case class Promotion(role: PromotableRole, pos: Pos) extends Event {
+  case class Promotion(role: PromotableRole, pos: Pos) extends Event:
     def typ = "promotion"
     def data =
       Json.obj(
@@ -1182,30 +1142,26 @@ object Event {
         "pieceClass" -> role.groundName,
         "lib"        -> pos.gameLogic.id
       )
-  }
 
-  case class PlayerMessage(line: PlayerLine) extends Event {
+  case class PlayerMessage(line: PlayerLine) extends Event:
     def typ            = "message"
     def data           = lila.chat.JsonView(line)
     override def owner = true
     override def troll = false
-  }
 
-  case class UserMessage(line: UserLine, w: Boolean) extends Event {
+  case class UserMessage(line: UserLine, w: Boolean) extends Event:
     def typ              = "message"
     def data             = lila.chat.JsonView(line)
     override def troll   = line.troll
     override def watcher = w
     override def owner   = !w
-  }
 
   // for mobile app BC only
-  case class End(winner: Option[PlayerIndex]) extends Event {
+  case class End(winner: Option[PlayerIndex]) extends Event:
     def typ  = "end"
     def data = Json.toJson(winner)
-  }
 
-  case class EndData(game: Game, ratingDiff: Option[RatingDiffs]) extends Event {
+  case class EndData(game: Game, ratingDiff: Option[RatingDiffs]) extends Event:
     def typ = "endData"
     def data =
       Json
@@ -1243,41 +1199,35 @@ object Event {
           )
         })
         .add("boosted" -> game.boosted)
-  }
 
-  case object Reload extends Empty {
+  case object Reload extends Empty:
     def typ = "reload"
-  }
-  case object ReloadOwner extends Empty {
+  case object ReloadOwner extends Empty:
     def typ            = "reload"
     override def owner = true
-  }
 
   private def reloadOr[A: Writes](typ: String, data: A) = Json.obj("t" -> typ, "d" -> data)
 
   // use t:reload for mobile app BC,
   // but send extra data for the web to avoid reloading
-  case class RematchOffer(by: Option[PlayerIndex]) extends Event {
+  case class RematchOffer(by: Option[PlayerIndex]) extends Event:
     def typ            = "reload"
     def data           = reloadOr("rematchOffer", by)
     override def owner = true
-  }
 
-  case class RematchTaken(nextId: Game.ID) extends Event {
+  case class RematchTaken(nextId: Game.ID) extends Event:
     def typ  = "reload"
     def data = reloadOr("rematchTaken", nextId)
-  }
 
-  case class DrawOffer(by: Option[PlayerIndex]) extends Event {
+  case class DrawOffer(by: Option[PlayerIndex]) extends Event:
     def typ  = "reload"
     def data = reloadOr("drawOffer", by)
-  }
 
   case class SelectSquaresOffer(
       playerIndex: PlayerIndex,
       squares: List[Pos],
       accepted: Option[Boolean] = None
-  ) extends Event {
+  ) extends Event:
     def typ = "selectSquaresOffer"
 
     def data = Json.obj(
@@ -1285,16 +1235,14 @@ object Event {
       "squares"     -> squares.mkString(","),
       "accepted"    -> accepted
     )
-  }
 
-  case class ClockInc(playerIndex: PlayerIndex, time: Centis) extends Event {
+  case class ClockInc(playerIndex: PlayerIndex, time: Centis) extends Event:
     def typ = "clockInc"
     def data =
       Json.obj(
         "playerIndex" -> playerIndex,
         "time"        -> time.centis
       )
-  }
 
   sealed trait ClockEvent extends Event
 
@@ -1308,7 +1256,7 @@ object Event {
       p1Periods: Int = 0,
       p2Periods: Int = 0,
       nextLagComp: Option[Centis] = None
-  ) extends ClockEvent {
+  ) extends ClockEvent:
     def typ = "clock"
     def data =
       Json
@@ -1323,10 +1271,9 @@ object Event {
           "p2Periods" -> p2Periods
         )
         .add("lag" -> nextLagComp.collect { case Centis(c) if c > 1 => c })
-  }
-  object Clock {
+  object Clock:
     def apply(clock: strategygames.ClockBase): Clock =
-      clock match {
+      clock match
         case fc: StratClock =>
           Clock(
             fc.remainingTime(P1),
@@ -1349,42 +1296,35 @@ object Event {
             bc.players(P2).spentPeriods,
             bc.lagCompEstimate(bc.player)
           )
-      }
-  }
 
-  case class Berserk(playerIndex: PlayerIndex) extends Event {
+  case class Berserk(playerIndex: PlayerIndex) extends Event:
     def typ  = "berserk"
     def data = Json.toJson(playerIndex)
-  }
 
-  case class CorrespondenceClock(p1: Float, p2: Float) extends ClockEvent {
+  case class CorrespondenceClock(p1: Float, p2: Float) extends ClockEvent:
     def typ  = "cclock"
     def data = Json.obj("p1" -> p1, "p2" -> p2)
-  }
-  object CorrespondenceClock {
+  object CorrespondenceClock:
     def apply(clock: lila.game.CorrespondenceClock): CorrespondenceClock =
       CorrespondenceClock(clock.p1Time, clock.p2Time)
-  }
 
-  case class CheckCount(p1: Int, p2: Int) extends Event {
+  case class CheckCount(p1: Int, p2: Int) extends Event:
     def typ = "checkCount"
     def data =
       Json.obj(
         "p1" -> p1,
         "p2" -> p2
       )
-  }
 
-  case class Score(p1: Int, p2: Int) extends Event {
+  case class Score(p1: Int, p2: Int) extends Event:
     def typ = "score"
     def data =
       Json.obj(
         "p1" -> p1,
         "p2" -> p2
       )
-  }
 
-  case class KingMoves(p1: Int, p2: Int, p1King: Option[Pos], p2King: Option[Pos]) extends Event {
+  case class KingMoves(p1: Int, p2: Int, p1King: Option[Pos], p2King: Option[Pos]) extends Event:
     def typ = "kingMoves"
     def data = Json.obj(
       "p1"     -> p1,
@@ -1392,7 +1332,6 @@ object Event {
       "p1King" -> p1King.map(_.toString),
       "p2King" -> p2King.map(_.toString)
     )
-  }
 
   case class State(
       playerIndex: PlayerIndex,
@@ -1404,7 +1343,7 @@ object Event {
       p2OffersDraw: Boolean,
       p1OffersSelectSquares: Boolean,
       p2OffersSelectSquares: Boolean
-  ) extends Event {
+  ) extends Event:
     def typ = "state"
     def data =
       Json
@@ -1419,12 +1358,11 @@ object Event {
         .add("bDraw" -> p2OffersDraw)
         .add("wSelectSquares" -> p1OffersSelectSquares)
         .add("bSelectSquares" -> p2OffersSelectSquares)
-  }
 
   case class TakebackOffers(
       p1: Boolean,
       p2: Boolean
-  ) extends Event {
+  ) extends Event:
     def typ = "takebackOffers"
     def data =
       Json
@@ -1432,13 +1370,12 @@ object Event {
         .add("p1" -> p1)
         .add("p2" -> p2)
     override def owner = true
-  }
 
   case class Crowd(
       p1: Boolean,
       p2: Boolean,
       watchers: Option[JsValue]
-  ) extends Event {
+  ) extends Event:
     def typ = "crowd"
     def data =
       Json
@@ -1447,5 +1384,3 @@ object Event {
           "p2" -> p2
         )
         .add("watchers" -> watchers)
-  }
-}

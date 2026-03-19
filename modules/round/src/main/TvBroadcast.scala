@@ -15,7 +15,7 @@ import scala.concurrent.ExecutionContextExecutor
 final private class TvBroadcast(
     userJsonView: lila.user.JsonView,
     lightUserSync: LightUser.GetterSync
-) extends Actor {
+) extends Actor:
 
   import TvBroadcast._
 
@@ -27,23 +27,22 @@ final private class TvBroadcast(
 
   implicit def system: ExecutionContextExecutor = context.dispatcher
 
-  override def postStop() = {
+  override def postStop() =
     super.postStop()
     unsubscribeFromFeaturedId()
-  }
 
-  def receive = {
+  def receive =
 
     case TvBroadcast.Connect(compat) =>
       sender() ! Source
-        .queue[JsValue](8, akka.stream.OverflowStrategy.dropHead)
+        .queue[JsValue](8, org.apache.pekko.stream.OverflowStrategy.dropHead)
         .mapMaterializedValue { queue =>
           val client = Client(queue, compat)
           self ! Add(client)
           queue.watchCompletion().foreach { _ =>
             self ! Remove(client)
           }
-          featured ifFalse compat foreach { f =>
+          featured `ifFalse` compat foreach { f =>
             client.queue.offer(Socket.makeMessage("featured", f.dataWithFen))
           }
         }
@@ -53,7 +52,7 @@ final private class TvBroadcast(
 
     case ChangeFeatured(pov, msg) =>
       unsubscribeFromFeaturedId()
-      Bus.subscribe(self, MoveGameEvent makeChan pov.gameId)
+      Bus.subscribe(self, MoveGameEvent `makeChan` pov.gameId)
       val feat = Featured(
         pov.gameId,
         Json.obj(
@@ -71,10 +70,9 @@ final private class TvBroadcast(
         fen = Forsyth.exportBoard(pov.game.variant.gameLogic, pov.game.board)
       )
       clients.foreach { client =>
-        client.queue offer {
+        client.queue offer:
           if (client.fromPlayStrategy) msg
           else feat.socketMsg
-        }
       }
       featured = feat.some
 
@@ -98,27 +96,23 @@ final private class TvBroadcast(
       featured foreach { f =>
         featured = f.copy(fen = fen).some
       }
-  }
 
   def unsubscribeFromFeaturedId() =
     featured foreach { previous =>
-      Bus.unsubscribe(self, MoveGameEvent makeChan previous.id)
+      Bus.unsubscribe(self, MoveGameEvent `makeChan` previous.id)
     }
-}
 
-object TvBroadcast {
+object TvBroadcast:
 
-  type SourceType = Source[JsValue, _]
+  type SourceType = Source[JsValue, ?]
   type Queue      = SourceQueueWithComplete[JsValue]
 
-  case class Featured(id: Game.ID, data: JsObject, fen: String) {
+  case class Featured(id: Game.ID, data: JsObject, fen: String):
     def dataWithFen = data ++ Json.obj("fen" -> fen)
     def socketMsg   = Socket.makeMessage("featured", dataWithFen)
-  }
 
   case class Connect(fromPlayStrategy: Boolean)
   case class Client(queue: Queue, fromPlayStrategy: Boolean)
 
   case class Add(c: Client)
   case class Remove(c: Client)
-}

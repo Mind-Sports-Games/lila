@@ -9,11 +9,10 @@ import strategygames.variant.{ Variant => StratVariant }
 import strategygames.{ Board, Player => PlayerIndex, GameLogic, Mode, Replay, Status }
 import play.api.data._
 import play.api.data.Forms._
-import scala.util.chaining._
 
 import lila.game._
 
-final class ImporterForm {
+final class ImporterForm:
 
   lazy val importForm = Form(
     mapping(
@@ -25,17 +24,14 @@ final class ImporterForm {
   def checkPgn(pgn: String): Validated[String, Preprocessed] = ImporterForm.catchOverflow { () =>
     ImportData(pgn, none).preprocess(none)
   }
-}
 
-object ImporterForm {
+object ImporterForm:
 
-  def catchOverflow(f: () => Validated[String, Preprocessed]): Validated[String, Preprocessed] = try {
+  def catchOverflow(f: () => Validated[String, Preprocessed]): Validated[String, Preprocessed] = try
     f()
-  } catch {
-    case e: RuntimeException if e.getMessage contains "StackOverflowError" =>
+  catch
+    case e: RuntimeException if e.getMessage `contains` "StackOverflowError" =>
       Validated.Invalid("This PGN seems too long or too complex!")
-  }
-}
 
 private case class TagResult(status: Status, winner: Option[PlayerIndex])
 case class Preprocessed(
@@ -45,7 +41,7 @@ case class Preprocessed(
     parsed: ParsedPgn
 )
 
-case class ImportData(pgn: String, analyse: Option[String]) {
+case class ImportData(pgn: String, analyse: Option[String]):
 
   private type TagPicker = Tag.type => TagType
 
@@ -54,7 +50,7 @@ case class ImportData(pgn: String, analyse: Option[String]) {
   private def evenIncomplete(result: Reader.Result): Replay = result.evenIncomplete
 
   def preprocess(user: Option[String]): Validated[String, Preprocessed] = ImporterForm.catchOverflow { () =>
-    Parser.full(pgn) flatMap { parsed =>
+    Parser.full(pgn) andThen { parsed =>
       Reader.fullWithSans(
         GameLogic.Chess(),
         pgn,
@@ -63,10 +59,9 @@ case class ImportData(pgn: String, analyse: Option[String]) {
       ) map evenIncomplete map { case replay: Replay =>
         val setup = replay.setup
         val state = replay.state
-        val board = setup.board match {
+        val board = setup.board match
           case Board.Chess(board) => board
           case _                  => sys.error("Importer doesn't support draughts yet")
-        }
         val initBoard    = parsed.tags.fen.map(fen => Forsyth.<<(GameLogic.Chess(), fen).map(_.board))
         val fromPosition = initBoard.nonEmpty && !parsed.tags.fen.exists(_.initial)
         val variant = StratVariant.wrap({
@@ -88,20 +83,19 @@ case class ImportData(pgn: String, analyse: Option[String]) {
             strategygames.chess.variant.FromPosition
           case v => v
         })
-        val game = state.copy(situation = state.situation withVariant variant)
+        val game = state.copy(situation = state.situation `withVariant` variant)
         val initialFen = parsed.tags.fen
           .flatMap(fen => Forsyth.<<<@(GameLogic.Chess(), variant, fen))
           .map(situation => Forsyth.>>(GameLogic.Chess(), situation))
 
-        val status = parsed.tags(_.Termination).map(_.toLowerCase) match {
+        val status = parsed.tags(_.Termination).map(_.toLowerCase) match
           case Some("normal") | None                   => Status.Resign
           case Some("abandoned")                       => Status.Aborted
           case Some("time forfeit")                    => Status.Outoftime
           case Some("rule of gin")                     => Status.RuleOfGin
           case Some("rules infraction")                => Status.Cheat
-          case Some(txt) if txt contains "won on time" => Status.Outoftime
+          case Some(txt) if txt `contains` "won on time" => Status.Outoftime
           case Some(_)                                 => Status.UnknownFinish
-        }
 
         val date = parsed.tags.anyDate
 
@@ -125,25 +119,22 @@ case class ImportData(pgn: String, analyse: Option[String]) {
           .sloppy
           .start pipe { dbGame =>
           // apply the result from the board or the tags
-          game.situation.status match {
+          game.situation.status match
             case Some(situationStatus) => dbGame.finish(situationStatus, game.situation.winner).game
             case None =>
               parsed.tags.resultPlayer
-                .map {
+                .map:
                   case Some(playerIndex)                       => TagResult(status, playerIndex.some)
                   case None if Status.flagged.contains(status) => TagResult(status, none)
                   case None                                    => TagResult(Status.Draw, none)
                   case _                                       => sys.error("Not implemented for draughts yet")
-                }
                 .filter(_.status > Status.Started)
                 .fold(dbGame) { res =>
                   dbGame.finish(res.status, res.winner).game
                 }
-          }
         }
 
         Preprocessed(NewGame(dbGame), replay.copy(state = game), initialFen, parsed)
       }
     }
   }
-}

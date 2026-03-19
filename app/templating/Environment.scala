@@ -7,7 +7,7 @@ import lila.app.ui.ScalatagsTemplate._
 import lila.common.extensions.*
 
 object Environment
-    extends lila.Lilaisms
+    extends lila.PackageObject
     with StringHelper
     with AssetHelper
     with DateHelper
@@ -25,6 +25,19 @@ object Environment
     with TournamentHelper
     with FlashHelper
     with ChessgroundHelper {
+
+  // Provide Zero instances needed for `.so` and `.option` extension methods in Scala 3 templates
+  // Using implicit val (not given) so they're importable via `import Environment._`
+  import alleycats.Zero
+  implicit val zeroString: Zero[String]                              = Zero("")
+  implicit def zeroOption[A]: Zero[Option[A]]                       = Zero(None)
+  implicit def zeroList[A]: Zero[List[A]]                           = Zero(Nil)
+  implicit def zeroVector[A]: Zero[Vector[A]]                       = Zero(Vector.empty)
+  implicit def zeroSet[A]: Zero[Set[A]]                             = Zero(Set.empty)
+  implicit def zeroMap[K, V]: Zero[Map[K, V]]                      = Zero(Map.empty)
+  implicit val zeroInt: Zero[Int]                                    = Zero(0)
+  implicit val zeroBool: Zero[Boolean]                               = Zero(false)
+  implicit val zeroFuUnit: Zero[scala.concurrent.Future[Unit]]      = Zero(scala.concurrent.Future.unit)
 
   // #TODO holy shit fix me
   // requires injecting all the templates!!

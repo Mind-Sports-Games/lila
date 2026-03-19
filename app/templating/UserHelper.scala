@@ -200,7 +200,7 @@ trait UserHelper { self: I18nHelper with StringHelper with NumberHelper =>
       dataHref := userUrl(name)
     )(
       withOnline so lineIcon(user),
-      user.so(u => titleTag(u.title map Title.apply)),
+      user.flatMap(u => u.title.map(t => userTitleTag(Title.apply(t)))),
       name
     )
   }

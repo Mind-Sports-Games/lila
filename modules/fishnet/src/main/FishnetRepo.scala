@@ -12,21 +12,20 @@ final private class FishnetRepo(
     analysisColl: Coll,
     clientColl: Coll,
     cacheApi: lila.memo.CacheApi
-)(implicit ec: scala.concurrent.ExecutionContext) {
+)(implicit ec: scala.concurrent.ExecutionContext):
 
   import BSONHandlers._
 
-  private val clientCache = cacheApi[Client.Key, Option[Client]](32, "fishnet.client") {
+  private val clientCache = cacheApi[Client.Key, Option[Client]](32, "fishnet.client"):
     _.expireAfterWrite(10 minutes)
       .buildAsyncFuture { key =>
         clientColl.one[Client](selectClient(key))
       }
-  }
 
   def getClient(key: Client.Key)        = clientCache get key
   def getEnabledClient(key: Client.Key) = getClient(key).map { _.filter(_.enabled) }
   def getOfflineClient: Fu[Client] =
-    getEnabledClient(Client.offline.key) getOrElse fuccess(Client.offline)
+    getEnabledClient(Client.offline.key) `getOrElse` fuccess(Client.offline)
   def updateClientInstance(client: Client, instance: Client.Instance): Fu[Client] =
     client.updateInstance(instance).fold(fuccess(client)) { updated =>
       clientColl.update.one(selectClient(client.key), $set("instance" -> updated.instance)).andDo(clientCache.invalidate(client.key)) inject updated
@@ -38,7 +37,7 @@ final private class FishnetRepo(
   def allRecentClients =
     clientColl.list[Client](
       $doc(
-        "instance.seenAt" $gt Client.Instance.recentSince
+        "instance.seenAt" `$gt` Client.Instance.recentSince
       )
     )
 
@@ -50,16 +49,16 @@ final private class FishnetRepo(
   def updateOrGiveUpAnalysis(ana: Work.Analysis) =
     if (ana.isOutOfTries) giveUpAnalysis(ana) else updateAnalysis(ana)
 
-  object status {
+  object status:
     private def system(v: Boolean)   = $doc("sender.system" -> v)
-    private def acquired(v: Boolean) = $doc("acquired" $exists v)
+    private def acquired(v: Boolean) = $doc("acquired" `$exists` v)
     private def oldestSeconds(system: Boolean): Fu[Int] =
       analysisColl
         .find($doc("sender.system" -> system) ++ acquired(false), $doc("createdAt" -> true).some)
-        .sort($sort asc "createdAt")
+        .sort($sort `asc` "createdAt")
         .one[Bdoc]
         .map(~_.flatMap(_.getAsOpt[DateTime]("createdAt").map { date =>
-          (nowSeconds - date.getSeconds).toInt atLeast 0
+          ((DateTime.now.getMillis / 1000) - (date.getMillis / 1000)).toInt `atLeast` 0
         }))
 
     def compute =
@@ -76,7 +75,6 @@ final private class FishnetRepo(
         user = Monitor.StatusFor(acquired = userAcquired, queued = userQueued, oldest = userOldest),
         system = Monitor.StatusFor(acquired = systemAcquired, queued = systemQueued, oldest = systemOldest)
       )
-  }
 
   def getSimilarAnalysis(work: Work.Analysis): Fu[Option[Work.Analysis]] =
     analysisColl.one[Work.Analysis]($doc("game.id" -> work.game.id))
@@ -87,9 +85,8 @@ final private class FishnetRepo(
   private[fishnet] def toKey(keyOrUser: String): Fu[Client.Key] =
     clientColl.primitiveOne[String](
       $or(
-        "_id" $eq keyOrUser,
-        "userId" $eq lila.user.User.normalize(keyOrUser)
+        "_id" `$eq` keyOrUser,
+        "userId" `$eq` lila.user.User.normalize(keyOrUser)
       ),
       "_id"
-    ) orFail "client not found" map Client.Key.apply
-}
+    ) `orFail` "client not found" map Client.Key.apply

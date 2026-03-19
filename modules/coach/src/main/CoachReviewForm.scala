@@ -3,7 +3,7 @@ package lila.coach
 import play.api.data._
 import play.api.data.Forms._
 
-object CoachReviewForm {
+object CoachReviewForm:
 
   lazy val form = Form(
     mapping(
@@ -13,4 +13,3 @@ object CoachReviewForm {
   )
 
   case class Data(text: String, score: Int)
-}

@@ -28,7 +28,7 @@ final class Env(
 )(implicit
     ec: scala.concurrent.ExecutionContext,
     scheduler: org.apache.pekko.actor.Scheduler
-) {
+):
 
   private val config = appConfig.get[ChatConfig]("chat")(AutoConfig.loader)
   import config._
@@ -47,4 +47,3 @@ final class Env(
   scheduler.scheduleWithFixedDelay(timeoutCheckEvery, timeoutCheckEvery) { () =>
     timeout.checkExpired foreach api.userChat.reinstate
   }
-}

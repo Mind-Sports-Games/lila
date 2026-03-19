@@ -28,7 +28,7 @@ final class ForumPost(env: Env) extends LilaController(env) with ForumController
             if (topic.closed) fuccess(BadRequest("This topic is closed"))
             else if (topic.isOld) fuccess(BadRequest("This topic is archived"))
             else
-              categ.team.so { env.team.cached.isLeader(_, me.id) } flatMap { inOwnTeam =>
+              categ.team.fold(fuFalse) { t => env.team.cached.isLeader(t, me.id) } flatMap { inOwnTeam =>
                 forms
                   .post(me, inOwnTeam)
                   .bindFromRequest()
@@ -59,7 +59,7 @@ final class ForumPost(env: Env) extends LilaController(env) with ForumController
     AuthBody { implicit ctx => me =>
       implicit val req = ctx.body
       env.forum.postApi.teamIdOfPostId(postId) flatMap { teamId =>
-        teamId.so { env.team.cached.isLeader(_, me.id) } flatMap { inOwnTeam =>
+        teamId.fold(fuFalse) { t => env.team.cached.isLeader(t, me.id) } flatMap { inOwnTeam =>
           forms
             .postEdit(me, inOwnTeam)
             .bindFromRequest()

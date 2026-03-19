@@ -1,7 +1,6 @@
 package lila.msg
 
 import org.joda.time.DateTime
-import scala.concurrent.duration._
 
 import lila.common.Bus
 import lila.db.dsl._
@@ -24,22 +23,21 @@ final private class MsgSecurity(
 )(implicit
     ec: scala.concurrent.ExecutionContext,
     scheduler: org.apache.pekko.actor.Scheduler
-) {
+):
 
   import BsonHandlers._
   import MsgSecurity._
 
-  private object limitCost {
+  private object limitCost:
     val normal   = 25
     val verified = 5
     val hog      = 1
     def apply(u: User.Contact) =
       if (u.isApiHog) hog
       else if (u.isVerified) verified
-      else if (u isDaysOld 3) normal
-      else if (u isHoursOld 3) normal * 2
+      else if (u `isDaysOld` 3) normal
+      else if (u `isHoursOld` 3) normal * 2
       else normal * 4
-  }
 
   private val CreateLimitPerUser = new RateLimit[User.ID](
     credits = 20 * limitCost.normal,
@@ -53,24 +51,24 @@ final private class MsgSecurity(
     key = "msg_reply.user"
   )
 
-  object can {
+  object can:
 
     def post(
         contacts: User.Contacts,
         rawText: String,
         isNew: Boolean,
         unlimited: Boolean = false
-    ): Fu[Verdict] = {
+    ): Fu[Verdict] =
       val text = rawText.trim
       if (text.isEmpty) fuccess(Invalid)
       else
         may.post(contacts, isNew) flatMap {
           case false => fuccess(Block)
           case _ =>
-            isLimited(contacts, isNew, unlimited) orElse
-              isSpam(text) orElse
-              isTroll(contacts) orElse
-              isDirt(contacts.orig, text, isNew) getOrElse
+            isLimited(contacts, isNew, unlimited) `orElse`
+              isSpam(text) `orElse`
+              isTroll(contacts) `orElse`
+              isDirt(contacts.orig, text, isNew) `getOrElse`
               fuccess(Ok)
         } flatMap {
           case mute: Mute =>
@@ -78,7 +76,7 @@ final private class MsgSecurity(
               if (isFriend) Ok else mute
             }
           case verdict => fuccess(verdict)
-        } addEffect {
+        } addEffect:
           case Dirt =>
             Bus.publish(
               AutoFlag(contacts.orig.id, s"msg/${contacts.orig.id}/${contacts.dest.id}", text),
@@ -87,22 +85,18 @@ final private class MsgSecurity(
           case Spam =>
             logger.warn(s"PM spam from ${contacts.orig.id} to ${contacts.dest.id}: $text")
           case _ =>
-        }
-    }
 
     private def isLimited(contacts: User.Contacts, isNew: Boolean, unlimited: Boolean): Fu[Option[Verdict]] =
       if (unlimited) fuccess(none)
       else if (isNew) {
         isLeaderOf(contacts) >>| isTeacherOf(contacts)
-      } map {
+      } map:
         case true => none
         case _ =>
           CreateLimitPerUser[Option[Verdict]](contacts.orig.id, limitCost(contacts.orig))(none)(Limit.some)
-      }
       else
-        fuccess {
+        fuccess:
           ReplyLimitPerUser[Option[Verdict]](contacts.orig.id, limitCost(contacts.orig))(none)(Limit.some)
-        }
 
     private def isSpam(text: String): Fu[Option[Verdict]] =
       spam.detect(text) so fuccess(Spam.some)
@@ -112,20 +106,18 @@ final private class MsgSecurity(
 
     private def isDirt(user: User.Contact, text: String, isNew: Boolean): Fu[Option[Verdict]] =
       (isNew && Analyser(text).dirty) so
-        !userRepo.isCreatedSince(user.id, DateTime.now.minusDays(30)) dmap { _ option Dirt }
-  }
+        userRepo.isCreatedSince(user.id, DateTime.now.minusDays(30)).not dmap { _ `option` Dirt }
 
-  object may {
+  object may:
 
     def post(orig: User.ID, dest: User.ID, isNew: Boolean): Fu[Boolean] =
-      userRepo.contacts(orig, dest) flatMap {
+      userRepo.contacts(orig, dest) flatMap:
         _ so { post(_, isNew) }
-      }
 
     def post(contacts: User.Contacts, isNew: Boolean): Fu[Boolean] =
       fuccess(contacts.dest.id != User.playstrategyId) >>& {
         fuccess(Granter.byRoles(_.ModMessage)(~contacts.orig.roles)) >>| {
-          !relationApi.fetchBlocks(contacts.dest.id, contacts.orig.id) >>&
+          relationApi.fetchBlocks(contacts.dest.id, contacts.orig.id).not >>&
             (create(contacts) >>| reply(contacts)) >>&
             chatPanic.allowed(contacts.orig.id, userRepo.byId) >>&
             kidCheck(contacts, isNew)
@@ -133,11 +125,10 @@ final private class MsgSecurity(
       }
 
     private def create(contacts: User.Contacts): Fu[Boolean] =
-      prefApi.getPref(contacts.dest.id, _.message) flatMap {
+      prefApi.getPref(contacts.dest.id, _.message) flatMap:
         case lila.pref.Pref.Message.NEVER  => fuccess(false)
         case lila.pref.Pref.Message.FRIEND => relationApi.fetchFollows(contacts.dest.id, contacts.orig.id)
         case lila.pref.Pref.Message.ALWAYS => fuccess(true)
-      }
 
     // Even if the dest prefs disallow it,
     // you can still reply if they recently messaged you,
@@ -145,19 +136,17 @@ final private class MsgSecurity(
     private def reply(contacts: User.Contacts): Fu[Boolean] =
       colls.thread.exists(
         $id(MsgThread.id(contacts.orig.id, contacts.dest.id)) ++
-          $doc("del" $ne contacts.dest.id)
+          $doc("del" `$ne` contacts.dest.id)
       )
 
     private def kidCheck(contacts: User.Contacts, isNew: Boolean): Fu[Boolean] =
       if (!isNew || !contacts.hasKid) fuTrue
       else
-        (contacts.orig.kidId, contacts.dest.kidId) match {
+        (contacts.orig.kidId, contacts.dest.kidId) match
           case (a: KidId, b: KidId)    => Bus.ask[Boolean]("clas") { AreKidsInSameClass(a, b, _) }
           case (t: NonKidId, s: KidId) => isTeacherOf(t.id, s.id)
           case (s: KidId, t: NonKidId) => isTeacherOf(t.id, s.id)
           case _                       => fuFalse
-        }
-  }
 
   private def isTeacherOf(contacts: User.Contacts) =
     Bus.ask[Boolean]("clas") { IsTeacherOf(contacts.orig.id, contacts.dest.id, _) }
@@ -167,9 +156,8 @@ final private class MsgSecurity(
 
   private def isLeaderOf(contacts: User.Contacts) =
     Bus.ask[Boolean]("teamIsLeaderOf") { IsLeaderOf(contacts.orig.id, contacts.dest.id, _) }
-}
 
-private object MsgSecurity {
+private object MsgSecurity:
 
   sealed trait Verdict
   sealed trait Reject                           extends Verdict
@@ -183,4 +171,3 @@ private object MsgSecurity {
   case object Block   extends Reject
   case object Limit   extends Reject
   case object Invalid extends Reject
-}

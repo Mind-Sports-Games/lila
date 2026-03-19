@@ -167,7 +167,7 @@ object games {
                       )
                     )
                   },
-                  td(dataSort := pov.game.updatedAt.getSeconds.toString)(
+                  td(dataSort := (pov.game.updatedAt.getMillis / 1000).toString)(
                     a(href := routes.Round.watcher(pov.gameId, pov.playerIndex.name), cls := "glpt")(
                       momentFromNowServerText(pov.game.updatedAt)
                     )

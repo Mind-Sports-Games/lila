@@ -8,14 +8,14 @@ import lila.game.{ Game, GameRepo }
 import lila.user.User
 import lila.i18n.VariantKeys
 import lila.quote.Quote
-import strategygames.{ GameFamily, P1, P2 }
+import strategygames.{ P1, P2 }
 import strategygames.variant.Variant
 
 final class JsonView(
     gameRepo: GameRepo,
     getLightUser: LightUser.Getter,
     proxyRepo: lila.round.GameProxyRepo
-)(implicit ec: scala.concurrent.ExecutionContext) {
+)(implicit ec: scala.concurrent.ExecutionContext):
 
   implicit private val playerIndexWriter: Writes[strategygames.Player] = Writes { c =>
     JsString(c.name)
@@ -24,7 +24,7 @@ final class JsonView(
   implicit private val simulTeamWriter: OWrites[SimulTeam] = Json.writes[SimulTeam]
 
   private def fetchGames(simul: Simul) =
-    if (simul.isFinished) gameRepo gamesFromSecondary simul.gameIds
+    if (simul.isFinished) gameRepo `gamesFromSecondary` simul.gameIds
     else Future.sequence(simul.gameIds.map(proxyRepo.game)).dmap(_.flatten)
 
   def apply(simul: Simul, team: Option[SimulTeam]): Fu[JsObject] =
@@ -129,7 +129,7 @@ final class JsonView(
       )
     }
 
-  private def boardSizeJson(v: Variant) = v match {
+  private def boardSizeJson(v: Variant) = v match
     case Variant.Draughts(v) =>
       Some(
         Json.obj(
@@ -138,7 +138,6 @@ final class JsonView(
         )
       )
     case _ => None
-  }
 
   private def gameJson(hostId: User.ID, g: Game) =
     Json
@@ -150,7 +149,7 @@ final class JsonView(
           .value,
         "gameLogic" -> g.situation.board.variant.gameLogic.name.toLowerCase(),
         "boardSize" -> boardSizeJson(g.situation.board.variant),
-        "lastMove"  -> ~g.lastActionKeys,
+        "lastMove"  -> g.lastActionKeys.getOrElse(""),
         "orient"    -> g.playerByUserId(hostId).map(_.playerIndex)
       )
       .add(
@@ -164,7 +163,7 @@ final class JsonView(
       .add("winner" -> g.winnerPlayerIndex.map(_.name))
 
   private def pairingJson(games: List[Game], hostId: String)(p: SimulPairing): Fu[Option[JsObject]] =
-    games.find(_.id == p.gameId) so { game =>
+    games.find(_.id == p.gameId).fold(fuccess(none[JsObject])) { game =>
       playerJson(p.player) map { player =>
         Json
           .obj(
@@ -178,4 +177,3 @@ final class JsonView(
           .some
       }
     }
-}

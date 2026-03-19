@@ -3,9 +3,8 @@ package lila.study
 import strategygames.format.{ FEN, Uci }
 import strategygames.format.pgn.{ Tag, Tags }
 import strategygames.variant.Variant
-import strategygames.{ GameLogic, Player => PlayerIndex, Pos }
+import strategygames.{ Player => PlayerIndex, Pos }
 import play.api.libs.json._
-import scala.util.chaining._
 
 import lila.common.Json._
 import lila.socket.Socket.Sri
@@ -16,7 +15,7 @@ import lila.i18n.VariantKeys
 final class JsonView(
     studyRepo: StudyRepo,
     lightUserApi: lila.user.LightUserApi
-)(implicit ec: scala.concurrent.ExecutionContext) {
+)(implicit ec: scala.concurrent.ExecutionContext):
 
   import JsonView._
 
@@ -25,7 +24,7 @@ final class JsonView(
       chapters: List[Chapter.Metadata],
       currentChapter: Chapter,
       me: Option[User]
-  ) = {
+  ) =
 
     def allowed(selection: Settings.UserSelection): Boolean =
       Settings.UserSelection.allows(selection, study, me.map(_.id))
@@ -55,12 +54,11 @@ final class JsonView(
             )
             .add("description", currentChapter.description)
             .add("serverEval", currentChapter.serverEval)
-            .add("relay", currentChapter.relay)(relayWrites)
+            .add("relay", currentChapter.relay)(using relayWrites)
             .pipe(addChapterMode(currentChapter))
         )
         .add("description", study.description)
     }
-  }
 
   def chapterConfig(c: Chapter) =
     Json
@@ -70,7 +68,7 @@ final class JsonView(
         "variant"     -> c.setup.variant,
         "orientation" -> c.setup.orientation
       )
-      .add("description", c.description) pipe addChapterMode(c)
+      .add("description", c.description) `pipe` addChapterMode(c)
 
   def pagerData(s: Study.WithChaptersAndLiked) =
     Json.obj(
@@ -111,15 +109,14 @@ final class JsonView(
         "settings"           -> s.settings,
         "visibility"         -> s.visibility,
         "createdAt"          -> s.createdAt,
-        "secondsSinceUpdate" -> (nowSeconds - s.updatedAt.getSeconds).toInt,
+        "secondsSinceUpdate" -> (nowSeconds - s.updatedAt.getMillis / 1000).toInt,
         "from"               -> s.from,
         "likes"              -> s.likes
       )
-      .add("isNew" -> s.isNew)
+      .add("isNew", s.isNew)
   }
-}
 
-object JsonView {
+object JsonView:
 
   case class JsData(study: JsObject, analysis: JsObject)
 
@@ -149,12 +146,11 @@ object JsonView {
   implicit private[study] val visibilityWriter: Writes[Study.Visibility] = Writes[Study.Visibility] { v =>
     JsString(v.key)
   }
-  implicit private[study] val fromWriter: Writes[Study.From] = Writes[Study.From] {
+  implicit private[study] val fromWriter: Writes[Study.From] = Writes[Study.From]:
     case Study.From.Scratch   => JsString("scratch")
     case Study.From.Game(id)  => Json.obj("game" -> id)
     case Study.From.Study(id) => Json.obj("study" -> id)
     case Study.From.Relay(id) => Json.obj("relay" -> id)
-  }
   implicit private[study] val userSelectionWriter: Writes[Settings.UserSelection] =
     Writes[Settings.UserSelection] { v =>
       JsString(v.key)
@@ -175,13 +171,12 @@ object JsonView {
     JsArray(tags.value map pgnTagWrites.writes)
   }
   implicit private val chapterSetupWrites: OWrites[Chapter.Setup] = Json.writes[Chapter.Setup]
-  implicit private[study] val chapterMetadataWrites: OWrites[Chapter.Metadata] = OWrites[Chapter.Metadata] {
+  implicit private[study] val chapterMetadataWrites: OWrites[Chapter.Metadata] = OWrites[Chapter.Metadata]:
     c =>
       Json
         .obj("id" -> c._id, "name" -> c.name)
         .add("ongoing", c.looksOngoing)
         .add("res" -> c.resultStr)
-  }
 
   implicit private[study] val positionRefWrites: Writes[Position.Ref] = Json.writes[Position.Ref]
   implicit private val likesWrites: Writes[Study.Likes] = Writes[Study.Likes] { p =>
@@ -207,7 +202,7 @@ object JsonView {
     JsArray(topics.value map topicWrites.writes)
   }
 
-  case class VariantHandler()(implicit variant: Variant) {
+  case class VariantHandler()(implicit variant: Variant):
     implicit private val posReader: Reads[Pos] = Reads[Pos] { v =>
       (v.asOpt[String] flatMap { p => Pos.fromKey(variant.gameLogic, p) })
         .fold[JsResult[Pos]](JsError(Nil))(JsSuccess(_))
@@ -217,15 +212,12 @@ object JsonView {
       js.asOpt[JsObject]
         .flatMap { o =>
           for {
-            brush <- o str "brush"
+            brush <- o `str` "brush"
             orig  <- o.get[Pos]("orig")
-          } yield o.get[Pos]("dest") match {
+          } yield o.get[Pos]("dest") match
             case Some(dest) => Shape.Arrow(brush, orig, dest)
             case _          => Shape.Circle(brush, orig)
-          }
         }
         .fold[JsResult[Shape]](JsError(Nil))(JsSuccess(_))
     }
-  }
 
-}

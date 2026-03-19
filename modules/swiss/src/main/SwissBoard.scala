@@ -16,21 +16,20 @@ private case class SwissBoard(
     multiMatchGameIds: Option[List[Game.ID]]
 )
 
-private object SwissBoard {
+private object SwissBoard:
   case class Player(user: LightUser, rank: Int, rating: Int, inputRating: Option[Int])
   case class WithGame(
       board: SwissBoard,
       game: Game,
       multiMatchGames: Option[List[Game]]
   )
-}
 
 final private class SwissBoardApi(
     rankingApi: SwissRankingApi,
     cacheApi: lila.memo.CacheApi,
     lightUserApi: lila.user.LightUserApi,
     gameProxyRepo: lila.round.GameProxyRepo
-)(implicit ec: scala.concurrent.ExecutionContext) {
+)(implicit ec: scala.concurrent.ExecutionContext):
 
   private val displayBoards = 6
 
@@ -39,7 +38,7 @@ final private class SwissBoardApi(
     .build[Swiss.Id, List[SwissBoard]]()
 
   def apply(id: Swiss.Id): Fu[List[SwissBoard.WithGame]] =
-    boardsCache.getIfPresent(id) so {
+    boardsCache.getIfPresent(id) so:
       boards =>
         Future.sequence(boards.map { board =>
           (gameProxyRepo.game(board.gameId) zip (
@@ -51,10 +50,9 @@ final private class SwissBoardApi(
             }
         })
           .dmap(_.flatten)
-    }
 
   def update(data: SwissScoring.Result): Funit =
-    data match {
+    data match
       case SwissScoring.Result(swiss, leaderboard, playerMap, pairings) =>
         rankingApi(swiss) map { ranks =>
           boardsCache
@@ -76,8 +74,8 @@ final private class SwissBoardApi(
                   for {
                     p1 <- playerMap get pairing.p1
                     p2 <- playerMap get pairing.p2
-                    u1 <- lightUserApi sync p1.userId
-                    u2 <- lightUserApi sync p2.userId
+                    u1 <- lightUserApi `sync` p1.userId
+                    u2 <- lightUserApi `sync` p2.userId
                     r1 <- ranks get p1.userId
                     r2 <- ranks get p2.userId
                   } yield SwissBoard(
@@ -91,5 +89,3 @@ final private class SwissBoardApi(
                 }
             )
         }
-    }
-}

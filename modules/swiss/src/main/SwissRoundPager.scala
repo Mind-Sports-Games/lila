@@ -8,7 +8,7 @@ import lila.common.paginator.Paginator
 import lila.db.dsl._
 import lila.db.paginator.Adapter
 
-final class SwissRoundPager(colls: SwissColls)(implicit ec: ExecutionContext) {
+final class SwissRoundPager(colls: SwissColls)(implicit ec: ExecutionContext):
 
   import BsonHandlers._
 
@@ -28,4 +28,3 @@ final class SwissRoundPager(colls: SwissColls)(implicit ec: ExecutionContext) {
       currentPage = page,
       maxPerPage = maxPerPage
     )
-}

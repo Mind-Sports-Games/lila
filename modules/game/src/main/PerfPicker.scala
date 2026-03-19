@@ -6,7 +6,7 @@ import strategygames.chess.variant.{ FromPosition, Standard }
 import lila.rating.{ Perf, PerfType }
 import lila.user.Perfs
 
-object PerfPicker {
+object PerfPicker:
 
   val default = (perfs: Perfs) => perfs.standard
 
@@ -14,19 +14,18 @@ object PerfPicker {
     PerfType(key(speed, variant, daysPerTurn))
 
   def key(speed: Speed, variant: Variant, daysPerTurn: Option[Int]): String =
-    if (variant == Variant.Chess(Standard)) {
+    if (variant == Variant.Chess(Standard))
       if (daysPerTurn.isDefined || speed == Speed.Correspondence) Speed.Correspondence.key
       else speed.key
-    } else variant.key
+    else variant.key
 
   def key(game: Game): String = key(game.speed, game.ratingVariant, game.daysPerTurn)
 
   def main(speed: Speed, variant: Variant, daysPerTurn: Option[Int]): Option[Perfs => Perf] =
-    if (variant == Variant.Chess(Standard)) Some {
+    if (variant == Variant.Chess(Standard)) Some:
       if (daysPerTurn.isDefined) (perfs: Perfs) => perfs.correspondence
-      else Perfs speedLens speed
-    }
-    else Perfs variantLens variant
+      else Perfs `speedLens` speed
+    else Perfs `variantLens` variant
 
   def main(game: Game): Option[Perfs => Perf] = main(game.speed, game.ratingVariant, game.daysPerTurn)
 
@@ -37,4 +36,3 @@ object PerfPicker {
 
   def mainOrDefault(game: Game): Perfs => Perf =
     mainOrDefault(game.speed, game.ratingVariant, game.daysPerTurn)
-}

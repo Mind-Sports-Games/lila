@@ -4,13 +4,11 @@ import reactivemongo.api.bson._
 
 import lila.db.BSON
 import lila.db.dsl._
-import play.api.libs.json._
 import lila.pref.PieceSet
-import scala.util.{ Success }
 
-private object PrefHandlers {
+private object PrefHandlers:
 
-  implicit private[pref] val pieceSetBSONHandler: BSON[PieceSet] = new BSON[PieceSet] {
+  implicit private[pref] val pieceSetBSONHandler: BSON[PieceSet] = new BSON[PieceSet]:
 
     def reads(r: BSON.Reader) = new PieceSet(r.str("name"), r.int("gameFamily"))
 
@@ -19,9 +17,8 @@ private object PrefHandlers {
         "name"       -> p.name,
         "gameFamily" -> p.gameFamily
       )
-  }
 
-  implicit private[pref] val themeBSONHandler: BSON[Theme] = new BSON[Theme] {
+  implicit private[pref] val themeBSONHandler: BSON[Theme] = new BSON[Theme]:
 
     def reads(r: BSON.Reader) = Theme.apply(r.str("name"), r.int("gameFamily"))
 
@@ -30,13 +27,12 @@ private object PrefHandlers {
         "name"       -> t.name,
         "gameFamily" -> t.gameFamily
       )
-  }
 
-  implicit val prefBSONHandler: BSON[Pref] = new BSON[Pref] {
+  implicit val prefBSONHandler: BSON[Pref] = new BSON[Pref]:
 
     def reads(r: BSON.Reader): Pref =
       Pref(
-        _id = r str "_id",
+        _id = r `str` "_id",
         bg = r.getD("bg", Pref.default.bg),
         bgImg = r.strO("bgImg"),
         color = r.getD("color", Pref.default.color),
@@ -137,5 +133,3 @@ private object PrefHandlers {
         "boardIdentifier"     -> o.boardIdentifier,
         "tags"                -> o.tags
       )
-  }
-}

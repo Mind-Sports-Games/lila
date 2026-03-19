@@ -30,24 +30,21 @@ final class Fishnet(env: Env) extends LilaController(env) {
         else api.acquire(client, slow) map Right.apply
       api
         .postAnalysis(Work.Id(workId), client, data)
-        .flatFold(
-          {
-            case WorkNotFound    => onComplete
-            case GameNotFound    => onComplete
-            case NotAcquired     => onComplete
-            case WeakAnalysis(_) => onComplete
-            // case WeakAnalysis => fuccess(Left(UnprocessableEntity("Not enough nodes per move")))
-            case e =>
-              fuccess(Left(InternalServerError(e.getMessage)))
-          },
-          {
-            case PostAnalysisResult.Complete(analysis) =>
-              env.round.proxyRepo.updateIfPresent(analysis.id)(_.setAnalysed)
-              onComplete
-            case _: PostAnalysisResult.Partial    => fuccess(Left(NoContent))
-            case PostAnalysisResult.UnusedPartial => fuccess(Left(NoContent))
-          }
-        )
+        .flatMap {
+          case PostAnalysisResult.Complete(analysis) =>
+            env.round.proxyRepo.updateIfPresent(analysis.id)(_.setAnalysed)
+            onComplete
+          case _: PostAnalysisResult.Partial    => fuccess(Left(NoContent))
+          case PostAnalysisResult.UnusedPartial => fuccess(Left(NoContent))
+        }
+        .recoverWith {
+          case WorkNotFound    => onComplete
+          case GameNotFound    => onComplete
+          case NotAcquired     => onComplete
+          case WeakAnalysis(_) => onComplete
+          case e: Exception =>
+            fuccess(Left(InternalServerError(e.getMessage)))
+        }
     }
 
   def abort(workId: String) =

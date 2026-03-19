@@ -20,7 +20,7 @@ case class SwissPlayer(
     absent: Boolean,
     byes: Set[SwissRound.Number], // byes granted by the pairing system - the player was here
     disqualified: Boolean
-) {
+):
   def is(uid: User.ID): Boolean       = uid == userId
   def is(user: User): Boolean         = is(user.id)
   def is(other: SwissPlayer): Boolean = is(other.userId)
@@ -32,10 +32,9 @@ case class SwissPlayer(
   // If bhTieBreak is None, then there is no secondary tb, else its sb
   val tieBreak2 = bhTieBreak.map(_ => sbTieBreak.value)
 
-  def mcMahonStartingScore(mcmahonCutoff: Int): Double = {
+  def mcMahonStartingScore(mcmahonCutoff: Int): Double =
     if (actualRating > mcmahonCutoff) mcMahonScoreFromRating(mcmahonCutoff)
     else mcMahonScoreFromRating(actualRating)
-  }
 
   def recomputeScore =
     copy(
@@ -46,9 +45,8 @@ case class SwissPlayer(
         performance | Swiss.Performance(actualRating.toFloat)
       )
     )
-}
 
-object SwissPlayer {
+object SwissPlayer:
 
   case class Id(value: String) extends AnyVal with StringValue
 
@@ -77,22 +75,20 @@ object SwissPlayer {
       disqualified = false
     ).recomputeScore
 
-  case class WithRank(player: SwissPlayer, rank: Int) {
-    def is(other: WithRank)       = player is other.player
+  case class WithRank(player: SwissPlayer, rank: Int):
+    def is(other: WithRank)       = player `is` other.player
     def withUser(user: LightUser) = WithUserAndRank(player, user, rank)
     override def toString         = s"$rank. ${player.userId}[${player.actualRating}]"
-  }
 
   case class WithUser(player: SwissPlayer, user: LightUser)
 
   case class WithUserAndRank(player: SwissPlayer, user: LightUser, rank: Int)
 
-  sealed private[swiss] trait Viewish {
+  sealed private[swiss] trait Viewish:
     val player: SwissPlayer
     val rank: Int
     val user: lila.common.LightUser
     val sheet: SwissSheet
-  }
 
   private[swiss] case class View(
       player: SwissPlayer,
@@ -115,7 +111,7 @@ object SwissPlayer {
   def toMap(players: List[SwissPlayer]): PlayerMap =
     players.view.map(p => p.userId -> p).toMap
 
-  object Fields {
+  object Fields:
     val id           = "_id"
     val swissId      = "s"
     val userId       = "u"
@@ -130,6 +126,4 @@ object SwissPlayer {
     val absent       = "a"
     val byes         = "b"
     val disqualified = "dq"
-  }
   def fields[A](f: Fields.type => A): A = f(Fields)
-}

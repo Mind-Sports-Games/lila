@@ -8,7 +8,7 @@ import play.api.libs.json.{ JsSuccess, Json }
 import play.api.libs.json.Reads
 import play.api.data.format.Formatter
 
-object CoachProfileForm {
+object CoachProfileForm:
 
   def edit(coach: Coach) =
     Form(
@@ -46,7 +46,7 @@ object CoachProfileForm {
       available: Boolean,
       languages: String,
       profile: CoachProfile
-  ) {
+  ):
 
     def apply(coach: Coach) =
       coach.copy(
@@ -59,11 +59,9 @@ object CoachProfileForm {
         },
         updatedAt = DateTime.now
       )
-  }
 
   import CoachProfile.RichText
 
   implicit private val richTextFormat: Formatter[RichText] =
     lila.common.Form.formatter.stringFormatter[RichText](_.value, RichText.apply)
   private def richText = of[RichText]
-}

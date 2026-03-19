@@ -38,14 +38,14 @@ final class Env(
     ec: scala.concurrent.ExecutionContext,
     system: ActorSystem,
     scheduler: org.apache.pekko.actor.Scheduler
-) {
+):
 
   private val config = appConfig.get[FishnetConfig]("fishnet")(AutoConfig.loader)
 
   private lazy val analysisColl = db(config.analysisColl)
 
   private lazy val redis = new FishnetRedis(
-    RedisClient create RedisURI.create(config.redisUri),
+    RedisClient `create` RedisURI.create(config.redisUri),
     "fishnet-in",
     "fishnet-out",
     shutdown
@@ -75,10 +75,9 @@ final class Env(
 
   lazy val api: FishnetApi = wire[FishnetApi]
 
-  lazy val player = {
+  lazy val player =
     def mk = (plies: Int) => wire[FishnetPlayer]
     mk(config.movePlies)
-  }
 
   private val limiter = wire[FishnetLimiter]
 
@@ -106,11 +105,11 @@ final class Env(
   )
 
   private def disable(username: String) =
-    repo toKey username flatMap { repo.enableClient(_, v = false) }
+    repo `toKey` username flatMap { repo.enableClient(_, v = false) }
 
   def cli =
-    new lila.common.Cli {
-      def process = {
+    new lila.common.Cli:
+      def process =
         case "fishnet" :: "client" :: "create" :: name :: Nil =>
           val userId = name.toLowerCase
           api.createClient(Client.UserId(userId)) map { client =>
@@ -118,16 +117,12 @@ final class Env(
             s"Created key: ${client.key.value} for: $userId"
           }
         case "fishnet" :: "client" :: "delete" :: key :: Nil =>
-          repo toKey key flatMap repo.deleteClient inject "done!"
+          repo `toKey` key flatMap repo.deleteClient inject "done!"
         case "fishnet" :: "client" :: "enable" :: key :: Nil =>
-          repo toKey key flatMap { repo.enableClient(_, v = true) } inject "done!"
+          repo `toKey` key flatMap { repo.enableClient(_, v = true) } inject "done!"
         case "fishnet" :: "client" :: "disable" :: key :: Nil => disable(key) inject "done!"
-      }
-    }
 
-  Bus.subscribeFun("adjustCheater", "adjustBooster", "shadowban") {
+  Bus.subscribeFun("adjustCheater", "adjustBooster", "shadowban"):
     case lila.hub.actorApi.mod.MarkCheater(userId, true) => disable(userId).discard
     case lila.hub.actorApi.mod.MarkBooster(userId)       => disable(userId).discard
     case lila.hub.actorApi.mod.Shadowban(userId, true)   => disable(userId).discard
-  }
-}

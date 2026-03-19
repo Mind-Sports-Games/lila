@@ -7,7 +7,7 @@ import strategygames.variant.Variant
 
 case class PuzzleTheme(key: PuzzleTheme.Key, name: I18nKey, description: I18nKey)
 
-object PuzzleTheme {
+object PuzzleTheme:
 
   case class Key(value: String) extends AnyVal with StringValue
 
@@ -370,4 +370,3 @@ object PuzzleTheme {
   def findDynamic(key: String) = find(key).filterNot(t => staticThemes(t.key))
 
   implicit val keyIso: Iso.StringIso[Key] = lila.common.Iso.string[Key](Key.apply, _.value)
-}

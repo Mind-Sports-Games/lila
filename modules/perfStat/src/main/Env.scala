@@ -13,7 +13,7 @@ final class Env(
 )(implicit
     ec: scala.concurrent.ExecutionContext,
     scheduler: org.apache.pekko.actor.Scheduler
-) {
+):
 
   lazy val storage = new PerfStatStorage(
     coll = db(appConfig.get[CollName]("perfStat.collection.perf_stat"))
@@ -24,12 +24,12 @@ final class Env(
   lazy val jsonView = wire[JsonView]
 
   def get(user: lila.user.User, perfType: lila.rating.PerfType): Fu[PerfStat] =
-    storage.find(user.id, perfType) getOrElse indexer.userPerf(user, perfType)
+    storage.find(user.id, perfType) `getOrElse` indexer.userPerf(user, perfType)
 
-  lila.common.Bus.subscribeFun("finishGame") {
+  lila.common.Bus.subscribeFun("finishGame"):
     case lila.game.actorApi.FinishGame(game, _, _) if !game.aborted =>
-      indexer addGame game addFailureEffect { e =>
-        lila.log("perfStat").error(s"index game ${game.id}", e)
-      } unit
-  }
-}
+      (indexer `addGame` game)
+        .addFailureEffect { e =>
+          lila.log("perfStat").error(s"index game ${game.id}", e)
+        }
+        .discard

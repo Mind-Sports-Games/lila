@@ -11,18 +11,18 @@ final class PublicChat(
     tournamentApi: lila.tournament.TournamentApi,
     simulEnv: lila.simul.Env,
     userRepo: UserRepo
-)(implicit ec: scala.concurrent.ExecutionContext) {
+)(implicit ec: scala.concurrent.ExecutionContext):
 
   def all: Fu[(List[(Tournament, UserChat)], List[(Simul, UserChat)])] =
     tournamentChats zip simulChats
 
   def deleteAll(userId: User.ID): Funit =
-    userRepo byId userId map2 Suspect flatMap { _ so deleteAll }
+    userRepo `byId` userId `map2` Suspect flatMap { _ so deleteAll }
 
   def deleteAll(suspect: Suspect): Funit =
     all.flatMap { case (tours, simuls) =>
       Future.sequence((tours.map(_._2) ::: simuls.map(_._2))
-        .filter(_ hasLinesOf suspect.user)
+        .filter(_ `hasLinesOf` suspect.user)
         .map(chatApi.userChat.delete(_, suspect.user, _.Global)))
         .void
     }
@@ -47,13 +47,12 @@ final class PublicChat(
       }
     }
 
-  private def fetchVisibleSimuls: Fu[List[Simul]] = {
+  private def fetchVisibleSimuls: Fu[List[Simul]] =
     simulEnv.allCreatedFeaturable.get {} zip
       simulEnv.repo.allStarted zip
       simulEnv.repo.allFinishedFeaturableOrManyPairings(3) map { case ((created, started), finished) =>
         created ::: started ::: finished
       }
-  }
 
   /** Sort the tournaments by the tournaments most likely to require moderation attention
     */
@@ -61,4 +60,3 @@ final class PublicChat(
     tournaments.sortBy { t =>
       (t._1.isFinished, -t._1.nbPlayers)
     }
-}

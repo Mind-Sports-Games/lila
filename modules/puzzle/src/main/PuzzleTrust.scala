@@ -7,9 +7,8 @@ import lila.db.dsl._
 import lila.user.{ Perfs, User }
 import strategygames.variant.Variant
 
-final private class PuzzleTrustApi(colls: PuzzleColls)(implicit ec: scala.concurrent.ExecutionContext) {
+final private class PuzzleTrustApi(colls: PuzzleColls)(implicit ec: scala.concurrent.ExecutionContext):
 
-  import BsonHandlers._
   import Puzzle.{ BSONFields => F }
 
   def vote(user: User, round: PuzzleRound, vote: Boolean): Fu[Option[Int]] = {
@@ -23,8 +22,8 @@ final private class PuzzleTrustApi(colls: PuzzleColls)(implicit ec: scala.concur
         coll.one[Bdoc](
           $id(round.id.puzzleId.value),
           $doc(F.variant -> true, F.lib -> true, s"${F.glicko}.r" -> true)
-        ) flatMap {
-          _ so { doc: Bdoc =>
+        ) flatMap:
+          _ so { (doc: Bdoc) =>
             {
               for {
                 variantId    <- doc.getAsOpt[Int](F.variant)
@@ -39,14 +38,13 @@ final private class PuzzleTrustApi(colls: PuzzleColls)(implicit ec: scala.concur
               } yield (math.abs(puzzleRating - userRating) > 300) so -4
             }.fold(fuccess(-2))(fuccess(_))
           }
-        }
       }
-    }.dmap(w +)
-  }.dmap(_.some.filter(0 <))
+    }.dmap(w + _)
+  }.dmap(_.some.filter(0 < _))
 
   def theme(user: User, round: PuzzleRound, theme: PuzzleTheme.Key, vote: Boolean): Fu[Option[Int]] =
     fuccess(base(user, round))
-      .dmap(_.some.filter(0 <))
+      .dmap(_.some.filter(0 < _))
 
   private def base(user: User, round: PuzzleRound): Int = {
     seniorityBonus(user) +
@@ -62,7 +60,7 @@ final private class PuzzleTrustApi(colls: PuzzleColls)(implicit ec: scala.concur
   // 1 year = 3.46
   // 2 years = 4.89
   private def seniorityBonus(user: User) =
-    math.sqrt(Days.daysBetween(user.createdAt, DateTime.now).getDays.toDouble / 30) atMost 5
+    math.sqrt(Days.daysBetween(user.createdAt, DateTime.now).getDays.toDouble / 30) `atMost` 5
 
   private def titleBonus(user: User) = user.hasTitle so 20
 
@@ -72,16 +70,15 @@ final private class PuzzleTrustApi(colls: PuzzleColls)(implicit ec: scala.concur
   // 3000 = 5
   private def ratingBonus(user: User) = user.perfs.standard.glicko.establishedIntRating.so { rating =>
     (rating - 1500) / 300
-  } atLeast 0
+  } `atLeast` 0
 
-  private def patronBonus(user: User) = (~user.planMonths * 5) atMost 15
+  private def patronBonus(user: User) = (~user.planMonths * 5) `atMost` 15
 
   private def modBonus(user: User) =
-    if (user.roles.exists(_ contains "ROLE_PUZZLE_CURATOR")) 100
+    if (user.roles.exists(_ `contains` "ROLE_PUZZLE_CURATOR")) 100
     else if (user.isAdmin) 50
     else if (user.isVerified) 30
     else 0
 
   private def lameBonus(user: User) =
     if (user.lameOrTroll) -30 else 0
-}

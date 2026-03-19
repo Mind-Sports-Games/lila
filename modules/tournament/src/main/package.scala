@@ -1,6 +1,6 @@
 package lila
 
-package object tournament extends PackageObject {
+package object tournament extends PackageObject:
 
   private[tournament] type Players = List[tournament.Player]
 
@@ -14,5 +14,4 @@ package object tournament extends PackageObject {
 
   private[tournament] val logger = lila.log("tournament")
 
-  private[tournament] val pairingLogger = logger branch "pairing"
-}
+  private[tournament] val pairingLogger = logger `branch` "pairing"

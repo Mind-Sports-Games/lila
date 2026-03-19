@@ -13,20 +13,19 @@ final private class CreatedOrganizer(
 )(implicit
     ec: scala.concurrent.ExecutionContext,
     scheduler: org.apache.pekko.actor.Scheduler,
-    mat: akka.stream.Materializer
-) extends Actor {
+    mat: org.apache.pekko.stream.Materializer
+) extends Actor:
 
-  override def preStart(): Unit = {
+  override def preStart(): Unit =
     context.setReceiveTimeout(15.seconds)
     val _ = scheduler.scheduleOnce(10 seconds, self, Tick)
-  }
 
   case object Tick
 
   def scheduleNext(): Unit =
     { val _ = scheduler.scheduleOnce(2 seconds, self, Tick) }
 
-  def receive = {
+  def receive =
 
     case ReceiveTimeout =>
       val msg = "tournament.CreatedOrganizer timed out!"
@@ -37,10 +36,9 @@ final private class CreatedOrganizer(
       tournamentRepo.shouldStartCursor
         .documentSource()
         .mapAsync(1) { tour =>
-          playerRepo count tour.id flatMap {
-            case 0 => api destroy tour
-            case _ => api start tour
-          }
+          playerRepo `count` tour.id flatMap:
+            case 0 => api `destroy` tour
+            case _ => api `start` tour
         }
         .log(getClass.getName)
         .toMat(Sink.ignore)(Keep.right)
@@ -48,5 +46,3 @@ final private class CreatedOrganizer(
         .monSuccess(_.tournament.createdOrganizer.tick)
         .addEffectAnyway(scheduleNext())
         .discard
-  }
-}

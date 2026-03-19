@@ -9,9 +9,9 @@ import lila.puzzle.BsonHandlers.PuzzleIdBSONHandler
 import lila.puzzle.Puzzle
 import lila.storm.StormPuzzle
 
-private object RacerBsonHandlers {
+private object RacerBsonHandlers:
 
-  implicit val StormPuzzleBSONReader: BSONDocumentReader[StormPuzzle] = new BSONDocumentReader[StormPuzzle] {
+  implicit val StormPuzzleBSONReader: BSONDocumentReader[StormPuzzle] = new BSONDocumentReader[StormPuzzle]:
     def readDocument(r: BSONDocument) = for {
       id      <- r.getAsTry[Puzzle.Id]("_id")
       fen     <- r.getAsTry[FEN]("fen")
@@ -20,5 +20,3 @@ private object RacerBsonHandlers {
       glicko  <- r.getAsTry[Bdoc]("glicko")
       rating  <- glicko.getAsTry[Double]("r")
     } yield StormPuzzle(id, fen, line, rating.toInt)
-  }
-}

@@ -14,15 +14,13 @@ case class Cluster[X](
     insight: Insight, // metric values
     size: Int,        // sample size
     insightIds: List[String]
-) {
+):
 
   def gameIds = insightIds.map(_ take Game.gameIdSize)
-}
 
 sealed trait Insight
-object Insight {
+object Insight:
   case class Single(point: Point)                                   extends Insight
   case class Stacked(points: List[(Metric.MetricValueName, Point)]) extends Insight
-}
 
 case class Point(y: Double) extends AnyVal

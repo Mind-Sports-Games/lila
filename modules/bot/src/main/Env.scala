@@ -17,7 +17,7 @@ final class Env(
     system: org.apache.pekko.actor.ActorSystem,
     scheduler: org.apache.pekko.actor.Scheduler,
     mode: play.api.Mode
-) {
+):
 
   lazy val jsonView = wire[BotJsonView]
 
@@ -28,4 +28,3 @@ final class Env(
   lazy val onlineApiUsers: OnlineApiUsers = wire[OnlineApiUsers]
 
   val form = BotForm
-}

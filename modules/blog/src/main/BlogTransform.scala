@@ -1,10 +1,9 @@
 package lila.blog
 
 import com.github.blemale.scaffeine.LoadingCache
-import scala.concurrent.duration._
 import scala.util.matching.Regex
 
-object BlogTransform {
+object BlogTransform:
 
   private val RemoveRegex          = """http://(\w{2}\.)?+playstrategy\.org""".r
   def removeProtocol(html: String) = RemoveRegex.replaceAllIn(html, _ => "//playstrategy.org")
@@ -12,7 +11,7 @@ object BlogTransform {
   private val AddRegex          = """(https?+:)?+(//)?+(\w{2}\.)?+playstrategy\.org""".r
   def addProtocol(html: String) = AddRegex.replaceAllIn(html, _ => "https://playstrategy.org")
 
-  object markdown {
+  object markdown:
     private type Text = String
     private type Html = String
 
@@ -27,5 +26,3 @@ object BlogTransform {
 
     def apply(html: Html): Html =
       PreRegex.replaceAllIn(html, m => Regex.quoteReplacement(cache get m.group(1)))
-  }
-}

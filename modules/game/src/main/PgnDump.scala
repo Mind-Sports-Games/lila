@@ -3,18 +3,17 @@ package lila.game
 import strategygames.chess.format.pgn.{ Parser }
 import strategygames.format.pgn.{ FullTurn, ParsedPgn, Pgn, Tag, TagType, Tags, Turn }
 import strategygames.format.{ FEN, Forsyth }
-import strategygames.{ ActionStrs, Centis, Player => PlayerIndex, GameLogic, Status }
+import strategygames.{ ActionStrs, Centis, Player => PlayerIndex, Status }
 import strategygames.variant.Variant
 
 import lila.common.config.BaseUrl
 import lila.common.LightUser
-import lila.common.Form
 import lila.i18n.VariantKeys
 
 final class PgnDump(
     baseUrl: BaseUrl,
     lightUserApi: lila.user.LightUserApi
-)(implicit ec: scala.concurrent.ExecutionContext) {
+)(implicit ec: scala.concurrent.ExecutionContext):
 
   import PgnDump._
 
@@ -26,14 +25,13 @@ final class PgnDump(
       flags: WithFlags,
       teams: Option[PlayerIndex.Map[String]] = None,
       hideRatings: Boolean = false
-  ): Fu[Pgn] = {
+  ): Fu[Pgn] =
     val imported = game.pgnImport.flatMap { pgni =>
       Parser.full(pgni.pgn).toOption
     }
-    val algebraic = game.variant match {
+    val algebraic = game.variant match
       case Variant.Draughts(variant) => variant.boardSize.pos.hasAlgebraic // && flags.algebraic
       case _                         => false
-    }
     val tagsFuture =
       if (flags.tags)
         tags(
@@ -49,7 +47,7 @@ final class PgnDump(
         )
       else fuccess(Tags(Nil))
     tagsFuture map { tags =>
-      val fullTurns = flags.turns so {
+      val fullTurns = flags.turns so:
         val fenSituation = tags.fen.flatMap { fen => Forsyth.<<<(game.variant.gameLogic, fen) }
         makeFullTurns(
           game.variant match {
@@ -68,7 +66,7 @@ final class PgnDump(
                   //and now we have lost the error. Perhaps we need to reconsider this
                 )
                 .fold(shortenDraughtsMoves(pliesFull))(moves => moves)
-              val delayedPlies = flags keepDelayIf game.playable applyDelay plies
+              val delayedPlies = flags `keepDelayIf` game.playable `applyDelay` plies
               val algPlies =
                 if (algebraic) san2alg(delayedPlies, variant.boardSize.pos)
                 else delayedPlies
@@ -78,7 +76,7 @@ final class PgnDump(
               offsetPlies.toVector.map(Vector(_))
             }
             case _ =>
-              (flags keepDelayIf game.playable applyDelay {
+              (flags `keepDelayIf` game.playable applyDelay {
                 if (fenSituation.exists(_.situation.player.p2)) Vector("..") +: game.actionStrs
                 else game.actionStrs
               }).toVector
@@ -87,19 +85,16 @@ final class PgnDump(
           flags.clocks so ~game.bothClockStates,
           game.startPlayerIndex
         )
-      }
       Pgn(tags, fullTurns)
     }
-  }
 
   private def shortenDraughtsMoves(moves: Seq[String]) = moves map { move =>
     val x1 = move.indexOf("x")
     if (x1 == -1) move
-    else {
+    else
       val x2 = move.lastIndexOf("x")
       if (x2 == x1 || x2 == -1) move
       else move.slice(0, x1) + move.slice(x2, move.length)
-    }
   }
 
   private def san2alg(moves: Seq[String], boardPos: strategygames.draughts.BoardPos) =
@@ -146,16 +141,14 @@ final class PgnDump(
       .map(Variant.Chess)
       .toSet
 
-  private def eventOf(game: Game) = {
+  private def eventOf(game: Game) =
     val perf = game.perfType.fold("Standard")(_.trans(lila.i18n.defaultLang))
     game.tournamentId.map { id =>
       s"${game.mode} $perf tournament https://playstrategy.org/tournament/$id"
     } orElse game.simulId.map { id =>
       s"$perf simul https://playstrategy.org/simul/$id"
-    } getOrElse {
+    } getOrElse:
       s"${game.mode} $perf game"
-    }
-  }
 
   private def ratingDiffTag(p: Player, tag: Tag.type => TagType) =
     p.ratingDiff.map { rd =>
@@ -174,7 +167,7 @@ final class PgnDump(
       withRatings: Boolean = true
   ): Fu[Tags] =
     gameLightUsers(game) map { case (wu, bu) =>
-      Tags {
+      Tags:
         val importedDate = imported.flatMap(_.tags(_.Date))
         List[Option[Tag]](
           Tag(
@@ -187,16 +180,16 @@ final class PgnDump(
           Tag(_.P1, player(game.p1Player, wu)).some,
           Tag(_.P2, player(game.p2Player, bu)).some,
           Tag(_.Result, result(game, draughtsResult)).some,
-          importedDate.isEmpty option Tag(
+          importedDate.isEmpty `option` Tag(
             _.UTCDate,
             imported.flatMap(_.tags(_.UTCDate)) | Tag.UTCDate.format.print(game.createdAt)
           ),
-          importedDate.isEmpty option Tag(
+          importedDate.isEmpty `option` Tag(
             _.UTCTime,
             imported.flatMap(_.tags(_.UTCTime)) | Tag.UTCTime.format.print(game.createdAt)
           ),
-          withRatings option Tag(_.P1Elo, rating(game.p1Player)),
-          withRatings option Tag(_.P2Elo, rating(game.p2Player)),
+          withRatings `option` Tag(_.P1Elo, rating(game.p1Player)),
+          withRatings `option` Tag(_.P2Elo, rating(game.p2Player)),
           withRatings so ratingDiffTag(game.p1Player, _.P1RatingDiff),
           withRatings so ratingDiffTag(game.p2Player, _.P2RatingDiff),
           wu.flatMap(_.title).map { t =>
@@ -211,7 +204,7 @@ final class PgnDump(
           Tag.timeControl(game.clock.map(_.config)).some,
           game.metadata.multiMatchGameId.map(gameId => Tag(_.MultiMatch, gameId)),
           Tag(_.ECO, game.opening.fold("?")(_.opening.eco)).some,
-          withOpening option Tag(_.Opening, game.opening.fold("?")(_.opening.name)),
+          withOpening `option` Tag(_.Opening, game.opening.fold("?")(_.opening.name)),
           Tag(
             _.Termination, {
               import Status._
@@ -253,7 +246,6 @@ final class PgnDump(
               Tag("SetUp", "1")
             )
         })
-      }
     }
 
   private def makeFullTurns(
@@ -289,9 +281,8 @@ final class PgnDump(
           )
         }
       } filterNot (_.isEmpty)
-}
 
-object PgnDump {
+object PgnDump:
 
   private val delayTurnsBy         = 3
   private val delayKeepsFirstTurns = 5
@@ -305,15 +296,13 @@ object PgnDump {
       literate: Boolean = false,
       pgnInJson: Boolean = false,
       delayTurns: Boolean = false
-  ) {
+  ):
     def applyDelay[M](actionStrs: Seq[M]): Seq[M] =
       if (!delayTurns) actionStrs
-      else actionStrs.take((actionStrs.size - delayTurnsBy) atLeast delayKeepsFirstTurns)
+      else actionStrs.take((actionStrs.size - delayTurnsBy) `atLeast` delayKeepsFirstTurns)
 
     def keepDelayIf(cond: Boolean) = copy(delayTurns = delayTurns && cond)
-  }
 
   def result(game: Game, draughtsResult: Boolean) =
     if (game.finished) PlayerIndex.showResult(game.winnerPlayerIndex, draughtsResult)
     else "*"
-}

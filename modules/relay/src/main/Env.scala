@@ -23,8 +23,9 @@ final class Env(
 )(implicit
     ec: scala.concurrent.ExecutionContext,
     system: ActorSystem,
-    scheduler: org.apache.pekko.actor.Scheduler
-) {
+    scheduler: org.apache.pekko.actor.Scheduler,
+    mat: org.apache.pekko.stream.Materializer
+):
 
   lazy val roundForm = wire[RelayRoundForm]
 
@@ -55,13 +56,9 @@ final class Env(
     ()
   }
 
-  lila.common.Bus.subscribeFun("study", "relayToggle") {
+  lila.common.Bus.subscribeFun("study", "relayToggle"):
     case lila.hub.actorApi.study.RemoveStudy(studyId, _) => api.onStudyRemove(studyId).discard
     case lila.study.actorApi.RelayToggle(id, v, who) =>
-      studyApi.isContributor(id, who.u) foreach {
-        _ so {
+      studyApi.isContributor(id, who.u) foreach:
+        _ so:
           api.requestPlay(RelayRound.Id(id.value), v)
-        }
-      }
-  }
-}

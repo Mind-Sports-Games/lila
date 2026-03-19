@@ -9,40 +9,34 @@ import lila.socket.Socket.{ makeMessage, GetVersion, SocketVersion }
 import lila.user.User
 
 import play.api.libs.json._
-import scala.concurrent.duration._
 import scala.concurrent.ExecutionContext
 
-object RoomSocket {
+object RoomSocket:
 
   case class RoomId(value: String) extends AnyVal with StringValue
 
-  case class NotifyVersion[A: Writes](tpe: String, data: A, troll: Boolean = false) {
+  case class NotifyVersion[A: Writes](tpe: String, data: A, troll: Boolean = false):
     def msg = makeMessage(tpe, data)
-  }
 
   final class RoomState(roomId: RoomId, send: Send)(implicit
       ec: ExecutionContext
-  ) extends Trouper {
+  ) extends Trouper:
 
     private var version = SocketVersion(0)
 
-    val process: Trouper.Receive = {
+    val process: Trouper.Receive =
       case GetVersion(promise) => promise success version
       case SetVersion(v)       => version = v
       case nv: NotifyVersion[_] =>
         version = version.inc
-        send {
+        send:
           val tell =
-            if (chatMsgs(nv.tpe)) Protocol.Out.tellRoomChat _
-            else Protocol.Out.tellRoomVersion _
+            if (chatMsgs(nv.tpe)) Protocol.Out.tellRoomChat
+            else Protocol.Out.tellRoomVersion
           tell(roomId, nv.msg, version, nv.troll)
-        }
-    }
-    override def stop() = {
+    override def stop() =
       super.stop()
       send(Protocol.Out.stop(roomId))
-    }
-  }
 
   def makeRoomMap(send: Send)(implicit
       ec: ExecutionContext,
@@ -93,10 +87,10 @@ object RoomSocket {
         }
     }: Handler) orElse minRoomHandler(rooms, logger)
 
-  def minRoomHandler(rooms: TrouperMap[RoomState], logger: Logger): Handler = {
+  def minRoomHandler(rooms: TrouperMap[RoomState], logger: Logger): Handler =
     case Protocol.In.KeepAlives(roomIds) =>
       roomIds foreach { roomId =>
-        rooms touchOrMake roomId.value
+        rooms `touchOrMake` roomId.value
       }
     case P.In.WsBoot =>
       logger.warn("Remote socket boot")
@@ -105,25 +99,22 @@ object RoomSocket {
       versions foreach { case (roomId, version) =>
         rooms.tell(roomId, SetVersion(version))
       }
-  }
 
   private val chatMsgs = Set("message", "chat_timeout", "chat_reinstate")
 
-  def subscribeChat(rooms: TrouperMap[RoomState], busChan: BusChan.Select) = {
+  def subscribeChat(rooms: TrouperMap[RoomState], busChan: BusChan.Select) =
     import lila.chat.actorApi._
-    lila.common.Bus.subscribeFun(busChan(BusChan).chan, BusChan.Global.chan) {
+    lila.common.Bus.subscribeFun(busChan(BusChan).chan, BusChan.Global.chan):
       case ChatLine(id, line: UserLine) =>
         rooms.tellIfPresent(id.value, NotifyVersion("message", lila.chat.JsonView(line), line.troll))
       case OnTimeout(id, userId) =>
         rooms.tellIfPresent(id.value, NotifyVersion("chat_timeout", userId, troll = false))
       case OnReinstate(id, userId) =>
         rooms.tellIfPresent(id.value, NotifyVersion("chat_reinstate", userId, troll = false))
-    }
-  }
 
-  object Protocol {
+  object Protocol:
 
-    object In {
+    object In:
 
       case class ChatSay(roomId: RoomId, userId: String, msg: String) extends P.In
       case class ChatTimeout(roomId: RoomId, userId: String, suspect: String, reason: String, text: String)
@@ -133,7 +124,7 @@ object RoomSocket {
       case class SetVersions(versions: Iterable[(String, SocketVersion)]) extends P.In
 
       val reader: P.In.Reader = raw =>
-        raw.path match {
+        raw.path match
           case "room/alives" => KeepAlives(P.In.commas(raw.args) map RoomId.apply).some
           case "chat/say" =>
             raw.get(3) { case Array(roomId, userId, msg) =>
@@ -145,9 +136,8 @@ object RoomSocket {
             }
           case "tell/room/sri" =>
             raw.get(4) { case arr @ Array(roomId, _, _, _) =>
-              P.In.tellSriMapper.lift(arr drop 1).flatten map {
+              P.In.tellSriMapper.lift(arr drop 1).flatten map:
                 TellRoomSri(RoomId(roomId), _)
-              }
             }
           case "room/versions" =>
             SetVersions(P.In.commas(raw.args) map {
@@ -156,10 +146,8 @@ object RoomSocket {
               }
             }).some
           case _ => P.In.baseReader(raw)
-        }
-    }
 
-    object Out {
+    object Out:
 
       def tellRoom(roomId: RoomId, payload: JsObject) =
         s"tell/room $roomId ${Json stringify payload}"
@@ -173,8 +161,5 @@ object RoomSocket {
         s"tell/room/chat $roomId $version ${P.Out.boolean(isTroll)} ${Json stringify payload}"
       def stop(roomId: RoomId) =
         s"room/stop $roomId"
-    }
-  }
 
   case class SetVersion(version: SocketVersion)
-}

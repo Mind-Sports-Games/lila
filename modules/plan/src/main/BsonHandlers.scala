@@ -3,7 +3,7 @@ package lila.plan
 import lila.db.dsl._
 import reactivemongo.api.bson._
 
-private[plan] object BsonHandlers {
+private[plan] object BsonHandlers:
 
   implicit val CentsBSONHandler: BSONHandler[Cents] = intAnyValHandler[Cents](_.value, Cents.apply)
 
@@ -19,7 +19,7 @@ private[plan] object BsonHandlers {
   implicit val PayPalSubIdBSONHandler: BSONHandler[PayPalSubscriptionId] =
     stringAnyValHandler[PayPalSubscriptionId](_.value, PayPalSubscriptionId)
 
-  object PatronHandlers {
+  object PatronHandlers:
     import Patron._
     implicit val PayPalEmailBSONHandler: BSONHandler[PayPalLegacy.Email] =
       stringAnyValHandler[PayPalLegacy.Email](_.value, PayPalLegacy.Email)
@@ -32,13 +32,10 @@ private[plan] object BsonHandlers {
     implicit val FreeBSONHandler: BSONDocumentHandler[Free]     = Macros.handler[Free]
     implicit val UserIdBSONHandler: BSONHandler[UserId]         = stringAnyValHandler[UserId](_.value, UserId)
     implicit val PatronBSONHandler: BSONDocumentHandler[Patron] = Macros.handler[Patron]
-  }
 
-  object ChargeHandlers {
+  object ChargeHandlers:
     import Charge._
     import PatronHandlers.PayPalCheckoutBSONHandler
     implicit val StripeBSONHandler: BSONDocumentHandler[Stripe]             = Macros.handler[Stripe]
     implicit val PayPalLegacyBSONHandler: BSONDocumentHandler[PayPalLegacy] = Macros.handler[PayPalLegacy]
     implicit val ChargeBSONHandler: BSONDocumentHandler[Charge]             = Macros.handler[Charge]
-  }
-}

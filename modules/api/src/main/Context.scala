@@ -20,14 +20,14 @@ case class PageData(
     error: Boolean = false
 )
 
-object PageData {
+object PageData:
 
   def anon(req: RequestHeader, nonce: Option[Nonce], blindMode: Boolean = false) =
     PageData(
       teamNbRequests = 0,
       nbChallenges = 0,
       nbNotifications = 0,
-      lila.pref.RequestPref fromRequest req,
+      lila.pref.RequestPref `fromRequest` req,
       blindMode = blindMode,
       hasFingerprint = false,
       hasClas = false,
@@ -36,9 +36,8 @@ object PageData {
     )
 
   def error(req: RequestHeader, nonce: Option[Nonce]) = anon(req, nonce).copy(error = true)
-}
 
-sealed trait Context extends lila.user.UserContextWrapper {
+sealed trait Context extends lila.user.UserContextWrapper:
 
   val userContext: UserContext
   val pageData: PageData
@@ -72,11 +71,11 @@ sealed trait Context extends lila.user.UserContextWrapper {
   def currentSelectedColorCls = Pref.Color.asString.get(pref.color).getOrElse(Pref.Color.default)
   def currentSelectedColor    = s"selected-color-${currentSelectedColorCls}"
 
-  lazy val mobileApiVersion = Mobile.Api requestVersion req
+  lazy val mobileApiVersion = Mobile.Api `requestVersion` req
 
   def isMobileApi = mobileApiVersion.isDefined
 
-  lazy val isMobileBrowser = HTTPRequest isMobile req
+  lazy val isMobileBrowser = HTTPRequest `isMobile` req
 
   def requiresFingerprint = isAuth && !pageData.hasFingerprint
 
@@ -85,7 +84,6 @@ sealed trait Context extends lila.user.UserContextWrapper {
   } | 85
 
   def flash(name: String): Option[String] = req.flash get name
-}
 
 sealed abstract class BaseContext(
     val userContext: lila.user.UserContext,
@@ -95,17 +93,16 @@ sealed abstract class BaseContext(
 final class BodyContext[A](
     val bodyContext: BodyUserContext[A],
     data: PageData
-) extends BaseContext(bodyContext, data) {
+) extends BaseContext(bodyContext, data):
 
   def body = bodyContext.body
-}
 
 final class HeaderContext(
     headerContext: HeaderUserContext,
     data: PageData
 ) extends BaseContext(headerContext, data)
 
-object Context {
+object Context:
 
   def error(req: RequestHeader, lang: Lang, nonce: Option[Nonce]): HeaderContext =
     new HeaderContext(UserContext(req, none, none, lang), PageData.error(req, nonce))
@@ -116,7 +113,5 @@ object Context {
   def apply[A](userContext: BodyUserContext[A], pageData: PageData): BodyContext[A] =
     new BodyContext(userContext, pageData)
 
-  trait ToLang {
+  trait ToLang:
     implicit def ctxLang(implicit ctx: Context): Lang = ctx.lang
-  }
-}

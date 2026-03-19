@@ -6,10 +6,10 @@ import lila.report.{ Mod, Suspect, Victim }
 final private class ModNotifier(
     notifyApi: NotifyApi,
     reportApi: lila.report.ReportApi
-)(implicit ec: scala.concurrent.ExecutionContext) {
+)(implicit ec: scala.concurrent.ExecutionContext):
 
   def reporters(mod: Mod, sus: Suspect): Funit =
-    reportApi.recentReportersOf(sus) flatMap {
+    reportApi.recentReportersOf(sus) flatMap:
       reporters =>
         Future.sequence(reporters.filter(r => mod.user.id != r.value)
           .map { reporterId =>
@@ -21,14 +21,11 @@ final private class ModNotifier(
             )
           })
           .void
-    }
 
   def refund(victim: Victim, pt: lila.rating.PerfType, points: Int): Funit =
-    notifyApi.addNotification {
+    notifyApi.addNotification:
       implicit val lang = victim.user.realLang | lila.i18n.defaultLang
       Notification.make(
         notifies = Notification.Notifies(victim.user.id),
         content = lila.notify.RatingRefund(pt.trans, points)
       )
-    }
-}

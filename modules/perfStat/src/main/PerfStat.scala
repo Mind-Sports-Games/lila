@@ -17,29 +17,27 @@ case class PerfStat(
     count: Count,
     resultStreak: ResultStreak,
     playStreak: PlayStreak
-) {
+):
 
   def id = _id
 
   def agg(pov: Pov) =
     if (!pov.game.finished) this
-    else {
-      val thisYear = pov.game.createdAt isAfter DateTime.now.minusYears(1)
+    else
+      val thisYear = pov.game.createdAt `isAfter` DateTime.now.minusYears(1)
       copy(
         highest = RatingAt.agg(highest, pov, 1),
         lowest = if (thisYear) RatingAt.agg(lowest, pov, -1) else lowest,
         bestWins = if (~pov.win) bestWins.agg(pov, 1) else bestWins,
         worstLosses = if (thisYear && ~pov.loss) worstLosses.agg(pov, -1) else worstLosses,
         count = count(pov),
-        resultStreak = resultStreak agg pov,
-        playStreak = playStreak agg pov
+        resultStreak = resultStreak `agg` pov,
+        playStreak = playStreak `agg` pov
       )
-    }
 
   def userIds = bestWins.userIds ::: worstLosses.userIds
-}
 
-object PerfStat {
+object PerfStat:
 
   type Getter = (lila.user.User, PerfType) => Fu[PerfStat]
 
@@ -58,17 +56,15 @@ object PerfStat {
       resultStreak = ResultStreak(win = Streaks.init, loss = Streaks.init),
       playStreak = PlayStreak(nb = Streaks.init, time = Streaks.init, lastDate = none)
     )
-}
 
-case class ResultStreak(win: Streaks, loss: Streaks) {
+case class ResultStreak(win: Streaks, loss: Streaks):
   def agg(pov: Pov) =
     copy(
       win = win(~pov.win, pov)(1),
       loss = loss(~pov.loss, pov)(1)
     )
-}
 
-case class PlayStreak(nb: Streaks, time: Streaks, lastDate: Option[DateTime]) {
+case class PlayStreak(nb: Streaks, time: Streaks, lastDate: Option[DateTime]):
   def agg(pov: Pov) =
     pov.game.durationSeconds.fold(this) { seconds =>
       val cont = seconds < 3 * 60 * 60 && isContinued(pov.game.createdAt)
@@ -83,25 +79,21 @@ case class PlayStreak(nb: Streaks, time: Streaks, lastDate: Option[DateTime]) {
     else copy(nb = nb.reset, time = time.reset)
   private def isContinued(at: DateTime) =
     lastDate.fold(true) { ld =>
-      at.isBefore(ld plusMinutes PlayStreak.expirationMinutes)
+      at.isBefore(ld `plusMinutes` PlayStreak.expirationMinutes)
     }
-}
-object PlayStreak {
+object PlayStreak:
   val expirationMinutes = 60
-}
 
-case class Streaks(cur: Streak, max: Streak) {
+case class Streaks(cur: Streak, max: Streak):
   def apply(cont: Boolean, pov: Pov)(v: Int) =
     copy(
       cur = cur(cont, pov)(v)
     ).setMax
   def reset          = copy(cur = Streak.init)
   private def setMax = copy(max = if (cur.v >= max.v) cur else max)
-}
-object Streaks {
+object Streaks:
   val init = Streaks(Streak.init, Streak.init)
-}
-case class Streak(v: Int, from: Option[GameAt], to: Option[GameAt]) {
+case class Streak(v: Int, from: Option[GameAt], to: Option[GameAt]):
   def apply(cont: Boolean, pov: Pov)(v: Int) = if (cont) inc(pov, v) else Streak.init
   private def inc(pov: Pov, by: Int) =
     copy(
@@ -110,10 +102,8 @@ case class Streak(v: Int, from: Option[GameAt], to: Option[GameAt]) {
       to = GameAt(pov.game.updatedAt, pov.gameId).some
     )
   def period = new Period(v * 1000L)
-}
-object Streak {
+object Streak:
   val init = Streak(0, none, none)
-}
 
 case class Count(
     all: Int,
@@ -126,7 +116,7 @@ case class Count(
     opAvg: Avg,
     seconds: Int,
     disconnects: Int
-) {
+):
   def apply(pov: Pov) =
     copy(
       all = all + 1,
@@ -146,8 +136,7 @@ case class Count(
       }
     )
   def period = new Period(seconds * 1000L)
-}
-object Count {
+object Count:
   val init = Count(
     all = 0,
     rated = 0,
@@ -160,23 +149,20 @@ object Count {
     seconds = 0,
     disconnects = 0
   )
-}
 
-case class Avg(avg: Double, pop: Int) {
+case class Avg(avg: Double, pop: Int):
   def agg(v: Int) =
     copy(
       avg = ((avg * pop) + v) / (pop + 1),
       pop = pop + 1
     )
-}
 
 case class GameAt(at: DateTime, gameId: String)
-object GameAt {
+object GameAt:
   def agg(pov: Pov) = GameAt(pov.game.updatedAt, pov.gameId)
-}
 
 case class RatingAt(int: Int, at: DateTime, gameId: String)
-object RatingAt {
+object RatingAt:
   def agg(cur: Option[RatingAt], pov: Pov, comp: Int) =
     pov.player.stableRatingAfter
       .filter { r =>
@@ -187,11 +173,10 @@ object RatingAt {
       .map {
         RatingAt(_, pov.game.updatedAt, pov.gameId)
       } orElse cur
-}
 
 case class Result(opInt: Int, opId: UserId, at: DateTime, gameId: String)
 
-case class Results(results: List[Result]) extends AnyVal {
+case class Results(results: List[Result]):
   def agg(pov: Pov, comp: Int) =
     pov.opponent.stableRating
       .ifTrue(pov.game.rated)
@@ -211,9 +196,7 @@ case class Results(results: List[Result]) extends AnyVal {
         )
       }
   def userIds = results.map(_.opId)
-}
-object Results {
+object Results:
   val nb = 5
-}
 
 case class UserId(value: String) extends AnyVal

@@ -14,7 +14,7 @@ final class MentionNotifier(
     userRepo: UserRepo,
     notifyApi: NotifyApi,
     relationApi: RelationApi
-)(implicit ec: scala.concurrent.ExecutionContext) {
+)(implicit ec: scala.concurrent.ExecutionContext):
 
   private val forbidden = Set("playstrategy")
 
@@ -30,7 +30,7 @@ final class MentionNotifier(
   /** Checks the database to make sure that the users mentioned exist, and removes any users that do not exist
     * or block the mentioner from the returned list.
     */
-  private def filterValidUsers(users: Set[User.ID], mentionedBy: User.ID): Fu[List[Notification.Notifies]] = {
+  private def filterValidUsers(users: Set[User.ID], mentionedBy: User.ID): Fu[List[Notification.Notifies]] =
     for {
       validUsers <-
         userRepo
@@ -39,7 +39,6 @@ final class MentionNotifier(
       validUnblockedUsers <- filterNotBlockedByUsers(validUsers, mentionedBy)
       validNotifies = validUnblockedUsers.map(Notification.Notifies.apply)
     } yield validNotifies
-  }
 
   private def filterNotBlockedByUsers(
       usersMentioned: List[User.ID],
@@ -52,7 +51,7 @@ final class MentionNotifier(
       topic: Topic,
       mentionedUser: Notification.Notifies,
       mentionedBy: MentionedInThread.MentionedBy
-  ): Notification = {
+  ): Notification =
     val notificationContent = MentionedInThread(
       mentionedBy,
       MentionedInThread.Topic(topic.name),
@@ -62,11 +61,8 @@ final class MentionNotifier(
     )
 
     Notification.make(mentionedUser, notificationContent)
-  }
 
   private def extractMentionedUsers(post: Post): Set[User.ID] =
-    post.text.contains('@') so {
+    post.text.contains('@') so:
       val m = lila.common.String.atUsernameRegex.findAllMatchIn(post.text)
       (post.author foldLeft m.map(_ group 1).map(User.normalize).toSet) { _ - _ }
-    }
-}

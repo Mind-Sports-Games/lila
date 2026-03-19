@@ -5,7 +5,7 @@ import play.api.data.Forms._
 
 import lila.common.Form.{ numberIn, stringIn }
 
-object PrefForm {
+object PrefForm:
 
   private def containedIn(choices: Seq[(Int, String)]): Int => Boolean =
     choice => choices.exists(_._1 == choice)
@@ -112,7 +112,7 @@ object PrefForm {
       message: Int,
       studyInvite: Option[Int],
       insightShare: Int
-  ) {
+  ):
 
     def apply(pref: Pref) =
       pref.copy(
@@ -153,9 +153,8 @@ object PrefForm {
         mancalaMove = behavior.mancalaMove | pref.mancalaMove,
         boardIdentifier = display.boardIdentifier | pref.boardIdentifier
       )
-  }
 
-  object PrefData {
+  object PrefData:
     def apply(pref: Pref): PrefData =
       PrefData(
         display = DisplayData(
@@ -201,37 +200,36 @@ object PrefForm {
         studyInvite = pref.studyInvite.some,
         insightShare = pref.insightShare
       )
-  }
 
   def prefOf(p: Pref): Form[PrefData] = pref fill PrefData(p)
 
   val theme = Form(
     single(
-      "theme" -> text.verifying(Theme contains _)
+      "theme" -> text.verifying(Theme `contains` _)
     )
   )
 
   val pieceSet = Form(
     single(
-      "set" -> text.verifying(PieceSet contains _)
+      "set" -> text.verifying(PieceSet `contains` _)
     )
   )
 
   val theme3d = Form(
     single(
-      "theme" -> text.verifying(Theme3d contains _)
+      "theme" -> text.verifying(Theme3d `contains` _)
     )
   )
 
   val pieceSet3d = Form(
     single(
-      "set" -> text.verifying(PieceSet3d contains _)
+      "set" -> text.verifying(PieceSet3d `contains` _)
     )
   )
 
   val soundSet = Form(
     single(
-      "set" -> text.verifying(SoundSet contains _)
+      "set" -> text.verifying(SoundSet `contains` _)
     )
   )
 
@@ -267,4 +265,3 @@ object PrefForm {
       "zen" -> text.verifying(Set("0", "1") contains _)
     )
   )
-}

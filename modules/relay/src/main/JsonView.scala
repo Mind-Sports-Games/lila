@@ -1,12 +1,11 @@
 package lila.relay
 
 import play.api.libs.json._
-import scala.concurrent.duration._
 
 import lila.common.config.BaseUrl
 import lila.common.Json.jodaWrites
 
-final class JsonView(baseUrl: BaseUrl, markup: RelayMarkup) {
+final class JsonView(baseUrl: BaseUrl, markup: RelayMarkup):
 
   import JsonView._
 
@@ -44,9 +43,8 @@ final class JsonView(baseUrl: BaseUrl, markup: RelayMarkup) {
       study = studyData.study,
       analysis = studyData.analysis
     )
-}
 
-object JsonView {
+object JsonView:
 
   case class JsData(relay: JsObject, study: JsObject, analysis: JsObject)
 
@@ -77,9 +75,7 @@ object JsonView {
       "ongoing" -> s.ongoing,
       "log"     -> s.log.events
     ) ++
-      s.upstream.so {
+      s.upstream.so:
         case RelayRound.Sync.UpstreamUrl(url) => Json.obj("url" -> url)
         case RelayRound.Sync.UpstreamIds(ids) => Json.obj("ids" -> ids)
-      }
   }
-}

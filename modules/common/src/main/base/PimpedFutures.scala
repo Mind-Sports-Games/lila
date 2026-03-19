@@ -8,10 +8,10 @@ import scala.concurrent.{ Await, ExecutionContext as EC, Future }
 import scala.util.Try
 
 import lila.common.Chronometer
-import lila.core.lilaism.Lilaism.{ fuFalse, fuTrue, fuccess, fufail, funit, Fu, Funit }
+import lila.core.lilaism.Lilaism.{ fuFalse, fuTrue, fuccess, fufail, Fu }
 import lila.core.lilaism.{ LilaException, LilaTimeout }
 
-final class PimpedFuture[A](private val fua: Fu[A]) extends AnyVal {
+final class PimpedFuture[A](private val fua: Fu[A]) extends AnyVal:
 
   @inline def dmap[B](f: A => B): Fu[B]       = fua.map(f)(using EC.parasitic)
   @inline def dforeach[B](f: A => Unit): Unit = fua.foreach(f)(using EC.parasitic)
@@ -44,11 +44,10 @@ final class PimpedFuture[A](private val fua: Fu[A]) extends AnyVal {
   def injectAnyway[B](b: => B)(implicit ec: EC): Fu[B] = fold(_ => b, _ => b)
 
   def effectFold(fail: Exception => Unit, succ: A => Unit)(implicit ec: EC): Unit =
-    fua onComplete {
+    fua onComplete:
       case scala.util.Failure(e: Exception) => fail(e)
       case scala.util.Failure(e)            => throw e // Throwables
       case scala.util.Success(e)            => succ(e)
-    }
 
   def fold[B](fail: Exception => B, succ: A => B)(implicit ec: EC): Fu[B] =
     fua map succ recover { case e: Exception => fail(e) }
@@ -66,31 +65,26 @@ final class PimpedFuture[A](private val fua: Fu[A]) extends AnyVal {
     fua.failed.foreach(effect)
     fua
 
-  def addEffect(effect: A => Unit)(implicit ec: EC): Fu[A] = {
+  def addEffect(effect: A => Unit)(implicit ec: EC): Fu[A] =
     fua foreach effect
     fua
-  }
 
-  def addEffects(fail: Exception => Unit, succ: A => Unit)(implicit ec: EC): Fu[A] = {
-    fua onComplete {
+  def addEffects(fail: Exception => Unit, succ: A => Unit)(implicit ec: EC): Fu[A] =
+    fua onComplete:
       case scala.util.Failure(e: Exception) => fail(e)
       case scala.util.Failure(e)            => throw e // Throwables
       case scala.util.Success(e)            => succ(e)
-    }
     fua
-  }
 
-  def addEffects(f: Try[A] => Unit)(implicit ec: EC): Fu[A] = {
+  def addEffects(f: Try[A] => Unit)(implicit ec: EC): Fu[A] =
     fua onComplete f
     fua
-  }
 
-  def addEffectAnyway(inAnyCase: => Unit)(implicit ec: EC): Fu[A] = {
+  def addEffectAnyway(inAnyCase: => Unit)(implicit ec: EC): Fu[A] =
     fua onComplete { _ =>
       inAnyCase
     }
     fua
-  }
 
   def mapFailure(f: Exception => Exception)(implicit ec: EC) =
     fua recoverWith { case cause: Exception =>
@@ -102,33 +96,29 @@ final class PimpedFuture[A](private val fua: Fu[A]) extends AnyVal {
       LilaException(s"$p ${e.getMessage}")
     }
 
-  def thenPp(implicit ec: EC): Fu[A] = {
+  def thenPp(implicit ec: EC): Fu[A] =
     effectFold(
       e => println("[failure] " + e),
       a => println("[success] " + a)
     )
     fua
-  }
 
-  def thenPp(msg: String)(implicit ec: EC): Fu[A] = {
+  def thenPp(msg: String)(implicit ec: EC): Fu[A] =
     effectFold(
       e => println(s"[$msg] [failure] $e"),
       a => println(s"[$msg] [success] $a")
     )
     fua
-  }
 
   def await(duration: FiniteDuration, name: String): A =
-    Chronometer.syncMon(_.blocking.time(name)) {
+    Chronometer.syncMon(_.blocking.time(name)):
       Await.result(fua, duration)
-    }
 
   def awaitOrElse(duration: FiniteDuration, name: String, default: => A): A =
     try
       await(duration, name)
-    catch {
+    catch
       case _: Exception => default
-    }
 
   def withTimeout(duration: FiniteDuration)(implicit ec: EC, scheduler: Scheduler): Fu[A] =
     withTimeout(duration, LilaTimeout(s"Future timed out after $duration"))
@@ -171,16 +161,14 @@ final class PimpedFuture[A](private val fua: Fu[A]) extends AnyVal {
   def recoverDefault(implicit z: Zero[A], ec: EC): Fu[A] = recoverDefault(z.zero)
 
   def recoverDefault(default: => A)(implicit ec: EC): Fu[A] =
-    fua recover {
+    fua recover:
       case _: LilaException                         => default
       case _: java.util.concurrent.TimeoutException => default
       case e: Exception                             =>
         lila.log("common").warn("Future.recoverDefault", e)
         default
-    }
-}
 
-final class PimpedFutureBoolean(private val fua: Fu[Boolean]) extends AnyVal {
+final class PimpedFutureBoolean(private val fua: Fu[Boolean]) extends AnyVal:
 
   def >>&(fub: => Fu[Boolean]): Fu[Boolean] =
     fua.flatMap(if _ then fub else fuFalse)(using EC.parasitic)
@@ -189,32 +177,27 @@ final class PimpedFutureBoolean(private val fua: Fu[Boolean]) extends AnyVal {
     fua.flatMap(if _ then fuTrue else fub)(using EC.parasitic)
 
   @inline def unary_! = fua.map(!_)(using EC.parasitic)
-}
 
-final class PimpedFutureOption[A](private val fua: Fu[Option[A]]) extends AnyVal {
+final class PimpedFutureOption[A](private val fua: Fu[Option[A]]) extends AnyVal:
 
   def orFail(msg: => String)(implicit ec: EC): Fu[A] =
-    fua flatMap {
+    fua flatMap:
       _.fold[Fu[A]](fufail(msg))(fuccess)
-    }
 
   def orFailWith(err: => Exception)(implicit ec: EC): Fu[A] =
-    fua flatMap {
+    fua flatMap:
       _.fold[Fu[A]](fufail(err))(fuccess)
-    }
 
   def orElse(other: => Fu[Option[A]])(implicit ec: EC): Fu[Option[A]] =
-    fua flatMap {
+    fua flatMap:
       _.fold(other) { x =>
         fuccess(Some(x))
       }
-    }
 
   def getOrElse(other: => Fu[A])(implicit ec: EC): Fu[A] = fua flatMap { _.fold(other)(fuccess) }
 
   def map2[B](f: A => B)(implicit ec: EC): Fu[Option[B]] = fua.map(_ map f)
   def dmap2[B](f: A => B): Fu[Option[B]]                 = fua.map(_ map f)(using EC.parasitic)
-}
 
 // final class PimpedFutureValid[A](private val fua: Fu[Valid[A]]) extends AnyVal {
 
@@ -223,6 +206,5 @@ final class PimpedFutureOption[A](private val fua: Fu[Option[A]]) extends AnyVal
 //   }(using EC.parasitic)
 // }
 
-final class PimpedIterableFuture[A, M[X] <: IterableOnce[X]](private val t: M[Fu[A]]) extends AnyVal {
+final class PimpedIterableFuture[A, M[X] <: IterableOnce[X]](private val t: M[Fu[A]]) extends AnyVal:
   def sequenceFu(implicit bf: BuildFrom[M[Fu[A]], A, M[A]], ec: EC): Fu[M[A]] = Future.sequence(t)
-}

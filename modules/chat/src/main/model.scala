@@ -9,10 +9,9 @@ case class UserModInfo(
     history: List[ChatTimeout.UserEntry]
 )
 
-sealed trait BusChan {
+sealed trait BusChan:
   lazy val chan = s"chat:${toString.toLowerCase}"
-}
-object BusChan {
+object BusChan:
   case object Round      extends BusChan
   case object Tournament extends BusChan
   case object Simul      extends BusChan
@@ -23,6 +22,5 @@ object BusChan {
   case object Lobby      extends BusChan
 
   type Select = BusChan.type => BusChan
-}
 
 case class GetLinkCheck(line: UserLine, source: PublicSource, promise: Promise[Boolean])

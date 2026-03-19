@@ -5,14 +5,14 @@ import lila.common.{ Chronometer, WMMatching }
 import lila.user.User
 import PairingSystem.Data
 
-private object AntmaPairing {
+private object AntmaPairing:
 
   private val maxStrike = 3
 
   private type RPlayer = RankedPlayerWithPlayerIndexHistory
 
   def apply(data: Data, players: List[RPlayer]): List[Pairing.Prep] =
-    players.nonEmpty so {
+    players.nonEmpty so:
       import data._
 
       def rankFactor = PairingSystem.rankFactorFor(players)
@@ -27,17 +27,16 @@ private object AntmaPairing {
           !a.playerIndexHistory.couldPlay(b.playerIndexHistory, maxStrike)
         ) None
         else
-          Some {
+          Some:
             Math.abs(a.rank - b.rank) * rankFactor(a, b) +
               Math.abs(a.player.actualRating - b.player.actualRating)
-          }
 
       def battleScore(a: RPlayer, b: RPlayer): Option[Int] =
         (a.player.team != b.player.team) so pairScore(a, b)
 
       def duelScore: (RPlayer, RPlayer) => Option[Int] = (_, _) => Some(1)
 
-      Chronometer.syncMon(_.tournament.pairing.wmmatching) {
+      Chronometer.syncMon(_.tournament.pairing.wmmatching):
         WMMatching(
           players.toArray,
           if (data.tour.isTeamBattle) battleScore
@@ -52,6 +51,3 @@ private object AntmaPairing {
             Pairing.prepWithPlayerIndex(tour, a, b)
           }
         )
-      }
-    }
-}

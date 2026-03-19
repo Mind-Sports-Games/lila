@@ -63,7 +63,7 @@ object variant {
         st.aside(cls := "page-menu__menu subnav")(
           Variant.all.filterNot(_.fromPositionVariant) map { v =>
             a(
-              cls := List("text" -> true, "active" -> active.has(v)),
+              cls := List("text" -> true, "active" -> active.contains(v)),
               href := routes.Page.variant(v.key),
               dataIcon := v.perfIcon
             )(VariantKeys.variantName(v))

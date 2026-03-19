@@ -20,36 +20,31 @@ final private class InsightIndexer(
 )(implicit
     ec: scala.concurrent.ExecutionContext,
     scheduler: org.apache.pekko.actor.Scheduler,
-    mat: akka.stream.Materializer
-) {
+    mat: org.apache.pekko.stream.Materializer
+):
 
   private val workQueue =
     new lila.hub.DuctSequencer(maxSize = 128, timeout = 2 minutes, name = "insightIndexer")
 
   def all(userId: User.ID): Funit =
-    workQueue {
-      userRepo byId userId flatMap {
+    workQueue:
+      userRepo `byId` userId flatMap:
         _ so { user =>
-          storage.fetchLast(user.id) flatMap {
+          storage.fetchLast(user.id) flatMap:
             case None    => fromScratch(user)
-            case Some(e) => computeFrom(user, e.date plusSeconds 1, e.number + 1)
-          }
+            case Some(e) => computeFrom(user, e.date `plusSeconds` 1, e.number + 1)
         }
-      }
-    }
 
   def update(game: Game, userId: String, previous: InsightEntry): Funit =
-    povToEntry(game, userId, previous.provisional) flatMap {
-      case Right(e) => storage update e.copy(number = previous.number)
+    povToEntry(game, userId, previous.provisional) flatMap:
+      case Right(e) => storage `update` e.copy(number = previous.number)
       case _        => funit
-    }
 
   private def fromScratch(user: User): Funit =
-    fetchFirstGame(user) flatMap {
+    fetchFirstGame(user) flatMap:
       _.so { g =>
         computeFrom(user, g.createdAt, 1)
       }
-    }
 
   private def gameQuery(user: User) =
     Query.user(user.id) ++
@@ -69,13 +64,13 @@ final private class InsightIndexer(
         .sort(Query.sortCreated)
         .skip(maxGames - 1)
         .one[Game](readPreference = ReadPreference.secondaryPreferred)
-    } orElse gameRepo.coll
+    } `orElse` gameRepo.coll
       .find(gameQuery(user))
       .sort(Query.sortChronological)
       .one[Game](readPreference = ReadPreference.secondaryPreferred)
 
   private def computeFrom(user: User, from: DateTime, fromNumber: Int): Funit =
-    storage nbByPerf user.id flatMap { nbs =>
+    storage.nbByPerf(user.id).flatMap { (nbs: Map[lila.rating.PerfType, Int]) =>
       var nbByPerf = nbs
       def toEntry(game: Game): Fu[Option[InsightEntry]] =
         game.perfType so { pt =>
@@ -85,7 +80,7 @@ final private class InsightIndexer(
             logger.warn(e.getMessage, e)
           } map (_.toOption)
         }
-      val query = gameQuery(user) ++ $doc(Game.BSONFields.createdAt $gte from)
+      val query = gameQuery(user) ++ $doc(Game.BSONFields.createdAt `$gte` from)
       gameRepo
         .sortedCursor(query, Query.sortChronological)
         .documentSource(maxGames)
@@ -97,6 +92,5 @@ final private class InsightIndexer(
         .map(storage.bulkInsert)
         .toMat(Sink.ignore)(Keep.right)
         .run()
-    } void
+    }.void
 
-}

@@ -6,7 +6,7 @@ import lila.db.dsl._
 import lila.rating.BSONHandlers.perfTypeIdHandler
 import lila.rating.PerfType
 
-final class PerfStatStorage(coll: Coll)(implicit ec: scala.concurrent.ExecutionContext) {
+final class PerfStatStorage(coll: Coll)(implicit ec: scala.concurrent.ExecutionContext):
 
   implicit private val UserIdBSONHandler: BSONHandler[UserId] =
     stringAnyValHandler[UserId](_.value, UserId.apply)
@@ -29,7 +29,7 @@ final class PerfStatStorage(coll: Coll)(implicit ec: scala.concurrent.ExecutionC
   def insert(perfStat: PerfStat): Funit =
     coll.insert.one(perfStat).void
 
-  def update(a: PerfStat, b: PerfStat): Funit = {
+  def update(a: PerfStat, b: PerfStat): Funit =
 
     val sets = $doc(
       docDiff(a.count, b.count).mapKeys(k => s"count.$k").toList :::
@@ -82,7 +82,6 @@ final class PerfStatStorage(coll: Coll)(implicit ec: scala.concurrent.ExecutionC
     coll.update
       .one($id(a.id), $doc("$set" -> sets))
       .void
-  }
 
   private def resultsDiff(a: PerfStat, b: PerfStat)(getter: PerfStat => Results): Option[Bdoc] =
     (getter(a) != getter(b)) so ResultsBSONHandler.writeOpt(getter(b))
@@ -95,13 +94,10 @@ final class PerfStatStorage(coll: Coll)(implicit ec: scala.concurrent.ExecutionC
       getter(a).fold(true)(_ != r) so RatingAtBSONHandler.writeOpt(r)
     }
 
-  private def docDiff[T: BSONDocumentWriter](a: T, b: T): Map[String, BSONValue] = {
+  private def docDiff[T: BSONDocumentWriter](a: T, b: T): Map[String, BSONValue] =
     val (am, bm) = (docMap(a), docMap(b))
-    bm collect {
+    bm collect:
       case (field, v) if am.get(field).fold(true)(_ != v) => field -> v
-    }
-  }
 
   private def docMap[T](a: T)(implicit writer: BSONDocumentWriter[T]) =
     writer.writeTry(a).get.toMap
-}

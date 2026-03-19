@@ -9,7 +9,7 @@ final private[forum] class ForumForm(
     promotion: lila.security.PromotionApi,
     val captcher: lila.hub.actors.Captcher
 )(implicit ec: scala.concurrent.ExecutionContext)
-    extends lila.hub.CaptchedForm {
+    extends lila.hub.CaptchedForm:
 
   import ForumForm._
 
@@ -20,7 +20,7 @@ final private[forum] class ForumForm(
       "move"    -> text,
       "modIcon" -> optional(boolean)
     )(PostData.apply)(d => Some((d.text, d.gameId, d.move, d.modIcon)))
-      .verifying(captchaFailMessage, validateCaptcha _)
+      .verifying(captchaFailMessage, validateCaptcha)
 
   def post(user: User, inOwnTeam: Boolean) = Form(postMapping(user, inOwnTeam))
 
@@ -47,9 +47,8 @@ final private[forum] class ForumForm(
         "You have reached the daily maximum for links in forum posts.",
         t => inOwnTeam || promotion.test(user)(t)
       )
-}
 
-object ForumForm {
+object ForumForm:
 
   case class PostData(
       text: String,
@@ -61,28 +60,25 @@ object ForumForm {
   case class TopicData(
       name: String,
       post: PostData
-  ) {
+  ):
 
     def looksLikeVenting =
       List(name, post.text) exists { txt =>
         mostlyUpperCase(txt) || ventingRegex.find(txt)
       }
-  }
 
   private def mostlyUpperCase(text: String) =
     text.lengthIs > 5 && {
       import java.lang.Character._
       // true if >2/3 of the latin letters are upper
       (text take 300).foldLeft(0) { (i, c) =>
-        getType(c) match {
+        getType(c) match
           case UPPERCASE_LETTER => i + 1
           case LOWERCASE_LETTER => i - 2
           case _                => i
-        }
       } > 0
     }
 
   private val ventingRegex = """cheat|engine|rating|loser|banned|abort""".r
 
   case class PostEdit(changes: String)
-}

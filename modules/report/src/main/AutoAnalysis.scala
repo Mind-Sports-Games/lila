@@ -1,7 +1,6 @@
 package lila.report
 
 import org.joda.time.DateTime
-import scala.concurrent.duration._
 
 import lila.game.{ Game, GameRepo }
 
@@ -11,15 +10,14 @@ final class AutoAnalysis(
 )(implicit
     ec: scala.concurrent.ExecutionContext,
     scheduler: org.apache.pekko.actor.Scheduler
-) {
+):
 
   def apply(candidate: Report.Candidate): Funit =
     if (candidate.isCheat) doItNow(candidate)
-    else if (candidate.isPrint) fuccess {
+    else if (candidate.isPrint) fuccess:
       List(30, 90) foreach { minutes =>
-        scheduler.scheduleOnce(minutes minutes) { doItNow(candidate).unit }
+        scheduler.scheduleOnce(minutes minutes) { val _ = doItNow(candidate) }
       }
-    }
     else funit
 
   private def doItNow(candidate: Report.Candidate) =
@@ -41,11 +39,9 @@ final class AutoAnalysis(
         10
       ) dmap { as ++ _ }
     }
-  }.map {
+  }.map:
     _.filter { g =>
       g.analysable && !g.metadata.analysed
     }.distinct
-      .sortBy(-_.createdAt.getSeconds)
+      .sortBy(-_.createdAt.getMillis / 1000)
       .take(10)
-  }
-}

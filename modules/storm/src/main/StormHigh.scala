@@ -1,67 +1,59 @@
 package lila.storm
 
-import scala.concurrent.duration._
 import scala.concurrent.ExecutionContext
 
 import lila.db.dsl._
 import lila.memo.CacheApi
 import lila.user.User
 
-case class StormHigh(day: Int, week: Int, month: Int, allTime: Int) {
+case class StormHigh(day: Int, week: Int, month: Int, allTime: Int):
 
   def update(score: Int) = copy(
-    day = day atLeast score,
-    week = week atLeast score,
-    month = month atLeast score,
-    allTime = allTime atLeast score
+    day = day `atLeast` score,
+    week = week `atLeast` score,
+    month = month `atLeast` score,
+    allTime = allTime `atLeast` score
   )
-}
 
-object StormHigh {
+object StormHigh:
   val default = StormHigh(0, 0, 0, 0)
 
-  sealed abstract class NewHigh(val key: String) {
+  sealed abstract class NewHigh(val key: String):
     val previous: Int
-  }
-  object NewHigh {
+  object NewHigh:
     case class Day(previous: Int)     extends NewHigh("day")
     case class Week(previous: Int)    extends NewHigh("week")
     case class Month(previous: Int)   extends NewHigh("month")
     case class AllTime(previous: Int) extends NewHigh("allTime")
-  }
-}
 
-final class StormHighApi(coll: Coll, cacheApi: CacheApi)(implicit ctx: ExecutionContext) {
+final class StormHighApi(coll: Coll, cacheApi: CacheApi)(implicit ctx: ExecutionContext):
 
   import StormBsonHandlers._
   import StormHigh.NewHigh
 
   def get(userId: User.ID): Fu[StormHigh] = cache get userId
 
-  def update(userId: User.ID, prev: StormHigh, score: Int): Option[NewHigh] = {
-    val high = prev update score
-    (high != prev) so {
+  def update(userId: User.ID, prev: StormHigh, score: Int): Option[NewHigh] =
+    val high = prev `update` score
+    (high != prev) so:
       cache.put(userId, fuccess(high))
       import NewHigh._
       if (high.allTime > prev.allTime) AllTime(prev.allTime).some
       else if (high.month > prev.month) Month(prev.month).some
       else if (high.week > prev.week) Week(prev.week).some
       else Day(prev.day).some
-    }
-  }
 
-  private val cache = cacheApi[User.ID, StormHigh](8192, "storm.high") {
+  private val cache = cacheApi[User.ID, StormHigh](8192, "storm.high"):
     _.expireAfterAccess(1 hour).buildAsyncFuture(compute)
-  }
 
   private def compute(userId: User.ID): Fu[StormHigh] =
     coll
       .aggregateWith[Bdoc]() { framework =>
         import framework._
-        def matchSince(sinceId: User.ID => StormDay.Id) = Match($doc("_id" $gte sinceId(userId)))
+        def matchSince(sinceId: User.ID => StormDay.Id) = Match($doc("_id" `$gte` sinceId(userId)))
         val scoreSort                                   = Sort(Descending("score"))
         List(
-          Match($doc("_id" $lte StormDay.Id.today(userId) $gt StormDay.Id.allTime(userId))),
+          Match($doc("_id" `$lte` StormDay.Id.today(userId) `$gt` StormDay.Id.allTime(userId))),
           Project($doc("score" -> true)),
           Sort(Descending("_id")),
           Facet(
@@ -87,4 +79,3 @@ final class StormHighApi(coll: Coll, cacheApi: CacheApi)(implicit ctx: Execution
         )
       }
       .map(_ | StormHigh.default)
-}

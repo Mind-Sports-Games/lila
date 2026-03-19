@@ -7,7 +7,7 @@ import lila.db.AsyncColl
 import lila.rating.BSONHandlers.perfTypeIdHandler
 import lila.rating.PerfType
 
-final private class Storage(val coll: AsyncColl)(implicit ec: scala.concurrent.ExecutionContext) {
+final private class Storage(val coll: AsyncColl)(implicit ec: scala.concurrent.ExecutionContext):
 
   import Storage._
   import BSONHandlers._
@@ -25,11 +25,10 @@ final private class Storage(val coll: AsyncColl)(implicit ec: scala.concurrent.E
   def insert(p: InsightEntry) = coll(_.insert.one(p).void)
 
   def bulkInsert(ps: Seq[InsightEntry]) =
-    coll {
+    coll:
       _.insert.many(
         ps.flatMap(BSONHandlers.EntryBSONHandler.writeOpt)
       )
-    }
 
   def update(p: InsightEntry) = coll(_.update.one(selectId(p.id), p, upsert = true).void)
 
@@ -40,12 +39,11 @@ final private class Storage(val coll: AsyncColl)(implicit ec: scala.concurrent.E
   def find(id: String) = coll(_.one[InsightEntry](selectId(id)))
 
   def ecos(userId: String): Fu[Set[String]] =
-    coll {
+    coll:
       _.distinctEasy[String, Set](F.eco, selectUserId(userId))
-    }
 
   def nbByPerf(userId: String): Fu[Map[PerfType, Int]] =
-    coll {
+    coll:
       _.aggregateWith[Bdoc]() { framework =>
         import framework._
         List(
@@ -54,18 +52,15 @@ final private class Storage(val coll: AsyncColl)(implicit ec: scala.concurrent.E
         )
       }
         .collect[List](maxDocs = 50)
-        .map {
+        .map:
         _.flatMap { doc =>
           for {
             perfType <- doc.getAsOpt[PerfType]("_id")
             nb       <- doc.int("nb")
           } yield perfType -> nb
         }.toMap
-      }
-    }
-}
 
-private object Storage {
+private object Storage:
 
   import InsightEntry.{ BSONFields => F }
 
@@ -78,4 +73,3 @@ private object Storage {
     docs.foldLeft(BSONDocument()) { case (acc, doc) =>
       acc ++ doc
     }
-}

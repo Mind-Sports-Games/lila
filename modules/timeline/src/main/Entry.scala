@@ -15,16 +15,15 @@ case class Entry(
     chan: Option[String],
     data: Bdoc,
     date: DateTime
-) {
+):
 
   import Entry._
   import atomBsonHandlers._
 
   def similarTo(other: Entry) = typ == other.typ && data == other.data
 
-  case object Deprecated extends lila.base.LilaException {
+  case object Deprecated extends lila.base.LilaException:
     val message = "Deprecated timeline entry"
-  }
 
   lazy val decode: Option[Atom] = Try(typ match {
     case "follow"       => followHandler.readTry(data).get
@@ -43,28 +42,26 @@ case class Entry(
     case "stream-start" => streamStartHandler.readTry(data).get
     case "note-create"  => throw Deprecated
     case _              => sys error s"Unhandled atom type: $typ"
-  }) match {
+  }) match
     case Success(atom)       => Some(atom)
     case Failure(Deprecated) => none
     case Failure(err) =>
       lila.log("timeline").warn(err.getMessage)
       none
-  }
 
   def userIds = decode.so(_.userIds)
 
   def okForKid = decode so (_.okForKid)
-}
 
-object Entry {
+object Entry:
 
   case class ForUsers(entry: Entry, userIds: List[String])
 
   private def toBson[A](data: A)(implicit writer: BSONDocumentWriter[A]) = writer.writeTry(data).get
 
-  private[timeline] def make(data: Atom): Entry = {
+  private[timeline] def make(data: Atom): Entry =
     import atomBsonHandlers._
-    data match {
+    data match
       case d: Follow      => "follow"       -> toBson(d)
       case d: TeamJoin    => "team-join"    -> toBson(d)
       case d: TeamCreate  => "team-create"  -> toBson(d)
@@ -79,13 +76,11 @@ object Entry {
       case d: PlanRenew   => "plan-renew"   -> toBson(d)(planRenewHandler)
       case d: BlogPost    => "blog-post"    -> toBson(d)(blogPostHandler)
       case d: StreamStart => "stream-start" -> toBson(d)(streamStartHandler)
-    }
-  } match {
+  match
     case (typ, bson) =>
       new Entry(BSONObjectID.generate(), typ, data.channel.some, bson, DateTime.now)
-  }
 
-  object atomBsonHandlers {
+  object atomBsonHandlers:
     implicit val followHandler: BSONDocumentHandler[Follow]           = Macros.handler[Follow]
     implicit val teamJoinHandler: BSONDocumentHandler[TeamJoin]       = Macros.handler[TeamJoin]
     implicit val teamCreateHandler: BSONDocumentHandler[TeamCreate]   = Macros.handler[TeamCreate]
@@ -100,9 +95,8 @@ object Entry {
     implicit val planRenewHandler: BSONDocumentHandler[PlanRenew]     = Macros.handler[PlanRenew]
     implicit val blogPostHandler: BSONDocumentHandler[BlogPost]       = Macros.handler[BlogPost]
     implicit val streamStartHandler: BSONDocumentHandler[StreamStart] = Macros.handler[StreamStart]
-  }
 
-  object atomJsonWrite {
+  object atomJsonWrite:
     implicit val followWrite: OWrites[Follow]           = Json.writes[Follow]
     implicit val teamJoinWrite: OWrites[TeamJoin]       = Json.writes[TeamJoin]
     implicit val teamCreateWrite: OWrites[TeamCreate]   = Json.writes[TeamCreate]
@@ -117,7 +111,7 @@ object Entry {
     implicit val planRenewWrite: OWrites[PlanRenew]     = Json.writes[PlanRenew]
     implicit val blogPostWrite: OWrites[BlogPost]       = Json.writes[BlogPost]
     implicit val streamStartWrite: OWrites[StreamStart] = Json.writes[StreamStart]
-    implicit val atomWrite: Writes[Atom] = Writes[Atom] {
+    implicit val atomWrite: Writes[Atom] = Writes[Atom]:
       case d: Follow      => followWrite writes d
       case d: TeamJoin    => teamJoinWrite writes d
       case d: TeamCreate  => teamCreateWrite writes d
@@ -132,8 +126,6 @@ object Entry {
       case d: PlanRenew   => planRenewWrite writes d
       case d: BlogPost    => blogPostWrite writes d
       case d: StreamStart => streamStartWrite writes d
-    }
-  }
 
   implicit val EntryBSONHandler: BSONDocumentHandler[Entry] = Macros.handler[Entry]
 
@@ -145,4 +137,3 @@ object Entry {
       "date" -> e.date
     )
   }
-}

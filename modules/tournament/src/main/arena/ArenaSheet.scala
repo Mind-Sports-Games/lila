@@ -13,12 +13,11 @@ import strategygames.Status.{
   ResignGammon
 }
 
-case class Sheet(scores: List[Sheet.Score]) {
+case class Sheet(scores: List[Sheet.Score]):
   val total  = scores.foldLeft(0)(_ + _.value)
   def onFire = Sheet.isOnFire(scores)
-}
 
-object Sheet {
+object Sheet:
 
   sealed trait Version
   case object V1 extends Version
@@ -55,16 +54,15 @@ object Sheet {
       flag: Flag,
       berserk: Berserk,
       statusScoring: StatusScore
-  ) {
+  ):
 
     def isBerserk = berserk != NoBerserk
 
     def isWin =
-      res match {
+      res match
         case ResWin  => Some(true)
         case ResLoss => Some(false)
         case _       => None
-      }
 
     def isDraw = res == ResDraw
 
@@ -78,13 +76,11 @@ object Sheet {
     }) + {
       if (res == ResWin && berserk == ValidBerserk) 1 else 0
     } + {
-      statusScoring match {
+      statusScoring match
         case SSBackgammon => 2
         case SSGammon     => 1
         case SSNormal     => 0
-      }
     }
-  }
 
   val emptySheet = Sheet(Nil)
 
@@ -95,19 +91,18 @@ object Sheet {
       streakable: Streakable,
       statusScoring: Boolean
   ): Sheet =
-    Sheet {
+    Sheet:
       val streaks = streakable == Streaks
       val nexts   = (pairings drop 1 map some) :+ None
       pairings.zip(nexts).foldLeft(List.empty[Score]) { case (scores, (p, n)) =>
-        val berserk = if (p berserkOf userId) {
+        val berserk = if (p `berserkOf` userId)
           if (p.notSoQuickFinish) ValidBerserk else InvalidBerserk
-        } else NoBerserk
-        val statusScoreWin = (statusScoring, p.status) match {
+        else NoBerserk
+        val statusScoreWin = (statusScoring, p.status) match
           case (true, BackgammonWin | ResignBackgammon | GinBackgammon | OutoftimeBackgammon) =>
             SSBackgammon
           case (true, GammonWin | ResignGammon | GinGammon | OutoftimeGammon) => SSGammon
           case _                                                              => SSNormal
-        }
         (p.winner match {
           case None if p.quickDraw => Score(ResDQ, Normal, berserk, SSNormal)
           case None =>
@@ -137,12 +132,11 @@ object Sheet {
           case _ => Score(ResLoss, Normal, berserk, SSNormal)
         }) :: scores
       }
-    }
 
   private val v2date = new DateTime(2020, 4, 21, 0, 0, 0)
 
   def versionOf(date: DateTime) =
-    if (date isBefore v2date) V1 else V2
+    if (date `isBefore` v2date) V1 else V2
 
   private def isOnFire(scores: List[Score]) =
     scores.headOption.exists(_.res == ResWin) &&
@@ -150,13 +144,10 @@ object Sheet {
 
   @scala.annotation.tailrec
   private def isDrawStreak(scores: List[Score]): Boolean =
-    scores match {
+    scores match
       case Nil => false
       case s :: more =>
-        s.isWin match {
+        s.isWin match
           case None        => true
           case Some(true)  => false
           case Some(false) => isDrawStreak(more)
-        }
-    }
-}

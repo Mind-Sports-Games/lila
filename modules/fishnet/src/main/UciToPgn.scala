@@ -2,7 +2,6 @@ package lila.fishnet
 
 import cats.data.Validated
 import cats.data.Validated.valid
-import cats.implicits._
 import strategygames.format.pgn.Dumper
 import strategygames.format.Uci
 import strategygames.{
@@ -11,8 +10,6 @@ import strategygames.{
   DiceRoll,
   Drop,
   EndTurn,
-  GameFamily,
-  GameLogic,
   Lift,
   Move,
   Pass,
@@ -28,11 +25,11 @@ import lila.base.LilaException
 // convert variations from UCI to PGN.
 // also drops extra variations
 // This has not been upgraded to multiaction - should it be?
-private object UciToPgn {
+private object UciToPgn:
 
   type WithErrors[A] = (A, List[Exception])
 
-  def apply(replay: Replay, analysis: Analysis, variant: Variant): WithErrors[Analysis] = {
+  def apply(replay: Replay, analysis: Analysis, variant: Variant): WithErrors[Analysis] =
 
     val pliesWithAdviceAndVariation: Set[Int] = analysis.advices.view.collect {
       case a if a.info.hasVariation => a.ply
@@ -46,26 +43,26 @@ private object UciToPgn {
     val family = variant.gameFamily
 
     def uciToPgn(ply: Int, variation: List[String]): Validated[String, List[PgnMove]] =
-      for {
-        situation <-
-          if (ply == replay.setup.startedAtPly + 1) valid(replay.setup.situation)
-          else
-            replay
-              .actionAtPly(ply)
-              .map(action => {
-                action match {
-                  case m: Move           => m.situationBefore
-                  case d: Drop           => d.situationBefore
-                  case l: Lift           => l.situationBefore
-                  case p: Pass           => p.situationBefore
-                  case ss: SelectSquares => ss.situationBefore
-                  case dr: DiceRoll      => dr.situationBefore
-                  case ca: CubeAction    => ca.situationBefore
-                  case et: EndTurn       => et.situationBefore
-                }
-              }) toValid "No move found"
-        ucis <- variation.map(v => Uci(logic, family, v)).sequence toValid "Invalid UCI moves " + variation
-        moves <-
+      val situationV =
+        if (ply == replay.setup.plies + 1) valid(replay.setup.situation)
+        else
+          replay
+            .actionAtPly(ply)
+            .map(action => {
+              action match {
+                case m: Move           => m.situationBefore
+                case d: Drop           => d.situationBefore
+                case l: Lift           => l.situationBefore
+                case p: Pass           => p.situationBefore
+                case ss: SelectSquares => ss.situationBefore
+                case dr: DiceRoll      => dr.situationBefore
+                case ca: CubeAction    => ca.situationBefore
+                case et: EndTurn       => et.situationBefore
+              }
+            }).toValid("No move found")
+
+      situationV.andThen { situation =>
+        variation.map(v => Uci(logic, family, v)).sequence.toValid("Invalid UCI moves " + variation).andThen { ucis =>
           ucis.foldLeft[Validated[String, (Situation, List[Action])]](valid(situation -> Nil)) {
             case (Validated.Valid((sit, moves)), uci: Uci.Move) =>
               sit.move(uci.orig, uci.dest, uci.promotion).leftMap(e => s"ply $ply $e") map { move =>
@@ -100,18 +97,16 @@ private object UciToPgn {
                 ca.situationAfter -> (ca :: moves)
               }
             case (failure, _) => failure
-          }
-      } yield moves._2.reverse map (Dumper(logic, _))
+          }.map(_._2.reverse.map(Dumper(logic, _)))
+        }
+      }
 
-    onlyMeaningfulVariations.foldLeft[WithErrors[List[Info]]]((Nil, Nil)) {
+    onlyMeaningfulVariations.foldLeft[WithErrors[List[Info]]]((Nil, Nil)):
       case ((infos, errs), info) if info.variation.isEmpty => (info :: infos, errs)
       case ((infos, errs), info) =>
         uciToPgn(info.ply, info.variation.flatten.toList).fold(
           err => (info.dropVariation :: infos, LilaException(err) :: errs),
           pgn => (info.copy(variation = Vector(pgn)) :: infos, errs)
         )
-    } match {
+    match
       case (infos, errors) => analysis.copy(infos = infos.reverse) -> errors
-    }
-  }
-}

@@ -1,12 +1,12 @@
 package lila.fishnet
 
-import strategygames.format.{ FEN, Forsyth, Uci }
-import strategygames.{ GameLogic, Replay }
+import strategygames.format.{ Forsyth, Uci }
+import strategygames.Replay
 import JsonApi.Request.Evaluation
 
 final private class FishnetEvalCache(
     evalCacheApi: lila.evalCache.EvalCacheApi
-)(implicit ec: scala.concurrent.ExecutionContext) {
+)(implicit ec: scala.concurrent.ExecutionContext):
 
   val maxPlies = 15
 
@@ -15,7 +15,7 @@ final private class FishnetEvalCache(
     rawEvals(game).dmap(_.map(_._1))
 
   def evals(work: Work.Analysis): Fu[Map[Int, Evaluation[Uci]]] =
-    rawEvals(work.game) map {
+    rawEvals(work.game) map:
       _.map { case (i, eval) =>
         val pv = eval.pvs.head
         i -> Evaluation[Uci](
@@ -32,7 +32,6 @@ final private class FishnetEvalCache(
           depth = eval.depth.some
         )
       }.toMap
-    }
 
   private def rawEvals(game: Work.Game): Fu[List[(Int, lila.evalCache.EvalCacheEntry.Eval)]] =
     Replay
@@ -53,4 +52,3 @@ final private class FishnetEvalCache(
             })
             .map(_.flatten)
       )
-}

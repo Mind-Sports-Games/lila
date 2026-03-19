@@ -10,7 +10,7 @@ final private class TeamSocket(
 )(implicit
     ec: scala.concurrent.ExecutionContext,
     mode: play.api.Mode
-) {
+):
 
   lazy val rooms = makeRoomMap(send)
 
@@ -23,14 +23,13 @@ final private class TeamSocket(
       logger,
       roomId => _.Team(roomId.value).some,
       localTimeout = Some { (roomId, modId, suspectId) =>
-        cached.isLeader(roomId.value, modId) >>& !cached.isLeader(roomId.value, suspectId)
+        cached.isLeader(roomId.value, modId) >>& cached.isLeader(roomId.value, suspectId).not
       },
       chatBusChan = _.Team
     )
 
-  private lazy val send: String => Unit = remoteSocketApi.makeSender("team-out").apply _
+  private lazy val send: String => Unit = remoteSocketApi.makeSender("team-out").apply
 
   remoteSocketApi.subscribe("team-in", RP.In.reader)(
     handler orElse remoteSocketApi.baseHandler
   ).andDo(send(P.Out.boot))
-}

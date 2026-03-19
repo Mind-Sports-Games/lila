@@ -7,7 +7,7 @@ import strategygames.{ Player => PlayerIndex }
 final class GameProxyRepo(
     gameRepo: lila.game.GameRepo,
     roundSocket: RoundSocket
-)(implicit ec: scala.concurrent.ExecutionContext) {
+)(implicit ec: scala.concurrent.ExecutionContext):
 
   def game(gameId: Game.ID): Fu[Option[Game]] = Game.validId(gameId) so roundSocket.getGame(gameId)
 
@@ -20,23 +20,23 @@ final class GameProxyRepo(
   def pov(fullId: Game.ID): Fu[Option[Pov]] = pov(PlayerRef(fullId))
 
   def pov(playerRef: PlayerRef): Fu[Option[Pov]] =
-    game(playerRef.gameId) dmap { _ flatMap { _ playerIdPov playerRef.playerId } }
+    game(playerRef.gameId) dmap { _ flatMap { _ `playerIdPov` playerRef.playerId } }
 
-  def gameIfPresent(gameId: Game.ID): Fu[Option[Game]] = roundSocket gameIfPresent gameId
+  def gameIfPresent(gameId: Game.ID): Fu[Option[Game]] = roundSocket `gameIfPresent` gameId
 
   // get the proxied version of the game
   def upgradeIfPresent(game: Game): Fu[Game] =
     if (game.finishedOrAborted) fuccess(game)
-    else roundSocket upgradeIfPresent game
+    else roundSocket `upgradeIfPresent` game
 
   def upgradeIfPresent(pov: Pov): Fu[Pov] =
-    upgradeIfPresent(pov.game).dmap(_ pov pov.playerIndex)
+    upgradeIfPresent(pov.game).dmap(_ `pov` pov.playerIndex)
 
   def upgradeIfPresent(games: List[Game]): Fu[List[Game]] =
     Future.sequence(games.map(upgradeIfPresent))
 
   // update the proxied game
-  def updateIfPresent = roundSocket.updateIfPresent _
+  def updateIfPresent = roundSocket.updateIfPresent
 
   def povIfPresent(gameId: Game.ID, playerIndex: PlayerIndex): Fu[Option[Pov]] =
     gameIfPresent(gameId) dmap2 { Pov(_, playerIndex) }
@@ -44,17 +44,15 @@ final class GameProxyRepo(
   def povIfPresent(fullId: Game.ID): Fu[Option[Pov]] = povIfPresent(PlayerRef(fullId))
 
   def povIfPresent(playerRef: PlayerRef): Fu[Option[Pov]] =
-    gameIfPresent(playerRef.gameId) dmap { _ flatMap { _ playerIdPov playerRef.playerId } }
+    gameIfPresent(playerRef.gameId) dmap { _ flatMap { _ `playerIdPov` playerRef.playerId } }
 
   def urgentGames(user: lila.user.User): Fu[List[Pov]] =
-    gameRepo urgentPovsUnsorted user flatMap {
+    gameRepo `urgentPovsUnsorted` user flatMap:
       povs =>
         Future.sequence(povs.map { pov =>
           gameIfPresent(pov.gameId) dmap { _.fold(pov)(pov.withGame) }
         }) map { povs =>
-        try {
+        try
           povs sortWith Pov.priority
-        } catch { case _: IllegalArgumentException => povs.sortBy(-_.game.updatedAt.getSeconds) }
+        catch { case _: IllegalArgumentException => povs.sortBy(-_.game.updatedAt.getMillis / 1000) }
       }
-    }
-}

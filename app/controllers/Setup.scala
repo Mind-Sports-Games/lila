@@ -75,7 +75,7 @@ final class Setup(
       PostRateLimit(HTTPRequest ipAddress ctx.req) {
         NoPlaybanOrCurrent {
           forms
-            .game(ctx)
+            .game(using ctx)
             .bindFromRequest()
             .fold(
               err =>
@@ -186,7 +186,7 @@ final class Setup(
         PostRateLimit(HTTPRequest ipAddress ctx.req) {
           NoPlaybanOrCurrent {
             forms
-              .hook(ctx)
+              .hook(using ctx)
               .bindFromRequest()
               .fold(
                 jsonFormError,
@@ -237,7 +237,7 @@ final class Setup(
   )
   def boardApiHook =
     ScopedBody(_.Board.Play) { implicit req => me =>
-      implicit val lang = reqLang
+      implicit val lang: play.api.i18n.Lang = reqLang
       if (me.isBot) notForBotAccounts.fuccess
       else
         forms.boardApiHook

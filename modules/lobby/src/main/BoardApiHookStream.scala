@@ -9,14 +9,14 @@ import lila.common.Bus
 
 final class BoardApiHookStream(
     trouper: LobbyTrouper
-)(implicit ec: scala.concurrent.ExecutionContext, system: ActorSystem) {
+)(implicit ec: scala.concurrent.ExecutionContext, system: ActorSystem):
 
   private case object SetOnline
 
   private val blueprint =
-    Source.queue[Option[JsObject]](16, akka.stream.OverflowStrategy.dropHead)
+    Source.queue[Option[JsObject]](16, org.apache.pekko.stream.OverflowStrategy.dropHead)
 
-  def apply(hook: Hook): Source[Option[JsObject], _] =
+  def apply(hook: Hook): Source[Option[JsObject], ?] =
     blueprint mapMaterializedValue { queue =>
       val actor = system.actorOf(Props(mkActor(hook, queue)))
       queue.watchCompletion().foreach { _ =>
@@ -25,36 +25,30 @@ final class BoardApiHookStream(
     }
 
   private def mkActor(hook: Hook, queue: SourceQueueWithComplete[Option[JsObject]]) =
-    new Actor {
+    new Actor:
 
       val classifiers = List(s"hookRemove:${hook.id}")
 
-      override def preStart(): Unit = {
+      override def preStart(): Unit =
         super.preStart()
         Bus.subscribe(self, classifiers)
         trouper ! actorApi.AddHook(hook)
-      }
 
-      override def postStop() = {
+      override def postStop() =
         super.postStop()
         Bus.unsubscribe(self, classifiers)
         trouper ! actorApi.CancelHook(hook.sri)
         queue.complete()
-      }
 
       self ! SetOnline
 
-      def receive = {
+      def receive =
 
         case actorApi.RemoveHook(_) => self ! PoisonPill
 
         case SetOnline =>
           val _ = context.system.scheduler
-            .scheduleOnce(3 second) {
+            .scheduleOnce(3 second):
               // gotta send a message to check if the client has disconnected
               queue offer None
               self ! SetOnline
-            }
-      }
-    }
-}

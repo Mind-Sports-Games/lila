@@ -19,33 +19,30 @@ final class StringToken[A](
 )(implicit
     ec: scala.concurrent.ExecutionContext,
     serializer: StringToken.Serializable[A]
-) {
+):
 
   def make(payload: A) =
     hashCurrentValue(payload) map { hashedValue =>
-      val signed   = signPayload(serializer write payload, hashedValue)
+      val signed   = signPayload(serializer `write` payload, hashedValue)
       val checksum = makeHash(signed)
       val token    = s"$signed$separator$checksum"
-      base64 encode token
+      base64 `encode` token
     }
 
   def read(token: String): Fu[Option[A]] =
-    (base64 decode token) so {
-      _ split separator match {
+    (base64 `decode` token) so:
+      _ split separator match
         case Array(payloadStr, hashed, checksum) =>
           BCrypt.bytesEqualSecure(
             makeHash(signPayload(payloadStr, hashed)).getBytes("utf-8"),
             checksum.getBytes("utf-8")
-          ) so {
-            val payload = serializer read payloadStr
+          ) so:
+            val payload = serializer `read` payloadStr
             (valueChecker match {
               case ValueChecker.Same      => hashCurrentValue(payload) map (hashed ==)
               case ValueChecker.Custom(f) => f(hashed)
-            }) map { _ option payload }
-          }
+            }) map { _ `option` payload }
         case _ => fuccess(none)
-      }
-    }
 
   private def makeHash(msg: String) = Algo.hmac(secret.value).sha256(msg).hex take fullHashSize
 
@@ -55,28 +52,22 @@ final class StringToken[A](
     }
 
   private def signPayload(payloadStr: String, hashedValue: String) = s"$payloadStr$separator$hashedValue"
-}
 
-object StringToken {
+object StringToken:
 
-  trait Serializable[A] {
+  trait Serializable[A]:
     def read(str: String): A
     def write(a: A): String
-  }
 
-  implicit final val stringSerializable: Serializable[String] = new Serializable[String] {
+  implicit final val stringSerializable: Serializable[String] = new Serializable[String]:
     def read(str: String) = str
     def write(a: String)  = a
-  }
 
   sealed trait ValueChecker
-  object ValueChecker {
+  object ValueChecker:
     case object Same                            extends ValueChecker
     case class Custom(f: String => Fu[Boolean]) extends ValueChecker
-  }
 
-  object DateStr {
+  object DateStr:
     def toStr(date: DateTime) = date.getMillis.toString
     def toDate(str: String)   = str.toLongOption map { new DateTime(_) }
-  }
-}

@@ -1,6 +1,6 @@
 package lila.lobby
 
-import strategygames.{ Game => StratGame, P1, P2, Situation }
+import strategygames.{ Game => StratGame, Situation }
 
 import actorApi.{ JoinHook, JoinSeek }
 import lila.game.{ Game, PerfPicker, Player }
@@ -13,7 +13,7 @@ final private class Biter(
 )(implicit
     ec: scala.concurrent.ExecutionContext,
     idGenerator: lila.game.IdGenerator
-) {
+):
 
   def apply(hook: Hook, sri: Sri, user: Option[LobbyUser]): Fu[JoinHook] =
     if (canJoin(hook, user)) join(hook, sri, user)
@@ -33,23 +33,22 @@ final private class Biter(
         p1User = creatorPlayerIndex.fold(ownerOption, userOption),
         p2User = creatorPlayerIndex.fold(userOption, ownerOption)
       ).withUniqueId
-      _ <- gameRepo insertDenormalized game
-    } yield {
+      _ <- gameRepo `insertDenormalized` game
+    } yield
       lila.mon.lobby.hook.join.increment()
       JoinHook(sri, hook, game, creatorPlayerIndex)
-    }
 
   private def join(seek: Seek, lobbyUser: LobbyUser): Fu[JoinSeek] =
     for {
-      user               <- userRepo byId lobbyUser.id orFail s"No such user: ${lobbyUser.id}"
-      owner              <- userRepo byId seek.user.id orFail s"No such user: ${seek.user.id}"
+      user               <- userRepo `byId` lobbyUser.id `orFail` s"No such user: ${lobbyUser.id}"
+      owner              <- userRepo `byId` seek.user.id `orFail` s"No such user: ${seek.user.id}"
       creatorPlayerIndex <- assignCreatorPlayerIndex(owner.some, user.some, seek.realPlayerIndex)
       game <- makeGame(
         seek,
         p1User = creatorPlayerIndex.fold(owner.some, user.some),
         p2User = creatorPlayerIndex.fold(user.some, owner.some)
       ).withUniqueId
-      _ <- gameRepo insertDenormalized game
+      _ <- gameRepo `insertDenormalized` game
     } yield JoinSeek(user.id, seek, game, creatorPlayerIndex)
 
   private def assignCreatorPlayerIndex(
@@ -57,14 +56,13 @@ final private class Biter(
       joinerUser: Option[User],
       playerIndex: PlayerIndex
   ): Fu[strategygames.Player] =
-    playerIndex match {
+    playerIndex match
       case PlayerIndex.Random =>
         userRepo.firstGetsP1(creatorUser.map(_.id), joinerUser.map(_.id)) map strategygames.Player.fromP1
       case PlayerIndex.P1 => fuccess(strategygames.P1)
       case PlayerIndex.P2 => fuccess(strategygames.P2)
-    }
 
-  private def makeGame(hook: Hook, p1User: Option[User], p2User: Option[User]) = {
+  private def makeGame(hook: Hook, p1User: Option[User], p2User: Option[User]) =
     val clock      = hook.clock.toClock
     val perfPicker = PerfPicker.mainOrDefault(strategygames.Speed(clock.config), hook.realVariant, none)
     val stratSit   = Situation(hook.realVariant.gameLogic, hook.realVariant)
@@ -87,9 +85,8 @@ final private class Biter(
         pgnImport = None
       )
       .start
-  }
 
-  private def makeGame(seek: Seek, p1User: Option[User], p2User: Option[User]) = {
+  private def makeGame(seek: Seek, p1User: Option[User], p2User: Option[User]) =
     val perfPicker = PerfPicker.mainOrDefault(strategygames.Speed(none), seek.realVariant, seek.daysPerTurn)
     val stratSit   = Situation(seek.realVariant.gameLogic, seek.realVariant)
     Game
@@ -112,7 +109,6 @@ final private class Biter(
         pgnImport = None
       )
       .start
-  }
 
   def canJoin(hook: Hook, user: Option[LobbyUser]): Boolean =
     hook.isAuth == user.isDefined && user.fold(true) { u =>
@@ -136,4 +132,3 @@ final private class Biter(
 
   def showHookTo(hook: Hook, member: LobbySocket.Member): Boolean =
     hook.sri == member.sri || canJoin(hook, member.user)
-}

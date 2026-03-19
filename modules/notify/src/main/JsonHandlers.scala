@@ -8,12 +8,12 @@ import lila.common.Json.jodaWrites
 import play.api.i18n.Lang
 import lila.i18n.JsDump
 
-final class JSONHandlers(getLightUser: LightUser.GetterSync) {
+final class JSONHandlers(getLightUser: LightUser.GetterSync):
 
-  implicit val notificationWrites: Writes[Notification] = new Writes[Notification] {
+  implicit val notificationWrites: Writes[Notification] = new Writes[Notification]:
 
-    private def writeBody(notificationContent: NotificationContent) = {
-      notificationContent match {
+    private def writeBody(notificationContent: NotificationContent) =
+      notificationContent match
         case MentionedInThread(mentionedBy, topic, _, category, postId) =>
           Json.obj(
             "mentionedBy" -> getLightUser(mentionedBy.value),
@@ -72,8 +72,6 @@ final class JSONHandlers(getLightUser: LightUser.GetterSync) {
             "text"  -> text,
             "icon"  -> icon
           )
-      }
-    }
 
     def writes(notification: Notification) =
       Json.obj(
@@ -82,7 +80,6 @@ final class JSONHandlers(getLightUser: LightUser.GetterSync) {
         "read"    -> notification.read.value,
         "date"    -> notification.createdAt
       )
-  }
 
   import lila.common.paginator.PaginatorJson._
   implicit val unreadWrites: Writes[Notification.UnreadCount] = Writes[Notification.UnreadCount] { v =>
@@ -122,4 +119,3 @@ final class JSONHandlers(getLightUser: LightUser.GetterSync) {
     andUnreadWrites.writes(notify) ++ Json.obj(
       "i18n" -> JsDump.keysToObject(i18nKeys, lang)
     )
-}

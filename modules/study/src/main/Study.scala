@@ -19,7 +19,7 @@ case class Study(
     topics: Option[StudyTopics] = None,
     createdAt: DateTime,
     updatedAt: DateTime
-) {
+):
 
   import Study._
 
@@ -29,7 +29,7 @@ case class Study(
 
   def isOwner(id: User.ID) = ownerId == id
 
-  def isMember(id: User.ID) = members contains id
+  def isMember(id: User.ID) = members `contains` id
 
   def canChat(id: User.ID) = Settings.UserSelection.allows(settings.chat, this, id.some)
 
@@ -47,11 +47,11 @@ case class Study(
   def isUnlisted = visibility == Study.Visibility.Unlisted
   def isPrivate  = visibility == Study.Visibility.Private
 
-  def isNew = (nowSeconds - createdAt.getSeconds) < 4
+  def isNew = (nowSeconds - (createdAt.getMillis / 1000)) < 4
 
-  def isOld = (nowSeconds - updatedAt.getSeconds) > 20 * 60
+  def isOld = (nowSeconds - (updatedAt.getMillis / 1000)) > 20 * 60
 
-  def cloneFor(user: User): Study = {
+  def cloneFor(user: User): Study =
     val owner = StudyMember(id = user.id, role = StudyMember.Role.Write)
     copy(
       _id = Study.makeId,
@@ -63,7 +63,6 @@ case class Study(
       createdAt = DateTime.now,
       updatedAt = DateTime.now
     )
-  }
 
   def nbMembers = members.members.size
 
@@ -77,9 +76,8 @@ case class Study(
     copy(
       topics = topics.fold(ts)(_ ++ ts).some
     )
-}
 
-object Study {
+object Study:
 
   val maxChapters = 64
 
@@ -89,46 +87,40 @@ object Study {
   case class Name(value: String) extends AnyVal with StringValue
   implicit val nameIso: Iso.StringIso[Name] = lila.common.Iso.string[Name](Name.apply, _.value)
 
-  case class IdName(_id: Id, name: Name) {
+  case class IdName(_id: Id, name: Name):
     def id = _id
-  }
 
   def toName(str: String) = Name(str.trim take 100)
 
-  sealed trait Visibility {
+  sealed trait Visibility:
     lazy val key = toString.toLowerCase
-  }
-  object Visibility {
+  object Visibility:
     case object Private  extends Visibility
     case object Unlisted extends Visibility
     case object Public   extends Visibility
     val byKey = List(Private, Unlisted, Public).map { v =>
       v.key -> v
     }.toMap
-  }
 
   case class Likes(value: Int) extends AnyVal
   case class Liking(likes: Likes, me: Boolean)
   val emptyLiking = Liking(Likes(0), me = false)
 
   case class Rank(value: DateTime) extends AnyVal
-  object Rank {
+  object Rank:
     def compute(likes: Likes, createdAt: DateTime) =
-      Rank {
-        createdAt plusHours likesToHours(likes)
-      }
+      Rank:
+        createdAt `plusHours` likesToHours(likes)
     private def likesToHours(likes: Likes): Int =
       if (likes.value < 1) 0
       else (5 * math.log(likes.value) + 1).toInt.min(likes.value) * 24
-  }
 
   sealed trait From
-  object From {
+  object From:
     case object Scratch                      extends From
     case class Game(id: String)              extends From
     case class Study(id: Id)                 extends From
     case class Relay(clonedFrom: Option[Id]) extends From
-  }
 
   case class Data(
       name: String,
@@ -139,7 +131,7 @@ object Study {
       chat: String,
       sticky: String,
       description: String
-  ) {
+  ):
     import Settings._
     def vis = Visibility.byKey.getOrElse(visibility, Visibility.Public)
     def settings =
@@ -151,7 +143,6 @@ object Study {
         stic = sticky == "true"
         desc = description == "true"
       } yield Settings(comp, expl, clon, chat, stic, desc)
-  }
 
   case class WithChapter(study: Study, chapter: Chapter)
 
@@ -167,7 +158,7 @@ object Study {
 
   val idSize = 8
 
-  def makeId = Id(lila.common.ThreadLocalRandom nextString idSize)
+  def makeId = Id(lila.common.ThreadLocalRandom `nextString` idSize)
 
   def make(
       user: User,
@@ -175,7 +166,7 @@ object Study {
       id: Option[Study.Id] = None,
       name: Option[Name] = None,
       settings: Option[Settings] = None
-  ) = {
+  ) =
     val owner = StudyMember(id = user.id, role = StudyMember.Role.Write)
     Study(
       _id = id | makeId,
@@ -190,5 +181,3 @@ object Study {
       createdAt = DateTime.now,
       updatedAt = DateTime.now
     )
-  }
-}

@@ -1,6 +1,5 @@
 package lila.practice
 
-import scala.concurrent.duration._
 import reactivemongo.api.ReadPreference
 
 import lila.common.Bus
@@ -14,7 +13,7 @@ final class PracticeApi(
     configStore: lila.memo.ConfigStore[PracticeConfig],
     cacheApi: lila.memo.CacheApi,
     studyApi: lila.study.StudyApi
-)(implicit ec: scala.concurrent.ExecutionContext) {
+)(implicit ec: scala.concurrent.ExecutionContext):
 
   import BSONHandlers._
 
@@ -28,8 +27,8 @@ final class PracticeApi(
     for {
       up       <- get(user)
       chapters <- studyApi.chapterMetadatas(studyId)
-      chapter = up.progress firstOngoingIn chapters
-      studyOption <- chapter.fold(studyApi byIdWithFirstChapter studyId) { chapter =>
+      chapter = up.progress `firstOngoingIn` chapters
+      studyOption <- chapter.fold(studyApi `byIdWithFirstChapter` studyId) { chapter =>
         studyApi.byIdWithChapter(studyId, chapter.id)
       }
     } yield makeUserStudy(studyOption, up, chapters)
@@ -56,22 +55,21 @@ final class PracticeApi(
         study = rawSc.study.rewindTo(rawSc.chapter).withoutMembers,
         chapter = rawSc.chapter.withoutChildrenIfPractice
       )
-      practiceStudy <- up.structure study sc.study.id
-      section       <- up.structure findSection sc.study.id
+      practiceStudy <- up.structure `study` sc.study.id
+      section       <- up.structure `findSection` sc.study.id
       publishedChapters = chapters.filterNot { c =>
-        PracticeStructure isChapterNameCommented c.name
+        PracticeStructure `isChapterNameCommented` c.name
       }
       if publishedChapters.exists(_.id == sc.chapter.id)
     } yield UserStudy(up, practiceStudy, publishedChapters, sc, section)
 
-  object config {
-    def get  = configStore.get dmap (_ | PracticeConfig.empty)
-    def set  = configStore.set _
+  object config:
+    def get  = configStore.get `dmap` (_ | PracticeConfig.empty)
+    def set  = configStore.set
     def form = configStore.makeForm
-  }
 
-  object structure {
-    private val cache = cacheApi.unit[PracticeStructure] {
+  object structure:
+    private val cache = cacheApi.unit[PracticeStructure]:
       _.expireAfterAccess(3.hours)
         .buildAsyncFuture { _ =>
           for {
@@ -79,7 +77,6 @@ final class PracticeApi(
             chapters <- studyApi.chapterIdNames(conf.studyIds)
           } yield PracticeStructure.make(conf, chapters)
         }
-    }
 
     def get     = cache.getUnit
     def clear() = cache.invalidateUnit()
@@ -87,16 +84,14 @@ final class PracticeApi(
       get foreach { structure =>
         if (structure.hasStudy(study.id)) clear()
       }
-  }
 
-  object progress {
+  object progress:
 
     import PracticeProgress.NbMoves
 
     def get(user: User): Fu[PracticeProgress] =
-      coll.one[PracticeProgress]($id(user.id)) dmap {
+      coll.one[PracticeProgress]($id(user.id)) dmap:
         _ | PracticeProgress.empty(PracticeProgress.Id(user.id))
-      }
 
     private def save(p: PracticeProgress): Funit =
       coll.update.one($id(p.id), p, upsert = true).void
@@ -119,7 +114,7 @@ final class PracticeApi(
         .aggregateWith[Bdoc](readPreference = ReadPreference.secondaryPreferred) { framework =>
           import framework._
           List(
-            Match($doc("_id" $in userIds)),
+            Match($doc("_id" `$in` userIds)),
             Project(
               $doc(
                 "nb" -> $doc(
@@ -132,13 +127,10 @@ final class PracticeApi(
           )
         }
         .collect[List](maxDocs = Int.MaxValue)
-        .map {
+        .map:
           _.view.flatMap { obj =>
             import cats.implicits._
             (obj.string("_id"), obj.int("nb")) mapN { (k, v) =>
               k -> (v * 100f / PracticeStructure.totalChapters).toInt
             }
           }.toMap
-        }
-  }
-}

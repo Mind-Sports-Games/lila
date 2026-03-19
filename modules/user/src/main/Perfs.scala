@@ -70,7 +70,7 @@ case class Perfs(
     storm: Perf.Storm,
     racer: Perf.Racer,
     streak: Perf.Streak
-) {
+):
 
   def perfs =
     List(
@@ -136,30 +136,27 @@ case class Perfs(
 
   private def fullPerfsMap: Map[String, Perf] = perfs.toMap
 
-  def bestPerf: Option[(PerfType, Perf)] = {
+  def bestPerf: Option[(PerfType, Perf)] =
     val ps = PerfType.nonPuzzle map { pt =>
       pt -> apply(pt)
     }
     val minNb = math.max(1, ps.foldLeft(0)(_ + _._2.nb) / 10)
-    ps.foldLeft(none[(PerfType, Perf)]) {
+    ps.foldLeft(none[(PerfType, Perf)]):
       case (ro, p) if p._2.nb >= minNb =>
         ro.fold(p.some) { r =>
           Some(if (p._2.intRating > r._2.intRating) p else r)
         }
       case (ro, _) => ro
-    }
-  }
 
   implicit private val ratingOrdering: Ordering[(PerfType, Perf)] =
     Ordering.by[(PerfType, Perf), Int](_._2.intRating)
 
-  def bestPerfs(nb: Int): List[(PerfType, Perf)] = {
+  def bestPerfs(nb: Int): List[(PerfType, Perf)] =
     val ps = PerfType.nonPuzzle map { pt =>
       pt -> apply(pt)
     }
     val minNb = math.max(1, ps.foldLeft(0)(_ + _._2.nb) / 15)
     ps.filter(p => p._2.nb >= minNb).topN(nb)
-  }
 
   def bestPerfType: Option[PerfType] = bestPerf.map(_._1)
 
@@ -167,11 +164,10 @@ case class Perfs(
 
   def bestStandardRating: Int = bestRatingIn(PerfType.standard)
 
-  def bestRatingIn(types: List[PerfType]): Int = {
-    val ps = types map apply match {
+  def bestRatingIn(types: List[PerfType]): Int =
+    val ps = types map apply match
       case Nil => List(standard)
       case x   => x
-    }
     val minNb = ps.foldLeft(0)(_ + _.nb) / 10
     ps.foldLeft(none[Int]) {
       case (ro, p) if p.nb >= minNb =>
@@ -180,13 +176,11 @@ case class Perfs(
         }
       case (ro, _) => ro
     } | Perf.default.intRating
-  }
 
   def bestRatingInWithMinGames(types: List[PerfType], nbGames: Int): Option[Int] =
-    types.map(apply).foldLeft(none[Int]) {
+    types.map(apply).foldLeft(none[Int]):
       case (ro, p) if p.nb >= nbGames && ro.fold(true)(_ < p.intRating) => p.intRating.some
       case (ro, _)                                                      => ro
-    }
 
   def bestProgress: Int = bestProgressIn(PerfType.leaderboardable)
 
@@ -295,23 +289,20 @@ case class Perfs(
     )
 
   def latest: Option[DateTime] =
-    perfsMap.values.flatMap(_.latest).foldLeft(none[DateTime]) {
+    perfsMap.values.flatMap(_.latest).foldLeft(none[DateTime]):
       case (None, date)                          => date.some
-      case (Some(acc), date) if date isAfter acc => date.some
+      case (Some(acc), date) if date `isAfter` acc => date.some
       case (acc, _)                              => acc
-    }
 
   // Lichess use this but we dont due to not having high level puzzles and also many puzzle variants.
-  def dubiousPuzzle = {
+  def dubiousPuzzle =
     puzzle_standard.glicko.rating > 3000 && !standard.glicko.establishedIntRating.exists(_ > 2100)
-  }
-}
 
 case class PerfLens(get: Perfs => Perf, set: (Perfs, Perf) => Perfs)
 
-case object Perfs {
+case object Perfs:
 
-  val default = {
+  val default =
     val p = Perf.default
     Perfs(
       p,
@@ -376,9 +367,8 @@ case object Perfs {
       Perf.Racer.default,
       Perf.Streak.default
     )
-  }
 
-  val defaultManaged = {
+  val defaultManaged =
     val managed       = Perf.defaultManaged
     val managedPuzzle = Perf.defaultManagedPuzzle
     default.copy(
@@ -395,10 +385,9 @@ case object Perfs {
       puzzle_racingKings = managedPuzzle,
       puzzle_linesOfAction = managedPuzzle
     )
-  }
 
   def variantLens(variant: Variant): Option[Perfs => Perf] =
-    variant match {
+    variant match
       case Variant.Chess(strategygames.chess.variant.Standard)               => Some(_.standard)
       case Variant.Chess(strategygames.chess.variant.Chess960)               => Some(_.chess960)
       case Variant.Chess(strategygames.chess.variant.KingOfTheHill)          => Some(_.kingOfTheHill)
@@ -447,10 +436,9 @@ case object Perfs {
       case Variant.Backgammon(strategygames.backgammon.variant.Nackgammon)       => Some(_.nackgammon)
       case Variant.Abalone(strategygames.abalone.variant.Abalone)                => Some(_.abalone)
       case _                                                                     => none
-    }
 
   def puzzleLens(variant: Variant): Option[PerfLens] =
-    variant match {
+    variant match
       case Variant.Chess(strategygames.chess.variant.Standard) =>
         Some(PerfLens(_.puzzle_standard, (p, v) => p.copy(puzzle_standard = v)))
       case Variant.Chess(strategygames.chess.variant.KingOfTheHill) =>
@@ -464,23 +452,21 @@ case object Perfs {
       case Variant.Chess(strategygames.chess.variant.LinesOfAction) =>
         Some(PerfLens(_.puzzle_linesOfAction, (p, v) => p.copy(puzzle_linesOfAction = v)))
       case _ => None
-    }
 
   def speedLens(speed: Speed): Perfs => Perf =
-    speed match {
+    speed match
       case Speed.Bullet         => perfs => perfs.bullet
       case Speed.Blitz          => perfs => perfs.blitz
       case Speed.Rapid          => perfs => perfs.rapid
       case Speed.Classical      => perfs => perfs.classical
       case Speed.Correspondence => perfs => perfs.correspondence
       case Speed.UltraBullet    => perfs => perfs.ultraBullet
-    }
 
-  val perfsBSONHandler = new BSON[Perfs] {
+  val perfsBSONHandler = new BSON[Perfs]:
 
     implicit def perfHandler: BSON[Perf] = Perf.perfBSONHandler
 
-    def reads(r: BSON.Reader): Perfs = {
+    def reads(r: BSON.Reader): Perfs =
       @inline def perf(key: String) = r.getO[Perf](key) getOrElse Perf.default
       Perfs(
         standard = perf("standard"),
@@ -545,9 +531,8 @@ case object Perfs {
         racer = r.getO[Perf.Racer]("racer") getOrElse Perf.Racer.default,
         streak = r.getO[Perf.Streak]("streak") getOrElse Perf.Streak.default
       )
-    }
 
-    private def notNew(p: Perf): Option[Perf] = p.nonEmpty option p
+    private def notNew(p: Perf): Option[Perf] = p.nonEmpty `option` p
 
     def writes(w: BSON.Writer, o: Perfs) =
       reactivemongo.api.bson.BSONDocument(
@@ -609,11 +594,10 @@ case object Perfs {
         "puzzle_horde"           -> notNew(o.puzzle_horde),
         "puzzle_racingKings"     -> notNew(o.puzzle_racingKings),
         "puzzle_linesOfAction"   -> notNew(o.puzzle_linesOfAction),
-        "storm"                  -> (o.storm.nonEmpty option o.storm),
-        "racer"                  -> (o.racer.nonEmpty option o.racer),
-        "streak"                 -> (o.streak.nonEmpty option o.streak)
+        "storm"                  -> (o.storm.nonEmpty `option` o.storm),
+        "racer"                  -> (o.racer.nonEmpty `option` o.racer),
+        "streak"                 -> (o.streak.nonEmpty `option` o.streak)
       )
-  }
 
   case class Leaderboards(
       ultraBullet: List[User.LightPerf],
@@ -666,11 +650,10 @@ case object Perfs {
       hyper: List[User.LightPerf],
       nackgammon: List[User.LightPerf],
       abalone: List[User.LightPerf]
-  ) {
-    def forVariant(variant: Variant): List[User.LightPerf] = {
+  ):
+    def forVariant(variant: Variant): List[User.LightPerf] =
       val key = variant.key
       allLeaderboards.getOrElse(key, Nil)
-    }
 
     lazy val allLeaderboards: Map[String, List[User.LightPerf]] = Map(
       "standard"               -> blitz, // standard leaderboard is blitz
@@ -725,7 +708,6 @@ case object Perfs {
       "nackgammon"             -> nackgammon,
       "abalone"                -> abalone
     )
-  }
 
   val emptyLeaderboards = Leaderboards(
     Nil,
@@ -779,4 +761,3 @@ case object Perfs {
     Nil,
     Nil
   )
-}

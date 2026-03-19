@@ -9,7 +9,7 @@ import lila.user.{ User, UserRepo }
 final class UserSearch(
     securityApi: lila.security.SecurityApi,
     userRepo: UserRepo
-)(implicit ec: scala.concurrent.ExecutionContext) {
+)(implicit ec: scala.concurrent.ExecutionContext):
 
   def apply(query: UserSearch.Query): Fu[List[User.WithEmails]] =
     (~query.as match {
@@ -20,19 +20,17 @@ final class UserSearch(
     }) flatMap userRepo.withEmailsU
 
   private def searchIp(ip: IpAddress) =
-    securityApi recentUserIdsByIp ip map (_.reverse) flatMap userRepo.usersFromSecondary
+    securityApi `recentUserIdsByIp` ip map (_.reverse) flatMap userRepo.usersFromSecondary
 
-  private def searchUsername(username: String) = userRepo named username map (_.toList)
+  private def searchUsername(username: String) = userRepo `named` username map (_.toList)
 
-  private def searchEmail(email: EmailAddress): Fu[List[User]] = {
+  private def searchEmail(email: EmailAddress): Fu[List[User]] =
     val normalized = email.normalize
     userRepo.byEmail(normalized) flatMap { current =>
       userRepo.byPrevEmail(normalized) map current.toList.:::
     }
-  }
-}
 
-object UserSearch {
+object UserSearch:
 
   val asChoices = List(
     "exact" -> "Exact match over all users"
@@ -49,4 +47,3 @@ object UserSearch {
       "as" -> optional(nonEmptyText.verifying(asValues contains _))
     )(Query.apply)(d => Some((d.q, d.as)))
   )
-}

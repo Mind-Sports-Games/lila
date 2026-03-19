@@ -11,20 +11,19 @@ import scala.concurrent.Promise
 final class AskPipeline[A](compute: () => Fu[A], timeout: FiniteDuration, name: String)(implicit
     scheduler: org.apache.pekko.actor.Scheduler,
     ec: Executor
-) extends Trouper {
+) extends Trouper:
 
   private var state: State = Idle
 
-  protected val process: Trouper.Receive = {
+  protected val process: Trouper.Receive =
 
     case Get(promise) =>
-      state match {
+      state match
         case Idle =>
           startComputing()
           state = Processing(List(promise), Nil)
         case p @ Processing(_, next) =>
           state = p.copy(next = promise :: next)
-      }
 
     case Done(res) =>
       complete(Right(res))
@@ -32,7 +31,6 @@ final class AskPipeline[A](compute: () => Fu[A], timeout: FiniteDuration, name: 
     case Fail(err) =>
       lila.log("hub").warn(name, err)
       complete(Left(err))
-  }
 
   def get: Fu[A] = ask[A](Get.apply)
 
@@ -45,7 +43,7 @@ final class AskPipeline[A](compute: () => Fu[A], timeout: FiniteDuration, name: 
       )
 
   private def complete(res: Either[Exception, A]) =
-    state match {
+    state match
       case Idle => // ???
       case Processing(current, next) =>
         res.fold(
@@ -53,11 +51,9 @@ final class AskPipeline[A](compute: () => Fu[A], timeout: FiniteDuration, name: 
           res => current.foreach(_ success res)
         )
         if (next.isEmpty) state = Idle
-        else {
+        else
           startComputing()
           state = Processing(next, Nil)
-        }
-    }
 
   private case class Get(promise: Promise[A])
   private case class Done(result: A)
@@ -66,7 +62,6 @@ final class AskPipeline[A](compute: () => Fu[A], timeout: FiniteDuration, name: 
   sealed private trait State
   private case object Idle                                                         extends State
   private case class Processing(current: List[Promise[A]], next: List[Promise[A]]) extends State
-}
 
 // Distributes tasks to many pipelines
 final class AskPipelines[K, R](
@@ -78,7 +73,7 @@ final class AskPipelines[K, R](
     ec: Executor,
     scheduler: org.apache.pekko.actor.Scheduler,
     mode: play.api.Mode
-) {
+):
 
   def apply(key: K): Fu[R] = pipelines.get(key).get
 
@@ -87,4 +82,3 @@ final class AskPipelines[K, R](
       .scaffeine(mode)
       .expireAfterAccess(expiration)
       .build(key => new AskPipeline[R](() => compute(key), timeout, name = s"$name:$key"))
-}

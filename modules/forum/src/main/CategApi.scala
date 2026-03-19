@@ -4,19 +4,19 @@ import lila.common.paginator._
 import lila.db.dsl._
 import lila.user.User
 
-final class CategApi(env: Env)(implicit ec: scala.concurrent.ExecutionContext) {
+final class CategApi(env: Env)(implicit ec: scala.concurrent.ExecutionContext):
 
   import BSONHandlers._
 
   def list(teams: Iterable[String], forUser: Option[User]): Fu[List[CategView]] =
     for {
-      categs <- env.categRepo withTeams teams
+      categs <- env.categRepo `withTeams` teams
       views <- Future.sequence(categs map { categ =>
-        env.postApi get (categ lastPostId forUser) map { topicPost =>
+        env.postApi `get` (categ `lastPostId` forUser) map { topicPost =>
           CategView(
             categ,
             topicPost map { case (topic, post) =>
-              (topic, post, env.postApi lastPageOf topic)
+              (topic, post, env.postApi `lastPageOf` topic)
             },
             forUser
           )
@@ -24,7 +24,7 @@ final class CategApi(env: Env)(implicit ec: scala.concurrent.ExecutionContext) {
       })
     } yield views
 
-  def makeTeam(slug: String, name: String): Funit = {
+  def makeTeam(slug: String, name: String): Funit =
     val categ = Categ(
       _id = teamSlug(slug),
       name = name,
@@ -60,25 +60,23 @@ final class CategApi(env: Env)(implicit ec: scala.concurrent.ExecutionContext) {
     )
     env.categRepo.coll.insert.one(categ).void >>
       env.postRepo.coll.insert.one(post).void >>
-      env.topicRepo.coll.insert.one(topic withPost post).void >>
+      env.topicRepo.coll.insert.one(topic `withPost` post).void >>
       env.categRepo.coll.update.one($id(categ.id), categ.withPost(topic, post)).void
-  }
 
   def show(slug: String, page: Int, forUser: Option[User]): Fu[Option[(Categ, Paginator[TopicView])]] =
-    env.categRepo bySlug slug flatMap {
+    env.categRepo `bySlug` slug flatMap:
       _ so { categ =>
         env.topicApi.paginator(categ, page, forUser) dmap { (categ, _).some }
       }
-    }
 
   def denormalize(categ: Categ): Funit =
     for {
-      nbTopics      <- env.topicRepo countByCateg categ
-      nbPosts       <- env.postRepo countByCateg categ
-      lastPost      <- env.postRepo lastByCateg categ
-      nbTopicsTroll <- env.topicRepo.unsafe countByCateg categ
-      nbPostsTroll  <- env.postRepo.unsafe countByCateg categ
-      lastPostTroll <- env.postRepo.unsafe lastByCateg categ
+      nbTopics      <- env.topicRepo `countByCateg` categ
+      nbPosts       <- env.postRepo `countByCateg` categ
+      lastPost      <- env.postRepo `lastByCateg` categ
+      nbTopicsTroll <- env.topicRepo.unsafe `countByCateg` categ
+      nbPostsTroll  <- env.postRepo.unsafe `countByCateg` categ
+      lastPostTroll <- env.postRepo.unsafe `lastByCateg` categ
       _ <-
         env.categRepo.coll.update
           .one(
@@ -94,4 +92,3 @@ final class CategApi(env: Env)(implicit ec: scala.concurrent.ExecutionContext) {
           )
           .void
     } yield ()
-}

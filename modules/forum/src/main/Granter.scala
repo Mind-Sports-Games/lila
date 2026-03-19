@@ -3,7 +3,7 @@ package lila.forum
 import lila.security.{ Permission, Granter => Master }
 import lila.user.{ User, UserContext }
 
-trait Granter {
+trait Granter:
 
   protected def userBelongsToTeam(teamId: String, userId: String): Fu[Boolean]
   protected def userOwnsTeam(teamId: String, userId: String): Fu[Boolean]
@@ -24,8 +24,6 @@ trait Granter {
     if (ctx.me so Master(Permission.ModerateForum)) fuTrue
     else
       Categ.slugToTeamId(categSlug) so { teamId =>
-        ctx.userId so {
+        ctx.userId so:
           userOwnsTeam(teamId, _)
-        }
       }
-}

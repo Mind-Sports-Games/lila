@@ -1,7 +1,6 @@
 package lila.history
 
 import play.api.libs.json._
-import scala.concurrent.duration._
 
 import lila.rating.PerfType
 import lila.user.{ User, UserRepo }
@@ -11,11 +10,11 @@ final class RatingChartApi(
     historyApi: HistoryApi,
     userRepo: UserRepo,
     cacheApi: lila.memo.CacheApi
-)(implicit ec: scala.concurrent.ExecutionContext) {
+)(implicit ec: scala.concurrent.ExecutionContext):
 
   def apply(user: User): Fu[Option[String]] =
     cache.get(user.id) dmap { chart =>
-      chart.nonEmpty option chart
+      chart.nonEmpty `option` chart
     }
 
   def singlePerf(user: User, perfType: PerfType): Fu[JsArray] =
@@ -23,35 +22,30 @@ final class RatingChartApi(
       ratingsMapToJson(user.id, user.createdAt, _)
     } map JsArray.apply
 
-  private val cache = cacheApi[User.ID, String](4096, "history.rating") {
+  private val cache = cacheApi[User.ID, String](4096, "history.rating"):
     _.expireAfterAccess(10 minutes)
       .maximumSize(4096)
       .buildAsyncFuture { userId =>
         build(userId).dmap(~_)
       }
-  }
 
   private def ratingsMapToJson(userId: User.ID, createdAt: DateTime, ratingsMap: RatingsMap) =
     ratingsMap.map { case (days, rating) =>
-      val date = createdAt plusDays days
+      val date = createdAt `plusDays` days
       Json.arr(date.getYear, date.getMonthOfYear - 1, date.getDayOfMonth, rating)
     }
 
   private def build(userId: User.ID): Fu[Option[String]] =
-    userRepo.createdAtById(userId) flatMap {
+    userRepo.createdAtById(userId) flatMap:
       _ so { createdAt =>
-        historyApi get userId map2 { (history: History) =>
-          lila.common.String.html.safeJsonValue {
-            Json.toJson {
+        historyApi `get` userId map2 { (history: History) =>
+          lila.common.String.html.safeJsonValue:
+            Json.toJson:
               PerfType.all.filter(_.key != "standard") map { pt =>
                 Json.obj(
                   "name"   -> pt.trans(lila.i18n.defaultLang),
                   "points" -> ratingsMapToJson(userId, createdAt, history(pt))
                 )
               }
-            }
-          }
         }
       }
-    }
-}

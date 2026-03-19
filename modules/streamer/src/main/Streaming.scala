@@ -12,7 +12,8 @@ import lila.common.Bus
 import lila.common.config.Secret
 import lila.common.extensions.*
 import lila.user.User
-import scala.concurrent.ExecutionContextExecutor
+import scala.concurrent.{ ExecutionContextExecutor, Future }
+import lila.base.LilaException
 
 final private class Streaming(
     ws: StandaloneWSClient,
@@ -107,7 +108,7 @@ final private class Streaming(
 
   def fetchYouTubeStreams(streamers: List[Streamer]): Fu[List[YouTube.Stream]] = {
     val youtubeStreamers = streamers.filter(_.youTube.isDefined)
-    (youtubeStreamers.nonEmpty && googleApiKey.value.nonEmpty) so {
+    if (youtubeStreamers.nonEmpty && googleApiKey.value.nonEmpty) {
       val now = DateTime.now
       val res =
         if (prevYouTubeStreams.at.isAfter(now minusMinutes 15))
@@ -127,7 +128,7 @@ final private class Streaming(
                 case JsSuccess(data, _) =>
                   fuccess(YouTube.StreamsFetched(data.streams(keyword, youtubeStreamers), now))
                 case JsError(err) =>
-                  fufail(s"youtube ${res.status} $err ${res.body.take(200)}")
+                  Future.failed(LilaException(s"youtube ${res.status} $err ${res.body.toString.take(200)}"))
               }
             }
             .monSuccess(_.tv.streamer.youTube)
@@ -140,7 +141,7 @@ final private class Streaming(
         prevYouTubeStreams = r
         r.list
       }
-    }
+    } else fuccess(Nil)
   }
 
   def dedupStreamers(streams: List[Stream]): List[Stream] =

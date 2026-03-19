@@ -25,7 +25,7 @@ final class Env(
     ec: scala.concurrent.ExecutionContext,
     system: ActorSystem,
     mode: play.api.Mode
-) {
+):
 
   lazy val teamRepo    = new TeamRepo(db(CollName("team")))
   lazy val memberRepo  = new MemberRepo(db(CollName("team_member")))
@@ -66,4 +66,3 @@ final class Env(
       promise completeWith api.isLeaderOf(leaderId, memberId)
     }
   )
-}

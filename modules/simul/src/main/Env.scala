@@ -33,7 +33,7 @@ final class Env(
     ec: scala.concurrent.ExecutionContext,
     scheduler: org.apache.pekko.actor.Scheduler,
     mode: play.api.Mode
-) {
+):
 
   private val config = appConfig.get[SimulConfig]("simul")(AutoConfig.loader)
 
@@ -47,12 +47,11 @@ final class Env(
 
   private val simulSocket = wire[SimulSocket]
 
-  val isHosting = new lila.round.IsSimulHost(u => api.currentHostIds dmap (_ contains u))
+  val isHosting = new lila.round.IsSimulHost(u => api.currentHostIds `dmap` (_ contains u))
 
-  val allCreatedFeaturable = cacheApi.unit[List[Simul]] {
+  val allCreatedFeaturable = cacheApi.unit[List[Simul]]:
     _.refreshAfterWrite(3 seconds)
       .buildAsyncFuture(_ => repo.allCreatedFeaturable)
-  }
 
   val featurable = new SimulIsFeaturable((simul: Simul) =>
     simul.team.isEmpty && featureLimiter(simul.hostId)(true)(false)
@@ -70,11 +69,11 @@ final class Env(
 
   Bus.subscribeFuns(
     "finishGame" -> { case lila.game.actorApi.FinishGame(game, _, _) =>
-      api finishGame game
+      api `finishGame` game
       ()
     },
     "adjustCheater" -> { case lila.hub.actorApi.mod.MarkCheater(userId, true) =>
-      api ejectCheater userId
+      api `ejectCheater` userId
       ()
     },
     "simulGetHosts" -> { case lila.hub.actorApi.simul.GetHostIds(promise) =>
@@ -90,8 +89,6 @@ final class Env(
       )
     }
   )
-}
 
-final class SimulIsFeaturable(f: Simul => Boolean) extends (Simul => Boolean) {
+final class SimulIsFeaturable(f: Simul => Boolean) extends (Simul => Boolean):
   def apply(simul: Simul) = f(simul)
-}

@@ -3,7 +3,7 @@ package lila.team
 import lila.db.dsl._
 import lila.user.User
 
-final class RequestRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionContext) {
+final class RequestRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionContext):
 
   import BSONHandlers._
 
@@ -26,7 +26,7 @@ final class RequestRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionC
 
   def selectId(teamId: ID, userId: ID) = $id(Request.makeId(teamId, userId))
   def teamQuery(teamId: ID)            = $doc("team" -> teamId)
-  def teamsQuery(teamIds: List[ID])    = $doc("team" $in teamIds)
+  def teamsQuery(teamIds: List[ID])    = $doc("team" `$in` teamIds)
 
   def getByUserId(userId: User.ID) =
     coll.list[Request]($doc("user" -> userId))
@@ -39,4 +39,3 @@ final class RequestRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionC
   def removeByTeam(teamId: ID) = coll.delete.one(teamQuery(teamId))
 
   def removeByUser(userId: User.ID) = coll.delete.one($doc("user" -> userId))
-}

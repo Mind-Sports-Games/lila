@@ -87,7 +87,7 @@ object GameDiff {
         },
         clk.limit,
         times,
-        g.flagged has playerIndex
+        g.flagged contains playerIndex
       )
 
     def clockHistoryToBytes(o: Option[ClockHistorySide]) =
@@ -165,7 +165,7 @@ object GameDiff {
             case Board.Draughts(b) => b.pieces
             case _                 => sys.error("Wrong board type")
           },
-          writeBytes compose { m: strategygames.draughts.PieceMap =>
+          writeBytes compose { (m: strategygames.draughts.PieceMap) =>
             BinaryFormat.piece.writeDraughts(
               m,
               a.variant match {

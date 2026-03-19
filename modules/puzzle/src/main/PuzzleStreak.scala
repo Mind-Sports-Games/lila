@@ -1,6 +1,5 @@
 package lila.puzzle
 
-import scala.concurrent.duration._
 import scala.concurrent.ExecutionContext
 
 import lila.common.extensions.*
@@ -9,7 +8,7 @@ import lila.memo.CacheApi
 
 case class PuzzleStreak(ids: String, first: Puzzle)
 
-final class PuzzleStreakApi(colls: PuzzleColls, cacheApi: CacheApi)(implicit ec: ExecutionContext) {
+final class PuzzleStreakApi(colls: PuzzleColls, cacheApi: CacheApi)(implicit ec: ExecutionContext):
 
   import BsonHandlers._
 
@@ -37,11 +36,11 @@ final class PuzzleStreakApi(colls: PuzzleColls, cacheApi: CacheApi)(implicit ec:
   private val poolSize = buckets.map(_._2).sum
   private val theme    = lila.puzzle.PuzzleTheme.mix.key.value
 
-  private val current = cacheApi.unit[Option[PuzzleStreak]] {
+  private val current = cacheApi.unit[Option[PuzzleStreak]]:
     _.refreshAfterWrite(30 seconds)
       .buildAsyncFuture { _ =>
         colls
-          .path {
+          .path:
             _.aggregateWith[Bdoc]() { framework =>
               import framework._
               List(Facet(
@@ -51,8 +50,8 @@ final class PuzzleStreakApi(colls: PuzzleColls, cacheApi: CacheApi)(implicit ec:
                   rating.toString -> List(
                     Match(
                       $doc(
-                        "min" $lte f"${theme}_${tier}_${rating}%04d",
-                        "max" $gte f"${theme}_${tier}_${rating}%04d"
+                        "min" `$lte` f"${theme}_${tier}_${rating}%04d",
+                        "max" `$gte` f"${theme}_${tier}_${rating}%04d"
                       )
                     ),
                     Sample(samples),
@@ -94,26 +93,22 @@ final class PuzzleStreakApi(colls: PuzzleColls, cacheApi: CacheApi)(implicit ec:
               )
             }
               .collect[List](maxDocs = poolSize)
-              .map {
+              .map:
               _.flatMap(PuzzleBSONReader.readOpt)
-            }
-          }
           .mon(_.streak.selector.time)
           .addEffect(monitor)
           .map { puzzles =>
-            puzzles.headOption map {
+            puzzles.headOption map:
               PuzzleStreak(puzzles.map(_.id) mkString " ", _)
-            }
           }
       }
-  }
 
-  private def monitor(puzzles: List[Puzzle]): Unit = {
+  private def monitor(puzzles: List[Puzzle]): Unit =
     val nb = puzzles.size
     lila.mon.streak.selector.count.record(nb)
     if (nb < poolSize * 0.9)
       logger.warn(s"Streak selector wanted $poolSize puzzles, only got $nb")
-    if (nb > 1) {
+    if (nb > 1)
       val rest = puzzles.toVector drop 1
       lila.common.Maths.mean(rest.map(_.glicko.intRating)) foreach { r =>
         val _ = lila.mon.streak.selector.rating.record(r.toInt)
@@ -124,6 +119,3 @@ final class PuzzleStreakApi(colls: PuzzleColls, cacheApi: CacheApi)(implicit ec:
           lila.mon.streak.selector.ratingSlice(i).record(r.toInt)
         }
       }
-    }
-  }
-}

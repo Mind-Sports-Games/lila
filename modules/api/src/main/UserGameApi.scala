@@ -4,7 +4,6 @@ import play.api.i18n.Lang
 import play.api.libs.json._
 
 import strategygames.format.Forsyth
-import strategygames.GameLogic
 
 import lila.common.Json.jodaWrites
 import lila.common.LightUser
@@ -16,7 +15,7 @@ final class UserGameApi(
     bookmarkApi: lila.bookmark.BookmarkApi,
     lightUser: lila.user.LightUserApi,
     getTournamentName: lila.tournament.GetTourName
-)(implicit ec: scala.concurrent.ExecutionContext) {
+)(implicit ec: scala.concurrent.ExecutionContext):
 
   import lila.game.JsonView._
   import LightUser.lightUserWrites
@@ -25,14 +24,13 @@ final class UserGameApi(
     for {
       bookmarkedIds <- bookmarkApi.filterGameIdsBookmarkedBy(pag.currentPageResults, ctx.me)
       _             <- lightUser.preloadMany(pag.currentPageResults.flatMap(_.userIds))
-    } yield {
+    } yield
       implicit val gameWriter = Writes[Game] { g =>
         write(g, bookmarkedIds(g.id), ctx.me)(ctx.lang)
       }
       Json.obj(
         "paginator" -> lila.common.paginator.PaginatorJson(pag)
       )
-    }
 
   private def write(g: Game, bookmarked: Boolean, as: Option[User])(implicit lang: Lang) =
     Json
@@ -74,4 +72,3 @@ final class UserGameApi(
       .add("tournament" -> g.tournamentId.map { tid =>
         Json.obj("id" -> tid, "name" -> getTournamentName.get(tid))
       })
-}

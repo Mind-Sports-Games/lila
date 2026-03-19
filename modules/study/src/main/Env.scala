@@ -31,9 +31,9 @@ final class Env(
 )(implicit
     ec: scala.concurrent.ExecutionContext,
     scheduler: org.apache.pekko.actor.Scheduler,
-    mat: akka.stream.Materializer,
+    mat: org.apache.pekko.stream.Materializer,
     mode: play.api.Mode
-) {
+):
 
   private lazy val studyDb = mongo.asyncDb("study", appConfig.get[String]("study.mongodb.uri"))
 
@@ -83,16 +83,13 @@ final class Env(
   lazy val gifExport = new GifExport(ws, appConfig.get[String]("game.gifUrl"))
 
   def cli =
-    new lila.common.Cli {
+    new lila.common.Cli:
       def process = { case "study" :: "rank" :: "reset" :: Nil =>
         api.resetAllRanks.map { count =>
           s"$count done"
         }
       }
-    }
 
-  lila.common.Bus.subscribeFun("studyAnalysisProgress") {
+  lila.common.Bus.subscribeFun("studyAnalysisProgress"):
     case lila.analyse.actorApi.StudyAnalysisProgress(analysis, complete) =>
       serverEvalMerger(analysis, complete).discard
-  }
-}

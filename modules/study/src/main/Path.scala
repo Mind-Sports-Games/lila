@@ -2,7 +2,7 @@ package lila.study
 
 import strategygames.format.UciCharPair
 
-case class Path(ids: Vector[UciCharPair]) extends AnyVal {
+case class Path(ids: Vector[UciCharPair]) extends AnyVal:
 
   def head: Option[UciCharPair] = ids.headOption
 
@@ -21,25 +21,23 @@ case class Path(ids: Vector[UciCharPair]) extends AnyVal {
   def prepend(id: UciCharPair) = Path(ids prepended id)
 
   def intersect(other: Path): Path =
-    Path {
+    Path:
       ids zip other.ids takeWhile { case (a, b) =>
         a == b
       } map (_._1)
-    }
 
   def toDbField =
     if (ids.isEmpty) s"root.${Path.rootDbKey}"
-    else s"root.${Path encodeDbKey this}"
+    else s"root.${Path `encodeDbKey` this}"
 
   def depth = ids.size
 
   override def toString = ids.mkString
-}
 
-object Path {
+object Path:
 
   def apply(str: String): Path =
-    Path {
+    Path:
       str
         .grouped(2)
         .flatMap { p =>
@@ -48,7 +46,6 @@ object Path {
           }
         }
         .toVector
-    }
 
   def fromDbKey(key: String): Path = apply(decodeDbKey(key))
 
@@ -69,4 +66,3 @@ object Path {
         child.id == id && isMainline(child, rest)
       }
     }
-}

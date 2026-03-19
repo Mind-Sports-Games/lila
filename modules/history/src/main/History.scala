@@ -63,10 +63,10 @@ case class History(
     puzzle_horde: RatingsMap,
     puzzle_racingKings: RatingsMap,
     puzzle_linesOfAction: RatingsMap
-) {
+):
 
   def apply(perfType: PerfType): RatingsMap =
-    perfType.key match {
+    perfType.key match
       case "standard"               => standard
       case "bullet"                 => bullet
       case "blitz"                  => blitz
@@ -126,16 +126,12 @@ case class History(
       case "puzzle_linesOfAction"   => puzzle_linesOfAction
       case "ultraBullet"            => ultraBullet
       case x                        => sys error s"No history for perf $x"
-    }
-}
 
-object History {
+object History:
 
   import reactivemongo.api.bson._
 
-  implicit private[history] val RatingsMapReader: BSONDocumentReader[RatingsMap] {
-    def readDocument(doc: reactivemongo.api.bson.BSONDocument): scala.util.Success[List[(Int, Int)]]
-  } = new BSONDocumentReader[RatingsMap] {
+  implicit private[history] val RatingsMapReader: BSONDocumentReader[RatingsMap] = new BSONDocumentReader[RatingsMap]:
     def readDocument(doc: BSONDocument) =
       Success(
         doc.elements
@@ -146,13 +142,10 @@ object History {
           .sortBy(_._1)
           .toList
       )
-  }
 
-  implicit private[history] val HistoryBSONReader: BSONDocumentReader[History] {
-    def readDocument(doc: reactivemongo.api.bson.BSONDocument): scala.util.Success[lila.history.History]
-  } = new BSONDocumentReader[History] {
+  implicit private[history] val HistoryBSONReader: BSONDocumentReader[History] = new BSONDocumentReader[History]:
     def readDocument(doc: BSONDocument) =
-      Success {
+      Success:
         def ratingsMap(key: String): RatingsMap = ~doc.getAsOpt[RatingsMap](key)
         History(
           standard = ratingsMap("standard"),
@@ -214,6 +207,3 @@ object History {
           puzzle_racingKings = ratingsMap("puzzle_racingKings"),
           puzzle_linesOfAction = ratingsMap("puzzle_linesOfAction")
         )
-      }
-  }
-}

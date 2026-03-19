@@ -17,22 +17,20 @@ final class Env(
 )(implicit
     ec: scala.concurrent.ExecutionContext,
     system: org.apache.pekko.actor.ActorSystem
-) {
+):
 
-  private lazy val internalEndpoint = InternalEndpoint {
+  private lazy val internalEndpoint = InternalEndpoint:
     appConfig.get[String]("explorer.internal_endpoint")
-  }
 
   private lazy val indexer: ExplorerIndexer = wire[ExplorerIndexer]
 
   lazy val importer = wire[ExplorerImporter]
 
   def cli =
-    new lila.common.Cli {
+    new lila.common.Cli:
       def process = { case "explorer" :: "index" :: since :: Nil =>
         indexer(since) inject "done"
       }
-    }
 
   lazy val indexFlowSetting = settingStore[Boolean](
     "explorerIndexFlow",
@@ -40,8 +38,6 @@ final class Env(
     text = "Explorer: index new games as soon as they complete".some
   )
 
-  lila.common.Bus.subscribeFun("finishGame") {
+  lila.common.Bus.subscribeFun("finishGame"):
     case lila.game.actorApi.FinishGame(game, _, _) if !game.aborted && indexFlowSetting.get() =>
       indexer(game).discard
-  }
-}

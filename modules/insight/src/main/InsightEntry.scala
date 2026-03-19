@@ -27,16 +27,15 @@ case class InsightEntry(
     analysed: Boolean,
     provisional: Boolean,
     date: DateTime
-) {
+):
 
   def gameId = id take Game.gameIdSize
-}
 
-case object InsightEntry {
+case object InsightEntry:
 
   def povToId(pov: Pov) = pov.gameId + pov.playerIndex.letter
 
-  object BSONFields {
+  object BSONFields:
     val id                       = "_id"
     val number                   = "n"
     val userId                   = "u"
@@ -56,8 +55,6 @@ case object InsightEntry {
     val analysed                 = "a"
     val provisional              = "pr"
     val date                     = "d"
-  }
-}
 
 case class InsightMove(
     phase: Phase,
@@ -74,7 +71,7 @@ case class InsightMove(
 )
 
 sealed abstract class Termination(val id: Int, val name: String)
-object Termination {
+object Termination:
   case object ClockFlag   extends Termination(1, "Clock flag")
   case object Disconnect  extends Termination(2, "Disconnect")
   case object Resignation extends Termination(3, "Resignation")
@@ -91,7 +88,7 @@ object Termination {
   import strategygames.{ Status => S }
 
   def fromStatus(s: strategygames.Status) =
-    s match {
+    s match
       case S.Timeout => Disconnect
       case S.Outoftime | S.OutoftimeGammon | S.OutoftimeBackgammon | S.RuleOfGin | S.GinGammon |
           S.GinBackgammon =>
@@ -105,11 +102,9 @@ object Termination {
       case S.Created | S.Started | S.Aborted | S.NoStart | S.UnknownFinish =>
         logger.error(s"Unfinished game in the insight indexer: $s")
         Resignation
-    }
-}
 
 sealed abstract class Result(val id: Int, val name: String)
-object Result {
+object Result:
   case object Win  extends Result(1, "Victory")
   case object Draw extends Result(2, "Draw")
   case object Loss extends Result(3, "Defeat")
@@ -118,10 +113,9 @@ object Result {
     (p.id, p)
   } toMap
   val idList = all.map(_.id)
-}
 
 sealed abstract class Phase(val id: Int, val name: String)
-object Phase {
+object Phase:
   case object Opening extends Phase(1, "Opening")
   case object Middle  extends Phase(2, "Middlegame")
   case object End     extends Phase(3, "Endgame")
@@ -130,18 +124,15 @@ object Phase {
     (p.id, p)
   } toMap
   def of(div: strategygames.Division, ply: Int): Phase =
-    div.middle.fold[Phase](Opening) {
+    div.middle.fold[Phase](Opening):
       case m if m > ply => Opening
       case _ =>
-        div.end.fold[Phase](Middle) {
+        div.end.fold[Phase](Middle):
           case e if e > ply => Middle
           case _            => End
-        }
-    }
-}
 
 sealed abstract class Castling(val id: Int, val name: String)
-object Castling {
+object Castling:
   object Kingside  extends Castling(1, "Kingside castling")
   object Queenside extends Castling(2, "Queenside castling")
   object None      extends Castling(3, "No castling")
@@ -150,23 +141,20 @@ object Castling {
     (p.id, p)
   } toMap
   def fromMoves(moves: Iterable[String]) =
-    moves.find(_ startsWith "O") match {
+    moves.find(_ `startsWith` "O") match
       case Some("O-O")   => Kingside
       case Some("O-O-O") => Queenside
       case _             => None
-    }
-}
 
 sealed abstract class QueenTrade(val id: Boolean, val name: String)
-object QueenTrade {
+object QueenTrade:
   object Yes extends QueenTrade(true, "Queen trade")
   object No  extends QueenTrade(false, "No queen trade")
   val all                           = List(Yes, No)
   def apply(v: Boolean): QueenTrade = if (v) Yes else No
-}
 
 sealed abstract class RelativeStrength(val id: Int, val name: String)
-object RelativeStrength {
+object RelativeStrength:
   case object MuchWeaker   extends RelativeStrength(10, "Much weaker")
   case object Weaker       extends RelativeStrength(20, "Weaker")
   case object Similar      extends RelativeStrength(30, "Similar")
@@ -177,17 +165,15 @@ object RelativeStrength {
     (p.id, p)
   } toMap
   def apply(diff: Int) =
-    diff match {
+    diff match
       case d if d < -200 => MuchWeaker
       case d if d < -100 => Weaker
       case d if d > 200  => MuchStronger
       case d if d > 100  => Stronger
       case _             => Similar
-    }
-}
 
 sealed abstract class MovetimeRange(val id: Int, val name: String, val tenths: Int)
-object MovetimeRange {
+object MovetimeRange:
   case object MTR1   extends MovetimeRange(1, "0 to 1 second", 10)
   case object MTR3   extends MovetimeRange(3, "1 to 3 seconds", 30)
   case object MTR5   extends MovetimeRange(5, "3 to 5 seconds", 50)
@@ -204,12 +190,10 @@ object MovetimeRange {
       all.indexOf(mr).some.filter(-1 !=).map(_ - 1).flatMap(all.lift).fold(0)(_.tenths),
       mr.tenths
     )
-}
 
-sealed abstract class MaterialRange(val id: Int, val name: String, val imbalance: Int) {
+sealed abstract class MaterialRange(val id: Int, val name: String, val imbalance: Int):
   def negative = imbalance <= 0
-}
-object MaterialRange {
+object MaterialRange:
   case object Down4 extends MaterialRange(1, "Less than -6", -6)
   case object Down3 extends MaterialRange(2, "-3 to -6", -3)
   case object Down2 extends MaterialRange(3, "-1 to -3", -1)
@@ -231,20 +215,17 @@ object MaterialRange {
         byId.get(mr.id - 1).fold(Int.MinValue)(_.imbalance),
         mr.imbalance
       )
-}
 
 sealed abstract class Blur(val id: Boolean, val name: String)
-object Blur {
+object Blur:
   object Yes extends Blur(true, "Blur")
   object No  extends Blur(false, "No blur")
   val all                     = List(Yes, No)
   def apply(v: Boolean): Blur = if (v) Yes else No
-}
 
-sealed abstract class TimeVariance(val id: Float, val name: String) {
+sealed abstract class TimeVariance(val id: Float, val name: String):
   lazy val intFactored = (id * TimeVariance.intFactor).toInt
-}
-object TimeVariance {
+object TimeVariance:
   case object VeryConsistent  extends TimeVariance(0.25f, "Very consistent")
   case object QuiteConsistent extends TimeVariance(0.4f, "Quite consistent")
   case object Medium          extends TimeVariance(0.6f, "Medium")
@@ -263,10 +244,9 @@ object TimeVariance {
         all.indexOf(tv).some.filter(-1 !=).map(_ - 1).flatMap(all.lift).fold(0)(_.intFactored),
         tv.intFactored
       )
-}
 
 final class CplRange(val name: String, val cpl: Int)
-object CplRange {
+object CplRange:
   val all = List(0, 10, 25, 50, 100, 200, 500, 99999).map { cpl =>
     new CplRange(
       name =
@@ -280,4 +260,3 @@ object CplRange {
     (p.cpl, p)
   }.toMap
   val worse = all.last
-}

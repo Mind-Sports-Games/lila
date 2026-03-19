@@ -1,6 +1,5 @@
 package lila.bot
 
-import scala.concurrent.duration._
 import play.api.i18n.Lang
 import play.api.libs.json._
 
@@ -8,13 +7,11 @@ import lila.common.Json.jodaWrites
 import lila.game.JsonView._
 import lila.game.{ DeadStoneOfferState, Game, GameRepo, Pov }
 
-import strategygames.GameLogic
-
 final class BotJsonView(
     lightUserApi: lila.user.LightUserApi,
     gameRepo: GameRepo,
     rematches: lila.game.Rematches
-)(implicit ec: scala.concurrent.ExecutionContext) {
+)(implicit ec: scala.concurrent.ExecutionContext):
 
   def gameFull(game: Game)(implicit lang: Lang): Fu[JsObject] = gameRepo.withInitialFen(game) flatMap gameFull
 
@@ -26,7 +23,7 @@ final class BotJsonView(
       )
     }
 
-  def gameImmutable(wf: Game.WithInitialFen)(implicit lang: Lang): JsObject = {
+  def gameImmutable(wf: Game.WithInitialFen)(implicit lang: Lang): JsObject =
     import wf._
     Json
       .obj(
@@ -44,14 +41,13 @@ final class BotJsonView(
         "initialFen" -> fen.fold("startpos")(_.value)
       )
       .add("tournamentId" -> game.tournamentId)
-  }
 
-  def gameState(wf: Game.WithInitialFen): Fu[JsObject] = {
+  def gameState(wf: Game.WithInitialFen): Fu[JsObject] =
     // NOTE: this uses UciDump to generate the moves for the bot
     // while the round game json uses the round.StepBuilder object.
     // not sure why the difference.
     import wf._
-    strategygames.format.UciDump(game.variant.gameLogic, game.actionStrs, fen, game.variant).toFuture map {
+    strategygames.format.UciDump(game.variant.gameLogic, game.actionStrs, fen, game.variant).toEither.toFuture map:
       uciMoves =>
         Json
           .obj(
@@ -70,17 +66,14 @@ final class BotJsonView(
           )
           .add("winner" -> game.winnerPlayerIndex)
           .add("rematch" -> rematches.of(game.id))
-    }
-  }
 
   def playerOffering(deadStoneOfferState: Option[DeadStoneOfferState]): Option[String] =
-    deadStoneOfferState match {
+    deadStoneOfferState match
       case Some(DeadStoneOfferState.P1Offering)      => Some("p1")
       case Some(DeadStoneOfferState.P2Offering)      => Some("p2")
       case Some(DeadStoneOfferState.AcceptedP1Offer) => Some("p1")
       case Some(DeadStoneOfferState.AcceptedP2Offer) => Some("p2")
       case _                                         => None
-    }
 
   def selectedSquaresJson(game: Game) =
     ssStatus(game).map(s =>
@@ -114,7 +107,7 @@ final class BotJsonView(
       "text"     -> text
     )
 
-  private def playerJson(pov: Pov) = {
+  private def playerJson(pov: Pov) =
     val light = pov.player.userId flatMap lightUserApi.sync
     Json
       .obj()
@@ -124,7 +117,6 @@ final class BotJsonView(
       .add("title" -> light.map(_.title))
       .add("rating" -> pov.player.rating)
       .add("provisional" -> pov.player.provisional)
-  }
 
   private def millisOf(pov: Pov): Int =
     pov.game.clock
@@ -150,7 +142,7 @@ final class BotJsonView(
       })
 
   implicit private val clockConfigWriter: OWrites[strategygames.ClockConfig] = OWrites { c =>
-    c match {
+    c match
       case c: strategygames.Clock.Config =>
         Json.obj(
           "initial"   -> c.limit.millis,
@@ -177,6 +169,4 @@ final class BotJsonView(
           "periods"   -> c.periodsTotal,
           "clockType" -> "byoyomi"
         )
-    }
   }
-}

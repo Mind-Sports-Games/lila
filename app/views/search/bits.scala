@@ -19,12 +19,11 @@ private object bits {
   private def dateMinMax: List[Modifier] =
     List(min := dateMin, max := dateFormatter.print(DateTime.now.plusDays(1)))
 
-  def of(form: Form[_])(implicit lang: Lang) =
-    new {
+  class SearchFormCommons(form: Form[?])(implicit lang: Lang) {
 
       def dataReqs =
         List("winner", "loser", "p1", "p2").map { f =>
-          data(s"req-$f") := ~form("players")(f).value
+          data(s"req-$f") := form("players")(f).value.getOrElse("")
         }
 
       def playerIndexs(hide: Boolean) =
@@ -40,7 +39,7 @@ private object bits {
                 id := form3.id(form("players")(playerIndex.name)),
                 name := form("players")(playerIndex.name).name
               )(
-                option(cls := "blank", value := "")
+                scalatags.Text.tags.option(cls := "blank", value := "")
               )
             )
           )
@@ -52,7 +51,7 @@ private object bits {
             th(label(`for` := form3.id(field))(trans.winner())),
             td(cls := "single")(
               st.select(id := form3.id(field), name := field.name)(
-                option(cls := "blank", value := "")
+                scalatags.Text.tags.option(cls := "blank", value := "")
               )
             )
           )
@@ -64,7 +63,7 @@ private object bits {
             th(label(`for` := form3.id(field))(trans.search.loser())),
             td(cls := "single")(
               st.select(id := form3.id(field), name := field.name)(
-                option(cls := "blank", value := "")
+                scalatags.Text.tags.option(cls := "blank", value := "")
               )
             )
           )
@@ -219,9 +218,11 @@ private object bits {
             )
           ),
           td(cls := "single")(
-            form3.cmnToggle(form3.id(field), field.name, checked = field.value.has("1"), value = "1")
+            form3.cmnToggle(form3.id(field), field.name, checked = field.value.contains("1"), value = "1")
           )
         )
       }
-    }
+  }
+
+  def of(form: Form[?])(implicit lang: Lang): SearchFormCommons = new SearchFormCommons(form)
 }

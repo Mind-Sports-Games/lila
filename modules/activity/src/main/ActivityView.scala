@@ -34,10 +34,9 @@ case class ActivityView(
     signup: Boolean = false
 )
 
-object ActivityView {
+object ActivityView:
 
   case class Tours(
       nb: Int,
       best: List[TourEntry]
   )
-}

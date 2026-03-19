@@ -3,7 +3,7 @@ package lila.clas
 import lila.db.dsl._
 import reactivemongo.api.bson._
 
-private[clas] object BsonHandlers {
+private[clas] object BsonHandlers:
 
   import Clas.Recorded
   implicit val recordedBSONHandler: BSONDocumentHandler[Recorded] = Macros.handler[Recorded]
@@ -18,4 +18,3 @@ private[clas] object BsonHandlers {
   implicit val inviteIdBSONHandler: BSONHandler[ClasInvite.Id] =
     stringAnyValHandler[ClasInvite.Id](_.value, ClasInvite.Id.apply)
   implicit val inviteBSONHandler: BSONDocumentHandler[ClasInvite] = Macros.handler[ClasInvite]
-}

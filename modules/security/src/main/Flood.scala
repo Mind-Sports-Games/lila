@@ -7,7 +7,7 @@ import scala.concurrent.duration.FiniteDuration
 import lila.common.base.Levenshtein.isLevenshteinDistanceLessThan
 import lila.user.User
 
-final class Flood(duration: FiniteDuration) {
+final class Flood(duration: FiniteDuration):
 
   import Flood._
 
@@ -17,7 +17,7 @@ final class Flood(duration: FiniteDuration) {
     .expireAfterAccess(duration)
     .build[User.ID, Messages]()
 
-  def allowMessage(uid: User.ID, text: String): Boolean = {
+  def allowMessage(uid: User.ID, text: String): Boolean =
     val msg  = Message(text, Instant.now)
     val msgs = ~cache.getIfPresent(uid)
     val dominated = duplicateMessage(msg, msgs)
@@ -26,13 +26,11 @@ final class Flood(duration: FiniteDuration) {
     val result    = !dominated_or_quick
     if (result) cache.put(uid, msg :: msgs)
     result
-  }
 
   private def quickPost(msg: Message, msgs: Messages): Boolean =
-    msgs.lift(floodNumber) so (_.date isAfter msg.date.minus(10000L))
-}
+    msgs.lift(floodNumber) so (_.date `isAfter` msg.date.minus(10000L))
 
-private object Flood {
+private object Flood:
 
   // ui/chat/src/preset.ts
   private val passList = Set(
@@ -58,7 +56,5 @@ private object Flood {
       }
     }
 
-  private def similar(s1: String, s2: String): Boolean = {
-    isLevenshteinDistanceLessThan(s1, s2, (s1.length.min(s2.length) >> 3) atLeast 2)
-  }
-}
+  private def similar(s1: String, s2: String): Boolean =
+    isLevenshteinDistanceLessThan(s1, s2, (s1.length.min(s2.length) >> 3) `atLeast` 2)

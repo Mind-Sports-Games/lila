@@ -21,7 +21,7 @@ case class PlayerAssessment(
     tcFactor: Option[Double]
 )
 
-object PlayerAssessment {
+object PlayerAssessment:
 
   // when you don't have computer analysis
   case class Basics(
@@ -37,25 +37,23 @@ object PlayerAssessment {
 
   private def highlyConsistentMoveTimeStreaksOf(pov: Pov): Boolean =
     pov.game.clock.exists(_.estimateTotalSeconds > 60) && {
-      Statistics.slidingMoveTimesCvs(pov) so {
+      Statistics.slidingMoveTimesCvs(pov) so:
         _ exists Statistics.cvIndicatesHighlyFlatTimesForStreaks
-      }
     }
 
-  def makeBasics(pov: Pov, holdAlerts: Option[Player.HoldAlert]): PlayerAssessment.Basics = {
+  def makeBasics(pov: Pov, holdAlerts: Option[Player.HoldAlert]): PlayerAssessment.Basics =
     import Statistics._
     import pov.{ game, playerIndex }
 
     Basics(
       plyTimes = intAvgSd(~game.plyTimes(playerIndex) map (_.roundTenths)),
-      blurs = game playerBlurPercent playerIndex,
+      blurs = game `playerBlurPercent` playerIndex,
       hold = holdAlerts.exists(_.suspicious),
       blurStreak = highestChunkBlursOf(pov).some.filter(0 <),
       mtStreak = highlyConsistentMoveTimeStreaksOf(pov)
     )
-  }
 
-  def make(pov: Pov, analysis: Analysis, holdAlerts: Option[Player.HoldAlert]): PlayerAssessment = {
+  def make(pov: Pov, analysis: Analysis, holdAlerts: Option[Player.HoldAlert]): PlayerAssessment =
     import Statistics._
     import pov.{ game, playerIndex }
 
@@ -110,9 +108,9 @@ object PlayerAssessment {
     val T = true
     val F = false
 
-    def assessment: GameAssessment = {
+    def assessment: GameAssessment =
       import GameAssessment._
-      val assessment = flags match {
+      val assessment = flags match
         //               SF1 SF2 BLR1 BLR2 HCMT MCMT NFM Holds
         case PlayerFlags(T, _, T, _, _, _, T, _) => Cheating // high accuracy, high blurs, no fast moves
         case PlayerFlags(T, _, _, T, _, _, _, _) => Cheating // high accuracy, moderate blurs
@@ -135,21 +133,18 @@ object PlayerAssessment {
 
         case PlayerFlags(F, F, _, _, _, _, _, _) => NotCheating // low accuracy, doesn't hold advantage
         case _                                   => NotCheating
-      }
 
       if (flags.suspiciousHoldAlert) assessment
       else if (~game.wonBy(playerIndex)) assessment
       else if (assessment == Cheating) LikelyCheating
       else if (assessment == LikelyCheating) Unclear
       else assessment
-    }
 
-    val tcFactor: Double = game.speed match {
+    val tcFactor: Double = game.speed match
       case Speed.Bullet | Speed.Blitz => 1.25
       case Speed.Rapid                => 1.0
       case Speed.Classical            => 0.6
       case _                          => 1.0
-    }
     PlayerAssessment(
       _id = s"${game.id}/${playerIndex.name}",
       gameId = game.id,
@@ -162,5 +157,3 @@ object PlayerAssessment {
       flags = flags,
       tcFactor = tcFactor.some
     )
-  }
-}

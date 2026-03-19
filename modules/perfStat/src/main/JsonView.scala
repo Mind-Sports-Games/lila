@@ -9,7 +9,7 @@ import lila.common.LightUser
 import lila.rating.{ Glicko, Perf, PerfType }
 import lila.user.User
 
-final class JsonView(getLightUser: LightUser.GetterSync) {
+final class JsonView(getLightUser: LightUser.GetterSync):
 
   import JsonView._
 
@@ -46,15 +46,14 @@ final class JsonView(getLightUser: LightUser.GetterSync) {
       "percentile" -> percentile,
       "stat"       -> stat
     )
-}
 
-object JsonView {
+object JsonView:
 
   private def round(v: Double, depth: Int = 2) = lila.common.Maths.roundAt(v, depth)
 
   private val isoFormatter = ISODateTimeFormat.dateTime
   implicit private val dateWriter: Writes[DateTime] = Writes { d =>
-    JsString(isoFormatter print d)
+    JsString(isoFormatter `print` d)
   }
   implicit private val userWriter: OWrites[User] = OWrites { u =>
     Json.obj("name" -> u.username)
@@ -79,4 +78,3 @@ object JsonView {
         "name" -> pt.trans
       )
     }
-}

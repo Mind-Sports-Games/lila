@@ -10,7 +10,7 @@ import lila.relation.Relations
 final class MsgJson(
     lightUserApi: lila.user.LightUserApi,
     isOnline: lila.socket.IsOnline
-)(implicit ec: scala.concurrent.ExecutionContext) {
+)(implicit ec: scala.concurrent.ExecutionContext):
 
   implicit private val lastMsgWrites: OWrites[Msg.Last]    = Json.writes[Msg.Last]
   implicit private val relationsWrites: OWrites[Relations] = Json.writes[Relations]
@@ -46,9 +46,9 @@ final class MsgJson(
     }
 
   private def withContacts(me: User, threads: List[MsgThread]): Fu[List[MsgThread.WithContact]] =
-    lightUserApi.asyncMany(threads.map(_ other me)) map { users =>
+    lightUserApi.asyncMany(threads.map(_ `other` me)) map { users =>
       threads.zip(users).map { case (thread, userOption) =>
-        MsgThread.WithContact(thread, userOption | LightUser.fallback(thread other me))
+        MsgThread.WithContact(thread, userOption | LightUser.fallback(thread `other` me))
       }
     }
 
@@ -63,4 +63,3 @@ final class MsgJson(
     LightUser
       .writeNoId(user)
       .add("online" -> isOnline(user.id))
-}

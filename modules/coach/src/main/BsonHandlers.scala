@@ -4,7 +4,7 @@ import reactivemongo.api.bson._
 
 import lila.db.dsl._
 
-private[coach] object BsonHandlers {
+private[coach] object BsonHandlers:
 
   implicit val CoachIdBSONHandler: BSONHandler[Coach.Id] =
     stringAnyValHandler[Coach.Id](_.value, Coach.Id.apply)
@@ -27,4 +27,3 @@ private[coach] object BsonHandlers {
   implicit val CoachBSONHandler: BSONDocumentHandler[Coach] = Macros.handler[Coach]
 
   implicit val CoachReviewBSONHandler: BSONDocumentHandler[CoachReview] = Macros.handler[CoachReview]
-}

@@ -4,7 +4,7 @@ import org.apache.pekko.stream.scaladsl._
 import strategygames.format.pgn.Tags
 import strategygames.Centis
 import strategygames.variant.Variant
-import reactivemongo.akkastream.cursorProducer
+import reactivemongo.pekkostream.cursorProducer
 import reactivemongo.api.bson._
 
 import lila.db.AsyncColl
@@ -12,8 +12,8 @@ import lila.db.dsl._
 
 final class ChapterRepo(val coll: AsyncColl)(implicit
     ec: scala.concurrent.ExecutionContext,
-    mat: akka.stream.Materializer
-) {
+    mat: org.apache.pekko.stream.Materializer
+):
 
   import BSONHandlers._
 
@@ -24,16 +24,16 @@ final class ChapterRepo(val coll: AsyncColl)(implicit
 
   def deleteByStudy(s: Study): Funit = coll(_.delete.one($studyId(s.id))).void
 
-  def deleteByStudyIds(ids: List[Study.Id]): Funit = coll(_.delete.one($doc("studyId" $in ids))).void
+  def deleteByStudyIds(ids: List[Study.Id]): Funit = coll(_.delete.one($doc("studyId" `$in` ids))).void
 
   def byIdAndStudy(id: Chapter.Id, studyId: Study.Id): Fu[Option[Chapter]] =
     coll(_.byId[Chapter, Chapter.Id](id)).dmap { _.filter(_.studyId == studyId) }
 
   def firstByStudy(studyId: Study.Id): Fu[Option[Chapter]] =
-    coll(_.find($studyId(studyId)).sort($sort asc "order").one[Chapter])
+    coll(_.find($studyId(studyId)).sort($sort `asc` "order").one[Chapter])
 
   def existsByStudy(studyId: Study.Id): Fu[Boolean] =
-    coll(_ exists $studyId(studyId))
+    coll(_ `exists` $studyId(studyId))
 
   private val metadataProjection =
     $doc(
@@ -44,34 +44,30 @@ final class ChapterRepo(val coll: AsyncColl)(implicit
     ).some
 
   def orderedMetadataByStudy(studyId: Study.Id): Fu[List[Chapter.Metadata]] =
-    coll {
+    coll:
       _.find($studyId(studyId), metadataProjection)
-        .sort($sort asc "order")
+        .sort($sort `asc` "order")
         .cursor[Chapter.Metadata]()
         .list()
-    }
 
-  def orderedByStudySource(studyId: Study.Id): Source[Chapter, _] =
-    Source futureSource {
-      coll map {
+  def orderedByStudySource(studyId: Study.Id): Source[Chapter, ?] =
+    Source futureSource:
+      coll map:
         _.find($studyId(studyId))
-          .sort($sort asc "order")
+          .sort($sort `asc` "order")
           .cursor[Chapter](readPreference = readPref)
           .documentSource()
-      }
-    }
 
   // loads all study chapters in memory!
   def orderedByStudy(studyId: Study.Id): Fu[List[Chapter]] =
-    coll {
+    coll:
       _.find($studyId(studyId))
-        .sort($sort asc "order")
+        .sort($sort `asc` "order")
         .cursor[Chapter]()
         .list()
-    }
 
   def relaysAndTagsByStudyId(studyId: Study.Id): Fu[List[Chapter.RelayAndTags]] =
-    coll {
+    coll:
       _.find(
         $studyId(studyId),
         $doc("relay" -> true, "tags" -> true).some
@@ -85,7 +81,6 @@ final class ChapterRepo(val coll: AsyncColl)(implicit
           tags  <- doc.getAsOpt[Tags]("tags")
         } yield Chapter.RelayAndTags(id, relay, tags)
       }
-    }
 
   def sort(study: Study, ids: List[Chapter.Id]): Funit =
     coll { c =>
@@ -97,7 +92,7 @@ final class ChapterRepo(val coll: AsyncColl)(implicit
     }
 
   def nextOrderByStudy(studyId: Study.Id): Fu[Int] =
-    coll(_.primitiveOne[Int]($studyId(studyId), $sort desc "order", "order")) dmap { ~_ + 1 }
+    coll(_.primitiveOne[Int]($studyId(studyId), $sort `desc` "order", "order")) dmap { _.getOrElse(0) + 1 }
 
   def setConceal(chapterId: Chapter.Id, conceal: Chapter.Ply) =
     coll(_.updateField($id(chapterId), "conceal", conceal)).void
@@ -114,30 +109,29 @@ final class ChapterRepo(val coll: AsyncColl)(implicit
   def setTagsFor(chapter: Chapter) =
     coll(_.updateField($id(chapter.id), "tags", chapter.tags)).void
 
-  def setShapes(shapes: lila.tree.Node.Shapes)(implicit variant: Variant) = {
+  def setShapes(shapes: lila.tree.Node.Shapes)(implicit variant: Variant) =
     val variantHandlers = VariantHandlers()
     import variantHandlers._
-    setNodeValue(Node.BsonFields.shapes, shapes.value.nonEmpty option shapes) _
-  }
+    setNodeValue(Node.BsonFields.shapes, shapes.value.nonEmpty `option` shapes)
 
   def setComments(comments: lila.tree.Node.Comments) =
-    setNodeValue(Node.BsonFields.comments, comments.value.nonEmpty option comments) _
+    setNodeValue(Node.BsonFields.comments, comments.value.nonEmpty `option` comments)
 
   def setGamebook(gamebook: lila.tree.Node.Gamebook) =
-    setNodeValue(Node.BsonFields.gamebook, gamebook.nonEmpty option gamebook) _
+    setNodeValue(Node.BsonFields.gamebook, gamebook.nonEmpty `option` gamebook)
 
   def setGlyphs(glyphs: strategygames.format.pgn.Glyphs) =
-    setNodeValue(Node.BsonFields.glyphs, glyphs.nonEmpty) _
+    setNodeValue(Node.BsonFields.glyphs, glyphs.nonEmpty)
 
-  def setClock(clock: Option[Centis]) = setNodeValue(Node.BsonFields.clock, clock) _
+  def setClock(clock: Option[Centis]) = setNodeValue(Node.BsonFields.clock, clock)
 
-  def forceVariation(force: Boolean) = setNodeValue(Node.BsonFields.forceVariation, force option true) _
+  def forceVariation(force: Boolean) = setNodeValue(Node.BsonFields.forceVariation, force `option` true)
 
   // insert node and its children
   // and sets the parent order field
   def addSubTree(subTree: Node, newParent: RootOrNode, parentPath: Path)(
       chapter: Chapter
-  )(implicit variant: Variant): Funit = {
+  )(implicit variant: Variant): Funit =
     val variantHandlers = VariantHandlers()
     import variantHandlers._
     val set = $doc(subTreeToBsonElements(parentPath, subTree)) ++ {
@@ -146,23 +140,19 @@ final class ChapterRepo(val coll: AsyncColl)(implicit
       )
     }
     coll(_.update.one($id(chapter.id), $set(set))).void
-  }
 
   private def subTreeToBsonElements(parentPath: Path, subTree: Node)(implicit
       variant: Variant
-  ): Vector[(String, Bdoc)] = {
+  ): Vector[(String, Bdoc)] =
     val variantHandlers = VariantHandlers()
     import variantHandlers._
-    (parentPath.depth < Node.maxPlies) so {
+    (parentPath.depth < Node.maxPlies) so:
       val path = parentPath + subTree
-      subTree.children.nodes.flatMap(subTreeToBsonElements(path, _)) appended {
+      subTree.children.nodes.flatMap(subTreeToBsonElements(path, _)) appended:
         path.toDbField -> writeNode(subTree)
-      }
-    }
-  }
 
   // overrides all children sub-nodes in DB! Make the tree merge beforehand.
-  def setChildren(children: Node.Children)(chapter: Chapter, path: Path)(implicit variant: Variant): Funit = {
+  def setChildren(children: Node.Children)(chapter: Chapter, path: Path)(implicit variant: Variant): Funit =
     val variantHandlers = VariantHandlers()
     import variantHandlers._
     val set: Bdoc = {
@@ -172,11 +162,10 @@ final class ChapterRepo(val coll: AsyncColl)(implicit
     } ++ $doc(childrenTreeToBsonElements(path, children))
 
     coll(_.update.one($id(chapter.id), $set(set))).void
-  }
 
   private def childrenTreeToBsonElements(parentPath: Path, children: Node.Children)(implicit
       variant: Variant
-  ): Vector[(String, Bdoc)] = {
+  ): Vector[(String, Bdoc)] =
     val variantHandlers = VariantHandlers()
     import variantHandlers._
     (parentPath.depth < Node.maxPlies) so
@@ -184,19 +173,17 @@ final class ChapterRepo(val coll: AsyncColl)(implicit
         val path = parentPath + node
         childrenTreeToBsonElements(path, node.children) appended (path.toDbField -> writeNode(node))
       }
-  }
 
   private def setNodeValue[A: BSONWriter](
       field: String,
       value: Option[A]
   )(chapter: Chapter, path: Path): Funit =
-    coll {
+    coll:
       _.updateOrUnsetField(
-        $id(chapter.id) ++ $doc(path.toDbField $exists true),
+        $id(chapter.id) ++ $doc(path.toDbField `$exists` true),
         pathToField(path, field),
         value
       ).void
-    }
 
   private[study] def setNodeValues(
       chapter: Chapter,
@@ -205,18 +192,16 @@ final class ChapterRepo(val coll: AsyncColl)(implicit
   ): Funit =
     values.collect { case (field, Some(v)) =>
       pathToField(path, field) -> v
-    } match {
+    } match
       case Nil => funit
       case sets =>
-        coll {
+        coll:
           _.update
             .one(
-              $id(chapter.id) ++ $doc(path.toDbField $exists true),
+              $id(chapter.id) ++ $doc(path.toDbField `$exists` true),
               $set($doc(sets))
             )
             .void
-        }
-    }
 
   // root.path.subField
   private def pathToField(path: Path, subField: String): String = s"${path.toDbField}.$subField"
@@ -227,36 +212,34 @@ final class ChapterRepo(val coll: AsyncColl)(implicit
   ): Fu[Map[Study.Id, Vector[Chapter.IdName]]] =
     studyIds.nonEmpty so coll(
       _.find(
-        $doc("studyId" $in studyIds),
+        $doc("studyId" `$in` studyIds),
         $doc("studyId" -> true, "_id" -> true, "name" -> true).some
       )
-        .sort($sort asc "order")
+        .sort($sort `asc` "order")
         .cursor[Bdoc]()
         .list(nbChaptersPerStudy * studyIds.size)
     )
       .map { docs =>
         docs.foldLeft(Map.empty[Study.Id, Vector[Chapter.IdName]]) { case (hash, doc) =>
           doc.getAsOpt[Study.Id]("studyId").fold(hash) { studyId =>
-            hash get studyId match {
+            hash get studyId match
               case Some(chapters) if chapters.sizeIs >= nbChaptersPerStudy => hash
               case maybe =>
-                val chapters = ~maybe
+                val chapters = maybe.getOrElse(Vector.empty)
                 hash + (studyId -> readIdName(doc).fold(chapters)(chapters :+ _))
-            }
           }
         }
       }
 
   def idNames(studyId: Study.Id): Fu[List[Chapter.IdName]] =
-    coll {
+    coll:
       _.find(
         $studyId(studyId),
         $doc("_id" -> true, "name" -> true).some
       )
-        .sort($sort asc "order")
+        .sort($sort `asc` "order")
         .cursor[Bdoc](readPref)
         .list(Study.maxChapters * 2)
-    }
       .dmap { _ flatMap readIdName }
 
   private def readIdName(doc: Bdoc) =
@@ -291,4 +274,3 @@ final class ChapterRepo(val coll: AsyncColl)(implicit
   def delete(c: Chapter): Funit     = delete(c.id)
 
   private def $studyId(id: Study.Id) = $doc("studyId" -> id)
-}

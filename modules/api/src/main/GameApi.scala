@@ -28,7 +28,7 @@ final private[api] class GameApi(
     gameCache: lila.game.Cached,
     analysisRepo: lila.analyse.AnalysisRepo,
     crosstableApi: CrosstableApi
-)(implicit ec: scala.concurrent.ExecutionContext) {
+)(implicit ec: scala.concurrent.ExecutionContext):
 
   import GameApi.WithFlags
 
@@ -50,7 +50,7 @@ final private[api] class GameApi(
             else
               $doc(
                 G.playerUids -> user.id,
-                G.status $gte Status.Mate.id,
+                G.status `$gte` Status.Mate.id,
                 G.analysed -> analysed.map[BSONValue] {
                   case true => BSONBoolean(true)
                   case _    => $doc("$exists" -> false)
@@ -80,16 +80,15 @@ final private[api] class GameApi(
       maxPerPage = nb
     ) flatMap { pag =>
       gamesJson(withFlags = withFlags)(pag.currentPageResults) map { games =>
-        PaginatorJson(pag withCurrentPageResults games)
+        PaginatorJson(pag `withCurrentPageResults` games)
       }
     }
 
   def one(id: String, withFlags: WithFlags): Fu[Option[JsObject]] =
-    gameRepo game id flatMap {
+    gameRepo `game` id flatMap:
       _ so { g =>
         gamesJson(withFlags)(List(g)) map (_.headOption)
       }
-    }
 
   def byUsersVs(
       users: (User, User),
@@ -108,7 +107,7 @@ final private[api] class GameApi(
             if (~playing) lila.game.Query.nowPlayingVs(users._1.id, users._2.id)
             else
               lila.game.Query.opponents(users._1, users._2) ++ $doc(
-                G.status $gte Status.Mate.id,
+                G.status `$gte` Status.Mate.id,
                 G.analysed -> analysed.map[BSONValue] {
                   case true => BSONBoolean(true)
                   case _    => $doc("$exists" -> false)
@@ -132,7 +131,7 @@ final private[api] class GameApi(
       maxPerPage = nb
     ) flatMap { pag =>
       gamesJson(withFlags.copy(fens = false))(pag.currentPageResults) map { games =>
-        PaginatorJson(pag withCurrentPageResults games)
+        PaginatorJson(pag `withCurrentPageResults` games)
       }
     }
 
@@ -153,7 +152,7 @@ final private[api] class GameApi(
           if (~playing) lila.game.Query.nowPlayingVs(userIds)
           else
             lila.game.Query.opponents(userIds) ++ $doc(
-              G.status $gte Status.Mate.id,
+              G.status `$gte` Status.Mate.id,
               G.analysed -> analysed.map[BSONValue] {
                 case true => BSONBoolean(true)
                 case _    => $doc("$exists" -> false)
@@ -164,7 +163,7 @@ final private[api] class GameApi(
             case true => BSONBoolean(true)
             case _    => $doc("$exists" -> false)
           },
-          G.createdAt $gte since
+          G.createdAt `$gte` since
         ),
         projection = none,
         sort = $doc(G.createdAt -> -1),
@@ -174,15 +173,15 @@ final private[api] class GameApi(
       maxPerPage = nb
     ) flatMap { pag =>
       gamesJson(withFlags.copy(fens = false))(pag.currentPageResults) map { games =>
-        PaginatorJson(pag withCurrentPageResults games)
+        PaginatorJson(pag `withCurrentPageResults` games)
       }
     }
 
   private def makeUrl(game: Game) = s"${net.baseUrl}/${game.id}/${game.naturalOrientation.name}"
 
-  private def gamesJson(withFlags: WithFlags)(games: Seq[Game]): Fu[Seq[JsObject]] = {
+  private def gamesJson(withFlags: WithFlags)(games: Seq[Game]): Fu[Seq[JsObject]] =
     val allAnalysis =
-      if (withFlags.analysis) analysisRepo byIds games.map(_.id)
+      if (withFlags.analysis) analysisRepo `byIds` games.map(_.id)
       else fuccess(List.fill(games.size)(none[Analysis]))
     allAnalysis flatMap { analysisOptions =>
       Future.sequence(games map gameRepo.initialFen) map { initialFens =>
@@ -191,9 +190,8 @@ final private[api] class GameApi(
         }
       }
     }
-  }
 
-  private def checkToken(withFlags: WithFlags) = withFlags applyToken apiToken.value
+  private def checkToken(withFlags: WithFlags) = withFlags `applyToken` apiToken.value
 
   private def gameToJson(
       g: Game,
@@ -234,9 +232,9 @@ final private[api] class GameApi(
             .add("name", p.name)
             .add("provisional" -> p.provisional)
             .add("isInputRating" -> p.isInputRating)
-            .add("plyCentis" -> withFlags.plyTimes so g.plyTimes(p.playerIndex).map(_.map(_.centis)))
+            .add("plyCentis" -> (if (withFlags.plyTimes) g.plyTimes(p.playerIndex).map(_.map(_.centis)) else none))
             .add("blurs" -> withFlags.blurs.option(p.blurs.nb))
-            .add("analysis" -> analysisOption.flatMap(analysisJson.player(g pov p.playerIndex)))
+            .add("analysis" -> analysisOption.flatMap(analysisJson.player(g `pov` p.playerIndex)))
         }),
         "analysis" -> analysisOption.ifTrue(withFlags.analysis).map(analysisJson.moves(_)),
         "moves" -> withFlags.moves.option(g.variant match {
@@ -255,8 +253,8 @@ final private[api] class GameApi(
             }
           case _ => g.actionStrs.map(_.mkString(",")).mkString(" ")
         }),
-        "opening" -> withFlags.opening.so(g.opening),
-        "fens" -> (withFlags.fens && g.finished) so {
+        "opening" -> g.opening.filter(_ => withFlags.opening),
+        "fens" -> (if (withFlags.fens && g.finished) {
           Replay
             .boards(
               lib = g.variant.gameLogic,
@@ -274,14 +272,13 @@ final private[api] class GameApi(
             .toOption map { boards =>
             JsArray(boards.map { b => Forsyth.exportBoard(b.variant.gameLogic, b) } map JsString.apply)
           }
-        },
+        } else none[JsArray]),
         "winner" -> g.winnerPlayerIndex.map(_.name),
         "url"    -> makeUrl(g)
       )
       .noNull
-}
 
-object GameApi {
+object GameApi:
 
   case class WithFlags(
       analysis: Boolean = false,
@@ -291,11 +288,9 @@ object GameApi {
       plyTimes: Boolean = false,
       blurs: Boolean = false,
       token: Option[String] = none
-  ) {
+  ):
 
     def applyToken(validToken: String) =
       copy(
-        blurs = token has validToken
+        blurs = token `has` validToken
       )
-  }
-}

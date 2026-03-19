@@ -2,9 +2,7 @@ package lila.round
 
 import org.apache.pekko.stream.scaladsl._
 import org.joda.time.DateTime
-import reactivemongo.akkastream.cursorProducer
-
-import scala.concurrent.duration._
+import reactivemongo.pekkostream.cursorProducer
 
 import lila.common.Bus
 import lila.common.LilaStream
@@ -20,8 +18,8 @@ final private class CorresAlarm(
 )(implicit
     ec: scala.concurrent.ExecutionContext,
     scheduler: org.apache.pekko.actor.Scheduler,
-    mat: akka.stream.Materializer
-) {
+    mat: org.apache.pekko.stream.Materializer
+):
 
   private case class Alarm(
       _id: String,       // game id
@@ -39,13 +37,13 @@ final private class CorresAlarm(
     if (game.hasCorrespondenceClock && !game.hasAi) coll.delete.one($id(game.id)).discard
   }
 
-  Bus.subscribeFun("moveEventCorres") {
+  Bus.subscribeFun("moveEventCorres"):
     case lila.hub.actorApi.round.CorresMoveEvent(move, _, _, alarmable, _) if alarmable =>
-      proxyGame(move.gameId) foreach {
+      proxyGame(move.gameId) foreach:
         _ foreach { game =>
-          game.bothPlayersHaveMoved so {
+          game.bothPlayersHaveMoved so:
             game.playableCorrespondenceClock so { clock =>
-              val remainingTime = clock remainingTime game.turnPlayerIndex
+              val remainingTime = clock `remainingTime` game.turnPlayerIndex
               val ringsAt       = DateTime.now.plusSeconds(remainingTime.toInt * 8 / 10)
               coll.update
                 .one(
@@ -59,14 +57,11 @@ final private class CorresAlarm(
                 )
                 .void
             }
-          }
         }
-      }
-  }
 
   private def run(): Funit =
     coll
-      .find($doc("ringsAt" $lt DateTime.now))
+      .find($doc("ringsAt" `$lt` DateTime.now))
       .cursor[Alarm]()
       .documentSource(200)
       .mapAsyncUnordered(4)(alarm => proxyGame(alarm._id))
@@ -83,4 +78,3 @@ final private class CorresAlarm(
       .mon(_.round.alarm.time)
       .addEffectAnyway { scheduleNext() }
       .void
-}

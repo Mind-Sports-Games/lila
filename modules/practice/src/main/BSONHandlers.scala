@@ -6,7 +6,7 @@ import lila.db.dsl._
 import lila.study.Chapter
 import reactivemongo.api.bson.BSONDocumentHandler
 
-object BSONHandlers {
+object BSONHandlers:
 
   import PracticeProgress.{ ChapterNbMoves, NbMoves }
 
@@ -19,4 +19,3 @@ object BSONHandlers {
     stringAnyValHandler[PracticeProgress.Id](_.value, PracticeProgress.Id.apply)
   implicit val practiceProgressHandler: BSONDocumentHandler[PracticeProgress] =
     Macros.handler[PracticeProgress]
-}

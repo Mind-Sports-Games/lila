@@ -4,7 +4,7 @@ import lila.user.LightUserApi
 
 import play.api.libs.json._
 
-final class JsonView(lightUserApi: LightUserApi) {
+final class JsonView(lightUserApi: LightUserApi):
 
   implicit val teamWrites: OWrites[Team] = OWrites[Team] { team =>
     Json
@@ -19,4 +19,3 @@ final class JsonView(lightUserApi: LightUserApi) {
       )
       .add("location" -> team.location)
   }
-}

@@ -13,7 +13,7 @@ case class Student(
     managed: Boolean, // created for the class by the teacher
     created: Clas.Recorded,
     archived: Option[Clas.Recorded]
-) {
+):
 
   def id = _id
 
@@ -22,9 +22,8 @@ case class Student(
 
   def isArchived = archived.isDefined
   def isActive   = !isArchived
-}
 
-object Student {
+object Student:
 
   def id(userId: User.ID, clasId: Clas.Id) = Id(s"$userId:$clasId")
 
@@ -48,16 +47,13 @@ object Student {
 
   case class ManagedInfo(createdBy: User, clas: Clas)
 
-  private[clas] object password {
+  private[clas] object password:
 
     private val random     = new java.security.SecureRandom()
     private val chars      = ('2' to '9') ++ (('a' to 'z').toSet - 'l') mkString
     private val nbChars    = chars.length
-    private def secureChar = chars(random nextInt nbChars)
+    private def secureChar = chars(random `nextInt` nbChars)
 
     def generate =
-      User.ClearPassword {
+      User.ClearPassword:
         new String(Array.fill(7)(secureChar))
-      }
-  }
-}

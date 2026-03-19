@@ -2,9 +2,9 @@ package lila.insight
 
 import lila.rating.PerfType
 
-case class Preset(name: String, question: Question[_])
+case class Preset(name: String, question: Question[?])
 
-object Preset {
+object Preset:
 
   import lila.insight.{ Dimension => D, Metric => M }
 
@@ -114,4 +114,3 @@ object Preset {
       )
     )
   )
-}

@@ -11,7 +11,7 @@ case class PracticeProgress(
     chapters: PracticeProgress.ChapterNbMoves,
     createdAt: DateTime,
     updatedAt: DateTime
-) {
+):
 
   import PracticeProgress.NbMoves
 
@@ -37,9 +37,8 @@ case class PracticeProgress(
     } orElse metas.find { c =>
       !PracticeStructure.isChapterNameCommented(c.name)
     }
-}
 
-object PracticeProgress {
+object PracticeProgress:
 
   case class Id(value: String) extends AnyVal
 
@@ -59,4 +58,3 @@ object PracticeProgress {
     )
 
   def anon = empty(Id("anon"))
-}

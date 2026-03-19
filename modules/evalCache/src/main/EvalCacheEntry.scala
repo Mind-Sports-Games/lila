@@ -15,7 +15,7 @@ case class EvalCacheEntry(
     evals: List[EvalCacheEntry.Eval],
     usedAt: DateTime,
     updatedAt: DateTime
-) {
+):
 
   import EvalCacheEntry._
 
@@ -33,13 +33,12 @@ case class EvalCacheEntry(
   def makeBestMultiPvEval(multiPv: Int): Option[Eval] =
     evals
       .find(_.multiPv >= multiPv.atMost(nbMoves))
-      .map(_ takePvs multiPv)
+      .map(_ `takePvs` multiPv)
 
   def similarTo(other: EvalCacheEntry) =
     id == other.id && evals == other.evals
-}
 
-object EvalCacheEntry {
+object EvalCacheEntry:
 
   val MIN_KNODES   = 3000
   val MIN_DEPTH    = 20
@@ -53,7 +52,7 @@ object EvalCacheEntry {
       depth: Int,
       by: User.ID,
       trust: Trust
-  ) {
+  ):
 
     def multiPv = pvs.size
 
@@ -73,75 +72,62 @@ object EvalCacheEntry {
         pvs = NonEmptyList(pvs.head, pvs.tail.take(multiPv - 1))
       )
 
-    def depthAboveMin = (depth - MIN_DEPTH) atLeast 0
-  }
+    def depthAboveMin = (depth - MIN_DEPTH) `atLeast` 0
 
-  case class Knodes(value: Int) extends AnyVal {
+  case class Knodes(value: Int) extends AnyVal:
 
-    def intNodes: Int = {
+    def intNodes: Int =
       val nodes = value * 1000d
       if (nodes.toInt == nodes) nodes.toInt
       else if (nodes > 0) Integer.MAX_VALUE
       else Integer.MIN_VALUE
-    }
-  }
 
-  case class Pv(score: Score, moves: Moves) {
+  case class Pv(score: Score, moves: Moves):
 
     def looksValid =
-      score.mate match {
+      score.mate match
         case None       => moves.value.toList.sizeIs > MIN_PV_SIZE
         case Some(mate) => mate.value != 0 // sometimes we get #0. Dunno why.
-      }
 
     def truncate = copy(moves = moves.truncate)
-  }
 
-  case class Moves(value: NonEmptyList[Uci]) extends AnyVal {
+  case class Moves(value: NonEmptyList[Uci]) extends AnyVal:
 
     def truncate = copy(value = NonEmptyList(value.head, value.tail.take(MAX_PV_SIZE - 1)))
 
     def gameLogic: GameLogic = value.head.gameLogic
 
-  }
 
-  case class Trust(value: Double) extends AnyVal {
+  case class Trust(value: Double) extends AnyVal:
     def isTooLow = value <= 0
     def isEnough = !isTooLow
-  }
 
   case class TrustedUser(trust: Trust, user: User)
 
   final class SmallFen private (val value: String) extends AnyVal with StringValue
 
   //TODO is this correct for all fens in SG? What is this used for?
-  object SmallFen {
+  object SmallFen:
     private[evalCache] def raw(str: String) = new SmallFen(str)
-    def make(variant: Variant, fen: FEN): SmallFen = {
+    def make(variant: Variant, fen: FEN): SmallFen =
       val base = fen.value.split(' ').take(4).mkString("").filter { c =>
         c != '/' && c != '-' && c != 'w'
       }
-      val str = variant match {
+      val str = variant match
         case Variant.Chess(strategygames.chess.variant.ThreeCheck) => base + ~fen.value.split(' ').lift(6)
         case Variant.Chess(strategygames.chess.variant.FiveCheck)  => base + ~fen.value.split(' ').lift(6)
         case _                                                     => base
-      }
       new SmallFen(str)
-    }
     def validate(variant: Variant, fen: FEN): Option[SmallFen] =
-      Forsyth.<<@(variant.gameLogic, variant, fen).exists(_ playable false) option make(variant, fen)
-  }
+      Forsyth.<<@(variant.gameLogic, variant, fen).exists(_ `playable` false) `option` make(variant, fen)
 
   case class Id(variant: Variant, smallFen: SmallFen)
 
   case class Input(id: Id, fen: FEN, eval: Eval)
 
-  object Input {
-    case class Candidate(variant: Variant, fen: String, eval: Eval) {
+  object Input:
+    case class Candidate(variant: Variant, fen: String, eval: Eval):
       def input =
-        SmallFen.validate(variant, FEN.apply(variant.gameLogic, fen)) ifTrue eval.looksValid map { smallFen =>
+        SmallFen.validate(variant, FEN.apply(variant.gameLogic, fen)) `ifTrue` eval.looksValid map { smallFen =>
           Input(Id(variant, smallFen), FEN.apply(variant.gameLogic, fen), eval.truncatePvs)
         }
-    }
-  }
-}

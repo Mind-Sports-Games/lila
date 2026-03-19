@@ -18,36 +18,34 @@ final private[api] class UserApi(
     liveStreamApi: lila.streamer.LiveStreamApi,
     gameProxyRepo: lila.round.GameProxyRepo,
     net: NetConfig
-)(implicit ec: scala.concurrent.ExecutionContext) {
+)(implicit ec: scala.concurrent.ExecutionContext):
 
   def pagerJson(pag: Paginator[User]): JsObject =
-    Json.obj("paginator" -> PaginatorJson(pag mapResults one))
+    Json.obj("paginator" -> PaginatorJson(pag `mapResults` one))
 
   def one(u: User): JsObject =
     addPlayingStreaming(jsonView(u), u.id) ++
       Json.obj("url" -> makeUrl(s"@/${u.username}")) // for app BC
 
   def extended(username: String, as: Option[User]): Fu[Option[JsObject]] =
-    userRepo named username flatMap {
-      _ so { extended(_, as) dmap some }
-    }
+    userRepo `named` username flatMap:
+      _ so { extended(_, as) `dmap` some }
 
   def extended(u: User, as: Option[User]): Fu[JsObject] =
-    if (u.disabled) fuccess {
+    if (u.disabled) fuccess:
       Json.obj(
         "id"       -> u.id,
         "username" -> u.username,
         "closed"   -> true
       )
-    }
-    else {
+    else
       gameProxyRepo.urgentGames(u).dmap(_.headOption) zip
         (as.filter(u !=) so { me =>
           crosstableApi.nbGames(me.id, u.id)
         }) zip
         relationApi.countFollowing(u.id) zip
         relationApi.countFollowers(u.id) zip
-        as.isDefined.so { prefApi followable u.id } zip
+        as.isDefined.so { prefApi `followable` u.id } zip
         as.map(_.id).so { relationApi.fetchRelation(_, u.id) } zip
         as.map(_.id).so { relationApi.fetchFollows(u.id, _) } zip
         bookmarkApi.countByUser(u) zip
@@ -57,7 +55,7 @@ final private[api] class UserApi(
           .completionRate(u.id)
           .map(_.map { cr =>
             math.round(cr * 100)
-          }) map {
+          }) map:
           // format: off
             case ((((((((((gameOption,nbGamesWithMe),following),followers),followable),
               relation),isFollowed),nbBookmarks),nbPlaying),nbImported),completionRate)=>
@@ -96,11 +94,8 @@ final private[api] class UserApi(
                 )
               )
           }.noNull
-        }
-    }
 
   private def addPlayingStreaming(js: JsObject, id: User.ID) =
     js.add("streaming", liveStreamApi.isStreaming(id))
 
   private def makeUrl(path: String): String = s"${net.baseUrl}/$path"
-}

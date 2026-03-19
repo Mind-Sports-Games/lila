@@ -8,74 +8,66 @@ import strategygames.variant.Variant
 import org.joda.time.format.DateTimeFormat
 
 import lila.common.String.slugify
-import lila.tree.Node.{ Shape, Shapes }
-import lila.i18n.VariantKeys
 
 final class SgfDump(
     chapterRepo: ChapterRepo,
     lightUserApi: lila.user.LightUserApi,
     net: lila.common.config.NetConfig
-) {
+):
 
   import SgfDump._
 
-  def apply(study: Study): Source[String, _] =
+  def apply(study: Study): Source[String, ?] =
     chapterRepo
       .orderedByStudySource(study.id)
       .map(ofChapter(study))
       .map(_.toString)
       .intersperse("\n\n\n")
 
-  def ofChapter(study: Study)(chapter: Chapter): String = {
+  def ofChapter(study: Study)(chapter: Chapter): String =
     val actionStrs = toActionStrs(chapter.root.mainline)
     val tags       = makeTags(study, chapter)
-    val initialFen = !chapter.root.fen.initial option chapter.root.fen
+    val initialFen = !chapter.root.fen.initial `option` chapter.root.fen
     format(chapter.setup.variant, actionStrs, tags, initialFen)
-  }
 
-  def format(variant: Variant, actionStrs: ActionStrs, tags: Tags, initialFen: Option[FEN]): String = {
+  def format(variant: Variant, actionStrs: ActionStrs, tags: Tags, initialFen: Option[FEN]): String =
     "(;" ++ tags.toString ++ "\n\n" ++ validSgf(variant, actionStrs, initialFen) ++ ")"
-  }
 
-  def validSgf(variant: Variant, actionStrs: ActionStrs, initialFen: Option[FEN]): String = {
+  def validSgf(variant: Variant, actionStrs: ActionStrs, initialFen: Option[FEN]): String =
     if (
       variant.gameLogic == GameLogic.FairySF() || variant.gameLogic == GameLogic
         .Go() || variant.gameLogic == GameLogic.Backgammon()
-    ) {
+    )
       Dumper(variant, actionStrs, initialFen)
-    } else {
+    else
       "SGF NOT SUPPORTED"
-    }
-  }
 
   private val fileR = """[\s,]""".r
 
   def ownerName(study: Study) = lightUserApi.sync(study.ownerId).fold(study.ownerId)(_.name)
 
-  def filename(study: Study): String = {
+  def filename(study: Study): String =
     val date = dateFormat.print(study.createdAt)
     fileR.replaceAllIn(
       s"playstrategy_study_${slugify(study.name.value)}_by_${ownerName(study)}_$date",
       ""
     )
-  }
 
-  def filename(study: Study, chapter: Chapter): String = {
+  def filename(study: Study, chapter: Chapter): String =
     val date = dateFormat.print(chapter.createdAt)
     fileR.replaceAllIn(
       s"playstrategy_study_${slugify(study.name.value)}_${slugify(chapter.name.value)}_by_${ownerName(study)}_$date",
       ""
     )
-  }
 
   private def chapterUrl(studyId: Study.Id, chapterId: Chapter.Id) =
     s"${net.baseUrl}/study/$studyId/$chapterId"
 
-  private val dateFormat = DateTimeFormat forPattern "yyyy.MM.dd"
+  private val dateFormat = DateTimeFormat `forPattern` "yyyy.MM.dd"
 
-  private def makeTags(study: Study, chapter: Chapter): Tags = {
+  private def makeTags(study: Study, chapter: Chapter): Tags =
     val isGo = chapter.setup.variant.gameFamily == GameFamily.Go()
-    Tags {
+    Tags:
       List(
         Tag(_.FF, 4),
         Tag(_.CA, "UTF-8"),
@@ -140,23 +132,17 @@ final class SgfDump(
           case _ => List()
         }
       )
-    }
-  }
-}
 
-object SgfDump {
+object SgfDump:
 
-  def toActionStrs(line: Vector[Node]): ActionStrs = {
+  def toActionStrs(line: Vector[Node]): ActionStrs =
     line
       .drop(1)
       .foldLeft(Vector(line.take(1))) { case (turn, node) =>
-        if (turn.head.head.playedPlayerIndex != node.playedPlayerIndex) {
+        if (turn.head.head.playedPlayerIndex != node.playedPlayerIndex)
           Vector(node) +: turn
-        } else {
+        else
           (turn.head :+ node) +: turn.tail
-        }
       }
       .reverse
       .map(t => t.map(_.move.uci.uci))
-  }
-}

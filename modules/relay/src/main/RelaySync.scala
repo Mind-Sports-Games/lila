@@ -11,32 +11,29 @@ final private class RelaySync(
     multiboard: StudyMultiBoard,
     chapterRepo: ChapterRepo,
     tourRepo: RelayTourRepo
-)(implicit ec: scala.concurrent.ExecutionContext) {
+)(implicit ec: scala.concurrent.ExecutionContext):
 
   private type NbMoves = Int
 
   def apply(rt: RelayRound.WithTour, games: RelayGames): Fu[SyncResult.Ok] =
-    studyApi byId rt.round.studyId orFail "Missing relay study!" flatMap { study =>
-      chapterRepo orderedByStudy study.id flatMap { chapters =>
-        RelayInputSanity(chapters, games) match {
+    studyApi byId rt.round.studyId `orFail` "Missing relay study!" flatMap { study =>
+      chapterRepo `orderedByStudy` study.id flatMap { chapters =>
+        RelayInputSanity(chapters, games) match
           case Some(fail) => fufail(fail.msg)
           case None =>
             lila.common.LilaFuture.linear(games) { game =>
-              findCorrespondingChapter(game, chapters, games.size) match {
+              findCorrespondingChapter(game, chapters, games.size) match
                 case Some(chapter) => updateChapter(rt.tour, study, chapter, game)
                 case None =>
                   createChapter(study, game) flatMap { chapter =>
                     chapters.find(_.isEmptyInitial).ifTrue(chapter.order == 2).so { initial =>
-                      studyApi.deleteChapter(study.id, initial.id) {
+                      studyApi.deleteChapter(study.id, initial.id):
                         actorApi.Who(study.ownerId, sri)
-                      }
                     } inject chapter.root.mainline.size
                   }
-              }
             } map { _.sum } flatMap { moves =>
               tourRepo.setSyncedNow(rt.tour) inject SyncResult.Ok(moves, games)
             }
-        }
       }
     }
 
@@ -63,15 +60,15 @@ final private class RelaySync(
     updateChapterTags(tour, study, chapter, game) >>
       updateChapterTree(study, chapter, game)
 
-  private def updateChapterTree(study: Study, chapter: Chapter, game: RelayGame): Fu[NbMoves] = {
+  private def updateChapterTree(study: Study, chapter: Chapter, game: RelayGame): Fu[NbMoves] =
     val who = actorApi.Who(chapter.ownerId, sri)
-    game.root.mainline.foldLeft(Path.root -> none[Node]) {
+    game.root.mainline.foldLeft(Path.root -> none[Node]):
       case ((parentPath, None), gameNode) =>
         val path = parentPath + gameNode
-        chapter.root.nodeAt(path) match {
+        chapter.root.nodeAt(path) match
           case None => parentPath -> gameNode.some
           case Some(existing) =>
-            gameNode.clock.filter(c => !existing.clock.has(c)) so { c =>
+            gameNode.clock.filter(c => !existing.clock.contains(c)) so { c =>
               studyApi.setClock(
                 studyId = study.id,
                 position = Position(chapter, path).ref,
@@ -79,9 +76,8 @@ final private class RelaySync(
               )(who)
             }
             path -> none
-        }
       case (found, _) => found
-    } match {
+    match
       case (path, newNode) =>
         !Path.isMainline(chapter.root, path) so {
           logger.info(s"Change mainline ${showSC(study, chapter)} $path")
@@ -105,21 +101,18 @@ final private class RelaySync(
                 )
                 .some
             )(who) inject position + n
-          } inject {
+          } inject:
             if (chapter.root.children.nodes.isEmpty && node.mainline.nonEmpty)
               studyApi.reloadChapters(study)
             node.mainline.size
-          }
         }
-    }
-  }
 
   private def updateChapterTags(
       tour: RelayTour,
       study: Study,
       chapter: Chapter,
       game: RelayGame
-  ): Funit = {
+  ): Funit =
     val gameTags = game.tags.value.foldLeft(Tags(Nil)) { case (newTags, tag) =>
       if (!chapter.tags.value.exists(tag ==)) newTags + tag
       else newTags
@@ -132,7 +125,7 @@ final private class RelaySync(
     val chapterNewTags = tags.value.foldLeft(chapter.tags) { case (chapterTags, tag) =>
       PgnTags(chapterTags + tag)
     }
-    (chapterNewTags != chapter.tags) so {
+    (chapterNewTags != chapter.tags) so:
       if (vs(chapterNewTags) != vs(chapter.tags))
         logger.info(s"Update ${showSC(study, chapter)} tags '${vs(chapter.tags)}' -> '${vs(chapterNewTags)}'")
       studyApi.setTags(
@@ -143,8 +136,6 @@ final private class RelaySync(
         val newEnd = chapter.tags.resultPlayer.isEmpty && tags.resultPlayer.isDefined
         newEnd so onChapterEnd(tour, study, chapter)
       }
-    }
-  }
 
   private def onChapterEnd(tour: RelayTour, study: Study, chapter: Chapter): Funit =
     chapterRepo.setRelayPath(chapter.id, Path.root) >> {
@@ -153,10 +144,9 @@ final private class RelaySync(
         chapterId = chapter.id,
         userId = study.ownerId
       )
-    }.andDo {
+    }.andDo:
       multiboard.invalidate(study.id)
       studyApi.reloadChapters(study)
-    }
 
   private def createChapter(study: Study, game: RelayGame): Fu[Chapter] =
     chapterRepo.nextOrderByStudy(study.id) flatMap { order =>
@@ -205,20 +195,14 @@ final private class RelaySync(
 
   private def showSC(study: Study, chapter: Chapter) =
     s"#${study.id} chapter[${chapter.relay.fold("?")(_.index.toString)}]"
-}
 
-sealed trait SyncResult {
+sealed trait SyncResult:
   val reportKey: String
-}
-object SyncResult {
-  case class Ok(moves: Int, games: RelayGames) extends SyncResult {
+object SyncResult:
+  case class Ok(moves: Int, games: RelayGames) extends SyncResult:
     val reportKey = "ok"
-  }
-  case object Timeout extends Exception with SyncResult {
+  case object Timeout extends Exception with SyncResult:
     val reportKey           = "timeout"
     override def getMessage = "In progress..."
-  }
-  case class Error(msg: String) extends SyncResult {
+  case class Error(msg: String) extends SyncResult:
     val reportKey = "error"
-  }
-}

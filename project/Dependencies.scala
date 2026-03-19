@@ -24,7 +24,7 @@ object Dependencies {
   }
   val hasher          = "com.roundeights"                 %% "hasher"                          % "1.3.1"
   val jodaTime        = "joda-time"                        % "joda-time"                       % "2.10.10"
-  val compression     = "org.lichess"                     %% "compression"                     % "3.0"
+  val compression     = "org.lichess"                      % "compression_2.13"                % "1.6"
   val strategyGames   = "org.playstrategy"                %% "strategygames"                   % "10.2.1-pstrat202-lw.20260117.1"
   val maxmind         = "com.maxmind.geoip2"               % "geoip2"                          % "4.2.0"
   val prismic         = "io.prismic"                      %% "scala-kit"                       % "1.2.19_lila-3.2"

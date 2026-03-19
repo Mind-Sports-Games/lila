@@ -15,7 +15,7 @@ final class Env(
     onStart: lila.round.OnStart,
     gameCache: lila.game.Cached,
     oauthServer: OAuthServer
-)(implicit ec: scala.concurrent.ExecutionContext, mat: akka.stream.Materializer) {
+)(implicit ec: scala.concurrent.ExecutionContext, mat: org.apache.pekko.stream.Materializer):
 
   private lazy val maxPlaying = appConfig.get[Max]("setup.max_playing")
 
@@ -24,4 +24,3 @@ final class Env(
   lazy val processor = wire[Processor]
 
   lazy val bulk = wire[SetupBulkApi]
-}

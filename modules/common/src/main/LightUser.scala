@@ -8,14 +8,13 @@ case class LightUser(
     country: Option[String],
     title: Option[String],
     isPatron: Boolean
-) {
+):
 
   def titleName = title.fold(name)(_ + " " + name)
 
   def isBot = title.has("BOT")
-}
 
-object LightUser {
+object LightUser:
 
   private type UserID = String
 
@@ -41,17 +40,14 @@ object LightUser {
       isPatron = false
     )
 
-  final class Getter(f: UserID => Fu[Option[LightUser]]) extends (UserID => Fu[Option[LightUser]]) {
+  final class Getter(f: UserID => Fu[Option[LightUser]]) extends (UserID => Fu[Option[LightUser]]):
     def apply(u: UserID) = f(u)
-  }
 
-  final class GetterSync(f: UserID => Option[LightUser]) extends (UserID => Option[LightUser]) {
+  final class GetterSync(f: UserID => Option[LightUser]) extends (UserID => Option[LightUser]):
     def apply(u: UserID) = f(u)
-  }
 
-  final class IsBotSync(f: UserID => Boolean) extends (UserID => Boolean) {
+  final class IsBotSync(f: UserID => Boolean) extends (UserID => Boolean):
     def apply(userId: UserID) = f(userId)
-  }
 
   // If adding a second bot to the list will need to consider the pairing algorithm in
   // modules/tournament/src/main/arena/PairingSystem.scala
@@ -101,4 +97,3 @@ object LightUser {
 
   val psBotsIDs = tourBotsIDs ++ poolBotsIDs ++ stockfishBotsIDs ++ List(randomBot.id)
 
-}

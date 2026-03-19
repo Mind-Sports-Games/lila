@@ -8,116 +8,98 @@ import lila.study.Study
 import lila.swiss.Swiss
 import lila.user.User
 
-object activities {
+object activities:
 
   val maxSubEntries = 15
 
-  case class Games(value: Map[PerfType, Score]) extends AnyVal {
+  case class Games(value: Map[PerfType, Score]) extends AnyVal:
     def add(pt: PerfType, score: Score) =
       copy(
-        value = value + (pt -> value.get(pt).fold(score)(_ add score))
+        value = value + (pt -> value.get(pt).fold(score)(_ `add` score))
       )
     def hasNonCorres = value.exists(_._1.key != "correspondence")
-  }
   implicit val GamesZero: Zero[Games] = Zero(Games(Map.empty))
 
-  case class Posts(value: List[PostId]) extends AnyVal {
+  case class Posts(value: List[PostId]) extends AnyVal:
     def +(postId: PostId) = Posts(postId :: value)
-  }
   case class PostId(value: String) extends AnyVal
   implicit val PostsZero: Zero[Posts] = Zero(Posts(Nil))
 
-  case class Puzzles(value: Map[PerfType, Score]) {
-    def +(s: Score, pt: PerfType) = Puzzles(value = value + (pt -> value.get(pt).fold(s)(_ add s)))
-  }
+  case class Puzzles(value: Map[PerfType, Score]):
+    def +(s: Score, pt: PerfType) = Puzzles(value = value + (pt -> value.get(pt).fold(s)(_ `add` s)))
   implicit val PuzzlesZero: Zero[Puzzles] = Zero(Puzzles(Map.empty))
 
-  case class Storm(runs: Int, score: Int) {
-    def +(s: Int) = Storm(runs = runs + 1, score = score atLeast s)
-  }
+  case class Storm(runs: Int, score: Int):
+    def +(s: Int) = Storm(runs = runs + 1, score = score `atLeast` s)
   implicit val StormZero: Zero[Storm] = Zero(Storm(0, 0))
 
-  case class Racer(runs: Int, score: Int) {
-    def +(s: Int) = Racer(runs = runs + 1, score = score atLeast s)
-  }
+  case class Racer(runs: Int, score: Int):
+    def +(s: Int) = Racer(runs = runs + 1, score = score `atLeast` s)
   implicit val RacerZero: Zero[Racer] = Zero(Racer(0, 0))
 
-  case class Streak(runs: Int, score: Int) {
-    def +(s: Int) = Streak(runs = runs + 1, score = score atLeast s)
-  }
+  case class Streak(runs: Int, score: Int):
+    def +(s: Int) = Streak(runs = runs + 1, score = score `atLeast` s)
   implicit val StreakZero: Zero[Streak] = Zero(Streak(0, 0))
 
-  case class Learn(value: Map[Learn.Stage, Int]) {
+  case class Learn(value: Map[Learn.Stage, Int]):
     def +(stage: Learn.Stage) =
       copy(
         value = value + (stage -> value.get(stage).fold(1)(1 +))
       )
-  }
-  object Learn {
+  object Learn:
     case class Stage(value: String) extends AnyVal
-  }
   implicit val LearnZero: Zero[Learn] = Zero(Learn(Map.empty))
 
-  case class Practice(value: Map[Study.Id, Int]) {
+  case class Practice(value: Map[Study.Id, Int]):
     def +(studyId: Study.Id) =
       copy(
         value = value + (studyId -> value.get(studyId).fold(1)(1 +))
       )
-  }
   implicit val PracticeZero: Zero[Practice] = Zero(Practice(Map.empty))
 
   case class SimulId(value: String) extends AnyVal
-  case class Simuls(value: List[SimulId]) extends AnyVal {
+  case class Simuls(value: List[SimulId]) extends AnyVal:
     def +(s: SimulId) = copy(value = s :: value)
-  }
   implicit val SimulsZero: Zero[Simuls] = Zero(Simuls(Nil))
 
-  case class Corres(moves: Int, movesIn: List[GameId], end: List[GameId]) {
+  case class Corres(moves: Int, movesIn: List[GameId], end: List[GameId]):
     def add(gameId: GameId, moved: Boolean, ended: Boolean) =
       Corres(
         moves = moves + (moved so 1),
         movesIn = if (moved) (gameId :: movesIn).distinct.take(maxSubEntries) else movesIn,
         end = if (ended) (gameId :: end).take(maxSubEntries) else end
       )
-  }
   implicit val CorresZero: Zero[Corres] = Zero(Corres(0, Nil, Nil))
 
   case class Patron(months: Int) extends AnyVal
-  case class FollowList(ids: List[User.ID], nb: Option[Int]) {
+  case class FollowList(ids: List[User.ID], nb: Option[Int]):
     def actualNb = nb | ids.size
     def +(id: User.ID) =
       if (ids contains id) this
-      else {
+      else
         val newIds = (id :: ids).distinct
         copy(
           ids = newIds take maxSubEntries,
-          nb = nb.map(1 +).orElse(newIds.size > maxSubEntries option newIds.size)
+          nb = nb.map(1 +).orElse(newIds.size > maxSubEntries `option` newIds.size)
         )
-      }
     def isEmpty = ids.isEmpty
-  }
   implicit val FollowListZero: Zero[FollowList] = Zero(FollowList(Nil, None))
   implicit val FollowsZero: Zero[Follows]       = Zero(Follows(None, None))
 
-  case class Follows(in: Option[FollowList], out: Option[FollowList]) {
+  case class Follows(in: Option[FollowList], out: Option[FollowList]):
     def addIn(id: User.ID)  = copy(in = Some(~in + id))
     def addOut(id: User.ID) = copy(out = Some(~out + id))
     def isEmpty             = in.fold(true)(_.isEmpty) && out.fold(true)(_.isEmpty)
-  }
 
-  case class Studies(value: List[Study.Id]) extends AnyVal {
+  case class Studies(value: List[Study.Id]) extends AnyVal:
     def +(s: Study.Id) = copy(value = (s :: value) take maxSubEntries)
-  }
   implicit val StudiesZero: Zero[Studies] = Zero(Studies(Nil))
 
-  case class Teams(value: List[String]) extends AnyVal {
+  case class Teams(value: List[String]) extends AnyVal:
     def +(s: String) = copy(value = (s :: value).distinct take maxSubEntries)
-  }
   implicit val TeamsZero: Zero[Teams] = Zero(Teams(Nil))
 
   case class SwissRank(id: Swiss.Id, rank: Int)
-  case class Swisses(value: List[SwissRank]) extends AnyVal {
+  case class Swisses(value: List[SwissRank]) extends AnyVal:
     def +(s: SwissRank) = copy(value = (s :: value) take maxSubEntries)
-  }
   implicit val SwissesZero: Zero[Swisses] = Zero(Swisses(Nil))
-}

@@ -23,8 +23,8 @@ final class SwissStatsApi(
     mongoCache: lila.memo.MongoCache.Api
 )(implicit
     ec: scala.concurrent.ExecutionContext,
-    mat: akka.stream.Materializer
-) {
+    mat: org.apache.pekko.stream.Materializer
+):
 
   import BsonHandlers._
 
@@ -45,7 +45,7 @@ final class SwissStatsApi(
   }
 
   private def fetch(id: Swiss.Id): Fu[SwissStats] =
-    colls.swiss.byId[Swiss](id.value) flatMap {
+    colls.swiss.byId[Swiss](id.value) flatMap:
       _.filter(_.nbPlayers > 0).fold(fuccess(SwissStats())) { swiss =>
         sheetApi
           .source(swiss, sort = $empty)
@@ -89,5 +89,3 @@ final class SwissStatsApi(
             )
           }
       }
-    }
-}

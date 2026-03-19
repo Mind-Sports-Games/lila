@@ -102,7 +102,7 @@ final class FishnetApi(
                 } else
                   analysisBuilder(client, work, complete.analysis) flatMap { analysis =>
                     monitor.analysis(work, client, complete)
-                    repo.deleteAnalysis(work) inject PostAnalysisResult.Complete(analysis)
+                    repo.deleteAnalysis(work).inject(PostAnalysisResult.Complete(analysis): PostAnalysisResult)
                   }
               } recoverWith { case e: Exception =>
                 Monitor.failure(work, client, e)
@@ -111,7 +111,7 @@ final class FishnetApi(
             case partial: PartialAnalysis =>
               {
                 fuccess(work.game.studyId.isDefined) >>| socketExists(work.game.id)
-              } flatMap {
+              }.flatMap[PostAnalysisResult] {
                 case true =>
                   analysisBuilder.partial(client, work, partial.analysis) map { analysis =>
                     PostAnalysisResult.Partial(analysis)

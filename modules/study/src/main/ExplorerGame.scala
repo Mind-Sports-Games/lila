@@ -1,7 +1,5 @@
 package lila.study
 
-import scala.util.chaining._
-
 import strategygames.format.FEN
 import strategygames.chess.format.pgn.Parser
 import lila.game.{ Game, Namer }
@@ -11,21 +9,20 @@ final private class ExplorerGame(
     importer: lila.explorer.ExplorerImporter,
     lightUserApi: lila.user.LightUserApi,
     net: lila.common.config.NetConfig
-)(implicit ec: scala.concurrent.ExecutionContext) {
+)(implicit ec: scala.concurrent.ExecutionContext):
 
   def quote(gameId: Game.ID): Fu[Option[Comment]] =
-    importer(gameId) map {
+    importer(gameId) map:
       _ so { game =>
         gameComment(game).some
       }
-    }
 
   def insert(study: Study, position: Position, gameId: Game.ID): Fu[Option[(Chapter, Path)]] =
-    if (position.chapter.isOverweight) {
+    if (position.chapter.isOverweight)
       logger.info(s"Overweight chapter ${study.id}/${position.chapter.id}")
       fuccess(none)
-    } else
-      importer(gameId) map {
+    else
+      importer(gameId) map:
         _ so { game =>
           position.node so { fromNode =>
             GameToRoot(game, none, withClocks = false).pipe { root =>
@@ -40,22 +37,19 @@ final private class ExplorerGame(
             }
           }
         }
-      }
 
   private def truncateFen(f: FEN)         = f.value split ' ' take 4 mkString " "
   private def compareFens(a: FEN, b: FEN) = truncateFen(a) == truncateFen(b)
 
-  private def merge(fromNode: RootOrNode, fromPath: Path, game: Node.Root): Option[(Node, Path)] = {
+  private def merge(fromNode: RootOrNode, fromPath: Path, game: Node.Root): Option[(Node, Path)] =
     val gameNodes = game.mainline.dropWhile(n => !compareFens(n.fen, fromNode.fen)) drop 1
-    val (path, foundGameNode) = gameNodes.foldLeft((Path.root, none[Node])) {
+    val (path, foundGameNode) = gameNodes.foldLeft((Path.root, none[Node])):
       case ((path, None), gameNode) =>
         val nextPath = path + gameNode
         if (fromNode.children.nodeAt(nextPath).isDefined) (nextPath, none)
         else (path, gameNode.some)
       case (found, _) => found
-    }
     foundGameNode.map { _ -> fromPath.+(path) }
-  }
 
   private def gameComment(game: Game) =
     Comment(
@@ -66,17 +60,14 @@ final private class ExplorerGame(
 
   private def gameUrl(game: Game) = s"${net.baseUrl}/${game.id}"
 
-  private def gameTitle(g: Game): String = {
+  private def gameTitle(g: Game): String =
     val pgn    = g.pgnImport.flatMap(pgnImport => Parser.full(pgnImport.pgn).toOption)
     val p1     = pgn.flatMap(_.tags(_.P1)) | Namer.playerTextBlocking(g.p1Player)(lightUserApi.sync)
     val p2     = pgn.flatMap(_.tags(_.P2)) | Namer.playerTextBlocking(g.p2Player)(lightUserApi.sync)
     val result = strategygames.Player.showResult(g.winnerPlayerIndex)
     val event: Option[String] =
-      (pgn.flatMap(_.tags(_.Event)), pgn.flatMap(_.tags.year).map(_.toString)) match {
+      (pgn.flatMap(_.tags(_.Event)), pgn.flatMap(_.tags.year).map(_.toString)) match
         case (Some(event), Some(year)) if event.contains(year) => event.some
         case (Some(event), Some(year))                         => s"$event, $year".some
         case (eventO, yearO)                                   => eventO orElse yearO
-      }
     s"$p1 - $p2, $result, ${event | "-"}"
-  }
-}

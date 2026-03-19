@@ -5,17 +5,16 @@ import play.api.data.Forms._
 
 import lila.common.Form.{ numberIn, stringIn }
 
-object PuzzleForm {
+object PuzzleForm:
 
   case class RoundData(
       win: Boolean,
       replayDays: Option[Int],
       streakId: Option[String],
       streakScore: Option[Int]
-  ) {
+  ):
     def result   = Result(win)
     def puzzleId = streakId flatMap Puzzle.toId
-  }
 
   val round = Form(
     mapping(
@@ -42,7 +41,7 @@ object PuzzleForm {
     single("variant" -> stringIn(Puzzle.puzzleVariants.map(_.key).toSet))
   )
 
-  object bc {
+  object bc:
 
     val round = Form(
       mapping(
@@ -61,5 +60,3 @@ object PuzzleForm {
 
     implicit val SolutionReads: Reads[Solution]   = Json.reads[Solution]
     implicit val SolveDataReads: Reads[SolveData] = Json.reads[SolveData]
-  }
-}

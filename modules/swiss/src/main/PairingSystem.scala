@@ -8,17 +8,16 @@ import scala.sys.process._
 
 final private class PairingSystem(trf: SwissTrf, rankingApi: SwissRankingApi, executable: String)(implicit
     ec: scala.concurrent.ExecutionContext,
-    mat: akka.stream.Materializer
-) {
+    mat: org.apache.pekko.stream.Materializer
+):
 
   def apply(swiss: Swiss): Fu[List[SwissPairing.ByeOrPending]] =
     trf.fetchPlayerIds(swiss) flatMap { playerIds =>
-      invoke(swiss, trf(swiss, playerIds, sorted = false)) map {
+      invoke(swiss, trf(swiss, playerIds, sorted = false)) map:
         reader(playerIds.map(_.swap), _)
-      }
     }
 
-  private def invoke(swiss: Swiss, input: Source[String, _]): Fu[List[String]] =
+  private def invoke(swiss: Swiss, input: Source[String, ?]): Fu[List[String]] =
     withTempFile(swiss, input) { file =>
       val flavour =
         if (swiss.nbPlayers < 250) "dutch"
@@ -27,23 +26,21 @@ final private class PairingSystem(trf: SwissTrf, rankingApi: SwissRankingApi, ex
       val command = s"$executable --$flavour $file -p"
       val stdout  = new collection.mutable.ListBuffer[String]
       val stderr  = new StringBuilder
-      val status = lila.common.Chronometer.syncMon(_.swiss.bbpairing) {
-        blocking {
-          command ! ProcessLogger(stdout append _, stderr append _ unit)
-        }
-      }
-      if (status != 0) {
+      val status = lila.common.Chronometer.syncMon(_.swiss.bbpairing):
+        blocking:
+          command ! ProcessLogger(stdout append _, { (s: String) => val _ = stderr append s })
+      if (status != 0)
         val error = stderr.toString
-        if (error contains "No valid pairing exists") Nil
+        if (error `contains` "No valid pairing exists") Nil
         else throw PairingSystem.BBPairingException(error, swiss)
-      } else stdout.toList
+      else stdout.toList
     }
 
   private def reader(idsToPlayers: IdPlayers, output: List[String]): List[SwissPairing.ByeOrPending] =
     output
       .drop(1) // first line is the number of pairings
       .map(_ split ' ')
-      .collect {
+      .collect:
         case Array(p, "0") =>
           p.toIntOption flatMap idsToPlayers.get map { userId =>
             Left(SwissPairing.Bye(userId))
@@ -53,10 +50,9 @@ final private class PairingSystem(trf: SwissTrf, rankingApi: SwissRankingApi, ex
             p1 <- w.toIntOption flatMap idsToPlayers.get
             p2 <- b.toIntOption flatMap idsToPlayers.get
           } yield Right(SwissPairing.Pending(p1, p2))
-      }
       .flatten
 
-  def withTempFile[A](swiss: Swiss, contents: Source[String, _])(f: File => A): Fu[A] = {
+  def withTempFile[A](swiss: Swiss, contents: Source[String, ?])(f: File => A): Fu[A] =
     // NOTE: The prefix and suffix must be at least 3 characters long,
     // otherwise this function throws an IllegalArgumentException.
     val file = File.createTempFile(s"lila-swiss-${swiss.id}-${swiss.round}-", s"-bbp")
@@ -69,9 +65,6 @@ final private class PairingSystem(trf: SwissTrf, rankingApi: SwissRankingApi, ex
         file.delete()
         res
       }
-  }
-}
 
-private object PairingSystem {
+private object PairingSystem:
   case class BBPairingException(message: String, swiss: Swiss) extends lila.base.LilaException
-}

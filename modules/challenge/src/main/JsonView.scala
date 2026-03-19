@@ -7,19 +7,18 @@ import lila.i18n.{ I18nKeys => trans }
 import lila.socket.Socket.SocketVersion
 import lila.socket.UserLagCache
 
-import strategygames.variant.Variant
-import strategygames.{ GameFamily, GameLogic, P1, P2 }
+import strategygames.{ GameFamily, P1, P2 }
 
 final class JsonView(
     baseUrl: lila.common.config.BaseUrl,
     getLightUser: lila.common.LightUser.GetterSync,
     isOnline: lila.socket.IsOnline
-) {
+):
 
   import lila.game.JsonView._
   import Challenge._
 
-  implicit private val RegisteredWrites: OWrites[Challenger.Registered] = OWrites[Challenger.Registered] {
+  implicit private val RegisteredWrites: OWrites[Challenger.Registered] = OWrites[Challenger.Registered]:
     r =>
       val light = getLightUser(r.id)
       Json
@@ -33,7 +32,6 @@ final class JsonView(
         .add("patron" -> light.so(_.isPatron))
         .add("online" -> isOnline(r.id))
         .add("lag" -> UserLagCache.getLagRating(r.id))
-  }
 
   def apply(a: AllChallenges)(implicit lang: Lang): JsObject =
     Json.obj(
@@ -53,12 +51,10 @@ final class JsonView(
       "socketVersion" -> socketVersion
     )
 
-  private def setupInfoJson(c: Challenge): String = {
-    (c.initialFen, c.variant.gameFamily) match {
+  private def setupInfoJson(c: Challenge): String =
+    (c.initialFen, c.variant.gameFamily) match
       case (Some(f), GameFamily.Go()) => c.variant.toGo.setupInfo(f.toGo).getOrElse("")
       case _                          => ""
-    }
-  }
 
   def apply(direction: Option[Direction])(c: Challenge)(implicit lang: Lang): JsObject =
     Json
@@ -122,4 +118,3 @@ final class JsonView(
     trans.cancel,
     trans.multiMatch
   ).map(_.key)
-}

@@ -3,6 +3,7 @@ package lila.relay
 import io.lemonlabs.uri._
 import play.api.libs.json._
 import play.api.libs.ws.StandaloneWSClient
+import play.api.libs.ws.DefaultBodyReadables._
 import scala.concurrent.duration._
 
 import strategygames.variant.Variant
@@ -80,13 +81,13 @@ final private class RelayFormatApi(ws: StandaloneWSClient, cacheApi: CacheApi)(i
       .withRequestTimeout(4.seconds)
       .get()
       .map {
-        case res if res.status == 200 => res.body.some
+        case res if res.status == 200 => res.body[String].some
         case _                        => none
       }
 
   private def looksLikePgn(body: String): Boolean = {
     // TODO: Only support chess PGN for now.
-    implicit val variant = Variant.Chess(ChessVariant.default)
+    implicit val variant: Variant = Variant.Chess(ChessVariant.default)
     MultiPgn.split(body, 1).value.headOption so { pgn =>
       lila.study.PgnImport(pgn, Nil).isValid
     }

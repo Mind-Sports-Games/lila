@@ -12,7 +12,7 @@ final class SgfDump(
     simulApi: lila.simul.SimulApi,
     getTournamentName: lila.tournament.GetTourName,
     getSwissName: lila.swiss.GetSwissName
-)(implicit ec: scala.concurrent.ExecutionContext) {
+)(implicit ec: scala.concurrent.ExecutionContext):
 
   implicit private val lang: Lang = lila.i18n.defaultLang
 
@@ -32,4 +32,3 @@ final class SgfDump(
       realPlayers: Option[RealPlayers]
   ) => apply(game, initialFen, flags, teams, realPlayers)
 
-}

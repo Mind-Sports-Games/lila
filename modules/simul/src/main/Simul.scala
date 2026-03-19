@@ -29,7 +29,7 @@ case class Simul(
     text: String,
     team: Option[String],
     featurable: Option[Boolean]
-) {
+):
   def id = _id
 
   def fullName = s"$name simul"
@@ -42,41 +42,38 @@ case class Simul(
 
   def isRunning = status == SimulStatus.Started
 
-  def hasApplicant(userId: String) = applicants.exists(_ is userId)
+  def hasApplicant(userId: String) = applicants.exists(_ `is` userId)
 
-  def hasPairing(userId: String) = pairings.exists(_ is userId)
+  def hasPairing(userId: String) = pairings.exists(_ `is` userId)
 
   def hasUser(userId: String) = hasApplicant(userId) || hasPairing(userId)
 
   def addApplicant(applicant: SimulApplicant) =
-    Created {
-      if (!hasApplicant(applicant.player.user) && variants.has(applicant.player.variant))
+    Created:
+      if (!hasApplicant(applicant.player.user) && variants.contains(applicant.player.variant))
         copy(applicants = applicants :+ applicant)
       else this
-    }
 
   def removeApplicant(userId: String) =
-    Created {
-      copy(applicants = applicants.filterNot(_ is userId))
-    }
+    Created:
+      copy(applicants = applicants.filterNot(_ `is` userId))
 
   def accept(userId: String, v: Boolean) =
-    Created {
+    Created:
       copy(applicants = applicants map {
-        case a if a is userId => a.copy(accepted = v)
+        case a if a `is` userId => a.copy(accepted = v)
         case a                => a
       })
-    }
 
   def removePairing(userId: String) =
-    copy(pairings = pairings.filterNot(_ is userId)).finishIfDone
+    copy(pairings = pairings.filterNot(_ `is` userId)).finishIfDone
 
   def nbAccepted = applicants.count(_.accepted)
 
   def startable = isCreated && nbAccepted > 1
 
   def start =
-    startable option copy(
+    startable `option` copy(
       status = SimulStatus.Started,
       startedAt = DateTime.now.some,
       applicants = Nil,
@@ -95,7 +92,7 @@ case class Simul(
     ).finishIfDone
 
   def ejectCheater(userId: String): Option[Simul] =
-    hasUser(userId) option removeApplicant(userId).removePairing(userId)
+    hasUser(userId) `option` removeApplicant(userId).removePairing(userId)
 
   private def finishIfDone =
     if (isStarted && pairings.forall(_.finished))
@@ -133,13 +130,12 @@ case class Simul(
 
   private def Created(s: => Simul): Simul = if (isCreated) s else this
 
-  def wins    = pairings.count(p => p.finished && p.wins.has(false))
+  def wins    = pairings.count(p => p.finished && p.wins.contains(false))
   def draws   = pairings.count(p => p.finished && p.wins.isEmpty)
-  def losses  = pairings.count(p => p.finished && p.wins.has(true))
+  def losses  = pairings.count(p => p.finished && p.wins.contains(true))
   def ongoing = pairings.count(_.ongoing)
-}
 
-object Simul {
+object Simul:
 
   type ID = String
 
@@ -158,7 +154,7 @@ object Simul {
       featurable: Option[Boolean]
   ): Simul =
     Simul(
-      _id = lila.common.ThreadLocalRandom nextString 8,
+      _id = lila.common.ThreadLocalRandom `nextString` 8,
       name = name,
       status = SimulStatus.Created,
       clock = clock,
@@ -188,4 +184,3 @@ object Simul {
       team = team,
       featurable = featurable
     )
-}

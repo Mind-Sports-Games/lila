@@ -3,7 +3,6 @@ package lila.oauth
 import com.softwaremill.macwire._
 import lila.common.autoconfig.{ AutoConfig, ConfigName }
 import play.api.Configuration
-import scala.concurrent.duration._
 
 import lila.common.config._
 import lila.db.AsyncColl
@@ -23,7 +22,7 @@ final class Env(
 )(implicit
     ec: scala.concurrent.ExecutionContext,
     scheduler: org.apache.pekko.actor.Scheduler
-) {
+):
 
   private val config = appConfig.get[OauthConfig]("oauth")(AutoConfig.loader)
 
@@ -37,9 +36,8 @@ final class Env(
 
   lazy val tryServer: OAuthServer.Try = () =>
     scala.concurrent
-      .Future {
+      .Future:
         server.some
-      }
       .withTimeoutDefault(50 millis, none) recover { case e: Exception =>
       lila.log("security").warn("oauth", e)
       none
@@ -48,6 +46,5 @@ final class Env(
   lazy val tokenApi = wire[PersonalTokenApi]
 
   def forms = OAuthForm
-}
 
 private class OauthColls(val token: AsyncColl, val app: AsyncColl)

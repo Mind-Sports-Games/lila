@@ -25,7 +25,7 @@ private[game] case class Metadata(
     multiMatch: Option[String] = None,
     multiPointState: Option[MultiPointState] = None,
     fromHandicappedTournament: Boolean = false
-) {
+):
 
   /*
     This function is used within the round context to check if another game is required.
@@ -46,28 +46,24 @@ private[game] case class Metadata(
     else "*"
   }
 
-  private def toInt(s: String): Option[Int] = {
-    try {
+  private def toInt(s: String): Option[Int] =
+    try
       Some(s.toInt)
-    } catch {
+    catch
       case _: Exception => None
-    }
-  }
 
   def pgnDate = pgnImport flatMap (_.date)
 
   def pgnUser = pgnImport flatMap (_.user)
 
   def isEmpty = this == Metadata.empty
-}
 
-private[game] object Metadata {
+private[game] object Metadata:
 
   val empty = Metadata(None, None, None, None, None, analysed = false, GameDrawOffers.empty)
-}
 
 // turns
-case class GameDrawOffers(p1: Set[Int], p2: Set[Int]) {
+case class GameDrawOffers(p1: Set[Int], p2: Set[Int]):
 
   def lastBy(playerIndex: PlayerIndex): Option[Int] = playerIndex.fold(p1, p2).maxOption
 
@@ -78,16 +74,13 @@ case class GameDrawOffers(p1: Set[Int], p2: Set[Int]) {
 
   // playstrategy allows to offer draw on either turn,
   // normalize to pretend it was done on the opponent turn.
-  def normalize(playerIndex: PlayerIndex): Set[Int] = playerIndex.fold(p1, p2) map {
+  def normalize(playerIndex: PlayerIndex): Set[Int] = playerIndex.fold(p1, p2) map:
     case turn if (turn % 2 == 0) == playerIndex.p1 => turn + 1
     case turn => turn
-  }
   def normalizedTurns: Set[Int] = normalize(P1) ++ normalize(P2)
-}
 
-object GameDrawOffers {
+object GameDrawOffers:
   val empty = GameDrawOffers(Set.empty, Set.empty)
-}
 
 case class PgnImport(
     user: Option[String],
@@ -97,11 +90,11 @@ case class PgnImport(
     h: Option[ByteArray]
 )
 
-object PgnImport {
+object PgnImport:
 
   def hash(pgn: String) =
-    ByteArray {
-      MessageDigest getInstance "MD5" digest {
+    ByteArray:
+      MessageDigest `getInstance` "MD5" digest {
         pgn.linesIterator
           .map(_.replace(" ", ""))
           .filter(_.nonEmpty)
@@ -109,7 +102,6 @@ object PgnImport {
           .mkString("\n")
           .getBytes("UTF-8")
       } take 12
-    }
 
   def make(
       user: Option[String],
@@ -126,4 +118,3 @@ object PgnImport {
   import reactivemongo.api.bson.Macros
   import ByteArray.ByteArrayBSONHandler
   implicit val pgnImportBSONHandler: BSONDocumentHandler[PgnImport] = Macros.handler[PgnImport]
-}

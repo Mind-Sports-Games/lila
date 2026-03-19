@@ -17,7 +17,7 @@ case class Chart(
     games: List[JsObject]
 )
 
-object Chart {
+object Chart:
 
   case class Xaxis(
       name: String,
@@ -37,11 +37,11 @@ object Chart {
       data: List[Double]
   )
 
-  def fromAnswer[X](getLightUser: LightUser.GetterSync)(answer: Answer[X])(implicit lang: Lang): Chart = {
+  def fromAnswer[X](getLightUser: LightUser.GetterSync)(answer: Answer[X])(implicit lang: Lang): Chart =
 
     import answer._, question._
 
-    def gameUserJson(player: lila.game.Player): JsObject = {
+    def gameUserJson(player: lila.game.Player): JsObject =
       val light = player.userId flatMap getLightUser
       Json
         .obj(
@@ -50,7 +50,6 @@ object Chart {
           "rating" -> player.rating
         )
         .noNull
-    }
 
     def games =
       povs.map { pov =>
@@ -58,7 +57,7 @@ object Chart {
           "id"          -> pov.gameId,
           "fen"         -> Forsyth.exportBoard(pov.game.variant.gameLogic, pov.game.board),
           "playerIndex" -> pov.player.playerIndex.name,
-          "lastMove"    -> ~pov.game.lastActionKeys,
+          "lastMove"    -> pov.game.lastActionKeys.getOrElse(""),
           "user1"       -> gameUserJson(pov.player),
           "user2"       -> gameUserJson(pov.opponent)
         )
@@ -68,7 +67,7 @@ object Chart {
       Xaxis(
         name = dimension.name,
         categories = clusters.map(_.x).map(Dimension.valueJson(dimension)),
-        dataType = Dimension dataTypeOf dimension
+        dataType = Dimension `dataTypeOf` dimension
       )
 
     def sizeSerie =
@@ -82,7 +81,7 @@ object Chart {
     def series =
       clusters
         .foldLeft(Map.empty[String, Serie]) { case (acc, cluster) =>
-          cluster.insight match {
+          cluster.insight match
             case Insight.Single(point) =>
               val key = metric.name
               acc.updated(
@@ -115,7 +114,6 @@ object Chart {
                   }
                 )
               }
-          }
         }
         .map { case (_, serie) =>
           serie.copy(data = serie.data.reverse)
@@ -123,15 +121,13 @@ object Chart {
         .toList
 
     def sortedSeries =
-      answer.clusters.headOption.fold(series) {
-        _.insight match {
+      answer.clusters.headOption.fold(series):
+        _.insight match
           case Insight.Single(_)       => series
           case Insight.Stacked(points) => series.sortLike(points.map(_._1.name), _.name)
-        }
-      }
 
     Chart(
-      question = JsonQuestion fromQuestion question,
+      question = JsonQuestion `fromQuestion` question,
       xAxis = xAxis,
       valueYaxis = Yaxis(metric.name, metric.dataType.name),
       sizeYaxis = Yaxis(metric.per.tellNumber, Metric.DataType.Count.name),
@@ -139,5 +135,3 @@ object Chart {
       sizeSerie = sizeSerie,
       games = games
     )
-  }
-}

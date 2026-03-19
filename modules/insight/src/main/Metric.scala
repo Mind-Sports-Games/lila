@@ -16,17 +16,15 @@ sealed abstract class Metric(
     val description: Frag
 )
 
-object Metric {
+object Metric:
 
-  sealed trait DataType {
+  sealed trait DataType:
     def name = toString.toLowerCase
-  }
-  object DataType {
+  object DataType:
     case object Seconds extends DataType
     case object Count   extends DataType
     case object Average extends DataType
     case object Percent extends DataType
-  }
 
   import DataType._
   import Position._
@@ -36,7 +34,7 @@ object Metric {
       extends Metric(
         "acpl",
         "Average centipawn loss",
-        F moves "c",
+        F `moves` "c",
         Move,
         Move,
         Average,
@@ -47,7 +45,7 @@ object Metric {
       extends Metric(
         "cplBucket",
         "Centipawn loss bucket",
-        F moves "c",
+        F `moves` "c",
         Move,
         Move,
         Percent,
@@ -58,7 +56,7 @@ object Metric {
       extends Metric(
         "movetime",
         "Move time",
-        F moves "t",
+        F `moves` "t",
         Move,
         Move,
         Seconds,
@@ -105,7 +103,7 @@ object Metric {
       extends Metric(
         "nbMoves",
         "Moves per game",
-        F moves "r",
+        F `moves` "r",
         Move,
         Game,
         Average,
@@ -116,7 +114,7 @@ object Metric {
       extends Metric(
         "piece",
         "Piece moved",
-        F moves "r",
+        F `moves` "r",
         Move,
         Move,
         Percent,
@@ -127,7 +125,7 @@ object Metric {
       extends Metric(
         "opportunism",
         "Opportunism",
-        F moves "o",
+        F `moves` "o",
         Move,
         Move,
         Percent,
@@ -140,7 +138,7 @@ object Metric {
       extends Metric(
         "luck",
         "Luck",
-        F moves "l",
+        F `moves` "l",
         Move,
         Move,
         Percent,
@@ -153,7 +151,7 @@ object Metric {
       extends Metric(
         "material",
         "Material imbalance",
-        F moves "i",
+        F `moves` "i",
         Move,
         Move,
         Average,
@@ -164,7 +162,7 @@ object Metric {
       extends Metric(
         "blurs",
         "Blurs",
-        F moves "b",
+        F `moves` "b",
         Move,
         Move,
         Percent,
@@ -175,7 +173,7 @@ object Metric {
       extends Metric(
         "timeVariance",
         "Time variance",
-        F moves "v",
+        F `moves` "v",
         Move,
         Move,
         Average,
@@ -203,30 +201,27 @@ object Metric {
   } toMap
 
   def requiresAnalysis(m: Metric) =
-    m match {
+    m match
       case MeanCpl   => true
       case CplBucket => true
       case _         => false
-    }
 
   def requiresStableRating(m: Metric) =
-    m match {
+    m match
       case RatingDiff     => true
       case OpponentRating => true
       case _              => false
-    }
 
   def isStacked(m: Metric) =
-    m match {
+    m match
       case Result      => true
       case Termination => true
       case PieceRole   => true
       case CplBucket   => true
       case _           => false
-    }
 
   def valuesOf(metric: Metric): List[MetricValue] =
-    metric match {
+    metric match
       case Result =>
         lila.insight.Result.all.map { r =>
           MetricValue(BSONInteger(r.id), MetricValueName(r.name))
@@ -244,8 +239,6 @@ object Metric {
           MetricValue(BSONInteger(cpl.cpl), MetricValueName(cpl.name))
         }
       case _ => Nil
-    }
 
   case class MetricValueName(name: String)
   case class MetricValue(key: BSONValue, name: MetricValueName)
-}

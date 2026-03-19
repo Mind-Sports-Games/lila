@@ -14,7 +14,7 @@ final private[video] class Youtube(
     apiKey: Secret,
     max: Max,
     api: VideoApi
-)(implicit ec: scala.concurrent.ExecutionContext) {
+)(implicit ec: scala.concurrent.ExecutionContext):
 
   import Youtube._
 
@@ -58,20 +58,17 @@ final private[video] class Youtube(
           "part" -> "id,statistics,snippet,contentDetails",
           "key"  -> apiKey.value
         )
-        .get() flatMap {
+        .get() flatMap:
         case res if res.status == 200 =>
-          readEntries reads res.body[JsValue] match {
+          readEntries reads res.body[JsValue] match
             case JsError(err)          => fufail(err.toString)
             case JsSuccess(entries, _) => fuccess(entries.toList)
-          }
         case res =>
           println(res.body)
           fufail(s"[video youtube] fetch ${res.status}")
-      }
     }
-}
 
-object Youtube {
+object Youtube:
 
   def empty = Metadata(0, 0, None, None, None)
 
@@ -103,7 +100,5 @@ object Youtube {
 
   private val iso8601Formatter = org.joda.time.format.ISOPeriodFormat.standard()
 
-  private[video] case class ContentDetails(duration: String) {
+  private[video] case class ContentDetails(duration: String):
     def seconds: Int = iso8601Formatter.parsePeriod(duration).toStandardSeconds.getSeconds
-  }
-}

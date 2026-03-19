@@ -61,6 +61,9 @@ final class Env(
   val config = ApiConfig loadFrom appConfig
   import config.apiToken
   import net.{ baseUrl, domain }
+  implicit private val netDomain: NetDomain = domain
+  implicit private val netBaseUrl: BaseUrl = baseUrl
+  implicit private val apiSecret: Secret = apiToken
 
   lazy val pgnDump: PgnDump = wire[PgnDump]
 

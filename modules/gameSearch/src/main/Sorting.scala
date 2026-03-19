@@ -2,7 +2,7 @@ package lila.gameSearch
 
 case class Sorting(f: String, order: String)
 
-object Sorting {
+object Sorting:
 
   val fields = List(
     Fields.date               -> "Date",
@@ -16,4 +16,3 @@ object Sorting {
   )
 
   val default = Sorting(Fields.date, "desc")
-}

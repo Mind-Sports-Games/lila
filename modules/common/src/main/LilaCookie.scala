@@ -5,7 +5,7 @@ import scala.concurrent.ExecutionContext
 
 import lila.common.config.NetDomain
 
-final class LilaCookie(domain: NetDomain, baker: SessionCookieBaker) {
+final class LilaCookie(domain: NetDomain, baker: SessionCookieBaker):
 
   private val cookieDomain = domain.value.split(":").head
 
@@ -47,17 +47,13 @@ final class LilaCookie(domain: NetDomain, baker: SessionCookieBaker) {
     else res withCookies makeSessionId(using req)
 
   def ensureAndGet(req: RequestHeader)(res: String => Fu[Result])(implicit ec: ExecutionContext): Fu[Result] =
-    req.session.data.get(LilaCookie.sessionId) match {
+    req.session.data.get(LilaCookie.sessionId) match
       case Some(sessionId) => res(sessionId)
       case None            =>
         val sid = generateSessionId()
-        res(sid) map {
+        res(sid) map:
           _ withCookies session(LilaCookie.sessionId, sid)(using req)
-        }
-    }
-}
 
-object LilaCookie {
+object LilaCookie:
 
   val sessionId = "sid"
-}

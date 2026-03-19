@@ -7,7 +7,6 @@ import strategygames.format.Uci
 
 import lila.common.LilaFuture
 import lila.game.{ Game, GameRepo, UciMemo }
-import scalalib.Random.approximately
 
 final class FishnetPlayer(
     redis: FishnetRedis,
@@ -17,13 +16,12 @@ final class FishnetPlayer(
 )(implicit
     ec: scala.concurrent.ExecutionContext,
     scheduler: org.apache.pekko.actor.Scheduler
-) {
+):
 
   def apply(game: Game): Funit =
     game.aiLevel so { level =>
-      LilaFuture.delay(delayFor(game) | 0.millis) {
-        makeWork(game, level) addEffect redis.request void
-      }
+      LilaFuture.delay(delayFor(game) | 0.millis):
+        makeWork(game, level) `addEffect` redis.request void
     } recover { case e: Exception =>
       logger.info(e.getMessage)
     }
@@ -39,18 +37,18 @@ final class FishnetPlayer(
         clock     = g.clock | defaultClock
         totalTime = clock.estimateTotalTime.centis
         if totalTime > 20 * 100
-        delay = (clock.remainingTime(pov.playerIndex).centis atMost totalTime) * delayFactor
-        accel = 1 - ((g.turnCount - 20) atLeast 0 atMost 100) / 150f
-        sleep = (delay * accel) atMost 500
+        delay = (clock.remainingTime(pov.playerIndex).centis `atMost` totalTime) * delayFactor
+        accel = 1 - ((g.turnCount - 20) `atLeast` 0 `atMost` 100) / 150f
+        sleep = (delay * accel) `atMost` 500
         if sleep > 25
         millis     = sleep * 10
-        randomized = approximately(0.5f)(millis)
+        randomized = millis + (millis * (java.util.concurrent.ThreadLocalRandom.current().nextFloat() - 0.5f)).toLong
         divided    = randomized / (if (g.turnCount > 9) 1 else 2)
-      } yield divided.millis
+      } yield divided.toLong.millis
 
   private def makeWork(game: Game, level: Int): Fu[Work.Move] =
-    if (game.situation playable true)
-      if (game.turnCount <= maxTurns) gameRepo.initialFen(game) zip uciMemo.get(game) map {
+    if (game.situation `playable` true)
+      if (game.turnCount <= maxTurns) gameRepo.initialFen(game) zip uciMemo.get(game) map:
         case (initialFen, moves) =>
           Work.Move(
             _id = Work.makeId,
@@ -77,7 +75,5 @@ final class FishnetPlayer(
               )
             }
           )
-      }
       else fufail(s"[fishnet] Too many turns (${game.turnCount}), won't play ${game.id}")
     else fufail(s"[fishnet] invalid position on ${game.id}")
-}

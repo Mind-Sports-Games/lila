@@ -19,7 +19,7 @@ final class Env(
 )(implicit
     ec: scala.concurrent.ExecutionContext,
     ws: play.api.libs.ws.StandaloneWSClient
-) {
+):
 
   private val config = appConfig.get[BlogConfig]("blog")(AutoConfig.loader)
 
@@ -28,4 +28,3 @@ final class Env(
   private lazy val notifier = wire[Notifier]
 
   lazy val lastPostCache = wire[LastPostCache]
-}

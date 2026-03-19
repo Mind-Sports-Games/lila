@@ -1,9 +1,8 @@
 package lila.relation
 
 import org.apache.pekko.stream.scaladsl._
-import reactivemongo.akkastream.cursorProducer
+import reactivemongo.pekkostream.cursorProducer
 import reactivemongo.api.ReadPreference
-import scala.concurrent.duration._
 
 import lila.common.config.MaxPerSecond
 import lila.db.dsl._
@@ -12,11 +11,11 @@ import lila.user.{ User, UserRepo }
 final class RelationStream(
     coll: Coll,
     userRepo: UserRepo
-)(implicit mat: akka.stream.Materializer) {
+)(implicit mat: org.apache.pekko.stream.Materializer):
 
   import RelationStream._
 
-  def follow(user: User, direction: Direction, perSecond: MaxPerSecond): Source[User, _] =
+  def follow(user: User, direction: Direction, perSecond: MaxPerSecond): Source[User, ?] =
     coll
       .find(
         $doc(selectField(direction) -> user.id, "r" -> Follow),
@@ -32,22 +31,17 @@ final class RelationStream(
       .mapConcat(identity)
 
   private def selectField(d: Direction) =
-    d match {
+    d match
       case Direction.Following => "u1"
       case Direction.Followers => "u2"
-    }
   private def projectField(d: Direction) =
-    d match {
+    d match
       case Direction.Following => "u2"
       case Direction.Followers => "u1"
-    }
-}
 
-object RelationStream {
+object RelationStream:
 
   sealed trait Direction
-  object Direction {
+  object Direction:
     case object Following extends Direction
     case object Followers extends Direction
-  }
-}

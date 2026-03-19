@@ -44,20 +44,15 @@ final class Env(
   private lazy val detectLanguage =
     new DetectLanguage(ws, appConfig.get[DetectLanguage.Config]("detectlanguage.api"))
 
-  lazy val categApi: CategApi = {
-    val mk = (env: Env) => wire[CategApi]
-    mk(this)
-  }
+  private val env: Env = this
 
-  lazy val topicApi: TopicApi = {
-    val mk = (max: MaxPerPage, env: Env) => wire[TopicApi]
-    mk(config.topicMaxPerPage, this)
-  }
+  lazy val categApi: CategApi = wire[CategApi]
 
-  lazy val postApi: PostApi = {
-    val mk = (max: MaxPerPage, env: Env) => wire[PostApi]
-    mk(config.postMaxPerPage, this)
-  }
+  lazy val topicApi: TopicApi =
+    new TopicApi(env, forumSearch, config.topicMaxPerPage, modLog, spam, promotion, timeline, shutup, detectLanguage)
+
+  lazy val postApi: PostApi =
+    new PostApi(env, forumSearch, config.postMaxPerPage, modLog, spam, promotion, timeline, shutup, detectLanguage)
 
   lazy val mentionNotifier: MentionNotifier = wire[MentionNotifier]
   lazy val forms                            = wire[ForumForm]

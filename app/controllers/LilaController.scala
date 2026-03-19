@@ -28,11 +28,22 @@ abstract private[controllers] class LilaController(val env: Env)
     with RequestGetter
     with ResponseWriter {
 
-  def controllerComponents                        = env.controllerComponents
-  implicit def executionContext: ExecutionContext = env.executionContext
-  implicit def scheduler: Scheduler               = env.scheduler
+  def controllerComponents                                                          = env.controllerComponents
+  implicit def executionContext: ExecutionContext                                   = env.executionContext
+  implicit def executor: scala.concurrent.ExecutionContextExecutor                 = env.executionContext.asInstanceOf[scala.concurrent.ExecutionContextExecutor]
+  implicit def scheduler: Scheduler                                                 = env.scheduler
 
   implicit protected val LilaResultZero: Zero[Result] = Zero[Result](Results.NotFound)
+
+  // Provide Zero instances needed by `.so` extension method in Scala 3
+  protected given zeroFuUnit: Zero[Fu[Unit]]     = Zero(scala.concurrent.Future.unit)
+  protected given [A]: Zero[Fu[Option[A]]]       = Zero(scala.concurrent.Future.successful(None))
+  protected given zeroString: Zero[String]       = Zero("")
+  protected given [A]: Zero[Option[A]]           = Zero(None)
+  protected given [A]: Zero[List[A]]             = Zero(Nil)
+  protected given zeroBoolean: Zero[Boolean]     = Zero(false)
+  protected given zeroInt: Zero[Int]             = Zero(0)
+  protected given zeroFuResult: Zero[Fu[Result]] = Zero(scala.concurrent.Future.successful(Results.NotFound))
 
   implicit final protected class LilaPimpedResult(result: Result) {
     def fuccess                           = scala.concurrent.Future successful result
@@ -626,7 +637,7 @@ abstract private[controllers] class LilaController(val env: Env)
     else result
 
   protected def NotManaged(result: => Fu[Result])(implicit ctx: Context) =
-    ctx.me.so(env.clas.api.student.isManaged) flatMap {
+    ctx.me.fold(fuccess(false))(env.clas.api.student.isManaged) flatMap {
       case true => notFound
       case _    => result
     }

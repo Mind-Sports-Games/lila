@@ -17,7 +17,11 @@ final class ErrorHandler(
     mainC: => controllers.Main,
     lobbyC: => controllers.Lobby
 )(implicit ec: scala.concurrent.ExecutionContext)
-    extends DefaultHttpErrorHandler(environment, config, router.some) {
+    extends DefaultHttpErrorHandler(
+      play.api.http.HttpErrorConfig(environment.mode.isProd, None),
+      None,
+      router.some
+    ) {
 
   override def onProdServerError(req: RequestHeader, exception: UsefulException) =
     Future {

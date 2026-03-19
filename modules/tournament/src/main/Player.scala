@@ -20,7 +20,7 @@ private[tournament] case class Player(
     performance: Int = 0,
     playedGames: Boolean = false,
     team: Option[TeamID] = None
-) {
+):
 
   def id = _id
 
@@ -37,10 +37,9 @@ private[tournament] case class Player(
 
   def magicScore = score * 100000 + (if (playedGames) 1 else 0) * 10000 + (performanceOption | actualRating)
 
-  def performanceOption = performance > 0 option performance
-}
+  def performanceOption = performance > 0 `option` performance
 
-private[tournament] object Player {
+private[tournament] object Player:
 
   type ID = String
 
@@ -65,4 +64,3 @@ private[tournament] object Player {
       isBot = user.isBot,
       team = team
     )
-}

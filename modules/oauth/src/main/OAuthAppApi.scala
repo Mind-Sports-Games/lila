@@ -3,32 +3,30 @@ package lila.oauth
 import lila.db.dsl._
 import lila.user.User
 
-final class OAuthAppApi(colls: OauthColls)(implicit ec: scala.concurrent.ExecutionContext) {
+final class OAuthAppApi(colls: OauthColls)(implicit ec: scala.concurrent.ExecutionContext):
 
   import OAuthApp.{ AppBSONHandler, AppIdHandler }
   import OAuthApp.{ BSONFields => F }
 
   def mine(u: User): Fu[List[OAuthApp]] =
-    colls.app {
-      _.find($doc(F.author -> u.id)).sort($sort desc F.createdAt).cursor[OAuthApp]().list(30)
-    }
+    colls.app:
+      _.find($doc(F.author -> u.id)).sort($sort `desc` F.createdAt).cursor[OAuthApp]().list(30)
 
   def create(app: OAuthApp) = colls.app(_.insert.one(app).void)
 
   def findBy(clientId: OAuthApp.Id, user: User): Fu[Option[OAuthApp]] =
-    colls.app {
+    colls.app:
       _.one[OAuthApp](
         $doc(
           F.clientId -> clientId,
           F.author   -> user.id
         )
       )
-    }
 
   def authorizedBy(user: User): Fu[List[AccessToken.WithApp]] =
     colls.app { appColl =>
       import OAuthApp.AppBSONHandler
-      colls.token {
+      colls.token:
         _.aggregateWith[Bdoc]() { implicit framework =>
           import framework._
           List(
@@ -54,25 +52,22 @@ final class OAuthAppApi(colls: OauthColls)(implicit ec: scala.concurrent.Executi
             app   <- doc.getAsOpt[List[OAuthApp]]("app").so(_.headOption)
           } yield AccessToken.WithApp(token, app)
         }
-      }
     }
 
   def revoke(id: AccessToken.Id, user: User): Funit =
-    colls.token {
+    colls.token:
       _.delete.one($doc("access_token_id" -> id, "user_id" -> user.id)).void
-    }
 
   def authorOf(clientId: OAuthApp.Id): Fu[Option[User.ID]] =
     colls.app(_.primitiveOne[User.ID]($doc(F.clientId -> clientId), F.author))
 
-  def update(from: OAuthApp)(f: OAuthApp => OAuthApp): Fu[OAuthApp] = {
+  def update(from: OAuthApp)(f: OAuthApp => OAuthApp): Fu[OAuthApp] =
     val app = f(from)
     if (app == from) fuccess(app)
     else colls.app(_.update.one($doc(F.clientId -> app.clientId), app)) inject app
-  }
 
   def deleteBy(clientId: OAuthApp.Id, user: User) =
-    colls.app {
+    colls.app:
       _.delete
         .one(
           $doc(
@@ -81,5 +76,3 @@ final class OAuthAppApi(colls: OauthColls)(implicit ec: scala.concurrent.Executi
           )
         )
         .void
-    }
-}

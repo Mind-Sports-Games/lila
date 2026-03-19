@@ -1,7 +1,5 @@
 package lila.forum
 
-import scala.concurrent.duration._
-
 import lila.memo.CacheApi._
 import lila.user.User
 
@@ -9,7 +7,7 @@ final class ForumRecent(
     postApi: PostApi,
     postRepo: PostRepo,
     cacheApi: lila.memo.CacheApi
-)(implicit ec: scala.concurrent.ExecutionContext) {
+)(implicit ec: scala.concurrent.ExecutionContext):
 
   private val nb: Int = 8
 
@@ -24,19 +22,17 @@ final class ForumRecent(
   def apply(user: Option[User], getTeams: GetTeamIds): Fu[List[MiniForumPost]] =
     userCacheKey(user, getTeams) flatMap cache.get
 
-  private val teamCache = cacheApi[String, List[MiniForumPost]](512, "forum.team.recent") {
+  private val teamCache = cacheApi[String, List[MiniForumPost]](512, "forum.team.recent"):
     _.expireAfterWrite(1 hour)
       .buildAsyncFuture { id =>
         postRepo.recentInCateg(teamSlug(id), 6) flatMap postApi.miniPosts
       }
-  }
 
   def team(teamId: String): Fu[List[MiniForumPost]] = teamCache get teamId
 
-  def invalidate(): Unit = {
+  def invalidate(): Unit =
     cache.invalidateAll()
     teamCache.invalidateAll()
-  }
 
   private val defaultLang = "en"
 
@@ -52,10 +48,9 @@ final class ForumRecent(
       parts.mkString(";")
     }
 
-  private val cache = cacheApi[String, List[MiniForumPost]](1024, "forum.recent") {
+  private val cache = cacheApi[String, List[MiniForumPost]](1024, "forum.recent"):
     _.expireAfterWrite(1 hour)
       .buildAsyncFuture(fetch)
-  }
 
   private def parseLangs(langStr: String) = langStr.split(",").toList.filter(_.nonEmpty)
 
@@ -64,4 +59,3 @@ final class ForumRecent(
       case langs :: categs => postRepo.recentInCategs(nb)(categs, parseLangs(langs))
       case categs          => postRepo.recentInCategs(nb)(categs, parseLangs("en"))
     }) flatMap postApi.miniPosts
-}

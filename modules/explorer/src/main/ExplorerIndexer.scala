@@ -24,17 +24,17 @@ final private class ExplorerIndexer(
     internalEndpoint: InternalEndpoint
 )(implicit
     ec: scala.concurrent.ExecutionContext,
-    mat: akka.stream.Materializer
-) {
+    mat: org.apache.pekko.stream.Materializer
+):
 
   private val separator           = "\n\n\n"
   private val datePattern         = "yyyy-MM-dd"
-  private val dateFormatter       = DateTimeFormat forPattern datePattern
-  private val pgnDateFormat       = DateTimeFormat forPattern "yyyy.MM.dd"
+  private val dateFormatter       = DateTimeFormat.forPattern(datePattern)
+  private val pgnDateFormat       = DateTimeFormat.forPattern("yyyy.MM.dd")
   private val internalEndPointUrl = s"$internalEndpoint/import/playstrategy"
 
   private def parseDate(str: String): Option[DateTime] =
-    Try(dateFormatter parseDateTime str).toOption
+    Try(dateFormatter.parseDateTime(str)).toOption
 
   def apply(sinceStr: String): Funit =
     getBotUserIds() flatMap { botUserIds =>
@@ -58,10 +58,9 @@ final private class ExplorerIndexer(
           .grouped(50)
           .map(_ mkString separator)
           .mapAsyncUnordered(2) { pgn =>
-            ws.url(internalEndPointUrl).put(pgn).flatMap {
+            ws.url(internalEndPointUrl).put(pgn).flatMap:
               case res if res.status == 200 => funit
               case res                      => fufail(s"Stop import because of status ${res.status}")
-            }
           }
           .toMat(Sink.ignore)(Keep.right)
           .run()
@@ -71,19 +70,18 @@ final private class ExplorerIndexer(
 
   def apply(game: Game): Funit =
     getBotUserIds() flatMap { botUserIds =>
-      makeFastPgn(game, botUserIds) map {
+      makeFastPgn(game, botUserIds) map:
         _ foreach flowBuffer.apply
-      }
     }
 
-  private object flowBuffer {
+  private object flowBuffer:
     private val max = 30
     private val buf = scala.collection.mutable.ArrayBuffer.empty[String]
-    def apply(pgn: String): Unit = {
+    def apply(pgn: String): Unit =
       buf += pgn
       val startAt = nowMillis
-      if (buf.sizeIs >= max) {
-        ws.url(internalEndPointUrl).put(buf mkString separator) andThen {
+      if (buf.sizeIs >= max)
+        ws.url(internalEndPointUrl).put(buf mkString separator) andThen:
           case Success(res) if res.status == 200 =>
             lila.mon.explorer.index.time.record((nowMillis - startAt) / max)
             lila.mon.explorer.index.count(true).increment(max)
@@ -93,11 +91,7 @@ final private class ExplorerIndexer(
           case Failure(err) =>
             logger.warn(s"$err", err)
             lila.mon.explorer.index.count(false).increment(max)
-        }
         buf.clear()
-      }
-    }
-  }
 
   private def valid(game: Game) =
     game.finished &&
@@ -105,13 +99,13 @@ final private class ExplorerIndexer(
       game.turnCount >= 10 &&
       game.variant != strategygames.chess.variant.FromPosition
 
-  private def stableRating(player: Player) = player.rating ifFalse player.provisional
+  private def stableRating(player: Player) = player.rating `ifFalse` player.provisional
 
   // probability of the game being indexed, between 0 and 1
-  private def probability(game: Game, rating: Int) = {
-    game.perfType match {
+  private def probability(game: Game, rating: Int) =
+    game.perfType match
       case Some(pt) =>
-        pt.key match {
+        pt.key match
           case "correspondence"                        => 1
           case "rapid" | "classical" if rating >= 2000 => 1
           case "rapid" | "classical" if rating >= 1800 => 2 / 5f
@@ -126,10 +120,7 @@ final private class ExplorerIndexer(
           case "bullet"                                => 1 / 20f
           case _ if rating >= 1600                     => 1      // variant games
           case _                                       => 1 / 2f // noob variant games
-        }
       case _ => 1 / 2f
-    }
-  }
 
   private def makeFastPgn(game: Game, botUserIds: Set[User.ID]): Fu[Option[String]] =
     ~(for {
@@ -144,7 +135,7 @@ final private class ExplorerIndexer(
       if probability(game, averageRating) > nextFloat()
       if !game.userIds.exists(botUserIds.contains)
       if valid(game)
-    } yield gameRepo initialFen game flatMap { initialFen =>
+    } yield gameRepo `initialFen` game flatMap { initialFen =>
       userRepo.usernamesByIds(game.userIds) map { usernames =>
         def username(playerIndex: PlayerIndex) =
           game.player(playerIndex).userId flatMap { id =>
@@ -181,4 +172,3 @@ final private class ExplorerIndexer(
     })
 
   private val logger = lila.log("explorer")
-}

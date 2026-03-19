@@ -13,14 +13,14 @@ import lila.common.HTTPRequest
 import lila.db.dsl._
 import lila.user.Holder
 
-final class GameMod(env: Env)(implicit mat: akka.stream.Materializer) extends LilaController(env) {
+final class GameMod(env: Env)(implicit mat: org.apache.pekko.stream.Materializer) extends LilaController(env) {
 
   import GameMod._
 
   def index(username: String) =
     SecureBody(_.Hunter) { implicit ctx => me =>
       OptionFuResult(env.user.repo named username) { user =>
-        implicit def req = ctx.body
+        implicit def req: play.api.mvc.Request[?] = ctx.body
         val form         = filterForm.bindFromRequest()
         val filter       = form.fold(_ => emptyFilter, identity)
         env.tournament.leaderboardApi.recentByUser(user, 1) zip
@@ -126,7 +126,7 @@ object GameMod {
       opponents: Option[String]
   ) {
     def opponentIds: List[lila.user.User.ID] =
-      (~opponents)
+      opponents.getOrElse("")
         .take(800)
         .replace(",", " ")
         .split(' ')
@@ -158,7 +158,7 @@ object GameMod {
         "swiss"     -> optional(nonEmptyText),
         "speed"     -> optional(nonEmptyText),
         "opponents" -> optional(nonEmptyText)
-      )(Filter.apply)(Filter.unapply _)
+      )(Filter.apply)(f => Some((f.arena, f.swiss, f.speed, f.opponents)))
     )
 
   val actionForm =

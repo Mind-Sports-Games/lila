@@ -2,7 +2,6 @@ package lila.studySearch
 
 import org.apache.pekko.actor._
 import com.softwaremill.macwire._
-import scala.concurrent.duration._
 
 import lila.common.Bus
 import lila.common.paginator._
@@ -21,8 +20,8 @@ final class Env(
     ec: scala.concurrent.ExecutionContext,
     system: org.apache.pekko.actor.ActorSystem,
     scheduler: org.apache.pekko.actor.Scheduler,
-    mat: akka.stream.Materializer
-) {
+    mat: org.apache.pekko.stream.Materializer
+):
 
   private val client = makeClient(Index("study"))
 
@@ -34,23 +33,19 @@ final class Env(
     Paginator[Study.WithChaptersAndLiked](
       adapter = new AdapterLike[Study] {
         def query                           = Query(text, me.map(_.id))
-        def nbResults                       = api count query
+        def nbResults                       = api `count` query
         def slice(offset: Int, length: Int) = api.search(query, From(offset), Size(length))
-      } mapFutureList pager.withChaptersAndLiking(me),
+      } `mapFutureList` pager.withChaptersAndLiking(me),
       currentPage = page,
       maxPerPage = pager.maxPerPage
     )
 
   def cli =
-    new lila.common.Cli {
-      def process = {
+    new lila.common.Cli:
+      def process =
         case "study" :: "search" :: "reset" :: Nil          => api.reset("reset") inject "done"
         case "study" :: "search" :: "index" :: since :: Nil => api.reset(since) inject "done"
-      }
-    }
 
-  Bus.subscribeFun("study") {
+  Bus.subscribeFun("study"):
     case lila.study.actorApi.SaveStudy(study) => api.store(study).discard
     case RemoveStudy(id, _)                   => client.deleteById(Id(id)).discard
-  }
-}

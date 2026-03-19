@@ -1,10 +1,10 @@
 package lila.security
 
 import org.apache.pekko.actor.ActorSystem
-import lila.common.autoconfig.{ AutoConfig, ConfigName }
+import lila.common.autoconfig.AutoConfig
 import play.api.i18n.Lang
 import play.api.libs.mailer.{ Email, SMTPConfiguration, SMTPMailer }
-import scala.concurrent.duration.{ span => _, _ }
+import scala.concurrent.duration.span => _
 import scala.concurrent.{ blocking, Future }
 import scalatags.Text.all.{ html => htmlTag, _ }
 import scalatags.Text.tags2.{ title => titleTag }
@@ -18,7 +18,7 @@ import org.apache.pekko.dispatch.MessageDispatcher
 final class Mailer(
     config: Mailer.Config,
     getSecondaryPermille: () => Int
-)(implicit system: ActorSystem) {
+)(implicit system: ActorSystem):
 
   implicit private val blockingExecutionContext: MessageDispatcher =
     system.dispatchers.lookup("blocking-smtp-dispatcher")
@@ -31,13 +31,13 @@ final class Mailer(
     else (primaryClient, config.primary)
 
   def send(msg: Mailer.Message): Funit =
-    if (msg.to.isNoReply) {
+    if (msg.to.isNoReply)
       logger.warn(s"Can't send ${msg.subject} to noreply email ${msg.to}")
       funit
-    } else
-      Future {
-        Chronometer.syncMon(_.email.send.time) {
-          blocking {
+    else
+      Future:
+        Chronometer.syncMon(_.email.send.time):
+          blocking:
             val (client, config) = randomClient()
             val _ = client
               .send(
@@ -49,12 +49,8 @@ final class Mailer(
                   bodyHtml = msg.htmlBody map { body => Mailer.html.wrap(msg.subject, body).render }
                 )
               )
-          }
-        }
-      }
-}
 
-object Mailer {
+object Mailer:
 
   private val timeout = 5 seconds
 
@@ -66,7 +62,7 @@ object Mailer {
       user: String,
       sender: String,
       password: String
-  ) {
+  ):
     def toClientConfig = SMTPConfiguration(
       host = host,
       port = port,
@@ -76,7 +72,6 @@ object Mailer {
       mock = mock,
       timeout = Mailer.timeout.toMillis.toInt.some
     )
-  }
   implicit val smtpLoader: ConfigLoader[Smtp] = AutoConfig.loader[Smtp]
 
   case class Config(
@@ -92,7 +87,7 @@ object Mailer {
       htmlBody: Option[Frag] = none
   )
 
-  object txt {
+  object txt:
 
     def serviceNote(implicit lang: Lang): String = s"""
 ${trans.common_note("https://playstrategy.org").render}
@@ -102,9 +97,8 @@ ${trans.common_contact("https://playstrategy.org/contact").render}"""
     def addServiceNote(body: String)(implicit lang: Lang) = s"""$body
 
 $serviceNote"""
-  }
 
-  object html {
+  object html:
 
     private val itemscope = attr("itemscope").empty
     private val itemtype  = attr("itemtype")
@@ -165,5 +159,3 @@ $serviceNote"""
           body(htmlBody)
         )
       )
-  }
-}

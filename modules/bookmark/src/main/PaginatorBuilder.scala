@@ -11,7 +11,7 @@ import lila.user.User
 final class PaginatorBuilder(
     coll: Coll,
     gameRepo: GameRepo
-)(implicit ec: scala.concurrent.ExecutionContext) {
+)(implicit ec: scala.concurrent.ExecutionContext):
 
   def byUser(user: User, page: Int): Fu[Paginator[Game]] =
     Paginator(
@@ -20,9 +20,9 @@ final class PaginatorBuilder(
       maxPerPage = lila.common.config.MaxPerPage(12)
     )
 
-  final class UserAdapter(user: User) extends AdapterLike[Game] {
+  final class UserAdapter(user: User) extends AdapterLike[Game]:
 
-    def nbResults: Fu[Int] = coll countSel selector
+    def nbResults: Fu[Int] = coll `countSel` selector
 
     def slice(offset: Int, length: Int): Fu[Seq[Game]] =
       coll
@@ -49,10 +49,7 @@ final class PaginatorBuilder(
           )
         }
         .collect[List](maxDocs = length)
-        .map {
+        .map:
           _.flatMap(lila.game.BSONHandlers.gameBSONHandler.readOpt)
-        }
 
     private def selector = $doc("u" -> user.id)
-  }
-}

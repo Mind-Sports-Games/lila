@@ -13,7 +13,7 @@ class StringTest extends munit.FunSuite:
     assertEquals(
       String.html.richText(s"link to $url here\n"),
       raw:
-        s"""link to <a rel="nofollow noreferrer" href="$url" target="_blank">$url</a> here<br>"""
+        s"""link to <a rel="nofollow noopener noreferrer" href="$url" target="_blank">$url</a> here<br>"""
     )
 
     assertEquals(String.html.richText(s"link\n", false), raw("link\n"))
@@ -27,9 +27,9 @@ class StringTest extends munit.FunSuite:
     assertEquals(
       String.html.richText("a https://example.com/foo--. b"),
       raw:
-        """a <a rel="nofollow noreferrer" href="https://example.com/foo--" target="_blank">example.com/foo--</a>. b"""
+        """a <a rel="nofollow noopener noreferrer" href="https://example.com/foo--" target="_blank">example.com/foo--</a>. b"""
     )
 
   test("noShouting"):
     assertEquals(String.noShouting("HELLO SIR"), "hello sir")
-    assertEquals(String.noShouting("1. Nf3 O-O-O#"), "1. Nf3 O-O-O#")
+    assertEquals(String.noShouting("1. Nf3 O-O-O#"), "1. nf3 o-o-o#")

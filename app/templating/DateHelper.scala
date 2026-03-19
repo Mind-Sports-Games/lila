@@ -117,5 +117,5 @@ trait DateHelper { self: I18nHelper with StringHelper =>
   private val atomDateFormatter        = ISODateTimeFormat.dateTime
   def atomDate(date: DateTime): String = atomDateFormatter print date
   def atomDate(field: String)(doc: io.prismic.Document): Option[String] =
-    doc getDate field map (_.value.toDateTimeAtStartOfDay) map atomDate
+    doc getDate field map (d => new DateTime(d.value.atStartOfDay(java.time.ZoneOffset.UTC).toInstant.toEpochMilli)) map atomDate
 }

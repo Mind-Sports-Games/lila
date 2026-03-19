@@ -1,7 +1,7 @@
 package lila.tournament
 
 import org.apache.pekko.stream.scaladsl._
-import reactivemongo.akkastream.cursorProducer
+import reactivemongo.pekkostream.cursorProducer
 import reactivemongo.api._
 import reactivemongo.api.bson._
 
@@ -14,8 +14,8 @@ final private class LeaderboardIndexer(
     leaderboardRepo: LeaderboardRepo
 )(implicit
     ec: scala.concurrent.ExecutionContext,
-    mat: akka.stream.Materializer
-) {
+    mat: org.apache.pekko.stream.Materializer
+):
 
   import LeaderboardApi._
   import BSONHandlers._
@@ -24,7 +24,7 @@ final private class LeaderboardIndexer(
     leaderboardRepo.coll.delete.one($empty) >>
       tournamentRepo.coll
         .find(tournamentRepo.finishedSelect)
-        .sort($sort desc "startsAt")
+        .sort($sort `desc` "startsAt")
         .cursor[Tournament](ReadPreference.secondaryPreferred)
         .documentSource()
         .via(lila.common.LilaStream.logRate[Tournament]("leaderboard index tour")(logger))
@@ -49,17 +49,16 @@ final private class LeaderboardIndexer(
       .void
 
   private def metaPointsFromRank(category: Option[Schedule.Freq], rank: Int): Option[Int] =
-    category match {
+    category match
       case Some(c) if c == Schedule.Freq.Shield || c == Schedule.Freq.MedleyShield =>
         if (rank == 1) Some(5)
         else if (rank == 2) Some(3)
         else if (rank == 3) Some(2)
         else Some(1)
       case _ => None
-    }
 
   private def shieldKeyFromTour(tour: Tournament): Option[String] =
-    tour.schedule.map(_.freq) match {
+    tour.schedule.map(_.freq) match
       case Some(c) if c == Schedule.Freq.Shield =>
         s"${tour.variant.gameFamily.id}_${tour.variant.id}".some
       case Some(c) if c == Schedule.Freq.MedleyShield =>
@@ -67,7 +66,6 @@ final private class LeaderboardIndexer(
           TournamentShield.MedleyShield.all.find(_.key == t).map(_.leaderboardKey)
         }
       case _ => None
-    }
 
   private def generateTourEntries(tour: Tournament): Fu[List[Entry]] =
     for {
@@ -92,4 +90,3 @@ final private class LeaderboardIndexer(
         )
       }
     }
-}

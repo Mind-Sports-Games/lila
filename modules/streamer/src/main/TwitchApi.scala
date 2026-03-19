@@ -9,7 +9,7 @@ import scala.concurrent.ExecutionContext
 import lila.common.config.Secret
 import lila.common.extensions.*
 
-final private class TwitchApi(ws: StandaloneWSClient, config: TwitchConfig)(implicit ec: ExecutionContext) {
+final private class TwitchApi(ws: StandaloneWSClient, config: TwitchConfig)(implicit ec: ExecutionContext):
 
   import Stream.Twitch
   import Twitch.Reads._
@@ -21,7 +21,7 @@ final private class TwitchApi(ws: StandaloneWSClient, config: TwitchConfig)(impl
       page: Int,
       pagination: Option[Twitch.Pagination]
   ): Fu[List[Twitch.TwitchStream]] =
-    (config.clientId.nonEmpty && config.secret.value.nonEmpty && page < 10) so {
+    (config.clientId.nonEmpty && config.secret.value.nonEmpty && page < 10) so:
       val query = List(
         "game_id" -> "490413", // 743 - chess //  490413 - Board games
         "first"   -> "100" // max results per page
@@ -29,23 +29,21 @@ final private class TwitchApi(ws: StandaloneWSClient, config: TwitchConfig)(impl
         pagination.flatMap(_.cursor).map { "after" -> _ }
       ).flatten
       ws.url("https://api.twitch.tv/helix/streams")
-        .withQueryStringParameters(query: _*)
+        .withQueryStringParameters(query*)
         .withHttpHeaders(
           "Client-ID"     -> config.clientId,
           "Authorization" -> s"Bearer ${tmpToken.value}"
         )
         .get()
-        .flatMap {
+        .flatMap:
           case res if res.status == 200 =>
-            res.body[JsValue].validate[Twitch.Result](twitchResultReads) match {
+            res.body[JsValue].validate[Twitch.Result](twitchResultReads) match
               case JsSuccess(result, _) => fuccess(result)
               case JsError(err)         => fufail(s"twitch $err ${lila.log.http(res.status, res.body)}")
-            }
           case res if res.status == 401 && res.body.contains("Invalid OAuth token") =>
             logger.warn("Renewing twitch API token")
             renewToken >> fuccess(Twitch.Result(None, None))
           case res => fufail(s"twitch ${lila.log.http(res.status, res.body)}")
-        }
         .recover { case e: Exception =>
           logger.warn(e.getMessage)
           Twitch.Result(None, None)
@@ -56,7 +54,6 @@ final private class TwitchApi(ws: StandaloneWSClient, config: TwitchConfig)(impl
             fetchStreams(streamers, page + 1, result.pagination) map (result.liveStreams ::: _)
           else fuccess(Nil)
         }
-    }
 
   private def renewToken: Funit =
     ws.url("https://id.twitch.tv/oauth2/token")
@@ -66,14 +63,11 @@ final private class TwitchApi(ws: StandaloneWSClient, config: TwitchConfig)(impl
         "grant_type"    -> "client_credentials"
       )
       .post(Map.empty[String, String])
-      .flatMap {
+      .flatMap:
         case res if res.status == 200 =>
-          res.body[JsValue].asOpt[JsObject].flatMap(_ str "access_token") match {
+          res.body[JsValue].asOpt[JsObject].flatMap(_ `str` "access_token") match
             case Some(token) =>
               tmpToken = Secret(token)
               funit
             case _ => fufail(s"twitch.renewToken ${lila.log.http(res.status, res.body)}")
-          }
         case res => fufail(s"twitch.renewToken ${lila.log.http(res.status, res.body)}")
-      }
-}

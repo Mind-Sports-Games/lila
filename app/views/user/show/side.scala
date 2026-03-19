@@ -28,7 +28,7 @@ object side {
         title := perfType.desc,
         cls := List(
           "empty"  -> perf.isEmpty,
-          "active" -> active.has(perfType)
+          "active" -> active.contains(perfType)
         ),
         href := {
           if (isPuzzle)
@@ -118,7 +118,7 @@ object side {
         showNonEmptyPerf(u.perfs.abalone, PerfType.orDefault("abalone")),
         u.noBot option frag(
           hr,
-          PerfType.allPuzzle.map(pt => showNonEmptyPerf(u.perfs.apply(pt), pt))
+          PerfType.allPuzzle.map[Option[Tag]](pt => showNonEmptyPerf(u.perfs.apply(pt), pt))
           // showStorm(u.perfs.storm, u),
           // showRacer(u.perfs.racer, u),
           // showStreak(u.perfs.streak, u)

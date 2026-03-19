@@ -1,6 +1,5 @@
 package lila.fishnet
 
-import scalalib.Random
 import com.gilt.gfc.semver.SemVer
 import lila.common.IpAddress
 import scala.util.{ Failure, Success, Try }
@@ -14,14 +13,14 @@ case class Client(
     instance: Option[Client.Instance], // last seen instance
     enabled: Boolean,
     createdAt: DateTime
-) {
+):
 
   def key = _id
 
   def fullId = s"$userId:$key"
 
   def updateInstance(i: Client.Instance): Option[Client] =
-    instance.fold(i.some)(_ update i) map { newInstance =>
+    instance.fold(i.some)(_ `update` i) map { newInstance =>
       copy(instance = newInstance.some)
     }
 
@@ -32,9 +31,8 @@ case class Client(
   def disabled = !enabled
 
   override def toString = s"$key by $userId"
-}
 
-object Client {
+object Client:
 
   val offline = Client(
     _id = Key("offline"),
@@ -54,39 +52,35 @@ object Client {
       version: Version,
       ip: IpAddress,
       seenAt: DateTime
-  ) {
+  ):
 
     def update(i: Instance): Option[Instance] =
       if (i.version != version) i.some
       else if (i.ip != ip) i.some
-      else if (i.seenAt isAfter seenAt.plusMinutes(5)) i.some
+      else if (i.seenAt `isAfter` seenAt.plusMinutes(5)) i.some
       else none
 
-    def seenRecently = seenAt isAfter Instance.recentSince
-  }
+    def seenRecently = seenAt `isAfter` Instance.recentSince
 
-  object Instance {
+  object Instance:
 
     def recentSince = DateTime.now.minusMinutes(15)
-  }
 
-  sealed trait Skill {
+  sealed trait Skill:
     def key = toString.toLowerCase
-  }
-  object Skill {
+  object Skill:
     case object Move     extends Skill
     case object Analysis extends Skill
     case object All      extends Skill
     val all                = List(Move, Analysis, All)
     def byKey(key: String) = all.find(_.key == key)
-  }
 
-  final class ClientVersion(minVersionString: String) {
+  final class ClientVersion(minVersionString: String):
 
     val minVersion = SemVer(minVersionString)
 
     def accept(v: Client.Version): Try[Unit] =
-      Try(SemVer(v.value)) match {
+      Try(SemVer(v.value)) match
         case Success(version) if version >= minVersion => Success(())
         case Success(_) =>
           Failure(
@@ -95,8 +89,5 @@ object Client {
             )
           )
         case Failure(error) => Failure(error)
-      }
-  }
 
   def makeKey = Key(Random.secureString(8))
-}

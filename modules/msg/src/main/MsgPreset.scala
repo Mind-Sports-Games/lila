@@ -2,7 +2,7 @@ package lila.msg
 
 case class MsgPreset(name: String, text: String)
 
-object MsgPreset {
+object MsgPreset:
 
   type Username = String
 
@@ -37,4 +37,3 @@ To follow new players, you must first unfollow some on https://playstrategy.org/
 
 Thank you for your understanding."""
     )
-}

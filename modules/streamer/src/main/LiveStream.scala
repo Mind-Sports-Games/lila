@@ -2,8 +2,7 @@ package lila.streamer
 
 import org.apache.pekko.actor._
 import org.apache.pekko.pattern.ask
-import makeTimeout.short
-import play.api.i18n.Lang
+import makeTimeout.given
 import play.api.mvc.RequestHeader
 import scala.concurrent.duration._
 
@@ -11,21 +10,21 @@ import lila.memo.CacheApi._
 import lila.user.User
 import alleycats.Zero
 
-case class LiveStreams(streams: List[Stream]) {
+case class LiveStreams(streams: List[Stream]):
 
   private lazy val streamerIds: Set[Streamer.Id] = streams.view.map(_.streamer.id).to(Set)
 
   def has(id: Streamer.Id): Boolean    = streamerIds(id)
   def has(streamer: Streamer): Boolean = has(streamer.id)
 
-  def get(streamer: Streamer) = streams.find(_ is streamer)
+  def get(streamer: Streamer) = streams.find(_ `is` streamer)
 
   def homepage(max: Int, req: RequestHeader, userLang: Option[String]) =
-    LiveStreams {
+    LiveStreams:
       val langs = req.acceptLanguages.view.map(_.language).toSet + "en" ++ userLang.toSet
       streams
         .takeWhile(_.streamer.approval.tier > 0)
-        .foldLeft(Vector.empty[Stream]) {
+        .foldLeft(Vector.empty[Stream]):
           case (selected, s) if langs(s.lang) && {
                 selected.sizeIs < max || s.streamer.approval.tier == Streamer.maxTier
               } && {
@@ -33,9 +32,7 @@ case class LiveStreams(streams: List[Stream]) {
               } =>
             selected :+ s
           case (selected, _) => selected
-        }
         .toList
-    }
 
   def withTitles(lightUser: lila.user.LightUserApi) =
     LiveStreams.WithTitles(
@@ -52,37 +49,33 @@ case class LiveStreams(streams: List[Stream]) {
     copy(
       streams = streams.filterNot(s => userIds contains s.streamer.userId)
     )
-}
 
-object LiveStreams {
+object LiveStreams:
 
-  case class WithTitles(live: LiveStreams, titles: Map[User.ID, String]) {
+  case class WithTitles(live: LiveStreams, titles: Map[User.ID, String]):
     def titleName(s: Stream) = s"${titles.get(s.streamer.userId).fold("")(_ + " ")}${s.streamer.name}"
     def excludeUsers(userIds: List[User.ID]) =
       copy(
-        live = live excludeUsers userIds
+        live = live `excludeUsers` userIds
       )
-  }
 
   implicit val zero: Zero[WithTitles] =
     Zero(WithTitles(LiveStreams(Nil), Map.empty))
-}
 
 final class LiveStreamApi(
     cacheApi: lila.memo.CacheApi,
     streamingActor: ActorRef
-)(implicit ec: scala.concurrent.ExecutionContext) {
+)(implicit ec: scala.concurrent.ExecutionContext):
 
-  private val cache = cacheApi.unit[LiveStreams] {
+  private val cache = cacheApi.unit[LiveStreams]:
     _.refreshAfterWrite(2 seconds)
       .buildAsyncFuture { _ =>
-        streamingActor ? Streaming.Get mapTo manifest[LiveStreams] dmap { s =>
+        (streamingActor ? Streaming.Get).mapTo[LiveStreams] dmap { s =>
           LiveStreams(s.streams.sortBy(-_.streamer.approval.tier))
         } addEffect { s =>
           userIdsCache = s.streams.map(_.streamer.userId).toSet
         }
       }
-  }
   private var userIdsCache = Set.empty[User.ID]
 
   def all: Fu[LiveStreams] = cache.getUnit
@@ -123,10 +116,9 @@ final class LiveStreamApi(
 
   def of(s: Streamer.WithUser): Fu[Streamer.WithUserAndStream] =
     all.map { live =>
-      Streamer.WithUserAndStream(s.streamer, s.user, live get s.streamer)
+      Streamer.WithUserAndStream(s.streamer, s.user, live `get` s.streamer)
     }
   def userIds                                       = userIdsCache
   def isStreaming(userId: User.ID)                  = userIdsCache contains userId
-  def one(userId: User.ID): Fu[Option[Stream]]      = all.map(_.streams.find(_ is userId))
+  def one(userId: User.ID): Fu[Option[Stream]]      = all.map(_.streams.find(_ `is` userId))
   def many(userIds: Seq[User.ID]): Fu[List[Stream]] = all.map(_.streams.filter(s => userIds.exists(s.is)))
-}

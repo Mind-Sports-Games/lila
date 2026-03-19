@@ -1,7 +1,6 @@
 package lila.coach
 
 import org.joda.time.DateTime
-import scala.concurrent.duration._
 
 import lila.db.dsl._
 import lila.db.Photographer
@@ -16,29 +15,25 @@ final class CoachApi(
     photographer: Photographer,
     cacheApi: lila.memo.CacheApi,
     notifyApi: NotifyApi
-)(implicit ec: scala.concurrent.ExecutionContext) {
+)(implicit ec: scala.concurrent.ExecutionContext):
 
   import BsonHandlers._
 
   def byId(id: Coach.Id): Fu[Option[Coach]] = coachColl.byId[Coach](id.value)
 
   def find(username: String): Fu[Option[Coach.WithUser]] =
-    userRepo named username flatMap { _ so find }
+    userRepo `named` username flatMap { _ so find }
 
   def find(user: User): Fu[Option[Coach.WithUser]] =
-    Granter(_.Coach)(user) so {
-      byId(Coach.Id(user.id)) dmap {
+    Granter(_.Coach)(user) so:
+      byId(Coach.Id(user.id)) dmap:
         _ map withUser(user)
-      }
-    }
 
   def findOrInit(coach: Holder): Fu[Option[Coach.WithUser]] =
-    Granter.is(_.Coach)(coach) so {
-      find(coach.user) orElse {
-        val c = Coach.WithUser(Coach make coach.user, coach.user)
+    Granter.is(_.Coach)(coach) so:
+      find(coach.user) orElse:
+        val c = Coach.WithUser(Coach `make` coach.user, coach.user)
         coachColl.insert.one(c.coach) inject c.some
-      }
-    }
 
   def isListedCoach(user: User): Fu[Boolean] =
     Granter(_.Coach)(user) so coachColl.exists($id(user.id) ++ $doc("listed" -> true))
@@ -47,13 +42,11 @@ final class CoachApi(
     Granter(_.Coach)(user) so coachColl.update.one($id(user.id), $set("user.seenAt" -> DateTime.now)).void
 
   def setRating(userPre: User): Funit =
-    Granter(_.Coach)(userPre) so {
-      userRepo.byId(userPre.id) flatMap {
+    Granter(_.Coach)(userPre) so:
+      userRepo.byId(userPre.id) flatMap:
         _ so { user =>
           coachColl.update.one($id(user.id), $set("user.rating" -> user.perfs.bestStandardRating)).void
         }
-      }
-    }
 
   def update(c: Coach.WithUser, data: CoachProfileForm.Data): Funit =
     coachColl.update
@@ -86,22 +79,21 @@ final class CoachApi(
   def deletePicture(c: Coach.WithUser): Funit =
     coachColl.update.one($id(c.coach.id), $unset("picturePath")).void
 
-  private val languagesCache = cacheApi.unit[Set[String]] {
+  private val languagesCache = cacheApi.unit[Set[String]]:
     _.refreshAfterWrite(1 hour)
       .buildAsyncFuture { _ =>
         coachColl.secondaryPreferred.distinctEasy[String, Set]("languages", $empty)
       }
-  }
   def allLanguages: Fu[Set[String]] = languagesCache.get {}
 
   private def withUser(user: User)(coach: Coach) = Coach.WithUser(coach, user)
 
-  object reviews {
+  object reviews:
 
     def add(me: User, coach: Coach, data: CoachReviewForm.Data): Fu[CoachReview] =
       find(me, coach).flatMap { existing =>
         val id = CoachReview.makeId(me, coach)
-        val review = existing match {
+        val review = existing match
           case None =>
             CoachReview(
               _id = id,
@@ -120,9 +112,8 @@ final class CoachApi(
               approved = false,
               updatedAt = DateTime.now
             )
-        }
         if (me.marks.troll) fuccess(review)
-        else {
+        else
           reviewColl.update.one($id(id), review, upsert = true) >>
             notifyApi.addNotification(
               Notification.make(
@@ -130,7 +121,6 @@ final class CoachApi(
                 content = lila.notify.CoachReview
               )
             ) >> refreshCoachNbReviews(coach.id) inject review
-        }
       }
 
     def byId(id: String) = reviewColl.byId[CoachReview](id)
@@ -159,9 +149,8 @@ final class CoachApi(
       ) >> refreshCoachNbReviews(r.coachId)
 
     private def refreshCoachNbReviews(id: Coach.Id): Funit =
-      reviewColl.countSel($doc("coachId" -> id.value, "approved" -> true)) flatMap {
+      reviewColl.countSel($doc("coachId" -> id.value, "approved" -> true)) flatMap:
         setNbReviews(id, _)
-      }
 
     def find(user: User, coach: Coach): Fu[Option[CoachReview]] =
       reviewColl.byId[CoachReview](CoachReview.makeId(user, coach))
@@ -187,8 +176,6 @@ final class CoachApi(
     private def findRecent(selector: Bdoc): Fu[CoachReview.Reviews] =
       reviewColl
         .find(selector)
-        .sort($sort desc "createdAt")
+        .sort($sort `desc` "createdAt")
         .cursor[CoachReview]()
         .list(100) map CoachReview.Reviews.apply
-  }
-}

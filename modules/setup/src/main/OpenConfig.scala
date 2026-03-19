@@ -1,6 +1,6 @@
 package lila.setup
 
-import strategygames.{ ByoyomiClock, Clock, ClockConfig, GameFamily, Speed }
+import strategygames.{ ByoyomiClock, Clock, ClockConfig, Speed }
 import strategygames.variant.Variant
 import strategygames.format.FEN
 import strategygames.chess.variant.{ FromPosition, Standard }
@@ -17,7 +17,7 @@ final case class OpenConfig(
     rated: Boolean,
     position: Option[FEN] = None,
     backgammonPoints: Option[Int] = None
-) {
+):
 
   def perfType: Option[PerfType] = PerfPicker.perfType(Speed(clock), variant, none)
 
@@ -33,9 +33,8 @@ final case class OpenConfig(
     if (variant == Variant.Chess(Standard) && position.exists(!_.initial))
       copy(variant = Variant.wrap(FromPosition))
     else this
-}
 
-object OpenConfig {
+object OpenConfig:
 
   def from(
       n: Option[String],
@@ -47,7 +46,7 @@ object OpenConfig {
       rated: Boolean,
       pos: Option[String],
       bp: Option[Int]
-  ) = {
+  ) =
     val variant = Variant.orDefault(~v)
     new OpenConfig(
       name = n.map(_.trim).filter(_.nonEmpty),
@@ -57,5 +56,3 @@ object OpenConfig {
       position = pos.map(f => FEN.apply(variant.gameLogic, f)),
       backgammonPoints = bp
     ).autoVariant
-  }
-}

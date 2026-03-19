@@ -7,7 +7,7 @@ case class CorrespondenceClock(
     increment: Int,
     p1Time: Float,
     p2Time: Float
-) {
+):
 
   import CorrespondenceClock._
 
@@ -29,10 +29,8 @@ case class CorrespondenceClock(
   def estimateTotalTime = increment * 40 / 2
 
   def incrementHours = increment / 60 / 60
-}
 
-private object CorrespondenceClock {
+private object CorrespondenceClock:
 
   private val hourSeconds = 60 * 60
   private val daySeconds  = 24 * hourSeconds
-}

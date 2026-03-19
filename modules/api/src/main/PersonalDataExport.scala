@@ -4,12 +4,10 @@ import org.apache.pekko.stream.Materializer
 import org.apache.pekko.stream.scaladsl._
 import org.joda.time.DateTime
 import org.joda.time.format.DateTimeFormat
-import reactivemongo.akkastream.cursorProducer
+import reactivemongo.pekkostream.cursorProducer
 import reactivemongo.api.ReadPreference
-import scala.concurrent.duration._
 import scala.concurrent.ExecutionContext
 
-import lila.chat.Chat
 import lila.db.dsl._
 import lila.game.Game
 import lila.user.User
@@ -24,15 +22,15 @@ final class PersonalDataExport(
     relationEnv: lila.relation.Env,
     userRepo: lila.user.UserRepo,
     mongoCacheApi: lila.memo.MongoCache.Api
-)(implicit ec: ExecutionContext, mat: Materializer) {
+)(implicit ec: ExecutionContext, mat: Materializer):
 
   private val lightPerSecond = 60
   private val heavyPerSecond = 30
 
-  def apply(user: User): Source[String, _] = {
+  def apply(user: User): Source[String, ?] =
 
     val intro =
-      Source.futureSource {
+      Source.futureSource:
         userRepo.currentOrPrevEmail(user.id) map { email =>
           Source(
             List(
@@ -46,7 +44,6 @@ final class PersonalDataExport(
             )
           )
         }
-      }
 
     val connections =
       Source(List(textTitle("Connections"))) concat
@@ -55,11 +52,10 @@ final class PersonalDataExport(
         }
 
     val followedUsers =
-      Source.futureSource {
+      Source.futureSource:
         relationEnv.api.fetchFollowing(user.id) map { userIds =>
           Source(List(textTitle("Followed players")) ++ userIds)
         }
-      }
 
     val forumPosts =
       Source(List(textTitle("Forum posts"))) concat
@@ -163,12 +159,10 @@ final class PersonalDataExport(
       gameNotes,
       outro
     ).foldLeft(Source.empty[String])(_ concat _)
-  }
 
   private val bigSep = "\n------------------------------------------\n"
 
   private def textTitle(t: String) = s"\n${"=" * t.length}\n$t\n${"=" * t.length}\n"
 
-  private val englishDateTimeFormatter = DateTimeFormat forStyle "MS"
-  private def textDate(date: DateTime) = englishDateTimeFormatter print date
-}
+  private val englishDateTimeFormatter = DateTimeFormat `forStyle` "MS"
+  private def textDate(date: DateTime) = englishDateTimeFormatter `print` date

@@ -5,8 +5,6 @@ import strategygames.variant.Variant
 import strategygames.{ Game, GameLogic }
 import org.joda.time.DateTime
 import play.api.libs.json.JsObject
-import scala.concurrent.duration._
-import scala.util.control.NonFatal
 
 import lila.db.dsl._
 import lila.memo.CacheApi._
@@ -18,7 +16,7 @@ final class EvalCacheApi(
     truster: EvalCacheTruster,
     upgrade: EvalCacheUpgrade,
     cacheApi: lila.memo.CacheApi
-)(implicit ec: scala.concurrent.ExecutionContext) {
+)(implicit ec: scala.concurrent.ExecutionContext):
 
   import EvalCacheEntry._
   import BSONHandlers._
@@ -46,20 +44,17 @@ final class EvalCacheApi(
       multiPv = 1
     )
 
-  private[evalCache] def drop(variant: Variant, fen: FEN): Funit = {
+  private[evalCache] def drop(variant: Variant, fen: FEN): Funit =
     val id = Id(variant, SmallFen.make(variant, fen))
     coll.delete.one($id(id)).void.andDo(cache.invalidate(id))
-  }
 
-  private val cache = cacheApi[Id, Option[EvalCacheEntry]](65536, "evalCache") {
+  private val cache = cacheApi[Id, Option[EvalCacheEntry]](65536, "evalCache"):
     _.expireAfterAccess(5 minutes)
       .buildAsyncFuture(fetchAndSetAccess)
-  }
 
   private def getEval(id: Id, multiPv: Int): Fu[Option[Eval]] =
-    getEntry(id) map {
-      _.flatMap(_ makeBestMultiPvEval multiPv)
-    }
+    getEntry(id) map:
+      _.flatMap(_ `makeBestMultiPvEval` multiPv)
 
   private def getEntry(id: Id): Fu[Option[EvalCacheEntry]] = cache get id
 
@@ -69,12 +64,12 @@ final class EvalCacheApi(
     }
 
   private def put(trustedUser: TrustedUser, input: Input, sri: Socket.Sri): Funit =
-    Validator(input) match {
+    Validator(input) match
       case Some(error) =>
         logger.info(s"Invalid from ${trustedUser.user.username} $error ${input.fen}")
         funit
       case None =>
-        getEntry(input.id) flatMap {
+        getEntry(input.id) flatMap:
           case None =>
             val entry = EvalCacheEntry(
               _id = input.id,
@@ -85,14 +80,10 @@ final class EvalCacheApi(
             )
             coll.insert.one(entry).void.recover(lila.db.ignoreDuplicateKey).andDo(cache.put(input.id, fuccess(entry.some))).andDo(upgrade.onEval(input, sri))
           case Some(oldEntry) =>
-            val entry = oldEntry add input.eval
-            !(entry similarTo oldEntry) so {
+            val entry = oldEntry `add` input.eval
+            !(entry `similarTo` oldEntry) so:
               coll.update.one($id(entry.id), entry, upsert = true).void.andDo(cache.put(input.id, fuccess(entry.some))).andDo(upgrade.onEval(input, sri))
-            }
 
-        }
-    }
 
   private def destSize(fen: FEN): Int =
     Game(GameLogic.Chess(), Variant.libStandard(GameLogic.Chess()).some, fen.some).situation.destinations.size
-}

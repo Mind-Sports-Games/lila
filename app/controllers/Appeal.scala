@@ -17,7 +17,7 @@ final class Appeal(env: Env, reportC: => Report, prismicC: => Prismic, userC: =>
 
   def home =
     Auth { implicit ctx => me =>
-      renderAppealOrTree(me) map { Ok(_) }
+      renderAppealOrTree(me) map { content => Ok(content) }
     }
 
   def landing =
@@ -25,7 +25,7 @@ final class Appeal(env: Env, reportC: => Report, prismicC: => Prismic, userC: =>
       if (ctx.isAppealUser || isGranted(_.Appeals)) {
         pageHit
         OptionOk(prismicC getPage "appeal-landing") { case (doc, resolver) =>
-          views.html.site.page.lone(doc, resolver)
+          views.html.site.page.lone(doc, resolver): scalatags.Text.Frag
         }
       } else notFound
     }
@@ -47,7 +47,7 @@ final class Appeal(env: Env, reportC: => Report, prismicC: => Prismic, userC: =>
       form
         .bindFromRequest()
         .fold(
-          err => renderAppealOrTree(me, err.some) map { BadRequest(_) },
+          err => renderAppealOrTree(me, err.some) map { content => BadRequest(content) },
           text => env.appeal.api.post(text, me) inject Redirect(routes.Appeal.home).flashSuccess
         )
     }
@@ -116,8 +116,9 @@ final class Appeal(env: Env, reportC: => Report, prismicC: => Prismic, userC: =>
     Secure(_.Appeals) { implicit ctx => me =>
       asMod(username) { (appeal, suspect) =>
         env.appeal.api.toggleMute(appeal) >>
-          env.report.api.inquiries.toggle(lila.report.Mod(me.user), appeal.id) inject
+          env.report.api.inquiries.toggle(lila.report.Mod(me.user), appeal.id) map { _ =>
           Redirect(routes.Appeal.queue)
+        }
       }
     }
 
@@ -143,13 +144,12 @@ final class Appeal(env: Env, reportC: => Report, prismicC: => Prismic, userC: =>
       username: String
   )(f: (lila.appeal.Appeal, Suspect) => Fu[Result])(implicit ctx: Context): Fu[Result] =
     env.user.repo named username flatMap {
-      _ so { user =>
+      case Some(user) =>
         env.appeal.api get user flatMap {
-          _ so { appeal =>
-            f(appeal, Suspect(user)) dmap some
-          }
+          case Some(appeal) => f(appeal, Suspect(user)) dmap some
+          case None => fuccess(none)
         }
-      }
+      case None => fuccess(none)
     } flatMap {
       _.fold(notFound)(fuccess)
     }

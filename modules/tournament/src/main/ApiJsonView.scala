@@ -10,7 +10,7 @@ import lila.i18n.VariantKeys
 
 import strategygames.variant.Variant
 
-final class ApiJsonView(lightUserApi: LightUserApi)(implicit ec: scala.concurrent.ExecutionContext) {
+final class ApiJsonView(lightUserApi: LightUserApi)(implicit ec: scala.concurrent.ExecutionContext):
 
   import JsonView._
 
@@ -33,7 +33,7 @@ final class ApiJsonView(lightUserApi: LightUserApi)(implicit ec: scala.concurren
   def calendar(tournaments: List[Tournament])(implicit lang: Lang): JsObject =
     Json.obj(
       "since"       -> tournaments.headOption.map(_.startsAt.withTimeAtStartOfDay),
-      "to"          -> tournaments.lastOption.map(_.finishesAt.withTimeAtStartOfDay plusDays 1),
+      "to"          -> tournaments.lastOption.map(_.finishesAt.withTimeAtStartOfDay `plusDays` 1),
       "tournaments" -> JsArray(tournaments.map(baseJson))
     )
 
@@ -92,7 +92,7 @@ final class ApiJsonView(lightUserApi: LightUserApi)(implicit ec: scala.concurren
       "icon"     -> p.iconChar.toString,
       "key"      -> p.key,
       "name"     -> p.trans,
-      "position" -> ~perfPositions.get(p)
+      "position" -> perfPositions.getOrElse(p, 0)
     )
 
   def variantJson(v: Variant)(implicit lang: Lang) =
@@ -102,4 +102,3 @@ final class ApiJsonView(lightUserApi: LightUserApi)(implicit ec: scala.concurren
       "name"     -> VariantKeys.variantName(v),
       "iconChar" -> v.perfIcon.toString
     )
-}

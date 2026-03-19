@@ -3,7 +3,7 @@ package lila.setup
 import strategygames.variant.Variant
 import strategygames.chess.variant.{ Chess960, FromPosition, Standard }
 import strategygames.format.{ FEN, Forsyth }
-import strategygames.{ ByoyomiClock, Clock, ClockConfig, GameFamily, Mode, Speed }
+import strategygames.{ ByoyomiClock, Clock, ClockConfig, Mode, Speed }
 
 import lila.game.PerfPicker
 import lila.lobby.PlayerIndex
@@ -23,7 +23,7 @@ final case class ApiConfig(
     message: Option[Template],
     multiMatch: Boolean,
     backgammonPoints: Option[Int] = None
-) {
+):
 
   def perfType: Option[PerfType] = PerfPicker.perfType(Speed(clock), variant, days)
 
@@ -49,11 +49,10 @@ final case class ApiConfig(
       copy(variant = Variant.wrap(FromPosition))
     else this
 
-}
 
-object ApiConfig extends BaseHumanConfig {
+object ApiConfig extends BaseHumanConfig:
 
-  lazy val clockLimitSeconds: Set[Int] = Set(0, 15, 30, 45, 60, 90) ++ (2 to 180).view.map(60 *).toSet
+  lazy val clockLimitSeconds: Set[Int] = Set(0, 15, 30, 45, 60, 90) ++ (2 to 180).view.map(60 * _).toSet
 
   def from(
       v: Option[String],
@@ -69,7 +68,7 @@ object ApiConfig extends BaseHumanConfig {
       msg: Option[String],
       mm: Option[Boolean],
       bp: Option[Int]
-  ) = {
+  ) =
     val variant = Variant.orDefault(~v)
     new ApiConfig(
       variant = variant,
@@ -83,14 +82,12 @@ object ApiConfig extends BaseHumanConfig {
       multiMatch = ~mm,
       backgammonPoints = bp
     ).autoVariant
-  }
 
   def validFen(variant: Variant, fen: Option[FEN]) =
     // TODO: This .get is unsafe
     if (variant == Variant.Chess(Chess960)) fen.forall(f => Chess960.positionNumber(f.chessFen.get).isDefined)
     else if (variant.fromPositionVariant)
       fen exists { f =>
-        (Forsyth.<<<(variant.gameLogic, f)).exists(_.situation playable false)
+        (Forsyth.<<<(variant.gameLogic, f)).exists(_.situation `playable` false)
       }
     else true
-}

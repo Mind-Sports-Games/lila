@@ -16,7 +16,7 @@ import scala.util.Try
 import lila.common.base.StringUtils
 
 // Joda formatters - Play 3 removed JodaForms, so we provide our own
-object JodaForms {
+object JodaForms:
   def jodaDate(pattern: String, timeZone: DateTimeZone = DateTimeZone.getDefault): Mapping[DateTime] =
     of[DateTime](using jodaDateTimeFormat(pattern, timeZone))
 
@@ -24,7 +24,7 @@ object JodaForms {
       pattern: String,
       timeZone: DateTimeZone = DateTimeZone.getDefault
   ): Formatter[DateTime] =
-    new Formatter[DateTime] {
+    new Formatter[DateTime]:
       val formatter                                    = DateTimeFormat.forPattern(pattern).withZone(timeZone)
       def bind(key: String, data: Map[String, String]) =
         data
@@ -36,12 +36,10 @@ object JodaForms {
           .getOrElse(Left(Seq(FormError(key, "error.required", Nil))))
       def unbind(key: String, value: DateTime) =
         Map(key -> formatter.print(value))
-    }
-}
 
 import JodaForms.*
 
-object Form {
+object Form:
 
   type Options[A] = Iterable[(A, String)]
 
@@ -92,7 +90,7 @@ object Form {
   def trim(m: Mapping[String]) = m.transform[String](_.trim, identity)
 
   // trims and removes garbage chars before validation
-  val cleanTextFormatter: Formatter[String] = new Formatter[String] {
+  val cleanTextFormatter: Formatter[String] = new Formatter[String]:
     def bind(key: String, data: Map[String, String]) =
       data
         .get(key)
@@ -100,15 +98,13 @@ object Form {
         .map(StringUtils.removeGarbageChars)
         .toRight(Seq(FormError(key, "error.required", Nil)))
     def unbind(key: String, value: String) = Map(key -> StringUtils.removeGarbageChars(value.trim))
-  }
 
   val cleanText: Mapping[String] = of(using cleanTextFormatter)
   def cleanText(minLength: Int = 0, maxLength: Int = Int.MaxValue): Mapping[String] =
-    (minLength, maxLength) match {
+    (minLength, maxLength) match
       case (min, Int.MaxValue) => cleanText.verifying(Constraints.minLength(min))
       case (0, max)            => cleanText.verifying(Constraints.maxLength(max))
       case (min, max)          => cleanText.verifying(Constraints.minLength(min), Constraints.maxLength(max))
-    }
 
   val cleanNonEmptyText: Mapping[String] = cleanText.verifying(Constraints.nonEmpty)
   def cleanNonEmptyText(minLength: Int = 0, maxLength: Int = Int.MaxValue): Mapping[String] =
@@ -142,26 +138,23 @@ object Form {
 
   def absoluteUrl = of[AbsoluteUrl](using formatter.absoluteUrlFormatter)
 
-  object formatter {
+  object formatter:
     def stringFormatter[A](from: A => String, to: String => A): Formatter[A] =
-      new Formatter[A] {
+      new Formatter[A]:
         def bind(key: String, data: Map[String, String]) = stringFormat.bind(key, data) map to
         def unbind(key: String, value: A)                = stringFormat.unbind(key, from(value))
-      }
     def intFormatter[A](from: A => Int, to: Int => A): Formatter[A] =
-      new Formatter[A] {
+      new Formatter[A]:
         def bind(key: String, data: Map[String, String]) = intFormat.bind(key, data) map to
         def unbind(key: String, value: A)                = intFormat.unbind(key, from(value))
-      }
-    val tolerantBooleanFormatter: Formatter[Boolean] = new Formatter[Boolean] {
+    val tolerantBooleanFormatter: Formatter[Boolean] = new Formatter[Boolean]:
       override val format                              = Some(("format.boolean", Nil))
       def bind(key: String, data: Map[String, String]) =
         Right(data.getOrElse(key, "false")).flatMap { v =>
           Right(trueish(v))
         }
       def unbind(key: String, value: Boolean) = Map(key -> value.toString)
-    }
-    val absoluteUrlFormatter: Formatter[AbsoluteUrl] = new Formatter[AbsoluteUrl] {
+    val absoluteUrlFormatter: Formatter[AbsoluteUrl] = new Formatter[AbsoluteUrl]:
       override val format                              = Some(("format.url", Nil))
       def bind(key: String, data: Map[String, String]) =
         data
@@ -172,10 +165,8 @@ object Form {
           .left
           .map(err => Seq(FormError(key, err.toString, Nil)))
       def unbind(key: String, value: AbsoluteUrl) = Map(key -> value.toString)
-    }
-  }
 
-  object constraint {
+  object constraint:
     import play.api.data.validation as V
     def minLength[A](from: A => String)(length: Int): Constraint[A] =
       Constraint[A]("constraint.minLength", length) { o =>
@@ -187,9 +178,8 @@ object Form {
         if from(o).lengthIs <= length then V.Valid
         else V.Invalid(V.ValidationError("error.maxLength", length))
       }
-  }
 
-  object fen {
+  object fen:
     implicit private val fenFormat: Formatter[FEN] =
       formatter.stringFormatter[FEN](_.value, fen => FEN.apply(GameLogic.Chess(), fen))
     val playableStrict            = playable(strict = true)
@@ -199,7 +189,6 @@ object Form {
         "Invalid position",
         fen => Forsyth.<<<(GameLogic.Chess(), fen).exists(_.situation.playable(strict))
       )
-  }
 
   def inTheFuture(m: Mapping[DateTime]) =
     m.verifying(
@@ -207,25 +196,22 @@ object Form {
       DateTime.now.isBefore(_)
     )
 
-  object UTCDate {
+  object UTCDate:
     val dateTimePattern                              = "yyyy-MM-dd HH:mm"
     val utcDate                                      = jodaDate(dateTimePattern, DateTimeZone.UTC)
     implicit val dateTimeFormat: Formatter[DateTime] = JodaForms.jodaDateTimeFormat(dateTimePattern)
-  }
-  object ISODateTime {
+  object ISODateTime:
     val dateTimePattern = "yyyy-MM-dd'T'HH:mm:ss.SSSZ"
     val formatter       = JodaForms.jodaDateTimeFormat(dateTimePattern, DateTimeZone.UTC)
     val isoDateTime     = jodaDate(dateTimePattern, DateTimeZone.UTC)
     implicit val dateTimeFormat: Formatter[DateTime] = JodaForms.jodaDateTimeFormat(dateTimePattern)
-  }
-  object ISODate {
+  object ISODate:
     val datePattern                              = "yyyy-MM-dd"
     val formatter                                = JodaForms.jodaDateTimeFormat(datePattern, DateTimeZone.UTC)
     val isoDateTime                              = jodaDate(datePattern, DateTimeZone.UTC)
     implicit val dateFormat: Formatter[DateTime] = JodaForms.jodaDateTimeFormat(datePattern)
-  }
-  object Timestamp {
-    val formatter = new Formatter[org.joda.time.DateTime] {
+  object Timestamp:
+    val formatter = new Formatter[org.joda.time.DateTime]:
       def bind(key: String, data: Map[String, String]) =
         for {
           str  <- stringFormat.bind(key, data)
@@ -238,23 +224,16 @@ object Form {
         } yield date
       def unbind(key: String, value: org.joda.time.DateTime): Map[String, String] =
         stringFormat.unbind(key, value.getMillis.toString)
-    }
     val timestamp = of[org.joda.time.DateTime](using formatter)
-  }
-  object ISODateOrTimestamp {
-    val formatter = new Formatter[org.joda.time.DateTime] {
+  object ISODateOrTimestamp:
+    val formatter = new Formatter[org.joda.time.DateTime]:
       def bind(key: String, data: Map[String, String]) =
         ISODate.formatter.bind(key, data) orElse Timestamp.formatter.bind(key, data)
       def unbind(key: String, value: org.joda.time.DateTime) = ISODate.formatter.unbind(key, value)
-    }
     val isoDateOrTimestamp = of[org.joda.time.DateTime](using formatter)
-  }
-  object ISODateTimeOrTimestamp {
-    val formatter = new Formatter[org.joda.time.DateTime] {
+  object ISODateTimeOrTimestamp:
+    val formatter = new Formatter[org.joda.time.DateTime]:
       def bind(key: String, data: Map[String, String]) =
         ISODateTime.formatter.bind(key, data) orElse Timestamp.formatter.bind(key, data)
       def unbind(key: String, value: org.joda.time.DateTime) = ISODateTime.formatter.unbind(key, value)
-    }
     val isoDateTimeOrTimestamp = of[org.joda.time.DateTime](using formatter)
-  }
-}

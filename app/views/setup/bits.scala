@@ -146,9 +146,9 @@ private object bits {
       optValuePrefix: String = ""
   ) =
     options.map { case (value, name, _) =>
-      option(
+      scalatags.Text.tags.option(
         st.value := optValuePrefix + value,
-        field.value.exists(v => compare(v, value)) option selected
+        field.value.exists(v => compare(v, value)).option(selected)
       )(name)
     }
 

@@ -16,15 +16,14 @@ sealed abstract class Dimension[A: BSONHandler](
     val dbKey: String,
     val position: Position,
     val description: Frag
-) {
+):
 
   def bson = implicitly[BSONHandler[A]]
 
   def isInGame = position == Position.Game
   def isInMove = position == Position.Move
-}
 
-object Dimension {
+object Dimension:
 
   import BSONHandlers._
   import Position._
@@ -197,14 +196,13 @@ object Dimension {
         raw("Centipawns lost by each move, according to Stockfish evaluation.")
       )
 
-  def requiresStableRating(d: Dimension[_]) =
-    d match {
+  def requiresStableRating(d: Dimension[?]) =
+    d match
       case OpponentStrength => true
       case _                => false
-    }
 
   def valuesOf[X](d: Dimension[X]): List[X] =
-    d match {
+    d match
       case Period                  => lila.insight.Period.selector
       case Date                    => Nil // Period is used instead
       case Perf                    => PerfType.nonPuzzle
@@ -222,10 +220,9 @@ object Dimension {
       case MaterialRange           => lila.insight.MaterialRange.all
       case Blur                    => lila.insight.Blur.all
       case TimeVariance            => lila.insight.TimeVariance.all
-    }
 
   def valueByKey[X](d: Dimension[X], key: String): Option[X] =
-    d match {
+    d match
       case Period                  => key.toIntOption map lila.insight.Period.apply
       case Date                    => None
       case Perf                    => PerfType.byKey get key
@@ -243,14 +240,12 @@ object Dimension {
       case MaterialRange           => key.toIntOption flatMap lila.insight.MaterialRange.byId.get
       case Blur                    => lila.insight.Blur(key == "true").some
       case TimeVariance            => key.toFloatOption map lila.insight.TimeVariance.byId
-    }
 
-  def valueToJson[X](d: Dimension[X])(v: X)(implicit lang: Lang): play.api.libs.json.JsObject = {
+  def valueToJson[X](d: Dimension[X])(v: X)(implicit lang: Lang): play.api.libs.json.JsObject =
     play.api.libs.json.Json.obj(
       "key"  -> valueKey(d)(v),
       "name" -> valueJson(d)(v)
     )
-  }
 
   def valueKey[X](d: Dimension[X])(v: X): String =
     (d match {
@@ -274,8 +269,8 @@ object Dimension {
     }).toString
 
   def valueJson[X](d: Dimension[X])(v: X)(implicit lang: Lang): JsValue =
-    d match {
-      case Date                    => JsNumber(v.min.getSeconds)
+    d match
+      case Date                    => JsNumber(v.min.getMillis / 1000)
       case Period                  => JsString(v.toString)
       case Perf                    => JsString(v.trans)
       case Phase                   => JsString(v.name)
@@ -292,27 +287,25 @@ object Dimension {
       case MaterialRange           => JsString(v.name)
       case Blur                    => JsString(v.name)
       case TimeVariance            => JsString(v.name)
-    }
 
-  def filtersOf[X](d: Dimension[X], selected: List[X]): Bdoc = {
+  def filtersOf[X](d: Dimension[X], selected: List[X]): Bdoc =
     import cats.implicits._
-    d match {
+    d match
       case Dimension.MovetimeRange =>
-        selected match {
+        selected match
           case Nil => $empty
           case many =>
             $doc(
               "$or" -> many.map(lila.insight.MovetimeRange.toRange).map { range =>
-                $doc(d.dbKey $gte range._1 $lt range._2)
+                $doc(d.dbKey `$gte` range._1 `$lt` range._2)
               }
             )
-        }
       case Dimension.Period =>
         selected.maximumByOption(_.days).fold($empty) { period =>
-          $doc(d.dbKey $gt period.min)
+          $doc(d.dbKey `$gt` period.min)
         }
       case Dimension.MaterialRange =>
-        selected match {
+        selected match
           case Nil => $empty
           case many =>
             $doc(
@@ -320,34 +313,27 @@ object Dimension {
                 val intRange = lila.insight.MaterialRange.toRange(range)
                 if (intRange._1 == intRange._2) $doc(d.dbKey -> intRange._1)
                 else if (range.negative)
-                  $doc(d.dbKey $gte intRange._1 $lt intRange._2)
+                  $doc(d.dbKey `$gte` intRange._1 `$lt` intRange._2)
                 else
-                  $doc(d.dbKey $gt intRange._1 $lte intRange._2)
+                  $doc(d.dbKey `$gt` intRange._1 `$lte` intRange._2)
               }
             )
-        }
       case Dimension.TimeVariance =>
-        selected match {
+        selected match
           case Nil => $empty
           case many =>
             $doc(
               "$or" -> many.map(lila.insight.TimeVariance.toRange).map { range =>
-                $doc(d.dbKey $gt range._1 $lte range._2)
+                $doc(d.dbKey `$gt` range._1 `$lte` range._2)
               }
             )
-        }
       case _ =>
-        selected flatMap d.bson.writeOpt match {
+        selected flatMap d.bson.writeOpt match
           case Nil     => $empty
           case List(x) => $doc(d.dbKey -> x)
-          case xs      => d.dbKey $in xs
-        }
-    }
-  }
+          case xs      => d.dbKey `$in` xs
 
   def dataTypeOf[X](d: Dimension[X]): String =
-    d match {
+    d match
       case Date => "date"
       case _    => "text"
-    }
-}

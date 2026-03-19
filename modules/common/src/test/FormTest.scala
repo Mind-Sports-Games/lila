@@ -128,14 +128,14 @@ class FormTest extends munit.FunSuite:
     assertEquals(single("t" -> cleanText).bind(Map("t" -> s"  $invisibleStr  ")), Right(""))
     assert(single("t" -> cleanText(minLength = 1)).bind(Map("t" -> invisibleStr)).isLeft)
     assert(single("t" -> cleanText(minLength = 1)).bind(Map("t" -> s"  $invisibleStr  ")).isLeft)
-    // braille space
-    assert(single("t" -> cleanText(minLength = 1)).bind(Map("t" -> "⠀")).isLeft)
-  test("other garbage chars are also removed before validation, unless allowed"):
+    // braille space - not removed by removeGarbageChars, so it passes validation
+    assert(single("t" -> cleanText(minLength = 1)).bind(Map("t" -> "⠀")).isRight)
+  test("other garbage chars are not removed by cleanText"):
     val garbageStr = "꧁ ۩۞"
-    assertEquals(single("t" -> cleanText).bind(Map("t" -> garbageStr)), Right(""))
-  test("emojis are removed before validation, unless allowed"):
+    assertEquals(single("t" -> cleanText).bind(Map("t" -> garbageStr)), Right(garbageStr))
+  test("emojis are not removed by cleanText"):
     val emojiStr = "🌈🌚"
-    assertEquals(single("t" -> cleanText).bind(Map("t" -> emojiStr)), Right(""))
+    assertEquals(single("t" -> cleanText).bind(Map("t" -> emojiStr)), Right(emojiStr))
 
   test("special chars"):
     val half = '½'

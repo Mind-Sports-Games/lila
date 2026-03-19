@@ -6,7 +6,7 @@ import User.{ LightPerf, PlayTime }
 import lila.common.Json.jodaWrites
 import lila.rating.{ Perf, PerfType }
 
-final class JsonView(isOnline: lila.socket.IsOnline) {
+final class JsonView(isOnline: lila.socket.IsOnline):
 
   import JsonView._
   implicit private val profileWrites: OWrites[Profile]   = Json.writes[Profile]
@@ -49,9 +49,8 @@ final class JsonView(isOnline: lila.socket.IsOnline) {
 
   def lightPerfIsOnline(lp: LightPerf) =
     lightPerfWrites.writes(lp).add("online" -> isOnline(lp.user.id))
-}
 
-object JsonView {
+object JsonView:
 
   import Title.titleJsonWrites
 
@@ -108,19 +107,19 @@ object JsonView {
         key -> perfWrites.writes(perf)
     }).add(
       "storm",
-      u.perfs.storm.nonEmpty option Json.obj(
+      u.perfs.storm.nonEmpty `option` Json.obj(
         "runs"  -> u.perfs.storm.runs,
         "score" -> u.perfs.storm.score
       )
     ).add(
       "racer",
-      u.perfs.racer.nonEmpty option Json.obj(
+      u.perfs.racer.nonEmpty `option` Json.obj(
         "runs"  -> u.perfs.racer.runs,
         "score" -> u.perfs.racer.score
       )
     ).add(
       "streak",
-      u.perfs.streak.nonEmpty option Json.obj(
+      u.perfs.streak.nonEmpty `option` Json.obj(
         "runs"  -> u.perfs.streak.runs,
         "score" -> u.perfs.streak.score
       )
@@ -130,4 +129,3 @@ object JsonView {
     JsObject(onlyPerfs.map { perfType =>
       perfType.key -> perfWrites.writes(u.perfs(perfType))
     })
-}

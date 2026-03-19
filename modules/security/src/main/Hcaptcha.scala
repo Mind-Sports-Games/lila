@@ -14,22 +14,20 @@ import lila.common.config._
 import lila.common.HTTPRequest
 import play.api.ConfigLoader
 
-trait Hcaptcha {
+trait Hcaptcha:
 
   def verify(response: String, req: RequestHeader): Fu[Hcaptcha.Result]
 
-  def verify()(implicit req: play.api.mvc.Request[_], formBinding: FormBinding): Fu[Hcaptcha.Result] =
+  def verify()(implicit req: play.api.mvc.Request[?], formBinding: FormBinding): Fu[Hcaptcha.Result] =
     verify(~Hcaptcha.form.bindFromRequest().value.flatten, req)
-}
 
-object Hcaptcha {
+object Hcaptcha:
 
   sealed abstract class Result(val ok: Boolean)
-  object Result {
+  object Result:
     case object Valid extends Result(true)
     case object Pass  extends Result(true)
     case object Fail  extends Result(false)
-  }
 
   val field = "h-captcha-response" -> optional(nonEmptyText)
   val form  = Form(single(field))
@@ -39,24 +37,21 @@ object Hcaptcha {
       @ConfigName("public_key") publicKey: String,
       @ConfigName("private_key") privateKey: Secret,
       enabled: Boolean
-  ) {
+  ):
     def public = HcaptchaPublicConfig(publicKey, enabled)
-  }
   implicit private[security] val configLoader: ConfigLoader[Config] = AutoConfig.loader[Config]
-}
 
-object HcaptchaSkip extends Hcaptcha {
+object HcaptchaSkip extends Hcaptcha:
 
   def verify(response: String, req: RequestHeader) = fuccess(Hcaptcha.Result.Valid)
 
-}
 
 final class HcaptchaReal(
     ws: StandaloneWSClient,
     netDomain: NetDomain,
     config: Hcaptcha.Config
 )(implicit ec: scala.concurrent.ExecutionContext)
-    extends Hcaptcha {
+    extends Hcaptcha:
 
   import Hcaptcha.Result
 
@@ -65,14 +60,13 @@ final class HcaptchaReal(
 
   private case class BadResponse(
       `error-codes`: List[String]
-  ) {
+  ):
     def missingInput      = `error-codes` contains "missing-input-response"
     override def toString = `error-codes` mkString ","
-  }
   implicit private val badReader: Reads[BadResponse] = Json.reads[BadResponse]
 
-  def verify(response: String, req: RequestHeader): Fu[Result] = {
-    val client = HTTPRequest clientName req
+  def verify(response: String, req: RequestHeader): Fu[Result] =
+    val client = HTTPRequest `clientName` req
     ws.url(config.endpoint)
       .post(
         Map(
@@ -81,17 +75,17 @@ final class HcaptchaReal(
           "remoteip" -> HTTPRequest.ipAddress(req).value,
           "sitekey"  -> config.publicKey
         )
-      ) map {
+      ) map:
       case res if res.status == 200 =>
-        res.body[JsValue].validate[GoodResponse] match {
+        res.body[JsValue].validate[GoodResponse] match
           case JsSuccess(res, _) =>
             lila.mon.security.hCaptcha.hit(client, "success").increment()
             if (res.success && res.hostname == netDomain.value) Result.Valid
             else Result.Fail
           case JsError(err) =>
-            res.body[JsValue].validate[BadResponse].asOpt match {
+            res.body[JsValue].validate[BadResponse].asOpt match
               case Some(err) if err.missingInput =>
-                logger.info(s"hcaptcha missing ${HTTPRequest printClient req}")
+                logger.info(s"hcaptcha missing ${HTTPRequest `printClient` req}")
                 lila.mon.security.hCaptcha.hit(client, "missing").increment()
                 if (HTTPRequest.apiVersion(req).isDefined) Result.Pass else Result.Fail
               case Some(err) =>
@@ -101,12 +95,7 @@ final class HcaptchaReal(
                 lila.mon.security.hCaptcha.hit(client, "error").increment()
                 logger.info(s"hcaptcha $err ${res.body}")
                 Result.Fail
-            }
-        }
       case res =>
         lila.mon.security.hCaptcha.hit(client, res.status.toString).increment()
         logger.info(s"hcaptcha ${res.status} ${res.body}")
         Result.Fail
-    }
-  }
-}

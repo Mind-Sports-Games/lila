@@ -1,7 +1,5 @@
 package lila.swiss
 
-import scala.concurrent.duration._
-
 import lila.hub.actorApi.team.IsLeader
 import lila.hub.LateMultiThrottler
 import lila.hub.LightTeam.TeamID
@@ -18,7 +16,7 @@ final private class SwissSocket(
     system: org.apache.pekko.actor.ActorSystem,
     scheduler: org.apache.pekko.actor.Scheduler,
     mode: play.api.Mode
-) {
+):
 
   private val reloadThrottler = LateMultiThrottler(executionTimeout = none, logger = logger)
 
@@ -51,9 +49,8 @@ final private class SwissSocket(
       chatBusChan = _.Swiss
     )
 
-  private lazy val send: String => Unit = remoteSocketApi.makeSender("swiss-out").apply _
+  private lazy val send: String => Unit = remoteSocketApi.makeSender("swiss-out").apply
 
   remoteSocketApi.subscribe("swiss-in", RP.In.reader)(
     handler orElse remoteSocketApi.baseHandler
   ).andDo(send(P.Out.boot))
-}

@@ -30,7 +30,7 @@ final class Env(
 )(implicit
     ec: scala.concurrent.ExecutionContext,
     scheduler: org.apache.pekko.actor.Scheduler
-) {
+):
 
   private val config = appConfig.get[PushConfig]("push")(AutoConfig.loader)
 
@@ -39,21 +39,20 @@ final class Env(
   private lazy val deviceApi  = new DeviceApi(db(config.deviceColl))
   lazy val webSubscriptionApi = new WebSubscriptionApi(db(config.subscriptionColl))
 
-  def registerDevice    = deviceApi.register _
-  def unregisterDevices = deviceApi.unregister _
+  def registerDevice    = deviceApi.register
+  def unregisterDevices = deviceApi.unregister
 
   private lazy val googleCredentials: Option[GoogleCredentials] =
-    try {
+    try
       config.firebase.json.value.some.filter(_.nonEmpty).map { json =>
         ServiceAccountCredentials
           .fromStream(new java.io.ByteArrayInputStream(json.getBytes()))
           .createScoped(Set("https://www.googleapis.com/auth/firebase.messaging").asJava)
       }
-    } catch {
+    catch
       case e: Exception =>
         logger.warn("Failed to create google credentials", e)
         none
-    }
   if (googleCredentials.isDefined) logger.info("Firebase push notifications are enabled.")
 
   private lazy val firebasePush = wire[FirebasePush]
@@ -62,10 +61,9 @@ final class Env(
 
   private lazy val pushApi: PushApi = wire[PushApi]
 
-  private def logUnit(f: Fu[_]): Unit = {
-    f logFailure logger
+  private def logUnit(f: Fu[?]): Unit =
+    f `logFailure` logger
     ()
-  }
   lila.common.Bus.subscribeFun(
     "finishGame",
     "moveEventCorres",
@@ -74,15 +72,15 @@ final class Env(
     "challenge",
     "corresAlarm",
     "offerEventCorres"
-  ) {
+  ):
     case lila.game.actorApi.FinishGame(game, _, _) =>
       logUnit { pushApi.finish(game) }
     case lila.hub.actorApi.round.CorresMoveEvent(move, _, pushable, _, _) if pushable =>
-      logUnit { pushApi move move }
+      logUnit { pushApi `move` move }
     case lila.hub.actorApi.round.CorresTakebackOfferEvent(gameId) =>
-      logUnit { pushApi takebackOffer gameId }
+      logUnit { pushApi `takebackOffer` gameId }
     case lila.hub.actorApi.round.CorresDrawOfferEvent(gameId) =>
-      logUnit { pushApi drawOffer gameId }
+      logUnit { pushApi `drawOffer` gameId }
     case lila.hub.actorApi.round.CorresSelectSquaresOfferEvent(gameId) =>
       logUnit { pushApi.selectSquaresOffer(gameId) }
     case lila.hub.actorApi.round.CorresAcceptSquaresOfferEvent(gameId) =>
@@ -90,12 +88,10 @@ final class Env(
     case lila.hub.actorApi.round.CorresDeclineSquaresOfferEvent(gameId) =>
       logUnit { pushApi.declineSquaresOffer(gameId) }
     case lila.msg.MsgThread.Unread(t) =>
-      logUnit { pushApi newMsg t }
+      logUnit { pushApi `newMsg` t }
     case lila.challenge.Event.Create(c) =>
-      logUnit { pushApi challengeCreate c }
+      logUnit { pushApi `challengeCreate` c }
     case lila.challenge.Event.Accept(c, joinerId) =>
       logUnit { pushApi.challengeAccept(c, joinerId) }
     case lila.game.actorApi.CorresAlarmEvent(pov) =>
-      logUnit { pushApi corresAlarm pov }
-  }
-}
+      logUnit { pushApi `corresAlarm` pov }

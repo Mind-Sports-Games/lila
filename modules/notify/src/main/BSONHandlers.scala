@@ -9,7 +9,7 @@ import lila.notify.MentionedInThread._
 import lila.notify.Notification._
 import reactivemongo.api.bson._
 
-private object BSONHandlers {
+private object BSONHandlers:
 
   implicit val NotifiesHandler: BSONHandler[Notifies] = stringAnyValHandler[Notifies](_.value, Notifies.apply)
 
@@ -61,10 +61,10 @@ private object BSONHandlers {
   implicit val PlayerIndexBSONHandler: BSONHandler[PlayerIndex] =
     BSONBooleanHandler.as[PlayerIndex](PlayerIndex.fromP1, _.p1)
 
-  implicit val NotificationContentHandler: BSON[NotificationContent] = new BSON[NotificationContent] {
+  implicit val NotificationContentHandler: BSON[NotificationContent] = new BSON[NotificationContent]:
 
     private def writeNotificationContent(notificationContent: NotificationContent) = {
-      notificationContent match {
+      notificationContent match
         case MentionedInThread(mentionedBy, topic, topicId, category, postId) =>
           $doc(
             "mentionedBy" -> mentionedBy,
@@ -87,10 +87,9 @@ private object BSONHandlers {
         case x: CorresAlarm                => CorresAlarmHandler.writeTry(x).get
         case x: IrwinDone                  => IrwinDoneHandler.writeTry(x).get
         case x: GenericLink                => GenericLinkHandler.writeTry(x).get
-      }
     } ++ $doc("type" -> notificationContent.key)
 
-    private def readMentionedNotification(reader: Reader): MentionedInThread = {
+    private def readMentionedNotification(reader: Reader): MentionedInThread =
       val mentionedBy = reader.get[MentionedBy]("mentionedBy")
       val topic       = reader.get[Topic]("topic")
       val topicId     = reader.get[TopicId]("topicId")
@@ -98,18 +97,16 @@ private object BSONHandlers {
       val postNumber  = reader.get[PostId]("postId")
 
       MentionedInThread(mentionedBy, topic, topicId, category, postNumber)
-    }
 
-    private def readInvitedStudyNotification(reader: Reader): NotificationContent = {
+    private def readInvitedStudyNotification(reader: Reader): NotificationContent =
       val invitedBy = reader.get[InvitedBy]("invitedBy")
       val studyName = reader.get[StudyName]("studyName")
       val studyId   = reader.get[StudyId]("studyId")
 
       InvitedToStudy(invitedBy, studyName, studyId)
-    }
 
     def reads(reader: Reader): NotificationContent =
-      reader.str("type") match {
+      reader.str("type") match
         case "mention"        => readMentionedNotification(reader)
         case "invitedStudy"   => readInvitedStudyNotification(reader)
         case "privateMessage" => PrivateMessageHandler.readTry(reader.doc).get
@@ -124,10 +121,7 @@ private object BSONHandlers {
         case "corresAlarm"    => CorresAlarmHandler.readTry(reader.doc).get
         case "irwinDone"      => IrwinDoneHandler.readTry(reader.doc).get
         case "genericLink"    => GenericLinkHandler.readTry(reader.doc).get
-      }
 
     def writes(writer: Writer, n: NotificationContent): dsl.Bdoc = writeNotificationContent(n)
-  }
 
   implicit val NotificationBSONHandler: BSONDocumentHandler[Notification] = Macros.handler[Notification]
-}

@@ -21,7 +21,7 @@ final class Env(
     cacheApi: lila.memo.CacheApi,
     db: lila.db.Db,
     imageRepo: lila.db.ImageRepo
-)(implicit ec: scala.concurrent.ExecutionContext) {
+)(implicit ec: scala.concurrent.ExecutionContext):
 
   private val config = appConfig.get[CoachConfig]("coach")(AutoConfig.loader)
 
@@ -46,7 +46,7 @@ final class Env(
     "finishGame",
     "shadowban",
     "setPermissions"
-  ) {
+  ):
     case lila.hub.actorApi.mod.Shadowban(userId, true) =>
       api.toggleApproved(userId, value = false)
       api.reviews.deleteAllBy(userId).discard
@@ -63,13 +63,9 @@ final class Env(
         p1 so api.setRating
         p2 so api.setRating
       }.discard
-  }
 
   def cli =
-    new lila.common.Cli {
-      def process = {
+    new lila.common.Cli:
+      def process =
         case "coach" :: "enable" :: username :: Nil  => api.toggleApproved(username, value = true)
         case "coach" :: "disable" :: username :: Nil => api.toggleApproved(username, value = false)
-      }
-    }
-}

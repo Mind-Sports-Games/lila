@@ -198,7 +198,7 @@ trait FormHelper { self: I18nHelper =>
         st.id := id(field),
         name := field.name,
         cls := List("form-control" -> true, klass -> klass.nonEmpty)
-      )(validationModifiers(field))(modifiers)(~field.value)
+      )(validationModifiers(field))(modifiers)(field.value.getOrElse(""))
 
     val actions = div(cls := "form-actions")
     val action  = div(cls := "form-actions single")

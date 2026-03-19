@@ -1,6 +1,5 @@
 package lila.pool
 
-import scala.concurrent.duration._
 import lila.common.ThreadLocalRandom
 
 import org.apache.pekko.actor._
@@ -15,13 +14,13 @@ final private class PoolActor(
     hookThieve: HookThieve,
     gameStarter: GameStarter,
     botGameStarter: BotGameStarter
-) extends Actor {
+) extends Actor:
 
   import PoolActor._
 
   var members = Vector.empty[PoolMember]
 
-  var nextWave: Cancellable = _
+  var nextWave: Cancellable = scala.compiletime.uninitialized
 
   implicit def ec: ExecutionContextExecutor = context.dispatcher
 
@@ -34,20 +33,18 @@ final private class PoolActor(
 
   scheduleWave()
 
-  def receive = {
+  def receive =
 
     case Join(joiner, rageSit) =>
-      members.find(joiner.is) match {
+      members.find(joiner.is) match
         case None =>
           members = members :+ PoolMember(joiner, config, rageSit)
           if (members.sizeIs >= config.wave.players.value) self ! FullWave
         case Some(member) if member.ratingRange != joiner.ratingRange =>
-          members = members.map {
-            case m if m == member => m withRange joiner.ratingRange
+          members = members.map:
+            case m if m == member => m `withRange` joiner.ratingRange
             case m                => m
-          }
         case _ => // no change
-      }
 
     case Leave(userId) =>
       members.find(_.userId == userId) foreach { member =>
@@ -111,13 +108,11 @@ final private class PoolActor(
       members = members.filter { m =>
         sris contains m.sri
       }
-  }
 
   val monitor = lila.mon.lobby.pool.wave
   val monId   = config.id.value.replace('+', '_')
-}
 
-private object PoolActor {
+private object PoolActor:
 
   case class Join(joiner: PoolApi.Joiner, rageSit: lila.playban.RageSit)
   case class Leave(userId: User.ID) extends AnyVal
@@ -125,4 +120,3 @@ private object PoolActor {
   case object ScheduledWave
   case object FullWave
   case object RunWave
-}

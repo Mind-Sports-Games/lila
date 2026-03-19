@@ -8,18 +8,16 @@ import Node.Children
 import lila.common.Chronometer
 import lila.db.dsl._
 
-private object StudyFlatTree {
+private object StudyFlatTree:
 
-  private case class FlatNode(path: Path, data: Bdoc) {
+  private case class FlatNode(path: Path, data: Bdoc):
     val depth = path.ids.size
 
     def toNodeWithChildren(children: Option[Children])(implicit variant: Variant): Option[Node] =
-      VariantHandlers().readNode(data, path.ids.last) map {
+      VariantHandlers().readNode(data, path.ids.last) map:
         _.copy(children = children | Node.emptyChildren)
-      }
-  }
 
-  object reader {
+  object reader:
 
     def rootChildren(flatTree: Bdoc)(implicit variant: Variant): Children =
       Chronometer
@@ -44,33 +42,26 @@ private object StudyFlatTree {
     // assumes that node has a greater depth than roots (sort beforehand)
     private def update(roots: Map[Path, Children], flat: FlatNode)(implicit
         variant: Variant
-    ): Map[Path, Children] = {
+    ): Map[Path, Children] =
       flat
         .toNodeWithChildren(roots.get(flat.path))
         .fold(roots) { node =>
           roots
             .removed(flat.path)
-            .updatedWith(flat.path.parent) {
+            .updatedWith(flat.path.parent):
               case None           => Children(Vector(node)).some
               case Some(siblings) => siblings.addNode(node).some
-            }
         }
-    }
-  }
 
-  object writer {
+  object writer:
 
     def rootChildren(root: Node.Root): Vector[(String, Bdoc)] =
-      Chronometer.syncMon(_.study.tree.write) {
+      Chronometer.syncMon(_.study.tree.write):
         root.children.nodes.flatMap { traverse(_, Path.root) }
-      }
 
     private def traverse(node: Node, parentPath: Path): Vector[(String, Bdoc)] =
-      (parentPath.depth < Node.maxPlies) so {
+      (parentPath.depth < Node.maxPlies) so:
         val path = parentPath + node.id
         node.children.nodes.flatMap {
           traverse(_, path)
         } appended (Path.encodeDbKey(path) -> VariantHandlers()(node.variant).writeNode(node))
-      }
-  }
-}

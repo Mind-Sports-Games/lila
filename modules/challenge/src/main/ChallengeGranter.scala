@@ -10,11 +10,11 @@ import lila.user.User
 
 case class ChallengeDenied(dest: User, reason: ChallengeDenied.Reason)
 
-object ChallengeDenied {
+object ChallengeDenied:
 
   sealed trait Reason
 
-  object Reason {
+  object Reason:
     case object YouAreAnon                         extends Reason
     case object YouAreBlocked                      extends Reason
     case object TheyDontAcceptChallenges           extends Reason
@@ -23,10 +23,9 @@ object ChallengeDenied {
     case object FriendsOnly                        extends Reason
     case object BotUltraBullet                     extends Reason
     case object Yourself                           extends Reason
-  }
 
   def translated(d: ChallengeDenied)(implicit lang: Lang): String =
-    d.reason match {
+    d.reason match
       case Reason.YouAreAnon               => trans.registerToSendChallenges.txt()
       case Reason.YouAreBlocked            => trans.youCannotChallengeX.txt(d.dest.titleUsername)
       case Reason.TheyDontAcceptChallenges => trans.xDoesNotAcceptChallenges.txt(d.dest.titleUsername)
@@ -36,13 +35,11 @@ object ChallengeDenied {
       case Reason.FriendsOnly               => trans.xOnlyAcceptsChallengesFromFriends.txt(d.dest.titleUsername)
       case Reason.BotUltraBullet            => "Bots cannot play UltraBullet. Choose a slower time control."
       case Reason.Yourself                  => trans.cannotChallengeYourself.txt()
-    }
-}
 
 final class ChallengeGranter(
     prefApi: lila.pref.PrefApi,
     relationApi: lila.relation.RelationApi
-) {
+):
 
   import ChallengeDenied.Reason._
 
@@ -58,7 +55,7 @@ final class ChallengeGranter(
         else fuccess(YouAreAnon.some)
       ) { from =>
         relationApi.fetchRelation(dest, from) zip
-          prefApi.getPref(dest).map(_.challenge) map {
+          prefApi.getPref(dest).map(_.challenge) map:
             case (Some(Block), _)                                  => YouAreBlocked.some
             case (_, Pref.Challenge.NEVER)                         => TheyDontAcceptChallenges.some
             case (Some(Follow), _)                                 => none // always accept from followed
@@ -69,21 +66,16 @@ final class ChallengeGranter(
               perfType so { pt =>
                 if (from.perfs(pt).provisional || dest.perfs(pt).provisional)
                   RatingIsProvisional(pt).some
-                else {
+                else
                   val diff = math.abs(from.perfs(pt).intRating - dest.perfs(pt).intRating)
-                  (diff > ratingThreshold) option RatingOutsideRange(pt)
-                }
+                  (diff > ratingThreshold) `option` RatingOutsideRange(pt)
               }
             case (_, Pref.Challenge.ALWAYS) => none
             case _                          => none
-          }
       }
-      .map {
-        case None if dest.isBot && perfType.has(PerfType.orDefaultSpeed("ultraBullet")) => BotUltraBullet.some
+      .map:
+        case None if dest.isBot && perfType.contains(PerfType.orDefaultSpeed("ultraBullet")) => BotUltraBullet.some
         case res                                                                        => res
-      }
-      .map {
+      .map:
         _.map { ChallengeDenied(dest, _) }
-      }
 
-}

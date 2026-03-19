@@ -10,14 +10,13 @@ case class Trophy(
     expiry: Option[DateTime],
     url: Option[String],
     name: Option[String]
-) extends Ordered[Trophy] {
+) extends Ordered[Trophy]:
 
   def timestamp = date.getMillis
 
   def compare(other: Trophy) =
-    if (kind.order == other.kind.order) date compareTo other.date
+    if (kind.order == other.kind.order) date `compareTo` other.date
     else Integer.compare(kind.order, other.kind.order)
-}
 
 case class TrophyKind(
     _id: String,
@@ -29,7 +28,7 @@ case class TrophyKind(
     withCustomImage: Boolean
 )
 
-object TrophyKind {
+object TrophyKind:
   val marathonWinner     = "marathonWinner"
   val marathonTopTen     = "marathonTopTen"
   val marathonTopFifty   = "marathonTopFifty"
@@ -49,4 +48,3 @@ object TrophyKind {
         klass = none,
         withCustomImage = false
       )
-}

@@ -11,7 +11,7 @@ case class PublicLine(
     date: Option[DateTime]
 )
 
-object PublicLine {
+object PublicLine:
 
   def make(text: String, from: Source): PublicLine =
     PublicLine(text, from.some, DateTime.now.some)
@@ -53,4 +53,3 @@ object PublicLine {
     },
     x => if (x.from.isDefined) objectHandler.writeTry(x).get else BSONString(x.text)
   )
-}

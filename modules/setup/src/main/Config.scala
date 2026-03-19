@@ -16,7 +16,7 @@ import strategygames.format.FEN
 import lila.game.Game
 import lila.lobby.PlayerIndex
 
-private[setup] trait Config {
+private[setup] trait Config:
 
   // Whether or not to use a clock
   val timeMode: TimeMode
@@ -69,10 +69,10 @@ private[setup] trait Config {
   def clockHasTime =
     clockHasFischerTime || clockHasSimpleDelayTime || clockHasBronsteinDelayTime || clockHasByoyomiTime
 
-  def makeClock = hasClock option justMakeClock
+  def makeClock = hasClock `option` justMakeClock
 
   protected def justMakeClock: ClockConfig =
-    timeMode match {
+    timeMode match
       case TimeMode.ByoyomiClock =>
         ByoyomiClock.Config(
           (time * 60).toInt,
@@ -89,10 +89,8 @@ private[setup] trait Config {
       //       when we add new clocks in the future.
       case TimeMode.Correspondence | TimeMode.FischerClock | TimeMode.Unlimited =>
         Clock.Config((time * 60).toInt, if (clockHasFischerTime) increment else 1)
-    }
 
-  def makeDaysPerTurn: Option[Int] = (timeMode == TimeMode.Correspondence) option days
-}
+  def makeDaysPerTurn: Option[Int] = (timeMode == TimeMode.Correspondence) `option` days
 
 trait Positional { self: Config =>
 
@@ -104,12 +102,12 @@ trait Positional { self: Config =>
 
   def strictFen: Boolean
 
-  lazy val validFen = variant.gameLogic match {
+  lazy val validFen = variant.gameLogic match
     //TODO: LOA defaults here, perhaps want to add LOA fromPosition
     case GameLogic.Chess() =>
       !variant.fromPositionVariant || {
         fen exists { f =>
-          (Forsyth.<<<(variant.gameLogic, f)).exists(_.situation playable strictFen)
+          (Forsyth.<<<(variant.gameLogic, f)).exists(_.situation `playable` strictFen)
         }
       }
     case GameLogic.Draughts() =>
@@ -119,7 +117,7 @@ trait Positional { self: Config =>
         fen so { f =>
           ~Forsyth
             .<<<@(variant.gameLogic, fenVariant | Variant.libStandard(GameLogic.Draughts()), f)
-            .map(_.situation playable strictFen)
+            .map(_.situation `playable` strictFen)
         }
       }
     case GameLogic.FairySF()      => true //no fromPosition yet
@@ -132,11 +130,10 @@ trait Positional { self: Config =>
     case GameLogic.Dameo()   => true //no fromPosition yet
     case _ =>
       fen exists { f =>
-        (Forsyth.<<<(variant.gameLogic, f)).exists(_.situation playable strictFen)
+        (Forsyth.<<<(variant.gameLogic, f)).exists(_.situation `playable` strictFen)
       }
-  }
 
-  lazy val validKingCount = variant.gameLogic match {
+  lazy val validKingCount = variant.gameLogic match
     case GameLogic.Draughts() =>
       !(variant.fromPositionVariant && Config
         .fenVariants(GameFamily.Draughts().id)
@@ -148,17 +145,15 @@ trait Positional { self: Config =>
         }
       }
     case _ => false
-  }
 
-  def fenGame(builder: StratGame => Game): Game = {
+  def fenGame(builder: StratGame => Game): Game =
     val baseState =
-      fen ifTrue (variant.fromPositionVariant || variant.gameLogic == GameLogic.Go()) flatMap {
+      fen `ifTrue` (variant.fromPositionVariant || variant.gameLogic == GameLogic.Go()) flatMap:
         Forsyth.<<<@(
           variant.gameLogic,
           variant,
           _
         )
-      }
     val (stratGame, state) = baseState.fold(makeGame -> none[SituationPlus]) { sit =>
       {
         val game = StratGame(
@@ -190,12 +185,11 @@ trait Positional { self: Config =>
         )
       )
     }
-  }
 }
 
 object Config extends BaseConfig
 
-trait BaseConfig {
+trait BaseConfig:
   val gameFamilys = GameFamily.all.map(_.id)
 
   val baseVariants = GameFamily.all.map(gf => (gf.id, gf.variants.filter(_.baseVariant).map(_.id))).toMap
@@ -285,4 +279,3 @@ trait BaseConfig {
   private val pointsMax                = 31
   def validateBackgammonPoints(i: Int) = i >= pointsMin && i <= pointsMax && i % 2 == 1
 
-}

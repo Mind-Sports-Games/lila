@@ -20,9 +20,9 @@ final class Relation(
   val api = env.relation.api
 
   private def renderActions(userId: String, mini: Boolean)(implicit ctx: Context) =
-    (ctx.userId so { api.fetchRelation(_, userId) }) zip
-      (ctx.isAuth so { env.pref.api followable userId }) zip
-      (ctx.userId so { api.fetchBlocks(userId, _) }) flatMap { case ((relation, followable), blocked) =>
+    (ctx.userId.fold(fuccess(none[Boolean]))(uid => api.fetchRelation(uid, userId))) zip
+      (if (ctx.isAuth) env.pref.api.followable(userId) else fuFalse) zip
+      (ctx.userId.fold(fuFalse)(uid => api.fetchBlocks(userId, uid))) flatMap { case ((relation, followable), blocked) =>
         negotiate(
           html = fuccess(Ok {
             if (mini)
@@ -165,9 +165,9 @@ final class Relation(
 
   private def followship(userIds: Seq[String])(implicit ctx: Context): Fu[List[Related]] =
     env.user.repo usersFromSecondary userIds.map(UserModel.normalize) flatMap { users =>
-      (ctx.isAuth so { env.pref.api.followableIds(users map (_.id)) }) flatMap { followables =>
+      (if (ctx.isAuth) env.pref.api.followableIds(users map (_.id)) else fuccess(Set.empty[String])) flatMap { followables =>
         Future.sequence(users.map { u =>
-          ctx.userId so { api.fetchRelation(_, u.id) } map { rel =>
+          ctx.userId.fold(fuccess(none[lila.relation.Relation]))(uid => api.fetchRelation(uid, u.id)) map { rel =>
             lila.relation.Related(u, none, followables(u.id), rel)
           }
         })

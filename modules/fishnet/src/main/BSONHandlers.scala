@@ -8,7 +8,7 @@ import reactivemongo.api.bson._
 import strategygames.GameLogic
 import strategygames.variant.Variant
 
-private object BSONHandlers {
+private object BSONHandlers:
 
   implicit val ClientKeyBSONHandler: BSONHandler[Client.Key] =
     stringAnyValHandler[Client.Key](_.value, Client.Key.apply)
@@ -20,7 +20,7 @@ private object BSONHandlers {
     stringAnyValHandler[Client.UserId](_.value, Client.UserId.apply)
 
   implicit val ClientSkillBSONHandler: BSONHandler[Client.Skill] = tryHandler[Client.Skill](
-    { case BSONString(v) => Client.Skill byKey v toTry s"Invalid client skill $v" },
+    { case BSONString(v) => Client.Skill `byKey` v `toTry` s"Invalid client skill $v" },
     x => BSONString(x.key)
   )
 
@@ -29,13 +29,11 @@ private object BSONHandlers {
 
   implicit val ClientBSONHandler: BSONDocumentHandler[Client] = Macros.handler[Client]
 
-  implicit val VariantBSONHandler: BSON[Variant] = new BSON[Variant] {
-    def reads(r: Reader) = Variant(GameLogic(r.intD("gl")), r.int("v")) match {
+  implicit val VariantBSONHandler: BSON[Variant] = new BSON[Variant]:
+    def reads(r: Reader) = Variant(GameLogic(r.intD("gl")), r.int("v")) match
       case Some(v) => v
       case None    => sys.error(s"No such variant: ${r.intD("v")} for gamelogic: ${r.intD("gl")}")
-    }
     def writes(w: Writer, v: Variant) = $doc("gl" -> v.gameLogic.id, "v" -> v.id)
-  }
 
   implicit val WorkIdBSONHandler: BSONHandler[Work.Id] = stringAnyValHandler[Work.Id](_.value, Work.Id.apply)
   import Work.Acquired
@@ -48,4 +46,3 @@ private object BSONHandlers {
   implicit val SenderHandler: BSONDocumentHandler[Sender] = Macros.handler[Sender]
   import Work.Analysis
   implicit val AnalysisHandler: BSONDocumentHandler[Analysis] = Macros.handler[Analysis]
-}

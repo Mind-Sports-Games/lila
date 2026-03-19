@@ -11,7 +11,7 @@ final class Options(env: Env) extends LilaController(env) {
   val root = all("")
 
   def all(@nowarn("cat=unused") url: String) =
-    Action { req =>
+    Action { (req: play.api.mvc.RequestHeader) =>
       if (isApiOrApp(req)) apiHeaders
       else NotFound
     }

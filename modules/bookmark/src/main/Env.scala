@@ -22,7 +22,7 @@ final class Env(
 )(implicit
     ec: scala.concurrent.ExecutionContext,
     system: ActorSystem
-) {
+):
 
   private val config = appConfig.get[BookmarkConfig]("bookmark")(AutoConfig.loader)
 
@@ -41,4 +41,3 @@ final class Env(
     }),
     name = config.actorName
   )
-}

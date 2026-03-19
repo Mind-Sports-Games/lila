@@ -1,7 +1,6 @@
 package lila.security
 
 import play.api.i18n.Lang
-import scala.util.chaining._
 
 import lila.common.config.BaseUrl
 import lila.common.EmailAddress
@@ -14,7 +13,7 @@ final class AutomaticEmail(
     userRepo: UserRepo,
     mailer: Mailer,
     baseUrl: BaseUrl
-)(implicit ec: scala.concurrent.ExecutionContext) {
+)(implicit ec: scala.concurrent.ExecutionContext):
 
   import Mailer.html._
 
@@ -22,11 +21,11 @@ final class AutomaticEmail(
 
 The PlayStrategy team"""
 
-  def welcome(user: User, email: EmailAddress)(implicit lang: Lang): Funit = {
+  def welcome(user: User, email: EmailAddress)(implicit lang: Lang): Funit =
     lila.mon.email.send.welcome.increment()
     val profileUrl = s"$baseUrl/@/${user.username}"
     val editUrl    = s"$baseUrl/account/profile"
-    mailer send Mailer.Message(
+    mailer `send` Mailer.Message(
       to = email,
       subject = trans.welcome_subject.txt(user.username),
       text = s"""
@@ -38,13 +37,12 @@ ${Mailer.txt.serviceNote}
         trans.welcome_text.txt(profileUrl, editUrl)
       ).some
     )
-  }
 
   def onTitleSet(username: String): Funit = {
     for {
-      user        <- userRepo named username orFail s"No such user $username"
-      emailOption <- userRepo email user.id
-      title       <- fuccess(user.title) orFail "User doesn't have a title!"
+      user        <- userRepo `named` username `orFail` s"No such user $username"
+      emailOption <- userRepo `email` user.id
+      title       <- fuccess(user.title) `orFail` "User doesn't have a title!"
       body = alsoSendAsPrivateMessage(user) { implicit lang =>
         s"""Hello,
 
@@ -56,7 +54,7 @@ $regards
       }
       _ <- emailOption so { email =>
         implicit val lang = userLang(user)
-        mailer send Mailer.Message(
+        mailer `send` Mailer.Message(
           to = email,
           subject = s"$title title confirmed on playstrategy.org",
           text = s"""
@@ -72,7 +70,7 @@ ${Mailer.txt.serviceNote}
     logger.info(e.message)
   }
 
-  def onBecomeCoach(user: User): Funit = {
+  def onBecomeCoach(user: User): Funit =
     val body = alsoSendAsPrivateMessage(user) { implicit lang =>
       s"""Hello,
 
@@ -82,10 +80,10 @@ Your coach profile awaits you on $baseUrl/coach/edit.
 $regards
 """
     }
-    userRepo email user.id flatMap {
+    userRepo `email` user.id flatMap:
       _ so { email =>
         implicit val lang = userLang(user)
-        mailer send Mailer.Message(
+        mailer `send` Mailer.Message(
           to = email,
           subject = "Coach profile unlocked on playstrategy.org",
           text = s"""
@@ -96,13 +94,11 @@ ${Mailer.txt.serviceNote}
           htmlBody = standardEmail(body).some
         )
       }
-    }
-  }
 
   def onFishnetKey(userId: User.ID, key: String): Funit =
     for {
-      user        <- userRepo named userId orFail s"No such user $userId"
-      emailOption <- userRepo email user.id
+      user        <- userRepo `named` userId `orFail` s"No such user $userId"
+      emailOption <- userRepo `email` user.id
       body = alsoSendAsPrivateMessage(user) { implicit lang =>
         s"""Hello,
 
@@ -119,7 +115,7 @@ $regards
       }
       _ <- emailOption.so { email =>
         implicit val lang = userLang(user)
-        mailer send Mailer.Message(
+        mailer `send` Mailer.Message(
           to = email,
           subject = "Your private fishnet key",
           text = s"""
@@ -132,7 +128,7 @@ ${Mailer.txt.serviceNote}
       }
     } yield ()
 
-  def onAppealReply(user: User): Funit = {
+  def onAppealReply(user: User): Funit =
     alsoSendAsPrivateMessage(user) { implicit lang =>
       s"""Hello,
 
@@ -142,9 +138,8 @@ $regards
 """
     }
     funit
-  }
 
-  def gdprErase(user: User): Funit = {
+  def gdprErase(user: User): Funit =
     val body =
       s"""Hello,
 
@@ -152,10 +147,10 @@ Following your request, the PlayStrategy account "${user.username} will be fully
 
 $regards
 """
-    userRepo emailOrPrevious user.id flatMap {
+    userRepo `emailOrPrevious` user.id flatMap:
       _ so { email =>
         implicit val lang = userLang(user)
-        mailer send Mailer.Message(
+        mailer `send` Mailer.Message(
           to = email,
           subject = "playstrategy.org account erasure",
           text = s"""
@@ -166,8 +161,6 @@ ${Mailer.txt.serviceNote}
           htmlBody = standardEmail(body).some
         )
       }
-    }
-  }
 
   def onPatronNew(user: User): Funit =
     sendAsPrivateMessageAndEmail(user)(
@@ -186,36 +179,32 @@ If you're still interested in supporting us in other ways, you can see non-finan
 To make a new donation, head to $baseUrl/patron"""
     )
 
-  private def alsoSendAsPrivateMessage(user: User)(body: Lang => String): String = {
+  private def alsoSendAsPrivateMessage(user: User)(body: Lang => String): String =
     implicit val lang = userLang(user)
     body(userLang(user)) tap { txt =>
       lila.common.Bus.publish(SystemMsg(user.id, txt), "msgSystemSend")
     }
-  }
 
   private def sendAsPrivateMessageAndEmail(user: User)(subject: Lang => String, body: Lang => String): Funit =
     alsoSendAsPrivateMessage(user)(body) pipe { body =>
-      userRepo email user.id flatMap {
+      userRepo `email` user.id flatMap:
         _ so { email =>
           implicit val lang = userLang(user)
-          mailer send Mailer.Message(
+          mailer `send` Mailer.Message(
             to = email,
             subject = subject(lang),
             text = Mailer.txt.addServiceNote(body),
             htmlBody = standardEmail(body).some
           )
         }
-      }
     }
 
   private def sendAsPrivateMessageAndEmail(
       username: String
   )(subject: Lang => String, body: Lang => String): Funit =
-    userRepo named username flatMap {
+    userRepo `named` username flatMap:
       _ so { user =>
         sendAsPrivateMessageAndEmail(user)(subject, body)
       }
-    }
 
   private def userLang(user: User): Lang = user.realLang | lila.i18n.defaultLang
-}

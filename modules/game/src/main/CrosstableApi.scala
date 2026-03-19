@@ -9,19 +9,19 @@ import lila.user.User
 final class CrosstableApi(
     coll: Coll,
     matchupColl: Coll
-)(implicit ec: ExecutionContext) {
+)(implicit ec: ExecutionContext):
 
   import Crosstable.{ Matchup, Result }
   import Crosstable.{ BSONFields => F }
 
   def apply(game: Game): Fu[Option[Crosstable]] =
     game.twoUserIds so { case (u1, u2) =>
-      apply(u1, u2) dmap some
+      apply(u1, u2) `dmap` some
     }
 
   def withMatchup(game: Game): Fu[Option[Crosstable.WithMatchup]] =
     game.twoUserIds so { case (u1, u2) =>
-      withMatchup(u1, u2) dmap some
+      withMatchup(u1, u2) `dmap` some
     }
 
   def apply(u1: User.ID, u2: User.ID): Fu[Crosstable] =
@@ -50,16 +50,15 @@ final class CrosstableApi(
     }
 
   def add(game: Game): Funit =
-    game.userIds.distinct.sorted match {
+    game.userIds.distinct.sorted match
       case List(u1, u2) =>
         val result     = Result(game.id, game.winnerUserId)
         val bsonResult = Crosstable.crosstableBSONHandler.writeResult(result, u1)
         def incScore(userId: User.ID): Int =
-          game.winnerUserId match {
+          game.winnerUserId match
             case Some(u) if u == userId => 10
             case None                   => 5
             case _                      => 0
-          }
         val inc1 = incScore(u1)
         val inc2 = incScore(u2)
         val updateCrosstable = coll.update.one(
@@ -88,7 +87,6 @@ final class CrosstableApi(
           )
         updateCrosstable zip updateMatchup void
       case _ => funit
-    }
 
   private val matchupProjection = $doc(F.lastPlayed -> false)
 
@@ -97,4 +95,3 @@ final class CrosstableApi(
 
   private def select(u1: User.ID, u2: User.ID) =
     $id(Crosstable.makeKey(u1, u2))
-}

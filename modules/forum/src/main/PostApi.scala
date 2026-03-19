@@ -2,9 +2,8 @@ package lila.forum
 
 import actorApi._
 import org.joda.time.DateTime
-import reactivemongo.akkastream.{ cursorProducer, AkkaStreamCursor }
+import reactivemongo.pekkostream.{ cursorProducer, PekkoStreamCursor }
 import reactivemongo.api.ReadPreference
-import scala.util.chaining._
 
 import lila.common.Bus
 import lila.common.paginator._
@@ -26,7 +25,7 @@ final class PostApi(
     timeline: lila.hub.actors.Timeline,
     shutup: lila.hub.actors.Shutup,
     detectLanguage: DetectLanguage
-)(implicit ec: scala.concurrent.ExecutionContext) {
+)(implicit ec: scala.concurrent.ExecutionContext):
 
   import BSONHandlers._
 
@@ -50,11 +49,11 @@ final class PostApi(
           categId = categ.id,
           modIcon = (~data.modIcon && MasterGranter(_.PublicMod)(me)).option(true)
         )
-        env.postRepo findDuplicate post flatMap {
+        env.postRepo `findDuplicate` post flatMap:
           case Some(dup) if !post.modIcon.getOrElse(false) => fuccess(dup)
           case _ =>
             env.postRepo.coll.insert.one(post) >>
-              env.topicRepo.coll.update.one($id(topic.id), topic withPost post) >> {
+              env.topicRepo.coll.update.one($id(topic.id), topic `withPost` post) >> {
                 shouldHideOnPost(topic) so env.topicRepo.hide(topic.id, value = true)
               } >>
               env.categRepo.coll.update.one($id(categ.id), categ.withPost(topic, post)).andDo {
@@ -66,30 +65,27 @@ final class PostApi(
                   else lila.hub.actorApi.shutup.RecordPublicForumMessage(me.id, post.text)
                 }
                 if (!post.troll && !categ.quiet && !topic.isTooBig)
-                  timeline ! Propagate(ForumPost(me.id, topic.id.some, topic.name, post.id)).pipe {
-                    _ toFollowersOf me.id toUsers topicUserIds exceptUser me.id
-                  }
+                  timeline ! Propagate(ForumPost(me.id, topic.id.some, topic.name, post.id)).pipe:
+                    _ `toFollowersOf` me.id `toUsers` topicUserIds `exceptUser` me.id
                 lila.mon.forum.post.create.increment()
                 env.mentionNotifier.notifyMentionedUsers(post, topic)
                 Bus.publish(actorApi.CreatePost(post), "forumPost")
               } inject post
-        }
       }
     }
 
   def editPost(postId: Post.ID, newText: String, user: User): Fu[Post] =
     get(postId) flatMap { post =>
-      post.fold[Fu[Post]](fufail("Post no longer exists.")) {
+      post.fold[Fu[Post]](fufail("Post no longer exists.")):
         case (_, post) if !post.canBeEditedBy(user.id) =>
           fufail("You are not authorized to modify this post.")
         case (_, post) if !post.canStillBeEdited =>
           fufail("Post can no longer be edited")
         case (_, post) =>
-          val newPost = post.editPost(DateTime.now, spam replace newText)
+          val newPost = post.editPost(DateTime.now, spam `replace` newText)
           (newPost.text != post.text).so {
             env.postRepo.coll.update.one($id(post.id), newPost).void
           } inject newPost
-      }
     }
 
   private val quickHideCategs = Set("playstrategy-feedback", "off-topic-discussion")
@@ -104,7 +100,7 @@ final class PostApi(
   // }
 
   def urlData(postId: String, forUser: Option[User]): Fu[Option[PostUrlData]] =
-    get(postId) flatMap {
+    get(postId) flatMap:
       case Some((_, post)) if !post.visibleBy(forUser) => fuccess(none[PostUrlData])
       case Some((topic, post)) =>
         env.postRepo.forUser(forUser).countBeforeNumber(topic.id, post.number) dmap { nb =>
@@ -112,20 +108,18 @@ final class PostApi(
           PostUrlData(topic.categId, topic.slug, page, post.number).some
         }
       case _ => fuccess(none)
-    }
 
   def get(postId: String): Fu[Option[(Topic, Post)]] =
-    getPost(postId) flatMap {
+    getPost(postId) flatMap:
       _ so { post =>
         env.topicRepo.coll.byId[Topic](post.topicId) dmap2 { _ -> post }
       }
-    }
 
   def getPost(postId: String): Fu[Option[Post]] =
     env.postRepo.coll.byId[Post](postId)
 
   def react(postId: String, me: User, reaction: String, v: Boolean): Fu[Option[Post]] =
-    Post.Reaction.set(reaction) so {
+    Post.Reaction.set(reaction) so:
       if (v) lila.mon.forum.reaction(reaction).increment()
       env.postRepo.coll.ext
         .findAndUpdate[Post](
@@ -136,7 +130,6 @@ final class PostApi(
           },
           fetchNewObject = true
         )
-    }
 
   def views(posts: List[Post]): Fu[List[PostView]] =
     for {
@@ -153,7 +146,7 @@ final class PostApi(
     env.postRepo.coll.byOrderedIds[Post, Post.ID](postIds)(_.id) flatMap views
 
   def viewOf(post: Post): Fu[Option[PostView]] =
-    views(List(post)) dmap (_.headOption)
+    views(List(post)) `dmap` (_.headOption)
 
   def liteViews(posts: Seq[Post]): Fu[Seq[PostLiteView]] =
     env.topicRepo.coll.byIds[Topic](posts.map(_.topicId).distinct) map { topics =>
@@ -165,7 +158,7 @@ final class PostApi(
     env.postRepo.byIds(postIds) flatMap liteViews
 
   def liteView(post: Post): Fu[Option[PostLiteView]] =
-    liteViews(List(post)) dmap (_.headOption)
+    liteViews(List(post)) `dmap` (_.headOption)
 
   def miniPosts(posts: List[Post]): Fu[List[MiniForumPost]] =
     env.topicRepo.coll.byIds[Topic](posts.map(_.topicId).distinct) map { topics =>
@@ -184,7 +177,7 @@ final class PostApi(
     }
 
   def lastNumberOf(topic: Topic): Fu[Int] =
-    env.postRepo lastByTopic topic dmap { _ so (_.number) }
+    env.postRepo `lastByTopic` topic dmap { _ so (_.number) }
 
   def lastPageOf(topic: Topic): Int =
     (topic.nbPosts + maxPerPage.value - 1) / maxPerPage.value
@@ -193,7 +186,7 @@ final class PostApi(
     Paginator(
       new Adapter(
         collection = env.postRepo.coll,
-        selector = env.postRepo.forUser(me) selectTopic topic.id,
+        selector = env.postRepo.forUser(me) `selectTopic` topic.id,
         projection = none,
         sort = env.postRepo.sortQuery
       ),
@@ -202,9 +195,9 @@ final class PostApi(
     )
 
   def delete(categSlug: String, postId: String, mod: User): Funit =
-    env.postRepo.unsafe.byCategAndId(categSlug, postId) flatMap {
+    env.postRepo.unsafe.byCategAndId(categSlug, postId) flatMap:
       _ so { post =>
-        viewOf(post) flatMap {
+        viewOf(post) flatMap:
           _ so { view =>
             for {
               first <- env.postRepo.isFirstPost(view.topic.id, view.post.id)
@@ -212,8 +205,8 @@ final class PostApi(
                 if (first) env.topicApi.delete(view.categ, view.topic)
                 else
                   env.postRepo.coll.delete.one($id(view.post.id)) >>
-                    (env.topicApi denormalize view.topic) >>
-                    (env.categApi denormalize view.categ).andDo(env.recent.invalidate()).andDo(indexer ! RemovePost(post.id))
+                    (env.topicApi `denormalize` view.topic) >>
+                    (env.categApi `denormalize` view.categ).andDo(env.recent.invalidate()).andDo(indexer ! RemovePost(post.id))
               _ <- MasterGranter(_.ModerateForum)(mod) so modLog.deletePost(
                 mod.id,
                 post.userId,
@@ -222,15 +215,13 @@ final class PostApi(
               )
             } yield ()
           }
-        }
       }
-    }
 
-  def allUserIds(topicId: Topic.ID) = env.postRepo allUserIdsByTopicId topicId
+  def allUserIds(topicId: Topic.ID) = env.postRepo `allUserIdsByTopicId` topicId
 
   def nbByUser(userId: String) = env.postRepo.coll.countSel($doc("userId" -> userId))
 
-  def allByUser(userId: User.ID): AkkaStreamCursor[Post] =
+  def allByUser(userId: User.ID): PekkoStreamCursor[Post] =
     env.postRepo.coll
       .find($doc("userId" -> userId))
       .sort($doc("createdAt" -> -1))
@@ -242,8 +233,8 @@ final class PostApi(
         "userId",
         $doc(
           "topicId" -> topic.id,
-          "number" $gt (newPostNumber - 10),
-          "createdAt" $gt DateTime.now.minusDays(5)
+          "number" `$gt` (newPostNumber - 10),
+          "createdAt" `$gt` DateTime.now.minusDays(5)
         ),
         ReadPreference.secondaryPreferred
       )
@@ -259,9 +250,7 @@ final class PostApi(
       }
 
   def teamIdOfPostId(postId: Post.ID): Fu[Option[TeamID]] =
-    env.postRepo.coll.byId[Post](postId) flatMap {
+    env.postRepo.coll.byId[Post](postId) flatMap:
       _ so { post =>
         env.categRepo.coll.primitiveOne[TeamID]($id(post.categId), "team")
       }
-    }
-}

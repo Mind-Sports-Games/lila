@@ -2,12 +2,13 @@ package lila.api
 
 import play.api.libs.ws.DefaultBodyWritables._
 import play.api.libs.ws.StandaloneWSClient
+import scala.util.{ Failure, Success }
 
 final class InfluxEvent(
     ws: StandaloneWSClient,
     endpoint: String,
     env: String
-)(implicit ec: scala.concurrent.ExecutionContext) {
+)(implicit ec: scala.concurrent.ExecutionContext):
 
   private val seed = lila.common.ThreadLocalRandom.nextString(6)
 
@@ -16,8 +17,8 @@ final class InfluxEvent(
   private def apply(key: String, text: String) =
     ws.url(endpoint)
       .post(s"""event,program=lila,env=$env,title=$key text="$text"""")
-      .effectFold(
-        err => lila.log("influxEvent").error(endpoint, err),
-        res => if (res.status != 204) lila.log("influxEvent").error(s"$endpoint ${res.status}")
-      )
-}
+      .onComplete:
+        case Failure(err: Exception) => lila.log("influxEvent").error(endpoint, err)
+        case Failure(err)            => throw err
+        case Success(res) =>
+          if (res.status != 204) lila.log("influxEvent").error(s"$endpoint ${res.status}")

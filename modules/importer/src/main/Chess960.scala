@@ -2,10 +2,10 @@ package lila.importer
 
 import strategygames.chess._
 
-private object Chess960 {
+private object Chess960:
 
   def isStartPosition(board: Board) =
-    board valid {
+    board valid:
 
       def rankMatches(f: Option[Piece] => Boolean)(rank: Rank) =
         File.all forall { file =>
@@ -29,12 +29,9 @@ private object Chess960 {
         case Some(Piece(P2, King | Queen | Rook | Knight | Bishop)) => true
         case _                                                      => false
       }(Rank.Eighth)
-    }
 
   def fixVariantName(v: String) =
-    v.toLowerCase match {
+    v.toLowerCase match
       case "chess 960"   => "chess960"
       case "fisherandom" => "chess960" // I swear, sometimes...
       case _             => v
-    }
-}

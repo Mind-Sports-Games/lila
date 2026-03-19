@@ -3,7 +3,7 @@ package lila.insight
 import play.api.i18n.Lang
 import play.api.libs.json._
 
-final class JsonView {
+final class JsonView:
 
   import lila.insight.{ Dimension => D, Metric => M }
   import writers._
@@ -11,7 +11,7 @@ final class JsonView {
   case class Categ(name: String, items: List[JsValue])
   implicit private val categWrites: OWrites[Categ] = Json.writes[Categ]
 
-  def ui(ecos: Set[String], asMod: Boolean)(implicit lang: Lang) = {
+  def ui(ecos: Set[String], asMod: Boolean)(implicit lang: Lang) =
 
     val openingJson = Json.obj(
       "key"         -> D.Opening.key,
@@ -30,39 +30,40 @@ final class JsonView {
       Categ(
         "Setup",
         List(
-          Json.toJson(D.Date: Dimension[_]),
-          Json.toJson(D.Period: Dimension[_]),
-          Json.toJson(D.Perf: Dimension[_]),
-          Json.toJson(D.PlayerIndex: Dimension[_]),
-          Json.toJson(D.OpponentStrength: Dimension[_])
+          dimensionToJson(D.Date),
+          dimensionToJson(D.Period),
+          dimensionToJson(D.Perf),
+          dimensionToJson(D.PlayerIndex),
+          dimensionToJson(D.OpponentStrength)
         )
       ),
       Categ(
         "Game",
         List(
           openingJson,
-          Json.toJson(D.MyCastling: Dimension[_]),
-          Json.toJson(D.OpCastling: Dimension[_]),
-          Json.toJson(D.QueenTrade: Dimension[_])
+          dimensionToJson(D.MyCastling),
+          dimensionToJson(D.OpCastling),
+          dimensionToJson(D.QueenTrade)
         )
       ),
       Categ(
         "Move",
         List(
-          Json.toJson(D.PieceRole: Dimension[_]),
-          Json.toJson(D.MovetimeRange: Dimension[_]),
-          Json.toJson(D.MaterialRange: Dimension[_]),
-          Json.toJson(D.Phase: Dimension[_]),
-          Json.toJson(D.CplRange: Dimension[_])
+          dimensionToJson(D.PieceRole),
+          dimensionToJson(D.MovetimeRange),
+          dimensionToJson(D.MaterialRange),
+          dimensionToJson(D.Phase),
+          dimensionToJson(D.CplRange)
         ) ::: {
-          asMod so List(Json.toJson(D.Blur: Dimension[_]), Json.toJson(D.TimeVariance: Dimension[_]))
+          if (asMod) List(dimensionToJson(D.Blur), dimensionToJson(D.TimeVariance))
+          else Nil
         }
       ),
       Categ(
         "Result",
         List(
-          Json.toJson(D.Termination: Dimension[_]),
-          Json.toJson(D.Result: Dimension[_])
+          dimensionToJson(D.Termination),
+          dimensionToJson(D.Result)
         )
       )
     )
@@ -82,10 +83,11 @@ final class JsonView {
           Json.toJson(M.Material: Metric),
           Json.toJson(M.NbMoves: Metric)
         ) ++ {
-          asMod so List(
+          if (asMod) List(
             Json.toJson(M.Blurs: Metric),
             Json.toJson(M.TimeVariance: Metric)
           )
+          else Nil
         }
       ),
       Categ(
@@ -112,9 +114,11 @@ final class JsonView {
       "metricCategs"    -> metricCategs,
       "presets"         -> { if (asMod) Preset.forMod else Preset.base }
     )
-  }
 
-  private object writers {
+  private def dimensionToJson[X](d: Dimension[X])(implicit lang: Lang): JsValue =
+    Json.toJson(d)(writers.dimensionWriter)
+
+  private object writers:
 
     implicit def presetWriter[X]: Writes[Preset] =
       Writes { p =>
@@ -151,16 +155,14 @@ final class JsonView {
     implicit val positionWriter: Writes[Position] = Writes { p =>
       JsString(p.name)
     }
-  }
 
-  object chart {
+  object chart:
     implicit private val xAxisWrites: OWrites[Chart.Xaxis] = Json.writes[Chart.Xaxis]
     implicit private val yAxisWrites: OWrites[Chart.Yaxis] = Json.writes[Chart.Yaxis]
     implicit private val SerieWrites: OWrites[Chart.Serie] = Json.writes[Chart.Serie]
     implicit private val ChartWrites: OWrites[Chart]       = Json.writes[Chart]
 
     def apply(c: Chart) = ChartWrites writes c
-  }
 
   def question(metric: String, dimension: String, filters: String) =
     Json.obj(
@@ -175,4 +177,3 @@ final class JsonView {
         }
         .toMap: Map[String, JsArray])
     )
-}

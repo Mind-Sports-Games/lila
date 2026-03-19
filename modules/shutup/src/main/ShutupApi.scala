@@ -13,7 +13,7 @@ final class ShutupApi(
     userRepo: UserRepo,
     relationApi: lila.relation.RelationApi,
     reporter: lila.hub.actors.Report
-)(implicit ec: scala.concurrent.ExecutionContext) {
+)(implicit ec: scala.concurrent.ExecutionContext):
 
   implicit private val UserRecordBSONHandler: BSONDocumentHandler[UserRecord] = Macros.handler[UserRecord]
   import PublicLine.PublicLineBSONHandler
@@ -22,9 +22,8 @@ final class ShutupApi(
     coll
       .find($doc("_id" -> userId), $doc("pub" -> 1).some)
       .one[Bdoc]
-      .map {
+      .map:
         ~_.flatMap(_.getAsOpt[List[PublicLine]]("pub"))
-      }
 
   def publicForumMessage(userId: User.ID, text: String) = record(userId, text, TextType.PublicForumMessage)
   def teamForumMessage(userId: User.ID, text: String)   = record(userId, text, TextType.TeamForumMessage)
@@ -32,11 +31,10 @@ final class ShutupApi(
     record(userId, text, TextType.PublicChat, source.some)
 
   def privateChat(chatId: String, userId: User.ID, text: String) =
-    gameRepo.getSourceAndUserIds(chatId) flatMap {
-      case (source, _) if source.has(lila.game.Source.Friend) => funit // ignore challenges
+    gameRepo.getSourceAndUserIds(chatId) flatMap:
+      case (source, _) if source.contains(lila.game.Source.Friend) => funit // ignore challenges
       case (_, userIds) =>
         record(userId, text, TextType.PrivateChat, none, userIds find (userId !=))
-    }
 
   def privateMessage(userId: User.ID, toUserId: User.ID, text: String) =
     record(userId, text, TextType.PrivateMessage, none, toUserId.some)
@@ -48,10 +46,10 @@ final class ShutupApi(
       source: Option[PublicSource] = None,
       toUserId: Option[User.ID] = None
   ): Funit =
-    userRepo isTroll userId flatMap {
+    userRepo `isTroll` userId flatMap:
       case true => funit
       case false =>
-        toUserId so { relationApi.fetchFollows(_, userId) } flatMap {
+        toUserId so { relationApi.fetchFollows(_, userId) } flatMap:
           case true => funit
           case false =>
             val analysed = Analyser(text)
@@ -76,15 +74,12 @@ final class ShutupApi(
                 fetchNewObject = true,
                 upsert = true
               )
-              .flatMap {
+              .flatMap:
                 case None             => fufail(s"can't find user record for $userId")
                 case Some(userRecord) => legiferate(userRecord)
-              }
-        }
-    }
 
   private def legiferate(userRecord: UserRecord): Funit =
-    userRecord.reports.exists(_.unacceptable) so {
+    userRecord.reports.exists(_.unacceptable) so:
       reporter ! lila.hub.actorApi.report.Shutup(userRecord.userId, reportText(userRecord))
       coll.update
         .one(
@@ -98,13 +93,10 @@ final class ShutupApi(
           )
         )
         .void
-    }
 
   private def reportText(userRecord: UserRecord) =
     userRecord.reports
-      .collect {
+      .collect:
         case r if r.unacceptable =>
           s"${r.textType.name}: ${r.nbBad} dubious (out of ${r.ratios.size})"
-      }
       .mkString("\n")
-}

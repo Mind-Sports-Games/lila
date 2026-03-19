@@ -3,13 +3,12 @@ package lila.insight
 import reactivemongo.api.bson._
 import lila.db.dsl._
 
-object AggregationClusters {
+object AggregationClusters:
 
   def apply[X](question: Question[X], aggDocs: List[Bdoc]): List[Cluster[X]] =
-    postSort(question) {
-      if (Metric isStacked question.metric) stacked(question, aggDocs)
+    postSort(question):
+      if (Metric `isStacked` question.metric) stacked(question, aggDocs)
       else single(question, aggDocs)
-    }
 
   private def single[X](question: Question[X], aggDocs: List[Bdoc]): List[Cluster[X]] =
     for {
@@ -29,7 +28,7 @@ object AggregationClusters {
   private def stacked[X](question: Question[X], aggDocs: List[Bdoc]): List[Cluster[X]] =
     for {
       doc <- aggDocs
-      metricValues = Metric valuesOf question.metric
+      metricValues = Metric `valuesOf` question.metric
       x     <- getId[X](doc)(question.dimension.bson)
       stack <- doc.getAsOpt[List[StackEntry]]("stack")
       points = metricValues.map { case Metric.MetricValue(id, name) =>
@@ -46,8 +45,6 @@ object AggregationClusters {
     } yield Cluster(x, Insight.Stacked(percents), total, ids)
 
   private def postSort[X](q: Question[X])(clusters: List[Cluster[X]]): List[Cluster[X]] =
-    q.dimension match {
+    q.dimension match
       case Dimension.Opening => clusters
       case _                 => clusters.sortLike(Dimension.valuesOf(q.dimension), _.x)
-    }
-}

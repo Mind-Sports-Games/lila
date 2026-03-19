@@ -25,7 +25,7 @@ final class Env(
 
   private val config = appConfig.get[TeamSearchConfig]("teamSearch")(AutoConfig.loader)
 
-  private val maxPerPage = MaxPerPage(15)
+  private val maxPerPage = lila.common.config.MaxPerPage(15)
 
   private lazy val client = makeClient(Index(config.indexName))
 

@@ -15,7 +15,7 @@ sealed abstract class PuzzlePerf(
     val iconChar: Char
 )
 
-object PuzzlePerf {
+object PuzzlePerf:
   case object ChessPuzzle
       extends PuzzlePerf(
         GameFamily.Chess(),
@@ -70,50 +70,43 @@ object PuzzlePerf {
         title = "Lines of Action tactics trainer",
         iconChar = Variant.orDefault(GameLogic.Chess(), "linesOfAction").perfIcon
       )
-}
 
 class PerfType(
     val category: Either[Either[Speed, Variant], PuzzlePerf]
-) {
+):
 
-  val id: Perf.ID = category match {
+  val id: Perf.ID = category match
     case Left(Left(s))  => s.perfId
     case Left(Right(v)) => v.perfId
     case Right(p)       => p.id
-  }
 
-  val key: Perf.Key = category match {
+  val key: Perf.Key = category match
     case Left(Left(s))  => s.key
     case Left(Right(v)) => v.key
     case Right(p)       => p.key
-  }
 
-  private val name: String = category match {
+  private val name: String = category match
     case Left(Left(s))  => s.name
     case Left(Right(v)) => VariantKeys.variantName(v)
     case Right(p)       => p.name
-  }
 
-  private val title: String = category match {
+  private val title: String = category match
     case Left(Left(s))  => s.title
     case Left(Right(v)) => s"${VariantKeys.variantName(v)} variant"
     case Right(p)       => p.title
-  }
 
-  val iconChar: Char = category match {
+  val iconChar: Char = category match
     case Left(Left(s))  => s.perfIcon
     case Left(Right(v)) => v.perfIcon
     case Right(p)       => p.iconChar
-  }
 
   def iconString = iconChar.toString
 
   def trans(implicit lang: Lang): String = PerfType.trans(this)
 
   def desc(implicit lang: Lang): String = PerfType.desc(this)
-}
 
-object PerfType {
+object PerfType:
 
   val allSpeed: List[PerfType] =
     Speed.all.map(s => new PerfType(Left(Left(s))))
@@ -162,38 +155,33 @@ object PerfType {
 
   val standard: List[PerfType] = allSpeed.filter(_.key != "ultraBullet")
 
-  def variantOf(pt: PerfType): Variant = pt.category match {
+  def variantOf(pt: PerfType): Variant = pt.category match
     case Left(Right(v)) => v
     case _              => Variant.default(GameLogic.Chess())
-  }
 
   def byVariant(variant: Variant): Option[PerfType] =
-    variants.filter(_.category == Left(Right(variant))) match {
+    variants.filter(_.category == Left(Right(variant))) match
       case List(pt) => pt.some
       case _        => none
-    }
 
   def puzzlebyVariant(variant: Variant): Option[PerfType] =
-    allPuzzle.filter(pt => pt.key == s"puzzle_${variant.key}") match {
+    allPuzzle.filter(pt => pt.key == s"puzzle_${variant.key}") match
       case List(pt) => pt.some
       case _        => none
-    }
 
   def standardBySpeed(speed: Speed): PerfType =
-    allSpeed.filter(_.category == Left(Left(speed))) match {
+    allSpeed.filter(_.category == Left(Left(speed))) match
       case List(pt) => pt
       //unnecessary default to keep compiler happy
       case _ => orDefaultSpeed("")
-    }
 
   def apply(variant: Variant, speed: Speed): PerfType =
     byVariant(variant) getOrElse standardBySpeed(speed)
 
   def totalTimeRoughEstimation(pt: PerfType): Centis =
-    pt.category match {
+    pt.category match
       case Left(Left(s)) => s.totalTimeRoughEstimation
       case _             => Centis(7 * 60 * 100)
-    }
 
   def iconByVariant(variant: Variant): Char =
     byVariant(variant).fold('C')(_.iconChar)
@@ -202,7 +190,7 @@ object PerfType {
     trans.substring(0, Math.min(trans.length(), maxLength))
 
   def trans(pt: PerfType)(implicit lang: Lang): String =
-    pt.key match {
+    pt.key match
       case "ultraBullet"    => "UltraBullet Chess"
       case "bullet"         => "Bullet Chess"
       case "blitz"          => "Blitz Chess"
@@ -210,7 +198,6 @@ object PerfType {
       case "classical"      => s"${trimTrans(I18nKeys.classical.txt())} Chess"
       case "correspondence" => s"${trimTrans(I18nKeys.correspondence.txt())} Chess"
       case _                => pt.name
-    }
 
   val translated: Set[PerfType] =
     all
@@ -220,7 +207,7 @@ object PerfType {
       .toSet
 
   def desc(pt: PerfType)(implicit lang: Lang): String =
-    pt.key match {
+    pt.key match
       case "ultraBullet"    => I18nKeys.ultraBulletDesc.txt()
       case "bullet"         => I18nKeys.bulletDesc.txt()
       case "blitz"          => I18nKeys.blitzDesc.txt()
@@ -228,5 +215,3 @@ object PerfType {
       case "classical"      => I18nKeys.classicalDesc.txt()
       case "correspondence" => I18nKeys.correspondenceDesc.txt()
       case _                => pt.title
-    }
-}

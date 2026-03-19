@@ -2,7 +2,6 @@ package lila.swiss
 
 import com.softwaremill.macwire._
 import play.api.Configuration
-import scala.concurrent.duration._
 
 import lila.common.config._
 import lila.common.{ AtMost, Every, ResilientScheduler }
@@ -29,10 +28,10 @@ final class Env(
     ec: scala.concurrent.ExecutionContext,
     system: org.apache.pekko.actor.ActorSystem,
     scheduler: org.apache.pekko.actor.Scheduler,
-    mat: akka.stream.Materializer,
+    mat: org.apache.pekko.stream.Materializer,
     idGenerator: lila.game.IdGenerator,
     mode: play.api.Mode
-) {
+):
 
   private val colls = wire[SwissColls]
 
@@ -58,7 +57,7 @@ final class Env(
 
   lazy val roundPager = wire[SwissRoundPager]
 
-  private def teamOf = api.teamOf _
+  private def teamOf = api.teamOf
 
   private lazy val socket = wire[SwissSocket]
 
@@ -82,12 +81,11 @@ final class Env(
     "adjustCheater",
     "adjustBooster",
     "teamKick"
-  ) {
+  ):
     case lila.game.actorApi.FinishGame(game, _, _)           => api.updateMultiMatchProgress(game).discard
     case lila.hub.actorApi.team.KickFromTeam(teamId, userId) => api.kickFromTeam(teamId, userId).discard
     case lila.hub.actorApi.mod.MarkCheater(userId, true)     => api.kickLame(userId).discard
     case lila.hub.actorApi.mod.MarkBooster(userId)           => api.kickLame(userId).discard
-  }
 
   ResilientScheduler(
     every = Every(1 seconds),
@@ -100,10 +98,8 @@ final class Env(
     atMost = AtMost(15 seconds),
     initialDelay = 20 seconds
   ) { api.checkOngoingGames }
-}
 
-private class SwissColls(db: lila.db.Db) {
+private class SwissColls(db: lila.db.Db):
   val swiss   = db(CollName("swiss"))
   val player  = db(CollName("swiss_player"))
   val pairing = db(CollName("swiss_pairing"))
-}

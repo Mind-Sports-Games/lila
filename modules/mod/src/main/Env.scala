@@ -44,7 +44,7 @@ final class Env(
 )(implicit
     ec: scala.concurrent.ExecutionContext,
     system: ActorSystem
-) {
+):
 
   private val config = appConfig.get[ModConfig]("mod")(AutoConfig.loader)
 
@@ -111,13 +111,13 @@ final class Env(
     },
     "garbageCollect" -> {
       case lila.hub.actorApi.security.GCImmediateSb(userId) =>
-        reportApi getSuspect userId orFail s"No such suspect $userId" foreach { sus =>
+        reportApi `getSuspect` userId `orFail` s"No such suspect $userId" foreach { sus =>
           reportApi.getPlayStrategyMod foreach { mod =>
             api.setTroll(mod, sus, value = true)
           }
         }
       case lila.hub.actorApi.security.GarbageCollect(userId) =>
-        reportApi getSuspect userId orFail s"No such suspect $userId" foreach { sus =>
+        reportApi `getSuspect` userId `orFail` s"No such suspect $userId" foreach { sus =>
           api.garbageCollect(sus) >> publicChat.deleteAll(sus)
         }
     },
@@ -136,4 +136,3 @@ final class Env(
       logApi.chatTimeout(mod, user, reason, text).discard
     }
   )
-}

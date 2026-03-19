@@ -1,23 +1,17 @@
 package lila.tournament
 
-import org.joda.time.DateTime
 import reactivemongo.api.bson._
-import reactivemongo.api.ReadPreference
 
 import lila.common.LightUser
-import lila.common.Maths
 import lila.common.config.MaxPerPage
-import lila.common.paginator.Paginator
 import lila.common.ThreadLocalRandom
 import lila.db.dsl._
-import lila.db.paginator.Adapter
-import lila.rating.PerfType
 import lila.user.User
 
 final class ShieldTableApi(
     repo: ShieldTableRepo,
     leaderboardApi: LeaderboardApi
-)(implicit ec: scala.concurrent.ExecutionContext) {
+)(implicit ec: scala.concurrent.ExecutionContext):
 
   import ShieldTableApi._
   import BSONHandlers._
@@ -31,7 +25,7 @@ final class ShieldTableApi(
           "c" -> id
         )
       )
-      .sort($sort desc "p")
+      .sort($sort `desc` "p")
       .cursor[ShieldTableEntry]()
       .list()
 
@@ -56,34 +50,29 @@ final class ShieldTableApi(
 
   def recalculateAll = Future.sequence(Category.all.map(recalculate)).void
 
-}
 
-object ShieldTableApi {
+object ShieldTableApi:
 
-  sealed trait Category {
+  sealed trait Category:
     val id: Int
     val name: String
     val medleyShieldCode: String
-  }
 
-  object Category {
+  object Category:
 
-    case object Overall extends Category {
+    case object Overall extends Category:
       val id   = 0
       val name = "Overall"
       // not used for overall all count
       val medleyShieldCode = "spm"
-    }
-    case object Chess extends Category {
+    case object Chess extends Category:
       val id               = 1
       val name             = "Chess"
       val medleyShieldCode = "scm"
-    }
-    case object Draughts extends Category {
+    case object Draughts extends Category:
       val id               = 2
       val name             = "Draughts"
       val medleyShieldCode = "sdm"
-    }
 
     val all: List[Category] = List(
       Overall,
@@ -100,7 +89,6 @@ object ShieldTableApi {
     def titleFromId(id: Int) = s"${getFromId(id).name} Shield Leaderboard"
 
     def restrictionGameFamily(id: Int) = if (id == 0) "" else s"${getFromId(id).name} "
-  }
 
   case class ShieldTableEntry(
       id: ShieldTableEntry.ID,
@@ -109,12 +97,10 @@ object ShieldTableApi {
       points: Int
   )
 
-  object ShieldTableEntry {
+  object ShieldTableEntry:
 
     type ID = String
 
-    def makeId = ThreadLocalRandom nextString 8
+    def makeId = ThreadLocalRandom `nextString` 8
 
-  }
 
-}

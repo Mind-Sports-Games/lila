@@ -36,19 +36,19 @@ final class Env(
     ec: scala.concurrent.ExecutionContext,
     system: ActorSystem,
     scheduler: Scheduler
-) {
+):
 
   private val config = appConfig.get[ReportConfig]("report")(AutoConfig.loader)
 
   private lazy val reportColl = db(config.reportColl)
 
-  lazy val scoreThresholdsSetting = ReportThresholds makeScoreSetting settingStore
+  lazy val scoreThresholdsSetting = ReportThresholds `makeScoreSetting` settingStore
 
-  lazy val discordScoreThresholdSetting = ReportThresholds makeDiscordSetting settingStore
+  lazy val discordScoreThresholdSetting = ReportThresholds `makeDiscordSetting` settingStore
 
   private val thresholds = Thresholds(
-    score = scoreThresholdsSetting.get _,
-    discord = discordScoreThresholdSetting.get _
+    score = (() => scoreThresholdsSetting.get()),
+    discord = (() => discordScoreThresholdSetting.get())
   )
 
   lazy val forms = wire[ReportForm]
@@ -74,13 +74,11 @@ final class Env(
     name = config.actorName
   )
 
-  lila.common.Bus.subscribeFun("playban", "autoFlag") {
+  lila.common.Bus.subscribeFun("playban", "autoFlag"):
     case lila.hub.actorApi.playban.Playban(userId, _) => api.maybeAutoPlaybanReport(userId).discard
     case lila.hub.actorApi.report.AutoFlag(suspectId, resource, text) =>
       api.autoCommFlag(SuspectId(suspectId), resource, text).discard
-  }
 
   system.scheduler.scheduleWithFixedDelay(1 minute, 1 minute) { () =>
     api.inquiries.expire.discard
   }
-}

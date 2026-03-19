@@ -1,7 +1,6 @@
 package lila.swiss
 
 import play.api.libs.json._
-import scala.concurrent.duration._
 
 import lila.common.LightUser
 import lila.db.dsl._
@@ -16,7 +15,7 @@ final class SwissStandingApi(
     colls: SwissColls,
     cacheApi: lila.memo.CacheApi,
     lightUserApi: lila.user.LightUserApi
-)(implicit ec: scala.concurrent.ExecutionContext) {
+)(implicit ec: scala.concurrent.ExecutionContext):
 
   import BsonHandlers._
 
@@ -25,10 +24,9 @@ final class SwissStandingApi(
     .build[(Swiss.Id, Int), JsObject]()
 
   def apply(swiss: Swiss, page: Int): Fu[JsObject] =
-    fuccess(pageCache.getIfPresent(swiss.id -> page)) getOrElse {
+    fuccess(pageCache.getIfPresent(swiss.id -> page)) getOrElse:
       if (page == 1) first get swiss.id
       else compute(swiss, page)
-    }
 
   def update(res: SwissScoring.Result): Funit =
     lightUserApi.asyncMany(res.leaderboard.map(_._1.userId)) map {
@@ -63,21 +61,20 @@ final class SwissStandingApi(
       pageCache.invalidate(res.swiss.id -> (lastPage + 1))
     }
 
-  private val first = cacheApi[Swiss.Id, JsObject](16, "swiss.page.first") {
+  private val first = cacheApi[Swiss.Id, JsObject](16, "swiss.page.first"):
     _.expireAfterWrite(1 minute)
       .buildAsyncFuture { compute(_, 1) }
-  }
 
   private def compute(id: Swiss.Id, page: Int): Fu[JsObject] =
-    colls.swiss.byId[Swiss](id.value) orFail s"No such tournament: $id" flatMap { compute(_, page) }
+    colls.swiss.byId[Swiss](id.value) `orFail` s"No such tournament: $id" flatMap { compute(_, page) }
 
   private def compute(swiss: Swiss, page: Int): Fu[JsObject] =
     for {
-      rankedPlayers <- bestWithRankByPage(swiss.id, 10, page atLeast 1)
+      rankedPlayers <- bestWithRankByPage(swiss.id, 10, page `atLeast` 1)
       pairings <- !swiss.isCreated so SwissPairing.fields { f =>
         colls.pairing
-          .find($doc(f.swissId -> swiss.id, f.players $in rankedPlayers.map(_.player.userId)))
-          .sort($sort asc f.round)
+          .find($doc(f.swissId -> swiss.id, f.players `$in` rankedPlayers.map(_.player.userId)))
+          .sort($sort `asc` f.round)
           .cursor[SwissPairing]()
           .list()
           .map(SwissPairing.toMap)
@@ -119,9 +116,8 @@ final class SwissStandingApi(
     SwissPlayer.fields { f =>
       colls.player
         .find($doc(f.swissId -> id))
-        .sort($sort desc f.score)
+        .sort($sort `desc` f.score)
         .skip(skip)
         .cursor[SwissPlayer]()
         .list(nb)
     }
-}

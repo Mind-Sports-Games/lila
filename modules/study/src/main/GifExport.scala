@@ -9,8 +9,8 @@ import play.api.libs.ws.StandaloneWSClient
 final class GifExport(
     ws: StandaloneWSClient,
     url: String
-)(implicit ec: scala.concurrent.ExecutionContext) {
-  def ofChapter(chapter: Chapter): Fu[Source[ByteString, _]] =
+)(implicit ec: scala.concurrent.ExecutionContext):
+  def ofChapter(chapter: Chapter): Fu[Source[ByteString, ?]] =
     ws.url(s"$url/game.gif")
       .withMethod("POST")
       .addHttpHeaders("Content-Type" -> "application/json")
@@ -31,16 +31,15 @@ final class GifExport(
           "frames" -> framesRec(chapter.root +: chapter.root.mainline, Json.arr())
         )
       )
-      .stream() flatMap {
+      .stream() flatMap:
       case res if res.status != 200 =>
         logger.warn(s"GifExport study ${chapter.studyId}/${chapter._id} ${res.status}")
         fufail(res.statusText)
       case res => fuccess(res.bodyAsSource)
-    }
 
   @annotation.tailrec
   private def framesRec(nodes: Vector[RootOrNode], arr: JsArray): JsArray =
-    nodes match {
+    nodes match
       case node +: tail =>
         framesRec(
           tail,
@@ -48,10 +47,8 @@ final class GifExport(
             .obj(
               "fen" -> node.fen.value
             )
-            .add("check", node.check option true)
+            .add("check", node.check `option` true)
             .add("lastMove", node.moveOption.map(_.uci.uci))
-            .add("delay", tail.isEmpty option 500) // more delay for last frame
+            .add("delay", tail.isEmpty `option` 500) // more delay for last frame
         )
       case _ => arr
-    }
-}

@@ -5,7 +5,7 @@ import play.api.libs.json._
 import lila.user.User
 import org.joda.time.format.DateTimeFormat
 
-final class StormJson(sign: StormSign) {
+final class StormJson(sign: StormSign):
 
   import StormJson._
 
@@ -41,18 +41,17 @@ final class StormJson(sign: StormSign) {
     "days" -> days
   )
 
-}
 
-object StormJson {
+object StormJson:
 
   import lila.puzzle.JsonView.puzzleIdWrites
 
   implicit val highWrites: OWrites[StormHigh] = Json.writes[StormHigh]
 
-  private val dateFormat = DateTimeFormat forPattern "Y/M/d"
+  private val dateFormat = DateTimeFormat `forPattern` "Y/M/d"
 
   implicit val dayIdWrites: Writes[StormDay.Id] = Writes { id =>
-    JsString(dateFormat print id.day.toDate)
+    JsString(dateFormat `print` id.day.toDate)
   }
   implicit val dayWrites: OWrites[StormDay] = Json.writes[StormDay]
 
@@ -64,4 +63,3 @@ object StormJson {
       "rating" -> p.rating
     )
   }
-}

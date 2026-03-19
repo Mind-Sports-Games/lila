@@ -23,7 +23,7 @@ trait ResponseWriter {
     ContentTypeOf[Int](Some(ContentTypes.TEXT))
 
   implicit def wOptionString(implicit codec: Codec): Writeable[Option[String]] =
-    Writeable[Option[String]]((i: Option[String]) => codec encode ~i)
+    Writeable[Option[String]]((i: Option[String]) => codec encode i.getOrElse(""))
   implicit def ctoOptionString: ContentTypeOf[Option[String]] =
     ContentTypeOf[Option[String]](Some(ContentTypes.TEXT))
 }

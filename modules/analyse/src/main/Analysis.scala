@@ -3,7 +3,6 @@ package lila.analyse
 import strategygames.{ Player => PlayerIndex }
 
 import org.joda.time.DateTime
-import lila.user.User
 
 case class Analysis(
     id: Analysis.ID, // game ID, or chapter ID if studyId is set
@@ -12,7 +11,7 @@ case class Analysis(
     startPly: Int,
     date: DateTime,
     fk: Option[Analysis.FishnetKey]
-) {
+):
 
   lazy val infoAdvices: InfoAdvices = {
     (Info.start(startPly) :: infos) sliding 2 collect { case List(prev, info) =>
@@ -37,9 +36,8 @@ case class Analysis(
 
   def nbEmptyInfos       = infos.count(_.isEmpty)
   def emptyRatio: Double = nbEmptyInfos.toDouble / infos.size
-}
 
-object Analysis {
+object Analysis:
 
   import lila.db.BSON
   import reactivemongo.api.bson._
@@ -49,19 +47,18 @@ object Analysis {
   type ID         = String
   type FishnetKey = String
 
-  implicit val analysisBSONHandler: BSON[Analysis] = new BSON[Analysis] {
-    def reads(r: BSON.Reader) = {
-      val startPly = r intD "ply"
-      val raw      = r str "data"
+  implicit val analysisBSONHandler: BSON[Analysis] = new BSON[Analysis]:
+    def reads(r: BSON.Reader) =
+      val startPly = r `intD` "ply"
+      val raw      = r `str` "data"
       Analysis(
-        id = r str "_id",
-        studyId = r strO "studyId",
-        infos = Info.decodeList(raw, startPly) err s"Invalid analysis data $raw",
+        id = r `str` "_id",
+        studyId = r `strO` "studyId",
+        infos = Info.decodeList(raw, startPly) `err` s"Invalid analysis data $raw",
         startPly = startPly,
-        date = r date "date",
-        fk = r strO "fk"
+        date = r `date` "date",
+        fk = r `strO` "fk"
       )
-    }
     def writes(w: BSON.Writer, a: Analysis) =
       BSONDocument(
         "_id"     -> a.id,
@@ -71,5 +68,3 @@ object Analysis {
         "date"    -> w.date(a.date),
         "fk"      -> a.fk
       )
-  }
-}

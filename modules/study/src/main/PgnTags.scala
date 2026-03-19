@@ -1,13 +1,11 @@
 package lila.study
 
-import scala.util.chaining._
-
 import strategygames.format.pgn.{ Tag, TagType, Tags }
 
-object PgnTags {
+object PgnTags:
 
   def apply(tags: Tags): Tags =
-    tags pipe filterRelevant pipe removeContradictingTermination pipe sort
+    tags `pipe` filterRelevant `pipe` removeContradictingTermination `pipe` sort
 
   def setRootClockFromTags(c: Chapter): Option[Chapter] =
     c.updateRoot { _.setClockAt(c.tags.clockConfig map (_.limit), Path.root) } filter (c !=)
@@ -26,7 +24,7 @@ object PgnTags {
 
   private val unknownValues = Set("", "?", "unknown")
 
-  private val sortedTypes: List[TagType] = {
+  private val sortedTypes: List[TagType] =
     import Tag._
     List(
       P1,
@@ -46,7 +44,6 @@ object PgnTags {
       Round,
       Annotator
     )
-  }
 
   val typesToString = sortedTypes mkString ","
 
@@ -55,9 +52,7 @@ object PgnTags {
   private val typePositions: Map[TagType, Int] = sortedTypes.zipWithIndex.toMap
 
   private def sort(tags: Tags) =
-    Tags {
+    Tags:
       tags.value.sortBy { t =>
         typePositions.getOrElse(t.name, Int.MaxValue)
       }
-    }
-}

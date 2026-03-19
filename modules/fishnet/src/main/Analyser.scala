@@ -1,7 +1,6 @@
 package lila.fishnet
 
 import org.joda.time.DateTime
-import scala.concurrent.duration._
 
 import lila.analyse.AnalysisRepo
 import lila.game.{ Game, UciMemo }
@@ -16,14 +15,14 @@ final class Analyser(
 )(implicit
     ec: scala.concurrent.ExecutionContext,
     scheduler: org.apache.pekko.actor.Scheduler
-) {
+):
 
   val maxPlies = 200
 
   private val workQueue = new lila.hub.DuctSequencer(maxSize = 256, timeout = 5 seconds, "fishnetAnalyser")
 
   def apply(game: Game, sender: Work.Sender): Fu[Boolean] =
-    (game.metadata.analysed so analysisRepo.exists(game.id)) flatMap {
+    (game.metadata.analysed so analysisRepo.exists(game.id)) flatMap:
       case true                  => fuFalse
       case _ if !game.analysable => fuFalse
       case _ =>
@@ -34,8 +33,8 @@ final class Analyser(
         ) flatMap { accepted =>
           accepted so {
             makeWork(game, sender) flatMap { work =>
-              workQueue {
-                repo getSimilarAnalysis work flatMap {
+              workQueue:
+                repo `getSimilarAnalysis` work flatMap:
                   // already in progress, do nothing
                   case Some(similar) if similar.isAcquired => funit
                   // queued by system, reschedule for the human sender
@@ -46,27 +45,24 @@ final class Analyser(
                   // first request, store
                   case _ =>
                     lila.mon.fishnet.analysis.requestCount("game").increment()
-                    evalCache skipPositions work.game flatMap { skipPositions =>
+                    evalCache `skipPositions` work.game flatMap { skipPositions =>
                       lila.mon.fishnet.analysis.evalCacheHits.record(skipPositions.size)
-                      repo addAnalysis work.copy(skipPositions = skipPositions)
+                      repo `addAnalysis` work.copy(skipPositions = skipPositions)
                     }
-                }
-              }
             }
           } inject accepted
         }
-    }
 
   def apply(gameId: String, sender: Work.Sender): Fu[Boolean] =
-    gameRepo game gameId flatMap { _ so { apply(_, sender) } }
+    gameRepo `game` gameId flatMap { _ so { apply(_, sender) } }
 
   def study(req: lila.hub.actorApi.fishnet.StudyChapterRequest): Fu[Boolean] =
-    analysisRepo exists req.chapterId flatMap {
+    analysisRepo `exists` req.chapterId flatMap:
       case true => fuFalse
       case _ =>
         import req._
         val sender = Work.Sender(req.userId, none, mod = false, system = false)
-        (fuccess(req.unlimited) >>| limiter(sender, ignoreConcurrentCheck = true, ownGame = false)) flatMap {
+        (fuccess(req.unlimited) >>| limiter(sender, ignoreConcurrentCheck = true, ownGame = false)) flatMap:
           accepted =>
             if (!accepted) logger.info(s"Study request declined: ${req.studyId}/${req.chapterId} by $sender")
             accepted so {
@@ -82,20 +78,15 @@ final class Analyser(
                 startPly = initialFen.flatMap(_.player).so(_.fold(0, 1)),
                 sender = sender
               )
-              workQueue {
-                repo getSimilarAnalysis work flatMap {
-                  _.isEmpty so {
+              workQueue:
+                repo `getSimilarAnalysis` work flatMap:
+                  _.isEmpty so:
                     lila.mon.fishnet.analysis.requestCount("study").increment()
-                    evalCache skipPositions work.game flatMap { skipPositions =>
+                    evalCache `skipPositions` work.game flatMap { skipPositions =>
                       lila.mon.fishnet.analysis.evalCacheHits.record(skipPositions.size)
-                      repo addAnalysis work.copy(skipPositions = skipPositions)
+                      repo `addAnalysis` work.copy(skipPositions = skipPositions)
                     }
-                  }
-                }
-              }
             } inject accepted
-        }
-    }
 
   private def makeWork(game: Game, sender: Work.Sender): Fu[Work.Analysis] =
     gameRepo.initialFen(game) zip uciMemo.get(game) map { case (initialFen, moves) =>
@@ -124,4 +115,3 @@ final class Analyser(
       skipPositions = Nil,
       createdAt = DateTime.now
     )
-}

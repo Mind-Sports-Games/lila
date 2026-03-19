@@ -6,9 +6,9 @@ final case class WebSubscription(
     p256dh: String
 )
 
-object WebSubscription {
+object WebSubscription:
 
-  object readers {
+  object readers:
     import play.api.libs.json._
     import play.api.libs.functional.syntax._
 
@@ -16,6 +16,4 @@ object WebSubscription {
       (__ \ "endpoint").read[String] and
         (__ \ "keys" \ "auth").read[String] and
         (__ \ "keys" \ "p256dh").read[String]
-    )(WebSubscription.apply _)
-  }
-}
+    )(WebSubscription.apply)

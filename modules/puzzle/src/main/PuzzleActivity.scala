@@ -2,9 +2,8 @@ package lila.puzzle
 
 import org.apache.pekko.stream.scaladsl._
 import play.api.libs.json._
-import reactivemongo.akkastream.cursorProducer
+import reactivemongo.pekkostream.cursorProducer
 import reactivemongo.api.ReadPreference
-import scala.concurrent.duration._
 
 import lila.common.config.MaxPerSecond
 import lila.common.Json.jodaWrites
@@ -16,17 +15,17 @@ final class PuzzleActivity(
 )(implicit
     ec: scala.concurrent.ExecutionContext,
     system: org.apache.pekko.actor.ActorSystem
-) {
+):
 
   import PuzzleActivity._
   import BsonHandlers._
   import JsonView._
 
-  def stream(config: Config): Source[String, _] =
-    Source futureSource {
-      colls.round.map {
+  def stream(config: Config): Source[String, ?] =
+    Source futureSource:
+      colls.round.map:
         _.find($doc(PuzzleRound.BSONFields.user -> config.user.id))
-          .sort($sort desc PuzzleRound.BSONFields.date)
+          .sort($sort `desc` PuzzleRound.BSONFields.date)
           .batchSize(config.perSecond.value)
           .cursor[PuzzleRound](ReadPreference.secondaryPreferred)
           .documentSource(config.max | Int.MaxValue)
@@ -37,11 +36,9 @@ final class PuzzleActivity(
           .map { json =>
             s"${Json.stringify(json)}\n"
           }
-      }
-    }
 
   private def enrich(rounds: Seq[PuzzleRound]): Fu[Seq[JsObject]] =
-    colls.puzzle {
+    colls.puzzle:
       _.primitiveMap[Puzzle.Id, Double](
         ids = rounds.map(_.id.puzzleId),
         field = s"${Puzzle.BSONFields.glicko}.r",
@@ -58,14 +55,11 @@ final class PuzzleActivity(
           }
         }
       }
-    }
-}
 
-object PuzzleActivity {
+object PuzzleActivity:
 
   case class Config(
       user: User,
       max: Option[Int] = None,
       perSecond: MaxPerSecond
   )
-}

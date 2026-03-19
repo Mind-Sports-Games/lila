@@ -13,7 +13,7 @@ import lila.user.User
 import strategygames.variant.Variant
 import lila.user.Perfs
 
-object PuzzleHistory {
+object PuzzleHistory:
 
   val maxPerPage = MaxPerPage(100)
 
@@ -31,7 +31,7 @@ object PuzzleHistory {
   }
 
   final class HistoryAdapter(user: User, variant: Variant, colls: PuzzleColls)(implicit ec: ExecutionContext)
-      extends AdapterLike[PuzzleSession] {
+      extends AdapterLike[PuzzleSession]:
 
     import BsonHandlers._
 
@@ -41,7 +41,7 @@ object PuzzleHistory {
 
     def slice(offset: Int, length: Int): Fu[Seq[PuzzleSession]] =
       colls
-        .round {
+        .round:
           _.aggregateWith[Bdoc](readPreference = ReadPreference.secondaryPreferred) { framework =>
             import framework._
             List(
@@ -49,12 +49,11 @@ object PuzzleHistory {
               Sort(Descending("d")),
               Skip(offset),
               Limit(length),
-              PipelineOperator(PuzzleRound puzzleLookup colls),
+              PipelineOperator(PuzzleRound `puzzleLookup` colls),
               Unwind("puzzle")
             )
           }
             .collect[List](maxDocs = length)
-        }
         .map { r =>
           for {
             doc   <- r
@@ -65,28 +64,25 @@ object PuzzleHistory {
         }
         .map(groupBySessions)
         .map(_.filter(_.puzzles.head.puzzle.variant == variant))
-  }
 
   private def groupBySessions(rounds: List[SessionRound]): List[PuzzleSession] =
     rounds
-      .foldLeft(List.empty[PuzzleSession]) {
+      .foldLeft(List.empty[PuzzleSession]):
         case (Nil, round) => List(PuzzleSession(round.theme, NonEmptyList(round, Nil)))
         case (last :: sessions, r) =>
           if (
             last.puzzles.head.theme == r.theme &&
             last.puzzles.head.puzzle.variant == r.puzzle.variant &&
-            r.round.date.isAfter(last.puzzles.head.round.date minusHours 1)
+            r.round.date.isAfter(last.puzzles.head.round.date `minusHours` 1)
           )
             last.copy(puzzles = r :: last.puzzles) :: sessions
           else PuzzleSession(r.theme, NonEmptyList(r, Nil)) :: last :: sessions
-      }
       .reverse
-}
 
 final class PuzzleHistoryApi(
     colls: PuzzleColls,
     cacheApi: CacheApi
-)(implicit ec: ExecutionContext) {
+)(implicit ec: ExecutionContext):
 
   import PuzzleHistory._
 
@@ -97,4 +93,3 @@ final class PuzzleHistoryApi(
       maxPerPage = maxPerPage
     )
 
-}

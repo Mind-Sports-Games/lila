@@ -56,8 +56,8 @@ object BinaryFormat {
     def read(start: Centis, bw: ByteArray, bb: ByteArray, flagged: Option[PlayerIndex]) =
       Try {
         FischerClockHistory(
-          readSide(start, bw, flagged has P1),
-          readSide(start, bb, flagged has P2)
+          readSide(start, bw, flagged.contains(P1)),
+          readSide(start, bb, flagged.contains(P2))
         )
       }.fold(
         e => { logger.warn(s"Exception decoding history", e); none },
@@ -77,8 +77,8 @@ object BinaryFormat {
     def read(start: Centis, bw: ByteArray, bb: ByteArray, flagged: Option[PlayerIndex]) =
       Try {
         DelayClockHistory( // NOTE: this is the only difference from the above fischerClockHistory
-          readSide(start, bw, flagged has P1),
-          readSide(start, bb, flagged has P2)
+          readSide(start, bw, flagged.contains(P1)),
+          readSide(start, bb, flagged.contains(P2))
         )
       }.fold(
         e => { logger.warn(s"Exception decoding history", e); none },
@@ -111,8 +111,8 @@ object BinaryFormat {
       Try {
         ByoyomiClockHistory(
           byoyomi,
-          readSide(start, bs, flagged has P1),
-          readSide(start, bg, flagged has P2),
+          readSide(start, bs, flagged.contains(P1)),
+          readSide(start, bg, flagged.contains(P2)),
           pe
         )
       }.fold(

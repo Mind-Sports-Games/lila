@@ -11,7 +11,7 @@ final class TeamSearchApi(
     teamRepo: TeamRepo
 )(implicit
     ec: scala.concurrent.ExecutionContext,
-    mat: akka.stream.Materializer
+    mat: org.apache.pekko.stream.Materializer
 ) extends SearchReadApi[Team, Query] {
 
   def search(query: Query, from: From, size: Size) =

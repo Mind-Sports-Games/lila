@@ -7,7 +7,7 @@ import lila.tree.Eval.JsonHandlers._
 
 import strategygames.Player.{ P1, P2 }
 
-object JsonView {
+object JsonView:
 
   def moves(analysis: Analysis, withGlyph: Boolean = true) =
     JsArray(analysis.infoAdvices map { case (info, adviceOption) =>
@@ -65,4 +65,3 @@ object JsonView {
       "summary" -> bothPlayers(game, analysis),
       "moves"   -> moves(analysis)
     )
-}

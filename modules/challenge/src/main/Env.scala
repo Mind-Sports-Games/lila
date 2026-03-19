@@ -2,7 +2,6 @@ package lila.challenge
 
 import com.softwaremill.macwire._
 import play.api.Configuration
-import scala.concurrent.duration._
 
 import lila.common.config._
 import lila.socket.Socket.{ GetVersion, SocketVersion }
@@ -29,7 +28,7 @@ final class Env(
     system: org.apache.pekko.actor.ActorSystem,
     scheduler: org.apache.pekko.actor.Scheduler,
     mode: play.api.Mode
-) {
+):
 
   private lazy val maxPlaying = appConfig.get[Max]("setup.max_playing")
 
@@ -65,9 +64,7 @@ final class Env(
   system.scheduler.scheduleWithFixedDelay(20 seconds, 2897 millis) { () =>
     bulk.tick.discard
   }
-}
 
-private class ChallengeColls(db: lila.db.Db) {
+private class ChallengeColls(db: lila.db.Db):
   val challenge = db(CollName("challenge"))
   val bulk      = db(CollName("challenge_bulk"))
-}

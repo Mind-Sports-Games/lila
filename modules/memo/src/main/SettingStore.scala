@@ -15,7 +15,7 @@ final class SettingStore[A: BSONHandler: SettingStore.StringReader: SettingStore
     val text: Option[String],
     persist: Boolean,
     init: SettingStore.Init[A]
-)(implicit ec: scala.concurrent.ExecutionContext) {
+)(implicit ec: scala.concurrent.ExecutionContext):
 
   import SettingStore.{ dbField, ConfigValue, DbValue }
 
@@ -23,12 +23,11 @@ final class SettingStore[A: BSONHandler: SettingStore.StringReader: SettingStore
 
   def get(): A = value
 
-  def set(v: A): Funit = {
+  def set(v: A): Funit =
     value = v
     persist so coll.update.one(dbId, $set(dbField -> v), upsert = true).void
-  }
 
-  def form: Form[_] = implicitly[SettingStore.Formable[A]] form value
+  def form: Form[?] = implicitly[SettingStore.Formable[A]] form value
 
   def setString(str: String): Funit = (implicitly[SettingStore.StringReader[A]] read str) so set
 
@@ -37,16 +36,15 @@ final class SettingStore[A: BSONHandler: SettingStore.StringReader: SettingStore
   persist so coll.primitiveOne[A](dbId, dbField) map2 { (v: A) =>
     value = init(ConfigValue(default), DbValue(v))
   }
-}
 
-object SettingStore {
+object SettingStore:
 
   case class ConfigValue[A](value: A)
   case class DbValue[A](value: A)
 
   type Init[A] = (ConfigValue[A], DbValue[A]) => A
 
-  final class Builder(db: lila.db.Db, config: MemoConfig)(implicit ec: scala.concurrent.ExecutionContext) {
+  final class Builder(db: lila.db.Db, config: MemoConfig)(implicit ec: scala.concurrent.ExecutionContext):
     val coll = db(config.configColl)
     def apply[A: BSONHandler: StringReader: Formable](
         id: String,
@@ -55,11 +53,10 @@ object SettingStore {
         persist: Boolean = true,
         init: Init[A] = (_: ConfigValue[A], db: DbValue[A]) => db.value
     ) = new SettingStore[A](coll, id, default, text, persist = persist, init = init)
-  }
 
   final class StringReader[A](val read: String => Option[A])
 
-  object StringReader {
+  object StringReader:
     implicit val booleanReader: StringReader[Boolean] = new StringReader[Boolean]({
       case "on" | "yes" | "true" | "1"  => true.some
       case "off" | "no" | "false" | "0" => false.some
@@ -68,31 +65,26 @@ object SettingStore {
     implicit val intReader: StringReader[Int]       = new StringReader[Int](_.toIntOption)
     implicit val stringReader: StringReader[String] = new StringReader[String](some)
     def fromIso[A](iso: lila.common.Iso[String, A]) = new StringReader[A](v => iso.from(v).some)
-  }
 
-  object Strings {
+  object Strings:
     val stringsIso                                               = lila.common.Iso.strings(",")
     implicit val stringsBsonHandler: BSONHandler[common.Strings] = lila.db.dsl.isoHandler(stringsIso)
     implicit val stringsReader: StringReader[common.Strings]     = StringReader.fromIso(stringsIso)
-  }
-  object UserIds {
+  object UserIds:
     val userIdsIso                                               = lila.common.Iso.userIds(",")
     implicit val userIdsBsonHandler: BSONHandler[common.UserIds] = lila.db.dsl.isoHandler(userIdsIso)
     implicit val userIdsReader: StringReader[common.UserIds]     = StringReader.fromIso(userIdsIso)
-  }
-  object Ints {
+  object Ints:
     val intsIso                                            = lila.common.Iso.ints(",")
     implicit val intsBsonHandler: BSONHandler[common.Ints] = lila.db.dsl.isoHandler(intsIso)
     implicit val intsReader: StringReader[common.Ints]     = StringReader.fromIso(intsIso)
-  }
-  object Regex {
+  object Regex:
     val regexIso                                      = lila.common.Iso.string[Regex](_.r, _.toString)
     implicit val regexBsonHandler: BSONHandler[Regex] = lila.db.dsl.isoHandler(regexIso)
     implicit val regexReader: StringReader[Regex]     = StringReader.fromIso(regexIso)
-  }
 
-  final class Formable[A](val form: A => Form[_])
-  object Formable {
+  final class Formable[A](val form: A => Form[?])
+  object Formable:
     implicit val regexFormable: Formable[Regex] = new Formable[Regex](v =>
       Form(
         single(
@@ -113,7 +105,5 @@ object SettingStore {
     implicit val userIdsFormable: Formable[common.UserIds] = new Formable[lila.common.UserIds](v =>
       Form(single("v" -> text)) fill UserIds.userIdsIso.to(v)
     )
-  }
 
   private val dbField = "setting"
-}

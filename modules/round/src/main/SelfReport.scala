@@ -1,7 +1,5 @@
 package lila.round
 
-import scala.concurrent.duration._
-
 import lila.common.IpAddress
 import lila.game.Game
 import lila.user.{ User, UserRepo }
@@ -12,7 +10,7 @@ final class SelfReport(
     userRepo: UserRepo,
     slackApi: lila.irc.SlackApi,
     proxyRepo: GameProxyRepo
-)(implicit ec: scala.concurrent.ExecutionContext) {
+)(implicit ec: scala.concurrent.ExecutionContext):
 
   private val p1list = Set("treehugger")
 
@@ -24,7 +22,7 @@ final class SelfReport(
       fullId: Game.FullId,
       name: String
   ): Funit =
-    !userId.exists(p1list.contains) so {
+    !userId.exists(p1list.contains) so:
       userId.so(userRepo.named) flatMap { user =>
         val known = user.exists(_.marks.engine)
         lila.mon.cheat.cssBot.increment()
@@ -32,7 +30,7 @@ final class SelfReport(
         //   Env.report.api.autoBotReport(u.id, referer, name)
         // }
         def doLog(): Unit =
-          if (name != "ceval") {
+          if (name != "ceval")
             lila
               .log("cheat")
               .branch("jslog")
@@ -47,10 +45,9 @@ final class SelfReport(
                 ip = ip
               )
             }
-          }
         if (name == "kb" || fullId.value == "____________") fuccess(doLog())
         else
-          proxyRepo.pov(fullId.value) flatMap {
+          proxyRepo.pov(fullId.value) flatMap:
             _ so { pov =>
               if (!known) doLog()
               if (
@@ -59,15 +56,11 @@ final class SelfReport(
                   name.contains("stockfish") || name.contains("userscript") ||
                     name.contains("__puppeteer_evaluation_script__")
                 ))
-              ) fuccess {
+              ) fuccess:
                 if (userId.isDefined) tellRound(pov.gameId, lila.round.actorApi.round.Cheat(pov.playerIndex))
                 user.ifTrue(name == "cma") foreach { u =>
                   lila.common.Bus.publish(lila.hub.actorApi.mod.SelfReportMark(u.id, name), "selfReportMark")
                 }
-              }
               else gameRepo.setBorderAlert(pov).void
             }
-          }
       }
-    }
-}
