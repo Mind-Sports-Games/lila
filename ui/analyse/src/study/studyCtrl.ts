@@ -398,7 +398,14 @@ export default function (
         return;
       }
       if (sticky && who && who.s === playstrategy.sri) {
-        data.position.path = position.path + node.id;
+        // Always use the server's authoritative node: handles push moves (e.g. Grand Abalone)
+        // where the local engine result may diverge from the server's.
+        const newPath = ctrl.tree.addNode(node, position.path);
+        if (!newPath) return xhrReload();
+        ctrl.tree.addDests(d.d, newPath);
+        data.position.path = newPath;
+        ctrl.jump(newPath);
+        redraw();
         return;
       }
       if (relay) relay.applyChapterRelay(data.chapter, d.relay);

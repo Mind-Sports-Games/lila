@@ -227,7 +227,163 @@ coords {
     }
   }
 
-  // togy coords are always inside the board
+  .variant-grandabalone & {
+    .abalone-dark & coord,
+    .abalone-classic & coord {
+      color: #fff !important;
+      text-shadow: 0 1px 2px #000;
+    }
+    .abalone-yellow & coord {
+      color: #eeddc0 !important;
+      text-shadow: 0 1px 2px #000;
+    }
+  }
+
+  .variant-grandabalone .orientation-p1 & {
+    &.files {
+      text-align: center;
+      &.rank-1 {
+        // 1 -> 6
+        bottom: 9.5%;
+        padding-left: 28.25%;
+        padding-right: 23.5%;
+      }
+      &.rank-2 {
+        // 7
+        bottom: 16.5%;
+        padding-left: 53.5%;
+      }
+      &.rank-3 {
+        // 8
+        bottom: 23.5%;
+        padding-left: 62%;
+      }
+      &.rank-4 {
+        // 9
+        bottom: 30.75%;
+        padding-left: 70%;
+      }
+      &.rank-5 {
+        // 10
+        bottom: 37.75%;
+        padding-left: 78%;
+      }
+      &.rank-6 {
+        // 11
+        bottom: 44.75%;
+        padding-left: 86%;
+      }
+    }
+    &.ranks {
+      text-align: center;
+      &.file-1 {
+        // f
+        left: 3%;
+        padding-top: 48.75%;
+      }
+      &.file-2 {
+        // e & g
+        left: 6.75%;
+        padding-top: 41.75%; // g
+        padding-bottom: 30.25%; // e
+      }
+      &.file-3 {
+        // d & h
+        left: 10.75%;
+        padding-top: 35%;
+        padding-bottom: 9%;
+      }
+      &.file-4 {
+        // c & i
+        left: 15%;
+        padding-top: 28.25%;
+        padding-bottom: 8%;
+      }
+      &.file-5 {
+        // b & j
+        left: 19%;
+        padding-top: 21%;
+        padding-bottom: 8%;
+      }
+      &.file-6 {
+        // a & k
+        left: 23%;
+        padding-top: 13.75%; // k?
+        padding-bottom: 1%; // a
+      }
+    }
+  }
+
+  .variant-grandabalone .orientation-p2 & {
+    &.files {
+      text-align: center;
+      &.rank-1 {
+        top: 8.5%;
+        padding-right: 29%;
+        padding-left: 23%;
+      }
+      &.rank-2 {
+        top: 15.5%;
+        padding-right: 54.5%;
+      }
+      &.rank-3 {
+        top: 22.5%;
+        padding-right: 63%;
+      }
+      &.rank-4 {
+        top: 29.5%;
+        padding-right: 71.75%;
+      }
+      &.rank-5 {
+        top: 36.5%;
+        padding-right: 79.5%;
+      }
+      &.rank-6 {
+        top: 43.5%;
+        padding-right: 86.75%;
+      }
+    }
+    &.ranks {
+      text-align: center;
+      &.file-1 {
+        // f
+        right: 2.75%;
+        padding-top: 48.5%;
+      }
+      &.file-2 {
+        // e & g
+        right: 7%;
+        padding-top: 41.75%; // e
+        padding-bottom: 31%; // g
+      }
+      &.file-3 {
+        // d & h
+        right: 11%;
+        padding-top: 34.75%; // d
+        padding-bottom: 9.5%; // h
+      }
+      &.file-4 {
+        // c & i
+        right: 15%;
+        padding-top: 27.75%;
+        padding-bottom: 8.75%;
+      }
+      &.file-5 {
+        // b & j
+        right: 19%;
+        padding-top: 20.75%;
+        padding-bottom: 8%;
+      }
+      &.file-6 {
+        // a & k
+        right: 23%;
+        padding-top: 13.75%;
+        padding-bottom: 1%;
+      }
+    }
+  }
+
+  //Handle togy corrds as they are always inside the board
   .variant-togyzkumalak &,
   .variant-bestemshe & {
     text-shadow:

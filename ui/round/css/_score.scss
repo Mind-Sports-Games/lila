@@ -6,7 +6,8 @@ $score-variants: (
   'oware',
   'togyzkumalak',
   'bestemshe',
-  'abalone'
+  'abalone',
+  'grandabalone'
 );
 $score-variants-square: (
   'flipello',
@@ -17,7 +18,8 @@ $score-variants-square: (
   'go9x9',
   'go13x13',
   'go19x19',
-  'abalone'
+  'abalone',
+  'grandabalone'
 );
 $go-variants: ('go9x9', 'go13x13', 'go19x19');
 
@@ -42,7 +44,8 @@ $go-variants: ('go9x9', 'go13x13', 'go19x19');
   }
 }
 
-.variant-abalone .game-score::after {
+.variant-abalone .game-score::after,
+.variant-grandabalone .game-score::after {
   @extend %active, %box-radius;
 
   content: attr(data-score);
@@ -201,7 +204,8 @@ body.backgammon-contemporary .variant-backgammon .game-score {
   }
 }
 
-body .variant-abalone .game-score piece.hole-piece {
+body .variant-abalone .game-score piece.hole-piece,
+body .variant-grandabalone .game-score piece.hole-piece {
   background: url(../images/board/abalone/score/hole.svg);
   background-size: cover;
 }
@@ -303,6 +307,153 @@ body .variant-abalone .game-score piece.hole-piece {
         height: 20% !important;
         top: 73.5%;
         left: 40%;
+      }
+    }
+  }
+}
+
+//additional piece spaces for grandabalone (4-row triangle: 1+2+3+4=10 marbles)
+.variant-grandabalone .game-score {
+  piece {
+    position: absolute;
+    &.slot-top {
+      &.s-piece {
+        width: 25% !important;
+        height: 25% !important;
+        left: 37.5%;
+        top: 0;
+      }
+      &.hole-piece {
+        width: 15% !important;
+        height: 15% !important;
+        left: 42.5%;
+        top: 5%;
+      }
+    }
+    &.slot-top-left {
+      &.s-piece {
+        width: 25% !important;
+        height: 25% !important;
+        top: 25%;
+        left: 25%;
+      }
+      &.hole-piece {
+        width: 15% !important;
+        height: 15% !important;
+        top: 30%;
+        left: 30%;
+      }
+    }
+    &.slot-top-right {
+      &.s-piece {
+        width: 25% !important;
+        height: 25% !important;
+        top: 25%;
+        left: 50%;
+      }
+      &.hole-piece {
+        width: 15% !important;
+        height: 15% !important;
+        top: 30%;
+        left: 55%;
+      }
+    }
+    &.slot-mid-left {
+      &.s-piece {
+        width: 25% !important;
+        height: 25% !important;
+        top: 50%;
+        left: 12.5%;
+      }
+      &.hole-piece {
+        width: 15% !important;
+        height: 15% !important;
+        top: 55%;
+        left: 17.5%;
+      }
+    }
+    &.slot-mid-mid {
+      &.s-piece {
+        width: 25% !important;
+        height: 25% !important;
+        top: 50%;
+        left: 37.5%;
+      }
+      &.hole-piece {
+        width: 15% !important;
+        height: 15% !important;
+        top: 55%;
+        left: 42.5%;
+      }
+    }
+    &.slot-mid-right {
+      &.s-piece {
+        width: 25% !important;
+        height: 25% !important;
+        top: 50%;
+        left: 62.5%;
+      }
+      &.hole-piece {
+        width: 15% !important;
+        height: 15% !important;
+        top: 55%;
+        left: 67.5%;
+      }
+    }
+    &.slot-bot-left {
+      &.s-piece {
+        width: 25% !important;
+        height: 25% !important;
+        top: 75%;
+        left: 0;
+      }
+      &.hole-piece {
+        width: 15% !important;
+        height: 15% !important;
+        top: 80%;
+        left: 5%;
+      }
+    }
+    &.slot-bot-mid-left {
+      &.s-piece {
+        width: 25% !important;
+        height: 25% !important;
+        top: 75%;
+        left: 25%;
+      }
+      &.hole-piece {
+        width: 15% !important;
+        height: 15% !important;
+        top: 80%;
+        left: 30%;
+      }
+    }
+    &.slot-bot-mid-right {
+      &.s-piece {
+        width: 25% !important;
+        height: 25% !important;
+        top: 75%;
+        left: 50%;
+      }
+      &.hole-piece {
+        width: 15% !important;
+        height: 15% !important;
+        top: 80%;
+        left: 55%;
+      }
+    }
+    &.slot-bot-right {
+      &.s-piece {
+        width: 25% !important;
+        height: 25% !important;
+        top: 75%;
+        left: 75%;
+      }
+      &.hole-piece {
+        width: 15% !important;
+        height: 15% !important;
+        top: 80%;
+        left: 80%;
       }
     }
   }

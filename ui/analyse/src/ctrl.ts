@@ -331,7 +331,10 @@ export default class AnalyseCtrl {
   makeCgOpts(): ChessgroundConfig {
     const node = this.node,
       playerIndex = this.turnPlayerIndex(),
-      dests = stratUtils.readDests(this.node.dests),
+      dests =
+        this.data.game.gameFamily === 'abalone'
+          ? stratUtils.readDestsAbalone(this.node.dests)
+          : stratUtils.readDests(this.node.dests),
       drops = stratUtils.readDrops(this.node.drops),
       dropsByRole = stratUtils.readDropsByRole(this.node.dropsByRole),
       variantKey = this.data.game.variant.key,
@@ -608,6 +611,7 @@ export default class AnalyseCtrl {
     this.reset();
   };
 
+  // @TODO: check what happens when we have a move in several parts (eg GAbalone or monster)
   private preparePremoving(): void {
     this.chessground.set({
       turnPlayerIndex: this.chessground.state.movable.playerIndex as cg.PlayerIndex,
@@ -632,7 +636,10 @@ export default class AnalyseCtrl {
     this.jump(newPath);
     this.redraw();
     this.chessground.playPremove();
-    const parsedDests = stratUtils.readDests(node.dests);
+    const parsedDests =
+      this.data.game.gameFamily === 'abalone'
+        ? stratUtils.readDestsAbalone(node.dests)
+        : stratUtils.readDests(node.dests);
     if (parsedDests) this.maybeForceMove(parsedDests);
   }
 

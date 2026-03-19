@@ -50,5 +50,6 @@ export const perf = {
     hyper: '',
     nackgammon: '',
     abalone: '\ue927',
+    grandabalone: '\ue92C',
   },
 };

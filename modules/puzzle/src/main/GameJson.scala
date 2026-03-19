@@ -132,8 +132,8 @@ final private class GameJson(
       )
     case Variant.Abalone(abaloneVariant) =>
       Json.obj(
-        "width"  -> abaloneVariant.boardSize.width,
-        "height" -> abaloneVariant.boardSize.height
+        "width"  -> abaloneVariant.boardType.width,
+        "height" -> abaloneVariant.boardType.height
       )
     case _ =>
       Json.obj(

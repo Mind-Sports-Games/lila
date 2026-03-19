@@ -51,6 +51,7 @@ case class History(
     hyper: RatingsMap,
     nackgammon: RatingsMap,
     abalone: RatingsMap,
+    grandabalone: RatingsMap,
     ultraBullet: RatingsMap,
     bullet: RatingsMap,
     blitz: RatingsMap,
@@ -118,6 +119,7 @@ case class History(
       case "hyper"                  => hyper
       case "nackgammon"             => nackgammon
       case "abalone"                => abalone
+      case "grandabalone"           => grandabalone
       case "puzzle_standard"        => puzzle_standard
       case "puzzle_kingOfTheHill"   => puzzle_kingOfTheHill
       case "puzzle_atomic"          => puzzle_atomic
@@ -201,6 +203,7 @@ object History {
           hyper = ratingsMap("hyper"),
           nackgammon = ratingsMap("nackgammon"),
           abalone = ratingsMap("abalone"),
+          grandabalone = ratingsMap("grandabalone"),
           ultraBullet = ratingsMap("ultraBullet"),
           bullet = ratingsMap("bullet"),
           blitz = ratingsMap("blitz"),

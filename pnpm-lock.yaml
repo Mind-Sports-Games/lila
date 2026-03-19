@@ -12,11 +12,11 @@ importers:
         specifier: github:lichess-org/ab-stub
         version: https://codeload.github.com/lichess-org/ab-stub/tar.gz/94236bf34dbc9c05daf50f4c9842d859b9142be0
       chessground:
-        specifier: github:Mind-Sports-Games/chessground#v7.11.1-pstrat3.32
-        version: https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/a8a0f1528dce26b37a62279c356a5a05cd8e3d95
+        specifier: github:r-gke/chessground#grand-abalone-merge
+        version: https://codeload.github.com/r-gke/chessground/tar.gz/a08de42dd114673da40ee019d20dfd6a331cda2b
       stratops:
-        specifier: github:Mind-Sports-Games/stratops#v0.8.1-pstrat5.26
-        version: https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/f79ca222fc81a218d8085031acc04e4237b2b613
+        specifier: github:r-gke/stratops#grandAbalone-pr
+        version: https://codeload.github.com/r-gke/stratops/tar.gz/7ea5cd1369792de5c28e33d7bf439b4c75f8a03f
       xml2js:
         specifier: ^0.6.2
         version: 0.6.2
@@ -576,8 +576,8 @@ importers:
 
 packages:
 
-  '@babel/runtime@7.28.6':
-    resolution: {integrity: sha512-05WQkdpL9COIMz4LjTxGpPNCdlpyimKppYNoJ5Di5EUObifl8t4tuLuUBBZEpoLYOmfvIWrsp9fCl0HoPRVTdA==}
+  '@babel/runtime@7.29.2':
+    resolution: {integrity: sha512-JiDShH45zKHWyGe4ZNVRrCjBz8Nh9TMmZG1kh4QTK8hCBTWBi8Da+i7s1fJw7/lYpM4ccepSNfqzZ/QvABBi5g==}
     engines: {node: '>=6.9.0'}
 
   '@badrap/result@0.2.13':
@@ -840,8 +840,8 @@ packages:
     resolution: {tarball: https://codeload.github.com/ornicar/chess.js/tar.gz/ad0709c0b07773d9d0da8e4605a9a2a28f00d249}
     version: 0.10.2
 
-  chessground@https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/a8a0f1528dce26b37a62279c356a5a05cd8e3d95:
-    resolution: {tarball: https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/a8a0f1528dce26b37a62279c356a5a05cd8e3d95}
+  chessground@https://codeload.github.com/r-gke/chessground/tar.gz/a08de42dd114673da40ee019d20dfd6a331cda2b:
+    resolution: {tarball: https://codeload.github.com/r-gke/chessground/tar.gz/a08de42dd114673da40ee019d20dfd6a331cda2b}
     version: 7.11.1-pstrat3.32
     engines: {node: ^20.19.4, pnpm: ^10.17.0}
 
@@ -1010,8 +1010,8 @@ packages:
   flatpickr@4.6.13:
     resolution: {integrity: sha512-97PMG/aywoYpB4IvbvUJi0RQi8vearvU0oov1WW3k0WZPBMrTQVqekSX5CjSG/M4Q3i6A/0FKXC7RyAoAUUSPw==}
 
-  flatted@3.4.1:
-    resolution: {integrity: sha512-IxfVbRFVlV8V/yRaGzk0UVIcsKKHMSfYw66T/u4nTwlWteQePsxe//LjudR1AMX4tZW3WFCh3Zqa/sjlqpbURQ==}
+  flatted@3.4.2:
+    resolution: {integrity: sha512-PjDse7RzhcPkIJwy5t7KPWQSZ9cAbzQXcafsetQoD7sOJRQlGikNbx7yZp2OotDnJyrDcbyRq3Ttb18iYOqkxA==}
 
   fs.realpath@1.0.0:
     resolution: {integrity: sha512-OO0pH2lK6a0hZnAdau5ItzHPI6pUlvI7jMVnxUQRtw4owF2wk8lOSabtGDCTP4Ggrg2MbGnWO9X8K1t4+fGMDw==}
@@ -1357,8 +1357,8 @@ packages:
   safari-14-idb-fix@1.0.6:
     resolution: {integrity: sha512-oTEQOdMwRX+uCtWCKT1nx2gAeSdpr8elg/2gcaKUH00SJU2xWESfkx11nmXwTRHy7xfQoj1o4TTQvdmuBosTnA==}
 
-  sax@1.5.0:
-    resolution: {integrity: sha512-21IYA3Q5cQf089Z6tgaUTr7lDAyzoTPx5HRtbhsME8Udispad8dC/+sziTNugOEx54ilvatQ9YCzl4KQLPcRHA==}
+  sax@1.6.0:
+    resolution: {integrity: sha512-6R3J5M4AcbtLUdZmRv2SygeVaM7IhrLXu9BmnOGmmACak8fiUtOsYNWUS4uK7upbmHIBbLBeFeI//477BKLBzA==}
     engines: {node: '>=11.0.0'}
 
   scheduler@0.27.0:
@@ -1400,8 +1400,8 @@ packages:
     resolution: {integrity: sha512-wHMNIOjkm/YNE5EM3RCbr/+DVgPg6AqQAX1eOxO46zYNvCXjKP5Y865tqQj3EXnaMBjkxmQA5jFuDpDK/dbfiA==}
     engines: {node: '>=8.3.0'}
 
-  stratops@https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/f79ca222fc81a218d8085031acc04e4237b2b613:
-    resolution: {tarball: https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/f79ca222fc81a218d8085031acc04e4237b2b613}
+  stratops@https://codeload.github.com/r-gke/stratops/tar.gz/7ea5cd1369792de5c28e33d7bf439b4c75f8a03f:
+    resolution: {tarball: https://codeload.github.com/r-gke/stratops/tar.gz/7ea5cd1369792de5c28e33d7bf439b4c75f8a03f}
     version: 0.8.1-pstrat5.26
     engines: {node: ^20.19.4, pnpm: ^10.17.0}
 
@@ -1521,7 +1521,7 @@ packages:
 
 snapshots:
 
-  '@babel/runtime@7.28.6': {}
+  '@babel/runtime@7.29.2': {}
 
   '@badrap/result@0.2.13': {}
 
@@ -1787,7 +1787,7 @@ snapshots:
 
   chess.js@https://codeload.github.com/ornicar/chess.js/tar.gz/ad0709c0b07773d9d0da8e4605a9a2a28f00d249: {}
 
-  chessground@https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/a8a0f1528dce26b37a62279c356a5a05cd8e3d95: {}
+  chessground@https://codeload.github.com/r-gke/chessground/tar.gz/a08de42dd114673da40ee019d20dfd6a331cda2b: {}
 
   chokidar@3.6.0:
     dependencies:
@@ -1838,7 +1838,7 @@ snapshots:
 
   date-fns@2.30.0:
     dependencies:
-      '@babel/runtime': 7.28.6
+      '@babel/runtime': 7.29.2
 
   debounce-promise@3.1.2: {}
 
@@ -1983,13 +1983,13 @@ snapshots:
 
   flat-cache@3.2.0:
     dependencies:
-      flatted: 3.4.1
+      flatted: 3.4.2
       keyv: 4.5.4
       rimraf: 3.0.2
 
   flatpickr@4.6.13: {}
 
-  flatted@3.4.1: {}
+  flatted@3.4.2: {}
 
   fs.realpath@1.0.0: {}
 
@@ -2302,7 +2302,7 @@ snapshots:
 
   safari-14-idb-fix@1.0.6: {}
 
-  sax@1.5.0: {}
+  sax@1.6.0: {}
 
   scheduler@0.27.0: {}
 
@@ -2332,7 +2332,7 @@ snapshots:
 
   snabbdom@3.5.1: {}
 
-  stratops@https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/f79ca222fc81a218d8085031acc04e4237b2b613:
+  stratops@https://codeload.github.com/r-gke/stratops/tar.gz/7ea5cd1369792de5c28e33d7bf439b4c75f8a03f:
     dependencies:
       '@badrap/result': 0.2.13
 
@@ -2412,7 +2412,7 @@ snapshots:
 
   xml2js@0.6.2:
     dependencies:
-      sax: 1.5.0
+      sax: 1.6.0
       xmlbuilder: 11.0.1
 
   xmlbuilder@11.0.1: {}

@@ -112,6 +112,8 @@ function wheel(ctrl: AnalyseCtrl, e: WheelEvent) {
 }
 
 function inputs(ctrl: AnalyseCtrl): VNode | undefined {
+  const variantKey = ctrl.data.game.variant.key;
+  const rules = variantKeyToRules(variantKey);
   if (ctrl.ongoing || !ctrl.data.userAnalysis) return;
   if (ctrl.redirecting) return spinner();
   return h('div.copyables', [
@@ -128,9 +130,7 @@ function inputs(ctrl: AnalyseCtrl): VNode | undefined {
             });
             el.addEventListener('input', _ => {
               ctrl.fenInput = el.value;
-              el.setCustomValidity(
-                parseFen(variantKeyToRules(ctrl.data.game.variant.key))(el.value.trim()).isOk ? '' : 'Invalid FEN',
-              );
+              el.setCustomValidity(parseFen(rules)(el.value.trim()).isOk ? '' : 'Invalid FEN');
             });
           },
           postpatch: (_, vnode) => {
@@ -163,7 +163,7 @@ function inputs(ctrl: AnalyseCtrl): VNode | undefined {
                 },
               },
             }),
-            ctrl.data.game.variant.lib == 0 && !['linesOfAction', 'scrambledEggs'].includes(ctrl.data.game.variant.key)
+            ctrl.data.game.variant.lib == 0 && !['linesOfAction', 'scrambledEggs'].includes(variantKey)
               ? h(
                   'button.button.button-thin.action.text',
                   {
@@ -406,8 +406,23 @@ function renderPlayerScore(
     children.push(h(`piece.${score > 5 ? 's-piece' : 'hole-piece'}.slot-bot-right.${opp}`));
 
     return h('div.game-score.game-score-top' + '.' + playerIndex, { attrs: { 'data-score': score } }, children);
+  } else if (variantKey === 'grandabalone') {
+    const opp = playerIndex === 'p1' ? 'p2' : 'p1';
+
+    children.push(h(`piece.${score > 0 ? 's-piece' : 'hole-piece'}.slot-top.${opp}`));
+    children.push(h(`piece.${score > 1 ? 's-piece' : 'hole-piece'}.slot-top-left.${opp}`));
+    children.push(h(`piece.${score > 2 ? 's-piece' : 'hole-piece'}.slot-top-right.${opp}`));
+    children.push(h(`piece.${score > 3 ? 's-piece' : 'hole-piece'}.slot-mid-left.${opp}`));
+    children.push(h(`piece.${score > 4 ? 's-piece' : 'hole-piece'}.slot-mid-mid.${opp}`));
+    children.push(h(`piece.${score > 5 ? 's-piece' : 'hole-piece'}.slot-mid-right.${opp}`));
+    children.push(h(`piece.${score > 6 ? 's-piece' : 'hole-piece'}.slot-bot-left.${opp}`));
+    children.push(h(`piece.${score > 7 ? 's-piece' : 'hole-piece'}.slot-bot-mid-left.${opp}`));
+    children.push(h(`piece.${score > 8 ? 's-piece' : 'hole-piece'}.slot-bot-mid-right.${opp}`));
+    children.push(h(`piece.${score > 9 ? 's-piece' : 'hole-piece'}.slot-bot-right.${opp}`));
+
+    return h('div.game-score.game-score-top' + '.' + playerIndex, { attrs: { 'data-score': score } }, children);
   } else {
-    //filpello variants
+    //flipello variants
     const pieceClass = 'piece.p-piece.';
     children.push(h(pieceClass + playerIndex, { attrs: { 'data-score': score } }));
     return h('div.game-score.game-score-top' + '.' + playerIndex, children);
@@ -491,8 +506,11 @@ export default function (ctrl: AnalyseCtrl): VNode {
     needsUserNameWithScore = ['togyzkumalak', 'oware'].includes(variantKey),
     needsInnerCoords =
       isCol1() ||
-      ((gaugeOn || !!playerBars) && !['xiangqi', 'shogi', 'minixiangqi', 'minishogi', 'oware'].includes(variantKey)) ||
-      ['togyzkumalak', 'bestemshe', 'backgammon', 'hyper', 'nackgammon', 'abalone'].includes(variantKey),
+      ((!!gaugeOn || !!playerBars) &&
+        !['xiangqi', 'shogi', 'minixiangqi', 'minishogi', 'oware'].includes(variantKey)) ||
+      ['togyzkumalak', 'bestemshe', 'backgammon', 'hyper', 'nackgammon', 'abalone', 'grandabalone'].includes(
+        variantKey,
+      ),
     needsOutterCoords =
       [
         'xiangqi',
@@ -537,7 +555,8 @@ export default function (ctrl: AnalyseCtrl): VNode {
         bottomScore = ctrl.topPlayerIndex() === 'p2' ? p1Score : p2Score;
         break;
       }
-      case 'abalone': {
+      case 'abalone':
+      case 'grandabalone': {
         const fen = ctrl.node.fen;
         const p1Score = getScoreFromFen(variantKey, fen, 'p1');
         const p2Score = getScoreFromFen(variantKey, fen, 'p2');
@@ -585,6 +604,7 @@ export default function (ctrl: AnalyseCtrl): VNode {
     'hyper',
     'nackgammon',
     'abalone',
+    'grandabalone',
   ].includes(variantKey)
     ? '.piece-letter'
     : '';
