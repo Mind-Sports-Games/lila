@@ -182,7 +182,7 @@ object JsonView {
     )
   }
 
-  //TODO we shoulnt have to unwrap per game logic
+  //TODO we shouldn't have to unwrap per game logic
   implicit val variantWriter: OWrites[Variant] = OWrites { v =>
     v match {
       case Variant.Draughts(draughtsVariant) =>
