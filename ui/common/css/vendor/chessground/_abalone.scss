@@ -100,6 +100,7 @@ $directions: ('W', 'NW', 'NE', 'E', 'SE', 'SW');
     }
   }
 
+  // Full boards: variant-abalone is a parent of orientation-p2 (descendant selector matches)
   .orientation-p2 {
     square {
       &.last-move.to {
@@ -117,13 +118,15 @@ $directions: ('W', 'NW', 'NE', 'E', 'SE', 'SW');
     }
   }
 
-  &.mini-game .orientation-p2 {
+  // Mini boards (profile history): both classes on the same cg-wrap element,
+  // so the descendant selector above does not match — use compound selector instead.
+  &.orientation-p2 {
     square {
       &.last-move.to {
         @each $player in $players {
           @each $direction in $directions {
             &.#{$player}#{$direction} {
-              background-image: url('../images/board/abalone/highlights/#{$player}#{$direction}.svg');
+              background-image: url('../images/board/abalone/highlights/#{$player}#{swapDirection($direction)}.svg');
               background-color: transparent;
               background-size: cover;
               z-index: z('cg__svg.direction');
@@ -185,6 +188,25 @@ $directions: ('W', 'NW', 'NE', 'E', 'SE', 'SW');
           @each $direction in $directions {
             &.#{$player}#{$direction} {
               background-image: url('../images/board/abalone/highlights/#{$player}#{$direction}.svg');
+              background-color: transparent;
+              background-size: cover;
+              z-index: z('cg__svg.direction');
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+.search__result {
+  .mini-board.orientation-p2 {
+    square {
+      &.last-move.to {
+        @each $player in $players {
+          @each $direction in $directions {
+            &.#{$player}#{$direction} {
+              background-image: url('../images/board/abalone/highlights/#{$player}#{swapDirection($direction)}.svg');
               background-color: transparent;
               background-size: cover;
               z-index: z('cg__svg.direction');
