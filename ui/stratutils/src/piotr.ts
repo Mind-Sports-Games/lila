@@ -299,13 +299,13 @@ export const piotr: Piotr = {
   '¦': 'j8',
 };
 
-export function abalonePiotrToKey(k: string): Key {
+export function abalonePiotrToKey(k: string): Key | undefined {
   const i = piotrKeys.findIndex(x => x === k);
   if (i < 0) {
     console.error('abalonePiotrToKey: invalid piotr key', k);
     return undefined;
   }
-  const pos: [number, number] = i < 81 ? [i % 9, i / 9] : abaloneHashPosToIndex(i);
+  const pos: [number, number] = i < 81 ? [i % 9, Math.floor(i / 9)] : abaloneHashPosToIndex(i);
   return (String.fromCharCode(pos[1] + 97) + '' + (pos[0] + 1)) as Key;
 }
 

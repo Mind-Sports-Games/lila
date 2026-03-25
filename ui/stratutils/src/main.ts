@@ -40,13 +40,16 @@ export function readDestsAbalone(lines?: string): Dests | null {
   const dests = new Map();
   if (lines)
     for (const line of lines.split(' ')) {
-      dests.set(
-        abalonePiotrToKey(line[0]),
-        line
-          .slice(1)
-          .split('')
-          .map(c => abalonePiotrToKey(c)),
-      );
+      const src = abalonePiotrToKey(line[0]);
+      if (!src) continue;
+      const targets = line
+        .slice(1)
+        .split('')
+        .flatMap(c => {
+          const k = abalonePiotrToKey(c);
+          return k ? [k] : [];
+        });
+      dests.set(src, targets);
     }
   return dests;
 }
