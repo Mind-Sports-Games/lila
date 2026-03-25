@@ -295,10 +295,13 @@ export default class AnalyseCtrl {
 
   setDropMode(cg: ChessgroundApi) {
     const playerIndex = cg.state.movable.playerIndex as cg.PlayerIndex;
-    setDropMode(cg.state, stratUtils.onlyDropsVariantPiece(cg.state.variant as VariantKey, playerIndex));
+    const isDropPly = isOnlyDropsPly(this.node, this.data.game.variant.key as VariantKey, this.data.onlyDropsVariant);
+    if (isDropPly) {
+      setDropMode(cg.state, stratUtils.onlyDropsVariantPiece(cg.state.variant as VariantKey, playerIndex));
+    }
     cg.set({
       dropmode: {
-        active: this.data.onlyDropsVariant,
+        active: isDropPly,
         showDropDests: !['go9x9', 'go13x13', 'go19x19', 'backgammon', 'hyper', 'nackgammon'].includes(
           cg.state.variant as VariantKey,
         ),
