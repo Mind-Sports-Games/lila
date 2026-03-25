@@ -34,10 +34,7 @@ if (db.getCollectionNames().indexOf(BAK) >= 0) {
   print('Backup collection ' + BAK + ' already exists — skipping backup step.');
   print('Drop it manually if you want to re-run the backup.');
 } else {
-  db.study_chapter_flat.aggregate([
-    { $match: FILTER },
-    { $out: BAK }
-  ]);
+  db.study_chapter_flat.aggregate([{ $match: FILTER }, { $out: BAK }]);
   const backedUp = db[BAK].countDocuments();
   print('Backup created: ' + BAK + ' (' + backedUp + ' documents)');
 }
@@ -49,9 +46,8 @@ if (db.getCollectionNames().indexOf(BAK) >= 0) {
 function mirrorKey(key) {
   // "e1" → "a5"
   const letter = key[0];
-  const num    = parseInt(key.slice(1));
-  return String.fromCharCode('a'.charCodeAt(0) + num - 1) +
-         (letter.charCodeAt(0) - 'a'.charCodeAt(0) + 1);
+  const num = parseInt(key.slice(1));
+  return String.fromCharCode('a'.charCodeAt(0) + num - 1) + (letter.charCodeAt(0) - 'a'.charCodeAt(0) + 1);
 }
 
 function mirrorUci(u) {
@@ -65,51 +61,46 @@ function getScores(fen) {
 }
 
 let chaptersUpdated = 0;
-let nodesUpdated    = 0;
+let nodesUpdated = 0;
 
-db.study_chapter_flat
-  .find({ 'setup.variant.gl': 7, 'setup.variant.v': 1 })
-  .forEach(chapter => {
-    const root    = chapter.root;
-    let   changed = false;
+db.study_chapter_flat.find({ 'setup.variant.gl': 7, 'setup.variant.v': 1 }).forEach(chapter => {
+  const root = chapter.root;
+  let changed = false;
 
-    for (const pathKey in root) {
-      if (pathKey === '_') continue;     // root node has no move
-      const node = root[pathKey];
-      if (!node.u) continue;
+  for (const pathKey in root) {
+    if (pathKey === '_') continue; // root node has no move
+    const node = root[pathKey];
+    if (!node.u) continue;
 
-      const parentKey = pathKey.length === 4 ? '_' : pathKey.slice(0, -4);
-      const parentFen = root[parentKey] && root[parentKey].f;
-      if (!parentFen) continue;
+    const parentKey = pathKey.length === 4 ? '_' : pathKey.slice(0, -4);
+    const parentFen = root[parentKey] && root[parentKey].f;
+    if (!parentFen) continue;
 
-      const newU = mirrorUci(node.u);
+    const newU = mirrorUci(node.u);
 
-      const [pa, pb] = getScores(parentFen);
-      const [ca, cb] = getScores(node.f);
-      const isCapture = ca > pa || cb > pb;
+    const [pa, pb] = getScores(parentFen);
+    const [ca, cb] = getScores(node.f);
+    const isCapture = ca > pa || cb > pb;
 
-      const orig = newU.slice(0, 2);
-      const dest = newU.slice(2, 4);
-      const newS = isCapture ? orig + 'x' + dest : newU;
+    const orig = newU.slice(0, 2);
+    const dest = newU.slice(2, 4);
+    const newS = isCapture ? orig + 'x' + dest : newU;
 
-      root[pathKey].u = newU;
-      root[pathKey].s = newS;
-      changed = true;
-      nodesUpdated++;
-    }
+    root[pathKey].u = newU;
+    root[pathKey].s = newS;
+    changed = true;
+    nodesUpdated++;
+  }
 
-    if (changed) {
-      // printjson({ // for dry-run verification
-      //   _id: chapter._id,
-      //   $set: { root: root }
-      // });
-      db.study_chapter_flat.updateOne(
-        { _id: chapter._id },
-        { $set: { root: root } }
-      );
-      chaptersUpdated++;
-    }
-  });
+  if (changed) {
+    // printjson({ // for dry-run verification
+    //   _id: chapter._id,
+    //   $set: { root: root }
+    // });
+    db.study_chapter_flat.updateOne({ _id: chapter._id }, { $set: { root: root } });
+    chaptersUpdated++;
+  }
+});
 
 print('Chapters updated: ' + chaptersUpdated);
 print('Nodes updated:    ' + nodesUpdated);
