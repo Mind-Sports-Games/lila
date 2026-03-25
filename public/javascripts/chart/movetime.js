@@ -31,6 +31,7 @@ playstrategy.movetimeChart = function (data, trans) {
               'shogi',
               'minishogi',
               'abalone',
+              'grandabalone',
               'linesOfAction',
               'go9x9',
               'go13x13',
