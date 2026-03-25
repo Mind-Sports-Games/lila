@@ -376,6 +376,19 @@ $pocket-col1-size: 9.5vw;
   grid-template-rows: $pocket-col1-size-grandabalone auto 3rem;
 }
 
+// grandabalone: correct score-box size (loop uses 9.5vw which wins over the earlier specific block)
+.variant-grandabalone .game-score {
+  width: $pocket-col1-size-grandabalone;
+  height: $pocket-col1-size-grandabalone;
+  &-top.p2 {
+    margin-left: calc(100% - #{$pocket-col1-size-grandabalone});
+  }
+  &-names {
+    width: calc(100% - 2 * #{$pocket-col1-size-grandabalone});
+    margin-left: $pocket-col1-size-grandabalone;
+  }
+}
+
 $pocket-height-oware: 14vh;
 .analyse.variant-oware {
   grid-template-rows: $pocket-height-oware auto calc(#{$pocket-height-oware} - 3rem) 3rem;
