@@ -97,7 +97,7 @@ object filter {
       )
     }
 
-  private def renderCheckbox(
+  def renderCheckbox(
       form: Form[_],
       key: String,
       index: Int,
