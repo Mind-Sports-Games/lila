@@ -128,7 +128,7 @@ object bits {
       p(trans.timeoutExpires(strong(secondsFromNow(ban.remainingSeconds)))),
       h2(trans.why()),
       p(
-        trans.pleasantChessExperience(),
+        trans.pleasantGameExperience(),
         br,
         trans.goodPractice(),
         br,

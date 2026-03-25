@@ -953,7 +953,7 @@ computer analysis, game chat and shareable URL.</string>
   <string name="weHadToTimeYouOutForAWhile">We had to time you out for a while.</string>
   <string name="timeoutExpires">The timeout expires %s.</string>
   <string name="why">Why?</string>
-  <string name="pleasantChessExperience">We aim to provide a pleasant chess experience for everyone.</string>
+  <string name="pleasantGameExperience">We aim to provide a pleasant game experience for everyone.</string>
   <string name="goodPractice">To that effect, we must ensure that all players follow good practice.</string>
   <string name="potentialProblem">When a potential problem is detected, we display this message.</string>
   <string name="howToAvoidThis">How to avoid this?</string>
