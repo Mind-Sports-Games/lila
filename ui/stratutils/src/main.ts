@@ -175,6 +175,7 @@ const noFishnetVariants: VariantKey[] = [
   'hyper',
   'nackgammon',
   'abalone',
+  'grandabalone',
 ];
 export function allowFishnetForVariant(variant: VariantKey) {
   return noFishnetVariants.indexOf(variant) == -1;
