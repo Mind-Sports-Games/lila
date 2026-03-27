@@ -33,15 +33,12 @@ const FILTER = { 'setup.variant.gl': 7, 'setup.variant.v': 1 };
 if (db.getCollectionNames().indexOf(BAK) >= 0) {
   // Backup exists from a previous run: restore original docs before re-migrating.
   print('Backup collection ' + BAK + ' found — restoring originals before re-running...');
-  db[BAK].find({}).forEach(function(doc) {
+  db[BAK].find({}).forEach(function (doc) {
     db.study_chapter_flat.replaceOne({ _id: doc._id }, doc);
   });
   print('Restored ' + db[BAK].count() + ' chapters from backup.');
 } else {
-  db.study_chapter_flat.aggregate([
-    { $match: { 'setup.variant.gl': 7, 'setup.variant.v': 1 } },
-    { $out: BAK },
-  ]);
+  db.study_chapter_flat.aggregate([{ $match: { 'setup.variant.gl': 7, 'setup.variant.v': 1 } }, { $out: BAK }]);
   const backedUp = db[BAK].count();
   print('Backup created: ' + BAK + ' (' + backedUp + ' documents)');
 }

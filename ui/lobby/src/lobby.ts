@@ -111,13 +111,13 @@ export default function PlayStrategyLobby(opts: LobbyOpts) {
       variantId: '5_6',
     },
     {
-      id: '5+3-abalone',
+      id: '5d2-grandabalone',
       lim: 5,
-      inc: 3,
+      delay: 2,
       perf: 'Abalone',
-      variant: 'abalone',
-      variantDisplayName: 'Abalone',
-      variantId: '12_1',
+      variant: 'grandabalone',
+      variantDisplayName: 'Grand Abalone',
+      variantId: '12_2',
     },
   ];
   const nbRoundSpread = spreadNumber('#nb_games_in_play > strong', 8),
