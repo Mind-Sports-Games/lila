@@ -41,7 +41,7 @@ object PoolList {
     PoolConfig(3 ++ 5, Wave(22 seconds, 30 players), Variant.FairySF(strategygames.fairysf.variant.Amazons)),
     PoolConfig(5 ++ 0, Wave(22 seconds, 30 players), Variant.FairySF(strategygames.fairysf.variant.Flipello)),
     PoolConfig(
-      5 ++ 3,
+      strategygames.Clock.SimpleDelayConfig(5 * 60, 2),
       Wave(22 seconds, 30 players),
       Variant.Abalone(strategygames.abalone.variant.Abalone)
     )
