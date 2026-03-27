@@ -983,7 +983,7 @@ object TournamentShield {
     case object Abalone
         extends Category(
           Variant.Abalone(strategygames.abalone.variant.Abalone),
-          Blitz53,
+          Delay52,
           2,
           1
         )
