@@ -20,22 +20,29 @@
 //
 // GL=7 (Abalone game logic), v=1.
 //
-// NOT IDEMPOTENT: run exactly once.
+// Safe to re-run: if the backup collection exists, originals are restored first.
 
 // ---------------------------------------------------------------------------
 // Step 1: backup — copy all matching chapters to a separate collection.
-// Run BEFORE the migration. To roll back: drop study_chapter_flat where
-// gl=7/v=1, then insert from the backup collection.
+// To roll back: re-run this script (restores from backup, then re-mirrors).
+// Or manually: drop study_chapter_flat where gl=7/v=1, then insert from backup.
 // ---------------------------------------------------------------------------
 const BAK = 'study_chapter_flat_bak_2603';
 const FILTER = { 'setup.variant.gl': 7, 'setup.variant.v': 1 };
 
 if (db.getCollectionNames().indexOf(BAK) >= 0) {
-  print('Backup collection ' + BAK + ' already exists — skipping backup step.');
-  print('Drop it manually if you want to re-run the backup.');
+  // Backup exists from a previous run: restore original docs before re-migrating.
+  print('Backup collection ' + BAK + ' found — restoring originals before re-running...');
+  db[BAK].find({}).forEach(function(doc) {
+    db.study_chapter_flat.replaceOne({ _id: doc._id }, doc);
+  });
+  print('Restored ' + db[BAK].count() + ' chapters from backup.');
 } else {
-  db.study_chapter_flat.aggregate([{ $match: FILTER }, { $out: BAK }]);
-  const backedUp = db[BAK].countDocuments();
+  db.study_chapter_flat.aggregate([
+    { $match: { 'setup.variant.gl': 7, 'setup.variant.v': 1 } },
+    { $out: BAK },
+  ]);
+  const backedUp = db[BAK].count();
   print('Backup created: ' + BAK + ' (' + backedUp + ' documents)');
 }
 
@@ -71,8 +78,9 @@ db.study_chapter_flat.find({ 'setup.variant.gl': 7, 'setup.variant.v': 1 }).forE
     if (pathKey === '_') continue; // root node has no move
     const node = root[pathKey];
     if (!node.u) continue;
+    if (!node.f) continue; // skip nodes without FEN — avoids TypeError in getScores
 
-    const parentKey = pathKey.length === 4 ? '_' : pathKey.slice(0, -4);
+    const parentKey = pathKey.length === 2 ? '_' : pathKey.slice(0, -2);
     const parentFen = root[parentKey] && root[parentKey].f;
     if (!parentFen) continue;
 
