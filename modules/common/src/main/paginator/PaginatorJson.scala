@@ -3,7 +3,7 @@ package paginator
 
 import play.api.libs.json._
 
-object PaginatorJson:
+object PaginatorJson {
 
   implicit val maxPerPageWrites: Writes[config.MaxPerPage] = Writes[config.MaxPerPage] { m =>
     JsNumber(m.value)
@@ -21,3 +21,4 @@ object PaginatorJson:
       "nextPage"           -> p.nextPage,
       "nbPages"            -> p.nbPages
     )
+}

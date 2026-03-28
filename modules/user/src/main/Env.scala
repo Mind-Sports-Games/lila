@@ -33,7 +33,7 @@ final class Env(
     ec: scala.concurrent.ExecutionContext,
     scheduler: Scheduler,
     ws: StandaloneWSClient
-):
+) {
 
   private val config = appConfig.get[UserConfig]("user")(AutoConfig.loader)
 
@@ -48,15 +48,17 @@ final class Env(
 
   lazy val jsonView = wire[JsonView]
 
-  lazy val noteApi =
+  lazy val noteApi = {
     def mk = (coll: Coll) => wire[NoteApi]
     mk(db(config.collectionNote))
+  }
 
   lazy val trophyApi = new TrophyApi(db(config.collectionTrophy), db(config.collectionTrophyKind), cacheApi)
 
-  lazy val rankingApi =
+  lazy val rankingApi = {
     def mk = (coll: Coll) => wire[RankingApi]
     mk(db(config.collectionRanking))
+  }
 
   lazy val cached: Cached = wire[Cached]
 
@@ -83,3 +85,4 @@ final class Env(
       rankingApi.remove(userId).discard
     }
   )
+}

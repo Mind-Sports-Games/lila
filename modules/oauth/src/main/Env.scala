@@ -22,7 +22,7 @@ final class Env(
 )(implicit
     ec: scala.concurrent.ExecutionContext,
     scheduler: org.apache.pekko.actor.Scheduler
-):
+) {
 
   private val config = appConfig.get[OauthConfig]("oauth")(AutoConfig.loader)
 
@@ -36,8 +36,9 @@ final class Env(
 
   lazy val tryServer: OAuthServer.Try = () =>
     scala.concurrent
-      .Future:
+      .Future {
         server.some
+    }
       .withTimeoutDefault(50 millis, none) recover { case e: Exception =>
       lila.log("security").warn("oauth", e)
       none
@@ -46,5 +47,6 @@ final class Env(
   lazy val tokenApi = wire[PersonalTokenApi]
 
   def forms = OAuthForm
+}
 
 private class OauthColls(val token: AsyncColl, val app: AsyncColl)

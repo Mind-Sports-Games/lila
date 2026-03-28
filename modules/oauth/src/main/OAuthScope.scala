@@ -1,56 +1,69 @@
 package lila.oauth
 
-sealed abstract class OAuthScope(val key: String, val name: String):
+sealed abstract class OAuthScope(val key: String, val name: String) {
   override def toString = s"Scope($key)"
+}
 
-object OAuthScope:
+object OAuthScope {
 
-  object Preference:
+  object Preference {
     case object Read  extends OAuthScope("preference:read", "Read preferences")
     case object Write extends OAuthScope("preference:write", "Write preferences")
+  }
 
-  object Email:
+  object Email {
     case object Read extends OAuthScope("email:read", "Read email address")
+  }
 
-  object Challenge:
+  object Challenge {
     case object Read  extends OAuthScope("challenge:read", "Read incoming challenges")
     case object Write extends OAuthScope("challenge:write", "Create, accept, decline challenges")
     case object Bulk  extends OAuthScope("challenge:bulk", "Create many games at once for other players")
+  }
 
-  object Study:
+  object Study {
     case object Read  extends OAuthScope("study:read", "Read private studies and broadcasts")
     case object Write extends OAuthScope("study:write", "Create, update, delete studies and broadcasts")
+  }
 
-  object Tournament:
+  object Tournament {
     case object Write extends OAuthScope("tournament:write", "Create and update tournaments")
+  }
 
-  object Puzzle:
+  object Puzzle {
     case object Read extends OAuthScope("puzzle:read", "Read puzzle activity")
+  }
 
-  object Team:
+  object Team {
     case object Write extends OAuthScope("team:write", "Join, leave, and manage teams")
+  }
 
-  object Msg:
+  object Msg {
     case object Write extends OAuthScope("msg:write", "Send private messages to other players")
+  }
 
-  object Board:
+  object Board {
     case object Play extends OAuthScope("board:play", "Play games with the board API")
+  }
 
-  object Bot:
+  object Bot {
     case object Play extends OAuthScope("bot:play", "Play games with the bot API")
+  }
 
-  object PrivateApi:
+  object PrivateApi {
     case object DbExport
         extends OAuthScope(
           "privateapi:dbexport",
           "Allows access to a few private APIs such as the game export API"
         )
+  }
 
-  object Web:
+  object Web {
     case object Login
         extends OAuthScope("web:login", "Create authenticated website sessions (grants full access!)")
     case object Mod
         extends OAuthScope("web:mod", "Use moderator tools (within the bounds of your permissions)")
+  }
 
   case class Scoped(user: lila.user.User, scopes: List[OAuthScope])
 
@@ -95,3 +108,4 @@ object OAuthScope:
     { case b: BSONString => OAuthScope.byKey.get(b.value) `toTry` s"No such scope: ${b.value}" },
     s => BSONString(s.key)
   )
+}

@@ -34,24 +34,24 @@ case class Event(
       (startsAt.getMillis / 1000 - nowSeconds).toInt
     }
 
-  def featureSince = startsAt minusMinutes (homepageHours * 60).toInt
+  def featureSince = startsAt `minusMinutes` (homepageHours * 60).toInt
 
   def featureNow = featureSince.isBeforeNow && !isFinishedSoon
 
-  def isFinishedSoon = finishesAt.isBefore(DateTime.now plusMinutes 5)
+  def isFinishedSoon = finishesAt.isBefore(DateTime.now `plusMinutes` 5)
 
   def isFinished = finishesAt.isBeforeNow
 
   def isNow = startsAt.isBeforeNow && !isFinished
 
-  def isNowOrSoon = startsAt.isBefore(DateTime.now plusMinutes 10) && !isFinished
+  def isNowOrSoon = startsAt.isBefore(DateTime.now `plusMinutes` 10) && !isFinished
 
   def id = _id
 }
 
 object Event {
 
-  def makeId = lila.common.ThreadLocalRandom nextString 8
+  def makeId = lila.common.ThreadLocalRandom `nextString` 8
 
   case class UserId(value: String) extends AnyVal
 }

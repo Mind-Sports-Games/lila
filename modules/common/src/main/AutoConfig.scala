@@ -14,14 +14,15 @@ import com.typesafe.config.*
   * @param name
   *   the name of the configuration key
   */
-final case class ConfigName(name: String) extends StaticAnnotation:
+final case class ConfigName(name: String) extends StaticAnnotation {
   assert(name != null && name.nonEmpty)
+}
 
-object AutoConfig:
+object AutoConfig {
 
   inline def loader[T] = ${ impl[T] }
 
-  private def impl[T](using Quotes)(using tpe: Type[T]) =
+  private def impl[T](using Quotes)(using tpe: Type[T]) = {
     import quotes.reflect.*
 
     // get class symbol and ensure it's indeed a class
@@ -30,7 +31,7 @@ object AutoConfig:
       .classSymbol
       .getOrElse(report.errorAndAbort(s"${Type.show[T]} must be a class"))
 
-    def build(confTerm: Expr[Config]) =
+    def build(confTerm: Expr[Config]) = {
       val argss: List[List[Expr[Any]]] = cls.primaryConstructor.paramSymss
         .filter(paramList => paramList.forall(!_.isTypeParam))
         .map { params =>
@@ -41,18 +42,19 @@ object AutoConfig:
 
             // see if the name needs to be overriden using ConfigName annotation
             val nameOverride = param.annotations
-              .collectFirst:
+              .collectFirst {
                 case a if a.tpe.derivesFrom(TypeRepr.of[ConfigName].typeSymbol) =>
                   val annot = a.asExprOf[ConfigName]
                   annot
+            }
               .map(ac => '{ $ac.name })
               .getOrElse(paramName)
 
             // Get the type of this class member
-            TypeRepr.of[T].memberType(param).asType match
+            TypeRepr.of[T].memberType(param).asType match {
               case '[t] =>
                 // summon ConfigLoader for the type of this parameter
-                Expr.summon[ConfigLoader[t]] match
+                Expr.summon[ConfigLoader[t]] match {
                   case None =>
                     // poop if we couldn't
                     report.errorAndAbort(
@@ -64,6 +66,8 @@ object AutoConfig:
                     '{
                       $value.load($confTerm, $nameOverride)
                     }
+                }
+            }
           }
         }
 
@@ -72,7 +76,7 @@ object AutoConfig:
         .select(cls.primaryConstructor)
         .appliedToArgss(argss.map(_.map(_.asTerm)))
         .asExprOf[T]
-    end build
+    } // end build
 
     // We are creating an AST for a lambda like this: (config: Config) => new T(...)
     // That's the only way I could figure it out given that `config` is a runtime parameter
@@ -89,11 +93,13 @@ object AutoConfig:
 
     // final definition of config loader
     '{
-      new ConfigLoader[T]:
-        def load(config: Config, path: String): T =
+      new ConfigLoader[T] {
+        def load(config: Config, path: String): T = {
           val conf = if path.isEmpty then config else config.getConfig(path)
           // we're invoking the lambda we manually constructed above
           $buildConfig(conf)
+        }
+      }
     }
-  end impl
-end AutoConfig
+  } // end impl
+} // end AutoConfig

@@ -1,6 +1,6 @@
 package lila.common
 
-object GreatPlayer:
+object GreatPlayer {
 
   val all: Map[String, String] = Map(
     ("Aagaard", "Jacob_Aagaard"),
@@ -610,3 +610,4 @@ object GreatPlayer:
     all get name map { s =>
       s"https://wikipedia.org/wiki/$s"
     }
+}

@@ -7,19 +7,20 @@ import scalatags.Text.all.*
 import lila.base.RawHtml
 import lila.common.base.StringUtils.{ escapeHtmlRaw, safeJsonString }
 
-object String:
+object String {
 
   private val slugR              = """[^\w-]""".r
   private val slugMultiDashRegex = """-{2,}""".r
 
   def lcfirst(str: String) = s"${str(0).toLower}${str.drop(1)}"
 
-  def slugify(input: String) =
+  def slugify(input: String) = {
     val nop1space    = input.trim.replace(' ', '-')
     val singleDashes = slugMultiDashRegex.replaceAllIn(nop1space, "-")
     val normalized   = Normalizer.normalize(singleDashes, Normalizer.Form.NFD)
     val slug         = slugR.replaceAllIn(normalized, "")
     slug.toLowerCase
+  }
 
   // https://www.compart.com/en/unicode/block/U+1F300
   private val multibyteSymbolsRegex               = "\\p{So}+".r
@@ -28,8 +29,9 @@ object String:
   def decodeUriPath(input: String): Option[String] =
     try
       play.utils.UriEncoding.decodePath(input, "UTF-8").some
-    catch
+    catch {
       case _: play.utils.InvalidUriEncodingException => None
+    }
 
   private def oneline(s: String)                            = s.replace('\n', ' ')
   def shorten(text: String, length: Int, sep: String = "?") =
@@ -41,17 +43,18 @@ object String:
       import java.lang.Character.*
       // true if >1/2 of the latin letters are uppercase
       (text take 80).foldLeft(0) { (i, c) =>
-        getType(c) match
+        getType(c) match {
           case UPPERCASE_LETTER => i + 1
           case LOWERCASE_LETTER => i - 1
           case _                => i
+        }
       } > 0
     }
   def noShouting(str: String): String = if isShouting(str) then str.toLowerCase else str
 
   def hasLinks = RawHtml.hasLinks
 
-  object base64:
+  object base64 {
     import java.util.Base64
     import java.nio.charset.StandardCharsets
     def encode(txt: String) =
@@ -59,40 +62,46 @@ object String:
     def decode(txt: String): Option[String] =
       try
         Some(new String(Base64.getDecoder.decode(txt), StandardCharsets.UTF_8))
-      catch
+      catch {
         case _: java.lang.IllegalArgumentException => none
+      }
+  }
 
   val atUsernameRegex = RawHtml.atUsernameRegex
 
-  object html:
+  object html {
 
     def richText(rawText: String, nl2br: Boolean = true, expandImg: Boolean = true): Frag =
-      raw:
+      raw {
         val withLinks = RawHtml.addLinks(rawText, expandImg)
         if nl2br then RawHtml.nl2br(withLinks) else withLinks
+      }
 
     def nl2brUnsafe(text: String): Frag =
-      raw:
+      raw {
         RawHtml.nl2br(text)
+      }
 
     def nl2br(text: String): Frag = nl2brUnsafe(escapeHtmlRaw(text))
 
     def escapeHtml(s: String): RawFrag =
-      raw:
+      raw {
         escapeHtmlRaw(s)
+      }
     def unescapeHtml(html: String): String =
       org.apache.commons.text.StringEscapeUtils.unescapeHtml4(html)
 
-    def markdownLinksOrRichText(text: String): Frag =
+    def markdownLinksOrRichText(text: String): Frag = {
       val escaped = escapeHtmlRaw(text)
       val marked  = RawHtml.justMarkdownLinks(escaped)
       if marked == escaped then richText(text)
       else nl2brUnsafe(marked)
+    }
 
     def safeJsonValue(jsValue: JsValue): String =
       // Borrowed from:
       // https://github.com/playframework/play-json/blob/160f66a84a9c5461c52b50ac5e222534f9e05442/play-json/js/src/main/scala/StaticBinding.scala#L65
-      jsValue match
+      jsValue match {
         case JsNull           => "null"
         case JsString(s)      => safeJsonString(s)
         case JsNumber(n)      => n.toString
@@ -105,8 +114,11 @@ object String:
               s"${safeJsonString(k)}:${safeJsonValue(v)}"
             }
             .mkString("{", ",", "}")
+      }
+  }
 
   private val prizeRegex =
     """(?i)(prize|\$|\u20ac|\u00a3|\u00a5|\u20b9|\u20a9|\u20ab|\u20ba|\u20bf|rupee|rupiah|ringgit|(\b|\d)usd|dollar|paypal|cash|award|\bfees?\b|\beuros?\b|price|(\b|\d)btc|bitcoin)""".r.unanchored
 
   def looksLikePrize(txt: String) = prizeRegex matches txt
+}

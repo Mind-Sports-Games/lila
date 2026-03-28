@@ -4,7 +4,7 @@ import play.api.http.HeaderNames
 import play.api.mvc.RequestHeader
 import play.api.routing.Router
 
-object HTTPRequest:
+object HTTPRequest {
 
   def isXhr(req: RequestHeader): Boolean =
     req.headers.get("X-Requested-With").contains("XMLHttpRequest")
@@ -51,19 +51,22 @@ object HTTPRequest:
   def referer(req: RequestHeader): Option[String] = req.headers.get(HeaderNames.REFERER)
 
   def ipAddress(req: RequestHeader) =
-    IpAddress.unchecked:
+    IpAddress.unchecked {
       req.remoteAddress.split(", ").lastOption | req.remoteAddress // trusted
+    }
 
   def sid(req: RequestHeader): Option[String] = req.session.get(LilaCookie.sessionId)
 
-  val isCrawler = UaMatcher:
+  val isCrawler = UaMatcher {
     """(?i)googlebot|googlebot-mobile|googlebot-image|mediapartners-google|bingbot|slurp|java|wget|curl|commons-httpclient|python-urllib|libwww|httpunit|nutch|phpcrawl|msnbot|adidxbot|blekkobot|teoma|ia_archiver|gingercrawler|webmon|httrack|webcrawler|fast-webcrawler|fastenterprisecrawler|convera|biglotron|grub\.org|usinenouvellecrawler|antibot|netresearchserver|speedy|fluffy|jyxobot|bibnum\.bnf|findlink|exabot|gigabot|msrbot|seekbot|ngbot|panscient|yacybot|aisearchbot|ioi|ips-agent|tagoobot|mj12bot|dotbot|woriobot|yanga|buzzbot|mlbot|purebot|lingueebot|yandex\.com/bots|""" +
       """voyager|cyberpatrol|voilabot|baiduspider|citeseerxbot|spbot|twengabot|postrank|turnitinbot|scribdbot|page2rss|sitebot|linkdex|ezooms|dotbot|mail\.ru|discobot|zombie\.js|heritrix|findthatfile|europarchive\.org|nerdbynature\.bot|sistrixcrawler|ahrefsbot|aboundex|domaincrawler|wbsearchbot|summify|ccbot|edisterbot|seznambot|ec2linkfinder|gslfbot|aihitbot|intelium_bot|yeti|retrevopageanalyzer|lb-spider|sogou|lssbot|careerbot|wotbox|wocbot|ichiro|duckduckbot|lssrocketcrawler|drupact|webcompanycrawler|acoonbot|openindexspider|gnamgnamspider|web-archive-net\.com\.bot|backlinkcrawler|""" +
       """coccoc|integromedb|contentcrawlerspider|toplistbot|seokicks-robot|it2media-domain-crawler|ip-web-crawler\.com|siteexplorer\.info|elisabot|proximic|changedetection|blexbot|arabot|wesee:search|niki-bot|crystalsemanticsbot|rogerbot|360spider|psbot|interfaxscanbot|lipperheyseoservice|ccmetadatascaper|g00g1e\.net|grapeshotcrawler|urlappendbot|brainobot|fr-crawler|binlar|simplecrawler|simplecrawler|livelapbot|twitterbot|cxensebot|smtbot|facebookexternalhit|daumoa|sputnikimagebot|visionutils|yisouspider|parsijoobot|mediatoolkit\.com|semrushbot"""
+  }
 
-  final class UaMatcher(rStr: String):
+  final class UaMatcher(rStr: String) {
     private val regex = rStr.r
     def apply(req: RequestHeader): Boolean = userAgent(req).exists(regex.findFirstIn(_).isDefined)
+  }
 
   def isFishnet(req: RequestHeader) = req.path.startsWith("/fishnet/")
 
@@ -99,9 +102,10 @@ object HTTPRequest:
   private val ApiVersionHeaderPattern = """application/vnd\.playstrategy\.v(\d++)\+json""".r
 
   def apiVersion(req: RequestHeader): Option[ApiVersion] =
-    req.headers.get(HeaderNames.ACCEPT).flatMap:
+    req.headers.get(HeaderNames.ACCEPT).flatMap {
       case ApiVersionHeaderPattern(v) => v.toIntOption.map(ApiVersion.apply)
       case _                          => none
+    }
 
   private def isDataDump(req: RequestHeader) = req.path == "/account/personal-data"
 
@@ -114,3 +118,4 @@ object HTTPRequest:
     if isXhr(req) then apiVersion(req).fold("xhr") { v => s"mobile/$v" }
     else if isCrawler(req) then "crawler"
     else "browser"
+}

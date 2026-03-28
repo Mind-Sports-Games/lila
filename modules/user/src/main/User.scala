@@ -30,12 +30,13 @@ case class User(
     plan: Plan,
     totpSecret: Option[TotpSecret] = None,
     marks: UserMarks = UserMarks.empty
-) extends Ordered[User]:
+) extends Ordered[User] {
 
   override def equals(other: Any) =
-    other match
+    other match {
       case u: User => id == u.id
       case _       => false
+    }
 
   override def hashCode: Int = id.hashCode
 
@@ -145,15 +146,16 @@ case class User(
 
   def isPlayStrategyTourBot = roles.exists(_ `contains` "ROLE_PSTBOT")
   def isUserBot             = isBot && !isPlayStrategyTourBot
+}
 
-object User:
+object User {
 
   type ID = String
 
   type CredentialCheck = ClearPassword => Boolean
-  case class LoginCandidate(user: User, check: CredentialCheck):
+  case class LoginCandidate(user: User, check: CredentialCheck) {
     import LoginCandidate._
-    def apply(p: PasswordAndToken): Result =
+    def apply(p: PasswordAndToken): Result = {
       val res =
         if (check(p.password)) user.totpSecret.fold[Result](Success(user)) { tp =>
           p.token.fold[Result](MissingTotpToken) { token =>
@@ -163,14 +165,18 @@ object User:
         else InvalidUsernameOrPassword
       lila.mon.user.auth.count(res.success).increment()
       res
+    }
     def option(p: PasswordAndToken): Option[User] = apply(p).toOption
-  object LoginCandidate:
-    sealed abstract class Result(val toOption: Option[User]):
+  }
+  object LoginCandidate {
+    sealed abstract class Result(val toOption: Option[User]) {
       def success = toOption.isDefined
+    }
     case class Success(user: User)        extends Result(user.some)
     case object InvalidUsernameOrPassword extends Result(none)
     case object MissingTotpToken          extends Result(none)
     case object InvalidTotpToken          extends Result(none)
+  }
 
   val anonymous      = "Anonymous"
   val playstrategyId = "playstrategy"
@@ -187,19 +193,22 @@ object User:
   case class LightPerf(user: LightUser, perfKey: String, rating: Int, progress: Int)
   case class LightCount(user: LightUser, count: Int)
 
-  case class Emails(current: Option[EmailAddress], previous: Option[NormalizedEmailAddress]):
+  case class Emails(current: Option[EmailAddress], previous: Option[NormalizedEmailAddress]) {
     def list = current.toList ::: previous.toList
+  }
   case class WithEmails(user: User, emails: Emails)
 
-  case class ClearPassword(value: String) extends AnyVal:
+  case class ClearPassword(value: String) extends AnyVal {
     override def toString = "ClearPassword(****)"
+  }
 
   case class TotpToken(value: String) extends AnyVal
   case class PasswordAndToken(password: ClearPassword, token: Option[TotpToken])
 
-  case class Speaker(username: String, title: Option[Title], enabled: Boolean, marks: Option[UserMarks]):
+  case class Speaker(username: String, title: Option[Title], enabled: Boolean, marks: Option[UserMarks]) {
     def isBot   = title `has` Title.BOT
     def isTroll = marks.exists(_.troll)
+  }
 
   case class Contact(
       _id: ID,
@@ -207,7 +216,7 @@ object User:
       marks: Option[UserMarks],
       roles: Option[List[String]],
       createdAt: DateTime
-  ):
+  ) {
     def id                     = _id
     def isKid                  = ~kid
     def isTroll                = marks.exists(_.troll)
@@ -216,14 +225,17 @@ object User:
     def isDaysOld(days: Int)   = createdAt `isBefore` DateTime.now.minusDays(days)
     def isHoursOld(hours: Int) = createdAt `isBefore` DateTime.now.minusHours(hours)
     def kidId                  = if (isKid) KidId(id) else NonKidId(id)
-  case class Contacts(orig: Contact, dest: Contact):
+  }
+  case class Contacts(orig: Contact, dest: Contact) {
     def hasKid = orig.isKid || dest.isKid
+  }
 
-  case class PlayTime(total: Int, tv: Int):
+  case class PlayTime(total: Int, tv: Int) {
     import org.joda.time.Period
     def totalPeriod      = new Period(total * 1000L)
     def tvPeriod         = new Period(tv * 1000L)
     def nonEmptyTvPeriod = (tv > 0) `option` tvPeriod
+  }
   implicit def playTimeHandler: BSONDocumentHandler[PlayTime] =
     reactivemongo.api.bson.Macros.handler[PlayTime]
 
@@ -246,7 +258,7 @@ object User:
 
   def noGhost(name: String) = !isGhost(name)
 
-  object BSONFields:
+  object BSONFields {
     val id                    = "_id"
     val username              = "username"
     val perfs                 = "perfs"
@@ -279,13 +291,14 @@ object User:
     val eraseAt               = "eraseAt"
     val erasedAt              = "erasedAt"
     val blind                 = "blind"
+  }
 
   def withFields[A](f: BSONFields.type => A): A = f(BSONFields)
 
   import lila.db.BSON
   import lila.db.dsl._
 
-  implicit val userBSONHandler: BSON[User] = new BSON[User]:
+  implicit val userBSONHandler: BSON[User] = new BSON[User] {
 
     import BSONFields._
     import reactivemongo.api.bson.BSONDocument
@@ -297,7 +310,7 @@ object User:
     implicit private def planHandler: BSONDocumentHandler[Plan]       = Plan.planBSONHandler
     implicit private def totpSecretHandler: BSONHandler[TotpSecret]   = TotpSecret.totpSecretBSONHandler
 
-    def reads(r: BSON.Reader): User =
+    def reads(r: BSON.Reader): User = {
       val userTitle = r.getO[Title](title)
       User(
         id = r `str` id,
@@ -321,6 +334,7 @@ object User:
         totpSecret = r.getO[TotpSecret](totpSecret),
         marks = r.getO[UserMarks](marks) | UserMarks.empty
       )
+    }
 
     def writes(w: BSON.Writer, o: User) =
       BSONDocument(
@@ -342,6 +356,7 @@ object User:
         totpSecret -> o.totpSecret,
         marks      -> o.marks.nonEmpty
       )
+  }
 
   implicit val speakerHandler: BSONDocumentHandler[Speaker] = reactivemongo.api.bson.Macros.handler[Speaker]
   implicit val contactHandler: BSONDocumentHandler[Contact] = reactivemongo.api.bson.Macros.handler[Contact]
@@ -358,3 +373,4 @@ object User:
       )
 
   val topPerfTrophiesEnabled = false
+}

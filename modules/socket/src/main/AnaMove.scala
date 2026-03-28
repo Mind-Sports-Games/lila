@@ -61,7 +61,7 @@ case class AnaMove(
           }
         )
         val sit     = game.situation
-        val movable = sit playable false
+        val movable = sit `playable` false
         val fen     = Forsyth.>>(lib, game)
         val captLen = (sit, dest) match {
           case (Situation.Draughts(sit), Pos.Draughts(dest)) =>
@@ -74,13 +74,13 @@ case class AnaMove(
             case (Situation.Draughts(sit), Pos.Draughts(dest)) =>
               AnaDests.validMoves(
                 Situation.Draughts(sit),
-                sit.ghosts > 0 option dest,
+                sit.ghosts > 0 `option` dest,
                 ~fullCapture
               )
             case _ => Map.empty[strategygames.draughts.Pos, List[strategygames.draughts.Move]]
           }
         val truncatedMoves =
-          (~fullCapture && ~captLen > 1) option AnaDests.truncateMoves(validMoves)
+          (~fullCapture && ~captLen > 1) `option` AnaDests.truncateMoves(validMoves)
         Branch(
           id = UciCharPair(lib, uci),
           ply = game.plies,
@@ -100,7 +100,7 @@ case class AnaMove(
                   .getOrElse(validMoves.view.mapValues { _ map (_.dest) })
                   .to(Map)
                   .map { case (p, m) => (Pos.Draughts(p), m.map(Pos.Draughts)) }
-              movable option draughtsDests
+              movable `option` draughtsDests
             }
             case _ => Some(movable so game.situation.destinations)
           },
@@ -123,16 +123,16 @@ case class AnaMove(
 object AnaMove {
 
   private def dataGameLogic(d: JsObject): GameLogic =
-    GameLogic(d int "lib" getOrElse 0)
+    GameLogic(d `int` "lib" getOrElse 0)
 
   def parse(o: JsObject) =
     for {
-      d <- o obj "d"
+      d <- o `obj` "d"
       gl = dataGameLogic(d)
-      orig <- d str "orig" flatMap { pos => Pos.fromKey(gl, pos) }
-      dest <- d str "dest" flatMap { pos => Pos.fromKey(gl, pos) }
-      fen  <- d str "fen" map { fen => FEN.apply(gl, fen) }
-      path <- d str "path"
+      orig <- d `str` "orig" flatMap { pos => Pos.fromKey(gl, pos) }
+      dest <- d `str` "dest" flatMap { pos => Pos.fromKey(gl, pos) }
+      fen  <- d `str` "fen" map { fen => FEN.apply(gl, fen) }
+      path <- d `str` "path"
       v = Variant.orDefault(gl, ~d.str("variant"))
     } yield AnaMove(
       orig = orig,
@@ -140,11 +140,11 @@ object AnaMove {
       variant = v,
       fen = fen,
       path = path,
-      chapterId = d str "ch",
+      chapterId = d `str` "ch",
       promotion = d.str("promotion").flatMap { p =>
         Role.allPromotableByGroundName(gl, v.gameFamily).get(p)
       },
-      uci = d str "uci",
-      fullCapture = d boolean "fullCapture"
+      uci = d `str` "uci",
+      fullCapture = d `boolean` "fullCapture"
     )
 }

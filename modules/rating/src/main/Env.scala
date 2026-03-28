@@ -3,7 +3,7 @@ package lila.rating
 import com.softwaremill.macwire._
 
 @Module
-final class Env(settingStore: lila.memo.SettingStore.Builder):
+final class Env(settingStore: lila.memo.SettingStore.Builder) {
 
   import RatingFactor.implicits._
 
@@ -14,3 +14,4 @@ final class Env(settingStore: lila.memo.SettingStore.Builder):
   )
 
   val getFactors = (() => ratingFactorsSetting.get())
+}

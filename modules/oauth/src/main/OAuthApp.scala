@@ -52,13 +52,13 @@ object OAuthApp {
       OAuthApp(
         clientId = r.get[Id](clientId),
         clientSecret = r.get[Secret](clientSecret),
-        name = r str name,
+        name = r `str` name,
         homepageUri = r.get[AbsoluteUrl](homepageUri),
         redirectUri =
-          r.get[List[AbsoluteUrl]](redirectUri).headOption err "Missing OAuthApp.redirectUri array",
-        author = r str author,
+          r.get[List[AbsoluteUrl]](redirectUri).headOption `err` "Missing OAuthApp.redirectUri array",
+        author = r `str` author,
         createdAt = r.get[DateTime](createdAt),
-        description = r strO description
+        description = r `strO` description
       )
 
     def writes(w: BSON.Writer, o: OAuthApp) =

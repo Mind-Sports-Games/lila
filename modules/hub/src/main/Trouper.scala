@@ -11,7 +11,7 @@ import scala.concurrent.{ ExecutionContext, Future, Promise }
  * Has an unbounded (!) Queue of messages.
  * Like Duct, but for synchronous message processors.
  */
-abstract class Trouper(implicit ec: ExecutionContext) extends lila.common.Tellable:
+abstract class Trouper(implicit ec: ExecutionContext) extends lila.common.Tellable {
 
   import Trouper._
 
@@ -29,10 +29,11 @@ abstract class Trouper(implicit ec: ExecutionContext) extends lila.common.Tellab
     if (isAlive && stateRef.getAndUpdate(state => Some(state.fold(Queue.empty[Any])(_ enqueue msg))).isEmpty)
       run(msg)
 
-  def ask[A](makeMsg: Promise[A] => Any): Fu[A] =
+  def ask[A](makeMsg: Promise[A] => Any): Fu[A] = {
     val promise = Promise[A]()
     this ! makeMsg(promise)
     promise.future
+  }
 
   def queueSize = stateRef.get().fold(0)(_.size + 1)
 
@@ -54,21 +55,25 @@ abstract class Trouper(implicit ec: ExecutionContext) extends lila.common.Tellab
   private val fallback: Receive = { case msg =>
     lila.log("trouper").warn(s"unhandled msg: $msg")
   }
+}
 
-object Trouper:
+object Trouper {
 
   type Receive = PartialFunction[Any, Unit]
 
   private type State = Option[Queue[Any]]
 
-  private val postRunUpdate = new UnaryOperator[State]:
+  private val postRunUpdate = new UnaryOperator[State] {
     override def apply(state: State): State =
       state flatMap { q =>
         if (q.isEmpty) None else Some(q.tail)
       }
+  }
 
   def stub(implicit ec: ExecutionContext) =
-    new Trouper:
+    new Trouper {
       val process: Receive = { case msg =>
         lila.log("trouper").warn(s"stub trouper received: $msg")
       }
+    }
+}

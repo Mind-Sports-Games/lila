@@ -2,7 +2,7 @@ package lila.pref
 
 sealed abstract class PrefCateg(val slug: String)
 
-object PrefCateg:
+object PrefCateg {
 
   case object GameDisplay  extends PrefCateg("game-display")
   case object ChessClock   extends PrefCateg("chess-clock")
@@ -12,3 +12,4 @@ object PrefCateg:
   val all: List[PrefCateg] = List(GameDisplay, ChessClock, GameBehavior, Privacy)
 
   def apply(slug: String) = all find (_.slug == slug)
+}

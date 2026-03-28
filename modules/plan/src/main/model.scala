@@ -9,24 +9,29 @@ import lila.user.User
 case class Source(value: String) extends AnyVal
 
 sealed abstract class Freq(val renew: Boolean)
-object Freq:
+object Freq {
   case object Monthly extends Freq(renew = true)
   case object Onetime extends Freq(renew = false)
+}
 
-case class Usd(value: BigDecimal) extends AnyVal with Ordered[Usd]:
+case class Usd(value: BigDecimal) extends AnyVal with Ordered[Usd] {
   def compare(other: Usd) = value compare other.value
   def cents               = Cents((value * 100).toInt)
   override def toString   = s"$$$value"
-object Usd:
+}
+object Usd {
   def apply(value: Int): Usd = Usd(BigDecimal(value))
-case class Cents(value: Int) extends AnyVal with Ordered[Cents]:
+}
+case class Cents(value: Int) extends AnyVal with Ordered[Cents] {
   def compare(other: Cents) = Integer.compare(value, other.value)
   def usd                   = Usd(BigDecimal(value, 2))
   override def toString     = usd.toString
   def display               = toString
+}
 
-object Cents:
+object Cents {
   val lifetime = Cents(25000)
+}
 
 case class Country(code: String) extends AnyVal
 
@@ -41,11 +46,13 @@ case class StripeProducts(monthly: String, onetime: String)
 
 case class StripeItem(id: String, price: StripePrice)
 
-case class StripePrice(product: String, unit_amount: Cents):
+case class StripePrice(product: String, unit_amount: Cents) {
   def cents = unit_amount
   def usd   = cents.usd
-object StripePrice:
+}
+object StripePrice {
   val defaultAmounts = List(5, 10, 20, 50).map(Usd.apply).map(_.cents)
+}
 
 case class NextUrls(cancel: String, success: String)
 
@@ -66,48 +73,54 @@ case class StripeSubscription(
     cancel_at_period_end: Boolean,
     status: String,
     default_payment_method: Option[String]
-):
+) {
   def renew    = !cancel_at_period_end
   def isActive = status == "active"
+}
 
 case class StripeCustomer(
     id: StripeCustomerId,
     email: Option[String],
     subscriptions: StripeSubscriptions
-):
+) {
 
   def firstSubscription = subscriptions.data.headOption
   def renew             = firstSubscription so (_.renew)
+}
 
 case class StripeCharge(
     id: StripeChargeId,
     amount: Cents,
     customer: StripeCustomerId,
     billing_details: Option[StripeCharge.BillingDetails]
-):
+) {
   def lifetimeWorthy = amount >= Cents.lifetime
   def country        = billing_details.flatMap(_.address).flatMap(_.country).map(Country)
+}
 
-object StripeCharge:
+object StripeCharge {
   case class Address(country: Option[String])
   case class BillingDetails(address: Option[Address])
+}
 
 case class StripeInvoice(
     id: Option[String],
     amount_due: Int,
     created: Long,
     paid: Boolean
-):
+) {
   def cents    = Cents(amount_due)
   def usd      = cents.usd
   def dateTime = new DateTime(created * 1000)
+}
 
 case class StripePaymentMethod(card: Option[StripeCard])
 
 case class StripeCard(brand: String, last4: String, exp_year: Int, exp_month: Int)
 
-case class StripeCompletedSession(customer: StripeCustomerId, mode: String):
+case class StripeCompletedSession(customer: StripeCustomerId, mode: String) {
   def freq = if (mode == "subscription") Freq.Monthly else Freq.Onetime
+}
 
 case class StripeSetupIntent(payment_method: String)
 
@@ -115,11 +128,13 @@ case class StripeSessionWithIntent(setup_intent: StripeSetupIntent)
 
 // payPal model
 
-case class PayPalAmount(value: BigDecimal, currency_code: Currency):
+case class PayPalAmount(value: BigDecimal, currency_code: Currency) {
   def cents = Usd(value).cents
   def usd   = Usd(value)
-object PayPalAmount:
+}
+object PayPalAmount {
   val defaultAmounts = List(5, 10, 20, 50).map(Usd.apply).map(_.cents)
+}
 
 case class PayPalOrderId(value: String)        extends AnyVal with StringValue
 case class PayPalSubscriptionId(value: String) extends AnyVal with StringValue
@@ -129,14 +144,16 @@ case class PayPalOrder(
     status: String,
     purchase_units: List[PayPalPurchaseUnit],
     payer: PayPalPayer
-):
-  val userId = purchase_units.headOption.flatMap(_.custom_id).so(_.trim) match
+) {
+  val userId = purchase_units.headOption.flatMap(_.custom_id).so(_.trim) match {
     case s"$userId" => userId.some
     case _          => none
+  }
   def isCompleted        = status == "COMPLETED"
   def isCompletedCapture = isCompleted && intent == "CAPTURE"
   def capturedMoney      = isCompletedCapture so purchase_units.headOption.map(_.amount.cents)
   def country            = payer.address.flatMap(_.country_code)
+}
 case class PayPalPayment(amount: PayPalAmount)
 case class PayPalBillingInfo(last_payment: PayPalPayment, next_billing_time: DateTime)
 case class PayPalSubscription(
@@ -144,31 +161,36 @@ case class PayPalSubscription(
     status: String,
     subscriber: PayPalPayer,
     billing_info: PayPalBillingInfo
-):
+) {
   def country       = subscriber.address.flatMap(_.country_code)
   def capturedMoney = billing_info.last_payment.amount.cents
   def nextChargeAt  = billing_info.next_billing_time
   def isActive      = status == "ACTIVE"
+}
 case class CreatePayPalOrder(
     checkout: PlanCheckout,
     user: User,
     isLifetime: Boolean
-):
+) {
   def makeCustomId = user.id
+}
 case class PayPalOrderCreated(id: PayPalOrderId)
 case class PayPalSubscriptionCreated(id: PayPalSubscriptionId)
 case class PayPalPurchaseUnit(amount: PayPalAmount, custom_id: Option[String])
 case class PayPalPayerId(value: String) extends AnyVal with StringValue
-case class PayPalPayer(payer_id: PayPalPayerId, address: Option[PayPalAddress]):
+case class PayPalPayer(payer_id: PayPalPayerId, address: Option[PayPalAddress]) {
   def id = payer_id
+}
 case class PayPalAddress(country_code: Option[Country])
 
 case class PayPalEventId(value: String) extends AnyVal with StringValue
-case class PayPalEvent(id: PayPalEventId, event_type: String, resource_type: String, resource: JsObject):
+case class PayPalEvent(id: PayPalEventId, event_type: String, resource_type: String, resource: JsObject) {
   def tpe         = event_type
   def resourceTpe = resource_type
   def resourceId  = resource `str` "id"
+}
 
 case class PayPalPlanId(value: String) extends AnyVal with StringValue
-case class PayPalPlan(id: PayPalPlanId, name: String, status: String, billing_cycles: JsArray):
+case class PayPalPlan(id: PayPalPlanId, name: String, status: String, billing_cycles: JsArray) {
   def active = status == "ACTIVE"
+}

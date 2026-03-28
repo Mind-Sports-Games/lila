@@ -8,7 +8,7 @@ import scala.util.{ Success, Try }
 
 import dsl.*
 
-abstract class BSON[T] extends BSONReadOnly[T] with BSONDocumentReader[T] with BSONDocumentWriter[T]:
+abstract class BSON[T] extends BSONReadOnly[T] with BSONDocumentReader[T] with BSONDocumentWriter[T] {
 
   import BSON.*
 
@@ -17,22 +17,25 @@ abstract class BSON[T] extends BSONReadOnly[T] with BSONDocumentReader[T] with B
   def writeTry(obj: T) = Success(writes(writer, obj))
 
   def write(obj: T) = writes(writer, obj)
+}
 
-abstract class BSONReadOnly[T] extends BSONDocumentReader[T]:
+abstract class BSONReadOnly[T] extends BSONDocumentReader[T] {
 
   import BSON.*
 
   def reads(reader: Reader): T
 
   def readDocument(doc: Bdoc) =
-    Try:
+    Try {
       reads(new Reader(doc))
+    }
 
   def read(doc: Bdoc) = readDocument(doc).get
+}
 
-object BSON extends Handlers:
+object BSON extends Handlers {
 
-  final class Reader(val doc: Bdoc):
+  final class Reader(val doc: Bdoc) {
 
     def get[A: BSONReader](k: String): A =
       doc.getAsTry[A](k).get
@@ -74,8 +77,9 @@ object BSON extends Handlers:
     def contains = doc.contains
 
     def debug = BSON.debug(doc)
+  }
 
-  final class Writer:
+  final class Writer {
 
     def bool(b: Boolean): BSONBoolean               = BSONBoolean(b)
     def boolO(b: Boolean): Option[BSONBoolean]      = if b then Some(BSONBoolean(true)) else None
@@ -89,12 +93,13 @@ object BSON extends Handlers:
     def bytesO(b: Array[Byte]): Option[BSONValue]          = byteArrayO(ByteArray(b))
     def bytes(b: Array[Byte]): BSONBinary                  = BSONBinary(b, ByteArray.subtype)
     def strListO(list: List[String]): Option[List[String]] =
-      list match
+      list match {
         case Nil          => None
         case List("")     => None
         case List("", "") => None
         case List(a, "")  => Some(List(a))
         case full         => Some(full)
+      }
     def listO[A](list: List[A])(implicit writer: BSONWriter[A]): Option[Barr] =
       if list.isEmpty then None
       else Some(BSONArray(list flatMap writer.writeOpt))
@@ -102,11 +107,12 @@ object BSON extends Handlers:
     def double(i: Double): BSONDouble                    = BSONDouble(i)
     def doubleO(i: Double): Option[BSONDouble]           = if i != 0 then Some(BSONDouble(i)) else None
     def zero[A](a: A)(implicit zero: Zero[A]): Option[A] = if zero.zero == a then None else Some(a)
+  }
 
   val writer = new Writer
 
   def debug(v: BSONValue): String =
-    v match
+    v match {
       case d: Bdoc        => debugDoc(d)
       case d: Barr        => debugArr(d)
       case BSONString(x)  => x
@@ -114,6 +120,7 @@ object BSON extends Handlers:
       case BSONDouble(x)  => x.toString
       case BSONBoolean(x) => x.toString
       case v              => v.toString
+    }
   def debugArr(doc: Barr): String = doc.values.toList.map(debug).mkString("[", ", ", "]")
   def debugDoc(doc: Bdoc): String =
     (doc.elements.toList map {
@@ -124,3 +131,4 @@ object BSON extends Handlers:
   def print(v: BSONValue): Unit = println(debug(v))
 
   def hashDoc(doc: Bdoc): String = debugDoc(doc).replace(" ", "")
+}

@@ -10,7 +10,7 @@ case class Charge(
     payPalCheckout: Option[Patron.PayPalCheckout] = none,
     cents: Cents,
     date: DateTime
-):
+) {
 
   def id = _id
 
@@ -27,8 +27,9 @@ case class Charge(
   def lifetimeWorthy = cents >= Cents.lifetime
 
   def copyAsNew = copy(_id = Charge.makeId, date = DateTime.now)
+}
 
-object Charge:
+object Charge {
 
   private def makeId = lila.common.ThreadLocalRandom `nextString` 8
 
@@ -61,3 +62,4 @@ object Charge:
       txnId: Option[String],
       subId: Option[String]
   )
+}

@@ -33,7 +33,7 @@ final class RankingApi(
           "perf"      -> perfType.id,
           "rating"    -> perf.intRating,
           "prog"      -> perf.progress,
-          "stable"    -> perf.rankable(PerfType variantOf perfType),
+          "stable"    -> perf.rankable(PerfType `variantOf` perfType),
           "expiresAt" -> DateTime.now.plusDays(31) // change back to 7 when more regular users
         ),
         upsert = true
@@ -41,7 +41,7 @@ final class RankingApi(
       .void
 
   def remove(userId: User.ID): Funit =
-    userRepo byId userId flatMap {
+    userRepo `byId` userId flatMap {
       _ so { user =>
         coll.delete
           .one(
@@ -207,7 +207,7 @@ final class RankingApi(
         .buildAsyncFuture { _ =>
           lila.common.LilaFuture
             .linear(PerfType.leaderboardable) { pt =>
-              compute(pt) dmap (pt -> _)
+              compute(pt) `dmap` (pt -> _)
             }
             .dmap(_.toMap)
         }

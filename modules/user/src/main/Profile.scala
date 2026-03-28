@@ -13,12 +13,13 @@ case class Profile(
     cfcRating: Option[Int] = None,
     dsbRating: Option[Int] = None,
     links: Option[String] = None
-):
+) {
 
   def nonEmptyRealName =
-    List(ne(firstName), ne(lastName)).flatten match
+    List(ne(firstName), ne(lastName)).flatten match {
       case Nil   => none
       case names => (names mkString " ").some
+    }
 
   def countryInfo = country flatMap Countries.info
 
@@ -44,8 +45,9 @@ case class Profile(
       dsbRating.map { OfficialRating("dsb", _) }
 
   private def ne(str: Option[String]) = str.filter(_.nonEmpty)
+}
 
-object Profile:
+object Profile {
 
   case class OfficialRating(name: String, rating: Int)
 
@@ -53,3 +55,4 @@ object Profile:
 
   import reactivemongo.api.bson.Macros
   private[user] val profileBSONHandler = Macros.handler[Profile]
+}

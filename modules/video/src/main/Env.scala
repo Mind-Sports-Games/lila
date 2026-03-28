@@ -28,7 +28,7 @@ final class Env(
     db: lila.db.Db,
     cacheApi: lila.memo.CacheApi,
     mode: Mode
-)(implicit ec: scala.concurrent.ExecutionContext):
+)(implicit ec: scala.concurrent.ExecutionContext) {
 
   private val config = appConfig.get[VideoConfig]("video")(AutoConfig.loader)
 
@@ -48,7 +48,7 @@ final class Env(
     api = api
   )
 
-  if (mode == Mode.Prod)
+  if (mode == Mode.Prod) {
     scheduler.scheduleWithFixedDelay(config.sheetDelay * 2, config.sheetDelay) { () =>
       sheet.fetchAll.logFailure(logger).discard
     }
@@ -56,3 +56,5 @@ final class Env(
     scheduler.scheduleWithFixedDelay(config.youtubeDelay * 2, config.youtubeDelay) { () =>
       youtube.updateAll.logFailure(logger).discard
     }
+  }
+}

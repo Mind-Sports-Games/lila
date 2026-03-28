@@ -2,7 +2,7 @@ package lila.core.lilaism
 
 import cats.mtl.Raise
 
-trait CoreExports:
+trait CoreExports {
 
   type Fu[A] = Future[A]
   type Funit = Fu[Unit]
@@ -24,18 +24,20 @@ trait CoreExports:
   export scalalib.model.{ Max, MaxPerPage, MaxPerSecond }
 
   // Random wrapper with secureString for backwards compatibility
-  object Random:
+  object Random {
     def secureString(len: Int): String = scalalib.SecureRandom.nextString(len)
     def nextString(len: Int): String = scalalib.SecureRandom.nextString(len)
     def nextInt(n: Int): Int = scalalib.SecureRandom.nextInt(n)
     def nextBoolean(): Boolean = scalalib.SecureRandom.nextBoolean()
     def shuffle[T, C](xs: IterableOnce[T])(using scala.collection.BuildFrom[xs.type, T, C]): C =
       scalalib.SecureRandom.shuffle(xs)
+  }
 
   export cats.syntax.all.*
   export cats.{ Eq, Show }
   export cats.data.NonEmptyList
 
   export cats.mtl.syntax.raise.*
+}
 
 object Core extends CoreExports

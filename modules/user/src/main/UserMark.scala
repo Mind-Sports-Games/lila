@@ -3,9 +3,10 @@ package lila.user
 import reactivemongo.api.bson.BSONHandler
 import lila.db.dsl._
 
-sealed trait UserMark:
+sealed trait UserMark {
   def key = toString.toLowerCase
-object UserMark:
+}
+object UserMark {
   case object Boost     extends UserMark
   case object Engine    extends UserMark
   case object Troll     extends UserMark
@@ -18,8 +19,9 @@ object UserMark:
   }.toMap
   val bannable: Set[UserMark]                         = Set(Boost, Engine, Troll, Alt)
   implicit val markBsonHandler: BSONHandler[UserMark] = stringAnyValHandler[UserMark](_.key, indexed.apply)
+}
 
-case class UserMarks(value: List[UserMark]) extends AnyVal:
+case class UserMarks(value: List[UserMark]) extends AnyVal {
   def apply(mark: UserMark) = value contains mark
   def boost                 = apply(UserMark.Boost)
   def engine                = apply(UserMark.Engine)
@@ -33,11 +35,14 @@ case class UserMarks(value: List[UserMark]) extends AnyVal:
   def clean    = !dirty
 
   def set(sel: UserMark.type => UserMark, v: Boolean) =
-    UserMarks:
+    UserMarks {
       if (v) sel(UserMark) :: value
       else value.filter(sel(UserMark) !=)
-object UserMarks:
+    }
+}
+object UserMarks {
   val empty = UserMarks(Nil)
 
   implicit val marksBsonHandler: BSONHandler[UserMarks] =
     implicitly[BSONHandler[List[UserMark]]].as[UserMarks](UserMarks.apply, _.value.distinct)
+}

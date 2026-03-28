@@ -2,42 +2,49 @@ package lila.common
 
 import scala.util.{ Failure, Success }
 
-object WMMatchingTest:
-  def toMate(n: Int, l: List[(Int, Int)]): Array[Int] =
+object WMMatchingTest {
+  def toMate(n: Int, l: List[(Int, Int)]): Array[Int] = {
     val a = Array.fill(n)(-1)
     l.foreach { case (i, j) => a(i) = j; a(j) = i }
     if a.count(_ >= 0) != 2 * l.length then null else a
+  }
 
-  def check0(a: Array[(Int, Int, Int)], maxcardinality: Boolean, expectedMate: Seq[Int]): Boolean =
+  def check0(a: Array[(Int, Int, Int)], maxcardinality: Boolean, expectedMate: Seq[Int]): Boolean = {
     val n = a.view.map(p => p._1.max(p._2)).max + 1
     val e = Array.newBuilder[Int]
     val w = Array.newBuilder[Int]
-    for p <- a do
+    for p <- a do {
       e += p._1
       e += p._2
       w += p._3
+    }
     val l = toMate(n, WMMatching.maxWeightMatching(e.result(), w.result(), maxcardinality))
     if l eq null then false else expectedMate.sameElements(l)
+  }
 
-  def check(n: Int, a: Array[Int], res: (Int, Int)): Boolean =
+  def check(n: Int, a: Array[Int], res: (Int, Int)): Boolean = {
     val v           = Array.range(0, n)
     def f(x: Int)   = (x * (x + 1)) / 2
     def off(i: Int) = f(n - 1) - f(n - 1 - i)
     def pairScore(i: Int, j: Int): Option[Int] =
       if i > j then pairScore(j, i)
-      else
+      else {
         val o = off(i) + (j - (i + 1))
         if a(o) < 0 then None else Some(a(o))
+      }
     def score(l: List[(Int, Int)]): (Int, Int) = (l.length, l.map(t => pairScore(t._1, t._2).head).sum)
     def checkScore(ans: (Int, Int)): Boolean   = res == ans
-    WMMatching(v, pairScore) match
+    WMMatching(v, pairScore) match {
       case Success(l) => checkScore(score(l))
       case Failure(_) => false
+    }
+  }
+}
 
-class WMMatchingTest extends munit.FunSuite:
+class WMMatchingTest extends munit.FunSuite {
   import WMMatchingTest.check0
 
-  test("WMMatching - create S-blossom and use it for augmentation"):
+  test("WMMatching - create S-blossom and use it for augmentation") {
     assert(check0(Array((1, 2, 8), (1, 3, 9), (2, 3, 10), (3, 4, 7)), false, List(-1, 2, 1, 4, 3)))
     assert(
       check0(
@@ -53,8 +60,9 @@ class WMMatchingTest extends munit.FunSuite:
         List(-1, 2, 1, 6, 5, 4, 3)
       )
     )
+  }
 
-  test("WMMatching - create S-blossom, relabel as T-blossom, use for augmentation"):
+  test("WMMatching - create S-blossom, relabel as T-blossom, use for augmentation") {
     assert(
       check0(
         Array((1, 2, 9), (1, 3, 8), (2, 3, 10), (1, 4, 5), (4, 5, 4), (1, 6, 3)),
@@ -62,8 +70,9 @@ class WMMatchingTest extends munit.FunSuite:
         List(-1, 6, 3, 2, 5, 4, 1)
       )
     )
+  }
 
-  test("WMMatching - create nested S-blossom, use for augmentation"):
+  test("WMMatching - create nested S-blossom, use for augmentation") {
     assert(
       check0(
         Array((1, 2, 9), (1, 3, 9), (2, 3, 10), (2, 4, 8), (3, 5, 8), (4, 5, 10), (5, 6, 6)),
@@ -71,8 +80,9 @@ class WMMatchingTest extends munit.FunSuite:
         List(-1, 3, 4, 1, 2, 6, 5)
       )
     )
+  }
 
-  test("WMMatching - create S-blossom, relabel as S, include in nested S-blossom"):
+  test("WMMatching - create S-blossom, relabel as S, include in nested S-blossom") {
     check0(
       Array(
         (1, 2, 10),
@@ -88,8 +98,9 @@ class WMMatchingTest extends munit.FunSuite:
       false,
       List(-1, 2, 1, 4, 3, 6, 5, 8, 7)
     )
+  }
 
-  test("WMMatching - create nested S-blossom, augment, expand recursively"):
+  test("WMMatching - create nested S-blossom, augment, expand recursively") {
     assert(
       check0(
         Array(
@@ -108,8 +119,9 @@ class WMMatchingTest extends munit.FunSuite:
         List(-1, 2, 1, 5, 6, 3, 4, 8, 7)
       )
     )
+  }
 
-  test("WMMatching - create S-blossom, relabel as T, expand"):
+  test("WMMatching - create S-blossom, relabel as T, expand") {
     assert(
       check0(
         Array((1, 2, 23), (1, 5, 22), (1, 6, 15), (2, 3, 25), (3, 4, 22), (4, 5, 25), (4, 8, 14), (5, 7, 13)),
@@ -117,8 +129,9 @@ class WMMatchingTest extends munit.FunSuite:
         List(-1, 6, 3, 2, 8, 7, 1, 5, 4)
       )
     )
+  }
 
-  test("WMMatching - create blossom, relabel as T in more than one way, expand, augment"):
+  test("WMMatching - create blossom, relabel as T in more than one way, expand, augment") {
     assert(
       check0(
         Array(
@@ -155,8 +168,9 @@ class WMMatchingTest extends munit.FunSuite:
         List(-1, 6, 3, 2, 8, 7, 1, 5, 4, 10, 9)
       )
     )
+  }
 
-  test("WMMatching - create blossom, relabel as T, expand such that a new least-slack S-to-free edge is produced, augment"):
+  test("WMMatching - create blossom, relabel as T, expand such that a new least-slack S-to-free edge is produced, augment") {
     assert(
       check0(
         Array(
@@ -175,8 +189,9 @@ class WMMatchingTest extends munit.FunSuite:
         List(-1, 6, 3, 2, 8, 7, 1, 5, 4, 10, 9)
       )
     )
+  }
 
-  test("WMMatching - create nested blossom, relabel as T in more than one way, expand outer blossom such that inner blossom ends up on an augmenting path"):
+  test("WMMatching - create nested blossom, relabel as T in more than one way, expand outer blossom such that inner blossom ends up on an augmenting path") {
     assert(
       check0(
         Array(
@@ -198,8 +213,9 @@ class WMMatchingTest extends munit.FunSuite:
         List(-1, 8, 3, 2, 6, 9, 4, 10, 1, 5, 7, 12, 11)
       )
     )
+  }
 
-  test("WMMatching - create nested S-blossom, relabel as S, expand recursively"):
+  test("WMMatching - create nested S-blossom, relabel as S, expand recursively") {
     assert(
       check0(
         Array(
@@ -219,8 +235,9 @@ class WMMatchingTest extends munit.FunSuite:
         List(-1, 2, 1, 5, 9, 3, 7, 6, 10, 4, 8)
       )
     )
+  }
 
-  test("WMMatching - hand"):
+  test("WMMatching - hand") {
     assert(check0(Array((0, 1, 1)), false, List(1, 0)))
     assert(check0(Array((0, 1, 1)), false, List(1, 0)))
     assert(check0(Array((1, 2, 10), (2, 3, 11)), false, List(-1, -1, 3, 2)))
@@ -233,8 +250,9 @@ class WMMatchingTest extends munit.FunSuite:
         List(-1, 6, 3, 2, 5, 4, 1)
       )
     )
+  }
 
-  test("WMMatching - random tests"):
+  test("WMMatching - random tests") {
     assert(WMMatchingTest.check(2, Array(7), (1, 7)))
     assert(WMMatchingTest.check(3, Array(-1, 20, -1), (1, 20)))
     assert(WMMatchingTest.check(3, Array(37, 13, 5), (1, 5)))
@@ -1026,3 +1044,5 @@ class WMMatchingTest extends munit.FunSuite:
         (10, 46)
       )
     )
+  }
+}

@@ -10,7 +10,7 @@ import lila.memo.RateLimit
 
 final private class DiscordClient(ws: StandaloneWSClient, urlMatchMaking: Secret, urlTournaments: Secret)(
     implicit ec: scala.concurrent.ExecutionContext
-):
+) {
 
   private val limiter = new RateLimit[DiscordMessage](
     credits = 2,
@@ -18,9 +18,10 @@ final private class DiscordClient(ws: StandaloneWSClient, urlMatchMaking: Secret
     key = "discord.client"
   )
 
-  private def urlForMsg(msg: DiscordMessage) = msg.channel match
+  private def urlForMsg(msg: DiscordMessage) = msg.channel match {
     case MatchMaking => urlMatchMaking.value
     case Tournaments => urlTournaments.value
+  }
 
   def apply(msg: DiscordMessage): Funit =
     limiter(msg) {
@@ -30,8 +31,10 @@ final private class DiscordClient(ws: StandaloneWSClient, urlMatchMaking: Secret
           .post(
             Json.obj("content" -> msg.text).noNull
           )
-          .flatMap:
+          .flatMap {
             case res if res.status == 200 => funit
             case res                      => fufail(s"[discord] ${urlForMsg(msg)} $msg ${res.status} ${res.body}")
+        }
           .recoverDefault
     }(funit)
+}

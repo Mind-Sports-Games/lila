@@ -8,7 +8,7 @@ import scala.util.Try
 private[plan] object JsonHandlers {
 
   implicit val CurrencyReads: Reads[Currency] = Reads.of[String].flatMapResult { code =>
-    Try(Currency getInstance code.toUpperCase).fold(err => JsError(err.getMessage), cur => JsSuccess(cur))
+    Try(Currency `getInstance` code.toUpperCase).fold(err => JsError(err.getMessage), cur => JsSuccess(cur))
   }
   implicit val StripeCents: Reads[Cents]    = Reads.of[Int].map(Cents.apply)
   implicit val CountryReads: Reads[Country] = Reads.of[String].map(Country)
@@ -28,7 +28,7 @@ private[plan] object JsonHandlers {
         (__ \ "cancel_at_period_end").read[Boolean] and
         (__ \ "status").read[String] and
         (__ \ "default_payment_method").readNullable[String]
-    )(StripeSubscription.apply _)
+    )(StripeSubscription.apply)
     implicit val SubscriptionsReads: Reads[StripeSubscriptions]         = Json.reads[StripeSubscriptions]
     implicit val CustomerReads: Reads[StripeCustomer]                   = Json.reads[StripeCustomer]
     implicit val AddressReads: Reads[StripeCharge.Address]              = Json.reads[StripeCharge.Address]

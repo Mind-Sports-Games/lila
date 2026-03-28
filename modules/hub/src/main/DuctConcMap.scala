@@ -45,7 +45,7 @@ final class DuctConcMap[D <: Duct](
 
   def size: Int = ducts.size()
 
-  def terminate(id: String, lastWill: Duct => Unit): Unit =
+  def terminate(id: String, lastWill: Duct => Unit): Unit = {
     val _ = ducts
       .computeIfPresent(
         id,
@@ -54,6 +54,7 @@ final class DuctConcMap[D <: Duct](
           nullD
         }
       )
+  }
 
   private val ducts = new ConcurrentHashMap[String, D](initialCapacity)
 

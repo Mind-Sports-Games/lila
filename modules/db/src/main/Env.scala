@@ -11,7 +11,7 @@ import lila.common.Lilakka
 final class Env(
     appConfig: Configuration,
     shutdown: CoordinatedShutdown
-)(implicit ec: ExecutionContext):
+)(implicit ec: ExecutionContext) {
 
   private val driver = new AsyncDriver(appConfig.get[Config]("mongodb").some)
 
@@ -32,3 +32,4 @@ final class Env(
   Lilakka.shutdown(shutdown, _.PhaseServiceStop, "Closing mongodb driver") { () =>
     driver.close()
   }
+}

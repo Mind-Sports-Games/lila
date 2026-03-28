@@ -7,7 +7,7 @@ import lila.db.dsl._
 
 final private class MonthlyGoalApi(getGoal: () => Usd, chargeColl: Coll)(implicit
     ec: scala.concurrent.ExecutionContext
-):
+) {
 
   def get: Fu[MonthlyGoal] =
     monthAmount dmap { amount =>
@@ -27,7 +27,9 @@ final private class MonthlyGoalApi(getGoal: () => Usd, chargeColl: Coll)(implici
       .map {
         ~_.flatMap { _.int("cents") }
       } `dmap` Cents.apply
+}
 
-case class MonthlyGoal(current: Cents, goal: Cents):
+case class MonthlyGoal(current: Cents, goal: Cents) {
 
   def percent = (goal.value > 0) so (100 * current.value / goal.value).toInt
+}

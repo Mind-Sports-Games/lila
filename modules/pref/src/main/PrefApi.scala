@@ -13,15 +13,16 @@ import lila.pref.JsonView._
 final class PrefApi(
     coll: Coll,
     cacheApi: lila.memo.CacheApi
-)(implicit ec: scala.concurrent.ExecutionContext):
+)(implicit ec: scala.concurrent.ExecutionContext) {
 
   import PrefHandlers._
 
   private def fetchPref(id: User.ID): Fu[Option[Pref]] = coll.find($id(id)).one[Pref]
 
-  private val cache = cacheApi[User.ID, Option[Pref]](65536, "pref.fetchPref"):
+  private val cache = cacheApi[User.ID, Option[Pref]](65536, "pref.fetchPref") {
     _.expireAfterAccess(10 minutes)
       .buildAsyncFuture(fetchPref)
+  }
 
   def saveTag(user: User, tag: Pref.Tag.type => String, value: Boolean) = {
     if (value)
@@ -102,6 +103,8 @@ final class PrefApi(
         )
     )
 
-  def saveNewUserPrefs(user: User, req: RequestHeader): Funit =
+  def saveNewUserPrefs(user: User, req: RequestHeader): Funit = {
     val reqPref = RequestPref `fromRequest` req
     (reqPref != Pref.default) so setPref(reqPref.copy(_id = user.id))
+  }
+}

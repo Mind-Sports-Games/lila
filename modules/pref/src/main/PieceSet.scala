@@ -2,7 +2,7 @@ package lila.pref
 import strategygames.{ GameFamily }
 
 
-sealed class PieceSet private[pref] (val name: String, val gameFamily: Int):
+sealed class PieceSet private[pref] (val name: String, val gameFamily: Int) {
 
   override def toString = name
 
@@ -11,8 +11,9 @@ sealed class PieceSet private[pref] (val name: String, val gameFamily: Int):
   def gameFamilyName = GameFamily(gameFamily).key
 
   def displayPiece = GameFamily(gameFamily).displayPiece
+}
 
-sealed trait PieceSetObject:
+sealed trait PieceSetObject {
 
   val all: List[PieceSet]
   val default: PieceSet
@@ -27,20 +28,23 @@ sealed trait PieceSetObject:
   def unapply(full: PieceSet): Some[(String, Int)] = Some((full.name, full.gameFamily))
 
   def contains(name: String) = allByName contains name
+}
 
 
-object PieceSet extends PieceSetObject:
+object PieceSet extends PieceSetObject {
   val default = new PieceSet("cburnett", 0)
 
   val defaults = GameFamily.all.map(gf => new PieceSet(gf.pieceSetDefault, gf.id))
 
-  def updatePieceSet(currentPieceSets: List[PieceSet], theme: String): List[PieceSet] =
+  def updatePieceSet(currentPieceSets: List[PieceSet], theme: String): List[PieceSet] = {
     val newPieceSet = applyThemeOnly(theme)
     addMissingDefaultsIfAny(currentPieceSets).map { x =>
-      x.gameFamily match
+      x.gameFamily match {
         case newPieceSet.gameFamily => newPieceSet
         case _                      => x
+      }
     }
+  }
 
   def addMissingDefaultsIfAny(currentPieceSets: List[PieceSet]): List[PieceSet] =
     defaults.map { x =>
@@ -53,9 +57,10 @@ object PieceSet extends PieceSetObject:
     GameFamily.all.map(gf => gf.pieceSetThemes.map(t => new PieceSet(t, gf.id))).flatten
 
   def allOfFamily(gf: GameFamily): List[PieceSet] = gf.pieceSetThemes.map(t => new PieceSet(t, gf.id))
+}
 
 
-object PieceSet3d extends PieceSetObject:
+object PieceSet3d extends PieceSetObject {
 
   val default = new PieceSet("Basic", 0)
 
@@ -74,3 +79,4 @@ object PieceSet3d extends PieceSetObject:
   ) map { name =>
     new PieceSet(name, 0)
   }
+}

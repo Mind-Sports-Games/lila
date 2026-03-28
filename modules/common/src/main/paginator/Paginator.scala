@@ -14,7 +14,7 @@ final class Paginator[A] private[paginator] (
     /** Returns the number of results. The result is cached.
       */
     val nbResults: Int
-):
+) {
 
   /** Returns the previous page.
     */
@@ -57,8 +57,9 @@ final class Paginator[A] private[paginator] (
 
   def mapFutureResults[B](f: A => Fu[B])(implicit ec: scala.concurrent.ExecutionContext): Fu[Paginator[B]] =
     Future.sequence(currentPageResults.map(f)).dmap(withCurrentPageResults)
+}
 
-object Paginator:
+object Paginator {
 
   def apply[A](
       adapter: AdapterLike[A],
@@ -90,7 +91,9 @@ object Paginator:
     if currentPage < 1 then Validated.invalid("Max per page must be greater than zero")
     else if maxPerPage.value <= 0 then Validated.invalid("Current page must be greater than zero")
     else
-      Validated.valid(for
+      Validated.valid(for {
         results   <- adapter.slice((currentPage - 1) * maxPerPage.value, maxPerPage.value)
         nbResults <- adapter.nbResults
+      }
       yield new Paginator(currentPage, maxPerPage, results, nbResults))
+}

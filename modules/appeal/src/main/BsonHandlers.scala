@@ -3,7 +3,7 @@ package lila.appeal
 import lila.db.dsl._
 import reactivemongo.api.bson._
 
-private[appeal] object BsonHandlers:
+private[appeal] object BsonHandlers {
 
   import Appeal.Status
 
@@ -17,3 +17,4 @@ private[appeal] object BsonHandlers:
 
   implicit val appealMsgHandler: BSONDocumentHandler[AppealMsg] = Macros.handler[AppealMsg]
   implicit val appealHandler: BSONDocumentHandler[Appeal]       = Macros.handler[Appeal]
+}

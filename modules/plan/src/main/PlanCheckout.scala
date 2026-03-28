@@ -7,7 +7,7 @@ case class PlanCheckout(
     email: Option[String],
     amount: Cents,
     freq: Freq
-):
+) {
 
   def cents = amount
 
@@ -15,8 +15,9 @@ case class PlanCheckout(
     Some(
       (email, amount.usd.value, freq.toString.toLowerCase)
     )
+}
 
-object PlanCheckout:
+object PlanCheckout {
 
   def amountField = bigDecimal(precision = 10, scale = 2)
     .verifying(_ >= 1)
@@ -40,12 +41,14 @@ object PlanCheckout:
       "freq"   -> nonEmptyText
     )(PlanCheckout.make)(_.toFormData)
   )
+}
 
-case class Switch(amount: BigDecimal):
+case class Switch(amount: BigDecimal) {
 
   def cents = Usd(amount).cents
+}
 
-object Switch:
+object Switch {
 
   val form = Form(
     mapping(
@@ -54,3 +57,4 @@ object Switch:
         .verifying(_ <= 10000)
     )(Switch.apply)(d => Some(d.amount))
   )
+}

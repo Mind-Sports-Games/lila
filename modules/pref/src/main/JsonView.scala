@@ -3,7 +3,7 @@ package lila.pref
 import play.api.libs.json._
 import play.api.libs.functional.syntax._
 
-object JsonView:
+object JsonView {
 
   implicit val prefJsonWriter: OWrites[Pref] = OWrites[Pref] { p =>
     Json.obj(
@@ -85,3 +85,4 @@ object JsonView:
   implicit val themesRead: Reads[List[Theme]] = Reads.list(themeFormat)
 
   implicit val themesWrite: Writes[List[Theme]] = Writes.list(themeFormat)
+}

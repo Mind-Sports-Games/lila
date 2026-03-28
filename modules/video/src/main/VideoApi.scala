@@ -14,37 +14,40 @@ final private[video] class VideoApi(
     videoColl: Coll,
     viewColl: Coll,
     cacheApi: lila.memo.CacheApi
-)(implicit ec: scala.concurrent.ExecutionContext):
+)(implicit ec: scala.concurrent.ExecutionContext) {
 
   import lila.db.BSON.BSONJodaDateTimeHandler
   import reactivemongo.api.bson.Macros
-  implicit private val YoutubeBSONHandler: BSONDocumentHandler[Youtube.Metadata] =
+  implicit private val YoutubeBSONHandler: BSONDocumentHandler[Youtube.Metadata] = {
     import Youtube.Metadata
     Macros.handler[Metadata]
+  }
   implicit private val VideoBSONHandler: BSONDocumentHandler[Video] = Macros.handler[Video]
   implicit private val TagNbBSONHandler: BSONDocumentHandler[TagNb] = Macros.handler[TagNb]
   import View.viewBSONHandler
 
   private def videoViews(userOption: Option[User])(videos: Seq[Video]): Fu[Seq[VideoView]] =
-    userOption match
+    userOption match {
       case None =>
-        fuccess:
+        fuccess {
           videos map { VideoView(_, view = false) }
+        }
       case Some(user) =>
         view.seenVideoIds(user, videos) map { ids =>
           videos.map { v =>
             VideoView(v, ids contains v.id)
           }
         }
+    }
 
-  object video:
+  object video {
 
     private val maxPerPage = lila.common.config.MaxPerPage(18)
 
     def find(id: Video.ID): Fu[Option[Video]] =
       videoColl.find($id(id)).one[Video]
 
-    def search(user: Option[User], query: String, page: Int): Fu[Paginator[VideoView]] =
+    def search(user: Option[User], query: String, page: Int): Fu[Paginator[VideoView]] = {
       val q = query.split(' ').map { word =>
         s""""$word""""
       } mkString " "
@@ -62,6 +65,7 @@ final private[video] class VideoApi(
         currentPage = page,
         maxPerPage = maxPerPage
       )
+    }
 
     def save(video: Video): Funit =
       videoColl.update
@@ -158,15 +162,18 @@ final private[video] class VideoApi(
         .collect[List](maxDocs = max)
         .map(_.flatMap(_.asOpt[Video])) flatMap videoViews(user)
 
-    object count:
+    object count {
 
-      private val cache = cacheApi.unit[Long]:
+      private val cache = cacheApi.unit[Long] {
         _.refreshAfterWrite(3 hours)
           .buildAsyncFuture(_ => videoColl.countAll)
+      }
 
       def apply: Fu[Long] = cache.getUnit
+    }
+  }
 
-  object view:
+  object view {
 
     def find(videoId: Video.ID, userId: String): Fu[Option[View]] =
       viewColl
@@ -196,8 +203,9 @@ final private[video] class VideoApi(
         }),
         ReadPreference.secondaryPreferred
       )
+  }
 
-  object tag:
+  object tag {
 
     def paths(filterTags: List[Tag]): Fu[List[TagNb]] = pathsCache get filterTags.sorted
 
@@ -205,7 +213,7 @@ final private[video] class VideoApi(
 
     private val max = 25
 
-    private val pathsCache = cacheApi[List[Tag], List[TagNb]](32, "video.paths"):
+    private val pathsCache = cacheApi[List[Tag], List[TagNb]](32, "video.paths") {
       _.expireAfterAccess(10 minutes)
         .buildAsyncFuture { filterTags =>
           val allPaths =
@@ -242,8 +250,9 @@ final private[video] class VideoApi(
             }
           }
         }
+    }
 
-    private val popularCache = cacheApi.unit[List[TagNb]]:
+    private val popularCache = cacheApi.unit[List[TagNb]] {
       _.refreshAfterWrite(1.day)
         .buildAsyncFuture { _ =>
           videoColl
@@ -257,6 +266,10 @@ final private[video] class VideoApi(
               )
             }
             .collect[List](maxDocs = Int.MaxValue)
-            .dmap:
+            .dmap {
               _.flatMap(_.asOpt[TagNb])
+          }
         }
+    }
+  }
+}

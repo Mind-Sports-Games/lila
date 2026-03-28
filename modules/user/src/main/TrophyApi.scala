@@ -32,9 +32,9 @@ final class TrophyApi(
 
   implicit private val trophyBSONHandler: BSONDocumentHandler[Trophy] = Macros.handler[Trophy]
 
-  private def permanent = $doc("expiry" $exists false)
+  private def permanent = $doc("expiry" `$exists` false)
 
-  private def relevant = $doc("expiry" $gt DateTime.now)
+  private def relevant = $doc("expiry" `$gt` DateTime.now)
 
   private def nonExpired = $doc("$or" -> List(permanent, relevant))
 
@@ -49,28 +49,28 @@ final class TrophyApi(
 
   def roleBasedTrophies(user: User, isPublicMod: Boolean, isDev: Boolean, isVerified: Boolean): List[Trophy] =
     List(
-      isPublicMod option Trophy(
+      isPublicMod `option` Trophy(
         _id = "",
         user = user.id,
-        kind = kindCache sync TrophyKind.moderator,
+        kind = kindCache `sync` TrophyKind.moderator,
         date = DateTime.now,
         url = none,
         name = none,
         expiry = none
       ),
-      isDev option Trophy(
+      isDev `option` Trophy(
         _id = "",
         user = user.id,
-        kind = kindCache sync TrophyKind.developer,
+        kind = kindCache `sync` TrophyKind.developer,
         date = DateTime.now,
         url = none,
         name = none,
         expiry = none
       ),
-      isVerified option Trophy(
+      isVerified `option` Trophy(
         _id = "",
         user = user.id,
-        kind = kindCache sync TrophyKind.verified,
+        kind = kindCache `sync` TrophyKind.verified,
         date = DateTime.now,
         url = none,
         name = none,

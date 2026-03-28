@@ -6,9 +6,9 @@ import lila.db.BSON
 import lila.db.dsl._
 import lila.pref.PieceSet
 
-private object PrefHandlers:
+private object PrefHandlers {
 
-  implicit private[pref] val pieceSetBSONHandler: BSON[PieceSet] = new BSON[PieceSet]:
+  implicit private[pref] val pieceSetBSONHandler: BSON[PieceSet] = new BSON[PieceSet] {
 
     def reads(r: BSON.Reader) = new PieceSet(r.str("name"), r.int("gameFamily"))
 
@@ -17,8 +17,9 @@ private object PrefHandlers:
         "name"       -> p.name,
         "gameFamily" -> p.gameFamily
       )
+  }
 
-  implicit private[pref] val themeBSONHandler: BSON[Theme] = new BSON[Theme]:
+  implicit private[pref] val themeBSONHandler: BSON[Theme] = new BSON[Theme] {
 
     def reads(r: BSON.Reader) = Theme.apply(r.str("name"), r.int("gameFamily"))
 
@@ -27,8 +28,9 @@ private object PrefHandlers:
         "name"       -> t.name,
         "gameFamily" -> t.gameFamily
       )
+  }
 
-  implicit val prefBSONHandler: BSON[Pref] = new BSON[Pref]:
+  implicit val prefBSONHandler: BSON[Pref] = new BSON[Pref] {
 
     def reads(r: BSON.Reader): Pref =
       Pref(
@@ -133,3 +135,5 @@ private object PrefHandlers:
         "boardIdentifier"     -> o.boardIdentifier,
         "tags"                -> o.tags
       )
+  }
+}

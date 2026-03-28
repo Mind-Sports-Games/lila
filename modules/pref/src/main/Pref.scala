@@ -51,7 +51,7 @@ case class Pref(
     resizeHandle: Int,
     boardIdentifier: Int,
     tags: Map[String, String] = Map.empty
-):
+) {
 
   import Pref._
 
@@ -72,7 +72,7 @@ case class Pref(
   def hasDgt = tags contains Tag.dgt
 
   def set(name: String, value: String): Option[Pref] =
-    name match
+    name match {
       case "bg"    => Pref.Bg.fromString.get(value).map { bg => copy(bg = bg) }
       case "bgImg" => copy(bgImg = value.some).some
       // case "theme" =>
@@ -95,17 +95,19 @@ case class Pref(
         }
       case "zen" => copy(zen = if (value == "1") 1 else 0).some
       case _     => none
+    }
 
   def setTheme(value: String, gameFamily: String): Option[Pref] =
     copy(theme = Theme.updateBoardTheme(theme, value, gameFamily)).some
 
   def animationMillis: Int =
-    animation match
+    animation match {
       case Animation.NONE   => 0
       case Animation.FAST   => 120
       case Animation.NORMAL => 250
       case Animation.SLOW   => 500
       case _                => 250
+    }
 
   def isBlindfold = blindfold == Pref.Blindfold.YES
 
@@ -115,9 +117,10 @@ case class Pref(
 
   def draughtsResult = gameResult == Pref.DraughtsGameResult.DRAUGHTS
 
-  def isAlgebraic(v: Variant) = v match
+  def isAlgebraic(v: Variant) = v match {
     case Variant.Draughts(v) => canAlgebraic && v.boardSize.pos.hasAlgebraic
     case _                   => false
+  }
 
   def canAlgebraic = coordSystem == Pref.DraughtsCoordSystem.ALGEBRAIC
 
@@ -135,20 +138,23 @@ case class Pref(
       animation == Animation.NONE &&
       highlight &&
       coords == Coords.OUTSIDE
+}
 
-object Pref:
+object Pref {
 
   val defaultBgImg = "//assets.playstrategy.org/assets/images/background/landscape.jpg"
 
-  trait BooleanPref:
+  trait BooleanPref {
     val NO      = 0
     val YES     = 1
     val choices = Seq(NO -> "No", YES -> "Yes")
+  }
 
-  object BooleanPref:
+  object BooleanPref {
     val verify = (v: Int) => v == 0 || v == 1
+  }
 
-  object Bg:
+  object Bg {
     val LIGHT       = 100
     val DARK        = 200
     val DARKBOARD   = 300
@@ -169,8 +175,9 @@ object Pref:
     )
 
     val asString = fromString.map(_.swap)
+  }
 
-  object Color:
+  object Color {
     val ORIGINAL = 100
     val BLACK    = 200
     val RED      = 300
@@ -199,11 +206,13 @@ object Pref:
     )
 
     val asString = fromString.map(_.swap)
+  }
 
-  object Tag:
+  object Tag {
     val dgt = "dgt"
+  }
 
-  object PlayerOrder:
+  object PlayerOrder {
     val P1     = 1
     val RANDOM = 2
     val P2     = 3
@@ -213,8 +222,9 @@ object Pref:
       RANDOM -> "Random",
       P2     -> "P2"
     )
+  }
 
-  object AutoQueen:
+  object AutoQueen {
     val NEVER   = 1
     val PREMOVE = 2
     val ALWAYS  = 3
@@ -224,8 +234,9 @@ object Pref:
       ALWAYS  -> "Always",
       PREMOVE -> "When premoving"
     )
+  }
 
-  object SubmitMove:
+  object SubmitMove {
     val NEVER                    = 0
     val CORRESPONDENCE_ONLY      = 4
     val CORRESPONDENCE_UNLIMITED = 1
@@ -237,12 +248,13 @@ object Pref:
       CORRESPONDENCE_UNLIMITED -> "Correspondence and unlimited",
       ALWAYS                   -> "Always"
     )
+  }
 
   object ConfirmResign    extends BooleanPref
   object ConfirmPass      extends BooleanPref
   object PlayForcedAction extends BooleanPref
 
-  object InsightShare:
+  object InsightShare {
     val NOBODY    = 0
     val FRIENDS   = 1
     val EVERYBODY = 2
@@ -252,12 +264,13 @@ object Pref:
       FRIENDS   -> "With friends",
       EVERYBODY -> "With everybody"
     )
+  }
 
   object KeyboardMove extends BooleanPref
 
   object BoardIdentifier extends BooleanPref
 
-  object RookCastle:
+  object RookCastle {
     val NO  = 0
     val YES = 1
 
@@ -265,8 +278,9 @@ object Pref:
       NO  -> "Castle by moving by two squares",
       YES -> "Castle by moving onto the rook"
     )
+  }
 
-  object MoveEvent:
+  object MoveEvent {
     val CLICK = 0
     val DRAG  = 1
     val BOTH  = 2
@@ -276,8 +290,9 @@ object Pref:
       DRAG  -> "Drag a piece",
       BOTH  -> "Both clicks and drag"
     )
+  }
 
-  object MancalaMove:
+  object MancalaMove {
     val SINGLE_CLICK    = 0
     val TWO_HOUSE_CLICK = 1
 
@@ -285,8 +300,9 @@ object Pref:
       SINGLE_CLICK    -> "Single Click",
       TWO_HOUSE_CLICK -> "Click/Drag start and destination houses"
     )
+  }
 
-  object PieceNotation:
+  object PieceNotation {
     val SYMBOL = 0
     val LETTER = 1
 
@@ -294,14 +310,16 @@ object Pref:
       SYMBOL -> "Chess piece symbol",
       LETTER -> "PGN letter (K, Q, R, B, N)"
     )
+  }
 
-  object Blindfold extends BooleanPref:
+  object Blindfold extends BooleanPref {
     override val choices = Seq(
       NO  -> "What? No!",
       YES -> "Yes, hide the pieces"
     )
+  }
 
-  object AutoThreefold:
+  object AutoThreefold {
     val NEVER  = 1
     val TIME   = 2
     val ALWAYS = 3
@@ -311,8 +329,9 @@ object Pref:
       ALWAYS -> "Always",
       TIME   -> "When time remaining < 30 seconds"
     )
+  }
 
-  object Takeback:
+  object Takeback {
     val NEVER  = 1
     val CASUAL = 2
     val ALWAYS = 3
@@ -322,8 +341,9 @@ object Pref:
       ALWAYS -> "Always",
       CASUAL -> "In casual games only"
     )
+  }
 
-  object Moretime:
+  object Moretime {
     val NEVER  = 1
     val CASUAL = 2
     val ALWAYS = 3
@@ -333,8 +353,9 @@ object Pref:
       ALWAYS -> "Always",
       CASUAL -> "In casual games only"
     )
+  }
 
-  object Animation:
+  object Animation {
     val NONE   = 0
     val FAST   = 1
     val NORMAL = 2
@@ -346,8 +367,9 @@ object Pref:
       NORMAL -> "Normal",
       SLOW   -> "Slow"
     )
+  }
 
-  object Coords:
+  object Coords {
     val NONE    = 0
     val INSIDE  = 1
     val OUTSIDE = 2
@@ -359,12 +381,14 @@ object Pref:
     )
 
     def classOf(v: Int) =
-      v match
+      v match {
         case INSIDE  => "in"
         case OUTSIDE => "out"
         case _       => "no"
+      }
+  }
 
-  object Replay:
+  object Replay {
     val NEVER  = 0
     val SLOW   = 1
     val ALWAYS = 2
@@ -374,8 +398,9 @@ object Pref:
       SLOW   -> "On slow games",
       ALWAYS -> "Always"
     )
+  }
 
-  object DraughtsGameResult:
+  object DraughtsGameResult {
     val STANDARD = 0
     val DRAUGHTS = 1
 
@@ -383,8 +408,9 @@ object Pref:
       STANDARD -> "1-0 • ½-½ • 0-1",
       DRAUGHTS -> "2-0 • 1-1 • 0-2"
     )
+  }
 
-  object DraughtsCoordSystem:
+  object DraughtsCoordSystem {
     val FIELDNUMBERS = 0
     val ALGEBRAIC    = 1
 
@@ -392,8 +418,9 @@ object Pref:
       FIELDNUMBERS -> "Fieldnumbers",
       ALGEBRAIC    -> "Algebraic"
     )
+  }
 
-  object ClockTenths:
+  object ClockTenths {
     val NEVER   = 0
     val LOWTIME = 1
     val ALWAYS  = 2
@@ -403,8 +430,9 @@ object Pref:
       LOWTIME -> "When time remaining < 10 seconds",
       ALWAYS  -> "Always"
     )
+  }
 
-  object Challenge:
+  object Challenge {
     val NEVER  = 1
     val RATING = 2
     val FRIEND = 3
@@ -418,8 +446,9 @@ object Pref:
       FRIEND -> "Only friends",
       ALWAYS -> "Always"
     )
+  }
 
-  object Message:
+  object Message {
     val NEVER  = 1
     val FRIEND = 2
     val ALWAYS = 3
@@ -429,8 +458,9 @@ object Pref:
       FRIEND -> "Only friends",
       ALWAYS -> "Always"
     )
+  }
 
-  object StudyInvite:
+  object StudyInvite {
     val NEVER  = 1
     val FRIEND = 2
     val ALWAYS = 3
@@ -440,8 +470,9 @@ object Pref:
       FRIEND -> "Only friends",
       ALWAYS -> "Always"
     )
+  }
 
-  object ResizeHandle:
+  object ResizeHandle {
     val NEVER   = 0
     val INITIAL = 1
     val ALWAYS  = 2
@@ -451,6 +482,7 @@ object Pref:
       INITIAL -> "On initial position",
       ALWAYS  -> "Always"
     )
+  }
 
   object Zen extends BooleanPref {}
 
@@ -509,3 +541,4 @@ object Pref:
 
   import alleycats.Zero
   implicit def PrefZero: Zero[Pref] = Zero(default)
+}

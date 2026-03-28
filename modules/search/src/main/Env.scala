@@ -16,7 +16,7 @@ private class SearchConfig(
 final class Env(
     appConfig: Configuration,
     ws: StandaloneWSClient
-)(implicit ec: scala.concurrent.ExecutionContext):
+)(implicit ec: scala.concurrent.ExecutionContext) {
 
   private val config = appConfig.get[SearchConfig]("search")(AutoConfig.loader)
 
@@ -25,3 +25,4 @@ final class Env(
   val makeClient = (index: Index) =>
     if (config.enabled) makeHttp(index)
     else wire[ESClientStub]
+}

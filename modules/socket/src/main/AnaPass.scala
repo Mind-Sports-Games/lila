@@ -53,14 +53,14 @@ object AnaPass {
 
   def parse(o: JsObject) =
     for {
-      d <- o obj "d"
+      d <- o `obj` "d"
       variant = Variant.orDefault(GameLogic.Go(), ~d.str("variant"))
-      fen  <- d str "fen" map { fen => FEN.apply(GameLogic.Go(), fen) }
-      path <- d str "path"
+      fen  <- d `str` "fen" map { fen => FEN.apply(GameLogic.Go(), fen) }
+      path <- d `str` "path"
     } yield AnaPass(
       variant = variant,
       fen = fen,
       path = path,
-      chapterId = d str "ch"
+      chapterId = d `str` "ch"
     )
 }

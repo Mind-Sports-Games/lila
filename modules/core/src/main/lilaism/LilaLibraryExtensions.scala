@@ -8,13 +8,14 @@ import scala.collection.BuildFrom
 import scala.concurrent.{ ExecutionContext as EC, Future }
 import scala.util.Try
 
-trait LilaLibraryExtensions extends CoreExports:
+trait LilaLibraryExtensions extends CoreExports {
 
   export scalalib.future.extensions.*
   export scalalib.future.given_Zero_Future
 
-  given [A]: Zero[Update[A]] with
+  given [A]: Zero[Update[A]] with {
     def zero = identity[A]
+  }
 
   def fuccess[A](a: A): Fu[A] = Future.successful(a)
   def fufail[X](t: Throwable): Fu[X] = Future.failed(t)
@@ -30,7 +31,7 @@ trait LilaLibraryExtensions extends CoreExports:
   given (using sched: Scheduler, ec: Executor): FutureAfter =
     [A] => (duration: FiniteDuration) => (fua: () => Future[A]) => org.apache.pekko.pattern.after(duration, sched)(fua())
 
-  extension [A](self: Option[A])
+  extension [A](self: Option[A]) {
 
     def toTryWith(err: => Exception): Try[A] =
       self.fold(scala.util.Failure(err))(scala.util.Success.apply)
@@ -44,42 +45,50 @@ trait LilaLibraryExtensions extends CoreExports:
 
     inline def raiseIfSome[B](f: => Fu[B]): FuRaise[A, B] =
       self.fold(f)(_.raise)
+  }
 
-  extension (self: Boolean)
+  extension (self: Boolean) {
     def not: Boolean = !self
     // move to scalalib? generalize Future away?
     def optionFu[B](f: => Future[B]): Future[Option[B]] =
       if self then f.map(Some(_))(using scala.concurrent.ExecutionContext.parasitic)
       else Future.successful(None)
+  }
 
-  extension (config: Config)
+  extension (config: Config) {
     def millis(name: String): Int = config.getDuration(name, TimeUnit.MILLISECONDS).toInt
     def seconds(name: String): Int = config.getDuration(name, TimeUnit.SECONDS).toInt
     def duration(name: String): FiniteDuration = millis(name).millis
+  }
 
-  extension [A, B](v: Either[A, B])
-    def toFuture: Fu[B] = v match
+  extension [A, B](v: Either[A, B]) {
+    def toFuture: Fu[B] = v match {
       case Right(res) => fuccess(res)
       case Left(err) =>
-        err match
+        err match {
           case e: Exception => Future.failed(e)
           case _ => fufail(err.toString)
+        }
+    }
 
     inline def raiseIfLeft: FuRaise[A, B] = v.fold(_.raise, fuccess)
+  }
 
   extension [A, B](v: (A, B)) def map2[C](f: B => C): (A, C) = (v._1, f(v._2))
 
-  extension (d: FiniteDuration)
+  extension (d: FiniteDuration) {
     def toCentis = strategygames.Centis(d)
     def abs = if d.length < 0 then -d else d
+  }
 
-  extension [A](list: List[A])
+  extension [A](list: List[A]) {
     def sortLike[B](other: Seq[B], f: A => B): List[A] =
       list.sortWith: (x, y) =>
         other.indexOf(f(x)) < other.indexOf(f(y))
-    def tailOption: Option[List[A]] = list match
+    def tailOption: Option[List[A]] = list match {
       case Nil => None
       case _ :: rest => Some(rest)
+    }
     def tailSafe: List[A] = tailOption.getOrElse(Nil)
     def indexOption(a: A) = Option(list.indexOf(a)).filter(0 <= _)
     def previous(a: A): Option[A] = indexOption(a).flatMap(i => list.lift(i - 1))
@@ -105,23 +114,28 @@ trait LilaLibraryExtensions extends CoreExports:
       *
       * returning the first error if there is and the successfully processed elements
       */
-    def sequentiallyRaise[E, B](f: A => FuRaise[E, B])(using EC): Fu[(List[B], Option[E])] =
+    def sequentiallyRaise[E, B](f: A => FuRaise[E, B])(using EC): Fu[(List[B], Option[E])] = {
       import cats.mtl.Handle.*
       list
         .foldLeft(fuccess((List.empty[B], none[E]))): (facc, a) =>
-          facc.flatMap:
+          facc.flatMap {
             case acc @ (bs, err) =>
-              err match
+              err match {
                 case Some(_) => fuccess(acc) // short-circuit on first error
                 case None =>
-                  allow:
+                  allow {
                     f(a).map(b => (b :: bs) -> none)
+                  }
                   .rescue: e =>
                     fuccess((bs, e.some))
+              }
+          }
         .dmap: (xs, err) =>
           (xs.reverse, err)
+    }
+  }
 
-  extension [A, M[A] <: IterableOnce[A]](list: M[A])
+  extension [A, M[A] <: IterableOnce[A]](list: M[A]) {
     def parallel[B](f: A => Fu[B])(using Executor, BuildFrom[M[A], B, M[B]]): Fu[M[B]] =
       Future.traverse(list)(f)
 
@@ -131,8 +145,9 @@ trait LilaLibraryExtensions extends CoreExports:
     def parallelVoid[B](f: A => Fu[B])(using Executor): Fu[Unit] =
       list.iterator
         .foldLeft(funit)((fr, a) => fr.zipWith(f(a))((_, _) => ()))
+  }
 
-  extension [A, M[A] <: IterableOnce[A]](list: M[Fu[A]])
+  extension [A, M[A] <: IterableOnce[A]](list: M[Fu[A]]) {
 
     def parallel(using Executor, BuildFrom[M[Future[A]], A, M[A]]): Fu[M[A]] =
       Future.sequence(list)
@@ -140,8 +155,9 @@ trait LilaLibraryExtensions extends CoreExports:
     def parallelVoid(using Executor): Fu[Unit] =
       list.iterator
         .foldLeft(funit)((fr, fa) => fr.zipWith(fa)((_, _) => ()))
+  }
 
-  extension [A](fua: Fu[A])
+  extension [A](fua: Fu[A]) {
 
     infix def >>[B](fub: => Fu[B])(using Executor): Fu[B] =
       fua.flatMap(_ => fub)
@@ -156,8 +172,9 @@ trait LilaLibraryExtensions extends CoreExports:
     def logFailure(logger: => play.api.LoggerLike)(using Executor): Fu[A] = logFailure(logger, _.toString)
 
     def mapFailure(f: Exception => Exception)(using Executor): Fu[A] =
-      fua.recoverWith:
+      fua.recoverWith {
         case cause: Exception => fufail(f(cause))
+      }
 
     def prefixFailure(p: => String)(using Executor): Fu[A] =
       mapFailure: e =>
@@ -174,8 +191,9 @@ trait LilaLibraryExtensions extends CoreExports:
         e => pprint.pprintln(s"[$msg] [failure] $e"),
         a => pprint.pprintln(s"[$msg] [success] $a")
       )
+  }
 
-  extension (fua: Fu[Boolean])
+  extension (fua: Fu[Boolean]) {
 
     infix def >>&(fub: => Fu[Boolean]): Fu[Boolean] =
       fua.flatMap { if _ then fub else fuFalse }(using EC.parasitic)
@@ -191,7 +209,10 @@ trait LilaLibraryExtensions extends CoreExports:
 
     // inline def unary_! = fua.map { !_ }(using EC.parasitic)
     inline def not = fua.map { !_ }(using EC.parasitic)
+  }
 
-  extension [A](p: PairOf[A])
+  extension [A](p: PairOf[A]) {
     def pairMap[B](f: A => B): PairOf[B] = (f(p._1), f(p._2))
     def asList: List[A] = List(p._1, p._2)
+  }
+}

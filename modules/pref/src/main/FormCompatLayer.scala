@@ -4,7 +4,7 @@ import play.api.mvc.Request
 
 // because the form structure has changed
 // and the mobile app keeps sending the old format
-object FormCompatLayer:
+object FormCompatLayer {
 
   private type FormData = Map[String, Seq[String]]
 
@@ -73,3 +73,4 @@ object FormCompatLayer:
         body.asMultipartFormData.get.asFormUrlEncoded
       case _ => Map.empty[String, Seq[String]]
     }) ++ req.queryString
+}

@@ -42,28 +42,28 @@ final class NoteApi(
           else $doc("from" -> me.id)
         }
       )
-      .sort($sort desc "date")
+      .sort($sort `desc` "date")
       .cursor[Note]()
       .list(20)
 
   def forMod(id: User.ID): Fu[List[Note]] =
     coll
       .find($doc("to" -> id, "mod" -> true))
-      .sort($sort desc "date")
+      .sort($sort `desc` "date")
       .cursor[Note]()
       .list(50)
 
   def forMod(ids: List[User.ID]): Fu[List[Note]] =
     coll
-      .find($doc("to" $in ids, "mod" -> true))
-      .sort($sort desc "date")
+      .find($doc("to" `$in` ids, "mod" -> true))
+      .sort($sort `desc` "date")
       .cursor[Note]()
       .list(100)
 
   def write(to: User, text: String, from: User, modOnly: Boolean, dox: Boolean) = {
 
     val note = Note(
-      _id = lila.common.ThreadLocalRandom nextString 8,
+      _id = lila.common.ThreadLocalRandom `nextString` 8,
       from = from.id,
       to = to.id,
       text = text,

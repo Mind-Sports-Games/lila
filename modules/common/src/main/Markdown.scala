@@ -8,7 +8,7 @@ import com.vladsch.flexmark.parser.Parser
 import com.vladsch.flexmark.util.data.MutableDataSet
 import scala.jdk.CollectionConverters.*
 
-final class Markdown(autoLink: Boolean = false):
+final class Markdown(autoLink: Boolean = false) {
 
   private type Text = String
   private type Html = String
@@ -28,3 +28,4 @@ final class Markdown(autoLink: Boolean = false):
   private val renderer = HtmlRenderer.builder(options).build()
 
   def apply(text: Text): Html = renderer.render(parser.parse(text))
+}

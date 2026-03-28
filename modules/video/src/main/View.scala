@@ -11,7 +11,7 @@ case class View(
 
 case class VideoView(video: Video, view: Boolean)
 
-object View:
+object View {
 
   def makeId(videoId: Video.ID, userId: String) = s"$videoId/$userId"
 
@@ -23,16 +23,17 @@ object View:
       date = DateTime.now
     )
 
-  object BSONFields:
+  object BSONFields {
     val id      = "_id"
     val videoId = "v"
     val userId  = "u"
     val date    = "d"
+  }
 
   import reactivemongo.api.bson._
   import lila.db.BSON
   import BSON.BSONJodaDateTimeHandler
-  implicit val viewBSONHandler: BSON[View] = new BSON[View]:
+  implicit val viewBSONHandler: BSON[View] = new BSON[View] {
 
     import BSONFields._
 
@@ -51,3 +52,5 @@ object View:
         userId  -> o.userId,
         date    -> o.date
       )
+  }
+}

@@ -2,7 +2,7 @@ package lila.common
 
 import scala.util.matching.Regex
 
-object LameName:
+object LameName {
 
   def username(name: String): Boolean =
     usernameRegex.find(name.replaceIf('_', "")) || containsTitleRegex.matches(name) || containsUsRegex
@@ -111,7 +111,7 @@ object LameName:
       + "$"
   ).r
 
-  private def lameWords(list: List[String], interspersed: String = "+"): Regex =
+  private def lameWords(list: List[String], interspersed: String = "+"): Regex = {
     val extras = Map(
       'a' -> "4",
       'e' -> "38",
@@ -131,7 +131,10 @@ object LameName:
     }.toMap
 
     list
-      .map:
+      .map {
         _.map(l => subs.getOrElse(l, l.toString)).iterator.map(l => s"$l$interspersed").mkString
+    }
       .mkString("|")
       .r
+  }
+}
