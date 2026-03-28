@@ -4,7 +4,7 @@ import lila.db.dsl._
 import lila.common.Iso
 import reactivemongo.api.bson.BSONHandler
 
-object BSONHandlers:
+object BSONHandlers {
 
   implicit val perfTypeIdIso: Iso.IntIso[PerfType] = Iso.int[PerfType](
     from = id => PerfType.byId get id `err` s"Invalid perf type id $id",
@@ -18,3 +18,4 @@ object BSONHandlers:
 
   implicit val perfTypeIdHandler: BSONHandler[PerfType]  = intIsoHandler(perfTypeIdIso)
   implicit val perfTypeKeyHandler: BSONHandler[PerfType] = stringIsoHandler(perfTypeKeyIso)
+}

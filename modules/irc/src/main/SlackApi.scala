@@ -11,11 +11,11 @@ final class SlackApi(
     client: SlackClient,
     noteApi: lila.user.NoteApi,
     implicit val lightUser: LightUser.Getter
-)(implicit ec: scala.concurrent.ExecutionContext):
+)(implicit ec: scala.concurrent.ExecutionContext) {
 
   import SlackApi._
 
-  object charge:
+  object charge {
 
     import lila.hub.actorApi.plan.ChargeEvent
 
@@ -23,9 +23,9 @@ final class SlackApi(
 
     implicit private val amountOrdering: Ordering[ChargeEvent] = Ordering.by[ChargeEvent, Int](_.amount)
 
-    def apply(event: ChargeEvent): Funit =
+    def apply(event: ChargeEvent): Funit = {
       buffer = buffer :+ event
-      buffer.head.date.isBefore(DateTime.now.minusHours(12)) so:
+      buffer.head.date.isBefore(DateTime.now.minusHours(12)) so {
         val firsts    = Heapsort.topN(buffer, 10, amountOrdering).map(_.username).map(userAt).mkString(", ")
         val amountSum = buffer.map(_.amount).sum
         val patrons =
@@ -33,8 +33,11 @@ final class SlackApi(
           else firsts
         displayMessage {
           s"$patrons donated ${amount(amountSum)}. Monthly progress: ${buffer.last.percent}%"
-        }.andDo:
+        }.andDo {
           buffer = Vector.empty
+        }
+      }
+    }
 
     private def displayMessage(text: String) =
       client(
@@ -51,9 +54,10 @@ final class SlackApi(
       else s"@$username"
 
     private def amount(cents: Int) = s"$$${BigDecimal(cents.toLong, 2)}"
+  }
 
   def publishEvent(event: Event): Funit =
-    event match
+    event match {
       case Error(msg)   => publishError(msg)
       case Warning(msg) => publishWarning(msg)
       case Info(msg)    => publishInfo(msg)
@@ -68,6 +72,7 @@ final class SlackApi(
             channel = rooms.tavern
           )
         )
+    }
 
   def commlog(mod: Holder, user: User, reportBy: Option[User.ID]): Funit =
     client(
@@ -85,7 +90,7 @@ final class SlackApi(
     )
 
   def monitorMod(modId: User.ID, icon: String, text: String, monitorType: MonitorType): Funit =
-    lightUser(modId) flatMap:
+    lightUser(modId) flatMap {
       _ so { mod =>
         val msg =
           SlackMessage(
@@ -96,9 +101,10 @@ final class SlackApi(
           )
         client(msg) >> client(msg.copy(channel = rooms.tavernMonitorAll))
       }
+    }
 
   def logMod(modId: User.ID, icon: String, text: String): Funit =
-    lightUser(modId) flatMap:
+    lightUser(modId) flatMap {
       _ so { mod =>
         client(
           SlackMessage(
@@ -109,6 +115,7 @@ final class SlackApi(
           )
         )
       }
+    }
 
   def printBan(mod: Holder, print: String, userIds: List[User.ID]): Funit =
     logMod(mod.id, "footprints", s"Ban print $print of ${userIds} users: ${userIds map linkifyUsers}")
@@ -271,16 +278,18 @@ final class SlackApi(
         channel = rooms.general
       )
     )
+}
 
-object SlackApi:
+object SlackApi {
 
   sealed trait MonitorType
-  object MonitorType:
+  object MonitorType {
     case object Hunt  extends MonitorType
     case object Comm  extends MonitorType
     case object Other extends MonitorType
+  }
 
-  private[irc] object rooms:
+  private[irc] object rooms {
     val general                         = "team"
     val tavern                          = "tavern"
     val tavernBots                      = "tavern-bots"
@@ -291,7 +300,10 @@ object SlackApi:
     def tavernMonitor(tpe: MonitorType) = s"tavern-monitor-${tpe.toString.toLowerCase}"
     val tavernMonitorAll                = "tavern-monitor-all"
     val gdprLog                         = "gdpr-log"
+  }
 
-  private[irc] object stage:
+  private[irc] object stage {
     val name = "stage.playstrategy.org"
     val icon = "volcano"
+  }
+}

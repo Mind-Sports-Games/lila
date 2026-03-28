@@ -157,7 +157,7 @@ final private class PayPalClient(
     )
 
   private def getOne[A: Reads](url: String): Fu[Option[A]] =
-    get[A](url) dmap some recover { case _: NotFoundException =>
+    get[A](url) `dmap` some recover { case _: NotFoundException =>
       None
     }
 
@@ -178,7 +178,7 @@ final private class PayPalClient(
     request(url) flatMap { _.post(data) } void
   }
 
-  private val logger = lila.plan.logger branch "payPal"
+  private val logger = lila.plan.logger `branch` "payPal"
 
   private def request(url: String) = tokenCache.get {} map { bearer =>
     ws.url(s"${config.endpoint}/$url")

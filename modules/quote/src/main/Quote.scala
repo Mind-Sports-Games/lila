@@ -7,13 +7,14 @@ import strategygames.GameFamily
 
 final class Quote(val text: String, val author: String)
 
-object Quote:
+object Quote {
 
   def one = common(Random.nextInt(common.size))
 
-  def one(seed: String, gf: Option[GameFamily] = None) =
+  def one(seed: String, gf: Option[GameFamily] = None) = {
     val quoteBook = common ++ (gf.flatMap(gameFamilySpecific.get).getOrElse(Vector[Quote]()))
     quoteBook(new Random(seed.hashCode).nextInt(quoteBook.size))
+  }
 
   // courtesy of http://www.chess-poster.com/english/notes_and_facts/chess_quotes.htm
   // and other various sources
@@ -1872,3 +1873,4 @@ object Quote:
         "author" -> q.author
       )
     }
+}

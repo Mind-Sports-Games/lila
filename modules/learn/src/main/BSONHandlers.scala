@@ -4,7 +4,7 @@ import reactivemongo.api.bson._
 
 import lila.db.dsl._
 
-object BSONHandlers:
+object BSONHandlers {
 
   import StageProgress.Score
 
@@ -18,3 +18,4 @@ object BSONHandlers:
   implicit val LearnProgressIdHandler: BSONHandler[LearnProgress.Id] =
     stringAnyValHandler[LearnProgress.Id](_.value, LearnProgress.Id.apply)
   implicit val LearnProgressHandler: BSONDocumentHandler[LearnProgress] = Macros.handler[LearnProgress]
+}

@@ -43,7 +43,7 @@ final private class StripeClient(
           lila.i18n.I18nKeys.patron.payLifetimeOnce.txt(data.checkout.amount.usd.toString)
       )
     }
-    postOne[StripeSession]("checkout/sessions", args: _*)
+    postOne[StripeSession]("checkout/sessions", args*)
   }
 
   private def recurringPriceArgs(name: String, amount: Cents) = List(
@@ -59,7 +59,7 @@ final private class StripeClient(
     val args = sessionArgs(data.customerId, data.urls) ++
       List("mode" -> "subscription") ++
       recurringPriceArgs("line_items", data.checkout.amount)
-    postOne[StripeSession]("checkout/sessions", args: _*)
+    postOne[StripeSession]("checkout/sessions", args*)
   }
 
   def createCustomer(user: User, data: PlanCheckout): Fu[StripeCustomer] =
@@ -80,7 +80,7 @@ final private class StripeClient(
     )
     postOne[StripeSubscription](
       s"subscriptions/${sub.id}",
-      args: _*
+      args*
     )
   }
 
@@ -109,7 +109,7 @@ final private class StripeClient(
       "mode"                                         -> "setup",
       "setup_intent_data[metadata][subscription_id]" -> sub.id
     )
-    postOne[StripeSession]("checkout/sessions", args: _*)
+    postOne[StripeSession]("checkout/sessions", args*)
   }
 
   def getSession(id: String): Fu[Option[StripeSessionWithIntent]] =
@@ -127,10 +127,10 @@ final private class StripeClient(
   def setSubscriptionPaymentMethod(subscription: StripeSubscription, paymentMethod: String): Funit =
     postOne[JsObject](s"subscriptions/${subscription.id}", "default_payment_method" -> paymentMethod).void
 
-  private val logger = lila.plan.logger branch "stripe"
+  private val logger = lila.plan.logger `branch` "stripe"
 
   private def getOne[A: Reads](url: String, queryString: (String, Any)*): Fu[Option[A]] =
-    get[A](url, queryString) dmap some recover {
+    get[A](url, queryString) `dmap` some recover {
       case _: NotFoundException => None
       case e: DeletedException =>
         logger.warn(e.getMessage)
@@ -147,7 +147,7 @@ final private class StripeClient(
 
   private def get[A: Reads](url: String, queryString: Seq[(String, Any)]): Fu[A] = {
     logger.debug(s"GET $url ${debugInput(queryString)}")
-    request(url).withQueryStringParameters(fixInput(queryString): _*).get() flatMap response[A]
+    request(url).withQueryStringParameters(fixInput(queryString)*).get() flatMap response[A]
   }
 
   private def post[A: Reads](url: String, data: Seq[(String, Any)]): Fu[A] = {
@@ -157,7 +157,7 @@ final private class StripeClient(
 
   private def delete[A: Reads](url: String, data: Seq[(String, Any)]): Fu[A] = {
     logger.info(s"DELETE $url ${debugInput(data)}")
-    request(url).withQueryStringParameters(fixInput(data): _*).delete() flatMap response[A]
+    request(url).withQueryStringParameters(fixInput(data)*).delete() flatMap response[A]
   }
 
   private def request(url: String) =

@@ -15,13 +15,14 @@ case class DbImage(
     size: Int, // in bytes
     createdAt: DateTime,
     createdBy: Option[String]
-):
+) {
 
   def id = _id
 
   def path = s"$id/$hash/$name"
+}
 
-object DbImage:
+object DbImage {
 
   def make(
       id: String,
@@ -30,7 +31,7 @@ object DbImage:
       path: Path,
       size: Int,
       createdBy: String
-  ) =
+  ) = {
     import com.roundeights.hasher.Implicits._
     val data = Files.readAllBytes(path)
     DbImage(
@@ -43,5 +44,7 @@ object DbImage:
       createdAt = DateTime.now,
       createdBy = createdBy.some
     )
+  }
 
   implicit val DbImageBSONHandler: BSONDocumentHandler[DbImage] = Macros.handler[DbImage]
+}

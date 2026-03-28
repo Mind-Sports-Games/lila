@@ -10,9 +10,9 @@ import lila.common.Form.UTCDate._
 import lila.i18n.LangList
 import lila.user.User
 
-object EventForm:
+object EventForm {
 
-  object icon:
+  object icon {
     val default   = ""
     val broadcast = "broadcast.icon"
     val choices = List(
@@ -22,6 +22,7 @@ object EventForm:
       broadcast                -> "Broadcast",
       "mso.logo.png"           -> "MSO"
     )
+  }
 
   val form = Form(
     mapping(
@@ -73,7 +74,7 @@ object EventForm:
       hostedBy: Option[User.ID] = None,
       icon: String = "",
       countdown: Boolean
-  ):
+  ) {
 
     def update(event: Event, by: User) =
       event.copy(
@@ -117,8 +118,9 @@ object EventForm:
         icon = icon.some.filter(_.nonEmpty),
         countdown = countdown
       )
+  }
 
-  object Data:
+  object Data {
 
     def make(event: Event) =
       Data(
@@ -137,3 +139,5 @@ object EventForm:
         icon = ~event.icon,
         countdown = event.countdown
       )
+  }
+}

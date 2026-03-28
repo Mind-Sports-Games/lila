@@ -1,26 +1,28 @@
 package lila.video
 
-case class TagNb(_id: Tag, nb: Int):
+case class TagNb(_id: Tag, nb: Int) {
 
   def tag = _id
 
   def empty = nb == 0
 
   def isNumeric = tag forall (_.isDigit)
+}
 
-case class Filter(tags: List[String]):
+case class Filter(tags: List[String]) {
 
   def toggle(tag: String) =
     copy(
       tags = if (tags contains tag) tags filter (tag !=) else tags :+ tag
     )
+}
 
 case class UserControl(
     filter: Filter,
     tags: List[TagNb],
     query: Option[String],
     bot: Boolean
-):
+) {
 
   def toggleTag(tag: String) =
     copy(
@@ -37,3 +39,4 @@ case class UserControl(
     ).flatten mkString "&"
 
   def queryStringUnlessBot = !bot so queryString
+}

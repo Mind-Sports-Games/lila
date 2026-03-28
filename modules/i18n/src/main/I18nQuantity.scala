@@ -25,7 +25,7 @@ private object I18nQuantity {
   type Selector = Count => I18nQuantity
 
   def apply(lang: Lang, c: Count): I18nQuantity =
-    langMap.getOrElse(lang.language, selectors.default _)(c)
+    langMap.getOrElse(lang.language, selectors.default)(c)
 
   private object selectors {
 

@@ -7,13 +7,13 @@ import strategygames.{ ByoyomiClock, Clock => StratClock, ClockConfig }
 import lila.common.Form._
 
 // Some helpers for dealing with clocks
-object Clock:
+object Clock {
 
   // Extract values from ClockConfig for form binding
   def valuesFromClockConfig(
       c: ClockConfig
   ): Option[(Boolean, Boolean, Boolean, Int, Int, Int, Option[Int], Option[Int])] =
-    c match
+    c match {
       case fc: StratClock.Config =>
         Some((false, false, false, fc.limitSeconds, fc.incrementSeconds, 0, None, None))
       case bc: StratClock.BronsteinConfig =>
@@ -22,6 +22,7 @@ object Clock:
         Some((false, false, true, udc.limitSeconds, 0, udc.delaySeconds, None, None))
       case bc: ByoyomiClock.Config =>
         Some((true, false, false, bc.limitSeconds, bc.incrementSeconds, 0, Some(bc.byoyomiSeconds), Some(bc.periods)))
+    }
 
   def clockConfigFromValues(
       useByoyomi: Boolean,
@@ -33,7 +34,7 @@ object Clock:
       byoyomi: Option[Int],
       periods: Option[Int]
   ): ClockConfig =
-    (useByoyomi, useBronsteinDelay, useSimpleDelay, byoyomi, periods) match
+    (useByoyomi, useBronsteinDelay, useSimpleDelay, byoyomi, periods) match {
       case (true, false, false, Some(byoyomi), Some(periods)) =>
         ByoyomiClock.Config(limit, increment, byoyomi, periods)
       case (false, true, false, _, _) =>
@@ -42,6 +43,7 @@ object Clock:
         StratClock.SimpleDelayConfig(limit, delay)
       case _ =>
         StratClock.Config(limit, increment)
+    }
 
   def formatLimit(l: Int) = // Assumes seconds
     StratClock.Config(l, 0).limitString + {
@@ -51,7 +53,7 @@ object Clock:
   def clockConfigMappingsMinutes(clockTimes: Seq[Double], byoyomiLimits: Seq[Int]): Mapping[ClockConfig] =
     clockConfigMappingsSeconds(clockTimes.map(_ * 60d).map(_.toInt), byoyomiLimits)
 
-  def clockConfigMappingsSeconds(clockTimes: Seq[Int], byoyomiLimits: Seq[Int]): Mapping[ClockConfig] =
+  def clockConfigMappingsSeconds(clockTimes: Seq[Int], byoyomiLimits: Seq[Int]): Mapping[ClockConfig] = {
     val clockTimeChoices = options(clockTimes, format = formatLimit)
 
     mapping[ClockConfig, Boolean, Boolean, Boolean, Int, Int, Int, Option[Int], Option[Int]](
@@ -64,6 +66,7 @@ object Clock:
       "byoyomi"           -> optional(number.verifying(byoyomiLimits.contains)),
       "periods"           -> optional(number(min = 0, max = 5))
     )(clockConfigFromValues)(valuesFromClockConfig)
+  }
 
   def clockConfigMappingsFromMinutes(clockTimes: Seq[Int], byoyomiLimits: Seq[Int]): Mapping[ClockConfig] =
     clockConfigMappingsMinutes(clockTimes.map(_.toDouble), byoyomiLimits)
@@ -76,3 +79,4 @@ object Clock:
 
   def clockTimeChoicesFromSeconds(clockTimes: Seq[Int]) =
     optionsMinutes(clockTimes, format = formatLimit)
+}

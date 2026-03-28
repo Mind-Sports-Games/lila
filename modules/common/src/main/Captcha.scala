@@ -8,11 +8,12 @@ case class Captcha(
     p1: Boolean,
     solutions: Captcha.Solutions,
     moves: Map[String, String]
-):
+) {
 
   def valid(solution: String) = solutions.toList contains solution
+}
 
-object Captcha:
+object Captcha {
 
   type Solutions = NonEmptyList[String]
 
@@ -29,3 +30,4 @@ object Captcha:
   import scala.language.reflectiveCalls
   def isFailed(form: Form.FormLike) =
     form.errors.exists(_.messages.has(failMessage))
+}

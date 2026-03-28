@@ -72,6 +72,6 @@ object ConfigStore {
     private val coll = db(config.configColl)
 
     def apply[A: ConfigLoader](id: String, logger: lila.log.Logger) =
-      new ConfigStore[A](coll, id, cacheApi, logger branch "configStore")
+      new ConfigStore[A](coll, id, cacheApi, logger `branch` "configStore")
   }
 }

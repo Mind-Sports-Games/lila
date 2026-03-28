@@ -5,7 +5,7 @@ import play.api.data.Forms._
 
 import lila.common.Form.{ numberIn, stringIn }
 
-object PrefForm:
+object PrefForm {
 
   private def containedIn(choices: Seq[(Int, String)]): Int => Boolean =
     choice => choices.exists(_._1 == choice)
@@ -112,7 +112,7 @@ object PrefForm:
       message: Int,
       studyInvite: Option[Int],
       insightShare: Int
-  ):
+  ) {
 
     def apply(pref: Pref) =
       pref.copy(
@@ -153,8 +153,9 @@ object PrefForm:
         mancalaMove = behavior.mancalaMove | pref.mancalaMove,
         boardIdentifier = display.boardIdentifier | pref.boardIdentifier
       )
+  }
 
-  object PrefData:
+  object PrefData {
     def apply(pref: Pref): PrefData =
       PrefData(
         display = DisplayData(
@@ -200,6 +201,7 @@ object PrefForm:
         studyInvite = pref.studyInvite.some,
         insightShare = pref.insightShare
       )
+  }
 
   def prefOf(p: Pref): Form[PrefData] = pref fill PrefData(p)
 
@@ -265,3 +267,4 @@ object PrefForm:
       "zen" -> text.verifying(Set("0", "1") contains _)
     )
   )
+}

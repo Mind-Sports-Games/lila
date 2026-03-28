@@ -62,13 +62,11 @@ object BuildSettings {
     smallModule(name, deps, defaultLibs ++ libs)
 
   val compilerOptions = Seq(
-    "-indent",
+    "-no-indent",
     "-feature",
     "-language:postfixOps",
     "-language:implicitConversions",
-    "-release:21",
-    "-Wimplausible-patterns",
-    "-Wunused:all"
+    "-release:21"
   )
 
   val srcMain = Seq(

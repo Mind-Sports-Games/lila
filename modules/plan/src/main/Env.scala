@@ -30,7 +30,7 @@ final class Env(
 )(implicit
     ec: scala.concurrent.ExecutionContext,
     system: org.apache.pekko.actor.ActorSystem
-):
+) {
 
   private val config = appConfig.get[PlanConfig]("plan")(AutoConfig.loader)
 
@@ -82,14 +82,17 @@ final class Env(
   }
 
   def cli =
-    new lila.common.Cli:
-      def process =
+    new lila.common.Cli {
+      def process = {
         case "patron" :: "lifetime" :: user :: Nil =>
           userRepo `named` user flatMap { _ so api.setLifetime } inject "ok"
         case "patron" :: "month" :: user :: Nil =>
           userRepo `named` user flatMap { _ so api.giveMonth } inject "ok"
         case "patron" :: "remove" :: user :: Nil =>
           userRepo `named` user flatMap { _ so api.remove } inject "ok"
+      }
+    }
+}
 
 private trait PatronColl
 private trait ChargeColl

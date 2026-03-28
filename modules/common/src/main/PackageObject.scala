@@ -1,6 +1,6 @@
 package lila
 
-trait PackageObject:
+trait PackageObject {
 
   export lila.core.lilaism.Lilaism.{ *, given }
 
@@ -14,7 +14,7 @@ trait PackageObject:
   implicit def toPimpedFutureOption[A](fua: Fu[Option[A]]): lila.base.PimpedFutureOption[A] =
     new lila.base.PimpedFutureOption(fua)
 
-  object makeTimeout:
+  object makeTimeout {
     import org.apache.pekko.util.Timeout
     import scala.concurrent.duration.*
 
@@ -30,3 +30,5 @@ trait PackageObject:
     val halfSecond: Timeout = millis(500)
 
     given Timeout = short
+  }
+}

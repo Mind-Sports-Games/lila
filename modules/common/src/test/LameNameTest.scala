@@ -1,10 +1,10 @@
 package lila.common
 
-class LameNameTest extends munit.FunSuite:
+class LameNameTest extends munit.FunSuite {
 
   def isLame(str: String) = LameName.username(str)
 
-  test("disallow separated titles"):
+  test("disallow separated titles") {
     assert(isLame("fm-foo"))
     assert(isLame("fm_foo"))
     assert(isLame("wgm-foo"))
@@ -14,8 +14,9 @@ class LameNameTest extends munit.FunSuite:
     assert(isLame("GmFoo"))
     assert(isLame("nm_brianmatthews"))
     assert(isLame("the_nm_brianmatthews"))
+  }
 
-  test("disallow uppercase titles"):
+  test("disallow uppercase titles") {
     assert(isLame("GMfoo"))
     assert(isLame("IMfoo"))
     assert(isLame("WFMfoo"))
@@ -28,16 +29,18 @@ class LameNameTest extends munit.FunSuite:
     assert(isLame("BrianMatthews_NM"))
     assert(isLame("BrianMatthewsNM"))
     assert(isLame("TheGMBrianMatthews"))
+  }
 
-  test("disallow gross"):
+  test("disallow gross") {
     assert(isLame("douchebag"))
     assert(isLame("d0uchebag"))
     assert(isLame("urcunt-blah"))
     assert(isLame("urcuntblah"))
     assert(isLame("fuckster"))
     assert(isLame("fuuckster"))
+  }
 
-  test("allow good stuff"):
+  test("allow good stuff") {
     assert(!isLame("joey"))
     assert(!isLame("gmfoo"))
     assert(!isLame("g-foo"))
@@ -50,4 +53,6 @@ class LameNameTest extends munit.FunSuite:
     assert(!isLame("BrianMatthews"))
     assert(!isLame("BrianMatthewsnm"))
     assert(!isLame("TheGMBRianMatthews"))
+  }
+}
 

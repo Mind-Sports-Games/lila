@@ -10,7 +10,7 @@ final class RateLimit[K](
     key: String,
     enforce: Boolean = true,
     log: Boolean = true
-) extends RateLimit.RateLimiter[K]:
+) extends RateLimit.RateLimiter[K] {
   import RateLimit._
 
   private val storage = lila.memo.CacheApi.scaffeineNoScheduler
@@ -30,7 +30,7 @@ final class RateLimit[K](
   def apply[A](k: K, cost: Cost = 1, msg: => String = "")(op: => A)(default: => A): A =
     if (cost < 1) op
     else
-      storage getIfPresent k match
+      storage getIfPresent k match {
         case None =>
           storage.put(k, cost -> makeClearAt)
           op
@@ -46,23 +46,26 @@ final class RateLimit[K](
           default
         case _ =>
           op
+      }
+}
 
-object RateLimit:
+object RateLimit {
 
   type Charge = Cost => Unit
   type Cost   = Int
 
-  trait RateLimiter[K]:
+  trait RateLimiter[K] {
 
     def apply[A](k: K, cost: Cost = 1, msg: => String = "")(op: => A)(default: => A): A
 
     def chargeable[A](k: K, cost: Cost = 1, msg: => String = "")(op: Charge => A)(default: => A): A
+  }
 
   def composite[K](
       key: String,
       enforce: Boolean = true,
       log: Boolean = true
-  )(rules: (String, Int, FiniteDuration)*): RateLimiter[K] =
+  )(rules: (String, Int, FiniteDuration)*): RateLimiter[K] = {
 
     val limiters: Seq[RateLimit[K]] = rules.map { case (subKey, credits, duration) =>
       new RateLimit[K](
@@ -74,15 +77,20 @@ object RateLimit:
       )
     }
 
-    new RateLimiter[K]:
+    new RateLimiter[K] {
 
-      def apply[A](k: K, cost: Cost = 1, msg: => String = "")(op: => A)(default: => A): A =
-        val accepted = limiters.foldLeft(true):
+      def apply[A](k: K, cost: Cost = 1, msg: => String = "")(op: => A)(default: => A): A = {
+        val accepted = limiters.foldLeft(true) {
           case (true, limiter) => limiter(k, cost, msg)(true)(false)
           case (false, _)      => false
+        }
         if (accepted) op else default
+      }
 
       def chargeable[A](k: K, cost: Cost = 1, msg: => String = "")(op: Charge => A)(default: => A): A =
         apply(k, cost, msg) { op(c => apply(k, c, s"charge: $msg") {} {}) }(default)
+    }
+  }
 
   private type ClearAt = Long
+}

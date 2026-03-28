@@ -10,7 +10,7 @@ final class DiscordApi(
     client: DiscordClient,
     baseUrl: String,
     implicit val lightUser: LightUser.Getter
-)(implicit ec: scala.concurrent.ExecutionContext):
+)(implicit ec: scala.concurrent.ExecutionContext) {
 
   def matchmakingAnnouncement(text: String, variant: Variant, isHook: Boolean): Funit =
     client(
@@ -44,14 +44,15 @@ final class DiscordApi(
     if (isMedley) s"Medley beginning with $variantName"
     else variantName
 
-  private def freqIcon(freq: String): String = freq match
+  private def freqIcon(freq: String): String = freq match {
     case "weekly"       => ":trophy:"
     case "shield"       => ":shield:"
     case "medleyshield" => ":shield:"
     case "yearly"       => ":cyclone:"
     case _              => ":trophy:"
+  }
 
-  private def gameFamilyRole(variant: Variant): String = (variant.gameFamily.key, variant.key) match
+  private def gameFamilyRole(variant: Variant): String = (variant.gameFamily.key, variant.key) match {
     case ("chess", "standard")     => DiscordRole.Chess.id
     case ("chess", _)              => DiscordRole.ChessVariants.id
     case ("loa", _)                => DiscordRole.LinesOfAction.id
@@ -68,6 +69,7 @@ final class DiscordApi(
     case ("backgammon", _)         => DiscordRole.Backgammon.id
     case ("abalone", _)            => DiscordRole.Abalone.id
     case _                         => DiscordRole.Default.id
+  }
 
   private def link(url: String, name: String) = s"[$name](<$url>)"
   private val userRegex                       = lila.common.String.atUsernameRegex.pattern
@@ -78,7 +80,7 @@ final class DiscordApi(
 
   sealed abstract class DiscordRole(val id: String)
 
-  object DiscordRole:
+  object DiscordRole {
 
     case object Chess extends DiscordRole("<@&1344675363279867904>")
     case object ChessVariants extends DiscordRole("<@&1344695574112239708>")
@@ -96,5 +98,7 @@ final class DiscordApi(
     case object Abalone extends DiscordRole("<@&1344679243082108988>")
 
     case object Default extends DiscordRole("<@&1344676517237755925>")
+  }
+}
 
 

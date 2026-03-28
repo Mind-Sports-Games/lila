@@ -11,7 +11,7 @@ final private[video] class Sheet(
     ws: StandaloneWSClient,
     url: String,
     api: VideoApi
-)(implicit ec: scala.concurrent.ExecutionContext):
+)(implicit ec: scala.concurrent.ExecutionContext) {
 
   import Sheet._
 
@@ -29,7 +29,7 @@ final private[video] class Sheet(
         .traverse(entries) { entry =>
           api.video
             .find(entry.youtubeId)
-            .flatMap:
+            .flatMap {
               case Some(video) =>
                 val updated = video.copy(
                   title = entry.title,
@@ -40,9 +40,10 @@ final private[video] class Sheet(
                   ads = entry.ads,
                   startTime = entry.startTime
                 )
-                (video != updated) so:
+                (video != updated) so {
                   logger.info(s"sheet update $updated")
                   api.video.save(updated)
+                }
               case None =>
                 val video = Video(
                   _id = entry.youtubeId,
@@ -59,6 +60,7 @@ final private[video] class Sheet(
                 logger.info(s"sheet insert $video")
                 api.video.save(video)
               case _ => funit
+          }
             .recover { case e: Exception =>
               logger.warn("sheet update", e)
             }
@@ -68,17 +70,21 @@ final private[video] class Sheet(
     }
 
   private def fetch: Fu[List[Entry]] =
-    ws.url(url).get() flatMap:
+    ws.url(url).get() flatMap {
       case res if res.status == 200 =>
-        readEntries reads res.body[JsValue] match
+        readEntries reads res.body[JsValue] match {
           case JsError(err)          => fufail(err.toString)
           case JsSuccess(entries, _) => fuccess(entries.toList)
+        }
       case res => fufail(s"[video sheet] fetch ${res.status}")
+    }
+}
 
-object Sheet:
+object Sheet {
 
-  case class GStr(`$t`: String):
+  case class GStr(`$t`: String) {
     override def toString = `$t`
+  }
 
   @nowarn case class Entry(
       `gsx$youtubeid`: GStr,
@@ -90,7 +96,7 @@ object Sheet:
       `gsx$include`: GStr,
       `gsx$starttimeinseconds`: GStr,
       `gsx$ads`: GStr
-  ):
+  ) {
     def youtubeId = `gsx$youtubeid`.toString.trim
     def author    = `gsx$youtubeauthor`.toString.trim
     def title     = `gsx$title`.toString.trim
@@ -105,3 +111,5 @@ object Sheet:
     def ads       = `gsx$ads`.toString.trim == "yes"
     def include   = `gsx$include`.toString.trim == "yes"
     def startTime = ~`gsx$starttimeinseconds`.toString.trim.toIntOption
+  }
+}

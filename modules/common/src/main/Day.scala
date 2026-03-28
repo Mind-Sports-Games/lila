@@ -3,11 +3,12 @@ package lila.common
 import org.joda.time.{ DateTime, Days }
 
 // number of days since playstrategy
-case class Day(value: Int) extends AnyVal:
+case class Day(value: Int) extends AnyVal {
 
   def toDate = Day.genesis.plusDays(value).withTimeAtStartOfDay
+}
 
-object Day:
+object Day {
 
   val genesis = new DateTime(2010, 1, 1, 0, 0).withTimeAtStartOfDay
 
@@ -21,4 +22,5 @@ object Day:
     (0 until nb).toList.map { delta =>
       Day(Days.daysBetween(genesis, DateTime.now.minusDays(delta).withTimeAtStartOfDay).getDays)
     }
+}
 

@@ -54,7 +54,7 @@ final class RemoteSocket(
       val _ = onlineUserIds.getAndUpdate(_ -- userIds)
     case In.NotifiedBatch(userIds) => notification ! lila.hub.actorApi.notify.NotifiedBatch(userIds)
     case In.Lags(lags) =>
-      lags foreach (UserLagCache.put _).tupled
+      lags foreach (UserLagCache.put).tupled
       // this shouldn't be necessary... ensure that users are known to be online
       val _ = onlineUserIds.getAndUpdate((x: UserIds) => x ++ lags.keys)
     case In.TellSri(sri, userId, typ, msg) =>
@@ -73,7 +73,7 @@ final class RemoteSocket(
     case In.Ping(id) => send(Out.pong(id))
     case In.WsBoot =>
       logger.warn("Remote socket boot")
-      onlineUserIds set Set("playstrategy")
+      onlineUserIds `set` Set("playstrategy")
   }
 
   Bus.subscribeFun(
@@ -137,7 +137,7 @@ final class RemoteSocket(
     if (parallelism > 1) new RoundRobinSender(redisClient.connectPubSub(), channel, parallelism)
     else new StoppableSender(redisClient.connectPubSub(), channel)
 
-  private val send: Send = makeSender("site-out").apply _
+  private val send: Send = makeSender("site-out").apply
 
   def subscribe(channel: Channel, reader: In.Reader)(handler: Handler): Funit =
     connectAndSubscribe(channel) { message =>
@@ -191,7 +191,7 @@ final class RemoteSocket(
 
 object RemoteSocket {
 
-  private val logger = lila log "socket"
+  private val logger = lila `log` "socket"
 
   type Send = String => Unit
 
@@ -261,7 +261,7 @@ object RemoteSocket {
             raw.get(2) { case Array(user, payload) =>
               for {
                 obj <- Json.parse(payload).asOpt[JsObject]
-                typ <- obj str "t"
+                typ <- obj `str` "t"
               } yield TellUser(user, typ, obj)
             }
           case "req/response" =>
@@ -276,7 +276,7 @@ object RemoteSocket {
       def tellSriMapper: PartialFunction[Array[String], Option[TellSri]] = { case Array(sri, user, payload) =>
         for {
           obj <- Json.parse(payload).asOpt[JsObject]
-          typ <- obj str "t"
+          typ <- obj `str` "t"
         } yield TellSri(Sri(sri), optional(user), typ, obj)
       }
 

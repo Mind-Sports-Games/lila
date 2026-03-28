@@ -12,7 +12,7 @@ final class OAuthServer(
     userRepo: UserRepo,
     appApi: OAuthAppApi,
     cacheApi: lila.memo.CacheApi
-)(implicit ec: scala.concurrent.ExecutionContext):
+)(implicit ec: scala.concurrent.ExecutionContext) {
 
   import AccessToken.accessTokenIdHandler
   import AccessToken.{ BSONFields => F }
@@ -29,18 +29,21 @@ final class OAuthServer(
     accessTokenCache.get(tokenId) `orFailWith` NoSuchToken flatMap {
       case at if scopes.nonEmpty && !scopes.exists(at.scopes.contains) => fufail(MissingScope(at.scopes))
       case at =>
-        userRepo `enabledById` at.userId flatMap:
+        userRepo `enabledById` at.userId flatMap {
           case None    => fufail(NoSuchUser)
           case Some(u) => fuccess(OAuthScope.Scoped(u, at.scopes))
+        }
     } `dmap` Right.apply recover { case e: AuthError =>
       Left(e)
     }
 
   def fetchAppAuthor(req: RequestHeader): Fu[Option[User.ID]] =
     reqToTokenId(req) so { tokenId =>
-      colls.token:
-        _.primitiveOne[OAuthApp.Id]($doc(F.id -> tokenId), F.clientId) flatMap:
+      colls.token {
+        _.primitiveOne[OAuthApp.Id]($doc(F.id -> tokenId), F.clientId) flatMap {
           _ so appApi.authorOf
+        }
+      }
     }
 
   def authBoth(scopes: List[OAuthScope])(
@@ -63,19 +66,22 @@ final class OAuthServer(
     }
 
   private val accessTokenCache =
-    cacheApi[AccessToken.Id, Option[AccessToken.ForAuth]](32, "oauth.server.personal_access_token"):
+    cacheApi[AccessToken.Id, Option[AccessToken.ForAuth]](32, "oauth.server.personal_access_token") {
       _.expireAfterWrite(5 minutes)
         .buildAsyncFuture(fetchAccessToken)
+    }
 
   private def fetchAccessToken(tokenId: AccessToken.Id): Fu[Option[AccessToken.ForAuth]] =
-    colls.token:
+    colls.token {
       _.ext.findAndUpdate[AccessToken.ForAuth](
         selector = $doc(F.id -> tokenId),
         update = $set(F.usedAt -> DateTime.now),
         fields = AccessToken.forAuthProjection.some
       )
+    }
+}
 
-object OAuthServer:
+object OAuthServer {
 
   type AuthResult = Either[AuthError, OAuthScope.Scoped]
 
@@ -96,3 +102,4 @@ object OAuthServer:
     )
 
   type Try = () => Fu[Option[OAuthServer]]
+}

@@ -2,7 +2,7 @@ package lila.base
 
 import play.api.libs.json._
 
-final class PimpedJsObject(private val js: JsObject) extends AnyVal:
+final class PimpedJsObject(private val js: JsObject) extends AnyVal {
 
   def str(key: String): Option[String] =
     (js \ key).asOpt[String]
@@ -37,9 +37,11 @@ final class PimpedJsObject(private val js: JsObject) extends AnyVal:
     (js \ key).asOpt[A]
 
   def noNull =
-    JsObject:
-      js.fields collect:
+    JsObject {
+      js.fields collect {
         case (key, value) if value != JsNull => key -> value
+      }
+    }
 
   def add(pair: (String, Boolean)): JsObject =
     if (pair._2) js + (pair._1 -> JsBoolean(true))
@@ -58,8 +60,9 @@ final class PimpedJsObject(private val js: JsObject) extends AnyVal:
     value.fold(js) { a =>
       js + (key -> Json.toJson(a))
     }
+}
 
-final class PimpedJsValue(private val js: JsValue) extends AnyVal:
+final class PimpedJsValue(private val js: JsValue) extends AnyVal {
 
   def str(key: String): Option[String] =
     js.asOpt[JsObject] flatMap { obj =>
@@ -95,3 +98,4 @@ final class PimpedJsValue(private val js: JsValue) extends AnyVal:
     js.asOpt[JsObject] flatMap { obj =>
       (obj \ key).asOpt[JsArray]
     }
+}

@@ -15,7 +15,7 @@ final class ConcurrencyLimit[K](
     maxConcurrency: Int = 1,
     limitedDefault: Int => Result = ConcurrencyLimit.limitedDefault,
     toString: K => String = (k: K) => k.toString
-)(implicit ec: scala.concurrent.ExecutionContext):
+)(implicit ec: scala.concurrent.ExecutionContext) {
 
   private val storage = lila.memo.CacheApi.scaffeineNoScheduler
     .expireAfterWrite(ttl)
@@ -27,19 +27,21 @@ final class ConcurrencyLimit[K](
   private lazy val monitor = lila.mon.security.concurrencyLimit(key)
 
   def compose[T](k: K, msg: => String = ""): Option[Source[T, ?] => Source[T, ?]] =
-    get(k) match
+    get(k) match {
       case c @ _ if c >= maxConcurrency =>
         logger.info(s"$k $msg")
         monitor.increment()
         none
       case c @ _ =>
         inc(k)
-        some:
+        some {
           _.watchTermination() { (_, done) =>
             done.onComplete { _ =>
               dec(k)
             }
           }
+        }
+    }
 
   def apply[T](k: K, msg: => String = "")(
       makeSource: => Source[T, ?]
@@ -51,8 +53,10 @@ final class ConcurrencyLimit[K](
   private def get(k: K) = ~storage.getIfPresent(toString(k))
   private def inc(k: K) = concurrentMap.compute(toString(k), (_, c) => (~Option(c) + 1) `atMost` maxConcurrency)
   private def dec(k: K) = concurrentMap.computeIfPresent(toString(k), (_, c) => (c - 1) `atLeast` 0)
+}
 
-object ConcurrencyLimit:
+object ConcurrencyLimit {
 
   def limitedDefault(max: Int) =
     TooManyRequests(Json.obj("error" -> s"Please only run $max request(s) at a time"))
+}

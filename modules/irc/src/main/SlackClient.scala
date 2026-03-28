@@ -10,7 +10,7 @@ import lila.memo.RateLimit
 
 final private class SlackClient(ws: StandaloneWSClient, url: Secret)(implicit
     ec: scala.concurrent.ExecutionContext
-):
+) {
 
   private val defaultChannel = "tavern"
 
@@ -35,8 +35,10 @@ final private class SlackClient(ws: StandaloneWSClient, url: Secret)(implicit
               )
               .noNull
           )
-          .flatMap:
+          .flatMap {
             case res if res.status == 200 => funit
             case res                      => fufail(s"[slack] $url $msg ${res.status} ${res.body}")
+        }
           .recoverDefault
     }(funit)
+}

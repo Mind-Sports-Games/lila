@@ -24,13 +24,13 @@ final class Authenticator(
   }
 
   def authenticateById(id: User.ID, passwordAndToken: PasswordAndToken): Fu[Option[User]] =
-    loginCandidateById(id) map { _ flatMap { _ option passwordAndToken } }
+    loginCandidateById(id) map { _ flatMap { _ `option` passwordAndToken } }
 
   def authenticateByEmail(
       email: NormalizedEmailAddress,
       passwordAndToken: PasswordAndToken
   ): Fu[Option[User]] =
-    loginCandidateByEmail(email) map { _ flatMap { _ option passwordAndToken } }
+    loginCandidateByEmail(email) map { _ flatMap { _ `option` passwordAndToken } }
 
   def loginCandidate(u: User): Fu[User.LoginCandidate] =
     loginCandidateById(u.id) dmap { _ | User.LoginCandidate(u, _ => false) }

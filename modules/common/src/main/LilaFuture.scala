@@ -5,7 +5,7 @@ import org.apache.pekko.actor.Scheduler
 import scala.concurrent.{ Promise, Future => ScalaFu }
 import scala.concurrent.duration.FiniteDuration
 
-object LilaFuture:
+object LilaFuture {
 
   def delay[A](
       duration: FiniteDuration
@@ -13,10 +13,11 @@ object LilaFuture:
     if duration == 0.millis then run
     else org.apache.pekko.pattern.after(duration, scheduler)(run)
 
-  def sleep(duration: FiniteDuration)(using ec: Executor, scheduler: Scheduler): Funit =
+  def sleep(duration: FiniteDuration)(using ec: Executor, scheduler: Scheduler): Funit = {
     val p = Promise[Unit]()
     scheduler.scheduleOnce(duration)(p.success(()))
     p.future
+  }
 
   def makeItLast[A](
       duration: FiniteDuration
@@ -28,10 +29,11 @@ object LilaFuture:
       ec: Executor,
       scheduler: Scheduler
   ): Fu[T] =
-    op().recoverWith:
+    op().recoverWith {
       case e if retries > 0 =>
         logger.foreach { _.info(s"$retries retries - ${e.getMessage}") }
         org.apache.pekko.pattern.after(delay, scheduler)(retry(op, delay, retries - 1, logger))
+    }
 
   def linear[A, B](list: Iterable[A])(f: A => Fu[B])(using ec: scala.concurrent.ExecutionContext): Fu[List[B]] =
     list.foldLeft(fuccess(List.empty[B])) { (acc, a) =>
@@ -55,7 +57,7 @@ object LilaFuture:
     ScalaFu
       .sequence {
         list.map { element =>
-          f(element).dmap(_ option element)
+          f(element).dmap(_ `option` element)
         }
       }
       .dmap(_.flatten)
@@ -77,3 +79,4 @@ object LilaFuture:
     list.foldLeft(fuccess(zero)) { (acc, a) =>
       acc.flatMap { b => f(b, a) }
     }
+}

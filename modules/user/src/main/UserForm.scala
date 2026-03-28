@@ -61,7 +61,7 @@ final class UserForm(authenticator: Authenticator) {
   }
 
   def passwd(u: User)(implicit ec: scala.concurrent.ExecutionContext) =
-    authenticator loginCandidate u map { candidate =>
+    authenticator `loginCandidate` u map { candidate =>
       Form(
         mapping(
           "oldPasswd"  -> nonEmptyText.verifying("incorrectPassword", p => candidate.check(ClearPassword(p))),
@@ -81,5 +81,5 @@ object UserForm {
     Constraints maxLength 30,
     Constraints.pattern(regex = User.historicalUsernameRegex)
   )
-  lazy val historicalUsernameField = text.verifying(historicalUsernameConstraints: _*)
+  lazy val historicalUsernameField = text.verifying(historicalUsernameConstraints*)
 }

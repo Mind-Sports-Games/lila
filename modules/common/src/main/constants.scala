@@ -1,6 +1,6 @@
 package lila.common
 
-object constants:
+object constants {
 
   val bannedYoutubeIds = List(
     "7UpltimWY_E",
@@ -14,3 +14,4 @@ object constants:
     "g-DKTxYFkRQ",
     "Z5eWjccV7D0"
   )
+}

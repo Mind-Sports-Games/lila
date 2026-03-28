@@ -10,7 +10,7 @@ final class AppealApi(
     userRepo: UserRepo,
     noteApi: NoteApi,
     snoozer: lila.memo.Snoozer[Appeal.SnoozeKey]
-)(implicit ec: scala.concurrent.ExecutionContext):
+)(implicit ec: scala.concurrent.ExecutionContext) {
 
   import BsonHandlers._
 
@@ -25,7 +25,7 @@ final class AppealApi(
   def exists(user: User) = coll.exists($id(user.id))
 
   def post(text: String, me: User) =
-    mine(me) flatMap:
+    mine(me) flatMap {
       case None =>
         val appeal =
           Appeal(
@@ -46,15 +46,18 @@ final class AppealApi(
       case Some(prev) =>
         val appeal = prev.post(text, me)
         coll.update.one($id(appeal.id), appeal) inject appeal
+    }
 
-  def reply(text: String, prev: Appeal, mod: Holder, preset: Option[String]) =
+  def reply(text: String, prev: Appeal, mod: Holder, preset: Option[String]) = {
     val appeal = prev.post(text, mod.user)
     coll.update.one($id(appeal.id), appeal) >> {
       preset so { note =>
-        userRepo.byId(appeal.id) flatMap:
+        userRepo.byId(appeal.id) flatMap {
           _ so { noteApi.write(_, s"Appeal reply: $note", mod.user, modOnly = true, dox = false) }
+        }
       }
     } inject appeal
+  }
 
   def countUnread = coll.countSel($doc("status" -> Appeal.Status.Unread.key))
 
@@ -72,8 +75,9 @@ final class AppealApi(
         .find($doc("status" `$ne` Appeal.Status.Unread.key))
         .sort($doc("firstUnrepliedAt" -> -1))
         .cursor[Appeal]()
-        .list(40 - unreads.size) map:
+        .list(40 - unreads.size) map {
         unreads ::: _
+      }
     }
 
   def setRead(appeal: Appeal) =
@@ -95,3 +99,4 @@ final class AppealApi(
 
   def snooze(mod: User, appealId: User.ID, duration: String): Unit =
     snoozer.set(Appeal.SnoozeKey(mod.id, appealId), duration)
+}

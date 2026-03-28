@@ -17,7 +17,7 @@ final class Env(
 
   private val RedisUri = appConfig.get[String]("socket.redis.uri")
 
-  private val redisClient = RedisClient create RedisURI.create(RedisUri)
+  private val redisClient = RedisClient `create` RedisURI.create(RedisUri)
 
   val remoteSocket: RemoteSocket = wire[RemoteSocket]
 
