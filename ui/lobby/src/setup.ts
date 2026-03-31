@@ -260,16 +260,16 @@ export default class Setup {
         });
       case '12_1': // abalone
         return Object.assign({}, defaultClockConfig, {
-          bullet: { timemode: '5', initial: '3', increment: '1' },
-          blitz: { timemode: '5', initial: '5', increment: '2' },
+          bullet: { timemode: '5', initial: '1', increment: '1' },
+          blitz: { timemode: '5', initial: '6', increment: '2' },
           rapid: { timemode: '5', initial: '10', increment: '5' },
           classical: { timemode: '5', initial: '20', increment: '10' },
         });
       case '12_2': // grand abalone
         return Object.assign({}, defaultClockConfig, {
-          bullet: { timemode: '5', initial: '3', increment: '1' },
-          blitz: { timemode: '5', initial: '5', increment: '2' },
-          rapid: { timemode: '5', initial: '10', increment: '5' },
+          bullet: { timemode: '5', initial: '2', increment: '2' },
+          blitz: { timemode: '5', initial: '6', increment: '6' },
+          rapid: { timemode: '5', initial: '10', increment: '10' },
           classical: { timemode: '5', initial: '20', increment: '10' },
         });
       default:

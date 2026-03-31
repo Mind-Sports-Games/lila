@@ -303,6 +303,7 @@ final private class TournamentScheduler(
       (nextMonday, 3),
       (nextMonday, 6),
       (nextMonday, 9),
+      (nextMonday, 11),
       (nextMonday, 15),
       (nextMonday, 21),
       (nextTuesday, 2),
@@ -367,7 +368,7 @@ final private class TournamentScheduler(
       (Variant.Chess(strategygames.chess.variant.Horde), Blitz53),
       (Variant.Togyzkumalak(strategygames.togyzkumalak.variant.Bestemshe), Blitz32),
       (Variant.FairySF(strategygames.fairysf.variant.MiniBreakthroughTroyka), Blitz21),
-      (Variant.Abalone(strategygames.abalone.variant.Abalone), Delay52),
+      (Variant.Abalone(strategygames.abalone.variant.Abalone), Delay62),
       (Variant.Draughts(strategygames.draughts.variant.Portuguese), Blitz32),
       (Variant.Samurai(strategygames.samurai.variant.Oware), Blitz32),
       (Variant.Chess(strategygames.chess.variant.Antichess), Blitz32),
@@ -378,6 +379,7 @@ final private class TournamentScheduler(
       (Variant.Chess(strategygames.chess.variant.KingOfTheHill), Blitz32),
       (Variant.FairySF(strategygames.fairysf.variant.AntiFlipello), Blitz),
       (Variant.Draughts(strategygames.draughts.variant.Brazilian), Blitz32),
+      (Variant.Abalone(strategygames.abalone.variant.GrandAbalone), Delay66),
       (Variant.FairySF(strategygames.fairysf.variant.Shogi), Byoyomi510),
       (Variant.FairySF(strategygames.fairysf.variant.BreakthroughTroyka), Blitz32),
       (Variant.Chess(strategygames.chess.variant.RacingKings), Blitz32),
@@ -541,7 +543,7 @@ final private class TournamentScheduler(
       scheduleYearly24hr(Variant.Chess(strategygames.chess.variant.Monster), Blitz32)(
         new DateTime(2026, 9, 11, 0, 0)
       ),
-      scheduleYearly24hr(Variant.Abalone(strategygames.abalone.variant.Abalone), Delay52)(
+      scheduleYearly24hr(Variant.Abalone(strategygames.abalone.variant.Abalone), Delay62)(
         new DateTime(2026, 9, 18, 0, 0)
       ),
       scheduleYearly24hr(Variant.Backgammon(strategygames.backgammon.variant.Backgammon), Delay1510)(
@@ -573,6 +575,9 @@ final private class TournamentScheduler(
       ),
       scheduleYearly24hr(Variant.Dameo(strategygames.dameo.variant.Dameo), Blitz53)(
         new DateTime(2026, 11, 20, 0, 0)
+      ),
+      scheduleYearly24hr(Variant.Abalone(strategygames.abalone.variant.GrandAbalone), Delay66)(
+        new DateTime(2026, 11, 27, 0, 0)
       ),
     ).flatten filter { _.schedule.at isAfter rightNow }
 
