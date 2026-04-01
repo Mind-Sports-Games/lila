@@ -111,6 +111,7 @@ export default function status(ctrl: Ctrl): string {
         case 'nackgammon':
           return noarg('gameFinished');
         case 'abalone':
+        case 'grandabalone':
           return noarg('gameFinished');
       }
       return noarg('variantEnding');

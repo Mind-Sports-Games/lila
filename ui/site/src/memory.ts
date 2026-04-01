@@ -112,7 +112,8 @@ playstrategy.load.then(() => {
       '',
       '',
       '',
-      '\ue927',
+      '\ue927', // Abalone
+      '\ue92C', // Grand Abalone
     ];
     const shuffledIcons = icons.sort(() => Math.random() - 0.5);
 

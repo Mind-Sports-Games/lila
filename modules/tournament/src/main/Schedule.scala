@@ -279,6 +279,9 @@ object Schedule {
     case object Blitz52      extends Speed(82)
     case object Blitz53      extends Speed(85)
     case object Blitz55      extends Speed(90)
+    case object Delay52      extends Speed(520)
+    case object Delay62      extends Speed(620)
+    case object Delay66      extends Speed(660)
     case object Delay110     extends Speed(110)
     case object Delay1510    extends Speed(115)
     case object Delay210     extends Speed(210)
@@ -312,6 +315,9 @@ object Schedule {
         Delay210,
         Delay212,
         Delay310,
+        Delay52,
+        Delay62,
+        Delay66,
         Byoyomi210x5,
         Byoyomi35,
         Byoyomi310x5,
@@ -491,6 +497,9 @@ object Schedule {
       case (_, _, Delay210)     => SDC(2 * 60, 10)
       case (_, _, Delay212)     => SDC(2 * 60, 12)
       case (_, _, Delay310)     => SDC(3 * 60, 10)
+      case (_, _, Delay52)      => SDC(5 * 60, 2)
+      case (_, _, Delay62)      => SDC(6 * 60, 2)
+      case (_, _, Delay66)      => SDC(6 * 60, 6)
       case (_, _, Byoyomi210x5) => BC(2 * 60, 0, 10, 5)
       case (_, _, Byoyomi35)    => BC(3 * 60, 0, 5, 1)
       case (_, _, Byoyomi310x5) => BC(3 * 60, 0, 10, 5)

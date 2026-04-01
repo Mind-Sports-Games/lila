@@ -1,5 +1,5 @@
 import * as domData from './data';
-import { readDice, fenPlayerIndex, readDoublingCube, lastMove } from 'stratutils';
+import { readDice, fenPlayerIndex, readDoublingCube, parseLastMove } from 'stratutils';
 
 export const init = (node: HTMLElement): void => {
   const [fen, orientation, ,] = node.getAttribute('data-state')!.split('|');
@@ -45,12 +45,7 @@ export const initWith = (node: HTMLElement, fen: string, orientation: Orientatio
           dice: readDice(fen, variantFromElement($el) as VariantKey),
           doublingCube: readDoublingCube(fen, variantFromElement($el) as VariantKey),
           showUndoButton: false,
-          lastMove: lastMove(
-            ['flipello', 'flipello10', 'antiflipello', 'octagonflipello', 'go9x9', 'go13x13', 'go19x19'].includes(
-              variantFromElement($el),
-            ),
-            lm,
-          ),
+          lastMove: parseLastMove(lm),
           highlight: {
             lastMove:
               lm != undefined &&
@@ -91,9 +86,11 @@ export const initWith = (node: HTMLElement, fen: string, orientation: Orientatio
                                       $el.hasClass('variant-hyper') ||
                                       $el.hasClass('variant-nackgammon')
                                     ? { width: 12, height: 2 }
-                                    : $el.hasClass('variant-abalone')
-                                      ? { width: 9, height: 9 }
-                                      : { width: 8, height: 8 },
+                                    : $el.hasClass('variant-grandabalone')
+                                      ? { width: 11, height: 11 }
+                                      : $el.hasClass('variant-abalone')
+                                        ? { width: 9, height: 9 }
+                                        : { width: 8, height: 8 },
           variant: variantFromElement($el),
           ...(multiPointState?.length === 6 && {
             multiPointState: {

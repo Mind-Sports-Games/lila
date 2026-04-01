@@ -111,9 +111,9 @@ export default function PlayStrategyLobby(opts: LobbyOpts) {
       variantId: '5_6',
     },
     {
-      id: '5+3-abalone',
+      id: '5d2-abalone',
       lim: 5,
-      inc: 3,
+      delay: 2,
       perf: 'Abalone',
       variant: 'abalone',
       variantDisplayName: 'Abalone',

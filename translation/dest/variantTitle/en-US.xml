@@ -46,5 +46,6 @@
   <string name="nackgammon">Get all your pieces into your home and then bear them off first to win</string>
   <string name="breakthroughtroyka">Reach opponents home rank to win</string>
   <string name="minibreakthroughtroyka">Reach opponents home rank to win</string>
-  <string name="abalone">Push six of your opponents marbles off the board to win</string>
+  <string name="abalone">Push six of your opponent's marbles off the board to win</string>
+  <string name="grandabalone">Push ten of your opponent's marbles off the board to win</string>
 </resources>

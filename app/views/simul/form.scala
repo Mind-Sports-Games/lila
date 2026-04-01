@@ -81,17 +81,25 @@ object form {
       },
       form3.group(form("variant"), trans.simulVariantsHint()) { f =>
         frag(
-          div(cls := "variants")(
-            views.html.setup.filter.renderCheckboxes(
-              form,
-              "variants",
-              translatedAllVariantChoicesWithVariants(v => s"${v.gameFamily.id}_${v.id}"),
-              checks = form.value
-                .map(_.variants.map(_.toString))
-                .getOrElse(simul.??(_.variants.map(v => s"${v.gameFamily.id}_${v.id}")))
-                .toSet
+          {
+            val options = translatedAllVariantChoicesWithVariants(v => s"${v.gameFamily.id}_${v.id}")
+            val checks = form.value
+              .map(_.variants.map(_.toString))
+              .getOrElse(simul.??(_.variants.map(v => s"${v.gameFamily.id}_${v.id}")))
+              .toSet
+            val checkboxes = options.zipWithIndex.map { case ((value, text, hint), index) =>
+              div(cls := "checkable")(
+                views.html.setup.filter.renderCheckbox(
+                  form, "variants", index, value, raw(text), hint, checks
+                )
+              )
+            }
+            val n = options.size
+            val fakeDivs = if (n % 3 == 2) 1 else 0
+            div(cls := "variants")(
+              checkboxes ++ Seq.fill(fakeDivs)(div(cls := "checkable fake", style := "visibility:hidden")())
             )
-          ),
+          },
           errMsg(f)
         )
       },

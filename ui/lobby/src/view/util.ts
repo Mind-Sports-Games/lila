@@ -82,4 +82,5 @@ export const perfIcons: any = {
   Hyper: '',
   Nackgammon: '',
   Abalone: '\ue927',
+  'Grand Abalone': '\ue92C',
 };

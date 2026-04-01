@@ -637,20 +637,22 @@ object BinaryFormat {
         .to(Map)
     }
 
-    def writeAbalone(pieces: abalone.PieceMap): ByteArray = {
+    def writeAbalone(pieces: abalone.PieceMap, variant: abalone.variant.Variant): ByteArray = {
       def posInt(pos: abalone.Pos): Int =
         (pieces get pos).fold(0) { piece =>
           piece.player.fold(0, 128) + piece.role.binaryInt
         }
-      ByteArray(abalone.Pos.all.map(posInt(_).toByte).toArray)
+      ByteArray(variant.boardType.cellListForBinary.map(posInt(_).toByte).toArray)
     }
+
+    def writeAbalone(board: abalone.Board): ByteArray = writeAbalone(board.pieces, board.variant)
 
     def readAbalone(ba: ByteArray, variant: abalone.variant.Variant): abalone.PieceMap = {
       def intPiece(int: Int): Option[abalone.Piece] =
         abalone.Role.allByBinaryInt.get(int & 127) map { role =>
           abalone.Piece(PlayerIndex.fromP1((int & 128) == 0), role)
         }
-      (abalone.Pos.all zip ba.value).view
+      (variant.boardType.cellListForBinary zip ba.value).view
         .flatMap { case (pos, int) =>
           intPiece(int) map (pos -> _)
         }
@@ -691,7 +693,7 @@ object BinaryFormat {
       case GameLogic.Go() => writeGo(go.Board.init(go.variant.Go19x19).pieces)
       case GameLogic.Backgammon() =>
         writeBackgammon(backgammon.Board.init(backgammon.variant.Backgammon).pieces)
-      case GameLogic.Abalone() => writeAbalone(abalone.Board.init(abalone.variant.Abalone).pieces)
+      case GameLogic.Abalone() => writeAbalone(abalone.Board.init(abalone.variant.Abalone))
       case GameLogic.Dameo()   => writeDameo(dameo.Board.init(dameo.variant.Dameo).pieces)
       case _ =>
         sys.error("Cant write to binary for lib")

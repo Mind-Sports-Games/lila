@@ -544,6 +544,44 @@ object TournamentShield {
           5
         )
 
+    private def abaloneVariantOrder(variants: List[Variant]) =
+      TournamentMedleyUtil.medleyVariantsAndIntervals(
+        variants,
+        None,
+        abaloneVariantMinutes,
+        abaloneRounds
+      )
+    private val abaloneVariants = List(
+      Variant.wrap(strategygames.abalone.variant.Abalone),
+      Variant.wrap(strategygames.abalone.variant.GrandAbalone),
+      Variant.wrap(strategygames.abalone.variant.Abalone)
+    )
+
+    private val abaloneVariantMinutes = 90
+    private val abaloneRounds         = abaloneVariants.size
+
+    case object AbaloneMedley
+        extends MedleyShield(
+          "shieldAbaloneMedley",
+          "sam",
+          VariantKeys.gameFamilyName(GameFamily.Abalone()),
+          Condition.TeamMember("playstrategy-abalone", "PlayStrategy Abalone"),
+          abaloneVariants,
+          abaloneVariantOrder,
+          Delay66,
+          Some(3),
+          7,
+          16,
+          abaloneVariantMinutes,
+          abaloneRounds,
+          "",
+          s"An Arena which is divided into ${abaloneRounds} equal length periods of ${abaloneVariants.init
+            .map(VariantKeys.variantName)
+            .mkString(", ")} and ${VariantKeys.variantName(abaloneVariants.last)} again.",
+          s"Welcome to the ${VariantKeys.gameFamilyName(GameFamily.Abalone())} Medley Arena!",
+          5
+        )
+
     //all the order permuations which doesnt put two chess or two backgammon next to each other
     private val chessgammonVariantPermuations = List(
       List(0, 1, 2, 3),
@@ -607,6 +645,7 @@ object TournamentShield {
       TogyzkumalakMedley,  //Monthly - 3rd Sat lunchtime
       BackgammonMedley,    //Monthly - 1st Sat afternoon
       BreakthroughMedley,  //Monthly - 4rd Sat afternoon
+      AbaloneMedley,       //Monthly - 3rd Sun afternoon
       ChessgammonMedley    //Monthly - 1st Sun afternoon
     )
 
@@ -983,8 +1022,15 @@ object TournamentShield {
     case object Abalone
         extends Category(
           Variant.Abalone(strategygames.abalone.variant.Abalone),
-          Blitz53,
+          Delay62,
           2,
+          1
+        )
+    case object GrandAbalone
+        extends Category(
+          Variant.Abalone(strategygames.abalone.variant.GrandAbalone),
+          Delay66,
+          14,
           1
         )
 
@@ -1034,7 +1080,8 @@ object TournamentShield {
       Backgammon,
       Hyper,
       Nackgammon,
-      Abalone
+      Abalone,
+      GrandAbalone
     )
 
     def of(t: Tournament): Option[Category] = all.find(_ matches t)

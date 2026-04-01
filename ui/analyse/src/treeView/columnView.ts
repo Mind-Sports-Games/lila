@@ -47,7 +47,13 @@ function renderChildrenOf(ctx: Ctx, node: Tree.ParentedNode, opts: Opts): MaybeV
   const conceal = opts.noConceal ? null : opts.conceal || ctx.concealOf(true)(opts.parentPath + main.id, main);
   if (conceal === 'hide') return;
   if (opts.isMainline) {
-    const isP1 = main.playedPlayerIndex === 'p1';
+    // isContinuation: main is a mid-turn continuation (same player played node and plays main).
+    // Used to suppress the P1 turn index before main.
+    const isContinuation = node.playedPlayerIndex === node.playerIndex;
+    // isMainMidTurn: main itself does not end a full turn (same player plays again after main).
+    // Used to suppress the P2 turn header after main.
+    const isMainMidTurn = main.playedPlayerIndex === main.playerIndex;
+    const isP1 = main.playedPlayerIndex === 'p1' && !isContinuation;
     const commentTags = renderMainlineCommentsOf(ctx, main, conceal, true).filter(nonEmpty);
     if (!cs[1] && isEmpty(commentTags) && !main.forceVariation)
       return ((isP1 ? [moveView.renderIndex(main, false)] : []) as MaybeVNodes).concat(
@@ -85,7 +91,7 @@ function renderChildrenOf(ctx: Ctx, node: Tree.ParentedNode, opts: Opts): MaybeV
         ),
       ] as MaybeVNodes)
       .concat(
-        mainChildren && main.playerIndex === 'p2'
+        mainChildren && main.playerIndex === 'p2' && !isMainMidTurn
           ? [moveView.renderIndex(main, false), emptyMove(passOpts.conceal)]
           : [],
       )
@@ -341,26 +347,6 @@ const emptyConcealOf: ConcealOf = function () {
   };
 };
 
-// Note : temporary fix for multi-action games in analysis mode
-const fixAnalysisMultiActionMoves = (root: Tree.ParentedNode, studyMode: boolean, variantKey: VariantKey) => {
-  if (!studyMode) {
-    const currPlayer = root.playerIndex;
-
-    if (variantKey === 'monster') {
-      return [
-        currPlayer === 'p2' ? moveView.renderIndex(root, false) : null,
-        root.ply > 0 && root.ply % 3 == 2 ? emptyMove() : null,
-      ];
-    } else if (variantKey === 'amazons') {
-      return [
-        currPlayer === 'p2' ? moveView.renderIndex(root, false) : null,
-        root.ply > 0 && root.ply % 4 > 1 ? emptyMove() : null,
-      ];
-    }
-  }
-  return [root.ply & 1 ? moveView.renderIndex(root, false) : null, root.ply & 1 ? emptyMove() : null];
-};
-
 export default function (ctrl: AnalyseCtrl, concealOf?: ConcealOf): VNode {
   const root = parentedNode(ctrl.tree.root);
   const ctx: Ctx = {
@@ -381,7 +367,8 @@ export default function (ctrl: AnalyseCtrl, concealOf?: ConcealOf): VNode {
     (
       [
         isEmpty(commentTags) ? null : h('interrupt', commentTags),
-        ...fixAnalysisMultiActionMoves(root, !!ctrl.study, ctrl.data.game.variant.key),
+        root.ply & 1 ? moveView.renderIndex(root, false) : null,
+        root.ply & 1 ? emptyMove() : null,
       ] as MaybeVNodes
     ).concat(
       renderChildrenOf(ctx, root, {

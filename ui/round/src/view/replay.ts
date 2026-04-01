@@ -197,7 +197,7 @@ export function analysisButton(ctrl: RoundController): VNode | undefined {
           },
           attrs: {
             title: ctrl.noarg('analysis'),
-            href: gameRoute(ctrl.data, ctrl.data.player.playerIndex) + '/analysis#' + ctrl.turnCount,
+            href: gameRoute(ctrl.data, ctrl.data.player.playerIndex) + '/analysis#' + round.lastPly(ctrl.data),
             'data-icon': 'A',
           },
         },
