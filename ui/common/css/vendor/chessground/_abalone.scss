@@ -58,7 +58,7 @@ $directions: ('W', 'NW', 'NE', 'E', 'SE', 'SW');
       @each $player in $players {
         @each $direction in $directions {
           &.#{$player}#{$direction} {
-            background-image: url('../images/board/abalone/highlights/#{$player}#{$direction}.svg');
+            background-image: url('../images/board/abalone/highlightsv2/#{$player}#{$direction}.svg');
             background-color: transparent;
             background-size: cover;
             z-index: z('cg__svg.direction');
@@ -107,7 +107,7 @@ $directions: ('W', 'NW', 'NE', 'E', 'SE', 'SW');
         @each $player in $players {
           @each $direction in $directions {
             &.#{$player}#{$direction} {
-              background-image: url('../images/board/abalone/highlights/#{$player}#{swapDirection($direction)}.svg');
+              background-image: url('../images/board/abalone/highlightsv2/#{$player}#{swapDirection($direction)}.svg');
               background-color: transparent;
               background-size: cover;
               z-index: z('cg__svg.direction');
@@ -126,7 +126,7 @@ $directions: ('W', 'NW', 'NE', 'E', 'SE', 'SW');
         @each $player in $players {
           @each $direction in $directions {
             &.#{$player}#{$direction} {
-              background-image: url('../images/board/abalone/highlights/#{$player}#{swapDirection($direction)}.svg');
+              background-image: url('../images/board/abalone/highlightsv2/#{$player}#{swapDirection($direction)}.svg');
               background-color: transparent;
               background-size: cover;
               z-index: z('cg__svg.direction');
@@ -168,7 +168,7 @@ $directions: ('W', 'NW', 'NE', 'E', 'SE', 'SW');
       @each $player in $players {
         @each $direction in $directions {
           &.#{$player}#{$direction} {
-            background-image: url('../images/board/abalone/highlights/#{$player}#{$direction}.svg');
+            background-image: url('../images/board/abalone/highlightsv2/#{$player}#{$direction}.svg');
             background-color: transparent;
             background-size: cover;
             z-index: z('cg__svg.direction');
@@ -187,7 +187,7 @@ $directions: ('W', 'NW', 'NE', 'E', 'SE', 'SW');
         @each $player in $players {
           @each $direction in $directions {
             &.#{$player}#{$direction} {
-              background-image: url('../images/board/abalone/highlights/#{$player}#{$direction}.svg');
+              background-image: url('../images/board/abalone/highlightsv2/#{$player}#{$direction}.svg');
               background-color: transparent;
               background-size: cover;
               z-index: z('cg__svg.direction');
@@ -206,7 +206,7 @@ $directions: ('W', 'NW', 'NE', 'E', 'SE', 'SW');
         @each $player in $players {
           @each $direction in $directions {
             &.#{$player}#{$direction} {
-              background-image: url('../images/board/abalone/highlights/#{$player}#{swapDirection($direction)}.svg');
+              background-image: url('../images/board/abalone/highlightsv2/#{$player}#{swapDirection($direction)}.svg');
               background-color: transparent;
               background-size: cover;
               z-index: z('cg__svg.direction');
