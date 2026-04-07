@@ -51,12 +51,12 @@ object side {
               if (isPuzzle) trans.nbPuzzles(perf.nb, perf.nb.localize)
               else trans.nbGames(perf.nb, perf.nb.localize)
             )
-          ),
-          rankMap get perfType map { rank =>
-            span(cls := "rank", title := trans.rankIsUpdatedEveryNbMinutes.pluralSameTxt(15))(
-              trans.rankX(rank.localize)
-            )
-          }
+          ), // pla-1604-hide-rank-from-player-profile-until-ranks-system-revamp rank is not properly computed (ranking col would need TTL index), and ranking system needs a revamp, so hide it for now
+          // rankMap get perfType map { rank =>
+          //   span(cls := "rank", title := trans.rankIsUpdatedEveryNbMinutes.pluralSameTxt(15))(
+          //     trans.rankX(rank.localize)
+          //   )
+          // }
         ),
         iconTag("G")
       )
