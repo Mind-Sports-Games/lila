@@ -43,9 +43,10 @@ object PrefForm {
         "autoQueen"        -> checkedNumber(Pref.AutoQueen.choices),
         "autoThreefold"    -> checkedNumber(Pref.AutoThreefold.choices),
         "submitMove"       -> checkedNumber(Pref.SubmitMove.choices),
-        "confirmResign"    -> checkedNumber(Pref.ConfirmResign.choices),
-        "confirmPass"      -> checkedNumber(Pref.ConfirmPass.choices),
-        "playForcedAction" -> checkedNumber(Pref.PlayForcedAction.choices),
+        "confirmResign"       -> checkedNumber(Pref.ConfirmResign.choices),
+        "confirmPass"         -> checkedNumber(Pref.ConfirmPass.choices),
+        "confirmCubeActions"  -> optional(booleanNumber),
+        "playForcedAction"    -> checkedNumber(Pref.PlayForcedAction.choices),
         "keyboardMove"     -> optional(booleanNumber),
         "rookCastle"       -> optional(booleanNumber)
       )(BehaviorData.apply)(BehaviorData.unapply),
@@ -91,6 +92,7 @@ object PrefForm {
       submitMove: Int,
       confirmResign: Int,
       confirmPass: Int,
+      confirmCubeActions: Option[Int],
       playForcedAction: Int,
       keyboardMove: Option[Int],
       rookCastle: Option[Int]
@@ -142,6 +144,7 @@ object PrefForm {
         insightShare = insightShare,
         confirmResign = behavior.confirmResign,
         confirmPass = behavior.confirmPass,
+        confirmCubeActions = behavior.confirmCubeActions | pref.confirmCubeActions,
         playForcedAction = behavior.playForcedAction,
         captured = display.captured == 1,
         keyboardMove = behavior.keyboardMove | pref.keyboardMove,
@@ -185,6 +188,7 @@ object PrefForm {
           submitMove = pref.submitMove,
           confirmResign = pref.confirmResign,
           confirmPass = pref.confirmPass,
+          confirmCubeActions = pref.confirmCubeActions.some,
           playForcedAction = pref.playForcedAction,
           keyboardMove = pref.keyboardMove.some,
           rookCastle = pref.rookCastle.some

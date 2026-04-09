@@ -206,6 +206,20 @@ export const passConfirm = (ctrl: RoundController): VNode =>
     fbtCancel(ctrl, ctrl.passTurn),
   ]);
 
+const cubeConfirm = (ctrl: RoundController, klass: string, text: string, action: (v: boolean) => void): VNode =>
+  h(`div.negotiation.${klass}`, [
+    declineButton(ctrl, () => action(false)),
+    h('p', text),
+    acceptButton(ctrl, `${klass}-yes`, () => action(true)),
+  ]);
+
+export const doubleConfirm = (ctrl: RoundController): VNode =>
+  cubeConfirm(ctrl, 'double-confirm', 'Offer double?', ctrl.offerDouble);
+export const takeCubeConfirm = (ctrl: RoundController): VNode =>
+  cubeConfirm(ctrl, 'take-confirm', 'Take the cube?', ctrl.takeCube);
+export const dropCubeConfirm = (ctrl: RoundController): VNode =>
+  cubeConfirm(ctrl, 'drop-confirm', 'Drop the cube?', ctrl.dropCube);
+
 export const offerSelectSquaresButton = (ctrl: RoundController, isNotSameOffer = true): VNode =>
   h('button.select-squares-offer.button', {
     class: { disabled: !isNotSameOffer },

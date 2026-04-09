@@ -89,6 +89,9 @@ export default class RoundController {
   resignConfirm?: Timeout = undefined;
   drawConfirm?: Timeout = undefined;
   passConfirm?: Timeout = undefined;
+  doubleConfirm?: Timeout = undefined;
+  takeCubeConfirm?: Timeout = undefined;
+  dropCubeConfirm?: Timeout = undefined;
   selectSquaresConfirm?: Timeout = undefined;
   // will be replaced by view layer
   autoScroll: () => void = () => {};
@@ -284,13 +287,13 @@ export default class RoundController {
         this.forceRollDice(this.data.game.variant.key);
         break;
       case 'double':
-        this.cubeAction('cubeo');
+        this.offerDouble(true);
         break;
       case 'take':
-        this.cubeAction('cubey');
+        this.takeCube(true);
         break;
       case 'drop':
-        this.cubeAction('cuben');
+        this.dropCube(true);
         break;
       case 'autoroll':
         this.autoRoll = !this.autoRoll;
@@ -1290,6 +1293,30 @@ export default class RoundController {
     this.sendCubeAction(this.data.game.variant.key, interaction);
     this.redraw();
   };
+
+  private cubeActionWithConfirm = (
+    interaction: string,
+    confirmState: 'doubleConfirm' | 'takeCubeConfirm' | 'dropCubeConfirm',
+    v: boolean,
+  ): void => {
+    if (v) {
+      if (this[confirmState] || !this.data.pref.confirmCubeActions) {
+        this.cubeAction(interaction);
+        clearTimeout(this[confirmState]);
+        this[confirmState] = undefined;
+      } else {
+        this[confirmState] = setTimeout(() => this.cubeActionWithConfirm(interaction, confirmState, false), 5000);
+      }
+    } else if (this[confirmState]) {
+      clearTimeout(this[confirmState]);
+      this[confirmState] = undefined;
+    }
+    this.redraw();
+  };
+
+  offerDouble = (v: boolean): void => this.cubeActionWithConfirm('cubeo', 'doubleConfirm', v);
+  takeCube = (v: boolean): void => this.cubeActionWithConfirm('cubey', 'takeCubeConfirm', v);
+  dropCube = (v: boolean): void => this.cubeActionWithConfirm('cuben', 'dropCubeConfirm', v);
 
   endTurnAction = (): void => {
     if (this.data.canEndTurn) {

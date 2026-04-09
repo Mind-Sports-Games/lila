@@ -289,7 +289,9 @@ export default class AnalyseCtrl {
   private uciToLastMove(uci?: Uci): Key[] | undefined {
     if (!uci || uci == 'pass' || uci.substring(0, 3) == 'ss:') return;
     const pos = uci.match(/[a-z][1-9][0-9]?/g) as Key[];
+    if (!pos) return; // roll, endturn, cube*, undo, dice roll
     if (uci[1] === '@') return [pos[0], pos[0]] as Key[];
+    if (pos.length < 2) return [pos[0]] as Key[]; // lift
     return [pos[0], pos[1]] as Key[];
   }
 
@@ -315,6 +317,7 @@ export default class AnalyseCtrl {
     if (!defined(this.node.dests)) this.getDests();
     this.withCg(cg => {
       cg.set(this.makeCgOpts());
+      if (['backgammon', 'hyper', 'nackgammon'].includes(this.data.game.variant.key)) cg.redrawAll();
       this.setAutoShapes();
       this.setDropMode(cg);
       if (this.node.shapes) cg.setShapes(this.node.shapes as DrawShape[]);
@@ -356,15 +359,19 @@ export default class AnalyseCtrl {
       config: ChessgroundConfig = {
         fen: this.data.game.variant.key == 'amazons' ? amazonsChessgroundFen(node.fen) : node.fen,
         turnPlayerIndex: playerIndex,
-        movable: this.embed
-          ? {
-              playerIndex: undefined,
-              dests: new Map(),
-            }
-          : {
-              playerIndex: movablePlayerIndex,
-              dests: (movablePlayerIndex === playerIndex && dests) || new Map(),
-            },
+        dice: stratUtils.readDice(node.fen, variantKey),
+        doublingCube: stratUtils.readDoublingCube(node.fen, variantKey),
+        multiPointState: stratUtils.finalMultiPointState(this.data.game, node.ply, this.tree.lastPly()),
+        movable:
+          this.embed || ['backgammon', 'hyper', 'nackgammon'].includes(variantKey)
+            ? {
+                playerIndex: undefined,
+                dests: new Map(),
+              }
+            : {
+                playerIndex: movablePlayerIndex,
+                dests: (movablePlayerIndex === playerIndex && dests) || new Map(),
+              },
         check: !!node.check,
         dropmode: {
           active: this.data.onlyDropsVariant,
@@ -373,7 +380,7 @@ export default class AnalyseCtrl {
         onlyDropsVariant: isOnlyDropsPly(node, variantKey, this.data.onlyDropsVariant),
         selected: this.data.game.variant.key === 'dameo' ? dameoStratUtils.activePiecePosition(node.fen) : undefined,
       };
-    if (!dests && !node.check) {
+    if (!dests && !node.check && !['backgammon', 'hyper', 'nackgammon'].includes(variantKey)) {
       // premove while dests are loading from server
       // can't use when in check because it highlights the wrong king
       config.turnPlayerIndex = opposite(playerIndex);

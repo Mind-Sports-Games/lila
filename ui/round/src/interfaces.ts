@@ -244,6 +244,7 @@ export interface Pref {
   clockTenths: Prefs.ShowClockTenths;
   confirmResign: boolean;
   confirmPass: boolean;
+  confirmCubeActions: boolean;
   playForcedAction: boolean;
   coords: cg.Coords;
   destination: boolean;
