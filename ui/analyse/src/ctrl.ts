@@ -53,6 +53,8 @@ import { StudyPracticeCtrl } from './study/practice/interfaces';
 import { valid as crazyValid } from './crazy/crazyCtrl';
 import { isOnlyDropsPly } from './util';
 import { variantClassFromKey, variantKeyToRules } from 'stratops/variants/util';
+import type { ControlConfig } from './control';
+import { configureVariantControl } from './control/configure';
 
 export default class AnalyseCtrl {
   data: AnalyseData;
@@ -118,6 +120,9 @@ export default class AnalyseCtrl {
   contextMenuPath?: Tree.Path;
   gamePath?: Tree.Path;
 
+  // per-variant navigation overrides
+  controlConfig: ControlConfig = {};
+
   // misc
   cgConfig: any; // latest chessground config (useful for revert)
   music?: any;
@@ -157,6 +162,8 @@ export default class AnalyseCtrl {
     }
 
     this.setPath(this.initialPath);
+
+    configureVariantControl(this);
 
     this.showGround();
     this.onToggleComputer();
