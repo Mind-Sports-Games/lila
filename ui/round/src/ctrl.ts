@@ -89,6 +89,9 @@ export default class RoundController {
   resignConfirm?: Timeout = undefined;
   drawConfirm?: Timeout = undefined;
   passConfirm?: Timeout = undefined;
+  doubleConfirm?: boolean = undefined;
+  takeCubeConfirm?: boolean = undefined;
+  dropCubeConfirm?: boolean = undefined;
   selectSquaresConfirm?: Timeout = undefined;
   // will be replaced by view layer
   autoScroll: () => void = () => {};
@@ -284,13 +287,13 @@ export default class RoundController {
         this.forceRollDice(this.data.game.variant.key);
         break;
       case 'double':
-        this.cubeAction('cubeo');
+        this.offerDouble(true);
         break;
       case 'take':
-        this.cubeAction('cubey');
+        this.takeCube(true);
         break;
       case 'drop':
-        this.cubeAction('cuben');
+        this.dropCube(true);
         break;
       case 'autoroll':
         this.autoRoll = !this.autoRoll;
@@ -888,6 +891,7 @@ export default class RoundController {
     };
     if (blur.get()) roll.b = 1;
     this.resign(false);
+    this.doubleConfirm = undefined;
     this.actualSendMove('diceroll', roll);
   };
 
@@ -1289,6 +1293,34 @@ export default class RoundController {
   cubeAction = (interaction: string): void => {
     this.sendCubeAction(this.data.game.variant.key, interaction);
     this.redraw();
+  };
+
+  private cubeActionWithConfirm = (
+    interaction: string,
+    confirmState: 'doubleConfirm' | 'takeCubeConfirm' | 'dropCubeConfirm',
+    v: boolean,
+  ): void => {
+    if (v) {
+      if (this[confirmState] || !this.data.pref.confirmCubeActions) {
+        this.cubeAction(interaction);
+        this[confirmState] = undefined;
+      } else {
+        this[confirmState] = true;
+      }
+    } else {
+      this[confirmState] = undefined;
+    }
+    this.redraw();
+  };
+
+  offerDouble = (v: boolean): void => this.cubeActionWithConfirm('cubeo', 'doubleConfirm', v);
+  takeCube = (v: boolean): void => {
+    if (v) this.dropCubeConfirm = undefined;
+    this.cubeActionWithConfirm('cubey', 'takeCubeConfirm', v);
+  };
+  dropCube = (v: boolean): void => {
+    if (v) this.takeCubeConfirm = undefined;
+    this.cubeActionWithConfirm('cuben', 'dropCubeConfirm', v);
   };
 
   endTurnAction = (): void => {

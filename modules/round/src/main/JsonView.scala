@@ -157,6 +157,7 @@ final class JsonView(
               .add("clockSound" -> pref.clockSound)
               .add("confirmResign" -> (!nvui && pref.confirmResign == Pref.ConfirmResign.YES))
               .add("confirmPass" -> (!nvui && pref.confirmPass == Pref.ConfirmPass.YES))
+              .add("confirmCubeActions" -> (!nvui && pref.confirmCubeActions == Pref.ConfirmCubeActions.YES))
               .add("playForcedAction" -> (!nvui && pref.playForcedAction == Pref.PlayForcedAction.YES))
               .add("keyboardMove" -> (!nvui && pref.keyboardMove == Pref.KeyboardMove.YES))
               .add("rookCastle" -> (pref.rookCastle == Pref.RookCastle.YES))

@@ -12,18 +12,18 @@ importers:
         specifier: github:lichess-org/ab-stub
         version: https://codeload.github.com/lichess-org/ab-stub/tar.gz/94236bf34dbc9c05daf50f4c9842d859b9142be0
       chessground:
-        specifier: github:Mind-Sports-Games/chessground#v7.11.1-pstrat3.33
-        version: https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/b7e13296130cdf38e56e48857fd4e73c0e0b59f3
+        specifier: github:Mind-Sports-Games/chessground#v7.11.1-pstrat3.34
+        version: https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/e39f6fa8f4d054e1d287d64befc4389f58866558
       stratops:
-        specifier: github:Mind-Sports-Games/stratops#v0.8.1-pstrat5.27
-        version: https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/7543f1163e2a87899ebfe016c754bdf42ceabe5f
+        specifier: github:Mind-Sports-Games/stratops#v0.8.1-pstrat5.28
+        version: https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/3ab9da347d5a551dc05935130ef1b5b83f8b574c
       xml2js:
         specifier: ^0.6.2
         version: 0.6.2
     devDependencies:
       '@types/node':
         specifier: ^20.19.4
-        version: 20.19.37
+        version: 20.19.39
       '@types/playstrategy':
         specifier: workspace:*
         version: link:ui/@types/playstrategy
@@ -47,7 +47,7 @@ importers:
         version: 7.1.0
       prettier:
         specifier: ^3.5.3
-        version: 3.8.1
+        version: 3.8.2
       typescript:
         specifier: ^5.9.2
         version: 5.9.3
@@ -71,7 +71,7 @@ importers:
         version: 0.2.13
       '@yaireo/tagify':
         specifier: ^4.32.0
-        version: 4.36.0(prop-types@15.8.1)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
+        version: 4.37.0(prop-types@15.8.1)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
       ceval:
         specifier: workspace:*
         version: link:../ceval
@@ -433,7 +433,7 @@ importers:
         version: 0.3.10
       '@yaireo/tagify':
         specifier: ^4.32.0
-        version: 4.36.0(prop-types@15.8.1)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
+        version: 4.37.0(prop-types@15.8.1)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
       chat:
         specifier: workspace:*
         version: link:../chat
@@ -657,8 +657,8 @@ packages:
   '@types/highcharts@4.2.57':
     resolution: {integrity: sha512-8/RF3I2Zy4I8ll9Ksa+wTbHA7ne/OHilmaTBQTVpQdNtOX6dL7EWFXfcfwiXQAfL+0r48LifHjYDmqug0t8mQA==}
 
-  '@types/node@20.19.37':
-    resolution: {integrity: sha512-8kzdPJ3FsNsVIurqBs7oodNnCEVbni9yUEkaHbgptDACOPW04jimGagZ51E6+lXUwJjgnBw+hyko/lkFWCldqw==}
+  '@types/node@20.19.39':
+    resolution: {integrity: sha512-orrrD74MBUyK8jOAD/r0+lfa1I2MO6I+vAkmAWzMYbCcgrN4lCrmK52gRFQq/JRxfYPfonkr4b0jcY7Olqdqbw==}
 
   '@types/react@19.2.14':
     resolution: {integrity: sha512-ilcTH/UniCkMdtexkoCN0bI7pMcJDvmQFPvuPvmEaYA/NSfFTAgdUSLAoVjaRJm7+6PvcM+q1zYOwS4wTYMF9w==}
@@ -736,9 +736,9 @@ packages:
   '@ungap/structured-clone@1.3.0':
     resolution: {integrity: sha512-WmoN8qaIAo7WTYWbAZuG8PYEhn5fkz7dZrqTBZ7dtt//lL2Gwms1IcnQ5yHqjDfX8Ft5j4YzDM23f87zBfDe9g==}
 
-  '@yaireo/tagify@4.36.0':
-    resolution: {integrity: sha512-pq7z1E0sWWPNTp8gUzWI7yNbILtVbA2qBAGMfn5bDu3ttLLWxW4k0sdKB/RkSZfimqxr0dTr3UNjwIUl49/LDw==}
-    engines: {node: '>=16.15.0', npm: '>=9.0.0'}
+  '@yaireo/tagify@4.37.0':
+    resolution: {integrity: sha512-/Lh4/sTbDJItkbKWdsRB6ECSm8xVUi7/ab+vi1emtQ1NMRFtOkRFifSZE9sRcfMG55/2JXV7m/bkOv6b1lKoCw==}
+    engines: {node: '>=22', pnpm: '>=10'}
     peerDependencies:
       prop-types: '>15.5.7'
       react: '*'
@@ -840,9 +840,9 @@ packages:
     resolution: {tarball: https://codeload.github.com/ornicar/chess.js/tar.gz/ad0709c0b07773d9d0da8e4605a9a2a28f00d249}
     version: 0.10.2
 
-  chessground@https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/b7e13296130cdf38e56e48857fd4e73c0e0b59f3:
-    resolution: {tarball: https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/b7e13296130cdf38e56e48857fd4e73c0e0b59f3}
-    version: 7.11.1-pstrat3.33
+  chessground@https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/e39f6fa8f4d054e1d287d64befc4389f58866558:
+    resolution: {tarball: https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/e39f6fa8f4d054e1d287d64befc4389f58866558}
+    version: 7.11.1-pstrat3.34
     engines: {node: ^20.19.4, pnpm: ^10.17.0}
 
   chokidar@3.6.0:
@@ -1300,8 +1300,8 @@ packages:
     resolution: {integrity: sha512-vkcDPrRZo1QZLbn5RLGPpg/WmIQ65qoWWhcGKf/b5eplkkarX0m9z8ppCat4mlOqUsWpyNuYgO3VRyrYHSzX5g==}
     engines: {node: '>= 0.8.0'}
 
-  prettier@3.8.1:
-    resolution: {integrity: sha512-UOnG6LftzbdaHZcKoPFtOcCKztrQ57WkHDeRD9t/PTQtmT0NHSeWWepj6pS0z/N7+08BHFDQVUrfmfMRcZwbMg==}
+  prettier@3.8.2:
+    resolution: {integrity: sha512-8c3mgTe0ASwWAJK+78dpviD+A8EqhndQPUBpNUIPt6+xWlIigCwfN01lWr9MAede4uqXGTEKeQWTvzb3vjia0Q==}
     engines: {node: '>=14'}
     hasBin: true
 
@@ -1315,16 +1315,16 @@ packages:
   queue-microtask@1.2.3:
     resolution: {integrity: sha512-NuaNSa6flKT5JaSYQzJok04JzTL1CA6aGhv5rfLW3PgqA+M2ChpZQnAC8h8i4ZFkBS8X5RqkDBHA7r4hej3K9A==}
 
-  react-dom@19.2.4:
-    resolution: {integrity: sha512-AXJdLo8kgMbimY95O2aKQqsz2iWi9jMgKJhRBAxECE4IFxfcazB2LmzloIoibJI3C12IlY20+KFaLv+71bUJeQ==}
+  react-dom@19.2.5:
+    resolution: {integrity: sha512-J5bAZz+DXMMwW/wV3xzKke59Af6CHY7G4uYLN1OvBcKEsWOs4pQExj86BBKamxl/Ik5bx9whOrvBlSDfWzgSag==}
     peerDependencies:
-      react: ^19.2.4
+      react: ^19.2.5
 
   react-is@16.13.1:
     resolution: {integrity: sha512-24e6ynE2H+OKt4kqsOvNd8kBpV65zoxbA4BVsEOB3ARVWQki/DHzaUoC5KuON/BiccDaCCTZBuOcfZs70kR8bQ==}
 
-  react@19.2.4:
-    resolution: {integrity: sha512-9nfp2hYpCwOjAN+8TZFGhtWEwgvWHXqESH8qT89AT/lWklpLON22Lc8pEtnpsZz7VmawabSU0gCjnj8aC0euHQ==}
+  react@19.2.5:
+    resolution: {integrity: sha512-llUJLzz1zTUBrskt2pwZgLq59AemifIftw4aB7JxOqf1HY2FDaGDxgwpAPVzHU1kdWabH7FauP4i1oEeer2WCA==}
     engines: {node: '>=0.10.0'}
 
   readdirp@3.6.0:
@@ -1364,8 +1364,8 @@ packages:
   scheduler@0.27.0:
     resolution: {integrity: sha512-eNv+WrVbKu1f3vbYJT/xtiF5syA5HPIMtf9IgY/nKg0sWqzAUEvqY/xm7OcZc/qafLx/iO9FgOmeSAp4v5ti/Q==}
 
-  sdp@3.2.1:
-    resolution: {integrity: sha512-lwsAIzOPlH8/7IIjjz3K0zYBk7aBVVcvjMwt3M4fLxpjMYyy7i3I97SLHebgn4YBjirkzfp3RvRDWSKsh/+WFw==}
+  sdp@3.2.2:
+    resolution: {integrity: sha512-xZocWwfyp4hkbN4hLWxMjmv2Q8aNa9MhmOZ7L9aCZPT+dZsgRr6wZRrSYE3HTdyk/2pZKPSgqI7ns7Een1xMSA==}
 
   semver@7.7.4:
     resolution: {integrity: sha512-vFKC2IEtQnVhpT78h1Yp8wzwrf8CM+MzKMHGJZfBtzhZNycRFnXsHk6E5TxIkkMsgNS7mdX3AGB7x2QM2di4lA==}
@@ -1400,9 +1400,9 @@ packages:
     resolution: {integrity: sha512-wHMNIOjkm/YNE5EM3RCbr/+DVgPg6AqQAX1eOxO46zYNvCXjKP5Y865tqQj3EXnaMBjkxmQA5jFuDpDK/dbfiA==}
     engines: {node: '>=8.3.0'}
 
-  stratops@https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/7543f1163e2a87899ebfe016c754bdf42ceabe5f:
-    resolution: {tarball: https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/7543f1163e2a87899ebfe016c754bdf42ceabe5f}
-    version: 0.8.1-pstrat5.27
+  stratops@https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/3ab9da347d5a551dc05935130ef1b5b83f8b574c:
+    resolution: {tarball: https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/3ab9da347d5a551dc05935130ef1b5b83f8b574c}
+    version: 0.8.1-pstrat5.28
     engines: {node: ^20.19.4, pnpm: ^10.17.0}
 
   string-argv@0.3.2:
@@ -1596,7 +1596,7 @@ snapshots:
     dependencies:
       '@types/geojson': 7946.0.16
 
-  '@types/node@20.19.37':
+  '@types/node@20.19.39':
     dependencies:
       undici-types: 6.21.0
 
@@ -1697,11 +1697,11 @@ snapshots:
 
   '@ungap/structured-clone@1.3.0': {}
 
-  '@yaireo/tagify@4.36.0(prop-types@15.8.1)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)':
+  '@yaireo/tagify@4.37.0(prop-types@15.8.1)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)':
     dependencies:
       prop-types: 15.8.1
-      react: 19.2.4
-      react-dom: 19.2.4(react@19.2.4)
+      react: 19.2.5
+      react-dom: 19.2.5(react@19.2.5)
 
   ab@https://codeload.github.com/lichess-org/ab-stub/tar.gz/94236bf34dbc9c05daf50f4c9842d859b9142be0: {}
 
@@ -1787,7 +1787,7 @@ snapshots:
 
   chess.js@https://codeload.github.com/ornicar/chess.js/tar.gz/ad0709c0b07773d9d0da8e4605a9a2a28f00d249: {}
 
-  chessground@https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/b7e13296130cdf38e56e48857fd4e73c0e0b59f3: {}
+  chessground@https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/e39f6fa8f4d054e1d287d64befc4389f58866558: {}
 
   chokidar@3.6.0:
     dependencies:
@@ -2256,7 +2256,7 @@ snapshots:
 
   prelude-ls@1.2.1: {}
 
-  prettier@3.8.1: {}
+  prettier@3.8.2: {}
 
   prop-types@15.8.1:
     dependencies:
@@ -2268,14 +2268,14 @@ snapshots:
 
   queue-microtask@1.2.3: {}
 
-  react-dom@19.2.4(react@19.2.4):
+  react-dom@19.2.5(react@19.2.5):
     dependencies:
-      react: 19.2.4
+      react: 19.2.5
       scheduler: 0.27.0
 
   react-is@16.13.1: {}
 
-  react@19.2.4: {}
+  react@19.2.5: {}
 
   readdirp@3.6.0:
     dependencies:
@@ -2306,7 +2306,7 @@ snapshots:
 
   scheduler@0.27.0: {}
 
-  sdp@3.2.1: {}
+  sdp@3.2.2: {}
 
   semver@7.7.4: {}
 
@@ -2332,7 +2332,7 @@ snapshots:
 
   snabbdom@3.5.1: {}
 
-  stratops@https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/7543f1163e2a87899ebfe016c754bdf42ceabe5f:
+  stratops@https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/3ab9da347d5a551dc05935130ef1b5b83f8b574c:
     dependencies:
       '@badrap/result': 0.2.13
 
@@ -2394,7 +2394,7 @@ snapshots:
 
   webrtc-adapter@9.0.4:
     dependencies:
-      sdp: 3.2.1
+      sdp: 3.2.2
 
   which@2.0.2:
     dependencies:

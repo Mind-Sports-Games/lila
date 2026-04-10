@@ -516,6 +516,12 @@ trait SetupHelper { self: I18nHelper =>
       (Pref.ConfirmPass.YES, trans.yes.txt())
     )
 
+  def confirmCubeActionsChoices(implicit lang: Lang) =
+    List(
+      (Pref.ConfirmCubeActions.NO, trans.no.txt()),
+      (Pref.ConfirmCubeActions.YES, trans.yes.txt())
+    )
+
   def playForcedActionChoices(implicit lang: Lang) =
     List(
       (Pref.PlayForcedAction.NO, trans.no.txt()),

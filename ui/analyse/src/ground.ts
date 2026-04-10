@@ -62,7 +62,10 @@ export function makeConfig(ctrl: AnalyseCtrl): CgConfig {
     orientation: ctrl.getOrientation(),
     myPlayerIndex: ctrl.data.player.playerIndex,
     coordinates: !!ctrl.embed || !!renderPlayerBars(ctrl) ? cg.Coords.Hidden : pref.coords,
-    boardScores: d.game.gameFamily == 'togyzkumalak',
+    boardScores: ['togyzkumalak', 'bestemshe', 'backgammon', 'hyper', 'nackgammon'].includes(variantKey),
+    dice: stratUtils.readDice(ctrl.node.fen, variantKey),
+    doublingCube: stratUtils.readDoublingCube(ctrl.node.fen, variantKey),
+    multiPointState: stratUtils.finalMultiPointState(d.game, ctrl.node.ply, ctrl.tree.lastPly()),
     addPieceZIndex: pref.is3d,
     viewOnly: !!ctrl.embed,
     movable: {

@@ -160,6 +160,10 @@ object pref {
               radios(form("behavior.confirmPass"), confirmPassChoices)
             ),
             setting(
+              confirmCubeActions(),
+              radios(form("behavior.confirmCubeActions"), confirmCubeActionsChoices)
+            ),
+            setting(
               playForcedAction(),
               radios(form("behavior.playForcedAction"), playForcedActionChoices)
             ),

@@ -80,6 +80,9 @@ export const renderTablePlay = (ctrl: RoundController) => {
             button.answerOpponentTakebackProposition(ctrl),
             button.selectSquaresOfferOptions(ctrl),
             button.resignOptions(ctrl),
+            ctrl.doubleConfirm ? button.doubleConfirm(ctrl) : null,
+            ctrl.takeCubeConfirm ? button.takeCubeConfirm(ctrl) : null,
+            ctrl.dropCubeConfirm ? button.dropCubeConfirm(ctrl) : null,
           ];
   return [
     replay.render(ctrl),
@@ -90,7 +93,16 @@ export const renderTablePlay = (ctrl: RoundController) => {
         : h(
             'div.ricons',
             {
-              class: { confirm: !!(ctrl.drawConfirm || ctrl.resignConfirm || ctrl.passConfirm) },
+              class: {
+                confirm: !!(
+                  ctrl.drawConfirm ||
+                  ctrl.resignConfirm ||
+                  ctrl.passConfirm ||
+                  ctrl.doubleConfirm ||
+                  ctrl.takeCubeConfirm ||
+                  ctrl.dropCubeConfirm
+                ),
+              },
             },
             icons,
           ),
