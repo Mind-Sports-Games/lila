@@ -99,6 +99,20 @@ final class ChallengeApi(
             (repo accept c) >>- {
               uncacheAndNotify(c)
               Bus.publish(Event.Accept(c, user.map(_.id)), "challenge")
+              if (!c.timeControl.isInstanceOf[Challenge.TimeControl.Correspondence]) {
+                if (!user.exists(_.isBot)) c.destUserId foreach { userId =>
+                  Bus.publish(
+                    SendTo(userId, lila.socket.Socket.makeMessage("redirect", play.api.libs.json.Json.obj("id" -> pov.fullId, "url" -> s"/${pov.fullId}"))),
+                    "socketUsers"
+                  )
+                }
+                c.challengerUserId foreach { userId =>
+                  Bus.publish(
+                    SendTo(userId, lila.socket.Socket.makeMessage("redirect", play.api.libs.json.Json.obj("id" -> (!pov).fullId, "url" -> s"/${(!pov).fullId}"))),
+                    "socketUsers"
+                  )
+                }
+              }
             } inject pov.some
           }
         }
