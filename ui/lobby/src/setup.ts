@@ -936,7 +936,7 @@ export default class Setup {
       if (isAnon) {
         setBaseDefaultOptions(); //default to chess, real time, blitz clock
         $casual.trigger('click');
-        $opponentInput.val('bot');
+        $opponentInput.filter('[value="bot"]').prop('checked', true);
         disableNonRealTimeModes();
       }
     };
@@ -1209,7 +1209,8 @@ export default class Setup {
       $form.find('.rating-range-config').hide();
       if (user) {
         const targetIsBot = $form.data('target-is-bot');
-        $opponentInput.val(targetIsBot ? 'bot' : 'friend');
+        $opponentInput.filter(`[value="${targetIsBot ? 'bot' : 'friend'}"]`).prop('checked', true);
+        updateLobbySubmit();
       }
       updateBotDetails();
     };
