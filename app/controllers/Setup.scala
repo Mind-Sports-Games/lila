@@ -123,9 +123,7 @@ final class Setup(
                             case true =>
                               negotiate(
                                 html = fuccess(
-                                  Redirect(
-                                    routes.Round.watcher(challenge.id, config.variant.startPlayer.name)
-                                  )
+                                  Redirect(routes.Challenge.show(challenge.id, None))
                                 ),
                                 api = _ => challengeC.showChallenge(challenge, justCreated = true)
                               )
