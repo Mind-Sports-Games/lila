@@ -45,6 +45,12 @@ object Theme extends ThemeObject {
     "horsey" -> (HexColor("f1d9b6") -> HexColor("8e6547"))
   )
 
+  val all: List[Theme] = GameFamily.all
+    .map(gf =>
+      gf.boardThemes.map(t => new Theme(t, Theme.colors.getOrElse(t, Theme.defaultHexColors), gf.id))
+    )
+    .flatten
+
   val default = allByName(0) get "maple" `err` "Can't find default theme D:"
 
   val defaults = GameFamily.all.map(gf =>
@@ -83,12 +89,6 @@ object Theme extends ThemeObject {
       else
         x
     }
-
-  val all: List[Theme] = GameFamily.all
-    .map(gf =>
-      gf.boardThemes.map(t => new Theme(t, Theme.colors.getOrElse(t, Theme.defaultHexColors), gf.id))
-    )
-    .flatten
 
   def allOfFamily(gf: GameFamily): List[Theme] =
     gf.boardThemes.map(t => new Theme(t, Theme.colors.getOrElse(t, Theme.defaultHexColors), gf.id))

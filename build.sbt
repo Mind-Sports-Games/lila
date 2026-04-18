@@ -1,10 +1,13 @@
-import com.typesafe.sbt.packager.Keys.scriptClasspath
+import com.typesafe.sbt.packager.Keys.{ bashScriptExtraDefines, scriptClasspath }
+import play.sbt.PlayCommands
+import play.sbt.PlayInternalKeys.playDependencyClasspath
+import play.sbt.routes.RoutesKeys
 
 import BuildSettings._
 import Dependencies._
 
 lazy val root = Project("lila", file("."))
-  .enablePlugins(PlayScala)
+  .enablePlugins(JavaServerAppPackaging, RoutesCompiler)
   .dependsOn(api)
   .aggregate(api)
   .settings(buildSettings)
@@ -13,8 +16,20 @@ lazy val root = Project("lila", file("."))
 scriptClasspath := Seq("*")
 maintainer := "matt@watkinsmedia.org"
 Compile / resourceDirectory := baseDirectory.value / "conf"
-Compile / _root_.play.sbt.routes.RoutesKeys.generateReverseRouter := false
-Compile / _root_.play.sbt.routes.RoutesKeys.generateForwardRouter := true
+Compile / sourceDirectory := baseDirectory.value / "app"
+Compile / scalaSource := baseDirectory.value / "app"
+Universal / sourceDirectory := baseDirectory.value / "dist"
+Compile / mainClass := Some("lila.app.Lila")
+// settings previously supplied by the PlayScala plugin
+shellPrompt := PlayCommands.playPrompt
+playDependencyClasspath := (Runtime / externalDependencyClasspath).value
+bashScriptExtraDefines += "addJava \"-Duser.dir=$(realpath \"$(cd \"${app_home}/..\"; pwd -P)\"  $(is_cygwin && echo \"fix\"))\"\n"
+Compile / RoutesKeys.routes / sources ++= {
+  val dirs = (Compile / unmanagedResourceDirectories).value
+  (dirs * "routes").get ++ (dirs * "*.routes").get
+}
+Compile / RoutesKeys.generateReverseRouter := false
+Compile / RoutesKeys.generateForwardRouter := true
 
 ThisBuild / evictionErrorLevel := Level.Warn
 
@@ -36,13 +51,18 @@ ThisBuild / dependencyOverrides ++= Seq(
 ThisBuild / excludeDependencies += "org.scala-lang.modules" % "scala-java8-compat_2.13"
 ThisBuild / dependencyOverrides += "org.scala-lang.modules" %% "scala-java8-compat" % "1.0.2"
 
+// Align jackson-module-scala with the jackson-databind version pulled transitively
+// (scrimage and others bump jackson-databind to 2.16.0, but akka ships jackson-module-scala 2.14.3
+// which enforces a strict databind version match at runtime).
+ThisBuild / dependencyOverrides += "com.fasterxml.jackson.module" %% "jackson-module-scala" % "2.16.0"
+
 // format: off
 libraryDependencies ++= akka.bundle ++ playWs.bundle ++ Seq(
   macwire.macros, macwire.util, play.json,
   strategyGames, compression, scalalib.core, hasher,
   reactivemongo.driver, reactivemongo.kamon, maxmind, prismic, scalatags,
   kamon.core, kamon.influxdb, kamon.metrics, kamon.prometheus,
-  scrimage, scaffeine, lettuce, uaparser, jacksonDatabind
+  scrimage, scaffeine, lettuce, uaparser
 )
 
 lazy val fairystockfish = Artifact("fairystockfish", "linux-x86_64")

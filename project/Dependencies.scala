@@ -43,7 +43,6 @@ object Dependencies {
   val catsMtl         = "org.typelevel"              %% "cats-mtl"         % "1.6.0"
   val kittens         = "org.typelevel"              %% "kittens"          % "3.5.0"
   val bloomFilter     = "com.github.alexandrnikitin" %% "bloom-filter"     % "0.13.1_lila-1"
-  val jacksonDatabind = "com.fasterxml.jackson.core"  % "jackson-databind" % "2.10.0"
 
   val munit      = "org.scalameta"  %% "munit"            % "1.2.1"  % Test
   val scalacheck = "org.scalacheck" %% "scalacheck"       % "1.19.0" % Test

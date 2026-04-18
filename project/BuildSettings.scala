@@ -27,7 +27,7 @@ object BuildSettings {
       Compile / packageDoc / publishArtifact := false,
       Compile / packageSrc / publishArtifact := false,
       Compile / run / fork                   := true,
-      Compile / run / javaOptions ++= Seq("-Xms64m", "-Xmx256m")
+      Compile / run / javaOptions ++= Seq("-Xms64m", "-Xmx512m")
     )
 
   lazy val defaultLibs: Seq[ModuleID] =

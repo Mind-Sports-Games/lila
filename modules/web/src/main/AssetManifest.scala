@@ -57,7 +57,7 @@ final class AssetManifest(val environment: Environment, net: NetConfig)(implicit
       }
     }
 
-  private val keyRe = """^(?!common\.)(\S+)\([A-Z0-9]{8})\(?:js|css)""".r
+  private val keyRe = """^(?!common\.)(\S+)\.([A-Z0-9]{8})\.(?:js|css)""".r
   private def keyOf(fullName: String): String =
     fullName match {
       case keyRe(k, _) => k
