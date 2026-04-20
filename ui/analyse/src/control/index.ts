@@ -1,15 +1,50 @@
 import type AnalyseCtrl from '../ctrl';
-
+import type { Config as ChessgroundConfig } from 'chessground/config';
 import { path as treePath } from 'tree';
 
 export interface ControlConfig {
-  canGoForward?: (ctrl: AnalyseCtrl) => boolean;
-  next?: (ctrl: AnalyseCtrl) => void;
-  prev?: (ctrl: AnalyseCtrl) => void;
-  last?: (ctrl: AnalyseCtrl) => void;
-  first?: (ctrl: AnalyseCtrl) => void;
-  enterVariation?: (ctrl: AnalyseCtrl) => void;
-  exitVariation?: (ctrl: AnalyseCtrl) => void;
+  // Navigation
+  canGoForward?(ctrl: AnalyseCtrl): boolean;
+  next?(ctrl: AnalyseCtrl): void;
+  prev?(ctrl: AnalyseCtrl): void;
+  last?(ctrl: AnalyseCtrl): void;
+  first?(ctrl: AnalyseCtrl): void;
+  enterVariation?(ctrl: AnalyseCtrl): void;
+  exitVariation?(ctrl: AnalyseCtrl): void;
+
+  // Orientation
+  getOrientation?(): string;
+  noRetroOnFlip?(): boolean;
+
+  // Lifecycle
+  onInit?(): void;
+  onAfterAddNode?(node: Tree.Node): void;
+  onUserAction?(): void;
+  afterJump?(): void;
+
+  // Chessground config
+  cgFen?(fen: string): string;
+  mutateCgOpts?(node: Tree.Node, config: ChessgroundConfig): void;
+  suppressPremove?(): boolean;
+
+  // Chessground hooks (registered per-variant)
+  cgHooks?: {
+    onCancelDropMode?(): void;
+    onSelectDice?(dice: unknown[]): void;
+    onButtonClick?(button: string): void;
+    onUserLift?(dest: string): void;
+  };
+
+  // Dests / ground refresh
+  needsDestsRefetch?(node: Tree.Node): boolean;
+  needsFullRedrawAfterGround?(): boolean;
+
+  // Drop mode
+  showDropDestsInDropMode?(): boolean;
+  alwaysCancelDropMode?(): boolean;
+
+  // Sound
+  nodeSoundOverride?(node: Tree.Node): string | false | undefined;
 }
 
 export function canGoForward(ctrl: AnalyseCtrl): boolean {
@@ -64,7 +99,7 @@ export function exitVariation(ctrl: AnalyseCtrl): void {
     return;
   }
   if (ctrl.onMainline) return;
-  let found,
+  let found: string | undefined,
     path = treePath.root;
   ctrl.nodeList.slice(1, -1).forEach(function (n: Tree.Node) {
     path += n.id;

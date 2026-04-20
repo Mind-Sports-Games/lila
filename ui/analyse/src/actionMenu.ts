@@ -8,7 +8,7 @@ import AnalyseCtrl from './ctrl';
 import { cont as contRoute } from 'game/router';
 import { bind, dataIcon } from './util';
 import * as pgnExport from './pgnExport';
-import { isChess } from 'common/analysis';
+import { isChess, allowStudyForVariant } from 'common/analysis';
 import { allowedForVariant as allowClientEvalForVariant } from 'ceval/src/util';
 
 interface AutoplaySpeed {
@@ -109,7 +109,8 @@ function hiddenInput(name: string, value: string) {
 }
 
 function studyButton(ctrl: AnalyseCtrl) {
-  const canStudyFromHere = isChess(ctrl.data.game.variant.key) || !ctrl.synthetic;
+  const canStudyFromHere =
+    (isChess(ctrl.data.game.variant.key) || !ctrl.synthetic) && allowStudyForVariant(ctrl.data.game.variant.key);
   if (!canStudyFromHere) return;
   if (ctrl.study && ctrl.embed && !ctrl.ongoing)
     return h(

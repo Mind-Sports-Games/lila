@@ -197,6 +197,11 @@ export function readDoublingCube(fen: string, variant: VariantKey): cg.DoublingC
   return undefined; //shouldn't get here...
 }
 
+export function parsePossibleLifts(line?: string | null): cg.Key[] {
+  if (!line) return [];
+  return (line.match(/[a-l][1-2]/g) as cg.Key[]) || [];
+}
+
 export function readDice(fen: string, variant: VariantKey, canEndTurn?: boolean, isDescending?: boolean): cg.Dice[] {
   if (!['backgammon', 'hyper', 'nackgammon'].includes(variant)) return [];
   if (fen.split(' ').length < 2) return [];

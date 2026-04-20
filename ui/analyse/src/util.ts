@@ -300,8 +300,9 @@ export function allowServerEvalForVariant(variant: VariantKey) {
 }
 
 export const isOnlyDropsPly = (node: Tree.Node, variantKey: VariantKey, defaultValue: boolean) => {
-  if (variantKey === 'amazons') return typeof node.dropsByRole === 'string' && node.dropsByRole.length > 0;
-  else return defaultValue;
+  if (['amazons', 'backgammon', 'hyper', 'nackgammon'].includes(variantKey))
+    return typeof node.dropsByRole === 'string' && node.dropsByRole.length > 0;
+  return defaultValue;
 };
 
 export function allowExplorerForVariant(_variant: VariantKey) {

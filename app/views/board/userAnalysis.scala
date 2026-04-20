@@ -17,10 +17,7 @@ import controllers.routes
 object userAnalysis {
 
   def noAnalysisVariants = List(
-    Variant.Chess(strategygames.chess.variant.FromPosition),
-    Variant.Backgammon(strategygames.backgammon.variant.Backgammon),
-    Variant.Backgammon(strategygames.backgammon.variant.Hyper),
-    Variant.Backgammon(strategygames.backgammon.variant.Nackgammon)
+    Variant.Chess(strategygames.chess.variant.FromPosition)
   )
 
   def analysisVariants =
@@ -31,7 +28,8 @@ object userAnalysis {
         Variant.all(GameLogic.Samurai()) ++
         Variant.all(GameLogic.Togyzkumalak()) ++
         Variant.all(GameLogic.Go()) ++
-        Variant.all(GameLogic.Abalone())
+        Variant.all(GameLogic.Abalone()) ++
+        Variant.all(GameLogic.Backgammon())
     )
       .filterNot(noAnalysisVariants.contains(_))
 

@@ -12,8 +12,8 @@ importers:
         specifier: github:lichess-org/ab-stub
         version: https://codeload.github.com/lichess-org/ab-stub/tar.gz/94236bf34dbc9c05daf50f4c9842d859b9142be0
       chessground:
-        specifier: github:Mind-Sports-Games/chessground#v7.11.1-pstrat3.34
-        version: https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/e39f6fa8f4d054e1d287d64befc4389f58866558
+        specifier: github:Mind-Sports-Games/chessground#pla-1023-support-backgammon-in-analysis-and-studies
+        version: https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/6e5ab8b12747dbeee6d0aa9f4ee4211b829d4b12
       stratops:
         specifier: github:Mind-Sports-Games/stratops#v0.8.1-pstrat5.28
         version: https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/3ab9da347d5a551dc05935130ef1b5b83f8b574c
@@ -47,7 +47,7 @@ importers:
         version: 7.1.0
       prettier:
         specifier: ^3.5.3
-        version: 3.8.2
+        version: 3.8.3
       typescript:
         specifier: ^5.9.2
         version: 5.9.3
@@ -71,7 +71,7 @@ importers:
         version: 0.2.13
       '@yaireo/tagify':
         specifier: ^4.32.0
-        version: 4.37.0(prop-types@15.8.1)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
+        version: 4.37.1(prop-types@15.8.1)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
       ceval:
         specifier: workspace:*
         version: link:../ceval
@@ -433,7 +433,7 @@ importers:
         version: 0.3.10
       '@yaireo/tagify':
         specifier: ^4.32.0
-        version: 4.37.0(prop-types@15.8.1)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
+        version: 4.37.1(prop-types@15.8.1)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
       chat:
         specifier: workspace:*
         version: link:../chat
@@ -466,7 +466,7 @@ importers:
         version: link:../stratutils
       tablesort:
         specifier: ^5.1
-        version: 5.7.0
+        version: 5.7.1
       zxcvbn:
         specifier: ^4.4.2
         version: 4.4.2
@@ -736,8 +736,8 @@ packages:
   '@ungap/structured-clone@1.3.0':
     resolution: {integrity: sha512-WmoN8qaIAo7WTYWbAZuG8PYEhn5fkz7dZrqTBZ7dtt//lL2Gwms1IcnQ5yHqjDfX8Ft5j4YzDM23f87zBfDe9g==}
 
-  '@yaireo/tagify@4.37.0':
-    resolution: {integrity: sha512-/Lh4/sTbDJItkbKWdsRB6ECSm8xVUi7/ab+vi1emtQ1NMRFtOkRFifSZE9sRcfMG55/2JXV7m/bkOv6b1lKoCw==}
+  '@yaireo/tagify@4.37.1':
+    resolution: {integrity: sha512-/+0ZZ55rd4sG5Nlop2QF9D2oo3kbRgn/KlsW6oN1MwKVS7DDB2mIrGnizk740M0qzXvQfE7JhbCeWDuC8+6kmA==}
     engines: {node: '>=22', pnpm: '>=10'}
     peerDependencies:
       prop-types: '>15.5.7'
@@ -802,11 +802,11 @@ packages:
     resolution: {integrity: sha512-Ceh+7ox5qe7LJuLHoY0feh3pHuUDHAcRUeyL2VYghZwfpkNIy/+8Ocg0a3UuSoYzavmylwuLWQOf3hl0jjMMIw==}
     engines: {node: '>=8'}
 
-  brace-expansion@1.1.13:
-    resolution: {integrity: sha512-9ZLprWS6EENmhEOpjCYW2c8VkmOvckIJZfkr7rBW6dObmfgJ/L1GpSYW5Hpo9lDz4D1+n0Ckz8rU7FwHDQiG/w==}
+  brace-expansion@1.1.14:
+    resolution: {integrity: sha512-MWPGfDxnyzKU7rNOW9SP/c50vi3xrmrua/+6hfPbCS2ABNWfx24vPidzvC7krjU/RTo235sV776ymlsMtGKj8g==}
 
-  brace-expansion@2.0.3:
-    resolution: {integrity: sha512-MCV/fYJEbqx68aE58kv2cA/kiky1G8vux3OR6/jbS+jIMe/6fJWa0DTzJU7dqijOWYwHi1t29FlfYI9uytqlpA==}
+  brace-expansion@2.1.0:
+    resolution: {integrity: sha512-TN1kCZAgdgweJhWWpgKYrQaMNHcDULHkWwQIspdtjV4Y5aurRdZpjAqn6yX3FPqTA9ngHCc4hJxMAMgGfve85w==}
 
   braces@3.0.3:
     resolution: {integrity: sha512-yQbXgO/OSZVD2IsiLlro+7Hf6Q18EJrKSEsdoMzKePKXct3gvD8oLcOQdIzGupr5Fj+EDe8gO/lxc1BzfMpxvA==}
@@ -840,8 +840,8 @@ packages:
     resolution: {tarball: https://codeload.github.com/ornicar/chess.js/tar.gz/ad0709c0b07773d9d0da8e4605a9a2a28f00d249}
     version: 0.10.2
 
-  chessground@https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/e39f6fa8f4d054e1d287d64befc4389f58866558:
-    resolution: {tarball: https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/e39f6fa8f4d054e1d287d64befc4389f58866558}
+  chessground@https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/6e5ab8b12747dbeee6d0aa9f4ee4211b829d4b12:
+    resolution: {tarball: https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/6e5ab8b12747dbeee6d0aa9f4ee4211b829d4b12}
     version: 7.11.1-pstrat3.34
     engines: {node: ^20.19.4, pnpm: ^10.17.0}
 
@@ -1300,8 +1300,8 @@ packages:
     resolution: {integrity: sha512-vkcDPrRZo1QZLbn5RLGPpg/WmIQ65qoWWhcGKf/b5eplkkarX0m9z8ppCat4mlOqUsWpyNuYgO3VRyrYHSzX5g==}
     engines: {node: '>= 0.8.0'}
 
-  prettier@3.8.2:
-    resolution: {integrity: sha512-8c3mgTe0ASwWAJK+78dpviD+A8EqhndQPUBpNUIPt6+xWlIigCwfN01lWr9MAede4uqXGTEKeQWTvzb3vjia0Q==}
+  prettier@3.8.3:
+    resolution: {integrity: sha512-7igPTM53cGHMW8xWuVTydi2KO233VFiTNyF5hLJqpilHfmn8C8gPf+PS7dUT64YcXFbiMGZxS9pCSxL/Dxm/Jw==}
     engines: {node: '>=14'}
     hasBin: true
 
@@ -1433,8 +1433,8 @@ packages:
     resolution: {integrity: sha512-qpCAvRl9stuOHveKsn7HncJRvv501qIacKzQlO/+Lwxc9+0q2wLyv4Dfvt80/DPn2pqOBsJdDiogXGR9+OvwRw==}
     engines: {node: '>=8'}
 
-  tablesort@5.7.0:
-    resolution: {integrity: sha512-irnN1HPD08466v6DHKR1+gqZ2be2+QZBDIGTM1DFGoWywY+d38bFtfsuUqBbMGkqaMyYE1uPxE7p0AM5cmbRSA==}
+  tablesort@5.7.1:
+    resolution: {integrity: sha512-wm+xSponmlN1spiuwGlrvNGoG8fEso+y86OOjS+Pl0Qsje/cOVSfUvELcXILWc8/sgEdY/NGMPo0qhFGyYKnwQ==}
     engines: {node: '>= 22', npm: '>= 10'}
 
   text-table@0.2.0:
@@ -1479,8 +1479,8 @@ packages:
   uri-js@4.4.1:
     resolution: {integrity: sha512-7rKUyy33Q1yc98pQ1DAmLtwX109F7TIfWlW1Ydo8Wl1ii1SeHieeh0HHfPeL2fMXK6z0s8ecKs9frCuLJvndBg==}
 
-  webrtc-adapter@9.0.4:
-    resolution: {integrity: sha512-5ZZY1+lGq8LEKuDlg9M2RPJHlH3R7OVwyHqMcUsLKCgd9Wvf+QrFTCItkXXYPmrJn8H6gRLXbSgxLLdexiqHxw==}
+  webrtc-adapter@9.0.5:
+    resolution: {integrity: sha512-U9vjByy/sK2OMXu5mmfuZFKTMIUQe34c0JXRO+oDrxJTsntdYT2iIFwYMOV7HhMTuktcZLGf2W1N/OcSf9ssWg==}
     engines: {node: '>=6.0.0', npm: '>=3.10.0'}
 
   which@2.0.2:
@@ -1697,7 +1697,7 @@ snapshots:
 
   '@ungap/structured-clone@1.3.0': {}
 
-  '@yaireo/tagify@4.37.0(prop-types@15.8.1)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)':
+  '@yaireo/tagify@4.37.1(prop-types@15.8.1)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)':
     dependencies:
       prop-types: 15.8.1
       react: 19.2.5
@@ -1747,12 +1747,12 @@ snapshots:
 
   binary-extensions@2.3.0: {}
 
-  brace-expansion@1.1.13:
+  brace-expansion@1.1.14:
     dependencies:
       balanced-match: 1.0.2
       concat-map: 0.0.1
 
-  brace-expansion@2.0.3:
+  brace-expansion@2.1.0:
     dependencies:
       balanced-match: 1.0.2
 
@@ -1787,7 +1787,7 @@ snapshots:
 
   chess.js@https://codeload.github.com/ornicar/chess.js/tar.gz/ad0709c0b07773d9d0da8e4605a9a2a28f00d249: {}
 
-  chessground@https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/e39f6fa8f4d054e1d287d64befc4389f58866558: {}
+  chessground@https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/6e5ab8b12747dbeee6d0aa9f4ee4211b829d4b12: {}
 
   chokidar@3.6.0:
     dependencies:
@@ -2164,11 +2164,11 @@ snapshots:
 
   minimatch@3.1.5:
     dependencies:
-      brace-expansion: 1.1.13
+      brace-expansion: 1.1.14
 
   minimatch@9.0.9:
     dependencies:
-      brace-expansion: 2.0.3
+      brace-expansion: 2.1.0
 
   mithril@https://codeload.github.com/ornicar/mithril.js/tar.gz/dd92827aec63f921149ca9a3460ccd981e7025bb: {}
 
@@ -2248,7 +2248,7 @@ snapshots:
       '@msgpack/msgpack': 2.8.0
       eventemitter3: 4.0.7
       peerjs-js-binarypack: 2.1.0
-      webrtc-adapter: 9.0.4
+      webrtc-adapter: 9.0.5
 
   picomatch@2.3.2: {}
 
@@ -2256,7 +2256,7 @@ snapshots:
 
   prelude-ls@1.2.1: {}
 
-  prettier@3.8.2: {}
+  prettier@3.8.3: {}
 
   prop-types@15.8.1:
     dependencies:
@@ -2360,7 +2360,7 @@ snapshots:
     dependencies:
       has-flag: 4.0.0
 
-  tablesort@5.7.0: {}
+  tablesort@5.7.1: {}
 
   text-table@0.2.0: {}
 
@@ -2392,7 +2392,7 @@ snapshots:
     dependencies:
       punycode: 2.3.1
 
-  webrtc-adapter@9.0.4:
+  webrtc-adapter@9.0.5:
     dependencies:
       sdp: 3.2.2
 

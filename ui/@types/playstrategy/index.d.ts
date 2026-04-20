@@ -624,6 +624,7 @@ declare namespace Tree {
     dests?: string;
     drops?: string | null;
     dropsByRole?: string | null;
+    lifts?: string | null;
     check?: Key;
     threat?: ClientEval;
     ceval?: ClientEval;

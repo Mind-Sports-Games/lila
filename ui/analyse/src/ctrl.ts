@@ -1,13 +1,6 @@
 import * as cg from 'chessground/types';
-import {
-  oppositeOrientation,
-  oppositeOrientationForLOA,
-  orientationForLOA,
-  oppositeOrientationForBackgammon,
-  orientationForBackgammon,
-} from 'chessground/util';
+import { oppositeOrientation } from 'chessground/util';
 import * as stratUtils from 'stratutils';
-import { dameo as dameoStratUtils } from 'stratutils';
 import * as game from 'game';
 import * as keyboard from './keyboard';
 import * as promotion from './promotion';
@@ -33,7 +26,6 @@ import { defined, prop, Prop } from 'common';
 import { DrawShape } from 'chessground/draw';
 import { ExplorerCtrl } from './explorer/interfaces';
 import { ForecastCtrl } from './forecast/interfaces';
-import { amazonsChessgroundFen } from 'stratops/compat';
 import { make as makeEvalCache, EvalCache } from './evalCache';
 import { make as makeForecast } from './forecast/forecastCtrl';
 import { make as makeFork, ForkCtrl } from './fork';
@@ -166,6 +158,7 @@ export default class AnalyseCtrl {
     configureVariantControl(this);
 
     this.showGround();
+    this.controlConfig.onInit?.();
     this.onToggleComputer();
     this.startCeval();
     this.explorer.setNode();
@@ -243,7 +236,7 @@ export default class AnalyseCtrl {
     this.chessground.set({
       orientation: this.getOrientation(),
     });
-    if (this.retro && this.data.game.variant.key !== 'racingKings') {
+    if (this.retro && !this.controlConfig.noRetroOnFlip?.()) {
       this.retro = makeRetro(this, this.bottomPlayerIndex());
     }
     if (this.practice) this.restartPractice();
@@ -262,22 +255,9 @@ export default class AnalyseCtrl {
   bottomIsP1 = () => this.bottomPlayerIndex() === 'p1';
 
   getOrientation(): Orientation {
-    if (this.data.game.variant.key === 'linesOfAction' || this.data.game.variant.key === 'scrambledEggs') {
-      const c = this.data.player.playerIndex;
-      return this.flipped ? oppositeOrientationForLOA(c) : orientationForLOA(c);
-    } else if (
-      this.data.game.variant.key === 'backgammon' ||
-      this.data.game.variant.key === 'hyper' ||
-      this.data.game.variant.key === 'nackgammon'
-    ) {
-      const c = this.data.player.playerIndex;
-      return this.flipped ? oppositeOrientationForBackgammon(c) : orientationForBackgammon(c);
-    } else if (this.data.game.variant.key === 'racingKings') {
-      return 'p1';
-    } else {
-      const o = this.data.orientation;
-      return this.flipped ? oppositeOrientation(o) : o;
-    }
+    if (this.controlConfig.getOrientation) return this.controlConfig.getOrientation() as Orientation;
+    const o = this.data.orientation;
+    return this.flipped ? oppositeOrientation(o) : o;
   }
   getNode(): Tree.Node {
     // required by ui/ceval
@@ -304,27 +284,29 @@ export default class AnalyseCtrl {
 
   setDropMode(cg: ChessgroundApi) {
     const playerIndex = cg.state.movable.playerIndex as cg.PlayerIndex;
-    const isDropPly = isOnlyDropsPly(this.node, this.data.game.variant.key as VariantKey, this.data.onlyDropsVariant);
+    const variantKey = this.data.game.variant.key as VariantKey;
+    const dropDests = stratUtils.readDropsByRole(this.node.dropsByRole);
+    const isDropPly = isOnlyDropsPly(this.node, variantKey, this.data.onlyDropsVariant);
     if (isDropPly) {
-      setDropMode(cg.state, stratUtils.onlyDropsVariantPiece(cg.state.variant as VariantKey, playerIndex));
+      setDropMode(cg.state, stratUtils.onlyDropsVariantPiece(variantKey, playerIndex));
     }
     cg.set({
+      // when bar pieces must be entered, treat as onlyDropsVariant so drop mode isn't cancelled on invalid clicks
+      onlyDropsVariant: isDropPly,
       dropmode: {
         active: isDropPly,
-        showDropDests: !['go9x9', 'go13x13', 'go19x19', 'backgammon', 'hyper', 'nackgammon'].includes(
-          cg.state.variant as VariantKey,
-        ),
-        dropDests: stratUtils.readDropsByRole(this.node.dropsByRole),
+        showDropDests: this.controlConfig.showDropDestsInDropMode ? this.controlConfig.showDropDestsInDropMode() : true,
+        dropDests,
       },
     });
   }
 
   private showGround(): void {
     this.onChange();
-    if (!defined(this.node.dests)) this.getDests();
+    if (!defined(this.node.dests) || this.controlConfig.needsDestsRefetch?.(this.node)) this.getDests();
     this.withCg(cg => {
       cg.set(this.makeCgOpts());
-      if (['backgammon', 'hyper', 'nackgammon'].includes(this.data.game.variant.key)) cg.redrawAll();
+      if (this.controlConfig.needsFullRedrawAfterGround?.()) cg.redrawAll();
       this.setAutoShapes();
       this.setDropMode(cg);
       if (this.node.shapes) cg.setShapes(this.node.shapes as DrawShape[]);
@@ -332,7 +314,7 @@ export default class AnalyseCtrl {
   }
 
   getDests: () => void = throttle(800, () => {
-    if (!this.embed && !defined(this.node.dests))
+    if (!this.embed && (!defined(this.node.dests) || this.controlConfig.needsDestsRefetch?.(this.node)))
       this.socket.sendAnaDests({
         variant: this.data.game.variant.key,
         lib: this.data.game.variant.lib,
@@ -344,13 +326,10 @@ export default class AnalyseCtrl {
   makeCgOpts(): ChessgroundConfig {
     const node = this.node,
       playerIndex = this.turnPlayerIndex(),
-      dests =
-        this.data.game.gameFamily === 'abalone'
-          ? stratUtils.readDestsAbalone(this.node.dests)
-          : stratUtils.readDests(this.node.dests),
+      variantKey = this.data.game.variant.key,
+      dests = stratUtils.readDests(this.node.dests),
       drops = stratUtils.readDrops(this.node.drops),
       dropsByRole = stratUtils.readDropsByRole(this.node.dropsByRole),
-      variantKey = this.data.game.variant.key,
       movablePlayerIndex = this.gamebookPlay()
         ? playerIndex
         : this.practice
@@ -360,55 +339,52 @@ export default class AnalyseCtrl {
                 drops === null ||
                 drops.length ||
                 dropsByRole == null ||
-                dropsByRole.size === 0)
+                dropsByRole.size === 0 ||
+                dropsByRole.size > 0)
             ? playerIndex
             : undefined,
       config: ChessgroundConfig = {
-        fen: this.data.game.variant.key == 'amazons' ? amazonsChessgroundFen(node.fen) : node.fen,
+        fen: this.controlConfig.cgFen ? this.controlConfig.cgFen(node.fen) : node.fen,
         turnPlayerIndex: playerIndex,
-        dice: stratUtils.readDice(node.fen, variantKey),
+        dice: stratUtils.readDice(node.fen, variantKey, false, true),
         doublingCube: stratUtils.readDoublingCube(node.fen, variantKey),
         multiPointState: stratUtils.finalMultiPointState(this.data.game, node.ply, this.tree.lastPly()),
-        movable:
-          this.embed || ['backgammon', 'hyper', 'nackgammon'].includes(variantKey)
-            ? {
-                playerIndex: undefined,
-                dests: new Map(),
-              }
-            : {
-                playerIndex: movablePlayerIndex,
-                dests: (movablePlayerIndex === playerIndex && dests) || new Map(),
-              },
+        movable: this.embed
+          ? {
+              playerIndex: undefined,
+              dests: new Map(),
+            }
+          : {
+              playerIndex: movablePlayerIndex,
+              dests: (movablePlayerIndex === playerIndex && dests) || new Map(),
+            },
+        liftable: { liftDests: [] },
         check: !!node.check,
         dropmode: {
           active: this.data.onlyDropsVariant,
         },
         lastMove: this.uciToLastMove(node.uci),
         onlyDropsVariant: isOnlyDropsPly(node, variantKey, this.data.onlyDropsVariant),
-        selected: this.data.game.variant.key === 'dameo' ? dameoStratUtils.activePiecePosition(node.fen) : undefined,
       };
-    if (!dests && !node.check && !['backgammon', 'hyper', 'nackgammon'].includes(variantKey)) {
+    if (!dests && !node.check && !this.controlConfig.suppressPremove?.()) {
       // premove while dests are loading from server
       // can't use when in check because it highlights the wrong king
       config.turnPlayerIndex = opposite(playerIndex);
       config.movable!.playerIndex = playerIndex;
     }
-    config.premovable = {
-      enabled: false,
-    };
-    if (this.data.game.variant.key === 'dameo') {
-      config.selected = dameoStratUtils.activePiecePosition(node.fen);
-    }
+    config.premovable = { enabled: false };
+    this.controlConfig.mutateCgOpts?.(node, config);
     this.cgConfig = config;
     return config;
   }
 
   private throttleSound = (name: string) => throttle(100, () => playstrategy.sound.play(name));
 
-  private sound = {
+  private sound: Record<string, () => void> = {
     move: this.throttleSound('move'),
     capture: this.throttleSound('capture'),
     check: this.throttleSound('check'),
+    diceRoll: this.throttleSound('diceRoll'),
   };
 
   private onChange: () => void = throttle(300, () => {
@@ -423,30 +399,16 @@ export default class AnalyseCtrl {
     this.autoScrollRequested = true;
   }
 
-  playedLastMoveMyself = () => !!this.justPlayed && !!this.node.uci && this.node.uci.startsWith(this.justPlayed);
+  playedLastMoveMyself = () =>
+    !!this.justPlayed && !!this.node.uci && this.node.uci.toLowerCase().startsWith(this.justPlayed.toLowerCase());
 
-  private onCancelDropMode = () => {
-    //redraw pocket - due to possible selection in CG and dropmode cancelled
-    if (['crazyhouse', 'shogi', 'minishogi'].includes(this.data.game.variant.key)) {
-      this.redraw();
-    }
-  };
-
-  makeCgHooks = () => ({
-    onCancelDropMode: this.onCancelDropMode,
-  });
+  makeCgHooks = () => this.controlConfig.cgHooks ?? {};
 
   jump(path: Tree.Path): void {
     const pathChanged = path !== this.path,
       isForwardStep = pathChanged && path.length == this.path.length + 2;
     this.setPath(path);
     this.showGround();
-    if (
-      (this.data.game.variant.key === 'togyzkumalak' || this.data.game.variant.key === 'bestemshe') &&
-      this.chessground
-    ) {
-      this.chessground.redrawAll(); //redraw board scores
-    }
     if (pathChanged) {
       const playedMyself = this.playedLastMoveMyself();
       if (this.study) this.study.setPath(path, this.node, playedMyself);
@@ -454,8 +416,13 @@ export default class AnalyseCtrl {
         if (!this.node.uci) this.sound.move();
         // initial position
         else if (!playedMyself) {
-          if (this.node.san!.includes('x')) this.sound.capture();
-          else this.sound.move();
+          const override = this.controlConfig.nodeSoundOverride?.(this.node);
+          if (override === undefined) {
+            if (this.node.san!.includes('x')) this.sound.capture();
+            else this.sound.move();
+          } else if (override) {
+            this.sound[override]?.();
+          }
         }
         if (/\+|#/.test(this.node.san!)) this.sound.check();
       }
@@ -464,6 +431,7 @@ export default class AnalyseCtrl {
       this.startCeval();
       speech.node(this.node);
     }
+
     this.justPlayed = this.justDropped = this.justCaptured = undefined;
     this.explorer.setNode();
     this.updateHref();
@@ -476,8 +444,7 @@ export default class AnalyseCtrl {
     }
     if (this.music) this.music.jump(this.node);
     playstrategy.pubsub.emit('ply', this.node.ply);
-    if (this.data.game.variant.key === 'dameo' && this.chessground)
-      this.chessground.selectSquare(dameoStratUtils.activePiecePosition(this.node.fen));
+    this.controlConfig.afterJump?.();
   }
 
   userJump = (path: Tree.Path): void => {
@@ -524,6 +491,7 @@ export default class AnalyseCtrl {
     this.instanciateCeval();
     this.instanciateEvalCache();
     this.cgVersion.js++;
+    this.controlConfig.onInit?.();
   }
 
   changePgn(pgn: string): void {
@@ -558,9 +526,8 @@ export default class AnalyseCtrl {
 
   userNewPiece = (piece: cg.Piece, pos: Key): void => {
     if (crazyValid(this.chessground, this.data, this.node.drops, this.node.dropsByRole, piece, pos)) {
-      this.justPlayed = ['go9x9', 'go13x13', 'go19x19'].includes(this.data.game.variant.key)
-        ? roleToChar(piece.role) + '@' + pos
-        : roleToChar(piece.role).toUpperCase() + '@' + pos;
+      const roleChar = roleToChar(piece.role);
+      this.justPlayed = roleChar.toUpperCase() + '@' + pos;
       this.justDropped = piece.role;
       this.justCaptured = undefined;
       this.sound.move();
@@ -572,11 +539,12 @@ export default class AnalyseCtrl {
         fen: this.node.fen,
         path: this.path,
       };
+      this.controlConfig.onUserAction?.();
       this.socket.sendAnaDrop(drop);
       this.preparePremoving();
       this.redraw();
     } else this.jump(this.path);
-    if (!this.data.onlyDropsVariant || this.data.game.variant.key === 'amazons') {
+    if (!this.data.onlyDropsVariant || this.controlConfig.alwaysCancelDropMode?.()) {
       cancelDropMode(this.chessground.state);
       this.redraw();
     }
@@ -606,7 +574,24 @@ export default class AnalyseCtrl {
     if (capture) this.justCaptured = capture;
     if (prom) move.promotion = prom;
     if (this.practice) this.practice.onUserMove();
+    this.controlConfig.onUserAction?.();
     this.socket.sendAnaMove(move);
+    this.preparePremoving();
+    this.redraw();
+  };
+
+  sendAnaLift = (pos: Key): void => {
+    this.justPlayed = pos;
+    this.justDropped = undefined;
+    if (this.practice) this.practice.onUserMove();
+    this.controlConfig.onUserAction?.();
+    this.socket.sendAnaLift({
+      pos,
+      variant: this.data.game.variant.key,
+      lib: this.data.game.variant.lib,
+      fen: this.node.fen,
+      path: this.path,
+    });
     this.preparePremoving();
     this.redraw();
   };
@@ -619,6 +604,7 @@ export default class AnalyseCtrl {
       path: this.path,
     };
     if (this.practice) this.practice.onUserMove();
+    this.controlConfig.onUserAction?.();
     this.socket.sendAnaPass(pass);
     this.preparePremoving();
     this.redraw();
@@ -646,40 +632,37 @@ export default class AnalyseCtrl {
   };
 
   addNode(node: Tree.Node, path: Tree.Path) {
+    // Check if this node already exists before adding
+    // Must use pathExists (not nodeAtPath) because nodeAtPath falls back to the nearest
+    // ancestor when the path doesn't exist — which would give a false "already exists" result
+    // for two consecutive lifts from the same square (same UciCharPair id).
+    const nodeIsNew = !this.tree.pathExists(path + node.id);
     const newPath = this.tree.addNode(node, path);
     if (!newPath) {
+      return this.redraw();
+    }
+
+    if (!nodeIsNew) {
+      if (this.path === path) {
+        this.jump(newPath);
+      }
+      // Duplicate node: just redraw, don't navigate or trigger auto-logic
       return this.redraw();
     }
     this.jump(newPath);
     this.redraw();
     this.chessground.playPremove();
-    const parsedDests =
-      this.data.game.gameFamily === 'abalone'
-        ? stratUtils.readDestsAbalone(node.dests)
-        : stratUtils.readDests(node.dests);
-    if (parsedDests) this.maybeForceMove(parsedDests);
+    this.controlConfig.onAfterAddNode?.(node);
   }
 
-  addDests(dests: string, path: Tree.Path): void {
+  addDests(dests: string, path: Tree.Path, lifts?: string): void {
     this.tree.addDests(dests, path);
+    if (lifts !== undefined) this.tree.addLifts(lifts, path);
     if (path === this.path) {
       this.showGround();
       if (this.outcome()) this.ceval.stop();
     }
     this.withCg(cg => cg.playPremove());
-  }
-
-  private maybeForceMove(possibleMoves: cg.Dests) {
-    if (this.data.game.gameFamily === 'flipello' && possibleMoves.size == 1) {
-      const passOrig = possibleMoves.keys().next().value;
-      if (passOrig != undefined) {
-        const passDests = possibleMoves.get(passOrig);
-        if (passDests && passDests.length == 1) {
-          const passDest = passDests[0];
-          this.sendMove(passOrig, passDest, undefined, undefined);
-        }
-      }
-    }
   }
 
   deleteNode(path: Tree.Path): void {

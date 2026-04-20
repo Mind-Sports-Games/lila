@@ -50,9 +50,6 @@ function renderChildrenOf(ctx: Ctx, node: Tree.ParentedNode, opts: Opts): MaybeV
     // isContinuation: main is a mid-turn continuation (same player played node and plays main).
     // Used to suppress the P1 turn index before main.
     const isContinuation = node.playedPlayerIndex === node.playerIndex;
-    // isMainMidTurn: main itself does not end a full turn (same player plays again after main).
-    // Used to suppress the P2 turn header after main.
-    const isMainMidTurn = main.playedPlayerIndex === main.playerIndex;
     const isP1 = main.playedPlayerIndex === 'p1' && !isContinuation;
     const commentTags = renderMainlineCommentsOf(ctx, main, conceal, true).filter(nonEmpty);
     if (!cs[1] && isEmpty(commentTags) && !main.forceVariation)
@@ -63,10 +60,40 @@ function renderChildrenOf(ctx: Ctx, node: Tree.ParentedNode, opts: Opts): MaybeV
           conceal,
         }) || [],
       );
+    // Collect all nodes of main's full turn so we can render complete turn notation
+    // and recurse into the next turn from the correct end-of-turn node.
+    const nodesOfFullTurn = main.forceVariation ? [main] : fullTurnNodesFromNode(main);
+    const lastNodeOfFullMove = nodesOfFullTurn[nodesOfFullTurn.length - 1];
+    const fullTurnPath = opts.parentPath + nodesOfFullTurn.map(n => n.id).join('');
+    // If the full turn itself has inner branching (e.g. same first move but alternative second
+    // moves), those variations must appear in the interrupt alongside any outer ones and comments.
+    const innerBranchingIdx = main.forceVariation
+      ? -1
+      : nodesOfFullTurn.findIndex(n => n.children.length > 1 && n.playedPlayerIndex === n.playerIndex);
+    const innerVariationsLine =
+      innerBranchingIdx >= 0
+        ? (() => {
+            const branchingNode = nodesOfFullTurn[innerBranchingIdx];
+            const branchingCs = parentedNodes(branchingNode.children, branchingNode);
+            const branchingParentPath =
+              opts.parentPath +
+              nodesOfFullTurn
+                .slice(0, innerBranchingIdx + 1)
+                .map(n => n.id)
+                .join('');
+            const prefixForVariations = nodesOfFullTurn.slice(0, innerBranchingIdx + 1);
+            return renderLines(
+              ctx,
+              branchingCs.slice(1),
+              { parentPath: branchingParentPath, isMainline: false, conceal, noConceal: !conceal },
+              prefixForVariations,
+            );
+          })()
+        : null;
     const mainChildren = main.forceVariation
       ? undefined
-      : renderChildrenOf(ctx, main, {
-          parentPath: opts.parentPath + main.id,
+      : renderChildrenOf(ctx, lastNodeOfFullMove, {
+          parentPath: fullTurnPath,
           isMainline: true,
           conceal,
         });
@@ -76,24 +103,30 @@ function renderChildrenOf(ctx: Ctx, node: Tree.ParentedNode, opts: Opts): MaybeV
       conceal,
     };
     return (isP1 ? [moveView.renderIndex(main, false)] : ([] as MaybeVNodes))
-      .concat(main.forceVariation ? [] : [renderMoveOf(ctx, main, passOpts), isP1 ? emptyMove(passOpts.conceal) : null])
+      .concat(
+        main.forceVariation ? [] : [renderFullMoveOf(ctx, main, passOpts), isP1 ? emptyMove(passOpts.conceal) : null],
+      )
       .concat([
         h(
           'interrupt',
-          commentTags.concat(
-            renderLines(ctx, main.forceVariation ? cs : cs.slice(1), {
-              parentPath: opts.parentPath,
-              isMainline: passOpts.isMainline,
-              conceal,
-              noConceal: !conceal,
-            }),
-          ),
+          commentTags
+            .concat(
+              renderLines(ctx, main.forceVariation ? cs : cs.slice(1), {
+                parentPath: opts.parentPath,
+                isMainline: passOpts.isMainline,
+                conceal,
+                noConceal: !conceal,
+              }),
+            )
+            .concat(innerVariationsLine ? [innerVariationsLine] : []),
         ),
       ] as MaybeVNodes)
       .concat(
-        mainChildren && main.playerIndex === 'p2' && !isMainMidTurn
-          ? [moveView.renderIndex(main, false), emptyMove(passOpts.conceal)]
-          : [],
+        !mainChildren
+          ? []
+          : lastNodeOfFullMove.playerIndex === 'p2'
+            ? [moveView.renderIndex(lastNodeOfFullMove, false), emptyMove(passOpts.conceal)]
+            : [],
       )
       .concat(mainChildren || []);
   }
@@ -114,7 +147,12 @@ function renderInlined(ctx: Ctx, nodes: Tree.ParentedNode[], opts: Opts): MaybeV
   });
 }
 
-function renderLines(ctx: Ctx, nodes: Tree.ParentedNode[], opts: Opts): VNode {
+function renderLines(
+  ctx: Ctx,
+  nodes: Tree.ParentedNode[],
+  opts: Opts,
+  turnPrefixNodes: Tree.ParentedNode[] = [],
+): VNode {
   return h(
     'lines',
     {
@@ -125,21 +163,33 @@ function renderLines(ctx: Ctx, nodes: Tree.ParentedNode[], opts: Opts): VNode {
         retroLine(ctx, n) ||
         h(
           'line',
-          renderMoveAndChildrenOf(ctx, n, {
-            parentPath: opts.parentPath,
-            isMainline: false,
-            withIndex: true,
-            noConceal: opts.noConceal,
-            truncate: n.comp && !treePath.contains(ctx.ctrl.path, opts.parentPath + n.id) ? 3 : undefined,
-          }),
+          renderMoveAndChildrenOf(
+            ctx,
+            n,
+            {
+              parentPath: opts.parentPath,
+              isMainline: false,
+              withIndex: true,
+              noConceal: opts.noConceal,
+              truncate: n.comp && !treePath.contains(ctx.ctrl.path, opts.parentPath + n.id) ? 3 : undefined,
+            },
+            turnPrefixNodes,
+          ),
         )
       );
     }),
   );
 }
 
-function renderFullMoveOf(ctx: Ctx, node: Tree.ParentedNode, opts: Opts): VNode {
-  return opts.isMainline ? renderMainlineFullMoveOf(ctx, node, opts) : renderVariationFullMoveOf(ctx, node, opts);
+function renderFullMoveOf(
+  ctx: Ctx,
+  node: Tree.ParentedNode,
+  opts: Opts,
+  turnPrefixNodes: Tree.ParentedNode[] = [],
+): VNode {
+  return opts.isMainline
+    ? renderMainlineFullMoveOf(ctx, node, opts)
+    : renderVariationFullMoveOf(ctx, node, opts, turnPrefixNodes);
 }
 
 function renderMainlineFullMoveOf(ctx: Ctx, node: Tree.ParentedNode, opts: Opts): VNode {
@@ -160,10 +210,18 @@ function renderMainlineFullMoveOf(ctx: Ctx, node: Tree.ParentedNode, opts: Opts)
   );
 }
 
-function renderVariationFullMoveOf(ctx: Ctx, node: Tree.ParentedNode, opts: Opts): VNode {
-  const fullTurnNodes: Tree.ParentedNode[] = fullTurnNodesFromNode(node);
+function renderVariationFullMoveOf(
+  ctx: Ctx,
+  node: Tree.ParentedNode,
+  opts: Opts,
+  turnPrefixNodes: Tree.ParentedNode[] = [],
+): VNode {
+  // turnPrefixNodes: shared nodes earlier in the same turn (e.g. dice roll + first move when
+  // this variation branches at the second move). Prepended so the full turn notation is correct.
+  const fullTurnNodes: Tree.ParentedNode[] = [...turnPrefixNodes, ...fullTurnNodesFromNode(node)];
   const variant = ctx.ctrl.data.game.variant;
-  const notation = variantClassFromKey(variant.key).getNotationStyle();
+  const variantClass = variantClassFromKey(variant.key);
+  const notation = variantClass.getNotationStyle();
   const withIndex = opts.withIndex || node.playedPlayerIndex === 'p1',
     path = opts.parentPath + node.id,
     content: MaybeVNodes = [
@@ -171,7 +229,7 @@ function renderVariationFullMoveOf(ctx: Ctx, node: Tree.ParentedNode, opts: Opts
       // TODO: the || '' are probably not correct
       moveView.combinedNotationOfTurn(
         fullTurnNodes.map(n => {
-          return variantClassFromKey(variant.key).computeMoveNotation({
+          return variantClass.computeMoveNotation({
             san: fixCrazySan(n.san || ''),
             uci: n.uci || '',
             fen: n.fen,
@@ -194,61 +252,15 @@ function renderVariationFullMoveOf(ctx: Ctx, node: Tree.ParentedNode, opts: Opts
   );
 }
 
-function renderMoveOf(ctx: Ctx, node: Tree.ParentedNode, opts: Opts): VNode {
-  return opts.isMainline ? renderMainlineMoveOf(ctx, node, opts) : renderVariationMoveOf(ctx, node, opts);
-}
-
-function renderMainlineMoveOf(ctx: Ctx, node: Tree.ParentedNode, opts: Opts): VNode {
-  const path = opts.parentPath + node.id,
-    classes = nodeClasses(ctx, node, path);
-  if (opts.conceal) classes[opts.conceal as string] = true;
-  return h(
-    'move',
-    {
-      attrs: { p: path },
-      class: classes,
-    },
-    moveView.renderMove({ variant: ctx.ctrl.data.game.variant, ...ctx }, node),
-  );
-}
-
-function renderVariationMoveOf(ctx: Ctx, node: Tree.ParentedNode, opts: Opts): VNode {
-  const variant = ctx.ctrl.data.game.variant;
-  const withIndex = opts.withIndex || node.playedPlayerIndex === 'p1',
-    path = opts.parentPath + node.id,
-    content: MaybeVNodes = [
-      withIndex ? moveView.renderIndex(node, true) : null,
-      // TODO: the || '' are probably not correct
-      variantClassFromKey(variant.key).computeMoveNotation({
-        san: fixCrazySan(node.san || ''),
-        uci: node.uci || '',
-        fen: node.fen,
-        prevFen: node.parent?.fen || '',
-      }),
-    ],
-    classes = nodeClasses(ctx, node, path);
-  if (opts.conceal) classes[opts.conceal as string] = true;
-  if (node.glyphs) node.glyphs.forEach(g => content.push(moveView.renderGlyph(g)));
-  return h(
-    'move',
-    {
-      attrs: { p: path },
-      class: classes,
-    },
-    content,
-  );
-}
-
-function renderMoveAndChildrenOf(ctx: Ctx, node: Tree.ParentedNode, opts: Opts): MaybeVNodes {
+function renderMoveAndChildrenOf(
+  ctx: Ctx,
+  node: Tree.ParentedNode,
+  opts: Opts,
+  turnPrefixNodes: Tree.ParentedNode[] = [],
+): MaybeVNodes {
   const nodesOfFullTurn = fullTurnNodesFromNode(node);
   const lastNodeOfFullMove = nodesOfFullTurn[nodesOfFullTurn.length - 1];
-  const path =
-    opts.parentPath +
-    nodesOfFullTurn
-      .map(n => {
-        return n.id;
-      })
-      .join('');
+  const path = opts.parentPath + nodesOfFullTurn.map(n => n.id).join('');
   if (opts.truncate === 0)
     return [
       h(
@@ -260,29 +272,50 @@ function renderMoveAndChildrenOf(ctx: Ctx, node: Tree.ParentedNode, opts: Opts):
       ),
     ];
   const conceal = opts.noConceal ? null : opts.conceal || ctx.concealOf(true)(opts.parentPath + node.id, node);
-  const cs = parentedNodes(node.children, node);
   const commentTags = renderMainlineCommentsOf(ctx, node, conceal, true).filter(nonEmpty);
   const isP1 = node.playedPlayerIndex === 'p1';
-  //check if childen within a full move turn of many actions and render the variation
-  if (node.children.length > 1 && node.playedPlayerIndex === node.playerIndex) {
-    return ([renderFullMoveOf(ctx, node, opts)] as MaybeVNodes)
+  // Find the first node within the full turn that has multiple children (a branching point).
+  // This handles both branching at the turn root (e.g. different first moves after a dice roll)
+  // and branching mid-turn (e.g. same first move but different second move).
+  const branchingNodeIdx = nodesOfFullTurn.findIndex(
+    n => n.children.length > 1 && n.playedPlayerIndex === n.playerIndex,
+  );
+  if (branchingNodeIdx >= 0) {
+    const branchingNode = nodesOfFullTurn[branchingNodeIdx];
+    const branchingCs = parentedNodes(branchingNode.children, branchingNode);
+    // Path to the branching node itself — used as parentPath for its children's variations.
+    const branchingParentPath =
+      opts.parentPath +
+      nodesOfFullTurn
+        .slice(0, branchingNodeIdx + 1)
+        .map(n => n.id)
+        .join('');
+    // Prefix for variations: the shared nodes up to and including the branching node.
+    // Variations need this to display the full turn notation (e.g. "65: 8/3 7/1" not just "65: 7/1").
+    const prefixForVariations = [...turnPrefixNodes, ...nodesOfFullTurn.slice(0, branchingNodeIdx + 1)];
+    return ([renderFullMoveOf(ctx, node, opts, turnPrefixNodes)] as MaybeVNodes)
       .concat(renderInlineCommentsOf(ctx, node))
       .concat(opts.inline ? renderInline(ctx, parentedNode(opts.inline, node), opts) : null)
       .concat([
         h(
           'interrupt',
           commentTags.concat(
-            renderLines(ctx, cs.slice(1), {
-              parentPath: opts.parentPath + node.id,
-              isMainline: false,
-              conceal,
-              noConceal: !conceal,
-            }),
+            renderLines(
+              ctx,
+              branchingCs.slice(1),
+              {
+                parentPath: branchingParentPath,
+                isMainline: false,
+                conceal,
+                noConceal: !conceal,
+              },
+              prefixForVariations,
+            ),
           ),
         ),
       ] as MaybeVNodes)
       .concat(
-        isP1 && lastNodeOfFullMove.children.length > 0
+        opts.isMainline && isP1 && lastNodeOfFullMove.children.length > 0
           ? [moveView.renderIndex(node, false), emptyMove(opts.conceal)]
           : [],
       )
@@ -295,7 +328,7 @@ function renderMoveAndChildrenOf(ctx: Ctx, node: Tree.ParentedNode, opts: Opts):
         }) || [],
       );
   }
-  return ([renderFullMoveOf(ctx, node, opts)] as MaybeVNodes)
+  return ([renderFullMoveOf(ctx, node, opts, turnPrefixNodes)] as MaybeVNodes)
     .concat(renderInlineCommentsOf(ctx, node))
     .concat(opts.inline ? renderInline(ctx, parentedNode(opts.inline, node), opts) : null)
     .concat(
