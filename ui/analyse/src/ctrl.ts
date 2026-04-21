@@ -530,7 +530,9 @@ export default class AnalyseCtrl {
       this.justPlayed = roleChar.toUpperCase() + '@' + pos;
       this.justDropped = piece.role;
       this.justCaptured = undefined;
-      this.sound[this.controlConfig.dropSoundOverride?.(piece, pos as cg.Key, captured) ?? (captured ? 'capture' : 'move')]?.();
+      this.sound[
+        this.controlConfig.dropSoundOverride?.(piece, pos as cg.Key, captured) ?? (captured ? 'capture' : 'move')
+      ]?.();
       const drop: AnaDrop = {
         role: piece.role,
         pos,

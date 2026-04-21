@@ -71,7 +71,10 @@ export const configure = (ctrl: AnalyseCtrl): void => {
     const nodeList = ctrl.nodeList;
     let rollIdx = -1;
     for (let i = nodeList.length - 2; i >= 0; i--) {
-      if (diceRollUci.test(nodeList[i].uci ?? '')) { rollIdx = i; break; }
+      if (diceRollUci.test(nodeList[i].uci ?? '')) {
+        rollIdx = i;
+        break;
+      }
     }
     if (rollIdx < 0) return null;
 
@@ -92,8 +95,7 @@ export const configure = (ctrl: AnalyseCtrl): void => {
     for (const child of rollNode.children) {
       if (child.id === currentBranchId) continue;
       const result = dfs(child, rollPath + child.id);
-      if (result)
-        return { endTurnPath: result, branchRootPath: rollPath + currentBranchId! };
+      if (result) return { endTurnPath: result, branchRootPath: rollPath + currentBranchId! };
     }
     return null;
   };
