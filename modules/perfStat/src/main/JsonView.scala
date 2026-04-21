@@ -3,7 +3,7 @@ package lila.perfStat
 import org.joda.time.DateTime
 import org.joda.time.format.ISODateTimeFormat
 import play.api.i18n.Lang
-import play.api.libs.json._
+import play.api.libs.json.*
 
 import lila.common.LightUser
 import lila.rating.{ Glicko, Perf, PerfType }
@@ -11,7 +11,7 @@ import lila.user.User
 
 final class JsonView(getLightUser: LightUser.GetterSync) {
 
-  import JsonView._
+  import JsonView.*
 
   implicit private val userIdWriter: OWrites[UserId] = OWrites { u =>
     val light = getLightUser(u.value)
@@ -52,9 +52,9 @@ object JsonView {
 
   private def round(v: Double, depth: Int = 2) = lila.common.Maths.roundAt(v, depth)
 
-  private val isoFormatter = ISODateTimeFormat.dateTime
+  private val isoFormatter                          = ISODateTimeFormat.dateTime
   implicit private val dateWriter: Writes[DateTime] = Writes { d =>
-    JsString(isoFormatter `print` d)
+    JsString(isoFormatter.print(d))
   }
   implicit private val userWriter: OWrites[User] = OWrites { u =>
     Json.obj("name" -> u.username)

@@ -44,7 +44,7 @@ final class LilaCookie(domain: NetDomain, baker: SessionCookieBaker) {
 
   def ensure(req: RequestHeader)(res: Result): Result =
     if req.session.data.contains(LilaCookie.sessionId) then res
-    else res `withCookies` makeSessionId(using req)
+    else res.withCookies(makeSessionId(using req))
 
   def ensureAndGet(req: RequestHeader)(res: String => Fu[Result])(implicit ec: ExecutionContext): Fu[Result] =
     req.session.data.get(LilaCookie.sessionId) match {
@@ -52,7 +52,7 @@ final class LilaCookie(domain: NetDomain, baker: SessionCookieBaker) {
       case None            =>
         val sid = generateSessionId()
         res(sid) map {
-          _ `withCookies` session(LilaCookie.sessionId, sid)(using req)
+          _.withCookies(session(LilaCookie.sessionId, sid)(using req))
         }
     }
 }

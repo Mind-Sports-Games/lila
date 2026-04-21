@@ -1,8 +1,8 @@
 package lila.timeline
 
-import reactivemongo.api.bson._
+import reactivemongo.api.bson.*
 
-import lila.db.dsl._
+import lila.db.dsl.*
 import lila.user.User
 
 final class UnsubApi(coll: Coll)(implicit ec: scala.concurrent.ExecutionContext) {
@@ -12,16 +12,16 @@ final class UnsubApi(coll: Coll)(implicit ec: scala.concurrent.ExecutionContext)
   private def select(channel: String, userId: User.ID) = $id(makeId(channel, userId))
 
   def set(channel: String, userId: User.ID, v: Boolean): Funit = {
-    if (v) coll.insert.one(select(channel, userId)).void
+    if v then coll.insert.one(select(channel, userId)).void
     else coll.delete.one(select(channel, userId)).void
   } recover { case _: Exception =>
     ()
   }
 
   def get(channel: String, userId: User.ID): Fu[Boolean] =
-    coll.countSel(select(channel, userId)) `dmap` (0 !=)
+    coll.countSel(select(channel, userId)).dmap(0 !=)
 
-  private def canUnsub(channel: String) = channel `startsWith` "forum:"
+  private def canUnsub(channel: String) = channel.startsWith("forum:")
 
   def filterUnsub(channel: String, userIds: List[User.ID]): Fu[List[String]] =
     canUnsub(channel) so coll.distinctEasy[String, List](

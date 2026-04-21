@@ -48,7 +48,7 @@ final class TeamInfoApi(
     requestRepo: RequestRepo
 )(implicit ec: scala.concurrent.ExecutionContext) {
 
-  import TeamInfo._
+  import TeamInfo.*
 
   def apply(team: Team, me: Option[User]): Fu[TeamInfo] =
     for {

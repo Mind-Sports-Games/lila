@@ -1,10 +1,10 @@
 package lila.activity
 
-import reactivemongo.api.bson._
+import reactivemongo.api.bson.*
 import scala.util.Success
 
 import lila.common.{ Day, Iso }
-import lila.db.dsl._
+import lila.db.dsl.*
 import lila.rating.BSONHandlers.perfTypeKeyIso
 import lila.rating.PerfType
 import lila.study.BSONHandlers.StudyIdBSONHandler
@@ -15,9 +15,9 @@ import lila.user.User
 
 private object BSONHandlers {
 
-  import Activity._
-  import activities._
-  import model._
+  import Activity.*
+  import activities.*
+  import model.*
 
   def regexId(userId: User.ID): Bdoc = "_id" `$startsWith` s"$userId:"
 
@@ -172,7 +172,7 @@ private object BSONHandlers {
 
   implicit lazy val activityHandler: lila.db.BSON[lila.activity.Activity] = new lila.db.BSON[Activity] {
 
-    import ActivityFields._
+    import ActivityFields.*
 
     def reads(r: lila.db.BSON.Reader) =
       Activity(

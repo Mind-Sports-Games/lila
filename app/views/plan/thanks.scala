@@ -1,13 +1,12 @@
 package views.html.plan
 
 import lila.api.Context
-import lila.app.templating.Environment._
-import lila.app.ui.ScalatagsTemplate._
-
+import lila.app.templating.Environment.*
+import lila.app.ui.ScalatagsTemplate.*
 
 object thanks {
 
-  import trans.patron._
+  import trans.patron.*
 
   def apply(patron: Option[lila.plan.Patron], stripeCustomer: Option[lila.plan.StripeCustomer])(implicit
       ctx: Context
@@ -22,19 +21,19 @@ object thanks {
           p(tyvm()),
           p(transactionCompleted()),
           patron.map { pat =>
-            if (
-              pat.payPal.exists(_.renew) || pat.payPalCheckout.exists(_.renew) || stripeCustomer
+            if pat.payPal.exists(_.renew) || pat.payPalCheckout.exists(_.renew) || stripeCustomer
                 .exists(_.renew)
-            ) ctx.me.fold(emptyFrag) { me =>
-              p(
-                permanentPatron(),
-                br,
-                a(href := routes.User.show(me.username))(checkOutProfile())
-              )
-            }
+            then
+              ctx.me.fold(emptyFrag) { me =>
+                p(
+                  permanentPatron(),
+                  br,
+                  a(href := routes.User.show(me.username))(checkOutProfile())
+                )
+              }
             else {
               frag(
-                if (pat.isLifetime)
+                if pat.isLifetime then
                   p(
                     nowLifetime(),
                     br,

@@ -3,9 +3,9 @@ package lila.study
 import strategygames.format.FEN
 import strategygames.format.Forsyth
 import strategygames.variant.Variant
-import strategygames.{ Player => PlayerIndex, P1, GameLogic }
-import play.api.data._
-import play.api.data.Forms._
+import strategygames.{ GameLogic, P1, Player as PlayerIndex }
+import play.api.data.*
+import play.api.data.Forms.*
 
 import lila.common.Form.cleanNonEmptyText
 
@@ -42,8 +42,8 @@ object StudyForm {
 
       def validFen: Boolean = actualFen
         .fold(true) { f =>
-          (Forsyth
-            .<<<@(variant.gameLogic, variant, f))
+          Forsyth
+            .<<<@(variant.gameLogic, variant, f)
             .exists(_.situation.playable(false))
         }
 
@@ -104,7 +104,7 @@ object StudyForm {
             variant = variantStr,
             pgn = onePgn.some,
             orientation =
-              if (pgns.sizeIs > 1) "auto"
+              if pgns.sizeIs > 1 then "auto"
               else (orientationStr.flatMap(PlayerIndex.fromName) | P1).name,
             mode = mode,
             initial = initial && index == 0
@@ -117,5 +117,5 @@ object StudyForm {
   def topicsForm = Form(single("topics" -> text))
 
   def topicsForm(topics: StudyTopics) =
-    Form(single("topics" -> text)) `fill` topics.value.map(_.value).mkString(", ")
+    Form(single("topics" -> text)).fill(topics.value.map(_.value).mkString(", "))
 }

@@ -1,8 +1,8 @@
 package lila.plan
 
-import cats.implicits._
-import play.api.data._
-import play.api.data.Forms._
+import cats.implicits.*
+import play.api.data.*
+import play.api.data.Forms.*
 
 object PlanForm {
 
@@ -21,7 +21,22 @@ object PlanForm {
       "first_name"        -> optional(text),
       "last_name"         -> optional(text),
       "residence_country" -> optional(text)
-    )(Ipn.apply)(d => Some((d.txnId, d.subId, d.txnType, d.gross, d.fee, d.userId, d.email, d.firstName, d.lastName, d.countryCode)))
+    )(Ipn.apply)(d =>
+      Some(
+        (
+          d.txnId,
+          d.subId,
+          d.txnType,
+          d.gross,
+          d.fee,
+          d.userId,
+          d.email,
+          d.firstName,
+          d.lastName,
+          d.countryCode
+        )
+      )
+    )
   )
 
   case class Ipn(

@@ -1,6 +1,6 @@
 package lila.plan
 
-import lila.db.dsl._
+import lila.db.dsl.*
 import lila.user.UserRepo
 
 import org.joda.time.DateTime
@@ -11,20 +11,21 @@ final private class Expiration(
     notifier: PlanNotifier
 )(implicit ec: scala.concurrent.ExecutionContext) {
 
-  import BsonHandlers._
-  import PatronHandlers._
+  import BsonHandlers.*
+  import PatronHandlers.*
 
   def run: Funit =
-    getExpired flatMap {
-      patrons =>
-        Future.sequence(patrons.map { patron =>
+    getExpired flatMap { patrons =>
+      Future
+        .sequence(patrons.map { patron =>
           patronColl.update.one($id(patron.id), patron.removeStripe.removePayPal) >>
             disableUserPlanOf(patron).andDo(logger.info(s"Expired $patron"))
-        }).void
+        })
+        .void
     }
 
   private def disableUserPlanOf(patron: Patron): Funit =
-    userRepo `byId` patron.userId flatMap {
+    userRepo.byId(patron.userId) flatMap {
       _ so { user =>
         userRepo.setPlan(user, user.plan.disable).andDo(notifier.onExpire(user))
       }

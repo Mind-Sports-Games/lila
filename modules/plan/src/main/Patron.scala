@@ -21,7 +21,7 @@ case class Patron(
 
   def levelUpIfPossible =
     copy(
-      lastLevelUp = if (canLevelUp) Some(DateTime.now) else lastLevelUp orElse Some(DateTime.now)
+      lastLevelUp = if canLevelUp then Some(DateTime.now) else lastLevelUp orElse Some(DateTime.now)
     )
 
   def expireInOneMonth: Patron =
@@ -30,7 +30,7 @@ case class Patron(
     )
 
   def expireInOneMonth(cond: Boolean): Patron =
-    if (cond) expireInOneMonth
+    if cond then expireInOneMonth
     else copy(expiresAt = none)
 
   def removeStripe =

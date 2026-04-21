@@ -1,8 +1,8 @@
 package views.html.lobby
 
 import lila.api.Context
-import lila.app.templating.Environment._
-import lila.app.ui.ScalatagsTemplate._
+import lila.app.templating.Environment.*
+import lila.app.ui.ScalatagsTemplate.*
 import lila.game.Pov
 
 object blindLobby {
@@ -10,7 +10,7 @@ object blindLobby {
   def apply(games: List[Pov])(implicit ctx: Context) =
     div(
       h2(games.size, " ongoing games"),
-      games.nonEmpty `option` ongoingGames(games),
+      games.nonEmpty.option(ongoingGames(games)),
       div(cls := "lobby__app")
     )
 

@@ -3,18 +3,18 @@ package lila.puzzle
 import org.joda.time.DateTime
 import org.joda.time.Days
 
-import lila.db.dsl._
+import lila.db.dsl.*
 import lila.user.{ Perfs, User }
 import strategygames.variant.Variant
 
 final private class PuzzleTrustApi(colls: PuzzleColls)(implicit ec: scala.concurrent.ExecutionContext) {
 
-  import Puzzle.{ BSONFields => F }
+  import Puzzle.BSONFields as F
 
   def vote(user: User, round: PuzzleRound, vote: Boolean): Fu[Option[Int]] = {
     val w = base(user, round) + {
       // more trust when vote != win
-      if (vote == round.win) -2 else 2
+      if vote == round.win then -2 else 2
     }
     // distrust provisional ratings and distant ratings
     (w > 0) so {
@@ -29,7 +29,7 @@ final private class PuzzleTrustApi(colls: PuzzleColls)(implicit ec: scala.concur
                 variantId    <- doc.getAsOpt[Int](F.variant)
                 libId        <- doc.getAsOpt[Int](F.lib)
                 puzzleRating <- doc.getAsOpt[Double](s"${F.glicko}.r")
-                variant = Variant.orDefault(strategygames.GameLogic(libId), variantId)
+                variant  = Variant.orDefault(strategygames.GameLogic(libId), variantId)
                 userPerf = Perfs
                   .puzzleLens(variant)
                   .map(_.get(user.perfs))
@@ -43,7 +43,12 @@ final private class PuzzleTrustApi(colls: PuzzleColls)(implicit ec: scala.concur
     }.dmap(w + _)
   }.dmap(_.some.filter(0 < _))
 
-  def theme(user: User, round: PuzzleRound, @annotation.nowarn("msg=unused") _theme: PuzzleTheme.Key, @annotation.nowarn("msg=unused") _vote: Boolean): Fu[Option[Int]] =
+  def theme(
+      user: User,
+      round: PuzzleRound,
+      @annotation.nowarn("msg=unused") _theme: PuzzleTheme.Key,
+      @annotation.nowarn("msg=unused") _vote: Boolean
+  ): Fu[Option[Int]] =
     fuccess(base(user, round))
       .dmap(_.some.filter(0 < _))
 
@@ -61,7 +66,7 @@ final private class PuzzleTrustApi(colls: PuzzleColls)(implicit ec: scala.concur
   // 1 year = 3.46
   // 2 years = 4.89
   private def seniorityBonus(user: User) =
-    math.sqrt(Days.daysBetween(user.createdAt, DateTime.now).getDays.toDouble / 30) `atMost` 5
+    math.sqrt(Days.daysBetween(user.createdAt, DateTime.now).getDays.toDouble / 30).atMost(5)
 
   private def titleBonus(user: User) = user.hasTitle so 20
 
@@ -69,18 +74,20 @@ final private class PuzzleTrustApi(colls: PuzzleColls)(implicit ec: scala.concur
   // 1500 = 0
   // 1800 = 1
   // 3000 = 5
-  private def ratingBonus(user: User) = user.perfs.standard.glicko.establishedIntRating.so { rating =>
-    (rating - 1500) / 300
-  } `atLeast` 0
+  private def ratingBonus(user: User) = user.perfs.standard.glicko.establishedIntRating
+    .so { rating =>
+      (rating - 1500) / 300
+    }
+    .atLeast(0)
 
-  private def patronBonus(user: User) = (~user.planMonths * 5) `atMost` 15
+  private def patronBonus(user: User) = (~user.planMonths * 5).atMost(15)
 
   private def modBonus(user: User) =
-    if (user.roles.exists(_ `contains` "ROLE_PUZZLE_CURATOR")) 100
-    else if (user.isAdmin) 50
-    else if (user.isVerified) 30
+    if user.roles.exists(_.contains("ROLE_PUZZLE_CURATOR")) then 100
+    else if user.isAdmin then 50
+    else if user.isVerified then 30
     else 0
 
   private def lameBonus(user: User) =
-    if (user.lameOrTroll) -30 else 0
+    if user.lameOrTroll then -30 else 0
 }

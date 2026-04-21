@@ -20,7 +20,7 @@ case class Client(
   def fullId = s"$userId:$key"
 
   def updateInstance(i: Client.Instance): Option[Client] =
-    instance.fold(i.some)(_ `update` i) map { newInstance =>
+    instance.fold(i.some)(_.update(i)) map { newInstance =>
       copy(instance = newInstance.some)
     }
 
@@ -56,12 +56,12 @@ object Client {
   ) {
 
     def update(i: Instance): Option[Instance] =
-      if (i.version != version) i.some
-      else if (i.ip != ip) i.some
-      else if (i.seenAt `isAfter` seenAt.plusMinutes(5)) i.some
+      if i.version != version then i.some
+      else if i.ip != ip then i.some
+      else if i.seenAt.isAfter(seenAt.plusMinutes(5)) then i.some
       else none
 
-    def seenRecently = seenAt `isAfter` Instance.recentSince
+    def seenRecently = seenAt.isAfter(Instance.recentSince)
   }
 
   object Instance {
@@ -87,7 +87,7 @@ object Client {
     def accept(v: Client.Version): Try[Unit] =
       Try(SemVer(v.value)) match {
         case Success(version) if version >= minVersion => Success(())
-        case Success(_) =>
+        case Success(_)                                =>
           Failure(
             new Exception(
               s"Version $v is no longer supported. Please restart fishnet to upgrade."

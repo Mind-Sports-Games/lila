@@ -1,6 +1,6 @@
 package lila.mod
 
-import strategygames.{ Player => PlayerIndex }
+import strategygames.Player as PlayerIndex
 import com.github.blemale.scaffeine.Cache
 
 import lila.game.Game
@@ -13,7 +13,7 @@ final private class SandbagWatch(
     reportApi: ReportApi
 )(implicit @annotation.nowarn("msg=unused") _ec: scala.concurrent.ExecutionContext) {
 
-  import SandbagWatch._
+  import SandbagWatch.*
 
   private val messageOnceEvery = lila.memo.OnceEvery(1 hour)
 
@@ -29,19 +29,21 @@ final private class SandbagWatch(
     }
 
   private def setRecord(userId: User.ID, record: Record, game: Game): Funit =
-    if (record.immaculate) fuccess {
-      records invalidate userId
-    }
+    if record.immaculate then
+      fuccess {
+        records invalidate userId
+      }
     else {
       records.put(userId, record)
       val sandbagCount = record.countSandbagWithLatest
       val boostCount   = record.samePlayerBoostCount
-      if (sandbagCount == 3) sendMessage(userId, MsgPreset.sandbagAuto)
-      else if (sandbagCount == 4) game.loserUserId so { loser =>
-        reportApi.autoSandbagReport(record.sandbagOpponents, loser)
-      }
-      else if (boostCount == 3) sendMessage(userId, MsgPreset.boostAuto)
-      else if (boostCount == 4) withWinnerAndLoser(game)(reportApi.autoBoostReport)
+      if sandbagCount == 3 then sendMessage(userId, MsgPreset.sandbagAuto)
+      else if sandbagCount == 4 then
+        game.loserUserId so { loser =>
+          reportApi.autoSandbagReport(record.sandbagOpponents, loser)
+        }
+      else if boostCount == 3 then sendMessage(userId, MsgPreset.boostAuto)
+      else if boostCount == 4 then withWinnerAndLoser(game)(reportApi.autoBoostReport)
       else funit
     }
 
@@ -67,14 +69,14 @@ final private class SandbagWatch(
       .playerByUserId(userId)
       .ifTrue(isSandbag(game))
       .fold[Outcome](Good) { player =>
-        if (player.playerIndex == loser) game.winnerUserId.fold[Outcome](Good)(Sandbag.apply)
+        if player.playerIndex == loser then game.winnerUserId.fold[Outcome](Good)(Sandbag.apply)
         else game.loserUserId.fold[Outcome](Good)(Boost.apply)
       }
 
-  //TODO extract this variable number of turns into strategygames
+  // TODO extract this variable number of turns into strategygames
   private def isSandbag(game: Game): Boolean =
     game.playedTurns <= {
-      if (game.variant == strategygames.chess.variant.Atomic) 3
+      if game.variant == strategygames.chess.variant.Atomic then 3
       else 8
     } && game.winner.so(~_.ratingDiff > 0)
 }

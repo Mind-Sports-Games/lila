@@ -1,11 +1,10 @@
 package views.html.tournament
 
 import lila.api.Context
-import lila.app.templating.Environment._
-import lila.app.ui.ScalatagsTemplate._
+import lila.app.templating.Environment.*
+import lila.app.ui.ScalatagsTemplate.*
 import lila.tournament.Tournament
 import lila.i18n.VariantKeys
-
 
 object finishedList {
 
@@ -33,10 +32,10 @@ object finishedList {
         span(
           t.clock.show,
           " • ",
-          if (t.variant.exotic) VariantKeys.variantName(t.variant) else t.perfType.trans,
-          t.position.isDefined `option` frag(" • ", trans.thematic()),
+          if t.variant.exotic then VariantKeys.variantName(t.variant) else t.perfType.trans,
+          t.position.isDefined.option(frag(" • ", trans.thematic())),
           " • ",
-          if (t.handicapped) trans.handicappedTournament()
+          if t.handicapped then trans.handicappedTournament()
           else t.mode.fold(trans.casualTournament, trans.ratedTournament)(),
           " • ",
           t.durationString

@@ -1,6 +1,6 @@
 package lila.analyse
 
-import lila.db.dsl._
+import lila.db.dsl.*
 import lila.game.Game
 
 final class AnalysisRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionContext) {
@@ -28,5 +28,5 @@ final class AnalysisRepo(val coll: Coll)(implicit ec: scala.concurrent.Execution
 
   def remove(id: String) = coll.delete one $id(id)
 
-  def exists(id: String) = coll `exists` $id(id)
+  def exists(id: String) = coll.exists($id(id))
 }

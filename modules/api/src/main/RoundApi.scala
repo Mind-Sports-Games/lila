@@ -1,11 +1,11 @@
 package lila.api
 
 import strategygames.format.FEN
-import strategygames.{ Player => PlayerIndex }
+import strategygames.Player as PlayerIndex
 import play.api.i18n.Lang
-import play.api.libs.json._
+import play.api.libs.json.*
 
-import lila.analyse.{ JsonView => analysisJson, Analysis }
+import lila.analyse.{ Analysis, JsonView as analysisJson }
 import lila.common.ApiVersion
 import lila.common.extensions.*
 import lila.game.{ Game, Pov }
@@ -14,8 +14,8 @@ import lila.round.JsonView.WithFlags
 import lila.round.{ Forecast, JsonView }
 import lila.security.Granter
 import lila.simul.Simul
-import lila.swiss.{ GameView => SwissView }
-import lila.tournament.{ GameView => TourView }
+import lila.swiss.GameView as SwissView
+import lila.tournament.GameView as TourView
 import lila.tree.Node.partitionTreeJsonWriter
 import lila.user.User
 
@@ -63,7 +63,7 @@ final private[api] class RoundApi(
                   withBookmark(bookmarked) compose
                   withForecastCount(forecast.map(_.steps.size))
               )(json)
-        }
+          }
       }
       .mon(_.round.api.player)
 
@@ -75,7 +75,7 @@ final private[api] class RoundApi(
       initialFenO: Option[Option[FEN]] = None
   )(implicit ctx: Context): Fu[JsObject] =
     initialFenO
-      .fold(gameRepo `initialFen` pov.game)(fuccess)
+      .fold(gameRepo.initialFen(pov.game))(fuccess)
       .flatMap { initialFen =>
         implicit val lang = ctx.lang
         jsonView.watcherJson(
@@ -113,7 +113,7 @@ final private[api] class RoundApi(
       owner: Boolean = false
   )(implicit ctx: Context): Fu[JsObject] =
     initialFenO
-      .fold(gameRepo `initialFen` pov.game)(fuccess)
+      .fold(gameRepo.initialFen(pov.game))(fuccess)
       .flatMap { initialFen =>
         implicit val lang = ctx.lang
         jsonView.watcherJson(
@@ -131,7 +131,7 @@ final private[api] class RoundApi(
           ctx.userId.ifTrue(ctx.isMobileApi).so {
             noteApi.get(pov.gameId, _)
           } zip
-          (owner.so(forecastApi `loadForDisplay` pov)) zip
+          (owner.so(forecastApi.loadForDisplay(pov))) zip
           bookmarkApi.exists(pov.game, ctx.me) map {
             case ((((((json, tour), simul), swiss), note), fco), bookmarked) =>
               (
@@ -144,7 +144,7 @@ final private[api] class RoundApi(
                   withAnalysis(pov.game, analysis) compose
                   withForecast(pov, owner, fco)
               )(json)
-        }
+          }
       }
       .mon(_.round.api.watcher)
 
@@ -156,7 +156,7 @@ final private[api] class RoundApi(
       withFlags: WithFlags
   ): Fu[JsObject] =
     initialFenO
-      .fold(gameRepo `initialFen` pov.game)(fuccess)
+      .fold(gameRepo.initialFen(pov.game))(fuccess)
       .flatMap { initialFen =>
         jsonView.watcherJson(
           pov,
@@ -184,9 +184,9 @@ final private[api] class RoundApi(
       me: Option[User],
       withForecast: Boolean = false
   ) =
-    (if (withForecast) owner.so(forecastApi `loadForDisplay` pov) else fuccess(none)).map { fco =>
+    (if withForecast then owner.so(forecastApi.loadForDisplay(pov)) else fuccess(none)).map { fco =>
       val addForecast: JsObject => JsObject =
-        if (withForecast) this.withForecast(pov, owner, fco) else identity
+        if withForecast then this.withForecast(pov, owner, fco) else identity
       addForecast(withTree(pov, analysis = none, initialFen, WithFlags(opening = true)) {
         jsonView.userAnalysisJson(pov, pref, initialFen, orientation, owner = owner, me = me)
       })
@@ -221,7 +221,7 @@ final private[api] class RoundApi(
     ))
 
   private def withNote(note: String)(json: JsObject) =
-    if (note.isEmpty) json else json + ("note" -> JsString(note))
+    if note.isEmpty then json else json + ("note" -> JsString(note))
 
   private def withBookmark(v: Boolean)(json: JsObject) =
     json.add("bookmarked" -> v)
@@ -232,13 +232,14 @@ final private[api] class RoundApi(
     }
 
   private def withForecast(pov: Pov, owner: Boolean, fco: Option[Forecast])(json: JsObject) =
-    if (pov.game.forecastable && owner)
+    if pov.game.forecastable && owner then
       json + (
         "forecast" -> {
-          if (pov.forecastable) fco.fold[JsValue](Json.obj("none" -> true)) { fc =>
-            import Forecast.forecastJsonWriter
-            Json toJson fc
-          }
+          if pov.forecastable then
+            fco.fold[JsValue](Json.obj("none" -> true)) { fc =>
+              import Forecast.forecastJsonWriter
+              Json toJson fc
+            }
           else Json.obj("onMyTurn" -> true)
         }
       )

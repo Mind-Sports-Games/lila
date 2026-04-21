@@ -3,11 +3,10 @@ package views.html.user.show
 import org.joda.time.DateTime
 
 import lila.api.Context
-import lila.app.templating.Environment._
-import lila.app.ui.ScalatagsTemplate._
+import lila.app.templating.Environment.*
+import lila.app.ui.ScalatagsTemplate.*
 import lila.user.Trophy
 import lila.i18n.VariantKeys
-
 
 object otherTrophies {
 

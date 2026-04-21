@@ -1,14 +1,14 @@
 package controllers
 
-import play.api.mvc._
+import play.api.mvc.*
 import play.api.libs.json.Json
 import scalatags.Text.all.Frag
 
 import lila.api.Context
 import lila.app.{ *, given }
 import lila.common.extensions.*
-import lila.memo.CacheApi._
-import views._
+import lila.memo.CacheApi.*
+import views.*
 
 final class KeyPages(env: Env)(implicit ec: scala.concurrent.ExecutionContext) {
 
@@ -32,9 +32,9 @@ final class KeyPages(env: Env)(implicit ec: scala.concurrent.ExecutionContext) {
           .map(some),
         chatVersion = ctx.noKid so env.lobby.version("lobbyhome").dmap(some)
       )
-      .mon(_.lobby `segment` "preloader.total")
+      .mon(_.lobby.segment("preloader.total"))
       .map { h =>
-        lila.mon.chronoSync(_.lobby `segment` "renderSync") {
+        lila.mon.chronoSync(_.lobby.segment("renderSync")) {
           html.lobby.home(h)
         }
       }
@@ -44,7 +44,7 @@ final class KeyPages(env: Env)(implicit ec: scala.concurrent.ExecutionContext) {
   }
 
   def p2listed(implicit ctx: Context): Result =
-    if (lila.api.Mobile.Api `requested` ctx.req)
+    if lila.api.Mobile.Api.requested(ctx.req) then
       Results.Unauthorized(
         Json.obj(
           "error" -> html.site.message.p2listedMessage

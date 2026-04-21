@@ -1,11 +1,11 @@
 package lila.blog
 
-import io.prismic._
+import io.prismic.*
 import play.api.mvc.RequestHeader
 import play.api.libs.ws.StandaloneWSClient
 
 import lila.common.config.MaxPerPage
-import lila.common.paginator._
+import lila.common.paginator.*
 
 final class BlogApi(
     config: BlogConfig
@@ -102,7 +102,7 @@ object BlogApi {
       .map {
         case Fragment.StructuredText.Block.Paragraph(text, _, _) => s"<p>$text</p>"
         case _                                                   => ""
-    }
+      }
       .mkString
 
   case class Context(api: Api, ref: String, linkResolver: DocumentLinkResolver) {

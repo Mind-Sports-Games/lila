@@ -39,7 +39,6 @@ case class Team(
   def isOfficial: Boolean = createdBy == "playstrategy"
 }
 
-
 object Team {
 
   case class Mini(id: Team.ID, name: String)
@@ -47,10 +46,11 @@ object Team {
   val maxJoinCeiling = 50
 
   def maxJoin(u: User) =
-    if (u.isVerified) maxJoinCeiling * 2
-    else {
-      30 + Days.daysBetween(u.createdAt, DateTime.now).getDays / 7
-    } `atMost` maxJoinCeiling
+    if u.isVerified then maxJoinCeiling * 2
+    else
+      {
+        30 + Days.daysBetween(u.createdAt, DateTime.now).getDays / 7
+      }.atMost(maxJoinCeiling)
 
   type ID = String
 
@@ -116,10 +116,10 @@ object Team {
     )
 
   def nameToId(name: String) =
-    (lila.common.String `slugify` name) pipe { slug =>
+    (lila.common.String.slugify(name)) pipe { slug =>
       // if most chars are not latin, go for random slug
-      if (slug.lengthIs > (name.lengthIs / 2)) slug else randomId()
+      if slug.lengthIs > (name.lengthIs / 2) then slug else randomId()
     }
 
-  private[team] def randomId() = lila.common.ThreadLocalRandom `nextString` 8
+  private[team] def randomId() = lila.common.ThreadLocalRandom.nextString(8)
 }

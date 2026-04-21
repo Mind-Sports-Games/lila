@@ -101,4 +101,3 @@ object LightUser {
 
   val psBotsIDs = tourBotsIDs ++ poolBotsIDs ++ stockfishBotsIDs ++ List(randomBot.id)
 }
-

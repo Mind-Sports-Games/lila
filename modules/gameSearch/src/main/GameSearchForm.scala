@@ -2,10 +2,10 @@ package lila.gameSearch
 
 import strategygames.Mode
 import org.joda.time.DateTime
-import play.api.data._
-import play.api.data.Forms._
+import play.api.data.*
+import play.api.data.Forms.*
 
-import lila.common.Form._
+import lila.common.Form.*
 import lila.search.Range
 
 final private[gameSearch] class GameSearchForm {
@@ -33,7 +33,7 @@ final private[gameSearch] class GameSearchForm {
       "aiLevelMax"        -> optional(numberIn(Query.aiLevels)),
       "durationMin"       -> optional(numberIn(Query.durations)),
       "durationMax"       -> optional(numberIn(Query.durations)),
-      "clock" -> mapping(
+      "clock"             -> mapping(
         "initMin" -> optional(numberIn(Query.clockInits)),
         "initMax" -> optional(numberIn(Query.clockInits)),
         "incMin"  -> optional(numberIn(Query.clockIncs)),
@@ -43,14 +43,39 @@ final private[gameSearch] class GameSearchForm {
       "dateMax"  -> GameSearchForm.dateField,
       "status"   -> optional(numberIn(Query.statuses)),
       "analysed" -> optional(number),
-      "sort" -> optional(
+      "sort"     -> optional(
         mapping(
           "field" -> stringIn(Sorting.fields),
           "order" -> stringIn(Sorting.orders)
         )(SearchSort.apply)(d => Some((d.field, d.order)))
       )
-    )(SearchData.apply)(d => Some((d.players, d.winnerPlayerIndex, d.perf, d.source, d.mode, d.turnsMin, d.turnsMax, d.ratingMin, d.ratingMax, d.hasAi, d.aiLevelMin, d.aiLevelMax, d.durationMin, d.durationMax, d.clock, d.dateMin, d.dateMax, d.status, d.analysed, d.sort)))
-  ) `fill` SearchData()
+    )(SearchData.apply)(d =>
+      Some(
+        (
+          d.players,
+          d.winnerPlayerIndex,
+          d.perf,
+          d.source,
+          d.mode,
+          d.turnsMin,
+          d.turnsMax,
+          d.ratingMin,
+          d.ratingMax,
+          d.hasAi,
+          d.aiLevelMin,
+          d.aiLevelMax,
+          d.durationMin,
+          d.durationMax,
+          d.clock,
+          d.dateMin,
+          d.dateMax,
+          d.status,
+          d.analysed,
+          d.sort
+        )
+      )
+    )
+  ).fill(SearchData())
 }
 
 private[gameSearch] object GameSearchForm {

@@ -1,8 +1,8 @@
 package lila.learn
 
-import play.api.libs.json._
+import play.api.libs.json.*
 
-import lila.common.Json._
+import lila.common.Json.*
 
 object JSONHandlers {
 

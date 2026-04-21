@@ -2,13 +2,12 @@ package views.html
 package account
 
 import lila.api.Context
-import lila.app.templating.Environment._
-import lila.app.ui.ScalatagsTemplate._
-
+import lila.app.templating.Environment.*
+import lila.app.ui.ScalatagsTemplate.*
 
 object twoFactor {
 
-  import trans.tfa._
+  import trans.tfa.*
 
   private val qrCode = raw(
     """<div style="width: 276px; height: 276px; padding: 10px; background: p1; margin: 2em auto;"><div id="qrcode" style="width: 256px; height: 256px;"></div></div>"""

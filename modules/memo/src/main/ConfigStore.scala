@@ -4,7 +4,7 @@ import com.typesafe.config.ConfigFactory
 import play.api.ConfigLoader
 import play.api.data.Form
 
-import lila.db.dsl._
+import lila.db.dsl.*
 
 final class ConfigStore[A](coll: Coll, id: String, cacheApi: CacheApi, logger: lila.log.Logger)(implicit
     ec: scala.concurrent.ExecutionContext,
@@ -42,12 +42,15 @@ final class ConfigStore[A](coll: Coll, id: String, cacheApi: CacheApi, logger: l
 
   def set(text: String): Either[List[String], Funit] =
     parse(text) map { a =>
-      coll.update.one($id(id), $doc(mongoDocKey -> text), upsert = true).void.andDo(cache.put((), fuccess(a.some)))
+      coll.update
+        .one($id(id), $doc(mongoDocKey -> text), upsert = true)
+        .void
+        .andDo(cache.put((), fuccess(a.some)))
     }
 
   def makeForm: Fu[Form[String]] = {
-    import play.api.data.Forms._
-    import play.api.data.validation._
+    import play.api.data.Forms.*
+    import play.api.data.validation.*
     val form = Form(
       single(
         "text" -> text.verifying(Constraint[String]("constraint.text_parsable") { t =>
@@ -72,6 +75,6 @@ object ConfigStore {
     private val coll = db(config.configColl)
 
     def apply[A: ConfigLoader](id: String, logger: lila.log.Logger) =
-      new ConfigStore[A](coll, id, cacheApi, logger `branch` "configStore")
+      new ConfigStore[A](coll, id, cacheApi, logger.branch("configStore"))
   }
 }

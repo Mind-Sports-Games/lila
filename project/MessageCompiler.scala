@@ -25,7 +25,7 @@ object MessageCompiler {
       dbs: List[String]
   ): File = {
     val scalaFile = compileTo / s"$locale.scala"
-    val xmlFiles =
+    val xmlFiles  =
       if (locale == "en-GB") dbs.map { db =>
         db -> (sourceDir / s"$db.xml")
       }
@@ -45,7 +45,7 @@ object MessageCompiler {
             val xml = XML.loadFile(file)
             xml.child.collect {
               case e if e.label == "string" =>
-                val safe = escape(e.text)
+                val safe        = escape(e.text)
                 val translation = escapeHtmlOption(safe) match {
                   case None          => s"""new Simple(\"\"\"$safe\"\"\")"""
                   case Some(escaped) => s"""new Escaped(\"\"\"$safe\"\"\",\"\"\"$escaped\"\"\")"""
@@ -134,7 +134,7 @@ private object Registry {
     if (items.size > 4) s"""Map(${items.map { case (k, v) => s"$k->$v" } mkString ","})"""
     else s"""new Map.Map${items.size}(${items.map { case (k, v) => s"$k,$v" } mkString ","})"""
 
-  private val badChars = """[<>&"'\r\n]""".r.pattern
+  private val badChars                                    = """[<>&"'\r\n]""".r.pattern
   private def escapeHtmlOption(s: String): Option[String] =
     if (badChars.matcher(s).find) Some {
       val sb = new java.lang.StringBuilder(s.length + 10) // wet finger style

@@ -1,9 +1,9 @@
 package lila.tournament
 
-import play.api.libs.json._
+import play.api.libs.json.*
 
 import lila.common.WorkQueue
-import lila.memo.CacheApi._
+import lila.memo.CacheApi.*
 
 /*
  * Getting a standing page of a tournament can be very expensive
@@ -31,9 +31,9 @@ final class TournamentStandingApi(
   )
 
   def apply(tour: Tournament, page: Int): Fu[JsObject] =
-    if (page == 1) first get tour.id
-    else if (page > 50)
-      if (tour.isCreated) createdCache.get(tour.id -> page)
+    if page == 1 then first get tour.id
+    else if page > 50 then
+      if tour.isCreated then createdCache.get(tour.id -> page)
       else computeMaybe(tour.id, page)
     else compute(tour, page)
 
@@ -51,7 +51,7 @@ final class TournamentStandingApi(
   }
 
   def clearCache(tour: Tournament): Unit =
-    first `invalidate` tour.id
+    first.invalidate(tour.id)
     // no need to invalidate createdCache, these are only cached when tour.isCreated
 
   private def computeMaybe(id: Tournament.ID, page: Int): Fu[JsObject] =
@@ -67,18 +67,23 @@ final class TournamentStandingApi(
     }
 
   private def compute(id: Tournament.ID, page: Int): Fu[JsObject] =
-    tournamentRepo `byId` id `orFail` s"No such tournament: $id" flatMap { compute(_, page) }
+    tournamentRepo.byId(id).orFail(s"No such tournament: $id") flatMap { compute(_, page) }
 
   private def compute(tour: Tournament, page: Int): Fu[JsObject] =
     for {
       rankedPlayers <- playerRepo.bestByTourWithRankByPage(tour.id, 10, page max 1)
-      sheets <-
-        Future.sequence(rankedPlayers
-          .map { p =>
-            cached.sheet(tour, p.player.userId) dmap { p.player.userId -> _ }
-          })
+      sheets        <-
+        Future
+          .sequence(
+            rankedPlayers
+              .map { p =>
+                cached.sheet(tour, p.player.userId) dmap { p.player.userId -> _ }
+              }
+          )
           .dmap(_.toMap)
-      players <- Future.sequence(rankedPlayers.map(JsonView.playerJson(lightUserApi, sheets, tour.streakable)))
+      players <- Future.sequence(
+        rankedPlayers.map(JsonView.playerJson(lightUserApi, sheets, tour.streakable))
+      )
     } yield Json.obj(
       "page"    -> page,
       "players" -> players

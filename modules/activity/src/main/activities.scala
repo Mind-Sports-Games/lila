@@ -1,6 +1,6 @@
 package lila.activity
 
-import model._
+import model.*
 import alleycats.Zero
 
 import lila.rating.PerfType
@@ -15,7 +15,7 @@ object activities {
   case class Games(value: Map[PerfType, Score]) extends AnyVal {
     def add(pt: PerfType, score: Score) =
       copy(
-        value = value + (pt -> value.get(pt).fold(score)(_ `add` score))
+        value = value + (pt -> value.get(pt).fold(score)(_.add(score)))
       )
     def hasNonCorres = value.exists(_._1.key != "correspondence")
   }
@@ -28,22 +28,22 @@ object activities {
   implicit val PostsZero: Zero[Posts] = Zero(Posts(Nil))
 
   case class Puzzles(value: Map[PerfType, Score]) {
-    def +(s: Score, pt: PerfType) = Puzzles(value = value + (pt -> value.get(pt).fold(s)(_ `add` s)))
+    def +(s: Score, pt: PerfType) = Puzzles(value = value + (pt -> value.get(pt).fold(s)(_.add(s))))
   }
   implicit val PuzzlesZero: Zero[Puzzles] = Zero(Puzzles(Map.empty))
 
   case class Storm(runs: Int, score: Int) {
-    def +(s: Int) = Storm(runs = runs + 1, score = score `atLeast` s)
+    def +(s: Int) = Storm(runs = runs + 1, score = score.atLeast(s))
   }
   implicit val StormZero: Zero[Storm] = Zero(Storm(0, 0))
 
   case class Racer(runs: Int, score: Int) {
-    def +(s: Int) = Racer(runs = runs + 1, score = score `atLeast` s)
+    def +(s: Int) = Racer(runs = runs + 1, score = score.atLeast(s))
   }
   implicit val RacerZero: Zero[Racer] = Zero(Racer(0, 0))
 
   case class Streak(runs: Int, score: Int) {
-    def +(s: Int) = Streak(runs = runs + 1, score = score `atLeast` s)
+    def +(s: Int) = Streak(runs = runs + 1, score = score.atLeast(s))
   }
   implicit val StreakZero: Zero[Streak] = Zero(Streak(0, 0))
 
@@ -66,7 +66,7 @@ object activities {
   }
   implicit val PracticeZero: Zero[Practice] = Zero(Practice(Map.empty))
 
-  case class SimulId(value: String) extends AnyVal
+  case class SimulId(value: String)       extends AnyVal
   case class Simuls(value: List[SimulId]) extends AnyVal {
     def +(s: SimulId) = copy(value = s :: value)
   }
@@ -76,22 +76,22 @@ object activities {
     def add(gameId: GameId, moved: Boolean, ended: Boolean) =
       Corres(
         moves = moves + (moved so 1),
-        movesIn = if (moved) (gameId :: movesIn).distinct.take(maxSubEntries) else movesIn,
-        end = if (ended) (gameId :: end).take(maxSubEntries) else end
+        movesIn = if moved then (gameId :: movesIn).distinct.take(maxSubEntries) else movesIn,
+        end = if ended then (gameId :: end).take(maxSubEntries) else end
       )
   }
   implicit val CorresZero: Zero[Corres] = Zero(Corres(0, Nil, Nil))
 
   case class Patron(months: Int) extends AnyVal
   case class FollowList(ids: List[User.ID], nb: Option[Int]) {
-    def actualNb = nb | ids.size
+    def actualNb       = nb | ids.size
     def +(id: User.ID) =
-      if (ids contains id) this
+      if ids contains id then this
       else {
         val newIds = (id :: ids).distinct
         copy(
           ids = newIds take maxSubEntries,
-          nb = nb.map(1 +).orElse(newIds.size > maxSubEntries `option` newIds.size)
+          nb = nb.map(1 +).orElse((newIds.size > maxSubEntries).option(newIds.size))
         )
       }
     def isEmpty = ids.isEmpty

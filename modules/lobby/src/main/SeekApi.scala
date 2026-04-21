@@ -2,10 +2,10 @@ package lila.lobby
 
 import org.joda.time.DateTime
 
-import lila.common.config._
-import lila.db.dsl._
+import lila.common.config.*
+import lila.db.dsl.*
 import lila.user.User
-import lila.memo.CacheApi._
+import lila.memo.CacheApi.*
 
 final class SeekApi(
     config: SeekApi.Config,
@@ -13,7 +13,7 @@ final class SeekApi(
     relationApi: lila.relation.RelationApi,
     cacheApi: lila.memo.CacheApi
 )(implicit ec: scala.concurrent.ExecutionContext) {
-  import config._
+  import config.*
 
   sealed private trait CacheKey
   private object ForAnon extends CacheKey
@@ -22,7 +22,7 @@ final class SeekApi(
   private def allCursor =
     coll
       .find($empty)
-      .sort($sort `desc` "createdAt")
+      .sort($sort.desc("createdAt"))
       .cursor[Seek]()
 
   private val cache = cacheApi[CacheKey, List[Seek]](2, "lobby.seek.list") {
@@ -30,12 +30,12 @@ final class SeekApi(
       .buildAsyncFuture {
         case ForAnon => allCursor.list(maxPerPage.value)
         case ForUser => allCursor.list()
-    }
+      }
   }
 
   private def cacheClear() = {
-    cache `invalidate` ForAnon
-    cache `invalidate` ForUser
+    cache.invalidate(ForAnon)
+    cache.invalidate(ForUser)
   }
 
   def forAnon = cache get ForAnon
@@ -57,7 +57,7 @@ final class SeekApi(
     seeks
       .foldLeft(List.empty[Seek] -> Set.empty[String]) {
         case ((res, h), seek) if seek.user.id == user.id => (seek :: res, h)
-        case ((res, h), seek) =>
+        case ((res, h), seek)                            =>
           val seekH =
             List(
               Some(seek.variant.toString()),
@@ -67,9 +67,9 @@ final class SeekApi(
               Some(seek.user.id)
             )
               .mkString(",")
-          if (h contains seekH) (res, h)
+          if h contains seekH then (res, h)
           else (seek :: res, h + seekH)
-    }
+      }
       ._1
       .reverse
 
@@ -77,15 +77,18 @@ final class SeekApi(
     coll.find($id(id)).one[Seek]
 
   def insert(seek: Seek) =
-    coll.insert.one(seek) >> findByUser(seek.user.id).flatMap {
-      case seeks if seeks.sizeIs <= maxPerUser.value => funit
-      case seeks                                     => Future.sequence(seeks.drop(maxPerUser.value).map(remove))
-    }.void.andDo(cacheClear())
+    coll.insert.one(seek) >> findByUser(seek.user.id)
+      .flatMap {
+        case seeks if seeks.sizeIs <= maxPerUser.value => funit
+        case seeks => Future.sequence(seeks.drop(maxPerUser.value).map(remove))
+      }
+      .void
+      .andDo(cacheClear())
 
   def findByUser(userId: String): Fu[List[Seek]] =
     coll
       .find($doc("user.id" -> userId))
-      .sort($sort `desc` "createdAt")
+      .sort($sort.desc("createdAt"))
       .cursor[Seek]()
       .list()
 
@@ -112,7 +115,8 @@ final class SeekApi(
           "user.id" -> userId
         )
       )
-      .void.andDo(cacheClear())
+      .void
+      .andDo(cacheClear())
 
   def removeByUser(user: User) =
     coll.delete.one($doc("user.id" -> user.id)).void.andDo(cacheClear())

@@ -1,10 +1,10 @@
 package lila.coach
 
-import com.softwaremill.macwire._
+import com.softwaremill.macwire.*
 import lila.common.autoconfig.{ AutoConfig, ConfigName }
 import play.api.Configuration
 
-import lila.common.config._
+import lila.common.config.*
 import lila.security.Permission
 
 @Module
@@ -59,10 +59,11 @@ final class Env(
     case lila.hub.actorApi.mod.SetPermissions(userId, permissions) =>
       api.toggleApproved(userId, permissions.has(Permission.Coach.dbKey)).discard
     case lila.game.actorApi.FinishGame(game, p1, p2) if game.rated =>
-      if (game.perfType.exists(lila.rating.PerfType.standard.contains)) {
-        p1 so api.setRating
-        p2 so api.setRating
-      }.discard
+      if game.perfType.exists(lila.rating.PerfType.standard.contains) then
+        {
+          p1 so api.setRating
+          p2 so api.setRating
+        }.discard
   }
 
   def cli =

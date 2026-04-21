@@ -12,12 +12,11 @@ final class AugmentedAny(private val self: Any) extends AnyVal {
 
 final class PimpedBoolean(private val self: Boolean) extends AnyVal {
 
-  /** Replaces scalaz boolean ops
-    * so so works on Zero and not Monoid
+  /** Replaces scalaz boolean ops so so works on Zero and not Monoid
     */
-  def ??[A](a: => A)(implicit z: Zero[A]): A = if (self) a else z.zero
+  def ??[A](a: => A)(implicit z: Zero[A]): A = if self then a else z.zero
 
-  def option[A](a: => A): Option[A] = if (self) Some(a) else None
+  def option[A](a: => A): Option[A] = if self then Some(a) else None
 }
 
 final class PimpedLong(private val self: Long) extends AnyVal {
@@ -29,8 +28,8 @@ final class PimpedLong(private val self: Long) extends AnyVal {
   def squeeze(bottom: Long, top: Long): Long = max(min(self, top), bottom)
 
   def toSaturatedInt: Int =
-    if (self.toInt == self) self.toInt
-    else if (self > 0) Integer.MAX_VALUE
+    if self.toInt == self then self.toInt
+    else if self > 0 then Integer.MAX_VALUE
     else Integer.MIN_VALUE
 }
 

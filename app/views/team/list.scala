@@ -1,14 +1,13 @@
 package views.html.team
 
 import lila.api.Context
-import lila.app.templating.Environment._
-import lila.app.ui.ScalatagsTemplate._
+import lila.app.templating.Environment.*
+import lila.app.ui.ScalatagsTemplate.*
 import lila.common.paginator.Paginator
-
 
 object list {
 
-  import trans.team._
+  import trans.team.*
 
   def search(text: String, teams: Paginator[lila.team.Team])(implicit ctx: Context) =
     list(
@@ -38,7 +37,7 @@ object list {
             )
           },
           table(cls := "slist slist-pad")(
-            if (teams.nonEmpty) tbody(teams.map(bits.teamTr(_)))
+            if teams.nonEmpty then tbody(teams.map(bits.teamTr(_)))
             else noTeam()
           )
         )
@@ -53,7 +52,7 @@ object list {
           h1(teamsIlead()),
           standardFlash(),
           table(cls := "slist slist-pad")(
-            if (teams.nonEmpty) tbody(teams.map(bits.teamTr(_)))
+            if teams.nonEmpty then tbody(teams.map(bits.teamTr(_)))
             else noTeam()
           )
         )
@@ -90,7 +89,7 @@ object list {
           ),
           standardFlash(),
           table(cls := "slist slist-pad")(
-            if (teams.nbResults > 0)
+            if teams.nbResults > 0 then
               tbody(cls := "infinite-scroll")(
                 teams.currentPageResults map { bits.teamTr(_) },
                 pagerNextTable(teams, nextPageUrl)

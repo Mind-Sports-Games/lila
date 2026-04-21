@@ -13,15 +13,15 @@ lazy val root = Project("lila", file("."))
   .settings(buildSettings)
 
 // shorter prod classpath
-scriptClasspath := Seq("*")
-maintainer := "matt@watkinsmedia.org"
+scriptClasspath             := Seq("*")
+maintainer                  := "matt@watkinsmedia.org"
 Compile / resourceDirectory := baseDirectory.value / "conf"
-Compile / sourceDirectory := baseDirectory.value / "app"
-Compile / scalaSource := baseDirectory.value / "app"
+Compile / sourceDirectory   := baseDirectory.value / "app"
+Compile / scalaSource       := baseDirectory.value / "app"
 Universal / sourceDirectory := baseDirectory.value / "dist"
-Compile / mainClass := Some("lila.app.Lila")
+Compile / mainClass         := Some("lila.app.Lila")
 // settings previously supplied by the PlayScala plugin
-shellPrompt := PlayCommands.playPrompt
+shellPrompt             := PlayCommands.playPrompt
 playDependencyClasspath := (Runtime / externalDependencyClasspath).value
 bashScriptExtraDefines += "addJava \"-Duser.dir=$(realpath \"$(cd \"${app_home}/..\"; pwd -P)\"  $(is_cygwin && echo \"fix\"))\"\n"
 Compile / RoutesKeys.routes / sources ++= {
@@ -36,19 +36,19 @@ ThisBuild / evictionErrorLevel := Level.Warn
 // Override Play library versions from the sbt plugin (plugin is 1.26, libraries are 3.22)
 val playLibVersion = "2.8.18-lila_3.22"
 ThisBuild / dependencyOverrides ++= Seq(
-  "com.typesafe.play" %% "play"              % playLibVersion,
-  "com.typesafe.play" %% "play-server"       % playLibVersion,
-  "com.typesafe.play" %% "play-netty-server" % playLibVersion,
-  "com.typesafe.play" %% "play-logback"      % playLibVersion,
-  "com.typesafe.play" %% "play-streams"      % playLibVersion,
-  "com.typesafe.play" %% "play-java"         % playLibVersion,
-  "com.typesafe.play" %% "play-guice"        % playLibVersion,
+  "com.typesafe.play" %% "play"                  % playLibVersion,
+  "com.typesafe.play" %% "play-server"           % playLibVersion,
+  "com.typesafe.play" %% "play-netty-server"     % playLibVersion,
+  "com.typesafe.play" %% "play-logback"          % playLibVersion,
+  "com.typesafe.play" %% "play-streams"          % playLibVersion,
+  "com.typesafe.play" %% "play-java"             % playLibVersion,
+  "com.typesafe.play" %% "play-guice"            % playLibVersion,
   "com.typesafe.play" %% "play-akka-http-server" % playLibVersion,
-  "com.typesafe.play" %% "filters-helpers"   % playLibVersion
+  "com.typesafe.play" %% "filters-helpers"       % playLibVersion
 )
 
 // Exclude Scala 2.13 version and force Scala 3 version
-ThisBuild / excludeDependencies += "org.scala-lang.modules" % "scala-java8-compat_2.13"
+ThisBuild / excludeDependencies += "org.scala-lang.modules"  % "scala-java8-compat_2.13"
 ThisBuild / dependencyOverrides += "org.scala-lang.modules" %% "scala-java8-compat" % "1.0.2"
 
 // Align jackson-module-scala with the jackson-databind version pulled transitively

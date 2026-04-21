@@ -6,7 +6,7 @@ import reactivemongo.api.ReadPreference
 
 import lila.common.IpAddress
 import lila.db.BSON.BSONJodaDateTimeHandler
-import lila.db.dsl._
+import lila.db.dsl.*
 
 final class Firewall(
     coll: Coll,
@@ -21,9 +21,9 @@ final class Firewall(
 
   def blocks(req: RequestHeader): Boolean = {
     val v = blocksIp {
-      lila.common.HTTPRequest `ipAddress` req
+      lila.common.HTTPRequest.ipAddress(req)
     }
-    if (v) lila.mon.security.firewall.block.increment()
+    if v then lila.mon.security.firewall.block.increment()
     v
   }
 

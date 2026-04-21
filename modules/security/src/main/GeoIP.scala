@@ -6,7 +6,7 @@ import com.maxmind.geoip2.model.CityResponse
 import lila.common.autoconfig.{ AutoConfig, ConfigName }
 import java.io.File
 import java.net.InetAddress
-import scala.concurrent.duration._
+import scala.concurrent.duration.*
 import scala.util.Try
 
 import lila.common.IpAddress
@@ -18,17 +18,15 @@ final class GeoIP(config: GeoIP.Config) {
     config.file.nonEmpty so {
       try {
         val dbFile = new File(config.file)
-        if (dbFile.exists()) {
+        if dbFile.exists() then {
           val r = new DatabaseReader.Builder(dbFile).build()
           logger.info("MaxMindIpGeo is enabled")
           r.some
-        }
-        else {
+        } else {
           logger.info(s"MaxMindIpGeo is disabled: file not found ${config.file}")
           none
         }
-      }
-      catch {
+      } catch {
         case e: Exception =>
           logger.info(s"MaxMindIpGeo is disabled: $e")
           none

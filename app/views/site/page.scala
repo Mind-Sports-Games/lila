@@ -1,10 +1,9 @@
 package views.html.site
 
-
 import lila.api.Context
-import lila.app.templating.Environment._
-import lila.app.ui.ScalatagsTemplate._
-import strategygames.{ GameFamily }
+import lila.app.templating.Environment.*
+import lila.app.ui.ScalatagsTemplate.*
+import strategygames.GameFamily
 
 object page {
 
@@ -135,8 +134,8 @@ $('#asset-version-message').text(window.playstrategy.info.message);"""
             p("Add the following HTML to your site:"),
             p(cls := "copy-zone")(
               input(
-                id := "tv-embed-src",
-                cls := "copyable autoselect",
+                id    := "tv-embed-src",
+                cls   := "copyable autoselect",
                 value := s"""<iframe src="$netBaseUrl/tv/frame?theme=auto&bg=auto" $args></iframe>"""
               ),
               button(title := "Copy code", cls := "copy button", dataRel := "tv-embed-src", dataIcon := "\"")
@@ -155,14 +154,14 @@ $('#asset-version-message').text(window.playstrategy.info.message);"""
             p("Add the following HTML to your site:"),
             p(cls := "copy-zone")(
               input(
-                id := "puzzle-embed-src",
+                id  := "puzzle-embed-src",
                 cls := "copyable autoselect",
                 value := s"""<iframe src="$netBaseUrl/training/frame/daily?bg=auto&theme=auto" $args></iframe>"""
               ),
               button(
-                title := "Copy code",
-                cls := "copy button",
-                dataRel := "puzzle-embed-src",
+                title    := "Copy code",
+                cls      := "copy button",
+                dataRel  := "puzzle-embed-src",
                 dataIcon := "\""
               )
             ),
@@ -233,7 +232,7 @@ $('#asset-version-message').text(window.playstrategy.info.message);"""
           a(activeCls("contact"), href := routes.Main.contact)(trans.contact.contact()),
           a(activeCls("tos"), href := routes.Page.tos)(trans.termsOfService()),
           a(activeCls("privacy"), href := "/privacy")(trans.privacy()),
-          //a(activeCls("master"), href := routes.Page.master)("Title verification"),
+          // a(activeCls("master"), href := routes.Page.master)("Title verification"),
           sep,
           a(activeCls("source"), href := routes.Page.source)(trans.sourceCode()),
           a(activeCls("help"), href := routes.Page.help)(trans.contribute()),
@@ -241,11 +240,11 @@ $('#asset-version-message').text(window.playstrategy.info.message);"""
           a(activeCls("thanks"), href := "/thanks")(trans.thankYou()),
           sep,
           a(activeCls("webmasters"), href := routes.Main.webmasters)(trans.webmasters()),
-          //a(activeCls("database"), href := "https://database.playstrategy.org")(trans.database(), external),
+          // a(activeCls("database"), href := "https://database.playstrategy.org")(trans.database(), external),
           a(activeCls("api"), href := routes.Api.index)("API", external),
           sep,
           a(activeCls("lag"), href := routes.Main.lag)(trans.lag.isPlayStrategyLagging())
-          //a(activeCls("ads"), href := "/ads")("Block ads")
+          // a(activeCls("ads"), href := "/ads")("Block ads")
         ),
         div(cls := s"page-menu__content $contentCls")(body)
       )

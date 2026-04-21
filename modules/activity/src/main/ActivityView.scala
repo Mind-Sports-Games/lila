@@ -6,10 +6,10 @@ import lila.game.LightPov
 import lila.practice.PracticeStudy
 import lila.simul.Simul
 import lila.study.Study
-import lila.tournament.LeaderboardApi.{ Entry => TourEntry }
+import lila.tournament.LeaderboardApi.Entry as TourEntry
 
-import activities._
-import model._
+import activities.*
+import model.*
 import lila.swiss.Swiss
 
 case class ActivityView(

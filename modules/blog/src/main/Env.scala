@@ -1,6 +1,6 @@
 package lila.blog
 
-import com.softwaremill.macwire._
+import com.softwaremill.macwire.*
 import lila.common.autoconfig.{ AutoConfig, ConfigName }
 import play.api.Configuration
 import scala.concurrent.duration.FiniteDuration

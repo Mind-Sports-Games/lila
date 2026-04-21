@@ -1,8 +1,8 @@
 package controllers
 
 import play.api.libs.json.Json
-import play.api.mvc._
-import views._
+import play.api.mvc.*
+import views.*
 
 import lila.app.{ *, given }
 import lila.common.{ HTTPRequest, IpAddress }
@@ -38,7 +38,7 @@ final class Importer(env: Env) extends LilaController(env) {
               api = _ => BadRequest(jsonError("Invalid PGN")).fuccess
             ),
           data =>
-            ImportRateLimitPerIP(HTTPRequest `ipAddress` req, cost = 1) {
+            ImportRateLimitPerIP(HTTPRequest.ipAddress(req), cost = 1) {
               doImport(data, req, ctx.me) flatMap {
                 case Some(game) =>
                   ctx.me.ifTrue(data.analyse.isDefined && game.analysable) so { me =>
@@ -60,7 +60,7 @@ final class Importer(env: Env) extends LilaController(env) {
 
   def apiSendGame = {
     def commonImport(req: Request[?], me: Option[lila.user.User]): Fu[Result] =
-      ImportRateLimitPerIP(HTTPRequest `ipAddress` req, cost = if (me.isDefined) 1 else 2) {
+      ImportRateLimitPerIP(HTTPRequest.ipAddress(req), cost = if me.isDefined then 1 else 2) {
         env.importer.forms.importForm
           .bindFromRequest()(using req, formBinding)
           .fold(

@@ -1,12 +1,11 @@
 package views.html.tournament
 
 import lila.api.Context
-import lila.app.templating.Environment._
-import lila.app.ui.ScalatagsTemplate._
+import lila.app.templating.Environment.*
+import lila.app.ui.ScalatagsTemplate.*
 import lila.tournament.{ ShieldTableApi, Tournament, TournamentShield }
 import lila.swiss.Swiss
 import lila.i18n.VariantKeys
-
 
 object shields {
 
@@ -190,7 +189,7 @@ object shields {
           h2("Next Tournament"),
           next.map { next =>
             a(
-              cls := "next-tournament",
+              cls  := "next-tournament",
               href := next.fold(
                 arena => routes.Tournament.show(arena.id),
                 swiss => routes.Swiss.show(swiss.id.value)
@@ -205,10 +204,10 @@ object shields {
           h2("Current Tournament Format"),
           h4(medleyShield.arenaFormatFull),
           h2("Variants Used in this Medley"),
-          if (medleyShield.hasAllVariants) {
+          if medleyShield.hasAllVariants then {
             h4(
               a(
-                cls := "all-variants",
+                cls  := "all-variants",
                 href := routes.Page.variantHome
               )("All variants on PlayStrategy!")
             )
@@ -218,8 +217,8 @@ object shields {
                 section(
                   h2(
                     a(
-                      cls := "medley-variant",
-                      href := routes.Page.variant(variant.key),
+                      cls      := "medley-variant",
+                      href     := routes.Page.variant(variant.key),
                       dataIcon := variant.perfIcon
                     )(
                       span(cls := "medley-variant-name")(

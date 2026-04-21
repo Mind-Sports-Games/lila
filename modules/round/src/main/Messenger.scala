@@ -1,6 +1,6 @@
 package lila.round
 
-import strategygames.{ Player => PlayerIndex }
+import strategygames.Player as PlayerIndex
 
 import lila.chat.{ Chat, ChatApi, ChatTimeout }
 import lila.game.Game
@@ -17,23 +17,29 @@ final class Messenger(api: ChatApi) {
 
   def system(persistent: Boolean)(game: Game, message: String): Unit = {
     val apiCall =
-      if (persistent) api.userChat.system
+      if persistent then api.userChat.system
       else api.userChat.volatile
     apiCall(watcherId(Chat.Id(game.id)), message, _.Round)
-    val _ = if (game.nonAi) apiCall(Chat.Id(game.id), message, _.Round)
+    val _ = if game.nonAi then apiCall(Chat.Id(game.id), message, _.Round)
   }
 
   def systemForOwners(chatId: Chat.Id, message: String): Unit =
     api.userChat.system(chatId, message, _.Round).discard
 
   def watcher(gameId: Game.Id, userId: User.ID, text: String) =
-    api.userChat.write(watcherIdOfGame(gameId), userId, text, PublicSource.Watcher(gameId.value).some, _.Round)
+    api.userChat.write(
+      watcherIdOfGame(gameId),
+      userId,
+      text,
+      PublicSource.Watcher(gameId.value).some,
+      _.Round
+    )
 
   private val whisperCommands = List("/whisper ", "/w ", "/W ")
 
   def owner(gameId: Game.Id, userId: User.ID, text: String): Funit =
     whisperCommands.collectFirst {
-      case command if text `startsWith` command =>
+      case command if text.startsWith(command) =>
         val source = PublicSource.Watcher(gameId.value)
         api.userChat.write(watcherIdOfGame(gameId), userId, text drop command.length, source.some, _.Round)
     } getOrElse {
@@ -62,6 +68,6 @@ final class Messenger(api: ChatApi) {
     "Bye!"
   )
 
-  private def watcherId(chatId: Chat.Id) = Chat.Id(s"$chatId/w")
+  private def watcherId(chatId: Chat.Id)       = Chat.Id(s"$chatId/w")
   private def watcherIdOfGame(gameId: Game.Id) = Chat.Id(s"$gameId/w")
 }

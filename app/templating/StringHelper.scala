@@ -3,7 +3,7 @@ package templating
 
 import play.api.i18n.Lang
 
-import ui.ScalatagsTemplate._
+import ui.ScalatagsTemplate.*
 
 trait StringHelper { self: NumberHelper =>
 
@@ -11,9 +11,9 @@ trait StringHelper { self: NumberHelper =>
 
   def shorten(text: String, length: Int, sep: String = "…") = lila.common.String.shorten(text, length, sep)
 
-  def pluralize(s: String, n: Int) = s"$n $s${if (n > 1) "s" else ""}"
+  def pluralize(s: String, n: Int) = s"$n $s${if n > 1 then "s" else ""}"
 
-  def showNumber(n: Int): String = if (n > 0) s"+$n" else n.toString
+  def showNumber(n: Int): String = if n > 0 then s"+$n" else n.toString
 
   def urlencode(str: String): String = java.net.URLEncoder.encode(str, "US-ASCII")
 
@@ -42,12 +42,12 @@ trait StringHelper { self: NumberHelper =>
   def encodeFen(fen: String) = lila.common.String.base64.encode(fen).reverse
 
   def addQueryParameter(url: String, key: String, value: Any) =
-    if (url `contains` "?") s"$url&$key=$value" else s"$url?$key=$value"
+    if url.contains("?") then s"$url&$key=$value" else s"$url?$key=$value"
 
   def fragList(frags: List[Frag], separator: String = ", "): Frag =
     frags match {
-      case Nil        => emptyFrag
-      case one :: Nil => one
+      case Nil           => emptyFrag
+      case one :: Nil    => one
       case first :: rest =>
         RawFrag(
           frag(first :: rest.map { frag(separator, _) }).render
@@ -58,6 +58,6 @@ trait StringHelper { self: NumberHelper =>
 }
 
 final class LilaRichString(val str: String) extends AnyVal {
-  def active(other: String, one: String = "active")  = if (str == other) one else ""
-  def activeO(other: String, one: String = "active") = if (str == other) Some(one) else None
+  def active(other: String, one: String = "active")  = if str == other then one else ""
+  def activeO(other: String, one: String = "active") = if str == other then Some(one) else None
 }

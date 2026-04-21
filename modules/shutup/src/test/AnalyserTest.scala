@@ -6,7 +6,7 @@ package lila.shutup
  */
 class AnalyserTest extends munit.FunSuite {
 
-  private def find(t: String) = Analyser(t).badWords
+  private def find(t: String)  = Analyser(t).badWords
   private def ratio(t: String) = Analyser(t).ratio
 
   test("find one bad word") {

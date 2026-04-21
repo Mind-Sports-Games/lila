@@ -1,13 +1,13 @@
 package lila.round
 
 import actorApi.{ GetSocketStatus, SocketStatus }
-import akka.actor._
-import com.softwaremill.macwire._
+import akka.actor.*
+import com.softwaremill.macwire.*
 import lila.common.autoconfig.{ AutoConfig, ConfigName }
 import play.api.Configuration
-import scala.concurrent.duration._
+import scala.concurrent.duration.*
 
-import lila.common.config._
+import lila.common.config.*
 import lila.common.{ Bus, Uptime }
 import lila.game.{ Game, GameRepo, Pov }
 import lila.hub.actorApi.round.{ Abort, MultiMatchRematch, Resign }
@@ -61,16 +61,16 @@ final class Env(
 
   implicit private val lightUserSync: lila.common.LightUser.GetterSync = lightUserApi.sync
 
-  @annotation.nowarn("msg=unused") implicit private val animationLoader: ConfigLoader[AnimationDuration] = durationLoader(
+  @annotation.nowarn("msg=unused")
+  implicit private val animationLoader: ConfigLoader[AnimationDuration] = durationLoader(
     AnimationDuration.apply
   )
   private val config = appConfig.get[RoundConfig]("round")(using AutoConfig.loader)
 
   private val defaultGoneWeight                      = fuccess(1f)
   private def goneWeight(userId: User.ID): Fu[Float] = playban.getRageSit(userId).dmap(_.goneWeight)
-  private val goneWeightsFor = (game: Game) =>
-    if (!game.playable || !game.hasClock || game.hasAi || !Uptime.startedSinceMinutes(1))
-      fuccess(1f -> 1f)
+  private val goneWeightsFor                         = (game: Game) =>
+    if !game.playable || !game.hasClock || game.hasAi || !Uptime.startedSinceMinutes(1) then fuccess(1f -> 1f)
     else
       game.p1Player.userId.fold(defaultGoneWeight)(goneWeight) zip
         game.p2Player.userId.fold(defaultGoneWeight)(goneWeight)
@@ -102,7 +102,7 @@ final class Env(
   lazy val roundSocket: RoundSocket = wire[RoundSocket]
 
   private def resignAllGamesOf(userId: User.ID) =
-    gameRepo `allPlaying` userId foreach {
+    gameRepo.allPlaying(userId) foreach {
       _ foreach { pov => tellRound(pov.gameId, Resign(pov.playerId)) }
     }
 
@@ -129,12 +129,11 @@ final class Env(
     }
   )
 
-  lazy val tellRound: TellRound = new TellRound((gameId: Game.ID, msg: Any) =>
-    roundSocket.rounds.tell(gameId, msg)
-  )
+  lazy val tellRound: TellRound =
+    new TellRound((gameId: Game.ID, msg: Any) => roundSocket.rounds.tell(gameId, msg))
 
   lazy val onStart: OnStart = new OnStart((gameId: Game.ID) =>
-    proxyRepo `game` gameId foreach {
+    proxyRepo.game(gameId) foreach {
       _ foreach { game =>
         lightUserApi.preloadMany(game.userIds).andDo {
           val sg = lila.game.actorApi.StartGame(game)
@@ -182,7 +181,8 @@ final class Env(
 
   lazy val messenger = wire[Messenger]
 
-  lazy val getSocketStatus = (game: Game) => roundSocket.rounds.ask[SocketStatus](game.id)(GetSocketStatus.apply)
+  lazy val getSocketStatus = (game: Game) =>
+    roundSocket.rounds.ask[SocketStatus](game.id)(GetSocketStatus.apply)
 
   private def isUserPresent(game: Game, userId: lila.user.User.ID): Fu[Boolean] =
     roundSocket.rounds.askIfPresentOrZero[Boolean](game.id)(RoundDuct.HasUserId(userId, _))
@@ -208,6 +208,6 @@ final class Env(
   val apiActionStream = wire[ApiActionStream]
 
   def resign(pov: Pov): Unit =
-    if (pov.game.abortable) tellRound(pov.gameId, Abort(pov.playerId))
-    else if (pov.game.resignable) tellRound(pov.gameId, Resign(pov.playerId))
+    if pov.game.abortable then tellRound(pov.gameId, Abort(pov.playerId))
+    else if pov.game.resignable then tellRound(pov.gameId, Resign(pov.playerId))
 }

@@ -20,13 +20,13 @@ case class Plan(
   def enable =
     copy(
       active = true,
-      months = months `atLeast` 1,
+      months = months.atLeast(1),
       since = since orElse DateTime.now.some
     )
 
   def isEmpty = months == 0
 
-  def nonEmpty = !isEmpty `option` this
+  def nonEmpty = (!isEmpty).option(this)
 
   def sinceDate = since | DateTime.now
 }
@@ -36,6 +36,6 @@ object Plan {
   val empty = Plan(0, active = false, none)
   def start = Plan(1, active = true, DateTime.now.some)
 
-  import lila.db.dsl._
+  import lila.db.dsl.*
   private[user] val planBSONHandler = reactivemongo.api.bson.Macros.handler[Plan]
 }

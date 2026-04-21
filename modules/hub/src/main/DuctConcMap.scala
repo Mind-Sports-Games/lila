@@ -4,7 +4,7 @@ import java.util.concurrent.ConcurrentHashMap
 import java.util.function.Function
 import alleycats.Zero
 import scala.concurrent.{ ExecutionContext, Promise }
-import scala.jdk.CollectionConverters._
+import scala.jdk.CollectionConverters.*
 
 final class DuctConcMap[D <: Duct](
     mkDuct: String => D,
@@ -40,7 +40,8 @@ final class DuctConcMap[D <: Duct](
     ducts.forEachKey(16, k => f(k))
 
   def tellAllWithAck(makeMsg: Promise[Unit] => Any)(implicit ec: ExecutionContext): Fu[Int] =
-    Future.sequence(ducts.values.asScala.map(_.ask(makeMsg)))
+    Future
+      .sequence(ducts.values.asScala.map(_.ask(makeMsg)))
       .map(_.size)
 
   def size: Int = ducts.size()

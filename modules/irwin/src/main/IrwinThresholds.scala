@@ -24,8 +24,8 @@ private object IrwinThresholds {
 
   implicit val thresholdsBsonHandler: BSONHandler[IrwinThresholds]   = lila.db.dsl.isoHandler(thresholdsIso)
   implicit val thresholdsStringReader: StringReader[IrwinThresholds] = StringReader.fromIso(thresholdsIso)
-  implicit val thresholdsFormable: Formable[IrwinThresholds] =
-    new Formable[IrwinThresholds](t => Form(single("v" -> text)) `fill` thresholdsIso.to(t))
+  implicit val thresholdsFormable: Formable[IrwinThresholds]         =
+    new Formable[IrwinThresholds](t => Form(single("v" -> text)).fill(thresholdsIso.to(t)))
 
   def makeSetting(store: lila.memo.SettingStore.Builder) =
     store[IrwinThresholds](

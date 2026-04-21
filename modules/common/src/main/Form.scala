@@ -116,8 +116,8 @@ object Form {
 
   def eventName(minLength: Int, maxLength: Int) =
     cleanText.verifying(
-      Constraints `minLength` minLength,
-      Constraints `maxLength` maxLength,
+      Constraints.minLength(minLength),
+      Constraints.maxLength(maxLength),
       Constraints.pattern(
         regex = """[\p{L}\p{N}-\s:.,;'\+]+""".r,
         error = "Invalid characters; only letters, numbers, and common punctuation marks are accepted."

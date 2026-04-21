@@ -1,12 +1,12 @@
 package lila.tournament
 
-import akka.actor._
-import com.softwaremill.macwire._
+import akka.actor.*
+import com.softwaremill.macwire.*
 import lila.common.autoconfig.{ AutoConfig, ConfigName }
 import play.api.Configuration
-import scala.concurrent.duration._
+import scala.concurrent.duration.*
 
-import lila.common.config._
+import lila.common.config.*
 import lila.socket.Socket.{ GetVersion, SocketVersion }
 import lila.user.User
 
@@ -36,7 +36,7 @@ final class Env(
     lightUserApi: lila.user.LightUserApi,
     onStart: lila.round.OnStart,
     historyApi: lila.history.HistoryApi,
-    //swissApi: lila.swiss.SwissApi,
+    // swissApi: lila.swiss.SwissApi,
     trophyApi: lila.user.TrophyApi,
     remoteSocketApi: lila.socket.RemoteSocket,
     discordApi: lila.irc.DiscordApi
@@ -82,11 +82,12 @@ final class Env(
   private lazy val apiCallbacks = TournamentApi.Callbacks(
     clearJsonViewCache = jsonView.clearCache,
     clearWinnersCache = winners.clearCache,
-    clearTrophyCache = tour =>
-      {
-        if (tour.isShield) { val _ = scheduler.scheduleOnce(10 seconds) { shieldApi.clear() } }
-        else if (Revolution `is` tour) { val _ = scheduler.scheduleOnce(10 seconds) { revolutionApi.clear() } }
-      },
+    clearTrophyCache = tour => {
+      if tour.isShield then { val _ = scheduler.scheduleOnce(10 seconds) { shieldApi.clear() } }
+      else if Revolution.is(tour) then {
+        val _ = scheduler.scheduleOnce(10 seconds) { revolutionApi.clear() }
+      }
+    },
     indexLeaderboard = leaderboardIndexer.indexOne
   )
 

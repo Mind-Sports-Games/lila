@@ -1,9 +1,9 @@
 package lila.video
 
 import org.joda.time.DateTime
-import play.api.libs.json._
+import play.api.libs.json.*
 import play.api.libs.ws.StandaloneWSClient
-import play.api.libs.ws.JsonBodyReadables._
+import play.api.libs.ws.JsonBodyReadables.*
 import scala.concurrent.Future
 
 final private[video] class Sheet(
@@ -12,10 +12,10 @@ final private[video] class Sheet(
     api: VideoApi
 )(implicit ec: scala.concurrent.ExecutionContext) {
 
-  import Sheet._
+  import Sheet.*
 
-  implicit private val readGStr: Reads[GStr]   = Json.reads[GStr]
-  implicit private val readEntry: Reads[Entry] = Json.reads[Entry]
+  implicit private val readGStr: Reads[GStr]          = Json.reads[GStr]
+  implicit private val readEntry: Reads[Entry]        = Json.reads[Entry]
   implicit private val readEntries: Reads[Seq[Entry]] =
     (__ \ "feed" \ "entry").read(using Reads.seq(using readEntry))
 
@@ -23,7 +23,7 @@ final private[video] class Sheet(
     entry.include && entry.lang == "en"
 
   def fetchAll: Funit =
-    fetch `dmap` (_ filter select) flatMap { entries =>
+    fetch.dmap(_ filter select) flatMap { entries =>
       Future
         .traverse(entries) { entry =>
           api.video
@@ -58,7 +58,7 @@ final private[video] class Sheet(
                 )
                 logger.info(s"sheet insert $video")
                 api.video.save(video)
-          }
+            }
             .recover { case e: Exception =>
               logger.warn("sheet update", e)
             }
@@ -99,10 +99,10 @@ object Sheet {
     def author    = `gsx$youtubeauthor`.toString.trim
     def title     = `gsx$title`.toString.trim
     def targets   = `gsx$target`.toString.split(';').map(_.trim).toList flatMap (_.toIntOption)
-    def tags =
+    def tags      =
       `gsx$tags`.toString.split(';').map(_.trim.toLowerCase).toList.filter(_.nonEmpty) ::: {
-        if (targets contains 1) List("beginner")
-        else if (targets contains 3) List("advanced")
+        if targets contains 1 then List("beginner")
+        else if targets contains 3 then List("advanced")
         else Nil
       }
     def lang      = `gsx$language`.toString.trim

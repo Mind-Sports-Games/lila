@@ -2,8 +2,8 @@ package lila.tournament
 
 import reactivemongo.api.bson.Macros
 
-import strategygames.{ Player => PlayerIndex }
-import lila.db.dsl._
+import strategygames.Player as PlayerIndex
+import lila.db.dsl.*
 import reactivemongo.api.bson.BSONDocumentHandler
 
 final class TournamentStatsApi(

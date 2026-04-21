@@ -1,6 +1,6 @@
 package controllers
 
-import play.api.mvc._
+import play.api.mvc.*
 
 import lila.api.Context
 import lila.app.*
@@ -12,7 +12,7 @@ final class Blog(
     prismicC: Prismic
 )(implicit ws: play.api.libs.ws.StandaloneWSClient)
     extends LilaController(env) {
-  import prismicC._
+  import prismicC.*
 
   private def blogApi = env.blog.api
 
@@ -27,14 +27,18 @@ final class Blog(
       }
     }
 
-  def show(id: String, @annotation.nowarn("msg=unused") slug: String, @annotation.nowarn("msg=unused") ref: Option[String]) =
+  def show(
+      id: String,
+      @annotation.nowarn("msg=unused") slug: String,
+      @annotation.nowarn("msg=unused") ref: Option[String]
+  ) =
     WithPrismic { implicit ctx => implicit prismic =>
       pageHit
       blogApi.one(prismic, id) flatMap {
         case Some(doc) => fuccess(Ok(views.html.blog.show(doc)))
         case _         => notFound
       } recoverWith {
-        case e: RuntimeException if e.getMessage `contains` "Not Found" => notFound
+        case e: RuntimeException if e.getMessage.contains("Not Found") => notFound
       }
     }
 
@@ -54,8 +58,8 @@ final class Blog(
       }
     }
 
-  import scala.concurrent.duration._
-  import lila.memo.CacheApi._
+  import scala.concurrent.duration.*
+  import lila.memo.CacheApi.*
   private val atomCache = env.memo.cacheApi.unit[String] {
     _.refreshAfterWrite(30.minutes)
       .buildAsyncFuture { _ =>
@@ -107,7 +111,7 @@ final class Blog(
 
   def year(year: Int) =
     WithPrismic { implicit ctx => implicit prismic =>
-      if (lila.blog.allYears contains year)
+      if lila.blog.allYears contains year then
         blogApi.byYear(prismic, year) map { posts => Ok(views.html.blog.index.byYear(year, posts)) }
       else notFound
     }
@@ -119,7 +123,7 @@ final class Blog(
       val redirect  = Redirect(routes.ForumTopic.show(categSlug, topicSlug))
       env.forum.topicRepo.existsByTree(categSlug, topicSlug) flatMap {
         case true => fuccess(redirect)
-        case _ =>
+        case _    =>
           blogApi.one(prismic.api, none, id) flatMap {
             _ so { doc =>
               env.forum.categRepo.bySlug(categSlug) flatMap {
@@ -129,7 +133,7 @@ final class Blog(
                     slug = topicSlug,
                     name = doc.getText("blog.title") | "New blog post",
                     url = s"${env.net.baseUrl}${routes.Blog
-                      .show(doc.id, urlencode(doc.getText("blog.title").getOrElse("-").toLowerCase().replace(" ", "-")))}"
+                        .show(doc.id, urlencode(doc.getText("blog.title").getOrElse("-").toLowerCase().replace(" ", "-")))}"
                   )
                 }
               } inject redirect
@@ -140,7 +144,7 @@ final class Blog(
 
   private def WithPrismic(f: Context => BlogApi.Context => Fu[Result]): Action[Unit] =
     Open { ctx =>
-      blogApi `context` ctx.req flatMap { prismic =>
+      blogApi.context(ctx.req) flatMap { prismic =>
         f(ctx)(prismic)
       }
     }

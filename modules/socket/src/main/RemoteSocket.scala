@@ -1,12 +1,12 @@
 package lila.socket
 
 import akka.actor.{ CoordinatedShutdown, Scheduler }
-import strategygames.{ Centis, Player => PlayerIndex }
-import io.lettuce.core._
-import io.lettuce.core.pubsub.{ StatefulRedisPubSubConnection => PubSub }
+import strategygames.{ Centis, Player as PlayerIndex }
+import io.lettuce.core.*
+import io.lettuce.core.pubsub.StatefulRedisPubSubConnection as PubSub
 import java.util.concurrent.atomic.AtomicReference
 import java.util.concurrent.ConcurrentHashMap
-import play.api.libs.json._
+import play.api.libs.json.*
 import scala.concurrent.{ Future, Promise }
 import Socket.Sri
 
@@ -27,7 +27,7 @@ final class RemoteSocket(
     scheduler: Scheduler
 ) {
 
-  import RemoteSocket._, Protocol._
+  import RemoteSocket.*, Protocol.*
 
   private var stopping = false
 
@@ -51,8 +51,8 @@ final class RemoteSocket(
     case In.DisconnectUsers(userIds) =>
       val _ = onlineUserIds.getAndUpdate(_ -- userIds)
     case In.NotifiedBatch(userIds) => notification ! lila.hub.actorApi.notify.NotifiedBatch(userIds)
-    case In.Lags(lags) =>
-      lags foreach (UserLagCache.put).tupled
+    case In.Lags(lags)             =>
+      lags foreach UserLagCache.put.tupled
       // this shouldn't be necessary... ensure that users are known to be online
       val _ = onlineUserIds.getAndUpdate((x: UserIds) => x ++ lags.keys)
     case In.TellSri(sri, userId, typ, msg) =>
@@ -69,9 +69,9 @@ final class RemoteSocket(
           }
         )
     case In.Ping(id) => send(Out.pong(id))
-    case In.WsBoot =>
+    case In.WsBoot   =>
       logger.warn("Remote socket boot")
-      onlineUserIds `set` Set("playstrategy")
+      onlineUserIds.set(Set("playstrategy"))
   }
 
   Bus.subscribeFun(
@@ -88,13 +88,14 @@ final class RemoteSocket(
   ) {
     case SendTos(userIds, payload) =>
       val connectedUsers = userIds intersect onlineUserIds.get
-      if (connectedUsers.nonEmpty) send(Out.tellUsers(connectedUsers, payload))
+      if connectedUsers.nonEmpty then send(Out.tellUsers(connectedUsers, payload))
     case SendTo(userId, payload) =>
-      if (onlineUserIds.get.contains(userId)) send(Out.tellUser(userId, payload))
+      if onlineUserIds.get.contains(userId) then send(Out.tellUser(userId, payload))
     case SendToAsync(userId, makePayload) =>
-      if (onlineUserIds.get.contains(userId)) makePayload() foreach { payload =>
-        send(Out.tellUser(userId, payload))
-      }
+      if onlineUserIds.get.contains(userId) then
+        makePayload() foreach { payload =>
+          send(Out.tellUser(userId, payload))
+        }
     case Announce(_, _, json) =>
       send(Out.tellAll(Json.obj("t" -> "announce", "d" -> json)))
     case Mlat(micros) =>
@@ -111,13 +112,13 @@ final class RemoteSocket(
       send(Out.impersonate(userId, modId))
     case ApiUserIsOnline(userId, value) =>
       send(Out.apiUserOnline(userId, value))
-      if (value) { val _ = onlineUserIds.getAndUpdate(_ + userId) }
+      if value then { val _ = onlineUserIds.getAndUpdate(_ + userId) }
     case Follow(u1, u2)   => send(Out.follow(u1, u2))
     case UnFollow(u1, u2) => send(Out.unfollow(u1, u2))
   }
 
   final class StoppableSender(conn: PubSub[String, String], channel: Channel) extends Sender {
-    def apply(msg: String): Unit               = if (!stopping) { val _ = conn.async.publish(channel, msg) }
+    def apply(msg: String): Unit = if !stopping then { val _ = conn.async.publish(channel, msg) }
     def sticky(_id: String, msg: String): Unit = apply(msg)
   }
 
@@ -128,11 +129,11 @@ final class RemoteSocket(
     def sticky(id: String, msg: String): Unit = publish(id.hashCode.abs % parallelism, msg)
 
     private def publish(subChannel: Int, msg: String) =
-      if (!stopping) { val _ = conn.async.publish(s"$channel:$subChannel", msg) }
+      if !stopping then { val _ = conn.async.publish(s"$channel:$subChannel", msg) }
   }
 
   def makeSender(channel: Channel, parallelism: Int = 1): Sender =
-    if (parallelism > 1) new RoundRobinSender(redisClient.connectPubSub(), channel, parallelism)
+    if parallelism > 1 then new RoundRobinSender(redisClient.connectPubSub(), channel, parallelism)
     else new StoppableSender(redisClient.connectPubSub(), channel)
 
   private val send: Send = makeSender("site-out").apply
@@ -151,10 +152,13 @@ final class RemoteSocket(
     // subscribe to main channel
     subscribe(channel, reader)(handler) >> {
       // and subscribe to subchannels
-      Future.sequence((0 to parallelism)
-        .map { index =>
-          subscribe(s"$channel:$index", reader)(handler)
-        })
+      Future
+        .sequence(
+          (0 to parallelism)
+            .map { index =>
+              subscribe(s"$channel:$index", reader)(handler)
+            }
+        )
         .void
     }
 
@@ -189,7 +193,7 @@ final class RemoteSocket(
 
 object RemoteSocket {
 
-  private val logger = lila `log` "socket"
+  private val logger = lila.log("socket")
 
   type Send = String => Unit
 
@@ -232,7 +236,7 @@ object RemoteSocket {
         raw.path match {
           case "connect/user"     => ConnectUser(raw.args).some
           case "disconnect/users" => DisconnectUsers(commas(raw.args)).some
-          case "connect/sris" =>
+          case "connect/sris"     =>
             ConnectSris {
               commas(raw.args) map (_ split ' ') map { s =>
                 (Sri(s(0)), s lift 1)
@@ -240,7 +244,7 @@ object RemoteSocket {
             }.some
           case "disconnect/sris" => DisconnectSris(commas(raw.args) map Sri.apply).some
           case "notified/batch"  => NotifiedBatch(commas(raw.args)).some
-          case "lag" =>
+          case "lag"             =>
             raw.all pipe { s =>
               s lift 1 flatMap (_.toIntOption) map Centis.apply map { Lag(s(0), _) }
             }
@@ -254,12 +258,12 @@ object RemoteSocket {
                 case _ => None
               }
             }.toMap).some
-          case "tell/sri" => raw.get(3)(tellSriMapper)
+          case "tell/sri"  => raw.get(3)(tellSriMapper)
           case "tell/user" =>
             raw.get(2) { case Array(user, payload) =>
               for {
                 obj <- Json.parse(payload).asOpt[JsObject]
-                typ <- obj `str` "t"
+                typ <- obj.str("t")
               } yield TellUser(user, typ, obj)
             }
           case "req/response" =>
@@ -274,13 +278,13 @@ object RemoteSocket {
       def tellSriMapper: PartialFunction[Array[String], Option[TellSri]] = { case Array(sri, user, payload) =>
         for {
           obj <- Json.parse(payload).asOpt[JsObject]
-          typ <- obj `str` "t"
+          typ <- obj.str("t")
         } yield TellSri(Sri(sri), optional(user), typ, obj)
       }
 
-      def commas(str: String): Array[String]    = if (str == "-") Array.empty else str split ','
+      def commas(str: String): Array[String]    = if str == "-" then Array.empty else str split ','
       def boolean(str: String): Boolean         = str == "+"
-      def optional(str: String): Option[String] = if (str == "-") None else Some(str)
+      def optional(str: String): Option[String] = if str == "-" then None else Some(str)
     }
 
     object Out {
@@ -297,7 +301,7 @@ object RemoteSocket {
       def tellSris(sris: Iterable[Sri], payload: JsValue) =
         s"tell/sris ${commas(sris)} ${Json stringify payload}"
       def mlat(micros: Int) =
-        s"mlat ${((micros / 100) / 10d)}"
+        s"mlat ${(micros / 100) / 10d}"
       def disconnectUser(userId: String) =
         s"disconnect/user $userId"
       def setTroll(userId: String, v: Boolean) =
@@ -311,8 +315,8 @@ object RemoteSocket {
       def pong(id: String)                     = s"pong $id"
       def stop(reqId: Int)                     = s"lila/stop $reqId"
 
-      def commas(strs: Iterable[Any]): String         = if (strs.isEmpty) "-" else strs mkString ","
-      def boolean(v: Boolean): String                 = if (v) "+" else "-"
+      def commas(strs: Iterable[Any]): String         = if strs.isEmpty then "-" else strs mkString ","
+      def boolean(v: Boolean): String                 = if v then "+" else "-"
       def optional(str: Option[String])               = str getOrElse "-"
       def playerIndex(c: PlayerIndex): String         = c.fold("w", "b")
       def playerIndex(c: Option[PlayerIndex]): String = optional(c.map(_.fold("w", "b")))

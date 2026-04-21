@@ -1,7 +1,7 @@
 package lila.round
 
 import org.joda.time.DateTime
-import play.api.libs.json._
+import play.api.libs.json.*
 
 import strategygames.format.Uci
 import strategygames.{ GameFamily, Move }
@@ -53,7 +53,6 @@ case class Forecast(
       case (move, _)                                                                => move
     }
 }
-
 
 object Forecast {
 

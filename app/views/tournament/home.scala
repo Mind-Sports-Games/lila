@@ -3,8 +3,8 @@ package views.html.tournament
 import play.api.libs.json.Json
 
 import lila.api.Context
-import lila.app.templating.Environment._
-import lila.app.ui.ScalatagsTemplate._
+import lila.app.templating.Environment.*
+import lila.app.ui.ScalatagsTemplate.*
 import lila.common.String.html.safeJsonValue
 import lila.tournament.Schedule.Freq
 import lila.tournament.Tournament
@@ -25,11 +25,11 @@ object home {
         infiniteScrollTag,
         jsModule("tournament.schedule"),
         embedJsUnsafeLoadThen(s"""PlayStrategyTournamentSchedule(${safeJsonValue(
-          Json.obj(
-            "data" -> json,
-            "i18n" -> bits.jsI18n
-          )
-        )})""")
+            Json.obj(
+              "data" -> json,
+              "i18n" -> bits.jsI18n
+            )
+          )})""")
       ),
       openGraph = lila.app.ui
         .OpenGraph(
@@ -82,12 +82,14 @@ object home {
         st.section(cls := "tour-home__schedule box")(
           div(cls := "box__top")(
             h1(trans.tournaments()),
-            ctx.isAuth `option` div(cls := "box__top__actions")(
-              a(
-                href := routes.Tournament.form,
-                cls := "button button-green text",
-                dataIcon := "O"
-              )(trans.createANewTournament())
+            ctx.isAuth.option(
+              div(cls := "box__top__actions")(
+                a(
+                  href     := routes.Tournament.form,
+                  cls      := "button button-green text",
+                  dataIcon := "O"
+                )(trans.createANewTournament())
+              )
             )
           ),
           div(cls := "tour-chart")

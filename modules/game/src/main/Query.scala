@@ -4,15 +4,15 @@ import strategygames.Status
 import strategygames.variant.Variant
 import strategygames.chess.variant.{ FromPosition, Standard }
 import org.joda.time.DateTime
-import reactivemongo.api.bson._
+import reactivemongo.api.bson.*
 
 import lila.db.BSON.BSONJodaDateTimeHandler
-import lila.db.dsl._
+import lila.db.dsl.*
 import lila.user.User
 
 object Query {
 
-  import Game.{ BSONFields => F }
+  import Game.BSONFields as F
 
   val rated: Bdoc = F.rated `$eq` true
 
@@ -40,7 +40,7 @@ object Query {
   val notFinished: Bdoc = F.status `$lte` Status.Started.id
 
   def analysed(an: Boolean): Bdoc =
-    if (an) F.analysed `$eq` true
+    if an then F.analysed `$eq` true
     else F.analysed `$ne` true
 
   val frozen: Bdoc = F.status `$gte` Status.Mate.id
@@ -112,20 +112,20 @@ object Query {
 
   def variant(v: Variant) =
     $and(
-      if (v.gameLogic.id == 0) $or($doc(F.lib -> 0), $doc(F.lib `$exists` false))
+      if v.gameLogic.id == 0 then $or($doc(F.lib -> 0), $doc(F.lib `$exists` false))
       else $doc(F.lib -> v.gameLogic.id),
-      if (v.id == 1) $or($doc(F.variant -> 1), $doc(F.variant `$exists` false))
+      if v.id == 1 then $or($doc(F.variant -> 1), $doc(F.variant `$exists` false))
       else $doc(F.variant -> v.id)
     )
 
   lazy val variantStandard = variant(Variant.Chess(Standard))
 
-  //legacy lichess format
-  //lazy val notHordeOrSincePawnsAreP1: Bdoc = $or(
+  // legacy lichess format
+  // lazy val notHordeOrSincePawnsAreP1: Bdoc = $or(
   //  F.variant $ne Horde.id,
   //  sinceHordePawnsAreP1
-  //)
-  //lazy val sinceHordePawnsAreP1: Bdoc =
+  // )
+  // lazy val sinceHordePawnsAreP1: Bdoc =
   //  createdSince(Game.hordeP1PawnsSince)
 
   val notFromPosition: Bdoc =
@@ -144,8 +144,8 @@ object Query {
 
   val notSimul = F.simulId `$exists` false
 
-  val sortCreated: Bdoc           = $sort `desc` F.createdAt
-  val sortChronological: Bdoc     = $sort `asc` F.createdAt
-  val sortAntiChronological: Bdoc = $sort `desc` F.createdAt
-  val sortMovedAtNoIndex: Bdoc    = $sort `desc` F.updatedAt
+  val sortCreated: Bdoc           = $sort.desc(F.createdAt)
+  val sortChronological: Bdoc     = $sort.asc(F.createdAt)
+  val sortAntiChronological: Bdoc = $sort.desc(F.createdAt)
+  val sortMovedAtNoIndex: Bdoc    = $sort.desc(F.updatedAt)
 }

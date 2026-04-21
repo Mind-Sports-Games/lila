@@ -4,11 +4,11 @@ import lila.chat.{ BusChan, Chat, ChatApi, ChatTimeout, UserLine }
 import lila.hub.actorApi.shutup.PublicSource
 import lila.hub.{ Trouper, TrouperMap }
 import lila.log.Logger
-import lila.socket.RemoteSocket.{ Protocol => P, _ }
+import lila.socket.RemoteSocket.{ Protocol as P, * }
 import lila.socket.Socket.{ makeMessage, GetVersion, SocketVersion }
 import lila.user.User
 
-import play.api.libs.json._
+import play.api.libs.json.*
 import scala.concurrent.ExecutionContext
 
 object RoomSocket {
@@ -26,13 +26,13 @@ object RoomSocket {
     private var version = SocketVersion(0)
 
     val process: Trouper.Receive = {
-      case GetVersion(promise) => promise success version
-      case SetVersion(v)       => version = v
-      case nv: NotifyVersion[_] =>
+      case GetVersion(promise)  => promise success version
+      case SetVersion(v)        => version = v
+      case nv: NotifyVersion[?] =>
         version = version.inc
         send {
           val tell =
-            if (chatMsgs(nv.tpe)) Protocol.Out.tellRoomChat
+            if chatMsgs(nv.tpe) then Protocol.Out.tellRoomChat
             else Protocol.Out.tellRoomVersion
           tell(roomId, nv.msg, version, nv.troll)
         }
@@ -78,7 +78,7 @@ object RoomSocket {
       case Protocol.In.ChatTimeout(roomId, modId, suspect, reason, text) =>
         lila.chat.ChatTimeout.Reason(reason) foreach { r =>
           localTimeout.so { _(roomId, modId, suspect) } foreach { local =>
-            val scope = if (local) ChatTimeout.Scope.Local else ChatTimeout.Scope.Global
+            val scope = if local then ChatTimeout.Scope.Local else ChatTimeout.Scope.Global
             chat.userChat.timeout(
               Chat.Id(roomId.value),
               modId,
@@ -95,7 +95,7 @@ object RoomSocket {
   def minRoomHandler(rooms: TrouperMap[RoomState], logger: Logger): Handler = {
     case Protocol.In.KeepAlives(roomIds) =>
       roomIds foreach { roomId =>
-        rooms `touchOrMake` roomId.value
+        rooms.touchOrMake(roomId.value)
       }
     case P.In.WsBoot =>
       logger.warn("Remote socket boot")
@@ -109,7 +109,7 @@ object RoomSocket {
   private val chatMsgs = Set("message", "chat_timeout", "chat_reinstate")
 
   def subscribeChat(rooms: TrouperMap[RoomState], busChan: BusChan.Select) = {
-    import lila.chat.actorApi._
+    import lila.chat.actorApi.*
     lila.common.Bus.subscribeFun(busChan(BusChan).chan, BusChan.Global.chan) {
       case ChatLine(id, line: UserLine) =>
         rooms.tellIfPresent(id.value, NotifyVersion("message", lila.chat.JsonView(line), line.troll))
@@ -134,7 +134,7 @@ object RoomSocket {
       val reader: P.In.Reader = raw =>
         raw.path match {
           case "room/alives" => KeepAlives(P.In.commas(raw.args) map RoomId.apply).some
-          case "chat/say" =>
+          case "chat/say"    =>
             raw.get(3) { case Array(roomId, userId, msg) =>
               ChatSay(RoomId(roomId), userId, msg).some
             }

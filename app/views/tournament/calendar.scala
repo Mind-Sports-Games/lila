@@ -3,8 +3,8 @@ package views.html.tournament
 import play.api.libs.json.Json
 
 import lila.api.Context
-import lila.app.templating.Environment._
-import lila.app.ui.ScalatagsTemplate._
+import lila.app.templating.Environment.*
+import lila.app.ui.ScalatagsTemplate.*
 import lila.common.String.html.safeJsonValue
 
 object calendar {
@@ -16,11 +16,11 @@ object calendar {
         jsModule("tournament.calendar"),
         embedJsUnsafeLoadThen(
           s"""PlayStrategyTournamentCalendar(document.getElementById('tournament-calendar'), ${safeJsonValue(
-            Json.obj(
-              "data" -> json,
-              "i18n" -> bits.jsI18n
-            )
-          )})"""
+              Json.obj(
+                "data" -> json,
+                "i18n" -> bits.jsI18n
+              )
+            )})"""
         )
       ),
       moreCss = cssTag("tournament.calendar")

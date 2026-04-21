@@ -5,17 +5,16 @@ import play.api.i18n.Lang
 import play.api.mvc.Call
 
 import lila.api.Context
-import lila.app.templating.Environment._
-import lila.app.ui.ScalatagsTemplate._
+import lila.app.templating.Environment.*
+import lila.app.ui.ScalatagsTemplate.*
 import lila.study.Order
-
 
 object bits {
 
   def orderSelect(order: lila.study.Order, active: String, url: String => Call)(implicit ctx: Context) = {
     val orders =
-      if (active == "all") Order.withoutSelector
-      else if (active `startsWith` "topic") Order.allWithMine
+      if active == "all" then Order.withoutSelector
+      else if active.startsWith("topic") then Order.allWithMine
       else Order.all
     views.html.base.bits.mselect(
       "orders",
@@ -53,11 +52,13 @@ object bits {
         div(
           tag(cls := "study-name")(s.study.name.value),
           span(
-            !s.study.isPublic `option` frag(
-              iconTag("a")(cls := "private", ariaTitle(trans.study.`private`.txt())),
-              " "
+            (!s.study.isPublic).option(
+              frag(
+                iconTag("a")(cls := "private", ariaTitle(trans.study.`private`.txt())),
+                " "
+              )
             ),
-            iconTag(if (s.liked) "" else ""),
+            iconTag(if s.liked then "" else ""),
             " ",
             s.study.likes.value,
             " • ",
@@ -77,7 +78,7 @@ object bits {
           s.study.members.members.values
             .take(4)
             .map { m =>
-              li(cls := "text", dataIcon := (if (m.canContribute) "" else "v"))(usernameOrId(m.id))
+              li(cls := "text", dataIcon := (if m.canContribute then "" else "v"))(usernameOrId(m.id))
             }
             .toList
         )
@@ -85,7 +86,9 @@ object bits {
     )
 
   def streamers(streamers: List[lila.user.User.ID])(implicit lang: Lang) =
-    streamers.nonEmpty `option` div(cls := "context-streamers none")(
-      streamers map views.html.streamer.bits.contextual
+    streamers.nonEmpty.option(
+      div(cls := "context-streamers none")(
+        streamers map views.html.streamer.bits.contextual
+      )
     )
 }

@@ -1,12 +1,12 @@
 package controllers
 
-import play.api.mvc._
-import views._
+import play.api.mvc.*
+import views.*
 
 import lila.api.Context
-import play.api.libs.json._
+import play.api.libs.json.*
 import lila.app.*
-import lila.streamer.{ Streamer => StreamerModel, StreamerForm }
+import lila.streamer.{ Streamer as StreamerModel, StreamerForm }
 
 final class Streamer(
     env: Env,
@@ -23,7 +23,7 @@ final class Streamer(
           val requests = getBool("requests") && isGranted(_.Streamers)
           for {
             liveStreams <- env.streamer.liveStreamApi.all
-            live        <- api `withUsers` liveStreams
+            live        <- api.withUsers(liveStreams)
             pager       <- env.streamer.pager.notLive(page, liveStreams, requests)
           } yield Ok(html.streamer.index(live, pager, requests))
         }
@@ -34,13 +34,13 @@ final class Streamer(
     env.streamer.liveStreamApi.all
       .map { streams =>
         val max      = env.streamer.homepageMaxSetting.get()
-        val featured = streams.homepage(max, req, none) `withTitles` env.user.lightUserApi
+        val featured = streams.homepage(max, req, none).withTitles(env.user.lightUserApi)
         JsonOk {
           featured.live.streams.map { s =>
             Json.obj(
               "url"    -> routes.Streamer.redirect(s.streamer.id.value).absoluteURL(),
               "status" -> s.status,
-              "user" -> Json
+              "user"   -> Json
                 .obj(
                   "id"   -> s.streamer.userId,
                   "name" -> s.streamer.name.value
@@ -55,7 +55,7 @@ final class Streamer(
   def live = apiC.ApiRequest { _ =>
     for {
       s     <- env.streamer.liveStreamApi.all
-      users <- env.user.lightUserApi `asyncManyFallback` s.streams.map(_.streamer.userId)
+      users <- env.user.lightUserApi.asyncManyFallback(s.streams.map(_.streamer.userId))
     } yield apiC.toApiResult {
       (s.streams zip users).map { case (stream, user) =>
         lila.common.LightUser.lightUserWrites.writes(user) ++ lila.streamer.Stream.toJson(stream)
@@ -65,10 +65,10 @@ final class Streamer(
 
   def show(username: String) =
     Open { implicit ctx =>
-      OptionFuResult(api `find` username) { s =>
+      OptionFuResult(api.find(username)) { s =>
         WithVisibleStreamer(s) {
           for {
-            sws      <- env.streamer.liveStreamApi `of` s
+            sws      <- env.streamer.liveStreamApi.of(s)
             activity <- env.activity.read.recent(sws.user, 10)
           } yield Ok(html.streamer.show(sws, activity))
         }
@@ -77,9 +77,9 @@ final class Streamer(
 
   def redirect(username: String) =
     Open { implicit ctx =>
-      OptionFuResult(api `find` username) { s =>
+      OptionFuResult(api.find(username)) { s =>
         WithVisibleStreamer(s) {
-          env.streamer.liveStreamApi `of` s map { sws =>
+          env.streamer.liveStreamApi.of(s) map { sws =>
             Redirect(sws.redirectToLiveUrl | routes.Streamer.show(username).url)
           }
         }
@@ -91,7 +91,7 @@ final class Streamer(
       ctx.noKid so {
         NoLameOrBot {
           NoShadowban {
-            api `find` me flatMap {
+            api.find(me) flatMap {
               case None => api.create(me) inject Redirect(routes.Streamer.edit)
               case _    => Redirect(routes.Streamer.edit).fuccess
             }
@@ -110,9 +110,9 @@ final class Streamer(
   def edit =
     Auth { implicit ctx => _ =>
       AsStreamer { s =>
-        env.streamer.liveStreamApi `of` s flatMap { sws =>
+        env.streamer.liveStreamApi.of(s) flatMap { sws =>
           modData(s.streamer) map { forMod =>
-            NoCache(Ok(html.streamer.edit(sws, StreamerForm `userForm` sws.streamer, forMod)))
+            NoCache(Ok(html.streamer.edit(sws, StreamerForm.userForm(sws.streamer), forMod)))
           }
         }
       }
@@ -121,7 +121,7 @@ final class Streamer(
   def editApply =
     AuthBody { implicit ctx => me =>
       AsStreamer { s =>
-        env.streamer.liveStreamApi `of` s flatMap { sws =>
+        env.streamer.liveStreamApi.of(s) flatMap { sws =>
           implicit val req = ctx.body
           StreamerForm
             .userForm(sws.streamer)
@@ -133,10 +133,10 @@ final class Streamer(
                 },
               data =>
                 api.update(sws.streamer, data, isGranted(_.Streamers)) flatMap { change =>
-                  if (change.decline) env.mod.logApi.streamerDecline(lila.report.Mod(me), s.user.id)
+                  if change.decline then env.mod.logApi.streamerDecline(lila.report.Mod(me), s.user.id)
                   change.list foreach { env.mod.logApi.streamerList(lila.report.Mod(me), s.user.id, _) }
                   change.tier foreach { env.mod.logApi.streamerTier(lila.report.Mod(me), s.user.id, _) }
-                  if (data.approval.flatMap(_.quick).isDefined)
+                  if data.approval.flatMap(_.quick).isDefined then
                     env.streamer.pager.nextRequestId map { nextId =>
                       Redirect {
                         nextId.fold(s"${routes.Streamer.index()}?requests=1") { id =>
@@ -145,7 +145,7 @@ final class Streamer(
                       }
                     }
                   else {
-                    val next = if (sws.streamer `is` me) "" else s"?u=${sws.user.id}"
+                    val next = if sws.streamer.is(me) then "" else s"?u=${sws.user.id}"
                     Redirect(s"${routes.Streamer.edit.url}$next").fuccess
                   }
                 }
@@ -191,7 +191,7 @@ final class Streamer(
 
   private def AsStreamer(f: StreamerModel.WithUser => Fu[Result])(implicit ctx: Context) =
     ctx.me.fold(notFound) { me =>
-      if (StreamerModel `canApply` me)
+      if StreamerModel.canApply(me) then
         api.find(get("u").ifTrue(isGranted(_.Streamers)) | me.id) flatMap {
           _.fold(Ok(html.streamer.bits.create).fuccess)(f)
         }
@@ -205,7 +205,7 @@ final class Streamer(
 
   private def WithVisibleStreamer(s: StreamerModel.WithUser)(f: Fu[Result])(implicit ctx: Context) =
     ctx.noKid so {
-      if (s.streamer.isListed || ctx.me.so(s.streamer.is) || isGranted(_.Admin)) f
+      if s.streamer.isListed || ctx.me.so(s.streamer.is) || isGranted(_.Admin) then f
       else notFound
     }
 }

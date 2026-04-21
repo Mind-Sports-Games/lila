@@ -2,8 +2,8 @@ package lila.relay
 
 import io.lemonlabs.uri.AbsoluteUrl
 import org.joda.time.DateTime
-import play.api.data._
-import play.api.data.Forms._
+import play.api.data.*
+import play.api.data.Forms.*
 
 import lila.common.Form.cleanText
 import lila.game.Game
@@ -13,12 +13,12 @@ import lila.user.User
 
 final class RelayRoundForm {
 
-  import RelayRoundForm._
+  import RelayRoundForm.*
   import lila.common.Form.ISODateTimeOrTimestamp
 
   val roundMapping =
     mapping(
-      "name" -> cleanText(minLength = 3, maxLength = 80),
+      "name"    -> cleanText(minLength = 3, maxLength = 80),
       "syncUrl" -> optional {
         cleanText(minLength = 8, maxLength = 600).verifying("Invalid source", validSource)
       },
@@ -36,7 +36,7 @@ final class RelayRoundForm {
       )
   }.fill(Data(name = s"Round ${trs.rounds.size + 1}", syncUrlRound = Some(trs.rounds.size + 1)))
 
-  def edit(r: RelayRound) = Form(roundMapping) `fill` Data.make(r)
+  def edit(r: RelayRound) = Form(roundMapping).fill(Data.make(r))
 }
 
 object RelayRoundForm {
@@ -45,7 +45,7 @@ object RelayRoundForm {
 
   private def toGameIds(ids: String): Option[GameIds] = {
     val list = ids.split(' ').view.map(_.trim take Game.gameIdSize).filter(Game.validId).toList
-    (list.sizeIs > 0 && list.sizeIs <= Study.maxChapters) `option` GameIds(list)
+    (list.sizeIs > 0 && list.sizeIs <= Study.maxChapters).option(GameIds(list))
   }
 
   private def validSource(source: String): Boolean =
@@ -105,7 +105,7 @@ object RelayRoundForm {
       relay.copy(
         name = name,
         sync = makeSync(user) pipe { sync =>
-          if (relay.sync.playing) sync.play else sync
+          if relay.sync.playing then sync.play else sync
         },
         startsAt = startsAt,
         finished = relay.finished && startsAt.fold(true)(_.isBeforeNow)
@@ -120,7 +120,7 @@ object RelayRoundForm {
         },
         until = none,
         nextAt = none,
-        delay = throttle `ifTrue` Granter(_.Relay)(user),
+        delay = throttle.ifTrue(Granter(_.Relay)(user)),
         log = SyncLog.empty
       )
 

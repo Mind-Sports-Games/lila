@@ -6,31 +6,31 @@ object WMMatchingTest {
   def toMate(n: Int, l: List[(Int, Int)]): Array[Int] = {
     val a = Array.fill(n)(-1)
     l.foreach { case (i, j) => a(i) = j; a(j) = i }
-    if (a.count(_ >= 0) != 2 * l.length) null else a
+    if a.count(_ >= 0) != 2 * l.length then null else a
   }
 
   def check0(a: Array[(Int, Int, Int)], maxcardinality: Boolean, expectedMate: Seq[Int]): Boolean = {
     val n = a.view.map(p => p._1.max(p._2)).max + 1
     val e = Array.newBuilder[Int]
     val w = Array.newBuilder[Int]
-    for (p <- a) {
+    for p <- a do {
       e += p._1
       e += p._2
       w += p._3
     }
     val l = toMate(n, WMMatching.maxWeightMatching(e.result(), w.result(), maxcardinality))
-    if (l eq null) false else expectedMate.sameElements(l)
+    if l eq null then false else expectedMate.sameElements(l)
   }
 
   def check(n: Int, a: Array[Int], res: (Int, Int)): Boolean = {
-    val v           = Array.range(0, n)
-    def f(x: Int)   = (x * (x + 1)) / 2
-    def off(i: Int) = f(n - 1) - f(n - 1 - i)
+    val v                                      = Array.range(0, n)
+    def f(x: Int)                              = (x * (x + 1)) / 2
+    def off(i: Int)                            = f(n - 1) - f(n - 1 - i)
     def pairScore(i: Int, j: Int): Option[Int] =
-      if (i > j) pairScore(j, i)
+      if i > j then pairScore(j, i)
       else {
         val o = off(i) + (j - (i + 1))
-        if (a(o) < 0) None else Some(a(o))
+        if a(o) < 0 then None else Some(a(o))
       }
     def score(l: List[(Int, Int)]): (Int, Int) = (l.length, l.map(t => pairScore(t._1, t._2).head).sum)
     def checkScore(ans: (Int, Int)): Boolean   = res == ans
@@ -170,7 +170,9 @@ class WMMatchingTest extends munit.FunSuite {
     )
 
   }
-  test("WMMatching - create blossom, relabel as T, expand such that a new least-slack S-to-free edge is produced, augment") {
+  test(
+    "WMMatching - create blossom, relabel as T, expand such that a new least-slack S-to-free edge is produced, augment"
+  ) {
     assert(
       check0(
         Array(
@@ -191,7 +193,9 @@ class WMMatchingTest extends munit.FunSuite {
     )
 
   }
-  test("WMMatching - create nested blossom, relabel as T in more than one way, expand outer blossom such that inner blossom ends up on an augmenting path") {
+  test(
+    "WMMatching - create nested blossom, relabel as T in more than one way, expand outer blossom such that inner blossom ends up on an augmenting path"
+  ) {
     assert(
       check0(
         Array(

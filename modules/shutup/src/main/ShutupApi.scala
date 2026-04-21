@@ -1,8 +1,8 @@
 package lila.shutup
 
-import reactivemongo.api.bson._
+import reactivemongo.api.bson.*
 
-import lila.db.dsl._
+import lila.db.dsl.*
 import lila.game.GameRepo
 import lila.hub.actorApi.shutup.PublicSource
 import lila.user.{ User, UserRepo }
@@ -24,7 +24,7 @@ final class ShutupApi(
       .one[Bdoc]
       .map {
         ~_.flatMap(_.getAsOpt[List[PublicLine]]("pub"))
-    }
+      }
 
   def publicForumMessage(userId: User.ID, text: String) = record(userId, text, TextType.PublicForumMessage)
   def teamForumMessage(userId: User.ID, text: String)   = record(userId, text, TextType.TeamForumMessage)
@@ -34,7 +34,7 @@ final class ShutupApi(
   def privateChat(chatId: String, userId: User.ID, text: String) =
     gameRepo.getSourceAndUserIds(chatId) flatMap {
       case (source, _) if source.contains(lila.game.Source.Friend) => funit // ignore challenges
-      case (_, userIds) =>
+      case (_, userIds)                                            =>
         record(userId, text, TextType.PrivateChat, none, userIds find (userId !=))
     }
 
@@ -48,13 +48,13 @@ final class ShutupApi(
       source: Option[PublicSource] = None,
       toUserId: Option[User.ID] = None
   ): Funit =
-    userRepo `isTroll` userId flatMap {
-      case true => funit
+    userRepo.isTroll(userId) flatMap {
+      case true  => funit
       case false =>
         toUserId so { relationApi.fetchFollows(_, userId) } flatMap {
-          case true => funit
+          case true  => funit
           case false =>
-            val analysed = Analyser(text)
+            val analysed       = Analyser(text)
             val pushPublicLine = source.ifTrue(analysed.nbBadWords > 0) so { source =>
               $doc(
                 "pub" -> $doc(
@@ -79,7 +79,7 @@ final class ShutupApi(
               .flatMap {
                 case None             => fufail(s"can't find user record for $userId")
                 case Some(userRecord) => legiferate(userRecord)
-            }
+              }
         }
     }
 
@@ -105,6 +105,6 @@ final class ShutupApi(
       .collect {
         case r if r.unacceptable =>
           s"${r.textType.name}: ${r.nbBad} dubious (out of ${r.ratios.size})"
-    }
+      }
       .mkString("\n")
 }

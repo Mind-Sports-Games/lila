@@ -26,16 +26,15 @@ final class LastPostCache(
         }
       }
     }
-  } `addEffect` maybeNotifyLastPost
+  }.addEffect(maybeNotifyLastPost)
 
   private var lastNotifiedId = none[String]
 
   private def maybeNotifyLastPost(posts: List[MiniPost]): Unit =
     posts.headOption foreach { last =>
-      if (lastNotifiedId.so(last.id !=)) notifier(last.id)
+      if lastNotifiedId.so(last.id !=) then notifier(last.id)
       lastNotifiedId = last.id.some
     }
 
-  def apply: List[MiniPost] = cache `sync` true
+  def apply: List[MiniPost] = cache.sync(true)
 }
-

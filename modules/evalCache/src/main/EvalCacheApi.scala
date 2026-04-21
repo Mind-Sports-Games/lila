@@ -6,8 +6,8 @@ import strategygames.{ Game, GameLogic }
 import org.joda.time.DateTime
 import play.api.libs.json.JsObject
 
-import lila.db.dsl._
-import lila.memo.CacheApi._
+import lila.db.dsl.*
+import lila.memo.CacheApi.*
 import lila.socket.Socket
 import lila.user.User
 
@@ -18,8 +18,8 @@ final class EvalCacheApi(
     cacheApi: lila.memo.CacheApi
 )(implicit ec: scala.concurrent.ExecutionContext) {
 
-  import EvalCacheEntry._
-  import BSONHandlers._
+  import EvalCacheEntry.*
+  import BSONHandlers.*
 
   def getEvalJson(variant: Variant, fen: FEN, multiPv: Int): Fu[Option[JsObject]] =
     getEval(
@@ -56,14 +56,14 @@ final class EvalCacheApi(
 
   private def getEval(id: Id, multiPv: Int): Fu[Option[Eval]] =
     getEntry(id) map {
-      _.flatMap(_ `makeBestMultiPvEval` multiPv)
+      _.flatMap(_.makeBestMultiPvEval(multiPv))
     }
 
   private def getEntry(id: Id): Fu[Option[EvalCacheEntry]] = cache get id
 
   private def fetchAndSetAccess(id: Id): Fu[Option[EvalCacheEntry]] =
     coll.find($id(id)).one[EvalCacheEntry] addEffect { res =>
-      if (res.isDefined) coll.updateFieldUnchecked($id(id), "usedAt", DateTime.now)
+      if res.isDefined then coll.updateFieldUnchecked($id(id), "usedAt", DateTime.now)
     }
 
   private def put(trustedUser: TrustedUser, input: Input, sri: Socket.Sri): Funit =
@@ -81,15 +81,23 @@ final class EvalCacheApi(
               usedAt = DateTime.now,
               updatedAt = DateTime.now
             )
-            coll.insert.one(entry).void.recover(lila.db.ignoreDuplicateKey).andDo(cache.put(input.id, fuccess(entry.some))).andDo(upgrade.onEval(input, sri))
+            coll.insert
+              .one(entry)
+              .void
+              .recover(lila.db.ignoreDuplicateKey)
+              .andDo(cache.put(input.id, fuccess(entry.some)))
+              .andDo(upgrade.onEval(input, sri))
           case Some(oldEntry) =>
-            val entry = oldEntry `add` input.eval
-            !(entry `similarTo` oldEntry) so {
-              coll.update.one($id(entry.id), entry, upsert = true).void.andDo(cache.put(input.id, fuccess(entry.some))).andDo(upgrade.onEval(input, sri))
+            val entry = oldEntry.add(input.eval)
+            (!entry.similarTo(oldEntry)).so {
+              coll.update
+                .one($id(entry.id), entry, upsert = true)
+                .void
+                .andDo(cache.put(input.id, fuccess(entry.some)))
+                .andDo(upgrade.onEval(input, sri))
             }
         }
     }
-
 
   private def destSize(fen: FEN): Int =
     Game(GameLogic.Chess(), Variant.libStandard(GameLogic.Chess()).some, fen.some).situation.destinations.size

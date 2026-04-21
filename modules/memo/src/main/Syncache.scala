@@ -1,17 +1,16 @@
 package lila.memo
 
-import com.github.benmanes.caffeine.cache._
+import com.github.benmanes.caffeine.cache.*
 import java.util.concurrent.TimeUnit
-import scala.concurrent.duration._
+import scala.concurrent.duration.*
 import scala.util.Success
 
 import lila.common.Uptime
 import lila.common.extensions.*
 
-/** A synchronous cache from asynchronous computations.
-  * It will attempt to serve cached responses synchronously.
-  * If none is available, it starts an async computation,
-  * and either waits for the result or serves a default value.
+/** A synchronous cache from asynchronous computations. It will attempt to serve cached responses
+  * synchronously. If none is available, it starts an async computation, and either waits for the result or
+  * serves a default value.
   */
 final private[memo] class Syncache[K, V](
     name: String,
@@ -22,7 +21,7 @@ final private[memo] class Syncache[K, V](
     expireAfter: Syncache.ExpireAfter
 )(implicit ec: scala.concurrent.ExecutionContext) {
 
-  import Syncache._
+  import Syncache.*
 
   // sync cached values
   private[memo] val cache: LoadingCache[K, Fu[V]] =
@@ -43,28 +42,28 @@ final private[memo] class Syncache[K, V](
             .mon(_ => recCompute) // monitoring: record async time
             .recover { case e: Exception =>
               logger.branch(s"syncache $name").warn(s"key=$k", e)
-              cache `invalidate` k
+              cache.invalidate(k)
               default(k)
             }
       })
 
   // get the value asynchronously, never blocks (preferred)
-  def async(k: K): Fu[V] = cache `get` k
+  def async(k: K): Fu[V] = cache.get(k)
 
   // get the value synchronously, might block depending on strategy
   def sync(k: K): V = {
-    val future = cache `get` k
+    val future = cache.get(k)
     future.value match {
       case Some(Success(v)) => v
-      case Some(_) =>
-        cache `invalidate` k
+      case Some(_)          =>
+        cache.invalidate(k)
         default(k)
       case _ =>
         incMiss()
         strategy match {
-          case NeverWait => default(k)
+          case NeverWait                         => default(k)
           case WaitAfterUptime(duration, uptime) =>
-            if (Uptime `startedSinceSeconds` uptime) waitForResult(k, future, duration)
+            if Uptime.startedSinceSeconds(uptime) then waitForResult(k, future, duration)
             else default(k)
         }
     }
@@ -73,7 +72,7 @@ final private[memo] class Syncache[K, V](
   // maybe optimize later with cache batching
   def asyncMany(ks: List[K]): Fu[List[V]] = Future.sequence(ks.map(async))
 
-  def invalidate(k: K): Unit = cache `invalidate` k
+  def invalidate(k: K): Unit = cache.invalidate(k)
 
   def preloadOne(k: K): Funit = async(k).void
 
@@ -94,8 +93,8 @@ final private[memo] class Syncache[K, V](
         default(k)
     }
 
-  private val incMiss    = (() => lila.mon.syncache.miss(name).increment())
-  private val incTimeout = (() => lila.mon.syncache.timeout(name).increment())
+  private val incMiss    = () => lila.mon.syncache.miss(name).increment()
+  private val incTimeout = () => lila.mon.syncache.timeout(name).increment()
   private val recWait    = lila.mon.syncache.wait(name)
   private val recCompute = lila.mon.syncache.compute(name)
 }

@@ -1,36 +1,36 @@
 package lila.user
 
-import com.roundeights.hasher.Implicits._
-import reactivemongo.api.bson._
+import com.roundeights.hasher.Implicits.*
+import reactivemongo.api.bson.*
 
 import lila.common.NormalizedEmailAddress
-import lila.db.dsl._
-import lila.user.User.{ ClearPassword, PasswordAndToken, BSONFields => F }
+import lila.db.dsl.*
+import lila.user.User.{ BSONFields as F, ClearPassword, PasswordAndToken }
 
 final class Authenticator(
     passHasher: PasswordHasher,
     userRepo: UserRepo
 )(implicit ec: scala.concurrent.ExecutionContext) {
-  import Authenticator._
+  import Authenticator.*
 
   def passEnc(p: ClearPassword): HashedPassword = passHasher.hash(p)
 
   def compare(auth: AuthData, p: ClearPassword): Boolean = {
     val newP = auth.salt.fold(p) { s =>
       val salted = s"${p.value}{$s}" // BC
-      ClearPassword(if (~auth.sha512) salted.sha512 else salted.sha1)
+      ClearPassword(if ~auth.sha512 then salted.sha512 else salted.sha1)
     }
     passHasher.check(auth.bpass, newP)
   }
 
   def authenticateById(id: User.ID, passwordAndToken: PasswordAndToken): Fu[Option[User]] =
-    loginCandidateById(id) map { _ flatMap { _ `option` passwordAndToken } }
+    loginCandidateById(id) map { _ flatMap { _.option(passwordAndToken) } }
 
   def authenticateByEmail(
       email: NormalizedEmailAddress,
       passwordAndToken: PasswordAndToken
   ): Fu[Option[User]] =
-    loginCandidateByEmail(email) map { _ flatMap { _ `option` passwordAndToken } }
+    loginCandidateByEmail(email) map { _ flatMap { _.option(passwordAndToken) } }
 
   def loginCandidate(u: User): Fu[User.LoginCandidate] =
     loginCandidateById(u.id) dmap { _ | User.LoginCandidate(u, _ => false) }
@@ -51,7 +51,7 @@ final class Authenticator(
 
   private def authWithBenefits(auth: AuthData)(p: ClearPassword): Boolean = {
     val res = compare(auth, p)
-    if (res && auth.salt.isDefined)
+    if res && auth.salt.isDefined then
       setPassword(id = auth._id, p).andDo { val _ = lila.mon.user.auth.bcFullMigrate.increment() }
     res
   }

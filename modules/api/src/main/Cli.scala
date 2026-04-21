@@ -48,18 +48,18 @@ final private[api] class Cli(
     case "swiss" :: "dq" :: username :: id :: Nil =>
       swiss.api.disqualify(id, username).map(_ => s"Byebye $username from $id")
     case "gdpr" :: "erase" :: username :: "forever" :: Nil =>
-      userRepo `named` username map {
+      userRepo.named(username) map {
         case None                       => "No such user."
         case Some(user) if user.enabled => "That user account is not closed. Can't erase."
-        case Some(user) =>
-          slackApi `gdprErase` user
-          userRepo `setEraseAt` user
-          email `gdprErase` user
+        case Some(user)                 =>
+          slackApi.gdprErase(user)
+          userRepo.setEraseAt(user)
+          email.gdprErase(user)
           Bus.publish(lila.user.User.GDPRErase(user), "gdprErase")
           s"Erasing all search data about ${user.username} now"
       }
     case "announce" :: "cancel" :: Nil =>
-      AnnounceStore `set` none
+      AnnounceStore.set(none)
       Bus.publish(AnnounceStore.cancel, "announce")
       fuccess("Removed announce")
     case "announce" :: msgWords =>

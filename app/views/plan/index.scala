@@ -3,13 +3,12 @@ package views.html.plan
 import play.api.i18n.Lang
 
 import lila.api.Context
-import lila.app.templating.Environment._
-import lila.app.ui.ScalatagsTemplate._
-
+import lila.app.templating.Environment.*
+import lila.app.ui.ScalatagsTemplate.*
 
 object index {
 
-  import trans.patron._
+  import trans.patron.*
 
   private[plan] val stripeScript = script(src := "https://js.stripe.com/v3/")
 
@@ -27,7 +26,7 @@ object index {
     views.html.base.layout(
       title = becomePatron.txt(),
       moreCss = cssTag("plan"),
-      moreJs = ctx.isAuth `option`
+      moreJs = ctx.isAuth.option(
         frag(
           stripeScript,
           frag(
@@ -42,7 +41,8 @@ object index {
           ),
           jsModule("checkout"),
           embedJsUnsafeLoadThen(s"""CheckoutStart("$stripePublicKey")""")
-        ),
+        )
+      ),
       openGraph = lila.app.ui
         .OpenGraph(
           title = becomePatron.txt(),
@@ -67,7 +67,7 @@ object index {
               iconTag(patronIconChar),
               div(
                 h1(thankYou()),
-                if (p.isLifetime) youHaveLifetime()
+                if p.isLifetime then youHaveLifetime()
                 else
                   p.expiresAt.map { expires =>
                     frag(
@@ -95,15 +95,14 @@ object index {
               ),
               div(cls := "content")(
                 div(
-                  cls := "plan_checkout",
-                  attr("data-email") := email.so(_.value),
-                  attr("data-lifetime-usd") := lila.plan.Cents.lifetime.usd.toString,
+                  cls                         := "plan_checkout",
+                  attr("data-email")          := email.so(_.value),
+                  attr("data-lifetime-usd")   := lila.plan.Cents.lifetime.usd.toString,
                   attr("data-lifetime-cents") := lila.plan.Cents.lifetime.value
                 )(
                   ctx.me map { me =>
                     p(style := "text-align:center;margin-bottom:1em")(
-                      if (patron.exists(_.isLifetime))
-                        makeExtraDonation()
+                      if patron.exists(_.isLifetime) then makeExtraDonation()
                       else
                         frag(
                           "Donating ",
@@ -116,12 +115,12 @@ object index {
                   st.group(cls := "radio buttons freq")(
                     div(
                       st.title := payLifetimeOnce.txt(lila.plan.Cents.lifetime.usd),
-                      cls := List("lifetime-check" -> patron.exists(_.isLifetime)),
+                      cls      := List("lifetime-check" -> patron.exists(_.isLifetime)),
                       input(
-                        tpe := "radio",
+                        tpe  := "radio",
                         name := "freq",
-                        id := "freq_lifetime",
-                        patron.exists(_.isLifetime) `option` disabled,
+                        id   := "freq_lifetime",
+                        patron.exists(_.isLifetime).option(disabled),
                         value := "lifetime"
                       ),
                       label(`for` := "freq_lifetime")(lifetime())
@@ -129,9 +128,9 @@ object index {
                     div(
                       st.title := recurringBilling.txt(),
                       input(
-                        tpe := "radio",
+                        tpe  := "radio",
                         name := "freq",
-                        id := "freq_monthly",
+                        id   := "freq_monthly",
                         checked,
                         value := "monthly"
                       ),
@@ -140,9 +139,9 @@ object index {
                     div(
                       st.title := singleDonation.txt(),
                       input(
-                        tpe := "radio",
+                        tpe  := "radio",
                         name := "freq",
-                        id := "freq_onetime",
+                        id   := "freq_onetime",
                         checked,
                         value := "onetime"
                       ),
@@ -155,12 +154,12 @@ object index {
                         val id = s"plan_${cents.value}"
                         div(
                           input(
-                            tpe := "radio",
-                            name := "plan",
+                            tpe   := "radio",
+                            name  := "plan",
                             st.id := id,
-                            cents.usd.value == 10 `option` checked,
-                            value := cents.value,
-                            attr("data-usd") := cents.usd.toString,
+                            (cents.usd.value == 10).option(checked),
+                            value               := cents.value,
+                            attr("data-usd")    := cents.usd.toString,
                             attr("data-amount") := cents.value
                           ),
                           label(`for` := id)(cents.usd.toString)
@@ -169,8 +168,8 @@ object index {
                       div(cls := "other")(
                         input(tpe := "radio", name := "plan", id := "plan_other", value := "other"),
                         label(
-                          `for` := "plan_other",
-                          title := pleaseEnterAmount.txt(),
+                          `for`                    := "plan_other",
+                          title                    := pleaseEnterAmount.txt(),
                           attr("data-trans-other") := otherAmount.txt()
                         )(otherAmount())
                       )
@@ -186,18 +185,20 @@ object index {
                   ),
                   div(cls := "service")(
                     div(cls := "buttons")(
-                      if (ctx.isAuth)
+                      if ctx.isAuth then
                         frag(
                           button(cls := "stripe button")(withCreditCard()),
-                          (payPalPublicKey != "") `option` frag(
-                            div(cls := "paypal paypal--order"),
-                            div(cls := "paypal paypal--subscription"),
-                            button(cls := "paypal button disabled paypal--disabled")("PAYPAL")
+                          (payPalPublicKey != "").option(
+                            frag(
+                              div(cls := "paypal paypal--order"),
+                              div(cls := "paypal paypal--subscription"),
+                              button(cls := "paypal button disabled paypal--disabled")("PAYPAL")
+                            )
                           )
                         )
                       else
                         a(
-                          cls := "button",
+                          cls  := "button",
                           href := s"${routes.Auth.login}?referrer=${routes.Plan.index}"
                         )(logInToDonate())
                     )

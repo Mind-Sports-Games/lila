@@ -1,14 +1,18 @@
 package lila.racer
 
-import play.api.libs.json._
+import play.api.libs.json.*
 
 import lila.common.LightUser
 import lila.storm.StormJson
 import lila.storm.StormSign
 
-final class RacerJson(@annotation.nowarn("msg=unused") _stormJson: StormJson, @annotation.nowarn("msg=unused") _sign: StormSign, lightUserSync: LightUser.GetterSync) {
+final class RacerJson(
+    @annotation.nowarn("msg=unused") _stormJson: StormJson,
+    @annotation.nowarn("msg=unused") _sign: StormSign,
+    lightUserSync: LightUser.GetterSync
+) {
 
-  import StormJson._
+  import StormJson.*
 
   implicit private val playerWrites: OWrites[RacerPlayer] = OWrites[RacerPlayer] { p =>
     val user = p.userId flatMap lightUserSync

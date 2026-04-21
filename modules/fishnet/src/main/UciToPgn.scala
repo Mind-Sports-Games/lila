@@ -36,7 +36,7 @@ private object UciToPgn {
     } to Set
 
     val onlyMeaningfulVariations: List[Info] = analysis.infos map { info =>
-      if (pliesWithAdviceAndVariation(info.ply)) info
+      if pliesWithAdviceAndVariation(info.ply) then info
       else info.dropVariation
     }
     val logic  = variant.gameLogic
@@ -44,7 +44,7 @@ private object UciToPgn {
 
     def uciToPgn(ply: Int, variation: List[String]): Validated[String, List[PgnMove]] = {
       val situationV =
-        if (ply == replay.setup.plies + 1) valid(replay.setup.situation)
+        if ply == replay.setup.plies + 1 then valid(replay.setup.situation)
         else
           replay
             .actionAtPly(ply)
@@ -59,58 +59,61 @@ private object UciToPgn {
                 case ca: CubeAction    => ca.situationBefore
                 case et: EndTurn       => et.situationBefore
               }
-            }).toValid("No move found")
+            })
+            .toValid("No move found")
 
       situationV.andThen { situation =>
-        variation.map(v => Uci(logic, family, v)).sequence.toValid("Invalid UCI moves " + variation).andThen { ucis =>
-          ucis.foldLeft[Validated[String, (Situation, List[Action])]](valid(situation -> Nil)) {
-            case (Validated.Valid((sit, moves)), uci: Uci.Move) =>
-              sit.move(uci.orig, uci.dest, uci.promotion).leftMap(e => s"ply $ply $e") map { move =>
-                move.situationAfter -> (move :: moves)
+        variation.map(v => Uci(logic, family, v)).sequence.toValid("Invalid UCI moves " + variation).andThen {
+          ucis =>
+            ucis
+              .foldLeft[Validated[String, (Situation, List[Action])]](valid(situation -> Nil)) {
+                case (Validated.Valid((sit, moves)), uci: Uci.Move) =>
+                  sit.move(uci.orig, uci.dest, uci.promotion).leftMap(e => s"ply $ply $e") map { move =>
+                    move.situationAfter -> (move :: moves)
+                  }
+                case (Validated.Valid((sit, moves)), uci: Uci.Drop) =>
+                  sit.drop(uci.role, uci.pos).leftMap(e => s"ply $ply $e") map { drop =>
+                    drop.situationAfter -> (drop :: moves)
+                  }
+                case (Validated.Valid((sit, moves)), uci: Uci.Lift) =>
+                  sit.lift(uci.pos).leftMap(e => s"ply $ply $e") map { lift =>
+                    lift.situationAfter -> (lift :: moves)
+                  }
+                case (Validated.Valid((sit, moves)), _: Uci.Pass) =>
+                  sit.pass.leftMap(e => s"ply $ply $e") map { pass =>
+                    pass.situationAfter -> (pass :: moves)
+                  }
+                case (Validated.Valid((sit, moves)), _: Uci.EndTurn) =>
+                  sit.endTurn.leftMap(e => s"ply $ply $e") map { endTurn =>
+                    endTurn.situationAfter -> (endTurn :: moves)
+                  }
+                case (Validated.Valid((sit, moves)), uci: Uci.SelectSquares) =>
+                  sit.selectSquares(uci.squares).leftMap(e => s"ply $ply $e") map { ss =>
+                    ss.situationAfter -> (ss :: moves)
+                  }
+                case (Validated.Valid((sit, moves)), uci: Uci.DiceRoll) =>
+                  sit.diceRoll(uci.dice).leftMap(e => s"ply $ply $e") map { dr =>
+                    dr.situationAfter -> (dr :: moves)
+                  }
+                case (Validated.Valid((sit, moves)), uci: Uci.CubeAction) =>
+                  sit.cubeAction(uci.interaction).leftMap(e => s"ply $ply $e") map { ca =>
+                    ca.situationAfter -> (ca :: moves)
+                  }
+                case (failure, _) => failure
               }
-            case (Validated.Valid((sit, moves)), uci: Uci.Drop) =>
-              sit.drop(uci.role, uci.pos).leftMap(e => s"ply $ply $e") map { drop =>
-                drop.situationAfter -> (drop :: moves)
-              }
-            case (Validated.Valid((sit, moves)), uci: Uci.Lift) =>
-              sit.lift(uci.pos).leftMap(e => s"ply $ply $e") map { lift =>
-                lift.situationAfter -> (lift :: moves)
-              }
-            case (Validated.Valid((sit, moves)), _: Uci.Pass) =>
-              sit.pass.leftMap(e => s"ply $ply $e") map { pass =>
-                pass.situationAfter -> (pass :: moves)
-              }
-            case (Validated.Valid((sit, moves)), _: Uci.EndTurn) =>
-              sit.endTurn.leftMap(e => s"ply $ply $e") map { endTurn =>
-                endTurn.situationAfter -> (endTurn :: moves)
-              }
-            case (Validated.Valid((sit, moves)), uci: Uci.SelectSquares) =>
-              sit.selectSquares(uci.squares).leftMap(e => s"ply $ply $e") map { ss =>
-                ss.situationAfter -> (ss :: moves)
-              }
-            case (Validated.Valid((sit, moves)), uci: Uci.DiceRoll) =>
-              sit.diceRoll(uci.dice).leftMap(e => s"ply $ply $e") map { dr =>
-                dr.situationAfter -> (dr :: moves)
-              }
-            case (Validated.Valid((sit, moves)), uci: Uci.CubeAction) =>
-              sit.cubeAction(uci.interaction).leftMap(e => s"ply $ply $e") map { ca =>
-                ca.situationAfter -> (ca :: moves)
-              }
-            case (failure, _) => failure
-          }.map(_._2.reverse.map(Dumper(logic, _)))
+              .map(_._2.reverse.map(Dumper(logic, _)))
         }
       }
     }
 
     onlyMeaningfulVariations.foldLeft[WithErrors[List[Info]]]((Nil, Nil)) {
       case ((infos, errs), info) if info.variation.isEmpty => (info :: infos, errs)
-      case ((infos, errs), info) =>
+      case ((infos, errs), info)                           =>
         uciToPgn(info.ply, info.variation.flatten.toList).fold(
           err => (info.dropVariation :: infos, LilaException(err) :: errs),
           pgn => (info.copy(variation = Vector(pgn)) :: infos, errs)
         )
-    }
-    match {
+    } match {
       case (infos, errors) => analysis.copy(infos = infos.reverse) -> errors
     }
   }

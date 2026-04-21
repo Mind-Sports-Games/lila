@@ -3,10 +3,9 @@ package views.html.study
 import play.api.libs.json.Json
 
 import lila.api.Context
-import lila.app.templating.Environment._
-import lila.app.ui.ScalatagsTemplate._
+import lila.app.templating.Environment.*
+import lila.app.ui.ScalatagsTemplate.*
 import lila.common.String.html.safeJsonValue
-
 
 object show {
 
@@ -24,32 +23,32 @@ object show {
         analyseTag,
         analyseNvuiTag,
         embedJsUnsafe(s"""playstrategy.study=${safeJsonValue(
-          Json.obj(
-            "study"    -> data.study.add("admin" -> isGranted(_.StudyAdmin)),
-            "data"     -> data.analysis,
-            "i18n"     -> jsI18n(),
-            "tagTypes" -> lila.study.PgnTags.typesToString,
-            "userId"   -> ctx.userId,
-            "chat" -> chatOption.map { c =>
-              views.html.chat.json(
-                c.chat,
-                name = trans.chatRoom.txt(),
-                timeout = c.timeout,
-                writeable = ctx.userId exists s.canChat,
-                public = false,
-                resourceId = lila.chat.Chat.ResourceId(s"study/${c.chat.id}"),
-                palantir = ctx.userId exists s.isMember,
-                localMod = ctx.userId exists s.canContribute
-              )
-            },
-            "explorer" -> Json.obj(
-              "endpoint"          -> explorerEndpoint,
-              "tablebaseEndpoint" -> tablebaseEndpoint
-            ),
-            "socketUrl"     -> socketUrl(s.id.value),
-            "socketVersion" -> socketVersion.value
-          )
-        )}""")
+            Json.obj(
+              "study"    -> data.study.add("admin" -> isGranted(_.StudyAdmin)),
+              "data"     -> data.analysis,
+              "i18n"     -> jsI18n(),
+              "tagTypes" -> lila.study.PgnTags.typesToString,
+              "userId"   -> ctx.userId,
+              "chat"     -> chatOption.map { c =>
+                views.html.chat.json(
+                  c.chat,
+                  name = trans.chatRoom.txt(),
+                  timeout = c.timeout,
+                  writeable = ctx.userId exists s.canChat,
+                  public = false,
+                  resourceId = lila.chat.Chat.ResourceId(s"study/${c.chat.id}"),
+                  palantir = ctx.userId exists s.isMember,
+                  localMod = ctx.userId exists s.canContribute
+                )
+              },
+              "explorer" -> Json.obj(
+                "endpoint"          -> explorerEndpoint,
+                "tablebaseEndpoint" -> tablebaseEndpoint
+              ),
+              "socketUrl"     -> socketUrl(s.id.value),
+              "socketVersion" -> socketVersion.value
+            )
+          )}""")
       ),
       robots = s.isPublic,
       chessground = false,

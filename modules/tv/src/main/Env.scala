@@ -1,7 +1,7 @@
 package lila.tv
 
 import akka.actor.ActorSystem
-import com.softwaremill.macwire._
+import com.softwaremill.macwire.*
 
 @Module
 final class Env(

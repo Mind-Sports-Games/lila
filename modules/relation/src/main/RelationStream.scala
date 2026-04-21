@@ -1,11 +1,11 @@
 package lila.relation
 
-import akka.stream.scaladsl._
+import akka.stream.scaladsl.*
 import reactivemongo.akkastream.cursorProducer
 import reactivemongo.api.ReadPreference
 
 import lila.common.config.MaxPerSecond
-import lila.db.dsl._
+import lila.db.dsl.*
 import lila.user.{ User, UserRepo }
 
 final class RelationStream(
@@ -13,7 +13,7 @@ final class RelationStream(
     userRepo: UserRepo
 )(implicit mat: akka.stream.Materializer) {
 
-  import RelationStream._
+  import RelationStream.*
 
   def follow(user: User, direction: Direction, perSecond: MaxPerSecond): Source[User, ?] =
     coll

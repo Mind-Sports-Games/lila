@@ -1,8 +1,8 @@
 package views.html.clas
 
 import lila.api.Context
-import lila.app.templating.Environment._
-import lila.app.ui.ScalatagsTemplate._
+import lila.app.templating.Environment.*
+import lila.app.ui.ScalatagsTemplate.*
 import lila.clas.{ Clas, Student }
 import lila.common.String.html.richText
 import lila.user.User
@@ -15,11 +15,11 @@ object studentDashboard {
       teachers: List[User],
       students: List[Student.WithUser]
   )(implicit ctx: Context) =
-    bits.layout(c.name, Left(c `withStudents` Nil))(
+    bits.layout(c.name, Left(c.withStudents(Nil)))(
       cls := "clas-show dashboard dashboard-student",
       div(cls := "clas-show__top")(
         h1(dataIcon := "f", cls := "text")(c.name),
-        c.desc.trim.nonEmpty `option` div(cls := "clas-show__desc")(richText(c.desc))
+        c.desc.trim.nonEmpty.option(div(cls := "clas-show__desc")(richText(c.desc)))
       ),
       c.archived map { archived =>
         div(cls := "box__pad")(
@@ -57,7 +57,7 @@ object studentDashboard {
           }
         )
       ),
-      if (c.wall.nonEmpty) div(cls := "box__pad clas-wall")(wall),
+      if c.wall.nonEmpty then div(cls := "box__pad clas-wall")(wall),
       div(cls := "students")(studentList(students))
     )
 
@@ -73,39 +73,40 @@ object studentDashboard {
         )
       ),
       tbody(
-        students.sortBy(s => -s.user.seenAt.fold(0L)(_.getMillis)).map { case Student.WithUser(student, user) =>
-          tr(
-            td(
-              userLink(
-                user,
-                name = span(
-                  strong(user.username),
-                  em(student.realName)
-                ).some,
-                withTitle = false
-              )
-            ),
-            td(dataSort := user.perfs.bestRating, cls := "rating")(cls := "rating")(user.best3Perfs.map {
-              showPerfRating(user, _)
-            }),
-            td(user.count.game.localize),
-            td(user.perfs.perfsPuzzleMap.values.map(_.nb).sum.localize),
-            challengeTd(user)
-          )
+        students.sortBy(s => -s.user.seenAt.fold(0L)(_.getMillis)).map {
+          case Student.WithUser(student, user) =>
+            tr(
+              td(
+                userLink(
+                  user,
+                  name = span(
+                    strong(user.username),
+                    em(student.realName)
+                  ).some,
+                  withTitle = false
+                )
+              ),
+              td(dataSort := user.perfs.bestRating, cls := "rating")(cls := "rating")(user.best3Perfs.map {
+                showPerfRating(user, _)
+              }),
+              td(user.count.game.localize),
+              td(user.perfs.perfsPuzzleMap.values.map(_.nb).sum.localize),
+              challengeTd(user)
+            )
         }
       )
     )
 
   private def challengeTd(user: lila.user.User)(implicit ctx: Context) =
-    if (ctx `is` user) td
+    if ctx.is(user) then td
     else {
       val online = isOnline(user.id)
       td(
         a(
           dataIcon := "U",
-          cls := List("button button-empty text" -> true, "disabled" -> !online),
-          title := trans.challenge.challengeToPlay.txt(),
-          href := online `option` s"${routes.Lobby.home}?user=${user.username}#game"
+          cls      := List("button button-empty text" -> true, "disabled" -> !online),
+          title    := trans.challenge.challengeToPlay.txt(),
+          href     := online.option(s"${routes.Lobby.home}?user=${user.username}#game")
         )(trans.play())
       )
     }

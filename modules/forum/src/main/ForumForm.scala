@@ -1,8 +1,8 @@
 package lila.forum
 
 import lila.common.Form.cleanText
-import play.api.data._
-import play.api.data.Forms._
+import play.api.data.*
+import play.api.data.Forms.*
 import lila.user.User
 
 final private[forum] class ForumForm(
@@ -11,7 +11,7 @@ final private[forum] class ForumForm(
 )(implicit ec: scala.concurrent.ExecutionContext)
     extends lila.hub.CaptchedForm {
 
-  import ForumForm._
+  import ForumForm.*
 
   def postMapping(user: User, inOwnTeam: Boolean) =
     mapping(
@@ -71,7 +71,7 @@ object ForumForm {
 
   private def mostlyUpperCase(text: String) =
     text.lengthIs > 5 && {
-      import java.lang.Character._
+      import java.lang.Character.*
       // true if >2/3 of the latin letters are upper
       (text take 300).foldLeft(0) { (i, c) =>
         getType(c) match {

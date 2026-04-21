@@ -1,17 +1,17 @@
 package lila.round
 
-import actorApi._, round._
-import strategygames.{ P2, Centis, Player => PlayerIndex, Move, P1, Pos }
+import actorApi.*, round.*
+import strategygames.{ Centis, Move, P1, P2, Player as PlayerIndex, Pos }
 import org.joda.time.DateTime
 import alleycats.Zero
-import play.api.libs.json._
-import scala.concurrent.duration._
+import play.api.libs.json.*
+import scala.concurrent.duration.*
 import scala.concurrent.Promise
 import java.io.{ PrintWriter, StringWriter }
 
 import lila.common.extensions.*
 import lila.game.Game.{ FullId, PlayerId }
-import lila.game.{ Game, GameRepo, Pov, Event, Progress, Player => GamePlayer }
+import lila.game.{ Event, Game, GameRepo, Player as GamePlayer, Pov, Progress }
 import lila.hub.actorApi.round.{
   Abort,
   BotPlay,
@@ -25,7 +25,7 @@ import lila.hub.actorApi.round.{
   ResignMatch
 }
 import lila.hub.Duct
-import lila.room.RoomSocket.{ Protocol => RP, _ }
+import lila.room.RoomSocket.{ Protocol as RP, * }
 import lila.socket.Socket.{ makeMessage, GetVersion, SocketVersion }
 import lila.socket.UserLagCache
 import lila.user.User
@@ -40,8 +40,8 @@ final private[round] class RoundDuct(
 ) extends Duct {
 
   import RoundSocket.Protocol
-  import RoundDuct._
-  import dependencies._
+  import RoundDuct.*
+  import dependencies.*
 
   private var takebackSituation: Option[TakebackSituation] = None
 
@@ -65,7 +65,7 @@ final private[round] class RoundDuct(
 
     def setOnline(on: Boolean): Unit = {
       isLongGone.foreach(_ so notifyGone(playerIndex, gone = !on))
-      offlineSince = if (on) None else offlineSince orElse nowMillis.some
+      offlineSince = if on then None else offlineSince orElse nowMillis.some
       bye = bye && !on
     }
     def setBye(): Unit =
@@ -75,13 +75,13 @@ final private[round] class RoundDuct(
 
     private def timeoutMillis: Long = {
       val base = {
-        if (bye) RoundSocket.ragequitTimeout
+        if bye then RoundSocket.ragequitTimeout
         else
           proxy.withGameOptionSync { g =>
-            RoundSocket.povDisconnectTimeout(g `pov` playerIndex)
+            RoundSocket.povDisconnectTimeout(g.pov(playerIndex))
           } | RoundSocket.disconnectTimeout
       }.toMillis * goneWeight
-      base `atLeast` RoundSocket.ragequitTimeout.toMillis.toFloat
+      base.atLeast(RoundSocket.ragequitTimeout.toMillis.toFloat)
     }.toLong
 
     def isLongGone: Fu[Boolean] = {
@@ -89,27 +89,25 @@ final private[round] class RoundDuct(
     } so isHostingSimul.not
 
     def showMillisToGone: Fu[Option[Long]] =
-      if (botConnected) fuccess(none)
+      if botConnected then fuccess(none)
       else {
         val now = nowMillis
         offlineSince.filter { since =>
           bye || (now - since) > 5000
         } so { since =>
-          isHostingSimul map {
-            !_ `option` (timeoutMillis + since - now)
-          }
+          isHostingSimul.map(host => (!host).option(timeoutMillis + since - now))
         }
       }
 
     def setBotConnected(v: Boolean) =
-      botConnections = Math.max(0, botConnections + (if (v) 1 else -1))
+      botConnections = Math.max(0, botConnections + (if v then 1 else -1))
   }
 
   private val p1Player = new Player(P1)
   private val p2Player = new Player(P2)
 
   def getGame: Fu[Option[Game]]          = proxy.game
-  def updateGame(f: Game => Game): Funit = proxy `update` f
+  def updateGame(f: Game => Game): Funit = proxy.update(f)
 
   val process: Duct.ReceiveAsync = {
 
@@ -120,7 +118,7 @@ final private[round] class RoundDuct(
         mightBeSimul = game.isSimul
         p1Player.goneWeight = p1GoneWeight
         p2Player.goneWeight = p2GoneWeight
-        if (game.playableByAi) player.requestFishnet(game, this)
+        if game.playableByAi then player.requestFishnet(game, this)
       }
 
     // socket stuff
@@ -143,8 +141,8 @@ final private[round] class RoundDuct(
 
     case RoomCrowd(p1, p2) =>
       fuccess {
-        p1Player `setOnline` p1
-        p2Player `setOnline` p2
+        p1Player.setOnline(p1)
+        p2Player.setOnline(p2)
       }
 
     case IsOnGame(playerIndex, promise) =>
@@ -181,12 +179,12 @@ final private[round] class RoundDuct(
 
     case Protocol.In.HoldAlert(fullId, ip, mean, sd) =>
       handle(fullId.playerId) { pov =>
-        gameRepo `hasHoldAlert` pov flatMap {
-          case true => funit
+        gameRepo.hasHoldAlert(pov) flatMap {
+          case true  => funit
           case false =>
             lila
               .log("cheat")
-              //TODO multiaction use gameid#turnCount in url (study/analysis to fix)
+              // TODO multiaction use gameid#turnCount in url (study/analysis to fix)
               .info(
                 s"hold alert $ip https://playstrategy.org/${pov.gameId}/${pov.playerIndex.name}#${pov.game.turnCount} ${pov.player.userId | "anon"} mean: $mean SD: $sd"
               )
@@ -204,7 +202,7 @@ final private[round] class RoundDuct(
               "analysisProgress",
               Json.obj(
                 "analysis" -> lila.analyse.JsonView.bothPlayers(a.game, a.analysis),
-                "tree" -> lila.tree.Node.minimalNodeJsonWriter.writes {
+                "tree"     -> lila.tree.Node.minimalNodeJsonWriter.writes {
                   TreeBuilder(
                     a.game,
                     a.analysis.some,
@@ -222,8 +220,8 @@ final private[round] class RoundDuct(
 
     case p: HumanPlay =>
       handle(p.playerId) { pov =>
-        if (pov.player.isAi) fufail(s"player $pov can't play AI")
-        else if (pov.game.outoftime(withGrace = true)) finisher.outOfTime(pov.game)
+        if pov.player.isAi then fufail(s"player $pov can't play AI")
+        else if pov.game.outoftime(withGrace = true) then finisher.outOfTime(pov.game)
         else {
           recordLag(pov)
           player.human(p, this)(pov)
@@ -231,22 +229,24 @@ final private[round] class RoundDuct(
       }.chronometer.lap.addEffects(
         err => {
           p.promise.foreach(_ failure err)
-          socketSend(Protocol.Out.resyncPlayer(Game.Id(gameId) `full` p.playerId))
+          socketSend(Protocol.Out.resyncPlayer(Game.Id(gameId).full(p.playerId)))
         },
         lap => {
           p.promise.foreach(_ success {})
           lila.mon.round.move.time.record(lap.nanos)
-          MoveLatMonitor `record` lap.micros
+          MoveLatMonitor.record(lap.micros)
         }
       )
 
     case p: BotPlay =>
-      val res = proxy.withPov(PlayerId(p.playerId)) {
-        _ so { pov =>
-          if (pov.game.outoftime(withGrace = true)) finisher.outOfTime(pov.game)
-          else player.bot(p.uci, this)(pov)
+      val res = proxy
+        .withPov(PlayerId(p.playerId)) {
+          _ so { pov =>
+            if pov.game.outoftime(withGrace = true) then finisher.outOfTime(pov.game)
+            else player.bot(p.uci, this)(pov)
+          }
         }
-      } `dmap` publish
+        .dmap(publish)
       p.promise.foreach(_ completeWith res)
       res
 
@@ -290,9 +290,11 @@ final private[round] class RoundDuct(
     case GoBerserk(playerIndex, promise) =>
       handle(playerIndex) { pov =>
         val berserked = pov.game.goBerserk(playerIndex)
-        berserked.so { progress =>
-          proxy.save(progress) >> gameRepo.goBerserk(pov) inject progress.events
-        }.andDo(promise.success(berserked.isDefined))
+        berserked
+          .so { progress =>
+            proxy.save(progress) >> gameRepo.goBerserk(pov) inject progress.events
+          }
+          .andDo(promise.success(berserked.isDefined))
       }
 
     case ResignForce(playerId) =>
@@ -302,7 +304,7 @@ final private[round] class RoundDuct(
             case true =>
               finisher.rageQuit(
                 pov.game,
-                Some(pov.playerIndex) `ifFalse` pov.game.situation.opponentHasInsufficientMaterial
+                Some(pov.playerIndex).ifFalse(pov.game.situation.opponentHasInsufficientMaterial)
               )
             case _ => fuccess(List(Event.Reload))
           }
@@ -339,7 +341,7 @@ final private[round] class RoundDuct(
     case Abandon =>
       proxy withGame { game =>
         game.abandoned so {
-          if (game.abortable) finisher.other(game, _.Aborted, None)
+          if game.abortable then finisher.other(game, _.Aborted, None)
           else finisher.other(game, _.Resign, Some(!game.player.playerIndex))
         }
       }
@@ -354,17 +356,17 @@ final private[round] class RoundDuct(
     case DrawYes(playerId)   => handle(playerId)(drawer.yes)
     case DrawNo(playerId)    => handle(playerId)(drawer.no)
     case DrawClaim(playerId) => handle(playerId)(drawer.claim)
-    case Cheat(playerIndex) =>
+    case Cheat(playerIndex)  =>
       handle { game =>
         (game.playable && !game.imported) so {
           finisher.other(game, _.Cheat, Some(!playerIndex))
         }
       }
-    case TooManyPlies => handle(drawer `force` _)
+    case TooManyPlies => handle(drawer.force(_))
 
     case Threefold =>
       proxy withGame { game =>
-        drawer `autoThreefold` game map {
+        drawer.autoThreefold(game) map {
           _ foreach { pov =>
             this ! DrawClaim(PlayerId(pov.player.id))
           }
@@ -374,7 +376,7 @@ final private[round] class RoundDuct(
     case RematchYes(playerId) => handle(PlayerId(playerId))(rematcher.yes)
     case RematchNo(playerId)  => handle(PlayerId(playerId))(rematcher.no)
 
-    //TODO: challengeMultiMatch: check this works for non-swiss MulitMatch, currently disabled in ui
+    // TODO: challengeMultiMatch: check this works for non-swiss MulitMatch, currently disabled in ui
     case MultiMatchRematch =>
       handle { game =>
         rematcher.multiMatch(game) map { events =>
@@ -383,7 +385,7 @@ final private[round] class RoundDuct(
               val gameNb     = game.metadata.multiMatchGameNr.getOrElse(1)
               val multiMatch = s"$gameNb:${game.id}}"
               gameRepo.setMultiMatch(game.id, multiMatch).void andThen { case _ =>
-                updateGame(game => game.copy(metadata = (game.metadata.copy(multiMatch = multiMatch.some))))
+                updateGame(game => game.copy(metadata = game.metadata.copy(multiMatch = multiMatch.some)))
               }
             }
             case _ =>
@@ -411,7 +413,7 @@ final private[round] class RoundDuct(
       handle(playerId) { pov =>
         moretimer(pov, duration) flatMap {
           _ so { progress =>
-            proxy `save` progress inject progress.events
+            proxy.save(progress) inject progress.events
           }
         }
       }
@@ -439,26 +441,28 @@ final private[round] class RoundDuct(
       }
 
     case LilaStop(promise) =>
-      proxy.withGame { g =>
-        g.playable so {
-          proxy saveAndFlush {
-            g.clock.fold(Progress(g)) { clock =>
-              g.withClock {
-                clock
-                  .giveTime(g.turnPlayerIndex, Centis(2000))
-                  .giveTime(!g.turnPlayerIndex, Centis(1000))
+      proxy
+        .withGame { g =>
+          g.playable so {
+            proxy saveAndFlush {
+              g.clock.fold(Progress(g)) { clock =>
+                g.withClock {
+                  clock
+                    .giveTime(g.turnPlayerIndex, Centis(2000))
+                    .giveTime(!g.turnPlayerIndex, Centis(1000))
+                }
               }
             }
           }
         }
-      } `tap` promise.completeWith
+        .tap(promise.completeWith)
 
     case WsBoot =>
       handle { game =>
         game.playable so {
           messenger.system(game, "PlayStrategy has been updated! Sorry for the inconvenience.")
           val progress = moretimer.give(game, PlayerIndex.all, 20 seconds)
-          proxy `save` progress inject progress.events
+          proxy.save(progress) inject progress.events
         }
       }
 
@@ -469,15 +473,16 @@ final private[round] class RoundDuct(
 
     case BotConnected(playerIndex, v) =>
       fuccess {
-        getPlayer(playerIndex) `setBotConnected` v
+        getPlayer(playerIndex).setBotConnected(v)
       }
 
     case NoStart =>
       handle { game =>
         game.timeBeforeExpirationAtStart.exists(_.centis == 0) so {
-          if (game.isSwiss) game.startClock so { g =>
-            proxy `save` g inject List(Event.Reload)
-          }
+          if game.isSwiss then
+            game.startClock so { g =>
+              proxy.save(g) inject List(Event.Reload)
+            }
           else finisher.noStart(game)
         }
       }
@@ -485,24 +490,21 @@ final private[round] class RoundDuct(
     case ForceExpiredAction =>
       handle { game =>
         game.timeBeforeExpirationOnPaused.exists(_.centis == 0) so {
-          if (game.selectSquaresPossible) {
+          if game.selectSquaresPossible then {
             val pov = Pov(game, game.activePlayerIndex)
-            if (game.neitherPlayerHasMadeAnOffer)
-              selectSquarer.selectSquares(List[Pos]())(pov)
-            else
-              selectSquarer.accept(pov)
-          }
-          else fuccess(List[Event]())
+            if game.neitherPlayerHasMadeAnOffer then selectSquarer.selectSquares(List[Pos]())(pov)
+            else selectSquarer.accept(pov)
+          } else fuccess(List[Event]())
         }
       } >> proxy.withGame { g =>
-        if (g.selectSquaresPossible) fuccess(scheduleActionExpiration(g))
+        if g.selectSquaresPossible then fuccess(scheduleActionExpiration(g))
         else funit
       }
 
     case StartClock =>
       handle { game =>
         game.startClock so { g =>
-          proxy `save` g inject List(Event.Reload)
+          proxy.save(g) inject List(Event.Reload)
         }
       }
 
@@ -515,10 +517,10 @@ final private[round] class RoundDuct(
       proxy.withGameOptionSync { g =>
         (g.forceResignableNow) so fuccess {
           PlayerIndex.all.foreach { c =>
-            if (!getPlayer(c).isOnline && getPlayer(!c).isOnline)
+            if !getPlayer(c).isOnline && getPlayer(!c).isOnline then
               getPlayer(c).showMillisToGone foreach {
                 _ so { millis =>
-                  if (millis <= 0) notifyGone(c, gone = true)
+                  if millis <= 0 then notifyGone(c, gone = true)
                   else g.clock.exists(_.remainingTime(c).millis > millis + 3000) so notifyGoneIn(c, millis)
                 }
               }
@@ -532,7 +534,7 @@ final private[round] class RoundDuct(
   private def getPlayer(playerIndex: PlayerIndex): Player = playerIndex.fold(p1Player, p2Player)
 
   private def recordLag(pov: Pov): Unit =
-    if (((pov.game.playedTurns & 30) == 10) && pov.game.actionStrs.lastOption.map(_.size) == Some(1))
+    if ((pov.game.playedTurns & 30) == 10) && pov.game.actionStrs.lastOption.map(_.size) == Some(1) then
       // Triggers on the first action of every 32 turns, starting on turn 10.
       // i.e. if single action per turn, then this triggers on ply: 10, 11, 42, 43, 74, 75, ...
       for {
@@ -573,7 +575,7 @@ final private[round] class RoundDuct(
     }
 
   private def handleAndPublish(events: Fu[Events]): Funit =
-    events `dmap` publish recover errorHandler("handle")
+    events.dmap(publish) recover errorHandler("handle")
 
   private def handleAi(op: Pov => Fu[Events]): Funit =
     proxy.withGame {
@@ -583,19 +585,18 @@ final private[round] class RoundDuct(
     }
 
   private def publish[A](events: Events): Unit =
-    if (events.nonEmpty) {
+    if events.nonEmpty then {
       events foreach { e =>
         version = version.inc
         socketSend {
           Protocol.Out.tellVersion(roomId, version, e)
         }
       }
-      if (
-        events exists {
+      if events exists {
           case e: Event.Move => e.threefold
           case _             => false
         }
-      ) this ! Threefold
+      then this ! Threefold
     }
 
   private def errorHandler(name: String): PartialFunction[Throwable, Unit] = {
@@ -631,7 +632,7 @@ object RoundDuct {
 
     def delaySeconds = (math.pow(nbDeclined min 10, 2) * 10).toInt
 
-    def offerable = lastDeclined.fold(true) { _ `isBefore` DateTime.now.minusSeconds(delaySeconds) }
+    def offerable = lastDeclined.fold(true) { _.isBefore(DateTime.now.minusSeconds(delaySeconds)) }
 
     def reset = takebackSituationZero.zero
   }

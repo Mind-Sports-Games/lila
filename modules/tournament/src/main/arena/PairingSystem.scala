@@ -17,7 +17,7 @@ final private[tournament] class PairingSystem(
     idGenerator: lila.game.IdGenerator
 ) {
 
-  import PairingSystem._
+  import PairingSystem.*
   import lila.tournament.Tournament.tournamentUrl
 
   private val minPlayersForNoBots = 4
@@ -55,14 +55,12 @@ final private[tournament] class PairingSystem(
       users: WaitingUsers,
       activePlayers: Int
   ): Fu[Pairing.LastOpponents] =
-    //this check enables pairing to happen with a bot when we have low numbers
-    if (
-      activePlayers <= 2 &&
+    // this check enables pairing to happen with a bot when we have low numbers
+    if activePlayers <= 2 &&
       users.size % 2 == 1 &&
       users.size < minPlayersForNoBots &&
       (!tour.botsAllowed || activePlayers % 2 == 1)
-    )
-      fuccess(Pairing.LastOpponents.empty)
+    then fuccess(Pairing.LastOpponents.empty)
     else pairingRepo.lastOpponents(tour.id, users.all, users.size * 4)
 
   private def readyToRunPreps(
@@ -73,14 +71,16 @@ final private[tournament] class PairingSystem(
     lastOpponents.hash.isEmpty || users.haveWaitedEnough(Math.min(2, activePlayers))
 
   private def isBotAvailable(tourId: Tournament.ID)(botId: User.ID): Fu[Option[User.ID]] =
-    pairingRepo.isPlaying(tourId, botId).map(isPlaying => if (isPlaying) None else Some(botId)).recover { case _ => None }
+    pairingRepo.isPlaying(tourId, botId).map(isPlaying => if isPlaying then None else Some(botId)).recover {
+      case _ => None
+    }
 
   private def availableBots(tourId: Tournament.ID)(joinedBots: List[Player]): Fu[Set[User.ID]] =
     Future
       .traverse(
-        //headOption used as we've only ever tested with one bot
-        //in a tournament at any one time and would want to work
-        //out some sytem for cycling through bots
+        // headOption used as we've only ever tested with one bot
+        // in a tournament at any one time and would want to work
+        // out some sytem for cycling through bots
         joinedBots.filterNot(_.withdraw).map(_.userId).headOption.toList
       )(
         isBotAvailable(tourId)
@@ -88,7 +88,7 @@ final private[tournament] class PairingSystem(
       .map(_.flatten.toSet)
 
   private def botsToAdd(tour: Tournament, activePlayers: Int): Fu[Set[User.ID]] =
-    if (tour.botsAllowed && activePlayers < minPlayersForNoBots && activePlayers % 2 == 1)
+    if tour.botsAllowed && activePlayers < minPlayersForNoBots && activePlayers % 2 == 1 then
       playerRepo
         .byTourAndUserIds(tour.id, LightUser.tourBotsIDs)
         .flatMap { availableBots(tour.id) }
@@ -103,19 +103,18 @@ final private[tournament] class PairingSystem(
   private val maxGroupSize = 100
 
   private def makePreps(data: Data, users: Set[User.ID]): Fu[List[Pairing.Prep]] = {
-    import data._
-    if (users.sizeIs < 2) fuccess(Nil)
+    import data.*
+    if users.sizeIs < 2 then fuccess(Nil)
     else
       playerRepo.rankedByTourAndUserIds(tour.id, users, ranking) map { idles =>
         val nbIdles = idles.size
-        if (data.tour.isRecentlyStarted && !data.tour.isTeamBattle) proximityPairings(tour, idles)
-        else if (nbIdles > maxGroupSize) {
+        if data.tour.isRecentlyStarted && !data.tour.isTeamBattle then proximityPairings(tour, idles)
+        else if nbIdles > maxGroupSize then {
           // make sure groupSize is even with / 4 * 2
-          val groupSize = (nbIdles / 4 * 2) `atMost` maxGroupSize
+          val groupSize = (nbIdles / 4 * 2).atMost(maxGroupSize)
           bestPairings(data, idles take groupSize) :::
             bestPairings(data, idles.slice(groupSize, groupSize + groupSize))
-        }
-        else if (nbIdles > 1) bestPairings(data, idles)
+        } else if nbIdles > 1 then bestPairings(data, idles)
         else Nil
       }
   }.monSuccess(_.tournament.pairing.prep)
@@ -128,7 +127,7 @@ final private[tournament] class PairingSystem(
   private def prepsToPairings(preps: List[Pairing.Prep]): Fu[List[Pairing]] =
     idGenerator.games(preps.size) map { ids =>
       preps.zip(ids).map { case (prep, id) =>
-        //playerIndex was chosen in prepWithPlayerIndex function
+        // playerIndex was chosen in prepWithPlayerIndex function
         prep.toPairing(id)
       }
     }
@@ -142,7 +141,7 @@ final private[tournament] class PairingSystem(
     (players.sizeIs > 1) so AntmaPairing(data, addPlayerIndexHistory(players))
 
   private def addPlayerIndexHistory(players: RankedPlayers) =
-    players.map(_ `withPlayerIndexHistory` playerIndexHistoryApi.get)
+    players.map(_.withPlayerIndexHistory(playerIndexHistoryApi.get))
 }
 
 private object PairingSystem {

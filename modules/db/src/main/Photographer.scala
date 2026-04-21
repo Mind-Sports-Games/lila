@@ -9,8 +9,7 @@ final class Photographer(repo: ImageRepo, prefix: String) {
   private def pictureId(id: String) = s"$prefix:$id:picture"
 
   def apply(id: String, uploaded: Photographer.Uploaded, createdBy: String): Fu[DbImage] =
-    if (uploaded.fileSize > uploadMaxBytes)
-      fufail(s"File size must not exceed ${uploadMaxMb}MB.")
+    if uploaded.fileSize > uploadMaxBytes then fufail(s"File size must not exceed ${uploadMaxMb}MB.")
     else {
 
       process(uploaded.ref.path)
@@ -29,7 +28,7 @@ final class Photographer(repo: ImageRepo, prefix: String) {
 
   private def process(path: Path) = {
 
-    import com.sksamuel.scrimage._
+    import com.sksamuel.scrimage.*
 
     ImmutableImage.loader().fromPath(path).cover(500, 500).output(new nio.JpegWriter(), path)
   }

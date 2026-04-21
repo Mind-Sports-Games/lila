@@ -21,7 +21,7 @@ case class RelayGame(
 
   lazy val looksLikePlayStrategy = tags(_.Site) exists { site =>
     RelayGame.playstrategyDomains exists { domain =>
-      site `startsWith` s"https://$domain/"
+      site.startsWith(s"https://$domain/")
     }
   }
 }

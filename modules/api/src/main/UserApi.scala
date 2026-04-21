@@ -1,8 +1,8 @@
 package lila.api
 
-import play.api.libs.json._
+import play.api.libs.json.*
 
-import lila.common.config._
+import lila.common.config.*
 import lila.common.paginator.{ Paginator, PaginatorJson }
 import lila.user.User
 
@@ -21,25 +21,26 @@ final private[api] class UserApi(
 )(implicit ec: scala.concurrent.ExecutionContext) {
 
   def pagerJson(pag: Paginator[User]): JsObject =
-    Json.obj("paginator" -> PaginatorJson(pag `mapResults` one))
+    Json.obj("paginator" -> PaginatorJson(pag.mapResults(one)))
 
   def one(u: User): JsObject =
     addPlayingStreaming(jsonView(u), u.id) ++
       Json.obj("url" -> makeUrl(s"@/${u.username}")) // for app BC
 
   def extended(username: String, as: Option[User]): Fu[Option[JsObject]] =
-    userRepo `named` username flatMap {
-      _ so { extended(_, as) `dmap` some }
+    userRepo.named(username) flatMap {
+      _ so { extended(_, as).dmap(some) }
     }
 
   def extended(u: User, as: Option[User]): Fu[JsObject] =
-    if (u.disabled) fuccess {
-      Json.obj(
-        "id"       -> u.id,
-        "username" -> u.username,
-        "closed"   -> true
-      )
-    }
+    if u.disabled then
+      fuccess {
+        Json.obj(
+          "id"       -> u.id,
+          "username" -> u.username,
+          "closed"   -> true
+        )
+      }
     else
       gameProxyRepo.urgentGames(u).dmap(_.headOption) zip
         (as.filter(u !=) so { me =>
@@ -47,7 +48,7 @@ final private[api] class UserApi(
         }) zip
         relationApi.countFollowing(u.id) zip
         relationApi.countFollowers(u.id) zip
-        as.isDefined.so { prefApi `followable` u.id } zip
+        as.isDefined.so { prefApi.followable(u.id) } zip
         as.map(_.id).so { relationApi.fetchRelation(_, u.id) } zip
         as.map(_.id).so { relationApi.fetchFollows(u.id, _) } zip
         bookmarkApi.countByUser(u) zip
@@ -62,41 +63,41 @@ final private[api] class UserApi(
             case ((((((((((gameOption,nbGamesWithMe),following),followers),followable),
               relation),isFollowed),nbBookmarks),nbPlaying),nbImported),completionRate)=>
             // format: on
-              jsonView(u) ++ {
-                Json
-                  .obj(
-                    "url"            -> makeUrl(s"@/${u.username}"), // for app BC
-                    "playing"        -> gameOption.map(g => makeUrl(s"${g.gameId}/${g.playerIndex.name}")),
-                    "nbFollowing"    -> following,
-                    "nbFollowers"    -> followers,
-                    "completionRate" -> completionRate,
-                    "count" -> Json.obj(
-                      "all"      -> u.count.game,
-                      "rated"    -> u.count.rated,
-                      "ai"       -> u.count.ai,
-                      "draw"     -> u.count.draw,
-                      "drawH"    -> u.count.drawH,
-                      "loss"     -> u.count.loss,
-                      "lossH"    -> u.count.lossH,
-                      "win"      -> u.count.win,
-                      "winH"     -> u.count.winH,
-                      "bookmark" -> nbBookmarks,
-                      "playing"  -> nbPlaying,
-                      "import"   -> nbImported,
-                      "me"       -> nbGamesWithMe
-                    )
+            jsonView(u) ++ {
+              Json
+                .obj(
+                  "url"            -> makeUrl(s"@/${u.username}"), // for app BC
+                  "playing"        -> gameOption.map(g => makeUrl(s"${g.gameId}/${g.playerIndex.name}")),
+                  "nbFollowing"    -> following,
+                  "nbFollowers"    -> followers,
+                  "completionRate" -> completionRate,
+                  "count"          -> Json.obj(
+                    "all"      -> u.count.game,
+                    "rated"    -> u.count.rated,
+                    "ai"       -> u.count.ai,
+                    "draw"     -> u.count.draw,
+                    "drawH"    -> u.count.drawH,
+                    "loss"     -> u.count.loss,
+                    "lossH"    -> u.count.lossH,
+                    "win"      -> u.count.win,
+                    "winH"     -> u.count.winH,
+                    "bookmark" -> nbBookmarks,
+                    "playing"  -> nbPlaying,
+                    "import"   -> nbImported,
+                    "me"       -> nbGamesWithMe
                   )
-                  .add("streaming", liveStreamApi.isStreaming(u.id)) ++
-                  as.isDefined.so(
-                    Json.obj(
-                      "followable" -> followable,
-                      "following"  -> relation.has(true),
-                      "blocking"   -> relation.has(false),
-                      "followsYou" -> isFollowed
-                    )
+                )
+                .add("streaming", liveStreamApi.isStreaming(u.id)) ++
+                as.isDefined.so(
+                  Json.obj(
+                    "followable" -> followable,
+                    "following"  -> relation.has(true),
+                    "blocking"   -> relation.has(false),
+                    "followsYou" -> isFollowed
                   )
-              }.noNull
-          }
+                )
+            }.noNull
+        }
 
   private def addPlayingStreaming(js: JsObject, id: User.ID) =
     js.add("streaming", liveStreamApi.isStreaming(id))

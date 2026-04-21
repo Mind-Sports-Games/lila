@@ -1,6 +1,5 @@
 package lila.pref
-import strategygames.{ GameFamily }
-
+import strategygames.GameFamily
 
 sealed class PieceSet private[pref] (val name: String, val gameFamily: Int) {
 
@@ -30,7 +29,6 @@ sealed trait PieceSetObject {
   def contains(name: String) = allByName contains name
 }
 
-
 object PieceSet extends PieceSetObject {
   val default = new PieceSet("cburnett", 0)
 
@@ -48,17 +46,15 @@ object PieceSet extends PieceSetObject {
 
   def addMissingDefaultsIfAny(currentPieceSets: List[PieceSet]): List[PieceSet] =
     defaults.map { x =>
-      if (currentPieceSets.filter(ps => ps.gameFamily == x.gameFamily).size == 1)
+      if currentPieceSets.filter(ps => ps.gameFamily == x.gameFamily).size == 1 then
         currentPieceSets.filter(ps => ps.gameFamily == x.gameFamily)(0)
-      else
-        x
+      else x
     }
   val all: List[PieceSet] =
     GameFamily.all.map(gf => gf.pieceSetThemes.map(t => new PieceSet(t, gf.id))).flatten
 
   def allOfFamily(gf: GameFamily): List[PieceSet] = gf.pieceSetThemes.map(t => new PieceSet(t, gf.id))
 }
-
 
 object PieceSet3d extends PieceSetObject {
 

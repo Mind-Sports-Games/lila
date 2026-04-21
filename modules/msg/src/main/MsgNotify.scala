@@ -3,7 +3,7 @@ package lila.msg
 import akka.actor.Cancellable
 import java.util.concurrent.ConcurrentHashMap
 
-import lila.db.dsl._
+import lila.db.dsl.*
 import lila.notify.{ Notification, PrivateMessage }
 import lila.common.String.shorten
 import lila.user.User
@@ -16,7 +16,7 @@ final private class MsgNotify(
     scheduler: akka.actor.Scheduler
 ) {
 
-  import BsonHandlers._
+  import BsonHandlers.*
 
   private val delay = 5 seconds
 
@@ -37,16 +37,19 @@ final private class MsgNotify(
         .void
 
   def deleteAllBy(threads: List[MsgThread], user: User): Funit =
-    Future.sequence(threads
-      .map { thread =>
-        cancel(thread.id)
-        notifyApi
-          .remove(
-            lila.notify.Notification.Notifies(thread `other` user),
-            $doc("content.user" -> user.id)
-          )
-          .void
-      })
+    Future
+      .sequence(
+        threads
+          .map { thread =>
+            cancel(thread.id)
+            notifyApi
+              .remove(
+                lila.notify.Notification.Notifies(thread.other(user)),
+                $doc("content.user" -> user.id)
+              )
+              .void
+          }
+      )
       .void
 
   private def schedule(threadId: MsgThread.Id): Unit = {
@@ -56,7 +59,7 @@ final private class MsgNotify(
         (id, canc) => {
           Option(canc).foreach(_.cancel())
           scheduler.scheduleOnce(delay) {
-            delayed `remove` id
+            delayed.remove(id)
             doNotify(threadId).discard
           }
         }
@@ -64,20 +67,22 @@ final private class MsgNotify(
   }
 
   private def cancel(threadId: MsgThread.Id): Boolean =
-    Option(delayed `remove` threadId).map(_.cancel()).isDefined
+    Option(delayed.remove(threadId)).map(_.cancel()).isDefined
 
   private def doNotify(threadId: MsgThread.Id): Funit =
     colls.thread.byId[MsgThread](threadId.value) flatMap {
       _ so { thread =>
         val msg  = thread.lastMsg
-        val dest = thread `other` msg.user
-        !thread.delBy(dest) so {
+        val dest = thread.other(msg.user)
+        (!thread.delBy(dest)).so {
           lila.common.Bus.publish(MsgThread.Unread(thread), "msgUnread")
-          notifyApi `addNotification` Notification.make(
-            Notification.Notifies(dest),
-            PrivateMessage(
-              PrivateMessage.Sender(msg.user),
-              PrivateMessage.Text(shorten(msg.text, 80))
+          notifyApi.addNotification(
+            Notification.make(
+              Notification.Notifies(dest),
+              PrivateMessage(
+                PrivateMessage.Sender(msg.user),
+                PrivateMessage.Text(shorten(msg.text, 80))
+              )
             )
           )
         }

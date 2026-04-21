@@ -1,10 +1,9 @@
 package views.html.game
 
 import lila.api.Context
-import lila.app.templating.Environment._
-import lila.app.ui.ScalatagsTemplate._
+import lila.app.templating.Environment.*
+import lila.app.ui.ScalatagsTemplate.*
 import lila.game.Crosstable
-
 
 object crosstable {
 
@@ -14,12 +13,12 @@ object crosstable {
   def apply(ct: Crosstable, trueMatchup: Option[Crosstable.Matchup], currentId: Option[String])(implicit
       ctx: Context
   ): Frag = {
-    val matchup = trueMatchup.filter(_.users != ct.users)
+    val matchup                   = trueMatchup.filter(_.users != ct.users)
     val matchupSepAt: Option[Int] = matchup map { m =>
       (ct.nbGames min Crosstable.maxGames) - m.users.nbGames
     }
     div(cls := "crosstable")(
-      ct.fillSize > 0 `option` raw { s"""<fill style="flex:${ct.fillSize * 0.75} 1 auto"></fill>""" },
+      (ct.fillSize > 0).option(raw { s"""<fill style="flex:${ct.fillSize * 0.75} 1 auto"></fill>""" }),
       ct.results.zipWithIndex.map { case (r, i) =>
         tag("povs")(
           cls := List(
@@ -37,14 +36,14 @@ object crosstable {
       },
       matchup map { m =>
         div(cls := "crosstable__matchup", title := trans.currentMatchScore.txt())(ct.users.toList.map { u =>
-          span(cls := m.users.winnerId.map(w => if (w == u.id) "win" else "loss"))(m.users.showScore(u.id))
+          span(cls := m.users.winnerId.map(w => if w == u.id then "win" else "loss"))(m.users.showScore(u.id))
         })
       },
       div(cls := "crosstable__users")(ct.users.toList.map { u =>
         userIdLink(u.id.some, withOnline = false)
       }),
       div(cls := "crosstable__score", title := trans.lifetimeScore.txt())(ct.users.toList.map { u =>
-        span(cls := ct.users.winnerId.map(w => if (w == u.id) "win" else "loss"))(ct.showScore(u.id))
+        span(cls := ct.users.winnerId.map(w => if w == u.id then "win" else "loss"))(ct.showScore(u.id))
       })
     )
   }

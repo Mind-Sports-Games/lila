@@ -2,16 +2,16 @@ package lila.study
 
 import strategygames.format.pgn.{ Glyph, Glyphs }
 import strategygames.format.{ FEN, Uci }
-import strategygames.format.{ UciCharPair }
+import strategygames.format.UciCharPair
 import strategygames.variant.Variant
-import strategygames.{ Centis, Player => PlayerIndex, PocketData }
+import strategygames.{ Centis, Player as PlayerIndex, PocketData }
 
 import lila.tree.Eval.Score
 import lila.tree.Node.{ Comment, Comments, Gamebook, Shapes }
 
 sealed trait RootOrNode {
   val ply: Int
-  //Will need to think what is stored here. Presumably turnCount is of the actual node (ply) and not the turnCount after this ply has been applied?
+  // Will need to think what is stored here. Presumably turnCount is of the actual node (ply) and not the turnCount after this ply has been applied?
   val turnCount: Int
   val playedPlayerIndex: PlayerIndex
   val variant: Variant
@@ -26,7 +26,7 @@ sealed trait RootOrNode {
   val glyphs: Glyphs
   val score: Option[Score]
   def addChild(node: Node): RootOrNode
-  def fullTurnCount = 1 + (turnCount - (if (playedPlayerIndex == playerIndex) 0 else 1)) / 2
+  def fullTurnCount = 1 + (turnCount - (if playedPlayerIndex == playerIndex then 0 else 1)) / 2
   def mainline: Vector[Node]
   def playerIndex = fen.player.getOrElse(PlayerIndex.P1)
   def moveOption: Option[Uci.WithSan]
@@ -61,28 +61,28 @@ case class Node(
 
   def withoutChildren = copy(children = Node.emptyChildren)
 
-  def addChild(child: Node) = copy(children = children `addNode` child)
+  def addChild(child: Node) = copy(children = children.addNode(child))
 
   def withClock(centis: Option[Centis])  = copy(clock = centis)
   def withForceVariation(force: Boolean) = copy(forceVariation = force)
 
   def isCommented = comments.value.nonEmpty
 
-  def setComment(comment: Comment)         = copy(comments = comments `set` comment)
-  def deleteComment(commentId: Comment.Id) = copy(comments = comments `delete` commentId)
+  def setComment(comment: Comment)         = copy(comments = comments.set(comment))
+  def deleteComment(commentId: Comment.Id) = copy(comments = comments.delete(commentId))
   def deleteComments                       = copy(comments = Comments.empty)
 
   def setGamebook(gamebook: Gamebook) = copy(gamebook = gamebook.some)
 
   def setShapes(s: Shapes) = copy(shapes = s)
 
-  def toggleGlyph(glyph: Glyph) = copy(glyphs = glyphs `toggle` glyph)
+  def toggleGlyph(glyph: Glyph) = copy(glyphs = glyphs.toggle(glyph))
 
   def mainline: Vector[Node] = this +: children.first.so(_.mainline)
 
   def updateMainlineLast(f: Node => Node): Node =
     children.first.fold(f(this)) { main =>
-      copy(children = children.update(main `updateMainlineLast` f))
+      copy(children = children.update(main.updateMainlineLast(f)))
     }
 
   def clearAnnotations =
@@ -98,12 +98,12 @@ case class Node(
       shapes = shapes ++ n.shapes,
       comments = comments ++ n.comments,
       gamebook = n.gamebook orElse gamebook,
-      glyphs = glyphs `merge` n.glyphs,
+      glyphs = glyphs.merge(n.glyphs),
       score = n.score orElse score,
       clock = n.clock orElse clock,
       pocketData = n.pocketData orElse pocketData,
       children = n.children.nodes.foldLeft(children) { case (cs, c) =>
-        cs `addNode` c
+        cs.addNode(c)
       },
       forceVariation = n.forceVariation || forceVariation
     )
@@ -125,7 +125,7 @@ object Node {
     def nodeAt(path: Path): Option[Node] =
       path.split flatMap {
         case (head, tail) if tail.isEmpty => get(head)
-        case (head, tail)                 => get(head) flatMap (_.children `nodeAt` tail)
+        case (head, tail)                 => get(head) flatMap (_.children.nodeAt(tail))
       }
 
     // select all nodes on that path
@@ -133,7 +133,7 @@ object Node {
       path.split so { case (head, tail) =>
         get(head) so { first =>
           (first, Path(Vector(head))) +: first.children.nodesOn(tail).map { case (n, p) =>
-            (n, p `prepend` head)
+            (n, p.prepend(head))
           }
         }
       }
@@ -153,12 +153,12 @@ object Node {
       path.split flatMap {
         case (head, Path(Vector())) if has(head) => Children(nodes.filterNot(_.id == head)).some
         case (_, Path(Vector()))                 => none
-        case (head, tail)                   => updateChildren(head, _.deleteNodeAt(tail))
+        case (head, tail)                        => updateChildren(head, _.deleteNodeAt(tail))
       }
 
     def promoteToMainlineAt(path: Path): Option[Children] =
       path.split match {
-        case None => this.some
+        case None               => this.some
         case Some((head, tail)) =>
           get(head).flatMap { node =>
             node.withChildren(_.promoteToMainlineAt(tail)).map { promoted =>
@@ -169,23 +169,23 @@ object Node {
 
     def promoteUpAt(path: Path): Option[(Children, Boolean)] =
       path.split match {
-        case None => Some(this -> false)
+        case None               => Some(this -> false)
         case Some((head, tail)) =>
           for {
             node                  <- get(head)
             mainlineNode          <- nodes.headOption
-            (newChildren, isDone) <- node.children `promoteUpAt` tail
+            (newChildren, isDone) <- node.children.promoteUpAt(tail)
             newNode = node.copy(children = newChildren)
           } yield
-            if (isDone) update(newNode) -> true
-            else if (newNode.id == mainlineNode.id) update(newNode) -> false
-            else Children(newNode +: nodes.filterNot(newNode ==))   -> true
+            if isDone then update(newNode) -> true
+            else if newNode.id == mainlineNode.id then update(newNode) -> false
+            else Children(newNode +: nodes.filterNot(newNode ==))      -> true
       }
 
     def updateAt(path: Path, f: Node => Node): Option[Children] =
       path.split flatMap {
         case (head, Path(Vector())) => updateWith(head, n => Some(f(n)))
-        case (head, tail)      => updateChildren(head, _.updateAt(tail, f))
+        case (head, tail)           => updateChildren(head, _.updateAt(tail, f))
       }
 
     def get(id: UciCharPair): Option[Node] = nodes.find(_.id == id)
@@ -208,7 +208,7 @@ object Node {
       get(id).flatMap(op).map(update)
 
     def updateChildren(id: UciCharPair, f: Children => Option[Children]): Option[Children] =
-      updateWith(id, _ `withChildren` f)
+      updateWith(id, _.withChildren(f))
 
     def update(child: Node): Children =
       Children(nodes.map {
@@ -262,47 +262,47 @@ object Node {
 
     def withoutChildren = copy(children = Node.emptyChildren)
 
-    def addChild(child: Node) = copy(children = children `addNode` child)
+    def addChild(child: Node) = copy(children = children.addNode(child))
 
     def nodeAt(path: Path): Option[RootOrNode] =
-      if (path.isEmpty) this.some else children `nodeAt` path
+      if path.isEmpty then this.some else children.nodeAt(path)
 
     def pathExists(path: Path): Boolean = nodeAt(path).isDefined
 
     def setShapesAt(shapes: Shapes, path: Path): Option[Root] =
-      if (path.isEmpty) copy(shapes = shapes).some
-      else updateChildrenAt(path, _ `setShapes` shapes)
+      if path.isEmpty then copy(shapes = shapes).some
+      else updateChildrenAt(path, _.setShapes(shapes))
 
     def setCommentAt(comment: Comment, path: Path): Option[Root] =
-      if (path.isEmpty) copy(comments = comments `set` comment).some
-      else updateChildrenAt(path, _ `setComment` comment)
+      if path.isEmpty then copy(comments = comments.set(comment)).some
+      else updateChildrenAt(path, _.setComment(comment))
 
     def deleteCommentAt(commentId: Comment.Id, path: Path): Option[Root] =
-      if (path.isEmpty) copy(comments = comments `delete` commentId).some
-      else updateChildrenAt(path, _ `deleteComment` commentId)
+      if path.isEmpty then copy(comments = comments.delete(commentId)).some
+      else updateChildrenAt(path, _.deleteComment(commentId))
 
     def setGamebookAt(gamebook: Gamebook, path: Path): Option[Root] =
-      if (path.isEmpty) copy(gamebook = gamebook.some).some
-      else updateChildrenAt(path, _ `setGamebook` gamebook)
+      if path.isEmpty then copy(gamebook = gamebook.some).some
+      else updateChildrenAt(path, _.setGamebook(gamebook))
 
     def toggleGlyphAt(glyph: Glyph, path: Path): Option[Root] =
-      if (path.isEmpty) copy(glyphs = glyphs `toggle` glyph).some
-      else updateChildrenAt(path, _ `toggleGlyph` glyph)
+      if path.isEmpty then copy(glyphs = glyphs.toggle(glyph)).some
+      else updateChildrenAt(path, _.toggleGlyph(glyph))
 
     def setClockAt(clock: Option[Centis], path: Path): Option[Root] =
-      if (path.isEmpty) copy(clock = clock).some
-      else updateChildrenAt(path, _ `withClock` clock)
+      if path.isEmpty then copy(clock = clock).some
+      else updateChildrenAt(path, _.withClock(clock))
 
     def forceVariationAt(force: Boolean, path: Path): Option[Root] =
-      if (path.isEmpty) copy(clock = clock).some
-      else updateChildrenAt(path, _ `withForceVariation` force)
+      if path.isEmpty then copy(clock = clock).some
+      else updateChildrenAt(path, _.withForceVariation(force))
 
     private def updateChildrenAt(path: Path, f: Node => Node): Option[Root] =
       withChildren(_.updateAt(path, f))
 
     def updateMainlineLast(f: Node => Node): Root =
       children.first.fold(this) { main =>
-        copy(children = children.update(main `updateMainlineLast` f))
+        copy(children = children.update(main.updateMainlineLast(f)))
       }
 
     lazy val mainline: Vector[Node] = children.first.so(_.mainline)
@@ -342,7 +342,7 @@ object Node {
         fen = variant.initialFen,
         check = false,
         clock = none,
-        pocketData = variant.dropsVariant `option` PocketData.init(variant.gameLogic),
+        pocketData = variant.dropsVariant.option(PocketData.init(variant.gameLogic)),
         children = emptyChildren
       )
 
@@ -380,8 +380,8 @@ object Node {
     val ply               = "p"
     val turnCount         = "t"
     val playedPlayerIndex = "ppi"
-    //no longer used (was plysPerTurn)
-    //val ppt            = "pt"
+    // no longer used (was plysPerTurn)
+    // val ppt            = "pt"
     val variant        = "v"
     val uci            = "u"
     val san            = "s"

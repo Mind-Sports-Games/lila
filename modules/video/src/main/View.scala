@@ -30,18 +30,18 @@ object View {
     val date    = "d"
   }
 
-  import reactivemongo.api.bson._
+  import reactivemongo.api.bson.*
   import lila.db.BSON
   import BSON.BSONJodaDateTimeHandler
   implicit val viewBSONHandler: BSON[View] = new BSON[View] {
 
-    import BSONFields._
+    import BSONFields.*
 
     def reads(r: BSON.Reader): View =
       View(
-        id = r `str` id,
-        videoId = r `str` videoId,
-        userId = r `str` userId,
+        id = r.str(id),
+        videoId = r.str(videoId),
+        userId = r.str(userId),
         date = r.get[DateTime](date)
       )
 

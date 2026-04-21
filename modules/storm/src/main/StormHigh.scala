@@ -2,17 +2,17 @@ package lila.storm
 
 import scala.concurrent.ExecutionContext
 
-import lila.db.dsl._
+import lila.db.dsl.*
 import lila.memo.CacheApi
 import lila.user.User
 
 case class StormHigh(day: Int, week: Int, month: Int, allTime: Int) {
 
   def update(score: Int) = copy(
-    day = day `atLeast` score,
-    week = week `atLeast` score,
-    month = month `atLeast` score,
-    allTime = allTime `atLeast` score
+    day = day.atLeast(score),
+    week = week.atLeast(score),
+    month = month.atLeast(score),
+    allTime = allTime.atLeast(score)
   )
 }
 
@@ -32,19 +32,19 @@ object StormHigh {
 
 final class StormHighApi(coll: Coll, cacheApi: CacheApi)(implicit ctx: ExecutionContext) {
 
-  import StormBsonHandlers._
+  import StormBsonHandlers.*
   import StormHigh.NewHigh
 
   def get(userId: User.ID): Fu[StormHigh] = cache get userId
 
   def update(userId: User.ID, prev: StormHigh, score: Int): Option[NewHigh] = {
-    val high = prev `update` score
+    val high = prev.update(score)
     (high != prev) so {
       cache.put(userId, fuccess(high))
-      import NewHigh._
-      if (high.allTime > prev.allTime) AllTime(prev.allTime).some
-      else if (high.month > prev.month) Month(prev.month).some
-      else if (high.week > prev.week) Week(prev.week).some
+      import NewHigh.*
+      if high.allTime > prev.allTime then AllTime(prev.allTime).some
+      else if high.month > prev.month then Month(prev.month).some
+      else if high.week > prev.week then Week(prev.week).some
       else Day(prev.day).some
     }
   }
@@ -56,7 +56,7 @@ final class StormHighApi(coll: Coll, cacheApi: CacheApi)(implicit ctx: Execution
   private def compute(userId: User.ID): Fu[StormHigh] =
     coll
       .aggregateWith[Bdoc]() { framework =>
-        import framework._
+        import framework.*
         def matchSince(sinceId: User.ID => StormDay.Id) = Match($doc("_id" `$gte` sinceId(userId)))
         val scoreSort                                   = Sort(Descending("score"))
         List(

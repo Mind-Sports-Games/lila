@@ -4,8 +4,8 @@ package tournament
 import play.api.data.Form
 
 import lila.api.Context
-import lila.app.templating.Environment._
-import lila.app.ui.ScalatagsTemplate._
+import lila.app.templating.Environment.*
+import lila.app.ui.ScalatagsTemplate.*
 import lila.common.paginator.Paginator
 import lila.tournament.crud.CrudForm
 import lila.tournament.{ Tournament, TournamentForm }
@@ -55,7 +55,7 @@ object crud {
             span("Created by ", usernameOrId(tour.createdBy), " on ", showDate(tour.createdAt))
           ),
           st.form(
-            cls := "box__top__actions",
+            cls    := "box__top__actions",
             action := routes.TournamentCrud.cloneT(tour.id),
             method := "get"
           )(

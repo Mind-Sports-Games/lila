@@ -1,11 +1,11 @@
 package lila.tournament
 
-import akka.stream.scaladsl._
+import akka.stream.scaladsl.*
 import reactivemongo.akkastream.cursorProducer
-import reactivemongo.api._
-import reactivemongo.api.bson._
+import reactivemongo.api.*
+import reactivemongo.api.bson.*
 
-import lila.db.dsl._
+import lila.db.dsl.*
 
 final private class LeaderboardIndexer(
     tournamentRepo: TournamentRepo,
@@ -17,14 +17,14 @@ final private class LeaderboardIndexer(
     mat: akka.stream.Materializer
 ) {
 
-  import LeaderboardApi._
-  import BSONHandlers._
+  import LeaderboardApi.*
+  import BSONHandlers.*
 
   def generateAll: Funit =
     leaderboardRepo.coll.delete.one($empty) >>
       tournamentRepo.coll
         .find(tournamentRepo.finishedSelect)
-        .sort($sort `desc` "startsAt")
+        .sort($sort.desc("startsAt"))
         .cursor[Tournament](ReadPreference.secondaryPreferred)
         .documentSource()
         .via(lila.common.LilaStream.logRate[Tournament]("leaderboard index tour")(logger))
@@ -51,9 +51,9 @@ final private class LeaderboardIndexer(
   private def metaPointsFromRank(category: Option[Schedule.Freq], rank: Int): Option[Int] =
     category match {
       case Some(c) if c == Schedule.Freq.Shield || c == Schedule.Freq.MedleyShield =>
-        if (rank == 1) Some(5)
-        else if (rank == 2) Some(3)
-        else if (rank == 3) Some(2)
+        if rank == 1 then Some(5)
+        else if rank == 2 then Some(3)
+        else if rank == 3 then Some(2)
         else Some(1)
       case _ => None
     }
@@ -82,7 +82,7 @@ final private class LeaderboardIndexer(
           nbGames = nb,
           score = player.score,
           rank = rank,
-          rankRatio = Ratio(if (tour.nbPlayers > 0) rank.toDouble / tour.nbPlayers else 0),
+          rankRatio = Ratio(if tour.nbPlayers > 0 then rank.toDouble / tour.nbPlayers else 0),
           metaPoints = metaPointsFromRank(tour.schedule.map(_.freq), rank),
           shieldKey = shieldKeyFromTour(tour),
           freq = tour.schedule.map(_.freq),

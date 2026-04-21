@@ -1,11 +1,11 @@
 package lila.timeline
 
-import akka.actor._
-import com.softwaremill.macwire._
+import akka.actor.*
+import com.softwaremill.macwire.*
 import lila.common.autoconfig.{ AutoConfig, ConfigName }
 import play.api.Configuration
 
-import lila.common.config._
+import lila.common.config.*
 
 @Module
 private class TimelineConfig(
@@ -42,7 +42,7 @@ final class Env(
 
   def status(channel: String)(userId: String): Fu[Option[Boolean]] =
     unsubApi.get(channel, userId) flatMap {
-      case true => fuccess(Some(true)) // unsubed
+      case true  => fuccess(Some(true)) // unsubed
       case false =>
         entryApi.channelUserIdRecentExists(channel, userId) map {
           case true  => Some(false) // subed

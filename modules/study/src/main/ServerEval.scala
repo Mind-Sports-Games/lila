@@ -3,15 +3,15 @@ package lila.study
 import strategygames.format.pgn.Glyphs
 import strategygames.format.{ Forsyth, Uci, UciCharPair }
 import strategygames.variant.Variant
-import strategygames.{ Division, Game, Player => PlayerIndex, Replay }
-import play.api.libs.json._
+import strategygames.{ Division, Game, Player as PlayerIndex, Replay }
+import play.api.libs.json.*
 
 import lila.analyse.{ Analysis, Info }
 import lila.hub.actorApi.fishnet.StudyChapterRequest
 import lila.security.Granter
 import lila.tree.Node.Comment
 import lila.user.{ User, UserRepo }
-import lila.{ tree => T }
+import lila.tree as T
 
 object ServerEval {
 
@@ -63,15 +63,18 @@ object ServerEval {
               lila.common.LilaFuture
                 .fold(chapter.root.mainline.zip(analysis.infoAdvices).toList)(Path.root) {
                   case (path, (node, (info, advOpt))) =>
-                    (chapter.root.nodeAt(path).flatMap { parent =>
-                      analysisLine(parent, chapter.setup.variant, info) map { subTree =>
-                        parent.addChild(subTree) -> subTree
+                    chapter.root
+                      .nodeAt(path)
+                      .flatMap { parent =>
+                        analysisLine(parent, chapter.setup.variant, info) map { subTree =>
+                          parent.addChild(subTree) -> subTree
+                        }
                       }
-                    }).fold(funit) { case (newParent, subTree) =>
-                      chapterRepo.addSubTree(subTree, newParent, path)(chapter)
-                    } >> {
-                      import BSONHandlers._
-                      import Node.{ BsonFields => F }
+                      .fold(funit) { case (newParent, subTree) =>
+                        chapterRepo.addSubTree(subTree, newParent, path)(chapter)
+                      } >> {
+                      import BSONHandlers.*
+                      import Node.BsonFields as F
                       ((info.eval.score.isDefined && node.score.isEmpty) || (advOpt.isDefined && !node.comments.hasPlayStrategyComment)) so
                         chapterRepo
                           .setNodeValues(
@@ -97,7 +100,7 @@ object ServerEval {
                                 .flatMap(CommentsBSONHandler.writeOpt),
                               F.glyphs -> advOpt
                                 .map { adv =>
-                                  node.glyphs `merge` Glyphs.fromList(List(adv.judgment.glyph))
+                                  node.glyphs.merge(Glyphs.fromList(List(adv.judgment.glyph)))
                                 }
                                 .flatMap(GlyphsBSONHandler.writeOpt)
                             )
@@ -118,7 +121,7 @@ object ServerEval {
                   )
                 }
               }
-            } `logFailure` logger
+            }.logFailure(logger)
           }
         }
       }
@@ -126,7 +129,7 @@ object ServerEval {
     def divisionOf(chapter: Chapter) =
       divider(
         id = chapter.id.value,
-        //TODO upgrade for multiaction
+        // TODO upgrade for multiaction
         actionStrs = chapter.root.mainline.map(_.move.san).toVector.map(Vector(_)),
         variant = chapter.setup.variant,
         initialFen = chapter.root.fen.some
@@ -136,7 +139,7 @@ object ServerEval {
       Replay.gameWithUciWhileValid(
         variant.gameLogic,
         info.variation.take(20),
-        //TODO: multiaction doublecheck: Think this is ok to handle like this
+        // TODO: multiaction doublecheck: Think this is ok to handle like this
         PlayerIndex.P1,
         PlayerIndex.fromTurnCount(info.variation.take(20).size),
         root.fen,
@@ -145,7 +148,7 @@ object ServerEval {
         case (_, games, error) =>
           error foreach { logger.info(_) }
           games.reverse match {
-            case Nil => none
+            case Nil            => none
             case (g, m) :: rest =>
               rest
                 .foldLeft(makeBranch(g, m)) { case (node, (g, m)) =>
@@ -159,7 +162,7 @@ object ServerEval {
         id = UciCharPair(g.situation.board.variant.gameLogic, m.uci),
         ply = g.plies,
         turnCount = g.turnCount,
-        playedPlayerIndex = if (g.board.history.currentTurn.nonEmpty) g.player else !g.player,
+        playedPlayerIndex = if g.board.history.currentTurn.nonEmpty then g.player else !g.player,
         variant = g.situation.board.variant,
         move = m,
         fen = Forsyth.>>(g.situation.board.variant.gameLogic, g),

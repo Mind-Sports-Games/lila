@@ -2,10 +2,10 @@ package lila.game
 
 import reactivemongo.api.ReadPreference
 
-import lila.common.paginator._
+import lila.common.paginator.*
 import lila.common.config.MaxPerPage
-import lila.db.dsl._
-import lila.db.paginator._
+import lila.db.dsl.*
+import lila.db.paginator.*
 
 final class PaginatorBuilder(gameRepo: GameRepo)(implicit ec: scala.concurrent.ExecutionContext) {
 

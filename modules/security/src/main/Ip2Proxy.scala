@@ -1,10 +1,10 @@
 package lila.security
 
 import com.github.blemale.scaffeine.AsyncLoadingCache
-import play.api.libs.json._
-import play.api.libs.ws.JsonBodyReadables._
+import play.api.libs.json.*
+import play.api.libs.ws.JsonBodyReadables.*
 import play.api.libs.ws.StandaloneWSClient
-import scala.concurrent.duration._
+import scala.concurrent.duration.*
 
 import lila.common.IpAddress
 import lila.common.extensions.*
@@ -55,11 +55,11 @@ final class Ip2ProxyServer(
 
   private def batch(ips: Seq[IpAddress]): Fu[Seq[Boolean]] =
     ips.take(50) match { // 50 * ipv6 length < max url length
-      case Nil      => fuccess(Seq.empty[Boolean])
+      case Nil     => fuccess(Seq.empty[Boolean])
       case Seq(ip) => apply(ip).dmap(Seq(_))
-      case ips =>
+      case ips     =>
         Future.sequence(ips.flatMap(cache.getIfPresent)) flatMap { cached =>
-          if (cached.sizeIs == ips.size) fuccess(cached)
+          if cached.sizeIs == ips.size then fuccess(cached)
           else
             ws.url(s"$checkUrl/batch")
               .addQueryStringParameters("ips" -> ips.mkString(","))
@@ -71,7 +71,7 @@ final class Ip2ProxyServer(
                 }
               }
               .flatMap { res =>
-                if (res.sizeIs == ips.size) fuccess(res)
+                if res.sizeIs == ips.size then fuccess(res)
                 else fufail(s"Ip2Proxy missing results for $ips -> $res")
               }
               .addEffect {

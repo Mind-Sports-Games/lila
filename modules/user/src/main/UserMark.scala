@@ -1,7 +1,7 @@
 package lila.user
 
 import reactivemongo.api.bson.BSONHandler
-import lila.db.dsl._
+import lila.db.dsl.*
 
 sealed trait UserMark {
   def key = toString.toLowerCase
@@ -13,7 +13,7 @@ object UserMark {
   case object Reportban extends UserMark
   case object Rankban   extends UserMark
   case object Alt       extends UserMark
-  val all = List(Boost, Engine, Troll, Reportban, Rankban, Alt)
+  val all                            = List(Boost, Engine, Troll, Reportban, Rankban, Alt)
   val indexed: Map[String, UserMark] = all.view.map { m =>
     m.key -> m
   }.toMap
@@ -30,13 +30,13 @@ case class UserMarks(value: List[UserMark]) extends AnyVal {
   def rankban               = apply(UserMark.Rankban)
   def alt                   = apply(UserMark.Alt)
 
-  def nonEmpty = value.nonEmpty `option` this
+  def nonEmpty = value.nonEmpty.option(this)
   def dirty    = value.exists(UserMark.bannable.contains)
   def clean    = !dirty
 
   def set(sel: UserMark.type => UserMark, v: Boolean) =
     UserMarks {
-      if (v) sel(UserMark) :: value
+      if v then sel(UserMark) :: value
       else value.filter(sel(UserMark) !=)
     }
 }

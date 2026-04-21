@@ -3,7 +3,7 @@ package lila.irc
 import org.joda.time.DateTime
 
 import lila.common.{ Heapsort, IpAddress, LightUser }
-import lila.hub.actorApi.slack._
+import lila.hub.actorApi.slack.*
 import lila.user.User
 import lila.user.Holder
 
@@ -13,7 +13,7 @@ final class SlackApi(
     implicit val lightUser: LightUser.Getter
 )(implicit ec: scala.concurrent.ExecutionContext) {
 
-  import SlackApi._
+  import SlackApi.*
 
   object charge {
 
@@ -28,8 +28,8 @@ final class SlackApi(
       buffer.head.date.isBefore(DateTime.now.minusHours(12)) so {
         val firsts    = Heapsort.topN(buffer, 10, amountOrdering).map(_.username).map(userAt).mkString(", ")
         val amountSum = buffer.map(_.amount).sum
-        val patrons =
-          if (firsts.lengthIs > 10) s"$firsts and, like, ${firsts.length - 10} others,"
+        val patrons   =
+          if firsts.lengthIs > 10 then s"$firsts and, like, ${firsts.length - 10} others,"
           else firsts
         displayMessage {
           s"$patrons donated ${amount(amountSum)}. Monthly progress: ${buffer.last.percent}%"
@@ -50,7 +50,7 @@ final class SlackApi(
       )
 
     private def userAt(username: String) =
-      if (username == "Anonymous") "Anonymous"
+      if username == "Anonymous" then "Anonymous"
       else s"@$username"
 
     private def amount(cents: Int) = s"$$${BigDecimal(cents.toLong, 2)}"
@@ -58,10 +58,10 @@ final class SlackApi(
 
   def publishEvent(event: Event): Funit =
     event match {
-      case Error(msg)   => publishError(msg)
-      case Warning(msg) => publishWarning(msg)
-      case Info(msg)    => publishInfo(msg)
-      case Victory(msg) => publishVictory(msg)
+      case Error(msg)                                 => publishError(msg)
+      case Warning(msg)                               => publishWarning(msg)
+      case Info(msg)                                  => publishInfo(msg)
+      case Victory(msg)                               => publishVictory(msg)
       case TournamentName(userName, tourId, tourName) =>
         client(
           SlackMessage(
@@ -80,7 +80,7 @@ final class SlackApi(
         username = mod.user.username,
         icon = "eye",
         text = {
-          val finalS = if (user.username `endsWith` "s") "" else "s"
+          val finalS = if user.username.endsWith("s") then "" else "s"
           s"checked out _*${userLink(user.username)}*_'$finalS communications "
         } + reportBy.filter(mod.id !=).fold("spontaneously") { by =>
           s"while investigating a report created by ${userLink(by)}"
@@ -124,8 +124,8 @@ final class SlackApi(
     client(
       SlackMessage(
         username = mod.user.username,
-        icon = if (v) "anger" else "information_source",
-        text = s"${if (v) "Enabled" else "Disabled"} $chatPanicLink",
+        icon = if v then "anger" else "information_source",
+        text = s"${if v then "Enabled" else "Disabled"} $chatPanicLink",
         channel = rooms.tavern
       )
     )
@@ -223,12 +223,12 @@ final class SlackApi(
   private val userReplace = link("https://playstrategy.org/@/$1?mod", "$1")
 
   private def linkifyUsers(msg: String) =
-    userRegex `matcher` msg `replaceAll` userReplace
+    userRegex.matcher(msg).replaceAll(userReplace)
 
   def userMod(user: User, mod: Holder): Funit =
     noteApi
       .forMod(user.id)
-      .map(_.headOption.filter(_.date `isAfter` DateTime.now.minusMinutes(5)))
+      .map(_.headOption.filter(_.date.isAfter(DateTime.now.minusMinutes(5))))
       .map {
         case None =>
           SlackMessage(
@@ -252,8 +252,8 @@ final class SlackApi(
       SlackMessage(
         username = modName,
         icon = "spiral_note_pad",
-        text = (s"_*${userLink(username)}*_ (${userNotesLink(username)}):\n" +
-          linkifyUsers(note take 2000)),
+        text = s"_*${userLink(username)}*_ (${userNotesLink(username)}):\n" +
+          linkifyUsers(note take 2000),
         channel = rooms.tavernNotes
       )
     )

@@ -3,9 +3,8 @@ package views.html.auth
 import play.api.data.Form
 
 import lila.api.Context
-import lila.app.templating.Environment._
-import lila.app.ui.ScalatagsTemplate._
-
+import lila.app.templating.Environment.*
+import lila.app.ui.ScalatagsTemplate.*
 
 object checkYourEmail {
 
@@ -18,7 +17,7 @@ object checkYourEmail {
       moreCss = cssTag("email-confirm")
     ) {
       main(
-        cls := s"page-small box box-pad email-confirm ${if (form.exists(_.hasErrors)) "error" else "anim"}"
+        cls := s"page-small box box-pad email-confirm ${if form.exists(_.hasErrors) then "error" else "anim"}"
       )(
         h1(cls := "is-green text", dataIcon := "E")(trans.checkYourEmail()),
         p(trans.weHaveSentYouAnEmailClickTheLink()),
@@ -32,11 +31,11 @@ object checkYourEmail {
               br,
               postForm(action := routes.Auth.fixEmail)(
                 input(
-                  id := "new-email",
+                  id  := "new-email",
                   tpe := "email",
                   required,
-                  name := "email",
-                  value := form.flatMap(_("email").value).getOrElse(email.value),
+                  name    := "email",
+                  value   := form.flatMap(_("email").value).getOrElse(email.value),
                   pattern := s"^((?!^${email.value}$$).)*$$"
                 ),
                 embedJsUnsafeLoadThen("""

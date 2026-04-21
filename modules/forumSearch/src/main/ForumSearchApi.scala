@@ -1,11 +1,11 @@
 package lila.forumSearch
 
-import akka.stream.scaladsl._
-import play.api.libs.json._
+import akka.stream.scaladsl.*
+import play.api.libs.json.*
 
 import lila.common.Json.jodaWrites
 import lila.forum.{ Post, PostApi, PostLiteView, PostRepo, PostView }
-import lila.search._
+import lila.search.*
 
 final class ForumSearchApi(
     client: ESClient,
@@ -22,10 +22,10 @@ final class ForumSearchApi(
     }
 
   def count(query: Query) =
-    client.count(query) `dmap` (_.count)
+    client.count(query).dmap(_.count)
 
   def store(post: Post) =
-    postApi `liteView` post flatMap {
+    postApi.liteView(post) flatMap {
       case Some(view) => client.store(Id(view.post.id), toDoc(view))
       case None       => funit
     }

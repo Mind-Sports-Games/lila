@@ -1,7 +1,5 @@
 package views.html.relay
 
-
-
 object roundForm {
   /*
   import trans.broadcast._

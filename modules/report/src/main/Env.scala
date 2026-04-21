@@ -1,12 +1,12 @@
 package lila.report
 
-import akka.actor._
-import com.softwaremill.macwire._
+import akka.actor.*
+import com.softwaremill.macwire.*
 import lila.common.autoconfig.{ AutoConfig, ConfigName }
 import play.api.Configuration
-import scala.concurrent.duration._
+import scala.concurrent.duration.*
 
-import lila.common.config._
+import lila.common.config.*
 
 @Module
 private class ReportConfig(
@@ -42,13 +42,13 @@ final class Env(
 
   private lazy val reportColl = db(config.reportColl)
 
-  lazy val scoreThresholdsSetting = ReportThresholds `makeScoreSetting` settingStore
+  lazy val scoreThresholdsSetting = ReportThresholds.makeScoreSetting(settingStore)
 
-  lazy val discordScoreThresholdSetting = ReportThresholds `makeDiscordSetting` settingStore
+  lazy val discordScoreThresholdSetting = ReportThresholds.makeDiscordSetting(settingStore)
 
   private val thresholds = Thresholds(
-    score = (() => scoreThresholdsSetting.get()),
-    discord = (() => discordScoreThresholdSetting.get())
+    score = () => scoreThresholdsSetting.get(),
+    discord = () => discordScoreThresholdSetting.get()
   )
 
   lazy val forms = wire[ReportForm]

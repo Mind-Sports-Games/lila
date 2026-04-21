@@ -1,11 +1,10 @@
 package views.html
 
-
-import lila.activity.activities._
-import lila.activity.model._
+import lila.activity.activities.*
+import lila.activity.model.*
 import lila.api.Context
-import lila.app.templating.Environment._
-import lila.app.ui.ScalatagsTemplate._
+import lila.app.templating.Environment.*
+import lila.app.ui.ScalatagsTemplate.*
 import lila.user.User
 import lila.swiss.Swiss
 import lila.rating.PerfType
@@ -38,20 +37,20 @@ object activity {
             a.tours map renderTours,
             a.swisses map renderSwisses,
             a.teams map renderTeams,
-            a.stream `option` renderStream(u),
-            a.signup `option` renderSignup
+            a.stream.option(renderStream(u)),
+            a.signup.option(renderSignup)
           )
         )
       }
     )
 
-  private def subCount(count: Int) = if (count >= maxSubEntries) s"$count+" else s"$count"
+  private def subCount(count: Int) = if count >= maxSubEntries then s"$count+" else s"$count"
 
   private def renderPatron(p: Patron)(implicit ctx: Context) =
     div(cls := "entry plan")(
       iconTag(""),
       div(
-        if (p.months == 0) a(href := routes.Plan.index)("Lifetime Patron!")
+        if p.months == 0 then a(href := routes.Plan.index)("Lifetime Patron!")
         else
           trans.activity.supportedNbMonths.plural(p.months, p.months, a(href := routes.Plan.index)("Patron"))
       )
@@ -137,21 +136,23 @@ object activity {
     }
 
   private def renderPosts(posts: Map[lila.forum.Topic, List[lila.forum.Post]])(implicit ctx: Context) =
-    ctx.noKid `option` entryTag(
-      iconTag("d"),
-      div(
-        posts.toSeq.map { case (topic, posts) =>
-          val url = routes.ForumTopic.show(topic.categId, topic.slug)
-          frag(
-            trans.activity.postedNbMessages
-              .plural(posts.size, posts.size, a(href := url)(shorten(topic.name, 70))),
-            subTag(
-              posts.map { post =>
-                div(cls := "line")(a(href := routes.ForumPost.redirect(post.id))(shorten(post.text, 120)))
-              }
+    ctx.noKid.option(
+      entryTag(
+        iconTag("d"),
+        div(
+          posts.toSeq.map { case (topic, posts) =>
+            val url = routes.ForumTopic.show(topic.categId, topic.slug)
+            frag(
+              trans.activity.postedNbMessages
+                .plural(posts.size, posts.size, a(href := url)(shorten(topic.name, 70))),
+              subTag(
+                posts.map { post =>
+                  div(cls := "line")(a(href := routes.ForumPost.redirect(post.id))(shorten(post.text, 120)))
+                }
+              )
             )
-          )
-        }
+          }
+        )
       )
     )
 
@@ -207,7 +208,7 @@ object activity {
       div(
         List(all.in.map(_ -> true), all.out.map(_ -> false)).flatten map { case (f, in) =>
           frag(
-            if (in) trans.activity.gainedNbFollowers.pluralSame(f.actualNb)
+            if in then trans.activity.gainedNbFollowers.pluralSame(f.actualNb)
             else trans.activity.followedNbPlayers.pluralSame(f.actualNb),
             subTag(
               fragList(f.ids.map(id => userIdLink(id.some))),
@@ -226,7 +227,7 @@ object activity {
       div(
         simuls.groupBy(_.isHost(u.some)).toSeq.map { case (isHost, simuls) =>
           frag(
-            if (isHost) trans.activity.hostedNbSimuls.pluralSame(simuls.size)
+            if isHost then trans.activity.hostedNbSimuls.pluralSame(simuls.size)
             else trans.activity.joinedNbSimuls.pluralSame(simuls.size),
             subTag(
               simuls.map { s =>
@@ -259,11 +260,13 @@ object activity {
     )
 
   private def renderTeams(teams: Teams)(implicit ctx: Context) =
-    ctx.noKid `option` entryTag(
-      iconTag("f"),
-      div(
-        trans.activity.joinedNbTeams.pluralSame(teams.value.size),
-        subTag(fragList(teams.value.map(id => teamLink(id))))
+    ctx.noKid.option(
+      entryTag(
+        iconTag("f"),
+        div(
+          trans.activity.joinedNbTeams.pluralSame(teams.value.size),
+          subTag(fragList(teams.value.map(id => teamLink(id))))
+        )
       )
     )
 
@@ -321,9 +324,11 @@ object activity {
     )
 
   private def renderStream(u: User)(implicit ctx: Context) =
-    ctx.noKid `option` entryTag(
-      iconTag(""),
-      a(href := routes.Streamer.redirect(u.username))(trans.activity.hostedALiveStream())
+    ctx.noKid.option(
+      entryTag(
+        iconTag(""),
+        a(href := routes.Streamer.redirect(u.username))(trans.activity.hostedALiveStream())
+      )
     )
 
   private def renderSignup(implicit ctx: Context) =
@@ -340,17 +345,17 @@ object activity {
   private def scoreFrag(s: Score)(implicit ctx: Context) =
     raw {
       s"""<score>${scoreStr("win", s.win, trans.nbWins)}${scoreStr("draw", s.draw, trans.nbDraws)}${scoreStr(
-        "loss",
-        s.loss,
-        trans.nbLosses
-      )}</score>"""
+          "loss",
+          s.loss,
+          trans.nbLosses
+        )}</score>"""
     }
 
   private def ratingProgFrag(r: RatingProg) =
     ratingTag(r.after.value, ratingProgress(r.diff))
 
   private def scoreStr(tag: String, p: Int, name: lila.i18n.I18nKey)(implicit ctx: Context) =
-    if (p == 0) ""
+    if p == 0 then ""
     else s"""<$tag>${wrapNumber(name.pluralSameTxt(p))}</$tag>"""
 
   private val wrapNumberRegex         = """(\d++)""".r

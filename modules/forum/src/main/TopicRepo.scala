@@ -1,7 +1,7 @@
 package lila.forum
 
-import Filter._
-import lila.db.dsl._
+import Filter.*
+import lila.db.dsl.*
 import lila.user.User
 
 final class TopicRepo(val coll: Coll, filter: Filter = Safe)(implicit
@@ -12,12 +12,12 @@ final class TopicRepo(val coll: Coll, filter: Filter = Safe)(implicit
     withFilter(user.filter(_.marks.troll).fold[Filter](Safe) { u =>
       SafeAnd(u.id)
     })
-  def withFilter(f: Filter) = if (f == filter) this else new TopicRepo(coll, f)
+  def withFilter(f: Filter) = if f == filter then this else new TopicRepo(coll, f)
   def unsafe                = withFilter(Unsafe)
 
   import BSONHandlers.TopicBSONHandler
 
-  private val noTroll = $doc("troll" -> false)
+  private val noTroll     = $doc("troll" -> false)
   private val trollFilter = filter match {
     case Safe       => noTroll
     case SafeAnd(u) => $or(noTroll, $doc("userId" -> u))
@@ -55,7 +55,7 @@ final class TopicRepo(val coll: Coll, filter: Filter = Safe)(implicit
     val slug = Topic.nameToId(name) + ~(it != 1).option("-" + it)
     // also take troll topic into accounts
     unsafe.byTree(categ.slug, slug) flatMap { found =>
-      if (found.isDefined) nextSlug(categ, name, it + 1)
+      if found.isDefined then nextSlug(categ, name, it + 1)
       else fuccess(slug)
     }
   }

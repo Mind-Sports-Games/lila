@@ -1,11 +1,11 @@
 package lila.puzzle
 
 import strategygames.format.{ FEN, Uci }
-import reactivemongo.api.bson._
+import reactivemongo.api.bson.*
 import scala.util.{ Success, Try }
 
 import lila.db.BSON
-import lila.db.dsl._
+import lila.db.dsl.*
 import lila.game.Game
 import lila.rating.Glicko
 
@@ -16,7 +16,7 @@ object BsonHandlers {
 
   implicit val PuzzleIdBSONHandler: BSONHandler[Puzzle.Id] = stringIsoHandler(using Puzzle.idIso)
 
-  import Puzzle.BSONFields._
+  import Puzzle.BSONFields.*
 
   implicit private[puzzle] val PuzzleBSONReader: BSONDocumentReader[Puzzle] = new BSONDocumentReader[Puzzle] {
     def readDocument(r: BSONDocument) = for {
@@ -28,7 +28,7 @@ object BsonHandlers {
       sgVariant = Variant.orDefault(gameLogic, variant)
       fen     <- r.getAsTry[String](fen)
       lineStr <- r.getAsTry[String](line)
-      line <- lineStr
+      line    <- lineStr
         .split(' ')
         .toList
         .flatMap { line => Uci.Move.apply(gameLogic, sgVariant.gameFamily, line) }
@@ -71,11 +71,11 @@ object BsonHandlers {
             Success(PuzzleRound.Theme(theme.key, v.head == '+'))
           }
       },
-      rt => BSONString(s"${if (rt.vote) "+" else "-"}${rt.theme}")
+      rt => BSONString(s"${if rt.vote then "+" else "-"}${rt.theme}")
     )
 
   implicit private[puzzle] val RoundHandler: BSON[PuzzleRound] = new BSON[PuzzleRound] {
-    import PuzzleRound.BSONFields._
+    import PuzzleRound.BSONFields.*
     def reads(r: BSON.Reader) = PuzzleRound(
       id = r.get[PuzzleRound.Id](id),
       win = r.bool(win),
@@ -95,11 +95,11 @@ object BsonHandlers {
       )
   }
 
-  implicit private[puzzle] val PathIdBSONHandler: BSONHandler[PuzzlePath.Id] = stringIsoHandler(
-    using PuzzlePath.pathIdIso
+  implicit private[puzzle] val PathIdBSONHandler: BSONHandler[PuzzlePath.Id] = stringIsoHandler(using
+    PuzzlePath.pathIdIso
   )
 
-  implicit private[puzzle] val ThemeKeyBSONHandler: BSONHandler[PuzzleTheme.Key] = stringIsoHandler(
-    using PuzzleTheme.keyIso
+  implicit private[puzzle] val ThemeKeyBSONHandler: BSONHandler[PuzzleTheme.Key] = stringIsoHandler(using
+    PuzzleTheme.keyIso
   )
 }

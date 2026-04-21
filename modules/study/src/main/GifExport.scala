@@ -1,9 +1,9 @@
 package lila.study
 
-import akka.stream.scaladsl._
+import akka.stream.scaladsl.*
 import akka.util.ByteString
-import play.api.libs.json._
-import play.api.libs.ws.JsonBodyWritables._
+import play.api.libs.json.*
+import play.api.libs.ws.JsonBodyWritables.*
 import play.api.libs.ws.StandaloneWSClient
 
 final class GifExport(
@@ -18,7 +18,7 @@ final class GifExport(
         Json.obj(
           "delay"       -> 80,
           "orientation" -> chapter.setup.orientation.name,
-          "p1" -> List(
+          "p1"          -> List(
             chapter.tags(_.P1Title),
             chapter.tags(_.P1),
             chapter.tags(_.P1Elo).map(elo => s"($elo)")
@@ -48,9 +48,9 @@ final class GifExport(
             .obj(
               "fen" -> node.fen.value
             )
-            .add("check", node.check `option` true)
+            .add("check", node.check.option(true))
             .add("lastMove", node.moveOption.map(_.uci.uci))
-            .add("delay", tail.isEmpty `option` 500) // more delay for last frame
+            .add("delay", tail.isEmpty.option(500)) // more delay for last frame
         )
       case _ => arr
     }

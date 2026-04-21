@@ -1,14 +1,14 @@
 package lila.learn
 
 import reactivemongo.api.ReadPreference
-import cats.implicits._
+import cats.implicits.*
 
-import lila.db.dsl._
+import lila.db.dsl.*
 import lila.user.User
 
 final class LearnApi(coll: Coll)(implicit ec: scala.concurrent.ExecutionContext) {
 
-  import BSONHandlers._
+  import BSONHandlers.*
 
   def get(user: User): Fu[LearnProgress] =
     coll.one[LearnProgress]($id(user.id)) dmap { _ | LearnProgress.empty(LearnProgress.Id(user.id)) }
@@ -29,7 +29,7 @@ final class LearnApi(coll: Coll)(implicit ec: scala.concurrent.ExecutionContext)
   def completionPercent(userIds: List[User.ID]): Fu[Map[User.ID, Int]] =
     coll
       .aggregateWith[Bdoc](readPreference = ReadPreference.secondaryPreferred) { framework =>
-        import framework._
+        import framework.*
         List(
           Match($doc("_id" `$in` userIds)),
           Project($doc("stages" -> $doc("$objectToArray" -> "$stages"))),
@@ -41,7 +41,7 @@ final class LearnApi(coll: Coll)(implicit ec: scala.concurrent.ExecutionContext)
                   "$filter" -> $doc(
                     "input" -> "$stages.v",
                     "as"    -> "s",
-                    "cond" -> $doc(
+                    "cond"  -> $doc(
                       "$ne" -> $arr("$$s", 0)
                     )
                   )
@@ -54,10 +54,12 @@ final class LearnApi(coll: Coll)(implicit ec: scala.concurrent.ExecutionContext)
       }
       .collect[List](maxDocs = Int.MaxValue)
       .map {
-        _.view.flatMap { obj =>
-          (obj string "_id", obj int "nb") mapN { (k, v) =>
-            k -> (v * 100f / maxCompletion).toInt
+        _.view
+          .flatMap { obj =>
+            (obj string "_id", obj int "nb") mapN { (k, v) =>
+              k -> (v * 100f / maxCompletion).toInt
+            }
           }
-        }.toMap
-    }
+          .toMap
+      }
 }

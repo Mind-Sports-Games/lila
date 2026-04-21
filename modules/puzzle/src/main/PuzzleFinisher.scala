@@ -1,12 +1,12 @@
 package lila.puzzle
 
-import cats.implicits._
+import cats.implicits.*
 import org.goochjs.glicko2.{ Rating, RatingCalculator, RatingPeriodResults }
 import org.joda.time.DateTime
-import scala.concurrent.duration._
+import scala.concurrent.duration.*
 
 import lila.common.Bus
-import lila.db.dsl._
+import lila.db.dsl.*
 import lila.rating.Perf
 import lila.rating.{ Glicko, PerfType }
 import lila.user.{ Perfs, User, UserRepo }
@@ -19,7 +19,7 @@ final private[puzzle] class PuzzleFinisher(
     colls: PuzzleColls
 )(implicit ec: scala.concurrent.ExecutionContext, scheduler: akka.actor.Scheduler, mode: play.api.Mode) {
 
-  import BsonHandlers._
+  import BsonHandlers.*
 
   private val sequencer =
     new lila.hub.DuctSequencers(
@@ -36,20 +36,21 @@ final private[puzzle] class PuzzleFinisher(
       user: User,
       result: Result
   ): Fu[Option[(PuzzleRound, Perf)]] =
-    if (api.casual(user, id)) fuccess {
-      PuzzleRound(
-        id = PuzzleRound.Id(user.id, id),
-        win = result.win,
-        fixedAt = none,
-        date = DateTime.now
-      ) -> Perfs.puzzleLens(variant).map(_.get(user.perfs)).getOrElse(user.perfs.puzzle_standard)
-    } `dmap` some
+    if api.casual(user, id) then
+      fuccess {
+        PuzzleRound(
+          id = PuzzleRound.Id(user.id, id),
+          win = result.win,
+          fixedAt = none,
+          date = DateTime.now
+        ) -> Perfs.puzzleLens(variant).map(_.get(user.perfs)).getOrElse(user.perfs.puzzle_standard)
+      }.dmap(some)
     else
       sequencer(id.value) {
         api.round.find(user, id) flatMap { prevRound =>
           api.puzzle.find(id) flatMap {
             _ so { puzzle =>
-              val now = DateTime.now
+              val now                  = DateTime.now
               val userPuzzlePerf: Perf =
                 Perfs.puzzleLens(variant).map(_.get(user.perfs)).getOrElse(user.perfs.puzzle_standard)
               val formerUserRating = userPuzzlePerf.intRating
@@ -62,9 +63,9 @@ final private[puzzle] class PuzzleFinisher(
                     userPuzzlePerf
                   )
                 case None =>
-                  val userRating = userPuzzlePerf.toRating
+                  val userRating   = userPuzzlePerf.toRating
                   val puzzleRating = new Rating(
-                    puzzle.glicko.rating `atLeast` Glicko.minRating,
+                    puzzle.glicko.rating.atLeast(Glicko.minRating),
                     puzzle.glicko.deviation,
                     puzzle.glicko.volatility,
                     puzzle.plays,
@@ -114,28 +115,32 @@ final private[puzzle] class PuzzleFinisher(
                     )
                     .void
                 } zip
-                (userPerf != userPuzzlePerf).so {
-                  userRepo.setPerf(
-                    user.id,
-                    PerfType.puzzlebyVariant(variant).getOrElse(PerfType.orDefaultPuzzle("puzzle_standard")),
-                    userPerf.clearRecent
-                  ) zip
-                    historyApi.addPuzzle(user = user, completedAt = now, perf = userPerf) void
-                }.andDo {
-                  if (prevRound.isEmpty)
-                    Bus.publish(
-                      Puzzle.UserResult(
-                        puzzle.id,
-                        user.id,
-                        result,
-                        formerUserRating -> userPerf.intRating,
-                        PerfType
-                          .puzzlebyVariant(variant)
-                          .getOrElse(PerfType.orDefaultPuzzle("puzzle_standard"))
-                      ),
-                      "finishPuzzle"
-                    )
-                } inject (round -> userPerf).some
+                (userPerf != userPuzzlePerf)
+                  .so {
+                    userRepo.setPerf(
+                      user.id,
+                      PerfType
+                        .puzzlebyVariant(variant)
+                        .getOrElse(PerfType.orDefaultPuzzle("puzzle_standard")),
+                      userPerf.clearRecent
+                    ) zip
+                      historyApi.addPuzzle(user = user, completedAt = now, perf = userPerf) void
+                  }
+                  .andDo {
+                    if prevRound.isEmpty then
+                      Bus.publish(
+                        Puzzle.UserResult(
+                          puzzle.id,
+                          user.id,
+                          result,
+                          formerUserRating -> userPerf.intRating,
+                          PerfType
+                            .puzzlebyVariant(variant)
+                            .getOrElse(PerfType.orDefaultPuzzle("puzzle_standard"))
+                        ),
+                        "finishPuzzle"
+                      )
+                  } inject (round -> userPerf).some
             }
           }
         }
@@ -172,23 +177,21 @@ final private[puzzle] class PuzzleFinisher(
     ).map(_.key)
 
     private def weightOf(theme: PuzzleTheme.Key, result: Result) =
-      if (theme == PuzzleTheme.mix.key) 1
-      else if (isObvious(theme))
-        if (result.win) 0.2f else 0.6f
-      else if (isHinting(theme))
-        if (result.win) 0.3f else 0.7f
-      else
-        if (result.win) 0.7f else 0.8f
+      if theme == PuzzleTheme.mix.key then 1
+      else if isObvious(theme) then if result.win then 0.2f else 0.6f
+      else if isHinting(theme) then if result.win then 0.3f else 0.7f
+      else if result.win then 0.7f
+      else 0.8f
 
     def player(theme: PuzzleTheme.Key, result: Result, glicko: (Glicko, Glicko), puzzle: Glicko) = {
       val provisionalPuzzle = puzzle.provisional so {
-        if (result.win) -0.2f else -0.7f
+        if result.win then -0.2f else -0.7f
       }
-      glicko._1.average(glicko._2, (weightOf(theme, result) + provisionalPuzzle) `atLeast` 0.1f)
+      glicko._1.average(glicko._2, (weightOf(theme, result) + provisionalPuzzle).atLeast(0.1f))
     }
 
     def puzzle(theme: PuzzleTheme.Key, result: Result, glicko: (Glicko, Glicko), player: Glicko) =
-      if (player.clueless) glicko._1
+      if player.clueless then glicko._1
       else glicko._1.average(glicko._2, weightOf(theme, result))
   }
 
@@ -213,4 +216,3 @@ final private[puzzle] class PuzzleFinisher(
     }
   }
 }
-

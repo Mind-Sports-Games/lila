@@ -3,7 +3,7 @@ package lila.game
 import java.security.MessageDigest
 import lila.db.ByteArray
 import org.joda.time.DateTime
-import strategygames.{ P2, Player => PlayerIndex, P1, Pos }
+import strategygames.{ P1, P2, Player as PlayerIndex, Pos }
 import reactivemongo.api.bson.BSONDocumentHandler
 
 private[game] case class Metadata(
@@ -14,14 +14,14 @@ private[game] case class Metadata(
     simulId: Option[String],
     analysed: Boolean,
     drawOffers: GameDrawOffers,
-    //go dead stones
+    // go dead stones
     selectedSquares: Option[List[Pos]] = None,
     deadStoneOfferState: Option[DeadStoneOfferState] = None,
-    //draughts options
+    // draughts options
     simulPairing: Option[Int] = None,
     timeOutUntil: Option[DateTime] = None,
     drawLimit: Option[Int] = None,
-    //extra match data
+    // extra match data
     multiMatch: Option[String] = None,
     multiPointState: Option[MultiPointState] = None,
     fromHandicappedTournament: Boolean = false
@@ -36,13 +36,13 @@ private[game] case class Metadata(
     multiMatch.fold(false)(x => x.contains("challengeMultiMatch"))
 
   def multiMatchGameNr = multiMatch so { mm =>
-    if (mm == "multiMatch") 1.some
-    else if (mm.length() == 10 && mm.substring(1, 2) == ":") toInt(mm.take(1))
+    if mm == "multiMatch" then 1.some
+    else if mm.length() == 10 && mm.substring(1, 2) == ":" then toInt(mm.take(1))
     else none
   }
 
   def multiMatchGameId = multiMatch.map { mm =>
-    if (mm.length() == 10 && mm.substring(1, 2) == ":") mm.drop(2)
+    if mm.length() == 10 && mm.substring(1, 2) == ":" then mm.drop(2)
     else "*"
   }
 
@@ -100,7 +100,7 @@ object PgnImport {
 
   def hash(pgn: String) =
     ByteArray {
-      MessageDigest `getInstance` "MD5" digest {
+      MessageDigest.getInstance("MD5") digest {
         pgn.linesIterator
           .map(_.replace(" ", ""))
           .filter(_.nonEmpty)

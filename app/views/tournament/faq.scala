@@ -2,13 +2,12 @@ package views.html
 package tournament
 
 import lila.api.Context
-import lila.app.templating.Environment._
-import lila.app.ui.ScalatagsTemplate._
-
+import lila.app.templating.Environment.*
+import lila.app.ui.ScalatagsTemplate.*
 
 object faq {
 
-  import trans.arena._
+  import trans.arena.*
 
   def page(implicit ctx: Context) =
     views.html.base.layout(
@@ -56,7 +55,7 @@ object faq {
             a(href := routes.Page.lonePage("handicaps"))("handicapped page.")
           )
         case Some(false) => p(trans.arena.isNotHandicapped())
-        case None =>
+        case None        =>
           p(
             trans.arena.someHandicapped(),
             " For more info see the ",
@@ -89,7 +88,7 @@ object faq {
             )
           )
         case Some(false) => frag()
-        case None =>
+        case None        =>
           frag(
             h2(trans.arena.howDoArenaMedleysWork()),
             p(

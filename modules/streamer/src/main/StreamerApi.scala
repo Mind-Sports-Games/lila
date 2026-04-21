@@ -3,9 +3,9 @@ package lila.streamer
 import org.joda.time.DateTime
 import reactivemongo.api.ReadPreference
 
-import lila.db.dsl._
+import lila.db.dsl.*
 import lila.db.Photographer
-import lila.memo.CacheApi._
+import lila.memo.CacheApi.*
 import lila.user.{ User, UserRepo }
 
 final class StreamerApi(
@@ -16,7 +16,7 @@ final class StreamerApi(
     notifyApi: lila.notify.NotifyApi
 )(implicit ec: scala.concurrent.ExecutionContext) {
 
-  import BsonHandlers._
+  import BsonHandlers.*
 
   def withColl[A](f: Coll => A): A = f(coll)
 
@@ -24,7 +24,7 @@ final class StreamerApi(
   def byIds(ids: Iterable[Streamer.Id]): Fu[List[Streamer]] = coll.byIds[Streamer](ids.map(_.value))
 
   def find(username: String): Fu[Option[Streamer.WithUser]] =
-    userRepo `named` username flatMap { _ so find }
+    userRepo.named(username) flatMap { _ so find }
 
   def find(user: User): Fu[Option[Streamer.WithUser]] =
     byId(Streamer.Id(user.id)) dmap {
@@ -33,12 +33,12 @@ final class StreamerApi(
 
   def findOrInit(user: User): Fu[Option[Streamer.WithUser]] =
     find(user) orElse {
-      val s = Streamer.WithUser(Streamer `make` user, user)
+      val s = Streamer.WithUser(Streamer.make(user), user)
       coll.insert.one(s.streamer) inject s.some
     }
 
   def withUser(s: Stream): Fu[Option[Streamer.WithUserAndStream]] =
-    userRepo `named` s.streamer.userId dmap {
+    userRepo.named(s.streamer.userId) dmap {
       _ map { user =>
         Streamer.WithUserAndStream(s.streamer, user, s.some)
       }
@@ -58,21 +58,22 @@ final class StreamerApi(
   def setLiveNow(ids: List[Streamer.Id]): Funit =
     coll.update.one($doc("_id" `$in` ids), $set("liveAt" -> DateTime.now), multi = true) >>
       cache.candidateIds.getUnit.map { candidateIds =>
-        if (ids.exists(candidateIds.contains)) cache.candidateIds.invalidateUnit()
+        if ids.exists(candidateIds.contains) then cache.candidateIds.invalidateUnit()
       }
 
   def update(prev: Streamer, data: StreamerForm.UserData, asMod: Boolean): Fu[Streamer.ModChange] = {
     val streamer = data(prev, asMod)
     coll.update.one($id(streamer.id), streamer).andDo(cache.listedIds.invalidateUnit()) inject {
-        val modChange = Streamer.ModChange(
-          list = prev.approval.granted != streamer.approval.granted `option` streamer.approval.granted,
-          tier = prev.approval.tier != streamer.approval.tier `option` streamer.approval.tier,
-          decline = !streamer.approval.granted && !streamer.approval.requested && prev.approval.requested
-        )
-        import lila.notify.Notification.Notifies
-        import lila.notify.Notification
-        ~modChange.list so {
-          notifyApi.addNotification(
+      val modChange = Streamer.ModChange(
+        list = (prev.approval.granted != streamer.approval.granted).option(streamer.approval.granted),
+        tier = (prev.approval.tier != streamer.approval.tier).option(streamer.approval.tier),
+        decline = !streamer.approval.granted && !streamer.approval.requested && prev.approval.requested
+      )
+      import lila.notify.Notification.Notifies
+      import lila.notify.Notification
+      ~modChange.list so {
+        notifyApi
+          .addNotification(
             Notification.make(
               Notifies(streamer.userId),
               lila.notify.GenericLink(
@@ -82,9 +83,10 @@ final class StreamerApi(
                 icon = ""
               )
             )
-          ).andDo(cache.candidateIds.invalidateUnit())
-        }
-        modChange
+          )
+          .andDo(cache.candidateIds.invalidateUnit())
+      }
+      modChange
     }
   }
 
@@ -103,7 +105,7 @@ final class StreamerApi(
     coll.delete.one($id(user.id)).void
 
   def create(u: User): Funit =
-    coll.insert.one(Streamer `make` u).void.recover(lila.db.ignoreDuplicateKey)
+    coll.insert.one(Streamer.make(u)).void.recover(lila.db.ignoreDuplicateKey)
 
   def isPotentialStreamer(user: User): Fu[Boolean] =
     cache.listedIds.getUnit.dmap(_ contains Streamer.Id(user.id))
@@ -172,7 +174,7 @@ final class StreamerApi(
           "_id" `$ne` streamer.userId
         )
       )
-      .sort($sort `desc` "createdAt")
+      .sort($sort.desc("createdAt"))
       .cursor[Streamer](readPreference = ReadPreference.secondaryPreferred)
       .list(10)
 

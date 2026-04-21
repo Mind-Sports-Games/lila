@@ -4,15 +4,15 @@ import strategygames.format.FEN
 import strategygames.{ GameFamily, GameLogic }
 import strategygames.variant.Variant
 import strategygames.Centis
-import play.api.data._
-import play.api.data.Forms._
+import play.api.data.*
+import play.api.data.Forms.*
 
 import lila.rating.RatingRange
 import lila.user.{ User, UserContext }
 
 object SetupForm {
 
-  import Mappings._
+  import Mappings.*
 
   val filter = Form(single("local" -> text))
 
@@ -21,7 +21,7 @@ object SetupForm {
   ): Form[GameConfig] =
     game(using ctx) fill {
       val baseConfig = GameConfig.default(lib.id)
-      val withFen = fen.fold(baseConfig) { f =>
+      val withFen    = fen.fold(baseConfig) { f =>
         baseConfig.copy(
           fen = Some(f),
           variant = lib match {
@@ -150,7 +150,9 @@ object SetupForm {
         "increment" -> increment,
         "byoyomi"   -> byoyomi,
         "periods"   -> periods
-      )(strategygames.ByoyomiClock.Config.apply)(c => Some((c.limitSeconds, c.incrementSeconds, c.byoyomiSeconds, c.periods)))
+      )(strategygames.ByoyomiClock.Config.apply)(c =>
+        Some((c.limitSeconds, c.incrementSeconds, c.byoyomiSeconds, c.periods))
+      )
         .verifying("Invalid clock", c => c.estimateTotalTime > Centis(0))
     lazy val byoyomiClock = "clock" -> optional(byoyomiClockMapping)
 
@@ -160,12 +162,12 @@ object SetupForm {
     lazy val message = optional(
       nonEmptyText.verifying(
         "The message must contain {game}, which will be replaced with the game URL.",
-        _ `contains` "{game}"
+        _.contains("{game}")
       )
     )
 
     def user(from: User) =
-      Form(challengeMapping.verifying("Invalid speed", _ `validSpeed` from.isBot))
+      Form(challengeMapping.verifying("Invalid speed", _.validSpeed(from.isBot)))
 
     def admin = Form(challengeMapping)
 

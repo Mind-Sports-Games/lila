@@ -7,7 +7,7 @@ import scala.concurrent.ExecutionContext
 import lila.common.config.MaxPerPage
 import lila.common.paginator.AdapterLike
 import lila.common.paginator.Paginator
-import lila.db.dsl._
+import lila.db.dsl.*
 import lila.memo.CacheApi
 import lila.user.User
 import strategygames.variant.Variant
@@ -33,7 +33,7 @@ object PuzzleHistory {
   final class HistoryAdapter(user: User, variant: Variant, colls: PuzzleColls)(implicit ec: ExecutionContext)
       extends AdapterLike[PuzzleSession] {
 
-    import BsonHandlers._
+    import BsonHandlers.*
 
     def nbResults: Fu[Int] = fuccess(
       Perfs.puzzleLens(variant).map(_.get(user.perfs)).getOrElse(user.perfs.puzzle_standard).nb
@@ -43,18 +43,18 @@ object PuzzleHistory {
       colls
         .round {
           _.aggregateWith[Bdoc](readPreference = ReadPreference.secondaryPreferred) { framework =>
-            import framework._
+            import framework.*
             List(
               Match($doc("u" -> user.id)),
               Sort(Descending("d")),
               Skip(offset),
               Limit(length),
-              PipelineOperator(PuzzleRound `puzzleLookup` colls),
+              PipelineOperator(PuzzleRound.puzzleLookup(colls)),
               Unwind("puzzle")
             )
           }
             .collect[List](maxDocs = length)
-      }
+        }
         .map { r =>
           for {
             doc   <- r
@@ -70,16 +70,14 @@ object PuzzleHistory {
   private def groupBySessions(rounds: List[SessionRound]): List[PuzzleSession] =
     rounds
       .foldLeft(List.empty[PuzzleSession]) {
-        case (Nil, round) => List(PuzzleSession(round.theme, NonEmptyList(round, Nil)))
+        case (Nil, round)          => List(PuzzleSession(round.theme, NonEmptyList(round, Nil)))
         case (last :: sessions, r) =>
-          if (
-            last.puzzles.head.theme == r.theme &&
+          if last.puzzles.head.theme == r.theme &&
             last.puzzles.head.puzzle.variant == r.puzzle.variant &&
-            r.round.date.isAfter(last.puzzles.head.round.date `minusHours` 1)
-          )
-            last.copy(puzzles = r :: last.puzzles) :: sessions
+            r.round.date.isAfter(last.puzzles.head.round.date.minusHours(1))
+          then last.copy(puzzles = r :: last.puzzles) :: sessions
           else PuzzleSession(r.theme, NonEmptyList(r, Nil)) :: last :: sessions
-    }
+      }
       .reverse
 }
 
@@ -88,7 +86,7 @@ final class PuzzleHistoryApi(
     @annotation.nowarn("msg=unused") _cacheApi: CacheApi
 )(implicit ec: ExecutionContext) {
 
-  import PuzzleHistory._
+  import PuzzleHistory.*
 
   def apply(user: User, variant: Variant, page: Int): Fu[Paginator[PuzzleSession]] =
     Paginator[PuzzleSession](
@@ -97,4 +95,3 @@ final class PuzzleHistoryApi(
       maxPerPage = maxPerPage
     )
 }
-

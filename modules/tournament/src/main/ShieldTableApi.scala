@@ -1,10 +1,10 @@
 package lila.tournament
 
-import reactivemongo.api.bson._
+import reactivemongo.api.bson.*
 
 import lila.common.LightUser
 import lila.common.ThreadLocalRandom
-import lila.db.dsl._
+import lila.db.dsl.*
 import lila.user.User
 
 final class ShieldTableApi(
@@ -12,8 +12,8 @@ final class ShieldTableApi(
     leaderboardApi: LeaderboardApi
 )(implicit ec: scala.concurrent.ExecutionContext) {
 
-  import ShieldTableApi._
-  import BSONHandlers._
+  import ShieldTableApi.*
+  import BSONHandlers.*
 
   // private val maxPerPage = MaxPerPage(15)
 
@@ -24,13 +24,13 @@ final class ShieldTableApi(
           "c" -> id
         )
       )
-      .sort($sort `desc` "p")
+      .sort($sort.desc("p"))
       .cursor[ShieldTableEntry]()
       .list()
 
   def clearRepo(category: Category) =
     byCategoryId(category.id) flatMap { entries =>
-      (entries.nonEmpty so repo.coll.delete.one($inIds(entries.map(_.id))).void)
+      entries.nonEmpty so repo.coll.delete.one($inIds(entries.map(_.id))).void
     }
 
   def insert(userPoints: Seq[ShieldTableEntry]) = userPoints.nonEmpty so
@@ -49,7 +49,6 @@ final class ShieldTableApi(
 
   def recalculateAll = Future.sequence(Category.all.map(recalculate)).void
 }
-
 
 object ShieldTableApi {
 
@@ -85,14 +84,14 @@ object ShieldTableApi {
     )
 
     val allById: Map[Int, Category] = all map { c =>
-      (c.id -> c)
+      c.id -> c
     } toMap
 
     def getFromId(id: Int) = allById.getOrElse(id, Overall)
 
     def titleFromId(id: Int) = s"${getFromId(id).name} Shield Leaderboard"
 
-    def restrictionGameFamily(id: Int) = if (id == 0) "" else s"${getFromId(id).name} "
+    def restrictionGameFamily(id: Int) = if id == 0 then "" else s"${getFromId(id).name} "
   }
 
   case class ShieldTableEntry(
@@ -106,8 +105,6 @@ object ShieldTableApi {
 
     type ID = String
 
-    def makeId = ThreadLocalRandom `nextString` 8
+    def makeId = ThreadLocalRandom.nextString(8)
   }
 }
-
-

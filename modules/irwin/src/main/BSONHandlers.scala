@@ -1,13 +1,13 @@
 package lila.irwin
 
-import reactivemongo.api.bson._
+import reactivemongo.api.bson.*
 
-import lila.db.dsl._
+import lila.db.dsl.*
 import lila.db.BSON
 
 object BSONHandlers {
 
-  import IrwinReport._
+  import IrwinReport.*
 
   implicit private val MoveReportBSONHandler: BSON[MoveReport] = new BSON[MoveReport] {
 
@@ -19,11 +19,11 @@ object BSONHandlers {
 
     def reads(r: BSON.Reader) =
       MoveReport(
-        activation = r `intD` activation,
-        rank = r `intO` rank,
-        ambiguity = r `intD` ambiguity,
-        odds = r `intD` odds,
-        loss = r `intD` loss
+        activation = r.intD(activation),
+        rank = r.intO(rank),
+        ambiguity = r.intD(ambiguity),
+        odds = r.intD(odds),
+        loss = r.intD(loss)
       )
 
     def writes(w: BSON.Writer, o: MoveReport) =

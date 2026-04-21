@@ -2,7 +2,7 @@ package lila.puzzle
 
 import strategygames.format.Forsyth
 import strategygames.format.UciCharPair
-import play.api.libs.json._
+import play.api.libs.json.*
 
 import lila.game.{ Game, GameRepo, PerfPicker }
 import strategygames.variant.Variant
@@ -16,7 +16,7 @@ final private class GameJson(
 )(implicit ec: scala.concurrent.ExecutionContext) {
 
   def apply(gameId: Game.ID, plies: Int, bc: Boolean): Fu[JsObject] =
-    (if (bc) bcCache else cache) get writeKey(gameId, plies)
+    (if bc then bcCache else cache) get writeKey(gameId, plies)
 
   def noCacheBc(game: Game, plies: Int): Fu[JsObject] =
     lightUserApi preloadMany game.userIds map { _ =>
@@ -51,9 +51,9 @@ final private class GameJson(
   }
 
   private def generate(gameId: Game.ID, plies: Int, bc: Boolean): Fu[JsObject] =
-    gameRepo `game` gameId `orFail` s"Missing puzzle game $gameId!" flatMap { game =>
+    gameRepo.game(gameId).orFail(s"Missing puzzle game $gameId!") flatMap { game =>
       lightUserApi preloadMany game.userIds map { _ =>
-        if (bc) generateBc(game, plies)
+        if bc then generateBc(game, plies)
         else generate(game, plies)
       }
     }
@@ -66,7 +66,7 @@ final private class GameJson(
         "variant" -> variantJson(game),
         "rated"   -> game.rated,
         "players" -> playersJson(game),
-        //can flatten whilst puzzles are just chess
+        // can flatten whilst puzzles are just chess
         "actionStrs" -> game.actionStrs.flatten.take(plies + 1).mkString(" "),
         "clock"      -> showClock(game)(using defaultLang)
       )
@@ -75,21 +75,21 @@ final private class GameJson(
     game.clock.map { clock => clock.config.show } getOrElse {
       game.daysPerTurn
         .map { days =>
-          if (days == 1) I18nKeys.oneDay.txt()
+          if days == 1 then I18nKeys.oneDay.txt()
           else I18nKeys.nbDays.pluralSame(days).toString
         }
         .getOrElse { "∞" }
     }
 
   private def perfJson(game: Game) = {
-    val perfType = lila.rating.PerfType `orDefault` PerfPicker.key(game)
+    val perfType = lila.rating.PerfType.orDefault(PerfPicker.key(game))
     Json.obj(
       "icon" -> perfType.iconChar.toString,
       "name" -> perfType.trans(using defaultLang)
     )
   }
 
-  //TODO wil need to support draughts differently (see game/jsonView example)
+  // TODO wil need to support draughts differently (see game/jsonView example)
   private def variantJson(game: Game) = Json.obj(
     "key"       -> game.variant.key,
     "name"      -> VariantKeys.variantName(game.variant),
@@ -157,17 +157,17 @@ final private class GameJson(
   private def generateBc(game: Game, turns: Int): JsObject =
     Json
       .obj(
-        "id"      -> game.id,
-        "perf"    -> perfJson(game),
-        "players" -> playersJson(game),
-        "variant" -> variantJson(game),
-        "rated"   -> game.rated,
+        "id"        -> game.id,
+        "perf"      -> perfJson(game),
+        "players"   -> playersJson(game),
+        "variant"   -> variantJson(game),
+        "rated"     -> game.rated,
         "treeParts" -> {
           val actionStrs = game.actionStrs.take(turns + 1)
           val lib        = game.variant.gameLogic
           for {
-            //TODO: multiaction ok for now as just chess puzzles
-            lastPly <- actionStrs.flatten.lastOption
+            // TODO: multiaction ok for now as just chess puzzles
+            lastPly   <- actionStrs.flatten.lastOption
             situation <- strategygames.Replay
               .situations(lib, actionStrs, None, game.variant)
               .valueOr { err =>

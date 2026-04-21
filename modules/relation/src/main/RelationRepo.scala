@@ -1,17 +1,17 @@
 package lila.relation
 
-import reactivemongo.api.bson._
+import reactivemongo.api.bson.*
 import reactivemongo.api.ReadPreference
 import org.joda.time.DateTime
 
-import lila.db.dsl._
+import lila.db.dsl.*
 import lila.user.User
 
 final private class RelationRepo(coll: Coll, userRepo: lila.user.UserRepo)(implicit
     ec: scala.concurrent.ExecutionContext
 ) {
 
-  import RelationRepo._
+  import RelationRepo.*
 
   def following(userId: ID) = relating(userId, Follow)
 
@@ -21,14 +21,14 @@ final private class RelationRepo(coll: Coll, userRepo: lila.user.UserRepo)(impli
   def freshFollowersFromSecondary(userId: ID): Fu[List[User.ID]] =
     coll
       .aggregateWith[Bdoc](readPreference = ReadPreference.secondaryPreferred) { implicit framework =>
-        import framework._
+        import framework.*
         List(
           Match($doc("u2" -> userId, "r" -> Follow)),
           PipelineOperator(
             $doc(
               "$lookup" -> $doc(
-                "from" -> userRepo.coll.name,
-                "let"  -> $doc("uid" -> "$u1"),
+                "from"     -> userRepo.coll.name,
+                "let"      -> $doc("uid" -> "$u1"),
                 "pipeline" -> $arr(
                   $doc(
                     "$match" -> $doc(

@@ -1,9 +1,8 @@
 package views.html.mod
 
 import lila.api.Context
-import lila.app.templating.Environment._
-import lila.app.ui.ScalatagsTemplate._
-
+import lila.app.templating.Environment.*
+import lila.app.ui.ScalatagsTemplate.*
 
 object emailConfirm {
 
@@ -51,16 +50,16 @@ this.setSelectionRange(this.value.length, this.value.length);
                   td(email.fold("-")(_.value)),
                   td(u.count.game.localize),
                   td(
-                    u.marks.engine `option` "ENGINE",
-                    u.marks.boost `option` "BOOSTER",
-                    u.marks.troll `option` "SHADOWBAN",
-                    u.disabled `option` "CLOSED"
+                    u.marks.engine.option("ENGINE"),
+                    u.marks.boost.option("BOOSTER"),
+                    u.marks.troll.option("SHADOWBAN"),
+                    u.disabled.option("CLOSED")
                   ),
                   td(momentFromNow(u.createdAt)),
                   td(u.seenAt.map(momentFromNow(_))),
                   td(style := "font-size:2em")(
-                    if (!u.everLoggedIn) iconTag("E")(cls := "is-green")
-                    else iconTag("L")(cls := "is-red")
+                    if !u.everLoggedIn then iconTag("E")(cls := "is-green")
+                    else iconTag("L")(cls                    := "is-red")
                   )
                 )
               )

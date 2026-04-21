@@ -1,9 +1,9 @@
 package lila.game
 
-import strategygames.chess.format.pgn.{ Parser }
+import strategygames.chess.format.pgn.Parser
 import strategygames.format.pgn.{ FullTurn, ParsedPgn, Pgn, Tag, TagType, Tags, Turn }
 import strategygames.format.{ FEN, Forsyth }
-import strategygames.{ ActionStrs, Centis, Player => PlayerIndex, Status }
+import strategygames.{ ActionStrs, Centis, Player as PlayerIndex, Status }
 import strategygames.variant.Variant
 
 import lila.common.config.BaseUrl
@@ -15,10 +15,10 @@ final class PgnDump(
     lightUserApi: lila.user.LightUserApi
 )(implicit ec: scala.concurrent.ExecutionContext) {
 
-  import PgnDump._
+  import PgnDump.*
 
-  //TODO: For draughts PgnDump to work as it does in lidraughts
-  //the extra flag fields commented out below need to be set
+  // TODO: For draughts PgnDump to work as it does in lidraughts
+  // the extra flag fields commented out below need to be set
   def apply(
       game: Game,
       initialFen: Option[FEN],
@@ -34,15 +34,15 @@ final class PgnDump(
       case _                         => false
     }
     val tagsFuture =
-      if (flags.tags)
+      if flags.tags then
         tags(
           game,
           initialFen,
           imported,
           withOpening = flags.opening,
-          //draughtsResult = flags.draughtsResult, //Need to set this elsewhere in lila
+          // draughtsResult = flags.draughtsResult, //Need to set this elsewhere in lila
           algebraic = algebraic,
-          //withProfileName = flags.profileName, //Need to set this elsewhere in lila
+          // withProfileName = flags.profileName, //Need to set this elsewhere in lila
           withRatings = !hideRatings,
           teams = teams
         )
@@ -54,7 +54,7 @@ final class PgnDump(
           game.variant match {
             case Variant.Draughts(variant) => {
               val pliesFull = game.draughtsActionStrsConcat(true, true).flatten
-              val plies = strategygames.draughts.Replay
+              val plies     = strategygames.draughts.Replay
                 .unambiguousPdnMoves(
                   pdnMoves = pliesFull,
                   initialFen = tags.fen match {
@@ -63,32 +63,32 @@ final class PgnDump(
                     case _                       => sys.error("invalid draughts fen in pgnDump")
                   },
                   variant = variant
-                  //TODO: draughts, this used to be a Valid[List[String]] type
-                  //and now we have lost the error. Perhaps we need to reconsider this
+                  // TODO: draughts, this used to be a Valid[List[String]] type
+                  // and now we have lost the error. Perhaps we need to reconsider this
                 )
                 .fold(shortenDraughtsMoves(pliesFull))(moves => moves)
-              val delayedPlies = flags `keepDelayIf` game.playable `applyDelay` plies
-              val algPlies =
-                if (algebraic) san2alg(delayedPlies, variant.boardSize.pos)
+              val delayedPlies = flags.keepDelayIf(game.playable).applyDelay(plies)
+              val algPlies     =
+                if algebraic then san2alg(delayedPlies, variant.boardSize.pos)
                 else delayedPlies
               val offsetPlies =
-                if (fenSituation.exists(_.situation.player.p2)) ".." +: algPlies
+                if fenSituation.exists(_.situation.player.p2) then ".." +: algPlies
                 else algPlies
               offsetPlies.toVector.map(Vector(_))
             }
             case Variant.Abalone(variant) if variant.hasPrevPlayer =>
               // Grand Abalone: P1's first turn = 1 ply, all subsequent turns = 2 plies each
-              val flat = game.actionStrs.flatten.toVector
+              val flat    = game.actionStrs.flatten.toVector
               val grouped =
-                if (flat.isEmpty) Vector.empty[Vector[String]]
+                if flat.isEmpty then Vector.empty[Vector[String]]
                 else Vector(Vector(flat.head)) ++ flat.tail.grouped(2).map(_.toVector).toVector
-              (flags `keepDelayIf` game.playable applyDelay {
-                if (fenSituation.exists(_.situation.player.p2)) Vector("..") +: grouped
+              (flags.keepDelayIf(game.playable) applyDelay {
+                if fenSituation.exists(_.situation.player.p2) then Vector("..") +: grouped
                 else grouped
               }).toVector
             case _ =>
-              (flags `keepDelayIf` game.playable applyDelay {
-                if (fenSituation.exists(_.situation.player.p2)) Vector("..") +: game.actionStrs
+              (flags.keepDelayIf(game.playable) applyDelay {
+                if fenSituation.exists(_.situation.player.p2) then Vector("..") +: game.actionStrs
                 else game.actionStrs
               }).toVector
           },
@@ -103,10 +103,10 @@ final class PgnDump(
 
   private def shortenDraughtsMoves(moves: Seq[String]) = moves map { move =>
     val x1 = move.indexOf("x")
-    if (x1 == -1) move
+    if x1 == -1 then move
     else {
       val x2 = move.lastIndexOf("x")
-      if (x2 == x1 || x2 == -1) move
+      if x2 == x1 || x2 == -1 then move
       else move.slice(0, x1) + move.slice(x2, move.length)
     }
   }
@@ -114,15 +114,15 @@ final class PgnDump(
   private def san2alg(moves: Seq[String], boardPos: strategygames.draughts.BoardPos) =
     moves map { move =>
       val capture         = move.contains('x')
-      val fields          = if (capture) move.split("x") else move.split("-")
+      val fields          = if capture then move.split("x") else move.split("-")
       val algebraicFields = fields.flatMap { boardPos.algebraic(_) }
-      val sep             = if (capture) "x" else "-"
+      val sep             = if capture then "x" else "-"
       algebraicFields mkString sep
     }
 
   private def gameUrl(id: String) = s"$baseUrl/$id"
 
-  //TODO figure out how this works for Draughts to replicate lidraughts functionality
+  // TODO figure out how this works for Draughts to replicate lidraughts functionality
   /*private def namedLightUser(userId: String) =
     lila.user.UserRepo.byId(userId) map {
       _ so { u =>
@@ -168,7 +168,7 @@ final class PgnDump(
 
   private def ratingDiffTag(p: Player, tag: Tag.type => TagType) =
     p.ratingDiff.map { rd =>
-      Tag(tag(Tag), s"${if (rd >= 0) "+" else ""}$rd")
+      Tag(tag(Tag), s"${if rd >= 0 then "+" else ""}$rd")
     }
 
   def tags(
@@ -188,7 +188,7 @@ final class PgnDump(
         List[Option[Tag]](
           Tag(
             _.Event,
-            imported.flatMap(_.tags(_.Event)) | { if (game.imported) "Import" else eventOf(game) }
+            imported.flatMap(_.tags(_.Event)) | { if game.imported then "Import" else eventOf(game) }
           ).some,
           Tag(_.Site, gameUrl(game.id)).some,
           Tag(_.Date, importedDate | Tag.UTCDate.format.print(game.createdAt)).some,
@@ -196,16 +196,20 @@ final class PgnDump(
           Tag(_.P1, player(game.p1Player, wu)).some,
           Tag(_.P2, player(game.p2Player, bu)).some,
           Tag(_.Result, result(game, draughtsResult)).some,
-          importedDate.isEmpty `option` Tag(
-            _.UTCDate,
-            imported.flatMap(_.tags(_.UTCDate)) | Tag.UTCDate.format.print(game.createdAt)
+          importedDate.isEmpty.option(
+            Tag(
+              _.UTCDate,
+              imported.flatMap(_.tags(_.UTCDate)) | Tag.UTCDate.format.print(game.createdAt)
+            )
           ),
-          importedDate.isEmpty `option` Tag(
-            _.UTCTime,
-            imported.flatMap(_.tags(_.UTCTime)) | Tag.UTCTime.format.print(game.createdAt)
+          importedDate.isEmpty.option(
+            Tag(
+              _.UTCTime,
+              imported.flatMap(_.tags(_.UTCTime)) | Tag.UTCTime.format.print(game.createdAt)
+            )
           ),
-          withRatings `option` Tag(_.P1Elo, rating(game.p1Player)),
-          withRatings `option` Tag(_.P2Elo, rating(game.p2Player)),
+          withRatings.option(Tag(_.P1Elo, rating(game.p1Player))),
+          withRatings.option(Tag(_.P2Elo, rating(game.p2Player))),
           withRatings so ratingDiffTag(game.p1Player, _.P1RatingDiff),
           withRatings so ratingDiffTag(game.p2Player, _.P2RatingDiff),
           wu.flatMap(_.title).map { t =>
@@ -220,10 +224,10 @@ final class PgnDump(
           Tag.timeControl(game.clock.map(_.config)).some,
           game.metadata.multiMatchGameId.map(gameId => Tag(_.MultiMatch, gameId)),
           Tag(_.ECO, game.opening.fold("?")(_.opening.eco)).some,
-          withOpening `option` Tag(_.Opening, game.opening.fold("?")(_.opening.name)),
+          withOpening.option(Tag(_.Opening, game.opening.fold("?")(_.opening.name))),
           Tag(
             _.Termination, {
-              import Status._
+              import Status.*
               game.status match {
                 case Created | Started                                           => "Unterminated"
                 case Aborted | NoStart                                           => "Abandoned"
@@ -247,7 +251,7 @@ final class PgnDump(
                   case None                    => None
                   case _                       => sys.error("invalid draughts fen in pgnDump tags")
                 }).flatMap { fen =>
-                  if (algebraic)
+                  if algebraic then
                     strategygames.draughts.format.Forsyth.toAlgebraic(
                       variant,
                       fen
@@ -316,13 +320,13 @@ object PgnDump {
       delayTurns: Boolean = false
   ) {
     def applyDelay[M](actionStrs: Seq[M]): Seq[M] =
-      if (!delayTurns) actionStrs
-      else actionStrs.take((actionStrs.size - delayTurnsBy) `atLeast` delayKeepsFirstTurns)
+      if !delayTurns then actionStrs
+      else actionStrs.take((actionStrs.size - delayTurnsBy).atLeast(delayKeepsFirstTurns))
 
     def keepDelayIf(cond: Boolean) = copy(delayTurns = delayTurns && cond)
   }
 
   def result(game: Game, draughtsResult: Boolean) =
-    if (game.finished) PlayerIndex.showResult(game.winnerPlayerIndex, draughtsResult)
+    if game.finished then PlayerIndex.showResult(game.winnerPlayerIndex, draughtsResult)
     else "*"
 }

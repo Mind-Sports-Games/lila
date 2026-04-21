@@ -1,6 +1,6 @@
 package lila.simul
 
-import play.api.libs.json._
+import play.api.libs.json.*
 
 import scala.util.Random
 import lila.common.LightUser
@@ -24,18 +24,20 @@ final class JsonView(
   implicit private val simulTeamWriter: OWrites[SimulTeam] = Json.writes[SimulTeam]
 
   private def fetchGames(simul: Simul) =
-    if (simul.isFinished) gameRepo `gamesFromSecondary` simul.gameIds
+    if simul.isFinished then gameRepo.gamesFromSecondary(simul.gameIds)
     else Future.sequence(simul.gameIds.map(proxyRepo.game)).dmap(_.flatten)
 
   def apply(simul: Simul, team: Option[SimulTeam]): Fu[JsObject] =
     for {
-      games      <- fetchGames(simul)
-      lightHost  <- getLightUser(simul.hostId)
-      applicants <- Future.sequence(simul.applicants.sortBy(-_.player.rating).map(applicantJson))
+      games          <- fetchGames(simul)
+      lightHost      <- getLightUser(simul.hostId)
+      applicants     <- Future.sequence(simul.applicants.sortBy(-_.player.rating).map(applicantJson))
       pairingOptions <-
-        Future.sequence(simul.pairings
-          .sortBy(-_.player.rating)
-          .map(pairingJson(games, simul.hostId)))
+        Future.sequence(
+          simul.pairings
+            .sortBy(-_.player.rating)
+            .map(pairingJson(games, simul.hostId))
+        )
       pairings = pairingOptions.flatten
     } yield baseSimul(simul, lightHost) ++ Json
       .obj(
@@ -79,7 +81,7 @@ final class JsonView(
 
   private def baseSimul(simul: Simul, lightHost: Option[LightUser]) =
     Json.obj(
-      "id" -> simul.id,
+      "id"   -> simul.id,
       "host" -> lightHost.map { host =>
         Json
           .obj(
@@ -145,8 +147,8 @@ final class JsonView(
       .obj(
         "id"     -> g.id,
         "status" -> g.status.id,
-        "fen" -> (strategygames.format.Forsyth
-          .>>(g.situation.board.variant.gameLogic, g.stratGame))
+        "fen"    -> strategygames.format.Forsyth
+          .>>(g.situation.board.variant.gameLogic, g.stratGame)
           .value,
         "gameLogic" -> g.situation.board.variant.gameLogic.name.toLowerCase(),
         "boardSize" -> boardSizeJson(g.situation.board.variant),

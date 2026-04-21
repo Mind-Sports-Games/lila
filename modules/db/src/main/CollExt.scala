@@ -2,9 +2,9 @@ package lila.db
 
 import scala.collection.Factory
 
-import reactivemongo.api._
-import reactivemongo.api.bson._
-import reactivemongo.api.{ WriteConcern => CWC }
+import reactivemongo.api.*
+import reactivemongo.api.bson.*
+import reactivemongo.api.WriteConcern as CWC
 
 trait CollExt { self: dsl & QueryBuilderExt =>
 

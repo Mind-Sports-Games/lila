@@ -1,11 +1,11 @@
 package lila.fishnet
 
-import scala.util.control.Exception._
+import scala.util.control.Exception.*
 
 import strategygames.format.{ Uci, UciDump }
 import strategygames.GameFamily
-import io.lettuce.core._
-import io.lettuce.core.pubsub._
+import io.lettuce.core.*
+import io.lettuce.core.pubsub.*
 import scala.concurrent.Future
 
 import lila.hub.actorApi.map.{ Tell, TellAll }
@@ -26,7 +26,7 @@ final class FishnetRedis(
   private var stopping = false
 
   def request(work: Work.Move): Unit =
-    if (!stopping) { val _ = connOut.async.publish(chanOut, writeWork(work)) }
+    if !stopping then { val _ = connOut.async.publish(chanOut, writeWork(work)) }
 
   connIn.async.subscribe(chanIn)
 

@@ -1,12 +1,16 @@
 package lila.swiss
 
-import akka.stream.scaladsl._
+import akka.stream.scaladsl.*
 import akka.util.ByteString
 import java.io.File
 import scala.concurrent.blocking
-import scala.sys.process._
+import scala.sys.process.*
 
-final private class PairingSystem(trf: SwissTrf, @annotation.nowarn("msg=unused") _rankingApi: SwissRankingApi, executable: String)(implicit
+final private class PairingSystem(
+    trf: SwissTrf,
+    @annotation.nowarn("msg=unused") _rankingApi: SwissRankingApi,
+    executable: String
+)(implicit
     ec: scala.concurrent.ExecutionContext,
     mat: akka.stream.Materializer
 ) {
@@ -21,23 +25,27 @@ final private class PairingSystem(trf: SwissTrf, @annotation.nowarn("msg=unused"
   private def invoke(swiss: Swiss, input: Source[String, ?]): Fu[List[String]] =
     withTempFile(swiss, input) { file =>
       val flavour =
-        if (swiss.nbPlayers < 250) "dutch"
-        else if (swiss.nbPlayers < 700) "burstein"
+        if swiss.nbPlayers < 250 then "dutch"
+        else if swiss.nbPlayers < 700 then "burstein"
         else "fast"
       val command = s"$executable --$flavour $file -p"
       val stdout  = new collection.mutable.ListBuffer[String]
       val stderr  = new StringBuilder
-      val status = lila.common.Chronometer.syncMon(_.swiss.bbpairing) {
+      val status  = lila.common.Chronometer.syncMon(_.swiss.bbpairing) {
         blocking {
-          command ! ProcessLogger(stdout append _, { (s: String) => val _ = stderr append s })
+          command ! ProcessLogger(
+            stdout append _,
+            { (s: String) =>
+              val _ = stderr append s
+            }
+          )
         }
       }
-      if (status != 0) {
+      if status != 0 then {
         val error = stderr.toString
-        if (error `contains` "No valid pairing exists") Nil
+        if error.contains("No valid pairing exists") then Nil
         else throw PairingSystem.BBPairingException(error, swiss)
-      }
-      else stdout.toList
+      } else stdout.toList
     }
 
   private def reader(idsToPlayers: IdPlayers, output: List[String]): List[SwissPairing.ByeOrPending] =
@@ -54,7 +62,7 @@ final private class PairingSystem(trf: SwissTrf, @annotation.nowarn("msg=unused"
             p1 <- w.toIntOption flatMap idsToPlayers.get
             p2 <- b.toIntOption flatMap idsToPlayers.get
           } yield Right(SwissPairing.Pending(p1, p2))
-    }
+      }
       .flatten
 
   def withTempFile[A](swiss: Swiss, contents: Source[String, ?])(f: File => A): Fu[A] = {

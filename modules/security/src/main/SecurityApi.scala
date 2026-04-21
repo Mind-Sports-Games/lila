@@ -1,17 +1,17 @@
 package lila.security
 
 import org.joda.time.DateTime
-import play.api.data._
-import play.api.data.Forms._
-import play.api.data.validation.{ Constraint, Valid => FormValid, Invalid, ValidationError }
+import play.api.data.*
+import play.api.data.Forms.*
+import play.api.data.validation.{ Constraint, Invalid, Valid as FormValid, ValidationError }
 import play.api.mvc.RequestHeader
-import reactivemongo.api.bson._
+import reactivemongo.api.bson.*
 import reactivemongo.api.ReadPreference
-import scala.concurrent.duration._
+import scala.concurrent.duration.*
 
 import lila.common.{ ApiVersion, EmailAddress, HTTPRequest, IpAddress }
 import lila.db.BSON.BSONJodaDateTimeHandler
-import lila.db.dsl._
+import lila.db.dsl.*
 import lila.oauth.{ AccessToken, OAuthScope, OAuthServer }
 import lila.user.{ User, UserRepo }
 import User.LoginCandidate
@@ -57,7 +57,7 @@ final class SecurityApi(
         case _                            => none
       }.verifying(Constraint { (t: LoginCandidate.Result) =>
         t match {
-          case LoginCandidate.Success(_) => FormValid
+          case LoginCandidate.Success(_)                => FormValid
           case LoginCandidate.InvalidUsernameOrPassword =>
             Invalid(Seq(ValidationError("invalidUsernameOrPassword")))
           case err => Invalid(Seq(ValidationError(err.toString)))
@@ -69,7 +69,7 @@ final class SecurityApi(
     emailValidator.validate(EmailAddress(str)) match {
       case Some(EmailAddressValidator.Acceptable(email)) =>
         authenticator.loginCandidateByEmail(email.normalize)
-      case None if User.couldBeUsername(str) => authenticator.loginCandidateById(User `normalize` str)
+      case None if User.couldBeUsername(str) => authenticator.loginCandidateById(User.normalize(str))
       case _                                 => fuccess(none)
     }
   } map loadedLoginForm
@@ -86,34 +86,35 @@ final class SecurityApi(
   def saveAuthentication(userId: User.ID, apiVersion: Option[ApiVersion])(implicit
       req: RequestHeader
   ): Fu[String] =
-    userRepo `mustConfirmEmail` userId flatMap {
-      case true => fufail(SecurityApi `MustConfirmEmail` userId)
+    userRepo.mustConfirmEmail(userId) flatMap {
+      case true  => fufail(SecurityApi.MustConfirmEmail(userId))
       case false =>
-        val sessionId = Random `secureString` 22
-        if (tor `isExitNode` HTTPRequest.ipAddress(req)) logger.info(s"Tor login $userId")
+        val sessionId = Random.secureString(22)
+        if tor.isExitNode(HTTPRequest.ipAddress(req)) then logger.info(s"Tor login $userId")
         store.save(sessionId, userId, req, apiVersion, up = true, fp = none) inject sessionId
     }
 
   def saveSignup(userId: User.ID, apiVersion: Option[ApiVersion], fp: Option[FingerPrint])(implicit
       req: RequestHeader
   ): Funit = {
-    val sessionId = lila.common.ThreadLocalRandom `nextString` 22
+    val sessionId = lila.common.ThreadLocalRandom.nextString(22)
     store.save(s"SIG-$sessionId", userId, req, apiVersion, up = false, fp = fp)
   }
 
   def restoreUser(req: RequestHeader): Fu[Option[Either[AppealUser, FingerPrintedUser]]] =
-    if (!firewall.accepts(req)) fuccess(none)
-    else reqSessionId(req).fold(fuccess(none[Either[AppealUser, FingerPrintedUser]])) { sessionId =>
-      appeal.authenticate(sessionId) match {
-        case Some(userId) => userRepo.byId(userId).map2 { u => Left(AppealUser(u)) }
-        case None =>
-          store.authInfo(sessionId) flatMap {
-            _.fold(fuccess(none[Either[AppealUser, FingerPrintedUser]])) { d =>
-              userRepo.byId(d.user).dmap { _.map { u => Right(FingerPrintedUser(u, d.hasFp)) } }
+    if !firewall.accepts(req) then fuccess(none)
+    else
+      reqSessionId(req).fold(fuccess(none[Either[AppealUser, FingerPrintedUser]])) { sessionId =>
+        appeal.authenticate(sessionId) match {
+          case Some(userId) => userRepo.byId(userId).map2 { u => Left(AppealUser(u)) }
+          case None         =>
+            store.authInfo(sessionId) flatMap {
+              _.fold(fuccess(none[Either[AppealUser, FingerPrintedUser]])) { d =>
+                userRepo.byId(d.user).dmap { _.map { u => Right(FingerPrintedUser(u, d.hasFp)) } }
+              }
             }
-          }
+        }
       }
-    }
 
   def oauthScoped(
       req: RequestHeader,
@@ -132,7 +133,7 @@ final class SecurityApi(
   private lazy val nonModRoles: Set[String] = Permission.nonModPermissions.map(_.dbKey)
 
   private def stripRolesOfOAuthUser(scoped: OAuthScope.Scoped) =
-    if (scoped.scopes.contains(OAuthScope.Web.Mod)) scoped
+    if scoped.scopes.contains(OAuthScope.Web.Mod) then scoped
     else scoped.copy(user = scoped.user.copy(roles = scoped.user.roles.filter(nonModRoles.contains)))
 
   def oauthScoped(
@@ -198,7 +199,9 @@ final class SecurityApi(
     def authenticate(sessionId: SessionId): Option[User.ID] =
       sessionId.startsWith(prefix) so store.getIfPresent(sessionId)
 
-    def saveAuthentication(userId: User.ID)(implicit @annotation.nowarn("msg=unused") _req: RequestHeader): Fu[SessionId] = {
+    def saveAuthentication(
+        userId: User.ID
+    )(implicit @annotation.nowarn("msg=unused") _req: RequestHeader): Fu[SessionId] = {
       val sessionId = s"$prefix${Random `secureString` 22}"
       store.put(sessionId, userId)
       logger.info(s"Appeal login by $userId")

@@ -3,7 +3,7 @@ package lila.round
 import strategygames.{ ActionStrs, Player, Replay, Situation }
 import strategygames.format.{ FEN, Forsyth, Uci }
 import strategygames.variant.Variant
-import play.api.libs.json._
+import play.api.libs.json.*
 
 import lila.socket.Step
 
@@ -63,15 +63,11 @@ object StepBuilder {
               pocketData = g.situation.board.pocketData,
               captLen = (g.situation, m) match {
                 case (Situation.Draughts(situation), Uci.DraughtsWithSan(m)) =>
-                  if (situation.ghosts > 0)
-                    situation.captureLengthFrom(m.uci.dest)
-                  else
-                    situation.allMovesCaptureLength.some
+                  if situation.ghosts > 0 then situation.captureLengthFrom(m.uci.dest)
+                  else situation.allMovesCaptureLength.some
                 case (Situation.Dameo(situation), Uci.DameoWithSan(m)) =>
-                  if (situation.ghosts > 0)
-                    situation.captureLengthFrom(m.uci.dest)
-                  else
-                    situation.allMovesCaptureLength.some
+                  if situation.ghosts > 0 then situation.captureLengthFrom(m.uci.dest)
+                  else situation.allMovesCaptureLength.some
                 case _ => None
               }
             )
@@ -82,7 +78,7 @@ object StepBuilder {
 
   private val logChessError = (id: String) =>
     (err: String) => {
-      val path = if (id == "synthetic") "analysis" else id
+      val path = if id == "synthetic" then "analysis" else id
       logger.info(s"https://playstrategy.org/$path ${err.linesIterator.toList.headOption | "?"}")
     }
 }

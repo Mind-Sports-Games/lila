@@ -4,10 +4,9 @@ package account
 import play.api.data.Form
 
 import lila.api.Context
-import lila.app.templating.Environment._
-import lila.app.ui.ScalatagsTemplate._
-import lila.security.EmailConfirm.Help._
-
+import lila.app.templating.Environment.*
+import lila.app.ui.ScalatagsTemplate.*
+import lila.security.EmailConfirm.Help.*
 
 object emailConfirmHelp {
 

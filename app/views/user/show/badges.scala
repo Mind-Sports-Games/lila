@@ -1,8 +1,8 @@
 package views.html.user.show
 
 import lila.api.Context
-import lila.app.templating.Environment._
-import lila.app.ui.ScalatagsTemplate._
+import lila.app.templating.Environment.*
+import lila.app.ui.ScalatagsTemplate.*
 import lila.user.Trophy
 
 object badges {
@@ -31,7 +31,7 @@ object badges {
             "trophy award icon3d streamer" -> true,
             "streaming"                    -> streaming
           ),
-          ariaTitle(if (streaming) "Live now!" else "PlayStrategy Streamer")
+          ariaTitle(if streaming then "Live now!" else "PlayStrategy Streamer")
         )("")
       }
     )

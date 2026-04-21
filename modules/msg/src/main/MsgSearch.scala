@@ -1,10 +1,10 @@
 package lila.msg
 
-import reactivemongo.api.bson._
+import reactivemongo.api.bson.*
 import reactivemongo.api.ReadPreference
 
 import lila.common.LightUser
-import lila.db.dsl._
+import lila.db.dsl.*
 import lila.user.User
 import lila.common.Bus
 import lila.hub.actorApi.clas.ClasMatesAndTeachers
@@ -17,10 +17,10 @@ final class MsgSearch(
     relationApi: lila.relation.RelationApi
 )(implicit ec: scala.concurrent.ExecutionContext, scheduler: akka.actor.Scheduler) {
 
-  import BsonHandlers._
+  import BsonHandlers.*
 
   def apply(me: User, q: String): Fu[MsgSearch.Result] =
-    if (me.kid) forKid(me, q)
+    if me.kid then forKid(me, q)
     else
       searchThreads(me, q) zip searchFriends(me, q) zip searchUsers(me, q) map {
         case ((threads, friends), users) =>
@@ -36,7 +36,7 @@ final class MsgSearch(
     threads  <- searchThreads(me, q)
     allMates <- Bus.ask[Set[User.ID]]("clas") { ClasMatesAndTeachers(KidId(me.id), _) }
     lower   = q.toLowerCase
-    mateIds = allMates.view.filter(_ `startsWith` lower).toList take 15
+    mateIds = allMates.view.filter(_.startsWith(lower)).toList take 15
     mates <- lightUserApi asyncMany mateIds
   } yield MsgSearch.Result(threads, mates.flatten, Nil)
 
@@ -53,7 +53,7 @@ final class MsgSearch(
           "del" `$ne` me.id
         )
       )
-      .sort($sort `desc` "lastMsg.date")
+      .sort($sort.desc("lastMsg.date"))
       .hint(
         colls.thread hint $doc(
           "users"        -> 1,
@@ -64,10 +64,10 @@ final class MsgSearch(
       .list(5)
 
   private def searchFriends(me: User, q: String): Fu[List[LightUser]] =
-    relationApi.searchFollowedBy(me, q, 15) flatMap lightUserApi.asyncMany `dmap` (_.flatten)
+    relationApi.searchFollowedBy(me, q, 15).flatMap(lightUserApi.asyncMany).dmap(_.flatten)
 
   private def searchUsers(@annotation.nowarn("msg=unused") _me: User, q: String): Fu[List[LightUser]] =
-    userCache.userIdsLike(q) flatMap lightUserApi.asyncMany `dmap` (_.flatten)
+    userCache.userIdsLike(q).flatMap(lightUserApi.asyncMany).dmap(_.flatten)
 }
 
 object MsgSearch {

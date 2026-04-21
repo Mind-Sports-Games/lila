@@ -1,14 +1,14 @@
 package lila.fishnet
 
 import org.joda.time.DateTime
-import reactivemongo.api.bson._
-import scala.concurrent.duration._
+import reactivemongo.api.bson.*
+import scala.concurrent.duration.*
 import scala.util.{ Failure, Success, Try }
 
 import Client.Skill
 import lila.common.IpAddress
 import lila.common.extensions.*
-import lila.db.dsl._
+import lila.db.dsl.*
 
 final class FishnetApi(
     repo: FishnetRepo,
@@ -24,22 +24,22 @@ final class FishnetApi(
     scheduler: akka.actor.Scheduler
 ) {
 
-  import FishnetApi._
+  import FishnetApi.*
   import JsonApi.Request.{ CompleteAnalysis, PartialAnalysis }
-  import BSONHandlers._
+  import BSONHandlers.*
 
   private val workQueue = new lila.hub.DuctSequencer(maxSize = 256, timeout = 5 seconds, name = "fishnetApi")
 
   def keyExists(key: Client.Key) = repo.getEnabledClient(key).map(_.isDefined)
 
   def authenticateClient(req: JsonApi.Request, ip: IpAddress): Fu[Try[Client]] = {
-    if (config.offlineMode) repo.getOfflineClient map some
+    if config.offlineMode then repo.getOfflineClient map some
     else repo.getEnabledClient(req.fishnet.apikey)
   } map {
     case None         => Failure(new Exception("Can't authenticate: invalid key or disabled client"))
-    case Some(client) => clientVersion `accept` req.fishnet.version map (_ => client)
+    case Some(client) => clientVersion.accept(req.fishnet.version) map (_ => client)
   } flatMap {
-    case Success(client) => repo.updateClientInstance(client, req `instance` ip) map Success.apply
+    case Success(client) => repo.updateClientInstance(client, req.instance(ip)) map Success.apply
     case failure         => fuccess(failure)
   }
 
@@ -66,13 +66,13 @@ final class FishnetApi(
         .sort(
           $doc(
             "sender.system" -> 1, // user requests first, then playstrategy auto analysis
-            "createdAt"     -> 1 // oldest requests first
+            "createdAt"     -> 1  // oldest requests first
           )
         )
         .one[Work.Analysis]
         .flatMap {
           _ so { work =>
-            repo.updateAnalysis(work `assignTo` client) inject work.some
+            repo.updateAnalysis(work.assignTo(client)) inject work.some
           }
         }
     }.map { _ map JsonApi.analysisFromWork(config.analysisNodes) }
@@ -88,19 +88,21 @@ final class FishnetApi(
         case None =>
           Monitor.notFound(workId, client)
           fufail(WorkNotFound)
-        case Some(work) if work `isAcquiredBy` client => {
+        case Some(work) if work.isAcquiredBy(client) => {
           val v    = work.game.variant
           val data = lexicalData.toUci(v)
           data.completeOrPartial match {
             case complete: CompleteAnalysis =>
               {
-                if (complete.weak && work.game.variant.key == "standard") {
+                if complete.weak && work.game.variant.key == "standard" then {
                   Monitor.weak(work, client, complete)
                   repo.updateOrGiveUpAnalysis(work.weak) >> fufail(WeakAnalysis(client))
                 } else
                   analysisBuilder(client, work, complete.analysis) flatMap { analysis =>
                     monitor.analysis(work, client, complete)
-                    repo.deleteAnalysis(work).inject(PostAnalysisResult.Complete(analysis): PostAnalysisResult)
+                    repo
+                      .deleteAnalysis(work)
+                      .inject(PostAnalysisResult.Complete(analysis): PostAnalysisResult)
                   }
               } recoverWith { case e: Exception =>
                 Monitor.failure(work, client, e)
@@ -130,15 +132,15 @@ final class FishnetApi(
       }
       .result
       .flatMap {
-        case r @ PostAnalysisResult.Complete(res) => sink `save` res inject r
-        case r @ PostAnalysisResult.Partial(res)  => sink `progress` res inject r
+        case r @ PostAnalysisResult.Complete(res) => sink.save(res) inject r
+        case r @ PostAnalysisResult.Partial(res)  => sink.progress(res) inject r
         case r @ PostAnalysisResult.UnusedPartial => fuccess(r)
       }
   }
 
   def abort(workId: Work.Id, client: Client): Funit =
     workQueue {
-      repo.getAnalysis(workId).map(_.filter(_ `isAcquiredBy` client)) flatMap {
+      repo.getAnalysis(workId).map(_.filter(_.isAcquiredBy(client))) flatMap {
         _ so { work =>
           Monitor.abort(client)
           repo.updateAnalysis(work.abort)
@@ -180,7 +182,7 @@ final class FishnetApi(
       enabled = true,
       createdAt = DateTime.now
     )
-    repo `addClient` client inject client
+    repo.addClient(client) inject client
   }
 }
 

@@ -1,11 +1,11 @@
 package lila.relay
 
-import akka.actor._
-import com.softwaremill.macwire._
+import akka.actor.*
+import com.softwaremill.macwire.*
 import play.api.libs.ws.StandaloneWSClient
-import scala.concurrent.duration._
+import scala.concurrent.duration.*
 
-import lila.common.config._
+import lila.common.config.*
 
 final class Env(
     ws: StandaloneWSClient,
@@ -58,7 +58,7 @@ final class Env(
 
   lila.common.Bus.subscribeFun("study", "relayToggle") {
     case lila.hub.actorApi.study.RemoveStudy(studyId, _) => api.onStudyRemove(studyId).discard
-    case lila.study.actorApi.RelayToggle(id, v, who) =>
+    case lila.study.actorApi.RelayToggle(id, v, who)     =>
       studyApi.isContributor(id, who.u) foreach {
         _ so {
           api.requestPlay(RelayRound.Id(id.value), v)

@@ -1,8 +1,8 @@
 package lila.report
 
-import play.api.data._
-import play.api.data.Forms._
-import play.api.data.validation._
+import play.api.data.*
+import play.api.data.Forms.*
+import play.api.data.validation.*
 
 import lila.common.LightUser
 import lila.common.extensions.*
@@ -15,10 +15,9 @@ final private[report] class ReportForm(
 )(implicit ec: scala.concurrent.ExecutionContext)
     extends lila.hub.CaptchedForm {
   val cheatLinkConstraint: Constraint[ReportSetup] = Constraint("constraints.cheatgamelink") { setup =>
-    if (setup.reason != "cheat" || (domain.value + """/(\w{8}|\w{12})""").r.findFirstIn(setup.text).isDefined)
-      Valid
-    else
-      Invalid(Seq(ValidationError("error.provideOneCheatedGameLink")))
+    if setup.reason != "cheat" || (domain.value + """/(\w{8}|\w{12})""").r.findFirstIn(setup.text).isDefined
+    then Valid
+    else Invalid(Seq(ValidationError("error.provideOneCheatedGameLink")))
   }
 
   val create = Form(
@@ -37,15 +36,15 @@ final private[report] class ReportForm(
       "text"   -> text(minLength = 5, maxLength = 2000),
       "gameId" -> text,
       "move"   -> text
-    )({ case (username, reason, text, gameId, move) =>
+    ) { case (username, reason, text, gameId, move) =>
       ReportSetup(
-        user = blockingFetchUser(username) `err` "Unknown username " + username,
+        user = blockingFetchUser(username).err("Unknown username " + username),
         reason = reason,
         text = text,
         gameId = gameId,
         move = move
       )
-    })(_.values.some).verifying(captchaFailMessage, validateCaptcha).verifying(cheatLinkConstraint)
+    }(_.values.some).verifying(captchaFailMessage, validateCaptcha).verifying(cheatLinkConstraint)
   )
 
   def createWithCaptcha = withCaptcha(create)
@@ -59,7 +58,7 @@ final private[report] class ReportForm(
   )
 
   private def blockingFetchUser(username: String) =
-    lightUserAsync(User `normalize` username).await(1 second, "reportUser")
+    lightUserAsync(User.normalize(username)).await(1 second, "reportUser")
 }
 
 private[report] case class ReportFlag(

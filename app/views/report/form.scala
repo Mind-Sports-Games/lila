@@ -3,10 +3,9 @@ package views.html.report
 import play.api.data.Form
 
 import lila.api.Context
-import lila.app.templating.Environment._
-import lila.app.ui.ScalatagsTemplate._
+import lila.app.templating.Environment.*
+import lila.app.ui.ScalatagsTemplate.*
 import lila.user.User
-
 
 object form {
 
@@ -21,7 +20,7 @@ object form {
       main(cls := "page-small box box-pad report")(
         h1(trans.reportAUser()),
         postForm(
-          cls := "form3",
+          cls    := "form3",
           action := s"${routes.Report.create}${reqUser.so(u => "?username=" + u.username)}"
         )(
           div(cls := "form-group")(
@@ -60,9 +59,9 @@ object form {
       form3.hidden("resource", resource),
       form3.hidden("text", text take 140),
       submitButton(
-        cls := "button button-empty button-red confirm",
+        cls      := "button button-empty button-red confirm",
         dataIcon := "j",
-        title := "Report spam or offensive language"
+        title    := "Report spam or offensive language"
       )
     )
 }

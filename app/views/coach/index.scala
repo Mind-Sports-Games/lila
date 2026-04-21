@@ -1,8 +1,6 @@
 package views.html
 package coach
 
-
-
 object index {
   /*
   import trans.coach._

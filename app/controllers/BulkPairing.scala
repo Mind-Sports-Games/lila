@@ -46,7 +46,7 @@ final class BulkPairing(env: Env) extends LilaController(env) {
                 ).fuccess
               case Left(SetupBulk.BadTokens(tokens)) =>
                 import lila.setup.SetupBulk.BadToken
-                import play.api.libs.json._
+                import play.api.libs.json.*
                 BadRequest(
                   Json.obj(
                     "tokens" -> JsObject {
@@ -61,7 +61,7 @@ final class BulkPairing(env: Env) extends LilaController(env) {
               case Right(bulk) =>
                 env.challenge.bulk.schedule(bulk) map {
                   case Left(error) => BadRequest(jsonError(error))
-                  case Right(bulk) => JsonOk(SetupBulk `toJson` bulk)
+                  case Right(bulk) => JsonOk(SetupBulk.toJson(bulk))
                 }
             }
         )

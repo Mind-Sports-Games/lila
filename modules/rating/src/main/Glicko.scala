@@ -1,6 +1,6 @@
 package lila.rating
 
-import org.goochjs.glicko2._
+import org.goochjs.glicko2.*
 import org.joda.time.DateTime
 import reactivemongo.api.bson.BSONDocument
 
@@ -23,12 +23,12 @@ case class Glicko(
 
   def rankable(variant: Variant) =
     deviation <= {
-      if (variant.key == "standard") Glicko.standardRankableDeviation
+      if variant.key == "standard" then Glicko.standardRankableDeviation
       else Glicko.variantRankableDeviation
     }
   def provisional          = deviation >= Glicko.provisionalDeviation
   def established          = !provisional
-  def establishedIntRating = established `option` intRating
+  def establishedIntRating = established.option(intRating)
 
   def clueless = deviation >= Glicko.cluelessDeviation
 
@@ -44,14 +44,14 @@ case class Glicko(
 
   def cap =
     copy(
-      rating = rating `atLeast` Glicko.minRating,
-      deviation = deviation `atLeast` Glicko.minDeviation `atMost` Glicko.maxDeviation,
-      volatility = volatility `atMost` Glicko.maxVolatility
+      rating = rating.atLeast(Glicko.minRating),
+      deviation = deviation.atLeast(Glicko.minDeviation).atMost(Glicko.maxDeviation),
+      volatility = volatility.atMost(Glicko.maxVolatility)
     )
 
   def average(other: Glicko, weight: Float = 0.5f) =
-    if (weight >= 1) other
-    else if (weight <= 0) this
+    if weight >= 1 then other
+    else if weight <= 0 then this
     else
       Glicko(
         rating = rating * (1 - weight) + other.rating * weight,
@@ -97,15 +97,15 @@ case object Glicko {
 
   def liveDeviation(p: Perf, reverse: Boolean): Double = {
     system.previewDeviation(p.toRating, new DateTime, reverse)
-  } `atLeast` minDeviation `atMost` maxDeviation
+  }.atLeast(minDeviation).atMost(maxDeviation)
 
   implicit val glickoBSONHandler: BSON[Glicko] = new BSON[Glicko] {
 
     def reads(r: BSON.Reader): Glicko =
       Glicko(
-        rating = r `double` "r",
-        deviation = r `double` "d",
-        volatility = r `double` "v"
+        rating = r.double("r"),
+        deviation = r.double("d"),
+        volatility = r.double("v")
       )
 
     def writes(w: BSON.Writer, o: Glicko) =

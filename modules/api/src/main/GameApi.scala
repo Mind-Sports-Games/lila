@@ -5,19 +5,19 @@ import strategygames.{ GameLogic, Replay, Status }
 import strategygames.variant.Variant
 
 import org.joda.time.DateTime
-import play.api.libs.json._
-import reactivemongo.api.bson._
+import play.api.libs.json.*
+import reactivemongo.api.bson.*
 import reactivemongo.api.ReadPreference
 
-import lila.analyse.{ JsonView => analysisJson, Analysis }
-import lila.common.config._
+import lila.analyse.{ Analysis, JsonView as analysisJson }
+import lila.common.config.*
 import lila.common.Json.jodaWrites
 import lila.common.paginator.{ Paginator, PaginatorJson }
-import lila.db.dsl._
+import lila.db.dsl.*
 import lila.db.paginator.{ Adapter, CachedAdapter }
-import lila.game.BSONHandlers._
-import lila.game.Game.{ BSONFields => G }
-import lila.game.JsonView._
+import lila.game.BSONHandlers.*
+import lila.game.Game.BSONFields as G
+import lila.game.JsonView.*
 import lila.game.{ CrosstableApi, Game, PerfPicker }
 import lila.user.User
 
@@ -46,7 +46,7 @@ final private[api] class GameApi(
         adapter = new Adapter[Game](
           collection = gameRepo.coll,
           selector = {
-            if (~playing) lila.game.Query.nowPlaying(user.id)
+            if ~playing then lila.game.Query.nowPlaying(user.id)
             else
               $doc(
                 G.playerUids -> user.id,
@@ -67,7 +67,7 @@ final private[api] class GameApi(
           readPreference = ReadPreference.secondaryPreferred
         ),
         nbResults =
-          if (~playing) gameCache.nbPlaying(user.id)
+          if ~playing then gameCache.nbPlaying(user.id)
           else
             fuccess {
               rated.fold(user.count.game) {
@@ -80,12 +80,12 @@ final private[api] class GameApi(
       maxPerPage = nb
     ) flatMap { pag =>
       gamesJson(withFlags = withFlags)(pag.currentPageResults) map { games =>
-        PaginatorJson(pag `withCurrentPageResults` games)
+        PaginatorJson(pag.withCurrentPageResults(games))
       }
     }
 
   def one(id: String, withFlags: WithFlags): Fu[Option[JsObject]] =
-    gameRepo `game` id flatMap {
+    gameRepo.game(id) flatMap {
       _ so { g =>
         gamesJson(withFlags)(List(g)) map (_.headOption)
       }
@@ -105,7 +105,7 @@ final private[api] class GameApi(
         adapter = new Adapter[Game](
           collection = gameRepo.coll,
           selector = {
-            if (~playing) lila.game.Query.nowPlayingVs(users._1.id, users._2.id)
+            if ~playing then lila.game.Query.nowPlayingVs(users._1.id, users._2.id)
             else
               lila.game.Query.opponents(users._1, users._2) ++ $doc(
                 G.status `$gte` Status.Mate.id,
@@ -125,14 +125,14 @@ final private[api] class GameApi(
           readPreference = ReadPreference.secondaryPreferred
         ),
         nbResults =
-          if (~playing) gameCache.nbPlaying(users._1.id)
+          if ~playing then gameCache.nbPlaying(users._1.id)
           else crosstableApi(users._1.id, users._2.id).dmap(_.nbGames)
       ),
       currentPage = page,
       maxPerPage = nb
     ) flatMap { pag =>
       gamesJson(withFlags.copy(fens = false))(pag.currentPageResults) map { games =>
-        PaginatorJson(pag `withCurrentPageResults` games)
+        PaginatorJson(pag.withCurrentPageResults(games))
       }
     }
 
@@ -150,7 +150,7 @@ final private[api] class GameApi(
       adapter = new Adapter[Game](
         collection = gameRepo.coll,
         selector = {
-          if (~playing) lila.game.Query.nowPlayingVs(userIds)
+          if ~playing then lila.game.Query.nowPlayingVs(userIds)
           else
             lila.game.Query.opponents(userIds) ++ $doc(
               G.status `$gte` Status.Mate.id,
@@ -174,7 +174,7 @@ final private[api] class GameApi(
       maxPerPage = nb
     ) flatMap { pag =>
       gamesJson(withFlags.copy(fens = false))(pag.currentPageResults) map { games =>
-        PaginatorJson(pag `withCurrentPageResults` games)
+        PaginatorJson(pag.withCurrentPageResults(games))
       }
     }
 
@@ -182,7 +182,7 @@ final private[api] class GameApi(
 
   private def gamesJson(withFlags: WithFlags)(games: Seq[Game]): Fu[Seq[JsObject]] = {
     val allAnalysis =
-      if (withFlags.analysis) analysisRepo `byIds` games.map(_.id)
+      if withFlags.analysis then analysisRepo.byIds(games.map(_.id))
       else fuccess(List.fill(games.size)(none[Analysis]))
     allAnalysis flatMap { analysisOptions =>
       Future.sequence(games map gameRepo.initialFen) map { initialFens =>
@@ -193,7 +193,7 @@ final private[api] class GameApi(
     }
   }
 
-  private def checkToken(withFlags: WithFlags) = withFlags `applyToken` apiToken.value
+  private def checkToken(withFlags: WithFlags) = withFlags.applyToken(apiToken.value)
 
   private def gameToJson(
       g: Game,
@@ -216,7 +216,7 @@ final private[api] class GameApi(
         "playerIndex" -> g.turnPlayerIndex.name,
         "status"      -> g.status.name,
         "abortable"   -> g.abortable,
-        "clock" -> g.clock.map { clock =>
+        "clock"       -> g.clock.map { clock =>
           Json.obj(
             "initial"   -> clock.limitSeconds,
             "increment" -> clock.graceSeconds,
@@ -224,7 +224,7 @@ final private[api] class GameApi(
           )
         },
         "daysPerTurn" -> g.daysPerTurn,
-        "players" -> JsObject(g.players map { p =>
+        "players"     -> JsObject(g.players map { p =>
           p.playerIndex.name -> Json
             .obj(
               "userId"     -> p.userId,
@@ -234,12 +234,15 @@ final private[api] class GameApi(
             .add("name", p.name)
             .add("provisional" -> p.provisional)
             .add("isInputRating" -> p.isInputRating)
-            .add("plyCentis" -> (if (withFlags.plyTimes) g.plyTimes(p.playerIndex).map(_.map(_.centis)) else none))
+            .add(
+              "plyCentis" -> (if withFlags.plyTimes then g.plyTimes(p.playerIndex).map(_.map(_.centis))
+                              else none)
+            )
             .add("blurs" -> withFlags.blurs.option(p.blurs.nb))
-            .add("analysis" -> analysisOption.flatMap(analysisJson.player(g `pov` p.playerIndex)))
+            .add("analysis" -> analysisOption.flatMap(analysisJson.player(g.pov(p.playerIndex))))
         }),
         "analysis" -> analysisOption.ifTrue(withFlags.analysis).map(analysisJson.moves(_)),
-        "moves" -> withFlags.moves.option(g.variant match {
+        "moves"    -> withFlags.moves.option(g.variant match {
           case Variant.Draughts(variant) =>
             strategygames.draughts.Replay.unambiguousPdnMoves(
               pdnMoves = g.draughtsActionStrsConcat(true, true).flatten,
@@ -256,25 +259,27 @@ final private[api] class GameApi(
           case _ => g.actionStrs.map(_.mkString(",")).mkString(" ")
         }),
         "opening" -> g.opening.filter(_ => withFlags.opening),
-        "fens" -> (if (withFlags.fens && g.finished) {
-          Replay
-            .boards(
-              lib = g.variant.gameLogic,
-              actionStrs = g.variant.gameLogic match {
-                case GameLogic.Draughts() => g.draughtsActionStrsConcat(true, true)
-                case _                    => g.actionStrs
-              },
-              initialFen = initialFen,
-              variant = g.variant,
-              finalSquare = g.variant.gameLogic match {
-                case GameLogic.Draughts() => true
-                case _                    => false
-              }
-            )
-            .toOption map { boards =>
-            JsArray(boards.map { b => Forsyth.exportBoard(b.variant.gameLogic, b) } map JsString.apply)
-          }
-        } else none[JsArray]),
+        "fens"    -> (if withFlags.fens && g.finished then {
+                     Replay
+                       .boards(
+                         lib = g.variant.gameLogic,
+                         actionStrs = g.variant.gameLogic match {
+                           case GameLogic.Draughts() => g.draughtsActionStrsConcat(true, true)
+                           case _                    => g.actionStrs
+                         },
+                         initialFen = initialFen,
+                         variant = g.variant,
+                         finalSquare = g.variant.gameLogic match {
+                           case GameLogic.Draughts() => true
+                           case _                    => false
+                         }
+                       )
+                       .toOption map { boards =>
+                       JsArray(boards.map { b =>
+                         Forsyth.exportBoard(b.variant.gameLogic, b)
+                       } map JsString.apply)
+                     }
+                   } else none[JsArray]),
         "winner" -> g.winnerPlayerIndex.map(_.name),
         "url"    -> makeUrl(g)
       )
@@ -295,7 +300,7 @@ object GameApi {
 
     def applyToken(validToken: String) =
       copy(
-        blurs = token `has` validToken
+        blurs = token.has(validToken)
       )
   }
 }

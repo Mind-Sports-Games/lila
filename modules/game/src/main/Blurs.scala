@@ -8,10 +8,10 @@ case class Blurs(bits: Long) extends AnyVal {
   def nb = java.lang.Long.bitCount(bits)
 
   def add(moveIndex: Int) =
-    if (moveIndex < 0 || moveIndex > 63) this
+    if moveIndex < 0 || moveIndex > 63 then this
     else Blurs(bits | (1L << moveIndex))
 
-  def asInt = ((bits >>> 32) == 0) `option` bits.toInt
+  def asInt = ((bits >>> 32) == 0).option(bits.toInt)
 
   def binaryString = java.lang.Long.toBinaryString(bits).reverse
 
@@ -26,7 +26,7 @@ object Blurs {
 
   implicit val blursZero: Zero[Blurs] = Zero(Blurs(0L))
 
-  import reactivemongo.api.bson._
+  import reactivemongo.api.bson.*
 
   implicit private[game] val BlursBSONHandler: BSONHandler[Blurs] = lila.db.dsl.tryHandler[Blurs](
     {

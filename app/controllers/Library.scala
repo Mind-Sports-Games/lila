@@ -3,7 +3,7 @@ package controllers
 import strategygames.variant.Variant
 
 import lila.app.*
-import lila.memo.CacheApi._
+import lila.memo.CacheApi.*
 import lila.puzzle.Puzzle
 
 final class Library(env: Env) extends LilaController(env) {
@@ -31,12 +31,17 @@ final class Library(env: Env) extends LilaController(env) {
             leaderboard = leaderboards.forVariant(variant)
             tours <- env.tournament.cached.onLibraryPage.getUnit.recoverDefault
             filteredTours = tours.filter(_.variant.key == variant.key)
-            featuredGame <- tvChannel.map(env.tv.tv.getGame).getOrElse(fuccess(none)) `orElse`
-              env.game.gameRepo.randomByVariant(variant)
+            featuredGame <- tvChannel
+              .map(env.tv.tv.getGame)
+              .getOrElse(fuccess(none))
+              .orElse(env.game.gameRepo.randomByVariant(variant))
             dailyPuzzle <- Puzzle.puzzleVariants
               .exists(_.key == variant.key)
               .so(env.puzzle.daily.getForVariant(variant))
-          } yield Ok(views.html.library.show(variant, monthlyGameData, winRates, leaderboard, filteredTours, featuredGame, dailyPuzzle))
+          } yield Ok(
+            views.html.library
+              .show(variant, monthlyGameData, winRates, leaderboard, filteredTours, featuredGame, dailyPuzzle)
+          )
         }
         case None => NotFound("Variant not found").fuccess
       }

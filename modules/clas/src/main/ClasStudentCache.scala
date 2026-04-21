@@ -2,14 +2,14 @@ package lila.clas
 
 import akka.actor.Scheduler
 import akka.stream.Materializer
-import akka.stream.scaladsl._
+import akka.stream.scaladsl.*
 import bloomfilter.mutable.BloomFilter
 import reactivemongo.akkastream.cursorProducer
 import reactivemongo.api.ReadPreference
 import scala.concurrent.ExecutionContext
 
 import lila.common.extensions.*
-import lila.db.dsl._
+import lila.db.dsl.*
 import lila.memo.CacheApi
 import lila.user.User
 
@@ -47,5 +47,5 @@ final class ClasStudentCache(colls: ClasColls, @annotation.nowarn("msg=unused") 
         .discard
     }
 
-  val _ = scheduler.scheduleWithFixedDelay(23 seconds, 1 hour) { (() => rebuildBloomFilter()) }
+  val _ = scheduler.scheduleWithFixedDelay(23 seconds, 1 hour) { () => rebuildBloomFilter() }
 }

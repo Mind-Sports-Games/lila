@@ -6,7 +6,7 @@ import scala.concurrent.ExecutionContext
 
 import strategygames.variant.Variant
 
-import lila.db.dsl._
+import lila.db.dsl.*
 import lila.memo.CacheApi
 import lila.user.User
 
@@ -27,7 +27,7 @@ final class PuzzleReplayApi(
     cacheApi: CacheApi
 )(implicit ec: ExecutionContext) {
 
-  import BsonHandlers._
+  import BsonHandlers.*
 
   private val maxPuzzles = 100
 
@@ -44,11 +44,12 @@ final class PuzzleReplayApi(
     maybeDays map { days =>
       replays.getFuture((user.id, variant), _ => createReplayFor(user, days, variant, theme)) flatMap {
         current =>
-          if (current.days == days && current.theme == theme && current.remaining.nonEmpty) fuccess(current)
+          if current.days == days && current.theme == theme && current.remaining.nonEmpty then
+            fuccess(current)
           else createReplayFor(user, days, variant, theme) tap { replays.put((user.id, variant), _) }
       } flatMap { replay =>
         replay.remaining.headOption so { id =>
-          colls.puzzle(_.byId[Puzzle](id.value)) `map2` (_ -> replay)
+          colls.puzzle(_.byId[Puzzle](id.value)).map2(_ -> replay)
         }
       }
     } getOrElse fuccess(None)
@@ -61,7 +62,7 @@ final class PuzzleReplayApi(
   ): Funit =
     replays.getIfPresent((round.userId, variant)) so {
       _ map { replay =>
-        if (replay.days == days && replay.theme == theme)
+        if replay.days == days && replay.theme == theme then
           replays.put((round.userId, variant), fuccess(replay.step))
       }
     }
@@ -75,7 +76,7 @@ final class PuzzleReplayApi(
     colls
       .round {
         _.aggregateWith[Bdoc]() { framework =>
-          import framework._
+          import framework.*
           List(
             Match(
               $doc(
@@ -90,7 +91,7 @@ final class PuzzleReplayApi(
                 "$lookup" -> $doc(
                   "from" -> colls.puzzle.name.value,
                   "as"   -> "puzzle",
-                  "let" -> $doc(
+                  "let"  -> $doc(
                     "pid" -> $doc("$arrayElemAt" -> $arr($doc("$split" -> $arr("$_id", ":")), 1))
                   ),
                   "pipeline" -> $arr(
@@ -98,7 +99,7 @@ final class PuzzleReplayApi(
                       "$match" -> $doc(
                         "$expr" -> {
                           val baseMatch = $doc("$eq" -> $arr("$_id", "$$pid"))
-                          if (theme == PuzzleTheme.mix.key)
+                          if theme == PuzzleTheme.mix.key then
                             $doc(
                               "$and" -> $arr(
                                 baseMatch,
@@ -130,7 +131,7 @@ final class PuzzleReplayApi(
         }
           .collect[List](maxDocs = 1)
           .dmap(_.headOption)
-    }
+      }
       .map {
         ~_.flatMap(_.getAsOpt[Vector[Puzzle.Id]]("ids"))
       } map { ids =>

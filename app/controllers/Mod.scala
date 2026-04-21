@@ -1,11 +1,11 @@
 package controllers
 
 import alleycats.Zero
-import play.api.data._
-import play.api.data.Forms._
-import play.api.mvc._
+import play.api.data.*
+import play.api.data.Forms.*
+import play.api.mvc.*
 import scala.annotation.nowarn
-import views._
+import views.*
 
 import lila.api.{ BodyContext, Context }
 import lila.app.{ *, given }
@@ -13,9 +13,9 @@ import lila.chat.Chat
 import lila.common.extensions.*
 import lila.common.{ EmailAddress, HTTPRequest, IpAddress }
 import lila.mod.UserSearch
-import lila.report.{ Suspect, Mod => AsMod }
+import lila.report.{ Mod as AsMod, Suspect }
 import lila.security.{ FingerHash, Permission }
-import lila.user.{ User => UserModel, Title, Holder }
+import lila.user.{ Holder, Title, User as UserModel }
 
 final class Mod(
     env: Env,
@@ -32,7 +32,7 @@ final class Mod(
     OAuthModBody(_.CloseAccount) { me =>
       withSuspect(username) { sus =>
         for {
-          inquiry <- env.report.api.inquiries `ofModId` me.id
+          inquiry <- env.report.api.inquiries.ofModId(me.id)
           _       <- modApi.setAlt(me, sus, v)
           _       <- (v && sus.user.enabled) so env.closeAccount(sus.user, me)
         } yield (inquiry, sus).some
@@ -47,7 +47,7 @@ final class Mod(
     OAuthModBody(_.MarkEngine) { me =>
       withSuspect(username) { sus =>
         for {
-          inquiry <- env.report.api.inquiries `ofModId` me.id
+          inquiry <- env.report.api.inquiries.ofModId(me.id)
           _       <- modApi.setEngine(me, sus, v)
         } yield (inquiry, sus).some
       }
@@ -75,7 +75,7 @@ final class Mod(
     OAuthModBody(_.MarkBooster) { me =>
       withSuspect(username) { prev =>
         for {
-          inquiry <- env.report.api.inquiries `ofModId` me.id
+          inquiry <- env.report.api.inquiries.ofModId(me.id)
           suspect <- modApi.setBoost(me, prev, v)
         } yield (inquiry, suspect).some
       }
@@ -89,7 +89,7 @@ final class Mod(
     OAuthModBody(_.Shadowban) { me =>
       withSuspect(username) { prev =>
         for {
-          inquiry <- env.report.api.inquiries `ofModId` me.id
+          inquiry <- env.report.api.inquiries.ofModId(me.id)
           suspect <- modApi.setTroll(me, prev, v)
         } yield (inquiry, suspect).some
       }
@@ -104,7 +104,7 @@ final class Mod(
       env.mod.presets.pmPresets.get().named(subject) so { preset =>
         withSuspect(username) { prev =>
           for {
-            inquiry <- env.report.api.inquiries `ofModId` me.id
+            inquiry <- env.report.api.inquiries.ofModId(me.id)
             suspect <- modApi.setTroll(me, prev, prev.user.marks.troll)
             _       <- env.msg.api.systemPost(suspect.user.id, preset.text)
             _       <- env.mod.logApi.modMessage(me.id, suspect.user.id, preset.name)
@@ -137,7 +137,7 @@ final class Mod(
 
   def closeAccount(username: String) =
     OAuthMod(_.CloseAccount) { _ => me =>
-      env.user.repo `named` username flatMap {
+      env.user.repo.named(username) flatMap {
         _ so { user =>
           env.closeAccount(user, me) map some
         }
@@ -165,12 +165,13 @@ final class Mod(
 
   def impersonate(username: String) =
     Auth { implicit ctx => me =>
-      if (username == "-" && env.mod.impersonate.isImpersonated(me)) fuccess {
-        env.mod.impersonate.stop(me)
-        Redirect(routes.User.show(me.username))
-      }
-      else if (isGranted(_.Impersonate) || (isGranted(_.Admin) && username.toLowerCase == "playstrategy"))
-        OptionFuRedirect(env.user.repo `named` username) { user =>
+      if username == "-" && env.mod.impersonate.isImpersonated(me) then
+        fuccess {
+          env.mod.impersonate.stop(me)
+          Redirect(routes.User.show(me.username))
+        }
+      else if isGranted(_.Impersonate) || (isGranted(_.Admin) && username.toLowerCase == "playstrategy") then
+        OptionFuRedirect(env.user.repo.named(username)) { user =>
           env.mod.impersonate.start(me, user)
           fuccess(routes.User.show(user.username))
         }
@@ -186,7 +187,9 @@ final class Mod(
           _ => fuccess(redirect(username, mod = true)),
           title =>
             modApi.setTitle(me.id, username, title map Title.apply) >>
-              env.security.automaticEmail.onTitleSet(username).andDo(env.user.lightUserApi.invalidate(UserModel `normalize` username)) inject
+              env.security.automaticEmail
+                .onTitleSet(username)
+                .andDo(env.user.lightUserApi.invalidate(UserModel.normalize(username))) inject
               redirect(username, mod = false)
         )
     }
@@ -194,7 +197,7 @@ final class Mod(
   def setEmail(username: String) =
     SecureBody(_.SetEmail) { implicit ctx => me =>
       implicit def req: play.api.mvc.Request[?] = ctx.body
-      OptionFuResult(env.user.repo `named` username) { user =>
+      OptionFuResult(env.user.repo.named(username)) { user =>
         env.security.forms
           .modEmail(user)
           .bindFromRequest()
@@ -202,7 +205,8 @@ final class Mod(
             err => BadRequest(err.toString).fuccess,
             rawEmail => {
               val email = env.security.emailAddressValidator
-                .validate(EmailAddress(rawEmail)) `err` s"Invalid email $rawEmail"
+                .validate(EmailAddress(rawEmail))
+                .err(s"Invalid email $rawEmail")
               modApi.setEmail(me.id, user.id, email.acceptable) inject redirect(user.username, mod = true)
             }
           )
@@ -223,25 +227,26 @@ final class Mod(
 
   private def communications(username: String, priv: Boolean) =
     Secure { perms =>
-      if (priv) perms.ViewPrivateComms else perms.Shadowban
+      if priv then perms.ViewPrivateComms else perms.Shadowban
     } { implicit ctx => me =>
-      OptionFuOk(env.user.repo `named` username) { user =>
+      OptionFuOk(env.user.repo.named(username)) { user =>
         implicit val renderIp = env.mod.ipRender(me)
         env.game.gameRepo
           .recentPovsByUserFromSecondary(user, 80)
           .mon(_.mod.comm.segment("recentPovs"))
           .flatMap { povs =>
-            (if (priv)
-              env.chat.api.playerChat
-                .optionsByOrderedIds(povs.map(_.gameId).map(Chat.Id.apply))
-                .mon(_.mod.comm.segment("playerChats"))
-            else fuccess(Nil)) zip
-              (if (priv)
-                env.msg.api
-                  .recentByForMod(user, 30)
-                  .mon(_.mod.comm.segment("pms"))
-              else fuccess(Nil)) zip
-              (env.shutup.api `getPublicLines` user.id)
+            (if priv then
+               env.chat.api.playerChat
+                 .optionsByOrderedIds(povs.map(_.gameId).map(Chat.Id.apply))
+                 .mon(_.mod.comm.segment("playerChats"))
+             else fuccess(Nil)) zip
+              (if priv then
+                 env.msg.api
+                   .recentByForMod(user, 30)
+                   .mon(_.mod.comm.segment("pms"))
+               else fuccess(Nil)) zip
+              env.shutup.api
+                .getPublicLines(user.id)
                 .mon(_.mod.comm.segment("publicChats")) zip
               env.user.noteApi
                 .forMod(user.id)
@@ -255,10 +260,10 @@ final class Mod(
               env.security.userLogins(user, 100).flatMap {
                 userC.loginsTableData(user, _, 100)
               } flatMap { case ((((((chats, convos), publicLines), notes), history), inquiry), logins) =>
-                if (priv) {
-                  if (!inquiry.so(_.isRecentCommOf(Suspect(user)))) {
+                if priv then {
+                  if !inquiry.so(_.isRecentCommOf(Suspect(user))) then {
                     env.irc.slack.commlog(mod = me, user = user, inquiry.map(_.oldestAtom.by.value))
-                    if (isGranted(_.MonitoredMod))
+                    if isGranted(_.MonitoredMod) then
                       env.irc.slack.monitorMod(
                         me.id,
                         "eyes",
@@ -299,7 +304,7 @@ final class Mod(
 
   def refreshUserAssess(username: String) =
     Secure(_.MarkEngine) { implicit ctx => me =>
-      OptionFuResult(env.user.repo `named` username) { user =>
+      OptionFuResult(env.user.repo.named(username)) { user =>
         assessApi.refreshAssessOf(user) >>
           env.irwin.api.requests.fromMod(Suspect(user), me) >>
           userC.renderModZoneActions(username)
@@ -308,13 +313,13 @@ final class Mod(
 
   def spontaneousInquiry(username: String) =
     Secure(_.SeeReport) { implicit ctx => me =>
-      OptionFuResult(env.user.repo `named` username) { user =>
+      OptionFuResult(env.user.repo.named(username)) { user =>
         env.appeal.api.exists(user) flatMap { isAppeal =>
           val f =
-            if (isAppeal) (m: Holder, s: Suspect) => env.report.api.inquiries.appeal(m, s)
+            if isAppeal then (m: Holder, s: Suspect) => env.report.api.inquiries.appeal(m, s)
             else (m: Holder, s: Suspect) => env.report.api.inquiries.spontaneous(m, s)
           f(me, Suspect(user)) inject {
-            if (isAppeal) Redirect(s"${routes.Appeal.show(user.username)}#appeal-actions")
+            if isAppeal then Redirect(s"${routes.Appeal.show(user.username)}#appeal-actions")
             else redirect(user.username, mod = true)
           }
         }
@@ -340,7 +345,7 @@ final class Mod(
   def search =
     SecureBody(_.UserSearch) { implicit ctx => me =>
       implicit def req: play.api.mvc.Request[?] = ctx.body
-      val f            = UserSearch.form
+      val f                                     = UserSearch.form
       f.bindFromRequest()
         .fold(
           err => BadRequest(html.mod.search(me, err, Nil)).fuccess,
@@ -349,9 +354,9 @@ final class Mod(
     }
 
   protected[controllers] def searchTerm(me: Holder, q: String)(implicit ctx: Context) = {
-    val query = UserSearch `exact` q
+    val query = UserSearch.exact(q)
     env.mod.search(query) map { users =>
-      Ok(html.mod.search(me, UserSearch.form `fill` query, users))
+      Ok(html.mod.search(me, UserSearch.form.fill(query), users))
     }
   }
 
@@ -359,11 +364,11 @@ final class Mod(
     SecureBody(_.ViewPrintNoIP) { implicit ctx => me =>
       val hash = FingerHash(fh)
       for {
-        uids       <- env.security.api `recentUserIdsByFingerHash` hash
-        users      <- env.user.repo `usersFromSecondary` uids.reverse
-        withEmails <- env.user.repo `withEmailsU` users
+        uids       <- env.security.api.recentUserIdsByFingerHash(hash)
+        users      <- env.user.repo.usersFromSecondary(uids.reverse)
+        withEmails <- env.user.repo.withEmailsU(users)
         uas        <- env.security.api.printUas(hash)
-      } yield Ok(html.mod.search.print(me, hash, withEmails, uas, env.security.printBan `blocks` hash))
+      } yield Ok(html.mod.search.print(me, hash, withEmails, uas, env.security.printBan.blocks(hash)))
     }
 
   def printBan(v: Boolean, fh: String) =
@@ -377,21 +382,21 @@ final class Mod(
       implicit val renderIp = env.mod.ipRender(me)
       env.mod.ipRender.decrypt(ip) so { address =>
         for {
-          uids       <- env.security.api `recentUserIdsByIp` address
-          users      <- env.user.repo `usersFromSecondary` uids.reverse
-          withEmails <- env.user.repo `withEmailsU` users
+          uids       <- env.security.api.recentUserIdsByIp(address)
+          users      <- env.user.repo.usersFromSecondary(uids.reverse)
+          withEmails <- env.user.repo.withEmailsU(users)
           uas        <- env.security.api.ipUas(address)
-        } yield Ok(html.mod.search.ip(me, address, withEmails, uas, env.security.firewall `blocksIp` address))
+        } yield Ok(html.mod.search.ip(me, address, withEmails, uas, env.security.firewall.blocksIp(address)))
       }
     }
 
   def singleIpBan(v: Boolean, ip: String) =
     Secure(_.IpBan) { ctx => _ =>
       val op =
-        if (v) (a: IpAddress) => env.security.firewall.blockIps(List(a))
+        if v then (a: IpAddress) => env.security.firewall.blockIps(List(a))
         else (a: IpAddress) => env.security.firewall.unblockIps(List(a))
-      (IpAddress `from` ip).fold(funit)(op) inject {
-        if (HTTPRequest `isXhr` ctx.req) jsonOkResult
+      IpAddress.from(ip).fold(funit)(op) inject {
+        if HTTPRequest.isXhr(ctx.req) then jsonOkResult
         else Redirect(routes.Mod.singleIp(ip))
       }
     }
@@ -400,13 +405,13 @@ final class Mod(
     Secure(_.ChatTimeout) { _ => _ =>
       implicit val lightUser = env.user.lightUserSync
       JsonOptionOk {
-        env.chat.api.userChat `userModInfo` username `map2` lila.chat.JsonView.userModInfo
+        env.chat.api.userChat.userModInfo(username).map2(lila.chat.JsonView.userModInfo)
       }
     }
 
   def permissions(username: String) =
     Secure(_.ChangePermission) { implicit ctx => me =>
-      OptionOk(env.user.repo `named` username) { user =>
+      OptionOk(env.user.repo.named(username)) { user =>
         html.mod.permissions(user, me)
       }
     }
@@ -415,7 +420,7 @@ final class Mod(
     SecureBody(_.ChangePermission) { implicit ctx => me =>
       implicit def req: play.api.mvc.Request[?] = ctx.body
       import lila.security.Permission
-      OptionFuResult(env.user.repo `named` username) { user =>
+      OptionFuResult(env.user.repo.named(username)) { user =>
         Form(
           single("permissions" -> list(text.verifying(Permission.allByDbKey.contains)))
         ).bindFromRequest()
@@ -426,7 +431,7 @@ final class Mod(
               modApi.setPermissions(me, user.username, Permission(permissions)) >> {
                 newPermissions(Permission.Coach) so env.security.automaticEmail.onBecomeCoach(user)
               } >> {
-                Permission(permissions).exists(_ `is` Permission.SeeReport) so env.plan.api.setLifetime(user)
+                Permission(permissions).exists(_.is(Permission.SeeReport)) so env.plan.api.setLifetime(user)
               } inject Redirect(routes.Mod.permissions(username)).flashSuccess
             }
           )
@@ -436,12 +441,12 @@ final class Mod(
   def emailConfirm =
     SecureBody(_.SetEmail) { implicit ctx => me =>
       get("q") match {
-        case None => Ok(html.mod.emailConfirm("", none, none)).fuccess
+        case None           => Ok(html.mod.emailConfirm("", none, none)).fuccess
         case Some(rawQuery) =>
           val query = rawQuery.trim.split(' ').toList
           val email = query.headOption
             .map(EmailAddress.apply) flatMap env.security.emailAddressValidator.validate
-          val username = query lift 1
+          val username                                                       = query lift 1
           def tryWith(setEmail: EmailAddress, q: String): Fu[Option[Result]] =
             env.mod.search(UserSearch.exact(q)) flatMap {
               case List(UserModel.WithEmails(user, _)) =>
@@ -454,11 +459,13 @@ final class Mod(
                   }
               case _ => fuccess(none)
             }
-          email.so { em =>
-            tryWith(em.acceptable, em.acceptable.value) orElse {
-              username so { tryWith(em.acceptable, _) }
-            } recover lila.db.recoverDuplicateKey(_ => none)
-          } `getOrElse` BadRequest(html.mod.emailConfirm(rawQuery, none, none)).fuccess
+          email
+            .so { em =>
+              tryWith(em.acceptable, em.acceptable.value) orElse {
+                username so { tryWith(em.acceptable, _) }
+              } recover lila.db.recoverDuplicateKey(_ => none)
+            }
+            .getOrElse(BadRequest(html.mod.emailConfirm(rawQuery, none, none)).fuccess)
       }
     }
 
@@ -503,7 +510,7 @@ final class Mod(
     }
 
   private def withSuspect[A](username: String)(f: Suspect => Fu[A])(implicit zero: Zero[A]): Fu[A] =
-    env.report.api `getSuspect` username flatMap {
+    env.report.api.getSuspect(username) flatMap {
       _ so f
     }
 
@@ -533,6 +540,6 @@ final class Mod(
   private def actionResult(
       username: String
   )(ctx: Context)(@nowarn("msg=unused") user: Holder)(@nowarn("msg=unused") res: Any) =
-    if (HTTPRequest `isSynchronousHttp` ctx.req) fuccess(redirect(username))
+    if HTTPRequest.isSynchronousHttp(ctx.req) then fuccess(redirect(username))
     else userC.renderModZoneActions(username)(using ctx)
 }

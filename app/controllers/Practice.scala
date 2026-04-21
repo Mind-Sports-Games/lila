@@ -1,16 +1,16 @@
 package controllers
 
-import play.api.libs.json._
+import play.api.libs.json.*
 import scala.annotation.nowarn
 
 import lila.api.Context
 import lila.app.*
-import lila.practice.JsonView._
+import lila.practice.JsonView.*
 import lila.practice.{ PracticeSection, PracticeStudy, UserStudy }
 import lila.study.Study.WithChapter
-import lila.study.{ Chapter, Study => StudyModel }
+import lila.study.{ Chapter, Study as StudyModel }
 import lila.tree.Node.partitionTreeJsonWriter
-import views._
+import views.*
 
 final class Practice(
     env: Env,
@@ -101,7 +101,7 @@ final class Practice(
         env.study.jsonView(study, chapters, chapter, ctx.me) map { studyJson =>
           val initialFen = chapter.root.fen.some
           val pov        = userAnalysisC.makePov(initialFen, chapter.setup.variant)
-          val baseData = env.round.jsonView
+          val baseData   = env.round.jsonView
             .userAnalysisJson(
               pov,
               ctx.pref,

@@ -26,7 +26,7 @@ case class AnaDrop(
     newGame.andThen { case (game, drop) =>
       game.actionStrs.flatten.lastOption toValid "Dropped but no last move!" map { lastAction =>
         val gameRecordNotation =
-          if (lib == GameLogic.FairySF() || lib == GameLogic.Go() || lib == GameLogic.Backgammon())
+          if lib == GameLogic.FairySF() || lib == GameLogic.Go() || lib == GameLogic.Backgammon() then
             strategygames.format.sgf.Dumper(variant, Vector(Vector(lastAction)))
           else lastAction
         val uci     = Uci(lib, drop)
@@ -36,7 +36,7 @@ case class AnaDrop(
           id = UciCharPair(lib, uci),
           ply = game.plies,
           turnCount = game.turnCount,
-          playedPlayerIndex = if (game.board.history.currentTurn.nonEmpty) game.player else !game.player,
+          playedPlayerIndex = if game.board.history.currentTurn.nonEmpty then game.player else !game.player,
           variant = variant,
           move = Uci.WithSan(lib, uci, gameRecordNotation),
           fen = fen,
@@ -55,11 +55,11 @@ case class AnaDrop(
 object AnaDrop {
 
   private def dataGameLogic(d: JsObject): GameLogic =
-    GameLogic(d `int` "lib" getOrElse 0)
+    GameLogic(d.int("lib") getOrElse 0)
 
   def parse(o: JsObject) =
     for {
-      d <- o `obj` "d"
+      d <- o.obj("d")
       gl      = dataGameLogic(d)
       variant = Variant.orDefault(gl, ~d.str("variant"))
       role <- d.str("role").flatMap(Role.allByGroundName(gl, variant.gameFamily).get)
@@ -72,6 +72,6 @@ object AnaDrop {
       variant = variant,
       fen = fen,
       path = path,
-      chapterId = d `str` "ch"
+      chapterId = d.str("ch")
     )
 }

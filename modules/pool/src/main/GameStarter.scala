@@ -1,6 +1,6 @@
 package lila.pool
 
-import strategygames.{ P1, P2, Situation, GameLogic }
+import strategygames.{ GameLogic, P1, P2, Situation }
 
 import lila.game.{ Game, GameRepo, IdGenerator, Player, Source }
 import lila.rating.Perf
@@ -17,7 +17,7 @@ final private class GameStarter(
     scheduler: akka.actor.Scheduler
 ) {
 
-  import PoolApi._
+  import PoolApi.*
 
   private val workQueue = new lila.hub.DuctSequencer(maxSize = 32, timeout = 10 seconds, name = "gameStarter")
 
@@ -27,7 +27,7 @@ final private class GameStarter(
         val userIds = couples.flatMap(_.userIds)
         userRepo.perfOf(userIds, pool.perfType) flatMap { perfs =>
           idGenerator.games(couples.size) flatMap { ids =>
-            Future.sequence(couples.zip(ids).map((one(pool, perfs)).tupled)).map { pairings =>
+            Future.sequence(couples.zip(ids).map(one(pool, perfs).tupled)).map { pairings =>
               lila.common.Bus.publish(Pairings(pairings.flatten.toList), "poolPairings")
             }
           }
@@ -39,20 +39,20 @@ final private class GameStarter(
       couple: MatchMaking.Couple,
       id: Game.ID
   ): Fu[Option[Pairing]] = {
-    import couple._
-    import cats.implicits._
+    import couple.*
+    import cats.implicits.*
     (perfs.get(p1.userId), perfs.get(p2.userId)).mapN((_, _)) so { case (perf1, perf2) =>
       for {
         p1P1 <- userRepo.firstGetsP1(p1.userId, p2.userId)
-        (p1Perf, p2Perf)     = if (p1P1) perf1 -> perf2 else perf2 -> perf1
-        (p1Member, p2Member) = if (p1P1) p1 -> p2 else p2 -> p1
-        game = makeGame(
+        (p1Perf, p2Perf)     = if p1P1 then perf1 -> perf2 else perf2 -> perf1
+        (p1Member, p2Member) = if p1P1 then p1 -> p2 else p2 -> p1
+        game                 = makeGame(
           id,
           pool,
           p1Member.userId -> p1Perf,
           p2Member.userId -> p2Perf
         ).start
-        _ <- gameRepo `insertDenormalized` game
+        _ <- gameRepo.insertDenormalized(game)
       } yield {
         onStart(Game.Id(game.id))
         Pairing(
@@ -77,7 +77,7 @@ final private class GameStarter(
           pool.variant.gameLogic,
           situation = stratSit,
           clock = pool.clock.toClock.some,
-          //we have to do this to handle Backgammon variable start player
+          // we have to do this to handle Backgammon variable start player
           plies = stratSit.player.fold(0, 1),
           turnCount = stratSit.player.fold(0, 1),
           startedAtPly = stratSit.player.fold(0, 1),
@@ -94,7 +94,6 @@ final private class GameStarter(
   }
 }
 
-
 final private class BotGameStarter(
     userRepo: UserRepo,
     gameRepo: GameRepo,
@@ -105,12 +104,12 @@ final private class BotGameStarter(
     scheduler: akka.actor.Scheduler
 ) {
 
-  import PoolApi._
+  import PoolApi.*
 
   private val workQueue =
     new lila.hub.DuctSequencer(maxSize = 32, timeout = 10 seconds, name = "botGameStarter")
 
-  //assumption - if a bot has a rating it can play a variant
+  // assumption - if a bot has a rating it can play a variant
   def apply(pool: PoolConfig, poolUser: PoolMember): Funit =
     workQueue {
       val userIds = List(poolUser.userId) ++ LightUser.poolBotsIDs
@@ -137,20 +136,20 @@ final private class BotGameStarter(
       couple: MatchMaking.Couple,
       id: Game.ID
   ): Fu[Option[Pairing]] = {
-    import couple._
-    import cats.implicits._
+    import couple.*
+    import cats.implicits.*
     (perfs.get(p1.userId), perfs.get(p2.userId)).mapN((_, _)) so { case (perf1, perf2) =>
       for {
         p1P1 <- userRepo.firstGetsP1(p1.userId, p2.userId)
-        (p1Perf, p2Perf)     = if (p1P1) perf1 -> perf2 else perf2 -> perf1
-        (p1Member, p2Member) = if (p1P1) p1 -> p2 else p2 -> p1
-        game = makeGame(
+        (p1Perf, p2Perf)     = if p1P1 then perf1 -> perf2 else perf2 -> perf1
+        (p1Member, p2Member) = if p1P1 then p1 -> p2 else p2 -> p1
+        game                 = makeGame(
           id,
           pool,
           p1Member.userId -> p1Perf,
           p2Member.userId -> p2Perf
         ).start
-        _ <- gameRepo `insertDenormalized` game
+        _ <- gameRepo.insertDenormalized(game)
       } yield {
         onStart(Game.Id(game.id))
         Pairing(
@@ -175,7 +174,7 @@ final private class BotGameStarter(
           pool.variant.gameLogic,
           situation = stratSit,
           clock = pool.clock.toClock.some,
-          //we have to do this to handle Backgammon variable start player
+          // we have to do this to handle Backgammon variable start player
           plies = stratSit.player.fold(0, 1),
           turnCount = stratSit.player.fold(0, 1),
           startedAtPly = stratSit.player.fold(0, 1),

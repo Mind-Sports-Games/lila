@@ -1,13 +1,13 @@
 package lila.forum
 
-import actorApi._
+import actorApi.*
 import lila.common.Bus
-import lila.common.paginator._
+import lila.common.paginator.*
 import lila.common.String.noShouting
-import lila.db.dsl._
-import lila.db.paginator._
+import lila.db.dsl.*
+import lila.db.paginator.*
 import lila.hub.actorApi.timeline.{ ForumPost, Propagate }
-import lila.security.{ Granter => MasterGranter }
+import lila.security.Granter as MasterGranter
 import lila.user.{ Holder, User }
 
 final private[forum] class TopicApi(
@@ -22,7 +22,7 @@ final private[forum] class TopicApi(
     detectLanguage: DetectLanguage
 )(implicit ec: scala.concurrent.ExecutionContext) {
 
-  import BSONHandlers._
+  import BSONHandlers.*
 
   def show(
       categSlug: String,
@@ -31,7 +31,7 @@ final private[forum] class TopicApi(
       forUser: Option[User]
   ): Fu[Option[(Categ, Topic, Paginator[Post])]] =
     for {
-      data <- env.categRepo `bySlug` categSlug flatMap {
+      data <- env.categRepo.bySlug(categSlug) flatMap {
         _ so { categ =>
           env.topicRepo.forUser(forUser).byTree(categSlug, slug) dmap {
             _ map (categ -> _)
@@ -56,7 +56,7 @@ final private[forum] class TopicApi(
         name = noShouting(data.name),
         userId = me.id,
         troll = me.marks.troll,
-        hidden = false //categ.quiet || data.looksLikeVenting
+        hidden = false // categ.quiet || data.looksLikeVenting
       )
       val post = Post.make(
         topicId = topic.id,
@@ -71,17 +71,17 @@ final private[forum] class TopicApi(
         modIcon = (~data.post.modIcon && MasterGranter(_.PublicMod)(me)).option(true)
       )
       env.postRepo.coll.insert.one(post) >>
-        env.topicRepo.coll.insert.one(topic `withPost` post) >>
+        env.topicRepo.coll.insert.one(topic.withPost(post)) >>
         env.categRepo.coll.update.one($id(categ.id), categ.withPost(topic, post)).andDo {
           !categ.quiet so (indexer ! InsertPost(post))
           !categ.quiet so env.recent.invalidate()
           promotion.save(me, post.text)
           shutup ! {
             val text = s"${topic.name} ${post.text}"
-            if (post.isTeam) lila.hub.actorApi.shutup.RecordTeamForumMessage(me.id, text)
+            if post.isTeam then lila.hub.actorApi.shutup.RecordTeamForumMessage(me.id, text)
             else lila.hub.actorApi.shutup.RecordPublicForumMessage(me.id, text)
           }
-          if (!post.troll && !categ.quiet)
+          if !post.troll && !categ.quiet then
             timeline ! Propagate(ForumPost(me.id, topic.id.some, topic.name, post.id)).toFollowersOf(me.id)
           lila.mon.forum.post.create.increment()
           env.mentionNotifier.notifyMentionedUsers(post, topic)
@@ -111,26 +111,30 @@ final private[forum] class TopicApi(
       modIcon = true.some
     )
     env.postRepo.coll.insert.one(post) >>
-      env.topicRepo.coll.insert.one(topic `withPost` post) >>
-      env.categRepo.coll.update.one($id(categ.id), categ.withPost(topic, post)).andDo(indexer ! InsertPost(post)).andDo(env.recent.invalidate()).andDo(Bus.publish(actorApi.CreatePost(post), "forumPost")) void
+      env.topicRepo.coll.insert.one(topic.withPost(post)) >>
+      env.categRepo.coll.update
+        .one($id(categ.id), categ.withPost(topic, post))
+        .andDo(indexer ! InsertPost(post))
+        .andDo(env.recent.invalidate())
+        .andDo(Bus.publish(actorApi.CreatePost(post), "forumPost")) void
   }
 
   def paginator(categ: Categ, page: Int, forUser: Option[User]): Fu[Paginator[TopicView]] = {
     val adapter = new Adapter[Topic](
       collection = env.topicRepo.coll,
-      selector = env.topicRepo.forUser(forUser) `byCategNotStickyQuery` categ,
+      selector = env.topicRepo.forUser(forUser).byCategNotStickyQuery(categ),
       projection = none,
       sort = $sort.updatedDesc
     ) mapFutureList { topics =>
-      env.postRepo.coll.optionsByOrderedIds[Post, String](topics.map(_ `lastPostId` forUser))(_.id) map {
+      env.postRepo.coll.optionsByOrderedIds[Post, String](topics.map(_.lastPostId(forUser)))(_.id) map {
         posts =>
           topics zip posts map { case (topic, post) =>
-            TopicView(categ, topic, post, env.postApi `lastPageOf` topic, forUser)
+            TopicView(categ, topic, post, env.postApi.lastPageOf(topic), forUser)
           }
       }
     }
     val cachedAdapter =
-      if (categ.isTeam) adapter
+      if categ.isTeam then adapter
       else new CachedAdapter(adapter, nbResults = fuccess(1000))
     Paginator(
       adapter = cachedAdapter,
@@ -142,16 +146,16 @@ final private[forum] class TopicApi(
   def getSticky(categ: Categ, forUser: Option[User]): Fu[List[TopicView]] =
     env.topicRepo.stickyByCateg(categ) flatMap { topics =>
       Future.sequence(topics.map { topic =>
-        env.postRepo.coll.byId[Post](topic `lastPostId` forUser) map { post =>
-          TopicView(categ, topic, post, env.postApi `lastPageOf` topic, forUser)
+        env.postRepo.coll.byId[Post](topic.lastPostId(forUser)) map { post =>
+          TopicView(categ, topic, post, env.postApi.lastPageOf(topic), forUser)
         }
       })
     }
 
   def delete(categ: Categ, topic: Topic): Funit =
     env.postRepo.idsByTopicId(topic.id) flatMap { postIds =>
-      (env.postRepo `removeByTopic` topic.id zip env.topicRepo.coll.delete.one($id(topic.id))) >>
-        (env.categApi `denormalize` categ).andDo(indexer ! RemovePosts(postIds)).andDo(env.recent.invalidate())
+      (env.postRepo.removeByTopic(topic.id) zip env.topicRepo.coll.delete.one($id(topic.id))) >>
+        env.categApi.denormalize(categ).andDo(indexer ! RemovePosts(postIds)).andDo(env.recent.invalidate())
     }
 
   def toggleClose(categ: Categ, topic: Topic, mod: Holder): Funit =
@@ -176,11 +180,11 @@ final private[forum] class TopicApi(
 
   def denormalize(topic: Topic): Funit =
     for {
-      nbPosts       <- env.postRepo `countByTopic` topic
-      lastPost      <- env.postRepo `lastByTopic` topic
-      nbPostsTroll  <- env.postRepo.unsafe `countByTopic` topic
-      lastPostTroll <- env.postRepo.unsafe `lastByTopic` topic
-      _ <-
+      nbPosts       <- env.postRepo.countByTopic(topic)
+      lastPost      <- env.postRepo.lastByTopic(topic)
+      nbPostsTroll  <- env.postRepo.unsafe.countByTopic(topic)
+      lastPostTroll <- env.postRepo.unsafe.lastByTopic(topic)
+      _             <-
         env.topicRepo.coll.update
           .one(
             $id(topic.id),

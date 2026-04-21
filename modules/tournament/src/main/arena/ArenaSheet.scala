@@ -76,7 +76,7 @@ object Sheet {
       case (ResDraw, _)      => 1
       case _                 => 0
     }) + {
-      if (res == ResWin && berserk == ValidBerserk) 1 else 0
+      if res == ResWin && berserk == ValidBerserk then 1 else 0
     } + {
       statusScoring match {
         case SSBackgammon => 2
@@ -99,9 +99,9 @@ object Sheet {
       val streaks = streakable == Streaks
       val nexts   = (pairings drop 1 map some) :+ None
       pairings.zip(nexts).foldLeft(List.empty[Score]) { case (scores, (p, n)) =>
-        val berserk = if (p `berserkOf` userId)
-          if (p.notSoQuickFinish) ValidBerserk else InvalidBerserk
-        else NoBerserk
+        val berserk =
+          if p.berserkOf(userId) then if p.notSoQuickFinish then ValidBerserk else InvalidBerserk
+          else NoBerserk
         val statusScoreWin = (statusScoring, p.status) match {
           case (true, BackgammonWin | ResignBackgammon | GinBackgammon | OutoftimeBackgammon) =>
             SSBackgammon
@@ -110,11 +110,11 @@ object Sheet {
         }
         (p.winner match {
           case None if p.quickDraw => Score(ResDQ, Normal, berserk, SSNormal)
-          case None =>
+          case None                =>
             Score(
               ResDraw,
-              if (streaks && isOnFire(scores)) Double
-              else if (version != V1 && !p.longGame && isDrawStreak(scores)) Null
+              if streaks && isOnFire(scores) then Double
+              else if version != V1 && !p.longGame && isDrawStreak(scores) then Null
               else Normal,
               berserk,
               SSNormal
@@ -122,15 +122,16 @@ object Sheet {
           case Some(w) if userId == w =>
             Score(
               ResWin,
-              if (!streaks) Normal
-              else if (isOnFire(scores)) Double
-              else if (scores.headOption.exists(_.flag == StreakStarter)) StreakStarter
+              if !streaks then Normal
+              else if isOnFire(scores) then Double
+              else if scores.headOption.exists(_.flag == StreakStarter) then StreakStarter
               else
                 n match {
                   case None                                 => StreakStarter
                   case Some(s) if s.winner.contains(userId) => StreakStarter
                   case _                                    => Normal
-                },
+                }
+              ,
               berserk,
               statusScoreWin
             )
@@ -142,7 +143,7 @@ object Sheet {
   private val v2date = new DateTime(2020, 4, 21, 0, 0, 0)
 
   def versionOf(date: DateTime) =
-    if (date `isBefore` v2date) V1 else V2
+    if date.isBefore(v2date) then V1 else V2
 
   private def isOnFire(scores: List[Score]) =
     scores.headOption.exists(_.res == ResWin) &&
@@ -151,7 +152,7 @@ object Sheet {
   @scala.annotation.tailrec
   private def isDrawStreak(scores: List[Score]): Boolean =
     scores match {
-      case Nil => false
+      case Nil       => false
       case s :: more =>
         s.isWin match {
           case None        => true

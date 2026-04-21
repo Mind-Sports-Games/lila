@@ -1,9 +1,9 @@
 package lila.lobby
 
-import akka.actor._
-import akka.stream.scaladsl._
-import play.api.libs.json._
-import scala.concurrent.duration._
+import akka.actor.*
+import akka.stream.scaladsl.*
+import play.api.libs.json.*
+import scala.concurrent.duration.*
 
 import lila.common.Bus
 
@@ -54,7 +54,7 @@ final class BoardApiHookStream(
               // gotta send a message to check if the client has disconnected
               queue offer None
               self ! SetOnline
-          }
+            }
       }
     }
 }

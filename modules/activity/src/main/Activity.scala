@@ -1,6 +1,6 @@
 package lila.activity
 
-import activities._
+import activities.*
 import org.joda.time.Interval
 
 import lila.common.Day
@@ -28,7 +28,7 @@ case class Activity(
 
   def date = id.day.toDate
 
-  def interval = new Interval(date, date `plusDays` 1)
+  def interval = new Interval(date, date.plusDays(1))
 
   def isEmpty =
     !stream && List(
@@ -60,5 +60,5 @@ object Activity {
 
   case class WithUserId(activity: Activity, userId: User.ID)
 
-  def make(userId: User.ID) = Activity(Id `today` userId)
+  def make(userId: User.ID) = Activity(Id.today(userId))
 }

@@ -5,20 +5,20 @@ import play.api.i18n.Lang
 import play.api.libs.json.Json
 
 import strategygames.variant.Variant
-import lila.i18n.{ VariantKeys }
+import lila.i18n.VariantKeys
 
 import lila.api.Context
-import lila.app.templating.Environment._
-import lila.app.ui.ScalatagsTemplate._
+import lila.app.templating.Environment.*
+import lila.app.ui.ScalatagsTemplate.*
 import lila.common.String.html.safeJsonValue
 import lila.puzzle.{ PuzzleDashboard, PuzzleTheme }
 import lila.user.User
 
 object dashboard {
 
-  private val baseClass      = "puzzle-dashboard"
-  private val metricClass    = s"${baseClass}__metric"
-  private val themeClass     = s"${baseClass}__theme"
+  private val baseClass   = "puzzle-dashboard"
+  private val metricClass = s"${baseClass}__metric"
+  private val themeClass  = s"${baseClass}__theme"
   def home(user: User, variant: Variant, dashOpt: Option[PuzzleDashboard], days: Int)(implicit ctx: Context) =
     dashboardLayout(
       user = user,
@@ -26,7 +26,7 @@ object dashboard {
       path = "dashboard",
       variant = variant,
       title =
-        if (ctx `is` user) trans.puzzle.puzzleDashboard.txt()
+        if ctx.is(user) then trans.puzzle.puzzleDashboard.txt()
         else s"${user.username} puzzle dashboard",
       subtitle = "Train, analyse, improve",
       dashOpt = dashOpt,
@@ -37,33 +37,34 @@ object dashboard {
         frag(
           jsModule("puzzle.dashboard"),
           embedJsUnsafeLoadThen(s"""PlayStrategyPuzzleDashboard(${safeJsonValue(
-            Json
-              .obj(
-                "radar" -> Json.obj(
-                  "labels" -> mostPlayedVariant.map { case (key, _) =>
-                    VariantKeys.variantName(key)
-                  },
-                  "datasets" -> Json.arr(
-                    Json.obj(
-                      "label" -> "Performance",
-                      "data" -> mostPlayedVariant.map { case (_, results) =>
-                        results.performance
-                      }
+              Json
+                .obj(
+                  "radar" -> Json.obj(
+                    "labels" -> mostPlayedVariant.map { case (key, _) =>
+                      VariantKeys.variantName(key)
+                    },
+                    "datasets" -> Json.arr(
+                      Json.obj(
+                        "label" -> "Performance",
+                        "data"  -> mostPlayedVariant.map { case (_, results) =>
+                          results.performance
+                        }
+                      )
                     )
                   )
                 )
-              )
-          )})""")
+            )})""")
         )
       }
     ) { dash =>
-      dash.mostPlayedThemes(variant).size > 0 `option`
+      (dash.mostPlayedThemes(variant).size > 0).option(
         div(cls := s"${baseClass}__global")(
           dash.byVariant.get(variant).map { results =>
             metricsOf(days, variant, PuzzleTheme.mix.key, results)
           },
-          dash.mostPlayedVariant.size > 2 `option` canvas(cls := s"${baseClass}__radar")
+          (dash.mostPlayedVariant.size > 2).option(canvas(cls := s"${baseClass}__radar"))
         )
+      )
     }
 
   def improvementAreas(user: User, variant: Variant, dashOpt: Option[PuzzleDashboard], days: Int)(implicit
@@ -75,14 +76,14 @@ object dashboard {
       "improvementAreas",
       variant = variant,
       title =
-        if (ctx `is` user) trans.puzzle.improvementAreas.txt()
+        if ctx.is(user) then trans.puzzle.improvementAreas.txt()
         else s"${user.username} improvement areas",
       subtitle = "Train these to optimize your progress!",
       dashOpt = dashOpt
     ) { dash =>
       {
         val weakThemes = dash.weakThemes(variant)
-        weakThemes.nonEmpty `option` themeSelection(days, variant, weakThemes)
+        weakThemes.nonEmpty.option(themeSelection(days, variant, weakThemes))
       }
     }
 
@@ -95,14 +96,14 @@ object dashboard {
       "strengths",
       variant = variant,
       title =
-        if (ctx `is` user) trans.puzzle.strengths.txt()
+        if ctx.is(user) then trans.puzzle.strengths.txt()
         else s"${user.username} puzzle strengths",
       subtitle = "You perform the best in these themes",
       dashOpt = dashOpt
     ) { dash =>
       {
         val strongThemes = dash.strongThemes(variant)
-        strongThemes.nonEmpty `option` themeSelection(days, variant, strongThemes)
+        strongThemes.nonEmpty.option(themeSelection(days, variant, strongThemes))
       }
     }
 
@@ -137,9 +138,9 @@ object dashboard {
               span(trans.nbDays.pluralSame(days)),
               PuzzleDashboard.dayChoices map { d =>
                 a(
-                  cls := (d == days).option("current"),
+                  cls  := (d == days).option("current"),
                   href := s"${routes.Puzzle
-                    .dashboard(variant.key, d, path)}${!(ctx `is` user) so s"?u=${user.username}"}"
+                      .dashboard(variant.key, d, path)}${!ctx.is(user) so s"?u=${user.username}"}"
                 )(trans.nbDays.pluralSame(d))
               }
             )
@@ -193,21 +194,23 @@ object dashboard {
         span("performance")
       ),
       div(
-        cls := s"$metricClass $metricClass--win",
+        cls   := s"$metricClass $metricClass--win",
         style := s"--first:${results.firstWinPercent}%;--win:${results.winPercent}%"
       )(
         strong(s"${results.winPercent}%"),
         span("solved")
       ),
       a(
-        cls := s"$metricClass $metricClass--fix",
+        cls  := s"$metricClass $metricClass--fix",
         href := results.canReplay.option(routes.Puzzle.replay(variant.key, days, theme.value).url)
       )(
-        results.canReplay `option` span(cls := s"$metricClass--fix__text")(
-          strong(results.unfixed),
-          span("to replay")
+        results.canReplay.option(
+          span(cls := s"$metricClass--fix__text")(
+            strong(results.unfixed),
+            span("to replay")
+          )
         ),
-        iconTag(if (results.canReplay) 'G' else 'E')
+        iconTag(if results.canReplay then 'G' else 'E')
       )
     )
 }

@@ -1,6 +1,6 @@
 package controllers
 
-import views._
+import views.*
 
 import lila.app.*
 import lila.common.{ HTTPRequest, IpAddress }
@@ -13,7 +13,7 @@ final class ForumPost(env: Env) extends LilaController(env) with ForumController
   def search(text: String, page: Int) =
     OpenBody { implicit ctx =>
       NotForKids {
-        if (text.trim.isEmpty) Redirect(routes.ForumCateg.index).fuccess
+        if text.trim.isEmpty then Redirect(routes.ForumCateg.index).fuccess
         else env.forumSearch(text, page, ctx.troll) map { html.forum.search(text, _) }
       }
     }
@@ -24,8 +24,8 @@ final class ForumPost(env: Env) extends LilaController(env) with ForumController
         CategGrantWrite(categSlug) {
           implicit val req = ctx.body
           OptionFuResult(topicApi.show(categSlug, slug, page, ctx.me)) { case (categ, topic, posts) =>
-            if (topic.closed) fuccess(BadRequest("This topic is closed"))
-            else if (topic.isOld) fuccess(BadRequest("This topic is archived"))
+            if topic.closed then fuccess(BadRequest("This topic is closed"))
+            else if topic.isOld then fuccess(BadRequest("This topic is archived"))
             else
               categ.team.fold(fuFalse) { t => env.team.cached.isLeader(t, me.id) } flatMap { inOwnTeam =>
                 forms
@@ -42,7 +42,7 @@ final class ForumPost(env: Env) extends LilaController(env) with ForumController
                           .show(categ, topic, posts, Some(err -> captcha), unsub, canModCateg = canModCateg)
                       ),
                     data =>
-                      CreateRateLimit(HTTPRequest `ipAddress` ctx.req) {
+                      CreateRateLimit(HTTPRequest.ipAddress(ctx.req)) {
                         postApi.makePost(categ, topic, data, me) map { post =>
                           Redirect(routes.ForumPost.redirect(post.id))
                         }
@@ -65,7 +65,7 @@ final class ForumPost(env: Env) extends LilaController(env) with ForumController
             .fold(
               _ => Redirect(routes.ForumPost.redirect(postId)).fuccess,
               data =>
-                CreateRateLimit(HTTPRequest `ipAddress` ctx.req) {
+                CreateRateLimit(HTTPRequest.ipAddress(ctx.req)) {
                   postApi.editPost(postId, data.changes, me).map { post =>
                     Redirect(routes.ForumPost.redirect(post.id))
                   }
@@ -77,9 +77,9 @@ final class ForumPost(env: Env) extends LilaController(env) with ForumController
 
   def delete(categSlug: String, id: String) =
     Auth { implicit ctx => me =>
-      postApi `getPost` id flatMap {
+      postApi.getPost(id) flatMap {
         _ so { post =>
-          if (me.id == ~post.userId && !post.erased)
+          if me.id == ~post.userId && !post.erased then
             postApi.erasePost(post) inject Redirect(routes.ForumPost.redirect(id))
           else
             isGrantedMod(categSlug) flatMap { granted =>

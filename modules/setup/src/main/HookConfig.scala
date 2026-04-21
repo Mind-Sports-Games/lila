@@ -39,11 +39,10 @@ case class HookConfig(
   def fixPlayerIndex =
     copy(
       playerIndex =
-        if (
-          mode == Mode.Rated &&
+        if mode == Mode.Rated &&
           lila.game.Game.variantsWhereP1IsBetter(variant) &&
           playerIndex != PlayerIndex.Random
-        ) PlayerIndex.Random
+        then PlayerIndex.Random
         else playerIndex
     )
 
@@ -85,7 +84,7 @@ case class HookConfig(
             sri = sri,
             variant = variant,
             clock = clock,
-            mode = if (lila.game.Game.allowRated(variant, clock.some)) mode else Mode.Casual,
+            mode = if lila.game.Game.allowRated(variant, clock.some) then mode else Mode.Casual,
             playerIndex = playerIndex.name,
             user = user,
             blocking = blocking,
@@ -114,7 +113,7 @@ case class HookConfig(
       case Some(c: ByoyomiClock) =>
         copy(
           variant = game.variant,
-          timeMode = TimeMode `ofGame` game,
+          timeMode = TimeMode.ofGame(game),
           time = c.limitInMinutes,
           increment = c.config.incrementSeconds,
           byoyomi = c.byoyomiSeconds,
@@ -125,7 +124,7 @@ case class HookConfig(
       case _ =>
         copy(
           variant = game.variant,
-          timeMode = TimeMode `ofGame` game,
+          timeMode = TimeMode.ofGame(game),
           time = game.clock.map(_.limitInMinutes) | time,
           // TODO: We are reusing the name 'increment' even for Bronstein and Simple Delay. This should probably be renamed
           increment = game.clock.map(_.config.graceSeconds) | increment,
@@ -136,7 +135,7 @@ case class HookConfig(
         )
     }
 
-  def withRatingRange(str: Option[String]) = copy(ratingRange = RatingRange `orDefault` str)
+  def withRatingRange(str: Option[String]) = copy(ratingRange = RatingRange.orDefault(str))
 }
 
 object HookConfig extends BaseHumanConfig {
@@ -157,8 +156,8 @@ object HookConfig extends BaseHumanConfig {
     val gameFamily = GameFamily(v.split("_")(0).toInt)
     val variantId  = v.split("_")(1).toInt
     new HookConfig(
-      variant = Variant(gameFamily.gameLogic, variantId) `err` s"Invalid game variant $v",
-      timeMode = TimeMode(tm) `err` s"Invalid time mode $tm",
+      variant = Variant(gameFamily.gameLogic, variantId).err(s"Invalid game variant $v"),
+      timeMode = TimeMode(tm).err(s"Invalid time mode $tm"),
       time = t,
       increment = i,
       byoyomi = b,
@@ -166,7 +165,7 @@ object HookConfig extends BaseHumanConfig {
       days = d,
       mode = realMode,
       ratingRange = e.fold(RatingRange.default)(RatingRange.orDefault),
-      playerIndex = PlayerIndex(c) `err` s"Invalid playerIndex $c"
+      playerIndex = PlayerIndex(c).err(s"Invalid playerIndex $c")
     )
   }
 
@@ -186,22 +185,22 @@ object HookConfig extends BaseHumanConfig {
   )
 
   import lila.db.BSON
-  import lila.db.dsl._
+  import lila.db.dsl.*
 
   implicit private[setup] val hookConfigBSONHandler: BSON[HookConfig] = new BSON[HookConfig] {
 
     def reads(r: BSON.Reader): HookConfig =
       HookConfig(
-        variant = Variant.orDefault(GameLogic(r `intD` "l"), r `int` "v"),
-        timeMode = TimeMode `orDefault` (r `int` "tm"),
-        time = r `double` "t",
-        increment = r `int` "i",
-        byoyomi = r `intD` "b",
-        periods = r `intD` "p",
-        days = r `int` "d",
-        mode = Mode `orDefault` (r `int` "m"),
+        variant = Variant.orDefault(GameLogic(r.intD("l")), r.int("v")),
+        timeMode = TimeMode.orDefault(r.int("tm")),
+        time = r.double("t"),
+        increment = r.int("i"),
+        byoyomi = r.intD("b"),
+        periods = r.intD("p"),
+        days = r.int("d"),
+        mode = Mode.orDefault(r.int("m")),
         playerIndex = PlayerIndex.Random,
-        ratingRange = r `strO` "e" flatMap RatingRange.apply getOrElse RatingRange.default
+        ratingRange = r.strO("e") flatMap RatingRange.apply getOrElse RatingRange.default
       )
 
     def writes(w: BSON.Writer, o: HookConfig) =

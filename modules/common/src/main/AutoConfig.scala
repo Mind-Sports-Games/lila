@@ -36,7 +36,6 @@ object AutoConfig {
         .filter(paramList => paramList.forall(!_.isTypeParam))
         .map { params =>
           params.map { param =>
-
             // parameter name
             val paramName = Expr(param.name)
 
@@ -46,7 +45,7 @@ object AutoConfig {
                 case a if a.tpe.derivesFrom(TypeRepr.of[ConfigName].typeSymbol) =>
                   val annot = a.asExprOf[ConfigName]
                   annot
-            }
+              }
               .map(ac => '{ $ac.name })
               .getOrElse(paramName)
 
@@ -103,4 +102,4 @@ object AutoConfig {
       }
     }
   } // end impl
-} // end AutoConfig
+}   // end AutoConfig

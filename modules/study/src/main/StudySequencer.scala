@@ -34,7 +34,7 @@ final private class StudySequencer(
           _.filter(_.studyId == studyId) so { chapter =>
             f(Study.WithChapter(study, chapter))
           }
-      }
+        }
         .mon(_.study.sequencer.chapterTime)
     }
 }

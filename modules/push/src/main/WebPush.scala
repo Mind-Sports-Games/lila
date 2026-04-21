@@ -1,8 +1,8 @@
 package lila.push
 
 import lila.common.autoconfig.{ AutoConfig, ConfigName }
-import play.api.libs.json._
-import play.api.libs.ws.JsonBodyWritables._
+import play.api.libs.json.*
+import play.api.libs.ws.JsonBodyWritables.*
 import play.api.libs.ws.StandaloneWSClient
 import cats.data.NonEmptyList
 
@@ -28,7 +28,7 @@ final private class WebPush(
           "subs" -> JsArray(subscriptions.map { sub =>
             Json.obj(
               "endpoint" -> sub.endpoint,
-              "keys" -> Json.obj(
+              "keys"     -> Json.obj(
                 "p256dh" -> sub.p256dh,
                 "auth"   -> sub.auth
               )

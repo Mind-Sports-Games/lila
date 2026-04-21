@@ -17,12 +17,12 @@ trait LilaLibraryExtensions extends CoreExports {
     def zero = identity[A]
   }
 
-  def fuccess[A](a: A): Fu[A] = Future.successful(a)
+  def fuccess[A](a: A): Fu[A]        = Future.successful(a)
   def fufail[X](t: Throwable): Fu[X] = Future.failed(t)
-  def fufail[X](s: String): Fu[X] = fufail(LilaException(s))
-  val funit: Future[Unit] = Future.unit
-  val fuTrue: Future[Boolean] = fuccess(true)
-  val fuFalse: Future[Boolean] = fuccess(false)
+  def fufail[X](s: String): Fu[X]    = fufail(LilaException(s))
+  val funit: Future[Unit]            = Future.unit
+  val fuTrue: Future[Boolean]        = fuccess(true)
+  val fuFalse: Future[Boolean]       = fuccess(false)
 
   inline def raiseIf[E](cond: Boolean)(e: => E): FuRaise[E, Unit] =
     if cond then e.raise else funit
@@ -56,18 +56,18 @@ trait LilaLibraryExtensions extends CoreExports {
   }
 
   extension (config: Config) {
-    def millis(name: String): Int = config.getDuration(name, TimeUnit.MILLISECONDS).toInt
-    def seconds(name: String): Int = config.getDuration(name, TimeUnit.SECONDS).toInt
+    def millis(name: String): Int              = config.getDuration(name, TimeUnit.MILLISECONDS).toInt
+    def seconds(name: String): Int             = config.getDuration(name, TimeUnit.SECONDS).toInt
     def duration(name: String): FiniteDuration = millis(name).millis
   }
 
   extension [A, B](v: Either[A, B]) {
     def toFuture: Fu[B] = v match {
       case Right(res) => fuccess(res)
-      case Left(err) =>
+      case Left(err)  =>
         err match {
           case e: Exception => Future.failed(e)
-          case _ => fufail(err.toString)
+          case _            => fufail(err.toString)
         }
     }
 
@@ -78,7 +78,7 @@ trait LilaLibraryExtensions extends CoreExports {
 
   extension (d: FiniteDuration) {
     def toCentis = strategygames.Centis(d)
-    def abs = if d.length < 0 then -d else d
+    def abs      = if d.length < 0 then -d else d
   }
 
   extension [A](list: List[A]) {
@@ -87,13 +87,13 @@ trait LilaLibraryExtensions extends CoreExports {
         other.indexOf(f(x)) < other.indexOf(f(y))
       }
     def tailOption: Option[List[A]] = list match {
-      case Nil => None
+      case Nil       => None
       case _ :: rest => Some(rest)
     }
-    def tailSafe: List[A] = tailOption.getOrElse(Nil)
-    def indexOption(a: A) = Option(list.indexOf(a)).filter(0 <= _)
-    def previous(a: A): Option[A] = indexOption(a).flatMap(i => list.lift(i - 1))
-    def next(a: A): Option[A] = indexOption(a).flatMap(i => list.lift(i + 1))
+    def tailSafe: List[A]                              = tailOption.getOrElse(Nil)
+    def indexOption(a: A)                              = Option(list.indexOf(a)).filter(0 <= _)
+    def previous(a: A): Option[A]                      = indexOption(a).flatMap(i => list.lift(i - 1))
+    def next(a: A): Option[A]                          = indexOption(a).flatMap(i => list.lift(i + 1))
     def sortedReverse(using ord: Ordering[A]): List[A] = list.sorted(using ord.reverse)
     def sortByReverse[B](f: A => B)(using ord: Ordering[B]): List[A] =
       list.sortBy(f)(using ord.reverse)
@@ -123,18 +123,17 @@ trait LilaLibraryExtensions extends CoreExports {
       import cats.mtl.Handle.*
       list
         .foldLeft(fuccess((List.empty[B], none[E]))) { (facc, a) =>
-          facc.flatMap {
-            case acc @ (bs, err) =>
-              err match {
-                case Some(_) => fuccess(acc) // short-circuit on first error
-                case None =>
-                  allow {
-                    f(a).map(b => (b :: bs) -> none)
-                  }
+          facc.flatMap { case acc @ (bs, err) =>
+            err match {
+              case Some(_) => fuccess(acc) // short-circuit on first error
+              case None    =>
+                allow {
+                  f(a).map(b => (b :: bs) -> none)
+                }
                   .rescue { e =>
                     fuccess((bs, e.some))
                   }
-              }
+            }
           }
         }
         .dmap { (xs, err) =>
@@ -181,8 +180,8 @@ trait LilaLibraryExtensions extends CoreExports {
     def logFailure(logger: => play.api.LoggerLike)(using Executor): Fu[A] = logFailure(logger, _.toString)
 
     def mapFailure(f: Exception => Exception)(using Executor): Fu[A] =
-      fua.recoverWith {
-        case cause: Exception => fufail(f(cause))
+      fua.recoverWith { case cause: Exception =>
+        fufail(f(cause))
       }
 
     def prefixFailure(p: => String)(using Executor): Fu[A] =
@@ -223,6 +222,6 @@ trait LilaLibraryExtensions extends CoreExports {
 
   extension [A](p: PairOf[A]) {
     def pairMap[B](f: A => B): PairOf[B] = (f(p._1), f(p._2))
-    def asList: List[A] = List(p._1, p._2)
+    def asList: List[A]                  = List(p._1, p._2)
   }
 }

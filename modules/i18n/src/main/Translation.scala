@@ -1,6 +1,6 @@
 package lila.i18n
 
-import scalatags.Text.all._
+import scalatags.Text.all.*
 
 import lila.common.String.html.escapeHtml
 
@@ -9,11 +9,11 @@ sealed private trait Translation
 final private class Simple(val message: String) extends Translation {
 
   def formatTxt(args: Seq[Any]): String =
-    if (args.isEmpty) message
+    if args.isEmpty then message
     else message.format(args*)
 
   def format(args: Seq[RawFrag]): RawFrag =
-    if (args.isEmpty) RawFrag(message)
+    if args.isEmpty then RawFrag(message)
     else RawFrag(message.format(args.map(_.v)*))
 
   override def toString = s"Simple($message)"
@@ -22,11 +22,11 @@ final private class Simple(val message: String) extends Translation {
 final private class Escaped(val message: String, escaped: String) extends Translation {
 
   def formatTxt(args: Seq[Any]): String =
-    if (args.isEmpty) message
+    if args.isEmpty then message
     else message.format(args*)
 
   def format(args: Seq[RawFrag]): RawFrag =
-    if (args.isEmpty) RawFrag(escaped)
+    if args.isEmpty then RawFrag(escaped)
     else RawFrag(escaped.format(args.map(_.v)*))
 
   override def toString = s"Escaped($message)"
@@ -42,14 +42,14 @@ final private class Plurals(val messages: Map[I18nQuantity, String]) extends Tra
 
   def formatTxt(quantity: I18nQuantity, args: Seq[Any]): Option[String] =
     messageFor(quantity).map { message =>
-      if (args.isEmpty) message
+      if args.isEmpty then message
       else message.format(args*)
     }
 
   def format(quantity: I18nQuantity, args: Seq[RawFrag]): Option[RawFrag] =
     messageFor(quantity).map { message =>
       val escaped = escapeHtml(message)
-      if (args.isEmpty) escaped
+      if args.isEmpty then escaped
       else RawFrag(escaped.v.format(args.map(_.v)*))
     }
 

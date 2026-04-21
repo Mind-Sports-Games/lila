@@ -1,9 +1,9 @@
 package lila.round
 
-import akka.stream.scaladsl._
-import strategygames.{ Player => PlayerIndex }
+import akka.stream.scaladsl.*
+import strategygames.Player as PlayerIndex
 import strategygames.format.Forsyth
-import play.api.libs.json._
+import play.api.libs.json.*
 import scala.concurrent.ExecutionContext
 
 import lila.common.Bus
@@ -29,7 +29,7 @@ final class ApiActionStream(gameRepo: GameRepo, gameJsonView: lila.game.JsonView
             .queue[JsObject](16, akka.stream.OverflowStrategy.dropHead)
             .statefulMapConcat { () => js =>
               moves += 1
-              if (game.finished || moves <= delayKeepsFirstMoves) List(js)
+              if game.finished || moves <= delayKeepsFirstMoves then List(js)
               else {
                 buffer.enqueue(js)
                 (buffer.size > delayMovesBy) so List(buffer.dequeue())
@@ -62,13 +62,12 @@ final class ApiActionStream(gameRepo: GameRepo, gameJsonView: lila.game.JsonView
                   )
                 }
               }
-              if (game.finished) {
+              if game.finished then {
                 queue offer gameJsonView(game, initialFen)
                 queue.complete()
-              }
-              else {
-                val chans = List(MoveGameEvent `makeChan` game.id, "finishGame")
-                val sub = Bus.subscribeFun(chans*) {
+              } else {
+                val chans = List(MoveGameEvent.makeChan(game.id), "finishGame")
+                val sub   = Bus.subscribeFun(chans*) {
                   case MoveGameEvent(g, fen, move) =>
                     queue.offer(toJson(g, fen, move.some)).discard
                   case FinishGame(g, _, _) if g.id == game.id =>

@@ -1,11 +1,10 @@
 package views.html.forum
 
 import lila.api.Context
-import lila.app.templating.Environment._
-import lila.app.ui.ScalatagsTemplate._
+import lila.app.templating.Environment.*
+import lila.app.ui.ScalatagsTemplate.*
 import lila.common.paginator.Paginator
 import lila.common.String.html.nl2br
-
 
 object search {
 
@@ -26,7 +25,7 @@ object search {
         ),
         strong(cls := "nb-results box__pad")(pager.nbResults, " posts found"),
         table(cls := "slist slist-pad search__results")(
-          if (pager.nbResults > 0)
+          if pager.nbResults > 0 then
             tbody(cls := "infinite-scroll")(
               pager.currentPageResults.map { view =>
                 tr(cls := "paginated")(

@@ -3,10 +3,10 @@ package lila.study
 import strategygames.format.{ FEN, Uci }
 import strategygames.format.pgn.{ Tag, Tags }
 import strategygames.variant.Variant
-import strategygames.{ Player => PlayerIndex, Pos }
-import play.api.libs.json._
+import strategygames.{ Player as PlayerIndex, Pos }
+import play.api.libs.json.*
 
-import lila.common.Json._
+import lila.common.Json.*
 import lila.socket.Socket.Sri
 import lila.tree.Node.Shape
 import lila.user.User
@@ -17,7 +17,7 @@ final class JsonView(
     lightUserApi: lila.user.LightUserApi
 )(implicit ec: scala.concurrent.ExecutionContext) {
 
-  import JsonView._
+  import JsonView.*
 
   def apply(
       study: Study,
@@ -32,7 +32,7 @@ final class JsonView(
     me.so { studyRepo.liked(study, _) } map { liked =>
       studyWrites.writes(study) ++ Json
         .obj(
-          "liked" -> liked,
+          "liked"    -> liked,
           "features" -> Json.obj(
             "cloneable"   -> allowed(study.settings.cloneable),
             "chat"        -> allowed(study.settings.chat),
@@ -41,12 +41,12 @@ final class JsonView(
           ),
           "topics"   -> study.topicsOrEmpty,
           "chapters" -> chapters.map(chapterMetadataWrites.writes),
-          "chapter" -> Json
+          "chapter"  -> Json
             .obj(
-              "id"      -> currentChapter.id,
-              "ownerId" -> currentChapter.ownerId,
-              "setup"   -> currentChapter.setup,
-              "tags"    -> currentChapter.tags,
+              "id"       -> currentChapter.id,
+              "ownerId"  -> currentChapter.ownerId,
+              "setup"    -> currentChapter.setup,
+              "tags"     -> currentChapter.tags,
               "features" -> Json.obj(
                 "computer" -> allowed(study.settings.computer),
                 "explorer" -> allowed(study.settings.explorer)
@@ -69,7 +69,8 @@ final class JsonView(
         "variant"     -> c.setup.variant,
         "orientation" -> c.setup.orientation
       )
-      .add("description", c.description) `pipe` addChapterMode(c)
+      .add("description", c.description)
+      .pipe(addChapterMode(c))
 
   def pagerData(s: Study.WithChaptersAndLiked) =
     Json.obj(
@@ -122,8 +123,8 @@ object JsonView {
 
   case class JsData(study: JsObject, analysis: JsObject)
 
-  implicit val studyIdWrites: Writes[Study.Id]     = stringIsoWriter(Study.idIso)
-  implicit val studyNameWrites: Writes[Study.Name] = stringIsoWriter(Study.nameIso)
+  implicit val studyIdWrites: Writes[Study.Id]          = stringIsoWriter(Study.idIso)
+  implicit val studyNameWrites: Writes[Study.Name]      = stringIsoWriter(Study.nameIso)
   implicit val studyIdNameWrites: OWrites[Study.IdName] = OWrites[Study.IdName] { s =>
     Json.obj("id" -> s._id, "name" -> s.name)
   }
@@ -173,7 +174,7 @@ object JsonView {
   implicit val pgnTagsWrites: Writes[Tags] = Writes[Tags] { tags =>
     JsArray(tags.value map pgnTagWrites.writes)
   }
-  implicit private val chapterSetupWrites: OWrites[Chapter.Setup] = Json.writes[Chapter.Setup]
+  implicit private val chapterSetupWrites: OWrites[Chapter.Setup]              = Json.writes[Chapter.Setup]
   implicit private[study] val chapterMetadataWrites: OWrites[Chapter.Metadata] = OWrites[Chapter.Metadata] {
     c =>
       Json
@@ -183,7 +184,7 @@ object JsonView {
   }
 
   implicit private[study] val positionRefWrites: Writes[Position.Ref] = Json.writes[Position.Ref]
-  implicit private val likesWrites: Writes[Study.Likes] = Writes[Study.Likes] { p =>
+  implicit private val likesWrites: Writes[Study.Likes]               = Writes[Study.Likes] { p =>
     JsNumber(p.value)
   }
   implicit private[study] val likingRefWrites: Writes[Study.Liking] = Json.writes[Study.Liking]
@@ -201,7 +202,7 @@ object JsonView {
     Json.obj("u" -> w.u, "s" -> w.sri)
   }
 
-  implicit val topicWrites: Writes[StudyTopic] = stringIsoWriter(StudyTopic.topicIso)
+  implicit val topicWrites: Writes[StudyTopic]   = stringIsoWriter(StudyTopic.topicIso)
   implicit val topicsWrites: Writes[StudyTopics] = Writes[StudyTopics] { topics =>
     JsArray(topics.value map topicWrites.writes)
   }
@@ -216,7 +217,7 @@ object JsonView {
       js.asOpt[JsObject]
         .flatMap { o =>
           for {
-            brush <- o `str` "brush"
+            brush <- o.str("brush")
             orig  <- o.get[Pos]("orig")
           } yield o.get[Pos]("dest") match {
             case Some(dest) => Shape.Arrow(brush, orig, dest)
@@ -227,4 +228,3 @@ object JsonView {
     }
   }
 }
-

@@ -1,10 +1,10 @@
 package lila.security
 
-import play.api.data._
-import play.api.data.Forms._
+import play.api.data.*
+import play.api.data.Forms.*
 import play.api.data.validation.Constraints
 
-import lila.common.{ EmailAddress, LameName, Form => LilaForm }
+import lila.common.{ EmailAddress, Form as LilaForm, LameName }
 import lila.common.extensions.*
 import lila.user.{ TotpSecret, User, UserRepo }
 import User.{ ClearPassword, TotpToken }
@@ -17,7 +17,7 @@ final class SecurityForm(
     hcaptchaPublicConfig: HcaptchaPublicConfig
 )(implicit ec: scala.concurrent.ExecutionContext) {
 
-  import SecurityForm._
+  import SecurityForm.*
 
   private val passwordMinLength = 4
 
@@ -26,9 +26,9 @@ final class SecurityForm(
   private val sendableEmail   = anyEmail.verifying(emailValidator.sendableConstraint)
   private val acceptableEmail = anyEmail.verifying(emailValidator.acceptableConstraint)
   private def acceptableUniqueEmail(forUser: Option[User]) =
-    acceptableEmail.verifying(emailValidator `uniqueConstraint` forUser)
+    acceptableEmail.verifying(emailValidator.uniqueConstraint(forUser))
 
-  private def withAcceptableDns(m: Mapping[String]) = m `verifying` emailValidator.withAcceptableDns
+  private def withAcceptableDns(m: Mapping[String]) = m.verifying(emailValidator.withAcceptableDns)
 
   private val preloadEmailDnsForm = Form(single("email" -> acceptableEmail))
 
@@ -44,8 +44,8 @@ final class SecurityForm(
 
     val username = LilaForm.cleanNonEmptyText
       .verifying(
-        Constraints `minLength` 2,
-        Constraints `maxLength` 20,
+        Constraints.minLength(2),
+        Constraints.maxLength(20),
         Constraints.pattern(
           regex = User.newUsernamePrefix,
           error = "usernamePrefixInvalid"
@@ -141,12 +141,12 @@ final class SecurityForm(
   )
 
   def changeEmail(u: User, old: Option[EmailAddress]) =
-    authenticator `loginCandidate` u map { candidate =>
+    authenticator.loginCandidate(u) map { candidate =>
       Form(
         mapping(
           "passwd" -> passwordMapping(candidate),
-          "email" -> withAcceptableDns {
-            acceptableUniqueEmail(candidate.user.some).verifying(emailValidator `differentConstraint` old)
+          "email"  -> withAcceptableDns {
+            acceptableUniqueEmail(candidate.user.some).verifying(emailValidator.differentConstraint(old))
           }
         )(ChangeEmail.apply)(d => Some((d.passwd, d.email)))
       ).fill(
@@ -158,7 +158,7 @@ final class SecurityForm(
     }
 
   def setupTwoFactor(u: User) =
-    authenticator `loginCandidate` u map { candidate =>
+    authenticator.loginCandidate(u) map { candidate =>
       Form(
         mapping(
           "secret" -> nonEmptyText,
@@ -178,11 +178,11 @@ final class SecurityForm(
     }
 
   def disableTwoFactor(u: User) =
-    authenticator `loginCandidate` u map { candidate =>
+    authenticator.loginCandidate(u) map { candidate =>
       Form(
         tuple(
           "passwd" -> passwordMapping(candidate),
-          "token"  -> text.verifying("invalidAuthenticationCode", t => u.totpSecret.so(_.verify(TotpToken(t))))
+          "token" -> text.verifying("invalidAuthenticationCode", t => u.totpSecret.so(_.verify(TotpToken(t))))
         )
       )
     }
@@ -191,7 +191,7 @@ final class SecurityForm(
     Form(
       single(
         "email" -> withAcceptableDns {
-          acceptableUniqueEmail(none).verifying(emailValidator `differentConstraint` old.some)
+          acceptableUniqueEmail(none).verifying(emailValidator.differentConstraint(old.some))
         }
       )
     ).fill(old.value)
@@ -199,7 +199,7 @@ final class SecurityForm(
   def modEmail(user: User) = Form(single("email" -> acceptableUniqueEmail(user.some)))
 
   private def passwordProtected(u: User) =
-    authenticator `loginCandidate` u map { candidate =>
+    authenticator.loginCandidate(u) map { candidate =>
       Form(single("passwd" -> passwordMapping(candidate)))
     }
 

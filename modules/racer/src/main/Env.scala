@@ -1,6 +1,6 @@
 package lila.racer
 
-import com.softwaremill.macwire._
+import com.softwaremill.macwire.*
 
 import lila.common.LightUser
 import lila.db.AsyncColl
@@ -33,7 +33,8 @@ final class Env(
 
   lazy val json = wire[RacerJson]
 
-  @annotation.nowarn("msg=unused") private val socket = wire[RacerSocket] // requires eager eval
+  @annotation.nowarn("msg=unused")
+  private val socket = wire[RacerSocket] // requires eager eval
 }
 
 final private class RacerColls(val puzzle: AsyncColl)

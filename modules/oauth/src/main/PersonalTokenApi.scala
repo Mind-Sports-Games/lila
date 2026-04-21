@@ -2,14 +2,14 @@ package lila.oauth
 
 import reactivemongo.api.bson.BSONObjectID
 
-import lila.db.dsl._
+import lila.db.dsl.*
 import lila.user.User
 
 final class PersonalTokenApi(colls: OauthColls)(implicit ec: scala.concurrent.ExecutionContext) {
 
-  import PersonalToken._
+  import PersonalToken.*
   import OAuthScope.scopeHandler
-  import AccessToken.{ BSONFields => F, _ }
+  import AccessToken.{ BSONFields as F, * }
 
   def list(u: User): Fu[List[AccessToken]] =
     colls.token {
@@ -19,7 +19,7 @@ final class PersonalTokenApi(colls: OauthColls)(implicit ec: scala.concurrent.Ex
           F.clientId -> clientId
         )
       )
-        .sort($sort `desc` F.createdAt)
+        .sort($sort.desc(F.createdAt))
         .cursor[AccessToken]()
         .list(100)
     }
@@ -36,7 +36,7 @@ final class PersonalTokenApi(colls: OauthColls)(implicit ec: scala.concurrent.Ex
     }
 
   def create(token: AccessToken) = colls.token(_.insert.one(token).void).andDo {
-    if (token.scopes contains OAuthScope.Web.Login)
+    if token.scopes contains OAuthScope.Web.Login then
       logger.warn(s"web:login token created by ${token.userId} ${~token.description}")
   }
 
@@ -49,7 +49,7 @@ final class PersonalTokenApi(colls: OauthColls)(implicit ec: scala.concurrent.Ex
             _ so { token =>
               coll.delete.one($doc(F.publicId -> token.publicId)) inject token.some
             }
-        }
+          }
       }
     }
 }

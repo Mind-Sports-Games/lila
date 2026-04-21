@@ -1,10 +1,9 @@
 package views
 package html.puzzle
 
-
 import lila.api.Context
-import lila.app.templating.Environment._
-import lila.app.ui.ScalatagsTemplate._
+import lila.app.templating.Environment.*
+import lila.app.ui.ScalatagsTemplate.*
 import lila.common.paginator.Paginator
 import lila.puzzle.Puzzle
 import lila.user.User
@@ -26,15 +25,15 @@ object ofPlayer {
           form(
             action := routes.Puzzle.ofPlayer(variant.key),
             method := "get",
-            cls := "form3 puzzle-of-player__form complete-parent"
+            cls    := "form3 puzzle-of-player__form complete-parent"
           )(
             st.input(
-              name := "name",
-              value := query,
-              cls := "form-control user-autocomplete",
-              placeholder := "PlayStrategy username",
+              name         := "name",
+              value        := query,
+              cls          := "form-control user-autocomplete",
+              placeholder  := "PlayStrategy username",
               autocomplete := "off",
-              dataTag := "span",
+              dataTag      := "span",
               autofocus
             ),
             submitButton(cls := "button")("Search puzzles")
@@ -42,7 +41,7 @@ object ofPlayer {
           div(cls := "puzzle-of-player__results")(
             (user, puzzles) match {
               case (Some(u), Some(pager)) =>
-                if (pager.nbResults == 0 && ctx.is(u))
+                if pager.nbResults == 0 && ctx.is(u) then
                   frag(
                     bits.variantSelector(
                       variant,
@@ -71,7 +70,7 @@ object ofPlayer {
                             lastMove = puzzle.line.head.uci
                           )(
                             a(
-                              cls := s"puzzle-of-player__puzzle__board variant-${puzzle.variant.key}",
+                              cls  := s"puzzle-of-player__puzzle__board variant-${puzzle.variant.key}",
                               href := routes.Puzzle.show(puzzle.variant.key, puzzle.id.value)
                             )
                           ),

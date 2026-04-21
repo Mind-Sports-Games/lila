@@ -1,7 +1,7 @@
 package lila.plan
 
-import play.api.data._
-import play.api.data.Forms._
+import play.api.data.*
+import play.api.data.Forms.*
 
 case class PlanCheckout(
     email: Option[String],
@@ -31,7 +31,7 @@ object PlanCheckout {
     PlanCheckout(
       email,
       Usd(amount).cents,
-      if (freq == "monthly") Freq.Monthly else Freq.Onetime
+      if freq == "monthly" then Freq.Monthly else Freq.Onetime
     )
 
   val form = Form[PlanCheckout](

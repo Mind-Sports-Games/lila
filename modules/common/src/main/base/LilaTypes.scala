@@ -1,8 +1,8 @@
 package lila.base
 
 // Re-export core types
-export lila.core.lilaism.Lilaism.{ Fu, Funit, fuccess, fufail, funit, fuTrue, fuFalse }
-export lila.core.lilaism.{ LilaException, LilaTimeout, LilaInvalid, LilaNoStackTrace }
+export lila.core.lilaism.Lilaism.{ fuFalse, fuTrue, fuccess, fufail, funit, Fu, Funit }
+export lila.core.lilaism.{ LilaException, LilaInvalid, LilaNoStackTrace, LilaTimeout }
 
 // PlayStrategy-specific value classes
 trait IntValue extends Any {

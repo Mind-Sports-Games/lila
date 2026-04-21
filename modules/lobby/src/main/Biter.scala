@@ -1,6 +1,6 @@
 package lila.lobby
 
-import strategygames.{ Game => StratGame, Situation }
+import strategygames.{ Game as StratGame, Situation }
 
 import actorApi.{ JoinHook, JoinSeek }
 import lila.game.{ Game, PerfPicker, Player }
@@ -16,11 +16,11 @@ final private class Biter(
 ) {
 
   def apply(hook: Hook, sri: Sri, user: Option[LobbyUser]): Fu[JoinHook] =
-    if (canJoin(hook, user)) join(hook, sri, user)
+    if canJoin(hook, user) then join(hook, sri, user)
     else fufail(s"$user cannot bite hook $hook")
 
   def apply(seek: Seek, user: LobbyUser): Fu[JoinSeek] =
-    if (canJoin(seek, user)) join(seek, user)
+    if canJoin(seek, user) then join(seek, user)
     else fufail(s"$user cannot join seek $seek")
 
   private def join(hook: Hook, sri: Sri, lobbyUserOption: Option[LobbyUser]): Fu[JoinHook] =
@@ -28,12 +28,12 @@ final private class Biter(
       userOption         <- lobbyUserOption.map(_.id) so userRepo.byId
       ownerOption        <- hook.userId so userRepo.byId
       creatorPlayerIndex <- assignCreatorPlayerIndex(ownerOption, userOption, hook.realPlayerIndex)
-      game <- makeGame(
+      game               <- makeGame(
         hook,
         p1User = creatorPlayerIndex.fold(ownerOption, userOption),
         p2User = creatorPlayerIndex.fold(userOption, ownerOption)
       ).withUniqueId
-      _ <- gameRepo `insertDenormalized` game
+      _ <- gameRepo.insertDenormalized(game)
     } yield {
       lila.mon.lobby.hook.join.increment()
       JoinHook(sri, hook, game, creatorPlayerIndex)
@@ -41,15 +41,15 @@ final private class Biter(
 
   private def join(seek: Seek, lobbyUser: LobbyUser): Fu[JoinSeek] =
     for {
-      user               <- userRepo `byId` lobbyUser.id `orFail` s"No such user: ${lobbyUser.id}"
-      owner              <- userRepo `byId` seek.user.id `orFail` s"No such user: ${seek.user.id}"
+      user               <- userRepo.byId(lobbyUser.id).orFail(s"No such user: ${lobbyUser.id}")
+      owner              <- userRepo.byId(seek.user.id).orFail(s"No such user: ${seek.user.id}")
       creatorPlayerIndex <- assignCreatorPlayerIndex(owner.some, user.some, seek.realPlayerIndex)
-      game <- makeGame(
+      game               <- makeGame(
         seek,
         p1User = creatorPlayerIndex.fold(owner.some, user.some),
         p2User = creatorPlayerIndex.fold(user.some, owner.some)
       ).withUniqueId
-      _ <- gameRepo `insertDenormalized` game
+      _ <- gameRepo.insertDenormalized(game)
     } yield JoinSeek(user.id, seek, game, creatorPlayerIndex)
 
   private def assignCreatorPlayerIndex(
@@ -74,7 +74,7 @@ final private class Biter(
           lib = hook.realVariant.gameLogic,
           situation = stratSit,
           clock = clock.some,
-          //we have to do this to handle Backgammon variable start player
+          // we have to do this to handle Backgammon variable start player
           plies = stratSit.player.fold(0, 1),
           turnCount = stratSit.player.fold(0, 1),
           startedAtPly = stratSit.player.fold(0, 1),
@@ -98,7 +98,7 @@ final private class Biter(
           lib = seek.realVariant.gameLogic,
           situation = stratSit,
           clock = none,
-          //we have to do this to handle Backgammon variable start player
+          // we have to do this to handle Backgammon variable start player
           plies = stratSit.player.fold(0, 1),
           turnCount = stratSit.player.fold(0, 1),
           startedAtPly = stratSit.player.fold(0, 1),

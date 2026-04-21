@@ -64,7 +64,7 @@ object HTTPRequest {
   }
 
   final class UaMatcher(rStr: String) {
-    private val regex = rStr.r
+    private val regex                      = rStr.r
     def apply(req: RequestHeader): Boolean = userAgent(req).exists(regex.findFirstIn(_).isDefined)
   }
 

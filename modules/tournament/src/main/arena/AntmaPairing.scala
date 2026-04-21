@@ -13,7 +13,7 @@ private object AntmaPairing {
 
   def apply(data: Data, players: List[RPlayer]): List[Pairing.Prep] =
     players.nonEmpty so {
-      import data._
+      import data.*
 
       def rankFactor = PairingSystem.rankFactorFor(players)
 
@@ -22,10 +22,9 @@ private object AntmaPairing {
           lastOpponents.hash.get(u2).contains(u1)
 
       def pairScore(a: RPlayer, b: RPlayer): Option[Int] =
-        if (
-          justPlayedTogether(a.player.userId, b.player.userId) ||
+        if justPlayedTogether(a.player.userId, b.player.userId) ||
           !a.playerIndexHistory.couldPlay(b.playerIndexHistory, maxStrike)
-        ) None
+        then None
         else
           Some {
             Math.abs(a.rank - b.rank) * rankFactor(a, b) +
@@ -40,8 +39,8 @@ private object AntmaPairing {
       Chronometer.syncMon(_.tournament.pairing.wmmatching) {
         WMMatching(
           players.toArray,
-          if (data.tour.isTeamBattle) battleScore
-          else if (data.onlyTwoActivePlayers) duelScore
+          if data.tour.isTeamBattle then battleScore
+          else if data.onlyTwoActivePlayers then duelScore
           else pairScore
         ).fold(
           err => {

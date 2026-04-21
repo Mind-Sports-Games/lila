@@ -20,7 +20,7 @@ case class AnaPass(
 ) extends AnaAny {
 
   def branch: Validated[String, Branch] =
-    (Game(variant.gameLogic, variant.some, fen.some)) match {
+    Game(variant.gameLogic, variant.some, fen.some) match {
       case (Game.Go(game)) =>
         game.pass().andThen { case (game, pass) =>
           game.actionStrs.flatten.lastOption toValid "Passed but no last move!" map { san =>
@@ -31,7 +31,8 @@ case class AnaPass(
               id = UciCharPair(uci),
               ply = game.plies,
               turnCount = game.turnCount,
-              playedPlayerIndex = if (game.board.history.currentTurn.nonEmpty) game.player else !game.player,
+              playedPlayerIndex =
+                if game.board.history.currentTurn.nonEmpty then game.player else !game.player,
               variant: Variant,
               move = strategygames.format.Uci.GoWithSan(Uci.WithSan(uci, san)),
               fen = fen,
@@ -39,7 +40,7 @@ case class AnaPass(
               dests = Some(movable so Game.Go(game).situation.destinations),
               opening = Variant.openingSensibleVariants(variant.gameLogic)(variant) so FullOpeningDB
                 .findByFen(variant.gameLogic, fen),
-              drops = if (movable) Game.Go(game).situation.drops else Some(Nil),
+              drops = if movable then Game.Go(game).situation.drops else Some(Nil),
               pocketData = Game.Go(game).situation.board.pocketData
             )
           }
@@ -53,14 +54,14 @@ object AnaPass {
 
   def parse(o: JsObject) =
     for {
-      d <- o `obj` "d"
+      d <- o.obj("d")
       variant = Variant.orDefault(GameLogic.Go(), ~d.str("variant"))
-      fen  <- d `str` "fen" map { fen => FEN.apply(GameLogic.Go(), fen) }
-      path <- d `str` "path"
+      fen  <- d.str("fen") map { fen => FEN.apply(GameLogic.Go(), fen) }
+      path <- d.str("path")
     } yield AnaPass(
       variant = variant,
       fen = fen,
       path = path,
-      chapterId = d `str` "ch"
+      chapterId = d.str("ch")
     )
 }

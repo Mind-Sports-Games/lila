@@ -1,7 +1,7 @@
 package lila.app
 package ui
 
-import lila.app.ui.ScalatagsTemplate._
+import lila.app.ui.ScalatagsTemplate.*
 
 case class OpenGraph(
     title: String,
@@ -23,10 +23,10 @@ case class OpenGraph(
     private def tag(name: String, value: String) =
       meta(
         property := s"og:$name",
-        content := value
+        content  := value
       )
 
-    private val tupledTag = (tag).tupled
+    private val tupledTag = tag.tupled
 
     def frags: List[Frag] =
       List(
@@ -48,7 +48,7 @@ case class OpenGraph(
         content := value
       )
 
-    private val tupledTag = (tag).tupled
+    private val tupledTag = tag.tupled
 
     def frags: List[Frag] =
       List(

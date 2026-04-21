@@ -3,13 +3,13 @@ package views.html.team
 import play.api.data.Form
 
 import lila.api.Context
-import lila.app.templating.Environment._
-import lila.app.ui.ScalatagsTemplate._
+import lila.app.templating.Environment.*
+import lila.app.ui.ScalatagsTemplate.*
 import lila.common.String.html.richText
 
 object request {
 
-  import trans.team._
+  import trans.team.*
 
   def requestForm(t: lila.team.Team, form: Form[?])(implicit ctx: Context) = {
 
@@ -63,15 +63,15 @@ object request {
       tbody(
         requests.map { request =>
           tr(
-            if (t.isEmpty) td(userLink(request.user), " ", teamLink(request.team))
+            if t.isEmpty then td(userLink(request.user), " ", teamLink(request.team))
             else td(userLink(request.user)),
             td(richText(request.message)),
             td(momentFromNow(request.date)),
             td(cls := "process")(
               postForm(cls := "process-request", action := routes.Team.requestProcess(request.id))(
                 input(
-                  tpe := "hidden",
-                  name := "url",
+                  tpe   := "hidden",
+                  name  := "url",
                   value := t.fold(routes.Team.requests)(te => routes.Team.show(te.id))
                 ),
                 button(name := "process", cls := "button button-empty button-red", value := "decline")(

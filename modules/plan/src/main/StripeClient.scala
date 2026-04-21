@@ -1,9 +1,9 @@
 package lila.plan
 
 import play.api.i18n.Lang
-import play.api.libs.json._
-import play.api.libs.ws.DefaultBodyWritables._
-import play.api.libs.ws.JsonBodyReadables._
+import play.api.libs.json.*
+import play.api.libs.ws.DefaultBodyWritables.*
+import play.api.libs.ws.JsonBodyReadables.*
 import play.api.libs.ws.{ StandaloneWSClient, StandaloneWSResponse }
 
 import lila.common.config.Secret
@@ -16,11 +16,11 @@ final private class StripeClient(
     config: StripeClient.Config
 )(implicit ec: scala.concurrent.ExecutionContext) {
 
-  import StripeClient._
-  import JsonHandlers._
-  import JsonHandlers.stripe._
+  import StripeClient.*
+  import JsonHandlers.*
+  import JsonHandlers.stripe.*
 
-  private val STRIPE_VERSION = "2020-08-27" //do we need this?
+  private val STRIPE_VERSION = "2020-08-27" // do we need this?
 
   def sessionArgs(customerId: StripeCustomerId, urls: NextUrls): List[(String, Any)] =
     List(
@@ -127,12 +127,12 @@ final private class StripeClient(
   def setSubscriptionPaymentMethod(subscription: StripeSubscription, paymentMethod: String): Funit =
     postOne[JsObject](s"subscriptions/${subscription.id}", "default_payment_method" -> paymentMethod).void
 
-  private val logger = lila.plan.logger `branch` "stripe"
+  private val logger = lila.plan.logger.branch("stripe")
 
   private def getOne[A: Reads](url: String, queryString: (String, Any)*): Fu[Option[A]] =
-    get[A](url, queryString) `dmap` some recover {
+    get[A](url, queryString).dmap(some) recover {
       case _: NotFoundException => None
-      case e: DeletedException =>
+      case e: DeletedException  =>
         logger.warn(e.getMessage)
         None
     }
@@ -173,7 +173,7 @@ final private class StripeClient(
         (implicitly[Reads[A]] reads res.body[JsValue]).fold(
           errs =>
             fufail {
-              if (isDeleted(res.body[JsValue]))
+              if isDeleted(res.body[JsValue]) then
                 new DeletedException(s"[stripe] Upstream resource was deleted: ${res.body}")
               else new Exception(s"[stripe] Can't parse ${res.body} --- $errs")
             },

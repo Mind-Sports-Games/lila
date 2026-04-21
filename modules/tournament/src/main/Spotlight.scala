@@ -1,6 +1,6 @@
 package lila.tournament
 
-import lila.common.Heapsort.implicits._
+import lila.common.Heapsort.implicits.*
 import lila.user.User
 
 case class Spotlight(
@@ -13,18 +13,18 @@ case class Spotlight(
 
 object Spotlight {
 
-  import Schedule.Freq._
+  import Schedule.Freq.*
 
-  //if re-enabling original lichess ordering, will want to change botN to topN
-  //implicit private val importanceOrdering = Ordering.by[Tournament, Int](_.schedule.so(_.freq.importance))
+  // if re-enabling original lichess ordering, will want to change botN to topN
+  // implicit private val importanceOrdering = Ordering.by[Tournament, Int](_.schedule.so(_.freq.importance))
   implicit private val importanceOrdering: Ordering[Tournament] =
     Ordering.by[Tournament, org.joda.time.DateTime](_.startsAt)
 
   def select(tours: List[Tournament], user: Option[User], max: Int): List[Tournament] =
-    user.fold(tours `botN` max) { select(tours, _, max) }
+    user.fold(tours.botN(max)) { select(tours, _, max) }
 
   def select(tours: List[Tournament], user: User, max: Int): List[Tournament] =
-    tours.filter { select(_, user) } `botN` max
+    tours.filter { select(_, user) }.botN(max)
 
   private def select(tour: Tournament, user: User): Boolean =
     !tour.isFinished &&
@@ -64,5 +64,5 @@ object Spotlight {
       tour.conditions.minRating.fold(true) { c =>
         c(user).accepted
       } &&
-      tour.conditions.maxRating.fold(true)(_ `maybe` user)
+      tour.conditions.maxRating.fold(true)(_.maybe(user))
 }

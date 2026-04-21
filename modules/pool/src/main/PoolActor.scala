@@ -2,7 +2,7 @@ package lila.pool
 
 import lila.common.ThreadLocalRandom
 
-import akka.actor._
+import akka.actor.*
 import akka.pattern.pipe
 
 import lila.socket.Socket.Sris
@@ -16,7 +16,7 @@ final private class PoolActor(
     botGameStarter: BotGameStarter
 ) extends Actor {
 
-  import PoolActor._
+  import PoolActor.*
 
   var members = Vector.empty[PoolMember]
 
@@ -39,10 +39,10 @@ final private class PoolActor(
       members.find(joiner.is) match {
         case None =>
           members = members :+ PoolMember(joiner, config, rageSit)
-          if (members.sizeIs >= config.wave.players.value) self ! FullWave
+          if members.sizeIs >= config.wave.players.value then self ! FullWave
         case Some(member) if member.ratingRange != joiner.ratingRange =>
           members = members.map {
-            case m if m == member => m `withRange` joiner.ratingRange
+            case m if m == member => m.withRange(joiner.ratingRange)
             case m                => m
           }
         case _ => // no change
@@ -84,12 +84,11 @@ final private class PoolActor(
 
       members = members.diff(pairedMembers).map(_.incMisses)
 
-      if (pairings.nonEmpty) gameStarter(config, pairings)
-      else if (
-        candidates
+      if pairings.nonEmpty then gameStarter(config, pairings)
+      else if candidates
           .filter(!_.lame)
           .size == 1
-      )
+      then
         candidates
           .filter(c => !c.lame && c.misses >= 1)
           .headOption

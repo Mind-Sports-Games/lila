@@ -1,8 +1,8 @@
 package lila.practice
 
-import com.softwaremill.macwire._
+import com.softwaremill.macwire.*
 
-import lila.common.config._
+import lila.common.config.*
 
 @Module
 final class Env(
@@ -20,6 +20,6 @@ final class Env(
   lazy val api: PracticeApi = wire[PracticeApi]
 
   lila.common.Bus.subscribeFun("study") { case lila.study.actorApi.SaveStudy(study) =>
-    api.structure `onSave` study
+    api.structure.onSave(study)
   }
 }

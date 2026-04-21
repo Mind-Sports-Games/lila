@@ -1,9 +1,8 @@
 package views.html.lobby
 
-
 import lila.api.Context
-import lila.app.templating.Environment._
-import lila.app.ui.ScalatagsTemplate._
+import lila.app.templating.Environment.*
+import lila.app.ui.ScalatagsTemplate.*
 import strategygames.variant.Variant
 import strategygames.GameGroup
 import lila.i18n.VariantKeys
@@ -78,13 +77,15 @@ object bits {
             .enterable(truncateTournamentList(tours, maxUnderboardRows))
         )
       ),
-      simuls.nonEmpty `option` div(cls := "lobby__simuls lobby__box")(
-        a(cls := "lobby__box__top", href := routes.Simul.home)(
-          h2(cls := "title text", dataIcon := "f")(trans.simultaneousExhibitions()),
-          span(cls := "more")(trans.more(), " »")
-        ),
-        div(cls := "enterable_list lobby__box__content")(
-          views.html.simul.bits.allCreated(simuls)
+      simuls.nonEmpty.option(
+        div(cls := "lobby__simuls lobby__box")(
+          a(cls := "lobby__box__top", href := routes.Simul.home)(
+            h2(cls := "title text", dataIcon := "f")(trans.simultaneousExhibitions()),
+            span(cls := "more")(trans.more(), " »")
+          ),
+          div(cls := "enterable_list lobby__box__content")(
+            views.html.simul.bits.allCreated(simuls)
+          )
         )
       )
     )
@@ -99,16 +100,16 @@ object bits {
   }
 
   def lastPosts(posts: List[lila.blog.MiniPost])(implicit ctx: Context): Option[Frag] =
-    posts.nonEmpty `option`
+    posts.nonEmpty.option(
       div(cls := "lobby__blog blog-post-cards")(
         posts map { post =>
           a(cls := "blog-post-card blog-post-card--link", href := routes.Blog.show(post.id, post.slug))(
             div(cls := "blog-post-card__container")(
               img(
-                src := post.image,
-                cls := "blog-post-card__image",
-                widthA := 400,
-                heightA := 400 * 10 / 16,
+                src             := post.image,
+                cls             := "blog-post-card__image",
+                widthA          := 400,
+                heightA         := 400 * 10 / 16,
                 attr("loading") := "lazy"
               ),
               span(cls := "blog-post-card__content")(
@@ -119,6 +120,7 @@ object bits {
           )
         }
       )
+    )
 
   def playbanInfo(ban: lila.playban.TempBan)(implicit ctx: Context) =
     nopeInfo(
@@ -164,7 +166,7 @@ object bits {
       br,
       postForm(action := routes.Round.resign(current.pov.fullId))(
         button(cls := "text button button-red", dataIcon := "L")(
-          if (current.pov.game.abortable) "Abort" else "Resign",
+          if current.pov.game.abortable then "Abort" else "Resign",
           " the game"
         )
       ),
@@ -183,20 +185,20 @@ object bits {
   def spotlight(e: lila.event.Event)(implicit ctx: Context) =
     div(
       a(
-        href := (if (e.isNow || !e.countdown) e.url else routes.Event.show(e.id).url),
-        cls := List(
+        href := (if e.isNow || !e.countdown then e.url else routes.Event.show(e.id).url),
+        cls  := List(
           s"tour-spotlight event-spotlight id_${e.id} ${ctx.currentSelectedColor}" -> true,
           "invert"                                                                 -> e.isNowOrSoon,
-          "highlighted"                                                            -> (e.isNow || !e.countdown)
+          "highlighted" -> (e.isNow || !e.countdown)
         )
       )(
-        if (e.isNow || !e.countdown) span(cls := "ribbon")(span("live")),
+        if e.isNow || !e.countdown then span(cls := "ribbon")(span("live")),
         views.html.event.iconOf(e),
         span(cls := "content")(
           span(cls := "name")(e.title),
           span(cls := "headline")(e.headline),
           span(cls := "more")(
-            if (e.isNow) e.duringMessage.fold(trans.eventInProgress())(m => raw(m))
+            if e.isNow then e.duringMessage.fold(trans.eventInProgress())(m => raw(m))
             else e.beforeMessage.fold[Frag](momentFromNow(e.startsAt))(m => raw(m))
           )
         )

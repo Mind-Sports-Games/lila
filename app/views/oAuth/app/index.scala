@@ -1,9 +1,8 @@
 package views.html.oAuth.app
 
 import lila.api.Context
-import lila.app.templating.Environment._
-import lila.app.ui.ScalatagsTemplate._
-
+import lila.app.templating.Environment.*
+import lila.app.ui.ScalatagsTemplate.*
 
 object index {
 
@@ -12,37 +11,39 @@ object index {
   ) =
     views.html.account.layout(title = "OAuth Apps", active = "oauth.app")(
       div(cls := "account oauth")(
-        used.nonEmpty `option` div(cls := "oauth-used box")(
-          h1(id := "used")("OAuth Apps"),
-          standardFlash(cls := "box__pad"),
-          table(cls := "slist slist-pad")(
-            used.map { t =>
-              tr(
-                td(
-                  strong(t.app.name),
-                  " by ",
-                  userIdLink(t.app.author.some),
-                  br,
-                  em(t.token.scopes.map(_.name).mkString(", "))
-                ),
-                td(cls := "date")(
-                  a(href := t.app.homepageUri.toString)(t.app.homepageUri.toString),
-                  br,
-                  t.token.usedAt map { at =>
-                    frag("Last used ", momentFromNow(at))
-                  }
-                ),
-                td(cls := "action")(
-                  postForm(action := routes.OAuthApp.revoke(t.token.id.value))(
-                    submitButton(
-                      cls := "button button-empty button-red confirm text",
-                      title := s"Revoke access from ${t.app.name}",
-                      dataIcon := "q"
-                    )("Revoke")
+        used.nonEmpty.option(
+          div(cls := "oauth-used box")(
+            h1(id := "used")("OAuth Apps"),
+            standardFlash(cls := "box__pad"),
+            table(cls := "slist slist-pad")(
+              used.map { t =>
+                tr(
+                  td(
+                    strong(t.app.name),
+                    " by ",
+                    userIdLink(t.app.author.some),
+                    br,
+                    em(t.token.scopes.map(_.name).mkString(", "))
+                  ),
+                  td(cls := "date")(
+                    a(href := t.app.homepageUri.toString)(t.app.homepageUri.toString),
+                    br,
+                    t.token.usedAt map { at =>
+                      frag("Last used ", momentFromNow(at))
+                    }
+                  ),
+                  td(cls := "action")(
+                    postForm(action := routes.OAuthApp.revoke(t.token.id.value))(
+                      submitButton(
+                        cls      := "button button-empty button-red confirm text",
+                        title    := s"Revoke access from ${t.app.name}",
+                        dataIcon := "q"
+                      )("Revoke")
+                    )
                   )
                 )
-              )
-            }
+              }
+            )
           )
         ),
         div(cls := "oauth-made box")(
@@ -77,15 +78,15 @@ object index {
                 ),
                 td(cls := "action")(
                   a(
-                    href := routes.OAuthApp.edit(t.clientId.value),
-                    cls := "button button-empty",
-                    title := "Edit this app",
+                    href     := routes.OAuthApp.edit(t.clientId.value),
+                    cls      := "button button-empty",
+                    title    := "Edit this app",
                     dataIcon := "m"
                   ),
                   postForm(action := routes.OAuthApp.delete(t.clientId.value))(
                     submitButton(
-                      cls := "button button-empty button-red confirm",
-                      title := "Delete this app",
+                      cls      := "button button-empty button-red confirm",
+                      title    := "Delete this app",
                       dataIcon := "q"
                     )
                   )

@@ -3,14 +3,14 @@ package lila.challenge
 import org.joda.time.DateTime
 
 import lila.common.config.Max
-import lila.db.dsl._
+import lila.db.dsl.*
 
 final private class ChallengeRepo(colls: ChallengeColls, maxPerUser: Max)(implicit
     ec: scala.concurrent.ExecutionContext
 ) {
 
-  import BSONHandlers._
-  import Challenge._
+  import BSONHandlers.*
+  import Challenge.*
 
   private val coll = colls.challenge
 
@@ -27,7 +27,7 @@ final private class ChallengeRepo(colls: ChallengeColls, maxPerUser: Max)(implic
     coll.insert.one(c) >> c.challengerUser.so { challenger =>
       createdByChallengerId(challenger.id).flatMap {
         case challenges if challenges.sizeIs <= maxPerUser.value => funit
-        case challenges                                          => Future.sequence(challenges.drop(maxPerUser.value).map(_.id).map(remove)).void
+        case challenges => Future.sequence(challenges.drop(maxPerUser.value).map(_.id).map(remove)).void
       }
     }
 
@@ -110,14 +110,14 @@ final private class ChallengeRepo(colls: ChallengeColls, maxPerUser: Max)(implic
   def setSeen(id: Challenge.ID) =
     coll.updateField($id(id), "seenAt", DateTime.now).void
 
-  def offline(challenge: Challenge) = setStatus(challenge, Status.Offline, Some(_ `plusHours` 3))
-  def cancel(challenge: Challenge)  = setStatus(challenge, Status.Canceled, Some(_ `plusHours` 3))
+  def offline(challenge: Challenge) = setStatus(challenge, Status.Offline, Some(_.plusHours(3)))
+  def cancel(challenge: Challenge)  = setStatus(challenge, Status.Canceled, Some(_.plusHours(3)))
   def decline(challenge: Challenge, reason: Challenge.DeclineReason) =
-    setStatus(challenge, Status.Declined, Some(_ `plusHours` 3)) >> {
+    setStatus(challenge, Status.Declined, Some(_.plusHours(3))) >> {
       (reason != Challenge.DeclineReason.default) so
         coll.updateField($id(challenge.id), "declineReason", reason).void
     }
-  def accept(challenge: Challenge) = setStatus(challenge, Status.Accepted, Some(_ `plusHours` 3))
+  def accept(challenge: Challenge) = setStatus(challenge, Status.Accepted, Some(_.plusHours(3)))
 
   def statusById(id: Challenge.ID) = coll.primitiveOne[Status]($id(id), "status")
 

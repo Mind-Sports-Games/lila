@@ -1,8 +1,8 @@
 package lila.socket
 
 import strategygames.format.{ FEN, Uci }
-import strategygames.{ Player => PlayerIndex, GameLogic, Pocket, PocketData, Pos, Role }
-import play.api.libs.json._
+import strategygames.{ GameLogic, Player as PlayerIndex, Pocket, PocketData, Pos, Role }
+import play.api.libs.json.*
 
 case class Step(
     ply: Int,
@@ -47,7 +47,7 @@ object Step {
   }
 
   implicit val stepJsonWriter: Writes[Step] = Writes { step =>
-    import step._
+    import step.*
     Json
       .obj(
         "ply"           -> ply,

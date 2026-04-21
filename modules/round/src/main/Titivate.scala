@@ -1,14 +1,14 @@
 package lila.round
 
-import akka.actor._
-import akka.stream.scaladsl._
+import akka.actor.*
+import akka.stream.scaladsl.*
 import org.joda.time.DateTime
 
-import scala.concurrent.duration._
+import scala.concurrent.duration.*
 
 import lila.common.LilaStream
 import lila.common.extensions.*
-import lila.db.dsl._
+import lila.db.dsl.*
 import lila.game.{ Game, GameRepo, Query }
 import lila.round.actorApi.round.{ Abandon, QuietFlag }
 import scala.concurrent.ExecutionContextExecutor
@@ -67,7 +67,7 @@ final private[round] class Titivate(
       }
   }
 
-  private val logBranch = logger `branch` "titivate"
+  private val logBranch = logger.branch("titivate")
 
   private val gameRead = Flow[Bdoc].map { doc =>
     lila.game.BSONHandlers.gameBSONHandler
@@ -83,13 +83,13 @@ final private[round] class Titivate(
     case Left((id, err)) =>
       lila.mon.round.titivate.broken(err.getClass.getSimpleName).increment()
       logBranch.warn(s"Can't read game $id", err)
-      gameRepo `unsetCheckAt` id
+      gameRepo.unsetCheckAt(id)
 
     case Right(game) =>
       game match {
 
         case game if game.finished || game.isPgnImport || game.playedThenAborted =>
-          gameRepo `unsetCheckAt` game.id
+          gameRepo.unsetCheckAt(game.id)
 
         case game if game.outoftime(withGrace = true) =>
           fuccess {
@@ -104,25 +104,25 @@ final private[round] class Titivate(
         case game if game.unplayed =>
           bookmark ! lila.hub.actorApi.bookmark.Remove(game.id)
           chatApi.remove(lila.chat.Chat.Id(game.id))
-          gameRepo `remove` game.id
+          gameRepo.remove(game.id)
 
         case game =>
           game.clock match {
 
             case Some(clock) if clock.isRunning =>
               val minutes = clock.estimateTotalSeconds / 60
-              gameRepo.setCheckAt(game, DateTime.now `plusMinutes` minutes).void
+              gameRepo.setCheckAt(game, DateTime.now.plusMinutes(minutes)).void
 
             case Some(_) =>
               val hours = Game.unplayedHours
-              gameRepo.setCheckAt(game, DateTime.now `plusHours` hours).void
+              gameRepo.setCheckAt(game, DateTime.now.plusHours(hours)).void
 
             case None =>
               val hours = game.daysPerTurn.fold(
-                if (game.hasAi) Game.aiAbandonedHours
+                if game.hasAi then Game.aiAbandonedHours
                 else Game.abandonedDays * 24
               )(_ * 24)
-              gameRepo.setCheckAt(game, DateTime.now `plusHours` hours).void
+              gameRepo.setCheckAt(game, DateTime.now.plusHours(hours)).void
           }
       }
   }

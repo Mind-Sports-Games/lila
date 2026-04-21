@@ -1,8 +1,8 @@
 package lila.activity
 
-import com.softwaremill.macwire._
+import com.softwaremill.macwire.*
 
-import lila.common.config._
+import lila.common.config.*
 import lila.hub.actorApi.round.CorresMoveEvent
 
 final class Env(

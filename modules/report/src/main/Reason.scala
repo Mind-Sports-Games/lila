@@ -12,7 +12,7 @@ sealed trait Reason {
 
 object Reason {
 
-  case object Cheat extends Reason
+  case object Cheat      extends Reason
   case object CheatPrint extends Reason { // BC, replaced with AltPrint
     override def name = "Print"
   }
@@ -26,8 +26,8 @@ object Reason {
   case object Other    extends Reason
   case object Playbans extends Reason
 
-  val all  = List(Cheat, AltPrint, Comm, Boost, Other, CheatPrint)
-  val keys = all map (_.key)
+  val all   = List(Cheat, AltPrint, Comm, Boost, Other, CheatPrint)
+  val keys  = all map (_.key)
   val byKey = all map { v =>
     (v.key, v)
   } toMap

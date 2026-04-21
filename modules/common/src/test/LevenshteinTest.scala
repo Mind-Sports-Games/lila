@@ -13,7 +13,7 @@ object LevenshteinTest {
 
   def rndStr(r: Random, l: Int, sigma: Int): String = {
     val sb = new StringBuilder(l)
-    for (_ <- 0 until l) sb.append((48 + r.nextInt(sigma)).toChar)
+    for _ <- 0 until l do sb.append((48 + r.nextInt(sigma)).toChar)
     sb.result()
   }
 

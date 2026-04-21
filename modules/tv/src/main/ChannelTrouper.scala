@@ -1,6 +1,6 @@
 package lila.tv
 
-import strategygames.{ Player => PlayerIndex }
+import strategygames.Player as PlayerIndex
 import scala.concurrent.Promise
 
 import lila.common.LightUser
@@ -16,7 +16,7 @@ final private[tv] class ChannelTrouper(
 )(implicit ec: scala.concurrent.ExecutionContext)
     extends Trouper {
 
-  import ChannelTrouper._
+  import ChannelTrouper.*
 
   // games featured on this channel
   // first entry is the current game
@@ -42,30 +42,38 @@ final private[tv] class ChannelTrouper(
       history = game.id :: history.take(2)
 
     case TvTrouper.Select =>
-      Future.sequence(candidateIds.keys
-        .map(proxyGame).toSeq)
-        .map(_.view.collect {
-          case Some(g) if channel `isOngoingGame` g => g
-        }.toList)
+      Future
+        .sequence(
+          candidateIds.keys
+            .map(proxyGame)
+            .toSeq
+        )
+        .map(
+          _.view
+            .collect {
+              case Some(g) if channel.isOngoingGame(g) => g
+            }
+            .toList
+        )
         .foreach { candidates =>
           oneId so proxyGame foreach {
-            case Some(current) if channel `isOngoingGame` current =>
-              fuccess(wayBetter(current, candidates)) `orElse` rematch(current) foreach elect
-            case Some(current) => rematch(current) `orElse` fuccess(bestOf(candidates)) foreach elect
+            case Some(current) if channel.isOngoingGame(current) =>
+              fuccess(wayBetter(current, candidates)).orElse(rematch(current)) foreach elect
+            case Some(current) => rematch(current).orElse(fuccess(bestOf(candidates))) foreach elect
             case _             => elect(bestOf(candidates))
           }
           manyIds = candidates
             .sortBy { g =>
               -(~g.averageUsersRating)
-              -(if (!g.olderThan(30)) 5000 else 0)
-              -(if (g.hasClock) 10000 else 0)
+              -(if !g.olderThan(30) then 5000 else 0)
+              -(if g.hasClock then 10000 else 0)
             }
             .take(50)
             .map(_.id)
         }
   }
 
-  def addCandidate(game: Game): Unit = candidateIds `put` game.id
+  def addCandidate(game: Game): Unit = candidateIds.put(game.id)
 
   private def elect(gameOption: Option[Game]): Unit = gameOption foreach { this ! SetGame(_) }
 
@@ -77,7 +85,7 @@ final private[tv] class ChannelTrouper(
   private def rematch(game: Game): Fu[Option[Game]] = rematchOf(game.id) so proxyGame
 
   private def bestOf(candidates: List[Game]) = {
-    import cats.implicits._
+    import cats.implicits.*
     candidates.maximumByOption(score)
   }
 

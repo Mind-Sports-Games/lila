@@ -1,6 +1,5 @@
 package views.html.video
 
-
 object show {
   /*
   def apply(

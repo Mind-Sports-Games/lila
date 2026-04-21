@@ -7,7 +7,7 @@ case class PracticeStructure(
 ) {
 
   def study(id: Study.Id): Option[PracticeStudy] =
-    sections.flatMap(_ `study` id).headOption
+    sections.flatMap(_.study(id)).headOption
 
   lazy val studiesByIds: Map[Study.Id, PracticeStudy] =
     sections.view
@@ -54,7 +54,7 @@ case class PracticeStudy(
     chapters: List[Chapter.IdName]
 ) {
 
-  val slug = lila.common.String `slugify` name
+  val slug = lila.common.String.slugify(name)
 
   def chapterIds = chapters.map(_.id)
 }

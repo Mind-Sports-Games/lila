@@ -1,17 +1,18 @@
 package controllers
 
-import play.api.mvc._
+import play.api.mvc.*
 
 import lila.api.Context
 import lila.app.{ *, given }
 
-final class Storm(env: Env)(implicit @annotation.nowarn("msg=unused") mat: akka.stream.Materializer) extends LilaController(env) {
+final class Storm(env: Env)(implicit @annotation.nowarn("msg=unused") mat: akka.stream.Materializer)
+    extends LilaController(env) {
 
   def home =
     Open { implicit ctx =>
       NoBot {
         env.storm.selector.apply flatMap { puzzles =>
-          ctx.userId.so { u => env.storm.highApi.get(u) `dmap` some } map { high =>
+          ctx.userId.so { u => env.storm.highApi.get(u).dmap(some) } map { high =>
             NoCache {
               Ok(
                 views.html.storm.home(
@@ -63,7 +64,7 @@ final class Storm(env: Env)(implicit @annotation.nowarn("msg=unused") mat: akka.
   def apiDashboardOf(username: String, days: Int) =
     Open { implicit ctx =>
       lila.user.User.validateId(username) so { userId =>
-        if (days < 0 || days > 365) notFoundJson("Invalid days parameter")
+        if days < 0 || days > 365 then notFoundJson("Invalid days parameter")
         else
           ((days > 0) so env.storm.dayApi.apiHistory(userId, days)) zip env.storm.highApi.get(userId) map {
             case (history, high) =>

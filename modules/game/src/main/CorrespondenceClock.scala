@@ -1,6 +1,6 @@
 package lila.game
 
-import strategygames.{ Player => PlayerIndex }
+import strategygames.Player as PlayerIndex
 
 // times are expressed in seconds
 case class CorrespondenceClock(
@@ -9,7 +9,7 @@ case class CorrespondenceClock(
     p2Time: Float
 ) {
 
-  import CorrespondenceClock._
+  import CorrespondenceClock.*
 
   def daysPerTurn = increment / 60 / 60 / 24
 

@@ -1,9 +1,9 @@
 package lila.round
 
-import akka.actor._
-import akka.stream.scaladsl._
+import akka.actor.*
+import akka.stream.scaladsl.*
 import strategygames.format.Forsyth
-import play.api.libs.json._
+import play.api.libs.json.*
 
 import lila.common.Bus
 import lila.common.LightUser
@@ -17,7 +17,7 @@ final private class TvBroadcast(
     lightUserSync: LightUser.GetterSync
 ) extends Actor {
 
-  import TvBroadcast._
+  import TvBroadcast.*
 
   private var clients = Set.empty[Client]
 
@@ -43,7 +43,7 @@ final private class TvBroadcast(
           queue.watchCompletion().foreach { _ =>
             self ! Remove(client)
           }
-          featured `ifFalse` compat foreach { f =>
+          featured.ifFalse(compat) foreach { f =>
             client.queue.offer(Socket.makeMessage("featured", f.dataWithFen))
           }
         }
@@ -53,13 +53,13 @@ final private class TvBroadcast(
 
     case ChangeFeatured(pov, msg) =>
       unsubscribeFromFeaturedId()
-      Bus.subscribe(self, MoveGameEvent `makeChan` pov.gameId)
+      Bus.subscribe(self, MoveGameEvent.makeChan(pov.gameId))
       val feat = Featured(
         pov.gameId,
         Json.obj(
           "id"          -> pov.gameId,
           "orientation" -> pov.playerIndex.name,
-          "players" -> pov.game.players.map { p =>
+          "players"     -> pov.game.players.map { p =>
             val user = p.userId.flatMap(lightUserSync)
             Json
               .obj("playerIndex" -> p.playerIndex.name)
@@ -72,7 +72,7 @@ final private class TvBroadcast(
       )
       clients.foreach { client =>
         client.queue offer {
-          if (client.fromPlayStrategy) msg
+          if client.fromPlayStrategy then msg
           else feat.socketMsg
         }
       }
@@ -102,7 +102,7 @@ final private class TvBroadcast(
 
   def unsubscribeFromFeaturedId() =
     featured foreach { previous =>
-      Bus.unsubscribe(self, MoveGameEvent `makeChan` previous.id)
+      Bus.unsubscribe(self, MoveGameEvent.makeChan(previous.id))
     }
 }
 

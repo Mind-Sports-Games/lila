@@ -1,7 +1,6 @@
 package views.html
 package coach
 
-
 object picture {
   /*
 

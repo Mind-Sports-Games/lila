@@ -1,8 +1,8 @@
 package lila.search
 
-import play.api.libs.json._
-import play.api.libs.ws._
-import play.api.libs.ws.JsonBodyWritables._
+import play.api.libs.json.*
+import play.api.libs.ws.*
+import play.api.libs.ws.JsonBodyWritables.*
 import lila.common.extensions.*
 
 sealed trait ESClient {
@@ -76,12 +76,12 @@ final class ESClientHttp(
 }
 
 final class ESClientStub extends ESClient {
-  def search[Q: Writes](query: Q, from: From, size: Size) = fuccess(SearchResponse(Nil))
-  def count[Q: Writes](query: Q)                          = fuccess(CountResponse(0))
-  def store(id: Id, doc: JsObject)                        = funit
+  def search[Q: Writes](query: Q, from: From, size: Size)                    = fuccess(SearchResponse(Nil))
+  def count[Q: Writes](query: Q)                                             = fuccess(CountResponse(0))
+  def store(id: Id, doc: JsObject)                                           = funit
   def storeBulk(@annotation.nowarn("msg=unused") _docs: Seq[(Id, JsObject)]) = funit
-  def deleteById(id: Id)                   = funit
-  def deleteByIds(ids: List[Id])           = funit
-  def putMapping                           = funit
-  def refresh                              = funit
+  def deleteById(id: Id)                                                     = funit
+  def deleteByIds(ids: List[Id])                                             = funit
+  def putMapping                                                             = funit
+  def refresh                                                                = funit
 }

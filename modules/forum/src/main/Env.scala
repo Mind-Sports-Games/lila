@@ -1,10 +1,10 @@
 package lila.forum
 
-import com.softwaremill.macwire._
+import com.softwaremill.macwire.*
 import lila.common.autoconfig.{ AutoConfig, ConfigName }
 import play.api.Configuration
 
-import lila.common.config._
+import lila.common.config.*
 import lila.hub.actorApi.team.CreateTeam
 import lila.mod.ModlogApi
 import lila.notify.NotifyApi
@@ -49,10 +49,30 @@ final class Env(
   lazy val categApi: CategApi = wire[CategApi]
 
   lazy val topicApi: TopicApi =
-    new TopicApi(env, forumSearch, config.topicMaxPerPage, modLog, spam, promotion, timeline, shutup, detectLanguage)
+    new TopicApi(
+      env,
+      forumSearch,
+      config.topicMaxPerPage,
+      modLog,
+      spam,
+      promotion,
+      timeline,
+      shutup,
+      detectLanguage
+    )
 
   lazy val postApi: PostApi =
-    new PostApi(env, forumSearch, config.postMaxPerPage, modLog, spam, promotion, timeline, shutup, detectLanguage)
+    new PostApi(
+      env,
+      forumSearch,
+      config.postMaxPerPage,
+      modLog,
+      spam,
+      promotion,
+      timeline,
+      shutup,
+      detectLanguage
+    )
 
   lazy val mentionNotifier: MentionNotifier = wire[MentionNotifier]
   lazy val forms                            = wire[ForumForm]

@@ -1,26 +1,25 @@
 package views.html.swiss
 
 import lila.api.Context
-import lila.app.templating.Environment._
-import lila.app.ui.ScalatagsTemplate._
-import lila.i18n.{ I18nKeys => trans, VariantKeys }
+import lila.app.templating.Environment.*
+import lila.app.ui.ScalatagsTemplate.*
+import lila.i18n.{ I18nKeys as trans, VariantKeys }
 import lila.swiss.Swiss
 import strategygames.variant.Variant
 
-
 object bits {
 
-  def link(swiss: Swiss): Frag      = link(swiss.id, swiss.name)
-  def link(swissId: Swiss.Id): Frag = link(swissId, idToName(swissId))
+  def link(swiss: Swiss): Frag                    = link(swiss.id, swiss.name)
+  def link(swissId: Swiss.Id): Frag               = link(swissId, idToName(swissId))
   def link(swissId: Swiss.Id, name: String): Frag =
     a(
       dataIcon := "g",
-      cls := "text",
-      href := routes.Swiss.show(swissId.value).url
+      cls      := "text",
+      href     := routes.Swiss.show(swissId.value).url
     )(name)
 
   def idToName(id: Swiss.Id): String = env.swiss.getName(id) getOrElse "Tournament"
-  def iconChar(swiss: Swiss): String = if (swiss.isMedley) "5" else swiss.perfType.iconChar.toString
+  def iconChar(swiss: Swiss): String = if swiss.isMedley then "5" else swiss.perfType.iconChar.toString
 
   def notFound()(implicit ctx: Context) =
     views.html.base.layout(
@@ -53,13 +52,13 @@ object bits {
                 span(cls := "setup")(
                   s.clock.show,
                   " • ",
-                  if (s.variant.exotic)
+                  if s.variant.exotic then
                     s.settings.backgammonPoints.fold("")(p => s"${p}pt ") + VariantKeys.variantName(s.variant)
                   else s.perfType.trans,
                   " • ",
-                  if (s.settings.handicapped) trans.handicappedTournament()
-                  else if (s.settings.mcmahon) trans.mcmahon()
-                  else if (s.settings.rated) trans.ratedTournament()
+                  if s.settings.handicapped then trans.handicappedTournament()
+                  else if s.settings.mcmahon then trans.mcmahon()
+                  else if s.settings.rated then trans.ratedTournament()
                   else trans.casualTournament(),
                   " • ",
                   s.estimatedDurationString
@@ -80,9 +79,9 @@ object bits {
       case Some(1)                         => frag("One round per day")
       case Some(d)                         => frag(s"One round every $d days")
       case None if s.settings.manualRounds => frag("Rounds are started manually")
-      case None =>
+      case None                            =>
         frag(
-          if (s.settings.intervalSeconds < 60) pluralize("second", s.settings.intervalSeconds)
+          if s.settings.intervalSeconds < 60 then pluralize("second", s.settings.intervalSeconds)
           else pluralize("minute", s.settings.intervalSeconds / 60),
           " between rounds"
         )
@@ -106,14 +105,14 @@ object bits {
       div(
         s"${trans.swiss.medleyGameGroups.txt()}: ${gameGroups}."
       ),
-      if (displayFirstRound)
+      if displayFirstRound then
         variants.headOption.map { v =>
           div(cls := "medley__rounds")(
             s"${trans.swiss.firstRound.txt()}: ",
             a(href := routes.Page.variant(v.key))(VariantKeys.variantName(v))
           )
         }
-      else if (displayAllRounds)
+      else if displayAllRounds then
         table(cls := "medley__rounds")(
           tbody(
             variants.zipWithIndex.filter { case (_, i) => i < maxRounds }.map { case (v, i) =>

@@ -4,7 +4,7 @@ package templating
 import play.api.i18n.Lang
 
 import lila.api.Context
-import lila.app.ui.ScalatagsTemplate._
+import lila.app.ui.ScalatagsTemplate.*
 import lila.forum.Post
 
 trait ForumHelper { self: UserHelper & StringHelper & HasEnv =>
@@ -19,7 +19,7 @@ trait ForumHelper { self: UserHelper & StringHelper & HasEnv =>
   }
 
   def isGrantedWrite(categSlug: String)(implicit ctx: Context) =
-    Granter `isGrantedWrite` categSlug
+    Granter.isGrantedWrite(categSlug)
 
   def authorLink(
       post: Post,
@@ -27,6 +27,6 @@ trait ForumHelper { self: UserHelper & StringHelper & HasEnv =>
       withOnline: Boolean = true,
       modIcon: Boolean = false
   )(implicit lang: Lang): Frag =
-    if (post.erased) span(cls := "author")("<erased>")
+    if post.erased then span(cls := "author")("<erased>")
     else userIdLink(post.userId, cssClass = cssClass, withOnline = withOnline, modIcon = modIcon)
 }

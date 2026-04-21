@@ -1,13 +1,13 @@
 package lila.round
 
-import akka.stream.scaladsl._
+import akka.stream.scaladsl.*
 import org.joda.time.DateTime
 import reactivemongo.akkastream.cursorProducer
 
 import lila.common.Bus
 import lila.common.LilaStream
 import lila.common.extensions.*
-import lila.db.dsl._
+import lila.db.dsl.*
 import lila.game.{ Game, Pov }
 import reactivemongo.api.bson.BSONDocumentHandler
 
@@ -34,7 +34,7 @@ final private class CorresAlarm(
   scheduler.scheduleOnce(10 seconds) { scheduleNext() }
 
   Bus.subscribeFun("finishGame") { case lila.game.actorApi.FinishGame(game, _, _) =>
-    if (game.hasCorrespondenceClock && !game.hasAi) coll.delete.one($id(game.id)).discard
+    if game.hasCorrespondenceClock && !game.hasAi then coll.delete.one($id(game.id)).discard
   }
 
   Bus.subscribeFun("moveEventCorres") {
@@ -43,7 +43,7 @@ final private class CorresAlarm(
         _ foreach { game =>
           game.bothPlayersHaveMoved so {
             game.playableCorrespondenceClock so { clock =>
-              val remainingTime = clock `remainingTime` game.turnPlayerIndex
+              val remainingTime = clock.remainingTime(game.turnPlayerIndex)
               val ringsAt       = DateTime.now.plusSeconds(remainingTime.toInt * 8 / 10)
               coll.update
                 .one(

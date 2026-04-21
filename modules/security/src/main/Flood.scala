@@ -9,7 +9,7 @@ import lila.user.User
 
 final class Flood(duration: FiniteDuration) {
 
-  import Flood._
+  import Flood.*
 
   private val floodNumber = 4
 
@@ -18,18 +18,18 @@ final class Flood(duration: FiniteDuration) {
     .build[User.ID, Messages]()
 
   def allowMessage(uid: User.ID, text: String): Boolean = {
-    val msg  = Message(text, Instant.now)
-    val msgs = ~cache.getIfPresent(uid)
-    val dominated = duplicateMessage(msg, msgs)
-    val quick     = !dominated && quickPost(msg, msgs)
+    val msg                = Message(text, Instant.now)
+    val msgs               = ~cache.getIfPresent(uid)
+    val dominated          = duplicateMessage(msg, msgs)
+    val quick              = !dominated && quickPost(msg, msgs)
     val dominated_or_quick = dominated || quick
-    val result    = !dominated_or_quick
-    if (result) cache.put(uid, msg :: msgs)
+    val result             = !dominated_or_quick
+    if result then cache.put(uid, msg :: msgs)
     result
   }
 
   private def quickPost(msg: Message, msgs: Messages): Boolean =
-    msgs.lift(floodNumber) so (_.date `isAfter` msg.date.minus(10000L))
+    msgs.lift(floodNumber) so (_.date.isAfter(msg.date.minus(10000L)))
 }
 
 private object Flood {
@@ -59,5 +59,5 @@ private object Flood {
     }
 
   private def similar(s1: String, s2: String): Boolean =
-    isLevenshteinDistanceLessThan(s1, s2, (s1.length.min(s2.length) >> 3) `atLeast` 2)
+    isLevenshteinDistanceLessThan(s1, s2, (s1.length.min(s2.length) >> 3).atLeast(2))
 }

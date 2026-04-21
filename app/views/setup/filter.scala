@@ -3,13 +3,13 @@ package views.html.setup
 import play.api.data.Form
 
 import lila.api.Context
-import lila.app.templating.Environment._
-import lila.app.ui.ScalatagsTemplate._
+import lila.app.templating.Environment.*
+import lila.app.ui.ScalatagsTemplate.*
 import lila.rating.RatingRange
 
 object filter {
 
-  import bits._
+  import bits.*
 
   def apply(form: Form[?])(implicit ctx: Context) =
     frag(
@@ -41,42 +41,48 @@ object filter {
                 )
               )
             ),
-            ctx.isAuth `option` tr(cls := "inline")(
-              td(trans.mode()),
-              td(renderCheckboxes(form, "mode", translatedModeChoices))
+            ctx.isAuth.option(
+              tr(cls := "inline")(
+                td(trans.mode()),
+                td(renderCheckboxes(form, "mode", translatedModeChoices))
+              )
             ),
-            ctx.isAuth `option` tr(
-              td(trans.ratingRange()),
-              td(
-                label(cls := "range")("? - ?"),
-                div(cls := "rating-range") {
-                  val field = form("ratingRange")
-                  frag(
-                    form3.hidden(field),
-                    input(
-                      name := s"${field.name}_range_min",
-                      tpe := "range",
-                      cls := "range rating-range__min",
-                      min := RatingRange.min,
-                      max := RatingRange.max
-                    ),
-                    "/",
-                    input(
-                      name := s"${field.name}_range_max",
-                      tpe := "range",
-                      cls := "range rating-range__max",
-                      min := RatingRange.min,
-                      max := RatingRange.max
+            ctx.isAuth.option(
+              tr(
+                td(trans.ratingRange()),
+                td(
+                  label(cls := "range")("? - ?"),
+                  div(cls := "rating-range") {
+                    val field = form("ratingRange")
+                    frag(
+                      form3.hidden(field),
+                      input(
+                        name := s"${field.name}_range_min",
+                        tpe  := "range",
+                        cls  := "range rating-range__min",
+                        min  := RatingRange.min,
+                        max  := RatingRange.max
+                      ),
+                      "/",
+                      input(
+                        name := s"${field.name}_range_max",
+                        tpe  := "range",
+                        cls  := "range rating-range__max",
+                        min  := RatingRange.min,
+                        max  := RatingRange.max
+                      )
                     )
-                  )
-                }
+                  }
+                )
               )
             )
           )
         ),
-        ctx.isAnon `option` frag(
-          renderInput(form("mode")),
-          renderInput(form("ratingRange"))
+        ctx.isAnon.option(
+          frag(
+            renderInput(form("mode")),
+            renderInput(form("ratingRange"))
+          )
         ),
         div(cls := "actions")(
           submitButton(cls := "button button-empty button-red text reset", dataIcon := "k")(trans.reset()),
@@ -108,11 +114,11 @@ object filter {
   ) =
     label(title := hint)(
       input(
-        tpe := "checkbox",
-        cls := "regular-checkbox",
-        name := s"${form(key).name}[$index]",
+        tpe      := "checkbox",
+        cls      := "regular-checkbox",
+        name     := s"${form(key).name}[$index]",
         st.value := value,
-        checks(value) `option` checked
+        checks(value).option(checked)
       )(content)
     )
 }

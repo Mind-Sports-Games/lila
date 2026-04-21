@@ -3,8 +3,8 @@ package views.html.simul
 import play.api.data.Form
 
 import lila.api.Context
-import lila.app.templating.Environment._
-import lila.app.ui.ScalatagsTemplate._
+import lila.app.templating.Environment.*
+import lila.app.ui.ScalatagsTemplate.*
 import lila.hub.LeaderTeam
 import lila.simul.Simul
 import lila.simul.SimulForm
@@ -17,7 +17,7 @@ object form {
     views.html.base.layout(
       title = trans.hostANewSimul.txt(),
       moreCss = cssTag("simul.form"),
-      //moreJs = jsModule("flatpickr")
+      // moreJs = jsModule("flatpickr")
       moreJs = jsModule("simulForm")
     ) {
       main(cls := "box box-pad page-small simul-form")(
@@ -42,7 +42,7 @@ object form {
     views.html.base.layout(
       title = s"Edit ${simul.fullName}",
       moreCss = cssTag("simul.form"),
-      //moreJs = jsModule("flatpickr")
+      // moreJs = jsModule("flatpickr")
       moreJs = jsModule("simulForm")
     ) {
       main(cls := "box box-pad page-small simul-form")(
@@ -65,7 +65,7 @@ object form {
   private def formContent(form: Form[SimulForm.Setup], teams: List[LeaderTeam], simul: Option[Simul])(implicit
       ctx: Context
   ) = {
-    import lila.simul.SimulForm._
+    import lila.simul.SimulForm.*
     frag(
       globalError(form),
       form3.group(form("name"), trans.name()) { f =>
@@ -80,19 +80,25 @@ object form {
         frag(
           {
             val options = translatedAllVariantChoicesWithVariants(v => s"${v.gameFamily.id}_${v.id}")
-            val checks = form.value
+            val checks  = form.value
               .map(_.variants.map(_.toString))
               .getOrElse(simul.so(_.variants.map(v => s"${v.gameFamily.id}_${v.id}")))
               .toSet
             val checkboxes = options.zipWithIndex.map { case ((value, text, hint), index) =>
               div(cls := "checkable")(
                 views.html.setup.filter.renderCheckbox(
-                  form, "variants", index, value, raw(text), hint, checks
+                  form,
+                  "variants",
+                  index,
+                  value,
+                  raw(text),
+                  hint,
+                  checks
                 )
               )
             }
-            val n = options.size
-            val fakeDivs = if (n % 3 == 2) 1 else 0
+            val n        = options.size
+            val fakeDivs = if n % 3 == 2 then 1 else 0
             div(cls := "variants")(
               checkboxes ++ Seq.fill(fakeDivs)(div(cls := "checkable fake", style := "visibility:hidden")())
             )
@@ -144,10 +150,11 @@ object form {
         )
       ),
       form3.split(
-        teams.nonEmpty `option`
+        teams.nonEmpty.option(
           form3.group(form("team"), raw("Only members of team"), half = true)(
             form3.select(_, List(("", "No Restriction")) ::: teams.map(_.pair))
-          ),
+          )
+        ),
         form3.group(
           form("position"),
           trans.startPosition(),
@@ -166,11 +173,16 @@ object form {
         raw("Simul description"),
         help = frag("Anything you want to tell the participants?").some
       )(form3.textarea(_)(rows := 10)),
-      ctx.me.exists(_.isSimulFeatured) `option` form3.checkbox(
-        form("featured"),
-        frag("Feature on playstrategy.org/simul"),
-        help = frag("Show your simul to everyone on playstrategy.org/simul. Disable for private simuls.").some
-      )
+      ctx.me
+        .exists(_.isSimulFeatured)
+        .option(
+          form3.checkbox(
+            form("featured"),
+            frag("Feature on playstrategy.org/simul"),
+            help =
+              frag("Show your simul to everyone on playstrategy.org/simul. Disable for private simuls.").some
+          )
+        )
     )
   }
 }

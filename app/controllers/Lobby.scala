@@ -1,10 +1,10 @@
 package controllers
 
-import play.api.libs.json._
-import play.api.mvc._
+import play.api.libs.json.*
+import play.api.mvc.*
 
 import lila.app.*
-import views._
+import views.*
 
 final class Lobby(
     env: Env

@@ -3,7 +3,7 @@ package lila.msg
 import org.joda.time.DateTime
 
 import lila.common.Bus
-import lila.db.dsl._
+import lila.db.dsl.*
 import lila.hub.actorApi.clas.{ AreKidsInSameClass, IsTeacherOf }
 import lila.hub.actorApi.report.AutoFlag
 import lila.hub.actorApi.team.IsLeaderOf
@@ -25,18 +25,18 @@ final private class MsgSecurity(
     scheduler: akka.actor.Scheduler
 ) {
 
-  import BsonHandlers._
-  import MsgSecurity._
+  import BsonHandlers.*
+  import MsgSecurity.*
 
   private object limitCost {
-    val normal   = 25
-    val verified = 5
-    val hog      = 1
+    val normal                 = 25
+    val verified               = 5
+    val hog                    = 1
     def apply(u: User.Contact) =
-      if (u.isApiHog) hog
-      else if (u.isVerified) verified
-      else if (u `isDaysOld` 3) normal
-      else if (u `isHoursOld` 3) normal * 2
+      if u.isApiHog then hog
+      else if u.isVerified then verified
+      else if u.isDaysOld(3) then normal
+      else if u.isHoursOld(3) then normal * 2
       else normal * 4
   }
 
@@ -61,20 +61,20 @@ final private class MsgSecurity(
         unlimited: Boolean = false
     ): Fu[Verdict] = {
       val text = rawText.trim
-      if (text.isEmpty) fuccess(Invalid)
+      if text.isEmpty then fuccess(Invalid)
       else
         may.post(contacts, isNew) flatMap {
           case false => fuccess(Block)
-          case _ =>
-            isLimited(contacts, isNew, unlimited) `orElse`
-              isSpam(text) `orElse`
-              isTroll(contacts) `orElse`
-              isDirt(contacts.orig, text, isNew) `getOrElse`
-              fuccess(Ok)
+          case _     =>
+            isLimited(contacts, isNew, unlimited)
+              .orElse(isSpam(text))
+              .orElse(isTroll(contacts))
+              .orElse(isDirt(contacts.orig, text, isNew))
+              .getOrElse(fuccess(Ok))
         } flatMap {
           case mute: Mute =>
             relationApi.fetchFollows(contacts.dest.id, contacts.orig.id) dmap { isFriend =>
-              if (isFriend) Ok else mute
+              if isFriend then Ok else mute
             }
           case verdict => fuccess(verdict)
         } addEffect {
@@ -90,14 +90,15 @@ final private class MsgSecurity(
     }
 
     private def isLimited(contacts: User.Contacts, isNew: Boolean, unlimited: Boolean): Fu[Option[Verdict]] =
-      if (unlimited) fuccess(none)
-      else if (isNew) {
-        isLeaderOf(contacts) >>| isTeacherOf(contacts)
-      } map {
-        case true => none
-        case _ =>
-          CreateLimitPerUser[Option[Verdict]](contacts.orig.id, limitCost(contacts.orig))(none)(Limit.some)
-      }
+      if unlimited then fuccess(none)
+      else if isNew then
+        {
+          isLeaderOf(contacts) >>| isTeacherOf(contacts)
+        } map {
+          case true => none
+          case _    =>
+            CreateLimitPerUser[Option[Verdict]](contacts.orig.id, limitCost(contacts.orig))(none)(Limit.some)
+        }
       else
         fuccess {
           ReplyLimitPerUser[Option[Verdict]](contacts.orig.id, limitCost(contacts.orig))(none)(Limit.some)
@@ -111,7 +112,7 @@ final private class MsgSecurity(
 
     private def isDirt(user: User.Contact, text: String, isNew: Boolean): Fu[Option[Verdict]] =
       (isNew && Analyser(text).dirty) so
-        userRepo.isCreatedSince(user.id, DateTime.now.minusDays(30)).not dmap { _ `option` Dirt }
+        userRepo.isCreatedSince(user.id, DateTime.now.minusDays(30)).not dmap { _.option(Dirt) }
   }
 
   object may {
@@ -148,7 +149,7 @@ final private class MsgSecurity(
       )
 
     private def kidCheck(contacts: User.Contacts, isNew: Boolean): Fu[Boolean] =
-      if (!isNew || !contacts.hasKid) fuTrue
+      if !isNew || !contacts.hasKid then fuTrue
       else
         (contacts.orig.kidId, contacts.dest.kidId) match {
           case (a: KidId, b: KidId)    => Bus.ask[Boolean]("clas") { AreKidsInSameClass(a, b, _) }

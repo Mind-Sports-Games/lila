@@ -1,7 +1,7 @@
 package lila.mod
 
 import com.github.blemale.scaffeine.LoadingCache
-import scala.jdk.CollectionConverters._
+import scala.jdk.CollectionConverters.*
 
 import lila.common.CuteNameGenerator
 import lila.common.IpAddress
@@ -19,9 +19,9 @@ object IpRender {
 
 final class IpRender {
 
-  import IpRender._
+  import IpRender.*
 
-  def apply(mod: Holder): RenderIp = if (Granter.is(_.Admin)(mod)) visible else encrypted
+  def apply(mod: Holder): RenderIp = if Granter.is(_.Admin)(mod) then visible else encrypted
 
   val visible = (ip: IpAddress) => ip.value
 
@@ -31,7 +31,7 @@ final class IpRender {
     cache.underlying.asMap.asScala.collectFirst {
       case (ip, encrypted) if encrypted == str =>
         ip
-  }
+    }
 
   private val cache: LoadingCache[IpAddress, Rendered] = CacheApi.scaffeineNoScheduler
     .expireAfterAccess(30 minutes)

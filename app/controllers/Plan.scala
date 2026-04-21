@@ -1,7 +1,7 @@
 package controllers
 
-import play.api.libs.json._
-import play.api.mvc._
+import play.api.libs.json.*
+import play.api.mvc.*
 
 import lila.api.Context
 import lila.app.*
@@ -22,10 +22,11 @@ import lila.plan.{
   StripeCustomer,
   StripeCustomerId
 }
-import lila.user.{ User => UserModel }
-import views._
+import lila.user.User as UserModel
+import views.*
 
-final class Plan(env: Env)(implicit @annotation.nowarn("msg=unused") system: akka.actor.ActorSystem) extends LilaController(env) {
+final class Plan(env: Env)(implicit @annotation.nowarn("msg=unused") system: akka.actor.ActorSystem)
+    extends LilaController(env) {
 
   private val logger = lila.log("plan")
 
@@ -33,11 +34,11 @@ final class Plan(env: Env)(implicit @annotation.nowarn("msg=unused") system: akk
     Open { implicit ctx =>
       pageHit
       ctx.me.fold(indexAnon) { me =>
-        import lila.plan.PlanApi.SyncResult._
+        import lila.plan.PlanApi.SyncResult.*
         env.plan.api.sync(me) flatMap {
-          case ReloadUser => Redirect(routes.Plan.index).fuccess
+          case ReloadUser                       => Redirect(routes.Plan.index).fuccess
           case Synced(Some(patron), None, None) =>
-            env.user.repo `email` me.id flatMap { email =>
+            env.user.repo.email(me.id) flatMap { email =>
               renderIndex(email, patron.some)
             }
           case Synced(Some(patron), Some(stripeCus), _) => indexStripePatron(me, patron, stripeCus)
@@ -50,7 +51,7 @@ final class Plan(env: Env)(implicit @annotation.nowarn("msg=unused") system: akk
   def list =
     Open { implicit ctx =>
       ctx.me.fold(Redirect(routes.Plan.index).fuccess) { me =>
-        import lila.plan.PlanApi.SyncResult._
+        import lila.plan.PlanApi.SyncResult.*
         env.plan.api.sync(me) flatMap {
           case ReloadUser            => Redirect(routes.Plan.list).fuccess
           case Synced(Some(_), _, _) => indexFreeUser(me)
@@ -62,7 +63,7 @@ final class Plan(env: Env)(implicit @annotation.nowarn("msg=unused") system: akk
   private def indexAnon(implicit ctx: Context) = renderIndex(email = none, patron = none)
 
   private def indexFreeUser(me: UserModel)(implicit ctx: Context) =
-    env.user.repo `email` me.id flatMap { email =>
+    env.user.repo.email(me.id) flatMap { email =>
       renderIndex(email, patron = none)
     }
 
@@ -93,7 +94,7 @@ final class Plan(env: Env)(implicit @annotation.nowarn("msg=unused") system: akk
       case Some(info: OneTimeCustomerInfo) =>
         renderIndex(info.customer.email map EmailAddress.apply, patron.some)
       case None =>
-        env.user.repo `email` me.id flatMap { email =>
+        env.user.repo.email(me.id) flatMap { email =>
           renderIndex(email, patron.some)
         }
     }
@@ -140,13 +141,12 @@ final class Plan(env: Env)(implicit @annotation.nowarn("msg=unused") system: akk
 
   def webhook =
     Action.async(parse.json) { req =>
-      if (req.headers.hasHeader("PAYPAL-TRANSMISSION-SIG"))
+      if req.headers.hasHeader("PAYPAL-TRANSMISSION-SIG") then
         env.plan.webhook.payPal(req.body) inject Ok("kthxbye")
-      else
-        env.plan.webhook.stripe(req.body) inject Ok("kthxbye")
+      else env.plan.webhook.stripe(req.body) inject Ok("kthxbye")
     }
 
-  def badStripeSession[A: Writes](err: A) = BadRequest(jsonError(err))
+  def badStripeSession[A: Writes](err: A)                  = BadRequest(jsonError(err))
   def badStripeApiCall: PartialFunction[Throwable, Result] = { case e: StripeException =>
     logger.error("Plan.stripeCheckout", e)
     badStripeSession("Stripe API call failed")
@@ -197,7 +197,7 @@ final class Plan(env: Env)(implicit @annotation.nowarn("msg=unused") system: akk
   def stripeCheckout =
     AuthBody { implicit ctx => me =>
       implicit val req = ctx.body
-      CheckoutRateLimit(HTTPRequest `ipAddress` req) {
+      CheckoutRateLimit(HTTPRequest.ipAddress(req)) {
         lila.plan.PlanCheckout.form
           .bindFromRequest()
           .fold(
@@ -223,7 +223,7 @@ final class Plan(env: Env)(implicit @annotation.nowarn("msg=unused") system: akk
   def updatePayment =
     AuthBody { implicit ctx => me =>
       implicit val req = ctx.body
-      CaptureRateLimit(HTTPRequest `ipAddress` req) {
+      CaptureRateLimit(HTTPRequest.ipAddress(req)) {
         env.plan.api.stripe.userCustomer(me) flatMap {
           _.flatMap(_.firstSubscription) so { sub =>
             env.plan.api.stripe
@@ -265,9 +265,10 @@ final class Plan(env: Env)(implicit @annotation.nowarn("msg=unused") system: akk
               BadRequest(jsonError(err.errors.map(_.message) mkString ", ")).fuccess
             },
             checkout => {
-              if (checkout.freq.renew) for {
-                sub <- env.plan.api.payPal.createSubscription(checkout, me)
-              } yield JsonOk(Json.obj("subscription" -> Json.obj("id" -> sub.id.value)))
+              if checkout.freq.renew then
+                for {
+                  sub <- env.plan.api.payPal.createSubscription(checkout, me)
+                } yield JsonOk(Json.obj("subscription" -> Json.obj("id" -> sub.id.value)))
               else
                 for {
                   order <- env.plan.api.payPal.createOrder(checkout, me)
@@ -281,7 +282,7 @@ final class Plan(env: Env)(implicit @annotation.nowarn("msg=unused") system: akk
     Auth { implicit ctx => me =>
       CaptureRateLimit(ctx.ip) {
         (get("sub") map PayPalSubscriptionId.apply match {
-          case None => env.plan.api.payPal.captureOrder(PayPalOrderId(orderId), ctx.ip)
+          case None        => env.plan.api.payPal.captureOrder(PayPalOrderId(orderId), ctx.ip)
           case Some(subId) =>
             env.plan.api.payPal.captureSubscription(PayPalOrderId(orderId), subId, me, ctx.ip)
         }) inject jsonOkResult

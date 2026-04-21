@@ -23,4 +23,3 @@ object Day {
       Day(Days.daysBetween(genesis, DateTime.now.minusDays(delta).withTimeAtStartOfDay).getDays)
     }
 }
-

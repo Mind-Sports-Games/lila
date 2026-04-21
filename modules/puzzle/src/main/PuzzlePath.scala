@@ -2,7 +2,7 @@ package lila.puzzle
 
 import scala.concurrent.ExecutionContext
 
-import lila.db.dsl._
+import lila.db.dsl.*
 import lila.user.{ Perfs, User }
 import lila.common.Iso
 import lila.common.extensions.*
@@ -34,8 +34,8 @@ final private class PuzzlePathApi(
     colls: PuzzleColls
 )(implicit ec: ExecutionContext) {
 
-  import BsonHandlers._
-  import PuzzlePath._
+  import BsonHandlers.*
+  import PuzzlePath.*
 
   def nextFor(
       user: User,
@@ -47,12 +47,12 @@ final private class PuzzlePathApi(
       compromise: Int = 0
   ): Fu[Option[Id]] = {
     val actualTier =
-      if (tier == PuzzleTier.Top && PuzzleDifficulty.isExtreme(difficulty)) PuzzleTier.Good
+      if tier == PuzzleTier.Top && PuzzleDifficulty.isExtreme(difficulty) then PuzzleTier.Good
       else tier
     colls
       .path {
         _.aggregateWith[Bdoc]() { framework =>
-          import framework._
+          import framework.*
           val rating =
             Perfs
               .puzzleLens(variant)
@@ -77,9 +77,9 @@ final private class PuzzlePathApi(
           .collect[List](maxDocs = 1)
           .dmap(_.headOption)
           .dmap(_.flatMap(_.getAsOpt[Id]("_id")))
-    }
+      }
       .flatMap {
-        case Some(path) => fuccess(path.some)
+        case Some(path)                        => fuccess(path.some)
         case _ if actualTier == PuzzleTier.Top =>
           nextFor(user, variant, theme, PuzzleTier.Good, difficulty, previousPaths)
         case _ if actualTier == PuzzleTier.Good && compromise == 2 =>
@@ -87,7 +87,7 @@ final private class PuzzlePathApi(
         case _ if compromise < 5 =>
           nextFor(user, variant, theme, actualTier, difficulty, previousPaths, compromise + 1)
         case _ => fuccess(none)
-    }
+      }
   }.mon(
     _.puzzle.path.nextFor(variant.key, theme.value, tier.key, difficulty.key, previousPaths.size, compromise)
   )

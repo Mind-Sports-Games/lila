@@ -1,39 +1,39 @@
 package lila.game
 
-import play.api.libs.json._
+import play.api.libs.json.*
 
 import strategygames.{
   Board,
   ByoyomiClock,
   Centis,
-  Clock => StratClock,
-  CubeAction => StratCubeAction,
+  Clock as StratClock,
+  CubeAction as StratCubeAction,
   CubeInteraction,
-  Drop => StratDrop,
+  DiceRoll as StratDiceRoll,
+  Drop as StratDrop,
+  EndTurn as StratEndTurn,
   GameFamily,
-  GameMessage,
   GameLogic,
-  Move => StratMove,
+  GameMessage,
+  Lift as StratLift,
+  Move as StratMove,
   P1,
   P2,
-  Pass => StratPass,
-  Player => PlayerIndex,
-  Lift => StratLift,
-  EndTurn => StratEndTurn,
-  Undo => StratUndo,
-  SelectSquares => StratSelectSquares,
-  DiceRoll => StratDiceRoll,
+  Pass as StratPass,
+  Player as PlayerIndex,
   PocketData,
   Pos,
   PromotableRole,
   Role,
+  SelectSquares as StratSelectSquares,
   Situation,
-  Status
+  Status,
+  Undo as StratUndo
 }
 import strategygames.chess
 import strategygames.format.Forsyth
 import strategygames.format.pgn.Dumper
-import JsonView._
+import JsonView.*
 import lila.chat.{ PlayerLine, UserLine }
 import lila.common.ApiVersion
 
@@ -146,7 +146,7 @@ object Event {
       pocketData: Option[PocketData],
       captLen: Option[Int]
   ) extends Event {
-    def typ = "move"
+    def typ  = "move"
     def data =
       Action.data(
         gf,
@@ -196,10 +196,9 @@ object Event {
         dest = move.dest,
         san = Dumper(situation.board.variant.gameLogic, move),
         fen =
-          if (
-            situation.board.variant.gameLogic == GameLogic
+          if situation.board.variant.gameLogic == GameLogic
               .Draughts() && situation.board.variant.frisianVariant
-          )
+          then
             situation.board match {
               case Board.Draughts(board) =>
                 Forsyth.exportBoard(GameLogic.Draughts(), situation.board) + ":" +
@@ -209,14 +208,15 @@ object Event {
           else
             Forsyth
               .>>(situation.board.variant.gameLogic, situation)
-              .value,
+              .value
+        ,
         check = situation.check,
         currentPointValueP1 = situation.pointValue(Some(P1)),
         currentPointValueP2 = situation.pointValue(Some(P2)),
         threefold = situation.threefoldRepetition,
         gameMessage = situation.gameMessage,
         promotion = move.promotion.map { Promotion(_, move.dest) },
-        enpassant = (move.capture `ifTrue` move.enpassant).map { (capture: List[Pos]) =>
+        enpassant = move.capture.ifTrue(move.enpassant).map { (capture: List[Pos]) =>
           Event.Enpassant(capture(0), !move.player)
         },
         castle = move.castle.map { case (king, rook) =>
@@ -233,7 +233,7 @@ object Event {
           // and should be ready to go now validMoves handles this ghosts logic internally
           // see Situation.Draughts.destinations
           case (Situation.Draughts(situation), Pos.Draughts(moveDest)) =>
-            if (situation.ghosts > 0)
+            if situation.ghosts > 0 then
               Map(
                 Pos.Draughts(moveDest) ->
                   situation.destinationsFrom(moveDest).map(Pos.Draughts.apply)
@@ -258,15 +258,11 @@ object Event {
         pocketData = pocketData,
         captLen = (situation, move.dest) match {
           case (Situation.Draughts(situation), Pos.Draughts(moveDest)) =>
-            if (situation.ghosts > 0)
-              situation.captureLengthFrom(moveDest)
-            else
-              situation.allMovesCaptureLength.some
+            if situation.ghosts > 0 then situation.captureLengthFrom(moveDest)
+            else situation.allMovesCaptureLength.some
           case (Situation.Dameo(situation), Pos.Dameo(moveDest)) =>
-            if (situation.ghosts > 0)
-              situation.captureLengthFrom(moveDest)
-            else
-              situation.allMovesCaptureLength.some
+            if situation.ghosts > 0 then situation.captureLengthFrom(moveDest)
+            else situation.allMovesCaptureLength.some
           case _ => None
         }
       )
@@ -297,7 +293,7 @@ object Event {
       possibleCubeActions: Option[List[CubeInteraction]],
       forcedAction: Option[String]
   ) extends Event {
-    def typ = "drop"
+    def typ  = "drop"
     def data =
       Action.data(
         gf,
@@ -399,7 +395,7 @@ object Event {
       possibleCubeActions: Option[List[CubeInteraction]],
       forcedAction: Option[String]
   ) extends Event {
-    def typ = "lift"
+    def typ  = "lift"
     def data =
       Action.data(
         gf,
@@ -501,7 +497,7 @@ object Event {
       possibleCubeActions: Option[List[CubeInteraction]],
       forcedAction: Option[String]
   ) extends Event {
-    def typ = "endturn"
+    def typ  = "endturn"
     def data =
       Action.data(
         gf,
@@ -606,7 +602,7 @@ object Event {
       possibleCubeActions: Option[List[CubeInteraction]],
       forcedAction: Option[String]
   ) extends Event {
-    def typ = "pass"
+    def typ  = "pass"
     def data =
       Action.data(
         gf,
@@ -641,7 +637,7 @@ object Event {
   }
 
   def deadStoneOfferStateJson(canSelectSquares: Boolean): Option[String] =
-    if (canSelectSquares) Some("ChooseFirstOffer") else None
+    if canSelectSquares then Some("ChooseFirstOffer") else None
 
   object Pass {
     def apply(
@@ -710,7 +706,7 @@ object Event {
       possibleCubeActions: Option[List[CubeInteraction]],
       forcedAction: Option[String]
   ) extends Event {
-    def typ = "selectSquares"
+    def typ  = "selectSquares"
     def data =
       Action.data(
         gf,
@@ -807,7 +803,7 @@ object Event {
       possibleCubeActions: Option[List[CubeInteraction]],
       forcedAction: Option[String]
   ) extends Event {
-    def typ = "diceroll"
+    def typ  = "diceroll"
     def data =
       Action.data(
         gf,
@@ -910,7 +906,7 @@ object Event {
       possibleCubeActions: Option[List[CubeInteraction]],
       forcedAction: Option[String]
   ) extends Event {
-    def typ = "cubeaction"
+    def typ  = "cubeaction"
     def data =
       Action.data(
         gf,
@@ -1012,7 +1008,7 @@ object Event {
       possibleCubeActions: Option[List[CubeInteraction]],
       forcedAction: Option[String]
   ) extends Event {
-    def typ = "undo"
+    def typ  = "undo"
     def data =
       Action.data(
         gf,
@@ -1094,43 +1090,42 @@ object Event {
   object PossibleDropsByRole {
 
     def json(drops: Map[Role, List[Pos]]) =
-      if (drops.isEmpty) JsNull
+      if drops.isEmpty then JsNull
       else {
         val sb    = new java.lang.StringBuilder(128)
         var first = true
         drops foreach { case (orig, dests) =>
-          if (first) first = false
-          else sb `append` " "
-          sb `append` orig.forsyth
-          dests foreach { sb `append` _.key }
+          if first then first = false
+          else sb.append(" ")
+          sb.append(orig.forsyth)
+          dests.foreach(d => sb.append(d.key))
         }
         JsString(sb.toString)
       }
   }
 
-
   object PossibleMoves {
 
     def json(moves: Map[Pos, List[Pos]], apiVersion: ApiVersion) =
-      if (apiVersion `gte` 4) newJson(moves)
+      if apiVersion.gte(4) then newJson(moves)
       else oldJson(moves)
 
     def newJson(moves: Map[Pos, List[Pos]]) =
-      if (moves.isEmpty) JsNull
+      if moves.isEmpty then JsNull
       else {
         val sb    = new java.lang.StringBuilder(128)
         var first = true
         moves foreach { case (orig, dests) =>
-          if (first) first = false
-          else sb `append` " "
-          sb `append` orig.key
-          dests foreach { sb `append` _.key }
+          if first then first = false
+          else sb.append(" ")
+          sb.append(orig.key)
+          dests.foreach(d => sb.append(d.key))
         }
         JsString(sb.toString)
       }
 
     def oldJson(moves: Map[Pos, List[Pos]]) =
-      if (moves.isEmpty) JsNull
+      if moves.isEmpty then JsNull
       else
         moves.foldLeft(JsObject(Nil)) { case (res, (o, d)) =>
           res + (o.key -> JsString(d map (_.key) mkString))
@@ -1138,7 +1133,7 @@ object Event {
   }
 
   case class Enpassant(pos: Pos, playerIndex: PlayerIndex) extends Event {
-    def typ = "enpassant"
+    def typ  = "enpassant"
     def data =
       Json.obj(
         "key"         -> pos.key,
@@ -1147,7 +1142,7 @@ object Event {
   }
 
   case class Castling(king: (Pos, Pos), rook: (Pos, Pos), playerIndex: PlayerIndex) extends Event {
-    def typ = "castling"
+    def typ  = "castling"
     def data =
       Json.obj(
         "king"        -> Json.arr(king._1.key, king._2.key),
@@ -1161,7 +1156,7 @@ object Event {
       id: String,
       cookie: Option[JsObject]
   ) extends Event {
-    def typ = "redirect"
+    def typ  = "redirect"
     def data =
       Json
         .obj(
@@ -1173,7 +1168,7 @@ object Event {
   }
 
   case class Promotion(role: PromotableRole, pos: Pos) extends Event {
-    def typ = "promotion"
+    def typ  = "promotion"
     def data =
       Json.obj(
         "key"        -> pos.key,
@@ -1204,7 +1199,7 @@ object Event {
   }
 
   case class EndData(game: Game, ratingDiff: Option[RatingDiffs]) extends Event {
-    def typ = "endData"
+    def typ  = "endData"
     def data =
       Json
         .obj(
@@ -1286,7 +1281,7 @@ object Event {
   }
 
   case class ClockInc(playerIndex: PlayerIndex, time: Centis) extends Event {
-    def typ = "clockInc"
+    def typ  = "clockInc"
     def data =
       Json.obj(
         "playerIndex" -> playerIndex,
@@ -1307,7 +1302,7 @@ object Event {
       p2Periods: Int = 0,
       nextLagComp: Option[Centis] = None
   ) extends ClockEvent {
-    def typ = "clock"
+    def typ  = "clock"
     def data =
       Json
         .obj(
@@ -1365,7 +1360,7 @@ object Event {
   }
 
   case class CheckCount(p1: Int, p2: Int) extends Event {
-    def typ = "checkCount"
+    def typ  = "checkCount"
     def data =
       Json.obj(
         "p1" -> p1,
@@ -1374,7 +1369,7 @@ object Event {
   }
 
   case class Score(p1: Int, p2: Int) extends Event {
-    def typ = "score"
+    def typ  = "score"
     def data =
       Json.obj(
         "p1" -> p1,
@@ -1383,7 +1378,7 @@ object Event {
   }
 
   case class KingMoves(p1: Int, p2: Int, p1King: Option[Pos], p2King: Option[Pos]) extends Event {
-    def typ = "kingMoves"
+    def typ  = "kingMoves"
     def data = Json.obj(
       "p1"     -> p1,
       "p2"     -> p2,
@@ -1403,7 +1398,7 @@ object Event {
       p1OffersSelectSquares: Boolean,
       p2OffersSelectSquares: Boolean
   ) extends Event {
-    def typ = "state"
+    def typ  = "state"
     def data =
       Json
         .obj(
@@ -1423,7 +1418,7 @@ object Event {
       p1: Boolean,
       p2: Boolean
   ) extends Event {
-    def typ = "takebackOffers"
+    def typ  = "takebackOffers"
     def data =
       Json
         .obj()
@@ -1437,7 +1432,7 @@ object Event {
       p2: Boolean,
       watchers: Option[JsValue]
   ) extends Event {
-    def typ = "crowd"
+    def typ  = "crowd"
     def data =
       Json
         .obj(

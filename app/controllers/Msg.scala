@@ -1,6 +1,6 @@
 package controllers
 
-import play.api.libs.json._
+import play.api.libs.json.*
 
 import lila.app.*
 import lila.common.LightUser.lightUserWrites
@@ -18,7 +18,7 @@ final class Msg(
         },
         api = v =>
           {
-            if (v >= 5) inboxJson(me)
+            if v >= 5 then inboxJson(me)
             else env.msg.compat.inbox(me, getInt("page"))
           } map { Ok(_) }
       )
@@ -26,7 +26,7 @@ final class Msg(
 
   def convo(username: String, before: Option[Long] = None) =
     Auth { implicit ctx => me =>
-      if (username == "new") Redirect(get("user").fold(routes.Msg.home)(routes.Msg.convo(_))).fuccess
+      if username == "new" then Redirect(get("user").fold(routes.Msg.home)(routes.Msg.convo(_))).fuccess
       else
         env.msg.api.convoWith(me, username, before).flatMap {
           case None =>
@@ -42,7 +42,7 @@ final class Msg(
               },
               api = v =>
                 {
-                  if (v >= 5) newJson
+                  if v >= 5 then newJson
                   else fuccess(env.msg.compat.thread(me, c))
                 } map { Ok(_) }
             )
@@ -60,7 +60,7 @@ final class Msg(
   def unreadCount =
     Auth { _ => me =>
       JsonOk {
-        env.msg.compat `unreadCount` me
+        env.msg.compat.unreadCount(me)
       }
     }
 
@@ -85,7 +85,7 @@ final class Msg(
     }
 
   def apiPost(username: String) = {
-    val userId = lila.user.User `normalize` username
+    val userId = lila.user.User.normalize(username)
     AuthOrScopedBody(_.Msg.Write)(
       // compat: reply
       auth = implicit ctx =>
@@ -100,8 +100,8 @@ final class Msg(
       scoped = implicit req =>
         me =>
           (!me.kid && userId != me.id) so {
-            import play.api.data._
-            import play.api.data.Forms._
+            import play.api.data.*
+            import play.api.data.Forms.*
             Form(single("text" -> nonEmptyText))
               .bindFromRequest()
               .fold(
@@ -110,7 +110,7 @@ final class Msg(
                   env.msg.api.post(me.id, userId, text) map {
                     case lila.msg.MsgApi.PostResult.Success => jsonOkResult
                     case lila.msg.MsgApi.PostResult.Limited => apiC.tooManyRequests
-                    case _                                  => BadRequest(jsonError("The message was rejected"))
+                    case _ => BadRequest(jsonError("The message was rejected"))
                   }
               )
           }

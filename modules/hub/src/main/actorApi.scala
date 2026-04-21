@@ -3,7 +3,7 @@ package actorApi
 
 import strategygames.format.Uci
 import org.joda.time.DateTime
-import play.api.libs.json._
+import play.api.libs.json.*
 import scala.concurrent.Promise
 
 // announce something to all clients
@@ -192,7 +192,7 @@ package timeline {
     case class ModsOnly(value: Boolean)   extends Propagation
   }
 
-  import propagation._
+  import propagation.*
 
   case class Propagate(data: Atom, propagations: List[Propagation] = Nil) {
     def toUsers(ids: List[String])  = add(Users(ids))

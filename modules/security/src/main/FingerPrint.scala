@@ -19,20 +19,19 @@ object FingerHash {
       import org.apache.commons.codec.binary.Hex
       FingerHash {
         Base64.getEncoder encodeToString {
-          Hex `decodeHex` normalize(print).toArray
+          Hex.decodeHex(normalize(print).toArray)
         } take length
       } some
-    }
-    catch {
+    } catch {
       case _: Exception => none
     }
 
   private def normalize(fp: FingerPrint): String = {
     val str = fp.value.replace("-", "")
-    if (str.length % 2 != 0) s"${str}0" else str
+    if str.length % 2 != 0 then s"${str}0" else str
   }
 
-  implicit val fingerHashIso: Iso.StringIso[FingerHash] = Iso.string[FingerHash](FingerHash.apply, _.value)
+  implicit val fingerHashIso: Iso.StringIso[FingerHash]   = Iso.string[FingerHash](FingerHash.apply, _.value)
   implicit val fingerHashHandler: BSONHandler[FingerHash] =
     lila.db.BSON.isoHandler[FingerHash, String](fingerHashIso)
 }

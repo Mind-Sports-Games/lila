@@ -21,26 +21,28 @@ case class RacerRace(
   def player(id: RacerPlayer.Id) = players.find(_.id == id)
 
   def join(id: RacerPlayer.Id): Option[RacerRace] =
-    !hasStarted && !has(id) && players.sizeIs < RacerRace.maxPlayers `option`
-      copy(players = players :+ RacerPlayer.make(id))
+    (!hasStarted && !has(id) && players.sizeIs < RacerRace.maxPlayers)
+      .option(copy(players = players :+ RacerPlayer.make(id)))
 
   def registerScore(playerId: RacerPlayer.Id, score: Int): Option[RacerRace] =
-    !finished `option` copy(
-      players = players map {
-        case p if p.id == playerId => p.copy(score = score)
-        case p                     => p
-      }
+    (!finished).option(
+      copy(
+        players = players map {
+          case p if p.id == playerId => p.copy(score = score)
+          case p                     => p
+        }
+      )
     )
 
   def startCountdown: Option[RacerRace] =
-    startsAt.isEmpty && players.size > (if (isLobby) 2 else 1) `option`
-      copy(startsAt = DateTime.now.plusSeconds(countdownSeconds).some)
+    (startsAt.isEmpty && players.size > (if isLobby then 2 else 1))
+      .option(copy(startsAt = DateTime.now.plusSeconds(countdownSeconds).some))
 
   def startsInMillis = startsAt.map(d => d.getMillis - nowMillis)
 
   def hasStarted = startsInMillis.exists(_ <= 0)
 
-  def finishesAt = startsAt.map(_ `plusSeconds` RacerRace.duration)
+  def finishesAt = startsAt.map(_.plusSeconds(RacerRace.duration))
 
   def finished = finishesAt.exists(_.isBeforeNow)
 
@@ -55,7 +57,7 @@ object RacerRace {
   case class Id(value: String) extends AnyVal with StringValue
 
   def make(owner: RacerPlayer.Id, puzzles: List[StormPuzzle], countdownSeconds: Int) = RacerRace(
-    _id = Id(lila.common.ThreadLocalRandom `nextString` 5),
+    _id = Id(lila.common.ThreadLocalRandom.nextString(5)),
     owner = owner,
     players = Nil,
     puzzles = puzzles,

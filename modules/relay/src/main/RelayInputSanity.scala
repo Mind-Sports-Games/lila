@@ -1,6 +1,6 @@
 package lila.relay
 
-import lila.study._
+import lila.study.*
 
 /* Try and detect variant ways for the input to be wrong */
 private object RelayInputSanity {
@@ -11,8 +11,8 @@ private object RelayInputSanity {
       extends Fail(s"Game ${gamePos + 1} matches with Chapter ${chapterPos + 1}")
 
   def apply(chapters: List[Chapter], games: RelayGames): Option[Fail] =
-    if (chapters.isEmpty) none
-    else if (isValidTCEC(chapters, games)) none
+    if chapters.isEmpty then none
+    else if isValidTCEC(chapters, games) then none
     else {
       val relayChapters: List[RelayChapter] = chapters.flatMap { chapter =>
         chapter.relay map chapter.->
@@ -23,10 +23,10 @@ private object RelayInputSanity {
   private def detectMissingOrMisplaced(chapters: List[RelayChapter], games: Vector[RelayGame]): Option[Fail] =
     chapters flatMap { case (chapter, relay) =>
       games.lift(relay.index) match {
-        case None => Missing(relay.index).some
+        case None                                         => Missing(relay.index).some
         case Some(game) if !game.staticTagsMatch(chapter) =>
           games.zipWithIndex collectFirst {
-            case (otherGame, otherPos) if otherGame `staticTagsMatch` chapter =>
+            case (otherGame, otherPos) if otherGame.staticTagsMatch(chapter) =>
               Misplaced(otherPos, relay.index)
           }
         case _ => None
@@ -38,7 +38,7 @@ private object RelayInputSanity {
     games match {
       case Vector(onlyGame) =>
         chapters.lastOption.exists { c =>
-          onlyGame `staticTagsMatch` c.tags
+          onlyGame.staticTagsMatch(c.tags)
         }
       case _ => false
     }

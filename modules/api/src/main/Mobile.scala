@@ -18,7 +18,6 @@ object Mobile {
     )
   }
 
-
   object Api {
 
     val currentVersion = ApiVersion(6)
@@ -26,7 +25,7 @@ object Mobile {
     val acceptedVersions: Set[ApiVersion] = Set(1, 2, 3, 4, 5, 6) map ApiVersion.apply
 
     def requestVersion(req: RequestHeader): Option[ApiVersion] =
-      HTTPRequest `apiVersion` req filter acceptedVersions.contains
+      HTTPRequest.apiVersion(req) filter acceptedVersions.contains
 
     def requested(req: RequestHeader) = requestVersion(req).isDefined
   }

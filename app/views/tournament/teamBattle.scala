@@ -4,8 +4,8 @@ package tournament
 import play.api.data.Form
 
 import lila.api.Context
-import lila.app.templating.Environment._
-import lila.app.ui.ScalatagsTemplate._
+import lila.app.templating.Environment.*
+import lila.app.ui.ScalatagsTemplate.*
 import lila.tournament.TeamBattle
 import lila.tournament.Tournament
 
@@ -24,7 +24,7 @@ object teamBattle {
         div(cls := "tour__form box box-pad")(
           h1(tour.name()),
           standardFlash(),
-          if (tour.isFinished) p("This tournament is over, and the teams can no longer be updated.")
+          if tour.isFinished then p("This tournament is over, and the teams can no longer be updated.")
           else p("List the teams that will compete in this battle."),
           postForm(cls := "form3", action := routes.Tournament.teamBattleUpdate(tour.id))(
             form3.group(
@@ -120,7 +120,7 @@ object teamBattle {
               tr(
                 td(index + 1),
                 td(
-                  (index < tour.teamBattle.so(_.nbLeaders)) `option` iconTag("8"),
+                  (index < tour.teamBattle.so(_.nbLeaders)).option(iconTag("8")),
                   userIdLink(player.userId.some)
                 ),
                 td(player.score),

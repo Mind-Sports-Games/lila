@@ -15,7 +15,7 @@ final class DiscordApi(
   def matchmakingAnnouncement(text: String, variant: Variant, isHook: Boolean): Funit =
     client(
       DiscordMessage(
-        text = linkifyUsers(text) + (if (isHook) s" ${gameFamilyRole(variant)}" else ""),
+        text = linkifyUsers(text) + (if isHook then s" ${gameFamilyRole(variant)}" else ""),
         channel = MatchMaking
       )
     )
@@ -41,7 +41,7 @@ final class DiscordApi(
     )
 
   private def variantLine(variantName: String, isMedley: Boolean) =
-    if (isMedley) s"Medley beginning with $variantName"
+    if isMedley then s"Medley beginning with $variantName"
     else variantName
 
   private def freqIcon(freq: String): String = freq match {
@@ -76,29 +76,27 @@ final class DiscordApi(
   private val userReplace                     = link(baseUrl + "/@/$1", "$1")
 
   private def linkifyUsers(msg: String) =
-    userRegex `matcher` msg `replaceAll` userReplace
+    userRegex.matcher(msg).replaceAll(userReplace)
 
   sealed abstract class DiscordRole(val id: String)
 
   object DiscordRole {
 
-    case object Chess extends DiscordRole("<@&1344675363279867904>")
-    case object ChessVariants extends DiscordRole("<@&1344695574112239708>")
-    case object LinesOfAction extends DiscordRole("<@&1344678278547640382>")
-    case object Draughts extends DiscordRole("<@&1344677542250025011>")
-    case object Shogi extends DiscordRole("<@&1344678410055843860>")
-    case object Xiangqi extends DiscordRole("<@&1344678872322543697>")
-    case object Flipello extends DiscordRole("<@&1344678917486678066>")
-    case object Amazons extends DiscordRole("<@&1344678966488731750>")
-    case object Togyzkumalak extends DiscordRole("<@&1344679095526625291>")
-    case object Oware extends DiscordRole("<@&1344679056683040838>")
+    case object Chess              extends DiscordRole("<@&1344675363279867904>")
+    case object ChessVariants      extends DiscordRole("<@&1344695574112239708>")
+    case object LinesOfAction      extends DiscordRole("<@&1344678278547640382>")
+    case object Draughts           extends DiscordRole("<@&1344677542250025011>")
+    case object Shogi              extends DiscordRole("<@&1344678410055843860>")
+    case object Xiangqi            extends DiscordRole("<@&1344678872322543697>")
+    case object Flipello           extends DiscordRole("<@&1344678917486678066>")
+    case object Amazons            extends DiscordRole("<@&1344678966488731750>")
+    case object Togyzkumalak       extends DiscordRole("<@&1344679095526625291>")
+    case object Oware              extends DiscordRole("<@&1344679056683040838>")
     case object BreakthroughTroyka extends DiscordRole("<@&1344679010734440448>")
-    case object Go extends DiscordRole("<@&1344679175453409323>")
-    case object Backgammon extends DiscordRole("<@&1344679208735215616>")
-    case object Abalone extends DiscordRole("<@&1344679243082108988>")
+    case object Go                 extends DiscordRole("<@&1344679175453409323>")
+    case object Backgammon         extends DiscordRole("<@&1344679208735215616>")
+    case object Abalone            extends DiscordRole("<@&1344679243082108988>")
 
     case object Default extends DiscordRole("<@&1344676517237755925>")
   }
 }
-
-

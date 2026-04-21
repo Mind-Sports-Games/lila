@@ -1,7 +1,5 @@
 package views.html.coach
 
-
-
 object edit {
   /*
   private val dataTab   = attr("data-tab")

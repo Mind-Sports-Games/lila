@@ -1,13 +1,13 @@
 package controllers
 
-import play.api.libs.json._
-import play.api.mvc._
+import play.api.libs.json.*
+import play.api.mvc.*
 import scala.util.{ Failure, Success }
 
 import lila.app.*
 import lila.common.HTTPRequest
-import lila.fishnet.JsonApi.readers._
-import lila.fishnet.JsonApi.writers._
+import lila.fishnet.JsonApi.readers.*
+import lila.fishnet.JsonApi.writers.*
 import lila.fishnet.{ JsonApi, Work }
 
 final class Fishnet(env: Env) extends LilaController(env) {
@@ -24,9 +24,9 @@ final class Fishnet(env: Env) extends LilaController(env) {
 
   def analysis(workId: String, slow: Boolean = false, stop: Boolean = false) =
     ClientAction[JsonApi.Request.PostAnalysisLexicalUci] { data => client =>
-      import lila.fishnet.FishnetApi._
+      import lila.fishnet.FishnetApi.*
       def onComplete =
-        if (stop) fuccess(Left(NoContent))
+        if stop then fuccess(Left(NoContent))
         else api.acquire(client, slow) map Right.apply
       api
         .postAnalysis(Work.Id(workId), client, data)
@@ -42,7 +42,7 @@ final class Fishnet(env: Env) extends LilaController(env) {
           case GameNotFound    => onComplete
           case NotAcquired     => onComplete
           case WeakAnalysis(_) => onComplete
-          case e: Exception =>
+          case e: Exception    =>
             fuccess(Left(InternalServerError(e.getMessage)))
         }
     }
@@ -54,7 +54,7 @@ final class Fishnet(env: Env) extends LilaController(env) {
 
   def keyExists(key: String) =
     Action.async { _ =>
-      api `keyExists` lila.fishnet.Client.Key(key) map {
+      api.keyExists(lila.fishnet.Client.Key(key)) map {
         case true  => Ok
         case false => NotFound
       }
@@ -77,8 +77,8 @@ final class Fishnet(env: Env) extends LilaController(env) {
             BadRequest(jsonError(JsError toJson err)).fuccess
           },
           data =>
-            api.authenticateClient(data, HTTPRequest `ipAddress` req) flatMap {
-              case Failure(msg) => Unauthorized(jsonError(msg.getMessage)).fuccess
+            api.authenticateClient(data, HTTPRequest.ipAddress(req)) flatMap {
+              case Failure(msg)    => Unauthorized(jsonError(msg.getMessage)).fuccess
               case Success(client) =>
                 f(data)(client).map {
                   case Right(Some(work)) => Accepted(Json toJson work)

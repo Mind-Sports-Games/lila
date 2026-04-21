@@ -1,14 +1,14 @@
 package lila.timeline
 
 import org.joda.time.DateTime
-import reactivemongo.api.bson._
+import reactivemongo.api.bson.*
 import reactivemongo.api.ReadPreference
-import scala.concurrent.duration._
+import scala.concurrent.duration.*
 
 import lila.common.config.Max
-import lila.db.dsl._
+import lila.db.dsl.*
 import lila.hub.actorApi.timeline.Atom
-import lila.memo.CacheApi._
+import lila.memo.CacheApi.*
 import lila.user.User
 
 final class EntryApi(
@@ -17,7 +17,7 @@ final class EntryApi(
     cacheApi: lila.memo.CacheApi
 )(implicit ec: scala.concurrent.ExecutionContext) {
 
-  import Entry._
+  import Entry.*
 
   private val projection = $doc("users" -> false)
 
@@ -36,7 +36,7 @@ final class EntryApi(
         ),
         projection.some
       )
-      .sort($sort `desc` "date")
+      .sort($sort.desc("date"))
       .cursor[Entry](ReadPreference.secondaryPreferred)
       .vector(max.value)
 
@@ -46,7 +46,7 @@ final class EntryApi(
         $doc("typ" -> typ, "date" `$gt` since),
         projection.some
       )
-      .sort($sort `desc` "date")
+      .sort($sort.desc("date"))
       .cursor[Entry](ReadPreference.secondaryPreferred)
       .vector(max.value)
 
@@ -90,7 +90,7 @@ final class EntryApi(
             "date" `$gt` DateTime.now.minusWeeks(2)
           )
         )
-        .sort($sort `desc` "date")
+        .sort($sort.desc("date"))
         .cursor[Entry](ReadPreference.primary) // must be on primary for cache refresh to work
         .vector(3)
 
@@ -99,17 +99,17 @@ final class EntryApi(
         bcs.headOption.fold(entries) { mostRecentBc =>
           val interleaved = {
             val oldestEntry = entries.lastOption
-            if (oldestEntry.fold(true)(_.date `isBefore` mostRecentBc.date))
+            if oldestEntry.fold(true)(_.date.isBefore(mostRecentBc.date)) then
               (entries ++ bcs).sortBy(-_.date.getMillis)
             else entries
           }
           // sneak recent broadcast at first place
-          if (mostRecentBc.date.isAfter(DateTime.now `minusDays` 1))
+          if mostRecentBc.date.isAfter(DateTime.now.minusDays(1)) then
             mostRecentBc +: interleaved.filter(mostRecentBc !=)
           else interleaved
         }
       }
 
-    def insert(atom: Atom): Funit = coll.insert.one(Entry `make` atom).void.andDo(cache.invalidateUnit())
+    def insert(atom: Atom): Funit = coll.insert.one(Entry.make(atom)).void.andDo(cache.invalidateUnit())
   }
 }

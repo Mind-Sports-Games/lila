@@ -2,7 +2,7 @@ package lila.game
 import strategygames.format.sgf.{ Dumper, Tag, Tags }
 import strategygames.format.FEN
 
-import strategygames.{ Player => PlayerIndex, Status, GameFamily, P1 }
+import strategygames.{ GameFamily, P1, Player as PlayerIndex, Status }
 
 import lila.common.config.BaseUrl
 import lila.common.LightUser
@@ -12,7 +12,7 @@ final class SgfDump(
     lightUserApi: lila.user.LightUserApi
 )(implicit ec: scala.concurrent.ExecutionContext) {
 
-  import SgfDump._
+  import SgfDump.*
 
   def apply(
       game: Game,
@@ -22,7 +22,7 @@ final class SgfDump(
       hideRatings: Boolean = false
   ): Fu[String] = {
     val tagsFuture =
-      if (isTags)
+      if isTags then
         tags(
           game,
           initialFen,
@@ -31,10 +31,8 @@ final class SgfDump(
         )
       else fuccess(Tags(Nil))
     tagsFuture map { tags =>
-      if (game.gameRecordFormat == "sgf")
-        format(game, tags, initialFen)
-      else
-        "SGF NOT SUPPORTED"
+      if game.gameRecordFormat == "sgf" then format(game, tags, initialFen)
+      else "SGF NOT SUPPORTED"
     }
   }
 
@@ -83,29 +81,29 @@ final class SgfDump(
           Tag(_.PC, "PlayStrategy: " ++ gameUrl(game.id)).some,
           Tag(_.EV, eventOf(game)).some,
           Tag(_.GN, player(game.p1Player, p1) ++ " vs. " ++ player(game.p2Player, p2)).some,
-          isP1Black `option` Tag(_.PB, player(game.p1Player, p1)),
-          !isP1Black `option` Tag(_.PB, player(game.p2Player, p2)),
-          !isP1Black `option` Tag(_.PW, player(game.p1Player, p1)),
-          isP1Black `option` Tag(_.PW, player(game.p2Player, p2)),
-          !isGo `option` Tag(_.RE, result(game)), //TODO different for backgammon multipoint
-          !isGo && withRatings && isP1Black `option` Tag(_.BR, rating(game.p1Player)),
-          !isGo && withRatings && !isP1Black `option` Tag(_.BR, rating(game.p2Player)),
-          !isGo && withRatings && !isP1Black `option` Tag(_.WR, rating(game.p1Player)),
-          !isGo && withRatings && isP1Black `option` Tag(_.WR, rating(game.p2Player)),
+          isP1Black.option(Tag(_.PB, player(game.p1Player, p1))),
+          (!isP1Black).option(Tag(_.PB, player(game.p2Player, p2))),
+          (!isP1Black).option(Tag(_.PW, player(game.p1Player, p1))),
+          isP1Black.option(Tag(_.PW, player(game.p2Player, p2))),
+          (!isGo).option(Tag(_.RE, result(game))), // TODO different for backgammon multipoint
+          (!isGo && withRatings && isP1Black).option(Tag(_.BR, rating(game.p1Player))),
+          (!isGo && withRatings && !isP1Black).option(Tag(_.BR, rating(game.p2Player))),
+          (!isGo && withRatings && !isP1Black).option(Tag(_.WR, rating(game.p1Player))),
+          (!isGo && withRatings && isP1Black).option(Tag(_.WR, rating(game.p2Player))),
           Tag.timeControl(game.clock.map(_.config)).some,
-          teams.flatMap { t => isP1Black `option` Tag("BT", t.p1) },
-          teams.flatMap { t => !isP1Black `option` Tag("BT", t.p2) },
-          teams.flatMap { t => !isP1Black `option` Tag("WT", t.p1) },
-          teams.flatMap { t => isP1Black `option` Tag("WT", t.p2) },
-          if (!isGo && !isBackgammon) { initialFen.map { fen => Tag(_.IP, fen.value) } }
+          teams.flatMap { t => isP1Black.option(Tag("BT", t.p1)) },
+          teams.flatMap { t => (!isP1Black).option(Tag("BT", t.p2)) },
+          teams.flatMap { t => (!isP1Black).option(Tag("WT", t.p1)) },
+          teams.flatMap { t => isP1Black.option(Tag("WT", t.p2)) },
+          if !isGo && !isBackgammon then { initialFen.map { fen => Tag(_.IP, fen.value) } }
           else None
         ).flatten
       } ++ (game.variant.gameFamily match {
-        case GameFamily.LinesOfAction() => //not used yet
+        case GameFamily.LinesOfAction() => // not used yet
           Tags {
             List(
               Tag(_.GM, 9),
-              Tag(_.SU, if (game.variant.key == "linesOfAction") "Standard" else "Scrambled-eggs")
+              Tag(_.SU, if game.variant.key == "linesOfAction" then "Standard" else "Scrambled-eggs")
             )
           }
         case GameFamily.Shogi() =>
@@ -113,7 +111,7 @@ final class SgfDump(
             List(
               Tag(_.GM, 8),
               Tag(_.SZ, game.variant.toFairySF.boardSize.height),
-              Tag(_.SU, if (game.variant.key == "shogi") "Standard" else "MiniShogi")
+              Tag(_.SU, if game.variant.key == "shogi" then "Standard" else "MiniShogi")
             )
           }
         case GameFamily.Xiangqi() =>
@@ -121,18 +119,18 @@ final class SgfDump(
             List(
               Tag(_.GM, 7),
               Tag(_.SZ, game.variant.toFairySF.boardSize.height),
-              Tag(_.SU, if (game.variant.key == "xiangqi") "Standard" else "MiniXiangqi")
+              Tag(_.SU, if game.variant.key == "xiangqi" then "Standard" else "MiniXiangqi")
             )
           }
         case GameFamily.Flipello() =>
           Tags { List(Tag(_.GM, 2), Tag(_.SZ, game.variant.toFairySF.boardSize.height)) }
-        case GameFamily.Amazons() => Tags { List(Tag(_.GM, 18)) }
+        case GameFamily.Amazons()            => Tags { List(Tag(_.GM, 18)) }
         case GameFamily.BreakthroughTroyka() =>
           Tags {
             List(
               Tag(_.GM, 41),
               Tag(_.SZ, game.variant.toFairySF.boardSize.height),
-              Tag(_.SU, if (game.variant.key == "breakthroughtroyka") "Standard" else "MiniBreakthrough")
+              Tag(_.SU, if game.variant.key == "breakthroughtroyka" then "Standard" else "MiniBreakthrough")
             )
           }
         case GameFamily.Go() =>
@@ -151,8 +149,8 @@ final class SgfDump(
               _ => false
             )
           val crawfordVariantLine =
-            if (game.variant.key == "hyper") ":Hypergammon3"
-            else if (game.variant.key == "nackgammon") ":Nackgammon"
+            if game.variant.key == "hyper" then ":Hypergammon3"
+            else if game.variant.key == "nackgammon" then ":Nackgammon"
             else ""
           val matchInfo = game.multiPointState.fold((1, 0, 0, 0))(mps =>
             (mps.target, game.metadata.multiMatchGameNr.fold(0)(x => x - 1), mps.p1Points, mps.p2Points)
@@ -160,7 +158,7 @@ final class SgfDump(
           Tags {
             List(
               Tag(_.GM, 6),
-              Tag(_.RU, "Crawford" + (if (isCrawfordGame) ":CrawfordGame" else "") + crawfordVariantLine),
+              Tag(_.RU, "Crawford" + (if isCrawfordGame then ":CrawfordGame" else "") + crawfordVariantLine),
               Tag(_.CV, 1),
               Tag(_.CO, game.board.cubeData.fold('n')(_ => 'c')),
               Tag.matchInfo(matchInfo._1, matchInfo._2, matchInfo._3, matchInfo._4)
@@ -175,7 +173,7 @@ final class SgfDump(
 object SgfDump {
 
   def result(game: Game) =
-    if (game.finished)
+    if game.finished then
       game.variant.key match {
         case "backgammon" | "nackgammon" | "hyper" => backgammonResult(game)
         case _                                     => PlayerIndex.showResult(game.winnerPlayerIndex, false)
@@ -184,15 +182,14 @@ object SgfDump {
 
   def backgammonResult(game: Game): String = {
     val isWinnerP1 = game.winnerPlayerIndex == Some(PlayerIndex.P1)
-    val winner     = if (isWinnerP1) "W" else "B"
-    val maxPoints =
-      game.multiPointState.fold(1)(mps => mps.target - (if (isWinnerP1) mps.p1Points else mps.p2Points))
+    val winner     = if isWinnerP1 then "W" else "B"
+    val maxPoints  =
+      game.multiPointState.fold(1)(mps => mps.target - (if isWinnerP1 then mps.p1Points else mps.p2Points))
     val points = Math.min(game.pointValue.getOrElse(1), game.multiPointState.fold(1)(_ => maxPoints))
     val resign =
-      if (
-        (Status.resigned ++ List(Status.Outoftime, Status.OutoftimeGammon, Status.OutoftimeBackgammon))
+      if (Status.resigned ++ List(Status.Outoftime, Status.OutoftimeGammon, Status.OutoftimeBackgammon))
           .contains(game.status)
-      ) "R"
+      then "R"
       else ""
     return s"$winner+$points$resign"
   }

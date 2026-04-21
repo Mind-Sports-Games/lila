@@ -1,10 +1,10 @@
 package lila.lobby
 
-import com.softwaremill.macwire._
+import com.softwaremill.macwire.*
 import play.api.Configuration
 import lila.socket.Socket.{ GetVersion, SocketVersion }
 
-import lila.common.config._
+import lila.common.config.*
 
 @Module
 final class Env(
@@ -72,4 +72,3 @@ final class Env(
     abortListener(pov).discard
   }
 }
-

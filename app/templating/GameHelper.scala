@@ -1,14 +1,14 @@
 package lila.app
 package templating
 
-import strategygames.{ Status => S, ClockConfig, Mode, Player => PlayerIndex, P2, P1, GameLogic }
+import strategygames.{ ClockConfig, GameLogic, Mode, P1, P2, Player as PlayerIndex, Status as S }
 import strategygames.variant.Variant
 import play.api.i18n.Lang
 
 import lila.api.Context
-import lila.app.ui.ScalatagsTemplate._
+import lila.app.ui.ScalatagsTemplate.*
 import lila.game.{ Game, Namer, Player, Pov }
-import lila.i18n.{ I18nKeys => trans, VariantKeys, defaultLang }
+import lila.i18n.{ defaultLang, I18nKeys as trans, VariantKeys }
 import lila.user.Title
 
 trait GameHelper { self: I18nHelper & UserHelper & AiHelper & StringHelper & ChessgroundHelper =>
@@ -30,21 +30,21 @@ trait GameHelper { self: I18nHelper & UserHelper & AiHelper & StringHelper & Che
   }
 
   def describePov(pov: Pov) = {
-    import pov._
-    val p1 = playerText(player, withRating = true)
-    val p2 = playerText(opponent, withRating = true)
+    import pov.*
+    val p1            = playerText(player, withRating = true)
+    val p2            = playerText(opponent, withRating = true)
     val speedAndClock =
-      if (game.imported) "imported"
+      if game.imported then "imported"
       else
         game.clock.fold(strategygames.Speed.Correspondence.name) { c =>
           s"${strategygames.Speed(c.config).name} (${c.config.show})"
         }
-    val mode = game.mode.name
+    val mode    = game.mode.name
     val variant =
-      if (game.variant.fromPositionVariant) s"position setup ${game.variant.gameLogic.name}"
-      else if (game.variant.exotic) VariantKeys.variantName(game.variant)
+      if game.variant.fromPositionVariant then s"position setup ${game.variant.gameLogic.name}"
+      else if game.variant.exotic then VariantKeys.variantName(game.variant)
       else game.variant.gameLogic.name.toLowerCase()
-    import strategygames.Status._
+    import strategygames.Status.*
     val result = (game.winner, game.loser, game.status, game.variant.gameLogic) match {
       case (
             Some(w),
@@ -53,7 +53,7 @@ trait GameHelper { self: I18nHelper & UserHelper & AiHelper & StringHelper & Che
             GameLogic.Chess() | GameLogic.FairySF() | GameLogic.Samurai() | GameLogic.Togyzkumalak() |
             GameLogic.Go() | GameLogic.Backgammon() | GameLogic.Abalone() | GameLogic.Dameo()
           ) =>
-        //TODO set this properly for non chess variants
+        // TODO set this properly for non chess variants
         s"${playerText(w)} won by checkmate"
       case (Some(w), _, Mate | PerpetualCheck, _) =>
         s"${playerText(w)} won by opponent perpetually checking"
@@ -114,8 +114,8 @@ trait GameHelper { self: I18nHelper & UserHelper & AiHelper & StringHelper & Che
     player.aiLevel.fold[Frag](
       player.userId.flatMap(lightUser).fold[Frag](trans.anonymous.txt()) { user =>
         frag(
-          titleTag(user.title `ifTrue` withTitle map Title.apply),
-          if (withRating) s"${user.name} (${lila.game.Namer `ratingString` player})"
+          titleTag(user.title.ifTrue(withTitle) map Title.apply),
+          if withRating then s"${user.name} (${lila.game.Namer `ratingString` player})"
           else user.name
         )
       }
@@ -142,7 +142,7 @@ trait GameHelper { self: I18nHelper & UserHelper & AiHelper & StringHelper & Che
       mod: Boolean = false,
       link: Boolean = true
   )(implicit lang: Lang): Frag = {
-    val statusIcon = (withBerserk && player.berserk) `option` berserkIconSpan
+    val statusIcon = (withBerserk && player.berserk).option(berserkIconSpan)
     player.userId.flatMap(lightUser) match {
       case None =>
         val klass = cssClass.so(" " + _)
@@ -157,18 +157,20 @@ trait GameHelper { self: I18nHelper & UserHelper & AiHelper & StringHelper & Che
         )
       case Some(user) =>
         frag(
-          (if (link) a else span)(
-            cls := userClass(user.id, cssClass, withOnline),
-            href := s"${routes.User `show` user.name}${if (mod) "?mod" else ""}"
+          (if link then a else span) (
+            cls  := userClass(user.id, cssClass, withOnline),
+            href := s"${routes.User `show` user.name}${if mod then "?mod" else ""}"
           )(
-            withOnline `option` frag(lineIcon(user), " "),
+            withOnline.option(frag(lineIcon(user), " ")),
             playerUsername(player, withRating),
-            (player.ratingDiff `ifTrue` withDiff) map { d =>
+            (player.ratingDiff.ifTrue(withDiff)) map { d =>
               frag(" ", showRatingDiff(d))
             },
-            engine `option` span(
-              cls := "tos_violation",
-              title := trans.thisAccountViolatedTos.txt()
+            engine.option(
+              span(
+                cls   := "tos_violation",
+                title := trans.thisAccountViolatedTos.txt()
+              )
             )
           ),
           statusIcon
@@ -179,16 +181,16 @@ trait GameHelper { self: I18nHelper & UserHelper & AiHelper & StringHelper & Che
   def gameEndStatus(game: Game)(implicit lang: Lang): String =
     game.status match {
       case S.Aborted => trans.gameAborted.txt()
-      case S.Mate =>
+      case S.Mate    =>
         game.variant.gameLogic match {
           case GameLogic.Chess() | GameLogic.FairySF() | GameLogic.Samurai() | GameLogic.Togyzkumalak() |
               GameLogic.Go() | GameLogic.Backgammon() | GameLogic.Abalone() | GameLogic.Dameo() =>
-            //TODO set this properly for non chess variants
+            // TODO set this properly for non chess variants
             trans.checkmate.txt()
           case _ => ""
         }
       case S.PerpetualCheck => trans.perpetualCheck.txt()
-      case S.Resign =>
+      case S.Resign         =>
         game.loser match {
           case Some(p) if p.playerIndex.p1 => trans.playerIndexResigned(game.playerTrans(P1)).v
           case _                           => trans.playerIndexResigned(game.playerTrans(P2)).v
@@ -215,13 +217,13 @@ trait GameHelper { self: I18nHelper & UserHelper & AiHelper & StringHelper & Che
         }
       case S.UnknownFinish => trans.finished.txt()
       case S.Stalemate     => trans.stalemate.txt()
-      case S.Timeout =>
+      case S.Timeout       =>
         game.loser match {
           case Some(p) if p.playerIndex.p1 => trans.playerIndexLeftTheGame(game.playerTrans(P1)).v
           case Some(_)                     => trans.playerIndexLeftTheGame(game.playerTrans(P2)).v
           case None                        => trans.draw.txt()
         }
-      case S.Draw => trans.draw.txt()
+      case S.Draw      => trans.draw.txt()
       case S.Outoftime =>
         (game.turnPlayerIndex, game.loser) match {
           case (P1, Some(_)) => trans.playerIndexTimeOut(game.playerTrans(P1)).v
@@ -255,43 +257,48 @@ trait GameHelper { self: I18nHelper & UserHelper & AiHelper & StringHelper & Che
           case Some(p) if p.playerIndex.p1 => trans.playerIndexWinsByGinBackgammon(game.playerTrans(P1)).v
           case _                           => trans.playerIndexWinsByGinBackgammon(game.playerTrans(P2)).v
         }
-      case S.NoStart       => trans.playerIndexDidntMove(game.playerTrans(game.loser.fold(PlayerIndex.p1)(_.playerIndex))).v
+      case S.NoStart =>
+        trans.playerIndexDidntMove(game.playerTrans(game.loser.fold(PlayerIndex.p1)(_.playerIndex))).v
       case S.Cheat         => trans.cheatDetected.txt()
       case S.SingleWin     => trans.backgammonSingleWin.txt()
       case S.GammonWin     => trans.backgammonGammonWin.txt()
       case S.BackgammonWin => trans.backgammonBackgammonWin.txt()
-      case S.VariantEnd =>
+      case S.VariantEnd    =>
         game.variant match {
-          case Variant.Chess(strategygames.chess.variant.KingOfTheHill)          => trans.kingInTheCenter.txt()
-          case Variant.Chess(strategygames.chess.variant.ThreeCheck)             => trans.threeChecks.txt()
-          case Variant.Chess(strategygames.chess.variant.FiveCheck)              => trans.fiveChecks.txt()
-          case Variant.Chess(strategygames.chess.variant.RacingKings)            => trans.raceFinished.txt()
-          case Variant.Chess(strategygames.chess.variant.LinesOfAction)          => trans.checkersConnected.txt()
-          case Variant.Chess(strategygames.chess.variant.ScrambledEggs)          => trans.checkersConnected.txt()
-          case Variant.Draughts(strategygames.draughts.variant.Breakthrough)     => trans.promotion.txt()
-          case Variant.FairySF(strategygames.fairysf.variant.Flipello)           => trans.gameFinished.txt()
-          case Variant.FairySF(strategygames.fairysf.variant.Flipello10)         => trans.gameFinished.txt()
-          case Variant.FairySF(strategygames.fairysf.variant.AntiFlipello)       => trans.gameFinished.txt()
-          case Variant.FairySF(strategygames.fairysf.variant.OctagonFlipello)    => trans.gameFinished.txt()
-          case Variant.FairySF(strategygames.fairysf.variant.Amazons)            => trans.gameFinished.txt()
+          case Variant.Chess(strategygames.chess.variant.KingOfTheHill)       => trans.kingInTheCenter.txt()
+          case Variant.Chess(strategygames.chess.variant.ThreeCheck)          => trans.threeChecks.txt()
+          case Variant.Chess(strategygames.chess.variant.FiveCheck)           => trans.fiveChecks.txt()
+          case Variant.Chess(strategygames.chess.variant.RacingKings)         => trans.raceFinished.txt()
+          case Variant.Chess(strategygames.chess.variant.LinesOfAction)       => trans.checkersConnected.txt()
+          case Variant.Chess(strategygames.chess.variant.ScrambledEggs)       => trans.checkersConnected.txt()
+          case Variant.Draughts(strategygames.draughts.variant.Breakthrough)  => trans.promotion.txt()
+          case Variant.FairySF(strategygames.fairysf.variant.Flipello)        => trans.gameFinished.txt()
+          case Variant.FairySF(strategygames.fairysf.variant.Flipello10)      => trans.gameFinished.txt()
+          case Variant.FairySF(strategygames.fairysf.variant.AntiFlipello)    => trans.gameFinished.txt()
+          case Variant.FairySF(strategygames.fairysf.variant.OctagonFlipello) => trans.gameFinished.txt()
+          case Variant.FairySF(strategygames.fairysf.variant.Amazons)         => trans.gameFinished.txt()
           case Variant.FairySF(strategygames.fairysf.variant.BreakthroughTroyka) => trans.raceFinished.txt()
           case Variant.FairySF(strategygames.fairysf.variant.MiniBreakthroughTroyka) =>
             trans.raceFinished.txt()
           case Variant.Samurai(strategygames.samurai.variant.Oware) =>
-            if (game.situation.isRepetition) trans.gameFinishedRepetition.txt() else trans.gameFinished.txt()
+            if game.situation.isRepetition then trans.gameFinishedRepetition.txt()
+            else trans.gameFinished.txt()
           case Variant.Togyzkumalak(strategygames.togyzkumalak.variant.Togyzkumalak) =>
             trans.gameFinished.txt()
           case Variant.Togyzkumalak(strategygames.togyzkumalak.variant.Bestemshe) =>
             trans.gameFinished.txt()
           case Variant.Go(strategygames.go.variant.Go9x9) =>
-            if (game.situation.isRepetition) trans.gameFinishedRepetition.txt() else trans.gameFinished.txt()
+            if game.situation.isRepetition then trans.gameFinishedRepetition.txt()
+            else trans.gameFinished.txt()
           case Variant.Go(strategygames.go.variant.Go13x13) =>
-            if (game.situation.isRepetition) trans.gameFinishedRepetition.txt() else trans.gameFinished.txt()
+            if game.situation.isRepetition then trans.gameFinishedRepetition.txt()
+            else trans.gameFinished.txt()
           case Variant.Go(strategygames.go.variant.Go19x19) =>
-            if (game.situation.isRepetition) trans.gameFinishedRepetition.txt() else trans.gameFinished.txt()
+            if game.situation.isRepetition then trans.gameFinishedRepetition.txt()
+            else trans.gameFinished.txt()
           case Variant.Backgammon(strategygames.backgammon.variant.Backgammon) =>
             trans.gameFinished.txt()
-          case Variant.Backgammon(strategygames.backgammon.variant.Hyper) => trans.gameFinished.txt()
+          case Variant.Backgammon(strategygames.backgammon.variant.Hyper)      => trans.gameFinished.txt()
           case Variant.Backgammon(strategygames.backgammon.variant.Nackgammon) =>
             trans.gameFinished.txt()
           case Variant.Abalone(strategygames.abalone.variant.Abalone) =>
@@ -305,12 +312,12 @@ trait GameHelper { self: I18nHelper & UserHelper & AiHelper & StringHelper & Che
 
   // p1Username 1-0 p2Username
   def gameSummary(p1UserId: String, p2UserId: String, finished: Boolean, result: Option[Boolean]) = {
-    val res = if (finished) PlayerIndex.showResult(result map PlayerIndex.fromP1) else "*"
+    val res = if finished then PlayerIndex.showResult(result map PlayerIndex.fromP1) else "*"
     s"${usernameOrId(p1UserId)} $res ${usernameOrId(p2UserId)}"
   }
 
   def gameResult(game: Game) =
-    if (game.finished) PlayerIndex.showResult(game.winnerPlayerIndex)
+    if game.finished then PlayerIndex.showResult(game.winnerPlayerIndex)
     else "*"
 
   def gameLink(
@@ -320,10 +327,10 @@ trait GameHelper { self: I18nHelper & UserHelper & AiHelper & StringHelper & Che
       tv: Boolean = false
   )(implicit ctx: Context): String = {
     val owner = ownerLink so ctx.me.flatMap(game.player)
-    if (tv) routes.Tv.index
+    if tv then routes.Tv.index
     else
       owner.fold(routes.Round.watcher(game.id, playerIndex.name)) { o =>
-        routes.Round.player(game `fullIdOf` o.playerIndex)
+        routes.Round.player(game.fullIdOf(o.playerIndex))
       }
   }.toString
 
@@ -337,7 +344,7 @@ trait GameHelper { self: I18nHelper & UserHelper & AiHelper & StringHelper & Che
       s"${usernameOrId(reg.id)} (${reg.rating.show})"
     }
     val players =
-      if (c.isOpen) "Open challenge"
+      if c.isOpen then "Open challenge"
       else
         c.destUser.fold(s"Challenge from $challenger") { dest =>
           s"$challenger challenges ${usernameOrId(dest.id)} (${dest.rating.show})"

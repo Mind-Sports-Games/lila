@@ -1,10 +1,10 @@
 package lila.clas
 
 import org.joda.time.{ DateTime, Period }
-import reactivemongo.api._
-import reactivemongo.api.bson._
+import reactivemongo.api.*
+import reactivemongo.api.bson.*
 
-import lila.db.dsl._
+import lila.db.dsl.*
 import lila.game.{ Game, GameRepo }
 import lila.puzzle.PuzzleRound
 import lila.rating.PerfType
@@ -36,7 +36,7 @@ case class StudentProgress(
     rating: (Int, Int)
 ) {
   def ratingProgress = rating._2 - rating._1
-  def winRate        = if (nb > 0) wins * 100 / nb else 0
+  def winRate        = if nb > 0 then wins * 100 / nb else 0
   def period         = new Period(millis)
 }
 
@@ -54,7 +54,7 @@ final class ClasProgressApi(
     val userIds = users.map(_.id)
 
     val playStatsFu =
-      if (perfType.key.startsWith("puzzle")) getPuzzleStats(userIds, days)
+      if perfType.key.startsWith("puzzle") then getPuzzleStats(userIds, days)
       else getGameStats(perfType, userIds, days)
 
     val progressesFu = historyApi.progresses(users, perfType, days)
@@ -76,11 +76,11 @@ final class ClasProgressApi(
     }
   }
 
-  //TODO should we split this by variant?
+  // TODO should we split this by variant?
   private def getPuzzleStats(userIds: List[User.ID], days: Int): Fu[Map[User.ID, PlayStats]] =
     puzzleColls.round {
       _.aggregateWith[Bdoc](readPreference = ReadPreference.secondaryPreferred) { framework =>
-        import framework._
+        import framework.*
         List(
           Match(
             $doc(
@@ -89,7 +89,7 @@ final class ClasProgressApi(
             )
           ),
           GroupField("u")(
-            "nb" -> SumAll,
+            "nb"  -> SumAll,
             "win" -> Sum(
               $doc(
                 "$cond" -> $arr("$w", 1, 0)
@@ -100,16 +100,16 @@ final class ClasProgressApi(
       }
         .collect[List](maxDocs = Int.MaxValue)
         .map {
-        _.flatMap { obj =>
-          obj.string("_id") map { id =>
-            id -> PlayStats(
-              nb = ~obj.int("nb"),
-              wins = ~obj.int("win"),
-              millis = 0
-            )
-          }
-        }.toMap
-      }
+          _.flatMap { obj =>
+            obj.string("_id") map { id =>
+              id -> PlayStats(
+                nb = ~obj.int("nb"),
+                wins = ~obj.int("win"),
+                millis = 0
+              )
+            }
+          }.toMap
+        }
     }
 
   private def getGameStats(
@@ -117,16 +117,16 @@ final class ClasProgressApi(
       userIds: List[User.ID],
       days: Int
   ): Fu[Map[User.ID, PlayStats]] = {
-    import Game.{ BSONFields => F }
+    import Game.BSONFields as F
     import lila.game.Query
     gameRepo.coll
       .aggregateWith[Bdoc](readPreference = ReadPreference.secondaryPreferred) { framework =>
-        import framework._
+        import framework.*
         List(
           Match(
             $doc(
               F.playerUids `$in` userIds,
-              Query.createdSince(DateTime.now `minusDays` days),
+              Query.createdSince(DateTime.now.minusDays(days)),
               F.perfType -> perfType.id
             )
           ),
@@ -141,7 +141,7 @@ final class ClasProgressApi(
           UnwindField(F.playerUids),
           Match($doc(F.playerUids `$in` userIds)),
           GroupField(F.playerUids)(
-            "nb" -> SumAll,
+            "nb"  -> SumAll,
             "win" -> Sum(
               $doc(
                 "$cond" -> $arr($doc("$eq" -> $arr("$us", "$wid")), 1, 0)
@@ -162,9 +162,9 @@ final class ClasProgressApi(
             )
           }
         }.toMap
-    }
+      }
   }
 
   private[clas] def onFinishGame(game: lila.game.Game): Unit =
-    if (game.userIds.exists(studentCache.isStudent)) gameRepo.denormalizePerfType(game)
+    if game.userIds.exists(studentCache.isStudent) then gameRepo.denormalizePerfType(game)
 }

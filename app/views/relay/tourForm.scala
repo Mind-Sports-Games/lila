@@ -1,7 +1,5 @@
 package views.html.relay
 
-
-
 object tourForm {
   /*
   import trans.broadcast._

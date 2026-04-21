@@ -3,8 +3,8 @@ package lila.tournament
 import play.api.i18n.Lang
 
 import lila.hub.LightTeam.TeamID
-import lila.memo._
-import lila.memo.CacheApi._
+import lila.memo.*
+import lila.memo.CacheApi.*
 import lila.user.User
 
 final private[tournament] class Cached(
@@ -20,7 +20,7 @@ final private[tournament] class Cached(
     name = "tournament.name",
     initialCapacity = 65536,
     compute = { case (id, lang) =>
-      tournamentRepo `byId` id dmap2 { _.name()(using lang) }
+      tournamentRepo.byId(id) dmap2 { _.name()(using lang) }
     },
     default = _ => none,
     strategy = Syncache.WaitAfterUptime(20 millis),
@@ -38,7 +38,7 @@ final private[tournament] class Cached(
   }
 
   def ranking(tour: Tournament): Fu[Ranking] =
-    if (tour.isFinished) finishedRanking get tour.id
+    if tour.isFinished then finishedRanking get tour.id
     else ongoingRanking get tour.id
 
   private[tournament] val teamInfo =
@@ -46,7 +46,7 @@ final private[tournament] class Cached(
       _.expireAfterWrite(5 seconds)
         .maximumSize(64)
         .buildAsyncFuture { case (tourId, teamId) =>
-          playerRepo.teamInfo(tourId, teamId) `dmap` some
+          playerRepo.teamInfo(tourId, teamId).dmap(some)
         }
     }
 
@@ -69,7 +69,7 @@ final private[tournament] class Cached(
       cacheApi[Tournament.ID, List[TeamBattle.RankedTeam]](8, "tournament.teamStanding") {
         _.expireAfterWrite(1 second)
           .buildAsyncFuture { id =>
-            tournamentRepo `teamBattleOf` id flatMap {
+            tournamentRepo.teamBattleOf(id) flatMap {
               _ so { playerRepo.bestTeamIdsByTour(id, _) }
             }
           }
@@ -101,8 +101,8 @@ final private[tournament] class Cached(
       SheetKey(
         tour.id,
         userId,
-        Sheet `versionOf` tour.startsAt,
-        if (tour.streakable) Sheet.Streaks else Sheet.NoStreaks,
+        Sheet.versionOf(tour.startsAt),
+        if tour.streakable then Sheet.Streaks else Sheet.NoStreaks,
         tour.statusScoring
       )
 

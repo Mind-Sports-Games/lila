@@ -2,14 +2,14 @@ package controllers
 
 import lila.app.*
 
-import play.api.data._
-import play.api.data.Forms._
-import play.api.libs.json._
+import play.api.data.*
+import play.api.data.Forms.*
+import play.api.libs.json.*
 import views.html
 
 final class Learn(env: Env) extends LilaController(env) {
 
-  import lila.learn.JSONHandlers._
+  import lila.learn.JSONHandlers.*
 
   def index =
     Open { implicit ctx =>

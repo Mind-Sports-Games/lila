@@ -2,7 +2,7 @@ package lila.swiss
 
 import play.api.i18n.Lang
 
-import lila.i18n.{ I18nKeys => trans }
+import lila.i18n.I18nKeys as trans
 import lila.rating.PerfType
 import lila.user.{ Title, User }
 
@@ -30,19 +30,19 @@ object SwissCondition {
 
   case object Titled extends SwissCondition with FlatCond {
     def name(perf: PerfType)(implicit lang: Lang) = "Only titled players"
-    def apply(user: User, perf: PerfType) =
-      if (user.title.exists(_ != Title.PM)) Accepted
+    def apply(user: User, perf: PerfType)         =
+      if user.title.exists(_ != Title.PM) then Accepted
       else Refused(name(perf)(using _))
   }
 
   case class NbRatedGame(nb: Int) extends SwissCondition with FlatCond {
 
     def apply(user: User, perf: PerfType) =
-      if (user.hasTitle) Accepted
-      else if (user.perfs(perf).nb >= nb) Accepted
+      if user.hasTitle then Accepted
+      else if user.perfs(perf).nb >= nb then Accepted
       else
         Refused { (lang: Lang) =>
-          given Lang = lang
+          given Lang  = lang
           val missing = nb - user.perfs(perf).nb
           trans.needNbMorePerfGames.pluralTxt(missing, missing, perf.trans)
         }
@@ -56,18 +56,20 @@ object SwissCondition {
     def apply(perf: PerfType, getMaxRating: GetMaxRating)(
         user: User
     )(implicit ec: scala.concurrent.ExecutionContext): Fu[Verdict] =
-      if (user.perfs(perf).provisional) fuccess(Refused { (lang: Lang) =>
-        given Lang = lang
-        trans.yourPerfRatingIsProvisional.txt(perf.trans)
-      })
-      else if (user.perfs(perf).intRating > rating) fuccess(Refused { (lang: Lang) =>
-        given Lang = lang
-        trans.yourPerfRatingIsTooHigh.txt(perf.trans, user.perfs(perf).intRating)
-      })
+      if user.perfs(perf).provisional then
+        fuccess(Refused { (lang: Lang) =>
+          given Lang = lang
+          trans.yourPerfRatingIsProvisional.txt(perf.trans)
+        })
+      else if user.perfs(perf).intRating > rating then
+        fuccess(Refused { (lang: Lang) =>
+          given Lang = lang
+          trans.yourPerfRatingIsTooHigh.txt(perf.trans, user.perfs(perf).intRating)
+        })
       else
         getMaxRating(perf) map {
           case r if r <= rating => Accepted
-          case r =>
+          case r                =>
             Refused { (lang: Lang) =>
               given Lang = lang
               trans.yourTopWeeklyPerfRatingIsTooHigh.txt(perf.trans, r)
@@ -83,15 +85,17 @@ object SwissCondition {
   case class MinRating(rating: Int) extends SwissCondition with FlatCond {
 
     def apply(user: User, perf: PerfType) =
-      if (user.hasTitle) Accepted
-      else if (user.perfs(perf).provisional) Refused { (lang: Lang) =>
-        given Lang = lang
-        trans.yourPerfRatingIsProvisional.txt(perf.trans)
-      }
-      else if (user.perfs(perf).intRating < rating) Refused { (lang: Lang) =>
-        given Lang = lang
-        trans.yourPerfRatingIsTooLow.txt(perf.trans, user.perfs(perf).intRating)
-      }
+      if user.hasTitle then Accepted
+      else if user.perfs(perf).provisional then
+        Refused { (lang: Lang) =>
+          given Lang = lang
+          trans.yourPerfRatingIsProvisional.txt(perf.trans)
+        }
+      else if user.perfs(perf).intRating < rating then
+        Refused { (lang: Lang) =>
+          given Lang = lang
+          trans.yourPerfRatingIsTooLow.txt(perf.trans, user.perfs(perf).intRating)
+        }
       else Accepted
 
     def name(perf: PerfType)(implicit lang: Lang) = trans.ratedMoreThanInPerf.txt(rating, perf.trans)
@@ -108,7 +112,7 @@ object SwissCondition {
 
     def relevant = list.nonEmpty
 
-    def ifNonEmpty = list.nonEmpty `option` this
+    def ifNonEmpty = list.nonEmpty.option(this)
 
     def withVerdicts(
         perf: PerfType,
@@ -116,10 +120,12 @@ object SwissCondition {
     )(user: User)(implicit
         ec: scala.concurrent.ExecutionContext
     ): Fu[All.WithVerdicts] =
-      Future.sequence(list.map {
-        case c: MaxRating => c(perf, getMaxRating)(user) map c.withVerdict
-        case c: FlatCond  => fuccess(c `withVerdict` c(user, perf))
-      }) `dmap` All.WithVerdicts.apply
+      Future
+        .sequence(list.map {
+          case c: MaxRating => c(perf, getMaxRating)(user) map c.withVerdict
+          case c: FlatCond  => fuccess(c.withVerdict(c(user, perf)))
+        })
+        .dmap(All.WithVerdicts.apply)
 
     def accepted = All.WithVerdicts(list.map { WithVerdict(_, Accepted) })
 
@@ -157,12 +163,12 @@ object SwissCondition {
   }
 
   object BSONHandlers {
-    import reactivemongo.api.bson._
-    import lila.db.dsl._
+    import reactivemongo.api.bson.*
+    import lila.db.dsl.*
     implicit private val NbRatedGameHandler: BSONDocumentHandler[NbRatedGame] = Macros.handler[NbRatedGame]
     implicit private val MaxRatingHandler: BSONDocumentHandler[MaxRating]     = Macros.handler[MaxRating]
     implicit private val MinRatingHandler: BSONDocumentHandler[MinRating]     = Macros.handler[MinRating]
-    implicit private val TitledHandler: BSONHandler[Titled.type] = quickHandler[Titled.type](
+    implicit private val TitledHandler: BSONHandler[Titled.type]              = quickHandler[Titled.type](
       { case _: BSONValue => Titled },
       _ => BSONBoolean(true)
     )
@@ -188,15 +194,15 @@ object SwissCondition {
 //   }
 
   object DataForm {
-    import play.api.data.Forms._
-    import lila.common.Form._
-    val perfAuto = "auto" -> "Auto"
-    val perfKeys = "auto" :: PerfType.nonPuzzle.map(_.key)
+    import play.api.data.Forms.*
+    import lila.common.Form.*
+    val perfAuto                         = "auto" -> "Auto"
+    val perfKeys                         = "auto" :: PerfType.nonPuzzle.map(_.key)
     def perfChoices(implicit lang: Lang) =
       perfAuto :: PerfType.nonPuzzle.map { pt =>
         pt.key -> pt.trans
       }
-    val nbRatedGames = Vector(0, 5, 10, 15, 20, 30, 40, 50, 75, 100, 150, 200)
+    val nbRatedGames       = Vector(0, 5, 10, 15, 20, 30, 40, 50, 75, 100, 150, 200)
     val nbRatedGameChoices = options(nbRatedGames, "%d rated game{s}") map {
       case (0, _) => (0, "No restriction")
       case x      => x
@@ -247,7 +253,7 @@ object SwissCondition {
         nbRatedGame.filter(_.nb > 0),
         maxRating.actualRating map MaxRating.apply,
         minRating.actualRating map MinRating.apply,
-        ~titled `option` Titled
+        (~titled).option(Titled)
       )
     }
     object AllSetup {
@@ -262,7 +268,7 @@ object SwissCondition {
           nbRatedGame = all.nbRatedGame,
           maxRating = RatingSetup(all.maxRating.map(_.rating)),
           minRating = RatingSetup(all.minRating.map(_.rating)),
-          titled = all.titled.contains(Titled) `option` true
+          titled = all.titled.contains(Titled).option(true)
         )
     }
   }

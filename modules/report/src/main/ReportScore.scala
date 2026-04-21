@@ -14,7 +14,7 @@ final private class ReportScore(
       impl.fixedAutoCommPrintScore(candidate) map
       impl.fixedBoostScore(candidate) map
       impl.commFlagScore(candidate) map { score =>
-        candidate `scored` Report.Score(score `atLeast` 5 `atMost` 100)
+        candidate.scored(Report.Score(score.atLeast(5).atMost(100)))
       }
 
   private object impl {
@@ -33,16 +33,16 @@ final private class ReportScore(
     // https://github.com/ornicar/lila/issues/4093
     // https://github.com/ornicar/lila/issues/4587
     def fixedAutoCommPrintScore(c: Report.Candidate)(score: Double): Double =
-      if (c.isAutoComm) baseScore
-      else if (c.isPrint || c.isCoachReview || c.isPlaybans) baseScore * 2
+      if c.isAutoComm then baseScore
+      else if c.isPrint || c.isCoachReview || c.isPlaybans then baseScore * 2
       else score
 
     def fixedBoostScore(c: Report.Candidate)(score: Double): Double =
-      if (c.isAutoBoost) baseScore
+      if c.isAutoBoost then baseScore
       else score
 
     def commFlagScore(c: Report.Candidate)(score: Double): Double =
-      if (c.isCommFlag) score / 2
+      if c.isCommFlag then score / 2
       else score
   }
 }

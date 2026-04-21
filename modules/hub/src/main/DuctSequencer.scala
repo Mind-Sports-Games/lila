@@ -12,7 +12,7 @@ final class DuctSequencer(maxSize: Int, timeout: FiniteDuration, name: String, l
     ec: Executor
 ) {
 
-  import DuctSequencer._
+  import DuctSequencer.*
 
   def apply[A](fu: => Fu[A]): Fu[A] = run(() => fu)
 
@@ -27,7 +27,7 @@ final class DuctSequencer(maxSize: Int, timeout: FiniteDuration, name: String, l
           {
             case LilaTimeout(msg) =>
               val fullMsg = s"$name DuctSequencer $msg"
-              if (logging) lila.log("duct").warn(fullMsg)
+              if logging then lila.log("duct").warn(fullMsg)
               LilaTimeout(fullMsg)
             case e => e
           }

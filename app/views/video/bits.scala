@@ -1,6 +1,5 @@
 package views.html.video
 
-
 object bits {
   /*
   private[video] def card(vv: lila.video.VideoView, control: lila.video.UserControl) =

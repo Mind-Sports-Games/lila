@@ -1,6 +1,6 @@
 package lila.study
 
-import akka.stream.scaladsl._
+import akka.stream.scaladsl.*
 import strategygames.format.sgf.{ Dumper, Tag, Tags }
 import strategygames.format.FEN
 import strategygames.{ ActionStrs, GameFamily, GameLogic }
@@ -15,7 +15,7 @@ final class SgfDump(
     net: lila.common.config.NetConfig
 ) {
 
-  import SgfDump._
+  import SgfDump.*
 
   def apply(study: Study): Source[String, ?] =
     chapterRepo
@@ -27,7 +27,7 @@ final class SgfDump(
   def ofChapter(study: Study)(chapter: Chapter): String = {
     val actionStrs = toActionStrs(chapter.root.mainline)
     val tags       = makeTags(study, chapter)
-    val initialFen = !chapter.root.fen.initial `option` chapter.root.fen
+    val initialFen = (!chapter.root.fen.initial).option(chapter.root.fen)
     format(chapter.setup.variant, actionStrs, tags, initialFen)
   }
 
@@ -35,13 +35,10 @@ final class SgfDump(
     "(;" ++ tags.toString ++ "\n\n" ++ validSgf(variant, actionStrs, initialFen) ++ ")"
 
   def validSgf(variant: Variant, actionStrs: ActionStrs, initialFen: Option[FEN]): String =
-    if (
-      variant.gameLogic == GameLogic.FairySF() || variant.gameLogic == GameLogic
+    if variant.gameLogic == GameLogic.FairySF() || variant.gameLogic == GameLogic
         .Go() || variant.gameLogic == GameLogic.Backgammon()
-    )
-      Dumper(variant, actionStrs, initialFen)
-    else
-      "SGF NOT SUPPORTED"
+    then Dumper(variant, actionStrs, initialFen)
+    else "SGF NOT SUPPORTED"
 
   private val fileR = """[\s,]""".r
 
@@ -66,7 +63,7 @@ final class SgfDump(
   private def chapterUrl(studyId: Study.Id, chapterId: Chapter.Id) =
     s"${net.baseUrl}/study/$studyId/$chapterId"
 
-  private val dateFormat = DateTimeFormat `forPattern` "yyyy.MM.dd"
+  private val dateFormat = DateTimeFormat.forPattern("yyyy.MM.dd")
 
   private def makeTags(study: Study, chapter: Chapter): Tags = {
     val isGo = chapter.setup.variant.gameFamily == GameFamily.Go()
@@ -83,33 +80,33 @@ final class SgfDump(
         )
       ) ::: (
         chapter.setup.variant.gameFamily match {
-          case GameFamily.LinesOfAction() => //not currently used
+          case GameFamily.LinesOfAction() => // not currently used
             List(
               Tag(_.GM, 9),
-              Tag(_.SU, if (chapter.setup.variant.key == "linesOfAction") "Standard" else "Scrambled-eggs")
+              Tag(_.SU, if chapter.setup.variant.key == "linesOfAction" then "Standard" else "Scrambled-eggs")
             )
           case GameFamily.Shogi() =>
             List(
               Tag(_.GM, 8),
               Tag(_.SZ, chapter.setup.variant.toFairySF.boardSize.height),
-              Tag(_.SU, if (chapter.setup.variant.key == "shogi") "Standard" else "MiniShogi")
+              Tag(_.SU, if chapter.setup.variant.key == "shogi" then "Standard" else "MiniShogi")
             )
           case GameFamily.Xiangqi() =>
             List(
               Tag(_.GM, 7),
               Tag(_.SZ, chapter.setup.variant.toFairySF.boardSize.height),
-              Tag(_.SU, if (chapter.setup.variant.key == "xiangqi") "Standard" else "MiniXiangqi")
+              Tag(_.SU, if chapter.setup.variant.key == "xiangqi" then "Standard" else "MiniXiangqi")
             )
           case GameFamily.Flipello() =>
             List(Tag(_.GM, 2), Tag(_.SZ, chapter.setup.variant.toFairySF.boardSize.height))
-          case GameFamily.Amazons() => List(Tag(_.GM, 18))
+          case GameFamily.Amazons()            => List(Tag(_.GM, 18))
           case GameFamily.BreakthroughTroyka() =>
             List(
               Tag(_.GM, 41),
               Tag(_.SZ, chapter.setup.variant.toFairySF.boardSize.height),
               Tag(
                 _.SU,
-                if (chapter.setup.variant.key == "breakthroughtroyka") "Standard" else "MiniBreakthrough"
+                if chapter.setup.variant.key == "breakthroughtroyka" then "Standard" else "MiniBreakthrough"
               )
             )
           case GameFamily.Go() =>
@@ -123,13 +120,13 @@ final class SgfDump(
           case GameFamily.Backgammon() =>
             List(
               Tag(_.GM, 6),
-              //Tag(_.RU, "Crawford"), // multipoint info
+              // Tag(_.RU, "Crawford"), // multipoint info
               Tag(_.CV, 1),
               Tag(_.CO, "n"),
               Tag.matchInfo(1, 1, 0, 0), // multipoint info
               Tag(
                 _.SU,
-                if (chapter.setup.variant.key == "backgammon") "Standard" else chapter.setup.variant.name
+                if chapter.setup.variant.key == "backgammon" then "Standard" else chapter.setup.variant.name
               )
             )
           case _ => List()
@@ -145,10 +142,8 @@ object SgfDump {
     line
       .drop(1)
       .foldLeft(Vector(line.take(1))) { case (turn, node) =>
-        if (turn.head.head.playedPlayerIndex != node.playedPlayerIndex)
-          Vector(node) +: turn
-        else
-          (turn.head :+ node) +: turn.tail
+        if turn.head.head.playedPlayerIndex != node.playedPlayerIndex then Vector(node) +: turn
+        else (turn.head :+ node) +: turn.tail
       }
       .reverse
       .map(t => t.map(_.move.uci.uci))

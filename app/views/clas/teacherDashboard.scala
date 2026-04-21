@@ -1,14 +1,14 @@
 package views.html.clas
 
 import lila.api.Context
-import lila.app.templating.Environment._
-import lila.app.ui.ScalatagsTemplate._
+import lila.app.templating.Environment.*
+import lila.app.ui.ScalatagsTemplate.*
 import lila.clas.{ Clas, ClasInvite, ClasProgress, Student }
 import lila.common.String.html.richText
 import lila.rating.PerfType
 import lila.user.User
 
-import strategygames.{ Player => PlayerIndex }
+import strategygames.Player as PlayerIndex
 
 object teacherDashboard {
 
@@ -17,7 +17,7 @@ object teacherDashboard {
       students: List[Student.WithUser],
       active: String
   )(modifiers: Modifier*)(implicit ctx: Context) =
-    bits.layout(c.name, Left(c `withStudents` students.map(_.student)))(
+    bits.layout(c.name, Left(c.withStudents(students.map(_.student))))(
       cls := s"clas-show dashboard dashboard-teacher dashboard-teacher-$active",
       div(cls := "clas-show__top")(
         h1(dataIcon := "f", cls := "text")(c.name),
@@ -25,7 +25,7 @@ object teacherDashboard {
           a(cls := active.active("overview"), href := routes.Clas.show(c.id.value))("Overview"),
           a(cls := active.active("wall"), href := routes.Clas.wall(c.id.value))("News"),
           a(
-            cls := active.active("progress"),
+            cls  := active.active("progress"),
             href := routes.Clas.progress(c.id.value, "blitz", 7)
           )(trans.clas.progress()),
           a(cls := active.active("edit"), href := routes.Clas.edit(c.id.value))(trans.edit()),
@@ -52,20 +52,18 @@ object teacherDashboard {
   )(implicit ctx: Context) =
     layout(c, students, "overview")(
       div(cls := "clas-show__overview")(
-        c.desc.trim.nonEmpty `option` div(cls := "clas-show__desc")(richText(c.desc)),
+        c.desc.trim.nonEmpty.option(div(cls := "clas-show__desc")(richText(c.desc))),
         div(cls := "clas-show__overview__manage")(
           clas.teachers(c),
           a(
-            href := routes.Clas.studentForm(c.id.value),
-            cls := "button button-clas text",
+            href     := routes.Clas.studentForm(c.id.value),
+            cls      := "button button-clas text",
             dataIcon := "O"
           )(trans.clas.addStudent())
         )
       ),
-      if (students.isEmpty)
-        p(cls := "box__pad students__empty")(trans.clas.noStudents())
-      else
-        studentList(c, students)
+      if students.isEmpty then p(cls := "box__pad students__empty")(trans.clas.noStudents())
+      else studentList(c, students)
     )
 
   def students(
@@ -74,10 +72,9 @@ object teacherDashboard {
       invites: List[ClasInvite]
   )(implicit ctx: Context) =
     layout(c, all.filter(_.student.isActive), "students") {
-      val archived = all.filter(_.student.isArchived)
+      val archived  = all.filter(_.student.isArchived)
       val inviteBox =
-        if (invites.isEmpty)
-          div(cls := "box__pad invites__empty")(h2(trans.clas.nbPendingInvitations(0)))
+        if invites.isEmpty then div(cls := "box__pad invites__empty")(h2(trans.clas.nbPendingInvitations(0)))
         else
           div(cls := "box__pad invites")(
             h2(trans.clas.nbPendingInvitations.pluralSame(invites.size)),
@@ -88,7 +85,7 @@ object teacherDashboard {
                     td(userIdLink(i.userId.some)),
                     td(i.realName),
                     td(
-                      if (i.accepted `has` false) "Declined" else "Pending"
+                      if i.accepted.has(false) then "Declined" else "Pending"
                     ),
                     td(momentFromNow(i.created.at)),
                     td(
@@ -102,8 +99,7 @@ object teacherDashboard {
             )
           )
       val archivedBox =
-        if (archived.isEmpty)
-          div(cls := "box__pad students__empty")(h2(trans.clas.noRemovedStudents()))
+        if archived.isEmpty then div(cls := "box__pad students__empty")(h2(trans.clas.noRemovedStudents()))
         else
           div(cls := "box__pad")(
             h2(trans.clas.removedStudents()),
@@ -143,8 +139,8 @@ object teacherDashboard {
                 trans.clas.variantXOverLastY(progress.perfType.trans, trans.nbDays.txt(progress.days)),
                 dataSortNumberTh(trans.rating()),
                 dataSortNumberTh(trans.clas.progress()),
-                dataSortNumberTh(if (progress.isPuzzle) trans.puzzles() else trans.games()),
-                if (progress.isPuzzle) dataSortNumberTh(trans.clas.winrate())
+                dataSortNumberTh(if progress.isPuzzle then trans.puzzles() else trans.games()),
+                if progress.isPuzzle then dataSortNumberTh(trans.clas.winrate())
                 else dataSortNumberTh(trans.clas.timePlaying())
               )
             ),
@@ -160,7 +156,7 @@ object teacherDashboard {
                     ratingProgress(prog.ratingProgress) | trans.clas.na.txt()
                   ),
                   td(prog.nb),
-                  if (progress.isPuzzle) td(dataSort := prog.winRate)(prog.winRate, "%")
+                  if progress.isPuzzle then td(dataSort := prog.winRate)(prog.winRate, "%")
                   else td(dataSort := prog.millis)(showPeriod(prog.period))
                 )
               }
@@ -222,7 +218,7 @@ object teacherDashboard {
         div(cls := "progress-choices")(
           (PerfType.standard ::: PerfType.allPuzzle).map { pt =>
             a(
-              cls := progress.map(_.perfType.key.active(pt.key)),
+              cls  := progress.map(_.perfType.key.active(pt.key)),
               href := routes.Clas.progress(c.id.value, pt.key, progress.fold(7)(_.days))
             )(pt.trans)
           },
@@ -237,7 +233,7 @@ object teacherDashboard {
           div(cls := "progress-choices")(
             List(1, 2, 3, 7, 10, 14, 21, 30, 60, 90).map { days =>
               a(
-                cls := p.days.toString.active(days.toString),
+                cls  := p.days.toString.active(days.toString),
                 href := routes.Clas.progress(c.id.value, p.perfType.key, days)
               )(days)
             }
@@ -270,8 +266,8 @@ object teacherDashboard {
               td(user.perfs.perfsPuzzleMap.values.map(_.nb).sum.localize),
               td(dataSort := user.seenAt.map(_.getMillis.toString))(user.seenAt.map(momentFromNowOnce)),
               td(
-                dataSort := (if (student.managed) 1 else 0),
-                student.managed `option` iconTag("5")(title := trans.clas.managed.txt())
+                dataSort := (if student.managed then 1 else 0),
+                student.managed.option(iconTag("5")(title := trans.clas.managed.txt()))
               )
             )
           }

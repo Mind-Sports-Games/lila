@@ -9,7 +9,7 @@ final class Range[A] private (val a: Option[A], val b: Option[A]) {
 
 object Range {
 
-  import play.api.libs.json._
+  import play.api.libs.json.*
 
   implicit def rangeJsonWriter[A: Writes]: Writes[Range[A]] =
     Writes[Range[A]] { r =>
@@ -19,7 +19,7 @@ object Range {
   def apply[A](a: Option[A], b: Option[A])(implicit o: Ordering[A]): Range[A] =
     (a, b) match {
       case (Some(aa), Some(bb)) =>
-        if (o.lt(aa, bb)) new Range(a, b)
+        if o.lt(aa, bb) then new Range(a, b)
         else new Range(b, a)
       case (x, y) => new Range(x, y)
     }

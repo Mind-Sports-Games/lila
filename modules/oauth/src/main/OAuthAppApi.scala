@@ -1,16 +1,16 @@
 package lila.oauth
 
-import lila.db.dsl._
+import lila.db.dsl.*
 import lila.user.User
 
 final class OAuthAppApi(colls: OauthColls)(implicit ec: scala.concurrent.ExecutionContext) {
 
   import OAuthApp.{ AppBSONHandler, AppIdHandler }
-  import OAuthApp.{ BSONFields => F }
+  import OAuthApp.BSONFields as F
 
   def mine(u: User): Fu[List[OAuthApp]] =
     colls.app {
-      _.find($doc(F.author -> u.id)).sort($sort `desc` F.createdAt).cursor[OAuthApp]().list(30)
+      _.find($doc(F.author -> u.id)).sort($sort.desc(F.createdAt)).cursor[OAuthApp]().list(30)
     }
 
   def create(app: OAuthApp) = colls.app(_.insert.one(app).void)
@@ -30,7 +30,7 @@ final class OAuthAppApi(colls: OauthColls)(implicit ec: scala.concurrent.Executi
       import OAuthApp.AppBSONHandler
       colls.token {
         _.aggregateWith[Bdoc]() { implicit framework =>
-          import framework._
+          import framework.*
           List(
             Match($doc("user_id" -> user.id)),
             Sort(Descending("used_at")),
@@ -48,12 +48,12 @@ final class OAuthAppApi(colls: OauthColls)(implicit ec: scala.concurrent.Executi
         }
           .collect[List](maxDocs = 100)
           .map { docs =>
-          for {
-            doc   <- docs
-            token <- AccessToken.AccessTokenBSONHandler.readOpt(doc)
-            app   <- doc.getAsOpt[List[OAuthApp]]("app").so(_.headOption)
-          } yield AccessToken.WithApp(token, app)
-        }
+            for {
+              doc   <- docs
+              token <- AccessToken.AccessTokenBSONHandler.readOpt(doc)
+              app   <- doc.getAsOpt[List[OAuthApp]]("app").so(_.headOption)
+            } yield AccessToken.WithApp(token, app)
+          }
       }
     }
 
@@ -67,7 +67,7 @@ final class OAuthAppApi(colls: OauthColls)(implicit ec: scala.concurrent.Executi
 
   def update(from: OAuthApp)(f: OAuthApp => OAuthApp): Fu[OAuthApp] = {
     val app = f(from)
-    if (app == from) fuccess(app)
+    if app == from then fuccess(app)
     else colls.app(_.update.one($doc(F.clientId -> app.clientId), app)) inject app
   }
 

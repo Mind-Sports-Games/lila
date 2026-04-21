@@ -1,16 +1,15 @@
 package views.html
 package appeal
 
-
 import lila.api.Context
-import lila.app.templating.Environment._
-import lila.app.ui.ScalatagsTemplate._
+import lila.app.templating.Environment.*
+import lila.app.ui.ScalatagsTemplate.*
 import lila.user.User
 
 object tree {
 
   import trans.contact.doNotMessageModerators
-  import views.html.base.navTree._
+  import views.html.base.navTree.*
 
   private def cleanMenu(implicit ctx: Context): Branch =
     Branch(
@@ -101,7 +100,7 @@ object tree {
   }
 
   private def boostMenu(implicit ctx: Context): Branch = {
-    val accept = "I accept that I manipulated my rating."
+    val accept     = "I accept that I manipulated my rating."
     val acceptFull =
       "I accept that I deliberately manipulated my rating by losing games on purpose, or by playing another account that was deliberately losing games. I am sorry and I would like another chance."
     val deny =
@@ -136,7 +135,7 @@ object tree {
   }
 
   private def muteMenu(implicit ctx: Context): Branch = {
-    val accept = "I accept that I have not followed the communication guidelines"
+    val accept     = "I accept that I have not followed the communication guidelines"
     val acceptFull =
       "I accept that I have not followed the communication guidelines. I will behave better in future, please give me another chance."
     val deny =
@@ -239,18 +238,18 @@ object tree {
 
   def apply(me: User, playban: Boolean)(implicit ctx: Context) =
     bits.layout("Appeal a moderation decision") {
-      val query = if (isGranted(_.Appeals)) ctx.req.queryString.toMap else Map.empty[String, Seq[String]]
+      val query = if isGranted(_.Appeals) then ctx.req.queryString.toMap else Map.empty[String, Seq[String]]
       main(cls := "page page-small box box-pad appeal")(
         h1("Appeal"),
         div(cls := "nav-tree")(
-          if (me.disabled || query.contains("alt")) altScreen
+          if me.disabled || query.contains("alt") then altScreen
           else
             renderNode(
               {
-                if (playban || query.contains("playban")) playbanMenu
-                else if (me.marks.engine || query.contains("engine")) engineMenu
-                else if (me.marks.boost || query.contains("boost")) boostMenu
-                else if (me.marks.troll || query.contains("shadowban")) muteMenu
+                if playban || query.contains("playban") then playbanMenu
+                else if me.marks.engine || query.contains("engine") then engineMenu
+                else if me.marks.boost || query.contains("boost") then boostMenu
+                else if me.marks.troll || query.contains("shadowban") then muteMenu
                 else cleanMenu
               },
               none

@@ -1,13 +1,13 @@
 package lila.plan
 
-import com.softwaremill.macwire._
+import com.softwaremill.macwire.*
 import lila.common.autoconfig.{ AutoConfig, ConfigName }
-import com.softwaremill.tagging._
+import com.softwaremill.tagging.*
 import play.api.Configuration
 import play.api.libs.ws.StandaloneWSClient
-import scala.concurrent.duration._
+import scala.concurrent.duration.*
 
-import lila.common.config._
+import lila.common.config.*
 
 @Module
 private class PlanConfig(
@@ -85,11 +85,11 @@ final class Env(
     new lila.common.Cli {
       def process = {
         case "patron" :: "lifetime" :: user :: Nil =>
-          userRepo `named` user flatMap { _ so api.setLifetime } inject "ok"
+          userRepo.named(user) flatMap { _ so api.setLifetime } inject "ok"
         case "patron" :: "month" :: user :: Nil =>
-          userRepo `named` user flatMap { _ so api.giveMonth } inject "ok"
+          userRepo.named(user) flatMap { _ so api.giveMonth } inject "ok"
         case "patron" :: "remove" :: user :: Nil =>
-          userRepo `named` user flatMap { _ so api.remove } inject "ok"
+          userRepo.named(user) flatMap { _ so api.remove } inject "ok"
       }
     }
 }

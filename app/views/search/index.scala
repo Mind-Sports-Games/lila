@@ -3,14 +3,13 @@ package views.html.search
 import play.api.data.Form
 
 import lila.api.Context
-import lila.app.templating.Environment._
-import lila.app.ui.ScalatagsTemplate._
+import lila.app.templating.Environment.*
+import lila.app.ui.ScalatagsTemplate.*
 import lila.common.paginator.Paginator
-
 
 object index {
 
-  import trans.search._
+  import trans.search.*
 
   def apply(form: Form[?], paginator: Option[Paginator[lila.game.Game]] = None, nbGames: Long)(implicit
       ctx: Context
@@ -28,7 +27,7 @@ object index {
         h1(advancedSearch()),
         st.form(
           noFollow,
-          cls := "box__pad search__form",
+          cls    := "box__pad search__form",
           action := s"${routes.Search.index()}#results",
           method := "GET"
         )(commons.dataReqs)(
@@ -74,7 +73,7 @@ object index {
           paginator.map { pager =>
             val permalink =
               a(cls := "permalink", href := routes.Search.index(), noFollow)("Permalink")
-            if (pager.nbResults > 0)
+            if pager.nbResults > 0 then
               frag(
                 div(cls := "search__status box__pad")(
                   strong(xGamesFound(pager.nbResults.localize, pager.nbResults)),

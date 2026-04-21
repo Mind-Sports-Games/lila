@@ -1,7 +1,6 @@
 package views.html
 package coach
 
-
 object show {
   /*
   import trans.coach._

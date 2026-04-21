@@ -4,13 +4,12 @@ package auth
 import play.api.data.Form
 
 import lila.api.Context
-import lila.app.templating.Environment._
-import lila.app.ui.ScalatagsTemplate._
-
+import lila.app.templating.Environment.*
+import lila.app.ui.ScalatagsTemplate.*
 
 object login {
 
-  import trans.tfa._
+  import trans.tfa.*
 
   def apply(form: Form[?], referrer: Option[String])(implicit ctx: Context) =
     views.html.base.layout(
@@ -24,10 +23,10 @@ object login {
       main(cls := "auth auth-login box box-pad")(
         h1(trans.signIn()),
         postForm(
-          cls := "form3",
+          cls    := "form3",
           action := s"${routes.Auth.authenticate}${referrer.fold("") { ref =>
-            s"?referrer=${urlencode(ref)}"
-          }}"
+              s"?referrer=${urlencode(ref)}"
+            }}"
         )(
           div(cls := "one-factor")(
             form3.globalError(form),

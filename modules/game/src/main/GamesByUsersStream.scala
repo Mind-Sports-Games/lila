@@ -1,7 +1,7 @@
 package lila.game
 
-import akka.stream.scaladsl._
-import play.api.libs.json._
+import akka.stream.scaladsl.*
+import play.api.libs.json.*
 
 import actorApi.{ FinishGame, StartGame }
 import strategygames.{ ByoyomiClock, Clock }
@@ -53,7 +53,7 @@ final class GamesByUsersStream(gameRepo: lila.game.GameRepo)(implicit
           "perf"      -> PerfPicker.key(g),
           "createdAt" -> g.createdAt,
           "status"    -> g.status.id,
-          "players" -> JsObject(g.players map { p =>
+          "players"   -> JsObject(g.players map { p =>
             p.playerIndex.name -> Json
               .obj(
                 "userId" -> p.userId,

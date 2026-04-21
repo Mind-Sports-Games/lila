@@ -19,7 +19,7 @@ final private[setup] class Processor(
       sid: Option[String],
       blocking: Set[String]
   )(using ctx: UserContext): Fu[Processor.HookResult] = {
-    import Processor.HookResult._
+    import Processor.HookResult.*
     val config = configBase.fixPlayerIndex
     config.hook(sri, ctx.me, sid, blocking) match {
       case Left(hook) =>
@@ -29,7 +29,7 @@ final private[setup] class Processor(
         }
       case Right(Some(seek)) =>
         ctx.userId.so(gameCache.nbPlaying) dmap { nbPlaying =>
-          if (maxPlaying <= nbPlaying) Refused
+          if maxPlaying <= nbPlaying then Refused
           else {
             Bus.publish(AddSeek(seek), "lobbyTrouper")
             Created(seek.id)
@@ -45,7 +45,7 @@ final private[setup] class Processor(
       sid: Option[String],
       blocking: Set[String]
   )(using ctx: UserContext): Fu[Processor.HookResult] = {
-    import Processor.HookResult._
+    import Processor.HookResult.*
     val config = configBase.toHookConfig.fixPlayerIndex
     config.hook(sri, ctx.me, sid, blocking) match {
       case Left(hook) =>
@@ -55,7 +55,7 @@ final private[setup] class Processor(
         }
       case Right(Some(seek)) =>
         ctx.userId.so(gameCache.nbPlaying) dmap { nbPlaying =>
-          if (maxPlaying <= nbPlaying) Refused
+          if maxPlaying <= nbPlaying then Refused
           else {
             Bus.publish(AddSeek(seek), "lobbyTrouper")
             Created(seek.id)

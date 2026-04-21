@@ -133,7 +133,7 @@ object LameName {
     list
       .map {
         _.map(l => subs.getOrElse(l, l.toString)).iterator.map(l => s"$l$interspersed").mkString
-    }
+      }
       .mkString("|")
       .r
   }

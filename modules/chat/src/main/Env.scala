@@ -1,11 +1,11 @@
 package lila.chat
 
-import com.softwaremill.macwire._
+import com.softwaremill.macwire.*
 import lila.common.autoconfig.{ AutoConfig, ConfigName }
 import play.api.Configuration
 import scala.concurrent.duration.FiniteDuration
 
-import lila.common.config._
+import lila.common.config.*
 
 private case class ChatConfig(
     @ConfigName("collection.chat") chatColl: CollName,
@@ -31,7 +31,7 @@ final class Env(
 ) {
 
   private val config = appConfig.get[ChatConfig]("chat")(using AutoConfig.loader)
-  import config._
+  import config.*
 
   lazy val timeout = new ChatTimeout(
     coll = db(timeoutColl),

@@ -1,7 +1,7 @@
 package lila.hub
 
-import akka.actor._
-import com.softwaremill.macwire._
+import akka.actor.*
+import com.softwaremill.macwire.*
 import com.typesafe.config.Config
 import play.api.Configuration
 
@@ -30,7 +30,7 @@ final class Env(
     system: ActorSystem
 ) {
 
-  import actors._
+  import actors.*
 
   private val config = appConfig.get[Config]("hub")
 

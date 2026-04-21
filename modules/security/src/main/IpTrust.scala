@@ -5,12 +5,12 @@ import lila.common.IpAddress
 final class IpTrust(proxyApi: Ip2Proxy, geoApi: GeoIP, torApi: Tor, firewallApi: Firewall) {
 
   def isSuspicious(ip: IpAddress): Fu[Boolean] =
-    if (firewallApi `blocksIp` ip) fuTrue
-    else if (torApi `isExitNode` ip) fuTrue
+    if firewallApi.blocksIp(ip) then fuTrue
+    else if torApi.isExitNode(ip) then fuTrue
     else {
-      val location = geoApi `orUnknown` ip
-      if (location == Location.unknown || location == Location.tor) fuTrue
-      else if (isUndetectedProxy(location)) fuTrue
+      val location = geoApi.orUnknown(ip)
+      if location == Location.unknown || location == Location.tor then fuTrue
+      else if isUndetectedProxy(location) then fuTrue
       else proxyApi(ip)
     }
 
@@ -24,7 +24,7 @@ final class IpTrust(proxyApi: Ip2Proxy, geoApi: GeoIP, torApi: Tor, firewallApi:
         case Location("Poland", Some("Subcarpathian Voivodeship"), Some("Stalowa Wola")) => true
         case Location("Poland", Some("Lesser Poland Voivodeship"), Some("Krakow"))       => true
         case Location("Russia", Some(region), Some("Ufa" | "Sterlitamak"))
-            if region `contains` "Bashkortostan" =>
+            if region.contains("Bashkortostan") =>
           true
         case _ => false
       })

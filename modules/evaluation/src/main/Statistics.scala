@@ -62,7 +62,7 @@ object Statistics {
   def moderatelyConsistentPlyTimes(pov: lila.game.Pov): Boolean =
     plyTimeCoefVariation(pov) so { cvIndicatesModeratelyFlatTimes(_) }
 
-  private val fastPly = Centis(50)
+  private val fastPly                          = Centis(50)
   def noFastPlies(pov: lila.game.Pov): Boolean = {
     val plyTimes = ~pov.game.plyTimes(pov.playerIndex)
     plyTimes.count(fastPly >) <= (plyTimes.size / 20) + 2

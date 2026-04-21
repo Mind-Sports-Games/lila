@@ -1,6 +1,6 @@
 package lila.evaluation
 
-import cats.implicits._
+import cats.implicits.*
 import scala.math.sqrt
 
 import lila.user.User
@@ -9,8 +9,8 @@ case class PlayerAggregateAssessment(
     user: User,
     playerAssessments: List[PlayerAssessment]
 ) {
-  import Statistics._
-  import AccountAction._
+  import Statistics.*
+  import AccountAction.*
   import GameAssessment.{ Cheating, LikelyCheating }
 
   def action: AccountAction = {
@@ -26,7 +26,7 @@ case class PlayerAggregateAssessment(
       (scoreCheatingGames(8) || scoreLikelyCheatingGames(16))
 
     val reportable: Boolean = isWorthLookingAt &&
-      (cheatingSum >= 2 || cheatingSum + likelyCheatingSum >= (if (isNewRatedUser) 2
+      (cheatingSum >= 2 || cheatingSum + likelyCheatingSum >= (if isNewRatedUser then 2
                                                                else 4)) &&
       (scoreCheatingGames(5) || scoreLikelyCheatingGames(10))
 
@@ -42,19 +42,18 @@ case class PlayerAggregateAssessment(
     )
 
     val actionable: Boolean = {
-      val difFlags = difs map (sigDif(10)).tupled
+      val difFlags = difs map sigDif(10).tupled
       difFlags.forall(_.isEmpty) || difFlags.exists(~_) || assessmentsCount < 50
     }
 
-    if (actionable)
-      if (markable && bannable) EngineAndBan
-      else if (markable) reportVariousReasons //Engine
-      else if (reportable) reportVariousReasons
+    if actionable then
+      if markable && bannable then EngineAndBan
+      else if markable then reportVariousReasons // Engine
+      else if reportable then reportVariousReasons
       else Nothing
-    else
-      if (markable) reportVariousReasons
-      else if (reportable) reportVariousReasons
-      else Nothing
+    else if markable then reportVariousReasons
+    else if reportable then reportVariousReasons
+    else Nothing
   }
 
   def countAssessmentValue(assessment: GameAssessment) =
@@ -71,8 +70,8 @@ case class PlayerAggregateAssessment(
 
   def weightedAssessmentValue(assessment: GameAssessment): Double =
     playerAssessments map { pa =>
-      if (pa.assessment != assessment) 0.0
-      else pa.tcFactor.getOrElse(1.0) * (if (pa.flags.highlyConsistentPlyTimes) 1.6 else 1.0)
+      if pa.assessment != assessment then 0.0
+      else pa.tcFactor.getOrElse(1.0) * (if pa.flags.highlyConsistentPlyTimes then 1.6 else 1.0)
     } sum
 
   val weightedCheatingSum       = weightedAssessmentValue(Cheating)
@@ -82,7 +81,7 @@ case class PlayerAggregateAssessment(
   def sfAvgGiven(predicate: PlayerAssessment => Boolean): Option[(Int, Int, Int)] = {
     val filteredAssessments = playerAssessments.filter(predicate)
     val n                   = filteredAssessments.size
-    if (n < 2) none
+    if n < 2 then none
     else {
       val filteredSfAvg = filteredAssessments.map(_.analysis.avg)
       val avg           = listAverage(filteredSfAvg)

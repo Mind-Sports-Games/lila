@@ -10,11 +10,11 @@ object UserLagCache {
     .build[String, Centis]()
 
   def put(userId: String, lag: Centis): Unit =
-    if (lag.centis >= 0)
+    if lag.centis >= 0 then
       cache.put(
         userId,
         cache.getIfPresent(userId).fold(lag) {
-          _ `avg` lag
+          _.avg(lag)
         }
       )
 

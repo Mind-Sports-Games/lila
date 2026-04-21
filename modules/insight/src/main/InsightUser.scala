@@ -1,9 +1,9 @@
 package lila.insight
 
 import org.joda.time.DateTime
-import reactivemongo.api.bson._
+import reactivemongo.api.bson.*
 
-import lila.db.dsl._
+import lila.db.dsl.*
 import lila.db.AsyncColl
 import lila.user.User
 

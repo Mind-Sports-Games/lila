@@ -2,7 +2,7 @@ package lila.memo
 
 import akka.actor.ActorSystem
 import com.github.benmanes.caffeine
-import com.github.blemale.scaffeine._
+import com.github.blemale.scaffeine.*
 import play.api.Mode
 import scala.concurrent.ExecutionContext
 
@@ -10,7 +10,7 @@ final class CacheApi(
     mode: Mode
 )(implicit ec: ExecutionContext, system: ActorSystem) {
 
-  import CacheApi._
+  import CacheApi.*
 
   def scaffeine: Builder = CacheApi.scaffeine(mode)
 
@@ -39,7 +39,7 @@ final class CacheApi(
       expireAfter: Syncache.ExpireAfter
   ): Syncache[K, V] = {
     val actualCapacity =
-      if (mode != Mode.Prod) math.sqrt(initialCapacity.toDouble).toInt `atLeast` 1
+      if mode != Mode.Prod then math.sqrt(initialCapacity.toDouble).toInt.atLeast(1)
       else initialCapacity
     val cache = new Syncache(name, actualCapacity, compute, default, strategy, expireAfter)
     monitor(name, cache.cache)
@@ -76,7 +76,7 @@ final class CacheApi(
     startMonitor(name, cache)
 
   def actualCapacity(c: Int) =
-    if (mode != Mode.Prod) math.sqrt(c.toDouble).toInt `atLeast` 1
+    if mode != Mode.Prod then math.sqrt(c.toDouble).toInt.atLeast(1)
     else c
 }
 
@@ -84,7 +84,7 @@ object CacheApi {
 
   private[memo] type Builder = Scaffeine[Any, Any]
 
-  def scaffeine(mode: Mode): Builder = lila.common.LilaCache `scaffeine` mode
+  def scaffeine(mode: Mode): Builder = lila.common.LilaCache.scaffeine(mode)
 
   def scaffeineNoScheduler: Builder = Scaffeine()
 
@@ -107,12 +107,12 @@ object CacheApi {
 
 final class BeafedAsync[K, V](val cache: AsyncCache[K, V]) extends AnyVal {
 
-  def invalidate(key: K): Unit = cache.underlying.synchronous `invalidate` key
+  def invalidate(key: K): Unit = cache.underlying.synchronous.invalidate(key)
   def invalidateAll(): Unit    = cache.underlying.synchronous.invalidateAll()
 
   def update(key: K, f: V => V): Unit =
     cache.getIfPresent(key) foreach { v =>
-      cache.put(key, v `dmap` f)
+      cache.put(key, v.dmap(f))
     }
 }
 

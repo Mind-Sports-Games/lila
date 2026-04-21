@@ -2,10 +2,10 @@ package lila.security
 
 import org.joda.time.DateTime
 import reactivemongo.api.ReadPreference
-import reactivemongo.api.bson._
+import reactivemongo.api.bson.*
 
 import lila.common.{ EmailAddress, IpAddress }
-import lila.db.dsl._
+import lila.db.dsl.*
 import lila.user.{ User, UserRepo }
 
 case class UserLogins(
@@ -39,12 +39,12 @@ final class UserLoginsApi(
     printBan: PrintBan
 )(implicit ec: scala.concurrent.ExecutionContext) {
 
-  import UserLogins._
+  import UserLogins.*
 
   def apply(user: User, maxOthers: Int): Fu[UserLogins] =
     store.chronoInfoByUser(user) flatMap { infos =>
-      val ips = distinctRecent(infos.map(_.datedIp))
-      val fps = distinctRecent(infos.flatMap(_.datedFp))
+      val ips                                          = distinctRecent(infos.map(_.datedIp))
+      val fps                                          = distinctRecent(infos.flatMap(_.datedFp))
       val fpClients: Map[FingerHash, UserAgent.Client] = infos.view.flatMap { i =>
         i.fp map { fp =>
           fp -> i.ua.client
@@ -70,8 +70,8 @@ final class UserLoginsApi(
             ips = ips.map { ip =>
               IPData(
                 ip,
-                firewall `blocksIp` ip.value,
-                geoIP `orUnknown` ip.value,
+                firewall.blocksIp(ip.value),
+                geoIP.orUnknown(ip.value),
                 proxies(ip.value),
                 Alts(othersByIp.getOrElse(ip.value, Set.empty)),
                 ipClients.getOrElse(ip.value, Set.empty)
@@ -80,7 +80,7 @@ final class UserLoginsApi(
             prints = fps.map { fp =>
               FPData(
                 fp,
-                printBan `blocks` fp.value,
+                printBan.blocks(fp.value),
                 Alts(othersByFp.getOrElse(fp.value, Set.empty)),
                 fpClients.getOrElse(fp.value, UserAgent.Client.PC)
               )
@@ -102,7 +102,7 @@ final class UserLoginsApi(
   ): Fu[List[OtherUser]] =
     ipSet.nonEmpty so store.coll
       .aggregateWith[Bdoc](readPreference = ReadPreference.secondaryPreferred) { implicit framework =>
-        import framework._
+        import framework.*
         import FingerHash.fingerHashHandler
         List(
           Match(
@@ -190,7 +190,7 @@ object UserLogins {
       .foldLeft(Map.empty[V, DateTime]) {
         case (acc, Dated(v, _)) if acc.contains(v) => acc
         case (acc, Dated(v, date))                 => acc + (v -> date)
-    }
+      }
       .view
       .map { case (v, date) => Dated(v, date) }
 
@@ -201,7 +201,7 @@ object UserLogins {
     lazy val alts     = users.count(_.marks.alt)
     lazy val closed   = users.count(u => u.disabled && u.marks.clean)
     lazy val cleans   = users.count(u => u.enabled && u.marks.clean)
-    def score =
+    def score         =
       (boosters * 10 + engines * 10 + trolls * 10 + alts * 10 + closed * 2 + cleans) match {
         case 0 => -999999 // rank empty alts last
         case n => n

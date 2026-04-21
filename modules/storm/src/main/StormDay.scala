@@ -6,7 +6,7 @@ import lila.common.Bus
 import lila.common.config.MaxPerPage
 import lila.common.Day
 import lila.common.paginator.Paginator
-import lila.db.dsl._
+import lila.db.dsl.*
 import lila.db.paginator.Adapter
 import lila.user.User
 import lila.user.UserRepo
@@ -26,7 +26,7 @@ case class StormDay(
 ) {
 
   def add(run: StormForm.RunData) = {
-    if (run.score > score)
+    if run.score > score then
       copy(
         score = run.score,
         moves = run.moves,
@@ -46,8 +46,8 @@ object StormDay {
   case class Id(userId: User.ID, day: Day)
   object Id {
     def today(userId: User.ID)     = Id(userId, Day.today)
-    def lastWeek(userId: User.ID)  = Id(userId, Day `daysAgo` 7)
-    def lastMonth(userId: User.ID) = Id(userId, Day `daysAgo` 30)
+    def lastWeek(userId: User.ID)  = Id(userId, Day.daysAgo(7))
+    def lastMonth(userId: User.ID) = Id(userId, Day.daysAgo(30))
     def allTime(userId: User.ID)   = Id(userId, Day(0))
   }
 
@@ -58,21 +58,21 @@ final class StormDayApi(coll: Coll, highApi: StormHighApi, userRepo: UserRepo, s
     ctx: ExecutionContext
 ) {
 
-  import StormDay._
-  import StormBsonHandlers._
+  import StormDay.*
+  import StormBsonHandlers.*
 
   def addRun(data: StormForm.RunData, user: Option[User]): Fu[Option[StormHigh.NewHigh]] = {
     val _ = lila.mon.storm.run.score(user.isDefined).record(data.score)
     user so { u =>
-      if (sign.check(u, ~data.signed)) {
+      if sign.check(u, ~data.signed) then {
         Bus.publish(lila.hub.actorApi.puzzle.StormRun(u.id, data.score), "stormRun")
-        highApi `get` u.id flatMap { prevHigh =>
-          val todayId = Id `today` u.id
+        highApi.get(u.id) flatMap { prevHigh =>
+          val todayId = Id.today(u.id)
           coll
             .one[StormDay]($id(todayId))
             .map {
-              _.getOrElse(StormDay `empty` todayId) `add` data
-          }
+              _.getOrElse(StormDay.empty(todayId)).add(data)
+            }
             .flatMap { day =>
               coll.update.one($id(day._id), day, upsert = true)
             }
@@ -81,10 +81,9 @@ final class StormDayApi(coll: Coll, highApi: StormHighApi, userRepo: UserRepo, s
               userRepo.addStormRun(u.id, data.score) inject high
             }
         }
-      }
-      else {
-        if (data.time > 40) {
-          if (data.score > 99) logger.warn(s"badly signed run from ${u.username} $data")
+      } else {
+        if data.time > 40 then {
+          if data.score > 99 then logger.warn(s"badly signed run from ${u.username} $data")
           lila.mon.storm.run
             .sign(data.signed match {
               case None              => "missing"
@@ -105,7 +104,7 @@ final class StormDayApi(coll: Coll, highApi: StormHighApi, userRepo: UserRepo, s
         collection = coll,
         selector = idRegexFor(userId),
         projection = none,
-        sort = $sort `desc` "_id"
+        sort = $sort.desc("_id")
       ),
       page,
       MaxPerPage(30)
@@ -114,7 +113,7 @@ final class StormDayApi(coll: Coll, highApi: StormHighApi, userRepo: UserRepo, s
   def apiHistory(userId: User.ID, days: Int): Fu[List[StormDay]] =
     coll
       .find(idRegexFor(userId))
-      .sort($sort `desc` "_id")
+      .sort($sort.desc("_id"))
       .cursor[StormDay](ReadPreference.secondaryPreferred)
       .list(days)
 

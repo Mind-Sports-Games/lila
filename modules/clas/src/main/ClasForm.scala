@@ -1,7 +1,7 @@
 package lila.clas
 
-import play.api.data._
-import play.api.data.Forms._
+import play.api.data.*
+import play.api.data.Forms.*
 
 import lila.common.Form.{ cleanNonEmptyText, cleanText }
 import lila.common.extensions.*
@@ -13,14 +13,14 @@ final class ClasForm(
     nameGenerator: NameGenerator
 )(implicit ec: scala.concurrent.ExecutionContext) {
 
-  import ClasForm._
+  import ClasForm.*
 
   object clas {
 
     val form = Form(
       mapping(
-        "name" -> cleanText(minLength = 3, maxLength = 100),
-        "desc" -> cleanText(minLength = 0, maxLength = 2000),
+        "name"     -> cleanText(minLength = 3, maxLength = 100),
+        "desc"     -> cleanText(minLength = 0, maxLength = 2000),
         "teachers" -> nonEmptyText.verifying(
           "Invalid teacher list",
           str => {
@@ -36,10 +36,12 @@ final class ClasForm(
     def create = form
 
     def edit(c: Clas) =
-      form `fill` ClasData(
-        name = c.name,
-        desc = c.desc,
-        teachers = c.teachers.toList mkString "\n"
+      form.fill(
+        ClasData(
+          name = c.name,
+          desc = c.desc,
+          teachers = c.teachers.toList mkString "\n"
+        )
       )
 
     def wall = Form(single("wall" -> text))
@@ -59,11 +61,12 @@ final class ClasForm(
 
     def generate: Fu[Form[NewStudent]] =
       nameGenerator() map { username =>
-        create `fill`
+        create.fill(
           NewStudent(
             username = ~username,
             realName = ""
           )
+        )
       }
 
     def invite(c: Clas) =
@@ -82,7 +85,7 @@ final class ClasForm(
           "realName" -> cleanNonEmptyText,
           "notes"    -> text(maxLength = 20000)
         )(StudentData.apply)(d => Some((d.realName, d.notes)))
-      ) `fill` StudentData(s.realName, s.notes)
+      ).fill(StudentData(s.realName, s.notes))
 
     def release =
       Form(
@@ -103,7 +106,7 @@ final class ClasForm(
   }
 
   private def blockingFetchUser(username: String) =
-    lightUserAsync(User `normalize` username).await(1 second, "clasInviteUser")
+    lightUserAsync(User.normalize(username)).await(1 second, "clasInviteUser")
 }
 
 object ClasForm {

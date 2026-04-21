@@ -1,26 +1,26 @@
 package controllers
 
-import play.api.data._
-import play.api.data.Forms._
+import play.api.data.*
+import play.api.data.Forms.*
 
 import lila.api.Context
 import lila.api.GameApiV2
 import lila.app.*
 import lila.common.config
 import lila.common.HTTPRequest
-import lila.db.dsl._
+import lila.db.dsl.*
 import lila.user.Holder
 
 final class GameMod(env: Env)(implicit mat: akka.stream.Materializer) extends LilaController(env) {
 
-  import GameMod._
+  import GameMod.*
 
   def index(username: String) =
     SecureBody(_.Hunter) { implicit ctx => _ =>
-      OptionFuResult(env.user.repo `named` username) { user =>
+      OptionFuResult(env.user.repo.named(username)) { user =>
         implicit def req: play.api.mvc.Request[?] = ctx.body
-        val form         = filterForm.bindFromRequest()
-        val filter       = form.fold(_ => emptyFilter, identity)
+        val form                                  = filterForm.bindFromRequest()
+        val filter                                = form.fold(_ => emptyFilter, identity)
         env.tournament.leaderboardApi.recentByUser(user, 1) zip
           env.activity.read.recentSwissRanks(user.id) zip
           fetchGames(user, filter) flatMap { case ((arenas, swisses), povs) =>
@@ -36,7 +36,7 @@ final class GameMod(env: Env)(implicit mat: akka.stream.Materializer) extends Li
     filter.speed
       .flatMap(k => strategygames.Speed.all.find(_.key == k))
       .fold(env.game.gameRepo.recentPovsByUserFromSecondary(user, nbGames, select)) { speed =>
-        import akka.stream.scaladsl._
+        import akka.stream.scaladsl.*
         env.game.gameRepo
           .recentGamesByUserFromSecondaryCursor(user, select)
           .documentSource(10_000)
@@ -51,7 +51,7 @@ final class GameMod(env: Env)(implicit mat: akka.stream.Materializer) extends Li
 
   def post(username: String) =
     SecureBody(_.Hunter) { implicit ctx => me =>
-      OptionFuResult(env.user.repo `named` username) { user =>
+      OptionFuResult(env.user.repo.named(username)) { user =>
         implicit val body = ctx.body
         actionForm
           .bindFromRequest()
@@ -123,7 +123,8 @@ object GameMod {
       opponents: Option[String]
   ) {
     def opponentIds: List[lila.user.User.ID] =
-      opponents.getOrElse("")
+      opponents
+        .getOrElse("")
         .take(800)
         .replace(",", " ")
         .split(' ')

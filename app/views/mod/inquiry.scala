@@ -4,8 +4,8 @@ import cats.data.NonEmptyList
 import scala.util.matching.Regex
 
 import lila.api.Context
-import lila.app.templating.Environment._
-import lila.app.ui.ScalatagsTemplate._
+import lila.app.templating.Environment.*
+import lila.app.ui.ScalatagsTemplate.*
 import lila.common.String.html.richText
 import lila.report.Reason
 import lila.report.Report
@@ -20,16 +20,16 @@ object inquiry {
     commFlagRegex.replaceAllIn(
       text,
       m => {
-        val id = m.group("id")
+        val id   = m.group("id")
         val path = m.group("tpe") match {
           case "game" => routes.Round.watcher(id, "p1").url
-          //case "relay"      => routes.RelayRound.show("-", "-", id).url
+          // case "relay"      => routes.RelayRound.show("-", "-", id).url
           case "tournament" => routes.Tournament.show(id).url
           case "swiss"      => routes.Swiss.show(id).url
           case _            => s"/${m.group("tpe")}/$id"
         }
         val link     = a(href := s"$path")(path)
-        val userText = if (highlight) communication.highlightBad(m group "text") else frag(m group "text")
+        val userText = if highlight then communication.highlightBad(m group "text") else frag(m group "text")
         Regex.quoteReplacement(s"${link.render} ${userText.render}")
       }
     )
@@ -54,9 +54,11 @@ object inquiry {
       )
 
     def renderNote(r: lila.user.Note)(implicit ctx: Context) =
-      (!r.dox || isGranted(_.Admin)) `option` div(cls := "doc note")(
-        h3("by ", userIdLink(r.from.some, withOnline = false), ", ", momentFromNow(r.date)),
-        p(richText(r.text, expandImg = false))
+      (!r.dox || isGranted(_.Admin)).option(
+        div(cls := "doc note")(
+          h3("by ", userIdLink(r.from.some, withOnline = false), ", ", momentFromNow(r.date)),
+          p(richText(r.text, expandImg = false))
+        )
       )
 
     def autoNextInput = input(cls := "auto-next", tpe := "hidden", name := "next", value := "1")
@@ -78,29 +80,33 @@ object inquiry {
             in.allReports.map(renderReport)
           )
         ),
-        isGranted(_.ModLog) `option` div(
-          cls := List(
-            "dropper counter history" -> true,
-            "empty"                   -> in.history.isEmpty
-          )
-        )(
-          span(
-            countTag(in.history.size),
-            "Mod log"
-          ),
-          in.history.nonEmpty `option` div(
-            ul(
-              in.history.map { e =>
-                li(
-                  userIdLink(e.mod.some, withOnline = false),
-                  " ",
-                  b(e.showAction),
-                  " ",
-                  e.details,
-                  " ",
-                  momentFromNow(e.date)
+        isGranted(_.ModLog).option(
+          div(
+            cls := List(
+              "dropper counter history" -> true,
+              "empty"                   -> in.history.isEmpty
+            )
+          )(
+            span(
+              countTag(in.history.size),
+              "Mod log"
+            ),
+            in.history.nonEmpty.option(
+              div(
+                ul(
+                  in.history.map { e =>
+                    li(
+                      userIdLink(e.mod.some, withOnline = false),
+                      " ",
+                      b(e.showAction),
+                      " ",
+                      e.details,
+                      " ",
+                      momentFromNow(e.date)
+                    )
+                  }
                 )
-              }
+              )
             )
           )
         ),
@@ -117,7 +123,7 @@ object inquiry {
           div(
             postForm(cls := "note", action := s"${routes.User.writeNote(in.user.username)}?note")(
               textarea(name := "text", placeholder := "Write a mod note"),
-              input(tpe := "hidden", name := "mod", value := "true"),
+              input(tpe     := "hidden", name      := "mod", value := "true"),
               div(cls := "submission")(
                 submitButton(cls := "button thin")("SEND")
               )
@@ -134,19 +140,21 @@ object inquiry {
             "Games"
           )
         },
-        isGranted(_.Shadowban) `option`
-          a(href := routes.Mod.communicationPublic(in.user.id))("View", br, "Comms")
+        isGranted(_.Shadowban)
+          .option(a(href := routes.Mod.communicationPublic(in.user.id))("View", br, "Comms"))
       ),
       div(cls := "actions")(
-        isGranted(_.ModMessage) `option` div(cls := "dropper warn buttons")(
-          iconTag("e"),
-          div(
-            env.mod.presets.pmPresets.get().value.map { preset =>
-              postForm(action := routes.Mod.warn(in.user.username, preset.name))(
-                submitButton(cls := "fbt", title := preset.text)(preset.name),
-                autoNextInput
-              )
-            }
+        isGranted(_.ModMessage).option(
+          div(cls := "dropper warn buttons")(
+            iconTag("e"),
+            div(
+              env.mod.presets.pmPresets.get().value.map { preset =>
+                postForm(action := routes.Mod.warn(in.user.username, preset.name))(
+                  submitButton(cls := "fbt", title := preset.text)(preset.name),
+                  autoNextInput
+                )
+              }
+            )
           )
         ),
         isGranted(_.MarkEngine) option {
@@ -174,8 +182,8 @@ object inquiry {
           div(cls := "dropper shadowban buttons")(
             postForm(
               action := url,
-              title := (if (in.user.marks.troll) "Un-shadowban" else "Shadowban"),
-              cls := "main"
+              title  := (if in.user.marks.troll then "Un-shadowban" else "Shadowban"),
+              cls    := "main"
             )(
               markButton(in.user.marks.troll)(dataIcon := "c"),
               autoNextInput
@@ -195,23 +203,25 @@ object inquiry {
         },
         div(cls := "dropper more buttons")(
           iconTag("u"),
-          isGranted(_.NotifySlack) `option` div(
-            postForm(action := routes.Mod.notifySlack(in.user.id))(
-              submitButton(cls := "fbt")("Notify Slack")
-            ),
-            postForm(action := routes.Report.xfiles(in.report.id))(
-              submitButton(cls := List("fbt" -> true, "active" -> (in.report.room.key == "xfiles")))(
-                "Move to X-Files"
+          isGranted(_.NotifySlack).option(
+            div(
+              postForm(action := routes.Mod.notifySlack(in.user.id))(
+                submitButton(cls := "fbt")("Notify Slack")
               ),
-              autoNextInput
-            ),
-            div(cls := "separator"),
-            lila.memo.Snooze.Duration.all.map { snooze =>
-              postForm(action := snoozeUrl(in.report, snooze.toString))(
-                submitButton(cls := "fbt")(s"Snooze ${snooze.name}"),
+              postForm(action := routes.Report.xfiles(in.report.id))(
+                submitButton(cls := List("fbt" -> true, "active" -> (in.report.room.key == "xfiles")))(
+                  "Move to X-Files"
+                ),
                 autoNextInput
-              )
-            }
+              ),
+              div(cls := "separator"),
+              lila.memo.Snooze.Duration.all.map { snooze =>
+                postForm(action := snoozeUrl(in.report, snooze.toString))(
+                  submitButton(cls := "fbt")(s"Snooze ${snooze.name}"),
+                  autoNextInput
+                )
+              }
+            )
           )
         )
       ),
@@ -223,16 +233,16 @@ object inquiry {
         ),
         postForm(
           action := routes.Report.process(in.report.id),
-          title := "Dismiss this report as processed. (Hotkey: d)",
-          cls := "process"
+          title  := "Dismiss this report as processed. (Hotkey: d)",
+          cls    := "process"
         )(
           submitButton(dataIcon := "E", cls := "fbt"),
           autoNextInput
         ),
         postForm(
           action := routes.Report.inquiry(in.report.id),
-          title := "Cancel the inquiry, re-instore the report",
-          cls := "cancel"
+          title  := "Cancel the inquiry, re-instore the report",
+          cls    := "cancel"
         )(
           submitButton(dataIcon := "L", cls := "fbt")
         )
@@ -241,7 +251,7 @@ object inquiry {
   }
 
   private def snoozeUrl(report: Report, duration: String): String =
-    if (report.isAppeal) routes.Appeal.snooze(report.user, duration).url
+    if report.isAppeal then routes.Appeal.snooze(report.user, duration).url
     else routes.Report.snooze(report.id, duration).url
 
   private def boostOpponents(report: Report): Option[NonEmptyList[User.ID]] =

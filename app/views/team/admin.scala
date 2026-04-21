@@ -3,12 +3,12 @@ package views.html.team
 import play.api.data.Form
 
 import lila.api.Context
-import lila.app.templating.Environment._
-import lila.app.ui.ScalatagsTemplate._
+import lila.app.templating.Environment.*
+import lila.app.ui.ScalatagsTemplate.*
 
 object admin {
 
-  import trans.team._
+  import trans.team.*
 
   def leaders(t: lila.team.Team, form: Form[?])(implicit ctx: Context) = {
     val title = s"${t.name} • ${trans.team.teamLeaders.txt()}"
@@ -81,26 +81,28 @@ $('#form3-message').val($('#form3-message').val() + $(e.target).data('copyurl') 
         div(cls := "page-menu__content box box-pad")(
           h1(title),
           p(messageAllMembersLongDescription()),
-          tours.nonEmpty `option` div(cls := "tournaments")(
-            p(youWayWantToLinkOneOfTheseTournaments()),
-            p(
-              ul(
-                tours.map { t =>
-                  li(
-                    tournamentLink(t),
-                    " ",
-                    momentFromNow(t.startsAt),
-                    " ",
-                    a(
-                      dataIcon := "z",
-                      cls := "text copy-url-button",
-                      data.copyurl := s"${netConfig.domain}${routes.Tournament.show(t.id).url}"
+          tours.nonEmpty.option(
+            div(cls := "tournaments")(
+              p(youWayWantToLinkOneOfTheseTournaments()),
+              p(
+                ul(
+                  tours.map { t =>
+                    li(
+                      tournamentLink(t),
+                      " ",
+                      momentFromNow(t.startsAt),
+                      " ",
+                      a(
+                        dataIcon     := "z",
+                        cls          := "text copy-url-button",
+                        data.copyurl := s"${netConfig.domain}${routes.Tournament.show(t.id).url}"
+                      )
                     )
-                  )
-                }
-              )
-            ),
-            br
+                  }
+                )
+              ),
+              br
+            )
           ),
           postForm(cls := "form3", action := routes.Team.pmAllSubmit(t.id))(
             form3.group(form("message"), trans.message())(form3.textarea(_)(rows := 10)),

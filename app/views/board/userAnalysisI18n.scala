@@ -2,8 +2,8 @@ package views.html.board
 
 import play.api.i18n.Lang
 
-import lila.app.templating.Environment._
-import lila.i18n.{ MessageKey, I18nKeys => trans }
+import lila.app.templating.Environment.*
+import lila.i18n.{ I18nKeys as trans, MessageKey }
 
 object userAnalysisI18n {
 
@@ -15,10 +15,10 @@ object userAnalysisI18n {
   )(implicit lang: Lang) =
     i18nJsObject(
       baseTranslations ++
-        (if (withCeval) cevalTranslations else Vector.empty) ++
-        (if (withExplorer) explorerTranslations else Vector.empty) ++
-        (if (withForecast) forecastTranslations else Vector.empty) ++
-        (if (withAdvantageChart) advantageChartTranslations else Vector.empty)
+        (if withCeval then cevalTranslations else Vector.empty) ++
+        (if withExplorer then explorerTranslations else Vector.empty) ++
+        (if withForecast then forecastTranslations else Vector.empty) ++
+        (if withAdvantageChart then advantageChartTranslations else Vector.empty)
     )
 
   private val baseTranslations: Vector[MessageKey] = Vector(

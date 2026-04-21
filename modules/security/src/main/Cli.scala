@@ -8,7 +8,7 @@ final private[security] class Cli(userRepo: UserRepo)(implicit ec: scala.concurr
   def process = {
 
     case "security" :: "roles" :: uid :: Nil =>
-      userRepo `named` uid dmap {
+      userRepo.named(uid) dmap {
         _.fold("User %s not found" format uid)(_.roles mkString " ")
       }
 
@@ -17,7 +17,7 @@ final private[security] class Cli(userRepo: UserRepo)(implicit ec: scala.concurr
   }
 
   private def perform(username: String, op: User => Funit): Fu[String] =
-    userRepo `named` username flatMap { userOption =>
+    userRepo.named(username) flatMap { userOption =>
       userOption.fold(fufail[String]("User %s not found" format username)) { u =>
         op(u) inject "User %s successfully updated".format(username)
       }

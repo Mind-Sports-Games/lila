@@ -1,6 +1,6 @@
 package lila.memo
 
-import scala.concurrent.duration._
+import scala.concurrent.duration.*
 
 object Snooze {
 

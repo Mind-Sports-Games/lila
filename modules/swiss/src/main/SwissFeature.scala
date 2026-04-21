@@ -4,10 +4,10 @@ import org.joda.time.DateTime
 import reactivemongo.api.ReadPreference
 
 import lila.common.Heapsort
-import lila.db.dsl._
+import lila.db.dsl.*
 import lila.hub.LightTeam.TeamID
 import lila.memo.CacheApi
-import lila.memo.CacheApi._
+import lila.memo.CacheApi.*
 
 final class SwissFeature(
     colls: SwissColls,
@@ -15,7 +15,7 @@ final class SwissFeature(
     swissCache: SwissCache
 )(implicit ec: scala.concurrent.ExecutionContext) {
 
-  import BsonHandlers._
+  import BsonHandlers.*
 
   private val playstrategyTeamId = "playstrategy-swiss"
 
@@ -63,7 +63,7 @@ final class SwissFeature(
           "garbage" `$ne` true
         )
       )
-      .sort($sort `desc` "nbPlayers")
+      .sort($sort.desc("nbPlayers"))
       .cursor[Swiss]()
       .list(5)
 }

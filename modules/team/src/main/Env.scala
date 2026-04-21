@@ -1,9 +1,9 @@
 package lila.team
 
-import akka.actor._
-import com.softwaremill.macwire._
+import akka.actor.*
+import com.softwaremill.macwire.*
 
-import lila.common.config._
+import lila.common.config.*
 import lila.mod.ModlogApi
 import lila.notify.NotifyApi
 import lila.socket.Socket.{ GetVersion, SocketVersion }

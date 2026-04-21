@@ -13,7 +13,7 @@ case class MsgThread(
 
   def users = List(user1, user2)
 
-  def other(userId: User.ID): User.ID = if (user1 == userId) user2 else user1
+  def other(userId: User.ID): User.ID = if user1 == userId then user2 else user1
   def other(user: User): User.ID      = other(user.id)
   def other(user: LightUser): User.ID = other(user.id)
 
@@ -56,5 +56,5 @@ object MsgThread {
     }
 
   private def sortUsers(u1: User.ID, u2: User.ID): (User.ID, User.ID) =
-    if (u1 < u2) (u1, u2) else (u2, u1)
+    if u1 < u2 then (u1, u2) else (u2, u1)
 }

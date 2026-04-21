@@ -1,13 +1,13 @@
 package lila.insight
 
 import play.api.i18n.Lang
-import play.api.libs.json._
-import reactivemongo.api.bson._
-import scalatags.Text.all._
+import play.api.libs.json.*
+import reactivemongo.api.bson.*
+import scalatags.Text.all.*
 
 import strategygames.chess.opening.EcopeningDB
-import strategygames.{ Player => PlayerIndex, GameLogic, Role }
-import lila.db.dsl._
+import strategygames.{ GameLogic, Player as PlayerIndex, Role }
+import lila.db.dsl.*
 import lila.rating.PerfType
 
 sealed abstract class Dimension[A: BSONHandler](
@@ -26,9 +26,9 @@ sealed abstract class Dimension[A: BSONHandler](
 
 object Dimension {
 
-  import BSONHandlers._
-  import Position._
-  import InsightEntry.{ BSONFields => F }
+  import BSONHandlers.*
+  import Position.*
+  import InsightEntry.BSONFields as F
   import lila.rating.BSONHandlers.perfTypeIdHandler
 
   case object Period
@@ -294,11 +294,11 @@ object Dimension {
     }
 
   def filtersOf[X](d: Dimension[X], selected: List[X]): Bdoc = {
-    import cats.implicits._
+    import cats.implicits.*
     d match {
       case Dimension.MovetimeRange =>
         selected match {
-          case Nil => $empty
+          case Nil  => $empty
           case many =>
             $doc(
               "$or" -> many.map(lila.insight.MovetimeRange.toRange).map { range =>
@@ -312,22 +312,20 @@ object Dimension {
         }
       case Dimension.MaterialRange =>
         selected match {
-          case Nil => $empty
+          case Nil  => $empty
           case many =>
             $doc(
               "$or" -> many.map { range =>
                 val intRange = lila.insight.MaterialRange.toRange(range)
-                if (intRange._1 == intRange._2) $doc(d.dbKey -> intRange._1)
-                else if (range.negative)
-                  $doc(d.dbKey `$gte` intRange._1 `$lt` intRange._2)
-                else
-                  $doc(d.dbKey `$gt` intRange._1 `$lte` intRange._2)
+                if intRange._1 == intRange._2 then $doc(d.dbKey -> intRange._1)
+                else if range.negative then $doc(d.dbKey `$gte` intRange._1 `$lt` intRange._2)
+                else $doc(d.dbKey `$gt` intRange._1 `$lte` intRange._2)
               }
             )
         }
       case Dimension.TimeVariance =>
         selected match {
-          case Nil => $empty
+          case Nil  => $empty
           case many =>
             $doc(
               "$or" -> many.map(lila.insight.TimeVariance.toRange).map { range =>

@@ -5,10 +5,10 @@ package templating
 import strategygames.Pos
 import strategygames.chess
 import strategygames.draughts
-import strategygames.{ Board, Player => PlayerIndex, History }
+import strategygames.{ Board, History, Player as PlayerIndex }
 import lila.api.Context
 
-import lila.app.ui.ScalatagsTemplate._
+import lila.app.ui.ScalatagsTemplate.*
 import lila.game.Pov
 
 trait ChessgroundHelper {
@@ -23,9 +23,9 @@ trait ChessgroundHelper {
     wrap {
       cgBoard {
         raw {
-          if (ctx.pref.is3d) ""
+          if ctx.pref.is3d then ""
           else {
-            //TODO we shouldn't be unwrapping Pos here. And does this work with different board sizes? Why a fixed 7?
+            // TODO we shouldn't be unwrapping Pos here. And does this work with different board sizes? Why a fixed 7?
             def top(p: Pos) = p match {
               case Pos.Chess(p)        => orient.fold(7 - p.rank.index, p.rank.index) * 12.5
               case Pos.Dameo(p)        => orient.fold(7 - p.rank.index, p.rank.index) * 12.5
@@ -34,7 +34,7 @@ trait ChessgroundHelper {
               case Pos.Togyzkumalak(p) => orient.fold(7 - p.rank.index, p.rank.index) * 12.5
               case Pos.Go(p)           => orient.fold(7 - p.rank.index, p.rank.index) * 12.5
               case Pos.Backgammon(p)   => orient.fold(7 - p.rank.index, p.rank.index) * 12.5
-              case Pos.Abalone(p)      => orient.fold(8 - p.y, p.y-1) * 12.5
+              case Pos.Abalone(p)      => orient.fold(8 - p.y, p.y - 1) * 12.5
               case _                   => sys.error("Invalid Pos type")
             }
             def left(p: Pos) = p match {
@@ -45,19 +45,19 @@ trait ChessgroundHelper {
               case Pos.Togyzkumalak(p) => orient.fold(p.file.index, 7 - p.file.index) * 12.5
               case Pos.Go(p)           => orient.fold(p.file.index, 7 - p.file.index) * 12.5
               case Pos.Backgammon(p)   => orient.fold(p.file.index, 7 - p.file.index) * 12.5
-              case Pos.Abalone(p)      => orient.fold(p.x-1, 8 - p.x) * 12.5
+              case Pos.Abalone(p)      => orient.fold(p.x - 1, 8 - p.x) * 12.5
               case _                   => sys.error("Invalid Pos type")
             }
             val highlights = ctx.pref.highlight so lastMove.distinct.map { pos =>
               s"""<square class="last-move" style="top:${top(pos)}%;left:${left(pos)}%"></square>"""
             } mkString ""
             val pieces =
-              if (ctx.pref.isBlindfold) ""
+              if ctx.pref.isBlindfold then ""
               else
-                //note this doesnt seem to be used although it is passed through on round creation
+                // note this doesnt seem to be used although it is passed through on round creation
                 board.pieces.map { case (pos, (piece, count)) =>
                   val klass =
-                    if (count > 1) s"${piece.player.name} ${piece.role.name}${count}"
+                    if count > 1 then s"${piece.player.name} ${piece.role.name}${count}"
                     else s"${piece.player.name} ${piece.role.name}"
                   s"""<piece class="$klass" style="top:${top(pos)}%;left:${left(pos)}%"></piece>"""
                 } mkString ""
@@ -72,15 +72,15 @@ trait ChessgroundHelper {
   ): Frag = wrap {
     cgBoard {
       raw {
-        def addX(p: draughts.PosMotion) = if (p.y % 2 != 0) -0.5 else -1.0
+        def addX(p: draughts.PosMotion) = if p.y % 2 != 0 then -0.5 else -1.0
         def top(p: draughts.PosMotion)  = orient.fold(p.y - 1, 10 - p.y) * 10.0
         def left(p: draughts.PosMotion) = orient.fold(addX(p) + p.x, 4.5 - (addX(p) + p.x)) * 20.0
-        val highlights = ctx.pref.highlight so lastMove.distinct.map { pos =>
+        val highlights                  = ctx.pref.highlight so lastMove.distinct.map { pos =>
           val pm = board.posAt(pos)
           s"""<square class="last-move" style="top:${top(pm)}%;left:${left(pm)}%"></square>"""
         } mkString ""
         val pieces =
-          if (ctx.pref.isBlindfold) ""
+          if ctx.pref.isBlindfold then ""
           else
             board.pieces.map { case (pos, piece) =>
               val klass = s"${piece.player.name} ${piece.role.name}"
@@ -102,7 +102,7 @@ trait ChessgroundHelper {
             List(orig, dest)
           }
         )
-      //is there a better way of duplicating the case for Chess/FairySF/Dameo etc?
+      // is there a better way of duplicating the case for Chess/FairySF/Dameo etc?
       case (board: Board.Dameo, history: History.Dameo) =>
         chessground(
           board = board,

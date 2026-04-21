@@ -1,14 +1,14 @@
 package views.html.streamer
 
 import lila.api.Context
-import lila.app.templating.Environment._
-import lila.app.ui.ScalatagsTemplate._
+import lila.app.templating.Environment.*
+import lila.app.ui.ScalatagsTemplate.*
 import lila.common.String.html.richText
 import lila.streamer.Stream.YouTube
 
 object show {
 
-  import trans.streamer._
+  import trans.streamer.*
 
   def apply(
       s: lila.streamer.Streamer.WithUserAndStream,
@@ -31,23 +31,25 @@ object show {
     )(
       main(cls := "page-menu streamer-show")(
         st.aside(cls := "page-menu__menu")(
-          s.streamer.approval.chatEnabled `option` div(cls := "streamer-chat")(
-            s.stream match {
-              case Some(YouTube.Stream(_, _, videoId, _)) =>
-                iframe(
-                  st.frameborder := "0",
-                  frame.scrolling := "no",
-                  src := s"https://www.youtube.com/live_chat?v=$videoId&embed_domain=${netConfig.domain}"
-                )
-              case _ =>
-                s.streamer.twitch.map { twitch =>
+          s.streamer.approval.chatEnabled.option(
+            div(cls := "streamer-chat")(
+              s.stream match {
+                case Some(YouTube.Stream(_, _, videoId, _)) =>
                   iframe(
-                    st.frameborder := "0",
-                    frame.scrolling := "yes",
-                    src := s"https://twitch.tv/embed/${twitch.userId}/chat?${(ctx.currentBg != "light") so "darkpopout&"}parent=${netConfig.domain}"
+                    st.frameborder  := "0",
+                    frame.scrolling := "no",
+                    src := s"https://www.youtube.com/live_chat?v=$videoId&embed_domain=${netConfig.domain}"
                   )
-                }
-            }
+                case _ =>
+                  s.streamer.twitch.map { twitch =>
+                    iframe(
+                      st.frameborder  := "0",
+                      frame.scrolling := "yes",
+                      src := s"https://twitch.tv/embed/${twitch.userId}/chat?${(ctx.currentBg != "light") so "darkpopout&"}parent=${netConfig.domain}"
+                    )
+                  }
+              }
+            )
           ),
           bits.menu("show", s.withoutStream.some)
         ),
@@ -56,7 +58,7 @@ object show {
             case Some(YouTube.Stream(_, _, videoId, _)) =>
               div(cls := "box embed youTube")(
                 iframe(
-                  src := s"https://www.youtube.com/embed/$videoId?autoplay=1",
+                  src            := s"https://www.youtube.com/embed/$videoId?autoplay=1",
                   st.frameborder := "0",
                   frame.allowfullscreen
                 )

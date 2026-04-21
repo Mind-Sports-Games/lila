@@ -31,7 +31,7 @@ case class SwissFinish(id: Swiss.Id, ranking: Ranking)
 
 object SwissBounds {
   val maxRounds            = 100
-  val maxGamesPerRound     = 9 //assume single digit in other parts of the code.
+  val maxGamesPerRound     = 9 // assume single digit in other parts of the code.
   val defaultGamesPerRound = 1
   val maxScore             = maxRounds * 2
   val maxBuchholz          = maxRounds * maxScore
@@ -61,12 +61,12 @@ object SwissBounds {
 
   def encodeIntoLongRecurse(factor: Long, data: WithBounds*): Long =
     data match {
-      case Seq(first) => factor * first.value
+      case Seq(first)      => factor * first.value
       case Seq(first, as*) =>
-        ((factor * first.value) + encodeIntoLongRecurse(
+        (factor * first.value) + encodeIntoLongRecurse(
           factor * first.totalValues,
           as*
-        ))
+        )
       case Seq() => 0
     }
 }

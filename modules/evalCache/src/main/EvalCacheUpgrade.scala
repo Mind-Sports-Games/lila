@@ -16,7 +16,7 @@ final private class EvalCacheUpgrade(scheduler: akka.actor.Scheduler)(implicit
     ec: scala.concurrent.ExecutionContext,
     mode: play.api.Mode
 ) {
-  import EvalCacheUpgrade._
+  import EvalCacheUpgrade.*
 
   private val members       = new ConcurrentHashMap[SriString, WatchingMember]
   private val evals         = new ConcurrentHashMap[SetupId, Set[SriString]]
@@ -28,8 +28,8 @@ final private class EvalCacheUpgrade(scheduler: akka.actor.Scheduler)(implicit
     Option(members.get(sri.value)).map(wm => unregisterEval(wm.setupId, sri))
     val setupId = makeSetupId(variant, fen, multiPv)
     members.put(sri.value, WatchingMember(push, setupId, path))
-    evals.put(setupId, (~Option(evals.get(setupId)) + sri.value))
-    expirableSris `put` sri.value
+    evals.put(setupId, ~Option(evals.get(setupId)) + sri.value)
+    expirableSris.put(sri.value)
   }
 
   def onEval(input: EvalCacheEntry.Input, sri: Socket.Sri): Unit =
@@ -37,7 +37,7 @@ final private class EvalCacheUpgrade(scheduler: akka.actor.Scheduler)(implicit
       Option(evals.get(makeSetupId(input.id.variant, input.fen, multiPv)))
     } foreach { sris =>
       val wms = sris.withFilter(sri.value !=).flatMap(i => Option(members.get(i)))
-      if (wms.nonEmpty) {
+      if wms.nonEmpty then {
         val json = JsonHandlers.writeEval(input.eval, input.fen)
         wms foreach { wm =>
           wm.push(json + ("path" -> JsString(wm.path)))
@@ -50,13 +50,13 @@ final private class EvalCacheUpgrade(scheduler: akka.actor.Scheduler)(implicit
     Option(members.get(sri.value)) foreach { wm =>
       unregisterEval(wm.setupId, sri)
       members.remove(sri.value)
-      expirableSris `remove` sri.value
+      expirableSris.remove(sri.value)
     }
 
   private def unregisterEval(setupId: SetupId, sri: Socket.Sri): Unit =
     Option(evals.get(setupId)) foreach { sris =>
       val newSris = sris - sri.value
-      if (newSris.isEmpty) evals.remove(setupId)
+      if newSris.isEmpty then evals.remove(setupId)
       else evals.put(setupId, newSris)
     }
 

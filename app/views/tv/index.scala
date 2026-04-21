@@ -4,10 +4,9 @@ package tv
 import play.api.libs.json.Json
 
 import lila.api.Context
-import lila.app.templating.Environment._
-import lila.app.ui.ScalatagsTemplate._
+import lila.app.templating.Environment.*
+import lila.app.ui.ScalatagsTemplate.*
 import lila.common.String.html.safeJsonValue
-
 
 object index {
 
@@ -26,11 +25,11 @@ object index {
         roundTag(pov.game.variant.gameLogic),
         embedJsUnsafeLoadThen(
           s"""${roundPlayStrategyTag(pov.game.variant.gameLogic)}(${safeJsonValue(
-            Json.obj(
-              "data" -> data,
-              "i18n" -> views.html.round.jsI18n(pov.game)
-            )
-          )})"""
+              Json.obj(
+                "data" -> data,
+                "i18n" -> views.html.round.jsI18n(pov.game)
+              )
+            )})"""
         )
       ),
       moreCss = cssTag("tv.single"),

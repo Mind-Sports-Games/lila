@@ -21,14 +21,17 @@ final class ChallengeMsg(msgApi: lila.msg.MsgApi, lightUserApi: LightUserApi)(im
       managedById: User.ID,
       template: Option[Template]
   ): Funit =
-    Future.sequence(List(u1 -> u2, u2 -> u1)
-      .map { case (u1, u2) =>
-        val msg = template
-          .fold("Your game with {opponent} is ready: {game}.")(_.value)
-          .replace("{player}", s"@${u1.name}")
-          .replace("{opponent}", s"@${u2.name}")
-          .replace("{game}", s"#${gameId}")
-        msgApi.post(managedById, u1.id, msg, multi = true)
-      })
+    Future
+      .sequence(
+        List(u1 -> u2, u2 -> u1)
+          .map { case (u1, u2) =>
+            val msg = template
+              .fold("Your game with {opponent} is ready: {game}.")(_.value)
+              .replace("{player}", s"@${u1.name}")
+              .replace("{opponent}", s"@${u2.name}")
+              .replace("{game}", s"#${gameId}")
+            msgApi.post(managedById, u1.id, msg, multi = true)
+          }
+      )
       .void
 }

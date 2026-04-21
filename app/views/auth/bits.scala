@@ -4,8 +4,8 @@ package auth
 import play.api.data.{ Field, Form }
 
 import lila.api.Context
-import lila.app.templating.Environment._
-import lila.app.ui.ScalatagsTemplate._
+import lila.app.templating.Environment.*
+import lila.app.ui.ScalatagsTemplate.*
 import lila.security.HcaptchaForm
 import lila.user.User
 
@@ -15,16 +15,16 @@ object bits {
       ctx: Context
   ) =
     frag(
-      form3.group(username, if (register) trans.username() else trans.usernameOrEmail()) { f =>
+      form3.group(username, if register then trans.username() else trans.usernameOrEmail()) { f =>
         frag(
           form3.input(f)(autofocus, required, autocomplete := "username"),
           p(cls := "error username-exists none")(trans.usernameAlreadyUsed())
         )
       },
       form3.passwordModified(password, trans.password())(
-        autocomplete := (if (register) "new-password" else "current-password")
+        autocomplete := (if register then "new-password" else "current-password")
       ),
-      register `option` form3.passwordComplexityMeter(trans.newPasswordStrength()),
+      register.option(form3.passwordComplexityMeter(trans.newPasswordStrength())),
       emailOption.map { email =>
         form3.group(email, trans.email(), help = frag("We will only use it for password reset.").some)(
           form3.input(_, typ = "email")(required)
@@ -41,7 +41,7 @@ object bits {
     ) {
       main(cls := "auth auth-signup box box-pad")(
         h1(
-          fail `option` span(cls := "is-red", dataIcon := "L"),
+          fail.option(span(cls := "is-red", dataIcon := "L")),
           trans.passwordReset()
         ),
         postForm(cls := "form3", action := routes.Auth.passwordResetApply)(
@@ -113,7 +113,7 @@ object bits {
     ) {
       main(cls := "auth auth-signup box box-pad")(
         h1(
-          fail `option` span(cls := "is-red", dataIcon := "L"),
+          fail.option(span(cls := "is-red", dataIcon := "L")),
           "Log in by email"
         ),
         p("We will send you an email containing a link to log you in."),

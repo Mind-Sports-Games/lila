@@ -1,7 +1,7 @@
 package controllers
 
 import play.api.http.ContentTypes
-import views._
+import views.*
 
 import lila.api.Context
 import lila.app.*
@@ -31,7 +31,7 @@ final class Tv(
 
   def channels =
     apiC.ApiRequest { _ =>
-      import play.api.libs.json._
+      import play.api.libs.json.*
       implicit val championWrites = Json.writes[lila.tv.Tv.Champion]
       env.tv.tv.getChampions map {
         _.channels map { case (chan, champ) => chan.name -> champ }
@@ -39,10 +39,10 @@ final class Tv(
     }
 
   private def playstrategyTv(channel: lila.tv.Tv.Channel)(implicit ctx: Context) =
-    OptionFuResult(env.tv.tv `getGameAndHistory` channel) { case (game, history) =>
+    OptionFuResult(env.tv.tv.getGameAndHistory(channel)) { case (game, history) =>
       val flip    = getBool("flip")
-      val natural = Pov `naturalOrientation` game
-      val pov     = if (flip) !natural else natural
+      val natural = Pov.naturalOrientation(game)
+      val pov     = if flip then !natural else natural
       val onTv    = lila.round.OnPlayStrategyTv(channel.key, flip)
       negotiate(
         html = env.tournament.api.gameView.watcher(pov.game) flatMap { tour =>
@@ -71,7 +71,7 @@ final class Tv(
                   channel,
                   (lGames ++ env.tv.tv.getNonLiveCorrespondenceGamesOfChannel(channel, cGames, 15, lGames))
                     .take(15) map Pov.naturalOrientation,
-                  env.tv.tv.getCorrespondenceChampions(cGames) `combineWithAndFavour` champs
+                  env.tv.tv.getCorrespondenceChampions(cGames).combineWithAndFavour(champs)
                 )
               )
             }
@@ -86,17 +86,19 @@ final class Tv(
       import lila.round.TvBroadcast
       import play.api.libs.EventSource
       val bc = getBool("bc", req)
-      (env.round.tvBroadcast ? TvBroadcast.Connect(bc)).mapTo(using scala.reflect.classTag[TvBroadcast.SourceType]) map { source =>
-          if (bc) Ok.chunked(source via EventSource.flow).as(ContentTypes.EVENT_STREAM) `pipe` noProxyBuffer
-          else apiC.sourceToNdJson(source)
-        }
+      (env.round.tvBroadcast ? TvBroadcast.Connect(bc)).mapTo(using
+        scala.reflect.classTag[TvBroadcast.SourceType]
+      ) map { source =>
+        if bc then Ok.chunked(source via EventSource.flow).as(ContentTypes.EVENT_STREAM).pipe(noProxyBuffer)
+        else apiC.sourceToNdJson(source)
+      }
     }
 
   def frame =
     Action.async { implicit req =>
       env.tv.tv.getBestGame map {
         case None       => NotFound
-        case Some(game) => Ok(views.html.tv.embed(Pov `naturalOrientation` game))
+        case Some(game) => Ok(views.html.tv.embed(Pov.naturalOrientation(game)))
       }
     }
 }

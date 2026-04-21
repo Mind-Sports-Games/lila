@@ -1,10 +1,10 @@
 package lila.app
 package templating
 
-import play.api.data._
+import play.api.data.*
 
 import lila.api.Context
-import lila.app.ui.ScalatagsTemplate._
+import lila.app.ui.ScalatagsTemplate.*
 
 trait FormHelper { self: I18nHelper =>
 
@@ -37,7 +37,7 @@ trait FormHelper { self: I18nHelper =>
 
     private def errors(errs: Seq[FormError])(implicit ctx: Context): Frag = errs map error
     private def errors(field: Field)(implicit ctx: Context): Frag         = errors(field.errors)
-    private def error(err: FormError)(implicit ctx: Context): Frag =
+    private def error(err: FormError)(implicit ctx: Context): Frag        =
       p(cls := "error")(transKey(err.message, err.args))
 
     private def validationModifiers(field: Field): Seq[Modifier] =
@@ -49,8 +49,8 @@ trait FormHelper { self: I18nHelper =>
         // case ("constraint.required", _) => required
         case ("constraint.minLength", Seq(m: Int)) => minlength := m
         case ("constraint.maxLength", Seq(m: Int)) => maxlength := m
-        case ("constraint.min", Seq(m: Int))       => min := m
-        case ("constraint.max", Seq(m: Int))       => max := m
+        case ("constraint.min", Seq(m: Int))       => min       := m
+        case ("constraint.max", Seq(m: Int))       => max       := m
       }
 
     val split = div(cls := "form-split")
@@ -81,10 +81,10 @@ trait FormHelper { self: I18nHelper =>
     def input(field: Field, typ: String = "", klass: String = ""): BaseTagType =
       st.input(
         st.id := id(field),
-        name := field.name,
+        name  := field.name,
         value := field.value,
-        tpe := typ.nonEmpty.option(typ),
-        cls := List("form-control" -> true, klass -> klass.nonEmpty)
+        tpe   := typ.nonEmpty.option(typ),
+        cls   := List("form-control" -> true, klass -> klass.nonEmpty)
       )(validationModifiers(field))
 
     def checkbox(
@@ -122,18 +122,18 @@ trait FormHelper { self: I18nHelper =>
     ) =
       frag(
         st.input(
-          st.id := fieldId,
-          name := fieldName,
+          st.id    := fieldId,
+          name     := fieldName,
           st.value := value,
-          tpe := "checkbox",
-          cls := "form-control cmn-toggle",
-          checked `option` st.checked,
-          disabled `option` st.disabled
+          tpe      := "checkbox",
+          cls      := "form-control cmn-toggle",
+          checked.option(st.checked),
+          disabled.option(st.disabled)
         ),
         label(`for` := fieldId)
       )
 
-    private def displayStyle(displayed: Boolean): String = if (displayed) "block" else "none"
+    private def displayStyle(displayed: Boolean): String = if displayed then "block" else "none"
 
     def select(
         field: Field,
@@ -144,20 +144,20 @@ trait FormHelper { self: I18nHelper =>
     ): Frag =
       frag(
         st.select(
-          st.id := id(field),
-          name := field.name,
-          cls := "form-control",
+          st.id   := id(field),
+          name    := field.name,
+          cls     := "form-control",
           display := displayStyle(displayed)
-        )(disabled `option` (st.disabled := true))(validationModifiers(field))(
+        )(disabled.option(st.disabled := true))(validationModifiers(field))(
           default map { option(value := "")(_) },
           options.toSeq map { case (value, name) =>
             option(
               st.value := value.toString,
-              field.value.has(value.toString) `option` selected
+              field.value.has(value.toString).option(selected)
             )(name)
           }
         ),
-        disabled `option` hidden(field)
+        disabled.option(hidden(field))
       )
 
     type SelectChoice = (String, String, Option[String])
@@ -171,9 +171,9 @@ trait FormHelper { self: I18nHelper =>
       frag(
         st.select(
           st.id := id(field),
-          name := field.name,
-          cls := "form-control"
-        )(disabled `option` (st.disabled := true))(validationModifiers(field))(
+          name  := field.name,
+          cls   := "form-control"
+        )(disabled.option(st.disabled := true))(validationModifiers(field))(
           default map { option(value := "")(_) },
           options.map { case ((ogValue, ogName, _), opts) =>
             optgroup(name := ogName)(
@@ -181,13 +181,13 @@ trait FormHelper { self: I18nHelper =>
                 option(
                   st.value := s"${ogValue}_${value}",
                   st.title := title,
-                  field.value.has(s"${ogValue}_${value}") `option` selected
+                  field.value.has(s"${ogValue}_${value}").option(selected)
                 )(name)
               }
             )
           }
         ),
-        disabled `option` hidden(field)
+        disabled.option(hidden(field))
       )
 
     def textarea(
@@ -196,8 +196,8 @@ trait FormHelper { self: I18nHelper =>
     )(modifiers: Modifier*): Frag =
       st.textarea(
         st.id := id(field),
-        name := field.name,
-        cls := List("form-control" -> true, klass -> klass.nonEmpty)
+        name  := field.name,
+        cls   := List("form-control" -> true, klass -> klass.nonEmpty)
       )(validationModifiers(field))(modifiers)(field.value.getOrElse(""))
 
     val actions = div(cls := "form-actions")
@@ -212,9 +212,9 @@ trait FormHelper { self: I18nHelper =>
     ): Tag =
       submitButton(
         dataIcon := icon,
-        name := nameValue.map(_._1),
-        value := nameValue.map(_._2),
-        cls := List(
+        name     := nameValue.map(_._1),
+        value    := nameValue.map(_._2),
+        cls      := List(
           "submit button" -> true,
           "text"          -> icon.isDefined,
           "confirm"       -> confirm.nonEmpty,
@@ -228,9 +228,9 @@ trait FormHelper { self: I18nHelper =>
 
     def hidden(name: String, value: String): Tag =
       st.input(
-        st.name := name,
+        st.name  := name,
         st.value := value,
-        tpe := "hidden"
+        tpe      := "hidden"
       )
 
     def passwordModified(field: Field, content: Frag)(modifiers: Modifier*)(implicit ctx: Context): Frag =
@@ -240,8 +240,8 @@ trait FormHelper { self: I18nHelper =>
       div(cls := "password-complexity")(
         label(cls := "password-complexity-label")(labelContent),
         div(cls := "password-complexity-meter")(
-          for (_ <- 1 to 4)
-            yield span()
+          for _ <- 1 to 4
+          yield span()
         )
       )
 
@@ -251,9 +251,9 @@ trait FormHelper { self: I18nHelper =>
       }
 
     def flatpickr(field: Field, withTime: Boolean = true, utc: Boolean = false): Tag =
-      input(field, klass = s"flatpickr${if (utc) " flatpickr-utc" else ""}")(
+      input(field, klass = s"flatpickr${if utc then " flatpickr-utc" else ""}")(
         dataEnableTime := withTime,
-        datatime24h := withTime
+        datatime24h    := withTime
       )
 
     object file {

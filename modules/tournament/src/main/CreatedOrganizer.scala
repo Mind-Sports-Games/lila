@@ -1,8 +1,8 @@
 package lila.tournament
 
-import akka.actor._
-import akka.stream.scaladsl._
-import scala.concurrent.duration._
+import akka.actor.*
+import akka.stream.scaladsl.*
+import scala.concurrent.duration.*
 
 import lila.common.extensions.*
 
@@ -38,9 +38,9 @@ final private class CreatedOrganizer(
       tournamentRepo.shouldStartCursor
         .documentSource()
         .mapAsync(1) { tour =>
-          playerRepo `count` tour.id flatMap {
-            case 0 => api `destroy` tour
-            case _ => api `start` tour
+          playerRepo.count(tour.id) flatMap {
+            case 0 => api.destroy(tour)
+            case _ => api.start(tour)
           }
         }
         .log(getClass.getName)

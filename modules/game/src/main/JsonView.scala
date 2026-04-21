@@ -1,22 +1,22 @@
 package lila.game
 
-import play.api.libs.json._
+import play.api.libs.json.*
 
 import strategygames.format.{ FEN, Forsyth }
 import strategygames.opening.FullOpening
 import strategygames.{
-  P2,
   ByoyomiClock,
-  ClockBase,
-  Player => PlayerIndex,
-  Division,
   Clock,
+  ClockBase,
+  Division,
   GameLogic,
+  P1,
+  P2,
+  Player as PlayerIndex,
   Pocket,
   PocketData,
   Role,
-  Status,
-  P1
+  Status
 }
 import strategygames.variant.Variant
 import lila.common.Json.jodaWrites
@@ -25,7 +25,7 @@ import lila.i18n.VariantKeys
 
 final class JsonView(rematches: Rematches) {
 
-  import JsonView._
+  import JsonView.*
 
   def apply(game: Game, initialFen: Option[FEN]) =
     Json
@@ -91,7 +91,7 @@ final class JsonView(rematches: Rematches) {
         "lastMove"    -> pov.game.lastActionKeys.getOrElse(""),
         "source"      -> pov.game.source,
         "status"      -> pov.game.status,
-        "variant" -> Json.obj(
+        "variant"     -> Json.obj(
           "gameLogic" -> Json.obj(
             "id"   -> pov.game.variant.gameLogic.id,
             "name" -> pov.game.variant.gameLogic.name
@@ -107,7 +107,7 @@ final class JsonView(rematches: Rematches) {
         "hasMoved" -> pov.hasMoved,
         "opponent" -> Json
           .obj(
-            "id" -> pov.opponent.userId,
+            "id"       -> pov.opponent.userId,
             "username" -> lila.game.Namer
               .playerTextBlocking(pov.opponent, withRating = false)(using lightUserSync)
           )
@@ -181,7 +181,7 @@ object JsonView {
     )
   }
 
-  //TODO we shouldn't have to unwrap per game logic
+  // TODO we shouldn't have to unwrap per game logic
   implicit val variantWriter: OWrites[Variant] = OWrites { v =>
     v match {
       case Variant.Draughts(draughtsVariant) =>
@@ -252,10 +252,10 @@ object JsonView {
         )
       case _ =>
         Json.obj(
-          "key"   -> v.key,
-          "name"  -> VariantKeys.variantName(v),
-          "short" -> VariantKeys.variantShortName(v),
-          "lib"   -> v.gameLogic.id,
+          "key"       -> v.key,
+          "name"      -> VariantKeys.variantName(v),
+          "short"     -> VariantKeys.variantShortName(v),
+          "lib"       -> v.gameLogic.id,
           "boardSize" -> Json.obj(
             "width"  -> 8,
             "height" -> 8

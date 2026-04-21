@@ -15,8 +15,7 @@ final class ChatPanic {
   def allowed(u: User): Boolean = allowed(u, tighter = false)
 
   def allowed(id: User.ID, fetch: User.ID => Fu[Option[User]]): Fu[Boolean] =
-    if (enabled) fetch(id) dmap { _ so allowed }
-    else fuTrue
+    if enabled then fetch(id) dmap { _ so allowed } else fuTrue
 
   def enabled =
     until exists { d =>
@@ -38,5 +37,5 @@ final class ChatPanic {
     until = none
   }
 
-  def set(v: Boolean) = if (v) start() else stop()
+  def set(v: Boolean) = if v then start() else stop()
 }

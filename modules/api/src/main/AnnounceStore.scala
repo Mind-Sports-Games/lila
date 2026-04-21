@@ -3,7 +3,7 @@ package lila.api
 import org.joda.time.DateTime
 import org.joda.time.format.ISODateTimeFormat
 import play.api.libs.json.Json
-import scala.concurrent.duration._
+import scala.concurrent.duration.*
 import scala.util.Try
 
 import lila.hub.actorApi.Announce
@@ -14,7 +14,7 @@ object AnnounceStore {
 
   def get: Option[Announce] = {
     current foreach { c =>
-      if (c.date.isBeforeNow) current = none
+      if c.date.isBeforeNow then current = none
     }
     current
   }
@@ -30,8 +30,8 @@ object AnnounceStore {
       case length :: unit :: rest =>
         Try {
           val msg     = rest mkString " "
-          val date    = DateTime.now `plusSeconds` Duration(s"$length $unit").toSeconds.toInt
-          val isoDate = ISODateTimeFormat.dateTime `print` date
+          val date    = DateTime.now.plusSeconds(Duration(s"$length $unit").toSeconds.toInt)
+          val isoDate = ISODateTimeFormat.dateTime.print(date)
           val json    = Json.obj("msg" -> msg, "date" -> isoDate)
           Announce(msg, date, json)
         }.toOption

@@ -1,12 +1,12 @@
 package controllers
 
-import play.api.libs.json._
+import play.api.libs.json.*
 
 import lila.api.Context
 import lila.app.*
 import lila.common.LightUser.lightUserWrites
-import lila.i18n.{ enLang, I18nKeys => trans, I18nLangPicker, LangList }
-import strategygames.{ GameFamily }
+import lila.i18n.{ enLang, I18nKeys as trans, I18nLangPicker, LangList }
+import strategygames.GameFamily
 
 final class Dasher(env: Env) extends LilaController(env) {
 
@@ -41,12 +41,12 @@ final class Dasher(env: Env) extends LilaController(env) {
 
   private def translations(implicit ctx: Context) =
     lila.i18n.JsDump.keysToObject(
-      if (ctx.isAnon) translationsAnon else translationsAuth,
+      if ctx.isAnon then translationsAnon else translationsAuth,
       ctx.lang
     ) ++ lila.i18n.JsDump.keysToObject(
       // the language settings should never be in a totally foreign language
       List(trans.language.key),
-      if (I18nLangPicker.allFromRequestHeaders(ctx.req).contains(ctx.lang)) ctx.lang
+      if I18nLangPicker.allFromRequestHeaders(ctx.req).contains(ctx.lang) then ctx.lang
       else I18nLangPicker.bestFromRequestHeaders(ctx.req) | enLang
     )
 
@@ -97,7 +97,7 @@ final class Dasher(env: Env) extends LilaController(env) {
                   "d3" -> List(
                     Json.obj(
                       "current" -> Json.obj("name" -> ctx.currentTheme3d.name, "gameFamily" -> "chess"),
-                      "list" -> lila.pref.Theme3d.all.map(t =>
+                      "list"    -> lila.pref.Theme3d.all.map(t =>
                         Json.obj("name" -> t.name, "gameFamily" -> "chess")
                       )
                     )
@@ -111,7 +111,7 @@ final class Dasher(env: Env) extends LilaController(env) {
                           .filter(ps => ps.gameFamily == gf.id)
                           .map(_.name)
                           .headOption,
-                        "gameFamily" -> gf.key,
+                        "gameFamily"   -> gf.key,
                         "displayPiece" -> ctx.currentPieceSet
                           .filter(ps => ps.gameFamily == gf.id)
                           .map(_.displayPiece)

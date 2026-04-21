@@ -2,13 +2,13 @@ package controllers
 
 import lila.api.Context
 import lila.app.*
-import lila.game.{ Game => GameModel, Pov, AnonCookie }
-import play.api.mvc._
+import lila.game.{ AnonCookie, Game as GameModel, Pov }
+import play.api.mvc.*
 
 private[controllers] trait TheftPrevention { self: LilaController =>
 
   protected def PreventTheft(pov: Pov)(ok: => Fu[Result])(implicit ctx: Context): Fu[Result] =
-    if (isTheft(pov)) fuccess(Redirect(routes.Round.watcher(pov.gameId, pov.playerIndex.name)))
+    if isTheft(pov) then fuccess(Redirect(routes.Round.watcher(pov.gameId, pov.playerIndex.name)))
     else ok
 
   protected def isTheft(pov: Pov)(implicit ctx: Context) =
@@ -16,9 +16,9 @@ private[controllers] trait TheftPrevention { self: LilaController =>
       (pov.player.userId, ctx.userId) match {
         case (Some(_), None)                    => true
         case (Some(playerUserId), Some(userId)) => playerUserId != userId
-        case (None, _) =>
+        case (None, _)                          =>
           !lila.api.Mobile.Api.requested(ctx.req) &&
-            !ctx.req.cookies.get(AnonCookie.name).exists(_.value == pov.playerId)
+          !ctx.req.cookies.get(AnonCookie.name).exists(_.value == pov.playerId)
       }
     }
 

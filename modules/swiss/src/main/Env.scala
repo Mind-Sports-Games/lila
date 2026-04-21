@@ -1,9 +1,9 @@
 package lila.swiss
 
-import com.softwaremill.macwire._
+import com.softwaremill.macwire.*
 import play.api.Configuration
 
-import lila.common.config._
+import lila.common.config.*
 import lila.common.{ AtMost, Every, ResilientScheduler }
 import lila.socket.Socket.{ GetVersion, SocketVersion }
 

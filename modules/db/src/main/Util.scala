@@ -1,6 +1,6 @@
 package lila.db
 
-import dsl._
+import dsl.*
 
 object Util {
 

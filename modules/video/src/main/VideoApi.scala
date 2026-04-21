@@ -1,13 +1,13 @@
 package lila.video
 
-import reactivemongo.api.bson._
+import reactivemongo.api.bson.*
 import reactivemongo.api.ReadPreference
-import scala.concurrent.duration._
+import scala.concurrent.duration.*
 
-import lila.common.paginator._
-import lila.db.dsl._
+import lila.common.paginator.*
+import lila.db.dsl.*
 import lila.db.paginator.Adapter
-import lila.memo.CacheApi._
+import lila.memo.CacheApi.*
 import lila.user.User
 
 final private[video] class VideoApi(
@@ -61,7 +61,7 @@ final private[video] class VideoApi(
           projection = textScore.some,
           sort = textScore,
           readPreference = ReadPreference.secondaryPreferred
-        ) `mapFutureList` videoViews(user),
+        ).mapFutureList(videoViews(user)),
         currentPage = page,
         maxPerPage = maxPerPage
       )
@@ -99,13 +99,13 @@ final private[video] class VideoApi(
           projection = none,
           sort = $doc("metadata.likes" -> -1),
           readPreference = ReadPreference.secondaryPreferred
-        ) `mapFutureList` videoViews(user),
+        ).mapFutureList(videoViews(user)),
         currentPage = page,
         maxPerPage = maxPerPage
       )
 
     def byTags(user: Option[User], tags: List[Tag], page: Int): Fu[Paginator[VideoView]] =
-      if (tags.isEmpty) popular(user, page)
+      if tags.isEmpty then popular(user, page)
       else
         Paginator(
           adapter = new Adapter[Video](
@@ -114,7 +114,7 @@ final private[video] class VideoApi(
             projection = none,
             sort = $doc("metadata.likes" -> -1),
             readPreference = ReadPreference.secondaryPreferred
-          ) `mapFutureList` videoViews(user),
+          ).mapFutureList(videoViews(user)),
           currentPage = page,
           maxPerPage = maxPerPage
         )
@@ -127,7 +127,7 @@ final private[video] class VideoApi(
           projection = none,
           sort = $doc("metadata.likes" -> -1),
           readPreference = ReadPreference.secondaryPreferred
-        ) `mapFutureList` videoViews(user),
+        ).mapFutureList(videoViews(user)),
         currentPage = page,
         maxPerPage = maxPerPage
       )
@@ -135,7 +135,7 @@ final private[video] class VideoApi(
     def similar(user: Option[User], video: Video, max: Int): Fu[Seq[VideoView]] =
       videoColl
         .aggregateWith[Bdoc](readPreference = ReadPreference.secondaryPreferred) { framework =>
-          import framework._
+          import framework.*
           List(
             Match(
               $doc(
@@ -185,7 +185,7 @@ final private[video] class VideoApi(
         .one[View]
 
     def add(a: View) =
-      (viewColl.insert.one(a)).void recover
+      viewColl.insert.one(a).void recover
         lila.db.recoverDuplicateKey(_ => ())
 
     def hasSeen(user: User, video: Video): Fu[Boolean] =
@@ -217,13 +217,14 @@ final private[video] class VideoApi(
       _.expireAfterAccess(10 minutes)
         .buildAsyncFuture { filterTags =>
           val allPaths =
-            if (filterTags.isEmpty) allPopular map { tags =>
-              tags.filterNot(_.isNumeric)
-            }
+            if filterTags.isEmpty then
+              allPopular map { tags =>
+                tags.filterNot(_.isNumeric)
+              }
             else
               videoColl
                 .aggregateWith[Bdoc](readPreference = ReadPreference.secondaryPreferred) { framework =>
-                  import framework._
+                  import framework.*
                   List(
                     Match($doc("tags" `$all` filterTags)),
                     Project($doc("tags" -> true)),
@@ -245,7 +246,7 @@ final private[video] class VideoApi(
               all find (_.tag == t)
             }
             list.sortBy { t =>
-              if (filterTags contains t.tag) Int.MinValue
+              if filterTags contains t.tag then Int.MinValue
               else -t.nb
             }
           }
@@ -257,7 +258,7 @@ final private[video] class VideoApi(
         .buildAsyncFuture { _ =>
           videoColl
             .aggregateWith[Bdoc](readPreference = ReadPreference.secondaryPreferred) { framework =>
-              import framework._
+              import framework.*
               List(
                 Project($doc("tags" -> true)),
                 UnwindField("tags"),
@@ -268,7 +269,7 @@ final private[video] class VideoApi(
             .collect[List](maxDocs = Int.MaxValue)
             .dmap {
               _.flatMap(_.asOpt[TagNb])
-          }
+            }
         }
     }
   }

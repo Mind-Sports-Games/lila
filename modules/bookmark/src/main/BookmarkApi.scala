@@ -1,9 +1,9 @@
 package lila.bookmark
 
 import org.joda.time.DateTime
-import reactivemongo.api.bson._
+import reactivemongo.api.bson.*
 
-import lila.db.dsl._
+import lila.db.dsl.*
 import lila.game.{ Game, GameRepo }
 import lila.user.User
 
@@ -16,10 +16,10 @@ final class BookmarkApi(
 )(implicit ec: scala.concurrent.ExecutionContext) {
 
   private def exists(gameId: Game.ID, userId: User.ID): Fu[Boolean] =
-    coll `exists` selectId(gameId, userId)
+    coll.exists(selectId(gameId, userId))
 
   def exists(game: Game, user: User): Fu[Boolean] =
-    if (game.bookmarks > 0) exists(game.id, user.id)
+    if game.bookmarks > 0 then exists(game.id, user.id)
     else fuFalse
 
   def exists(game: Game, user: Option[User]): Fu[Boolean] =
@@ -43,9 +43,9 @@ final class BookmarkApi(
 
   def toggle(gameId: Game.ID, userId: User.ID): Funit =
     exists(gameId, userId) flatMap { e =>
-      (if (e) remove(gameId, userId) else add(gameId, userId, DateTime.now)) inject !e
+      (if e then remove(gameId, userId) else add(gameId, userId, DateTime.now)) inject !e
     } flatMap { bookmarked =>
-      gameRepo.incBookmarks(gameId, if (bookmarked) 1 else -1)
+      gameRepo.incBookmarks(gameId, if bookmarked then 1 else -1)
     }
 
   def countByUser(user: User): Fu[Int] = coll.countSel(userIdQuery(user.id))

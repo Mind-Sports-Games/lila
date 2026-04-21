@@ -1,13 +1,13 @@
 package lila.fishnet
 
-import akka.stream.scaladsl._
+import akka.stream.scaladsl.*
 import org.joda.time.DateTime
 import reactivemongo.akkastream.cursorProducer
-import reactivemongo.api.bson._
-import scala.concurrent.duration._
+import reactivemongo.api.bson.*
+import scala.concurrent.duration.*
 
 import lila.db.BSON.BSONJodaDateTimeHandler
-import lila.db.dsl._
+import lila.db.dsl.*
 
 final private class Cleaner(
     repo: FishnetRepo,
@@ -18,7 +18,7 @@ final private class Cleaner(
     mat: akka.stream.Materializer
 ) {
 
-  import BSONHandlers._
+  import BSONHandlers.*
 
   private def analysisTimeout(plies: Int) = (plies + 1) * 7.seconds
   private def analysisTimeoutBase         = analysisTimeout(20)
@@ -28,15 +28,18 @@ final private class Cleaner(
   private def cleanAnalysis: Funit =
     analysisColl
       .find($doc("acquired.date" `$lt` durationAgo(analysisTimeoutBase)))
-      .sort($sort `desc` "acquired.date")
+      .sort($sort.desc("acquired.date"))
       .cursor[Work.Analysis]()
       .documentSource()
       .filter { ana =>
-        ana.acquiredAt.so(_ `isBefore` durationAgo(analysisTimeout(ana.nbMoves)))
+        ana.acquiredAt.so(_.isBefore(durationAgo(analysisTimeout(ana.nbMoves))))
       }
       .take(200)
       .mapAsyncUnordered(4) { ana =>
-        repo.updateOrGiveUpAnalysis(ana.timeout).andDo(logger.info(s"Timeout analysis $ana")).andDo(ana.acquired.foreach { ack =>
+        repo
+          .updateOrGiveUpAnalysis(ana.timeout)
+          .andDo(logger.info(s"Timeout analysis $ana"))
+          .andDo(ana.acquired.foreach { ack =>
             Monitor.timeout(ack.userId)
           })
       }

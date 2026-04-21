@@ -17,8 +17,8 @@ object Lilaism extends LilaLibraryExtensions {
 
   import play.api.Mode
   extension (mode: Mode) {
-    inline def isDev  = mode == Mode.Dev
-    inline def isProd = mode == Mode.Prod
+    inline def isDev   = mode == Mode.Dev
+    inline def isProd  = mode == Mode.Prod
     inline def notProd = mode != Mode.Prod
   }
 }

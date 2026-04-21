@@ -1,12 +1,12 @@
 package lila.bookmark
 
-import akka.actor._
-import com.softwaremill.macwire._
+import akka.actor.*
+import com.softwaremill.macwire.*
 import lila.common.autoconfig.{ AutoConfig, ConfigName }
 import play.api.Configuration
 
-import lila.common.config._
-import lila.hub.actorApi.bookmark._
+import lila.common.config.*
+import lila.hub.actorApi.bookmark.*
 
 @Module
 final private class BookmarkConfig(

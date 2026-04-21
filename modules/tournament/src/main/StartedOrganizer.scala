@@ -1,8 +1,8 @@
 package lila.tournament
 
-import akka.actor._
-import akka.stream.scaladsl._
-import scala.concurrent.duration._
+import akka.actor.*
+import akka.stream.scaladsl.*
+import scala.concurrent.duration.*
 import lila.common.ThreadLocalRandom
 import lila.common.extensions.*
 
@@ -58,19 +58,18 @@ final private class StartedOrganizer(
   }
 
   private def processMedleyRoundChange(tour: Tournament) =
-    if (tour.needsNewMedleyRound) api.newMedleyRound(tour)
+    if tour.needsNewMedleyRound then api.newMedleyRound(tour)
     else tour
 
   private def processPairings(tour: Tournament) =
-    if (!tour.isScheduled && tour.nbPlayers < 30 && ThreadLocalRandom.nextInt(10) == 0)
-      playerRepo `nbActiveUserIds` tour.id flatMap { nb =>
+    if !tour.isScheduled && tour.nbPlayers < 30 && ThreadLocalRandom.nextInt(10) == 0 then
+      playerRepo.nbActiveUserIds(tour.id) flatMap { nb =>
         (nb >= 2) so startPairing(tour)
       }
     else startPairing(tour)
 
   private def processTour(tour: Tournament): Fu[Int] =
-    if (tour.isOver)
-      api.finish(tour).inject(0)
+    if tour.isOver then api.finish(tour).inject(0)
     else
       tour
         .pipe(processMedleyRoundChange)

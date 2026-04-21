@@ -1,11 +1,11 @@
 package lila.team
 
-import lila.db.dsl._
+import lila.db.dsl.*
 import lila.user.User
 
 final class RequestRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionContext) {
 
-  import BSONHandlers._
+  import BSONHandlers.*
 
   type ID = String
 

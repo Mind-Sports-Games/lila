@@ -2,15 +2,15 @@ package lila.db
 
 import cats.data.NonEmptyList
 import org.joda.time.DateTime
-import reactivemongo.api.bson._
+import reactivemongo.api.bson.*
 import reactivemongo.api.bson.exceptions.TypeDoesNotMatchException
 import scala.util.{ Failure, Success, Try }
 
-import lila.common.Iso._
+import lila.common.Iso.*
 import lila.common.{ EmailAddress, IpAddress, Iso, NormalizedEmailAddress }
-import strategygames.{ Player => PlayerIndex, GameLogic, ByoyomiClock, Clock }
-import strategygames.format.{ FEN => StratFEN }
-import strategygames.variant.{ Variant => StratVariant }
+import strategygames.{ ByoyomiClock, Clock, GameLogic, Player as PlayerIndex }
+import strategygames.format.FEN as StratFEN
+import strategygames.variant.Variant as StratVariant
 import strategygames.chess.format.FEN
 import strategygames.chess.variant.Variant
 import io.lemonlabs.uri.AbsoluteUrl
@@ -36,11 +36,13 @@ trait Handlers {
   def stringAnyValHandler[A](to: A => String, from: String => A): BSONHandler[A] =
     stringIsoHandler(using Iso(from, to))
 
-  def intIsoHandler[A](implicit iso: IntIso[A]): BSONHandler[A]         = BSONIntegerHandler.as[A](iso.from, iso.to)
+  def intIsoHandler[A](implicit iso: IntIso[A]): BSONHandler[A] = BSONIntegerHandler.as[A](iso.from, iso.to)
   def intAnyValHandler[A](to: A => Int, from: Int => A): BSONHandler[A] = intIsoHandler(using Iso(from, to))
 
-  def longIsoHandler[A](implicit iso: LongIso[A]): BSONHandler[A]          = BSONLongHandler.as[A](iso.from, iso.to)
-  def longAnyValHandler[A](to: A => Long, from: Long => A): BSONHandler[A] = longIsoHandler(using Iso(from, to))
+  def longIsoHandler[A](implicit iso: LongIso[A]): BSONHandler[A] = BSONLongHandler.as[A](iso.from, iso.to)
+  def longAnyValHandler[A](to: A => Long, from: Long => A): BSONHandler[A] = longIsoHandler(using
+    Iso(from, to)
+  )
 
   def booleanIsoHandler[A](implicit iso: BooleanIso[A]): BSONHandler[A] =
     BSONBooleanHandler.as[A](iso.from, iso.to)

@@ -1,17 +1,17 @@
 package lila.insight
 
-import reactivemongo.api.bson._
+import reactivemongo.api.bson.*
 
-import lila.db.dsl._
+import lila.db.dsl.*
 import lila.db.AsyncColl
 import lila.rating.BSONHandlers.perfTypeIdHandler
 import lila.rating.PerfType
 
 final private class Storage(val coll: AsyncColl)(implicit ec: scala.concurrent.ExecutionContext) {
 
-  import Storage._
-  import BSONHandlers._
-  import InsightEntry.{ BSONFields => F }
+  import Storage.*
+  import BSONHandlers.*
+  import InsightEntry.BSONFields as F
 
   def fetchFirst(userId: String): Fu[Option[InsightEntry]] =
     coll(_.find(selectUserId(userId)).sort(sortChronological).one[InsightEntry])
@@ -47,7 +47,7 @@ final private class Storage(val coll: AsyncColl)(implicit ec: scala.concurrent.E
   def nbByPerf(userId: String): Fu[Map[PerfType, Int]] =
     coll {
       _.aggregateWith[Bdoc]() { framework =>
-        import framework._
+        import framework.*
         List(
           Match(BSONDocument(F.userId -> userId)),
           GroupField(F.perf)("nb" -> SumAll)
@@ -55,19 +55,19 @@ final private class Storage(val coll: AsyncColl)(implicit ec: scala.concurrent.E
       }
         .collect[List](maxDocs = 50)
         .map {
-        _.flatMap { doc =>
-          for {
-            perfType <- doc.getAsOpt[PerfType]("_id")
-            nb       <- doc.int("nb")
-          } yield perfType -> nb
-        }.toMap
-      }
+          _.flatMap { doc =>
+            for {
+              perfType <- doc.getAsOpt[PerfType]("_id")
+              nb       <- doc.int("nb")
+            } yield perfType -> nb
+          }.toMap
+        }
     }
 }
 
 private object Storage {
 
-  import InsightEntry.{ BSONFields => F }
+  import InsightEntry.BSONFields as F
 
   def selectId(id: String)     = BSONDocument(F.id -> id)
   def selectUserId(id: String) = BSONDocument(F.userId -> id)

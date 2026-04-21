@@ -2,13 +2,14 @@ package lila.db
 
 import scala.collection.Factory
 
-import reactivemongo.api._
-import reactivemongo.api.bson._
+import reactivemongo.api.*
+import reactivemongo.api.bson.*
 
 trait CursorExt { self: dsl =>
 
   // Can be refactor as CursorProducer
-  @annotation.nowarn("msg=unused") implicit final class ExtendCursor[A: BSONDocumentReader](val c: Cursor[A])(implicit
+  @annotation.nowarn("msg=unused")
+  implicit final class ExtendCursor[A: BSONDocumentReader](val c: Cursor[A])(implicit
       ec: scala.concurrent.ExecutionContext
   ) {
 

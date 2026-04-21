@@ -21,8 +21,7 @@ final class ModApi(
       sus = prev.set(_.withMarks(_.set(_.Alt, v)))
       _ <- reportApi.process(mod, sus, Set(Room.Cheat, Room.Print))
       _ <- logApi.alt(mod, sus, v)
-    } yield
-      if (v) notifier.reporters(mod, sus).discard
+    } yield if v then notifier.reporters(mod, sus).discard
 
   def setEngine(mod: Mod, prev: Suspect, v: Boolean): Funit =
     (prev.user.marks.engine != v) so {
@@ -33,18 +32,18 @@ final class ModApi(
         _ <- logApi.engine(mod, sus, v)
       } yield {
         Bus.publish(lila.hub.actorApi.mod.MarkCheater(sus.user.id, v), "adjustCheater")
-        if (v) {
+        if v then {
           notifier.reporters(mod, sus)
-          refunder `schedule` sus
+          refunder.schedule(sus)
         }
       }
     }
 
   def autoMark(suspectId: SuspectId, modId: ModId, note: String): Funit =
     for {
-      sus       <- reportApi.getSuspect(suspectId.value) `orFail` s"No such suspect $suspectId"
+      sus       <- reportApi.getSuspect(suspectId.value).orFail(s"No such suspect $suspectId")
       unengined <- logApi.wasUnengined(sus)
-      _ <- (!sus.user.isBot && !sus.user.marks.engine && !unengined) so {
+      _         <- (!sus.user.isBot && !sus.user.marks.engine && !unengined) so {
         reportApi.getMod(modId.value) flatMap {
           _ so { mod =>
             lila.mon.cheat.autoMark.increment()
@@ -56,7 +55,7 @@ final class ModApi(
     } yield ()
 
   def setBoost(mod: Mod, prev: Suspect, v: Boolean): Fu[Suspect] =
-    if (prev.user.marks.boost == v) fuccess(prev)
+    if prev.user.marks.boost == v then fuccess(prev)
     else
       for {
         _ <- userRepo.setBoost(prev.user.id, v)
@@ -64,7 +63,7 @@ final class ModApi(
         _ <- reportApi.process(mod, sus, Set(Room.Other))
         _ <- logApi.booster(mod, sus, v)
       } yield {
-        if (v) {
+        if v then {
           Bus.publish(lila.hub.actorApi.mod.MarkBooster(sus.user.id), "adjustBooster")
           notifier.reporters(mod, sus)
         }
@@ -81,7 +80,7 @@ final class ModApi(
       }
     } >>
       reportApi.process(mod, sus, Set(Room.Comm)).andDo {
-        if (value) notifier.reporters(mod, sus).discard
+        if value then notifier.reporters(mod, sus).discard
       } inject sus
   }
 
@@ -100,20 +99,20 @@ final class ModApi(
 
   def disableTwoFactor(mod: String, username: String): Funit =
     withUser(username) { user =>
-      (userRepo `disableTwoFactor` user.id) >> logApi.disableTwoFactor(mod, user.id)
+      (userRepo.disableTwoFactor(user.id)) >> logApi.disableTwoFactor(mod, user.id)
     }
 
   def reopenAccount(mod: String, username: String): Funit =
     withUser(username) { user =>
       !user.enabled so {
-        (userRepo `reopen` user.id) >> logApi.reopenAccount(mod, user.id)
+        (userRepo.reopen(user.id)) >> logApi.reopenAccount(mod, user.id)
       }
     }
 
   def setKid(mod: String, username: String): Funit =
     withUser(username) { user =>
       userRepo.isKid(user.id) flatMap {
-        !_ so { (userRepo.setKid(user, true)) } >> logApi.setKidMode(mod, user.id)
+        !_ so { userRepo.setKid(user, true) } >> logApi.setKidMode(mod, user.id)
       }
     }
 
@@ -162,7 +161,7 @@ final class ModApi(
 
   def setRankban(mod: Mod, sus: Suspect, v: Boolean): Funit =
     (sus.user.marks.rankban != v) so {
-      if (v) Bus.publish(lila.hub.actorApi.mod.KickFromRankings(sus.user.id), "kickFromRankings")
+      if v then Bus.publish(lila.hub.actorApi.mod.KickFromRankings(sus.user.id), "kickFromRankings")
       userRepo.setRankban(sus.user.id, v) >> logApi.rankban(mod, sus, v)
     }
 
@@ -170,8 +169,8 @@ final class ModApi(
     userRepo.userIdsWithRoles(Permission.modPermissions.view.map(_.dbKey).toList) flatMap
       userRepo.enabledByIds dmap {
         _.sortBy(_.timeNoSee)
-    }
+      }
 
   private def withUser[A](username: String)(op: User => Fu[A]): Fu[A] =
-    userRepo `named` username `orFail` s"[mod] missing user $username" flatMap op
+    userRepo.named(username).orFail(s"[mod] missing user $username") flatMap op
 }

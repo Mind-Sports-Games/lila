@@ -5,7 +5,7 @@ import strategygames.format.{ FEN, Forsyth, Uci, UciCharPair }
 import strategygames.variant.Variant
 import strategygames.opening.FullOpeningDB
 import strategygames.{ Game, GameLogic, Pos, PromotableRole, Role, Situation }
-import play.api.libs.json._
+import play.api.libs.json.*
 
 import lila.tree.Branch
 
@@ -31,7 +31,7 @@ case class AnaMove(
 ) extends AnaAny {
 
   private lazy val lib = variant.gameLogic
-  //draughts
+  // draughts
   private lazy val fullCaptureFields =
     uci.flatMap(m => Uci.Move.apply(lib, variant.gameFamily, m)).flatMap(_.capture)
 
@@ -49,7 +49,7 @@ case class AnaMove(
     newGame.andThen { case (game, move) =>
       game.actionStrs.flatten.lastOption toValid "Moved but no last move!" map { lastAction =>
         val gameRecordNotation =
-          if (lib == GameLogic.FairySF() || lib == GameLogic.Go() || lib == GameLogic.Backgammon())
+          if lib == GameLogic.FairySF() || lib == GameLogic.Go() || lib == GameLogic.Backgammon() then
             strategygames.format.sgf.Dumper(variant, Vector(Vector(lastAction)))
           else lastAction
         val uci = Uci(
@@ -61,11 +61,11 @@ case class AnaMove(
           }
         )
         val sit     = game.situation
-        val movable = sit `playable` false
+        val movable = sit.playable(false)
         val fen     = Forsyth.>>(lib, game)
         val captLen = (sit, dest) match {
           case (Situation.Draughts(sit), Pos.Draughts(dest)) =>
-            if (sit.ghosts > 0) sit.captureLengthFrom(dest)
+            if sit.ghosts > 0 then sit.captureLengthFrom(dest)
             else sit.allMovesCaptureLength.some
           case _ => None
         }
@@ -74,18 +74,18 @@ case class AnaMove(
             case (Situation.Draughts(sit), Pos.Draughts(dest)) =>
               AnaDests.validMoves(
                 Situation.Draughts(sit),
-                sit.ghosts > 0 `option` dest,
+                (sit.ghosts > 0).option(dest),
                 ~fullCapture
               )
             case _ => Map.empty[strategygames.draughts.Pos, List[strategygames.draughts.Move]]
           }
         val truncatedMoves =
-          (~fullCapture && ~captLen > 1) `option` AnaDests.truncateMoves(validMoves)
+          (~fullCapture && ~captLen > 1).option(AnaDests.truncateMoves(validMoves))
         Branch(
           id = UciCharPair(lib, uci),
           ply = game.plies,
           turnCount = game.turnCount,
-          playedPlayerIndex = if (game.board.history.currentTurn.nonEmpty) game.player else !game.player,
+          playedPlayerIndex = if game.board.history.currentTurn.nonEmpty then game.player else !game.player,
           variant = variant,
           move = Uci.WithSan(lib, uci, gameRecordNotation),
           fen = fen,
@@ -100,7 +100,7 @@ case class AnaMove(
                   .getOrElse(validMoves.view.mapValues { _ map (_.dest) })
                   .to(Map)
                   .map { case (p, m) => (Pos.Draughts(p), m.map(Pos.Draughts.apply)) }
-              movable `option` draughtsDests
+              movable.option(draughtsDests)
             }
             case _ => Some(movable so game.situation.destinations)
           },
@@ -112,7 +112,7 @@ case class AnaMove(
           opening = (game.turnCount <= 30 && Variant.openingSensibleVariants(lib)(variant)) so {
             FullOpeningDB.findByFen(lib, fen)
           },
-          drops = if (movable) game.situation.drops else Some(Nil),
+          drops = if movable then game.situation.drops else Some(Nil),
           dropsByRole = game.situation.dropsByRole,
           pocketData = game.situation.board.pocketData
         )
@@ -123,16 +123,16 @@ case class AnaMove(
 object AnaMove {
 
   private def dataGameLogic(d: JsObject): GameLogic =
-    GameLogic(d `int` "lib" getOrElse 0)
+    GameLogic(d.int("lib") getOrElse 0)
 
   def parse(o: JsObject) =
     for {
-      d <- o `obj` "d"
+      d <- o.obj("d")
       gl = dataGameLogic(d)
-      orig <- d `str` "orig" flatMap { pos => Pos.fromKey(gl, pos) }
-      dest <- d `str` "dest" flatMap { pos => Pos.fromKey(gl, pos) }
-      fen  <- d `str` "fen" map { fen => FEN.apply(gl, fen) }
-      path <- d `str` "path"
+      orig <- d.str("orig") flatMap { pos => Pos.fromKey(gl, pos) }
+      dest <- d.str("dest") flatMap { pos => Pos.fromKey(gl, pos) }
+      fen  <- d.str("fen") map { fen => FEN.apply(gl, fen) }
+      path <- d.str("path")
       v = Variant.orDefault(gl, ~d.str("variant"))
     } yield AnaMove(
       orig = orig,
@@ -140,11 +140,11 @@ object AnaMove {
       variant = v,
       fen = fen,
       path = path,
-      chapterId = d `str` "ch",
+      chapterId = d.str("ch"),
       promotion = d.str("promotion").flatMap { p =>
         Role.allPromotableByGroundName(gl, v.gameFamily).get(p)
       },
-      uci = d `str` "uci",
-      fullCapture = d `boolean` "fullCapture"
+      uci = d.str("uci"),
+      fullCapture = d.boolean("fullCapture")
     )
 }

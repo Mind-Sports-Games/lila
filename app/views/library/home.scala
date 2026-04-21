@@ -3,11 +3,11 @@ package views.html.library
 import play.api.libs.json.Json
 
 import lila.api.Context
-import lila.app.templating.Environment._
-import lila.app.ui.ScalatagsTemplate._
+import lila.app.templating.Environment.*
+import lila.app.ui.ScalatagsTemplate.*
 import lila.common.String.html.safeJsonValue
-import lila.i18n.{ I18nKeys => trans, VariantKeys }
-import lila.game.{ MonthlyGameData }
+import lila.i18n.{ I18nKeys as trans, VariantKeys }
+import lila.game.MonthlyGameData
 
 import strategygames.variant.Variant
 import strategygames.GameGroup
@@ -26,20 +26,20 @@ object home {
         jsModule("library"),
         jsTag("chart/library.js"),
         embedJsUnsafeLoadThen(s"""window.libraryChartData = ${safeJsonValue(
-          Json.obj(
-            "freq" -> bits.transformData(monthlyGameData),
-            "i18n" -> i18nJsObject(bits.i18nKeys),
-            "variantNames" -> Json.obj(
-              Variant.all.map(v =>
-                s"${v.gameFamily.id}_${v.id}" -> Json.toJsFieldJsValueWrapper(VariantKeys.variantName(v))
-              )*
-            ),
-            "gameGroupNames" -> Json.obj(
-              GameGroup.all
-                .map(gg => s"${gg.id}" -> Json.toJsFieldJsValueWrapper(VariantKeys.gameGroupName(gg)))*
+            Json.obj(
+              "freq"         -> bits.transformData(monthlyGameData),
+              "i18n"         -> i18nJsObject(bits.i18nKeys),
+              "variantNames" -> Json.obj(
+                Variant.all.map(v =>
+                  s"${v.gameFamily.id}_${v.id}" -> Json.toJsFieldJsValueWrapper(VariantKeys.variantName(v))
+                )*
+              ),
+              "gameGroupNames" -> Json.obj(
+                GameGroup.all
+                  .map(gg => s"${gg.id}" -> Json.toJsFieldJsValueWrapper(VariantKeys.gameGroupName(gg)))*
+              )
             )
-          )
-        )};"""),
+          )};"""),
         embedJsUnsafeLoadThen(s"""playstrategy.libraryChart(window.libraryChartData)""")
       ),
       openGraph = lila.app.ui
@@ -52,27 +52,27 @@ object home {
       zoomable = true
     )(
       main(
-        id := "library-section",
+        id  := "library-section",
         cls := "library-all"
       )(
         h1(cls := "library-title color-choice")(trans.gameLibrary()),
         div(cls := "gamegroup-choice")(
           div(cls := "section-title")(trans.gameGroup()),
           div(cls := "gamegroup-icons")(translatedGameGroupIconChoices map { case (id, icon, hint) =>
-            (button(cls := "gamegroup", value := id, dataIcon := icon)(hint))
+            button(cls := "gamegroup", value := id, dataIcon := icon)(hint)
           })
         ),
         div(cls := "variants-choice hidden")(
           div(cls := "section-title")(trans.variant()),
           div(cls := "variants-icons")(translatedVariantIconChoices.filter { case (id, _, _) =>
-            id != "0_3" //from position
+            id != "0_3" // from position
           } map { case (id, icon, name) =>
-            (button(
-              cls := "variant",
+            button(
+              cls      := "variant",
               dataIcon := icon,
-              value := id,
-              href := routes.Library.variant(variantKey(id))
-            )(name))
+              value    := id,
+              href     := routes.Library.variant(variantKey(id))
+            )(name)
           })
         ),
         div(id := "library_chart_area")(
@@ -82,7 +82,7 @@ object home {
           div(cls := "library-stats-title color-choice")(
             div(dataIcon := "^"),
             h2("Overall Game Stats"),
-            div(" ") //place holder to keep title centered
+            div(" ") // place holder to keep title centered
           ),
           bits
             .statsRow("Total Game Variants", bits.totalVariants(monthlyGameData).toString, "total-variants"),

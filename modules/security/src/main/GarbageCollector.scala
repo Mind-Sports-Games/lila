@@ -28,9 +28,9 @@ final class GarbageCollector(
 
   // User just signed up and doesn't have security data yet, so wait a bit
   def delay(user: User, email: EmailAddress, req: RequestHeader): Unit =
-    if (user.createdAt.isAfter(DateTime.now `minusDays` 3)) {
-      val ip = HTTPRequest `ipAddress` req
-      val _ = scheduler
+    if user.createdAt.isAfter(DateTime.now.minusDays(3)) then {
+      val ip = HTTPRequest.ipAddress(req)
+      val _  = scheduler
         .scheduleOnce(6 seconds) {
           val applyData = ApplyData(user, ip, email, req)
           logger.debug(s"delay $applyData")
@@ -47,7 +47,7 @@ final class GarbageCollector(
     }
 
   private def ensurePrintAvailable(data: ApplyData): Funit =
-    userLogins `userHasPrint` data.user flatMap {
+    userLogins.userHasPrint(data.user) flatMap {
       case false => fufail("No print available yet")
       case _     => funit
     }
@@ -58,7 +58,7 @@ final class GarbageCollector(
         for {
           spy    <- userLogins(user, 300)
           ipSusp <- ipTrust.isSuspicious(ip)
-          _ <- {
+          _      <- {
             val printOpt = spy.prints.headOption
             logger.debug(s"apply ${data.user.username} print=$printOpt")
             Bus.publish(
@@ -67,7 +67,7 @@ final class GarbageCollector(
             )
             printOpt.filter(_.banned).map(_.fp.value) match {
               case Some(print) => collect(user, email, msg = s"Print ban: ${print.value}")
-              case _ =>
+              case _           =>
                 badOtherAccounts(spy.otherUsers.map(_.user)) so { others =>
                   logger.debug(s"other ${data.user.username} others=${others.map(_.username)}")
                   lila.common.LilaFuture
@@ -88,27 +88,27 @@ final class GarbageCollector(
   private def badOtherAccounts(accounts: List[User]): Option[List[User]] = {
     val others = accounts
       .sortBy(-_.createdAt.getMillis / 1000)
-      .takeWhile(_.createdAt.isAfter(DateTime.now `minusDays` 10))
+      .takeWhile(_.createdAt.isAfter(DateTime.now.minusDays(10)))
       .take(4)
-    (others.sizeIs > 1 && others.forall(isBadAccount) && others.headOption.exists(_.disabled)) `option` others
+    (others.sizeIs > 1 && others.forall(isBadAccount) && others.headOption.exists(_.disabled)).option(others)
   }
 
   private def isBadAccount(user: User) = user.lameOrTrollOrAlt
 
   private def collect(user: User, email: EmailAddress, msg: => String): Funit =
     justOnce(user.id) so {
-      val armed = isArmed()
-      val wait  = (30 + ThreadLocalRandom.nextInt(300)).seconds
+      val armed   = isArmed()
+      val wait    = (30 + ThreadLocalRandom.nextInt(300)).seconds
       val message =
         s"Will dispose of @${user.username} in $wait. Email: ${email.value}. $msg${!armed so " [SIMULATION]"}"
       logger.info(message)
       noteApi.playstrategyWrite(user, s"Garbage collected because of $msg")
       slack.garbageCollector(message).andDo {
-        if (armed) {
+        if armed then {
           doInitialSb(user)
           val _ = scheduler.scheduleOnce(wait) {
-              doCollect(user)
-            }
+            doCollect(user)
+          }
         }
       }
     }

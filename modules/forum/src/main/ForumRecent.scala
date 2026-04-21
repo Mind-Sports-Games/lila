@@ -1,6 +1,6 @@
 package lila.forum
 
-import lila.memo.CacheApi._
+import lila.memo.CacheApi.*
 import lila.user.User
 
 final class ForumRecent(

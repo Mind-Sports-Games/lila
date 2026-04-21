@@ -1,6 +1,6 @@
 package lila.api
 
-import play.api.libs.ws.DefaultBodyWritables._
+import play.api.libs.ws.DefaultBodyWritables.*
 import play.api.libs.ws.StandaloneWSClient
 import scala.util.{ Failure, Success }
 
@@ -20,7 +20,7 @@ final class InfluxEvent(
       .onComplete {
         case Failure(err: Exception) => lila.log("influxEvent").error(endpoint, err)
         case Failure(err)            => throw err
-        case Success(res) =>
-          if (res.status != 204) lila.log("influxEvent").error(s"$endpoint ${res.status}")
-    }
+        case Success(res)            =>
+          if res.status != 204 then lila.log("influxEvent").error(s"$endpoint ${res.status}")
+      }
 }

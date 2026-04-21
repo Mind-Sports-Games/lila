@@ -40,7 +40,7 @@ object Namer {
 
   def ratingString(p: Player) =
     p.rating match {
-      case Some(rating) => s"$rating${if (p.isInputRating) "*" else if (p.provisional) "?" else ""}"
+      case Some(rating) => s"$rating${if p.isInputRating then "*" else if p.provisional then "?" else ""}"
       case _            => "?"
     }
 }

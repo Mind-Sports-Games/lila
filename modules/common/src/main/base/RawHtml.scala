@@ -1,7 +1,7 @@
 package lila.base
 
 import java.lang.Character.isLetterOrDigit
-import java.lang.{ StringBuilder as jStringBuilder, Math }
+import java.lang.{ Math, StringBuilder as jStringBuilder }
 import scala.annotation.{ switch, tailrec }
 
 import lila.common.base.StringUtils.escapeHtmlRaw
@@ -15,8 +15,7 @@ object RawHtml {
       if char == '\n' then {
         counter += 1
         if counter < 3 then sb.append("<br>")
-      }
-      else if char != '\r' then {
+      } else if char != '\r' then {
         counter = 0
         sb.append(char)
       }
@@ -33,7 +32,7 @@ object RawHtml {
 
   private val USER_LINK = """/@/([\w-]{2,30}+)?""".r
 
-  private val DOMAIN      = "playstrategy.org"
+  private val DOMAIN = "playstrategy.org"
 
   // Matches a playstrategy username with an '@' prefix if it is used as a single
   // word (i.e. preceded and followed by space or appropriate punctuation):
@@ -57,8 +56,7 @@ object RawHtml {
       do ()
       if idx < text.length then buf += text.substring(idx)
       buf.result()
-    }
-    else List(text)
+    } else List(text)
   }
 
   def hasLinks(text: String) = urlPattern.matcher(text).find
@@ -106,16 +104,17 @@ object RawHtml {
           val allButScheme = escapeHtmlRaw(csb.toString)
 
           if isTldInternal then
-            sb.append(s"""<a href="${if allButScheme.isEmpty then "/"
-            else allButScheme}">${allButScheme match {
-              case USER_LINK(user) => "@" + user
-              case _               => DOMAIN + allButScheme
-              }
-            }</a>""")
+            sb.append(s"""<a href="${
+                if allButScheme.isEmpty then "/"
+                else allButScheme
+              }">${allButScheme match {
+                case USER_LINK(user) => "@" + user
+                case _               => DOMAIN + allButScheme
+              }}</a>""")
           else {
-            val isHttp = domainS - start == 7
-            val url    = (if isHttp then "http://" else "https://") + allButScheme
-            val text   = if isHttp then url else allButScheme
+            val isHttp  = domainS - start == 7
+            val url     = (if isHttp then "http://" else "https://") + allButScheme
+            val text    = if isHttp then url else allButScheme
             val imgHtml =
               if (end < sArr.length && sArr(end) == '"') || !expandImg then None
               else imgUrl(url)
@@ -140,8 +139,7 @@ object RawHtml {
 
   private def adjustUrlEnd(sArr: Array[Char], start: Int, end: Int): Int = {
     var last = end - 1
-    while
-      (sArr(last): @switch) match {
+    while (sArr(last): @switch) match {
         case '.' | ',' | '?' | '!' | ':' | ';' | '–' | '—' | '@' | '\'' | '(' => true
         case _                                                                => false
       }
@@ -157,12 +155,10 @@ object RawHtml {
               case '(' => 1
               case ')' => -1
               case _   => 0
-            }
-            )
+            })
           )
       var parenCnt = pCnter(start, -1)
-      while
-        (sArr(last): @switch) match {
+      while (sArr(last): @switch) match {
           case '.' | ',' | '?' | '!' | ':' | ';' | '–' | '—' | '@' | '\'' => true
           case '('                                                        => parenCnt -= 1; true
           case ')'                                                        => parenCnt += 1; parenCnt <= 0
@@ -182,8 +178,7 @@ object RawHtml {
       case imgurRegex(id) => Some(s"""https://i.imgur.com/$id.jpg""")
       case giphyRegex(id) => Some(s"""https://media.giphy.com/media/$id/giphy.gif""")
       case _              => None
-    }
-    ).map { img =>
+    }).map { img =>
       s"""<img class="embed" src="$img" alt="$url"/>"""
     }
 

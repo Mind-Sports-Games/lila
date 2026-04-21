@@ -22,17 +22,17 @@ case class PerfStat(
   def id = _id
 
   def agg(pov: Pov) =
-    if (!pov.game.finished) this
+    if !pov.game.finished then this
     else {
-      val thisYear = pov.game.createdAt `isAfter` DateTime.now.minusYears(1)
+      val thisYear = pov.game.createdAt.isAfter(DateTime.now.minusYears(1))
       copy(
         highest = RatingAt.agg(highest, pov, 1),
-        lowest = if (thisYear) RatingAt.agg(lowest, pov, -1) else lowest,
-        bestWins = if (~pov.win) bestWins.agg(pov, 1) else bestWins,
-        worstLosses = if (thisYear && ~pov.loss) worstLosses.agg(pov, -1) else worstLosses,
+        lowest = if thisYear then RatingAt.agg(lowest, pov, -1) else lowest,
+        bestWins = if ~pov.win then bestWins.agg(pov, 1) else bestWins,
+        worstLosses = if thisYear && ~pov.loss then worstLosses.agg(pov, -1) else worstLosses,
         count = count(pov),
-        resultStreak = resultStreak `agg` pov,
-        playStreak = playStreak `agg` pov
+        resultStreak = resultStreak.agg(pov),
+        playStreak = playStreak.agg(pov)
       )
     }
 
@@ -79,11 +79,11 @@ case class PlayStreak(nb: Streaks, time: Streaks, lastDate: Option[DateTime]) {
       )
     }
   def checkCurrent =
-    if (isContinued(DateTime.now)) this
+    if isContinued(DateTime.now) then this
     else copy(nb = nb.reset, time = time.reset)
   private def isContinued(at: DateTime) =
     lastDate.fold(true) { ld =>
-      at.isBefore(ld `plusMinutes` PlayStreak.expirationMinutes)
+      at.isBefore(ld.plusMinutes(PlayStreak.expirationMinutes))
     }
 }
 object PlayStreak {
@@ -96,14 +96,14 @@ case class Streaks(cur: Streak, max: Streak) {
       cur = cur(cont, pov)(v)
     ).setMax
   def reset          = copy(cur = Streak.init)
-  private def setMax = copy(max = if (cur.v >= max.v) cur else max)
+  private def setMax = copy(max = if cur.v >= max.v then cur else max)
 }
 object Streaks {
   val init = Streaks(Streak.init, Streak.init)
 }
 case class Streak(v: Int, from: Option[GameAt], to: Option[GameAt]) {
-  def apply(cont: Boolean, pov: Pov)(v: Int) = if (cont) inc(pov, v) else Streak.init
-  private def inc(pov: Pov, by: Int) =
+  def apply(cont: Boolean, pov: Pov)(v: Int) = if cont then inc(pov, v) else Streak.init
+  private def inc(pov: Pov, by: Int)         =
     copy(
       v = v + by,
       from = from orElse GameAt(pov.game.createdAt, pov.gameId).some,
@@ -130,19 +130,19 @@ case class Count(
   def apply(pov: Pov) =
     copy(
       all = all + 1,
-      rated = rated + (if (pov.game.rated) 1 else 0),
-      win = win + (if (pov.win.contains(true)) 1 else 0),
-      loss = loss + (if (pov.win.contains(false)) 1 else 0),
-      draw = draw + (if (pov.win.isEmpty) 1 else 0),
-      tour = tour + (if (pov.game.isTournament) 1 else 0),
-      berserk = berserk + (if (pov.player.berserk) 1 else 0),
+      rated = rated + (if pov.game.rated then 1 else 0),
+      win = win + (if pov.win.contains(true) then 1 else 0),
+      loss = loss + (if pov.win.contains(false) then 1 else 0),
+      draw = draw + (if pov.win.isEmpty then 1 else 0),
+      tour = tour + (if pov.game.isTournament then 1 else 0),
+      berserk = berserk + (if pov.player.berserk then 1 else 0),
       opAvg = pov.opponent.stableRating.fold(opAvg)(opAvg.agg),
       seconds = seconds + (pov.game.durationSeconds match {
         case Some(s) if s <= 3 * 60 * 60 => s
         case _                           => 0
       }),
       disconnects = disconnects + {
-        if (~pov.loss && pov.game.status == strategygames.Status.Timeout) 1 else 0
+        if ~pov.loss && pov.game.status == strategygames.Status.Timeout then 1 else 0
       }
     )
   def period = new Period(seconds * 1000L)

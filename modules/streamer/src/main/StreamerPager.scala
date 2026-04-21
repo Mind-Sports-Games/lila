@@ -1,9 +1,9 @@
 package lila.streamer
 
-import reactivemongo.api._
+import reactivemongo.api.*
 
 import lila.common.paginator.Paginator
-import lila.db.dsl._
+import lila.db.dsl.*
 import lila.db.paginator.{ Adapter, CachedAdapter }
 import lila.user.{ User, UserRepo }
 
@@ -13,7 +13,7 @@ final class StreamerPager(
     maxPerPage: lila.common.config.MaxPerPage
 )(implicit ec: scala.concurrent.ExecutionContext) {
 
-  import BsonHandlers._
+  import BsonHandlers.*
 
   def notLive(
       page: Int,
@@ -23,16 +23,17 @@ final class StreamerPager(
     val adapter = new Adapter[Streamer](
       collection = coll,
       selector =
-        if (approvalRequested) approvalRequestedSelector
+        if approvalRequested then approvalRequestedSelector
         else
           $doc(
             "approval.granted" -> true,
             "listed"           -> Streamer.Listed(true),
             "_id" `$nin` live.streams.map(_.streamer.id)
-          ),
+          )
+      ,
       projection = none,
-      sort = if (approvalRequested) $sort `asc` "updatedAt" else $sort `desc` "liveAt"
-    ) `mapFutureList` withUsers
+      sort = if approvalRequested then $sort.asc("updatedAt") else $sort.desc("liveAt")
+    ).mapFutureList(withUsers)
     Paginator(
       adapter = new CachedAdapter(adapter, nbResults = fuccess(6000)),
       currentPage = page,
@@ -43,7 +44,7 @@ final class StreamerPager(
   def nextRequestId: Fu[Option[Streamer.Id]] =
     coll.primitiveOne[Streamer.Id](
       $doc(approvalRequestedSelector),
-      $sort `asc` "updatedAt",
+      $sort.asc("updatedAt"),
       "_id"
     )
 

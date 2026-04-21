@@ -1,7 +1,7 @@
 package lila.analyse
 
 import strategygames.format.pgn.Glyph
-import lila.tree.Eval._
+import lila.tree.Eval.*
 
 //TODO to work for multiaction we need add turnCount to advice from Info
 sealed trait Advice {
@@ -74,7 +74,7 @@ private[analyse] object CpAdvice {
       infoCp <- info.cp map (_.ceiled.centipawns)
       prevWinningChances    = cpWinningChances(cp)
       currentWinningChances = cpWinningChances(infoCp)
-      delta = (currentWinningChances - prevWinningChances) pipe { d =>
+      delta                 = (currentWinningChances - prevWinningChances) pipe { d =>
         info.playerIndex.fold(-d, d)
       }
       judgement <- winningChanceJudgements find { case (d, _) => d <= delta } map (_._2)
@@ -112,12 +112,12 @@ private[analyse] case class MateAdvice(
 private[analyse] object MateAdvice {
 
   def apply(prev: Info, info: Info): Option[MateAdvice] = {
-    def invertCp(cp: Cp)       = cp `invertIf` info.playerIndex.p2
-    def invertMate(mate: Mate) = mate `invertIf` info.playerIndex.p2
+    def invertCp(cp: Cp)       = cp.invertIf(info.playerIndex.p2)
+    def invertMate(mate: Mate) = mate.invertIf(info.playerIndex.p2)
     def prevCp                 = prev.cp.map(invertCp).so(_.centipawns)
     def nextCp                 = info.cp.map(invertCp).so(_.centipawns)
     MateSequence(prev.mate map invertMate, info.mate map invertMate) flatMap { sequence =>
-      import Advice.Judgement._
+      import Advice.Judgement.*
       val judgment: Option[Advice.Judgement] = sequence match {
         case MateCreated if prevCp < -999 => Option(Inaccuracy)
         case MateCreated if prevCp < -700 => Option(Mistake)

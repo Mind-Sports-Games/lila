@@ -1,6 +1,5 @@
 package views.html.video
 
-
 object index {
   /*
   def apply(videos: Paginator[lila.video.VideoView], count: Long, control: lila.video.UserControl)(implicit

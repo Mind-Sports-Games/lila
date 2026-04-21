@@ -30,20 +30,20 @@ case class Appeal(
       msgs = msgs :+ msg,
       updatedAt = DateTime.now,
       status =
-        if (isByMod(msg) && status == Appeal.Status.Unread) Appeal.Status.Read
-        else if (!isByMod(msg) && status == Appeal.Status.Read) Appeal.Status.Unread
+        if isByMod(msg) && status == Appeal.Status.Unread then Appeal.Status.Read
+        else if !isByMod(msg) && status == Appeal.Status.Read then Appeal.Status.Unread
         else status,
       firstUnrepliedAt =
-        if (isByMod(msg) || msgs.lastOption.exists(isByMod)) DateTime.now
+        if isByMod(msg) || msgs.lastOption.exists(isByMod) then DateTime.now
         else firstUnrepliedAt
     )
   }
 
   def canAddMsg: Boolean = {
     val recentWithoutMod = msgs.foldLeft(Vector.empty[AppealMsg]) {
-      case (_, msg) if isByMod(msg)                                => Vector.empty
-      case (acc, msg) if msg.at `isAfter` DateTime.now.minusWeeks(1) => acc :+ msg
-      case (acc, _)                                                => acc
+      case (_, msg) if isByMod(msg)                                 => Vector.empty
+      case (acc, msg) if msg.at.isAfter(DateTime.now.minusWeeks(1)) => acc :+ msg
+      case (acc, _)                                                 => acc
     }
     val recentSize = recentWithoutMod.foldLeft(0)(_ + _.text.size)
     recentSize < Appeal.maxLength
@@ -51,7 +51,7 @@ case class Appeal(
 
   def unread     = copy(status = Appeal.Status.Unread)
   def read       = copy(status = Appeal.Status.Read)
-  def toggleMute = if (isMuted) read else copy(status = Appeal.Status.Muted)
+  def toggleMute = if isMuted then read else copy(status = Appeal.Status.Muted)
 
   def isByMod(msg: AppealMsg) = msg.by != id
 }
@@ -71,8 +71,8 @@ object Appeal {
 
   val maxLength = 1000
 
-  import play.api.data._
-  import play.api.data.Forms._
+  import play.api.data.*
+  import play.api.data.Forms.*
 
   val form =
     Form[String](

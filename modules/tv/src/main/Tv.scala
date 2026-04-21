@@ -6,7 +6,7 @@ import lila.hub.Trouper
 import lila.i18n.VariantKeys
 import strategygames.variant.Variant
 import strategygames.{ GameGroup, GameLogic }
-import cats.implicits._
+import cats.implicits.*
 
 final class Tv(
     gameRepo: GameRepo,
@@ -15,8 +15,8 @@ final class Tv(
     lightUserSync: LightUser.GetterSync
 )(implicit ec: scala.concurrent.ExecutionContext) {
 
-  import Tv._
-  import ChannelTrouper._
+  import Tv.*
+  import ChannelTrouper.*
 
   private def roundProxyGame = gameProxyRepo.game
 
@@ -27,23 +27,26 @@ final class Tv(
     trouper.ask[GameIdAndHistory](TvTrouper.GetGameIdAndHistory(channel, _)) flatMap {
       case GameIdAndHistory(gameId, historyIds) =>
         for {
-          game <- gameId so roundProxyGame
+          game  <- gameId so roundProxyGame
           games <-
-            Future.sequence(historyIds
-              .map { id =>
-                roundProxyGame(id) `orElse` gameRepo.game(id)
-              })
+            Future
+              .sequence(
+                historyIds
+                  .map { id =>
+                    roundProxyGame(id).orElse(gameRepo.game(id))
+                  }
+              )
               .dmap(_.flatten)
           history = games map Pov.naturalOrientation
         } yield game map (_ -> history)
     }
 
   def getGames(channel: Tv.Channel, max: Int): Fu[List[Game]] =
-    trouper.ask[List[Game.ID]](TvTrouper.GetGameIds(channel, max, _)) flatMap {
-      ids => Future.sequence(ids.map(roundProxyGame)).map(_.flatten)
+    trouper.ask[List[Game.ID]](TvTrouper.GetGameIds(channel, max, _)) flatMap { ids =>
+      Future.sequence(ids.map(roundProxyGame)).map(_.flatten)
     }
 
-  def getBestGame = getGame(Tv.Channel.AllGames) `orElse` gameRepo.random
+  def getBestGame = getGame(Tv.Channel.AllGames).orElse(gameRepo.random)
 
   def getBestAndHistory = getGameAndHistory(Tv.Channel.AllGames)
 
@@ -51,8 +54,8 @@ final class Tv(
     trouper.ask[Champions](TvTrouper.GetChampions.apply)
 
   def getCorrespondenceGames: Fu[List[Game]] =
-    gameRepo.playingCorrespondenceNoAi flatMap {
-      ids => Future.sequence(ids.map(gameRepo.game(_))).map(_.flatten)
+    gameRepo.playingCorrespondenceNoAi flatMap { ids =>
+      Future.sequence(ids.map(gameRepo.game(_))).map(_.flatten)
     }
 
   def getNonLiveCorrespondenceGamesOfChannel(
@@ -85,20 +88,20 @@ final class Tv(
 }
 
 object Tv {
-  import strategygames.chess.{ variant => CV }
-  import strategygames.draughts.{ variant => DV }
-  import strategygames.fairysf.{ variant => FV }
-  import strategygames.samurai.{ variant => MSV }
-  import strategygames.togyzkumalak.{ variant => MTV }
-  import strategygames.go.{ variant => GV }
-  import strategygames.backgammon.{ variant => BV }
-  import strategygames.abalone.{ variant => AV }
-  import strategygames.dameo.{ variant => D2V }
-  import strategygames.{ Speed => S, GameFamily }
+  import strategygames.chess.variant as CV
+  import strategygames.draughts.variant as DV
+  import strategygames.fairysf.variant as FV
+  import strategygames.samurai.variant as MSV
+  import strategygames.togyzkumalak.variant as MTV
+  import strategygames.go.variant as GV
+  import strategygames.backgammon.variant as BV
+  import strategygames.abalone.variant as AV
+  import strategygames.dameo.variant as D2V
+  import strategygames.{ GameFamily, Speed as S }
 
   case class Champion(user: LightUser, rating: Int, gameId: Game.ID)
   case class Champions(channels: Map[Channel, Champion]) {
-    def get = channels.get
+    def get                                                   = channels.get
     def combineWithAndFavour(overWritingChampions: Champions) =
       Champions(channels ++ overWritingChampions.channels)
   }
@@ -122,7 +125,7 @@ object Tv {
   ) {
     def isFresh(g: Game): Boolean       = fresh(secondsSinceLastMove, g)
     def isOngoingGame(g: Game): Boolean = onGoingGame(g)
-    //def filter(c: Candidate): Boolean = filters.forall { _(c) } && isFresh(c.game)
+    // def filter(c: Candidate): Boolean = filters.forall { _(c) } && isFresh(c.game)
     def filter(c: Candidate): Boolean = filters.forall { _(c) } && isOngoingGame(c.game)
     val key                           = s"${toString.head.toLower}${toString.drop(1)}"
   }
@@ -159,7 +162,8 @@ object Tv {
           name = s"All ${VariantKeys.gameFamilyName(GameFamily.Draughts())}",
           icon = DV.Standard.perfIcon.toString,
           secondsSinceLastMove = freshBlitz,
-          filters = Seq(anyVariant(Variant.all(GameLogic.Draughts()) ++ Variant.all(GameLogic.Dameo())), noBot),
+          filters =
+            Seq(anyVariant(Variant.all(GameLogic.Draughts()) ++ Variant.all(GameLogic.Dameo())), noBot),
           familyChannel = true,
           gameFamily = "draughts"
         )
@@ -270,7 +274,7 @@ object Tv {
           name = S.Bullet.name,
           icon = S.Bullet.perfIcon.toString,
           secondsSinceLastMove = 35,
-          //filters = Seq(speed(S.Bullet), rated(2000), standard, noBot)
+          // filters = Seq(speed(S.Bullet), rated(2000), standard, noBot)
           filters = Seq(speed(S.Bullet), standard, noBot),
           familyChannel = false,
           gameFamily = "chess"
@@ -280,7 +284,7 @@ object Tv {
           name = S.Blitz.name,
           icon = S.Blitz.perfIcon.toString,
           secondsSinceLastMove = freshBlitz,
-          //filters = Seq(speed(S.Blitz), rated(2000), standard, noBot)
+          // filters = Seq(speed(S.Blitz), rated(2000), standard, noBot)
           filters = Seq(speed(S.Blitz), standard, noBot),
           familyChannel = false,
           gameFamily = "chess"
@@ -290,7 +294,7 @@ object Tv {
           name = S.Rapid.name,
           icon = S.Rapid.perfIcon.toString,
           secondsSinceLastMove = freshRapid,
-          //filters = Seq(speed(S.Rapid), rated(1800), standard, noBot)
+          // filters = Seq(speed(S.Rapid), rated(1800), standard, noBot)
           filters = Seq(speed(S.Rapid), standard, noBot),
           familyChannel = false,
           gameFamily = "chess"
@@ -300,7 +304,7 @@ object Tv {
           name = S.Classical.name,
           icon = S.Classical.perfIcon.toString,
           secondsSinceLastMove = 60 * 8,
-          //filters = Seq(speed(S.Classical), rated(1650), standard, noBot)
+          // filters = Seq(speed(S.Classical), rated(1650), standard, noBot)
           filters = Seq(speed(S.Classical), standard, noBot),
           familyChannel = false,
           gameFamily = "chess"
@@ -409,7 +413,7 @@ object Tv {
           name = S.UltraBullet.name,
           icon = S.UltraBullet.perfIcon.toString,
           secondsSinceLastMove = 20,
-          //filters = Seq(speed(S.UltraBullet), rated(1600), standard, noBot)
+          // filters = Seq(speed(S.UltraBullet), rated(1600), standard, noBot)
           filters = Seq(speed(S.UltraBullet), standard, noBot),
           familyChannel = false,
           gameFamily = "chess"
@@ -751,7 +755,7 @@ object Tv {
         )
     val all = List(
       AllGames,
-      //Best,
+      // Best,
       ChessFamily,
       Bullet,
       Blitz,
@@ -822,14 +826,13 @@ object Tv {
     }.toMap
   }
 
-
   // private def rated(min: Int)                           = (c: Candidate) => c.game.rated && hasMinRating(c.game, min)
-  private def speed(speed: strategygames.Speed)         = (c: Candidate) => c.game.speed == speed
-  private def variant(variant: Variant)                 = (c: Candidate) => c.game.variant == variant
-  private def anyVariant(variantList: List[Variant])    = (c: Candidate) => variantList.contains(c.game.variant)
-  private val standard                                  = variant(Variant.libStandard(GameLogic.Chess()))
-  private val freshBlitz                                = 60 * 2
-  private val freshRapid                                = 60 * 5
+  private def speed(speed: strategygames.Speed)      = (c: Candidate) => c.game.speed == speed
+  private def variant(variant: Variant)              = (c: Candidate) => c.game.variant == variant
+  private def anyVariant(variantList: List[Variant]) = (c: Candidate) => variantList.contains(c.game.variant)
+  private val standard                               = variant(Variant.libStandard(GameLogic.Chess()))
+  private val freshBlitz                             = 60 * 2
+  private val freshRapid                             = 60 * 5
   private def computerFromInitialPosition(c: Candidate) = c.game.hasAi && !c.game.fromPosition
   private def hasBot(c: Candidate)                      = c.hasBot
   private def noBot(c: Candidate)                       = !c.hasBot

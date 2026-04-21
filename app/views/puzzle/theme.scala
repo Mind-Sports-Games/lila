@@ -1,10 +1,9 @@
 package views
 package html.puzzle
 
-
 import lila.api.Context
-import lila.app.templating.Environment._
-import lila.app.ui.ScalatagsTemplate._
+import lila.app.templating.Environment.*
+import lila.app.ui.ScalatagsTemplate.*
 import lila.puzzle.PuzzleTheme
 import strategygames.variant.Variant
 
@@ -38,7 +37,7 @@ object theme {
                     themes.map { pt =>
                       (pt.count > 0).option {
                         val url =
-                          if (pt.theme == PuzzleTheme.mix) routes.Puzzle.home(variant.key)
+                          if pt.theme == PuzzleTheme.mix then routes.Puzzle.home(variant.key)
                           else routes.Puzzle.show(variant.key, pt.theme.key.value)
                         a(cls := "puzzle-themes__link", href := url.url)(
                           span(

@@ -1,12 +1,12 @@
 package views.html
 
-import play.api.libs.json._
+import play.api.libs.json.*
 
 import lila.api.Context
-import lila.app.templating.Environment._
-import lila.app.ui.ScalatagsTemplate._
+import lila.app.templating.Environment.*
+import lila.app.ui.ScalatagsTemplate.*
 import lila.common.String.html.safeJsonValue
-import lila.i18n.I18nKeys.{ storm => s }
+import lila.i18n.I18nKeys.storm as s
 import lila.racer.RacerRace
 
 object racer {
@@ -32,19 +32,20 @@ object racer {
       )
     }
 
-  @annotation.nowarn("msg=unused") def show(race: RacerRace, data: JsObject, pref: JsObject)(implicit ctx: Context) =
+  @annotation.nowarn("msg=unused")
+  def show(race: RacerRace, data: JsObject, pref: JsObject)(implicit ctx: Context) =
     views.html.base.layout(
       moreCss = frag(cssTag("racer")),
       moreJs = frag(
         jsModule("racer"),
         embedJsUnsafeLoadThen(
           s"""PlayStrategyRacer(${safeJsonValue(
-            Json.obj(
-              "data" -> data,
-              "pref" -> pref,
-              "i18n" -> i18nJsObject(i18nKeys)
-            )
-          )})"""
+              Json.obj(
+                "data" -> data,
+                "pref" -> pref,
+                "i18n" -> i18nJsObject(i18nKeys)
+              )
+            )})"""
         )
       ),
       title = "Puzzle Racer",

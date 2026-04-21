@@ -1,8 +1,8 @@
 package lila.common
 
-import akka.actor._
+import akka.actor.*
 import java.util.concurrent.ConcurrentHashMap
-import scala.concurrent.duration._
+import scala.concurrent.duration.*
 
 final class Debouncer[Id](scheduler: Scheduler, duration: FiniteDuration, initialCapacity: Int = 64)(
     f: Id => Unit
@@ -35,8 +35,7 @@ final class Debouncer[Id](scheduler: Scheduler, duration: FiniteDuration, initia
           f(id)
           scheduler.scheduleOnce(duration) { runScheduled(id) }
           Queued.Empty
-        }
-        else nullToRemove
+        } else nullToRemove
     )
 
   @scala.annotation.nowarn

@@ -1,7 +1,7 @@
 package controllers
 
 import play.api.mvc.Result
-import views._
+import views.*
 
 import lila.api.Context
 import lila.app.*
@@ -12,7 +12,7 @@ final class Appeal(env: Env, reportC: => Report, prismicC: => Prismic, userC: =>
     extends LilaController(env) {
 
   private def form(implicit ctx: Context) =
-    if (isGranted(_.Appeals)) lila.appeal.Appeal.modForm
+    if isGranted(_.Appeals) then lila.appeal.Appeal.modForm
     else lila.appeal.Appeal.form
 
   def home =
@@ -22,9 +22,9 @@ final class Appeal(env: Env, reportC: => Report, prismicC: => Prismic, userC: =>
 
   def landing =
     Auth { implicit ctx => _ =>
-      if (ctx.isAppealUser || isGranted(_.Appeals)) {
+      if ctx.isAppealUser || isGranted(_.Appeals) then {
         pageHit
-        OptionOk(prismicC `getPage` "appeal-landing") { case (doc, resolver) =>
+        OptionOk(prismicC.getPage("appeal-landing")) { case (doc, resolver) =>
           views.html.site.page.lone(doc, resolver): scalatags.Text.Frag
         }
       } else notFound
@@ -33,7 +33,7 @@ final class Appeal(env: Env, reportC: => Report, prismicC: => Prismic, userC: =>
   private def renderAppealOrTree(
       me: lila.user.User,
       err: Option[Form[String]] = None
-  )(implicit ctx: Context) = env.appeal.api `mine` me flatMap {
+  )(implicit ctx: Context) = env.appeal.api.mine(me) flatMap {
     case None =>
       env.playban.api.currentBan(me.id).dmap(_.isDefined) map {
         html.appeal.tree(me, _)
@@ -94,7 +94,11 @@ final class Appeal(env: Env, reportC: => Report, prismicC: => Prismic, userC: =>
       }
     }
 
-  private def getModData(me: lila.user.Holder, @annotation.nowarn("msg=unused") appeal: lila.appeal.Appeal, suspect: Suspect)(implicit
+  private def getModData(
+      me: lila.user.Holder,
+      @annotation.nowarn("msg=unused") appeal: lila.appeal.Appeal,
+      suspect: Suspect
+  )(implicit
       ctx: Context
   ) =
     for {
@@ -117,8 +121,8 @@ final class Appeal(env: Env, reportC: => Report, prismicC: => Prismic, userC: =>
       asMod(username) { (appeal, _) =>
         env.appeal.api.toggleMute(appeal) >>
           env.report.api.inquiries.toggle(lila.report.Mod(me.user), appeal.id) map { _ =>
-          Redirect(routes.Appeal.queue)
-        }
+            Redirect(routes.Appeal.queue)
+          }
       }
     }
 
@@ -143,11 +147,11 @@ final class Appeal(env: Env, reportC: => Report, prismicC: => Prismic, userC: =>
   private def asMod(
       username: String
   )(f: (lila.appeal.Appeal, Suspect) => Fu[Result])(implicit ctx: Context): Fu[Result] =
-    env.user.repo `named` username flatMap {
+    env.user.repo.named(username) flatMap {
       case Some(user) =>
-        env.appeal.api `get` user flatMap {
-          case Some(appeal) => f(appeal, Suspect(user)) `dmap` some
-          case None => fuccess(none)
+        env.appeal.api.get(user) flatMap {
+          case Some(appeal) => f(appeal, Suspect(user)).dmap(some)
+          case None         => fuccess(none)
         }
       case None => fuccess(none)
     } flatMap {

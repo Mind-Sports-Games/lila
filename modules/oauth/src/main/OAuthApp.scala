@@ -35,9 +35,9 @@ object OAuthApp {
     val description  = "description"
   }
 
-  import reactivemongo.api.bson._
+  import reactivemongo.api.bson.*
   import lila.db.BSON
-  import lila.db.dsl._
+  import lila.db.dsl.*
   import BSON.BSONJodaDateTimeHandler
 
   implicit private[oauth] val AppIdHandler: BSONHandler[Id] = stringAnyValHandler[Id](_.value, Id.apply)
@@ -46,19 +46,19 @@ object OAuthApp {
 
   implicit val AppBSONHandler: BSON[OAuthApp] = new BSON[OAuthApp] {
 
-    import BSONFields._
+    import BSONFields.*
 
     def reads(r: BSON.Reader): OAuthApp =
       OAuthApp(
         clientId = r.get[Id](clientId),
         clientSecret = r.get[Secret](clientSecret),
-        name = r `str` name,
+        name = r.str(name),
         homepageUri = r.get[AbsoluteUrl](homepageUri),
         redirectUri =
-          r.get[List[AbsoluteUrl]](redirectUri).headOption `err` "Missing OAuthApp.redirectUri array",
-        author = r `str` author,
+          r.get[List[AbsoluteUrl]](redirectUri).headOption.err("Missing OAuthApp.redirectUri array"),
+        author = r.str(author),
         createdAt = r.get[DateTime](createdAt),
-        description = r `strO` description
+        description = r.strO(description)
       )
 
     def writes(w: BSON.Writer, o: OAuthApp) =

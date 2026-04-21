@@ -4,22 +4,21 @@ import java.security.SecureRandom
 import java.util.Base64
 import javax.crypto.Cipher
 import javax.crypto.spec.{ IvParameterSpec, SecretKeySpec }
-import com.roundeights.hasher.Implicits._
+import com.roundeights.hasher.Implicits.*
 
 import lila.common.config.Secret
 
 /** Encryption for bcrypt hashes.
   *
-  * CTS reveals input length, which is fine for
-  * this application.
+  * CTS reveals input length, which is fine for this application.
   */
 final private class Aes(secret: Secret) {
   private val sKey = {
     val sk    = Base64.getDecoder.decode(secret.value)
     val kBits = sk.length * 8
-    if (kBits != 128) {
-      if (!(kBits == 192 || kBits == 256)) throw new IllegalArgumentException
-      if (kBits > Cipher.getMaxAllowedKeyLength("AES/CTS/NoPadding"))
+    if kBits != 128 then {
+      if !(kBits == 192 || kBits == 256) then throw new IllegalArgumentException
+      if kBits > Cipher.getMaxAllowedKeyLength("AES/CTS/NoPadding") then
         throw new IllegalStateException(s"$kBits bit AES unavailable")
     }
     new SecretKeySpec(sk, "AES")
@@ -43,7 +42,7 @@ private object Aes {
 }
 
 case class HashedPassword(bytes: Array[Byte]) extends AnyVal {
-  def parse = bytes.lengthIs == 39 `option` bytes.splitAt(16)
+  def parse = (bytes.lengthIs == 39).option(bytes.splitAt(16))
 }
 
 final private class PasswordHasher(
@@ -54,8 +53,8 @@ final private class PasswordHasher(
   import org.mindrot.BCrypt
   import User.ClearPassword
 
-  private val prng = new SecureRandom()
-  private val aes  = new Aes(secret)
+  private val prng                                       = new SecureRandom()
+  private val aes                                        = new Aes(secret)
   private def bHash(salt: Array[Byte], p: ClearPassword) =
     hashTimer(BCrypt.hashpwRaw(p.value.sha512, 'a', logRounds, salt))
 
@@ -74,7 +73,7 @@ final private class PasswordHasher(
 
 object PasswordHasher {
 
-  import scala.concurrent.duration._
+  import scala.concurrent.duration.*
   import play.api.mvc.RequestHeader
   import lila.memo.RateLimit
   import lila.common.{ HTTPRequest, IpAddress }
@@ -100,16 +99,15 @@ object PasswordHasher {
   def rateLimit[A](
       enforce: lila.common.config.RateLimit
   )(username: String, req: RequestHeader)(run: RateLimit.Charge => Fu[A])(default: => Fu[A]): Fu[A] =
-    if (enforce.value) {
+    if enforce.value then {
       val cost = 1
-      val ip   = HTTPRequest `ipAddress` req
-      rateLimitPerUser(User `normalize` username, cost = cost) {
+      val ip   = HTTPRequest.ipAddress(req)
+      rateLimitPerUser(User.normalize(username), cost = cost) {
         rateLimitPerIP.chargeable(ip, cost = cost) { charge =>
           rateLimitGlobal("-", cost = cost, msg = ip.value) {
             run(charge)
           }(default)
         }(default)
       }(default)
-    }
-    else run(_ => ())
+    } else run(_ => ())
 }

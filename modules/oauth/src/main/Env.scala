@@ -1,10 +1,10 @@
 package lila.oauth
 
-import com.softwaremill.macwire._
+import com.softwaremill.macwire.*
 import lila.common.autoconfig.{ AutoConfig, ConfigName }
 import play.api.Configuration
 
-import lila.common.config._
+import lila.common.config.*
 import lila.db.AsyncColl
 
 private case class OauthConfig(
@@ -38,7 +38,7 @@ final class Env(
     scala.concurrent
       .Future {
         server.some
-    }
+      }
       .withTimeoutDefault(50 millis, none) recover { case e: Exception =>
       lila.log("security").warn("oauth", e)
       none

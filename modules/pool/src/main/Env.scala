@@ -1,6 +1,6 @@
 package lila.pool
 
-import com.softwaremill.macwire._
+import com.softwaremill.macwire.*
 
 import lila.common.Bus
 import lila.game.Game

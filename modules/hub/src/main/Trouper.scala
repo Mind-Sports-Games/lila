@@ -13,7 +13,7 @@ import scala.concurrent.{ ExecutionContext, Future, Promise }
  */
 abstract class Trouper(implicit ec: ExecutionContext) extends lila.common.Tellable {
 
-  import Trouper._
+  import Trouper.*
 
   // implement async behaviour here
   protected val process: Receive
@@ -26,8 +26,8 @@ abstract class Trouper(implicit ec: ExecutionContext) extends lila.common.Tellab
     isAlive = false
 
   def !(msg: Any): Unit =
-    if (isAlive && stateRef.getAndUpdate(state => Some(state.fold(Queue.empty[Any])(_ enqueue msg))).isEmpty)
-      run(msg)
+    if isAlive && stateRef.getAndUpdate(state => Some(state.fold(Queue.empty[Any])(_ enqueue msg))).isEmpty
+    then run(msg)
 
   def ask[A](makeMsg: Promise[A] => Any): Fu[A] = {
     val promise = Promise[A]()
@@ -49,8 +49,7 @@ abstract class Trouper(implicit ec: ExecutionContext) extends lila.common.Tellab
       process.applyOrElse(msg, fallback)
     } onComplete postRun
 
-  private val postRun = (_: Any) =>
-    stateRef.getAndUpdate(postRunUpdate) flatMap (_.headOption) foreach run
+  private val postRun = (_: Any) => stateRef.getAndUpdate(postRunUpdate) flatMap (_.headOption) foreach run
 
   private val fallback: Receive = { case msg =>
     lila.log("trouper").warn(s"unhandled msg: $msg")
@@ -66,7 +65,7 @@ object Trouper {
   private val postRunUpdate = new UnaryOperator[State] {
     override def apply(state: State): State =
       state flatMap { q =>
-        if (q.isEmpty) None else Some(q.tail)
+        if q.isEmpty then None else Some(q.tail)
       }
   }
 

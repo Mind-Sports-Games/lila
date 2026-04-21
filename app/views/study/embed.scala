@@ -2,15 +2,15 @@ package views.html.study
 
 import play.api.libs.json.Json
 
-import lila.app.templating.Environment._
+import lila.app.templating.Environment.*
 import lila.app.ui.EmbedConfig
-import lila.app.ui.ScalatagsTemplate._
+import lila.app.ui.ScalatagsTemplate.*
 import lila.common.String.html.safeJsonValue
-import lila.i18n.{ I18nKeys => trans }
+import lila.i18n.I18nKeys as trans
 
 object embed {
 
-  import EmbedConfig.implicits._
+  import EmbedConfig.implicits.*
 
   def apply(
       s: lila.study.Study,
@@ -39,10 +39,10 @@ object embed {
           ),
           a(
             targetBlank,
-            cls := "open",
+            cls      := "open",
             dataIcon := "=",
-            href := url,
-            title := trans.study.open.txt()
+            href     := url,
+            title    := trans.study.open.txt()
           )
         )
       },
@@ -55,14 +55,14 @@ object embed {
       analyseTag,
       embedJsUnsafeLoadThen(
         s"""PlayStrategyAnalyseEmbed(${safeJsonValue(
-          Json.obj(
-            "study"  -> data.study,
-            "data"   -> data.analysis,
-            "embed"  -> true,
-            "i18n"   -> views.html.board.userAnalysisI18n(),
-            "userId" -> none[String]
-          )
-        )});
+            Json.obj(
+              "study"  -> data.study,
+              "data"   -> data.analysis,
+              "embed"  -> true,
+              "i18n"   -> views.html.board.userAnalysisI18n(),
+              "userId" -> none[String]
+            )
+          )});
 document.getElementById('chapter-selector').onchange = function() {
   location.href = this.value + location.search;
 }""",

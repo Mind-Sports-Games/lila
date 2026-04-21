@@ -24,7 +24,7 @@ final class RealPlayerApi(
               res.status == 200 &&
                 res.headers
                   .get("Content-Type")
-                  .exists(_.exists(_ `startsWith` "text/plain"))
+                  .exists(_.exists(_.startsWith("text/plain")))
             valid so {
               res.body.linesIterator
                 .take(9999)

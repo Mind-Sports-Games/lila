@@ -1,7 +1,7 @@
 package lila.tournament
 
 import play.api.i18n.Lang
-import play.api.libs.json._
+import play.api.libs.json.*
 
 import lila.common.Json.jodaWrites
 import lila.rating.PerfType
@@ -12,7 +12,7 @@ import strategygames.variant.Variant
 
 final class ApiJsonView(lightUserApi: LightUserApi)(implicit ec: scala.concurrent.ExecutionContext) {
 
-  import JsonView._
+  import JsonView.*
 
   def apply(tournaments: VisibleTournaments)(implicit lang: Lang): Fu[JsObject] =
     for {
@@ -33,7 +33,7 @@ final class ApiJsonView(lightUserApi: LightUserApi)(implicit ec: scala.concurren
   def calendar(tournaments: List[Tournament])(implicit lang: Lang): JsObject =
     Json.obj(
       "since"       -> tournaments.headOption.map(_.startsAt.withTimeAtStartOfDay),
-      "to"          -> tournaments.lastOption.map(_.finishesAt.withTimeAtStartOfDay `plusDays` 1),
+      "to"          -> tournaments.lastOption.map(_.finishesAt.withTimeAtStartOfDay.plusDays(1)),
       "tournaments" -> JsArray(tournaments.map(baseJson))
     )
 

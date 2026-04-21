@@ -5,8 +5,8 @@ final case class SimulApplicant(
     accepted: Boolean
 ) {
 
-  def is(userId: String): Boolean     = player `is` userId
-  def is(other: SimulPlayer): Boolean = player `is` other
+  def is(userId: String): Boolean     = player.is(userId)
+  def is(other: SimulPlayer): Boolean = player.is(other)
 }
 
 private[simul] object SimulApplicant {

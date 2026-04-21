@@ -3,8 +3,8 @@ package views.html.analyse
 import strategygames.format.FEN
 
 import lila.api.Context
-import lila.app.templating.Environment._
-import lila.app.ui.ScalatagsTemplate._
+import lila.app.templating.Environment.*
+import lila.app.ui.ScalatagsTemplate.*
 import lila.game.Pov
 
 object replayBot {
@@ -19,7 +19,7 @@ object replayBot {
   )(implicit ctx: Context) = {
 
     views.html.analyse.bits.layout(
-      title = replay `titleOf` pov,
+      title = replay.titleOf(pov),
       moreCss = cssTag("analyse.round"),
       openGraph = povOpenGraph(pov).some
     ) {

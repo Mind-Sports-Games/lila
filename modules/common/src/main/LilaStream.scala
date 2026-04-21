@@ -1,8 +1,8 @@
 package lila.common
 
 import akka.NotUsed
-import akka.stream.scaladsl._
-import scala.concurrent.duration._
+import akka.stream.scaladsl.*
+import scala.concurrent.duration.*
 
 object LilaStream {
 

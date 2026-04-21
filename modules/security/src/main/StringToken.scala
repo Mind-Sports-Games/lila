@@ -23,25 +23,25 @@ final class StringToken[A](
 
   def make(payload: A) =
     hashCurrentValue(payload) map { hashedValue =>
-      val signed   = signPayload(serializer `write` payload, hashedValue)
+      val signed   = signPayload(serializer.write(payload), hashedValue)
       val checksum = makeHash(signed)
       val token    = s"$signed$separator$checksum"
-      base64 `encode` token
+      base64.encode(token)
     }
 
   def read(token: String): Fu[Option[A]] =
-    (base64 `decode` token) so {
+    (base64.decode(token)) so {
       _ split separator match {
         case Array(payloadStr, hashed, checksum) =>
           BCrypt.bytesEqualSecure(
             makeHash(signPayload(payloadStr, hashed)).getBytes("utf-8"),
             checksum.getBytes("utf-8")
           ) so {
-            val payload = serializer `read` payloadStr
+            val payload = serializer.read(payloadStr)
             (valueChecker match {
               case ValueChecker.Same      => hashCurrentValue(payload) map (hashed ==)
               case ValueChecker.Custom(f) => f(hashed)
-            }) map { _ `option` payload }
+            }) map { _.option(payload) }
           }
         case _ => fuccess(none)
       }

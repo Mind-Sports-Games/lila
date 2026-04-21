@@ -1,12 +1,12 @@
 package lila.tournament
 package crud
 
-import BSONHandlers._
+import BSONHandlers.*
 import org.joda.time.DateTime
 
 import lila.common.config.MaxPerPage
 import lila.common.paginator.Paginator
-import lila.db.dsl._
+import lila.db.dsl.*
 import lila.db.paginator.Adapter
 import lila.user.User
 
@@ -15,45 +15,47 @@ import strategygames.variant.Variant
 
 final class CrudApi(tournamentRepo: TournamentRepo) {
 
-  def list = tournamentRepo `uniques` 50
+  def list = tournamentRepo.uniques(50)
 
-  def one(id: String) = tournamentRepo `uniqueById` id
+  def one(id: String) = tournamentRepo.uniqueById(id)
 
   def editForm(tour: Tournament) =
-    CrudForm.apply `fill` CrudForm.Data(
-      name = tour.name,
-      homepageHours = ~tour.spotlight.flatMap(_.homepageHours),
-      clock = tour.clock,
-      minutes = tour.minutes,
-      variant = s"${tour.variant.gameFamily.id}_${tour.variant.id}".some,
-      handicapped = tour.handicapped,
-      position = tour.position,
-      date = tour.startsAt,
-      image = ~tour.spotlight.flatMap(_.iconImg),
-      headline = tour.spotlight.so(_.headline),
-      description = tour.spotlight.so(_.description),
-      conditions = Condition.DataForm.AllSetup(tour.conditions),
-      berserkable = !tour.noBerserk,
-      streakable = tour.streakable,
-      statusScoring = tour.statusScoring,
-      teamBattle = tour.isTeamBattle,
-      hasChat = tour.hasChat
+    CrudForm.apply.fill(
+      CrudForm.Data(
+        name = tour.name,
+        homepageHours = ~tour.spotlight.flatMap(_.homepageHours),
+        clock = tour.clock,
+        minutes = tour.minutes,
+        variant = s"${tour.variant.gameFamily.id}_${tour.variant.id}".some,
+        handicapped = tour.handicapped,
+        position = tour.position,
+        date = tour.startsAt,
+        image = ~tour.spotlight.flatMap(_.iconImg),
+        headline = tour.spotlight.so(_.headline),
+        description = tour.spotlight.so(_.description),
+        conditions = Condition.DataForm.AllSetup(tour.conditions),
+        berserkable = !tour.noBerserk,
+        streakable = tour.streakable,
+        statusScoring = tour.statusScoring,
+        teamBattle = tour.isTeamBattle,
+        hasChat = tour.hasChat
+      )
     )
 
   def update(old: Tournament, data: CrudForm.Data) =
-    tournamentRepo `update` updateTour(old, data) void
+    tournamentRepo.update(updateTour(old, data)) void
 
   def createForm = CrudForm.apply
 
   def create(data: CrudForm.Data, owner: User): Fu[Tournament] = {
     val tour = updateTour(empty, data).copy(createdBy = owner.id)
-    tournamentRepo `insert` tour inject tour
+    tournamentRepo.insert(tour) inject tour
   }
 
   def clone(old: Tournament) =
     old.copy(
       name = s"${old.name} (clone)",
-      startsAt = DateTime.now `plusDays` 7
+      startsAt = DateTime.now.plusDays(7)
     )
 
   def paginator(page: Int)(implicit ec: scala.concurrent.ExecutionContext) =
@@ -91,10 +93,10 @@ final class CrudApi(tournamentRepo: TournamentRepo) {
     )
 
   private def updateTour(tour: Tournament, data: CrudForm.Data) = {
-    import data._
+    import data.*
     tour.copy(
       name = name,
-      clock = if (tour.isCreated) clock else tour.clock,
+      clock = if tour.isCreated then clock else tour.clock,
       minutes = minutes,
       variant = realVariant,
       handicapped = data.handicapped,
@@ -117,7 +119,7 @@ final class CrudApi(tournamentRepo: TournamentRepo) {
       noBerserk = !data.berserkable,
       noStreak = !data.streakable,
       statusScoring = data.statusScoring,
-      teamBattle = data.teamBattle `option` (tour.teamBattle | TeamBattle(Set.empty, 10)),
+      teamBattle = data.teamBattle.option(tour.teamBattle | TeamBattle(Set.empty, 10)),
       hasChat = data.hasChat
     ) pipe { tour =>
       tour.copy(conditions =

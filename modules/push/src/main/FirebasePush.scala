@@ -2,10 +2,10 @@ package lila.push
 
 import com.google.auth.oauth2.{ AccessToken, GoogleCredentials }
 import lila.common.autoconfig.AutoConfig
-import play.api.libs.json._
-import play.api.libs.ws.JsonBodyWritables._
+import play.api.libs.json.*
+import play.api.libs.ws.JsonBodyWritables.*
 import play.api.libs.ws.StandaloneWSClient
-import scala.concurrent.duration._
+import scala.concurrent.duration.*
 import scala.concurrent.{ blocking, Future }
 
 import lila.common.Chronometer
@@ -34,7 +34,7 @@ final private class FirebasePush(
         case devices =>
           workQueue {
             Future {
-              Chronometer.syncMon(_.blocking `time` "firebase") {
+              Chronometer.syncMon(_.blocking.time("firebase")) {
                 blocking {
                   creds.refreshIfExpired()
                   creds.getAccessToken
@@ -63,7 +63,7 @@ final private class FirebasePush(
               "token" -> device._id,
               // firebase doesn't support nested data object and we only use what is
               // inside userData
-              "data" -> (data.payload \ "userData").asOpt[JsObject].map(transform(_)),
+              "data"         -> (data.payload \ "userData").asOpt[JsObject].map(transform(_)),
               "notification" -> Json.obj(
                 "body"  -> data.body,
                 "title" -> data.title
@@ -81,12 +81,11 @@ final private class FirebasePush(
         )
       ) flatMap { res =>
       lila.mon.push.firebaseStatus(res.status).increment()
-      if (res.status == 200) funit
-      else if (res.status == 404) {
+      if res.status == 200 then funit
+      else if res.status == 404 then {
         logger.info(s"Delete missing firebase device $device")
-        deviceApi `delete` device
-      }
-      else {
+        deviceApi.delete(device)
+      } else {
         logger.warn(s"[push] firebase: ${res.status}")
         funit
       }

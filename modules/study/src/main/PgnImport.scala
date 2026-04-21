@@ -5,7 +5,7 @@ import strategygames.Centis
 import strategygames.format.pgn.{ Dumper, Glyphs, ParsedPgn, San, Tags }
 import strategygames.format.{ FEN, Forsyth, Uci, UciCharPair }
 import strategygames.variant.Variant
-import strategygames.{ Player => PlayerIndex, Game, Status }
+import strategygames.{ Game, Player as PlayerIndex, Status }
 
 import lila.common.LightUser
 import lila.importer.{ ImportData, Preprocessed }
@@ -39,7 +39,7 @@ object PgnImport {
               ply = replay.setup.plies,
               turnCount = replay.setup.turnCount,
               playedPlayerIndex =
-                if (replay.setup.board.history.currentTurn.nonEmpty) replay.setup.player
+                if replay.setup.board.history.currentTurn.nonEmpty then replay.setup.player
                 else !replay.setup.player,
               variant = game.variant,
               fen = initialFen.getOrElse(game.variant.initialFen),
@@ -58,7 +58,7 @@ object PgnImport {
                 ).fold(variations)(_ :: variations).toVector
               }
             )
-            val end: Option[End] = (game.finished `option` game.status).map { status =>
+            val end: Option[End] = game.finished.option(game.status).map { status =>
               End(
                 status = status,
                 winner = game.winnerPlayerIndex,
@@ -67,7 +67,7 @@ object PgnImport {
               )
             }
             val commented =
-              if (root.mainline.lastOption.so(_.isCommented)) root
+              if root.mainline.lastOption.so(_.isCommented) then root
               else
                 end.map(endComment).fold(root) { comment =>
                   root updateMainlineLast { _.setComment(comment) }
@@ -82,7 +82,7 @@ object PgnImport {
     }
 
   private def findAnnotator(pgn: ParsedPgn, contributors: List[LightUser]): Option[Comment.Author] =
-    pgn `tags` "annotator" map { a =>
+    pgn.tags("annotator") map { a =>
       val lowered = a.toLowerCase
       contributors.find { c =>
         c.name == lowered || c.titleName == lowered || lowered.endsWith(s"/${c.id}")
@@ -93,7 +93,7 @@ object PgnImport {
 
   private def endComment(end: End): Comment = {
     import lila.tree.Node.Comment
-    import end._
+    import end.*
     val text = s"$resultText $statusText"
     Comment(Comment.Id.make, Comment.Text(text), Comment.Author.PlayStrategy)
   }
@@ -116,7 +116,7 @@ object PgnImport {
             (shapes ++ s),
             c orElse clock,
             (str.trim match {
-              case "" => comments
+              case ""  => comments
               case com =>
                 comments + Comment(
                   Comment.Id.make,
@@ -131,7 +131,7 @@ object PgnImport {
   private def makeNode(prev: Game, sans: List[San], annotator: Option[Comment.Author]): Option[Node] =
     try
       sans match {
-        case Nil => none
+        case Nil         => none
         case san :: rest =>
           san(prev.situation).fold(
             _ => none, // illegal move; stop here.
@@ -147,7 +147,7 @@ object PgnImport {
                     ply = game.plies,
                     turnCount = game.turnCount,
                     playedPlayerIndex =
-                      if (game.board.history.currentTurn.nonEmpty) game.player else !game.player,
+                      if game.board.history.currentTurn.nonEmpty then game.player else !game.player,
                     variant = variant,
                     move = Uci.WithSan(game.situation.gameLogic, uci, sanStr),
                     fen = Forsyth.>>(game.situation.gameLogic, game),
@@ -185,7 +185,7 @@ object PgnImport {
       case Some(main) if children.variations.exists(_.id == main.id) =>
         Node.Children {
           main +: children.variations.flatMap { node =>
-            if (node.id == main.id) node.children.nodes
+            if node.id == main.id then node.children.nodes
             else Vector(node)
           }
         }

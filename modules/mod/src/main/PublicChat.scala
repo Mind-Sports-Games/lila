@@ -17,20 +17,22 @@ final class PublicChat(
 )(implicit ec: scala.concurrent.ExecutionContext) {
 
   def all: Fu[(List[(Tournament, UserChat)], List[(Swiss, UserChat)], List[(Simul, UserChat)])] =
-    tournamentChats zip swissChats zip simulChats map {
-      case ((tours, swisses), simuls) => (tours, swisses, simuls)
+    tournamentChats zip swissChats zip simulChats map { case ((tours, swisses), simuls) =>
+      (tours, swisses, simuls)
     }
 
   def deleteAll(userId: User.ID): Funit =
-    userRepo `byId` userId `map2` Suspect.apply flatMap { _ so deleteAll }
+    userRepo.byId(userId).map2(Suspect.apply) flatMap { _ so deleteAll }
 
   def deleteAll(suspect: Suspect): Funit =
     all.flatMap { case (tours, swisses, simuls) =>
-      Future.sequence(
-        (tours.map(_._2) ::: swisses.map(_._2) ::: simuls.map(_._2))
-          .filter(_ `hasLinesOf` suspect.user)
-          .map(chatApi.userChat.delete(_, suspect.user, _.Global))
-      ).void
+      Future
+        .sequence(
+          (tours.map(_._2) ::: swisses.map(_._2) ::: simuls.map(_._2))
+            .filter(_.hasLinesOf(suspect.user))
+            .map(chatApi.userChat.delete(_, suspect.user, _.Global))
+        )
+        .void
     } >> deleteLobbyChat(suspect) >>- Bus.publish(
       lila.hub.actorApi.security.DeletePublicChats(suspect.user.id),
       "deleteTeamChats"

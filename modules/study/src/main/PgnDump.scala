@@ -1,6 +1,6 @@
 package lila.study
 
-import akka.stream.scaladsl._
+import akka.stream.scaladsl.*
 import strategygames.format.pgn.{ FullTurn, Glyphs, Initial, Pgn, Tag, Tags, Turn }
 import strategygames.Player
 import org.joda.time.format.DateTimeFormat
@@ -15,7 +15,7 @@ final class PgnDump(
     net: lila.common.config.NetConfig
 ) {
 
-  import PgnDump._
+  import PgnDump.*
 
   def apply(study: Study, flags: WithFlags): Source[String, ?] =
     chapterRepo
@@ -56,7 +56,7 @@ final class PgnDump(
   private def chapterUrl(studyId: Study.Id, chapterId: Chapter.Id) =
     s"${net.baseUrl}/study/$studyId/$chapterId"
 
-  private val dateFormat = DateTimeFormat `forPattern` "yyyy.MM.dd"
+  private val dateFormat = DateTimeFormat.forPattern("yyyy.MM.dd")
 
   private def annotatorTag(study: Study) =
     Tag(_.Annotator, s"https://playstrategy.org/@/${ownerName(study)}")
@@ -81,7 +81,7 @@ final class PgnDump(
       )
       genTags
         .foldLeft(chapter.tags.value.reverse) { case (tags, tag) =>
-          if (tags.exists(t => tag.name == t.name)) tags
+          if tags.exists(t => tag.name == t.name) then tags
           else tag :: tags
         }
         .reverse
@@ -95,12 +95,12 @@ object PgnDump {
   private type Variations = Vector[Node]
   private val noVariations: Variations = Vector.empty
 
-  //assume comments and info is stored on first node of turn
+  // assume comments and info is stored on first node of turn
   private def nodes2Multiaction(nodes: Vector[Node], variations: Variations)(implicit flags: WithFlags) =
     nodes.headOption.map { firstNode =>
       Turn(
         san = nodes.map(_.move.san).mkString(","),
-        glyphs = if (flags.comments) firstNode.glyphs else Glyphs.empty,
+        glyphs = if flags.comments then firstNode.glyphs else Glyphs.empty,
         comments = flags.comments so {
           firstNode.comments.list.map(_.text.value) ::: shapeComment(firstNode.shapes).toList
         },
@@ -153,7 +153,7 @@ object PgnDump {
   )(implicit flags: WithFlags): Vector[FullTurn] = {
     val nodeTurns: Vector[Vector[Node]] = toNodeTurns(line)
     nodeTurns match {
-      case Vector(Vector()) => Vector()
+      case Vector(Vector())                                           => Vector()
       case first +: rest if first.head.playedPlayerIndex == Player.P2 =>
         FullTurn(
           first.head.fullTurnCount,
@@ -189,10 +189,8 @@ object PgnDump {
     line
       .drop(1)
       .foldLeft(Vector(line.take(1))) { case (turn, node) =>
-        if (turn.head.head.playedPlayerIndex != node.playedPlayerIndex)
-          Vector(node) +: turn
-        else
-          (turn.head :+ node) +: turn.tail
+        if turn.head.head.playedPlayerIndex != node.playedPlayerIndex then Vector(node) +: turn
+        else (turn.head :+ node) +: turn.tail
       }
       .reverse
 }

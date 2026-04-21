@@ -30,7 +30,7 @@ final case class ApiConfig(
   def validFen = ApiConfig.validFen(variant, position)
 
   def initialFen: Option[FEN] = position.flatMap(p =>
-    if (variant.initialFens.contains(p) && variant.initialFens.size > 1)
+    if variant.initialFens.contains(p) && variant.initialFens.size > 1 then
       Random.shuffle(variant.initialFens).headOption
     else Some(p)
   )
@@ -45,11 +45,10 @@ final case class ApiConfig(
   def mode = Mode(rated)
 
   def autoVariant =
-    if (variant == Variant.Chess(Standard) && position.exists(!_.initial))
+    if variant == Variant.Chess(Standard) && position.exists(!_.initial) then
       copy(variant = Variant.wrap(FromPosition))
     else this
 }
-
 
 object ApiConfig extends BaseHumanConfig {
 
@@ -87,10 +86,11 @@ object ApiConfig extends BaseHumanConfig {
 
   def validFen(variant: Variant, fen: Option[FEN]) =
     // TODO: This .get is unsafe
-    if (variant == Variant.Chess(Chess960)) fen.forall(f => Chess960.positionNumber(f.chessFen.get).isDefined)
-    else if (variant.fromPositionVariant)
+    if variant == Variant.Chess(Chess960) then
+      fen.forall(f => Chess960.positionNumber(f.chessFen.get).isDefined)
+    else if variant.fromPositionVariant then
       fen exists { f =>
-        (Forsyth.<<<(variant.gameLogic, f)).exists(_.situation `playable` false)
+        Forsyth.<<<(variant.gameLogic, f).exists(_.situation.playable(false))
       }
     else true
 }

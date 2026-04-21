@@ -1,17 +1,17 @@
 package lila.round
 
-import strategygames.{ Player => PlayerIndex, Centis, Game, Replay, Situation }
+import strategygames.{ Centis, Game, Player as PlayerIndex, Replay, Situation }
 import strategygames.format.pgn.Glyphs
 import strategygames.format.{ FEN, Forsyth, Uci, UciCharPair }
 import strategygames.opening.{ FullOpening, FullOpeningDB }
 import strategygames.variant.Variant
 import JsonView.WithFlags
 import lila.analyse.{ Advice, Analysis, Info }
-import lila.tree._
+import lila.tree.*
 
 object TreeBuilder {
 
-  private type Ply       = Int
+  private type Ply = Int
   // private type OpeningOf = FEN => Option[FullOpening]
 
   private def makeEval(info: Info) =
@@ -22,7 +22,7 @@ object TreeBuilder {
     )
 
   def fullOpeningOf(fen: FEN, variant: Variant, withFlags: WithFlags): Option[FullOpening] =
-    if (withFlags.opening && Variant.openingSensibleVariants(variant.gameLogic)(variant))
+    if withFlags.opening && Variant.openingSensibleVariants(variant.gameLogic)(variant) then
       FullOpeningDB.findByFen(variant.gameLogic, fen)
     else None
 
@@ -44,15 +44,19 @@ object TreeBuilder {
     ) match {
       case (init, games, error) =>
         error foreach logChessError(game.id)
-        val fen                 = Forsyth.>>(game.variant.gameLogic, init)
-        val infos: Vector[Info] = analysis.so(_.infos.toVector)
-        val advices: Map[Ply, Advice] = analysis.so(_.advices.view.map { a =>
-          a.ply -> a
-        }.toMap)
+        val fen                       = Forsyth.>>(game.variant.gameLogic, init)
+        val infos: Vector[Info]       = analysis.so(_.infos.toVector)
+        val advices: Map[Ply, Advice] = analysis.so(
+          _.advices.view
+            .map { a =>
+              a.ply -> a
+            }
+            .toMap
+        )
         val root = Root(
           ply = init.plies,
           turnCount = init.turnCount,
-          playedPlayerIndex = if (init.board.history.currentTurn.nonEmpty) init.player else !init.player,
+          playedPlayerIndex = if init.board.history.currentTurn.nonEmpty then init.player else !init.player,
           variant = game.variant,
           fen = fen,
           check = init.situation.check,
@@ -76,16 +80,16 @@ object TreeBuilder {
             id = UciCharPair(g.situation.board.variant.gameLogic, m.uci),
             ply = g.plies,
             turnCount = g.turnCount,
-            playedPlayerIndex = if (g.board.history.currentTurn.nonEmpty) g.player else !g.player,
+            playedPlayerIndex = if g.board.history.currentTurn.nonEmpty then g.player else !g.player,
             variant = g.situation.board.variant,
             move = m,
             fen = fen,
             captureLength = (g.situation, m) match {
               case (Situation.Draughts(situation), Uci.DraughtsWithSan(uciMove)) =>
-                if (situation.ghosts > 0) situation.captureLengthFrom(uciMove.uci.dest)
+                if situation.ghosts > 0 then situation.captureLengthFrom(uciMove.uci.dest)
                 else situation.allMovesCaptureLength.some
               case (Situation.Dameo(situation), Uci.DameoWithSan(uciMove)) =>
-                if (situation.ghosts > 0) situation.captureLengthFrom(uciMove.uci.dest)
+                if situation.ghosts > 0 then situation.captureLengthFrom(uciMove.uci.dest)
                 else situation.allMovesCaptureLength.some
               case _ => None
             },
@@ -123,11 +127,11 @@ object TreeBuilder {
           } getOrElse branch
         }
         games.zipWithIndex.reverse match {
-          case Nil => root
+          case Nil                 => root
           case ((g, m), i) :: rest =>
-            root `prependChild` rest.foldLeft(makeBranch(i + 1, g, m)) { case (node, ((g, m), i)) =>
-              makeBranch(i + 1, g, m) `prependChild` node
-            }
+            root.prependChild(rest.foldLeft(makeBranch(i + 1, g, m)) { case (node, ((g, m), i)) =>
+              makeBranch(i + 1, g, m).prependChild(node)
+            })
         }
     }
   }
@@ -152,7 +156,7 @@ object TreeBuilder {
         id = UciCharPair(variant.gameLogic, m.uci),
         ply = g.plies,
         turnCount = g.turnCount,
-        playedPlayerIndex = if (g.board.history.currentTurn.nonEmpty) g.player else !g.player,
+        playedPlayerIndex = if g.board.history.currentTurn.nonEmpty then g.player else !g.player,
         variant = variant,
         move = m,
         fen = fen,
@@ -166,7 +170,7 @@ object TreeBuilder {
     Replay.gameWithUciWhileValid(
       variant.gameLogic,
       info.variation.take(20),
-      //TODO: Doublecheck: Think this is ok to handle like this
+      // TODO: Doublecheck: Think this is ok to handle like this
       PlayerIndex.P1,
       PlayerIndex.fromTurnCount(info.variation.take(20).size),
       fromFen,
@@ -175,12 +179,17 @@ object TreeBuilder {
       case (_, games, error) =>
         error foreach logChessError(id)
         games.reverse match {
-          case Nil => root
+          case Nil            => root
           case (g, m) :: rest =>
-            root.addChild(rest
-              .foldLeft(makeBranch(g, m))((branch, gm) =>
-                makeBranch(gm._1, gm._2).addChild(branch).asInstanceOf[Branch]
-              ).setComp).asInstanceOf[Branch]
+            root
+              .addChild(
+                rest
+                  .foldLeft(makeBranch(g, m))((branch, gm) =>
+                    makeBranch(gm._1, gm._2).addChild(branch).asInstanceOf[Branch]
+                  )
+                  .setComp
+              )
+              .asInstanceOf[Branch]
         }
     }
   }

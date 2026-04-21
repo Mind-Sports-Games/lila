@@ -4,13 +4,12 @@ package study
 import play.api.mvc.Call
 
 import lila.api.Context
-import lila.app.templating.Environment._
-import lila.app.ui.ScalatagsTemplate._
+import lila.app.templating.Environment.*
+import lila.app.ui.ScalatagsTemplate.*
 import lila.common.paginator.Paginator
 import lila.study.{ Order, StudyTopic, StudyTopics }
 import lila.study.Study.WithChaptersAndLiked
 import lila.user.User
-
 
 object list {
 
@@ -113,7 +112,7 @@ object list {
     }
 
   private[study] def paginate(pager: Paginator[WithChaptersAndLiked], url: Call)(implicit ctx: Context) =
-    if (pager.currentPageResults.isEmpty)
+    if pager.currentPageResults.isEmpty then
       div(cls := "nostudies")(
         iconTag("4"),
         p(trans.study.noneYet())
@@ -129,10 +128,10 @@ object list {
   private[study] def menu(active: String, order: Order, topics: List[StudyTopic] = Nil)(implicit
       ctx: Context
   ) = {
-    val nonMineOrder = if (order == Order.Mine) Order.Hot else order
+    val nonMineOrder = if order == Order.Mine then Order.Hot else order
     st.aside(cls := "page-menu__menu subnav")(
       a(cls := active.active("all"), href := routes.Study.all(nonMineOrder.key))(trans.study.allStudies()),
-      ctx.isAuth `option` bits.authLinks(active, nonMineOrder),
+      ctx.isAuth.option(bits.authLinks(active, nonMineOrder)),
       a(cls := List("active" -> active.startsWith("topic")), href := routes.Study.topics)("Topics"),
       topics.map { topic =>
         a(cls := active.active(s"topic:$topic"), href := routes.Study.byTopic(topic.value, order.key))(
@@ -147,8 +146,8 @@ object list {
 
   private[study] def searchForm(placeholder: String, value: String) =
     form(cls := "search", action := routes.Study.search(), method := "get")(
-      input(name := "q", st.placeholder := placeholder, st.value := value),
-      submitButton(cls := "button", dataIcon := "y")
+      input(name       := "q", st.placeholder := placeholder, st.value := value),
+      submitButton(cls := "button", dataIcon  := "y")
     )
 
   private def layout(

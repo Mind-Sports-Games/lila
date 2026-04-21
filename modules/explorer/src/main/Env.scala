@@ -1,6 +1,6 @@
 package lila.explorer
 
-import com.softwaremill.macwire._
+import com.softwaremill.macwire.*
 import play.api.Configuration
 
 case class InternalEndpoint(value: String) extends AnyVal with StringValue

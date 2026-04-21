@@ -1,8 +1,8 @@
 package lila.relay
 
 import org.joda.time.DateTime
-import play.api.data._
-import play.api.data.Forms._
+import play.api.data.*
+import play.api.data.Forms.*
 
 import lila.common.Form.cleanText
 import lila.security.Granter
@@ -10,7 +10,7 @@ import lila.user.User
 
 final class RelayTourForm {
 
-  import RelayTourForm._
+  import RelayTourForm.*
 
   val form = Form(
     mapping(
@@ -23,7 +23,7 @@ final class RelayTourForm {
 
   def create = form
 
-  def edit(t: RelayTour) = form `fill` Data.make(t)
+  def edit(t: RelayTour) = form.fill(Data.make(t))
 }
 
 object RelayTourForm {
@@ -64,7 +64,7 @@ object RelayTourForm {
         name = tour.name,
         description = tour.description,
         markup = tour.markup,
-        official = tour.official `option` true
+        official = tour.official.option(true)
       )
   }
 }

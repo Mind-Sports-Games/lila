@@ -1,6 +1,6 @@
 package lila
 
-import play.api.http._
+import play.api.http.*
 import play.api.mvc.Codec
 import scalatags.Text.Frag
 

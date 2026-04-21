@@ -2,7 +2,7 @@ package lila.web
 
 import play.api.libs.ws.StandaloneWSClient
 import play.api.Environment
-import com.softwaremill.macwire._
+import com.softwaremill.macwire.*
 import lila.common.config.NetConfig
 
 @Module
@@ -13,4 +13,3 @@ final class Env(environment: Environment, net: NetConfig)(implicit
 
   val manifest = wire[AssetManifest]
 }
-

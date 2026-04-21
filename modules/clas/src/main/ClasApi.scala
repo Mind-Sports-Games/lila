@@ -1,11 +1,11 @@
 package lila.clas
 
 import org.joda.time.DateTime
-import reactivemongo.api._
+import reactivemongo.api.*
 
 import lila.common.config.BaseUrl
 import lila.common.EmailAddress
-import lila.db.dsl._
+import lila.db.dsl.*
 import lila.msg.MsgApi
 import lila.user.{ Authenticator, User, UserRepo }
 import lila.user.Holder
@@ -21,7 +21,7 @@ final class ClasApi(
     baseUrl: BaseUrl
 )(implicit ec: scala.concurrent.ExecutionContext) {
 
-  import BsonHandlers._
+  import BsonHandlers.*
 
   object clas {
 
@@ -39,7 +39,7 @@ final class ClasApi(
     def byIds(clasIds: List[Clas.Id]): Fu[List[Clas]] =
       coll
         .find($inIds(clasIds))
-        .sort($sort `desc` "createdAt")
+        .sort($sort.desc("createdAt"))
         .cursor[Clas]()
         .list()
 
@@ -49,7 +49,7 @@ final class ClasApi(
     }
 
     def update(from: Clas, data: ClasForm.ClasData): Fu[Clas] = {
-      val clas = data `update` from
+      val clas = data.update(from)
       userRepo.filterEnabled(clas.teachers.toList) flatMap { filtered =>
         val checked = clas.copy(
           teachers = clas.teachers.toList.filter(filtered.contains).toNel | from.teachers
@@ -77,30 +77,32 @@ final class ClasApi(
 
     def areKidsInSameClass(kid1: KidId, kid2: KidId): Fu[Boolean] =
       fuccess(studentCache.isStudent(kid1.id) && studentCache.isStudent(kid2.id)) >>&
-        colls.student.aggregateWith[Bdoc](readPreference = ReadPreference.secondaryPreferred) {
-          framework =>
-            import framework._
+        colls.student
+          .aggregateWith[Bdoc](readPreference = ReadPreference.secondaryPreferred) { framework =>
+            import framework.*
             List(
               Match($doc("userId" `$in` List(kid1.id, kid2.id))),
               GroupField("clasId")("nb" -> SumAll),
               Match($doc("nb" -> 2)),
               Limit(1)
             )
-        }.collect[List](maxDocs = 1).dmap(_.nonEmpty)
+          }
+          .collect[List](maxDocs = 1)
+          .dmap(_.nonEmpty)
 
     def isTeacherOf(teacher: User.ID, student: User.ID): Fu[Boolean] =
       fuccess(studentCache.isStudent(student)) >>&
         colls.student
           .aggregateWith[Bdoc](readPreference = ReadPreference.secondaryPreferred) { framework =>
-            import framework._
+            import framework.*
             List(
               Match($doc("userId" -> student)),
               Project($doc("clasId" -> true)),
               PipelineOperator(
                 $doc(
                   "$lookup" -> $doc(
-                    "from" -> colls.clas.name,
-                    "let"  -> $doc("c" -> "$clasId"),
+                    "from"     -> colls.clas.name,
+                    "let"      -> $doc("c" -> "$clasId"),
                     "pipeline" -> $arr(
                       $doc(
                         "$match" -> $doc(
@@ -123,13 +125,15 @@ final class ClasApi(
               Limit(1),
               Project($id(true))
             )
-          }.collect[List](maxDocs = 1).dmap(_.nonEmpty)
+          }
+          .collect[List](maxDocs = 1)
+          .dmap(_.nonEmpty)
 
     def archive(c: Clas, t: User, v: Boolean): Funit =
       coll.update
         .one(
           $id(c.id),
-          if (v) $set("archived" -> Clas.Recorded(t.id, DateTime.now))
+          if v then $set("archived" -> Clas.Recorded(t.id, DateTime.now))
           else $unset("archived")
         )
         .void
@@ -147,7 +151,7 @@ final class ClasApi(
     def allWithUsers(clas: Clas, selector: Bdoc = $empty): Fu[List[Student.WithUser]] =
       colls.student
         .aggregateWith[Bdoc](readPreference = ReadPreference.secondaryPreferred) { framework =>
-          import framework._
+          import framework.*
           List(
             Match($doc("clasId" -> clas.id) ++ selector),
             PipelineOperator(
@@ -178,7 +182,7 @@ final class ClasApi(
     private def of(selector: Bdoc): Fu[List[Student]] =
       coll
         .find(selector)
-        .sort($sort `asc` "userId")
+        .sort($sort.asc("userId"))
         .cursor[Student]()
         .list(500)
 
@@ -210,7 +214,7 @@ final class ClasApi(
       get(clas, user.id) map2 { Student.WithUser(_, user) }
 
     def update(from: Student, data: ClasForm.StudentData): Fu[Student] = {
-      val student = data `update` from
+      val student = data.update(from)
       coll.update.one($id(student.id), student) inject student
     }
 
@@ -234,7 +238,7 @@ final class ClasApi(
         )
         .orFail(s"No user could be created for ${data.username}")
         .flatMap { user =>
-          studentCache `addStudent` user.id
+          studentCache.addStudent(user.id)
           val student = Student.make(user, clas, teacher.id, data.realName, managed = true)
           userRepo.setKid(user, v = true) >>
             userRepo.setManagedUserInitialPerfs(user.id) >>
@@ -271,7 +275,7 @@ final class ClasApi(
         .findAndUpdate[Student](
           selector = $id(sId),
           update =
-            if (v) $set("archived" -> Clas.Recorded(by.id, DateTime.now))
+            if v then $set("archived" -> Clas.Recorded(by.id, DateTime.now))
             else $unset("archived"),
           fetchNewObject = true
         )
@@ -282,7 +286,7 @@ final class ClasApi(
           orig = teacherId,
           dest = student.id,
           text = s"""${lila.i18n.I18nKeys.clas.welcomeToClass
-            .txt(clas.name)(using student.realLang | lila.i18n.defaultLang)}
+              .txt(clas.name)(using student.realLang | lila.i18n.defaultLang)}
 
 $baseUrl/class/${clas.id}
 
@@ -294,7 +298,7 @@ ${clas.desc}""",
 
   object invite {
 
-    import ClasInvite.Feedback._
+    import ClasInvite.Feedback.*
 
     def create(clas: Clas, user: User, realName: String, teacher: Holder): Fu[ClasInvite.Feedback] =
       student
@@ -327,7 +331,7 @@ ${clas.desc}""",
         _ so { invite =>
           colls.clas.one[Clas]($id(invite.clasId)) flatMap {
             _ so { clas =>
-              studentCache `addStudent` user.id
+              studentCache.addStudent(user.id)
               val stu = Student.make(user, clas, invite.created.by, invite.realName, managed = false)
               colls.student.insert.one(stu) >>
                 colls.invite.updateField($id(id), "accepted", true) >>
@@ -350,7 +354,7 @@ ${clas.desc}""",
     def listPending(clas: Clas): Fu[List[ClasInvite]] =
       colls.invite
         .find($doc("clasId" -> clas.id, "accepted" `$ne` true))
-        .sort($sort `desc` "created.at")
+        .sort($sort.desc("created.at"))
         .cursor[ClasInvite]()
         .list(100)
 
@@ -364,9 +368,9 @@ ${clas.desc}""",
         invite: ClasInvite
     ): Fu[ClasInvite.Feedback] = {
       val url = s"$baseUrl/class/invitation/${invite._id}"
-      if (student.kid) fuccess(ClasInvite.Feedback.CantMsgKid(url))
+      if student.kid then fuccess(ClasInvite.Feedback.CantMsgKid(url))
       else {
-        import lila.i18n.I18nKeys.clas._
+        import lila.i18n.I18nKeys.clas.*
         implicit val lang = student.realLang | lila.i18n.defaultLang
         msgApi
           .post(

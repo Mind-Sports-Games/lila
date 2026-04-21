@@ -1,9 +1,9 @@
 package lila.perfStat
 
-import com.softwaremill.macwire._
+import com.softwaremill.macwire.*
 import play.api.Configuration
 
-import lila.common.config._
+import lila.common.config.*
 
 final class Env(
     appConfig: Configuration,
@@ -24,11 +24,12 @@ final class Env(
   lazy val jsonView = wire[JsonView]
 
   def get(user: lila.user.User, perfType: lila.rating.PerfType): Fu[PerfStat] =
-    storage.find(user.id, perfType) `getOrElse` indexer.userPerf(user, perfType)
+    storage.find(user.id, perfType).getOrElse(indexer.userPerf(user, perfType))
 
   lila.common.Bus.subscribeFun("finishGame") {
     case lila.game.actorApi.FinishGame(game, _, _) if !game.aborted =>
-      (indexer `addGame` game)
+      indexer
+        .addGame(game)
         .addFailureEffect { e =>
           lila.log("perfStat").error(s"index game ${game.id}", e)
         }

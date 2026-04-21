@@ -1,7 +1,7 @@
 package lila.analyse
 
-import cats.implicits._
-import strategygames.{ ActionStrs, Player => PlayerIndex, GameFamily, GameLogic }
+import cats.implicits.*
+import strategygames.{ ActionStrs, GameFamily, GameLogic, Player as PlayerIndex }
 import strategygames.format.Uci
 
 import lila.tree.Eval
@@ -18,16 +18,16 @@ case class Info(
   def mate = eval.mate
   def best = eval.best
 
-  //TODO Wrong for Amazons / multiaction
+  // TODO Wrong for Amazons / multiaction
   def fullTurnNumber = 1 + (ply - 1) / 2
 
-  //TODO Wrong for Amazons / multiaction. Using fromTurnCount as fromPly
+  // TODO Wrong for Amazons / multiaction. Using fromTurnCount as fromPly
   def playerIndex = PlayerIndex.fromTurnCount(ply - 1)
 
   def encode: String =
     List(
       best so (_.piotr),
-      //TODO Wrong for multiaction
+      // TODO Wrong for multiaction
       (variation take Info.LineMaxTurns).flatten mkString " ",
       mate so (_.value.toString),
       cp so (_.value.toString)
@@ -38,7 +38,7 @@ case class Info(
 
   def invert = copy(eval = eval.invert)
 
-  def cpComment: Option[String] = cp map (_.showPawns)
+  def cpComment: Option[String]   = cp map (_.showPawns)
   def mateComment: Option[String] =
     mate map { m =>
       s"Mate in ${math.abs(m.value)}"
@@ -74,15 +74,15 @@ object Info {
 
   private def decode(ply: Int, str: String): Option[Info] =
     str.split(separator) match {
-      case Array()       => Info(ply, Eval.empty).some
-      case Array(cp)     => Info(ply, Eval(strCp(cp), None, None)).some
-      case Array(cp, ma) => Info(ply, Eval(strCp(cp), strMate(ma), None)).some
+      case Array()           => Info(ply, Eval.empty).some
+      case Array(cp)         => Info(ply, Eval(strCp(cp), None, None)).some
+      case Array(cp, ma)     => Info(ply, Eval(strCp(cp), strMate(ma), None)).some
       case Array(cp, ma, va) =>
         Info(ply, Eval(strCp(cp), strMate(ma), None), va.split(' ').toVector.map(Vector(_))).some
       case Array(cp, ma, va, be) =>
         Info(
           ply,
-          //TODO Wrong for non Chess
+          // TODO Wrong for non Chess
           Eval(strCp(cp), strMate(ma), Uci.Move.piotr(GameLogic.Chess(), GameFamily.Chess(), be)),
           va.split(' ').toVector.map(Vector(_))
         ).some

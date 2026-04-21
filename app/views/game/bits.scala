@@ -1,14 +1,13 @@
 package views.html.game
 
 import lila.api.Context
-import lila.app.templating.Environment._
-import lila.app.ui.ScalatagsTemplate._
+import lila.app.templating.Environment.*
+import lila.app.ui.ScalatagsTemplate.*
 import lila.game.{ Game, Pov }
 import lila.i18n.VariantKeys
 
 import strategygames.format.FEN
 import strategygames.variant.Variant
-
 
 object bits {
 
@@ -46,9 +45,9 @@ object bits {
       matchPoints: Option[Int] = None
   ) =
     a(
-      cls := "variant-link",
+      cls  := "variant-link",
       href := (variant match {
-        case Variant.Chess(strategygames.chess.variant.Standard) => "https://en.wikipedia.org/wiki/Chess"
+        case Variant.Chess(strategygames.chess.variant.Standard)     => "https://en.wikipedia.org/wiki/Chess"
         case Variant.Chess(strategygames.chess.variant.FromPosition) =>
           s"""${routes.Editor.index}?fen=${initialFen.so(_.value.replace(' ', '_'))}"""
         case v => routes.Page.variant(v.key).url
@@ -59,7 +58,7 @@ object bits {
 
   def medleyLink =
     a(
-      cls := "variant-link",
+      cls  := "variant-link",
       href := routes.Page.lonePage("medley"),
       targetBlank,
       title := "Medley"

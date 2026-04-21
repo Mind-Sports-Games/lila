@@ -1,6 +1,6 @@
 package lila.memo
 
-import akka.stream.scaladsl._
+import akka.stream.scaladsl.*
 import play.api.libs.json.Json
 import play.api.mvc.Result
 import play.api.mvc.Results.TooManyRequests
@@ -51,8 +51,9 @@ final class ConcurrencyLimit[K](
     }
 
   private def get(k: K) = ~storage.getIfPresent(toString(k))
-  private def inc(k: K) = concurrentMap.compute(toString(k), (_, c) => (~Option(c) + 1) `atMost` maxConcurrency)
-  private def dec(k: K) = concurrentMap.computeIfPresent(toString(k), (_, c) => (c - 1) `atLeast` 0)
+  private def inc(k: K) =
+    concurrentMap.compute(toString(k), (_, c) => (~Option(c) + 1).atMost(maxConcurrency))
+  private def dec(k: K) = concurrentMap.computeIfPresent(toString(k), (_, c) => (c - 1).atLeast(0))
 }
 
 object ConcurrencyLimit {

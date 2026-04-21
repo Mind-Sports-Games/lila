@@ -1,7 +1,7 @@
 package lila.common
 
 class HeapsortTest extends munit.FunSuite {
-  import lila.common.Heapsort.implicits._
+  import lila.common.Heapsort.implicits.*
 
   test("Heapsort - empty collection") {
     assertEquals(List.empty[Int].topN(10), List.empty[Int])

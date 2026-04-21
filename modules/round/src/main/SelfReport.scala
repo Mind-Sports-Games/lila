@@ -30,7 +30,7 @@ final class SelfReport(
         //   Env.report.api.autoBotReport(u.id, referer, name)
         // }
         def doLog(): Unit =
-          if (name != "ceval") {
+          if name != "ceval" then {
             lila
               .log("cheat")
               .branch("jslog")
@@ -46,23 +46,25 @@ final class SelfReport(
               )
             }
           }
-        if (name == "kb" || fullId.value == "____________") fuccess(doLog())
+        if name == "kb" || fullId.value == "____________" then fuccess(doLog())
         else
           proxyRepo.pov(fullId.value) flatMap {
             _ so { pov =>
-              if (!known) doLog()
-              if (
-                Set("ceval", "rcb", "cma", "lga")(name) ||
+              if !known then doLog()
+              if Set("ceval", "rcb", "cma", "lga")(name) ||
                 (name.startsWith("soc") && (
                   name.contains("stockfish") || name.contains("userscript") ||
                     name.contains("__puppeteer_evaluation_script__")
                 ))
-              ) fuccess {
-                if (userId.isDefined) tellRound(pov.gameId, lila.round.actorApi.round.Cheat(pov.playerIndex))
-                user.ifTrue(name == "cma") foreach { u =>
-                  lila.common.Bus.publish(lila.hub.actorApi.mod.SelfReportMark(u.id, name), "selfReportMark")
+              then
+                fuccess {
+                  if userId.isDefined then
+                    tellRound(pov.gameId, lila.round.actorApi.round.Cheat(pov.playerIndex))
+                  user.ifTrue(name == "cma") foreach { u =>
+                    lila.common.Bus
+                      .publish(lila.hub.actorApi.mod.SelfReportMark(u.id, name), "selfReportMark")
+                  }
                 }
-              }
               else gameRepo.setBorderAlert(pov).void
             }
           }

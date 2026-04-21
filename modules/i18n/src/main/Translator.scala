@@ -1,6 +1,6 @@
 package lila.i18n
 
-import scalatags.Text.all._
+import scalatags.Text.all.*
 import play.api.i18n.Lang
 
 import lila.common.String.html.escapeHtml
@@ -74,6 +74,6 @@ object Translator {
   }
 
   private[i18n] def findTranslation(key: MessageKey, lang: Lang): Option[Translation] =
-    Registry.all.get(lang).flatMap(t => Option(t `get` key)) orElse
+    Registry.all.get(lang).flatMap(t => Option(t.get(key))) orElse
       Option(Registry.default.get(key))
 }

@@ -3,8 +3,8 @@ package views.html.swiss
 import play.api.data.Form
 
 import lila.api.Context
-import lila.app.templating.Environment._
-import lila.app.ui.ScalatagsTemplate._
+import lila.app.templating.Environment.*
+import lila.app.ui.ScalatagsTemplate.*
 import lila.hub.LightTeam.TeamID
 import lila.swiss.{ Swiss, SwissCondition, SwissForm }
 import lila.tournament.TournamentForm
@@ -92,7 +92,7 @@ object form {
             form3.split(fields.description, fields.position),
             form3.split(
               fields.roundInterval,
-              swiss.isCreated `option` fields.startsAt
+              swiss.isCreated.option(fields.startsAt)
             ),
             form3.split(
               fields.halfwayBreak,
@@ -119,7 +119,8 @@ object form {
       )
     }
 
-  @annotation.nowarn("msg=unused") private def condition(form: Form[?], fields: SwissFields, swiss: Option[Swiss])(implicit ctx: Context) =
+  @annotation.nowarn("msg=unused")
+  private def condition(form: Form[?], fields: SwissFields, swiss: Option[Swiss])(implicit ctx: Context) =
     frag(
       form3.split(
         form3.group(form("conditions.nbRatedGame.nb"), frag("Minimum rated games"), half = true)(

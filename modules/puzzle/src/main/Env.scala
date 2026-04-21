@@ -1,10 +1,10 @@
 package lila.puzzle
 
-import com.softwaremill.macwire._
+import com.softwaremill.macwire.*
 import lila.common.autoconfig.{ AutoConfig, ConfigName }
 import play.api.Configuration
 
-import lila.common.config._
+import lila.common.config.*
 import lila.db.AsyncColl
 
 @Module
@@ -79,7 +79,7 @@ final class Env(
   def cli =
     new lila.common.Cli {
       def process = { case "puzzle" :: "delete" :: id :: Nil =>
-        api.puzzle `delete` Puzzle.Id(id) inject "Done"
+        api.puzzle.delete(Puzzle.Id(id)) inject "Done"
       }
     }
 }

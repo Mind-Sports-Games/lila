@@ -1,9 +1,9 @@
 package lila.analyse
 
-import org.joda.time._
+import org.joda.time.*
 import reactivemongo.api.bson.{ BSONBoolean, BSONInteger }
 
-import lila.db.dsl._
+import lila.db.dsl.*
 import lila.user.User
 
 final class RequesterApi(coll: Coll)(implicit ec: scala.concurrent.ExecutionContext) {
@@ -16,7 +16,7 @@ final class RequesterApi(coll: Coll)(implicit ec: scala.concurrent.ExecutionCont
         $id(requester),
         $inc(
           "total"                       -> 1,
-          formatter.print(DateTime.now) -> (if (ownGame) 1 else 2)
+          formatter.print(DateTime.now) -> (if ownGame then 1 else 2)
         ),
         upsert = true
       )
@@ -32,7 +32,7 @@ final class RequesterApi(coll: Coll)(implicit ec: scala.concurrent.ExecutionCont
         }
       )
       .map { doc =>
-        val daily = doc.flatMap(_ int formatter.print(now))
+        val daily  = doc.flatMap(_ int formatter.print(now))
         val weekly = doc so {
           _.values.foldLeft(0) {
             case (acc, BSONInteger(v)) => acc + v

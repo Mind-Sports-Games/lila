@@ -1,11 +1,10 @@
 package views.html.swiss
 
 import lila.api.Context
-import lila.app.templating.Environment._
-import lila.app.ui.ScalatagsTemplate._
+import lila.app.templating.Environment.*
+import lila.app.ui.ScalatagsTemplate.*
 import lila.swiss.{ FeaturedSwisses, Swiss }
 import lila.i18n.VariantKeys
-
 
 object home {
 
@@ -57,30 +56,30 @@ object home {
             ),
             td(cls := "infos")(
               span(cls := "rounds")(
-                s.isStarted `option` frag(s.round.value, " / "),
+                s.isStarted.option(frag(s.round.value, " / ")),
                 s.settings.nbRounds,
                 " rounds",
-                if (s.settings.isBestOfX) {
+                if s.settings.isBestOfX then {
                   s" (best of ${s.settings.nbGamesPerRound} games"
-                } else if (s.settings.isPlayX) {
+                } else if s.settings.isPlayX then {
                   s" (${s.settings.nbGamesPerRound} games per round"
                 },
-                if (s.settings.isMatchScore) " using match score"
+                if s.settings.isMatchScore then " using match score"
                 else "",
-                if (s.settings.isBestOfX || s.settings.isPlayX) ")"
+                if s.settings.isBestOfX || s.settings.isPlayX then ")"
                 else ""
               ),
               span(cls := "setup")(
                 s.clock.show,
                 " • ",
-                if (s.isMedley) trans.medley.txt()
-                else if (s.variant.exotic)
+                if s.isMedley then trans.medley.txt()
+                else if s.variant.exotic then
                   s.settings.backgammonPoints.fold("")(p => s"${p}pt ") + VariantKeys.variantName(s.variant)
                 else s.perfType.trans,
                 " • ",
-                if (s.settings.handicapped) trans.handicappedTournament()
-                else if (s.settings.mcmahon) trans.mcmahon()
-                else if (s.settings.rated) trans.ratedTournament()
+                if s.settings.handicapped then trans.handicappedTournament()
+                else if s.settings.mcmahon then trans.mcmahon()
+                else if s.settings.rated then trans.ratedTournament()
                 else trans.casualTournament()
               )
             ),

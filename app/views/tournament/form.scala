@@ -4,8 +4,8 @@ package tournament
 import play.api.data.{ Field, Form }
 
 import lila.api.Context
-import lila.app.templating.Environment._
-import lila.app.ui.ScalatagsTemplate._
+import lila.app.templating.Environment.*
+import lila.app.ui.ScalatagsTemplate.*
 import lila.hub.LeaderTeam
 import lila.tournament.{ Condition, Tournament, TournamentForm }
 import lila.i18n.VariantKeys
@@ -24,7 +24,7 @@ object form {
       main(cls := "page-small")(
         div(cls := "tour__form box box-pad")(
           h1(
-            if (fields.isTeamBattle) "New Team Battle"
+            if fields.isTeamBattle then "New Team Battle"
             else trans.createANewTournament()
           ),
           postForm(cls := "form3", action := routes.Tournament.create)(
@@ -48,7 +48,7 @@ object form {
                 fields.startDate
               )
             ),
-            fields.isTeamBattle `option` form3.hidden(form("teamBattleByTeam")),
+            fields.isTeamBattle.option(form3.hidden(form("teamBattleByTeam"))),
             form3.actions(
               a(href := routes.Tournament.home)(trans.cancel()),
               form3.submit(trans.createANewTournament(), icon = "g".some)
@@ -70,7 +70,7 @@ object form {
         div(cls := "tour__form box box-pad")(
           h1("Edit ", tour.name()),
           postForm(cls := "form3", action := routes.Tournament.update(tour.id))(
-            form3.split(fields.name, tour.isCreated `option` fields.startDate),
+            form3.split(fields.name, tour.isCreated.option(fields.startDate)),
             form3.split(fields.rated, fields.variant),
             form3.split(fields.handicapped, fields.inputPlayerRatings),
             fields.medleyControls,
@@ -81,7 +81,8 @@ object form {
             fields.clockRow2,
             fields.clockRow3,
             form3.split(
-              if ((TournamentForm.minutes contains tour.minutes) || tour.isMedley) form3.split(fields.minutes)
+              if (TournamentForm.minutes contains tour.minutes) || tour.isMedley then
+                form3.split(fields.minutes)
               else
                 form3.group(form("minutes"), trans.duration(), half = true)(
                   form3.input(_)(tpe := "number")
@@ -111,7 +112,7 @@ object form {
 
   private def autoField(auto: Boolean, field: Field)(visible: Field => Frag) =
     frag(
-      if (auto) form3.hidden(field) else visible(field)
+      if auto then form3.hidden(field) else visible(field)
     )
 
   def condition(
@@ -128,7 +129,7 @@ object form {
         fields.password,
         (auto && tour.isEmpty && teams.nonEmpty) option {
           val baseField = form("conditions.teamMember.teamId")
-          val field = ctx.req.queryString get "team" flatMap (_.headOption) match {
+          val field     = ctx.req.queryString get "team" flatMap (_.headOption) match {
             case None       => baseField
             case Some(team) => baseField.copy(value = team.some)
           }
@@ -236,7 +237,7 @@ final private class TourFields(form: Form[?], tour: Option[Tournament])(implicit
       div(
         form3.input(f),
         " ",
-        if (isTeamBattle) "Team Battle" else "Arena",
+        if isTeamBattle then "Team Battle" else "Arena",
         br,
         small(cls := "form-help")(
           trans.safeTournamentName(),
@@ -279,9 +280,9 @@ final private class TourFields(form: Form[?], tour: Option[Tournament])(implicit
         ).some
       ),
       st.input(
-        tpe := "hidden",
+        tpe     := "hidden",
         st.name := form("handicapped").name,
-        value := "false"
+        value   := "false"
       ) // hack allow disabling handicapped
     )
   def inputPlayerRatings =

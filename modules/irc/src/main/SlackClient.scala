@@ -1,9 +1,9 @@
 package lila.irc
 
-import play.api.libs.json._
-import play.api.libs.ws.JsonBodyWritables._
+import play.api.libs.json.*
+import play.api.libs.ws.JsonBodyWritables.*
 import play.api.libs.ws.StandaloneWSClient
-import scala.concurrent.duration._
+import scala.concurrent.duration.*
 
 import lila.common.config.Secret
 import lila.memo.RateLimit
@@ -22,7 +22,7 @@ final private class SlackClient(ws: StandaloneWSClient, url: Secret)(implicit
 
   def apply(msg: SlackMessage): Funit =
     limiter(msg) {
-      if (url.value.isEmpty) fuccess(lila.log("slack").info(msg.toString))
+      if url.value.isEmpty then fuccess(lila.log("slack").info(msg.toString))
       else
         ws.url(url.value)
           .post(
@@ -38,7 +38,7 @@ final private class SlackClient(ws: StandaloneWSClient, url: Secret)(implicit
           .flatMap {
             case res if res.status == 200 => funit
             case res                      => fufail(s"[slack] $url $msg ${res.status} ${res.body}")
-        }
+          }
           .recoverDefault
     }(funit)
 }

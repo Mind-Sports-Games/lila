@@ -1,11 +1,11 @@
 package lila.team
 
-import akka.stream.scaladsl._
+import akka.stream.scaladsl.*
 import reactivemongo.akkastream.cursorProducer
 import reactivemongo.api.ReadPreference
 
 import lila.common.config.MaxPerSecond
-import lila.db.dsl._
+import lila.db.dsl.*
 import lila.user.{ User, UserRepo }
 
 final class TeamMemberStream(
@@ -32,7 +32,7 @@ final class TeamMemberStream(
   ): Source[Seq[User.ID], ?] =
     memberRepo.coll
       .find($doc("team" -> team.id) ++ selector, $doc("user" -> true).some)
-      .sort($sort `desc` "date")
+      .sort($sort.desc("date"))
       .batchSize(perSecond.value)
       .cursor[Bdoc](ReadPreference.secondaryPreferred)
       .documentSource()

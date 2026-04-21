@@ -1,8 +1,8 @@
 package controllers
 
-import akka.stream.scaladsl._
+import akka.stream.scaladsl.*
 import akka.util.ByteString
-import strategygames.{ Player => PlayerIndex }
+import strategygames.Player as PlayerIndex
 import play.api.mvc.Result
 
 import lila.app.*
@@ -27,7 +27,7 @@ final class Export(env: Env) extends LilaController(env) {
     Open { implicit ctx =>
       OnlyHumansAndFacebookOrTwitter {
         ExportGifRateLimitGlobal("-", msg = HTTPRequest.ipAddress(ctx.req).value) {
-          OptionFuResult(env.game.gameRepo `gameWithInitialFen` id) { case (game, initialFen) =>
+          OptionFuResult(env.game.gameRepo.gameWithInitialFen(id)) { case (game, initialFen) =>
             val pov = Pov(game, PlayerIndex.fromName(playerIndex) | PlayerIndex.p1)
             env.game.gifExport.fromPov(pov, initialFen) map
               stream("image/gif") map
@@ -45,7 +45,7 @@ final class Export(env: Env) extends LilaController(env) {
   def gameThumbnail(id: String) =
     Open { implicit ctx =>
       ExportImageRateLimitGlobal("-", msg = HTTPRequest.ipAddress(ctx.req).value) {
-        OptionFuResult(env.game.gameRepo `game` id) { game =>
+        OptionFuResult(env.game.gameRepo.game(id)) { game =>
           env.game.gifExport.gameThumbnail(game) map
             stream("image/gif") map
             gameImageCacheSeconds(game)
@@ -56,7 +56,7 @@ final class Export(env: Env) extends LilaController(env) {
   def puzzleThumbnail(id: String) =
     Open { implicit ctx =>
       ExportImageRateLimitGlobal("-", msg = HTTPRequest.ipAddress(ctx.req).value) {
-        OptionFuResult(env.puzzle.api.puzzle `find` Id(id)) { puzzle =>
+        OptionFuResult(env.puzzle.api.puzzle.find(Id(id))) { puzzle =>
           env.game.gifExport.thumbnail(
             fen = puzzle.fenAfterInitialMove,
             lastMove = puzzle.line.head.uci.some,
@@ -70,7 +70,7 @@ final class Export(env: Env) extends LilaController(env) {
 
   private def gameImageCacheSeconds(game: lila.game.Game)(res: Result): Result = {
     val cacheSeconds =
-      if (game.finishedOrAborted) 3600 * 24
+      if game.finishedOrAborted then 3600 * 24
       else 10
     res.withHeaders(CACHE_CONTROL -> s"max-age=$cacheSeconds")
   }

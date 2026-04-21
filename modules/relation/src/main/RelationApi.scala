@@ -1,18 +1,18 @@
 package lila.relation
 
 import org.joda.time.DateTime
-import reactivemongo.api._
-import reactivemongo.api.bson._
-import scala.concurrent.duration._
+import reactivemongo.api.*
+import reactivemongo.api.bson.*
+import scala.concurrent.duration.*
 
 import lila.common.Bus
-import lila.common.Heapsort.implicits._
-import lila.db.dsl._
-import lila.db.paginator._
-import lila.hub.actorApi.timeline.{ Propagate, Follow => FollowUser }
+import lila.common.Heapsort.implicits.*
+import lila.db.dsl.*
+import lila.db.paginator.*
+import lila.hub.actorApi.timeline.{ Follow as FollowUser, Propagate }
 import lila.hub.actors
-import lila.memo.CacheApi._
-import lila.relation.BSONHandlers._
+import lila.memo.CacheApi.*
+import lila.relation.BSONHandlers.*
 import lila.user.User
 
 final class RelationApi(
@@ -47,7 +47,7 @@ final class RelationApi(
       .aggregateWith[Bdoc](
         readPreference = ReadPreference.secondaryPreferred
       ) { framework =>
-        import framework._
+        import framework.*
         List(
           Match(
             $doc(
@@ -65,7 +65,7 @@ final class RelationApi(
       .headOption
       .map {
         ~_.flatMap(_.getAsOpt[Set[String]]("_id")) - userId
-    }
+      }
 
   def fetchFollows(u1: ID, u2: ID): Fu[Boolean] =
     (u1 != u2) so {
@@ -143,10 +143,10 @@ final class RelationApi(
             fetchRelation(u1, u2) zip fetchRelation(u2, u1) flatMap {
               case (Some(Follow), _) => funit
               case (_, Some(Block))  => funit
-              case _ =>
+              case _                 =>
                 repo.follow(u1, u2) >> limitFollow(u1).andDo {
                   countFollowersCache.update(u2, 1 +)
-                  countFollowingCache.update(u1, prev => (prev + 1) `atMost` config.maxFollow.value)
+                  countFollowingCache.update(u1, prev => (prev + 1).atMost(config.maxFollow.value))
                   timeline ! Propagate(FollowUser(u1, u2)).toFriendsOf(u1).toUsers(List(u2))
                   Bus.publish(lila.hub.actorApi.relation.Follow(u1, u2), "relation")
                   val _ = lila.mon.relation.follow.increment()
@@ -169,7 +169,7 @@ final class RelationApi(
         limitFollowRateLimiter(u) {
           fetchFollowing(u) flatMap userRepo.filterClosedOrInactiveIds(DateTime.now.minusDays(90))
         }(fuccess(Nil)) flatMap {
-          case Nil => repo.drop(u, true, nb - config.maxFollow.value)
+          case Nil         => repo.drop(u, true, nb - config.maxFollow.value)
           case inactiveIds =>
             repo.unfollowMany(u, inactiveIds).andDo(countFollowingCache.update(u, _ - inactiveIds.size))
         }
@@ -185,7 +185,7 @@ final class RelationApi(
     (u1 != u2 && u2 != User.playstrategyId) so {
       fetchBlocks(u1, u2) flatMap {
         case true => funit
-        case _ =>
+        case _    =>
           repo.block(u1, u2) >> limitBlock(u1) >> unfollow(u2, u1).andDo {
             Bus.publish(lila.hub.actorApi.relation.Block(u1, u2), "relation")
             Bus.publish(
@@ -230,5 +230,5 @@ final class RelationApi(
     }
 
   def searchFollowedBy(u: User, term: String, max: Int): Fu[List[User.ID]] =
-    repo.followingLike(u.id, term) map { _ `botN` max } // alphabetical order
+    repo.followingLike(u.id, term) map { _.botN(max) } // alphabetical order
 }

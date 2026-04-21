@@ -2,11 +2,11 @@ package lila.chat
 
 import org.joda.time.DateTime
 import play.api.data.Form
-import play.api.data.Forms._
-import reactivemongo.api.bson._
-import scala.concurrent.duration._
+import play.api.data.Forms.*
+import reactivemongo.api.bson.*
+import scala.concurrent.duration.*
 
-import lila.db.dsl._
+import lila.db.dsl.*
 import lila.user.User
 
 final class ChatTimeout(
@@ -14,15 +14,15 @@ final class ChatTimeout(
     duration: FiniteDuration
 )(implicit ec: scala.concurrent.ExecutionContext) {
 
-  import ChatTimeout._
+  import ChatTimeout.*
 
   private val global = new lila.memo.ExpireSetMemo(duration)
 
   def add(chat: UserChat, mod: User, user: User, reason: Reason, scope: Scope): Fu[Boolean] =
     isActive(chat.id, user.id) flatMap {
-      case true => fuccess(false)
+      case true  => fuccess(false)
       case false =>
-        if (scope == Scope.Global) global `put` user.id
+        if scope == Scope.Global then global.put(user.id)
         coll.insert
           .one(
             $doc(
@@ -47,7 +47,7 @@ final class ChatTimeout(
     )
 
   def history(user: User, nb: Int): Fu[List[UserEntry]] =
-    coll.find($doc("user" -> user.id)).sort($sort `desc` "createdAt").cursor[UserEntry]().list(nb)
+    coll.find($doc("user" -> user.id)).sort($sort.desc("createdAt")).cursor[UserEntry]().list(nb)
 
   def checkExpired: Fu[List[Reinstate]] =
     coll.list[Reinstate](
@@ -55,14 +55,14 @@ final class ChatTimeout(
         "expiresAt" `$lt` DateTime.now
       )
     ) flatMap {
-      case Nil => fuccess(Nil)
+      case Nil  => fuccess(Nil)
       case objs =>
         coll.unsetField($inIds(objs.map(_._id)), "expiresAt", multi = true) inject objs
     }
 
   private val idSize = 8
 
-  private def makeId = lila.common.ThreadLocalRandom `nextString` idSize
+  private def makeId = lila.common.ThreadLocalRandom.nextString(idSize)
 }
 
 object ChatTimeout {
@@ -82,7 +82,7 @@ object ChatTimeout {
     def apply(key: String) = all.find(_.key == key)
   }
   implicit val ReasonBSONHandler: BSONHandler[Reason] = tryHandler[Reason](
-    { case BSONString(value) => Reason(value) `toTry` s"Invalid reason $value" },
+    { case BSONString(value) => Reason(value).toTry(s"Invalid reason $value") },
     x => BSONString(x.key)
   )
 

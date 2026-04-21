@@ -3,7 +3,7 @@ package lila.storm
 import scala.concurrent.ExecutionContext
 
 import lila.common.extensions.*
-import lila.db.dsl._
+import lila.db.dsl.*
 import lila.memo.CacheApi
 import lila.puzzle.PuzzleColls
 
@@ -13,7 +13,7 @@ import lila.puzzle.PuzzleColls
  */
 final class StormSelector(colls: PuzzleColls, cacheApi: CacheApi)(implicit ec: ExecutionContext) {
 
-  import StormBsonHandlers._
+  import StormBsonHandlers.*
 
   def apply: Fu[List[StormPuzzle]] = current.get {}
 
@@ -49,62 +49,63 @@ final class StormSelector(colls: PuzzleColls, cacheApi: CacheApi)(implicit ec: E
         colls
           .path {
             _.aggregateWith[Bdoc]() { framework =>
-              import framework._
+              import framework.*
               val fenPlayerIndexRegex = $doc(
                 "$regexMatch" -> $doc(
                   "input" -> "$fen",
-                  "regex" -> { if (scala.util.Random.nextBoolean()) " w " else " b " }
+                  "regex" -> { if scala.util.Random.nextBoolean() then " w " else " b " }
                 )
               )
-              List(Facet(
-                ratingBuckets.map { case (rating, nbPuzzles) =>
-                  rating.toString -> List(
-                    Match(
-                      $doc(
-                        "min" `$lte` f"${theme}_${tier}_${rating}%04d",
-                        "max" `$gte` f"${theme}_${tier}_${rating}%04d"
-                      )
-                    ),
-                    Sample(1),
-                    Project($doc("_id" -> false, "ids" -> true)),
-                    UnwindField("ids"),
-                    // ensure we have enough after filtering deviation & playerIndex
-                    Sample(nbPuzzles * 7),
-                    PipelineOperator(
-                      $doc(
-                        "$lookup" -> $doc(
-                          "from" -> colls.puzzle.name.value,
-                          "as"   -> "puzzle",
-                          "let"  -> $doc("id" -> "$ids"),
-                          "pipeline" -> $arr(
-                            $doc(
-                              "$match" -> $doc(
-                                "$expr" -> $doc(
-                                  "$and" -> $arr(
-                                    $doc("$eq"  -> $arr("$_id", "$$id")),
-                                    $doc("$lte" -> $arr("$glicko.d", maxDeviation)),
-                                    fenPlayerIndexRegex
+              List(
+                Facet(
+                  ratingBuckets.map { case (rating, nbPuzzles) =>
+                    rating.toString -> List(
+                      Match(
+                        $doc(
+                          "min" `$lte` f"${theme}_${tier}_${rating}%04d",
+                          "max" `$gte` f"${theme}_${tier}_${rating}%04d"
+                        )
+                      ),
+                      Sample(1),
+                      Project($doc("_id" -> false, "ids" -> true)),
+                      UnwindField("ids"),
+                      // ensure we have enough after filtering deviation & playerIndex
+                      Sample(nbPuzzles * 7),
+                      PipelineOperator(
+                        $doc(
+                          "$lookup" -> $doc(
+                            "from"     -> colls.puzzle.name.value,
+                            "as"       -> "puzzle",
+                            "let"      -> $doc("id" -> "$ids"),
+                            "pipeline" -> $arr(
+                              $doc(
+                                "$match" -> $doc(
+                                  "$expr" -> $doc(
+                                    "$and" -> $arr(
+                                      $doc("$eq"  -> $arr("$_id", "$$id")),
+                                      $doc("$lte" -> $arr("$glicko.d", maxDeviation)),
+                                      fenPlayerIndexRegex
+                                    )
                                   )
                                 )
-                              )
-                            ),
-                            $doc(
-                              "$project" -> $doc(
-                                "fen"    -> true,
-                                "line"   -> true,
-                                "rating" -> $doc("$toInt" -> "$glicko.r")
+                              ),
+                              $doc(
+                                "$project" -> $doc(
+                                  "fen"    -> true,
+                                  "line"   -> true,
+                                  "rating" -> $doc("$toInt" -> "$glicko.r")
+                                )
                               )
                             )
                           )
                         )
-                      )
-                    ),
-                    UnwindField("puzzle"),
-                    Sample(nbPuzzles),
-                    ReplaceRootField("puzzle")
-                  )
-                }
-              ),
+                      ),
+                      UnwindField("puzzle"),
+                      Sample(nbPuzzles),
+                      ReplaceRootField("puzzle")
+                    )
+                  }
+                ),
                 Project($doc("all" -> $doc("$setUnion" -> ratingBuckets.map(r => s"$$${r._1}")))),
                 UnwindField("all"),
                 ReplaceRootField("all"),
@@ -113,9 +114,9 @@ final class StormSelector(colls: PuzzleColls, cacheApi: CacheApi)(implicit ec: E
             }
               .collect[List](maxDocs = poolSize)
               .map {
-              _.flatMap(StormPuzzleBSONReader.readOpt)
-            }
-        }
+                _.flatMap(StormPuzzleBSONReader.readOpt)
+              }
+          }
           .mon(_.storm.selector.time)
           .addEffect { puzzles =>
             monitor(puzzles.toVector, poolSize)
@@ -126,9 +127,8 @@ final class StormSelector(colls: PuzzleColls, cacheApi: CacheApi)(implicit ec: E
   private def monitor(puzzles: Vector[StormPuzzle], poolSize: Int): Unit = {
     val nb = puzzles.size
     lila.mon.storm.selector.count.record(nb)
-    if (nb < poolSize * 0.9)
-      logger.warn(s"Selector wanted $poolSize puzzles, only got $nb")
-    if (nb > 1) {
+    if nb < poolSize * 0.9 then logger.warn(s"Selector wanted $poolSize puzzles, only got $nb")
+    if nb > 1 then {
       val rest = puzzles.toVector drop 1
       lila.common.Maths.mean(rest.map(_.rating)) foreach { r =>
         val _ = lila.mon.storm.selector.rating.record(r.toInt)

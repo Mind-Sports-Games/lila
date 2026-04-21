@@ -1,10 +1,10 @@
 package lila.api
 
-import akka.actor._
-import akka.stream.scaladsl._
+import akka.actor.*
+import akka.stream.scaladsl.*
 import org.joda.time.DateTime
-import play.api.libs.json._
-import scala.concurrent.duration._
+import play.api.libs.json.*
+import scala.concurrent.duration.*
 
 import lila.challenge.Challenge
 import lila.common.Bus
@@ -84,19 +84,19 @@ final class EventStream(
         case SetOnline =>
           onlineApiUsers.setOnline(me.id)
 
-          if (lastSetSeenAt `isBefore` DateTime.now.minusMinutes(10)) {
-            userRepo `setSeenAt` me.id
+          if lastSetSeenAt.isBefore(DateTime.now.minusMinutes(10)) then {
+            userRepo.setSeenAt(me.id)
             lastSetSeenAt = DateTime.now
           }
 
           val _ = context.system.scheduler
             .scheduleOnce(6 second) {
-              if (online) {
+              if online then {
                 // gotta send a message to check if the client has disconnected
                 queue offer None
                 self ! SetOnline
               }
-          }
+            }
 
         case StartGame(game) => queue.offer(gameJson("gameStart", me)(game)).discard
 

@@ -2,9 +2,9 @@ package lila.setup
 
 import strategygames.{
   ByoyomiClock,
-  ClockConfig,
   Clock,
-  Game => StratGame,
+  ClockConfig,
+  Game as StratGame,
   GameFamily,
   GameLogic,
   Situation,
@@ -66,32 +66,32 @@ private[setup] trait Config {
   def clockHasSimpleDelayTime    = isSimpleDelay && time + increment > 0
   def clockHasBronsteinDelayTime = isBronstein && time + increment > 0
   def clockHasByoyomiTime        = isByoyomi && time + increment + byoyomi > 0
-  def clockHasTime =
+  def clockHasTime               =
     clockHasFischerTime || clockHasSimpleDelayTime || clockHasBronsteinDelayTime || clockHasByoyomiTime
 
-  def makeClock = hasClock `option` justMakeClock
+  def makeClock = hasClock.option(justMakeClock)
 
   protected def justMakeClock: ClockConfig =
     timeMode match {
       case TimeMode.ByoyomiClock =>
         ByoyomiClock.Config(
           (time * 60).toInt,
-          if (clockHasByoyomiTime) increment else 0,
-          if (clockHasByoyomiTime) byoyomi else 10,
+          if clockHasByoyomiTime then increment else 0,
+          if clockHasByoyomiTime then byoyomi else 10,
           periods
         )
       case TimeMode.SimpleDelayClock =>
-        Clock.SimpleDelayConfig((time * 60).toInt, if (clockHasSimpleDelayTime) increment else 1)
+        Clock.SimpleDelayConfig((time * 60).toInt, if clockHasSimpleDelayTime then increment else 1)
       case TimeMode.BronsteinDelayClock =>
-        Clock.BronsteinConfig((time * 60).toInt, if (clockHasBronsteinDelayTime) increment else 1)
+        Clock.BronsteinConfig((time * 60).toInt, if clockHasBronsteinDelayTime then increment else 1)
       // NOTE: This would have always returned a Clock.Config before anywys. The reason
       //       why I'm not using the case _ => clause, is I want this code to not compile
       //       when we add new clocks in the future.
       case TimeMode.Correspondence | TimeMode.FischerClock | TimeMode.Unlimited =>
-        Clock.Config((time * 60).toInt, if (clockHasFischerTime) increment else 1)
+        Clock.Config((time * 60).toInt, if clockHasFischerTime then increment else 1)
     }
 
-  def makeDaysPerTurn: Option[Int] = (timeMode == TimeMode.Correspondence) `option` days
+  def makeDaysPerTurn: Option[Int] = (timeMode == TimeMode.Correspondence).option(days)
 }
 
 trait Positional { self: Config =>
@@ -105,11 +105,11 @@ trait Positional { self: Config =>
   def strictFen: Boolean
 
   lazy val validFen = variant.gameLogic match {
-    //TODO: LOA defaults here, perhaps want to add LOA fromPosition
+    // TODO: LOA defaults here, perhaps want to add LOA fromPosition
     case GameLogic.Chess() =>
       !variant.fromPositionVariant || {
         fen exists { f =>
-          (Forsyth.<<<(variant.gameLogic, f)).exists(_.situation `playable` strictFen)
+          Forsyth.<<<(variant.gameLogic, f).exists(_.situation.playable(strictFen))
         }
       }
     case GameLogic.Draughts() =>
@@ -119,17 +119,17 @@ trait Positional { self: Config =>
         fen so { f =>
           ~Forsyth
             .<<<@(variant.gameLogic, fenVariant | Variant.libStandard(GameLogic.Draughts()), f)
-            .map(_.situation `playable` strictFen)
+            .map(_.situation.playable(strictFen))
         }
       }
-    case GameLogic.FairySF()      => true //no fromPosition yet
-    case GameLogic.Samurai()      => true //no fromPosition yet
-    case GameLogic.Togyzkumalak() => true //no fromPosition yet
-    case GameLogic.Go()           => true //using handicap and komi to set fen instead - but no from position
-    case GameLogic.Backgammon() =>
-      true //randomly chooses start player and also sets multipoint in fen - but no from position
-    case GameLogic.Abalone() => true //no fromPosition yet
-    case GameLogic.Dameo()   => true //no fromPosition yet
+    case GameLogic.FairySF()      => true // no fromPosition yet
+    case GameLogic.Samurai()      => true // no fromPosition yet
+    case GameLogic.Togyzkumalak() => true // no fromPosition yet
+    case GameLogic.Go()           => true // using handicap and komi to set fen instead - but no from position
+    case GameLogic.Backgammon()   =>
+      true // randomly chooses start player and also sets multipoint in fen - but no from position
+    case GameLogic.Abalone()      => true // no fromPosition yet
+    case GameLogic.Dameo()        => true // no fromPosition yet
   }
 
   lazy val validKingCount = variant.gameLogic match {
@@ -148,7 +148,7 @@ trait Positional { self: Config =>
 
   def fenGame(builder: StratGame => Game): Game = {
     val baseState =
-      fen `ifTrue` (variant.fromPositionVariant || variant.gameLogic == GameLogic.Go()) flatMap {
+      fen.ifTrue(variant.fromPositionVariant || variant.gameLogic == GameLogic.Go()) flatMap {
         Forsyth.<<<@(
           variant.gameLogic,
           variant,
@@ -166,7 +166,7 @@ trait Positional { self: Config =>
           startedAtTurn = sit.turnCount,
           clock = makeClock.map(_.toClock)
         )
-        if (Forsyth.>>(sit.situation.gameLogic, game).initial)
+        if Forsyth.>>(sit.situation.gameLogic, game).initial then
           makeGame(Variant.libStandard(sit.situation.gameLogic)) -> none
         else game                                                -> baseState
       }
@@ -212,7 +212,7 @@ trait BaseConfig {
     )
     .toMap
 
-  //concat ensures ordering that FromPosition is the last element
+  // concat ensures ordering that FromPosition is the last element
   val fishnetVariants = GameFamily.all
     .map(gf =>
       (
@@ -228,7 +228,7 @@ trait BaseConfig {
   val variantsWithVariants =
     GameFamily.all.map(gf => (gf.id, gf.variants.filter(!_.fromPositionVariant).map(_.id))).toMap
 
-  //concat ensures ordering that FromPosition is the last element
+  // concat ensures ordering that FromPosition is the last element
   val variantsWithFenAndVariants = GameFamily.all
     .map(gf =>
       (
@@ -242,7 +242,7 @@ trait BaseConfig {
     .toMap
 
   val fenVariants = GameFamily.all
-    .map(gf => (gf.id, (gf.variants.filter(v => v.baseVariant || v.fenVariant)).map(_.id)))
+    .map(gf => (gf.id, gf.variants.filter(v => v.baseVariant || v.fenVariant).map(_.id)))
     .toMap
 
   val boardApiVariants =
@@ -253,7 +253,7 @@ trait BaseConfig {
   private val timeMin             = 0
   private val timeMax             = 180
   private val acceptableFractions = Set(1 / 4d, 1 / 2d, 3 / 4d, 3 / 2d)
-  def validateTime(t: Double) =
+  def validateTime(t: Double)     =
     t >= timeMin && t <= timeMax && (t.isWhole || acceptableFractions(t))
 
   private val incrementMin      = 0
@@ -272,7 +272,7 @@ trait BaseConfig {
   private val handicapMax        = 25
   def validateGoHandicap(i: Int) = i >= handicapMin && i <= handicapMax
 
-  //komi is multipled by 10 to allow int.
+  // komi is multipled by 10 to allow int.
   private def komiMin(bs: Int)               = -bs * bs * 10
   private def komiMax(bs: Int)               = bs * bs * 10
   def validateGoKomi(boardSize: Int)(i: Int) = i >= komiMin(boardSize) && i <= komiMax(boardSize)
@@ -281,4 +281,3 @@ trait BaseConfig {
   private val pointsMax                = 31
   def validateBackgammonPoints(i: Int) = i >= pointsMin && i <= pointsMax && i % 2 == 1
 }
-

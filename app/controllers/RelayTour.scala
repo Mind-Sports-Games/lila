@@ -1,6 +1,5 @@
 package controllers
 
-
 import lila.app.*
 
 final class RelayTour(env: Env, @annotation.nowarn("msg=unused") apiC: => Api) extends LilaController(env) {

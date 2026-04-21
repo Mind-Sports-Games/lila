@@ -1,10 +1,10 @@
 package lila.memo
 
-import com.softwaremill.macwire._
+import com.softwaremill.macwire.*
 import lila.common.autoconfig.{ AutoConfig, ConfigName }
 import play.api.Configuration
 
-import lila.common.config._
+import lila.common.config.*
 
 final class MemoConfig(
     @ConfigName("collection.cache") val cacheColl: CollName,

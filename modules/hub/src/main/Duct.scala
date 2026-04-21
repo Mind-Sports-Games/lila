@@ -11,13 +11,14 @@ import scala.concurrent.Promise
  */
 abstract class Duct(implicit ec: scala.concurrent.ExecutionContext) extends lila.common.Tellable {
 
-  import Duct._
+  import Duct.*
 
   // implement async behaviour here
   protected val process: ReceiveAsync
 
   def !(msg: Any): Unit =
-    if (stateRef.getAndUpdate(state => Some(state.fold(Queue.empty[Any])(_.enqueue(msg)))).isEmpty) run(msg)
+    if stateRef.getAndUpdate(state => Some(state.fold(Queue.empty[Any])(_.enqueue(msg)))).isEmpty then
+      run(msg)
 
   def ask[A](makeMsg: Promise[A] => Any): Fu[A] = {
     val promise = Promise[A]()
@@ -35,8 +36,7 @@ abstract class Duct(implicit ec: scala.concurrent.ExecutionContext) extends lila
   private def run(msg: Any): Unit =
     process.applyOrElse(msg, Duct.fallback).onComplete(postRun)
 
-  private val postRun = (_: Any) =>
-    stateRef.getAndUpdate(postRunUpdate).flatMap(_.headOption).foreach(run)
+  private val postRun = (_: Any) => stateRef.getAndUpdate(postRunUpdate).flatMap(_.headOption).foreach(run)
 }
 
 object Duct {
@@ -48,7 +48,7 @@ object Duct {
   private val postRunUpdate = new UnaryOperator[State] {
     override def apply(state: State): State =
       state flatMap { q =>
-        if (q.isEmpty) None else Some(q.tail)
+        if q.isEmpty then None else Some(q.tail)
       }
   }
 

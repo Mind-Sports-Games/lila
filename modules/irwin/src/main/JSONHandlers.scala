@@ -1,12 +1,12 @@
 package lila.irwin
 
 import org.joda.time.DateTime
-import play.api.libs.functional.syntax._
-import play.api.libs.json._
+import play.api.libs.functional.syntax.*
+import play.api.libs.json.*
 
 object JSONHandlers {
 
-  import IrwinReport._
+  import IrwinReport.*
 
   implicit val moveReader: Reads[MoveReport] = (
     (__ \ "a").read[Int] and           // activation

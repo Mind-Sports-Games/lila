@@ -2,11 +2,11 @@ package lila.study
 
 import strategygames.variant.Variant
 
-import BSONHandlers._
+import BSONHandlers.*
 import Node.Children
 
 import lila.common.Chronometer
-import lila.db.dsl._
+import lila.db.dsl.*
 
 private object StudyFlatTree {
 
@@ -53,7 +53,7 @@ private object StudyFlatTree {
             .updatedWith(flat.path.parent) {
               case None           => Children(Vector(node)).some
               case Some(siblings) => siblings.addNode(node).some
-          }
+            }
         }
   }
 

@@ -1,13 +1,13 @@
 package lila.round
 
-import reactivemongo.api.bson._
+import reactivemongo.api.bson.*
 
 import lila.db.BSON.BSONJodaDateTimeHandler
-import lila.db.dsl._
+import lila.db.dsl.*
 import org.joda.time.DateTime
 import scala.concurrent.Promise
 
-import strategygames.{ Player => PlayerIndex, Move }
+import strategygames.{ Move, Player as PlayerIndex }
 import strategygames.format.Uci
 import Forecast.Step
 import lila.game.Game.PlayerId
@@ -45,7 +45,7 @@ final class ForecastApi(coll: Coll, tellRound: TellRound)(implicit ec: scala.con
       uciMove: String,
       steps: Forecast.Steps
   ): Funit =
-    if (!pov.isMyTurn) funit
+    if !pov.isMyTurn then funit
     else
       Uci
         .Move(pov.game.variant.gameLogic, pov.game.variant.gameFamily, uciMove)
@@ -65,44 +65,44 @@ final class ForecastApi(coll: Coll, tellRound: TellRound)(implicit ec: scala.con
 
   def loadForDisplay(pov: Pov): Fu[Option[Forecast]] =
     pov.forecastable so coll.byId[Forecast](pov.fullId) flatMap {
-      case None => fuccess(none)
+      case None     => fuccess(none)
       case Some(fc) =>
-        if (firstStep(fc.steps).exists(_.ply != pov.game.plies + 1)) clearPov(pov) inject none
+        if firstStep(fc.steps).exists(_.ply != pov.game.plies + 1) then clearPov(pov) inject none
         else fuccess(fc.some)
     }
 
   def loadForPlay(pov: Pov): Fu[Option[Forecast]] =
     pov.game.forecastable so coll.byId[Forecast](pov.fullId) flatMap {
-      case None => fuccess(none)
+      case None     => fuccess(none)
       case Some(fc) =>
-        if (firstStep(fc.steps).exists(_.ply != pov.game.plies)) clearPov(pov) inject none
+        if firstStep(fc.steps).exists(_.ply != pov.game.plies) then clearPov(pov) inject none
         else fuccess(fc.some)
     }
 
   def nextMove(g: Game, last: Move): Fu[Option[Uci.Move]] =
     g.forecastable so {
-      loadForPlay(Pov `player` g) flatMap {
-        case None => fuccess(none)
+      loadForPlay(Pov.player(g)) flatMap {
+        case None     => fuccess(none)
         case Some(fc) =>
           fc(g, last) match {
             case Some((newFc, uciMove)) if newFc.steps.nonEmpty =>
               coll.update.one($id(fc._id), newFc) inject uciMove.some
-            case Some((_, uciMove)) => clearPov(Pov `player` g) inject uciMove.some
-            case _                  => clearPov(Pov `player` g) inject none
+            case Some((_, uciMove)) => clearPov(Pov.player(g)) inject uciMove.some
+            case _                  => clearPov(Pov.player(g)) inject none
           }
       }
     }
 
   def moveOpponent(g: Game, last: Move): Fu[Option[Uci.Move]] = g.forecastable so {
-    loadForPlay(Pov `opponent` g) flatMap {
+    loadForPlay(Pov.opponent(g)) flatMap {
       case None =>
         fuccess(none)
       case Some(fc) =>
         fc.moveOpponent(g, last) match {
           case Some((newFc, uciMove)) if newFc.steps.nonEmpty =>
             coll.update.one($id(fc._id), newFc) inject uciMove.some
-          case Some((_, uciMove)) => clearPov(Pov `player` g) inject uciMove.some
-          case _                  => clearPov(Pov `player` g) inject none
+          case Some((_, uciMove)) => clearPov(Pov.player(g)) inject uciMove.some
+          case _                  => clearPov(Pov.player(g)) inject none
         }
     }
   }

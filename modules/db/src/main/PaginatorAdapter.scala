@@ -1,9 +1,9 @@
 package lila.db
 package paginator
 
-import dsl._
-import reactivemongo.api._
-import reactivemongo.api.bson._
+import dsl.*
+import reactivemongo.api.*
+import reactivemongo.api.bson.*
 import scala.concurrent.ExecutionContext
 
 import lila.common.paginator.AdapterLike

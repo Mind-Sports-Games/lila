@@ -1,6 +1,6 @@
 package lila.forum
 
-import lila.db.dsl._
+import lila.db.dsl.*
 import reactivemongo.api.ReadPreference
 
 final class CategRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionContext) {

@@ -3,12 +3,11 @@ package views.html.challenge
 import play.api.libs.json.Json
 
 import lila.api.Context
-import lila.app.templating.Environment._
-import lila.app.ui.ScalatagsTemplate._
+import lila.app.templating.Environment.*
+import lila.app.ui.ScalatagsTemplate.*
 import lila.challenge.Challenge
 import lila.common.String.html.safeJsonValue
 import strategygames.GameFamily
-
 
 object bits {
 
@@ -23,31 +22,30 @@ object bits {
     frag(
       jsModule("challengePage"),
       embedJsUnsafeLoadThen(s"""PlayStrategyChallenge(${safeJsonValue(
-        Json.obj(
-          "socketUrl" -> s"/challenge/${c.id}/socket/v$apiVersion",
-          "xhrUrl"    -> routes.Challenge.show(c.id, playerIndex.map(_.name)).url,
-          "owner"     -> owner,
-          "data"      -> json
-        )
-      )})""")
+          Json.obj(
+            "socketUrl" -> s"/challenge/${c.id}/socket/v$apiVersion",
+            "xhrUrl"    -> routes.Challenge.show(c.id, playerIndex.map(_.name)).url,
+            "owner"     -> owner,
+            "data"      -> json
+          )
+        )})""")
     )
 
   def details(c: Challenge, requestedPlayerIndex: Option[strategygames.Player])(implicit ctx: Context) = frag(
     div(cls := "details")(
-      div(cls := "variant", dataIcon := (if (c.initialFen.isDefined) '*' else c.perfType.iconChar))(
+      div(cls := "variant", dataIcon := (if c.initialFen.isDefined then '*' else c.perfType.iconChar))(
         div(
-          if (c.variant.exotic)
+          if c.variant.exotic then
             views.html.game.bits
               .variantLink(
                 c.variant,
                 variantName(c.variant),
-                matchPoints = (c.variant.gameFamily match {
+                matchPoints = c.variant.gameFamily match {
                   case GameFamily.Backgammon() => c.backgammonPoints
                   case _                       => None
-                })
+                }
               )
-          else
-            c.perfType.trans,
+          else c.perfType.trans,
           (c.initialFen, c.variant.gameFamily) match {
             case (Some(f), GameFamily.Go()) => " " + c.variant.toGo.setupInfo(f.toGo).getOrElse("")
             case _                          => ""
@@ -55,7 +53,7 @@ object bits {
           br,
           span(cls := "clock")(
             c.daysPerTurn map { days =>
-              if (days == 1) trans.oneDay()
+              if days == 1 then trans.oneDay()
               else trans.nbDays.pluralSame(days)
             } getOrElse shortClockName(c.clock.map(_.config))
           )
@@ -70,10 +68,12 @@ object bits {
         modeName(c.mode)
       )
     ),
-    c.isMultiMatch `option` div(cls := "multi-match")(
-      trans.multiMatchChallenge(),
-      " ",
-      trans.multiMatchDefinition()
+    c.isMultiMatch.option(
+      div(cls := "multi-match")(
+        trans.multiMatchChallenge(),
+        " ",
+        trans.multiMatchDefinition()
+      )
     )
   )
 

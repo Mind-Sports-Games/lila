@@ -1,13 +1,13 @@
 package lila.studySearch
 
-import akka.actor._
-import com.softwaremill.macwire._
+import akka.actor.*
+import com.softwaremill.macwire.*
 
 import lila.common.Bus
-import lila.common.paginator._
+import lila.common.paginator.*
 import lila.hub.actorApi.study.RemoveStudy
 import lila.hub.LateMultiThrottler
-import lila.search._
+import lila.search.*
 import lila.study.Study
 import lila.user.User
 
@@ -33,9 +33,9 @@ final class Env(
     Paginator[Study.WithChaptersAndLiked](
       adapter = new AdapterLike[Study] {
         def query                           = Query(text, me.map(_.id))
-        def nbResults                       = api `count` query
+        def nbResults                       = api.count(query)
         def slice(offset: Int, length: Int) = api.search(query, From(offset), Size(length))
-      } `mapFutureList` pager.withChaptersAndLiking(me),
+      }.mapFutureList(pager.withChaptersAndLiking(me)),
       currentPage = page,
       maxPerPage = pager.maxPerPage
     )

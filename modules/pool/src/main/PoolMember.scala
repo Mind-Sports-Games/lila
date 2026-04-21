@@ -20,7 +20,7 @@ case class PoolMember(
   def ratingDiff(other: PoolMember) = Math.abs(rating - other.rating)
 
   def withRange(r: Option[RatingRange]) =
-    if (r == ratingRange) this
+    if r == ratingRange then this
     else copy(ratingRange = r, misses = 0)
 
   def hasRange = ratingRange.isDefined
@@ -30,7 +30,11 @@ object PoolMember {
 
   case class BlockedUsers(ids: Set[User.ID]) extends AnyVal
 
-  def apply(joiner: PoolApi.Joiner, @annotation.nowarn("msg=unused") _config: PoolConfig, rageSit: RageSit): PoolMember =
+  def apply(
+      joiner: PoolApi.Joiner,
+      @annotation.nowarn("msg=unused") _config: PoolConfig,
+      rageSit: RageSit
+  ): PoolMember =
     PoolMember(
       userId = joiner.userId,
       sri = joiner.sri,

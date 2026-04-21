@@ -27,7 +27,7 @@ sealed trait UserContext {
 
   def troll = me.exists(_.marks.troll)
 
-  def ip = lila.common.HTTPRequest `ipAddress` req
+  def ip = lila.common.HTTPRequest.ipAddress(req)
 
   def kid   = me.exists(_.kid)
   def noKid = !kid

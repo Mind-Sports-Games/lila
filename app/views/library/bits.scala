@@ -1,7 +1,7 @@
 package views.html.library
 
-import lila.i18n.{ I18nKeys => trans }
-import lila.app.ui.ScalatagsTemplate._
+import lila.i18n.I18nKeys as trans
+import lila.app.ui.ScalatagsTemplate.*
 import strategygames.variant.Variant
 import strategygames.GameLogic
 import org.joda.time.DateTime
@@ -13,14 +13,14 @@ object bits {
   def transformData(data: List[MonthlyGameData]): List[(String, String, Long)] =
     data.map { case MonthlyGameData(yearMonth, libVar, count) => (yearMonth, getVariantKey(libVar), count) }
 
-  private def variantKey(variant: Variant) = s"${variant.gameFamily.id}_${variant.id}"
+  private def variantKey(variant: Variant)   = s"${variant.gameFamily.id}_${variant.id}"
   private def getVariantKey(lib_var: String) =
     lib_var.split('_') match {
       case Array(lib, id) => {
         val variant = Variant.orDefault(GameLogic(lib.toInt), id.toInt)
         variantKey(variant)
       }
-      case _ => "0_1" //standard chess
+      case _ => "0_1" // standard chess
     }
 
   def totalVariants(data: List[MonthlyGameData]): Int =
@@ -42,7 +42,7 @@ object bits {
   def gamePerDayForVariant(data: List[MonthlyGameData], variant: Variant): Option[Double] =
     firstGamePlayedForVariant(data, variant).map { first =>
       val days = Days.daysBetween(first, DateTime.now).getDays
-      if (days > 0) totalGamesForVariant(data, variant).toDouble / days.toDouble
+      if days > 0 then totalGamesForVariant(data, variant).toDouble / days.toDouble
       else totalGamesForVariant(data, variant).toDouble
     }
 

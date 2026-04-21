@@ -3,12 +3,12 @@ package templating
 
 import play.api.i18n.Lang
 
-import lila.app.ui.ScalatagsTemplate._
+import lila.app.ui.ScalatagsTemplate.*
 
 trait AiHelper { self: I18nHelper =>
 
   def aiName(level: Int, withRating: Boolean = true)(implicit lang: Lang): String = {
-    val name = trans.aiNameLevelAiLevel.txt("Stockfish", level)
+    val name   = trans.aiNameLevelAiLevel.txt("Stockfish", level)
     val rating = withRating so {
       aiRating(level) so { r =>
         s" ($r)"

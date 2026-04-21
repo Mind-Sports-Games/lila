@@ -1,9 +1,8 @@
 package views.html.mod
 
-
 import lila.api.Context
-import lila.app.templating.Environment._
-import lila.app.ui.ScalatagsTemplate._
+import lila.app.templating.Environment.*
+import lila.app.ui.ScalatagsTemplate.*
 import lila.memo.SettingStore
 import play.api.data.Form
 import lila.mod.ModPresets

@@ -1,8 +1,8 @@
 package lila.socket
 
 import akka.actor.{ CoordinatedShutdown, Scheduler }
-import com.softwaremill.macwire._
-import io.lettuce.core._
+import com.softwaremill.macwire.*
+import io.lettuce.core.*
 import play.api.Configuration
 
 @Module
@@ -17,7 +17,7 @@ final class Env(
 
   private val RedisUri = appConfig.get[String]("socket.redis.uri")
 
-  private val redisClient = RedisClient `create` RedisURI.create(RedisUri)
+  private val redisClient = RedisClient.create(RedisURI.create(RedisUri))
 
   val remoteSocket: RemoteSocket = wire[RemoteSocket]
 

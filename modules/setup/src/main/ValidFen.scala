@@ -13,7 +13,7 @@ object ValidFen {
     val lib = fen.gameLogic
     for {
       parsed <- strategygames.format.Forsyth.<<<(lib, fen)
-      if parsed.situation `playable` strict
+      if parsed.situation.playable(strict)
       validated = strategygames.format.Forsyth.>>(lib, parsed)
     } yield ValidFen(validated, parsed.situation)
   }

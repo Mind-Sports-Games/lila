@@ -83,20 +83,20 @@ final class Round(
               }
           }
       }
-    ) `dmap` NoCache
+    ).dmap(NoCache)
   }
 
   def player(fullId: String) =
     Open { implicit ctx =>
       env.round.proxyRepo.pov(fullId) flatMap {
         case Some(pov) => renderPlayer(pov)
-        case None      => userC.tryRedirect(fullId) `getOrElse` notFound
+        case None      => userC.tryRedirect(fullId).getOrElse(notFound)
       }
     }
 
   private def otherPovs(game: GameModel)(implicit ctx: Context) =
     ctx.me so { user =>
-      env.round.proxyRepo `urgentGames` user map {
+      env.round.proxyRepo.urgentGames(user) map {
         _ filter { pov =>
           pov.gameId != game.id && pov.game.isSwitchable && pov.game.isSimul == game.isSimul
         }
@@ -123,7 +123,7 @@ final class Round(
 
   def next(gameId: String) =
     Auth { implicit ctx => me =>
-      OptionFuResult(env.round.proxyRepo `game` gameId) { currentGame =>
+      OptionFuResult(env.round.proxyRepo.game(gameId)) { currentGame =>
         otherPovs(currentGame) map getNext(currentGame) map {
           _ orElse Pov(currentGame, me)
         } flatMap {
@@ -157,7 +157,7 @@ final class Round(
             case None =>
               watch(pov, None, forceAnalysis)
           }
-        case None => userC.tryRedirect(gameId) `getOrElse` challengeC.showId(gameId)
+        case None => userC.tryRedirect(gameId).getOrElse(challengeC.showId(gameId))
       }
     }
 
@@ -254,7 +254,7 @@ final class Round(
             for {
               tour     <- env.tournament.api.gameView.watcher(pov.game)
               data     <- env.api.roundApi.watcher(pov, tour, apiVersion, tv = none)
-              analysis <- analyser `get` pov.game
+              analysis <- analyser.get(pov.game)
               chat     <- getWatcherChat(pov.game)
             } yield Ok {
               data
@@ -287,7 +287,7 @@ final class Round(
           .GameOrEvent(
             Right(
               (
-                c `truncate` 100,
+                c.truncate(100),
                 lila.chat.Chat.ResourceId(resource)
               )
             )
@@ -375,7 +375,7 @@ final class Round(
 
   def continue(id: String, mode: String) =
     Open { implicit ctx =>
-      OptionResult(env.game.gameRepo `game` id) { game =>
+      OptionResult(env.game.gameRepo.game(id)) { game =>
         Redirect(
           "%s?fen=%s#%s".format(
             routes.Lobby.home,
@@ -393,7 +393,7 @@ final class Round(
           lila.log("round").warn(s"theft resign $fullId ${HTTPRequest.ipAddress(ctx.req)}")
           fuccess(routes.Lobby.home)
         } else {
-          env.round `resign` pov
+          env.round.resign(pov)
           import scala.concurrent.duration._
           akka.pattern.after(500.millis, env.system.scheduler)(fuccess(routes.Lobby.home))
         }
@@ -405,14 +405,14 @@ final class Round(
       OptionOk(
         PlayerIndex
           .fromName(playerIndex)
-          .so(env.round.proxyRepo.povIfPresent(gameId, _)) `orElse` env.game.gameRepo
-          .pov(gameId, playerIndex)
+          .so(env.round.proxyRepo.povIfPresent(gameId, _)).orElse(env.game.gameRepo
+          .pov(gameId, playerIndex))
       )(html.game.mini(_))
     }
 
   def miniFullId(fullId: String) =
     Open { implicit ctx =>
-      OptionOk(env.round.proxyRepo.povIfPresent(fullId) `orElse` env.game.gameRepo.pov(fullId))(
+      OptionOk(env.round.proxyRepo.povIfPresent(fullId).orElse(env.game.gameRepo.pov(fullId)))(
         html.game.mini(_)
       )
     }
@@ -422,7 +422,7 @@ final class Round(
       import lila.round.actorApi.round.Moretime
       if (seconds < 1 || seconds > 86400) BadRequest.fuccess
       else
-        env.round.proxyRepo.game(lila.game.Game `takeGameId` anyId) map {
+        env.round.proxyRepo.game(lila.game.Game.takeGameId(anyId)) map {
           _.flatMap { Pov(_, me) }.so { pov =>
             env.round.tellRound(pov.gameId, Moretime(pov.typedPlayerId, seconds.seconds))
             jsonOkResult

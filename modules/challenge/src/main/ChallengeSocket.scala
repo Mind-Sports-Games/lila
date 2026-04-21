@@ -1,9 +1,9 @@
 package lila.challenge
 
-import play.api.libs.json._
+import play.api.libs.json.*
 
-import lila.room.RoomSocket.{ Protocol => RP, _ }
-import lila.socket.RemoteSocket.{ Protocol => P, _ }
+import lila.room.RoomSocket.{ Protocol as RP, * }
+import lila.socket.RemoteSocket.{ Protocol as P, * }
 
 final private class ChallengeSocket(
     api: ChallengeApi,
@@ -13,7 +13,7 @@ final private class ChallengeSocket(
     mode: play.api.Mode
 ) {
 
-  import ChallengeSocket._
+  import ChallengeSocket.*
 
   def reload(challengeId: Challenge.ID): Unit =
     rooms.tell(challengeId, NotifyVersion("reload", JsNull))
@@ -27,10 +27,10 @@ final private class ChallengeSocket(
   }
 
   remoteSocketApi.subscribe("chal-in", Protocol.In.reader)(
-    challengeHandler orElse minRoomHandler(rooms, lila `log` "challenge") orElse remoteSocketApi.baseHandler
+    challengeHandler orElse minRoomHandler(rooms, lila.log("challenge")) orElse remoteSocketApi.baseHandler
   )
 
-  api `registerSocket` this
+  api.registerSocket(this)
 }
 
 object ChallengeSocket {

@@ -1,10 +1,10 @@
 package lila.round
 
-import strategygames.{ Player => PlayerIndex }
+import strategygames.Player as PlayerIndex
 import lila.common.Bus
 import lila.game.{ Event, Game, GameRepo, Pov, Progress, Rewind, UciMemo }
 import lila.pref.{ Pref, PrefApi }
-import lila.i18n.{ defaultLang, I18nKeys => trans }
+import lila.i18n.{ defaultLang, I18nKeys as trans }
 import RoundDuct.TakebackSituation
 import play.api.i18n.Lang
 
@@ -25,25 +25,25 @@ final private class Takebacker(
         case Pov(game, playerIndex) if pov.opponent.isProposingTakeback =>
           {
             val povTurn = playerIndex == pov.game.turnPlayerIndex
-            if (pov.opponent.proposeTakebackAt == pov.game.plies && povTurn)
+            if pov.opponent.proposeTakebackAt == pov.game.plies && povTurn then
               // go back until the playerindex switches
               takebackSwitchPlayer(game)
             else
               // go back one ply. if playerindex has not switched, continue going back
               takebackRetainPlayer(game)
-          } `dmap` (_ -> situation.reset)
-        case Pov(game, _) if pov.game.playableByAi => takebackSwitchPlayer(game) `dmap` (_ -> situation)
-        case Pov(game, _) if pov.opponent.isAi     => takebackRetainPlayer(game) `dmap` (_ -> situation)
-        case Pov(game, _) if pov.opponent.isPSBot  => takebackRetainPlayer(game) `dmap` (_ -> situation)
-        case Pov(game, playerIndex) if (game `playerCanProposeTakeback` playerIndex) && situation.offerable =>
+          }.dmap(_ -> situation.reset)
+        case Pov(game, _) if pov.game.playableByAi => takebackSwitchPlayer(game).dmap(_ -> situation)
+        case Pov(game, _) if pov.opponent.isAi     => takebackRetainPlayer(game).dmap(_ -> situation)
+        case Pov(game, _) if pov.opponent.isPSBot  => takebackRetainPlayer(game).dmap(_ -> situation)
+        case Pov(game, playerIndex) if (game.playerCanProposeTakeback(playerIndex)) && situation.offerable =>
           {
             messenger.system(game, trans.takebackPropositionSent.txt())
             val progress = Progress(game) map { g =>
-              g.updatePlayer(playerIndex, _ `proposeTakeback` g.plies)
+              g.updatePlayer(playerIndex, _.proposeTakeback(g.plies))
             }
             proxy.save(progress).andDo(publishTakebackOffer(pov)) inject
               List(Event.TakebackOffers(playerIndex.p1, playerIndex.p2))
-          } `dmap` (_ -> situation)
+          }.dmap(_ -> situation)
         case _ => fufail(ClientError("[takebacker] invalid yes " + pov))
       }
     }
@@ -72,11 +72,11 @@ final private class Takebacker(
     }
 
   def isAllowedIn(game: Game): Fu[Boolean] =
-    if (game.isMandatory || !game.situation.takebackable) fuFalse
+    if game.isMandatory || !game.situation.takebackable then fuFalse
     else isAllowedByPrefs(game)
 
   private def isAllowedByPrefs(game: Game): Fu[Boolean] =
-    if (game.hasAi) fuTrue
+    if game.hasAi then fuTrue
     else
       Future.sequence(game.userIds.map {
         prefApi.getPref(_, (p: Pref) => p.takeback)
@@ -87,15 +87,15 @@ final private class Takebacker(
       }
 
   private def publishTakebackOffer(pov: Pov): Unit =
-    if (pov.game.isCorrespondence && pov.game.nonAi && pov.player.hasUser)
+    if pov.game.isCorrespondence && pov.game.nonAi && pov.player.hasUser then
       Bus.publish(
         lila.hub.actorApi.round.CorresTakebackOfferEvent(pov.gameId),
         "offerEventCorres"
       )
 
   private def IfAllowed[A](game: Game)(f: => Fu[A]): Fu[A] =
-    if (!game.playable) fufail(ClientError("[takebacker] game is over " + game.id))
-    else if (game.isMandatory) fufail(ClientError("[takebacker] game disallows it " + game.id))
+    if !game.playable then fufail(ClientError("[takebacker] game is over " + game.id))
+    else if game.isMandatory then fufail(ClientError("[takebacker] game disallows it " + game.id))
     else
       isAllowedByPrefs(game) flatMap {
         case true => f
@@ -107,10 +107,10 @@ final private class Takebacker(
 
   // Would be nice to test these methods with a multimove game that has > 2 plies in a turn
   private def takebackSwitchPlayer(game: Game)(implicit proxy: GameProxy): Fu[Events] =
-    if (currentPlayerTakingBack(game)) rewindPly(game)
+    if currentPlayerTakingBack(game) then rewindPly(game)
     else rewindTurnAndPly(game)
   private def takebackRetainPlayer(game: Game)(implicit proxy: GameProxy): Fu[Events] =
-    if (currentPlayerTakingBack(game)) rewindTurnAndPly(game)
+    if currentPlayerTakingBack(game) then rewindTurnAndPly(game)
     else rewindPly(game)
 
   private def rewindPly(game: Game)(implicit proxy: GameProxy): Fu[Events] =

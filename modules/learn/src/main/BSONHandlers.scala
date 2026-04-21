@@ -1,8 +1,8 @@
 package lila.learn
 
-import reactivemongo.api.bson._
+import reactivemongo.api.bson.*
 
-import lila.db.dsl._
+import lila.db.dsl.*
 
 object BSONHandlers {
 

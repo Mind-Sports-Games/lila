@@ -6,7 +6,7 @@ import lila.base.RawHtml.*
 
 class RawHtmlTest extends munit.FunSuite {
 
-  given NetDomain = NetDomain("playstrategy.org")
+  given NetDomain                       = NetDomain("playstrategy.org")
   val htmlTags                          = "<[^>]++>".r
   def copyLinkConsistency(text: String) = {
     // Plain text of linkified text >> linkify to the same result.
@@ -94,7 +94,7 @@ class RawHtmlTest extends munit.FunSuite {
     )
   }
   test("detect i.ibb image URL") {
-    val url    = "https://i.ibb.co/DH1h40Wc/4d1c3ca94244.png"
+    val url = "https://i.ibb.co/DH1h40Wc/4d1c3ca94244.png"
     assertEquals(
       addLinks(s"""img to $url here"""),
       s"""img to <a rel="nofollow noopener noreferrer" href="$url" target="_blank">i.ibb.co/DH1h40Wc/4d1c3ca94244.png</a> here"""
@@ -145,7 +145,10 @@ class RawHtmlTest extends munit.FunSuite {
     assertEquals(addLinks("playstrategy.org.-"), """<a href="/">playstrategy.org</a>.-""")
 
     assertEquals(addLinks("playstrategy.org/foo:bar"), """<a href="/foo:bar">playstrategy.org/foo:bar</a>""")
-    assertEquals(addLinks("playstrategy.org/foo:bar:"), """<a href="/foo:bar">playstrategy.org/foo:bar</a>:""")
+    assertEquals(
+      addLinks("playstrategy.org/foo:bar:"),
+      """<a href="/foo:bar">playstrategy.org/foo:bar</a>:"""
+    )
   }
 
   test("handle embedded links") {

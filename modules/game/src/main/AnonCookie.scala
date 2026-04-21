@@ -1,6 +1,6 @@
 package lila.game
 
-import play.api.libs.json._
+import play.api.libs.json.*
 
 object AnonCookie {
 
@@ -8,9 +8,11 @@ object AnonCookie {
   val maxAge = 604800 // one week
 
   def json(pov: Pov): Option[JsObject] =
-    pov.player.userId.isEmpty `option` Json.obj(
-      "name"   -> name,
-      "maxAge" -> maxAge,
-      "value"  -> pov.playerId
+    pov.player.userId.isEmpty.option(
+      Json.obj(
+        "name"   -> name,
+        "maxAge" -> maxAge,
+        "value"  -> pov.playerId
+      )
     )
 }

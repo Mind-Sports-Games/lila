@@ -6,7 +6,7 @@ case class Preset(name: String, question: Question[?])
 
 object Preset {
 
-  import lila.insight.{ Dimension => D, Metric => M }
+  import lila.insight.{ Dimension as D, Metric as M }
 
   private val filterBlitzPlus = List(
     Filter(

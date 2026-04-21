@@ -3,8 +3,8 @@ package views.html
 import play.api.data.Form
 
 import lila.api.Context
-import lila.app.templating.Environment._
-import lila.app.ui.ScalatagsTemplate._
+import lila.app.templating.Environment.*
+import lila.app.ui.ScalatagsTemplate.*
 import lila.event.{ Event, EventForm }
 import lila.i18n.LangList
 
@@ -64,8 +64,8 @@ object event {
         e.description.map { d =>
           div(cls := "desc")(views.html.base.markdown(d))
         },
-        if (e.isFinished) p(cls := "desc")("The event is finished.")
-        else if (e.isNow)
+        if e.isFinished then p(cls := "desc")("The event is finished.")
+        else if e.isNow then
           a(href := e.url, cls := "button button-fat")(
             e.duringMessage.fold(trans.eventInProgress())(m => raw(m))
           )
@@ -205,10 +205,10 @@ object event {
         ) { f =>
           div(cls := "complete-parent")(
             input(
-              cls := "form-control user-autocomplete",
-              name := f.name,
-              id := form3.id(f),
-              value := f.value,
+              cls     := "form-control user-autocomplete",
+              name    := f.name,
+              id      := form3.id(f),
+              value   := f.value,
               dataTag := "span"
             )
           )

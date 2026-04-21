@@ -5,7 +5,7 @@ import reactivemongo.api.bson.BSONNull
 import reactivemongo.api.ReadPreference
 import scala.concurrent.ExecutionContext
 
-import lila.db.dsl._
+import lila.db.dsl.*
 import lila.memo.CacheApi
 import lila.user.User
 import reactivemongo.core.errors.DatabaseException
@@ -26,7 +26,7 @@ final class ClasMatesCache(colls: ClasColls, cacheApi: CacheApi, studentCache: C
   private def fetchMatesAndTeachers(studentId: User.ID): Fu[Set[User.ID]] =
     colls.student
       .aggregateWith[Bdoc](readPreference = ReadPreference.secondaryPreferred) { framework =>
-        import framework._
+        import framework.*
         List(
           Match($doc("userId" -> studentId)),
           Group(BSONNull)("classes" -> PushField("clasId")),
@@ -36,9 +36,9 @@ final class ClasMatesCache(colls: ClasColls, cacheApi: CacheApi, studentCache: C
                 PipelineOperator(
                   $doc(
                     "$lookup" -> $doc(
-                      "from" -> colls.student.name,
-                      "as"   -> "mates",
-                      "let"  -> $doc("ids" -> "$classes"),
+                      "from"     -> colls.student.name,
+                      "as"       -> "mates",
+                      "let"      -> $doc("ids" -> "$classes"),
                       "pipeline" -> $arr(
                         $doc(
                           "$match" -> $doc(
@@ -66,9 +66,9 @@ final class ClasMatesCache(colls: ClasColls, cacheApi: CacheApi, studentCache: C
                 PipelineOperator(
                   $doc(
                     "$lookup" -> $doc(
-                      "from" -> colls.clas.name,
-                      "as"   -> "teachers",
-                      "let"  -> $doc("ids" -> "$classes"),
+                      "from"     -> colls.clas.name,
+                      "as"       -> "teachers",
+                      "let"      -> $doc("ids" -> "$classes"),
                       "pipeline" -> $arr(
                         $doc(
                           "$match" -> $doc(
@@ -113,5 +113,5 @@ final class ClasMatesCache(colls: ClasColls, cacheApi: CacheApi, studentCache: C
       .recover {
         // can happen, probably in case of student cache bloom filter false positive
         case e: DatabaseException if e.getMessage.contains("resulting value was: MISSING") => Set.empty
-    }
+      }
 }

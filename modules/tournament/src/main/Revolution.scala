@@ -6,17 +6,17 @@ import reactivemongo.api.ReadPreference
 import strategygames.variant.Variant
 import strategygames.GameLogic
 
-import lila.db.dsl._
+import lila.db.dsl.*
 import lila.user.User
-import lila.memo.CacheApi._
+import lila.memo.CacheApi.*
 
 final class RevolutionApi(
     tournamentRepo: TournamentRepo,
     cacheApi: lila.memo.CacheApi
 )(implicit ec: scala.concurrent.ExecutionContext) {
 
-  import Revolution._
-  import BSONHandlers._
+  import Revolution.*
+  import BSONHandlers.*
 
   def active(u: User): Fu[List[Award]] = cache.getUnit dmap { ~_.get(u.id) }
 
@@ -39,8 +39,8 @@ final class RevolutionApi(
           .list() map { docOpt =>
           val awards =
             for {
-              doc    <- docOpt
-              winner <- doc.getAsOpt[User.ID]("winner")
+              doc     <- docOpt
+              winner  <- doc.getAsOpt[User.ID]("winner")
               variant <- doc.int("variant") flatMap { v =>
                 Variant.apply(
                   GameLogic(doc.int("lib") match {
@@ -74,7 +74,7 @@ object Revolution {
       variant: Variant,
       tourId: Tournament.ID
   ) {
-    val iconChar = lila.rating.PerfType `iconByVariant` variant
+    val iconChar = lila.rating.PerfType.iconByVariant(variant)
   }
 
   type PerOwner = Map[User.ID, List[Award]]

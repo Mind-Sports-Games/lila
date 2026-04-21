@@ -1,7 +1,7 @@
 package controllers
 
-import play.api.data._
-import play.api.data.Forms._
+import play.api.data.*
+import play.api.data.Forms.*
 import play.api.libs.json.Json
 
 import lila.app.*
@@ -23,7 +23,7 @@ final class I18n(env: Env) extends LilaController(env) {
         .fold(
           _ => notFound,
           code => {
-            val lang = toLang(code) `err` "Universe is collapsing"
+            val lang = toLang(code).err("Universe is collapsing")
             ctx.me.filterNot(_.lang contains lang.code).so {
               env.user.repo.setLang(_, lang)
             } >> negotiate(
@@ -34,14 +34,14 @@ final class I18n(env: Env) extends LilaController(env) {
                       val pageUri = java.net.URI(str)
                       val path    = pageUri.getPath
                       val query   = pageUri.getQuery
-                      if (query == null) path
+                      if query == null then path
                       else path + "?" + query
                     } catch {
                       case _: java.net.URISyntaxException => routes.Lobby.home.url
                     }
                   }
                 }
-                if (ctx.isAnon) redir.withCookies(env.lilaCookie.session("lang", lang.code))
+                if ctx.isAnon then redir.withCookies(env.lilaCookie.session("lang", lang.code))
                 else redir
               }.fuccess,
               api = _ => Ok(Json.obj("lang" -> lang.code)).fuccess

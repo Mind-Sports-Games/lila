@@ -1,6 +1,6 @@
 package lila.common
 
-import akka.stream.scaladsl._
+import akka.stream.scaladsl.*
 import akka.stream.{ Materializer, QueueOfferResult }
 import scala.concurrent.duration.FiniteDuration
 import scala.concurrent.{ Future, Promise }
@@ -53,7 +53,10 @@ object WorkQueue {
   final class EnqueueException(msg: String) extends Exception(msg)
 
   private case class TaskWithPromise[A](task: () => Fu[A], promise: Promise[A]) {
-    def run(timeout: FiniteDuration, name: String)(implicit ec: Executor, scheduler: akka.actor.Scheduler): Future[A] =
+    def run(timeout: FiniteDuration, name: String)(implicit
+        ec: Executor,
+        scheduler: akka.actor.Scheduler
+    ): Future[A] =
       task()
         .withTimeout(timeout, s"WorkQueue:$name")
         .tap(promise.completeWith)

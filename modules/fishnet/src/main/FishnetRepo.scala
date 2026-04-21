@@ -1,12 +1,12 @@
 package lila.fishnet
 
 import org.joda.time.DateTime
-import reactivemongo.api.bson._
-import scala.concurrent.duration._
+import reactivemongo.api.bson.*
+import scala.concurrent.duration.*
 
 import lila.db.BSON.BSONJodaDateTimeHandler
-import lila.db.dsl._
-import lila.memo.CacheApi._
+import lila.db.dsl.*
+import lila.memo.CacheApi.*
 
 final private class FishnetRepo(
     analysisColl: Coll,
@@ -14,7 +14,7 @@ final private class FishnetRepo(
     cacheApi: lila.memo.CacheApi
 )(implicit ec: scala.concurrent.ExecutionContext) {
 
-  import BSONHandlers._
+  import BSONHandlers.*
 
   private val clientCache = cacheApi[Client.Key, Option[Client]](32, "fishnet.client") {
     _.expireAfterWrite(10 minutes)
@@ -25,14 +25,17 @@ final private class FishnetRepo(
 
   def getClient(key: Client.Key)        = clientCache get key
   def getEnabledClient(key: Client.Key) = getClient(key).map { _.filter(_.enabled) }
-  def getOfflineClient: Fu[Client] =
-    getEnabledClient(Client.offline.key) `getOrElse` fuccess(Client.offline)
+  def getOfflineClient: Fu[Client]      =
+    getEnabledClient(Client.offline.key).getOrElse(fuccess(Client.offline))
   def updateClientInstance(client: Client, instance: Client.Instance): Fu[Client] =
     client.updateInstance(instance).fold(fuccess(client)) { updated =>
-      clientColl.update.one(selectClient(client.key), $set("instance" -> updated.instance)).andDo(clientCache.invalidate(client.key)) inject updated
+      clientColl.update
+        .one(selectClient(client.key), $set("instance" -> updated.instance))
+        .andDo(clientCache.invalidate(client.key)) inject updated
     }
   def addClient(client: Client)     = clientColl.insert.one(client)
-  def deleteClient(key: Client.Key) = clientColl.delete.one(selectClient(key)).andDo(clientCache.invalidate(key))
+  def deleteClient(key: Client.Key) =
+    clientColl.delete.one(selectClient(key)).andDo(clientCache.invalidate(key))
   def enableClient(key: Client.Key, v: Boolean): Funit =
     clientColl.update.one(selectClient(key), $set("enabled" -> v)).void.andDo(clientCache.invalidate(key))
   def allRecentClients =
@@ -48,18 +51,18 @@ final private class FishnetRepo(
   def deleteAnalysis(ana: Work.Analysis) = analysisColl.delete.one(selectWork(ana.id)).void
   def giveUpAnalysis(ana: Work.Analysis) = deleteAnalysis(ana).andDo(logger.warn(s"Give up on analysis $ana"))
   def updateOrGiveUpAnalysis(ana: Work.Analysis) =
-    if (ana.isOutOfTries) giveUpAnalysis(ana) else updateAnalysis(ana)
+    if ana.isOutOfTries then giveUpAnalysis(ana) else updateAnalysis(ana)
 
   object status {
-    private def system(v: Boolean)   = $doc("sender.system" -> v)
-    private def acquired(v: Boolean) = $doc("acquired" `$exists` v)
+    private def system(v: Boolean)                      = $doc("sender.system" -> v)
+    private def acquired(v: Boolean)                    = $doc("acquired" `$exists` v)
     private def oldestSeconds(system: Boolean): Fu[Int] =
       analysisColl
         .find($doc("sender.system" -> system) ++ acquired(false), $doc("createdAt" -> true).some)
-        .sort($sort `asc` "createdAt")
+        .sort($sort.asc("createdAt"))
         .one[Bdoc]
         .map(~_.flatMap(_.getAsOpt[DateTime]("createdAt").map { date =>
-          ((DateTime.now.getMillis / 1000) - (date.getMillis / 1000)).toInt `atLeast` 0
+          ((DateTime.now.getMillis / 1000) - (date.getMillis / 1000)).toInt.atLeast(0)
         }))
 
     def compute =
@@ -85,11 +88,13 @@ final private class FishnetRepo(
   def selectClient(key: Client.Key) = $id(key.value)
 
   private[fishnet] def toKey(keyOrUser: String): Fu[Client.Key] =
-    clientColl.primitiveOne[String](
-      $or(
-        "_id" `$eq` keyOrUser,
-        "userId" `$eq` lila.user.User.normalize(keyOrUser)
-      ),
-      "_id"
-    ) `orFail` "client not found" map Client.Key.apply
+    clientColl
+      .primitiveOne[String](
+        $or(
+          "_id" `$eq` keyOrUser,
+          "userId" `$eq` lila.user.User.normalize(keyOrUser)
+        ),
+        "_id"
+      )
+      .orFail("client not found") map Client.Key.apply
 }

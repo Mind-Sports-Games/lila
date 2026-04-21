@@ -1,19 +1,19 @@
 package lila.api
 
-import akka.stream.scaladsl._
+import akka.stream.scaladsl.*
 import strategygames.format.FEN
 import strategygames.format.pgn.Tag
-import strategygames.{ Player => PlayerIndex, P2, P1 }
+import strategygames.{ P1, P2, Player as PlayerIndex }
 import org.joda.time.DateTime
-import play.api.libs.json._
-import scala.concurrent.duration._
+import play.api.libs.json.*
+import scala.concurrent.duration.*
 
-import lila.analyse.{ JsonView => analysisJson, Analysis }
+import lila.analyse.{ Analysis, JsonView as analysisJson }
 import lila.common.config.MaxPerSecond
 import lila.common.Json.jodaWrites
 import lila.common.{ HTTPRequest, LightUser }
-import lila.db.dsl._
-import lila.game.JsonView._
+import lila.db.dsl.*
+import lila.game.JsonView.*
 import lila.game.PgnDump.WithFlags
 import lila.game.{ Game, PerfPicker, Query }
 import lila.team.GameTeams
@@ -39,20 +39,20 @@ final class GameApiV2(
     system: akka.actor.ActorSystem
 ) {
 
-  import GameApiV2._
+  import GameApiV2.*
 
   private val keepAliveInterval = 70.seconds // play's idleTimeout = 75s
 
   def exportOne(game: Game, config: OneConfig): Fu[String] =
-    game.pgnImport `ifTrue` config.imported match {
+    game.pgnImport.ifTrue(config.imported) match {
       case Some(imported) => fuccess(imported.pgn)
-      case None =>
+      case None           =>
         for {
           realPlayers                  <- config.playerFile.so(realPlayerApi.apply)
           (game, initialFen, analysis) <- enrich(config.flags)(game)
-          _export <- config.format match {
+          _export                      <- config.format match {
             case Format.JSON =>
-              toJson(game, initialFen, analysis, config.flags, realPlayers = realPlayers) `dmap` Json.stringify
+              toJson(game, initialFen, analysis, config.flags, realPlayers = realPlayers).dmap(Json.stringify)
             case Format.PGN =>
               pgnDump(
                 game,
@@ -60,7 +60,7 @@ final class GameApiV2(
                 analysis,
                 config.flags,
                 realPlayers = realPlayers
-              ) `dmap` pgnDump.toPgnString
+              ).dmap(pgnDump.toPgnString)
             case Format.SGF =>
               sgfDump(
                 game,
@@ -129,8 +129,8 @@ final class GameApiV2(
             batchSize = config.perSecond.value
           )
           .documentSource()
-          .map(g => config.postFilter(g) `option` g)
-          .throttle(config.perSecond.value * 10, 1 second, e => if (e.isDefined) 10 else 2)
+          .map(g => config.postFilter(g).option(g))
+          .throttle(config.perSecond.value * 10, 1 second, e => if e.isDefined then 10 else 2)
           .mapConcat(_.toList)
           .take(config.max | Int.MaxValue)
           .via(upgradeOngoingGame)
@@ -145,7 +145,7 @@ final class GameApiV2(
         gameRepo
           .sortedCursor(
             $inIds(config.ids),
-            (if (chronological) Query.sortChronological else Query.sortCreated),
+            if chronological then Query.sortChronological else Query.sortCreated,
             batchSize = config.perSecond.value
           )
           .documentSource()
@@ -172,7 +172,7 @@ final class GameApiV2(
             } flatMap { playerTeams =>
               gameRepo.gameOptionsFromSecondary(pairings.map(_.gameId)) map {
                 _.zip(pairings) collect { case (Some(game), pairing) =>
-                  import cats.implicits._
+                  import cats.implicits.*
                   (
                     game,
                     pairing,
@@ -193,20 +193,20 @@ final class GameApiV2(
           }
           .mapAsync(4) { case ((game, fen, analysis), pairing, teams) =>
             config.format match {
-              case Format.PGN => pgnDump.formatter(config.flags)(game, fen, analysis, teams, none)
-              case Format.SGF => sgfDump.formatter(config.flags)(game, fen, analysis, teams, none)
+              case Format.PGN  => pgnDump.formatter(config.flags)(game, fen, analysis, teams, none)
+              case Format.SGF  => sgfDump.formatter(config.flags)(game, fen, analysis, teams, none)
               case Format.JSON =>
                 def addBerserk(playerIndex: PlayerIndex)(json: JsObject) =
-                  if (pairing `berserkOf` playerIndex)
+                  if pairing.berserkOf(playerIndex) then
                     json deepMerge Json.obj(
                       "players" -> Json.obj(playerIndex.name -> Json.obj("berserk" -> true))
                     )
                   else json
-                toJson(game, fen, analysis, config.flags, teams) `dmap`
-                  addBerserk(P1) `dmap`
-                  addBerserk(P2) dmap { json =>
-                    s"${Json.stringify(json)}\n"
-                  }
+                toJson(game, fen, analysis, config.flags, teams)
+                  .dmap(addBerserk(P1))
+                  .dmap(addBerserk(P2)) dmap { json =>
+                  s"${Json.stringify(json)}\n"
+                }
             }
           }
       }
@@ -225,8 +225,8 @@ final class GameApiV2(
       .mapAsync(4)(enrich(config.flags))
       .mapAsync(4) { case (game, fen, analysis) =>
         config.format match {
-          case Format.PGN => pgnDump.formatter(config.flags)(game, fen, analysis, none, none)
-          case Format.SGF => sgfDump.formatter(config.flags)(game, fen, analysis, none, none)
+          case Format.PGN  => pgnDump.formatter(config.flags)(game, fen, analysis, none, none)
+          case Format.SGF  => sgfDump.formatter(config.flags)(game, fen, analysis, none, none)
           case Format.JSON =>
             toJson(game, fen, analysis, config.flags, None) dmap { json =>
               s"${Json.stringify(json)}\n"
@@ -258,7 +258,7 @@ final class GameApiV2(
       }
 
   private def enrich(flags: WithFlags)(game: Game) =
-    gameRepo `initialFen` game flatMap { initialFen =>
+    gameRepo.initialFen(game) flatMap { initialFen =>
       (flags.evals so analysisRepo.byGame(game)) dmap {
         (game, initialFen, _)
       }
@@ -300,7 +300,7 @@ final class GameApiV2(
   ): Fu[JsObject] =
     for {
       lightUsers <- gameLightUsers(g) dmap { case (wu, bu) => List(wu, bu) }
-      pgn <-
+      pgn        <-
         withFlags.pgnInJson so pgnDump
           .apply(g, initialFen, analysisOption, withFlags, realPlayers = realPlayers)
           .dmap(pgnDump.toPgnString)
@@ -316,7 +316,7 @@ final class GameApiV2(
         "createdAt"  -> g.createdAt,
         "lastMoveAt" -> g.updatedAt,
         "status"     -> g.status.name,
-        "players" -> JsObject(g.players zip lightUsers map { case (p, user) =>
+        "players"    -> JsObject(g.players zip lightUsers map { case (p, user) =>
           p.playerIndex.name -> Json
             .obj()
             .add("user", user)
@@ -326,7 +326,7 @@ final class GameApiV2(
             .add("provisional" -> p.provisional)
             .add("isInputRating" -> p.isInputRating)
             .add("aiLevel" -> p.aiLevel)
-            .add("analysis" -> analysisOption.flatMap(analysisJson.player(g `pov` p.playerIndex)))
+            .add("analysis" -> analysisOption.flatMap(analysisJson.player(g.pov(p.playerIndex))))
             .add("team" -> teams.map(_(p.playerIndex)))
         // .add("plyCentis" -> withFlags.plyTimes so g.plyTimes(p.playerIndex).map(_.map(_.centis)))
         })
@@ -336,7 +336,7 @@ final class GameApiV2(
       .add("winner" -> g.winnerPlayerIndex.map(_.name))
       .add("opening" -> g.opening.ifTrue(withFlags.opening))
       .add("moves" -> withFlags.turns.option {
-        withFlags `keepDelayIf` g.playable `applyDelay` g.actionStrs.map(_.mkString(",")) mkString " "
+        withFlags.keepDelayIf(g.playable).applyDelay(g.actionStrs.map(_.mkString(","))) mkString " "
       })
       .add("pgn" -> pgn)
       .add("daysPerTurn" -> g.daysPerTurn)
@@ -362,7 +362,7 @@ object GameApiV2 {
     case object PGN  extends Format
     case object JSON extends Format
     case object SGF  extends Format
-    def byRequest(req: play.api.mvc.RequestHeader) = if (HTTPRequest `acceptsNdJson` req) JSON else PGN
+    def byRequest(req: play.api.mvc.RequestHeader) = if HTTPRequest.acceptsNdJson(req) then JSON else PGN
   }
 
   sealed trait Config {
@@ -397,7 +397,7 @@ object GameApiV2 {
       rated.fold(true)(g.rated ==) && {
         perfType.isEmpty || g.perfType.exists(perfType.contains)
       } && playerIndex.fold(true) { c =>
-        g.player(c).userId `has` user.id
+        g.player(c).userId.has(user.id)
       } && analysed.fold(true)(g.metadata.analysed ==)
   }
 

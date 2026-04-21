@@ -1,12 +1,12 @@
 package lila.forumSearch
 
-import akka.actor._
-import com.softwaremill.macwire._
+import akka.actor.*
+import com.softwaremill.macwire.*
 import lila.common.autoconfig.{ AutoConfig, ConfigName }
 import play.api.Configuration
 
-import lila.common.config._
-import lila.search._
+import lila.common.config.*
+import lila.search.*
 import Query.jsonWriter
 
 @Module
@@ -47,7 +47,7 @@ final class Env(
 
   system.actorOf(
     Props(new Actor {
-      import lila.forum.actorApi._
+      import lila.forum.actorApi.*
       def receive = {
         case InsertPost(post) => api.store(post).discard
         case RemovePost(id)   => client.deleteById(Id(id)).discard

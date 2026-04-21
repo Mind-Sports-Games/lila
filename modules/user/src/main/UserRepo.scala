@@ -1,19 +1,19 @@
 package lila.user
 
-import cats.implicits._
+import cats.implicits.*
 import org.joda.time.DateTime
-import reactivemongo.api._
-import reactivemongo.api.bson._
+import reactivemongo.api.*
+import reactivemongo.api.bson.*
 
 import lila.common.{ ApiVersion, EmailAddress, NormalizedEmailAddress, ThreadLocalRandom }
 import lila.db.BSON.BSONJodaDateTimeHandler
-import lila.db.dsl._
+import lila.db.dsl.*
 import lila.rating.Glicko
 import lila.rating.{ Perf, PerfType }
 
 final class UserRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionContext) {
 
-  import User.{ userBSONHandler, ID, BSONFields => F }
+  import User.{ userBSONHandler, BSONFields as F, ID }
   import Title.titleBsonHandler
   import UserMark.markBsonHandler
 
@@ -22,7 +22,7 @@ final class UserRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionCont
   val normalize = (name: String) => User.normalize(name)
 
   def topNbGame(nb: Int): Fu[List[User]] =
-    coll.find(enabledNoBotSelect ++ notLame).sort($sort `desc` "count.game").cursor[User]().list(nb)
+    coll.find(enabledNoBotSelect ++ notLame).sort($sort.desc("count.game")).cursor[User]().list(nb)
 
   def byId(id: ID): Fu[Option[User]] = User.noGhost(id) so coll.byId[User](id)
 
@@ -120,7 +120,7 @@ final class UserRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionCont
           "perfs.standard.gl.d" `$lt` Glicko.provisionalDeviation
         ) ++ $inIds(ids) ++ botSelect(false)
       )
-      .sort($sort `desc` "perfs.standard.gl.r")
+      .sort($sort.desc("perfs.standard.gl.r"))
       .cursor[User](ReadPreference.secondaryPreferred)
       .list(nb)
 
@@ -131,7 +131,7 @@ final class UserRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionCont
           F.enabled -> true
         ) ++ $inIds(ids) ++ botSelect(false)
       )
-      .sort($sort `asc` "username")
+      .sort($sort.asc("username"))
       .cursor[User](ReadPreference.secondaryPreferred)
       .list(nb)
 
@@ -180,8 +180,8 @@ final class UserRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionCont
         }
       }
       .addEffect { v =>
-        incPlayerIndex(u1, if (v) 1 else -1)
-        incPlayerIndex(u2, if (v) -1 else 1)
+        incPlayerIndex(u1, if v then 1 else -1)
+        incPlayerIndex(u2, if v then -1 else 1)
       }
 
   def firstGetsP1(u1O: Option[User.ID], u2O: Option[User.ID]): Fu[Boolean] =
@@ -241,7 +241,7 @@ final class UserRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionCont
       .one(
         $id(userId),
         $inc(s"perfs.$field.runs" -> 1) ++
-          $doc("$max"             -> $doc(s"perfs.$field.score" -> score))
+          $doc("$max" -> $doc(s"perfs.$field.score" -> score))
       )
       .void
   }
@@ -255,12 +255,12 @@ final class UserRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionCont
       .void
 
   def setUsernameCased(id: ID, username: String): Funit = {
-    if (id == username.toLowerCase) {
+    if id == username.toLowerCase then {
       coll.update.one(
         $id(id) ++ (F.changedCase `$exists` false),
         $set(F.username -> username, F.changedCase -> true)
       ) flatMap { result =>
-        if (result.n == 0) fufail(s"You have already changed your username")
+        if result.n == 0 then fufail(s"You have already changed your username")
         else funit
       }
     } else fufail(s"Proposed username $username does not match old username $id")
@@ -275,27 +275,27 @@ final class UserRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionCont
   def getPlayTime(id: ID): Fu[Option[User.PlayTime]] =
     coll.primitiveOne[User.PlayTime]($id(id), F.playTime)
 
-  val enabledSelect  = $doc(F.enabled -> true)
-  val disabledSelect = $doc(F.enabled -> false)
+  val enabledSelect                                = $doc(F.enabled -> true)
+  val disabledSelect                               = $doc(F.enabled -> false)
   def markSelect(mark: UserMark)(v: Boolean): Bdoc =
-    if (v) $doc(F.marks -> mark.key)
+    if v then $doc(F.marks -> mark.key)
     else F.marks `$ne` mark.key
   def engineSelect = markSelect(UserMark.Engine)
   def trollSelect  = markSelect(UserMark.Troll)
   val lame         = $doc(F.marks `$in` List(UserMark.Engine.key, UserMark.Boost.key))
-  val lameOrTroll = $or(
+  val lameOrTroll  = $or(
     $doc(F.marks -> UserMark.Engine.key),
     $doc(F.marks -> UserMark.Boost.key),
     $doc(F.marks -> UserMark.Troll.key)
   )
-  val notLame            = $doc(F.marks `$nin` List(UserMark.Engine.key, UserMark.Boost.key))
-  val enabledNoBotSelect = enabledSelect ++ $doc(F.title `$ne` Title.BOT)
+  val notLame                        = $doc(F.marks `$nin` List(UserMark.Engine.key, UserMark.Boost.key))
+  val enabledNoBotSelect             = enabledSelect ++ $doc(F.title `$ne` Title.BOT)
   def stablePerfSelect(perf: String) =
     $doc(s"perfs.$perf.gl.d" -> $lt(lila.rating.Glicko.provisionalDeviation))
   val patronSelect = $doc(s"${F.plan}.active" -> true)
 
-  def sortPerfDesc(perf: String) = $sort `desc` s"perfs.$perf.gl.r"
-  val sortCreatedAtDesc          = $sort `desc` F.createdAt
+  def sortPerfDesc(perf: String) = $sort.desc(s"perfs.$perf.gl.r")
+  val sortCreatedAtDesc          = $sort.desc(F.createdAt)
 
   def glicko(userId: ID, perfType: PerfType): Fu[Glicko] =
     coll
@@ -317,20 +317,20 @@ final class UserRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionCont
   ) = {
     val incs: List[BSONElement] = List(
       "count.game".some,
-      rated `option` "count.rated",
-      ai `option` "count.ai",
-      (result match {
+      rated.option("count.rated"),
+      ai.option("count.ai"),
+      result match {
         case -1 => "count.loss".some
         case 1  => "count.win".some
         case 0  => "count.draw".some
         case _  => none
-      }),
+      },
       (result match {
         case -1 => "count.lossH".some
         case 1  => "count.winH".some
         case 0  => "count.drawH".some
         case _  => none
-      }) `ifFalse` ai
+      }).ifFalse(ai)
     ).flatten.map(k => BSONElement(k, BSONInteger(1))) ::: List(
       totalTime map (v => BSONElement(s"${F.playTime}.total", BSONInteger(v + 2))),
       tvTime map (v => BSONElement(s"${F.playTime}.tv", BSONInteger(v + 2)))
@@ -360,12 +360,14 @@ final class UserRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionCont
     }
 
   def nameExists(username: String): Fu[Boolean] = idExists(normalize(username))
-  def idExists(id: String): Fu[Boolean]         = coll `exists` $id(id)
+  def idExists(id: String): Fu[Boolean]         = coll.exists($id(id))
 
   /** Filters out invalid usernames and returns the IDs for those usernames
     *
-    * @param usernames Usernames to filter out the non-existent usernames from, and return the IDs for
-    * @return A list of IDs for the usernames that were given that were valid
+    * @param usernames
+    *   Usernames to filter out the non-existent usernames from, and return the IDs for
+    * @return
+    *   A list of IDs for the usernames that were given that were valid
     */
   def existingUsernameIds(usernames: Set[String]): Fu[List[User.ID]] =
     coll.primitive[String]($inIds(usernames.map(normalize)), F.id)
@@ -442,7 +444,7 @@ final class UserRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionCont
       .one(
         $id(user.id),
         $set(F.enabled -> false) ++ $unset(F.roles) ++ {
-          if (keepEmail) $unset(F.mustConfirmEmail)
+          if keepEmail then $unset(F.mustConfirmEmail)
           else $doc("$rename" -> $doc(F.email -> F.prevEmail))
         }
       )
@@ -451,7 +453,7 @@ final class UserRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionCont
   def isMonitoredMod(userId: User.ID) =
     coll.exists($id(userId) ++ $doc(F.roles -> "ROLE_MONITORED_MOD"))
 
-  import Authenticator._
+  import Authenticator.*
   def getPasswordHash(id: User.ID): Fu[Option[String]] =
     coll.byId[AuthData](id, authProjection) map {
       _.map { _.hashToken }
@@ -463,7 +465,7 @@ final class UserRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionCont
       .one(
         $id(id),
         $set(F.email -> normalizedEmail) ++ $unset(F.prevEmail) ++ {
-          if (email.value == normalizedEmail.value) $unset(F.verbatimEmail)
+          if email.value == normalizedEmail.value then $unset(F.verbatimEmail)
           else $set(F.verbatimEmail -> email)
         }
       )
@@ -496,7 +498,7 @@ final class UserRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionCont
         for {
           doc         <- maybeDoc
           storedEmail <- anyEmail(doc)
-        } yield (userBSONHandler `read` doc, storedEmail)
+        } yield (userBSONHandler.read(doc), storedEmail)
       }
 
   def prevEmail(id: ID): Fu[Option[EmailAddress]] =
@@ -517,7 +519,7 @@ final class UserRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionCont
       _ so { doc =>
         User
           .WithEmails(
-            userBSONHandler `read` doc,
+            userBSONHandler.read(doc),
             User.Emails(
               current = anyEmail(doc),
               previous = doc.getAsOpt[NormalizedEmailAddress](F.prevEmail)
@@ -533,7 +535,7 @@ final class UserRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionCont
       .map {
         _ map { doc =>
           User.WithEmails(
-            userBSONHandler `read` doc,
+            userBSONHandler.read(doc),
             User.Emails(
               current = anyEmail(doc),
               previous = doc.getAsOpt[NormalizedEmailAddress](F.prevEmail)
@@ -565,13 +567,13 @@ final class UserRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionCont
   def isManaged(id: ID): Fu[Boolean] = email(id).dmap(_.exists(_.isNoReply))
 
   def setBot(user: User): Funit =
-    if (user.count.game > 0)
+    if user.count.game > 0 then
       fufail(lila.base.LilaInvalid("You already have games played. Make a new account."))
     else coll.updateField($id(user.id), F.title, Title.BOT).void
 
   private def botSelect(v: Boolean) =
-    if (v) $doc(F.title -> Title.BOT)
-    else $doc(F.title   -> $ne(Title.BOT))
+    if v then $doc(F.title -> Title.BOT)
+    else $doc(F.title      -> $ne(Title.BOT))
 
   private[user] def botIds =
     coll.distinctEasy[String, Set](
@@ -691,7 +693,7 @@ final class UserRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionCont
     )
 
   def setEraseAt(user: User) =
-    coll.updateField($id(user.id), F.eraseAt, DateTime.now `plusDays` 1).void
+    coll.updateField($id(user.id), F.eraseAt, DateTime.now.plusDays(1)).void
 
   private def newUser(
       username: String,
@@ -724,7 +726,7 @@ final class UserRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionCont
     ) ++ {
       (email.value != normalizedEmail.value) so $doc(F.verbatimEmail -> email)
     } ++ {
-      if (blind) $doc(F.blind -> true) else $empty
+      if blind then $doc(F.blind -> true) else $empty
     }
   }
 }

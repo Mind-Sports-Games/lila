@@ -1,15 +1,15 @@
 package lila.evalCache
 
-import EvalCacheEntry._
+import EvalCacheEntry.*
 
-/** selects the evals to store
-  * for a given position
+/** selects the evals to store for a given position
   */
 object EvalCacheSelector {
 
   private type Evals = List[Eval]
 
-  @annotation.nowarn("msg=unused") implicit private val order: Ordering[Double] = Ordering.Double.TotalOrdering
+  @annotation.nowarn("msg=unused")
+  implicit private val order: Ordering[Double] = Ordering.Double.TotalOrdering
 
   def apply(evals: Evals): Evals =
     // first, let us group evals by multiPv
@@ -18,24 +18,24 @@ object EvalCacheSelector {
       .toList
       // and sort the groups by multiPv, higher first
       .sortBy(-_._1)
-      //keep only the best eval in each group
+      // keep only the best eval in each group
       .flatMap {
-        import cats.implicits._
+        import cats.implicits.*
         _._2.maximumByOption(ranking)
-      // now remove obsolete evals
-    }
+        // now remove obsolete evals
+      }
       .foldLeft(Nil: Evals) {
         case (acc, e) if acc.exists { makesObsolete(_, e) } => acc
         case (acc, e)                                       => e :: acc
-      // and finally ensure ordering by depth and nodes, best first
-    }
+        // and finally ensure ordering by depth and nodes, best first
+      }
       .sortBy(negativeNodesAndDepth)
 
   private def greatTrust(t: Trust) = t.value >= 5
 
   private def ranking(e: Eval): (Double, Double, Double) =
     // if well trusted, only rank on depth and tie on nodes
-    if (greatTrust(e.trust)) (99999, e.depth, e.knodes.value)
+    if greatTrust(e.trust) then (99999, e.depth, e.knodes.value)
     // else, rank on trust, and tie on depth then nodes
     else (e.trust.value, e.depth, e.knodes.value)
 

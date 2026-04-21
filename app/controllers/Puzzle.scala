@@ -1,8 +1,8 @@
 package controllers
 
 import play.api.data.Form
-import play.api.libs.json._
-import views._
+import play.api.libs.json.*
+import views.*
 
 import lila.api.BodyContext
 import lila.api.Context
@@ -11,7 +11,7 @@ import lila.common.ApiVersion
 import lila.common.config.MaxPerSecond
 import lila.puzzle.PuzzleForm.RoundData
 import lila.puzzle.PuzzleTheme
-import lila.puzzle.{ Result, PuzzleDashboard, PuzzleDifficulty, PuzzleReplay, PuzzleStreak, Puzzle => Puz }
+import lila.puzzle.{ Puzzle as Puz, PuzzleDashboard, PuzzleDifficulty, PuzzleReplay, PuzzleStreak, Result }
 import lila.user.Perfs
 import strategygames.variant.Variant
 
@@ -29,7 +29,7 @@ final class Puzzle(
   )(implicit
       ctx: Context
   ): Fu[JsObject] =
-    if (apiVersion.exists(!_.puzzleV2))
+    if apiVersion.exists(!_.puzzleV2) then
       env.puzzle.jsonView.bc(puzzle = puzzle, user = newUser orElse ctx.me)
     else
       env.puzzle.jsonView(puzzle = puzzle, theme = theme.some, replay = replay, user = newUser orElse ctx.me)
@@ -40,7 +40,7 @@ final class Puzzle(
       replay: Option[PuzzleReplay] = None
   )(implicit ctx: Context) =
     renderJson(puzzle, theme, replay) zip
-      ctx.me.so(u => env.puzzle.session.getDifficulty(u) `dmap` some) map { case (json, difficulty) =>
+      ctx.me.so(u => env.puzzle.session.getDifficulty(u).dmap(some)) map { case (json, difficulty) =>
         EnableSharedArrayBuffer(
           Ok(
             views.html.puzzle
@@ -121,7 +121,7 @@ final class Puzzle(
   private def nextPuzzleForMe(variant: Variant, theme: PuzzleTheme.Key)(implicit ctx: Context): Fu[Puz] =
     ctx.me match {
       case Some(me) => env.puzzle.session.nextPuzzleFor(me, variant, theme)
-      case None     => env.puzzle.anon.getOneFor(variant, theme) `orFail` "Couldn't find a puzzle for anon!"
+      case None     => env.puzzle.anon.getOneFor(variant, theme).orFail("Couldn't find a puzzle for anon!")
     }
 
   def complete(variant: String, themeStr: String, id: String) =
@@ -131,7 +131,7 @@ final class Puzzle(
           onComplete(env.puzzle.forms.round)(
             pid,
             puzzleVariantFromKey(variant),
-            PuzzleTheme `findOrAny` themeStr,
+            PuzzleTheme.findOrAny(themeStr),
             mobileBc = false
           )
         }
@@ -148,8 +148,8 @@ final class Puzzle(
   def ofPlayer(variant: String, name: Option[String], page: Int) =
     Open { implicit ctx =>
       val fixed = name.map(_.trim).filter(_.nonEmpty)
-      fixed.so(env.user.repo.enabledNamed) `orElse` fuccess(ctx.me) flatMap { user =>
-        user.so { env.puzzle.api.puzzle.of(_, puzzleVariantFromKey(variant), page) `dmap` some } map {
+      fixed.so(env.user.repo.enabledNamed).orElse(fuccess(ctx.me)) flatMap { user =>
+        user.so { env.puzzle.api.puzzle.of(_, puzzleVariantFromKey(variant), page).dmap(some) } map {
           puzzles =>
             Ok(views.html.puzzle.ofPlayer(~fixed, user, puzzleVariantFromKey(variant), puzzles))
         }
@@ -171,7 +171,7 @@ final class Puzzle(
             data.puzzleId match {
               case Some(streakNextId) =>
                 env.puzzle.api.puzzle.find(streakNextId) flatMap {
-                  case None => fuccess(Json.obj("streakComplete" -> true))
+                  case None         => fuccess(Json.obj("streakComplete" -> true))
                   case Some(puzzle) =>
                     for {
                       score <- data.streakScore
@@ -199,17 +199,18 @@ final class Puzzle(
                           .getOrElse(me.perfs)
                         val newUser = me.copy(perfs = newPerfs)
                         for {
-                          _ <- env.puzzle.session.onComplete(round, variant, theme.key)
+                          _    <- env.puzzle.session.onComplete(round, variant, theme.key)
                           json <-
-                            if (mobileBc) fuccess {
-                              env.puzzle.jsonView.bc.userJson(perf.intRating) ++ Json.obj(
-                                "round" -> Json.obj(
-                                  "ratingDiff" -> 0,
-                                  "win"        -> data.result.win
-                                ),
-                                "voted" -> round.vote
-                              )
-                            }
+                            if mobileBc then
+                              fuccess {
+                                env.puzzle.jsonView.bc.userJson(perf.intRating) ++ Json.obj(
+                                  "round" -> Json.obj(
+                                    "ratingDiff" -> 0,
+                                    "win"        -> data.result.win
+                                  ),
+                                  "voted" -> round.vote
+                                )
+                              }
                             else
                               data.replayDays match {
                                 case None =>
@@ -226,7 +227,7 @@ final class Puzzle(
                                   )
                                 case Some(replayDays) =>
                                   for {
-                                    _    <- env.puzzle.replay.onComplete(round, replayDays, variant, theme.key)
+                                    _ <- env.puzzle.replay.onComplete(round, replayDays, variant, theme.key)
                                     next <- env.puzzle.replay(me, replayDays.some, variant, theme.key)
                                     json <- next match {
                                       case None => fuccess(Json.obj("replayComplete" -> true))
@@ -253,7 +254,7 @@ final class Puzzle(
                     }
                   case None =>
                     env.puzzle.finisher.incPuzzlePlays(id)
-                    if (mobileBc) fuccess(Json.obj("user" -> false))
+                    if mobileBc then fuccess(Json.obj("user" -> false))
                     else
                       nextPuzzleForMe(variant, theme.key) flatMap {
                         renderJson(_, theme)
@@ -262,7 +263,7 @@ final class Puzzle(
                       }
                 }
             }
-          } `dmap` JsonOk
+          }.dmap(JsonOk)
       )
   }
 
@@ -362,7 +363,7 @@ final class Puzzle(
             renderShow(_, theme)
           }
         case None if themeOrId.size == Puz.idSize =>
-          OptionFuResult(env.puzzle.api.puzzle `find` Puz.Id(themeOrId)) { puzzle =>
+          OptionFuResult(env.puzzle.api.puzzle.find(Puz.Id(themeOrId))) { puzzle =>
             ctx.me.so { env.puzzle.api.casual.setCasualIfNotYetPlayed(_, puzzle) } >>
               renderShow(puzzle, PuzzleTheme.mix)
           }
@@ -380,8 +381,8 @@ final class Puzzle(
   def showWithTheme(variant: String, themeKey: String, id: String) = Open { implicit ctx =>
     NoBot {
       val theme = PuzzleTheme.findOrAny(themeKey)
-      OptionFuResult(env.puzzle.api.puzzle `find` Puz.Id(id)) { puzzle =>
-        if (puzzle.themes contains theme.key)
+      OptionFuResult(env.puzzle.api.puzzle.find(Puz.Id(id))) { puzzle =>
+        if puzzle.themes contains theme.key then
           ctx.me.so { env.puzzle.api.casual.setCasualIfNotYetPlayed(_, puzzle) } >>
             renderShow(puzzle, theme)
         else Redirect(routes.Puzzle.show(variant, puzzle.id.value)).fuccess
@@ -401,13 +402,13 @@ final class Puzzle(
     Scoped(_.Puzzle.Read) { req => me =>
       val config = lila.puzzle.PuzzleActivity.Config(
         user = me,
-        max = getInt("max", req) map (_ `atLeast` 1),
+        max = getInt("max", req) map (_.atLeast(1)),
         perSecond = MaxPerSecond(20)
       )
       apiC
         .GlobalConcurrencyLimitPerIpAndUserOption(req, me.some)(env.puzzle.activity.stream(config)) {
           source =>
-            Ok.chunked(source).as(ndJsonContentType) `pipe` noProxyBuffer
+            Ok.chunked(source).as(ndJsonContentType).pipe(noProxyBuffer)
         }
         .fuccess
     }
@@ -495,9 +496,11 @@ final class Puzzle(
           api = v => {
             val theme         = PuzzleTheme.mix
             val puzzleVariant = Puz.puzzleVariants.head
-            nextPuzzleForMe(puzzleVariant, theme.key) flatMap { puzzle =>
-              renderJson(puzzle, theme, apiVersion = v.some)
-            } `dmap` JsonOk
+            nextPuzzleForMe(puzzleVariant, theme.key)
+              .flatMap { puzzle =>
+                renderJson(puzzle, theme, apiVersion = v.some)
+              }
+              .dmap(JsonOk)
           }
         )
       }
@@ -509,7 +512,7 @@ final class Puzzle(
       negotiate(
         html = notFound,
         api = _ => {
-          val nb = getInt("nb") getOrElse 15 `atLeast` 1 `atMost` 30
+          val nb = getInt("nb").getOrElse(15).atLeast(1).atMost(30)
           env.puzzle.batch.nextFor(ctx.me, nb) flatMap { puzzles =>
             env.puzzle.jsonView.bc.batch(puzzles, ctx.me)
           } dmap { Ok(_) }
@@ -523,7 +526,7 @@ final class Puzzle(
       negotiate(
         html = notFound,
         api = _ => {
-          import lila.puzzle.PuzzleForm.bc._
+          import lila.puzzle.PuzzleForm.bc.*
           ctx.body.body
             .validate[SolveData]
             .fold(

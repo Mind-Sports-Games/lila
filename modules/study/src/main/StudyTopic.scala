@@ -1,12 +1,12 @@
 package lila.study
 
-import play.api.libs.json._
-import reactivemongo.api.bson._
-import scala.concurrent.duration._
+import play.api.libs.json.*
+import reactivemongo.api.bson.*
+import scala.concurrent.duration.*
 
 import lila.common.LilaFuture
 import lila.db.AsyncColl
-import lila.db.dsl._
+import lila.db.dsl.*
 import lila.user.User
 import lila.common.Iso
 
@@ -73,7 +73,7 @@ final class StudyTopicApi(topicRepo: StudyTopicRepo, userTopicRepo: StudyUserTop
       val favsFu: Fu[List[StudyTopic]] =
         myId.so { userId =>
           userTopics(userId).map {
-            _.value.filter(_.value `startsWith` str) take nb
+            _.value.filter(_.value.startsWith(str)) take nb
           }
         }
       favsFu flatMap { favs =>
@@ -83,12 +83,12 @@ final class StudyTopicApi(topicRepo: StudyTopicRepo, userTopicRepo: StudyUserTop
               .sort($sort.naturalAsc)
               .cursor[Bdoc](readPref)
               .list(nb - favs.size)
-        }
+          }
           .dmap { _ flatMap docTopic }
           .dmap { favs ::: _ }
       }
     }
-  } `dmap` StudyTopics.apply
+  }.dmap(StudyTopics.apply)
 
   def userTopics(userId: User.ID): Fu[StudyTopics] =
     userTopicRepo.coll(_.byId(userId)).dmap {
@@ -100,10 +100,10 @@ final class StudyTopicApi(topicRepo: StudyTopicRepo, userTopicRepo: StudyUserTop
 
   def userTopics(user: User, json: String): Funit = {
     val topics =
-      if (json.trim.isEmpty) StudyTopics.empty
+      if json.trim.isEmpty then StudyTopics.empty
       else
         Json.parse(json).validate[List[TagifyTopic]] match {
-          case JsSuccess(topics, _) => StudyTopics `fromStrs` topics.map(_.value)
+          case JsSuccess(topics, _) => StudyTopics.fromStrs(topics.map(_.value))
           case _                    => StudyTopics.empty
         }
     userTopicRepo.coll {
@@ -133,10 +133,10 @@ final class StudyTopicApi(topicRepo: StudyTopicRepo, userTopicRepo: StudyUserTop
           .sort($sort.naturalAsc)
           .cursor[Bdoc]()
           .list(nb)
-    }
+      }
       .dmap {
         _ flatMap docTopic
-    }
+      }
       .dmap(StudyTopics.apply)
 
   private def docTopic(doc: Bdoc): Option[StudyTopic] =
@@ -158,7 +158,7 @@ final class StudyTopicApi(topicRepo: StudyTopicRepo, userTopicRepo: StudyUserTop
   private def recomputeNow: Funit =
     studyRepo.coll {
       _.aggregateWith[Bdoc]() { framework =>
-        import framework._
+        import framework.*
         List(
           Match(
             $doc(

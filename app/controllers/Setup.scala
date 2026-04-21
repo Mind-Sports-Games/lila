@@ -15,7 +15,7 @@ import lila.game.{ AnonCookie, Pov }
 import lila.setup.Processor.HookResult
 import lila.setup.ValidFen
 import lila.socket.Socket.Sri
-import views._
+import views.*
 
 final class Setup(
     env: Env,
@@ -40,7 +40,7 @@ final class Setup(
 
   def gameForm(userId: Option[String]) =
     Open { implicit ctx =>
-      if (HTTPRequest `isXhr` ctx.req) {
+      if HTTPRequest.isXhr(ctx.req) then {
         val lib                      = gameLogic(getInt("lib"))
         val variant: Option[Variant] = get("variant").map(Variant.orDefault)
         val inputTimeMode            = get("time")
@@ -58,7 +58,8 @@ final class Setup(
             case Some(user) =>
               env.challenge.granter(ctx.me, user, none) map {
                 case Some(denied) => BadRequest(lila.challenge.ChallengeDenied.translated(denied))
-                case None         => Ok(html.setup.forms.game(form, user.some, none, validFen, variant, inputTimeMode))
+                case None         =>
+                  Ok(html.setup.forms.game(form, user.some, none, validFen, variant, inputTimeMode))
               }
           }
         }
@@ -71,7 +72,7 @@ final class Setup(
   def game(sri: String, userId: Option[String]) =
     OpenBody { implicit ctx =>
       implicit val req = ctx.body
-      PostRateLimit(HTTPRequest `ipAddress` ctx.req) {
+      PostRateLimit(HTTPRequest.ipAddress(ctx.req)) {
         NoPlaybanOrCurrent {
           forms
             .game(using ctx)
@@ -94,7 +95,7 @@ final class Setup(
                             api = _ => BadRequest(jsonError(message)).fuccess
                           )
                         case None =>
-                          import lila.challenge.Challenge._
+                          import lila.challenge.Challenge.*
                           val timeControl = config.makeClock map {
                             TimeControl.Clock.apply
                           } orElse config.makeDaysPerTurn.map {
@@ -102,13 +103,13 @@ final class Setup(
                           } getOrElse TimeControl.Unlimited
                           val challenge = lila.challenge.Challenge.make(
                             variant = config.variant,
-                            //TODO: draughts: need to have two variants stored in the config?
+                            // TODO: draughts: need to have two variants stored in the config?
                             fenVariant = config.variant.some,
                             initialFen = config.actualFen,
                             timeControl = timeControl,
                             mode = config.mode,
                             playerIndex = config.playerIndex.name,
-                            challenger = (ctx.me, HTTPRequest `sid` req) match {
+                            challenger = (ctx.me, HTTPRequest.sid(req)) match {
                               case (Some(user), _) => toRegistered(config.variant, timeControl)(user)
                               case (_, Some(sid))  => Challenger.Anonymous(sid)
                               case _               => Challenger.Open
@@ -141,7 +142,7 @@ final class Setup(
                         .gameHook(
                           config, // withinLimits ctx.me,
                           Sri(sri),
-                          HTTPRequest `sid` req,
+                          HTTPRequest.sid(req),
                           blocking
                         )
                         .map(hookResponse)
@@ -180,7 +181,7 @@ final class Setup(
     OpenBody { implicit ctx =>
       NoBot {
         implicit val req = ctx.body
-        PostRateLimit(HTTPRequest `ipAddress` ctx.req) {
+        PostRateLimit(HTTPRequest.ipAddress(ctx.req)) {
           NoPlaybanOrCurrent {
             forms
               .hook(using ctx)
@@ -190,9 +191,9 @@ final class Setup(
                 userConfig =>
                   (ctx.userId so env.relation.api.fetchBlocking) flatMap { blocking =>
                     processor.hook(
-                      userConfig `withinLimits` ctx.me,
+                      userConfig.withinLimits(ctx.me),
                       Sri(sri),
-                      HTTPRequest `sid` req,
+                      HTTPRequest.sid(req),
                       blocking
                     ) map hookResponse
                   }
@@ -205,19 +206,24 @@ final class Setup(
   def like(sri: String, gameId: String) =
     Open { implicit ctx =>
       NoBot {
-        PostRateLimit(HTTPRequest `ipAddress` ctx.req) {
+        PostRateLimit(HTTPRequest.ipAddress(ctx.req)) {
           NoPlaybanOrCurrent {
-            env.game.gameRepo `game` gameId flatMap {
+            env.game.gameRepo.game(gameId) flatMap {
               _ so { game =>
                 for {
                   blocking <- ctx.userId so env.relation.api.fetchBlocking
-                  hookConfig = lila.setup.HookConfig.default(ctx.isAuth) `withRatingRange` get(
-                    "rr"
-                  ) `updateFrom` game
+                  hookConfig = lila.setup.HookConfig
+                    .default(ctx.isAuth)
+                    .withRatingRange(
+                      get(
+                        "rr"
+                      )
+                    )
+                    .updateFrom(game)
                   sameOpponents = game.userIds
                   hookResult <-
                     processor
-                      .hook(hookConfig, Sri(sri), HTTPRequest `sid` ctx.req, blocking ++ sameOpponents)
+                      .hook(hookConfig, Sri(sri), HTTPRequest.sid(ctx.req), blocking ++ sameOpponents)
                 } yield hookResponse(hookResult)
               }
             }
@@ -235,7 +241,7 @@ final class Setup(
   def boardApiHook =
     ScopedBody(_.Board.Play) { implicit req => me =>
       implicit val lang: play.api.i18n.Lang = reqLang
-      if (me.isBot) notForBotAccounts.fuccess
+      if me.isBot then notForBotAccounts.fuccess
       else
         forms.boardApiHook
           .bindFromRequest()
@@ -246,7 +252,7 @@ final class Setup(
                 val uniqId = s"sri:${me.id}"
                 config.fixPlayerIndex.hook(Sri(uniqId), me.some, sid = uniqId.some, blocking) match {
                   case Left(hook) =>
-                    PostRateLimit(HTTPRequest `ipAddress` req) {
+                    PostRateLimit(HTTPRequest.ipAddress(req)) {
                       BoardApiHookConcurrencyLimitPerUser(me.id)(
                         env.lobby.boardApiHookStream(hook.copy(boardApi = true))
                       )(apiC.sourceToNdJsonOption).fuccess
@@ -265,7 +271,7 @@ final class Setup(
   def validateFen =
     Open { implicit ctx =>
       get("fen") map (s => FEN.clean(gameLogic(getInt("lib")), s)) flatMap ValidFen(getBool("strict")) match {
-        case None => BadRequest.fuccess
+        case None    => BadRequest.fuccess
         case Some(v) =>
           Ok(html.board.bits.miniSpan(v.fen, v.playerIndex, v.situation.board.variant.key)).fuccess
       }
@@ -273,13 +279,15 @@ final class Setup(
 
   private[controllers] def redirectPov(pov: Pov)(implicit ctx: Context) = {
     val redir = Redirect(routes.Round.watcher(pov.gameId, pov.game.variant.startPlayer.name))
-    if (ctx.isAuth) redir
+    if ctx.isAuth then redir
     else
-      redir.withCookies(env.lilaCookie.cookie(
-        AnonCookie.name,
-        pov.playerId,
-        maxAge = AnonCookie.maxAge.some,
-        httpOnly = false.some
-      ))
+      redir.withCookies(
+        env.lilaCookie.cookie(
+          AnonCookie.name,
+          pov.playerId,
+          maxAge = AnonCookie.maxAge.some,
+          httpOnly = false.some
+        )
+      )
   }
 }

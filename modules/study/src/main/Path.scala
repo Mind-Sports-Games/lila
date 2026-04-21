@@ -28,7 +28,7 @@ case class Path(ids: Vector[UciCharPair]) extends AnyVal {
     }
 
   def toDbField =
-    if (ids.isEmpty) s"root.${Path.rootDbKey}"
+    if ids.isEmpty then s"root.${Path.rootDbKey}"
     else s"root.${Path `encodeDbKey` this}"
 
   def depth = ids.size
@@ -65,19 +65,19 @@ object Path {
   def encodeDbKey(path: Path): String        = encodeDbKey(path.ids.mkString)
   def encodeDbKey(pair: UciCharPair): String = encodeDbKey(pair.toString)
   def encodeDbKey(pathStr: String): String   = pathStr.map {
-    case '.'       => '\u0001' // '.' forbidden in MongoDB keys
-    case '$'       => '\u0002' // '$' forbidden in MongoDB keys
-    case '\u0090'  => '\u0003' // char(144): valid pos encoding (e.g. Grand Abalone k10, Go pos 109)
-    case '\u0091'  => '\u0004' // char(145): valid pos encoding (e.g. Grand Abalone k11, Go pos 110)
-    case c         => c
+    case '.'      => '\u0001' // '.' forbidden in MongoDB keys
+    case '$'      => '\u0002' // '$' forbidden in MongoDB keys
+    case '\u0090' => '\u0003' // char(144): valid pos encoding (e.g. Grand Abalone k10, Go pos 109)
+    case '\u0091' => '\u0004' // char(145): valid pos encoding (e.g. Grand Abalone k11, Go pos 110)
+    case c        => c
   }
-  def decodeDbKey(key: String): String       = key.map {
+  def decodeDbKey(key: String): String = key.map {
     case '\u0001' => '.'
     case '\u0002' => '$'
     case '\u0003' => '\u0090'
     case '\u0004' => '\u0091'
-    case '\u0090' => '.'  // backward compat: original encoding stored '.' as char(144)
-    case '\u0091' => '$'  // backward compat: original encoding stored '$' as char(145)
+    case '\u0090' => '.' // backward compat: original encoding stored '.' as char(144)
+    case '\u0091' => '$' // backward compat: original encoding stored '$' as char(145)
     case c        => c
   }
 

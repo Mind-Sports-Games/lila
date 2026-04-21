@@ -1,13 +1,12 @@
 package views.html.plan
 
 import lila.api.Context
-import lila.app.templating.Environment._
-import lila.app.ui.ScalatagsTemplate._
-
+import lila.app.templating.Environment.*
+import lila.app.ui.ScalatagsTemplate.*
 
 object indexStripe {
 
-  import trans.patron._
+  import trans.patron.*
 
   private val dataForm = attr("data-form")
 
@@ -33,7 +32,7 @@ object indexStripe {
         h1(
           userLink(me),
           " • ",
-          if (patron.isLifetime) strong(lifetimePatron())
+          if patron.isLifetime then strong(lifetimePatron())
           else patronForMonths(me.plan.months)
         ),
         table(cls := "all")(
@@ -69,11 +68,11 @@ object indexStripe {
                   p(decideHowMuch()),
                   "USD $ ",
                   input(
-                    tpe := "number",
-                    min := 1,
-                    max := 100000,
-                    step := "0.01",
-                    name := "usd",
+                    tpe   := "number",
+                    min   := 1,
+                    max   := 100000,
+                    step  := "0.01",
+                    name  := "usd",
                     value := info.subscription.item.price.usd.toString
                   ),
                   submitButton(cls := "button")(trans.apply()),
@@ -120,7 +119,7 @@ object indexStripe {
                   tbody(
                     info.pastInvoices.map { in =>
                       tr(
-                        td(in.paid `option` span(dataIcon := "E", cls := "is-green text")(paid())),
+                        td(in.paid.option(span(dataIcon := "E", cls := "is-green text")(paid()))),
                         td(cls := "id")(in.id),
                         td(showDate(in.dateTime)),
                         td(in.usd.toString)

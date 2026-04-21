@@ -3,8 +3,8 @@ package lila.swiss
 import lila.hub.actorApi.team.IsLeader
 import lila.hub.LateMultiThrottler
 import lila.hub.LightTeam.TeamID
-import lila.room.RoomSocket.{ Protocol => RP, _ }
-import lila.socket.RemoteSocket.{ Protocol => P, _ }
+import lila.room.RoomSocket.{ Protocol as RP, * }
+import lila.socket.RemoteSocket.{ Protocol as P, * }
 import lila.socket.Socket.makeMessage
 
 final private class SwissSocket(
@@ -51,7 +51,9 @@ final private class SwissSocket(
 
   private lazy val send: String => Unit = remoteSocketApi.makeSender("swiss-out").apply
 
-  remoteSocketApi.subscribe("swiss-in", RP.In.reader)(
-    handler orElse remoteSocketApi.baseHandler
-  ).andDo(send(P.Out.boot))
+  remoteSocketApi
+    .subscribe("swiss-in", RP.In.reader)(
+      handler orElse remoteSocketApi.baseHandler
+    )
+    .andDo(send(P.Out.boot))
 }

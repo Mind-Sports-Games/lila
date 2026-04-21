@@ -2,9 +2,9 @@ package views.html.analyse
 
 import play.api.libs.json.{ JsObject, Json }
 
-import lila.app.templating.Environment._
+import lila.app.templating.Environment.*
 import lila.app.ui.EmbedConfig
-import lila.app.ui.ScalatagsTemplate._
+import lila.app.ui.ScalatagsTemplate.*
 import lila.common.String.html.safeJsonValue
 
 object embed {
@@ -37,12 +37,14 @@ object embed {
       analyseTag,
       embedJsUnsafeLoadThen(
         s"""PlayStrategyAnalyseEmbed(${safeJsonValue(
-          Json.obj(
-            "data"  -> data,
-            "embed" -> true,
-            "i18n"  -> views.html.board.userAnalysisI18n(withCeval = false, withExplorer = false)(using config.lang)
-          )
-        )})""",
+            Json.obj(
+              "data"  -> data,
+              "embed" -> true,
+              "i18n"  -> views.html.board.userAnalysisI18n(withCeval = false, withExplorer = false)(using
+                config.lang
+              )
+            )
+          )})""",
         config.nonce
       )
     )(using config)

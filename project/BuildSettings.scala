@@ -16,7 +16,9 @@ object BuildSettings {
     Defaults.coreDefaultSettings ++ Seq(
       version      := lilaVersion,
       organization := "org.lichess",
-      resolvers ++= Seq(jitpack, lilaMaven, lichessMaven, sonashots) ++ Resolver.sonatypeOssRepos("snapshots") ++ localMaven,
+      resolvers ++= Seq(jitpack, lilaMaven, lichessMaven, sonashots) ++ Resolver.sonatypeOssRepos(
+        "snapshots"
+      ) ++ localMaven,
       scalaVersion := globalScalaVersion,
       scalacOptions ++= compilerOptions,
       scalacOptions := scalacOptions.value.distinct,
@@ -37,7 +39,7 @@ object BuildSettings {
       play.api,
       strategyGames,
       kittens,
-      jodaTime,
+      jodaTime
     )
 
   def smallModule(

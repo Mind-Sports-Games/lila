@@ -14,19 +14,20 @@ object PerfPicker {
     PerfType(key(speed, variant, daysPerTurn))
 
   def key(speed: Speed, variant: Variant, daysPerTurn: Option[Int]): String =
-    if (variant == Variant.Chess(Standard))
-      if (daysPerTurn.isDefined || speed == Speed.Correspondence) Speed.Correspondence.key
+    if variant == Variant.Chess(Standard) then
+      if daysPerTurn.isDefined || speed == Speed.Correspondence then Speed.Correspondence.key
       else speed.key
     else variant.key
 
   def key(game: Game): String = key(game.speed, game.ratingVariant, game.daysPerTurn)
 
   def main(speed: Speed, variant: Variant, daysPerTurn: Option[Int]): Option[Perfs => Perf] =
-    if (variant == Variant.Chess(Standard)) Some {
-      if (daysPerTurn.isDefined) (perfs: Perfs) => perfs.correspondence
-      else Perfs `speedLens` speed
-    }
-    else Perfs `variantLens` variant
+    if variant == Variant.Chess(Standard) then
+      Some {
+        if daysPerTurn.isDefined then (perfs: Perfs) => perfs.correspondence
+        else Perfs.speedLens(speed)
+      }
+    else Perfs.variantLens(variant)
 
   def main(game: Game): Option[Perfs => Perf] = main(game.speed, game.ratingVariant, game.daysPerTurn)
 

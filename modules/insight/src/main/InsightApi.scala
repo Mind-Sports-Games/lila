@@ -13,20 +13,20 @@ final class InsightApi(
     indexer: InsightIndexer
 )(implicit ec: scala.concurrent.ExecutionContext) {
 
-  import InsightApi._
+  import InsightApi.*
 
   def insightUser(user: User): Fu[InsightUser] =
-    insightUserApi `find` user.id flatMap {
+    insightUserApi.find(user.id) flatMap {
       case Some(u) =>
-        u.lastSeen.isBefore(DateTime.now `minusDays` 1) so {
-          insightUserApi `setSeenNow` user
+        u.lastSeen.isBefore(DateTime.now.minusDays(1)) so {
+          insightUserApi.setSeenNow(user)
         } inject u
       case None =>
         for {
-          count <- storage `count` user.id
-          ecos  <- storage `ecos` user.id
+          count <- storage.count(user.id)
+          ecos  <- storage.ecos(user.id)
           c = InsightUser.make(user.id, count, ecos)
-          _ <- insightUserApi `save` c
+          _ <- insightUserApi.save(c)
         } yield c
     }
 
@@ -43,13 +43,13 @@ final class InsightApi(
       .monSuccess(_.insight.request)
 
   def userStatus(user: User): Fu[UserStatus] =
-    gameRepo `lastFinishedRatedNotFromPosition` user flatMap {
-      case None => fuccess(UserStatus.NoGame)
+    gameRepo.lastFinishedRatedNotFromPosition(user) flatMap {
+      case None       => fuccess(UserStatus.NoGame)
       case Some(game) =>
-        storage `fetchLast` user.id map {
-          case None                                              => UserStatus.Empty
-          case Some(entry) if entry.date `isBefore` game.createdAt => UserStatus.Stale
-          case _                                                 => UserStatus.Fresh
+        storage.fetchLast(user.id) map {
+          case None                                               => UserStatus.Empty
+          case Some(entry) if entry.date.isBefore(game.createdAt) => UserStatus.Stale
+          case _                                                  => UserStatus.Fresh
         }
     }
 
@@ -60,16 +60,19 @@ final class InsightApi(
       insightUserApi.remove(userId)
 
   def updateGame(g: Game) =
-    Future.sequence(Pov(g)
-      .map { pov =>
-        pov.player.userId so { userId =>
-          storage `find` InsightEntry.povToId(pov) flatMap {
-            _ so { old =>
-              indexer.update(g, userId, old)
+    Future
+      .sequence(
+        Pov(g)
+          .map { pov =>
+            pov.player.userId so { userId =>
+              storage.find(InsightEntry.povToId(pov)) flatMap {
+                _ so { old =>
+                  indexer.update(g, userId, old)
+                }
+              }
             }
           }
-        }
-      })
+      )
       .void
 }
 

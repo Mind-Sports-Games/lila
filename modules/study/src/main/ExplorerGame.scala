@@ -19,11 +19,10 @@ final private class ExplorerGame(
     }
 
   def insert(study: Study, position: Position, gameId: Game.ID): Fu[Option[(Chapter, Path)]] =
-    if (position.chapter.isOverweight) {
+    if position.chapter.isOverweight then {
       logger.info(s"Overweight chapter ${study.id}/${position.chapter.id}")
       fuccess(none)
-    }
-    else
+    } else
       importer(gameId) map {
         _ so { game =>
           position.node so { fromNode =>
@@ -45,11 +44,11 @@ final private class ExplorerGame(
   private def compareFens(a: FEN, b: FEN) = truncateFen(a) == truncateFen(b)
 
   private def merge(fromNode: RootOrNode, fromPath: Path, game: Node.Root): Option[(Node, Path)] = {
-    val gameNodes = game.mainline.dropWhile(n => !compareFens(n.fen, fromNode.fen)) drop 1
+    val gameNodes             = game.mainline.dropWhile(n => !compareFens(n.fen, fromNode.fen)) drop 1
     val (path, foundGameNode) = gameNodes.foldLeft((Path.root, none[Node])) {
       case ((path, None), gameNode) =>
         val nextPath = path + gameNode
-        if (fromNode.children.nodeAt(nextPath).isDefined) (nextPath, none)
+        if fromNode.children.nodeAt(nextPath).isDefined then (nextPath, none)
         else (path, gameNode.some)
       case (found, _) => found
     }

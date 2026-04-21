@@ -1,8 +1,8 @@
 package lila.tournament
 
-import akka.actor._
+import akka.actor.*
 import java.util.concurrent.ConcurrentHashMap
-import scala.concurrent.duration._
+import scala.concurrent.duration.*
 import scala.concurrent.Promise
 
 import play.api.libs.json.JsObject
@@ -10,8 +10,8 @@ import play.api.libs.json.JsObject
 import lila.chat.Chat
 import lila.game.Game
 import lila.hub.LateMultiThrottler
-import lila.room.RoomSocket.{ Protocol => RP, _ }
-import lila.socket.RemoteSocket.{ Protocol => P, _ }
+import lila.room.RoomSocket.{ Protocol as RP, * }
+import lila.socket.RemoteSocket.{ Protocol as P, * }
 import lila.socket.Socket.makeMessage
 import lila.user.User
 
@@ -45,7 +45,7 @@ final private class TournamentSocket(
       player.userId foreach { userId =>
         send(
           RP.Out
-            .tellRoomUser(RoomId(tourId), userId, makeMessage("redirect", game `fullIdOf` player.playerIndex))
+            .tellRoomUser(RoomId(tourId), userId, makeMessage("redirect", game.fullIdOf(player.playerIndex)))
         )
       }
     }
@@ -61,16 +61,16 @@ final private class TournamentSocket(
     allWaitingUsers.compute(
       tour.id,
       (_: Tournament.ID, cur: WaitingUsers.WithNext) =>
-        Option(cur).getOrElse(WaitingUsers `emptyWithNext` tour.clock).copy(next = promise.some)
+        Option(cur).getOrElse(WaitingUsers.emptyWithNext(tour.clock)).copy(next = promise.some)
     )
     promise.future.withTimeout(2.seconds, "getWaitingUsers timeout")
   }
 
   def hasUser(tourId: Tournament.ID, userId: User.ID): Boolean =
-    Option(allWaitingUsers.get(tourId)).exists(_.waiting `hasUser` userId)
+    Option(allWaitingUsers.get(tourId)).exists(_.waiting.hasUser(userId))
 
   def finish(tourId: Tournament.ID): Unit = {
-    allWaitingUsers `remove` tourId
+    allWaitingUsers.remove(tourId)
     reload(tourId)
   }
 
@@ -104,9 +104,11 @@ final private class TournamentSocket(
 
   private lazy val send: String => Unit = remoteSocketApi.makeSender("tour-out").apply
 
-  remoteSocketApi.subscribe("tour-in", Protocol.In.reader)(
-    tourHandler orElse handler orElse remoteSocketApi.baseHandler
-  ).andDo(send(P.Out.boot))
+  remoteSocketApi
+    .subscribe("tour-in", Protocol.In.reader)(
+      tourHandler orElse handler orElse remoteSocketApi.baseHandler
+    )
+    .andDo(send(P.Out.boot))
 
   object Protocol {
 
@@ -134,4 +136,3 @@ final private class TournamentSocket(
   def systemChat(tourId: Tournament.ID, text: String, volatile: Boolean = false): Unit =
     chat.userChat.service(Chat.Id(tourId), text, _.Tournament, volatile)
 }
-

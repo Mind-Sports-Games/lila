@@ -19,7 +19,7 @@ object JsDump {
 
   def removeDbPrefix(key: MessageKey): String = {
     val index = key.indexOf(':')
-    if (index > 0) key.drop(index + 1) else key
+    if index > 0 then key.drop(index + 1) else key
   }
 
   private def translatedJs(fullKey: MessageKey, t: Translation): JsTrans = {

@@ -1,6 +1,6 @@
 package controllers
 
-import play.api.http._
+import play.api.http.*
 import play.api.mvc.Codec
 
 trait ResponseWriter {

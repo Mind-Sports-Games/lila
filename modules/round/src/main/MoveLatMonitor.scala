@@ -19,5 +19,5 @@ private object MoveLatMonitor {
       )
     }
 
-  def record(micros: Int): Unit = { val _ = latency.getAndUpdate(_ `record` micros) }
+  def record(micros: Int): Unit = { val _ = latency.getAndUpdate(_.record(micros)) }
 }

@@ -1,5 +1,5 @@
 package lila.game
-import strategygames.{ GameFamily }
+import strategygames.GameFamily
 import strategygames.variant.Variant
 import strategygames.format.FEN
 
@@ -79,11 +79,11 @@ object Handicaps {
           case 1 => GoHandicap(40, 0)
           case 2 => GoHandicap(20, 0)
           case 3 => GoHandicap(0, 0)
-          case x if (x - 4) % 5 == 0 => GoHandicap(80, (((x - 4) / 5) + 2))
-          case x if (x - 4) % 5 == 1 => GoHandicap(60, (((x - 5) / 5) + 2))
-          case x if (x - 4) % 5 == 2 => GoHandicap(40, (((x - 6) / 5) + 2))
-          case x if (x - 4) % 5 == 3 => GoHandicap(20, (((x - 7) / 5) + 2))
-          case x if (x - 4) % 5 == 4 => GoHandicap(0, (((x - 8) / 5) + 2))
+          case x if (x - 4) % 5 == 0 => GoHandicap(80, ((x - 4) / 5) + 2)
+          case x if (x - 4) % 5 == 1 => GoHandicap(60, ((x - 5) / 5) + 2)
+          case x if (x - 4) % 5 == 2 => GoHandicap(40, ((x - 6) / 5) + 2)
+          case x if (x - 4) % 5 == 3 => GoHandicap(20, ((x - 7) / 5) + 2)
+          case x if (x - 4) % 5 == 4 => GoHandicap(0, ((x - 8) / 5) + 2)
         }
       case 13 =>
         rankDiff match {
@@ -109,8 +109,8 @@ object Handicaps {
 
   private def goRankDiff(rating: Int, diff: Int): Int = {
     def computeRankDiff(r: Int, diffLeft: Int, rank: Int): Int = {
-      val ratingIncrease = if (r < 1000) 33 else if (r < 1700) 50 else 100
-      if (!(diffLeft >= ratingIncrease)) return rank
+      val ratingIncrease = if r < 1000 then 33 else if r < 1700 then 50 else 100
+      if !(diffLeft >= ratingIncrease) then return rank
       else computeRankDiff(r + ratingIncrease, diffLeft - ratingIncrease, rank + 1)
     }
 
@@ -121,7 +121,7 @@ object Handicaps {
     ratingType match {
       case KyuRating =>
         goRating match {
-          case y if y > 18 => Math.max(1593 - y * 33, 600) //lowest rating is 600 on site
+          case y if y > 18 => Math.max(1593 - y * 33, 600) // lowest rating is 600 on site
           case y if y > 4  => 1900 - y * 50
           case y if y > 0  => 2100 - y * 100
           case _           => 1500
@@ -134,10 +134,8 @@ object Handicaps {
   val psRating    = s"^([0-9]+)$$".r
 
   def goRatingDisplay(rating: Int): String =
-    if (rating >= 2100)
-      (mcMahonScoreFromRating(rating).toInt + 1).toString() + "d"
-    else
-      (mcMahonScoreFromRating(rating).toInt * -1).toString() + "k"
+    if rating >= 2100 then (mcMahonScoreFromRating(rating).toInt + 1).toString() + "d"
+    else (mcMahonScoreFromRating(rating).toInt * -1).toString() + "k"
 
   def mcMahonScoreFromRating(rating: Int): Double =
     rating match {

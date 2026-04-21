@@ -1,9 +1,9 @@
 package lila.forum
 
-import play.api.libs.json._
+import play.api.libs.json.*
 import play.api.libs.ws.StandaloneWSClient
-import play.api.libs.ws.DefaultBodyWritables._
-import play.api.libs.ws.JsonBodyReadables._
+import play.api.libs.ws.DefaultBodyWritables.*
+import play.api.libs.ws.JsonBodyReadables.*
 import play.api.i18n.Lang
 import lila.common.autoconfig.AutoConfig
 import scala.math.Ordering.Float.TotalOrdering
@@ -26,7 +26,7 @@ final class DetectLanguage(
   private val defaultLang = Lang("en")
 
   def apply(message: String): Fu[Option[Lang]] =
-    if (config.key.value.isEmpty) fuccess(defaultLang.some)
+    if config.key.value.isEmpty then fuccess(defaultLang.some)
     else
       ws.url(config.url)
         .post(

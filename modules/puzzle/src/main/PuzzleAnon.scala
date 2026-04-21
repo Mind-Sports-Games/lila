@@ -4,7 +4,7 @@ import scala.concurrent.ExecutionContext
 
 import lila.common.ThreadLocalRandom
 import lila.common.extensions.*
-import lila.db.dsl._
+import lila.db.dsl.*
 import lila.memo.CacheApi
 
 import strategygames.variant.Variant
@@ -16,7 +16,7 @@ final class PuzzleAnon(
     countApi: PuzzleCountApi
 )(implicit ec: ExecutionContext) {
 
-  import BsonHandlers._
+  import BsonHandlers.*
 
   def getOneFor(variant: Variant, theme: PuzzleTheme.Key): Fu[Option[Puzzle]] =
     pool
@@ -27,7 +27,7 @@ final class PuzzleAnon(
         _ foreach { puzzle =>
           lila.mon.puzzle.selector.anon.vote(theme.value).record(100 + math.round(puzzle.vote * 100))
         }
-    }
+      }
 
   def getBatchFor(nb: Int): Fu[Vector[Puzzle]] = {
     pool.get((Puzzle.defaultVariant, PuzzleTheme.mix.key)) map (_ take nb)
@@ -40,7 +40,7 @@ final class PuzzleAnon(
       _.expireAfterWrite(1 minute)
         .buildAsyncFuture { case (variant, theme) =>
           countApi.byVariantTheme(variant, theme) flatMap { _ =>
-            //TODO tailor selection criteria when more variety of puzzles available
+            // TODO tailor selection criteria when more variety of puzzles available
             // val tier =
             //   if (count > 5000) PuzzleTier.Top
             //   else if (count > 2000) PuzzleTier.Good
@@ -59,7 +59,7 @@ final class PuzzleAnon(
             val pathSampleSize     = 15
             colls.path {
               _.aggregateWith[Bdoc]() { framework =>
-                import framework._
+                import framework.*
                 List(
                   Match(pathApi.select(variant, theme, tier, ratingRange)),
                   Sample(pathSampleSize),
@@ -85,8 +85,8 @@ final class PuzzleAnon(
               }
                 .collect[List](maxDocs = poolSize)
                 .map {
-                _.view.flatMap(PuzzleBSONReader.readOpt).toVector
-              }
+                  _.view.flatMap(PuzzleBSONReader.readOpt).toVector
+                }
             }
           }
         }

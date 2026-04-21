@@ -1,6 +1,5 @@
 package controllers
 
-
 import lila.app.*
 
 // import lila.common.config.MaxPerSecond

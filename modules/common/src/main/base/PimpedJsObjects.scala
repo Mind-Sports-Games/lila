@@ -1,6 +1,6 @@
 package lila.base
 
-import play.api.libs.json._
+import play.api.libs.json.*
 
 final class PimpedJsObject(private val js: JsObject) extends AnyVal {
 
@@ -44,11 +44,11 @@ final class PimpedJsObject(private val js: JsObject) extends AnyVal {
     }
 
   def add(pair: (String, Boolean)): JsObject =
-    if (pair._2) js + (pair._1 -> JsBoolean(true))
+    if pair._2 then js + (pair._1 -> JsBoolean(true))
     else js
 
   def add(key: String, value: Boolean): JsObject =
-    if (value) js + (key -> JsBoolean(true))
+    if value then js + (key -> JsBoolean(true))
     else js
 
   def add[A: Writes](pair: (String, Option[A])): JsObject =

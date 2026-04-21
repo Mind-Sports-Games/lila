@@ -1,6 +1,6 @@
 package lila.common
 
-import scala.concurrent.duration._
+import scala.concurrent.duration.*
 
 object ResilientScheduler {
 
@@ -9,13 +9,13 @@ object ResilientScheduler {
       atMost: AtMost,
       initialDelay: FiniteDuration
   )(f: => Funit)(using ec: Executor, scheduler: Scheduler): Unit = {
-    val run = () => f
+    val run                        = () => f
     def runAndScheduleNext(): Unit =
       run()
         .withTimeout(atMost.value, "ResilientScheduler")
         .addEffectAnyway {
           scheduler.scheduleOnce(every.value) { runAndScheduleNext() }
-      }
+        }
     scheduler.scheduleOnce(initialDelay) { runAndScheduleNext() }
   }
 }

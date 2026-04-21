@@ -2,8 +2,8 @@ package views.html
 package puzzle
 
 import lila.api.Context
-import lila.app.templating.Environment._
-import lila.app.ui.ScalatagsTemplate._
+import lila.app.templating.Environment.*
+import lila.app.ui.ScalatagsTemplate.*
 import strategygames.variant.Variant
 
 object faq {

@@ -4,8 +4,8 @@ import play.api.data.Form
 import play.api.i18n.Lang
 
 import lila.api.Context
-import lila.app.templating.Environment._
-import lila.app.ui.ScalatagsTemplate._
+import lila.app.templating.Environment.*
+import lila.app.ui.ScalatagsTemplate.*
 import lila.clas.{ Clas, Student }
 import lila.clas.ClasForm.ClasData
 
@@ -45,16 +45,14 @@ object clas {
       div(cls := "box__top")(
         h1(trans.clas.playstrategyClasses()),
         a(
-          href := routes.Clas.form,
-          cls := "new button button-empty",
-          title := trans.clas.newClass.txt(),
+          href     := routes.Clas.form,
+          cls      := "new button button-empty",
+          title    := trans.clas.newClass.txt(),
           dataIcon := "O"
         )
       ),
-      if (classes.isEmpty)
-        frag(hr, p(cls := "box__pad classes__empty")(trans.clas.noClassesYet()))
-      else
-        renderClasses(classes)
+      if classes.isEmpty then frag(hr, p(cls := "box__pad classes__empty")(trans.clas.noClassesYet()))
+      else renderClasses(classes)
     )
 
   def studentIndex(classes: List[Clas])(implicit ctx: Context) =
@@ -68,7 +66,7 @@ object clas {
     div(cls := "classes")(
       classes.map { clas =>
         div(
-          cls := List("clas-widget" -> true, "clas-widget-archived" -> clas.isArchived),
+          cls      := List("clas-widget" -> true, "clas-widget-archived" -> clas.isArchived),
           dataIcon := "f"
         )(
           a(cls := "overlay", href := routes.Clas.show(clas.id.value)),
@@ -99,12 +97,14 @@ object clas {
       div(cls := "box-pad")(
         innerForm(form, c.some),
         hr,
-        c.isActive `option` postForm(
-          action := routes.Clas.archive(c.id.value, v = true),
-          cls := "clas-edit__archive"
-        )(
-          form3.submit(trans.clas.closeClass(), icon = none)(
-            cls := "confirm button-red button-empty"
+        c.isActive.option(
+          postForm(
+            action := routes.Clas.archive(c.id.value, v = true),
+            cls    := "clas-edit__archive"
+          )(
+            form3.submit(trans.clas.closeClass(), icon = none)(
+              cls := "confirm button-red button-empty"
+            )
           )
         )
       )
@@ -142,7 +142,7 @@ object clas {
         help = trans.clas.visibleByBothStudentsAndTeachers().some
       )(form3.textarea(_)(rows := 5)),
       clas match {
-        case None => form3.hidden(form("teachers"), ctx.userId)
+        case None    => form3.hidden(form("teachers"), ctx.userId)
         case Some(_) =>
           form3.group(
             form("teachers"),

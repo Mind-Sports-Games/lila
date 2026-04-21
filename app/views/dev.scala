@@ -3,9 +3,8 @@ package views.html
 import play.api.data.Form
 
 import lila.api.Context
-import lila.app.templating.Environment._
-import lila.app.ui.ScalatagsTemplate._
-
+import lila.app.templating.Environment.*
+import lila.app.ui.ScalatagsTemplate.*
 
 object dev {
 
@@ -30,7 +29,7 @@ object dev {
                   )
                 case v =>
                   input(
-                    name := "v",
+                    name  := "v",
                     value := (v match {
                       case None    => ""
                       case Some(x) => x.toString

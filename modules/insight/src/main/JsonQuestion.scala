@@ -1,6 +1,6 @@
 package lila.insight
 
-import play.api.libs.json._
+import play.api.libs.json.*
 
 case class JsonQuestion(
     dimension: String,
@@ -9,7 +9,7 @@ case class JsonQuestion(
 ) {
 
   def question: Option[Question[?]] = {
-    import Dimension._
+    import Dimension.*
     for {
       realMetric <- Metric.byKey get metric
       realFilters =
@@ -44,7 +44,7 @@ case class JsonQuestion(
                 case _                    => none
               }
             }
-        }
+          }
           .filterNot(_.isEmpty)
           .toList
       question <- {

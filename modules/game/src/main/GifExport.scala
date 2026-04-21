@@ -1,11 +1,11 @@
 package lila.game
 
-import akka.stream.scaladsl._
+import akka.stream.scaladsl.*
 import akka.util.ByteString
 import strategygames.format.{ FEN, Forsyth, Uci }
-import strategygames.{ Centis, Player => PlayerIndex, Replay, Situation, Game => ChessGame }
-import play.api.libs.json._
-import play.api.libs.ws.JsonBodyWritables._
+import strategygames.{ Centis, Game as ChessGame, Player as PlayerIndex, Replay, Situation }
+import play.api.libs.json.*
+import play.api.libs.ws.JsonBodyWritables.*
 import play.api.libs.ws.StandaloneWSClient
 
 import lila.common.config.BaseUrl
@@ -27,9 +27,9 @@ final class GifExport(
         .addHttpHeaders("Content-Type" -> "application/json")
         .withBody(
           Json.obj(
-            "p1"          -> Namer.playerTextBlocking(pov.game.p1Player, withRating = true)(using lightUserApi.sync),
-            "p2"          -> Namer.playerTextBlocking(pov.game.p2Player, withRating = true)(using lightUserApi.sync),
-            "comment"     -> s"${baseUrl.value}/${pov.game.id} rendered with https://github.com/niklasf/lila-gif",
+            "p1" -> Namer.playerTextBlocking(pov.game.p1Player, withRating = true)(using lightUserApi.sync),
+            "p2" -> Namer.playerTextBlocking(pov.game.p2Player, withRating = true)(using lightUserApi.sync),
+            "comment" -> s"${baseUrl.value}/${pov.game.id} rendered with https://github.com/niklasf/lila-gif",
             "orientation" -> pov.playerIndex.name,
             "delay"       -> targetMedianTime.centis, // default delay for frames
             "frames"      -> frames(pov.game, initialFen)
@@ -45,7 +45,7 @@ final class GifExport(
 
   def gameThumbnail(game: Game): Fu[Source[ByteString, ?]] = {
     val query = List(
-      "fen"         -> (Forsyth.>>(game.variant.gameLogic, game.stratGame)).value,
+      "fen"         -> Forsyth.>>(game.variant.gameLogic, game.stratGame).value,
       "p1"          -> Namer.playerTextBlocking(game.p1Player, withRating = true)(using lightUserApi.sync),
       "p2"          -> Namer.playerTextBlocking(game.p2Player, withRating = true)(using lightUserApi.sync),
       "orientation" -> game.naturalOrientation.name
@@ -94,10 +94,10 @@ final class GifExport(
       case Some(median) =>
         val scale = targetMedianTime.centis.toDouble / median.centis.atLeast(1).toDouble
         plyTimes.map { t =>
-          if (t * 2 < median) t `atMost` (targetMedianTime *~ 0.5)
-          else t *~ scale `atLeast` (targetMedianTime *~ 0.5) `atMost` targetMaxTime
+          if t * 2 < median then t.atMost(targetMedianTime *~ 0.5)
+          else (t *~ scale).atLeast(targetMedianTime *~ 0.5).atMost(targetMaxTime)
         }
-      case None => plyTimes.map(_ `atMost` targetMaxTime)
+      case None => plyTimes.map(_.atMost(targetMaxTime))
     }
 
   private def frames(game: Game, initialFen: Option[FEN]) =
@@ -128,7 +128,7 @@ final class GifExport(
         arr
       case ((game, uci), scaledMoveTime) :: tail =>
         // longer delay for last frame
-        val delay = if (tail.isEmpty) Centis(500).some else scaledMoveTime
+        val delay = if tail.isEmpty then Centis(500).some else scaledMoveTime
         framesRec(tail, arr :+ frame(game.situation, uci, delay))
     }
 

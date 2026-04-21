@@ -14,9 +14,9 @@ final class UciMemo(gameRepo: GameRepo)(implicit ec: scala.concurrent.ExecutionC
   private val maxTurns = 300
 
   def add(game: Game, uci: String, playerIndex: Player): Unit = {
-    val current = ~cache.getIfPresent(game.id)
+    val current       = ~cache.getIfPresent(game.id)
     val newActionStrs =
-      if (Player.fromTurnCount(current.size + game.stratGame.startedAtTurn) == playerIndex)
+      if Player.fromTurnCount(current.size + game.stratGame.startedAtTurn) == playerIndex then
         current :+ List(uci)
       else current.dropRight(1) :+ (current.takeRight(1).flatten :+ uci)
     cache.put(game.id, newActionStrs)
@@ -40,7 +40,11 @@ final class UciMemo(gameRepo: GameRepo)(implicit ec: scala.concurrent.ExecutionC
     uciStrsFromGame(game, maxTurns, fen)
       .map(cache.put(game.id, _))
 
-  private def uciStrsFromGame(game: Game, @annotation.nowarn("msg=unused") _max: Int, fen: Option[FEN]): Fu[ActionStrs] =
+  private def uciStrsFromGame(
+      game: Game,
+      @annotation.nowarn("msg=unused") _max: Int,
+      fen: Option[FEN]
+  ): Fu[ActionStrs] =
     UciDump(game.variant.gameLogic, game.actionStrs take maxTurns, fen, game.variant)
       .map(_.toVector.map(_.toVector))
       .fold(fufail(_), fuccess(_))

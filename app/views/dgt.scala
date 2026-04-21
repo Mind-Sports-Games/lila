@@ -1,9 +1,8 @@
 package views.html
 
-
 import lila.api.Context
-import lila.app.templating.Environment._
-import lila.app.ui.ScalatagsTemplate._
+import lila.app.templating.Environment.*
+import lila.app.ui.ScalatagsTemplate.*
 import lila.oauth.AccessToken
 
 object dgt {
@@ -89,7 +88,7 @@ object dgt {
         form(action := routes.DgtCtrl.generateToken, method := "post")(
           st.section(
             h2("PlayStrategy connectivity"),
-            if (token.isDefined)
+            if token.isDefined then
               p(cls := "text", dataIcon := "E")(
                 "You have an OAuth token suitable for DGT play.",
                 br,
@@ -164,11 +163,11 @@ object dgt {
               div(cls := "form-group")(
                 st.label(`for` := name, cls := "form-label")("Keywords"),
                 st.textarea(
-                  id := name,
-                  st.name := name,
-                  cls := "form-control",
+                  id        := name,
+                  st.name   := name,
+                  cls       := "form-control",
                   maxlength := 600,
-                  rows := 10
+                  rows      := 10
                 ),
                 st.small(cls := "form-help")(
                   """Keywords are in JSON format. They are used to translate moves and results into your language. Default is English, but feel free to change it."""
@@ -200,9 +199,9 @@ object dgt {
         val id = s"${name}_${v._1}"
         div(
           input(
-            st.id := id,
-            tpe := "radio",
-            value := v._1.toString,
+            st.id   := id,
+            tpe     := "radio",
+            value   := v._1.toString,
             st.name := name
           ),
           label(`for` := id)(v._2)

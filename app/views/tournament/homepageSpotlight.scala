@@ -1,9 +1,8 @@
 package views.html.tournament
 
-
 import lila.api.Context
-import lila.app.templating.Environment._
-import lila.app.ui.ScalatagsTemplate._
+import lila.app.templating.Environment.*
+import lila.app.ui.ScalatagsTemplate.*
 
 object homepageSpotlight {
 
@@ -18,7 +17,7 @@ object homepageSpotlight {
     tour.spotlight map { spot =>
       div(
         a(href := routes.Tournament.show(tour.id), cls := tourClass)(
-          if (tour.isStarted && !tour.isFinished) span(cls := "ribbon")(span("live")),
+          if tour.isStarted && !tour.isFinished then span(cls := "ribbon")(span("live")),
           frag(
             spot.iconImg map { i =>
               img(cls := "img", src := staticAssetUrl(s"images/$i"))
@@ -30,14 +29,14 @@ object homepageSpotlight {
             },
             span(cls := "content")(
               span(cls := "name")(tour.name()),
-              if (tour.isDistant) span(cls := "more")(momentFromNow(tour.startsAt))
+              if tour.isDistant then span(cls := "more")(momentFromNow(tour.startsAt))
               else
                 frag(
                   span(cls := "headline")(spot.headline),
                   span(cls := "more")(
                     trans.nbPlayers.plural(tour.nbPlayers, tour.nbPlayers.localize),
                     " • ",
-                    if (tour.isStarted) trans.finishesX(momentFromNow(tour.finishesAt))
+                    if tour.isStarted then trans.finishesX(momentFromNow(tour.finishesAt))
                     else momentFromNow(tour.startsAt)
                   )
                 )
@@ -52,7 +51,7 @@ object homepageSpotlight {
         span(cls := "more")(
           trans.nbPlayers.plural(tour.nbPlayers, tour.nbPlayers.localize),
           " • ",
-          if (tour.isStarted) trans.eventInProgress() else momentFromNow(tour.startsAt)
+          if tour.isStarted then trans.eventInProgress() else momentFromNow(tour.startsAt)
         )
       )
     )

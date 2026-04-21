@@ -3,7 +3,7 @@ package lila.plan
 import org.joda.time.DateTime
 import reactivemongo.api.bson.BSONNull
 
-import lila.db.dsl._
+import lila.db.dsl.*
 
 final private class MonthlyGoalApi(getGoal: () => Usd, chargeColl: Coll)(implicit
     ec: scala.concurrent.ExecutionContext
@@ -17,7 +17,7 @@ final private class MonthlyGoalApi(getGoal: () => Usd, chargeColl: Coll)(implici
   def monthAmount: Fu[Cents] =
     chargeColl
       .aggregateWith() { framework =>
-        import framework._
+        import framework.*
         List(
           Match($doc("date" `$gt` DateTime.now.withDayOfMonth(1).withTimeAtStartOfDay)),
           Group(BSONNull)("cents" -> SumField("cents"))
@@ -26,7 +26,8 @@ final private class MonthlyGoalApi(getGoal: () => Usd, chargeColl: Coll)(implici
       .headOption
       .map {
         ~_.flatMap { _.int("cents") }
-      } `dmap` Cents.apply
+      }
+      .dmap(Cents.apply)
 }
 
 case class MonthlyGoal(current: Cents, goal: Cents) {

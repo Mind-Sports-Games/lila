@@ -9,48 +9,54 @@ object FormCompatLayer {
   private type FormData = Map[String, Seq[String]]
 
   def apply(pref: Pref, req: Request[?]): FormData =
-    reqToFormData(req) `pipe`
-      moveToAndRename(
-        "clock",
-        List(
-          "clockTenths" -> "tenths",
-          "clockBar"    -> "bar",
-          "clockSound"  -> "sound",
-          "moretime"    -> "moretime"
+    reqToFormData(req)
+      .pipe(
+        moveToAndRename(
+          "clock",
+          List(
+            "clockTenths" -> "tenths",
+            "clockBar"    -> "bar",
+            "clockSound"  -> "sound",
+            "moretime"    -> "moretime"
+          )
         )
-      ) `pipe`
-      addMissing("clock.moretime", pref.moretime.toString) `pipe`
-      addMissing("display.coordSystem", pref.coordSystem.toString) `pipe`
-      moveTo(
-        "behavior",
-        List(
-          "moveEvent",
-          "mancalaMove",
-          "premove",
-          "takeback",
-          "autoQueen",
-          "autoThreefold",
-          "submitMove",
-          "confirmResign",
-          "confirmPass",
-          "playForcedAction",
-          "keyboardMove"
+      )
+      .pipe(addMissing("clock.moretime", pref.moretime.toString))
+      .pipe(addMissing("display.coordSystem", pref.coordSystem.toString))
+      .pipe(
+        moveTo(
+          "behavior",
+          List(
+            "moveEvent",
+            "mancalaMove",
+            "premove",
+            "takeback",
+            "autoQueen",
+            "autoThreefold",
+            "submitMove",
+            "confirmResign",
+            "confirmPass",
+            "playForcedAction",
+            "keyboardMove"
+          )
         )
-      ) `pipe`
-      moveTo(
-        "display",
-        List(
-          "animation",
-          "captured",
-          "highlight",
-          "destination",
-          "playerTurnIndicator",
-          "actionReminder",
-          "coords",
-          "coordSystem",
-          "replay",
-          "pieceNotation",
-          "blindfold"
+      )
+      .pipe(
+        moveTo(
+          "display",
+          List(
+            "animation",
+            "captured",
+            "highlight",
+            "destination",
+            "playerTurnIndicator",
+            "actionReminder",
+            "coords",
+            "coordSystem",
+            "replay",
+            "pieceNotation",
+            "blindfold"
+          )
         )
       )
 
@@ -68,7 +74,7 @@ object FormCompatLayer {
 
   private def reqToFormData(req: Request[?]): FormData =
     (req.body match {
-      case body: play.api.mvc.AnyContent if body.asFormUrlEncoded.isDefined => body.asFormUrlEncoded.get
+      case body: play.api.mvc.AnyContent if body.asFormUrlEncoded.isDefined    => body.asFormUrlEncoded.get
       case body: play.api.mvc.AnyContent if body.asMultipartFormData.isDefined =>
         body.asMultipartFormData.get.asFormUrlEncoded
       case _ => Map.empty[String, Seq[String]]

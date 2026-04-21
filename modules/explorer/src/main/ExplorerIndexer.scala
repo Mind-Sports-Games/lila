@@ -1,17 +1,17 @@
 package lila.explorer
 
-import akka.stream.scaladsl._
-import strategygames.{ Player => PlayerIndex, P2, P1 }
+import akka.stream.scaladsl.*
+import strategygames.{ P1, P2, Player as PlayerIndex }
 import strategygames.GameLogic
 import strategygames.format.pgn.Tag
 import org.joda.time.DateTime
 import org.joda.time.format.DateTimeFormat
-import play.api.libs.ws.DefaultBodyWritables._
+import play.api.libs.ws.DefaultBodyWritables.*
 import lila.common.ThreadLocalRandom.nextFloat
 import scala.util.{ Failure, Success, Try }
 
 import lila.common.LilaStream
-import lila.db.dsl._
+import lila.db.dsl.*
 import lila.game.{ Game, GameRepo, PgnDump, Player, Query }
 import lila.user.{ User, UserRepo }
 import lila.i18n.VariantKeys
@@ -77,12 +77,12 @@ final private class ExplorerIndexer(
     }
 
   private object flowBuffer {
-    private val max = 30
-    private val buf = scala.collection.mutable.ArrayBuffer.empty[String]
+    private val max              = 30
+    private val buf              = scala.collection.mutable.ArrayBuffer.empty[String]
     def apply(pgn: String): Unit = {
       buf += pgn
       val startAt = nowMillis
-      if (buf.sizeIs >= max) {
+      if buf.sizeIs >= max then {
         ws.url(internalEndPointUrl).put(buf mkString separator) andThen {
           case Success(res) if res.status == 200 =>
             lila.mon.explorer.index.time.record((nowMillis - startAt) / max)
@@ -105,7 +105,7 @@ final private class ExplorerIndexer(
       game.turnCount >= 10 &&
       game.variant != strategygames.chess.variant.FromPosition
 
-  private def stableRating(player: Player) = player.rating `ifFalse` player.provisional
+  private def stableRating(player: Player) = player.rating.ifFalse(player.provisional)
 
   // probability of the game being indexed, between 0 and 1
   private def probability(game: Game, rating: Int) =
@@ -134,8 +134,8 @@ final private class ExplorerIndexer(
     ~(for {
       p1Rating <- stableRating(game.p1Player)
       p2Rating <- stableRating(game.p2Player)
-      minPlayerRating  = if (game.variant.exotic) 1400 else 1500
-      minAverageRating = if (game.variant.exotic) 1520 else 1600
+      minPlayerRating  = if game.variant.exotic then 1400 else 1500
+      minAverageRating = if game.variant.exotic then 1520 else 1600
       if p1Rating >= minPlayerRating
       if p2Rating >= minPlayerRating
       averageRating = (p1Rating + p2Rating) / 2
@@ -143,7 +143,7 @@ final private class ExplorerIndexer(
       if probability(game, averageRating) > nextFloat()
       if !game.userIds.exists(botUserIds.contains)
       if valid(game)
-    } yield gameRepo `initialFen` game flatMap { initialFen =>
+    } yield gameRepo.initialFen(game) flatMap { initialFen =>
       userRepo.usernamesByIds(game.userIds) map { usernames =>
         def username(playerIndex: PlayerIndex) =
           game.player(playerIndex).userId flatMap { id =>
@@ -173,7 +173,7 @@ final private class ExplorerIndexer(
           Tag(_.Date, pgnDateFormat.print(game.createdAt))
         )
         val allTags = fenTags ::: otherTags
-        //this uses maxPlies as maxTurns
+        // this uses maxPlies as maxTurns
         val allActionStrs = game.actionStrs.map(_.mkString(",")).take(maxPlies).mkString(" ")
         s"${allTags.mkString("\n")}\n\n${allActionStrs}".some
       }

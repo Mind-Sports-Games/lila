@@ -2,7 +2,7 @@ package lila.game
 
 import strategygames.chess.format
 import strategygames.chess.{ Castles, Piece, PieceMap, Pos, PositionHash, Role, UnmovedRooks }
-import strategygames.{ ActionStrs, Player => PlayerIndex, VActionStrs }
+import strategygames.{ ActionStrs, Player as PlayerIndex, VActionStrs }
 
 import lila.db.ByteArray
 
@@ -34,8 +34,8 @@ private object PgnStorage {
 
   case object Huffman extends PgnStorage {
 
-    import org.lichess.compression.game.{ Encoder, Piece => JavaPiece, Role => JavaRole }
-    import scala.jdk.CollectionConverters._
+    import org.lichess.compression.game.{ Encoder, Piece as JavaPiece, Role as JavaRole }
+    import scala.jdk.CollectionConverters.*
 
     def encode(pgnMoves: PgnMoves) =
       ByteArray {
@@ -45,7 +45,7 @@ private object PgnStorage {
       }
     def decode(bytes: ByteArray, plies: Int): Decoded =
       monitor(_.game.pgn.decode("huffman")) {
-        val decoded = Encoder.decode(bytes.value, plies)
+        val decoded      = Encoder.decode(bytes.value, plies)
         val unmovedRooks = decoded.unmovedRooks.asScala.view.flatMap(chessPos).to(Set)
         Decoded(
           actionStrs = decoded.pgnMoves.toVector.map(Vector(_)),
@@ -66,7 +66,7 @@ private object PgnStorage {
       }
 
     private def chessPos(sq: Integer): Option[Pos] = Pos(sq)
-    private def chessRole(role: JavaRole): Role =
+    private def chessRole(role: JavaRole): Role    =
       Role.javaSymbolToRole(role.symbol)
 
     private def chessPiece(piece: JavaPiece): Piece =

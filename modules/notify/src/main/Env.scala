@@ -1,12 +1,12 @@
 package lila.notify
 
-import akka.actor._
-import com.softwaremill.macwire._
+import akka.actor.*
+import com.softwaremill.macwire.*
 import lila.common.autoconfig.{ AutoConfig, ConfigName }
 import play.api.Configuration
 
 import lila.common.Bus
-import lila.common.config._
+import lila.common.config.*
 
 private class NotifyConfig(
     @ConfigName("collection.notify") val notifyColl: CollName,
@@ -48,11 +48,13 @@ final class Env(
           case lila.game.actorApi.CorresAlarmEvent(pov) =>
             pov.player.userId so { userId =>
               lila.game.Namer.playerText(pov.opponent)(using getLightUser) foreach { opponent =>
-                api `addNotification` Notification.make(
-                  Notification.Notifies(userId),
-                  CorresAlarm(
-                    gameId = pov.gameId,
-                    opponent = opponent
+                api.addNotification(
+                  Notification.make(
+                    Notification.Notifies(userId),
+                    CorresAlarm(
+                      gameId = pov.gameId,
+                      opponent = opponent
+                    )
                   )
                 )
               }

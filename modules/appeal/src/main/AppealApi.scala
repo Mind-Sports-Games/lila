@@ -2,7 +2,7 @@ package lila.appeal
 
 import org.joda.time.DateTime
 
-import lila.db.dsl._
+import lila.db.dsl.*
 import lila.user.{ Holder, NoteApi, User, UserRepo }
 
 final class AppealApi(
@@ -12,7 +12,7 @@ final class AppealApi(
     snoozer: lila.memo.Snoozer[Appeal.SnoozeKey]
 )(implicit ec: scala.concurrent.ExecutionContext) {
 
-  import BsonHandlers._
+  import BsonHandlers.*
 
   def mine(me: User): Fu[Option[Appeal]] = coll.byId[Appeal](me.id)
 
@@ -61,7 +61,7 @@ final class AppealApi(
 
   def countUnread = coll.countSel($doc("status" -> Appeal.Status.Unread.key))
 
-  def queueOf(mod: User) = queue(snoozer `snoozedKeysOf` mod.id map (_.appealId))
+  def queueOf(mod: User) = queue(snoozer.snoozedKeysOf(mod.id) map (_.appealId))
 
   private def queue(exceptIds: Iterable[User.ID]): Fu[List[Appeal]] =
     coll

@@ -1,13 +1,13 @@
 package lila.puzzle
 
-import akka.stream.scaladsl._
-import play.api.libs.json._
+import akka.stream.scaladsl.*
+import play.api.libs.json.*
 import reactivemongo.akkastream.cursorProducer
 import reactivemongo.api.ReadPreference
 
 import lila.common.config.MaxPerSecond
 import lila.common.Json.jodaWrites
-import lila.db.dsl._
+import lila.db.dsl.*
 import lila.user.User
 
 final class PuzzleActivity(
@@ -17,15 +17,15 @@ final class PuzzleActivity(
     system: akka.actor.ActorSystem
 ) {
 
-  import PuzzleActivity._
-  import BsonHandlers._
-  import JsonView._
+  import PuzzleActivity.*
+  import BsonHandlers.*
+  import JsonView.*
 
   def stream(config: Config): Source[String, ?] =
     Source futureSource {
       colls.round.map {
         _.find($doc(PuzzleRound.BSONFields.user -> config.user.id))
-          .sort($sort `desc` PuzzleRound.BSONFields.date)
+          .sort($sort.desc(PuzzleRound.BSONFields.date))
           .batchSize(config.perSecond.value)
           .cursor[PuzzleRound](ReadPreference.secondaryPreferred)
           .documentSource(config.max | Int.MaxValue)

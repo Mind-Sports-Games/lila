@@ -1,6 +1,6 @@
 package lila.analyse
 
-import strategygames.{ Player => PlayerIndex }
+import strategygames.Player as PlayerIndex
 
 import org.joda.time.DateTime
 
@@ -41,7 +41,7 @@ case class Analysis(
 object Analysis {
 
   import lila.db.BSON
-  import reactivemongo.api.bson._
+  import reactivemongo.api.bson.*
 
   case class Analyzed(game: lila.game.Game, analysis: Analysis)
 
@@ -50,15 +50,15 @@ object Analysis {
 
   implicit val analysisBSONHandler: BSON[Analysis] = new BSON[Analysis] {
     def reads(r: BSON.Reader) = {
-      val startPly = r `intD` "ply"
-      val raw      = r `str` "data"
+      val startPly = r.intD("ply")
+      val raw      = r.str("data")
       Analysis(
-        id = r `str` "_id",
-        studyId = r `strO` "studyId",
-        infos = Info.decodeList(raw, startPly) `err` s"Invalid analysis data $raw",
+        id = r.str("_id"),
+        studyId = r.strO("studyId"),
+        infos = Info.decodeList(raw, startPly).err(s"Invalid analysis data $raw"),
         startPly = startPly,
-        date = r `date` "date",
-        fk = r `strO` "fk"
+        date = r.date("date"),
+        fk = r.strO("fk")
       )
     }
     def writes(w: BSON.Writer, a: Analysis) =

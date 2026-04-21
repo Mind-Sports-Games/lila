@@ -19,9 +19,9 @@ case class Charge(
   def isStripe         = stripe.nonEmpty
 
   def serviceName =
-    if (isStripe) "stripe"
-    else if (isPayPalLegacy) "paypal legacy"
-    else if (isPayPalCheckout) "paypal checkout"
+    if isStripe then "stripe"
+    else if isPayPalLegacy then "paypal legacy"
+    else if isPayPalCheckout then "paypal checkout"
     else "???"
 
   def lifetimeWorthy = cents >= Cents.lifetime
@@ -31,7 +31,7 @@ case class Charge(
 
 object Charge {
 
-  private def makeId = lila.common.ThreadLocalRandom `nextString` 8
+  private def makeId = lila.common.ThreadLocalRandom.nextString(8)
 
   def make(
       userId: Option[String],

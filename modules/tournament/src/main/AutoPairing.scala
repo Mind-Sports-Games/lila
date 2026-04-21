@@ -1,9 +1,9 @@
 package lila.tournament
 
-import strategygames.{ P2, Player => PlayerIndex, P1, Game => StratGame }
+import strategygames.{ Game as StratGame, P1, P2, Player as PlayerIndex }
 import strategygames.variant.Variant
 
-import lila.game.{ Game, Player => GamePlayer, GameRepo, Source, Handicaps }
+import lila.game.{ Game, GameRepo, Handicaps, Player as GamePlayer, Source }
 import lila.user.User
 
 final class AutoPairing(
@@ -20,30 +20,30 @@ final class AutoPairing(
       playersMap: Map[User.ID, Player],
       ranking: Ranking
   ): Fu[Game] = {
-    val player1 = playersMap get pairing.user1 `err` s"Missing pairing player1 $pairing"
-    val player2 = playersMap get pairing.user2 `err` s"Missing pairing player2 $pairing"
+    val player1 = playersMap.get(pairing.user1).err(s"Missing pairing player1 $pairing")
+    val player2 = playersMap.get(pairing.user2).err(s"Missing pairing player2 $pairing")
     val clock   = tour.clock.toClock
-    val game = Game
+    val game    = Game
       .make(
         stratGame = StratGame(
           variant.gameLogic,
           Some {
-            if (tour.position.isEmpty) variant
+            if tour.position.isEmpty then variant
             else
               Variant
                 .byName(variant.gameLogic, "From Position")
                 .getOrElse(Variant.orDefault(variant.gameLogic, 3))
           },
-          if (tour.handicapped)
+          if tour.handicapped then
             Handicaps.startingFen(variant.some, player1.actualRating, player2.actualRating)
           else tour.position
         ) pipe { g =>
           val turns = g.player.fold(0, 1)
           g.copy(
             clock = clock.some,
-            //Its ok to set all of these to turns - we're just saying we're starting at a non standard
-            //place (if 1) and its all normal if 0. We don't necessarily know about how many turns/plies
-            //made up the history of a position but it doesnt really matter
+            // Its ok to set all of these to turns - we're just saying we're starting at a non standard
+            // place (if 1) and its all normal if 0. We don't necessarily know about how many turns/plies
+            // made up the history of a position but it doesnt really matter
             plies = turns,
             turnCount = turns,
             startedAtPly = turns,
@@ -60,7 +60,7 @@ final class AutoPairing(
       .withTournamentId(tour.id)
       .withHandicappedTournament(tour.handicapped)
       .start
-    (gameRepo `insertDenormalized` game).andDo {
+    gameRepo.insertDenormalized(game).andDo {
       onStart(game.id)
       duelStore.add(
         tour = tour,

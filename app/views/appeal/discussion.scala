@@ -4,8 +4,8 @@ package appeal
 import play.api.data.Form
 
 import lila.api.Context
-import lila.app.templating.Environment._
-import lila.app.ui.ScalatagsTemplate._
+import lila.app.templating.Environment.*
+import lila.app.ui.ScalatagsTemplate.*
 import lila.appeal.Appeal
 import lila.common.String.html.richText
 import lila.mod.IpRender.RenderIp
@@ -47,24 +47,24 @@ object discussion {
               postForm(action := routes.Mod.spontaneousInquiry(appeal.id))(
                 submitButton(cls := "button")("Handle this appeal")
               )
-            case Some(Inquiry(mod, _)) if ctx.userId `has` mod =>
+            case Some(Inquiry(mod, _)) if ctx.userId.has(mod) =>
               postForm(action := routes.Appeal.mute(modData.suspect.user.username))(
-                if (appeal.isMuted)
+                if appeal.isMuted then
                   submitButton("Un-mute")(
                     title := "Be notified about user replies again",
-                    cls := "button button-green button-thin"
+                    cls   := "button button-green button-thin"
                   )
                 else
                   submitButton("Mute")(
                     title := "Don't be notified about user replies",
-                    cls := "button button-red button-thin"
+                    cls   := "button button-red button-thin"
                   )
               )
             case Some(Inquiry(mod, _)) => frag(userIdLink(mod.some), nbsp, "is handling this.")
           },
           postForm(
             action := routes.Appeal.notifySlack(modData.suspect.user.id),
-            cls := "appeal__actions__slack"
+            cls    := "appeal__actions__slack"
           )(
             submitButton(cls := "button button-thin")("Send to slack")
           )
@@ -81,11 +81,11 @@ object discussion {
       h1(
         div(cls := "title")(
           "Appeal",
-          modData.isDefined `option` frag(" by ", userIdLink(appeal.id.some))
+          modData.isDefined.option(frag(" by ", userIdLink(appeal.id.some)))
         ),
         div(cls := "actions")(
           a(
-            cls := "button button-empty mod-zone-toggle",
+            cls  := "button button-empty mod-zone-toggle",
             href := routes.User.mod(appeal.id),
             titleOrText("Mod zone (Hotkey: m)"),
             dataIcon := ""
@@ -103,7 +103,7 @@ object discussion {
       standardFlash(),
       div(cls := "body")(
         appeal.msgs.map { msg =>
-          div(cls := s"appeal__msg appeal__msg--${if (appeal `isByMod` msg) "mod" else "suspect"}")(
+          div(cls := s"appeal__msg appeal__msg--${if appeal `isByMod` msg then "mod" else "suspect"}")(
             div(cls := "appeal__msg__header")(
               renderUser(appeal, msg.by, modData.isDefined),
               momentFromNowOnce(msg.at)
@@ -111,28 +111,34 @@ object discussion {
             div(cls := "appeal__msg__text")(richText(msg.text))
           )
         },
-        if (modData.isEmpty && !appeal.canAddMsg) p("Please wait for a moderator to reply.")
+        if modData.isEmpty && !appeal.canAddMsg then p("Please wait for a moderator to reply.")
         else
-          modData.fold(true)(_.inquiry.isDefined) `option` renderForm(
-            textForm,
-            action =
-              if (modData.isDefined) routes.Appeal.reply(appeal.id).url
-              else routes.Appeal.post.url,
-            isNew = false,
-            presets = modData.map(_.presets)
-          )
+          modData
+            .fold(true)(_.inquiry.isDefined)
+            .option(
+              renderForm(
+                textForm,
+                action =
+                  if modData.isDefined then routes.Appeal.reply(appeal.id).url
+                  else routes.Appeal.post.url,
+                isNew = false,
+                presets = modData.map(_.presets)
+              )
+            )
       )
     )
 
   private def renderUser(appeal: Appeal, userId: User.ID, asMod: Boolean)(implicit ctx: Context) =
-    if (appeal `isAbout` userId) userIdLink(userId.some, params = if (asMod) "?mod" else "")
+    if appeal.isAbout(userId) then userIdLink(userId.some, params = if asMod then "?mod" else "")
     else
       span(
         userIdLink(User.playstrategyId.some),
-        isGranted(_.Appeals) `option` frag(
-          " (",
-          userIdLink(userId.some),
-          ")"
+        isGranted(_.Appeals).option(
+          frag(
+            " (",
+            userIdLink(userId.some),
+            ")"
+          )
         )
       )
 
@@ -143,8 +149,8 @@ object discussion {
       form3.globalError(form),
       form3.group(
         form("text"),
-        if (isNew) "Create an appeal" else "Add something to the appeal",
-        help = !isGranted(_.Appeals) `option` frag("Please be concise. Maximum 1000 chars.")
+        if isNew then "Create an appeal" else "Add something to the appeal",
+        help = (!isGranted(_.Appeals)).option(frag("Please be concise. Maximum 1000 chars."))
       )(
         form3.textarea(_)(rows := 6)
       ),
@@ -160,7 +166,7 @@ object discussion {
                 )(name)
               }
             ),
-            isGranted(_.Presets) `option` a(href := routes.Mod.presets("appeal"))("Edit presets")
+            isGranted(_.Presets).option(a(href := routes.Mod.presets("appeal"))("Edit presets"))
           ),
           form3.submit(trans.send())
         )

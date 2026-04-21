@@ -1,19 +1,19 @@
 package lila.challenge
 
-import reactivemongo.api.bson._
+import reactivemongo.api.bson.*
 
 import strategygames.GameLogic
 import strategygames.variant.Variant
 import lila.db.BSON
 import lila.db.BSON.{ Reader, Writer }
-import lila.db.dsl._
+import lila.db.dsl.*
 import scala.util.Success
 
-import cats.implicits._
+import cats.implicits.*
 
 private object BSONHandlers {
 
-  import Challenge._
+  import Challenge.*
 
   implicit val PlayerIndexChoiceBSONHandler: BSONHandler[PlayerIndexChoice] =
     BSONIntegerHandler.as[PlayerIndexChoice](
@@ -39,9 +39,7 @@ private object BSONHandlers {
         )
         .getOrElse(
           (r.strO("t").filter(_ == "bronstein"), r.intO("l"), r.intO("d"))
-            .mapN((_, limit, delay) =>
-              TimeControl.Clock(strategygames.Clock.BronsteinConfig(limit, delay))
-            )
+            .mapN((_, limit, delay) => TimeControl.Clock(strategygames.Clock.BronsteinConfig(limit, delay)))
             .getOrElse(
               (r.strO("t").filter(_ == "usdelay"), r.intO("l"), r.intO("d"))
                 .mapN((_, limit, delay) =>
@@ -53,7 +51,7 @@ private object BSONHandlers {
                       TimeControl.Clock(strategygames.Clock.Config(limit, inc))
                     }
                     .orElse(
-                      r `intO` "d" map TimeControl.Correspondence.apply
+                      r.intO("d") map TimeControl.Correspondence.apply
                     )
                     .getOrElse(TimeControl.Unlimited)
                 )
@@ -61,7 +59,7 @@ private object BSONHandlers {
         )
     def writes(w: Writer, t: TimeControl) =
       t match {
-        case TimeControl.Clock(strategygames.Clock.Config(l, i)) => $doc("l" -> l, "i" -> i)
+        case TimeControl.Clock(strategygames.Clock.Config(l, i))          => $doc("l" -> l, "i" -> i)
         case TimeControl.Clock(strategygames.Clock.BronsteinConfig(l, d)) =>
           $doc("t" -> "bronstein", "l" -> l, "d" -> d)
         case TimeControl.Clock(strategygames.Clock.SimpleDelayConfig(l, d)) =>
@@ -82,11 +80,11 @@ private object BSONHandlers {
   }
 
   implicit val StatusBSONHandler: BSONHandler[Status] = tryHandler[Status](
-    { case BSONInteger(v) => Status(v) `toTry` s"No such status: $v" },
+    { case BSONInteger(v) => Status(v).toTry(s"No such status: $v") },
     x => BSONInteger(x.id)
   )
   implicit val RatingBSONHandler: BSON[Rating] = new BSON[Rating] {
-    def reads(r: Reader) = Rating(r.int("i"), r.boolD("p"))
+    def reads(r: Reader)             = Rating(r.int("i"), r.boolD("p"))
     def writes(w: Writer, r: Rating) =
       $doc(
         "i" -> r.int,
@@ -94,7 +92,7 @@ private object BSONHandlers {
       )
   }
   implicit val RegisteredBSONHandler: BSON[Challenger.Registered] = new BSON[Challenger.Registered] {
-    def reads(r: Reader) = Challenger.Registered(r.str("id"), r.get[Rating]("r"))
+    def reads(r: Reader)                            = Challenger.Registered(r.str("id"), r.get[Rating]("r"))
     def writes(w: Writer, r: Challenger.Registered) =
       $doc(
         "id" -> r.id,
@@ -102,7 +100,7 @@ private object BSONHandlers {
       )
   }
   implicit val AnonymousBSONHandler: BSON[Challenger.Anonymous] = new BSON[Challenger.Anonymous] {
-    def reads(r: Reader) = Challenger.Anonymous(r.str("s"))
+    def reads(r: Reader)                           = Challenger.Anonymous(r.str("s"))
     def writes(w: Writer, a: Challenger.Anonymous) =
       $doc(
         "s" -> a.secret
@@ -114,8 +112,8 @@ private object BSONHandlers {
   )
   implicit val ChallengerBSONHandler: BSON[Challenger] = new BSON[Challenger] {
     def reads(r: Reader) =
-      if (r contains "id") RegisteredBSONHandler `reads` r
-      else if (r contains "s") AnonymousBSONHandler `reads` r
+      if r contains "id" then RegisteredBSONHandler.reads(r)
+      else if r contains "s" then AnonymousBSONHandler.reads(r)
       else Challenger.Open
     def writes(w: Writer, c: Challenger) =
       c match {

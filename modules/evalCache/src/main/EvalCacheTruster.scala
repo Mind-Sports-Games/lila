@@ -16,8 +16,8 @@ final private class EvalCacheTruster(
   private val HIGHER = Trust(9999)
 
   def apply(user: User): Trust =
-    if (user.lameOrTroll) LOWER
-    else if (Granter(_.SeeReport)(user)) HIGHER
+    if user.lameOrTroll then LOWER
+    else if Granter(_.SeeReport)(user) then HIGHER
     else
       Trust {
         seniorityBonus(user) +
@@ -29,7 +29,7 @@ final private class EvalCacheTruster(
   private val userIdCache = cacheApi[User.ID, Option[TrustedUser]](256, "evalCache.userIdTrustCache") {
     _.expireAfterWrite(10 minutes)
       .buildAsyncFuture { userId =>
-        userRepo `named` userId `map2` makeTrusted
+        userRepo.named(userId).map2(makeTrusted)
       }
   }
 
@@ -46,7 +46,7 @@ final private class EvalCacheTruster(
   private def seniorityBonus(user: User) =
     math.sqrt(Days.daysBetween(user.createdAt, DateTime.now).getDays.toDouble / 30) - 1
 
-  private def patronBonus(user: User) = (~user.planMonths * 5) `atMost` 20
+  private def patronBonus(user: User) = (~user.planMonths * 5).atMost(20)
 
   private def titleBonus(user: User) = user.hasTitle so 20
 

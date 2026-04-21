@@ -1,11 +1,11 @@
 package lila.notify
 
-import lila.db.dsl._
+import lila.db.dsl.*
 import org.joda.time.DateTime
 
 final private class NotificationRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionContext) {
 
-  import BSONHandlers._
+  import BSONHandlers.*
 
   def insert(notification: Notification) =
     coll.insert.one(notification).void
@@ -73,7 +73,7 @@ final private class NotificationRepo(val coll: Coll)(implicit ec: scala.concurre
   def exists(notifies: Notification.Notifies, selector: Bdoc): Fu[Boolean] =
     coll.exists(userNotificationsQuery(notifies) ++ selector)
 
-  val recentSort = $sort `desc` "createdAt"
+  val recentSort = $sort.desc("createdAt")
 
   def userNotificationsQuery(userId: Notification.Notifies) = $doc("notifies" -> userId)
 
@@ -81,4 +81,3 @@ final private class NotificationRepo(val coll: Coll)(implicit ec: scala.concurre
   private def unreadOnlyQuery(userIds: Iterable[Notification.Notifies]) =
     $doc("notifies" `$in` userIds, "read" -> false)
 }
-

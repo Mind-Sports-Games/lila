@@ -1,6 +1,6 @@
 package lila.study
 
-import lila.db.dsl._
+import lila.db.dsl.*
 import lila.notify.{ InvitedToStudy, Notification, NotifyApi }
 import lila.pref.Pref
 import lila.relation.{ Block, Follow }
@@ -31,36 +31,37 @@ final private class StudyInvite(
   ): Fu[User] =
     for {
       _       <- (study.nbMembers >= maxMembers) so fufail[Unit](s"Max study members reached: $maxMembers")
-      inviter <- userRepo `named` byUserId `orFail` "No such inviter"
-      _ <- (!study.isOwner(inviter.id) && !Granter(_.StudyAdmin)(inviter)) so fufail[Unit](
+      inviter <- userRepo.named(byUserId).orFail("No such inviter")
+      _       <- (!study.isOwner(inviter.id) && !Granter(_.StudyAdmin)(inviter)) so fufail[Unit](
         "Only the study owner can invite"
       )
       invited <-
         userRepo
           .named(invitedUsername)
-          .map(_.filterNot(_.id == User.playstrategyId)) `orFail` "No such invited"
+          .map(_.filterNot(_.id == User.playstrategyId))
+          .orFail("No such invited")
       _         <- study.members.contains(invited) so fufail[Unit]("Already a member")
       relation  <- relationApi.fetchRelation(invited.id, byUserId)
       _         <- relation.contains(Block) so fufail[Unit]("This user does not want to join")
       isPresent <- getIsPresent(invited.id)
-      _ <-
-        if (isPresent) funit
+      _         <-
+        if isPresent then funit
         else
           prefApi.getPref(invited).map(_.studyInvite).flatMap {
             case Pref.StudyInvite.ALWAYS => funit
             case Pref.StudyInvite.NEVER  => fufail("This user doesn't accept study invitations")
             case Pref.StudyInvite.FRIEND =>
-              if (relation.contains(Follow)) funit
+              if relation.contains(Follow) then funit
               else fufail("This user only accept study invitations from friends")
           }
-      _ <- studyRepo.addMember(study, StudyMember `make` invited)
-      shouldNotify = !isPresent && (!inviter.marks.troll || relation.contains(Follow))
+      _ <- studyRepo.addMember(study, StudyMember.make(invited))
+      shouldNotify  = !isPresent && (!inviter.marks.troll || relation.contains(Follow))
       rateLimitCost =
-        if (relation.contains(Follow)) 10
-        else if (inviter.roles.contains("ROLE_COACH")) 20
-        else if (inviter.hasTitle) 20
-        else if (inviter.perfs.bestRating >= 2000) 50
-        else if (invited.hasTitle) 200
+        if relation.contains(Follow) then 10
+        else if inviter.roles.contains("ROLE_COACH") then 20
+        else if inviter.hasTitle then 20
+        else if inviter.perfs.bestRating >= 2000 then 50
+        else if invited.hasTitle then 200
         else 100
       _ <- shouldNotify so notifyRateLimit(inviter.id, rateLimitCost) {
         val notificationContent = InvitedToStudy(
@@ -79,7 +80,7 @@ final private class StudyInvite(
         .one(
           $id(study.id.value),
           $set(s"members.${user.id}" -> $doc("role" -> "w", "admin" -> true)) ++
-            $addToSet("uids"         -> user.id)
+            $addToSet("uids" -> user.id)
         )
     }.void
 }

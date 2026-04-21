@@ -1,11 +1,11 @@
 package lila.streamer
 
-import akka.actor._
+import akka.actor.*
 import org.joda.time.DateTime
-import play.api.libs.json._
-import play.api.libs.ws.JsonBodyReadables._
+import play.api.libs.json.*
+import play.api.libs.ws.JsonBodyReadables.*
 import play.api.libs.ws.StandaloneWSClient
-import scala.concurrent.duration._
+import scala.concurrent.duration.*
 
 import lila.common.Bus
 import lila.common.config.Secret
@@ -25,8 +25,8 @@ final private class Streaming(
     twitchApi: TwitchApi
 ) extends Actor {
 
-  import Stream._
-  import YouTube.Reads._
+  import Stream.*
+  import YouTube.Reads.*
 
   private case object Tick
 
@@ -51,7 +51,7 @@ final private class Streaming(
       activeIds = streamerIds.filter { id =>
         liveStreams.has(id) || isOnline(id.value)
       }
-      streamers <- api `byIds` activeIds
+      streamers                       <- api.byIds(activeIds)
       (twitchStreams, youTubeStreams) <-
         twitchApi.fetchStreams(streamers, 0, None) map {
           _.collect { case Twitch.TwitchStream(name, title, _) =>
@@ -65,7 +65,7 @@ final private class Streaming(
         } zip fetchYouTubeStreams(streamers)
       streams = LiveStreams {
         lila.common.ThreadLocalRandom.shuffle {
-          (twitchStreams ::: youTubeStreams) `pipe` dedupStreamers
+          (twitchStreams ::: youTubeStreams).pipe(dedupStreamers)
         }
       }
       _ <- api.setLiveNow(streamers.withFilter(streams.has).map(_.id))
@@ -74,15 +74,15 @@ final private class Streaming(
   private val streamStartMemo = new lila.memo.ExpireSetMemo(2 hour)
 
   def publishStreams(streamers: List[Streamer], newStreams: LiveStreams) = {
-    if (newStreams != liveStreams) {
+    if newStreams != liveStreams then {
       newStreams.streams filterNot { s =>
-        liveStreams `has` s.streamer
+        liveStreams.has(s.streamer)
       } foreach { s =>
         import s.streamer.userId
         streamStartMemo.put(userId)
         timeline ! {
           import lila.hub.actorApi.timeline.{ Propagate, StreamStart }
-          Propagate(StreamStart(userId, s.streamer.name.value)) `toFollowersOf` userId
+          Propagate(StreamStart(userId, s.streamer.name.value)).toFollowersOf(userId)
         }
         Bus.publish(
           lila.hub.actorApi.streamer.StreamStart(userId),
@@ -93,11 +93,11 @@ final private class Streaming(
     liveStreams = newStreams
     streamers foreach { streamer =>
       streamer.twitch.foreach { t =>
-        if (liveStreams.streams.exists(s => s.serviceName == "twitch" && s.is(streamer)))
+        if liveStreams.streams.exists(s => s.serviceName == "twitch" && s.is(streamer)) then
           lila.mon.tv.streamer.present(s"${t.userId}@twitch").increment()
       }
       streamer.youTube.foreach { t =>
-        if (liveStreams.streams.exists(s => s.serviceName == "youTube" && s.is(streamer)))
+        if liveStreams.streams.exists(s => s.serviceName == "youTube" && s.is(streamer)) then
           lila.mon.tv.streamer.present(s"${t.channelId}@youtube").increment()
       }
     }
@@ -107,11 +107,10 @@ final private class Streaming(
 
   def fetchYouTubeStreams(streamers: List[Streamer]): Fu[List[YouTube.Stream]] = {
     val youtubeStreamers = streamers.filter(_.youTube.isDefined)
-    if (youtubeStreamers.nonEmpty && googleApiKey.value.nonEmpty) {
+    if youtubeStreamers.nonEmpty && googleApiKey.value.nonEmpty then {
       val now = DateTime.now
       val res =
-        if (prevYouTubeStreams.at.isAfter(now `minusMinutes` 15))
-          fuccess(prevYouTubeStreams)
+        if prevYouTubeStreams.at.isAfter(now.minusMinutes(15)) then fuccess(prevYouTubeStreams)
         else {
           ws.url("https://www.googleapis.com/youtube/v3/search")
             .withQueryStringParameters(
@@ -147,7 +146,7 @@ final private class Streaming(
     streams
       .foldLeft((Set.empty[Streamer.Id], List.empty[Stream])) {
         case ((streamerIds, streams), stream) if streamerIds(stream.streamer.id) => (streamerIds, streams)
-        case ((streamerIds, streams), stream)                                    => (streamerIds + stream.streamer.id, stream :: streams)
+        case ((streamerIds, streams), stream) => (streamerIds + stream.streamer.id, stream :: streams)
       }
       ._2
 }

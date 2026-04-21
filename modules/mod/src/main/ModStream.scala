@@ -1,7 +1,7 @@
 package lila.mod
 
-import akka.stream.scaladsl._
-import play.api.libs.json._
+import akka.stream.scaladsl.*
+import play.api.libs.json.*
 
 import lila.common.{ Bus, HTTPRequest }
 import lila.security.UserSignup

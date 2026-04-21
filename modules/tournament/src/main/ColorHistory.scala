@@ -1,6 +1,6 @@
 package lila.tournament
 
-import strategygames.{ Player => PlayerIndex }
+import strategygames.Player as PlayerIndex
 
 import lila.memo.CacheApi
 
@@ -9,10 +9,10 @@ import lila.memo.CacheApi
 case class PlayerIndexHistory(strike: Int, balance: Int) extends Ordered[PlayerIndexHistory] {
 
   override def compare(that: PlayerIndexHistory): Int =
-    if (strike < that.strike) -1
-    else if (strike > that.strike) 1
-    else if (balance < that.balance) -1
-    else if (balance > that.balance) 1
+    if strike < that.strike then -1
+    else if strike > that.strike then 1
+    else if balance < that.balance then -1
+    else if balance > that.balance then 1
     else 0
 
   def firstGetsP1(that: PlayerIndexHistory)(fallback: () => Boolean) = {
@@ -22,18 +22,18 @@ case class PlayerIndexHistory(strike: Int, balance: Int) extends Ordered[PlayerI
 
   def inc(playerIndex: PlayerIndex): PlayerIndexHistory =
     copy(
-      strike = playerIndex.fold((strike + 1) `atLeast` 1, (strike - 1) `atMost` -1),
+      strike = playerIndex.fold((strike + 1).atLeast(1), (strike - 1) `atMost` -1),
       balance = balance + playerIndex.fold(1, -1)
     )
 
-  //couldn't play if both players played maxStrike p2s games before
-  //or both player maxStrike games before
+  // couldn't play if both players played maxStrike p2s games before
+  // or both player maxStrike games before
   def couldPlay(that: PlayerIndexHistory, maxStrike: Int): Boolean =
     (strike > -maxStrike || that.strike > -maxStrike) &&
       (strike < maxStrike || that.strike < maxStrike)
 
-  //add some penalty for pairs when both players have played last game with same playerIndex
-  //heuristics: after such pairing one streak will be always incremented
+  // add some penalty for pairs when both players have played last game with same playerIndex
+  // heuristics: after such pairing one streak will be always incremented
   def samePlayerIndexs(that: PlayerIndexHistory): Boolean = strike.sign * that.strike.sign > 0
 }
 
@@ -49,5 +49,5 @@ final class PlayerIndexHistoryApi(cacheApi: CacheApi) {
 
   def get(playerId: Player.ID) = cache.getIfPresent(playerId) | default
 
-  def inc(playerId: Player.ID, playerIndex: PlayerIndex) = cache.put(playerId, get(playerId) `inc` playerIndex)
+  def inc(playerId: Player.ID, playerIndex: PlayerIndex) = cache.put(playerId, get(playerId).inc(playerIndex))
 }

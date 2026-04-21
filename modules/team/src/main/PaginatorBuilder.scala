@@ -1,10 +1,10 @@
 package lila.team
 
 import lila.common.config.MaxPerPage
-import lila.common.paginator._
+import lila.common.paginator.*
 import lila.common.LightUser
-import lila.db.dsl._
-import lila.db.paginator._
+import lila.db.dsl.*
+import lila.db.paginator.*
 
 final private[team] class PaginatorBuilder(
     teamRepo: TeamRepo,
@@ -14,7 +14,7 @@ final private[team] class PaginatorBuilder(
   private val maxPerPage     = MaxPerPage(15)
   private val maxUserPerPage = MaxPerPage(30)
 
-  import BSONHandlers._
+  import BSONHandlers.*
 
   def popularTeams(page: Int): Fu[Paginator[Team]] =
     Paginator(
@@ -51,7 +51,7 @@ final private[team] class PaginatorBuilder(
         userIds = docs.flatMap(_ string "user")
         users <- lightUserApi asyncMany userIds
       } yield users.flatten
-    private def selector = memberRepo `teamQuery` team.id
-    private def sorting  = $sort `desc` "date"
+    private def selector = memberRepo.teamQuery(team.id)
+    private def sorting  = $sort.desc("date")
   }
 }

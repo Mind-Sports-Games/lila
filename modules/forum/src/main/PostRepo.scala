@@ -4,8 +4,8 @@ import org.joda.time.DateTime
 import reactivemongo.akkastream.cursorProducer
 import reactivemongo.api.ReadPreference
 
-import Filter._
-import lila.db.dsl._
+import Filter.*
+import lila.db.dsl.*
 import lila.user.User
 
 final class PostRepo(val coll: Coll, filter: Filter = Safe)(implicit
@@ -16,12 +16,12 @@ final class PostRepo(val coll: Coll, filter: Filter = Safe)(implicit
     withFilter(user.filter(_.marks.troll).fold[Filter](Safe) { u =>
       SafeAnd(u.id)
     })
-  def withFilter(f: Filter) = if (f == filter) this else new PostRepo(coll, f)
+  def withFilter(f: Filter) = if f == filter then this else new PostRepo(coll, f)
   def unsafe                = withFilter(Unsafe)
 
   import BSONHandlers.PostBSONHandler
 
-  private val noTroll = $doc("troll" -> false)
+  private val noTroll     = $doc("troll" -> false)
   private val trollFilter = filter match {
     case Safe       => noTroll
     case SafeAnd(u) => $or(noTroll, $doc("userId" -> u))
@@ -86,7 +86,7 @@ final class PostRepo(val coll: Coll, filter: Filter = Safe)(implicit
   val selectNotErased = $doc("erasedAt" `$exists` false)
 
   def selectLangs(langs: List[String]) =
-    if (langs.isEmpty) $empty
+    if langs.isEmpty then $empty
     else $doc("lang" `$in` langs)
 
   def findDuplicate(post: Post): Fu[Option[Post]] =

@@ -2,8 +2,8 @@ package views.html
 package game
 
 import lila.api.Context
-import lila.app.templating.Environment._
-import lila.app.ui.ScalatagsTemplate._
+import lila.app.templating.Environment.*
+import lila.app.ui.ScalatagsTemplate.*
 import lila.game.{ Game, Player, Pov }
 import lila.i18n.VariantKeys
 
@@ -28,14 +28,14 @@ object widgets {
           div(cls := "header", dataIcon := bits.gameIcon(g))(
             div(cls := "header__text")(
               strong(
-                if (g.imported)
+                if g.imported then
                   frag(
                     span("IMPORT"),
                     g.pgnImport.flatMap(_.user).map { user =>
                       frag(" ", trans.by(userIdLink(user.some, None, withOnline = false)))
                     },
                     separator,
-                    if (g.variant.exotic)
+                    if g.variant.exotic then
                       bits.variantLink(
                         g.variant,
                         VariantKeys.variantName(g.variant).toUpperCase,
@@ -51,8 +51,8 @@ object widgets {
                       strategygames.chess.variant.FromPosition.name
                     )(_.trans),
                     separator,
-                    if (g.fromHandicappedTournament) trans.handicapped.txt()
-                    else if (g.rated) trans.rated.txt()
+                    if g.fromHandicappedTournament then trans.handicapped.txt()
+                    else if g.rated then trans.rated.txt()
                     else trans.casual.txt()
                   )
               ),
@@ -77,10 +77,10 @@ object widgets {
             gamePlayer(g.p2Player)
           ),
           div(cls := "result")(
-            if (g.isBeingPlayed) trans.playingRightNow()
+            if g.isBeingPlayed then trans.playingRightNow()
             else {
-              if (g.finishedOrAborted)
-                span(cls := g.winner.flatMap(w => fromPlayer.map(p => if (p == w) "win" else "loss")))(
+              if g.finishedOrAborted then
+                span(cls := g.winner.flatMap(w => fromPlayer.map(p => if p == w then "win" else "loss")))(
                   gameEndStatus(g),
                   g.winner.map { winner =>
                     frag(
@@ -92,7 +92,7 @@ object widgets {
               else trans.playerIndexPlays(g.playerTrans(g.turnPlayerIndex))
             }
           ),
-          if (g.actionStrs.length > 0)
+          if g.actionStrs.length > 0 then
             div(cls := "opening")(
               (!g.fromPosition so g.opening) map { opening =>
                 strong(opening.opening.toString())
@@ -103,12 +103,12 @@ object widgets {
                   case (Vector(p1), i)     => s"${i + 1}. $p1"
                   case _                   => ""
                 } mkString " ",
-                g.actionStrs.length > 6 `option` s" ... ${1 + (g.actionStrs.length - 1) / 2} turns "
+                (g.actionStrs.length > 6).option(s" ... ${1 + (g.actionStrs.length - 1) / 2} turns ")
               )
             )
           else frag(br, br),
-          g.metadata.analysed `option`
-            div(cls := "metadata text", dataIcon := "")(trans.computerAnalysisAvailable()),
+          g.metadata.analysed
+            .option(div(cls := "metadata text", dataIcon := "")(trans.computerAnalysisAvailable())),
           g.pgnImport.flatMap(_.user).map { user =>
             div(cls := "metadata")("PGN import by ", userIdLink(user.some))
           }
@@ -123,7 +123,7 @@ object widgets {
       game.daysPerTurn
         .map { days =>
           span(title := trans.correspondence.txt())(
-            if (days == 1) trans.oneDay()
+            if days == 1 then trans.oneDay()
             else trans.nbDays.pluralSame(days)
           )
         }
@@ -140,10 +140,10 @@ object widgets {
         frag(
           userIdLink(playerUser.id.some, withOnline = false),
           br,
-          player.berserk `option` berserkIconSpan,
+          player.berserk.option(berserkIconSpan),
           playerUser.rating,
-          player.isInputRating `option` "*",
-          player.provisional `option` "?",
+          player.isInputRating.option("*"),
+          player.provisional.option("?"),
           playerUser.ratingDiff map { d =>
             frag(" ", showRatingDiff(d))
           }
@@ -156,14 +156,14 @@ object widgets {
             aiRating(level)
           )
         } getOrElse {
-          (player.nameSplit.fold[Frag](anonSpan) { case (name, rating) =>
+          player.nameSplit.fold[Frag](anonSpan) { case (name, rating) =>
             frag(
               span(name),
               rating.map { r =>
                 frag(br, r)
               }
             )
-          })
+          }
         }
       }
     )

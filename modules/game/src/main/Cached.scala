@@ -2,7 +2,7 @@ package lila.game
 
 import com.github.blemale.scaffeine.LoadingCache
 
-import lila.db.dsl._
+import lila.db.dsl.*
 import lila.memo.{ CacheApi, MongoCache }
 import lila.user.User
 
@@ -20,7 +20,7 @@ final class Cached(
   def gameWinRates: Fu[List[WinRatePercentages]] = gameWinRatesCache.get {}
 
   def nbPlaying = nbPlayingCache.get
-  //def nbCorrespondencePlaying = nbCorrespondencePlayingCache.get {}
+  // def nbCorrespondencePlaying = nbCorrespondencePlayingCache.get {}
 
   def lastPlayedPlayingId(userId: User.ID): Fu[Option[Game.ID]] = lastPlayedPlayingIdCache get userId
 
@@ -36,7 +36,7 @@ final class Cached(
   private val nbPlayingCache = cacheApi[User.ID, Int](256, "game.nbPlaying") {
     _.expireAfterWrite(15 seconds)
       .buildAsyncFuture { userId =>
-        gameRepo.coll.countSel(Query `nowPlaying` userId)
+        gameRepo.coll.countSel(Query.nowPlaying(userId))
       }
   }
 
@@ -61,9 +61,9 @@ final class Cached(
     _.expireAfterAccess(10 minutes)
       .buildAsyncFuture {
         loader { userId =>
-          gameRepo.coll `countSel` Query.imported(userId)
+          gameRepo.coll.countSel(Query.imported(userId))
         }
-    }
+      }
   }
 
   private val nbTotalCache = mongoCache.unit[Long](
@@ -75,7 +75,7 @@ final class Cached(
         loader { _ =>
           gameRepo.coll.countAll
         }
-    }
+      }
   }
 
   private val monthlyGamesCache = cacheApi.unit[List[MonthlyGameData]] {
@@ -92,4 +92,3 @@ final class Cached(
       }
   }
 }
-

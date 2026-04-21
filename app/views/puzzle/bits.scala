@@ -8,8 +8,8 @@ import play.api.libs.json.{ JsString, Json }
 import strategygames.variant.Variant
 import lila.puzzle.Puzzle
 
-import lila.app.templating.Environment._
-import lila.app.ui.ScalatagsTemplate._
+import lila.app.templating.Environment.*
+import lila.app.ui.ScalatagsTemplate.*
 import lila.i18n.{ MessageKey, VariantKeys }
 import lila.puzzle.{ PuzzleDifficulty, PuzzleTheme }
 
@@ -19,7 +19,7 @@ object bits {
     views.html.board.bits.miniForVariant(fen, p.variant, p.playerIndex, lastMove)(span)
 
   def jsI18n(streak: Boolean)(implicit lang: Lang) =
-    if (streak) i18nJsObject(streakI18nKeys)
+    if streak then i18nJsObject(streakI18nKeys)
     else
       i18nJsObject(trainingI18nKeys) + (PuzzleTheme.enPassant.key.value -> JsString(
         PuzzleTheme.enPassant.name.txt()(using lila.i18n.defaultLang)
@@ -41,9 +41,9 @@ object bits {
   def variantSelector(variant: Variant, link: Variant => String)(implicit lang: Lang) =
     div(cls := s"variant_group")(
       Puzzle.puzzleVariants.map { v =>
-        button(cls := s"variant ${if (v.key == variant.key) "selected" else ""}")(
+        button(cls := s"variant ${if v.key == variant.key then "selected" else ""}")(
           a(
-            href := link(v),
+            href     := link(v),
             dataIcon := v.perfIcon
           )(VariantKeys.variantName(v))
         )
@@ -61,7 +61,7 @@ object bits {
       a(cls := active.active("dashboard"), href := routes.Puzzle.dashboard(variant.key, days, "dashboard"))(
         trans.puzzle.puzzleDashboard()
       ),
-      //TODO we can put this back once we have more themes for our puzzles
+      // TODO we can put this back once we have more themes for our puzzles
       // a(
       //   cls := active.active("improvementAreas"),
       //   href := routes.Puzzle.dashboard(variant.key, days, "improvementAreas")

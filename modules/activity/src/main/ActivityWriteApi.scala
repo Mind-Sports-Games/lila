@@ -1,6 +1,6 @@
 package lila.activity
 
-import lila.db.dsl._
+import lila.db.dsl.*
 import lila.game.Game
 import lila.study.Study
 import lila.user.User
@@ -10,33 +10,40 @@ final class ActivityWriteApi(
     studyApi: lila.study.StudyApi
 )(implicit ec: scala.concurrent.ExecutionContext) {
 
-  import Activity._
-  import BSONHandlers._
-  import activities._
-  import model._
+  import Activity.*
+  import BSONHandlers.*
+  import activities.*
+  import model.*
 
   def game(game: Game): Funit =
-    Future.sequence(game.userIds
-      .flatMap { userId =>
-        for {
-          pt     <- game.perfType
-          player <- game `playerByUserId` userId
-        } yield for {
-          a <- getOrCreate(userId)
-          setGames = !game.isCorrespondence so $doc(
-            ActivityFields.games -> a.games.getOrElse(activities.Games(Map.empty))
-              .add(pt, Score.make(game `wonBy` player.playerIndex, RatingProg `make` player))
-          )
-          setCorres = game.hasCorrespondenceClock so $doc(
-            ActivityFields.corres -> a.corres.getOrElse(activities.Corres(0, Nil, Nil)).add(GameId(game.id), moved = false, ended = true)
-          )
-          setters = setGames ++ setCorres
-          _ <-
-            (!setters.isEmpty) so coll.update
-              .one($id(a.id), $set(setters), upsert = true)
-              .void
-        } yield ()
-      })
+    Future
+      .sequence(
+        game.userIds
+          .flatMap { userId =>
+            for {
+              pt     <- game.perfType
+              player <- game.playerByUserId(userId)
+            } yield
+              for {
+                a <- getOrCreate(userId)
+                setGames = !game.isCorrespondence so $doc(
+                  ActivityFields.games -> a.games
+                    .getOrElse(activities.Games(Map.empty))
+                    .add(pt, Score.make(game.wonBy(player.playerIndex), RatingProg.make(player)))
+                )
+                setCorres = game.hasCorrespondenceClock so $doc(
+                  ActivityFields.corres -> a.corres
+                    .getOrElse(activities.Corres(0, Nil, Nil))
+                    .add(GameId(game.id), moved = false, ended = true)
+                )
+                setters = setGames ++ setCorres
+                _ <-
+                  (!setters.isEmpty) so coll.update
+                    .one($id(a.id), $set(setters), upsert = true)
+                    .void
+              } yield ()
+          }
+      )
       .void
 
   def forumPost(post: lila.forum.Post): Funit =
@@ -126,10 +133,10 @@ final class ActivityWriteApi(
 
   def follow(from: User.ID, to: User.ID) =
     update(from) { a =>
-      a.copy(follows = Some(~a.follows `addOut` to)).some
+      a.copy(follows = Some((~a.follows).addOut(to))).some
     } >>
       update(to) { a =>
-        a.copy(follows = Some(~a.follows `addIn` from)).some
+        a.copy(follows = Some((~a.follows).addIn(from))).some
       }
 
   def unfollowAll(from: User, following: Set[User.ID]) =
@@ -140,13 +147,16 @@ final class ActivityWriteApi(
       val all = following ++ extra
       all.nonEmpty.so {
         logger.info(s"${from.id} unfollow ${all.size} users")
-        Future.sequence(all.toSeq
-          .map { userId =>
-            coll.update.one(
-              regexId(userId) ++ $doc("f.i.ids" -> from.id),
-              $pull("f.i.ids" -> from.id)
-            )
-          })
+        Future
+          .sequence(
+            all.toSeq
+              .map { userId =>
+                coll.update.one(
+                  regexId(userId) ++ $doc("f.i.ids" -> from.id),
+                  $pull("f.i.ids" -> from.id)
+                )
+              }
+          )
           .void
       }
     }
@@ -178,7 +188,7 @@ final class ActivityWriteApi(
       a.copy(simuls = Some(~a.simuls + SimulId(simul.id))).some
     }
 
-  private def get(userId: User.ID)         = coll.byId[Activity, Id](Id `today` userId)
+  private def get(userId: User.ID)         = coll.byId[Activity, Id](Id.today(userId))
   private def getOrCreate(userId: User.ID) = get(userId) map { _ | Activity.make(userId) }
   private def save(activity: Activity)     = coll.update.one($id(activity.id), activity, upsert = true).void
   private def update(userId: User.ID)(f: Activity => Option[Activity]): Funit =

@@ -34,7 +34,7 @@ final class GameStateStream(
   ): Source[Option[JsObject], ?] = {
 
     // terminate previous one if any
-    Bus.publish(PoisonPill, uniqChan(init.game `pov` as))
+    Bus.publish(PoisonPill, uniqChan(init.game.pov(as)))
 
     blueprint mapMaterializedValue { queue =>
       val actor = system.actorOf(
@@ -62,20 +62,20 @@ final class GameStateStream(
       var gameOver = false
 
       private val classifiers = List(
-        MoveGameEvent `makeChan` id,
+        MoveGameEvent.makeChan(id),
         s"boardDrawOffer:$id",
         s"boardSelectSquaresOffer:$id",
         "finishGame",
         "abortGame",
-        uniqChan(init.game `pov` as),
-        Chat `chanOf` Chat.Id(id)
+        uniqChan(init.game.pov(as)),
+        Chat.chanOf(Chat.Id(id))
       ) :::
-        user.isBot.option(Chat `chanOf` Chat.Id(s"$id/w")).toList
+        user.isBot.option(Chat.chanOf(Chat.Id(s"$id/w"))).toList
 
       override def preStart(): Unit = {
         super.preStart()
         Bus.subscribe(self, classifiers)
-        jsonView `gameFull` init foreach { json =>
+        jsonView.gameFull(init) foreach { json =>
           // prepend the full game JSON at the start of the stream
           queue offer json.some
           // close stream if game is over

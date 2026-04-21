@@ -4,14 +4,14 @@ import cats.mtl.Raise
 
 trait CoreExports {
 
-  type Fu[A] = Future[A]
-  type Funit = Fu[Unit]
+  type Fu[A]          = Future[A]
+  type Funit          = Fu[Unit]
   type FuRaise[E, +A] = Raise[Fu, E] ?=> Fu[A]
-  type PairOf[A] = (A, A)
-  type Update[A] = A => A
+  type PairOf[A]      = (A, A)
+  type Update[A]      = A => A
 
   export scala.concurrent.{ ExecutionContextExecutor as Executor, Future, Promise }
-  export scala.concurrent.duration.{ DurationInt, DurationLong, IntMult, Duration, FiniteDuration }
+  export scala.concurrent.duration.{ Duration, DurationInt, DurationLong, FiniteDuration, IntMult }
   export akka.actor.Scheduler
   export java.time.{ Instant, LocalDateTime }
 
@@ -26,9 +26,9 @@ trait CoreExports {
   // Random wrapper with secureString for backwards compatibility
   object Random {
     def secureString(len: Int): String = scalalib.SecureRandom.nextString(len)
-    def nextString(len: Int): String = scalalib.SecureRandom.nextString(len)
-    def nextInt(n: Int): Int = scalalib.SecureRandom.nextInt(n)
-    def nextBoolean(): Boolean = scalalib.SecureRandom.nextBoolean()
+    def nextString(len: Int): String   = scalalib.SecureRandom.nextString(len)
+    def nextInt(n: Int): Int           = scalalib.SecureRandom.nextInt(n)
+    def nextBoolean(): Boolean         = scalalib.SecureRandom.nextBoolean()
     def shuffle[T, C](xs: IterableOnce[T])(using scala.collection.BuildFrom[xs.type, T, C]): C =
       scalalib.SecureRandom.shuffle(xs)
   }

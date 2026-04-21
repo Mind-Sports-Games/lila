@@ -1,8 +1,8 @@
 package lila.push
 
-import akka.actor._
-import play.api.libs.json._
-import scala.concurrent.duration._
+import akka.actor.*
+import play.api.libs.json.*
+import scala.concurrent.duration.*
 
 import lila.challenge.Challenge
 import lila.common.LightUser
@@ -25,41 +25,44 @@ final private class PushApi(
 ) {
 
   def finish(game: Game): Funit =
-    if (!game.isCorrespondence || game.hasAi) funit
+    if !game.isCorrespondence || game.hasAi then funit
     else
-      Future.sequence(game.userIds
-        .map { userId =>
-          Pov.ofUserId(game, userId) so { pov =>
-            IfAway(pov) {
-              gameRepo.countWhereUserTurn(userId) flatMap { nbMyTurn =>
-                asyncOpponentName(pov) flatMap { opponent =>
-                  pushToAll(
-                    userId,
-                    _.finish,
-                    PushApi.Data(
-                      title = pov.win match {
-                        case Some(true)  => "You won!"
-                        case Some(false) => "You lost."
-                        case _           => "It's a draw."
-                      },
-                      body = s"Your game with $opponent is over.",
-                      stacking = Stacking.GameFinish,
-                      payload = Json.obj(
-                        "userId" -> userId,
-                        "userData" -> Json.obj(
-                          "type"   -> "gameFinish",
-                          "gameId" -> game.id,
-                          "fullId" -> pov.fullId
+      Future
+        .sequence(
+          game.userIds
+            .map { userId =>
+              Pov.ofUserId(game, userId) so { pov =>
+                IfAway(pov) {
+                  gameRepo.countWhereUserTurn(userId) flatMap { nbMyTurn =>
+                    asyncOpponentName(pov) flatMap { opponent =>
+                      pushToAll(
+                        userId,
+                        _.finish,
+                        PushApi.Data(
+                          title = pov.win match {
+                            case Some(true)  => "You won!"
+                            case Some(false) => "You lost."
+                            case _           => "It's a draw."
+                          },
+                          body = s"Your game with $opponent is over.",
+                          stacking = Stacking.GameFinish,
+                          payload = Json.obj(
+                            "userId"   -> userId,
+                            "userData" -> Json.obj(
+                              "type"   -> "gameFinish",
+                              "gameId" -> game.id,
+                              "fullId" -> pov.fullId
+                            )
+                          ),
+                          iosBadge = nbMyTurn.some.filter(0 <)
                         )
-                      ),
-                      iosBadge = nbMyTurn.some.filter(0 <)
-                    )
-                  )
+                      )
+                    }
+                  }
                 }
               }
             }
-          }
-        })
+        )
         .void
 
   def move(move: MoveEvent): Funit =
@@ -100,7 +103,7 @@ final private class PushApi(
       proxyRepo.game(gameId) flatMap {
         _.filter(_.playable).so { game =>
           game.players.collectFirst {
-            case p if p.isProposingTakeback => Pov(game, game `opponent` p)
+            case p if p.isProposingTakeback => Pov(game, game.opponent(p))
           } so { pov => // the pov of the receiver
             pov.player.userId so { userId =>
               IfAway(pov) {
@@ -131,7 +134,7 @@ final private class PushApi(
       proxyRepo.game(gameId) flatMap {
         _.filter(_.playable).so { game =>
           game.players.collectFirst {
-            case p if p.isOfferingDraw => Pov(game, game `opponent` p)
+            case p if p.isOfferingDraw => Pov(game, game.opponent(p))
           } so { pov => // the pov of the receiver
             pov.player.userId so { userId =>
               IfAway(pov) {
@@ -162,7 +165,7 @@ final private class PushApi(
       proxyRepo.game(gameId) flatMap {
         _.filter(_.playable).so { game =>
           game.players.collectFirst {
-            case p if p.isOfferingSelectSquares => Pov(game, game `opponent` p)
+            case p if p.isOfferingSelectSquares => Pov(game, game.opponent(p))
           } so { pov => // the pov of the receiver
             pov.player.userId so { userId =>
               IfAway(pov) {
@@ -193,7 +196,7 @@ final private class PushApi(
       proxyRepo.game(gameId) flatMap {
         _.filter(_.playable).so { game =>
           game.players.collectFirst {
-            case p if p.isOfferingSelectSquares => Pov(game, game `opponent` p)
+            case p if p.isOfferingSelectSquares => Pov(game, game.opponent(p))
           } so { pov => // the pov of the receiver
             pov.player.userId so { userId =>
               IfAway(pov) {
@@ -224,7 +227,7 @@ final private class PushApi(
       proxyRepo.game(gameId) flatMap {
         _.filter(_.playable).so { game =>
           game.players.collectFirst {
-            case p if p.isOfferingSelectSquares => Pov(game, game `opponent` p)
+            case p if p.isOfferingSelectSquares => Pov(game, game.opponent(p))
           } so { pov => // the pov of the receiver
             pov.player.userId so { userId =>
               IfAway(pov) {
@@ -279,18 +282,18 @@ final private class PushApi(
   def newMsg(t: lila.msg.MsgThread): Funit =
     lightUser(t.lastMsg.user) flatMap {
       _ so { sender =>
-        userRepo.isKid(t `other` sender) flatMap { isKid =>
-          if (isKid) funit
+        userRepo.isKid(t.other(sender)) flatMap { isKid =>
+          if isKid then funit
           else
             pushToAll(
-              t `other` sender,
+              t.other(sender),
               _.message,
               PushApi.Data(
                 title = sender.titleName,
                 body = t.lastMsg.text take 140,
                 stacking = Stacking.NewMessage,
                 payload = Json.obj(
-                  "userId" -> t.other(sender),
+                  "userId"   -> t.other(sender),
                   "userData" -> Json.obj(
                     "type"     -> "newMessage",
                     "threadId" -> sender.id
@@ -315,7 +318,7 @@ final private class PushApi(
                 body = describeChallenge(c),
                 stacking = Stacking.ChallengeCreate,
                 payload = Json.obj(
-                  "userId" -> dest.id,
+                  "userId"   -> dest.id,
                   "userData" -> Json.obj(
                     "type"        -> "challengeCreate",
                     "challengeId" -> c.id
@@ -339,7 +342,7 @@ final private class PushApi(
             body = describeChallenge(c),
             stacking = Stacking.ChallengeAccept,
             payload = Json.obj(
-              "userId" -> challenger.id,
+              "userId"   -> challenger.id,
               "userData" -> Json.obj(
                 "type"        -> "challengeAccept",
                 "challengeId" -> c.id
@@ -361,7 +364,7 @@ final private class PushApi(
       } void
 
   private def describeChallenge(c: Challenge) = {
-    import lila.challenge.Challenge.TimeControl._
+    import lila.challenge.Challenge.TimeControl.*
     List(
       c.mode.fold("Casual", "Rated"),
       c.timeControl match {
@@ -381,7 +384,7 @@ final private class PushApi(
       case false => f
     }
 
-  private def asyncOpponentName(pov: Pov): Fu[String] = Namer `playerText` pov.opponent
+  private def asyncOpponentName(pov: Pov): Fu[String] = Namer.playerText(pov.opponent)
 }
 
 private object PushApi {

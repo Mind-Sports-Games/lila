@@ -2,8 +2,8 @@ package views.html
 package userTournament
 
 import lila.api.Context
-import lila.app.templating.Environment._
-import lila.app.ui.ScalatagsTemplate._
+import lila.app.templating.Environment.*
+import lila.app.ui.ScalatagsTemplate.*
 import lila.common.paginator.Paginator
 import lila.user.User
 
@@ -15,8 +15,7 @@ object upcoming {
       title = s"${u.username} upcoming tournaments",
       path = "upcoming"
     ) {
-      if (pager.nbResults == 0)
-        div(cls := "box-pad")(u.username, " hasn't joined any tournament yet!")
+      if pager.nbResults == 0 then div(cls := "box-pad")(u.username, " hasn't joined any tournament yet!")
       else
         div(cls := "tournament-list")(
           table(cls := "slist")(

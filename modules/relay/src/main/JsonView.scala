@@ -1,13 +1,13 @@
 package lila.relay
 
-import play.api.libs.json._
+import play.api.libs.json.*
 
 import lila.common.config.BaseUrl
 import lila.common.Json.jodaWrites
 
 final class JsonView(baseUrl: BaseUrl, markup: RelayMarkup) {
 
-  import JsonView._
+  import JsonView.*
 
   def apply(trs: RelayTour.WithRounds, withUrls: Boolean = false) =
     Json
@@ -79,6 +79,6 @@ object JsonView {
       s.upstream.so {
         case RelayRound.Sync.UpstreamUrl(url) => Json.obj("url" -> url)
         case RelayRound.Sync.UpstreamIds(ids) => Json.obj("ids" -> ids)
-    }
+      }
   }
 }

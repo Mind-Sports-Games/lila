@@ -10,7 +10,7 @@ final private class HookThieve()(implicit
     scheduler: akka.actor.Scheduler
 ) {
 
-  import HookThieve._
+  import HookThieve.*
 
   def candidates(clock: strategygames.ClockConfig, variant: strategygames.variant.Variant): Fu[PoolHooks] =
     Bus
@@ -20,7 +20,7 @@ final private class HookThieve()(implicit
 
   def stolen(poolHooks: Vector[PoolHook], monId: String) = {
     lila.mon.lobby.pool.thieve.stolen(monId).record(poolHooks.size)
-    if (poolHooks.nonEmpty) Bus.publish(StolenHookIds(poolHooks.map(_.hookId)), "lobbyTrouper")
+    if poolHooks.nonEmpty then Bus.publish(StolenHookIds(poolHooks.map(_.hookId)), "lobbyTrouper")
   }
 }
 

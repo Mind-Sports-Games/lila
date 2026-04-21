@@ -4,7 +4,7 @@ import strategygames.Speed
 import strategygames.variant.Variant
 import org.joda.time.DateTime
 
-import lila.common.Heapsort.implicits._
+import lila.common.Heapsort.implicits.*
 import lila.db.BSON
 import lila.rating.{ Glicko, Perf, PerfType }
 
@@ -146,7 +146,7 @@ case class Perfs(
     ps.foldLeft(none[(PerfType, Perf)]) {
       case (ro, p) if p._2.nb >= minNb =>
         ro.fold(p.some) { r =>
-          Some(if (p._2.intRating > r._2.intRating) p else r)
+          Some(if p._2.intRating > r._2.intRating then p else r)
         }
       case (ro, _) => ro
     }
@@ -178,7 +178,7 @@ case class Perfs(
     ps.foldLeft(none[Int]) {
       case (ro, p) if p.nb >= minNb =>
         ro.fold(p.intRating.some) { r =>
-          Some(if (p.intRating > r) p.intRating else r)
+          Some(if p.intRating > r then p.intRating else r)
         }
       case (ro, _) => ro
     } | Perf.default.intRating
@@ -195,7 +195,7 @@ case class Perfs(
   def bestProgressIn(types: List[PerfType]): Int =
     types.foldLeft(0) { case (max, t) =>
       val p = apply(t).progress
-      if (p > max) p else max
+      if p > max then p else max
     }
 
   lazy val perfsMap: Map[String, Perf] = Map(
@@ -281,7 +281,7 @@ case class Perfs(
       standard = {
         val subs = List(bullet, blitz, rapid, classical, correspondence).filterNot(_.provisional)
         subs.maxByOption(_.latest.fold(0L)(_.getMillis)).flatMap(_.latest).fold(standard) { date =>
-          val nb = subs.map(_.nb).sum
+          val nb     = subs.map(_.nb).sum
           val glicko = Glicko(
             rating = subs.map(s => s.glicko.rating * (s.nb / nb.toDouble)).sum,
             deviation = subs.map(s => s.glicko.deviation * (s.nb / nb.toDouble)).sum,
@@ -299,9 +299,9 @@ case class Perfs(
 
   def latest: Option[DateTime] =
     perfsMap.values.flatMap(_.latest).foldLeft(none[DateTime]) {
-      case (None, date)                          => date.some
-      case (Some(acc), date) if date `isAfter` acc => date.some
-      case (acc, _)                              => acc
+      case (None, date)                           => date.some
+      case (Some(acc), date) if date.isAfter(acc) => date.some
+      case (acc, _)                               => acc
     }
 
   // Lichess use this but we dont due to not having high level puzzles and also many puzzle variants.
@@ -402,41 +402,41 @@ case object Perfs {
 
   def variantLens(variant: Variant): Option[Perfs => Perf] =
     variant match {
-      case Variant.Chess(strategygames.chess.variant.Standard)               => Some(_.standard)
-      case Variant.Chess(strategygames.chess.variant.Chess960)               => Some(_.chess960)
-      case Variant.Chess(strategygames.chess.variant.KingOfTheHill)          => Some(_.kingOfTheHill)
-      case Variant.Chess(strategygames.chess.variant.ThreeCheck)             => Some(_.threeCheck)
-      case Variant.Chess(strategygames.chess.variant.FiveCheck)              => Some(_.fiveCheck)
-      case Variant.Chess(strategygames.chess.variant.Antichess)              => Some(_.antichess)
-      case Variant.Chess(strategygames.chess.variant.Atomic)                 => Some(_.atomic)
-      case Variant.Chess(strategygames.chess.variant.Crazyhouse)             => Some(_.crazyhouse)
-      case Variant.Chess(strategygames.chess.variant.Horde)                  => Some(_.horde)
-      case Variant.Chess(strategygames.chess.variant.RacingKings)            => Some(_.racingKings)
-      case Variant.Chess(strategygames.chess.variant.NoCastling)             => Some(_.noCastling)
-      case Variant.Chess(strategygames.chess.variant.Monster)                => Some(_.monster)
-      case Variant.Chess(strategygames.chess.variant.LinesOfAction)          => Some(_.linesOfAction)
-      case Variant.Chess(strategygames.chess.variant.ScrambledEggs)          => Some(_.scrambledEggs)
-      case Variant.Draughts(strategygames.draughts.variant.Standard)         => Some(_.international)
-      case Variant.Draughts(strategygames.draughts.variant.Frysk)            => Some(_.frysk)
-      case Variant.Draughts(strategygames.draughts.variant.Frisian)          => Some(_.frisian)
-      case Variant.Draughts(strategygames.draughts.variant.Antidraughts)     => Some(_.antidraughts)
-      case Variant.Draughts(strategygames.draughts.variant.Breakthrough)     => Some(_.breakthrough)
-      case Variant.Draughts(strategygames.draughts.variant.Russian)          => Some(_.russian)
-      case Variant.Draughts(strategygames.draughts.variant.Brazilian)        => Some(_.brazilian)
-      case Variant.Draughts(strategygames.draughts.variant.Pool)             => Some(_.pool)
-      case Variant.Draughts(strategygames.draughts.variant.Portuguese)       => Some(_.portuguese)
-      case Variant.Draughts(strategygames.draughts.variant.English)          => Some(_.english)
-      case Variant.Dameo(strategygames.dameo.variant.Dameo)                  => Some(_.dameo)
-      case Variant.FairySF(strategygames.fairysf.variant.Shogi)              => Some(_.shogi)
-      case Variant.FairySF(strategygames.fairysf.variant.Xiangqi)            => Some(_.xiangqi)
-      case Variant.FairySF(strategygames.fairysf.variant.MiniShogi)          => Some(_.minishogi)
-      case Variant.FairySF(strategygames.fairysf.variant.MiniXiangqi)        => Some(_.minixiangqi)
-      case Variant.FairySF(strategygames.fairysf.variant.Flipello)           => Some(_.flipello)
-      case Variant.FairySF(strategygames.fairysf.variant.Flipello10)         => Some(_.flipello10)
-      case Variant.FairySF(strategygames.fairysf.variant.AntiFlipello)       => Some(_.antiflipello)
-      case Variant.FairySF(strategygames.fairysf.variant.OctagonFlipello)    => Some(_.octagonflipello)
-      case Variant.FairySF(strategygames.fairysf.variant.Amazons)            => Some(_.amazons)
-      case Variant.FairySF(strategygames.fairysf.variant.BreakthroughTroyka) => Some(_.breakthroughtroyka)
+      case Variant.Chess(strategygames.chess.variant.Standard)                   => Some(_.standard)
+      case Variant.Chess(strategygames.chess.variant.Chess960)                   => Some(_.chess960)
+      case Variant.Chess(strategygames.chess.variant.KingOfTheHill)              => Some(_.kingOfTheHill)
+      case Variant.Chess(strategygames.chess.variant.ThreeCheck)                 => Some(_.threeCheck)
+      case Variant.Chess(strategygames.chess.variant.FiveCheck)                  => Some(_.fiveCheck)
+      case Variant.Chess(strategygames.chess.variant.Antichess)                  => Some(_.antichess)
+      case Variant.Chess(strategygames.chess.variant.Atomic)                     => Some(_.atomic)
+      case Variant.Chess(strategygames.chess.variant.Crazyhouse)                 => Some(_.crazyhouse)
+      case Variant.Chess(strategygames.chess.variant.Horde)                      => Some(_.horde)
+      case Variant.Chess(strategygames.chess.variant.RacingKings)                => Some(_.racingKings)
+      case Variant.Chess(strategygames.chess.variant.NoCastling)                 => Some(_.noCastling)
+      case Variant.Chess(strategygames.chess.variant.Monster)                    => Some(_.monster)
+      case Variant.Chess(strategygames.chess.variant.LinesOfAction)              => Some(_.linesOfAction)
+      case Variant.Chess(strategygames.chess.variant.ScrambledEggs)              => Some(_.scrambledEggs)
+      case Variant.Draughts(strategygames.draughts.variant.Standard)             => Some(_.international)
+      case Variant.Draughts(strategygames.draughts.variant.Frysk)                => Some(_.frysk)
+      case Variant.Draughts(strategygames.draughts.variant.Frisian)              => Some(_.frisian)
+      case Variant.Draughts(strategygames.draughts.variant.Antidraughts)         => Some(_.antidraughts)
+      case Variant.Draughts(strategygames.draughts.variant.Breakthrough)         => Some(_.breakthrough)
+      case Variant.Draughts(strategygames.draughts.variant.Russian)              => Some(_.russian)
+      case Variant.Draughts(strategygames.draughts.variant.Brazilian)            => Some(_.brazilian)
+      case Variant.Draughts(strategygames.draughts.variant.Pool)                 => Some(_.pool)
+      case Variant.Draughts(strategygames.draughts.variant.Portuguese)           => Some(_.portuguese)
+      case Variant.Draughts(strategygames.draughts.variant.English)              => Some(_.english)
+      case Variant.Dameo(strategygames.dameo.variant.Dameo)                      => Some(_.dameo)
+      case Variant.FairySF(strategygames.fairysf.variant.Shogi)                  => Some(_.shogi)
+      case Variant.FairySF(strategygames.fairysf.variant.Xiangqi)                => Some(_.xiangqi)
+      case Variant.FairySF(strategygames.fairysf.variant.MiniShogi)              => Some(_.minishogi)
+      case Variant.FairySF(strategygames.fairysf.variant.MiniXiangqi)            => Some(_.minixiangqi)
+      case Variant.FairySF(strategygames.fairysf.variant.Flipello)               => Some(_.flipello)
+      case Variant.FairySF(strategygames.fairysf.variant.Flipello10)             => Some(_.flipello10)
+      case Variant.FairySF(strategygames.fairysf.variant.AntiFlipello)           => Some(_.antiflipello)
+      case Variant.FairySF(strategygames.fairysf.variant.OctagonFlipello)        => Some(_.octagonflipello)
+      case Variant.FairySF(strategygames.fairysf.variant.Amazons)                => Some(_.amazons)
+      case Variant.FairySF(strategygames.fairysf.variant.BreakthroughTroyka)     => Some(_.breakthroughtroyka)
       case Variant.FairySF(strategygames.fairysf.variant.MiniBreakthroughTroyka) =>
         Some(_.minibreakthroughtroyka)
       case Variant.Samurai(strategygames.samurai.variant.Oware)                  => Some(_.oware)
@@ -552,7 +552,7 @@ case object Perfs {
       )
     }
 
-    private def notNew(p: Perf): Option[Perf] = p.nonEmpty `option` p
+    private def notNew(p: Perf): Option[Perf] = p.nonEmpty.option(p)
 
     def writes(w: BSON.Writer, o: Perfs) =
       reactivemongo.api.bson.BSONDocument(
@@ -615,9 +615,9 @@ case object Perfs {
         "puzzle_horde"           -> notNew(o.puzzle_horde),
         "puzzle_racingKings"     -> notNew(o.puzzle_racingKings),
         "puzzle_linesOfAction"   -> notNew(o.puzzle_linesOfAction),
-        "storm"                  -> (o.storm.nonEmpty `option` o.storm),
-        "racer"                  -> (o.racer.nonEmpty `option` o.racer),
-        "streak"                 -> (o.streak.nonEmpty `option` o.streak)
+        "storm"                  -> (o.storm.nonEmpty.option(o.storm)),
+        "racer"                  -> (o.racer.nonEmpty.option(o.racer)),
+        "streak"                 -> (o.streak.nonEmpty.option(o.streak))
       )
   }
 

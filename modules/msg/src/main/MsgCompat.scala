@@ -1,16 +1,16 @@
 package lila.msg
 
-import play.api.data._
-import play.api.data.Forms._
-import play.api.libs.json._
+import play.api.data.*
+import play.api.data.Forms.*
+import play.api.libs.json.*
 import reactivemongo.api.ReadPreference
 
-import lila.common.config._
+import lila.common.config.*
 import lila.common.extensions.*
 import lila.common.Json.jodaWrites
 import lila.common.LightUser
-import lila.common.paginator._
-import lila.db.dsl._
+import lila.common.paginator.*
+import lila.db.dsl.*
 import lila.user.{ LightUserApi, User }
 
 final class MsgCompat(
@@ -25,11 +25,11 @@ final class MsgCompat(
   private val maxPerPage = MaxPerPage(25)
 
   def inbox(me: User, pageOpt: Option[Int]): Fu[JsObject] = {
-    val page = pageOpt.fold(1)(_ `atLeast` 1 `atMost` 2)
+    val page = pageOpt.fold(1)(_.atLeast(1).atMost(2))
     api.threadsOf(me) flatMap { allThreads =>
       val threads =
         allThreads.slice((page - 1) * maxPerPage.value, (page - 1) * maxPerPage.value + maxPerPage.value)
-      lightUserApi.preloadMany(threads.map(_ `other` me)) inject
+      lightUserApi.preloadMany(threads.map(_.other(me))) inject
         PaginatorJson {
           Paginator
             .fromResults(
@@ -39,7 +39,7 @@ final class MsgCompat(
               maxPerPage = maxPerPage
             )
             .mapResults { t =>
-              val user = lightUserApi.sync(t `other` me) | LightUser.fallback(t `other` me)
+              val user = lightUserApi.sync(t.other(me)) | LightUser.fallback(t.other(me))
               Json.obj(
                 "id"        -> user.id,
                 "author"    -> user.titleName,
@@ -48,7 +48,7 @@ final class MsgCompat(
                 "isUnread"  -> t.lastMsg.unreadBy(me.id)
               )
             }
-      }
+        }
     }
   }
 
@@ -59,7 +59,7 @@ final class MsgCompat(
       .buildAsyncFuture[User.ID, Int] { userId =>
         colls.thread
           .aggregateWith[Bdoc](readPreference = ReadPreference.secondaryPreferred) { framework =>
-            import framework._
+            import framework.*
             List(
               Match($doc("users" -> userId, "del" `$ne` userId)),
               Sort(Descending("lastMsg.date")),
@@ -76,12 +76,12 @@ final class MsgCompat(
 
   def thread(me: User, c: MsgConvo): JsObject =
     Json.obj(
-      "id"   -> c.contact.id,
-      "name" -> c.contact.name,
+      "id"    -> c.contact.id,
+      "name"  -> c.contact.name,
       "posts" -> c.msgs.reverse.map { msg =>
         Json.obj(
-          "sender"    -> renderUser(if (msg.user == c.contact.id) c.contact else me.light),
-          "receiver"  -> renderUser(if (msg.user != c.contact.id) c.contact else me.light),
+          "sender"    -> renderUser(if msg.user == c.contact.id then c.contact else me.light),
+          "receiver"  -> renderUser(if msg.user != c.contact.id then c.contact else me.light),
           "text"      -> msg.text,
           "createdAt" -> msg.date
         )
@@ -99,7 +99,7 @@ final class MsgCompat(
             "Sorry, this player doesn't accept new messages",
             { name =>
               security.may
-                .post(me.id, User `normalize` name, isNew = true)
+                .post(me.id, User.normalize(name), isNew = true)
                 .await(2 seconds, "pmAccept") // damn you blocking API
             }
           ),
@@ -110,7 +110,7 @@ final class MsgCompat(
       .fold(
         err => Left(err),
         data => {
-          val userId = User `normalize` data.user
+          val userId = User.normalize(data.user)
           Right(api.post(me.id, userId, s"${data.subject}\n${data.text}") inject userId)
         }
       )
@@ -127,7 +127,7 @@ final class MsgCompat(
       )
 
   private def blockingFetchUser(username: String) =
-    lightUserApi.async(User `normalize` username).await(500 millis, "pmUser")
+    lightUserApi.async(User.normalize(username)).await(500 millis, "pmUser")
 
   private case class ThreadData(user: String, subject: String, text: String)
 

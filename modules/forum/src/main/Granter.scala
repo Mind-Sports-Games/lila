@@ -1,6 +1,6 @@
 package lila.forum
 
-import lila.security.{ Permission, Granter => Master }
+import lila.security.{ Granter as Master, Permission }
 import lila.user.{ User, UserContext }
 
 trait Granter {
@@ -21,7 +21,7 @@ trait Granter {
     }
 
   def isGrantedMod(categSlug: String)(implicit ctx: UserContext): Fu[Boolean] =
-    if (ctx.me so Master(Permission.ModerateForum)) fuTrue
+    if ctx.me so Master(Permission.ModerateForum) then fuTrue
     else
       Categ.slugToTeamId(categSlug) so { teamId =>
         ctx.userId so {

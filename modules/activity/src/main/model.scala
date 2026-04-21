@@ -13,7 +13,7 @@ object model {
   object RatingProg {
     def add(rp1O: Option[RatingProg], rp2O: Option[RatingProg]) =
       (rp1O, rp2O) match {
-        case (Some(rp1), Some(rp2)) => Some(rp1 `add` rp2)
+        case (Some(rp1), Some(rp2)) => Some(rp1.add(rp2))
         case _                      => rp2O orElse rp1O
       }
     def make(player: lila.game.Player) =
@@ -43,9 +43,11 @@ object model {
     def make(povs: List[lila.game.LightPov]): Score =
       povs.foldLeft(ScoreZero.zero) {
         case (score, pov) if pov.game.finished =>
-          score `add` make(
-            res = pov.game.wonBy(pov.playerIndex),
-            rp = RatingProg.make(pov.player)
+          score.add(
+            make(
+              res = pov.game.wonBy(pov.playerIndex),
+              rp = RatingProg.make(pov.player)
+            )
           )
         case (score, _) => score
       }

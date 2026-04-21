@@ -1,10 +1,9 @@
 package views.html
 package user
 
-
 import lila.api.Context
-import lila.app.templating.Environment._
-import lila.app.ui.ScalatagsTemplate._
+import lila.app.templating.Environment.*
+import lila.app.ui.ScalatagsTemplate.*
 import lila.user.User
 
 object bots {
@@ -33,7 +32,7 @@ object bots {
                 div(cls := "box__top")(
                   h1("Community bots"),
                   a(
-                    cls := "bots__about",
+                    cls  := "bots__about",
                     href := "https://playstrategy.org/blog/YvJkQxAAACIApTnD/welcome-playstrategy-bots"
                   )(
                     "About PlayStrategy Bots"
@@ -81,9 +80,9 @@ object bots {
         ),
         a(
           dataIcon := "U",
-          cls := List("button button-empty text" -> true),
+          cls      := List("button button-empty text" -> true),
           st.title := trans.challenge.challengeToPlay.txt(),
-          href := s"${routes.Lobby.home}?user=${u.username}#game"
+          href     := s"${routes.Lobby.home}?user=${u.username}#game"
         )(trans.play())
       )
     }

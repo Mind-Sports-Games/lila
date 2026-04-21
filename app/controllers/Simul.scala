@@ -1,13 +1,13 @@
 package controllers
 
-import play.api.mvc._
-import views._
+import play.api.mvc.*
+import views.*
 
 import lila.api.Context
 import lila.app.{ *, given }
 import lila.chat.Chat
 import lila.common.HTTPRequest
-import lila.simul.{ Simul => Sim }
+import lila.simul.Simul as Sim
 
 final class Simul(env: Env) extends LilaController(env) {
 
@@ -44,12 +44,12 @@ final class Simul(env: Env) extends LilaController(env) {
 
   def show(id: String) =
     Open { implicit ctx =>
-      env.simul.repo `find` id flatMap {
+      env.simul.repo.find(id) flatMap {
         _.fold(simulNotFound.fuccess) { sim =>
           for {
             team    <- sim.team so env.team.api.team
             version <- env.simul.version(sim.id)
-            json <- env.simul.jsonView(
+            json    <- env.simul.jsonView(
               sim,
               team.map { t =>
                 lila.simul.SimulTeam(
@@ -66,7 +66,7 @@ final class Simul(env: Env) extends LilaController(env) {
             _ <- chat so { c =>
               env.user.lightUserApi.preloadMany(c.chat.userIds)
             }
-            stream <- env.streamer.liveStreamApi `one` sim.hostId
+            stream <- env.streamer.liveStreamApi.one(sim.hostId)
           } yield Ok(html.simul.show(sim, version, json, chat, stream, team))
         }
       } map { NoCache(_) }
@@ -85,23 +85,23 @@ final class Simul(env: Env) extends LilaController(env) {
   def hostPing(simulId: String) =
     Open { implicit ctx =>
       AsHost(simulId) { simul =>
-        env.simul.api `hostPing` simul inject jsonOkResult
+        env.simul.api.hostPing(simul) inject jsonOkResult
       }
     }
 
   def start(simulId: String) =
     Open { implicit ctx =>
       AsHost(simulId) { simul =>
-        env.simul.api `start` simul inject jsonOkResult
+        env.simul.api.start(simul) inject jsonOkResult
       }
     }
 
   def abort(simulId: String) =
     Auth { implicit ctx => me =>
       AsHost(simulId) { simul =>
-        env.simul.api `abort` simul.id inject {
-          if (!simul.isHost(me)) env.mod.logApi.terminateTournament(me.id, simul.fullName)
-          if (HTTPRequest `isXhr` ctx.req) jsonOkResult
+        env.simul.api.abort(simul.id) inject {
+          if !simul.isHost(me) then env.mod.logApi.terminateTournament(me.id, simul.fullName)
+          if HTTPRequest.isXhr(ctx.req) then jsonOkResult
           else Redirect(routes.Simul.home)
         }
       }
@@ -170,7 +170,7 @@ final class Simul(env: Env) extends LilaController(env) {
       NoLameOrBot {
         env.team.cached.teamIds(me.id) flatMap { teamIds =>
           env.simul.api.addApplicant(id, me, teamIds.contains, variant) inject {
-            if (HTTPRequest `isXhr` ctx.req) jsonOkResult
+            if HTTPRequest.isXhr(ctx.req) then jsonOkResult
             else Redirect(routes.Simul.show(id))
           }
         }
@@ -180,7 +180,7 @@ final class Simul(env: Env) extends LilaController(env) {
   def withdraw(id: String) =
     Auth { implicit ctx => me =>
       env.simul.api.removeApplicant(id, me) inject {
-        if (HTTPRequest `isXhr` ctx.req) jsonOkResult
+        if HTTPRequest.isXhr(ctx.req) then jsonOkResult
         else Redirect(routes.Simul.show(id))
       }
     }
@@ -221,7 +221,7 @@ final class Simul(env: Env) extends LilaController(env) {
       f: Sim => Fu[Result]
   )(implicit ctx: Context): Fu[Result] =
     AsHost(id) { sim =>
-      if (sim.isStarted) Redirect(routes.Simul.show(sim.id)).fuccess
+      if sim.isStarted then Redirect(routes.Simul.show(sim.id)).fuccess
       else f(sim)
     }
 }

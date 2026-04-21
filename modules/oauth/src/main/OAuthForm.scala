@@ -2,8 +2,8 @@ package lila.oauth
 
 import io.lemonlabs.uri.AbsoluteUrl
 import org.joda.time.DateTime
-import play.api.data._
-import play.api.data.Forms._
+import play.api.data.*
+import play.api.data.Forms.*
 import reactivemongo.api.bson.BSONObjectID
 
 import lila.common.Form.absoluteUrl
@@ -53,7 +53,7 @@ object OAuthForm {
 
     def create = form
 
-    def edit(app: OAuthApp) = form `fill` Data.make(app)
+    def edit(app: OAuthApp) = form.fill(Data.make(app))
 
     case class Data(
         name: String,

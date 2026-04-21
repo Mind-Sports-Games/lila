@@ -3,8 +3,8 @@ package lila.study
 import strategygames.format.pgn.Tags
 import strategygames.format.{ FEN, Forsyth }
 import strategygames.variant.Variant
-import strategygames.{ GameLogic, Player => PlayerIndex, PocketData }
-import strategygames.chess.variant.{ Variant => ChessVariant }
+import strategygames.{ GameLogic, Player as PlayerIndex, PocketData }
+import strategygames.chess.variant.Variant as ChessVariant
 import lila.chat.{ Chat, ChatApi }
 import lila.game.{ Game, Namer }
 import lila.user.User
@@ -18,7 +18,7 @@ final private class ChapterMaker(
     pgnDump: lila.game.PgnDump
 )(implicit ec: scala.concurrent.ExecutionContext) {
 
-  import ChapterMaker._
+  import ChapterMaker.*
 
   def apply(study: Study, data: Data, order: Int, userId: User.ID): Fu[Chapter] =
     data.game.so(parseGame) flatMap {
@@ -29,7 +29,7 @@ final private class ChapterMaker(
         }
       case Some(game) => fromGame(study, game, data, order, userId)
     } map { (c: Chapter) =>
-      if (c.name.value.isEmpty) c.copy(name = Chapter `defaultName` order) else c
+      if c.name.value.isEmpty then c.copy(name = Chapter.defaultName(order)) else c
     }
 
   def fromFenOrPgnOrBlank(study: Study, data: Data, order: Int, userId: User.ID): Fu[Chapter] =
@@ -69,7 +69,7 @@ final private class ChapterMaker(
       ownerId = userId,
       practice = data.isPractice,
       gamebook = data.isGamebook,
-      conceal = data.isConceal `option` Chapter.Ply(parsed.root.ply)
+      conceal = data.isConceal.option(Chapter.Ply(parsed.root.ply))
     )
   }
 
@@ -93,7 +93,7 @@ final private class ChapterMaker(
           ply = sit.plies,
           turnCount = sit.turnCount,
           playedPlayerIndex =
-            if (sit.situation.board.history.currentTurn.nonEmpty) sit.situation.player
+            if sit.situation.board.history.currentTurn.nonEmpty then sit.situation.player
             else !sit.situation.player,
           variant = sit.situation.board.variant,
           fen = Forsyth.>>(sit.situation.board.variant.gameLogic, sit),
@@ -111,7 +111,7 @@ final private class ChapterMaker(
           fen = variant.initialFen,
           check = false,
           clock = none,
-          pocketData = variant.dropsVariant `option` PocketData.init(variant.gameLogic),
+          pocketData = variant.dropsVariant.option(PocketData.init(variant.gameLogic)),
           children = Node.emptyChildren
         ) -> false
     }) match {
@@ -123,7 +123,7 @@ final private class ChapterMaker(
             none,
             variant,
             resolveOrientation(data.realOrientation, root),
-            fromFen = isFromFen `option` true
+            fromFen = isFromFen.option(true)
           ),
           root = root,
           tags = Tags.empty,
@@ -148,15 +148,15 @@ final private class ChapterMaker(
       root <- game2root(game, initialFen)
       tags <- pgnDump.tags(game, initialFen, none, withOpening = true)
       name <-
-        if (data.isDefaultName)
-          Namer.gameVsText(game, withRatings = false)(using lightUser.async) `dmap` Chapter.Name.apply
+        if data.isDefaultName then
+          Namer.gameVsText(game, withRatings = false)(using lightUser.async).dmap(Chapter.Name.apply)
         else fuccess(data.name)
       _ = notifyChat(study, game, userId)
     } yield Chapter.make(
       studyId = study.id,
       name = name,
       setup = Chapter.Setup(
-        !game.synthetic `option` game.id,
+        (!game.synthetic).option(game.id),
         game.variant,
         data.realOrientation match {
           case Orientation.Auto               => PlayerIndex.p1
@@ -169,23 +169,24 @@ final private class ChapterMaker(
       ownerId = userId,
       practice = data.isPractice,
       gamebook = data.isGamebook,
-      conceal = data.isConceal `option` Chapter.Ply(root.ply)
+      conceal = data.isConceal.option(Chapter.Ply(root.ply))
     )
 
   def notifyChat(study: Study, game: Game, userId: User.ID) =
-    if (study.isPublic) List(game.id, s"${game.id}/w") foreach { chatId =>
-      chatApi.userChat.write(
-        chatId = Chat.Id(chatId),
-        userId = userId,
-        text = s"I'm studying this game on ${net.domain}/study/${study.id}",
-        publicSource = none,
-        _.Round,
-        persist = false
-      )
-    }
+    if study.isPublic then
+      List(game.id, s"${game.id}/w") foreach { chatId =>
+        chatApi.userChat.write(
+          chatId = Chat.Id(chatId),
+          userId = userId,
+          text = s"I'm studying this game on ${net.domain}/study/${study.id}",
+          publicSource = none,
+          _.Round,
+          persist = false
+        )
+      }
 
   private[study] def game2root(game: Game, initialFen: Option[FEN]): Fu[Node.Root] =
-    initialFen.fold(gameRepo `initialFen` game) { fen =>
+    initialFen.fold(gameRepo.initialFen(game)) { fen =>
       fuccess(fen.some)
     } map { GameToRoot(game, _, withClocks = true) }
 

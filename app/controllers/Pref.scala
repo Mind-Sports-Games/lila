@@ -1,15 +1,15 @@
 package controllers
 
-import play.api.mvc._
+import play.api.mvc.*
 
 import lila.api.Context
 import lila.app.*
-import views._
+import views.*
 import lila.pref.PieceSet
 import lila.pref.Theme
-import lila.pref.JsonView._
+import lila.pref.JsonView.*
 
-import play.api.libs.json._
+import play.api.libs.json.*
 
 final class Pref(env: Env) extends LilaController(env) {
 
@@ -20,8 +20,8 @@ final class Pref(env: Env) extends LilaController(env) {
     Scoped(_.Preference.Read) { _ => me =>
       env.pref.api.getPref(me) map { prefs =>
         JsonOk {
-          import play.api.libs.json._
-          import lila.pref.JsonView._
+          import play.api.libs.json.*
+          import lila.pref.JsonView.*
           Json.obj("prefs" -> prefs)
         }
       }
@@ -30,9 +30,9 @@ final class Pref(env: Env) extends LilaController(env) {
   def form(categSlug: String) =
     Auth { implicit ctx => me =>
       lila.pref.PrefCateg(categSlug) match {
-        case None => notFound
+        case None        => notFound
         case Some(categ) =>
-          Ok(html.account.pref(me, forms `prefOf` ctx.pref, categ)).fuccess
+          Ok(html.account.pref(me, forms.prefOf(ctx.pref), categ)).fuccess
       }
     }
 
@@ -56,7 +56,7 @@ final class Pref(env: Env) extends LilaController(env) {
 
   def set(name: String) =
     OpenBody { implicit ctx =>
-      if (name == "zoom") {
+      if name == "zoom" then {
         Ok.withCookies(env.lilaCookie.session("zoom2", (getInt("v") | 185).toString)).fuccess
       } else {
         implicit val req = ctx.body
@@ -104,11 +104,15 @@ final class Pref(env: Env) extends LilaController(env) {
   private def updatePieceSetForFamily(gameFamily: String, value: String, ctx: Context): Fu[Cookie] =
     ctx.me match {
       case Some(u) =>
-        api.updatePrefPieceSet(u, gameFamily, value).map(j => env.lilaCookie.session("pieceSet", j)(using ctx.req))
-      case _ => //get PieceSet pref from session and update the cookie
+        api
+          .updatePrefPieceSet(u, gameFamily, value)
+          .map(j => env.lilaCookie.session("pieceSet", j)(using ctx.req))
+      case _ => // get PieceSet pref from session and update the cookie
         val currentPS = ctx.req.session
           .get("pieceSet")
-          .fold(PieceSet.defaults)(p => Json.parse(p).validate(using pieceSetsRead).getOrElse(PieceSet.defaults))
+          .fold(PieceSet.defaults)(p =>
+            Json.parse(p).validate(using pieceSetsRead).getOrElse(PieceSet.defaults)
+          )
         val newPS = PieceSet.updatePieceSet(currentPS, value)
         val j     = Json.toJson(newPS).toString
         fuccess(env.lilaCookie.session("pieceSet", j)(using ctx.req))
@@ -118,7 +122,7 @@ final class Pref(env: Env) extends LilaController(env) {
     ctx.me match {
       case Some(u) =>
         api.updatePrefTheme(u, gameFamily, value).map(j => env.lilaCookie.session("theme", j)(using ctx.req))
-      case _ => //get Theme pref from session and update the cookie
+      case _ => // get Theme pref from session and update the cookie
         val currentT = ctx.req.session
           .get("theme")
           .fold(Theme.defaults)(p => Json.parse(p).validate(using themesRead).getOrElse(Theme.defaults))

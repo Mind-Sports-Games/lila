@@ -1,16 +1,16 @@
 package controllers
 
 import akka.pattern.ask
-import play.api.data._, Forms._
-import play.api.libs.json._
-import play.api.mvc._
+import play.api.data.*, Forms.*
+import play.api.libs.json.*
+import play.api.mvc.*
 import scala.annotation.nowarn
 
 import lila.app.*
 import lila.common.HTTPRequest
 import lila.hub.actorApi.captcha.ValidCaptcha
 implicit private val defaultTimeout: akka.util.Timeout = makeTimeout.large
-import views._
+import views.*
 
 final class Main(
     env: Env,
@@ -34,11 +34,13 @@ final class Main(
           .fold(
             _ => BadRequest,
             { case (enable, redirect) =>
-              Redirect(redirect) `withCookies` env.lilaCookie.cookie(
-                env.api.config.accessibility.blindCookieName,
-                if (enable == "0") "" else env.api.config.accessibility.hash,
-                maxAge = env.api.config.accessibility.blindCookieMaxAge.toSeconds.toInt.some,
-                httpOnly = true.some
+              Redirect(redirect).withCookies(
+                env.lilaCookie.cookie(
+                  env.api.config.accessibility.blindCookieName,
+                  if enable == "0" then "" else env.api.config.accessibility.hash,
+                  maxAge = env.api.config.accessibility.blindCookieMaxAge.toSeconds.toInt.some,
+                  httpOnly = true.some
+                )
               )
             }
           )
@@ -50,7 +52,7 @@ final class Main(
   def captchaCheck(id: String) =
     Open { implicit ctx =>
       env.hub.captcher.actor ? ValidCaptcha(id, get("solution").getOrElse("")) map { case valid: Boolean =>
-        Ok(if (valid) 1 else 0)
+        Ok(if valid then 1 else 0)
       }
     }
 
@@ -92,7 +94,7 @@ final class Main(
     Open { ctx =>
       env.round.selfReport(
         userId = ctx.userId,
-        ip = HTTPRequest `ipAddress` ctx.req,
+        ip = HTTPRequest.ipAddress(ctx.req),
         fullId = lila.game.Game.FullId(id),
         name = get("n", ctx.req) | "?"
       )
@@ -112,7 +114,7 @@ final class Main(
       env.imageRepo
         .fetch(id)
         .map {
-          case None => NotFound
+          case None        => NotFound
           case Some(image) =>
             lila.mon.http.imageBytes.record(image.size.toLong)
             Ok(image.data).withHeaders(
@@ -123,7 +125,7 @@ final class Main(
 
   val robots = Action { (req: play.api.mvc.RequestHeader) =>
     Ok {
-      if (env.net.crawlable && req.domain == env.net.domain.value) """User-agent: *
+      if env.net.crawlable && req.domain == env.net.domain.value then """User-agent: *
 Allow: /
 Disallow: /game/export/
 Disallow: /games/export/
@@ -147,7 +149,7 @@ Allow: /
           "background_playerIndex" -> "#161512",
           "theme_playerIndex"      -> "#161512",
           "description"            -> "The (really) free, no-ads, open source chess server.",
-          "icons" -> List(32, 64, 128, 192, 256, 512, 1024).map { size =>
+          "icons"                  -> List(32, 64, 128, 192, 256, 512, 1024).map { size =>
             Json.obj(
               "src"   -> s"//${env.net.assetDomain.value}/assets/logo/playstrategy-favicon-$size.png",
               "sizes" -> s"${size}x$size",
@@ -155,7 +157,7 @@ Allow: /
             )
           }
         )
-      } `withHeaders` (CACHE_CONTROL -> "max-age=1209600")
+      }.withHeaders(CACHE_CONTROL -> "max-age=1209600")
     }
 
   def getFishnet =
@@ -198,7 +200,7 @@ Allow: /
   def instantChess =
     Open { implicit ctx =>
       pageHit
-      if (ctx.isAuth) fuccess(Redirect(routes.Lobby.home))
+      if ctx.isAuth then fuccess(Redirect(routes.Lobby.home))
       else
         fuccess {
           Redirect(s"${routes.Lobby.home}#pool/3+2-standard").withCookies(
@@ -221,7 +223,7 @@ Allow: /
           case 110  => s"$faq#name"
           case 29   => s"$faq#titles"
           case 4811 => s"$faq#lm"
-          //case 216  => routes.Main.mobile.url
+          // case 216  => routes.Main.mobile.url
           case 340 => s"$faq#trophies"
           case 6   => s"$faq#ratings"
           case 207 => s"$faq#hide-ratings"

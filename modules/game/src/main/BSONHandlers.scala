@@ -1,28 +1,28 @@
 package lila.game
 
 import strategygames.{
-  Player => PlayerIndex,
-  ClockConfig,
+  Board,
+  ByoyomiClock,
   Clock,
   ClockBase,
+  ClockConfig,
   CubeData,
-  ByoyomiClock,
-  P1,
-  P2,
-  Game => StratGame,
+  Game as StratGame,
   GameFamily,
   GameLogic,
   History,
-  Status,
   Mode,
+  MultiPointState as StratMultiPointState,
+  P1,
+  P2,
+  Player as PlayerIndex,
   Pocket,
   PocketData,
   Pockets,
   PositionHash,
-  MultiPointState => StratMultiPointState,
+  Role,
   Score,
-  Board,
-  Role
+  Status
 }
 import strategygames.chess
 import strategygames.draughts
@@ -34,46 +34,47 @@ import strategygames.go
 import strategygames.backgammon
 import strategygames.abalone
 import strategygames.format.FEN
-import strategygames.chess.variant.{ Variant => ChessVariant, Standard => ChessStandard }
-import strategygames.draughts.variant.{ Variant => DraughtsVariant, Standard => DraughtsStandard }
-import strategygames.fairysf.variant.{ Variant => FairySFVariant, Shogi => FairySFStandard }
-import strategygames.samurai.variant.{ Variant => SamuraiVariant, Oware => SamuraiStandard }
+import strategygames.chess.variant.{ Standard as ChessStandard, Variant as ChessVariant }
+import strategygames.draughts.variant.{ Standard as DraughtsStandard, Variant as DraughtsVariant }
+import strategygames.fairysf.variant.{ Shogi as FairySFStandard, Variant as FairySFVariant }
+import strategygames.samurai.variant.{ Oware as SamuraiStandard, Variant as SamuraiVariant }
 import strategygames.togyzkumalak.variant.{
-  Variant => TogyzkumalakVariant,
-  Togyzkumalak => TogyzkumalakStandard
+  Togyzkumalak as TogyzkumalakStandard,
+  Variant as TogyzkumalakVariant
 }
-import strategygames.go.variant.{ Variant => GoVariant, Go19x19 => GoStandard }
-import strategygames.backgammon.variant.{ Variant => BackgammonVariant, Backgammon => BackgammonStandard }
-import strategygames.abalone.variant.{ Variant => AbaloneVariant, Abalone => AbaloneStandard }
-import strategygames.dameo.variant.{ Variant => DameoVariant, Dameo => DameoStandard }
+import strategygames.go.variant.{ Go19x19 as GoStandard, Variant as GoVariant }
+import strategygames.backgammon.variant.{ Backgammon as BackgammonStandard, Variant as BackgammonVariant }
+import strategygames.abalone.variant.{ Abalone as AbaloneStandard, Variant as AbaloneVariant }
+import strategygames.dameo.variant.{ Dameo as DameoStandard, Variant as DameoVariant }
 import org.joda.time.DateTime
-import reactivemongo.api.bson._
+import reactivemongo.api.bson.*
 import scala.util.{ Success, Try }
 
 import lila.db.BSON
-import lila.db.dsl._
+import lila.db.dsl.*
 
 object BSONHandlers {
 
   import lila.db.ByteArray.ByteArrayBSONHandler
 
-  implicit private[game] val checkCountWriter: BSONWriter[chess.CheckCount] = new BSONWriter[chess.CheckCount] {
-    def writeTry(cc: chess.CheckCount) = Success(BSONArray(cc.p1, cc.p2))
-  }
+  implicit private[game] val checkCountWriter: BSONWriter[chess.CheckCount] =
+    new BSONWriter[chess.CheckCount] {
+      def writeTry(cc: chess.CheckCount) = Success(BSONArray(cc.p1, cc.p2))
+    }
 
   implicit private[game] val scoreWriter: BSONWriter[Score] = new BSONWriter[Score] {
     def writeTry(sc: Score) = Success(BSONArray(sc.p1, sc.p2))
   }
 
   implicit val StatusBSONHandler: BSONHandler[Status] = tryHandler[Status](
-    { case BSONInteger(v) => Status(v) `toTry` s"No such status: $v" },
+    { case BSONInteger(v) => Status(v).toTry(s"No such status: $v") },
     x => BSONInteger(x.id)
   )
 
   implicit private[game] val unmovedRooksHandler: BSONHandler[chess.UnmovedRooks] =
     tryHandler[chess.UnmovedRooks](
       { case bin: BSONBinary => ByteArrayBSONHandler.readTry(bin) map BinaryFormat.unmovedRooks.read },
-      x => ByteArrayBSONHandler.writeTry(BinaryFormat.unmovedRooks `write` x).get
+      x => ByteArrayBSONHandler.writeTry(BinaryFormat.unmovedRooks.write(x)).get
     )
 
   implicit private[game] val pocketDataBSONHandler: BSON[PocketData] = new BSON[PocketData] {
@@ -86,7 +87,7 @@ object BSONHandlers {
               pockets = {
                 val (p1, p2) = {
                   r.str("p").view.flatMap(c => chess.Piece.fromChar(c)).to(List)
-                }.partition(_ `is` P1)
+                }.partition(_.is(P1))
                 Pockets(
                   p1 = Pocket(p1.map(_.role).map(Role.ChessRole.apply)),
                   p2 = Pocket(p2.map(_.role).map(Role.ChessRole.apply))
@@ -101,7 +102,7 @@ object BSONHandlers {
               pockets = {
                 val (p1, p2) = {
                   r.str("p").view.flatMap(c => fairysf.Piece.fromChar(GameFamily(r.intD("f")), c)).to(List)
-                }.partition(_ `is` P1)
+                }.partition(_.is(P1))
                 Pockets(
                   p1 = Pocket(p1.map(_.role).map(Role.FairySFRole.apply)),
                   p2 = Pocket(p2.map(_.role).map(Role.FairySFRole.apply))
@@ -116,7 +117,7 @@ object BSONHandlers {
               pockets = {
                 val (p1, p2) = {
                   r.str("p").view.flatMap(c => go.Piece.fromChar(c)).to(List)
-                }.partition(_ `is` P1)
+                }.partition(_.is(P1))
                 Pockets(
                   p1 = Pocket(p1.map(_.role).map(Role.GoRole.apply)),
                   p2 = Pocket(p2.map(_.role).map(Role.GoRole.apply))
@@ -133,7 +134,7 @@ object BSONHandlers {
                     .view
                     .flatMap(c => backgammon.Piece.fromChar(c))
                     .to(List)
-                }.partition(_ `is` P1)
+                }.partition(_.is(P1))
                 Pockets(
                   p1 = Pocket(p1.map(_.role).map(Role.BackgammonRole.apply)),
                   p2 = Pocket(p2.map(_.role).map(Role.BackgammonRole.apply))
@@ -147,7 +148,7 @@ object BSONHandlers {
     def writes(w: BSON.Writer, o: PocketData) =
       BSONDocument(
         "l" -> o.gameLogic.id,
-        //TODO Move this into SG
+        // TODO Move this into SG
         "f" -> (o match {
           case PocketData.Chess(_)      => 0
           case PocketData.FairySF(pd)   => pd.gameFamily.getOrElse(GameFamily.Shogi()).id
@@ -192,7 +193,7 @@ object BSONHandlers {
     { case arr: BSONArray =>
       Success(arr.values.foldLeft(GameDrawOffers.empty) {
         case (offers, BSONInteger(p)) =>
-          if (p > 0) offers.copy(p1 = offers.p1 incl p)
+          if p > 0 then offers.copy(p1 = offers.p1 incl p)
           else offers.copy(p2 = offers.p2 incl -p)
         case (offers, _) => offers
       })
@@ -221,87 +222,90 @@ object BSONHandlers {
   import Player.playerBSONHandler
   private val emptyPlayerBuilder = playerBSONHandler.read($empty)
 
-  implicit private[game] val kingMovesWriter: BSONWriter[draughts.KingMoves] = new BSONWriter[draughts.KingMoves] {
-    def writeTry(km: draughts.KingMoves) = Try {
-      BSONArray(km.p1, km.p2, km.p1King.fold(0)(_.fieldNumber), km.p2King.fold(0)(_.fieldNumber))
+  implicit private[game] val kingMovesWriter: BSONWriter[draughts.KingMoves] =
+    new BSONWriter[draughts.KingMoves] {
+      def writeTry(km: draughts.KingMoves) = Try {
+        BSONArray(km.p1, km.p2, km.p1King.fold(0)(_.fieldNumber), km.p2King.fold(0)(_.fieldNumber))
+      }
     }
-  }
 
   implicit val gameBSONHandler: BSON[Game] = new BSON[Game] {
 
-    import Game.{ BSONFields => F }
+    import Game.BSONFields as F
     import PgnImport.pgnImportBSONHandler
 
     def reads(r: BSON.Reader): Game = {
 
       lila.mon.game.fetch.increment()
 
-      val light     = lightGameBSONHandler.readsWithPlayerIds(r, r `str` F.playerIds)
-      val createdAt = r `date` F.createdAt
+      val light     = lightGameBSONHandler.readsWithPlayerIds(r, r.str(F.playerIds))
+      val createdAt = r.date(F.createdAt)
 
-      val startedAtTurn = r `intD` F.startedAtTurn
-      val startedAtPly  = r `intD` F.startedAtPly
+      val startedAtTurn = r.intD(F.startedAtTurn)
+      val startedAtPly  = r.intD(F.startedAtPly)
       // do we need to cap turns on reading?
-      val turns = r `int` F.turns `atMost` Game.maxTurns
+      val turns = r.int(F.turns).atMost(Game.maxTurns)
       // capping because unlimited can cause StackOverflowError
-      val plies = ((r `intO` F.plies) | turns) `atMost` Game.maxPlies
+      val plies = ((r.intO(F.plies)) | turns).atMost(Game.maxPlies)
 
       val playedPlies = plies - startedAtPly
 
-      val turnPlayerIndex = PlayerIndex(((r `intO` F.activePlayer) | (turns % 2 + 1)) == 1)
+      val turnPlayerIndex = PlayerIndex(((r.intO(F.activePlayer)) | (turns % 2 + 1)) == 1)
 
       val periodEntries = readPeriodEntries(r)
 
       val defaultMetaData =
         Metadata(
-          source = r `intO` F.source flatMap Source.apply,
+          source = r.intO(F.source) flatMap Source.apply,
           pgnImport = r.getO[PgnImport](F.pgnImport)(using PgnImport.pgnImportBSONHandler),
-          tournamentId = r `strO` F.tournamentId,
-          swissId = r `strO` F.swissId,
-          simulId = r `strO` F.simulId,
-          multiMatch = r `strO` F.multiMatch,
-          analysed = r `boolD` F.analysed,
-          fromHandicappedTournament = r `boolD` F.fromHandicappedTournament,
+          tournamentId = r.strO(F.tournamentId),
+          swissId = r.strO(F.swissId),
+          simulId = r.strO(F.simulId),
+          multiMatch = r.strO(F.multiMatch),
+          analysed = r.boolD(F.analysed),
+          fromHandicappedTournament = r.boolD(F.fromHandicappedTournament),
           drawOffers = r.getD(F.drawOffers, GameDrawOffers.empty)
         )
 
-      val clock = r.getO[PlayerIndex => ClockBase](F.clock)(using
-        clockBSONReader(
-          r.intO(F.clockType),
-          createdAt,
-          periodEntries,
-          light.p1Player.berserk,
-          light.p2Player.berserk
+      val clock = r
+        .getO[PlayerIndex => ClockBase](F.clock)(using
+          clockBSONReader(
+            r.intO(F.clockType),
+            createdAt,
+            periodEntries,
+            light.p1Player.berserk,
+            light.p2Player.berserk
+          )
         )
-      ).map(_(turnPlayerIndex))
+        .map(_(turnPlayerIndex))
 
       def readChessGame(r: BSON.Reader): (StratGame, Metadata) = {
 
-        val gameVariant = ChessVariant(r `intD` F.variant) | ChessStandard
+        val gameVariant = ChessVariant(r.intD(F.variant)) | ChessStandard
 
         val decoded = r.bytesO(F.huffmanPgn).map { PgnStorage.Huffman.decode(_, playedPlies) } | {
           val clm        = r.get[CastleLastMove](F.castleLastMove)
-          val actionStrs = PgnStorage.OldBin.decode(r `bytesD` F.oldPgn, playedPlies)
+          val actionStrs = PgnStorage.OldBin.decode(r.bytesD(F.oldPgn), playedPlies)
           PgnStorage.Decoded(
             actionStrs = actionStrs,
-            pieces = BinaryFormat.piece.readChess(r `bytes` F.binaryPieces, gameVariant),
+            pieces = BinaryFormat.piece.readChess(r.bytes(F.binaryPieces), gameVariant),
             positionHashes = r.getO[PositionHash](F.positionHashes) | Array.empty,
             unmovedRooks = r.getO[chess.UnmovedRooks](F.unmovedRooks) | chess.UnmovedRooks.default,
             lastMove = clm.lastMove,
             castles = clm.castles,
-            //TODO monster chess. Currently we can flatten as chess does not have any multiaction games (yet)
-            halfMoveClock = actionStrs.flatten.reverse.indexWhere(san =>
-              san.contains("x") || san.headOption.exists(_.isLower)
-            ) `atLeast` 0
+            // TODO monster chess. Currently we can flatten as chess does not have any multiaction games (yet)
+            halfMoveClock = actionStrs.flatten.reverse
+              .indexWhere(san => san.contains("x") || san.headOption.exists(_.isLower))
+              .atLeast(0)
           )
         }
 
         def turnUcis(turnStr: Option[String]) =
           turnStr.map(_.split(",").toList.flatMap(chess.format.Uci.apply))
 
-        //Need to store lastTurn differently in case of multiaction
-        val lastTurnUcis    = turnUcis(r `strO` F.historyLastTurn).getOrElse(decoded.lastMove.toList)
-        val currentTurnUcis = turnUcis(r `strO` F.historyCurrentTurn).getOrElse(List.empty)
+        // Need to store lastTurn differently in case of multiaction
+        val lastTurnUcis    = turnUcis(r.strO(F.historyLastTurn)).getOrElse(decoded.lastMove.toList)
+        val currentTurnUcis = turnUcis(r.strO(F.historyCurrentTurn)).getOrElse(List.empty)
 
         val chessGame = StratGame.Chess(
           chess.Game(
@@ -315,13 +319,13 @@ object BSONHandlers {
                   halfMoveClock = decoded.halfMoveClock,
                   positionHashes = decoded.positionHashes,
                   unmovedRooks = decoded.unmovedRooks,
-                  checkCount = if (gameVariant.key == "threeCheck" || gameVariant.key == "fiveCheck") {
+                  checkCount = if gameVariant.key == "threeCheck" || gameVariant.key == "fiveCheck" then {
                     val counts = r.intsD(F.checkCount)
                     chess.CheckCount(~counts.headOption, ~counts.lastOption)
                   } else Game.emptyCheckCount
                 ),
                 variant = gameVariant,
-                pocketData = gameVariant.dropsVariant `option` (r.get[PocketData](F.pocketData)) match {
+                pocketData = gameVariant.dropsVariant.option(r.get[PocketData](F.pocketData)) match {
                   case Some(PocketData.Chess(pd)) => Some(pd)
                   case None                       => None
                   case _                          => sys.error("non chess pocket data")
@@ -343,24 +347,24 @@ object BSONHandlers {
 
       def readDraughtsGame(r: BSON.Reader): (StratGame, Metadata) = {
 
-        val gameVariant = DraughtsVariant(r `intD` F.variant) | DraughtsStandard
+        val gameVariant = DraughtsVariant(r.intD(F.variant)) | DraughtsStandard
 
-        val actionStrs = NewLibStorage.OldBin.decode(GameLogic.Draughts(), r `bytesD` F.oldPgn, playedPlies)
+        val actionStrs = NewLibStorage.OldBin.decode(GameLogic.Draughts(), r.bytesD(F.oldPgn), playedPlies)
 
         val decodedBoard = draughts.Board(
-          pieces = BinaryFormat.piece.readDraughts(r `bytes` F.binaryPieces, gameVariant),
+          pieces = BinaryFormat.piece.readDraughts(r.bytes(F.binaryPieces), gameVariant),
           history = draughts.DraughtsHistory(
-            //whilst Draughts isnt upgraded to multiaction
-            lastMove = r `strO` F.historyLastTurn flatMap (draughts.format.Uci.apply),
+            // whilst Draughts isnt upgraded to multiaction
+            lastMove = r.strO(F.historyLastTurn) flatMap (draughts.format.Uci.apply),
             positionHashes = r.getO[PositionHash](F.positionHashes) | Array.empty,
-            kingMoves = if (gameVariant.frisianVariant || gameVariant.draughts64Variant) {
+            kingMoves = if gameVariant.frisianVariant || gameVariant.draughts64Variant then {
               val counts = r.intsD(F.kingMoves)
-              if (counts.length > 0) {
+              if counts.length > 0 then {
                 draughts.KingMoves(
                   ~counts.headOption,
                   ~counts.tail.headOption,
-                  if (counts.length > 2) gameVariant.boardSize.pos.posAt(counts(2)) else none,
-                  if (counts.length > 3) gameVariant.boardSize.pos.posAt(counts(3)) else none
+                  if counts.length > 2 then gameVariant.boardSize.pos.posAt(counts(2)) else none,
+                  if counts.length > 3 then gameVariant.boardSize.pos.posAt(counts(3)) else none
                 )
               } else draughts.KingMoves(0, 0)
             } else draughts.KingMoves(0, 0),
@@ -369,10 +373,10 @@ object BSONHandlers {
           variant = gameVariant
         )
 
-        //we can flatten as draughts does not have any multiaction games (yet)
+        // we can flatten as draughts does not have any multiaction games (yet)
         val midCapture =
           actionStrs.flatten.lastOption.fold(false)(_.indexOf('x') != -1) && decodedBoard.ghosts != 0
-        val currentPly = if (midCapture) plies - 1 else plies
+        val currentPly = if midCapture then plies - 1 else plies
 
         val decodedSituation = draughts.Situation(
           board = decodedBoard,
@@ -384,7 +388,7 @@ object BSONHandlers {
             situation = decodedSituation,
             actionStrs = actionStrs,
             clock = clock,
-            //whilst Draughts isnt upgraded to multiaction
+            // whilst Draughts isnt upgraded to multiaction
             plies = currentPly,
             turnCount = currentPly,
             startedAtPly = startedAtPly,
@@ -393,9 +397,9 @@ object BSONHandlers {
         )
 
         val draughtsMetaData = defaultMetaData.copy(
-          simulPairing = r `intO` F.simulPairing,
-          timeOutUntil = r `dateO` F.timeOutUntil,
-          drawLimit = r `intO` F.drawLimit
+          simulPairing = r.intO(F.simulPairing),
+          timeOutUntil = r.dateO(F.timeOutUntil),
+          drawLimit = r.intO(F.drawLimit)
         )
 
         (draughtsGame, draughtsMetaData)
@@ -403,9 +407,9 @@ object BSONHandlers {
 
       def readFairySFGame(r: BSON.Reader): (StratGame, Metadata) = {
 
-        val gameVariant = FairySFVariant(r `intD` F.variant) | FairySFStandard
+        val gameVariant = FairySFVariant(r.intD(F.variant)) | FairySFStandard
 
-        val actionStrs = NewLibStorage.OldBin.decode(GameLogic.FairySF(), r `bytesD` F.oldPgn, playedPlies)
+        val actionStrs = NewLibStorage.OldBin.decode(GameLogic.FairySF(), r.bytesD(F.oldPgn), playedPlies)
 
         def turnUcis(turnStr: Option[String]) =
           turnStr
@@ -416,19 +420,19 @@ object BSONHandlers {
           fairysf.Game(
             situation = fairysf.Situation(
               fairysf.Board(
-                pieces = BinaryFormat.piece.readFairySF(r `bytes` F.binaryPieces, gameVariant),
+                pieces = BinaryFormat.piece.readFairySF(r.bytes(F.binaryPieces), gameVariant),
                 history = fairysf.History(
-                  lastTurn = turnUcis(r `strO` F.historyLastTurn),
-                  currentTurn = turnUcis(r `strO` F.historyCurrentTurn),
-                  //we can flatten as fairysf does not have any true multiaction games (yet)
-                  //TODO: Is halfMoveClock even doing anything for fairysf?
-                  halfMoveClock = actionStrs.flatten.reverse.indexWhere(san =>
-                    san.contains("x") || san.headOption.exists(_.isLower)
-                  ) `atLeast` 0,
+                  lastTurn = turnUcis(r.strO(F.historyLastTurn)),
+                  currentTurn = turnUcis(r.strO(F.historyCurrentTurn)),
+                  // we can flatten as fairysf does not have any true multiaction games (yet)
+                  // TODO: Is halfMoveClock even doing anything for fairysf?
+                  halfMoveClock = actionStrs.flatten.reverse
+                    .indexWhere(san => san.contains("x") || san.headOption.exists(_.isLower))
+                    .atLeast(0),
                   positionHashes = r.getO[PositionHash](F.positionHashes) | Array.empty
                 ),
                 variant = gameVariant,
-                pocketData = gameVariant.dropsVariant `option` (r.get[PocketData](F.pocketData)) match {
+                pocketData = gameVariant.dropsVariant.option(r.get[PocketData](F.pocketData)) match {
                   case Some(PocketData.FairySF(pd)) => Some(pd)
                   case None                         => None
                   case _                            => sys.error("non fairysf pocket data")
@@ -452,9 +456,9 @@ object BSONHandlers {
 
       def readSamuraiGame(r: BSON.Reader): (StratGame, Metadata) = {
 
-        val gameVariant = SamuraiVariant(r `intD` F.variant) | SamuraiStandard
+        val gameVariant = SamuraiVariant(r.intD(F.variant)) | SamuraiStandard
 
-        val actionStrs = NewLibStorage.OldBin.decode(GameLogic.Samurai(), r `bytesD` F.oldPgn, playedPlies)
+        val actionStrs = NewLibStorage.OldBin.decode(GameLogic.Samurai(), r.bytesD(F.oldPgn), playedPlies)
 
         def turnUcis(turnStr: Option[String]) =
           turnStr.map(_.split(",").toList.flatMap(samurai.format.Uci.apply)).getOrElse(List.empty)
@@ -463,15 +467,15 @@ object BSONHandlers {
           samurai.Game(
             situation = samurai.Situation(
               samurai.Board(
-                pieces = BinaryFormat.piece.readSamurai(r `bytes` F.binaryPieces, gameVariant),
+                pieces = BinaryFormat.piece.readSamurai(r.bytes(F.binaryPieces), gameVariant),
                 history = samurai.History(
-                  lastTurn = turnUcis(r `strO` F.historyLastTurn),
-                  currentTurn = turnUcis(r `strO` F.historyCurrentTurn),
-                  //we can flatten as samurai does not have any multiaction games
-                  //TODO: Is halfMoveClock even doing anything for samurai?
-                  halfMoveClock = actionStrs.flatten.reverse.indexWhere(san =>
-                    san.contains("x") || san.headOption.exists(_.isLower)
-                  ) `atLeast` 0,
+                  lastTurn = turnUcis(r.strO(F.historyLastTurn)),
+                  currentTurn = turnUcis(r.strO(F.historyCurrentTurn)),
+                  // we can flatten as samurai does not have any multiaction games
+                  // TODO: Is halfMoveClock even doing anything for samurai?
+                  halfMoveClock = actionStrs.flatten.reverse
+                    .indexWhere(san => san.contains("x") || san.headOption.exists(_.isLower))
+                    .atLeast(0),
                   positionHashes = r.getO[PositionHash](F.positionHashes) | Array.empty
                 ),
                 variant = gameVariant,
@@ -493,9 +497,10 @@ object BSONHandlers {
 
       def readTogyzkumalakGame(r: BSON.Reader): (StratGame, Metadata) = {
 
-        val gameVariant = TogyzkumalakVariant(r `intD` F.variant) | TogyzkumalakStandard
+        val gameVariant = TogyzkumalakVariant(r.intD(F.variant)) | TogyzkumalakStandard
 
-        val actionStrs = NewLibStorage.OldBin.decode(GameLogic.Togyzkumalak(), r `bytesD` F.oldPgn, playedPlies)
+        val actionStrs =
+          NewLibStorage.OldBin.decode(GameLogic.Togyzkumalak(), r.bytesD(F.oldPgn), playedPlies)
 
         def turnUcis(turnStr: Option[String]) =
           turnStr.map(_.split(",").toList.flatMap(togyzkumalak.format.Uci.apply)).getOrElse(List.empty)
@@ -505,16 +510,16 @@ object BSONHandlers {
             situation = togyzkumalak.Situation(
               togyzkumalak.Board(
                 pieces = BinaryFormat.piece
-                  .readTogyzkumalak(r `bytes` F.binaryPieces, gameVariant)
+                  .readTogyzkumalak(r.bytes(F.binaryPieces), gameVariant)
                   .filterNot { case (_, posInfo) => posInfo._2 == 0 },
                 history = togyzkumalak.History(
-                  lastTurn = turnUcis(r `strO` F.historyLastTurn),
-                  currentTurn = turnUcis(r `strO` F.historyCurrentTurn),
-                  //we can flatten as togyzkumalak does not have any multiaction games
-                  //TODO: Is halfMoveClock even doing anything for togyzkumalak?
-                  halfMoveClock = actionStrs.flatten.reverse.indexWhere(san =>
-                    san.contains("x") || san.headOption.exists(_.isLower)
-                  ) `atLeast` 0,
+                  lastTurn = turnUcis(r.strO(F.historyLastTurn)),
+                  currentTurn = turnUcis(r.strO(F.historyCurrentTurn)),
+                  // we can flatten as togyzkumalak does not have any multiaction games
+                  // TODO: Is halfMoveClock even doing anything for togyzkumalak?
+                  halfMoveClock = actionStrs.flatten.reverse
+                    .indexWhere(san => san.contains("x") || san.headOption.exists(_.isLower))
+                    .atLeast(0),
                   positionHashes = r.getO[PositionHash](F.positionHashes) | Array.empty,
                   score = {
                     val counts = r.intsD(F.score)
@@ -539,30 +544,30 @@ object BSONHandlers {
 
       def readGoGame(r: BSON.Reader): (StratGame, Metadata) = {
 
-        val gameVariant = GoVariant(r `intD` F.variant) | GoStandard
+        val gameVariant = GoVariant(r.intD(F.variant)) | GoStandard
 
-        val actionStrs = NewLibStorage.OldBin.decode(GameLogic.Go(), r `bytesD` F.oldPgn, playedPlies)
+        val actionStrs = NewLibStorage.OldBin.decode(GameLogic.Go(), r.bytesD(F.oldPgn), playedPlies)
         val uciMoves   = actionStrs.flatten.toList
 
-        //This is different for Go because select squares uci uses commas
-        //When we change ss to a proper multiaction sequence we will need to change this
+        // This is different for Go because select squares uci uses commas
+        // When we change ss to a proper multiaction sequence we will need to change this
         def turnUcis(turnStr: Option[String]) = turnStr.flatMap(go.format.Uci.apply).toList
 
-        val initialFen: Option[FEN] = r.getO[FEN](F.initialFen) //for handicapped games
+        val initialFen: Option[FEN] = r.getO[FEN](F.initialFen) // for handicapped games
 
         val goGame = StratGame.Go(
           go.Game(
             situation = go.Situation(
               go.Board(
-                pieces = BinaryFormat.piece.readGo(r `bytes` F.binaryPieces, gameVariant),
+                pieces = BinaryFormat.piece.readGo(r.bytes(F.binaryPieces), gameVariant),
                 history = go.History(
-                  lastTurn = turnUcis(r `strO` F.historyLastTurn),
-                  currentTurn = turnUcis(r `strO` F.historyCurrentTurn),
-                  //we can flatten as go does not have any multiaction games
-                  //TODO: Is halfMoveClock even doing anything for togyzkumalak?
-                  halfMoveClock = actionStrs.flatten.reverse.indexWhere(san =>
-                    san.contains("x") || san.headOption.exists(_.isLower)
-                  ) `atLeast` 0,
+                  lastTurn = turnUcis(r.strO(F.historyLastTurn)),
+                  currentTurn = turnUcis(r.strO(F.historyCurrentTurn)),
+                  // we can flatten as go does not have any multiaction games
+                  // TODO: Is halfMoveClock even doing anything for togyzkumalak?
+                  halfMoveClock = actionStrs.flatten.reverse
+                    .indexWhere(san => san.contains("x") || san.headOption.exists(_.isLower))
+                    .atLeast(0),
                   positionHashes = r.getO[PositionHash](F.positionHashes) | Array.empty,
                   score = {
                     val counts = r.intsD(F.score)
@@ -574,7 +579,7 @@ object BSONHandlers {
                   }
                 ),
                 variant = gameVariant,
-                pocketData = gameVariant.dropsVariant `option` (r.get[PocketData](F.pocketData)) match {
+                pocketData = gameVariant.dropsVariant.option(r.get[PocketData](F.pocketData)) match {
                   case Some(PocketData.Go(pd)) => Some(pd)
                   case None                    => None
                   case _                       => sys.error("non go pocket data")
@@ -594,8 +599,8 @@ object BSONHandlers {
           )
         )
         val goMetaData = defaultMetaData.copy(
-          selectedSquares = (r `bytesO` F.selectedSquares).map(BinaryFormat.pos.readGo(_)),
-          deadStoneOfferState = (r `intO` F.deadStoneOfferState) flatMap DeadStoneOfferState.apply
+          selectedSquares = r.bytesO(F.selectedSquares).map(BinaryFormat.pos.readGo(_)),
+          deadStoneOfferState = (r.intO(F.deadStoneOfferState)) flatMap DeadStoneOfferState.apply
         )
         (goGame, goMetaData)
 
@@ -603,9 +608,9 @@ object BSONHandlers {
 
       def readBackgammonGame(r: BSON.Reader): (StratGame, Metadata) = {
 
-        val gameVariant = BackgammonVariant(r `intD` F.variant) | BackgammonStandard
+        val gameVariant = BackgammonVariant(r.intD(F.variant)) | BackgammonStandard
 
-        val actionStrs = NewLibStorage.OldBin.decode(GameLogic.Backgammon(), r `bytesD` F.oldPgn, playedPlies)
+        val actionStrs = NewLibStorage.OldBin.decode(GameLogic.Backgammon(), r.bytesD(F.oldPgn), playedPlies)
 
         def turnUcis(turnStr: Option[String]) =
           turnStr.map(_.split(",").toList.flatMap(backgammon.format.Uci.apply)).getOrElse(List.empty)
@@ -617,15 +622,15 @@ object BSONHandlers {
             situation = backgammon.Situation(
               backgammon.Board(
                 pieces = BinaryFormat.piece
-                  .readBackgammon(r `bytes` F.binaryPieces, gameVariant)
+                  .readBackgammon(r.bytes(F.binaryPieces), gameVariant)
                   .filterNot { case (_, posInfo) => posInfo._2 == 0 },
                 history = backgammon.History(
-                  lastTurn = turnUcis(r `strO` F.historyLastTurn),
-                  currentTurn = turnUcis(r `strO` F.historyCurrentTurn),
-                  //TODO: Is halfMoveClock even doing anything for backgammon?
-                  halfMoveClock = actionStrs.flatten.reverse.indexWhere(san =>
-                    san.contains("x") || san.headOption.exists(_.isLower)
-                  ) `atLeast` 0,
+                  lastTurn = turnUcis(r.strO(F.historyLastTurn)),
+                  currentTurn = turnUcis(r.strO(F.historyCurrentTurn)),
+                  // TODO: Is halfMoveClock even doing anything for backgammon?
+                  halfMoveClock = actionStrs.flatten.reverse
+                    .indexWhere(san => san.contains("x") || san.headOption.exists(_.isLower))
+                    .atLeast(0),
                   positionHashes = r.getO[PositionHash](F.positionHashes) | Array.empty,
                   score = {
                     val counts = r.intsD(F.score)
@@ -635,7 +640,7 @@ object BSONHandlers {
                     multiPointState.map(mps => StratMultiPointState(mps.target, mps.p1Points, mps.p2Points))
                 ),
                 variant = gameVariant,
-                pocketData = gameVariant.dropsVariant `option` (r.get[PocketData](F.pocketData)) match {
+                pocketData = gameVariant.dropsVariant.option(r.get[PocketData](F.pocketData)) match {
                   case Some(PocketData.Backgammon(pd)) => Some(pd)
                   case None                            => None
                   case _                               => sys.error("non backgammon pocket data")
@@ -666,26 +671,26 @@ object BSONHandlers {
 
       def readAbaloneGame(r: BSON.Reader): (StratGame, Metadata) = {
 
-        val gameVariant = AbaloneVariant(r `intD` F.variant) | AbaloneStandard
+        val gameVariant = AbaloneVariant(r.intD(F.variant)) | AbaloneStandard
 
-        val actionStrs = NewLibStorage.OldBin.decode(GameLogic.Abalone(), r `bytesD` F.oldPgn, playedPlies)
+        val actionStrs = NewLibStorage.OldBin.decode(GameLogic.Abalone(), r.bytesD(F.oldPgn), playedPlies)
 
         def turnUcis(turnStr: Option[String]) =
           turnStr.map(_.split(",").toList.flatMap(abalone.format.Uci.apply)).getOrElse(List.empty)
 
-        val currentTurnUcis = turnUcis(r `strO` F.historyCurrentTurn)
+        val currentTurnUcis = turnUcis(r.strO(F.historyCurrentTurn))
 
         val abaloneGame = StratGame.Abalone(
           abalone.Game(
             situation = abalone.Situation(
               abalone.Board(
-                pieces = BinaryFormat.piece.readAbalone(r `bytes` F.binaryPieces, gameVariant),
+                pieces = BinaryFormat.piece.readAbalone(r.bytes(F.binaryPieces), gameVariant),
                 history = abalone.History(
-                  lastTurn = turnUcis(r `strO` F.historyLastTurn),
+                  lastTurn = turnUcis(r.strO(F.historyLastTurn)),
                   currentTurn = currentTurnUcis,
-                  pliesRemainingThisTurn = if (gameVariant.hasPrevPlayer) {
-                    val completedPlies    = if (turns == 0) 0 else 2 * turns - 1
-                    Some((if (turns == 0) 1 else 2) - (plies - completedPlies))
+                  pliesRemainingThisTurn = if gameVariant.hasPrevPlayer then {
+                    val completedPlies = if turns == 0 then 0 else 2 * turns - 1
+                    Some((if turns == 0 then 1 else 2) - (plies - completedPlies))
                   } else None,
                   // halfMoveClock only affects FEN serialization and has no impact on game logic
                   // (3-fold repetition uses positionHashes; no N-move rule for Abalone).
@@ -716,9 +721,9 @@ object BSONHandlers {
 
       def readDameoGame(r: BSON.Reader): (StratGame, Metadata) = {
 
-        val gameVariant = DameoVariant(r `intD` F.variant) | DameoStandard
+        val gameVariant = DameoVariant(r.intD(F.variant)) | DameoStandard
 
-        val actionStrs = NewLibStorage.OldBin.decode(GameLogic.Dameo(), r `bytesD` F.oldPgn, playedPlies)
+        val actionStrs = NewLibStorage.OldBin.decode(GameLogic.Dameo(), r.bytesD(F.oldPgn), playedPlies)
 
         def turnUcis(turnStr: Option[String]) =
           turnStr.map(_.split(",").toList.flatMap(dameo.format.Uci.apply)).getOrElse(List.empty)
@@ -727,11 +732,11 @@ object BSONHandlers {
           dameo.Game(
             situation = dameo.Situation(
               dameo.Board(
-                pieces = BinaryFormat.piece.readDameo(r `bytes` F.binaryPieces, gameVariant),
+                pieces = BinaryFormat.piece.readDameo(r.bytes(F.binaryPieces), gameVariant),
                 history = dameo.History(
-                  lastTurn = turnUcis(r `strO` F.historyLastTurn),
-                  currentTurn = turnUcis(r `strO` F.historyCurrentTurn),
-                  halfMoveClock = r `intD` F.halfMoveClock,
+                  lastTurn = turnUcis(r.strO(F.historyLastTurn)),
+                  currentTurn = turnUcis(r.strO(F.historyCurrentTurn)),
+                  halfMoveClock = r.intD(F.halfMoveClock),
                   positionHashes = r.getO[PositionHash](F.positionHashes) | Array.empty
                 ),
                 variant = gameVariant
@@ -750,7 +755,7 @@ object BSONHandlers {
         (dameoGame, defaultMetaData)
       }
 
-      val libId = r `intD` F.lib
+      val libId                 = r.intD(F.lib)
       val (stratGame, metadata) = libId match {
         case 0 => readChessGame(r)
         case 1 => readDraughtsGame(r)
@@ -771,10 +776,10 @@ object BSONHandlers {
         stratGame = stratGame,
         readClockHistory(r, light, turnPlayerIndex, periodEntries),
         status = light.status,
-        daysPerTurn = r `intO` F.daysPerTurn,
-        binaryPlyTimes = r `bytesO` F.plyTimes,
-        mode = Mode(r `boolD` F.rated),
-        bookmarks = r `intD` F.bookmarks,
+        daysPerTurn = r.intO(F.daysPerTurn),
+        binaryPlyTimes = r.bytesO(F.plyTimes),
+        mode = Mode(r.boolD(F.rated)),
+        bookmarks = r.intD(F.bookmarks),
         createdAt = createdAt,
         updatedAt = r.dateD(F.updatedAt, createdAt),
         turnAt = r.dateD(F.turnAt, createdAt),
@@ -787,24 +792,24 @@ object BSONHandlers {
         F.id         -> o.id,
         F.playerIds  -> (o.p1Player.id + o.p2Player.id),
         F.playerUids -> w.strListO(List(~o.p1Player.userId, ~o.p2Player.userId)),
-        F.p1Player -> w.docO(
-          playerBSONHandler `write` ((_: PlayerIndex) =>
+        F.p1Player   -> w.docO(
+          playerBSONHandler.write((_: PlayerIndex) =>
             (_: Player.ID) => (_: Player.UserId) => (_: Player.Win) => o.p1Player
           )
         ),
         F.p2Player -> w.docO(
-          playerBSONHandler `write` ((_: PlayerIndex) =>
+          playerBSONHandler.write((_: PlayerIndex) =>
             (_: Player.ID) => (_: Player.UserId) => (_: Player.Win) => o.p2Player
           )
         ),
-        F.status        -> o.status,
-        F.turns         -> o.stratGame.turnCount,
-        F.plies         -> w.intO(if (o.stratGame.plies == o.stratGame.turnCount) 0 else o.stratGame.plies),
-        F.activePlayer  -> o.stratGame.situation.player.hashCode,
-        F.startedAtPly  -> w.intO(o.stratGame.startedAtPly),
+        F.status       -> o.status,
+        F.turns        -> o.stratGame.turnCount,
+        F.plies        -> w.intO(if o.stratGame.plies == o.stratGame.turnCount then 0 else o.stratGame.plies),
+        F.activePlayer -> o.stratGame.situation.player.hashCode,
+        F.startedAtPly -> w.intO(o.stratGame.startedAtPly),
         F.startedAtTurn -> w.intO(o.stratGame.startedAtTurn),
         F.clockType     -> o.stratGame.clock.map(clockTypeBSONWrite),
-        F.clock -> (o.stratGame.clock flatMap { c =>
+        F.clock         -> (o.stratGame.clock flatMap { c =>
           clockBSONWrite(o.createdAt, c).toOption
         }),
         F.daysPerTurn               -> o.daysPerTurn,
@@ -813,7 +818,7 @@ object BSONHandlers {
         F.p2ClockHistory            -> clockHistory(P2, o.clockHistory, o.stratGame.clock, o.flagged),
         F.rated                     -> w.boolO(o.mode.rated),
         F.lib                       -> o.board.variant.gameLogic.id,
-        F.variant                   -> o.board.variant.exotic.option(w `int` o.board.variant.id),
+        F.variant                   -> o.board.variant.exotic.option(w.int(o.board.variant.id)),
         F.bookmarks                 -> w.intO(o.bookmarks),
         F.createdAt                 -> w.date(o.createdAt),
         F.updatedAt                 -> w.date(o.updatedAt),
@@ -941,24 +946,24 @@ object BSONHandlers {
               F.historyLastTurn    -> o.history.lastTurnUciString,
               F.historyCurrentTurn -> o.history.currentTurnUciString
             )
-          case _ => //chess or fail
-            if (o.variant.key == "standard")
+          case _ => // chess or fail
+            if o.variant.key == "standard" then
               $doc(F.huffmanPgn -> PgnStorage.Huffman.encode(o.actionStrs.flatten take Game.maxPlies))
             else {
               $doc(
-                F.oldPgn -> PgnStorage.OldBin.encodeActionStrs(o.actionStrs take Game.maxTurns),
+                F.oldPgn       -> PgnStorage.OldBin.encodeActionStrs(o.actionStrs take Game.maxTurns),
                 F.binaryPieces -> BinaryFormat.piece.writeChess(o.board match {
                   case Board.Chess(board) => board.pieces
                   case _                  => sys.error("invalid chess board")
                 }),
                 F.positionHashes -> o.history.positionHashes,
                 F.unmovedRooks   -> o.history.unmovedRooks,
-                //need to store this for multiaction variants. Going to be essentially
-                //storing 'lastMove' twice, once in lastTurn and once in castleLastMove
-                //but want to retain old functionality, and this is only for chess variants
+                // need to store this for multiaction variants. Going to be essentially
+                // storing 'lastMove' twice, once in lastTurn and once in castleLastMove
+                // but want to retain old functionality, and this is only for chess variants
                 F.historyLastTurn    -> o.history.lastTurnUciString,
                 F.historyCurrentTurn -> o.history.currentTurnUciString,
-                F.castleLastMove -> CastleLastMove.castleLastMoveBSONHandler
+                F.castleLastMove     -> CastleLastMove.castleLastMoveBSONHandler
                   .writeTry(
                     CastleLastMove(
                       castles = o.history.castles,
@@ -970,7 +975,7 @@ object BSONHandlers {
                   )
                   .toOption,
                 F.checkCount -> o.history.checkCount.nonEmpty.option(o.history.checkCount),
-                //F.score      -> o.history.score.nonEmpty.option(o.history.score),
+                // F.score      -> o.history.score.nonEmpty.option(o.history.score),
                 F.pocketData -> o.board.pocketData
               )
             }
@@ -991,7 +996,7 @@ object BSONHandlers {
 
   implicit object lightGameBSONHandler extends lila.db.BSONReadOnly[LightGame] {
 
-    import Game.{ BSONFields => F }
+    import Game.BSONFields as F
     import Player.playerBSONHandler
 
     def reads(r: BSON.Reader): LightGame = {
@@ -1001,7 +1006,7 @@ object BSONHandlers {
 
     def readsWithPlayerIds(r: BSON.Reader, playerIds: String): LightGame = {
       val (p1Id, p2Id)   = playerIds splitAt 4
-      val winC           = r `boolO` F.winnerPlayerIndex map (PlayerIndex.fromP1)
+      val winC           = r.boolO(F.winnerPlayerIndex) map (PlayerIndex.fromP1)
       val uids           = ~r.getO[List[lila.user.User.ID]](F.playerUids)
       val (p1Uid, p2Uid) = (uids.headOption.filter(_.nonEmpty), uids.lift(1).filter(_.nonEmpty))
       def makePlayer(field: String, playerIndex: PlayerIndex, id: Player.ID, uid: Player.UserId): Player = {
@@ -1009,19 +1014,19 @@ object BSONHandlers {
         builder(playerIndex)(id)(uid)(winC map (_ == playerIndex))
       }
       LightGame(
-        id = r `str` F.id,
+        id = r.str(F.id),
         p1Player = makePlayer(F.p1Player, P1, p1Id, p1Uid),
         p2Player = makePlayer(F.p2Player, P2, p2Id, p2Uid),
         status = r.get[Status](F.status),
-        lib = r `intD` F.lib,
-        variant_id = r `intD` F.variant
+        lib = r.intD(F.lib),
+        variant_id = r.intD(F.variant)
       )
     }
   }
 
-  //------------------------------------------------------------------------------
+  // ------------------------------------------------------------------------------
   // General API
-  //------------------------------------------------------------------------------
+  // ------------------------------------------------------------------------------
   private[game] def clockTypeBSONWrite(clock: ClockBase) =
     // NOTE: If you're changing this, the read below also needs to be changed.
     clock.config match {
@@ -1079,24 +1084,24 @@ object BSONHandlers {
       turnPlayerIndex: PlayerIndex,
       periodEntries: Option[PeriodEntries]
   ) = {
-    import Game.{ BSONFields => F }
-    val p1ClockHistory = r `bytesO` F.p1ClockHistory
-    val p2ClockHistory = r `bytesO` F.p2ClockHistory
+    import Game.BSONFields as F
+    val p1ClockHistory = r.bytesO(F.p1ClockHistory)
+    val p2ClockHistory = r.bytesO(F.p2ClockHistory)
     (clk: ClockBase) =>
       for {
-        bw <- p1ClockHistory
-        bb <- p2ClockHistory
+        bw      <- p1ClockHistory
+        bb      <- p2ClockHistory
         history <-
           clk.config match {
             case fc: Clock.Config =>
               BinaryFormat.fischerClockHistory
-                .read(fc.limit, bw, bb, (Status.flagged.contains(light.status)).option(turnPlayerIndex))
+                .read(fc.limit, bw, bb, Status.flagged.contains(light.status).option(turnPlayerIndex))
             case bdc: Clock.BronsteinConfig =>
               BinaryFormat.delayClockHistory
-                .read(bdc.limit, bw, bb, (Status.flagged.contains(light.status)).option(turnPlayerIndex))
+                .read(bdc.limit, bw, bb, Status.flagged.contains(light.status).option(turnPlayerIndex))
             case sdc: Clock.SimpleDelayConfig =>
               BinaryFormat.delayClockHistory
-                .read(sdc.limit, bw, bb, (Status.flagged.contains(light.status)).option(turnPlayerIndex))
+                .read(sdc.limit, bw, bb, Status.flagged.contains(light.status).option(turnPlayerIndex))
             case bc: ByoyomiClock.Config =>
               BinaryFormat.byoyomiClockHistory
                 .read(
@@ -1105,7 +1110,7 @@ object BSONHandlers {
                   bw,
                   bb,
                   periodEntries.getOrElse(PeriodEntries.default),
-                  (Status.flagged.contains(light.status)).option(turnPlayerIndex)
+                  Status.flagged.contains(light.status).option(turnPlayerIndex)
                 )
           }
         _ = lila.mon.game.loadClockHistory.increment()
@@ -1116,9 +1121,9 @@ object BSONHandlers {
     //                                           rather than turnPlayerIndex?
   }
 
-  //------------------------------------------------------------------------------
+  // ------------------------------------------------------------------------------
   // FischerClock stuff
-  //------------------------------------------------------------------------------
+  // ------------------------------------------------------------------------------
   private[game] def otherClockBSONReader(
       configConstructor: (Int, Int) => ClockConfig,
       since: DateTime,
@@ -1143,15 +1148,15 @@ object BSONHandlers {
       BinaryFormat.fischerClock(since).write(clock)
     }
 
-  //------------------------------------------------------------------------------
+  // ------------------------------------------------------------------------------
   // ByoyomiClock  stuff
-  //------------------------------------------------------------------------------
+  // ------------------------------------------------------------------------------
   def readPeriodEntries(r: BSON.Reader) = {
-    import Game.{ BSONFields => F }
+    import Game.BSONFields as F
     BinaryFormat.periodEntries
       .read(
-        r `bytesD` F.periodsP1,
-        r `bytesD` F.periodsP2
+        r.bytesD(F.periodsP1),
+        r.bytesD(F.periodsP2)
       )
   }
 

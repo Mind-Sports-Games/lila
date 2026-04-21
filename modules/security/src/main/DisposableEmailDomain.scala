@@ -1,7 +1,7 @@
 package lila.security
 
 import play.api.libs.ws.StandaloneWSClient
-import play.api.libs.ws.DefaultBodyReadables._
+import play.api.libs.ws.DefaultBodyReadables.*
 
 import lila.common.Domain
 

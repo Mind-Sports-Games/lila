@@ -1,8 +1,8 @@
 package lila.insight
 
-import reactivemongo.api.bson._
+import reactivemongo.api.bson.*
 
-import lila.db.dsl._
+import lila.db.dsl.*
 import lila.user.User
 
 final private class AggregationPipeline(store: Storage)(implicit ec: scala.concurrent.ExecutionContext) {
@@ -11,13 +11,13 @@ final private class AggregationPipeline(store: Storage)(implicit ec: scala.concu
     store.coll {
       _.aggregateWith[Bdoc](
         allowDiskUse = true
-      ) { (framework) =>
-        import framework._
+      ) { framework =>
+        import framework.*
         import question.{ dimension, filters, metric }
 
-        import lila.insight.{ Dimension => D, Metric => M }
-        import InsightEntry.{ BSONFields => F }
-        import Storage._
+        import lila.insight.{ Dimension as D, Metric as M }
+        import InsightEntry.BSONFields as F
+        import Storage.*
 
         val sampleGames    = Sample(10_000)
         val sampleMoves    = Sample(200_000).some
@@ -61,7 +61,7 @@ final private class AggregationPipeline(store: Storage)(implicit ec: scala.concu
               case (acc, mat) =>
                 $doc(
                   "$cond" -> $arr(
-                    $doc((if (mat.negative) "$lt" else "$lte") -> $arr("$" + F.moves("i"), mat.imbalance)),
+                    $doc((if mat.negative then "$lt" else "$lte") -> $arr("$" + F.moves("i"), mat.imbalance)),
                     mat.id,
                     acc
                   )

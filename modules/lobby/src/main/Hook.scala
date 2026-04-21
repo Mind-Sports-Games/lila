@@ -4,7 +4,7 @@ import strategygames.{ ClockConfig, GameLogic, Mode, Speed }
 import strategygames.variant.Variant
 import org.joda.time.DateTime
 import play.api.i18n.Lang
-import play.api.libs.json._
+import play.api.libs.json.*
 
 import lila.game.PerfPicker
 import lila.rating.RatingRange
@@ -28,11 +28,11 @@ case class Hook(
     boardApi: Boolean
 ) {
 
-  val realPlayerIndex = PlayerIndex `orDefault` playerIndex
+  val realPlayerIndex = PlayerIndex.orDefault(playerIndex)
 
   val realVariant = Variant.orDefault(lib, variant)
 
-  val realMode = Mode `orDefault` mode
+  val realMode = Mode.orDefault(mode)
 
   val isAuth = user.nonEmpty
 
@@ -42,7 +42,7 @@ case class Hook(
       lib == h.lib &&
       variant == h.variant &&
       clock == h.clock &&
-      (realPlayerIndex `compatibleWith` h.realPlayerIndex) &&
+      (realPlayerIndex.compatibleWith(h.realPlayerIndex)) &&
       ratingRangeCompatibleWith(h) && h.ratingRangeCompatibleWith(this) &&
       (userId.isEmpty || userId != h.userId)
 
@@ -52,7 +52,7 @@ case class Hook(
     }
 
   lazy val realRatingRange: Option[RatingRange] = isAuth so {
-    RatingRange `noneIfDefault` ratingRange
+    RatingRange.noneIfDefault(ratingRange)
   }
 
   def userId   = user.map(_.id)
@@ -61,11 +61,11 @@ case class Hook(
 
   lazy val perfType = PerfPicker.perfType(speed, realVariant, none)
 
-  lazy val perf: Option[LobbyPerf] = for { u <- user; pt <- perfType } yield u `perfAt` pt
+  lazy val perf: Option[LobbyPerf] = for { u <- user; pt <- perfType } yield u.perfAt(pt)
   def rating: Option[Int]          = perf.map(_.rating)
 
   val message = s"[Play](<https://playstrategy.org>) live **${VariantKeys
-    .variantName(realVariant)}** with ${user.fold(User.anonymous)(u => "@" + u.username)} (${clock.show})"
+      .variantName(realVariant)}** with ${user.fold(User.anonymous)(u => "@" + u.username)} (${clock.show})"
 
   def render(implicit lang: Lang): JsObject =
     Json
@@ -75,7 +75,7 @@ case class Hook(
         "clock" -> clock.show,
         "t"     -> clock.estimateTotalSeconds,
         "s"     -> speed.id,
-        "i"     -> (if (clock.graceSeconds > 0) 1 else 0)
+        "i"     -> (if clock.graceSeconds > 0 then 1 else 0)
       )
       .add("prov" -> perf.map(_.provisional).filter(identity))
       .add("u" -> user.map(_.username))
@@ -130,7 +130,7 @@ object Hook {
       boardApi: Boolean = false
   ): Hook =
     new Hook(
-      id = lila.common.ThreadLocalRandom `nextString` idSize,
+      id = lila.common.ThreadLocalRandom.nextString(idSize),
       sri = sri,
       lib = variant.gameLogic,
       variant = variant.id,

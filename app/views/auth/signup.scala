@@ -2,9 +2,8 @@ package views.html
 package auth
 
 import lila.api.Context
-import lila.app.templating.Environment._
-import lila.app.ui.ScalatagsTemplate._
-
+import lila.app.templating.Environment.*
+import lila.app.ui.ScalatagsTemplate.*
 
 object signup {
 
@@ -23,7 +22,7 @@ object signup {
       main(cls := "auth auth-signup box box-pad")(
         h1(trans.signUp()),
         postForm(
-          id := "signup-form",
+          id  := "signup-form",
           cls := List(
             "form3"             -> true,
             "h-captcha-enabled" -> form.config.enabled
@@ -42,7 +41,7 @@ object signup {
               br
             )
           ),
-          agreement(form("agreement"), form.form.errors.exists(_.key `startsWith` "agreement.")),
+          agreement(form("agreement"), form.form.errors.exists(_.key.startsWith("agreement."))),
           views.html.base.hcaptcha.tag(form),
           button(cls := "submit button text big")(trans.signUp())
         )
@@ -51,9 +50,11 @@ object signup {
 
   private def agreement(form: play.api.data.Field, error: Boolean)(implicit ctx: Context) =
     div(cls := "agreement")(
-      error `option` p(
-        strong(cls := "error")(
-          "You must agree to the PlayStrategy policies listed below:"
+      error.option(
+        p(
+          strong(cls := "error")(
+            "You must agree to the PlayStrategy policies listed below:"
+          )
         )
       ),
       agreements.map { case (field, i18n) =>

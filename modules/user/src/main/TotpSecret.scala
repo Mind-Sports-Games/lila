@@ -1,7 +1,7 @@
 package lila.user
 
 import org.apache.commons.codec.binary.Base32
-import reactivemongo.api.bson._
+import reactivemongo.api.bson.*
 
 import java.security.SecureRandom
 import javax.crypto.Mac
@@ -10,7 +10,7 @@ import java.nio.ByteBuffer
 import User.TotpToken
 
 case class TotpSecret(secret: Array[Byte]) extends AnyVal {
-  import TotpSecret._
+  import TotpSecret.*
 
   override def toString = "TotpSecret(****)"
 

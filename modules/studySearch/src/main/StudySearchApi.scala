@@ -1,15 +1,15 @@
 package lila.studySearch
 
-import akka.actor._
-import akka.stream.scaladsl._
+import akka.actor.*
+import akka.stream.scaladsl.*
 import strategygames.format.pgn.{ Tag, TagType }
 import org.joda.time.DateTime
 import org.joda.time.format.DateTimeFormat
-import play.api.libs.json._
+import play.api.libs.json.*
 
 import lila.common.extensions.*
 import lila.hub.LateMultiThrottler
-import lila.search._
+import lila.search.*
 import lila.study.{ Chapter, ChapterRepo, RootOrNode, Study, StudyRepo }
 import lila.tree.Node.Comments
 
@@ -26,16 +26,16 @@ final class StudySearchApi(
 
   def search(query: Query, from: From, size: Size) =
     client.search(query, from, size) flatMap { res =>
-      studyRepo `byOrderedIds` res.ids.map(Study.Id.apply)
+      studyRepo.byOrderedIds(res.ids.map(Study.Id.apply))
     }
 
-  def count(query: Query) = client.count(query) `dmap` (_.count)
+  def count(query: Query) = client.count(query).dmap(_.count)
 
   def store(study: Study) =
     fuccess {
       indexThrottler ! LateMultiThrottler.work(
         id = study.id.value,
-        run = studyRepo `byId` study.id flatMap { _ so doStore },
+        run = studyRepo.byId(study.id) flatMap { _ so doStore },
         delay = 30.seconds.some
       )
     }
@@ -49,9 +49,9 @@ final class StudySearchApi(
 
   private def toDoc(s: Study.WithActualChapters) =
     Json.obj(
-      Fields.name    -> s.study.name.value,
-      Fields.owner   -> s.study.ownerId,
-      Fields.members -> s.study.members.ids,
+      Fields.name         -> s.study.name.value,
+      Fields.owner        -> s.study.ownerId,
+      Fields.members      -> s.study.members.ids,
       Fields.chapterNames ->
         s.chapters
           .collect { case c if !Chapter.isDefaultName(c.name) => c.name.value }
@@ -84,9 +84,9 @@ final class StudySearchApi(
 
   private def extraText(c: Chapter): List[String] =
     List(
-      c.isPractice `option` "practice",
-      c.isConceal `option` "conceal puzzle",
-      c.isGamebook `option` "lesson",
+      c.isPractice.option("practice"),
+      c.isConceal.option("conceal puzzle"),
+      c.isGamebook.option("lesson"),
       c.description
     ).flatten
 
@@ -107,9 +107,9 @@ final class StudySearchApi(
       case c: ESClientHttp =>
         {
           val sinceOption: Either[Unit, Option[DateTime]] =
-            if (sinceStr == "reset") Left(()) else Right(parseDate(sinceStr))
+            if sinceStr == "reset" then Left(()) else Right(parseDate(sinceStr))
           val since = sinceOption match {
-            case Right(None) => sys error "Missing since date argument"
+            case Right(None)       => sys error "Missing since date argument"
             case Right(Some(date)) =>
               logger.info(s"Resume since $date")
               date
@@ -120,16 +120,16 @@ final class StudySearchApi(
           }
           logger.info(s"Index to ${c.index.name} since $since")
           val retryLogger = logger.branch("index")
-          import lila.db.dsl._
+          import lila.db.dsl.*
           Source
             .futureSource {
               studyRepo
                 .sortedCursor(
                   $doc("createdAt" `$gte` since),
-                  sort = $sort `asc` "createdAt"
+                  sort = $sort.asc("createdAt")
                 )
                 .map(_.documentSource())
-          }
+            }
             .via(lila.common.LilaStream.logRate[Study]("study index")(logger))
             .mapAsyncUnordered(8) { study =>
               lila.common.LilaFuture.retry(() => doStore(study), 5 seconds, 10, retryLogger.some)
@@ -142,7 +142,7 @@ final class StudySearchApi(
 
   private def parseDate(str: String): Option[DateTime] = {
     val datePattern   = "yyyy-MM-dd"
-    val dateFormatter = DateTimeFormat `forPattern` datePattern
-    scala.util.Try(dateFormatter `parseDateTime` str).toOption
+    val dateFormatter = DateTimeFormat.forPattern(datePattern)
+    scala.util.Try(dateFormatter.parseDateTime(str)).toOption
   }
 }

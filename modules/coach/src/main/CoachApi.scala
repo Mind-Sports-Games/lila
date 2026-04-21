@@ -2,7 +2,7 @@ package lila.coach
 
 import org.joda.time.DateTime
 
-import lila.db.dsl._
+import lila.db.dsl.*
 import lila.db.Photographer
 import lila.notify.{ Notification, NotifyApi }
 import lila.security.Granter
@@ -17,12 +17,12 @@ final class CoachApi(
     notifyApi: NotifyApi
 )(implicit ec: scala.concurrent.ExecutionContext) {
 
-  import BsonHandlers._
+  import BsonHandlers.*
 
   def byId(id: Coach.Id): Fu[Option[Coach]] = coachColl.byId[Coach](id.value)
 
   def find(username: String): Fu[Option[Coach.WithUser]] =
-    userRepo `named` username flatMap { _ so find }
+    userRepo.named(username) flatMap { _ so find }
 
   def find(user: User): Fu[Option[Coach.WithUser]] =
     Granter(_.Coach)(user) so {
@@ -34,7 +34,7 @@ final class CoachApi(
   def findOrInit(coach: Holder): Fu[Option[Coach.WithUser]] =
     Granter.is(_.Coach)(coach) so {
       find(coach.user) orElse {
-        val c = Coach.WithUser(Coach `make` coach.user, coach.user)
+        val c = Coach.WithUser(Coach.make(coach.user), coach.user)
         coachColl.insert.one(c.coach) inject c.some
       }
     }
@@ -71,7 +71,7 @@ final class CoachApi(
       $id(User.normalize(username)),
       $set("approved" -> value)
     ) dmap { result =>
-      if (result.n > 0) "Done!"
+      if result.n > 0 then "Done!"
       else "No such coach"
     }
 
@@ -99,7 +99,7 @@ final class CoachApi(
 
     def add(me: User, coach: Coach, data: CoachReviewForm.Data): Fu[CoachReview] =
       find(me, coach).flatMap { existing =>
-        val id = CoachReview.makeId(me, coach)
+        val id     = CoachReview.makeId(me, coach)
         val review = existing match {
           case None =>
             CoachReview(
@@ -120,7 +120,7 @@ final class CoachApi(
               updatedAt = DateTime.now
             )
         }
-        if (me.marks.troll) fuccess(review)
+        if me.marks.troll then fuccess(review)
         else
           reviewColl.update.one($id(id), review, upsert = true) >>
             notifyApi.addNotification(
@@ -137,7 +137,7 @@ final class CoachApi(
       reviewColl.byId[CoachReview](CoachReview.makeId(user, coach))
 
     def approve(r: CoachReview, v: Boolean) = {
-      if (v)
+      if v then
         reviewColl.update
           .one(
             $id(r.id),
@@ -176,7 +176,7 @@ final class CoachApi(
     def deleteAllBy(userId: User.ID): Funit =
       for {
         reviews <- reviewColl.list[CoachReview]($doc("userId" -> userId))
-        _ <- Future.sequence(reviews.map { review =>
+        _       <- Future.sequence(reviews.map { review =>
           reviewColl.delete.one($doc("userId" -> review.userId)).void
         })
         _ <- Future.sequence(reviews.map(_.coachId).distinct.map(refreshCoachNbReviews))
@@ -185,7 +185,7 @@ final class CoachApi(
     private def findRecent(selector: Bdoc): Fu[CoachReview.Reviews] =
       reviewColl
         .find(selector)
-        .sort($sort `desc` "createdAt")
+        .sort($sort.desc("createdAt"))
         .cursor[CoachReview]()
         .list(100) map CoachReview.Reviews.apply
   }

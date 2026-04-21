@@ -1,8 +1,8 @@
 package views.html.base
 
 import com.github.blemale.scaffeine.LoadingCache
-import scala.concurrent.duration._
-import lila.app.ui.ScalatagsTemplate._
+import scala.concurrent.duration.*
+import lila.app.ui.ScalatagsTemplate.*
 
 object markdown {
 

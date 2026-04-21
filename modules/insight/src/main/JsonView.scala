@@ -1,12 +1,12 @@
 package lila.insight
 
 import play.api.i18n.Lang
-import play.api.libs.json._
+import play.api.libs.json.*
 
 final class JsonView {
 
-  import lila.insight.{ Dimension => D, Metric => M }
-  import writers._
+  import lila.insight.{ Dimension as D, Metric as M }
+  import writers.*
 
   case class Categ(name: String, items: List[JsValue])
   implicit private val categWrites: OWrites[Categ] = Json.writes[Categ]
@@ -18,7 +18,7 @@ final class JsonView {
       "name"        -> D.Opening.name,
       "position"    -> D.Opening.position,
       "description" -> D.Opening.description.render,
-      "values" -> Dimension
+      "values"      -> Dimension
         .valuesOf(D.Opening)
         .filter { o =>
           ecos contains o.eco
@@ -55,7 +55,7 @@ final class JsonView {
           dimensionToJson(D.Phase),
           dimensionToJson(D.CplRange)
         ) ::: {
-          if (asMod) List(dimensionToJson(D.Blur), dimensionToJson(D.TimeVariance))
+          if asMod then List(dimensionToJson(D.Blur), dimensionToJson(D.TimeVariance))
           else Nil
         }
       ),
@@ -83,10 +83,11 @@ final class JsonView {
           Json.toJson(M.Material: Metric),
           Json.toJson(M.NbMoves: Metric)
         ) ++ {
-          if (asMod) List(
-            Json.toJson(M.Blurs: Metric),
-            Json.toJson(M.TimeVariance: Metric)
-          )
+          if asMod then
+            List(
+              Json.toJson(M.Blurs: Metric),
+              Json.toJson(M.TimeVariance: Metric)
+            )
           else Nil
         }
       ),
@@ -112,7 +113,7 @@ final class JsonView {
     Json.obj(
       "dimensionCategs" -> dimensionCategs,
       "metricCategs"    -> metricCategs,
-      "presets"         -> { if (asMod) Preset.forMod else Preset.base }
+      "presets"         -> { if asMod then Preset.forMod else Preset.base }
     )
   }
 
@@ -127,7 +128,7 @@ final class JsonView {
           "name"      -> p.name,
           "dimension" -> p.question.dimension.key,
           "metric"    -> p.question.metric.key,
-          "filters" -> JsObject(p.question.filters.map { case Filter(dimension, selected) =>
+          "filters"   -> JsObject(p.question.filters.map { case Filter(dimension, selected) =>
             dimension.key -> JsArray(selected.map(Dimension.valueKey(dimension)).map(JsString.apply))
           })
         )
@@ -171,7 +172,7 @@ final class JsonView {
     Json.obj(
       "metric"    -> metric,
       "dimension" -> dimension,
-      "filters" -> (filters
+      "filters"   -> (filters
         .split('/')
         .view
         .map(_ split ':')

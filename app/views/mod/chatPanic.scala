@@ -1,9 +1,8 @@
 package views.html.mod
 
 import lila.api.Context
-import lila.app.templating.Environment._
-import lila.app.ui.ScalatagsTemplate._
-
+import lila.app.templating.Environment.*
+import lila.app.ui.ScalatagsTemplate.*
 
 object chatPanic {
 
@@ -33,7 +32,7 @@ object chatPanic {
             } getOrElse badTag(cls := "text", dataIcon := "L")(strong("DISABLED"))
           ),
           div(cls := "forms")(
-            if (state.isDefined)
+            if state.isDefined then
               frag(
                 postForm(action := s"${routes.Mod.chatPanicPost}?v=0")(
                   submitButton(cls := "button button-fat button-red text", dataIcon := "L")("Disable")

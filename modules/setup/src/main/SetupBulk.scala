@@ -1,11 +1,11 @@
 package lila.setup
 
-import akka.stream.scaladsl._
+import akka.stream.scaladsl.*
 import org.joda.time.DateTime
-import play.api.data._
-import play.api.data.Forms._
+import play.api.data.*
+import play.api.data.Forms.*
 import play.api.libs.json.Json
-import scala.concurrent.duration._
+import scala.concurrent.duration.*
 
 import strategygames.{ ClockConfig, GameLogic, Mode }
 import strategygames.variant.Variant
@@ -81,13 +81,13 @@ object SetupBulk {
     str
       .split(',')
       .view
-      .map(_ `split` ":")
+      .map(_.split(":"))
       .collect { case Array(w, b) =>
         w.trim -> b.trim
       }
       .collect {
         case (w, b) if w.nonEmpty && b.nonEmpty => (AccessToken.Id(w), AccessToken.Id(b))
-    }
+      }
       .toList
 
   case class BadToken(token: AccessToken.Id, error: OAuthServer.AuthError)
@@ -107,7 +107,7 @@ object SetupBulk {
       message: Option[Template],
       pairedAt: Option[DateTime] = None
   ) {
-    def userSet = Set(games.flatMap(g => List(g.p1, g.p2)))
+    def userSet                            = Set(games.flatMap(g => List(g.p1, g.p2)))
     def collidesWith(other: ScheduledBulk) = {
       pairAt == other.pairAt || startClocksAt == startClocksAt
     } && userSet.exists(other.userSet.contains)
@@ -119,11 +119,11 @@ object SetupBulk {
   case object RateLimited                         extends ScheduleError
 
   def toJson(bulk: ScheduledBulk) = {
-    import bulk._
+    import bulk.*
     import lila.common.Json.jodaWrites
     Json
       .obj(
-        "id" -> _id,
+        "id"    -> _id,
         "games" -> games.map { g =>
           Json.obj(
             "id" -> g.id,
@@ -132,7 +132,7 @@ object SetupBulk {
           )
         },
         "variant" -> variant.key,
-        "clock" -> Json.obj(
+        "clock"   -> Json.obj(
           "limit" -> clock.limitSeconds,
           // TODO: the name of this field is no longer correct for all clocks (Bronstein/ Simple Delay) should we change it?
           "increment" -> clock.graceSeconds
@@ -147,13 +147,12 @@ object SetupBulk {
   }
 }
 
-
 final class SetupBulkApi(oauthServer: OAuthServer, idGenerator: IdGenerator)(implicit
     ec: scala.concurrent.ExecutionContext,
     mat: akka.stream.Materializer
 ) {
 
-  import SetupBulk._
+  import SetupBulk.*
 
   type Result = Either[ScheduleError, ScheduledBulk]
 
@@ -178,9 +177,9 @@ final class SetupBulkApi(oauthServer: OAuthServer, idGenerator: IdGenerator)(imp
         case (Left(bads), _)               => Left(bads)
         case (Right(_), Left(bad))         => Left(bad :: Nil)
         case (Right(users), Right(scoped)) => Right(scoped.user.id :: users)
-    }
+      }
       .flatMap {
-        case Left(errors) => fuccess(Left(BadTokens(errors.reverse)))
+        case Left(errors)      => fuccess(Left(BadTokens(errors.reverse)))
         case Right(allPlayers) =>
           val dups = allPlayers
             .groupBy(identity)
@@ -188,9 +187,9 @@ final class SetupBulkApi(oauthServer: OAuthServer, idGenerator: IdGenerator)(imp
             .mapValues(_.size)
             .collect {
               case (u, nb) if nb > 1 => u
-          }
+            }
             .toList
-          if (dups.nonEmpty) fuccess(Left(DuplicateUsers(dups)))
+          if dups.nonEmpty then fuccess(Left(DuplicateUsers(dups)))
           else {
             val pairs = allPlayers.reverse
               .grouped(2)
@@ -203,15 +202,15 @@ final class SetupBulkApi(oauthServer: OAuthServer, idGenerator: IdGenerator)(imp
                 .games(nbGames)
                 .map {
                   _.toList zip pairs
-              }
+                }
                 .map {
                   _.map { case (id, (w, b)) =>
                     ScheduledGame(id, w, b)
                   }
-              }
+                }
                 .dmap {
                   ScheduledBulk(
-                    _id = lila.common.ThreadLocalRandom `nextString` 8,
+                    _id = lila.common.ThreadLocalRandom.nextString(8),
                     by = me.id,
                     _,
                     data.variant,
@@ -222,9 +221,9 @@ final class SetupBulkApi(oauthServer: OAuthServer, idGenerator: IdGenerator)(imp
                     message = data.message,
                     scheduledAt = DateTime.now
                   )
-              }
+                }
                 .dmap(Right.apply)
             }(fuccess(Left(RateLimited)))
           }
-    }
+      }
 }

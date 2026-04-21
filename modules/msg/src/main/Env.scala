@@ -1,9 +1,9 @@
 package lila.msg
 
-import com.softwaremill.macwire._
+import com.softwaremill.macwire.*
 
 import lila.common.Bus
-import lila.common.config._
+import lila.common.config.*
 import lila.user.User
 import lila.hub.actorApi.socket.remote.TellUserIn
 
@@ -53,13 +53,13 @@ final class Env(
       api.systemPost(userId, text).discard
     },
     "remoteSocketIn:msgRead" -> { case TellUserIn(userId, msg) =>
-      msg `str` "d" map User.normalize foreach { api.setRead(userId, _) }
+      msg.str("d") map User.normalize foreach { api.setRead(userId, _) }
     },
     "remoteSocketIn:msgSend" -> { case TellUserIn(userId, msg) =>
       for {
-        obj  <- msg `obj` "d"
-        dest <- obj `str` "dest" map User.normalize
-        text <- obj `str` "text"
+        obj  <- msg.obj("d")
+        dest <- obj.str("dest") map User.normalize
+        text <- obj.str("text")
       } api.post(userId, dest, text)
     }
   )

@@ -3,8 +3,8 @@ package views.html.oAuth.token
 import play.api.data.Form
 
 import lila.api.Context
-import lila.app.templating.Environment._
-import lila.app.ui.ScalatagsTemplate._
+import lila.app.templating.Environment.*
+import lila.app.ui.ScalatagsTemplate.*
 
 object create {
 
@@ -40,19 +40,21 @@ object create {
                   isGranted(_.Shusher) || isGranted(_.Hunter)
                 )
               val id = s"oauth-scope-${scope.key.replace(":", "_")}"
-              !hidden `option` div(
-                span(
-                  form3.cmnToggle(
-                    id,
-                    s"${form("scopes").name}[]",
-                    value = scope.key,
-                    checked = form.value.exists(_.scopes.contains(scope.key)),
-                    disabled = disabled
+              (!hidden).option(
+                div(
+                  span(
+                    form3.cmnToggle(
+                      id,
+                      s"${form("scopes").name}[]",
+                      value = scope.key,
+                      checked = form.value.exists(_.scopes.contains(scope.key)),
+                      disabled = disabled
+                    )
+                  ),
+                  label(`for` := id, st.title := disabled.option("You already have played games!"))(
+                    scope.name,
+                    em(scope.key)
                   )
-                ),
-                label(`for` := id, st.title := disabled.option("You already have played games!"))(
-                  scope.name,
-                  em(scope.key)
                 )
               )
             }

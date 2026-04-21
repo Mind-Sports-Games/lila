@@ -1,10 +1,10 @@
 package lila.common
 
-import play.api.data._
-import play.api.data.Forms._
+import play.api.data.*
+import play.api.data.Forms.*
 
-import strategygames.{ ByoyomiClock, Clock => StratClock, ClockConfig }
-import lila.common.Form._
+import strategygames.{ ByoyomiClock, Clock as StratClock, ClockConfig }
+import lila.common.Form.*
 
 // Some helpers for dealing with clocks
 object Clock {
@@ -21,7 +21,18 @@ object Clock {
       case udc: StratClock.SimpleDelayConfig =>
         Some((false, false, true, udc.limitSeconds, 0, udc.delaySeconds, None, None))
       case bc: ByoyomiClock.Config =>
-        Some((true, false, false, bc.limitSeconds, bc.incrementSeconds, 0, Some(bc.byoyomiSeconds), Some(bc.periods)))
+        Some(
+          (
+            true,
+            false,
+            false,
+            bc.limitSeconds,
+            bc.incrementSeconds,
+            0,
+            Some(bc.byoyomiSeconds),
+            Some(bc.periods)
+          )
+        )
     }
 
   def clockConfigFromValues(

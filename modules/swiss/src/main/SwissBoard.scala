@@ -1,8 +1,8 @@
 package lila.swiss
 
-import cats.implicits._
+import cats.implicits.*
 
-import scala.concurrent.duration._
+import scala.concurrent.duration.*
 
 import lila.common.LightUser
 import lila.game.Game
@@ -39,9 +39,9 @@ final private class SwissBoardApi(
     .build[Swiss.Id, List[SwissBoard]]()
 
   def apply(id: Swiss.Id): Fu[List[SwissBoard.WithGame]] =
-    boardsCache.getIfPresent(id) so {
-      boards =>
-        Future.sequence(boards.map { board =>
+    boardsCache.getIfPresent(id) so { boards =>
+      Future
+        .sequence(boards.map { board =>
           (gameProxyRepo.game(board.gameId) zip (
             board.multiMatchGameIds
               .traverse(l => l.traverse(gid => gameProxyRepo.game(gid)).map(_.flatten))
@@ -50,7 +50,7 @@ final private class SwissBoardApi(
               game.map(g => SwissBoard.WithGame(board, g, multiMatchGames))
             }
         })
-          .dmap(_.flatten)
+        .dmap(_.flatten)
     }
 
   def update(data: SwissScoring.Result): Funit =
@@ -76,8 +76,8 @@ final private class SwissBoardApi(
                   for {
                     p1 <- playerMap get pairing.p1
                     p2 <- playerMap get pairing.p2
-                    u1 <- lightUserApi `sync` p1.userId
-                    u2 <- lightUserApi `sync` p2.userId
+                    u1 <- lightUserApi.sync(p1.userId)
+                    u2 <- lightUserApi.sync(p2.userId)
                     r1 <- ranks get p1.userId
                     r2 <- ranks get p2.userId
                   } yield SwissBoard(

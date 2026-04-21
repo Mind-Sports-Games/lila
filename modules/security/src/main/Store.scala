@@ -10,7 +10,7 @@ import reactivemongo.api.ReadPreference
 import scala.concurrent.blocking
 
 import lila.common.{ ApiVersion, HTTPRequest, IpAddress }
-import lila.db.dsl._
+import lila.db.dsl.*
 import lila.user.User
 import reactivemongo.api.bson.BSONDocumentReader
 import reactivemongo.api.bson.BSONDocumentHandler
@@ -19,7 +19,7 @@ final class Store(val coll: Coll, cacheApi: lila.memo.CacheApi)(implicit
     ec: scala.concurrent.ExecutionContext
 ) {
 
-  import Store._
+  import Store.*
 
   private val authCache = cacheApi[String, Option[AuthInfo]](32768, "security.authCache") {
     _.expireAfterAccess(5 minutes)
@@ -30,7 +30,7 @@ final class Store(val coll: Coll, cacheApi: lila.memo.CacheApi)(implicit
           .one[Bdoc]
           .map {
             _.flatMap { doc =>
-              if (doc.getAsOpt[DateTime]("date").fold(true)(_ `isBefore` DateTime.now.minusHours(12)))
+              if doc.getAsOpt[DateTime]("date").fold(true)(_.isBefore(DateTime.now.minusHours(12))) then
                 coll.updateFieldUnchecked($id(id), "date", DateTime.now)
               doc.getAsOpt[User.ID]("user") map { AuthInfo(_, doc.contains("fp")) }
             }
@@ -40,7 +40,7 @@ final class Store(val coll: Coll, cacheApi: lila.memo.CacheApi)(implicit
 
   def authInfo(sessionId: String) = authCache get sessionId
 
-  private val authInfoProjection = $doc("user" -> true, "fp" -> true, "date" -> true, "_id" -> false)
+  private val authInfoProjection         = $doc("user" -> true, "fp" -> true, "date" -> true, "_id" -> false)
   private def uncache(sessionId: String) =
     blocking { blockingUncache(sessionId) }
   private def uncacheAllOf(userId: User.ID): Funit =
@@ -82,7 +82,8 @@ final class Store(val coll: Coll, cacheApi: lila.memo.CacheApi)(implicit
         $id(sessionId),
         $set("up" -> false)
       )
-      .void.andDo(uncache(sessionId))
+      .void
+      .andDo(uncache(sessionId))
 
   def closeUserAndSessionId(userId: User.ID, sessionId: String): Funit =
     coll.update
@@ -90,7 +91,8 @@ final class Store(val coll: Coll, cacheApi: lila.memo.CacheApi)(implicit
         $doc("user" -> userId, "_id" -> sessionId, "up" -> true),
         $set("up"   -> false)
       )
-      .void.andDo(uncache(sessionId))
+      .void
+      .andDo(uncache(sessionId))
 
   def closeUserExceptSessionId(userId: User.ID, sessionId: String): Funit =
     coll.update
@@ -111,7 +113,7 @@ final class Store(val coll: Coll, cacheApi: lila.memo.CacheApi)(implicit
       .void >> uncacheAllOf(userId)
 
   implicit private val UserSessionBSONHandler: BSONDocumentHandler[UserSession] = Macros.handler[UserSession]
-  def openSessions(userId: User.ID, nb: Int): Fu[List[UserSession]] =
+  def openSessions(userId: User.ID, nb: Int): Fu[List[UserSession]]             =
     coll
       .find($doc("user" -> userId, "up" -> true))
       .sort($doc("date" -> -1))
@@ -126,7 +128,7 @@ final class Store(val coll: Coll, cacheApi: lila.memo.CacheApi)(implicit
 
   def setFingerPrint(id: String, fp: FingerPrint): Fu[FingerHash] =
     FingerHash(fp) match {
-      case None => fufail(s"Can't hash $id's fingerprint $fp")
+      case None       => fufail(s"Can't hash $id's fingerprint $fp")
       case Some(hash) =>
         coll.updateField($id(id), "fp", hash).andDo {
           authInfo(id) foreach {
@@ -142,11 +144,12 @@ final class Store(val coll: Coll, cacheApi: lila.memo.CacheApi)(implicit
       .find(
         $doc(
           "user" -> user.id,
-          "date" `$gt` (if (user.createdAt.isAfter(DateTime.now.minusYears(1))) user.createdAt else DateTime.now.minusYears(1))
+          "date" `$gt` (if user.createdAt.isAfter(DateTime.now.minusYears(1)) then user.createdAt
+                        else DateTime.now.minusYears(1))
         ),
         $doc("_id" -> false, "ip" -> true, "ua" -> true, "fp" -> true, "date" -> true).some
       )
-      .sort($sort `desc` "date")
+      .sort($sort.desc("date"))
       .cursor[Info]()(using InfoReader, implicitly[CursorProducer[Info]])
       .list(1000)
 
@@ -181,47 +184,51 @@ final class Store(val coll: Coll, cacheApi: lila.memo.CacheApi)(implicit
         coll.delete.one($inIds(olds)).void
       } >> uncacheAllOf(userId)
 
-  @annotation.nowarn("msg=unused") implicit private val IpAndFpReader: BSONDocumentReader[IpAndFp] = Macros.reader[IpAndFp]
+  @annotation.nowarn("msg=unused")
+  implicit private val IpAndFpReader: BSONDocumentReader[IpAndFp] = Macros.reader[IpAndFp]
 
   def shareAnIpOrFp(u1: User.ID, u2: User.ID): Fu[Boolean] =
-    coll.aggregateWith[Bdoc](
-      readPreference = ReadPreference.secondaryPreferred
-    ) { framework =>
-      import framework._
-      List(
-        Match($doc("user" `$in` List(u1, u2))),
-        Limit(500),
-        Project(
-          $doc(
-            "_id"  -> false,
-            "user" -> true,
-            "x"    -> $arr("$ip", "$fp")
-          )
-        ),
-        UnwindField("x"),
-        GroupField("x")("users" -> AddFieldToSet("user")),
-        Match(
-          $doc(
-            "_id" `$ne` BSONNull,
-            "users.1" `$exists` true
-          )
-        ),
-        Limit(1)
-      )
-    }.collect[List](maxDocs = 1).dmap(_.nonEmpty)
+    coll
+      .aggregateWith[Bdoc](
+        readPreference = ReadPreference.secondaryPreferred
+      ) { framework =>
+        import framework.*
+        List(
+          Match($doc("user" `$in` List(u1, u2))),
+          Limit(500),
+          Project(
+            $doc(
+              "_id"  -> false,
+              "user" -> true,
+              "x"    -> $arr("$ip", "$fp")
+            )
+          ),
+          UnwindField("x"),
+          GroupField("x")("users" -> AddFieldToSet("user")),
+          Match(
+            $doc(
+              "_id" `$ne` BSONNull,
+              "users.1" `$exists` true
+            )
+          ),
+          Limit(1)
+        )
+      }
+      .collect[List](maxDocs = 1)
+      .dmap(_.nonEmpty)
 
   def ips(user: User): Fu[Set[IpAddress]] =
     coll.distinctEasy[IpAddress, Set]("ip", $doc("user" -> user.id))
 
   private[security] def recentByIpExists(ip: IpAddress): Fu[Boolean] =
     coll.secondaryPreferred.exists(
-      $doc("ip" -> ip, "date" -> $gt(DateTime.now `minusDays` 7))
+      $doc("ip" -> ip, "date" -> $gt(DateTime.now.minusDays(7)))
     )
 
   private[security] def recentByPrintExists(fp: FingerPrint): Fu[Boolean] =
     FingerHash(fp) so { hash =>
       coll.secondaryPreferred.exists(
-        $doc("fp" -> hash, "date" -> $gt(DateTime.now `minusDays` 7))
+        $doc("fp" -> hash, "date" -> $gt(DateTime.now.minusDays(7)))
       )
     }
 }

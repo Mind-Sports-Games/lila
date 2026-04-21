@@ -1,6 +1,6 @@
 package lila.socket
 
-import play.api.libs.json._
+import play.api.libs.json.*
 import scala.concurrent.Promise
 import alleycats.Zero
 import lila.base.IntValue
@@ -19,7 +19,7 @@ object Socket extends Socket {
     def inc                           = SocketVersion(value + 1)
   }
 
-  val socketVersionIso                                    = lila.common.Iso.int[SocketVersion](SocketVersion.apply, _.value)
+  val socketVersionIso = lila.common.Iso.int[SocketVersion](SocketVersion.apply, _.value)
   implicit val socketVersionFormat: Format[SocketVersion] = lila.common.Json.intIsoFormat(socketVersionIso)
   implicit val socketVersionZero: Zero[SocketVersion]     = Zero[SocketVersion](SocketVersion(0))
 

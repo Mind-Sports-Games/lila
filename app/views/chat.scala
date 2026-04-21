@@ -3,8 +3,8 @@ package views.html
 import play.api.libs.json.Json
 
 import lila.api.Context
-import lila.app.templating.Environment._
-import lila.app.ui.ScalatagsTemplate._
+import lila.app.templating.Environment.*
+import lila.app.ui.ScalatagsTemplate.*
 import lila.i18n.I18nKeys
 
 object chat {
@@ -67,9 +67,9 @@ object chat {
           .add("loginRequired" -> chat.loginRequired)
           .add("restricted" -> restricted)
           .add("palantir" -> (palantir && ctx.isAuth)),
-        "i18n"      -> i18n(withNote = withNoteAge.isDefined),
-        "writeable" -> writeable,
-        "public"    -> public,
+        "i18n"        -> i18n(withNote = withNoteAge.isDefined),
+        "writeable"   -> writeable,
+        "public"      -> public,
         "permissions" -> Json
           .obj("local" -> localMod)
           .add("timeout" -> isGranted(_.ChatTimeout))
@@ -88,14 +88,14 @@ object chat {
       I18nKeys.toggleTheChat.some,
       I18nKeys.loginToChat.some,
       I18nKeys.youHaveBeenTimedOut.some,
-      withNote `option` I18nKeys.notes,
-      withNote `option` I18nKeys.typePrivateNotesHere
+      withNote.option(I18nKeys.notes),
+      withNote.option(I18nKeys.typePrivateNotesHere)
     )
 
   val spectatorsFrag =
     div(
-      cls := "chat__members none",
-      aria.live := "off",
+      cls           := "chat__members none",
+      aria.live     := "off",
       aria.relevant := "additions removals text"
     )
 }

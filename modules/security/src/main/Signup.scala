@@ -1,6 +1,6 @@
 package lila.security
 
-import play.api.data._
+import play.api.data.*
 import play.api.i18n.Lang
 import play.api.mvc.{ Request, RequestHeader }
 
@@ -35,14 +35,14 @@ final class Signup(
     case object YesBecauseUA           extends MustConfirmEmail(true)
 
     def apply(print: Option[FingerPrint])(implicit req: RequestHeader): Fu[MustConfirmEmail] = {
-      val ip = HTTPRequest `ipAddress` req
+      val ip = HTTPRequest.ipAddress(req)
       store.recentByIpExists(ip) flatMap { ipExists =>
-        if (ipExists) fuccess(YesBecauseIpExists)
-        else if (HTTPRequest `weirdUA` req) fuccess(YesBecauseUA)
+        if ipExists then fuccess(YesBecauseIpExists)
+        else if HTTPRequest.weirdUA(req) then fuccess(YesBecauseUA)
         else
           print.fold[Fu[MustConfirmEmail]](fuccess(YesBecausePrintMissing)) { fp =>
             store.recentByPrintExists(fp) flatMap { printFound =>
-              if (printFound) fuccess(YesBecausePrintExists)
+              if printFound then fuccess(YesBecausePrintExists)
               else
                 ipTrust.isSuspicious(ip).map {
                   case true => YesBecauseIpSusp
@@ -60,19 +60,20 @@ final class Signup(
     hcaptcha.verify().flatMap {
       case Hcaptcha.Result.Fail           => fuccess(Signup.MissingCaptcha)
       case Hcaptcha.Result.Pass if !blind => fuccess(Signup.MissingCaptcha)
-      case hcaptchaResult =>
+      case hcaptchaResult                 =>
         forms.signup.website.form
           .bindFromRequest()
           .fold[Fu[Signup.Result]](
-            err => fuccess(Signup.Bad(err `tap` signupErrLog)),
+            err => fuccess(Signup.Bad(err.tap(signupErrLog))),
             data =>
-              signupRateLimit(data.username, if (hcaptchaResult == Hcaptcha.Result.Valid) 1 else 3) {
+              signupRateLimit(data.username, if hcaptchaResult == Hcaptcha.Result.Valid then 1 else 3) {
                 MustConfirmEmail(data.fingerPrint) flatMap { mustConfirm =>
                   lila.mon.user.register.count(none)
                   lila.mon.user.register.mustConfirmEmail(mustConfirm.toString).increment()
                   val email = emailAddressValidator
-                    .validate(data.realEmail) `err` s"Invalid email ${data.email}"
-                  val passwordHash = authenticator `passEnc` User.ClearPassword(data.password)
+                    .validate(data.realEmail)
+                    .err(s"Invalid email ${data.email}")
+                  val passwordHash = authenticator.passEnc(User.ClearPassword(data.password))
                   userRepo
                     .create(
                       data.username,
@@ -99,9 +100,9 @@ final class Signup(
       apiVersion: Option[ApiVersion]
   )(user: User)(implicit req: RequestHeader, lang: Lang): Fu[Signup.Result] =
     store.deletePreviousSessions(user) >> {
-      if (mustConfirm.value)
+      if mustConfirm.value then
         emailConfirm.send(user, email.acceptable) >> {
-          if (emailConfirm.effective)
+          if emailConfirm.effective then
             api.saveSignup(user.id, apiVersion, fingerPrint) inject
               Signup.ConfirmEmail(user, email.acceptable)
           else fuccess(Signup.AllSet(user, email.acceptable))
@@ -115,15 +116,16 @@ final class Signup(
     forms.signup.mobile
       .bindFromRequest()
       .fold[Fu[Signup.Result]](
-        err => fuccess(Signup.Bad(err `tap` signupErrLog)),
+        err => fuccess(Signup.Bad(err.tap(signupErrLog))),
         data =>
           signupRateLimit(data.username, cost = 2) {
             val email = emailAddressValidator
-              .validate(data.realEmail) `err` s"Invalid email ${data.email}"
+              .validate(data.realEmail)
+              .err(s"Invalid email ${data.email}")
             val mustConfirm = MustConfirmEmail.YesBecauseMobile
             lila.mon.user.register.count(apiVersion.some).increment()
             lila.mon.user.register.mustConfirmEmail(mustConfirm.toString).increment()
-            val passwordHash = authenticator `passEnc` User.ClearPassword(data.password)
+            val passwordHash = authenticator.passEnc(User.ClearPassword(data.password))
             userRepo
               .create(
                 data.username,
@@ -158,7 +160,7 @@ final class Signup(
       f: => Fu[Signup.Result]
   )(implicit req: RequestHeader): Fu[Signup.Result] =
     HasherRateLimit(username, req) { _ =>
-      signupRateLimitPerIP(HTTPRequest `ipAddress` req, cost = cost)(f)(rateLimitDefault)
+      signupRateLimitPerIP(HTTPRequest.ipAddress(req), cost = cost)(f)(rateLimitDefault)
     }(rateLimitDefault)
 
   private def logSignup(
@@ -173,7 +175,7 @@ final class Signup(
       user.username,
       email.value,
       s"fp: $fingerPrint mustConfirm: $mustConfirm fp: ${fingerPrint
-        .so(_.value)} ip: ${HTTPRequest `ipAddress` req} api: ${apiVersion.so(_.value)}"
+          .so(_.value)} ip: ${HTTPRequest.ipAddress(req)} api: ${apiVersion.so(_.value)}"
     )
 
   private def signupErrLog(err: Form[?]) =
@@ -181,11 +183,9 @@ final class Signup(
       username <- err("username").value
       email    <- err("email").value
     }
-      if (
-        err.errors.exists(_.messages.contains("error.email_acceptable")) &&
+      if err.errors.exists(_.messages.contains("error.email_acceptable")) &&
         err("email").value.exists(EmailAddress.isValid)
-      )
-        authLog(username, email, s"Signup with unacceptable email")
+      then authLog(username, email, s"Signup with unacceptable email")
 
   private def authLog(user: String, email: String, msg: String) =
     lila.log("auth").info(s"$user $email $msg")

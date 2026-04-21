@@ -1,12 +1,12 @@
 package lila.study
 
-import akka.stream.scaladsl._
+import akka.stream.scaladsl.*
 import org.joda.time.DateTime
 import reactivemongo.akkastream.{ cursorProducer, AkkaStreamCursor }
-import reactivemongo.api._
+import reactivemongo.api.*
 
 import lila.db.AsyncColl
-import lila.db.dsl._
+import lila.db.dsl.*
 import lila.user.User
 
 final class StudyRepo(private[study] val coll: AsyncColl)(implicit
@@ -14,7 +14,7 @@ final class StudyRepo(private[study] val coll: AsyncColl)(implicit
     mat: akka.stream.Materializer
 ) {
 
-  import BSONHandlers._
+  import BSONHandlers.*
 
   private object F {
     val uids      = "uids"
@@ -57,13 +57,13 @@ final class StudyRepo(private[study] val coll: AsyncColl)(implicit
 
   private[study] def selectOwnerId(ownerId: User.ID)   = $doc("ownerId" -> ownerId)
   private[study] def selectMemberId(memberId: User.ID) = $doc(F.uids -> memberId)
-  private[study] val selectPublic = $doc(
+  private[study] val selectPublic                      = $doc(
     "visibility" -> VisibilityHandler.writeTry(Study.Visibility.Public).get
   )
   private[study] val selectPrivateOrUnlisted = "visibility" `$ne` VisibilityHandler
     .writeTry(Study.Visibility.Public)
     .get
-  private[study] def selectLiker(userId: User.ID) = $doc(F.likers -> userId)
+  private[study] def selectLiker(userId: User.ID)         = $doc(F.likers -> userId)
   private[study] def selectContributorId(userId: User.ID) =
     selectMemberId(userId) ++ // use the index
       $doc("ownerId" `$ne` userId) ++
@@ -76,7 +76,7 @@ final class StudyRepo(private[study] val coll: AsyncColl)(implicit
     Source futureSource {
       coll map {
         _.find(selectOwnerId(ownerId) ++ (!isMe so selectPublic))
-          .sort($sort `desc` "updatedAt")
+          .sort($sort.desc("updatedAt"))
           .cursor[Study](readPreference = readPref)
           .documentSource()
       }
@@ -171,7 +171,7 @@ final class StudyRepo(private[study] val coll: AsyncColl)(implicit
     }.void
 
   def uids(studyId: Study.Id): Fu[Set[User.ID]] =
-    coll(_.primitiveOne[Set[User.ID]]($id(studyId), F.uids)) `dmap` (_.getOrElse(Set.empty))
+    coll(_.primitiveOne[Set[User.ID]]($id(studyId), F.uids)).dmap(_.getOrElse(Set.empty))
 
   private val idNameProjection = $doc("name" -> true)
 
@@ -181,7 +181,7 @@ final class StudyRepo(private[study] val coll: AsyncColl)(implicit
   def recentByOwner(userId: User.ID, nb: Int) =
     coll {
       _.find(selectOwnerId(userId), idNameProjection.some)
-        .sort($sort `desc` "updatedAt")
+        .sort($sort.desc("updatedAt"))
         .cursor[Study.IdName](readPref)
         .list(nb)
     }
@@ -189,7 +189,7 @@ final class StudyRepo(private[study] val coll: AsyncColl)(implicit
   def recentByContributor(userId: User.ID, nb: Int) =
     coll {
       _.find(selectContributorId(userId), idNameProjection.some)
-        .sort($sort `desc` "updatedAt")
+        .sort($sort.desc("updatedAt"))
         .cursor[Study.IdName](readPref)
         .list(nb)
     }
@@ -202,9 +202,9 @@ final class StudyRepo(private[study] val coll: AsyncColl)(implicit
 
   def like(studyId: Study.Id, userId: User.ID, v: Boolean): Fu[Study.Likes] =
     countLikes(studyId).flatMap {
-      case None => fuccess(Study.Likes(0))
+      case None                         => fuccess(Study.Likes(0))
       case Some((prevLikes, createdAt)) =>
-        val likes = Study.Likes(prevLikes.value + (if (v) 1 else -1))
+        val likes = Study.Likes(prevLikes.value + (if v then 1 else -1))
         coll {
           _.update.one(
             $id(studyId),
@@ -212,7 +212,7 @@ final class StudyRepo(private[study] val coll: AsyncColl)(implicit
               F.likes -> likes,
               F.rank  -> Study.Rank.compute(likes, createdAt)
             ) ++ {
-              if (v) $addToSet(F.likers -> userId) else $pull(F.likers -> userId)
+              if v then $addToSet(F.likers -> userId) else $pull(F.likers -> userId)
             }
           ) inject likes
         }
@@ -253,7 +253,7 @@ final class StudyRepo(private[study] val coll: AsyncColl)(implicit
   private def countLikes(studyId: Study.Id): Fu[Option[(Study.Likes, DateTime)]] =
     coll {
       _.aggregateWith[Bdoc]() { framework =>
-        import framework._
+        import framework.*
         List(
           Match($id(studyId)),
           Project(

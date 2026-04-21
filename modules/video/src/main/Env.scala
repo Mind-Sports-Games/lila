@@ -2,12 +2,12 @@ package lila.video
 
 import play.api.libs.ws.StandaloneWSClient
 import play.api.Mode
-import com.softwaremill.macwire._
+import com.softwaremill.macwire.*
 import lila.common.autoconfig.{ AutoConfig, ConfigName }
 import play.api.Configuration
-import scala.concurrent.duration._
+import scala.concurrent.duration.*
 
-import lila.common.config._
+import lila.common.config.*
 
 @Module
 private class VideoConfig(
@@ -48,7 +48,7 @@ final class Env(
     api = api
   )
 
-  if (mode == Mode.Prod) {
+  if mode == Mode.Prod then {
     scheduler.scheduleWithFixedDelay(config.sheetDelay * 2, config.sheetDelay) { () =>
       sheet.fetchAll.logFailure(logger).discard
     }

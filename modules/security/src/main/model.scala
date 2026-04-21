@@ -10,7 +10,7 @@ import lila.common.Iso
 import reactivemongo.api.bson.BSONHandler
 
 case class Dated[V](value: V, date: DateTime) extends Ordered[Dated[V]] {
-  def compare(other: Dated[V]) = other.date `compareTo` date
+  def compare(other: Dated[V]) = other.date.compareTo(date)
   def map[X](f: V => X)        = copy(value = f(value))
   def seconds                  = date.getMillis / 1000
 }
@@ -61,8 +61,8 @@ case class UserAgent(value: String) {
   import UserAgent.Client
 
   lazy val client: Client =
-    if (value `contains` "Lichobile") Client.App
-    else if (value `contains` "Mobile") Client.Mob
+    if value.contains("Lichobile") then Client.App
+    else if value.contains("Mobile") then Client.Mob
     else Client.PC
 
   def parse = org.uaparser.scala.Parser.default.parse(value)
@@ -70,7 +70,7 @@ case class UserAgent(value: String) {
 
 object UserAgent {
 
-  implicit val userAgentIso: Iso.StringIso[UserAgent] = Iso.string[UserAgent](UserAgent.apply, _.value)
+  implicit val userAgentIso: Iso.StringIso[UserAgent]   = Iso.string[UserAgent](UserAgent.apply, _.value)
   implicit val userAgentHandler: BSONHandler[UserAgent] =
     lila.db.BSON.isoHandler[UserAgent, String](userAgentIso)
 

@@ -1,11 +1,11 @@
 package lila.teamSearch
 
-import akka.actor._
-import com.softwaremill.macwire._
+import akka.actor.*
+import com.softwaremill.macwire.*
 import lila.common.autoconfig.{ AutoConfig, ConfigName }
 import play.api.Configuration
 
-import lila.search._
+import lila.search.*
 
 @Module
 private class TeamSearchConfig(
@@ -43,7 +43,7 @@ final class Env(
 
   system.actorOf(
     Props(new Actor {
-      import lila.team.actorApi._
+      import lila.team.actorApi.*
       def receive = {
         case InsertTeam(team) => api.store(team).discard
         case RemoveTeam(id)   => client.deleteById(Id(id)).discard

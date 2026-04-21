@@ -6,8 +6,8 @@ import strategygames.{ P1, P2 }
 import play.api.libs.json.Json
 
 import lila.api.Context
-import lila.app.templating.Environment._
-import lila.app.ui.ScalatagsTemplate._
+import lila.app.templating.Environment.*
+import lila.app.ui.ScalatagsTemplate.*
 import lila.common.String.html.safeJsonValue
 import lila.swiss.{ Swiss, SwissCondition }
 import lila.swiss.SwissRound
@@ -33,30 +33,30 @@ object show {
       title = fullName(s),
       moreJs = frag(
         jsModule("swiss"),
-        hasScheduleInput `option` jsModule("flatpickr"),
+        hasScheduleInput.option(jsModule("flatpickr")),
         embedJsUnsafeLoadThen(s"""PlayStrategySwiss.start(${safeJsonValue(
-          Json
-            .obj(
-              "data"   -> data,
-              "i18n"   -> bits.jsI18n,
-              "userId" -> ctx.userId,
-              "chat" -> chatOption.map { c =>
-                chat.json(
-                  c.chat,
-                  name = trans.chatRoom.txt(),
-                  timeout = c.timeout,
-                  public = true,
-                  resourceId = lila.chat.Chat.ResourceId(s"swiss/${c.chat.id}"),
-                  localMod = isLocalMod
-                )
-              }
-            )
-            .add("schedule" -> hasScheduleInput)
-        )})""")
+            Json
+              .obj(
+                "data"   -> data,
+                "i18n"   -> bits.jsI18n,
+                "userId" -> ctx.userId,
+                "chat"   -> chatOption.map { c =>
+                  chat.json(
+                    c.chat,
+                    name = trans.chatRoom.txt(),
+                    timeout = c.timeout,
+                    public = true,
+                    resourceId = lila.chat.Chat.ResourceId(s"swiss/${c.chat.id}"),
+                    localMod = isLocalMod
+                  )
+                }
+              )
+              .add("schedule" -> hasScheduleInput)
+          )})""")
       ),
       moreCss = frag(
         cssTag("swiss.show"),
-        hasScheduleInput `option` cssTag("flatpickr")
+        hasScheduleInput.option(cssTag("flatpickr"))
       ),
       chessground = false,
       openGraph = lila.app.ui
@@ -101,8 +101,8 @@ object show {
               tr(cls := "paginated")(
                 td(a(href := routes.Round.watcher(p.gameId, "p1"), cls := "glpt")(s"#${p.gameId}")),
                 td(userIdLink(p.p1.some)),
-                td(p `strResultOf` P1),
-                td(p `strResultOf` P2),
+                td(p.strResultOf(P1)),
+                td(p.strResultOf(P2)),
                 td(userIdLink(p.p2.some))
               )
             },

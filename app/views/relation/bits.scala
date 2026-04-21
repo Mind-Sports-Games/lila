@@ -3,12 +3,11 @@ package views.html.relation
 import play.api.mvc.Call
 
 import lila.api.Context
-import lila.app.templating.Environment._
-import lila.app.ui.ScalatagsTemplate._
+import lila.app.templating.Environment.*
+import lila.app.ui.ScalatagsTemplate.*
 import lila.common.paginator.Paginator
 import lila.relation.Related
 import lila.user.User
-
 
 object bits {
 
@@ -64,7 +63,7 @@ object bits {
 
   private def pagTable(pager: Paginator[Related], call: Call)(implicit ctx: Context) =
     table(cls := "slist")(
-      if (pager.nbResults > 0)
+      if pager.nbResults > 0 then
         tbody(cls := "infinite-scroll")(
           pager.currentPageResults.map { r =>
             tr(cls := "paginated")(

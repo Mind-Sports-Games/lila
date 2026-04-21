@@ -32,7 +32,7 @@ final class FutureConcurrencyLimit[K](
         }
     }
 
-  private def get(k: K): Int = ~storage.getIfPresent(toString(k))
+  private def get(k: K): Int  = ~storage.getIfPresent(toString(k))
   private def inc(k: K): Unit = {
     val _ = concurrentMap.compute(toString(k), (_, c) => (~Option(c) + 1).atMost(maxConcurrency))
   }

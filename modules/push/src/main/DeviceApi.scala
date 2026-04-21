@@ -1,9 +1,9 @@
 package lila.push
 
 import org.joda.time.DateTime
-import reactivemongo.api.bson._
+import reactivemongo.api.bson.*
 
-import lila.db.dsl._
+import lila.db.dsl.*
 import lila.user.User
 
 final private class DeviceApi(coll: Coll)(implicit ec: scala.concurrent.ExecutionContext) {
@@ -26,7 +26,7 @@ final private class DeviceApi(coll: Coll)(implicit ec: scala.concurrent.Executio
       .list(max)
 
   private[push] def findLastOneByUserId(platform: String)(userId: String): Fu[Option[Device]] =
-    findLastManyByUserId(platform, 1)(userId) `dmap` (_.headOption)
+    findLastManyByUserId(platform, 1)(userId).dmap(_.headOption)
 
   def register(user: User, platform: String, deviceId: String) = {
     lila.mon.push.register.in(platform).increment()

@@ -2,7 +2,7 @@ package lila.mod
 
 import org.joda.time.DateTime
 
-import lila.db.dsl._
+import lila.db.dsl.*
 import lila.report.{ Mod, ModId, Report, Suspect }
 import lila.security.Permission
 import lila.user.{ Holder, User, UserRepo }
@@ -25,7 +25,7 @@ final class ModlogApi(repo: ModlogRepo, userRepo: UserRepo, slackApi: SlackApi)(
     }
   def streamerList(mod: Mod, streamerId: User.ID, v: Boolean) =
     add {
-      Modlog(mod.user.id, streamerId.some, if (v) Modlog.streamerList else Modlog.streamerUnlist)
+      Modlog(mod.user.id, streamerId.some, if v then Modlog.streamerList else Modlog.streamerUnlist)
     }
   def streamerTier(mod: Mod, streamerId: User.ID, v: Int) =
     add {
@@ -39,22 +39,22 @@ final class ModlogApi(repo: ModlogRepo, userRepo: UserRepo, slackApi: SlackApi)(
 
   def alt(mod: Mod, sus: Suspect, v: Boolean) =
     add {
-      Modlog.make(mod, sus, if (v) Modlog.alt else Modlog.unalt)
+      Modlog.make(mod, sus, if v then Modlog.alt else Modlog.unalt)
     }
 
   def engine(mod: Mod, sus: Suspect, v: Boolean) =
     add {
-      Modlog.make(mod, sus, if (v) Modlog.engine else Modlog.unengine)
+      Modlog.make(mod, sus, if v then Modlog.engine else Modlog.unengine)
     }
 
   def booster(mod: Mod, sus: Suspect, v: Boolean) =
     add {
-      Modlog.make(mod, sus, if (v) Modlog.booster else Modlog.unbooster)
+      Modlog.make(mod, sus, if v then Modlog.booster else Modlog.unbooster)
     }
 
   def troll(mod: Mod, sus: Suspect) =
     add {
-      Modlog.make(mod, sus, if (sus.user.marks.troll) Modlog.troll else Modlog.untroll)
+      Modlog.make(mod, sus, if sus.user.marks.troll then Modlog.troll else Modlog.untroll)
     }
 
   def setKidMode(mod: User.ID, kid: User.ID) =
@@ -127,7 +127,7 @@ final class ModlogApi(repo: ModlogRepo, userRepo: UserRepo, slackApi: SlackApi)(
       Modlog(
         mod,
         none,
-        if (closed) Modlog.closeTopic else Modlog.openTopic,
+        if closed then Modlog.closeTopic else Modlog.openTopic,
         details = s"$categ/$topic".some
       )
     }
@@ -137,7 +137,7 @@ final class ModlogApi(repo: ModlogRepo, userRepo: UserRepo, slackApi: SlackApi)(
       Modlog(
         mod,
         none,
-        if (hidden) Modlog.hideTopic else Modlog.showTopic,
+        if hidden then Modlog.hideTopic else Modlog.showTopic,
         details = s"$categ/$topic".some
       )
     }
@@ -147,7 +147,7 @@ final class ModlogApi(repo: ModlogRepo, userRepo: UserRepo, slackApi: SlackApi)(
       Modlog(
         mod,
         none,
-        if (sticky) Modlog.stickyTopic else Modlog.unstickyTopic,
+        if sticky then Modlog.stickyTopic else Modlog.unstickyTopic,
         details = s"$categ/$topic".some
       )
     }
@@ -180,7 +180,7 @@ final class ModlogApi(repo: ModlogRepo, userRepo: UserRepo, slackApi: SlackApi)(
         Modlog.permissions,
         details = permissions
           .map { case (p, dir) =>
-            s"${if (dir) "+" else "-"}${p}"
+            s"${if dir then "+" else "-"}${p}"
           }
           .mkString(", ")
           .some
@@ -192,7 +192,7 @@ final class ModlogApi(repo: ModlogRepo, userRepo: UserRepo, slackApi: SlackApi)(
 
   def reportban(mod: Mod, sus: Suspect, v: Boolean) =
     add {
-      Modlog.make(mod, sus, if (v) Modlog.reportban else Modlog.unreportban)
+      Modlog.make(mod, sus, if v then Modlog.reportban else Modlog.unreportban)
     }
 
   def modMessage(mod: User.ID, user: User.ID, subject: String) =
@@ -222,7 +222,7 @@ final class ModlogApi(repo: ModlogRepo, userRepo: UserRepo, slackApi: SlackApi)(
 
   def rankban(mod: Mod, sus: Suspect, v: Boolean) =
     add {
-      Modlog.make(mod, sus, if (v) Modlog.rankban else Modlog.unrankban)
+      Modlog.make(mod, sus, if v then Modlog.rankban else Modlog.unrankban)
     }
 
   def teamKick(mod: User.ID, user: User.ID, teamName: String) =
@@ -255,7 +255,7 @@ final class ModlogApi(repo: ModlogRepo, userRepo: UserRepo, slackApi: SlackApi)(
     )
 
   def userHistory(userId: User.ID): Fu[List[Modlog]] =
-    coll.find($doc("user" -> userId)).sort($sort `desc` "date").cursor[Modlog]().gather[List](30)
+    coll.find($doc("user" -> userId)).sort($sort.desc("date")).cursor[Modlog]().gather[List](30)
 
   def countRecentCheatDetected(userId: User.ID): Fu[Int] =
     coll.countSel(
@@ -275,7 +275,7 @@ final class ModlogApi(repo: ModlogRepo, userRepo: UserRepo, slackApi: SlackApi)(
   }
 
   private def slackMonitor(m: Modlog): Funit = {
-    import lila.mod.{ Modlog => M }
+    import lila.mod.Modlog as M
     val icon = m.action match {
       case M.alt | M.engine | M.booster | M.troll | M.closeAccount          => "thorhammer"
       case M.unalt | M.unengine | M.unbooster | M.untroll | M.reopenAccount => "large_blue_circle"

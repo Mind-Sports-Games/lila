@@ -3,17 +3,16 @@ package views.html.mod
 import play.api.i18n.Lang
 
 import lila.api.Context
-import lila.app.templating.Environment._
-import lila.app.ui.ScalatagsTemplate._
+import lila.app.templating.Environment.*
+import lila.app.ui.ScalatagsTemplate.*
 import lila.mod.Gamify.Period
-
 
 object gamify {
 
   def index(leaderboards: lila.mod.Gamify.Leaderboards, history: List[lila.mod.Gamify.HistoryMonth])(implicit
       ctx: Context
   ) = {
-    val title = "Moderator hall of fame"
+    val title                 = "Moderator hall of fame"
     def yearHeader(year: Int) =
       tr(cls := "year")(
         th(year),
@@ -43,7 +42,7 @@ object gamify {
               },
               history.map { h =>
                 frag(
-                  h.date.getMonthOfYear == 12 `option` yearHeader(h.date.getYear),
+                  (h.date.getMonthOfYear == 12).option(yearHeader(h.date.getYear)),
                   tr(
                     th(h.date.monthOfYear.getAsText),
                     th(userIdLink(h.champion.modId.some, withOnline = false)),

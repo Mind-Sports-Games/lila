@@ -1,13 +1,12 @@
 package views.html.streamer
 
-
 import lila.api.Context
-import lila.app.templating.Environment._
-import lila.app.ui.ScalatagsTemplate._
+import lila.app.templating.Environment.*
+import lila.app.ui.ScalatagsTemplate.*
 
 object picture {
 
-  import trans.streamer._
+  import trans.streamer.*
 
   def apply(s: lila.streamer.Streamer.WithUser, error: Option[String] = None)(implicit ctx: Context) =
     views.html.base.layout(
@@ -25,18 +24,19 @@ $('.streamer-picture form.upload input[type=file]').on('change', function() {
         div(cls := "forms")(
           error.map { badTag(_) },
           postForm(
-            action := routes.Streamer.pictureApply,
+            action  := routes.Streamer.pictureApply,
             enctype := "multipart/form-data",
-            cls := "upload"
+            cls     := "upload"
           )(
             p(maxSize(s"${lila.db.Photographer.uploadMaxMb}MB.")),
             form3.file.image("picture"),
             submitButton(cls := "button")(uploadPicture())
           ),
-          s.streamer.hasPicture `option`
+          s.streamer.hasPicture.option(
             postForm(action := routes.Streamer.pictureDelete, cls := "delete")(
               submitButton(cls := "button button-red")(deletePicture())
-            ),
+            )
+          ),
           div(cls := "cancel")(
             a(href := routes.Streamer.edit, cls := "text", dataIcon := "I")(trans.cancel())
           )

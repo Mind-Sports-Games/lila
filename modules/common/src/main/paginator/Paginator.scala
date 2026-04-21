@@ -94,6 +94,5 @@ object Paginator {
       Validated.valid(for {
         results   <- adapter.slice((currentPage - 1) * maxPerPage.value, maxPerPage.value)
         nbResults <- adapter.nbResults
-      }
-      yield new Paginator(currentPage, maxPerPage, results, nbResults))
+      } yield new Paginator(currentPage, maxPerPage, results, nbResults))
 }

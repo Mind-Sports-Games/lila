@@ -4,11 +4,10 @@ package user
 import play.api.i18n.Lang
 
 import lila.api.Context
-import lila.app.templating.Environment._
-import lila.app.ui.ScalatagsTemplate._
+import lila.app.templating.Environment.*
+import lila.app.ui.ScalatagsTemplate.*
 import lila.rating.PerfType
 import lila.user.User
-
 
 object list {
 
@@ -52,7 +51,7 @@ object list {
               userTopPerf(leaderboards.rapid, PerfType.orDefault("rapid")),
               userTopPerf(leaderboards.classical, PerfType.orDefault("classical")),
               userTopPerf(leaderboards.ultraBullet, PerfType.orDefault("ultraBullet")),
-              //tournamentWinners(tourneyWinners),
+              // tournamentWinners(tourneyWinners),
               userTopPerf(leaderboards.crazyhouse, PerfType.orDefault("crazyhouse")),
               userTopPerf(leaderboards.chess960, PerfType.orDefault("chess960")),
               userTopPerf(leaderboards.antichess, PerfType.orDefault("antichess")),
@@ -109,7 +108,7 @@ object list {
     st.section(cls := "user-top")(
       h2(cls := "text", dataIcon := perfType.iconChar)(
         perfType.trans
-        //a(href := routes.User.topNb(200, perfType.key))(perfType.trans)
+          // a(href := routes.User.topNb(200, perfType.key))(perfType.trans)
       ),
       ol(users map { l =>
         li(

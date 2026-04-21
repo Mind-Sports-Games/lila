@@ -2,14 +2,13 @@ package views.html
 package account
 
 import lila.api.Context
-import lila.app.templating.Environment._
-import lila.app.ui.ScalatagsTemplate._
+import lila.app.templating.Environment.*
+import lila.app.ui.ScalatagsTemplate.*
 import lila.pref.PrefCateg
-
 
 object pref {
 
-  import trans.preferences._
+  import trans.preferences.*
 
   private def categFieldset(categ: lila.pref.PrefCateg, active: lila.pref.PrefCateg) =
     div(cls := List("none" -> (categ != active)))
@@ -20,14 +19,14 @@ object pref {
     st.group(cls := "radio")(
       options.map { v =>
         val id      = s"${field.id}_${v._1}"
-        val checked = field.value `has` v._1.toString
+        val checked = field.value.has(v._1.toString)
         div(
           input(
             st.id := s"$prefix$id",
-            checked `option` st.checked,
-            tpe := "radio",
+            checked.option(st.checked),
+            tpe   := "radio",
             value := v._1.toString,
-            name := field.name
+            name  := field.name
           ),
           label(`for` := s"$prefix$id")(v._2)
         )

@@ -1,6 +1,5 @@
 package views.html.video
 
-
 object search {
   /*
   def apply(videos: Paginator[lila.video.VideoView], control: lila.video.UserControl)(implicit ctx: Context) =

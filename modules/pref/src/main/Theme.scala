@@ -1,5 +1,5 @@
 package lila.pref
-import strategygames.{ GameFamily }
+import strategygames.GameFamily
 
 sealed class Theme private[pref] (val name: String, val colors: Theme.HexColors, val gameFamily: Int) {
 
@@ -28,7 +28,6 @@ sealed trait ThemeObject {
 
   def contains(name: String) = all map (t => t.name) contains name
 }
-
 
 object Theme extends ThemeObject {
 
@@ -84,16 +83,14 @@ object Theme extends ThemeObject {
 
   def addMissingDefaultsIfAny(currentThemes: List[Theme]): List[Theme] =
     defaults.map { x =>
-      if (currentThemes.filter(t => t.gameFamily == x.gameFamily).size == 1)
+      if currentThemes.filter(t => t.gameFamily == x.gameFamily).size == 1 then
         currentThemes.filter(t => t.gameFamily == x.gameFamily)(0)
-      else
-        x
+      else x
     }
 
   def allOfFamily(gf: GameFamily): List[Theme] =
     gf.boardThemes.map(t => new Theme(t, Theme.colors.getOrElse(t, Theme.defaultHexColors), gf.id))
 }
-
 
 object Theme3d extends ThemeObject {
 

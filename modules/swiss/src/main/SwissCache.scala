@@ -1,16 +1,15 @@
 package lila.swiss
 
-
-import lila.db.dsl._
+import lila.db.dsl.*
 import lila.hub.LightTeam.TeamID
-import lila.memo._
+import lila.memo.*
 
 final private class SwissCache(
     colls: SwissColls,
     cacheApi: CacheApi
 )(implicit ec: scala.concurrent.ExecutionContext) {
 
-  import BsonHandlers._
+  import BsonHandlers.*
 
   val name = cacheApi.sync[Swiss.Id, Option[String]](
     name = "swiss.name",
@@ -34,13 +33,13 @@ final private class SwissCache(
       for {
         enterable <- colls.swiss.primitive[Swiss.Id](
           $doc("teamId" -> teamId, "finishedAt" `$exists` false),
-          $sort `asc` "startsAt",
+          $sort.asc("startsAt"),
           nb = max,
           "_id"
         )
         finished <- colls.swiss.primitive[Swiss.Id](
           $doc("teamId" -> teamId, "finishedAt" `$exists` true),
-          $sort `desc` "startsAt",
+          $sort.desc("startsAt"),
           nb = max - enterable.size,
           "_id"
         )

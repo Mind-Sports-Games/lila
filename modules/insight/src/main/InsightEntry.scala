@@ -1,7 +1,7 @@
 package lila.insight
 
 import strategygames.chess.opening.Ecopening
-import strategygames.{ Player => PlayerIndex, Role }
+import strategygames.{ Player as PlayerIndex, Role }
 import org.joda.time.DateTime
 
 import lila.game.{ Game, Pov }
@@ -83,12 +83,12 @@ object Termination {
   case object Checkmate   extends Termination(6, "Checkmate")
   case object Perpetual   extends Termination(7, "Perpetual")
 
-  val all = List(ClockFlag, Disconnect, Resignation, Draw, Stalemate, Checkmate)
+  val all  = List(ClockFlag, Disconnect, Resignation, Draw, Stalemate, Checkmate)
   val byId = all map { p =>
     (p.id, p)
   } toMap
 
-  import strategygames.{ Status => S }
+  import strategygames.Status as S
 
   def fromStatus(s: strategygames.Status) =
     s match {
@@ -102,7 +102,7 @@ object Termination {
       case S.Mate | S.SingleWin | S.GammonWin | S.BackgammonWin | S.VariantEnd            => Checkmate
       case S.PerpetualCheck                                                               => Perpetual
       case S.Cheat                                                                        => Resignation
-      case S.Created | S.Started | S.Aborted | S.NoStart | S.UnknownFinish =>
+      case S.Created | S.Started | S.Aborted | S.NoStart | S.UnknownFinish                =>
         logger.error(s"Unfinished game in the insight indexer: $s")
         Resignation
     }
@@ -113,7 +113,7 @@ object Result {
   case object Win  extends Result(1, "Victory")
   case object Draw extends Result(2, "Draw")
   case object Loss extends Result(3, "Defeat")
-  val all = List(Win, Draw, Loss)
+  val all  = List(Win, Draw, Loss)
   val byId = all map { p =>
     (p.id, p)
   } toMap
@@ -125,14 +125,14 @@ object Phase {
   case object Opening extends Phase(1, "Opening")
   case object Middle  extends Phase(2, "Middlegame")
   case object End     extends Phase(3, "Endgame")
-  val all = List(Opening, Middle, End)
+  val all  = List(Opening, Middle, End)
   val byId = all map { p =>
     (p.id, p)
   } toMap
   def of(div: strategygames.Division, ply: Int): Phase =
     div.middle.fold[Phase](Opening) {
       case m if m > ply => Opening
-      case _ =>
+      case _            =>
         div.end.fold[Phase](Middle) {
           case e if e > ply => Middle
           case _            => End
@@ -145,12 +145,12 @@ object Castling {
   object Kingside  extends Castling(1, "Kingside castling")
   object Queenside extends Castling(2, "Queenside castling")
   object None      extends Castling(3, "No castling")
-  val all = List(Kingside, Queenside, None)
+  val all  = List(Kingside, Queenside, None)
   val byId = all map { p =>
     (p.id, p)
   } toMap
   def fromMoves(moves: Iterable[String]) =
-    moves.find(_ `startsWith` "O") match {
+    moves.find(_.startsWith("O")) match {
       case Some("O-O")   => Kingside
       case Some("O-O-O") => Queenside
       case _             => None
@@ -162,7 +162,7 @@ object QueenTrade {
   object Yes extends QueenTrade(true, "Queen trade")
   object No  extends QueenTrade(false, "No queen trade")
   val all                           = List(Yes, No)
-  def apply(v: Boolean): QueenTrade = if (v) Yes else No
+  def apply(v: Boolean): QueenTrade = if v then Yes else No
 }
 
 sealed abstract class RelativeStrength(val id: Int, val name: String)
@@ -172,7 +172,7 @@ object RelativeStrength {
   case object Similar      extends RelativeStrength(30, "Similar")
   case object Stronger     extends RelativeStrength(40, "Stronger")
   case object MuchStronger extends RelativeStrength(50, "Much stronger")
-  val all = List(MuchWeaker, Weaker, Similar, Stronger, MuchStronger)
+  val all  = List(MuchWeaker, Weaker, Similar, Stronger, MuchStronger)
   val byId = all map { p =>
     (p.id, p)
   } toMap
@@ -196,7 +196,7 @@ object MovetimeRange {
   case object MTRInf extends MovetimeRange(60, "More than 30 seconds", Int.MaxValue)
   val all           = List(MTR1, MTR3, MTR5, MTR10, MTR30, MTRInf)
   def reversedNoInf = all.reverse drop 1
-  val byId = all map { p =>
+  val byId          = all map { p =>
     (p.id, p)
   } toMap
   def toRange(mr: MovetimeRange): (Int, Int) =
@@ -221,11 +221,11 @@ object MaterialRange {
   case object Up4   extends MaterialRange(9, "More than +6", Int.MaxValue)
   val all                     = List(Down4, Down3, Down2, Down1, Equal, Up1, Up2, Up3, Up4)
   def reversedButEqualAndLast = all.diff(List(Equal, Up4)).reverse
-  val byId = all map { p =>
+  val byId                    = all map { p =>
     (p.id, p)
   } toMap
   def toRange(mr: MaterialRange): (Int, Int) =
-    if (mr.id == Equal.id) (0, 0)
+    if mr.id == Equal.id then (0, 0)
     else
       (
         byId.get(mr.id - 1).fold(Int.MinValue)(_.imbalance),
@@ -238,7 +238,7 @@ object Blur {
   object Yes extends Blur(true, "Blur")
   object No  extends Blur(false, "No blur")
   val all                     = List(Yes, No)
-  def apply(v: Boolean): Blur = if (v) Yes else No
+  def apply(v: Boolean): Blur = if v then Yes else No
 }
 
 sealed abstract class TimeVariance(val id: Float, val name: String) {
@@ -250,14 +250,14 @@ object TimeVariance {
   case object Medium          extends TimeVariance(0.6f, "Medium")
   case object QuiteVariable   extends TimeVariance(0.75f, "Quite variable")
   case object VeryVariable    extends TimeVariance(1f, "Very variable")
-  val all = List(VeryConsistent, QuiteConsistent, Medium, QuiteVariable, VeryVariable)
+  val all  = List(VeryConsistent, QuiteConsistent, Medium, QuiteVariable, VeryVariable)
   val byId = all map { p =>
     (p.id, p)
   } toMap
-  def apply(v: Float) = all.find(_.id >= v) | VeryVariable
-  val intFactor: Int  = 100_000 // multiply variance by that to get an Int for storage
+  def apply(v: Float)                       = all.find(_.id >= v) | VeryVariable
+  val intFactor: Int                        = 100_000 // multiply variance by that to get an Int for storage
   def toRange(tv: TimeVariance): (Int, Int) =
-    if (tv == VeryVariable) (QuiteVariable.intFactored, Int.MaxValue)
+    if tv == VeryVariable then (QuiteVariable.intFactored, Int.MaxValue)
     else
       (
         all.indexOf(tv).some.filter(-1 !=).map(_ - 1).flatMap(all.lift).fold(0)(_.intFactored),
@@ -270,8 +270,8 @@ object CplRange {
   val all = List(0, 10, 25, 50, 100, 200, 500, 99999).map { cpl =>
     new CplRange(
       name =
-        if (cpl == 0) "Perfect"
-        else if (cpl == 99999) "> 500 CPL"
+        if cpl == 0 then "Perfect"
+        else if cpl == 99999 then "> 500 CPL"
         else s"≤ $cpl CPL",
       cpl = cpl
     )

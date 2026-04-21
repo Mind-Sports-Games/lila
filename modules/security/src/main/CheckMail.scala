@@ -1,14 +1,14 @@
 package lila.security
 
-import play.api.libs.json._
+import play.api.libs.json.*
 import play.api.libs.ws.StandaloneWSClient
 import reactivemongo.api.ReadPreference
-import play.api.libs.ws.JsonBodyReadables._
-import scala.concurrent.duration._
+import play.api.libs.ws.JsonBodyReadables.*
+import scala.concurrent.duration.*
 
 import lila.common.Domain
 import lila.common.extensions.*
-import lila.db.dsl._
+import lila.db.dsl.*
 
 /* An expensive API detecting disposable email.
  * Only hit after trying everything else (DnsApi)
@@ -23,7 +23,7 @@ final private class CheckMail(
 ) {
 
   def apply(domain: Domain.Lower): Fu[Boolean] =
-    if (config.key.value.isEmpty) fuccess(true)
+    if config.key.value.isEmpty then fuccess(true)
     else
       cache
         .get(domain)
@@ -78,7 +78,7 @@ final private class CheckMail(
           ok
         case res =>
           throw lila.base.LilaException(s"${config.url} $domain ${res.status} ${res.body.toString.take(200)}")
-    }
+      }
       .monTry(res => _.security.checkMailApi.fetch(res.isSuccess, res.getOrElse(true)))
 
   // sometimes it's "1" and sometimes it's "true"

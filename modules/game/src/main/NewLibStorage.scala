@@ -35,7 +35,6 @@ private object NewLibStorage {
       }
   }
 
-
   private def monitor[A](mon: lila.mon.TimerPath)(f: => A): A =
     lila.common.Chronometer.syncMon(mon)(f)
 }

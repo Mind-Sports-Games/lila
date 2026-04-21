@@ -21,8 +21,9 @@ object Bus {
   def subscribe(ref: ActorRef, to: Channel): Unit = bus.subscribe(Tellable.Actor(ref), to)
 
   def subscribe(subscriber: Tellable, to: Channel*): Unit = to.foreach(bus.subscribe(subscriber, _))
-  def subscribe(ref: ActorRef, to: Channel*): Unit = to.foreach(bus.subscribe(Tellable.Actor(ref), _))
-  def subscribe(ref: ActorRef, to: Iterable[Channel]): Unit = to.foreach(bus.subscribe(Tellable.Actor(ref), _))
+  def subscribe(ref: ActorRef, to: Channel*): Unit        = to.foreach(bus.subscribe(Tellable.Actor(ref), _))
+  def subscribe(ref: ActorRef, to: Iterable[Channel]): Unit =
+    to.foreach(bus.subscribe(Tellable.Actor(ref), _))
 
   def subscribeFun(to: Channel*)(f: PartialFunction[Any, Unit]): Tellable = {
     val t = lila.common.Tellable(f)
@@ -36,7 +37,7 @@ object Bus {
     }
 
   def unsubscribe(subscriber: Tellable, from: Channel): Unit = bus.unsubscribe(subscriber, from)
-  def unsubscribe(ref: ActorRef, from: Channel): Unit = bus.unsubscribe(Tellable.Actor(ref), from)
+  def unsubscribe(ref: ActorRef, from: Channel): Unit        = bus.unsubscribe(Tellable.Actor(ref), from)
 
   def unsubscribe(subscriber: Tellable, from: Iterable[Channel]): Unit =
     from.foreach(bus.unsubscribe(subscriber, _))
@@ -79,8 +80,7 @@ final private class EventBus[Event, Channel, Subscriber](
   def subscribe(subscriber: Subscriber, channel: Channel): Unit =
     entries.compute(
       channel,
-      (_: Channel, subs: Set[Subscriber]) =>
-        Option(subs).fold(Set(subscriber))(_ + subscriber)
+      (_: Channel, subs: Set[Subscriber]) => Option(subs).fold(Set(subscriber))(_ + subscriber)
     )
 
   def unsubscribe(subscriber: Subscriber, channel: Channel): Unit =

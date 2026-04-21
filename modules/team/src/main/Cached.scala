@@ -19,7 +19,7 @@ final class Cached(
     expireAfter = Syncache.ExpireAfterAccess(20 minutes)
   )
 
-  def blockingTeamName(id: Team.ID) = nameCache `sync` id
+  def blockingTeamName(id: Team.ID) = nameCache.sync(id)
 
   def preloadSet = nameCache.preloadSet
 

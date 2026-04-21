@@ -1,13 +1,13 @@
 package lila.chat
 
-import play.api.libs.json._
+import play.api.libs.json.*
 
 import lila.common.LightUser
-import lila.common.Json._
+import lila.common.Json.*
 
 object JsonView {
 
-  import writers._
+  import writers.*
 
   lazy val timeoutReasons = Json toJson ChatTimeout.Reason.all
 

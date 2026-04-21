@@ -25,7 +25,7 @@ object Duel {
 
   case class DuelPlayer(name: Name, rating: Rating, rank: Rank, isInputRating: Boolean)
   case class Name(value: String) extends AnyVal with StringValue {
-    def id = User `normalize` value
+    def id = User.normalize(value)
   }
   case class Rating(value: Int) extends AnyVal with IntValue
   case class Rank(value: Int)   extends AnyVal with IntValue
@@ -42,11 +42,11 @@ object Duel {
 
 final private class DuelStore {
 
-  import Duel._
+  import Duel.*
 
   private val byTourId = new ConcurrentHashMap[Tournament.ID, TreeSet[Duel]](256)
 
-  def get(tourId: Tournament.ID): Option[TreeSet[Duel]] = Option(byTourId `get` tourId)
+  def get(tourId: Tournament.ID): Option[TreeSet[Duel]] = Option(byTourId.get(tourId))
 
   def bestRated(tourId: Tournament.ID, nb: Int): List[Duel] =
     get(tourId) so {
@@ -54,7 +54,7 @@ final private class DuelStore {
     }
 
   def find(tour: Tournament, user: User): Option[Game.ID] =
-    get(tour.id) flatMap { _.find(_ `has` user).map(_.gameId) }
+    get(tour.id) flatMap { _.find(_.has(user)).map(_.gameId) }
 
   def add(tour: Tournament, game: Game, p1: UsernameRating, p2: UsernameRating, ranking: Ranking): Unit =
     for {
@@ -69,7 +69,7 @@ final private class DuelStore {
     } byTourId.compute(
       tour.id,
       (_: Tournament.ID, v: TreeSet[Duel]) => {
-        if (v == null) TreeSet(tb)(using gameIdOrdering)
+        if v == null then TreeSet(tb)(using gameIdOrdering)
         else v + tb
       }
     )
@@ -80,7 +80,7 @@ final private class DuelStore {
         tourId,
         (_: Tournament.ID, tb: TreeSet[Duel]) => {
           val w = tb - emptyGameId(game.id)
-          if (w.isEmpty) null else w
+          if w.isEmpty then null else w
         }
       )
     }

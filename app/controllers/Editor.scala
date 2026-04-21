@@ -3,12 +3,12 @@ package controllers
 import strategygames.variant.Variant
 import strategygames.format.{ FEN, Forsyth }
 import strategygames.Situation
-import play.api.libs.json._
-import views._
-import strategygames.chess.format.{ Forsyth => ChessForsyth }
+import play.api.libs.json.*
+import views.*
+import strategygames.chess.format.Forsyth as ChessForsyth
 
 import lila.app.*
-import lila.common.Json._
+import lila.common.Json.*
 
 final class Editor(env: Env) extends LilaController(env) {
 
@@ -27,11 +27,11 @@ final class Editor(env: Env) extends LilaController(env) {
   def load(urlFen: String) =
     Open { implicit ctx =>
       val urlVariant: Option[String] = ctx.req.getQueryString("variant")
-      val fenStr = lila.common.String
+      val fenStr                     = lila.common.String
         .decodeUriPath(urlFen)
         .map(_.replace('_', ' ').trim)
         .filter(_.nonEmpty)
-      val variant = Variant.orDefault(urlVariant.getOrElse(""))
+      val variant     = Variant.orDefault(urlVariant.getOrElse(""))
       val orientation = ctx.req.getQueryString("orientation")
       fuccess {
         val situation = readFen(fenStr, variant)
@@ -76,10 +76,9 @@ final class Editor(env: Env) extends LilaController(env) {
   // If the game is not playable and the FEN is not passed, redirect to the editor based on the state after the last move.
   def game(id: String) =
     Open { implicit ctx =>
-      OptionResult(env.game.gameRepo `game` id) { game =>
+      OptionResult(env.game.gameRepo.game(id)) { game =>
         Redirect(
-          if (game.playable)
-            routes.Round.watcher(game.id, game.variant.startPlayer.name).url
+          if game.playable then routes.Round.watcher(game.id, game.variant.startPlayer.name).url
           else
             editorUrl(
               get("fen").fold(Forsyth.>>(game.variant.gameLogic, game.stratGame))(fen =>
@@ -92,6 +91,6 @@ final class Editor(env: Env) extends LilaController(env) {
     }
 
   private[controllers] def editorUrl(fen: FEN, variant: Variant): String =
-    if (fen.value == ChessForsyth.initial.value && variant.key == "standard") routes.Editor.index.url
+    if fen.value == ChessForsyth.initial.value && variant.key == "standard" then routes.Editor.index.url
     else routes.Editor.load(fen.value).url + s"?variant=${variant.key}"
 }

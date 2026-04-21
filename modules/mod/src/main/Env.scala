@@ -1,11 +1,11 @@
 package lila.mod
 
-import akka.actor._
-import com.softwaremill.macwire._
+import akka.actor.*
+import com.softwaremill.macwire.*
 import lila.common.autoconfig.{ AutoConfig, ConfigName }
 import play.api.Configuration
 
-import lila.common.config._
+import lila.common.config.*
 import lila.user.User
 
 @Module
@@ -86,17 +86,17 @@ final class Env(
   lila.common.Bus.subscribeFuns(
     "finishGame" -> {
       case lila.game.actorApi.FinishGame(game, p1UserOption, p2UserOption) if !game.aborted =>
-        import cats.implicits._
+        import cats.implicits.*
         (p1UserOption, p2UserOption) mapN { (p1User, p2User) =>
           sandbagWatch(game)
           assessApi.onGameReady(game, p1User, p2User)
         }
-        if (game.status == strategygames.Status.Cheat)
+        if game.status == strategygames.Status.Cheat then
           game.loserUserId foreach { userId =>
             logApi.cheatDetected(userId, game.id) >>
               logApi.countRecentCheatDetected(userId) flatMap { count =>
                 (count >= 3) so {
-                  if (game.hasClock)
+                  if game.hasClock then
                     api.autoMark(
                       lila.report.SuspectId(userId),
                       lila.report.ModId.playstrategy,
@@ -112,13 +112,13 @@ final class Env(
     },
     "garbageCollect" -> {
       case lila.hub.actorApi.security.GCImmediateSb(userId) =>
-        reportApi `getSuspect` userId `orFail` s"No such suspect $userId" foreach { sus =>
+        reportApi.getSuspect(userId).orFail(s"No such suspect $userId") foreach { sus =>
           reportApi.getPlayStrategyMod foreach { mod =>
             api.setTroll(mod, sus, value = true)
           }
         }
       case lila.hub.actorApi.security.GarbageCollect(userId) =>
-        reportApi `getSuspect` userId `orFail` s"No such suspect $userId" foreach { sus =>
+        reportApi.getSuspect(userId).orFail(s"No such suspect $userId") foreach { sus =>
           api.garbageCollect(sus) >> publicChat.deleteAll(sus)
         }
     },

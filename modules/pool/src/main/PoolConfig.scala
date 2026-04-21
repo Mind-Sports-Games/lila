@@ -1,6 +1,6 @@
 package lila.pool
 
-import scala.concurrent.duration._
+import scala.concurrent.duration.*
 import strategygames.variant.Variant
 import lila.i18n.VariantKeys
 import lila.rating.PerfType
@@ -32,13 +32,13 @@ object PoolConfig {
 
   case class Wave(every: FiniteDuration, players: NbPlayers)
 
-  //def clockToId(clock: Clock.Config) = Id(clock.show)
+  // def clockToId(clock: Clock.Config) = Id(clock.show)
 
   def clockAndVariantToId(clock: ClockConfig, variant: Variant) = Id(
     clock.show.replace("|", "-").replace(" ", "").replace("/", "") + "-" + variant.key
   )
 
-  import play.api.libs.json._
+  import play.api.libs.json.*
   implicit val poolConfigJsonWriter: OWrites[PoolConfig] = OWrites[PoolConfig] { p =>
     p.clock match {
       case fc: Clock.Config =>

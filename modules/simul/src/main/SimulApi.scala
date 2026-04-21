@@ -46,7 +46,7 @@ final class SimulApi(
   private val currentHostIdsCache = cacheApi.unit[Set[User.ID]] {
     _.refreshAfterWrite(5 minutes)
       .buildAsyncFuture { _ =>
-        repo.allStarted `dmap` (_.view.map(_.hostId).toSet)
+        repo.allStarted.dmap((_.view.map(_.hostId).toSet))
       }
   }
 
@@ -64,7 +64,7 @@ final class SimulApi(
       featurable = some(~setup.featured && me.isSimulFeatured)
     )
     repo.create(simul).andDo(publish()).andDo {
-      timeline ! (Propagate(SimulCreate(me.id, simul.id, simul.fullName)) `toFollowersOf` me.id)
+      timeline ! (Propagate(SimulCreate(me.id, simul.id, simul.fullName)).toFollowersOf(me.id))
     } inject simul
   }
 
@@ -86,9 +86,9 @@ final class SimulApi(
   def addApplicant(simulId: Simul.ID, user: User, isInTeam: TeamID => Boolean, variantKey: String): Funit =
     WithSimul(repo.findCreated, simulId) { simul =>
       if (simul.nbAccepted < Game.maxPlayingRealtime && simul.team.forall(isInTeam)) {
-        timeline ! (Propagate(SimulJoin(user.id, simul.id, simul.fullName)) `toFollowersOf` user.id)
+        timeline ! (Propagate(SimulJoin(user.id, simul.id, simul.fullName)).toFollowersOf(user.id))
         Variant(variantKey).filter(simul.variants.contains).fold(simul) { variant =>
-          simul `addApplicant` SimulApplicant.make(
+          simul.addApplicant(SimulApplicant.make(
             SimulPlayer.make(
               user,
               variant,
@@ -98,17 +98,17 @@ final class SimulApi(
                 daysPerTurn = none
               )(user.perfs)
             )
-          )
+          ))
         }
       }
       else simul
     }
 
   def removeApplicant(simulId: Simul.ID, user: User): Funit =
-    WithSimul(repo.findCreated, simulId) { _ `removeApplicant` user.id }
+    WithSimul(repo.findCreated, simulId) { _.removeApplicant(user.id) }
 
   def accept(simulId: Simul.ID, userId: String, v: Boolean): Funit =
-    userRepo `byId` userId flatMap {
+    userRepo.byId(userId) flatMap {
       _ so { user =>
         WithSimul(repo.findCreated, simulId) { _.accept(user.id, v) }
       }
@@ -122,7 +122,7 @@ final class SimulApi(
         repo.findCreated(simul.id) flatMap {
           _ so { simul =>
             simul.start so { started =>
-              userRepo `byId` started.hostId `orFail` s"No such host: ${simul.hostId}" flatMap { host =>
+              userRepo.byId(started.hostId).orFail(s"No such host: ${simul.hostId}") flatMap { host =>
                 Future.sequence(started.pairings.zipWithIndex.map(makeGame(started, host))) map { games =>
                   games.headOption foreach { case (game, _) =>
                     socket.startSimul(simul, game)
@@ -150,7 +150,7 @@ final class SimulApi(
     workQueue(simulId) {
       repo.findCreated(simulId) flatMap {
         _ so { simul =>
-          (repo `remove` simul).andDo(socket.aborted(simul.id)).andDo(publish())
+          (repo.remove(simul)).andDo(socket.aborted(simul.id)).andDo(publish())
         }
       }
     }
@@ -204,7 +204,7 @@ final class SimulApi(
         workQueue(oldSimul.id) {
           repo.findCreated(oldSimul.id) flatMap {
             _ so { simul =>
-              (simul `ejectCheater` userId) so { simul2 =>
+              (simul.ejectCheater(userId)) so { simul2 =>
                 update(simul2).void
               }
             }
@@ -232,7 +232,7 @@ final class SimulApi(
   def byTeamLeaders = repo.byTeamLeaders
 
   def idToName(id: Simul.ID): Fu[Option[String]] =
-    repo `find` id dmap2 { _.fullName }
+    repo.find(id) dmap2 { _.fullName }
 
   def teamOf(id: Simul.ID): Fu[Option[TeamID]] =
     repo.coll.primitiveOne[TeamID]($id(id), "team")
@@ -243,7 +243,7 @@ final class SimulApi(
     pairingAndNumber match {
       case (pairing, number) =>
         for {
-          user <- userRepo `byId` pairing.player.user `orFail` s"No user with id ${pairing.player.user}"
+          user <- userRepo.byId(pairing.player.user).orFail(s"No user with id ${pairing.player.user}")
           hostPlayerIndex = simul.hostPlayerIndex | PlayerIndex.fromP1(number % 2 == 0)
           p1User          = hostPlayerIndex.fold(host, user)
           p2User          = hostPlayerIndex.fold(user, host)
@@ -280,7 +280,7 @@ final class SimulApi(
               .withSimulId(simul.id)
               .start
           _ <-
-            (gameRepo `insertDenormalized` game2).andDo(onGameStart(game2.id)).andDo(socket.startGame(simul, game2))
+            (gameRepo.insertDenormalized(game2)).andDo(onGameStart(game2.id)).andDo(socket.startGame(simul, game2))
         } yield game2 -> hostPlayerIndex
     }
 

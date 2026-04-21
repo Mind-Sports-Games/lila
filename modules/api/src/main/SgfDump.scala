@@ -1,7 +1,7 @@
 package lila.api
 
 import strategygames.format.FEN
-import lila.analyse.{ Analysis }
+import lila.analyse.Analysis
 import lila.game.Game
 import lila.game.PgnDump.WithFlags
 import lila.team.GameTeams
@@ -14,7 +14,8 @@ final class SgfDump(
     @annotation.nowarn("msg=unused") _getSwissName: lila.swiss.GetSwissName
 )(implicit @annotation.nowarn("msg=unused") _ec: scala.concurrent.ExecutionContext) {
 
-  @annotation.nowarn("msg=unused") implicit private val lang: Lang = lila.i18n.defaultLang
+  @annotation.nowarn("msg=unused")
+  implicit private val lang: Lang = lila.i18n.defaultLang
 
   def apply(
       game: Game,
@@ -32,4 +33,3 @@ final class SgfDump(
       realPlayers: Option[RealPlayers]
   ) => apply(game, initialFen, flags, teams, realPlayers)
 }
-

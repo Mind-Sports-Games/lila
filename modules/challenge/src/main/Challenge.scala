@@ -3,7 +3,7 @@ package lila.challenge
 import strategygames.format.FEN
 import strategygames.variant.Variant
 import strategygames.chess.variant.Chess960
-import strategygames.{ P2, Player => PlayerIndex, GameFamily, Mode, Speed, P1 }
+import strategygames.{ GameFamily, Mode, P1, P2, Player as PlayerIndex, Speed }
 
 import org.joda.time.DateTime
 import scala.util.Random
@@ -36,7 +36,7 @@ case class Challenge(
     backgammonPoints: Option[Int] = None
 ) {
 
-  import Challenge._
+  import Challenge.*
 
   def id = _id
 
@@ -95,8 +95,8 @@ case class Challenge(
 
   def notableInitialFen: Option[FEN] =
     variant match {
-      case Variant.Chess(variant)                => if (variant.standardInitialPosition) none else initialFen
-      case Variant.Draughts(_)                   => draughtsCustomStartingPosition so initialFen
+      case Variant.Chess(variant) => if variant.standardInitialPosition then none else initialFen
+      case Variant.Draughts(_)    => draughtsCustomStartingPosition so initialFen
       case Variant.Go(_) | Variant.Backgammon(_) => customStartingPosition so initialFen
       case _                                     => none
     }
@@ -108,13 +108,13 @@ case class Challenge(
     variant == Variant.Draughts(strategygames.draughts.variant.FromPosition) ||
       (draughtsFenVariants(variant) && customStartingPosition)
 
-  //When updating, also edit modules/game, modules/puzzle and ui/@types/playstrategy/index.d.ts:declare type PlayerName
+  // When updating, also edit modules/game, modules/puzzle and ui/@types/playstrategy/index.d.ts:declare type PlayerName
   def playerTrans(p: PlayerIndex)(implicit lang: Lang): String =
     variant.playerNames(p) match {
       case "White" => I18nKeys.white.txt()
       case "Black" => I18nKeys.black.txt()
-      //Xiangqi add back in when adding red as a colour for Xiangqi
-      //case "Red"   => I18nKeys.red.txt()
+      // Xiangqi add back in when adding red as a colour for Xiangqi
+      // case "Red"   => I18nKeys.red.txt()
       case "Sente"   => I18nKeys.sente.txt()
       case "Gote"    => I18nKeys.gote.txt()
       case s: String => s
@@ -175,16 +175,29 @@ object Challenge {
     case object OnlyBot     extends DeclineReason(I18nKeys.challenge.declineOnlyBot)
     case object NoAnon      extends DeclineReason(I18nKeys.challenge.declineNoAnon)
 
-    val default: DeclineReason = Generic
+    val default: DeclineReason   = Generic
     val all: List[DeclineReason] =
-      List(Generic, Later, TooFast, TooSlow, TimeControl, Rated, Casual, Standard, Variant, NoBot, OnlyBot, NoAnon)
+      List(
+        Generic,
+        Later,
+        TooFast,
+        TooSlow,
+        TimeControl,
+        Rated,
+        Casual,
+        Standard,
+        Variant,
+        NoBot,
+        OnlyBot,
+        NoAnon
+      )
     val allExceptBot: List[DeclineReason] =
       all.filterNot(r => r == NoBot || r == OnlyBot)
     def apply(key: String) = all.find { d => d.key == key.toLowerCase || d.trans.key == key } | Generic
   }
 
   case class Rating(int: Int, provisional: Boolean) {
-    def show = s"$int${if (provisional) "?" else ""}"
+    def show = s"$int${if provisional then "?" else ""}"
   }
   object Rating {
     def apply(p: lila.rating.Perf): Rating = Rating(p.intRating, p.provisional)
@@ -199,8 +212,8 @@ object Challenge {
 
   sealed trait TimeControl
   object TimeControl {
-    case object Unlimited                extends TimeControl
-    case class Correspondence(days: Int) extends TimeControl
+    case object Unlimited                               extends TimeControl
+    case class Correspondence(days: Int)                extends TimeControl
     case class Clock(config: strategygames.ClockConfig) extends TimeControl {
       // All durations are expressed in seconds
       def limit = config.limit
@@ -233,7 +246,7 @@ object Challenge {
 
   private val idSize = 8
 
-  private def randomId = lila.common.ThreadLocalRandom `nextString` idSize
+  private def randomId = lila.common.ThreadLocalRandom.nextString(idSize)
 
   def toRegistered(variant: Variant, timeControl: TimeControl)(u: User) =
     Challenger.Registered(u.id, Rating(u.perfs(perfTypeOf(variant, timeControl))))
@@ -256,7 +269,7 @@ object Challenge {
       rematchOf: Option[Game.ID],
       name: Option[String] = None,
       multiMatch: Boolean = false,
-      //this could be extended into 'gameSettings' if more game specific fields are required
+      // this could be extended into 'gameSettings' if more game specific fields are required
       backgammonPoints: Option[Int] = None
   ): Challenge = {
     val (playerIndexChoice, finalPlayerIndex) = playerIndex match {
@@ -264,7 +277,7 @@ object Challenge {
       case "p2" => PlayerIndexChoice.P2     -> P2
       case _    => PlayerIndexChoice.Random -> randomPlayerIndex
     }
-    //val finalInitialFen = finalVariant match {
+    // val finalInitialFen = finalVariant match {
     //  case Variant.Draughts(v) =>
     //    draughtsFenVariants(v) so {
     //      initialFen.flatMap(fen => Forsyth.<<@(finalVariant.gameLogic, finalVariant, fen.value))
@@ -273,27 +286,26 @@ object Challenge {
     //      case fen @ Some(_) => fen
     //      case _ => !finalVariant.standardInitialPosition option FEN(finalVariant.initialFen)
     //    }
-    //}
+    // }
     val finalMode = timeControl match {
       case TimeControl.Clock(clock) if !lila.game.Game.allowRated(variant, clock.some) => Mode.Casual
       case _                                                                           => mode
     }
-    val isOpen = challenger == Challenge.Challenger.Open
+    val isOpen    = challenger == Challenge.Challenger.Open
     var challenge = new Challenge(
       _id = randomId,
       status = Status.Created,
       variant = variant,
       initialFen =
-        if (
-          variant.fromPositionVariant || variant.gameFamily == GameFamily
+        if variant.fromPositionVariant || variant.gameFamily == GameFamily
             .Go() || variant.gameFamily == GameFamily.Backgammon()
-        ) initialFen
-        else if (variant == Variant.Chess(Chess960)) initialFen filter { fen =>
-          fen.chessFen.map(fen => Chess960.positionNumber(fen).isDefined).getOrElse(false)
-        }
-        else if (variant.initialFens.size > 1)
-          Random.shuffle(variant.initialFens).headOption
-        else !variant.standardInitialPosition `option` variant.initialFen,
+        then initialFen
+        else if variant == Variant.Chess(Chess960) then
+          initialFen filter { fen =>
+            fen.chessFen.map(fen => Chess960.positionNumber(fen).isDefined).getOrElse(false)
+          }
+        else if variant.initialFens.size > 1 then Random.shuffle(variant.initialFens).headOption
+        else (!variant.standardInitialPosition).option(variant.initialFen),
       timeControl = timeControl,
       mode = finalMode,
       playerIndexChoice = playerIndexChoice,
@@ -302,16 +314,15 @@ object Challenge {
       destUser = destUser map toRegistered(variant, timeControl),
       rematchOf = rematchOf,
       createdAt = DateTime.now,
-      seenAt = !isOpen `option` DateTime.now,
-      expiresAt = if (isOpen) DateTime.now.plusDays(1) else inTwoWeeks,
-      open = isOpen `option` true,
+      seenAt = (!isOpen).option(DateTime.now),
+      expiresAt = if isOpen then DateTime.now.plusDays(1) else inTwoWeeks,
+      open = isOpen.option(true),
       name = name,
-      multiMatch = multiMatch `option` true,
+      multiMatch = multiMatch.option(true),
       backgammonPoints = backgammonPoints
     )
-    if (multiMatch && !challenge.customStartingPosition)
-      challenge = challenge.copy(multiMatch = none)
-    if (challenge.mode.rated && !challenge.isMultiMatch && challenge.customStartingPosition)
+    if multiMatch && !challenge.customStartingPosition then challenge = challenge.copy(multiMatch = none)
+    if challenge.mode.rated && !challenge.isMultiMatch && challenge.customStartingPosition then
       challenge = challenge.copy(mode = Mode.Casual)
     challenge
   }

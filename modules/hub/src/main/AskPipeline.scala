@@ -46,13 +46,13 @@ final class AskPipeline[A](compute: () => Fu[A], timeout: FiniteDuration, name: 
 
   private def complete(res: Either[Exception, A]) =
     state match {
-      case Idle => // ???
+      case Idle                      => // ???
       case Processing(current, next) =>
         res.fold(
           err => current.foreach(_ failure err),
           res => current.foreach(_ success res)
         )
-        if (next.isEmpty) state = Idle
+        if next.isEmpty then state = Idle
         else {
           startComputing()
           state = Processing(next, Nil)

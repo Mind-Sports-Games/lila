@@ -3,10 +3,9 @@ package views.html.user
 import play.api.i18n.Lang
 
 import lila.api.Context
-import lila.app.templating.Environment._
-import lila.app.ui.ScalatagsTemplate._
+import lila.app.templating.Environment.*
+import lila.app.ui.ScalatagsTemplate.*
 import lila.user.User
-
 
 object bits {
 
@@ -32,7 +31,7 @@ object bits {
   def signalBars(v: Int) =
     raw {
       val bars = (1 to 4).map { b =>
-        s"""<i${if (v < b) " class=\"off\"" else ""}></i>"""
+        s"""<i${if v < b then " class=\"off\"" else ""}></i>"""
       } mkString ""
       val title = v match {
         case 1 => "Poor connection"

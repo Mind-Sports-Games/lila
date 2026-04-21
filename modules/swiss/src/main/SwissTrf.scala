@@ -1,9 +1,9 @@
 package lila.swiss
 
-import akka.stream.scaladsl._
-import reactivemongo.api.bson._
+import akka.stream.scaladsl.*
+import reactivemongo.api.bson.*
 
-import lila.db.dsl._
+import lila.db.dsl.*
 import lila.user.User
 
 // https://www.fide.com/FIDE/handbook/C04Annex2_TRF16.pdf
@@ -24,14 +24,14 @@ final class SwissTrf(
       tournamentLines(swiss) concat
         forbiddenPairings(swiss, playerIds) concat sheetApi
           .source(swiss, sort = sorted.so($doc(f.inputRating -> -1, f.rating -> -1)))
-          .map((playerLine(swiss, playerIds)).tupled)
-          .map(formatLine) concat (if (swiss.settings.mcmahon || swiss.settings.isMatchScore)
+          .map(playerLine(swiss, playerIds).tupled)
+          .map(formatLine) concat (if swiss.settings.mcmahon || swiss.settings.isMatchScore then
                                      sheetApi
                                        .source(
                                          swiss,
                                          sort = sorted.so($doc(f.inputRating -> -1, f.rating -> -1))
                                        )
-                                       .map((acceleratedPairingLine(swiss, playerIds)).tupled)
+                                       .map(acceleratedPairingLine(swiss, playerIds).tupled)
                                        .map(formatLine)
                                    else Source.empty[String])
     }
@@ -55,7 +55,11 @@ final class SwissTrf(
   private def acceleratedPairingLine(
       swiss: Swiss,
       playerIds: PlayerIds
-  )(p: SwissPlayer, @annotation.nowarn("msg=unused") _pairings: Map[SwissRound.Number, SwissPairing], sheet: SwissSheet): Bits =
+  )(
+      p: SwissPlayer,
+      @annotation.nowarn("msg=unused") _pairings: Map[SwissRound.Number, SwissPairing],
+      sheet: SwissSheet
+  ): Bits =
     List(
       3 -> "XXA",
       8 -> playerIds.getOrElse(p.userId, 0).toString
@@ -66,23 +70,21 @@ final class SwissTrf(
     }
 
   private def additionalPoints(swiss: Swiss, player: SwissPlayer, sheet: SwissSheet, round: Int): Double =
-    if (swiss.settings.isMatchScore) {
+    if swiss.settings.isMatchScore then {
       val outcomesSoFar = sheet.outcomes.slice(0, round - 1)
       Swiss
         .Points {
           outcomesSoFar.foldLeft(0) { case (acc, out) => acc + SwissSheet.pointsFor(out) }
-      }
+        }
         .-(Swiss.Points {
           outcomesSoFar.foldLeft(0) { case (acc, out) => acc + SwissSheet.pointsForTrf(out) }
         })
         .value
         .toDouble
-    }
-    else if (swiss.settings.mcmahon) {
+    } else if swiss.settings.mcmahon then {
       val maxScore = 30.0 // so that all scores are positive
       maxScore + player.mcMahonStartingScore(swiss.settings.mcmahonCutoffGrade)
-    }
-    else 0
+    } else 0
 
   private def playerLine(
       swiss: Swiss,
@@ -98,10 +100,10 @@ final class SwissTrf(
       swiss.allRounds.zip(sheet.outcomes).flatMap { case (rn, outcome) =>
         val pairing = pairings get rn
         List(
-          95 -> pairing.map(_ `opponentOf` p.userId).flatMap(playerIds.get).so(_.toString),
-          97 -> pairing.map(_ `bbpPairingPlayerIndexOf` p.userId).so(_.fold("w", "b")),
+          95 -> pairing.map(_.opponentOf(p.userId)).flatMap(playerIds.get).so(_.toString),
+          97 -> pairing.map(_.bbpPairingPlayerIndexOf(p.userId)).so(_.fold("w", "b")),
           99 -> {
-            import SwissSheet._
+            import SwissSheet.*
             outcome match {
               case res if outcome.length == 1 =>
                 res(0) match {
@@ -113,7 +115,7 @@ final class SwissTrf(
                   case Ongoing => "Z"
                 }
               case _ if outcome(0) == Bye => "U"
-              case l =>
+              case l                      =>
                 pointsForTrf(l) match {
                   case 2 => "1"
                   case 1 => "="
@@ -138,15 +140,15 @@ final class SwissTrf(
       s"""$acc${" " * (pos - txt.length - acc.length)}$txt"""
     }
 
-  private val dateFormatter = org.joda.time.format.DateTimeFormat `forStyle` "M-"
+  private val dateFormatter = org.joda.time.format.DateTimeFormat.forStyle("M-")
 
   def fetchPlayerIds(swiss: Swiss): Fu[PlayerIds] =
     SwissPlayer
       .fields { p =>
-        import BsonHandlers._
+        import BsonHandlers.*
         colls.player
           .aggregateWith[Bdoc]() { framework =>
-            import framework._
+            import framework.*
             List(
               Match($doc(p.swissId -> swiss.id)),
               Sort(Descending(p.inputRating), Descending(p.rating)),
@@ -157,16 +159,18 @@ final class SwissTrf(
           .dmap(_.headOption)
           .map {
             ~_.flatMap(_.getAsOpt[List[User.ID]]("us"))
-        }
+          }
           .map {
-            _.view.zipWithIndex.map { case (userId, index) =>
-              (userId, index + 1)
-            }.toMap
-        }
+            _.view.zipWithIndex
+              .map { case (userId, index) =>
+                (userId, index + 1)
+              }
+              .toMap
+          }
       }
 
   private def forbiddenPairings(swiss: Swiss, playerIds: PlayerIds): Source[String, ?] =
-    if (swiss.settings.forbiddenPairings.isEmpty) Source.empty[String]
+    if swiss.settings.forbiddenPairings.isEmpty then Source.empty[String]
     else
       Source.fromIterator { () =>
         swiss.settings.forbiddenPairings.linesIterator.flatMap {

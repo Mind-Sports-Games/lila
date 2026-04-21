@@ -1,19 +1,19 @@
 package lila.study
 
-import BSONHandlers._
-import strategygames.{ Player => PlayerIndex }
+import BSONHandlers.*
+import strategygames.Player as PlayerIndex
 import strategygames.format.pgn.Tags
 import strategygames.format.{ FEN, Uci }
 import com.github.blemale.scaffeine.AsyncLoadingCache
-import JsonView._
-import play.api.libs.json._
-import reactivemongo.api.bson._
-import scala.concurrent.duration._
+import JsonView.*
+import play.api.libs.json.*
+import reactivemongo.api.bson.*
+import scala.concurrent.duration.*
 
 import lila.common.config.MaxPerPage
 import lila.common.paginator.AdapterLike
 import lila.common.paginator.{ Paginator, PaginatorJson }
-import lila.db.dsl._
+import lila.db.dsl.*
 
 final class StudyMultiBoard(
     chapterRepo: ChapterRepo,
@@ -22,11 +22,11 @@ final class StudyMultiBoard(
 
   private val maxPerPage = MaxPerPage(9)
 
-  import StudyMultiBoard._
-  import handlers._
+  import StudyMultiBoard.*
+  import handlers.*
 
   def json(studyId: Study.Id, page: Int, playing: Boolean): Fu[JsObject] = {
-    if (page == 1 && !playing) firstPageCache.get(studyId)
+    if page == 1 && !playing then firstPageCache.get(studyId)
     else fetch(studyId, page, playing)
   } map { PaginatorJson(_) }
 
@@ -58,7 +58,7 @@ final class StudyMultiBoard(
       chapterRepo
         .coll {
           _.aggregateWith[Bdoc](readPreference = readPref) { framework =>
-            import framework._
+            import framework.*
             List(
               Match(selector),
               Sort(Ascending("order")),
@@ -83,7 +83,7 @@ final class StudyMultiBoard(
             )
           }
             .collect[List](maxDocs = length)
-      }
+        }
         .map { r =>
           for {
             doc     <- r

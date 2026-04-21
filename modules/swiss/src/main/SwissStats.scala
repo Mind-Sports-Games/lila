@@ -1,10 +1,10 @@
 package lila.swiss
 
-import akka.stream.scaladsl._
+import akka.stream.scaladsl.*
 import reactivemongo.api.bson.Macros
-import scala.concurrent.duration._
+import scala.concurrent.duration.*
 
-import lila.db.dsl._
+import lila.db.dsl.*
 import reactivemongo.api.bson.BSONDocumentHandler
 
 case class SwissStats(
@@ -26,7 +26,7 @@ final class SwissStatsApi(
     mat: akka.stream.Materializer
 ) {
 
-  import BsonHandlers._
+  import BsonHandlers.*
 
   def apply(swiss: Swiss): Fu[Option[SwissStats]] =
     swiss.isFinished so cache.get(swiss.id).dmap(some).dmap(_.filter(_.games > 0))

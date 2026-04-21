@@ -1,6 +1,6 @@
 package controllers
 
-import play.api.mvc._
+import play.api.mvc.*
 
 import lila.api.Context
 import lila.app.*
@@ -25,7 +25,7 @@ private[controllers] trait ForumController extends forum.Granter { self: LilaCon
       categSlug: String
   )(a: => Fu[A])(implicit ctx: Context): Fu[Result] =
     isGrantedWrite(categSlug) flatMap { granted =>
-      if (granted) a
+      if granted then a
       else fuccess(Forbidden("You cannot post to this category"))
     }
 
@@ -33,7 +33,7 @@ private[controllers] trait ForumController extends forum.Granter { self: LilaCon
       categSlug: String
   )(a: => Fu[A])(implicit ctx: Context): Fu[Result] =
     isGrantedMod(categSlug) flatMap { granted =>
-      if (granted | isGranted(_.ModerateForum)) a
+      if granted | isGranted(_.ModerateForum) then a
       else fuccess(Forbidden("You cannot post to this category"))
     }
 }

@@ -5,7 +5,7 @@ import reactivemongo.api.ReadPreference
 
 import strategygames.variant.Variant
 
-import lila.db.dsl._
+import lila.db.dsl.*
 import Schedule.Freq
 import lila.user.User
 import reactivemongo.api.bson.BSONDocumentHandler
@@ -18,42 +18,42 @@ case class Winner(
 )
 
 case class FreqWinners(
-    //mso21: Option[Winner],
-    //msoGP: Option[Winner],
-    //msoWarmUp: Option[Winner],
+    // mso21: Option[Winner],
+    // msoGP: Option[Winner],
+    // msoWarmUp: Option[Winner],
     introductory: Option[Winner],
     yearly: Option[Winner],
-    //monthly: Option[Winner],
+    // monthly: Option[Winner],
     shield: Option[Winner],
     weekly: Option[Winner]
-    //daily: Option[Winner]
+    // daily: Option[Winner]
 ) {
 
   lazy val top: Option[Winner] =
-    //daily.filter(_.date isAfter DateTime.now.minusHours(2)) orElse
-    weekly.filter(_.date `isAfter` DateTime.now.minusDays(1)) orElse
-      //monthly.filter(_.date isAfter DateTime.now.minusDays(3)) orElse
-      shield.filter(_.date `isAfter` DateTime.now.minusDays(3)) orElse
-      yearly.filter(_.date `isAfter` DateTime.now.minusDays(28)) orElse
-      //mso21.filter(_.date isAfter DateTime.now.minusDays(60)) orElse
-      //msoGP.filter(_.date isAfter DateTime.now.minusDays(60)) orElse
-      //msoWarmUp.filter(_.date isAfter DateTime.now.minusDays(14)) orElse
-      //introductory orElse msoGP orElse mso21 orElse msoWarmUp orElse yearly orElse monthly orElse shield orElse weekly orElse daily
+    // daily.filter(_.date isAfter DateTime.now.minusHours(2)) orElse
+    weekly.filter(_.date.isAfter(DateTime.now.minusDays(1))) orElse
+      // monthly.filter(_.date isAfter DateTime.now.minusDays(3)) orElse
+      shield.filter(_.date.isAfter(DateTime.now.minusDays(3))) orElse
+      yearly.filter(_.date.isAfter(DateTime.now.minusDays(28))) orElse
+      // mso21.filter(_.date isAfter DateTime.now.minusDays(60)) orElse
+      // msoGP.filter(_.date isAfter DateTime.now.minusDays(60)) orElse
+      // msoWarmUp.filter(_.date isAfter DateTime.now.minusDays(14)) orElse
+      // introductory orElse msoGP orElse mso21 orElse msoWarmUp orElse yearly orElse monthly orElse shield orElse weekly orElse daily
       introductory orElse yearly orElse shield orElse weekly
 
   def userIds =
     List(introductory, yearly, shield, weekly).flatten.map(_.userId)
-  //List(mso21, msoGP, msoWarmUp, introductory, yearly, monthly, shield, weekly, daily).flatten.map(_.userId)
+  // List(mso21, msoGP, msoWarmUp, introductory, yearly, monthly, shield, weekly, daily).flatten.map(_.userId)
 }
 
 case class AllWinners(
-    //hyperbullet: FreqWinners,
-    //bullet: FreqWinners,
-    //superblitz: FreqWinners,
-    //blitz: FreqWinners,
-    //rapid: FreqWinners,
-    //elite: List[Winner],
-    //marathon: List[Winner],
+    // hyperbullet: FreqWinners,
+    // bullet: FreqWinners,
+    // superblitz: FreqWinners,
+    // blitz: FreqWinners,
+    // rapid: FreqWinners,
+    // elite: List[Winner],
+    // marathon: List[Winner],
     annuals: List[Winner],
     yearlies: List[Winner],
     medleyShields: List[Winner],
@@ -87,17 +87,17 @@ case class AllWinners(
       shields.take(20 - 6 - TournamentShield.MedleyShield.all.size max 1) ++
       weeklies.take(2)
 
-  //lichess top
-  //lazy val top: List[Winner] = List(
+  // lichess top
+  // lazy val top: List[Winner] = List(
   //  List(hyperbullet, bullet, superblitz, blitz, rapid).flatMap(_.top),
   //  List(elite.headOption, marathon.headOption).flatten,
   //  Variant.all.flatMap { v =>
   //    variants get v.key flatMap (_.top)
   //  }
-  //).flatten
+  // ).flatten
 
   lazy val userIds =
-    //List(hyperbullet, bullet, superblitz, blitz, rapid).flatMap(_.userIds) :::
+    // List(hyperbullet, bullet, superblitz, blitz, rapid).flatMap(_.userIds) :::
     //  elite.map(_.userId) ::: marathon.map(_.userId) :::
     (annuals ++ yearlies ++ medleyShields ++ shields ++ weeklies).map(_.userId) ++
       variants.values.toList.flatMap(_.userIds)
@@ -109,7 +109,7 @@ final class WinnersApi(
     scheduler: akka.actor.Scheduler
 )(implicit ec: scala.concurrent.ExecutionContext) {
 
-  import BSONHandlers._
+  import BSONHandlers.*
   implicit private val WinnerHandler: BSONDocumentHandler[Winner] =
     reactivemongo.api.bson.Macros.handler[Winner]
   implicit private val FreqWinnersHandler: BSONDocumentHandler[FreqWinners] =
@@ -126,7 +126,7 @@ final class WinnersApi(
           "winner" `$exists` true
         )
       )
-      .sort($sort `desc` "startsAt")
+      .sort($sort.desc("startsAt"))
       .cursor[Tournament](ReadPreference.secondaryPreferred)
       .list(Int.MaxValue)
 
@@ -144,19 +144,19 @@ final class WinnersApi(
     for {
       annuals  <- fetchLastFreq(Freq.Annual, DateTime.now.minusYears(2))
       yearlies <- fetchLastFreq(Freq.Yearly, DateTime.now.minusYears(1))
-      //monthlies     <- fetchLastFreq(Freq.Monthly, DateTime.now.minusMonths(2))
+      // monthlies     <- fetchLastFreq(Freq.Monthly, DateTime.now.minusMonths(2))
       shields       <- fetchLastFreq(Freq.Shield, DateTime.now.minusMonths(2))
       medleyShields <- fetchLastFreq(Freq.MedleyShield, DateTime.now.minusMonths(2))
       weeklies      <- fetchLastFreq(Freq.Weekly, DateTime.now.minusWeeks(2))
-      //dailies       <- fetchLastFreq(Freq.Daily, DateTime.now.minusDays(2))
-      //mso21         <- fetchLastFreq(Freq.MSO21, DateTime.now.minusMonths(8))
-      //msoGP         <- fetchLastFreq(Freq.MSOGP, DateTime.now.minusMonths(10))
-      //msoWarmUp     <- fetchLastFreq(Freq.MSOWarmUp, DateTime.now.minusWeeks(3))
+      // dailies       <- fetchLastFreq(Freq.Daily, DateTime.now.minusDays(2))
+      // mso21         <- fetchLastFreq(Freq.MSO21, DateTime.now.minusMonths(8))
+      // msoGP         <- fetchLastFreq(Freq.MSOGP, DateTime.now.minusMonths(10))
+      // msoWarmUp     <- fetchLastFreq(Freq.MSOWarmUp, DateTime.now.minusWeeks(3))
       introductory <- fetchLastFreq(Freq.Introductory, DateTime.now.minusYears(1))
-      //elites    <- fetchLastFreq(Freq.Weekend, DateTime.now.minusWeeks(3))
-      //marathons <- fetchLastFreq(Freq.Marathon, DateTime.now.minusMonths(13))
+      // elites    <- fetchLastFreq(Freq.Weekend, DateTime.now.minusWeeks(3))
+      // marathons <- fetchLastFreq(Freq.Marathon, DateTime.now.minusMonths(13))
     } yield
-      //def standardFreqWinners(speed: Speed): FreqWinners =
+      // def standardFreqWinners(speed: Speed): FreqWinners =
       //  FreqWinners(
       //    yearly = firstStandardWinner(yearlies, speed),
       //    monthly = firstStandardWinner(monthlies, speed),
@@ -164,13 +164,13 @@ final class WinnersApi(
       //    daily = firstStandardWinner(dailies, speed)
       //  )
       AllWinners(
-        //hyperbullet = standardFreqWinners(Speed.HyperBullet),
-        //bullet = standardFreqWinners(Speed.Bullet),
-        //superblitz = standardFreqWinners(Speed.SuperBlitz),
-        //blitz = standardFreqWinners(Speed.Blitz),
-        //rapid = standardFreqWinners(Speed.Rapid),
-        //elite = elites flatMap (_.winner) take 4,
-        //marathon = marathons flatMap (_.winner) take 4,
+        // hyperbullet = standardFreqWinners(Speed.HyperBullet),
+        // bullet = standardFreqWinners(Speed.Bullet),
+        // superblitz = standardFreqWinners(Speed.SuperBlitz),
+        // blitz = standardFreqWinners(Speed.Blitz),
+        // rapid = standardFreqWinners(Speed.Rapid),
+        // elite = elites flatMap (_.winner) take 4,
+        // marathon = marathons flatMap (_.winner) take 4,
         annuals = annuals.flatMap(_.winner),
         yearlies = yearlies.flatMap(_.winner),
         shields = shields.flatMap(_.winner),
@@ -179,13 +179,13 @@ final class WinnersApi(
         variants = Variant.all.view.map { v =>
           v.key -> FreqWinners(
             yearly = firstVariantWinner(yearlies, v),
-            //monthly = firstVariantWinner(monthlies, v),
+            // monthly = firstVariantWinner(monthlies, v),
             shield = firstVariantWinner(shields, v),
             weekly = firstVariantWinner(weeklies, v),
-            //daily = firstVariantWinner(dailies, v),
-            //mso21 = firstVariantWinner(mso21, v),
-            //msoGP = firstVariantWinner(msoGP, v),
-            //msoWarmUp = firstVariantWinner(msoWarmUp, v),
+            // daily = firstVariantWinner(dailies, v),
+            // mso21 = firstVariantWinner(mso21, v),
+            // msoGP = firstVariantWinner(msoGP, v),
+            // msoWarmUp = firstVariantWinner(msoWarmUp, v),
             introductory = firstVariantWinner(introductory, v)
           )
         }.toMap
@@ -203,21 +203,21 @@ final class WinnersApi(
 
   // because we read on secondaries, delay cache clear
   def clearCache(tour: Tournament): Unit =
-    if (tour.schedule.exists(_.freq.isDailyOrBetter)) {
+    if tour.schedule.exists(_.freq.isDailyOrBetter) then {
       { val _ = scheduler.scheduleOnce(5.seconds) { allCache.invalidate {} } }
     }
 
   private[tournament] def clearAfterMarking(userId: User.ID): Funit = all map { winners =>
-    if (winners.userIds contains userId) allCache.invalidate {}
+    if winners.userIds contains userId then allCache.invalidate {}
   }
 }
 
 object WinnersApi {
 
-  //val variants = Variant.all(GameLogic.Chess()).filter {
+  // val variants = Variant.all(GameLogic.Chess()).filter {
   //  case Variant.Chess(strategygames.chess.variant.Standard) |
   //      Variant.Chess(strategygames.chess.variant.FromPosition) =>
   //    false
   //  case _ => true
-  //}
+  // }
 }

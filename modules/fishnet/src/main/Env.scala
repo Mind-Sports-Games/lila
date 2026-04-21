@@ -1,13 +1,13 @@
 package lila.fishnet
 
-import akka.actor._
-import com.softwaremill.macwire._
-import io.lettuce.core._
+import akka.actor.*
+import com.softwaremill.macwire.*
+import io.lettuce.core.*
 import lila.common.autoconfig.{ AutoConfig, ConfigName }
 import play.api.Configuration
 
 import lila.common.Bus
-import lila.common.config._
+import lila.common.config.*
 import lila.game.Game
 
 @Module
@@ -45,7 +45,7 @@ final class Env(
   private lazy val analysisColl = db(config.analysisColl)
 
   private lazy val redis = new FishnetRedis(
-    RedisClient `create` RedisURI.create(config.redisUri),
+    RedisClient.create(RedisURI.create(config.redisUri)),
     "fishnet-in",
     "fishnet-out",
     shutdown
@@ -106,7 +106,7 @@ final class Env(
   )
 
   private def disable(username: String) =
-    repo `toKey` username flatMap { repo.enableClient(_, v = false) }
+    repo.toKey(username) flatMap { repo.enableClient(_, v = false) }
 
   def cli =
     new lila.common.Cli {
@@ -118,9 +118,9 @@ final class Env(
             s"Created key: ${client.key.value} for: $userId"
           }
         case "fishnet" :: "client" :: "delete" :: key :: Nil =>
-          repo `toKey` key flatMap repo.deleteClient inject "done!"
+          repo.toKey(key) flatMap repo.deleteClient inject "done!"
         case "fishnet" :: "client" :: "enable" :: key :: Nil =>
-          repo `toKey` key flatMap { repo.enableClient(_, v = true) } inject "done!"
+          repo.toKey(key) flatMap { repo.enableClient(_, v = true) } inject "done!"
         case "fishnet" :: "client" :: "disable" :: key :: Nil => disable(key) inject "done!"
       }
     }

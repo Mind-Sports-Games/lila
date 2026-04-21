@@ -39,6 +39,6 @@ object RatingFactor {
     implicit val ratingFactorsStringReader: StringReader[RatingFactors] =
       StringReader.fromIso(ratingFactorsIso)
     implicit val ratingFactorsFormable: Formable[RatingFactors] =
-      new Formable[RatingFactors](rfs => Form(single("v" -> text)) `fill` write(rfs))
+      new Formable[RatingFactors](rfs => Form(single("v" -> text)).fill(write(rfs)))
   }
 }

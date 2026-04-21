@@ -1,9 +1,9 @@
 package lila.event
 
-import reactivemongo.api.bson._
+import reactivemongo.api.bson.*
 import play.api.i18n.Lang
 
-import lila.db.dsl._
+import lila.db.dsl.*
 
 private[event] object BsonHandlers {
 

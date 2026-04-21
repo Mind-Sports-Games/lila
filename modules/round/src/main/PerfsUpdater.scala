@@ -1,13 +1,13 @@
 package lila.round
 
-import strategygames.{ P2, Player => PlayerIndex, Speed, P1 }
+import strategygames.{ P1, P2, Player as PlayerIndex, Speed }
 import strategygames.variant.Variant
-import strategygames.chess.variant._
-import org.goochjs.glicko2._
+import strategygames.chess.variant.*
+import org.goochjs.glicko2.*
 
 import lila.game.{ Game, GameRepo, PerfPicker, RatingDiffs }
 import lila.history.HistoryApi
-import lila.rating.{ Glicko, Perf, RatingFactors, RatingRegulator, PerfType => PT }
+import lila.rating.{ Glicko, Perf, PerfType as PT, RatingFactors, RatingRegulator }
 import lila.user.{ Perfs, RankingApi, User, UserRepo }
 
 final class PerfsUpdater(
@@ -23,7 +23,7 @@ final class PerfsUpdater(
   def save(game: Game, p1: User, p2: User): Fu[Option[RatingDiffs]] =
     botFarming(game) flatMap {
       case true => fuccess(none)
-      case _ =>
+      case _    =>
         PerfPicker.main(game) so { mainPerf =>
           (game.finished && game.updateRatingsOnFinish && !p1.lame && !p2.lame) so {
             val ratingsW = mkRatings(p1.perfs)
@@ -141,7 +141,7 @@ final class PerfsUpdater(
             val perfsW                      = mkPerfs(ratingsW, p1 -> p2, game)
             val perfsB                      = mkPerfs(ratingsB, p2 -> p1, game)
             def intRatingLens(perfs: Perfs) = mainPerf(perfs).glicko.intRating
-            val ratingDiffs = PlayerIndex.Map(
+            val ratingDiffs                 = PlayerIndex.Map(
               intRatingLens(perfsW) - intRatingLens(p1.perfs),
               intRatingLens(perfsB) - intRatingLens(p2.perfs)
             )
@@ -289,18 +289,17 @@ final class PerfsUpdater(
   private def mkPerfs(ratings: Ratings, users: (User, User), game: Game): Perfs =
     users match {
       case (player, opponent) =>
-        val perfs            = player.perfs
-        val speed            = game.speed
-        val isStd            = game.ratingVariant.key == "standard"
-        val isHumanVsMachine = player.noBot && opponent.isBot
+        val perfs                                                  = player.perfs
+        val speed                                                  = game.speed
+        val isStd                                                  = game.ratingVariant.key == "standard"
+        val isHumanVsMachine                                       = player.noBot && opponent.isBot
         def addRatingIf(cond: Boolean, perf: Perf, rating: Rating) =
-          if (cond) {
+          if cond then {
             val p = perf.addOrReset(_.round.error.glicko, s"game ${game.id}")(rating, game.updatedAt)
-            if (isHumanVsMachine)
-              p.copy(glicko = p.glicko `average` perf.glicko) // halve rating diffs for human
+            if isHumanVsMachine then
+              p.copy(glicko = p.glicko.average(perf.glicko)) // halve rating diffs for human
             else p
-          }
-          else perf
+          } else perf
         def addRatingVariant(variant: Variant, perf: Perf, rating: Rating) =
           addRatingIf(game.ratingVariant == variant, perf, rating)
         val perfs1 = perfs.copy(
@@ -543,7 +542,7 @@ final class PerfsUpdater(
           correspondence =
             addRatingIf(isStd && speed == Speed.Correspondence, perfs.correspondence, ratings.correspondence)
         )
-        val r = RatingRegulator(ratingFactors())
+        val r      = RatingRegulator(ratingFactors())
         val perfs2 = perfs1.copy(
           chess960 = r(PT.orDefault("chess960"), perfs.chess960, perfs1.chess960),
           kingOfTheHill = r(PT.orDefault("kingOfTheHill"), perfs.kingOfTheHill, perfs1.kingOfTheHill),
@@ -601,6 +600,6 @@ final class PerfsUpdater(
           classical = r(PT.orDefault("classical"), perfs.classical, perfs1.classical),
           correspondence = r(PT.orDefault("correspondence"), perfs.correspondence, perfs1.correspondence)
         )
-        if (isStd) perfs2.updateStandard else perfs2
+        if isStd then perfs2.updateStandard else perfs2
     }
 }

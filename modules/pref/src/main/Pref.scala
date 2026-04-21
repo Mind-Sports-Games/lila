@@ -54,7 +54,7 @@ case class Pref(
     tags: Map[String, String] = Map.empty
 ) {
 
-  import Pref._
+  import Pref.*
 
   def id = _id
 
@@ -63,12 +63,12 @@ case class Pref(
   def realTheme3d    = Theme3d(theme3d)
   def realPieceSet3d = PieceSet3d(pieceSet3d)
 
-  def themeColor = if (bg == Bg.LIGHT) "#dbd7d1" else "#2e2a24"
+  def themeColor = if bg == Bg.LIGHT then "#dbd7d1" else "#2e2a24"
 
   def realSoundSet = SoundSet(soundSet)
 
   def coordPlayerIndexName = PlayerOrder.choices.toMap.get(coordPlayerIndex).fold("random")(_.toLowerCase)
-  def coordsClass          = Coords `classOf` coords
+  def coordsClass          = Coords.classOf(coords)
 
   def hasDgt = tags contains Tag.dgt
 
@@ -78,7 +78,7 @@ case class Pref(
       case "bgImg" => copy(bgImg = value.some).some
       // case "theme" =>
       //    copy(theme = Theme.updateBoardTheme(theme, value)).some
-      case "color" => Pref.Color.fromString.get(value).map { c => copy(color = c) }
+      case "color"    => Pref.Color.fromString.get(value).map { c => copy(color = c) }
       case "pieceSet" =>
         copy(pieceSet = PieceSet.updatePieceSet(pieceSet, value)).some
       case "theme3d" =>
@@ -89,12 +89,12 @@ case class Pref(
         PieceSet3d.allByName get value map { p =>
           copy(pieceSet3d = p.name)
         }
-      case "is3d" => copy(is3d = value == "true").some
+      case "is3d"     => copy(is3d = value == "true").some
       case "soundSet" =>
         SoundSet.allByKey get value map { s =>
           copy(soundSet = s.key)
         }
-      case "zen" => copy(zen = if (value == "1") 1 else 0).some
+      case "zen" => copy(zen = if value == "1" then 1 else 0).some
       case _     => none
     }
 
@@ -251,10 +251,10 @@ object Pref {
     )
   }
 
-  object ConfirmResign        extends BooleanPref
-  object ConfirmPass          extends BooleanPref
-  object ConfirmCubeActions   extends BooleanPref
-  object PlayForcedAction     extends BooleanPref
+  object ConfirmResign      extends BooleanPref
+  object ConfirmPass        extends BooleanPref
+  object ConfirmCubeActions extends BooleanPref
+  object PlayForcedAction   extends BooleanPref
 
   object InsightShare {
     val NOBODY    = 0

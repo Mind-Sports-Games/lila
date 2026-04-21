@@ -3,14 +3,14 @@ package lila.relay
 import akka.stream.scaladsl.Source
 import org.joda.time.DateTime
 import alleycats.Zero
-import play.api.libs.json._
+import play.api.libs.json.*
 import reactivemongo.akkastream.cursorProducer
-import reactivemongo.api.bson._
+import reactivemongo.api.bson.*
 import reactivemongo.api.ReadPreference
-import scala.concurrent.duration._
+import scala.concurrent.duration.*
 
 import lila.common.config.MaxPerSecond
-import lila.db.dsl._
+import lila.db.dsl.*
 import lila.study.{ Settings, Study, StudyApi, StudyMaker, StudyMultiBoard, StudyRepo }
 import lila.user.User
 
@@ -24,18 +24,18 @@ final class RelayApi(
     formatApi: RelayFormatApi
 )(implicit ec: scala.concurrent.ExecutionContext, mat: akka.stream.Materializer) {
 
-  import BSONHandlers._
+  import BSONHandlers.*
   import lila.study.BSONHandlers.StudyIdBSONHandler
 
   def byId(id: RelayRound.Id) = roundRepo.coll.byId[RelayRound](id.value)
 
   def byIdWithTour(id: RelayRound.Id): Fu[Option[RelayRound.WithTour]] =
     roundRepo.coll
-      .aggregateWith[Bdoc]() { (framework) =>
-        import framework._
+      .aggregateWith[Bdoc]() { framework =>
+        import framework.*
         List(
           Match($id(id)),
-          PipelineOperator(tourRepo `lookup` "tourId"),
+          PipelineOperator(tourRepo.lookup("tourId")),
           UnwindField("tour")
         )
       }
@@ -47,7 +47,7 @@ final class RelayApi(
     byIdWithStudy(id) map {
       _ collect {
         case RelayRound.WithTourAndStudy(relay, tour, study) if study.canContribute(me.id) =>
-          relay `withTour` tour
+          relay.withTour(tour)
       }
     }
 
@@ -61,7 +61,7 @@ final class RelayApi(
     }
 
   def byTourOrdered(tour: RelayTour): Fu[List[RelayRound.WithTour]] =
-    roundRepo.byTourOrdered(tour).dmap(_.map(_ `withTour` tour))
+    roundRepo.byTourOrdered(tour).dmap(_.map(_.withTour(tour)))
 
   def withRounds(tour: RelayTour) = roundRepo.byTourOrdered(tour).dmap(tour.withRounds)
 
@@ -84,16 +84,16 @@ final class RelayApi(
 
   def officialActive: Fu[List[RelayTour.ActiveWithNextRound]] =
     tourRepo.coll
-      .aggregateWith[Bdoc]() { (framework) =>
-        import framework._
+      .aggregateWith[Bdoc]() { framework =>
+        import framework.*
         List(
           Match(tourRepo.selectors.official ++ tourRepo.selectors.active),
           PipelineOperator(
             $doc(
               "$lookup" -> $doc(
-                "from" -> roundRepo.coll.name,
-                "as"   -> "round",
-                "let"  -> $doc("id" -> "$_id"),
+                "from"     -> roundRepo.coll.name,
+                "as"       -> "round",
+                "let"      -> $doc("id" -> "$_id"),
                 "pipeline" -> $arr(
                   $doc(
                     "$match" -> $doc(
@@ -137,11 +137,11 @@ final class RelayApi(
 
   def fetchWithTours(query: Bdoc, maxDocs: Int, readPreference: ReadPreference = ReadPreference.primary) =
     roundRepo.coll
-      .aggregateWith[Bdoc](readPreference = readPreference) { (framework) =>
-        import framework._
+      .aggregateWith[Bdoc](readPreference = readPreference) { framework =>
+        import framework.*
         List(
           Match(query),
-          PipelineOperator(tourRepo `lookup` "tourId"),
+          PipelineOperator(tourRepo.lookup("tourId")),
           UnwindField("tour")
         )
       }
@@ -194,22 +194,22 @@ final class RelayApi(
     WithRelay(id) { relay =>
       relay.sync.upstream.flatMap(_.asUrl).map(_.withRound) foreach formatApi.refresh
       update(relay) { r =>
-        if (v) r.withSync(_.play) else r.withSync(_.pause)
+        if v then r.withSync(_.play) else r.withSync(_.pause)
       } void
     }
 
   def update(from: RelayRound)(f: RelayRound => RelayRound): Fu[RelayRound] = {
     val round = f(from) pipe { r =>
-      if (r.sync.upstream != from.sync.upstream) r.withSync(_.clearLog) else r
+      if r.sync.upstream != from.sync.upstream then r.withSync(_.clearLog) else r
     }
     studyApi.rename(round.studyId, Study.Name(round.name)) >> {
-      if (round == from) fuccess(round)
+      if round == from then fuccess(round)
       else
         roundRepo.coll.update.one($id(round.id), round).void >> {
           (round.sync.playing != from.sync.playing) so sendToContributors(
             round.id,
             "relaySync",
-            jsonView `sync` round
+            jsonView.sync(round)
           )
         } >> {
           (round.finished != from.finished) so denormalizeTourActive(round.tourId)
@@ -236,13 +236,13 @@ final class RelayApi(
   def getOngoing(id: RelayRound.Id): Fu[Option[RelayRound.WithTour]] =
     roundRepo.coll.one[RelayRound]($doc("_id" -> id, "finished" -> false)) flatMap {
       _ so { relay =>
-        tourById(relay.tourId) `map2` relay.withTour
+        tourById(relay.tourId).map2(relay.withTour)
       }
     }
 
   def canUpdate(user: User, tour: RelayTour): Fu[Boolean] =
     fuccess(tour.ownerId == user.id) >>|
-      roundRepo.coll.distinctEasy[Study.Id, List]("_id", roundRepo.selectors `tour` tour.id).flatMap { ids =>
+      roundRepo.coll.distinctEasy[Study.Id, List]("_id", roundRepo.selectors.tour(tour.id)).flatMap { ids =>
         studyRepo.membersByIds(ids) map {
           _.exists(_.contributorIds(user.id))
         }
@@ -250,8 +250,8 @@ final class RelayApi(
 
   def officialTourStream(perSecond: MaxPerSecond, nb: Int): Source[RelayTour.WithRounds, ?] =
     tourRepo.coll
-      .aggregateWith[Bdoc](readPreference = ReadPreference.secondaryPreferred) { (framework) =>
-        import framework._
+      .aggregateWith[Bdoc](readPreference = ReadPreference.secondaryPreferred) { framework =>
+        import framework.*
         List(
           Match(tourRepo.selectors.official),
           Sort(Descending("syncedAt")),
@@ -287,12 +287,13 @@ final class RelayApi(
         "startedAt" `$exists` false,
         "sync.until" `$exists` false
       )
-    ) flatMap {
-      relays =>
-        Future.sequence(relays.map { relay =>
+    ) flatMap { relays =>
+      Future
+        .sequence(relays.map { relay =>
           logger.info(s"Automatically start $relay")
           requestPlay(relay.id, v = true)
-        }).void
+        })
+        .void
     }
 
   private[relay] def autoFinishNotSyncing: Funit =
@@ -306,12 +307,13 @@ final class RelayApi(
           "startsAt" `$lt` DateTime.now
         )
       )
-    ) flatMap {
-      relays =>
-        Future.sequence(relays.map { relay =>
+    ) flatMap { relays =>
+      Future
+        .sequence(relays.map { relay =>
           logger.info(s"Automatically finish $relay")
           update(relay)(_.finish)
-        }).void
+        })
+        .void
     }
 
   private[relay] def WithRelay[A: Zero](id: RelayRound.Id)(f: RelayRound => Fu[A]): Fu[A] =
@@ -321,7 +323,7 @@ final class RelayApi(
     roundRepo.coll.delete.one($id(RelayRound.Id(studyId))).void
 
   private def sendToContributors(id: RelayRound.Id, t: String, msg: JsObject): Funit =
-    studyApi `members` Study.Id(id.value) map {
+    studyApi.members(Study.Id(id.value)) map {
       _.map(_.contributorIds).withFilter(_.nonEmpty) foreach { userIds =>
         import lila.hub.actorApi.socket.SendTos
         import JsonView.roundIdWrites

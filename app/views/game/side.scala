@@ -7,10 +7,9 @@ import strategygames.GameFamily
 import strategygames.variant.Variant
 
 import lila.api.Context
-import lila.app.templating.Environment._
-import lila.app.ui.ScalatagsTemplate._
+import lila.app.templating.Environment.*
+import lila.app.ui.ScalatagsTemplate.*
 import lila.i18n.VariantKeys
-
 
 object side {
 
@@ -27,9 +26,11 @@ object side {
       bookmarked: Boolean,
       swissPairingGames: Option[lila.swiss.SwissPairingGames]
   )(implicit ctx: Context): Option[Frag] =
-    ctx.noBlind `option` frag(
-      meta(pov, initialFen, tour, simul, userTv, bookmarked, swissPairingGames),
-      pov.game.userIds.filter(isStreaming) map views.html.streamer.bits.contextual
+    ctx.noBlind.option(
+      frag(
+        meta(pov, initialFen, tour, simul, userTv, bookmarked, swissPairingGames),
+        pov.game.userIds.filter(isStreaming) map views.html.streamer.bits.contextual
+      )
     )
 
   def meta(
@@ -42,7 +43,7 @@ object side {
       swissPairingGames: Option[lila.swiss.SwissPairingGames]
   )(implicit ctx: Context): Option[Frag] =
     ctx.noBlind option {
-      import pov._
+      import pov.*
       div(cls := "game__meta")(
         st.section(
           div(cls := "game__meta__infos", dataIcon := bits.gameIcon(game))(
@@ -50,45 +51,44 @@ object side {
               div(cls := "header")(
                 div(cls := "setup")(
                   views.html.bookmark.toggle(game, bookmarked),
-                  if (game.imported)
+                  if game.imported then
                     div(
                       a(href := routes.Importer.importGame, title := trans.importGame.txt())("IMPORT"),
                       separator,
-                      if (game.variant.exotic)
+                      if game.variant.exotic then
                         bits.variantLink(
                           game.variant,
-                          (if (game.variant == Variant.Chess(strategygames.chess.variant.KingOfTheHill))
+                          (if game.variant == Variant.Chess(strategygames.chess.variant.KingOfTheHill) then
                              VariantKeys.variantShortName(game.variant)
                            else VariantKeys.variantName(game.variant)).toUpperCase,
                           initialFen = initialFen,
                           game.metadata.multiPointState.map(_.target)
                         )
-                      else
-                        VariantKeys.variantName(game.variant).toUpperCase
+                      else VariantKeys.variantName(game.variant).toUpperCase
                     )
                   else
                     frag(
                       a(
-                        cls := "remove_color",
-                        title := "Clock info",
-                        href := s"${routes.Page.lonePage("clocks")}",
+                        cls    := "remove_color",
+                        title  := "Clock info",
+                        href   := s"${routes.Page.lonePage("clocks")}",
                         target := "_blank"
-                      )(widgets `showClock` game),
+                      )(widgets.showClock(game)),
                       separator,
-                      if (game.fromHandicappedTournament) {
+                      if game.fromHandicappedTournament then {
                         a(
-                          cls := "remove_color",
-                          title := "Handicap info",
-                          href := s"${routes.Page.lonePage("handicaps")}",
+                          cls    := "remove_color",
+                          title  := "Handicap info",
+                          href   := s"${routes.Page.lonePage("handicaps")}",
                           target := "_blank"
                         )(trans.handicapped.txt())
-                      } else if (game.rated) trans.rated.txt()
+                      } else if game.rated then trans.rated.txt()
                       else trans.casual.txt(),
                       separator,
-                      if (game.variant.exotic)
+                      if game.variant.exotic then
                         bits.variantLink(
                           game.variant,
-                          (if (game.variant == Variant.Chess(strategygames.chess.variant.KingOfTheHill))
+                          (if game.variant == Variant.Chess(strategygames.chess.variant.KingOfTheHill) then
                              VariantKeys.variantShortName(game.variant)
                            else VariantKeys.variantName(game.variant)).toUpperCase,
                           initialFen = initialFen,
@@ -102,17 +102,21 @@ object side {
                 ),
                 game.pgnImport.flatMap(_.date).map(frag(_)) getOrElse {
                   frag(
-                    if (game.isBeingPlayed) trans.playingRightNow()
+                    if game.isBeingPlayed then trans.playingRightNow()
                     else momentFromNowWithPreload(game.createdAt)
                   )
                 }
               ),
-              game.pgnImport.exists(_.date.isDefined) `option` small(
-                "Imported ",
-                game.pgnImport.flatMap(_.user).map { user =>
-                  trans.by(userIdLink(user.some, None, withOnline = false))
-                }
-              )
+              game.pgnImport
+                .exists(_.date.isDefined)
+                .option(
+                  small(
+                    "Imported ",
+                    game.pgnImport.flatMap(_.user).map { user =>
+                      trans.by(userIdLink(user.some, None, withOnline = false))
+                    }
+                  )
+                )
             )
           ),
           div(cls := "game__meta__players")(
@@ -141,7 +145,7 @@ object side {
         },
         (initialFen orElse {
           // Chess960 games at position 518 (standard chess start) don't store initialFen
-          if (game.variant.key == "chess960")
+          if game.variant.key == "chess960" then
             Some(FEN.Chess(strategygames.chess.variant.Standard.initialFen))
           else None
         })
@@ -181,7 +185,7 @@ object side {
         tour.map { t =>
           st.section(cls := "game__tournament")(
             a(cls := "text", dataIcon := "g", href := routes.Tournament.show(t.tour.id))(t.tour.name()),
-            if (t.tour.isMedley && !t.tour.finalMedleyVariant) {
+            if t.tour.isMedley && !t.tour.finalMedleyVariant then {
               div(cls := "medley-interval")(
                 span(cls := "clock", dataTime := t.tour.secondsToFinish)(t.tour.clockStatus),
                 span(cls := "text medley-text")(" ("),
@@ -204,25 +208,25 @@ object side {
           )
         },
         swissPairingGames.flatMap { spg =>
-          if (spg.nbGamesPerRound > 1 || spg.isMultiPoint) {
+          if spg.nbGamesPerRound > 1 || spg.isMultiPoint then {
             Some(
               st.section(cls := "game__multi-match")(
                 frag(
-                  if (spg.nbGamesPerRound > 1) trans.multiMatch()
+                  if spg.nbGamesPerRound > 1 then trans.multiMatch()
                   else s"${spg.game.metadata.multiPointState.map(_.target).getOrElse(0)}pt Match",
-                  if (spg.isBestOfX) s" (best of ${spg.nbGamesPerRound})"
-                  else if (spg.isPlayX) s" (play ${spg.nbGamesPerRound} games)"
+                  if spg.isBestOfX then s" (best of ${spg.nbGamesPerRound})"
+                  else if spg.isPlayX then s" (play ${spg.nbGamesPerRound} games)"
                   else "",
                   s" : ${spg.game.p1Player.userId.getOrElse("?")} (${spg.strResultOf(P1)}) vs ${spg.game.p2Player.userId
-                    .getOrElse("?")} (${spg.strResultOf(P2)}) : ",
+                      .getOrElse("?")} (${spg.strResultOf(P2)}) : ",
                   spg.multiMatchGames
                     .foldLeft(List(spg.game))(_ ++ _)
                     .zipWithIndex
                     .map {
                       case (mmGame, index) => {
-                        val current = if (mmGame.id == game.id) " current" else ""
+                        val current = if mmGame.id == game.id then " current" else ""
                         a(
-                          cls := s"text glpt${current} mm_game_link",
+                          cls  := s"text glpt${current} mm_game_link",
                           href := routes.Round.watcher(mmGame.id, (!pov.playerIndex).name)
                         )(
                           trans.gameNumberX(index + 1)

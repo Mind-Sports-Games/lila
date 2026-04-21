@@ -2,8 +2,8 @@ package views.html
 package account
 
 import lila.api.Context
-import lila.app.templating.Environment._
-import lila.app.ui.ScalatagsTemplate._
+import lila.app.templating.Environment.*
+import lila.app.ui.ScalatagsTemplate.*
 
 import play.api.i18n.Lang
 
@@ -18,14 +18,16 @@ object security {
         standardFlash(cls := "box__pad"),
         div(cls := "box__pad")(
           p(trans.thisIsAListOfDevicesThatHaveLoggedIntoYourAccount()),
-          sessions.sizeIs > 1 `option` div(
-            trans.alternativelyYouCanX {
-              postForm(cls := "revoke-all", action := routes.Account.signout("all"))(
-                submitButton(cls := "button button-empty button-red confirm")(
-                  trans.revokeAllSessions()
+          (sessions.sizeIs > 1).option(
+            div(
+              trans.alternativelyYouCanX {
+                postForm(cls := "revoke-all", action := routes.Account.signout("all"))(
+                  submitButton(cls := "button button-empty button-red confirm")(
+                    trans.revokeAllSessions()
+                  )
                 )
-              )
-            }
+              }
+            )
           )
         ),
         table(sessions, curSessionId.some)
@@ -38,8 +40,8 @@ object security {
         tr(
           td(cls := "icon")(
             span(
-              cls := curSessionId.map { cur => s"is-${if (cur == s.session.id) "gold" else "green"}" },
-              dataIcon := (if (s.session.isMobile) "" else "")
+              cls := curSessionId.map { cur => s"is-${if cur == s.session.id then "gold" else "green"}" },
+              dataIcon := (if s.session.isMobile then "" else "")
             )
           ),
           td(cls := "info")(
@@ -50,16 +52,17 @@ object security {
             s.session.date.map { date =>
               p(cls := "date")(
                 momentFromNow(date),
-                curSessionId `has` s.session.id `option` span(cls := "current")("[CURRENT]")
+                curSessionId.has(s.session.id).option(span(cls := "current")("[CURRENT]"))
               )
             }
           ),
           curSessionId.map { cur =>
             td(
-              s.session.id != cur `option`
+              (s.session.id != cur).option(
                 postForm(action := routes.Account.signout(s.session.id))(
                   submitButton(cls := "button button-red", title := trans.logOut.txt(), dataIcon := "L")
                 )
+              )
             )
           }
         )

@@ -1,10 +1,10 @@
 package lila.challenge
 
 import akka.actor.ActorSystem
-import akka.stream.scaladsl._
+import akka.stream.scaladsl.*
 import org.joda.time.DateTime
 import reactivemongo.api.bson.Macros
-import scala.concurrent.duration._
+import scala.concurrent.duration.*
 
 import strategygames.{ GameLogic, Situation, Speed }
 import strategygames.Player.{ P1, P2 }
@@ -12,7 +12,7 @@ import strategygames.Player.{ P1, P2 }
 import lila.common.Bus
 import lila.common.LilaStream
 import lila.common.Template
-import lila.db.dsl._
+import lila.db.dsl.*
 import lila.game.{ Game, Player }
 import lila.hub.actorApi.map.TellMany
 import lila.hub.DuctSequencers
@@ -38,11 +38,12 @@ final class ChallengeBulkApi(
     mode: play.api.Mode
 ) {
 
-  implicit private val gameHandler: BSONDocumentHandler[ScheduledGame]   = Macros.handler[ScheduledGame]
-  @annotation.nowarn("msg=unused") implicit private val variantHandler: BSONHandler[Variant]              = variantByKeyHandler
+  implicit private val gameHandler: BSONDocumentHandler[ScheduledGame] = Macros.handler[ScheduledGame]
+  @annotation.nowarn("msg=unused")
+  implicit private val variantHandler: BSONHandler[Variant]              = variantByKeyHandler
   implicit private val stratVariantHandler: BSONHandler[variant.Variant] = stratVariantByKeyHandler
   implicit private val clockHandler: BSONHandler[ClockConfig]            = clockConfigHandler
-  implicit private val messageHandler: BSONHandler[Template] =
+  implicit private val messageHandler: BSONHandler[Template]             =
     stringAnyValHandler[Template](_.value, Template.apply)
   implicit private val bulkHandler: BSONDocumentHandler[ScheduledBulk] = Macros.handler[ScheduledBulk]
 
@@ -64,9 +65,9 @@ final class ChallengeBulkApi(
 
   def schedule(bulk: ScheduledBulk): Fu[Either[String, ScheduledBulk]] = workQueue(bulk.by) {
     coll.list[ScheduledBulk]($doc("by" -> bulk.by, "pairedAt" `$exists` false)) flatMap { bulks =>
-      if (bulks.sizeIs >= 10) fuccess(Left("Already too many bulks queued"))
-      else if (bulks.map(_.games.size).sum >= 1000) fuccess(Left("Already too many games queued"))
-      else if (bulks.exists(_ `collidesWith` bulk))
+      if bulks.sizeIs >= 10 then fuccess(Left("Already too many bulks queued"))
+      else if bulks.map(_.games.size).sum >= 1000 then fuccess(Left("Already too many games queued"))
+      else if bulks.exists(_.collidesWith(bulk)) then
         fuccess(Left("A bulk containing the same players is scheduled at the same time"))
       else coll.insert.one(bulk) inject Right(bulk)
     }
@@ -138,8 +139,7 @@ final class ChallengeBulkApi(
       .addEffect { nb =>
         val _ = lila.mon.api.challenge.bulk.createNb(bulk.by).increment(nb)
       } >> {
-      if (bulk.startClocksAt.isDefined)
-        coll.updateField($id(bulk._id), "pairedAt", DateTime.now)
+      if bulk.startClocksAt.isDefined then coll.updateField($id(bulk._id), "pairedAt", DateTime.now)
       else coll.delete.one($id(bulk._id))
     }.void
   }

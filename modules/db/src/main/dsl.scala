@@ -18,7 +18,7 @@ package lila.db
 
 import alleycats.Zero
 
-import reactivemongo.api.bson._
+import reactivemongo.api.bson.*
 
 trait dsl {
 
@@ -26,7 +26,7 @@ trait dsl {
   type Bdoc = BSONDocument
   type Barr = BSONArray
 
-  //**********************************************************************************************//
+  // **********************************************************************************************//
   // Helpers
   val $empty: Bdoc = document.asStrict
 
@@ -46,11 +46,11 @@ trait dsl {
   def $int(i: Int)         = BSONInteger(i)
 
   // End of Helpers
-  //**********************************************************************************************//
+  // **********************************************************************************************//
 
   implicit val LilaBSONDocumentZero: Zero[Bdoc] = Zero($empty)
 
-  //**********************************************************************************************//
+  // **********************************************************************************************//
   // Top Level Logical Operators
   def $or(expressions: Bdoc*): Bdoc = {
     $doc("$or" -> expressions)
@@ -64,9 +64,9 @@ trait dsl {
     $doc("$nor" -> expressions)
   }
   // End of Top Level Logical Operators
-  //**********************************************************************************************//
+  // **********************************************************************************************//
 
-  //**********************************************************************************************//
+  // **********************************************************************************************//
   // Top Level Evaluation Operators
   def $text(term: String): Bdoc = {
     $doc("$text" -> $doc("$search" -> term))
@@ -80,9 +80,9 @@ trait dsl {
     $doc("$where" -> expr)
   }
   // End of Top Level Evaluation Operators
-  //**********************************************************************************************//
+  // **********************************************************************************************//
 
-  //**********************************************************************************************//
+  // **********************************************************************************************//
   // Top Level Field Update Operators
   def $inc(item: ElementProducer, items: ElementProducer*): Bdoc = {
     $doc("$inc" -> $doc((Seq(item) ++ items)*))
@@ -112,7 +112,7 @@ trait dsl {
     }
 
   def $setBoolOrUnset(field: String, value: Boolean): Bdoc = {
-    if (value) $set(field -> true) else $unset(field)
+    if value then $set(field -> true) else $unset(field)
   }
 
   def $min(item: ElementProducer): Bdoc = {
@@ -162,24 +162,23 @@ trait dsl {
     def isValid: Boolean = Seq("date", "timestamp") contains value
 
     def produce: BSONValue = {
-      if (!isValid)
-        throw new IllegalArgumentException(value)
+      if !isValid then throw new IllegalArgumentException(value)
 
       $doc("$type" -> value)
     }
   }
 
   // End of Top Level Field Update Operators
-  //**********************************************************************************************//
+  // **********************************************************************************************//
 
-  //**********************************************************************************************//
+  // **********************************************************************************************//
   // Top Level Array Update Operators
 
   def $addToSet(item: ElementProducer, items: ElementProducer*): Bdoc =
     $doc("$addToSet" -> $doc((Seq(item) ++ items)*))
 
   def $pop(item: (String, Int)): Bdoc = {
-    if (item._2 != -1 && item._2 != 1)
+    if item._2 != -1 && item._2 != 1 then
       throw new IllegalArgumentException(s"${item._2} is not equal to: -1 | 1")
     $doc("$pop" -> $doc(item))
   }
@@ -200,13 +199,13 @@ trait dsl {
     $doc("$pull" -> $doc(item))
 
   def $addOrPull[T: BSONWriter](key: String, value: T, add: Boolean): Bdoc =
-    $doc((if (add) "$addToSet" else "$pull") -> $doc(key -> value))
+    $doc((if add then "$addToSet" else "$pull") -> $doc(key -> value))
 
   // End ofTop Level Array Update Operators
-  //**********************************************************************************************//
+  // **********************************************************************************************//
 
-  /** Represents the initial state of the expression which has only the name of the field.
-    * It does not know the value of the expression.
+  /** Represents the initial state of the expression which has only the name of the field. It does not know
+    * the value of the expression.
     */
   trait ElementBuilder {
     def field: String
@@ -359,9 +358,9 @@ trait dsl {
     def pipeline(from: Coll, as: String, local: String, foreign: String, pipeline: List[Bdoc]): Bdoc =
       $doc(
         "$lookup" -> $doc(
-          "from" -> from.name,
-          "as"   -> as,
-          "let"  -> $doc("local" -> s"$$$local"),
+          "from"     -> from.name,
+          "as"       -> as,
+          "let"      -> $doc("local" -> s"$$$local"),
           "pipeline" -> {
             $doc(
               "$match" -> $doc(

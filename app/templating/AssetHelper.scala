@@ -4,7 +4,7 @@ package templating
 import play.api.mvc.RequestHeader
 
 import lila.api.Context
-import lila.app.ui.ScalatagsTemplate._
+import lila.app.ui.ScalatagsTemplate.*
 import lila.common.{ AssetVersion, ContentSecurityPolicy, Nonce }
 import lila.web.AssetManifest
 
@@ -12,19 +12,19 @@ import strategygames.GameLogic
 
 trait AssetHelper { self: I18nHelper & SecurityHelper =>
 
-  private lazy val netDomain      = env.net.domain
-  private lazy val assetDomain    = env.net.assetDomain
-  private lazy val assetBaseUrl   = env.net.assetBaseUrl
-  private lazy val baseUrl        = env.net.baseUrl
-  private lazy val socketDomains  = env.net.socketDomains
-  lazy val vapidPublicKey         = env.push.vapidPublicKey
+  private lazy val netDomain     = env.net.domain
+  private lazy val assetDomain   = env.net.assetDomain
+  private lazy val assetBaseUrl  = env.net.assetBaseUrl
+  private lazy val baseUrl       = env.net.baseUrl
+  private lazy val socketDomains = env.net.socketDomains
+  lazy val vapidPublicKey        = env.push.vapidPublicKey
 
   lazy val sameAssetDomain = netDomain.value == assetDomain.value
 
   def manifest: AssetManifest
   def assetVersion = AssetVersion.current
 
-  def updateManifest() = if (!env.net.isProd) env.web.manifest.update()
+  def updateManifest() = if !env.net.isProd then env.web.manifest.update()
 
   def assetUrl(path: String): String =
     s"$assetBaseUrl/assets/${manifest.hashed(path).getOrElse(s"_$assetVersion/$path")}"
@@ -42,8 +42,7 @@ trait AssetHelper { self: I18nHelper & SecurityHelper =>
   private def cssAt(path: String): Frag =
     link(href := s"$assetBaseUrl/assets/${path}", rel := "stylesheet")
   private def cssNameFromManifest(name: String, theme: String = ""): String =
-    if (!theme.isEmpty())
-      s"${manifest.css(s"$name.$theme").getOrElse(s"$name.$theme")}"
+    if !theme.isEmpty() then s"${manifest.css(s"$name.$theme").getOrElse(s"$name.$theme")}"
     else s"${manifest.css(s"$name").getOrElse(s"$name")}"
 
   private def jsNameFromManifest(key: String): String = manifest.js(key).fold(key)(_.name)
@@ -91,10 +90,10 @@ trait AssetHelper { self: I18nHelper & SecurityHelper =>
     case GameLogic.Draughts() => "PlayStrategyDraughtsRound"
     case _                    => "PlayStrategyRound"
   }
-  def roundNvuiTag(implicit ctx: Context) = ctx.blind `option` jsModule("round.nvui")
+  def roundNvuiTag(implicit ctx: Context) = ctx.blind.option(jsModule("round.nvui"))
 
   def analyseTag                            = jsModule("analysisBoard")
-  def analyseNvuiTag(implicit ctx: Context) = ctx.blind `option` jsModule("analysisBoard.nvui")
+  def analyseNvuiTag(implicit ctx: Context) = ctx.blind.option(jsModule("analysisBoard.nvui"))
 
   def captchaTag        = jsModule("captcha")
   def infiniteScrollTag = jsModule("infiniteScroll")
@@ -116,9 +115,9 @@ trait AssetHelper { self: I18nHelper & SecurityHelper =>
     }
 
   def basicCsp(implicit req: RequestHeader): ContentSecurityPolicy = {
-    val assets = if (req.secure) s"https://$assetDomain" else assetDomain.value
+    val assets  = if req.secure then s"https://$assetDomain" else assetDomain.value
     val sockets = socketDomains map { socketDomain =>
-      val protocol = if (req.secure) "wss://" else "ws://"
+      val protocol = if req.secure then "wss://" else "ws://"
       s"$protocol$socketDomain"
     }
     ContentSecurityPolicy(

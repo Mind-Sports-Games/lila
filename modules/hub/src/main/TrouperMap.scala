@@ -1,12 +1,12 @@
 package lila.hub
 
-import com.github.benmanes.caffeine.cache._
+import com.github.benmanes.caffeine.cache.*
 import java.util.concurrent.TimeUnit
 import alleycats.Zero
 import play.api.Mode
 import scala.concurrent.duration.FiniteDuration
 import scala.concurrent.Promise
-import scala.jdk.CollectionConverters._
+import scala.jdk.CollectionConverters.*
 
 final class TrouperMap[T <: Trouper](
     mkTrouper: String => T,

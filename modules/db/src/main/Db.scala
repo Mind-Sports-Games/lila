@@ -1,6 +1,6 @@
 package lila.db
 
-import reactivemongo.api._
+import reactivemongo.api.*
 import scala.concurrent.Future
 
 import lila.common.Chronometer

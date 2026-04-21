@@ -2,8 +2,8 @@ package views
 package html.site
 
 import lila.api.Context
-import lila.app.templating.Environment._
-import lila.app.ui.ScalatagsTemplate._
+import lila.app.templating.Environment.*
+import lila.app.ui.ScalatagsTemplate.*
 import lila.i18n.VariantKeys
 
 import strategygames.variant.Variant
@@ -62,8 +62,8 @@ object variant {
         st.aside(cls := "page-menu__menu subnav")(
           Variant.all.filterNot(_.fromPositionVariant) map { v =>
             a(
-              cls := List("text" -> true, "active" -> active.contains(v)),
-              href := routes.Page.variant(v.key),
+              cls      := List("text" -> true, "active" -> active.contains(v)),
+              href     := routes.Page.variant(v.key),
               dataIcon := v.perfIcon
             )(VariantKeys.variantName(v))
           }

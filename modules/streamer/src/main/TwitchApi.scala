@@ -1,8 +1,8 @@
 package lila.streamer
 
-import play.api.libs.json._
-import play.api.libs.ws.DefaultBodyWritables._
-import play.api.libs.ws.JsonBodyReadables._
+import play.api.libs.json.*
+import play.api.libs.ws.DefaultBodyWritables.*
+import play.api.libs.ws.JsonBodyReadables.*
 import play.api.libs.ws.StandaloneWSClient
 import scala.concurrent.ExecutionContext
 
@@ -12,7 +12,7 @@ import lila.common.extensions.*
 final private class TwitchApi(ws: StandaloneWSClient, config: TwitchConfig)(implicit ec: ExecutionContext) {
 
   import Stream.Twitch
-  import Twitch.Reads._
+  import Twitch.Reads.*
 
   private var tmpToken = Secret("init")
 
@@ -24,7 +24,7 @@ final private class TwitchApi(ws: StandaloneWSClient, config: TwitchConfig)(impl
     (config.clientId.nonEmpty && config.secret.value.nonEmpty && page < 10) so {
       val query = List(
         "game_id" -> "490413", // 743 - chess //  490413 - Board games
-        "first"   -> "100" // max results per page
+        "first"   -> "100"     // max results per page
       ) ::: List(
         pagination.flatMap(_.cursor).map { "after" -> _ }
       ).flatten
@@ -45,14 +45,14 @@ final private class TwitchApi(ws: StandaloneWSClient, config: TwitchConfig)(impl
             logger.warn("Renewing twitch API token")
             renewToken >> fuccess(Twitch.Result(None, None))
           case res => fufail(s"twitch ${lila.log.http(res.status, res.body)}")
-      }
+        }
         .recover { case e: Exception =>
           logger.warn(e.getMessage)
           Twitch.Result(None, None)
         }
         .monSuccess(_.tv.streamer.twitch)
         .flatMap { result =>
-          if (result.data.exists(_.nonEmpty))
+          if result.data.exists(_.nonEmpty) then
             fetchStreams(streamers, page + 1, result.pagination) map (result.liveStreams ::: _)
           else fuccess(Nil)
         }
@@ -68,12 +68,12 @@ final private class TwitchApi(ws: StandaloneWSClient, config: TwitchConfig)(impl
       .post(Map.empty[String, String])
       .flatMap {
         case res if res.status == 200 =>
-          res.body[JsValue].asOpt[JsObject].flatMap(_ `str` "access_token") match {
+          res.body[JsValue].asOpt[JsObject].flatMap(_.str("access_token")) match {
             case Some(token) =>
               tmpToken = Secret(token)
               funit
             case _ => fufail(s"twitch.renewToken ${lila.log.http(res.status, res.body)}")
           }
         case res => fufail(s"twitch.renewToken ${lila.log.http(res.status, res.body)}")
-    }
+      }
 }

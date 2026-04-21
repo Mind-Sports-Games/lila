@@ -31,13 +31,13 @@ case class UserChat(
   val loginRequired = true
 
   def forUser(u: Option[User]): UserChat =
-    if (u.so(_.marks.troll)) this
+    if u.so(_.marks.troll) then this
     else copy(lines = lines filterNot (_.troll))
 
   def markDeleted(u: User) =
     copy(
       lines = lines.map { l =>
-        if (l.userId == u.id) l.delete else l
+        if l.userId == u.id then l.delete else l
       }
     )
 
@@ -49,16 +49,16 @@ case class UserChat(
 
   def userIds = lines.map(_.userId)
 
-  def truncate(max: Int) = copy(lines = lines.drop((lines.size - max) `atLeast` 0))
+  def truncate(max: Int) = copy(lines = lines.drop((lines.size - max).atLeast(0)))
 
-  def getlast(num: Int) = copy(lines = lines.takeRight(num `atMost` lines.size))
+  def getlast(num: Int) = copy(lines = lines.takeRight(num.atMost(lines.size)))
 
   def hasRecentLine(u: User): Boolean = lines.reverse.take(12).exists(_.userId == u.id)
 }
 
 object UserChat {
   case class Mine(chat: UserChat, timeout: Boolean) {
-    def truncate(max: Int) = copy(chat = chat `truncate` max)
+    def truncate(max: Int) = copy(chat = chat.truncate(max))
   }
 }
 
@@ -70,7 +70,7 @@ case class MixedChat(
   val loginRequired = false
 
   def forUser(u: Option[User]): MixedChat =
-    if (u.so(_.marks.troll)) this
+    if u.so(_.marks.troll) then this
     else
       copy(lines = lines filter {
         case l: UserLine   => !l.troll
@@ -117,7 +117,7 @@ object Chat {
     val lines = "l"
   }
 
-  import BSONFields._
+  import BSONFields.*
   import reactivemongo.api.bson.{ BSONArray, BSONDocument }
   import Line.{ lineBSONHandler, userLineBSONHandler }
 

@@ -1,13 +1,13 @@
 package lila.relay
 
-import reactivemongo.api.bson._
+import reactivemongo.api.bson.*
 import reactivemongo.akkastream.cursorProducer
 
-import lila.db.dsl._
+import lila.db.dsl.*
 
 final private class RelayRoundRepo(val coll: Coll)(implicit ec: scala.concurrent.ExecutionContext) {
 
-  import BSONHandlers._
+  import BSONHandlers.*
 
   def byTourOrdered(tour: RelayTour): Fu[List[RelayRound]] =
     coll
@@ -18,7 +18,7 @@ final private class RelayRoundRepo(val coll: Coll)(implicit ec: scala.concurrent
 
   def lastByTour(tour: RelayTour): Fu[Option[RelayRound]] =
     coll
-      .find(selectors `tour` tour.id)
+      .find(selectors.tour(tour.id))
       .sort(sort.reverseChrono)
       .one[RelayRound]
 

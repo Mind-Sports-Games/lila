@@ -1,11 +1,11 @@
 package lila.puzzle
 
 import play.api.i18n.Lang
-import play.api.libs.json._
+import play.api.libs.json.*
 
-import strategygames.{ Game }
+import strategygames.Game
 
-import lila.common.Json._
+import lila.common.Json.*
 import lila.game.GameRepo
 import lila.rating.{ Perf, PerfType }
 import lila.tree
@@ -19,7 +19,7 @@ final class JsonView(
     gameRepo: GameRepo
 )(implicit ec: scala.concurrent.ExecutionContext) {
 
-  import JsonView._
+  import JsonView.*
 
   def apply(
       puzzle: Puzzle,
@@ -46,9 +46,9 @@ final class JsonView(
           theme.map { t =>
             Json
               .obj(
-                "key" -> t.key,
+                "key"  -> t.key,
                 "name" -> {
-                  if (t == PuzzleTheme.mix) lila.i18n.I18nKeys.puzzle.puzzleThemes.txt()
+                  if t == PuzzleTheme.mix then lila.i18n.I18nKeys.puzzle.puzzleThemes.txt()
                   else t.name.txt()
                 },
                 "desc" -> t.description.txt()
@@ -154,8 +154,8 @@ final class JsonView(
           .add("user" -> user.map(_.perfs.puzzle_standard.intRating).map(userJson))
       }
 
-    //TODO this and above doesn't work but we dont require it too as its for mobile bc batch only
-    //would need to assume the batch has all same variant??
+    // TODO this and above doesn't work but we dont require it too as its for mobile bc batch only
+    // would need to assume the batch has all same variant??
     def batch(puzzles: Seq[Puzzle], user: Option[User])(implicit
         @annotation.nowarn("msg=unused") _lang: Lang
     ): Fu[JsObject] = for {
@@ -186,7 +186,7 @@ final class JsonView(
       "playerIndex" -> puzzle.playerIndex.name,
       "initialPly"  -> (puzzle.initialPly + 1),
       "gameId"      -> puzzle.gameId,
-      "lines" -> puzzle.line.tail.reverse.foldLeft[JsValue](JsString("win")) { case (acc, move) =>
+      "lines"       -> puzzle.line.tail.reverse.foldLeft[JsValue](JsString("win")) { case (acc, move) =>
         Json.obj(move.uci -> acc)
       },
       "vote"   -> 0,
@@ -194,11 +194,11 @@ final class JsonView(
     )
 
     private def makeBranch(puzzle: Puzzle): Option[tree.Branch] = {
-      import strategygames.format._
+      import strategygames.format.*
       val init =
-        //TODO: Do we need to set turns through withTurnsAndPlies can the fen not decode this?
+        // TODO: Do we need to set turns through withTurnsAndPlies can the fen not decode this?
         Game(puzzle.variant.gameLogic, none, puzzle.fenAfterInitialMove.some).withTurnsAndPlies(
-          //TODO multiaction. For now plies and turns are the same whilst puzzle deals with just standard chess
+          // TODO multiaction. For now plies and turns are the same whilst puzzle deals with just standard chess
           puzzle.initialPly + 1,
           puzzle.initialPly + 1
         )
@@ -211,9 +211,9 @@ final class JsonView(
             id = UciCharPair(game.situation.board.variant.gameLogic, move.toUci),
             ply = game.plies,
             turnCount = game.turnCount,
-            playedPlayerIndex = if (game.board.history.currentTurn.nonEmpty) game.player else !game.player,
+            playedPlayerIndex = if game.board.history.currentTurn.nonEmpty then game.player else !game.player,
             variant = game.situation.board.variant,
-            //TODO multiaction. For now we can flatten actionStrs as we are dealing with just Chess
+            // TODO multiaction. For now we can flatten actionStrs as we are dealing with just Chess
             move =
               Uci.WithSan(game.situation.board.variant.gameLogic, move.toUci, game.actionStrs.flatten.last),
             fen = Forsyth.>>(game.situation.board.variant.gameLogic, game),

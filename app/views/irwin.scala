@@ -1,9 +1,8 @@
 package views.html
 
 import lila.api.Context
-import lila.app.templating.Environment._
-import lila.app.ui.ScalatagsTemplate._
-
+import lila.app.templating.Environment.*
+import lila.app.ui.ScalatagsTemplate.*
 
 object irwin {
 
@@ -26,7 +25,7 @@ object irwin {
           div(cls := "box__top")(
             h1(
               "Irwin status: ",
-              if (dashboard.seenRecently) span(cls := "up")("Operational")
+              if dashboard.seenRecently then span(cls := "up")("Operational")
               else
                 span(cls := "down")(
                   dashboard.lastSeenAt.map { seenAt =>
@@ -39,7 +38,7 @@ object irwin {
             div(cls := "box__top__actions")(
               a(
                 href := "https://monitor.playstrategy.ovh/d/a5qOnu9Wz/mod-yield",
-                cls := "button button-empty"
+                cls  := "button button-empty"
               )("Monitoring")
             )
           ),
@@ -98,9 +97,9 @@ object irwin {
                   a(href := routes.Round.watcher(pov.gameId, pov.playerIndex.name))(
                     gameReport.moves.map { move =>
                       span(
-                        cls := percentClass(move.activation),
+                        cls      := percentClass(move.activation),
                         st.title := move.toString,
-                        style := s"height:${move.activation}%"
+                        style    := s"height:${move.activation}%"
                       )
                     }
                   )

@@ -1,13 +1,13 @@
 package lila.notify
 
-import strategygames.{ Player => PlayerIndex }
+import strategygames.Player as PlayerIndex
 import lila.db.BSON.{ Reader, Writer }
-import lila.db.dsl._
+import lila.db.dsl.*
 import lila.db.{ dsl, BSON }
 import lila.notify.InvitedToStudy.{ InvitedBy, StudyId, StudyName }
-import lila.notify.MentionedInThread._
-import lila.notify.Notification._
-import reactivemongo.api.bson._
+import lila.notify.MentionedInThread.*
+import lila.notify.Notification.*
+import reactivemongo.api.bson.*
 
 private object BSONHandlers {
 
@@ -28,9 +28,9 @@ private object BSONHandlers {
   implicit val ReadHandler: BSONHandler[NotificationRead] =
     booleanAnyValHandler[NotificationRead](_.value, NotificationRead.apply)
 
-  import PrivateMessage._
-  implicit val PMSenderIdHandler: BSONHandler[Sender]                     = stringAnyValHandler[Sender](_.value, Sender.apply)
-  implicit val PMTextHandler: BSONHandler[Text]                           = stringAnyValHandler[Text](_.value, Text.apply)
+  import PrivateMessage.*
+  implicit val PMSenderIdHandler: BSONHandler[Sender] = stringAnyValHandler[Sender](_.value, Sender.apply)
+  implicit val PMTextHandler: BSONHandler[Text]       = stringAnyValHandler[Text](_.value, Text.apply)
   implicit val PrivateMessageHandler: BSONDocumentHandler[PrivateMessage] = Macros.handler[PrivateMessage]
 
   implicit val TeamIdHandler: BSONHandler[TeamJoined.Id] =

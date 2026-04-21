@@ -1,10 +1,9 @@
 package views.html
 
 import lila.api.Context
-import lila.app.templating.Environment._
-import lila.app.ui.ScalatagsTemplate._
-import lila.hub.actorApi.timeline._
-
+import lila.app.templating.Environment.*
+import lila.app.ui.ScalatagsTemplate.*
+import lila.hub.actorApi.timeline.*
 
 object timeline {
 
@@ -36,7 +35,7 @@ object timeline {
     entries.filter(e => e.typ != "blog-post")
 
   private def filterEntries(entries: Vector[lila.timeline.Entry])(implicit ctx: Context) =
-    if (ctx.noKid) entries
+    if ctx.noKid then entries
     else entries.filter(e => e.okForKid)
 
   private def entry(e: lila.timeline.Entry)(implicit ctx: Context) =
@@ -55,7 +54,7 @@ object timeline {
           trans.xPostedInForumY(
             userIdLink(userId.some, withOnline = false),
             a(
-              href := routes.ForumPost.redirect(postId),
+              href  := routes.ForumPost.redirect(postId),
               title := topicName
             )(shorten(topicName, 30))
           )
@@ -82,9 +81,9 @@ object timeline {
               case None        => trans.drawVsYInZ
             })(
               a(
-                href := routes.Round.player(playerId),
+                href     := routes.Round.player(playerId),
                 dataIcon := perf.iconChar,
-                cls := "text glpt"
+                cls      := "text glpt"
               )(win match {
                 case Some(true)  => trans.victory()
                 case Some(false) => trans.defeat()

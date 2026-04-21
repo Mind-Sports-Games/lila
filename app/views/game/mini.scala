@@ -6,8 +6,8 @@ import strategygames.{ ByoyomiClock, Clock }
 import play.api.i18n.Lang
 
 import lila.api.Context
-import lila.app.templating.Environment._
-import lila.app.ui.ScalatagsTemplate._
+import lila.app.templating.Environment.*
+import lila.app.ui.ScalatagsTemplate.*
 import lila.game.{ MultiPointState, Pov }
 import lila.i18n.defaultLang
 
@@ -39,12 +39,12 @@ object mini {
   )(implicit ctx: Context): Tag = {
     val game    = pov.game
     val isLive  = game.isBeingPlayed
-    val tag     = if (withLink) a else span
+    val tag     = if withLink then a else span
     val extra   = extraClasses(game.variant)
     val variant = game.variant.key
     tag(
       href := withLink.option(gameLink(game, pov.playerIndex, ownerLink, tv)),
-      cls := s"mini-game mini-game-${game.id} mini-game--init ${extra} ${variant} variant-${variant} is2d",
+      cls  := s"mini-game mini-game-${game.id} mini-game--init ${extra} ${variant} variant-${variant} is2d",
       dataLive := isLive.option(game.id),
       renderState(pov)
     )(
@@ -60,7 +60,7 @@ object mini {
     val extra   = extraClasses(game.variant)
     val variant = game.variant.key
     a(
-      href := (if (tv) routes.Tv.index else routes.Round.watcher(pov.gameId, pov.playerIndex.name)),
+      href := (if tv then routes.Tv.index else routes.Round.watcher(pov.gameId, pov.playerIndex.name)),
       cls := s"mini-game mini-game-${game.id} mini-game--init is2d ${isLive so "mini-game--live"} ${extra} ${variant} variant-${variant}",
       dataLive := isLive.option(game.id),
       renderState(pov)
@@ -85,16 +85,16 @@ object mini {
     pov.game.variant match {
       case Variant.Backgammon(_) =>
         dataState := s"${Forsyth.>>(pov.game.variant.gameLogic, pov.game.stratGame)}|${orientation(
-          pov
-        )}|${~pov.game.lastActionKeys}|${pov.game.multiPointResult.fold(MultiPointState.noDataChar)(_.toString)}"
+            pov
+          )}|${~pov.game.lastActionKeys}|${pov.game.multiPointResult.fold(MultiPointState.noDataChar)(_.toString)}"
       case Variant.Chess(_) | Variant.FairySF(_) | Variant.Samurai(_) | Variant.Togyzkumalak(_) |
           Variant.Go(_) | Variant.Abalone(_) | Variant.Dameo(_) =>
         dataState := s"${Forsyth.>>(pov.game.variant.gameLogic, pov.game.stratGame)}|${orientation(pov)}|${~pov.game.lastActionKeys}"
       case Variant.Draughts(v) =>
         dataState := s"${Forsyth.boardAndPlayer(
-          pov.game.variant.gameLogic,
-          pov.game.situation
-        )}|${v.boardSize.width}x${v.boardSize.height}|${pov.playerIndex.name}|${~pov.game.lastActionKeys}"
+            pov.game.variant.gameLogic,
+            pov.game.situation
+          )}|${v.boardSize.width}x${v.boardSize.height}|${pov.playerIndex.name}|${~pov.game.lastActionKeys}"
     }
 
   private def renderPlayer(pov: Pov)(implicit lang: Lang) =
@@ -103,13 +103,13 @@ object mini {
         cls := s"mini-game__user playerIndex-icon is ${pov.game.variant.playerColors(pov.player.playerIndex)} text"
       )(
         playerUsername(pov.player, withRating = false),
-        span(cls := "rating")(lila.game.Namer `ratingString` pov.player),
-        if (pov.player.berserk) iconTag("`")
+        span(cls := "rating")(lila.game.Namer.ratingString(pov.player)),
+        if pov.player.berserk then iconTag("`")
       ),
       span(cls := s"mini-game__score--${pov.playerIndex.name}")(
-        if (!pov.game.finished) calculateScore(pov) else ""
+        if !pov.game.finished then calculateScore(pov) else ""
       ),
-      if (pov.game.finished) renderResult(pov)
+      if pov.game.finished then renderResult(pov)
       else pov.game.clock.map { renderClock(_, pov) }
     )
 
@@ -122,7 +122,7 @@ object mini {
       }
       case None => {
         val score = pov.game.calculateScore(pov.playerIndex)
-        if (score == "") ""
+        if score == "" then ""
         else " (" + score + ")"
       }
     }
@@ -130,7 +130,7 @@ object mini {
   private def renderResult(pov: Pov) =
     span(cls := "mini-game__result")(
       pov.game.winnerPlayerIndex.fold("½") { c =>
-        if (c == pov.playerIndex) "1" else "0"
+        if c == pov.playerIndex then "1" else "0"
       }
         +
           calculateScore(pov)
@@ -146,10 +146,10 @@ object mini {
       case _: ByoyomiClock.Config      => 0
     }
     span(
-      cls := s"mini-game__clock mini-game__clock--${pov.playerIndex.name}",
-      dataTime := s,
+      cls             := s"mini-game__clock mini-game__clock--${pov.playerIndex.name}",
+      dataTime        := s,
       dataTimePending := p,
-      dataTimeDelay := d
+      dataTimeDelay   := d
     )(
       f"${s / 60}:${s % 60}%02d"
         +

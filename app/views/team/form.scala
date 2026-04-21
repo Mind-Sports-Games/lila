@@ -4,13 +4,13 @@ import play.api.data.Form
 import play.api.i18n.Lang
 
 import lila.api.Context
-import lila.app.templating.Environment._
-import lila.app.ui.ScalatagsTemplate._
+import lila.app.templating.Environment.*
+import lila.app.ui.ScalatagsTemplate.*
 import lila.team.Team
 
 object form {
 
-  import trans.team._
+  import trans.team.*
 
   def create(form: Form[?], captcha: lila.common.Captcha)(implicit ctx: Context) =
     views.html.base.layout(
@@ -46,54 +46,62 @@ object form {
         bits.menu(none),
         div(cls := "page-menu__content box box-pad")(
           h1(title),
-          t.enabled `option` postForm(cls := "form3", action := routes.Team.update(t.id))(
-            div(cls := "form-group")(
-              a(cls := "button button-empty", href := routes.Team.leaders(t.id))(teamLeaders()),
-              a(cls := "button button-empty", href := routes.Team.kick(t.id))(kickSomeone())
-            ),
-            requestField(form),
-            hideFields(form),
-            passwordField(form),
-            textFields(form),
-            form3.group(form("chat"), frag("Team chat")) { f =>
-              form3.select(
-                f,
-                Seq(
-                  Team.ChatFor.NONE    -> "No chat",
-                  Team.ChatFor.LEADERS -> "Team leaders",
-                  Team.ChatFor.MEMBERS -> "Team members"
+          t.enabled.option(
+            postForm(cls := "form3", action := routes.Team.update(t.id))(
+              div(cls := "form-group")(
+                a(cls := "button button-empty", href := routes.Team.leaders(t.id))(teamLeaders()),
+                a(cls := "button button-empty", href := routes.Team.kick(t.id))(kickSomeone())
+              ),
+              requestField(form),
+              hideFields(form),
+              passwordField(form),
+              textFields(form),
+              form3.group(form("chat"), frag("Team chat")) { f =>
+                form3.select(
+                  f,
+                  Seq(
+                    Team.ChatFor.NONE    -> "No chat",
+                    Team.ChatFor.LEADERS -> "Team leaders",
+                    Team.ChatFor.MEMBERS -> "Team members"
+                  )
                 )
+              },
+              form3.actions(
+                a(href := routes.Team.show(t.id), style := "margin-left:20px")(trans.cancel()),
+                form3.submit(trans.apply())
               )
-            },
-            form3.actions(
-              a(href := routes.Team.show(t.id), style := "margin-left:20px")(trans.cancel()),
-              form3.submit(trans.apply())
             )
           ),
-          ctx.userId.exists(t.leaders) || isGranted(_.ManageTeam) `option` frag(
-            hr,
-            t.enabled `option` postForm(cls := "inline", action := routes.Team.disable(t.id))(
-              submitButton(
-                dataIcon := "j",
-                cls := "submit button text confirm button-empty button-red",
-                st.title := trans.team.closeTeamDescription.txt() // can actually be reverted
-              )(closeTeam())
-            ),
-            isGranted(_.ManageTeam) `option`
-              postForm(cls := "inline", action := routes.Team.close(t.id))(
-                submitButton(
-                  dataIcon := "q",
-                  cls := "text button button-empty button-red confirm",
-                  st.title := "Deletes the team and its memberships. Cannot be reverted!"
-                )(trans.delete())
+          (ctx.userId.exists(t.leaders) || isGranted(_.ManageTeam)).option(
+            frag(
+              hr,
+              t.enabled.option(
+                postForm(cls := "inline", action := routes.Team.disable(t.id))(
+                  submitButton(
+                    dataIcon := "j",
+                    cls      := "submit button text confirm button-empty button-red",
+                    st.title := trans.team.closeTeamDescription.txt() // can actually be reverted
+                  )(closeTeam())
+                )
               ),
-            (t.disabled && isGranted(_.ManageTeam)) `option`
-              postForm(cls := "inline", action := routes.Team.disable(t.id))(
-                submitButton(
-                  cls := "button button-empty confirm",
-                  st.title := "Re-enables the team and restores memberships"
-                )("Re-enable")
+              isGranted(_.ManageTeam).option(
+                postForm(cls := "inline", action := routes.Team.close(t.id))(
+                  submitButton(
+                    dataIcon := "q",
+                    cls      := "text button button-empty button-red confirm",
+                    st.title := "Deletes the team and its memberships. Cannot be reverted!"
+                  )(trans.delete())
+                )
+              ),
+              (t.disabled && isGranted(_.ManageTeam)).option(
+                postForm(cls := "inline", action := routes.Team.disable(t.id))(
+                  submitButton(
+                    cls      := "button button-empty confirm",
+                    st.title := "Re-enables the team and restores memberships"
+                  )("Re-enable")
+                )
               )
+            )
           )
         )
       )
@@ -115,7 +123,8 @@ object form {
       help = trans.team.manuallyReviewAdmissionRequestsHelp().some
     )
 
-  @annotation.nowarn("msg=unused") private def hideFields(form: Form[?])(implicit lang: Lang) =
+  @annotation.nowarn("msg=unused")
+  private def hideFields(form: Form[?])(implicit lang: Lang) =
     form3.split(
       form3.checkbox(
         form("hideMembers"),

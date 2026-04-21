@@ -1,14 +1,14 @@
 package lila.app
 
 import akka.actor.{ ActorSystem, CoordinatedShutdown }
-import com.softwaremill.macwire._
+import com.softwaremill.macwire.*
 import play.api.inject.DefaultApplicationLifecycle
 import play.api.http.FileMimeTypes
 import play.api.inject.ApplicationLifecycle
 import play.api.libs.crypto.DefaultCookieSigner
 import play.api.libs.ws.StandaloneWSClient
-import play.api.mvc._
-import play.api.mvc.request._
+import play.api.mvc.*
+import play.api.mvc.request.*
 import play.api.routing.Router
 import play.api.{ BuiltInComponents, Configuration, Environment }
 
@@ -51,7 +51,7 @@ final class LilaComponents(
     s"lila ${environment.mode} $appVersionCommit $appVersionDate / java $java, memory: ${mem}MB"
   }
 
-  import _root_.controllers._
+  import _root_.controllers.*
 
   // we want to use the legacy session cookie baker
   // for compatibility with lila-ws
@@ -169,7 +169,7 @@ final class LilaComponents(
   // eagerly wire up all controllers
   val router: Router = wire[_root_.router.router.Routes]
 
-  if (configuration.get[Boolean]("kamon.enabled")) {
+  if configuration.get[Boolean]("kamon.enabled") then {
     lila.log("boot").info("Kamon is enabled")
     kamon.Kamon.loadModules()
   }

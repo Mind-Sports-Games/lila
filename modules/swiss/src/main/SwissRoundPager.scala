@@ -5,12 +5,12 @@ import scala.concurrent.ExecutionContext
 
 import lila.common.config
 import lila.common.paginator.Paginator
-import lila.db.dsl._
+import lila.db.dsl.*
 import lila.db.paginator.Adapter
 
 final class SwissRoundPager(colls: SwissColls)(implicit ec: ExecutionContext) {
 
-  import BsonHandlers._
+  import BsonHandlers.*
 
   private val maxPerPage = config.MaxPerPage(50)
 

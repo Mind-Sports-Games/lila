@@ -4,7 +4,7 @@ import org.joda.time.DateTime
 
 import strategygames.format.pgn.{ Tag, Tags }
 import lila.socket.Socket.Sri
-import lila.study._
+import lila.study.*
 
 final private class RelaySync(
     studyApi: StudyApi,
@@ -16,15 +16,15 @@ final private class RelaySync(
   private type NbMoves = Int
 
   def apply(rt: RelayRound.WithTour, games: RelayGames): Fu[SyncResult.Ok] =
-    studyApi byId rt.round.studyId `orFail` "Missing relay study!" flatMap { study =>
-      chapterRepo `orderedByStudy` study.id flatMap { chapters =>
+    studyApi.byId(rt.round.studyId).orFail("Missing relay study!") flatMap { study =>
+      chapterRepo.orderedByStudy(study.id) flatMap { chapters =>
         RelayInputSanity(chapters, games) match {
           case Some(fail) => fufail(fail.msg)
-          case None =>
+          case None       =>
             lila.common.LilaFuture.linear(games) { game =>
               findCorrespondingChapter(game, chapters, games.size) match {
                 case Some(chapter) => updateChapter(rt.tour, study, chapter, game)
-                case None =>
+                case None          =>
                   createChapter(study, game) flatMap { chapter =>
                     chapters.find(_.isEmptyInitial).ifTrue(chapter.order == 2).so { initial =>
                       studyApi.deleteChapter(study.id, initial.id) {
@@ -51,7 +51,7 @@ final private class RelaySync(
       chapters: List[Chapter],
       nbGames: Int
   ): Option[Chapter] =
-    if (nbGames == 1 || game.looksLikePlayStrategy) chapters find game.staticTagsMatch
+    if nbGames == 1 || game.looksLikePlayStrategy then chapters find game.staticTagsMatch
     else chapters.find(_.relay.exists(_.index == game.index))
 
   private def updateChapter(
@@ -69,7 +69,7 @@ final private class RelaySync(
       case ((parentPath, None), gameNode) =>
         val path = parentPath + gameNode
         chapter.root.nodeAt(path) match {
-          case None => parentPath -> gameNode.some
+          case None           => parentPath -> gameNode.some
           case Some(existing) =>
             gameNode.clock.filter(c => !existing.clock.contains(c)) so { c =>
               studyApi.setClock(
@@ -81,8 +81,7 @@ final private class RelaySync(
             path -> none
         }
       case (found, _) => found
-    }
-    match {
+    } match {
       case (path, newNode) =>
         !Path.isMainline(chapter.root, path) so {
           logger.info(s"Change mainline ${showSC(study, chapter)} $path")
@@ -92,22 +91,23 @@ final private class RelaySync(
             toMainline = true
           )(who) >> chapterRepo.setRelayPath(chapter.id, path)
         } >> newNode.so { node =>
-          lila.common.LilaFuture.fold(node.mainline.toList)(Position(chapter, path).ref) { case (position, n) =>
-            studyApi.addNode(
-              studyId = study.id,
-              position = position,
-              node = n,
-              opts = moveOpts.copy(clock = n.clock),
-              relay = Chapter
-                .Relay(
-                  index = game.index,
-                  path = position.path + n,
-                  lastMoveAt = DateTime.now
-                )
-                .some
-            )(who) inject position + n
+          lila.common.LilaFuture.fold(node.mainline.toList)(Position(chapter, path).ref) {
+            case (position, n) =>
+              studyApi.addNode(
+                studyId = study.id,
+                position = position,
+                node = n,
+                opts = moveOpts.copy(clock = n.clock),
+                relay = Chapter
+                  .Relay(
+                    index = game.index,
+                    path = position.path + n,
+                    lastMoveAt = DateTime.now
+                  )
+                  .some
+              )(who) inject position + n
           } inject {
-            if (chapter.root.children.nodes.isEmpty && node.mainline.nonEmpty)
+            if chapter.root.children.nodes.isEmpty && node.mainline.nonEmpty then
               studyApi.reloadChapters(study)
             node.mainline.size
           }
@@ -122,19 +122,19 @@ final private class RelaySync(
       game: RelayGame
   ): Funit = {
     val gameTags = game.tags.value.foldLeft(Tags(Nil)) { case (newTags, tag) =>
-      if (!chapter.tags.value.exists(tag ==)) newTags + tag
+      if !chapter.tags.value.exists(tag ==) then newTags + tag
       else newTags
     }
     val newEndTag = game.end
       .ifFalse(gameTags(_.Result).isDefined)
       .filterNot(end => chapter.tags(_.Result).so(end.resultText ==))
       .map(end => Tag(_.Result, end.resultText))
-    val tags = newEndTag.fold(gameTags)(gameTags + _)
+    val tags           = newEndTag.fold(gameTags)(gameTags + _)
     val chapterNewTags = tags.value.foldLeft(chapter.tags) { case (chapterTags, tag) =>
       PgnTags(chapterTags + tag)
     }
     (chapterNewTags != chapter.tags) so {
-      if (vs(chapterNewTags) != vs(chapter.tags))
+      if vs(chapterNewTags) != vs(chapter.tags) then
         logger.info(s"Update ${showSC(study, chapter)} tags '${vs(chapter.tags)}' -> '${vs(chapterNewTags)}'")
       studyApi.setTags(
         studyId = study.id,
@@ -190,7 +190,9 @@ final private class RelaySync(
           )
           .some
       )
-      studyApi.doAddChapter(study, chapter, sticky = false, actorApi.Who(study.ownerId, sri)).andDo(multiboard.invalidate(study.id)) inject chapter
+      studyApi
+        .doAddChapter(study, chapter, sticky = false, actorApi.Who(study.ownerId, sri))
+        .andDo(multiboard.invalidate(study.id)) inject chapter
     }
 
   private val moveOpts = MoveOpts(

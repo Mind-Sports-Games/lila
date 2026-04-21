@@ -1,10 +1,9 @@
 package views.html.user.show
 
 import lila.api.Context
-import lila.app.templating.Environment._
-import lila.app.ui.ScalatagsTemplate._
+import lila.app.templating.Environment.*
+import lila.app.ui.ScalatagsTemplate.*
 import lila.user.User
-
 
 object newPlayer {
 
@@ -13,15 +12,17 @@ object newPlayer {
       h2(trans.onboarding.welcome.txt()),
       p(
         trans.onboarding.profilePage.txt(),
-        u.profile.isEmpty `option` frag(
-          br,
-          trans.onboarding.wouldYou(
-            a(href := routes.Account.profile)(trans.onboarding.improveIt())
+        u.profile.isEmpty.option(
+          frag(
+            br,
+            trans.onboarding.wouldYou(
+              a(href := routes.Account.profile)(trans.onboarding.improveIt())
+            )
           )
         )
       ),
       p(
-        if (u.kid) trans.onboarding.kidModeEnabled.txt()
+        if u.kid then trans.onboarding.kidModeEnabled.txt()
         else
           frag(
             trans.onboarding.willAChildUse(

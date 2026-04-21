@@ -1,6 +1,6 @@
 package lila.simul
 
-import strategygames.{ Player => PlayerIndex, Speed }
+import strategygames.{ Player as PlayerIndex, Speed }
 import strategygames.format.FEN
 import strategygames.variant.Variant
 import org.joda.time.DateTime
@@ -42,48 +42,50 @@ case class Simul(
 
   def isRunning = status == SimulStatus.Started
 
-  def hasApplicant(userId: String) = applicants.exists(_ `is` userId)
+  def hasApplicant(userId: String) = applicants.exists(_.is(userId))
 
-  def hasPairing(userId: String) = pairings.exists(_ `is` userId)
+  def hasPairing(userId: String) = pairings.exists(_.is(userId))
 
   def hasUser(userId: String) = hasApplicant(userId) || hasPairing(userId)
 
   def addApplicant(applicant: SimulApplicant) =
     Created {
-      if (!hasApplicant(applicant.player.user) && variants.contains(applicant.player.variant))
+      if !hasApplicant(applicant.player.user) && variants.contains(applicant.player.variant) then
         copy(applicants = applicants :+ applicant)
       else this
     }
 
   def removeApplicant(userId: String) =
     Created {
-      copy(applicants = applicants.filterNot(_ `is` userId))
+      copy(applicants = applicants.filterNot(_.is(userId)))
     }
 
   def accept(userId: String, v: Boolean) =
     Created {
       copy(applicants = applicants map {
-        case a if a `is` userId => a.copy(accepted = v)
-        case a                => a
+        case a if a.is(userId) => a.copy(accepted = v)
+        case a                 => a
       })
     }
 
   def removePairing(userId: String) =
-    copy(pairings = pairings.filterNot(_ `is` userId)).finishIfDone
+    copy(pairings = pairings.filterNot(_.is(userId))).finishIfDone
 
   def nbAccepted = applicants.count(_.accepted)
 
   def startable = isCreated && nbAccepted > 1
 
   def start =
-    startable `option` copy(
-      status = SimulStatus.Started,
-      startedAt = DateTime.now.some,
-      applicants = Nil,
-      pairings = applicants collect {
-        case a if a.accepted => SimulPairing(a.player)
-      },
-      hostSeenAt = none
+    startable.option(
+      copy(
+        status = SimulStatus.Started,
+        startedAt = DateTime.now.some,
+        applicants = Nil,
+        pairings = applicants collect {
+          case a if a.accepted => SimulPairing(a.player)
+        },
+        hostSeenAt = none
+      )
     )
 
   def updatePairing(gameId: String, f: SimulPairing => SimulPairing) =
@@ -95,10 +97,10 @@ case class Simul(
     ).finishIfDone
 
   def ejectCheater(userId: String): Option[Simul] =
-    hasUser(userId) `option` removeApplicant(userId).removePairing(userId)
+    hasUser(userId).option(removeApplicant(userId).removePairing(userId))
 
   private def finishIfDone =
-    if (isStarted && pairings.forall(_.finished))
+    if isStarted && pairings.forall(_.finished) then
       copy(
         status = SimulStatus.Finished,
         finishedAt = DateTime.now.some,
@@ -131,7 +133,7 @@ case class Simul(
   def setPairingHostPlayerIndex(gameId: String, hostPlayerIndex: PlayerIndex) =
     updatePairing(gameId, _.copy(hostPlayerIndex = hostPlayerIndex))
 
-  private def Created(s: => Simul): Simul = if (isCreated) s else this
+  private def Created(s: => Simul): Simul = if isCreated then s else this
 
   def wins    = pairings.count(p => p.finished && p.wins.contains(false))
   def draws   = pairings.count(p => p.finished && p.wins.isEmpty)
@@ -158,7 +160,7 @@ object Simul {
       featurable: Option[Boolean]
   ): Simul =
     Simul(
-      _id = lila.common.ThreadLocalRandom `nextString` 8,
+      _id = lila.common.ThreadLocalRandom.nextString(8),
       name = name,
       status = SimulStatus.Created,
       clock = clock,
@@ -176,7 +178,7 @@ object Simul {
       createdAt = DateTime.now,
       estimatedStartAt = estimatedStartAt,
       variants =
-        if (position.isDefined) List(Variant.wrap(strategygames.chess.variant.Standard)) else variants,
+        if position.isDefined then List(Variant.wrap(strategygames.chess.variant.Standard)) else variants,
       position = position,
       applicants = Nil,
       pairings = Nil,

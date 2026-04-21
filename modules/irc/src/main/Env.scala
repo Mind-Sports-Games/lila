@@ -1,11 +1,11 @@
 package lila.irc
 
-import com.softwaremill.macwire._
+import com.softwaremill.macwire.*
 import play.api.{ Configuration, Mode }
 import play.api.libs.ws.StandaloneWSClient
 
 import lila.common.Lilakka
-import lila.common.config._
+import lila.common.config.*
 import lila.hub.actorApi.plan.ChargeEvent
 import lila.hub.actorApi.slack.Event
 import lila.hub.actorApi.user.Note
@@ -34,9 +34,9 @@ final class Env(
 
   lazy val discord: DiscordApi = wire[DiscordApi]
 
-  if (mode == Mode.Prod) {
+  if mode == Mode.Prod then {
     slack.publishInfo("PlayStrategy has started!")
-    Lilakka.shutdown(shutdown, _.PhaseBeforeServiceUnbind, "Tell slack")((() => slack.stop()))
+    Lilakka.shutdown(shutdown, _.PhaseBeforeServiceUnbind, "Tell slack")(() => slack.stop())
   }
 
   lila.common.Bus.subscribeFun("slack", "plan", "userNote") {

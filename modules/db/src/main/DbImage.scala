@@ -2,9 +2,9 @@ package lila.db
 
 import java.nio.file.{ Files, Path }
 import org.joda.time.DateTime
-import reactivemongo.api.bson._
+import reactivemongo.api.bson.*
 
-import dsl._
+import dsl.*
 
 case class DbImage(
     _id: String,
@@ -32,7 +32,7 @@ object DbImage {
       size: Int,
       createdBy: String
   ) = {
-    import com.roundeights.hasher.Implicits._
+    import com.roundeights.hasher.Implicits.*
     val data = Files.readAllBytes(path)
     DbImage(
       _id = id,

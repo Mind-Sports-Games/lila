@@ -1,8 +1,8 @@
 package lila.irwin
 
-import akka.stream.scaladsl._
-import play.api.libs.json._
-import scala.concurrent.duration._
+import akka.stream.scaladsl.*
+import play.api.libs.json.*
+import scala.concurrent.duration.*
 
 import lila.common.Bus
 
@@ -37,7 +37,7 @@ final class IrwinStream {
     Json.obj(
       "t"      -> "request",
       "origin" -> req.origin.key,
-      "user" -> Json.obj(
+      "user"   -> Json.obj(
         "id"     -> req.suspect.user.id,
         "titled" -> req.suspect.user.hasTitle,
         "engine" -> req.suspect.user.marks.engine,
@@ -48,9 +48,9 @@ final class IrwinStream {
           "id" -> game.id,
           "p1" -> game.p1Player.userId,
           "p2" -> game.p2Player.userId,
-          //flatten until Irwin supports non chess
-          "pgn"  -> game.actionStrs.flatten.mkString(" "),
-          "emts" -> (if (game.clockHistory.isDefined) game.plyTimes.map(_.map(_.centis)) else None),
+          // flatten until Irwin supports non chess
+          "pgn"      -> game.actionStrs.flatten.mkString(" "),
+          "emts"     -> (if game.clockHistory.isDefined then game.plyTimes.map(_.map(_.centis)) else None),
           "analysis" -> analysis.map {
             _.infos.map { info =>
               info.cp.map { cp =>

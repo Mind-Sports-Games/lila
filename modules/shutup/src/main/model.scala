@@ -31,7 +31,7 @@ case class TextAnalysis(
 
   def nbBadWords = badWords.size
 
-  def ratio: Double = if (nbWords == 0) 0 else nbBadWords.toDouble / nbWords
+  def ratio: Double = if nbWords == 0 then 0 else nbBadWords.toDouble / nbWords
 
   def dirty = ratio > 0
 }
@@ -55,7 +55,7 @@ case class TextReport(textType: TextType, ratios: List[Double]) {
 
   def minRatios   = textType.rotation / 15
   def nbBad       = ratios.count(_ > TextReport.unacceptableRatio)
-  def tolerableNb = (ratios.size / 10) `atLeast` 3
+  def tolerableNb = (ratios.size / 10).atLeast(3)
 
   def unacceptable = (ratios.sizeIs >= minRatios) && (nbBad > tolerableNb)
 }

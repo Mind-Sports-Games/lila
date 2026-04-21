@@ -1,6 +1,6 @@
 package lila.fishnet
 
-import scala.concurrent.duration._
+import scala.concurrent.duration.*
 
 import strategygames.{ Clock, P1, P2 }
 import strategygames.format.Uci
@@ -21,7 +21,7 @@ final class FishnetPlayer(
   def apply(game: Game): Funit =
     game.aiLevel so { level =>
       LilaFuture.delay(delayFor(game) | 0.millis) {
-        makeWork(game, level) `addEffect` redis.request void
+        makeWork(game, level).addEffect(redis.request) void
       }
     } recover { case e: Exception =>
       logger.info(e.getMessage)
@@ -31,26 +31,28 @@ final class FishnetPlayer(
   private val defaultClock = Clock(300, 0)
 
   private def delayFor(g: Game): Option[FiniteDuration] =
-    if (!g.bothPlayersHaveMoved) 2.seconds.some
+    if !g.bothPlayersHaveMoved then 2.seconds.some
     else
       for {
         pov <- g.aiPov
         clock     = g.clock | defaultClock
         totalTime = clock.estimateTotalTime.centis
         if totalTime > 20 * 100
-        delay = (clock.remainingTime(pov.playerIndex).centis `atMost` totalTime) * delayFactor
-        accel = 1 - ((g.turnCount - 20) `atLeast` 0 `atMost` 100) / 150f
-        sleep = (delay * accel) `atMost` 500
+        delay = (clock.remainingTime(pov.playerIndex).centis.atMost(totalTime)) * delayFactor
+        accel = 1 - ((g.turnCount - 20).atLeast(0).atMost(100)) / 150f
+        sleep = (delay * accel).atMost(500)
         if sleep > 25
         millis     = sleep * 10
-        randomized = millis + (millis * (java.util.concurrent.ThreadLocalRandom.current().nextFloat() - 0.5f)).toLong
-        divided    = randomized / (if (g.turnCount > 9) 1 else 2)
+        randomized = millis + (millis * (java.util.concurrent.ThreadLocalRandom
+          .current()
+          .nextFloat() - 0.5f)).toLong
+        divided = randomized / (if g.turnCount > 9 then 1 else 2)
       } yield divided.toLong.millis
 
   private def makeWork(game: Game, level: Int): Fu[Work.Move] =
-    if (game.situation `playable` true)
-      if (game.turnCount <= maxTurns) gameRepo.initialFen(game) zip uciMemo.get(game) map {
-        case (initialFen, moves) =>
+    if game.situation.playable(true) then
+      if game.turnCount <= maxTurns then
+        gameRepo.initialFen(game) zip uciMemo.get(game) map { case (initialFen, moves) =>
           Work.Move(
             _id = Work.makeId,
             game = Work.Game(
@@ -58,14 +60,14 @@ final class FishnetPlayer(
               initialFen = initialFen,
               studyId = none,
               variant = game.variant,
-              //ok to flatten as fishnet doesnt handle multimove
+              // ok to flatten as fishnet doesnt handle multimove
               moves = moves.flatten
                 .flatMap(Uci(game.variant.gameLogic, game.variant.gameFamily, _))
                 .map(_.uci)
                 .mkString(" ")
             ),
             level =
-              if (level < 3 && game.clock.exists(_.config.limit.toSeconds < 60)) 3
+              if level < 3 && game.clock.exists(_.config.limit.toSeconds < 60) then 3
               else level,
             clock = game.clock.map { clk =>
               Work.Clock(
@@ -76,7 +78,7 @@ final class FishnetPlayer(
               )
             }
           )
-      }
+        }
       else fufail(s"[fishnet] Too many turns (${game.turnCount}), won't play ${game.id}")
     else fufail(s"[fishnet] invalid position on ${game.id}")
 }

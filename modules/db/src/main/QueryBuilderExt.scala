@@ -4,7 +4,7 @@ import scala.collection.Factory
 
 import scala.concurrent.ExecutionContext
 
-import reactivemongo.api._
+import reactivemongo.api.*
 
 trait QueryBuilderExt { self: dsl =>
   implicit final class ExtendQueryCursor[A](cursor: Cursor.WithOps[A])(implicit ec: ExecutionContext) { // CursorProducer?

@@ -1,6 +1,6 @@
 package lila.challenge
 
-import strategygames.{ P2, Player => PlayerIndex, GameLogic, Mode, Situation, P1 }
+import strategygames.{ GameLogic, Mode, P1, P2, Player as PlayerIndex, Situation }
 import strategygames.format.Forsyth
 import strategygames.format.Forsyth.SituationPlus
 import strategygames.variant.Variant
@@ -15,13 +15,14 @@ final private class ChallengeJoiner(
 )(implicit ec: scala.concurrent.ExecutionContext) {
 
   def apply(c: Challenge, destUser: Option[User], playerIndex: Option[PlayerIndex]): Fu[Option[Pov]] =
-    gameRepo `exists` c.id flatMap {
-      case true                                                                             => fuccess(None)
-      case _ if playerIndex.map(Challenge.PlayerIndexChoice.apply).contains(c.playerIndexChoice) => fuccess(None)
+    gameRepo.exists(c.id) flatMap {
+      case true => fuccess(None)
+      case _ if playerIndex.map(Challenge.PlayerIndexChoice.apply).contains(c.playerIndexChoice) =>
+        fuccess(None)
       case _ =>
         c.challengerUserId.so(userRepo.byId) flatMap { origUser =>
           val game = ChallengeJoiner.createGame(c, origUser, destUser, playerIndex)
-          (gameRepo.insertDenormalized(game, c.initialFen)).andDo(onStart(game.id)) inject Pov(
+          gameRepo.insertDenormalized(game, c.initialFen).andDo(onStart(game.id)) inject Pov(
             game,
             !c.finalPlayerIndex
           ).some
@@ -59,19 +60,19 @@ private object ChallengeJoiner {
           startedAtTurn = sp.turnCount,
           clock = c.clock.map(_.config.toClock)
         )
-        if (c.variant.fromPositionVariant && Forsyth.>>(c.variant.gameLogic, game).initial)
+        if c.variant.fromPositionVariant && Forsyth.>>(c.variant.gameLogic, game).initial then
           makeStratGame(Variant.libStandard(c.variant.gameLogic)) -> none
         else game                                                 -> baseState
       }
     }
-    val multiMatch = c.isMultiMatch && c.customStartingPosition `option` "multiMatch"
+    val multiMatch = (c.isMultiMatch && c.customStartingPosition).option("multiMatch")
     val perfPicker = (perfs: lila.user.Perfs) => perfs(c.perfType)
     Game
       .make(
         stratGame = stratGame,
         p1Player = Player.make(P1, c.finalPlayerIndex.fold(origUser, destUser), perfPicker),
         p2Player = Player.make(P2, c.finalPlayerIndex.fold(destUser, origUser), perfPicker),
-        mode = if (stratGame.board.variant.fromPositionVariant) Mode.Casual else c.mode,
+        mode = if stratGame.board.variant.fromPositionVariant then Mode.Casual else c.mode,
         source = Source.Friend,
         daysPerTurn = c.daysPerTurn,
         pgnImport = None,

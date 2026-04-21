@@ -37,7 +37,7 @@ object PlayServer {
       )(using application.materializer)
 
       process.addShutdownHook {
-        if (application.coordinatedShutdown.shutdownReason().isEmpty) server.stop()
+        if application.coordinatedShutdown.shutdownReason().isEmpty then server.stop()
       }
 
       server
@@ -59,14 +59,15 @@ object PlayServer {
         .getOptional[String]("play.server.dir")
         .getOrElse(throw ServerStartException("No root server path supplied"))
       val file = new File(path)
-      if (!file.isDirectory) throw ServerStartException(s"Bad root server path: $path")
+      if !file.isDirectory then throw ServerStartException(s"Bad root server path: $path")
       file
     }
 
-    val httpPort = configuration.getOptional[String]("play.server.http.port").flatMap(_.toIntOption).getOrElse(9663)
-    val address  = configuration.getOptional[String]("play.server.http.address").getOrElse("0.0.0.0")
-    val mode =
-      if (configuration.getOptional[String]("play.mode").contains("prod")) Mode.Prod
+    val httpPort =
+      configuration.getOptional[String]("play.server.http.port").flatMap(_.toIntOption).getOrElse(9663)
+    val address = configuration.getOptional[String]("play.server.http.address").getOrElse("0.0.0.0")
+    val mode    =
+      if configuration.getOptional[String]("play.mode").contains("prod") then Mode.Prod
       else Mode.Dev
 
     ServerConfig(rootDir, httpPort, address, mode, process.properties, configuration)

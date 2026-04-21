@@ -13,7 +13,7 @@ final class Importer(gameRepo: GameRepo)(implicit ec: scala.concurrent.Execution
       gameRepo.findPgnImport(data.pgn) flatMap { _.fold(processing)(fuccess) }
 
     gameExists {
-      (data `preprocess` user).toEither.toFuture flatMap { case Preprocessed(g, _, initialFen, _) =>
+      data.preprocess(user).toEither.toFuture flatMap { case Preprocessed(g, _, initialFen, _) =>
         val game = forceId.fold(g.sloppy)(g.withId)
         gameRepo.insertDenormalized(game, initialFen) >> {
           game.pgnImport.flatMap(_.user).isDefined so gameRepo.setImportCreatedAt(game)
@@ -31,6 +31,6 @@ final class Importer(gameRepo: GameRepo)(implicit ec: scala.concurrent.Execution
 
   def inMemory(data: ImportData): Validated[String, (Game, Option[FEN])] =
     data.preprocess(user = none).map { case Preprocessed(game, _, fen, _) =>
-      (game `withId` "synthetic", fen)
+      (game.withId("synthetic"), fen)
     }
 }

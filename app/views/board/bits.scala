@@ -1,7 +1,7 @@
 package views.html.board
 
 import strategygames.format.{ FEN, Forsyth }
-import strategygames.{ Player => PlayerIndex, P2, P1 }
+import strategygames.{ P1, P2, Player as PlayerIndex }
 import strategygames.variant.Variant
 import strategygames.{ GameLogic, Situation }
 import strategygames.draughts.Board
@@ -9,8 +9,8 @@ import strategygames.draughts.Board
 import play.api.libs.json.Json
 
 import lila.api.Context
-import lila.app.templating.Environment._
-import lila.app.ui.ScalatagsTemplate._
+import lila.app.templating.Environment.*
+import lila.app.ui.ScalatagsTemplate.*
 import lila.game.Pov
 import lila.game.MultiPointState
 
@@ -18,8 +18,8 @@ object bits {
 
   sealed abstract class Orientation extends Product
 
-  //Orientation P1,P2,Left,Right is the view of the boar as though you are sat down at that position
-  //Orientation P1VFlip is for backgammon where for P2 they essentially view as P1 but flip the board vertically
+  // Orientation P1,P2,Left,Right is the view of the boar as though you are sat down at that position
+  // Orientation P1VFlip is for backgammon where for P2 they essentially view as P1 but flip the board vertically
   object Orientation {
     case object P1      extends Orientation
     case object P2      extends Orientation
@@ -30,13 +30,13 @@ object bits {
 
   def playerIndexToOrientation(c: PlayerIndex, v: String): Orientation =
     (c, v) match {
-      case (_, "racingKings") => Orientation.P1
-      case (P1, _)            => Orientation.P1
-      case (P2, "backgammon") => Orientation.P1VFlip
-      case (P2, "hyper")      => Orientation.P1VFlip
-      case (P2, "nackgammon") => Orientation.P1VFlip
+      case (_, "racingKings")                            => Orientation.P1
+      case (P1, _)                                       => Orientation.P1
+      case (P2, "backgammon")                            => Orientation.P1VFlip
+      case (P2, "hyper")                                 => Orientation.P1VFlip
+      case (P2, "nackgammon")                            => Orientation.P1VFlip
       case (P2, "linesOfAction") | (P2, "scrambledEggs") => Orientation.Right
-      case (P2, _)            => Orientation.P2
+      case (P2, _)                                       => Orientation.P2
     }
 
   private val dataState = attr("data-state")
@@ -87,17 +87,18 @@ object bits {
     val libName   = fen.gameLogic.name
     val orient    = orientation.toString().toLowerCase()
     val boardSize = boardSizeOpt.getOrElse(Board.D100)
-    val data = if (libName == "Draughts") {
+    val data      = if libName == "Draughts" then {
       s"${fen.value}|${boardSize.width}x${boardSize.height}|${orient}|$lastMove"
     } else {
       s"${fen.value}|${orient}|$lastMove|${multiPointResult.fold(MultiPointState.noDataChar)(_.toString)}"
     }
     val extra =
-      if (libName == "Draughts") s"is${boardSize.key} ${libName.toLowerCase()}"
-      else if (variantKey == "linesOfAction") "loa" //TODO daily puzzle (test other variants when supported)
+      if libName == "Draughts" then s"is${boardSize.key} ${libName.toLowerCase()}"
+      else if variantKey == "linesOfAction" then
+        "loa" // TODO daily puzzle (test other variants when supported)
       else s"${libName.toLowerCase()}"
     tag(
-      cls := s"mini-board mini-board--init cg-wrap is2d variant-${variantKey} ${extra}",
+      cls       := s"mini-board mini-board--init cg-wrap is2d variant-${variantKey} ${extra}",
       dataState := data
     )(cgWrapContent)
   }
@@ -123,7 +124,7 @@ object bits {
       side: strategygames.chess.Side
   ): Boolean =
     sit match {
-      case Situation.Chess(sit) => sit canCastle playerIndex `on` side
+      case Situation.Chess(sit) => sit.canCastle(playerIndex).on(side)
       case _                    => false
     }
 
@@ -133,10 +134,10 @@ object bits {
       variant: Variant = Variant.libStandard(GameLogic.Chess())
   )(implicit ctx: Context) =
     Json.obj(
-      "fen"         -> fen.value, // require full fen for score updates
-      "baseUrl"     -> s"$netBaseUrl/editor/", // base for building urls in the editor, should not depend on the variant or the FEN
+      "fen" -> fen.value, // require full fen for score updates
+      "baseUrl" -> s"$netBaseUrl/editor/", // base for building urls in the editor, should not depend on the variant or the FEN
       "playerIndex" -> sit.player.name,
-      "castles" -> Json.obj(
+      "castles"     -> Json.obj(
         "K" -> sitCanCastle(sit, P1, strategygames.chess.KingSide),
         "Q" -> sitCanCastle(sit, P1, strategygames.chess.QueenSide),
         "k" -> sitCanCastle(sit, P2, strategygames.chess.KingSide),

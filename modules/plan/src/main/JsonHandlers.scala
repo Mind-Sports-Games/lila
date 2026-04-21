@@ -1,25 +1,26 @@
 package lila.plan
 
-import play.api.libs.json._
-import play.api.libs.functional.syntax._
+import play.api.libs.json.*
+import play.api.libs.functional.syntax.*
 import java.util.Currency
 import scala.util.Try
 
 private[plan] object JsonHandlers {
 
   implicit val CurrencyReads: Reads[Currency] = Reads.of[String].flatMapResult { code =>
-    Try(Currency `getInstance` code.toUpperCase).fold(err => JsError(err.getMessage), cur => JsSuccess(cur))
+    Try(Currency.getInstance(code.toUpperCase)).fold(err => JsError(err.getMessage), cur => JsSuccess(cur))
   }
   implicit val StripeCents: Reads[Cents]    = Reads.of[Int].map(Cents.apply)
   implicit val CountryReads: Reads[Country] = Reads.of[String].map(Country.apply)
 
   object stripe {
-    implicit val SubscriptionIdReads: Reads[StripeSubscriptionId] = Reads.of[String].map(StripeSubscriptionId.apply)
-    implicit val SessionIdReads: Reads[StripeSessionId]           = Reads.of[String].map(StripeSessionId.apply)
-    implicit val CustomerIdReads: Reads[StripeCustomerId]         = Reads.of[String].map(StripeCustomerId.apply)
-    implicit val ChargeIdReads: Reads[StripeChargeId]             = Reads.of[String].map(StripeChargeId.apply)
-    implicit val PriceReads: Reads[StripePrice]                   = Json.reads[StripePrice]
-    implicit val ItemReads: Reads[StripeItem]                     = Json.reads[StripeItem]
+    implicit val SubscriptionIdReads: Reads[StripeSubscriptionId] =
+      Reads.of[String].map(StripeSubscriptionId.apply)
+    implicit val SessionIdReads: Reads[StripeSessionId]   = Reads.of[String].map(StripeSessionId.apply)
+    implicit val CustomerIdReads: Reads[StripeCustomerId] = Reads.of[String].map(StripeCustomerId.apply)
+    implicit val ChargeIdReads: Reads[StripeChargeId]     = Reads.of[String].map(StripeChargeId.apply)
+    implicit val PriceReads: Reads[StripePrice]           = Json.reads[StripePrice]
+    implicit val ItemReads: Reads[StripeItem]             = Json.reads[StripeItem]
     // require that the items array is not empty.
     implicit val SubscriptionReads: Reads[StripeSubscription] = (
       (__ \ "id").read[String] and
@@ -29,13 +30,13 @@ private[plan] object JsonHandlers {
         (__ \ "status").read[String] and
         (__ \ "default_payment_method").readNullable[String]
     )(StripeSubscription.apply)
-    implicit val SubscriptionsReads: Reads[StripeSubscriptions]         = Json.reads[StripeSubscriptions]
-    implicit val CustomerReads: Reads[StripeCustomer]                   = Json.reads[StripeCustomer]
-    implicit val AddressReads: Reads[StripeCharge.Address]              = Json.reads[StripeCharge.Address]
-    implicit val BillingReads: Reads[StripeCharge.BillingDetails]       = Json.reads[StripeCharge.BillingDetails]
-    implicit val ChargeReads: Reads[StripeCharge]                       = Json.reads[StripeCharge]
-    implicit val InvoiceReads: Reads[StripeInvoice]                     = Json.reads[StripeInvoice]
-    implicit val SessionReads: Reads[StripeSession]                     = Json.reads[StripeSession]
+    implicit val SubscriptionsReads: Reads[StripeSubscriptions]   = Json.reads[StripeSubscriptions]
+    implicit val CustomerReads: Reads[StripeCustomer]             = Json.reads[StripeCustomer]
+    implicit val AddressReads: Reads[StripeCharge.Address]        = Json.reads[StripeCharge.Address]
+    implicit val BillingReads: Reads[StripeCharge.BillingDetails] = Json.reads[StripeCharge.BillingDetails]
+    implicit val ChargeReads: Reads[StripeCharge]                 = Json.reads[StripeCharge]
+    implicit val InvoiceReads: Reads[StripeInvoice]               = Json.reads[StripeInvoice]
+    implicit val SessionReads: Reads[StripeSession]               = Json.reads[StripeSession]
     implicit val SessionCompletedReads: Reads[StripeCompletedSession]   = Json.reads[StripeCompletedSession]
     implicit val CardReads: Reads[StripeCard]                           = Json.reads[StripeCard]
     implicit val PaymentMethodReads: Reads[StripePaymentMethod]         = Json.reads[StripePaymentMethod]
@@ -49,10 +50,11 @@ private[plan] object JsonHandlers {
     }
     implicit val PayerIdReads: Reads[PayPalPayerId]               = Reads.of[String].map(PayPalPayerId.apply)
     implicit val OrderIdReads: Reads[PayPalOrderId]               = Reads.of[String].map(PayPalOrderId.apply)
-    implicit val SubscriptionIdReads: Reads[PayPalSubscriptionId] = Reads.of[String].map(PayPalSubscriptionId.apply)
-    implicit val EventIdReads: Reads[PayPalEventId]               = Reads.of[String].map(PayPalEventId.apply)
-    implicit val PlanIdReads: Reads[PayPalPlanId]                 = Reads.of[String].map(PayPalPlanId.apply)
-    implicit val OrderCreatedReads: Reads[PayPalOrderCreated]     = Json.reads[PayPalOrderCreated]
+    implicit val SubscriptionIdReads: Reads[PayPalSubscriptionId] =
+      Reads.of[String].map(PayPalSubscriptionId.apply)
+    implicit val EventIdReads: Reads[PayPalEventId]           = Reads.of[String].map(PayPalEventId.apply)
+    implicit val PlanIdReads: Reads[PayPalPlanId]             = Reads.of[String].map(PayPalPlanId.apply)
+    implicit val OrderCreatedReads: Reads[PayPalOrderCreated] = Json.reads[PayPalOrderCreated]
     implicit val SubscriptionCreatedReads: Reads[PayPalSubscriptionCreated] =
       Json.reads[PayPalSubscriptionCreated]
     implicit val AmountReads: Reads[PayPalAmount]             = Json.reads[PayPalAmount]

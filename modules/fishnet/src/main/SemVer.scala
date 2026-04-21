@@ -3,10 +3,10 @@ package com.gilt.gfc.semver
 
 object SemVer {
   def apply(version: String): SemVer = {
-    val bits = version.split("[\\.\\-]")
+    val bits           = version.split("[\\.\\-]")
     val (nums, extras) =
       bits.take(3).foldLeft((Nil: List[Long], Nil: List[String])) { case ((num, extra), bit) =>
-        import scala.util.control.Exception._
+        import scala.util.control.Exception.*
         allCatch opt bit.toLong match {
           case Some(long) => (long :: num, extra)
           case None       => (num, bit :: extra)
@@ -19,7 +19,7 @@ object SemVer {
           y,
           z, {
             val e = extras.reverse ::: bits.drop(3).toList
-            if (e.isEmpty) None else Some(e.mkString("-"))
+            if e.isEmpty then None else Some(e.mkString("-"))
           },
           version
         )
@@ -29,7 +29,7 @@ object SemVer {
           y,
           0, {
             val e = extras.reverse ::: bits.drop(2).toList
-            if (e.isEmpty) None else Some(e.mkString("-"))
+            if e.isEmpty then None else Some(e.mkString("-"))
           },
           version
         )
@@ -39,7 +39,7 @@ object SemVer {
           0,
           0, {
             val e = extras.reverse ::: bits.drop(1).toList
-            if (e.isEmpty) None else Some(e.mkString("-"))
+            if e.isEmpty then None else Some(e.mkString("-"))
           },
           version
         )
@@ -72,11 +72,11 @@ case class SemVer(major: Long, minor: Long, point: Long, extra: Option[String], 
     }
 
   def compare(o: SemVer): Int =
-    if (major != o.major) major.compare(o.major)
-    else if (minor != o.minor) minor.compare(o.minor)
-    else if (point != o.point) point.compare(o.point)
+    if major != o.major then major.compare(o.major)
+    else if minor != o.minor then minor.compare(o.minor)
+    else if point != o.point then point.compare(o.point)
     else {
-      import scala.util.control.Exception._
+      import scala.util.control.Exception.*
       val thsNumPrefix: Option[Long] = allCatch opt extra.get.takeWhile(_.isDigit).toLong
       val thtNumPrefix: Option[Long] = allCatch opt o.extra.get.takeWhile(_.isDigit).toLong
       (extra, thsNumPrefix, o.extra, thtNumPrefix) match {
@@ -88,8 +88,8 @@ case class SemVer(major: Long, minor: Long, point: Long, extra: Option[String], 
           1 // Number prefixes compared
         case (Some(ths), Some(_), Some(tht), Some(_)) =>
           ths.compareTo(tht) // Number prefixes same: Compare lexicographically
-        case (Some(_), Some(_), Some(_), None) => 0 // One starts with number the other doesn't: Can't decide
-        case (Some(_), None, Some(_), Some(_)) => 0 // One starts with number the other doesn't: Can't decide
+        case (Some(_), Some(_), Some(_), None)  => 0 // One starts with number the other doesn't: Can't decide
+        case (Some(_), None, Some(_), Some(_))  => 0 // One starts with number the other doesn't: Can't decide
         case (Some(ths), None, Some(tht), None) =>
           ths.compareTo(tht) // No number prefixes: Compare lexicographically
         case (Some(_), _, None, _) => -1 // One has extra, the other doesn't

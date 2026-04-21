@@ -2,7 +2,7 @@ package lila.app
 package templating
 
 import lila.api.Context
-import lila.app.ui.ScalatagsTemplate._
+import lila.app.ui.ScalatagsTemplate.*
 
 trait FlashHelper { self: I18nHelper =>
 
@@ -12,21 +12,21 @@ trait FlashHelper { self: I18nHelper =>
   def successFlash(modifiers: Seq[Modifier])(implicit ctx: Context): Option[Frag] =
     ctx.flash("success").map { msg =>
       flashMessage(modifiers ++ Seq(cls := "flash-success"))(
-        if (msg.isEmpty) trans.success() else msg
+        if msg.isEmpty then trans.success() else msg
       )
     }
 
   def warningFlash(modifiers: Seq[Modifier])(implicit ctx: Context): Option[Frag] =
     ctx.flash("warning").map { msg =>
       flashMessage(modifiers ++ Seq(cls := "flash-warning"))(
-        if (msg.isEmpty) "Warning" else msg
+        if msg.isEmpty then "Warning" else msg
       )
     }
 
   def failureFlash(modifiers: Seq[Modifier])(implicit ctx: Context): Option[Frag] =
     ctx.flash("failure").map { msg =>
       flashMessage(modifiers ++ Seq(cls := "flash-failure"))(
-        if (msg.isEmpty) "Failure" else msg
+        if msg.isEmpty then "Failure" else msg
       )
     }
 

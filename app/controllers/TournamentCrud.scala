@@ -1,7 +1,7 @@
 package controllers
 
 import lila.app.*
-import views._
+import views.*
 
 final class TournamentCrud(env: Env) extends LilaController(env) {
 
@@ -16,14 +16,14 @@ final class TournamentCrud(env: Env) extends LilaController(env) {
 
   def edit(id: String) =
     Secure(_.ManageTournament) { implicit ctx => _ =>
-      OptionOk(crud `one` id) { tour =>
-        html.tournament.crud.edit(tour, crud `editForm` tour)
+      OptionOk(crud.one(id)) { tour =>
+        html.tournament.crud.edit(tour, crud.editForm(tour))
       }
     }
 
   def update(id: String) =
     SecureBody(_.ManageTournament) { implicit ctx => _ =>
-      OptionFuResult(crud `one` id) { tour =>
+      OptionFuResult(crud.one(id)) { tour =>
         implicit val req = ctx.body
         crud
           .editForm(tour)
@@ -50,7 +50,7 @@ final class TournamentCrud(env: Env) extends LilaController(env) {
           data =>
             crud.create(data, me.user) map { tour =>
               Redirect {
-                if (tour.isTeamBattle) routes.Tournament.teamBattleEdit(tour.id)
+                if tour.isTeamBattle then routes.Tournament.teamBattleEdit(tour.id)
                 else routes.TournamentCrud.edit(tour.id)
               }.flashSuccess
             }
@@ -59,9 +59,9 @@ final class TournamentCrud(env: Env) extends LilaController(env) {
 
   def cloneT(id: String) =
     Secure(_.ManageTournament) { implicit ctx => _ =>
-      OptionFuResult(crud `one` id) { old =>
-        val tour = crud `clone` old
-        Ok(html.tournament.crud.create(crud `editForm` tour)).fuccess
+      OptionFuResult(crud.one(id)) { old =>
+        val tour = crud.clone(old)
+        Ok(html.tournament.crud.create(crud.editForm(tour))).fuccess
       }
     }
 

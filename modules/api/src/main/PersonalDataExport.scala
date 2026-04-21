@@ -1,14 +1,14 @@
 package lila.api
 
 import akka.stream.Materializer
-import akka.stream.scaladsl._
+import akka.stream.scaladsl.*
 import org.joda.time.DateTime
 import org.joda.time.format.DateTimeFormat
 import reactivemongo.akkastream.cursorProducer
 import reactivemongo.api.ReadPreference
 import scala.concurrent.ExecutionContext
 
-import lila.db.dsl._
+import lila.db.dsl.*
 import lila.game.Game
 import lila.user.User
 
@@ -77,7 +77,7 @@ final class PersonalDataExport(
     def gameChatsLookup(lookup: Bdoc) =
       gameEnv.gameRepo.coll
         .aggregateWith[Bdoc](readPreference = ReadPreference.secondaryPreferred) { framework =>
-          import framework._
+          import framework.*
           List(
             Match($doc(Game.BSONFields.playerUids -> user.id)),
             Project($id(true)),
@@ -125,7 +125,7 @@ final class PersonalDataExport(
           .aggregateWith[Bdoc](
             readPreference = ReadPreference.secondaryPreferred
           ) { framework =>
-            import framework._
+            import framework.*
             List(
               Match($doc(Game.BSONFields.playerUids -> user.id)),
               Project($id(true)),
@@ -167,6 +167,6 @@ final class PersonalDataExport(
 
   private def textTitle(t: String) = s"\n${"=" * t.length}\n$t\n${"=" * t.length}\n"
 
-  private val englishDateTimeFormatter = DateTimeFormat `forStyle` "MS"
-  private def textDate(date: DateTime) = englishDateTimeFormatter `print` date
+  private val englishDateTimeFormatter = DateTimeFormat.forStyle("MS")
+  private def textDate(date: DateTime) = englishDateTimeFormatter.print(date)
 }

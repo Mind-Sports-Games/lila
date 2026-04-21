@@ -60,12 +60,12 @@ case class Tournament(
   def isTeamBattle = teamBattle.isDefined
 
   def name(full: Boolean = true)(implicit lang: Lang): String = {
-    import lila.i18n.I18nKeys.tourname._
-    if (isMarathon || isUnique) name
-    else if (isTeamBattle && full) xTeamBattle.txt(name)
-    else if (isTeamBattle) name
-    //else schedule.fold(if (full) s"$name Arena" else name)(_.name(full))
-    else if (full) s"$name Arena"
+    import lila.i18n.I18nKeys.tourname.*
+    if isMarathon || isUnique then name
+    else if isTeamBattle && full then xTeamBattle.txt(name)
+    else if isTeamBattle then name
+    // else schedule.fold(if (full) s"$name Arena" else name)(_.name(full))
+    else if full then s"$name Arena"
     else name
   }
 
@@ -81,7 +81,8 @@ case class Tournament(
 
   def isMarathonOrUnique = isMarathon || isUnique
 
-  def isMSO = schedule.map(_.freq).contains(Schedule.Freq.MSO21) || schedule.map(_.freq).contains(Schedule.Freq.MSOGP)
+  def isMSO =
+    schedule.map(_.freq).contains(Schedule.Freq.MSO21) || schedule.map(_.freq).contains(Schedule.Freq.MSOGP)
 
   def isMSOWarmUp = schedule.map(_.freq).contains(Schedule.Freq.MSOWarmUp)
 
@@ -107,14 +108,14 @@ case class Tournament(
 
   def medleySecondsToFinishInterval =
     medleyIntervalSeconds.fold(0)(
-      (secondsToFinish - _.drop(medleyRound + 1).sum)
+      secondsToFinish - _.drop(medleyRound + 1).sum
     )
 
-  def finishesAt = startsAt `plusMinutes` minutes
+  def finishesAt = startsAt.plusMinutes(minutes)
 
-  def secondsToStart = (startsAt.getMillis / 1000 - nowSeconds).toInt `atLeast` 0
+  def secondsToStart = (startsAt.getMillis / 1000 - nowSeconds).toInt.atLeast(0)
 
-  def secondsToFinish = (finishesAt.getMillis / 1000 - nowSeconds).toInt `atLeast` 0
+  def secondsToFinish = (finishesAt.getMillis / 1000 - nowSeconds).toInt.atLeast(0)
 
   def pairingsClosedSeconds = math.max(30, math.min(clock.limitSeconds / 2, 120))
 
@@ -126,7 +127,7 @@ case class Tournament(
 
   def finalMedleyVariant: Boolean = medleyRound.some == medleyNumIntervals.map(_ - 1)
 
-  //start at 0 as it's actually an index for medley variants in front end
+  // start at 0 as it's actually an index for medley variants in front end
   def medleyRound: Int = {
     val cutoff = (nowSeconds - startsAt.getMillis / 1000).toInt
     medleyIntervalSeconds
@@ -156,20 +157,20 @@ case class Tournament(
 
   def isRecentlyStarted = isStarted && (nowSeconds - startsAt.getMillis / 1000) < 15
 
-  def isNowOrSoon = startsAt.isBefore(DateTime.now `plusMinutes` 15) && !isFinished
+  def isNowOrSoon = startsAt.isBefore(DateTime.now.plusMinutes(15)) && !isFinished
 
-  def isDistant = startsAt.isAfter(DateTime.now `plusDays` 1)
+  def isDistant = startsAt.isAfter(DateTime.now.plusDays(1))
 
   def duration = new Duration(minutes * 60 * 1000)
 
   def interval = new Interval(startsAt, duration)
 
-  def overlaps(other: Tournament) = interval `overlaps` other.interval
+  def overlaps(other: Tournament) = interval.overlaps(other.interval)
 
   def similarTo(other: Tournament) =
     (schedule, other.schedule) match {
-      case (Some(s1), Some(s2)) if s1 `similarTo` s2 => true
-      case _                                       => false
+      case (Some(s1), Some(s2)) if s1.similarTo(s2) => true
+      case _                                        => false
     }
 
   def sameFreqAndVariant(other: Tournament) =
@@ -182,11 +183,11 @@ case class Tournament(
 
   def perfType: PerfType = PerfType(variant, speed)
 
-  def iconChar = if (isMedley) '5' else perfType.iconChar
+  def iconChar = if isMedley then '5' else perfType.iconChar
 
   def durationString =
-    if (minutes < 60) s"${minutes}m"
-    else s"${minutes / 60}h" + (if (minutes % 60 != 0) s" ${minutes % 60}m" else "")
+    if minutes < 60 then s"${minutes}m"
+    else s"${minutes / 60}h" + (if minutes % 60 != 0 then s" ${minutes % 60}m" else "")
 
   def berserkable = !noBerserk && clock.berserkable
   def streakable  = !noStreak
@@ -213,10 +214,10 @@ case class Tournament(
       )
     }
 
-  def nonPlayStrategyCreatedBy = (createdBy != User.playstrategyId) `option` createdBy
+  def nonPlayStrategyCreatedBy = (createdBy != User.playstrategyId).option(createdBy)
 
   def ratingVariant =
-    if (variant.fromPositionVariant) Variant.libStandard(variant.gameLogic) else variant
+    if variant.fromPositionVariant then Variant.libStandard(variant.gameLogic) else variant
 
   def startingPosition = position flatMap Thematic.byFen
 
@@ -229,9 +230,10 @@ case class Tournament(
   def medleyGameGroupsString: Option[String] =
     medleyGameGroups.map(_.map(VariantKeys.gameGroupName).mkString(", "))
 
-  val minWaitingUsersForPairings: Int = if (botsAllowed) 1 else 2
+  val minWaitingUsersForPairings: Int = if botsAllowed then 1 else 2
 
-  override def toString = s"$id $startsAt ${name()(using defaultLang)} $minutes minutes, $clock, $nbPlayers players"
+  override def toString =
+    s"$id $startsAt ${name()(using defaultLang)} $minutes minutes, $clock, $nbPlayers players"
 }
 
 case class EnterableTournaments(tours: List[Tournament], scheduled: List[Tournament])
@@ -291,8 +293,8 @@ object Tournament {
       statusScoring = statusScoring,
       schedule = None,
       startsAt = startDate match {
-        case Some(startDate) => startDate `plusSeconds` ThreadLocalRandom.nextInt(60)
-        case None            => DateTime.now `plusMinutes` waitMinutes
+        case Some(startDate) => startDate.plusSeconds(ThreadLocalRandom.nextInt(60))
+        case None            => DateTime.now.plusMinutes(waitMinutes)
       },
       description = description,
       hasChat = hasChat
@@ -307,7 +309,7 @@ object Tournament {
           .makeName(ms.medleyName, sched.at, ms.weekOfMonth.isEmpty, ms.countOffset)
       ),
       status = Status.Created,
-      clock = Schedule `clockFor` sched,
+      clock = Schedule.clockFor(sched),
       minutes = minutes,
       createdBy = User.playstrategyId,
       createdAt = DateTime.now,
@@ -321,18 +323,18 @@ object Tournament {
       conditions = sched.conditions,
       statusScoring = sched.statusScoring,
       schedule = Some(sched),
-      startsAt = sched.at `plusSeconds` ThreadLocalRandom.nextInt(60),
+      startsAt = sched.at.plusSeconds(ThreadLocalRandom.nextInt(60)),
       description = sched.medleyShield.map(_.arenaDescriptionFull),
       trophy1st = sched.medleyShield.map(_.key),
       trophyExpiryDays = sched.trophyExpiryDays,
-      //we've scheduled this tour so make bots allowed for any of our tours
+      // we've scheduled this tour so make bots allowed for any of our tours
       botsAllowed = true
     )
   }
 
   def tournamentUrl(tourId: String): String = s"https://playstrategy.org/tournament/$tourId"
 
-  def makeId = ThreadLocalRandom `nextString` 8
+  def makeId = ThreadLocalRandom.nextString(8)
 
   case class PastAndNext(past: List[Tournament], next: List[Tournament])
 

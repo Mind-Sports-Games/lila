@@ -1,13 +1,13 @@
 package lila.puzzle
 
-import cats.implicits._
+import cats.implicits.*
 import org.joda.time.DateTime
-import scala.concurrent.duration._
+import scala.concurrent.duration.*
 
 import strategygames.variant.Variant
 import lila.common.paginator.Paginator
 import lila.common.config.MaxPerPage
-import lila.db.dsl._
+import lila.db.dsl.*
 import lila.db.paginator.Adapter
 import lila.user.User
 
@@ -17,7 +17,7 @@ final class PuzzleApi(
     countApi: PuzzleCountApi
 )(implicit ec: scala.concurrent.ExecutionContext, scheduler: akka.actor.Scheduler, mode: play.api.Mode) {
 
-  import BsonHandlers._
+  import BsonHandlers.*
 
   object puzzle {
 
@@ -34,7 +34,7 @@ final class PuzzleApi(
             collection = coll,
             selector = $doc("users" -> user.id),
             projection = none,
-            sort = $sort `desc` "glicko.r"
+            sort = $sort.desc("glicko.r")
           ),
           page,
           MaxPerPage(30)
@@ -48,7 +48,7 @@ final class PuzzleApi(
             collection = coll,
             selector = $doc("users" -> user.id, "v" -> variant.id, "l" -> variant.gameLogic.id),
             projection = none,
-            sort = $sort `desc` "glicko.r"
+            sort = $sort.desc("glicko.r")
           ),
           page,
           MaxPerPage(30)
@@ -92,7 +92,7 @@ final class PuzzleApi(
             _ so { prevRound =>
               trustApi.vote(user, prevRound, vote) flatMap {
                 _ so { weight =>
-                  val voteValue = (if (vote) 1 else -1) * weight
+                  val voteValue = (if vote then 1 else -1) * weight
                   lila.mon.puzzle.vote(vote, prevRound.win).increment()
                   updatePuzzle(id, voteValue, prevRound.vote) zip
                     colls.round {
@@ -101,12 +101,12 @@ final class PuzzleApi(
                 }
               }
             }
-        }
+          }
       }
 
     private def updatePuzzle(puzzleId: Puzzle.Id, newVote: Int, prevVote: Option[Int]): Funit =
       colls.puzzle { coll =>
-        import Puzzle.{ BSONFields => F }
+        import Puzzle.BSONFields as F
         coll.one[Bdoc](
           $id(puzzleId.value),
           $doc(F.voteUp -> true, F.voteDown -> true, F.day -> true, F.id -> false)
@@ -126,7 +126,7 @@ final class PuzzleApi(
                 ) ++ {
                   (newVote <= -100 && doc
                     .getAsOpt[DateTime](F.day)
-                    .exists(_ `isAfter` DateTime.now.minusDays(1))) so
+                    .exists(_.isAfter(DateTime.now.minusDays(1)))) so
                     $unset(F.day)
                 }
               )
@@ -151,9 +151,9 @@ final class PuzzleApi(
       round.find(user, id) flatMap {
         _ so { round =>
           round.themeVote(theme, vote) so { newThemes =>
-            import PuzzleRound.{ BSONFields => F }
+            import PuzzleRound.BSONFields as F
             val update =
-              if (newThemes.isEmpty || !PuzzleRound.themesLookSane(newThemes))
+              if newThemes.isEmpty || !PuzzleRound.themesLookSane(newThemes) then
                 fuccess($unset(F.themes, F.puzzle).some)
               else
                 vote match {

@@ -2,7 +2,7 @@ package lila.study
 
 import strategygames.format.pgn.{ Glyph, Tags }
 import strategygames.variant.Variant
-import strategygames.{ Centis, Player => PlayerIndex }
+import strategygames.{ Centis, Player as PlayerIndex }
 import org.joda.time.DateTime
 
 import strategygames.opening.{ FullOpening, FullOpeningDB }
@@ -62,7 +62,7 @@ case class Chapter(
     updateRoot(_.forceVariationAt(force, path))
 
   def opening: Option[FullOpening] =
-    if (!Variant.openingSensibleVariants(setup.variant.gameLogic)(setup.variant)) none
+    if !Variant.openingSensibleVariants(setup.variant.gameLogic)(setup.variant) then none
     else FullOpeningDB.searchInFens(setup.variant.gameLogic, root.mainline.map(_.fen))
 
   def isEmptyInitial = order == 1 && root.children.nodes.isEmpty
@@ -86,7 +86,7 @@ case class Chapter(
     _id = _id,
     name = name,
     setup = setup,
-    resultPlayerIndex = tagsResultPlayerIndex.isDefined `option` tagsResultPlayerIndex,
+    resultPlayerIndex = tagsResultPlayerIndex.isDefined.option(tagsResultPlayerIndex),
     hasRelayPath = relay.exists(!_.path.isEmpty)
   )
 
@@ -96,7 +96,7 @@ case class Chapter(
 
   def withoutChildren = copy(root = root.withoutChildren)
 
-  def withoutChildrenIfPractice = if (isPractice) copy(root = root.withoutChildren) else this
+  def withoutChildrenIfPractice = if isPractice then copy(root = root.withoutChildren) else this
 
   def relayAndTags = relay map { Chapter.RelayAndTags(id, _, tags) }
 
@@ -149,9 +149,9 @@ object Chapter {
       tags.resultPlayer.isEmpty &&
         relay.lastMoveAt.isAfter {
           DateTime.now.minusMinutes {
-            tags.clockConfig.fold(40)(_.limitInMinutes.toInt / 2 `atLeast` 15 `atMost` 60)
+            tags.clockConfig.fold(40)(c => (c.limitInMinutes.toInt / 2).atLeast(15).atMost(60))
           }
-      }
+        }
 
     def looksOver = !looksAlive
   }
@@ -185,7 +185,7 @@ object Chapter {
 
   val idSize = 8
 
-  def makeId = Id(lila.common.ThreadLocalRandom `nextString` idSize)
+  def makeId = Id(lila.common.ThreadLocalRandom.nextString(idSize))
 
   def make(
       studyId: Study.Id,
@@ -209,8 +209,8 @@ object Chapter {
       tags = tags,
       order = order,
       ownerId = ownerId,
-      practice = practice `option` true,
-      gamebook = gamebook `option` true,
+      practice = practice.option(true),
+      gamebook = gamebook.option(true),
       conceal = conceal,
       relay = relay,
       createdAt = DateTime.now

@@ -1,12 +1,12 @@
 package lila.simul
 
-import com.softwaremill.macwire._
+import com.softwaremill.macwire.*
 import lila.common.autoconfig.{ AutoConfig, ConfigName }
 import play.api.Configuration
-import scala.concurrent.duration._
+import scala.concurrent.duration.*
 
 import lila.common.Bus
-import lila.common.config._
+import lila.common.config.*
 import lila.socket.Socket.{ GetVersion, SocketVersion }
 
 @Module
@@ -47,16 +47,15 @@ final class Env(
 
   private val simulSocket = wire[SimulSocket]
 
-  val isHosting = new lila.round.IsSimulHost(u => api.currentHostIds `dmap` (_ contains u))
+  val isHosting = new lila.round.IsSimulHost(u => api.currentHostIds.dmap(_ contains u))
 
   val allCreatedFeaturable = cacheApi.unit[List[Simul]] {
     _.refreshAfterWrite(3 seconds)
       .buildAsyncFuture(_ => repo.allCreatedFeaturable)
   }
 
-  val featurable = new SimulIsFeaturable((simul: Simul) =>
-    simul.team.isEmpty && featureLimiter(simul.hostId)(true)(false)
-  )
+  val featurable =
+    new SimulIsFeaturable((simul: Simul) => simul.team.isEmpty && featureLimiter(simul.hostId)(true)(false))
 
   private val featureLimiter = new lila.memo.RateLimit[lila.user.User.ID](
     credits = config.featureViews.value,
@@ -70,11 +69,11 @@ final class Env(
 
   Bus.subscribeFuns(
     "finishGame" -> { case lila.game.actorApi.FinishGame(game, _, _) =>
-      api `finishGame` game
+      api.finishGame(game)
       ()
     },
     "adjustCheater" -> { case lila.hub.actorApi.mod.MarkCheater(userId, true) =>
-      api `ejectCheater` userId
+      api.ejectCheater(userId)
       ()
     },
     "simulGetHosts" -> { case lila.hub.actorApi.simul.GetHostIds(promise) =>
