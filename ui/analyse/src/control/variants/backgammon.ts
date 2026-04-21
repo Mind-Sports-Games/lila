@@ -34,6 +34,7 @@ export const configure = (ctrl: AnalyseCtrl): void => {
   };
 
   let areDiceDescending = true;
+  let lastRollPath = '';
   let rollPending = false;
   let rollSent = false;
   let actionSent = false;
@@ -139,6 +140,11 @@ export const configure = (ctrl: AnalyseCtrl): void => {
     const variantKey = ctrl.data.game.variant.key;
 
     config.myPlayerIndex = playerIndex;
+
+    if (diceRollUci.test(node.uci ?? '') && ctrl.path !== lastRollPath) {
+      areDiceDescending = true;
+      lastRollPath = ctrl.path;
+    }
 
     const dice = stratUtils.readDice(node.fen, variantKey, false, areDiceDescending);
     config.dice = dice;
