@@ -109,8 +109,7 @@ function hiddenInput(name: string, value: string) {
 }
 
 function studyButton(ctrl: AnalyseCtrl) {
-  const canStudyFromHere =
-    (isChess(ctrl.data.game.variant.key) || !ctrl.synthetic);
+  const canStudyFromHere = isChess(ctrl.data.game.variant.key) || !ctrl.synthetic;
   if (!canStudyFromHere) return;
   if (ctrl.study && ctrl.embed && !ctrl.ongoing)
     return h(
