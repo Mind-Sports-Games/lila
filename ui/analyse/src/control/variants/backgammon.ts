@@ -63,10 +63,54 @@ export const configure = (ctrl: AnalyseCtrl): void => {
     ctrl.redraw();
   };
 
-  const sendEndTurn = () => {
-    const existingEndTurn = ctrl.node.children.find(c => c.uci === 'endturn');
-    if (existingEndTurn) {
-      ctrl.userJumpIfCan(ctrl.path + existingEndTurn.id);
+  const findEquivalentEndTurn = (): { endTurnPath: string; branchRootPath: string | null } | null => {
+    const directEndTurn = ctrl.node.children.find(c => c.uci === 'endturn');
+    if (directEndTurn) return { endTurnPath: ctrl.path + directEndTurn.id, branchRootPath: null };
+
+    const targetBoard = ctrl.node.fen.split(' ')[0];
+    const nodeList = ctrl.nodeList;
+    let rollIdx = -1;
+    for (let i = nodeList.length - 2; i >= 0; i--) {
+      if (diceRollUci.test(nodeList[i].uci ?? '')) { rollIdx = i; break; }
+    }
+    if (rollIdx < 0) return null;
+
+    const rollPath = ctrl.path.slice(0, rollIdx * 2);
+    const rollNode = nodeList[rollIdx];
+    const currentBranchId = nodeList[rollIdx + 1]?.id;
+
+    const dfs = (node: Tree.Node, path: string): string | null => {
+      const et = node.children.find(c => c.uci === 'endturn');
+      if (et) return node.fen.split(' ')[0] === targetBoard ? path + et.id : null;
+      for (const child of node.children) {
+        const result = dfs(child, path + child.id);
+        if (result) return result;
+      }
+      return null;
+    };
+
+    for (const child of rollNode.children) {
+      if (child.id === currentBranchId) continue;
+      const result = dfs(child, rollPath + child.id);
+      if (result)
+        return { endTurnPath: result, branchRootPath: rollPath + currentBranchId! };
+    }
+    return null;
+  };
+
+  const sendEndTurn = (deleteNodeIfSameTurnPlayed = false) => {
+    const sameTurnPlayed = findEquivalentEndTurn();
+    if (sameTurnPlayed) {
+      const pathToDelete =
+        deleteNodeIfSameTurnPlayed && sameTurnPlayed.branchRootPath !== null
+          ? sameTurnPlayed.branchRootPath
+          : undefined;
+      ctrl.userJumpIfCan(sameTurnPlayed.endTurnPath);
+      if (pathToDelete !== undefined) {
+        ctrl.tree.deleteNodeAt(pathToDelete);
+        if (ctrl.study) ctrl.study.deleteNode(pathToDelete);
+        ctrl.redraw();
+      }
       sendRollDice();
       return;
     }
@@ -114,7 +158,7 @@ export const configure = (ctrl: AnalyseCtrl): void => {
     if (allDiceConsumed) {
       if (!ctrl.study || actionSent) {
         actionSent = false;
-        sendEndTurn();
+        sendEndTurn(true);
       }
     } else if (noMovesAfterRoll) {
       if (!ctrl.study || rollSent || actionSent) {
