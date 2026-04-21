@@ -22,27 +22,27 @@ object Dependencies {
     val lila     = org %% "scalalib-lila"      % version
     def bundle   = Seq(core, model, playJson, lila)
   }
-  val hasher        = "com.roundeights"      %% "hasher"           % "1.3.1"
-  val jodaTime      = "joda-time"             % "joda-time"        % "2.10.10"
-  val compression   = "org.lichess"           % "compression_2.13" % "1.6"
-  val strategyGames = "org.playstrategy"     %% "strategygames"    % "10.2.1-pstrat209.lw20260417.1"
-  val maxmind       = "com.maxmind.geoip2"    % "geoip2"           % "4.2.0"
-  val prismic       = "io.prismic"           %% "scala-kit"        % "1.2.19_lila-3.2"
-  val scrimage      = "com.sksamuel.scrimage" % "scrimage-core"    % "4.3.0"
-  val scaffeine     = "com.github.blemale"   %% "scaffeine"        % "5.2.1" % "compile"
-  val googleOAuth = "com.google.auth" % "google-auth-library-oauth2-http" % "0.25.5"
-  val scalaUri    = "io.lemonlabs"   %% "scala-uri"                       % "4.0.3"
-  val scalatags   = "com.lihaoyi"    %% "scalatags"                       % "0.13.1"
-  val lettuce     = "io.lettuce"      % "lettuce-core"                    % "6.1.2.RELEASE"
+  val hasher        = "com.roundeights"      %% "hasher"                          % "1.3.1"
+  val jodaTime      = "joda-time"             % "joda-time"                       % "2.10.10"
+  val compression   = "org.lichess"           % "compression_2.13"                % "1.6"
+  val strategyGames = "org.playstrategy"     %% "strategygames"                   % "10.2.1-pstrat209-scala3"
+  val maxmind       = "com.maxmind.geoip2"    % "geoip2"                          % "4.2.0"
+  val prismic       = "io.prismic"           %% "scala-kit"                       % "1.2.19_lila-3.2"
+  val scrimage      = "com.sksamuel.scrimage" % "scrimage-core"                   % "4.3.0"
+  val scaffeine     = "com.github.blemale"   %% "scaffeine"                       % "5.2.1" % "compile"
+  val googleOAuth   = "com.google.auth"       % "google-auth-library-oauth2-http" % "0.25.5"
+  val scalaUri      = "io.lemonlabs"         %% "scala-uri"                       % "4.0.3"
+  val scalatags     = "com.lihaoyi"          %% "scalatags"                       % "0.13.1"
+  val lettuce       = "io.lettuce"            % "lettuce-core"                    % "6.1.2.RELEASE"
   val epoll     = "io.netty"       % "netty-transport-native-epoll" % "4.1.58.Final" classifier "linux-x86_64"
   val scalatest = "org.scalatest" %% "scalatest"                    % "3.2.18" % Test
   val uaparser  = "org.uaparser"  %% "uap-scala"                    % "0.21.0"
-  val apacheText      = "org.apache.commons"          % "commons-text"     % "1.12.0"
-  val cats            = "org.typelevel"              %% "cats-core"        % "2.13.0"
-  val alleycats       = "org.typelevel"              %% "alleycats-core"   % "2.13.0"
-  val catsMtl         = "org.typelevel"              %% "cats-mtl"         % "1.6.0"
-  val kittens         = "org.typelevel"              %% "kittens"          % "3.5.0"
-  val bloomFilter     = "com.github.alexandrnikitin" %% "bloom-filter"     % "0.13.1_lila-1"
+  val apacheText  = "org.apache.commons"          % "commons-text"   % "1.12.0"
+  val cats        = "org.typelevel"              %% "cats-core"      % "2.13.0"
+  val alleycats   = "org.typelevel"              %% "alleycats-core" % "2.13.0"
+  val catsMtl     = "org.typelevel"              %% "cats-mtl"       % "1.6.0"
+  val kittens     = "org.typelevel"              %% "kittens"        % "3.5.0"
+  val bloomFilter = "com.github.alexandrnikitin" %% "bloom-filter"   % "0.13.1_lila-1"
 
   val munit      = "org.scalameta"  %% "munit"            % "1.2.1"  % Test
   val scalacheck = "org.scalacheck" %% "scalacheck"       % "1.19.0" % Test
@@ -72,20 +72,20 @@ object Dependencies {
   object reactivemongo {
     val version = "1.1.0-RC20"
 
-    val driver = "org.reactivemongo" %% "reactivemongo"             % version
-    val stream = "org.reactivemongo" %% "reactivemongo-akkastream"  % version
-    val kamon  = "org.reactivemongo" %% "reactivemongo-kamon"       % version
+    val driver = "org.reactivemongo" %% "reactivemongo"            % version
+    val stream = "org.reactivemongo" %% "reactivemongo-akkastream" % version
+    val kamon  = "org.reactivemongo" %% "reactivemongo-kamon"      % version
     def bundle = Seq(driver, stream)
   }
 
   object play {
     val playVersion = "2.8.18-lila_3.22"
-    val json    = "org.playframework" %% "play-json"         % "3.0.6"
-    val api     = "com.typesafe.play" %% "play"              % playVersion
-    val server  = "com.typesafe.play" %% "play-server"       % playVersion
-    val netty   = "com.typesafe.play" %% "play-netty-server" % playVersion
-    val logback = "com.typesafe.play" %% "play-logback"      % playVersion
-    val mailer  = "org.playframework" %% "play-mailer"       % "10.1.0"
+    val json        = "org.playframework" %% "play-json"         % "3.0.6"
+    val api         = "com.typesafe.play" %% "play"              % playVersion
+    val server      = "com.typesafe.play" %% "play-server"       % playVersion
+    val netty       = "com.typesafe.play" %% "play-netty-server" % playVersion
+    val logback     = "com.typesafe.play" %% "play-logback"      % playVersion
+    val mailer      = "org.playframework" %% "play-mailer"       % "10.1.0"
   }
 
   object playWs {
