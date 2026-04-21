@@ -397,6 +397,8 @@ export default function (
         if (sticky && !vm.mode.sticky) redraw();
         return;
       }
+      // Check if this node is being added at our current viewing position (before any jump)
+      const nodeAtCurrentPath = position.path === ctrl.path;
       if (sticky && who && who.s === playstrategy.sri) {
         // Always use the server's authoritative node: handles push moves (e.g. Grand Abalone)
         // where the local engine result may diverge from the server's.
@@ -405,6 +407,7 @@ export default function (
         ctrl.tree.addDests(d.d, newPath);
         data.position.path = newPath;
         ctrl.jump(newPath);
+        ctrl.controlConfig.onAfterAddNode?.(node);
         redraw();
         return;
       }
@@ -416,8 +419,14 @@ export default function (
       if (
         (sticky && vm.mode.sticky) ||
         (position.path === ctrl.path && position.path === treePath.fromNodeList(ctrl.mainline))
-      )
+      ) {
         ctrl.jump(newPath);
+        ctrl.controlConfig.onAfterAddNode?.(node);
+      } else if (nodeAtCurrentPath) {
+        // Node arrived at our current position but we didn't navigate (non-sticky/variation view).
+        // Still run auto-logic (e.g. auto-endturn when no valid moves after a dice roll).
+        ctrl.controlConfig.onAfterAddNode?.(node);
+      }
       redraw();
     },
     deleteNode(d) {

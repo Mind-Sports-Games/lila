@@ -26,12 +26,6 @@ export function allowGameBookStudyForVariant(variant: VariantKey) {
   return noGameBookVariants.indexOf(variant) === -1;
 }
 
-const noStudyVariants: string[] = ['backgammon', 'hyper', 'nackgammon'];
-
-export function allowStudyForVariant(variant: VariantKey) {
-  return noStudyVariants.indexOf(variant) === -1;
-}
-
 // Means that it's a lichess variant, so everything works
 const chessOnly: VariantKey[] = [
   'standard',

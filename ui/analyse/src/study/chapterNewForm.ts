@@ -3,7 +3,7 @@ import { defined, prop, Prop } from 'common';
 import { canUseBoardEditor } from 'common/editor';
 import { storedProp, StoredProp } from 'common/storage';
 import * as xhr from 'common/xhr';
-import { allowAnalysisForVariant, isChess, allowGameBookStudyForVariant, allowStudyForVariant } from 'common/analysis';
+import { allowAnalysisForVariant, isChess, allowGameBookStudyForVariant } from 'common/analysis';
 import { bind, bindSubmit, spinner, option, onInsert } from '../util';
 import { variants as xhrVariants, importPgn } from './studyXhr';
 import * as modal from '../modal';
@@ -340,7 +340,7 @@ export function view(ctrl: StudyChapterNewFormCtrl): VNode {
               gameOrPgn
                 ? [h('option', noarg('automatic'))]
                 : ctrl.vm.variants
-                    .filter(v => allowAnalysisForVariant(v.key) && allowStudyForVariant(v.key))
+                    .filter(v => allowAnalysisForVariant(v.key))
                     .map(v =>
                       h(
                         'option',

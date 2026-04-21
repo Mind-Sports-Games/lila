@@ -34,10 +34,21 @@ export const configure = (ctrl: AnalyseCtrl): void => {
   };
 
   let areDiceDescending = true;
+  let rollPending = false;
+  let rollSent = false;
   let actionSent = false;
   let endTurnSent = false;
 
+  const diceRollUci = /^[1-6](\/[1-6])+$/;
+
   const sendRollDice = () => {
+    if (rollPending) return;
+    // fix 2 successive rolls: If another session already rolled, navigate to the node instead of creating a duplicate
+    const existingRoll = ctrl.node.children.find(c => diceRollUci.test(c.uci ?? ''));
+    if (existingRoll) {
+      ctrl.userJumpIfCan(ctrl.path + existingRoll.id);
+      return;
+    }
     const roll: AnaRoll = {
       variant: ctrl.data.game.variant.key,
       lib: ctrl.data.game.variant.lib,
@@ -45,12 +56,19 @@ export const configure = (ctrl: AnalyseCtrl): void => {
       path: ctrl.path,
     };
     if (ctrl.practice) ctrl.practice.onUserMove();
-    actionSent = true;
+    rollPending = true;
+    rollSent = true;
     ctrl.socket.sendAnaRoll(roll);
     ctrl.redraw();
   };
 
   const sendEndTurn = () => {
+    const existingEndTurn = ctrl.node.children.find(c => c.uci === 'endturn');
+    if (existingEndTurn) {
+      ctrl.userJumpIfCan(ctrl.path + existingEndTurn.id);
+      sendRollDice();
+      return;
+    }
     const endTurn: AnaEndTurn = {
       variant: ctrl.data.game.variant.key,
       lib: ctrl.data.game.variant.lib,
@@ -71,6 +89,9 @@ export const configure = (ctrl: AnalyseCtrl): void => {
   };
 
   const maybeAutoEndTurn = (node: Tree.Node): void => {
+    const isRollNode = diceRollUci.test(node.uci ?? '');
+    if (isRollNode) rollPending = false;
+
     const fenParts = node.fen.split(' ');
     if (fenParts.length < 3) return;
     const unusedDice = fenParts[1];
@@ -89,11 +110,19 @@ export const configure = (ctrl: AnalyseCtrl): void => {
       (!node.dests || node.dests === '') &&
       (!node.dropsByRole || node.dropsByRole === '') &&
       (!node.lifts || node.lifts === '');
-    if (allDiceConsumed || noMovesAfterRoll) {
+    if (allDiceConsumed) {
       if (!ctrl.study || actionSent) {
         actionSent = false;
         sendEndTurn();
       }
+    } else if (noMovesAfterRoll) {
+      if (!ctrl.study || rollSent || actionSent) {
+        rollSent = false;
+        actionSent = false;
+        sendEndTurn();
+      }
+    } else if (isRollNode) {
+      rollSent = false;
     }
   };
 
@@ -135,7 +164,12 @@ export const configure = (ctrl: AnalyseCtrl): void => {
   };
 
   ctrl.controlConfig.cgHooks = {
-    onSelectDice: (_dice: unknown[]) => {
+    onSelectDice: (dice: unknown[]) => {
+      const typedDice = dice as { value: number; isAvailable: boolean }[];
+      if (typedDice.length > 0 && !typedDice.some(d => d.isAvailable)) {
+        sendEndTurn();
+        return;
+      }
       areDiceDescending = !areDiceDescending;
       ctrl.reset();
     },
@@ -154,7 +188,7 @@ export const configure = (ctrl: AnalyseCtrl): void => {
   ctrl.controlConfig.showDropDestsInDropMode = () => false;
 
   ctrl.controlConfig.nodeSoundOverride = (node: Tree.Node) => {
-    if (/^[1-6](\/[1-6])+$/.test(node.uci ?? '')) return 'diceRoll';
+    if (diceRollUci.test(node.uci ?? '')) return 'diceRoll';
     if (node.uci === 'endturn') return false;
     return undefined;
   };
