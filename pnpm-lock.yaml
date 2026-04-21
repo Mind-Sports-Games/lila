@@ -13,7 +13,7 @@ importers:
         version: https://codeload.github.com/lichess-org/ab-stub/tar.gz/94236bf34dbc9c05daf50f4c9842d859b9142be0
       chessground:
         specifier: github:Mind-Sports-Games/chessground#pla-1023-support-backgammon-in-analysis-and-studies
-        version: https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/6e5ab8b12747dbeee6d0aa9f4ee4211b829d4b12
+        version: https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/29d9f9e64ed05d86ed4ec5bd8ededa0276c66b10
       stratops:
         specifier: github:Mind-Sports-Games/stratops#v0.8.1-pstrat5.28
         version: https://codeload.github.com/Mind-Sports-Games/stratops/tar.gz/3ab9da347d5a551dc05935130ef1b5b83f8b574c
@@ -840,8 +840,8 @@ packages:
     resolution: {tarball: https://codeload.github.com/ornicar/chess.js/tar.gz/ad0709c0b07773d9d0da8e4605a9a2a28f00d249}
     version: 0.10.2
 
-  chessground@https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/6e5ab8b12747dbeee6d0aa9f4ee4211b829d4b12:
-    resolution: {tarball: https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/6e5ab8b12747dbeee6d0aa9f4ee4211b829d4b12}
+  chessground@https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/29d9f9e64ed05d86ed4ec5bd8ededa0276c66b10:
+    resolution: {tarball: https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/29d9f9e64ed05d86ed4ec5bd8ededa0276c66b10}
     version: 7.11.1-pstrat3.34
     engines: {node: ^20.19.4, pnpm: ^10.17.0}
 
@@ -1787,7 +1787,7 @@ snapshots:
 
   chess.js@https://codeload.github.com/ornicar/chess.js/tar.gz/ad0709c0b07773d9d0da8e4605a9a2a28f00d249: {}
 
-  chessground@https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/6e5ab8b12747dbeee6d0aa9f4ee4211b829d4b12: {}
+  chessground@https://codeload.github.com/Mind-Sports-Games/chessground/tar.gz/29d9f9e64ed05d86ed4ec5bd8ededa0276c66b10: {}
 
   chokidar@3.6.0:
     dependencies:

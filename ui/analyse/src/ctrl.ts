@@ -524,13 +524,13 @@ export default class AnalyseCtrl {
       encodeURIComponent(fen).replace(/%20/g, '_').replace(/%2F/g, '/');
   }
 
-  userNewPiece = (piece: cg.Piece, pos: Key): void => {
+  userNewPiece = (piece: cg.Piece, pos: Key, captured?: cg.Piece): void => {
     if (crazyValid(this.chessground, this.data, this.node.drops, this.node.dropsByRole, piece, pos)) {
       const roleChar = roleToChar(piece.role);
       this.justPlayed = roleChar.toUpperCase() + '@' + pos;
       this.justDropped = piece.role;
       this.justCaptured = undefined;
-      this.sound.move();
+      this.sound[this.controlConfig.dropSoundOverride?.(piece, pos as cg.Key, captured) ?? (captured ? 'capture' : 'move')]?.();
       const drop: AnaDrop = {
         role: piece.role,
         pos,

@@ -244,8 +244,20 @@ export const configure = (ctrl: AnalyseCtrl): void => {
 
   ctrl.controlConfig.showDropDestsInDropMode = () => false;
 
+  ctrl.controlConfig.dropSoundOverride = (_piece: cg.Piece, _pos: cg.Key, captured?: cg.Piece) =>
+    captured ? 'capture' : undefined;
+
   ctrl.controlConfig.nodeSoundOverride = (node: Tree.Node) => {
-    if (diceRollUci.test(node.uci ?? '')) return 'diceRoll';
+    if (diceRollUci.test(node.uci ?? '')) {
+      const fenParts = node.fen.split(' ');
+      const noPlay =
+        fenParts.length >= 3 &&
+        fenParts[1] !== '-' &&
+        (!node.dests || node.dests === '') &&
+        (!node.dropsByRole || node.dropsByRole === '') &&
+        (!node.lifts || node.lifts === '');
+      return noPlay ? false : 'diceRoll';
+    }
     if (node.uci === 'endturn') return false;
     return undefined;
   };

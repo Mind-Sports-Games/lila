@@ -1,5 +1,6 @@
 import type AnalyseCtrl from '../ctrl';
-import type { Config as ChessgroundConfig } from 'chessground/config';
+import type { Config as CgConfig } from 'chessground/config';
+import type { Piece as CgPiece, Key as CgKey } from 'chessground/types';
 import { path as treePath } from 'tree';
 
 export interface ControlConfig {
@@ -24,7 +25,7 @@ export interface ControlConfig {
 
   // Chessground config
   cgFen?(fen: string): string;
-  mutateCgOpts?(node: Tree.Node, config: ChessgroundConfig): void;
+  mutateCgOpts?(node: Tree.Node, config: CgConfig): void;
   suppressPremove?(): boolean;
 
   // Chessground hooks (registered per-variant)
@@ -45,6 +46,7 @@ export interface ControlConfig {
 
   // Sound
   nodeSoundOverride?(node: Tree.Node): string | false | undefined;
+  dropSoundOverride?(piece: CgPiece, pos: CgKey, captured?: CgPiece): string | undefined;
 }
 
 export function canGoForward(ctrl: AnalyseCtrl): boolean {

@@ -207,15 +207,17 @@ export default class RoundController {
     this.sendLift(this.data.game.variant.key, dest);
   };
 
-  private onNewPiece = () => {
-    if (!['backgammon', 'hyper', 'nackgammon'].includes(this.data.game.variant.key)) sound.move();
+  private onNewPiece = (_piece: cg.Piece, _key: cg.Key, captured?: cg.Piece) => {
+    if (['backgammon', 'hyper', 'nackgammon'].includes(this.data.game.variant.key)) {
+      if (captured) sound.capture();
+      else sound.move();
+    } else sound.move();
   };
 
   private onUserNewPiece = (role: cg.Role, key: cg.Key, meta: cg.MoveMetadata) => {
     if (!this.replaying() && crazyValid(this.data, role, key)) {
       this.sendNewPiece(role, key, this.data.game.variant.key, !!meta.predrop);
       if (['backgammon', 'hyper', 'nackgammon'].includes(this.data.game.variant.key)) {
-        sound.move();
         cancelDropMode(this.chessground.state);
         this.redraw();
       }
