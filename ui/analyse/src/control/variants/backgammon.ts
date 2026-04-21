@@ -166,9 +166,16 @@ export const configure = (ctrl: AnalyseCtrl): void => {
   ctrl.controlConfig.cgHooks = {
     onSelectDice: (dice: unknown[]) => {
       const typedDice = dice as { value: number; isAvailable: boolean }[];
-      if (typedDice.length > 0 && !typedDice.some(d => d.isAvailable)) {
-        sendEndTurn();
-        return;
+      if (typedDice.length > 0) {
+        const allConsumed = !typedDice.some(d => d.isAvailable);
+        const noMovesAvailable =
+          (!ctrl.node.dests || ctrl.node.dests === '') &&
+          (!ctrl.node.dropsByRole || ctrl.node.dropsByRole === '') &&
+          (!ctrl.node.lifts || ctrl.node.lifts === '');
+        if (allConsumed || noMovesAvailable) {
+          sendEndTurn();
+          return;
+        }
       }
       areDiceDescending = !areDiceDescending;
       ctrl.reset();
