@@ -116,7 +116,7 @@ object show {
           div(cls := "library__puzzle")(
             div(cls := "color-choice title")(
               div(dataIcon := "-"),
-              h2("Daily Puzzle"),
+              h2(trans.dailyPuzzle()),
               div(" ")
             ),
             views.html.puzzle.embed.dailyLink(p)(ctx.lang)
@@ -126,7 +126,7 @@ object show {
           div(cls := List("library__tv" -> true, "library__tv--centered" -> dailyPuzzle.isEmpty))(
             div(cls := "color-choice title")(
               div(dataIcon := "1"),
-              h2("Featured Game"),
+              h2(trans.featuredGame()),
               div(" ")
             ),
             views.html.game.mini(Pov naturalOrientation g, tv = false)
@@ -137,7 +137,7 @@ object show {
         div(cls := "library-stats-table")(
           div(cls := "library-stats-title color-choice")(
             div(dataIcon := "^"),
-            h2("Game Info"),
+            h2(trans.gameInfo()),
             div(" ") //place holder to keep title centered
           ),
           bits.statsRow("Date Released", bits.releaseDateDisplay(monthlyGameData, variant)),
@@ -173,7 +173,7 @@ object show {
     div(cls := "leaderboards")(
       div(cls := "color-choice title")(
         div(dataIcon := "U"),
-        h2("Leaderboard"),
+        h2(trans.leaderboard()),
         div(" ") //place holder to keep title centered
         //a(href := routes.User.topNb(200, perfType.key))("More »")
       ),
